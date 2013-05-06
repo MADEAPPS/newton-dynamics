@@ -1,0 +1,9 @@
+//
+// Prefix header for all source files of the 'dScene' target in the 'dScene' project.
+//
+
+//#include <Carbon/Carbon.h>
+
+#ifdef __OBJC__
+#import <Foundation/Foundation.h>
+#endif
