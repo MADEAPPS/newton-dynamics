@@ -1,0 +1,851 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		FFF89ADA132D17C100A262F2 /* dg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89A96132D17C100A262F2 /* dg.cpp */; };
+		FFF89ADB132D17C100A262F2 /* dg.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89A97132D17C100A262F2 /* dg.h */; };
+		FFF89ADC132D17C100A262F2 /* dgAABBPolygonSoup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89A98132D17C100A262F2 /* dgAABBPolygonSoup.cpp */; };
+		FFF89ADD132D17C100A262F2 /* dgAABBPolygonSoup.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89A99132D17C100A262F2 /* dgAABBPolygonSoup.h */; };
+		FFF89ADE132D17C100A262F2 /* dgArray.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89A9A132D17C100A262F2 /* dgArray.h */; };
+		FFF89ADF132D17C100A262F2 /* dgConvexHull3d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89A9B132D17C100A262F2 /* dgConvexHull3d.cpp */; };
+		FFF89AE0132D17C100A262F2 /* dgConvexHull3d.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89A9C132D17C100A262F2 /* dgConvexHull3d.h */; };
+		FFF89AE1132D17C100A262F2 /* dgConvexHull4d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89A9D132D17C100A262F2 /* dgConvexHull4d.cpp */; };
+		FFF89AE2132D17C100A262F2 /* dgConvexHull4d.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89A9E132D17C100A262F2 /* dgConvexHull4d.h */; };
+		FFF89AE3132D17C100A262F2 /* dgCRC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89A9F132D17C100A262F2 /* dgCRC.cpp */; };
+		FFF89AE4132D17C100A262F2 /* dgCRC.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89AA0132D17C100A262F2 /* dgCRC.h */; };
+		FFF89AE5132D17C100A262F2 /* dgDebug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89AA1132D17C100A262F2 /* dgDebug.cpp */; };
+		FFF89AE6132D17C100A262F2 /* dgDebug.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89AA2132D17C100A262F2 /* dgDebug.h */; };
+		FFF89AE7132D17C100A262F2 /* dgDelaunayTetrahedralization.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89AA3132D17C100A262F2 /* dgDelaunayTetrahedralization.cpp */; };
+		FFF89AE8132D17C100A262F2 /* dgDelaunayTetrahedralization.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89AA4132D17C100A262F2 /* dgDelaunayTetrahedralization.h */; };
+		FFF89AE9132D17C100A262F2 /* dgGeneralMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89AA5132D17C100A262F2 /* dgGeneralMatrix.cpp */; };
+		FFF89AEA132D17C100A262F2 /* dgGeneralMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89AA6132D17C100A262F2 /* dgGeneralMatrix.h */; };
+		FFF89AEB132D17C100A262F2 /* dgGeneralVector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89AA7132D17C100A262F2 /* dgGeneralVector.cpp */; };
+		FFF89AEC132D17C100A262F2 /* dgGeneralVector.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89AA8132D17C100A262F2 /* dgGeneralVector.h */; };
+		FFF89AED132D17C100A262F2 /* dgGoogol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89AA9132D17C100A262F2 /* dgGoogol.cpp */; };
+		FFF89AEE132D17C100A262F2 /* dgGoogol.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89AAA132D17C100A262F2 /* dgGoogol.h */; };
+		FFF89AEF132D17C100A262F2 /* dgGraph.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89AAB132D17C100A262F2 /* dgGraph.h */; };
+		FFF89AF0132D17C100A262F2 /* dgHeap.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89AAC132D17C100A262F2 /* dgHeap.h */; };
+		FFF89AF1132D17C100A262F2 /* dgIntersections.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89AAD132D17C100A262F2 /* dgIntersections.cpp */; };
+		FFF89AF2132D17C100A262F2 /* dgIntersections.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89AAE132D17C100A262F2 /* dgIntersections.h */; };
+		FFF89AF3132D17C100A262F2 /* dgList.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89AAF132D17C100A262F2 /* dgList.h */; };
+		FFF89AF4132D17C100A262F2 /* dgMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89AB0132D17C100A262F2 /* dgMatrix.cpp */; };
+		FFF89AF5132D17C100A262F2 /* dgMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89AB1132D17C100A262F2 /* dgMatrix.h */; };
+		FFF89AF6132D17C100A262F2 /* dgMemory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89AB2132D17C100A262F2 /* dgMemory.cpp */; };
+		FFF89AF7132D17C100A262F2 /* dgMemory.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89AB3132D17C100A262F2 /* dgMemory.h */; };
+		FFF89AF8132D17C100A262F2 /* dgNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89AB4132D17C100A262F2 /* dgNode.cpp */; };
+		FFF89AF9132D17C100A262F2 /* dgNode.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89AB5132D17C100A262F2 /* dgNode.h */; };
+		FFF89AFA132D17C100A262F2 /* dgPathFinder.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89AB6132D17C100A262F2 /* dgPathFinder.h */; };
+		FFF89AFB132D17C100A262F2 /* dgPlane.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89AB7132D17C100A262F2 /* dgPlane.h */; };
+		FFF89AFC132D17C100A262F2 /* dgPolygonSoupBuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89AB8132D17C100A262F2 /* dgPolygonSoupBuilder.cpp */; };
+		FFF89AFD132D17C100A262F2 /* dgPolygonSoupBuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89AB9132D17C100A262F2 /* dgPolygonSoupBuilder.h */; };
+		FFF89AFE132D17C100A262F2 /* dgPolygonSoupDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89ABA132D17C100A262F2 /* dgPolygonSoupDatabase.h */; };
+		FFF89AFF132D17C100A262F2 /* dgPolyhedra.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89ABB132D17C100A262F2 /* dgPolyhedra.cpp */; };
+		FFF89B00132D17C100A262F2 /* dgPolyhedra.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89ABC132D17C100A262F2 /* dgPolyhedra.h */; };
+		FFF89B01132D17C100A262F2 /* dgPolyhedraMassProperties.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89ABD132D17C100A262F2 /* dgPolyhedraMassProperties.cpp */; };
+		FFF89B02132D17C100A262F2 /* dgPolyhedraMassProperties.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89ABE132D17C100A262F2 /* dgPolyhedraMassProperties.h */; };
+		FFF89B03132D17C100A262F2 /* dgQuaternion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89ABF132D17C100A262F2 /* dgQuaternion.cpp */; };
+		FFF89B04132D17C100A262F2 /* dgQuaternion.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89AC0132D17C100A262F2 /* dgQuaternion.h */; };
+		FFF89B05132D17C100A262F2 /* dgRandom.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89AC1132D17C100A262F2 /* dgRandom.cpp */; };
+		FFF89B06132D17C100A262F2 /* dgRandom.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89AC2132D17C100A262F2 /* dgRandom.h */; };
+		FFF89B07132D17C100A262F2 /* dgRef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89AC3132D17C100A262F2 /* dgRef.cpp */; };
+		FFF89B08132D17C100A262F2 /* dgRef.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89AC4132D17C100A262F2 /* dgRef.h */; };
+		FFF89B09132D17C100A262F2 /* dgRefCounter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89AC5132D17C100A262F2 /* dgRefCounter.cpp */; };
+		FFF89B0A132D17C100A262F2 /* dgRefCounter.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89AC6132D17C100A262F2 /* dgRefCounter.h */; };
+		FFF89B0B132D17C100A262F2 /* dgRtti.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89AC7132D17C100A262F2 /* dgRtti.h */; };
+		FFF89B0C132D17C100A262F2 /* dgSimD_Instrutions.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89AC8132D17C100A262F2 /* dgSimD_Instrutions.h */; };
+		FFF89B0D132D17C100A262F2 /* dgSmallDeterminant.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89AC9132D17C100A262F2 /* dgSmallDeterminant.cpp */; };
+		FFF89B0E132D17C100A262F2 /* dgSmallDeterminant.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89ACA132D17C100A262F2 /* dgSmallDeterminant.h */; };
+		FFF89B0F132D17C100A262F2 /* dgSPDMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89ACB132D17C100A262F2 /* dgSPDMatrix.cpp */; };
+		FFF89B10132D17C100A262F2 /* dgSPDMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89ACC132D17C100A262F2 /* dgSPDMatrix.h */; };
+		FFF89B11132D17C100A262F2 /* dgSphere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89ACD132D17C100A262F2 /* dgSphere.cpp */; };
+		FFF89B12132D17C100A262F2 /* dgSphere.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89ACE132D17C100A262F2 /* dgSphere.h */; };
+		FFF89B13132D17C100A262F2 /* dgStack.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89ACF132D17C100A262F2 /* dgStack.h */; };
+		FFF89B14132D17C100A262F2 /* dgStdafx.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89AD0132D17C100A262F2 /* dgStdafx.h */; };
+		FFF89B15132D17C100A262F2 /* dgThreadHive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89AD1132D17C100A262F2 /* dgThreadHive.cpp */; };
+		FFF89B16132D17C100A262F2 /* dgThreadHive.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89AD2132D17C100A262F2 /* dgThreadHive.h */; };
+		FFF89B17132D17C100A262F2 /* dgTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89AD3132D17C100A262F2 /* dgTree.cpp */; };
+		FFF89B18132D17C100A262F2 /* dgTree.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89AD4132D17C100A262F2 /* dgTree.h */; };
+		FFF89B19132D17C100A262F2 /* dgTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89AD5132D17C100A262F2 /* dgTypes.cpp */; };
+		FFF89B1A132D17C100A262F2 /* dgTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89AD6132D17C100A262F2 /* dgTypes.h */; };
+		FFF89B1B132D17C100A262F2 /* dgVector.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89AD7132D17C100A262F2 /* dgVector.h */; };
+		FFF89B1C132D17C100A262F2 /* dgWorkerThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89AD8132D17C100A262F2 /* dgWorkerThread.cpp */; };
+		FFF89B1D132D17C100A262F2 /* dgWorkerThread.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89AD9132D17C100A262F2 /* dgWorkerThread.h */; };
+		FFF89B23132D17D800A262F2 /* Newton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B1E132D17D800A262F2 /* Newton.cpp */; };
+		FFF89B24132D17D800A262F2 /* Newton.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B1F132D17D800A262F2 /* Newton.h */; };
+		FFF89B25132D17D800A262F2 /* NewtonClass.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B20132D17D800A262F2 /* NewtonClass.cpp */; };
+		FFF89B26132D17D800A262F2 /* NewtonClass.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B21132D17D800A262F2 /* NewtonClass.h */; };
+		FFF89B27132D17D800A262F2 /* NewtonStdAfx.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B22132D17D800A262F2 /* NewtonStdAfx.h */; };
+		FFF89B7E132D17F600A262F2 /* dgBallConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B28132D17F600A262F2 /* dgBallConstraint.cpp */; };
+		FFF89B7F132D17F600A262F2 /* dgBallConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B29132D17F600A262F2 /* dgBallConstraint.h */; };
+		FFF89B80132D17F600A262F2 /* dgBilateralConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B2A132D17F600A262F2 /* dgBilateralConstraint.cpp */; };
+		FFF89B81132D17F600A262F2 /* dgBilateralConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B2B132D17F600A262F2 /* dgBilateralConstraint.h */; };
+		FFF89B82132D17F600A262F2 /* dgBody.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B2C132D17F600A262F2 /* dgBody.cpp */; };
+		FFF89B83132D17F600A262F2 /* dgBody.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B2D132D17F600A262F2 /* dgBody.h */; };
+		FFF89B84132D17F600A262F2 /* dgBodyMasterList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B2E132D17F600A262F2 /* dgBodyMasterList.cpp */; };
+		FFF89B85132D17F600A262F2 /* dgBodyMasterList.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B2F132D17F600A262F2 /* dgBodyMasterList.h */; };
+		FFF89B86132D17F600A262F2 /* dgBroadPhaseCollision.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B30132D17F600A262F2 /* dgBroadPhaseCollision.cpp */; };
+		FFF89B87132D17F600A262F2 /* dgBroadPhaseCollision.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B31132D17F600A262F2 /* dgBroadPhaseCollision.h */; };
+		FFF89B88132D17F600A262F2 /* dgCollision.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B32132D17F600A262F2 /* dgCollision.cpp */; };
+		FFF89B89132D17F600A262F2 /* dgCollision.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B33132D17F600A262F2 /* dgCollision.h */; };
+		FFF89B8A132D17F600A262F2 /* dgCollisionBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B34132D17F600A262F2 /* dgCollisionBox.cpp */; };
+		FFF89B8B132D17F600A262F2 /* dgCollisionBox.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B35132D17F600A262F2 /* dgCollisionBox.h */; };
+		FFF89B8C132D17F600A262F2 /* dgCollisionBVH.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B36132D17F600A262F2 /* dgCollisionBVH.cpp */; };
+		FFF89B8D132D17F600A262F2 /* dgCollisionBVH.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B37132D17F600A262F2 /* dgCollisionBVH.h */; };
+		FFF89B8E132D17F600A262F2 /* dgCollisionCapsule.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B38132D17F600A262F2 /* dgCollisionCapsule.cpp */; };
+		FFF89B8F132D17F600A262F2 /* dgCollisionCapsule.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B39132D17F600A262F2 /* dgCollisionCapsule.h */; };
+		FFF89B90132D17F600A262F2 /* dgCollisionChamferCylinder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B3A132D17F600A262F2 /* dgCollisionChamferCylinder.cpp */; };
+		FFF89B91132D17F600A262F2 /* dgCollisionChamferCylinder.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B3B132D17F600A262F2 /* dgCollisionChamferCylinder.h */; };
+		FFF89B92132D17F600A262F2 /* dgCollisionCompound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B3C132D17F600A262F2 /* dgCollisionCompound.cpp */; };
+		FFF89B93132D17F600A262F2 /* dgCollisionCompound.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B3D132D17F600A262F2 /* dgCollisionCompound.h */; };
+		FFF89B94132D17F600A262F2 /* dgCollisionCompoundBreakable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B3E132D17F600A262F2 /* dgCollisionCompoundBreakable.cpp */; };
+		FFF89B95132D17F600A262F2 /* dgCollisionCompoundBreakable.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B3F132D17F600A262F2 /* dgCollisionCompoundBreakable.h */; };
+		FFF89B96132D17F600A262F2 /* dgCollisionCone.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B40132D17F600A262F2 /* dgCollisionCone.cpp */; };
+		FFF89B97132D17F600A262F2 /* dgCollisionCone.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B41132D17F600A262F2 /* dgCollisionCone.h */; };
+		FFF89B98132D17F600A262F2 /* dgCollisionConvex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B42132D17F600A262F2 /* dgCollisionConvex.cpp */; };
+		FFF89B99132D17F600A262F2 /* dgCollisionConvex.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B43132D17F600A262F2 /* dgCollisionConvex.h */; };
+		FFF89B9A132D17F600A262F2 /* dgCollisionConvexHull.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B44132D17F600A262F2 /* dgCollisionConvexHull.cpp */; };
+		FFF89B9B132D17F600A262F2 /* dgCollisionConvexHull.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B45132D17F600A262F2 /* dgCollisionConvexHull.h */; };
+		FFF89B9C132D17F600A262F2 /* dgCollisionConvexModifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B46132D17F600A262F2 /* dgCollisionConvexModifier.cpp */; };
+		FFF89B9D132D17F600A262F2 /* dgCollisionConvexModifier.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B47132D17F600A262F2 /* dgCollisionConvexModifier.h */; };
+		FFF89B9E132D17F600A262F2 /* dgCollisionCylinder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B48132D17F600A262F2 /* dgCollisionCylinder.cpp */; };
+		FFF89B9F132D17F600A262F2 /* dgCollisionCylinder.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B49132D17F600A262F2 /* dgCollisionCylinder.h */; };
+		FFF89BA0132D17F600A262F2 /* dgCollisionEllipse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B4A132D17F600A262F2 /* dgCollisionEllipse.cpp */; };
+		FFF89BA1132D17F600A262F2 /* dgCollisionEllipse.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B4B132D17F600A262F2 /* dgCollisionEllipse.h */; };
+		FFF89BA2132D17F600A262F2 /* dgCollisionHeightField.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B4C132D17F600A262F2 /* dgCollisionHeightField.cpp */; };
+		FFF89BA3132D17F600A262F2 /* dgCollisionHeightField.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B4D132D17F600A262F2 /* dgCollisionHeightField.h */; };
+		FFF89BA4132D17F600A262F2 /* dgCollisionMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B4E132D17F600A262F2 /* dgCollisionMesh.cpp */; };
+		FFF89BA5132D17F600A262F2 /* dgCollisionMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B4F132D17F600A262F2 /* dgCollisionMesh.h */; };
+		FFF89BA6132D17F600A262F2 /* dgCollisionNull.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B50132D17F600A262F2 /* dgCollisionNull.cpp */; };
+		FFF89BA7132D17F600A262F2 /* dgCollisionNull.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B51132D17F600A262F2 /* dgCollisionNull.h */; };
+		FFF89BA8132D17F600A262F2 /* dgCollisionScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B52132D17F600A262F2 /* dgCollisionScene.cpp */; };
+		FFF89BA9132D17F600A262F2 /* dgCollisionScene.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B53132D17F600A262F2 /* dgCollisionScene.h */; };
+		FFF89BAA132D17F600A262F2 /* dgCollisionSphere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B54132D17F600A262F2 /* dgCollisionSphere.cpp */; };
+		FFF89BAB132D17F600A262F2 /* dgCollisionSphere.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B55132D17F600A262F2 /* dgCollisionSphere.h */; };
+		FFF89BAC132D17F600A262F2 /* dgCollisionUserMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B56132D17F600A262F2 /* dgCollisionUserMesh.cpp */; };
+		FFF89BAD132D17F600A262F2 /* dgCollisionUserMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B57132D17F600A262F2 /* dgCollisionUserMesh.h */; };
+		FFF89BAE132D17F600A262F2 /* dgConnectorConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B58132D17F600A262F2 /* dgConnectorConstraint.cpp */; };
+		FFF89BAF132D17F600A262F2 /* dgConnectorConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B59132D17F600A262F2 /* dgConnectorConstraint.h */; };
+		FFF89BB0132D17F600A262F2 /* dgConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B5A132D17F600A262F2 /* dgConstraint.cpp */; };
+		FFF89BB1132D17F600A262F2 /* dgConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B5B132D17F600A262F2 /* dgConstraint.h */; };
+		FFF89BB2132D17F600A262F2 /* dgContact.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B5C132D17F600A262F2 /* dgContact.cpp */; };
+		FFF89BB3132D17F600A262F2 /* dgContact.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B5D132D17F600A262F2 /* dgContact.h */; };
+		FFF89BB4132D17F600A262F2 /* dgCorkscrewConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B5E132D17F600A262F2 /* dgCorkscrewConstraint.cpp */; };
+		FFF89BB5132D17F600A262F2 /* dgCorkscrewConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B5F132D17F600A262F2 /* dgCorkscrewConstraint.h */; };
+		FFF89BB6132D17F600A262F2 /* dgHingeConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B60132D17F600A262F2 /* dgHingeConstraint.cpp */; };
+		FFF89BB7132D17F600A262F2 /* dgHingeConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B61132D17F600A262F2 /* dgHingeConstraint.h */; };
+		FFF89BB8132D17F600A262F2 /* dgMeshEffect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B62132D17F600A262F2 /* dgMeshEffect.cpp */; };
+		FFF89BB9132D17F600A262F2 /* dgMeshEffect.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B63132D17F600A262F2 /* dgMeshEffect.h */; };
+		FFF89BBA132D17F600A262F2 /* dgMeshEffect2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B64132D17F600A262F2 /* dgMeshEffect2.cpp */; };
+		FFF89BBB132D17F600A262F2 /* dgMinkowskiConv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B65132D17F600A262F2 /* dgMinkowskiConv.cpp */; };
+		FFF89BBC132D17F600A262F2 /* dgMinkowskiConv.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B66132D17F600A262F2 /* dgMinkowskiConv.h */; };
+		FFF89BBD132D17F600A262F2 /* dgMinkowskiConvSimd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B67132D17F600A262F2 /* dgMinkowskiConvSimd.cpp */; };
+		FFF89BBE132D17F600A262F2 /* dgNarrowPhaseCollision.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B68132D17F600A262F2 /* dgNarrowPhaseCollision.cpp */; };
+		FFF89BBF132D17F600A262F2 /* dgPhysics.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B69132D17F600A262F2 /* dgPhysics.h */; };
+		FFF89BC0132D17F600A262F2 /* dgPhysicsStdafx.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B6A132D17F600A262F2 /* dgPhysicsStdafx.h */; };
+		FFF89BC1132D17F600A262F2 /* dgPointToCurveConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B6B132D17F600A262F2 /* dgPointToCurveConstraint.cpp */; };
+		FFF89BC2132D17F600A262F2 /* dgPointToCurveConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B6C132D17F600A262F2 /* dgPointToCurveConstraint.h */; };
+		FFF89BC3132D17F600A262F2 /* dgSlidingConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B6D132D17F600A262F2 /* dgSlidingConstraint.cpp */; };
+		FFF89BC4132D17F600A262F2 /* dgSlidingConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B6E132D17F600A262F2 /* dgSlidingConstraint.h */; };
+		FFF89BC5132D17F600A262F2 /* dgUniversalConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B6F132D17F600A262F2 /* dgUniversalConstraint.cpp */; };
+		FFF89BC6132D17F600A262F2 /* dgUniversalConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B70132D17F600A262F2 /* dgUniversalConstraint.h */; };
+		FFF89BC7132D17F600A262F2 /* dgUpVectorConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B71132D17F600A262F2 /* dgUpVectorConstraint.cpp */; };
+		FFF89BC8132D17F600A262F2 /* dgUpVectorConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B72132D17F600A262F2 /* dgUpVectorConstraint.h */; };
+		FFF89BC9132D17F600A262F2 /* dgUserConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B73132D17F600A262F2 /* dgUserConstraint.cpp */; };
+		FFF89BCA132D17F600A262F2 /* dgUserConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B74132D17F600A262F2 /* dgUserConstraint.h */; };
+		FFF89BCB132D17F600A262F2 /* dgVehicleConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B75132D17F600A262F2 /* dgVehicleConstraint.cpp */; };
+		FFF89BCC132D17F600A262F2 /* dgVehicleConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B76132D17F600A262F2 /* dgVehicleConstraint.h */; };
+		FFF89BCD132D17F600A262F2 /* dgWorld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B77132D17F600A262F2 /* dgWorld.cpp */; };
+		FFF89BCE132D17F600A262F2 /* dgWorld.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B78132D17F600A262F2 /* dgWorld.h */; };
+		FFF89BCF132D17F600A262F2 /* dgWorldDynamicsParallelSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B79132D17F600A262F2 /* dgWorldDynamicsParallelSolver.cpp */; };
+		FFF89BD0132D17F600A262F2 /* dgWorldDynamicsSimdSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B7A132D17F600A262F2 /* dgWorldDynamicsSimdSolver.cpp */; };
+		FFF89BD1132D17F600A262F2 /* dgWorldDynamicsSimpleSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B7B132D17F600A262F2 /* dgWorldDynamicsSimpleSolver.cpp */; };
+		FFF89BD2132D17F600A262F2 /* dgWorldDynamicUpdate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B7C132D17F600A262F2 /* dgWorldDynamicUpdate.cpp */; };
+		FFF89BD3132D17F600A262F2 /* dgWorldDynamicUpdate.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B7D132D17F600A262F2 /* dgWorldDynamicUpdate.h */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		32BAE0B70371A74B00C91783 /* newton_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = newton_Prefix.pch; sourceTree = "<group>"; };
+		D2AAC06F0554671400DB518D /* libnewton.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libnewton.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		FFF89A96132D17C100A262F2 /* dg.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dg.cpp; path = ../../../source/core/dg.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89A97132D17C100A262F2 /* dg.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dg.h; path = ../../../source/core/dg.h; sourceTree = SOURCE_ROOT; };
+		FFF89A98132D17C100A262F2 /* dgAABBPolygonSoup.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgAABBPolygonSoup.cpp; path = ../../../source/core/dgAABBPolygonSoup.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89A99132D17C100A262F2 /* dgAABBPolygonSoup.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgAABBPolygonSoup.h; path = ../../../source/core/dgAABBPolygonSoup.h; sourceTree = SOURCE_ROOT; };
+		FFF89A9A132D17C100A262F2 /* dgArray.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgArray.h; path = ../../../source/core/dgArray.h; sourceTree = SOURCE_ROOT; };
+		FFF89A9B132D17C100A262F2 /* dgConvexHull3d.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgConvexHull3d.cpp; path = ../../../source/core/dgConvexHull3d.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89A9C132D17C100A262F2 /* dgConvexHull3d.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgConvexHull3d.h; path = ../../../source/core/dgConvexHull3d.h; sourceTree = SOURCE_ROOT; };
+		FFF89A9D132D17C100A262F2 /* dgConvexHull4d.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgConvexHull4d.cpp; path = ../../../source/core/dgConvexHull4d.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89A9E132D17C100A262F2 /* dgConvexHull4d.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgConvexHull4d.h; path = ../../../source/core/dgConvexHull4d.h; sourceTree = SOURCE_ROOT; };
+		FFF89A9F132D17C100A262F2 /* dgCRC.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgCRC.cpp; path = ../../../source/core/dgCRC.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89AA0132D17C100A262F2 /* dgCRC.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgCRC.h; path = ../../../source/core/dgCRC.h; sourceTree = SOURCE_ROOT; };
+		FFF89AA1132D17C100A262F2 /* dgDebug.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgDebug.cpp; path = ../../../source/core/dgDebug.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89AA2132D17C100A262F2 /* dgDebug.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgDebug.h; path = ../../../source/core/dgDebug.h; sourceTree = SOURCE_ROOT; };
+		FFF89AA3132D17C100A262F2 /* dgDelaunayTetrahedralization.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgDelaunayTetrahedralization.cpp; path = ../../../source/core/dgDelaunayTetrahedralization.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89AA4132D17C100A262F2 /* dgDelaunayTetrahedralization.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgDelaunayTetrahedralization.h; path = ../../../source/core/dgDelaunayTetrahedralization.h; sourceTree = SOURCE_ROOT; };
+		FFF89AA5132D17C100A262F2 /* dgGeneralMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgGeneralMatrix.cpp; path = ../../../source/core/dgGeneralMatrix.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89AA6132D17C100A262F2 /* dgGeneralMatrix.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgGeneralMatrix.h; path = ../../../source/core/dgGeneralMatrix.h; sourceTree = SOURCE_ROOT; };
+		FFF89AA7132D17C100A262F2 /* dgGeneralVector.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgGeneralVector.cpp; path = ../../../source/core/dgGeneralVector.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89AA8132D17C100A262F2 /* dgGeneralVector.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgGeneralVector.h; path = ../../../source/core/dgGeneralVector.h; sourceTree = SOURCE_ROOT; };
+		FFF89AA9132D17C100A262F2 /* dgGoogol.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgGoogol.cpp; path = ../../../source/core/dgGoogol.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89AAA132D17C100A262F2 /* dgGoogol.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgGoogol.h; path = ../../../source/core/dgGoogol.h; sourceTree = SOURCE_ROOT; };
+		FFF89AAB132D17C100A262F2 /* dgGraph.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgGraph.h; path = ../../../source/core/dgGraph.h; sourceTree = SOURCE_ROOT; };
+		FFF89AAC132D17C100A262F2 /* dgHeap.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgHeap.h; path = ../../../source/core/dgHeap.h; sourceTree = SOURCE_ROOT; };
+		FFF89AAD132D17C100A262F2 /* dgIntersections.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgIntersections.cpp; path = ../../../source/core/dgIntersections.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89AAE132D17C100A262F2 /* dgIntersections.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgIntersections.h; path = ../../../source/core/dgIntersections.h; sourceTree = SOURCE_ROOT; };
+		FFF89AAF132D17C100A262F2 /* dgList.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgList.h; path = ../../../source/core/dgList.h; sourceTree = SOURCE_ROOT; };
+		FFF89AB0132D17C100A262F2 /* dgMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgMatrix.cpp; path = ../../../source/core/dgMatrix.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89AB1132D17C100A262F2 /* dgMatrix.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgMatrix.h; path = ../../../source/core/dgMatrix.h; sourceTree = SOURCE_ROOT; };
+		FFF89AB2132D17C100A262F2 /* dgMemory.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgMemory.cpp; path = ../../../source/core/dgMemory.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89AB3132D17C100A262F2 /* dgMemory.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgMemory.h; path = ../../../source/core/dgMemory.h; sourceTree = SOURCE_ROOT; };
+		FFF89AB4132D17C100A262F2 /* dgNode.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgNode.cpp; path = ../../../source/core/dgNode.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89AB5132D17C100A262F2 /* dgNode.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgNode.h; path = ../../../source/core/dgNode.h; sourceTree = SOURCE_ROOT; };
+		FFF89AB6132D17C100A262F2 /* dgPathFinder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgPathFinder.h; path = ../../../source/core/dgPathFinder.h; sourceTree = SOURCE_ROOT; };
+		FFF89AB7132D17C100A262F2 /* dgPlane.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgPlane.h; path = ../../../source/core/dgPlane.h; sourceTree = SOURCE_ROOT; };
+		FFF89AB8132D17C100A262F2 /* dgPolygonSoupBuilder.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgPolygonSoupBuilder.cpp; path = ../../../source/core/dgPolygonSoupBuilder.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89AB9132D17C100A262F2 /* dgPolygonSoupBuilder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgPolygonSoupBuilder.h; path = ../../../source/core/dgPolygonSoupBuilder.h; sourceTree = SOURCE_ROOT; };
+		FFF89ABA132D17C100A262F2 /* dgPolygonSoupDatabase.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgPolygonSoupDatabase.h; path = ../../../source/core/dgPolygonSoupDatabase.h; sourceTree = SOURCE_ROOT; };
+		FFF89ABB132D17C100A262F2 /* dgPolyhedra.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgPolyhedra.cpp; path = ../../../source/core/dgPolyhedra.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89ABC132D17C100A262F2 /* dgPolyhedra.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgPolyhedra.h; path = ../../../source/core/dgPolyhedra.h; sourceTree = SOURCE_ROOT; };
+		FFF89ABD132D17C100A262F2 /* dgPolyhedraMassProperties.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgPolyhedraMassProperties.cpp; path = ../../../source/core/dgPolyhedraMassProperties.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89ABE132D17C100A262F2 /* dgPolyhedraMassProperties.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgPolyhedraMassProperties.h; path = ../../../source/core/dgPolyhedraMassProperties.h; sourceTree = SOURCE_ROOT; };
+		FFF89ABF132D17C100A262F2 /* dgQuaternion.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgQuaternion.cpp; path = ../../../source/core/dgQuaternion.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89AC0132D17C100A262F2 /* dgQuaternion.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgQuaternion.h; path = ../../../source/core/dgQuaternion.h; sourceTree = SOURCE_ROOT; };
+		FFF89AC1132D17C100A262F2 /* dgRandom.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgRandom.cpp; path = ../../../source/core/dgRandom.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89AC2132D17C100A262F2 /* dgRandom.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgRandom.h; path = ../../../source/core/dgRandom.h; sourceTree = SOURCE_ROOT; };
+		FFF89AC3132D17C100A262F2 /* dgRef.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgRef.cpp; path = ../../../source/core/dgRef.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89AC4132D17C100A262F2 /* dgRef.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgRef.h; path = ../../../source/core/dgRef.h; sourceTree = SOURCE_ROOT; };
+		FFF89AC5132D17C100A262F2 /* dgRefCounter.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgRefCounter.cpp; path = ../../../source/core/dgRefCounter.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89AC6132D17C100A262F2 /* dgRefCounter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgRefCounter.h; path = ../../../source/core/dgRefCounter.h; sourceTree = SOURCE_ROOT; };
+		FFF89AC7132D17C100A262F2 /* dgRtti.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgRtti.h; path = ../../../source/core/dgRtti.h; sourceTree = SOURCE_ROOT; };
+		FFF89AC8132D17C100A262F2 /* dgSimD_Instrutions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgSimD_Instrutions.h; path = ../../../source/core/dgSimD_Instrutions.h; sourceTree = SOURCE_ROOT; };
+		FFF89AC9132D17C100A262F2 /* dgSmallDeterminant.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgSmallDeterminant.cpp; path = ../../../source/core/dgSmallDeterminant.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89ACA132D17C100A262F2 /* dgSmallDeterminant.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgSmallDeterminant.h; path = ../../../source/core/dgSmallDeterminant.h; sourceTree = SOURCE_ROOT; };
+		FFF89ACB132D17C100A262F2 /* dgSPDMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgSPDMatrix.cpp; path = ../../../source/core/dgSPDMatrix.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89ACC132D17C100A262F2 /* dgSPDMatrix.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgSPDMatrix.h; path = ../../../source/core/dgSPDMatrix.h; sourceTree = SOURCE_ROOT; };
+		FFF89ACD132D17C100A262F2 /* dgSphere.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgSphere.cpp; path = ../../../source/core/dgSphere.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89ACE132D17C100A262F2 /* dgSphere.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgSphere.h; path = ../../../source/core/dgSphere.h; sourceTree = SOURCE_ROOT; };
+		FFF89ACF132D17C100A262F2 /* dgStack.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgStack.h; path = ../../../source/core/dgStack.h; sourceTree = SOURCE_ROOT; };
+		FFF89AD0132D17C100A262F2 /* dgStdafx.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgStdafx.h; path = ../../../source/core/dgStdafx.h; sourceTree = SOURCE_ROOT; };
+		FFF89AD1132D17C100A262F2 /* dgThreadHive.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgThreadHive.cpp; path = ../../../source/core/dgThreadHive.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89AD2132D17C100A262F2 /* dgThreadHive.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgThreadHive.h; path = ../../../source/core/dgThreadHive.h; sourceTree = SOURCE_ROOT; };
+		FFF89AD3132D17C100A262F2 /* dgTree.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgTree.cpp; path = ../../../source/core/dgTree.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89AD4132D17C100A262F2 /* dgTree.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgTree.h; path = ../../../source/core/dgTree.h; sourceTree = SOURCE_ROOT; };
+		FFF89AD5132D17C100A262F2 /* dgTypes.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgTypes.cpp; path = ../../../source/core/dgTypes.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89AD6132D17C100A262F2 /* dgTypes.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgTypes.h; path = ../../../source/core/dgTypes.h; sourceTree = SOURCE_ROOT; };
+		FFF89AD7132D17C100A262F2 /* dgVector.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgVector.h; path = ../../../source/core/dgVector.h; sourceTree = SOURCE_ROOT; };
+		FFF89AD8132D17C100A262F2 /* dgWorkerThread.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgWorkerThread.cpp; path = ../../../source/core/dgWorkerThread.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89AD9132D17C100A262F2 /* dgWorkerThread.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgWorkerThread.h; path = ../../../source/core/dgWorkerThread.h; sourceTree = SOURCE_ROOT; };
+		FFF89B1E132D17D800A262F2 /* Newton.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Newton.cpp; path = ../../../source/newton/Newton.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B1F132D17D800A262F2 /* Newton.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Newton.h; path = ../../../source/newton/Newton.h; sourceTree = SOURCE_ROOT; };
+		FFF89B20132D17D800A262F2 /* NewtonClass.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = NewtonClass.cpp; path = ../../../source/newton/NewtonClass.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B21132D17D800A262F2 /* NewtonClass.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NewtonClass.h; path = ../../../source/newton/NewtonClass.h; sourceTree = SOURCE_ROOT; };
+		FFF89B22132D17D800A262F2 /* NewtonStdAfx.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NewtonStdAfx.h; path = ../../../source/newton/NewtonStdAfx.h; sourceTree = SOURCE_ROOT; };
+		FFF89B28132D17F600A262F2 /* dgBallConstraint.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgBallConstraint.cpp; path = ../../../source/physics/dgBallConstraint.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B29132D17F600A262F2 /* dgBallConstraint.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgBallConstraint.h; path = ../../../source/physics/dgBallConstraint.h; sourceTree = SOURCE_ROOT; };
+		FFF89B2A132D17F600A262F2 /* dgBilateralConstraint.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgBilateralConstraint.cpp; path = ../../../source/physics/dgBilateralConstraint.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B2B132D17F600A262F2 /* dgBilateralConstraint.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgBilateralConstraint.h; path = ../../../source/physics/dgBilateralConstraint.h; sourceTree = SOURCE_ROOT; };
+		FFF89B2C132D17F600A262F2 /* dgBody.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgBody.cpp; path = ../../../source/physics/dgBody.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B2D132D17F600A262F2 /* dgBody.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgBody.h; path = ../../../source/physics/dgBody.h; sourceTree = SOURCE_ROOT; };
+		FFF89B2E132D17F600A262F2 /* dgBodyMasterList.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgBodyMasterList.cpp; path = ../../../source/physics/dgBodyMasterList.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B2F132D17F600A262F2 /* dgBodyMasterList.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgBodyMasterList.h; path = ../../../source/physics/dgBodyMasterList.h; sourceTree = SOURCE_ROOT; };
+		FFF89B30132D17F600A262F2 /* dgBroadPhaseCollision.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgBroadPhaseCollision.cpp; path = ../../../source/physics/dgBroadPhaseCollision.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B31132D17F600A262F2 /* dgBroadPhaseCollision.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgBroadPhaseCollision.h; path = ../../../source/physics/dgBroadPhaseCollision.h; sourceTree = SOURCE_ROOT; };
+		FFF89B32132D17F600A262F2 /* dgCollision.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgCollision.cpp; path = ../../../source/physics/dgCollision.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B33132D17F600A262F2 /* dgCollision.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgCollision.h; path = ../../../source/physics/dgCollision.h; sourceTree = SOURCE_ROOT; };
+		FFF89B34132D17F600A262F2 /* dgCollisionBox.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgCollisionBox.cpp; path = ../../../source/physics/dgCollisionBox.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B35132D17F600A262F2 /* dgCollisionBox.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgCollisionBox.h; path = ../../../source/physics/dgCollisionBox.h; sourceTree = SOURCE_ROOT; };
+		FFF89B36132D17F600A262F2 /* dgCollisionBVH.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgCollisionBVH.cpp; path = ../../../source/physics/dgCollisionBVH.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B37132D17F600A262F2 /* dgCollisionBVH.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgCollisionBVH.h; path = ../../../source/physics/dgCollisionBVH.h; sourceTree = SOURCE_ROOT; };
+		FFF89B38132D17F600A262F2 /* dgCollisionCapsule.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgCollisionCapsule.cpp; path = ../../../source/physics/dgCollisionCapsule.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B39132D17F600A262F2 /* dgCollisionCapsule.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgCollisionCapsule.h; path = ../../../source/physics/dgCollisionCapsule.h; sourceTree = SOURCE_ROOT; };
+		FFF89B3A132D17F600A262F2 /* dgCollisionChamferCylinder.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgCollisionChamferCylinder.cpp; path = ../../../source/physics/dgCollisionChamferCylinder.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B3B132D17F600A262F2 /* dgCollisionChamferCylinder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgCollisionChamferCylinder.h; path = ../../../source/physics/dgCollisionChamferCylinder.h; sourceTree = SOURCE_ROOT; };
+		FFF89B3C132D17F600A262F2 /* dgCollisionCompound.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgCollisionCompound.cpp; path = ../../../source/physics/dgCollisionCompound.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B3D132D17F600A262F2 /* dgCollisionCompound.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgCollisionCompound.h; path = ../../../source/physics/dgCollisionCompound.h; sourceTree = SOURCE_ROOT; };
+		FFF89B3E132D17F600A262F2 /* dgCollisionCompoundBreakable.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgCollisionCompoundBreakable.cpp; path = ../../../source/physics/dgCollisionCompoundBreakable.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B3F132D17F600A262F2 /* dgCollisionCompoundBreakable.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgCollisionCompoundBreakable.h; path = ../../../source/physics/dgCollisionCompoundBreakable.h; sourceTree = SOURCE_ROOT; };
+		FFF89B40132D17F600A262F2 /* dgCollisionCone.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgCollisionCone.cpp; path = ../../../source/physics/dgCollisionCone.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B41132D17F600A262F2 /* dgCollisionCone.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgCollisionCone.h; path = ../../../source/physics/dgCollisionCone.h; sourceTree = SOURCE_ROOT; };
+		FFF89B42132D17F600A262F2 /* dgCollisionConvex.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgCollisionConvex.cpp; path = ../../../source/physics/dgCollisionConvex.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B43132D17F600A262F2 /* dgCollisionConvex.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgCollisionConvex.h; path = ../../../source/physics/dgCollisionConvex.h; sourceTree = SOURCE_ROOT; };
+		FFF89B44132D17F600A262F2 /* dgCollisionConvexHull.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgCollisionConvexHull.cpp; path = ../../../source/physics/dgCollisionConvexHull.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B45132D17F600A262F2 /* dgCollisionConvexHull.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgCollisionConvexHull.h; path = ../../../source/physics/dgCollisionConvexHull.h; sourceTree = SOURCE_ROOT; };
+		FFF89B46132D17F600A262F2 /* dgCollisionConvexModifier.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgCollisionConvexModifier.cpp; path = ../../../source/physics/dgCollisionConvexModifier.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B47132D17F600A262F2 /* dgCollisionConvexModifier.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgCollisionConvexModifier.h; path = ../../../source/physics/dgCollisionConvexModifier.h; sourceTree = SOURCE_ROOT; };
+		FFF89B48132D17F600A262F2 /* dgCollisionCylinder.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgCollisionCylinder.cpp; path = ../../../source/physics/dgCollisionCylinder.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B49132D17F600A262F2 /* dgCollisionCylinder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgCollisionCylinder.h; path = ../../../source/physics/dgCollisionCylinder.h; sourceTree = SOURCE_ROOT; };
+		FFF89B4A132D17F600A262F2 /* dgCollisionEllipse.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgCollisionEllipse.cpp; path = ../../../source/physics/dgCollisionEllipse.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B4B132D17F600A262F2 /* dgCollisionEllipse.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgCollisionEllipse.h; path = ../../../source/physics/dgCollisionEllipse.h; sourceTree = SOURCE_ROOT; };
+		FFF89B4C132D17F600A262F2 /* dgCollisionHeightField.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgCollisionHeightField.cpp; path = ../../../source/physics/dgCollisionHeightField.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B4D132D17F600A262F2 /* dgCollisionHeightField.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgCollisionHeightField.h; path = ../../../source/physics/dgCollisionHeightField.h; sourceTree = SOURCE_ROOT; };
+		FFF89B4E132D17F600A262F2 /* dgCollisionMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgCollisionMesh.cpp; path = ../../../source/physics/dgCollisionMesh.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B4F132D17F600A262F2 /* dgCollisionMesh.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgCollisionMesh.h; path = ../../../source/physics/dgCollisionMesh.h; sourceTree = SOURCE_ROOT; };
+		FFF89B50132D17F600A262F2 /* dgCollisionNull.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgCollisionNull.cpp; path = ../../../source/physics/dgCollisionNull.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B51132D17F600A262F2 /* dgCollisionNull.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgCollisionNull.h; path = ../../../source/physics/dgCollisionNull.h; sourceTree = SOURCE_ROOT; };
+		FFF89B52132D17F600A262F2 /* dgCollisionScene.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgCollisionScene.cpp; path = ../../../source/physics/dgCollisionScene.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B53132D17F600A262F2 /* dgCollisionScene.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgCollisionScene.h; path = ../../../source/physics/dgCollisionScene.h; sourceTree = SOURCE_ROOT; };
+		FFF89B54132D17F600A262F2 /* dgCollisionSphere.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgCollisionSphere.cpp; path = ../../../source/physics/dgCollisionSphere.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B55132D17F600A262F2 /* dgCollisionSphere.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgCollisionSphere.h; path = ../../../source/physics/dgCollisionSphere.h; sourceTree = SOURCE_ROOT; };
+		FFF89B56132D17F600A262F2 /* dgCollisionUserMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgCollisionUserMesh.cpp; path = ../../../source/physics/dgCollisionUserMesh.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B57132D17F600A262F2 /* dgCollisionUserMesh.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgCollisionUserMesh.h; path = ../../../source/physics/dgCollisionUserMesh.h; sourceTree = SOURCE_ROOT; };
+		FFF89B58132D17F600A262F2 /* dgConnectorConstraint.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgConnectorConstraint.cpp; path = ../../../source/physics/dgConnectorConstraint.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B59132D17F600A262F2 /* dgConnectorConstraint.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgConnectorConstraint.h; path = ../../../source/physics/dgConnectorConstraint.h; sourceTree = SOURCE_ROOT; };
+		FFF89B5A132D17F600A262F2 /* dgConstraint.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgConstraint.cpp; path = ../../../source/physics/dgConstraint.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B5B132D17F600A262F2 /* dgConstraint.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgConstraint.h; path = ../../../source/physics/dgConstraint.h; sourceTree = SOURCE_ROOT; };
+		FFF89B5C132D17F600A262F2 /* dgContact.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgContact.cpp; path = ../../../source/physics/dgContact.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B5D132D17F600A262F2 /* dgContact.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgContact.h; path = ../../../source/physics/dgContact.h; sourceTree = SOURCE_ROOT; };
+		FFF89B5E132D17F600A262F2 /* dgCorkscrewConstraint.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgCorkscrewConstraint.cpp; path = ../../../source/physics/dgCorkscrewConstraint.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B5F132D17F600A262F2 /* dgCorkscrewConstraint.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgCorkscrewConstraint.h; path = ../../../source/physics/dgCorkscrewConstraint.h; sourceTree = SOURCE_ROOT; };
+		FFF89B60132D17F600A262F2 /* dgHingeConstraint.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgHingeConstraint.cpp; path = ../../../source/physics/dgHingeConstraint.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B61132D17F600A262F2 /* dgHingeConstraint.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgHingeConstraint.h; path = ../../../source/physics/dgHingeConstraint.h; sourceTree = SOURCE_ROOT; };
+		FFF89B62132D17F600A262F2 /* dgMeshEffect.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgMeshEffect.cpp; path = ../../../source/physics/dgMeshEffect.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B63132D17F600A262F2 /* dgMeshEffect.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgMeshEffect.h; path = ../../../source/physics/dgMeshEffect.h; sourceTree = SOURCE_ROOT; };
+		FFF89B64132D17F600A262F2 /* dgMeshEffect2.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgMeshEffect2.cpp; path = ../../../source/physics/dgMeshEffect2.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B65132D17F600A262F2 /* dgMinkowskiConv.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgMinkowskiConv.cpp; path = ../../../source/physics/dgMinkowskiConv.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B66132D17F600A262F2 /* dgMinkowskiConv.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgMinkowskiConv.h; path = ../../../source/physics/dgMinkowskiConv.h; sourceTree = SOURCE_ROOT; };
+		FFF89B67132D17F600A262F2 /* dgMinkowskiConvSimd.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgMinkowskiConvSimd.cpp; path = ../../../source/physics/dgMinkowskiConvSimd.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B68132D17F600A262F2 /* dgNarrowPhaseCollision.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgNarrowPhaseCollision.cpp; path = ../../../source/physics/dgNarrowPhaseCollision.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B69132D17F600A262F2 /* dgPhysics.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgPhysics.h; path = ../../../source/physics/dgPhysics.h; sourceTree = SOURCE_ROOT; };
+		FFF89B6A132D17F600A262F2 /* dgPhysicsStdafx.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgPhysicsStdafx.h; path = ../../../source/physics/dgPhysicsStdafx.h; sourceTree = SOURCE_ROOT; };
+		FFF89B6B132D17F600A262F2 /* dgPointToCurveConstraint.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgPointToCurveConstraint.cpp; path = ../../../source/physics/dgPointToCurveConstraint.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B6C132D17F600A262F2 /* dgPointToCurveConstraint.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgPointToCurveConstraint.h; path = ../../../source/physics/dgPointToCurveConstraint.h; sourceTree = SOURCE_ROOT; };
+		FFF89B6D132D17F600A262F2 /* dgSlidingConstraint.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgSlidingConstraint.cpp; path = ../../../source/physics/dgSlidingConstraint.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B6E132D17F600A262F2 /* dgSlidingConstraint.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgSlidingConstraint.h; path = ../../../source/physics/dgSlidingConstraint.h; sourceTree = SOURCE_ROOT; };
+		FFF89B6F132D17F600A262F2 /* dgUniversalConstraint.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgUniversalConstraint.cpp; path = ../../../source/physics/dgUniversalConstraint.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B70132D17F600A262F2 /* dgUniversalConstraint.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgUniversalConstraint.h; path = ../../../source/physics/dgUniversalConstraint.h; sourceTree = SOURCE_ROOT; };
+		FFF89B71132D17F600A262F2 /* dgUpVectorConstraint.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgUpVectorConstraint.cpp; path = ../../../source/physics/dgUpVectorConstraint.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B72132D17F600A262F2 /* dgUpVectorConstraint.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgUpVectorConstraint.h; path = ../../../source/physics/dgUpVectorConstraint.h; sourceTree = SOURCE_ROOT; };
+		FFF89B73132D17F600A262F2 /* dgUserConstraint.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgUserConstraint.cpp; path = ../../../source/physics/dgUserConstraint.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B74132D17F600A262F2 /* dgUserConstraint.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgUserConstraint.h; path = ../../../source/physics/dgUserConstraint.h; sourceTree = SOURCE_ROOT; };
+		FFF89B75132D17F600A262F2 /* dgVehicleConstraint.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgVehicleConstraint.cpp; path = ../../../source/physics/dgVehicleConstraint.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B76132D17F600A262F2 /* dgVehicleConstraint.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgVehicleConstraint.h; path = ../../../source/physics/dgVehicleConstraint.h; sourceTree = SOURCE_ROOT; };
+		FFF89B77132D17F600A262F2 /* dgWorld.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgWorld.cpp; path = ../../../source/physics/dgWorld.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B78132D17F600A262F2 /* dgWorld.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgWorld.h; path = ../../../source/physics/dgWorld.h; sourceTree = SOURCE_ROOT; };
+		FFF89B79132D17F600A262F2 /* dgWorldDynamicsParallelSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgWorldDynamicsParallelSolver.cpp; path = ../../../source/physics/dgWorldDynamicsParallelSolver.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B7A132D17F600A262F2 /* dgWorldDynamicsSimdSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgWorldDynamicsSimdSolver.cpp; path = ../../../source/physics/dgWorldDynamicsSimdSolver.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B7B132D17F600A262F2 /* dgWorldDynamicsSimpleSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgWorldDynamicsSimpleSolver.cpp; path = ../../../source/physics/dgWorldDynamicsSimpleSolver.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B7C132D17F600A262F2 /* dgWorldDynamicUpdate.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgWorldDynamicUpdate.cpp; path = ../../../source/physics/dgWorldDynamicUpdate.cpp; sourceTree = SOURCE_ROOT; };
+		FFF89B7D132D17F600A262F2 /* dgWorldDynamicUpdate.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgWorldDynamicUpdate.h; path = ../../../source/physics/dgWorldDynamicUpdate.h; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D2AAC06D0554671400DB518D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		034768DDFF38A45A11DB9C8B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D2AAC06F0554671400DB518D /* libnewton.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		0867D691FE84028FC02AAC07 /* newton */ = {
+			isa = PBXGroup;
+			children = (
+				08FB77ACFE841707C02AAC07 /* core */,
+				FFF899F9132D161E00A262F2 /* newton */,
+				FFF899FA132D163E00A262F2 /* physics */,
+				FFF89A83132D16BA00A262F2 /* other sources */,
+				034768DDFF38A45A11DB9C8B /* Products */,
+			);
+			name = newton;
+			sourceTree = "<group>";
+		};
+		08FB77ACFE841707C02AAC07 /* core */ = {
+			isa = PBXGroup;
+			children = (
+				FFF89A96132D17C100A262F2 /* dg.cpp */,
+				FFF89A97132D17C100A262F2 /* dg.h */,
+				FFF89A98132D17C100A262F2 /* dgAABBPolygonSoup.cpp */,
+				FFF89A99132D17C100A262F2 /* dgAABBPolygonSoup.h */,
+				FFF89A9A132D17C100A262F2 /* dgArray.h */,
+				FFF89A9B132D17C100A262F2 /* dgConvexHull3d.cpp */,
+				FFF89A9C132D17C100A262F2 /* dgConvexHull3d.h */,
+				FFF89A9D132D17C100A262F2 /* dgConvexHull4d.cpp */,
+				FFF89A9E132D17C100A262F2 /* dgConvexHull4d.h */,
+				FFF89A9F132D17C100A262F2 /* dgCRC.cpp */,
+				FFF89AA0132D17C100A262F2 /* dgCRC.h */,
+				FFF89AA1132D17C100A262F2 /* dgDebug.cpp */,
+				FFF89AA2132D17C100A262F2 /* dgDebug.h */,
+				FFF89AA3132D17C100A262F2 /* dgDelaunayTetrahedralization.cpp */,
+				FFF89AA4132D17C100A262F2 /* dgDelaunayTetrahedralization.h */,
+				FFF89AA5132D17C100A262F2 /* dgGeneralMatrix.cpp */,
+				FFF89AA6132D17C100A262F2 /* dgGeneralMatrix.h */,
+				FFF89AA7132D17C100A262F2 /* dgGeneralVector.cpp */,
+				FFF89AA8132D17C100A262F2 /* dgGeneralVector.h */,
+				FFF89AA9132D17C100A262F2 /* dgGoogol.cpp */,
+				FFF89AAA132D17C100A262F2 /* dgGoogol.h */,
+				FFF89AAB132D17C100A262F2 /* dgGraph.h */,
+				FFF89AAC132D17C100A262F2 /* dgHeap.h */,
+				FFF89AAD132D17C100A262F2 /* dgIntersections.cpp */,
+				FFF89AAE132D17C100A262F2 /* dgIntersections.h */,
+				FFF89AAF132D17C100A262F2 /* dgList.h */,
+				FFF89AB0132D17C100A262F2 /* dgMatrix.cpp */,
+				FFF89AB1132D17C100A262F2 /* dgMatrix.h */,
+				FFF89AB2132D17C100A262F2 /* dgMemory.cpp */,
+				FFF89AB3132D17C100A262F2 /* dgMemory.h */,
+				FFF89AB4132D17C100A262F2 /* dgNode.cpp */,
+				FFF89AB5132D17C100A262F2 /* dgNode.h */,
+				FFF89AB6132D17C100A262F2 /* dgPathFinder.h */,
+				FFF89AB7132D17C100A262F2 /* dgPlane.h */,
+				FFF89AB8132D17C100A262F2 /* dgPolygonSoupBuilder.cpp */,
+				FFF89AB9132D17C100A262F2 /* dgPolygonSoupBuilder.h */,
+				FFF89ABA132D17C100A262F2 /* dgPolygonSoupDatabase.h */,
+				FFF89ABB132D17C100A262F2 /* dgPolyhedra.cpp */,
+				FFF89ABC132D17C100A262F2 /* dgPolyhedra.h */,
+				FFF89ABD132D17C100A262F2 /* dgPolyhedraMassProperties.cpp */,
+				FFF89ABE132D17C100A262F2 /* dgPolyhedraMassProperties.h */,
+				FFF89ABF132D17C100A262F2 /* dgQuaternion.cpp */,
+				FFF89AC0132D17C100A262F2 /* dgQuaternion.h */,
+				FFF89AC1132D17C100A262F2 /* dgRandom.cpp */,
+				FFF89AC2132D17C100A262F2 /* dgRandom.h */,
+				FFF89AC3132D17C100A262F2 /* dgRef.cpp */,
+				FFF89AC4132D17C100A262F2 /* dgRef.h */,
+				FFF89AC5132D17C100A262F2 /* dgRefCounter.cpp */,
+				FFF89AC6132D17C100A262F2 /* dgRefCounter.h */,
+				FFF89AC7132D17C100A262F2 /* dgRtti.h */,
+				FFF89AC8132D17C100A262F2 /* dgSimD_Instrutions.h */,
+				FFF89AC9132D17C100A262F2 /* dgSmallDeterminant.cpp */,
+				FFF89ACA132D17C100A262F2 /* dgSmallDeterminant.h */,
+				FFF89ACB132D17C100A262F2 /* dgSPDMatrix.cpp */,
+				FFF89ACC132D17C100A262F2 /* dgSPDMatrix.h */,
+				FFF89ACD132D17C100A262F2 /* dgSphere.cpp */,
+				FFF89ACE132D17C100A262F2 /* dgSphere.h */,
+				FFF89ACF132D17C100A262F2 /* dgStack.h */,
+				FFF89AD0132D17C100A262F2 /* dgStdafx.h */,
+				FFF89AD1132D17C100A262F2 /* dgThreadHive.cpp */,
+				FFF89AD2132D17C100A262F2 /* dgThreadHive.h */,
+				FFF89AD3132D17C100A262F2 /* dgTree.cpp */,
+				FFF89AD4132D17C100A262F2 /* dgTree.h */,
+				FFF89AD5132D17C100A262F2 /* dgTypes.cpp */,
+				FFF89AD6132D17C100A262F2 /* dgTypes.h */,
+				FFF89AD7132D17C100A262F2 /* dgVector.h */,
+				FFF89AD8132D17C100A262F2 /* dgWorkerThread.cpp */,
+				FFF89AD9132D17C100A262F2 /* dgWorkerThread.h */,
+			);
+			name = core;
+			sourceTree = "<group>";
+		};
+		FFF899F9132D161E00A262F2 /* newton */ = {
+			isa = PBXGroup;
+			children = (
+				FFF89B1E132D17D800A262F2 /* Newton.cpp */,
+				FFF89B1F132D17D800A262F2 /* Newton.h */,
+				FFF89B20132D17D800A262F2 /* NewtonClass.cpp */,
+				FFF89B21132D17D800A262F2 /* NewtonClass.h */,
+				FFF89B22132D17D800A262F2 /* NewtonStdAfx.h */,
+			);
+			name = newton;
+			sourceTree = "<group>";
+		};
+		FFF899FA132D163E00A262F2 /* physics */ = {
+			isa = PBXGroup;
+			children = (
+				FFF89B28132D17F600A262F2 /* dgBallConstraint.cpp */,
+				FFF89B29132D17F600A262F2 /* dgBallConstraint.h */,
+				FFF89B2A132D17F600A262F2 /* dgBilateralConstraint.cpp */,
+				FFF89B2B132D17F600A262F2 /* dgBilateralConstraint.h */,
+				FFF89B2C132D17F600A262F2 /* dgBody.cpp */,
+				FFF89B2D132D17F600A262F2 /* dgBody.h */,
+				FFF89B2E132D17F600A262F2 /* dgBodyMasterList.cpp */,
+				FFF89B2F132D17F600A262F2 /* dgBodyMasterList.h */,
+				FFF89B30132D17F600A262F2 /* dgBroadPhaseCollision.cpp */,
+				FFF89B31132D17F600A262F2 /* dgBroadPhaseCollision.h */,
+				FFF89B32132D17F600A262F2 /* dgCollision.cpp */,
+				FFF89B33132D17F600A262F2 /* dgCollision.h */,
+				FFF89B34132D17F600A262F2 /* dgCollisionBox.cpp */,
+				FFF89B35132D17F600A262F2 /* dgCollisionBox.h */,
+				FFF89B36132D17F600A262F2 /* dgCollisionBVH.cpp */,
+				FFF89B37132D17F600A262F2 /* dgCollisionBVH.h */,
+				FFF89B38132D17F600A262F2 /* dgCollisionCapsule.cpp */,
+				FFF89B39132D17F600A262F2 /* dgCollisionCapsule.h */,
+				FFF89B3A132D17F600A262F2 /* dgCollisionChamferCylinder.cpp */,
+				FFF89B3B132D17F600A262F2 /* dgCollisionChamferCylinder.h */,
+				FFF89B3C132D17F600A262F2 /* dgCollisionCompound.cpp */,
+				FFF89B3D132D17F600A262F2 /* dgCollisionCompound.h */,
+				FFF89B3E132D17F600A262F2 /* dgCollisionCompoundBreakable.cpp */,
+				FFF89B3F132D17F600A262F2 /* dgCollisionCompoundBreakable.h */,
+				FFF89B40132D17F600A262F2 /* dgCollisionCone.cpp */,
+				FFF89B41132D17F600A262F2 /* dgCollisionCone.h */,
+				FFF89B42132D17F600A262F2 /* dgCollisionConvex.cpp */,
+				FFF89B43132D17F600A262F2 /* dgCollisionConvex.h */,
+				FFF89B44132D17F600A262F2 /* dgCollisionConvexHull.cpp */,
+				FFF89B45132D17F600A262F2 /* dgCollisionConvexHull.h */,
+				FFF89B46132D17F600A262F2 /* dgCollisionConvexModifier.cpp */,
+				FFF89B47132D17F600A262F2 /* dgCollisionConvexModifier.h */,
+				FFF89B48132D17F600A262F2 /* dgCollisionCylinder.cpp */,
+				FFF89B49132D17F600A262F2 /* dgCollisionCylinder.h */,
+				FFF89B4A132D17F600A262F2 /* dgCollisionEllipse.cpp */,
+				FFF89B4B132D17F600A262F2 /* dgCollisionEllipse.h */,
+				FFF89B4C132D17F600A262F2 /* dgCollisionHeightField.cpp */,
+				FFF89B4D132D17F600A262F2 /* dgCollisionHeightField.h */,
+				FFF89B4E132D17F600A262F2 /* dgCollisionMesh.cpp */,
+				FFF89B4F132D17F600A262F2 /* dgCollisionMesh.h */,
+				FFF89B50132D17F600A262F2 /* dgCollisionNull.cpp */,
+				FFF89B51132D17F600A262F2 /* dgCollisionNull.h */,
+				FFF89B52132D17F600A262F2 /* dgCollisionScene.cpp */,
+				FFF89B53132D17F600A262F2 /* dgCollisionScene.h */,
+				FFF89B54132D17F600A262F2 /* dgCollisionSphere.cpp */,
+				FFF89B55132D17F600A262F2 /* dgCollisionSphere.h */,
+				FFF89B56132D17F600A262F2 /* dgCollisionUserMesh.cpp */,
+				FFF89B57132D17F600A262F2 /* dgCollisionUserMesh.h */,
+				FFF89B58132D17F600A262F2 /* dgConnectorConstraint.cpp */,
+				FFF89B59132D17F600A262F2 /* dgConnectorConstraint.h */,
+				FFF89B5A132D17F600A262F2 /* dgConstraint.cpp */,
+				FFF89B5B132D17F600A262F2 /* dgConstraint.h */,
+				FFF89B5C132D17F600A262F2 /* dgContact.cpp */,
+				FFF89B5D132D17F600A262F2 /* dgContact.h */,
+				FFF89B5E132D17F600A262F2 /* dgCorkscrewConstraint.cpp */,
+				FFF89B5F132D17F600A262F2 /* dgCorkscrewConstraint.h */,
+				FFF89B60132D17F600A262F2 /* dgHingeConstraint.cpp */,
+				FFF89B61132D17F600A262F2 /* dgHingeConstraint.h */,
+				FFF89B62132D17F600A262F2 /* dgMeshEffect.cpp */,
+				FFF89B63132D17F600A262F2 /* dgMeshEffect.h */,
+				FFF89B64132D17F600A262F2 /* dgMeshEffect2.cpp */,
+				FFF89B65132D17F600A262F2 /* dgMinkowskiConv.cpp */,
+				FFF89B66132D17F600A262F2 /* dgMinkowskiConv.h */,
+				FFF89B67132D17F600A262F2 /* dgMinkowskiConvSimd.cpp */,
+				FFF89B68132D17F600A262F2 /* dgNarrowPhaseCollision.cpp */,
+				FFF89B69132D17F600A262F2 /* dgPhysics.h */,
+				FFF89B6A132D17F600A262F2 /* dgPhysicsStdafx.h */,
+				FFF89B6B132D17F600A262F2 /* dgPointToCurveConstraint.cpp */,
+				FFF89B6C132D17F600A262F2 /* dgPointToCurveConstraint.h */,
+				FFF89B6D132D17F600A262F2 /* dgSlidingConstraint.cpp */,
+				FFF89B6E132D17F600A262F2 /* dgSlidingConstraint.h */,
+				FFF89B6F132D17F600A262F2 /* dgUniversalConstraint.cpp */,
+				FFF89B70132D17F600A262F2 /* dgUniversalConstraint.h */,
+				FFF89B71132D17F600A262F2 /* dgUpVectorConstraint.cpp */,
+				FFF89B72132D17F600A262F2 /* dgUpVectorConstraint.h */,
+				FFF89B73132D17F600A262F2 /* dgUserConstraint.cpp */,
+				FFF89B74132D17F600A262F2 /* dgUserConstraint.h */,
+				FFF89B75132D17F600A262F2 /* dgVehicleConstraint.cpp */,
+				FFF89B76132D17F600A262F2 /* dgVehicleConstraint.h */,
+				FFF89B77132D17F600A262F2 /* dgWorld.cpp */,
+				FFF89B78132D17F600A262F2 /* dgWorld.h */,
+				FFF89B79132D17F600A262F2 /* dgWorldDynamicsParallelSolver.cpp */,
+				FFF89B7A132D17F600A262F2 /* dgWorldDynamicsSimdSolver.cpp */,
+				FFF89B7B132D17F600A262F2 /* dgWorldDynamicsSimpleSolver.cpp */,
+				FFF89B7C132D17F600A262F2 /* dgWorldDynamicUpdate.cpp */,
+				FFF89B7D132D17F600A262F2 /* dgWorldDynamicUpdate.h */,
+			);
+			name = physics;
+			sourceTree = "<group>";
+		};
+		FFF89A83132D16BA00A262F2 /* other sources */ = {
+			isa = PBXGroup;
+			children = (
+				32BAE0B70371A74B00C91783 /* newton_Prefix.pch */,
+			);
+			name = "other sources";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		D2AAC06B0554671400DB518D /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FFF89ADB132D17C100A262F2 /* dg.h in Headers */,
+				FFF89ADD132D17C100A262F2 /* dgAABBPolygonSoup.h in Headers */,
+				FFF89ADE132D17C100A262F2 /* dgArray.h in Headers */,
+				FFF89AE0132D17C100A262F2 /* dgConvexHull3d.h in Headers */,
+				FFF89AE2132D17C100A262F2 /* dgConvexHull4d.h in Headers */,
+				FFF89AE4132D17C100A262F2 /* dgCRC.h in Headers */,
+				FFF89AE6132D17C100A262F2 /* dgDebug.h in Headers */,
+				FFF89AE8132D17C100A262F2 /* dgDelaunayTetrahedralization.h in Headers */,
+				FFF89AEA132D17C100A262F2 /* dgGeneralMatrix.h in Headers */,
+				FFF89AEC132D17C100A262F2 /* dgGeneralVector.h in Headers */,
+				FFF89AEE132D17C100A262F2 /* dgGoogol.h in Headers */,
+				FFF89AEF132D17C100A262F2 /* dgGraph.h in Headers */,
+				FFF89AF0132D17C100A262F2 /* dgHeap.h in Headers */,
+				FFF89AF2132D17C100A262F2 /* dgIntersections.h in Headers */,
+				FFF89AF3132D17C100A262F2 /* dgList.h in Headers */,
+				FFF89AF5132D17C100A262F2 /* dgMatrix.h in Headers */,
+				FFF89AF7132D17C100A262F2 /* dgMemory.h in Headers */,
+				FFF89AF9132D17C100A262F2 /* dgNode.h in Headers */,
+				FFF89AFA132D17C100A262F2 /* dgPathFinder.h in Headers */,
+				FFF89AFB132D17C100A262F2 /* dgPlane.h in Headers */,
+				FFF89AFD132D17C100A262F2 /* dgPolygonSoupBuilder.h in Headers */,
+				FFF89AFE132D17C100A262F2 /* dgPolygonSoupDatabase.h in Headers */,
+				FFF89B00132D17C100A262F2 /* dgPolyhedra.h in Headers */,
+				FFF89B02132D17C100A262F2 /* dgPolyhedraMassProperties.h in Headers */,
+				FFF89B04132D17C100A262F2 /* dgQuaternion.h in Headers */,
+				FFF89B06132D17C100A262F2 /* dgRandom.h in Headers */,
+				FFF89B08132D17C100A262F2 /* dgRef.h in Headers */,
+				FFF89B0A132D17C100A262F2 /* dgRefCounter.h in Headers */,
+				FFF89B0B132D17C100A262F2 /* dgRtti.h in Headers */,
+				FFF89B0C132D17C100A262F2 /* dgSimD_Instrutions.h in Headers */,
+				FFF89B0E132D17C100A262F2 /* dgSmallDeterminant.h in Headers */,
+				FFF89B10132D17C100A262F2 /* dgSPDMatrix.h in Headers */,
+				FFF89B12132D17C100A262F2 /* dgSphere.h in Headers */,
+				FFF89B13132D17C100A262F2 /* dgStack.h in Headers */,
+				FFF89B14132D17C100A262F2 /* dgStdafx.h in Headers */,
+				FFF89B16132D17C100A262F2 /* dgThreadHive.h in Headers */,
+				FFF89B18132D17C100A262F2 /* dgTree.h in Headers */,
+				FFF89B1A132D17C100A262F2 /* dgTypes.h in Headers */,
+				FFF89B1B132D17C100A262F2 /* dgVector.h in Headers */,
+				FFF89B1D132D17C100A262F2 /* dgWorkerThread.h in Headers */,
+				FFF89B24132D17D800A262F2 /* Newton.h in Headers */,
+				FFF89B26132D17D800A262F2 /* NewtonClass.h in Headers */,
+				FFF89B27132D17D800A262F2 /* NewtonStdAfx.h in Headers */,
+				FFF89B7F132D17F600A262F2 /* dgBallConstraint.h in Headers */,
+				FFF89B81132D17F600A262F2 /* dgBilateralConstraint.h in Headers */,
+				FFF89B83132D17F600A262F2 /* dgBody.h in Headers */,
+				FFF89B85132D17F600A262F2 /* dgBodyMasterList.h in Headers */,
+				FFF89B87132D17F600A262F2 /* dgBroadPhaseCollision.h in Headers */,
+				FFF89B89132D17F600A262F2 /* dgCollision.h in Headers */,
+				FFF89B8B132D17F600A262F2 /* dgCollisionBox.h in Headers */,
+				FFF89B8D132D17F600A262F2 /* dgCollisionBVH.h in Headers */,
+				FFF89B8F132D17F600A262F2 /* dgCollisionCapsule.h in Headers */,
+				FFF89B91132D17F600A262F2 /* dgCollisionChamferCylinder.h in Headers */,
+				FFF89B93132D17F600A262F2 /* dgCollisionCompound.h in Headers */,
+				FFF89B95132D17F600A262F2 /* dgCollisionCompoundBreakable.h in Headers */,
+				FFF89B97132D17F600A262F2 /* dgCollisionCone.h in Headers */,
+				FFF89B99132D17F600A262F2 /* dgCollisionConvex.h in Headers */,
+				FFF89B9B132D17F600A262F2 /* dgCollisionConvexHull.h in Headers */,
+				FFF89B9D132D17F600A262F2 /* dgCollisionConvexModifier.h in Headers */,
+				FFF89B9F132D17F600A262F2 /* dgCollisionCylinder.h in Headers */,
+				FFF89BA1132D17F600A262F2 /* dgCollisionEllipse.h in Headers */,
+				FFF89BA3132D17F600A262F2 /* dgCollisionHeightField.h in Headers */,
+				FFF89BA5132D17F600A262F2 /* dgCollisionMesh.h in Headers */,
+				FFF89BA7132D17F600A262F2 /* dgCollisionNull.h in Headers */,
+				FFF89BA9132D17F600A262F2 /* dgCollisionScene.h in Headers */,
+				FFF89BAB132D17F600A262F2 /* dgCollisionSphere.h in Headers */,
+				FFF89BAD132D17F600A262F2 /* dgCollisionUserMesh.h in Headers */,
+				FFF89BAF132D17F600A262F2 /* dgConnectorConstraint.h in Headers */,
+				FFF89BB1132D17F600A262F2 /* dgConstraint.h in Headers */,
+				FFF89BB3132D17F600A262F2 /* dgContact.h in Headers */,
+				FFF89BB5132D17F600A262F2 /* dgCorkscrewConstraint.h in Headers */,
+				FFF89BB7132D17F600A262F2 /* dgHingeConstraint.h in Headers */,
+				FFF89BB9132D17F600A262F2 /* dgMeshEffect.h in Headers */,
+				FFF89BBC132D17F600A262F2 /* dgMinkowskiConv.h in Headers */,
+				FFF89BBF132D17F600A262F2 /* dgPhysics.h in Headers */,
+				FFF89BC0132D17F600A262F2 /* dgPhysicsStdafx.h in Headers */,
+				FFF89BC2132D17F600A262F2 /* dgPointToCurveConstraint.h in Headers */,
+				FFF89BC4132D17F600A262F2 /* dgSlidingConstraint.h in Headers */,
+				FFF89BC6132D17F600A262F2 /* dgUniversalConstraint.h in Headers */,
+				FFF89BC8132D17F600A262F2 /* dgUpVectorConstraint.h in Headers */,
+				FFF89BCA132D17F600A262F2 /* dgUserConstraint.h in Headers */,
+				FFF89BCC132D17F600A262F2 /* dgVehicleConstraint.h in Headers */,
+				FFF89BCE132D17F600A262F2 /* dgWorld.h in Headers */,
+				FFF89BD3132D17F600A262F2 /* dgWorldDynamicUpdate.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		D2AAC06E0554671400DB518D /* newton */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1DEB920108733DBB0010E9CD /* Build configuration list for PBXNativeTarget "newton" */;
+			buildPhases = (
+				D2AAC06B0554671400DB518D /* Headers */,
+				D2AAC06C0554671400DB518D /* Sources */,
+				D2AAC06D0554671400DB518D /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = newton;
+			productName = newton;
+			productReference = D2AAC06F0554671400DB518D /* libnewton.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		0867D690FE84028FC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB920508733DBB0010E9CD /* Build configuration list for PBXProject "newton" */;
+			hasScannedForEncodings = 1;
+			mainGroup = 0867D691FE84028FC02AAC07 /* newton */;
+			productRefGroup = 034768DDFF38A45A11DB9C8B /* Products */;
+			projectDirPath = "";
+			targets = (
+				D2AAC06E0554671400DB518D /* newton */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D2AAC06C0554671400DB518D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FFF89ADA132D17C100A262F2 /* dg.cpp in Sources */,
+				FFF89ADC132D17C100A262F2 /* dgAABBPolygonSoup.cpp in Sources */,
+				FFF89ADF132D17C100A262F2 /* dgConvexHull3d.cpp in Sources */,
+				FFF89AE1132D17C100A262F2 /* dgConvexHull4d.cpp in Sources */,
+				FFF89AE3132D17C100A262F2 /* dgCRC.cpp in Sources */,
+				FFF89AE5132D17C100A262F2 /* dgDebug.cpp in Sources */,
+				FFF89AE7132D17C100A262F2 /* dgDelaunayTetrahedralization.cpp in Sources */,
+				FFF89AE9132D17C100A262F2 /* dgGeneralMatrix.cpp in Sources */,
+				FFF89AEB132D17C100A262F2 /* dgGeneralVector.cpp in Sources */,
+				FFF89AED132D17C100A262F2 /* dgGoogol.cpp in Sources */,
+				FFF89AF1132D17C100A262F2 /* dgIntersections.cpp in Sources */,
+				FFF89AF4132D17C100A262F2 /* dgMatrix.cpp in Sources */,
+				FFF89AF6132D17C100A262F2 /* dgMemory.cpp in Sources */,
+				FFF89AF8132D17C100A262F2 /* dgNode.cpp in Sources */,
+				FFF89AFC132D17C100A262F2 /* dgPolygonSoupBuilder.cpp in Sources */,
+				FFF89AFF132D17C100A262F2 /* dgPolyhedra.cpp in Sources */,
+				FFF89B01132D17C100A262F2 /* dgPolyhedraMassProperties.cpp in Sources */,
+				FFF89B03132D17C100A262F2 /* dgQuaternion.cpp in Sources */,
+				FFF89B05132D17C100A262F2 /* dgRandom.cpp in Sources */,
+				FFF89B07132D17C100A262F2 /* dgRef.cpp in Sources */,
+				FFF89B09132D17C100A262F2 /* dgRefCounter.cpp in Sources */,
+				FFF89B0D132D17C100A262F2 /* dgSmallDeterminant.cpp in Sources */,
+				FFF89B0F132D17C100A262F2 /* dgSPDMatrix.cpp in Sources */,
+				FFF89B11132D17C100A262F2 /* dgSphere.cpp in Sources */,
+				FFF89B15132D17C100A262F2 /* dgThreadHive.cpp in Sources */,
+				FFF89B17132D17C100A262F2 /* dgTree.cpp in Sources */,
+				FFF89B19132D17C100A262F2 /* dgTypes.cpp in Sources */,
+				FFF89B1C132D17C100A262F2 /* dgWorkerThread.cpp in Sources */,
+				FFF89B23132D17D800A262F2 /* Newton.cpp in Sources */,
+				FFF89B25132D17D800A262F2 /* NewtonClass.cpp in Sources */,
+				FFF89B7E132D17F600A262F2 /* dgBallConstraint.cpp in Sources */,
+				FFF89B80132D17F600A262F2 /* dgBilateralConstraint.cpp in Sources */,
+				FFF89B82132D17F600A262F2 /* dgBody.cpp in Sources */,
+				FFF89B84132D17F600A262F2 /* dgBodyMasterList.cpp in Sources */,
+				FFF89B86132D17F600A262F2 /* dgBroadPhaseCollision.cpp in Sources */,
+				FFF89B88132D17F600A262F2 /* dgCollision.cpp in Sources */,
+				FFF89B8A132D17F600A262F2 /* dgCollisionBox.cpp in Sources */,
+				FFF89B8C132D17F600A262F2 /* dgCollisionBVH.cpp in Sources */,
+				FFF89B8E132D17F600A262F2 /* dgCollisionCapsule.cpp in Sources */,
+				FFF89B90132D17F600A262F2 /* dgCollisionChamferCylinder.cpp in Sources */,
+				FFF89B92132D17F600A262F2 /* dgCollisionCompound.cpp in Sources */,
+				FFF89B94132D17F600A262F2 /* dgCollisionCompoundBreakable.cpp in Sources */,
+				FFF89B96132D17F600A262F2 /* dgCollisionCone.cpp in Sources */,
+				FFF89B98132D17F600A262F2 /* dgCollisionConvex.cpp in Sources */,
+				FFF89B9A132D17F600A262F2 /* dgCollisionConvexHull.cpp in Sources */,
+				FFF89B9C132D17F600A262F2 /* dgCollisionConvexModifier.cpp in Sources */,
+				FFF89B9E132D17F600A262F2 /* dgCollisionCylinder.cpp in Sources */,
+				FFF89BA0132D17F600A262F2 /* dgCollisionEllipse.cpp in Sources */,
+				FFF89BA2132D17F600A262F2 /* dgCollisionHeightField.cpp in Sources */,
+				FFF89BA4132D17F600A262F2 /* dgCollisionMesh.cpp in Sources */,
+				FFF89BA6132D17F600A262F2 /* dgCollisionNull.cpp in Sources */,
+				FFF89BA8132D17F600A262F2 /* dgCollisionScene.cpp in Sources */,
+				FFF89BAA132D17F600A262F2 /* dgCollisionSphere.cpp in Sources */,
+				FFF89BAC132D17F600A262F2 /* dgCollisionUserMesh.cpp in Sources */,
+				FFF89BAE132D17F600A262F2 /* dgConnectorConstraint.cpp in Sources */,
+				FFF89BB0132D17F600A262F2 /* dgConstraint.cpp in Sources */,
+				FFF89BB2132D17F600A262F2 /* dgContact.cpp in Sources */,
+				FFF89BB4132D17F600A262F2 /* dgCorkscrewConstraint.cpp in Sources */,
+				FFF89BB6132D17F600A262F2 /* dgHingeConstraint.cpp in Sources */,
+				FFF89BB8132D17F600A262F2 /* dgMeshEffect.cpp in Sources */,
+				FFF89BBA132D17F600A262F2 /* dgMeshEffect2.cpp in Sources */,
+				FFF89BBB132D17F600A262F2 /* dgMinkowskiConv.cpp in Sources */,
+				FFF89BBD132D17F600A262F2 /* dgMinkowskiConvSimd.cpp in Sources */,
+				FFF89BBE132D17F600A262F2 /* dgNarrowPhaseCollision.cpp in Sources */,
+				FFF89BC1132D17F600A262F2 /* dgPointToCurveConstraint.cpp in Sources */,
+				FFF89BC3132D17F600A262F2 /* dgSlidingConstraint.cpp in Sources */,
+				FFF89BC5132D17F600A262F2 /* dgUniversalConstraint.cpp in Sources */,
+				FFF89BC7132D17F600A262F2 /* dgUpVectorConstraint.cpp in Sources */,
+				FFF89BC9132D17F600A262F2 /* dgUserConstraint.cpp in Sources */,
+				FFF89BCB132D17F600A262F2 /* dgVehicleConstraint.cpp in Sources */,
+				FFF89BCD132D17F600A262F2 /* dgWorld.cpp in Sources */,
+				FFF89BCF132D17F600A262F2 /* dgWorldDynamicsParallelSolver.cpp in Sources */,
+				FFF89BD0132D17F600A262F2 /* dgWorldDynamicsSimdSolver.cpp in Sources */,
+				FFF89BD1132D17F600A262F2 /* dgWorldDynamicsSimpleSolver.cpp in Sources */,
+				FFF89BD2132D17F600A262F2 /* dgWorldDynamicUpdate.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1DEB920208733DBB0010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_ALTIVEC_EXTENSIONS = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_ENABLE_SSE3_EXTENSIONS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = newton_Prefix.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = _MACOSX_VER;
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = newton;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		1DEB920308733DBB0010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = ppc;
+				GCC_ALTIVEC_EXTENSIONS = YES;
+				GCC_AUTO_VECTORIZATION = NO;
+				GCC_ENABLE_SSE3_EXTENSIONS = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = newton_Prefix.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = _MACOSX_VER;
+				GCC_UNROLL_LOOPS = YES;
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = newton;
+			};
+			name = Release;
+		};
+		1DEB920608733DBB0010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+			};
+			name = Debug;
+		};
+		1DEB920708733DBB0010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB920108733DBB0010E9CD /* Build configuration list for PBXNativeTarget "newton" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB920208733DBB0010E9CD /* Debug */,
+				1DEB920308733DBB0010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1DEB920508733DBB0010E9CD /* Build configuration list for PBXProject "newton" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB920608733DBB0010E9CD /* Debug */,
+				1DEB920708733DBB0010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 0867D690FE84028FC02AAC07 /* Project object */;
+}
