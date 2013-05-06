@@ -158,7 +158,7 @@ class BasicVehicleEntity: public DemoEntity
 		NewtonDestroyCollision(chassisCollision);
 
 
-		for (int i = 0; i < (sizeof (m_gearMap) / sizeof (m_gearMap[0])); i ++) {
+		for (int i = 0; i < int ((sizeof (m_gearMap) / sizeof (m_gearMap[0]))); i ++) {
 			m_gearMap[i] = i;
 		}
 		m_gearMap[0] = 1;
