@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="programs">
+      <UniqueIdentifier>{2e4940c0-7fd5-4ed5-9c99-4683e8a3defe}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\source\openCL\dgHelloOpenCL.cl">
+      <Filter>programs</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\source\openCL\dgOpencl.cpp" />
+    <ClCompile Include="..\..\..\source\openCL\dgOpenclBroadPhase.cpp" />
+    <ClCompile Include="..\..\..\source\openCL\dgOpenclInstance.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\source\openCL\dgOpencl.h" />
+    <ClInclude Include="..\..\..\source\openCL\dgOpenclBroadPhase.h" />
+    <ClInclude Include="..\..\..\source\openCL\dgOpenclInstance.h" />
+  </ItemGroup>
+</Project>

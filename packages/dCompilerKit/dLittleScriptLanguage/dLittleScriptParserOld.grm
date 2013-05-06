@@ -1,0 +1,438 @@
+/* Copyright (c) <2009> <Newton Game Dynamics>
+* 
+* This software is provided 'as-is', without any express or implied
+* warranty. In no event will the authors be held liable for any damages
+* arising from the use of this software.
+* 
+* Permission is granted to anyone to use this software for any purpose,
+* including commercial applications, and to alter it and redistribute it
+* freely
+*/
+
+%{
+#include "dLSCstdafx.h"
+#include "dLittleScriptParser.h"
+#include "dLittleScriptLexical.h"
+#include "dLittleScriptCompiler.h"
+
+
+// Newton Little Scripting Language parser specification 1.0.0
+// loosely based on a subset of Java and C sharp
+%}
+
+
+%union 
+{
+	class dUserVariable: public dDefualtUserVariable
+	{
+		public:
+		dUserVariable () 
+			:dDefualtUserVariable (), m_node(NULL)
+		{
+		}
+		
+		dUserVariable (dToken token, const char* const text, int scannerLine, int scannerIndex)
+			:dDefualtUserVariable (token, text, scannerLine, scannerIndex)
+			,m_node(NULL)
+		{
+		}
+		class dDAG* m_node;
+	};
+}
+
+
+%token NATIVE CONSTANT
+%token INTEGER_VALUE FLOAT_VALUE STRING_VALUE
+%token IMPORT 
+%token PRIVATE CLASS BASE DOUBLE_COLOM IDENTIFIER EXTENDS GUI
+%token BOOLEAN ENUM BYTE SHORT INT LONG UNSIGNED FLOAT DOUBLE VOID_TYPE
+
+%token CAST SIZEOF OPERATOR
+%token NEW
+%token RETURN
+%token FOR WHILE DO
+%token IF ELSE SWITCH CASE DEFAULT 
+%token CONTINUE BREAK
+
+
+%token LOGIC_AND LOGIC_OR 
+%token SHIFT_RIGHT SHIFT_LEFT
+%token LESS_EQUAL GREATHER_EQUAL
+%token IDENTICAL DIFFERENT
+
+//%expect 2
+
+
+%right ELSE
+%right IF
+%right '='
+%right '?'
+%right ':'
+%left LOGIC_OR 
+%left LOGIC_AND 
+%left '|'
+%left '^'
+%left '&'
+%left IDENTICAL DIFFERENT
+%left LESS_EQUAL GREATHER_EQUAL '<' '>' 
+%left SHIFT_RIGHT SHIFT_LEFT
+%left '+' '-'
+%left '*' '/' '%'
+%left '!' '~'
+
+%{
+#define GET_PARENT_CLASS  dScriptCompiler* const me = (dScriptCompiler*) this;
+%}
+
+
+	
+%start compilation_unit
+
+%%
+
+compilation_unit
+	:											
+	| module_list								
+	; 
+
+
+module_list 
+	: module									
+	| module_list module						
+	;
+			
+module 
+	: ';'										
+	| import_module								{_ASSERTE (0);}
+	| class_delaration							
+	;			
+
+
+error_token
+	: ';'										{ $$ = $1;}
+	| '{'										{ $$ = $1;}
+	| '}'										{ $$ = $1;}
+	| ')'										{ $$ = $1;}
+	| '('										{ $$ = $1;}
+	| '['										{ $$ = $1;}
+	| ']'										{ $$ = $1;}
+	| IDENTIFIER								{ $$ = $1;}
+	| OPERATOR									{ $$ = $1;}
+	;
+		
+syntax_error	
+	: error error_token							{ GET_PARENT_CLASS; me->SyntaxError (scanner, $1, $2); }
+	;
+		
+		
+compound_identifier_List
+	: IDENTIFIER								{$$ = $1;}
+	| compound_identifier_List '.' IDENTIFIER	{$$ = $1;	$$.m_data = $1.m_data + string (".") + $3.m_data;}
+	;
+
+import_module 
+	: IMPORT '<' compound_identifier_List '>'	{_ASSERTE (0);}
+	;
+	
+start_new_class
+	:											{ GET_PARENT_CLASS; $$ = me->BeginClassNode (); }
+	;
+		  
+	  
+		  
+class_delaration 
+	: start_new_class class_visibility CLASS IDENTIFIER extends gui_support '{' class_member_list '}' {GET_PARENT_CLASS; $$ = me->FinalizeClassNode ($1, $2, $4, $5, $6); }
+	;			  
+
+class_visibility
+	:											
+	| PRIVATE {$$ = $1;}						{_ASSERTE (0);}
+	;
+				
+gui_support 
+	:											
+	| GUI										{_ASSERTE (0);}
+	;				
+				
+extends 
+	:
+	| EXTENDS IDENTIFIER						{_ASSERTE (0);}
+	;		
+	
+
+function_modifier
+	: NATIVE										{$$ = $1;}
+	| PRIVATE										{$$ = $1;}
+	;
+			
+function_modifier_list
+	: function_modifier								{GET_PARENT_CLASS; $$ = me->NewFunctionModifier (dUserVariable(), $1);}
+	| function_modifier_list function_modifier		{GET_PARENT_CLASS; $$ = me->NewFunctionModifier ($1, $2);}
+	;
+	
+
+
+class_member_list	 
+	: class_member								{/* nothing here */}
+	| class_member_list	class_member			{/* nothing here */}
+	;
+			
+class_member 
+	: ';'										{/* nothing here */}
+	| syntax_error								{/* nothing here */}
+	| parameter	';'								{GET_PARENT_CLASS; me->AddClassVariable($1);}
+// this line generate a shif reduce error and make the parcel malfuntion	
+//	| PRIVATE parameter ';'						{GET_PARENT_CLASS; me->AddClassVariable($1);}
+	| class_function							{GET_PARENT_CLASS; me->AddClassFunction($1);}
+	;
+
+
+
+class_function
+	: function_prototype ';'											{GET_PARENT_CLASS; $$ = me->NewClassFunction (dUserVariable(), $1, dUserVariable());}
+	| function_prototype block_scope									{GET_PARENT_CLASS; $$ = me->NewClassFunction (dUserVariable(), $1, $2);}
+	| function_modifier_list function_prototype ';'						{GET_PARENT_CLASS; $$ = me->NewClassFunction ($1, $2, dUserVariable());}
+	| function_modifier_list function_prototype block_scope				{GET_PARENT_CLASS; $$ = me->NewClassFunction ($1, $2, $3);}
+	;
+
+function_prototype
+	: IDENTIFIER '(' function_parameters ')' init_base_class 								  {GET_PARENT_CLASS; $$ = me->NewConstructorPrototype ($1, $3, $5);}
+	| type_specifier IDENTIFIER '(' function_parameters ')' const_function					  {GET_PARENT_CLASS; $$ = me->NewFunctionPrototype ($1, $2, $4, $6);}
+	| type_specifier OPERATOR overlodable_operator '(' function_parameters ')' const_function {GET_PARENT_CLASS; dUserVariable temp; temp.m_data = string ("operator") + $3.m_data; $$ = me->NewFunctionPrototype ($1, temp, $5, $7);}
+	;
+	
+
+parameter
+	: type_specifier IDENTIFIER				{GET_PARENT_CLASS; $$ = me->NewParameterNode ($1, $2);}
+	;
+
+parameter_list 
+	: parameter									{$$ = $1;}
+	| parameter_list ',' parameter				{GET_PARENT_CLASS; $$ = me->LinkParameters($1, $3);}
+	| syntax_error
+	;	
+	
+function_parameters
+	:									{/* nothing here */}
+	| parameter_list					{$$ = $1;}
+	;
+	
+const_function
+	:									{/* nothing here */}
+	| CONSTANT							{_ASSERTE (0);}
+	;
+	
+init_base_class
+	:									{/* nothing here */}
+	| ':' function_call					{_ASSERTE (0);}
+	;
+
+overlodable_operator
+	: '+'									{_ASSERTE (0);}
+	| '-'									{_ASSERTE (0);}	
+	| '*'									{_ASSERTE (0);}
+	| '/'									{_ASSERTE (0);}
+	| '%'									{_ASSERTE (0);}
+	; 	
+	
+			  
+	
+type_specifier
+	: primitive_types						{$$ = $1;}
+	| class_Type							{$$ = $1;}
+	| primitive_types array_type_list		{GET_PARENT_CLASS; $$ = me->TypeAddDimension($1, $2);}
+	| class_Type array_type_list			{_ASSERTE (0); GET_PARENT_CLASS; $$ = me->TypeAddDimension($1, $2);}
+	;		
+	
+primitive_types
+	: enum				{_ASSERTE (0);}
+	| BOOLEAN			{GET_PARENT_CLASS; $$ = me->EmitTypeNode ($1);}
+	| BYTE				{GET_PARENT_CLASS; $$ = me->EmitTypeNode ($1);}
+	| SHORT				{GET_PARENT_CLASS; $$ = me->EmitTypeNode ($1);}
+	| INT				{GET_PARENT_CLASS; $$ = me->EmitTypeNode ($1);}
+	| LONG				{GET_PARENT_CLASS; $$ = me->EmitTypeNode ($1);}
+	| UNSIGNED BYTE		{GET_PARENT_CLASS; $$ = me->EmitTypeNode ($2, $1);}	
+	| UNSIGNED SHORT	{GET_PARENT_CLASS; $$ = me->EmitTypeNode ($2, $1);}	
+	| UNSIGNED INT		{GET_PARENT_CLASS; $$ = me->EmitTypeNode ($2, $1);}	
+	| UNSIGNED LONG		{GET_PARENT_CLASS; $$ = me->EmitTypeNode ($1, $1);}	
+	| FLOAT				{GET_PARENT_CLASS; $$ = me->EmitTypeNode ($1);}
+	| DOUBLE			{GET_PARENT_CLASS; $$ = me->EmitTypeNode ($1);}
+	| VOID_TYPE			{GET_PARENT_CLASS; $$ = me->EmitTypeNode ($1);}
+	;
+	
+enum
+	: ENUM				{_ASSERTE (0);}
+	;
+	
+	
+class_Type
+	: CLASS IDENTIFIER  {GET_PARENT_CLASS; $$ = me->EmitTypeNode ($1, $2);}	
+	;
+	
+		 
+		 
+begin_scope
+	:														{GET_PARENT_CLASS; $$ = me->BeginScopeBlock();}
+	;
+	
+block_scope 
+	: begin_scope '{'  '}'									{GET_PARENT_CLASS; $$ = me->EndScopeBlock ($1);}
+	| begin_scope '{' statement_list '}'					{GET_PARENT_CLASS; $$ = me->EndScopeBlock ($1);}
+	;
+			   
+			   
+statement_list 
+	: statement												{GET_PARENT_CLASS; me->AddStatementToCurrentBlock($1);}	
+	| statement_list statement								{GET_PARENT_CLASS; me->AddStatementToCurrentBlock($2);}	
+	;
+
+	
+
+for_begin
+	:											{GET_PARENT_CLASS; $$ = me->BeginScopeBlock();}
+	;
+	
+for_first_expression
+	:											{/* nothing here */}
+	| expression								{$$ = $1;} 
+	| assigment_statement						{$$ = $1;}
+	| parameter '=' expression					{GET_PARENT_CLASS; $$ = me->NewLocalVariableStatement($1, $3);} 
+	;
+	
+	
+for_third_expression	
+	:											{/* nothing here */}
+	| expression								{$$ = $1;}
+	| assigment_statement						{$$ = $1;}
+	;
+
+array_type_list
+	: array_type								{$$ = $1;}
+	| array_type_list array_type				{GET_PARENT_CLASS; $$ = me->LinkDimensionNode($1, $2);}
+	;
+	
+array_type
+	: '[' ']'									{GET_PARENT_CLASS; $$ = me->NewDimensionNode(dUserVariable());}
+	| '[' expression ']'						{GET_PARENT_CLASS; $$ = me->NewDimensionNode($2);}	
+	;	
+
+
+dimension
+	: '[' expression ']'						{GET_PARENT_CLASS; $$ = me->NewDimensionNode($2);}
+	;
+	
+multidimension_array
+	: dimension									{$$ = $1;}	
+	| multidimension_array dimension			{GET_PARENT_CLASS; $$ = me->LinkDimensionNode($1, $2);}
+	;
+	
+	
+assigment_statement
+	: compound_identifier_List '=' expression							{GET_PARENT_CLASS; $$ = me->NewExpresionNodeAssigment ($1, dUserVariable(), $3);}
+	| compound_identifier_List multidimension_array	'=' expression		{GET_PARENT_CLASS; $$ = me->NewExpresionNodeAssigment ($1, $2, $4);}
+	;
+	
+	
+switch_case_list
+	: switch_case										{_ASSERTE (0);}
+	| switch_case_list switch_case						{_ASSERTE (0);}
+	;
+	
+switch_case
+	: CASE INTEGER_VALUE ':' block_scope				{_ASSERTE (0);}		
+	| DEFAULT ':' block_scope							{_ASSERTE (0);}	
+	;  	
+	
+	
+argument_list
+	: expression										{$$ = $1;}
+	| argument_list ',' expression						{GET_PARENT_CLASS; $$ = me->LinkExpressions($1, $3);}
+	;
+	
+base_class_indetifier_prefix	
+	: BASE DOUBLE_COLOM 
+	| base_class_indetifier_prefix BASE DOUBLE_COLOM
+	;
+	
+function_indentifier
+	: compound_identifier_List								{$$ = $1;}
+	| base_class_indetifier_prefix IDENTIFIER				{_ASSERTE (0);}
+	;
+			
+function_call
+	: function_indentifier '(' ')'							{GET_PARENT_CLASS; $$ = me->NewExpressionFunctionCall ($1, dUserVariable());}
+	| function_indentifier '(' argument_list ')'			{GET_PARENT_CLASS; $$ = me->NewExpressionFunctionCall ($1, $3);}
+	;
+
+return 
+	: RETURN												{GET_PARENT_CLASS; $$ = me->NewReturnStatement(dUserVariable());}
+	| RETURN expression										{GET_PARENT_CLASS; $$ = me->NewReturnStatement($2);}
+	;	
+	
+new_types 
+	: CLASS IDENTIFIER '(' ')'								{_ASSERTE (0);}
+	| CLASS IDENTIFIER '(' argument_list ')'				{_ASSERTE (0);}
+	| primitive_types array_type_list						{_ASSERTE (0);}
+	| CLASS IDENTIFIER array_type_list						{_ASSERTE (0);}
+	;
+	
+	
+expression
+	: '(' expression ')'								{$$ = $2;}
+	| function_call										{$$ = $1;}	
+	| compound_identifier_List							{GET_PARENT_CLASS; $$ = me->NewExpressionNodeVariable ($1, dUserVariable());}	
+	| compound_identifier_List multidimension_array		{GET_PARENT_CLASS; $$ = me->NewExpressionNodeVariable ($1, $2);}	
+//	| expression IDENTICAL expression					{GET_PARENT_CLASS; $$ = me->NewExpressionNodeBinaryOperator ($2, $1, $3);}
+//	| expression DIFFERENT expression					{GET_PARENT_CLASS; $$ = me->NewExpressionNodeBinaryOperator ($2, $1, $3);}
+//	| expression LOGIC_OR expression					{GET_PARENT_CLASS; $$ = me->NewExpressionNodeBinaryOperator ($2, $1, $3);}
+//	| expression LOGIC_AND expression					{GET_PARENT_CLASS; $$ = me->NewExpressionNodeBinaryOperator ($2, $1, $3);}	
+//	| expression '|' expression							{GET_PARENT_CLASS; $$ = me->NewExpressionNodeBinaryOperator ($2, $1, $3);}
+//	| expression '^' expression							{GET_PARENT_CLASS; $$ = me->NewExpressionNodeBinaryOperator ($2, $1, $3);}
+//	| expression '&' expression							{GET_PARENT_CLASS; $$ = me->NewExpressionNodeBinaryOperator ($2, $1, $3);}
+	| expression '<' expression							{GET_PARENT_CLASS; $$ = me->NewExpressionNodeBinaryOperator ($2, $1, $3);}
+	| expression '>' expression							{GET_PARENT_CLASS; $$ = me->NewExpressionNodeBinaryOperator ($2, $1, $3);}
+	| expression GREATHER_EQUAL expression				{GET_PARENT_CLASS; $$ = me->NewExpressionNodeBinaryOperator ($2, $1, $3);}
+	| expression LESS_EQUAL expression					{GET_PARENT_CLASS; $$ = me->NewExpressionNodeBinaryOperator ($2, $1, $3);}
+//	| expression SHIFT_RIGHT expression					{GET_PARENT_CLASS; $$ = me->NewExpressionNodeBinaryOperator ($2, $1, $3);}
+	| expression '+' expression							{GET_PARENT_CLASS; $$ = me->NewExpressionNodeBinaryOperator ($2, $1, $3);}
+	| expression '-' expression							{GET_PARENT_CLASS; $$ = me->NewExpressionNodeBinaryOperator ($2, $1, $3);}
+	| expression '*' expression							{GET_PARENT_CLASS; $$ = me->NewExpressionNodeBinaryOperator ($2, $1, $3);}
+	| expression '%' expression							{GET_PARENT_CLASS; $$ = me->NewExpressionNodeBinaryOperator ($2, $1, $3);}
+	| expression '/' expression							{GET_PARENT_CLASS; $$ = me->NewExpressionNodeBinaryOperator ($2, $1, $3);}
+//	| '!' expression 									{GET_PARENT_CLASS; $$ = me->NewExpressionNodeUnuaryOperator ($1, $2);}
+//	| '~' expression 									{GET_PARENT_CLASS; $$ = me->NewExpressionNodeUnuaryOperator ($1, $2);}
+//	| '-' expression %prec '~'							{GET_PARENT_CLASS; $$ = me->NewExpressionNodeUnuaryOperator ($1, $2);}
+//	| '+' expression %prec '~'							{$$ = $2;}
+//	| expression '?' expression ':' expression			{_ASSERTE (0);}		
+	| SIZEOF '(' compound_identifier_List ')'			{_ASSERTE (0);}
+	| SIZEOF '(' type_specifier ')'						{_ASSERTE (0);}
+	| CAST '<' type_specifier '>' '(' expression ')'	{_ASSERTE (0);}
+	| NEW new_types										{_ASSERTE (0);}
+	| INTEGER_VALUE										{GET_PARENT_CLASS; $$ = me->NewExpressionNodeConstant ($1);}
+	| FLOAT_VALUE										{GET_PARENT_CLASS; $$ = me->NewExpressionNodeConstant ($1);}
+	| STRING_VALUE										{GET_PARENT_CLASS; $$ = me->NewExpressionNodeConstant ($1);}
+	;	
+	
+	
+statement
+	: ';'																							{$$ = $1;}
+	| block_scope																					{$$ = $1;}
+	| assigment_statement ';'																		{$$ = $1;}		
+	| parameter ';'																					{GET_PARENT_CLASS; $$ = me->NewLocalVariableStatement($1, dUserVariable());}
+	| parameter '=' expression ';'																	{GET_PARENT_CLASS; $$ = me->NewLocalVariableStatement($1, $3);} 
+	| CONTINUE ';'																					{_ASSERTE (0);}
+	| BREAK	';'																						{GET_PARENT_CLASS; $$ = me->NewBreakStatement();}
+	| SWITCH '(' expression ')' '{' switch_case_list '}' 											{_ASSERTE (0);}
+	| FOR for_begin '(' for_first_expression ';' ';' for_third_expression ')' statement 			{GET_PARENT_CLASS; $$ = me->NewForStatement($2, $4, dUserVariable(), $7, $9);}
+	| FOR for_begin '(' for_first_expression ';' expression ';' for_third_expression ')' statement 	{GET_PARENT_CLASS; $$ = me->NewForStatement($2, $4, $6, $8, $10);}
+	| WHILE '(' ')' statement																		{GET_PARENT_CLASS; $$ = me->NewWhileStatement(dUserVariable(), $4);}
+	| WHILE '(' expression ')' statement															{GET_PARENT_CLASS; $$ = me->NewWhileStatement($3, $5);}
+	| DO statement WHILE '(' ')' ';'																{GET_PARENT_CLASS; $$ = me->NewDoStatement(dUserVariable(), $2);}
+	| DO statement WHILE '(' expression ')' ';'														{GET_PARENT_CLASS; $$ = me->NewDoStatement($5, $2);}
+	| return ';'																					{$$ = $1;}
+	| function_call ';'																				{GET_PARENT_CLASS; $$ = me->NewFunctionCallStatement($1);}
+	| IF '(' expression	')' statement																{GET_PARENT_CLASS; $$ = me->NewIFStatement($3, $5, dUserVariable());}	
+	| IF '(' expression	')' statement ELSE statement												{GET_PARENT_CLASS; $$ = me->NewIFStatement ($3, $5, $7);}
+	| syntax_error
+	;
+	

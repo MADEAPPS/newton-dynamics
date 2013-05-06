@@ -1,0 +1,2567 @@
+/* Copyright (c) <2009> <Newton Game Dynamics>
+* 
+* This software is provided 'as-is', without any express or implied
+* warranty. In no event will the authors be held liable for any damages
+* arising from the use of this software.
+* 
+* Permission is granted to anyone to use this software for any purpose,
+* including commercial applications, and to alter it and redistribute it
+* freely
+*/
+
+<html xmlns:v="urn:schemas-microsoft-com:vml"
+xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:w="urn:schemas-microsoft-com:office:word"
+xmlns:m="http://schemas.microsoft.com/office/2004/12/omml"
+xmlns="http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<meta name=ProgId content=Word.Document>
+<meta name=Generator content="Microsoft Word 12">
+<meta name=Originator content="Microsoft Word 12">
+<link rel=File-List href="NewtonTutorial_files/filelist.xml">
+<!--[if gte mso 9]><xml>
+ <o:DocumentProperties>
+  <o:Author>Julio</o:Author>
+  <o:LastAuthor>Julio</o:LastAuthor>
+  <o:Revision>2</o:Revision>
+  <o:TotalTime>1</o:TotalTime>
+  <o:Created>2009-07-03T13:11:00Z</o:Created>
+  <o:LastSaved>2009-07-03T13:11:00Z</o:LastSaved>
+  <o:Pages>10</o:Pages>
+  <o:Words>1889</o:Words>
+  <o:Characters>10770</o:Characters>
+  <o:Company>Newton Game Dynamics</o:Company>
+  <o:Lines>89</o:Lines>
+  <o:Paragraphs>25</o:Paragraphs>
+  <o:CharactersWithSpaces>12634</o:CharactersWithSpaces>
+  <o:Version>12.00</o:Version>
+ </o:DocumentProperties>
+</xml><![endif]-->
+<link rel=themeData href="NewtonTutorial_files/themedata.thmx">
+<link rel=colorSchemeMapping href="NewtonTutorial_files/colorschememapping.xml">
+<!--[if gte mso 9]><xml>
+ <w:WordDocument>
+  <w:SpellingState>Clean</w:SpellingState>
+  <w:GrammarState>Clean</w:GrammarState>
+  <w:TrackMoves>false</w:TrackMoves>
+  <w:TrackFormatting/>
+  <w:PunctuationKerning/>
+  <w:ValidateAgainstSchemas/>
+  <w:SaveIfXMLInvalid>false</w:SaveIfXMLInvalid>
+  <w:IgnoreMixedContent>false</w:IgnoreMixedContent>
+  <w:AlwaysShowPlaceholderText>false</w:AlwaysShowPlaceholderText>
+  <w:DoNotPromoteQF/>
+  <w:LidThemeOther>EN-US</w:LidThemeOther>
+  <w:LidThemeAsian>X-NONE</w:LidThemeAsian>
+  <w:LidThemeComplexScript>X-NONE</w:LidThemeComplexScript>
+  <w:Compatibility>
+   <w:BreakWrappedTables/>
+   <w:SnapToGridInCell/>
+   <w:WrapTextWithPunct/>
+   <w:UseAsianBreakRules/>
+   <w:DontGrowAutofit/>
+   <w:SplitPgBreakAndParaMark/>
+   <w:DontVertAlignCellWithSp/>
+   <w:DontBreakConstrainedForcedTables/>
+   <w:DontVertAlignInTxbx/>
+   <w:Word11KerningPairs/>
+   <w:CachedColBalance/>
+  </w:Compatibility>
+  <w:BrowserLevel>MicrosoftInternetExplorer4</w:BrowserLevel>
+  <m:mathPr>
+   <m:mathFont m:val="Cambria Math"/>
+   <m:brkBin m:val="before"/>
+   <m:brkBinSub m:val="&#45;-"/>
+   <m:smallFrac m:val="off"/>
+   <m:dispDef/>
+   <m:lMargin m:val="0"/>
+   <m:rMargin m:val="0"/>
+   <m:defJc m:val="centerGroup"/>
+   <m:wrapIndent m:val="1440"/>
+   <m:intLim m:val="subSup"/>
+   <m:naryLim m:val="undOvr"/>
+  </m:mathPr></w:WordDocument>
+</xml><![endif]--><!--[if gte mso 9]><xml>
+ <w:LatentStyles DefLockedState="false" DefUnhideWhenUsed="true"
+  DefSemiHidden="true" DefQFormat="false" DefPriority="99"
+  LatentStyleCount="267">
+  <w:LsdException Locked="false" Priority="0" SemiHidden="false"
+   UnhideWhenUsed="false" QFormat="true" Name="Normal"/>
+  <w:LsdException Locked="false" Priority="9" SemiHidden="false"
+   UnhideWhenUsed="false" QFormat="true" Name="heading 1"/>
+  <w:LsdException Locked="false" Priority="9" QFormat="true" Name="heading 2"/>
+  <w:LsdException Locked="false" Priority="9" QFormat="true" Name="heading 3"/>
+  <w:LsdException Locked="false" Priority="9" QFormat="true" Name="heading 4"/>
+  <w:LsdException Locked="false" Priority="9" QFormat="true" Name="heading 5"/>
+  <w:LsdException Locked="false" Priority="9" QFormat="true" Name="heading 6"/>
+  <w:LsdException Locked="false" Priority="9" QFormat="true" Name="heading 7"/>
+  <w:LsdException Locked="false" Priority="9" QFormat="true" Name="heading 8"/>
+  <w:LsdException Locked="false" Priority="9" QFormat="true" Name="heading 9"/>
+  <w:LsdException Locked="false" Priority="39" Name="toc 1"/>
+  <w:LsdException Locked="false" Priority="39" Name="toc 2"/>
+  <w:LsdException Locked="false" Priority="39" Name="toc 3"/>
+  <w:LsdException Locked="false" Priority="39" Name="toc 4"/>
+  <w:LsdException Locked="false" Priority="39" Name="toc 5"/>
+  <w:LsdException Locked="false" Priority="39" Name="toc 6"/>
+  <w:LsdException Locked="false" Priority="39" Name="toc 7"/>
+  <w:LsdException Locked="false" Priority="39" Name="toc 8"/>
+  <w:LsdException Locked="false" Priority="39" Name="toc 9"/>
+  <w:LsdException Locked="false" Priority="35" QFormat="true" Name="caption"/>
+  <w:LsdException Locked="false" Priority="10" SemiHidden="false"
+   UnhideWhenUsed="false" QFormat="true" Name="Title"/>
+  <w:LsdException Locked="false" Priority="1" Name="Default Paragraph Font"/>
+  <w:LsdException Locked="false" Priority="11" SemiHidden="false"
+   UnhideWhenUsed="false" QFormat="true" Name="Subtitle"/>
+  <w:LsdException Locked="false" Priority="22" SemiHidden="false"
+   UnhideWhenUsed="false" QFormat="true" Name="Strong"/>
+  <w:LsdException Locked="false" Priority="20" SemiHidden="false"
+   UnhideWhenUsed="false" QFormat="true" Name="Emphasis"/>
+  <w:LsdException Locked="false" Priority="59" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Table Grid"/>
+  <w:LsdException Locked="false" UnhideWhenUsed="false" Name="Placeholder Text"/>
+  <w:LsdException Locked="false" Priority="1" SemiHidden="false"
+   UnhideWhenUsed="false" QFormat="true" Name="No Spacing"/>
+  <w:LsdException Locked="false" Priority="60" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Light Shading"/>
+  <w:LsdException Locked="false" Priority="61" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Light List"/>
+  <w:LsdException Locked="false" Priority="62" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Light Grid"/>
+  <w:LsdException Locked="false" Priority="63" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Shading 1"/>
+  <w:LsdException Locked="false" Priority="64" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Shading 2"/>
+  <w:LsdException Locked="false" Priority="65" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium List 1"/>
+  <w:LsdException Locked="false" Priority="66" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium List 2"/>
+  <w:LsdException Locked="false" Priority="67" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Grid 1"/>
+  <w:LsdException Locked="false" Priority="68" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Grid 2"/>
+  <w:LsdException Locked="false" Priority="69" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Grid 3"/>
+  <w:LsdException Locked="false" Priority="70" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Dark List"/>
+  <w:LsdException Locked="false" Priority="71" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Colorful Shading"/>
+  <w:LsdException Locked="false" Priority="72" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Colorful List"/>
+  <w:LsdException Locked="false" Priority="73" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Colorful Grid"/>
+  <w:LsdException Locked="false" Priority="60" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Light Shading Accent 1"/>
+  <w:LsdException Locked="false" Priority="61" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Light List Accent 1"/>
+  <w:LsdException Locked="false" Priority="62" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Light Grid Accent 1"/>
+  <w:LsdException Locked="false" Priority="63" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Shading 1 Accent 1"/>
+  <w:LsdException Locked="false" Priority="64" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Shading 2 Accent 1"/>
+  <w:LsdException Locked="false" Priority="65" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium List 1 Accent 1"/>
+  <w:LsdException Locked="false" UnhideWhenUsed="false" Name="Revision"/>
+  <w:LsdException Locked="false" Priority="34" SemiHidden="false"
+   UnhideWhenUsed="false" QFormat="true" Name="List Paragraph"/>
+  <w:LsdException Locked="false" Priority="29" SemiHidden="false"
+   UnhideWhenUsed="false" QFormat="true" Name="Quote"/>
+  <w:LsdException Locked="false" Priority="30" SemiHidden="false"
+   UnhideWhenUsed="false" QFormat="true" Name="Intense Quote"/>
+  <w:LsdException Locked="false" Priority="66" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium List 2 Accent 1"/>
+  <w:LsdException Locked="false" Priority="67" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Grid 1 Accent 1"/>
+  <w:LsdException Locked="false" Priority="68" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Grid 2 Accent 1"/>
+  <w:LsdException Locked="false" Priority="69" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Grid 3 Accent 1"/>
+  <w:LsdException Locked="false" Priority="70" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Dark List Accent 1"/>
+  <w:LsdException Locked="false" Priority="71" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Colorful Shading Accent 1"/>
+  <w:LsdException Locked="false" Priority="72" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Colorful List Accent 1"/>
+  <w:LsdException Locked="false" Priority="73" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Colorful Grid Accent 1"/>
+  <w:LsdException Locked="false" Priority="60" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Light Shading Accent 2"/>
+  <w:LsdException Locked="false" Priority="61" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Light List Accent 2"/>
+  <w:LsdException Locked="false" Priority="62" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Light Grid Accent 2"/>
+  <w:LsdException Locked="false" Priority="63" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Shading 1 Accent 2"/>
+  <w:LsdException Locked="false" Priority="64" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Shading 2 Accent 2"/>
+  <w:LsdException Locked="false" Priority="65" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium List 1 Accent 2"/>
+  <w:LsdException Locked="false" Priority="66" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium List 2 Accent 2"/>
+  <w:LsdException Locked="false" Priority="67" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Grid 1 Accent 2"/>
+  <w:LsdException Locked="false" Priority="68" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Grid 2 Accent 2"/>
+  <w:LsdException Locked="false" Priority="69" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Grid 3 Accent 2"/>
+  <w:LsdException Locked="false" Priority="70" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Dark List Accent 2"/>
+  <w:LsdException Locked="false" Priority="71" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Colorful Shading Accent 2"/>
+  <w:LsdException Locked="false" Priority="72" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Colorful List Accent 2"/>
+  <w:LsdException Locked="false" Priority="73" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Colorful Grid Accent 2"/>
+  <w:LsdException Locked="false" Priority="60" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Light Shading Accent 3"/>
+  <w:LsdException Locked="false" Priority="61" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Light List Accent 3"/>
+  <w:LsdException Locked="false" Priority="62" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Light Grid Accent 3"/>
+  <w:LsdException Locked="false" Priority="63" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Shading 1 Accent 3"/>
+  <w:LsdException Locked="false" Priority="64" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Shading 2 Accent 3"/>
+  <w:LsdException Locked="false" Priority="65" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium List 1 Accent 3"/>
+  <w:LsdException Locked="false" Priority="66" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium List 2 Accent 3"/>
+  <w:LsdException Locked="false" Priority="67" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Grid 1 Accent 3"/>
+  <w:LsdException Locked="false" Priority="68" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Grid 2 Accent 3"/>
+  <w:LsdException Locked="false" Priority="69" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Grid 3 Accent 3"/>
+  <w:LsdException Locked="false" Priority="70" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Dark List Accent 3"/>
+  <w:LsdException Locked="false" Priority="71" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Colorful Shading Accent 3"/>
+  <w:LsdException Locked="false" Priority="72" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Colorful List Accent 3"/>
+  <w:LsdException Locked="false" Priority="73" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Colorful Grid Accent 3"/>
+  <w:LsdException Locked="false" Priority="60" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Light Shading Accent 4"/>
+  <w:LsdException Locked="false" Priority="61" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Light List Accent 4"/>
+  <w:LsdException Locked="false" Priority="62" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Light Grid Accent 4"/>
+  <w:LsdException Locked="false" Priority="63" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Shading 1 Accent 4"/>
+  <w:LsdException Locked="false" Priority="64" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Shading 2 Accent 4"/>
+  <w:LsdException Locked="false" Priority="65" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium List 1 Accent 4"/>
+  <w:LsdException Locked="false" Priority="66" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium List 2 Accent 4"/>
+  <w:LsdException Locked="false" Priority="67" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Grid 1 Accent 4"/>
+  <w:LsdException Locked="false" Priority="68" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Grid 2 Accent 4"/>
+  <w:LsdException Locked="false" Priority="69" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Grid 3 Accent 4"/>
+  <w:LsdException Locked="false" Priority="70" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Dark List Accent 4"/>
+  <w:LsdException Locked="false" Priority="71" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Colorful Shading Accent 4"/>
+  <w:LsdException Locked="false" Priority="72" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Colorful List Accent 4"/>
+  <w:LsdException Locked="false" Priority="73" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Colorful Grid Accent 4"/>
+  <w:LsdException Locked="false" Priority="60" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Light Shading Accent 5"/>
+  <w:LsdException Locked="false" Priority="61" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Light List Accent 5"/>
+  <w:LsdException Locked="false" Priority="62" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Light Grid Accent 5"/>
+  <w:LsdException Locked="false" Priority="63" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Shading 1 Accent 5"/>
+  <w:LsdException Locked="false" Priority="64" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Shading 2 Accent 5"/>
+  <w:LsdException Locked="false" Priority="65" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium List 1 Accent 5"/>
+  <w:LsdException Locked="false" Priority="66" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium List 2 Accent 5"/>
+  <w:LsdException Locked="false" Priority="67" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Grid 1 Accent 5"/>
+  <w:LsdException Locked="false" Priority="68" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Grid 2 Accent 5"/>
+  <w:LsdException Locked="false" Priority="69" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Grid 3 Accent 5"/>
+  <w:LsdException Locked="false" Priority="70" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Dark List Accent 5"/>
+  <w:LsdException Locked="false" Priority="71" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Colorful Shading Accent 5"/>
+  <w:LsdException Locked="false" Priority="72" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Colorful List Accent 5"/>
+  <w:LsdException Locked="false" Priority="73" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Colorful Grid Accent 5"/>
+  <w:LsdException Locked="false" Priority="60" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Light Shading Accent 6"/>
+  <w:LsdException Locked="false" Priority="61" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Light List Accent 6"/>
+  <w:LsdException Locked="false" Priority="62" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Light Grid Accent 6"/>
+  <w:LsdException Locked="false" Priority="63" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Shading 1 Accent 6"/>
+  <w:LsdException Locked="false" Priority="64" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Shading 2 Accent 6"/>
+  <w:LsdException Locked="false" Priority="65" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium List 1 Accent 6"/>
+  <w:LsdException Locked="false" Priority="66" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium List 2 Accent 6"/>
+  <w:LsdException Locked="false" Priority="67" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Grid 1 Accent 6"/>
+  <w:LsdException Locked="false" Priority="68" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Grid 2 Accent 6"/>
+  <w:LsdException Locked="false" Priority="69" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Medium Grid 3 Accent 6"/>
+  <w:LsdException Locked="false" Priority="70" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Dark List Accent 6"/>
+  <w:LsdException Locked="false" Priority="71" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Colorful Shading Accent 6"/>
+  <w:LsdException Locked="false" Priority="72" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Colorful List Accent 6"/>
+  <w:LsdException Locked="false" Priority="73" SemiHidden="false"
+   UnhideWhenUsed="false" Name="Colorful Grid Accent 6"/>
+  <w:LsdException Locked="false" Priority="19" SemiHidden="false"
+   UnhideWhenUsed="false" QFormat="true" Name="Subtle Emphasis"/>
+  <w:LsdException Locked="false" Priority="21" SemiHidden="false"
+   UnhideWhenUsed="false" QFormat="true" Name="Intense Emphasis"/>
+  <w:LsdException Locked="false" Priority="31" SemiHidden="false"
+   UnhideWhenUsed="false" QFormat="true" Name="Subtle Reference"/>
+  <w:LsdException Locked="false" Priority="32" SemiHidden="false"
+   UnhideWhenUsed="false" QFormat="true" Name="Intense Reference"/>
+  <w:LsdException Locked="false" Priority="33" SemiHidden="false"
+   UnhideWhenUsed="false" QFormat="true" Name="Book Title"/>
+  <w:LsdException Locked="false" Priority="37" Name="Bibliography"/>
+  <w:LsdException Locked="false" Priority="39" QFormat="true" Name="TOC Heading"/>
+ </w:LatentStyles>
+</xml><![endif]-->
+<style>
+<!--
+ /* Font Definitions */
+ @font-face
+	{font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;
+	mso-font-charset:1;
+	mso-generic-font-family:roman;
+	mso-font-format:other;
+	mso-font-pitch:variable;
+	mso-font-signature:0 0 0 0 0 0;}
+@font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;
+	mso-font-charset:0;
+	mso-generic-font-family:swiss;
+	mso-font-pitch:variable;
+	mso-font-signature:-1610611985 1073750139 0 0 159 0;}
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{mso-style-unhide:no;
+	mso-style-qformat:yes;
+	mso-style-parent:"";
+	margin-top:0in;
+	margin-right:0in;
+	margin-bottom:10.0pt;
+	margin-left:0in;
+	line-height:115%;
+	mso-pagination:widow-orphan;
+	font-size:11.0pt;
+	font-family:"Calibri","sans-serif";
+	mso-ascii-font-family:Calibri;
+	mso-ascii-theme-font:minor-latin;
+	mso-fareast-font-family:Calibri;
+	mso-fareast-theme-font:minor-latin;
+	mso-hansi-font-family:Calibri;
+	mso-hansi-theme-font:minor-latin;
+	mso-bidi-font-family:"Times New Roman";
+	mso-bidi-theme-font:minor-bidi;}
+p
+	{mso-style-noshow:yes;
+	mso-style-priority:99;
+	margin-top:4.8pt;
+	margin-right:0in;
+	margin-bottom:6.0pt;
+	margin-left:0in;
+	line-height:18.0pt;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	font-family:"Times New Roman","serif";
+	mso-fareast-font-family:"Times New Roman";}
+pre
+	{mso-style-noshow:yes;
+	mso-style-priority:99;
+	mso-style-link:"HTML Preformatted Char";
+	margin:0in;
+	margin-bottom:.0001pt;
+	line-height:13.2pt;
+	mso-pagination:widow-orphan;
+	tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+	background:#F9F9F9;
+	border:none;
+	mso-border-alt:dashed #2F6FAB .5pt;
+	padding:0in;
+	mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt;
+	font-size:10.0pt;
+	font-family:"Courier New";
+	mso-fareast-font-family:"Times New Roman";
+	color:black;}
+span.HTMLPreformattedChar
+	{mso-style-name:"HTML Preformatted Char";
+	mso-style-noshow:yes;
+	mso-style-priority:99;
+	mso-style-unhide:no;
+	mso-style-locked:yes;
+	mso-style-link:"HTML Preformatted";
+	mso-ansi-font-size:10.0pt;
+	mso-bidi-font-size:10.0pt;
+	font-family:"Courier New";
+	mso-ascii-font-family:"Courier New";
+	mso-fareast-font-family:"Times New Roman";
+	mso-hansi-font-family:"Courier New";
+	mso-bidi-font-family:"Courier New";
+	color:black;
+	background:#F9F9F9;}
+span.SpellE
+	{mso-style-name:"";
+	mso-spl-e:yes;}
+span.GramE
+	{mso-style-name:"";
+	mso-gram-e:yes;}
+.MsoChpDefault
+	{mso-style-type:export-only;
+	mso-default-props:yes;
+	mso-ascii-font-family:Calibri;
+	mso-ascii-theme-font:minor-latin;
+	mso-fareast-font-family:Calibri;
+	mso-fareast-theme-font:minor-latin;
+	mso-hansi-font-family:Calibri;
+	mso-hansi-theme-font:minor-latin;
+	mso-bidi-font-family:"Times New Roman";
+	mso-bidi-theme-font:minor-bidi;}
+.MsoPapDefault
+	{mso-style-type:export-only;
+	margin-bottom:10.0pt;
+	line-height:115%;}
+@page Section1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.0in 1.0in 1.0in;
+	mso-header-margin:.5in;
+	mso-footer-margin:.5in;
+	mso-paper-source:0;}
+div.Section1
+	{page:Section1;}
+-->
+</style>
+<!--[if gte mso 10]>
+<style>
+ /* Style Definitions */
+ table.MsoNormalTable
+	{mso-style-name:"Table Normal";
+	mso-tstyle-rowband-size:0;
+	mso-tstyle-colband-size:0;
+	mso-style-noshow:yes;
+	mso-style-priority:99;
+	mso-style-qformat:yes;
+	mso-style-parent:"";
+	mso-padding-alt:0in 5.4pt 0in 5.4pt;
+	mso-para-margin-top:0in;
+	mso-para-margin-right:0in;
+	mso-para-margin-bottom:10.0pt;
+	mso-para-margin-left:0in;
+	line-height:115%;
+	mso-pagination:widow-orphan;
+	font-size:11.0pt;
+	font-family:"Calibri","sans-serif";
+	mso-ascii-font-family:Calibri;
+	mso-ascii-theme-font:minor-latin;
+	mso-hansi-font-family:Calibri;
+	mso-hansi-theme-font:minor-latin;}
+</style>
+<![endif]--><!--[if gte mso 9]><xml>
+ <o:shapedefaults v:ext="edit" spidmax="2050"/>
+</xml><![endif]--><!--[if gte mso 9]><xml>
+ <o:shapelayout v:ext="edit">
+  <o:idmap v:ext="edit" data="1"/>
+ </o:shapelayout></xml><![endif]-->
+</head>
+
+<body lang=EN-US style='tab-interval:.5in'>
+
+<div class=Section1>
+
+<p class=MsoNormal style='margin-bottom:6.0pt;line-height:18.0pt;background:
+white'><span lang=EN style='font-size:12.5pt;font-family:"Arial","sans-serif";
+mso-fareast-font-family:"Times New Roman";color:black;mso-ansi-language:EN'>Download
+the file NewtonTutorial.zip from the Newton website and unpack it anywhere in
+your windows machine, if you have not done so. <o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>These tutorials are made
+for Win32, compiled with visual Studio 2003 and using Simple <span
+class=SpellE>DirectMedia</span> Layer (SDL) for Graphics, Sound and Input. All
+of the elements in the tutorials are cross platform; therefore it should be
+simple to build then on other platform like win64, Linux, and Mac OS. However
+this is a basic tutorial and we will not experiment with that right now. <o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>After unpacking, go to the
+folder .../<span class=SpellE>NewtonToturials</span> and open the visual studio
+solution NewtonTutorials.sln <o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>In the solution explorer
+right click on project Tutorial_101_GettingStarted and select Set as Startup
+Project, then click Rebuild Solution. All the dependencies are included in the
+download; therefore all projects should build with zero warning and zero
+errors. <o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>Open up file Main.cpp <o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>The first lines of code <o:p></o:p></span></p>
+
+<div style='mso-element:para-border-div;border:solid #2F6FAB 1.0pt;mso-border-alt:
+solid #2F6FAB .5pt;padding:12.0pt 12.0pt 12.0pt 12.0pt;background:#F9F9F9'>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>#include &lt;<span class=SpellE>stdafx.h</span>&gt;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>#include &lt;<span class=SpellE>dVector.h</span>&gt;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>#include &quot;<span class=SpellE>OpenGlUtil.h</span>&quot;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>#include &quot;<span class=SpellE>CreateScene.h</span>&quot;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>#define USE_VISUAL_DEBUGGER<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>#define DEMO_FPS_IN_MICROSECUNDS (<span
+class=SpellE>int</span> (1000000.0f/100.0f))<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span class=GramE><span lang=EN
+style='font-size:10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>static</span></span><span lang=EN
+style='font-size:10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'> <span class=SpellE>int</span> <span
+class=SpellE>g_currentTime</span>;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span class=GramE><span lang=EN
+style='font-size:10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>static</span></span><span lang=EN
+style='font-size:10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'> <span class=SpellE>int</span> <span
+class=SpellE>g_physicTime</span>;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span class=GramE><span lang=EN
+style='font-size:10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>static</span></span><span lang=EN
+style='font-size:10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'> <span class=SpellE>int</span> <span
+class=SpellE>g_timeAccumulator</span> = DEMO_FPS_IN_MICROSECUNDS;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span class=GramE><span lang=EN
+style='font-size:10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>static</span></span><span lang=EN
+style='font-size:10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'> void* <span class=SpellE>g_newtonDebugger</span>;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span class=GramE><span lang=EN
+style='font-size:10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>static</span></span><span lang=EN
+style='font-size:10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'> <span class=SpellE>NewtonWorld</span>* <span
+class=SpellE>g_world</span>;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span class=GramE><span lang=EN
+style='font-size:10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>static</span></span><span lang=EN
+style='font-size:10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'> <span class=SpellE>SceneManager</span>* <span
+class=SpellE>g_sceneManager</span>;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span class=GramE><span lang=EN
+style='font-size:10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>static</span></span><span lang=EN
+style='font-size:10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'> void <span class=SpellE>ShutDown</span> ();<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span class=GramE><span lang=EN
+style='font-size:10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>static</span></span><span lang=EN
+style='font-size:10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'> void* <span class=SpellE>AllocMemory</span>
+(<span class=SpellE>int</span> <span class=SpellE>sizeInBytes</span>);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span class=GramE><span lang=EN
+style='font-size:10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>static</span></span><span lang=EN
+style='font-size:10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'> void <span class=SpellE>FreeMemory</span>
+(void *<span class=SpellE>ptr</span>, <span class=SpellE>int</span> <span
+class=SpellE>sizeInBytes</span>);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span class=GramE><span lang=EN
+style='font-size:10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>static</span></span><span lang=EN
+style='font-size:10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'> void <span class=SpellE>AdvanceSimulation</span>
+(<span class=SpellE>int</span> <span class=SpellE>timeInMilisecunds</span>);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>#<span class=SpellE>pragma</span> warning
+(disable: 4100) //unreferenced formal parameter<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>#<span class=SpellE>pragma</span> warning
+(disable: 4702) //unreachable code<o:p></o:p></span></p>
+
+</div>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>These are just the
+necessary included files, constant and variables necessary for the project to
+work. <o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>The first Line in function
+main <o:p></o:p></span></p>
+
+<div style='mso-element:para-border-div;border:solid #2F6FAB 1.0pt;mso-border-alt:
+solid #2F6FAB .5pt;padding:12.0pt 12.0pt 12.0pt 12.0pt;background:#F9F9F9'>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>_<span class=GramE>CrtSetDbgFlag(</span>_CRTDBG_LEAK_CHECK_DF|_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF));<o:p></o:p></span></p>
+
+</div>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>Is <span class=GramE>a</span>
+operating system memory leak check handler that indicates if some memory
+allocation was not freed on exit. <o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>The following lines: <o:p></o:p></span></p>
+
+<div style='mso-element:para-border-div;border:solid #2F6FAB 1.0pt;mso-border-alt:
+solid #2F6FAB .5pt;padding:12.0pt 12.0pt 12.0pt 12.0pt;background:#F9F9F9'>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span>//
+initialize graphics system<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=GramE>if</span> (!<span class=SpellE>InitGraphicsSystem</span> (800,
+600)) {<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:2'>               </span><span
+class=GramE>exit</span> (0);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span>}<o:p></o:p></span></p>
+
+</div>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>Initializes a proper SDL
+Graphic System that will be use to visualize the physics scene. You are welcome
+to step into the function in debug mode to see how it is implemented, I will
+not spend time explaining the details, <span class=GramE>I</span> will only say
+the code was taken almost verbatim from the SDL examples. <o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>Next <o:p></o:p></span></p>
+
+<div style='mso-element:para-border-div;border:solid #2F6FAB 1.0pt;mso-border-alt:
+solid #2F6FAB .5pt;padding:12.0pt 12.0pt 12.0pt 12.0pt;background:#F9F9F9'>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>// set a callback for destroying the world at
+termination<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span class=SpellE><span
+class=GramE><span lang=EN style='font-size:10.0pt;font-family:"Courier New";
+mso-fareast-font-family:"Times New Roman";color:black;mso-ansi-language:EN'>atexit</span></span></span><span
+lang=EN style='font-size:10.0pt;font-family:"Courier New";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'> (<span class=SpellE>ShutDown</span>);<o:p></o:p></span></p>
+
+</div>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>A termination function is
+set, which will be called when the user decides to terminate the program. For
+most Graphics engines with a gracious ways to shutting down this is not
+necessary, but graphics libraries like SDL and GLUT do not terminate with grace
+and all termination code has to be added during forced exit termination. The
+termination function looks like this: <o:p></o:p></span></p>
+
+<div style='mso-element:para-border-div;border:solid #2F6FAB 1.0pt;mso-border-alt:
+solid #2F6FAB .5pt;padding:12.0pt 12.0pt 12.0pt 12.0pt;background:#F9F9F9'>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>// <span class=GramE>On</span> termination,
+the application must destroy the Newton world <o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span class=GramE><span lang=EN
+style='font-size:10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>void</span></span><span lang=EN
+style='font-size:10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'> <span class=SpellE>ShutDown</span> ()<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>{<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>#<span class=SpellE>ifdef</span>
+USE_VISUAL_DEBUGGER<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span>//
+destroy the debugger server<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=SpellE>NewtonDebuggerDestroyServer</span> (<span class=SpellE>g_newtonDebugger</span>);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>#<span class=SpellE>endif</span><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span>//
+destroy all rigid bodies, this is not necessary because Newton Destroy world
+will also destroy all bodies<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span>//
+but if you want to change level and restart you can call this function.<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=SpellE>NewtonDestroyAllBodies</span> (<span class=SpellE>g_world</span>);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span>//
+finally destroy the <span class=SpellE>newton</span> world <o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=SpellE>NewtonDestroy</span> (<span class=SpellE>g_world</span>);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span>//
+now we need to destroy the Graphics entities<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-spacerun:yes'>       </span>Delete
+<span class=SpellE>g_sceneManager</span>;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>}<o:p></o:p></span></p>
+
+</div>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>Essentially this destroys
+all objects created by the application in reverse order. <o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>Next <o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>&lt;/<span class=SpellE>prev</span>&gt;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'><span
+style='mso-spacerun:yes'>          </span>// now populate the world with
+Graphic and physical entities <o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'><span style='mso-tab-count:
+1'>          </span><span class=SpellE><span class=GramE>CreateScene</span></span><span
+class=GramE>(</span><span class=SpellE>g_world</span>, <span class=SpellE>g_sceneManager</span>);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>&lt;<span class=SpellE><span
+class=GramE>prev</span></span>&gt;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>Every Graphics engine has a
+way to encapsulate the various graphics components of a visual object into some
+kind of structure, in this tutorials will call those object Entities.<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>In turns these Entities are
+encapsulated into an even higher level object called Scene Manager. A Scene
+Manager is an object that encapsulates most of the functionality of graphics
+engine.<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>It manages the creation, destruction,
+user interface and motion of any graphic object. For the purposes of <span
+class=GramE>this tutorials</span> the scene manager is a class that look like this:<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>&lt;/<span class=SpellE>prev</span>&gt;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span class=GramE><span
+style='font-size:10.0pt;font-family:"Courier New";color:blue'>class</span></span><span
+style='font-size:10.0pt;font-family:"Courier New"'> <span class=SpellE><span
+style='color:black'>SceneManager</span></span><span style='color:black'><o:p></o:p></span></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'>{<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+class=GramE><span style='color:blue'>public</span></span>:<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+class=SpellE><span class=GramE><span style='color:black'>SceneManager</span></span></span><span
+class=GramE>(</span><span style='color:blue'>void</span>);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+class=GramE><span style='color:blue'>virtual</span></span> ~<span class=SpellE><span
+style='color:black'>SceneManager</span></span>(<span style='color:blue'>void</span>);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+class=GramE><span style='color:blue'>void</span></span> <span class=SpellE><span
+style='color:black'>CreateScene</span></span> ();<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+style='color:black'>Entity</span>* <span class=SpellE><span class=GramE><span
+style='color:black'>CreateEntity</span></span></span><span class=GramE>(</span>);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+class=GramE><span style='color:blue'>void</span></span> <span class=SpellE><span
+style='color:black'>SetIntepalationParam</span></span>(<span class=SpellE><span
+style='color:black'>dFloat</span></span> <span class=SpellE><span
+style='color:black'>param</span></span>);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+class=GramE><span style='color:blue'>void</span></span> <span style='color:
+black'>Render</span> ();<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+class=GramE><span style='color:blue'>protected</span></span>:<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+class=SpellE><span class=GramE><span style='color:blue'>int</span></span></span>
+<span class=SpellE><span style='color:black'>m_entCount</span></span>;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+class=SpellE><span class=GramE><span style='color:black'>dFloat</span></span></span>
+<span class=SpellE><span style='color:black'>m_intepolationParam</span></span>;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+style='color:black'>Entity</span>* <span class=SpellE><span style='color:black'>m_<span
+class=GramE>entityArray</span></span></span><span class=GramE>[</span><span
+style='color:black'>MAX_ENTITY_COUNT</span>];<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'>};<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>&lt;<span class=SpellE><span
+class=GramE>prev</span></span>&gt;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>Basically is a very simple
+flat array of Entities.<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'><span
+style='mso-spacerun:yes'> </span><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>The following lines,
+initializes the default settings for a Newton world <o:p></o:p></span></p>
+
+<div style='mso-element:para-border-div;border:solid #2F6FAB 1.0pt;mso-border-alt:
+solid #2F6FAB .5pt;padding:12.0pt 12.0pt 12.0pt 12.0pt;background:#F9F9F9'>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span>//
+create the Newton World<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=SpellE>g_world</span> = <span class=SpellE>NewtonCreate</span> (<span
+class=SpellE>AllocMemory</span>, <span class=SpellE>FreeMemory</span>);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span>//
+configure the Newton world to use iterative solve mode 0<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span>//
+this is the most efficient but the less accurate mode<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=SpellE>NewtonSetSolverModel</span> (<span class=SpellE>g_world</span>,
+1);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span>//
+use the standard x87 floating point model<span style='mso-spacerun:yes'> 
+</span><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=SpellE>NewtonSetPlatformArchitecture</span> (<span class=SpellE>g_world</span>,
+0);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span>//
+set a fix world size<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=SpellE><span class=GramE>dVector</span></span> <span class=SpellE>minSize</span>
+(-500.0f, -500.0f, -500.0f);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=SpellE><span class=GramE>dVector</span></span> <span class=SpellE>maxSize</span>
+( 500.0f,<span style='mso-spacerun:yes'>  </span>500.0f,<span
+style='mso-spacerun:yes'>  </span>500.0f);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=SpellE>NewtonSetWorldSize</span> (<span class=SpellE>g_world</span>,
+&amp;<span class=SpellE><span class=GramE>minSize</span></span><span
+class=GramE>[</span>0], &amp;<span class=SpellE>maxSize</span>[0]); <o:p></o:p></span></p>
+
+</div>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>The function <span
+class=SpellE>NewtoCreate</span> passes the pointer to memory allocation
+functions that will take care of all the engine memory allocation. These
+functions are optional, you can pass NULL but you cannot pass one or the other,
+if you decided to control memory allocation then you must write a memory
+allocation and a memory free function. At the simplest level these function
+should look like this: <o:p></o:p></span></p>
+
+<div style='mso-element:para-border-div;border:solid #2F6FAB 1.0pt;mso-border-alt:
+solid #2F6FAB .5pt;padding:12.0pt 12.0pt 12.0pt 12.0pt;background:#F9F9F9'>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>// this is the callback for allocating Newton
+memory<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span class=GramE><span lang=EN
+style='font-size:10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>void</span></span><span lang=EN
+style='font-size:10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>* <span class=SpellE>AllocMemory</span> (<span
+class=SpellE>int</span> <span class=SpellE>sizeInBytes</span>)<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>{<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=GramE>return</span> <span class=SpellE>malloc</span> (<span class=SpellE>sizeInBytes</span>);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>}<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>// this is the callback for freeing Newton
+Memory<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span class=GramE><span lang=EN
+style='font-size:10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>void</span></span><span lang=EN
+style='font-size:10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'> <span class=SpellE>FreeMemory</span> (void *<span
+class=SpellE>ptr</span>, <span class=SpellE>int</span> <span class=SpellE>sizeInBytes</span>)<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>{<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=GramE>free</span> (<span class=SpellE>ptr</span>);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>}<o:p></o:p></span></p>
+
+</div>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'><br>
+The following lines show a new feature in SDK 2.00 <o:p></o:p></span></p>
+
+<div style='mso-element:para-border-div;border:solid #2F6FAB 1.0pt;mso-border-alt:
+solid #2F6FAB .5pt;padding:12.0pt 12.0pt 12.0pt 12.0pt;background:#F9F9F9'>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>// initialize Newton Visual Debugger<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>#<span class=SpellE>ifdef</span>
+USE_VISUAL_DEBUGGER<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=SpellE>g_newtonDebugger</span> = <span class=SpellE>NewtonDebuggerCreateServer</span>
+();<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>#<span class=SpellE>endif</span><o:p></o:p></span></p>
+
+</div>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>It is the visual debugger,
+at the time of the writing these tutorial the Visual Debugger Listener is not
+yet fully implemented. <o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>Next<o:p></o:p></span></p>
+
+<div style='mso-element:para-border-div;border:solid #2F6FAB 1.0pt;mso-border-alt:
+solid #2F6FAB .5pt;padding:12.0pt 12.0pt 12.0pt 12.0pt;background:#F9F9F9'>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span>//
+now populate the world with Graphic and physical entities<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=SpellE>CreateScene</span> (<span class=SpellE>g_world</span>, <span
+class=SpellE>g_sceneManager</span>);<o:p></o:p></span></p>
+
+</div>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>For these tutorials the Entity
+class looks like this: <o:p></o:p></span></p>
+
+<div style='mso-element:para-border-div;border:solid #2F6FAB 1.0pt;mso-border-alt:
+solid #2F6FAB .5pt;padding:12.0pt 12.0pt 12.0pt 12.0pt;background:#F9F9F9'>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span class=GramE><span lang=EN
+style='font-size:10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>class</span></span><span lang=EN
+style='font-size:10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'> Entity<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>{<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=GramE>public</span>:<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=SpellE><span class=GramE>struct</span></span> <span class=SpellE>SubMesh</span><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span>{<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:2'>               </span><span
+class=GramE>unsigned</span> <span class=SpellE>m_textureHandle</span>;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:2'>               </span><span
+class=SpellE><span class=GramE>int</span></span> <span class=SpellE>m_indexCount</span>;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:2'>               </span><span
+class=GramE>unsigned</span> short* <span class=SpellE>m_indexArray</span>;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span>};<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=GramE>Entity(</span>void);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=GramE>virtual</span> ~Entity(void);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=GramE>void</span> <span class=SpellE>LoadMesh</span> (const char* name);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=GramE>virtual</span> void Render (<span class=SpellE>dFloat</span> <span
+class=SpellE>interpolationParam</span>);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span>//
+these are the element to represent the position and orientation state of a
+graphics object in the world <o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=SpellE><span class=GramE>dMatrix</span></span> <span class=SpellE>m_matrix</span>;<span
+style='mso-tab-count:2'>              </span><span style='mso-spacerun:yes'>   
+</span>// current interpolated visual matrix<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=SpellE><span class=GramE>dVector</span></span> <span class=SpellE>m_curPosition</span>;<span
+style='mso-tab-count:2'>         </span><span style='mso-spacerun:yes'>   
+</span>// position one physics simulation step in the future<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=SpellE><span class=GramE>dVector</span></span> <span class=SpellE>m_prevPosition</span>;<span
+style='mso-spacerun:yes'>             </span>// position at the current physics
+simulation step<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=SpellE><span class=GramE>dQuaternion</span></span> <span class=SpellE>m_curRotation</span>;<span
+style='mso-spacerun:yes'>          </span>// rotation one physics simulation
+step in the future<span style='mso-spacerun:yes'>  </span><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=SpellE><span class=GramE>dQuaternion</span></span> <span class=SpellE>m_prevRotation</span>;<span
+style='mso-spacerun:yes'>         </span>// rotation at the current physics
+simulation step<span style='mso-spacerun:yes'>  </span><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span>//
+<span class=GramE>These</span> are the elements for a simple vertex list index
+list graphics object. <o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=SpellE><span class=GramE>int</span></span> <span class=SpellE>m_subMeshCount</span>;<span
+style='mso-tab-count:5'>                                   </span><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=SpellE><span class=GramE>int</span></span> <span class=SpellE>m_vertexCount</span>;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=SpellE><span class=GramE>dFloat</span></span> *<span class=SpellE>m_uv</span>;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=SpellE><span class=GramE>dFloat</span></span> *<span class=SpellE>m_vertex</span>;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=SpellE><span class=GramE>dFloat</span></span> *<span class=SpellE>m_normal</span>;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:1'>        </span><span
+class=SpellE>SubMesh</span> *<span class=SpellE>m_subMeshes</span>;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>}; <o:p></o:p></span></p>
+
+</div>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>This class in not part of
+Newton and it is not part of any Graphics engine, It is just an easy way to
+group graphics functionality in this tutorial, please do not use this class as
+part of the physics engine. <o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>This is where the application
+will create and save all graphics scene, <o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>For this simple tutorial we
+create a simple scene with a big box as floor and two other small boxes floating
+on the air.<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>&lt;/<span class=SpellE>prev</span>&gt;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span class=GramE><span
+style='font-size:10.0pt;font-family:"Courier New";color:blue'>void</span></span><span
+style='font-size:10.0pt;font-family:"Courier New"'> <span class=SpellE><span
+style='color:black'>CreateScene</span></span> (<span class=SpellE><span
+style='color:black'>NewtonWorld</span></span>* <span style='color:black'>world</span>,
+<span class=SpellE><span style='color:black'>SceneManager</span></span>* <span
+class=SpellE><span style='color:black'>sceneManager</span></span>)<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'>{<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+style='color:black'>Entity</span>* <span style='color:black'>floor</span>;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+style='color:black'>Entity</span>* <span class=SpellE><span style='color:black'>smilly</span></span>;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+style='color:black'>Entity</span>* <span class=SpellE><span style='color:black'>frowny</span></span>;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+style='color:green'>// <span class=GramE>Create</span> a large body to be the
+floor<o:p></o:p></span></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+class=GramE><span style='color:black'>floor</span></span> = <span class=SpellE><span
+style='color:black'>sceneManager</span></span>-&gt;<span class=SpellE><span
+style='color:black'>CreateEntity</span></span>();<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+class=GramE><span style='color:black'>floor</span></span>-&gt;<span
+class=SpellE><span style='color:black'>LoadMesh</span></span>
+(&quot;FloorBox.dat&quot;);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+style='color:green'>// add some visual entities.<o:p></o:p></span></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+class=SpellE><span class=GramE><span style='color:black'>smilly</span></span></span>
+= <span class=SpellE><span style='color:black'>sceneManager</span></span>-&gt;<span
+class=SpellE><span style='color:black'>CreateEntity</span></span>();<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+class=SpellE><span class=GramE><span style='color:black'>smilly</span></span></span>-&gt;<span
+class=SpellE><span style='color:black'>LoadMesh</span></span>
+(&quot;Smilly.dat&quot;);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+class=SpellE><span class=GramE><span style='color:black'>smilly</span></span></span>-&gt;<span
+class=SpellE><span style='color:black'>m_curPosition</span>.<span
+style='color:black'>m_y</span></span> = 10.0f;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+class=SpellE><span class=GramE><span style='color:black'>smilly</span></span></span>-&gt;<span
+class=SpellE><span style='color:black'>m_prevPosition</span></span> = <span
+class=SpellE><span style='color:black'>smilly</span></span>-&gt;<span
+class=SpellE><span style='color:black'>m_curPosition</span></span>;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+style='color:green'>// add some visual entities.<o:p></o:p></span></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+class=SpellE><span class=GramE><span style='color:black'>frowny</span></span></span>
+= <span class=SpellE><span style='color:black'>sceneManager</span></span>-&gt;<span
+class=SpellE><span style='color:black'>CreateEntity</span></span>();<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+class=SpellE><span class=GramE><span style='color:black'>frowny</span></span></span>-&gt;<span
+class=SpellE><span style='color:black'>LoadMesh</span></span>
+(&quot;Frowny.dat&quot;);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+class=SpellE><span class=GramE><span style='color:black'>frowny</span></span></span>-&gt;<span
+class=SpellE><span style='color:black'>m_curPosition</span>.<span
+style='color:black'>m_x</span></span> = 0.5f;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+class=SpellE><span class=GramE><span style='color:black'>frowny</span></span></span>-&gt;<span
+class=SpellE><span style='color:black'>m_curPosition</span>.<span
+style='color:black'>m_z</span></span> = 0.4f;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+class=SpellE><span class=GramE><span style='color:black'>frowny</span></span></span>-&gt;<span
+class=SpellE><span style='color:black'>m_curPosition</span>.<span
+style='color:black'>m_y</span></span> = 10.0f;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+class=SpellE><span class=GramE><span style='color:black'>frowny</span></span></span>-&gt;<span
+class=SpellE><span style='color:black'>m_prevPosition</span></span> = <span
+class=SpellE><span style='color:black'>frowny</span></span>-&gt;<span
+class=SpellE><span style='color:black'>m_curPosition</span></span>;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'>}<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'>&lt;<span class=SpellE><span class=GramE>prev</span></span>&gt;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>Subsequences tutorials will
+go straight to this function to explain the process of adding physics properties
+to the graphics scene. <o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>Next we add the application
+main loop.<o:p></o:p></span></p>
+
+<div style='mso-element:para-border-div;border:solid #2F6FAB 1.0pt;mso-border-alt:
+solid #2F6FAB .5pt;padding:12.0pt 12.0pt 12.0pt 12.0pt;background:#F9F9F9'>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-spacerun:yes'>    </span>//
+run the main application loop until the user terminates the demo<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-spacerun:yes'>    </span><span
+class=GramE>for</span> (;;) {<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-spacerun:yes'>       
+</span>// Draw the screen. <o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-spacerun:yes'>       
+</span><span class=SpellE>AdvanceSimulation</span> (<span class=SpellE>GetTimeInMicrosenconds</span>
+());<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-spacerun:yes'>    </span>}<o:p></o:p></span></p>
+
+</div>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>This is the simplex main
+simulation loop we can come up with, it advances the Physical and Graphical
+simulation by calling <span class=SpellE>AdvanceSimulation</span> with a time
+elapsed since the last loop in microseconds. <o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>If you lock at function <span
+class=SpellE>AdvanceSimulation</span>, you will find that this function has two
+parts. <o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>First parts updates physical
+simulation at a fix time step and collect the external inputs to the application.
+It also calls the Visual debugger to visualize the Physical Scene on the
+external Visual debugger. <o:p></o:p></span></p>
+
+<div style='mso-element:para-border-div;border:solid #2F6FAB 1.0pt;mso-border-alt:
+solid #2F6FAB .5pt;padding:12.0pt 12.0pt 12.0pt 12.0pt;background:#F9F9F9'>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-spacerun:yes'> </span><span
+style='mso-tab-count:1'>       </span><span class=SpellE><span class=GramE>int</span></span>
+<span class=SpellE>deltaTime</span>;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-spacerun:yes'> </span><span
+style='mso-tab-count:1'>       </span><span class=SpellE><span class=GramE>dFloat</span></span>
+fps;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-spacerun:yes'> </span><span
+style='mso-tab-count:1'>       </span><span class=SpellE><span class=GramE>dFloat</span></span>
+<span class=SpellE>physicTime</span>;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-spacerun:yes'> </span><span
+style='mso-tab-count:1'>       </span><span class=SpellE><span class=GramE>dFloat</span></span>
+<span class=SpellE>interpolationParam</span>;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-spacerun:yes'> </span><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-spacerun:yes'> </span><span
+style='mso-tab-count:1'>       </span>// get the time step<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-spacerun:yes'> </span><span
+style='mso-tab-count:1'>       </span><span class=SpellE><span class=GramE>deltaTime</span></span>
+= <span class=SpellE>timeInMilisecunds</span> - <span class=SpellE>g_currentTime</span>;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-spacerun:yes'> </span><span
+style='mso-tab-count:1'>       </span><span class=SpellE>g_currentTime</span> =
+<span class=SpellE>timeInMilisecunds</span>;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-spacerun:yes'> </span><span
+style='mso-tab-count:1'>       </span><span class=SpellE>g_timeAccumulator</span>
++= <span class=SpellE>deltaTime</span>;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-spacerun:yes'> </span><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-spacerun:yes'> </span><span
+style='mso-tab-count:1'>       </span><span class=SpellE><span class=GramE>physicTime</span></span>
+= 0;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-spacerun:yes'> </span><span
+style='mso-tab-count:1'>       </span>// advance the simulation at a fixed
+time-step<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-spacerun:yes'> </span><span
+style='mso-tab-count:1'>       </span><span class=GramE>while</span> (<span
+class=SpellE>g_timeAccumulator</span> &gt;= DEMO_FPS_IN_MICROSECUNDS)<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-spacerun:yes'> </span><span
+style='mso-tab-count:1'>       </span>{<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-spacerun:yes'> </span><span
+style='mso-tab-count:2'>              </span>// sample time before the Update<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:2'>               </span><span
+class=SpellE>g_physicTime</span> = <span class=SpellE>GetTimeInMicrosenconds</span>
+();<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:2'>               </span>//
+do a <span class=SpellE>newton</span> update<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:2'>               </span><span
+class=SpellE>NewtonUpdate</span> (<span class=SpellE>g_world</span>, <span
+class=SpellE>dFloat</span> (DEMO_FPS_IN_MICROSECUNDS) * 1000000);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:2'>               </span>//
+calculate the time spent in the physical Simulation<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:2'>               </span><span
+class=SpellE>g_physicTime</span> = <span class=SpellE>GetTimeInMicrosenconds</span>
+() - <span class=SpellE>g_physicTime</span>;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:2'>               </span>//
+Process incoming events. <o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:2'>               </span><span
+class=SpellE>ProcessEvents</span> ();<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:2'>               </span>//
+call the visual debugger to show the physics scene<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>#<span class=SpellE>ifdef</span>
+USE_VISUAL_DEBUGGER<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:2'>               </span><span
+class=SpellE>NewtonDebuggerServe</span> (<span class=SpellE>g_newtonDebugger</span>,
+<span class=SpellE>g_world</span>);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'>#<span class=SpellE>endif</span><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:2'>               </span>//
+subtract time from time accumulator<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:2'>               </span><span
+class=SpellE>g_timeAccumulator</span> -= DEMO_FPS_IN_MICROSECUNDS;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-tab-count:2'>               </span><span
+class=SpellE><span class=GramE>physicTime</span></span> ++;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+13.2pt;tab-stops:45.8pt 91.6pt 137.4pt 183.2pt 229.0pt 274.8pt 320.6pt 366.4pt 412.2pt 458.0pt 503.8pt 549.6pt 595.4pt 641.2pt 687.0pt 732.8pt;
+background:#F9F9F9;border:none;mso-border-alt:solid #2F6FAB .5pt;padding:0in;
+mso-padding-alt:12.0pt 12.0pt 12.0pt 12.0pt'><span lang=EN style='font-size:
+10.0pt;font-family:"Courier New";mso-fareast-font-family:"Times New Roman";
+color:black;mso-ansi-language:EN'><span style='mso-spacerun:yes'> </span><span
+style='mso-tab-count:1'>       </span>}<o:p></o:p></span></p>
+
+</div>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'><br>
+Basically this is a loop designed to run the physics update at a fixed
+time-step. It keeps track of the delta time accumulated since the last call,
+and every time the accumulated time is equal or larger to one physical time
+step, represented by const DEMO_FPS_IN_MICROSECUNDS, the loop issues a call to
+a <span class=SpellE>ProcessEvent</span>, <span class=SpellE>NewtonUpdate</span>,
+<span class=SpellE>NewtonDebuggerServe</span> and the time step is subtracted
+from the time accumulator. <o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span class=SpellE><span
+lang=EN style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>ProcessEvent</span></span><span
+lang=EN style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'> is the function in charge
+of collecting the user inputs for controlling the simulation. <span
+class=SpellE>NewtonUpdate</span> is the Newton Engine main update functions,
+and is does all of the physical work on all physics entities. <span
+class=SpellE>NewtonDebuggerServe</span> displays the physical state of the
+world to the external visual debugger. <o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>The second part on this
+function updates the Camera, Render the Graphics Scene and display some useful
+information on the screen. <o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>&lt;/<span class=SpellE>prev</span>&gt;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New";color:green'>// Clear the color and depth
+buffers. <o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-spacerun:yes'>    </span><span
+class=SpellE><span class=GramE><span style='color:black'>glClear</span></span></span>
+(<span style='color:black'>GL_COLOR_BUFFER_BIT</span> | <span style='color:
+black'>GL_DEPTH_BUFFER_BIT</span> );<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+style='color:green'>// calculate the interpolation parameter for smooth
+rendering <o:p></o:p></span></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+class=SpellE><span style='color:black'>g_sceneManager</span></span>-&gt;<span
+class=SpellE><span class=GramE><span style='color:black'>SetIntepolationParam</span></span></span><span
+class=GramE>(</span><span class=SpellE><span style='color:black'>dFloat</span></span>
+(<span class=SpellE><span style='color:black'>g_timeAccumulator</span></span>)
+/ <span class=SpellE><span style='color:black'>dFloat</span></span>(<span
+style='color:black'>DEMO_FPS_IN_MICROSECUNDS</span>));<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+style='color:green'>// do the rendering here entire Scene<o:p></o:p></span></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+class=SpellE><span style='color:black'>g_sceneManager</span></span>-&gt;<span
+style='color:black'>Render</span> ();<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+style='color:green'>// display the frame rate<o:p></o:p></span></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+class=GramE><span style='color:black'>fps</span></span> = 1000000.0f / <span
+class=SpellE><span style='color:black'>dFloat</span></span> (<span
+class=SpellE><span style='color:black'>deltaTime</span></span>);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+class=SpellE><span class=GramE><span style='color:black'>physicTime</span></span></span>
+= <span class=SpellE><span style='color:black'>g_physicTime</span></span> * <span
+class=SpellE><span style='color:black'>dFloat</span></span>(1.0f / 1000000.0f);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+style='color:black'>Print</span> (<span class=SpellE><span style='color:black'>dVector</span></span>
+(1.0f, 1.0f, 0.0f, 0.0f), 10, 10, &quot;fps: %6.2f<span
+style='mso-spacerun:yes'>   </span>physic time (milliseconds): %6.2f&quot;, <span
+style='color:black'>fps</span>, <span class=SpellE><span style='color:black'>physicTime</span></span>);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+style='color:green'>// show GL rendered Scene <o:p></o:p></span></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+class=SpellE><span class=GramE><span style='color:black'>glFlush</span></span></span><span
+class=GramE>(</span>);<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+class=SpellE><span style='color:black'>SDL_GL_<span class=GramE>SwapBuffers</span></span></span><span
+class=GramE>(</span> );</span><span lang=EN style='font-size:12.5pt;font-family:
+"Arial","sans-serif";mso-fareast-font-family:"Times New Roman";color:black;
+mso-ansi-language:EN'><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>&lt;<span class=SpellE><span
+class=GramE>prev</span></span>&gt;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:6.0pt;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>Here the most important
+part is that the rendering does not happen at the same rate than the physics,
+because of this, the rendering system maintains two transformation states: the
+old state and the state one after DEMO_FPS_IN_MICROSECUNDS has passed. The
+graphics system will calculate the correct transformation for visualization by
+interpolating the fraction of time elapsed between the two stages. The fraction
+of elapsed time is calculated in a variable <span class=SpellE>interpolationParam</span>
+<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:.1in;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>&lt;/<span class=SpellE>prev</span>&gt;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+style='color:green'>// calculate the interpolation parameter for smooth
+rendering <o:p></o:p></span></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'><span style='mso-tab-count:1'>      </span><span
+class=SpellE><span style='color:black'>g_sceneManager</span></span>-&gt;<span
+class=SpellE><span class=GramE><span style='color:black'>SetIntepolationParam</span></span></span><span
+class=GramE>(</span><span class=SpellE><span style='color:black'>dFloat</span></span>
+(<span class=SpellE><span style='color:black'>g_timeAccumulator</span></span>)
+/ <span class=SpellE><span style='color:black'>dFloat</span></span>(<span
+style='color:black'>DEMO_FPS_IN_MICROSECUNDS</span>));<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;mso-layout-grid-align:none;text-autospace:none'><span style='font-size:
+10.0pt;font-family:"Courier New"'>&lt;<span class=SpellE><span class=GramE>prev</span></span>&gt;<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:.1in;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:.1in;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>This ends this <span
+class=GramE>tutorial,</span> We have created a Graphics framework that will
+serve as our representation of the minimum functionality of must graphics
+engines.<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:.1in;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>We integrated the Newton Engine
+in this hypothetical graphics engine, and believe it or not it is this simple
+to integrate Newton in to a graphics engine. <o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:.1in;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'>Next tutorials will demonstrate
+how to add Physical properties to each of the entities in of the graphics
+world.<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-top:4.8pt;margin-right:0in;margin-bottom:.1in;
+margin-left:0in;line-height:18.0pt;background:white'><span lang=EN
+style='font-size:12.5pt;font-family:"Arial","sans-serif";mso-fareast-font-family:
+"Times New Roman";color:black;mso-ansi-language:EN'><span
+style='mso-spacerun:yes'> </span><o:p></o:p></span></p>
+
+<p class=MsoNormal><o:p>&nbsp;</o:p></p>
+
+</div>
+
+</body>
+
+</html>
+

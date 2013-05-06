@@ -1,0 +1,472 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		FF3B296117300B57007E6FEC /* dCollisionTreeNodeInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF3B295517300B57007E6FEC /* dCollisionTreeNodeInfo.cpp */; };
+		FF3B296217300B57007E6FEC /* dCollisionTreeNodeInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = FF3B295617300B57007E6FEC /* dCollisionTreeNodeInfo.h */; };
+		FF3B296317300B57007E6FEC /* dSceneCacheInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF3B295717300B57007E6FEC /* dSceneCacheInfo.cpp */; };
+		FF3B296417300B57007E6FEC /* dSceneCacheInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = FF3B295817300B57007E6FEC /* dSceneCacheInfo.h */; };
+		FF3B296517300B57007E6FEC /* dSceneModelInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF3B295917300B57007E6FEC /* dSceneModelInfo.cpp */; };
+		FF3B296617300B57007E6FEC /* dSceneModelInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = FF3B295A17300B57007E6FEC /* dSceneModelInfo.h */; };
+		FF3B296717300B57007E6FEC /* dSceneRender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF3B295B17300B57007E6FEC /* dSceneRender.cpp */; };
+		FF3B296817300B57007E6FEC /* dSceneRender.h in Headers */ = {isa = PBXBuildFile; fileRef = FF3B295C17300B57007E6FEC /* dSceneRender.h */; };
+		FF3B296917300B57007E6FEC /* dSceneStdafx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF3B295D17300B57007E6FEC /* dSceneStdafx.cpp */; };
+		FF3B296A17300B57007E6FEC /* dSceneStdafx.h in Headers */ = {isa = PBXBuildFile; fileRef = FF3B295E17300B57007E6FEC /* dSceneStdafx.h */; };
+		FF3B296B17300B57007E6FEC /* dUndoRedo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF3B295F17300B57007E6FEC /* dUndoRedo.cpp */; };
+		FF3B296C17300B57007E6FEC /* dUndoRedo.h in Headers */ = {isa = PBXBuildFile; fileRef = FF3B296017300B57007E6FEC /* dUndoRedo.h */; };
+		FF8C27421313D82800646B90 /* dBoneNodeInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C27071313D82800646B90 /* dBoneNodeInfo.cpp */; };
+		FF8C27431313D82800646B90 /* dBoneNodeInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C27081313D82800646B90 /* dBoneNodeInfo.h */; };
+		FF8C27461313D82800646B90 /* dCollisionBoxNodeInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C270B1313D82800646B90 /* dCollisionBoxNodeInfo.cpp */; };
+		FF8C27471313D82800646B90 /* dCollisionBoxNodeInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C270C1313D82800646B90 /* dCollisionBoxNodeInfo.h */; };
+		FF8C27481313D82800646B90 /* dCollisionCapsuleNodeInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C270D1313D82800646B90 /* dCollisionCapsuleNodeInfo.cpp */; };
+		FF8C27491313D82800646B90 /* dCollisionCapsuleNodeInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C270E1313D82800646B90 /* dCollisionCapsuleNodeInfo.h */; };
+		FF8C274A1313D82800646B90 /* dCollisionChamferCylinderNodeInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C270F1313D82800646B90 /* dCollisionChamferCylinderNodeInfo.cpp */; };
+		FF8C274B1313D82800646B90 /* dCollisionChamferCylinderNodeInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C27101313D82800646B90 /* dCollisionChamferCylinderNodeInfo.h */; };
+		FF8C274C1313D82800646B90 /* dCollisionCompoundNodeInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C27111313D82800646B90 /* dCollisionCompoundNodeInfo.cpp */; };
+		FF8C274D1313D82800646B90 /* dCollisionCompoundNodeInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C27121313D82800646B90 /* dCollisionCompoundNodeInfo.h */; };
+		FF8C274E1313D82800646B90 /* dCollisionConeNodeInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C27131313D82800646B90 /* dCollisionConeNodeInfo.cpp */; };
+		FF8C274F1313D82800646B90 /* dCollisionConeNodeInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C27141313D82800646B90 /* dCollisionConeNodeInfo.h */; };
+		FF8C27501313D82800646B90 /* dCollisionConvexHullNodeInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C27151313D82800646B90 /* dCollisionConvexHullNodeInfo.cpp */; };
+		FF8C27511313D82800646B90 /* dCollisionConvexHullNodeInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C27161313D82800646B90 /* dCollisionConvexHullNodeInfo.h */; };
+		FF8C27521313D82800646B90 /* dCollisionCylinderNodeInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C27171313D82800646B90 /* dCollisionCylinderNodeInfo.cpp */; };
+		FF8C27531313D82800646B90 /* dCollisionCylinderNodeInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C27181313D82800646B90 /* dCollisionCylinderNodeInfo.h */; };
+		FF8C27541313D82800646B90 /* dCollisionNodeInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C27191313D82800646B90 /* dCollisionNodeInfo.cpp */; };
+		FF8C27551313D82800646B90 /* dCollisionNodeInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C271A1313D82800646B90 /* dCollisionNodeInfo.h */; };
+		FF8C27561313D82800646B90 /* dCollisionSphereNodeInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C271B1313D82800646B90 /* dCollisionSphereNodeInfo.cpp */; };
+		FF8C27571313D82800646B90 /* dCollisionSphereNodeInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C271C1313D82800646B90 /* dCollisionSphereNodeInfo.h */; };
+		FF8C27581313D82800646B90 /* dDrawUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C271D1313D82800646B90 /* dDrawUtils.cpp */; };
+		FF8C27591313D82800646B90 /* dDrawUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C271E1313D82800646B90 /* dDrawUtils.h */; };
+		FF8C275C1313D82800646B90 /* dGeometryNodeInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C27211313D82800646B90 /* dGeometryNodeInfo.cpp */; };
+		FF8C275D1313D82800646B90 /* dGeometryNodeInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C27221313D82800646B90 /* dGeometryNodeInfo.h */; };
+		FF8C275E1313D82800646B90 /* dGeometryNodeModifierInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C27231313D82800646B90 /* dGeometryNodeModifierInfo.cpp */; };
+		FF8C275F1313D82800646B90 /* dGeometryNodeModifierInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C27241313D82800646B90 /* dGeometryNodeModifierInfo.h */; };
+		FF8C27601313D82800646B90 /* dGeometryNodeSkinModifierInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C27251313D82800646B90 /* dGeometryNodeSkinModifierInfo.cpp */; };
+		FF8C27611313D82800646B90 /* dGeometryNodeSkinModifierInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C27261313D82800646B90 /* dGeometryNodeSkinModifierInfo.h */; };
+		FF8C27651313D82800646B90 /* dMaterialNodeInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C272A1313D82800646B90 /* dMaterialNodeInfo.cpp */; };
+		FF8C27661313D82800646B90 /* dMaterialNodeInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C272B1313D82800646B90 /* dMaterialNodeInfo.h */; };
+		FF8C27671313D82800646B90 /* dMeshNodeInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C272C1313D82800646B90 /* dMeshNodeInfo.cpp */; };
+		FF8C27681313D82800646B90 /* dMeshNodeInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C272D1313D82800646B90 /* dMeshNodeInfo.h */; };
+		FF8C27691313D82800646B90 /* dNodeInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C272E1313D82800646B90 /* dNodeInfo.cpp */; };
+		FF8C276A1313D82800646B90 /* dNodeInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C272F1313D82800646B90 /* dNodeInfo.h */; };
+		FF8C276F1313D82800646B90 /* dRigidbodyNodeInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C27341313D82800646B90 /* dRigidbodyNodeInfo.cpp */; };
+		FF8C27701313D82800646B90 /* dRigidbodyNodeInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C27351313D82800646B90 /* dRigidbodyNodeInfo.h */; };
+		FF8C27711313D82800646B90 /* dRootNodeInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C27361313D82800646B90 /* dRootNodeInfo.cpp */; };
+		FF8C27721313D82800646B90 /* dRootNodeInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C27371313D82800646B90 /* dRootNodeInfo.h */; };
+		FF8C27731313D82800646B90 /* dScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C27381313D82800646B90 /* dScene.cpp */; };
+		FF8C27741313D82800646B90 /* dScene.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C27391313D82800646B90 /* dScene.h */; };
+		FF8C27751313D82800646B90 /* dSceneGraph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C273A1313D82800646B90 /* dSceneGraph.cpp */; };
+		FF8C27761313D82800646B90 /* dSceneGraph.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C273B1313D82800646B90 /* dSceneGraph.h */; };
+		FF8C27771313D82800646B90 /* dSceneNodeInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C273C1313D82800646B90 /* dSceneNodeInfo.cpp */; };
+		FF8C27781313D82800646B90 /* dSceneNodeInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C273D1313D82800646B90 /* dSceneNodeInfo.h */; };
+		FF8C27791313D82800646B90 /* dTextureNodeInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C273E1313D82800646B90 /* dTextureNodeInfo.cpp */; };
+		FF8C277A1313D82800646B90 /* dTextureNodeInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C273F1313D82800646B90 /* dTextureNodeInfo.h */; };
+		FF8C277B1313D82800646B90 /* dVariable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C27401313D82800646B90 /* dVariable.cpp */; };
+		FF8C277C1313D82800646B90 /* dVariable.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C27411313D82800646B90 /* dVariable.h */; };
+		FFF615461556DFA200E7B112 /* Newton.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF615451556DFA200E7B112 /* Newton.h */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		32BAE0B70371A74B00C91783 /* dScene_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dScene_Prefix.pch; sourceTree = "<group>"; };
+		D2AAC06F0554671400DB518D /* libdScene_d.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libdScene_d.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF3B295517300B57007E6FEC /* dCollisionTreeNodeInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dCollisionTreeNodeInfo.cpp; path = ../../../dScene/dCollisionTreeNodeInfo.cpp; sourceTree = "<group>"; };
+		FF3B295617300B57007E6FEC /* dCollisionTreeNodeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dCollisionTreeNodeInfo.h; path = ../../../dScene/dCollisionTreeNodeInfo.h; sourceTree = "<group>"; };
+		FF3B295717300B57007E6FEC /* dSceneCacheInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dSceneCacheInfo.cpp; path = ../../../dScene/dSceneCacheInfo.cpp; sourceTree = "<group>"; };
+		FF3B295817300B57007E6FEC /* dSceneCacheInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dSceneCacheInfo.h; path = ../../../dScene/dSceneCacheInfo.h; sourceTree = "<group>"; };
+		FF3B295917300B57007E6FEC /* dSceneModelInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dSceneModelInfo.cpp; path = ../../../dScene/dSceneModelInfo.cpp; sourceTree = "<group>"; };
+		FF3B295A17300B57007E6FEC /* dSceneModelInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dSceneModelInfo.h; path = ../../../dScene/dSceneModelInfo.h; sourceTree = "<group>"; };
+		FF3B295B17300B57007E6FEC /* dSceneRender.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dSceneRender.cpp; path = ../../../dScene/dSceneRender.cpp; sourceTree = "<group>"; };
+		FF3B295C17300B57007E6FEC /* dSceneRender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dSceneRender.h; path = ../../../dScene/dSceneRender.h; sourceTree = "<group>"; };
+		FF3B295D17300B57007E6FEC /* dSceneStdafx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dSceneStdafx.cpp; path = ../../../dScene/dSceneStdafx.cpp; sourceTree = "<group>"; };
+		FF3B295E17300B57007E6FEC /* dSceneStdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dSceneStdafx.h; path = ../../../dScene/dSceneStdafx.h; sourceTree = "<group>"; };
+		FF3B295F17300B57007E6FEC /* dUndoRedo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dUndoRedo.cpp; path = ../../../dScene/dUndoRedo.cpp; sourceTree = "<group>"; };
+		FF3B296017300B57007E6FEC /* dUndoRedo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dUndoRedo.h; path = ../../../dScene/dUndoRedo.h; sourceTree = "<group>"; };
+		FF8C27071313D82800646B90 /* dBoneNodeInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dBoneNodeInfo.cpp; path = ../../../dScene/dBoneNodeInfo.cpp; sourceTree = SOURCE_ROOT; };
+		FF8C27081313D82800646B90 /* dBoneNodeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dBoneNodeInfo.h; path = ../../../dScene/dBoneNodeInfo.h; sourceTree = SOURCE_ROOT; };
+		FF8C270B1313D82800646B90 /* dCollisionBoxNodeInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dCollisionBoxNodeInfo.cpp; path = ../../../dScene/dCollisionBoxNodeInfo.cpp; sourceTree = SOURCE_ROOT; };
+		FF8C270C1313D82800646B90 /* dCollisionBoxNodeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dCollisionBoxNodeInfo.h; path = ../../../dScene/dCollisionBoxNodeInfo.h; sourceTree = SOURCE_ROOT; };
+		FF8C270D1313D82800646B90 /* dCollisionCapsuleNodeInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dCollisionCapsuleNodeInfo.cpp; path = ../../../dScene/dCollisionCapsuleNodeInfo.cpp; sourceTree = SOURCE_ROOT; };
+		FF8C270E1313D82800646B90 /* dCollisionCapsuleNodeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dCollisionCapsuleNodeInfo.h; path = ../../../dScene/dCollisionCapsuleNodeInfo.h; sourceTree = SOURCE_ROOT; };
+		FF8C270F1313D82800646B90 /* dCollisionChamferCylinderNodeInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dCollisionChamferCylinderNodeInfo.cpp; path = ../../../dScene/dCollisionChamferCylinderNodeInfo.cpp; sourceTree = SOURCE_ROOT; };
+		FF8C27101313D82800646B90 /* dCollisionChamferCylinderNodeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dCollisionChamferCylinderNodeInfo.h; path = ../../../dScene/dCollisionChamferCylinderNodeInfo.h; sourceTree = SOURCE_ROOT; };
+		FF8C27111313D82800646B90 /* dCollisionCompoundNodeInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dCollisionCompoundNodeInfo.cpp; path = ../../../dScene/dCollisionCompoundNodeInfo.cpp; sourceTree = SOURCE_ROOT; };
+		FF8C27121313D82800646B90 /* dCollisionCompoundNodeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dCollisionCompoundNodeInfo.h; path = ../../../dScene/dCollisionCompoundNodeInfo.h; sourceTree = SOURCE_ROOT; };
+		FF8C27131313D82800646B90 /* dCollisionConeNodeInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dCollisionConeNodeInfo.cpp; path = ../../../dScene/dCollisionConeNodeInfo.cpp; sourceTree = SOURCE_ROOT; };
+		FF8C27141313D82800646B90 /* dCollisionConeNodeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dCollisionConeNodeInfo.h; path = ../../../dScene/dCollisionConeNodeInfo.h; sourceTree = SOURCE_ROOT; };
+		FF8C27151313D82800646B90 /* dCollisionConvexHullNodeInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dCollisionConvexHullNodeInfo.cpp; path = ../../../dScene/dCollisionConvexHullNodeInfo.cpp; sourceTree = SOURCE_ROOT; };
+		FF8C27161313D82800646B90 /* dCollisionConvexHullNodeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dCollisionConvexHullNodeInfo.h; path = ../../../dScene/dCollisionConvexHullNodeInfo.h; sourceTree = SOURCE_ROOT; };
+		FF8C27171313D82800646B90 /* dCollisionCylinderNodeInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dCollisionCylinderNodeInfo.cpp; path = ../../../dScene/dCollisionCylinderNodeInfo.cpp; sourceTree = SOURCE_ROOT; };
+		FF8C27181313D82800646B90 /* dCollisionCylinderNodeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dCollisionCylinderNodeInfo.h; path = ../../../dScene/dCollisionCylinderNodeInfo.h; sourceTree = SOURCE_ROOT; };
+		FF8C27191313D82800646B90 /* dCollisionNodeInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dCollisionNodeInfo.cpp; path = ../../../dScene/dCollisionNodeInfo.cpp; sourceTree = SOURCE_ROOT; };
+		FF8C271A1313D82800646B90 /* dCollisionNodeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dCollisionNodeInfo.h; path = ../../../dScene/dCollisionNodeInfo.h; sourceTree = SOURCE_ROOT; };
+		FF8C271B1313D82800646B90 /* dCollisionSphereNodeInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dCollisionSphereNodeInfo.cpp; path = ../../../dScene/dCollisionSphereNodeInfo.cpp; sourceTree = SOURCE_ROOT; };
+		FF8C271C1313D82800646B90 /* dCollisionSphereNodeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dCollisionSphereNodeInfo.h; path = ../../../dScene/dCollisionSphereNodeInfo.h; sourceTree = SOURCE_ROOT; };
+		FF8C271D1313D82800646B90 /* dDrawUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dDrawUtils.cpp; path = ../../../dScene/dDrawUtils.cpp; sourceTree = SOURCE_ROOT; };
+		FF8C271E1313D82800646B90 /* dDrawUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dDrawUtils.h; path = ../../../dScene/dDrawUtils.h; sourceTree = SOURCE_ROOT; };
+		FF8C27211313D82800646B90 /* dGeometryNodeInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dGeometryNodeInfo.cpp; path = ../../../dScene/dGeometryNodeInfo.cpp; sourceTree = SOURCE_ROOT; };
+		FF8C27221313D82800646B90 /* dGeometryNodeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dGeometryNodeInfo.h; path = ../../../dScene/dGeometryNodeInfo.h; sourceTree = SOURCE_ROOT; };
+		FF8C27231313D82800646B90 /* dGeometryNodeModifierInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dGeometryNodeModifierInfo.cpp; path = ../../../dScene/dGeometryNodeModifierInfo.cpp; sourceTree = SOURCE_ROOT; };
+		FF8C27241313D82800646B90 /* dGeometryNodeModifierInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dGeometryNodeModifierInfo.h; path = ../../../dScene/dGeometryNodeModifierInfo.h; sourceTree = SOURCE_ROOT; };
+		FF8C27251313D82800646B90 /* dGeometryNodeSkinModifierInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dGeometryNodeSkinModifierInfo.cpp; path = ../../../dScene/dGeometryNodeSkinModifierInfo.cpp; sourceTree = SOURCE_ROOT; };
+		FF8C27261313D82800646B90 /* dGeometryNodeSkinModifierInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dGeometryNodeSkinModifierInfo.h; path = ../../../dScene/dGeometryNodeSkinModifierInfo.h; sourceTree = SOURCE_ROOT; };
+		FF8C272A1313D82800646B90 /* dMaterialNodeInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dMaterialNodeInfo.cpp; path = ../../../dScene/dMaterialNodeInfo.cpp; sourceTree = SOURCE_ROOT; };
+		FF8C272B1313D82800646B90 /* dMaterialNodeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dMaterialNodeInfo.h; path = ../../../dScene/dMaterialNodeInfo.h; sourceTree = SOURCE_ROOT; };
+		FF8C272C1313D82800646B90 /* dMeshNodeInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dMeshNodeInfo.cpp; path = ../../../dScene/dMeshNodeInfo.cpp; sourceTree = SOURCE_ROOT; };
+		FF8C272D1313D82800646B90 /* dMeshNodeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dMeshNodeInfo.h; path = ../../../dScene/dMeshNodeInfo.h; sourceTree = SOURCE_ROOT; };
+		FF8C272E1313D82800646B90 /* dNodeInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dNodeInfo.cpp; path = ../../../dScene/dNodeInfo.cpp; sourceTree = SOURCE_ROOT; };
+		FF8C272F1313D82800646B90 /* dNodeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dNodeInfo.h; path = ../../../dScene/dNodeInfo.h; sourceTree = SOURCE_ROOT; };
+		FF8C27341313D82800646B90 /* dRigidbodyNodeInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dRigidbodyNodeInfo.cpp; path = ../../../dScene/dRigidbodyNodeInfo.cpp; sourceTree = SOURCE_ROOT; };
+		FF8C27351313D82800646B90 /* dRigidbodyNodeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dRigidbodyNodeInfo.h; path = ../../../dScene/dRigidbodyNodeInfo.h; sourceTree = SOURCE_ROOT; };
+		FF8C27361313D82800646B90 /* dRootNodeInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dRootNodeInfo.cpp; path = ../../../dScene/dRootNodeInfo.cpp; sourceTree = SOURCE_ROOT; };
+		FF8C27371313D82800646B90 /* dRootNodeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dRootNodeInfo.h; path = ../../../dScene/dRootNodeInfo.h; sourceTree = SOURCE_ROOT; };
+		FF8C27381313D82800646B90 /* dScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dScene.cpp; path = ../../../dScene/dScene.cpp; sourceTree = SOURCE_ROOT; };
+		FF8C27391313D82800646B90 /* dScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dScene.h; path = ../../../dScene/dScene.h; sourceTree = SOURCE_ROOT; };
+		FF8C273A1313D82800646B90 /* dSceneGraph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dSceneGraph.cpp; path = ../../../dScene/dSceneGraph.cpp; sourceTree = SOURCE_ROOT; };
+		FF8C273B1313D82800646B90 /* dSceneGraph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dSceneGraph.h; path = ../../../dScene/dSceneGraph.h; sourceTree = SOURCE_ROOT; };
+		FF8C273C1313D82800646B90 /* dSceneNodeInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dSceneNodeInfo.cpp; path = ../../../dScene/dSceneNodeInfo.cpp; sourceTree = SOURCE_ROOT; };
+		FF8C273D1313D82800646B90 /* dSceneNodeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dSceneNodeInfo.h; path = ../../../dScene/dSceneNodeInfo.h; sourceTree = SOURCE_ROOT; };
+		FF8C273E1313D82800646B90 /* dTextureNodeInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dTextureNodeInfo.cpp; path = ../../../dScene/dTextureNodeInfo.cpp; sourceTree = SOURCE_ROOT; };
+		FF8C273F1313D82800646B90 /* dTextureNodeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dTextureNodeInfo.h; path = ../../../dScene/dTextureNodeInfo.h; sourceTree = SOURCE_ROOT; };
+		FF8C27401313D82800646B90 /* dVariable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dVariable.cpp; path = ../../../dScene/dVariable.cpp; sourceTree = SOURCE_ROOT; };
+		FF8C27411313D82800646B90 /* dVariable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dVariable.h; path = ../../../dScene/dVariable.h; sourceTree = SOURCE_ROOT; };
+		FFF615451556DFA200E7B112 /* Newton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Newton.h; path = ../../../../coreLibrary_300/source/newton/Newton.h; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D2AAC06D0554671400DB518D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		034768DDFF38A45A11DB9C8B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D2AAC06F0554671400DB518D /* libdScene_d.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		0867D691FE84028FC02AAC07 /* dScene */ = {
+			isa = PBXGroup;
+			children = (
+				08FB77ACFE841707C02AAC07 /* Source */,
+				034768DDFF38A45A11DB9C8B /* Products */,
+			);
+			name = dScene;
+			sourceTree = "<group>";
+		};
+		08FB77ACFE841707C02AAC07 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				FF3B295517300B57007E6FEC /* dCollisionTreeNodeInfo.cpp */,
+				FF3B295617300B57007E6FEC /* dCollisionTreeNodeInfo.h */,
+				FF3B295717300B57007E6FEC /* dSceneCacheInfo.cpp */,
+				FF3B295817300B57007E6FEC /* dSceneCacheInfo.h */,
+				FF3B295917300B57007E6FEC /* dSceneModelInfo.cpp */,
+				FF3B295A17300B57007E6FEC /* dSceneModelInfo.h */,
+				FF3B295B17300B57007E6FEC /* dSceneRender.cpp */,
+				FF3B295C17300B57007E6FEC /* dSceneRender.h */,
+				FF3B295D17300B57007E6FEC /* dSceneStdafx.cpp */,
+				FF3B295E17300B57007E6FEC /* dSceneStdafx.h */,
+				FF3B295F17300B57007E6FEC /* dUndoRedo.cpp */,
+				FF3B296017300B57007E6FEC /* dUndoRedo.h */,
+				FFF615451556DFA200E7B112 /* Newton.h */,
+				FF8C27071313D82800646B90 /* dBoneNodeInfo.cpp */,
+				FF8C27081313D82800646B90 /* dBoneNodeInfo.h */,
+				FF8C270B1313D82800646B90 /* dCollisionBoxNodeInfo.cpp */,
+				FF8C270C1313D82800646B90 /* dCollisionBoxNodeInfo.h */,
+				FF8C270D1313D82800646B90 /* dCollisionCapsuleNodeInfo.cpp */,
+				FF8C270E1313D82800646B90 /* dCollisionCapsuleNodeInfo.h */,
+				FF8C270F1313D82800646B90 /* dCollisionChamferCylinderNodeInfo.cpp */,
+				FF8C27101313D82800646B90 /* dCollisionChamferCylinderNodeInfo.h */,
+				FF8C27111313D82800646B90 /* dCollisionCompoundNodeInfo.cpp */,
+				FF8C27121313D82800646B90 /* dCollisionCompoundNodeInfo.h */,
+				FF8C27131313D82800646B90 /* dCollisionConeNodeInfo.cpp */,
+				FF8C27141313D82800646B90 /* dCollisionConeNodeInfo.h */,
+				FF8C27151313D82800646B90 /* dCollisionConvexHullNodeInfo.cpp */,
+				FF8C27161313D82800646B90 /* dCollisionConvexHullNodeInfo.h */,
+				FF8C27171313D82800646B90 /* dCollisionCylinderNodeInfo.cpp */,
+				FF8C27181313D82800646B90 /* dCollisionCylinderNodeInfo.h */,
+				FF8C27191313D82800646B90 /* dCollisionNodeInfo.cpp */,
+				FF8C271A1313D82800646B90 /* dCollisionNodeInfo.h */,
+				FF8C271B1313D82800646B90 /* dCollisionSphereNodeInfo.cpp */,
+				FF8C271C1313D82800646B90 /* dCollisionSphereNodeInfo.h */,
+				FF8C271D1313D82800646B90 /* dDrawUtils.cpp */,
+				FF8C271E1313D82800646B90 /* dDrawUtils.h */,
+				FF8C27211313D82800646B90 /* dGeometryNodeInfo.cpp */,
+				FF8C27221313D82800646B90 /* dGeometryNodeInfo.h */,
+				FF8C27231313D82800646B90 /* dGeometryNodeModifierInfo.cpp */,
+				FF8C27241313D82800646B90 /* dGeometryNodeModifierInfo.h */,
+				FF8C27251313D82800646B90 /* dGeometryNodeSkinModifierInfo.cpp */,
+				FF8C27261313D82800646B90 /* dGeometryNodeSkinModifierInfo.h */,
+				FF8C272A1313D82800646B90 /* dMaterialNodeInfo.cpp */,
+				FF8C272B1313D82800646B90 /* dMaterialNodeInfo.h */,
+				FF8C272C1313D82800646B90 /* dMeshNodeInfo.cpp */,
+				FF8C272D1313D82800646B90 /* dMeshNodeInfo.h */,
+				FF8C272E1313D82800646B90 /* dNodeInfo.cpp */,
+				FF8C272F1313D82800646B90 /* dNodeInfo.h */,
+				FF8C27341313D82800646B90 /* dRigidbodyNodeInfo.cpp */,
+				FF8C27351313D82800646B90 /* dRigidbodyNodeInfo.h */,
+				FF8C27361313D82800646B90 /* dRootNodeInfo.cpp */,
+				FF8C27371313D82800646B90 /* dRootNodeInfo.h */,
+				FF8C27381313D82800646B90 /* dScene.cpp */,
+				FF8C27391313D82800646B90 /* dScene.h */,
+				FF8C273A1313D82800646B90 /* dSceneGraph.cpp */,
+				FF8C273B1313D82800646B90 /* dSceneGraph.h */,
+				FF8C273C1313D82800646B90 /* dSceneNodeInfo.cpp */,
+				FF8C273D1313D82800646B90 /* dSceneNodeInfo.h */,
+				FF8C273E1313D82800646B90 /* dTextureNodeInfo.cpp */,
+				FF8C273F1313D82800646B90 /* dTextureNodeInfo.h */,
+				FF8C27401313D82800646B90 /* dVariable.cpp */,
+				FF8C27411313D82800646B90 /* dVariable.h */,
+				32BAE0B70371A74B00C91783 /* dScene_Prefix.pch */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		D2AAC06B0554671400DB518D /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FF8C27431313D82800646B90 /* dBoneNodeInfo.h in Headers */,
+				FF8C27471313D82800646B90 /* dCollisionBoxNodeInfo.h in Headers */,
+				FF8C27491313D82800646B90 /* dCollisionCapsuleNodeInfo.h in Headers */,
+				FF8C274B1313D82800646B90 /* dCollisionChamferCylinderNodeInfo.h in Headers */,
+				FF8C274D1313D82800646B90 /* dCollisionCompoundNodeInfo.h in Headers */,
+				FF8C274F1313D82800646B90 /* dCollisionConeNodeInfo.h in Headers */,
+				FF8C27511313D82800646B90 /* dCollisionConvexHullNodeInfo.h in Headers */,
+				FF8C27531313D82800646B90 /* dCollisionCylinderNodeInfo.h in Headers */,
+				FF8C27551313D82800646B90 /* dCollisionNodeInfo.h in Headers */,
+				FF8C27571313D82800646B90 /* dCollisionSphereNodeInfo.h in Headers */,
+				FF8C27591313D82800646B90 /* dDrawUtils.h in Headers */,
+				FF8C275D1313D82800646B90 /* dGeometryNodeInfo.h in Headers */,
+				FF8C275F1313D82800646B90 /* dGeometryNodeModifierInfo.h in Headers */,
+				FF8C27611313D82800646B90 /* dGeometryNodeSkinModifierInfo.h in Headers */,
+				FF8C27661313D82800646B90 /* dMaterialNodeInfo.h in Headers */,
+				FF8C27681313D82800646B90 /* dMeshNodeInfo.h in Headers */,
+				FF8C276A1313D82800646B90 /* dNodeInfo.h in Headers */,
+				FF8C27701313D82800646B90 /* dRigidbodyNodeInfo.h in Headers */,
+				FF8C27721313D82800646B90 /* dRootNodeInfo.h in Headers */,
+				FF8C27741313D82800646B90 /* dScene.h in Headers */,
+				FF8C27761313D82800646B90 /* dSceneGraph.h in Headers */,
+				FF8C27781313D82800646B90 /* dSceneNodeInfo.h in Headers */,
+				FF8C277A1313D82800646B90 /* dTextureNodeInfo.h in Headers */,
+				FF8C277C1313D82800646B90 /* dVariable.h in Headers */,
+				FFF615461556DFA200E7B112 /* Newton.h in Headers */,
+				FF3B296217300B57007E6FEC /* dCollisionTreeNodeInfo.h in Headers */,
+				FF3B296417300B57007E6FEC /* dSceneCacheInfo.h in Headers */,
+				FF3B296617300B57007E6FEC /* dSceneModelInfo.h in Headers */,
+				FF3B296817300B57007E6FEC /* dSceneRender.h in Headers */,
+				FF3B296A17300B57007E6FEC /* dSceneStdafx.h in Headers */,
+				FF3B296C17300B57007E6FEC /* dUndoRedo.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		D2AAC06E0554671400DB518D /* dScene */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1DEB920108733DBB0010E9CD /* Build configuration list for PBXNativeTarget "dScene" */;
+			buildPhases = (
+				D2AAC06B0554671400DB518D /* Headers */,
+				D2AAC06C0554671400DB518D /* Sources */,
+				D2AAC06D0554671400DB518D /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = dScene;
+			productName = dScene;
+			productReference = D2AAC06F0554671400DB518D /* libdScene_d.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		0867D690FE84028FC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0450;
+			};
+			buildConfigurationList = 1DEB920508733DBB0010E9CD /* Build configuration list for PBXProject "dScene" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
+			mainGroup = 0867D691FE84028FC02AAC07 /* dScene */;
+			productRefGroup = 034768DDFF38A45A11DB9C8B /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D2AAC06E0554671400DB518D /* dScene */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D2AAC06C0554671400DB518D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FF8C27421313D82800646B90 /* dBoneNodeInfo.cpp in Sources */,
+				FF8C27461313D82800646B90 /* dCollisionBoxNodeInfo.cpp in Sources */,
+				FF8C27481313D82800646B90 /* dCollisionCapsuleNodeInfo.cpp in Sources */,
+				FF8C274A1313D82800646B90 /* dCollisionChamferCylinderNodeInfo.cpp in Sources */,
+				FF8C274C1313D82800646B90 /* dCollisionCompoundNodeInfo.cpp in Sources */,
+				FF8C274E1313D82800646B90 /* dCollisionConeNodeInfo.cpp in Sources */,
+				FF8C27501313D82800646B90 /* dCollisionConvexHullNodeInfo.cpp in Sources */,
+				FF8C27521313D82800646B90 /* dCollisionCylinderNodeInfo.cpp in Sources */,
+				FF8C27541313D82800646B90 /* dCollisionNodeInfo.cpp in Sources */,
+				FF8C27561313D82800646B90 /* dCollisionSphereNodeInfo.cpp in Sources */,
+				FF8C27581313D82800646B90 /* dDrawUtils.cpp in Sources */,
+				FF8C275C1313D82800646B90 /* dGeometryNodeInfo.cpp in Sources */,
+				FF8C275E1313D82800646B90 /* dGeometryNodeModifierInfo.cpp in Sources */,
+				FF8C27601313D82800646B90 /* dGeometryNodeSkinModifierInfo.cpp in Sources */,
+				FF8C27651313D82800646B90 /* dMaterialNodeInfo.cpp in Sources */,
+				FF8C27671313D82800646B90 /* dMeshNodeInfo.cpp in Sources */,
+				FF8C27691313D82800646B90 /* dNodeInfo.cpp in Sources */,
+				FF8C276F1313D82800646B90 /* dRigidbodyNodeInfo.cpp in Sources */,
+				FF8C27711313D82800646B90 /* dRootNodeInfo.cpp in Sources */,
+				FF8C27731313D82800646B90 /* dScene.cpp in Sources */,
+				FF8C27751313D82800646B90 /* dSceneGraph.cpp in Sources */,
+				FF8C27771313D82800646B90 /* dSceneNodeInfo.cpp in Sources */,
+				FF8C27791313D82800646B90 /* dTextureNodeInfo.cpp in Sources */,
+				FF8C277B1313D82800646B90 /* dVariable.cpp in Sources */,
+				FF3B296117300B57007E6FEC /* dCollisionTreeNodeInfo.cpp in Sources */,
+				FF3B296317300B57007E6FEC /* dSceneCacheInfo.cpp in Sources */,
+				FF3B296517300B57007E6FEC /* dSceneModelInfo.cpp in Sources */,
+				FF3B296717300B57007E6FEC /* dSceneRender.cpp in Sources */,
+				FF3B296917300B57007E6FEC /* dSceneStdafx.cpp in Sources */,
+				FF3B296B17300B57007E6FEC /* dUndoRedo.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1DEB920208733DBB0010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = dScene_Prefix.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = _MACOSX_VER;
+				HEADER_SEARCH_PATHS = (
+					../../../../coreLibrary_300/source/newton,
+					../../../dMath,
+					../../../dContainers,
+					../../../thirdParty/tinyxml,
+					"../../../thirdParty/enet-1.2/include",
+				);
+				INSTALL_PATH = /usr/local/lib;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = dScene_d;
+				SDKROOT = macosx;
+				VALID_ARCHS = x86_64;
+			};
+			name = Debug;
+		};
+		1DEB920308733DBB0010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = dScene_Prefix.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = _MACOSX_VER;
+				HEADER_SEARCH_PATHS = (
+					../../../../coreLibrary_300/source/newton,
+					../../../dMath,
+					../../../dContainers,
+					../../../thirdParty/tinyxml,
+					"../../../thirdParty/enet-1.2/include",
+				);
+				INSTALL_PATH = /usr/local/lib;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = dScene;
+				SDKROOT = macosx;
+				VALID_ARCHS = x86_64;
+			};
+			name = Release;
+		};
+		1DEB920608733DBB0010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		1DEB920708733DBB0010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB920108733DBB0010E9CD /* Build configuration list for PBXNativeTarget "dScene" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB920208733DBB0010E9CD /* Debug */,
+				1DEB920308733DBB0010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1DEB920508733DBB0010E9CD /* Build configuration list for PBXProject "dScene" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB920608733DBB0010E9CD /* Debug */,
+				1DEB920708733DBB0010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 0867D690FE84028FC02AAC07 /* Project object */;
+}

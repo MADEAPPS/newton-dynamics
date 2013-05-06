@@ -1,0 +1,101 @@
+/* Copyright (c) <2009> <Newton Game Dynamics>
+* 
+* This software is provided 'as-is', without any express or implied
+* warranty. In no event will the authors be held liable for any damages
+* arising from the use of this software.
+* 
+* Permission is granted to anyone to use this software for any purpose,
+* including commercial applications, and to alter it and redistribute it
+* freely
+*/
+
+
+// NewtonPlayerControllerManager.h: interface for the NewtonPlayerControllerManager class.
+//
+//////////////////////////////////////////////////////////////////////
+
+#ifndef D_CUSTOM_PLAYER_CONTROLLER_MANAGER_H_
+#define D_CUSTOM_PLAYER_CONTROLLER_MANAGER_H_
+
+#include "CustomJointLibraryStdAfx.h"
+#include "CustomControllerManager.h"
+
+
+#define PLAYER_PLUGIN_NAME				"playerManager"
+#define PLAYER_CONTROLLER_MAX_CONTACTS	32
+
+class CustomPlayerController
+{
+	CUSTOM_CONTROLLER_GLUE(CustomPlayerController);
+	
+	public:
+	dFloat GetHight() const 
+	{
+		return m_height;
+	}
+
+	const dVector GetUpDir () const
+	{
+		return m_upVector;	
+	}
+
+	void SetClimbSlope (dFloat slopeInRadians)
+	{
+		m_maxSlope = dCos (dAbs(slopeInRadians));
+	}
+
+	const dVector& GetGroundPlane() const
+	{
+		return m_groundPlane;
+	}
+
+	void SetPlayerOrigin (dFloat originHigh);
+	void SetPlayerVelocity (dFloat forwadSpeed, dFloat lateralSpeed, dFloat verticalSpeed, dFloat headinAngle, const dVector& gravity, dFloat timestep);
+
+
+	protected:
+	dVector CalculateDesiredOmega (dFloat headinAngle, dFloat timestep) const;
+	dVector CalculateDesiredVelocity (dFloat forwadSpeed, dFloat lateralSpeed, dFloat verticalSpeed, const dVector& gravity, dFloat timestep) const;
+
+	void Init(dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stepHigh, const dMatrix& localAxis);
+
+	virtual void PreUpdate(dFloat timestep, int threadIndex);
+	virtual void PostUpdate(dFloat timestep, int threadIndex);
+	
+	private:
+	dFloat CalculateContactKinematics(const dVector& veloc, const NewtonWorldConvexCastReturnInfo* const contact) const;
+
+	dVector m_upVector;
+	dVector m_frontVector;
+	dVector m_groundPlane;
+	dVector m_groundVelocity;
+	dFloat m_outerRadios;
+	dFloat m_innerRadios;
+	dFloat m_height;
+	dFloat m_stairStep;
+	dFloat m_maxSlope;
+	bool m_isJumping;
+	NewtonCollision* m_supportShape;
+	NewtonCollision* m_collisionShape;
+
+	friend class CustomPlayerControllerManager;
+};
+
+class CustomPlayerControllerManager: public CustomControllerManager<CustomPlayerController> 
+{
+	public:
+	CustomPlayerControllerManager(NewtonWorld* const world);
+	virtual ~CustomPlayerControllerManager();
+
+	virtual void Debug () const {};
+
+	virtual CustomController* CreatePlayer (dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dMatrix& localAxis);
+	virtual void ApplyPlayerMove (CustomPlayerController* const controller, dFloat timestep) = 0; 
+
+	// the client application can overload this function to customizer contacts
+	virtual int ProcessContacts (const CustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const; 
+};
+
+
+#endif 
+

@@ -1,0 +1,189 @@
+<?xml version="1.0" ?>
+<alchemedia>
+    <header description="alchemedia file format" revision="100" />
+    <nodes count="19">
+        <dRootNodeInfo>
+            <dNodeInfo name="rootNode" />
+            <childrenNodes count="9" indices="1 2 3 4 5 8 10 11 14" />
+        </dRootNodeInfo>
+        <dCameraNodeInfo>
+            <dNodeInfo name="viewport0" />
+            <position x="0.000000" y="0.000000" z="0.000000" />
+            <rotation pitch="30.000000" yaw="30.000000" />
+            <miscelaneus dist="5.000000" viewportOrthoSize="20.000000" projectionMode="perspective" />
+            <parentNodes count="1" indices="0" />
+        </dCameraNodeInfo>
+        <dCameraNodeInfo>
+            <dNodeInfo name="viewport1" />
+            <position x="0.000000" y="0.000000" z="0.000000" />
+            <rotation pitch="30.000000" yaw="30.000000" />
+            <miscelaneus dist="5.000000" viewportOrthoSize="20.000000" projectionMode="perspective" />
+            <parentNodes count="1" indices="0" />
+        </dCameraNodeInfo>
+        <dCameraNodeInfo>
+            <dNodeInfo name="viewport2" />
+            <position x="0.000000" y="0.000000" z="0.000000" />
+            <rotation pitch="30.000000" yaw="30.000000" />
+            <miscelaneus dist="5.000000" viewportOrthoSize="20.000000" projectionMode="perspective" />
+            <parentNodes count="1" indices="0" />
+        </dCameraNodeInfo>
+        <dCameraNodeInfo>
+            <dNodeInfo name="viewport3" />
+            <position x="0.000000" y="0.000000" z="0.000000" />
+            <rotation pitch="30.000000" yaw="30.000000" />
+            <miscelaneus dist="5.000000" viewportOrthoSize="20.000000" projectionMode="perspective" />
+            <parentNodes count="1" indices="0" />
+        </dCameraNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="root" />
+            <color float4="0.750000 0.750000 0.000000 0.000000" />
+            <transform position="0.000000 -5.000000 0.000000 1.000000" eulerAngles="0.000000 -0.000000 0.000000 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
+            <parentNodes count="1" indices="0" />
+            <childrenNodes count="2" indices="6 15" />
+        </dSceneNodeInfo>
+        <dMeshNodeInfo>
+            <dGeometryNodeInfo>
+                <dNodeInfo name="floor" />
+                <pivotMatrix float16="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
+            </dGeometryNodeInfo>
+            <points>
+                <position float4="8" floats="-50.000015 -1.000000 -49.999985 0.000000 -50.000015 1.000000 -49.999985 0.000000 49.999985 1.000000 -50.000015 0.000000 49.999985 -1.000000 -50.000015 0.000000 50.000015 -1.000000 49.999985 0.000000 -49.999985 -1.000000 50.000015 0.000000 -49.999985 1.000000 50.000015 0.000000 50.000015 1.000000 49.999985 0.000000" />
+                <normal float3="6" floats="-1.000000 0.000000 0.000000 -0.000000 0.000000 -1.000000 0.000000 -1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 1.000000 1.000000 0.000000 -0.000000" />
+                <uv0 float2="4" floats="0.000000 0.000000 0.000000 1.000000 1.000000 1.000000 1.000000 0.000000" />
+                <uv1 float2="1" floats="0.000000 0.000000" />
+            </points>
+            <polygons count="6" faceIndexCount="4 4 4 4 4 4">
+                <faceMaterial index="1 1 0 1 0 1" />
+                <position index="0 1 2 3 0 3 4 5 0 5 6 1 1 6 7 2 2 7 4 3 4 7 6 5" />
+                <normal index="1 1 1 1 2 2 2 2 0 0 0 0 3 3 3 3 5 5 5 5 4 4 4 4" />
+                <uv0 index="0 1 2 3 0 3 2 1 0 1 2 3 0 1 2 3 3 2 1 0 3 2 1 0" />
+                <uv1 index="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" />
+            </polygons>
+            <parentNodes count="1" indices="5" />
+            <childrenNodes count="2" indices="7 9" />
+        </dMeshNodeInfo>
+        <dMaterialNodeInfo id="0">
+            <dNodeInfo name="material" />
+            <ambient textureId="-1" color="0.200000 0.200000 0.200000 1.000000" />
+            <diffuse textureId="-854382109" color="0.800000 0.800000 0.800000 1.000000" />
+            <specular textureId="-1" color="0.000000 0.000000 0.000000 1.000000" />
+            <emissive textureId="-1" color="0.000000 0.000000 0.000000 1.000000" />
+            <shininess float="0.000000" />
+            <opacity float="1.000000" />
+            <parentNodes count="1" indices="6" />
+            <childrenNodes count="1" indices="8" />
+        </dMaterialNodeInfo>
+        <dTextureNodeInfo path="grassanddirt.tga">
+            <dNodeInfo name="texture" />
+            <parentNodes count="2" indices="0 7" />
+        </dTextureNodeInfo>
+        <dMaterialNodeInfo id="1">
+            <dNodeInfo name="material" />
+            <ambient textureId="-1" color="0.200000 0.200000 0.200000 1.000000" />
+            <diffuse textureId="-1797769562" color="0.800000 0.800000 0.800000 1.000000" />
+            <specular textureId="-1" color="0.000000 0.000000 0.000000 1.000000" />
+            <emissive textureId="-1" color="0.000000 0.000000 0.000000 1.000000" />
+            <shininess float="0.000000" />
+            <opacity float="1.000000" />
+            <parentNodes count="1" indices="6" />
+            <childrenNodes count="1" indices="10" />
+        </dMaterialNodeInfo>
+        <dTextureNodeInfo path="metal_30.tga">
+            <dNodeInfo name="texture" />
+            <parentNodes count="2" indices="0 9" />
+        </dTextureNodeInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="root" />
+            <color float4="0.750000 0.750000 0.000000 0.000000" />
+            <transform position="-2.000001 -3.499950 -1.999999 1.000000" eulerAngles="0.000000 -0.000000 0.000000 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
+            <parentNodes count="1" indices="0" />
+            <childrenNodes count="2" indices="12 17" />
+        </dSceneNodeInfo>
+        <dMeshNodeInfo>
+            <dGeometryNodeInfo>
+                <dNodeInfo name="stackShape" />
+                <pivotMatrix float16="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
+            </dGeometryNodeInfo>
+            <points>
+                <position float4="8" floats="-0.500000 -0.500000 -0.500000 0.000000 -0.500000 -0.500000 0.500000 0.000000 -0.500000 0.500000 0.500000 0.000000 -0.500000 0.500000 -0.500000 0.000000 0.500000 0.500000 -0.500000 0.000000 0.500000 -0.500000 -0.500000 0.000000 0.500000 -0.500000 0.500000 0.000000 0.500000 0.500000 0.500000 0.000000" />
+                <normal float3="6" floats="-1.000000 0.000000 0.000000 -0.000000 0.000000 -1.000000 0.000000 -1.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 1.000000 1.000000 0.000000 -0.000000" />
+                <uv0 float2="4" floats="0.000000 0.000000 0.000000 1.000000 1.000000 0.000000 1.000000 1.000000" />
+                <uv1 float2="1" floats="0.000000 0.000000" />
+            </points>
+            <polygons count="6" faceIndexCount="4 4 4 4 4 4">
+                <faceMaterial index="0 0 0 0 0 0" />
+                <position index="0 1 2 3 0 3 4 5 0 5 6 1 1 6 7 2 2 7 4 3 4 7 6 5" />
+                <normal index="0 0 0 0 1 1 1 1 2 2 2 2 4 4 4 4 3 3 3 3 5 5 5 5" />
+                <uv0 index="0 1 3 2 0 1 3 2 0 2 3 1 0 2 3 1 1 3 2 0 2 3 1 0" />
+                <uv1 index="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" />
+            </polygons>
+            <parentNodes count="1" indices="11" />
+            <childrenNodes count="1" indices="13" />
+        </dMeshNodeInfo>
+        <dMaterialNodeInfo id="0">
+            <dNodeInfo name="material" />
+            <ambient textureId="-1" color="0.200000 0.200000 0.200000 1.000000" />
+            <diffuse textureId="1868475005" color="0.800000 0.800000 0.800000 1.000000" />
+            <specular textureId="-1" color="0.000000 0.000000 0.000000 1.000000" />
+            <emissive textureId="-1" color="0.000000 0.000000 0.000000 1.000000" />
+            <shininess float="0.000000" />
+            <opacity float="1.000000" />
+            <parentNodes count="1" indices="12" />
+            <childrenNodes count="1" indices="14" />
+        </dMaterialNodeInfo>
+        <dTextureNodeInfo path="smilli.tga">
+            <dNodeInfo name="texture" />
+            <parentNodes count="2" indices="0 13" />
+        </dTextureNodeInfo>
+        <dRigidbodyNodeInfo>
+            <dNodeInfo name="rigidBody_scene_model_000">
+                <variables>
+                    <string name="rigidBodyType" value="default gravity" />
+                </variables>
+            </dNodeInfo>
+            <transform />
+            <centerOfMass float4="0.000000 0.000000 0.000000 0.000000" />
+            <massMatrix float4="0.000000 0.000000 0.000000 0.000000" />
+            <velocity float4="0.000000 0.000000 0.000000 1.000000" />
+            <omega float4="0.000000 0.000000 0.000000 1.000000" />
+            <internalDamp float4="0.000000 0.000000 0.000000 0.000000" />
+            <parentNodes count="1" indices="5" />
+            <childrenNodes count="1" indices="16" />
+        </dRigidbodyNodeInfo>
+        <dCollisionBoxNodeInfo>
+            <dCollisionNodeInfo shapeId="0">
+                <dNodeInfo name="box collision" />
+                <offsetMatrix float16="-1.000000 0.000000 -0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
+                <geometricInertia float4="0.000000 0.000000 0.000000 0.000000" />
+                <geometricCenterAndVolume float4="0.000000 0.000000 0.000000 0.000000" />
+            </dCollisionNodeInfo>
+            <size float4="100.000000 2.000000 100.000000 0.000000" />
+            <parentNodes count="1" indices="15" />
+        </dCollisionBoxNodeInfo>
+        <dRigidbodyNodeInfo>
+            <dNodeInfo name="rigidBody_scene_model_001">
+                <variables>
+                    <string name="rigidBodyType" value="default gravity" />
+                </variables>
+            </dNodeInfo>
+            <transform />
+            <centerOfMass float4="0.000000 0.000000 0.000000 1.000000" />
+            <massMatrix float4="0.166667 0.166667 0.166667 1.000000" />
+            <velocity float4="0.000000 0.000000 0.000000 1.000000" />
+            <omega float4="0.000000 0.000000 0.000000 1.000000" />
+            <internalDamp float4="0.000000 0.000000 0.000000 0.000000" />
+            <parentNodes count="1" indices="11" />
+            <childrenNodes count="1" indices="18" />
+        </dRigidbodyNodeInfo>
+        <dCollisionBoxNodeInfo>
+            <dCollisionNodeInfo shapeId="0">
+                <dNodeInfo name="box collision" />
+                <offsetMatrix float16="-1.000000 0.000000 -0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 -1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
+                <geometricInertia float4="0.000000 0.000000 0.000000 0.000000" />
+                <geometricCenterAndVolume float4="0.000000 0.000000 0.000000 0.000000" />
+            </dCollisionNodeInfo>
+            <size float4="1.000000 1.000000 1.000000 0.000000" />
+            <parentNodes count="1" indices="17" />
+        </dCollisionBoxNodeInfo>
+    </nodes>
+</alchemedia>

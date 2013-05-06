@@ -1,0 +1,4 @@
+If you unzip this into your MilkShape 3D installation folder, then the projects are setup
+correctly.
+
+http://www.milkshape3d.com
