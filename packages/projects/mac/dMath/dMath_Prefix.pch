@@ -1,9 +1,0 @@
-//
-// Prefix header for all source files of the 'dMath' target in the 'dMath' project.
-//
-
-//#include <Carbon/Carbon.h>
-
-#ifdef __OBJC__
-#import <Foundation/Foundation.h>
-#endif
