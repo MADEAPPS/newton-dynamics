@@ -3995,13 +3995,6 @@ int NewtonCollisionClosestPoint(const NewtonWorld* const newtonWorld,
 // Also the application should implement their own trivial aabb test, before calling this function .
 //
 // See also: NewtonCollisionCollideContinue, NewtonCollisionClosestPoint, NewtonCollisionPointDistance, NewtonCollisionRayCast, NewtonCollisionCalculateAABB
-//int NewtonCollisionCollide(const NewtonWorld* const newtonWorld, int maxSize,
-//						   const NewtonCollision* const collisionA, const dFloat* const matrixA,
-//						   const NewtonCollision* const collisionB, const dFloat* const matrixB,
-//						   dFloat* const contacts, dFloat* const normals, dFloat* const penetration, 
-//						   dLong* const attributeA, dLong* const attributeB, int threadIndex)
-//
-
 int NewtonCollisionCollide (const NewtonWorld* const newtonWorld, int maxSize,
 						   const NewtonCollision* const collisionA, const dFloat* const matrixA, 
 						   const NewtonCollision* const collisionB, const dFloat* const matrixB,
@@ -4138,7 +4131,7 @@ dFloat NewtonCollisionRayCast(const NewtonCollision* const collisionPtr, const d
 
 	dFloat t = collision->RayCast (q0, q1, contact, NULL, NULL, NULL);
 	if (t >= dFloat (0.0f) && t <= dFloat (dgFloat32(1.0f))) {
-		attribute[0] = dLong (contact.m_shapeId0);
+		attribute[0] = (dLong) contact.m_shapeId0;
 
 		dgVector n (matrix.RotateVector (contact.m_normal));
 		normal[0] = n[0];
