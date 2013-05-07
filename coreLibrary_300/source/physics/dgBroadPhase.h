@@ -26,6 +26,7 @@
 
 class dgBody;
 class dgWorld;
+class dgContact;
 class dgCollision;
 class dgCollisionInstance;
 class dgBroadphaseSyncDescriptor;
@@ -124,6 +125,8 @@ class dgBroadPhase
 	void FindCollidingPairsDynamics (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
 	void FindCollidingPairsStatic (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
 	void FindCollidingPairsHybrid (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
+
+	void CheckKenamaticBodyActivation (dgContact* const contatJoint) const;
 
 	dgWorld* m_world;
 	dgNode* m_rootNode;

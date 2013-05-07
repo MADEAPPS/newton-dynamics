@@ -4643,6 +4643,13 @@ void NewtonDestroyBody(const NewtonWorld* const newtonWorld, const NewtonBody* c
 	world->DestroyBody(body);
 }
 
+void NewtonSetBodyCollidable (const NewtonBody* const bodyPtr, int collidable)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgBody* const body = (dgBody *)bodyPtr;
+	body->SetCollidable(collidable ? true : false);
+}
+
 int NewtonBodyGetType (const NewtonBody* const bodyPtr)
 {
 	TRACE_FUNCTION(__FUNCTION__);

@@ -346,6 +346,7 @@ class dgWorldDynamicUpdate
 	dgInt32 GetJacobianDerivatives (const dgIsland* const island, dgInt32 threadID, bool bitMode, dgInt32 rowBase, dgInt32 rowCount, dgFloat32 timestep) const;	
 
 
+
 	dgInt32 m_bodies;
 	dgInt32 m_joints;
 	dgInt32 m_islands;

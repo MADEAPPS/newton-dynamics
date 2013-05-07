@@ -98,8 +98,10 @@ void CustomPlayerController::Init(dFloat outerRadius, dFloat innerRadius, dFloat
 	dMatrix locationMatrix (GetIdentityMatrix());
 	NewtonBody* const body = NewtonCreateKinematicBody(world, playerShape, &locationMatrix[0][0]);
 
+	// make the body collidable with other dynamics bodies, by default
+	NewtonSetBodyCollidable (body, true);
+	
 	SetBody (body);
-
 	NewtonCollision* const shape = NewtonBodyGetCollision(body);
 	m_supportShape = NewtonCompoundCollisionGetCollisionFromNode (shape, NewtonCompoundCollisionGetNodeByIndex (shape, 0));
 	m_collisionShape = NewtonCompoundCollisionGetCollisionFromNode (shape, NewtonCompoundCollisionGetNodeByIndex (shape, 1));

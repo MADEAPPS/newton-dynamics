@@ -77,6 +77,8 @@ class dgDynamicBody : public dgBody
 	virtual void SetMatrixIgnoreSleep(const dgMatrix& matrix);
 
 	virtual bool IsInEquilibrium () const;
+	virtual void SetCollidable (bool state) {}
+
 	virtual void ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex);
 	virtual OnApplyExtForceAndTorque GetExtForceAndTorqueCallback () const;
 	virtual void SetExtForceAndTorqueCallback (OnApplyExtForceAndTorque callback);

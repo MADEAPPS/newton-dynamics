@@ -331,7 +331,8 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body)
 				dgAssert ((constraint->m_body0 == linkBody) || (constraint->m_body1 == linkBody));
 				const dgContact* const contact = (constraint->GetId() == dgConstraint::m_contactConstraint) ? (dgContact*)constraint : NULL;
 				//if (linkBody->IsRTTIType(dgBody::m_dynamicBodyRTTI) && (!contact || contact->m_maxDOF || contact->m_continueCollisionMode)) { 
-				if (linkBody->IsRTTIType(dgBody::m_dynamicBodyRTTI) && (!contact || contact->m_maxDOF || (srcBody->m_continueCollisionMode | linkBody->m_continueCollisionMode))) { 
+				//if (linkBody->IsRTTIType(dgBody::m_dynamicBodyRTTI) && (!contact || contact->m_maxDOF || (srcBody->m_continueCollisionMode | linkBody->m_continueCollisionMode))) { 
+				if (linkBody->IsCollidable() && (!contact || contact->m_maxDOF || (srcBody->m_continueCollisionMode | linkBody->m_continueCollisionMode))) { 
 					dgDynamicBody* const body = (dgDynamicBody*)linkBody;
 
 					isInEquilibrium &= srcBody->m_equilibrium;
@@ -548,7 +549,8 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 				const dgContact* const contact = (constraint->GetId() == dgConstraint::m_contactConstraint) ? (dgContact*)constraint : NULL;
 				//if (linkBody->IsRTTIType(dgBody::m_dynamicBodyRTTI) && (!contact || contact->m_maxDOF || contact->m_continueCollisionMode)) { 
 				dgInt32 ccdMode = contact ? (body->m_continueCollisionMode | linkBody->m_continueCollisionMode) : 0;
-				if (linkBody->IsRTTIType(dgBody::m_dynamicBodyRTTI) && (!contact || contact->m_maxDOF || ccdMode)) { 
+				//if (linkBody->IsRTTIType(dgBody::m_dynamicBodyRTTI) && (!contact || contact->m_maxDOF || ccdMode)) { 
+				if (linkBody->IsCollidable() && (!contact || contact->m_maxDOF || ccdMode)) { 
 					dgDynamicBody* const body = (dgDynamicBody*)linkBody;
 
 					if (constraint->m_dynamicsLru != lruMark) {

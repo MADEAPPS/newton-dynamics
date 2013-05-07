@@ -65,6 +65,8 @@ class dgKinematicBody: public dgBody
 	virtual dgVector PredictAngularVelocity(dgFloat32 timestep) const {return m_omega;}
 
 	virtual bool IsInEquilibrium  () const {return true;}
+	virtual void SetCollidable (bool state) {m_collidable = state;}
+
 	virtual void AddImpulse (const dgVector& pointVeloc, const dgVector& pointPosit) {};
 	virtual void ApplyImpulsePair (const dgVector& linearImpulse, const dgVector& angularImpulse) {}
 	virtual void ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, const dgFloat32* const impulseArray, const dgFloat32* const pointArray) {}

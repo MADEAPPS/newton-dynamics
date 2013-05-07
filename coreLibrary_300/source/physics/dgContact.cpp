@@ -388,7 +388,6 @@ void dgCollidingPairCollector::Init ()
 {
 	dgWorld* const world = (dgWorld*) this;
 	m_pairs = (dgPair*) &world->m_pairMemoryBuffer[0];
-//	m_lock = 0;
 	m_count = 0;
 }
 

@@ -29,6 +29,7 @@ dgVector dgKinematicBody::m_dummy (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32
 dgKinematicBody::dgKinematicBody()
 	:dgBody()
 {
+	m_collidable = false;
 	m_type = m_kinamticBody;
 	m_rtti |= m_kinematicBodyRTTI;
 }
@@ -36,6 +37,7 @@ dgKinematicBody::dgKinematicBody()
 dgKinematicBody::dgKinematicBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionNode, dgDeserialize serializeCallback, void* const userData)
 	:dgBody (world, collisionNode, serializeCallback, userData)
 {
+	m_collidable = false;
 	m_type = m_kinamticBody;
 	m_rtti |= m_kinematicBodyRTTI;
 }

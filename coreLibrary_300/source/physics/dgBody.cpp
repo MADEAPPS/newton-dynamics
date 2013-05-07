@@ -74,6 +74,7 @@ dgBody::dgBody()
 	,m_matrixUpdate(NULL)
 {
 	m_autoSleep = true;
+	m_collidable = true;
 	m_collideWithLinkedBodies = true;
 }
 
@@ -110,6 +111,7 @@ dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>*
 	,m_matrixUpdate(NULL)
 {
 	m_autoSleep = true;
+	m_collidable = true;
 	m_collideWithLinkedBodies = true;
 
 	serializeCallback (userData, &m_rotation, sizeof (m_rotation));

@@ -124,6 +124,8 @@ class dgBody
 	bool GetAutoSleep () const;
 	void SetAutoSleep (bool state);
 
+	bool IsCollidable() const;
+
 	
 
 	dgCollisionInstance* GetCollision () const;
@@ -133,9 +135,6 @@ class dgBody
 	void SetDestructorCallback (OnBodyDestroy destructor);
 	OnMatrixUpdateCallback GetMatrixUpdateCallback () const;
 	void SetMatrixUpdateCallback (OnMatrixUpdateCallback callback);
-	
-
-
 	
 	virtual const dgVector& GetForce() const = 0;
 	virtual const dgVector& GetTorque() const = 0;
@@ -163,7 +162,10 @@ class dgBody
 	virtual dgVector PredictLinearVelocity(dgFloat32 timestep) const = 0;
 	virtual dgVector PredictAngularVelocity(dgFloat32 timestep) const = 0;
 
+	
 	virtual bool IsInEquilibrium () const = 0;
+	virtual void SetCollidable (bool state) = 0;
+
 	virtual void AddImpulse (const dgVector& pointVeloc, const dgVector& pointPosit) = 0;
 	virtual void ApplyImpulsePair (const dgVector& linearImpulse, const dgVector& angularImpulse) = 0;
 	virtual void ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, const dgFloat32* const impulseArray, const dgFloat32* const pointArray) = 0;
@@ -234,6 +236,7 @@ class dgBody
 			dgUnsigned32 m_spawnnedFromCallback		: 1;
 			dgUnsigned32 m_collideWithLinkedBodies  : 1;
 			dgUnsigned32 m_inCallback				: 1;
+			dgUnsigned32 m_collidable				: 1;
 		};
 	};
 
@@ -474,6 +477,11 @@ DG_INLINE void dgBody::SetSleepState (bool state)
 	m_equilibrium = state;
 }
 
+
+DG_INLINE bool dgBody::IsCollidable() const
+{
+	return m_collidable;
+}
 
 DG_INLINE void dgBody::SetMatrixOriginAndRotation(const dgMatrix& matrix)
 {

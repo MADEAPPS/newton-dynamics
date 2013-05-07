@@ -773,13 +773,11 @@ DG_INLINE dgInt32 dgAtomicExchangeAndAdd (dgInt32* const addend, dgInt32 amount)
 {
 	// it is a pity that pthread does not supports cross platform atomics, it would be nice if it did
 	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER) || defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
-		dgInt32 ret = _InterlockedExchangeAdd((long*) addend, long (amount));
-		return ret;
+		return _InterlockedExchangeAdd((long*) addend, long (amount));
 	#endif
 
 	#if (defined (_POSIX_VER) || defined (_MACOSX_VER))
-		dgInt32 ret = __sync_fetch_and_add ((int32_t*)addend, amount );
-		return ret;
+		return __sync_fetch_and_add ((int32_t*)addend, amount );
 	#endif
 }
 
@@ -787,14 +785,12 @@ DG_INLINE dgInt32 dgInterlockedExchange(dgInt32* const ptr, dgInt32 value)
 {
 	// it is a pity that pthread does not supports cross platform atomics, it would be nice if it did
 	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER) || defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
-		dgInt32 ret = _InterlockedExchange((long*) ptr, value);
-		return ret;
+		return _InterlockedExchange((long*) ptr, value);
 	#endif
 
 	#if (defined (_POSIX_VER) || defined (_MACOSX_VER))
 		//__sync_synchronize();
-		dgInt32 ret = __sync_lock_test_and_set((int32_t*)ptr, value);
-		return ret;
+		return __sync_lock_test_and_set((int32_t*)ptr, value);
 	#endif
 }
 

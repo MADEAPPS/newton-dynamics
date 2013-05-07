@@ -309,7 +309,6 @@ class dgBroadphaseSyncDescriptor
 	dgInt32 m_pairsAtomicCounter;
 	dgInt32 m_jointsAtomicCounter;
 	dgFloat32 m_timestep;
-//	dgWorld* m_world;
 	dgBodyMasterList::dgListNode* m_collindPairBodyNode;
 	dgBodyMasterList::dgListNode* m_forceAndTorqueBodyNode;
 	dgBroadPhase::dgType m_broadPhaseType;
@@ -915,7 +914,6 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, dgInt32 th
 						contact = new (m_world->m_allocator) dgDeformableContact (m_world, material);
 					} else {
 						contact = new (m_world->m_allocator) dgContact (m_world, material);
-						//contact->m_continueCollisionMode = body0->m_continueCollisionMode | body1->m_continueCollisionMode;
 					}
 					contact->AppendToActiveList();
 					m_world->AttachConstraint (contact, body0, body1);
@@ -976,13 +974,17 @@ void dgBroadPhase::ApplyForceAndtorque (dgBroadphaseSyncDescriptor* const descri
 			dymamicBody->m_prevExternalTorque = dymamicBody->m_alpha;
 		} else {
 			dgAssert (body->IsRTTIType(dgBody::m_kinematicBodyRTTI));
+
 			// kinematic bodies are always sleeping (skip collision with kinematic bodies)
-			//body->m_sleeping = true;	
-			//body->m_autoSleep = true;
-			// kinematic bodies always awake (slower because can cause deep penetration collision)
-			body->m_sleeping = false;	
-			body->m_autoSleep = false;
+			if (body->IsCollidable()) {
+				body->m_sleeping = false;	
+				body->m_autoSleep = false;
+			} else {
+				body->m_sleeping = true;	
+				body->m_autoSleep = true;
+			}
 			body->m_equilibrium = true;
+
 			// update collision matrix by calling the transform callback for all kinematic bodies
 			body->UpdateMatrix (timestep, threadID);
 		}
@@ -995,6 +997,25 @@ void dgBroadPhase::ApplyForceAndtorque (dgBroadphaseSyncDescriptor* const descri
 	}
 }
 
+
+void dgBroadPhase::CheckKenamaticBodyActivation (dgContact* const contatJoint) const
+{
+	dgBody* const body0 = contatJoint->GetBody0();
+	dgBody* const body1 = contatJoint->GetBody1();
+	if (body0->IsRTTIType(dgBody::m_kinematicBodyRTTI)) {
+		if (body0->IsCollidable() && (body1->GetInvMass().m_w > dgFloat32 (0.0f))) {
+			dgAssert (!body1->IsRTTIType(dgBody::m_kinematicBodyRTTI));
+			dgThreadHiveScopeLock lock (m_world, &body1->m_criticalSectionLock);
+			body1->m_sleeping = false;
+		}
+	} else if (body1->IsRTTIType(dgBody::m_kinematicBodyRTTI)) {
+		if (body1->IsCollidable() && (body0->GetInvMass().m_w > dgFloat32 (0.0f))) {
+			dgAssert (!body0->IsRTTIType(dgBody::m_kinematicBodyRTTI));
+			dgThreadHiveScopeLock lock (m_world, &body0->m_criticalSectionLock);
+			body0->m_sleeping = false;
+		}
+	}
+}
 
 void dgBroadPhase::CalculatePairContacts (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID)
 {
@@ -1021,10 +1042,12 @@ void dgBroadPhase::CalculatePairContacts (dgBroadphaseSyncDescriptor* const desc
 					m_world->ProcessDeformableContacts (pair, timestep, threadID);
 				} else {
 					m_world->ProcessContacts (pair, timestep, threadID);
+					CheckKenamaticBodyActivation (pair->m_contact);
 				}
 			} else {
 				if (pair->m_cacheIsValid) {
 					m_world->ProcessCachedContacts (pair->m_contact, timestep, threadID);
+					CheckKenamaticBodyActivation (pair->m_contact);
 				} else {
 					pair->m_contact->m_maxDOF = 0;
 				}
@@ -1252,8 +1275,6 @@ void dgBroadPhase::FindCollidingPairsDynamics (dgBroadphaseSyncDescriptor* const
 {
 	dgNode* pool[2 * DG_BROADPHASE_MAX_STACK_DEPTH];		
 
-//	dgAssert (m_world == descriptor->m_world);
-	
 	dgInt32 index;
 	while ((index = dgAtomicExchangeAndAdd(&descriptor->m_pairsCount, -1)) > 0) {
 		index --;

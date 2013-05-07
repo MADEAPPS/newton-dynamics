@@ -816,7 +816,7 @@ extern "C" {
 	NEWTON_API void  NewtonDestroyBody(const NewtonWorld* const newtonWorld, const NewtonBody* const body);
 
 	NEWTON_API int NewtonBodyGetType (const NewtonBody* const body);
-
+	NEWTON_API void NewtonSetBodyCollidable (const NewtonBody* const body, int collidableState);
 
 	NEWTON_API void  NewtonBodyAddForce (const NewtonBody* const body, const dFloat* const force);
 	NEWTON_API void  NewtonBodyAddTorque (const NewtonBody* const body, const dFloat* const torque);
