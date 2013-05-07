@@ -1422,6 +1422,7 @@ void dgMeshEffect::ApplyTransform (const dgMatrix& matrix)
 	for (dgInt32 i = 0; i < m_atribCount; i ++) {
 		dgVector n (dgFloat32 (m_attrib[i].m_normal_x), dgFloat32 (m_attrib[i].m_normal_y), dgFloat32 (m_attrib[i].m_normal_z), dgFloat32 (0.0f));
 		n = rotation.RotateVector(n);
+		dgAssert ((n % n) > dgFloat32 (0.0f));
 		n = n.Scale (dgRsqrt (n % n));
 		m_attrib[i].m_normal_x = n.m_x;
 		m_attrib[i].m_normal_y = n.m_y;
@@ -1599,6 +1600,7 @@ void dgMeshEffect::SphericalMapping (dgInt32 material)
 	dgStack<dgBigVector>sphere (m_pointCount);
 	for (dgInt32 i = 0; i < m_pointCount; i ++) {
 		dgBigVector point (m_points[i] - origin);
+		dgAssert ((point % point) > dgFloat32 (0.0f));
 		point = point.Scale (dgRsqrt (point % point));
 
 		dgFloat64 u = dgAsin (point.m_y);
@@ -1651,6 +1653,7 @@ void dgMeshEffect::CylindricalMapping (dgInt32 cylinderMaterial, dgInt32 capMate
 		dgBigVector point (m_points[i] - origin);
 		dgFloat64 u = (point.m_x - pMin.m_x) * scale.m_x;
 
+		dgAssert ((point % point) > dgFloat32 (0.0f));
 		point = point.Scale (dgRsqrt (point % point));
 		dgFloat64 v = dgAtan2 (point.m_y, point.m_z);
 
