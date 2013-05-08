@@ -1233,6 +1233,7 @@ bool dScene::Deserialize (const char* const fileName)
 	// apply last Configuration
 	TiXmlDocument doc (fileName);
 	doc.LoadFile();
+	dAssert (!doc.Error());
 
 	bool state = true;
 	const TiXmlElement* const root = doc.RootElement();
