@@ -2267,9 +2267,17 @@ void dgMeshEffect::BuildFromVertexListIndexList(
 			point.m_vertex = m_points[index];
 			
 			index = normalIndex[(acc + i)] * normalStride;
-			point.m_normal_x =  normal[index + 0];
-			point.m_normal_y =  normal[index + 1];
-			point.m_normal_z =  normal[index + 2];
+			dgBigVector n (normal[index + 0], normal[index + 1], normal[index + 2], dgFloat64 (0.0f));
+			dgFloat64 mag2 = n % n ; 
+			if (mag2 < dgFloat64 (1.0e-16f)) {
+				n.m_x = dgFloat64 (0.0f);
+				n.m_y = dgFloat64 (1.0f);
+				n.m_z = dgFloat64 (0.0f);
+				n.m_w = dgFloat64 (0.0f);
+			}
+			point.m_normal_x = n[0];
+			point.m_normal_y = n[1];
+			point.m_normal_z = n[2];
 
 			index = uv0Index[(acc + i)] * uv0Stride;
 			point.m_u0 = uv0[index + 0];
@@ -2282,11 +2290,11 @@ void dgMeshEffect::BuildFromVertexListIndexList(
 			point.m_material = materialIndex;
 			AddAtribute(point);
 
-
-
 			attrIndexMap[attributeCount] = attributeCount;
 			attributeCount ++;
 		}
+
+
 		acc += indexCount;
 		if (attributeCount >= (attributeCountMarker + 1024 * 256)) {
 			dgInt32 count = attributeCount - attributeCountMarker;
