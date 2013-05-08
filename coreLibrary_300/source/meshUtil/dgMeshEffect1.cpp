@@ -1942,6 +1942,18 @@ void dgMeshEffect::AddAtribute (const dgVertexAtribute& attib)
 	}
 
 	m_attrib[m_atribCount] = attib;
+
+	dgBigVector n (attib.m_normal_x, attib.m_normal_y, attib.m_normal_z, dgFloat64 (0.0f));
+	dgFloat64 mag2 = n % n ; 
+	if (mag2 < dgFloat64 (1.0e-16f)) {
+		n.m_x = dgFloat64 (0.0f);
+		n.m_y = dgFloat64 (1.0f);
+		n.m_z = dgFloat64 (0.0f);
+	}
+	m_attrib[m_atribCount].m_normal_x = n.m_x;
+	m_attrib[m_atribCount].m_normal_y = n.m_y;
+	m_attrib[m_atribCount].m_normal_z = n.m_z;
+
 	m_attrib[m_atribCount].m_vertex.m_x = QuantizeCordinade(m_attrib[m_atribCount].m_vertex.m_x);
 	m_attrib[m_atribCount].m_vertex.m_y = QuantizeCordinade(m_attrib[m_atribCount].m_vertex.m_y);
 	m_attrib[m_atribCount].m_vertex.m_z = QuantizeCordinade(m_attrib[m_atribCount].m_vertex.m_z);
@@ -2267,17 +2279,9 @@ void dgMeshEffect::BuildFromVertexListIndexList(
 			point.m_vertex = m_points[index];
 			
 			index = normalIndex[(acc + i)] * normalStride;
-			dgBigVector n (normal[index + 0], normal[index + 1], normal[index + 2], dgFloat64 (0.0f));
-			dgFloat64 mag2 = n % n ; 
-			if (mag2 < dgFloat64 (1.0e-16f)) {
-				n.m_x = dgFloat64 (0.0f);
-				n.m_y = dgFloat64 (1.0f);
-				n.m_z = dgFloat64 (0.0f);
-				n.m_w = dgFloat64 (0.0f);
-			}
-			point.m_normal_x = n[0];
-			point.m_normal_y = n[1];
-			point.m_normal_z = n[2];
+			point.m_normal_x =  normal[index + 0];
+			point.m_normal_y =  normal[index + 1];
+			point.m_normal_z =  normal[index + 2];
 
 			index = uv0Index[(acc + i)] * uv0Stride;
 			point.m_u0 = uv0[index + 0];
@@ -2293,7 +2297,6 @@ void dgMeshEffect::BuildFromVertexListIndexList(
 			attrIndexMap[attributeCount] = attributeCount;
 			attributeCount ++;
 		}
-
 
 		acc += indexCount;
 		if (attributeCount >= (attributeCountMarker + 1024 * 256)) {
