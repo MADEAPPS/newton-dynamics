@@ -385,6 +385,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\resource.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\include\GL\wglew.h"
 			>
 		</File>
