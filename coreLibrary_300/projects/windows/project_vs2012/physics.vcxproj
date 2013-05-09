@@ -372,12 +372,6 @@
     <ClInclude Include="..\..\..\source\physics\dgWorldDynamicUpdate.h" />
     <ClInclude Include="..\..\..\source\meshUtil\dgMeshEffect.h" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="core.vcxproj">
-      <Project>{57ac4f2d-b115-4931-8f6e-af8ad616b6aa}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
