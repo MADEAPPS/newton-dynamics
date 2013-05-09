@@ -63,10 +63,11 @@ void Friction (DemoEntityManager* const scene)
 
 	// load the scene from a ngd file format
 	char fileName[2048];
-	GetWorkingFileName ("frictionDemo.ngd", fileName);
+	//GetWorkingFileName ("frictionDemo.ngd", fileName);
+	GetWorkingFileName ("flatPlane.ngd", fileName);
 	scene->LoadScene (fileName);
 
-
+/*
 	// set a default material call back
 	NewtonWorld* const world = scene->GetNewton();
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (world);
@@ -98,7 +99,7 @@ void Friction (DemoEntityManager* const scene)
 			index ++;
 		}
 	}
-
+*/
 	// place camera into position
 	dQuaternion rot;
 	dVector origin (-70.0f, 10.0f, 0.0f, 0.0f);
