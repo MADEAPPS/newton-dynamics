@@ -556,7 +556,7 @@
     <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010\dVisualDebuggerServer.vcxproj">
       <Project>{2ffeb5b8-8929-469f-bb13-4e391cd3213c}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\thirdParty\enet-1.2\enet_2010.vcxproj">
+    <ProjectReference Include="..\..\..\..\packages\thirdParty\enet-1.2\VS_2010\enet.vcxproj">
       <Project>{a862a496-668a-41ca-ba4b-8c86892006b7}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\thirdParty\glew\build\VS_2010\glew.vcxproj">

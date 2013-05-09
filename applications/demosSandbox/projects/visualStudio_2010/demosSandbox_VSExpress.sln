@@ -16,8 +16,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dVisualDebuggerServer", "..
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dScene", "..\..\..\..\packages\projects\visualStudio_2010\dScene.vcxproj", "{B5EEC82D-938F-44C9-89BB-4A058581750B}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "enet", "..\..\..\..\packages\thirdParty\enet-1.2\enet_2010.vcxproj", "{A862A496-668A-41CA-BA4B-8C86892006B7}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glew", "..\..\..\..\packages\thirdParty\glew\build\VS_2010\glew.vcxproj", "{0C9707F5-DEC7-42EB-8EA1-A484DF1E515B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "demosSandbox", "demosSandbox.vcxproj", "{E7F83F91-569D-4540-9F8B-9FD2DD20DE8A}"
@@ -39,6 +37,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread", "..\..\..\..\packages\thirdParty\pthreads.2\VS_2010\pthread.vcxproj", "{03BCA23C-02A5-415B-A37B-26600BC2CE96}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "openAL", "..\..\..\..\packages\thirdParty\openAL\VS_2010\openAL.vcxproj", "{9F1FAC3F-FF22-41E0-825C-034802F5EA24}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "enet", "..\..\..\..\packages\thirdParty\enet-1.2\VS_2010\enet.vcxproj", "{A862A496-668A-41CA-BA4B-8C86892006B7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -112,14 +112,6 @@ Global
 		{B5EEC82D-938F-44C9-89BB-4A058581750B}.Release|Win32.Build.0 = release|Win32
 		{B5EEC82D-938F-44C9-89BB-4A058581750B}.Release|x64.ActiveCfg = release|x64
 		{B5EEC82D-938F-44C9-89BB-4A058581750B}.Release|x64.Build.0 = release|x64
-		{A862A496-668A-41CA-BA4B-8C86892006B7}.Debug|Win32.ActiveCfg = Debug|Win32
-		{A862A496-668A-41CA-BA4B-8C86892006B7}.Debug|Win32.Build.0 = Debug|Win32
-		{A862A496-668A-41CA-BA4B-8C86892006B7}.Debug|x64.ActiveCfg = Debug|x64
-		{A862A496-668A-41CA-BA4B-8C86892006B7}.Debug|x64.Build.0 = Debug|x64
-		{A862A496-668A-41CA-BA4B-8C86892006B7}.Release|Win32.ActiveCfg = Release|Win32
-		{A862A496-668A-41CA-BA4B-8C86892006B7}.Release|Win32.Build.0 = Release|Win32
-		{A862A496-668A-41CA-BA4B-8C86892006B7}.Release|x64.ActiveCfg = Release|x64
-		{A862A496-668A-41CA-BA4B-8C86892006B7}.Release|x64.Build.0 = Release|x64
 		{0C9707F5-DEC7-42EB-8EA1-A484DF1E515B}.Debug|Win32.ActiveCfg = Debug|Win32
 		{0C9707F5-DEC7-42EB-8EA1-A484DF1E515B}.Debug|Win32.Build.0 = Debug|Win32
 		{0C9707F5-DEC7-42EB-8EA1-A484DF1E515B}.Debug|x64.ActiveCfg = Debug|x64
@@ -208,6 +200,14 @@ Global
 		{9F1FAC3F-FF22-41E0-825C-034802F5EA24}.Release|Win32.Build.0 = Release|Win32
 		{9F1FAC3F-FF22-41E0-825C-034802F5EA24}.Release|x64.ActiveCfg = Release|x64
 		{9F1FAC3F-FF22-41E0-825C-034802F5EA24}.Release|x64.Build.0 = Release|x64
+		{A862A496-668A-41CA-BA4B-8C86892006B7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A862A496-668A-41CA-BA4B-8C86892006B7}.Debug|Win32.Build.0 = Debug|Win32
+		{A862A496-668A-41CA-BA4B-8C86892006B7}.Debug|x64.ActiveCfg = Debug|x64
+		{A862A496-668A-41CA-BA4B-8C86892006B7}.Debug|x64.Build.0 = Debug|x64
+		{A862A496-668A-41CA-BA4B-8C86892006B7}.Release|Win32.ActiveCfg = Release|Win32
+		{A862A496-668A-41CA-BA4B-8C86892006B7}.Release|Win32.Build.0 = Release|Win32
+		{A862A496-668A-41CA-BA4B-8C86892006B7}.Release|x64.ActiveCfg = Release|x64
+		{A862A496-668A-41CA-BA4B-8C86892006B7}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
