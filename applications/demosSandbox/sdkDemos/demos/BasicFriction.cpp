@@ -64,7 +64,7 @@ void Friction (DemoEntityManager* const scene)
 	// load the scene from a ngd file format
 	char fileName[2048];
 	//GetWorkingFileName ("frictionDemo.ngd", fileName);
-	GetWorkingFileName ("flatPlane.ngd", fileName);
+	GetWorkingFileName ("box.ngd", fileName);
 	scene->LoadScene (fileName);
 
 /*
