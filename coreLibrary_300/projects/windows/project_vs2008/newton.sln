@@ -24,7 +24,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ai", "ai.vcproj", "{7D48CEE
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96} = {03BCA23C-02A5-415B-A37B-26600BC2CE96}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread", "..\..\..\..\packages\thirdParty\pthreads.2\pthread.vcproj", "{03BCA23C-02A5-415B-A37B-26600BC2CE96}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread", "..\..\..\..\packages\thirdParty\pthreads.2\VS_2008\pthread.vcproj", "{03BCA23C-02A5-415B-A37B-26600BC2CE96}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -106,16 +106,14 @@ Global
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debug|Win32.Build.0 = debug|Win32
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debug|x64.ActiveCfg = debug|x64
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debug|x64.Build.0 = debug|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debugDll|Win32.ActiveCfg = debug|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debugDll|Win32.Build.0 = debug|Win32
+		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debugDll|Win32.ActiveCfg = debug|x64
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debugDll|x64.ActiveCfg = debug|x64
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debugDll|x64.Build.0 = debug|x64
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release|Win32.ActiveCfg = release|Win32
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release|Win32.Build.0 = release|Win32
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release|x64.ActiveCfg = release|x64
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release|x64.Build.0 = release|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.releaseDll|Win32.ActiveCfg = release|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.releaseDll|Win32.Build.0 = release|Win32
+		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.releaseDll|Win32.ActiveCfg = release|x64
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.releaseDll|x64.ActiveCfg = release|x64
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.releaseDll|x64.Build.0 = release|x64
 	EndGlobalSection
