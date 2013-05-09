@@ -36,9 +36,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "core", "..\..\..\..\package
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gl", "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010\wx_vc9_gl.vcxproj", "{DA8B15EF-6750-5928-BC0E-C748213CF9B2}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "openAL", "..\..\..\..\packages\thirdParty\openAL\openAL_2010.vcxproj", "{9F1FAC3F-FF22-41E0-825C-034802F5EA24}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread", "..\..\..\..\packages\thirdParty\pthreads.2\VS_2010\pthread.vcxproj", "{03BCA23C-02A5-415B-A37B-26600BC2CE96}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "openAL", "..\..\..\..\packages\thirdParty\openAL\VS_2010\openAL.vcxproj", "{9F1FAC3F-FF22-41E0-825C-034802F5EA24}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -192,14 +192,6 @@ Global
 		{DA8B15EF-6750-5928-BC0E-C748213CF9B2}.Release|Win32.Build.0 = Release|Win32
 		{DA8B15EF-6750-5928-BC0E-C748213CF9B2}.Release|x64.ActiveCfg = Release|x64
 		{DA8B15EF-6750-5928-BC0E-C748213CF9B2}.Release|x64.Build.0 = Release|x64
-		{9F1FAC3F-FF22-41E0-825C-034802F5EA24}.Debug|Win32.ActiveCfg = Debug|Win32
-		{9F1FAC3F-FF22-41E0-825C-034802F5EA24}.Debug|Win32.Build.0 = Debug|Win32
-		{9F1FAC3F-FF22-41E0-825C-034802F5EA24}.Debug|x64.ActiveCfg = Debug|x64
-		{9F1FAC3F-FF22-41E0-825C-034802F5EA24}.Debug|x64.Build.0 = Debug|x64
-		{9F1FAC3F-FF22-41E0-825C-034802F5EA24}.Release|Win32.ActiveCfg = Release|Win32
-		{9F1FAC3F-FF22-41E0-825C-034802F5EA24}.Release|Win32.Build.0 = Release|Win32
-		{9F1FAC3F-FF22-41E0-825C-034802F5EA24}.Release|x64.ActiveCfg = Release|x64
-		{9F1FAC3F-FF22-41E0-825C-034802F5EA24}.Release|x64.Build.0 = Release|x64
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.Debug|Win32.ActiveCfg = debug|Win32
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.Debug|Win32.Build.0 = debug|Win32
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.Debug|x64.ActiveCfg = debug|x64
@@ -208,6 +200,14 @@ Global
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.Release|Win32.Build.0 = release|Win32
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.Release|x64.ActiveCfg = release|x64
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.Release|x64.Build.0 = release|x64
+		{9F1FAC3F-FF22-41E0-825C-034802F5EA24}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9F1FAC3F-FF22-41E0-825C-034802F5EA24}.Debug|Win32.Build.0 = Debug|Win32
+		{9F1FAC3F-FF22-41E0-825C-034802F5EA24}.Debug|x64.ActiveCfg = Debug|x64
+		{9F1FAC3F-FF22-41E0-825C-034802F5EA24}.Debug|x64.Build.0 = Debug|x64
+		{9F1FAC3F-FF22-41E0-825C-034802F5EA24}.Release|Win32.ActiveCfg = Release|Win32
+		{9F1FAC3F-FF22-41E0-825C-034802F5EA24}.Release|Win32.Build.0 = Release|Win32
+		{9F1FAC3F-FF22-41E0-825C-034802F5EA24}.Release|x64.ActiveCfg = Release|x64
+		{9F1FAC3F-FF22-41E0-825C-034802F5EA24}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
