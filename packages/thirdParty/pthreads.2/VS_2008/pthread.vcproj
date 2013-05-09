@@ -53,7 +53,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="."
+				AdditionalIncludeDirectories="../"
 				PreprocessorDefinitions="__CLEANUP_C;WIN32;NDEBUG;_WINDOWS;_USRDLL;PTW32_BUILD;PTW32_STATIC_LIB"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -137,7 +137,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="."
+				AdditionalIncludeDirectories="../"
 				PreprocessorDefinitions="__CLEANUP_C;WIN32;NDEBUG;_WINDOWS;_USRDLL;PTW32_BUILD;PTW32_STATIC_LIB"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -220,7 +220,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="."
+				AdditionalIncludeDirectories="../"
 				PreprocessorDefinitions="__CLEANUP_C;WIN32;_DEBUG;_WINDOWS;_USRDLL;PTW32_BUILD;PTW32_STATIC_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -304,7 +304,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="."
+				AdditionalIncludeDirectories="../"
 				PreprocessorDefinitions="__CLEANUP_C;WIN32;_DEBUG;_WINDOWS;_USRDLL;PTW32_BUILD;PTW32_STATIC_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -357,89 +357,26 @@
 	<References>
 	</References>
 	<Files>
-		<Filter
-			Name="Source Files"
-			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
+		<File
+			RelativePath="..\implement.h"
 			>
-			<File
-				RelativePath="pthread.c"
-				>
-				<FileConfiguration
-					Name="release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-						AssemblerListingLocation="$(IntDir)\"
-						ObjectFile="$(IntDir)\"
-						ProgramDataBaseFileName="$(IntDir)\vc90.pdb"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-						AssemblerListingLocation="$(IntDir)\"
-						ObjectFile="$(IntDir)\"
-						ProgramDataBaseFileName="$(IntDir)\vc90.pdb"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-						AssemblerListingLocation="$(IntDir)\"
-						ObjectFile="$(IntDir)\"
-						ProgramDataBaseFileName="$(IntDir)\vc90.pdb"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-						AssemblerListingLocation="$(IntDir)\"
-						ObjectFile="$(IntDir)\"
-						ProgramDataBaseFileName="$(IntDir)\vc90.pdb"
-					/>
-				</FileConfiguration>
-			</File>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl"
+		</File>
+		<File
+			RelativePath="..\pthread.c"
 			>
-			<File
-				RelativePath="implement.h"
-				>
-			</File>
-			<File
-				RelativePath="pthread.h"
-				>
-			</File>
-			<File
-				RelativePath="sched.h"
-				>
-			</File>
-			<File
-				RelativePath="semaphore.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
+		</File>
+		<File
+			RelativePath="..\pthread.h"
 			>
-		</Filter>
+		</File>
+		<File
+			RelativePath="..\sched.h"
+			>
+		</File>
+		<File
+			RelativePath="..\semaphore.h"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
