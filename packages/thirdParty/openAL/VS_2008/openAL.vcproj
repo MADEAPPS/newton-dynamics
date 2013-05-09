@@ -58,7 +58,7 @@
 				AdditionalOptions=" /Zm1000"
 				Optimization="0"
 				InlineFunctionExpansion="0"
-				AdditionalIncludeDirectories=".\;.\include;.\OpenAL32\Include"
+				AdditionalIncludeDirectories="..\;..\include;..\OpenAL32\Include"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;AL_LIBTYPE_STATIC;AL_ALEXT_PROTOTYPES;_WIN32;_WIN32_WINNT=0x0501;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;strcasecmp=_stricmp;strncasecmp=_strnicmp;snprintf=_snprintf;isfinite=_finite;isnan=_isnan"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="3"
@@ -142,7 +142,7 @@
 				AdditionalOptions=" /Zm1000"
 				Optimization="0"
 				InlineFunctionExpansion="0"
-				AdditionalIncludeDirectories=".\;.\include;.\OpenAL32\Include"
+				AdditionalIncludeDirectories="..\;..\include;..\OpenAL32\Include"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;AL_LIBTYPE_STATIC;AL_ALEXT_PROTOTYPES;_WIN32;_WIN32_WINNT=0x0501;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;strcasecmp=_stricmp;strncasecmp=_strnicmp;snprintf=_snprintf;isfinite=_finite;isnan=_isnan"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="3"
@@ -224,7 +224,7 @@
 				AdditionalOptions=" /Zm1000"
 				Optimization="2"
 				InlineFunctionExpansion="2"
-				AdditionalIncludeDirectories=".\;.\include;.\OpenAL32\Include"
+				AdditionalIncludeDirectories="..\;..\include;..\OpenAL32\Include"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;AL_LIBTYPE_STATIC;AL_ALEXT_PROTOTYPES;_WIN32;_WIN32_WINNT=0x0501;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;strcasecmp=_stricmp;strncasecmp=_strnicmp;snprintf=_snprintf;isfinite=_finite;isnan=_isnan"
 				ExceptionHandling="0"
 				RuntimeLibrary="0"
@@ -305,7 +305,7 @@
 				AdditionalOptions=" /Zm1000"
 				Optimization="2"
 				InlineFunctionExpansion="2"
-				AdditionalIncludeDirectories=".\;.\include;.\OpenAL32\Include"
+				AdditionalIncludeDirectories="..\;..\include;..\OpenAL32\Include"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;AL_LIBTYPE_STATIC;AL_ALEXT_PROTOTYPES;_WIN32;_WIN32_WINNT=0x0501;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;strcasecmp=_stricmp;strncasecmp=_strnicmp;snprintf=_snprintf;isfinite=_finite;isnan=_isnan"
 				ExceptionHandling="0"
 				RuntimeLibrary="0"
@@ -350,119 +350,119 @@
 	</References>
 	<Files>
 		<File
-			RelativePath=".\OpenAL32\alAuxEffectSlot.c"
+			RelativePath="..\OpenAL32\alAuxEffectSlot.c"
 			>
 		</File>
 		<File
-			RelativePath=".\OpenAL32\alBuffer.c"
+			RelativePath="..\OpenAL32\alBuffer.c"
 			>
 		</File>
 		<File
-			RelativePath=".\Alc\ALc.c"
+			RelativePath="..\Alc\ALc.c"
 			>
 		</File>
 		<File
-			RelativePath=".\Alc\alcConfig.c"
+			RelativePath="..\Alc\alcConfig.c"
 			>
 		</File>
 		<File
-			RelativePath=".\Alc\alcDedicated.c"
+			RelativePath="..\Alc\alcDedicated.c"
 			>
 		</File>
 		<File
-			RelativePath=".\Alc\alcEcho.c"
+			RelativePath="..\Alc\alcEcho.c"
 			>
 		</File>
 		<File
-			RelativePath=".\Alc\alcModulator.c"
+			RelativePath="..\Alc\alcModulator.c"
 			>
 		</File>
 		<File
-			RelativePath=".\Alc\alcReverb.c"
+			RelativePath="..\Alc\alcReverb.c"
 			>
 		</File>
 		<File
-			RelativePath=".\Alc\alcRing.c"
+			RelativePath="..\Alc\alcRing.c"
 			>
 		</File>
 		<File
-			RelativePath=".\Alc\alcThread.c"
+			RelativePath="..\Alc\alcThread.c"
 			>
 		</File>
 		<File
-			RelativePath=".\OpenAL32\alEffect.c"
+			RelativePath="..\OpenAL32\alEffect.c"
 			>
 		</File>
 		<File
-			RelativePath=".\OpenAL32\alError.c"
+			RelativePath="..\OpenAL32\alError.c"
 			>
 		</File>
 		<File
-			RelativePath=".\OpenAL32\alExtension.c"
+			RelativePath="..\OpenAL32\alExtension.c"
 			>
 		</File>
 		<File
-			RelativePath=".\OpenAL32\alFilter.c"
+			RelativePath="..\OpenAL32\alFilter.c"
 			>
 		</File>
 		<File
-			RelativePath=".\OpenAL32\alListener.c"
+			RelativePath="..\OpenAL32\alListener.c"
 			>
 		</File>
 		<File
-			RelativePath=".\OpenAL32\alSource.c"
+			RelativePath="..\OpenAL32\alSource.c"
 			>
 		</File>
 		<File
-			RelativePath=".\OpenAL32\alState.c"
+			RelativePath="..\OpenAL32\alState.c"
 			>
 		</File>
 		<File
-			RelativePath=".\OpenAL32\alThunk.c"
+			RelativePath="..\OpenAL32\alThunk.c"
 			>
 		</File>
 		<File
-			RelativePath=".\Alc\ALu.c"
+			RelativePath="..\Alc\ALu.c"
 			>
 		</File>
 		<File
-			RelativePath=".\Alc\bs2b.c"
+			RelativePath="..\Alc\bs2b.c"
 			>
 		</File>
 		<File
-			RelativePath=".\Alc\helpers.c"
+			RelativePath="..\Alc\helpers.c"
 			>
 		</File>
 		<File
-			RelativePath=".\Alc\hrtf.c"
+			RelativePath="..\Alc\hrtf.c"
 			>
 		</File>
 		<File
-			RelativePath=".\Alc\backends\loopback.c"
+			RelativePath="..\Alc\backends\loopback.c"
 			>
 		</File>
 		<File
-			RelativePath=".\Alc\mixer.c"
+			RelativePath="..\Alc\mixer.c"
 			>
 		</File>
 		<File
-			RelativePath=".\Alc\backends\mmdevapi.c"
+			RelativePath="..\Alc\backends\mmdevapi.c"
 			>
 		</File>
 		<File
-			RelativePath=".\Alc\backends\null.c"
+			RelativePath="..\Alc\backends\null.c"
 			>
 		</File>
 		<File
-			RelativePath=".\Alc\panning.c"
+			RelativePath="..\Alc\panning.c"
 			>
 		</File>
 		<File
-			RelativePath=".\Alc\backends\wave.c"
+			RelativePath="..\Alc\backends\wave.c"
 			>
 		</File>
 		<File
-			RelativePath=".\Alc\backends\winmm.c"
+			RelativePath="..\Alc\backends\winmm.c"
 			>
 		</File>
 	</Files>
