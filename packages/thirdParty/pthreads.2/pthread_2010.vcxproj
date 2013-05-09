@@ -1,43 +1,44 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
+    <ProjectConfiguration Include="debug|Win32">
+      <Configuration>debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|x64">
-      <Configuration>Debug</Configuration>
+    <ProjectConfiguration Include="debug|x64">
+      <Configuration>debug</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
+    <ProjectConfiguration Include="release|Win32">
+      <Configuration>release</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|x64">
-      <Configuration>Release</Configuration>
+    <ProjectConfiguration Include="release|x64">
+      <Configuration>release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
+    <ProjectName>pthread</ProjectName>
     <ProjectGuid>{03BCA23C-02A5-415B-A37B-26600BC2CE96}</ProjectGuid>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
@@ -45,37 +46,35 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)_d</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectName)_d</TargetName>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
     <Midl>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MkTypLibCompatible>true</MkTypLibCompatible>
@@ -94,15 +93,15 @@
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Precise</FloatingPointModel>
       <PrecompiledHeaderOutputFile>.\./pthread.pch</PrecompiledHeaderOutputFile>
-      <AssemblerListingLocation>.\./</AssemblerListingLocation>
-      <ObjectFileName>.\./</ObjectFileName>
-      <ProgramDataBaseFileName>.\./</ProgramDataBaseFileName>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)vc90.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Precise</FloatingPointModel>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;PTW32_RC_MSC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -113,12 +112,8 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>.\./pthread.bsc</OutputFile>
     </Bscmake>
-    <Lib>
-      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
-    </Lib>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
     <Midl>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MkTypLibCompatible>true</MkTypLibCompatible>
@@ -137,15 +132,15 @@
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
       <PrecompiledHeaderOutputFile>.\./pthread.pch</PrecompiledHeaderOutputFile>
-      <AssemblerListingLocation>.\./</AssemblerListingLocation>
-      <ObjectFileName>.\./</ObjectFileName>
-      <ProgramDataBaseFileName>.\./</ProgramDataBaseFileName>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)vc90.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;PTW32_RC_MSC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -156,10 +151,6 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>.\./pthread.bsc</OutputFile>
     </Bscmake>
-    <Lib>
-      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
-    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -179,15 +170,15 @@
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Precise</FloatingPointModel>
       <PrecompiledHeaderOutputFile>.\./pthread.pch</PrecompiledHeaderOutputFile>
-      <AssemblerListingLocation>.\./</AssemblerListingLocation>
-      <ObjectFileName>.\./</ObjectFileName>
-      <ProgramDataBaseFileName>.\./</ProgramDataBaseFileName>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)vc90.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Precise</FloatingPointModel>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;PTW32_RC_MSC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -196,14 +187,13 @@
     </ResourceCompile>
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
     </Lib>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>.\./pthread.bsc</OutputFile>
     </Bscmake>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
     <Midl>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MkTypLibCompatible>true</MkTypLibCompatible>
@@ -221,15 +211,15 @@
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
       <PrecompiledHeaderOutputFile>.\./pthread.pch</PrecompiledHeaderOutputFile>
-      <AssemblerListingLocation>.\./</AssemblerListingLocation>
-      <ObjectFileName>.\./</ObjectFileName>
-      <ProgramDataBaseFileName>.\./</ProgramDataBaseFileName>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)vc90.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;PTW32_RC_MSC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -238,7 +228,6 @@
     </ResourceCompile>
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
     </Lib>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -251,22 +240,22 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)</AssemblerListingLocation>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)</ObjectFileName>
-      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)</AssemblerListingLocation>
-      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)</ObjectFileName>
-      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)</AssemblerListingLocation>
-      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)</ObjectFileName>
-      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)</AssemblerListingLocation>
-      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)</ObjectFileName>
-      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)vc90.pdb</ProgramDataBaseFileName>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='debug|x64'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='debug|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(IntDir)vc90.pdb</ProgramDataBaseFileName>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(IntDir)vc90.pdb</ProgramDataBaseFileName>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='release|x64'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(IntDir)vc90.pdb</ProgramDataBaseFileName>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
