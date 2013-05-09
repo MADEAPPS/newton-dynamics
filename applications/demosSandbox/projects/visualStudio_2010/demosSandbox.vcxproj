@@ -565,7 +565,7 @@
     <ProjectReference Include="..\..\..\..\packages\thirdParty\openAL\openAL_2010.vcxproj">
       <Project>{9f1fac3f-ff22-41e0-825c-034802f5ea24}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\thirdParty\pthreads.2\pthread_2010.vcxproj">
+    <ProjectReference Include="..\..\..\..\packages\thirdParty\pthreads.2\VS_2010\pthread.vcxproj">
       <Project>{03bca23c-02a5-415b-a37b-26600bc2ce96}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\thirdParty\tinyxml\vs2010\tinyxml.vcxproj">
