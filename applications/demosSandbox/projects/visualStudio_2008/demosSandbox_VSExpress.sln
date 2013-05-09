@@ -48,8 +48,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dVisualDebuggerServer", "..
 		{721C99CE-4716-4146-9817-59BC2671B844} = {721C99CE-4716-4146-9817-59BC2671B844}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "enet", "..\..\..\..\packages\thirdParty\enet-1.2\enet_2008.vcproj", "{A862A496-668A-41CA-BA4B-8C86892006B7}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dAILibrary", "..\..\..\..\packages\projects\visualStudio_2008\dAILibrary.vcproj", "{2F95C24F-6935-4288-A71C-DAB402E4EABC}"
 	ProjectSection(ProjectDependencies) = postProject
 		{68D9962C-0EC7-445A-B0FD-F87B16D43901} = {68D9962C-0EC7-445A-B0FD-F87B16D43901}
@@ -114,6 +112,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread", "..\..\..\..\packages\thirdParty\pthreads.2\VS_2008\pthread.vcproj", "{03BCA23C-02A5-415B-A37B-26600BC2CE96}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "openAL", "..\..\..\..\packages\thirdParty\openAL\VS_2008\openAL.vcproj", "{9F1FAC3F-FF22-41E0-825C-034802F5EA24}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "enet", "..\..\..\..\packages\thirdParty\enet-1.2\VS_2008\enet.vcproj", "{A862A496-668A-41CA-BA4B-8C86892006B7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -223,22 +223,6 @@ Global
 		{2FFEB5B8-8929-469F-BB13-4E391CD3213C}.ReleaseDLL|Win32.Build.0 = Release|Win32
 		{2FFEB5B8-8929-469F-BB13-4E391CD3213C}.ReleaseDLL|x64.ActiveCfg = Release|x64
 		{2FFEB5B8-8929-469F-BB13-4E391CD3213C}.ReleaseDLL|x64.Build.0 = Release|x64
-		{A862A496-668A-41CA-BA4B-8C86892006B7}.Debug|Win32.ActiveCfg = Debug|Win32
-		{A862A496-668A-41CA-BA4B-8C86892006B7}.Debug|Win32.Build.0 = Debug|Win32
-		{A862A496-668A-41CA-BA4B-8C86892006B7}.Debug|x64.ActiveCfg = Debug|x64
-		{A862A496-668A-41CA-BA4B-8C86892006B7}.Debug|x64.Build.0 = Debug|x64
-		{A862A496-668A-41CA-BA4B-8C86892006B7}.DebugDll|Win32.ActiveCfg = Debug|Win32
-		{A862A496-668A-41CA-BA4B-8C86892006B7}.DebugDll|Win32.Build.0 = Debug|Win32
-		{A862A496-668A-41CA-BA4B-8C86892006B7}.DebugDll|x64.ActiveCfg = Debug|x64
-		{A862A496-668A-41CA-BA4B-8C86892006B7}.DebugDll|x64.Build.0 = Debug|x64
-		{A862A496-668A-41CA-BA4B-8C86892006B7}.Release|Win32.ActiveCfg = Release|Win32
-		{A862A496-668A-41CA-BA4B-8C86892006B7}.Release|Win32.Build.0 = Release|Win32
-		{A862A496-668A-41CA-BA4B-8C86892006B7}.Release|x64.ActiveCfg = Release|x64
-		{A862A496-668A-41CA-BA4B-8C86892006B7}.Release|x64.Build.0 = Release|x64
-		{A862A496-668A-41CA-BA4B-8C86892006B7}.ReleaseDLL|Win32.ActiveCfg = Release|Win32
-		{A862A496-668A-41CA-BA4B-8C86892006B7}.ReleaseDLL|Win32.Build.0 = Release|Win32
-		{A862A496-668A-41CA-BA4B-8C86892006B7}.ReleaseDLL|x64.ActiveCfg = Release|x64
-		{A862A496-668A-41CA-BA4B-8C86892006B7}.ReleaseDLL|x64.Build.0 = Release|x64
 		{2F95C24F-6935-4288-A71C-DAB402E4EABC}.Debug|Win32.ActiveCfg = Debug|Win32
 		{2F95C24F-6935-4288-A71C-DAB402E4EABC}.Debug|Win32.Build.0 = Debug|Win32
 		{2F95C24F-6935-4288-A71C-DAB402E4EABC}.Debug|x64.ActiveCfg = Debug|x64
@@ -437,6 +421,20 @@ Global
 		{9F1FAC3F-FF22-41E0-825C-034802F5EA24}.ReleaseDLL|Win32.ActiveCfg = Release|x64
 		{9F1FAC3F-FF22-41E0-825C-034802F5EA24}.ReleaseDLL|x64.ActiveCfg = Release|x64
 		{9F1FAC3F-FF22-41E0-825C-034802F5EA24}.ReleaseDLL|x64.Build.0 = Release|x64
+		{A862A496-668A-41CA-BA4B-8C86892006B7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A862A496-668A-41CA-BA4B-8C86892006B7}.Debug|Win32.Build.0 = Debug|Win32
+		{A862A496-668A-41CA-BA4B-8C86892006B7}.Debug|x64.ActiveCfg = Debug|x64
+		{A862A496-668A-41CA-BA4B-8C86892006B7}.Debug|x64.Build.0 = Debug|x64
+		{A862A496-668A-41CA-BA4B-8C86892006B7}.DebugDll|Win32.ActiveCfg = Debug|x64
+		{A862A496-668A-41CA-BA4B-8C86892006B7}.DebugDll|x64.ActiveCfg = Debug|x64
+		{A862A496-668A-41CA-BA4B-8C86892006B7}.DebugDll|x64.Build.0 = Debug|x64
+		{A862A496-668A-41CA-BA4B-8C86892006B7}.Release|Win32.ActiveCfg = Release|Win32
+		{A862A496-668A-41CA-BA4B-8C86892006B7}.Release|Win32.Build.0 = Release|Win32
+		{A862A496-668A-41CA-BA4B-8C86892006B7}.Release|x64.ActiveCfg = Release|x64
+		{A862A496-668A-41CA-BA4B-8C86892006B7}.Release|x64.Build.0 = Release|x64
+		{A862A496-668A-41CA-BA4B-8C86892006B7}.ReleaseDLL|Win32.ActiveCfg = Release|x64
+		{A862A496-668A-41CA-BA4B-8C86892006B7}.ReleaseDLL|x64.ActiveCfg = Release|x64
+		{A862A496-668A-41CA-BA4B-8C86892006B7}.ReleaseDLL|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
