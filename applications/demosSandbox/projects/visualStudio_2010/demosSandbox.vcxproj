@@ -571,13 +571,13 @@
     <ProjectReference Include="..\..\..\..\packages\thirdParty\tinyxml\vs2010\tinyxml.vcxproj">
       <Project>{18e509cf-46d2-4749-b3bb-160937cf2481}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw\wx_vc9_base.vcxproj">
+    <ProjectReference Include="..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010\wx_vc9_base.vcxproj">
       <Project>{3fcc50c2-81e9-5db2-b8d8-2129427568b1}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw\wx_vc9_core.vcxproj">
+    <ProjectReference Include="..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010\wx_vc9_core.vcxproj">
       <Project>{6744dad8-9c70-574a-bff2-9f8dddb24a75}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw\wx_vc9_gl.vcxproj">
+    <ProjectReference Include="..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010\wx_vc9_gl.vcxproj">
       <Project>{da8b15ef-6750-5928-bc0e-c748213cf9b2}</Project>
     </ProjectReference>
   </ItemGroup>
