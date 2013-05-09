@@ -569,7 +569,7 @@ rem xcopy  "$(OutDir)$(TargetName).dll" "C:\dev\pengII\pengII\Debug\*.*"  /F /Y 
     <ClInclude Include="..\..\..\source\newton\NewtonStdAfx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\packages\thirdParty\pthreads.2\pthread.vcxproj">
+    <ProjectReference Include="..\..\..\..\packages\thirdParty\pthreads.2\VS_2010\pthread.vcxproj">
       <Project>{03bca23c-02a5-415b-a37b-26600bc2ce96}</Project>
     </ProjectReference>
     <ProjectReference Include="ai.vcxproj">
