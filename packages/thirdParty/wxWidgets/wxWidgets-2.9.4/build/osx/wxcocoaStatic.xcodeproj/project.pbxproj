@@ -3848,9 +3848,9 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				"MACOSX_DEPLOYMENT_TARGET[arch=x86_64]" = 10.7;
 				ONLY_ACTIVE_ARCH = NO;
-				PRODUCT_NAME = "$(PRODUCT_NAME)_d";
+				PRODUCT_NAME = wxWidgets_d;
 				SDKROOT = macosx;
-				VALID_ARCHS = "i386 x86_64";
+				VALID_ARCHS = x86_64;
 			};
 			name = Debug;
 		};
@@ -3870,6 +3870,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DYLIB_COMPATIBILITY_VERSION = 2.9;
 				DYLIB_CURRENT_VERSION = 2.9.4;
+				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_PFE_FILE_C_DIALECTS = "c++ objective-c++";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(WXROOT)/include/wx/wxprec.h";
@@ -3903,10 +3904,10 @@
 					"$(OTHER_CFLAGS)",
 					"-fvisibility-inlines-hidden",
 				);
-				PRODUCT_NAME = wx_osx_cocoa;
+				PRODUCT_NAME = wxWidgets;
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "\"$(WXROOT)/include\" \"$(WXROOT)/build/osx/setup/$(WXTOOLKIT)/include\" \"$(WXROOT)/src/jpeg\" \"$(WXROOT)/src/png\" \"$(WXROOT)/src/regex\" \"$(WXROOT)/src/expat/lib\" \"$(WXROOT)/src/tiff/libtiff\" \"$(WXROOT)/src/stc/scintilla/src\" \"$(WXROOT)/src/stc/scintilla/include\"";
-				VALID_ARCHS = "i386 x86_64";
+				VALID_ARCHS = x86_64;
 				WXPLATFORM = "__WXOSX_$(WXTOOLKITUPPER)__";
 				WXTOOLKIT = cocoa;
 				WXTOOLKITUPPER = COCOA;

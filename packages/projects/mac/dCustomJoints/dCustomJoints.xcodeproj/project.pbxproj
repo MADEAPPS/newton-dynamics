@@ -355,8 +355,9 @@
 					"../../../thirdParty/enet-1.2/include",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)_d";
+				VALID_ARCHS = x86_64;
 			};
 			name = Debug;
 		};
@@ -365,6 +366,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				EXECUTABLE_PREFIX = lib;
+				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PREPROCESSOR_DEFINITIONS = _NEWTON_STATIC_LIB;
 				HEADER_SEARCH_PATHS = (
 					../../../../coreLibrary_300/source/newton,
@@ -374,8 +376,9 @@
 					"../../../thirdParty/enet-1.2/include",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = x86_64;
 			};
 			name = Release;
 		};

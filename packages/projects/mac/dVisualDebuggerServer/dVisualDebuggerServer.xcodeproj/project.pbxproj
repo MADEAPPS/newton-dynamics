@@ -202,8 +202,9 @@
 					"../../../thirdParty/enet-1.2/include",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)_d";
+				VALID_ARCHS = x86_64;
 			};
 			name = Debug;
 		};
@@ -220,8 +221,9 @@
 					"../../../thirdParty/enet-1.2/include",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = x86_64;
 			};
 			name = Release;
 		};

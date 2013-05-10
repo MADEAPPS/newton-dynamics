@@ -193,8 +193,9 @@
 				);
 				HEADER_SEARCH_PATHS = ../../include;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				ONLY_ACTIVE_ARCH = NO;
-				PRODUCT_NAME = "$(TARGET_NAME)_d";
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = glew_d;
+				VALID_ARCHS = x86_64;
 			};
 			name = Debug;
 		};
@@ -206,8 +207,9 @@
 				GCC_PREPROCESSOR_DEFINITIONS = GLEW_STATIC;
 				HEADER_SEARCH_PATHS = ../../include;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				ONLY_ACTIVE_ARCH = NO;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = glew;
+				VALID_ARCHS = x86_64;
 			};
 			name = Release;
 		};

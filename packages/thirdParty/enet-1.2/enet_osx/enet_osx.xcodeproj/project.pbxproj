@@ -241,7 +241,8 @@
 				HEADER_SEARCH_PATHS = ../include;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = NO;
-				PRODUCT_NAME = "$(TARGET_NAME)_d";
+				PRODUCT_NAME = enet_d;
+				VALID_ARCHS = x86_64;
 			};
 			name = Debug;
 		};
@@ -253,7 +254,8 @@
 				HEADER_SEARCH_PATHS = ../include;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = NO;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = enet;
+				VALID_ARCHS = x86_64;
 			};
 			name = Release;
 		};

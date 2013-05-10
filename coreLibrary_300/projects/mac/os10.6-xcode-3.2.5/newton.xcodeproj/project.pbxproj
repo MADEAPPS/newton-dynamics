@@ -898,11 +898,11 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = /usr/local/lib;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = newton_d;
 				SDKROOT = macosx;
 				SKIP_INSTALL = NO;
-				VALID_ARCHS = "i386 x86_64";
+				VALID_ARCHS = x86_64;
 				ZERO_LINK = YES;
 			};
 			name = Debug;
@@ -917,6 +917,7 @@
 				GCC_ENABLE_SSE3_EXTENSIONS = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = newton_Prefix.pch;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -927,11 +928,11 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = /usr/local/lib;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = newton;
 				SDKROOT = macosx;
 				SKIP_INSTALL = NO;
-				VALID_ARCHS = "i386 x86_64";
+				VALID_ARCHS = x86_64;
 			};
 			name = Release;
 		};

@@ -21,16 +21,16 @@
 		FFD27434172DA05A00114513 /* BasicPlayerController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFD27432172DA05A00114513 /* BasicPlayerController.cpp */; };
 		FFD27436172DA06D00114513 /* DemoCameraListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFD27435172DA06D00114513 /* DemoCameraListener.cpp */; };
 		FFD27493172E04FD00114513 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FFD27492172E04FD00114513 /* OpenAL.framework */; };
-		FFF06DF1173D56E9005F31CE /* libdContainers.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFF06DE7173D56E9005F31CE /* libdContainers.a */; };
-		FFF06DF2173D56EA005F31CE /* libdCustomJoints.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFF06DE8173D56E9005F31CE /* libdCustomJoints.a */; };
-		FFF06DF3173D56EA005F31CE /* libdMath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFF06DE9173D56E9005F31CE /* libdMath.a */; };
-		FFF06DF4173D56EA005F31CE /* libdScene.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFF06DEA173D56E9005F31CE /* libdScene.a */; };
-		FFF06DF5173D56EA005F31CE /* libdVisualDebuggerServer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFF06DEB173D56E9005F31CE /* libdVisualDebuggerServer.a */; };
-		FFF06DF6173D56EA005F31CE /* libenet_osx.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFF06DEC173D56E9005F31CE /* libenet_osx.a */; };
-		FFF06DF7173D56EA005F31CE /* libglew-osx.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFF06DED173D56E9005F31CE /* libglew-osx.a */; };
-		FFF06DF8173D56EA005F31CE /* libnewton.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFF06DEE173D56E9005F31CE /* libnewton.a */; };
-		FFF06DF9173D56EA005F31CE /* libtinyxml.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFF06DEF173D56E9005F31CE /* libtinyxml.a */; };
-		FFF06DFA173D56EA005F31CE /* libwx_osx_cocoa.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFF06DF0173D56E9005F31CE /* libwx_osx_cocoa.a */; };
+		FFF06E3B173D60A8005F31CE /* libdContainers.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFF06E31173D60A8005F31CE /* libdContainers.a */; };
+		FFF06E3C173D60A8005F31CE /* libdCustomJoints.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFF06E32173D60A8005F31CE /* libdCustomJoints.a */; };
+		FFF06E3D173D60A8005F31CE /* libdMath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFF06E33173D60A8005F31CE /* libdMath.a */; };
+		FFF06E3E173D60A8005F31CE /* libdScene.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFF06E34173D60A8005F31CE /* libdScene.a */; };
+		FFF06E3F173D60A8005F31CE /* libdVisualDebuggerServer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFF06E35173D60A8005F31CE /* libdVisualDebuggerServer.a */; };
+		FFF06E40173D60A8005F31CE /* libenet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFF06E36173D60A8005F31CE /* libenet.a */; };
+		FFF06E41173D60A8005F31CE /* libglew.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFF06E37173D60A8005F31CE /* libglew.a */; };
+		FFF06E42173D60A8005F31CE /* libnewton.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFF06E38173D60A8005F31CE /* libnewton.a */; };
+		FFF06E43173D60A8005F31CE /* libtinyxml.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFF06E39173D60A8005F31CE /* libtinyxml.a */; };
+		FFF06E44173D60A8005F31CE /* libwxWidgets.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFF06E3A173D60A8005F31CE /* libwxWidgets.a */; };
 		FFF60F461556D9F100E7B112 /* DemoAIAgent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F2D1556D9F100E7B112 /* DemoAIAgent.cpp */; };
 		FFF60F471556D9F100E7B112 /* DemoAIListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F2F1556D9F100E7B112 /* DemoAIListener.cpp */; };
 		FFF60F481556D9F100E7B112 /* DemoCamera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F311556D9F100E7B112 /* DemoCamera.cpp */; };
@@ -259,16 +259,16 @@
 		FFD27492172E04FD00114513 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = ../../../../../../../../../System/Library/Frameworks/OpenAL.framework; sourceTree = "<group>"; };
 		FFD2A77A172E0A1200114513 /* dVisualDebuggerServer.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = dVisualDebuggerServer.xcodeproj; path = ../../../../../../../../../../packages/projects/mac/dVisualDebuggerServer/dVisualDebuggerServer.xcodeproj; sourceTree = BUILT_PRODUCTS_DIR; };
 		FFD2A799172E126900114513 /* dCustomJoints.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = dCustomJoints.xcodeproj; path = ../../../../../../../../../../packages/projects/mac/dCustomJoints/dCustomJoints.xcodeproj; sourceTree = BUILT_PRODUCTS_DIR; };
-		FFF06DE7173D56E9005F31CE /* libdContainers.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdContainers.a; path = DerivedData/demosSandbox/Build/Products/Release/libdContainers.a; sourceTree = "<group>"; };
-		FFF06DE8173D56E9005F31CE /* libdCustomJoints.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdCustomJoints.a; path = DerivedData/demosSandbox/Build/Products/Release/libdCustomJoints.a; sourceTree = "<group>"; };
-		FFF06DE9173D56E9005F31CE /* libdMath.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdMath.a; path = DerivedData/demosSandbox/Build/Products/Release/libdMath.a; sourceTree = "<group>"; };
-		FFF06DEA173D56E9005F31CE /* libdScene.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdScene.a; path = DerivedData/demosSandbox/Build/Products/Release/libdScene.a; sourceTree = "<group>"; };
-		FFF06DEB173D56E9005F31CE /* libdVisualDebuggerServer.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdVisualDebuggerServer.a; path = DerivedData/demosSandbox/Build/Products/Release/libdVisualDebuggerServer.a; sourceTree = "<group>"; };
-		FFF06DEC173D56E9005F31CE /* libenet_osx.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libenet_osx.a; path = DerivedData/demosSandbox/Build/Products/Release/libenet_osx.a; sourceTree = "<group>"; };
-		FFF06DED173D56E9005F31CE /* libglew-osx.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libglew-osx.a"; path = "DerivedData/demosSandbox/Build/Products/Release/libglew-osx.a"; sourceTree = "<group>"; };
-		FFF06DEE173D56E9005F31CE /* libnewton.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libnewton.a; path = DerivedData/demosSandbox/Build/Products/Release/libnewton.a; sourceTree = "<group>"; };
-		FFF06DEF173D56E9005F31CE /* libtinyxml.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtinyxml.a; path = DerivedData/demosSandbox/Build/Products/Release/libtinyxml.a; sourceTree = "<group>"; };
-		FFF06DF0173D56E9005F31CE /* libwx_osx_cocoa.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libwx_osx_cocoa.a; path = DerivedData/demosSandbox/Build/Products/Release/libwx_osx_cocoa.a; sourceTree = "<group>"; };
+		FFF06E31173D60A8005F31CE /* libdContainers.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdContainers.a; path = DerivedData/demosSandbox/Build/Products/Release/libdContainers.a; sourceTree = "<group>"; };
+		FFF06E32173D60A8005F31CE /* libdCustomJoints.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdCustomJoints.a; path = DerivedData/demosSandbox/Build/Products/Release/libdCustomJoints.a; sourceTree = "<group>"; };
+		FFF06E33173D60A8005F31CE /* libdMath.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdMath.a; path = DerivedData/demosSandbox/Build/Products/Release/libdMath.a; sourceTree = "<group>"; };
+		FFF06E34173D60A8005F31CE /* libdScene.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdScene.a; path = DerivedData/demosSandbox/Build/Products/Release/libdScene.a; sourceTree = "<group>"; };
+		FFF06E35173D60A8005F31CE /* libdVisualDebuggerServer.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdVisualDebuggerServer.a; path = DerivedData/demosSandbox/Build/Products/Release/libdVisualDebuggerServer.a; sourceTree = "<group>"; };
+		FFF06E36173D60A8005F31CE /* libenet.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libenet.a; path = DerivedData/demosSandbox/Build/Products/Release/libenet.a; sourceTree = "<group>"; };
+		FFF06E37173D60A8005F31CE /* libglew.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libglew.a; path = DerivedData/demosSandbox/Build/Products/Release/libglew.a; sourceTree = "<group>"; };
+		FFF06E38173D60A8005F31CE /* libnewton.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libnewton.a; path = DerivedData/demosSandbox/Build/Products/Release/libnewton.a; sourceTree = "<group>"; };
+		FFF06E39173D60A8005F31CE /* libtinyxml.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtinyxml.a; path = DerivedData/demosSandbox/Build/Products/Release/libtinyxml.a; sourceTree = "<group>"; };
+		FFF06E3A173D60A8005F31CE /* libwxWidgets.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libwxWidgets.a; path = DerivedData/demosSandbox/Build/Products/Release/libwxWidgets.a; sourceTree = "<group>"; };
 		FFF18508131314CD0077CF7A /* newtonDemos_d */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = newtonDemos_d; path = newtonDemos; sourceTree = BUILT_PRODUCTS_DIR; };
 		FFF60F2D1556D9F100E7B112 /* DemoAIAgent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DemoAIAgent.cpp; path = ../../../sdkDemos/DemoAIAgent.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60F2E1556D9F100E7B112 /* DemoAIAgent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DemoAIAgent.h; path = ../../../sdkDemos/DemoAIAgent.h; sourceTree = SOURCE_ROOT; };
@@ -343,16 +343,16 @@
 				FF8F28B2131367150019E923 /* OpenGL.framework in Frameworks */,
 				09AD1AB4131433160054D1B6 /* CoreFoundation.framework in Frameworks */,
 				FFD27493172E04FD00114513 /* OpenAL.framework in Frameworks */,
-				FFF06DF1173D56E9005F31CE /* libdContainers.a in Frameworks */,
-				FFF06DF2173D56EA005F31CE /* libdCustomJoints.a in Frameworks */,
-				FFF06DF3173D56EA005F31CE /* libdMath.a in Frameworks */,
-				FFF06DF4173D56EA005F31CE /* libdScene.a in Frameworks */,
-				FFF06DF5173D56EA005F31CE /* libdVisualDebuggerServer.a in Frameworks */,
-				FFF06DF6173D56EA005F31CE /* libenet_osx.a in Frameworks */,
-				FFF06DF7173D56EA005F31CE /* libglew-osx.a in Frameworks */,
-				FFF06DF8173D56EA005F31CE /* libnewton.a in Frameworks */,
-				FFF06DF9173D56EA005F31CE /* libtinyxml.a in Frameworks */,
-				FFF06DFA173D56EA005F31CE /* libwx_osx_cocoa.a in Frameworks */,
+				FFF06E3B173D60A8005F31CE /* libdContainers.a in Frameworks */,
+				FFF06E3C173D60A8005F31CE /* libdCustomJoints.a in Frameworks */,
+				FFF06E3D173D60A8005F31CE /* libdMath.a in Frameworks */,
+				FFF06E3E173D60A8005F31CE /* libdScene.a in Frameworks */,
+				FFF06E3F173D60A8005F31CE /* libdVisualDebuggerServer.a in Frameworks */,
+				FFF06E40173D60A8005F31CE /* libenet.a in Frameworks */,
+				FFF06E41173D60A8005F31CE /* libglew.a in Frameworks */,
+				FFF06E42173D60A8005F31CE /* libnewton.a in Frameworks */,
+				FFF06E43173D60A8005F31CE /* libtinyxml.a in Frameworks */,
+				FFF06E44173D60A8005F31CE /* libwxWidgets.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -491,16 +491,16 @@
 		FF9936311735F863000533B7 /* libraries */ = {
 			isa = PBXGroup;
 			children = (
-				FFF06DE7173D56E9005F31CE /* libdContainers.a */,
-				FFF06DE8173D56E9005F31CE /* libdCustomJoints.a */,
-				FFF06DE9173D56E9005F31CE /* libdMath.a */,
-				FFF06DEA173D56E9005F31CE /* libdScene.a */,
-				FFF06DEB173D56E9005F31CE /* libdVisualDebuggerServer.a */,
-				FFF06DEC173D56E9005F31CE /* libenet_osx.a */,
-				FFF06DED173D56E9005F31CE /* libglew-osx.a */,
-				FFF06DEE173D56E9005F31CE /* libnewton.a */,
-				FFF06DEF173D56E9005F31CE /* libtinyxml.a */,
-				FFF06DF0173D56E9005F31CE /* libwx_osx_cocoa.a */,
+				FFF06E31173D60A8005F31CE /* libdContainers.a */,
+				FFF06E32173D60A8005F31CE /* libdCustomJoints.a */,
+				FFF06E33173D60A8005F31CE /* libdMath.a */,
+				FFF06E34173D60A8005F31CE /* libdScene.a */,
+				FFF06E35173D60A8005F31CE /* libdVisualDebuggerServer.a */,
+				FFF06E36173D60A8005F31CE /* libenet.a */,
+				FFF06E37173D60A8005F31CE /* libglew.a */,
+				FFF06E38173D60A8005F31CE /* libnewton.a */,
+				FFF06E39173D60A8005F31CE /* libtinyxml.a */,
+				FFF06E3A173D60A8005F31CE /* libwxWidgets.a */,
 			);
 			name = libraries;
 			sourceTree = "<group>";
