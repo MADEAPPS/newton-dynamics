@@ -732,8 +732,11 @@ void dScene::Serialize (const char* const fileName)
 	// save file content
 	dSceneGraph::Serialize (parentNode);
 
-	// save the file
+	// save the file, using standard localization
+	char* const oldloc = setlocale( LC_ALL, 0 );
+	setlocale( LC_ALL, "C" );
 	asciifile.SaveFile (fileName);
+	setlocale (LC_ALL, oldloc);
 }
 
 
@@ -1230,10 +1233,15 @@ void dScene::NewtonWorldToScene (const NewtonWorld* const world, dSceneExportCal
 
 bool dScene::Deserialize (const char* const fileName)
 {
-	// apply last Configuration
+	
 	TiXmlDocument doc (fileName);
+
+	// apply last Configuration, using standard localization
+	char* const oldloc = setlocale( LC_ALL, 0 );
+	setlocale( LC_ALL, "C" );
 	doc.LoadFile();
 	dAssert (!doc.Error());
+	setlocale( LC_ALL, oldloc );
 
 	bool state = true;
 	const TiXmlElement* const root = doc.RootElement();

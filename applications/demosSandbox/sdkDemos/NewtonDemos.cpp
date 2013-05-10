@@ -365,8 +365,6 @@ class NewtonDemosApp: public wxApp
 		//frame->LoadDemo (DEFAULT_SCENE);
 		wxMenuEvent loadDemo (wxEVT_COMMAND_MENU_SELECTED, NewtonDemos::ID_RUN_DEMO + DEFAULT_SCENE);
 		frame->GetEventHandler()->ProcessEvent(loadDemo);
-
-
 		return true;
 	}
 

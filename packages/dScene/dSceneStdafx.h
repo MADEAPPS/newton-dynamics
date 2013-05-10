@@ -34,8 +34,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-
-
+#include <locale.h>
 #include <tinyxml.h>
 
 #if _MSC_VER
