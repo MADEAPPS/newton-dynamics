@@ -333,9 +333,9 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	// load the sky box
 	scene->CreateSkyBox();
 
-	//CreateLevelMesh (scene, "flatPlane.ngd", true);
+	CreateLevelMesh (scene, "flatPlane.ngd", true);
 	//CreateLevelMesh (scene, "playground.ngd", true);
-	CreateLevelMesh (scene, "castle.ngd", true);
+//	CreateLevelMesh (scene, "castle.ngd", true);
 	//CreateLevelMesh (scene, "sponza.ngd", true);
 	//CreateLevelMesh (scene, "sibenik.ngd", true);
 
@@ -355,8 +355,16 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	// set as the player with the camera
 	manager->SetAsPlayer(player);
 
-	dQuaternion rot;
 	dVector origin (-10.0f, 2.0f, 0.0f, 0.0f);
+
+	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
+	location.m_posit.m_x += 5.0f;
+	dVector size (2.0f, 2.0f, 2.0f, 0.0f);
+	int count = 1;
+	dMatrix shapeOffsetMatrix (GetIdentityMatrix());
+	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+
+	dQuaternion rot;
 	scene->SetCameraMatrix(rot, origin);
 }
 

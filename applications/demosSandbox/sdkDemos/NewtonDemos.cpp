@@ -24,7 +24,7 @@
 
 
 //#define DEFAULT_SCENE	0			// using NetwonMesh Tool
-#define DEFAULT_SCENE	1			// Coefficients of friction
+//#define DEFAULT_SCENE	1			// Coefficients of friction
 //#define DEFAULT_SCENE	2			// Coefficients of restitution
 //#define DEFAULT_SCENE	3			// Precessing tops
 //#define DEFAULT_SCENE	4			// closest distance
@@ -50,7 +50,7 @@
 //#define DEFAULT_SCENE	24			// continue collision
 //#define DEFAULT_SCENE	25			// puck slide continue collision
 //#define DEFAULT_SCENE	26			// basic car
-//#define DEFAULT_SCENE	27			// player controller
+#define DEFAULT_SCENE	27			// player controller
 //#define DEFAULT_SCENE	28			// advanced player controller
 //#define DEFAULT_SCENE	29			// high performance super car
 //#define DEFAULT_SCENE	30			// soft bodies			
