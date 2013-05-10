@@ -16,21 +16,21 @@
 		FF3B297C17300D39007E6FEC /* PuckSlide.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF3B297917300D39007E6FEC /* PuckSlide.cpp */; };
 		FF3B297D17300D39007E6FEC /* SimpleBooleans.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF3B297A17300D39007E6FEC /* SimpleBooleans.cpp */; };
 		FF8F28B2131367150019E923 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF8F28B1131367150019E923 /* OpenGL.framework */; };
-		FF99363C1735F8AC000533B7 /* libdContainers_d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF9936321735F8AC000533B7 /* libdContainers_d.a */; };
-		FF9936731735F8AD000533B7 /* libdCustomJoints_d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF9936331735F8AC000533B7 /* libdCustomJoints_d.a */; };
-		FF9936741735F8AD000533B7 /* libdMath_d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF9936341735F8AC000533B7 /* libdMath_d.a */; };
-		FF9936751735F8AD000533B7 /* libdScene_d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF9936351735F8AC000533B7 /* libdScene_d.a */; };
-		FF9936761735F8AD000533B7 /* libdVisualDebuggerServer_d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF9936361735F8AC000533B7 /* libdVisualDebuggerServer_d.a */; };
-		FF9936771735F8AD000533B7 /* libenet_osx_d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF9936371735F8AC000533B7 /* libenet_osx_d.a */; };
-		FF9936781735F8AD000533B7 /* libglew-osx_d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF9936381735F8AC000533B7 /* libglew-osx_d.a */; };
-		FF9936791735F8AD000533B7 /* libnewton_d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF9936391735F8AC000533B7 /* libnewton_d.a */; };
-		FF99367A1735F8AD000533B7 /* libtinyxml_d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF99363A1735F8AC000533B7 /* libtinyxml_d.a */; };
-		FF99367B1735F8AD000533B7 /* libwx_osx_cocoa_d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF99363B1735F8AC000533B7 /* libwx_osx_cocoa_d.a */; };
 		FFD27430172DA02000114513 /* DemoListenerBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFD2742E172DA02000114513 /* DemoListenerBase.cpp */; };
 		FFD27433172DA05A00114513 /* AdvancedPlayerController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFD27431172DA05A00114513 /* AdvancedPlayerController.cpp */; };
 		FFD27434172DA05A00114513 /* BasicPlayerController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFD27432172DA05A00114513 /* BasicPlayerController.cpp */; };
 		FFD27436172DA06D00114513 /* DemoCameraListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFD27435172DA06D00114513 /* DemoCameraListener.cpp */; };
 		FFD27493172E04FD00114513 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FFD27492172E04FD00114513 /* OpenAL.framework */; };
+		FFF06DF1173D56E9005F31CE /* libdContainers.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFF06DE7173D56E9005F31CE /* libdContainers.a */; };
+		FFF06DF2173D56EA005F31CE /* libdCustomJoints.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFF06DE8173D56E9005F31CE /* libdCustomJoints.a */; };
+		FFF06DF3173D56EA005F31CE /* libdMath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFF06DE9173D56E9005F31CE /* libdMath.a */; };
+		FFF06DF4173D56EA005F31CE /* libdScene.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFF06DEA173D56E9005F31CE /* libdScene.a */; };
+		FFF06DF5173D56EA005F31CE /* libdVisualDebuggerServer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFF06DEB173D56E9005F31CE /* libdVisualDebuggerServer.a */; };
+		FFF06DF6173D56EA005F31CE /* libenet_osx.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFF06DEC173D56E9005F31CE /* libenet_osx.a */; };
+		FFF06DF7173D56EA005F31CE /* libglew-osx.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFF06DED173D56E9005F31CE /* libglew-osx.a */; };
+		FFF06DF8173D56EA005F31CE /* libnewton.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFF06DEE173D56E9005F31CE /* libnewton.a */; };
+		FFF06DF9173D56EA005F31CE /* libtinyxml.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFF06DEF173D56E9005F31CE /* libtinyxml.a */; };
+		FFF06DFA173D56EA005F31CE /* libwx_osx_cocoa.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFF06DF0173D56E9005F31CE /* libwx_osx_cocoa.a */; };
 		FFF60F461556D9F100E7B112 /* DemoAIAgent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F2D1556D9F100E7B112 /* DemoAIAgent.cpp */; };
 		FFF60F471556D9F100E7B112 /* DemoAIListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F2F1556D9F100E7B112 /* DemoAIListener.cpp */; };
 		FFF60F481556D9F100E7B112 /* DemoCamera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F311556D9F100E7B112 /* DemoCamera.cpp */; };
@@ -250,16 +250,6 @@
 		FF8C2D0A1313DC9500646B90 /* tinyxml.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = tinyxml.xcodeproj; path = ../../../../../../../../../../packages/projects/mac/tinyxml/tinyxml.xcodeproj; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF8F28B1131367150019E923 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		FF9936141735F69D000533B7 /* newton.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = newton.xcodeproj; path = "../../../../../coreLibrary_300/projects/mac/os10.6-xcode-3.2.5/newton.xcodeproj"; sourceTree = "<group>"; };
-		FF9936321735F8AC000533B7 /* libdContainers_d.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdContainers_d.a; path = DerivedData/demosSandbox/Build/Products/Debug/libdContainers_d.a; sourceTree = "<group>"; };
-		FF9936331735F8AC000533B7 /* libdCustomJoints_d.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdCustomJoints_d.a; path = DerivedData/demosSandbox/Build/Products/Debug/libdCustomJoints_d.a; sourceTree = "<group>"; };
-		FF9936341735F8AC000533B7 /* libdMath_d.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdMath_d.a; path = DerivedData/demosSandbox/Build/Products/Debug/libdMath_d.a; sourceTree = "<group>"; };
-		FF9936351735F8AC000533B7 /* libdScene_d.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdScene_d.a; path = DerivedData/demosSandbox/Build/Products/Debug/libdScene_d.a; sourceTree = "<group>"; };
-		FF9936361735F8AC000533B7 /* libdVisualDebuggerServer_d.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdVisualDebuggerServer_d.a; path = DerivedData/demosSandbox/Build/Products/Debug/libdVisualDebuggerServer_d.a; sourceTree = "<group>"; };
-		FF9936371735F8AC000533B7 /* libenet_osx_d.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libenet_osx_d.a; path = DerivedData/demosSandbox/Build/Products/Debug/libenet_osx_d.a; sourceTree = "<group>"; };
-		FF9936381735F8AC000533B7 /* libglew-osx_d.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libglew-osx_d.a"; path = "DerivedData/demosSandbox/Build/Products/Debug/libglew-osx_d.a"; sourceTree = "<group>"; };
-		FF9936391735F8AC000533B7 /* libnewton_d.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libnewton_d.a; path = DerivedData/demosSandbox/Build/Products/Debug/libnewton_d.a; sourceTree = "<group>"; };
-		FF99363A1735F8AC000533B7 /* libtinyxml_d.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtinyxml_d.a; path = DerivedData/demosSandbox/Build/Products/Debug/libtinyxml_d.a; sourceTree = "<group>"; };
-		FF99363B1735F8AC000533B7 /* libwx_osx_cocoa_d.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libwx_osx_cocoa_d.a; path = DerivedData/demosSandbox/Build/Products/Debug/libwx_osx_cocoa_d.a; sourceTree = "<group>"; };
 		FFD2742D172DA02000114513 /* DemoCameraListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DemoCameraListener.h; path = ../../../sdkDemos/DemoCameraListener.h; sourceTree = "<group>"; };
 		FFD2742E172DA02000114513 /* DemoListenerBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DemoListenerBase.cpp; path = ../../../sdkDemos/DemoListenerBase.cpp; sourceTree = "<group>"; };
 		FFD2742F172DA02000114513 /* DemoListenerBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DemoListenerBase.h; path = ../../../sdkDemos/DemoListenerBase.h; sourceTree = "<group>"; };
@@ -269,7 +259,17 @@
 		FFD27492172E04FD00114513 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = ../../../../../../../../../System/Library/Frameworks/OpenAL.framework; sourceTree = "<group>"; };
 		FFD2A77A172E0A1200114513 /* dVisualDebuggerServer.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = dVisualDebuggerServer.xcodeproj; path = ../../../../../../../../../../packages/projects/mac/dVisualDebuggerServer/dVisualDebuggerServer.xcodeproj; sourceTree = BUILT_PRODUCTS_DIR; };
 		FFD2A799172E126900114513 /* dCustomJoints.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = dCustomJoints.xcodeproj; path = ../../../../../../../../../../packages/projects/mac/dCustomJoints/dCustomJoints.xcodeproj; sourceTree = BUILT_PRODUCTS_DIR; };
-		FFF18508131314CD0077CF7A /* newtonDemos_d */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = newtonDemos_d; sourceTree = BUILT_PRODUCTS_DIR; };
+		FFF06DE7173D56E9005F31CE /* libdContainers.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdContainers.a; path = DerivedData/demosSandbox/Build/Products/Release/libdContainers.a; sourceTree = "<group>"; };
+		FFF06DE8173D56E9005F31CE /* libdCustomJoints.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdCustomJoints.a; path = DerivedData/demosSandbox/Build/Products/Release/libdCustomJoints.a; sourceTree = "<group>"; };
+		FFF06DE9173D56E9005F31CE /* libdMath.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdMath.a; path = DerivedData/demosSandbox/Build/Products/Release/libdMath.a; sourceTree = "<group>"; };
+		FFF06DEA173D56E9005F31CE /* libdScene.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdScene.a; path = DerivedData/demosSandbox/Build/Products/Release/libdScene.a; sourceTree = "<group>"; };
+		FFF06DEB173D56E9005F31CE /* libdVisualDebuggerServer.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdVisualDebuggerServer.a; path = DerivedData/demosSandbox/Build/Products/Release/libdVisualDebuggerServer.a; sourceTree = "<group>"; };
+		FFF06DEC173D56E9005F31CE /* libenet_osx.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libenet_osx.a; path = DerivedData/demosSandbox/Build/Products/Release/libenet_osx.a; sourceTree = "<group>"; };
+		FFF06DED173D56E9005F31CE /* libglew-osx.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libglew-osx.a"; path = "DerivedData/demosSandbox/Build/Products/Release/libglew-osx.a"; sourceTree = "<group>"; };
+		FFF06DEE173D56E9005F31CE /* libnewton.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libnewton.a; path = DerivedData/demosSandbox/Build/Products/Release/libnewton.a; sourceTree = "<group>"; };
+		FFF06DEF173D56E9005F31CE /* libtinyxml.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtinyxml.a; path = DerivedData/demosSandbox/Build/Products/Release/libtinyxml.a; sourceTree = "<group>"; };
+		FFF06DF0173D56E9005F31CE /* libwx_osx_cocoa.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libwx_osx_cocoa.a; path = DerivedData/demosSandbox/Build/Products/Release/libwx_osx_cocoa.a; sourceTree = "<group>"; };
+		FFF18508131314CD0077CF7A /* newtonDemos_d */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = newtonDemos_d; path = newtonDemos; sourceTree = BUILT_PRODUCTS_DIR; };
 		FFF60F2D1556D9F100E7B112 /* DemoAIAgent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DemoAIAgent.cpp; path = ../../../sdkDemos/DemoAIAgent.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60F2E1556D9F100E7B112 /* DemoAIAgent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DemoAIAgent.h; path = ../../../sdkDemos/DemoAIAgent.h; sourceTree = SOURCE_ROOT; };
 		FFF60F2F1556D9F100E7B112 /* DemoAIListener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DemoAIListener.cpp; path = ../../../sdkDemos/DemoAIListener.cpp; sourceTree = SOURCE_ROOT; };
@@ -343,16 +343,16 @@
 				FF8F28B2131367150019E923 /* OpenGL.framework in Frameworks */,
 				09AD1AB4131433160054D1B6 /* CoreFoundation.framework in Frameworks */,
 				FFD27493172E04FD00114513 /* OpenAL.framework in Frameworks */,
-				FF99363C1735F8AC000533B7 /* libdContainers_d.a in Frameworks */,
-				FF9936731735F8AD000533B7 /* libdCustomJoints_d.a in Frameworks */,
-				FF9936741735F8AD000533B7 /* libdMath_d.a in Frameworks */,
-				FF9936751735F8AD000533B7 /* libdScene_d.a in Frameworks */,
-				FF9936761735F8AD000533B7 /* libdVisualDebuggerServer_d.a in Frameworks */,
-				FF9936771735F8AD000533B7 /* libenet_osx_d.a in Frameworks */,
-				FF9936781735F8AD000533B7 /* libglew-osx_d.a in Frameworks */,
-				FF9936791735F8AD000533B7 /* libnewton_d.a in Frameworks */,
-				FF99367A1735F8AD000533B7 /* libtinyxml_d.a in Frameworks */,
-				FF99367B1735F8AD000533B7 /* libwx_osx_cocoa_d.a in Frameworks */,
+				FFF06DF1173D56E9005F31CE /* libdContainers.a in Frameworks */,
+				FFF06DF2173D56EA005F31CE /* libdCustomJoints.a in Frameworks */,
+				FFF06DF3173D56EA005F31CE /* libdMath.a in Frameworks */,
+				FFF06DF4173D56EA005F31CE /* libdScene.a in Frameworks */,
+				FFF06DF5173D56EA005F31CE /* libdVisualDebuggerServer.a in Frameworks */,
+				FFF06DF6173D56EA005F31CE /* libenet_osx.a in Frameworks */,
+				FFF06DF7173D56EA005F31CE /* libglew-osx.a in Frameworks */,
+				FFF06DF8173D56EA005F31CE /* libnewton.a in Frameworks */,
+				FFF06DF9173D56EA005F31CE /* libtinyxml.a in Frameworks */,
+				FFF06DFA173D56EA005F31CE /* libwx_osx_cocoa.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -491,16 +491,16 @@
 		FF9936311735F863000533B7 /* libraries */ = {
 			isa = PBXGroup;
 			children = (
-				FF9936321735F8AC000533B7 /* libdContainers_d.a */,
-				FF9936331735F8AC000533B7 /* libdCustomJoints_d.a */,
-				FF9936341735F8AC000533B7 /* libdMath_d.a */,
-				FF9936351735F8AC000533B7 /* libdScene_d.a */,
-				FF9936361735F8AC000533B7 /* libdVisualDebuggerServer_d.a */,
-				FF9936371735F8AC000533B7 /* libenet_osx_d.a */,
-				FF9936381735F8AC000533B7 /* libglew-osx_d.a */,
-				FF9936391735F8AC000533B7 /* libnewton_d.a */,
-				FF99363A1735F8AC000533B7 /* libtinyxml_d.a */,
-				FF99363B1735F8AC000533B7 /* libwx_osx_cocoa_d.a */,
+				FFF06DE7173D56E9005F31CE /* libdContainers.a */,
+				FFF06DE8173D56E9005F31CE /* libdCustomJoints.a */,
+				FFF06DE9173D56E9005F31CE /* libdMath.a */,
+				FFF06DEA173D56E9005F31CE /* libdScene.a */,
+				FFF06DEB173D56E9005F31CE /* libdVisualDebuggerServer.a */,
+				FFF06DEC173D56E9005F31CE /* libenet_osx.a */,
+				FFF06DED173D56E9005F31CE /* libglew-osx.a */,
+				FFF06DEE173D56E9005F31CE /* libnewton.a */,
+				FFF06DEF173D56E9005F31CE /* libtinyxml.a */,
+				FFF06DF0173D56E9005F31CE /* libwx_osx_cocoa.a */,
 			);
 			name = libraries;
 			sourceTree = "<group>";
@@ -959,6 +959,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/DerivedData/demosSandbox/Build/Products/Debug\"",
+					"\"$(SRCROOT)/DerivedData/demosSandbox/Build/Products/Release\"",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
@@ -987,7 +988,7 @@
 					"-framework",
 					QuickTime,
 				);
-				PRODUCT_NAME = newtonDemos_d;
+				PRODUCT_NAME = demosSandbox;
 				SDKROOT = macosx;
 				VALID_ARCHS = x86_64;
 				WXPLATFORM = "__WXOSX_$(WXTOOLKITUPPER)__";
@@ -1044,6 +1045,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/DerivedData/demosSandbox/Build/Products/Debug\"",
+					"\"$(SRCROOT)/DerivedData/demosSandbox/Build/Products/Release\"",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1072,7 +1074,7 @@
 					"-framework",
 					QuickTime,
 				);
-				PRODUCT_NAME = newtonDemos;
+				PRODUCT_NAME = demosSandbox;
 				SDKROOT = macosx;
 				VALID_ARCHS = x86_64;
 				WXPLATFORM = "__WXOSX_$(WXTOOLKITUPPER)__";
