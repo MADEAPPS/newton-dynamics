@@ -709,6 +709,10 @@ void dScene::BakeTransform (dMatrix& matrix) const
 
 void dScene::Serialize (const char* const fileName)
 {
+	// save the file, using standard localization
+	char* const oldloc = setlocale( LC_ALL, 0 );
+	setlocale( LC_ALL, "C" );
+
 	TiXmlDocument asciifile;
 	TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" );
 	asciifile.LinkEndChild (decl);
@@ -731,11 +735,9 @@ void dScene::Serialize (const char* const fileName)
 
 	// save file content
 	dSceneGraph::Serialize (parentNode);
-
-	// save the file, using standard localization
-	char* const oldloc = setlocale( LC_ALL, 0 );
-	setlocale( LC_ALL, "C" );
 	asciifile.SaveFile (fileName);
+
+	// restore locale settings
 	setlocale (LC_ALL, oldloc);
 }
 
@@ -1233,15 +1235,14 @@ void dScene::NewtonWorldToScene (const NewtonWorld* const world, dSceneExportCal
 
 bool dScene::Deserialize (const char* const fileName)
 {
-	
-	TiXmlDocument doc (fileName);
-
 	// apply last Configuration, using standard localization
 	char* const oldloc = setlocale( LC_ALL, 0 );
 	setlocale( LC_ALL, "C" );
+
+	TiXmlDocument doc (fileName);
 	doc.LoadFile();
 	dAssert (!doc.Error());
-	setlocale( LC_ALL, oldloc );
+
 
 	bool state = true;
 	const TiXmlElement* const root = doc.RootElement();
@@ -1280,6 +1281,9 @@ bool dScene::Deserialize (const char* const fileName)
 		// update the revision to latest 
 		m_revision = D_SCENE_REVISION_NUMBER;
 	}
+
+	// restore locale settings
+	setlocale( LC_ALL, oldloc );
 	return state;
 }
 
