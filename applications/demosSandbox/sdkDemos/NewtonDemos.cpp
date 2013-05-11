@@ -171,22 +171,6 @@ class NewtonDemosApp: public wxApp
 
 		NewtonDemos* const frame = new NewtonDemos( "Newton 3.0 SDK demos", wxDefaultPosition, wxSize(1024, 768));
 
-
-wxMenuBar* menubar = new wxMenuBar();
-wxMenu* testmenu = new  wxMenu();
-testmenu->Append(wxID_ANY, _("New\tCtrl-N"));
-testmenu->Append(wxID_ANY, _("Open\tCtrl-O"));
-
-testmenu->Append(wxID_ABOUT, _("About"));
-testmenu->Append(wxID_HELP, _("Help"));
-testmenu->Append(wxID_PREFERENCES, _("Preferences"));
-testmenu->Append(wxID_EXIT, _("Exit"));
-
-menubar->Append(testmenu, _("File"));
-frame->SetMenuBar(menubar);
-
-
-
 		frame->Show(true);
 		SetTopWindow(frame);
 
@@ -197,8 +181,8 @@ frame->SetMenuBar(menubar);
 
 		// load the default Scene		
 		//frame->LoadDemo (DEFAULT_SCENE);
-//		wxMenuEvent loadDemo (wxEVT_COMMAND_MENU_SELECTED, NewtonDemos::ID_RUN_DEMO + DEFAULT_SCENE);
-//		frame->GetEventHandler()->ProcessEvent(loadDemo);
+		wxMenuEvent loadDemo (wxEVT_COMMAND_MENU_SELECTED, NewtonDemos::ID_RUN_DEMO + DEFAULT_SCENE);
+		frame->GetEventHandler()->ProcessEvent(loadDemo);
 		return true;
 	}
 
@@ -228,10 +212,9 @@ BEGIN_EVENT_TABLE(NewtonDemos, wxFrame)
 	// mandatory menu events for mac cocoa osx  support
 
 	EVT_MENU(wxID_ABOUT, NewtonDemos::OnAbout)
-	EVT_MENU(wxID_PREFERENCES, NewtonDemos::OnAbout)
-/*
 	EVT_MENU(wxID_EXIT, NewtonDemos::OnQuit)
 	EVT_MENU(wxID_HELP, NewtonDemos::OnAbout)
+	EVT_MENU(wxID_PREFERENCES, NewtonDemos::OnAbout)
 
 	// game menus events
 	EVT_MENU_RANGE(ID_RUN_DEMO, ID_RUN_DEMO_RANGE, NewtonDemos::OnRunDemo)
@@ -262,7 +245,7 @@ BEGIN_EVENT_TABLE(NewtonDemos, wxFrame)
 //	FXMAPFUNC(SEL_COMMAND,		NewtonDemos::ID_SAVE,								NewtonDemos::onSave),
 //	FXMAPFUNC(SEL_COMMAND,		NewtonDemos::ID_SERIALIZE,							NewtonDemos::onSerializeWorld),
 //	FXMAPFUNC(SEL_COMMAND,		NewtonDemos::ID_DESERIALIZE,						NewtonDemos::onDeserializeWorld),
-*/
+
 
 END_EVENT_TABLE()
 
@@ -314,14 +297,13 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	m_keyMap[1] = VK_RBUTTON;
 	m_keyMap[2] = VK_MBUTTON; 
 #endif
-/*
+
 	m_scene = new DemoEntityManager(this);
 	m_statusbar = CreateStatusBar();
 	int widths[] = { 150, 160, 150};
 	m_statusbar->SetFieldsCount (sizeof (widths)/sizeof (widths[0]), widths);
 	CalculateFPS(0.0f);
 	m_mainMenu = CreateMainMenu();
-*/
 }
 
 
