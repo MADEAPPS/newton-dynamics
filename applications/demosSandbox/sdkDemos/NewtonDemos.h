@@ -39,11 +39,6 @@ class NewtonDemos: public wxFrame
 		ID_SHOW_PROFILER = ID_SHOW_PHYSICS_PROFILER + 16,
 		ID_SHOW_CONCURRENCE_PROFILER,
 
-		ID_PLATFORMS,
-//		ID_USE_X87_INSTRUCTIONS,
-//		ID_USE_SIMD_INSTRUCTIONS,
-//		ID_USE_AVX_INSTRUCTIONS,
-
 		ID_DYNAMICS_BROADPHASE = ID_PLATFORMS + 16,
 		ID_STATIC_BROADPHASE,
 		ID_HYBRID_BROADPHASE,
@@ -70,6 +65,9 @@ class NewtonDemos: public wxFrame
 		ID_DYNAMICS_BROADPHASE,
 		ID_STATIC_BROADPHASE,
 		ID_HYBRID_BROADPHASE,
+
+		ID_PLATFORMS,
+		ID_PLATFORMS_MAX = ID_PLATFORMS + 8,
 
 		ID_SELECT_ALL_PROFILERS,
 		ID_UNSELECT_ALL_PROFILERS,
@@ -111,9 +109,9 @@ class NewtonDemos: public wxFrame
 	bool m_physicProfilerState;
 //	bool m_showContactPointState;
 	bool m_showStatistics;
-	FXuint m_broadPhaseMode;
+	
 	FXDataTarget m_broadPhaseSelection;
-	FXuint m_cpuInstructionsMode;
+	
 	FXDataTarget m_cpuInstructionSelection;
 	
 	FXDataTarget m_microthreadCountSelection;
@@ -169,6 +167,7 @@ class NewtonDemos: public wxFrame
 	void OnUnselectAllPerformanceChart(wxCommandEvent& event);
 	void OnRunPhysicsConcurrent(wxCommandEvent& event);
 	void OnSelectNumberOfMicroThreads(wxCommandEvent& event);
+	void OnSimdInstructions(wxCommandEvent& event);
 
 //	long onNew(FXObject* sender, FXSelector id, void* eventPtr); 
 //	long onLoad(FXObject* sender, FXSelector id, void* eventPtr); 
@@ -176,7 +175,6 @@ class NewtonDemos: public wxFrame
 //	long onSerializeWorld(FXObject* sender, FXSelector id, void* eventPtr); 
 //	long onDeserializeWorld(FXObject* sender, FXSelector id, void* eventPtr); 
 //	long onRunDemo(FXObject* sender, FXSelector id, void* eventPtr); 
-//	long onSimdInstructions(FXObject* sender, FXSelector id, void* eventPtr);
 
 
 
@@ -208,6 +206,8 @@ class NewtonDemos: public wxFrame
 	float m_timestepAcc;
 	float m_fps;
 	int m_microthreadIndex;
+	int m_cpuInstructionsMode;
+	int m_broadPhaseMode;
 
 	int m_key[512];
 	int m_keyMap[512];

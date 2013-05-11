@@ -55,190 +55,6 @@
 //#define DEFAULT_SCENE	29			// high performance super car
 //#define DEFAULT_SCENE	30			// soft bodies			
 
-#if 0
-
-
-NewtonDemos::NewtonDemos(FXApp& application)
-	:FXMainWindow(&application, "Newton Dynamics 3.00 unit test demos", NULL, NULL, DECOR_ALL, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
-	,m_showContactPoints(false)
-	,m_physicProfilerState(true)
-//	,m_showContactPointState(false)
-	,m_showStatistics(true)
-	,m_broadPhaseMode (ID_DYNAMICS_BROADPHASE)
-	,m_broadPhaseSelection(m_broadPhaseMode)
-	,m_cpuInstructionsMode(ID_PLATFORMS)
-//	,m_cpuInstructionsMode(ID_USE_AVX_INSTRUCTIONS)
-	,m_cpuInstructionSelection (m_cpuInstructionsMode)
-	,m_microthreadCount(ID_SELECT_MICROTHREADS)
-	,m_microthreadCountSelection(m_microthreadCount)
-{
-	m_broadPhaseSelection.setTarget(this);
-	m_broadPhaseSelection.setSelector(ID_DYNAMICS_BROADPHASE);
-
-	m_cpuInstructionSelection.setTarget(this);
-	m_cpuInstructionSelection.setSelector(ID_PLATFORMS);
-
-	m_microthreadCountSelection.setTarget(this);
-	m_microthreadCountSelection.setSelector(ID_SELECT_MICROTHREADS);
-
-
-	// create status bar for showing results 
-	m_statusbar = new FXStatusBar(this, LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|STATUSBAR_WITH_DRAGCORNER);
-	// init the fps status bar
-	CalculateFPS(0.0f);
-
-	// create the main menu
-	FXDockSite* const dockMenuFrame = new FXDockSite(this,DOCKSITE_NO_WRAP|LAYOUT_SIDE_TOP|LAYOUT_FILL_X);
-
-
-	// Set the initial states
-	onShowCollisionLines(this, 0, (void*) m_debugDisplayState);
-
-	// create the open gl canvas and scene manager
-	FXHorizontalFrame* const glFrame = new FXHorizontalFrame(this,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0,0,0,0, 0,0,0,0, 4,4);
-
-	//create a main frame to hold the Render canvas
-	m_scene = new DemoEntityManager (glFrame, this);
-
-	// create main menu
-	m_mainMenu = new DemoMenu (dockMenuFrame, this);
-
-	// clear the key map
-	memset (m_key, 0, sizeof (m_key));
-	for (int i = 0; i < int (sizeof (m_keyMap)/sizeof (m_keyMap[0])); i ++) {
-		m_keyMap[i] = i;
-	}
-	for (int i = 'a'; i <= 'z'; i ++) {
-		m_keyMap[i] = i - 'a' + 'A';
-	}
-
-#ifdef WIN32
-	m_keyMap[0] = VK_LBUTTON;
-	m_keyMap[1] = VK_RBUTTON;
-	m_keyMap[2] = VK_MBUTTON; 
-#endif
-
-
-	NewtonSelectBroadphaseAlgorithm (m_scene->GetNewton(), m_broadPhaseMode - ID_DYNAMICS_BROADPHASE);
-	m_broadPhaseMode = m_broadPhaseMode - FXDataTarget::ID_OPTION;
-
-	//m_mainMenu->m_cpuModes[2]->disable();
-	NewtonSetCurrentDevice (m_scene->GetNewton(), m_cpuInstructionsMode - ID_PLATFORMS); 
-	m_cpuInstructionsMode = m_cpuInstructionsMode - FXDataTarget::ID_OPTION;
-
-
-	NewtonSetThreadsCount(m_scene->GetNewton(), m_mainMenu->m_threadsTracks[m_microthreadIndex-ID_SELECT_MICROTHREADS]); 
-	m_microthreadIndex = m_microthreadIndex - FXDataTarget::ID_OPTION;
-
-	if (m_useParallelSolver) {
-		NewtonSetMultiThreadSolverOnSingleIsland (m_scene->GetNewton(), 1);
-	}
-
-	if (m_physicProfilerState) {
-		m_scene->m_showProfiler[NEWTON_PROFILER_WORLD_UPDATE] = 1;
-	}
-}
-
-
-
-long NewtonDemos::onNew(FXObject* sender, FXSelector id, void* eventPtr)
-{
-	BEGIN_MENU_OPTION();
-	m_scene->Cleanup();
-	RestoreSettings ();
-	m_scene->ResetTimer();
-	END_MENU_OPTION();
-	return 1;
-}
-
-long NewtonDemos::onLoad(FXObject* sender, FXSelector id, void* eventPtr)
-{
-	BEGIN_MENU_OPTION();
-
-	const FXchar patterns[]="Newton Dynamics Files (*.ngd)";
-	FXFileDialog open(this,"Load Newton Dynamics scene");
-	open.setPatternList(patterns);
-	open.setDirectory ("../../../media");
-	if(open.execute()){
-
-		m_scene->Cleanup();
-
-		// load the scene from a ngd file format
-		m_scene->makeCurrent();
-		m_scene->LoadScene (open.getFilename().text());
-		m_scene->makeNonCurrent();
-
-		// add a sky box to the scene, make the first object
-		m_scene->Addtop (new SkyBox());
-
-		// place camera into position
-		dMatrix camMatrix (GetIdentityMatrix());
-//		camMatrix.m_posit = dVector (-40.0f, 10.0f, 0.0f, 0.0f);
-		camMatrix = dYawMatrix(-0.0f * 3.1416f / 180.0f);
-		camMatrix.m_posit = dVector (-5.0f, 1.0f, -0.0f, 0.0f);
-		m_scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
-
-		RestoreSettings ();
-	}
-
-
-	m_scene->ResetTimer();
-	END_MENU_OPTION();
-	return 1;
-}
-
-long NewtonDemos::onSave(FXObject* sender, FXSelector id, void* eventPtr)
-{
-	return 1;
-}
-
-
-long NewtonDemos::onSerializeWorld(FXObject* sender, FXSelector id, void* eventPtr)
-{
-	BEGIN_MENU_OPTION();
-
-	const FXchar patterns[]="Newton Dynamics Files (*.bin)";
-	FXFileDialog open(this, "Export a Newton Dynamics Serialized Physics Scene");
-	open.setPatternList(patterns);
-	open.setDirectory ("../../../media");
-	if(open.execute()){
-		m_scene->SerializedPhysicScene (open.getFilename().text());
-	}
-
-	m_scene->ResetTimer();
-	END_MENU_OPTION();
-	return 1;
-}
-
-long NewtonDemos::onDeserializeWorld(FXObject* sender, FXSelector id, void* eventPtr)
-{
-	BEGIN_MENU_OPTION();
-
-	const FXchar patterns[]="Newton Dynamics Files (*.bin)";
-	FXFileDialog open(this, "Import a Newton Dynamics Serialized Physics Scene");
-	open.setPatternList(patterns);
-	open.setDirectory ("../../../media");
-	if(open.execute()){
-		m_scene->makeCurrent();
-		m_scene->DeserializedPhysicScene (open.getFilename().text());
-		m_scene->makeNonCurrent();
-		RestoreSettings ();
-	}
-
-	m_scene->ResetTimer();
-	END_MENU_OPTION();
-	return 1;
-}
-
-long NewtonDemos::onSimdInstructions(FXObject* sender, FXSelector id, void* eventPtr)
-{
-	BEGIN_MENU_OPTION();
-	int selection = ((m_cpuInstructionsMode + FXDataTarget::ID_OPTION) & 0xffff) - ID_PLATFORMS;
-	NewtonSetCurrentDevice (m_scene->GetNewton(), selection);
-	END_MENU_OPTION();
-	return 1;
-}
-#endif
 
 
 
@@ -354,17 +170,35 @@ class NewtonDemosApp: public wxApp
 		NewtonSetMemorySystem (PhysicsAlloc, PhysicsFree);
 
 		NewtonDemos* const frame = new NewtonDemos( "Newton 3.0 SDK demos", wxDefaultPosition, wxSize(1024, 768));
+
+
+wxMenuBar* menubar = new wxMenuBar();
+wxMenu* testmenu = new  wxMenu();
+testmenu->Append(wxID_ANY, _("New\tCtrl-N"));
+testmenu->Append(wxID_ANY, _("Open\tCtrl-O"));
+
+testmenu->Append(wxID_ABOUT, _("About"));
+testmenu->Append(wxID_HELP, _("Help"));
+testmenu->Append(wxID_PREFERENCES, _("Preferences"));
+testmenu->Append(wxID_EXIT, _("Exit"));
+
+menubar->Append(testmenu, _("File"));
+frame->SetMenuBar(menubar);
+
+
+
 		frame->Show(true);
 		SetTopWindow(frame);
 
 		// initialize open gl graphics
-		frame->m_scene->InitGraphicsSystem();
-
+		if (frame->m_scene) {
+			frame->m_scene->InitGraphicsSystem();
+		}
 
 		// load the default Scene		
 		//frame->LoadDemo (DEFAULT_SCENE);
-		wxMenuEvent loadDemo (wxEVT_COMMAND_MENU_SELECTED, NewtonDemos::ID_RUN_DEMO + DEFAULT_SCENE);
-		frame->GetEventHandler()->ProcessEvent(loadDemo);
+//		wxMenuEvent loadDemo (wxEVT_COMMAND_MENU_SELECTED, NewtonDemos::ID_RUN_DEMO + DEFAULT_SCENE);
+//		frame->GetEventHandler()->ProcessEvent(loadDemo);
 		return true;
 	}
 
@@ -388,15 +222,16 @@ class NewtonDemosApp: public wxApp
 int NewtonDemosApp::m_totalMemoryUsed = 0;
 
 
-
 IMPLEMENT_APP(NewtonDemosApp)
 
 BEGIN_EVENT_TABLE(NewtonDemos, wxFrame)
 	// mandatory menu events for mac cocoa osx  support
-	EVT_MENU(wxID_EXIT, NewtonDemos::OnQuit)
+
 	EVT_MENU(wxID_ABOUT, NewtonDemos::OnAbout)
-	EVT_MENU(wxID_HELP, NewtonDemos::OnAbout)
 	EVT_MENU(wxID_PREFERENCES, NewtonDemos::OnAbout)
+/*
+	EVT_MENU(wxID_EXIT, NewtonDemos::OnQuit)
+	EVT_MENU(wxID_HELP, NewtonDemos::OnAbout)
 
 	// game menus events
 	EVT_MENU_RANGE(ID_RUN_DEMO, ID_RUN_DEMO_RANGE, NewtonDemos::OnRunDemo)
@@ -410,6 +245,7 @@ BEGIN_EVENT_TABLE(NewtonDemos, wxFrame)
 	EVT_MENU(ID_USE_PARALLEL_SOLVER, NewtonDemos::OnUseParallelSolver)
 
 	EVT_MENU_RANGE(ID_DYNAMICS_BROADPHASE, ID_HYBRID_BROADPHASE, NewtonDemos::OnBroadPhaseType)
+	EVT_MENU_RANGE(ID_PLATFORMS, ID_PLATFORMS_MAX, NewtonDemos::OnSimdInstructions)
 
 	EVT_MENU(ID_SHOW_CONCURRENCE_PROFILER, NewtonDemos::OnShowConcurrentProfiler)
 	EVT_MENU(ID_SHOW_PROFILER,	NewtonDemos::OnShowThreadProfiler)
@@ -426,13 +262,16 @@ BEGIN_EVENT_TABLE(NewtonDemos, wxFrame)
 //	FXMAPFUNC(SEL_COMMAND,		NewtonDemos::ID_SAVE,								NewtonDemos::onSave),
 //	FXMAPFUNC(SEL_COMMAND,		NewtonDemos::ID_SERIALIZE,							NewtonDemos::onSerializeWorld),
 //	FXMAPFUNC(SEL_COMMAND,		NewtonDemos::ID_DESERIALIZE,						NewtonDemos::onDeserializeWorld),
-//	FXMAPFUNCS(SEL_COMMAND,		NewtonDemos::ID_PLATFORMS,				NewtonDemos::ID_PLATFORMS + 16,					NewtonDemos::onSimdInstructions),
+*/
 
 END_EVENT_TABLE()
 
 
 NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize& size)
 	:wxFrame(NULL, -1, title, pos, size)
+	,m_mainMenu(NULL)
+	,m_statusbar(NULL)
+	,m_scene(NULL)
 	,m_physicsUpdateMode(0)
 	,m_suspendVisualUpdates(true)
 	,m_autoSleepState(false)
@@ -456,6 +295,8 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	,m_timestepAcc(0)
 	,m_fps(0.0f)
 	,m_microthreadIndex(1)
+	,m_cpuInstructionsMode(0)
+	,m_broadPhaseMode (0)
 {
 	memset (m_profilerTracksMenu, 0, sizeof (m_profilerTracksMenu));
 
@@ -473,17 +314,14 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	m_keyMap[1] = VK_RBUTTON;
 	m_keyMap[2] = VK_MBUTTON; 
 #endif
-
+/*
 	m_scene = new DemoEntityManager(this);
-
 	m_statusbar = CreateStatusBar();
 	int widths[] = { 150, 160, 150};
 	m_statusbar->SetFieldsCount (sizeof (widths)/sizeof (widths[0]), widths);
 	CalculateFPS(0.0f);
-
-	//SetStatusText(_T("Engine settings:"));
-
 	m_mainMenu = CreateMainMenu();
+*/
 }
 
 
@@ -546,18 +384,15 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 		optionsMenu->AppendCheckItem(ID_SHOW_AABB, _T("Show aabb"));
 		optionsMenu->AppendCheckItem(ID_USE_PARALLEL_SOLVER, _T("Parallel solver on"));
 
-//		optionsMenu->AppendSeparator();
-//		//m_cpuModes[0] = new FXMenuRadio(m_optionsMenu, "Use x87 instructions", &mainFrame->m_cpuInstructionSelection, NewtonDemos::ID_USE_X87_INSTRUCTIONS);
-//		//m_cpuModes[1] = new FXMenuRadio(m_optionsMenu, "Use sse instructions", &mainFrame->m_cpuInstructionSelection, NewtonDemos::ID_USE_SIMD_INSTRUCTIONS);
-//		//m_cpuModes[2] = new FXMenuRadio(m_optionsMenu, "Use avx instructions", &mainFrame->m_cpuInstructionSelection, NewtonDemos::ID_USE_AVX_INSTRUCTIONS);
-//		if (mainFrame->m_scene) {
-//			int platformsCount = NewtonEnumrateDevices (mainFrame->m_scene->GetNewton());
-//			for (int i = 0; i < platformsCount; i ++) {
-//				char platform[256];
-//				NewtonGetDeviceString (mainFrame->m_scene->GetNewton(), i, platform, sizeof (platform));
-//				m_cpuModes[i] = new FXMenuRadio(m_optionsMenu, platform, &mainFrame->m_cpuInstructionSelection, NewtonDemos::ID_PLATFORMS + i);
-//			}
-//		}
+		optionsMenu->AppendSeparator();
+		if (m_scene) {
+			int platformsCount = NewtonEnumrateDevices (m_scene->GetNewton());
+			for (int i = 0; i < platformsCount; i ++) {
+				char platform[256];
+				NewtonGetDeviceString (m_scene->GetNewton(), i, platform, sizeof (platform));
+				optionsMenu->AppendCheckItem(ID_PLATFORMS, _T(platform));
+			}
+		}
 
 		optionsMenu->AppendSeparator();
 		optionsMenu->AppendRadioItem(ID_DYNAMICS_BROADPHASE, _T("dynamics broad phase"));
@@ -601,13 +436,11 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 		optionsMenu->AppendCheckItem(ID_CONCURRENT_PHYSICS_UPDATE, _T("Concurrent physics update"));
 
 		wxMenu* const microThreadedsSubMenu = new wxMenu;
-//		FXMenuRadio* threadMenus[128];
 		for (int i = 0 ; i < int (sizeof (m_threadsTracks)/ sizeof (m_threadsTracks[0])); i ++) {
 			wxString msg;
 			msg.Printf(wxT ("%d micro threads"), m_threadsTracks[i]);
 			microThreadedsSubMenu->AppendRadioItem(ID_SELECT_MICROTHREADS + i, msg);
 		}
-//		threadMenus[0]->setCheck(true);
 		optionsMenu->AppendSubMenu (microThreadedsSubMenu, _T("select microThread count"));
 
 
@@ -650,16 +483,10 @@ void NewtonDemos::END_MENU_OPTION()
 
 void NewtonDemos::RestoreSettings ()
 {
-//	int cpuMode = ((m_cpuInstructionsMode + FXDataTarget::ID_OPTION) & 0xffff) - ID_PLATFORMS;
-//	NewtonSetCurrentDevice (m_scene->GetNewton(), cpuMode); 
-
-//	int threadIndex = ((m_microthreadCount + FXDataTarget::ID_OPTION) & 0xffff) - ID_SELECT_MICROTHREADS;
-//	NewtonSetThreadsCount(m_scene->GetNewton(), m_mainMenu->m_threadsTracks[threadIndex]); 
-
-//	int broadPhase = ((m_broadPhaseMode + FXDataTarget::ID_OPTION) & 0xffff) - ID_DYNAMICS_BROADPHASE;
-//	NewtonSelectBroadphaseAlgorithm (m_scene->GetNewton(), broadPhase);
+	NewtonSetCurrentDevice (m_scene->GetNewton(), m_cpuInstructionsMode); 
+	NewtonSetThreadsCount(m_scene->GetNewton(), m_threadsTracks[m_microthreadIndex]); 
+	NewtonSelectBroadphaseAlgorithm (m_scene->GetNewton(), m_broadPhaseMode);
 }
-
 
 
 void NewtonDemos::LoadDemo (int index)
@@ -887,10 +714,10 @@ void NewtonDemos::OnUseParallelSolver(wxCommandEvent& event)
 void NewtonDemos::OnBroadPhaseType(wxCommandEvent& event)
 {
 	BEGIN_MENU_OPTION();
-	int selection = event.GetId() - ID_DYNAMICS_BROADPHASE;
-	dAssert (selection >= 0);
-	dAssert (selection <= 3);
-	NewtonSelectBroadphaseAlgorithm (m_scene->GetNewton(), selection);
+	m_broadPhaseMode = event.GetId() - ID_DYNAMICS_BROADPHASE;
+	dAssert (m_broadPhaseMode >= 0);
+	dAssert (m_broadPhaseMode <= 3);
+	NewtonSelectBroadphaseAlgorithm (m_scene->GetNewton(), m_broadPhaseMode);
 
 	END_MENU_OPTION();
 }
@@ -963,3 +790,104 @@ void NewtonDemos::OnSelectNumberOfMicroThreads(wxCommandEvent& event)
 	END_MENU_OPTION();
 }
 
+void NewtonDemos::OnSimdInstructions(wxCommandEvent& event)
+{
+	BEGIN_MENU_OPTION();
+	int selection = event.GetId() - ID_PLATFORMS;
+	NewtonSetCurrentDevice (m_scene->GetNewton(), selection);
+	END_MENU_OPTION();
+}
+
+
+#if 0
+
+long NewtonDemos::onNew(FXObject* sender, FXSelector id, void* eventPtr)
+{
+	BEGIN_MENU_OPTION();
+	m_scene->Cleanup();
+	RestoreSettings ();
+	m_scene->ResetTimer();
+	END_MENU_OPTION();
+	return 1;
+}
+
+long NewtonDemos::onLoad(FXObject* sender, FXSelector id, void* eventPtr)
+{
+	BEGIN_MENU_OPTION();
+
+	const FXchar patterns[]="Newton Dynamics Files (*.ngd)";
+	FXFileDialog open(this,"Load Newton Dynamics scene");
+	open.setPatternList(patterns);
+	open.setDirectory ("../../../media");
+	if(open.execute()){
+
+		m_scene->Cleanup();
+
+		// load the scene from a ngd file format
+		m_scene->makeCurrent();
+		m_scene->LoadScene (open.getFilename().text());
+		m_scene->makeNonCurrent();
+
+		// add a sky box to the scene, make the first object
+		m_scene->Addtop (new SkyBox());
+
+		// place camera into position
+		dMatrix camMatrix (GetIdentityMatrix());
+		//		camMatrix.m_posit = dVector (-40.0f, 10.0f, 0.0f, 0.0f);
+		camMatrix = dYawMatrix(-0.0f * 3.1416f / 180.0f);
+		camMatrix.m_posit = dVector (-5.0f, 1.0f, -0.0f, 0.0f);
+		m_scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
+
+		RestoreSettings ();
+	}
+
+
+	m_scene->ResetTimer();
+	END_MENU_OPTION();
+	return 1;
+}
+
+long NewtonDemos::onSave(FXObject* sender, FXSelector id, void* eventPtr)
+{
+	return 1;
+}
+
+
+long NewtonDemos::onSerializeWorld(FXObject* sender, FXSelector id, void* eventPtr)
+{
+	BEGIN_MENU_OPTION();
+
+	const FXchar patterns[]="Newton Dynamics Files (*.bin)";
+	FXFileDialog open(this, "Export a Newton Dynamics Serialized Physics Scene");
+	open.setPatternList(patterns);
+	open.setDirectory ("../../../media");
+	if(open.execute()){
+		m_scene->SerializedPhysicScene (open.getFilename().text());
+	}
+
+	m_scene->ResetTimer();
+	END_MENU_OPTION();
+	return 1;
+}
+
+long NewtonDemos::onDeserializeWorld(FXObject* sender, FXSelector id, void* eventPtr)
+{
+	BEGIN_MENU_OPTION();
+
+	const FXchar patterns[]="Newton Dynamics Files (*.bin)";
+	FXFileDialog open(this, "Import a Newton Dynamics Serialized Physics Scene");
+	open.setPatternList(patterns);
+	open.setDirectory ("../../../media");
+	if(open.execute()){
+		m_scene->makeCurrent();
+		m_scene->DeserializedPhysicScene (open.getFilename().text());
+		m_scene->makeNonCurrent();
+		RestoreSettings ();
+	}
+
+	m_scene->ResetTimer();
+	END_MENU_OPTION();
+	return 1;
+}
+
+#endif
