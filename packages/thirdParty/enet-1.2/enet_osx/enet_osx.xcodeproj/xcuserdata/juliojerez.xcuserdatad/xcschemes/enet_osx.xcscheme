@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "FF3B29D5173014AE007E6FEC"
-               BuildableName = "libenet_osx.a"
+               BuildableName = "libenet.a"
                BlueprintName = "enet_osx"
                ReferencedContainer = "container:enet_osx.xcodeproj">
             </BuildableReference>

@@ -27,7 +27,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		FF3B29D6173014AE007E6FEC /* libenet_osx_d.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libenet_osx_d.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF3B29D6173014AE007E6FEC /* libenet_d.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libenet_d.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF7F20901730195E00AC6E4B /* callbacks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = callbacks.h; path = ../include/enet/callbacks.h; sourceTree = "<group>"; };
 		FF7F20911730195E00AC6E4B /* enet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = enet.h; path = ../include/enet/enet.h; sourceTree = "<group>"; };
 		FF7F20921730195E00AC6E4B /* list.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = list.h; path = ../include/enet/list.h; sourceTree = "<group>"; };
@@ -69,7 +69,7 @@
 		FF3B29D7173014AE007E6FEC /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				FF3B29D6173014AE007E6FEC /* libenet_osx_d.a */,
+				FF3B29D6173014AE007E6FEC /* libenet_d.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -134,7 +134,7 @@
 			);
 			name = enet_osx;
 			productName = enet_osx;
-			productReference = FF3B29D6173014AE007E6FEC /* libenet_osx_d.a */;
+			productReference = FF3B29D6173014AE007E6FEC /* libenet_d.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -240,7 +240,7 @@
 				EXECUTABLE_PREFIX = lib;
 				HEADER_SEARCH_PATHS = ../include;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = enet_d;
 				VALID_ARCHS = x86_64;
 			};
@@ -251,9 +251,10 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				EXECUTABLE_PREFIX = lib;
+				GCC_OPTIMIZATION_LEVEL = 3;
 				HEADER_SEARCH_PATHS = ../include;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = enet;
 				VALID_ARCHS = x86_64;
 			};

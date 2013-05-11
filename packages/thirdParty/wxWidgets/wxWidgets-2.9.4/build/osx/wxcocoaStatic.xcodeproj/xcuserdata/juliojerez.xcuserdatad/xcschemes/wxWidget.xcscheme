@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "BAB02EC06578349A9171CCAC"
-               BuildableName = "libwx_osx_cocoa.a"
+               BuildableName = "libwxWidgets.a"
                BlueprintName = "wxWidget"
                ReferencedContainer = "container:wxcocoaStatic.xcodeproj">
             </BuildableReference>

@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "FF0A4FEB173160E6005D6C12"
-               BuildableName = "libglew-osx.a"
+               BuildableName = "libglew.a"
                BlueprintName = "glew-osx"
                ReferencedContainer = "container:glew-osx.xcodeproj">
             </BuildableReference>

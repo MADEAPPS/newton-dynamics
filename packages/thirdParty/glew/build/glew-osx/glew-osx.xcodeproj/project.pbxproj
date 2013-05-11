@@ -14,7 +14,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		FF0A4FEC173160E6005D6C12 /* libglew-osx_d.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libglew-osx_d.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF0A4FEC173160E6005D6C12 /* libglew-osx_d.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = "libglew-osx_d.a"; path = libglew_d.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF0A4FF41731614C005D6C12 /* glew.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = glew.h; path = ../../include/GL/glew.h; sourceTree = "<group>"; };
 		FF0A4FF51731614C005D6C12 /* glxew.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = glxew.h; path = ../../include/GL/glxew.h; sourceTree = "<group>"; };
 		FF0A4FF61731614C005D6C12 /* wglew.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = wglew.h; path = ../../include/GL/wglew.h; sourceTree = "<group>"; };
@@ -204,6 +204,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				EXECUTABLE_PREFIX = lib;
+				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PREPROCESSOR_DEFINITIONS = GLEW_STATIC;
 				HEADER_SEARCH_PATHS = ../../include;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
