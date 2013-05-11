@@ -78,7 +78,7 @@ void DemoEntityManager::ButtonKey::UpdatePushButton (const NewtonDemos* const ma
 
 
 DemoEntityManager::DemoEntityManager(NewtonDemos* const parent)
-	:wxGLCanvas(parent, wxID_ANY, wxDefaultPosition, wxSize (300, 300), wxSUNKEN_BORDER|wxFULL_REPAINT_ON_RESIZE, _T("GLRenderCanvas"), m_attributes)
+	:wxGLCanvas(parent, wxID_ANY, wxDefaultPosition, wxSize (300, 300), wxSUNKEN_BORDER|wxFULL_REPAINT_ON_RESIZE, _("GLRenderCanvas"), m_attributes)
 	,dList <DemoEntity*>() 
 	,m_mainWindow(parent)
 	,m_world(NULL)

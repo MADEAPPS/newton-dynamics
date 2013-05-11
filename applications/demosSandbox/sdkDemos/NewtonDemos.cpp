@@ -338,27 +338,27 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 	{
 		wxMenu* const fileMenu = new wxMenu;
 
-		fileMenu->Append(wxID_ABOUT, _T("About"));
+		fileMenu->Append(wxID_ABOUT, _("About"));
 		
 		fileMenu->AppendSeparator();
-		fileMenu->Append(wxID_PREFERENCES, _T("Preferences"));
+		fileMenu->Append(wxID_PREFERENCES, _("Preferences"));
 
 		fileMenu->AppendSeparator();
-		fileMenu->Append(wxID_NEW, _T("&New"), _T("Create a blank new scene"));
+		fileMenu->Append(wxID_NEW, _("&New"), _("Create a blank new scene"));
 
 		fileMenu->AppendSeparator();
-		fileMenu->Append(wxID_OPEN, _T("&Open"), _T("Open visual scene in dScene newton format"));
-		fileMenu->Append(wxID_SAVE, _T("&Save"), _T("Save visual scene in dScene newton format"));
+		fileMenu->Append(wxID_OPEN, _("&Open"), _("Open visual scene in dScene newton format"));
+		fileMenu->Append(wxID_SAVE, _("&Save"), _("Save visual scene in dScene newton format"));
 
 	//	fileMenu->AppendSeparator();
 	//	fileMenu->Append(m_idImportPhysics, _T("&Open physics scene"), _T("Open physics scene in collada format"));
 	//	fileMenu->Append(m_idExportPhysics, _T("&Save physics scene"), _T("Save physics in collada format"));
 
 		fileMenu->AppendSeparator();
-		fileMenu->Append(wxID_EXIT, _T("E&xit\tAlt-X"), _T("Quit SDK sample") );
+		fileMenu->Append(wxID_EXIT, _("E&xit\tAlt-X"), _("Quit SDK sample") );
 
 		// add main menus to menu bar
-		mainMenu->Append(fileMenu, _T("&File"));
+		mainMenu->Append(fileMenu, _("&File"));
 	}
 
 	// engine all demo examples
@@ -369,20 +369,20 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 			sdkDemos->AppendRadioItem (NewtonDemos::ID_RUN_DEMO + i,  m_demosSelection[i].m_name, m_demosSelection[i].m_description);
 		}
 
-		mainMenu->Append(sdkDemos, _T("&Demos"));
+		mainMenu->Append(sdkDemos, _("&Demos"));
 	}
 
 	// option menu
 	{
 		wxMenu* const optionsMenu = new wxMenu;;
 
-		optionsMenu->AppendCheckItem(ID_AUTOSLEEP_MODE, _T("Autosleep off"), _T("toogle auto sleep bodies"));
-		optionsMenu->AppendCheckItem(ID_HIDE_VISUAL_MESHES, _T("Hide visual meshes"));
-		optionsMenu->AppendCheckItem(ID_SHOW_COLLISION_MESH, _T("Show collision Mesh"));
-		optionsMenu->AppendCheckItem(ID_SHOW_CONTACT_POINTS, _T("Show contact points"));
-		optionsMenu->AppendCheckItem(ID_SHOW_NORMAL_FORCES, _T("Show normal forces"));
-		optionsMenu->AppendCheckItem(ID_SHOW_AABB, _T("Show aabb"));
-		optionsMenu->AppendCheckItem(ID_USE_PARALLEL_SOLVER, _T("Parallel solver on"));
+		optionsMenu->AppendCheckItem(ID_AUTOSLEEP_MODE, _("Autosleep off"), _("toogle auto sleep bodies"));
+		optionsMenu->AppendCheckItem(ID_HIDE_VISUAL_MESHES, _("Hide visual meshes"));
+		optionsMenu->AppendCheckItem(ID_SHOW_COLLISION_MESH, _("Show collision Mesh"));
+		optionsMenu->AppendCheckItem(ID_SHOW_CONTACT_POINTS, _("Show contact points"));
+		optionsMenu->AppendCheckItem(ID_SHOW_NORMAL_FORCES, _("Show normal forces"));
+		optionsMenu->AppendCheckItem(ID_SHOW_AABB, _("Show aabb"));
+		optionsMenu->AppendCheckItem(ID_USE_PARALLEL_SOLVER, _("Parallel solver on"));
 
 		optionsMenu->AppendSeparator();
 		if (m_scene) {
@@ -390,50 +390,50 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 			for (int i = 0; i < platformsCount; i ++) {
 				char platform[256];
 				NewtonGetDeviceString (m_scene->GetNewton(), i, platform, sizeof (platform));
-				optionsMenu->AppendCheckItem(ID_PLATFORMS, _T(platform));
+				optionsMenu->AppendCheckItem(ID_PLATFORMS, _(platform));
 			}
 		}
 
 		optionsMenu->AppendSeparator();
-		optionsMenu->AppendRadioItem(ID_DYNAMICS_BROADPHASE, _T("dynamics broad phase"));
-		optionsMenu->AppendRadioItem(ID_STATIC_BROADPHASE, _T("static broad phase"));
-		optionsMenu->AppendRadioItem(ID_HYBRID_BROADPHASE, _T("hybrid broad phase"));
+		optionsMenu->AppendRadioItem(ID_DYNAMICS_BROADPHASE, _("dynamics broad phase"));
+		optionsMenu->AppendRadioItem(ID_STATIC_BROADPHASE, _("static broad phase"));
+		optionsMenu->AppendRadioItem(ID_HYBRID_BROADPHASE, _("hybrid broad phase"));
 
 
 		optionsMenu->AppendSeparator();
-		optionsMenu->Append(ID_SHOW_CONCURRENCE_PROFILER, _T("Show concurrent profiler"));
+		optionsMenu->Append(ID_SHOW_CONCURRENCE_PROFILER, _("Show concurrent profiler"));
 //		if (mainFrame->m_concurrentProfilerState) {
 //			concurrentProfiler->setCheck(true);
 //		}
 //		FXMenuCheck* const threadProfiler = new FXMenuCheck(m_optionsMenu, "Show micro thread profiler", mainFrame, NewtonDemos::ID_SHOW_PROFILER);
-		optionsMenu->Append(ID_SHOW_PROFILER, _T("Show micro thread profiler"));
+		optionsMenu->Append(ID_SHOW_PROFILER, _("Show micro thread profiler"));
 //		if (mainFrame->m_threadProfilerState) {
 //			threadProfiler->setCheck(true);
 //		}
 
 		optionsMenu->AppendSeparator();
-		optionsMenu->Append(ID_SELECT_ALL_PROFILERS, _T("select all profiler"));
-		optionsMenu->Append(ID_UNSELECT_ALL_PROFILERS, _T("unselect all profiler"));
+		optionsMenu->Append(ID_SELECT_ALL_PROFILERS, _("select all profiler"));
+		optionsMenu->Append(ID_UNSELECT_ALL_PROFILERS, _("unselect all profiler"));
 
 		wxMenu* const profilerSubMenu = new wxMenu;
-		m_profilerTracksMenu[0] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 0, _T("show global physics update performance chart"));
-		m_profilerTracksMenu[1] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 1, _T("global collision update performance chart"));
-		m_profilerTracksMenu[2] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 2, _T("broad phase collision performance chart"));
-		m_profilerTracksMenu[3] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 3, _T("narrow phase collision performance chart"));
-		m_profilerTracksMenu[4] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 4, _T("global dynamics update performance chart"));
-		m_profilerTracksMenu[5] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 5, _T("dynamics setup performance chart"));
-		m_profilerTracksMenu[6] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 6, _T("dynamics solver performance chart"));
-		m_profilerTracksMenu[7] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 7, _T("force and torque callback performance chart"));
-		m_profilerTracksMenu[8] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 8, _T("pre-simulation listener"));
-		m_profilerTracksMenu[9] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 9, _T("post-simulation listener"));
+		m_profilerTracksMenu[0] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 0, _("show global physics update performance chart"));
+		m_profilerTracksMenu[1] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 1, _("global collision update performance chart"));
+		m_profilerTracksMenu[2] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 2, _("broad phase collision performance chart"));
+		m_profilerTracksMenu[3] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 3, _("narrow phase collision performance chart"));
+		m_profilerTracksMenu[4] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 4, _("global dynamics update performance chart"));
+		m_profilerTracksMenu[5] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 5, _("dynamics setup performance chart"));
+		m_profilerTracksMenu[6] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 6, _("dynamics solver performance chart"));
+		m_profilerTracksMenu[7] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 7, _("force and torque callback performance chart"));
+		m_profilerTracksMenu[8] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 8, _("pre-simulation listener"));
+		m_profilerTracksMenu[9] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 9, _("post-simulation listener"));
 //		if (mainFrame->m_physicProfilerState) {
 //			m_profilerTracksMenu[0]->setCheck(true);
 //		}
-		optionsMenu->AppendSubMenu (profilerSubMenu, _T("select sub profiler"));
+		optionsMenu->AppendSubMenu (profilerSubMenu, _("select sub profiler"));
 
 
 		optionsMenu->AppendSeparator();
-		optionsMenu->AppendCheckItem(ID_CONCURRENT_PHYSICS_UPDATE, _T("Concurrent physics update"));
+		optionsMenu->AppendCheckItem(ID_CONCURRENT_PHYSICS_UPDATE, _("Concurrent physics update"));
 
 		wxMenu* const microThreadedsSubMenu = new wxMenu;
 		for (int i = 0 ; i < int (sizeof (m_threadsTracks)/ sizeof (m_threadsTracks[0])); i ++) {
@@ -441,19 +441,19 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 			msg.Printf(wxT ("%d micro threads"), m_threadsTracks[i]);
 			microThreadedsSubMenu->AppendRadioItem(ID_SELECT_MICROTHREADS + i, msg);
 		}
-		optionsMenu->AppendSubMenu (microThreadedsSubMenu, _T("select microThread count"));
+		optionsMenu->AppendSubMenu (microThreadedsSubMenu, _("select microThread count"));
 
 
-		mainMenu->Append(optionsMenu, _T("&Options"));
+		mainMenu->Append(optionsMenu, _("&Options"));
 	}
 
 	// add help menu
 	{
 		wxMenu* const helpMenu = new wxMenu;;
 
-		helpMenu->Append(wxID_HELP, _T("About"));
+		helpMenu->Append(wxID_HELP, _("About"));
 //		helpMenu->Append(NewtonDemos::ID_ON_ABOUT, _T("About"));
-		mainMenu->Append(helpMenu, _T("&Help"));
+		mainMenu->Append(helpMenu, _("&Help"));
 	}
 
 	SetMenuBar(mainMenu);
@@ -641,7 +641,7 @@ void NewtonDemos::OnRunDemo(wxCommandEvent& event)
 {
 	BEGIN_MENU_OPTION();
 
-	wxMenu* const menu = m_mainMenu->GetMenu(m_mainMenu->FindMenu(_T ("Demos")));
+	wxMenu* const menu = m_mainMenu->GetMenu(m_mainMenu->FindMenu(_ ("Demos")));
 	if (!menu->IsChecked(event.GetId())) {
 		menu->Check (event.GetId(), true);
 	}
