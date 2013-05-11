@@ -4441,7 +4441,9 @@ void NewtonCollisionGetInfo(const NewtonCollision* const collision, NewtonCollis
 	dgCollisionInstance* const coll = (dgCollisionInstance*)collision;
 
 	dgAssert ( dgInt32 (sizeof (dgCollisionInfo)) <= dgInt32 (sizeof (NewtonCollisionInfoRecord)));
-	coll->GetCollisionInfo ((dgCollisionInfo*) collisionInfo);
+	dgCollisionInfo info;
+	coll->GetCollisionInfo (&info);
+	memcpy (collisionInfo, &info, sizeof (dgCollisionInfo));
 }
 
 

@@ -73,11 +73,10 @@ enum dgCollisionID
 
 	// these are for internal use only	
 	m_polygonCollision,
-
 };
 
 
-
+DG_MSC_VECTOR_ALIGMENT
 class dgCollisionInfo
 {
 	public:
@@ -205,9 +204,7 @@ class dgCollisionInfo
 		dgSceneData m_sceneCollision;
 		dgFloat32 m_paramArray[32];
 	};
-};
-
-
+}DG_GCC_VECTOR_ALIGMENT;
 
 
 
