@@ -16,7 +16,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		FFD2749F172E08F400114513 /* libdVisualDebuggerServer_d.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libdVisualDebuggerServer_d.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		FFD2749F172E08F400114513 /* libdVisualDebuggerServer.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libdVisualDebuggerServer.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		FFD274A7172E093000114513 /* DebuggerServer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DebuggerServer.cpp; path = ../../../dVisualDebuggerServer/DebuggerServer.cpp; sourceTree = "<group>"; };
 		FFD274A8172E093000114513 /* DebuggerServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DebuggerServer.h; path = ../../../dVisualDebuggerServer/DebuggerServer.h; sourceTree = "<group>"; };
 		FFD274A9172E093000114513 /* NewtonDebuggerServer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = NewtonDebuggerServer.cpp; path = ../../../dVisualDebuggerServer/NewtonDebuggerServer.cpp; sourceTree = "<group>"; };
@@ -47,7 +47,7 @@
 		FFD274A0172E08F400114513 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				FFD2749F172E08F400114513 /* libdVisualDebuggerServer_d.a */,
+				FFD2749F172E08F400114513 /* libdVisualDebuggerServer.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -95,7 +95,7 @@
 			);
 			name = dVisualDebuggerServer;
 			productName = dVisualDebuggerServer;
-			productReference = FFD2749F172E08F400114513 /* libdVisualDebuggerServer_d.a */;
+			productReference = FFD2749F172E08F400114513 /* libdVisualDebuggerServer.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -193,7 +193,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "compiler-default";
 				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				HEADER_SEARCH_PATHS = (
 					../../../../coreLibrary_300/source/newton,
 					../../../dMath,
@@ -201,10 +204,11 @@
 					../../../thirdParty/tinyxml,
 					"../../../thirdParty/enet-1.2/include",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)_d";
-				VALID_ARCHS = x86_64;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = "";
+				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Debug;
 		};
@@ -212,7 +216,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "compiler-default";
 				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_OPTIMIZATION_LEVEL = 3;
 				HEADER_SEARCH_PATHS = (
 					../../../../coreLibrary_300/source/newton,
@@ -221,10 +228,11 @@
 					../../../thirdParty/tinyxml,
 					"../../../thirdParty/enet-1.2/include",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				VALID_ARCHS = x86_64;
+				SDKROOT = "";
+				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Release;
 		};

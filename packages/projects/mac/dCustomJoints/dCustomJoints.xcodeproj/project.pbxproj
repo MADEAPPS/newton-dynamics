@@ -98,7 +98,7 @@
 		FF32E1FF172E13BF0052D273 /* CustomVehicleControllerManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomVehicleControllerManager.h; path = ../../../dCustomJoints/CustomVehicleControllerManager.h; sourceTree = "<group>"; };
 		FF32E200172E13BF0052D273 /* CustomWormGear.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomWormGear.cpp; path = ../../../dCustomJoints/CustomWormGear.cpp; sourceTree = "<group>"; };
 		FF32E201172E13BF0052D273 /* CustomWormGear.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomWormGear.h; path = ../../../dCustomJoints/CustomWormGear.h; sourceTree = "<group>"; };
-		FFD2A792172E123600114513 /* libdCustomJoints_d.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libdCustomJoints_d.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		FFD2A792172E123600114513 /* libdCustomJoints.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libdCustomJoints.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -123,7 +123,7 @@
 		FFD2A793172E123600114513 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				FFD2A792172E123600114513 /* libdCustomJoints_d.a */,
+				FFD2A792172E123600114513 /* libdCustomJoints.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -228,7 +228,7 @@
 			);
 			name = dCustomJoints;
 			productName = dCustomJoints;
-			productReference = FFD2A792172E123600114513 /* libdCustomJoints_d.a */;
+			productReference = FFD2A792172E123600114513 /* libdCustomJoints.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -345,8 +345,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "compiler-default";
 				CLANG_X86_VECTOR_INSTRUCTIONS = sse4.1;
 				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PREPROCESSOR_DEFINITIONS = _NEWTON_STATIC_LIB;
 				HEADER_SEARCH_PATHS = (
 					../../../../coreLibrary_300/source/newton,
@@ -355,10 +358,11 @@
 					../../../thirdParty/tinyxml,
 					"../../../thirdParty/enet-1.2/include",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)_d";
-				VALID_ARCHS = x86_64;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = "";
+				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Debug;
 		};
@@ -366,8 +370,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "compiler-default";
 				CLANG_X86_VECTOR_INSTRUCTIONS = sse4.1;
 				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PREPROCESSOR_DEFINITIONS = _NEWTON_STATIC_LIB;
 				HEADER_SEARCH_PATHS = (
@@ -377,10 +384,11 @@
 					../../../thirdParty/tinyxml,
 					"../../../thirdParty/enet-1.2/include",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				VALID_ARCHS = x86_64;
+				SDKROOT = "";
+				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Release;
 		};

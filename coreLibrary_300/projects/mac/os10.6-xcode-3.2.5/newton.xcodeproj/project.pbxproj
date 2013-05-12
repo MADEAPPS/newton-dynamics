@@ -189,7 +189,7 @@
 
 /* Begin PBXFileReference section */
 		32BAE0B70371A74B00C91783 /* newton_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = newton_Prefix.pch; sourceTree = "<group>"; };
-		D2AAC06F0554671400DB518D /* libnewton_d.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libnewton_d.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		D2AAC06F0554671400DB518D /* libnewton.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libnewton.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF80B6851596686E00E8D3B8 /* dgMeshEffect5.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dgMeshEffect5.cpp; path = ../../../source/meshUtil/dgMeshEffect5.cpp; sourceTree = SOURCE_ROOT; };
 		FFE8C0F616304AF8008A1215 /* dgBroadPhase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dgBroadPhase.cpp; path = ../../../source/physics/dgBroadPhase.cpp; sourceTree = SOURCE_ROOT; };
 		FFE8C0F716304AF8008A1215 /* dgBroadPhase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgBroadPhase.h; path = ../../../source/physics/dgBroadPhase.h; sourceTree = SOURCE_ROOT; };
@@ -384,7 +384,7 @@
 		034768DDFF38A45A11DB9C8B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				D2AAC06F0554671400DB518D /* libnewton_d.a */,
+				D2AAC06F0554671400DB518D /* libnewton.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -743,7 +743,7 @@
 			);
 			name = newton;
 			productName = newton;
-			productReference = D2AAC06F0554671400DB518D /* libnewton_d.a */;
+			productReference = D2AAC06F0554671400DB518D /* libnewton.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -897,12 +897,12 @@
 				);
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = /usr/local/lib;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = newton_d;
-				SDKROOT = macosx;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = "";
 				SKIP_INSTALL = NO;
-				VALID_ARCHS = x86_64;
+				VALID_ARCHS = "i386 x86_64";
 				ZERO_LINK = YES;
 			};
 			name = Debug;
@@ -928,12 +928,12 @@
 				GCC_UNROLL_LOOPS = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = /usr/local/lib;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = newton;
-				SDKROOT = macosx;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = "";
 				SKIP_INSTALL = NO;
-				VALID_ARCHS = x86_64;
+				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Release;
 		};

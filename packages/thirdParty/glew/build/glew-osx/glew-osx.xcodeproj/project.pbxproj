@@ -14,7 +14,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		FF0A4FEC173160E6005D6C12 /* libglew-osx_d.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = "libglew-osx_d.a"; path = libglew_d.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF0A4FEC173160E6005D6C12 /* libglew-osx.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libglew-osx.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF0A4FF41731614C005D6C12 /* glew.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = glew.h; path = ../../include/GL/glew.h; sourceTree = "<group>"; };
 		FF0A4FF51731614C005D6C12 /* glxew.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = glxew.h; path = ../../include/GL/glxew.h; sourceTree = "<group>"; };
 		FF0A4FF61731614C005D6C12 /* wglew.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = wglew.h; path = ../../include/GL/wglew.h; sourceTree = "<group>"; };
@@ -43,7 +43,7 @@
 		FF0A4FED173160E6005D6C12 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				FF0A4FEC173160E6005D6C12 /* libglew-osx_d.a */,
+				FF0A4FEC173160E6005D6C12 /* libglew-osx.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -89,7 +89,7 @@
 			);
 			name = "glew-osx";
 			productName = "glew-osx";
-			productReference = FF0A4FEC173160E6005D6C12 /* libglew-osx_d.a */;
+			productReference = FF0A4FEC173160E6005D6C12 /* libglew-osx.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -185,17 +185,21 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "compiler-default";
 				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					GLEW_STATIC,
 					"DEBUG=1",
 					"$(inherited)",
 				);
 				HEADER_SEARCH_PATHS = ../../include;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = glew_d;
-				VALID_ARCHS = x86_64;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = "";
+				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Debug;
 		};
@@ -203,14 +207,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "compiler-default";
 				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PREPROCESSOR_DEFINITIONS = GLEW_STATIC;
 				HEADER_SEARCH_PATHS = ../../include;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = glew;
-				VALID_ARCHS = x86_64;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = "";
+				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Release;
 		};

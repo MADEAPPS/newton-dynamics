@@ -17,7 +17,7 @@
 
 /* Begin PBXFileReference section */
 		32BAE0B70371A74B00C91783 /* tinyxml_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tinyxml_Prefix.pch; sourceTree = "<group>"; };
-		D2AAC06F0554671400DB518D /* libtinyxml_d.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libtinyxml_d.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		D2AAC06F0554671400DB518D /* libtinyxml.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libtinyxml.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF8C27B91313DA9C00646B90 /* tinystr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tinystr.cpp; path = ../../../thirdParty/tinyxml/tinystr.cpp; sourceTree = SOURCE_ROOT; };
 		FF8C27BA1313DA9C00646B90 /* tinystr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tinystr.h; path = ../../../thirdParty/tinyxml/tinystr.h; sourceTree = SOURCE_ROOT; };
 		FF8C27BB1313DA9C00646B90 /* tinyxml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tinyxml.cpp; path = ../../../thirdParty/tinyxml/tinyxml.cpp; sourceTree = SOURCE_ROOT; };
@@ -40,7 +40,7 @@
 		034768DDFF38A45A11DB9C8B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				D2AAC06F0554671400DB518D /* libtinyxml_d.a */,
+				D2AAC06F0554671400DB518D /* libtinyxml.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -97,7 +97,7 @@
 			);
 			name = tinyxml;
 			productName = tinyxml;
-			productReference = D2AAC06F0554671400DB518D /* libtinyxml_d.a */;
+			productReference = D2AAC06F0554671400DB518D /* libtinyxml.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -150,6 +150,7 @@
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -158,11 +159,11 @@
 				GCC_PREPROCESSOR_DEFINITIONS = _MACOSX_VER;
 				GCC_VERSION = "";
 				INSTALL_PATH = /usr/local/lib;
-				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = tinyxml_d;
-				SDKROOT = macosx;
-				VALID_ARCHS = x86_64;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = "";
+				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Debug;
 		};
@@ -173,17 +174,18 @@
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = tinyxml_Prefix.pch;
 				GCC_PREPROCESSOR_DEFINITIONS = _MACOSX_VER;
 				GCC_VERSION = "";
 				INSTALL_PATH = /usr/local/lib;
-				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = tinyxml;
-				SDKROOT = macosx;
-				VALID_ARCHS = x86_64;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = "";
+				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Release;
 		};

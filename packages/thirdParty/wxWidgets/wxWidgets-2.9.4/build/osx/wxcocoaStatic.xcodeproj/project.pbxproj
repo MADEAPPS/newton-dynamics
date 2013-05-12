@@ -893,7 +893,7 @@
 		1C4ABE16C5A13979827F4F7C /* UniConversion.cxx */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = UniConversion.cxx; path = ../../src/stc/scintilla/src/UniConversion.cxx; sourceTree = "<group>"; };
 		1C71BF55495034FFBE653C80 /* LexMSSQL.cxx */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = LexMSSQL.cxx; path = ../../src/stc/scintilla/src/LexMSSQL.cxx; sourceTree = "<group>"; };
 		1CE9B3DD54AD318FAA821732 /* richtextimagedlg.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = richtextimagedlg.cpp; path = ../../src/richtext/richtextimagedlg.cpp; sourceTree = "<group>"; };
-		1D025E39C79E3E119D19686C /* libwx_osx_cocoa_d.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = libwx_osx_cocoa_d.a; path = libwxWidgets_d.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		1D025E39C79E3E119D19686C /* libwxWidget.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libwxWidget.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		1D799486AD7F336BB1F33DDC /* menu.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = menu.mm; path = ../../src/osx/cocoa/menu.mm; sourceTree = "<group>"; };
 		1DAF0931E4AD3E6581D7FDBC /* jidctint.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = jidctint.c; path = ../../src/jpeg/jidctint.c; sourceTree = "<group>"; };
 		1E2FEBCEED2D33CFAAF75206 /* gbsizer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = gbsizer.cpp; path = ../../src/common/gbsizer.cpp; sourceTree = "<group>"; };
@@ -2402,7 +2402,7 @@
 		C2FC1A9BBB8C3046994369BF /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1D025E39C79E3E119D19686C /* libwx_osx_cocoa_d.a */,
+				1D025E39C79E3E119D19686C /* libwxWidget.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2970,7 +2970,7 @@
 			);
 			name = wxWidget;
 			productName = static;
-			productReference = 1D025E39C79E3E119D19686C /* libwx_osx_cocoa_d.a */;
+			productReference = 1D025E39C79E3E119D19686C /* libwxWidget.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -3843,15 +3843,24 @@
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CLANG_X86_VECTOR_INSTRUCTIONS = sse4.1;
 				COMBINE_HIDPI_IMAGES = YES;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_VERSION = "";
 				"GCC_VERSION[arch=ppc]" = "";
 				"HEADER_SEARCH_PATHS[arch=*]" = "\"$(WXROOT)/src/tiff/libtiff\"";
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				"MACOSX_DEPLOYMENT_TARGET[arch=x86_64]" = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = "";
+				"MACOSX_DEPLOYMENT_TARGET[arch=x86_64]" = "";
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = wxWidgets_d;
-				SDKROOT = macosx;
-				VALID_ARCHS = x86_64;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Carbon,
+					"-framework",
+					Cocoa,
+					"-framework",
+					OpenGL,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = "";
+				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Debug;
 		};
@@ -3872,6 +3881,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DYLIB_COMPATIBILITY_VERSION = 2.9;
 				DYLIB_CURRENT_VERSION = 2.9.4;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_PFE_FILE_C_DIALECTS = "c++ objective-c++";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -3892,8 +3902,8 @@
 				GCC_VERSION = "";
 				"GCC_VERSION[arch=ppc]" = "";
 				HEADER_SEARCH_PATHS = "\"$(WXROOT)/src/tiff/libtiff\"";
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				"MACOSX_DEPLOYMENT_TARGET[arch=x86_64]" = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = "";
+				"MACOSX_DEPLOYMENT_TARGET[arch=x86_64]" = "";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-Wall",
@@ -3906,10 +3916,18 @@
 					"$(OTHER_CFLAGS)",
 					"-fvisibility-inlines-hidden",
 				);
-				PRODUCT_NAME = wxWidgets;
-				SDKROOT = macosx;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Carbon,
+					"-framework",
+					Cocoa,
+					"-framework",
+					OpenGL,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = "";
 				USER_HEADER_SEARCH_PATHS = "\"$(WXROOT)/include\" \"$(WXROOT)/build/osx/setup/$(WXTOOLKIT)/include\" \"$(WXROOT)/src/jpeg\" \"$(WXROOT)/src/png\" \"$(WXROOT)/src/regex\" \"$(WXROOT)/src/expat/lib\" \"$(WXROOT)/src/tiff/libtiff\" \"$(WXROOT)/src/stc/scintilla/src\" \"$(WXROOT)/src/stc/scintilla/include\"";
-				VALID_ARCHS = x86_64;
+				VALID_ARCHS = "i386 x86_64";
 				WXPLATFORM = "__WXOSX_$(WXTOOLKITUPPER)__";
 				WXTOOLKIT = cocoa;
 				WXTOOLKITUPPER = COCOA;

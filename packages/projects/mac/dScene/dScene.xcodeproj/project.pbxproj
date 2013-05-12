@@ -72,7 +72,7 @@
 
 /* Begin PBXFileReference section */
 		32BAE0B70371A74B00C91783 /* dScene_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dScene_Prefix.pch; sourceTree = "<group>"; };
-		D2AAC06F0554671400DB518D /* libdScene_d.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libdScene_d.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		D2AAC06F0554671400DB518D /* libdScene.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libdScene.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF3B295517300B57007E6FEC /* dCollisionTreeNodeInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dCollisionTreeNodeInfo.cpp; path = ../../../dScene/dCollisionTreeNodeInfo.cpp; sourceTree = "<group>"; };
 		FF3B295617300B57007E6FEC /* dCollisionTreeNodeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dCollisionTreeNodeInfo.h; path = ../../../dScene/dCollisionTreeNodeInfo.h; sourceTree = "<group>"; };
 		FF3B295717300B57007E6FEC /* dSceneCacheInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dSceneCacheInfo.cpp; path = ../../../dScene/dSceneCacheInfo.cpp; sourceTree = "<group>"; };
@@ -150,7 +150,7 @@
 		034768DDFF38A45A11DB9C8B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				D2AAC06F0554671400DB518D /* libdScene_d.a */,
+				D2AAC06F0554671400DB518D /* libdScene.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -291,7 +291,7 @@
 			);
 			name = dScene;
 			productName = dScene;
-			productReference = D2AAC06F0554671400DB518D /* libdScene_d.a */;
+			productReference = D2AAC06F0554671400DB518D /* libdScene.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -370,6 +370,7 @@
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -384,11 +385,11 @@
 					"../../../thirdParty/enet-1.2/include",
 				);
 				INSTALL_PATH = /usr/local/lib;
-				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = dScene_d;
-				SDKROOT = macosx;
-				VALID_ARCHS = x86_64;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = "";
+				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Debug;
 		};
@@ -399,6 +400,7 @@
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -412,11 +414,11 @@
 					"../../../thirdParty/enet-1.2/include",
 				);
 				INSTALL_PATH = /usr/local/lib;
-				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = dScene;
-				SDKROOT = macosx;
-				VALID_ARCHS = x86_64;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = "";
+				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Release;
 		};

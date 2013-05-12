@@ -22,6 +22,15 @@
 #include "wx/buffer.h"
 #include "wx/unichar.h"
 
+#include <ciso646>  // detect std::lib
+    #ifdef _LIBCPP_VERSION
+    // using libc++
+    #define HAVE_TYPE_TRAITS
+#else
+    // using libstdc++
+    #define HAVE_TR1_TYPE_TRAITS
+#endif
+
 #if defined(HAVE_TYPE_TRAITS)
     #include <type_traits>
 #elif defined(HAVE_TR1_TYPE_TRAITS)

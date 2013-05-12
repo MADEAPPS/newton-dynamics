@@ -31,7 +31,7 @@
 
 /* Begin PBXFileReference section */
 		32BAE0B70371A74B00C91783 /* dContainers_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dContainers_Prefix.pch; sourceTree = "<group>"; };
-		D2AAC06F0554671400DB518D /* libdContainers_d.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libdContainers_d.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		D2AAC06F0554671400DB518D /* libdContainers.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libdContainers.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF8C26691313D31E00646B90 /* dBaseHierarchy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dBaseHierarchy.cpp; path = ../../../dContainers/dBaseHierarchy.cpp; sourceTree = SOURCE_ROOT; };
 		FF8C266A1313D31E00646B90 /* dBaseHierarchy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dBaseHierarchy.h; path = ../../../dContainers/dBaseHierarchy.h; sourceTree = SOURCE_ROOT; };
 		FF8C266B1313D31E00646B90 /* dClassInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dClassInfo.cpp; path = ../../../dContainers/dClassInfo.cpp; sourceTree = SOURCE_ROOT; };
@@ -68,7 +68,7 @@
 		034768DDFF38A45A11DB9C8B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				D2AAC06F0554671400DB518D /* libdContainers_d.a */,
+				D2AAC06F0554671400DB518D /* libdContainers.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -149,7 +149,7 @@
 			);
 			name = dContainers;
 			productName = dContainers;
-			productReference = D2AAC06F0554671400DB518D /* libdContainers_d.a */;
+			productReference = D2AAC06F0554671400DB518D /* libdContainers.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -206,6 +206,7 @@
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -220,11 +221,11 @@
 					"../../../thirdParty/enet-1.2/include",
 				);
 				INSTALL_PATH = /usr/local/lib;
-				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = dContainers_d;
-				SDKROOT = macosx;
-				VALID_ARCHS = x86_64;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = "";
+				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Debug;
 		};
@@ -235,6 +236,7 @@
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -248,11 +250,11 @@
 					"../../../thirdParty/enet-1.2/include",
 				);
 				INSTALL_PATH = /usr/local/lib;
-				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = dContainers;
-				SDKROOT = macosx;
-				VALID_ARCHS = x86_64;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = "";
+				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Release;
 		};
