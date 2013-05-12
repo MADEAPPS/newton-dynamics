@@ -36,7 +36,6 @@ typedef long long unsigned64;
 
 
 #include <stddef.h>
-#include <stdlib.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <math.h>
@@ -75,6 +74,7 @@ typedef long long unsigned64;
 #endif
 	
 #ifdef _POSIX_VER
+	#include <stdlib.h>
 	#include <unistd.h>
 	#include <time.h>
 	#include <GL/glxew.h>
