@@ -79,7 +79,7 @@ void DemoCamera::SetViewMatrix(int width, int height)
 			  m_matrix.m_up.m_x, m_matrix.m_up.m_y, m_matrix.m_up.m_z);	
 
 
-	glGetIntegerv(GL_VIEWPORT, m_viewport); 
+	glGetIntegerv(GL_VIEWPORT, (GLint*)&m_viewport); 
 	glGetDoublev(GL_MODELVIEW_MATRIX, m_modelViewMatrix); 
 	glGetDoublev(GL_PROJECTION_MATRIX, m_projectionViewMatrix); 
 }
@@ -98,7 +98,7 @@ dVector DemoCamera::ScreenToWorld (const dVector& screenPoint) const
 	GLdouble objx;
 	GLdouble objy;
 	GLdouble objz;
-	gluUnProject (winX, winY, winZ, m_modelViewMatrix, m_projectionViewMatrix, m_viewport, &objx, &objy, &objz);
+	gluUnProject (winX, winY, winZ, m_modelViewMatrix, m_projectionViewMatrix, (GLint*)&m_viewport, &objx, &objy, &objz);
 
 	return dVector (dFloat(objx), dFloat(objy), dFloat(objz));
 }
