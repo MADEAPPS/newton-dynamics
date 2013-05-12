@@ -324,10 +324,12 @@ class dgCollisionDeformableMesh::dgDeformableNode
 		m_minBox.m_x = dgFloor (p0.m_x) * DG_DEFORMABLE_INV_PADDING; 
 		m_minBox.m_y = dgFloor (p0.m_y) * DG_DEFORMABLE_INV_PADDING;  
 		m_minBox.m_z = dgFloor (p0.m_z) * DG_DEFORMABLE_INV_PADDING;  
+		m_minBox.m_w = dgFloat32 (0.0f);
 
 		m_maxBox.m_x = dgFloor (p1.m_x + dgFloat32 (1.0f)) * DG_DEFORMABLE_INV_PADDING;  
 		m_maxBox.m_y = dgFloor (p1.m_y + dgFloat32 (1.0f)) * DG_DEFORMABLE_INV_PADDING;  
 		m_maxBox.m_z = dgFloor (p1.m_z + dgFloat32 (1.0f)) * DG_DEFORMABLE_INV_PADDING;  
+		m_maxBox.m_w = dgFloat32 (0.0f);
 
 		dgVector side0 (m_maxBox - m_minBox);
 		dgVector side1 (side0.m_y, side0.m_z, side0.m_x, dgFloat32 (0.0f));
