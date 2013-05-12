@@ -603,16 +603,12 @@ dgKinematicBody* dgWorld::CreateKinematicBody (dgCollisionInstance* const collis
 
 dgBody* dgWorld::CreateDeformableBody(dgCollisionInstance* const collision, const dgMatrix& matrix)
 {
-	dgAssert (0);
-	return NULL;
-/*
 	dgBody* const body = new (m_allocator) dgDeformableBody();
 	dgAssert (dgInt32 (sizeof (dgBody) & 0xf) == 0);
 	dgAssert ((dgUnsigned64 (body) & 0xf) == 0);
 
 	InitBody (body, collision, matrix);
 	return body;
-*/
 }
 
 

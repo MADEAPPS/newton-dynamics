@@ -580,11 +580,27 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\source\physics\dgCollisionDeformableClothPatch.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\source\physics\dgCollisionDeformableClothPatch.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\source\physics\dgCollisionDeformableMesh.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\source\physics\dgCollisionDeformableMesh.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\source\physics\dgCollisionDeformableSolidMesh.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\source\physics\dgCollisionDeformableSolidMesh.h"
 				>
 			</File>
 			<File

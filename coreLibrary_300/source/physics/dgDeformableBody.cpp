@@ -21,23 +21,26 @@
 
 #include "dgPhysicsStdafx.h"
 
-#if 0
+
 #include "dgWorld.h"
 #include "dgDeformableBody.h"
 #include "dgCollisionInstance.h"
 #include "dgCollisionDeformableMesh.h"
 
+dgVector dgDeformableBody::m_dummy (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 
 dgDeformableBody::dgDeformableBody()
 	:dgBody()
 {
 	m_type = m_deformableBody;
 	m_rtti |= m_deformableBodyRTTI;
-	m_isDeformable = true;
+//	m_isDeformable = true;
 }
 
-dgDeformableBody::dgDeformableBody(dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionCashe, OnBodyDeserialize bodyCallback, dgDeserialize serializeCallback, void* const userData)
-	:dgBody(world, collisionCashe, bodyCallback, serializeCallback, userData)
+//dgDeformableBody::dgDeformableBody(dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionCashe, OnBodyDeserialize bodyCallback, dgDeserialize serializeCallback, void* const userData)
+//	:dgBody(world, collisionCashe, bodyCallback, serializeCallback, userData)
+dgDeformableBody::dgDeformableBody(dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionNode, dgDeserialize serializeCallback, void* const userData)
+	:dgBody (world, collisionNode, serializeCallback, userData)
 {
 	m_type = m_deformableBody;
 	m_rtti |= m_deformableBodyRTTI;
@@ -49,23 +52,25 @@ dgDeformableBody::~dgDeformableBody()
 }
 
 
-void dgDeformableBody::Serialize (const dgTree<dgInt32, const dgCollision*>* const collisionCashe, OnBodySerialize bodyCallback, dgSerialize serializeCallback, void* const userData)
+//void dgDeformableBody::Serialize (const dgTree<dgInt32, const dgCollision*>* const collisionCashe, OnBodySerialize bodyCallback, dgSerialize serializeCallback, void* const userData)
+void dgDeformableBody::Serialize (const dgTree<dgInt32, const dgCollision*>* const collisionCashe, dgSerialize serializeCallback, void* const userData)
 {
-	dgBody::Serialize (collisionCashe, bodyCallback, serializeCallback, userData);
+//	dgBody::Serialize (collisionCashe, bodyCallback, serializeCallback, userData);
+	dgBody::Serialize (collisionCashe, serializeCallback, userData);
 	dgAssert (0);
 }
 
 void dgDeformableBody::SetMassMatrix (dgFloat32 mass, dgFloat32 Ix, dgFloat32 Iy, dgFloat32 Iz)
 {
-	dgBody::SetMassMatrix (mass, Ix, Iy, Iz);
 	dgAssert (m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI));
-
-	dgCollisionDeformableMesh* const deformableCollision = (dgCollisionDeformableMesh*) m_collision;
-	deformableCollision->SetParticlesMasses (mass);
+//	dgCollisionDeformableMesh* const deformableCollision = (dgCollisionDeformableMesh*) m_collision;
+//	deformableCollision->SetParticlesMasses (mass);
 }
 
 void dgDeformableBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex)
 {
+	dgAssert(0);
+/*
 	m_dynamicsLru =  m_world->m_dynamicsLru + DG_BODY_LRU_STEP;
 
 	if (m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
@@ -75,15 +80,19 @@ void dgDeformableBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadInd
 		dgCollisionDeformableMesh* const deformableCollision = (dgCollisionDeformableMesh*) m_collision;
 		deformableCollision->ApplyExternalAndInternalForces (this, timestep, threadIndex);
 	}
+*/
 }
 
 void dgDeformableBody::SetVelocity (const dgVector& velocity)
 {
+	dgAssert(0);
+/*
 	dgBody::SetVelocity(velocity);
 	dgAssert (m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI));
 
 	dgCollisionDeformableMesh* const deformableCollision = (dgCollisionDeformableMesh*) m_collision;
 	deformableCollision->SetParticlesVelocities (velocity);
+*/
 }
 
 
@@ -95,6 +104,8 @@ bool dgDeformableBody::IsInEquilibrium  () const
 
 void dgDeformableBody::SetMatrix(const dgMatrix& matrix)
 {
+	dgAssert(0);
+/*
 	if (m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
 		dgCollisionDeformableMesh* const deformableCollision = (dgCollisionDeformableMesh*) m_collision;
 		dgMatrix indentityRotation (matrix);
@@ -102,8 +113,7 @@ void dgDeformableBody::SetMatrix(const dgMatrix& matrix)
 
 		deformableCollision->SetMatrix(matrix);
 		dgBody::SetMatrix(indentityRotation);
-		
 	}
+*/
 }
 
-#endif

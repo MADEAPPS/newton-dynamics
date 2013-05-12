@@ -58,9 +58,6 @@ class dgKinematicBody: public dgBody
 	virtual void SetMassMatrix (dgFloat32 mass, dgFloat32 Ix, dgFloat32 Iy, dgFloat32 Iz) {}
 	virtual void SetMassProperties (dgFloat32 mass, const dgCollisionInstance* const collision) {}
 
-
-//	virtual void UpdatePredictinVelocity(dgFloat32 timestep) {};
-//	virtual void GetPredictingVelocity (dgVector& veloc, dgVector& omega) const {veloc = GetVelocity(); omega = GetOmega();}
 	virtual dgVector PredictLinearVelocity(dgFloat32 timestep) const {return m_veloc;}
 	virtual dgVector PredictAngularVelocity(dgFloat32 timestep) const {return m_omega;}
 
@@ -73,7 +70,6 @@ class dgKinematicBody: public dgBody
 	virtual void Serialize (const dgTree<dgInt32, const dgCollision*>* const collisionNode, dgSerialize serializeCallback, void* const userData);
 
 /*
-	
 	virtual dgConstraint* GetFirstJoint() const;
 	virtual dgConstraint* GetNextJoint(dgConstraint* const joint) const;
 	virtual dgConstraint* GetFirstContact() const;

@@ -280,7 +280,10 @@ class dgWorld:
 	dgCollisionInstance* CreateChamferCylinder (dgFloat32 radius, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix = dgGetIdentityMatrix());
 	dgCollisionInstance* CreateCollisionCompound ();
 
+	dgCollisionInstance* CreateClothPatchMesh (dgMeshEffect* const mesh, dgInt32 shapeID);
 	dgCollisionInstance* CreateDeformableMesh (dgMeshEffect* const mesh, dgInt32 shapeID);
+
+
 //	dgCollision* CreateCollisionCompoundBreakable (dgInt32 count, const dgMeshEffect* const solidArray[], const dgInt32* const idArray,  const dgFloat32* const densities, const dgInt32* const internalFaceMaterial, dgInt32 debriID, dgFloat32 gap);
 
 

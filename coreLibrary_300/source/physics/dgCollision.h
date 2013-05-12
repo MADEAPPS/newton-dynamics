@@ -66,7 +66,8 @@ enum dgCollisionID
 	m_compoundCollision,
 	m_boundingBoxHierachy,
 	m_heightField,
-	m_deformableMesh,
+	m_deformableClothPatch,
+	m_deformableSolidMesh,
 	m_userMesh,
 	m_sceneCollision,
 	m_compoundBreakable,
@@ -231,10 +232,12 @@ class dgCollision
 		dgCollisionBVH_RTTI							= 1<<13,
 		dgCollisionMesh_RTTI						= 1<<14,
 		dgCollisionDeformableMesh_RTTI				= 1<<15,
-		dgCollisionUserMesh_RTTI					= 1<<16,
-		dgCollisionHeightField_RTTI					= 1<<17,
-		dgCollisionScene_RTTI						= 1<<18,
-		dgCollisionCompoundBreakable_RTTI			= 1<<19,
+		dgCollisionDeformableSolidMesh_RTTI			= 1<<16,
+		dgCollisionDeformableClothPatch_RTTI		= 1<<17,
+		dgCollisionUserMesh_RTTI					= 1<<18,
+		dgCollisionHeightField_RTTI					= 1<<19,
+		dgCollisionScene_RTTI						= 1<<20,
+		dgCollisionCompoundBreakable_RTTI			= 1<<21,
 	};													 
 	
 	DG_CLASS_ALLOCATOR(allocator)

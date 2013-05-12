@@ -8585,6 +8585,13 @@ void NewtonMeshCalculateFaceNormal (const NewtonMesh* const mesh, const void* co
 	normal[2] = n.m_z;
 }
 
+NewtonCollision* NewtonCreateClothPatch (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *)newtonWorld;
+	return (NewtonCollision*) world->CreateClothPatchMesh((dgMeshEffect*)mesh, shapeID);
+}
+
 NewtonCollision* NewtonCreateDeformableMesh (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID)
 {
 	TRACE_FUNCTION(__FUNCTION__);
@@ -8615,14 +8622,11 @@ NewtonBody* NewtonCreateDeformableBody (const NewtonWorld* const newtonWorld, co
 void NewtonDeformableMeshSetSkinThickness (NewtonCollision* const deformableMesh, dFloat skinThickness)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	dgAssert (0);
-/*
 	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
 	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
-		dgCollisionDeformableMesh* const deformable = (dgCollisionDeformableMesh*) collision;
-		deformable->SetSkinThickness(skinThickness);
+		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*) collision->GetChildShape();
+		deformableShape->SetSkinThickness(skinThickness);
 	}
-*/
 }
 
 void NewtonDeformableMeshSetPlasticity (NewtonCollision* const deformableMesh, dFloat plasticity)
@@ -8656,28 +8660,22 @@ void NewtonDeformableMeshSetStiffness (NewtonCollision* const deformableMesh, dF
 int NewtonDeformableMeshGetVertexCount (const NewtonCollision* const deformableMesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	dgAssert (0);
-	/*
 	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
 	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
-		dgCollisionDeformableMesh* const deformable = (dgCollisionDeformableMesh*) collision;
-		return deformable->GetVisualPointsCount();
+		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*) collision->GetChildShape();
+		return deformableShape->GetVisualPointsCount();
 	}
-*/
 	return 0;
 }
 
 void NewtonDeformableMeshUpdateRenderNormals (const NewtonCollision* const deformableMesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	dgAssert (0);
-/*
 	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
 	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
-		dgCollisionDeformableMesh* const deformable = (dgCollisionDeformableMesh*) collision;
-		deformable->UpdateVisualNormals();
+		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*) collision->GetChildShape();
+		deformableShape->UpdateVisualNormals();
 	}
-*/
 }
 
 void NewtonDeformableMeshGetVertexStreams (
@@ -8688,15 +8686,11 @@ void NewtonDeformableMeshGetVertexStreams (
 	int uvStrideInByte1, dFloat* const uv1)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	dgAssert (0);
-	/*
 	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
 	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
-		dgCollisionDeformableMesh* const deformable = (dgCollisionDeformableMesh*) collision;
-		deformable->GetVisualVertexData(vertexStrideInByte, vertex, normalStrideInByte, normal, 
-		uvStrideInByte0, uv0,uvStrideInByte1, uv1);
+		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*) collision->GetChildShape();
+		deformableShape->GetVisualVertexData(vertexStrideInByte, vertex, normalStrideInByte, normal, uvStrideInByte0, uv0,uvStrideInByte1, uv1);
 	}
-*/
 }
 
 
@@ -8704,73 +8698,55 @@ void NewtonDeformableMeshGetVertexStreams (
 NewtonDeformableMeshSegment* NewtonDeformableMeshGetFirstSegment (const NewtonCollision* const deformableMesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	dgAssert (0);
-	/*
-
 	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
 	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
-		dgCollisionDeformableMesh* const deformable = (dgCollisionDeformableMesh*) collision;
-		return (NewtonDeformableMeshSegment*) deformable->GetFirtVisualSegment();
+		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*) collision->GetChildShape();
+		return (NewtonDeformableMeshSegment*) deformableShape->GetFirtVisualSegment();
 	}
-*/
 	return NULL;
 }
-
-
 
 NewtonDeformableMeshSegment* NewtonDeformableMeshGetNextSegment (const NewtonCollision* const deformableMesh, const NewtonDeformableMeshSegment* const segment)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	dgAssert (0);
-	/*
 	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
 	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
-		dgCollisionDeformableMesh* const deformable = (dgCollisionDeformableMesh*) collision;
-		return (NewtonDeformableMeshSegment*) deformable->GetNextVisualSegment((void*)segment);
+		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*) collision->GetChildShape();
+		return (NewtonDeformableMeshSegment*) deformableShape->GetNextVisualSegment((void*)segment);
 	}
-*/
 	return NULL;
 }
 
 int NewtonDeformableMeshSegmentGetMaterialID (const NewtonCollision* const deformableMesh, const NewtonDeformableMeshSegment* const segment)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	dgAssert (0);
-	/*
 	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
 	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
-		dgCollisionDeformableMesh* const deformable = (dgCollisionDeformableMesh*) collision;
-		return deformable->GetSegmentMaterial((void*)segment);
+		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*) collision->GetChildShape();
+		return deformableShape->GetSegmentMaterial((void*)segment);
 	}
-*/
 	return 0;
 }
 
 int NewtonDeformableMeshSegmentGetIndexCount (const NewtonCollision* const deformableMesh, const NewtonDeformableMeshSegment* const segment)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	dgAssert (0);
-	/*
 	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
 	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
-		dgCollisionDeformableMesh* const deformable = (dgCollisionDeformableMesh*) collision;
-		return deformable->GetSegmentIndexCount((void*)segment);
+		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*) collision->GetChildShape();
+		return deformableShape->GetSegmentIndexCount((void*)segment);
 	}
-*/
 	return 0;
 }
 
-short* NewtonDeformableMeshSegmentGetIndexList (const NewtonCollision* const deformableMesh, const NewtonDeformableMeshSegment* const segment)
+const short* NewtonDeformableMeshSegmentGetIndexList (const NewtonCollision* const deformableMesh, const NewtonDeformableMeshSegment* const segment)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	dgAssert (0);
-	/*
 	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
 	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
-		dgCollisionDeformableMesh* const deformable = (dgCollisionDeformableMesh*) collision;
-		return deformable->GetSegmentIndexList((void*)segment);
+		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*) collision->GetChildShape();
+		return deformableShape->GetSegmentIndexList((void*)segment);
 	}
-*/
 	return 0;
 }
 

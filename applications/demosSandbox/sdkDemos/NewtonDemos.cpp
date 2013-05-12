@@ -50,10 +50,11 @@
 //#define DEFAULT_SCENE	24			// continue collision
 //#define DEFAULT_SCENE	25			// puck slide continue collision
 //#define DEFAULT_SCENE	26			// basic car
-#define DEFAULT_SCENE	27			// player controller
+//#define DEFAULT_SCENE	27			// player controller
 //#define DEFAULT_SCENE	28			// advanced player controller
-//#define DEFAULT_SCENE	29			// high performance super car
+#define DEFAULT_SCENE	29			// cloth patch			
 //#define DEFAULT_SCENE	30			// soft bodies			
+//#define DEFAULT_SCENE	31			// high performance super car
 
 
 
@@ -65,6 +66,7 @@ void ClosestDistance (DemoEntityManager* const scene);
 void ConvexCast (DemoEntityManager* const scene);
 void PrimitiveCollision (DemoEntityManager* const scene);
 void KinematicBodies (DemoEntityManager* const scene);
+void ClothPath(DemoEntityManager* const scene);
 void SoftBodies (DemoEntityManager* const scene);
 void BasicBoxStacks (DemoEntityManager* const scene);
 void SimpleMeshLevelCollision (DemoEntityManager* const scene);
@@ -125,7 +127,8 @@ NewtonDemos::SDKDemos NewtonDemos::m_demosSelection[] =
 	{"Basic player controller", "demonstrate simple player controller", BasicPlayerController},
 	{"Advanced player controller", "demonstrate player interacting with other objects", AdvancedPlayerController},
 //	{"High performance super car", "implement a high performance ray cast car", SuperCar},
-	{"Simple soft Body", "show simple stack of Boxes", SoftBodies},
+	{"Simple cloth Path", "show simple cloth path", ClothPath},
+	{"Simple soft Body", "show simple soft body", SoftBodies},
 
 
 //	{"basic convex hull stacking", "demonstrate convex hull stacking", BasicConvexStacks},

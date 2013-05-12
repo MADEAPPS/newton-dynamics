@@ -79,7 +79,7 @@ class dgBody
 	virtual ~dgBody();
 
 	dgType GetType () const;
-	dgInt32 IsRTTIType (dgRTTI rtti) const;
+	dgInt32 IsRTTIType (dgUnsigned32 rtti) const;
 
 	void* GetUserData() const;
 	void SetUserData (void* const userData);
@@ -289,7 +289,7 @@ DG_INLINE dgBody::dgType dgBody::GetType () const
 	return dgType (m_type);
 }
 
-DG_INLINE dgInt32 dgBody::IsRTTIType (dgRTTI rtti) const
+DG_INLINE dgInt32 dgBody::IsRTTIType (dgUnsigned32 rtti) const
 {
 	return rtti & m_rtti;
 }

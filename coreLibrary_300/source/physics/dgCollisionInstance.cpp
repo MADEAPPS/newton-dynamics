@@ -38,6 +38,8 @@
 #include "dgCollisionTaperedCapsule.h"
 #include "dgCollisionTaperedCylinder.h"
 #include "dgCollisionChamferCylinder.h"
+#include "dgCollisionDeformableSolidMesh.h"
+#include "dgCollisionDeformableClothPatch.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -109,10 +111,13 @@ dgCollisionInstance::dgCollisionInstance(const dgCollisionInstance& instance)
 			dgCollisionCompound *const compound = (dgCollisionCompound*) m_childShape;
 			m_childShape = new (m_world->GetAllocator()) dgCollisionCompound (*compound);
 		}
-	} else if (m_childShape->IsType (dgCollision::dgCollisionDeformableMesh_RTTI)) {
+	} else if (m_childShape->IsType (dgCollision::dgCollisionDeformableClothPatch_RTTI)) {
+		dgCollisionDeformableClothPatch* const deformable = (dgCollisionDeformableClothPatch*) m_childShape;
+		m_childShape = new (m_world->GetAllocator()) dgCollisionDeformableClothPatch (*deformable);
+	} else if (m_childShape->IsType (dgCollision::dgCollisionDeformableSolidMesh_RTTI)) {
 		dgAssert (0);
-		//dgCollisionDeformableMesh* const deformable = (dgCollisionDeformableMesh*) collision;
-		//collision = new (m_world->GetAllocator()) dgCollisionDeformableMesh (*deformable);
+		//dgCollisionDeformableSolidMesh* const deformable = (dgCollisionDeformableSolidMesh*) m_childShape;
+		//m_childShape = new (m_world->GetAllocator()) dgCollisionDeformableSolidMesh (*deformable);
 	} else {
 		m_childShape->AddRef();
 	}

@@ -99,10 +99,11 @@ extern "C" {
 	#define SERIALIZE_ID_COMPOUND							10
 	#define SERIALIZE_ID_TREE								11
 	#define SERIALIZE_ID_HEIGHTFIELD						12
-	#define SERIALIZE_ID_DEFORMABLEMESH						13
-	#define SERIALIZE_ID_USERMESH							14
-	#define SERIALIZE_ID_SCENE								15
-	#define SERIALIZE_ID_COMPOUND_BREAKABLE					16
+	#define SERIALIZE_ID_CLOTH_PATCH						13
+	#define SERIALIZE_ID_DEFORMABLE_SOLID					14
+	#define SERIALIZE_ID_USERMESH							15
+	#define SERIALIZE_ID_SCENE								16
+	#define SERIALIZE_ID_COMPOUND_BREAKABLE					17
 
 	typedef struct NewtonMesh{} NewtonMesh;
 	typedef struct NewtonBody{} NewtonBody;
@@ -813,6 +814,8 @@ extern "C" {
 	// **********************************************************************************************
 	NEWTON_API NewtonBody* NewtonCreateDynamicBody (const NewtonWorld* const newtonWorld, const NewtonCollision* const collision, const dFloat* const matrix);
 	NEWTON_API NewtonBody* NewtonCreateKinematicBody (const NewtonWorld* const newtonWorld, const NewtonCollision* const collision, const dFloat* const matrix);
+	NEWTON_API NewtonBody* NewtonCreateDeformableBody (const NewtonWorld* const newtonWorld, const NewtonCollision* const deformableMesh, const dFloat* const matrix);
+
 	NEWTON_API void  NewtonDestroyBody(const NewtonWorld* const newtonWorld, const NewtonBody* const body);
 
 	NEWTON_API int NewtonBodyGetType (const NewtonBody* const body);
@@ -967,14 +970,12 @@ extern "C" {
 	// particle system interface (soft bodies, individual, pressure bodies and cloth)   
 	//
 	// **********************************************************************************************
+	NEWTON_API NewtonCollision* NewtonCreateClothPatch (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID);
 	NEWTON_API NewtonCollision* NewtonCreateDeformableMesh (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID);
 	
-	NEWTON_API void NewtonDeformableMeshSetPlasticity (NewtonCollision* const deformableMesh, dFloat plasticity);
-	NEWTON_API void NewtonDeformableMeshSetStiffness (NewtonCollision* const deformableMesh, dFloat stiffness);
+//	NEWTON_API void NewtonDeformableMeshSetPlasticity (NewtonCollision* const deformableMesh, dFloat plasticity);
+//	NEWTON_API void NewtonDeformableMeshSetStiffness (NewtonCollision* const deformableMesh, dFloat stiffness);
 	NEWTON_API void NewtonDeformableMeshSetSkinThickness (NewtonCollision* const deformableMesh, dFloat skinThickness);
-
-	NEWTON_API NewtonBody* NewtonCreateDeformableBody (const NewtonWorld* const newtonWorld, const NewtonCollision* const deformableMesh, const dFloat* const matrix);
-	
 
 	NEWTON_API void NewtonDeformableMeshUpdateRenderNormals (const NewtonCollision* const deformableMesh); 
 	NEWTON_API int NewtonDeformableMeshGetVertexCount (const NewtonCollision* const deformableMesh); 
@@ -988,7 +989,7 @@ extern "C" {
 
 	NEWTON_API int NewtonDeformableMeshSegmentGetMaterialID (const NewtonCollision* const deformableMesh, const NewtonDeformableMeshSegment* const segment);
 	NEWTON_API int NewtonDeformableMeshSegmentGetIndexCount (const NewtonCollision* const deformableMesh, const NewtonDeformableMeshSegment* const segment);
-	NEWTON_API short* NewtonDeformableMeshSegmentGetIndexList (const NewtonCollision* const deformableMesh, const NewtonDeformableMeshSegment* const segment);
+	NEWTON_API const short* NewtonDeformableMeshSegmentGetIndexList (const NewtonCollision* const deformableMesh, const NewtonDeformableMeshSegment* const segment);
 
 
 
