@@ -57,7 +57,7 @@ class DemoCamera: public DemoEntity
 	
 	bool m_navigationMode;
 
-	GLint m_viewport[4]; 
+	int m_viewport[4]; 
 	GLdouble m_modelViewMatrix[16];
 	GLdouble m_projectionViewMatrix[16];
 	friend class DemoEntity;

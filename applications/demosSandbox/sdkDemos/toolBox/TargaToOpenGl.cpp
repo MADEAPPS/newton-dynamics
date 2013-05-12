@@ -80,15 +80,12 @@ public:
 
 	const char* FindById (GLuint id) const
 	{
-		dAssert (0);
-/*
 		Iterator iter (*this);
 		for (iter.Begin(); iter; iter ++) {
 			if (iter.GetNode()->GetInfo().m_textureID == id) {
-				return iter.GetNode()->GetInfo().m_textureName;
+				return iter.GetNode()->GetInfo().m_textureName.GetStr();
 			}
 		}
-*/
 		return NULL;
 	}
 

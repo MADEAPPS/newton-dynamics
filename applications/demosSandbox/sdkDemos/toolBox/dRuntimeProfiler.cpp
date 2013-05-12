@@ -102,14 +102,14 @@ void dRuntimeProfiler::Render (int mask)
 {
 	struct GLViewPort
 	{
-		GLint x;
-		GLint y;
-		GLsizei width;
-		GLsizei height;
+		int x;
+		int y;
+		int width;
+		int height;
 	} viewport;
 
 	//Retrieves the viewport and stores it in the variable
-	glGetIntegerv(GL_VIEWPORT, &viewport.x); 
+	glGetIntegerv(GL_VIEWPORT, (GLint*) &viewport.x); 
 
 	m_width = viewport.width;
 	m_height = viewport.height;
@@ -279,14 +279,14 @@ void dRuntimeProfiler::RenderThreadPerformance ()
 	if (threadCount > 0) {
 		struct GLViewPort
 		{
-			GLint x;
-			GLint y;
-			GLsizei width;
-			GLsizei height;
+			int x;
+			int y;
+			int width;
+			int height;
 		} viewport;
 
 		//Retrieves the viewport and stores it in the variable
-		glGetIntegerv(GL_VIEWPORT, &viewport.x); 
+		glGetIntegerv(GL_VIEWPORT, (GLint*) &viewport.x); 
 
 
 		glColor3f(1.0, 1.0, 1.0);
@@ -401,14 +401,14 @@ void dRuntimeProfiler::RenderConcurrentPerformance ()
 {
 	struct GLViewPort
 	{
-		GLint x;
-		GLint y;
-		GLsizei width;
-		GLsizei height;
+		int x;
+		int y;
+		int width;
+		int height;
 	} viewport;
-
 	//Retrieves the viewport and stores it in the variable
-	glGetIntegerv(GL_VIEWPORT, &viewport.x); 
+	glGetIntegerv(GL_VIEWPORT, (GLint*) &viewport.x); 
+
 	m_width = viewport.width;
 	m_height = viewport.height;
 
