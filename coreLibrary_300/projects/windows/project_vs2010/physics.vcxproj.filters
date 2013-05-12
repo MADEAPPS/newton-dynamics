@@ -160,6 +160,12 @@
     <ClCompile Include="..\..\..\source\physics\dgBroadPhase.cpp">
       <Filter>systems</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\source\physics\dgCollisionDeformableClothPatch.cpp">
+      <Filter>collision</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\physics\dgCollisionDeformableSolidMesh.cpp">
+      <Filter>collision</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\source\physics\dgBilateralConstraint.h">
@@ -296,6 +302,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgBroadPhase.h">
       <Filter>systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\source\physics\dgCollisionDeformableClothPatch.h">
+      <Filter>collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\source\physics\dgCollisionDeformableSolidMesh.h">
+      <Filter>collision</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
