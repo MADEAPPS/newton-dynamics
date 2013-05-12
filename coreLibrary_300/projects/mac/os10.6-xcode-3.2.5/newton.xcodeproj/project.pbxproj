@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		FF80B6861596686E00E8D3B8 /* dgMeshEffect5.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF80B6851596686E00E8D3B8 /* dgMeshEffect5.cpp */; };
+		FF85FFB617405B4500BEE80B /* dgCollisionDeformableClothPatch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF85FFB217405B4500BEE80B /* dgCollisionDeformableClothPatch.cpp */; };
+		FF85FFB717405B4500BEE80B /* dgCollisionDeformableClothPatch.h in Headers */ = {isa = PBXBuildFile; fileRef = FF85FFB317405B4500BEE80B /* dgCollisionDeformableClothPatch.h */; };
+		FF85FFB817405B4500BEE80B /* dgCollisionDeformableSolidMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF85FFB417405B4500BEE80B /* dgCollisionDeformableSolidMesh.cpp */; };
+		FF85FFB917405B4500BEE80B /* dgCollisionDeformableSolidMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = FF85FFB517405B4500BEE80B /* dgCollisionDeformableSolidMesh.h */; };
 		FFE8C0FC16304AF8008A1215 /* dgBroadPhase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFE8C0F616304AF8008A1215 /* dgBroadPhase.cpp */; };
 		FFE8C0FD16304AF8008A1215 /* dgBroadPhase.h in Headers */ = {isa = PBXBuildFile; fileRef = FFE8C0F716304AF8008A1215 /* dgBroadPhase.h */; };
 		FFE8C0FE16304AF8008A1215 /* dgDynamicBody.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFE8C0F816304AF8008A1215 /* dgDynamicBody.cpp */; };
@@ -191,6 +195,10 @@
 		32BAE0B70371A74B00C91783 /* newton_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = newton_Prefix.pch; sourceTree = "<group>"; };
 		D2AAC06F0554671400DB518D /* libnewton.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libnewton.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF80B6851596686E00E8D3B8 /* dgMeshEffect5.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dgMeshEffect5.cpp; path = ../../../source/meshUtil/dgMeshEffect5.cpp; sourceTree = SOURCE_ROOT; };
+		FF85FFB217405B4500BEE80B /* dgCollisionDeformableClothPatch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dgCollisionDeformableClothPatch.cpp; path = ../../../source/physics/dgCollisionDeformableClothPatch.cpp; sourceTree = "<group>"; };
+		FF85FFB317405B4500BEE80B /* dgCollisionDeformableClothPatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgCollisionDeformableClothPatch.h; path = ../../../source/physics/dgCollisionDeformableClothPatch.h; sourceTree = "<group>"; };
+		FF85FFB417405B4500BEE80B /* dgCollisionDeformableSolidMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dgCollisionDeformableSolidMesh.cpp; path = ../../../source/physics/dgCollisionDeformableSolidMesh.cpp; sourceTree = "<group>"; };
+		FF85FFB517405B4500BEE80B /* dgCollisionDeformableSolidMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgCollisionDeformableSolidMesh.h; path = ../../../source/physics/dgCollisionDeformableSolidMesh.h; sourceTree = "<group>"; };
 		FFE8C0F616304AF8008A1215 /* dgBroadPhase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dgBroadPhase.cpp; path = ../../../source/physics/dgBroadPhase.cpp; sourceTree = SOURCE_ROOT; };
 		FFE8C0F716304AF8008A1215 /* dgBroadPhase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgBroadPhase.h; path = ../../../source/physics/dgBroadPhase.h; sourceTree = SOURCE_ROOT; };
 		FFE8C0F816304AF8008A1215 /* dgDynamicBody.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dgDynamicBody.cpp; path = ../../../source/physics/dgDynamicBody.cpp; sourceTree = SOURCE_ROOT; };
@@ -520,6 +528,10 @@
 		FFF899FA132D163E00A262F2 /* physics */ = {
 			isa = PBXGroup;
 			children = (
+				FF85FFB217405B4500BEE80B /* dgCollisionDeformableClothPatch.cpp */,
+				FF85FFB317405B4500BEE80B /* dgCollisionDeformableClothPatch.h */,
+				FF85FFB417405B4500BEE80B /* dgCollisionDeformableSolidMesh.cpp */,
+				FF85FFB517405B4500BEE80B /* dgCollisionDeformableSolidMesh.h */,
 				FFE8C0F616304AF8008A1215 /* dgBroadPhase.cpp */,
 				FFE8C0F716304AF8008A1215 /* dgBroadPhase.h */,
 				FFE8C0F816304AF8008A1215 /* dgDynamicBody.cpp */,
@@ -723,6 +735,8 @@
 				FFE8C0FF16304AF8008A1215 /* dgDynamicBody.h in Headers */,
 				FFE8C10116304AF8008A1215 /* dgKinematicBody.h in Headers */,
 				FFE8C11016304C14008A1215 /* dgOpenclInstance.h in Headers */,
+				FF85FFB717405B4500BEE80B /* dgCollisionDeformableClothPatch.h in Headers */,
+				FF85FFB917405B4500BEE80B /* dgCollisionDeformableSolidMesh.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -865,6 +879,8 @@
 				FFE8C10016304AF8008A1215 /* dgKinematicBody.cpp in Sources */,
 				FFE8C10D16304BB7008A1215 /* dgAsyncThread.cpp in Sources */,
 				FFE8C10E16304BB7008A1215 /* dgSimd.cpp in Sources */,
+				FF85FFB617405B4500BEE80B /* dgCollisionDeformableClothPatch.cpp in Sources */,
+				FF85FFB817405B4500BEE80B /* dgCollisionDeformableSolidMesh.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

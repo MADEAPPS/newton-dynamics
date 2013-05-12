@@ -86,16 +86,7 @@
 		FF084AD0173F1B310059C41D /* SoftBodies.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F711556DA2300E7B112 /* SoftBodies.cpp */; };
 		FF084AD1173F1B310059C41D /* SuperCar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F731556DA2300E7B112 /* SuperCar.cpp */; };
 		FF084AD2173F1B310059C41D /* UsingNewtonMeshTool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F771556DA2300E7B112 /* UsingNewtonMeshTool.cpp */; };
-		FF084AD8173F1C8D0059C41D /* libdContainers.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF9936A31735F8B0000533B7 /* libdContainers.a */; };
-		FF084AD9173F1C8D0059C41D /* libdCustomJoints.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF9936991735F8AF000533B7 /* libdCustomJoints.a */; };
-		FF084ADA173F1C8D0059C41D /* libdMath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF99368A1735F8AF000533B7 /* libdMath.a */; };
-		FF084ADB173F1C8D0059C41D /* libdScene.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF9936851735F8AF000533B7 /* libdScene.a */; };
-		FF084ADC173F1C8D0059C41D /* libdVisualDebuggerServer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF99368F1735F8AF000533B7 /* libdVisualDebuggerServer.a */; };
-		FF084ADD173F1C8D0059C41D /* libenet_osx.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF9936801735F8AF000533B7 /* libenet_osx.a */; };
-		FF084ADE173F1C8D0059C41D /* libglew-osx.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF9936A81735F8B0000533B7 /* libglew-osx.a */; };
 		FF084ADF173F1C8D0059C41D /* libnewton.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF99361C1735F69E000533B7 /* libnewton.a */; };
-		FF084AE0173F1C8D0059C41D /* libtinyxml.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF9936941735F8AF000533B7 /* libtinyxml.a */; };
-		FF084AE1173F1C8D0059C41D /* libwxWidget.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF99369E1735F8B0000533B7 /* libwxWidget.a */; };
 		FF50660B173F34B600D01FDF /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF50660A173F34B600D01FDF /* Cocoa.framework */; };
 		FF50660D173F360C00D01FDF /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF50660C173F360C00D01FDF /* IOKit.framework */; };
 		FF50660F173F36B200D01FDF /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF50660E173F36B200D01FDF /* Carbon.framework */; };
@@ -271,40 +262,21 @@
 		FF5067F8173F3EAD00D01FDF /* engine_start.wav in Resources */ = {isa = PBXBuildFile; fileRef = FF50669C173F3D8800D01FDF /* engine_start.wav */; };
 		FF5067F9173F3EAD00D01FDF /* env1.tga in Resources */ = {isa = PBXBuildFile; fileRef = FF50669D173F3D8800D01FDF /* env1.tga */; };
 		FF5067FA173F3EAD00D01FDF /* f1.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF50669E173F3D8800D01FDF /* f1.ngd */; };
+		FF85000C1740605300BEE80B /* libdContainers.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF85FFE317405FDE00BEE80B /* libdContainers.a */; };
+		FF85000D1740605400BEE80B /* libdCustomJoints.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF85FFF217405FDE00BEE80B /* libdCustomJoints.a */; };
+		FF85000E1740605400BEE80B /* libdMath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF85000117405FDE00BEE80B /* libdMath.a */; };
+		FF85000F1740605400BEE80B /* libdScene.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF85FFED17405FDE00BEE80B /* libdScene.a */; };
+		FF8500101740605400BEE80B /* libdVisualDebuggerServer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF85FFF717405FDE00BEE80B /* libdVisualDebuggerServer.a */; };
+		FF8500111740605400BEE80B /* libenet_osx.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF85FFE817405FDE00BEE80B /* libenet_osx.a */; };
+		FF8500121740605400BEE80B /* libglew-osx.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF85000617405FDE00BEE80B /* libglew-osx.a */; };
+		FF8500131740605400BEE80B /* libtinyxml.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF85000B17405FDE00BEE80B /* libtinyxml.a */; };
+		FF8500141740605400BEE80B /* libwxWidget.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF85FFFC17405FDE00BEE80B /* libwxWidget.a */; };
 		FF87BFAC173F269200472B56 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF87BFAB173F269200472B56 /* CoreFoundation.framework */; };
 		FF87BFAE173F26B900472B56 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF87BFAD173F26B900472B56 /* OpenGL.framework */; };
 		FF87BFB0173F26DF00472B56 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF87BFAF173F26DF00472B56 /* OpenAL.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		FF084A71173F1A9C0059C41D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FF8C2CE91313DC3700646B90 /* dMath.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = D2AAC06E0554671400DB518D;
-			remoteInfo = dMath;
-		};
-		FF084A73173F1A9C0059C41D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FFD2A799172E126900114513 /* dCustomJoints.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = FFD2A791172E123500114513;
-			remoteInfo = dCustomJoints;
-		};
-		FF084A75173F1A9C0059C41D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FF8402EB17353606008E038A /* wxcocoaStatic.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = BAB02EC06578349A9171CCAC;
-			remoteInfo = wxWidget;
-		};
-		FF084A77173F1A9C0059C41D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FF8C2CFF1313DC7F00646B90 /* dScene.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = D2AAC06E0554671400DB518D;
-			remoteInfo = dScene;
-		};
 		FF084A79173F1A9C0059C41D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = FF9936141735F69D000533B7 /* newton.xcodeproj */;
@@ -312,40 +284,68 @@
 			remoteGlobalIDString = D2AAC06E0554671400DB518D;
 			remoteInfo = newton;
 		};
-		FF084A7B173F1A9C0059C41D /* PBXContainerItemProxy */ = {
+		FF85000017405FDE00BEE80B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FF8C2CE91313DC3700646B90 /* dMath.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D2AAC06F0554671400DB518D;
+			remoteInfo = dMath;
+		};
+		FF85000517405FDE00BEE80B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = FF0A5030173163D5005D6C12 /* glew-osx.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = FF0A4FEB173160E6005D6C12;
+			proxyType = 2;
+			remoteGlobalIDString = FF0A4FEC173160E6005D6C12;
 			remoteInfo = "glew-osx";
 		};
-		FF084A7D173F1A9C0059C41D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FF8C2CF41313DC6A00646B90 /* dContainers.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = D2AAC06E0554671400DB518D;
-			remoteInfo = dContainers;
-		};
-		FF084A7F173F1A9C0059C41D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FFD2A77A172E0A1200114513 /* dVisualDebuggerServer.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = FFD2749E172E08F400114513;
-			remoteInfo = dVisualDebuggerServer;
-		};
-		FF084A81173F1A9C0059C41D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FF7F20861730187900AC6E4B /* enet_osx.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = FF3B29D5173014AE007E6FEC;
-			remoteInfo = enet_osx;
-		};
-		FF084A83173F1A9C0059C41D /* PBXContainerItemProxy */ = {
+		FF85000A17405FDE00BEE80B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = FF8C2D0A1313DC9500646B90 /* tinyxml.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = D2AAC06E0554671400DB518D;
+			proxyType = 2;
+			remoteGlobalIDString = D2AAC06F0554671400DB518D;
 			remoteInfo = tinyxml;
+		};
+		FF85FFE217405FDE00BEE80B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FF8C2CF41313DC6A00646B90 /* dContainers.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D2AAC06F0554671400DB518D;
+			remoteInfo = dContainers;
+		};
+		FF85FFE717405FDE00BEE80B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FF7F20861730187900AC6E4B /* enet_osx.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = FF3B29D6173014AE007E6FEC;
+			remoteInfo = enet_osx;
+		};
+		FF85FFEC17405FDE00BEE80B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FF8C2CFF1313DC7F00646B90 /* dScene.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D2AAC06F0554671400DB518D;
+			remoteInfo = dScene;
+		};
+		FF85FFF117405FDE00BEE80B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FFD2A799172E126900114513 /* dCustomJoints.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = FFD2A792172E123600114513;
+			remoteInfo = dCustomJoints;
+		};
+		FF85FFF617405FDE00BEE80B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FFD2A77A172E0A1200114513 /* dVisualDebuggerServer.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = FFD2749F172E08F400114513;
+			remoteInfo = dVisualDebuggerServer;
+		};
+		FF85FFFB17405FDE00BEE80B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FF8402EB17353606008E038A /* wxcocoaStatic.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1D025E39C79E3E119D19686C;
+			remoteInfo = wxWidget;
 		};
 		FF99361B1735F69E000533B7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -354,69 +354,6 @@
 			remoteGlobalIDString = D2AAC06F0554671400DB518D;
 			remoteInfo = newton;
 		};
-		FF99367F1735F8AF000533B7 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FF7F20861730187900AC6E4B /* enet_osx.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = FF3B29D6173014AE007E6FEC;
-			remoteInfo = enet_osx;
-		};
-		FF9936841735F8AF000533B7 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FF8C2CFF1313DC7F00646B90 /* dScene.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = D2AAC06F0554671400DB518D;
-			remoteInfo = dScene;
-		};
-		FF9936891735F8AF000533B7 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FF8C2CE91313DC3700646B90 /* dMath.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = D2AAC06F0554671400DB518D;
-			remoteInfo = dMath;
-		};
-		FF99368E1735F8AF000533B7 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FFD2A77A172E0A1200114513 /* dVisualDebuggerServer.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = FFD2749F172E08F400114513;
-			remoteInfo = dVisualDebuggerServer;
-		};
-		FF9936931735F8AF000533B7 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FF8C2D0A1313DC9500646B90 /* tinyxml.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = D2AAC06F0554671400DB518D;
-			remoteInfo = tinyxml;
-		};
-		FF9936981735F8AF000533B7 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FFD2A799172E126900114513 /* dCustomJoints.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = FFD2A792172E123600114513;
-			remoteInfo = dCustomJoints;
-		};
-		FF99369D1735F8B0000533B7 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FF8402EB17353606008E038A /* wxcocoaStatic.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 1D025E39C79E3E119D19686C;
-			remoteInfo = wxWidget;
-		};
-		FF9936A21735F8B0000533B7 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FF8C2CF41313DC6A00646B90 /* dContainers.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = D2AAC06F0554671400DB518D;
-			remoteInfo = dContainers;
-		};
-		FF9936A71735F8B0000533B7 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FF0A5030173163D5005D6C12 /* glew-osx.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = FF0A4FEC173160E6005D6C12;
-			remoteInfo = "glew-osx";
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -424,7 +361,7 @@
 		FF084A30173F188A0059C41D /* demosSandbox-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "demosSandbox-Info.plist"; path = "demosSandbox/demosSandbox-Info.plist"; sourceTree = "<group>"; };
 		FF084A36173F188A0059C41D /* demosSandbox-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "demosSandbox-Prefix.pch"; path = "demosSandbox/demosSandbox-Prefix.pch"; sourceTree = "<group>"; };
 		FF084A3E173F188B0059C41D /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		FF0A5030173163D5005D6C12 /* glew-osx.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "glew-osx.xcodeproj"; path = "../../../../../../../../../../packages/thirdParty/glew/build/glew-osx/glew-osx.xcodeproj"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF0A5030173163D5005D6C12 /* glew-osx.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "glew-osx.xcodeproj"; path = "../../../../../packages/thirdParty/glew/build/glew-osx/glew-osx.xcodeproj"; sourceTree = "<group>"; };
 		FF3B296E17300BD6007E6FEC /* KinematicBodies.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = KinematicBodies.cpp; path = ../../../sdkDemos/demos/KinematicBodies.cpp; sourceTree = "<group>"; };
 		FF3B297017300C79007E6FEC /* UserStaticCollision.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UserStaticCollision.cpp; path = ../../../sdkDemos/demos/UserStaticCollision.cpp; sourceTree = "<group>"; };
 		FF3B297217300CF0007E6FEC /* UserHeightFieldCollision.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UserHeightFieldCollision.cpp; path = ../../../sdkDemos/toolBox/UserHeightFieldCollision.cpp; sourceTree = "<group>"; };
@@ -611,15 +548,15 @@
 		FF50671E173F3D8A00D01FDF /* wood_4.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = wood_4.tga; path = ../../../../media/wood_4.tga; sourceTree = "<group>"; };
 		FF50671F173F3D8A00D01FDF /* x01_st.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = x01_st.tga; path = ../../../../media/x01_st.tga; sourceTree = "<group>"; };
 		FF506720173F3D8A00D01FDF /* yellow_p.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = yellow_p.tga; path = ../../../../media/yellow_p.tga; sourceTree = "<group>"; };
-		FF7F20861730187900AC6E4B /* enet_osx.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = enet_osx.xcodeproj; path = "../../../../../../../../../../packages/thirdParty/enet-1.2/enet_osx/enet_osx.xcodeproj"; sourceTree = BUILT_PRODUCTS_DIR; };
-		FF8402EB17353606008E038A /* wxcocoaStatic.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = wxcocoaStatic.xcodeproj; path = "../../../../../../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/build/osx/wxcocoaStatic.xcodeproj"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF7F20861730187900AC6E4B /* enet_osx.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = enet_osx.xcodeproj; path = "../../../../../packages/thirdParty/enet-1.2/enet_osx/enet_osx.xcodeproj"; sourceTree = "<group>"; };
+		FF8402EB17353606008E038A /* wxcocoaStatic.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = wxcocoaStatic.xcodeproj; path = "../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/build/osx/wxcocoaStatic.xcodeproj"; sourceTree = "<group>"; };
 		FF87BFAB173F269200472B56 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
 		FF87BFAD173F26B900472B56 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		FF87BFAF173F26DF00472B56 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = /System/Library/Frameworks/OpenAL.framework; sourceTree = "<absolute>"; };
-		FF8C2CE91313DC3700646B90 /* dMath.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = dMath.xcodeproj; path = ../../../../../../../../../../packages/projects/mac/dMath/dMath.xcodeproj; sourceTree = BUILT_PRODUCTS_DIR; };
-		FF8C2CF41313DC6A00646B90 /* dContainers.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = dContainers.xcodeproj; path = ../../../../../../../../../../packages/projects/mac/dContainers/dContainers.xcodeproj; sourceTree = BUILT_PRODUCTS_DIR; };
-		FF8C2CFF1313DC7F00646B90 /* dScene.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = dScene.xcodeproj; path = ../../../../../../../../../../packages/projects/mac/dScene/dScene.xcodeproj; sourceTree = BUILT_PRODUCTS_DIR; };
-		FF8C2D0A1313DC9500646B90 /* tinyxml.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = tinyxml.xcodeproj; path = ../../../../../../../../../../packages/projects/mac/tinyxml/tinyxml.xcodeproj; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF8C2CE91313DC3700646B90 /* dMath.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = dMath.xcodeproj; path = ../../../../../packages/projects/mac/dMath/dMath.xcodeproj; sourceTree = "<group>"; };
+		FF8C2CF41313DC6A00646B90 /* dContainers.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = dContainers.xcodeproj; path = ../../../../../packages/projects/mac/dContainers/dContainers.xcodeproj; sourceTree = "<group>"; };
+		FF8C2CFF1313DC7F00646B90 /* dScene.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = dScene.xcodeproj; path = ../../../../../packages/projects/mac/dScene/dScene.xcodeproj; sourceTree = "<group>"; };
+		FF8C2D0A1313DC9500646B90 /* tinyxml.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = tinyxml.xcodeproj; path = ../../../../../packages/projects/mac/tinyxml/tinyxml.xcodeproj; sourceTree = "<group>"; };
 		FF9936141735F69D000533B7 /* newton.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = newton.xcodeproj; path = "../../../../../coreLibrary_300/projects/mac/os10.6-xcode-3.2.5/newton.xcodeproj"; sourceTree = "<group>"; };
 		FFD2742D172DA02000114513 /* DemoCameraListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DemoCameraListener.h; path = ../../../sdkDemos/DemoCameraListener.h; sourceTree = "<group>"; };
 		FFD2742E172DA02000114513 /* DemoListenerBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DemoListenerBase.cpp; path = ../../../sdkDemos/DemoListenerBase.cpp; sourceTree = "<group>"; };
@@ -627,8 +564,8 @@
 		FFD27431172DA05A00114513 /* AdvancedPlayerController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AdvancedPlayerController.cpp; path = ../../../sdkDemos/demos/AdvancedPlayerController.cpp; sourceTree = "<group>"; };
 		FFD27432172DA05A00114513 /* BasicPlayerController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BasicPlayerController.cpp; path = ../../../sdkDemos/demos/BasicPlayerController.cpp; sourceTree = "<group>"; };
 		FFD27435172DA06D00114513 /* DemoCameraListener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DemoCameraListener.cpp; path = ../../../sdkDemos/DemoCameraListener.cpp; sourceTree = "<group>"; };
-		FFD2A77A172E0A1200114513 /* dVisualDebuggerServer.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = dVisualDebuggerServer.xcodeproj; path = ../../../../../../../../../../packages/projects/mac/dVisualDebuggerServer/dVisualDebuggerServer.xcodeproj; sourceTree = BUILT_PRODUCTS_DIR; };
-		FFD2A799172E126900114513 /* dCustomJoints.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = dCustomJoints.xcodeproj; path = ../../../../../../../../../../packages/projects/mac/dCustomJoints/dCustomJoints.xcodeproj; sourceTree = BUILT_PRODUCTS_DIR; };
+		FFD2A77A172E0A1200114513 /* dVisualDebuggerServer.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = dVisualDebuggerServer.xcodeproj; path = ../../../../../packages/projects/mac/dVisualDebuggerServer/dVisualDebuggerServer.xcodeproj; sourceTree = "<group>"; };
+		FFD2A799172E126900114513 /* dCustomJoints.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = dCustomJoints.xcodeproj; path = ../../../../../packages/projects/mac/dCustomJoints/dCustomJoints.xcodeproj; sourceTree = "<group>"; };
 		FFF60F2D1556D9F100E7B112 /* DemoAIAgent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DemoAIAgent.cpp; path = ../../../sdkDemos/DemoAIAgent.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60F2E1556D9F100E7B112 /* DemoAIAgent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DemoAIAgent.h; path = ../../../sdkDemos/DemoAIAgent.h; sourceTree = SOURCE_ROOT; };
 		FFF60F2F1556D9F100E7B112 /* DemoAIListener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DemoAIListener.cpp; path = ../../../sdkDemos/DemoAIListener.cpp; sourceTree = SOURCE_ROOT; };
@@ -699,18 +636,18 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FF50660F173F36B200D01FDF /* Carbon.framework in Frameworks */,
-				FF084AD8173F1C8D0059C41D /* libdContainers.a in Frameworks */,
-				FF084AD9173F1C8D0059C41D /* libdCustomJoints.a in Frameworks */,
-				FF084ADA173F1C8D0059C41D /* libdMath.a in Frameworks */,
-				FF084ADB173F1C8D0059C41D /* libdScene.a in Frameworks */,
-				FF084ADC173F1C8D0059C41D /* libdVisualDebuggerServer.a in Frameworks */,
-				FF084ADD173F1C8D0059C41D /* libenet_osx.a in Frameworks */,
-				FF084ADE173F1C8D0059C41D /* libglew-osx.a in Frameworks */,
+				FF85000C1740605300BEE80B /* libdContainers.a in Frameworks */,
+				FF85000D1740605400BEE80B /* libdCustomJoints.a in Frameworks */,
+				FF85000E1740605400BEE80B /* libdMath.a in Frameworks */,
+				FF85000F1740605400BEE80B /* libdScene.a in Frameworks */,
+				FF8500101740605400BEE80B /* libdVisualDebuggerServer.a in Frameworks */,
+				FF8500111740605400BEE80B /* libenet_osx.a in Frameworks */,
+				FF8500121740605400BEE80B /* libglew-osx.a in Frameworks */,
+				FF8500131740605400BEE80B /* libtinyxml.a in Frameworks */,
+				FF8500141740605400BEE80B /* libwxWidget.a in Frameworks */,
 				FF084ADF173F1C8D0059C41D /* libnewton.a in Frameworks */,
-				FF084AE0173F1C8D0059C41D /* libtinyxml.a in Frameworks */,
-				FF084AE1173F1C8D0059C41D /* libwxWidget.a in Frameworks */,
 				FF50660D173F360C00D01FDF /* IOKit.framework in Frameworks */,
+				FF50660F173F36B200D01FDF /* Carbon.framework in Frameworks */,
 				FF50660B173F34B600D01FDF /* Cocoa.framework in Frameworks */,
 				FF87BFB0173F26DF00472B56 /* OpenAL.framework in Frameworks */,
 				FF87BFAE173F26B900472B56 /* OpenGL.framework in Frameworks */,
@@ -930,6 +867,78 @@
 			name = assets;
 			sourceTree = "<group>";
 		};
+		FF85000217405FDE00BEE80B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FF85000617405FDE00BEE80B /* libglew-osx.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FF85000717405FDE00BEE80B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FF85000B17405FDE00BEE80B /* libtinyxml.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FF85FFDF17405FDE00BEE80B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FF85FFE317405FDE00BEE80B /* libdContainers.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FF85FFE417405FDE00BEE80B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FF85FFE817405FDE00BEE80B /* libenet_osx.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FF85FFE917405FDE00BEE80B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FF85FFED17405FDE00BEE80B /* libdScene.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FF85FFEE17405FDE00BEE80B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FF85FFF217405FDE00BEE80B /* libdCustomJoints.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FF85FFF317405FDE00BEE80B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FF85FFF717405FDE00BEE80B /* libdVisualDebuggerServer.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FF85FFF817405FDE00BEE80B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FF85FFFC17405FDE00BEE80B /* libwxWidget.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FF85FFFD17405FDE00BEE80B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FF85000117405FDE00BEE80B /* libdMath.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		FF8C27F31313DB2700646B90 /* dependencies */ = {
 			isa = PBXGroup;
 			children = (
@@ -1035,78 +1044,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		FF99367C1735F8AF000533B7 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				FF9936801735F8AF000533B7 /* libenet_osx.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		FF9936811735F8AF000533B7 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				FF9936851735F8AF000533B7 /* libdScene.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		FF9936861735F8AF000533B7 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				FF99368A1735F8AF000533B7 /* libdMath.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		FF99368B1735F8AF000533B7 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				FF99368F1735F8AF000533B7 /* libdVisualDebuggerServer.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		FF9936901735F8AF000533B7 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				FF9936941735F8AF000533B7 /* libtinyxml.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		FF9936951735F8AF000533B7 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				FF9936991735F8AF000533B7 /* libdCustomJoints.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		FF99369A1735F8B0000533B7 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				FF99369E1735F8B0000533B7 /* libwxWidget.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		FF99369F1735F8B0000533B7 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				FF9936A31735F8B0000533B7 /* libdContainers.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		FF9936A41735F8B0000533B7 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				FF9936A81735F8B0000533B7 /* libglew-osx.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		FFF184A113130A6F0077CF7A /* source */ = {
 			isa = PBXGroup;
 			children = (
@@ -1167,16 +1104,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				FF084A72173F1A9C0059C41D /* PBXTargetDependency */,
-				FF084A74173F1A9C0059C41D /* PBXTargetDependency */,
-				FF084A76173F1A9C0059C41D /* PBXTargetDependency */,
-				FF084A78173F1A9C0059C41D /* PBXTargetDependency */,
 				FF084A7A173F1A9C0059C41D /* PBXTargetDependency */,
-				FF084A7C173F1A9C0059C41D /* PBXTargetDependency */,
-				FF084A7E173F1A9C0059C41D /* PBXTargetDependency */,
-				FF084A80173F1A9C0059C41D /* PBXTargetDependency */,
-				FF084A82173F1A9C0059C41D /* PBXTargetDependency */,
-				FF084A84173F1A9C0059C41D /* PBXTargetDependency */,
 			);
 			name = demosSandbox;
 			productName = demosSandbox;
@@ -1206,31 +1134,31 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = FF99369F1735F8B0000533B7 /* Products */;
+					ProductGroup = FF85FFDF17405FDE00BEE80B /* Products */;
 					ProjectRef = FF8C2CF41313DC6A00646B90 /* dContainers.xcodeproj */;
 				},
 				{
-					ProductGroup = FF9936951735F8AF000533B7 /* Products */;
+					ProductGroup = FF85FFEE17405FDE00BEE80B /* Products */;
 					ProjectRef = FFD2A799172E126900114513 /* dCustomJoints.xcodeproj */;
 				},
 				{
-					ProductGroup = FF9936861735F8AF000533B7 /* Products */;
+					ProductGroup = FF85FFFD17405FDE00BEE80B /* Products */;
 					ProjectRef = FF8C2CE91313DC3700646B90 /* dMath.xcodeproj */;
 				},
 				{
-					ProductGroup = FF9936811735F8AF000533B7 /* Products */;
+					ProductGroup = FF85FFE917405FDE00BEE80B /* Products */;
 					ProjectRef = FF8C2CFF1313DC7F00646B90 /* dScene.xcodeproj */;
 				},
 				{
-					ProductGroup = FF99368B1735F8AF000533B7 /* Products */;
+					ProductGroup = FF85FFF317405FDE00BEE80B /* Products */;
 					ProjectRef = FFD2A77A172E0A1200114513 /* dVisualDebuggerServer.xcodeproj */;
 				},
 				{
-					ProductGroup = FF99367C1735F8AF000533B7 /* Products */;
+					ProductGroup = FF85FFE417405FDE00BEE80B /* Products */;
 					ProjectRef = FF7F20861730187900AC6E4B /* enet_osx.xcodeproj */;
 				},
 				{
-					ProductGroup = FF9936A41735F8B0000533B7 /* Products */;
+					ProductGroup = FF85000217405FDE00BEE80B /* Products */;
 					ProjectRef = FF0A5030173163D5005D6C12 /* glew-osx.xcodeproj */;
 				},
 				{
@@ -1238,11 +1166,11 @@
 					ProjectRef = FF9936141735F69D000533B7 /* newton.xcodeproj */;
 				},
 				{
-					ProductGroup = FF9936901735F8AF000533B7 /* Products */;
+					ProductGroup = FF85000717405FDE00BEE80B /* Products */;
 					ProjectRef = FF8C2D0A1313DC9500646B90 /* tinyxml.xcodeproj */;
 				},
 				{
-					ProductGroup = FF99369A1735F8B0000533B7 /* Products */;
+					ProductGroup = FF85FFF817405FDE00BEE80B /* Products */;
 					ProjectRef = FF8402EB17353606008E038A /* wxcocoaStatic.xcodeproj */;
 				},
 			);
@@ -1254,74 +1182,74 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		FF85000117405FDE00BEE80B /* libdMath.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libdMath.a;
+			remoteRef = FF85000017405FDE00BEE80B /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		FF85000617405FDE00BEE80B /* libglew-osx.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libglew-osx.a";
+			remoteRef = FF85000517405FDE00BEE80B /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		FF85000B17405FDE00BEE80B /* libtinyxml.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libtinyxml.a;
+			remoteRef = FF85000A17405FDE00BEE80B /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		FF85FFE317405FDE00BEE80B /* libdContainers.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libdContainers.a;
+			remoteRef = FF85FFE217405FDE00BEE80B /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		FF85FFE817405FDE00BEE80B /* libenet_osx.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libenet_osx.a;
+			remoteRef = FF85FFE717405FDE00BEE80B /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		FF85FFED17405FDE00BEE80B /* libdScene.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libdScene.a;
+			remoteRef = FF85FFEC17405FDE00BEE80B /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		FF85FFF217405FDE00BEE80B /* libdCustomJoints.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libdCustomJoints.a;
+			remoteRef = FF85FFF117405FDE00BEE80B /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		FF85FFF717405FDE00BEE80B /* libdVisualDebuggerServer.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libdVisualDebuggerServer.a;
+			remoteRef = FF85FFF617405FDE00BEE80B /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		FF85FFFC17405FDE00BEE80B /* libwxWidget.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libwxWidget.a;
+			remoteRef = FF85FFFB17405FDE00BEE80B /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		FF99361C1735F69E000533B7 /* libnewton.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libnewton.a;
 			remoteRef = FF99361B1735F69E000533B7 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		FF9936801735F8AF000533B7 /* libenet_osx.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libenet_osx.a;
-			remoteRef = FF99367F1735F8AF000533B7 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		FF9936851735F8AF000533B7 /* libdScene.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libdScene.a;
-			remoteRef = FF9936841735F8AF000533B7 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		FF99368A1735F8AF000533B7 /* libdMath.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libdMath.a;
-			remoteRef = FF9936891735F8AF000533B7 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		FF99368F1735F8AF000533B7 /* libdVisualDebuggerServer.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libdVisualDebuggerServer.a;
-			remoteRef = FF99368E1735F8AF000533B7 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		FF9936941735F8AF000533B7 /* libtinyxml.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libtinyxml.a;
-			remoteRef = FF9936931735F8AF000533B7 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		FF9936991735F8AF000533B7 /* libdCustomJoints.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libdCustomJoints.a;
-			remoteRef = FF9936981735F8AF000533B7 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		FF99369E1735F8B0000533B7 /* libwxWidget.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libwxWidget.a;
-			remoteRef = FF99369D1735F8B0000533B7 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		FF9936A31735F8B0000533B7 /* libdContainers.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libdContainers.a;
-			remoteRef = FF9936A21735F8B0000533B7 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		FF9936A81735F8B0000533B7 /* libglew-osx.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = "libglew-osx.a";
-			remoteRef = FF9936A71735F8B0000533B7 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -1598,55 +1526,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		FF084A72173F1A9C0059C41D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = dMath;
-			targetProxy = FF084A71173F1A9C0059C41D /* PBXContainerItemProxy */;
-		};
-		FF084A74173F1A9C0059C41D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = dCustomJoints;
-			targetProxy = FF084A73173F1A9C0059C41D /* PBXContainerItemProxy */;
-		};
-		FF084A76173F1A9C0059C41D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = wxWidget;
-			targetProxy = FF084A75173F1A9C0059C41D /* PBXContainerItemProxy */;
-		};
-		FF084A78173F1A9C0059C41D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = dScene;
-			targetProxy = FF084A77173F1A9C0059C41D /* PBXContainerItemProxy */;
-		};
 		FF084A7A173F1A9C0059C41D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = newton;
 			targetProxy = FF084A79173F1A9C0059C41D /* PBXContainerItemProxy */;
-		};
-		FF084A7C173F1A9C0059C41D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = "glew-osx";
-			targetProxy = FF084A7B173F1A9C0059C41D /* PBXContainerItemProxy */;
-		};
-		FF084A7E173F1A9C0059C41D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = dContainers;
-			targetProxy = FF084A7D173F1A9C0059C41D /* PBXContainerItemProxy */;
-		};
-		FF084A80173F1A9C0059C41D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = dVisualDebuggerServer;
-			targetProxy = FF084A7F173F1A9C0059C41D /* PBXContainerItemProxy */;
-		};
-		FF084A82173F1A9C0059C41D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = enet_osx;
-			targetProxy = FF084A81173F1A9C0059C41D /* PBXContainerItemProxy */;
-		};
-		FF084A84173F1A9C0059C41D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = tinyxml;
-			targetProxy = FF084A83173F1A9C0059C41D /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
