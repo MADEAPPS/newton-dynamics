@@ -51,6 +51,7 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 		dgFloat32* m_invMass;
 		dgVector* m_posit;
 		dgVector* m_veloc;
+		dgVector* m_force;
 //		dgVector* m_deltaPosition;
 //		dgVector* m_shapePosition;
 //		dgVector* m_instantVelocity;

@@ -56,21 +56,18 @@ dgCollisionDeformableMesh::dgParticle::dgParticle (dgInt32 particlesCount)
 	m_invMass = (dgFloat32*) dgMallocStack (m_count * sizeof (dgFloat32));
 	m_posit = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
 	m_veloc = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
-/*
-	m_deltaPosition = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
-	m_shapePosition = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
-	m_instantVelocity = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
-	m_internalVelocity = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
-	
+	m_force = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
 
-	memset (m_mass, 0, m_count * sizeof (dgFloat32));
-	memset (m_invMass, 0, m_count * sizeof (dgFloat32));
-	
-	memset (m_position, 0, m_count * sizeof (dgVector));
-	memset (m_deltaPosition, 0, m_count * sizeof (dgVector));
-	memset (m_shapePosition, 0, m_count * sizeof (dgVector));
-	memset (m_instantVelocity, 0, m_count * sizeof (dgVector));
-*/
+//	m_deltaPosition = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
+//	m_shapePosition = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
+//	m_instantVelocity = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
+//	m_internalVelocity = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
+//	memset (m_mass, 0, m_count * sizeof (dgFloat32));
+//	memset (m_invMass, 0, m_count * sizeof (dgFloat32));
+//	memset (m_position, 0, m_count * sizeof (dgVector));
+//	memset (m_deltaPosition, 0, m_count * sizeof (dgVector));
+//	memset (m_shapePosition, 0, m_count * sizeof (dgVector));
+//	memset (m_instantVelocity, 0, m_count * sizeof (dgVector));
 }
 
 
@@ -82,6 +79,8 @@ dgCollisionDeformableMesh::dgParticle::dgParticle(const dgParticle& source)
 	m_invMass = (dgFloat32*) dgMallocStack (m_count * sizeof (dgFloat32));
 	m_posit = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
 	m_veloc = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
+	m_force = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
+
 //	m_deltaPosition = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
 //	m_shapePosition = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
 //	m_instantVelocity = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
@@ -108,16 +107,10 @@ dgCollisionDeformableMesh::dgParticle::~dgParticle()
 	if (m_mass) {
 		dgFree (m_mass);
 		dgFree (m_invMass);
-	}
-
-	if (m_posit) {
 		dgFree (m_posit);
 		dgFree (m_veloc);
+		dgFree (m_force);
 	}
-//	dgFree (m_deltaPosition);
-//	dgFree (m_shapePosition);
-//	dgFree (m_instantVelocity);
-//	dgFree (m_internalVelocity);
 }
 
 #if 0
@@ -1050,18 +1043,10 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMes
 //	dgVector delta (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 //	dgBigVector com (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-		m_particles.m_invMass[i] = dgFloat32 (0.0f);
-		m_particles.m_invMass[i] = dgFloat32 (1.0e15f);
+		m_particles.m_mass[i] = dgFloat32 (1.0f);
+		m_particles.m_invMass[i] = dgFloat32 (1.0f);
 		m_particles.m_posit[i] = dgVector (dgFloat32 (vertex[i * stride + 0]), dgFloat32 (vertex[i * stride + 1]), dgFloat32 (vertex[i * stride + 2]), dgFloat32 (0.0f));
 		m_particles.m_veloc[i] = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-
-//		m_particles.m_shapePosition[i] = dgVector (dgFloat32 (vertex[i * stride + 0]), dgFloat32 (vertex[i * stride + 1]), dgFloat32 (vertex[i * stride + 2]), dgFloat32 (0.0f));
-//		m_particles.m_position[i] = m_particles.m_shapePosition[i];
-//		m_particles.m_deltaPosition[i] = delta;
-//		if (m_particles.m_position[i].m_y < 0.0f){
-//			//m_particles.m_position1[i].m_y = 0.0f;
-//		}
-//		com += dgBigVector (m_particles.m_position[i]);
 	}
 //	com = com.Scale(dgFloat32 (1.0f / m_particles.m_count));
 //	m_particles.m_com = com;
