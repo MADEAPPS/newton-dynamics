@@ -914,7 +914,7 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh (const dgCollisionDeformabl
 	m_rtti = source.m_rtti;
 
 	dgCollisionDeformableMeshList& softBodyList = *m_world;
-	softBodyList.Insert (this, this);
+	softBodyList.AddShape (this);
 
 	m_indexList = (dgInt16*) dgMallocStack (3 * m_trianglesCount * sizeof (dgInt16));
 	m_faceNormals = (dgVector*) dgMallocStack (m_trianglesCount * sizeof (dgVector));
@@ -1029,7 +1029,7 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMes
 	m_rtti |= dgCollisionDeformableMesh_RTTI;
 
 	dgCollisionDeformableMeshList& softBodyList = *m_world;
-	softBodyList.Insert (this, this);
+	softBodyList.AddShape (this);
 
 	dgMeshEffect meshCopy (*mesh);
 	meshCopy.Triangulate();
@@ -1179,7 +1179,7 @@ dgCollisionDeformableMesh::~dgCollisionDeformableMesh(void)
 //	}
 
 	dgCollisionDeformableMeshList& softBodyList = *m_world;
-	softBodyList.Remove (this);
+	softBodyList.RemoveShape (this);
 }
 
 

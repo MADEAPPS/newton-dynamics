@@ -73,13 +73,31 @@ class dgBodyMaterialList: public dgTree<dgContactMaterial, dgUnsigned32>
 	}
 };
 
-class dgCollisionDeformableMeshList: public dgTree<const dgCollisionDeformableMesh*, const dgCollisionDeformableMesh*>
+class dgCollisionDeformableMeshList: public dgList<const dgCollisionDeformableMesh*>
 {
 	public:
 	dgCollisionDeformableMeshList (dgMemoryAllocator* const allocator)
-		:dgTree<const dgCollisionDeformableMesh*, const dgCollisionDeformableMesh*>(allocator)
+		:dgList<const dgCollisionDeformableMesh*>(allocator)
+		,m_dictionary(allocator)
 	{
 	}
+
+	void AddShape(dgCollisionDeformableMesh* const shape)
+	{
+		dgListNode* const node = Append (shape);
+		m_dictionary.Insert (node, shape);
+	}
+
+	void RemoveShape(dgCollisionDeformableMesh*  const shape)
+	{
+		dgTree <dgListNode*, const dgCollisionDeformableMesh*>::dgTreeNode* const node = m_dictionary.Find (shape);
+		dgAssert (node);
+		Remove (node->GetInfo());
+		m_dictionary.Remove (node);
+	}
+
+	private:
+	dgTree <dgListNode*, const dgCollisionDeformableMesh*> m_dictionary;
 };
 
 class dgCollisionParamProxy;
