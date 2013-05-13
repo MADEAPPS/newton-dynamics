@@ -271,8 +271,7 @@ extern "C" {
 		dFloat m_extraParameters[16];
 		int	m_bodiesCollisionOn;
 		char m_descriptionType[32];
-	} ;
-
+	};
 
 	
 	struct NewtonUserMeshCollisionCollideDesc
@@ -328,7 +327,13 @@ extern "C" {
 		dFloat m_minFriction;
 		dFloat m_maxFriction;
 		dFloat m_timestep;
-	} ;
+	};
+
+	struct NewtonClothPatchMaterial
+	{
+		dFloat m_damper;
+		dFloat m_stiffness;
+	};
 
 
 	// Newton callback functions
@@ -970,7 +975,7 @@ extern "C" {
 	// particle system interface (soft bodies, individual, pressure bodies and cloth)   
 	//
 	// **********************************************************************************************
-	NEWTON_API NewtonCollision* NewtonCreateClothPatch (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID);
+	NEWTON_API NewtonCollision* NewtonCreateClothPatch (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID, NewtonClothPatchMaterial* const structuralMaterial, NewtonClothPatchMaterial* const bendMaterial);
 	NEWTON_API NewtonCollision* NewtonCreateDeformableMesh (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID);
 	
 //	NEWTON_API void NewtonDeformableMeshSetPlasticity (NewtonCollision* const deformableMesh, dFloat plasticity);

@@ -8585,11 +8585,17 @@ void NewtonMeshCalculateFaceNormal (const NewtonMesh* const mesh, const void* co
 	normal[2] = n.m_z;
 }
 
-NewtonCollision* NewtonCreateClothPatch (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID)
+NewtonCollision* NewtonCreateClothPatch (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID, NewtonClothPatchMaterial* const structuralMaterial, NewtonClothPatchMaterial* const bendMaterial)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-	return (NewtonCollision*) world->CreateClothPatchMesh((dgMeshEffect*)mesh, shapeID);
+
+	dgClothPatchMaterial material0;
+	dgClothPatchMaterial material1;
+
+	memcpy (&material0, structuralMaterial, sizeof (NewtonClothPatchMaterial));
+	memcpy (&material1, bendMaterial, sizeof (NewtonClothPatchMaterial));
+	return (NewtonCollision*) world->CreateClothPatchMesh((dgMeshEffect*)mesh, shapeID, material0, material1);
 }
 
 NewtonCollision* NewtonCreateDeformableMesh (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID)

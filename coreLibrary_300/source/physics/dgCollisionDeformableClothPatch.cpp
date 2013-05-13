@@ -38,7 +38,7 @@ class dgCollisionDeformableClothPatch::dgClothLink
 	public:
 	dgInt16 m_particle_0;
 	dgInt16 m_particle_1;
-
+	dgInt16 m_materialIndex;
 };
 
 #if 0
@@ -500,6 +500,8 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch (const dgCollis
 	m_rtti = source.m_rtti;
 	m_isdoubleSided = source.m_isdoubleSided;
 
+	memcpy (&m_materials, &source.m_materials, sizeof (dgClothPatchMaterial));
+
 	m_links = (dgClothLink*) dgMallocStack (m_linksCount * sizeof (dgClothLink));
 	memcpy (m_links, source.m_links, m_linksCount * sizeof (dgClothLink));
 }
@@ -512,16 +514,18 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch (dgWorld* const
 }
 
 
-dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgMeshEffect* const mesh)
+dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgMeshEffect* const mesh, const dgClothPatchMaterial& structuralMaterial, const dgClothPatchMaterial& bendMaterial)
 	:dgCollisionDeformableMesh (mesh, m_deformableClothPatch)
 	,m_linksCount (0)
 	,m_links(NULL)
 {
 	m_isdoubleSided = true;
 	m_rtti |= dgCollisionDeformableClothPatch_RTTI;
+
+	m_materials[1] = bendMaterial;
+	m_materials[0] = structuralMaterial;
 	
 	//create structural connectivity 
-
 	dgPolyhedra conectivity (GetAllocator());
 	conectivity.BeginFace();
 	for (dgInt32 i = 0; i < m_trianglesCount; i ++) {
@@ -544,6 +548,9 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgMeshEffect* c
 				dgAssert (bendEdge);
 				dgAssert (bendTwin);
 
+				bendEdge->m_mark = mark;
+				bendTwin->m_mark = mark;
+
 				bendEdge->m_twin = bendTwin;
 				bendTwin->m_twin = bendEdge;
 				
@@ -560,7 +567,7 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgMeshEffect* c
 	mark = conectivity.IncLRU();
 	for (iter.Begin(); iter; iter ++) {
 		dgEdge* const edge = &iter.GetNode()->GetInfo();
-		if (edge->m_mark < mark) {
+		if (edge->m_mark < mark){
 			dgEdge* const twin = edge->m_twin;
 			edge->m_mark = mark;
 			twin->m_mark = mark;
@@ -568,8 +575,7 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgMeshEffect* c
 			dgClothLink* const link = &m_links[index];
 			link->m_particle_0 = dgInt16 (edge->m_incidentVertex);
 			link->m_particle_1 = dgInt16 (twin->m_incidentVertex);
-
-
+			link->m_materialIndex = dgInt16 (edge->m_userData);
 			index ++;
 		}
 	}

@@ -234,7 +234,16 @@ class SimpleSoftBodyEntity: public DemoEntity
 		NewtonMeshApplyBoxMapping(mesh, material, material, material);
 
 		// now create a soft collision mesh
-		NewtonCollision* const softCollisionMesh = NewtonCreateClothPatch (world, mesh, 0);
+		NewtonClothPatchMaterial bendMaterial;
+		NewtonClothPatchMaterial structuralMaterial;
+
+		structuralMaterial.m_damper = 100;
+		structuralMaterial.m_stiffness = 500;
+
+		bendMaterial.m_damper = 100;
+		bendMaterial.m_stiffness = 500;
+
+		NewtonCollision* const softCollisionMesh = NewtonCreateClothPatch (world, mesh, 0, &structuralMaterial, &bendMaterial);
 		//NewtonDeformableMeshSetSkinThickness (softCollisionMesh, 1.0f);
 		NewtonDeformableMeshSetSkinThickness (softCollisionMesh, 0.05f);
 

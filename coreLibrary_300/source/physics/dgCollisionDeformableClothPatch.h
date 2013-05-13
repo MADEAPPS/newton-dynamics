@@ -37,7 +37,7 @@ class dgCollisionDeformableClothPatch: public dgCollisionDeformableMesh
 	class dgClothLink;
 
 	dgCollisionDeformableClothPatch (const dgCollisionDeformableClothPatch& source);
-	dgCollisionDeformableClothPatch (dgMeshEffect* const mesh);
+	dgCollisionDeformableClothPatch (dgMeshEffect* const mesh, const dgCollisionDeformableClothPatch::dgClothPatchMaterial& structuralMaterial, const dgCollisionDeformableClothPatch::dgClothPatchMaterial& bendMaterial);
 	dgCollisionDeformableClothPatch (dgWorld* const world, dgDeserialize deserialization, void* const userData);
 	virtual ~dgCollisionDeformableClothPatch(void);
 
@@ -58,6 +58,7 @@ class dgCollisionDeformableClothPatch: public dgCollisionDeformableMesh
 	void Serialize(dgSerialize callback, void* const userData) const;
 	virtual dgInt32 CalculateSignature () const;
 
+	dgClothPatchMaterial m_materials[2];
 	dgInt32 m_linksCount;
 	dgClothLink* m_links;
 	friend class dgWorld;

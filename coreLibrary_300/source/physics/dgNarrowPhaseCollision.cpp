@@ -198,10 +198,10 @@ dgCollisionInstance* dgWorld::CreateCollisionCompound ()
 }
 
 
-dgCollisionInstance* dgWorld::CreateClothPatchMesh (dgMeshEffect* const mesh, dgInt32 shapeID)
+dgCollisionInstance* dgWorld::CreateClothPatchMesh (dgMeshEffect* const mesh, dgInt32 shapeID, const dgClothPatchMaterial& structuralMaterial, const dgClothPatchMaterial& bendMaterial)
 {
 	dgAssert (m_allocator == mesh->GetAllocator());
-	dgCollision* const collision = new (m_allocator) dgCollisionDeformableClothPatch (mesh);
+	dgCollision* const collision = new (m_allocator) dgCollisionDeformableClothPatch (mesh, structuralMaterial, bendMaterial);
 	dgCollisionInstance* const instance = CreateInstance (collision, shapeID, dgGetIdentityMatrix()); 
 	collision->Release();
 	return instance;
