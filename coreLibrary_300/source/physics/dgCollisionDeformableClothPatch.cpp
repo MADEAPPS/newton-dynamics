@@ -596,5 +596,9 @@ void dgCollisionDeformableClothPatch::CalculateInternalForces (dgFloat32 timeste
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
 		m_particles.m_force[i] = force.Scale (m_particles.m_mass[i] * massScale);
 	}
+}
+
+void dgCollisionDeformableClothPatch::IntegrateVelocities (dgFloat32 timestep)
+{
 
 }

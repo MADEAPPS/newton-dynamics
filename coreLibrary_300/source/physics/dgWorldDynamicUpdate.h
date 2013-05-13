@@ -268,6 +268,7 @@ class dgWorldDynamicUpdate
 
 	static dgInt32 CompareIslands (const dgIsland* const islandA, const dgIsland* const islandB, void* notUsed);
 	static void CalculateIslandReactionForcesKernel (void* const context, void* const worldContext, dgInt32 threadID);
+	static void IntegrateSoftBodyForcesKernel (void* const context, void* const worldContext, dgInt32 threadID);
 
 	static void IntegrateInslandParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
 	static void InitilizeBodyArrayParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
@@ -306,7 +307,7 @@ class dgWorldDynamicUpdate
 	void BuildJacobianMatrixParallel (dgParallelSolverSyncData* const syncData) const; 
 	void SolverInitInternalForcesParallel (dgParallelSolverSyncData* const syncData) const; 
 	void CalculateForcesGameModeParallel (dgParallelSolverSyncData* const syncData) const; 
-	
+
 
 	void IntegrateInslandParallelSimd (dgParallelSolverSyncData* const syncData) const; 
 	void InitilizeBodyArrayParallelSimd (dgParallelSolverSyncData* const yncData) const; 
@@ -345,7 +346,7 @@ class dgWorldDynamicUpdate
 	void IntegrateArray (const dgIsland* const island, dgFloat32 accelTolerance, dgFloat32 timestep, dgInt32 threadID) const;
 	dgInt32 GetJacobianDerivatives (const dgIsland* const island, dgInt32 threadID, bool bitMode, dgInt32 rowBase, dgInt32 rowCount, dgFloat32 timestep) const;	
 
-
+	void IntegrateSoftBody (dgWorldDynamicUpdateSyncDescriptor* const descriptor, dgInt32 threadID);
 
 	dgInt32 m_bodies;
 	dgInt32 m_joints;
@@ -353,7 +354,7 @@ class dgWorldDynamicUpdate
 	dgUnsigned32 m_markLru;
 	mutable dgInt32 m_rowCountAtomicIndex;
 	dgJacobianMemory m_solverMemory;
-
+	dgThread::dgCriticalSection m_softBodyCriticalSectionLock;
 	dgBody* m_sentinelBody;
 
 	friend class dgWorld;

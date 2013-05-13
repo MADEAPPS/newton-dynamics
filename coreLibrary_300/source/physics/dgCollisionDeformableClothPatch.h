@@ -58,6 +58,7 @@ class dgCollisionDeformableClothPatch: public dgCollisionDeformableMesh
 	void Serialize(dgSerialize callback, void* const userData) const;
 	virtual dgInt32 CalculateSignature () const;
 
+	virtual void IntegrateVelocities (dgFloat32 timestep);
 	virtual void CalculateInternalForces (dgFloat32 timestep);
 
 	dgClothPatchMaterial m_materials[2];

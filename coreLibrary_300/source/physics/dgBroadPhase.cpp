@@ -37,10 +37,6 @@
 #define DG_BROADPHASE_AABB_INV_SCALE	(dgFloat32 (1.0f) / DG_BROADPHASE_AABB_SCALE)
 
 
-
-
-
-
 DG_MSC_VECTOR_AVX_ALIGMENT
 class dgBroadPhase::dgNode
 {
@@ -1215,14 +1211,7 @@ void dgBroadPhase::UpdateSoftBodyForcesKernel (void* const context, void* const 
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*) context;
 	dgWorld* const world = (dgWorld*) worldContext;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
-
-	if (!threadID) {
-		dgUnsigned32 ticks0 = world->m_getPerformanceCount();
-		broadPhase->UpdateSoftBodyForcesKernel (descriptor, threadID);
-		world->m_perfomanceCounters[m_softBodyTicks] = world->m_getPerformanceCount() - ticks0;
-	} else {
-		broadPhase->UpdateSoftBodyForcesKernel (descriptor, threadID);
-	}
+	broadPhase->UpdateSoftBodyForcesKernel (descriptor, threadID);
 }
 
 
@@ -1820,4 +1809,5 @@ void dgBroadPhase::UpdateContacts( dgFloat32 timestep)
 		m_world->QueueJob (UpdateSoftBodyForcesKernel, &syncPoints, m_world);
 	}
 	m_world->SynchronizationBarrier();
+	m_world->m_perfomanceCounters[m_softBodyTicks] = m_world->m_getPerformanceCount() - endTicks;
 }

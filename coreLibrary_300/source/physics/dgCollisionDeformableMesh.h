@@ -95,6 +95,7 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	void SetSkinThickness (dgFloat32 skinThickness);
 	void GetVisualVertexData(dgInt32 vertexStrideInByte, dgFloat32* const vertex, dgInt32 normalStrideInByte, dgFloat32* const normals, dgInt32 uvStrideInByte0, dgFloat32* const uv0, dgInt32 uvStrideInByte1, dgFloat32* const uv1);
 	
+	virtual void IntegrateVelocities (dgFloat32 timestep) = 0;
 	virtual void CalculateInternalForces (dgFloat32 timestep) = 0;
 
 	void* GetFirtVisualSegment() const;
