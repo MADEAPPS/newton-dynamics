@@ -96,8 +96,6 @@ class dgContactPoint
 	dgInt64 m_shapeId0;
 	dgInt64 m_shapeId1;
 	dgFloat32 m_penetration;
-	dgUnsigned16 m_deformableIndex0;
-	dgUnsigned16 m_deformableIndex1;
 }DG_GCC_VECTOR_ALIGMENT;
 
 DG_MSC_VECTOR_ALIGMENT

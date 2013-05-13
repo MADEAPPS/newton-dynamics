@@ -514,8 +514,8 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch (dgWorld* const
 }
 
 
-dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgMeshEffect* const mesh, const dgClothPatchMaterial& structuralMaterial, const dgClothPatchMaterial& bendMaterial)
-	:dgCollisionDeformableMesh (mesh, m_deformableClothPatch)
+dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgWorld* const world, dgMeshEffect* const mesh, const dgClothPatchMaterial& structuralMaterial, const dgClothPatchMaterial& bendMaterial)
+	:dgCollisionDeformableMesh (world, mesh, m_deformableClothPatch)
 	,m_linksCount (0)
 	,m_links(NULL)
 {

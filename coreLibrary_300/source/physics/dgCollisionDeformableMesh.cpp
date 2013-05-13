@@ -903,6 +903,7 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh (const dgCollisionDeformabl
 	,m_nodesCount(source.m_nodesCount)
 	,m_trianglesCount(source.m_trianglesCount)
 	,m_visualVertexCount(source.m_visualVertexCount)
+	,m_world (source.m_world)
 	,m_indexList(NULL)
 	,m_faceNormals(NULL)
 	,m_rootNode(NULL)
@@ -911,6 +912,9 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh (const dgCollisionDeformabl
 	,m_isdoubleSided(source.m_isdoubleSided)
 {
 	m_rtti = source.m_rtti;
+
+	dgCollisionDeformableMeshList& softBodyList = *m_world;
+	softBodyList.Insert (this, this);
 
 	m_indexList = (dgInt16*) dgMallocStack (3 * m_trianglesCount * sizeof (dgInt16));
 	m_faceNormals = (dgVector*) dgMallocStack (m_trianglesCount * sizeof (dgVector));
@@ -986,6 +990,9 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh (dgWorld* const world, dgDe
 //	
 {
 	dgAssert (0);
+//	dgCollisionDeformableMeshList& softBodyList = *m_world;
+//	softBodyList.Insert (this, this);
+
 /*
 	m_rtti |= dgCollisionDeformableMesh_RTTI;
 	dgAABBPolygonSoup::Deserialize (deserialization, userData);
@@ -998,7 +1005,7 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh (dgWorld* const world, dgDe
 }
 
 
-dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgMeshEffect* const mesh, dgCollisionID collsionID)
+dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMeshEffect* const mesh, dgCollisionID collsionID)
 	:dgCollisionConvex (mesh->GetAllocator(), 0, collsionID)
 	,m_particles (mesh->GetVertexCount ())
 	,m_visualSegments(mesh->GetAllocator())
@@ -1006,6 +1013,7 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgMeshEffect* const mesh, d
 	,m_nodesCount(0)
 	,m_trianglesCount(0)
 	,m_visualVertexCount(0)
+	,m_world (world)
 	,m_indexList(NULL)
 	,m_faceNormals(NULL)
 	,m_rootNode(NULL)
@@ -1019,6 +1027,10 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgMeshEffect* const mesh, d
 	
 {
 	m_rtti |= dgCollisionDeformableMesh_RTTI;
+
+	dgCollisionDeformableMeshList& softBodyList = *m_world;
+	softBodyList.Insert (this, this);
+
 	dgMeshEffect meshCopy (*mesh);
 	meshCopy.Triangulate();
 
@@ -1166,6 +1178,8 @@ dgCollisionDeformableMesh::~dgCollisionDeformableMesh(void)
 //		dgFree (m_regions);
 //	}
 
+	dgCollisionDeformableMeshList& softBodyList = *m_world;
+	softBodyList.Remove (this);
 }
 
 

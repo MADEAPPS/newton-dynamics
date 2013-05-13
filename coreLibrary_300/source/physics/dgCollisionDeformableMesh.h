@@ -85,7 +85,7 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	};
 
 	dgCollisionDeformableMesh (const dgCollisionDeformableMesh& source);
-	dgCollisionDeformableMesh(dgMeshEffect* const mesh, dgCollisionID collsionID);
+	dgCollisionDeformableMesh (dgWorld* const world, dgMeshEffect* const mesh, dgCollisionID collsionID);
 	dgCollisionDeformableMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData);
 	virtual ~dgCollisionDeformableMesh(void);
 
@@ -154,6 +154,8 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	dgInt32 m_nodesCount;
 	dgInt32 m_trianglesCount;
 	dgInt32 m_visualVertexCount;
+
+	dgWorld* m_world;
 	dgInt16* m_indexList;
 	dgVector* m_faceNormals;
 	dgDeformableNode* m_rootNode;

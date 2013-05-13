@@ -52,6 +52,7 @@ class dgCollisionInstance;
 class dgUpVectorConstraint;
 class dgUniversalConstraint;
 class dgCorkscrewConstraint;
+class dgCollisionDeformableMesh;
 
 
 class dgBodyCollisionList: public dgTree<const dgCollision*, dgUnsigned32>
@@ -60,7 +61,6 @@ class dgBodyCollisionList: public dgTree<const dgCollision*, dgUnsigned32>
 	dgBodyCollisionList (dgMemoryAllocator* const allocator)
 		:dgTree<const dgCollision*, dgUnsigned32>(allocator)
 	{
-
 	}
 };
 
@@ -70,7 +70,15 @@ class dgBodyMaterialList: public dgTree<dgContactMaterial, dgUnsigned32>
 	dgBodyMaterialList (dgMemoryAllocator* const allocator)
 		:dgTree<dgContactMaterial, dgUnsigned32>(allocator)
 	{
+	}
+};
 
+class dgCollisionDeformableMeshList: public dgTree<const dgCollisionDeformableMesh*, const dgCollisionDeformableMesh*>
+{
+	public:
+	dgCollisionDeformableMeshList (dgMemoryAllocator* const allocator)
+		:dgTree<const dgCollisionDeformableMesh*, const dgCollisionDeformableMesh*>(allocator)
+	{
 	}
 };
 
@@ -124,6 +132,7 @@ class dgWorld:
 	public dgBodyMasterList,
 	public dgBodyMaterialList,
 	public dgBodyCollisionList,
+	public dgCollisionDeformableMeshList,
 	public dgActiveContacts, 
 	public dgCollidingPairCollector,
 	public dgWorldDynamicUpdate,

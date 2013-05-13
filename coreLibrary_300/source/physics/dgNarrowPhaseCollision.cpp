@@ -201,7 +201,7 @@ dgCollisionInstance* dgWorld::CreateCollisionCompound ()
 dgCollisionInstance* dgWorld::CreateClothPatchMesh (dgMeshEffect* const mesh, dgInt32 shapeID, const dgClothPatchMaterial& structuralMaterial, const dgClothPatchMaterial& bendMaterial)
 {
 	dgAssert (m_allocator == mesh->GetAllocator());
-	dgCollision* const collision = new (m_allocator) dgCollisionDeformableClothPatch (mesh, structuralMaterial, bendMaterial);
+	dgCollision* const collision = new (m_allocator) dgCollisionDeformableClothPatch (this, mesh, structuralMaterial, bendMaterial);
 	dgCollisionInstance* const instance = CreateInstance (collision, shapeID, dgGetIdentityMatrix()); 
 	collision->Release();
 	return instance;
@@ -394,10 +394,7 @@ dgInt32 dgWorld::ClosestPoint(const dgCollisionInstance* const collisionSrcA, co
 
 
 	dgContactMaterial material;
-//	material.m_userId = 0;
 	material.m_penetration = dgFloat32 (0.0f);
-	material.m_deformableIndex0 = 0;
-	material.m_deformableIndex1 = 0;
 
 	dgContact contactJoint (this, &material);
 	contactJoint.SetBodies (&collideBodyA, &collideBodyB);
@@ -1391,8 +1388,6 @@ dgInt32 dgWorld::CollideContinue (
 
 	dgContactMaterial material;
 	material.m_penetration = dgFloat32 (0.0f);
-	material.m_deformableIndex0 = 0;
-	material.m_deformableIndex1 = 0;
 
 	dgContact contactJoint (this, &material);
 	contactJoint.SetBodies (&collideBodyA, &collideBodyB);
@@ -1463,8 +1458,6 @@ dgInt32 dgWorld::Collide (
 
 	dgContactMaterial material; 
 	material.m_penetration = dgFloat32 (0.0f);
-	material.m_deformableIndex0 = 0;
-	material.m_deformableIndex1 = 0;
 
 	dgContact contactJoint (this, &material);
 	contactJoint.SetBodies (&collideBodyA, &collideBodyB);

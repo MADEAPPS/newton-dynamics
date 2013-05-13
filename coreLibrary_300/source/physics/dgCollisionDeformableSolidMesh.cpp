@@ -1455,8 +1455,8 @@ dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh (dgWorld* const w
 }
 
 
-dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(dgMeshEffect* const mesh)
-	:dgCollisionDeformableMesh (mesh, m_deformableSolidMesh)
+dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(dgWorld* const world, dgMeshEffect* const mesh)
+	:dgCollisionDeformableMesh (world, mesh, m_deformableSolidMesh)
 //	,m_particles (mesh->GetVertexCount ())
 //	,m_regionsCount(0)
 //	,m_trianglesCount(0)
