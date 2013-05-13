@@ -134,6 +134,7 @@ class dgCollisionParamProxy
 
 class dgClothPatchMaterial
 {
+	public:
 	dgFloat32 m_damper;
 	dgFloat32 m_stiffness;
 };
