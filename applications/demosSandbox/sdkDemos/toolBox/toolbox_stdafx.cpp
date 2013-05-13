@@ -63,9 +63,10 @@ void GetWorkingFileName (const char* const name, char* const outPathName)
 		CFURLRef appURL (CFBundleCopyBundleURL(CFBundleGetMainBundle()));
         CFStringRef filePath (CFURLCopyFileSystemPath (appURL, kCFURLPOSIXPathStyle));
         CFStringGetCString (filePath, tmp, PATH_MAX, kCFStringEncodingUTF8);
-        char* const ptr = strstr (tmp, "applications");
-        ptr [0] = 0;
-        sprintf (outPathName, "%sapplications/media/%s", tmp, name);
+        //char* const ptr = strstr (tmp, "applications");
+        //ptr [0] = 0;
+        //sprintf (outPathName, "%sapplications/media/%s", tmp, name);
+        sprintf (outPathName, "%s/Contents/Resources/%s", tmp, name);
 
 		// Clean up 
 		CFRelease( appURL ); 
