@@ -73,11 +73,11 @@ class dgBodyMaterialList: public dgTree<dgContactMaterial, dgUnsigned32>
 	}
 };
 
-class dgCollisionDeformableMeshList: public dgList<const dgCollisionDeformableMesh*>
+class dgCollisionDeformableMeshList: public dgList<dgCollisionDeformableMesh*>
 {
 	public:
 	dgCollisionDeformableMeshList (dgMemoryAllocator* const allocator)
-		:dgList<const dgCollisionDeformableMesh*>(allocator)
+		:dgList<dgCollisionDeformableMesh*>(allocator)
 		,m_dictionary(allocator)
 	{
 	}
@@ -114,10 +114,11 @@ enum dgPerformanceCounters
 	m_dynamicsBuildSpanningTreeTicks,
 	m_dynamicsSolveSpanningTreeTicks,
 
-	m_forceCallback,
+	m_forceCallbackTicks,
+	m_softBodyTicks,
 
-	m_preUpdataLister,
-	m_postUpdataLister,
+	m_preUpdataListerTicks,
+	m_postUpdataListerTicks,
 
 	m_counterSize
 };

@@ -1289,7 +1289,7 @@ m_cpu = dgSimdPresent;
 			dgListener& listener = node->GetInfo();
 			listener.m_onListenerUpdate (this, listener.m_userData, timestep);
 		}
-		m_perfomanceCounters[m_postUpdataLister] = m_getPerformanceCount() - ticks;
+		m_perfomanceCounters[m_postUpdataListerTicks] = m_getPerformanceCount() - ticks;
 	}
 
 	m_perfomanceCounters[m_worldTicks] = m_getPerformanceCount() - ticks;

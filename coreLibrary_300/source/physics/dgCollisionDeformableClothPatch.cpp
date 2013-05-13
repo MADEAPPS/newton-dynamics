@@ -588,3 +588,6 @@ dgCollisionDeformableClothPatch::~dgCollisionDeformableClothPatch(void)
 	}
 }
 
+void dgCollisionDeformableClothPatch::CalculateInternalForces (dgFloat32 timestep)
+{
+}

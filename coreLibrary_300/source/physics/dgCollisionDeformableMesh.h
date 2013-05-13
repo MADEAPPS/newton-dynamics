@@ -94,7 +94,7 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	void SetSkinThickness (dgFloat32 skinThickness);
 	void GetVisualVertexData(dgInt32 vertexStrideInByte, dgFloat32* const vertex, dgInt32 normalStrideInByte, dgFloat32* const normals, dgInt32 uvStrideInByte0, dgFloat32* const uv0, dgInt32 uvStrideInByte1, dgFloat32* const uv1);
 	
-
+	virtual void CalculateInternalForces (dgFloat32 timestep) = 0;
 
 	void* GetFirtVisualSegment() const;
 	void* GetNextVisualSegment(void* const segment) const;
@@ -147,6 +147,7 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 
 	dgInt32 CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy, dgInt32 useSimd);
 	//dgInt32 CalculateContacts (dgCollisionParamProxy& proxy, dgVector* const contactsOut) const;
+
 
 	dgParticle m_particles;
 	dgList<dgMeshSegment> m_visualSegments;

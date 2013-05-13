@@ -29,7 +29,7 @@
 #include "dgCollisionInstance.h"
 #include "dgDeformableContact.h"
 #include "dgWorldDynamicUpdate.h"
-
+#include "dgCollisionDeformableMesh.h"
 
 #define DG_CONVEX_CAST_POOLSIZE			32
 #define DG_BROADPHASE_MAX_STACK_DEPTH	256
@@ -200,9 +200,9 @@ class dgBroadphaseSyncDescriptor
 		,m_pairsAtomicCounter(0)
 		,m_jointsAtomicCounter(0)
 		,m_timestep(dgFloat32 (0.0f))
-//		,m_world(NULL)
 		,m_collindPairBodyNode(NULL)
 		,m_forceAndTorqueBodyNode(NULL)
+		,m_sofBodyNode(NULL)
 		,m_broadPhaseType(broadPhaseType)
 	{
 	}
@@ -311,6 +311,7 @@ class dgBroadphaseSyncDescriptor
 	dgFloat32 m_timestep;
 	dgBodyMasterList::dgListNode* m_collindPairBodyNode;
 	dgBodyMasterList::dgListNode* m_forceAndTorqueBodyNode;
+	dgCollisionDeformableMeshList::dgListNode* m_sofBodyNode;
 	dgBroadPhase::dgType m_broadPhaseType;
 	dgBroadPhase::dgNode* m_pairs[1024 * 4];	
 };
@@ -932,8 +933,6 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, dgInt32 th
 
 void dgBroadPhase::ApplyForceAndtorque (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID)
 {
-//	dgAssert (m_world == descriptor->m_world);
-
 	dgFloat32 timestep = descriptor->m_timestep; 
 	bool simd = (m_world->m_cpu == dgSimdPresent);
 
@@ -996,6 +995,31 @@ void dgBroadPhase::ApplyForceAndtorque (dgBroadphaseSyncDescriptor* const descri
 	}
 }
 
+void dgBroadPhase::UpdateSoftBodyForcesKernel (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID)
+{
+//	dgCollisionDeformableMeshList& softBodyList = *m_world;
+
+	dgFloat32 timestep = descriptor->m_timestep; 
+	dgCollisionDeformableMeshList::dgListNode* node = NULL;
+	{
+		dgThreadHiveScopeLock lock (m_world, descriptor->m_lock);
+		node = descriptor->m_sofBodyNode;
+		if (node) {
+			descriptor->m_sofBodyNode = node->GetNext();
+		}
+	}
+	for ( ; node; ) {
+		dgCollisionDeformableMesh* const softShape = node->GetInfo();
+
+		softShape->CalculateInternalForces (timestep);
+
+		dgThreadHiveScopeLock lock (m_world, descriptor->m_lock);
+		node = descriptor->m_sofBodyNode;
+		if (node) {
+			descriptor->m_sofBodyNode = node->GetNext();
+		}
+	}
+}
 
 void dgBroadPhase::CheckKenamaticBodyActivation (dgContact* const contatJoint) const
 {
@@ -1127,7 +1151,7 @@ void dgBroadPhase::ForceAndToqueKernel (void* const context, void* const worldCo
 	if (!threadID) {
 		dgUnsigned32 ticks0 = world->m_getPerformanceCount();
 		broadPhase->ApplyForceAndtorque (descriptor, threadID);
-		world->m_perfomanceCounters[m_forceCallback] = world->m_getPerformanceCount() - ticks0;
+		world->m_perfomanceCounters[m_forceCallbackTicks] = world->m_getPerformanceCount() - ticks0;
 	} else {
 		broadPhase->ApplyForceAndtorque (descriptor, threadID);
 	}
@@ -1186,7 +1210,20 @@ void dgBroadPhase::UpdateContactsKernel (void* const context, void* const worldC
 }
 
 
+void dgBroadPhase::UpdateSoftBodyForcesKernel (void* const context, void* const worldContext, dgInt32 threadID)
+{
+	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*) context;
+	dgWorld* const world = (dgWorld*) worldContext;
+	dgBroadPhase* const broadPhase = world->GetBroadPhase();
 
+	if (!threadID) {
+		dgUnsigned32 ticks0 = world->m_getPerformanceCount();
+		broadPhase->UpdateSoftBodyForcesKernel (descriptor, threadID);
+		world->m_perfomanceCounters[m_softBodyTicks] = world->m_getPerformanceCount() - ticks0;
+	} else {
+		broadPhase->UpdateSoftBodyForcesKernel (descriptor, threadID);
+	}
+}
 
 
 void dgBroadPhase::SubmitPairsStatic (dgNode* const bodyNode, dgNode* const node, dgInt32 threadID)
@@ -1734,10 +1771,14 @@ void dgBroadPhase::UpdateContacts( dgFloat32 timestep)
 //	syncPoints.m_world = m_world;
 	syncPoints.m_timestep = timestep;
 
+	
 	const dgBodyMasterList* const masterList = m_world;
+	const dgCollisionDeformableMeshList* const softBodyList = m_world;
+
 	dgBodyMasterList::dgListNode* const firstBodyNode = masterList->GetFirst()->GetNext();
 	syncPoints.m_collindPairBodyNode = firstBodyNode;
 	syncPoints.m_forceAndTorqueBodyNode = firstBodyNode;
+	syncPoints.m_sofBodyNode = softBodyList->GetFirst();
 
 	for (dgInt32 i = 0; i < threadsCount; i ++) {
 		m_world->QueueJob (ForceAndToqueKernel, &syncPoints, m_world);
@@ -1751,7 +1792,7 @@ void dgBroadPhase::UpdateContacts( dgFloat32 timestep)
 			dgWorld::dgListener& listener = node->GetInfo();
 			listener.m_onListenerUpdate (m_world, listener.m_userData, timestep);
 		}
-		m_world->m_perfomanceCounters[m_preUpdataLister] = m_world->m_getPerformanceCount() - ticks;
+		m_world->m_perfomanceCounters[m_preUpdataListerTicks] = m_world->m_getPerformanceCount() - ticks;
 	}
 
 	ImproveFitness();
@@ -1772,5 +1813,11 @@ void dgBroadPhase::UpdateContacts( dgFloat32 timestep)
 	UpdateContactsBroadPhaseEnd();
 
 	dgUnsigned32 endTicks = m_world->m_getPerformanceCount();
-	m_world->m_perfomanceCounters[m_collisionTicks] = endTicks - ticks - m_world->m_perfomanceCounters[m_forceCallback];
+	m_world->m_perfomanceCounters[m_collisionTicks] = endTicks - ticks - m_world->m_perfomanceCounters[m_forceCallbackTicks];
+
+	// update sofbody dynamics phase 1
+	for (dgInt32 i = 0; i < threadsCount; i ++) {
+		m_world->QueueJob (UpdateSoftBodyForcesKernel, &syncPoints, m_world);
+	}
+	m_world->SynchronizationBarrier();
 }

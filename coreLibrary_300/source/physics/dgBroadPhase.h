@@ -114,12 +114,13 @@ class dgBroadPhase
 	static void ForceAndToqueKernel (void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void CollidingPairsKernel (void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void UpdateContactsKernel (void* const descriptor, void* const worldContext, dgInt32 threadID);
-
+	static void UpdateSoftBodyForcesKernel (void* const descriptor, void* const worldContext, dgInt32 threadID);
 	
 	void UpdateContactsBroadPhaseEnd ();
 	void ApplyForceAndtorque (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
 	void ApplyDeformableForceAndtorque (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
 	void CalculatePairContacts (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID);
+	void UpdateSoftBodyForcesKernel (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID);
 	
 	void SubmitPairsStatic (dgNode* const body, dgNode* const node, dgInt32 threadID);
 	void FindCollidingPairsDynamics (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
