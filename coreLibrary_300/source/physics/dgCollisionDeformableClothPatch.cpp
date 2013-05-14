@@ -245,8 +245,6 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgWorld* const 
 			} while (ptr != edge) ;
 		}
 	} 
-
-	EndConfiguration ();
 }
 
 dgCollisionDeformableClothPatch::~dgCollisionDeformableClothPatch(void)
