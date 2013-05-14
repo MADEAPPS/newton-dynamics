@@ -106,6 +106,16 @@ void dgCollisionBox::Init (dgFloat32 size_x, dgFloat32 size_y, dgFloat32 size_z)
 
 	dgCollisionConvex::m_vertex = m_vertex;
 	dgCollisionConvex::m_simplex = m_edgeArray;
+
+	memset (m_vertexToEdgeMap, 0, sizeof (m_vertexToEdgeMap));
+	for (dgInt32 i = 0; i < m_edgeCount; i ++) {
+		dgConvexSimplexEdge* const edge = &m_simplex[i];
+		if (!m_vertexToEdgeMap[edge->m_vertex]) {
+			dgAssert (edge->m_vertex < 8);
+			m_vertexToEdgeMap[edge->m_vertex] = edge;
+		}
+	}
+
 	SetVolumeAndCG ();
 }
 
@@ -272,12 +282,11 @@ dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, cons
 {
 	dgFloat32 test[8];
 	dgPlane plane (normal, - (normal % point));
-
-	dgConvexSimplexEdge* edge = NULL;
 	for (dgInt32 i = 0; i < 8; i ++) {
 		test[i] = plane.Evalue (m_vertex[i]);
 	}
 
+	dgConvexSimplexEdge* edge = NULL;
 	for (dgInt32 i = 0; i < 8; i ++) {
 		dgConvexSimplexEdge* const ptr = m_vertexToEdgeMap[i];
 		dgFloat32 side0 = test[ptr->m_vertex];

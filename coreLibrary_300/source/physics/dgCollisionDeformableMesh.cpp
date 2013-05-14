@@ -52,8 +52,7 @@ dgCollisionDeformableMesh::dgParticle::dgParticle (dgInt32 particlesCount)
 	:m_com (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)) 
 	,m_count(particlesCount)
 {
-	m_mass = (dgFloat32*) dgMallocStack (m_count * sizeof (dgFloat32));
-	m_invMass = (dgFloat32*) dgMallocStack (m_count * sizeof (dgFloat32));
+	m_unitMass = (dgFloat32*) dgMallocStack (m_count * sizeof (dgFloat32));
 	m_posit = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
 	m_veloc = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
 	m_force = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
@@ -75,8 +74,7 @@ dgCollisionDeformableMesh::dgParticle::dgParticle(const dgParticle& source)
 	:m_com (source.m_com) 
 	,m_count(source.m_count)
 {
-	m_mass = (dgFloat32*) dgMallocStack (m_count * sizeof (dgFloat32));
-	m_invMass = (dgFloat32*) dgMallocStack (m_count * sizeof (dgFloat32));
+	m_unitMass = (dgFloat32*) dgMallocStack (m_count * sizeof (dgFloat32));
 	m_posit = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
 	m_veloc = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
 	m_force = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
@@ -86,8 +84,7 @@ dgCollisionDeformableMesh::dgParticle::dgParticle(const dgParticle& source)
 //	m_instantVelocity = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
 //	m_internalVelocity = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
 
-	memcpy (m_mass, source.m_mass, m_count * sizeof (dgFloat32));
-	memcpy (m_invMass, source.m_invMass, m_count * sizeof (dgFloat32));
+	memcpy (m_unitMass, source.m_unitMass, m_count * sizeof (dgFloat32));
 	memcpy (m_posit, source.m_posit, m_count * sizeof (dgVector));
 	memcpy (m_veloc, source.m_veloc, m_count * sizeof (dgVector));
 //	memcpy (m_shapePosition, source.m_shapePosition, m_count * sizeof (dgVector));
@@ -104,9 +101,8 @@ dgCollisionDeformableMesh::dgParticle::dgParticle (dgWorld* const world, dgDeser
 
 dgCollisionDeformableMesh::dgParticle::~dgParticle()
 {
-	if (m_mass) {
-		dgFree (m_mass);
-		dgFree (m_invMass);
+	if (m_unitMass) {
+		dgFree (m_unitMass);
 		dgFree (m_posit);
 		dgFree (m_veloc);
 		dgFree (m_force);
@@ -478,26 +474,6 @@ void dgCollisionDeformableMesh::GetCollidingFaces (dgPolygonMeshDesc* const data
 }
 
 
-
-
-
-
-
-
-void dgCollisionDeformableMesh::CreateRegions()
-{
-	// for now only one region
-	dgStack<dgInt16> indexList(m_particles.m_count);
-	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-		indexList[i] = dgInt16(i);
-	}
-
-	for (dgInt32 i = 0; i < m_regionsCount; i ++) {
-		m_regions[i].Init(m_particles.m_count, &indexList[0], m_particles);
-	}
-}
-
-
 void dgCollisionDeformableMesh::DebugCollision (const dgMatrix& matrixPtr, OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 dgAssert (0);
@@ -557,10 +533,6 @@ void dgCollisionDeformableMesh::SetParticlesMasses (dgFloat32 totalMass)
 		for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
 			m_particles.m_mass[i] = mass;
 			m_particles.m_invMass[i] = invMass;
-		}
-
-		for (dgInt32 i = 0; i < m_regionsCount; i ++) {
-			m_regions[i].Update(m_particles);
 		}
 	}
 }
@@ -636,11 +608,6 @@ void dgCollisionDeformableMesh::ApplyExternalAndInternalForces (dgDeformableBody
 		instantVelocity[i] += extenalVelocityImpulse;
 		deltaPositions[i] = instantVelocity[i].Scale (timestep);
 		positions[i] += deltaPositions[i];
-	}
-
-	// apply particle velocity contribution by each particle regions
-	for (dgInt32 i = 0; i < m_regionsCount; i ++) {
-		m_regions[i].UpdateVelocities(m_particles, timestep, m_stiffness);
 	}
 
 	// integrate each particle by the deformation velocity, also calculate the new com
@@ -912,16 +879,10 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh (const dgCollisionDeformabl
 	m_indexList = (dgInt16*) dgMallocStack (3 * m_trianglesCount * sizeof (dgInt16));
 	m_faceNormals = (dgVector*) dgMallocStack (m_trianglesCount * sizeof (dgVector));
 	m_nodesMemory = (dgDeformableNode*) dgMallocStack(m_nodesCount * sizeof (dgDeformableNode));
-//	m_regions = (dgDeformationRegion*) dgMallocStack (sizeof (dgDeformationRegion) * m_regionsCount);
 
-//	memset (m_regions, 0, sizeof (dgDeformationRegion) * m_regionsCount);
 	memcpy (m_indexList, source.m_indexList, 3 * m_trianglesCount * sizeof (dgInt16));
 	memcpy (m_faceNormals, source.m_faceNormals, m_trianglesCount * sizeof (dgVector));
 	memcpy (m_nodesMemory, source.m_nodesMemory, m_nodesCount * sizeof (dgDeformableNode));
-//	for (dgInt32 i = 0; i < m_regionsCount; i ++) {
-//		m_regions[i].Copy (source.m_regions[i]);
-//	}
-
 
 	dgInt32 index = dgInt32 (source.m_rootNode - source.m_nodesMemory);
 	m_rootNode = &m_nodesMemory[index];
@@ -1013,11 +974,6 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMes
 	,m_nodesMemory(NULL)
 	,m_visualVertexData(NULL)
 	,m_isdoubleSided(false)
-//	,m_regionsCount(0)
-//	,m_stiffness(DG_DEFORMABLE_DEFAULT_STIFFNESS)
-//	,m_plasticity(DG_DEFORMABLE_DEFAULT_PLASTICITY)
-//	,m_regions(NULL)
-	
 {
 	m_rtti |= dgCollisionDeformableMesh_RTTI;
 
@@ -1032,23 +988,18 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMes
 	m_indexList = (dgInt16*) dgMallocStack (3 * m_trianglesCount * sizeof (dgInt16) );
 	m_faceNormals = (dgVector*) dgMallocStack (m_trianglesCount * sizeof (dgVector));
 
-
-//	m_regions = (dgDeformationRegion*) dgMallocStack (sizeof (dgDeformationRegion) * m_regionsCount);
-//	memset (m_regions, 0, sizeof (dgDeformationRegion) * m_regionsCount);
 	dgInt32 stride = mesh->GetVertexStrideInByte() / sizeof (dgFloat64);  
 	dgFloat64* const vertex = mesh->GetVertexPool();  
 
 //	dgVector delta (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 //	dgBigVector com (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-		m_particles.m_mass[i] = dgFloat32 (1.0f);
-		m_particles.m_invMass[i] = dgFloat32 (1.0f);
+		m_particles.m_unitMass[i] = dgFloat32 (1.0f);
 		m_particles.m_posit[i] = dgVector (dgFloat32 (vertex[i * stride + 0]), dgFloat32 (vertex[i * stride + 1]), dgFloat32 (vertex[i * stride + 2]), dgFloat32 (0.0f));
 		m_particles.m_veloc[i] = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	}
 //	com = com.Scale(dgFloat32 (1.0f / m_particles.m_count));
 //	m_particles.m_com = com;
-//	CreateRegions();
 
 	dgInt32 indexCount = mesh->GetTotalIndexCount (); 
 	dgStack<dgInt32> faceArray (m_trianglesCount);
@@ -1116,11 +1067,6 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMes
 			dgInt32 index1 = m_trianglesCount * 3;
 			for (dgInt32 j = i; j < m_trianglesCount; j ++) {
 				if (materials[j] == -1) {
-//					for (dgInt32 k = 0; k < 3; k ++) {
-//						dgInt32 m = mesh->GetPointIndex(indexArray[j * 3 + k]);
-//						segment.m_indexList[count] = dgInt16 (m);
-//						count ++;
-//					}
 					dgInt32 m0 = mesh->GetPointIndex(indexArray[j * 3 + 0]);
 					dgInt32 m1 = mesh->GetPointIndex(indexArray[j * 3 + 1]);
 					dgInt32 m2 = mesh->GetPointIndex(indexArray[j * 3 + 2]);
@@ -1153,13 +1099,6 @@ dgCollisionDeformableMesh::~dgCollisionDeformableMesh(void)
 	if (m_visualVertexData) {
 		dgFree (m_visualVertexData);
 	}
-
-//	if (m_regions) {
-//		for (dgInt32 i = 0; i < m_regionsCount; i ++) {
-//			m_regions[i].CleanUP();
-//		}
-//		dgFree (m_regions);
-//	}
 
 	dgCollisionDeformableMeshList& softBodyList = *m_world;
 	softBodyList.RemoveShape (this);
@@ -1305,7 +1244,6 @@ void dgCollisionDeformableMesh::ImproveNodeFitness (dgDeformableNode* const node
 		node->m_surfaceArea = CalculateSurfaceArea (node->m_left, node->m_right, node->m_minBox, node->m_maxBox);
 	} else {
 		if (node->m_parent->m_left == node) {
-			//dgFloat32 cost0 = node->m_surfaceArea;
 			dgFloat32 cost0 = CalculateSurfaceArea (node->m_left, node->m_right, node->m_minBox, node->m_maxBox);
 			node->m_surfaceArea = cost0;
 
@@ -1369,7 +1307,6 @@ void dgCollisionDeformableMesh::ImproveNodeFitness (dgDeformableNode* const node
 				parent->m_surfaceArea = cost2;
 			}
 		} else {
-			//dgFloat32 cost0 = node->m_surfaceArea;
 			dgFloat32 cost0 = CalculateSurfaceArea (node->m_left, node->m_right, node->m_minBox, node->m_maxBox);
 			node->m_surfaceArea = cost0;
 
@@ -1547,7 +1484,6 @@ void dgCollisionDeformableMesh::UpdateVisualNormals()
 
 		for (dgInt32 i = 0; i < segment.m_indexCount; i ++) {
 			dgInt32 index = segment.m_indexList[i];
-			//dgInt32 sourceNormalIndex = m_visualVertexData[index].m_vertexIndex;
 			dgInt32 faceIndexNormal = i / 3;
 			m_visualVertexData[index].m_normals[0] += m_faceNormals[faceIndexNormal].m_x;
 			m_visualVertexData[index].m_normals[1] += m_faceNormals[faceIndexNormal].m_y;
@@ -1689,8 +1625,7 @@ dgVector dgCollisionDeformableMesh::GetParticlePosition(dgInt32 index) const
 
 void dgCollisionDeformableMesh::ConstraintParticle (dgInt32 particleIndex, const dgVector& posit, const dgBody* const body)
 {
- 	m_particles.m_invMass[particleIndex] = dgFloat32 (0.0f);
-	m_particles.m_mass[particleIndex] = dgFloat32 (1.0e-15f);
+ 	m_particles.m_unitMass[particleIndex] = dgFloat32 (0.0f);
 	m_particles.m_posit[particleIndex].m_x = posit.m_x;
 	m_particles.m_posit[particleIndex].m_y = posit.m_y;
 	m_particles.m_posit[particleIndex].m_z = posit.m_z;

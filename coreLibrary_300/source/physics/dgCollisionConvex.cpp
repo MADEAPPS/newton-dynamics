@@ -1217,55 +1217,42 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 
 dgCollisionConvex::dgCollisionConvex (dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgCollisionID id)
 	:dgCollision(allocator, signature, id) 
+	,m_size_x (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
+	,m_size_y (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
+	,m_size_z (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
+	,m_userData (NULL)
+	,m_vertex (NULL)
+	,m_simplex (NULL)
+	,m_boxMinRadius (dgFloat32 (0.0f))
+	,m_boxMaxRadius (dgFloat32 (0.0f))
+	,m_simplexVolume (dgFloat32 (0.0f))
+	,m_edgeCount (0)
+	,m_vertexCount (0)
 {
 	m_rtti |= dgCollisionConvexShape_RTTI;
-
-	m_edgeCount= 0;
-	m_vertexCount = 0;
-	m_vertex = NULL;
-	m_vertexToEdgeMap = NULL;
-//	m_vertexSOACount = 0;
-//	m_simdVertexSOA = NULL;
-	m_simplex = NULL;
-	m_userData = NULL;
-	m_simplexVolume = dgFloat32 (0.0f);
-	m_boxMinRadius = dgFloat32 (0.0f);
-	m_boxMaxRadius = dgFloat32 (0.0f);
-
-//	for (dgUnsigned32 i = 0; i < sizeof (m_supportVertexStarQuadrant) / sizeof (m_supportVertexStarQuadrant[0]); i ++) {
-//		m_supportVertexStarQuadrant[i] = NULL;
-//	}
 }
 
 
 dgCollisionConvex::dgCollisionConvex (dgWorld* const world, dgDeserialize deserialization, void* const userData)
 	:dgCollision (world, deserialization, userData)
+	,m_size_x (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
+	,m_size_y (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
+	,m_size_z (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
+	,m_userData (userData)
+	,m_vertex (NULL)
+	,m_simplex (NULL)
+	,m_boxMinRadius (dgFloat32 (0.0f))
+	,m_boxMaxRadius (dgFloat32 (0.0f))
+	,m_simplexVolume (dgFloat32 (0.0f))
+	,m_edgeCount (0)
+	,m_vertexCount (0)
 {
 	dgAssert (m_rtti | dgCollisionConvexShape_RTTI);
-	m_edgeCount= 0;
-	m_vertexCount = 0;
-	m_vertex = NULL;
-	m_vertexToEdgeMap = NULL;
-//	m_vertexSOACount = 0;
-//	m_simdVertexSOA = NULL;
-	m_simplex = NULL;
-	m_userData = NULL;
-	m_simplexVolume = dgFloat32 (0.0f);
-	m_boxMinRadius = dgFloat32 (0.0f);
-	m_boxMaxRadius = dgFloat32 (0.0f);
-
-//	for (dgUnsigned32 i = 0; i < sizeof (m_supportVertexStarQuadrant) / sizeof (m_supportVertexStarQuadrant[0]); i ++) {
-//		m_supportVertexStarQuadrant[i] = NULL;
-//	}
 }
 
 
 dgCollisionConvex::~dgCollisionConvex ()
 {
-	if (m_vertexToEdgeMap) {
-		m_allocator->Free (m_vertexToEdgeMap);
-	}
-
 	if (m_vertex) {
 		m_allocator->Free (m_vertex);
 	}
@@ -1273,11 +1260,6 @@ dgCollisionConvex::~dgCollisionConvex ()
 	if (m_simplex) {
 		m_allocator->Free (m_simplex);
 	}
-
-	
-//	if (m_simdVertexSOA) {
-//		m_allocator->Free (m_simdVertexSOA);
-//	}
 }
 
 void dgCollisionConvex::SerializeLow(dgSerialize callback, void* const userData) const
@@ -1298,64 +1280,9 @@ void dgCollisionConvex::SetUserData (void* const userData)
 
 void dgCollisionConvex::SetVolumeAndCG ()
 {
-/*
-	dgVector faceVertex[512];
-	dgStack<dgInt8> edgeMarks (m_edgeCount);
-	m_vertexSOACount = 0;
-	if (m_vertexCount < DG_MAX_SIMD_VERTEX_LIMIT) {
-
-		dgInt32 sizeInFloats = DG_VECTOR_AVX_SIZE / 4;
-		dgInt32 sizeInVectors = DG_VECTOR_AVX_SIZE / DG_VECTOR_SIMD_SIZE;
-		dgInt32 count = (m_vertexCount + (sizeInFloats - 1)) & (-sizeInFloats);
-
-		dgInt32 soaSize = 3 * sizeInVectors;
-		m_vertexSOACount = dgInt16 (soaSize * count / sizeInFloats);
-		m_simdVertexSOA = (dgVector*) m_allocator->MallocLow (m_vertexSOACount * sizeof (dgVector));
-		dgAssert (!((dgUnsigned64(m_simdVertexSOA)) & (DG_VECTOR_AVX_SIZE - 1)));
-
-		count -= sizeInFloats;
-		for (dgInt32 i = 0; i < count; i += sizeInFloats) {
-			dgFloat32* const dst = &m_simdVertexSOA[i * soaSize/sizeInFloats][0];
-			const dgFloat32* const src = &m_vertex[i][0];
-			for (dgInt32 j = 0; j < 4; j ++) {
-				for (dgInt32 k = 0; k < 3; k ++) {
-					dgFloat32 val = src[(j * 2 + 0) * 4 + k];
-					dst[k * sizeInFloats + j * 2 + 0] = val;
-					val = src[(j * 2 + 1) * 4 + k];
-					dst[k * sizeInFloats + j * 2 + 1] = val;
-				}
-			}
-		}
-
-		dgVector padding[DG_VECTOR_AVX_SIZE / 4];
-		for (dgInt32 i = 0; i < DG_VECTOR_AVX_SIZE / 4; i ++) {
-			padding[i] = m_vertex[0];
-		}
-		count = m_vertexCount & (-sizeInFloats);
-		if (count == m_vertexCount) {
-			count -= sizeInFloats;
-		}
-		dgAssert (count >= 0);
-		for (dgInt32 i = count; i < m_vertexCount; i ++) {
-			padding[i - count] = m_vertex[i];
-		}
-
-		dgFloat32* const dst = &m_simdVertexSOA[count * soaSize/sizeInFloats][0];
-		const dgFloat32* const src = &padding[0][0];
-		for (dgInt32 j = 0; j < 4; j ++) {
-			for (dgInt32 k = 0; k < 3; k ++) {
-				dgFloat32 val = src[(j * 2 + 0) * 4 + k];
-				dst[k * sizeInFloats + j * 2 + 0] = val;
-				val = src[(j * 2 + 1) * 4 + k];
-				dst[k * sizeInFloats + j * 2 + 1] = val;
-			}
-		}
-	}
-*/
-
-	dgAssert (!m_vertexToEdgeMap);
-	m_vertexToEdgeMap = (dgConvexSimplexEdge**) m_allocator->Malloc (dgInt32 (m_vertexCount * sizeof (dgConvexSimplexEdge*)));
-	memset (m_vertexToEdgeMap, 0, m_vertexCount * sizeof (dgConvexSimplexEdge*));
+//	dgAssert (!m_vertexToEdgeMap);
+//	m_vertexToEdgeMap = (dgConvexSimplexEdge**) m_allocator->Malloc (dgInt32 (m_vertexCount * sizeof (dgConvexSimplexEdge*)));
+//	memset (m_vertexToEdgeMap, 0, m_vertexCount * sizeof (dgConvexSimplexEdge*));
 
 	dgVector faceVertex[64];
 	dgStack<dgInt8> edgeMarks (m_edgeCount);
@@ -1364,9 +1291,9 @@ void dgCollisionConvex::SetVolumeAndCG ()
 	dgPolyhedraMassProperties localData;
 	for (dgInt32 i = 0; i < m_edgeCount; i ++) {
 		dgConvexSimplexEdge* const face = &m_simplex[i];
-		if (!m_vertexToEdgeMap[face->m_vertex]) {
-			m_vertexToEdgeMap[face->m_vertex] = face;
-		}
+//		if (!m_vertexToEdgeMap[face->m_vertex]) {
+//			m_vertexToEdgeMap[face->m_vertex] = face;
+//		}
 		if (!edgeMarks[i]) {
 			dgConvexSimplexEdge* edge = face;
 			dgInt32 count = 0;
@@ -1388,16 +1315,6 @@ void dgCollisionConvex::SetVolumeAndCG ()
 	dgVector crossInertia;
 	dgFloat32 volume = localData.MassProperties (origin, inertia, crossInertia);
 	m_simplexVolume = volume;
-
-	// set the table for quick calculation of support vertex
-//	dgInt32 count = sizeof (m_supportVertexStarQuadrant) / sizeof (m_supportVertexStarQuadrant[0]);
-//	for (dgInt32 i = 0; i < count; i ++) {
-//		m_supportVertexStarQuadrant[i] = GetSupportEdge (m_multiResDir[i]);
-//	}
-//	dgAssert (m_supportVertexStarQuadrant[4] == GetSupportEdge (m_multiResDir[0].Scale (-1.0f)));
-//	dgAssert (m_supportVertexStarQuadrant[5] == GetSupportEdge (m_multiResDir[1].Scale (-1.0f)));
-//	dgAssert (m_supportVertexStarQuadrant[6] == GetSupportEdge (m_multiResDir[2].Scale (-1.0f)));
-//	dgAssert (m_supportVertexStarQuadrant[7] == GetSupportEdge (m_multiResDir[3].Scale (-1.0f)));
 
 	// calculate the origin of the bound box of this primitive
 	dgVector p0; 
@@ -1545,27 +1462,6 @@ void dgCollisionConvex::CalcAABBSimd (const dgMatrix &matrix, dgVector& p0, dgVe
 	(dgSimd&)p1 = (origin + size) & dgSimd::m_triplexMask;
 }
 
-/*
-dgConvexSimplexEdge *dgCollisionConvex::GetSupportEdge (const dgVector& dir) const
-{
-	dgAssert (dgAbsf(dir % dir - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
-	
-	dgConvexSimplexEdge* edge = &m_simplex[0];
-	dgFloat32 side0 = m_vertex[edge->m_vertex] % dir;
-	dgConvexSimplexEdge* ptr = edge;
-	do {
-		dgFloat32 side1 = m_vertex[ptr->m_twin->m_vertex] % dir;
-		if (side1 > side0) {
-			side0 = side1;
-			edge = ptr->m_twin;
-			ptr = edge;
-		}
-		ptr = ptr->m_twin->m_next;
-	} while (ptr != edge);
-
-	return edge;
-}
-*/
 
 void dgCollisionConvex::CalculateInertia (void* userData, int indexCount, const dgFloat32* const faceVertex, int faceId)
 {

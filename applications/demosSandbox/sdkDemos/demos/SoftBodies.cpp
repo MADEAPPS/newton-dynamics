@@ -170,7 +170,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 
 
 		//#define steps 32
-		#define steps 3
+		#define steps 16
 
 		dFloat dimension = 0.25f;
 		dVector points[steps][steps];
@@ -238,11 +238,11 @@ class SimpleSoftBodyEntity: public DemoEntity
 		NewtonClothPatchMaterial bendMaterial;
 		NewtonClothPatchMaterial structuralMaterial;
 
-		structuralMaterial.m_damper = 0;
-		structuralMaterial.m_stiffness = 10;
+		structuralMaterial.m_damper = 100.0f;
+		structuralMaterial.m_stiffness = 5000.0f;
 
-		bendMaterial.m_damper = 0;
-		bendMaterial.m_stiffness = 10;
+		bendMaterial.m_damper = 10.0f;
+		bendMaterial.m_stiffness = 200.0f;
 
 		NewtonCollision* const softCollisionMesh = NewtonCreateClothPatch (world, mesh, 0, &structuralMaterial, &bendMaterial);
 
@@ -369,6 +369,5 @@ void ClothPath(DemoEntityManager* const scene)
 
 	//	scene->SaveScene ("test1.ngd");
 	//	dScene CreateAlchemediaFromPhysic(); 
-
 }
 

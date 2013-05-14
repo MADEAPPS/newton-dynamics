@@ -888,7 +888,7 @@ void dgCollisionDeformableSolidMesh::SetParticlesMasses (dgFloat32 totalMass)
 
 		for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
 			m_particles.m_mass[i] = mass;
-			m_particles.m_invMass[i] = invMass;
+			m_particles.m_unitMass[i] = invMass;
 		}
 
 		for (dgInt32 i = 0; i < m_regionsCount; i ++) {

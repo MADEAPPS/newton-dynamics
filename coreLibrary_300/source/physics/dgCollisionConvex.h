@@ -136,12 +136,9 @@ class dgCollisionConvex: public dgCollision
 	dgVector m_size_x;
 	dgVector m_size_y;
 	dgVector m_size_z;
-//	dgConvexSimplexEdge* m_supportVertexStarQuadrant[8];
 	
 	void* m_userData;
 	dgVector* m_vertex;
-	dgConvexSimplexEdge** m_vertexToEdgeMap;
-//	dgVector* m_simdVertexSOA;
 	dgConvexSimplexEdge* m_simplex;
 	
 	dgFloat32 m_boxMinRadius;
@@ -150,11 +147,9 @@ class dgCollisionConvex: public dgCollision
 	
 	dgUnsigned16 m_edgeCount;
 	dgUnsigned16 m_vertexCount;
-//	dgUnsigned16 m_vertexSOACount;
+
 	
 	public:	
-//	static dgVector m_multiResDir[8];
-//	static dgVector m_multiResDir_sse[6];
 	static dgVector m_hullDirs[14]; 
 	static dgVector m_dummySum[4];
 	static dgInt32 m_rayCastSimplex[4][4];

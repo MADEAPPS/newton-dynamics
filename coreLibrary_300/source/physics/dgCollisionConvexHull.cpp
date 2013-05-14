@@ -109,7 +109,6 @@ dgCollisionConvexHull::dgCollisionConvexHull(dgWorld* const world, dgDeserialize
 		m_faceArray[i] = m_simplex + faceOffset; 
 	}
 
-
 	SetVolumeAndCG ();
 }
 

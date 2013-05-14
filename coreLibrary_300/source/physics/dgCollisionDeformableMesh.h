@@ -47,8 +47,7 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 
 		dgVector m_com;
 		dgInt32 m_count;
-		dgFloat32* m_mass;
-		dgFloat32* m_invMass;
+		dgFloat32* m_unitMass;
 		dgVector* m_posit;
 		dgVector* m_veloc;
 		dgVector* m_force;
@@ -124,7 +123,6 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 
 	class dgDeformableNode;
 /*
-	class dgDeformationRegion;
 	void Serialize(dgSerialize callback, void* const userData) const;
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
 	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
@@ -138,10 +136,8 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	void CalculateContactsToCollisionTree (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy, dgInt32 useSimd);
 	void CalculatePolygonContacts (dgDeformableNode* const node, const dgPlane& plane, dgCollisionConvexPolygon* const polygon, dgFloat32 timestep);
 	void CreateRegions();
-	dgInt32 m_regionsCount;
 	dgFloat32 m_stiffness;
 	dgFloat32 m_plasticity;
-	dgDeformationRegion* m_regions;
 */
 
 	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1);
