@@ -1039,14 +1039,16 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMes
 	dgInt32 stride = mesh->GetVertexStrideInByte() / sizeof (dgFloat64);  
 	dgFloat64* const vertex = mesh->GetVertexPool();  
 
-
 //	dgVector delta (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 //	dgBigVector com (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-		m_particles.m_mass[i] = dgFloat32 (1.0f);
-		m_particles.m_invMass[i] = dgFloat32 (1.0f);
-		m_particles.m_posit[i] = dgVector (dgFloat32 (vertex[i * stride + 0]), dgFloat32 (vertex[i * stride + 1]), dgFloat32 (vertex[i * stride + 2]), dgFloat32 (0.0f));
-		m_particles.m_veloc[i] = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+		dgFloat64* const vertexPtr = &vertex[i * stride];
+		dgInt32 index = dgInt32 (vertexPtr[3]);
+		
+		m_particles.m_mass[index] = dgFloat32 (1.0f);
+		m_particles.m_invMass[index] = dgFloat32 (1.0f);
+		m_particles.m_posit[index] = dgVector (dgFloat32 (vertexPtr[0]), dgFloat32 (vertexPtr[1]), dgFloat32 (vertexPtr[2]), dgFloat32 (0.0f));
+		m_particles.m_veloc[index] = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	}
 //	com = com.Scale(dgFloat32 (1.0f / m_particles.m_count));
 //	m_particles.m_com = com;
@@ -1556,7 +1558,7 @@ void dgCollisionDeformableMesh::UpdateVisualNormals()
 			m_visualVertexData[index].m_normals[2] += m_faceNormals[faceIndexNormal].m_z;
 		}
 	}
-
+/*
 	for (dgInt32 i = 0; i < m_visualVertexCount; i ++)	{
 		dgVector n (m_visualVertexData[i].m_normals[0], m_visualVertexData[i].m_normals[1], m_visualVertexData[i].m_normals[2],  dgFloat32 (0.0f));
 		n = n.Scale(dgRsqrt (n % n));
@@ -1564,6 +1566,7 @@ void dgCollisionDeformableMesh::UpdateVisualNormals()
 		m_visualVertexData[i].m_normals[1] = n.m_y;
 		m_visualVertexData[i].m_normals[2] = n.m_z;
 	}
+*/
 }
 
 
@@ -1679,3 +1682,11 @@ return 0;
 */
 }
 
+void dgCollisionDeformableMesh::ConstraintParticle (dgInt32 particleIndex, const dgVector& posit, const dgBody* const body)
+{
+ 	m_particles.m_invMass[particleIndex] = dgFloat32 (0.0f);
+	m_particles.m_mass[particleIndex] = dgFloat32 (1.0e-15f);
+	m_particles.m_posit[particleIndex].m_x = posit.m_x;
+	m_particles.m_posit[particleIndex].m_y = posit.m_y;
+	m_particles.m_posit[particleIndex].m_z = posit.m_z;
+}

@@ -170,6 +170,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 
 
 		#define steps 32
+		//#define steps 2
 
 		dFloat dimension = 0.25f;
 		dVector points[steps][steps];
@@ -177,9 +178,9 @@ class SimpleSoftBodyEntity: public DemoEntity
 		dFloat y = 4.0f;
 		int enumerator = 0;
 		for (int i = 0; i < steps; i ++) {
-			dFloat x = (i - steps / 2) * dimension;
+			dFloat z = (i - steps / 2) * dimension;
 			for (int j = 0; j < steps; j ++) {
-				dFloat z = (j - steps / 2) * dimension;
+				dFloat x = (j - steps / 2) * dimension;
 				points[i][j] = dVector (x, y, z, dFloat (enumerator));
 				enumerator ++;
 			}
@@ -237,13 +238,21 @@ class SimpleSoftBodyEntity: public DemoEntity
 		NewtonClothPatchMaterial bendMaterial;
 		NewtonClothPatchMaterial structuralMaterial;
 
-		structuralMaterial.m_damper = 100;
-		structuralMaterial.m_stiffness = 500;
+		structuralMaterial.m_damper = 0;
+		structuralMaterial.m_stiffness = 1;
 
-		bendMaterial.m_damper = 100;
-		bendMaterial.m_stiffness = 500;
+		bendMaterial.m_damper = 0;
+		bendMaterial.m_stiffness = 1;
 
 		NewtonCollision* const softCollisionMesh = NewtonCreateClothPatch (world, mesh, 0, &structuralMaterial, &bendMaterial);
+
+		// constraint the four corner of this patch to the world
+		NewtonDeformableMeshConstraintParticle (softCollisionMesh, steps * 0 + 0, &points[0][0].m_x, NULL);
+		NewtonDeformableMeshConstraintParticle (softCollisionMesh, steps * 0 + steps - 1, &points[0][steps - 1].m_x, NULL);
+		NewtonDeformableMeshConstraintParticle (softCollisionMesh, steps * (steps - 1) + 0, &points[steps - 1][0].m_x, NULL);
+		NewtonDeformableMeshConstraintParticle (softCollisionMesh, steps * (steps - 1) + steps - 1, &points[steps - 1][steps - 1].m_x, NULL);
+
+
 		//NewtonDeformableMeshSetSkinThickness (softCollisionMesh, 1.0f);
 		NewtonDeformableMeshSetSkinThickness (softCollisionMesh, 0.05f);
 
