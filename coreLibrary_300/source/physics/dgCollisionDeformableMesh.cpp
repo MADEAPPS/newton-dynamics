@@ -1597,10 +1597,3 @@ dgVector dgCollisionDeformableMesh::GetParticlePosition(dgInt32 index) const
 	return m_particles.m_posit[index];
 }
 
-void dgCollisionDeformableMesh::ConstraintParticle (dgInt32 particleIndex, const dgVector& posit, const dgBody* const body)
-{
- 	m_particles.m_unitMass[particleIndex] = dgFloat32 (0.0f);
-	m_particles.m_posit[particleIndex].m_x = posit.m_x;
-	m_particles.m_posit[particleIndex].m_y = posit.m_y;
-	m_particles.m_posit[particleIndex].m_z = posit.m_z;
-}

@@ -37,446 +37,18 @@ class dgCollisionDeformableClothPatch::dgClothLink
 {
 	public:
 	dgFloat32 m_restLengh;
+	dgFloat32 m_mass0_influence;
+	dgFloat32 m_mass1_influence;
 	dgInt16 m_particle_0;
 	dgInt16 m_particle_1;
 	dgInt16 m_materialIndex;
 };
 
-#if 0
-void dgCollisionDeformableClothPatch::SetSkinThickness (dgFloat32 skinThickness)
+class dgCollisionDeformableClothPatch::dgSoftBodyEdge: public dgConvexSimplexEdge
 {
-	m_skinThickness = dgAbsf (skinThickness);
-	if (m_skinThickness < DG_DEFORMABLE_DEFAULT_SKIN_THICKNESS) {
-		m_skinThickness = DG_DEFORMABLE_DEFAULT_SKIN_THICKNESS;
-	}
-	SetCollisionBBox (m_rootNode->m_minBox, m_rootNode->m_maxBox);
-}
-
-void dgCollisionDeformableClothPatch::SetStiffness (dgFloat32 stiffness)
-{
-	m_stiffness = dgAbsf (stiffness);
-	if (m_stiffness < DG_DEFORMABLE_DEFAULT_STIFFNESS) {
-		m_stiffness = DG_DEFORMABLE_DEFAULT_STIFFNESS;
-	}
-}
-
-void dgCollisionDeformableClothPatch::SetPlasticity (dgFloat32 plasticity)
-{
-	m_plasticity = dgAbsf (plasticity);
-	if (m_plasticity < DG_DEFORMABLE_DEFAULT_PLASTICITY) {
-		m_plasticity = DG_DEFORMABLE_DEFAULT_PLASTICITY;
-	}
-}
-
-
-void dgCollisionDeformableClothPatch::DebugCollision (const dgMatrix& matrixPtr, OnDebugCollisionMeshCallback callback, void* const userData) const
-{
-dgAssert (0);
-/*
-	dgMatrix matrix (GetLocalMatrix() * matrixPtr);
-	for (dgInt32 i = 0; i < m_trianglesCount; i ++ ) {
-		dgTriplex points[3];
-		for (dgInt32 j = 0; j < 3; j ++) {
-			dgInt32 index = m_indexList[i * 3 + j];
-			dgVector p (matrix.TransformVector(m_particles.m_position[index]));
-			points[j].m_x = p.m_x;
-			points[j].m_y = p.m_y;
-			points[j].m_z = p.m_z;
-		}
-		callback (userData, 3, &points[0].m_x, 0);
-	}
-*/
-}
-
-
-void dgCollisionDeformableClothPatch::GetCollisionInfo(dgCollisionInfo* const info) const
-{
-	dgCollisionConvex::GetCollisionInfo(info);
-	
-	dgCollisionInfo::dgDeformableMeshData& data = info->m_deformableMesh;
-	data.m_vertexCount = m_particles.m_count;
-	data.m_vertexStrideInBytes = sizeof (dgVector);
-	data.m_triangleCount = m_trianglesCount;
-	data.m_indexList = (dgUnsigned16*) m_indexList;
-	data.m_vertexList = &m_particles.m_shapePosition->m_x;
-}
-
-
-void dgCollisionDeformableClothPatch::SetParticlesMasses (dgFloat32 totalMass)
-{
-	if (totalMass < DG_INFINITE_MASS) {
-		dgFloat32 mass = totalMass / m_particles.m_count;
-		dgFloat32 invMass = dgFloat32 (1.0f) / mass;
-
-		for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-			m_particles.m_mass[i] = mass;
-			m_particles.m_invMass[i] = invMass;
-		}
-
-		for (dgInt32 i = 0; i < m_regionsCount; i ++) {
-			m_regions[i].Update(m_particles);
-		}
-	}
-}
-
-void dgCollisionDeformableClothPatch::SetParticlesVelocities (const dgVector& velocity)
-{
-	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-		m_particles.m_instantVelocity[i] = velocity;
-	}
-}
-
-
-void dgCollisionDeformableClothPatch::UpdateCollision ()
-{
-	// reorganize the collision structure
-	dgVector* const positions = m_particles.m_position;
-	bool update = false;
-	for (dgInt32 i = 0; i < m_trianglesCount; i ++) {
-		dgDeformableNode* const node = &m_nodesMemory[i];
-
-		if (node->UpdateBox (positions, &m_indexList[node->m_indexStart])) {
-			for (dgDeformableNode* parent = node->m_parent; parent; parent = parent->m_parent) {
-				dgVector minBox;
-				dgVector maxBox;
-				dgFloat32 area = CalculateSurfaceArea (parent->m_left, parent->m_right, minBox, maxBox);
-				if (!dgCompareBox (minBox, maxBox, parent->m_minBox, parent->m_maxBox)) {
-					break;
-				}
-				update = true;
-				parent->m_minBox = minBox;
-				parent->m_maxBox = maxBox;
-				parent->m_surfaceArea = area;
-			}
-		}
-	}
-	if (update) {
-		ImproveTotalFitness	();
-	}
-}
-
-
-void dgCollisionDeformableClothPatch::SetMatrix (const dgMatrix& matrix)
-{
-	dgVector* const positions = m_particles.m_position;
-	dgVector* const deltaPositions = m_particles.m_deltaPosition;
-
-	dgMatrix matrix1 (matrix);
-	matrix1.m_posit -= matrix1.RotateVector (m_particles.m_com);
-
-	m_particles.m_com = matrix.m_posit;
-
-	matrix1.TransformTriplex(&positions[0].m_x, sizeof (dgVector), &positions[0].m_x, sizeof (dgVector), m_particles.m_count);
-	memset (deltaPositions, 0, sizeof (dgVector) * m_particles.m_count);
-
-	UpdateCollision ();
-	SetCollisionBBox (m_rootNode->m_minBox, m_rootNode->m_maxBox);
-}
-
-void dgCollisionDeformableClothPatch::ApplyExternalAndInternalForces (dgDeformableBody* const myBody, dgFloat32 timestep, dgInt32 threadIndex)
-{
-//	sleep (100);
-
-	// force are applied immediately to each particle
-	dgVector zero (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	dgVector* const positions = m_particles.m_position;
-	dgVector* const deltaPositions = m_particles.m_deltaPosition;
-	dgVector* const instantVelocity = m_particles.m_instantVelocity;
-	dgVector* const internalVelocity = m_particles.m_internalVelocity;
-
-	// integrate particles external forces and current velocity
-	dgVector extenalVelocityImpulse (myBody->m_accel.Scale (myBody->m_invMass.m_w * timestep));
-	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-		internalVelocity[i] = zero;
-		instantVelocity[i] += extenalVelocityImpulse;
-		deltaPositions[i] = instantVelocity[i].Scale (timestep);
-		positions[i] += deltaPositions[i];
-	}
-
-	// apply particle velocity contribution by each particle regions
-	for (dgInt32 i = 0; i < m_regionsCount; i ++) {
-		m_regions[i].UpdateVelocities(m_particles, timestep, m_stiffness);
-	}
-
-	// integrate each particle by the deformation velocity, also calculate the new com
-	dgFloat32 dampCoef = 0.0f;
-	dgVector com (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-		instantVelocity[i] += internalVelocity[i].Scale (dampCoef);
-		dgVector step (internalVelocity[i].Scale (timestep));
-		deltaPositions[i] += step;
-		positions[i] += step;
-		com += positions[i];
-	}
-
-	// center the particles around the new geometrics center of mass
-	dgVector oldCom (m_particles.m_com);
-	m_particles.m_com = com.Scale (dgFloat32 (1.0f) / m_particles.m_count); 
-
-	// calculate the new body average velocity
-	myBody->m_veloc = (m_particles.m_com - oldCom).Scale (dgFloat32 (1.0f) / timestep);
-	myBody->m_globalCentreOfMass = m_particles.m_com; 
-	myBody->m_matrix.m_posit = m_particles.m_com; 
-
-	//myBody->UpdateMatrix (timestep, threadIndex);
-	if (myBody->m_matrixUpdate) {
-		myBody->m_matrixUpdate (*myBody, myBody->m_matrix, threadIndex);
-	}
-
-	// the collision changed shape, need to update spatial structure 
-	UpdateCollision ();
-
-	SetCollisionBBox (m_rootNode->m_minBox, m_rootNode->m_maxBox);
-
-
-//	if (xxxx >= 70)
-//		xxxx *=1;
-//	dgTrace (("%d ", xxxx));
-//	dgVector xxx (myBody->m_collisionWorldMatrix.TransformVector(m_particles.m_position1[0]));
-//	dgTrace (("(%f %f %f) ", xxx.m_y, m_particles.m_instantVelocity[0].m_y, m_particles.m_internalVelocity[0].m_y));
-//	//dgTrace (("(%f %f %f) ", m_particles.m_position1[0].m_y, m_particles.m_instantVelocity[0].m_y, m_particles.m_internalVelocity[0].m_y));
-//	//dgTrace (("(%f %f %f) ", m_particles.m_position1[4].m_y, m_particles.m_instantVelocity[4].m_y, m_particles.m_internalVelocity[4].m_y));
-//	dgTrace (("\n"));
-
-}
-
-
-dgInt32 dgCollisionDeformableClothPatch::CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy, dgInt32 useSimd)
-{
-dgAssert (0);
-return 0;
-/*
-
-	if (m_rootNode) {
-		dgAssert (IsType (dgCollision::dgCollisionDeformableClothPatch_RTTI));
-
-		if (pair->m_body1->m_collision->IsType (dgCollision::dgCollisionBVH_RTTI)) {
-			CalculateContactsToCollisionTree (pair, proxy, useSimd);
-
-//		if (pair->m_body1->m_collision->IsType (dgCollision::dgCollisionConvexShape_RTTI)) {
-//			contactCount = CalculateContactsToSingle (pair, proxy, useSimd);
-//		} else if (pair->m_body1->m_collision->IsType (dgCollision::dgCollisionCompound_RTTI)) {
-//			contactCount = CalculateContactsToCompound (pair, proxy, useSimd);
-//		} else if (pair->m_body1->m_collision->IsType (dgCollision::dgCollisionBVH_RTTI)) {
-//			contactCount = CalculateContactsToCollisionTree (pair, proxy, useSimd);
-//		} else if (pair->m_body1->m_collision->IsType (dgCollision::dgCollisionHeightField_RTTI)) {
-//			contactCount = CalculateContactsToHeightField (pair, proxy, useSimd);
-//		} else {
-//			dgAssert (pair->m_body1->m_collision->IsType (dgCollision::dgCollisionUserMesh_RTTI));
-//			contactCount = CalculateContactsBruteForce (pair, proxy, useSimd);
-//		}
-		} else {
-			dgAssert (0);
-		}
-	}
-	pair->m_contactCount = 0;
-	return 0;
-*/
-}
-
-
-
-
-void dgCollisionDeformableClothPatch::CalculateContactsToCollisionTree (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy, dgInt32 useSimd)
-{
-	dgAssert (0);
-	/*
-	dgBody* const myBody = pair->m_body0;
-	dgBody* const treeBody = pair->m_body1;
-
-	dgAssert (pair->m_body0->m_collision == this);
-	dgCollisionBVH* const treeCollision = (dgCollisionBVH*)treeBody->m_collision;
-
-	dgMatrix matrix (myBody->m_collisionWorldMatrix * treeBody->m_collisionWorldMatrix.Inverse());
-	dgPolygonMeshDesc data;
-	CalcAABB (matrix, data.m_boxP0, data.m_boxP1);
-
-	data.m_vertex = NULL;
-	data.m_threadNumber = proxy.m_threadIndex;
-	data.m_faceCount = 0;
-	data.m_faceIndexCount = 0;
-	data.m_vertexStrideInBytes = 0;
-
-	data.m_faceMaxSize = NULL;
-	data.m_userAttribute = NULL;
-	data.m_faceVertexIndex = NULL;
-	data.m_faceNormalIndex = NULL;
-	data.m_faceAdjencentEdgeNormal = NULL;
-	data.m_userData = treeCollision->GetUserData();
-	data.m_objCollision = collision;
-	data.m_objBody = myBody;
-	data.m_polySoupBody = treeBody;
-
-
-static int xxx;
-xxx ++;
-
-	treeCollision->GetCollidingFaces (&data);
-	if (data.m_faceCount) {
-		//dgFloat32* const faceSize = data.m_faceMaxSize; 
-		//dgInt32* const idArray = (dgInt32*)data.m_userAttribute; 
-
-
-		dgFloat32 timestep = proxy.m_timestep;
-		//dgFloat32 invTimeStep = dgFloat32 (1.0f) / timestep;
-		//dgVector externImpulseDistance ((myBody->m_accel.Scale (myBody->m_invMass.m_w * timestep) + myBody->m_veloc).Scale (timestep));
-		//dgFloat32 gravityDistance = dgAbsf (dgSqrt (externImpulseDistance % externImpulseDistance));
-
-		dgInt32* const indexArray = (dgInt32*)data.m_faceVertexIndex;
-		dgInt32 thread = data.m_threadNumber;
-		dgCollisionMesh::dgCollisionConvexPolygon* const polygon = treeCollision->m_polygon[thread];
-
-		polygon->m_vertex = data.m_vertex;
-		polygon->m_stride = dgInt32 (data.m_vertexStrideInBytes / sizeof (dgFloat32));
-
-//		dgMatrix matInv (matrix.Inverse());
-		const dgMatrix& worldMatrix = treeBody->m_collisionWorldMatrix;
-
-		dgInt32 indexCount = 0;
-		for (dgInt32 i = 0; i < data.m_faceCount; i ++) {
-
-//dgTrace (("%d ", xxx));
-//dgTrace (("(%f %f %f) ", m_particles.m_position1[0].m_y, m_particles.m_instantVelocity[0].m_y, m_particles.m_internalVelocity[0].m_y));
-//dgTrace (("(%f %f %f) ", m_particles.m_position1[4].m_y, m_particles.m_instantVelocity[4].m_y, m_particles.m_internalVelocity[4].m_y));
-//dgTrace (("\n"));
-
-			polygon->SetFaceVertex (data.m_faceIndexCount[i], &indexArray[indexCount]);
-			dgPlane plane (polygon->m_normal, -(polygon->m_normal % polygon->m_localPoly[0]));
-			plane.m_w -= m_skinThickness;
-			plane = worldMatrix.TransformPlane(plane);
-			worldMatrix.TransformTriplex (&polygon->m_localPoly[0].m_x, sizeof (polygon->m_localPoly[0]), &polygon->m_localPoly[0].m_x, sizeof (polygon->m_localPoly[0]), polygon->m_count); 
-
-			dgPlane scaledPlane(plane);
-			scaledPlane.m_w *= dgFloat32 (2.0f);
-			dgVector planeSupport (dgAbsf(scaledPlane.m_x), dgAbsf(scaledPlane.m_y), dgAbsf(scaledPlane.m_z), dgAbsf(0.0f));
-
-			dgDeformableNode* stackPool[DG_DEFORMABLE_STACK_DEPTH];
-#ifdef _DEBUG
-			dgList<dgDeformableNode*> collidingList (GetAllocator());
-			for (dgInt32 j = 0; j < m_trianglesCount; j ++) {
-				dgDeformableNode* const node = &m_nodesMemory[j];
-				dgVector size (node->m_maxBox - node->m_minBox) ;
-				dgVector origin (node->m_maxBox + node->m_minBox);
-				dgFloat32 support = planeSupport % size;
-				dgFloat32 dist = scaledPlane.Evalue(origin);
-				dgFloat32 maxDist = dist + support;
-				dgFloat32 minDist = dist - support;
-				if (minDist * maxDist <= dgFloat32 (0.0f)) {
-					collidingList.Append(node);
-				}
-			}
-#endif
-
-
-			dgInt32 stack = 1;
-			stackPool[0] = m_rootNode;
-			while (stack) {
-				stack --;
-				dgDeformableNode* const node = stackPool[stack];
-
-				dgVector size (node->m_maxBox - node->m_minBox) ;
-				dgVector origin (node->m_maxBox + node->m_minBox);
-				dgFloat32 support = planeSupport % size;
-				dgFloat32 dist = scaledPlane.Evalue(origin);
-				dgFloat32 maxDist = dist + support;
-				dgFloat32 minDist = dist - support;
-				maxDist = 1;
-				minDist = -1;
-				if ((maxDist * minDist) <= dgFloat32 (0.0f)) {
-					if(node->m_indexStart >= 0) {
-#ifdef _DEBUG	
-						collidingList.Remove(node);
-#endif
-						CalculatePolygonContacts (node, plane, polygon, timestep);
-					}
-
-					if (node->m_left) {
-						stackPool[stack] = node->m_left;
-						stack ++;
-					}
-					if (node->m_right) {
-						stackPool[stack] = node->m_right;
-						stack ++;
-					}
-				}
-			}
-			indexCount += data.m_faceIndexCount[i];
-
-#ifdef _DEBUG	
-			if (collidingList.GetCount()) {
-				dgAssert (0);
-			}
-#endif		
-		}
-	}
-*/
-}
-
-
-void dgCollisionDeformableClothPatch::CalculatePolygonContacts (dgDeformableNode* const node, const dgPlane& plane, dgCollisionConvexPolygon* const polygonShape, dgFloat32 timestep)
-{
-static int xxx;
-xxx ++;
-
-	dgInt32 polyVertCount = polygonShape->m_count;
-	dgVector* const positions = m_particles.m_position;
-	dgVector* const velocity = m_particles.m_instantVelocity;
-	dgVector* const deltaPosition = m_particles.m_deltaPosition;
-	const dgVector* const polygon = polygonShape->m_localPoly;
-
-	if (plane.m_y < 0.0f)
-		xxx *=1;
-
-	for (dgInt32 i = 0; i < 3; i ++) {
-		dgInt32 index = m_indexList[node->m_indexStart + i];
-		dgVector& p0 = positions[index];
-		dgFloat32 side0 = plane.Evalue(p0);
-		if (side0 <= dgFloat32 (0.0f)) {
-			const dgVector& delta = deltaPosition[index];
-			dgVector p1 (p0 - delta);
-			dgFloat32 side1 = plane.Evalue(p1);
-			if (side1 >= dgFloat32 (0.0f)) {
-
-				bool inside = true;
-				dgInt32 j0 = polyVertCount - 1;
-				for(dgInt32 j1 = 0; j1 < polyVertCount; j1 ++) {
-					dgVector e0 (polygon[j1] - polygon[j0]);
-					dgVector e1 (p0 - polygon[j0]);
-					dgVector e2 (p1 - polygon[j0]);
-					dgFloat32 volume = (e0 * e1) % e2;
-					if (volume < dgFloat32 (0.0f)) {
-						inside = false;
-						break;
-					}
-					j0 = j1;
-				}
-
-				if (inside) {
-					dgFloat32 den =  delta % plane;
-					dgAssert (dgAbsf(den) > dgFloat32 (1.0e-6f));
-					p0 -= delta.Scale (dgFloat32 (1.001f) * side0 / den);
-
-//					dgFloat32 reflexVeloc = veloc % plane;
-//					dgVector bounceVeloc (plane.Scale (reflexVeloc));
-//					dgVector tangentVeloc (veloc - bounceVeloc);
-//					float restitution = dgFloat32 (0.0f);
-//					veloc = veloc - bounceVeloc.Scale (dgFloat32 (1.0f) + restitution) ;
-					velocity[index] = dgVector (0.0f, 0.0f, 0.0f, 0.0f);
-					//float keneticFriction = dgFloat32 (0.5f);
-				}
-			}
-		}
-	}
-}
-#endif
-
-
-
-						   
-
-
-
-
+	public:
+	dgClothLink* m_link;
+};
 
 
 void dgCollisionDeformableClothPatch::Serialize(dgSerialize callback, void* const userData) const
@@ -497,7 +69,9 @@ dgInt32 dgCollisionDeformableClothPatch::CalculateSignature () const
 dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch (const dgCollisionDeformableClothPatch& source)
 	:dgCollisionDeformableMesh (source)
 	,m_linksCount (source.m_linksCount)
+	,m_graphCount (source.m_graphCount)
 {
+	_ASSERTE (0);
 	m_rtti = source.m_rtti;
 	m_isdoubleSided = source.m_isdoubleSided;
 
@@ -518,7 +92,10 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch (dgWorld* const
 dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgWorld* const world, dgMeshEffect* const mesh, const dgClothPatchMaterial& structuralMaterial, const dgClothPatchMaterial& bendMaterial)
 	:dgCollisionDeformableMesh (world, mesh, m_deformableClothPatch)
 	,m_linksCount (0)
+	,m_graphCount (0)
 	,m_links(NULL)
+	,m_graph(NULL)
+	,m_particleToEddgeMap(NULL)
 {
 	m_isdoubleSided = true;
 	m_rtti |= dgCollisionDeformableClothPatch_RTTI;
@@ -537,6 +114,7 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgWorld* const 
 	// add bending edges
 	dgInt32 mark = conectivity.IncLRU();
 	dgPolyhedra::Iterator iter (conectivity);
+
 	for (iter.Begin(); iter; iter ++) {
 		dgEdge* const edge = &iter.GetNode()->GetInfo();
 		if (edge->m_mark < mark) {
@@ -544,28 +122,35 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgWorld* const 
 			edge->m_mark = mark;
 			twin->m_mark = mark;
 			if ((edge->m_incidentFace > 0) && (twin->m_incidentFace > 0)) {
-				dgEdge* const bendEdge = conectivity.AddHalfEdge (edge->m_prev->m_incidentVertex, twin->m_prev->m_incidentVertex);
-				dgEdge* const bendTwin = conectivity.AddHalfEdge (twin->m_prev->m_incidentVertex, edge->m_prev->m_incidentVertex);
+//				dgEdge* const bendEdge = conectivity.AddHalfEdge (edge->m_prev->m_incidentVertex, twin->m_prev->m_incidentVertex);
+//				dgEdge* const bendTwin = conectivity.AddHalfEdge (twin->m_prev->m_incidentVertex, edge->m_prev->m_incidentVertex);
+//				dgAssert (bendEdge);
+//				dgAssert (bendTwin);
+//				bendEdge->m_twin = bendTwin;
+//				bendTwin->m_twin = bendEdge;
+
+
+				dgEdge* const bendEdge = conectivity.ConnectVertex (edge->m_prev, twin->m_prev);
 				dgAssert (bendEdge);
-				dgAssert (bendTwin);
+				dgEdge* const bendTwin = bendEdge->m_twin;
+
+				bendEdge->m_incidentFace = -1;
+				bendTwin->m_incidentFace = -1;
 
 				bendEdge->m_mark = mark;
 				bendTwin->m_mark = mark;
-
-				bendEdge->m_twin = bendTwin;
-				bendTwin->m_twin = bendEdge;
-				
+			
 				bendEdge->m_userData = 1;
 				bendTwin->m_userData = 1;
 			}
 		}
 	}
 
-	m_linksCount = conectivity.GetEdgeCount() / 2;
-	m_links = (dgClothLink*) dgMallocStack (m_linksCount * sizeof (dgClothLink));
 
 	dgInt32 index = 0;
 	mark = conectivity.IncLRU();
+	m_linksCount = conectivity.GetEdgeCount() / 2;
+	m_links = (dgClothLink*) dgMallocStack (m_linksCount * sizeof (dgClothLink));
 
 	const dgVector* const posit = m_particles.m_posit;
 	for (iter.Begin(); iter; iter ++) {
@@ -577,75 +162,111 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgWorld* const 
 
 			dgVector dist (posit[edge->m_incidentVertex] - posit[twin->m_incidentVertex]);
 			dgFloat32 dist2 = dist % dist;
-			if (dist2 > 1.0e-5f) {
+			if (dist2 > 1.0e-6f) {
 				dgClothLink* const link = &m_links[index];
 				link->m_restLengh = dgSqrt (dist2);
 				link->m_particle_0 = dgInt16 (edge->m_incidentVertex);
 				link->m_particle_1 = dgInt16 (twin->m_incidentVertex);
+				link->m_mass0_influence = dgFloat32 (0.5f);
+				link->m_mass1_influence = dgFloat32 (0.5f);
 				link->m_materialIndex = dgInt16 (edge->m_userData);
+
+				edge->m_userData = index;
+				edge->m_twin->m_userData = index;
 				index ++;
+			} else {
+				edge->m_userData = 0xffffffff;
+				edge->m_twin->m_userData = 0xffffffff;
 			}
 		}
 	}
 
-/*
-	dgPolyhedra polyhedra (GetAllocator());
-	polyhedra.BeginFace();
-	for (dgInt32 i = 0; i < m_trianglesCount; i ++) {
-		polyhedra.AddFace (m_indexList[i * 3 + 0], m_indexList[i * 3 + 1], m_indexList[i * 3 + 2]);
-	}
-	polyhedra.EndFace();
 
-	dgInt32 mark = polyhedra.IncLRU();
-	dgPolyhedra::Iterator iter (polyhedra);
+	// enumerate the edges
+	mark = conectivity.IncLRU();
 	for (iter.Begin(); iter; iter ++) {
-
 		dgEdge* const edge = &iter.GetNode()->GetInfo();
 		if (edge->m_mark != mark) {
 			dgEdge* ptr = edge;
 			do {
 				ptr->m_mark = mark;
-				ptr->m_userData = m_edgeCount;
-				m_edgeCount ++;
+				ptr->m_userData = (dgInt64 (m_graphCount) << 32) + ptr->m_userData;
+				m_graphCount ++;
 				ptr = ptr->m_twin->m_next;
 			} while (ptr != edge) ;
 		}
 	} 
 
-	m_simplex = (dgConvexSimplexEdge*) m_allocator->Malloc (dgInt32 (m_edgeCount * sizeof (dgConvexSimplexEdge)));
+	m_graph = (dgSoftBodyEdge*) m_allocator->Malloc (m_graphCount * dgInt32 (sizeof (dgSoftBodyEdge)));
+	m_particleToEddgeMap = (dgSoftBodyEdge**) m_allocator->Malloc (m_particles.m_count * dgInt32 (sizeof (dgSoftBodyEdge*)));
+	memset (m_particleToEddgeMap, 0, m_particles.m_count * dgInt32 (sizeof (dgSoftBodyEdge*)));
 
-	mark = polyhedra.IncLRU();;
+	mark = conectivity.IncLRU();;
 	for (iter.Begin(); iter; iter ++) {
 		dgEdge* const edge = &iter.GetNode()->GetInfo();
 		if (edge->m_mark != mark) {
 			dgEdge *ptr = edge;
 			do {
 				ptr->m_mark = mark;
-				dgConvexSimplexEdge* const simplexPtr = &m_simplex[ptr->m_userData];
-				simplexPtr->m_vertex = dgInt16 (ptr->m_incidentVertex);
-				simplexPtr->m_openFace = (ptr->m_incidentFace > 0) ? 0 : 1;
-				simplexPtr->m_next = &m_simplex[ptr->m_next->m_userData];
-				simplexPtr->m_prev = &m_simplex[ptr->m_prev->m_userData];
-				simplexPtr->m_twin = &m_simplex[ptr->m_twin->m_userData];
+				dgSoftBodyEdge* const simplexPtr = &m_graph[ptr->m_userData >> 32];
 
-				if (!m_particles.m_edge[simplexPtr->m_vertex] && !simplexPtr->m_openFace) {
-					m_particles.m_edge[simplexPtr->m_vertex] = simplexPtr;
+				simplexPtr->m_vertex = ptr->m_incidentVertex;
+				simplexPtr->m_next = &m_graph[ptr->m_next->m_userData >> 32];
+				simplexPtr->m_prev = &m_graph[ptr->m_prev->m_userData >> 32];
+				simplexPtr->m_twin = &m_graph[ptr->m_twin->m_userData >> 32];
+
+				dgInt32 linkIndex = ptr->m_userData & 0xffffffff;
+				simplexPtr->m_link = (linkIndex >= 0) ? &m_links[linkIndex] : NULL;
+
+				if (!m_particleToEddgeMap[simplexPtr->m_vertex] && (ptr->m_incidentFace > 0)) {
+					m_particleToEddgeMap[simplexPtr->m_vertex] = simplexPtr;
 				}
 
 				ptr = ptr->m_twin->m_next;
 			} while (ptr != edge) ;
 		}
 	} 
-*/
 }
 
 dgCollisionDeformableClothPatch::~dgCollisionDeformableClothPatch(void)
 {
 	if (m_links) {
 		dgFree (m_links);
+		dgFree (m_graph);
+		dgFree (m_particleToEddgeMap);
 	}
 }
 
+void dgCollisionDeformableClothPatch::ConstraintParticle (dgInt32 particleIndex, const dgVector& posit, const dgBody* const body)
+{
+	m_particles.m_unitMass[particleIndex] = dgFloat32 (0.0f);
+	m_particles.m_posit[particleIndex].m_x = posit.m_x;
+	m_particles.m_posit[particleIndex].m_y = posit.m_y;
+	m_particles.m_posit[particleIndex].m_z = posit.m_z;
+
+	dgSoftBodyEdge* edge = m_particleToEddgeMap[particleIndex];
+	do {
+		dgClothLink* const link = edge->m_link;		
+		if (link) {
+			dgInt32 i0 = link->m_particle_0;
+			dgInt32 i1 = link->m_particle_1;
+			dgAssert ((i0 == particleIndex) || (i1 == particleIndex));
+
+			if ((m_particles.m_unitMass[i0] == dgFloat32 (0.0f)) && (m_particles.m_unitMass[i1] == dgFloat32 (0.0f))) {
+				link->m_mass0_influence = dgFloat32 (0.0f);
+				link->m_mass1_influence = dgFloat32 (0.0f);
+			} else if (m_particles.m_unitMass[i0] == dgFloat32 (0.0f)){
+				link->m_mass0_influence = dgFloat32 (0.0f);
+				link->m_mass1_influence = dgFloat32 (1.0f);
+			} else {
+				link->m_mass0_influence = dgFloat32 (1.0f);
+				link->m_mass1_influence = dgFloat32 (0.0f);
+			}
+		}
+		edge = (dgSoftBodyEdge*)edge->m_twin->m_next;
+	} while (edge != m_particleToEddgeMap[particleIndex]);
+
+}
 
 
 void dgCollisionDeformableClothPatch::CalculateInternalForces (dgFloat32 timestep)

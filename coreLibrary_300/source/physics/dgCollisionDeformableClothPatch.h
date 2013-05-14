@@ -35,11 +35,7 @@ class dgCollisionDeformableClothPatch: public dgCollisionDeformableMesh
 	public:
 
 	class dgClothLink;
-
-//	class dgSofgBodyEdge: public dgConvexSimplexEdge
-//	{
-//	public:
-//	};
+	class dgSoftBodyEdge;
 
 
 	dgCollisionDeformableClothPatch (const dgCollisionDeformableClothPatch& source);
@@ -67,9 +63,14 @@ class dgCollisionDeformableClothPatch: public dgCollisionDeformableMesh
 	virtual void IntegrateVelocities (dgFloat32 timestep);
 	virtual void CalculateInternalForces (dgFloat32 timestep);
 
+	virtual void ConstraintParticle (dgInt32 particleIndex, const dgVector& posit, const dgBody* const body);
+
 	dgClothPatchMaterial m_materials[2];
 	dgInt32 m_linksCount;
+	dgInt32 m_graphCount;
 	dgClothLink* m_links;
+	dgSoftBodyEdge* m_graph;
+	dgSoftBodyEdge** m_particleToEddgeMap;
 	friend class dgWorld;
 };
 
