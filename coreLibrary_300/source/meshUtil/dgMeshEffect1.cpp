@@ -1684,7 +1684,8 @@ void dgMeshEffect::CylindricalMapping (dgInt32 cylinderMaterial, dgInt32 capMate
 	dgInt32 mark = IncLRU();
 	for(iter.Begin(); iter; iter ++){
 		dgEdge* const edge = &(*iter);
-		if (edge->m_mark < mark){
+		//if (edge->m_mark < mark){
+		if ((edge->m_mark < mark) && (edge->m_incidentFace > 0)) {
 			const dgVector& p0 = m_points[edge->m_incidentVertex];
 			const dgVector& p1 = m_points[edge->m_next->m_incidentVertex];
 			const dgVector& p2 = m_points[edge->m_prev->m_incidentVertex];
@@ -1742,7 +1743,8 @@ void dgMeshEffect::BoxMapping (dgInt32 front, dgInt32 side, dgInt32 top)
 	dgPolyhedra::Iterator iter (*this);	
 	for(iter.Begin(); iter; iter ++){
 		dgEdge* const edge = &(*iter);
-		if (edge->m_mark < mark){
+		//if (edge->m_mark < mark){
+		if ((edge->m_mark < mark) && (edge->m_incidentFace > 0)) {
 			const dgBigVector& p0 = m_points[edge->m_incidentVertex];
 			const dgBigVector& p1 = m_points[edge->m_next->m_incidentVertex];
 			const dgBigVector& p2 = m_points[edge->m_prev->m_incidentVertex];
@@ -1807,7 +1809,8 @@ void dgMeshEffect::UniformBoxMapping (dgInt32 material, const dgMatrix& textureM
 
 		for(iter.Begin(); iter; iter ++){
 			dgEdge* const edge = &(*iter);
-			if (edge->m_mark < mark){
+			//if (edge->m_mark < mark){
+			if ((edge->m_mark < mark) && (edge->m_incidentFace > 0)) {
 				dgBigVector n (FaceNormal(edge, &m_points[0].m_x, sizeof (dgBigVector)));
 				dgVector normal (rotationMatrix.RotateVector(dgVector (n.Scale (dgFloat64 (1.0f) / sqrt (n % n)))));
 				normal.m_x = dgAbsf (normal.m_x);
