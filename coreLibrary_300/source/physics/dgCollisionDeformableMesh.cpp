@@ -86,7 +86,6 @@ dgCollisionDeformableMesh::dgParticle::~dgParticle()
 		dgFree (m_posit);
 		dgFree (m_veloc);
 		dgFree (m_force);
-//		dgFree (m_edge);
 	}
 }
 

@@ -70,8 +70,10 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch (const dgCollis
 	:dgCollisionDeformableMesh (source)
 	,m_linksCount (source.m_linksCount)
 	,m_graphCount (source.m_graphCount)
+	,m_links(NULL)
+	,m_graph(NULL)
+	,m_particleToEddgeMap(NULL)
 {
-	_ASSERTE (0);
 	m_rtti = source.m_rtti;
 	m_isdoubleSided = source.m_isdoubleSided;
 
@@ -79,6 +81,23 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch (const dgCollis
 
 	m_links = (dgClothLink*) dgMallocStack (m_linksCount * sizeof (dgClothLink));
 	memcpy (m_links, source.m_links, m_linksCount * sizeof (dgClothLink));
+
+	m_graph = (dgSoftBodyEdge*) m_allocator->Malloc (m_graphCount * dgInt32 (sizeof (dgSoftBodyEdge)));
+	for (dgInt32 i = 0; i < m_graphCount; i ++) {
+		dgSoftBodyEdge* const dst = &m_graph[i];
+		dgSoftBodyEdge* const src = &source.m_graph[i];
+		
+		dst->m_vertex = src->m_vertex;
+		dst->m_twin = &m_graph[source.m_graph - src->m_twin];
+		dst->m_next = &m_graph[source.m_graph - src->m_next];
+		dst->m_prev = &m_graph[source.m_graph - src->m_next];
+		dst->m_link = &m_links[source.m_links - src->m_link];
+	}
+
+	m_particleToEddgeMap = (dgSoftBodyEdge**) m_allocator->Malloc (m_particles.m_count * dgInt32 (sizeof (dgSoftBodyEdge*)));
+	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
+		m_particleToEddgeMap[i] = &m_graph[source.m_graph - source.m_particleToEddgeMap[i]];
+	}
 }
 
 
