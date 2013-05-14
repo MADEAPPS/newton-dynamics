@@ -32,32 +32,33 @@
 
 dgConvexSimplexEdge dgCollisionBox::m_edgeArray[24] = 
 {
-	{1, &m_edgeArray[3], &m_edgeArray[12], &m_edgeArray[5]}, 
-	{2, &m_edgeArray[6], &m_edgeArray[3], &m_edgeArray[7]}, 
-	{7, &m_edgeArray[12], &m_edgeArray[6], &m_edgeArray[14]}, 
-	{0, &m_edgeArray[0], &m_edgeArray[9], &m_edgeArray[1]}, 
-	{3, &m_edgeArray[9], &m_edgeArray[15], &m_edgeArray[11]}, 
-	{6, &m_edgeArray[15], &m_edgeArray[0], &m_edgeArray[16]}, 
-	{0, &m_edgeArray[1], &m_edgeArray[18], &m_edgeArray[2]}, 
-	{3, &m_edgeArray[10], &m_edgeArray[1], &m_edgeArray[9]}, 
-	{5, &m_edgeArray[18], &m_edgeArray[10], &m_edgeArray[20]}, 
-	{1, &m_edgeArray[4], &m_edgeArray[7], &m_edgeArray[3]}, 
-	{2, &m_edgeArray[7], &m_edgeArray[21], &m_edgeArray[8]}, 
-	{4, &m_edgeArray[21], &m_edgeArray[4], &m_edgeArray[22]}, 
-	{0, &m_edgeArray[2], &m_edgeArray[16], &m_edgeArray[0]}, 
-	{6, &m_edgeArray[16], &m_edgeArray[19], &m_edgeArray[17]}, 
-	{5, &m_edgeArray[19], &m_edgeArray[2], &m_edgeArray[18]}, 
-	{1, &m_edgeArray[5], &m_edgeArray[22], &m_edgeArray[4]}, 
-	{7, &m_edgeArray[13], &m_edgeArray[5], &m_edgeArray[12]}, 
-	{4, &m_edgeArray[22], &m_edgeArray[13], &m_edgeArray[23]}, 
-	{2, &m_edgeArray[8], &m_edgeArray[14], &m_edgeArray[6]}, 
-	{7, &m_edgeArray[14], &m_edgeArray[23], &m_edgeArray[13]}, 
-	{4, &m_edgeArray[23], &m_edgeArray[8], &m_edgeArray[21]}, 
-	{3, &m_edgeArray[11], &m_edgeArray[20], &m_edgeArray[10]}, 
-	{6, &m_edgeArray[17], &m_edgeArray[11], &m_edgeArray[15]}, 
-	{5, &m_edgeArray[20], &m_edgeArray[17], &m_edgeArray[19]}, 
+	{&m_edgeArray[3], &m_edgeArray[12], &m_edgeArray[5], 1, 0}, 
+	{&m_edgeArray[6], &m_edgeArray[3], &m_edgeArray[7], 2, 0}, 
+	{&m_edgeArray[12], &m_edgeArray[6], &m_edgeArray[14], 7, 0}, 
+	{&m_edgeArray[0], &m_edgeArray[9], &m_edgeArray[1], 0, 0}, 
+	{&m_edgeArray[9], &m_edgeArray[15], &m_edgeArray[11], 3, 0}, 
+	{&m_edgeArray[15], &m_edgeArray[0], &m_edgeArray[16], 6, 0}, 
+	{&m_edgeArray[1], &m_edgeArray[18], &m_edgeArray[2], 0, 0}, 
+	{&m_edgeArray[10], &m_edgeArray[1], &m_edgeArray[9], 3, 0}, 
+	{&m_edgeArray[18], &m_edgeArray[10], &m_edgeArray[20], 5, 0}, 
+	{&m_edgeArray[4], &m_edgeArray[7], &m_edgeArray[3], 1, 0}, 
+	{&m_edgeArray[7], &m_edgeArray[21], &m_edgeArray[8], 2, 0}, 
+	{&m_edgeArray[21], &m_edgeArray[4], &m_edgeArray[22], 4, 0}, 
+	{&m_edgeArray[2], &m_edgeArray[16], &m_edgeArray[0], 0, 0}, 
+	{&m_edgeArray[16], &m_edgeArray[19], &m_edgeArray[17], 6, 0}, 
+	{&m_edgeArray[19], &m_edgeArray[2], &m_edgeArray[18], 5, 0}, 
+	{&m_edgeArray[5], &m_edgeArray[22], &m_edgeArray[4], 1, 0}, 
+	{&m_edgeArray[13], &m_edgeArray[5], &m_edgeArray[12], 7, 0}, 
+	{&m_edgeArray[22], &m_edgeArray[13], &m_edgeArray[23], 4, 0}, 
+	{&m_edgeArray[8], &m_edgeArray[14], &m_edgeArray[6], 2, 0}, 
+	{&m_edgeArray[14], &m_edgeArray[23], &m_edgeArray[13], 7, 0}, 
+	{&m_edgeArray[23], &m_edgeArray[8], &m_edgeArray[21], 4, 0}, 
+	{&m_edgeArray[11], &m_edgeArray[20], &m_edgeArray[10], 3, 0}, 
+	{&m_edgeArray[17], &m_edgeArray[11], &m_edgeArray[15], 6, 0}, 
+	{&m_edgeArray[20], &m_edgeArray[17], &m_edgeArray[19], 5, 0}, 
 };
 
+dgConvexSimplexEdge* dgCollisionBox::m_vertexToEdgeMap[8] = {&m_edgeArray[3], &m_edgeArray[0], &m_edgeArray[1], &m_edgeArray[4], &m_edgeArray[11], &m_edgeArray[8], &m_edgeArray[5], &m_edgeArray[2]};
 
 dgCollisionBox::dgCollisionBox(dgMemoryAllocator* allocator, dgUnsigned32 signature, dgFloat32 size_x, dgFloat32 size_y, dgFloat32 size_z)
 	:dgCollisionConvex(allocator, signature, m_boxCollision)
@@ -106,15 +107,6 @@ void dgCollisionBox::Init (dgFloat32 size_x, dgFloat32 size_y, dgFloat32 size_z)
 
 	dgCollisionConvex::m_vertex = m_vertex;
 	dgCollisionConvex::m_simplex = m_edgeArray;
-
-	memset (m_vertexToEdgeMap, 0, sizeof (m_vertexToEdgeMap));
-	for (dgInt32 i = 0; i < m_edgeCount; i ++) {
-		dgConvexSimplexEdge* const edge = &m_simplex[i];
-		if (!m_vertexToEdgeMap[edge->m_vertex]) {
-			dgAssert (edge->m_vertex < 8);
-			m_vertexToEdgeMap[edge->m_vertex] = edge;
-		}
-	}
 
 	SetVolumeAndCG ();
 }

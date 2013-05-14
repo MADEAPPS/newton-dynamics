@@ -1280,10 +1280,6 @@ void dgCollisionConvex::SetUserData (void* const userData)
 
 void dgCollisionConvex::SetVolumeAndCG ()
 {
-//	dgAssert (!m_vertexToEdgeMap);
-//	m_vertexToEdgeMap = (dgConvexSimplexEdge**) m_allocator->Malloc (dgInt32 (m_vertexCount * sizeof (dgConvexSimplexEdge*)));
-//	memset (m_vertexToEdgeMap, 0, m_vertexCount * sizeof (dgConvexSimplexEdge*));
-
 	dgVector faceVertex[64];
 	dgStack<dgInt8> edgeMarks (m_edgeCount);
 	memset (&edgeMarks[0], 0, sizeof (dgInt8) * m_edgeCount);
@@ -1291,9 +1287,6 @@ void dgCollisionConvex::SetVolumeAndCG ()
 	dgPolyhedraMassProperties localData;
 	for (dgInt32 i = 0; i < m_edgeCount; i ++) {
 		dgConvexSimplexEdge* const face = &m_simplex[i];
-//		if (!m_vertexToEdgeMap[face->m_vertex]) {
-//			m_vertexToEdgeMap[face->m_vertex] = face;
-//		}
 		if (!edgeMarks[i]) {
 			dgConvexSimplexEdge* edge = face;
 			dgInt32 count = 0;

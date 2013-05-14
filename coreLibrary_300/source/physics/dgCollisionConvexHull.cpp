@@ -44,30 +44,29 @@ class dgCollisionConvexHull::dgConvexBox
 
 dgCollisionConvexHull::dgCollisionConvexHull(dgMemoryAllocator* const allocator, dgUnsigned32 signature)
 	:dgCollisionConvex(allocator, signature, m_convexHullCollision)
+	,m_faceCount (0)
+	,m_supportTreeCount (0)
+	,m_faceArray (NULL)
+	,m_supportTree (NULL)
 {
-	m_faceCount = 0;
 	m_edgeCount = 0;
 	m_vertexCount = 0;
-	m_supportTreeCount = 0;
 	m_vertex = NULL;
 	m_simplex = NULL;
-	m_faceArray = NULL;
-	m_supportTree = NULL;
 	m_rtti |= dgCollisionConvexHull_RTTI;
 }
 
 dgCollisionConvexHull::dgCollisionConvexHull(dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgInt32 count, dgInt32 strideInBytes, dgFloat32 tolerance, const dgFloat32* const vertexArray)
 	:dgCollisionConvex(allocator, signature, m_convexHullCollision)
+	,m_faceCount (0)
+	,m_supportTreeCount (0)
+	,m_faceArray (NULL)
+	,m_supportTree (NULL)
 {
-	m_faceCount = 0;
 	m_edgeCount = 0;
 	m_vertexCount = 0;
-	m_supportTreeCount = 0;
 	m_vertex = NULL;
 	m_simplex = NULL;
-	m_faceArray = NULL;
-	m_supportTree = NULL;
-
 	m_rtti |= dgCollisionConvexHull_RTTI;
 
 	BuildHull (count, strideInBytes, tolerance, vertexArray);
@@ -75,7 +74,10 @@ dgCollisionConvexHull::dgCollisionConvexHull(dgMemoryAllocator* const allocator,
 
 dgCollisionConvexHull::dgCollisionConvexHull(dgWorld* const world, dgDeserialize deserialization, void* const userData)
 	:dgCollisionConvex (world, deserialization, userData)
-	,m_supportTree(NULL)
+	,m_faceCount (0)
+	,m_supportTreeCount (0)
+	,m_faceArray (NULL)
+	,m_supportTree (NULL)
 {
 	m_rtti |= dgCollisionConvexHull_RTTI;
 	deserialization (userData, &m_vertexCount, sizeof (dgInt32));
@@ -97,7 +99,8 @@ dgCollisionConvexHull::dgCollisionConvexHull(dgWorld* const world, dgDeserialize
 		dgInt32 serialization[4];
 		deserialization (userData, serialization, sizeof (serialization));
 
-		m_simplex[i].m_vertex = serialization[0];
+		m_simplex[i].m_openFace = 0;
+		m_simplex[i].m_vertex = dgInt16 (serialization[0]);
 		m_simplex[i].m_twin = m_simplex + serialization[1];
 		m_simplex[i].m_next = m_simplex + serialization[2];
 		m_simplex[i].m_prev = m_simplex + serialization[3];
@@ -486,7 +489,8 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 			do {
 				ptr->m_mark = mark;
 				dgConvexSimplexEdge* const simplexPtr = &m_simplex[ptr->m_userData];
-				simplexPtr->m_vertex = vertexMap[ptr->m_incidentVertex];
+				simplexPtr->m_openFace = 0;
+				simplexPtr->m_vertex = dgInt16 (vertexMap[ptr->m_incidentVertex]);
 				simplexPtr->m_next = &m_simplex[ptr->m_next->m_userData];
 				simplexPtr->m_prev = &m_simplex[ptr->m_prev->m_userData];
 				simplexPtr->m_twin = &m_simplex[ptr->m_twin->m_userData];
@@ -684,7 +688,7 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 			dgConvexSimplexEdge* const ptr = &m_simplex[i];
 			dgTree<dgVector,dgInt32>::dgTreeNode* const node = sortTree.Find(ptr->m_vertex);
 			dgInt32 index = dgInt32 (node->GetInfo().m_w);
-			ptr->m_vertex = index;
+			ptr->m_vertex = dgInt16 (index);
 		}
 	}
 

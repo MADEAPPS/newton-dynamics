@@ -29,10 +29,11 @@
 class dgConvexSimplexEdge
 {
 	public:
-	dgInt32 m_vertex;
 	dgConvexSimplexEdge* m_twin;
 	dgConvexSimplexEdge* m_next;
 	dgConvexSimplexEdge* m_prev;
+	dgInt16 m_vertex;
+	dgInt32 m_openFace;
 };
 
 
