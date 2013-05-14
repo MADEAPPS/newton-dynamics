@@ -8646,10 +8646,22 @@ void NewtonDeformableMeshGetParticlePosition (NewtonCollision* const deformableM
 		posit[0] = p[0];
 		posit[1] = p[1];
 		posit[2] = p[2];
-		
 	}
 }
 
+void NewtonDeformableMeshBeginConfiguration (const NewtonCollision* const deformableMesh)
+{
+}
+
+void NewtonDeformableMeshEndConfiguration (const NewtonCollision* const deformableMesh)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
+	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
+		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*) collision->GetChildShape();
+		deformableShape->EndConfiguration();
+	}
+}
 
 void NewtonDeformableMeshUnconstraintParticle (NewtonCollision* const deformableMesh, int partivleIndex)
 {

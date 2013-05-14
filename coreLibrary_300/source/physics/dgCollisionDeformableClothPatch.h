@@ -63,6 +63,7 @@ class dgCollisionDeformableClothPatch: public dgCollisionDeformableMesh
 	virtual void IntegrateVelocities (dgFloat32 timestep);
 	virtual void CalculateInternalForces (dgFloat32 timestep);
 
+	virtual void EndConfiguration ();
 	virtual void ConstraintParticle (dgInt32 particleIndex, const dgVector& posit, const dgBody* const body);
 
 	dgClothPatchMaterial m_materials[2];

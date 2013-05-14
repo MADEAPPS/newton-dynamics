@@ -284,10 +284,12 @@ class SimpleSoftBodyEntity: public DemoEntity
 		}
 
 		// constraint the four corner of this patch to the world
+		NewtonDeformableMeshBeginConfiguration (softCollisionMesh);
 		NewtonDeformableMeshConstraintParticle (softCollisionMesh, index0, &p0.m_x, NULL);
 		NewtonDeformableMeshConstraintParticle (softCollisionMesh, index1, &p1.m_x, NULL);
 		NewtonDeformableMeshConstraintParticle (softCollisionMesh, index2, &p2.m_x, NULL);
 		NewtonDeformableMeshConstraintParticle (softCollisionMesh, index3, &p3.m_x, NULL);
+		NewtonDeformableMeshEndConfiguration (softCollisionMesh);
 
 
 		//NewtonDeformableMeshSetSkinThickness (softCollisionMesh, 1.0f);

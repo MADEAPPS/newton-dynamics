@@ -985,8 +985,10 @@ extern "C" {
 	NEWTON_API int NewtonDeformableMeshParticleCount (const NewtonCollision* const deformableMesh); 
 	NEWTON_API void NewtonDeformableMeshGetParticlePosition (NewtonCollision* const deformableMesh, int particleIndex, dFloat* const posit);
 
+	NEWTON_API void NewtonDeformableMeshBeginConfiguration (const NewtonCollision* const deformableMesh); 
 	NEWTON_API void NewtonDeformableMeshUnconstraintParticle (NewtonCollision* const deformableMesh, int partivleIndex);
 	NEWTON_API void NewtonDeformableMeshConstraintParticle (NewtonCollision* const deformableMesh, int partivleIndex, const dFloat* const posit, const NewtonBody* const body);
+	NEWTON_API void NewtonDeformableMeshEndConfiguration (const NewtonCollision* const deformableMesh); 
 
 //	NEWTON_API void NewtonDeformableMeshSetPlasticity (NewtonCollision* const deformableMesh, dFloat plasticity);
 //	NEWTON_API void NewtonDeformableMeshSetStiffness (NewtonCollision* const deformableMesh, dFloat stiffness);

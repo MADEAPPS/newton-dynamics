@@ -245,6 +245,8 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgWorld* const 
 			} while (ptr != edge) ;
 		}
 	} 
+
+	EndConfiguration ();
 }
 
 dgCollisionDeformableClothPatch::~dgCollisionDeformableClothPatch(void)
@@ -284,6 +286,10 @@ void dgCollisionDeformableClothPatch::ConstraintParticle (dgInt32 particleIndex,
 		}
 		edge = (dgSoftBodyEdge*)edge->m_twin->m_next;
 	} while (edge != m_particleToEddgeMap[particleIndex]);
+}
+
+void dgCollisionDeformableClothPatch::EndConfiguration ()
+{
 
 }
 
@@ -362,5 +368,4 @@ dgFloat32 invMassScale = 1.0f / 0.01f;
 		veloc[i] += force[i].Scale (invMassTime);
 		posit[i] += veloc[i].Scale (timestep);
 	}
-
 }

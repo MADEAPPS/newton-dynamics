@@ -99,7 +99,8 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	
 	virtual void IntegrateVelocities (dgFloat32 timestep) = 0;
 	virtual void CalculateInternalForces (dgFloat32 timestep) = 0;
-
+	
+	virtual void EndConfiguration () = 0;
 	virtual void ConstraintParticle (dgInt32 particleIndex, const dgVector& posit, const dgBody* const body) = 0;
 
 	void* GetFirtVisualSegment() const;
