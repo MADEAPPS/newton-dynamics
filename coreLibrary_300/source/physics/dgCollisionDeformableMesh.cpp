@@ -56,17 +56,6 @@ dgCollisionDeformableMesh::dgParticle::dgParticle (dgInt32 particlesCount)
 	m_posit = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
 	m_veloc = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
 	m_force = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
-
-//	m_deltaPosition = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
-//	m_shapePosition = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
-//	m_instantVelocity = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
-//	m_internalVelocity = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
-//	memset (m_mass, 0, m_count * sizeof (dgFloat32));
-//	memset (m_invMass, 0, m_count * sizeof (dgFloat32));
-//	memset (m_position, 0, m_count * sizeof (dgVector));
-//	memset (m_deltaPosition, 0, m_count * sizeof (dgVector));
-//	memset (m_shapePosition, 0, m_count * sizeof (dgVector));
-//	memset (m_instantVelocity, 0, m_count * sizeof (dgVector));
 }
 
 
@@ -79,18 +68,9 @@ dgCollisionDeformableMesh::dgParticle::dgParticle(const dgParticle& source)
 	m_veloc = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
 	m_force = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
 
-//	m_deltaPosition = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
-//	m_shapePosition = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
-//	m_instantVelocity = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
-//	m_internalVelocity = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
-
 	memcpy (m_unitMass, source.m_unitMass, m_count * sizeof (dgFloat32));
 	memcpy (m_posit, source.m_posit, m_count * sizeof (dgVector));
 	memcpy (m_veloc, source.m_veloc, m_count * sizeof (dgVector));
-//	memcpy (m_shapePosition, source.m_shapePosition, m_count * sizeof (dgVector));
-//	memcpy (m_deltaPosition, source.m_deltaPosition, m_count * sizeof (dgVector));
-//	memcpy (m_instantVelocity, source.m_instantVelocity, m_count * sizeof (dgVector));
-//	memcpy (m_internalVelocity, source.m_internalVelocity, m_count * sizeof (dgVector));
 }
 
 
@@ -106,6 +86,7 @@ dgCollisionDeformableMesh::dgParticle::~dgParticle()
 		dgFree (m_posit);
 		dgFree (m_veloc);
 		dgFree (m_force);
+//		dgFree (m_edge);
 	}
 }
 
@@ -934,14 +915,6 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh (dgWorld* const world, dgDe
 	,m_nodesMemory(NULL)
 	,m_visualVertexData(NULL) 
 	,m_isdoubleSided(false)
-
-//	,m_stiffness(DG_DEFORMABLE_DEFAULT_STIFFNESS)
-//	,m_plasticity(DG_DEFORMABLE_DEFAULT_PLASTICITY)
-//	,m_indexList(NULL)
-//	,m_faceNormals(NULL)
-//	,m_rootNode(NULL)
-//	,m_nodesMemory(NULL)
-//	
 {
 	dgAssert (0);
 //	dgCollisionDeformableMeshList& softBodyList = *m_world;
@@ -994,6 +967,7 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMes
 //	dgVector delta (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 //	dgBigVector com (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
+//		m_particles.m_edge[i] = NULL;
 		m_particles.m_unitMass[i] = dgFloat32 (1.0f);
 		m_particles.m_posit[i] = dgVector (dgFloat32 (vertex[i * stride + 0]), dgFloat32 (vertex[i * stride + 1]), dgFloat32 (vertex[i * stride + 2]), dgFloat32 (0.0f));
 		m_particles.m_veloc[i] = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
@@ -1084,51 +1058,6 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMes
 			}
 		}
 	}
-
-
-	dgPolyhedra polyhedra (GetAllocator());
-	polyhedra.BeginFace();
-	for (dgInt32 i = 0; i < m_trianglesCount; i ++) {
-		polyhedra.AddFace (m_indexList[i * 3 + 0], m_indexList[i * 3 + 1], m_indexList[i * 3 + 2]);
-	}
-	polyhedra.EndFace();
-
-	dgInt32 mark = polyhedra.IncLRU();
-	dgPolyhedra::Iterator iter (polyhedra);
-	for (iter.Begin(); iter; iter ++) {
-
-		dgEdge* const edge = &iter.GetNode()->GetInfo();
-		if (edge->m_mark != mark) {
-			dgEdge* ptr = edge;
-			do {
-				ptr->m_mark = mark;
-				ptr->m_userData = m_edgeCount;
-				m_edgeCount ++;
-				ptr = ptr->m_twin->m_next;
-			} while (ptr != edge) ;
-		}
-	} 
-
-	m_simplex = (dgConvexSimplexEdge*) m_allocator->Malloc (dgInt32 (m_edgeCount * sizeof (dgConvexSimplexEdge)));
-
-	mark = polyhedra.IncLRU();;
-	for (iter.Begin(); iter; iter ++) {
-		dgEdge* const edge = &iter.GetNode()->GetInfo();
-		if (edge->m_mark != mark) {
-			dgEdge *ptr = edge;
-			do {
-				ptr->m_mark = mark;
-				dgConvexSimplexEdge* const simplexPtr = &m_simplex[ptr->m_userData];
-				simplexPtr->m_vertex = dgInt16 (ptr->m_incidentVertex);
-				simplexPtr->m_openFace = (ptr->m_incidentFace > 0) ? 1 : 0;
-				simplexPtr->m_next = &m_simplex[ptr->m_next->m_userData];
-				simplexPtr->m_prev = &m_simplex[ptr->m_prev->m_userData];
-				simplexPtr->m_twin = &m_simplex[ptr->m_twin->m_userData];
-
-				ptr = ptr->m_twin->m_next;
-			} while (ptr != edge) ;
-		}
-	} 
 }
 
 

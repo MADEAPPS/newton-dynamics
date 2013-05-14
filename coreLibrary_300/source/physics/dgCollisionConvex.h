@@ -32,8 +32,7 @@ class dgConvexSimplexEdge
 	dgConvexSimplexEdge* m_twin;
 	dgConvexSimplexEdge* m_next;
 	dgConvexSimplexEdge* m_prev;
-	dgInt16 m_vertex;
-	dgInt32 m_openFace;
+	dgInt32 m_vertex;
 };
 
 

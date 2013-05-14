@@ -36,6 +36,12 @@ class dgCollisionDeformableClothPatch: public dgCollisionDeformableMesh
 
 	class dgClothLink;
 
+//	class dgSofgBodyEdge: public dgConvexSimplexEdge
+//	{
+//	public:
+//	};
+
+
 	dgCollisionDeformableClothPatch (const dgCollisionDeformableClothPatch& source);
 	dgCollisionDeformableClothPatch (dgWorld* const world, dgMeshEffect* const mesh, const dgCollisionDeformableClothPatch::dgClothPatchMaterial& structuralMaterial, const dgCollisionDeformableClothPatch::dgClothPatchMaterial& bendMaterial);
 	dgCollisionDeformableClothPatch (dgWorld* const world, dgDeserialize deserialization, void* const userData);

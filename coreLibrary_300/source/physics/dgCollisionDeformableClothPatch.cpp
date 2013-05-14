@@ -587,6 +587,56 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgWorld* const 
 			}
 		}
 	}
+
+/*
+	dgPolyhedra polyhedra (GetAllocator());
+	polyhedra.BeginFace();
+	for (dgInt32 i = 0; i < m_trianglesCount; i ++) {
+		polyhedra.AddFace (m_indexList[i * 3 + 0], m_indexList[i * 3 + 1], m_indexList[i * 3 + 2]);
+	}
+	polyhedra.EndFace();
+
+	dgInt32 mark = polyhedra.IncLRU();
+	dgPolyhedra::Iterator iter (polyhedra);
+	for (iter.Begin(); iter; iter ++) {
+
+		dgEdge* const edge = &iter.GetNode()->GetInfo();
+		if (edge->m_mark != mark) {
+			dgEdge* ptr = edge;
+			do {
+				ptr->m_mark = mark;
+				ptr->m_userData = m_edgeCount;
+				m_edgeCount ++;
+				ptr = ptr->m_twin->m_next;
+			} while (ptr != edge) ;
+		}
+	} 
+
+	m_simplex = (dgConvexSimplexEdge*) m_allocator->Malloc (dgInt32 (m_edgeCount * sizeof (dgConvexSimplexEdge)));
+
+	mark = polyhedra.IncLRU();;
+	for (iter.Begin(); iter; iter ++) {
+		dgEdge* const edge = &iter.GetNode()->GetInfo();
+		if (edge->m_mark != mark) {
+			dgEdge *ptr = edge;
+			do {
+				ptr->m_mark = mark;
+				dgConvexSimplexEdge* const simplexPtr = &m_simplex[ptr->m_userData];
+				simplexPtr->m_vertex = dgInt16 (ptr->m_incidentVertex);
+				simplexPtr->m_openFace = (ptr->m_incidentFace > 0) ? 0 : 1;
+				simplexPtr->m_next = &m_simplex[ptr->m_next->m_userData];
+				simplexPtr->m_prev = &m_simplex[ptr->m_prev->m_userData];
+				simplexPtr->m_twin = &m_simplex[ptr->m_twin->m_userData];
+
+				if (!m_particles.m_edge[simplexPtr->m_vertex] && !simplexPtr->m_openFace) {
+					m_particles.m_edge[simplexPtr->m_vertex] = simplexPtr;
+				}
+
+				ptr = ptr->m_twin->m_next;
+			} while (ptr != edge) ;
+		}
+	} 
+*/
 }
 
 dgCollisionDeformableClothPatch::~dgCollisionDeformableClothPatch(void)

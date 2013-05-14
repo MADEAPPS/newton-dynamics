@@ -99,8 +99,7 @@ dgCollisionConvexHull::dgCollisionConvexHull(dgWorld* const world, dgDeserialize
 		dgInt32 serialization[4];
 		deserialization (userData, serialization, sizeof (serialization));
 
-		m_simplex[i].m_openFace = 0;
-		m_simplex[i].m_vertex = dgInt16 (serialization[0]);
+		m_simplex[i].m_vertex = serialization[0];
 		m_simplex[i].m_twin = m_simplex + serialization[1];
 		m_simplex[i].m_next = m_simplex + serialization[2];
 		m_simplex[i].m_prev = m_simplex + serialization[3];
@@ -489,8 +488,7 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 			do {
 				ptr->m_mark = mark;
 				dgConvexSimplexEdge* const simplexPtr = &m_simplex[ptr->m_userData];
-				simplexPtr->m_openFace = 0;
-				simplexPtr->m_vertex = dgInt16 (vertexMap[ptr->m_incidentVertex]);
+				simplexPtr->m_vertex = vertexMap[ptr->m_incidentVertex];
 				simplexPtr->m_next = &m_simplex[ptr->m_next->m_userData];
 				simplexPtr->m_prev = &m_simplex[ptr->m_prev->m_userData];
 				simplexPtr->m_twin = &m_simplex[ptr->m_twin->m_userData];

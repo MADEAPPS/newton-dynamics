@@ -109,8 +109,6 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	const dgInt16* GetSegmentIndexList (void* const segment) const;
 
 /*
-	
-
 	void SetStiffness (dgFloat32 stiffness);
 	void SetPlasticity (dgFloat32 plasticity);
 	virtual void SetParticlesMasses (dgFloat32 totalMass);

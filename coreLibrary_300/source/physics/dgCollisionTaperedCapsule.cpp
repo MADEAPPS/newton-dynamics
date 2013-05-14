@@ -173,7 +173,7 @@ void dgCollisionTaperedCapsule::Init (dgFloat32 radio0, dgFloat32 radio1, dgFloa
 
 			dgConvexSimplexEdge* const ptr = &m_edgeArray[edge->m_userData];
 
-			ptr->m_vertex = dgInt16 (edge->m_incidentVertex);
+			ptr->m_vertex = edge->m_incidentVertex;
 			ptr->m_next = &m_edgeArray[edge->m_next->m_userData];
 			ptr->m_prev = &m_edgeArray[edge->m_prev->m_userData];
 			ptr->m_twin = &m_edgeArray[edge->m_twin->m_userData];
