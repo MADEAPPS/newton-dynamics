@@ -239,10 +239,10 @@ class SimpleSoftBodyEntity: public DemoEntity
 		NewtonClothPatchMaterial structuralMaterial;
 
 		structuralMaterial.m_damper = 0;
-		structuralMaterial.m_stiffness = 1;
+		structuralMaterial.m_stiffness = 10;
 
 		bendMaterial.m_damper = 0;
-		bendMaterial.m_stiffness = 1;
+		bendMaterial.m_stiffness = 10;
 
 		NewtonCollision* const softCollisionMesh = NewtonCreateClothPatch (world, mesh, 0, &structuralMaterial, &bendMaterial);
 
