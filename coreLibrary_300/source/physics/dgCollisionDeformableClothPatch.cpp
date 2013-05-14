@@ -600,6 +600,7 @@ dgCollisionDeformableClothPatch::~dgCollisionDeformableClothPatch(void)
 
 void dgCollisionDeformableClothPatch::CalculateInternalForces (dgFloat32 timestep)
 {
+//return;
 	dgFloat32* const mass = m_particles.m_mass;
 	dgFloat32* const invMass = m_particles.m_invMass;
 	dgVector* const posit = m_particles.m_posit;
@@ -609,7 +610,7 @@ void dgCollisionDeformableClothPatch::CalculateInternalForces (dgFloat32 timeste
 	// apply gravity force
 	dgFloat32 massScale = 0.01f;
 	//dgVector gravity (0.0f, -9.8f, 0.0f, 0.0f);
-	dgVector gravity (0.0f, 0.0f, 0.0f, 0.0f);
+	dgVector gravity (0.0f, -1.0f, 0.0f, 0.0f);
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
 		force[i] = gravity.Scale (mass[i] * massScale);
 	}
@@ -651,6 +652,7 @@ void dgCollisionDeformableClothPatch::CalculateInternalForces (dgFloat32 timeste
 
 void dgCollisionDeformableClothPatch::IntegrateVelocities (dgFloat32 timestep)
 {
+//return;
 	dgFloat32* const invMass = m_particles.m_invMass;
 	dgVector* const posit = m_particles.m_posit;
 	dgVector* const veloc = m_particles.m_veloc;

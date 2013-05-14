@@ -169,8 +169,8 @@ class SimpleSoftBodyEntity: public DemoEntity
 		// make a Box collision as a source to make a mesh 
 
 
-		#define steps 32
-		//#define steps 2
+		//#define steps 32
+		#define steps 16
 
 		dFloat dimension = 0.25f;
 		dVector points[steps][steps];
@@ -246,11 +246,48 @@ class SimpleSoftBodyEntity: public DemoEntity
 
 		NewtonCollision* const softCollisionMesh = NewtonCreateClothPatch (world, mesh, 0, &structuralMaterial, &bendMaterial);
 
+		int particlesCount = NewtonDeformableMeshParticleCount (softCollisionMesh);
+
+		int index0 = -1; 
+		int index1 = -1; 
+		int index2 = -1; 
+		int index3 = -1; 
+		dVector p0 (1.0e10f, 1.0e10f, 1.0e10f, 0.0f);
+		dVector p1 (1.0e10f, 1.0e10f, -1.0e10f, 0.0f);
+		dVector p2 (-1.0e10f, 1.0e10f, -1.0e10f, 0.0f);
+		dVector p3 (-1.0e10f, 1.0e10f,  1.0e10f, 0.0f);
+		for (int i = 0; i < particlesCount; i++ ) {
+			dVector p;
+			NewtonDeformableMeshGetParticlePosition (softCollisionMesh, i, &p.m_x);
+			if ((p.m_x < p0.m_x) || (p.m_z < p0.m_z)) {
+				index0 = i;
+				p0 = p;
+			}
+
+			NewtonDeformableMeshGetParticlePosition (softCollisionMesh, i, &p.m_x);
+			if ((p.m_x < p1.m_x) || (p.m_z > p1.m_z)) {
+				index1 = i;
+				p1 = p;
+			}
+
+			NewtonDeformableMeshGetParticlePosition (softCollisionMesh, i, &p.m_x);
+			if ((p.m_x > p2.m_x) || (p.m_z > p2.m_z)) {
+				index2 = i;
+				p2 = p;
+			}
+
+			NewtonDeformableMeshGetParticlePosition (softCollisionMesh, i, &p.m_x);
+			if ((p.m_x > p3.m_x) || (p.m_z < p3.m_z)) {
+				index3 = i;
+				p3 = p;
+			}
+		}
+
 		// constraint the four corner of this patch to the world
-		NewtonDeformableMeshConstraintParticle (softCollisionMesh, steps * 0 + 0, &points[0][0].m_x, NULL);
-		NewtonDeformableMeshConstraintParticle (softCollisionMesh, steps * 0 + steps - 1, &points[0][steps - 1].m_x, NULL);
-		NewtonDeformableMeshConstraintParticle (softCollisionMesh, steps * (steps - 1) + 0, &points[steps - 1][0].m_x, NULL);
-		NewtonDeformableMeshConstraintParticle (softCollisionMesh, steps * (steps - 1) + steps - 1, &points[steps - 1][steps - 1].m_x, NULL);
+		NewtonDeformableMeshConstraintParticle (softCollisionMesh, index0, &p0.m_x, NULL);
+		NewtonDeformableMeshConstraintParticle (softCollisionMesh, index1, &p1.m_x, NULL);
+		NewtonDeformableMeshConstraintParticle (softCollisionMesh, index2, &p2.m_x, NULL);
+		NewtonDeformableMeshConstraintParticle (softCollisionMesh, index3, &p3.m_x, NULL);
 
 
 		//NewtonDeformableMeshSetSkinThickness (softCollisionMesh, 1.0f);

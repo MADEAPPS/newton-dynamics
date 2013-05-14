@@ -8625,8 +8625,29 @@ NewtonBody* NewtonCreateDeformableBody (const NewtonWorld* const newtonWorld, co
 	return (NewtonBody*) world->CreateDeformableBody (collision, matrix);
 }
 
+int NewtonDeformableMeshParticleCount (const NewtonCollision* const deformableMesh)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
+	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
+		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*) collision->GetChildShape();
+		return deformableShape->GetParticleCount();
+	}
+	return 0;
+}
+
 void NewtonDeformableMeshGetParticlePosition (NewtonCollision* const deformableMesh, int particleIndex, dFloat* const posit)
 {
+	TRACE_FUNCTION(__FUNCTION__);
+	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
+	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
+		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*) collision->GetChildShape();
+		dgVector p (deformableShape->GetParticlePosition(particleIndex));
+		posit[0] = p[0];
+		posit[1] = p[1];
+		posit[2] = p[2];
+		
+	}
 }
 
 

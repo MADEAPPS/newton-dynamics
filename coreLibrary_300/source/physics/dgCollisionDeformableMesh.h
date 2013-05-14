@@ -90,6 +90,9 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	dgCollisionDeformableMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData);
 	virtual ~dgCollisionDeformableMesh(void);
 
+	dgInt32 GetParticleCount() const;
+	dgVector GetParticlePosition(dgInt32 index) const;
+
 	void UpdateVisualNormals();
 	dgInt32 GetVisualPointsCount() const;
 	void SetSkinThickness (dgFloat32 skinThickness);
