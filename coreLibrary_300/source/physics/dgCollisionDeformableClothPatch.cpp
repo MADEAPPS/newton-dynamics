@@ -402,7 +402,7 @@ void dgCollisionDeformableClothPatch::CalculateInternalForces (dgFloat32 timeste
 		//no materials for now
 		//const dgClothPatchMaterial& material = m_materials[link.m_materialIndex];
 
-		// these can be p[recompued ouside the loop;
+		// when iteration count is more than one, these can be precomputed ouside the loop;
 		dgInt32 index0 = link->m_particle_0;
 		dgInt32 index1 = link->m_particle_1;
 		dgVector relPosit (posit[index1] - posit[index0]);
