@@ -225,9 +225,8 @@ void DemoEntityManager::InitGraphicsSystem()
 {
 	SetCurrent();
 
-	GLenum err = glewInit();
-	dAssert (err == GLEW_OK);
-
+	glewInit();
+	
 #if defined (_MSC_VER)
 	wglSwapIntervalEXT(0);
 

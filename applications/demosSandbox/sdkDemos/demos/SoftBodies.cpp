@@ -169,12 +169,12 @@ class SimpleSoftBodyEntity: public DemoEntity
 		// make a Box collision as a source to make a mesh 
 
 
-		#define steps 32
+		#define steps 24
 		
 		dFloat dimension = 0.25f;
 		dVector points[steps][steps];
 
-		dFloat y = 8.0f;
+		dFloat y = 10.0f;
 		int enumerator = 0;
 		for (int i = 0; i < steps; i ++) {
 			dFloat z = (i - steps / 2) * dimension;
@@ -230,7 +230,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 		}
 		NewtonMeshEndFace (mesh);
 
-		int material = LoadTexture("smilli.tga");
+		int material = LoadTexture("persianRug.tga");
 		NewtonMeshApplyBoxMapping(mesh, material, material, material);
 
 		// now create a soft collision mesh
