@@ -49,24 +49,20 @@
 
 
 dgCollisionDeformableMesh::dgParticle::dgParticle (dgInt32 particlesCount)
-	:m_com (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)) 
-	,m_count(particlesCount)
+	:m_count(particlesCount)
 {
-	m_unitMass = (dgFloat32*) dgMallocStack (m_count * sizeof (dgFloat32));
 	m_posit = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
 	m_veloc = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
-	m_force = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
+	m_unitMass = (dgFloat32*) dgMallocStack (m_count * sizeof (dgFloat32));
 }
 
 
 dgCollisionDeformableMesh::dgParticle::dgParticle(const dgParticle& source)
-	:m_com (source.m_com) 
-	,m_count(source.m_count)
+	:m_count(source.m_count)
 {
-	m_unitMass = (dgFloat32*) dgMallocStack (m_count * sizeof (dgFloat32));
 	m_posit = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
 	m_veloc = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
-	m_force = (dgVector*) dgMallocStack (m_count * sizeof (dgVector));
+	m_unitMass = (dgFloat32*) dgMallocStack (m_count * sizeof (dgFloat32));
 
 	memcpy (m_unitMass, source.m_unitMass, m_count * sizeof (dgFloat32));
 	memcpy (m_posit, source.m_posit, m_count * sizeof (dgVector));
@@ -82,10 +78,9 @@ dgCollisionDeformableMesh::dgParticle::dgParticle (dgWorld* const world, dgDeser
 dgCollisionDeformableMesh::dgParticle::~dgParticle()
 {
 	if (m_unitMass) {
-		dgFree (m_unitMass);
 		dgFree (m_posit);
 		dgFree (m_veloc);
-		dgFree (m_force);
+		dgFree (m_unitMass);
 	}
 }
 
@@ -1086,7 +1081,7 @@ void dgCollisionDeformableMesh::SetCollisionBBox (const dgVector& p0, const dgVe
 
 	m_boxSize = (p1 - p0).Scale (dgFloat32 (0.5f)); 
 	m_boxOrigin = (p1 + p0).Scale (dgFloat32 (0.5f)); 
-	m_boxOrigin-= m_particles.m_com;
+//	m_boxOrigin-= m_particles.m_com;
 
 	dgFloat32 padding = m_skinThickness + DG_DEFORMABLE_DEFAULT_SKIN_THICKNESS;
 	m_boxSize += dgVector (padding, padding, padding, dgFloat32 (0.0f));
@@ -1481,10 +1476,10 @@ void dgCollisionDeformableMesh::GetVisualVertexData(dgInt32 vertexStrideInByte, 
 	dgInt32 uvStride0 = uvStrideInByte0 / sizeof (dgFloat32); 
 	dgInt32 uvStride1 = uvStrideInByte1 / sizeof (dgFloat32); 
 
-	dgVector com (m_particles.m_com);
+//	dgVector com (m_particles.m_com);
 	for (dgInt32 i = 0; i < m_visualVertexCount; i ++) {
 		dgInt32 index = m_visualVertexData[i].m_vertexIndex;
-		dgVector p (m_particles.m_posit[index] - com);
+		const dgVector& p = m_particles.m_posit[index];
 		vertex[i * vertexStride + 0] = p.m_x;
 		vertex[i * vertexStride + 1] = p.m_y;
 		vertex[i * vertexStride + 2] = p.m_z;
@@ -1503,7 +1498,7 @@ void dgCollisionDeformableMesh::GetVisualVertexData(dgInt32 vertexStrideInByte, 
 	if (m_isdoubleSided) {
 		for (dgInt32 i = 0; i < m_visualVertexCount; i ++) {
 			dgInt32 index = m_visualVertexData[i].m_vertexIndex;
-			dgVector p (m_particles.m_posit[index] - com);
+			const dgVector& p = m_particles.m_posit[index];
 			dgInt32 j = i + m_visualVertexCount;
 			vertex[j * vertexStride + 0] = p.m_x;
 			vertex[j * vertexStride + 1] = p.m_y;

@@ -76,6 +76,7 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch (const dgCollis
 	:dgCollisionDeformableMesh (source)
 	,m_linksCount (source.m_linksCount)
 	,m_graphCount (source.m_graphCount)
+	,m_posit(NULL)
 	,m_linkOrder(NULL)
 	,m_links(NULL)
 	,m_graph(NULL)
@@ -104,6 +105,9 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch (const dgCollis
 		dst->m_link = &m_links[src->m_link - source.m_links];
 	}
 
+	m_posit = (dgVector*) dgMallocStack (m_particles.m_count * sizeof (dgVector));
+	memcpy (m_posit, source.m_posit, m_particles.m_count * sizeof (dgVector));
+
 	m_particleToEddgeMap = (dgSoftBodyEdge**) m_allocator->Malloc (m_particles.m_count * dgInt32 (sizeof (dgSoftBodyEdge*)));
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
 		m_particleToEddgeMap[i] = &m_graph[source.m_graph - source.m_particleToEddgeMap[i]];
@@ -122,6 +126,7 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgWorld* const 
 	:dgCollisionDeformableMesh (world, mesh, m_deformableClothPatch)
 	,m_linksCount (0)
 	,m_graphCount (0)
+	,m_posit(NULL)
 	,m_linkOrder(NULL)
 	,m_links(NULL)
 	,m_graph(NULL)
@@ -132,6 +137,11 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgWorld* const 
 
 	m_materials[1] = bendMaterial;
 	m_materials[0] = structuralMaterial;
+
+	m_posit = (dgVector*) dgMallocStack (m_particles.m_count * sizeof (dgVector));
+	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
+		m_posit[i] = m_particles.m_posit[i];
+	}
 	
 	//create structural connectivity 
 	dgPolyhedra conectivity (GetAllocator());
@@ -153,9 +163,9 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgWorld* const 
 			edge->m_mark = mark;
 			twin->m_mark = mark;
 			if ((edge->m_incidentFace > 0) && (twin->m_incidentFace > 0)) {
-				dgEdgePair& pair = bendPairs.Append()->GetInfo();
-				pair.m_edge = edge->m_prev;
-				pair.m_twin = twin->m_prev;
+//				dgEdgePair& pair = bendPairs.Append()->GetInfo();
+//				pair.m_edge = edge->m_prev;
+//				pair.m_twin = twin->m_prev;
 			}
 		}
 	}
@@ -268,6 +278,7 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgWorld* const 
 dgCollisionDeformableClothPatch::~dgCollisionDeformableClothPatch(void)
 {
 	if (m_links) {
+		dgFree (m_posit);
 		dgFree (m_links);
 		dgFree (m_graph);
 		dgFree (m_linkOrder);
@@ -304,11 +315,6 @@ void dgCollisionDeformableClothPatch::ConstraintParticle (dgInt32 particleIndex,
 		edge = (dgSoftBodyEdge*)edge->m_twin->m_next;
 	} while (edge != m_particleToEddgeMap[particleIndex]);
 }
-
-
-
-
-
 
 
 void dgCollisionDeformableClothPatch::EndConfiguration ()
@@ -348,53 +354,32 @@ void dgCollisionDeformableClothPatch::EndConfiguration ()
 }
 
 
-void dgCollisionDeformableClothPatch::IntegrateVelocities (dgFloat32 timestep)
+
+
+
+void dgCollisionDeformableClothPatch::IntegrateParticles (dgFloat32 timestep)
 {
-	//return;
-/*
-	//timestep /= 4.0f;
 	dgVector* const posit = m_particles.m_posit;
 	dgVector* const veloc = m_particles.m_veloc;
-	dgVector* const force = m_particles.m_force;
-	//	dgFloat32* const unitMass = m_particles.m_unitMass;
-
-	dgFloat32 invMassScale = 1.0f / 0.01f;
-	dgFloat32 invMassTime = invMassScale * timestep;
-
-	// later change this to a verlet integration
-	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-		veloc[i] += force[i].Scale (invMassTime);
-		posit[i] += veloc[i].Scale (timestep);
-	}
-
-	for (dgInt32 i = 0; i < m_linksCountl i ++) {
-		dgClothLink* const links = m_links[m_linkOrder[i]];
-
-		dgVector dir ()
-	}
-*/
-}
-
-
-
-void dgCollisionDeformableClothPatch::CalculateInternalForces (dgFloat32 timestep)
-{
-
-	dgVector* const posit = m_particles.m_posit;
-	dgVector* const veloc = m_particles.m_veloc;
-	dgVector* const force = m_particles.m_force;
 	dgFloat32* const unitMass = m_particles.m_unitMass;
 
 	//timestep /= 4.0f;
 	// apply gravity force
+	// I am restricting all particle masses to be either infinite of constant value
+	// this allow me to express then by a value that can be either 0.0 (infinite mass) or 1.0 (constant mass)
+
 	dgFloat32 particleMass = 0.01f;
+	dgFloat32 invTimeStep = dgFloat32 (1.0f) / timestep;
 	dgVector gravity (0.0f, -9.8f, 0.0f, 0.0f);
 	//dgVector gravity (0.0f, -1.0f, 0.0f, 0.0f);
+	dgVector gravityStep (gravity.Scale (timestep));
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-		force[i] = gravity.Scale (unitMass[i] * particleMass);
+		veloc[i] = (posit[i] - m_posit[i]).Scale (invTimeStep);
+		m_posit[i] = posit[i];
+		veloc[i] += gravityStep.Scale (unitMass[i]);
+		posit[i] += veloc[i].Scale (timestep);
 	}
-
-
+/*
 	// calculate internal forces
 	for (dgInt32 i = 0; i < m_linksCount; i ++) {
 		dgClothLink* const link = &m_links[m_linkOrder[i]];
@@ -409,11 +394,41 @@ void dgCollisionDeformableClothPatch::CalculateInternalForces (dgFloat32 timeste
 		dgFloat32 invMag2 = dgFloat32 (1.0f) / (relPosit % relPosit);
 
 		// this is the velocity projection code 
-		dgVector relVeloc (veloc[index1] - veloc[index0]);
+		dgVector relVeloc (veloc[index0] - veloc[index1]);
 		relVeloc = relPosit.Scale ((relVeloc % relPosit) * invMag2);
 
-		veloc[index0] += relVeloc.Scale (link->m_mass0_influence);
-		veloc[index1] -= relVeloc.Scale (link->m_mass1_influence);
+		veloc[index0] -= relVeloc.Scale (link->m_mass0_influence);
+		veloc[index1] += relVeloc.Scale (link->m_mass1_influence);
 	}
+*/
 }
 
+//using paper, this is more stable that spring mass  
+//http://www.pagines.ma1.upc.edu/~susin/files/AdvancedCharacterPhysics.pdf
+void dgCollisionDeformableClothPatch::ResolvePositionsConstraints (dgFloat32 timestep)
+{
+	dgVector* const posit = m_particles.m_posit;
+	dgFloat32* const unitMass = m_particles.m_unitMass;
+
+	for (dgInt32 i = 0; i < m_linksCount; i ++) {
+		dgClothLink* const link = &m_links[m_linkOrder[i]];
+
+		// here these are not constant, need to do in each iteration
+		// remenbet that mass == invMass (when boteh are 1.0
+		dgInt32 index0 = link->m_particle_0;
+		dgInt32 index1 = link->m_particle_1;
+		dgVector relPosit (posit[index0] - posit[index1]);
+		dgFloat32 x2 = relPosit % relPosit; 
+#if 1
+		dgFloat32 x = dgSqrt(x2);
+		dgFloat32 error = (x - link->m_restLengh) / x;
+#else 
+		// using two turns of Taylor expansion for sqrt (x) with inital guess equa restlength the x = dgSqrt(x2) ~= (restLengh * restLengh + x2) / (2.0f * restLengh)
+
+#endif
+		
+		posit[index0] -= relPosit.Scale (error * link->m_mass0_influence);
+		posit[index1] += relPosit.Scale (error * link->m_mass1_influence);
+	}
+
+}

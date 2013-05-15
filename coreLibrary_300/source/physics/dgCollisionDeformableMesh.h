@@ -44,26 +44,20 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 		dgParticle(const dgParticle& source);
 		dgParticle (dgWorld* const world, dgDeserialize deserialization, void* const userData);
 		~dgParticle();
-
-		dgVector m_com;
-		dgInt32 m_count;
-		dgFloat32* m_unitMass;
+		
 		dgVector* m_posit;
 		dgVector* m_veloc;
-		dgVector* m_force;
-//		dgVector* m_deltaPosition;
-//		dgVector* m_shapePosition;
-//		dgVector* m_instantVelocity;
-//		dgVector* m_internalVelocity;
+		dgFloat32* m_unitMass;
+		dgInt32 m_count;
 	};
 
 	class dgVisualVertexData
 	{
 		public:
-		dgInt32 m_vertexIndex;
 		dgFloat32 m_normals[3];
 		dgFloat32 m_uv0[2];
 		dgFloat32 m_uv1[2];
+		dgInt32 m_vertexIndex;
 	};
 
 	class dgMeshSegment
@@ -97,8 +91,8 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	void SetSkinThickness (dgFloat32 skinThickness);
 	void GetVisualVertexData(dgInt32 vertexStrideInByte, dgFloat32* const vertex, dgInt32 normalStrideInByte, dgFloat32* const normals, dgInt32 uvStrideInByte0, dgFloat32* const uv0, dgInt32 uvStrideInByte1, dgFloat32* const uv1);
 	
-	virtual void IntegrateVelocities (dgFloat32 timestep) = 0;
-	virtual void CalculateInternalForces (dgFloat32 timestep) = 0;
+	virtual void IntegrateParticles (dgFloat32 timestep) = 0;
+	virtual void ResolvePositionsConstraints (dgFloat32 timestep) = 0;
 	
 	virtual void EndConfiguration () = 0;
 	virtual void ConstraintParticle (dgInt32 particleIndex, const dgVector& posit, const dgBody* const body) = 0;

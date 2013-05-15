@@ -1007,7 +1007,7 @@ void dgBroadPhase::UpdateSoftBodyForcesKernel (dgBroadphaseSyncDescriptor* const
 	for ( ; node; ) {
 		dgCollisionDeformableMesh* const softShape = node->GetInfo();
 
-		softShape->CalculateInternalForces (timestep);
+		softShape->IntegrateParticles (timestep);
 
 		dgThreadHiveScopeLock lock (m_world, descriptor->m_lock);
 		node = descriptor->m_sofBodyNode;

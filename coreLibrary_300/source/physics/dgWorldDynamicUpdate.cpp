@@ -694,7 +694,7 @@ void dgWorldDynamicUpdate::IntegrateSoftBody (dgWorldDynamicUpdateSyncDescriptor
 	for ( ; node; ) {
 		dgCollisionDeformableMesh* const softShape = node->GetInfo();
 
-		softShape->IntegrateVelocities (timestep);
+		softShape->ResolvePositionsConstraints (timestep);
 
 		dgThreadHiveScopeLock lock (world, descriptor->m_lock);
 		node = descriptor->m_sofBodyNode;

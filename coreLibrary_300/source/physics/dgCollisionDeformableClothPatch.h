@@ -60,8 +60,8 @@ class dgCollisionDeformableClothPatch: public dgCollisionDeformableMesh
 	void Serialize(dgSerialize callback, void* const userData) const;
 	virtual dgInt32 CalculateSignature () const;
 
-	virtual void IntegrateVelocities (dgFloat32 timestep);
-	virtual void CalculateInternalForces (dgFloat32 timestep);
+	virtual void IntegrateParticles (dgFloat32 timestep);
+	virtual void ResolvePositionsConstraints (dgFloat32 timestep);
 
 	virtual void EndConfiguration ();
 	virtual void ConstraintParticle (dgInt32 particleIndex, const dgVector& posit, const dgBody* const body);
@@ -69,6 +69,7 @@ class dgCollisionDeformableClothPatch: public dgCollisionDeformableMesh
 	dgClothPatchMaterial m_materials[2];
 	dgInt32 m_linksCount;
 	dgInt32 m_graphCount;
+	dgVector* m_posit;
 	dgInt32* m_linkOrder;
 	dgClothLink* m_links;
 	dgSoftBodyEdge* m_graph;
