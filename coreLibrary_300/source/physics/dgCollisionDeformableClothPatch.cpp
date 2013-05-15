@@ -50,6 +50,12 @@ class dgCollisionDeformableClothPatch::dgSoftBodyEdge: public dgConvexSimplexEdg
 	dgClothLink* m_link;
 };
 
+class dgCollisionDeformableClothPatch::dgEdgePair
+{
+	public:
+	dgEdge* m_edge;
+	dgEdge* m_twin;
+};
 
 void dgCollisionDeformableClothPatch::Serialize(dgSerialize callback, void* const userData) const
 {
@@ -139,6 +145,7 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgWorld* const 
 	dgInt32 mark = conectivity.IncLRU();
 	dgPolyhedra::Iterator iter (conectivity);
 
+	dgList<dgEdgePair> bendPairs (GetAllocator());
 	for (iter.Begin(); iter; iter ++) {
 		dgEdge* const edge = &iter.GetNode()->GetInfo();
 		if (edge->m_mark < mark) {
@@ -146,28 +153,28 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgWorld* const 
 			edge->m_mark = mark;
 			twin->m_mark = mark;
 			if ((edge->m_incidentFace > 0) && (twin->m_incidentFace > 0)) {
-//				dgEdge* const bendEdge = conectivity.AddHalfEdge (edge->m_prev->m_incidentVertex, twin->m_prev->m_incidentVertex);
-//				dgEdge* const bendTwin = conectivity.AddHalfEdge (twin->m_prev->m_incidentVertex, edge->m_prev->m_incidentVertex);
-//				dgAssert (bendEdge);
-//				dgAssert (bendTwin);
-//				bendEdge->m_twin = bendTwin;
-//				bendTwin->m_twin = bendEdge;
-
-
-				dgEdge* const bendEdge = conectivity.ConnectVertex (edge->m_prev, twin->m_prev);
-				dgAssert (bendEdge);
-				dgEdge* const bendTwin = bendEdge->m_twin;
-
-				bendEdge->m_incidentFace = -1;
-				bendTwin->m_incidentFace = -1;
-
-				bendEdge->m_mark = mark;
-				bendTwin->m_mark = mark;
-			
-				bendEdge->m_userData = 1;
-				bendTwin->m_userData = 1;
+				dgEdgePair& pair = bendPairs.Append()->GetInfo();
+				pair.m_edge = edge->m_prev;
+				pair.m_twin = twin->m_prev;
 			}
 		}
+	}
+
+	for (dgList<dgEdgePair>::dgListNode* node = bendPairs.GetFirst(); node; node = node->GetNext()) {
+		dgEdgePair& pair = node->GetInfo();
+
+		dgEdge* const bendEdge = conectivity.ConnectVertex (pair.m_edge, pair.m_twin);
+		dgAssert (bendEdge);
+		dgEdge* const bendTwin = bendEdge->m_twin;
+
+		bendEdge->m_incidentFace = -1;
+		bendTwin->m_incidentFace = -1;
+
+		bendEdge->m_mark = mark;
+		bendTwin->m_mark = mark;
+
+		bendEdge->m_userData = 1;
+		bendTwin->m_userData = 1;
 	}
 
 
@@ -300,81 +307,8 @@ void dgCollisionDeformableClothPatch::ConstraintParticle (dgInt32 particleIndex,
 
 
 
-void dgCollisionDeformableClothPatch::CalculateInternalForces (dgFloat32 timestep)
-{
-	dgVector* const posit = m_particles.m_posit;
-	dgVector* const veloc = m_particles.m_veloc;
-	dgVector* const force = m_particles.m_force;
-	dgFloat32* const unitMass = m_particles.m_unitMass;
-
-//timestep /= 4.0f;
-	// apply gravity force
-	dgFloat32 particleMass = 0.01f;
-	dgVector gravity (0.0f, -9.8f, 0.0f, 0.0f);
-	//dgVector gravity (0.0f, -1.0f, 0.0f, 0.0f);
-	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-		force[i] = gravity.Scale (unitMass[i] * particleMass);
-	}
-
-//static int xxx;
-//dgTrace (("%d\n", xxx));
-//xxx ++;
-//Sleep (100);
-//if (xxx >50)
-//xxx *=1;
-
-	// calculate internal forces
-	for (dgInt32 i = 0; i < m_linksCount; i ++) {
-		dgClothLink& link = m_links[i];
-
-		const dgClothPatchMaterial& material = m_materials[link.m_materialIndex];
-		dgInt32 index0 = link.m_particle_0;
-		dgInt32 index1 = link.m_particle_1;
-
-		dgVector relPosit (posit[index1] - posit[index0]);
-		dgVector relVeloc (veloc[index1] - veloc[index0]);
-
-		dgFloat32 dirMag2 = relPosit % relPosit;
-		dgAssert (dirMag2 > dgFloat32 (0.0f));
-		
-		dgFloat32 invMag = dgRsqrt (dirMag2);
-		dgVector dir (relPosit.Scale (invMag));
-
-		dgFloat32 mag = dirMag2 * invMag;
-		dgFloat32 x = mag - link.m_restLengh;
-		dgFloat32 s = relVeloc % dir;
-		dgFloat32 ksd = timestep * material.m_stiffness;
-		dgFloat32 num = material.m_stiffness * x + material.m_damper * s + ksd * s;
-		dgFloat32 den = dgFloat32 (1.0f) + timestep * material.m_damper + timestep * ksd;
-		dgAssert (den > 0.0f);
-		dgFloat32 linkForce = particleMass * num / den;
-
-		force[index0] += dir.Scale (linkForce * unitMass[index0]);
-		force[index1] -= dir.Scale (linkForce * unitMass[index1]);
-	}
-}
 
 
-
-void dgCollisionDeformableClothPatch::IntegrateVelocities (dgFloat32 timestep)
-{
-//return;
-	
-//timestep /= 4.0f;
-	dgVector* const posit = m_particles.m_posit;
-	dgVector* const veloc = m_particles.m_veloc;
-	dgVector* const force = m_particles.m_force;
-//	dgFloat32* const unitMass = m_particles.m_unitMass;
-
-dgFloat32 invMassScale = 1.0f / 0.01f;
-	dgFloat32 invMassTime = invMassScale * timestep;
-
-	// later change this to a verlet integration
-	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-		veloc[i] += force[i].Scale (invMassTime);
-		posit[i] += veloc[i].Scale (timestep);
-	}
-}
 
 
 void dgCollisionDeformableClothPatch::EndConfiguration ()
@@ -412,3 +346,74 @@ void dgCollisionDeformableClothPatch::EndConfiguration ()
 		}
 	}
 }
+
+
+void dgCollisionDeformableClothPatch::IntegrateVelocities (dgFloat32 timestep)
+{
+	//return;
+/*
+	//timestep /= 4.0f;
+	dgVector* const posit = m_particles.m_posit;
+	dgVector* const veloc = m_particles.m_veloc;
+	dgVector* const force = m_particles.m_force;
+	//	dgFloat32* const unitMass = m_particles.m_unitMass;
+
+	dgFloat32 invMassScale = 1.0f / 0.01f;
+	dgFloat32 invMassTime = invMassScale * timestep;
+
+	// later change this to a verlet integration
+	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
+		veloc[i] += force[i].Scale (invMassTime);
+		posit[i] += veloc[i].Scale (timestep);
+	}
+
+	for (dgInt32 i = 0; i < m_linksCountl i ++) {
+		dgClothLink* const links = m_links[m_linkOrder[i]];
+
+		dgVector dir ()
+	}
+*/
+}
+
+
+
+void dgCollisionDeformableClothPatch::CalculateInternalForces (dgFloat32 timestep)
+{
+
+	dgVector* const posit = m_particles.m_posit;
+	dgVector* const veloc = m_particles.m_veloc;
+	dgVector* const force = m_particles.m_force;
+	dgFloat32* const unitMass = m_particles.m_unitMass;
+
+	//timestep /= 4.0f;
+	// apply gravity force
+	dgFloat32 particleMass = 0.01f;
+	dgVector gravity (0.0f, -9.8f, 0.0f, 0.0f);
+	//dgVector gravity (0.0f, -1.0f, 0.0f, 0.0f);
+	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
+		force[i] = gravity.Scale (unitMass[i] * particleMass);
+	}
+
+
+	// calculate internal forces
+	for (dgInt32 i = 0; i < m_linksCount; i ++) {
+		dgClothLink* const link = &m_links[m_linkOrder[i]];
+
+		//no materials for now
+		//const dgClothPatchMaterial& material = m_materials[link.m_materialIndex];
+
+		// these can be p[recompued ouside the loop;
+		dgInt32 index0 = link->m_particle_0;
+		dgInt32 index1 = link->m_particle_1;
+		dgVector relPosit (posit[index1] - posit[index0]);
+		dgFloat32 invMag2 = dgFloat32 (1.0f) / (relPosit % relPosit);
+
+		// this is the velocity projection code 
+		dgVector relVeloc (veloc[index1] - veloc[index0]);
+		relVeloc = relPosit.Scale ((relVeloc % relPosit) * invMag2);
+
+		veloc[index0] += relVeloc.Scale (link->m_mass0_influence);
+		veloc[index1] -= relVeloc.Scale (link->m_mass1_influence);
+	}
+}
+

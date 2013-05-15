@@ -170,7 +170,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 
 
 		//#define steps 32
-		#define steps 2
+		#define steps 32
 
 		dFloat dimension = 0.25f;
 		dVector points[steps][steps];

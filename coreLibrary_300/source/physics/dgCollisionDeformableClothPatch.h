@@ -33,7 +33,7 @@
 class dgCollisionDeformableClothPatch: public dgCollisionDeformableMesh
 {
 	public:
-
+	class dgEdgePair;
 	class dgClothLink;
 	class dgSoftBodyEdge;
 
