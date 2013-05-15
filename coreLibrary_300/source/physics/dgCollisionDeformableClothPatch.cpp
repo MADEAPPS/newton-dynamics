@@ -343,7 +343,7 @@ void dgCollisionDeformableClothPatch::EndConfiguration ()
 			dgSoftBodyEdge* ptr = edge;
 			do {
 				if (mark[ptr->m_twin->m_vertex] < 2) {
-					m_linkOrder[index] = (ptr->m_link - m_links);
+					m_linkOrder[index] = dgInt32 (ptr->m_link - m_links);
 					index ++;
 					queue.Append ((dgSoftBodyEdge*) ptr->m_twin);
 				}
