@@ -281,10 +281,6 @@ void DebugShowGeometryCollision (void* userData, int vertexCount, const dFloat* 
 
 static void DebugShowBodyCollision (const NewtonBody* const body, DEBUG_DRAW_MODE mode)
 {
-	dFloat mass;
-	dFloat Ixx;
-	dFloat Iyy;
-	dFloat Izz;
 
 	if (mode == m_lines) {
 		glBegin(GL_LINES);
@@ -292,27 +288,38 @@ static void DebugShowBodyCollision (const NewtonBody* const body, DEBUG_DRAW_MOD
 		glBegin(GL_TRIANGLES);
 	}
 
-	NewtonBodyGetMassMatrix (body, &mass, &Ixx, &Iyy, &Izz);	
-	if (mass > 0.0f) {
-		int sleepState = NewtonBodyGetSleepState(body);
-		if (sleepState == 1) {
-			// indicate when body is sleeping 
-			glColor3f(0.42f, 0.73f, 0.98f);
-		} else {
-			// body is active
-			glColor3f(1.0f, 1.0f, 1.0f);
+
+	switch (NewtonBodyGetType(body)) 
+	{
+		case NEWTON_DYNAMIC_BODY:
+		{
+			//dFloat mass;
+			//dFloat Ixx;
+			//dFloat Iyy;
+			//dFloat Izz;
+			int sleepState = NewtonBodyGetSleepState(body);
+			if (sleepState == 1) {
+				// indicate when body is sleeping 
+				glColor3f(0.42f, 0.73f, 0.98f);
+			} else {
+				// body is active
+				glColor3f(1.0f, 1.0f, 1.0f);
+			}
+			break;
 		}
 
-		dMatrix matrix;
-		NewtonBodyGetMatrix(body, &matrix[0][0]);
-		NewtonCollisionForEachPolygonDo (NewtonBodyGetCollision(body), &matrix[0][0], DebugShowGeometryCollision, (void*) mode);
-	} else if (NewtonBodyGetType(body) == NEWTON_KINEMATIC_BODY) {
-//	} else {
-		dMatrix matrix;
-		glColor3f(1.0f, 1.0f, 0.0f);
-		NewtonBodyGetMatrix(body, &matrix[0][0]);
-		NewtonCollisionForEachPolygonDo (NewtonBodyGetCollision(body), &matrix[0][0], DebugShowGeometryCollision, (void*) mode);
+		case NEWTON_KINEMATIC_BODY:
+			glColor3f(1.0f, 1.0f, 0.0f);
+			break;
+
+		case NEWTON_DEFORMABLE_BODY:
+			glColor3f (0.0f, 1.0f, 1.0f);
+			break;
 	}
+	dMatrix matrix;
+	NewtonBodyGetMatrix(body, &matrix[0][0]);
+	NewtonCollisionForEachPolygonDo (NewtonBodyGetCollision(body), &matrix[0][0], DebugShowGeometryCollision, (void*) mode);
+
 	glEnd();
 }
 

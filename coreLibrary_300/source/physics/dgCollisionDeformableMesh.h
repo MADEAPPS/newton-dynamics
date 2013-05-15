@@ -122,7 +122,7 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	virtual dgFloat32 RayCastSimd (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
 	virtual void GetCollidingFaces (dgPolygonMeshDesc* const data) const;
 	virtual void GetCollidingFacesSimd (dgPolygonMeshDesc* const data) const;
-	virtual void DebugCollision (const dgMatrix& matrixPtr, OnDebugCollisionMeshCallback callback, void* const userData) const;
+
 	virtual dgInt32 CalculateSignature () const;
 	virtual void UpdateCollision ();
 
@@ -134,6 +134,7 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 */
 
 	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1);
+	virtual void DebugCollision (const dgMatrix& matrixPtr, OnDebugCollisionMeshCallback callback, void* const userData) const;
 
 	bool SanityCheck () const;
 	void ImproveTotalFitness();

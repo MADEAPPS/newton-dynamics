@@ -186,6 +186,9 @@ class NewtonDemosApp: public wxApp
 		//frame->LoadDemo (DEFAULT_SCENE);
 		wxMenuEvent loadDemo (wxEVT_COMMAND_MENU_SELECTED, NewtonDemos::ID_RUN_DEMO + DEFAULT_SCENE);
 		frame->GetEventHandler()->ProcessEvent(loadDemo);
+
+//		wxMenuEvent autoSleep (wxEVT_COMMAND_MENU_SELECTED, NewtonDemos::ID_AUTOSLEEP_MODE);
+//		frame->GetEventHandler()->ProcessEvent(autoSleep);
 		return true;
 	}
 
@@ -260,7 +263,7 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	,m_scene(NULL)
 	,m_physicsUpdateMode(0)
 	,m_suspendVisualUpdates(true)
-	,m_autoSleepState(false)
+	,m_autoSleepState(true)
 	,m_useParallelSolver(false)
 	,m_hideVisualMeshes(false)
 	,m_showContactPoints(false)
@@ -280,7 +283,7 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	,m_framesCount(0)
 	,m_timestepAcc(0)
 	,m_fps(0.0f)
-	,m_microthreadIndex(1)
+	,m_microthreadIndex(0)
 	,m_cpuInstructionsMode(0)
 	,m_broadPhaseMode (0)
 {
@@ -303,7 +306,7 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 
 	m_scene = new DemoEntityManager(this);
 	m_statusbar = CreateStatusBar();
-	int widths[] = { 150, 160, 150};
+	int widths[] = {150, 160, 150, 90, 70, 90};
 	m_statusbar->SetFieldsCount (sizeof (widths)/sizeof (widths[0]), widths);
 	CalculateFPS(0.0f);
 	m_mainMenu = CreateMainMenu();
@@ -361,13 +364,15 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 	{
 		wxMenu* const optionsMenu = new wxMenu;;
 
-		optionsMenu->AppendCheckItem(ID_AUTOSLEEP_MODE, _("Autosleep off"), _("toogle auto sleep bodies"));
+		optionsMenu->AppendCheckItem(ID_AUTOSLEEP_MODE, _("Auto sleep mode"), _("toogle auto sleep bodies"));
 		optionsMenu->AppendCheckItem(ID_HIDE_VISUAL_MESHES, _("Hide visual meshes"));
 		optionsMenu->AppendCheckItem(ID_SHOW_COLLISION_MESH, _("Show collision Mesh"));
 		optionsMenu->AppendCheckItem(ID_SHOW_CONTACT_POINTS, _("Show contact points"));
 		optionsMenu->AppendCheckItem(ID_SHOW_NORMAL_FORCES, _("Show normal forces"));
 		optionsMenu->AppendCheckItem(ID_SHOW_AABB, _("Show aabb"));
 		optionsMenu->AppendCheckItem(ID_USE_PARALLEL_SOLVER, _("Parallel solver on"));
+
+		optionsMenu->Check (ID_AUTOSLEEP_MODE, m_autoSleepState);
 
 		optionsMenu->AppendSeparator();
 		if (m_scene) {
@@ -460,7 +465,7 @@ void NewtonDemos::END_MENU_OPTION()
 	m_suspendVisualUpdates = false;																			
 	if (m_scene && m_scene->GetNewton()) {		
 		NewtonWaitForUpdateToFinish (m_scene->GetNewton());
-		SetAutoSleepMode (m_scene->GetNewton(), m_autoSleepState);
+		SetAutoSleepMode (m_scene->GetNewton(), !m_autoSleepState);
 		NewtonSetMultiThreadSolverOnSingleIsland (m_scene->GetNewton(), m_useParallelSolver ? 1 : 0);	
 	}
 }
@@ -589,10 +594,6 @@ void NewtonDemos::CalculateFPS(float timestep)
 		char platform[256];
 		NewtonGetDeviceString(world, NewtonGetCurrentDevice(world), platform, sizeof (platform));
 		int memoryUsed = NewtonGetMemoryUsed() / (1024) ;
-
-//		sprintf (statusText, "render fps: (%7.2f)  physics time: (%4.2fms)  bodyCount: (%d)   physicsThreads: (%d)  platform: (%s)  autosleepMode: (%s)    PhysMemory (%d kbytes)", 
-//			m_fps, m_scene->GetPhysicsTime() * 1000.0f, NewtonWorldGetBodyCount(world), 
-//			NewtonGetThreadsCount(world), platform, m_autoSleepState ? "on" : "off", memoryUsed);
 		
 		sprintf (statusText, "render fps: %7.2f", m_fps);
 		m_statusbar->SetStatusText (statusText, 0);
@@ -600,8 +601,17 @@ void NewtonDemos::CalculateFPS(float timestep)
 		sprintf (statusText, "physics time: %4.2f ms", m_scene->GetPhysicsTime() * 1000.0f);
 		m_statusbar->SetStatusText (statusText, 1);
 
-		sprintf (statusText, "memory %d kbytes", memoryUsed);
+		sprintf (statusText, "memory: %d kbytes", memoryUsed);
 		m_statusbar->SetStatusText (statusText, 2);
+
+		sprintf (statusText, "bodies: %d", NewtonWorldGetBodyCount(world));
+		m_statusbar->SetStatusText (statusText, 3);
+
+		sprintf (statusText, "threads: %d", NewtonGetThreadsCount(world));
+		m_statusbar->SetStatusText (statusText, 4);
+
+		sprintf (statusText, "auto sleep: %s", m_autoSleepState ? "on" : "off");
+		m_statusbar->SetStatusText (statusText, 5);
 	}
 }
 

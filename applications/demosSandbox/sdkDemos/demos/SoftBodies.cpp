@@ -358,7 +358,8 @@ void ClothPath(DemoEntityManager* const scene)
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 	//CreateLevelMesh (scene, "playground.ngd", 1);
 
-	dVector location (8.0f, 0.0f, -10.0f, 0.0f) ;
+//	dVector location (8.0f, 0.0f, -10.0f, 0.0f) ;
+	dVector location (0.0f, 0.0f, 0.0f, 0.0f) ;
 
 	NewtonCollision* const softBody = SimpleSoftBodyEntity::CreateClothPatchShape (scene);
 	new SimpleSoftBodyEntity (scene, softBody, location);

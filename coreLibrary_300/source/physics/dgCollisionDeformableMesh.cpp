@@ -449,24 +449,6 @@ void dgCollisionDeformableMesh::GetCollidingFaces (dgPolygonMeshDesc* const data
 }
 
 
-void dgCollisionDeformableMesh::DebugCollision (const dgMatrix& matrixPtr, OnDebugCollisionMeshCallback callback, void* const userData) const
-{
-dgAssert (0);
-/*
-	dgMatrix matrix (GetLocalMatrix() * matrixPtr);
-	for (dgInt32 i = 0; i < m_trianglesCount; i ++ ) {
-		dgTriplex points[3];
-		for (dgInt32 j = 0; j < 3; j ++) {
-			dgInt32 index = m_indexList[i * 3 + j];
-			dgVector p (matrix.TransformVector(m_particles.m_position[index]));
-			points[j].m_x = p.m_x;
-			points[j].m_y = p.m_y;
-			points[j].m_z = p.m_z;
-		}
-		callback (userData, 3, &points[0].m_x, 0);
-	}
-*/
-}
 
 
 void dgCollisionDeformableMesh::GetCollisionInfo(dgCollisionInfo* const info) const
@@ -1591,3 +1573,19 @@ dgVector dgCollisionDeformableMesh::GetParticlePosition(dgInt32 index) const
 	return m_particles.m_posit[index];
 }
 
+void dgCollisionDeformableMesh::DebugCollision (const dgMatrix& matrixPtr, OnDebugCollisionMeshCallback callback, void* const userData) const
+{
+//	dgMatrix matrix (GetLocalMatrix() * matrixPtr);
+	for (dgInt32 i = 0; i < m_trianglesCount; i ++ ) {
+		dgTriplex points[3];
+		for (dgInt32 j = 0; j < 3; j ++) {
+			dgInt32 index = m_indexList[i * 3 + j];
+			//dgVector p (matrix.TransformVector(m_particles.m_position[index]));
+			const dgVector& p = m_particles.m_posit[index];
+			points[j].m_x = p.m_x;
+			points[j].m_y = p.m_y;
+			points[j].m_z = p.m_z;
+		}
+		callback (userData, 3, &points[0].m_x, 0);
+	}
+}

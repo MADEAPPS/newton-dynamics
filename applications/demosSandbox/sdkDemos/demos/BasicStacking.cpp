@@ -21,6 +21,8 @@
 static void BuildPyramid (DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int count)
 {
 	dMatrix matrix (GetIdentityMatrix());
+	matrix.m_posit = origin;
+	matrix.m_posit.m_w = 1.0f;
 
 	// create the shape and visual mesh as a common data to be re used
 	NewtonWorld* const world = scene->GetNewton();
@@ -79,8 +81,19 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 	scene->LoadScene (fileName);
 #else
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
-	//BuildPyramid (scene, 10.0f, dVector(0.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), 5);
-	BuildPyramid (scene, 10.0f, dVector(0.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), 50);
+	int high = 10;
+//	BuildPyramid (scene, 10.0f, dVector(0.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), 50);
+
+	BuildPyramid (scene, 10.0f, dVector(-10.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high);
+	BuildPyramid (scene, 10.0f, dVector(-8.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high);
+	BuildPyramid (scene, 10.0f, dVector(-6.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high);
+	BuildPyramid (scene, 10.0f, dVector(-4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high);
+	BuildPyramid (scene, 10.0f, dVector(-2.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high);
+	BuildPyramid (scene, 10.0f, dVector(0.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high);
+	BuildPyramid (scene, 10.0f, dVector(2.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high);
+	BuildPyramid (scene, 10.0f, dVector(4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high);
+	BuildPyramid (scene, 10.0f, dVector(6.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high);
+	BuildPyramid (scene, 10.0f, dVector(8.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high);
 #endif
 
 
