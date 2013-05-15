@@ -70,6 +70,7 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch (const dgCollis
 	:dgCollisionDeformableMesh (source)
 	,m_linksCount (source.m_linksCount)
 	,m_graphCount (source.m_graphCount)
+	,m_linkOrder(NULL)
 	,m_links(NULL)
 	,m_graph(NULL)
 	,m_particleToEddgeMap(NULL)
@@ -78,6 +79,9 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch (const dgCollis
 	m_isdoubleSided = source.m_isdoubleSided;
 
 	memcpy (&m_materials, &source.m_materials, sizeof (source.m_materials));
+
+	m_linkOrder = (dgInt32*) dgMallocStack (m_linksCount * sizeof (dgInt32));
+	memcpy (m_linkOrder, source.m_linkOrder, m_linksCount * sizeof (dgInt32));
 
 	m_links = (dgClothLink*) dgMallocStack (m_linksCount * sizeof (dgClothLink));
 	memcpy (m_links, source.m_links, m_linksCount * sizeof (dgClothLink));
@@ -88,10 +92,10 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch (const dgCollis
 		dgSoftBodyEdge* const src = &source.m_graph[i];
 		
 		dst->m_vertex = src->m_vertex;
-		dst->m_twin = &m_graph[source.m_graph - src->m_twin];
-		dst->m_next = &m_graph[source.m_graph - src->m_next];
-		dst->m_prev = &m_graph[source.m_graph - src->m_next];
-		dst->m_link = &m_links[source.m_links - src->m_link];
+		dst->m_twin = &m_graph[src->m_twin - source.m_graph];
+		dst->m_next = &m_graph[src->m_next - source.m_graph];
+		dst->m_prev = &m_graph[src->m_next - source.m_graph];
+		dst->m_link = &m_links[src->m_link - source.m_links];
 	}
 
 	m_particleToEddgeMap = (dgSoftBodyEdge**) m_allocator->Malloc (m_particles.m_count * dgInt32 (sizeof (dgSoftBodyEdge*)));
@@ -112,6 +116,7 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgWorld* const 
 	:dgCollisionDeformableMesh (world, mesh, m_deformableClothPatch)
 	,m_linksCount (0)
 	,m_graphCount (0)
+	,m_linkOrder(NULL)
 	,m_links(NULL)
 	,m_graph(NULL)
 	,m_particleToEddgeMap(NULL)
@@ -216,6 +221,12 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgWorld* const 
 		}
 	} 
 
+	m_linkOrder = (dgInt32*) dgMallocStack (m_linksCount * sizeof (dgInt32));
+	for (dgInt32 i = 0; i <  m_linksCount; i ++) {
+		m_linkOrder[i] = i; 
+	}
+
+
 	m_graph = (dgSoftBodyEdge*) m_allocator->Malloc (m_graphCount * dgInt32 (sizeof (dgSoftBodyEdge)));
 	m_particleToEddgeMap = (dgSoftBodyEdge**) m_allocator->Malloc (m_particles.m_count * dgInt32 (sizeof (dgSoftBodyEdge*)));
 	memset (m_particleToEddgeMap, 0, m_particles.m_count * dgInt32 (sizeof (dgSoftBodyEdge*)));
@@ -252,6 +263,7 @@ dgCollisionDeformableClothPatch::~dgCollisionDeformableClothPatch(void)
 	if (m_links) {
 		dgFree (m_links);
 		dgFree (m_graph);
+		dgFree (m_linkOrder);
 		dgFree (m_particleToEddgeMap);
 	}
 }
@@ -286,10 +298,6 @@ void dgCollisionDeformableClothPatch::ConstraintParticle (dgInt32 particleIndex,
 	} while (edge != m_particleToEddgeMap[particleIndex]);
 }
 
-void dgCollisionDeformableClothPatch::EndConfiguration ()
-{
-
-}
 
 
 void dgCollisionDeformableClothPatch::CalculateInternalForces (dgFloat32 timestep)
@@ -365,5 +373,42 @@ dgFloat32 invMassScale = 1.0f / 0.01f;
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
 		veloc[i] += force[i].Scale (invMassTime);
 		posit[i] += veloc[i].Scale (timestep);
+	}
+}
+
+
+void dgCollisionDeformableClothPatch::EndConfiguration ()
+{
+	dgStack<dgInt8> markPool (m_particles.m_count);
+	dgInt8* const mark = &markPool[0];
+	memset (mark, 0, markPool.GetSizeInBytes());
+
+	dgList<dgSoftBodyEdge*> queue (GetAllocator());
+	const dgFloat32* mass = m_particles.m_unitMass;
+	for (dgInt32 i = 0; i < m_graphCount; i ++) {
+		dgSoftBodyEdge* const edge = &m_graph[i];
+		if ((mass[edge->m_vertex] == dgFloat32 (0.0f)) && !mark[edge->m_vertex]) {
+			mark[edge->m_vertex] = 1;
+			queue.Append (edge);
+		}
+	}
+
+	dgInt32 index = 0;
+	while (queue.GetCount()) {
+		dgSoftBodyEdge* const edge = queue.GetFirst()->GetInfo();
+		queue.Remove(queue.GetFirst());
+
+		if (mark[edge->m_vertex] < 2) {
+			mark[edge->m_vertex] = 2;
+			dgSoftBodyEdge* ptr = edge;
+			do {
+				if (mark[ptr->m_twin->m_vertex] < 2) {
+					m_linkOrder[index] = (ptr->m_link - m_links);
+					index ++;
+					queue.Append ((dgSoftBodyEdge*) ptr->m_twin);
+				}
+				ptr = (dgSoftBodyEdge*) ptr->m_twin->m_next;
+			} while (ptr != edge);
+		}
 	}
 }

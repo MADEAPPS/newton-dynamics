@@ -69,6 +69,7 @@ class dgCollisionDeformableClothPatch: public dgCollisionDeformableMesh
 	dgClothPatchMaterial m_materials[2];
 	dgInt32 m_linksCount;
 	dgInt32 m_graphCount;
+	dgInt32* m_linkOrder;
 	dgClothLink* m_links;
 	dgSoftBodyEdge* m_graph;
 	dgSoftBodyEdge** m_particleToEddgeMap;
