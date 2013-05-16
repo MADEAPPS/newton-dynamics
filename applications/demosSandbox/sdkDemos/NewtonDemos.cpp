@@ -34,7 +34,7 @@
 //#define DEFAULT_SCENE	8			// Box stacks
 //#define DEFAULT_SCENE	9			// simple level mesh collision
 //#define DEFAULT_SCENE	10			// optimized level mesh collision
-//#define DEFAULT_SCENE	11			// height field Collision
+#define DEFAULT_SCENE	11			// height field Collision
 //#define DEFAULT_SCENE	12			// infinite user plane collision
 //#define DEFAULT_SCENE	13			// user height field Collision
 //#define DEFAULT_SCENE	14			// compound Collision
@@ -52,7 +52,7 @@
 //#define DEFAULT_SCENE	26			// basic car
 //#define DEFAULT_SCENE	27			// player controller
 //#define DEFAULT_SCENE	28			// advanced player controller
-#define DEFAULT_SCENE	29			// cloth patch			
+//#define DEFAULT_SCENE	29			// cloth patch			
 //#define DEFAULT_SCENE	30			// soft bodies			
 //#define DEFAULT_SCENE	31			// high performance super car
 

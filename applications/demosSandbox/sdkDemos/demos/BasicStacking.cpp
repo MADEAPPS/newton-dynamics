@@ -17,7 +17,68 @@
 #include "DemoMesh.h"
 #include "PhysicsUtils.h"
 
-#if 1
+//static void BuildJenga (NewtonFrame& system, dVector origin, int hight)
+static void BuildJenga (DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int count)
+{
+//	int i;
+//	int j;
+//	dFloat gap;
+//	dFloat mass;
+
+	// build a standard block stack of 20 * 3 boxes for a total of 60
+	NewtonWorld* const world = scene->GetNewton();
+
+	dVector blockBoxSize (0.8f, 0.5f, 0.8f * 3.0f);
+	blockBoxSize = blockBoxSize.Scale (1.0f);
+
+	// create the stack
+	dMatrix baseMatrix (GetIdentityMatrix());
+
+	// for the elevation of the floor at the stack position
+	baseMatrix.m_posit.m_x = origin.m_x;
+	baseMatrix.m_posit.m_z = origin.m_z;
+
+	dFloat startElevation = 100.0f;
+	dVector floor (FindFloor (world, dVector (baseMatrix.m_posit.m_x, startElevation, baseMatrix.m_posit.m_z, 0.0f), 2.0f * startElevation));
+	baseMatrix.m_posit.m_y = floor.m_y + blockBoxSize.m_y / 2.0f;
+
+	// set realistic mass and inertia matrix for each block
+	mass = 5.0f;
+
+	// create a 90 degree rotation matrix
+	dMatrix rotMatrix (dYawMatrix (3.141592f * 0.5f));
+
+	// create a material to control collision with this objects
+	int defaultMaterialID;
+	defaultMaterialID = NewtonMaterialGetDefaultGroupID (world);
+
+	// separate a bit the block alone the horizontal direction
+	dFloat gap = 0.01f;
+
+	// create the shape and visual mesh as a common data to be re used
+	NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), blockBoxSize, _BOX_PRIMITIVE, defaultMaterialID);
+	DemoMesh* const geometry = new DemoMesh("box", collision, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+
+	for (int i = 0; i < count; i ++) { 
+		dMatrix matrix(baseMatrix);
+		matrix.m_posit -= matrix.m_front.Scale (blockBoxSize.m_x - gap); 
+
+		for (int j = 0; j < 3; j ++) { 
+			CreateSimpleSolid (scene, geometry, mass, matrix, collision, defaultMaterialID);
+			matrix.m_posit += matrix.m_front.Scale (blockBoxSize.m_x + gap);  
+		}
+
+		baseMatrix = rotMatrix * baseMatrix;
+		baseMatrix.m_posit += matrix.m_up.Scale (blockBoxSize.m_y * 0.99f);
+	}
+
+	// do not forget to release the assets	
+	geometry->Release(); 
+	NewtonDestroyCollision (collision);
+}
+
+
+
 static void BuildPyramid (DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int count)
 {
 	dMatrix matrix (GetIdentityMatrix());
@@ -81,19 +142,15 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 	scene->LoadScene (fileName);
 #else
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
-	int high = 10;
-//	BuildPyramid (scene, 10.0f, dVector(0.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), 50);
-
-	BuildPyramid (scene, 10.0f, dVector(-10.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high);
-	BuildPyramid (scene, 10.0f, dVector(-8.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high);
-	BuildPyramid (scene, 10.0f, dVector(-6.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high);
-	BuildPyramid (scene, 10.0f, dVector(-4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high);
-	BuildPyramid (scene, 10.0f, dVector(-2.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high);
-	BuildPyramid (scene, 10.0f, dVector(0.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high);
-	BuildPyramid (scene, 10.0f, dVector(2.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high);
-	BuildPyramid (scene, 10.0f, dVector(4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high);
-	BuildPyramid (scene, 10.0f, dVector(6.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high);
-	BuildPyramid (scene, 10.0f, dVector(8.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high);
+	for (int i = 0; i < 10; i ++) {
+		BuildPyramid (scene, 10.0f, dVector(-10.0f + i * 2.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), 20);
+	}
+	
+	for (int i = 0; i < 2; i ++) {
+		for (int j = 0; j < 2; j ++) {
+			BuildJenga (scene, 5.0f, dVector(-10.0f + j * 8, 0.0f, 10.0f + i * 8, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), 100);
+		}
+	}
 #endif
 
 
@@ -107,195 +164,3 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 }
 
 
-
-
-#else
-
-
-
-/* Copyright (c) <2009> <Newton Game Dynamics>
-* 
-* This software is provided 'as-is', without any express or implied
-* warranty. In no event will the authors be held liable for any damages
-* arising from the use of this software.
-* 
-* Permission is granted to anyone to use this software for any purpose,
-* including commercial applications, and to alter it and redistribute it
-* freely
-*/
-
-#include <toolbox_stdafx.h>
-#include "SkyBox.h"
-#include "../DemoEntityManager.h"
-#include "../DemoCamera.h"
-#include "DemoMesh.h"
-#include "PhysicsUtils.h"
-
-#include "CustomBallAndSocket.h"
-#include "CustomKinematicController.h"
-
-
-static NewtonBody* BuildBox (DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size)
-{
-	dMatrix matrix (GetIdentityMatrix());
-
-	// create the shape and visual mesh as a common data to be re used
-	NewtonWorld* const world = scene->GetNewton();
-	NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
-
-
-	DemoMesh* const geometry = mass 
-		? new DemoMesh("DynBox", collision, "smilli.tga", "smilli.tga", "smilli.tga")
-		: new DemoMesh("StaticBox", collision, "wood_0.tga", "wood_0.tga", "wood_1.tga");
-
-	matrix.m_posit = origin; 
-
-	NewtonBody *body = CreateSimpleSolid (scene, geometry, mass, matrix, collision, 0);
-
-	// do not forget to release the assets   
-	geometry->Release(); 
-	NewtonDestroyCollision (collision);
-
-	return body;
-}
-
-
-
-
-void BasicBoxStacks (DemoEntityManager* const scene)
-{
-	BuildBox (scene, 0.0f, dVector(0,-5,0), dVector (100, 10, 100)); // ground
-
-#if 0
-
-	// provoke CCD assert
-	NewtonBody* body = BuildBox (scene, 10.0f, dVector(0,3,1), dVector (4,4,4));
-	NewtonBodySetContinuousCollisionMode (body, 1);
-	CustomKinematicController *kj = new CustomKinematicController(body, dVector (0,3,0));
-	kj->SetMaxLinearFriction (1000);
-	kj->SetTargetPosit (dVector (0,0,0));
-
-#elif 1
-/*
-	// provoke 'penetration bug'
-	NewtonBody* body = BuildBox (scene, 1.0f, dVector(0,3,1), dVector (4,4,4));
-	CustomKinematicController *kj = new CustomKinematicController(body, dVector (0,3,0));
-	dQuaternion q (dVector(1,0,0), 0.7f);
-	kj->SetPickMode (1);
-	kj->SetTargetPosit (dVector (0,0,0));
-	kj->SetTargetRotation (q);
-	kj->SetMaxLinearFriction (500);
-	kj->SetMaxAngularFriction (500);
-
-// provoke explosion bug
-   dVector p (0,3,3);
-   NewtonBody* body[2] = {0, BuildBox (scene, 1.0f, p, dVector (4,4,4))};
-   NewtonBodySetContinuousCollisionMode (body[1], 1);
-   for (int i=0; i<4; i++)
-   {
-      p[0] += 6;
-      body[i&1] = BuildBox (scene, 1.0f, p, dVector (4,4,4));
-      NewtonBodySetContinuousCollisionMode (body[i&1], 1);
-      dMatrix matrix (GetIdentityMatrix());
-      matrix.m_posit = p;// + dVector(-3,0,0);
-      new CustomBallAndSocket (matrix, body[!(i&1)], body[i&1]); 
-   }
-
-
-   // provoke assert in CalculateAngularDerivative
-   NewtonBody* body = BuildBox (scene, 1.0f, dVector(0,3,0), dVector (4,4,4));
-   CustomKinematicController *kj = new CustomKinematicController(body, dVector (0,3,0));
-   kj->SetMaxLinearFriction (1000); 
-   kj->SetTargetPosit (dVector (0,0,0));
-   NewtonBodySetContinuousCollisionMode (body, 1);
-
-	// provoke Minchovski assert
-	NewtonBody* body = BuildBox (scene, 1.0f, dVector(0,2,0), dVector (4,4,4));
-	NewtonBodySetContinuousCollisionMode (body, 1);
-	body = BuildBox (scene, 1.0f, dVector(0,8,3.995f), dVector (4,4,4));
-	dVector t (0.0f, 0.1f, 5.0f);
-	NewtonBodySetOmega (body, (const float*)&t.m_x);
-	NewtonBodySetContinuousCollisionMode (body, 1);
-
-	// provoke another kind of Minkovski
-	dVector center (0,30,-12);
-	NewtonBody* parentBody = BuildBox (scene, 1.0f, center, dVector (4,4,4));
-	NewtonBodySetContinuousCollisionMode (parentBody, 1);
-	for (float a = 0.0f; a<3.14; a+=0.2f) {
-		NewtonBody* body[2] = {0, parentBody};
-		dVector dir (cos(a), 0, sin(a));
-		dVector p = center;
-		for (int i=0; i<4; i++) {
-			p += dir.Scale(5.0f);
-			body[i&1] = BuildBox (scene, 1.0f, p, dVector (4,4,4));
-			NewtonBodySetContinuousCollisionMode (body[i&1], 1);
-			dMatrix matrix (GetIdentityMatrix());
-			matrix.m_posit = p;
-			new CustomBallAndSocket (matrix, body[!(i&1)], body[i&1]); 
-		}
-	}
-
-	// provoke 3rd. kind of Minkovski
-	dVector center (0,30,-12);
-	NewtonBody* parentBody = BuildBox (scene, 1.0f, center, dVector (4,4,4));
-	NewtonBodySetContinuousCollisionMode (parentBody, 1);
-	for (float a = 0.0f; a<3.14*2; a+=1.0) {
-		NewtonBody* body[2] = {0, parentBody};
-		dVector dir (cos(a), 0, sin(a));
-		dVector p = center;
-		for (int i=0; i<2; i++) {
-			p += dir.Scale(5.0f);
-			body[i&1] = BuildBox (scene, 1.0f, p, dVector (4,4,4));
-			NewtonBodySetContinuousCollisionMode (body[i&1], 1);
-			dMatrix matrix (GetIdentityMatrix());
-			matrix.m_posit = p;
-			new CustomBallAndSocket (matrix, body[!(i&1)], body[i&1]); 
-
-			dVector t (0.0f, 0.1f, 5.0f);
-			NewtonBodySetOmega (body[i&1], (const float*)&t.m_x);
-		}
-	}
-*/
-
-	// provoke angular joint explosion
-   {
-	   dVector origin (0,5,0);
-	   NewtonBody* body = BuildBox (scene, 1.0f, origin, dVector (6,1,8));
-	   CustomKinematicController *kj = new CustomKinematicController (body, origin);
-	   dQuaternion q (dVector(1,0,0), float(PI*0.5));
-	   kj->SetPickMode (1);
-	   kj->SetTargetPosit (origin);
-	   kj->SetTargetRotation (q);
-	   kj->SetMaxLinearFriction (500);
-	   kj->SetMaxAngularFriction (500);
-
-	   NewtonBody* poorBox = BuildBox (scene, 3.0f, dVector (0,2,4), dVector (5,2,10));
-	   //NewtonBody* poorBox = BuildBox (scene, 0.5f, dVector (0,2,3), dVector (3,2,3));
-	   //NewtonBody* poorBox = BuildBox (scene, 0.5f, dVector (0,2,0), dVector (3,2,3));
-	   //NewtonBody* poorBox = BuildBox (scene, 0.5f, dVector (0,2,0.7f), dVector (8,3.0f,1));
-
-	   NewtonBodySetContinuousCollisionMode (poorBox, 1); NewtonBodySetContinuousCollisionMode (body, 1);
-   }
-
-#else
-
-	// provoke 'penetration bug' linear only
-
-	NewtonBody* body = BuildBox (scene, 1.0f, dVector(0,3,1), dVector (4,4,4));
-	CustomKinematicController *kj = new CustomKinematicController(body, dVector (0,3,0));
-	kj->SetTargetPosit (dVector (0,-10,0));
-	kj->SetMaxLinearFriction (500);
-
-#endif
-
-
-	// place camera into position
-	dQuaternion rot;
-	dVector origin (-20.0f, 2.0f, 0.0f, 0.0f);
-	scene->SetCameraMatrix(rot, origin);
-
-
-	//   ExportScene (scene->GetNewton(), "../../../media/test1.ngd");
-}
-
-#endif
