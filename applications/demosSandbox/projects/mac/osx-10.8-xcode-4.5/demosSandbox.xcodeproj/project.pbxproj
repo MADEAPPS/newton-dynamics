@@ -271,6 +271,7 @@
 		FF8500121740605400BEE80B /* libglew-osx.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF85000617405FDE00BEE80B /* libglew-osx.a */; };
 		FF8500131740605400BEE80B /* libtinyxml.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF85000B17405FDE00BEE80B /* libtinyxml.a */; };
 		FF8500141740605400BEE80B /* libwxWidget.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF85FFFC17405FDE00BEE80B /* libwxWidget.a */; };
+		FF850082174525BC00BEE80B /* persianRug.tga in Resources */ = {isa = PBXBuildFile; fileRef = FF850081174525BC00BEE80B /* persianRug.tga */; };
 		FF87BFAC173F269200472B56 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF87BFAB173F269200472B56 /* CoreFoundation.framework */; };
 		FF87BFAE173F26B900472B56 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF87BFAD173F26B900472B56 /* OpenGL.framework */; };
 		FF87BFB0173F26DF00472B56 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF87BFAF173F26DF00472B56 /* OpenAL.framework */; };
@@ -550,6 +551,7 @@
 		FF506720173F3D8A00D01FDF /* yellow_p.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = yellow_p.tga; path = ../../../../media/yellow_p.tga; sourceTree = "<group>"; };
 		FF7F20861730187900AC6E4B /* enet_osx.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = enet_osx.xcodeproj; path = "../../../../../packages/thirdParty/enet-1.2/enet_osx/enet_osx.xcodeproj"; sourceTree = "<group>"; };
 		FF8402EB17353606008E038A /* wxcocoaStatic.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = wxcocoaStatic.xcodeproj; path = "../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/build/osx/wxcocoaStatic.xcodeproj"; sourceTree = "<group>"; };
+		FF850081174525BC00BEE80B /* persianRug.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = persianRug.tga; path = ../../../../media/persianRug.tga; sourceTree = "<group>"; };
 		FF87BFAB173F269200472B56 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
 		FF87BFAD173F26B900472B56 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		FF87BFAF173F26DF00472B56 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = /System/Library/Frameworks/OpenAL.framework; sourceTree = "<absolute>"; };
@@ -661,6 +663,7 @@
 		08FB7794FE84155DC02AAC07 /* newtonDemo */ = {
 			isa = PBXGroup;
 			children = (
+				FF850081174525BC00BEE80B /* persianRug.tga */,
 				FF506721173F3DDC00D01FDF /* assets */,
 				FFF184A113130A6F0077CF7A /* source */,
 				FF8C27F71313DB5500646B90 /* frameworks */,
@@ -1259,6 +1262,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FF850082174525BC00BEE80B /* persianRug.tga in Resources */,
 				FF506750173F3EAC00D01FDF /* streaked.tga in Resources */,
 				FF506751173F3EAC00D01FDF /* teapot.ngd in Resources */,
 				FF506752173F3EAC00D01FDF /* tekwall2.tga in Resources */,
