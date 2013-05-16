@@ -101,7 +101,7 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch (const dgCollis
 		dst->m_vertex = src->m_vertex;
 		dst->m_twin = &m_graph[(dgSoftBodyEdge*)src->m_twin - source.m_graph];
 		dst->m_next = &m_graph[(dgSoftBodyEdge*)src->m_next - source.m_graph];
-		dst->m_prev = &m_graph[(dgSoftBodyEdge*)src->m_next - source.m_graph];
+		dst->m_prev = &m_graph[(dgSoftBodyEdge*)src->m_prev - source.m_graph];
 		dst->m_link = &m_links[src->m_link - source.m_links];
 	}
 
