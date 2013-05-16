@@ -272,8 +272,29 @@ dgFloat32 dgBody::RayCastSimd (const dgLineBox& line, OnRayCastAction filter, On
 	}
 	return minT;
 */
-	dgAssert (0);
-	return 0;
+
+	dgVector l0 (line.m_l0);
+	dgVector l1 (line.m_l1);
+	if (dgRayBoxClip (l0, l1, m_minAABB, m_maxAABB)) {
+		dgContactPoint contactOut;
+		const dgMatrix& globalMatrix = m_collision->GetGlobalMatrix();
+		dgVector localP0 (globalMatrix.UntransformVectorSimd(l0));
+		dgVector localP1 (globalMatrix.UntransformVectorSimd (l1));
+		dgFloat32 t = m_collision->RayCastSimd (localP0, localP1, contactOut, preFilter, this, userData);
+		if (t < dgFloat32 (1.0f)) {
+			dgVector p (globalMatrix.TransformVectorSimd(localP0 + (localP1 - localP0).Scale(t)));
+			dgVector l1l0 (line.m_l1 - line.m_l0);
+			t = ((p - line.m_l0) % l1l0) / (l1l0 % l1l0);
+			if (t < minT) {
+				dgAssert (t >= 0.0f);
+				dgAssert (t <= 1.0f);
+				contactOut.m_normal = globalMatrix.RotateVectorSimd (contactOut.m_normal);
+				minT = filter (this, contactOut.m_collision0, contactOut.m_normal, (void*)contactOut.m_shapeId0, userData, t);
+			}
+		}
+	} 
+	return minT;
+
 }
 
 dgFloat32 dgBody::RayCast (const dgLineBox& line, OnRayCastAction filter, OnRayPrecastAction preFilter, void* const userData, dgFloat32 minT) const

@@ -31,15 +31,15 @@
 
 void dgWorldDynamicUpdate::CalculateIslandReactionForcesSimd (dgIsland* const island, dgFloat32 timestep, dgInt32 threadID) const
 {
-dgAssert (0);
 	if (!(island->m_isContinueCollision && island->m_jointCount)) {
-		dgInt32 rowBase = BuildJacobianMatrix (island, threadID, timestep);
-		CalculateReactionsForces (island, rowBase, threadID, timestep, DG_SOLVER_MAX_ERROR);
+		dgInt32 rowBase = BuildJacobianMatrixSimd(island, threadID, timestep);
+		CalculateReactionsForcesSimd (island, rowBase, threadID, timestep, DG_SOLVER_MAX_ERROR);
 		IntegrateArray (island, DG_SOLVER_MAX_ERROR, timestep, threadID); 
 	} else {
+
 		// calculate reaction force sand new velocities
-		dgInt32 rowBase = BuildJacobianMatrix (island, threadID, timestep);
-		CalculateReactionsForces (island, rowBase, threadID, timestep, DG_SOLVER_MAX_ERROR);
+		dgInt32 rowBase = BuildJacobianMatrixSimd (island, threadID, timestep);
+		CalculateReactionsForcesSimd (island, rowBase, threadID, timestep, DG_SOLVER_MAX_ERROR);
 
 		// see if the island goes to sleep
 		bool isAutoSleep = true;
@@ -102,7 +102,7 @@ dgAssert (0);
 					body->m_omega = zero;
 				}
 			} else {
-				// island is no sleeping but may be at reat with small residual veliduty for a long time
+				// island is not sleeping but may be at rest with small residual velocity for a long time
 				// see if we can force to go to sleep
 				if ((maxAccel > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxAccel) ||
 					(maxAlpha > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxAlpha) ||
@@ -229,8 +229,8 @@ dgAssert (0);
 						}
 					}
 
-					dgInt32 rowBase = BuildJacobianMatrix (island, threadID, 0.0f);
-					CalculateReactionsForces (island, rowBase, threadID, 0.0f, DG_SOLVER_MAX_ERROR);
+					dgInt32 rowBase = BuildJacobianMatrixSimd(island, threadID, 0.0f);
+					CalculateReactionsForcesSimd (island, rowBase, threadID, 0.0f, DG_SOLVER_MAX_ERROR);
 				}
 			}
 

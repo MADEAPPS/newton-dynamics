@@ -375,31 +375,22 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 		optionsMenu->Check (ID_AUTOSLEEP_MODE, m_autoSleepState);
 
 		optionsMenu->AppendSeparator();
-		if (m_scene) {
-			int platformsCount = NewtonEnumrateDevices (m_scene->GetNewton());
-			for (int i = 0; i < platformsCount; i ++) {
-				char platform[256];
-				NewtonGetDeviceString (m_scene->GetNewton(), i, platform, sizeof (platform));
-				optionsMenu->AppendCheckItem(ID_PLATFORMS + i, _(platform));
-			}
+		int platformsCount = NewtonEnumrateDevices (m_scene->GetNewton());
+		for (int i = 0; i < platformsCount; i ++) {
+			char platform[256];
+			NewtonGetDeviceString (m_scene->GetNewton(), i, platform, sizeof (platform));
+			optionsMenu->AppendRadioItem(ID_PLATFORMS + i, _(platform));
 		}
+		//optionsMenu->Check(ID_PLATFORMS, true);
 
 		optionsMenu->AppendSeparator();
 		optionsMenu->AppendRadioItem(ID_DYNAMICS_BROADPHASE, _("dynamics broad phase"));
 		optionsMenu->AppendRadioItem(ID_STATIC_BROADPHASE, _("static broad phase"));
 		optionsMenu->AppendRadioItem(ID_HYBRID_BROADPHASE, _("hybrid broad phase"));
 
-
 		optionsMenu->AppendSeparator();
 		optionsMenu->Append(ID_SHOW_CONCURRENCE_PROFILER, _("Show concurrent profiler"));
-//		if (mainFrame->m_concurrentProfilerState) {
-//			concurrentProfiler->setCheck(true);
-//		}
-//		FXMenuCheck* const threadProfiler = new FXMenuCheck(m_optionsMenu, "Show micro thread profiler", mainFrame, NewtonDemos::ID_SHOW_PROFILER);
 		optionsMenu->Append(ID_SHOW_PROFILER, _("Show micro thread profiler"));
-//		if (mainFrame->m_threadProfilerState) {
-//			threadProfiler->setCheck(true);
-//		}
 
 		optionsMenu->AppendSeparator();
 		optionsMenu->Append(ID_SELECT_ALL_PROFILERS, _("select all profiler"));
@@ -794,8 +785,8 @@ void NewtonDemos::OnSelectNumberOfMicroThreads(wxCommandEvent& event)
 void NewtonDemos::OnSimdInstructions(wxCommandEvent& event)
 {
 	BEGIN_MENU_OPTION();
-	int selection = event.GetId() - ID_PLATFORMS;
-	NewtonSetCurrentDevice (m_scene->GetNewton(), selection);
+	m_cpuInstructionsMode = event.GetId() - ID_PLATFORMS;
+	NewtonSetCurrentDevice (m_scene->GetNewton(), m_cpuInstructionsMode);
 	END_MENU_OPTION();
 }
 
