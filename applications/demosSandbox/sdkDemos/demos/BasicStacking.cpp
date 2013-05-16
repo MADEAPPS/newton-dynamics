@@ -17,14 +17,8 @@
 #include "DemoMesh.h"
 #include "PhysicsUtils.h"
 
-//static void BuildJenga (NewtonFrame& system, dVector origin, int hight)
 static void BuildJenga (DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int count)
 {
-//	int i;
-//	int j;
-//	dFloat gap;
-//	dFloat mass;
-
 	// build a standard block stack of 20 * 3 boxes for a total of 60
 	NewtonWorld* const world = scene->GetNewton();
 
@@ -79,7 +73,7 @@ static void BuildJenga (DemoEntityManager* const scene, dFloat mass, const dVect
 
 
 
-static void BuildPyramid (DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int count)
+static void BuildPyramid (DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int count, PrimitiveType type, const dMatrix& shapeMatrix = GetIdentityMatrix())
 {
 	dMatrix matrix (GetIdentityMatrix());
 	matrix.m_posit = origin;
@@ -87,10 +81,14 @@ static void BuildPyramid (DemoEntityManager* const scene, dFloat mass, const dVe
 
 	// create the shape and visual mesh as a common data to be re used
 	NewtonWorld* const world = scene->GetNewton();
-	NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
 
+	int defaultMaterialID;
+	defaultMaterialID = NewtonMaterialGetDefaultGroupID (world);
 
-	//	DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "wood_0.tga", "wood_0.tga", "wood_1.tga");
+	//dMatrix shapeMatrix (dRollMatrix(3.141692f * 0.5f));
+	NewtonCollision* const collision = CreateConvexCollision (world, shapeMatrix, size, type, defaultMaterialID);
+
+	//DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "wood_0.tga", "wood_0.tga", "wood_1.tga");
 	DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
 	//	matrix = dRollMatrix(3.141592f/2.0f);
@@ -99,8 +97,17 @@ static void BuildPyramid (DemoEntityManager* const scene, dFloat mass, const dVe
 
 	matrix.m_posit.m_y = floor.m_y + size.m_y / 2.0f; 
 
-	dFloat stepz = size.m_z + 0.01f;
-	dFloat stepy = size.m_y;
+//	dFloat stepz = size.m_z + 0.01f;
+//	dFloat stepy = size.m_y;
+
+	// get the dimension from shape itself
+	dVector minP;
+	dVector maxP;
+	CalculateAABB (collision, GetIdentityMatrix(), minP, maxP);
+
+	//dFloat stepz = size.m_z + 0.01f;
+	dFloat stepz = maxP.m_z - minP.m_z + 0.01f;
+	dFloat stepy = maxP.m_y - minP.m_y;
 
 	float y0 = matrix.m_posit.m_z + stepy / 2.0f;
 	float z0 = matrix.m_posit.m_z - stepz * count / 2;
@@ -110,7 +117,7 @@ static void BuildPyramid (DemoEntityManager* const scene, dFloat mass, const dVe
 
 		matrix.m_posit.m_z = z0;
 		for (int i = 0; i < (count - j) ; i ++) {
-			CreateSimpleSolid (scene, geometry, mass, matrix, collision, 0);
+			CreateSimpleSolid (scene, geometry, mass, matrix, collision, defaultMaterialID);
 			matrix.m_posit.m_z += stepz;
 		}
 		z0 += stepz * 0.5f;
@@ -130,6 +137,7 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 	// load the skybox
 	scene->CreateSkyBox();
 
+	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 
 	// load the scene from a ngd file format
 #if 0
@@ -141,14 +149,26 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 	GetWorkingFileName ("pyramid40x40.ngd", fileName);
 	scene->LoadScene (fileName);
 #else
-	CreateLevelMesh (scene, "flatPlane.ngd", 1);
-	for (int i = 0; i < 10; i ++) {
-		BuildPyramid (scene, 10.0f, dVector(-10.0f + i * 2.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), 20);
-	}
 	
+	int high = 10;
+	PrimitiveType selection[] = {_BOX_PRIMITIVE, _CYLINDER_PRIMITIVE, _TAPERED_CYLINDER_PRIMITIVE, _REGULAR_CONVEX_HULL_PRIMITIVE};
+	for (int i = 0; i < 10; i ++) {
+		int index = dRand() % (sizeof (selection) / sizeof (selection[0]));
+		dMatrix shapeMatrix (dRollMatrix(0.5f * 3.14159f));
+		if (selection[index] == _BOX_PRIMITIVE) {
+			shapeMatrix = GetIdentityMatrix();
+		}
+		BuildPyramid (scene, 10.0f, dVector(-10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high, selection[index], shapeMatrix);
+//		BuildPyramid (scene, 10.0f, dVector(-10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high, _BOX_PRIMITIVE);
+//		BuildPyramid (scene, 10.0f, dVector(-10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high, _CYLINDER_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
+//		BuildPyramid (scene, 10.0f, dVector(-10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high, _TAPERED_CYLINDER_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
+//		BuildPyramid (scene, 10.0f, dVector(-10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high, _REGULAR_CONVEX_HULL_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
+	}
+
+	high = 20;
 	for (int i = 0; i < 2; i ++) {
 		for (int j = 0; j < 2; j ++) {
-			BuildJenga (scene, 5.0f, dVector(-10.0f + j * 8, 0.0f, 10.0f + i * 8, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), 100);
+			BuildJenga (scene, 5.0f, dVector(-10.0f + j * 8, 0.0f, 10.0f + i * 8, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high);
 		}
 	}
 #endif
