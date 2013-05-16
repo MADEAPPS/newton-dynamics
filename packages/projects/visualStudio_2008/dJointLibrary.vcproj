@@ -199,7 +199,7 @@
 				AdditionalIncludeDirectories="../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="0"
-				EnableEnhancedInstructionSet="0"
+				EnableEnhancedInstructionSet="2"
 				FloatingPointModel="0"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="CustomJointLibraryStdAfx.h"

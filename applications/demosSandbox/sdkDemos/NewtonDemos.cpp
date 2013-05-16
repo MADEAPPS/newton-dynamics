@@ -306,7 +306,7 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 
 	m_scene = new DemoEntityManager(this);
 	m_statusbar = CreateStatusBar();
-	int widths[] = {150, 160, 150, 90, 70, 90};
+	int widths[] = {150, 160, 150, 90, 80, 90};
 	m_statusbar->SetFieldsCount (sizeof (widths)/sizeof (widths[0]), widths);
 	CalculateFPS(0.0f);
 	m_mainMenu = CreateMainMenu();

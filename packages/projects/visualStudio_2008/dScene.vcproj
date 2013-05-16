@@ -202,7 +202,7 @@
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;DSCENE_EXPORTS;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				EnableEnhancedInstructionSet="0"
+				EnableEnhancedInstructionSet="2"
 				FloatingPointModel="0"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="dSceneStdafx.h"

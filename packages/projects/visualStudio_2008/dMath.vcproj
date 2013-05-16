@@ -197,7 +197,7 @@
 				AdditionalIncludeDirectories="../../;../../dMath;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="0"
-				EnableEnhancedInstructionSet="0"
+				EnableEnhancedInstructionSet="2"
 				FloatingPointModel="0"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="dStdAfxMath.h"
