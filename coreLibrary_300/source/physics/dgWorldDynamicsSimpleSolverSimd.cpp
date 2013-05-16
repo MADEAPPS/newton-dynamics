@@ -20,17 +20,234 @@
 */
 
 #include "dgPhysicsStdafx.h"
-
-#include "dgBody.h"
 #include "dgWorld.h"
-#include "dgDynamicBody.h"
 #include "dgConstraint.h"
+#include "dgDynamicBody.h"
+#include "dgDynamicBody.h"
+#include "dgCollisionInstance.h"
 #include "dgWorldDynamicUpdate.h"
+
 
 
 void dgWorldDynamicUpdate::CalculateIslandReactionForcesSimd (dgIsland* const island, dgFloat32 timestep, dgInt32 threadID) const
 {
-	dgAssert (0);
+dgAssert (0);
+	if (!(island->m_isContinueCollision && island->m_jointCount)) {
+		dgInt32 rowBase = BuildJacobianMatrix (island, threadID, timestep);
+		CalculateReactionsForces (island, rowBase, threadID, timestep, DG_SOLVER_MAX_ERROR);
+		IntegrateArray (island, DG_SOLVER_MAX_ERROR, timestep, threadID); 
+	} else {
+		// calculate reaction force sand new velocities
+		dgInt32 rowBase = BuildJacobianMatrix (island, threadID, timestep);
+		CalculateReactionsForces (island, rowBase, threadID, timestep, DG_SOLVER_MAX_ERROR);
+
+		// see if the island goes to sleep
+		bool isAutoSleep = true;
+		bool stackSleeping = true;
+		dgInt32 sleepCounter = 10000;
+
+		dgWorld* const world = (dgWorld*) this;
+		dgInt32 bodyCount = island->m_bodyCount;
+		dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
+		dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
+
+		dgVector zero (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+
+		dgFloat32 forceDamp = DG_FREEZZING_VELOCITY_DRAG;
+		dgFloat32 maxAccel = dgFloat32 (0.0f);
+		dgFloat32 maxAlpha = dgFloat32 (0.0f);
+		dgFloat32 maxSpeed = dgFloat32 (0.0f);
+		dgFloat32 maxOmega = dgFloat32 (0.0f);
+
+		dgFloat32 speedFreeze = world->m_freezeSpeed2;
+		dgFloat32 accelFreeze = world->m_freezeAccel2;
+		for (dgInt32 i = 1; i < bodyCount; i ++) {
+			dgDynamicBody* const body = bodyArray[i].m_body;
+			dgAssert (body->m_invMass.m_w);
+
+			dgFloat32 accel2 = body->m_accel % body->m_accel;
+			dgFloat32 alpha2 = body->m_alpha % body->m_alpha;
+			dgFloat32 speed2 = body->m_veloc % body->m_veloc;
+			dgFloat32 omega2 = body->m_omega % body->m_omega;
+
+			maxAccel = dgMax (maxAccel, accel2);
+			maxAlpha = dgMax (maxAlpha, alpha2);
+			maxSpeed = dgMax (maxSpeed, speed2);
+			maxOmega = dgMax (maxOmega, omega2);
+
+			bool equilibrium = (accel2 < accelFreeze) && (alpha2 < accelFreeze) && (speed2 < speedFreeze) && (omega2 < speedFreeze);
+			if (equilibrium) {
+				body->m_veloc = body->m_veloc.Scale (forceDamp);
+				body->m_omega = body->m_omega.Scale (forceDamp);
+			}
+			body->m_equilibrium = dgUnsigned32 (equilibrium);
+			stackSleeping &= equilibrium;
+			isAutoSleep &= body->m_autoSleep;
+
+			sleepCounter = dgMin (sleepCounter, body->m_sleepingCounter);
+
+			// clear force and torque accumulators
+			body->m_accel = zero;
+			body->m_alpha = zero;
+		}
+
+		if (isAutoSleep) {
+			if (stackSleeping) {
+				// the island went to sleep mode, 
+				for (dgInt32 i = 1; i < bodyCount; i ++) {
+					dgDynamicBody* const body = bodyArray[i].m_body;
+					body->m_netForce = zero;
+					body->m_netTorque = zero;
+					body->m_veloc = zero;
+					body->m_omega = zero;
+				}
+			} else {
+				// island is no sleeping but may be at reat with small residual veliduty for a long time
+				// see if we can force to go to sleep
+				if ((maxAccel > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxAccel) ||
+					(maxAlpha > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxAlpha) ||
+					(maxSpeed > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxVeloc) ||
+					(maxOmega > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxOmega)) {
+						for (dgInt32 i = 1; i < bodyCount; i ++) {
+							dgDynamicBody* const body = bodyArray[i].m_body;
+							body->m_sleepingCounter = 0;
+						}
+				} else {
+					dgInt32 index = 0;
+					for (dgInt32 i = 0; i < DG_SLEEP_ENTRIES; i ++) {
+						if ((maxAccel <= world->m_sleepTable[i].m_maxAccel) &&
+							(maxAlpha <= world->m_sleepTable[i].m_maxAlpha) &&
+							(maxSpeed <= world->m_sleepTable[i].m_maxVeloc) &&
+							(maxOmega <= world->m_sleepTable[i].m_maxOmega)) {
+								index = i;
+								break;
+						}
+					}
+
+					dgInt32 timeScaleSleepCount = dgInt32 (dgFloat32 (60.0f) * sleepCounter * timestep);
+					if (timeScaleSleepCount > world->m_sleepTable[index].m_steps) {
+						// force island to sleep
+						stackSleeping = true;
+						for (dgInt32 i = 1; i < bodyCount; i ++) {
+							dgDynamicBody* const body = bodyArray[i].m_body;
+							body->m_netForce = zero;
+							body->m_netTorque = zero;
+							body->m_veloc = zero;
+							body->m_omega = zero;
+							body->m_equilibrium = true;
+						}
+					} else {
+						sleepCounter ++;
+						for (dgInt32 i = 1; i < bodyCount; i ++) {
+							dgDynamicBody* const body = bodyArray[i].m_body;
+							body->m_sleepingCounter = sleepCounter;
+						}
+					}
+				}
+			}
+		} 
+
+
+		if (!(isAutoSleep & stackSleeping)) {
+			// island is not sleeping, need to integrate island velocity
+
+			dgUnsigned32 lru = world->GetBroadPhase()->m_lru;
+			dgInt32 jointCount = island->m_jointCount;
+			dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
+			dgJointInfo* const constraintArray = &constraintArrayPtr[island->m_jointStart];
+
+			dgFloat32 timeRemaining = timestep;
+			const dgFloat32 timeTol = dgFloat32 (0.01f) * timestep;
+			for (dgInt32 i = 0; (i < DG_MAX_CONTINUE_COLLISON_STEPS) && (timeRemaining > timeTol); i ++) {
+
+				// calculate the closest time to impact 
+				dgFloat32 timeToImpact = timeRemaining;
+				for (dgInt32 j = 0; j < jointCount; j ++) {
+					dgContact* const contact = (dgContact*) constraintArray[j].m_joint;
+					if (contact->GetId() == dgConstraint::m_contactConstraint) {
+						dgDynamicBody* const body0 = (dgDynamicBody*)contact->m_body0;
+						dgDynamicBody* const body1 = (dgDynamicBody*)contact->m_body1;
+						if (body0->m_continueCollisionMode | body1->m_continueCollisionMode) {
+							dgVector p;
+							dgVector q;
+							dgVector normal;
+							dgFloat32 t = world->CalculateTimeToImpact (contact, timeToImpact, threadID, p, q, normal);
+							if (t < timeToImpact) {
+								if (t == dgFloat32 (0.0f)) {
+									// apply resolve penetration resolution
+									dgAssert (dgAbsf (normal % normal - dgFloat32 (1.0f)) < dgFloat32 (1.0e-2f));
+									// determine if bodies are residing away
+									dgVector veloc0 (body0->m_veloc + ((p - body0->m_globalCentreOfMass) * body0->m_omega));
+									dgVector veloc1 (body1->m_veloc + ((q - body1->m_globalCentreOfMass) * body1->m_omega));
+									dgVector relVeloc (veloc1 - veloc0);
+									dgFloat32 speed (relVeloc % normal);
+									if (speed > dgFloat32 (0.0f)) {
+										// bodies are moving toward each other, check if the speed is too small
+										if (speed < dgFloat32 (2.0f)) {
+											speed = dgMax (dgFloat32 (1.0e-3f), speed);
+											dgFloat32 distance = dgMax (body0->m_collision->GetBoxMinRadius(), body1->m_collision->GetBoxMinRadius()) * dgFloat32 (0.25f);
+											dgAssert (distance > dgFloat32 (0.0f));
+											dgFloat32 maxtime = distance / speed;
+											t = dgMax(timeTol * dgFloat32 (2.0f), dgMin(maxtime, timeRemaining));
+										}
+									} else {
+										// bodies are residing, let the move by a fraction of the tome step
+										t = timeRemaining;
+									}
+								}
+								timeToImpact = t;
+							}
+						}
+					}
+				}
+
+				if (timeToImpact > timeTol) {
+					timeRemaining -= timeToImpact;
+					for (dgInt32 j = 1; j < bodyCount; j ++) {
+						dgDynamicBody* const body = bodyArray[j].m_body;
+						body->IntegrateVelocity(timeToImpact);
+						body->UpdateWorlCollisionMatrix();
+					}
+				} else {
+					for (dgInt32 j = 0; j < jointCount; j ++) {
+						dgContact* const contact = (dgContact*) constraintArray[j].m_joint;
+						if (contact->GetId() == dgConstraint::m_contactConstraint) {
+							dgContactPoint contactArray[DG_MAX_CONTATCS];
+							dgCollidingPairCollector::dgPair pair;
+
+							contact->m_maxDOF = 0;
+							contact->m_broadphaseLru = lru;
+							pair.m_contact = contact;
+							pair.m_cacheIsValid = false;
+							pair.m_contactBuffer = contactArray;
+							world->CalculateContacts (&pair, timeRemaining, false, threadID);
+
+							if (pair.m_contactCount) {
+								dgAssert (pair.m_contactCount <= (DG_CONSTRAINT_MAX_ROWS / 3));
+								world->ProcessContacts (&pair, timeRemaining, threadID);
+							}
+						}
+					}
+
+					dgInt32 rowBase = BuildJacobianMatrix (island, threadID, 0.0f);
+					CalculateReactionsForces (island, rowBase, threadID, 0.0f, DG_SOLVER_MAX_ERROR);
+				}
+			}
+
+			if (timeRemaining > dgFloat32 (0.0)) {
+				for (dgInt32 i = 1; i < bodyCount; i ++) {
+					dgDynamicBody* const body = bodyArray[i].m_body;
+					body->IntegrateVelocity(timeRemaining);
+					body->UpdateMatrix (timeRemaining, threadID);
+				}
+			} else {
+				for (dgInt32 i = 1; i < bodyCount; i ++) {
+					dgDynamicBody* const body = bodyArray[i].m_body;
+					body->UpdateMatrix (timestep, threadID);
+				}
+			}
+		}
+	}	
 }
 
 dgInt32 dgWorldDynamicUpdate::BuildJacobianMatrixSimd (dgIsland* const island, dgInt32 threadIndex, dgFloat32 timestep) const

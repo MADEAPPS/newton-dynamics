@@ -25,9 +25,7 @@
 // by default newton is run on a separate thread, optionally concurrent with the calling thread, it also uses a thread job pool for multi core systems.
 // define DG_USE_THREAD_EMULATION on the command line for platform that do not support hardware multi threading or if multi threading is not stable 
 
-//#ifdef IOS
-//	#define DG_USE_THREAD_EMULATION
-//#endif
+//
 //#define DG_USE_MUTEX_CRITICAL_SECTION
 
 class dgThread

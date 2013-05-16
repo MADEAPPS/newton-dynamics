@@ -198,7 +198,7 @@ class dgBody
 	virtual dgVector CalculateInverseDynamicForce (const dgVector& desiredVeloc, dgFloat32 timestep) const;
 
 	protected:
-	void UpdateWorlCollsionMatrix() const;
+	void UpdateWorlCollisionMatrix() const;
 	void SetMatrixOriginAndRotation(const dgMatrix& matrix);
 	void UpdateMatrix (dgFloat32 timestep, dgInt32 threadIndex);
 	void UpdateCollisionMatrix (dgFloat32 timestep, dgInt32 threadIndex);

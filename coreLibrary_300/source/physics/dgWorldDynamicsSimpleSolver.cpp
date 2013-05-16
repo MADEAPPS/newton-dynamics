@@ -20,10 +20,9 @@
 */
 
 #include "dgPhysicsStdafx.h"
-
-#include "dgDynamicBody.h"
 #include "dgWorld.h"
 #include "dgConstraint.h"
+#include "dgDynamicBody.h"
 #include "dgDynamicBody.h"
 #include "dgCollisionInstance.h"
 #include "dgWorldDynamicUpdate.h"
@@ -205,7 +204,7 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 					for (dgInt32 j = 1; j < bodyCount; j ++) {
 						dgDynamicBody* const body = bodyArray[j].m_body;
 						body->IntegrateVelocity(timeToImpact);
-						body->UpdateWorlCollsionMatrix();
+						body->UpdateWorlCollisionMatrix();
 					}
 				} else {
 					for (dgInt32 j = 0; j < jointCount; j ++) {
@@ -245,13 +244,6 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 					body->UpdateMatrix (timestep, threadID);
 				}
 			}
-
-//for (dgInt32 i = 1; i < bodyCount; i ++) {
-//	dgDynamicBody* const body = bodyArray[i].m_body;
-//	dgTrace (("%f %f %f\n", body->m_veloc.m_x, body->m_veloc.m_y, body->m_veloc.m_z));
-//}
-//dgTrace (("\n"));
-
 		}
 	}
 }

@@ -20,36 +20,6 @@ class DemoEntityManager;
 
 class NewtonDemos: public wxFrame
 {
-/*
-	FXDECLARE(NewtonDemos)
-
-	public:
-	enum {
-		ID_CANVAS = FXMainWindow::ID_LAST,
-		ID_CHORE,
-		ID_NEW,
-		ID_LOAD,
-		ID_SAVE,
-		ID_SERIALIZE,
-		ID_DESERIALIZE,
-		ID_ABOUT,
-
-
-		ID_SHOW_PHYSICS_PROFILER,
-		ID_SHOW_PROFILER = ID_SHOW_PHYSICS_PROFILER + 16,
-		ID_SHOW_CONCURRENCE_PROFILER,
-
-		ID_DYNAMICS_BROADPHASE = ID_PLATFORMS + 16,
-		ID_STATIC_BROADPHASE,
-		ID_HYBRID_BROADPHASE,
-
-		ID_SELECT_MICROTHREADS,
-		ID_CONCURRENT_PHYSICS_UPDATE = ID_SELECT_MICROTHREADS + 16,
-		ID_SET_CAMERA_SPEED,
-	};
-*/
-
-
 	enum MY_WXDHEDTS_IDS
 	{
 		ID_CANVAS = wxID_HIGHEST,
@@ -83,20 +53,6 @@ class NewtonDemos: public wxFrame
 		ID_SHOW_PROFILER,
 		ID_SHOW_CONCURRENCE_PROFILER,
 
-
-//		m_idExportPhysics,
-//		m_idImportPhysics,
-//		m_idTooBar,
-//		m_idUseSimD,
-//		m_idShowCollision,
-//		m_idShowPhysicsProfiler,
-//		m_idTogglePhysicsUpdate,
-//		m_idRunMultithreadedPhysics,
-//		m_idHideMeshes, 
-//		m_idWireFrameMeshes,
-//		m_idShowContacts, 
-//		m_idShowIslands, 
-//		m_idToggleAutoSleep,
 		ID_RUN_DEMO,
 		ID_RUN_DEMO_RANGE = ID_RUN_DEMO + 100,
 	};
@@ -105,20 +61,6 @@ class NewtonDemos: public wxFrame
 	public:
 	NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize& size);
 	~NewtonDemos();
-/*
-	bool m_physicProfilerState;
-//	bool m_showContactPointState;
-	bool m_showStatistics;
-	
-	FXDataTarget m_broadPhaseSelection;
-	
-	FXDataTarget m_cpuInstructionSelection;
-	
-	FXDataTarget m_microthreadCountSelection;
-	friend class dRuntimeProfiler;
-	friend class DemoEntityManager;
-*/
-
 
 	typedef void (*LaunchSDKDemoCallback) (DemoEntityManager* scene);
 	class SDKDemos

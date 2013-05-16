@@ -306,7 +306,7 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 
 	m_scene = new DemoEntityManager(this);
 	m_statusbar = CreateStatusBar();
-	int widths[] = {150, 160, 150, 90, 80, 90};
+	int widths[] = {150, 160, 150, 90, 80, 100, 100};
 	m_statusbar->SetFieldsCount (sizeof (widths)/sizeof (widths[0]), widths);
 	CalculateFPS(0.0f);
 	m_mainMenu = CreateMainMenu();
@@ -380,7 +380,7 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 			for (int i = 0; i < platformsCount; i ++) {
 				char platform[256];
 				NewtonGetDeviceString (m_scene->GetNewton(), i, platform, sizeof (platform));
-				optionsMenu->AppendCheckItem(ID_PLATFORMS, _(platform));
+				optionsMenu->AppendCheckItem(ID_PLATFORMS + i, _(platform));
 			}
 		}
 
@@ -612,6 +612,12 @@ void NewtonDemos::CalculateFPS(float timestep)
 
 		sprintf (statusText, "auto sleep: %s", m_autoSleepState ? "on" : "off");
 		m_statusbar->SetStatusText (statusText, 5);
+
+		char floatMode[128];
+		NewtonGetDeviceString (m_scene->GetNewton(), m_cpuInstructionsMode, floatMode, sizeof (floatMode));
+		sprintf (statusText, "instructions: %s", floatMode);
+		m_statusbar->SetStatusText (statusText, 6);
+
 	}
 }
 

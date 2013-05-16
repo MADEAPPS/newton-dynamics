@@ -189,78 +189,54 @@ void dgBody::SetMatrixIgnoreSleep(const dgMatrix& matrix)
 	SetMatrix(matrix);
 }
 
+void dgBody::UpdateWorlCollisionMatrix() const
+{
+	m_collision->SetGlobalMatrix (m_collision->GetLocalMatrix() * m_matrix);
+}
+
 
 void dgBody::UpdateCollisionMatrixSimd (dgFloat32 timestep, dgInt32 threadIndex)
 {
-	m_collision->SetGlobalMatrix (m_collision->GetLocalMatrix().MultiplySimd(m_matrix));
-
 	dgVector oldP0 (m_minAABB);
 	dgVector oldP1 (m_maxAABB);
+	
+	m_collision->SetGlobalMatrix (m_collision->GetLocalMatrix().MultiplySimd (m_matrix));
 	m_collision->CalcAABBSimd(m_collision->GetGlobalMatrix(), m_minAABB, m_maxAABB);
-
-	dgAssert (0);
-	//UpdatePredictinVelocity(timestep);
 
 	if (m_continueCollisionMode) {
 		dgAssert (0);
+		dgVector predictiveVeloc (PredictLinearVelocity(timestep));
+		dgVector predictiveOmega (PredictAngularVelocity(timestep));
+		dgMovingAABB (m_minAABB, m_maxAABB, predictiveVeloc, predictiveOmega, timestep, m_collision->GetBoxMaxRadius(), m_collision->GetBoxMinRadius());
 	}
 
 	if (m_collisionCell) {
 		dgAssert (m_world);
 
 		if (!m_sleeping) {
-			dgSimd tol (DG_AABB_ERROR, DG_AABB_ERROR, DG_AABB_ERROR, DG_AABB_ERROR);
-			dgSimd diff0 (((dgSimd&)oldP0) - ((dgSimd&)m_minAABB));
-			dgSimd diff1 (((dgSimd&)oldP1) - ((dgSimd&)m_maxAABB));
-			dgSimd test ((diff0.Abs() > tol) | (diff1.Abs() > tol)); 
-			dgInt32 signMask = test.GetSignMask();
-			if (signMask & 0x07) {
-				m_world->GetBroadPhase()->UpdateBodyBroadphaseSimd (this, threadIndex);
+			if ((dgAbsf (oldP0.m_x - m_minAABB.m_x) > DG_AABB_ERROR) || (dgAbsf (oldP0.m_y - m_minAABB.m_y) > DG_AABB_ERROR) ||
+				(dgAbsf (oldP0.m_z - m_minAABB.m_z) > DG_AABB_ERROR) || (dgAbsf (oldP1.m_x - m_maxAABB.m_x) > DG_AABB_ERROR) || 
+				(dgAbsf (oldP1.m_y - m_maxAABB.m_y) > DG_AABB_ERROR) || (dgAbsf (oldP1.m_z - m_maxAABB.m_z) > DG_AABB_ERROR)) {
+					m_world->GetBroadPhase()->UpdateBodyBroadphaseSimd (this, threadIndex);
 			}
 		}
 	}
+
 }
-
-
-void dgBody::UpdateWorlCollsionMatrix() const
-{
-	m_collision->SetGlobalMatrix (m_collision->GetLocalMatrix() * m_matrix);
-}
-
 
 
 void dgBody::UpdateCollisionMatrix (dgFloat32 timestep, dgInt32 threadIndex)
 {
-	//m_collision->SetGlobalMatrix (m_collision->GetLocalMatrix() * m_matrix);
-	UpdateWorlCollsionMatrix();
-
 	dgVector oldP0 (m_minAABB);
 	dgVector oldP1 (m_maxAABB);
+
+	m_collision->SetGlobalMatrix (m_collision->GetLocalMatrix() * m_matrix);
 	m_collision->CalcAABB (m_collision->GetGlobalMatrix(), m_minAABB, m_maxAABB);
 
 	if (m_continueCollisionMode) {
 		dgVector predictiveVeloc (PredictLinearVelocity(timestep));
 		dgVector predictiveOmega (PredictAngularVelocity(timestep));
 		dgMovingAABB (m_minAABB, m_maxAABB, predictiveVeloc, predictiveOmega, timestep, m_collision->GetBoxMaxRadius(), m_collision->GetBoxMinRadius());
-
-//      this is no longer necessary since function dgMovingAABB does the job
-//		if (m_collision->IsType (dgCollision::dgCollisionCompound_RTTI)) {
-//			dgCollisionCompound *const compoundCollision = (dgCollisionCompound *)m_collision;
-//			dgVector box1Min;
-//			dgVector box1Max;
-//			compoundCollision-> GetAABB (box1Min, box1Max);
-
-//			dgVector boxSize ((box1Max - box1Min).Scale (dgFloat32 (0.25f)));
-//			for (dgInt32 j = 0; j < 3; j ++) {
-//				if (dgAbsf (step[j]) > boxSize[j]) {
-//					if (step[j] > dgFloat32 (0.0f)) {
-//						box1Max[j] += step[j]; 
-//					} else {
-//						box1Min[j] += step[j]; 
-//					}
-//				}
-//			}
-//		}
 	}
 
 	if (m_collisionCell) {
