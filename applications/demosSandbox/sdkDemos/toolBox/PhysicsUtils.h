@@ -41,65 +41,27 @@ void ExportScene (NewtonWorld* const world, const char* const fileName);
 
 class DemoEntityManager;
 /*
-#define CAMERA_SPEED 10.0f
-
-extern dVector cameraDir;
-extern dVector cameraEyepoint;
-extern dFloat yawAngle;
-extern dFloat rollAngle;
-
-class OGLMesh;
-class SceneManager;
-class NewtonCustomJoint;
-
-
-
 void InitEyePoint (const dVector& dir, const dVector& origin);
-
-
 void SetShowIslands (SceneManager& me, int mode);
 void SetShowContacts (SceneManager& me, int mode);
 void SetShowMeshCollision (SceneManager& me, int mode);
-
 void ShowBodyContacts (const NewtonBody* body);
-
 void ShowJointInfo(const NewtonCustomJoint* joint);
-
 void ConvexCastPlacement (NewtonBody* body);
-
-
-//void CalculateAABB (const NewtonBody* body, dVector& minP, dVector& maxP);
-
-
-
 void Keyboard(SceneManager& me);
-
 void PhysicsSetTransform (const NewtonBody* body, const dFloat* matrix, int threadIndex);
-
 int  PhysicsIslandUpdate (const NewtonWorld* world, const void* islandHandle, int bodyCount);
-
-
-
-
-
 NewtonBody* CreateGenericSolid (NewtonWorld* world, SceneManager* scene, const char* meshName, dFloat mass, const dMatrix& matrix, const dVector& size, PrimitiveType type, int materialID);
-
-
-
-// this callback is called for every contact between the two bodies
 int GenericContactProcess (const NewtonMaterial* material, const NewtonBody* const body0, const NewtonBody* const body1, dFloat timestep, int threadIndex);
 int OnAABBOverlap (const NewtonMaterial* material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex);
-
-
 NewtonMesh* CreateCollisionTreeDoubleFaces (NewtonWorld* world, NewtonCollision* optimizedDoubelFacesTree);
 */
 
-#endif
+
 
 void GetContactOnBody (NewtonBody* const body);
 void HandlecollisionPoints (NewtonJoint* const contactjoint);
 NewtonJoint* CheckIfBodiesCollide (NewtonBody* const body0, NewtonBody* const body1);
-
 
 //dFloat FindFloor (const NewtonWorld* world, dFloat x, dFloat z);
 dVector FindFloor (const NewtonWorld* world, const dVector& origin, dFloat dist);
@@ -108,7 +70,6 @@ dFloat RandomVariable(dFloat amp);
 
 void PhysicsBodyDestructor (const NewtonBody* body);
 void PhysicsApplyGravityForce (const NewtonBody* body, dFloat timestep, int threadIndex);
-
 
 void SetAutoSleepMode (NewtonWorld* const world, int mode);
 void CalculateAABB (const NewtonCollision* const collision, const dMatrix& matrix, dVector& minP, dVector& maxP);
@@ -124,5 +85,6 @@ void AddPrimitiveArray (DemoEntityManager* const scene, dFloat mass, const dVect
 NewtonBody* CreateLevelMesh (DemoEntityManager* const scene, const char* const levelName, bool optimized);
 
 
-
 //void SerializationWorld (const char* const name, NewtonWorld* const world);
+
+#endif

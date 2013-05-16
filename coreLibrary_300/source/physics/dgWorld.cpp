@@ -294,8 +294,6 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 
 	m_hardwaredIndex = 0;
 	m_cpu = dgNoSimdPresent;
-//	SetHardwareMode (0);
-
 	SetThreadsCount (0);
 
 	//dgBroadPhase::Init ();
@@ -388,38 +386,6 @@ void dgWorld::SetFrictionMode (dgInt32 mode)
 {
 	m_frictionMode = dgUnsigned32 (mode);
 }
-/*
-void dgWorld::SetHardwareMode (dgInt32 mode)
-{
-	m_cpu = dgNoSimdPresent;
-	if (mode) {
-		m_cpu = dgGetCpuType ();
-	}
-}
-
-dgInt32 dgWorld::GetHardwareMode(char* const description)
-{
-	dgInt32 mode = 0;
-
-	if (m_cpu == dgNoSimdPresent){
-		mode = 0;
-		if (description) {
-			sprintf (description, "x87");
-		}
-	} else if (m_cpu == dgSimdPresent) {
-		mode = 1;
-		if (description) {
-			sprintf (description, "simd");
-		}
-	} else {
-		mode = 2;
-		if (description) {
-			sprintf (description, "avx");
-		}
-	}
-	return mode;
-}
-*/
 
 dgInt32 dgWorld::EnumerateCPUHardwareModes() const
 {
@@ -510,7 +476,6 @@ void dgWorld::SetCurrentHardwareMode(dgInt32 deviceIndex)
 
 dgInt32 dgWorld::GetCurrentHardwareMode() const
 {
-//	return m_cpu;
 	return m_hardwaredIndex;
 }
 
@@ -1243,9 +1208,13 @@ void dgWorld::StepDynamics (dgFloat32 timestep)
 
 //m_cpu = dgSimdPresent;
 //m_cpu = dgNoSimdPresent;
+
 #ifdef _POSIX_VER
 	//m_cpu = dgNoSimdPresent;
 #endif
+
+// !!!until I find out what is wrong with simd mode when running in multi threaded
+m_cpu = dgNoSimdPresent;
 
 	dgAssert (m_inUpdate == 0);
 //SerializeToFile ("xxx.bin");

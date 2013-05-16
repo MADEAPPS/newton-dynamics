@@ -800,27 +800,59 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 				}
 
 				dgFloat32 alphaDen = alphas[0] + alphas[1] + alphas[2];
-				dgAssert (alphaDen > dgFloat32 (0.0f));
+				if (alphaDen > dgFloat32 (1.0e-16f)) {
+					dgAssert (alphaDen > dgFloat32 (0.0f));
 
-				alphaDen = dgFloat32 (1.0f / alphaDen);
-				alphas[0] *= alphaDen;
-				alphas[1] *= alphaDen;
-				alphas[2] *= alphaDen;
-				//dgAssert (alphas[0] >= dgFloat32 (-1.0e-2f));
-				//dgAssert (alphas[1] >= dgFloat32 (-1.0e-2f));
-				//dgAssert (alphas[2] >= dgFloat32 (-1.0e-2f));
-				s = m_hullSum[0].Scale(alphas[1]) + m_hullSum[1].Scale(alphas[2]) + m_hullSum[2].Scale (alphas[0]);
-				d = m_hullDiff[0].Scale(alphas[1]) + m_hullDiff[1].Scale(alphas[2]) + m_hullDiff[2].Scale (alphas[0]);
+					alphaDen = dgFloat32 (1.0f / alphaDen);
+					alphas[0] *= alphaDen;
+					alphas[1] *= alphaDen;
+					alphas[2] *= alphaDen;
+					s = m_hullSum[0].Scale(alphas[1]) + m_hullSum[1].Scale(alphas[2]) + m_hullSum[2].Scale (alphas[0]);
+					d = m_hullDiff[0].Scale(alphas[1]) + m_hullDiff[1].Scale(alphas[2]) + m_hullDiff[2].Scale (alphas[0]);
+				} else {
+					// this is a degenerated face that is so small that lose accuracy in 32 bit floats
+					// get the closest point from the longest edge
+
+					dgVector dir (((e10 % e10) > (e20 % e20)) ? e10 : e20);
+					dgInt32 i0 = 0;
+					dgInt32 i1 = 0;
+					dgFloat32 dist0 = dir % m_hullDiff[0];
+					dgFloat32 dist1 = -dist0;
+					for (dgInt32 i = 1; i < 3; i ++) {
+						dgFloat32 test = dir % m_hullDiff[i];
+						if (test > dist0) {
+							i0 = i;
+							dist0 = test;
+						}
+						test *= dgFloat32 (-1.0f);					
+						if (test > dist1) {
+							i1 = i;
+							dist1 = test;
+						}
+					}
+					
+					if (i0 != i1) {
+						const dgVector& p0 = m_hullDiff[i0];
+						const dgVector& p1 = m_hullDiff[i1];
+						dgVector dp (p1 - p0);
+						dgAssert (dp % dp > dgFloat32 (0.0f));
+						dgFloat32 alpha0 = - (p0 % dp) / (dp % dp);
+						dgAssert (alpha0 <= dgFloat32 (1.01f));
+						dgAssert (alpha0 >= dgFloat32 (-0.01f));
+						d = p0 + dp.Scale (alpha0);
+						s = m_hullSum[0] + (m_hullSum[i1] - m_hullSum[i0]).Scale (alpha0);
+					} else {
+						s = m_hullSum[i0];
+						d = m_hullDiff[i0];
+					}
+
+				}
 			}
 			break;
 		}
 
-		//sum  = p + q;
-		//diff = p - q;
 		m_p = (s + d).Scale (dgFloat32 (0.5f));
 		m_q = (s - d).Scale (dgFloat32 (0.5f));
-		//dir = d.Scale(-dgRsqrt (d % d));
-		//dir = normal;
 		dgAssert (dgAbsf (m_normal % m_normal - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f)) ;
 		m_contactJoint->m_separtingVector = m_normal;
 	}
@@ -832,7 +864,6 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 		dgAssert (collConvexInstance->m_childShape == m_otherShape);
 		dgAssert (collConicConvexInstance->m_childShape == m_myShape);
 		dgAssert (collConicConvexInstance->IsType (dgCollision::dgCollisionConvexShape_RTTI));
-
 
 		dgInt32 simplexPointCount = 0;
 		dgFloat32 radiusA = m_myShape->GetBoxMaxRadius() * collConicConvexInstance->m_maxScale;
