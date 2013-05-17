@@ -52,11 +52,6 @@ class dgKinematicBody: public dgBody
 	virtual dgVector GetAngularDamping () const {return m_dummy;}
 	virtual void SetLinearDamping (dgFloat32 linearDamp) {}
 	virtual void SetAngularDamping (const dgVector& angularDamp) {}
-	virtual const dgMatrix& GetInertiaMatrix () const {return dgGetZeroMatrix();}
-	virtual dgMatrix CalculateInertiaMatrix () const {return dgGetZeroMatrix();}
-	virtual dgMatrix CalculateInvInertiaMatrix () const {return dgGetZeroMatrix();}
-	virtual void SetMassMatrix (dgFloat32 mass, dgFloat32 Ix, dgFloat32 Iy, dgFloat32 Iz) {}
-	virtual void SetMassProperties (dgFloat32 mass, const dgCollisionInstance* const collision) {}
 
 	virtual dgVector PredictLinearVelocity(dgFloat32 timestep) const {return m_veloc;}
 	virtual dgVector PredictAngularVelocity(dgFloat32 timestep) const {return m_omega;}

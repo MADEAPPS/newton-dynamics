@@ -134,6 +134,13 @@ class dgBody
 	void SetDestructorCallback (OnBodyDestroy destructor);
 	OnMatrixUpdateCallback GetMatrixUpdateCallback () const;
 	void SetMatrixUpdateCallback (OnMatrixUpdateCallback callback);
+
+	dgVector GetMass() const;
+	dgVector GetInvMass() const;
+	const dgMatrix& GetInertiaMatrix () const;
+
+	virtual dgMatrix CalculateInertiaMatrix () const;
+	virtual dgMatrix CalculateInvInertiaMatrix () const;
 	
 	virtual const dgVector& GetForce() const = 0;
 	virtual const dgVector& GetTorque() const = 0;
@@ -149,12 +156,8 @@ class dgBody
 	virtual void SetLinearDamping (dgFloat32 linearDamp) = 0;
 	virtual void SetAngularDamping (const dgVector& angularDamp) = 0;
 
-	virtual const dgMatrix& GetInertiaMatrix () const = 0;
-	virtual dgMatrix CalculateInertiaMatrix () const = 0;
-	virtual dgMatrix CalculateInvInertiaMatrix () const = 0;
-
-	virtual void SetMassMatrix (dgFloat32 mass, dgFloat32 Ix, dgFloat32 Iy, dgFloat32 Iz) = 0;
-	virtual void SetMassProperties (dgFloat32 mass, const dgCollisionInstance* const collision) = 0;
+	virtual void SetMassMatrix (dgFloat32 mass, dgFloat32 Ix, dgFloat32 Iy, dgFloat32 Iz);
+	virtual void SetMassProperties (dgFloat32 mass, const dgCollisionInstance* const collision);
 
 	virtual dgVector PredictLinearVelocity(dgFloat32 timestep) const = 0;
 	virtual dgVector PredictAngularVelocity(dgFloat32 timestep) const = 0;
@@ -167,8 +170,6 @@ class dgBody
 	virtual void ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, const dgFloat32* const impulseArray, const dgFloat32* const pointArray) = 0;
 	
 	virtual void InvalidateCache();
-	virtual dgVector GetMass() const;
-	virtual dgVector GetInvMass() const;
 	
 	virtual void IntegrateVelocity (dgFloat32 timestep);
 	virtual void AttachCollision (dgCollisionInstance* const collision);
@@ -198,18 +199,27 @@ class dgBody
 	void UpdateCollisionMatrix (dgFloat32 timestep, dgInt32 threadIndex);
 	void UpdateCollisionMatrixSimd (dgFloat32 timestep, dgInt32 threadIndex);
 		
-
 	// member variables:
 	protected:
+	void CalcInvInertiaMatrix ();
+	void CalcInvInertiaMatrixSimd ();
+	dgVector GetApparentMass() const;
+	void SetAparentMassMatrix (const dgVector& massMatrix);
+
+
+	dgMatrix m_invWorldInertiaMatrix;
 	dgMatrix m_matrix;
+	dgQuaternion m_rotation;
+	dgVector m_mass;
+	dgVector m_invMass;
 	dgVector m_veloc;
 	dgVector m_omega;
 	dgVector m_minAABB;
 	dgVector m_maxAABB;
-	dgQuaternion m_rotation;
-
 	dgVector m_localCentreOfMass;	
 	dgVector m_globalCentreOfMass;	
+	dgVector m_aparentMass;
+
 	dgInt32 m_index;
 	dgInt32 m_uniqueID;
 	dgInt32 m_bodyGroupId;
@@ -267,16 +277,23 @@ class dgBody
 //	 Implementation	
 // 
 // *****************************************************************************
-DG_INLINE dgVector dgBody::GetMass() const
+DG_INLINE const dgMatrix& dgBody::GetInertiaMatrix () const 
 {
-	return dgVector (DG_INFINITE_MASS * dgFloat32 (2.0f), DG_INFINITE_MASS * dgFloat32 (2.0f), DG_INFINITE_MASS * dgFloat32 (2.0f), DG_INFINITE_MASS * dgFloat32 (2.0f));	
+	return m_invWorldInertiaMatrix;
 }
+
 
 
 DG_INLINE dgVector dgBody::GetInvMass() const
 {
-	return dgVector(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	return m_invMass;
 }
+
+DG_INLINE dgVector dgBody::GetMass() const
+{
+	return m_mass;
+}
+
 
 DG_INLINE dgBody::dgType dgBody::GetType () const
 {
@@ -477,6 +494,12 @@ DG_INLINE bool dgBody::IsCollidable() const
 	return m_collidable;
 }
 
+DG_INLINE dgVector dgBody::GetApparentMass() const
+{
+	return m_aparentMass;
+}
+
+
 DG_INLINE void dgBody::SetMatrixOriginAndRotation(const dgMatrix& matrix)
 {
 	m_matrix = matrix;
@@ -505,6 +528,9 @@ DG_INLINE void dgBody::SetMatrixOriginAndRotation(const dgMatrix& matrix)
 	m_rotation = dgQuaternion (m_matrix);
 	m_globalCentreOfMass = m_matrix.TransformVector (m_localCentreOfMass);
 }
+
+
+
 
 #endif 
 

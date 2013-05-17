@@ -57,7 +57,7 @@ class CustomPlayerController
 	dVector CalculateDesiredOmega (dFloat headinAngle, dFloat timestep) const;
 	dVector CalculateDesiredVelocity (dFloat forwadSpeed, dFloat lateralSpeed, dFloat verticalSpeed, const dVector& gravity, dFloat timestep) const;
 
-	void Init(dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stepHigh, const dMatrix& localAxis);
+	void Init(dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stepHigh, const dMatrix& localAxis);
 
 	virtual void PreUpdate(dFloat timestep, int threadIndex);
 	virtual void PostUpdate(dFloat timestep, int threadIndex);
@@ -89,7 +89,7 @@ class CustomPlayerControllerManager: public CustomControllerManager<CustomPlayer
 
 	virtual void Debug () const {};
 
-	virtual CustomController* CreatePlayer (dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dMatrix& localAxis);
+	virtual CustomController* CreatePlayer (dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dMatrix& localAxis);
 	virtual void ApplyPlayerMove (CustomPlayerController* const controller, dFloat timestep) = 0; 
 
 	// the client application can overload this function to customizer contacts

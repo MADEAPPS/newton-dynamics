@@ -104,23 +104,27 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	for (dgBodyMasterList::dgListNode* node = me.GetLast(); node; node = node->GetPrev()) {
 		const dgBodyMasterListRow& graphNode = node->GetInfo();
 		dgBody* const body = graphNode.GetBody();	
-		if ((body->GetType() == dgBody::m_kinamticBody) || (body->GetInvMass().m_w == dgFloat32(0.0f))) {
+
+		//if ((body->GetType() == dgBody::m_kinamticBody) || (body->GetInvMass().m_w == dgFloat32(0.0f))) {
+		if (body->GetInvMass().m_w == dgFloat32(0.0f)) {
 #ifdef _DEBUG
 			for (; node; node = node->GetPrev()) {
-				dgAssert ((body->GetType() == dgBody::m_kinamticBody) ||(node->GetInfo().GetBody()->GetInvMass().m_w == dgFloat32(0.0f)));
+				//dgAssert ((body->GetType() == dgBody::m_kinamticBody) ||(node->GetInfo().GetBody()->GetInvMass().m_w == dgFloat32(0.0f)));
+				dgAssert (node->GetInfo().GetBody()->GetInvMass().m_w == dgFloat32(0.0f));
 			}
 #endif
 			break;
 		}
 
-		dgAssert (body->IsRTTIType(dgBody::m_dynamicBodyRTTI));
-		dgDynamicBody* const dynamicBody = (dgDynamicBody*) body;
-		if (dynamicBody->m_dynamicsLru < lru) {
-			if (!(dynamicBody->m_freeze | dynamicBody->m_spawnnedFromCallback | dynamicBody->m_sleeping)) {
-				SpanningTree (dynamicBody);
+		if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+			dgDynamicBody* const dynamicBody = (dgDynamicBody*) body;
+			if (dynamicBody->m_dynamicsLru < lru) {
+				if (!(dynamicBody->m_freeze | dynamicBody->m_spawnnedFromCallback | dynamicBody->m_sleeping)) {
+					SpanningTree (dynamicBody);
+				}
 			}
+			dynamicBody->m_spawnnedFromCallback = false;
 		}
-		dynamicBody->m_spawnnedFromCallback = false;
 	}
 
 	dgIsland* const islands = (dgIsland*) &world->m_islandMemory[0];

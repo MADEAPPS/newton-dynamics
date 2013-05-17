@@ -50,3 +50,4 @@ void dgKinematicBody::Serialize (const dgTree<dgInt32, const dgCollision*>* cons
 {
 	dgBody::Serialize (collisionCashe, serializeCallback, userData);
 }
+

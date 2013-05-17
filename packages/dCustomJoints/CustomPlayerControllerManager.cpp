@@ -31,10 +31,10 @@ CustomPlayerControllerManager::~CustomPlayerControllerManager()
 {
 }
 
-CustomPlayerControllerManager::CustomController* CustomPlayerControllerManager::CreatePlayer (dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dMatrix& localAxis)
+CustomPlayerControllerManager::CustomController* CustomPlayerControllerManager::CreatePlayer (dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dMatrix& localAxis)
 {
 	CustomPlayerControllerManager::CustomController* const controller = CreateController();
-	controller->Init(outerRadius, innerRadius, height, stairStep, localAxis);
+	controller->Init (mass, outerRadius, innerRadius, height, stairStep, localAxis);
 	return controller;
 }
 
@@ -48,7 +48,7 @@ int CustomPlayerControllerManager::ProcessContacts (const CustomPlayerController
 }
 
 
-void CustomPlayerController::Init(dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dMatrix& localAxis)
+void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dMatrix& localAxis)
 {
 	dAssert (stairStep >= 0.0f);
 	dAssert (innerRadius >= 0.0f);
@@ -98,11 +98,15 @@ void CustomPlayerController::Init(dFloat outerRadius, dFloat innerRadius, dFloat
 	dMatrix locationMatrix (GetIdentityMatrix());
 	NewtonBody* const body = NewtonCreateKinematicBody(world, playerShape, &locationMatrix[0][0]);
 
+	// players must have weight, otherwise they are infinitely strong when they collide
+	NewtonCollision* const shape = NewtonBodyGetCollision(body);
+	NewtonBodySetMassProperties(body, mass, shape);
+
 	// make the body collidable with other dynamics bodies, by default
 	NewtonSetBodyCollidable (body, true);
 	
 	SetBody (body);
-	NewtonCollision* const shape = NewtonBodyGetCollision(body);
+	
 	m_supportShape = NewtonCompoundCollisionGetCollisionFromNode (shape, NewtonCompoundCollisionGetNodeByIndex (shape, 0));
 	m_collisionShape = NewtonCompoundCollisionGetCollisionFromNode (shape, NewtonCompoundCollisionGetNodeByIndex (shape, 1));
 

@@ -127,7 +127,7 @@ class dgBroadPhase
 	void FindCollidingPairsStatic (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
 	void FindCollidingPairsHybrid (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
 
-	void CheckKenamaticBodyActivation (dgContact* const contatJoint) const;
+	void KinematicBodyActivation (dgContact* const contatJoint) const;
 
 	dgWorld* m_world;
 	dgNode* m_rootNode;

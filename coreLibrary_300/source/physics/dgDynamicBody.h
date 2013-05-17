@@ -44,7 +44,6 @@ class dgDynamicBody : public dgBody
 	dgDynamicBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionNode, dgDeserialize serializeCallback, void* const userData);
 	virtual ~dgDynamicBody ();
 
-	
 	virtual const dgVector& GetForce() const;
 	virtual const dgVector& GetTorque() const;
 	virtual const dgVector& GetNetForce() const;
@@ -60,20 +59,11 @@ class dgDynamicBody : public dgBody
 	virtual void SetLinearDamping (dgFloat32 linearDamp);
 	virtual void SetAngularDamping (const dgVector& angularDamp);
 
-	virtual const dgMatrix& GetInertiaMatrix () const;
-	virtual dgMatrix CalculateInertiaMatrix () const;
-	virtual dgMatrix CalculateInvInertiaMatrix () const;
-
-	virtual void SetMassMatrix (dgFloat32 mass, dgFloat32 Ix, dgFloat32 Iy, dgFloat32 Iz);
-	virtual void SetMassProperties (dgFloat32 mass, const dgCollisionInstance* const collision);
-
 	virtual void AttachCollision (dgCollisionInstance* const collision);
 	virtual dgVector PredictLinearVelocity(dgFloat32 timestep) const;
 	virtual dgVector PredictAngularVelocity(dgFloat32 timestep) const;
 
 	virtual void InvalidateCache();
-	virtual dgVector GetMass() const;
-	virtual dgVector GetInvMass() const;
 	virtual void SetMatrixIgnoreSleep(const dgMatrix& matrix);
 
 	virtual bool IsInEquilibrium () const;
@@ -89,28 +79,11 @@ class dgDynamicBody : public dgBody
 	virtual void ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, const dgFloat32* const impulseArray, const dgFloat32* const pointArray);
 
 	virtual void Serialize (const dgTree<dgInt32, const dgCollision*>* const collisionNode, dgSerialize serializeCallback, void* const userData);
-/*
-	virtual dgConstraint* GetFirstJoint() const;
-	virtual dgConstraint* GetNextJoint(dgConstraint* const joint) const;
-	virtual dgConstraint* GetFirstContact() const;
-	virtual dgConstraint* GetNextContact(dgConstraint* const joint) const;
-	virtual void AddBuoyancyForce (dgFloat32 fluidDensity, dgFloat32 fluidLinearViscousity, dgFloat32 fluidAngularViscousity,  const dgVector& gravityVector, GetBuoyancyPlane buoyancyPlane, void* const context);
-	virtual dgVector CalculateInverseDynamicForce (const dgVector& desiredVeloc, dgFloat32 timestep) const;
-*/
 
 	private:
-	
-	dgVector GetApparentMass() const;
-	void SetAparentMassMatrix (const dgVector& massMatrix);
 	void AddDampingAcceleration();
 	void AddDampingAccelerationSimd();
-	void CalcInvInertiaMatrix ();
-	void CalcInvInertiaMatrixSimd ();
 
-
-	dgMatrix m_invWorldInertiaMatrix;
-	dgVector m_mass;
-	dgVector m_invMass;
 	dgVector m_accel;
 	dgVector m_alpha;
 	dgVector m_netForce;
@@ -155,11 +128,6 @@ DG_INLINE const dgVector& dgDynamicBody::GetNetTorque() const
 
 
 
-DG_INLINE const dgMatrix& dgDynamicBody::GetInertiaMatrix () const 
-{
-	return m_invWorldInertiaMatrix;
-}
-
 
 DG_INLINE dgFloat32 dgDynamicBody::GetLinearDamping () const
 {
@@ -191,22 +159,6 @@ DG_INLINE void dgDynamicBody::SetAngularDamping (const dgVector& angularDamp)
 	m_dampCoef.m_z = DG_MIN_SPEED_ATT + (DG_MAX_SPEED_ATT - DG_MIN_SPEED_ATT) * tmp;
 }
 
-DG_INLINE dgVector dgDynamicBody::GetApparentMass() const
-{
-	return m_aparentMass;
-}
-
-
-
-DG_INLINE dgVector dgDynamicBody::GetInvMass() const
-{
-	return m_invMass;
-}
-
-DG_INLINE dgVector dgDynamicBody::GetMass() const
-{
-	return m_mass;
-}
 
 
 DG_INLINE void dgDynamicBody::AddForce (const dgVector& force)

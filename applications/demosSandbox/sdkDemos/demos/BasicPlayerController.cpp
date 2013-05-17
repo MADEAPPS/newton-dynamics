@@ -51,7 +51,7 @@ class BasicPlayerEntity: public DemoEntity
 		playerAxis[3] = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 
 		// make the player controller, this function makes a kinematic body
-		m_controller = manager->CreatePlayer(radius, radius * 0.5f, height, height * 0.33f, playerAxis);
+		m_controller = manager->CreatePlayer(80.0f, radius, radius * 0.5f, height, height * 0.33f, playerAxis);
 
 		// players by default have the origin at the center of the lower bottom of the collision shape.
 		// you can change this by calling SetPlayerOrigin, for example if a player has it origin at the center of the AABB you can call 
