@@ -83,6 +83,7 @@ dgBody::dgBody()
 	m_autoSleep = true;
 	m_collidable = true;
 	m_collideWithLinkedBodies = true;
+	m_invWorldInertiaMatrix[3][3] = dgFloat32 (1.0f);
 }
 
 dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionCashe, dgDeserialize serializeCallback, void* const userData)
@@ -116,6 +117,7 @@ dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>*
 	m_autoSleep = true;
 	m_collidable = true;
 	m_collideWithLinkedBodies = true;
+	m_invWorldInertiaMatrix[3][3] = dgFloat32 (1.0f);
 
 	serializeCallback (userData, &m_rotation, sizeof (m_rotation));
 	serializeCallback (userData, &m_matrix.m_posit, sizeof (m_matrix.m_posit));

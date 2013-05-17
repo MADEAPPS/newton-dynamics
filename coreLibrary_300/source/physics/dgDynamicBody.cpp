@@ -46,7 +46,6 @@ dgDynamicBody::dgDynamicBody()
 {
 	m_type = m_dynamicBody;
 	m_rtti |= m_dynamicBodyRTTI;
-	m_invWorldInertiaMatrix[3][3] = dgFloat32 (1.0f);
 	dgAssert ( dgInt32 (sizeof (dgDynamicBody) & 0x0f) == 0);
 }
 

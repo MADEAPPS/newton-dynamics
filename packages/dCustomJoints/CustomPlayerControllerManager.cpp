@@ -100,7 +100,7 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 
 	// players must have weight, otherwise they are infinitely strong when they collide
 	NewtonCollision* const shape = NewtonBodyGetCollision(body);
-	NewtonBodySetMassProperties(body, mass, shape);
+//	NewtonBodySetMassProperties(body, mass, shape);
 
 	// make the body collidable with other dynamics bodies, by default
 	NewtonSetBodyCollidable (body, true);
