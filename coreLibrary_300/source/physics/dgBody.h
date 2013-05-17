@@ -125,7 +125,6 @@ class dgBody
 	void SetAutoSleep (bool state);
 
 	bool IsCollidable() const;
-
 	
 
 	dgCollisionInstance* GetCollision () const;
@@ -157,11 +156,8 @@ class dgBody
 	virtual void SetMassMatrix (dgFloat32 mass, dgFloat32 Ix, dgFloat32 Iy, dgFloat32 Iz) = 0;
 	virtual void SetMassProperties (dgFloat32 mass, const dgCollisionInstance* const collision) = 0;
 
-//	virtual void UpdatePredictinVelocity(dgFloat32 timestep) = 0;
-//	virtual void GetPredictingVelocity (dgVector& veloc, dgVector& omega) const = 0;
 	virtual dgVector PredictLinearVelocity(dgFloat32 timestep) const = 0;
 	virtual dgVector PredictAngularVelocity(dgFloat32 timestep) const = 0;
-
 	
 	virtual bool IsInEquilibrium () const = 0;
 	virtual void SetCollidable (bool state) = 0;
@@ -169,8 +165,6 @@ class dgBody
 	virtual void AddImpulse (const dgVector& pointVeloc, const dgVector& pointPosit) = 0;
 	virtual void ApplyImpulsePair (const dgVector& linearImpulse, const dgVector& angularImpulse) = 0;
 	virtual void ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, const dgFloat32* const impulseArray, const dgFloat32* const pointArray) = 0;
-
-
 	
 	virtual void InvalidateCache();
 	virtual dgVector GetMass() const;

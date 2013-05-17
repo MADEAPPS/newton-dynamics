@@ -250,93 +250,6 @@ void NewtonDeserializeBodyArray (const NewtonWorld* const newtonWorld, NewtonOnB
 
 
 
-// Name: NewtonGetGlobalScale
-// Get the global scale factor.
-// 
-// Remarks: the physics system in theory should be dimensionless, however in practice the engine have to be implemented with
-// limited precision floating numbers and is also built for real-time simulation, it is inevitable that tolerances have to be used in order to increase performance, and 
-// reduce instabilities. These tolerances make the engine dimension dependent, for example let say a rigid body is considered at rest when 
-// its velocity is less than 0.01 units per second for some frames. For a program using meters as unit this translate to 0.01 meters per second, 
-// however for a program using centimeter this translate to 0.0001 meter per second, since the precession of speed is independent of the unit system, 
-// this means that in the second system the engine has to work much harder to bring the body to rest. A solution for this is to scale all tolerances 
-// to match the unit system. The argument *globalScale* must be a constant to convert the unit system in the game to meters, for example if in your game you are using 39 units is a meter, 
-// the *globaScale* must be 39. The exact conversion factor does not have to be exact, but the closer it is to reality the better performance the application will get.
-// Applications that are already using meters as the unit system must pass 1.0 as *globalScale*.
-//
-//See also: NewtonCreate
-//dFloat NewtonGetGlobalScale(const NewtonWorld* const newtonWorld)
-//{
-//	Newton* const world;
-//	world = (Newton *) newtonWorld;
-//	return world->GetGlobalScale();
-//	return dgFloat32(1.0f);
-//}
-
-
-// Name: NewtonSetPlatformArchitecture 
-// Set the current platform hardware architecture.
-//
-// Parameters:
-// *const NewtonWorld* *newtonWorld - is the pointer to the Newton world
-// *int* model - model of operation 0 = default, 1 = medium, n = best.
-// 
-// Return: Nothing
-//
-// Remarks: This function allows the application to configure the Newton to take advantage  
-// for specific hardware architecture in the same platform.
-//
-// 0: force the hardware lower common denominator for the running platform.
-//
-// 1: will try to use common floating point enhancement like special instruction set 
-// on the specific architecture. This mode made lead to result that differ from mode 1 and 2 as the accumulation 
-// round off errors maybe different. 
-//
-// Remarks: the only hardware mode guarantee to work is mode 0. all other are only 
-// hints to the engine, for example setting mode 1 will take not effect on CPUs without  
-// specially floating point instructions set. 
-//
-// See also: NewtonGetPlatformArchitecture
-//void NewtonSetPlatformArchitecture(const NewtonWorld* const newtonWorld, int mode)
-//{
-//	TRACE_FUNCTION(__FUNCTION__);
-//	Newton* const world = (Newton *)newtonWorld;
-//	world->SetHardwareMode(mode);
-//}
-
-
-
-// Name: NewtonGetPlatformArchitecture 
-// Get the current platform hardware architecture.
-//
-// Parameters:
-// *const NewtonWorld* *newtonWorld - is the pointer to the Newton world
-// *char* *description - pointer to a string to contain a description of the current architecture
-// 
-// Return: index indicating the current platform architecture.
-//
-// Remarks: if *description* is not NULL, then is must be at least 32 characters long.
-//
-// Remarks: This function allows the application to configure the Newton to take advantage  
-// for specific hardware architecture in the same platform.
-//
-// 0: force the hardware lower common denominator for the running platform.
-//
-// 1: will try to use common floating point enhancement like special instruction set 
-// on the specific architecture. This mode made lead to result that differ from mode 1 and 2 as the accumulation 
-// round off errors maybe different. 
-//
-// Remarks: the only hardware mode guarantee to work is mode 0. all other are only 
-// hints to the engine, for example setting mode 1 will take not effect on CPUs without  
-// specially floating point instructions set. 
-//
-// See also: NewtonSetPlatformArchitecture
-//int NewtonGetPlatformArchitecture(const NewtonWorld* const newtonWorld, char* description)
-//{
-//	TRACE_FUNCTION(__FUNCTION__);
-//	Newton* const world = (Newton *)newtonWorld;
-//	return world->GetHardwareMode(description);
-//}
-
 int NewtonGetCurrentDevice (const NewtonWorld* const newtonWorld)
 {
 	TRACE_FUNCTION(__FUNCTION__);
@@ -1526,20 +1439,6 @@ void NewtonMaterialDestroyAllGroupID(const NewtonWorld* const newtonWorld)
 }
 
 
-
-//int NewtonGetActiveBodiesCount()
-//{
-//	dgAssert (0);
-//	return 0;
-//}
-
-//int NewtonGetActiveConstraintsCount()
-//{
-//	dgAssert (0);
-//	return 0;
-//}
-
-
 // ***************************************************************************************************************
 //
 // Name: Material setup interface
@@ -2153,36 +2052,6 @@ void NewtonMaterialGetContactTangentDirections(const NewtonMaterial* const mater
 }
 
 
-// Name: NewtonMaterialGetBodyCollisionID
-// Retrieve a user defined value stored with a convex collision primitive.
-//
-// Parameters:
-// *const NewtonMaterial* materialHandle - pointer to a material pair.
-// *const NewtonBody* *bodyPtr - is the pointer to the body.
-// 
-// Return: a user defined value. Zero if not id was stored with the collision primitive.
-//
-// Remarks: the application can store an id with any collision primitive. This id can be used to identify what type of collision primitive generated a contact.
-// This function can only be called from a contact callback,  
-//
-// Remarks: this function can only be called from a contact process callback. If called from contact callback begin this function will crash the application.
-//
-// See also: NewtonCollisionSetUserID, NewtonCreateBox, NewtonCreateSphere
-/*
-unsigned NewtonMaterialGetBodyCollisionID(const NewtonMaterial* const material, const NewtonBody* const body)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgBody* const bodyPtr = (dgBody*) body;
-	dgContactMaterial* const materialPtr = (dgContactMaterial*) material;
-
-	dgCollisionInstance* collision = materialPtr->m_collision0; 
-	if (bodyPtr == materialPtr->m_body1) {
-		collision = materialPtr->m_collision1; 
-	}
-
-	return collision->SetUserDataID();
-}
-*/
 
 NewtonCollision* NewtonMaterialGetBodyCollidingShape(const NewtonMaterial* const material, const NewtonBody* const body)
 {
@@ -3154,7 +3023,7 @@ int NewtonBreakableSegmentGetIndexStreamShort (const NewtonCollision* const comp
 }
 */
 
-// Name: NewtonCollisionSetAsTriggerVolume 
+
 // Return the trigger volume flag of this shape.
 //
 // Parameters:
@@ -3165,9 +3034,6 @@ int NewtonBreakableSegmentGetIndexStreamShort (const NewtonCollision* const comp
 // Remarks: this function can be used to place collision triggers in the scene. 
 // Setting this flag is not really a necessary to place a collision trigger however this option hint the engine that 
 // this particular shape is a trigger volume and no contact calculation is desired.
-//
-// See also: NewtonCollisionIsTriggerVolume
-//int NewtonCollisionIsTriggerVolume(const NewtonCollision* const convexCollision)
 int NewtonCollisionGetMode(const NewtonCollision* const convexCollision)
 {
 	dgCollisionInstance* const collision = (dgCollisionInstance*) convexCollision;
@@ -3175,7 +3041,7 @@ int NewtonCollisionGetMode(const NewtonCollision* const convexCollision)
 	return collision->GetCollisionMode() ? 1 : 0;
 }
 
-// Name: NewtonCollisionSetAsTriggerVolume 
+
 // Set a flag on a convex collision shape to indicate that no contacts should calculated for this shape.
 //
 // Parameters:
@@ -3188,8 +3054,6 @@ int NewtonCollisionGetMode(const NewtonCollision* const convexCollision)
 // Setting this flag is not really a necessary to place a collision trigger however this option hint the engine that 
 // this particular shape is a trigger volume and no contact calculation is desired.
 //
-// See also: NewtonCollisionIsTriggerVolume
-//void NewtonCollisionSetAsTriggerVolume(const NewtonCollision* convexCollision, int trigger)
 void NewtonCollisionSetCollisonMode (const NewtonCollision* convexCollision, int mode)
 {
 	TRACE_FUNCTION(__FUNCTION__);
@@ -5681,49 +5545,6 @@ void NewtonBodySetCollisionScale (const NewtonBody* const bodyPtr, dFloat scaleX
 	NewtonBodySetMatrix (bodyPtr, &matrix[0][0]);
 }
 
-/*
-// Name: NewtonBodySetGyroscopicForcesMode 
-// Enable or disable Coriolis and gyroscopic force calculation for this body.
-//
-// Parameters:
-// *const NewtonBody* *bodyPtr - pointer to the body.
-// *int* mode - force mode zero indicate not gyroscopic force calculation.
-//
-// Return: Nothing.
-//
-// Remarks: Gyroscopic forces internal forces generated as a result of an asymmetric tensor. They are a pure mathematical consequence that the physics have to comply in order to agree with the math. As Gyroscopic forces are not real forces but the result of net unbalance of the changing inertia tensor or a rigid body when its angular velocity is measured on a reference frame different than the body’s own.  
-// Gyroscopic forces are extremely non linear by nature, therefore a first order implicit integrator will have a extremely hard time at dealing with this kind of forces, however because the fact that they are not real forces they do not make much difference in the outcome of the integration.
-// Fortunately due to the fact that the magnitude of gyroscopic forces is proportional to the unbalance of the inertia tensor, it is possible to disregard the effect of this forces by assuming their inertial tensor is symmetric for the purpose of this calculation. For most cases an ordinary person is not capable to distinguish the motion of a body subject to gyroscopic forces and one that is not, especially when the motion is constrained.
-// Because of this fact gyroscopic force are turned off by default in Newton, however there are cases when the desire effect is precisely to simulate these forces like a spinning top, or the design of a space navigational system, etc. The most important feature of gyroscopic forces is that they make the rigid body to process. 
-void  NewtonBodySetGyroscopicForcesMode(const NewtonBody* const bodyPtr, int mode)
-{
-	dgBody* const body;
-
-	dgBody* const body = (dgBody *)bodyPtr;
-	body->SetGyroscopicTorqueMode (mode ? true : false); 
-}
-
-
-// Name: NewtonBodyGetGyroscopicForcesMode 
-// get a values indicating if Coriolis and gyroscopic force calculation for this body are enable.
-//
-// Parameters:
-// *const NewtonBody* *bodyPtr - pointer to the body.
-//
-// Return: force mode 1 means Gyro copy force are on.
-//
-// Remarks: Gyroscopic forces are internal forces generated as a result of an asymmetric tensor. They are a pure mathematical consequence that the physics have to comply in order to agree with the math. As Gyroscopic forces are not real forces but the result of net unbalance of the changing inertia tensor or a rigid body when its angular velocity is measured on a reference frame different than the body’s own.  
-// Gyroscopic forces are extremely non linear by nature, therefore a first order implicit integrator will have a extremely hard time at dealing with this kind of forces, however because the fact that they are not real forces they do not make much difference in the outcome of the integration.
-// Fortunately due to the fact that the magnitude of gyroscopic forces is proportional to the unbalance of the inertia tensor, it is possible to disregard the effect of this forces by assuming their inertial tensor is symmetric for the purpose of this calculation. For most cases an ordinary person is not capable to distinguish the motion of a body subject to gyroscopic forces and one that is not, especially when the motion is constrained.
-// Because of this fact gyroscopic force are turned off by default in Newton, however there are cases when the desire effect is precisely to simulate these forces like a spinning top, or the design of a space navigational system, etc. The most important feature of gyroscopic forces is that they make the rigid body to process. 
-int NewtonBodyGetGyroscopicForcesMode(const NewtonBody* const bodyPtr)
-{
-	dgBody* const body;
-	dgBody* const body = (dgBody *)bodyPtr;
-	return body->GetGyroscopicTorqueMode () ? 1 : 0; 
-}
-*/
-
 
 // Name: NewtonBodyGetCollision 
 // Get the collision primitive of a body.
@@ -5999,69 +5820,6 @@ void NewtonBodySetSleepState(const NewtonBody* const bodyPtr, int state)
 	body->SetSleepState(state ? true : false);
 }
 
-
-/*
-// Name: NewtonBodySetFreezeTreshold 
-// Set the minimum values for velocity of a body that will be considered at rest.
-//
-// Parameters:
-// *const NewtonBody* *bodyPtr - is the pointer to the body.
-// *dFloat* freezeSpeedMag2 - magnitude squared of the velocity threshold.
-// *dFloat* freezeOmegaMag2 - magnitude squared of angular velocity threshold.
-// *int* framesCount - number of frames the body velocity and angular will not exceed freezeSpeedMag and freezeOmegaMag.
-// 
-// Remarks: Ideally, a body should be deactivated when it reaches a state of stable equilibrium. However, because of floating point 
-// inaccuracy, discrete time step simulation and other factors it is virtually impossible for a body to reach that state
-// in a real-time simulation. Therefore, in the Newton World, a body is considered to be in stable equilibrium when its 
-// velocity and angular velocity fall below some threshold for a consecutive number of frames. 
-//
-// Remarks: The default and minimum values for the thresholds is 0.01 for speed and 10 for frames count.
-// These values are tuned for single objects colliding under the influence of gravity. It is possible that for complex configuration
-// of bodies like multiples pendulums, rag dolls, etc. these values may need to be increased. This is because joints have the property that they
-// add a small amount of energy to the system in order to reduce the separation error. This may cause the bodies reach a state of unstable
-// equilibrium. That is, when a body oscillates between two different positions because the energy added to the body is equal to the energy
-// dissipated by the integrator. This is a situation that is hard to predict, and the best solution is to tweak these values for specific cases. 
-//
-// See also: NewtonBodySetAutoSleep, NewtonBodyGetFreezeTreshold
-void NewtonBodySetFreezeTreshold(const NewtonBody* const bodyPtr, dFloat freezeSpeedMag2, dFloat freezeOmegaMag2, int framesCount)
-{
-//	dFloat alpha;
-//	dFloat accel;
-	dgBody* const body;
-
-	dgBody* const body = (dgBody *)bodyPtr;
-//	framesCount =  GetMin (framesCount * 2, 30); 
-//	alpha = 60.0f * dgSqrt (freezeOmegaMag2) / framesCount;
-//	accel = 60.0f * dgSqrt (freezeSpeedMag2) / framesCount;
-//	body->SetFreezeTreshhold (accel * accel, alpha * alpha, freezeSpeedMag2, freezeOmegaMag2);
-//	dFloat scale;
-//	slace = dgFloat32(1.0f) / (framesCount
-	
-	body->SetFreezeTreshhold (freezeSpeedMag2, freezeOmegaMag2, freezeSpeedMag2 * dgFloat32(0.1f), freezeOmegaMag2 * dgFloat32(0.1f));
-}
-
-// Name: NewtonBodyGetFreezeTreshold 
-// Get the minimum values for velocity of a body the will be considered at rest.
-//
-// Parameters:
-// *const NewtonBody* *bodyPtr - is the pointer to the body.
-// *dFloat* freezeSpeedMag2 - point the to a dFloat to hold the velocity threshold
-// *dFloat* freezeOmegaMag2 - point the to a dFloat to hold the angular velocity threshold 
-//
-// See also: NewtonBodySetFreezeTreshold
-void NewtonBodyGetFreezeTreshold(const NewtonBody* const bodyPtr, dFloat* freezeSpeedMag2, dFloat* freezeOmegaMag2)
-{
-	dgBody* const body;
-	dFloat alpha;
-	dFloat accel;
-
-	dgBody* const body = (dgBody *)bodyPtr;
-	body->GetFreezeTreshhold (accel, alpha, *freezeSpeedMag2, *freezeOmegaMag2);
-
-	freezeSpeedMag2[0] *= 10.0f;
-	freezeOmegaMag2[0] *= 10.0f;
-}
-*/
 
 // Name: NewtonBodyGetAABB 
 // Get the world axis aligned bounding box (AABB) of the body.

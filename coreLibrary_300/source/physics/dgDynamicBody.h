@@ -131,26 +131,6 @@ class dgDynamicBody : public dgBody
 	friend class dgBroadPhase;
 } DG_GCC_VECTOR_AVX_ALIGMENT;
 
-// *****************************************************************************
-// 
-//	 Implementation	
-// 
-// *****************************************************************************
-//DG_INLINE void dgDynamicBody::SetFreezeTreshhold (dgFloat32 freezeAccel2, dgFloat32 freezeAlpha2, dgFloat32 freezeSpeed2, dgFloat32 freezeOmega2)
-//{
-//	m_freezeAccel2 = GetMax (freezeAccel2, dgFloat32(DG_FREEZE_MAG2));
-//	m_freezeAlpha2 = GetMax (freezeAlpha2, dgFloat32(DG_FREEZE_MAG2));
-//	m_freezeSpeed2 = GetMax (freezeSpeed2, dgFloat32(DG_FREEZE_MAG2));
-//	m_freezeOmega2 = GetMax (freezeOmega2, dgFloat32(DG_FREEZE_MAG2));
-//}
-
-//DG_INLINE void dgDynamicBody::GetFreezeTreshhold (dgFloat32& freezeAccel2, dgFloat32& freezeAlpha2, dgFloat32& freezeSpeed2, dgFloat32& freezeOmega2) const
-//{
-//	freezeAccel2 = m_freezeAccel2;
-//	freezeAlpha2 = m_freezeAlpha2;
-//	freezeSpeed2 = m_freezeSpeed2;
-//	freezeOmega2 = m_freezeOmega2;
-//}
 
 DG_INLINE const dgVector& dgDynamicBody::GetForce() const
 {
