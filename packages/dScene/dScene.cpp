@@ -1236,7 +1236,7 @@ void dScene::NewtonWorldToScene (const NewtonWorld* const world, dSceneExportCal
 bool dScene::Deserialize (const char* const fileName)
 {
 	// apply last Configuration, using standard localization
-	char* const oldloc = setlocale( LC_ALL, 0 );
+	static char* oldloc = setlocale( LC_ALL, 0 );
 	setlocale( LC_ALL, "C" );
 
 	TiXmlDocument doc (fileName);
@@ -1283,7 +1283,8 @@ bool dScene::Deserialize (const char* const fileName)
 	}
 
 	// restore locale settings
-	setlocale( LC_ALL, oldloc );
+	//setlocale( LC_ALL, ""oldloc );
+	setlocale( LC_ALL, "");
 	return state;
 }
 
