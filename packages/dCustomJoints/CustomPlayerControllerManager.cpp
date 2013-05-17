@@ -195,8 +195,6 @@ dVector CustomPlayerController::CalculateDesiredVelocity (dFloat forwardSpeed, d
 		veloc += updir.Scale(verticalSpeed);
 		veloc += gravity.Scale (timestep);
 	}
-if (veloc.m_y > 0.0f)
-timestep *=1;
 
 	return veloc;
 }
@@ -237,14 +235,8 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 	NewtonWorld* const world = manager->GetWorld();
 	NewtonBody* const body = GetBody();
 
-static int xxx;
-xxx ++;
-if (xxx >= 2874)
-xxx *=1;
-
 	// apply the player motion, by calculation the desired plane linear and angular velocity
 	manager->ApplyPlayerMove (this, timestep);
-
 
 	// get the body motion state 
 	NewtonBodyGetMatrix(body, &matrix[0][0]);
@@ -415,9 +407,6 @@ xxx *=1;
 			}
 		}
 	}
-
-if (veloc.m_y > 0.0f)
-timestep *=1;
 
 	// set player velocity, position and orientation
 	NewtonBodySetVelocity(body, &veloc[0]);
