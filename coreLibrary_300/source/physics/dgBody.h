@@ -99,6 +99,9 @@ class dgBody
 
 	const dgVector& GetOmega() const;
 	const dgVector& GetVelocity() const;
+	const dgVector& GetNetForce() const;
+	const dgVector& GetNetTorque() const;
+
 	dgVector GetVelocityAtPoint (const dgVector& point) const;
 
 	void SetOmega (const dgVector& omega);
@@ -144,8 +147,6 @@ class dgBody
 	
 	virtual const dgVector& GetForce() const = 0;
 	virtual const dgVector& GetTorque() const = 0;
-	virtual const dgVector& GetNetForce() const = 0;
-	virtual const dgVector& GetNetTorque() const = 0;
 	virtual void AddForce (const dgVector& force) = 0;
 	virtual void AddTorque (const dgVector& torque) = 0;
 	virtual void SetForce (const dgVector& force) = 0;
@@ -155,6 +156,9 @@ class dgBody
 	virtual dgVector GetAngularDamping () const = 0;
 	virtual void SetLinearDamping (dgFloat32 linearDamp) = 0;
 	virtual void SetAngularDamping (const dgVector& angularDamp) = 0;
+	virtual void AddDampingAcceleration() = 0;
+	virtual void AddDampingAccelerationSimd() = 0;
+
 
 	virtual void SetMassMatrix (dgFloat32 mass, dgFloat32 Ix, dgFloat32 Iy, dgFloat32 Iz);
 	virtual void SetMassProperties (dgFloat32 mass, const dgCollisionInstance* const collision);
@@ -179,7 +183,6 @@ class dgBody
 	virtual OnApplyExtForceAndTorque GetExtForceAndTorqueCallback () const = 0;
 	virtual void SetExtForceAndTorqueCallback (OnApplyExtForceAndTorque callback) = 0;
 
-
 	virtual dgFloat32 RayCast (const dgLineBox& line, OnRayCastAction filter, OnRayPrecastAction preFilter, void* const userData, dgFloat32 minT) const;
 	virtual dgFloat32 RayCastSimd (const dgLineBox& line, OnRayCastAction filter, OnRayPrecastAction preFilter, void* const userData, dgFloat32 minT) const;
 	
@@ -198,6 +201,8 @@ class dgBody
 	void UpdateMatrix (dgFloat32 timestep, dgInt32 threadIndex);
 	void UpdateCollisionMatrix (dgFloat32 timestep, dgInt32 threadIndex);
 	void UpdateCollisionMatrixSimd (dgFloat32 timestep, dgInt32 threadIndex);
+
+
 		
 	// member variables:
 	protected:
@@ -216,6 +221,8 @@ class dgBody
 	dgVector m_omega;
 	dgVector m_minAABB;
 	dgVector m_maxAABB;
+	dgVector m_netForce;
+	dgVector m_netTorque;
 	dgVector m_localCentreOfMass;	
 	dgVector m_globalCentreOfMass;	
 	dgVector m_aparentMass;
@@ -225,6 +232,7 @@ class dgBody
 	dgInt32 m_bodyGroupId;
 	dgInt32 m_rtti;
 	dgInt32 m_type;
+	dgUnsigned32 m_dynamicsLru;	
 	dgUnsigned32 m_genericLRUMark;
 	dgThread::dgCriticalSection m_criticalSectionLock;
 
@@ -529,6 +537,16 @@ DG_INLINE void dgBody::SetMatrixOriginAndRotation(const dgMatrix& matrix)
 	m_globalCentreOfMass = m_matrix.TransformVector (m_localCentreOfMass);
 }
 
+
+DG_INLINE const dgVector& dgBody::GetNetForce() const
+{
+	return m_netForce; 
+}
+
+DG_INLINE const dgVector& dgBody::GetNetTorque() const
+{
+	return m_netTorque;
+}
 
 
 

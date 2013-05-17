@@ -75,6 +75,9 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel (const dgIsland* cons
 
 dgInt32 dgWorldDynamicUpdate::LinearizeBodyParallelArray(dgInt32 islandsCount, dgParallelSolverSyncData* const solverSyncData, const dgBodyInfo* const bodyArray, const dgIsland* const islandArray) const
 {
+dgAssert (0);
+return 0;
+/*
 	dgInt32* const bodyInfoMap = solverSyncData->m_bodyInfoMap;
 	dgInt32 bodyCount = 0;
 	for (dgInt32 i = 0; i < islandsCount; i ++) {
@@ -89,6 +92,7 @@ dgInt32 dgWorldDynamicUpdate::LinearizeBodyParallelArray(dgInt32 islandsCount, d
 		}
 	}
 	return bodyCount;
+*/
 }
 
 
@@ -96,6 +100,8 @@ dgInt32 dgWorldDynamicUpdate::LinearizeBodyParallelArray(dgInt32 islandsCount, d
 
 void dgWorldDynamicUpdate::InitilizeBodyArrayParallelKernel (void* const context, void* const worldContext, dgInt32 threadID)
 {
+dgAssert (0);
+/*
 	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
 	dgWorld* const world = (dgWorld*) worldContext;
 	dgInt32* const atomicIndex = &syncData->m_atomicIndex; 
@@ -125,6 +131,7 @@ void dgWorldDynamicUpdate::InitilizeBodyArrayParallelKernel (void* const context
 		internalForces[index].m_linear = zero;
 		internalForces[index].m_angular = zero;
 	}
+*/
 }
 
 
@@ -143,6 +150,8 @@ void dgWorldDynamicUpdate::InitilizeBodyArrayParallel (dgParallelSolverSyncData*
 
 void dgWorldDynamicUpdate::BuildJacobianMatrixParallelKernel (void* const context, void* const worldContext, dgInt32 threadID)
 {
+dgAssert (0);
+/*
 	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
 	dgWorld* const world = (dgWorld*) worldContext;
 	const dgParallelJointMap* const jointInfoIndexArray = syncData->m_jointInfoMap;
@@ -217,6 +226,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrixParallelKernel (void* const contex
 			index ++;
 		}
 	}
+*/
 }
 
 
@@ -336,6 +346,8 @@ void dgWorldDynamicUpdate::CalculateJointsAccelParallelKernel (void* const conte
 
 void dgWorldDynamicUpdate::CalculateJointsForceParallelKernel (void* const context, void* const worldContext, dgInt32 threadID)
 {
+dgAssert (0);
+/*
 	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
 	dgWorld* const world = (dgWorld*) worldContext;
 	
@@ -418,10 +430,14 @@ void dgWorldDynamicUpdate::CalculateJointsForceParallelKernel (void* const conte
 		internalForces[m1].m_linear = linearM1;
 		internalForces[m1].m_angular = angularM1;
 	}
+*/
 }
 
 void dgWorldDynamicUpdate::CalculateJointsVelocParallelKernel (void* const context, void* const worldContext, dgInt32 threadID)
 {
+dgAssert (0);
+
+/*
 	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
 	dgWorld* const world = (dgWorld*) worldContext;
 
@@ -452,11 +468,15 @@ void dgWorldDynamicUpdate::CalculateJointsVelocParallelKernel (void* const conte
 		//internalVeloc[index].m_linear += body->m_veloc;
 		//internalVeloc[index].m_angular += body->m_omega;
 	}
+*/
 }
 
 
 void dgWorldDynamicUpdate::CalculateJointsImpulseVelocParallelKernel (void* const context, void* const worldContext, dgInt32 threadID)
 {
+dgAssert (0);
+/*
+
 	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
 	dgWorld* const world = (dgWorld*) worldContext;
 
@@ -481,6 +501,7 @@ void dgWorldDynamicUpdate::CalculateJointsImpulseVelocParallelKernel (void* cons
 		//internalVeloc[index].m_linear += body->m_veloc;
 		//internalVeloc[index].m_angular += body->m_omega;
 	}
+*/
 }
 
 
@@ -514,6 +535,8 @@ void dgWorldDynamicUpdate::UpdateFeedbackForcesParallelKernel (void* const conte
 
 void dgWorldDynamicUpdate::UpdateBodyVelocityParallelKernel (void* const context, void* const worldContext, dgInt32 threadID)
 {
+dgAssert (0);
+/*
 	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
 	dgWorld* const world = (dgWorld*) worldContext;
 
@@ -551,6 +574,7 @@ void dgWorldDynamicUpdate::UpdateBodyVelocityParallelKernel (void* const context
 		alpha = body->m_matrix.UnrotateVector(alpha);
 		body->m_netTorque = body->m_matrix.RotateVector (alpha.CompProduct(body->m_mass));
 	}
+*/
 }
 
 void dgWorldDynamicUpdate::KinematicCallbackUpdateParallelKernel (void* const context, void* const worldContext, dgInt32 threadID)

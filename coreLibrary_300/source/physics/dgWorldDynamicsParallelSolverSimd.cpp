@@ -72,6 +72,9 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallelSimd (const dgIsland* 
 
 void dgWorldDynamicUpdate::InitilizeBodyArrayParallelKernelSimd (void* const context, void* const worldContext, dgInt32 threadID)
 {
+dgAssert (0);
+
+/*
 	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
 	dgWorld* const world = (dgWorld*) worldContext;
 	dgInt32* const atomicIndex = &syncData->m_atomicIndex; 
@@ -101,6 +104,7 @@ void dgWorldDynamicUpdate::InitilizeBodyArrayParallelKernelSimd (void* const con
 		(dgSimd&)internalForces[index].m_linear = zero;
 		(dgSimd&)internalForces[index].m_angular = zero;
 	}
+*/
 }
 
 
@@ -119,6 +123,8 @@ void dgWorldDynamicUpdate::InitilizeBodyArrayParallelSimd (dgParallelSolverSyncD
 
 void dgWorldDynamicUpdate::BuildJacobianMatrixParallelKernelSimd (void* const context, void* const worldContext, dgInt32 threadID)
 {
+dgAssert (0);
+/*
 	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
 	dgWorld* const world = (dgWorld*) worldContext;
 	const dgParallelJointMap* const jointInfoIndexArray = syncData->m_jointInfoMap;
@@ -202,6 +208,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrixParallelKernelSimd (void* const co
 			index ++;
 		}
 	}
+*/
 }
 
 
@@ -319,6 +326,8 @@ void dgWorldDynamicUpdate::CalculateJointsAccelParallelKernelSimd (void* const c
 
 void dgWorldDynamicUpdate::CalculateJointsForceParallelKernelSimd (void* const context, void* const worldContext, dgInt32 threadID)
 {
+dgAssert (0);
+/*
 	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
 	dgWorld* const world = (dgWorld*) worldContext;
 	const dgParallelJointMap* const jointInfoIndexArray = syncData->m_jointInfoMap;
@@ -401,11 +410,14 @@ void dgWorldDynamicUpdate::CalculateJointsForceParallelKernelSimd (void* const c
 		(dgSimd&)internalForces[m1].m_linear = linearM1;
 		(dgSimd&)internalForces[m1].m_angular = angularM1;
 	}
+*/
 }
 
 
 void dgWorldDynamicUpdate::CalculateJointsVelocParallelKernelSimd (void* const context, void* const worldContext, dgInt32 threadID)
 {
+dgAssert (0);
+/*
 	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
 	dgWorld* const world = (dgWorld*) worldContext;
 
@@ -445,11 +457,15 @@ void dgWorldDynamicUpdate::CalculateJointsVelocParallelKernelSimd (void* const c
 //		(dgSimd&)internalVeloc[index].m_linear = (dgSimd&)internalVeloc[index].m_linear + (dgSimd&) body->m_veloc;
 //		(dgSimd&)internalVeloc[index].m_angular = (dgSimd&)internalVeloc[index].m_angular + (dgSimd&) body->m_omega;
 	}
+*/
 }
 
 
 void dgWorldDynamicUpdate::CalculateJointsImpulseVelocParallelKernelSimd (void* const context, void* const worldContext, dgInt32 threadID)
 {
+dgAssert (0);
+/*
+
 	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
 	dgWorld* const world = (dgWorld*) worldContext;
 
@@ -480,6 +496,7 @@ void dgWorldDynamicUpdate::CalculateJointsImpulseVelocParallelKernelSimd (void* 
 		//(dgSimd&)internalVeloc[index].m_linear = (dgSimd&)internalVeloc[index].m_linear + (dgSimd&) body->m_veloc;
 		//(dgSimd&)internalVeloc[index].m_angular = (dgSimd&)internalVeloc[index].m_angular + (dgSimd&) body->m_omega;
 	}
+*/
 }
 
 
@@ -512,6 +529,9 @@ void dgWorldDynamicUpdate::UpdateFeedbackForcesParallelKernelSimd (void* const c
 
 void dgWorldDynamicUpdate::UpdateBodyVelocityParallelKernelSimd (void* const context, void* const worldContext, dgInt32 threadID)
 {
+dgAssert (0);
+
+/*
 	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
 	dgWorld* const world = (dgWorld*) worldContext;
 
@@ -563,11 +583,8 @@ void dgWorldDynamicUpdate::UpdateBodyVelocityParallelKernelSimd (void* const con
 		dgAssert (dgAbsf (body->m_netForce[1]) < dgFloat32 (1.0e10f));
 		dgAssert (dgAbsf (body->m_netForce[2]) < dgFloat32 (1.0e10f));
 	}
+*/
 }
-
-
-
-
 
 void dgWorldDynamicUpdate::KinematicCallbackUpdateParallelKernelSimd (void* const context, void* const worldContext, dgInt32 threadID)
 {

@@ -58,7 +58,7 @@
 
 #define DG_MAX_CONTINUE_COLLISON_STEPS	8
 
-
+class dgBody;
 class dgDynamicBody;
 class dgParallelSolverSyncData;
 class dgWorldDynamicUpdateSyncDescriptor;
@@ -76,7 +76,7 @@ class dgIslandCallbackStruct
 class dgBodyInfo
 {
 	public:
-	dgDynamicBody* m_body;
+	dgBody* m_body;
 };
 
 class dgIsland

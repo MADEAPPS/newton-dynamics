@@ -3572,19 +3572,13 @@ NewtonCollision* NewtonCreateSceneCollision (const NewtonWorld* const newtonWorl
 void NewtonSceneCollisionBeginAddRemove (NewtonCollision* const sceneCollision)	
 {
 	TRACE_FUNCTION(__FUNCTION__);
-//	dgCollisionInstance* const instance = (dgCollisionInstance*) sceneCollision;
-//	if (instance->IsType (dgCollision::dgCollisionScene_RTTI)) {
-		NewtonCompoundCollisionBeginAddRemove (sceneCollision);
-//	}
+	NewtonCompoundCollisionBeginAddRemove (sceneCollision);
 }
 
 void NewtonSceneCollisionEndAddRemove (NewtonCollision* const sceneCollision)	
 {
 	TRACE_FUNCTION(__FUNCTION__);
-//	dgCollisionInstance* const instance = (dgCollisionInstance*) sceneCollision;
-//	if (instance->IsType (dgCollision::dgCollisionScene_RTTI)) {
-		NewtonCompoundCollisionEndAddRemove (sceneCollision);
-//	}
+	NewtonCompoundCollisionEndAddRemove (sceneCollision);
 }
 
 

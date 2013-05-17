@@ -62,6 +62,8 @@ dgBody::dgBody()
 	,m_omega(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
 	,m_minAABB(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
 	,m_maxAABB(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
+	,m_netForce(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
+	,m_netTorque(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
 	,m_localCentreOfMass(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))	
 	,m_globalCentreOfMass(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))	
 	,m_aparentMass(dgFloat32 (DG_INFINITE_MASS), dgFloat32 (DG_INFINITE_MASS), dgFloat32 (DG_INFINITE_MASS), dgFloat32 (DG_INFINITE_MASS))
@@ -69,6 +71,8 @@ dgBody::dgBody()
 	,m_uniqueID(0)
 	,m_bodyGroupId(0)
 	,m_rtti(m_baseBodyRTTI)
+	,m_type(0)
+	,m_dynamicsLru(0)
 	,m_genericLRUMark(0)
 	,m_criticalSectionLock()
 	,m_flags(0)
@@ -96,6 +100,8 @@ dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>*
 	,m_omega(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
 	,m_minAABB(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
 	,m_maxAABB(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
+	,m_netForce(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
+	,m_netTorque(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
 	,m_localCentreOfMass(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))	
 	,m_globalCentreOfMass(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))	
 	,m_aparentMass(dgFloat32 (DG_INFINITE_MASS), dgFloat32 (DG_INFINITE_MASS), dgFloat32 (DG_INFINITE_MASS), dgFloat32 (DG_INFINITE_MASS))
@@ -103,6 +109,8 @@ dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>*
 	,m_uniqueID(0)
 	,m_bodyGroupId(0)
 	,m_rtti(m_baseBodyRTTI)
+	,m_type(0)
+	,m_dynamicsLru(0)
 	,m_genericLRUMark(0)
 	,m_criticalSectionLock()
 	,m_flags(0)
@@ -153,6 +161,7 @@ void dgBody::AttachCollision (dgCollisionInstance* const collisionSrc)
 		m_collision->Release();
 	}
 	m_collision = instance;
+	m_equilibrium = 0;
 }
 
 

@@ -37,8 +37,6 @@ class dgKinematicBody: public dgBody
 	
 	virtual const dgVector& GetForce() const {return m_dummy;}
 	virtual const dgVector& GetTorque() const {return m_dummy;}
-	virtual const dgVector& GetNetForce() const {return m_dummy;}
-	virtual const dgVector& GetNetTorque() const {return m_dummy;}
 	
 	virtual void AddForce (const dgVector& force) {}
 	virtual void AddTorque (const dgVector& torque) {}
@@ -59,10 +57,13 @@ class dgKinematicBody: public dgBody
 	virtual bool IsInEquilibrium  () const {return true;}
 	virtual void SetCollidable (bool state) {m_collidable = state;}
 
-	virtual void AddImpulse (const dgVector& pointVeloc, const dgVector& pointPosit) {};
-	virtual void ApplyImpulsePair (const dgVector& linearImpulse, const dgVector& angularImpulse) {}
-	virtual void ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, const dgFloat32* const impulseArray, const dgFloat32* const pointArray) {}
+	virtual void AddImpulse (const dgVector& pointVeloc, const dgVector& pointPosit) {dgAssert(0);}
+	virtual void ApplyImpulsePair (const dgVector& linearImpulse, const dgVector& angularImpulse) {dgAssert(0);}
+	virtual void ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, const dgFloat32* const impulseArray, const dgFloat32* const pointArray) {dgAssert(0);}
 	virtual void Serialize (const dgTree<dgInt32, const dgCollision*>* const collisionNode, dgSerialize serializeCallback, void* const userData);
+
+	virtual void AddDampingAcceleration() {}
+	virtual void AddDampingAccelerationSimd() {}
 
 /*
 	virtual dgConstraint* GetFirstJoint() const;

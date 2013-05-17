@@ -31,6 +31,8 @@
 
 void dgWorldDynamicUpdate::CalculateIslandReactionForcesSimd (dgIsland* const island, dgFloat32 timestep, dgInt32 threadID) const
 {
+	dgAssert (0);
+/*
 	if (!(island->m_isContinueCollision && island->m_jointCount)) {
 		dgInt32 rowBase = BuildJacobianMatrixSimd(island, threadID, timestep);
 		CalculateReactionsForcesSimd (island, rowBase, threadID, timestep, DG_SOLVER_MAX_ERROR);
@@ -248,10 +250,14 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForcesSimd (dgIsland* const is
 			}
 		}
 	}	
+*/
 }
 
 dgInt32 dgWorldDynamicUpdate::BuildJacobianMatrixSimd (dgIsland* const island, dgInt32 threadIndex, dgFloat32 timestep) const
 {
+dgAssert (0);
+return 0;
+/*
 	dgAssert (island->m_bodyCount >= 2);
 	dgWorld* const world = (dgWorld*) this;
 
@@ -377,12 +383,15 @@ dgInt32 dgWorldDynamicUpdate::BuildJacobianMatrixSimd (dgIsland* const island, d
 		}
 	}
 	return rowBase;
+*/
 }
 
 
 
 void dgWorldDynamicUpdate::ApplyExternalForcesAndAccelerationSimd (const dgIsland* const island, dgInt32 rowStart, dgInt32 threadIndex, dgFloat32 timestepSrc, dgFloat32 maxAccNorm) const
 {
+dgAssert (0);
+/*
 	dgJacobian* const internalForces = &m_solverMemory.m_internalForces[island->m_bodyStart];
 
 	dgSimd zero (dgFloat32 (0.0f));
@@ -474,11 +483,14 @@ void dgWorldDynamicUpdate::ApplyExternalForcesAndAccelerationSimd (const dgIslan
 			(dgSimd&)body->m_omega = (dgSimd&)body->m_omega + body->m_invWorldInertiaMatrix.RotateVectorSimd (angularMomentum);
 		}
 	}
+*/
 }
 
 
 void dgWorldDynamicUpdate::CalculateSimpleBodyReactionsForcesSimd (const dgIsland* const island, dgInt32 rowStart, dgInt32 threadIndex, dgFloat32 timestep, dgFloat32 maxAccNorm) const
 {
+dgAssert (0);
+/*
 	dgFloat32 accel[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 activeRow[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 lowBound[DG_CONSTRAINT_MAX_ROWS];
@@ -758,12 +770,14 @@ void dgWorldDynamicUpdate::CalculateSimpleBodyReactionsForcesSimd (const dgIslan
 		akNumSimd = dgSimd (akNum);
 		accNormSimd.StoreScalar(&accNorm);
 	}
+*/
 }
 
 
 void dgWorldDynamicUpdate::CalculateForcesGameModeSimd (const dgIsland* const island, dgInt32 rowStart, dgInt32 threadIndex, dgFloat32 timestepSrc, dgFloat32 maxAccNorm) const
 {
-//	dgJacobian* const internalVeloc = &m_solverMemory.m_internalVeloc[island->m_bodyStart];
+dgAssert (0);
+/*
 	dgJacobian* const internalForces = &m_solverMemory.m_internalForces[island->m_bodyStart];
 
 	dgSimd zero (dgSimd::m_zero);
@@ -1009,9 +1023,8 @@ void dgWorldDynamicUpdate::CalculateForcesGameModeSimd (const dgIsland* const is
 			}
 		}
 	}
+*/
 }
-
-
 
 dgFloat32 dgWorldDynamicUpdate::CalculateJointForcesSimd (const dgIsland* const island, dgInt32 rowStart, dgInt32 joint, dgFloat32* const forceStep, dgFloat32 maxAccNorm, const dgJacobianPair* const JMinv) const
 {
@@ -1227,6 +1240,8 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForcesSimd (const dgIsland* const 
 
 void dgWorldDynamicUpdate::CalculateForcesSimulationModeSimd (const dgIsland* const island, dgInt32 rowStart, dgInt32 threadIndex, dgFloat32 timestep, dgFloat32 maxAccNorm) const
 {
+dgAssert (0);
+/*
 	dgFloat32 forceStep[DG_CONSTRAINT_MAX_ROWS];	
 	dgWorld* const world = (dgWorld*) this;
 	dgJacobian* const internalForces = &m_solverMemory.m_internalForces[island->m_bodyStart];
@@ -1731,6 +1746,7 @@ void dgWorldDynamicUpdate::CalculateForcesSimulationModeSimd (const dgIsland* co
 	}
 
 	ApplyExternalForcesAndAccelerationSimd (island, rowStart, threadIndex, timestep, maxAccNorm);
+*/
 }
 
 

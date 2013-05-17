@@ -46,8 +46,6 @@ class dgDynamicBody : public dgBody
 
 	virtual const dgVector& GetForce() const;
 	virtual const dgVector& GetTorque() const;
-	virtual const dgVector& GetNetForce() const;
-	virtual const dgVector& GetNetTorque() const;
 	
 	virtual void AddForce (const dgVector& force);
 	virtual void AddTorque (const dgVector& torque);
@@ -81,20 +79,16 @@ class dgDynamicBody : public dgBody
 	virtual void Serialize (const dgTree<dgInt32, const dgCollision*>* const collisionNode, dgSerialize serializeCallback, void* const userData);
 
 	private:
-	void AddDampingAcceleration();
-	void AddDampingAccelerationSimd();
+	virtual void AddDampingAcceleration();
+	virtual void AddDampingAccelerationSimd();
 
 	dgVector m_accel;
 	dgVector m_alpha;
-	dgVector m_netForce;
-	dgVector m_netTorque;
 	dgVector m_prevExternalForce;
 	dgVector m_prevExternalTorque;
 	dgVector m_dampCoef;
 	dgVector m_aparentMass;
-
 	dgInt32 m_sleepingCounter;
-	dgUnsigned32 m_dynamicsLru;	
 	dgUnsigned32 m_isInDestructionArrayLRU;
 
 	OnApplyExtForceAndTorque m_applyExtForces;
@@ -113,16 +107,6 @@ DG_INLINE const dgVector& dgDynamicBody::GetForce() const
 DG_INLINE const dgVector& dgDynamicBody::GetTorque() const
 {
 	return m_alpha;
-}
-
-DG_INLINE const dgVector& dgDynamicBody::GetNetForce() const
-{
-	return m_netForce; 
-}
-
-DG_INLINE const dgVector& dgDynamicBody::GetNetTorque() const
-{
-	return m_netTorque;
 }
 
 
