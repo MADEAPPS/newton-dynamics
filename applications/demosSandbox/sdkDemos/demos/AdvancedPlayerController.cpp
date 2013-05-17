@@ -195,8 +195,8 @@ class AdvancePlayerControllerManager: public CustomPlayerControllerManager
 	AdvancePlayerControllerManager (NewtonWorld* const world)
 		:CustomPlayerControllerManager (world)
 		,m_player (NULL) 
-		,m_shotProp(true)
-		,m_cameraMode(true)
+		,m_shootProp(true)
+		,m_cameraMode(false)
 	{
 		// hook a callback for 2d help display
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
@@ -230,15 +230,15 @@ class AdvancePlayerControllerManager: public CustomPlayerControllerManager
 			glDisable(GL_TEXTURE_2D);
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 			scene->Print (color, 10, 200, "Navigation keys:");
-			scene->Print (color, 10, 220, "W - walk forward");
-			scene->Print (color, 10, 240, "S - walk backward");
-			scene->Print (color, 10, 260, "D - strafe right");
-			scene->Print (color, 10, 280, "A - strafe left");
-			scene->Print (color, 10, 320, "C - toggle Camera mode");
-			scene->Print (color, 10, 300, "Space - jump");
-			scene->Print (color, 10, 340, "Enter - shot random prop");
-			scene->Print (color, 10, 360, "H - hide Help");
-			scene->Print (color, 10, 380, "Left move button down and move mouse to orient the player direction and look up and down");
+			scene->Print (color, 10, 220, "walk forward:        W");
+			scene->Print (color, 10, 240, "walk backward:       S");
+			scene->Print (color, 10, 260, "strafe right:        D");
+			scene->Print (color, 10, 280, "strafe left:         A");
+			scene->Print (color, 10, 300, "toggle camera mode:  C");
+			scene->Print (color, 10, 320, "jump:                Space");
+			scene->Print (color, 10, 340, "shoot random prop:   Enter");
+			scene->Print (color, 10, 360, "hide help:           H");
+			scene->Print (color, 10, 380, "Left mouse button down and move to orient the player direction and look up and down");
 			glEnable(GL_TEXTURE_2D);	
 		}
 	}
@@ -273,7 +273,7 @@ class AdvancePlayerControllerManager: public CustomPlayerControllerManager
 		m_player->m_jumpSpeed = (m_player->m_jumpKey.UpdateTriggerButton(mainWindow, ' ')) ? jumpSpeed : 0.0f;
 
 		// see if we are shoting
-		m_player->m_shootProp = m_shotProp.UpdateTriggerButton(mainWindow, 0x0d) ? 1 : 0;
+		m_player->m_shootProp = m_shootProp.UpdateTriggerButton(mainWindow, 0x0d) ? 1 : 0;
 
 		// set the help key
 		m_player->m_helpKey.UpdatePushButton (mainWindow, 'H');
@@ -294,14 +294,14 @@ class AdvancePlayerControllerManager: public CustomPlayerControllerManager
 		}
 
 #if 0
-	#if 1
+	#if 0
 		static FILE* file = fopen ("log.bin", "wb");
 		if (file) {
 			fwrite (&player->m_headinAngle, sizeof (dFloat), 1, file);
 			fwrite (&player->m_forwarSpeed, sizeof (dFloat), 1, file);
 			fwrite (&player->m_strafeSpeed, sizeof (dFloat), 1, file);
 			fwrite (&player->m_jumpSpeed, sizeof (dFloat), 1, file);
-			fwrite (&player->m_shotProp, sizeof (m_shotProp), 1, file);
+			fwrite (&player->m_shootProp, sizeof (m_shootProp), 1, file);
 			fflush(file);
 		}
 	#else 
@@ -311,7 +311,7 @@ class AdvancePlayerControllerManager: public CustomPlayerControllerManager
 			fread (&player->m_forwarSpeed, sizeof (dFloat), 1, file);
 			fread (&player->m_strafeSpeed, sizeof (dFloat), 1, file);
 			fread (&player->m_jumpSpeed, sizeof (dFloat), 1, file);
-			fread (&player->m_shotProp, sizeof (m_shotProp), 1, file);
+			fread (&player->m_shootProp, sizeof (m_shootProp), 1, file);
 		}
 	#endif
 #endif
@@ -413,7 +413,7 @@ class AdvancePlayerControllerManager: public CustomPlayerControllerManager
 
 	
 	AdvancePlayerEntity* m_player;
-	DemoEntityManager::ButtonKey m_shotProp;
+	DemoEntityManager::ButtonKey m_shootProp;
 	DemoEntityManager::ButtonKey m_cameraMode;
 };
 
