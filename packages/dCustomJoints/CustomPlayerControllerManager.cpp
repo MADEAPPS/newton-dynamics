@@ -160,37 +160,27 @@ dVector CustomPlayerController::CalculateDesiredVelocity (dFloat forwardSpeed, d
 	dVector frontDir (matrix.RotateVector(m_frontVector));
 	dVector rightDir (frontDir * updir);
 
-	dVector veloc (m_groundVelocity);
+	dVector veloc (0.0f, 0.0f, 0.0f, 0.0f);
 	if ((verticalSpeed <= 0.0f) && (m_groundPlane % m_groundPlane) > 0.0f) {
 		// plane is supported by a ground plane, apply the player input velocity
 		if ((m_groundPlane % updir) >= m_maxSlope) {
-			if ((dAbs (forwardSpeed) < 1.0e-3f) && (dAbs (lateralSpeed) < 1.0e-3f) && ((veloc % veloc) < 1.0e-3f)) {
-				// the player is resting, he has unlimited frictions which means his lateral velocity is zero 
-				veloc += updir.Scale(verticalSpeed);
-				veloc += gravity.Scale (timestep);
-				dFloat normalVeloc = m_groundPlane % veloc;
-				if (normalVeloc < 0.0f) {
-					veloc -= m_groundPlane.Scale (normalVeloc);
-				}
-				veloc = m_groundPlane.Scale (veloc % m_groundPlane);
-			} else {
-				// player is in a legal slope, he is in full control of his movement
-				dVector bodyVeloc;
-				NewtonBodyGetVelocity(body, &bodyVeloc[0]);
-				veloc += frontDir.Scale (forwardSpeed) + rightDir.Scale (lateralSpeed) + updir.Scale(bodyVeloc % updir);
-				veloc += updir.Scale(verticalSpeed);
-				veloc += gravity.Scale (timestep);
-				dFloat normalVeloc = m_groundPlane % veloc;
-				if (normalVeloc < 0.0f) {
-					veloc -= m_groundPlane.Scale (normalVeloc);
-				}
+			// player is in a legal slope, he is in full control of his movement
+			dVector bodyVeloc;
+			NewtonBodyGetVelocity(body, &bodyVeloc[0]);
+			veloc = frontDir.Scale (forwardSpeed) + rightDir.Scale (lateralSpeed) + updir.Scale(bodyVeloc % updir);
+			veloc += updir.Scale(verticalSpeed);
+			veloc += gravity.Scale (timestep);
+			veloc += (m_groundVelocity - updir.Scale (updir % m_groundVelocity));
+			dFloat normalVeloc = m_groundPlane % (veloc - m_groundVelocity);
+			if (normalVeloc < 0.0f) {
+				veloc -= m_groundPlane.Scale (normalVeloc);
 			}
 		} else {
 			// player is in an illegal ramp, he slides down hill an loses control of his movement 
 			NewtonBodyGetVelocity(body, &veloc[0]);
 			veloc += updir.Scale(verticalSpeed);
 			veloc += gravity.Scale (timestep);
-			dFloat normalVeloc = m_groundPlane % veloc;
+			dFloat normalVeloc = m_groundPlane % (veloc - m_groundVelocity);
 			if (normalVeloc < 0.0f) {
 				veloc -= m_groundPlane.Scale (normalVeloc);
 			}
@@ -201,6 +191,9 @@ dVector CustomPlayerController::CalculateDesiredVelocity (dFloat forwardSpeed, d
 		veloc += updir.Scale(verticalSpeed);
 		veloc += gravity.Scale (timestep);
 	}
+if (veloc.m_y > 0.0f)
+timestep *=1;
+
 	return veloc;
 }
 
@@ -220,18 +213,6 @@ void CustomPlayerController::SetPlayerVelocity (dFloat forwadSpeed, dFloat later
 
 dFloat CustomPlayerController::CalculateContactKinematics(const dVector& veloc, const NewtonWorldConvexCastReturnInfo* const contactInfo) const
 {
-//	dMatrix matrix; 
-//	dVector com;
-//	dVector contactVeloc;
-//	dVector contactOmega; 
-//	dVector point (contactInfo->m_point);
-//	NewtonBodyGetMatrix(contactInfo->m_hitBody, &matrix[0][0]);
-//	NewtonBodyGetOmega(contactInfo->m_hitBody, &contactOmega[0]);
-//	NewtonBodyGetVelocity(contactInfo->m_hitBody, &contactVeloc[0]);
-//	NewtonBodyGetCentreOfMass(contactInfo->m_hitBody, &com[0]);
-//	com = matrix.TransformVector(com);
-//	contactVeloc += contactOmega * (point - com);
-
 	dVector contactVeloc;
 	NewtonBodyGetPointVelocity (contactInfo->m_hitBody, contactInfo->m_point, &contactVeloc[0]);
 
@@ -251,6 +232,11 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 	CustomPlayerControllerManager* const manager = (CustomPlayerControllerManager*) GetManager();
 	NewtonWorld* const world = manager->GetWorld();
 	NewtonBody* const body = GetBody();
+
+static int xxx;
+xxx ++;
+if (xxx >= 2874)
+xxx *=1;
 
 	// apply the player motion, by calculation the desired plane linear and angular velocity
 	manager->ApplyPlayerMove (this, timestep);
@@ -425,6 +411,9 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 			}
 		}
 	}
+
+if (veloc.m_y > 0.0f)
+timestep *=1;
 
 	// set player velocity, position and orientation
 	NewtonBodySetVelocity(body, &veloc[0]);
