@@ -1769,8 +1769,6 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgCollidingPairCo
 	dgBody* const compoundBody = constraint->GetBody0();
 	dgBody* const otherBody = constraint->GetBody1();
 
-	
-
 	dgCollisionInstance* const compoundInstance = compoundBody->m_collision;
 	dgCollisionInstance* const otherInstance = otherBody->m_collision;
 
@@ -1798,6 +1796,10 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgCollidingPairCo
 	stackPool[0] = m_root;
 	const dgContactMaterial* const material = constraint->GetMaterial();
 
+	dgFloat32 maxParam = dgFloat32 (1.0f);
+
+int xxx = 0;
+
 	if (useSimd) {
 		dgAssert (0);
 	} else {
@@ -1809,7 +1811,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgCollidingPairCo
 
 			dgVector minBox (me->m_p0 - boxP1);
 			dgVector maxBox (me->m_p1 - boxP0);
-
+xxx ++;
 			if (ray.BoxTest (minBox, maxBox)) {
 				if (me->m_type == m_leaf) {
 					dgCollisionInstance* const subShape = me->GetShape();
@@ -1828,14 +1830,29 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgCollidingPairCo
 							proxy.m_contacts = &contacts[contactCount];
 
 							dgInt32 count = m_world->CalculateConvexToConvexContacts (proxy);
-							for (dgInt32 i = 0; i < count; i ++) {
-								dgAssert (contacts[contactCount + i].m_collision0 == &childInstance);
-								contacts[contactCount + i].m_collision0 = subShape;
-							}
-							contactCount += count;
+							if (count) {
+								for (dgInt32 i = 0; i < count; i ++) {
+									dgAssert (contacts[contactCount + i].m_collision0 == &childInstance);
+									contacts[contactCount + i].m_collision0 = subShape;
+								}
+								contactCount += count;
 
-							if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
-								contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
+								if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
+									contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
+								}
+
+								dgFloat32 param = proxy.m_timestep;
+								dgAssert (param >= dgFloat32 (0.0f));
+								if (param < maxParam) {
+									maxParam = param;
+									if (maxParam == dgFloat32 (0.0f)) {
+										dgAssert (0);
+										break;
+									}
+									ray.Reset (maxParam);
+
+									// remember to sort contacts by proximity
+								}
 							}
 						}
 					}
