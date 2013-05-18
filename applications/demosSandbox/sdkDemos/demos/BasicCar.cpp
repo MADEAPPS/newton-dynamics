@@ -20,7 +20,7 @@
 #include "DemoCamera.h"
 //#include "DemoAIAgent.h"
 #include "DemoEntityManager.h"
-#include "toolBox/DebugDisplay.h"
+#include "DebugDisplay.h"
 #include "UserPlaneCollision.h"
 #include "CustomVehicleControllerManager.h"
 

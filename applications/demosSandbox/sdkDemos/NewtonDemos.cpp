@@ -172,7 +172,10 @@ class NewtonDemosApp: public wxApp
 		// it should be called once, and the the call is optional 
 		NewtonSetMemorySystem (PhysicsAlloc, PhysicsFree);
 
-		NewtonDemos* const frame = new NewtonDemos( "Newton 3.0 SDK demos", wxDefaultPosition, wxSize(1024, 768));
+		int version = NewtonWorldGetVersion();
+		char tittle[256]; 
+		sprintf (tittle, "Newton %d.%02d SDK demos", version / 100, version % 100);
+		NewtonDemos* const frame = new NewtonDemos(tittle, wxDefaultPosition, wxSize(1024, 768));
 
 		frame->Show(true);
 		SetTopWindow(frame);
