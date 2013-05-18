@@ -30,7 +30,7 @@
 //#define DEFAULT_SCENE	4			// closest distance
 //#define DEFAULT_SCENE	5			// primitive collision
 //#define DEFAULT_SCENE	6 			// Kinematic bodies
-#define DEFAULT_SCENE	7			// primitive convex cast 
+//#define DEFAULT_SCENE	7			// primitive convex cast 
 //#define DEFAULT_SCENE	8			// Box stacks
 //#define DEFAULT_SCENE	9			// simple level mesh collision
 //#define DEFAULT_SCENE	10			// optimized level mesh collision
@@ -51,7 +51,7 @@
 //#define DEFAULT_SCENE	25			// puck slide continue collision
 //#define DEFAULT_SCENE	26			// basic car
 //#define DEFAULT_SCENE	27			// player controller
-//#define DEFAULT_SCENE	28			// advanced player controller
+#define DEFAULT_SCENE	28			// advanced player controller
 //#define DEFAULT_SCENE	29			// cloth patch			
 //#define DEFAULT_SCENE	30			// soft bodies			
 //#define DEFAULT_SCENE	31			// high performance super car

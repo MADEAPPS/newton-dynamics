@@ -69,8 +69,8 @@ class CustomPlayerController
 	dVector m_frontVector;
 	dVector m_groundPlane;
 	dVector m_groundVelocity;
-	dFloat m_outerRadios;
-	dFloat m_innerRadios;
+	dFloat m_outerRadio;
+	dFloat m_innerRadio;
 	dFloat m_height;
 	dFloat m_stairStep;
 	dFloat m_maxSlope;

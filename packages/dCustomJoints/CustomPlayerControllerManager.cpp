@@ -58,8 +58,8 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 	CustomPlayerControllerManager* const manager = (CustomPlayerControllerManager*) GetManager();
 	NewtonWorld* const world = manager->GetWorld();
 
-	m_outerRadios = outerRadius;
-	m_innerRadios = innerRadius;
+	m_outerRadio = outerRadius;
+	m_innerRadio = innerRadius;
 	m_height = height;
 	m_stairStep = stairStep;
 	SetClimbSlope(45.0f * 3.1416f/ 180.0f);
@@ -76,7 +76,9 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 	dAssert (shapeHigh > 0.0f);
 	supportShapeMatrix.m_posit = supportShapeMatrix[0].Scale(shapeHigh * 0.5f);
 	supportShapeMatrix.m_posit.m_w = 1.0f;
-	NewtonCollision* const supportShapeCylinder = NewtonCreateCylinder(world, m_innerRadios, shapeHigh, 0, &supportShapeMatrix[0][0]); 		
+	//NewtonCollision* const supportShape = NewtonCreateCylinder(world, m_innerRadios, shapeHigh, 0, &supportShapeMatrix[0][0]);
+	NewtonCollision* const supportShape = NewtonCreateCapsule(world, 0.25f, 0.5f, 0, &supportShapeMatrix[0][0]);
+	NewtonCollisionSetScale(supportShape, shapeHigh, m_innerRadio * 4.0f, m_innerRadio * 4.0f);
 
 	// create the outer thick cylinder
 	dMatrix outerShapeMatrix (localAxis);
@@ -84,14 +86,15 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 	dAssert (cylinderHeight > 0.0f);
 	outerShapeMatrix.m_posit = outerShapeMatrix[0].Scale(cylinderHeight * 0.5f + stairStep);
 	outerShapeMatrix.m_posit.m_w = 1.0f;
-	NewtonCollision* const playerCylinder = NewtonCreateCylinder(world, m_outerRadios, cylinderHeight, 0, &outerShapeMatrix[0][0]); 		
-
+	//NewtonCollision* const bodyCylinder = NewtonCreateCylinder(world, m_outerRadios, cylinderHeight, 0, &outerShapeMatrix[0][0]);
+	NewtonCollision* const bodyCylinder = NewtonCreateCapsule(world, 0.25f, 0.5f, 0, &outerShapeMatrix[0][0]);
+	NewtonCollisionSetScale(bodyCylinder, cylinderHeight, m_outerRadio * 4.0f, m_outerRadio * 4.0f);
 
 	// compound collision player controller
 	NewtonCollision* const playerShape = NewtonCreateCompoundCollision(world, 0);
 	NewtonCompoundCollisionBeginAddRemove(playerShape);	
-	NewtonCompoundCollisionAddSubCollision (playerShape, supportShapeCylinder);
-	NewtonCompoundCollisionAddSubCollision (playerShape, playerCylinder);
+	NewtonCompoundCollisionAddSubCollision (playerShape, supportShape);
+	NewtonCompoundCollisionAddSubCollision (playerShape, bodyCylinder);
 	NewtonCompoundCollisionEndAddRemove (playerShape);	
 
 	// create the kinematic body
@@ -110,8 +113,8 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 	m_supportShape = NewtonCompoundCollisionGetCollisionFromNode (shape, NewtonCompoundCollisionGetNodeByIndex (shape, 0));
 	m_collisionShape = NewtonCompoundCollisionGetCollisionFromNode (shape, NewtonCompoundCollisionGetNodeByIndex (shape, 1));
 
-	NewtonDestroyCollision (playerCylinder);
-	NewtonDestroyCollision (supportShapeCylinder);
+	NewtonDestroyCollision (bodyCylinder);
+	NewtonDestroyCollision (supportShape);
 	NewtonDestroyCollision (playerShape);
 
 	m_isJumping = false;
