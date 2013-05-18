@@ -202,64 +202,101 @@ class dConvexCastManager: public CustomControllerManager<dConvexCastRecord>
 #endif
 
 
-static void MakeLargeStaticCovexMap (DemoEntityManager* const scene, int count)
+class StupidComplexOfConvexShapes: public DemoEntity
 {
-	DemoMesh* gemetries[32];
-	NewtonCollision* collisionArray[32];
+	public:
+	StupidComplexOfConvexShapes (DemoEntityManager* const scene, int count)
+		:DemoEntity (GetIdentityMatrix(), NULL)
+	{
+		scene->Append(this);
 
-	NewtonWorld* const world = scene->GetNewton();
+		const dFloat size = 0.5f;
 
-	int materialID = NewtonMaterialGetDefaultGroupID(world);
-	
-	const dFloat size = 0.5f;
-	PrimitiveType selection[] = {_BOX_PRIMITIVE, _CYLINDER_PRIMITIVE, _TAPERED_CYLINDER_PRIMITIVE, _REGULAR_CONVEX_HULL_PRIMITIVE};
-	for (int i = 0; i < sizeof (collisionArray) / sizeof (collisionArray[0]); i ++) {
-		int index = dRand() % (sizeof (selection) / sizeof (selection[0]));
-		dVector shapeSize (size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), 0.0f);
-		collisionArray[i] = CreateConvexCollision (world, GetIdentityMatrix(), shapeSize, selection[index], materialID);
+		DemoMesh* gemetries[32];
+		NewtonCollision* collisionArray[32];
+		NewtonWorld* const world = scene->GetNewton();
+		int materialID = NewtonMaterialGetDefaultGroupID(world);
 
-		gemetries[i] = new DemoMesh("geometry", collisionArray[i], "wood_4.tga", "wood_4.tga", "wood_1.tga");
-
-	}
-
-	NewtonCollision* const compound = NewtonCreateCompoundCollision (world, materialID);
-	NewtonCompoundCollisionBeginAddRemove(compound);	
-
-	for (int i = 0 ; i < count; i ++) {
-		for (int j = 0 ; j < count; j ++) {
-			float pitch = RandomVariable (1.0f) * 2.0f * 3.1416f;
-			float yaw = RandomVariable (1.0f) * 2.0f * 3.1416f;
-			float roll = RandomVariable (1.0f) * 2.0f * 3.1416f;
-
-			float x = size * (j - count / 2) + RandomVariable (size * 0.5f);
-			float y = RandomVariable (size * 2.0f);
-			float z = size * (i - count / 2) + RandomVariable (size * 0.5f);
-
-			dMatrix matrix (dPitchMatrix (pitch) * dYawMatrix (yaw) * dRollMatrix (roll));
-			matrix.m_posit = dVector (x, y, z, 1.0f);
-
+		// create a pool of predefined convex mesh
+		PrimitiveType selection[] = {_SPHERE_PRIMITIVE,	_BOX_PRIMITIVE,	_CAPSULE_PRIMITIVE, _CYLINDER_PRIMITIVE, _CONE_PRIMITIVE, _TAPERED_CAPSULE_PRIMITIVE, _TAPERED_CYLINDER_PRIMITIVE, _CHAMFER_CYLINDER_PRIMITIVE, _RANDOM_CONVEX_HULL_PRIMITIVE, _REGULAR_CONVEX_HULL_PRIMITIVE};
+		for (int i = 0; i < sizeof (collisionArray) / sizeof (collisionArray[0]); i ++) {
 			int index = dRand() % (sizeof (selection) / sizeof (selection[0]));
-			DemoEntity* const entity = new DemoEntity(matrix, NULL);
-			scene->Append (entity);
-			entity->SetMesh(gemetries[index]);
-
-			NewtonCollisionSetMatrix (collisionArray[index], &matrix[0][0]);
-			NewtonCompoundCollisionAddSubCollision (compound, collisionArray[index]);
+			dVector shapeSize (size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), 0.0f);
+			collisionArray[i] = CreateConvexCollision (world, GetIdentityMatrix(), shapeSize, selection[index], materialID);
+			gemetries[i] = new DemoMesh("geometry", collisionArray[i], "wood_4.tga", "wood_4.tga", "wood_1.tga");
 		}
+
+		// make a large complex of plane by adding lost of these shapes at a random location and oriention; 
+		NewtonCollision* const compound = NewtonCreateCompoundCollision (world, materialID);
+		NewtonCompoundCollisionBeginAddRemove(compound);	
+		for (int i = 0 ; i < count; i ++) {
+			for (int j = 0 ; j < count; j ++) {
+				float pitch = RandomVariable (1.0f) * 2.0f * 3.1416f;
+				float yaw = RandomVariable (1.0f) * 2.0f * 3.1416f;
+				float roll = RandomVariable (1.0f) * 2.0f * 3.1416f;
+
+				float x = size * (j - count / 2) + RandomVariable (size * 0.5f);
+				float y = RandomVariable (size * 2.0f);
+				float z = size * (i - count / 2) + RandomVariable (size * 0.5f);
+
+				dMatrix matrix (dPitchMatrix (pitch) * dYawMatrix (yaw) * dRollMatrix (roll));
+				matrix.m_posit = dVector (x, y, z, 1.0f);
+
+				int index = dRand() % (sizeof (selection) / sizeof (selection[0]));
+				DemoEntity* const entity = new DemoEntity(matrix, this);
+				entity->SetMesh(gemetries[index]);
+
+				NewtonCollisionSetMatrix (collisionArray[index], &matrix[0][0]);
+				NewtonCompoundCollisionAddSubCollision (compound, collisionArray[index]);
+			}
+		}
+		NewtonCompoundCollisionEndAddRemove(compound);	
+	
+		CreateSimpleBody (world, NULL, 0.0f, GetIdentityMatrix(), compound, 0);
+
+		// destroy all collision shapes after they are used
+		NewtonDestroyCollision(compound);
+		for (int i = 0; i < sizeof (collisionArray) / sizeof (collisionArray[0]); i ++) {
+			gemetries[i]->Release();
+			NewtonDestroyCollision(collisionArray[i]);
+		}
+
+
+		// now make and array of collision shapes for convex casting by mouse point click an drag
+		dVector shapeSize (size, size, size, 0.0f);
+		PrimitiveType castSelection[] = {_SPHERE_PRIMITIVE,	_CAPSULE_PRIMITIVE, _BOX_PRIMITIVE, _CYLINDER_PRIMITIVE, _REGULAR_CONVEX_HULL_PRIMITIVE, _CHAMFER_CYLINDER_PRIMITIVE};
+		m_count =  sizeof (castSelection) / sizeof (castSelection[0]);
+		m_castingGeometries = new DemoMesh*[m_count];
+		m_castingShapeArray = new NewtonCollision*[m_count];
+
+		for (int i = 0; i < m_count; i ++) {
+			dVector shapeSize (size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), 0.0f);
+			m_castingShapeArray[i] = CreateConvexCollision (world, GetIdentityMatrix(), shapeSize, castSelection[i], materialID);
+			m_castingGeometries[i] = new DemoMesh("geometry", m_castingShapeArray[i], "smilli.tga", "smilli.tga", "smilli.tga");
+		}
+
+		// make and entity for showing the result of the convex cast
+		m_castingEntity = new DemoEntity (GetIdentityMatrix(), NULL);
+		m_castingEntity->SetMesh(m_castingGeometries[0]);
 	}
-	NewtonCompoundCollisionEndAddRemove(compound);	
 
+	~StupidComplexOfConvexShapes()
+	{
+		m_castingEntity->Release();
 
-	CreateSimpleBody (world, NULL, 0.0f, GetIdentityMatrix(), compound, 0);
-	NewtonDestroyCollision(compound);
-
-
-	for (int i = 0; i < sizeof (collisionArray) / sizeof (collisionArray[0]); i ++) {
-		gemetries[i]->Release();
-		NewtonDestroyCollision(collisionArray[i]);
+		for (int i = 0; i < m_count; i ++) {
+			m_castingGeometries[i]->Release();
+			NewtonDestroyCollision(m_castingShapeArray[i]);
+		}
+		delete[] m_castingGeometries;
+		delete[] m_castingShapeArray;
 	}
-}
 
+	int m_count;
+	DemoEntity* m_castingEntity;
+	DemoMesh** m_castingGeometries;
+	NewtonCollision** m_castingShapeArray;
+};
 
 
 // create physics scene
@@ -275,7 +312,7 @@ void ConvexCast (DemoEntityManager* const scene)
 
 //	CreateLevelMesh (scene, "flatPlane.ngd", 0);
 
-	MakeLargeStaticCovexMap (scene, 10);
+	new StupidComplexOfConvexShapes (scene, 10);
 /*
 //	CreateLevelMesh (scene, "playground.ngd", 0);
 
