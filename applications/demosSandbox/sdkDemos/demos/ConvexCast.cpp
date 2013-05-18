@@ -17,7 +17,7 @@
 #include "../DemoMesh.h"
 #include "../toolBox/OpenGlUtil.h"
 
-
+#if 0
 class dConvexCastRecord
 {
 	CUSTOM_CONTROLLER_GLUE(dConvexCastRecord);
@@ -199,6 +199,67 @@ class dConvexCastManager: public CustomControllerManager<dConvexCastRecord>
 		}
 	}
 };
+#endif
+
+
+static void MakeLargeStaticCovexMap (DemoEntityManager* const scene, int count)
+{
+	DemoMesh* gemetries[32];
+	NewtonCollision* collisionArray[32];
+
+	NewtonWorld* const world = scene->GetNewton();
+
+	int materialID = NewtonMaterialGetDefaultGroupID(world);
+	
+	const dFloat size = 0.5f;
+	PrimitiveType selection[] = {_BOX_PRIMITIVE, _CYLINDER_PRIMITIVE, _TAPERED_CYLINDER_PRIMITIVE, _REGULAR_CONVEX_HULL_PRIMITIVE};
+	for (int i = 0; i < sizeof (collisionArray) / sizeof (collisionArray[0]); i ++) {
+		int index = dRand() % (sizeof (selection) / sizeof (selection[0]));
+		dVector shapeSize (size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), 0.0f);
+		collisionArray[i] = CreateConvexCollision (world, GetIdentityMatrix(), shapeSize, selection[index], materialID);
+
+		gemetries[i] = new DemoMesh("geometry", collisionArray[i], "wood_4.tga", "wood_4.tga", "wood_1.tga");
+
+	}
+
+	NewtonCollision* const compound = NewtonCreateCompoundCollision (world, materialID);
+	NewtonCompoundCollisionBeginAddRemove(compound);	
+
+	for (int i = 0 ; i < count; i ++) {
+		for (int j = 0 ; j < count; j ++) {
+			float pitch = RandomVariable (1.0f) * 2.0f * 3.1416f;
+			float yaw = RandomVariable (1.0f) * 2.0f * 3.1416f;
+			float roll = RandomVariable (1.0f) * 2.0f * 3.1416f;
+
+			float x = size * (j - count / 2) + RandomVariable (size * 0.5f);
+			float y = RandomVariable (size * 2.0f);
+			float z = size * (i - count / 2) + RandomVariable (size * 0.5f);
+
+			dMatrix matrix (dPitchMatrix (pitch) * dYawMatrix (yaw) * dRollMatrix (roll));
+			matrix.m_posit = dVector (x, y, z, 1.0f);
+
+			int index = dRand() % (sizeof (selection) / sizeof (selection[0]));
+			DemoEntity* const entity = new DemoEntity(matrix, NULL);
+			scene->Append (entity);
+			entity->SetMesh(gemetries[index]);
+
+			NewtonCollisionSetMatrix (collisionArray[index], &matrix[0][0]);
+			NewtonCompoundCollisionAddSubCollision (compound, collisionArray[index]);
+		}
+	}
+	NewtonCompoundCollisionEndAddRemove(compound);	
+
+
+	CreateSimpleBody (world, NULL, 0.0f, GetIdentityMatrix(), compound, 0);
+	NewtonDestroyCollision(compound);
+
+
+	for (int i = 0; i < sizeof (collisionArray) / sizeof (collisionArray[0]); i ++) {
+		gemetries[i]->Release();
+		NewtonDestroyCollision(collisionArray[i]);
+	}
+}
+
 
 
 // create physics scene
@@ -209,10 +270,13 @@ void ConvexCast (DemoEntityManager* const scene)
 	// customize the scene after loading
 	// set a user friction variable in the body for variable friction demos
 	// later this will be done using LUA script
-	NewtonWorld* const world = scene->GetNewton();
+	//NewtonWorld* const world = scene->GetNewton();
 	dMatrix offsetMatrix (GetIdentityMatrix());
 
-	CreateLevelMesh (scene, "flatPlane.ngd", 0);
+//	CreateLevelMesh (scene, "flatPlane.ngd", 0);
+
+	MakeLargeStaticCovexMap (scene, 10);
+/*
 //	CreateLevelMesh (scene, "playground.ngd", 0);
 
 	int materialID = NewtonMaterialGetDefaultGroupID (world);
@@ -242,6 +306,7 @@ void ConvexCast (DemoEntityManager* const scene)
 //	castManager->AddPrimitives (count, dVector (-6, 0, -6), _TAPERED_CAPSULE_PRIMITIVE, materialID, castinShapeType);
 //	castManager->AddPrimitives (count, dVector (-8, 0, -8), _TAPERED_CYLINDER_PRIMITIVE, materialID, castinShapeType);
 //	castManager->AddPrimitives (count, dVector (-10, 0, -10), _REGULAR_CONVEX_HULL_PRIMITIVE, materialID, castinShapeType);
+*/
 
 	// place camera into position
 	dMatrix camMatrix (GetIdentityMatrix());

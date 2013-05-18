@@ -43,6 +43,13 @@ unsigned dRand ()
 	return randSeed & dRAND_MAX;
 }
 
+dFloat RandomVariable(dFloat amp)
+{
+	unsigned val;
+	val = dRand() + dRand();
+	return amp * (dFloat (val) / dFloat(dRAND_MAX) - 1.0f) * 0.5f;
+}
+
 
 // Windows user assets path
 void GetWorkingFileName (const char* const name, char* const outPathName)

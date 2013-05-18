@@ -209,6 +209,7 @@ typedef long long unsigned64;
 #define dRAND_MAX		0x0fffffff
 
 unsigned dRand ();
+dFloat RandomVariable(dFloat amp);
 
 
 // for some reason specifying a relative does not seem to work in Linus

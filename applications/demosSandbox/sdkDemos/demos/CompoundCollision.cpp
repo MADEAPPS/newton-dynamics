@@ -115,7 +115,7 @@ static void MakeFunnyCompound (DemoEntityManager* const scene, const dVector& or
 	NewtonWorld* const world = scene->GetNewton();
 
 	// create an empty compound collision
-	NewtonCollision* compound = NewtonCreateCompoundCollision (world, 0);
+	NewtonCollision* const compound = NewtonCreateCompoundCollision (world, 0);
 	
 	
 #if 1
@@ -126,13 +126,13 @@ static void MakeFunnyCompound (DemoEntityManager* const scene, const dVector& or
 	for (int i = 0 ; i < 300; i ++) {
 		NewtonCollision* collision = NULL;
 
-		float pitch = (float ((dRand() % 1023)) / 1024.0f) * 2 * 3.1416f;
-		float yaw = (float ((dRand() % 1023)) / 1024.0f) * 2 * 3.1416f;
-		float roll = (float ((dRand() % 1023)) / 1024.0f) * 2 * 3.1416f;
+		float pitch = RandomVariable (1.0f) * 2.0f * 3.1416f;
+		float yaw = RandomVariable (1.0f) * 2.0f * 3.1416f;
+		float roll = RandomVariable (1.0f) * 2.0f * 3.1416f;
 
-		float x = (float ((dRand() % 1023)) / 1024.0f) - 0.5f;
-		float y = (float ((dRand() % 1023)) / 1024.0f) - 0.5f;
-		float z = (float ((dRand() % 1023)) / 1024.0f) - 0.5f;
+		float x = RandomVariable (0.5f);
+		float y = RandomVariable (0.5f);
+		float z = RandomVariable (0.5f);
 		if ((x == 0.0f) && (y == 0.0f) && (z == 0.0f)){
 			x = 0.1f;
 		}

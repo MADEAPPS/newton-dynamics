@@ -66,7 +66,6 @@ NewtonJoint* CheckIfBodiesCollide (NewtonBody* const body0, NewtonBody* const bo
 //dFloat FindFloor (const NewtonWorld* world, dFloat x, dFloat z);
 dVector FindFloor (const NewtonWorld* world, const dVector& origin, dFloat dist);
 
-dFloat RandomVariable(dFloat amp);
 
 void PhysicsBodyDestructor (const NewtonBody* body);
 void PhysicsApplyGravityForce (const NewtonBody* body, dFloat timestep, int threadIndex);

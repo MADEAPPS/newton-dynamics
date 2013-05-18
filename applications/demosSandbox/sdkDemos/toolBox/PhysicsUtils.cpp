@@ -503,16 +503,6 @@ void GetContactOnBody (NewtonBody* const body)
 
 
 
-
-dFloat RandomVariable(dFloat amp)
-{
-	unsigned val;
-	val = dRand() + dRand();
-	return amp * (dFloat (val) / dFloat(dRAND_MAX) - 1.0f) * 0.5f;
-}
-
-
-
 // rigid body destructor
 void  PhysicsBodyDestructor (const NewtonBody* body)
 {
