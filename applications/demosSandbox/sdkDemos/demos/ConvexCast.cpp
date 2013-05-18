@@ -134,6 +134,12 @@ class StupidComplexOfConvexShapes: public DemoEntity
 		m_rayP1 = p1;
 	}
 
+	void ChangeCastingShape()
+	{
+		m_currentCastingShape = (m_currentCastingShape + 1) % m_count;
+		m_castingEntity->SetMesh(m_castingGeometries[m_currentCastingShape]);
+	}
+
 	void SetCastEntityMatrix (DemoEntityManager* const scene, const dMatrix& matrix) const
 	{
 		m_castingEntity->ResetMatrix(*scene, matrix);
@@ -189,6 +195,7 @@ class dConvexCastManager: public CustomControllerManager<dConvexCastRecord>
 	dConvexCastManager(DemoEntityManager* const scene, StupidComplexOfConvexShapes* const stupidLevel)
 		:CustomControllerManager<dConvexCastRecord>(scene->GetNewton(), "dConvexCastManager")
 		,m_helpKey (true)
+		,m_selectShape (true)
 		,m_stupidLevel(stupidLevel)
 	{
 		scene->Set2DDisplayRenderFunction (RenderHelp, this);
@@ -226,6 +233,9 @@ class dConvexCastManager: public CustomControllerManager<dConvexCastRecord>
 		DemoCamera* const camera = scene->GetCamera();
 
 		m_helpKey.UpdatePushButton (mainWindow, 'H');
+		if (m_selectShape.UpdateTriggerButton (mainWindow, ' ')) {
+			m_stupidLevel->ChangeCastingShape();
+		}
 
 		bool buttonState = mainWindow->GetMouseKeyState(1);
 		if (buttonState) {
@@ -258,6 +268,7 @@ class dConvexCastManager: public CustomControllerManager<dConvexCastRecord>
 	}
 
 	DemoEntityManager::ButtonKey m_helpKey;
+	DemoEntityManager::ButtonKey m_selectShape;
 	StupidComplexOfConvexShapes* m_stupidLevel;
 };
 
