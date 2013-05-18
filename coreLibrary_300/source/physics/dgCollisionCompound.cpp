@@ -1788,7 +1788,6 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgCollidingPairCo
 	dgVector boxP0;
 	dgVector boxP1;
 	otherInstance->CalcAABB(matrix, boxP0, boxP1);
-//	dgOOBBTestData data (matrix, p0, p1);
 	dgVector relVeloc (myMatrix.UnrotateVector (otherBody->GetVelocity() - compoundBody->GetVelocity()));
 	dgFastRayTest ray (dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)), relVeloc);
 
@@ -1796,9 +1795,8 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgCollidingPairCo
 	stackPool[0] = m_root;
 	const dgContactMaterial* const material = constraint->GetMaterial();
 
-	dgFloat32 maxParam = dgFloat32 (1.0f);
-
-int xxx = 0;
+	dgFloat32 maxParam = proxy.m_timestep;
+	dgFloat32 invMaxParam = dgFloat32 (1.0f) / maxParam; 
 
 	if (useSimd) {
 		dgAssert (0);
@@ -1811,7 +1809,6 @@ int xxx = 0;
 
 			dgVector minBox (me->m_p0 - boxP1);
 			dgVector maxBox (me->m_p1 - boxP0);
-xxx ++;
 			if (ray.BoxTest (minBox, maxBox)) {
 				if (me->m_type == m_leaf) {
 					dgCollisionInstance* const subShape = me->GetShape();
@@ -1831,27 +1828,34 @@ xxx ++;
 
 							dgInt32 count = m_world->CalculateConvexToConvexContacts (proxy);
 							if (count) {
-								for (dgInt32 i = 0; i < count; i ++) {
-									dgAssert (contacts[contactCount + i].m_collision0 == &childInstance);
-									contacts[contactCount + i].m_collision0 = subShape;
-								}
-								contactCount += count;
-
-								if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
-									contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
-								}
-
 								dgFloat32 param = proxy.m_timestep;
 								dgAssert (param >= dgFloat32 (0.0f));
 								if (param < maxParam) {
+									ray.Reset (param);
+
+									if (contactCount && ((param - maxParam) * invMaxParam) < dgFloat32(-1.0e-3f)) {
+										for (dgInt32 i = 0; i < count; i ++) {
+											contacts[i] = contacts[contactCount + i];
+										}
+										contactCount = 0;
+									}
 									maxParam = param;
+
 									if (maxParam == dgFloat32 (0.0f)) {
 										dgAssert (0);
 										break;
 									}
-									ray.Reset (maxParam);
+									
+									for (dgInt32 i = 0; i < count; i ++) {
+										dgAssert (contacts[contactCount + i].m_collision0 == &childInstance);
+										contacts[contactCount + i].m_collision0 = subShape;
+									}
+									contactCount += count;
 
-									// remember to sort contacts by proximity
+									if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
+										contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
+									}
+								
 								}
 							}
 						}

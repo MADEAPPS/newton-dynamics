@@ -1674,6 +1674,8 @@ dgInt32 dgBroadPhase::ConvexCast (dgCollisionInstance* const shape, const dgMatr
 	dgFloat32 time = dgFloat32 (1.0f);
 	dgFloat32 maxParam = dgFloat32 (1.2f);
 	dgFastRayTest ray (dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)), velocA);
+
+
 	while (stack) {
 		stack --;
 		const dgNode* const node = stackPool[stack];
