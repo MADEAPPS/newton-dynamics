@@ -126,6 +126,11 @@ count = 1;
 		return m_castingShapeArray[m_currentCastingShape];
 	}
 
+	void SetCastEntityMatrix (DemoEntityManager* const scene, const dMatrix& matrix) const 
+	{
+		m_castingEntity->ResetMatrix(*scene, matrix);
+	}
+
 	virtual void Render(dFloat timeStep) const
 	{
 		DemoEntity::Render(timeStep);
@@ -359,6 +364,10 @@ class dConvexCastManager: public CustomControllerManager<dConvexCastRecord>
 			dVector p0 (camera->ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
 			dVector p1 (camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
 
+p1 = dVector (0, 0, 0,0);
+
+
+			// do the convex cast here 
 			dMatrix matrix (GetIdentityMatrix());
 			matrix.m_posit = p0;
 
@@ -367,20 +376,10 @@ class dConvexCastManager: public CustomControllerManager<dConvexCastRecord>
 			NewtonCollision* const shape = m_stupidLevel->GetCurrentShape();
 			int count = NewtonWorldConvexCast (world, &matrix[0][0], &p1[0], shape, &hitParam, NULL, NULL, &info[0], 4, 0);		
 			if (count) {
-				_ASSERTE (0);
-				//matrixB.m_posit += (targetPosit - matrixB.m_posit).Scale (hitParam);
-				//m_castingVisualEntity->m_contactsCount = dMin(count, int (sizeof (m_castingVisualEntity->m_contacts)/sizeof (m_castingVisualEntity->m_contacts[0])));
-				//for (int i = 0; i < m_castingVisualEntity->m_contactsCount; i ++) {
-				//	m_castingVisualEntity->m_normals[i] = dVector (info[i].m_normal[0], info[i].m_normal[1], info[i].m_normal[2], 0.0f);
-				//	m_castingVisualEntity->m_contacts[i] = dVector (info[i].m_point[0], info[i].m_point[1], info[i].m_point[2], 0.0f);
-				//}
+				matrix.m_posit += (p1 - matrix.m_posit).Scale (hitParam);
+				m_stupidLevel->SetCastEntityMatrix (scene, matrix);
 			}
-			//m_castingVisualEntity->ResetMatrix(*scene, matrixB);
-
-
 		}
-
-		// do the convex cast here 
 	}
 
 	DemoEntityManager::ButtonKey m_helpKey;
