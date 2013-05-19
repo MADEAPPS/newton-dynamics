@@ -36,6 +36,9 @@ class NewtonDemos: public wxFrame
 		ID_STATIC_BROADPHASE,
 		ID_HYBRID_BROADPHASE,
 
+		ID_SERIALIZE,
+		ID_DESERIALIZE,
+
 		ID_PLATFORMS,
 		ID_PLATFORMS_MAX = ID_PLATFORMS + 8,
 
@@ -111,12 +114,12 @@ class NewtonDemos: public wxFrame
 	void OnSelectNumberOfMicroThreads(wxCommandEvent& event);
 	void OnSimdInstructions(wxCommandEvent& event);
 
-//	long onNew(FXObject* sender, FXSelector id, void* eventPtr); 
+	void OnNew(wxCommandEvent& event);
+	void OnSerializeWorld(wxCommandEvent& event);
+	void OnDeserializeWorld(wxCommandEvent& event);
+
 //	long onLoad(FXObject* sender, FXSelector id, void* eventPtr); 
 //	long onSave(FXObject* sender, FXSelector id, void* eventPtr); 
-//	long onSerializeWorld(FXObject* sender, FXSelector id, void* eventPtr); 
-//	long onDeserializeWorld(FXObject* sender, FXSelector id, void* eventPtr); 
-//	long onRunDemo(FXObject* sender, FXSelector id, void* eventPtr); 
 
 
 

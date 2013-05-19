@@ -224,6 +224,7 @@ BEGIN_EVENT_TABLE(NewtonDemos, wxFrame)
 	EVT_MENU(wxID_EXIT, NewtonDemos::OnQuit)
 	EVT_MENU(wxID_HELP, NewtonDemos::OnAbout)
 	EVT_MENU(wxID_PREFERENCES, NewtonDemos::OnAbout)
+	EVT_MENU(wxID_NEW, NewtonDemos::OnNew)
 
 	// game menus events
 	EVT_MENU_RANGE(ID_RUN_DEMO, ID_RUN_DEMO_RANGE, NewtonDemos::OnRunDemo)
@@ -249,11 +250,14 @@ BEGIN_EVENT_TABLE(NewtonDemos, wxFrame)
 	EVT_MENU(ID_CONCURRENT_PHYSICS_UPDATE, NewtonDemos::OnRunPhysicsConcurrent)
 	EVT_MENU_RANGE(ID_SELECT_MICROTHREADS, ID_SELECT_MICROTHREADS_COUNT, NewtonDemos::OnSelectNumberOfMicroThreads)
 
-//	FXMAPFUNC(SEL_COMMAND,		NewtonDemos::ID_NEW,								NewtonDemos::onNew),
+	
+	EVT_MENU(ID_SERIALIZE, NewtonDemos::OnSerializeWorld)
+	EVT_MENU(ID_DESERIALIZE, NewtonDemos::OnDeserializeWorld)
+
+
+
 //	FXMAPFUNC(SEL_COMMAND,		NewtonDemos::ID_LOAD,								NewtonDemos::onLoad),
 //	FXMAPFUNC(SEL_COMMAND,		NewtonDemos::ID_SAVE,								NewtonDemos::onSave),
-//	FXMAPFUNC(SEL_COMMAND,		NewtonDemos::ID_SERIALIZE,							NewtonDemos::onSerializeWorld),
-//	FXMAPFUNC(SEL_COMMAND,		NewtonDemos::ID_DESERIALIZE,						NewtonDemos::onDeserializeWorld),
 
 
 END_EVENT_TABLE()
@@ -340,6 +344,10 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 		fileMenu->AppendSeparator();
 		fileMenu->Append(wxID_OPEN, _("&Open"), _("Open visual scene in dScene newton format"));
 		fileMenu->Append(wxID_SAVE, _("&Save"), _("Save visual scene in dScene newton format"));
+
+		fileMenu->AppendSeparator();
+		fileMenu->Append(ID_SERIALIZE, _T("&Serialize"), _T("Serialize scene to binary file"));
+		fileMenu->Append(ID_DESERIALIZE, _T("&Deserialize"), _T("Load previuoslly serialized scame"));
 
 	//	fileMenu->AppendSeparator();
 	//	fileMenu->Append(m_idImportPhysics, _T("&Open physics scene"), _T("Open physics scene in collada format"));
@@ -793,19 +801,49 @@ void NewtonDemos::OnSimdInstructions(wxCommandEvent& event)
 	END_MENU_OPTION();
 }
 
-
-#if 0
-
-long NewtonDemos::onNew(FXObject* sender, FXSelector id, void* eventPtr)
+void NewtonDemos::OnNew (wxCommandEvent& event)
 {
 	BEGIN_MENU_OPTION();
 	m_scene->Cleanup();
 	RestoreSettings ();
 	m_scene->ResetTimer();
 	END_MENU_OPTION();
-	return 1;
 }
 
+
+void NewtonDemos::OnSerializeWorld (wxCommandEvent& event)
+{
+	BEGIN_MENU_OPTION();
+
+	wxFileDialog open (this, _("Export a Newton Dynamics Serialized Physics Scene"), _("../../../media"), _(""), _T("*.bin"));
+	if (open.ShowModal() == wxID_OK) {
+		wxString currentDocPath (open.GetPath());
+		m_scene->SerializedPhysicScene (currentDocPath.c_str());
+	}
+	m_scene->ResetTimer();
+
+	END_MENU_OPTION();
+}
+
+void NewtonDemos::OnDeserializeWorld(wxCommandEvent& event)
+{
+	BEGIN_MENU_OPTION();
+
+	wxFileDialog save (this, _("Import a Newton Dynamics Serialized Physics Scene"), _("../../../media"), _(""), _T("*.bin"));
+	if (save.ShowModal() == wxID_OK) {
+//		m_scene->makeCurrent();
+		wxString currentDocPath (save.GetPath());
+		m_scene->DeserializedPhysicScene (currentDocPath.c_str());
+//		m_scene->makeNonCurrent();
+		RestoreSettings ();
+	}
+
+	m_scene->ResetTimer();
+	END_MENU_OPTION();
+}
+
+
+#if 0
 long NewtonDemos::onLoad(FXObject* sender, FXSelector id, void* eventPtr)
 {
 	BEGIN_MENU_OPTION();
@@ -844,44 +882,6 @@ long NewtonDemos::onLoad(FXObject* sender, FXSelector id, void* eventPtr)
 
 long NewtonDemos::onSave(FXObject* sender, FXSelector id, void* eventPtr)
 {
-	return 1;
-}
-
-
-long NewtonDemos::onSerializeWorld(FXObject* sender, FXSelector id, void* eventPtr)
-{
-	BEGIN_MENU_OPTION();
-
-	const FXchar patterns[]="Newton Dynamics Files (*.bin)";
-	FXFileDialog open(this, "Export a Newton Dynamics Serialized Physics Scene");
-	open.setPatternList(patterns);
-	open.setDirectory ("../../../media");
-	if(open.execute()){
-		m_scene->SerializedPhysicScene (open.getFilename().text());
-	}
-
-	m_scene->ResetTimer();
-	END_MENU_OPTION();
-	return 1;
-}
-
-long NewtonDemos::onDeserializeWorld(FXObject* sender, FXSelector id, void* eventPtr)
-{
-	BEGIN_MENU_OPTION();
-
-	const FXchar patterns[]="Newton Dynamics Files (*.bin)";
-	FXFileDialog open(this, "Import a Newton Dynamics Serialized Physics Scene");
-	open.setPatternList(patterns);
-	open.setDirectory ("../../../media");
-	if(open.execute()){
-		m_scene->makeCurrent();
-		m_scene->DeserializedPhysicScene (open.getFilename().text());
-		m_scene->makeNonCurrent();
-		RestoreSettings ();
-	}
-
-	m_scene->ResetTimer();
-	END_MENU_OPTION();
 	return 1;
 }
 
