@@ -21,7 +21,7 @@
 #define D_PLAYER_MAX_INTERGRATION_STEPS		8
 #define D_PLAYER_MAX_SOLVER_ITERATIONS		16
 
-#define D_PLAYER_USE_CYLINDER_SHAPES
+//#define D_PLAYER_USE_CYLINDER_SHAPES
 
 
 CustomPlayerControllerManager::CustomPlayerControllerManager(NewtonWorld* const world)
@@ -78,12 +78,7 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 	dAssert (shapeHigh > 0.0f);
 	supportShapeMatrix.m_posit = supportShapeMatrix[0].Scale(shapeHigh * 0.5f);
 	supportShapeMatrix.m_posit.m_w = 1.0f;
-	#ifdef D_PLAYER_USE_CYLINDER_SHAPES
-		NewtonCollision* const supportShape = NewtonCreateCylinder(world, m_innerRadio, shapeHigh, 0, &supportShapeMatrix[0][0]);
-	#else 
-		NewtonCollision* const supportShape = NewtonCreateCapsule(world, 0.25f, 0.5f, 0, &supportShapeMatrix[0][0]);
-		NewtonCollisionSetScale(supportShape, shapeHigh * (1.0f), m_innerRadio * 4.0f, m_innerRadio * 4.0f);
-	#endif
+	NewtonCollision* const supportShape = NewtonCreateCylinder(world, m_innerRadio, shapeHigh, 0, &supportShapeMatrix[0][0]);
 
 	// create the outer thick cylinder
 	dMatrix outerShapeMatrix (localAxis);
