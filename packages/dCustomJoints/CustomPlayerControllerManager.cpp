@@ -21,6 +21,8 @@
 #define D_PLAYER_MAX_INTERGRATION_STEPS		8
 #define D_PLAYER_MAX_SOLVER_ITERATIONS		16
 
+#define D_PLAYER_USE_CYLINDER_SHAPES
+
 
 CustomPlayerControllerManager::CustomPlayerControllerManager(NewtonWorld* const world)
 	:CustomControllerManager<CustomPlayerController> (world, PLAYER_PLUGIN_NAME)
@@ -76,9 +78,12 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 	dAssert (shapeHigh > 0.0f);
 	supportShapeMatrix.m_posit = supportShapeMatrix[0].Scale(shapeHigh * 0.5f);
 	supportShapeMatrix.m_posit.m_w = 1.0f;
-	//NewtonCollision* const supportShape = NewtonCreateCylinder(world, m_innerRadios, shapeHigh, 0, &supportShapeMatrix[0][0]);
-	NewtonCollision* const supportShape = NewtonCreateCapsule(world, 0.25f, 0.5f, 0, &supportShapeMatrix[0][0]);
-	NewtonCollisionSetScale(supportShape, shapeHigh, m_innerRadio * 4.0f, m_innerRadio * 4.0f);
+	#ifdef D_PLAYER_USE_CYLINDER_SHAPES
+		NewtonCollision* const supportShape = NewtonCreateCylinder(world, m_innerRadio, shapeHigh, 0, &supportShapeMatrix[0][0]);
+	#else 
+		NewtonCollision* const supportShape = NewtonCreateCapsule(world, 0.25f, 0.5f, 0, &supportShapeMatrix[0][0]);
+		NewtonCollisionSetScale(supportShape, shapeHigh * (1.0f), m_innerRadio * 4.0f, m_innerRadio * 4.0f);
+	#endif
 
 	// create the outer thick cylinder
 	dMatrix outerShapeMatrix (localAxis);
@@ -86,9 +91,12 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 	dAssert (cylinderHeight > 0.0f);
 	outerShapeMatrix.m_posit = outerShapeMatrix[0].Scale(cylinderHeight * 0.5f + stairStep);
 	outerShapeMatrix.m_posit.m_w = 1.0f;
-	//NewtonCollision* const bodyCylinder = NewtonCreateCylinder(world, m_outerRadios, cylinderHeight, 0, &outerShapeMatrix[0][0]);
-	NewtonCollision* const bodyCylinder = NewtonCreateCapsule(world, 0.25f, 0.5f, 0, &outerShapeMatrix[0][0]);
-	NewtonCollisionSetScale(bodyCylinder, cylinderHeight, m_outerRadio * 4.0f, m_outerRadio * 4.0f);
+	#ifdef D_PLAYER_USE_CYLINDER_SHAPES
+		NewtonCollision* const bodyCylinder = NewtonCreateCylinder(world, m_outerRadio, cylinderHeight, 0, &outerShapeMatrix[0][0]);
+	#else
+		NewtonCollision* const bodyCylinder = NewtonCreateCapsule(world, 0.25f, 0.5f, 0, &outerShapeMatrix[0][0]);
+		NewtonCollisionSetScale(bodyCylinder, cylinderHeight, m_outerRadio * 4.0f, m_outerRadio * 4.0f);
+	#endif
 
 	// compound collision player controller
 	NewtonCollision* const playerShape = NewtonCreateCompoundCollision(world, 0);
