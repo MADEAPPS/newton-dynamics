@@ -966,10 +966,12 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 		if (stackSleeping) {
 			for (dgInt32 i = 0; i < count; i ++) {
 				dgBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
-				body->m_netForce = zero;
-				body->m_netTorque = zero;
-				body->m_veloc = zero;
-				body->m_omega = zero;
+				if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+					body->m_netForce = zero;
+					body->m_netTorque = zero;
+					body->m_veloc = zero;
+					body->m_omega = zero;
+				}
 			}
 		} else {
 			if ((maxAccel > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxAccel) ||
@@ -998,11 +1000,13 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 				if (timeScaleSleepCount > world->m_sleepTable[index].m_steps) {
 					for (dgInt32 i = 0; i < count; i ++) {
 						dgBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
-						body->m_netForce = zero;
-						body->m_netTorque = zero;
-						body->m_veloc = zero;
-						body->m_omega = zero;
-						body->m_equilibrium = true;
+						if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+							body->m_netForce = zero;
+							body->m_netTorque = zero;
+							body->m_veloc = zero;
+							body->m_omega = zero;
+							body->m_equilibrium = true;
+						}
 					}
 				} else {
 					sleepCounter ++;
