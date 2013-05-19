@@ -231,7 +231,9 @@ BEGIN_EVENT_TABLE(NewtonDemos, wxFrame)
 
 	EVT_MENU(ID_AUTOSLEEP_MODE,	NewtonDemos::OnAutoSleepMode)
 	EVT_MENU(ID_HIDE_VISUAL_MESHES,	NewtonDemos::OnHideVisualMeshes)
-	EVT_MENU(ID_SHOW_COLLISION_MESH, NewtonDemos::OnShowCollisionLines)
+
+	EVT_MENU_RANGE(ID_SHOW_COLLISION_MESH, ID_SHOW_COLLISION_MESH_RANGE, NewtonDemos::OnShowCollisionLines)
+
 	EVT_MENU(ID_SHOW_CONTACT_POINTS, NewtonDemos::OnShowContactPoints)
 	EVT_MENU(ID_SHOW_NORMAL_FORCES,	NewtonDemos::OnShowNormalForces)
 	EVT_MENU(ID_SHOW_AABB, NewtonDemos::OnShowAABB)
@@ -277,22 +279,21 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	,m_showNormalForces(false)
 //	,m_showNormalForces(true)
 	,m_showAABB(false)
-	,m_debugDisplayState(false)
-//	,m_debugDisplayState(true)
 	,m_concurrentProfilerState(false)
 	,m_threadProfilerState(false)
+	,m_hasJoysticController(false)
 	,m_mousePosX(0)
+	,m_debugDisplayMode(0)
 	,m_mousePosY(0)
 	,m_joytickX(0)
 	,m_joytickY(0)
 	,m_joytickButtonMask(0)
-	,m_hasJoysticController(false)
 	,m_framesCount(0)
-	,m_timestepAcc(0)
-	,m_fps(0.0f)
 	,m_microthreadIndex(0)
 	,m_cpuInstructionsMode(0)
 	,m_broadPhaseMode (0)
+	,m_timestepAcc(0)
+	,m_fps(0.0f)
 {
 	memset (m_profilerTracksMenu, 0, sizeof (m_profilerTracksMenu));
 
@@ -376,8 +377,14 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 		wxMenu* const optionsMenu = new wxMenu;;
 
 		optionsMenu->AppendCheckItem(ID_AUTOSLEEP_MODE, _("Auto sleep mode"), _("toogle auto sleep bodies"));
+
+		optionsMenu->AppendSeparator();
+		optionsMenu->AppendRadioItem(ID_SHOW_COLLISION_MESH, _("Hide collision Mesh"));
+		optionsMenu->AppendRadioItem(ID_SHOW_COLLISION_MESH + 1, _("Show solid collision Mesh"));
+		optionsMenu->AppendRadioItem(ID_SHOW_COLLISION_MESH + 2, _("Show wire frame collision Mesh"));
+
+		optionsMenu->AppendSeparator();
 		optionsMenu->AppendCheckItem(ID_HIDE_VISUAL_MESHES, _("Hide visual meshes"));
-		optionsMenu->AppendCheckItem(ID_SHOW_COLLISION_MESH, _("Show collision Mesh"));
 		optionsMenu->AppendCheckItem(ID_SHOW_CONTACT_POINTS, _("Show contact points"));
 		optionsMenu->AppendCheckItem(ID_SHOW_NORMAL_FORCES, _("Show normal forces"));
 		optionsMenu->AppendCheckItem(ID_SHOW_AABB, _("Show aabb"));
@@ -675,10 +682,8 @@ void NewtonDemos::OnHideVisualMeshes(wxCommandEvent& event)
 void NewtonDemos::OnShowCollisionLines(wxCommandEvent& event)
 {
 	BEGIN_MENU_OPTION();
-
-	m_debugDisplayState = event.IsChecked(); 
-	SetDebugDisplayMode (m_debugDisplayState);
-
+	m_debugDisplayMode = event.GetId() - ID_SHOW_COLLISION_MESH;
+	SetDebugDisplayMode (m_debugDisplayMode);
 	END_MENU_OPTION();
 }
 

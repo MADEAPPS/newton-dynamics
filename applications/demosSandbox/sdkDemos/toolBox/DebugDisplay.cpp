@@ -16,14 +16,14 @@
 #include <DebugDisplay.h>
 
 
-static bool debugMode = false;
+static int debugMode = 0;
 
-bool DebugDisplayOn()
+int DebugDisplayOn()
 {
 	return debugMode;
 }
 
-void SetDebugDisplayMode(bool state)
+void SetDebugDisplayMode(int state)
 {
 	debugMode = state;
 }
@@ -265,9 +265,13 @@ void DebugShowGeometryCollision (void* userData, int vertexCount, const dFloat* 
 			p0 = p1;
 		}
 	} else {
-
 		dVector p0 (faceVertec[0 * 3 + 0], faceVertec[0 * 3 + 1], faceVertec[0 * 3 + 2]);
 		dVector p1 (faceVertec[1 * 3 + 0], faceVertec[1 * 3 + 1], faceVertec[1 * 3 + 2]);
+		dVector p2 (faceVertec[2 * 3 + 0], faceVertec[2 * 3 + 1], faceVertec[2 * 3 + 2]);
+
+		dVector normal ((p1 - p0) * (p2 - p0));
+		normal = normal.Scale (1.0f / dSqrt (normal % normal));
+		glNormal3f(normal.m_x, normal.m_y, normal.m_z);
 		for (int i = 2; i < vertexCount; i ++) {
 			dVector p2 (faceVertec[i * 3 + 0], faceVertec[i * 3 + 1], faceVertec[i * 3 + 2]);
 			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
@@ -281,29 +285,17 @@ void DebugShowGeometryCollision (void* userData, int vertexCount, const dFloat* 
 
 static void DebugShowBodyCollision (const NewtonBody* const body, DEBUG_DRAW_MODE mode)
 {
-
-	if (mode == m_lines) {
-		glBegin(GL_LINES);
-	} else {
-		glBegin(GL_TRIANGLES);
-	}
-
-
 	switch (NewtonBodyGetType(body)) 
 	{
 		case NEWTON_DYNAMIC_BODY:
 		{
-			//dFloat mass;
-			//dFloat Ixx;
-			//dFloat Iyy;
-			//dFloat Izz;
 			int sleepState = NewtonBodyGetSleepState(body);
 			if (sleepState == 1) {
 				// indicate when body is sleeping 
 				glColor3f(0.42f, 0.73f, 0.98f);
 			} else {
 				// body is active
-				glColor3f(1.0f, 1.0f, 1.0f);
+				glColor3f(0.5f, 0.5f, 0.5f);
 			}
 			break;
 		}
@@ -319,25 +311,25 @@ static void DebugShowBodyCollision (const NewtonBody* const body, DEBUG_DRAW_MOD
 	dMatrix matrix;
 	NewtonBodyGetMatrix(body, &matrix[0][0]);
 	NewtonCollisionForEachPolygonDo (NewtonBodyGetCollision(body), &matrix[0][0], DebugShowGeometryCollision, (void*) mode);
-
-	glEnd();
 }
 
 
 void DebugRenderWorldCollision (const NewtonWorld* const world, DEBUG_DRAW_MODE mode)
 {
-	glDisable (GL_LIGHTING);
 	glDisable(GL_TEXTURE_2D);
-	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
-		DebugShowBodyCollision (body, mode);
-	}
-
 	if (mode == m_lines) {
+		glDisable (GL_LIGHTING);
 		glBegin(GL_LINES);
 	} else {
 		glBegin(GL_TRIANGLES);
 	}
+	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
+		DebugShowBodyCollision (body, mode);
+	}
+	glEnd();
 
+	glDisable (GL_LIGHTING);
+	glBegin(GL_LINES);
 	glColor3f(1.0f, 1.0f, 0.0f);
 	for (int i = 0; i < debugDisplayCount; i += 2) {
 		glVertex3f (debugDisplayCallback[i].m_x, debugDisplayCallback[i].m_y, debugDisplayCallback[i].m_z);

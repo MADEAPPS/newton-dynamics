@@ -339,6 +339,14 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	//CreateLevelMesh (scene, "sponza.ngd", true);
 	CreateLevelMesh (scene, "sibenik.ngd", true);
 
+//char xxx[256];
+//GetWorkingFileName ("test.bin", xxx);
+//FILE* const file = fopen (xxx, "rb");
+//dMatrix camMatrix(GetIdentityMatrix());
+//NewtonDeserializeBodyArray(scene->GetNewton(), DemoEntityManager::BodyDeserialization, DemoEntityManager::DeserializeFile, file);
+//fclose (file);
+
+
 	NewtonWorld* const world = scene->GetNewton();
 
 	// create a character controller manager

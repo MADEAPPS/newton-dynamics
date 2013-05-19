@@ -26,7 +26,10 @@ class NewtonDemos: public wxFrame
 
 		ID_AUTOSLEEP_MODE,
 		ID_HIDE_VISUAL_MESHES,
+
 		ID_SHOW_COLLISION_MESH,
+		ID_SHOW_COLLISION_MESH_RANGE = ID_SHOW_COLLISION_MESH + 4,
+
 		ID_SHOW_CONTACT_POINTS,
 		ID_SHOW_NORMAL_FORCES,
 		ID_SHOW_AABB,
@@ -136,23 +139,23 @@ class NewtonDemos: public wxFrame
 	bool m_showContactPoints;
 	bool m_showNormalForces;
 	bool m_showAABB;
-	bool m_debugDisplayState;
 	bool m_concurrentProfilerState;
 	bool m_threadProfilerState;
+	bool m_hasJoysticController;
 
+	int m_debugDisplayMode;
 	int m_mousePosX;
 	int m_mousePosY;
 	int m_joytickX;
 	int m_joytickY;
 	int m_joytickButtonMask;
-	bool m_hasJoysticController;
-
 	int m_framesCount;
-	float m_timestepAcc;
-	float m_fps;
 	int m_microthreadIndex;
 	int m_cpuInstructionsMode;
 	int m_broadPhaseMode;
+	float m_timestepAcc;
+	float m_fps;
+
 
 	int m_key[512];
 	int m_keyMap[512];

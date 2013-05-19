@@ -784,12 +784,9 @@ void DemoEntityManager::RenderFrame ()
 
 
 	//	DEBUG_DRAW_MODE mode = m_solid;
-	DEBUG_DRAW_MODE mode = m_lines;
-	if (m_mainWindow->m_debugDisplayState) {
-		//glDisable (GL_LIGHTING);
-		glDisable(GL_TEXTURE_2D);
+	if (m_mainWindow->m_debugDisplayMode) {
+		DEBUG_DRAW_MODE mode = (m_mainWindow->m_debugDisplayMode == 1) ? m_solid : m_lines;
 		DebugRenderWorldCollision (GetNewton(), mode);
-		glEnd();
 	}
 
 	if (m_renderHood) {

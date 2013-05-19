@@ -24,8 +24,8 @@ enum DEBUG_DRAW_MODE
 	m_solid,
 };
 
-bool DebugDisplayOn();
-void SetDebugDisplayMode(bool state);
+int DebugDisplayOn();
+void SetDebugDisplayMode(int state);
 
 void RenderAABB (NewtonWorld* const world);
 void RenderNormalForces (NewtonWorld* const world);
