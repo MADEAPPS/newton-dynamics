@@ -91,8 +91,29 @@ class dgBigVector;
 // 128 bit single precision vector class declaration
 //
 // *****************************************************************************************
+
 DG_MSC_VECTOR_ALIGMENT
 class dgVector: public dgTemplateVector<dgFloat32>
+{
+	public:
+	DG_INLINE dgVector();
+	DG_INLINE dgVector(const dgSimd& val);
+
+	DG_INLINE dgVector (const dgTemplateVector<dgFloat32>& v);
+	DG_INLINE dgVector (const dgFloat32* const ptr);
+	DG_INLINE dgVector (dgFloat32 x, dgFloat32 y, dgFloat32 z, dgFloat32 w); 
+    DG_INLINE dgVector (const dgBigVector& copy); 
+
+	DG_INLINE dgVector operator= (const dgSimd& val);
+
+	DG_INLINE dgFloat32 DotProductSimd (const dgVector& A) const;
+	DG_INLINE dgVector CrossProductSimd (const dgVector &A) const;
+	DG_INLINE dgVector CompProductSimd (const dgVector &A) const;
+}DG_GCC_VECTOR_ALIGMENT;
+
+/*
+DG_MSC_VECTOR_ALIGMENT
+class dgVector
 {
 	public:
 	dgVector();
@@ -101,7 +122,7 @@ class dgVector: public dgTemplateVector<dgFloat32>
 	dgVector (const dgTemplateVector<dgFloat32>& v);
 	dgVector (const dgFloat32* const ptr);
 	dgVector (dgFloat32 x, dgFloat32 y, dgFloat32 z, dgFloat32 w); 
-    dgVector (const dgBigVector& copy); 
+	dgVector (const dgBigVector& copy); 
 
 	dgVector operator= (const dgSimd& val);
 
@@ -109,7 +130,14 @@ class dgVector: public dgTemplateVector<dgFloat32>
 	dgVector CrossProductSimd (const dgVector &A) const;
 	dgVector CompProductSimd (const dgVector &A) const;
 
-}DG_GCC_VECTOR_ALIGMENT;
+	DG_CLASS_ALLOCATOR(allocator)
+
+	dgFloat32 m_x;
+	dgFloat32 m_y;
+	dgFloat32 m_z;
+	dgFloat32 m_w;
+} DG_GCC_VECTOR_ALIGMENT;
+*/
 
 // *****************************************************************************************
 //
@@ -137,21 +165,21 @@ template<class T>
 dgTemplateVector<T>::dgTemplateVector () {}
 
 template<class T>
-dgTemplateVector<T>::dgTemplateVector (const T* const ptr)
+DG_INLINE dgTemplateVector<T>::dgTemplateVector (const T* const ptr)
 	:m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w (0.0f)
 {
 //	dgAssert (dgCheckVector ((*this)));
 }
 
 template<class T>
-dgTemplateVector<T>::dgTemplateVector (T x, T y, T z, T w) 
+DG_INLINE dgTemplateVector<T>::dgTemplateVector (T x, T y, T z, T w) 
 	:m_x(x), m_y(y), m_z(z), m_w (w)
 {
 }
 
 
 template<class T>
-T& dgTemplateVector<T>::operator[] (dgInt32 i)
+DG_INLINE T& dgTemplateVector<T>::operator[] (dgInt32 i)
 {
 	dgAssert (i < 4);
 	dgAssert (i >= 0);
@@ -159,7 +187,7 @@ T& dgTemplateVector<T>::operator[] (dgInt32 i)
 }	
 
 template<class T>
-const T& dgTemplateVector<T>::operator[] (dgInt32 i) const
+DG_INLINE const T& dgTemplateVector<T>::operator[] (dgInt32 i) const
 {
 	dgAssert (i < 4);
 	dgAssert (i >= 0);
@@ -167,26 +195,26 @@ const T& dgTemplateVector<T>::operator[] (dgInt32 i) const
 }
 
 template<class T>
-dgTemplateVector<T> dgTemplateVector<T>::Scale (T scale) const
+DG_INLINE dgTemplateVector<T> dgTemplateVector<T>::Scale (T scale) const
 {
 	return dgTemplateVector<T> (m_x * scale, m_y * scale, m_z * scale, m_w);
 }
 
 template<class T>
-dgTemplateVector<T> dgTemplateVector<T>::Scale4 (T scale) const
+DG_INLINE dgTemplateVector<T> dgTemplateVector<T>::Scale4 (T scale) const
 {
 	return dgTemplateVector<T> (m_x * scale, m_y * scale, m_z * scale, m_w * scale);
 }
 
 
 template<class T>
-dgTemplateVector<T> dgTemplateVector<T>::operator+ (const dgTemplateVector<T> &B) const
+DG_INLINE dgTemplateVector<T> dgTemplateVector<T>::operator+ (const dgTemplateVector<T> &B) const
 {
 	return dgTemplateVector<T> (m_x + B.m_x, m_y + B.m_y, m_z + B.m_z, m_w);
 }
 
 template<class T>
-dgTemplateVector<T>& dgTemplateVector<T>::operator+= (const dgTemplateVector<T> &A) 
+DG_INLINE dgTemplateVector<T>& dgTemplateVector<T>::operator+= (const dgTemplateVector<T> &A) 
 {
 	m_x += A.m_x;
 	m_y += A.m_y;
@@ -196,13 +224,13 @@ dgTemplateVector<T>& dgTemplateVector<T>::operator+= (const dgTemplateVector<T> 
 }
 
 template<class T>
-dgTemplateVector<T> dgTemplateVector<T>::operator- (const dgTemplateVector<T> &A) const
+DG_INLINE dgTemplateVector<T> dgTemplateVector<T>::operator- (const dgTemplateVector<T> &A) const
 {
 	return dgTemplateVector<T> (m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w);
 }
 
 template<class T>
-dgTemplateVector<T>& dgTemplateVector<T>::operator-= (const dgTemplateVector<T> &A) 
+DG_INLINE dgTemplateVector<T>& dgTemplateVector<T>::operator-= (const dgTemplateVector<T> &A) 
 {
 	m_x -= A.m_x;
 	m_y -= A.m_y;
@@ -213,14 +241,14 @@ dgTemplateVector<T>& dgTemplateVector<T>::operator-= (const dgTemplateVector<T> 
 
 
 template<class T>
-T dgTemplateVector<T>::operator% (const dgTemplateVector<T> &A) const
+DG_INLINE T dgTemplateVector<T>::operator% (const dgTemplateVector<T> &A) const
 {
 	return m_x * A.m_x + m_y * A.m_y + m_z * A.m_z;
 }
 
 
 template<class T>
-dgTemplateVector<T> dgTemplateVector<T>::operator* (const dgTemplateVector<T> &B) const
+DG_INLINE dgTemplateVector<T> dgTemplateVector<T>::operator* (const dgTemplateVector<T> &B) const
 {
 	return dgTemplateVector<T> (m_y * B.m_z - m_z * B.m_y,
  							    m_z * B.m_x - m_x * B.m_z,
@@ -228,13 +256,13 @@ dgTemplateVector<T> dgTemplateVector<T>::operator* (const dgTemplateVector<T> &B
 }
 
 template<class T>
-dgTemplateVector<T> dgTemplateVector<T>::Add4 (const dgTemplateVector &A) const
+DG_INLINE dgTemplateVector<T> dgTemplateVector<T>::Add4 (const dgTemplateVector &A) const
 {
 	return dgTemplateVector<T> (m_x + A.m_x, m_y + A.m_y, m_z + A.m_z, m_w + A.m_w);
 }
 
 template<class T>
-dgTemplateVector<T> dgTemplateVector<T>::Sub4 (const dgTemplateVector &A) const
+DG_INLINE dgTemplateVector<T> dgTemplateVector<T>::Sub4 (const dgTemplateVector &A) const
 {
 	return dgTemplateVector<T> (m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w - A.m_w);
 }
@@ -242,13 +270,13 @@ dgTemplateVector<T> dgTemplateVector<T>::Sub4 (const dgTemplateVector &A) const
 
 // return dot 4d dot product
 template<class T>
-T dgTemplateVector<T>::DotProduct4 (const dgTemplateVector &A) const
+DG_INLINE T dgTemplateVector<T>::DotProduct4 (const dgTemplateVector &A) const
 {
 	return m_x * A.m_x + m_y * A.m_y + m_z * A.m_z + m_w * A.m_w;
 }
 
 template<class T>
-dgTemplateVector<T> dgTemplateVector<T>::CrossProduct4 (const dgTemplateVector &A, const dgTemplateVector &B) const
+DG_INLINE dgTemplateVector<T> dgTemplateVector<T>::CrossProduct4 (const dgTemplateVector &A, const dgTemplateVector &B) const
 {
 	T cofactor[3][3];
 	T array[4][4];
@@ -289,13 +317,13 @@ dgTemplateVector<T> dgTemplateVector<T>::CrossProduct4 (const dgTemplateVector &
 
 
 template<class T>
-dgTemplateVector<T> dgTemplateVector<T>::CompProduct (const dgTemplateVector<T> &A) const
+DG_INLINE dgTemplateVector<T> dgTemplateVector<T>::CompProduct (const dgTemplateVector<T> &A) const
 {
 	return dgTemplateVector<T> (m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, A.m_w);
 }
 
 template<class T>
-dgTemplateVector<T> dgTemplateVector<T>::CompProduct4 (const dgTemplateVector<T> &A) const
+DG_INLINE dgTemplateVector<T> dgTemplateVector<T>::CompProduct4 (const dgTemplateVector<T> &A) const
 {
 	return dgTemplateVector<T> (m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, m_w * A.m_w);
 }
