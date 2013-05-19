@@ -864,7 +864,6 @@ void dgBroadPhase::ImproveFitness()
 
 void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, dgInt32 threadID)
 {
-
 	dgAssert ((body0->GetInvMass().m_w != dgFloat32 (0.0f)) || (body1->GetInvMass().m_w != dgFloat32 (0.0f)) || (body0->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI)) || (body1->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI)));
 
 	// add all pairs 
@@ -1213,6 +1212,19 @@ void dgBroadPhase::UpdateSoftBodyForcesKernel (void* const context, void* const 
 	broadPhase->UpdateSoftBodyForcesKernel (descriptor, threadID);
 }
 
+bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* const body1) const
+{
+//	dgInt32 test1 = (-dgOverlapTestSimd (body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) >> 4) &
+//					!((body0->IsRTTIType (dgBody::m_kinematicBodyRTTI) && body1->m_invMass.m_w) || (body1->IsRTTIType (dgBody::m_kinematicBodyRTTI) && body0->m_invMass.m_w)) &
+//					!(body1->m_collision->IsType (dgCollision::dgCollisionNull_RTTI) | body0->m_collision->IsType (dgCollision::dgCollisionNull_RTTI)) &
+//					!(body0->GetSleepState() & body1->GetSleepState()) & 1;
+
+	return ( (-dgOverlapTestSimd (body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB)) >> 4) &
+		     (!body0->IsRTTIType (dgBody::m_kinematicBodyRTTI) || body1->m_invMass.m_w) & 
+			 (!body1->IsRTTIType (dgBody::m_kinematicBodyRTTI) || body0->m_invMass.m_w) &
+			 !(body1->m_collision->IsType (dgCollision::dgCollisionNull_RTTI) | body0->m_collision->IsType (dgCollision::dgCollisionNull_RTTI)) &
+		     !(body0->GetSleepState() & body1->GetSleepState()) & 1;
+}
 
 void dgBroadPhase::SubmitPairsStatic (dgNode* const bodyNode, dgNode* const node, dgInt32 threadID)
 {
@@ -1233,13 +1245,17 @@ void dgBroadPhase::SubmitPairsStatic (dgNode* const bodyNode, dgNode* const node
 				if (!rootNode->m_left) {
 					dgAssert (!rootNode->m_right);
 					dgBody* const body1 = rootNode->m_body;
-					if (dgOverlapTest(body1->m_minAABB, body1->m_maxAABB, body0->m_minAABB, body0->m_maxAABB)) {
-						if (!body1->m_collision->IsType (dgCollision::dgCollisionNull_RTTI)) {
-							if (!(body0->GetSleepState() & body1->GetSleepState())) { 
-								AddPair (body0, body1, threadID);
-							}
-						}
+//					if (dgOverlapTest(body1->m_minAABB, body1->m_maxAABB, body0->m_minAABB, body0->m_maxAABB)) {
+//						if (!body1->m_collision->IsType (dgCollision::dgCollisionNull_RTTI)) {
+//							if (!(body0->GetSleepState() & body1->GetSleepState())) { 
+//								AddPair (body0, body1, threadID);
+//							}
+//						}
+//					}
+					if (TestOverlaping (body0, body1)) {
+						AddPair (body0, body1, threadID);
 					}
+
 				} else {
 					pool[stack] = rootNode->m_left;
 					stack ++;
@@ -1333,13 +1349,15 @@ void dgBroadPhase::FindCollidingPairsDynamics (dgBroadphaseSyncDescriptor* const
 					if (left->m_body && right->m_body) {
 						dgBody* const body0 = left->m_body;
 						dgBody* const body1 = right->m_body;
-						dgInt32 test = (-dgOverlapTestSimd (body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) >> 4) &
-									   !(body1->m_collision->IsType (dgCollision::dgCollisionNull_RTTI) | body0->m_collision->IsType (dgCollision::dgCollisionNull_RTTI)) &
-									   !(body0->GetSleepState() & body1->GetSleepState());
-						if (test & 1) {
+//						dgInt32 test = (-dgOverlapTestSimd (body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) >> 4) &
+//									   !(body1->m_collision->IsType (dgCollision::dgCollisionNull_RTTI) | body0->m_collision->IsType (dgCollision::dgCollisionNull_RTTI)) &
+//									   !(body0->GetSleepState() & body1->GetSleepState());
+//						if (test & 1) {
+//							AddPair (body0, body1, threadID);
+//						}
+						if (TestOverlaping (body0, body1)) {
 							AddPair (body0, body1, threadID);
 						}
-
 
 					} else if (!(left->m_body || right->m_body)) {
 
@@ -1428,12 +1446,16 @@ void dgBroadPhase::FindCollidingPairsDynamics (dgBroadphaseSyncDescriptor* const
 //								}
 //							}
 //						}
-						dgInt32 test = (-dgOverlapTest(body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) >> 4) &
-										!(body1->m_collision->IsType (dgCollision::dgCollisionNull_RTTI) | body0->m_collision->IsType (dgCollision::dgCollisionNull_RTTI)) &
-										!(body0->GetSleepState() & body1->GetSleepState());
-						if (test & 1) {
+//						dgInt32 test = (-dgOverlapTest(body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) >> 4) &
+//										!(body1->m_collision->IsType (dgCollision::dgCollisionNull_RTTI) | body0->m_collision->IsType (dgCollision::dgCollisionNull_RTTI)) &
+//										!(body0->GetSleepState() & body1->GetSleepState());
+//						if (test & 1) {
+//							AddPair (body0, body1, threadID);
+//						}
+						if (TestOverlaping (body0, body1)) {
 							AddPair (body0, body1, threadID);
 						}
+
 					} else if (!(left->m_body || right->m_body)) {
 
 						if (dgOverlapTest (left->m_left->m_minBox, left->m_left->m_maxBox, right->m_left->m_minBox, right->m_left->m_maxBox)) { 

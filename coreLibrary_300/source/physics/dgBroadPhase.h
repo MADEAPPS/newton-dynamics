@@ -129,6 +129,8 @@ class dgBroadPhase
 
 	void KinematicBodyActivation (dgContact* const contatJoint) const;
 
+	bool TestOverlaping (const dgBody* const body0, const dgBody* const body1) const;
+
 	dgWorld* m_world;
 	dgNode* m_rootNode;
 	dgUnsigned32 m_lru;

@@ -854,7 +854,8 @@ void AddPrimitiveArray (DemoEntityManager* const scene, dFloat mass, const dVect
 
 	DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
-	dFloat startElevation = 1000.0f;
+	//dFloat startElevation = 1000.0f;
+	dFloat startElevation = 20.0f;
 
 	dMatrix matrix (GetIdentityMatrix());
 	for (int i = 0; i < xCount; i ++) {

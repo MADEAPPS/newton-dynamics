@@ -111,7 +111,7 @@ class BasicPlayerControllerManager: public CustomPlayerControllerManager
 		:CustomPlayerControllerManager (world)
 		,m_player (NULL) 
 		,m_shotProp(true)
-		,m_cameraMode(true)
+		,m_cameraMode(false)
 	{
 		// hook a callback for 2d help display
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
@@ -335,9 +335,9 @@ void BasicPlayerController (DemoEntityManager* const scene)
 
 	//CreateLevelMesh (scene, "flatPlane.ngd", true);
 	//CreateLevelMesh (scene, "playground.ngd", true);
-	CreateLevelMesh (scene, "castle.ngd", true);
+	//CreateLevelMesh (scene, "castle.ngd", true);
 	//CreateLevelMesh (scene, "sponza.ngd", true);
-	//CreateLevelMesh (scene, "sibenik.ngd", true);
+	CreateLevelMesh (scene, "sibenik.ngd", true);
 
 	NewtonWorld* const world = scene->GetNewton();
 
@@ -355,7 +355,8 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	// set as the player with the camera
 	manager->SetAsPlayer(player);
 
-	dVector origin (-10.0f, 2.0f, 0.0f, 0.0f);
+	
+
 
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 	location.m_posit.m_x += 5.0f;
@@ -364,6 +365,7 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	dMatrix shapeOffsetMatrix (GetIdentityMatrix());
 	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 
+	dVector origin (-10.0f, 2.0f, 0.0f, 0.0f);
 	dQuaternion rot;
 	scene->SetCameraMatrix(rot, origin);
 }

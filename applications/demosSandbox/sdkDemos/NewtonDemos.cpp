@@ -50,8 +50,8 @@
 //#define DEFAULT_SCENE	24			// continue collision
 //#define DEFAULT_SCENE	25			// puck slide continue collision
 //#define DEFAULT_SCENE	26			// basic car
-//#define DEFAULT_SCENE	27			// player controller
-#define DEFAULT_SCENE	28			// advanced player controller
+#define DEFAULT_SCENE	27			// player controller
+//#define DEFAULT_SCENE	28			// advanced player controller
 //#define DEFAULT_SCENE	29			// cloth patch			
 //#define DEFAULT_SCENE	30			// soft bodies			
 //#define DEFAULT_SCENE	31			// high performance super car
