@@ -85,6 +85,12 @@ class dgTemplateVector
 
 class dgBigVector;
 
+
+// *****************************************************************************************
+//
+// 128 bit single precision vector class declaration
+//
+// *****************************************************************************************
 DG_MSC_VECTOR_ALIGMENT
 class dgVector: public dgTemplateVector<dgFloat32>
 {
@@ -105,6 +111,11 @@ class dgVector: public dgTemplateVector<dgFloat32>
 
 }DG_GCC_VECTOR_ALIGMENT;
 
+// *****************************************************************************************
+//
+// 256 bit double precision vector class declaration
+//
+// *****************************************************************************************
 DG_MSC_VECTOR_ALIGMENT
 class dgBigVector: public dgTemplateVector<dgFloat64>
 {
@@ -118,7 +129,6 @@ class dgBigVector: public dgTemplateVector<dgFloat64>
 #endif
 	dgBigVector (dgFloat64 x, dgFloat64 y, dgFloat64 z, dgFloat64 w); 
 } DG_GCC_VECTOR_ALIGMENT;
-
 
 
 
@@ -292,80 +302,11 @@ dgTemplateVector<T> dgTemplateVector<T>::CompProduct4 (const dgTemplateVector<T>
 
 
 
-DG_INLINE dgVector::dgVector()
-	:dgTemplateVector<dgFloat32>()
-{
-}
-
-DG_INLINE dgVector::dgVector (const dgTemplateVector<dgFloat32>& v)
-	:dgTemplateVector<dgFloat32>(v)
-{
-	dgAssert (dgCheckVector ((*this)));
-}
-
-DG_INLINE dgVector::dgVector (const dgFloat32 *ptr)
-	:dgTemplateVector<dgFloat32>(ptr)
-{
-	dgAssert (dgCheckVector ((*this)));
-}
-
-DG_INLINE dgVector::dgVector (const dgBigVector& copy)
-	:dgTemplateVector<dgFloat32>(dgFloat32 (copy.m_x), dgFloat32 (copy.m_y), dgFloat32 (copy.m_z), dgFloat32 (copy.m_w))
-{
-	dgAssert (dgCheckVector ((*this)));
-}
-
-DG_INLINE dgVector::dgVector(const dgSimd& val)
-#ifndef _MSC_VER
-	// for GCC only
-	:dgTemplateVector<dgFloat32>(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
-#endif
-{
-	dgAssert ((dgUnsigned64(this) & 0x0f) == 0);
-	(dgSimd&) *this = val;
-	dgAssert (dgCheckVector ((*this)));
-}
-/*
-DG_INLINE dgVector::dgVector(const simd_256& val)
-{
-	*this = (dgVector&) val;
-	dgAssert (dgCheckVector ((*this)));
-}
-*/
-
-DG_INLINE dgVector dgVector::operator= (const dgSimd& val)
-{
-	(dgSimd&)*this = val;
-	return *this;
-}
-
-
-
-DG_INLINE dgVector::dgVector (dgFloat32 x, dgFloat32 y, dgFloat32 z, dgFloat32 w) 
-	:dgTemplateVector<dgFloat32>(x, y, z, w)
-{
-	dgAssert (dgCheckVector ((*this)));
-}
-
-DG_INLINE dgFloat32 dgVector::DotProductSimd (const dgVector& A) const
-{
-	dgFloat32 dot;
-	dgSimd temp (((dgSimd&)*this).DotProduct((dgSimd&)A));
-	temp.StoreScalar (&dot);
-	return dot;
-}
-
-DG_INLINE dgVector dgVector::CrossProductSimd (const dgVector &e10) const
-{
-	return ((dgSimd&)*this).CrossProduct((dgSimd&)e10);
-}
-
-
-DG_INLINE dgVector dgVector::CompProductSimd (const dgVector &A) const
-{
-	return ((dgSimd&)*this) * (dgSimd&)A;
-}
-
+// *****************************************************************************************
+//
+// 256 bit double precision vector class implementation
+//
+// *****************************************************************************************
 DG_INLINE dgBigVector::dgBigVector()
 	:dgTemplateVector<dgFloat64>()
 {
@@ -401,6 +342,78 @@ DG_INLINE dgBigVector::dgBigVector (dgFloat64 x, dgFloat64 y, dgFloat64 z, dgFlo
 	:dgTemplateVector<dgFloat64>(x, y, z, w)
 {
 	dgAssert (dgCheckVector ((*this)));
+}
+
+
+// *****************************************************************************************
+//
+// 128 bit single precision vector class implementation
+//
+// *****************************************************************************************
+DG_INLINE dgVector::dgVector()
+	:dgTemplateVector<dgFloat32>()
+{
+}
+
+DG_INLINE dgVector::dgVector (const dgTemplateVector<dgFloat32>& v)
+	:dgTemplateVector<dgFloat32>(v)
+{
+	dgAssert (dgCheckVector ((*this)));
+}
+
+DG_INLINE dgVector::dgVector (const dgFloat32 *ptr)
+	:dgTemplateVector<dgFloat32>(ptr)
+{
+	dgAssert (dgCheckVector ((*this)));
+}
+
+DG_INLINE dgVector::dgVector (const dgBigVector& copy)
+	:dgTemplateVector<dgFloat32>(dgFloat32 (copy.m_x), dgFloat32 (copy.m_y), dgFloat32 (copy.m_z), dgFloat32 (copy.m_w))
+{
+	dgAssert (dgCheckVector ((*this)));
+}
+
+DG_INLINE dgVector::dgVector(const dgSimd& val)
+#ifndef _MSC_VER
+	// for GCC only
+	:dgTemplateVector<dgFloat32>(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
+#endif
+{
+	dgAssert ((dgUnsigned64(this) & 0x0f) == 0);
+	(dgSimd&) *this = val;
+	dgAssert (dgCheckVector ((*this)));
+}
+
+
+DG_INLINE dgVector dgVector::operator= (const dgSimd& val)
+{
+	(dgSimd&)*this = val;
+	return *this;
+}
+
+DG_INLINE dgVector::dgVector (dgFloat32 x, dgFloat32 y, dgFloat32 z, dgFloat32 w) 
+	:dgTemplateVector<dgFloat32>(x, y, z, w)
+{
+	dgAssert (dgCheckVector ((*this)));
+}
+
+DG_INLINE dgFloat32 dgVector::DotProductSimd (const dgVector& A) const
+{
+	dgFloat32 dot;
+	dgSimd temp (((dgSimd&)*this).DotProduct((dgSimd&)A));
+	temp.StoreScalar (&dot);
+	return dot;
+}
+
+DG_INLINE dgVector dgVector::CrossProductSimd (const dgVector &e10) const
+{
+	return ((dgSimd&)*this).CrossProduct((dgSimd&)e10);
+}
+
+
+DG_INLINE dgVector dgVector::CompProductSimd (const dgVector &A) const
+{
+	return ((dgSimd&)*this) * (dgSimd&)A;
 }
 
 
