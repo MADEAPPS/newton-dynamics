@@ -86,13 +86,13 @@ class dgTemplateVector
 		m_x += A.m_x;
 		m_y += A.m_y;
 		m_z += A.m_z;
-		//	dgAssert (dgCheckVector ((*this)));
+		m_w += A.m_w;
 		return *this;
 	}
 
 	DG_INLINE dgTemplateVector<T> operator- (const dgTemplateVector<T> &A) const
 	{
-		return dgTemplateVector<T> (m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w);
+		return dgTemplateVector<T> (m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w - A.m_w);
 	}
 
 	DG_INLINE dgTemplateVector<T>& operator-= (const dgTemplateVector<T> &A) 
@@ -100,7 +100,6 @@ class dgTemplateVector
 		m_x -= A.m_x;
 		m_y -= A.m_y;
 		m_z -= A.m_z;
-		//	dgAssert (dgCheckVector ((*this)));
 		return *this;
 	}
 
@@ -114,8 +113,8 @@ class dgTemplateVector
 	DG_INLINE dgTemplateVector<T> operator* (const dgTemplateVector<T> &B) const
 	{
 		return dgTemplateVector<T> (m_y * B.m_z - m_z * B.m_y,
-			m_z * B.m_x - m_x * B.m_z,
-			m_x * B.m_y - m_y * B.m_x, m_w);
+									m_z * B.m_x - m_x * B.m_z,
+									m_x * B.m_y - m_y * B.m_x, m_w);
 	}
 
 	DG_INLINE dgTemplateVector<T> Add4 (const dgTemplateVector &A) const
@@ -480,8 +479,6 @@ class dgVector
 
 	DG_INLINE dgVector operator+ (const dgVector &A) const
 	{
-//		dgVector tmp (A & m_triplexMask);
-//		return _mm_add_ps (m_type, tmp.m_type);	
 		return _mm_add_ps (m_type, A.m_type);	
 	}
 
@@ -492,8 +489,7 @@ class dgVector
 
 	DG_INLINE dgVector operator- (const dgVector &A) const 
 	{
-		dgVector tmp (A & m_triplexMask);
-		return _mm_sub_ps (m_type, tmp.m_type);	
+		return _mm_sub_ps (m_type, A.m_type);	
 	}
 
 	DG_INLINE dgVector Sub4 (const dgVector &A) const
@@ -503,15 +499,13 @@ class dgVector
 
 	DG_INLINE dgVector &operator+= (const dgVector &A)
 	{
-		dgVector tmp (A & m_triplexMask);
-		m_type = _mm_add_ps (m_type, tmp.m_type);
+		m_type = _mm_add_ps (m_type, A.m_type);
 		return *this;
 	}
 
 	DG_INLINE dgVector &operator-= (const dgVector &A)
 	{
-		dgVector tmp (A & m_triplexMask);
-		m_type = _mm_sub_ps (m_type, tmp.m_type);
+		m_type = _mm_sub_ps (m_type, A.m_type);
 		return *this;
 	}
 
@@ -668,13 +662,6 @@ class dgVector
 	static dgVector m_triplexMask;
 } DG_GCC_VECTOR_ALIGMENT;
 
-
-
 #endif
-
-
-
-
-
 #endif
 
