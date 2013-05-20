@@ -871,9 +871,9 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 					dgAssert (row->m_Jt.m_jacobianM1.m_angular.m_w == dgFloat32 (0.0f));
 
 					dgVector JMinvJacobianLinearM0 (row->m_Jt.m_jacobianM0.m_linear.Scale4 (invMass0));
-					dgVector JMinvJacobianAngularM0 (invInertia0.UnrotateVector (row->m_Jt.m_jacobianM0.m_angular));
+					dgVector JMinvJacobianAngularM0 (invInertia0.RotateVector (row->m_Jt.m_jacobianM0.m_angular));
 					dgVector JMinvJacobianLinearM1 (row->m_Jt.m_jacobianM1.m_linear.Scale4 (invMass1));
-					dgVector JMinvJacobianAngularM1 (invInertia1.UnrotateVector (row->m_Jt.m_jacobianM1.m_angular));
+					dgVector JMinvJacobianAngularM1 (invInertia1.RotateVector (row->m_Jt.m_jacobianM1.m_angular));
 
 					dgVector a (JMinvJacobianLinearM0.CompProduct4(linearM0) + JMinvJacobianAngularM0.CompProduct4(angularM0) + JMinvJacobianLinearM1.CompProduct4(linearM1) + JMinvJacobianAngularM1.CompProduct4(angularM1));
 
