@@ -1841,10 +1841,6 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgCollidingPairCo
 									}
 									maxParam = param;
 
-									if (maxParam == dgFloat32 (0.0f)) {
-										dgAssert (0);
-										break;
-									}
 									
 									for (dgInt32 i = 0; i < count; i ++) {
 										dgAssert (contacts[contactCount + i].m_collision0 == &childInstance);
@@ -1855,7 +1851,10 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgCollidingPairCo
 									if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
 										contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
 									}
-								
+
+									if (maxParam == dgFloat32 (0.0f)) {
+										break;
+									}
 								}
 							}
 						}

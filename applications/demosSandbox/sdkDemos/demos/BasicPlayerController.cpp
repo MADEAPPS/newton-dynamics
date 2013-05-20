@@ -333,11 +333,11 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	// load the sky box
 	scene->CreateSkyBox();
 
-	//CreateLevelMesh (scene, "flatPlane.ngd", true);
+	CreateLevelMesh (scene, "flatPlane.ngd", true);
 	//CreateLevelMesh (scene, "playground.ngd", true);
 	//CreateLevelMesh (scene, "castle.ngd", true);
 	//CreateLevelMesh (scene, "sponza.ngd", true);
-	CreateLevelMesh (scene, "sibenik.ngd", true);
+	//CreateLevelMesh (scene, "sibenik.ngd", true);
 
 //char xxx[256];
 //GetWorkingFileName ("test.bin", xxx);
