@@ -334,7 +334,7 @@ namespace InternalSphere
 
 
 dgSphere::dgSphere ()
-	:dgMatrix(dgGetIdentityMatrix()), m_size (0, 0, 0, 0)
+	:dgMatrix(dgGetIdentityMatrix()), m_size (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
 {
 //	dgAssert (0);
 //	planeTest = FrontTest;

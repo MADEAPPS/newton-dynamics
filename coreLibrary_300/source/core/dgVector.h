@@ -78,7 +78,7 @@ class dgTemplateVector
 
 	DG_INLINE dgTemplateVector<T> operator+ (const dgTemplateVector<T> &B) const
 	{
-		return dgTemplateVector<T> (m_x + B.m_x, m_y + B.m_y, m_z + B.m_z, m_w);
+		return dgTemplateVector<T> (m_x + B.m_x, m_y + B.m_y, m_z + B.m_z, m_w + B.m_w);
 	}
 
 	DG_INLINE dgTemplateVector<T>& operator+= (const dgTemplateVector<T> &A) 
@@ -299,6 +299,12 @@ class dgVector: public dgTemplateVector<dgFloat32>
 		dgAssert (dgCheckVector ((*this)));
 	}
 
+	DG_INLINE dgVector (dgInt32 ix, dgInt32 iy, dgInt32 iz, dgInt32 iw)
+		:dgTemplateVector<dgFloat32>(*((dgFloat32*)&ix), *((dgFloat32*)&iy), *((dgFloat32*)&iz), *((dgFloat32*)&iw))
+	{
+	}
+
+
 	DG_INLINE dgVector (const dgBigVector& copy)
 		:dgTemplateVector<dgFloat32>(dgFloat32 (copy.m_x), dgFloat32 (copy.m_y), dgFloat32 (copy.m_z), dgFloat32 (copy.m_w))
 	{
@@ -311,7 +317,7 @@ class dgVector: public dgTemplateVector<dgFloat32>
 		return *this;
 	}
 
-
+/*
 	DG_INLINE dgFloat32 dgVector::DotProductSimd (const dgVector& A) const
 	{
 		dgFloat32 dot;
@@ -332,21 +338,21 @@ class dgVector: public dgTemplateVector<dgFloat32>
 
 
 	// logical operations
-//	DG_INLINE dgVector operator& (const dgVector& data) const
-//	{
-//		return _mm_and_ps (m_type, data.m_type);	
-//	}
+	DG_INLINE dgVector operator& (const dgVector& data) const
+	{
+		return _mm_and_ps (m_type, data.m_type);	
+	}
 
-//	DG_INLINE dgVector operator| (const dgVector& data) const
-//	{
-//		return _mm_or_ps (m_type, data.m_type);	
-//	}
+	DG_INLINE dgVector operator| (const dgVector& data) const
+	{
+		return _mm_or_ps (m_type, data.m_type);	
+	}
 
-//	DG_INLINE dgVector AndNot (const dgVector& data) const
-//	{
-//		return _mm_andnot_ps (m_type, data.m_type);	
-//	}
-/*
+	DG_INLINE dgVector AndNot (const dgVector& data) const
+	{
+		return _mm_andnot_ps (m_type, data.m_type);	
+	}
+
 	DG_INLINE dgVector MoveLow (const dgVector& data) const
 	{
 		return dgSimd (m_x, m_y, data.m_x, data.m_y); 
