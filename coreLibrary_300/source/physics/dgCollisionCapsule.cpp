@@ -176,9 +176,9 @@ void dgCollisionCapsule::TesselateTriangle (dgInt32 level, const dgVector& p0, c
 		dgVector p12 (p1 + p2);
 		dgVector p20 (p2 + p0);
 
-		p01 = p01.Scale (dgRsqrt(p01 % p01));
-		p12 = p12.Scale (dgRsqrt(p12 % p12));
-		p20 = p20.Scale (dgRsqrt(p20 % p20));
+		p01 = p01.Scale3 (dgRsqrt(p01 % p01));
+		p12 = p12.Scale3 (dgRsqrt(p12 % p12));
+		p20 = p20.Scale3 (dgRsqrt(p20 % p20));
 
 		dgAssert (dgAbsf (p01 % p01 - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
 		dgAssert (dgAbsf (p12 % p12 - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
@@ -190,9 +190,9 @@ void dgCollisionCapsule::TesselateTriangle (dgInt32 level, const dgVector& p0, c
 		TesselateTriangle (level - 1, p01, p12, p20, count, ouput);
 
 	} else {
-		ouput[count + 0] = p0.Scale (m_radius);
-		ouput[count + 1] = p1.Scale (m_radius);
-		ouput[count + 2] = p2.Scale (m_radius);
+		ouput[count + 0] = p0.Scale3 (m_radius);
+		ouput[count + 1] = p1.Scale3 (m_radius);
+		ouput[count + 2] = p2.Scale3 (m_radius);
 		count += 3;
 	}
 }
@@ -287,7 +287,7 @@ dgVector dgCollisionCapsule::SupportVertex (const dgVector& dir, dgInt32* const 
 {
 	dgAssert (dgAbsf(dir % dir - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 
-	dgVector p0(dir.Scale (m_radius));
+	dgVector p0(dir.Scale3 (m_radius));
 	dgVector p1(p0);
 	p0.m_x += m_height;
 	p1.m_x -= m_height;
@@ -317,32 +317,32 @@ dgFloat32 dgCollisionCapsule::RayCast (const dgVector& q0, const dgVector& q1, d
 	dgFloat32 t1 = dgRayCastSphere (q0, q1, origin1, m_radius);
 	if ((t0 < dgFloat32 (1.2f)) && (t1 < dgFloat32 (1.2f))) {
 		if (t0 < t1) {
-			dgVector q (q0 + (q1 - q0).Scale (t0));
+			dgVector q (q0 + (q1 - q0).Scale3 (t0));
 			dgVector n (q - origin0); 
-			contactOut.m_normal = n.Scale (dgRsqrt (n % n));
+			contactOut.m_normal = n.Scale3 (dgRsqrt (n % n));
 			//contactOut.m_userId = SetUserDataID();
 			return t0;
 		} else {
-			dgVector q (q0 + (q1 - q0).Scale (t1));
+			dgVector q (q0 + (q1 - q0).Scale3 (t1));
 			dgVector n (q - origin1); 
-			contactOut.m_normal = n.Scale (dgRsqrt (n % n));
+			contactOut.m_normal = n.Scale3 (dgRsqrt (n % n));
 			//contactOut.m_userId = SetUserDataID();
 			return t1;
 		}
 	} else if (t0 < dgFloat32 (1.2f)) {
-		dgVector q (q0 + (q1 - q0).Scale (t0));
+		dgVector q (q0 + (q1 - q0).Scale3 (t0));
 		if (q.m_x >= m_height) {
 			dgVector n (q - origin0); 
-			contactOut.m_normal = n.Scale (dgRsqrt (n % n));
+			contactOut.m_normal = n.Scale3 (dgRsqrt (n % n));
 			//contactOut.m_userId = SetUserDataID();
 			return t0;
 		}
 
 	} else if (t1 < dgFloat32 (1.2f)) {
-		dgVector q (q0 + (q1 - q0).Scale (t1));
+		dgVector q (q0 + (q1 - q0).Scale3 (t1));
 		if (q.m_x <= -m_height) {
 			dgVector n (q - origin1); 
-			contactOut.m_normal = n.Scale (dgRsqrt (n % n));
+			contactOut.m_normal = n.Scale3 (dgRsqrt (n % n));
 			//contactOut.m_userId = SetUserDataID();
 			return t1;
 		}
@@ -354,10 +354,10 @@ dgFloat32 dgCollisionCapsule::RayCast (const dgVector& q0, const dgVector& q1, d
 	p1.m_x = dgFloat32 (0.0f);
 	t0 = dgRayCastSphere (p0, p1, dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)), m_radius);
 	if (t0 < dgFloat32 (1.0f)) {
-		dgVector q (q0 + (q1 - q0).Scale (t0));
+		dgVector q (q0 + (q1 - q0).Scale3 (t0));
 		if ((q.m_x <= m_height) && (q.m_x >= -m_height)) {
-			dgVector n (p0 + (p1 - p0).Scale (t0));
-			contactOut.m_normal = n.Scale (dgRsqrt (n % n));
+			dgVector n (p0 + (p1 - p0).Scale3 (t0));
+			contactOut.m_normal = n.Scale3 (dgRsqrt (n % n));
 			//contactOut.m_userId = SetUserDataID();
 			return t0;
 		}
@@ -441,7 +441,7 @@ dgVector dgCollisionCapsule::ConvexConicSupporVertex (const dgVector& point, con
 //{
 //	dgVector r (posit, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 //	dgFloat32 t = normal % (r - point);
-//	contact[0] = r + normal.Scale (t);
+//	contact[0] = r + normal.Scale3 (t);
 //	return 1;
 //}
 
@@ -456,7 +456,7 @@ dgInt32 dgCollisionCapsule::CalculateContacts (const dgVector& point, const dgVe
 //		return CalculateSphereConicContacts (-m_height, normal, point, contactsOut);
 //	}
 	if (dgAbsf (normal.m_x) > DG_CAPSULE_PERPENDICULAR_NORMAL) {
-		contactsOut[0] = SupportVertex (normal.Scale (dgFloat32 (-1.0f)), NULL);
+		contactsOut[0] = SupportVertex (normal.Scale3 (dgFloat32 (-1.0f)), NULL);
 		return 1;
 	}
 	return CalculateContactsGeneric (point, normal, proxy, contactsOut);
@@ -483,8 +483,8 @@ dgInt32 dgCollisionCapsule::CalculatePlaneIntersection (const dgVector& normal, 
 		dgVector p1 (-m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 		dgVector dir1 (p1 - origin);
 		dgFloat32 dist1 = dir1 % normal;
-		contactsOut[0] = p0 - normal.Scale (dist0);
-		contactsOut[1] = p1 - normal.Scale (dist1);
+		contactsOut[0] = p0 - normal.Scale3 (dist0);
+		contactsOut[1] = p1 - normal.Scale3 (dist1);
 		count = 2;
 	}
 	return count;

@@ -298,7 +298,7 @@ dgFloat32 dgCollisionBVH::RayCastSimd (const dgVector& localP0, const dgVector& 
 		ForAllSectorsRayHitSimd (ray, RayHitSimd, &ray);
 		if (ray.m_t <= 1.0f) {
 			param = ray.m_t; 
-			contactOut.m_normal = ray.m_normal.Scale (dgRsqrt ((ray.m_normal % ray.m_normal) + 1.0e-8f));
+			contactOut.m_normal = ray.m_normal.Scale3 (dgRsqrt ((ray.m_normal % ray.m_normal) + 1.0e-8f));
 //			contactOut.m_userId = ray.m_id;
 			contactOut.m_shapeId0 = ray.m_id;
 			contactOut.m_shapeId1 = ray.m_id;
@@ -312,7 +312,7 @@ dgFloat32 dgCollisionBVH::RayCastSimd (const dgVector& localP0, const dgVector& 
 		ForAllSectorsRayHitSimd (ray, RayHitUserSimd, &ray);
 		if (ray.m_t <= 1.0f) {
 			param = ray.m_t; 
-			contactOut.m_normal = ray.m_normal.Scale (dgRsqrt ((ray.m_normal % ray.m_normal) + 1.0e-8f));
+			contactOut.m_normal = ray.m_normal.Scale3 (dgRsqrt ((ray.m_normal % ray.m_normal) + 1.0e-8f));
 //			contactOut.m_userId = ray.m_id;
 			contactOut.m_shapeId0 = ray.m_id;
 			contactOut.m_shapeId1 = ray.m_id;
@@ -333,7 +333,7 @@ dgFloat32 dgCollisionBVH::RayCast (const dgVector& localP0, const dgVector& loca
 		ForAllSectorsRayHit (ray, RayHit, &ray);
 		if (ray.m_t <= 1.0f) {
 			param = ray.m_t; 
-			contactOut.m_normal = ray.m_normal.Scale (dgRsqrt ((ray.m_normal % ray.m_normal) + 1.0e-8f));
+			contactOut.m_normal = ray.m_normal.Scale3 (dgRsqrt ((ray.m_normal % ray.m_normal) + 1.0e-8f));
 //			contactOut.m_userId = ray.m_id;
 			contactOut.m_shapeId0 = ray.m_id;
 			contactOut.m_shapeId1 = ray.m_id;
@@ -347,7 +347,7 @@ dgFloat32 dgCollisionBVH::RayCast (const dgVector& localP0, const dgVector& loca
 		ForAllSectorsRayHit (ray, RayHitUser, &ray);
 		if (ray.m_t <= 1.0f) {
 			param = ray.m_t; 
-			contactOut.m_normal = ray.m_normal.Scale (dgRsqrt ((ray.m_normal % ray.m_normal) + 1.0e-8f));
+			contactOut.m_normal = ray.m_normal.Scale3 (dgRsqrt ((ray.m_normal % ray.m_normal) + 1.0e-8f));
 //			contactOut.m_userId = ray.m_id;
 			contactOut.m_shapeId0 = ray.m_id;
 			contactOut.m_shapeId1 = ray.m_id;

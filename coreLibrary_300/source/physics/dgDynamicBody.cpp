@@ -96,15 +96,15 @@ void dgDynamicBody::AddBuoyancyForce (dgFloat32 fluidDensity, dgFloat32 fluidLin
 //			dgVector buoyanceCenter (volumeIntegral - m_matrix.m_posit);
 			dgVector buoyanceCenter (volumeIntegral - m_globalCentreOfMass);
 
-			dgVector force (gravityVector.Scale (-fluidDensity * volumeIntegral.m_w));
+			dgVector force (gravityVector.Scale3 (-fluidDensity * volumeIntegral.m_w));
 			dgVector torque (buoyanceCenter * force);
 
 			dgFloat32 damp = GetMax (GetMin ((m_veloc % m_veloc) * dgFloat32 (100.0f) * fluidLinearViscousity, dgFloat32 (1.0f)), dgFloat32(dgFloat32 (10.0f)));
-			force -= m_veloc.Scale (damp);
+			force -= m_veloc.Scale3 (damp);
 
 			//damp = (m_omega % m_omega) * dgFloat32 (10.0f) * fluidAngularViscousity;
 			damp = GetMax (GetMin ((m_omega % m_omega) * dgFloat32 (1000.0f) * fluidAngularViscousity, dgFloat32(0.25f)), dgFloat32(2.0f));
-			torque -= m_omega.Scale (damp);
+			torque -= m_omega.Scale3 (damp);
 
 //			dgAssert (dgSqrt (force % force) < (dgSqrt (gravityVector % gravityVector) * m_mass.m_w * dgFloat32 (100.0f)));
 //			dgAssert (dgSqrt (torque % torque) < (dgSqrt (gravityVector % gravityVector) * m_mass.m_w * dgFloat32 (100.0f) * dgFloat32 (10.0f)));
@@ -219,7 +219,7 @@ void dgDynamicBody::AddImpulse (const dgVector& pointDeltaVeloc, const dgVector&
 	dgVector changeOfMomentum (contactMatrix.RotateVector (pointDeltaVeloc));
 
 
-	dgVector dv (changeOfMomentum.Scale (m_invMass.m_w));
+	dgVector dv (changeOfMomentum.Scale3 (m_invMass.m_w));
 	dgVector dw (invInertia.RotateVector (globalContact * changeOfMomentum));
 
 	m_veloc += dv;
@@ -246,10 +246,10 @@ void dgDynamicBody::ApplyImpulsePair (const dgVector& linearImpulseIn, const dgV
 	dgMatrix inertia (CalculateInertiaMatrix());
 	dgMatrix invInertia (CalculateInvInertiaMatrix());
 
-	dgVector linearImpulse (m_veloc.Scale (m_mass.m_w) + linearImpulseIn);
+	dgVector linearImpulse (m_veloc.Scale3 (m_mass.m_w) + linearImpulseIn);
 	dgVector angularImpulse (inertia.RotateVector (m_omega) + angularImpulseIn);
 
-	m_veloc = linearImpulse.Scale(m_invMass.m_w);
+	m_veloc = linearImpulse.Scale3(m_invMass.m_w);
 	m_omega = invInertia.RotateVector(angularImpulse);
 
 	m_sleeping	= false;
@@ -263,7 +263,7 @@ void dgDynamicBody::ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, 
 
 	dgMatrix inertia (CalculateInertiaMatrix());
 
-	dgVector impulse (m_veloc.Scale (m_mass.m_w));
+	dgVector impulse (m_veloc.Scale3 (m_mass.m_w));
 	dgVector angularImpulse (inertia.RotateVector (m_omega));
 
 	dgVector com (m_globalCentreOfMass);
@@ -278,7 +278,7 @@ void dgDynamicBody::ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, 
 	}
 
 	dgMatrix invInertia (CalculateInvInertiaMatrix());
-	m_veloc = impulse.Scale(m_invMass.m_w);
+	m_veloc = impulse.Scale3(m_invMass.m_w);
 	m_omega = invInertia.RotateVector(angularImpulse);
 
 	m_sleeping	= false;

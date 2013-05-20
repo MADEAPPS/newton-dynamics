@@ -110,7 +110,7 @@ void dgBilateralConstraint::CalculateMatrixOffset (const dgVector& pivot, const 
 	length = dir % dir;
 	length = dgSqrt (length);
 	dgAssert (length > dgFloat32 (0.0f));
-	matrix0 = dgMatrix (body0_Matrix.UnrotateVector (dir.Scale (dgFloat32 (1.0f) / length)));
+	matrix0 = dgMatrix (body0_Matrix.UnrotateVector (dir.Scale3 (dgFloat32 (1.0f) / length)));
 	matrix0.m_posit = body0_Matrix.UntransformVector (pivot);
 
 	matrix0.m_front.m_w = dgFloat32 (0.0f);
@@ -137,9 +137,9 @@ void dgBilateralConstraint::SetPivotAndPinDir (const dgVector& pivot, const dgVe
 
 	
 	dgAssert ((pinDirection0 % pinDirection0) > dgFloat32 (0.0f));
-	m_localMatrix0.m_front = pinDirection0.Scale (dgRsqrt (pinDirection0 % pinDirection0));
+	m_localMatrix0.m_front = pinDirection0.Scale3 (dgRsqrt (pinDirection0 % pinDirection0));
 	m_localMatrix0.m_right = m_localMatrix0.m_front * pinDirection1;
-	m_localMatrix0.m_right = m_localMatrix0.m_right.Scale (dgRsqrt (m_localMatrix0.m_right % m_localMatrix0.m_right));
+	m_localMatrix0.m_right = m_localMatrix0.m_right.Scale3 (dgRsqrt (m_localMatrix0.m_right % m_localMatrix0.m_right));
 	m_localMatrix0.m_up = m_localMatrix0.m_right * m_localMatrix0.m_front; 
 	m_localMatrix0.m_posit = pivot;
 

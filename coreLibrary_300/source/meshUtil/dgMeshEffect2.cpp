@@ -2010,9 +2010,9 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 						dgBigVector p1 (delaunayTetrahedras.GetVertex(tetrahedrum->m_faces[j].m_index[1]));
 						dgBigVector p2 (delaunayTetrahedras.GetVertex(tetrahedrum->m_faces[j].m_index[2]));
 						dgBigVector n ((p1 - p0) * (p2 - p0));
-						n = n.Scale (dgFloat64 (1.0f) / sqrt(n % n));
+						n = n.Scale3 (dgFloat64 (1.0f) / sqrt(n % n));
 						dgBigVector normal (dgFloat64 (n.m_x), dgFloat64 (n.m_y), dgFloat64  (n.m_z), dgFloat64 (0.0f));
-						pointArray[count] = voronoiPoints[i] + normal.Scale (borderSize);
+						pointArray[count] = voronoiPoints[i] + normal.Scale3 (borderSize);
 
 						count ++;
 						dgAssert (count < dgInt32 (sizeof (pointArray) / sizeof (pointArray[0])));

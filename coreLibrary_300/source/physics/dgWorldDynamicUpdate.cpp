@@ -944,8 +944,8 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 			bool equilibrium = (accel2 < accelFreeze) && (alpha2 < accelFreeze) && (speed2 < speedFreeze) && (omega2 < speedFreeze);
 
 			if (equilibrium) {
-				body->m_veloc = body->m_veloc.Scale (forceDamp);
-				body->m_omega = body->m_omega.Scale (forceDamp);
+				body->m_veloc = body->m_veloc.Scale3 (forceDamp);
+				body->m_omega = body->m_omega.Scale3 (forceDamp);
 			}
 			body->m_equilibrium = dgUnsigned32 (equilibrium);
 			stackSleeping &= equilibrium;

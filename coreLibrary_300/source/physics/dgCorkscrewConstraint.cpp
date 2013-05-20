@@ -186,10 +186,10 @@ dgVector dgCorkscrewConstraint::GetJointForce () const
 
 	CalculateGlobalMatrixAndAngle (matrix0, matrix1);
 
-	return dgVector (matrix0.m_up.Scale (m_jointForce[0]) + 
-		             matrix0.m_right.Scale (m_jointForce[1]) + 
-					 matrix0.m_up.Scale (m_jointForce[2]) +
-					 matrix0.m_right.Scale (m_jointForce[3]));
+	return dgVector (matrix0.m_up.Scale3 (m_jointForce[0]) + 
+		             matrix0.m_right.Scale3 (m_jointForce[1]) + 
+					 matrix0.m_up.Scale3 (m_jointForce[2]) +
+					 matrix0.m_right.Scale3 (m_jointForce[3]));
 
 }
 
@@ -202,7 +202,7 @@ dgUnsigned32 dgCorkscrewConstraint::JacobianDerivative (dgContraintDescritor& pa
 
 	m_angle = -angle.m_x;
 	m_posit = (matrix0.m_posit - matrix1.m_posit) % matrix0.m_front;
-	matrix1.m_posit += matrix1.m_front.Scale (m_posit);
+	matrix1.m_posit += matrix1.m_front.Scale3 (m_posit);
 
 	dgAssert (dgAbsf (dgFloat32 (1.0f) - (matrix0.m_front % matrix0.m_front)) < dgFloat32 (1.0e-5f)); 
 	dgAssert (dgAbsf (dgFloat32 (1.0f) - (matrix0.m_up % matrix0.m_up)) < dgFloat32 (1.0e-5f)); 
@@ -214,10 +214,10 @@ dgUnsigned32 dgCorkscrewConstraint::JacobianDerivative (dgContraintDescritor& pa
 //	const dgVector& p0 = matrix0.m_posit;
 //	const dgVector& p1 = matrix1.m_posit;
 	dgVector p0 (matrix0.m_posit);
-	dgVector p1 (matrix1.m_posit + matrix1.m_front.Scale ((p0 - matrix1.m_posit) % matrix1.m_front));
+	dgVector p1 (matrix1.m_posit + matrix1.m_front.Scale3 ((p0 - matrix1.m_posit) % matrix1.m_front));
 
-	dgVector q0 (p0 + matrix0.m_front.Scale(MIN_JOINT_PIN_LENGTH));
-	dgVector q1 (p1 + matrix1.m_front.Scale(MIN_JOINT_PIN_LENGTH));
+	dgVector q0 (p0 + matrix0.m_front.Scale3(MIN_JOINT_PIN_LENGTH));
+	dgVector q1 (p1 + matrix1.m_front.Scale3(MIN_JOINT_PIN_LENGTH));
 
 	dgPointParam pointDataP;
 	dgPointParam pointDataQ;

@@ -60,8 +60,8 @@ void dgCollisionMesh::SetCollisionBBox (const dgVector& p0, const dgVector& p1)
 	dgAssert (p0.m_y <= p1.m_y);
 	dgAssert (p0.m_z <= p1.m_z);
 
-	m_boxSize = (p1 - p0).Scale (dgFloat32 (0.5f)); 
-	m_boxOrigin = (p1 + p0).Scale (dgFloat32 (0.5f)); 
+	m_boxSize = (p1 - p0).Scale3 (dgFloat32 (0.5f)); 
+	m_boxOrigin = (p1 + p0).Scale3 (dgFloat32 (0.5f)); 
 
 	m_boxSize.m_w = dgFloat32 (0.0f);
 	m_boxOrigin.m_w = dgFloat32 (0.0f);
@@ -183,7 +183,7 @@ void dgCollisionMesh::CalcAABB(const dgMatrix &matrix, dgVector &p0, dgVector &p
 	dgVector q1;
 	dgMatrix trans (matrix.Transpose());
 	for (i = 0; i < 3; i ++) {
-		q0[i] = matrix.m_posit[i] + matrix.RotateVector (BoxSupportMapping(trans[i].Scale (-1.0f)))[i];
+		q0[i] = matrix.m_posit[i] + matrix.RotateVector (BoxSupportMapping(trans[i].Scale3 (-1.0f)))[i];
 		q1[i] = matrix.m_posit[i] + matrix.RotateVector (BoxSupportMapping(trans[i]))[i];
 	}
 
@@ -223,7 +223,7 @@ dgInt32 dgCollisionMesh::CalculatePlaneIntersection (const dgFloat32* const vert
 					t = dgSign(t) * dgFloat32 (1.0e-8f);	
 				}
 				dgAssert (0);
-				contactsOut[count] = p0 - dp.Scale (side0 / t);
+				contactsOut[count] = p0 - dp.Scale3 (side0 / t);
 				count ++;
 
 			} 
@@ -235,7 +235,7 @@ dgInt32 dgCollisionMesh::CalculatePlaneIntersection (const dgFloat32* const vert
 				t = dgSign(t) * dgFloat32 (1.0e-8f);	
 			}
 			dgAssert (0);
-			contactsOut[count] = p0 - dp.Scale (side0 / t);
+			contactsOut[count] = p0 - dp.Scale3 (side0 / t);
 			count ++;
 		}
 

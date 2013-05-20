@@ -180,7 +180,7 @@ DG_INLINE void dgDynamicBody::SetTorque (const dgVector& torque)
 
 DG_INLINE void dgDynamicBody::AddDampingAcceleration()
 {
-	m_veloc -= m_veloc.Scale (m_dampCoef.m_w);
+	m_veloc -= m_veloc.Scale3 (m_dampCoef.m_w);
 	dgVector omega (m_matrix.UnrotateVector (m_omega));
 	omega -= omega.CompProduct (m_dampCoef);
 	m_omega = m_matrix.RotateVector (omega);
@@ -198,12 +198,12 @@ DG_INLINE void dgDynamicBody::AddDampingAccelerationSimd()
 
 DG_INLINE dgVector dgDynamicBody::PredictLinearVelocity(dgFloat32 timestep) const
 {
-	return 	m_veloc + m_accel.Scale (timestep * m_invMass.m_w);
+	return 	m_veloc + m_accel.Scale3 (timestep * m_invMass.m_w);
 }
 
 DG_INLINE dgVector dgDynamicBody::PredictAngularVelocity(dgFloat32 timestep) const
 {
-	return m_omega + m_invWorldInertiaMatrix.RotateVector(m_alpha).Scale (timestep);
+	return m_omega + m_invWorldInertiaMatrix.RotateVector(m_alpha).Scale3 (timestep);
 }
 
 

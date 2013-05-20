@@ -136,7 +136,7 @@ void dgCollisionSphere::Init (dgFloat32 radius, dgMemoryAllocator* allocator)
 	}
 
 	for (dgInt32 i = 0; i < DG_SPHERE_VERTEX_COUNT; i ++) {
-		m_vertex[i] = m_unitSphere[i].Scale (m_radius);
+		m_vertex[i] = m_unitSphere[i].Scale3 (m_radius);
 	}
 
 	m_shapeRefCount ++;
@@ -149,13 +149,13 @@ void dgCollisionSphere::Init (dgFloat32 radius, dgMemoryAllocator* allocator)
 dgVector dgCollisionSphere::SupportVertexSimd (const dgVector& dir, dgInt32* const vertexIndex) const
 {
 	dgAssert (dgAbsf(dir % dir - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
-	return dir.Scale (m_radius);
+	return dir.Scale3 (m_radius);
 }
 
 dgVector dgCollisionSphere::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
 	dgAssert (dgAbsf(dir % dir - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
-	return dir.Scale (m_radius);
+	return dir.Scale3 (m_radius);
 }
 
 
@@ -173,11 +173,11 @@ void dgCollisionSphere::TesselateTriangle (dgInt32 level, const dgVector& p0, co
 //float a = p01 % p01;
 //float b = sqrt(a);
 //float c = 1.0f / b;
-//p01 = p01.Scale (c);
+//p01 = p01.Scale3 (c);
 
-		p01 = p01.Scale (dgRsqrt(p01 % p01));
-		p12 = p12.Scale (dgRsqrt(p12 % p12));
-		p20 = p20.Scale (dgRsqrt(p20 % p20));
+		p01 = p01.Scale3 (dgRsqrt(p01 % p01));
+		p12 = p12.Scale3 (dgRsqrt(p12 % p12));
+		p20 = p20.Scale3 (dgRsqrt(p20 % p20));
 
 		dgAssert (dgAbsf (p01 % p01 - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
 		dgAssert (dgAbsf (p12 % p12 - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
@@ -242,7 +242,7 @@ void dgCollisionSphere::CalcAABBSimd (const dgMatrix &matrix, dgVector &p0, dgVe
 dgInt32 dgCollisionSphere::CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const
 {
 	dgAssert ((normal % normal) > dgFloat32 (0.999f));
-	contactsOut[0] = normal.Scale (normal % point);
+	contactsOut[0] = normal.Scale3 (normal % point);
 	return 1;
 }
 
@@ -279,7 +279,7 @@ void dgCollisionSphere::DebugCollision (const dgMatrix& matrix, OnDebugCollision
 	TesselateTriangle (i, p5, p0, p3, count, tmpVectex);
 
 	for (dgInt32 i = 0; i < count; i ++) {
-		tmpVectex[i] = tmpVectex[i].Scale (m_radius);
+		tmpVectex[i] = tmpVectex[i].Scale3 (m_radius);
 	}
 
 	//dgMatrix matrix (GetLocalMatrix() * matrixPtr);
@@ -312,8 +312,8 @@ dgFloat32 dgCollisionSphere::RayCast (const dgVector& p0, const dgVector& p1, dg
 {
 	dgFloat32 t = dgRayCastSphere (p0, p1, dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)), m_radius);
 	if (t < dgFloat32 (1.0f)) {
-		dgVector contact (p0 + (p1 - p0).Scale (t));
-		contactOut.m_normal = contact.Scale (dgRsqrt (contact % contact));
+		dgVector contact (p0 + (p1 - p0).Scale3 (t));
+		contactOut.m_normal = contact.Scale3 (dgRsqrt (contact % contact));
 		//contactOut.m_userId = SetUserDataID();
 	}
 	return t;
@@ -363,7 +363,7 @@ dgVector dgCollisionSphere::ConvexConicSupporVertex (const dgVector& point, cons
 
 dgInt32 dgCollisionSphere::CalculateContacts (const dgVector& point, const dgVector& normal, dgCollisionParamProxy& proxy, dgVector* const contactsOut) const
 {
-	contactsOut[0] = normal.Scale(normal % point);
+	contactsOut[0] = normal.Scale3(normal % point);
 	return 1;
 }
 

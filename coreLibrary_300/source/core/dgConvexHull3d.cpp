@@ -259,7 +259,7 @@ dgAABBPointTree3d* dgConvexHull3d::BuildTree (dgAABBPointTree3d* const parent, d
 			varian += p.CompProduct (p);
 		}
 
-		varian = varian.Scale (dgFloat32 (count)) - median.CompProduct(median);
+		varian = varian.Scale3 (dgFloat32 (count)) - median.CompProduct(median);
 		dgInt32 index = 0;
 		dgFloat64 maxVarian = dgFloat64 (-1.0e10f);
 		for (dgInt32 i = 0; i < 3; i ++) {
@@ -268,7 +268,7 @@ dgAABBPointTree3d* dgConvexHull3d::BuildTree (dgAABBPointTree3d* const parent, d
 				maxVarian = varian[i];
 			}
 		}
-		dgBigVector center = median.Scale (dgFloat64 (1.0f) / dgFloat64 (count));
+		dgBigVector center = median.Scale3 (dgFloat64 (1.0f) / dgFloat64 (count));
 
 		dgFloat64 test = center[index];
 
@@ -445,7 +445,7 @@ dgInt32 dgConvexHull3d::InitVertexArray(dgHullVertex* const points, const dgFloa
 		validTetrahedrum = true;
 	}
 	if (!validTetrahedrum) {
-		dgVector n (normal.Scale(dgFloat64 (-1.0f)));
+		dgVector n (normal.Scale3(dgFloat64 (-1.0f)));
 		dgInt32 index = SupportVertex (&tree, points, n);
 		e3 = points[index] - m_points[0];
 		dgFloat64 error2 = normal % e3;
@@ -509,9 +509,9 @@ void dgConvexHull3d::TessellateTriangle (dgInt32 level, const dgVector& p0, cons
 		dgVector p12 (p1 + p2);
 		dgVector p20 (p2 + p0);
 
-		p01 = p01.Scale (dgRsqrt(p01 % p01));
-		p12 = p12.Scale (dgRsqrt(p12 % p12));
-		p20 = p20.Scale (dgRsqrt(p20 % p20));
+		p01 = p01.Scale3 (dgRsqrt(p01 % p01));
+		p12 = p12.Scale3 (dgRsqrt(p12 % p12));
+		p20 = p20.Scale3 (dgRsqrt(p20 % p20));
 
 		dgAssert (dgAbsf (p01 % p01 - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
 		dgAssert (dgAbsf (p12 % p12 - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));

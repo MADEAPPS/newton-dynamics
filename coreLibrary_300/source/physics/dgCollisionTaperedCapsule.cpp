@@ -74,8 +74,8 @@ void dgCollisionTaperedCapsule::Init (dgFloat32 radio0, dgFloat32 radio1, dgFloa
 		dgFloat32 angle = (angle1 + angle0) * dgFloat32 (0.5f);
 		dgVector dir (dgSin (angle), dgCos (angle), dgFloat32 (0.0f), dgFloat32 (0.0f));
 
-		dgVector p0(dir.Scale (m_radio0));
-		dgVector p1(dir.Scale (m_radio1));
+		dgVector p0(dir.Scale3 (m_radio0));
+		dgVector p1(dir.Scale3 (m_radio1));
 		p0.m_x += m_height;
 		p1.m_x -= m_height;
 		dgFloat32 dir0 = p0 % dir;
@@ -212,9 +212,9 @@ void dgCollisionTaperedCapsule::TesselateTriangle (dgInt32 level, const dgVector
 		dgVector p12 (p1 + p2);
 		dgVector p20 (p2 + p0);
 
-		p01 = p01.Scale (dgRsqrt(p01 % p01));
-		p12 = p12.Scale (dgRsqrt(p12 % p12));
-		p20 = p20.Scale (dgRsqrt(p20 % p20));
+		p01 = p01.Scale3 (dgRsqrt(p01 % p01));
+		p12 = p12.Scale3 (dgRsqrt(p12 % p12));
+		p20 = p20.Scale3 (dgRsqrt(p20 % p20));
 
 		dgAssert (dgAbsf (p01 % p01 - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
 		dgAssert (dgAbsf (p12 % p12 - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
@@ -226,9 +226,9 @@ void dgCollisionTaperedCapsule::TesselateTriangle (dgInt32 level, const dgVector
 		TesselateTriangle (level - 1, p01, p12, p20, count, ouput);
 
 	} else {
-		ouput[count + 0] = p0.Scale (m_radio0);
-		ouput[count + 1] = p1.Scale (m_radio0);
-		ouput[count + 2] = p2.Scale (m_radio0);
+		ouput[count + 0] = p0.Scale3 (m_radio0);
+		ouput[count + 1] = p1.Scale3 (m_radio0);
+		ouput[count + 2] = p2.Scale3 (m_radio0);
 		count += 3;
 	}
 }
@@ -272,14 +272,14 @@ void dgCollisionTaperedCapsule::DebugCollision (const dgMatrix& matrix, OnDebugC
 			if (p1.m_x > m_clip0) {
 				if (p0.m_x < m_clip0) {
 					dgFloat32 t = (m_clip0 - p0.m_x) / (p1.m_x - p0.m_x);
-					edgeP0 = p0 + (p1 - p0).Scale (t);
+					edgeP0 = p0 + (p1 - p0).Scale3 (t);
 					edgeP0.m_x = m_clip0;
 
 					face0[n0] = edgeP0;
 					face0[n0].m_x += m_height;
 					n0 ++;
 
-					face1[n1] = edgeP0.Scale (scale);
+					face1[n1] = edgeP0.Scale3 (scale);
 					face1[n1].m_x -= m_height;
 					n1 ++;
 				}
@@ -289,18 +289,18 @@ void dgCollisionTaperedCapsule::DebugCollision (const dgMatrix& matrix, OnDebugC
 			} else {
 				if (p0.m_x > m_clip0) {
 					dgFloat32 t = (m_clip0 - p0.m_x) / (p1.m_x - p0.m_x);
-					edgeP1 = p0 + (p1 - p0).Scale (t);
+					edgeP1 = p0 + (p1 - p0).Scale3 (t);
 					edgeP1.m_x = m_clip0;
 
 					face0[n0] = edgeP1;
 					face0[n0].m_x += m_height;
 					n0 ++;
 
-					face1[n1] = edgeP1.Scale (scale);
+					face1[n1] = edgeP1.Scale3 (scale);
 					face1[n1].m_x -= m_height;
 					n1 ++;
 				}
-				face1[n1] = p1.Scale (scale);;
+				face1[n1] = p1.Scale3 (scale);;
 				face1[n1].m_x -= m_height;
 				
 				n1 ++;
@@ -320,8 +320,8 @@ void dgCollisionTaperedCapsule::DebugCollision (const dgMatrix& matrix, OnDebugC
 		if (n0 && n1) {
 			face0[0] = edgeP0;
 			face0[1] = edgeP1;
-			face0[2] = edgeP1.Scale (scale);
-			face0[3] = edgeP0.Scale (scale);
+			face0[2] = edgeP1.Scale3 (scale);
+			face0[3] = edgeP0.Scale3 (scale);
 			face0[0].m_x += m_height;
 			face0[1].m_x += m_height;
 			face0[2].m_x -= m_height;
@@ -349,8 +349,8 @@ dgVector dgCollisionTaperedCapsule::SupportVertex (const dgVector& dir, dgInt32*
 {
 	dgAssert (dgAbsf(dir % dir - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 
-	dgVector p0(dir.Scale (m_radio0));
-	dgVector p1(dir.Scale (m_radio1));
+	dgVector p0(dir.Scale3 (m_radio0));
+	dgVector p1(dir.Scale3 (m_radio1));
 	p0.m_x += m_height;
 	p1.m_x -= m_height;
 	dgFloat32 dir0 = p0 % dir;
@@ -379,32 +379,32 @@ dgFloat32 dgCollisionTaperedCapsule::RayCast (const dgVector& q0, const dgVector
 	dgFloat32 t1 = dgRayCastSphere (q0, q1, origin1, m_radio1);
 	if ((t0 < dgFloat32 (1.2f)) && (t1 < dgFloat32 (1.2f))) {
 		if (t0 < t1) {
-			dgVector q (q0 + (q1 - q0).Scale (t0));
+			dgVector q (q0 + (q1 - q0).Scale3 (t0));
 			dgVector n (q - origin0); 
-			contactOut.m_normal = n.Scale (dgRsqrt (n % n));
+			contactOut.m_normal = n.Scale3 (dgRsqrt (n % n));
 //			contactOut.m_userId = SetUserDataID();
 			return t0;
 		} else {
-			dgVector q (q0 + (q1 - q0).Scale (t1));
+			dgVector q (q0 + (q1 - q0).Scale3 (t1));
 			dgVector n (q - origin1); 
-			contactOut.m_normal = n.Scale (dgRsqrt (n % n));
+			contactOut.m_normal = n.Scale3 (dgRsqrt (n % n));
 //			contactOut.m_userId = SetUserDataID();
 			return t1;
 		}
 	} else if (t0 < dgFloat32 (1.2f)) {
-		dgVector q (q0 + (q1 - q0).Scale (t0));
+		dgVector q (q0 + (q1 - q0).Scale3 (t0));
 		if (q.m_x >= (m_height + m_clip0)) {
 			dgVector n (q - origin0); 
-			contactOut.m_normal = n.Scale (dgRsqrt (n % n));
+			contactOut.m_normal = n.Scale3 (dgRsqrt (n % n));
 //			contactOut.m_userId = SetUserDataID();
 			return t0;
 		}
 
 	} else if (t1 < dgFloat32 (1.2f)) {
-		dgVector q (q0 + (q1 - q0).Scale (t1));
+		dgVector q (q0 + (q1 - q0).Scale3 (t1));
 		if (q.m_x <= (-m_height + m_clip1)) {
 			dgVector n (q - origin1); 
-			contactOut.m_normal = n.Scale (dgRsqrt (n % n));
+			contactOut.m_normal = n.Scale3 (dgRsqrt (n % n));
 //			contactOut.m_userId = SetUserDataID();
 			return t1;
 		}
@@ -453,7 +453,7 @@ dgFloat32 dgCollisionTaperedCapsule::CalculateMassProperties (const dgMatrix& of
 	inertia.m_y = inertiaTensor[1][1] + volume * (central.m_z + central.m_x);
 	inertia.m_z = inertiaTensor[2][2] + volume * (central.m_x + central.m_y);
 
-	centerOfMass = centerOfMass.Scale (volume);
+	centerOfMass = centerOfMass.Scale3 (volume);
 */
 	return volume;
 }
@@ -482,8 +482,8 @@ void dgCollisionTaperedCapsule::Serialize(dgSerialize callback, void* const user
 
 dgVector dgCollisionTaperedCapsule::ConvexConicSupporVertex (const dgVector& dir) const
 {
-	dgVector p0(dir.Scale (m_radio0));
-	dgVector p1(dir.Scale (m_radio1));
+	dgVector p0(dir.Scale3 (m_radio0));
+	dgVector p1(dir.Scale3 (m_radio1));
 	p0.m_x += m_height;
 	p1.m_x -= m_height;
 	dgFloat32 dir0 = p0 % dir;
@@ -503,7 +503,7 @@ dgVector dgCollisionTaperedCapsule::ConvexConicSupporVertex (const dgVector& poi
 	if (project > dgFloat32 (0.9998f)) {
 		dgFloat32 t = dgFloat32 (0.5f) * (point.m_x + m_height) / m_height;
 		dgFloat32 r = m_radio1 + (m_radio0 - m_radio1) * t;
-		p = dir.Scale (r);
+		p = dir.Scale3 (r);
 		p.m_x += point.m_x;
 	}
 	return p;
@@ -513,7 +513,7 @@ dgInt32 dgCollisionTaperedCapsule::CalculateSphereConicContacts (dgFloat32 posit
 {
 	dgVector r (posit, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	dgFloat32 t = normal % (r - point);
-	contact[0] = r - normal.Scale (t);
+	contact[0] = r - normal.Scale3 (t);
 	return 1;
 }
 
@@ -547,7 +547,7 @@ dgInt32 dgCollisionTaperedCapsule::CalculatePlaneIntersection (const dgVector& n
 	dgVector dir0 (p0 - origin);
 	dgFloat32 dist0 = dir0 % normal;
 	if ((dist0 * dist0) < (m_radio0 * m_radio0)) {
-		contactsOut[count] = p0 - normal.Scale (dist0);
+		contactsOut[count] = p0 - normal.Scale3 (dist0);
 		count ++;
 	}
 
@@ -555,7 +555,7 @@ dgInt32 dgCollisionTaperedCapsule::CalculatePlaneIntersection (const dgVector& n
 	dgVector dir1 (p1 - origin);
 	dgFloat32 dist1 = dir1 % normal;
 	if ((dist1 * dist1) < (m_radio1 * m_radio1)) {
-		contactsOut[count] = p1 - normal.Scale (dist1);
+		contactsOut[count] = p1 - normal.Scale3 (dist1);
 		count ++;
 	}
 	return count;

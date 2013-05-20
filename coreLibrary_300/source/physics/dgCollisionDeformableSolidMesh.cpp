@@ -246,7 +246,7 @@ m_rot = dgGetIdentityMatrix();
 			dgInt32 index = m_indices[i];
 			dgVector qi (posit0[index] - m_com0);
 			dgVector gi (m_rot.UnrotateVector(qi) + m_com);
-			velocity[index] += (gi - posit1[index]).Scale (invTimeScale);
+			velocity[index] += (gi - posit1[index]).Scale3 (invTimeScale);
 		}
 	}
 
@@ -1071,11 +1071,11 @@ void dgCollisionDeformableSolidMesh::ApplyExternalAndInternalForces (dgDeformabl
 	dgVector* const internalVelocity = m_particles.m_internalVelocity;
 
 	// integrate particles external forces and current velocity
-	dgVector extenalVelocityImpulse (myBody->m_accel.Scale (myBody->m_invMass.m_w * timestep));
+	dgVector extenalVelocityImpulse (myBody->m_accel.Scale3 (myBody->m_invMass.m_w * timestep));
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
 		internalVelocity[i] = zero;
 		instantVelocity[i] += extenalVelocityImpulse;
-		deltaPositions[i] = instantVelocity[i].Scale (timestep);
+		deltaPositions[i] = instantVelocity[i].Scale3 (timestep);
 		positions[i] += deltaPositions[i];
 	}
 
@@ -1088,8 +1088,8 @@ void dgCollisionDeformableSolidMesh::ApplyExternalAndInternalForces (dgDeformabl
 	dgFloat32 dampCoef = 0.0f;
 	dgVector com (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-		instantVelocity[i] += internalVelocity[i].Scale (dampCoef);
-		dgVector step (internalVelocity[i].Scale (timestep));
+		instantVelocity[i] += internalVelocity[i].Scale3 (dampCoef);
+		dgVector step (internalVelocity[i].Scale3 (timestep));
 		deltaPositions[i] += step;
 		positions[i] += step;
 		com += positions[i];

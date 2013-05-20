@@ -669,7 +669,7 @@ void dgWorld::PopulateContacts (dgCollidingPairCollector::dgPair* const pair, dg
 	dgVector vel0 (v0 + w0 * (contactArray[0].m_point - matrix0.m_posit));
 	dgVector vel1 (v1 + w1 * (contactArray[0].m_point - matrix1.m_posit));
 	dgVector vRel (vel1 - vel0);
-	dgVector tangDir (vRel - controlNormal.Scale (vRel % controlNormal));
+	dgVector tangDir (vRel - controlNormal.Scale3 (vRel % controlNormal));
 	dgFloat32 diff = tangDir % tangDir;
 
 	dgInt32 staticMotion = 0;
@@ -682,7 +682,7 @@ void dgWorld::PopulateContacts (dgCollidingPairCollector::dgPair* const pair, dg
 		}
 		controlDir0 = controlNormal * tangDir;
 		dgAssert (controlDir0 % controlDir0 > dgFloat32 (1.0e-8f));
-		controlDir0 = controlDir0.Scale (dgRsqrt (controlDir0 % controlDir0));
+		controlDir0 = controlDir0.Scale3 (dgRsqrt (controlDir0 % controlDir0));
 		controlDir1 = controlNormal * controlDir0;
 		dgAssert (dgAbsf((controlDir0 * controlDir1) % controlNormal - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 	}
@@ -767,7 +767,7 @@ void dgWorld::PopulateContacts (dgCollidingPairCollector::dgPair* const pair, dg
 				}
 				contactMaterial->m_dir0 = contactMaterial->m_normal * tangDir;
 				dgAssert (contactMaterial->m_dir0 % contactMaterial->m_dir0 > dgFloat32 (1.0e-8f));
-				contactMaterial->m_dir0 = contactMaterial->m_dir0.Scale (dgRsqrt (contactMaterial->m_dir0 % contactMaterial->m_dir0));
+				contactMaterial->m_dir0 = contactMaterial->m_dir0.Scale3 (dgRsqrt (contactMaterial->m_dir0 % contactMaterial->m_dir0));
 				contactMaterial->m_dir1 = contactMaterial->m_normal * contactMaterial->m_dir0;
 				dgAssert (dgAbsf((contactMaterial->m_dir0 * contactMaterial->m_dir1) % contactMaterial->m_normal - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 			}
@@ -784,11 +784,11 @@ void dgWorld::PopulateContacts (dgCollidingPairCollector::dgPair* const pair, dg
 				breakImpulse1 = contactMaterial->m_collision1->GetBreakImpulse();
 			}
 
-			dgVector tangDir (vRel - contactMaterial->m_normal.Scale (impulse));
+			dgVector tangDir (vRel - contactMaterial->m_normal.Scale3 (impulse));
 			diff = tangDir % tangDir;
 
 			if (diff > dgFloat32 (1.0e-2f)) {
-				contactMaterial->m_dir0 = tangDir.Scale (dgRsqrt (diff));
+				contactMaterial->m_dir0 = tangDir.Scale3 (dgRsqrt (diff));
 			} else {
 				if (dgAbsf (contactMaterial->m_normal.m_z) > dgFloat32 (0.577f)) {
 					tangDir = dgVector (-contactMaterial->m_normal.m_y, contactMaterial->m_normal.m_z, dgFloat32 (0.0f), dgFloat32 (0.0f));
@@ -797,7 +797,7 @@ void dgWorld::PopulateContacts (dgCollidingPairCollector::dgPair* const pair, dg
 				}
 				contactMaterial->m_dir0 = contactMaterial->m_normal * tangDir;
 				dgAssert (contactMaterial->m_dir0 % contactMaterial->m_dir0 > dgFloat32 (1.0e-8f));
-				contactMaterial->m_dir0 = contactMaterial->m_dir0.Scale (dgRsqrt (contactMaterial->m_dir0 % contactMaterial->m_dir0));
+				contactMaterial->m_dir0 = contactMaterial->m_dir0.Scale3 (dgRsqrt (contactMaterial->m_dir0 % contactMaterial->m_dir0));
 			}
 			contactMaterial->m_dir1 = contactMaterial->m_normal * contactMaterial->m_dir0;
 			dgAssert (dgAbsf((contactMaterial->m_dir0 * contactMaterial->m_dir1) % contactMaterial->m_normal - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
@@ -1322,7 +1322,7 @@ dgFloat32 dgWorld::CalculateTimeToImpact (dgContact* const contact, dgFloat32 ti
 	} else {
 		contact->m_body0 = body0;
 		contact->m_body1 = body1;
-		normal = proxy.m_normal.Scale(dgFloat32 (-1.0f));
+		normal = proxy.m_normal.Scale3(dgFloat32 (-1.0f));
 		p = proxy.m_closestPointBody1;
 		q = proxy.m_closestPointBody0;
 	}
@@ -1547,15 +1547,15 @@ dgInt32 dgWorld::ClosestPoint (dgCollisionParamProxy& proxy) const
 		dgVector v (tmp.m_matrix.m_posit);
 		dgFloat32 mag2 = v % v;
 		if (mag2 > dgFloat32 (0.0f)) {
-			contactJoint->m_separtingVector = v.Scale (dgRsqrt (mag2));
+			contactJoint->m_separtingVector = v.Scale3 (dgRsqrt (mag2));
 		} else {
 			contactJoint->m_separtingVector =  dgVector(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 		}
 
 		bool state = convexShape->CalculateClosestPoints (tmp);
 		if (state) {
-			proxy.m_contacts[0].m_normal = tmp.m_contacts[0].m_normal.Scale (dgFloat32 (-1.0f));
-			proxy.m_contacts[1].m_normal = tmp.m_contacts[1].m_normal.Scale (dgFloat32 (-1.0f));
+			proxy.m_contacts[0].m_normal = tmp.m_contacts[0].m_normal.Scale3 (dgFloat32 (-1.0f));
+			proxy.m_contacts[1].m_normal = tmp.m_contacts[1].m_normal.Scale3 (dgFloat32 (-1.0f));
 			dgSwap (proxy.m_contacts[0].m_point, proxy.m_contacts[1].m_point);
 			return 1;
 		}
@@ -1566,7 +1566,7 @@ dgInt32 dgWorld::ClosestPoint (dgCollisionParamProxy& proxy) const
 		dgVector v (proxy.m_matrix.m_posit);
 		dgFloat32 mag2 = v % v;
 		if (mag2 > dgFloat32 (0.0f)) {
-			contactJoint->m_separtingVector = v.Scale (dgRsqrt (mag2));
+			contactJoint->m_separtingVector = v.Scale3 (dgRsqrt (mag2));
 		} else {
 			contactJoint->m_separtingVector =  dgVector(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 		}
@@ -1656,7 +1656,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts (dgCollisionParamProxy& prox
 			dgFloat32 angularSpeedBound = maxAngularSpeed * (convexInstance->GetBoxMaxRadius() - minRadius);
 
 			dgFloat32 upperBoundSpeed = baseLinearSpeed + dgSqrt (angularSpeedBound);
-			dgVector upperBoundVeloc (hullVeloc.Scale (proxy.m_timestep * upperBoundSpeed / baseLinearSpeed));
+			dgVector upperBoundVeloc (hullVeloc.Scale3 (proxy.m_timestep * upperBoundSpeed / baseLinearSpeed));
 
 			data.m_boxDistanceTravelInMeshSpace = polySoupInstance->m_invScale.CompProduct4(soupMatrix.UnrotateVector(upperBoundVeloc.CompProduct4(convexInstance->m_invScale)));
 			data.m_distanceTravelInCollidingShapeSpace = convexInstance->m_invScale.CompProduct4(hullMatrix.UnrotateVector(upperBoundVeloc.CompProduct4(polySoupInstance->m_invScale)));
@@ -1733,7 +1733,7 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) 
 				dgVector v (tmp.m_matrix.m_posit);
 				dgFloat32 mag2 = v % v;
 				if (mag2 > dgFloat32 (0.0f)) {
-					contactJoint->m_separtingVector = v.Scale (dgRsqrt (mag2));
+					contactJoint->m_separtingVector = v.Scale3 (dgRsqrt (mag2));
 				} else {
 					contactJoint->m_separtingVector =  dgVector(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 				}
@@ -1741,14 +1741,14 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) 
 			count = convexShape->CalculateConvexCastContacts (tmp);
 			proxy.m_timestep = tmp.m_timestep;
 
-			dgVector step (tmp.m_floatingBody->m_veloc.Scale (tmp.m_timestep));
+			dgVector step (tmp.m_floatingBody->m_veloc.Scale3 (tmp.m_timestep));
 			dgContactPoint* const contactOut = proxy.m_contacts;
 			for (dgInt32 i = 0; i < count; i ++) {
-				contactOut[i].m_normal = contactOut[i].m_normal.Scale (dgFloat32 (-1.0f));
+				contactOut[i].m_normal = contactOut[i].m_normal.Scale3 (dgFloat32 (-1.0f));
 				contactOut[i].m_point += step;
 			}
 
-			proxy.m_normal = tmp.m_normal.Scale(dgFloat32 (-1.0f));
+			proxy.m_normal = tmp.m_normal.Scale3(dgFloat32 (-1.0f));
 			proxy.m_closestPointBody0 = tmp.m_closestPointBody1;
 			proxy.m_closestPointBody1 = tmp.m_closestPointBody0;
 
@@ -1761,7 +1761,7 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) 
 				dgVector v (proxy.m_matrix.m_posit);
 				dgFloat32 mag2 = v % v;
 				if (mag2 > dgFloat32 (0.0f)) {
-					contactJoint->m_separtingVector = v.Scale (dgRsqrt (mag2));
+					contactJoint->m_separtingVector = v.Scale3 (dgRsqrt (mag2));
 				} else {
 					contactJoint->m_separtingVector =  dgVector(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 				}
@@ -1788,7 +1788,7 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) 
 				dgVector v (tmp.m_matrix.m_posit);
 				dgFloat32 mag2 = v % v;
 				if (mag2 > dgFloat32 (0.0f)) {
-					contactJoint->m_separtingVector = v.Scale (dgRsqrt (mag2));
+					contactJoint->m_separtingVector = v.Scale3 (dgRsqrt (mag2));
 				} else {
 					contactJoint->m_separtingVector =  dgVector(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 				}
@@ -1799,11 +1799,11 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) 
 
 				dgContactPoint* const contactOut = proxy.m_contacts;
 				for (dgInt32 i = 0; i < count; i ++) {
-					contactOut[i].m_normal = contactOut[i].m_normal.Scale (dgFloat32 (-1.0f));
+					contactOut[i].m_normal = contactOut[i].m_normal.Scale3 (dgFloat32 (-1.0f));
 				}
 			}
 
-			proxy.m_normal = tmp.m_normal.Scale(dgFloat32 (-1.0f));
+			proxy.m_normal = tmp.m_normal.Scale3(dgFloat32 (-1.0f));
 			proxy.m_closestPointBody0 = tmp.m_closestPointBody1;
 			proxy.m_closestPointBody1 = tmp.m_closestPointBody0;
 
@@ -1816,7 +1816,7 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) 
 				dgVector v (proxy.m_matrix.m_posit);
 				dgFloat32 mag2 = v % v;
 				if (mag2 > dgFloat32 (0.0f)) {
-					contactJoint->m_separtingVector = v.Scale (dgRsqrt (mag2));
+					contactJoint->m_separtingVector = v.Scale3 (dgRsqrt (mag2));
 				} else {
 					contactJoint->m_separtingVector =  dgVector(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 				}
@@ -1869,7 +1869,7 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 	dgVector separatingVector (proxy.m_matrix.m_posit);
 	dgFloat32 mag2 = separatingVector % separatingVector;
 	if (mag2 > dgFloat32 (0.0f)) {
-		separatingVector = separatingVector.Scale (dgRsqrt (mag2));
+		separatingVector = separatingVector.Scale3 (dgRsqrt (mag2));
 	} else {
 		separatingVector =  dgVector(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	}
@@ -1924,7 +1924,7 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 	const dgMatrix& matrix = convexInstance->m_globalMatrix;
 	for (dgInt32 i = 0; i < count; i ++) {
 		const dgVector& normal = contactOut[i].m_normal;
-		dgVector minPenetration (contactOut[i].m_point - matrix.TransformVector(convexInstance->SupportVertex (matrix.UnrotateVector(normal.Scale (dgFloat32 (-1.0f))), NULL)));
+		dgVector minPenetration (contactOut[i].m_point - matrix.TransformVector(convexInstance->SupportVertex (matrix.UnrotateVector(normal.Scale3 (dgFloat32 (-1.0f))), NULL)));
 		penetrations[i] = minPenetration % normal;
 	}
 
@@ -1989,7 +1989,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue (dgCollisionParamPro
 	dgVector separatingVector (proxy.m_matrix.m_posit);
 	dgFloat32 mag2 = separatingVector % separatingVector;
 	if (mag2 > dgFloat32 (0.0f)) {
-		separatingVector = separatingVector.Scale (dgRsqrt (mag2));
+		separatingVector = separatingVector.Scale3 (dgRsqrt (mag2));
 	} else {
 		separatingVector =  dgVector(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	}
@@ -2025,7 +2025,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue (dgCollisionParamPro
 		polygon.m_faceNormalIndex = data.GetNormalIndex (localIndexArray, polygon.m_count);
 		dgVector normal (&vertex[polygon.m_faceNormalIndex * polygon.m_stride]);
 		normal = invScale.CompProduct4(normal);
-		polygon.m_normal = normal.Scale(dgRsqrt (normal % normal));
+		polygon.m_normal = normal.Scale3(dgRsqrt (normal % normal));
 		polygon.m_normal.m_w = dgFloat32 (0.0f);
 		contactJoint->m_separtingVector = separatingVector;
 		for (dgInt32 i = 0; i < polygon.m_count; i ++) {

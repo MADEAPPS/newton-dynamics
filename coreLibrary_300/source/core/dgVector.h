@@ -28,6 +28,8 @@
 #include "dgSimd.h"
 
 
+//#define DG_SIMD_VECTOR_CLASS
+
 #define dgCheckVector(x) (dgCheckFloat(x[0]) && dgCheckFloat(x[1]) && dgCheckFloat(x[2]) && dgCheckFloat(x[3]))
 
 
@@ -64,7 +66,7 @@ class dgTemplateVector
 		return (&m_x)[i];
 	}
 
-	DG_INLINE dgTemplateVector<T> Scale (T scale) const
+	DG_INLINE dgTemplateVector<T> Scale3 (T scale) const
 	{
 		return dgTemplateVector<T> (m_x * scale, m_y * scale, m_z * scale, m_w);
 	}
@@ -257,7 +259,8 @@ class dgBigVector: public dgTemplateVector<dgFloat64>
 // 128 bit single precision vector class declaration
 //
 // *****************************************************************************************
-#if 1
+#ifndef DG_SIMD_VECTOR_CLASS
+
 DG_MSC_VECTOR_ALIGMENT
 class dgVector: public dgTemplateVector<dgFloat32>
 {
@@ -326,6 +329,7 @@ class dgVector: public dgTemplateVector<dgFloat32>
 	{
 		return ((dgSimd&)*this) * (dgSimd&)A;
 	}
+
 }DG_GCC_VECTOR_ALIGMENT;
 
 
@@ -335,48 +339,124 @@ DG_MSC_VECTOR_ALIGMENT
 class dgVector
 {
 	protected:
+	public:
+	DG_INLINE dgVector() 
+	{
+	}
+
 	DG_INLINE dgVector(const __m128 type)
 		:m_type (type)
 	{
 	}
 
-	public:
-	DG_INLINE dgVector();
-	DG_INLINE dgVector(const dgSimd& val);
-	DG_INLINE dgVector (const dgFloat32* const ptr);
-	DG_INLINE dgVector (const dgBigVector& copy); 
+	DG_INLINE dgVector (const dgFloat32 a)
+		: m_type(_mm_set_ps1(a)) 
+	{
+	}
+
+	DG_INLINE dgVector(const dgSimd& val)
+		:m_type (val.m_type)
+	{
+	}
+
+	DG_INLINE dgVector (const dgFloat32* const ptr)
+		:m_type(_mm_loadu_ps (ptr))
+	{
+	}
+
+	DG_INLINE dgVector (const dgBigVector& copy)
+		:m_type(_mm_set_ps(dgFloat32 (copy.m_w), dgFloat32 (copy.m_z), dgFloat32 (copy.m_y), dgFloat32 (copy.m_x)))
+	{
+	}
+
 	DG_INLINE dgVector (dgFloat32 x, dgFloat32 y, dgFloat32 z, dgFloat32 w)
 		:m_type(_mm_set_ps(w, z, y, x))
 	{
 	}
 
-	DG_INLINE dgVector operator= (const dgSimd& val);
+	DG_INLINE dgVector (dgInt32 ix, dgInt32 iy, dgInt32 iz, dgInt32 iw)
+		:m_type(_mm_set_ps(*(dgFloat32*)&iw, *(dgFloat32*)&iz, *(dgFloat32*)&iy, *(dgFloat32*)&ix))
+	{
+	}
+
+
+	DG_INLINE dgVector operator= (const dgSimd& val)
+	{
+		m_type = val.m_type;
+		return *this;
+	}
 
 //	DG_INLINE dgFloat32 DotProductSimd (const dgVector& A) const;
 //	DG_INLINE dgVector CrossProductSimd (const dgVector &A) const;
 //	DG_INLINE dgVector CompProductSimd (const dgVector &A) const;
 	
-	DG_INLINE dgVector Scale (dgFloat32 s) const;
-	DG_INLINE dgVector Scale4 (dgFloat32 s) const;
+	DG_INLINE dgVector Scale (dgFloat32 s) const
+	{
+		return _mm_mul_ps (m_type, _mm_set_ps1(s));
+	}
 
-	DG_INLINE dgFloat32& operator[] (dgInt32 i);
-	DG_INLINE const dgFloat32& operator[] (dgInt32 i) const;
+	DG_INLINE dgVector Scale4 (dgFloat32 s) const
+	{
+		return Scale (s);
+	}
+
+	DG_INLINE dgFloat32& operator[] (dgInt32 i)
+	{
+		dgAssert (i < 4);
+		dgAssert (i >= 0);
+		return m_f[i];
+	}
+
+	DG_INLINE const dgFloat32& operator[] (dgInt32 i) const
+	{
+		dgAssert (i < 4);
+		dgAssert (i >= 0);
+		return m_f[i];
+	}
 
 	DG_INLINE dgVector operator+ (const dgVector &A) const
 	{
 		return _mm_add_ps (m_type, A.m_type);	
 	}
-	DG_INLINE dgVector operator- (const dgVector &A) const; 
-	DG_INLINE dgVector &operator+= (const dgVector &A);
-	DG_INLINE dgVector &operator-= (const dgVector &A); 
+
+	DG_INLINE dgVector Add4 (const dgVector &A) const
+	{
+		return _mm_add_ps (m_type, A.m_type);	
+	}
+
+	DG_INLINE dgVector operator- (const dgVector &A) const 
+	{
+		return _mm_sub_ps (m_type, A.m_type);	
+	}
+
+	DG_INLINE dgVector Sub4 (const dgVector &A) const
+	{
+		return _mm_sub_ps (m_type, A.m_type);	
+	}
+
+	DG_INLINE dgVector &operator+= (const dgVector &A)
+	{
+		m_type = _mm_add_ps (m_type, A.m_type);
+		return *this;
+	}
+
+	DG_INLINE dgVector &operator-= (const dgVector &A)
+	{
+		m_type = _mm_sub_ps (m_type, A.m_type);
+		return *this;
+	}
 
 	// return dot product
 	DG_INLINE dgFloat32 operator% (const dgVector &A) const
 	{
-		dgAssert (0);
-		dgAssert ((m_w * A.m_w) == dgFloat32 (0.0f));
-		dgVector dot (_mm_mul_ps (m_type, A.m_type));
-		return dot.AddHorizontal().m_x;
+		dgVector tmp (A & m_triplexMask);
+		dgAssert ((m_w * tmp.m_w) == dgFloat32 (0.0f));
+		return CompProduct(tmp).AddHorizontal().m_x;
+	}
+
+	DG_INLINE dgFloat32 DotProduct4 (const dgVector &A) const
+	{
+		return CompProduct(A).AddHorizontal().m_x;
 	}
 
 	// return cross product
@@ -387,17 +467,55 @@ class dgVector
 
 	}
 
-	// return dot 4d dot product
-	DG_INLINE dgVector Add4 (const dgVector &A) const;
-	DG_INLINE dgVector Sub4 (const dgVector &A) const;
-	DG_INLINE dgFloat32 DotProduct4 (const dgVector &A) const; 
-	DG_INLINE dgVector CrossProduct4 (const dgVector &A, const dgVector &B) const; 
+	DG_INLINE dgVector CrossProduct4 (const dgVector &A, const dgVector &B) const
+	{
+		dgFloat32 cofactor[3][3];
+		dgFloat32 array[4][4];
+
+		const dgVector& me = *this;
+		for (dgInt32 i = 0; i < 4; i ++) {
+			array[0][i] = me[i];
+			array[1][i] = A[i];
+			array[2][i] = B[i];
+			array[3][i] = dgFloat32 (1.0f);
+		}
+
+		dgVector normal;
+		dgFloat32  sign = dgFloat32 (-1.0f);
+		for (dgInt32 i = 0; i < 4; i ++)  {
+
+			for (dgInt32 j = 0; j < 3; j ++) {
+				dgInt32 k0 = 0;
+				for (dgInt32 k = 0; k < 4; k ++) {
+					if (k != i) {
+						cofactor[j][k0] = array[j][k];
+						k0 ++;
+					}
+				}
+			}
+			dgFloat32  x = cofactor[0][0] * (cofactor[1][1] * cofactor[2][2] - cofactor[1][2] * cofactor[2][1]);
+			dgFloat32  y = cofactor[0][1] * (cofactor[1][2] * cofactor[2][0] - cofactor[1][0] * cofactor[2][2]);
+			dgFloat32  z = cofactor[0][2] * (cofactor[1][0] * cofactor[2][1] - cofactor[1][1] * cofactor[2][0]);
+			dgFloat32  det = x + y + z;
+
+			normal[i] = sign * det;
+			sign *= dgFloat32 (-1.0f);
+		}
+
+		return normal;
+	}
 
 	// component wise multiplication
-	DG_INLINE dgVector CompProduct (const dgVector &A) const;
+	DG_INLINE dgVector CompProduct (const dgVector &A) const
+	{
+		return _mm_mul_ps (m_type, A.m_type);
+	}
 
 	// component wise multiplication
-	DG_INLINE dgVector CompProduct4 (const dgVector &A) const;
+	DG_INLINE dgVector CompProduct4 (const dgVector &A) const
+	{
+		return CompProduct (A);
+	}
 
 	DG_INLINE dgVector AddHorizontal () const
 	{
@@ -405,10 +523,17 @@ class dgVector
 		return _mm_hadd_ps (tmp.m_type, tmp.m_type);
 	}
 
+	// logical operations
+	DG_INLINE dgVector operator& (const dgVector& data) const
+	{
+		return _mm_and_ps (m_type, data.m_type);	
+	}
+
 	DG_CLASS_ALLOCATOR(allocator)
 	
 	union {
 		__m128 m_type;
+		dgFloat32 m_f[4];
 		struct {
 			dgFloat32 m_x;
 			dgFloat32 m_y;
@@ -422,10 +547,13 @@ class dgVector
 			dgFloat32 m_iw;
 		};
 	};
+
+	static dgVector m_triplexMask;
 } DG_GCC_VECTOR_ALIGMENT;
+
+
+
 #endif
-
-
 
 
 

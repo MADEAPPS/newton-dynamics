@@ -62,7 +62,7 @@ void dgCollisionTaperedCylinder::Init (dgFloat32 radio0, dgFloat32 radio1, dgFlo
 	m_dirVector.m_y = m_height * dgFloat32 (2.0f);
 	m_dirVector.m_z = dgFloat32 (0.0f);
 	m_dirVector.m_w = dgFloat32 (0.0f);
-	m_dirVector = m_dirVector.Scale(dgRsqrt(m_dirVector % m_dirVector));
+	m_dirVector = m_dirVector.Scale3(dgRsqrt(m_dirVector % m_dirVector));
 
 	dgFloat32 angle = dgFloat32 (0.0f);
 	for (dgInt32 i = 0; i < DG_CYLINDER_SEGMENTS; i ++) {
@@ -323,7 +323,7 @@ dgFloat32 dgCollisionTaperedCylinder::CalculateMassProperties (const dgMatrix& o
 	inertia.m_y = inertiaTensor[1][1] + volume * (central.m_z + central.m_x);
 	inertia.m_z = inertiaTensor[2][2] + volume * (central.m_x + central.m_y);
 
-	centerOfMass = centerOfMass.Scale (volume);
+	centerOfMass = centerOfMass.Scale3 (volume);
 */
 	return volume;
 }

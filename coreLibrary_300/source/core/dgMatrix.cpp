@@ -24,6 +24,10 @@
 #include "dgQuaternion.h"
 
 
+#ifdef DG_SIMD_VECTOR_CLASS
+dgVector dgVector::m_triplexMask (0xffffffff, 0xffffffff, 0xffffffff, 0);
+#endif
+
 static dgMatrix zeroMatrix (dgVector (dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f)),
 							dgVector (dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f)),
 							dgVector (dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f)),
@@ -217,8 +221,8 @@ void dgMatrix::TransformBBox (const dgVector& p0local, const dgVector& p1local, 
 */
 
 	const dgMatrix& matrix = *this;
-	dgVector size ((p1local - p0local).Scale (dgFloat32 (0.5f)));
-	dgVector center (TransformVector ((p1local + p0local).Scale (dgFloat32 (0.5f))));
+	dgVector size ((p1local - p0local).Scale3 (dgFloat32 (0.5f)));
+	dgVector center (TransformVector ((p1local + p0local).Scale3 (dgFloat32 (0.5f))));
 	dgVector extends (size.m_x * dgAbsf(matrix[0][0]) + size.m_y * dgAbsf(matrix[1][0]) + size.m_z * dgAbsf(matrix[2][0]),  
 					  size.m_x * dgAbsf(matrix[0][1]) + size.m_y * dgAbsf(matrix[1][1]) + size.m_z * dgAbsf(matrix[2][1]),  
 	                  size.m_x * dgAbsf(matrix[0][2]) + size.m_y * dgAbsf(matrix[1][2]) + size.m_z * dgAbsf(matrix[2][2]), dgFloat32 (0.0f));  
@@ -398,7 +402,7 @@ void dgMatrix::EigenVectors (dgVector &eigenValues, const dgMatrix& initialGuess
 			// order the eigenvalue vectors	
 			dgVector tmp (eigenVectors.m_front * eigenVectors.m_up);
 			if (tmp % eigenVectors.m_right < dgFloat32(0.0f)) {
-				eigenVectors.m_right = eigenVectors.m_right.Scale (-dgFloat32(1.0f));
+				eigenVectors.m_right = eigenVectors.m_right.Scale3 (-dgFloat32(1.0f));
 			}
 
 			eigenValues = dgVector (d[0], d[1], d[2], dgFloat32 (0.0f));
@@ -553,7 +557,7 @@ void dgMatrix::EigenVectors (dgVector &eigenValues, const dgMatrix& initialGuess
 			// order the eigenvalue vectors	
 			dgVector tmp (eigenVectors.m_front * eigenVectors.m_up);
 			if (tmp % eigenVectors.m_right < dgFloat32(0.0f)) {
-				eigenVectors.m_right = eigenVectors.m_right.Scale (-dgFloat32(1.0f));
+				eigenVectors.m_right = eigenVectors.m_right.Scale3 (-dgFloat32(1.0f));
 			}
 
 			eigenValues = dgVector (d[0], d[1], d[2], dgFloat32 (0.0f));

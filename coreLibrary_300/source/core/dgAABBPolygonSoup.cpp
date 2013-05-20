@@ -488,13 +488,13 @@ class dgAABBTree
 							maxP.m_y = dgMax (p1.m_y, maxP.m_y); 
 							maxP.m_z = dgMax (p1.m_z, maxP.m_z); 
 
-							dgVector p ((p0 + p1).Scale (0.5f));
+							dgVector p ((p0 + p1).Scale3 (0.5f));
 
 							median += p;
 							varian += p.CompProduct (p);
 						}
 
-						varian = varian.Scale (dgFloat32 (boxCount)) - median.CompProduct(median);
+						varian = varian.Scale3 (dgFloat32 (boxCount)) - median.CompProduct(median);
 
 
 						dgInt32 index = 0;
@@ -506,7 +506,7 @@ class dgAABBTree
 							}
 						}
 	
-						dgVector center = median.Scale (dgFloat32 (1.0f) / dgFloat32 (boxCount));
+						dgVector center = median.Scale3 (dgFloat32 (1.0f) / dgFloat32 (boxCount));
 
 						dgFloat32 test = center[index];
 
@@ -1404,7 +1404,7 @@ dgIntersectStatus dgAABBPolygonSoup::CalculateDisjointedFaceEdgeNormals (void* c
 						dgAssert (y1 > y0);
 						if (!((y0 >= x1) || (y1 <= x0))) {
 							dgFloat64 t = ((p0 - q0) % q1q0) / q1q0Mag2;
-							dgBigVector q (q0 + q1q0.Scale(t));
+							dgBigVector q (q0 + q1q0.Scale3(t));
 							dgBigVector dist (p0 - q);
 							dgFloat64 err2 = dist % dist;
 							if (err2 < DG_WELDING_TOL2) {
@@ -1523,7 +1523,7 @@ dgFloat32 dgAABBPolygonSoup::CalculateFaceMaxSize (dgTriplex* const vertex, dgIn
 		dgVector p1 (vertex[index].m_x, vertex[index].m_y, vertex[index].m_z, dgFloat32 (0.0f));
 
 		dgVector dir (p1 - p0);
-		dir = dir.Scale (dgRsqrt (dir % dir));
+		dir = dir.Scale3 (dgRsqrt (dir % dir));
 
 		dgFloat32 maxVal = dgFloat32 (-1.0e10f);
 		dgFloat32 minVal = dgFloat32 ( 1.0e10f);

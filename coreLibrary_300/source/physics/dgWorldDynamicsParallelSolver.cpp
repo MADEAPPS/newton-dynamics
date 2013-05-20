@@ -189,9 +189,9 @@ dgAssert (0);
 		for (dgInt32 i = 0; i < count; i ++) {
 			dgJacobianMatrixElement* const row = &matrixRow[index];
 
-			dgVector JMinvJacobianLinearM0 (row->m_Jt.m_jacobianM0.m_linear.Scale (invMass0));
+			dgVector JMinvJacobianLinearM0 (row->m_Jt.m_jacobianM0.m_linear.Scale3 (invMass0));
 			dgVector JMinvJacobianAngularM0 (invInertia0.UnrotateVector (row->m_Jt.m_jacobianM0.m_angular));
-			dgVector JMinvJacobianLinearM1 (row->m_Jt.m_jacobianM1.m_linear.Scale (invMass1));
+			dgVector JMinvJacobianLinearM1 (row->m_Jt.m_jacobianM1.m_linear.Scale3 (invMass1));
 			dgVector JMinvJacobianAngularM1 (invInertia1.UnrotateVector (row->m_Jt.m_jacobianM1.m_angular));
 
 			dgVector tmpDiag (JMinvJacobianLinearM0.CompProduct(row->m_Jt.m_jacobianM0.m_linear) +
@@ -277,10 +277,10 @@ void dgWorldDynamicUpdate::SolverInitInternalForcesParallelKernel (void* const c
 
 			dgFloat32 val = row->m_force; 
 			dgAssert (dgCheckFloat(val));
-			y0.m_linear += row->m_Jt.m_jacobianM0.m_linear.Scale (val);
-			y0.m_angular += row->m_Jt.m_jacobianM0.m_angular.Scale (val);
-			y1.m_linear += row->m_Jt.m_jacobianM1.m_linear.Scale (val);
-			y1.m_angular += row->m_Jt.m_jacobianM1.m_angular.Scale (val);
+			y0.m_linear += row->m_Jt.m_jacobianM0.m_linear.Scale3 (val);
+			y0.m_angular += row->m_Jt.m_jacobianM0.m_angular.Scale3 (val);
+			y1.m_linear += row->m_Jt.m_jacobianM1.m_linear.Scale3 (val);
+			y1.m_angular += row->m_Jt.m_jacobianM1.m_angular.Scale3 (val);
 		}
 
 		dgInt32 m0 = jointInfo->m_m0;
@@ -387,9 +387,9 @@ dgAssert (0);
 		for (dgInt32 k = 0; k < rowsCount; k ++) {
 			dgJacobianMatrixElement* const row = &matrixRow[index];
 
-			dgVector JMinvJacobianLinearM0 (row->m_Jt.m_jacobianM0.m_linear.Scale (invMass0));
+			dgVector JMinvJacobianLinearM0 (row->m_Jt.m_jacobianM0.m_linear.Scale3 (invMass0));
 			dgVector JMinvJacobianAngularM0 (invInertia0.UnrotateVector (row->m_Jt.m_jacobianM0.m_angular));
-			dgVector JMinvJacobianLinearM1 (row->m_Jt.m_jacobianM1.m_linear.Scale (invMass1));
+			dgVector JMinvJacobianLinearM1 (row->m_Jt.m_jacobianM1.m_linear.Scale3 (invMass1));
 			dgVector JMinvJacobianAngularM1 (invInertia1.UnrotateVector (row->m_Jt.m_jacobianM1.m_angular));
 
 			dgVector acc (JMinvJacobianLinearM0.CompProduct(linearM0) + 
@@ -419,10 +419,10 @@ dgAssert (0);
 			row->m_force = f;
 			normalForce[k] = f;
 
-			linearM0 += row->m_Jt.m_jacobianM0.m_linear.Scale (prevValue);
-			angularM0 += row->m_Jt.m_jacobianM0.m_angular.Scale (prevValue);
-			linearM1 += row->m_Jt.m_jacobianM1.m_linear.Scale (prevValue);
-			angularM1 += row->m_Jt.m_jacobianM1.m_angular.Scale (prevValue);
+			linearM0 += row->m_Jt.m_jacobianM0.m_linear.Scale3 (prevValue);
+			angularM0 += row->m_Jt.m_jacobianM0.m_angular.Scale3 (prevValue);
+			linearM1 += row->m_Jt.m_jacobianM1.m_linear.Scale3 (prevValue);
+			angularM1 += row->m_Jt.m_jacobianM1.m_angular.Scale3 (prevValue);
 			index ++;
 		}
 		internalForces[m0].m_linear = linearM0;
@@ -460,10 +460,10 @@ dgAssert (0);
 		dgVector force (body->m_accel + internalForces[index].m_linear);
 		dgVector torque (body->m_alpha + internalForces[index].m_angular);
 
-		dgVector accel (force.Scale (body->m_invMass.m_w));
+		dgVector accel (force.Scale3 (body->m_invMass.m_w));
 		dgVector alpha (body->m_invWorldInertiaMatrix.RotateVector (torque));
-		body->m_veloc += accel.Scale(timestep);
-		body->m_omega += alpha.Scale(timestep);
+		body->m_veloc += accel.Scale3(timestep);
+		body->m_omega += alpha.Scale3(timestep);
 
 		//internalVeloc[index].m_linear += body->m_veloc;
 		//internalVeloc[index].m_angular += body->m_omega;
@@ -495,7 +495,7 @@ dgAssert (0);
 		const dgVector& linearMomentum = internalForces[index].m_linear;
 		const dgVector& angularMomentum = internalForces[index].m_angular;
 
-		body->m_veloc += linearMomentum.Scale(body->m_invMass.m_w);
+		body->m_veloc += linearMomentum.Scale3(body->m_invMass.m_w);
 		body->m_omega += body->m_invWorldInertiaMatrix.RotateVector (angularMomentum);
 
 		//internalVeloc[index].m_linear += body->m_veloc;
@@ -556,8 +556,8 @@ dgAssert (0);
 		dgDynamicBody* const body = bodyArray[index].m_body;
 
 		// the initial velocity and angular velocity were stored in net force and net torque, for memory saving
-		dgVector accel = (body->m_veloc - body->m_netForce).Scale (invTimestepSrc);
-		dgVector alpha = (body->m_omega - body->m_netTorque).Scale (invTimestepSrc);
+		dgVector accel = (body->m_veloc - body->m_netForce).Scale3 (invTimestepSrc);
+		dgVector alpha = (body->m_omega - body->m_netTorque).Scale3 (invTimestepSrc);
 
 		if ((accel % accel) < maxAccNorm2) {
 			accel = zero;
@@ -569,7 +569,7 @@ dgAssert (0);
 
 		body->m_accel = accel;
 		body->m_alpha = alpha;
-		body->m_netForce = accel.Scale (body->m_mass[3]);
+		body->m_netForce = accel.Scale3 (body->m_mass[3]);
 
 		alpha = body->m_matrix.UnrotateVector(alpha);
 		body->m_netTorque = body->m_matrix.RotateVector (alpha.CompProduct(body->m_mass));

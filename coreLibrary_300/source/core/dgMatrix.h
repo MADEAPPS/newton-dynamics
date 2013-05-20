@@ -131,7 +131,7 @@ DG_INLINE dgMatrix::dgMatrix (const dgVector& front)
 	} else {
 	  	m_right = front * dgVector (-front.m_y, front.m_x, dgFloat32(0.0f), dgFloat32(0.0f));
 	}
-  	m_right = m_right.Scale (dgRsqrt (m_right % m_right));
+  	m_right = m_right.Scale3 (dgRsqrt (m_right % m_right));
   	m_up = m_right * m_front;
 
 	m_front.m_w = dgFloat32(0.0f);

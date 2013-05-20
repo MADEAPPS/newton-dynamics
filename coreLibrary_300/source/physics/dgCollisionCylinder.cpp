@@ -350,7 +350,7 @@ dgFloat32 dgCollisionCylinder::RayCast (const dgVector& q0, const dgVector& q1, 
 			dgFloat32 t1 = dgMin ((- b + desc) * a, (- b - desc) * a);
 			if ((t1 < dgFloat32 (1.0f)) && (t1 >= dgFloat32 (0.0f))) {
 				dgVector dq (q1 - q0);
-				dgVector contact (q0 + dq.Scale (t1));
+				dgVector contact (q0 + dq.Scale3 (t1));
 				if (contact.m_x > m_height) {
 					if (q1.m_x < m_height) {
 						t1 = (m_height - q0.m_x) / (q1.m_x - q0.m_x);
@@ -377,7 +377,7 @@ dgFloat32 dgCollisionCylinder::RayCast (const dgVector& q0, const dgVector& q1, 
 					t = t1;
 					dgVector n (contact);
 					n.m_x = dgFloat32 (0.0f);
-					contactOut.m_normal = n.Scale (dgRsqrt (n % n));
+					contactOut.m_normal = n.Scale3 (dgRsqrt (n % n));
 					//contactOut.m_userId = SetUserDataID();
 				}
 			}

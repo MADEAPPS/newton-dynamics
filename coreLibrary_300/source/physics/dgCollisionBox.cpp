@@ -349,7 +349,7 @@ dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, cons
 
 				dgAssert (t <= dgFloat32 (0.01f));
 				dgAssert (t >= dgFloat32 (-1.05f));
-				contactsOut[count] = m_vertex[ptr->m_vertex] - dp.Scale (t);
+				contactsOut[count] = m_vertex[ptr->m_vertex] - dp.Scale3 (t);
 				count ++;
 
 				dgConvexSimplexEdge* ptr1 = ptr->m_next;
@@ -506,7 +506,7 @@ void dgCollisionBox::GetCollisionInfo(dgCollisionInfo* const info) const
 void dgCollisionBox::Serialize(dgSerialize callback, void* const userData) const
 {
 	SerializeLow(callback, userData);
-	dgVector size (m_size[0].Scale (dgFloat32 (2.0f)));
+	dgVector size (m_size[0].Scale3 (dgFloat32 (2.0f)));
 	callback (userData, &size, sizeof (dgVector));
 }
 
@@ -590,7 +590,7 @@ dgInt32 dgWorld::CalculateBoxToBoxContacts (dgBody* box1, dgBody* box2, dgContac
 			if (test < dgFloat32 (0.0f)) {
 				plane[i] = dgFloat32 (-1.0f);
 			}
-			plane = matrix1.TransformPlane (plane).Scale (dgFloat32 (-1.0f));
+			plane = matrix1.TransformPlane (plane).Scale3 (dgFloat32 (-1.0f));
 		}
 	}
 
@@ -599,19 +599,19 @@ dgInt32 dgWorld::CalculateBoxToBoxContacts (dgBody* box1, dgBody* box2, dgContac
 			dgVector normal (matrix1[k] * matrix2[i]);
 			test = (normal % normal) ;
 			if (test > dgFloat32(1.0e-6f)) {
-				normal = normal.Scale (dgRsqrt (test));
+				normal = normal.Scale3 (dgRsqrt (test));
 				d2 = size2[0] * dgAbsf (matrix2[0] % normal) + size2[1] * dgAbsf (matrix2[1] % normal) + size2[2] * dgAbsf (matrix2[2] % normal);
 				d1 = size1[0] * dgAbsf (matrix1[0] % normal) + size1[1] * dgAbsf (matrix1[1] % normal) + size1[2] * dgAbsf (matrix1[2] % normal);
 
-				dgVector q (matrix2[3] - normal.Scale (d2));
-				dgVector p (matrix1[3] + normal.Scale (d1));
+				dgVector q (matrix2[3] - normal.Scale3 (d2));
+				dgVector p (matrix1[3] + normal.Scale3 (d1));
 				dist = (q - p) % normal;
 				if (dist > (-DG_RESTING_CONTACT_PENETRATION)) {
 					return 0;
 				}
 
-				dgVector q1 (matrix2[3] + normal.Scale (d2));
-				dgVector p1 (matrix1[3] - normal.Scale (d1));
+				dgVector q1 (matrix2[3] + normal.Scale3 (d2));
+				dgVector p1 (matrix1[3] - normal.Scale3 (d1));
 				test = (p1 - q1) % normal;
 				if (test > (-DG_RESTING_CONTACT_PENETRATION)) {
 					return 0;
@@ -645,11 +645,11 @@ dgInt32 dgWorld::CalculateBoxToBoxContacts (dgBody* box1, dgBody* box2, dgContac
 	dgPlane plane1 (matrix1.UntransformPlane (plane));	
 	count1 = collision1->CalculatePlaneIntersection (plane1, shape1);
 	if (!count1) {
-		dgVector p1 (collision1->SupportVertex (plane1.Scale (dgFloat32 (-1.0f))));
+		dgVector p1 (collision1->SupportVertex (plane1.Scale3 (dgFloat32 (-1.0f))));
 		dgPlane plane (plane1, - (plane1 % p1) - DG_ROBUST_PLANE_CLIP);
 		count1 = collision1->CalculatePlaneIntersection (plane, shape1);
 		if (count1) {
-			dgVector err (plane1.Scale (plane1.Evalue (shape1[0])));
+			dgVector err (plane1.Scale3 (plane1.Evalue (shape1[0])));
 			for (i = 0; i < count1; i ++) {
 				shape1[i] -= err;
 			}
@@ -666,7 +666,7 @@ dgInt32 dgWorld::CalculateBoxToBoxContacts (dgBody* box1, dgBody* box2, dgContac
 		dgPlane plane (plane2, DG_ROBUST_PLANE_CLIP - (plane2 % p2));
 		count2 = collision2->CalculatePlaneIntersection (plane, shape2);
 		if (count2) {
-			dgVector err (plane2.Scale (plane2.Evalue (shape2[0])));
+			dgVector err (plane2.Scale3 (plane2.Evalue (shape2[0])));
 			for (i = 0; i < count2; i ++) {
 				shape2[i] -= err;
 			}

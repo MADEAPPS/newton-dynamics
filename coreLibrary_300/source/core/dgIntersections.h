@@ -63,7 +63,7 @@ class dgFastRayTest
 
 	void Reset (dgFloat32 t) 
 	{
-		m_dpInv = m_dpBaseInv.Scale (dgFloat32 (1.0f) / (t + dgFloat32 (1.0e-12f)));
+		m_dpInv = m_dpBaseInv.Scale3 (dgFloat32 (1.0f) / (t + dgFloat32 (1.0e-12f)));
 	}
 
 	dgVector m_p0;
@@ -151,7 +151,7 @@ DG_INLINE dgInt32 dgCompareBox (const dgVector& p0, const dgVector& p1, const dg
 
 DG_INLINE void dgMovingAABB (dgVector& p0, dgVector& p1, const dgVector& veloc, const dgVector& omega, dgFloat32 timestep, dgFloat32 maxRadius, dgFloat32 minRadius)
 {
-	dgVector linearStep (veloc.Scale (timestep));
+	dgVector linearStep (veloc.Scale3 (timestep));
 
 	// estimate the maximum effect of the angular velocity and enlarge that box by that value (use 45 degrees as max angle not 90)
 	dgFloat32 maxAngle = dgMin (dgSqrt ((omega % omega) * timestep * timestep), dgFloat32 (45.0f * 3.14159f / 180.0f));

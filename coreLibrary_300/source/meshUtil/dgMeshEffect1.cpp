@@ -129,7 +129,7 @@ void dgMeshEffect::dgMeshBVH::dgMeshBVHNode::SetBox (const dgVector& p0, const d
 	m_p0.m_w = 0.0f;
 	m_p1.m_w = 0.0f;
 
-	dgVector size ((m_p1 - m_p0).Scale (dgFloat32 (0.5f)));
+	dgVector size ((m_p1 - m_p0).Scale3 (dgFloat32 (0.5f)));
 	dgVector size1(size.m_y, size.m_z, size.m_x, dgFloat32 (0.0f));
 	m_area = size % size1;
 }
@@ -170,7 +170,7 @@ dgFloat32 dgMeshEffect::dgMeshBVH::CalculateSurfaceArea (dgMeshBVHNode* const no
 {
 	minBox = dgVector (dgMin (node0->m_p0.m_x, node1->m_p0.m_x), dgMin (node0->m_p0.m_y, node1->m_p0.m_y), dgMin (node0->m_p0.m_z, node1->m_p0.m_z), dgFloat32 (0.0f));
 	maxBox = dgVector (dgMax (node0->m_p1.m_x, node1->m_p1.m_x), dgMax (node0->m_p1.m_y, node1->m_p1.m_y), dgMax (node0->m_p1.m_z, node1->m_p1.m_z), dgFloat32 (0.0f));		
-	dgVector side0 ((maxBox - minBox).Scale (dgFloat32 (0.5f)));
+	dgVector side0 ((maxBox - minBox).Scale3 (dgFloat32 (0.5f)));
 	dgVector side1 (side0.m_y, side0.m_z, side0.m_x, dgFloat32 (0.0f));
 	return side0 % side1;
 }
@@ -569,7 +569,7 @@ dgFloat64 dgMeshEffect::dgMeshBVH::VertexRayCast (const dgBigVector& p0, const d
 					dgBigVector q0p0 (q0 - p0);
 					dgFloat64 alpha = q0p0 % p1p0;
 					if ((alpha > (DG_BOOLEAN_ZERO_TOLERANCE * den)) && (alpha < (den - DG_BOOLEAN_ZERO_TOLERANCE))) {
-						dgBigVector dist (p0 + p1p0.Scale (alpha / den) - q0);
+						dgBigVector dist (p0 + p1p0.Scale3 (alpha / den) - q0);
 						dgFloat64 dist2 = dist % dist;
 						if (dist2 < (DG_BOOLEAN_ZERO_TOLERANCE * DG_BOOLEAN_ZERO_TOLERANCE)) {
 							return alpha / den;
@@ -631,10 +631,10 @@ bool dgMeshEffect::dgMeshBVH::RayRayIntersect (dgEdge* const edge, const dgMeshE
 			return false;
 		}
 		//dgBigVector normal (p1p0 * q1q0);
-		//dgFloat64 dist0 = normal % (p1p0.Scale (t / den) - ray_p0);
-		//dgFloat64 dist1 = normal % (q1q0.Scale (s / den) - ray_q0);
-		dgBigVector r0 = ray_p0 + p1p0.Scale (t / den);
-		dgBigVector r1 = ray_q0 + q1q0.Scale (s / den);
+		//dgFloat64 dist0 = normal % (p1p0.Scale3 (t / den) - ray_p0);
+		//dgFloat64 dist1 = normal % (q1q0.Scale3 (s / den) - ray_q0);
+		dgBigVector r0 = ray_p0 + p1p0.Scale3 (t / den);
+		dgBigVector r1 = ray_q0 + q1q0.Scale3 (s / den);
 		dgBigVector r1r0 (r1 - r0);
 		dgFloat64 dist2 = r1r0 % r1r0;
 		if (dist2 > (DG_BOOLEAN_ZERO_TOLERANCE * DG_BOOLEAN_ZERO_TOLERANCE)) {
@@ -1423,7 +1423,7 @@ void dgMeshEffect::ApplyTransform (const dgMatrix& matrix)
 		dgVector n (dgFloat32 (m_attrib[i].m_normal_x), dgFloat32 (m_attrib[i].m_normal_y), dgFloat32 (m_attrib[i].m_normal_z), dgFloat32 (0.0f));
 		n = rotation.RotateVector(n);
 		dgAssert ((n % n) > dgFloat32 (0.0f));
-		n = n.Scale (dgRsqrt (n % n));
+		n = n.Scale3 (dgRsqrt (n % n));
 		m_attrib[i].m_normal_x = n.m_x;
 		m_attrib[i].m_normal_y = n.m_y;
 		m_attrib[i].m_normal_z = n.m_z;
@@ -1547,7 +1547,7 @@ dgBigVector dgMeshEffect::GetOrigin ()const
 	for (dgInt32 i = 0; i < m_pointCount; i ++) {
 		origin += m_points[i];
 	}	
-	return origin.Scale (dgFloat64 (1.0f) / m_pointCount);
+	return origin.Scale3 (dgFloat64 (1.0f) / m_pointCount);
 }
 
 
@@ -1601,7 +1601,7 @@ void dgMeshEffect::SphericalMapping (dgInt32 material)
 	for (dgInt32 i = 0; i < m_pointCount; i ++) {
 		dgBigVector point (m_points[i] - origin);
 		dgAssert ((point % point) > dgFloat32 (0.0f));
-		point = point.Scale (dgRsqrt (point % point));
+		point = point.Scale3 (dgRsqrt (point % point));
 
 		dgFloat64 u = dgAsin (point.m_y);
 		dgFloat64 v = dgAtan2 (point.m_x, point.m_z);
@@ -1654,7 +1654,7 @@ void dgMeshEffect::CylindricalMapping (dgInt32 cylinderMaterial, dgInt32 capMate
 		dgFloat64 u = (point.m_x - pMin.m_x) * scale.m_x;
 
 		dgAssert ((point % point) > dgFloat32 (0.0f));
-		point = point.Scale (dgRsqrt (point % point));
+		point = point.Scale3 (dgRsqrt (point % point));
 		dgFloat64 v = dgAtan2 (point.m_y, point.m_z);
 
 		v = (dgFloat64 (3.141592f) - v) / dgFloat64 (2.0f * 3.141592f);
@@ -1812,7 +1812,7 @@ void dgMeshEffect::UniformBoxMapping (dgInt32 material, const dgMatrix& textureM
 			//if (edge->m_mark < mark){
 			if ((edge->m_mark < mark) && (edge->m_incidentFace > 0)) {
 				dgBigVector n (FaceNormal(edge, &m_points[0].m_x, sizeof (dgBigVector)));
-				dgVector normal (rotationMatrix.RotateVector(dgVector (n.Scale (dgFloat64 (1.0f) / sqrt (n % n)))));
+				dgVector normal (rotationMatrix.RotateVector(dgVector (n.Scale3 (dgFloat64 (1.0f) / sqrt (n % n)))));
 				normal.m_x = dgAbsf (normal.m_x);
 				normal.m_y = dgAbsf (normal.m_y);
 				normal.m_z = dgAbsf (normal.m_z);
@@ -1858,7 +1858,7 @@ void dgMeshEffect::CalculateNormals (dgFloat64 angleInRadians)
 			dgEdge* ptr = edge;
 			do {
 				dgBigVector normal (FaceNormal (ptr, &m_points[0].m_x, sizeof (m_points[0])));
-				normal = normal.Scale (dgFloat32 (1.0f) / (sqrt(normal % normal) + dgFloat32(1.0e-16f)));
+				normal = normal.Scale3 (dgFloat32 (1.0f) / (sqrt(normal % normal) + dgFloat32(1.0e-16f)));
 				faceNormal[edgeIndex] = normal;
 				normalsMap.Insert(edgeIndex, ptr);
 				edgeIndex ++;
@@ -1897,7 +1897,7 @@ void dgMeshEffect::CalculateNormals (dgFloat64 angleInRadians)
 				normal += normal1;
 				normal0 = normal1;
 			} 
-			normal = normal.Scale (dgFloat32 (1.0f) / (sqrt(normal % normal) + dgFloat32(1.0e-16f)));
+			normal = normal.Scale3 (dgFloat32 (1.0f) / (sqrt(normal % normal) + dgFloat32(1.0e-16f)));
 			for (dgInt32 i = 0; i < attribCount; i ++) {
 				tmpAttributes[i].m_normal_x = normal.m_x;
 				tmpAttributes[i].m_normal_y = normal.m_y;
@@ -2746,7 +2746,7 @@ dgBigVector dgMeshEffect::CalculateFaceNormal (const void* const face) const
 	dgTreeNode* const node = (dgTreeNode*) face;
 	dgEdge* const faceEdge = &node->GetInfo();
 	dgBigVector normal (FaceNormal (faceEdge, &m_points[0].m_x, sizeof (m_points[0])));
-	normal = normal.Scale (1.0f / sqrt (normal % normal));
+	normal = normal.Scale3 (1.0f / sqrt (normal % normal));
 	return normal;
 }
 
@@ -3037,7 +3037,7 @@ dgCollisionInstance* dgMeshEffect::CreateConvexCollision(dgWorld* const world, d
 	dgBigVector minBox;
 	dgBigVector maxBox;
 	CalculateAABB (minBox, maxBox);
-	dgVector com ((minBox + maxBox).Scale (dgFloat32 (0.5f)));
+	dgVector com ((minBox + maxBox).Scale3 (dgFloat32 (0.5f)));
 
 	dgInt32 count = 0;
 	dgInt32 mark = IncLRU();
@@ -3236,7 +3236,7 @@ dgMeshEffect::dgVertexAtribute dgMeshEffect::InterpolateVertex (const dgBigVecto
 					dgBigVector normal (attr0.m_normal_x * alpha0 + attr1.m_normal_x * alpha1 + attr2.m_normal_x * alpha2,
 										attr0.m_normal_y * alpha0 + attr1.m_normal_y * alpha1 + attr2.m_normal_y * alpha2,
 										attr0.m_normal_z * alpha0 + attr1.m_normal_z * alpha1 + attr2.m_normal_z * alpha2, dgFloat32 (0.0f));
-					normal = normal.Scale (dgFloat64 (1.0f) / sqrt (normal % normal));
+					normal = normal.Scale3 (dgFloat64 (1.0f) / sqrt (normal % normal));
 
 		#ifdef _DEBUG
 					dgBigVector testPoint (attr0.m_vertex.m_x * alpha0 + attr1.m_vertex.m_x * alpha1 + attr2.m_vertex.m_x * alpha2,

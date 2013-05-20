@@ -156,18 +156,18 @@ void dgCollisionConvexPolygon::BeamClipping (const dgCollisionInstance* const hu
 	dgVector points[sizeof (m_localPoly) / sizeof (m_localPoly[0]) + 8];
 	dgClippedFaceEdge clippedFace [sizeof (m_localPoly) / sizeof (m_localPoly[0]) + 8];
 
-	//dgVector origin (matrix.UnrotateVector (matrix.m_posit.Scale (dgFloat32 (-1.0f))));	 
+	//dgVector origin (matrix.UnrotateVector (matrix.m_posit.Scale3 (dgFloat32 (-1.0f))));	 
 	dgVector dir (m_localPoly[1] - m_localPoly[0]);
 
 	dgAssert ((dir % dir) > dgFloat32 (1.0e-8f));
 
-	dir = dir.Scale (dgRsqrt (dir % dir));
+	dir = dir.Scale3 (dgRsqrt (dir % dir));
 	planes[0] = dgPlane (dir, dist);
-	planes[2] = dgPlane (dir.Scale (dgFloat32 (-1.0f)), dist);
+	planes[2] = dgPlane (dir.Scale3 (dgFloat32 (-1.0f)), dist);
 
 	dir = m_normal * dir;
 	planes[1] = dgPlane (dir, dist);
-	planes[3] = dgPlane (dir.Scale (dgFloat32 (-1.0f)), dist);
+	planes[3] = dgPlane (dir.Scale3 (dgFloat32 (-1.0f)), dist);
 
 	for (dgInt32 i = 0; i < m_count; i ++) {
 		dgInt32 j = i << 1;
@@ -208,7 +208,7 @@ void dgCollisionConvexPolygon::BeamClipping (const dgCollisionInstance* const hu
 					const dgVector& p0 = points[ptr->m_incidentVertex];
 					const dgVector& p1 = points[ptr->m_next->m_incidentVertex];
 					dgVector dp (p1 - p0); 
-					points[indexCount] = p0 - dp.Scale (test0  / (dp % plane));
+					points[indexCount] = p0 - dp.Scale3 (test0  / (dp % plane));
 
 					dgClippedFaceEdge* const newEdge = &clippedFace[edgeCount];
 					newEdge->m_twin = newEdge + 1;
@@ -239,7 +239,7 @@ void dgCollisionConvexPolygon::BeamClipping (const dgCollisionInstance* const hu
 					const dgVector& p0 = points[ptr->m_incidentVertex];
 					const dgVector& p1 = points[ptr->m_next->m_incidentVertex];
 					dgVector dp (p1 - p0); 
-					points[indexCount] = p0 - dp.Scale (test0  / (dp % plane));
+					points[indexCount] = p0 - dp.Scale3 (test0  / (dp % plane));
 
 					dgClippedFaceEdge* const newEdge = &clippedFace[edgeCount];
 					newEdge->m_twin = newEdge + 1;
@@ -388,7 +388,7 @@ dgInt32 dgCollisionConvexPolygon::CalculatePlaneIntersection (const dgVector& no
 	dgFloat32 projectFactor = m_normal % normal;
 	if (projectFactor < dgFloat32 (0.0f)) {
 		projectFactor *= dgFloat32 (-1.0f);
-		normal = normal.Scale (dgFloat32 (-1.0f));
+		normal = normal.Scale3 (dgFloat32 (-1.0f));
 	}
 
 	if (projectFactor > dgFloat32 (0.9999f)) {
@@ -418,7 +418,7 @@ dgInt32 dgCollisionConvexPolygon::CalculatePlaneIntersection (const dgVector& no
 
 			if (side0 > dgFloat32 (0.0f)) {
 				maxDist = dgMax (maxDist, side0);
-				contactsOut[count] = p0 - plane.Scale (side0);
+				contactsOut[count] = p0 - plane.Scale3 (side0);
 				count ++;
 				if (count > 1) {
 					dgVector edgeSegment (contactsOut[count - 1] - contactsOut[count - 2]);
@@ -435,7 +435,7 @@ dgInt32 dgCollisionConvexPolygon::CalculatePlaneIntersection (const dgVector& no
 					if (dgAbsf (t) < dgFloat32 (1.0e-8f)) {
 						t = dgSign(t) * dgFloat32 (1.0e-8f);	
 					}
-					contactsOut[count] = p0 - dp.Scale (side0 / t);
+					contactsOut[count] = p0 - dp.Scale3 (side0 / t);
 					count ++;
 					if (count > 1) {
 						dgVector edgeSegment (contactsOut[count - 1] - contactsOut[count - 2]);
@@ -452,7 +452,7 @@ dgInt32 dgCollisionConvexPolygon::CalculatePlaneIntersection (const dgVector& no
 				if (dgAbsf (t) < dgFloat32 (1.0e-8f)) {
 					t = dgSign(t) * dgFloat32 (1.0e-8f);	
 				}
-				contactsOut[count] = p0 - dp.Scale (side0 / t);
+				contactsOut[count] = p0 - dp.Scale3 (side0 / t);
 				count ++;
 				if (count > 1) {
 					dgVector edgeSegment (contactsOut[count - 1] - contactsOut[count - 2]);
@@ -477,7 +477,7 @@ dgInt32 dgCollisionConvexPolygon::CalculatePlaneIntersection (const dgVector& no
 			dgFloat32 side1 = plane.Evalue (p1);
 
 			if ((side0 * side1) < dgFloat32 (0.0f)) {
-				contactsOut[count] = p0 - plane.Scale (side0);
+				contactsOut[count] = p0 - plane.Scale3 (side0);
 				count ++;
 				if (count > 1) {
 					dgVector edgeSegment (contactsOut[count - 1] - contactsOut[count - 2]);
@@ -543,7 +543,7 @@ dgInt32 dgCollisionConvexPolygon::CalculatePlaneIntersection (const dgVector& no
 					n += e0 * e1;
 					e0 = e1;
 				} 
-				n = n.Scale (dgRsqrt(n % n));
+				n = n.Scale3 (dgRsqrt(n % n));
 				dgFloat32 val = n % normal;
 				dgAssert (val > dgFloat32 (0.9f));
 			}
@@ -571,10 +571,10 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete (dgCollis
 	const dgVector& scale = polygonInstance->m_scale;
 	const dgVector& invScale = polygonInstance->m_invScale;
 	m_normal = m_normal.CompProduct4(invScale);
-	m_normal = m_normal.Scale (dgRsqrt (m_normal % m_normal));
+	m_normal = m_normal.Scale3 (dgRsqrt (m_normal % m_normal));
 
 	dgVector normalInHull (matrix.RotateVector (m_normal));
-	dgVector pointInHull (hull->SupportVertex (normalInHull.Scale (dgFloat32 (-1.0f)), NULL));
+	dgVector pointInHull (hull->SupportVertex (normalInHull.Scale3 (dgFloat32 (-1.0f)), NULL));
 	dgVector p0 (matrix.UntransformVector (pointInHull));
 	dgVector p1 (matrix.UntransformVector (hull->SupportVertex (normalInHull, NULL)));
 
@@ -627,7 +627,7 @@ isConcaveCap = 0;
 		dgFloat32 convexSphapeUmbra = hull->GetUmbraClipSize ();
 		if (m_faceClipSize > convexSphapeUmbra) {
 			const dgBody* const refBody = proxy.m_referenceBody;
-			dgVector origin (polygonInstance->m_globalMatrix.UntransformVector((refBody->m_minAABB + refBody->m_maxAABB).Scale (dgFloat32 (0.5f))));
+			dgVector origin (polygonInstance->m_globalMatrix.UntransformVector((refBody->m_minAABB + refBody->m_maxAABB).Scale3 (dgFloat32 (0.5f))));
 			BeamClipping (hull, origin, convexSphapeUmbra);
 			m_faceClipSize = hull->m_childShape->GetBoxMaxRadius();
 		}
@@ -635,7 +635,7 @@ isConcaveCap = 0;
 			dgAssert (0);
 			//dgVector pointsContacts[64];
 			//matrix.TransformTriplex(&m_localPoly[0].m_x, sizeof (dgVector), &m_localPoly[0].m_x, sizeof (dgVector), m_count);
-			//count = hull->CalculatePlaneIntersection (normalInHull.Scale (dgFloat32 (-1.0f)), m_localPoly[0], pointsContacts);
+			//count = hull->CalculatePlaneIntersection (normalInHull.Scale3 (dgFloat32 (-1.0f)), m_localPoly[0], pointsContacts);
 			//penetration = GetMax(dgAbsf (penetration) - DG_IMPULSIVE_CONTACT_PENETRATION, dgFloat32 (0.0f));
 			//const dgMatrix& worldMatrix = hull->m_globalMatrix;
 			//dgContactPoint* const contactsOut = proxy.m_contacts;
@@ -684,9 +684,9 @@ isConcaveCap = 0;
 		}
 	} else {
 		dgVector pointsContacts[64];
-		dgVector point (pointInHull + normalInHull.Scale(dgMax (penetration - DG_IMPULSIVE_CONTACT_PENETRATION, DG_IMPULSIVE_CONTACT_PENETRATION)));
-		count = hull->CalculatePlaneIntersection (normalInHull.Scale (dgFloat32 (-1.0f)), point, pointsContacts);
-		dgVector step (normalInHull.Scale((penetration - proxy.m_skinThickness) * dgFloat32 (0.5f)));
+		dgVector point (pointInHull + normalInHull.Scale3(dgMax (penetration - DG_IMPULSIVE_CONTACT_PENETRATION, DG_IMPULSIVE_CONTACT_PENETRATION)));
+		count = hull->CalculatePlaneIntersection (normalInHull.Scale3 (dgFloat32 (-1.0f)), point, pointsContacts);
+		dgVector step (normalInHull.Scale3((penetration - proxy.m_skinThickness) * dgFloat32 (0.5f)));
 		penetration = dgMax(dgAbsf (penetration) - DG_IMPULSIVE_CONTACT_PENETRATION, dgFloat32 (0.0f));
 		const dgMatrix& worldMatrix = hull->m_globalMatrix;
 		dgContactPoint* const contactsOut = proxy.m_contacts;

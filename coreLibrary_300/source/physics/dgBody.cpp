@@ -296,7 +296,7 @@ dgFloat32 dgBody::RayCastSimd (const dgLineBox& line, OnRayCastAction filter, On
 		dgVector localP1 (globalMatrix.UntransformVectorSimd (l1));
 		dgFloat32 t = m_collision->RayCastSimd (localP0, localP1, contactOut, preFilter, this, userData);
 		if (t < dgFloat32 (1.0f)) {
-			dgVector p (globalMatrix.TransformVectorSimd(localP0 + (localP1 - localP0).Scale(t)));
+			dgVector p (globalMatrix.TransformVectorSimd(localP0 + (localP1 - localP0).Scale3(t)));
 			dgVector l1l0 (line.m_l1 - line.m_l0);
 			t = ((p - line.m_l0) % l1l0) / (l1l0 % l1l0);
 			if (t < minT) {
@@ -324,7 +324,7 @@ dgFloat32 dgBody::RayCast (const dgLineBox& line, OnRayCastAction filter, OnRayP
 		dgVector localP1 (globalMatrix.UntransformVector (l1));
 		dgFloat32 t = m_collision->RayCast (localP0, localP1, contactOut, preFilter, this, userData);
 		if (t < dgFloat32 (1.0f)) {
-			dgVector p (globalMatrix.TransformVector(localP0 + (localP1 - localP0).Scale(t)));
+			dgVector p (globalMatrix.TransformVector(localP0 + (localP1 - localP0).Scale3(t)));
 			dgVector l1l0 (line.m_l1 - line.m_l0);
 			t = ((p - line.m_l0) % l1l0) / (l1l0 % l1l0);
 			if (t < minT) {
@@ -350,15 +350,15 @@ void dgBody::AddBuoyancyForce (dgFloat32 fluidDensity, dgFloat32 fluidLinearVisc
 //			dgVector buoyanceCenter (volumeIntegral - m_matrix.m_posit);
 			dgVector buoyanceCenter (volumeIntegral - m_globalCentreOfMass);
 
-			dgVector force (gravityVector.Scale (-fluidDensity * volumeIntegral.m_w));
+			dgVector force (gravityVector.Scale3 (-fluidDensity * volumeIntegral.m_w));
 			dgVector torque (buoyanceCenter * force);
 
 			dgFloat32 damp = GetMax (GetMin ((m_veloc % m_veloc) * dgFloat32 (100.0f) * fluidLinearViscousity, dgFloat32 (1.0f)), dgFloat32(dgFloat32 (10.0f)));
-			force -= m_veloc.Scale (damp);
+			force -= m_veloc.Scale3 (damp);
 
 			//damp = (m_omega % m_omega) * dgFloat32 (10.0f) * fluidAngularViscousity;
 			damp = GetMax (GetMin ((m_omega % m_omega) * dgFloat32 (1000.0f) * fluidAngularViscousity, dgFloat32(0.25f)), dgFloat32(2.0f));
-			torque -= m_omega.Scale (damp);
+			torque -= m_omega.Scale3 (damp);
 
 //			dgAssert (dgSqrt (force % force) < (dgSqrt (gravityVector % gravityVector) * m_mass.m_w * dgFloat32 (100.0f)));
 //			dgAssert (dgSqrt (torque % torque) < (dgSqrt (gravityVector % gravityVector) * m_mass.m_w * dgFloat32 (100.0f) * dgFloat32 (10.0f)));
@@ -388,16 +388,16 @@ void dgBody::UpdateMatrix (dgFloat32 timestep, dgInt32 threadIndex)
 
 void dgBody::IntegrateVelocity (dgFloat32 timestep)
 {
-	m_globalCentreOfMass += m_veloc.Scale (timestep); 
+	m_globalCentreOfMass += m_veloc.Scale3 (timestep); 
 	while (((m_omega % m_omega) * timestep * timestep) > (DG_MAX_ANGLE_STEP * DG_MAX_ANGLE_STEP)) {
-		m_omega = m_omega.Scale (dgFloat32 (0.8f));
+		m_omega = m_omega.Scale3 (dgFloat32 (0.8f));
 	}
 
 	// this is correct
 	dgFloat32 omegaMag2 = m_omega % m_omega;
 	if (omegaMag2 > ((dgFloat32 (0.0125f) * dgDEG2RAD) * (dgFloat32 (0.0125f) * dgDEG2RAD))) {
 		dgFloat32 invOmegaMag = dgRsqrt (omegaMag2);
-		dgVector omegaAxis (m_omega.Scale (invOmegaMag));
+		dgVector omegaAxis (m_omega.Scale3 (invOmegaMag));
 		dgFloat32 omegaAngle = invOmegaMag * omegaMag2 * timestep;
 		dgQuaternion rotation (omegaAxis, omegaAngle);
 		m_rotation = m_rotation * rotation;
@@ -442,7 +442,7 @@ dgVector dgBody::CalculateInverseDynamicForce (const dgVector& desiredVeloc, dgF
 			massAccel *= (dgFloat32 (2.0f) * dgFloat32 (LINEAR_SOLVER_SUB_STEPS) / dgFloat32 (LINEAR_SOLVER_SUB_STEPS + 1));
 		} 
 	}
-	return (desiredVeloc - m_veloc).Scale (massAccel);
+	return (desiredVeloc - m_veloc).Scale3 (massAccel);
 */
 }
 

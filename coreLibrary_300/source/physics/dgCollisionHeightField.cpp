@@ -268,7 +268,7 @@ dgFloat32 dgCollisionHeightField::RayCastCellSimd (const dgFastRayTest& ray, dgI
 		dgVector e10 (points[2] - points[1]);
 		dgVector e20 (points[3] - points[1]);
 		dgVector normal (e10 * e20);
-		normal = normal.Scale (dgRsqrt (normal % normal));
+		normal = normal.Scale3 (dgRsqrt (normal % normal));
 		t = ray.PolygonIntersectSimd (normal, &points[0].m_x, sizeof (dgVector), triangle, 3);
 		if (t < dgFloat32 (1.0f)){
 			normalOut = normal;
@@ -281,7 +281,7 @@ dgFloat32 dgCollisionHeightField::RayCastCellSimd (const dgFastRayTest& ray, dgI
 
 		dgVector e30 (points[0] - points[1]);
 		normal = e30 * e10;
-		normal = normal.Scale (dgRsqrt (normal % normal));
+		normal = normal.Scale3 (dgRsqrt (normal % normal));
 		t = ray.PolygonIntersectSimd (normal, &points[0].m_x, sizeof (dgVector), triangle, 3);
 		if (t < dgFloat32 (1.0f)){
 			normalOut = normal;
@@ -296,7 +296,7 @@ dgFloat32 dgCollisionHeightField::RayCastCellSimd (const dgFastRayTest& ray, dgI
 		dgVector e10 (points[2] - points[0]);
 		dgVector e20 (points[3] - points[0]);
 		dgVector normal (e10 * e20);
-		normal = normal.Scale (dgRsqrt (normal % normal));
+		normal = normal.Scale3 (dgRsqrt (normal % normal));
 		t = ray.PolygonIntersectSimd (normal, &points[0].m_x, sizeof (dgVector), triangle, 3);
 		if (t < dgFloat32 (1.0f)){
 			normalOut = normal;
@@ -309,7 +309,7 @@ dgFloat32 dgCollisionHeightField::RayCastCellSimd (const dgFastRayTest& ray, dgI
 
 		dgVector e30 (points[1] - points[0]);
 		normal = e20 * e30;
-		normal = normal.Scale (dgRsqrt (normal % normal));
+		normal = normal.Scale3 (dgRsqrt (normal % normal));
 		t = ray.PolygonIntersectSimd (normal, &points[0].m_x, sizeof (dgVector), triangle, 3);
 		if (t < dgFloat32 (1.0f)){
 			normalOut = normal;
@@ -346,7 +346,7 @@ dgFloat32 dgCollisionHeightField::RayCastCell (const dgFastRayTest& ray, dgInt32
 		dgVector e10 (points[2] - points[1]);
 		dgVector e20 (points[3] - points[1]);
 		dgVector normal (e10 * e20);
-		normal = normal.Scale (dgRsqrt (normal % normal));
+		normal = normal.Scale3 (dgRsqrt (normal % normal));
 		t = ray.PolygonIntersect (normal, &points[0].m_x, sizeof (dgVector), triangle, 3);
 		if (t < dgFloat32 (1.0f)){
 			normalOut = normal;
@@ -359,7 +359,7 @@ dgFloat32 dgCollisionHeightField::RayCastCell (const dgFastRayTest& ray, dgInt32
 
 		dgVector e30 (points[0] - points[1]);
 		normal = e30 * e10;
-		normal = normal.Scale (dgRsqrt (normal % normal));
+		normal = normal.Scale3 (dgRsqrt (normal % normal));
 		t = ray.PolygonIntersect (normal, &points[0].m_x, sizeof (dgVector), triangle, 3);
 		if (t < dgFloat32 (1.0f)){
 			normalOut = normal;
@@ -374,7 +374,7 @@ dgFloat32 dgCollisionHeightField::RayCastCell (const dgFastRayTest& ray, dgInt32
 		dgVector e10 (points[2] - points[0]);
 		dgVector e20 (points[3] - points[0]);
 		dgVector normal (e10 * e20);
-		normal = normal.Scale (dgRsqrt (normal % normal));
+		normal = normal.Scale3 (dgRsqrt (normal % normal));
 		t = ray.PolygonIntersect (normal, &points[0].m_x, sizeof (dgVector), triangle, 3);
 		if (t < dgFloat32 (1.0f)){
 			normalOut = normal;
@@ -387,7 +387,7 @@ dgFloat32 dgCollisionHeightField::RayCastCell (const dgFastRayTest& ray, dgInt32
 
 		dgVector e30 (points[1] - points[0]);
 		normal = e20 * e30;
-		normal = normal.Scale (dgRsqrt (normal % normal));
+		normal = normal.Scale3 (dgRsqrt (normal % normal));
 		t = ray.PolygonIntersect (normal, &points[0].m_x, sizeof (dgVector), triangle, 3);
 		if (t < dgFloat32 (1.0f)){
 			normalOut = normal;
@@ -469,7 +469,7 @@ dgFloat32 dgCollisionHeightField::RayCastSimd (const dgVector& q0, const dgVecto
 			dgFloat32 t = RayCastCellSimd(ray, xIndex0, zIndex0, normalOut);
 			if (t < dgFloat32 (1.0f)) {
 				// bail out at the first intersection and copy the data into the descriptor
-				contactOut.m_normal = normalOut.Scale (dgRsqrt (normalOut % normalOut));
+				contactOut.m_normal = normalOut.Scale3 (dgRsqrt (normalOut % normalOut));
 				//contactOut.m_userId = m_atributeMap[zIndex0 * m_width + xIndex0];
 				contactOut.m_shapeId0 = m_atributeMap[zIndex0 * m_width + xIndex0];
 				contactOut.m_shapeId1 = m_atributeMap[zIndex0 * m_width + xIndex0];
@@ -570,7 +570,7 @@ dgFloat32 dgCollisionHeightField::RayCast (const dgVector& q0, const dgVector& q
 			dgFloat32 t = RayCastCell (ray, xIndex0, zIndex0, normalOut);
 			if (t < dgFloat32 (1.0f)) {
 				// bail out at the first intersection and copy the data into the descriptor
-				contactOut.m_normal = normalOut.Scale (dgRsqrt (normalOut % normalOut));
+				contactOut.m_normal = normalOut.Scale3 (dgRsqrt (normalOut % normalOut));
 				contactOut.m_shapeId0 = m_atributeMap[zIndex0 * m_width + xIndex0];
 				contactOut.m_shapeId1 = m_atributeMap[zIndex0 * m_width + xIndex0];
 
@@ -808,10 +808,10 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 					dgVector n0 (e1 *  e2);
 
 					//normalBase 
-					n0 = n0.Scale (dgRsqrt(n0 % n0));
+					n0 = n0.Scale3 (dgRsqrt(n0 % n0));
 					vertex[normalBase] = n0;
 					
-					n1 = n1.Scale (dgRsqrt(n1 % n1));
+					n1 = n1.Scale3 (dgRsqrt(n1 % n1));
 					vertex[normalBase + 1] = n1;
 
 					faceIndexCount[faceCount] = 3;
@@ -903,10 +903,10 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 					dgVector n0 (e1 *  e2);
 
 					//normalBase 
-					n0 = n0.Scale (dgRsqrt(n0 % n0));
+					n0 = n0.Scale3 (dgRsqrt(n0 % n0));
 					vertex[normalBase] = n0;
 
-					n1 = n1.Scale (dgRsqrt(n1 % n1));
+					n1 = n1.Scale3 (dgRsqrt(n1 % n1));
 					vertex[normalBase + 1] = n1;
 
 					faceIndexCount[faceCount] = 3;

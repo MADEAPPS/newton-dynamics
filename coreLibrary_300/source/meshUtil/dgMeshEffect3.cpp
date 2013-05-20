@@ -156,7 +156,7 @@ class dgHACDClusterGraph
 			pool[0][2] = points[i2];
 
 			const dgFloat64 rayLength = dgFloat64(4.0f) * GetDiagonal();
-			const dgBigVector step(normal.Scale(rayLength));
+			const dgBigVector step(normal.Scale3(rayLength));
 
 			dgFloat64 concavity = dgFloat32(0.0f);
 			dgFloat64 minArea = dgFloat32(0.125f);
@@ -173,14 +173,14 @@ class dgHACDClusterGraph
 				dgBigVector p2(pool[tail][2]);
 				tail = (tail + 1) & mask;
 
-				dgBigVector q1((p0 + p1 + p2).Scale(dgFloat64(1.0f / 3.0f)));
+				dgBigVector q1((p0 + p1 + p2).Scale3(dgFloat64(1.0f / 3.0f)));
 				dgBigVector q0(q1 + step);
 
 				dgFloat64 param = RayCast(q0, q1, &firstGuess);
 				if (param > dgFloat64(1.0f)) {
 					param = dgFloat64(1.0f);
 				}
-				dgBigVector dq(step.Scale(dgFloat32(1.0f) - param));
+				dgBigVector dq(step.Scale3(dgFloat32(1.0f) - param));
 				dgFloat64 lenght2 = sqrt (dq % dq);
 				if (lenght2 > concavity) {
 					concavity = lenght2;
@@ -192,9 +192,9 @@ class dgHACDClusterGraph
 					dgBigVector n(edge10 * edge20);
 					dgFloat64 area2 = n % n;
 					if (area2 > minArea2) {
-						dgBigVector p01((p0 + p1).Scale(dgFloat64(0.5f)));
-						dgBigVector p12((p1 + p2).Scale(dgFloat64(0.5f)));
-						dgBigVector p20((p2 + p0).Scale(dgFloat64(0.5f)));
+						dgBigVector p01((p0 + p1).Scale3(dgFloat64(0.5f)));
+						dgBigVector p12((p1 + p2).Scale3(dgFloat64(0.5f)));
+						dgBigVector p20((p2 + p0).Scale3(dgFloat64(0.5f)));
 
 						pool[head][0] = p0;
 						pool[head][1] = p01;
@@ -630,7 +630,7 @@ class dgHACDClusterGraph
 				dgHACDClusterFace& face = cluster.Append()->GetInfo();
 				face.m_edge = edge;
 				face.m_area = dgFloat64(0.5f) * mag;
-				face.m_normal = normal.Scale(dgFloat64(1.0f) / mag);
+				face.m_normal = normal.Scale3(dgFloat64(1.0f) / mag);
 
 				m_concavityTreeArray[color] = new (allocator) dgHACDConvacityLookAheadTree (allocator, edge, dgFloat64 (0.0f));
 
@@ -728,9 +728,9 @@ class dgHACDClusterGraph
 			ptr = ptr->m_next->m_next;
 			do {
 				dgVector p2 (points[ptr->m_incidentVertex]);
-				dgVector p01 ((p0 + p1).Scale (dgFloat32 (0.5f)));
-				dgVector p12 ((p1 + p2).Scale (dgFloat32 (0.5f)));
-				dgVector p20 ((p2 + p0).Scale (dgFloat32 (0.5f)));
+				dgVector p01 ((p0 + p1).Scale3 (dgFloat32 (0.5f)));
+				dgVector p12 ((p1 + p2).Scale3 (dgFloat32 (0.5f)));
+				dgVector p20 ((p2 + p0).Scale3 (dgFloat32 (0.5f)));
 
 				CastBackFace (clusterNodeA, p0, p01, p20, distanceThreshold, clusterMap);
 				CastBackFace (clusterNodeA, p1, p12, p01, distanceThreshold, clusterMap);
@@ -767,13 +767,13 @@ class dgHACDClusterGraph
 		dgFloat32 distanceThreshold,
 		dgTree<dgListNode*,dgInt32>& clusterMap)
 	{
-		dgVector origin ((p0 + p1 + p2).Scale (dgFloat32 (1.0f/3.0f)));
+		dgVector origin ((p0 + p1 + p2).Scale3 (dgFloat32 (1.0f/3.0f)));
 
 		dgFloat32 rayDistance = distanceThreshold * dgFloat32 (2.0f);
 
 		dgHACDCluster& clusterA = clusterNodeA->GetInfo().m_nodeData;
 		dgHACDClusterFace& faceA = clusterA.GetFirst()->GetInfo();
-		dgVector end (origin - dgVector (faceA.m_normal).Scale (rayDistance));
+		dgVector end (origin - dgVector (faceA.m_normal).Scale3 (rayDistance));
 
 		dgHACDRayCasterContext ray (origin, end, this, clusterA.m_color);
 		ForAllSectorsRayHit(ray, RayHit, &ray);

@@ -342,7 +342,7 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertex(const dgVector& dir, dgInt
 	} else {
 		// support((p * m), n) = m * support (p, n * trans(m)) 
 		dgVector dir1 (m_scale.CompProduct(dir));
-		dir1 = dir1.Scale (dgRsqrt (dir1 % dir1));
+		dir1 = dir1.Scale3 (dgRsqrt (dir1 % dir1));
 		return m_scale.CompProduct(m_childShape->SupportVertex (dir1, vertexIndex));
 	}
 
@@ -394,9 +394,9 @@ DG_INLINE dgMatrix dgCollisionInstance::CalculateSpaceMatrix (const dgCollisionI
 	dgMatrix matrix (instance->m_globalMatrix * m_globalMatrix.Inverse());
 
 	const dgVector& scale = instance->m_scale;
-	matrix[0] = matrix[0].Scale(scale[0]);
-	matrix[1] = matrix[1].Scale(scale[1]);
-	matrix[2] = matrix[2].Scale(scale[2]);
+	matrix[0] = matrix[0].Scale3(scale[0]);
+	matrix[1] = matrix[1].Scale3(scale[1]);
+	matrix[2] = matrix[2].Scale3(scale[2]);
 
 	matrix[0] = m_invScale.CompProduct4 (matrix[0]);
 	matrix[1] = m_invScale.CompProduct4 (matrix[1]);
@@ -409,9 +409,9 @@ DG_INLINE dgMatrix dgCollisionInstance::CalculateSpaceMatrixSimd (const dgCollis
 {
 	dgMatrix matrix (instance->m_globalMatrix * m_globalMatrix.Inverse());
 	const dgVector& scale = instance->m_scale;
-	matrix[0] = matrix[0].Scale(scale[0]);
-	matrix[1] = matrix[1].Scale(scale[1]);
-	matrix[2] = matrix[2].Scale(scale[2]);
+	matrix[0] = matrix[0].Scale3(scale[0]);
+	matrix[1] = matrix[1].Scale3(scale[1]);
+	matrix[2] = matrix[2].Scale3(scale[2]);
 
 	matrix[0] = m_invScale.CompProduct4 (matrix[0]);
 	matrix[1] = m_invScale.CompProduct4 (matrix[1]);

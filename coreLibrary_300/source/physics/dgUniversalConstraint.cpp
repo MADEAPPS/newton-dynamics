@@ -195,10 +195,10 @@ dgVector dgUniversalConstraint::GetJointForce () const
 
 	CalculateGlobalMatrixAndAngle (matrix0, matrix1);
 
-	return dgVector (matrix0.m_up.Scale (m_jointForce[0]) + 
-		             matrix0.m_right.Scale (m_jointForce[1]) + 
-					 matrix0.m_up.Scale (m_jointForce[2]) +
-					 matrix0.m_right.Scale (m_jointForce[3]));
+	return dgVector (matrix0.m_up.Scale3 (m_jointForce[0]) + 
+		             matrix0.m_right.Scale3 (m_jointForce[1]) + 
+					 matrix0.m_up.Scale3 (m_jointForce[2]) +
+					 matrix0.m_right.Scale3 (m_jointForce[3]));
 }
 
 dgUnsigned32 dgUniversalConstraint::JacobianDerivative (dgContraintDescritor& params)
@@ -216,13 +216,13 @@ dgUnsigned32 dgUniversalConstraint::JacobianDerivative (dgContraintDescritor& pa
 	dgVector dir2 (dir0 * dir1);
 
 	dgVector dir3 (dir2 * dir0);
-	dir3 = dir3.Scale (dgRsqrt (dir3 % dir3));
+	dir3 = dir3.Scale3 (dgRsqrt (dir3 % dir3));
 
 	const dgVector& p0 = matrix0.m_posit;
 	const dgVector& p1 = matrix1.m_posit;
 
-	dgVector q0 (p0 + dir3.Scale(MIN_JOINT_PIN_LENGTH));
-	dgVector q1 (p1 + dir1.Scale(MIN_JOINT_PIN_LENGTH));
+	dgVector q0 (p0 + dir3.Scale3(MIN_JOINT_PIN_LENGTH));
+	dgVector q1 (p1 + dir1.Scale3(MIN_JOINT_PIN_LENGTH));
 
 	dgPointParam pointDataP;
 	dgPointParam pointDataQ;

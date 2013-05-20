@@ -279,13 +279,13 @@ bool dgApi dgRayBoxClip (dgVector& p0, dgVector& p1, const dgVector& boxP0, cons
 		if (tmp0 > dgFloat32 (0.0f)) {
 			dgFloat32 tmp1 = boxP1[i] - p1[i];
 			if (tmp1 < dgFloat32 (0.0f)) {
-				p1 = p0 + (p1 - p0).Scale (tmp0 / (p1[i] - p0[i])); 
+				p1 = p0 + (p1 - p0).Scale3 (tmp0 / (p1[i] - p0[i])); 
 				p1[i] = boxP1[i];
 			}
 		} else {
 			dgFloat32 tmp1 = boxP1[i] - p1[i];
 			if (tmp1 > dgFloat32 (0.0f)) {
-				p0 += (p1 - p0).Scale (tmp0 / (p1[i] - p0[i])); 
+				p0 += (p1 - p0).Scale3 (tmp0 / (p1[i] - p0[i])); 
 				p0[i] = boxP1[i];
 			} else {
 				return false;
@@ -296,13 +296,13 @@ bool dgApi dgRayBoxClip (dgVector& p0, dgVector& p1, const dgVector& boxP0, cons
 		if (tmp0 < dgFloat32 (0.0f)) {
 			dgFloat32 tmp1 = boxP0[i] - p1[i];
 			if (tmp1 > dgFloat32 (0.0f)) {
-				p1 = p0 + (p1 - p0).Scale (tmp0 / (p1[i] - p0[i])); 
+				p1 = p0 + (p1 - p0).Scale3 (tmp0 / (p1[i] - p0[i])); 
 				p1[i] = boxP0[i];
 			}
 		} else {
 			dgFloat32 tmp1 = boxP0[i] - p1[i];
 			if (tmp1 < dgFloat32 (0.0f)) {
-				p0 += (p1 - p0).Scale (tmp0 / (p1[i] - p0[i])); 
+				p0 += (p1 - p0).Scale3 (tmp0 / (p1[i] - p0[i])); 
 				p0[i] = boxP0[i];
 			} else {
 				return false;
@@ -318,7 +318,7 @@ dgVector dgApi dgPointToRayDistance (const dgVector& point, const dgVector& ray_
 	dgFloat32 t;
 	dgVector dp (ray_p1 - ray_p0);
 	t = dgClamp (((point - ray_p0) % dp) / (dp % dp), dgFloat32(dgFloat32 (0.0f)), dgFloat32 (1.0f));
-	return ray_p0 + dp.Scale (t);
+	return ray_p0 + dp.Scale3 (t);
 }
 
 void dgApi dgRayToRayDistance (const dgVector& ray_p0, const dgVector& ray_p1, const dgVector& ray_q0, const dgVector& ray_q1, dgVector& pOut, dgVector& qOut)
@@ -390,8 +390,8 @@ void dgApi dgRayToRayDistance (const dgVector& ray_p0, const dgVector& ray_p1, c
 	dgFloat32 sc = (dgAbsf(sN) < dgFloat32(1.0e-8f) ? dgFloat32 (0.0f) : sN / sD);
 	dgFloat32 tc = (dgAbsf(tN) < dgFloat32(1.0e-8f) ? dgFloat32 (0.0f) : tN / tD);
 
-	pOut = ray_p0 + u.Scale (sc);
-	qOut = ray_q0 + v.Scale (tc);
+	pOut = ray_p0 + u.Scale3 (sc);
+	qOut = ray_q0 + v.Scale3 (tc);
 }
 
 /*
@@ -419,7 +419,7 @@ dgVector dgPointToTriangleDistance____ (const dgVector& point, const dgVector& p
 		dgFloat32 t = alpha1 / (alpha1 - alpha3);
 		dgAssert (t >= dgFloat32 (0.0f));
 		dgAssert (t <= dgFloat32 (1.0f));
-		return p0 + p10.Scale (t);
+		return p0 + p10.Scale3 (t);
 	}
 
 
@@ -436,7 +436,7 @@ dgVector dgPointToTriangleDistance____ (const dgVector& point, const dgVector& p
 		dgFloat32 t = alpha2 / (alpha2 - alpha6);
 		dgAssert (t >= dgFloat32 (0.0f));
 		dgAssert (t <= dgFloat32 (1.0f));
-		return p0 + p20.Scale (t);
+		return p0 + p20.Scale3 (t);
 	}
 
 
@@ -445,7 +445,7 @@ dgVector dgPointToTriangleDistance____ (const dgVector& point, const dgVector& p
 		dgFloat32 t = (alpha4 - alpha3) / ((alpha4 - alpha3) + (alpha5 - alpha6));
 		dgAssert (t >= dgFloat32 (0.0f));
 		dgAssert (t <= dgFloat32 (1.0f));
-		return p1 + (p2 - p1).Scale (t);
+		return p1 + (p2 - p1).Scale3 (t);
 	}
 
 	dgFloat32 den = float(dgFloat32 (1.0f)) / (va + vb + vc);
@@ -455,7 +455,7 @@ dgVector dgPointToTriangleDistance____ (const dgVector& point, const dgVector& p
 	dgAssert (s >= dgFloat32 (0.0f));
 	dgAssert (t <= dgFloat32 (1.0f));
 	dgAssert (s <= dgFloat32 (1.0f));
-	return p0 + p10.Scale (t) + p20.Scale (s);
+	return p0 + p10.Scale3 (t) + p20.Scale3 (s);
 }
 */
 
@@ -496,7 +496,7 @@ dgVector dgPointToTriangleDistance (const dgVector& point, const dgVector& p0, c
 			} else if (num > den) {
 				closestIndex = i1;
 			} else {
-				return array[i0] + segment.Scale (num / den);
+				return array[i0] + segment.Scale3 (num / den);
 			}
 		}
 		p1p0 = p2p0;
@@ -506,7 +506,7 @@ dgVector dgPointToTriangleDistance (const dgVector& point, const dgVector& p0, c
 	if (closestIndex >= 0) {
 		return array[closestIndex];
 	} else {
-		return point - normal.Scale((normal % (point - p0)) / (normal % normal));
+		return point - normal.Scale3((normal % (point - p0)) / (normal % normal));
 	}
 }
 
@@ -546,7 +546,7 @@ dgBigVector dgPointToTriangleDistance (const dgBigVector& point, const dgBigVect
 			} else if (num > den) {
 				closestIndex = i1;
 			} else {
-				return array[i0] + segment.Scale (num / den);
+				return array[i0] + segment.Scale3 (num / den);
 			}
 		}
 		p1p0 = p2p0;
@@ -556,7 +556,7 @@ dgBigVector dgPointToTriangleDistance (const dgBigVector& point, const dgBigVect
 	if (closestIndex >= 0) {
 		return array[closestIndex];
 	} else {
-		return point - normal.Scale((normal % (point - p0)) / (normal % normal));
+		return point - normal.Scale3((normal % (point - p0)) / (normal % normal));
 	}
 }
 
@@ -630,7 +630,7 @@ dgBigVector LineTriangleIntersection (const dgBigVector& p0, const dgBigVector& 
 	dgFloat64 den = sum.GetAproximateValue();
 
 #ifdef _DEBUG
-	dgBigVector testpoint (A.Scale (val0 / den) + B.Scale (val1 / den) + C.Scale(val2 / den));
+	dgBigVector testpoint (A.Scale3 (val0 / den) + B.Scale3 (val1 / den) + C.Scale3(val2 / den));
 	dgFloat64 volume = ((B - A) * (C - A)) % (testpoint - A);
 	dgAssert (fabs (volume) < dgFloat64 (1.0e-12f));
 #endif
@@ -679,10 +679,10 @@ class dgSweepSphereToPolygon
 		for (dgInt32 i = 0; i < 10; i ++) {
 			dgFloat64 clipParam;
 			dgInt32 exitRegion = GetExitRegion (startRegion, r0, q1, clipParam);
-			dgBigVector r1 (r0 + (q1 - r0).Scale (clipParam));
+			dgBigVector r1 (r0 + (q1 - r0).Scale3 (clipParam));
 			dgFloat64 param = CalculateInterstionParam(startRegion, r0, r1, radius, normalOut, contactOut);
 			if (param >= dgFloat32 (0.0f)) {
-				dgBigVector q2 (r0 + (r1 - r0).Scale (param));
+				dgBigVector q2 (r0 + (r1 - r0).Scale3 (param));
 				return dgFloat32 (((q2 - q0) % diff) / (diff % diff));
 			}
 			if (startRegion == exitRegion) {
@@ -704,13 +704,13 @@ class dgSweepSphereToPolygon
 		dgInt32 j = m_nextVertex[vertexIndex];
 		dgBigVector v1 (m_polygon[j]);
 		dgBigVector dir0 (v1 - v0);
-		dir0 = dir0.Scale (sqrt (dgFloat64(1.0f) / (dir0 % dir0)));
+		dir0 = dir0.Scale3 (sqrt (dgFloat64(1.0f) / (dir0 % dir0)));
 		planeA = dgBigPlane (dir0, -(dir0 % v0));
 
 		j = m_prevVertex[vertexIndex];
 		dgBigVector v2 (m_polygon[j]);
 		dgBigVector dir2 (v2 - v0);
-		dir2 = dir2.Scale (sqrt (dgFloat64(1.0f) / (dir2 % dir2)));
+		dir2 = dir2.Scale3 (sqrt (dgFloat64(1.0f) / (dir2 % dir2)));
 		planeB = dgBigPlane (dir2, -(dir2 % v0));
 	}
 
@@ -719,7 +719,7 @@ class dgSweepSphereToPolygon
 	{
 		dgInt32 voronoiRegion = 0;
 		dgBigVector v0 (m_polygon[m_count-1]);
-		dgVector pointInPlane (point - m_normal.Scale ((point - v0) % m_normal));
+		dgVector pointInPlane (point - m_normal.Scale3 ((point - v0) % m_normal));
 
 		dgBigVector p0 (point);
 		dgBigVector p1 (pointInPlane);
@@ -807,7 +807,7 @@ class dgSweepSphereToPolygon
 					dgBigVector v1 (m_polygon[i]);
 					dgBigVector edge (v1 - v0);
 					dgBigVector wallNormal (edge * m_normal);
-					wallNormal = wallNormal.Scale (sqrt (dgFloat64(1.0f) / (wallNormal % wallNormal)));
+					wallNormal = wallNormal.Scale3 (sqrt (dgFloat64(1.0f) / (wallNormal % wallNormal)));
 					planes[i] =  dgBigPlane (wallNormal, - (wallNormal % v1));
 					adjacentRegion[i] = m_edgeVoronoi[m_prevVertex[i]];
 					v0 = v1;
@@ -827,7 +827,7 @@ class dgSweepSphereToPolygon
 			dgBigVector q1 (m_polygon[i1]);
 			dgBigVector dir (q0 - q1);
 			dir = dir * m_normal;
-			dir = dir.Scale (sqrt (dgFloat64(1.0f) / (dir % dir)));
+			dir = dir.Scale3 (sqrt (dgFloat64(1.0f) / (dir % dir)));
 			planes[0] =  dgBigPlane (dir, - (dir % q0));
 			adjacentRegion[0] = 0;
 
@@ -879,7 +879,7 @@ class dgSweepSphereToPolygon
 			dgFloat64 t = num / den;
 
 			if (t < dgFloat32 (0.0f)) {
-				dgBigVector r (diff.Scale (t));
+				dgBigVector r (diff.Scale3 (t));
 				if ((r % r) < radius * radius) {
 					t = dgFloat64 (0.0f);
 				}
@@ -889,8 +889,8 @@ class dgSweepSphereToPolygon
 				//t = dgFloat32 (0.0f);
 				t = dgFloat32 (-1.0f);
 			} else {
-				dgBigVector p (p0 + diff.Scale (t));
-				contactOut = dgVector (p - m_normal.Scale (m_normal % (p - dgBigVector(m_polygon[0]))));
+				dgBigVector p (p0 + diff.Scale3 (t));
+				contactOut = dgVector (p - m_normal.Scale3 (m_normal % (p - dgBigVector(m_polygon[0]))));
 				normalOut = m_normal;
 			}
 			return t;
@@ -908,8 +908,8 @@ class dgSweepSphereToPolygon
 			dgBigVector p1p0 (p1 - p0);
 			dgFloat64 den = dgFloat64 (1.0f) / (q1q0 % q1q0);
 
-			dgBigVector B (q1q0.Scale ((p0q0 % q1q0) * den));
-			dgBigVector C (q1q0.Scale ((p1p0 % q1q0) * den));
+			dgBigVector B (q1q0.Scale3 ((p0q0 % q1q0) * den));
+			dgBigVector C (q1q0.Scale3 ((p1p0 % q1q0) * den));
 			
 			dgBigVector r0 (p0q0 - B);
 			dgBigVector r1 (p1p0 - C);
@@ -923,7 +923,7 @@ class dgSweepSphereToPolygon
 			if (dgQuadraticRoots (a, b, c, t0, t1)) {
 				t0 = dgMin(t0, t1);
 				if (t0 < dgFloat32 (0.0f)) {
-					dgBigVector r ((p1 - p0).Scale (t0));
+					dgBigVector r ((p1 - p0).Scale3 (t0));
 					if ((r % r) < radius * radius) {
 						t0 = dgFloat64 (0.0f);
 					}
@@ -932,12 +932,12 @@ class dgSweepSphereToPolygon
 				if ((t0 < dgFloat32 (0.0f)) || (t0 > dgFloat32 (1.0f))) {
 					t0 = dgFloat32 (-1.0f);
 				} else {
-					dgBigVector p (p0 + p1p0.Scale (t0));
-					dgBigVector q (q0 + B + C.Scale (t0));
+					dgBigVector p (p0 + p1p0.Scale3 (t0));
+					dgBigVector q (q0 + B + C.Scale3 (t0));
 					
 					contactOut = q;
 					normalOut = dgVector (p - q);
-					normalOut = normalOut.Scale (dgRsqrt(normalOut % normalOut));
+					normalOut = normalOut.Scale3 (dgRsqrt(normalOut % normalOut));
 				}
 			}
 			return t0;
@@ -959,7 +959,7 @@ class dgSweepSphereToPolygon
 				t0 = dgMin(t0, t1);
 
 				if (t0 < dgFloat32 (0.0f)) {
-					dgBigVector r ((p1 - p0).Scale (t0));
+					dgBigVector r ((p1 - p0).Scale3 (t0));
 					if ((r % r) < radius * radius) {
 						t0 = dgFloat64 (0.0f);
 					}
@@ -969,8 +969,8 @@ class dgSweepSphereToPolygon
 					t0 = dgFloat32 (-1.0f);
 				} else {
 					contactOut = q;
-					normalOut = dgVector (p0 + p1p0.Scale (t0) - q);
-					normalOut = normalOut.Scale (dgRsqrt (normalOut % normalOut));
+					normalOut = dgVector (p0 + p1p0.Scale3 (t0) - q);
+					normalOut = normalOut.Scale3 (dgRsqrt (normalOut % normalOut));
 				}
 			}
 			return t0;

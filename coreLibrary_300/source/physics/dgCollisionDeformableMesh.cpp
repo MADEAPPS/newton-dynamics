@@ -127,11 +127,11 @@ class dgCollisionDeformableMesh::dgDeformationRegion
 			dgInt32 index = m_indices[i];
 			dgFloat32 mass = particles.m_mass[index];
 			m_totalMass += mass;
-			accSum += particles.m_shapePosition[index].Scale (mass);
+			accSum += particles.m_shapePosition[index].Scale3 (mass);
 		}
 
 		if (m_totalMass > dgFloat32 (0.0f)) {
-			m_com0 = accSum.Scale (dgFloat32 (1.0f) / m_totalMass);
+			m_com0 = accSum.Scale3 (dgFloat32 (1.0f) / m_totalMass);
 
 			dgMatrix sumQiQi (dgGetZeroMatrix());
 			for (dgInt32 i = 0; i < m_count; i ++) {
@@ -158,9 +158,9 @@ class dgCollisionDeformableMesh::dgDeformationRegion
 		dgVector com = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 		for (dgInt32 i = 0; i < m_count; i ++) {
 			dgInt32 index = m_indices[i];
-			com += posit1[index].Scale (mass[index]);
+			com += posit1[index].Scale3 (mass[index]);
 		}
-		m_com = com.Scale (dgFloat32 (1.0f) / m_totalMass);
+		m_com = com.Scale3 (dgFloat32 (1.0f) / m_totalMass);
 
 		dgMatrix sumQiPi (dgGetZeroMatrix());
 		for (dgInt32 i = 0; i < m_count; i ++) {
@@ -207,9 +207,9 @@ class dgCollisionDeformableMesh::dgDeformationRegion
 		eigenValues.m_z = dgSqrt (eigenValues.m_z);
 
 		dgMatrix m (S);
-		m.m_front = m.m_front.Scale (eigenValues.m_x);
-		m.m_up    = m.m_up.Scale (eigenValues.m_y);
-		m.m_right = m.m_right.Scale (eigenValues.m_z);
+		m.m_front = m.m_front.Scale3 (eigenValues.m_x);
+		m.m_up    = m.m_up.Scale3 (eigenValues.m_y);
+		m.m_right = m.m_right.Scale3 (eigenValues.m_z);
 		S = S.Transpose4X4() * m;
 		m_rot = S.Symetric3by3Inverse() * sumQiPi;
 		dgMatrix A (m_AqqInv * sumQiPi);
@@ -223,7 +223,7 @@ m_rot = dgGetIdentityMatrix();
 			dgInt32 index = m_indices[i];
 			dgVector qi (posit0[index] - m_com0);
 			dgVector gi (m_rot.UnrotateVector(qi) + m_com);
-			velocity[index] += (gi - posit1[index]).Scale (invTimeScale);
+			velocity[index] += (gi - posit1[index]).Scale3 (invTimeScale);
 		}
 	}
 
@@ -473,8 +473,8 @@ void dgCollisionDeformableMesh::CalculateInertia (dgVector& inertiaOut, dgVector
 		sum2 += m_particles.m_shapePosition[i].CompProduct(m_particles.m_shapePosition[i]);
 	}
 
-	originOut = sum.Scale (dgFloat32 (1.0f)/m_particles.m_count);
-	inertiaOut = sum2.Scale (dgFloat32 (1.0f)/m_particles.m_count) - originOut.CompProduct(originOut);
+	originOut = sum.Scale3 (dgFloat32 (1.0f)/m_particles.m_count);
+	inertiaOut = sum2.Scale3 (dgFloat32 (1.0f)/m_particles.m_count) - originOut.CompProduct(originOut);
 }
 */
 
@@ -559,11 +559,11 @@ void dgCollisionDeformableMesh::ApplyExternalAndInternalForces (dgDeformableBody
 	dgVector* const internalVelocity = m_particles.m_internalVelocity;
 
 	// integrate particles external forces and current velocity
-	dgVector extenalVelocityImpulse (myBody->m_accel.Scale (myBody->m_invMass.m_w * timestep));
+	dgVector extenalVelocityImpulse (myBody->m_accel.Scale3 (myBody->m_invMass.m_w * timestep));
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
 		internalVelocity[i] = zero;
 		instantVelocity[i] += extenalVelocityImpulse;
-		deltaPositions[i] = instantVelocity[i].Scale (timestep);
+		deltaPositions[i] = instantVelocity[i].Scale3 (timestep);
 		positions[i] += deltaPositions[i];
 	}
 
@@ -571,8 +571,8 @@ void dgCollisionDeformableMesh::ApplyExternalAndInternalForces (dgDeformableBody
 	dgFloat32 dampCoef = 0.0f;
 	dgVector com (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-		instantVelocity[i] += internalVelocity[i].Scale (dampCoef);
-		dgVector step (internalVelocity[i].Scale (timestep));
+		instantVelocity[i] += internalVelocity[i].Scale3 (dampCoef);
+		dgVector step (internalVelocity[i].Scale3 (timestep));
 		deltaPositions[i] += step;
 		positions[i] += step;
 		com += positions[i];
@@ -580,10 +580,10 @@ void dgCollisionDeformableMesh::ApplyExternalAndInternalForces (dgDeformableBody
 
 	// center the particles around the new geometrics center of mass
 	dgVector oldCom (m_particles.m_com);
-	m_particles.m_com = com.Scale (dgFloat32 (1.0f) / m_particles.m_count); 
+	m_particles.m_com = com.Scale3 (dgFloat32 (1.0f) / m_particles.m_count); 
 
 	// calculate the new body average velocity
-	myBody->m_veloc = (m_particles.m_com - oldCom).Scale (dgFloat32 (1.0f) / timestep);
+	myBody->m_veloc = (m_particles.m_com - oldCom).Scale3 (dgFloat32 (1.0f) / timestep);
 	myBody->m_globalCentreOfMass = m_particles.m_com; 
 	myBody->m_matrix.m_posit = m_particles.m_com; 
 
@@ -656,7 +656,7 @@ xxx ++;
 
 		dgFloat32 timestep = proxy.m_timestep;
 		//dgFloat32 invTimeStep = dgFloat32 (1.0f) / timestep;
-		//dgVector externImpulseDistance ((myBody->m_accel.Scale (myBody->m_invMass.m_w * timestep) + myBody->m_veloc).Scale (timestep));
+		//dgVector externImpulseDistance ((myBody->m_accel.Scale3 (myBody->m_invMass.m_w * timestep) + myBody->m_veloc).Scale3 (timestep));
 		//dgFloat32 gravityDistance = dgAbsf (dgSqrt (externImpulseDistance % externImpulseDistance));
 
 		dgInt32* const indexArray = (dgInt32*)data.m_faceVertexIndex;
@@ -791,13 +791,13 @@ xxx ++;
 				if (inside) {
 					dgFloat32 den =  delta % plane;
 					dgAssert (dgAbsf(den) > dgFloat32 (1.0e-6f));
-					p0 -= delta.Scale (dgFloat32 (1.001f) * side0 / den);
+					p0 -= delta.Scale3 (dgFloat32 (1.001f) * side0 / den);
 
 //					dgFloat32 reflexVeloc = veloc % plane;
-//					dgVector bounceVeloc (plane.Scale (reflexVeloc));
+//					dgVector bounceVeloc (plane.Scale3 (reflexVeloc));
 //					dgVector tangentVeloc (veloc - bounceVeloc);
 //					float restitution = dgFloat32 (0.0f);
-//					veloc = veloc - bounceVeloc.Scale (dgFloat32 (1.0f) + restitution) ;
+//					veloc = veloc - bounceVeloc.Scale3 (dgFloat32 (1.0f) + restitution) ;
 					velocity[index] = dgVector (0.0f, 0.0f, 0.0f, 0.0f);
 					//float keneticFriction = dgFloat32 (0.5f);
 				}
@@ -948,7 +948,7 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMes
 		m_particles.m_posit[i] = dgVector (dgFloat32 (vertex[i * stride + 0]), dgFloat32 (vertex[i * stride + 1]), dgFloat32 (vertex[i * stride + 2]), dgFloat32 (0.0f));
 		m_particles.m_veloc[i] = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	}
-//	com = com.Scale(dgFloat32 (1.0f / m_particles.m_count));
+//	com = com.Scale3(dgFloat32 (1.0f / m_particles.m_count));
 //	m_particles.m_com = com;
 
 	dgInt32 indexCount = mesh->GetTotalIndexCount (); 
@@ -1061,8 +1061,8 @@ void dgCollisionDeformableMesh::SetCollisionBBox (const dgVector& p0, const dgVe
 	dgAssert (p0.m_y <= p1.m_y);
 	dgAssert (p0.m_z <= p1.m_z);
 
-	m_boxSize = (p1 - p0).Scale (dgFloat32 (0.5f)); 
-	m_boxOrigin = (p1 + p0).Scale (dgFloat32 (0.5f)); 
+	m_boxSize = (p1 - p0).Scale3 (dgFloat32 (0.5f)); 
+	m_boxOrigin = (p1 + p0).Scale3 (dgFloat32 (0.5f)); 
 //	m_boxOrigin-= m_particles.m_com;
 
 	dgFloat32 padding = m_skinThickness + DG_DEFORMABLE_DEFAULT_SKIN_THICKNESS;
@@ -1117,12 +1117,12 @@ dgCollisionDeformableMesh::dgDeformableNode* dgCollisionDeformableMesh::BuildTop
 		dgVector varian (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 		for (dgInt32 i = 0; i < count; i ++) {
 			const dgDeformableNode* const node = &children[i];
-			dgVector p ((node->m_minBox + node->m_maxBox).Scale (0.5f));
+			dgVector p ((node->m_minBox + node->m_maxBox).Scale3 (0.5f));
 			median += p;
 			varian += p.CompProduct (p);
 		}
 
-		varian = varian.Scale (dgFloat32 (count)) - median.CompProduct(median);
+		varian = varian.Scale3 (dgFloat32 (count)) - median.CompProduct(median);
 
 		dgInt32 index = 0;
 		dgFloat32 maxVarian = dgFloat32 (-1.0e10f);
@@ -1133,7 +1133,7 @@ dgCollisionDeformableMesh::dgDeformableNode* dgCollisionDeformableMesh::BuildTop
 			}
 		}
 
-		dgVector center = median.Scale (dgFloat32 (1.0f) / dgFloat32 (count));
+		dgVector center = median.Scale3 (dgFloat32 (1.0f) / dgFloat32 (count));
 		dgFloat32 test = center[index];
 
 		dgInt32 i0 = 0;
@@ -1419,7 +1419,7 @@ void dgCollisionDeformableMesh::UpdateVisualNormals()
 		dgVector e0 (m_particles.m_posit[i1] - m_particles.m_posit[i0]);
 		dgVector e1 (m_particles.m_posit[i2] - m_particles.m_posit[i0]);
 		dgVector n = e1 * e0;
-		n = n.Scale(dgRsqrt (n % n));
+		n = n.Scale3(dgRsqrt (n % n));
 		m_faceNormals[i] = n;
 	} 
 
@@ -1443,7 +1443,7 @@ void dgCollisionDeformableMesh::UpdateVisualNormals()
 
 	for (dgInt32 i = 0; i < m_visualVertexCount; i ++)	{
 		dgVector n (m_visualVertexData[i].m_normals[0], m_visualVertexData[i].m_normals[1], m_visualVertexData[i].m_normals[2],  dgFloat32 (0.0f));
-		n = n.Scale(dgRsqrt (n % n));
+		n = n.Scale3(dgRsqrt (n % n));
 		m_visualVertexData[i].m_normals[0] = n.m_x;
 		m_visualVertexData[i].m_normals[1] = n.m_y;
 		m_visualVertexData[i].m_normals[2] = n.m_z;

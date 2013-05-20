@@ -65,8 +65,8 @@ dgCollisionCompound::dgOOBBTestData::dgOOBBTestData (const dgMatrix& matrix)
 dgCollisionCompound::dgOOBBTestData::dgOOBBTestData (const dgMatrix& matrix, const dgVector& p0, const dgVector& p1)
 	:m_matrix (matrix), m_localP0(p0), m_localP1(p1)
 {
-	m_size = (m_localP1 - m_localP0).Scale (dgFloat32 (0.5f));
-	m_origin = (m_localP1 + m_localP0).Scale (dgFloat32 (0.5f));
+	m_size = (m_localP1 - m_localP0).Scale3 (dgFloat32 (0.5f));
+	m_origin = (m_localP1 + m_localP0).Scale3 (dgFloat32 (0.5f));
 
 	for (dgInt32 i = 0; i < 3; i ++) {
 		m_absMatrix[i][3] = dgFloat32 (0.0f);
@@ -176,8 +176,8 @@ void dgCollisionCompound::dgNodeBase::SetBox (const dgVector& p0, const dgVector
 	m_p1 = p1;
 	m_p0.m_w = 0.0f;
 	m_p1.m_w = 0.0f;
-	m_size = (m_p1 - m_p0).Scale (dgFloat32 (0.5f));
-	m_origin = (m_p1 + m_p0).Scale (dgFloat32 (0.5f));
+	m_size = (m_p1 - m_p0).Scale3 (dgFloat32 (0.5f));
+	m_origin = (m_p1 + m_p0).Scale3 (dgFloat32 (0.5f));
 
 	dgVector size1(m_size.m_y, m_size.m_z, m_size.m_x, dgFloat32 (0.0f));
 	m_area = m_size % size1;
@@ -697,18 +697,18 @@ dgMatrix dgCollisionCompound::CalculateInertiaAndCenterOfMass (const dgVector& l
 		dgVector crossInertia__;
 		dgVector centerOfMass__;
 		dgMatrix scaledMatrix__(matrix);
-		scaledMatrix__[0] = scaledMatrix__[0].Scale(localScale.m_x);
-		scaledMatrix__[1] = scaledMatrix__[1].Scale(localScale.m_y);
-		scaledMatrix__[2] = scaledMatrix__[2].Scale(localScale.m_z);
+		scaledMatrix__[0] = scaledMatrix__[0].Scale3(localScale.m_x);
+		scaledMatrix__[1] = scaledMatrix__[1].Scale3(localScale.m_y);
+		scaledMatrix__[2] = scaledMatrix__[2].Scale3(localScale.m_z);
 		dgFloat32 volume__ = CalculateMassProperties (scaledMatrix__, inertiaII__, crossInertia__, centerOfMass__);
 		if (volume__ < DG_MAX_MIN_VOLUME) {
 			volume__ = DG_MAX_MIN_VOLUME;
 		}
 
 		dgFloat32 invVolume__ = dgFloat32 (1.0f) / volume__;
-		centerOfMass__ = centerOfMass__.Scale(invVolume__);
-		inertiaII__ = inertiaII__.Scale (invVolume__);
-		crossInertia__ = crossInertia__.Scale (invVolume__);
+		centerOfMass__ = centerOfMass__.Scale3(invVolume__);
+		inertiaII__ = inertiaII__.Scale3 (invVolume__);
+		crossInertia__ = crossInertia__.Scale3 (invVolume__);
 		dgMatrix inertia__ (dgGetIdentityMatrix());
 		inertia__[0][0] = inertiaII__[0];
 		inertia__[1][1] = inertiaII__[1];
@@ -758,18 +758,18 @@ dgMatrix dgCollisionCompound::CalculateInertiaAndCenterOfMass (const dgVector& l
 		dgVector crossInertia;
 		dgVector centerOfMass;
 		dgMatrix scaledMatrix(matrix);
-		scaledMatrix[0] = scaledMatrix[0].Scale(localScale.m_x);
-		scaledMatrix[1] = scaledMatrix[1].Scale(localScale.m_y);
-		scaledMatrix[2] = scaledMatrix[2].Scale(localScale.m_z);
+		scaledMatrix[0] = scaledMatrix[0].Scale3(localScale.m_x);
+		scaledMatrix[1] = scaledMatrix[1].Scale3(localScale.m_y);
+		scaledMatrix[2] = scaledMatrix[2].Scale3(localScale.m_z);
 		dgFloat32 volume = CalculateMassProperties (scaledMatrix, inertiaII, crossInertia, centerOfMass);
 		if (volume < DG_MAX_MIN_VOLUME) {
 			volume = DG_MAX_MIN_VOLUME;
 		}
 
 		dgFloat32 invVolume = dgFloat32 (1.0f) / volume;
-		centerOfMass = centerOfMass.Scale(invVolume);
-		inertiaII = inertiaII.Scale (invVolume);
-		crossInertia = crossInertia.Scale (invVolume);
+		centerOfMass = centerOfMass.Scale3(invVolume);
+		inertiaII = inertiaII.Scale3 (invVolume);
+		crossInertia = crossInertia.Scale3 (invVolume);
 		dgMatrix inertia (dgGetIdentityMatrix());
 		inertia[0][0] = inertiaII[0];
 		inertia[1][1] = inertiaII[1];
@@ -806,10 +806,10 @@ void dgCollisionCompound::MassProperties ()
 	dgAssert (volume_ > dgFloat32 (0.0f));
 
 	dgFloat32 invVolume_ = dgFloat32 (1.0f)/volume_;
-	m_centerOfMass = origin_.Scale (invVolume_);
+	m_centerOfMass = origin_.Scale3 (invVolume_);
 	m_centerOfMass.m_w = volume_;
-	m_inertia = inertia_.Scale (invVolume_);
-	m_crossInertia = crossInertia_.Scale(invVolume_);
+	m_inertia = inertia_.Scale3 (invVolume_);
+	m_crossInertia = crossInertia_.Scale3(invVolume_);
 #endif
 
 
@@ -824,14 +824,14 @@ void dgCollisionCompound::MassProperties ()
 		dgFloat32 shapeVolume = collision->GetVolume();
 
 		volume += shapeVolume;
-		origin += shapeInertia.m_posit.Scale(shapeVolume);
-		inertiaII += dgVector (shapeInertia[0][0], shapeInertia[0][0], shapeInertia[0][0], dgFloat32 (0.0f)).Scale (shapeVolume);
-		inertiaIJ += dgVector (shapeInertia[1][2], shapeInertia[0][2], shapeInertia[0][1], dgFloat32 (0.0f)).Scale (shapeVolume);
+		origin += shapeInertia.m_posit.Scale3(shapeVolume);
+		inertiaII += dgVector (shapeInertia[0][0], shapeInertia[0][0], shapeInertia[0][0], dgFloat32 (0.0f)).Scale3 (shapeVolume);
+		inertiaIJ += dgVector (shapeInertia[1][2], shapeInertia[0][2], shapeInertia[0][1], dgFloat32 (0.0f)).Scale3 (shapeVolume);
 	}
 	dgFloat32 invVolume = dgFloat32 (1.0f)/volume;
-	m_inertia = inertiaII.Scale (invVolume);
-	m_crossInertia = inertiaIJ.Scale (invVolume);
-	m_centerOfMass = origin.Scale (invVolume);
+	m_inertia = inertiaII.Scale3 (invVolume);
+	m_crossInertia = inertiaIJ.Scale3 (invVolume);
+	m_centerOfMass = origin.Scale3 (invVolume);
 	m_centerOfMass.m_w = volume;
 
 	dgCollision::MassProperties ();
@@ -1204,7 +1204,7 @@ dgFloat32 dgCollisionCompound::CalculateSurfaceArea (dgNodeBase* const node0, dg
 {
 	minBox = dgVector (dgMin (node0->m_p0.m_x, node1->m_p0.m_x), dgMin (node0->m_p0.m_y, node1->m_p0.m_y), dgMin (node0->m_p0.m_z, node1->m_p0.m_z), dgFloat32 (0.0f));
 	maxBox = dgVector (dgMax (node0->m_p1.m_x, node1->m_p1.m_x), dgMax (node0->m_p1.m_y, node1->m_p1.m_y), dgMax (node0->m_p1.m_z, node1->m_p1.m_z), dgFloat32 (0.0f));		
-	dgVector side0 ((maxBox - minBox).Scale (dgFloat32 (0.5f)));
+	dgVector side0 ((maxBox - minBox).Scale3 (dgFloat32 (0.5f)));
 	dgVector side1 (side0.m_y, side0.m_z, side0.m_x, dgFloat32 (0.0f));
 	return side0 % side1;
 }
@@ -1251,8 +1251,8 @@ void dgCollisionCompound::ImproveNodeFitness (dgNodeBase* const node) const
 				parent->m_p0 = cost1P0;
 				parent->m_p1 = cost1P1;		
 				parent->m_area = cost1;
-				parent->m_size = (parent->m_p1 - parent->m_p0).Scale(dgFloat32 (0.5f));
-				parent->m_origin = (parent->m_p1 + parent->m_p0).Scale(dgFloat32 (0.5f));
+				parent->m_size = (parent->m_p1 - parent->m_p0).Scale3(dgFloat32 (0.5f));
+				parent->m_origin = (parent->m_p1 + parent->m_p0).Scale3(dgFloat32 (0.5f));
 
 			} else if ((cost2 <= cost0) && (cost2 <= cost1)) {
 				dgNodeBase* const parent = node->m_parent;
@@ -1279,8 +1279,8 @@ void dgCollisionCompound::ImproveNodeFitness (dgNodeBase* const node) const
 				parent->m_p0 = cost2P0;
 				parent->m_p1 = cost2P1;		
 				parent->m_area = cost2;
-				parent->m_size = (parent->m_p1 - parent->m_p0).Scale(dgFloat32 (0.5f));
-				parent->m_origin = (parent->m_p1 + parent->m_p0).Scale(dgFloat32 (0.5f));
+				parent->m_size = (parent->m_p1 - parent->m_p0).Scale3(dgFloat32 (0.5f));
+				parent->m_origin = (parent->m_p1 + parent->m_p0).Scale3(dgFloat32 (0.5f));
 			}
 		} else {
 			dgFloat32 cost0 = node->m_area;
@@ -1319,8 +1319,8 @@ void dgCollisionCompound::ImproveNodeFitness (dgNodeBase* const node) const
 				parent->m_p0 = cost1P0;
 				parent->m_p1 = cost1P1;		
 				parent->m_area = cost1;
-				parent->m_size = (parent->m_p1 - parent->m_p0).Scale(dgFloat32 (0.5f));
-				parent->m_origin = (parent->m_p1 + parent->m_p0).Scale(dgFloat32 (0.5f));
+				parent->m_size = (parent->m_p1 - parent->m_p0).Scale3(dgFloat32 (0.5f));
+				parent->m_origin = (parent->m_p1 + parent->m_p0).Scale3(dgFloat32 (0.5f));
 
 			} else if ((cost2 <= cost0) && (cost2 <= cost1)) {
 				dgNodeBase* const parent = node->m_parent;
@@ -1347,8 +1347,8 @@ void dgCollisionCompound::ImproveNodeFitness (dgNodeBase* const node) const
 				parent->m_p0 = cost2P0;
 				parent->m_p1 = cost2P1;		
 				parent->m_area = cost2;
-				parent->m_size = (parent->m_p1 - parent->m_p0).Scale(dgFloat32 (0.5f));
-				parent->m_origin = (parent->m_p1 + parent->m_p0).Scale(dgFloat32 (0.5f));
+				parent->m_size = (parent->m_p1 - parent->m_p0).Scale3(dgFloat32 (0.5f));
+				parent->m_origin = (parent->m_p1 + parent->m_p0).Scale3(dgFloat32 (0.5f));
 			}
 		}
 	} else {
@@ -1391,8 +1391,8 @@ dgInt32 dgCollisionCompound::CalculateContacts (dgCollidingPairCollector::dgPair
 void dgCollisionCompound::CalculateCollisionTreeArea(dgNodePairs& pairOut, const dgCollisionBVH* const collisionTree, const void* const treeNode) const
 {
 	collisionTree->GetNodeAABB(treeNode, pairOut.m_treeNodeP0, pairOut.m_treeNodeP1);
-	pairOut.m_treeNodeSize = (pairOut.m_treeNodeP1 - pairOut.m_treeNodeP0).Scale (dgFloat32 (0.5f));
-	pairOut.m_treeNodeOrigin = (pairOut.m_treeNodeP1 + pairOut.m_treeNodeP0).Scale (dgFloat32 (0.5f));
+	pairOut.m_treeNodeSize = (pairOut.m_treeNodeP1 - pairOut.m_treeNodeP0).Scale3 (dgFloat32 (0.5f));
+	pairOut.m_treeNodeOrigin = (pairOut.m_treeNodeP1 + pairOut.m_treeNodeP0).Scale3 (dgFloat32 (0.5f));
 	dgVector size (pairOut.m_treeNodeSize.m_y, pairOut.m_treeNodeSize.m_z, pairOut.m_treeNodeSize.m_x, dgFloat32 (0.0f));
 	pairOut.m_treeNodeArea = pairOut.m_treeNodeSize  % size;
 	dgAssert (pairOut.m_treeNodeArea > dgFloat32 (0.0f));
@@ -2069,8 +2069,8 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTree (dgCollidingPairCo
 			dgVector p0;
 			dgVector p1;
 			treeCollision->GetNodeAABB(other, p0, p1);
-			dgVector size = (p1 - p0).Scale (dgFloat32 (0.5f));
-			dgVector origin = (p1 + p0).Scale (dgFloat32 (0.5f));
+			dgVector size = (p1 - p0).Scale3 (dgFloat32 (0.5f));
+			dgVector origin = (p1 + p0).Scale3 (dgFloat32 (0.5f));
 			dgVector size1 (size.m_y, size.m_z, size.m_x, dgFloat32 (0.0f));
 			dgFloat32 area = size  % size1;
 			dgAssert (dgAbsf(area - stackEntry->m_treeNodeArea) < dgFloat32 (1.0e-1f));
@@ -2358,8 +2358,8 @@ dgInt32 dgCollisionCompound::CalculateContactsToHeightField (dgCollidingPairColl
 		dgVector p1 (origin + size);
 
 		terrainCollision->GetLocalAABB (p0, p1, nodeProxi.m_p0, nodeProxi.m_p1);
-		nodeProxi.m_size = (nodeProxi.m_p1 - nodeProxi.m_p0).Scale (dgFloat32 (0.5f));
-		nodeProxi.m_origin = (nodeProxi.m_p1 + nodeProxi.m_p0).Scale (dgFloat32 (0.5f));
+		nodeProxi.m_size = (nodeProxi.m_p1 - nodeProxi.m_p0).Scale3 (dgFloat32 (0.5f));
+		nodeProxi.m_origin = (nodeProxi.m_p1 + nodeProxi.m_p0).Scale3 (dgFloat32 (0.5f));
 		if (me->BoxTest (data, &nodeProxi)) {
 			if (me->m_type == m_leaf) {
 				dgCollisionInstance* const subShape = me->GetShape();

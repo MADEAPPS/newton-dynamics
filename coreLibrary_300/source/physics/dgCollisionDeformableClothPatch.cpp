@@ -372,12 +372,12 @@ void dgCollisionDeformableClothPatch::IntegrateParticles (dgFloat32 timestep)
 	dgFloat32 invTimeStep = dgFloat32 (1.0f) / timestep;
 	dgVector gravity (0.0f, -9.8f, 0.0f, 0.0f);
 	//dgVector gravity (0.0f, -1.0f, 0.0f, 0.0f);
-	dgVector gravityStep (gravity.Scale (timestep));
+	dgVector gravityStep (gravity.Scale3 (timestep));
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-		veloc[i] = (posit[i] - m_posit[i]).Scale (invTimeStep);
+		veloc[i] = (posit[i] - m_posit[i]).Scale3 (invTimeStep);
 		m_posit[i] = posit[i];
-		veloc[i] += gravityStep.Scale (unitMass[i]);
-		posit[i] += veloc[i].Scale (timestep);
+		veloc[i] += gravityStep.Scale3 (unitMass[i]);
+		posit[i] += veloc[i].Scale3 (timestep);
 	}
 /*
 	// calculate internal forces
@@ -395,10 +395,10 @@ void dgCollisionDeformableClothPatch::IntegrateParticles (dgFloat32 timestep)
 
 		// this is the velocity projection code 
 		dgVector relVeloc (veloc[index0] - veloc[index1]);
-		relVeloc = relPosit.Scale ((relVeloc % relPosit) * invMag2);
+		relVeloc = relPosit.Scale3 ((relVeloc % relPosit) * invMag2);
 
-		veloc[index0] -= relVeloc.Scale (link->m_mass0_influence);
-		veloc[index1] += relVeloc.Scale (link->m_mass1_influence);
+		veloc[index0] -= relVeloc.Scale3 (link->m_mass0_influence);
+		veloc[index1] += relVeloc.Scale3 (link->m_mass1_influence);
 	}
 */
 }
@@ -427,8 +427,8 @@ void dgCollisionDeformableClothPatch::ResolvePositionsConstraints (dgFloat32 tim
 
 #endif
 		
-		posit[index0] -= relPosit.Scale (error * link->m_mass0_influence);
-		posit[index1] += relPosit.Scale (error * link->m_mass1_influence);
+		posit[index0] -= relPosit.Scale3 (error * link->m_mass0_influence);
+		posit[index1] += relPosit.Scale3 (error * link->m_mass1_influence);
 	}
 
 }

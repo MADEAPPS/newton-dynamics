@@ -305,9 +305,9 @@ void dgConvexHull4d::TessellateTriangle (dgInt32 level, const dgVector& p0, cons
 		dgVector p12 (p1 + p2);
 		dgVector p20 (p2 + p0);
 
-		p01 = p01.Scale (dgRsqrt(p01 % p01));
-		p12 = p12.Scale (dgRsqrt(p12 % p12));
-		p20 = p20.Scale (dgRsqrt(p20 % p20));
+		p01 = p01.Scale3 (dgRsqrt(p01 % p01));
+		p12 = p12.Scale3 (dgRsqrt(p12 % p12));
+		p20 = p20.Scale3 (dgRsqrt(p20 % p20));
 
 		dgAssert (dgAbsf (p01 % p01 - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
 		dgAssert (dgAbsf (p12 % p12 - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));

@@ -244,8 +244,8 @@ dgVector dgCollisionChamferCylinder::SupportVertex (const dgVector& dir, dgInt32
 	}
 
 	dgVector sideDir (dgFloat32 (0.0f), dir.m_y, dir.m_z, dgFloat32 (0.0f));
-	sideDir = sideDir.Scale (m_radius * dgRsqrt (sideDir % sideDir + dgFloat32 (1.0e-18f)));
-	return sideDir + dir.Scale (m_height);
+	sideDir = sideDir.Scale3 (m_radius * dgRsqrt (sideDir % sideDir + dgFloat32 (1.0e-18f)));
+	return sideDir + dir.Scale3 (m_height);
 }
 
 
@@ -308,7 +308,7 @@ dgFloat32 dgCollisionChamferCylinder::RayCast (const dgVector& q0, const dgVecto
 
 	dgVector dq (q1 - q0);
 	dgAssert ((dq % dq) > 0.0f);
-	dgVector dir (dq.Scale (dgRsqrt(dq % dq)));
+	dgVector dir (dq.Scale3 (dgRsqrt(dq % dq)));
 	if (dgAbsf (dir.m_x) > 0.9999f) {
 		return dgCollisionConvex::RayCast (q0, q1, contactOut, NULL, NULL);
 	}
@@ -332,23 +332,23 @@ dgFloat32 dgCollisionChamferCylinder::RayCast (const dgVector& q0, const dgVecto
 		dgFloat32 s0 = (-b + desc) * den;
 		dgFloat32 s1 = (-b - desc) * den;
 
-		dgVector origin0 (p0 + dp.Scale (s0));
-		dgVector origin1 (p0 + dp.Scale (s1));
-		origin0 = origin0.Scale (m_radius / (m_radius + m_height));
-		origin1 = origin1.Scale (m_radius / (m_radius + m_height));
+		dgVector origin0 (p0 + dp.Scale3 (s0));
+		dgVector origin1 (p0 + dp.Scale3 (s1));
+		origin0 = origin0.Scale3 (m_radius / (m_radius + m_height));
+		origin1 = origin1.Scale3 (m_radius / (m_radius + m_height));
 		dgFloat32 t0 = dgRayCastSphere (q0, q1, origin0, m_height);
 		dgFloat32 t1 = dgRayCastSphere (q0, q1, origin1, m_height);
 		if (t0 < t1) {
 			if ((t0 >= 0.0f) && (t0 <= 1.0f)) {
-				contactOut.m_normal = q0 + dq.Scale (t0) - origin0;
-				contactOut.m_normal = contactOut.m_normal.Scale (dgRsqrt (contactOut.m_normal % contactOut.m_normal));
+				contactOut.m_normal = q0 + dq.Scale3 (t0) - origin0;
+				contactOut.m_normal = contactOut.m_normal.Scale3 (dgRsqrt (contactOut.m_normal % contactOut.m_normal));
 				//contactOut.m_userId = SetUserDataID();
 				return t0; 
 			}
 		} else {
 			if ((t1 >= 0.0f) && (t1 <= 1.0f)) {
-				contactOut.m_normal = q0 + dq.Scale (t1) - origin1;
-				contactOut.m_normal = contactOut.m_normal.Scale (dgRsqrt (contactOut.m_normal % contactOut.m_normal));
+				contactOut.m_normal = q0 + dq.Scale3 (t1) - origin1;
+				contactOut.m_normal = contactOut.m_normal.Scale3 (dgRsqrt (contactOut.m_normal % contactOut.m_normal));
 				//contactOut.m_userId = SetUserDataID();
 				return t1; 
 			}
@@ -370,12 +370,12 @@ dgVector dgCollisionChamferCylinder::ConvexConicSupporVertex (const dgVector& di
 
 	dgVector sideDir (dgFloat32 (0.0f), dir.m_y, dir.m_z, dgFloat32 (0.0f));
 	dgAssert ((sideDir % sideDir) > dgFloat32 (0.0f));
-	return sideDir.Scale (m_radius * dgRsqrt (sideDir % sideDir));
+	return sideDir.Scale3 (m_radius * dgRsqrt (sideDir % sideDir));
 }
 
 dgVector dgCollisionChamferCylinder::ConvexConicSupporVertex (const dgVector& point, const dgVector& dir) const
 {
-	return point + dir.Scale(m_height);
+	return point + dir.Scale3(m_height);
 }
 
 
@@ -389,9 +389,9 @@ dgInt32 dgCollisionChamferCylinder::CalculateContacts (const dgVector& point, co
 
 		dgVector r (dgFloat32 (0.0f), point.m_y, point.m_z, dgFloat32 (0.0f));
 		dgAssert ((r % r) > dgFloat32 (0.0f));
-		r = r.Scale(m_radius * dgRsqrt (r % r));
+		r = r.Scale3(m_radius * dgRsqrt (r % r));
 		dgFloat32 t = normal % (r - point);
-		contactsOut[0] = r - normal.Scale (t);
+		contactsOut[0] = r - normal.Scale3 (t);
 		return 1;
 	}
 }

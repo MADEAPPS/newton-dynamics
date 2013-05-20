@@ -180,7 +180,7 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 			return false;
 		}
 
-		dgBigVector r (ray_p0 + p1p0.Scale (num / den));
+		dgBigVector r (ray_p0 + p1p0.Scale3 (num / den));
 		dgBigVector q0r (q0 - r);
 		dgFloat64 dist2 (q0r % q0r);
 		return dist2 <= (tol * tol);
@@ -229,7 +229,7 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 		// compute the line parameters of the two closest points
 		if (den < tol) { 
 			// almost parallel
-			dgBigVector r = ray_q0 + q1q0.Scale (e / c);
+			dgBigVector r = ray_q0 + q1q0.Scale3 (e / c);
 			dgBigVector r1r0 (ray_p0 - r);
 			dgFloat64 dist2 (r1r0 % r1r0);
 			// almost parallel, intersection can not be tested, let the the extend precision routine figure it out 
@@ -247,8 +247,8 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 				return false;
 			}
 
-			dgBigVector r0 = ray_p0 + p1p0.Scale (t / den);
-			dgBigVector r1 = ray_q0 + q1q0.Scale (s / den);
+			dgBigVector r0 = ray_p0 + p1p0.Scale3 (t / den);
+			dgBigVector r1 = ray_q0 + q1q0.Scale3 (s / den);
 			dgBigVector r1r0 (r1 - r0);
 			dgFloat64 dist2 (r1r0 % r1r0);
 			if (dist2 > tol * tol) {
@@ -274,7 +274,7 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 			// can not make decision let the extended precision test determine this
 			return true;
 		}
-		normal = normal.Scale (1.0 / sqrt (mag2));
+		normal = normal.Scale3 (1.0 / sqrt (mag2));
 		
 
 		dgBigVector p0 (m_mesh->m_points[vertex->m_incidentVertex]);
@@ -353,7 +353,7 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 			return false;
 		}
 
-		dgHugeVector r (ray_p0 + p1p0.Scale (param));
+		dgHugeVector r (ray_p0 + p1p0.Scale3 (param));
 		dgHugeVector q0r (q0 - r);
 		dgGoogol dist2 (q0r % q0r);
 		return (dist2 <= m_tol2);
@@ -392,8 +392,8 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 				return false;
 			}
 
-			dgHugeVector r0 = ray_p0 + p1p0.Scale (t);
-			dgHugeVector r1 = ray_q0 + q1q0.Scale (s);
+			dgHugeVector r0 = ray_p0 + p1p0.Scale3 (t);
+			dgHugeVector r1 = ray_q0 + q1q0.Scale3 (s);
 			dgHugeVector r1r0 (r1 - r0);
 			dgGoogol dist2 (r1r0 % r1r0);
 			if (dist2 > m_tol2) {
@@ -605,7 +605,7 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 						dgBigVector normal (attr0.m_normal_x * falpha0 + attr1.m_normal_x * falpha1 + attr2.m_normal_x * falpha2,
 											attr0.m_normal_y * falpha0 + attr1.m_normal_y * falpha1 + attr2.m_normal_y * falpha2,
 											attr0.m_normal_z * falpha0 + attr1.m_normal_z * falpha1 + attr2.m_normal_z * falpha2, dgFloat32 (0.0f));
-						normal = normal.Scale (dgFloat64 (1.0f) / sqrt (normal % normal));
+						normal = normal.Scale3 (dgFloat64 (1.0f) / sqrt (normal % normal));
 
 
 						attribute.m_vertex.m_x = point.m_x;
@@ -654,7 +654,7 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 		dgGoogol t0(dgGoogol::m_one - param);
 		dgGoogol t1(param);
 		dgInt32 v01 = newEdge->m_twin->m_incidentVertex;
-		m_vertexAlias[v01] = m_vertexAlias[v0].Scale (t0) + m_vertexAlias[v1].Scale (t1);
+		m_vertexAlias[v01] = m_vertexAlias[v0].Scale3 (t0) + m_vertexAlias[v1].Scale3 (t1);
 
 		dgTree<dgMeshBVHNode*, dgUnsigned64>::dgTreeNode* const mapNode = m_nodeEdgeMap.Find(edgeKey.GetVal());
 		if (mapNode) {
@@ -1459,7 +1459,7 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 			for (dgEdge* ptr = edge->m_next->m_next; ptr != edge; ptr = ptr->m_next) {
 				const dgBigVector& q = m_mesh->m_points[ptr->m_incidentVertex];
 				dgBigVector qp0 (q - p0);
-				dgBigVector diff (qp0 - p1p0.Scale ((qp0 % p1p0) * den));
+				dgBigVector diff (qp0 - p1p0.Scale3 ((qp0 % p1p0) * den));
 				dgFloat64 dist2 = diff % diff;
 				if (dist2 > maxDist) {
 					index = ptr->m_incidentVertex;
@@ -1477,7 +1477,7 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 			for (dgEdge* ptr = edge->m_next->m_next; ptr != edge; ptr = ptr->m_next) {
 				const dgHugeVector& q = m_mesh->m_points[ptr->m_incidentVertex];
 				dgHugeVector qp0 (q - p0);
-				dgHugeVector diff (qp0 - p1p0.Scale ((qp0 % p1p0) * den));
+				dgHugeVector diff (qp0 - p1p0.Scale3 ((qp0 % p1p0) * den));
 				dgGoogol dist2 = diff % diff;
 				if (dist2 > maxDist) {
 					index = ptr->m_incidentVertex;
@@ -2080,7 +2080,7 @@ clipperMeshBVH->m_mesh->Trace();
 				dgGoogol num (normal % (clipperMeshBVH->m_vertexAlias[firstClipperEdge->m_incidentVertex] - origin));
 				dgGoogol den (normal % p1p0);
 				dgHugeVector& point = curve.Addtop()->GetInfo();
-				point = clipperMeshBVH->m_vertexAlias[firstClipperEdge->m_incidentVertex] - p1p0.Scale(num / den);
+				point = clipperMeshBVH->m_vertexAlias[firstClipperEdge->m_incidentVertex] - p1p0.Scale3(num / den);
 
 				if (firstClipperEdge->m_mark >= clusterColor) {
 					firstClipperEdge->m_mark = clipperMark;
@@ -2251,8 +2251,8 @@ clipperMeshBVH->m_mesh->Trace();
 							curve.InsertAfter (curveNode, curve.Append(meshBVH->m_vertexAlias[meshBVH->m_mesh->GetVertexCount()-1]));
 
 						} else if (!((test0ParamP ^ test1ParamP) & (test0ParamQ ^ test1ParamQ))) {
-							dgHugeVector p (p0 + (p1 - p0).Scale (paramP));
-							dgHugeVector q (q0 + (q1 - q0).Scale (paramQ));
+							dgHugeVector p (p0 + (p1 - p0).Scale3 (paramP));
+							dgHugeVector q (q0 + (q1 - q0).Scale3 (paramQ));
 							dgHugeVector pq = (p - q);
 							dgGoogol dist2 (pq % pq);
 							if (dist2 < m_tol2) {
@@ -2409,7 +2409,7 @@ clipperMeshBVH->m_mesh->Trace();
 		{
 			dgHugeVector normal (meshBVH->FaceNormal (faceNode->m_face));
 			dgGoogol mag2 (normal % normal);
-			normal = normal.Scale (mag2.InvSqrt());
+			normal = normal.Scale3 (mag2.InvSqrt());
 			const dgHugeVector& origin (meshBVH->m_vertexAlias[faceNode->m_face->m_incidentVertex]);
 
 			dgClusterFace::dgListNode* nextNode;
@@ -2722,7 +2722,7 @@ meshBVH->m_mesh->Trace();
 						dgBigVector normal (attr0.m_normal_x * falpha0 + attr1.m_normal_x * falpha1 + attr2.m_normal_x * falpha2,
 											attr0.m_normal_y * falpha0 + attr1.m_normal_y * falpha1 + attr2.m_normal_y * falpha2,
 											attr0.m_normal_z * falpha0 + attr1.m_normal_z * falpha1 + attr2.m_normal_z * falpha2, dgFloat32 (0.0f));
-						normal = normal.Scale (dgFloat64 (1.0f) / sqrt (normal % normal));
+						normal = normal.Scale3 (dgFloat64 (1.0f) / sqrt (normal % normal));
 
 
 						attribute.m_vertex.m_x = point.m_x;
@@ -2770,7 +2770,7 @@ meshBVH->m_mesh->Trace();
 		dgGoogol t0(dgGoogol::m_one - param);
 		dgGoogol t1(param);
 		dgInt32 v01 = newEdge->m_twin->m_incidentVertex;
-		m_vertexAlias[v01] = m_vertexAlias[v0].Scale (t0) + m_vertexAlias[v1].Scale (t1);
+		m_vertexAlias[v01] = m_vertexAlias[v0].Scale3 (t0) + m_vertexAlias[v1].Scale3 (t1);
 
 		dgTree<dgMeshBVHNode*, dgUnsigned64>::dgTreeNode* const mapNode = m_nodeEdgeMap.Find(edgeKey.GetVal());
 		if (mapNode) {

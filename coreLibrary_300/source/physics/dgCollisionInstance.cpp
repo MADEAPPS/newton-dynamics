@@ -380,9 +380,9 @@ void dgCollisionInstance::SetLocalMatrix (const dgMatrix& matrix)
 void dgCollisionInstance::DebugCollision (const dgMatrix& matrix, OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 	dgMatrix scaledMatrix (m_localMatrix * matrix);
-	scaledMatrix[0] = scaledMatrix[0].Scale (m_scale[0]);
-	scaledMatrix[1] = scaledMatrix[1].Scale (m_scale[1]);
-	scaledMatrix[2] = scaledMatrix[2].Scale (m_scale[2]);
+	scaledMatrix[0] = scaledMatrix[0].Scale3 (m_scale[0]);
+	scaledMatrix[1] = scaledMatrix[1].Scale3 (m_scale[1]);
+	scaledMatrix[2] = scaledMatrix[2].Scale3 (m_scale[2]);
 	m_childShape->DebugCollision (scaledMatrix, callback, userData);
 }
 
@@ -404,7 +404,7 @@ dgInt32 dgCollisionInstance::CalculatePlaneIntersection (const dgVector& normal,
 	dgVector point1 (m_invScale.CompProduct4(point));
 	if (!m_scaleIsUniform) {
 		normal1 = m_scale.CompProduct(normal1);
-		normal1 = normal1.Scale (dgRsqrt (normal1 % normal1));
+		normal1 = normal1.Scale3 (dgRsqrt (normal1 % normal1));
 	}
 
 	count = m_childShape->CalculatePlaneIntersection (normal1, point1, contactsOut);
@@ -423,7 +423,7 @@ dgInt32 dgCollisionInstance::CalculatePlaneIntersectionSimd (const dgVector& nor
 	} else if (m_scaleType == m_uniform) {
 		dgInt32 count = m_childShape->CalculatePlaneIntersectionSimd (normal, point, contactsOut);
 		for (dgInt32 i = 0; i < count; i ++) {
-			contactsOut[i] = contactsOut[i].Scale (m_maxScale);
+			contactsOut[i] = contactsOut[i].Scale3 (m_maxScale);
 		}
 	} else {
 		dgAssert (0);
@@ -438,8 +438,8 @@ dgInt32 dgCollisionInstance::CalculatePlaneIntersectionSimd (const dgVector& nor
 void dgCollisionInstance::CalcAABB (const dgMatrix &matrix, dgVector& p0, dgVector& p1) const
 {
 	m_childShape->CalcAABB (matrix, p0, p1);
-	p0 = matrix.m_posit + (p0 - matrix.m_posit).Scale(m_maxScale) - m_padding;
-	p1 = matrix.m_posit + (p1 - matrix.m_posit).Scale(m_maxScale) + m_padding;
+	p0 = matrix.m_posit + (p0 - matrix.m_posit).Scale3(m_maxScale) - m_padding;
+	p1 = matrix.m_posit + (p1 - matrix.m_posit).Scale3(m_maxScale) + m_padding;
 }
 
 void dgCollisionInstance::CalcAABBSimd (const dgMatrix &matrix, dgVector& p0, dgVector& p1) const
@@ -513,7 +513,7 @@ dgFloat32 dgCollisionInstance::RayCast (const dgVector& localP0, const dgVector&
 					contactOut.m_shapeId0 = GetUserDataID();
 					contactOut.m_shapeId1 = GetUserDataID();
 					dgVector n (m_scale.CompProduct (contactOut.m_normal));
-					contactOut.m_normal = n.Scale (dgRsqrt (n % n));
+					contactOut.m_normal = n.Scale3 (dgRsqrt (n % n));
 				}
 				contactOut.m_collision0 = this;
 				contactOut.m_collision1 = this;

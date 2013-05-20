@@ -157,7 +157,7 @@ dgBigVector dgContactSolver::ReduceLineLarge (const dgBigVector& origin)
 			v = p0;
 			m_vertexIndex = 1;
 		} else {
-			v = p0 + dp.Scale (alpha0);
+			v = p0 + dp.Scale3 (alpha0);
 		}
 	}
 	return v;
@@ -234,7 +234,7 @@ dgBigVector dgContactSolver::ReduceTriangleLarge (const dgBigVector& origin)
 			tmp1 = m_averVertexLarge[i1];
 			m_averVertexLarge[0] = tmp0;
 			m_averVertexLarge[1] = tmp1;
-			return m_hullVertexLarge[0] + segment.Scale (num / den);
+			return m_hullVertexLarge[0] + segment.Scale3 (num / den);
 		}
 		p1p0 = p2p0;
 		i0 = i1;
@@ -248,7 +248,7 @@ dgBigVector dgContactSolver::ReduceTriangleLarge (const dgBigVector& origin)
 		return m_hullVertexLarge[0];
 	} else {
 		m_vertexIndex = 3;
-		return origin - normal.Scale((normal % (origin - m_hullVertexLarge[0])) / (normal % normal));
+		return origin - normal.Scale3((normal % (origin - m_hullVertexLarge[0])) / (normal % normal));
 	}
 
 }
@@ -504,7 +504,7 @@ dgContactSolver::dgMinkReturnCode dgContactSolver::UpdateSeparatingPlaneFallback
 					dgBigVector normal ((p1 - p0) * (p2 - p0));
 					dgFloat64 mag2 = normal % normal;
 					dgAssert (mag2 > dgFloat64 (1.0e-10f));
-					normal = normal.Scale (dgFloat64 (1.0f)/ sqrt(mag2));
+					normal = normal.Scale3 (dgFloat64 (1.0f)/ sqrt(mag2));
 					dgVector dir (dgFloat32 (normal.m_x), dgFloat32 (normal.m_y), dgFloat32 (normal.m_z), dgFloat32 (0.0f)); 
 					CalcSupportVertexLarge (dir, 3);
 					CalcSupportVertexLarge (dir.Scale (dgFloat32 (-1.0f)), 4);
@@ -532,7 +532,7 @@ dgContactSolver::dgMinkReturnCode dgContactSolver::UpdateSeparatingPlaneFallback
 
 
 		dgAssert (dist > dgFloat64 (1.0e-24f));
-		dgBigVector dir (v.Scale (- dgFloat64 (1.0f) / sqrt (dist)));
+		dgBigVector dir (v.Scale3 (- dgFloat64 (1.0f) / sqrt (dist)));
 		dist = dir0 % dir;
 		if (dist < dgFloat64 (0.9995f)) {
 			dgVector dir1 (dgFloat32 (dir.m_x), dgFloat32 (dir.m_y), dgFloat32 (dir.m_z), dgFloat32 (0.0f)); 
@@ -627,7 +627,7 @@ dgContactSolver::dgMinkReturnCode dgContactSolver::UpdateSeparatingPlaneFallback
 					dgFloat64 mag2 = up % up;
 					dgAssert (mag2 > dgFloat64 (1.0e-24f));
 					//rotMatrix.m_up = rotMatrix.m_up.Scale(dgRsqrt (mag2));
-					up = up.Scale(dgFloat64(1.0f) / sqrt (mag2));
+					up = up.Scale3(dgFloat64(1.0f) / sqrt (mag2));
 					rotMatrix.m_up = dgVector (dgFloat32 (up.m_x), dgFloat32 (up.m_y), dgFloat32 (up.m_z), dgFloat32 (0.0f));
 					rotMatrix.m_right = rotMatrix.m_front * rotMatrix.m_up;
 
@@ -767,7 +767,7 @@ dgContactSolver::dgMinkReturnCode dgContactSolver::UpdateSeparatingPlaneFallback
 			dgFloat64 dist = n % n;
 			dgAssert (dist > dgFloat64 (1.0e-20f));
 			if (dist > DG_DISTANCE_TOLERANCE_ZERO) {
-				n = n.Scale (dgFloat32 (1.0f) / sqrt (dist));
+				n = n.Scale3 (dgFloat32 (1.0f) / sqrt (dist));
 				dist = fabs (n % (origin - p0));
 				if (dist < minDist) {
 					minDist = dist;
@@ -1177,7 +1177,7 @@ dgContactSolver::dgMinkReturnCode dgContactSolver::UpdateSeparatingPlaneLarge(dg
 
 			dgFloat64 dist = n % n;
 			if (dist > DG_DISTANCE_TOLERANCE_ZERO) {
-				n = n.Scale (dgFloat64 (1.0f)/ sqrt(dist));
+				n = n.Scale3 (dgFloat64 (1.0f)/ sqrt(dist));
 				dist = n % (origin - p0);
 
 				// find the plane farther away from the origin

@@ -164,7 +164,7 @@ dgBigVector dgCollisionConvexHull::FaceNormal (const dgEdge *face, const dgBigVe
 		e1 = e2;
 	} 
 	dgFloat64 den = sqrt (normal % normal) + dgFloat64 (1.0e-24f);
-	normal = normal.Scale (dgFloat64 (1.0f)/ den);
+	normal = normal.Scale3 (dgFloat64 (1.0f)/ den);
 
 #ifdef _DEBUG
 	edge = face;
@@ -219,8 +219,8 @@ bool dgCollisionConvexHull::RemoveCoplanarEdge (dgPolyhedra& polyhedra, const dg
 						dgAssert ((e0 % e0) >= dgFloat64 (0.0f));
 						dgAssert ((e1 % e1) >= dgFloat64 (0.0f));
 
-						e0 = e0.Scale (dgFloat64 (1.0f) / sqrt (e0 % e0));
-						e1 = e1.Scale (dgFloat64 (1.0f) / sqrt (e1 % e1));
+						e0 = e0.Scale3 (dgFloat64 (1.0f) / sqrt (e0 % e0));
+						e1 = e1.Scale3 (dgFloat64 (1.0f) / sqrt (e1 % e1));
 						dgBigVector n1 (e0 * e1);
 
 						dgFloat64 projection = n1 % normal0;
@@ -230,10 +230,10 @@ bool dgCollisionConvexHull::RemoveCoplanarEdge (dgPolyhedra& polyhedra, const dg
 							dgBigVector e0 (hullVertexArray[edge0->m_twin->m_incidentVertex] - hullVertexArray[edge0->m_twin->m_prev->m_incidentVertex]);
 							dgAssert ((e0 % e0) >= dgFloat64 (0.0f));
 							dgAssert ((e1 % e1) >= dgFloat64 (0.0f));
-							//e0 = e0.Scale (dgRsqrt (e0 % e0));
-							//e1 = e1.Scale (dgRsqrt (e1 % e1));
-							e0 = e0.Scale (dgFloat64 (1.0f) / sqrt (e0 % e0));
-							e1 = e1.Scale (dgFloat64 (1.0f) / sqrt (e1 % e1));
+							//e0 = e0.Scale3 (dgRsqrt (e0 % e0));
+							//e1 = e1.Scale3 (dgRsqrt (e1 % e1));
+							e0 = e0.Scale3 (dgFloat64 (1.0f) / sqrt (e0 % e0));
+							e1 = e1.Scale3 (dgFloat64 (1.0f) / sqrt (e1 % e1));
 
 							dgBigVector n1 (e0 * e1);
 							projection = n1 % normal0;
@@ -291,7 +291,7 @@ bool dgCollisionConvexHull::CheckConvex (dgPolyhedra& polyhedra1, const dgBigVec
 			} while (ptr != edge);
 		}
 	}
-	center = center.Scale (dgFloat64 (1.0f) / dgFloat64 (count));
+	center = center.Scale3 (dgFloat64 (1.0f) / dgFloat64 (count));
 
 	for (iter.Begin(); iter; iter ++) {
 		dgEdge* const edge = &(*iter);
@@ -352,7 +352,7 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 		}
 		dgVector normal (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 		normal[index] = dgFloat32 (1.0f);
-		dgVector step = sphere.RotateVector (normal.Scale (dgFloat32 (0.05f)));
+		dgVector step = sphere.RotateVector (normal.Scale3 (dgFloat32 (0.05f)));
 		for (dgInt32 i = 0; i < count; i ++) {
 			dgVector p1 (tmp[i] + step);
 			dgVector p2 (tmp[i] - step);
@@ -575,7 +575,7 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 					varian += p.CompProduct (p);
 				}
 
-				varian = varian.Scale (dgFloat32 (box.m_vertexCount)) - median.CompProduct(median);
+				varian = varian.Scale3 (dgFloat32 (box.m_vertexCount)) - median.CompProduct(median);
 				dgInt32 index = 0;
 				dgFloat64 maxVarian = dgFloat64 (-1.0e10f);
 				for (dgInt32 i = 0; i < 3; i ++) {
@@ -584,7 +584,7 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 						maxVarian = varian[i];
 					}
 				}
-				dgVector center = median.Scale (dgFloat32 (1.0f) / dgFloat32 (box.m_vertexCount));
+				dgVector center = median.Scale3 (dgFloat32 (1.0f) / dgFloat32 (box.m_vertexCount));
 				dgFloat32 test = center[index];
 
 				dgInt32 i0 = 0;
@@ -921,7 +921,7 @@ dgFloat32 dgCollisionConvexHull::RayCast (const dgVector& localQ0, const dgVecto
 
 		dgVector p0 (localQ0 - m_boxOrigin); 
 		dgVector p1 (localP1 - m_boxOrigin); 
-		dgVector paddedBox (m_boxSize.Scale (1.1f));
+		dgVector paddedBox (m_boxSize.Scale3 (1.1f));
 		for (dgInt32 i = 0; i < 3; i ++) {
 			dgFloat32 den = p1[i] - p0[i]; 
 			if (dgAbsf (den) < dgFloat32 (1.0e-6f)) {
@@ -958,7 +958,7 @@ dgFloat32 dgCollisionConvexHull::RayCast (const dgVector& localQ0, const dgVecto
 		}
 
 		if (tMin < dgFloat32 (1.0f)) {
-			dgVector localP0 (localQ0 + (localP1 - localQ0).Scale(tMin));
+			dgVector localP0 (localQ0 + (localP1 - localQ0).Scale3(tMin));
 
 			dgVector hitNormal(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 
@@ -1012,11 +1012,11 @@ dgFloat32 dgCollisionConvexHull::RayCast (const dgVector& localQ0, const dgVecto
 
 			if (hasHit) {
 				//interset = tE;	
-				dgVector numVector (localP0 + dS.Scale(tE) - localQ0);
+				dgVector numVector (localP0 + dS.Scale3(tE) - localQ0);
 				dgVector denVector (localP1 - localQ0);
 				interset = (numVector % denVector) / (denVector % denVector);
 
-				contactOut.m_normal = hitNormal.Scale (dgRsqrt(hitNormal % hitNormal));
+				contactOut.m_normal = hitNormal.Scale3 (dgRsqrt(hitNormal % hitNormal));
 				//contactOut.m_userId = SetUserDataID();
 			}
 		}
