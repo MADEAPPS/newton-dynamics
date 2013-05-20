@@ -389,16 +389,18 @@ class dgVector
 //	DG_INLINE dgFloat32 DotProductSimd (const dgVector& A) const;
 //	DG_INLINE dgVector CrossProductSimd (const dgVector &A) const;
 //	DG_INLINE dgVector CompProductSimd (const dgVector &A) const;
-	
-	DG_INLINE dgVector Scale (dgFloat32 s) const
+
+	DG_INLINE dgVector Scale3 (dgFloat32 s) const
 	{
-		return _mm_mul_ps (m_type, _mm_set_ps1(s));
+		dgVector tmp (s, s, s, dgFloat32 (1.0f));
+		return _mm_mul_ps (m_type, tmp.m_type);
 	}
 
 	DG_INLINE dgVector Scale4 (dgFloat32 s) const
 	{
-		return Scale (s);
+		return _mm_mul_ps (m_type, _mm_set_ps1(s));
 	}
+
 
 	DG_INLINE dgFloat32& operator[] (dgInt32 i)
 	{
