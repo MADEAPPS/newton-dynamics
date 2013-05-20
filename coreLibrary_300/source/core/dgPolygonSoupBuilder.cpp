@@ -593,10 +593,10 @@ void dgPolygonSoupDatabaseBuilder::Optimize(dgInt32 faceId, const dgFaceBucket& 
 					}
 					dgBigVector p ((p0 + p1).Scale3 (0.5f));
 					median += p;
-					varian += p.CompProduct (p);
+					varian += p.CompProduct3 (p);
 				}
 
-				varian = varian.Scale3 (dgFloat32 (faceCount)) - median.CompProduct(median);
+				varian = varian.Scale3 (dgFloat32 (faceCount)) - median.CompProduct3(median);
 
 				dgInt32 axis = 0;
 				dgFloat32 maxVarian = dgFloat32 (-1.0e10f);

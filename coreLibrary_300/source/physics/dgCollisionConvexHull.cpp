@@ -572,10 +572,10 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 					maxP.m_z = dgMax (p.m_z, maxP.m_z); 
 
 					median += p;
-					varian += p.CompProduct (p);
+					varian += p.CompProduct3 (p);
 				}
 
-				varian = varian.Scale3 (dgFloat32 (box.m_vertexCount)) - median.CompProduct(median);
+				varian = varian.Scale3 (dgFloat32 (box.m_vertexCount)) - median.CompProduct3(median);
 				dgInt32 index = 0;
 				dgFloat64 maxVarian = dgFloat64 (-1.0e10f);
 				for (dgInt32 i = 0; i < 3; i ++) {

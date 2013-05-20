@@ -282,8 +282,8 @@ class dgCollisionDeformableMesh::dgDeformableNode
 		dgVector p1;
 		TriangleBox (position, faceIndices, p0, p1);
 
-		p0 = p0.CompProduct(dgVector (DG_DEFORMABLE_PADDING, DG_DEFORMABLE_PADDING, DG_DEFORMABLE_PADDING, dgFloat32 (0.0f)));
-		p1 = p1.CompProduct(dgVector (DG_DEFORMABLE_PADDING, DG_DEFORMABLE_PADDING, DG_DEFORMABLE_PADDING, dgFloat32 (0.0f)));
+		p0 = p0.CompProduct3(dgVector (DG_DEFORMABLE_PADDING, DG_DEFORMABLE_PADDING, DG_DEFORMABLE_PADDING, dgFloat32 (0.0f)));
+		p1 = p1.CompProduct3(dgVector (DG_DEFORMABLE_PADDING, DG_DEFORMABLE_PADDING, DG_DEFORMABLE_PADDING, dgFloat32 (0.0f)));
 
 		m_minBox.m_x = dgFloor (p0.m_x) * DG_DEFORMABLE_INV_PADDING; 
 		m_minBox.m_y = dgFloor (p0.m_y) * DG_DEFORMABLE_INV_PADDING;  
@@ -306,8 +306,8 @@ class dgCollisionDeformableMesh::dgDeformableNode
 		dgVector p1;
 		TriangleBox (position, faceIndices, p0, p1);
 
-		p0 = p0.CompProduct(dgVector (DG_DEFORMABLE_PADDING, DG_DEFORMABLE_PADDING, DG_DEFORMABLE_PADDING, dgFloat32 (0.0f)));
-		p1 = p1.CompProduct(dgVector (DG_DEFORMABLE_PADDING, DG_DEFORMABLE_PADDING, DG_DEFORMABLE_PADDING, dgFloat32 (0.0f)));
+		p0 = p0.CompProduct3(dgVector (DG_DEFORMABLE_PADDING, DG_DEFORMABLE_PADDING, DG_DEFORMABLE_PADDING, dgFloat32 (0.0f)));
+		p1 = p1.CompProduct3(dgVector (DG_DEFORMABLE_PADDING, DG_DEFORMABLE_PADDING, DG_DEFORMABLE_PADDING, dgFloat32 (0.0f)));
 
 		dgVector minP (dgFloor (p0.m_x) * DG_DEFORMABLE_INV_PADDING, dgFloor (p0.m_y) * DG_DEFORMABLE_INV_PADDING, dgFloor (p0.m_z) * DG_DEFORMABLE_INV_PADDING, dgFloat32(0.0f));  
 		dgVector maxP (dgFloor (p1.m_x + dgFloat32 (1.0f)) * DG_DEFORMABLE_INV_PADDING,  
@@ -470,11 +470,11 @@ void dgCollisionDeformableMesh::CalculateInertia (dgVector& inertiaOut, dgVector
 	dgVector sum2 (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
 		sum += m_particles.m_shapePosition[i];
-		sum2 += m_particles.m_shapePosition[i].CompProduct(m_particles.m_shapePosition[i]);
+		sum2 += m_particles.m_shapePosition[i].CompProduct3(m_particles.m_shapePosition[i]);
 	}
 
 	originOut = sum.Scale3 (dgFloat32 (1.0f)/m_particles.m_count);
-	inertiaOut = sum2.Scale3 (dgFloat32 (1.0f)/m_particles.m_count) - originOut.CompProduct(originOut);
+	inertiaOut = sum2.Scale3 (dgFloat32 (1.0f)/m_particles.m_count) - originOut.CompProduct3(originOut);
 }
 */
 
@@ -1119,10 +1119,10 @@ dgCollisionDeformableMesh::dgDeformableNode* dgCollisionDeformableMesh::BuildTop
 			const dgDeformableNode* const node = &children[i];
 			dgVector p ((node->m_minBox + node->m_maxBox).Scale3 (0.5f));
 			median += p;
-			varian += p.CompProduct (p);
+			varian += p.CompProduct3 (p);
 		}
 
-		varian = varian.Scale3 (dgFloat32 (count)) - median.CompProduct(median);
+		varian = varian.Scale3 (dgFloat32 (count)) - median.CompProduct3(median);
 
 		dgInt32 index = 0;
 		dgFloat32 maxVarian = dgFloat32 (-1.0e10f);

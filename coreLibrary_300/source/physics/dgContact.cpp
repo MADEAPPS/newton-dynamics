@@ -334,10 +334,10 @@ void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 		if (!rowMatrix[k].m_accelIsMotor) {
 			dgJacobianMatrixElement* const row = &rowMatrix[k];
 
-			dgVector relVeloc (row->m_Jt.m_jacobianM0.m_linear.CompProduct(bodyVeloc0)+
-							   row->m_Jt.m_jacobianM0.m_angular.CompProduct(bodyOmega0)+
-							   row->m_Jt.m_jacobianM1.m_linear.CompProduct(bodyVeloc1)+
-							   row->m_Jt.m_jacobianM1.m_angular.CompProduct(bodyOmega1));
+			dgVector relVeloc (row->m_Jt.m_jacobianM0.m_linear.CompProduct3(bodyVeloc0)+
+							   row->m_Jt.m_jacobianM0.m_angular.CompProduct3(bodyOmega0)+
+							   row->m_Jt.m_jacobianM1.m_linear.CompProduct3(bodyVeloc1)+
+							   row->m_Jt.m_jacobianM1.m_angular.CompProduct3(bodyOmega1));
 			dgFloat32 vRel = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
 			dgFloat32 aRel = row->m_deltaAccel;
 

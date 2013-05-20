@@ -1098,10 +1098,10 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForcesSimd (const dgIsland* const 
 		dgFloat32 akDen = dgFloat32 (0.0f);
 		for (dgInt32 j = 0; j < count; j ++) {
 			dgJacobianMatrixElement* const row = &matrixRow[j];
-			dgVector acc (JMinv[j].m_jacobianM0.m_linear.CompProduct(y0.m_linear) +
-						  JMinv[j].m_jacobianM0.m_angular.CompProduct(y0.m_angular) +
-			              JMinv[j].m_jacobianM1.m_linear.CompProduct(y1.m_linear) +
-			              JMinv[j].m_jacobianM1.m_angular.CompProduct(y1.m_angular));
+			dgVector acc (JMinv[j].m_jacobianM0.m_linear.CompProduct3(y0.m_linear) +
+						  JMinv[j].m_jacobianM0.m_angular.CompProduct3(y0.m_angular) +
+			              JMinv[j].m_jacobianM1.m_linear.CompProduct3(y1.m_linear) +
+			              JMinv[j].m_jacobianM1.m_angular.CompProduct3(y1.m_angular));
 
 			deltaAccel[j] = acc.m_x + acc.m_y + acc.m_z + deltaForce[j] * row->m_diagDamp;
 			akDen += deltaAccel[j] * deltaForce[j];
@@ -1352,10 +1352,10 @@ dgAssert (0);
 				JMinv[i].m_jacobianM1.m_linear  = row->m_Jt.m_jacobianM1.m_linear.Scale3 (invMass1);
 				JMinv[i].m_jacobianM1.m_angular = invInertia1.UnrotateVector (row->m_Jt.m_jacobianM1.m_angular);
 
-				dgVector acc (JMinv[i].m_jacobianM0.m_linear.CompProduct(y0.m_linear) + 
-							  JMinv[i].m_jacobianM0.m_angular.CompProduct(y0.m_angular) + 
-							  JMinv[i].m_jacobianM1.m_linear.CompProduct(y1.m_linear) + 
-							  JMinv[i].m_jacobianM1.m_angular.CompProduct(y1.m_angular));
+				dgVector acc (JMinv[i].m_jacobianM0.m_linear.CompProduct3(y0.m_linear) + 
+							  JMinv[i].m_jacobianM0.m_angular.CompProduct3(y0.m_angular) + 
+							  JMinv[i].m_jacobianM1.m_linear.CompProduct3(y1.m_linear) + 
+							  JMinv[i].m_jacobianM1.m_angular.CompProduct3(y1.m_angular));
 
 				row->m_accel = row->m_coordenateAccel - acc.m_x - acc.m_y - acc.m_z - row->m_force * row->m_diagDamp;
 			}
@@ -1453,10 +1453,10 @@ dgAssert (0);
 			dgVector JMinvJacobianLinearM1 (row->m_Jt.m_jacobianM1.m_linear.Scale3 (invMass1));
 			dgVector JMinvJacobianAngularM1 (invInertia1.UnrotateVector (row->m_Jt.m_jacobianM1.m_angular));
 
-			dgVector tmpAccel (JMinvJacobianLinearM0.CompProduct(y0.m_linear) +
-							   JMinvJacobianAngularM0.CompProduct(y0.m_angular) +
-				               JMinvJacobianLinearM1.CompProduct(y1.m_linear) +
-				               JMinvJacobianAngularM1.CompProduct(y1.m_angular));
+			dgVector tmpAccel (JMinvJacobianLinearM0.CompProduct3(y0.m_linear) +
+							   JMinvJacobianAngularM0.CompProduct3(y0.m_angular) +
+				               JMinvJacobianLinearM1.CompProduct3(y1.m_linear) +
+				               JMinvJacobianAngularM1.CompProduct3(y1.m_angular));
 			row->m_accel = row->m_coordenateAccel - tmpAccel.m_x - tmpAccel.m_y - tmpAccel.m_z - row->m_force * row->m_diagDamp;
 		}
 
@@ -1569,10 +1569,10 @@ dgAssert (0);
 				dgVector JMinvJacobianLinearM1 (row->m_Jt.m_jacobianM1.m_linear.Scale3 (invMass1));
 				dgVector JMinvJacobianAngularM1 (invInertia1.UnrotateVector (row->m_Jt.m_jacobianM1.m_angular));
 
-				dgVector tmpAccel (JMinvJacobianLinearM0.CompProduct(y0.m_linear) +
-								   JMinvJacobianAngularM0.CompProduct(y0.m_angular) +
-					               JMinvJacobianLinearM1.CompProduct(y1.m_linear) +
-					               JMinvJacobianAngularM1.CompProduct(y1.m_angular));
+				dgVector tmpAccel (JMinvJacobianLinearM0.CompProduct3(y0.m_linear) +
+								   JMinvJacobianAngularM0.CompProduct3(y0.m_angular) +
+					               JMinvJacobianLinearM1.CompProduct3(y1.m_linear) +
+					               JMinvJacobianAngularM1.CompProduct3(y1.m_angular));
 
 				row->m_deltaAccel = tmpAccel.m_x + tmpAccel.m_y + tmpAccel.m_z + row->m_deltaForce * row->m_diagDamp;
 				akDen += row->m_deltaAccel * row->m_deltaForce;

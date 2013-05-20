@@ -182,7 +182,7 @@ DG_INLINE void dgDynamicBody::AddDampingAcceleration()
 {
 	m_veloc -= m_veloc.Scale3 (m_dampCoef.m_w);
 	dgVector omega (m_matrix.UnrotateVector (m_omega));
-	omega -= omega.CompProduct (m_dampCoef);
+	omega -= omega.CompProduct3 (m_dampCoef);
 	m_omega = m_matrix.RotateVector (omega);
 }
 

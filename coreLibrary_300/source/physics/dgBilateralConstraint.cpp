@@ -432,10 +432,10 @@ void dgBilateralConstraint::JointAccelerationsSimd(dgJointAccelerationDecriptor*
 			dgFloat32 aRelErr;
 			dgFloat32 relPosit;
 
-			dgVector relVeloc (Jt[k].m_jacobian_IM0.m_linear.CompProduct(bodyVeloc0));
-			relVeloc += Jt[k].m_jacobian_IM0.m_angular.CompProduct(bodyOmega0);
-			relVeloc += Jt[k].m_jacobian_IM1.m_linear.CompProduct(bodyVeloc1);
-			relVeloc += Jt[k].m_jacobian_IM1.m_angular.CompProduct(bodyOmega1);
+			dgVector relVeloc (Jt[k].m_jacobian_IM0.m_linear.CompProduct3(bodyVeloc0));
+			relVeloc += Jt[k].m_jacobian_IM0.m_angular.CompProduct3(bodyOmega0);
+			relVeloc += Jt[k].m_jacobian_IM1.m_linear.CompProduct3(bodyVeloc1);
+			relVeloc += Jt[k].m_jacobian_IM1.m_angular.CompProduct3(bodyOmega1);
 
 			vRel = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
 			aRel = params.m_externAccelaration[k];
@@ -476,10 +476,10 @@ void dgBilateralConstraint::JointAccelerationsSimd(dgJointAccelerationDecriptor*
 			dgFloat32 penetrationVeloc;
 			dgFloat32 penetrationCorrection;
 
-			dgVector relVeloc (Jt[k].m_jacobian_IM0.m_linear.CompProduct(bodyVeloc0));
-			relVeloc += Jt[k].m_jacobian_IM0.m_angular.CompProduct(bodyOmega0);
-			relVeloc += Jt[k].m_jacobian_IM1.m_linear.CompProduct(bodyVeloc1);
-			relVeloc += Jt[k].m_jacobian_IM1.m_angular.CompProduct(bodyOmega1);
+			dgVector relVeloc (Jt[k].m_jacobian_IM0.m_linear.CompProduct3(bodyVeloc0));
+			relVeloc += Jt[k].m_jacobian_IM0.m_angular.CompProduct3(bodyOmega0);
+			relVeloc += Jt[k].m_jacobian_IM1.m_linear.CompProduct3(bodyVeloc1);
+			relVeloc += Jt[k].m_jacobian_IM1.m_angular.CompProduct3(bodyOmega1);
 
 			vRel = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z ;		
 
@@ -524,10 +524,10 @@ void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* con
    				jacobianMatrixElements[k].m_coordenateAccel = m_motorAcceleration[k] + jacobianMatrixElements[k].m_deltaAccel;
 			} else {
 				const dgJacobianPair& Jt = jacobianMatrixElements[k].m_Jt;
-				dgVector relVeloc (Jt.m_jacobianM0.m_linear.CompProduct(bodyVeloc0) +
-								   Jt.m_jacobianM0.m_angular.CompProduct(bodyOmega0) +
-								   Jt.m_jacobianM1.m_linear.CompProduct(bodyVeloc1) +
-								   Jt.m_jacobianM1.m_angular.CompProduct(bodyOmega1));
+				dgVector relVeloc (Jt.m_jacobianM0.m_linear.CompProduct3(bodyVeloc0) +
+								   Jt.m_jacobianM0.m_angular.CompProduct3(bodyOmega0) +
+								   Jt.m_jacobianM1.m_linear.CompProduct3(bodyVeloc1) +
+								   Jt.m_jacobianM1.m_angular.CompProduct3(bodyOmega1));
 
 				dgFloat32 vRel = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
 				//aRel = params.m_externAccelaration[k];
@@ -563,10 +563,10 @@ void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* con
 				jacobianMatrixElements[k].m_coordenateAccel = m_motorAcceleration[k] + jacobianMatrixElements[k].m_deltaAccel;
 			} else {
 				const dgJacobianPair& Jt = jacobianMatrixElements[k].m_Jt;
-				dgVector relVeloc (Jt.m_jacobianM0.m_linear.CompProduct(bodyVeloc0) +
-								   Jt.m_jacobianM0.m_angular.CompProduct(bodyOmega0) +
-								   Jt.m_jacobianM1.m_linear.CompProduct(bodyVeloc1) +
-								   Jt.m_jacobianM1.m_angular.CompProduct(bodyOmega1));
+				dgVector relVeloc (Jt.m_jacobianM0.m_linear.CompProduct3(bodyVeloc0) +
+								   Jt.m_jacobianM0.m_angular.CompProduct3(bodyOmega0) +
+								   Jt.m_jacobianM1.m_linear.CompProduct3(bodyVeloc1) +
+								   Jt.m_jacobianM1.m_angular.CompProduct3(bodyOmega1));
 
 				dgFloat32 vRel = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
 				jacobianMatrixElements[k].m_coordenateAccel = jacobianMatrixElements[k].m_deltaAccel - vRel;
@@ -588,10 +588,10 @@ void dgBilateralConstraint::JointVelocityCorrection(dgJointAccelerationDecriptor
 		dgFloat32 vRel;
 		dgFloat32 penetrationCorrection;
 
-		dgVector relVeloc (Jt[k].m_jacobian_IM0.m_linear.CompProduct(bodyVeloc0));
-		relVeloc += Jt[k].m_jacobian_IM0.m_angular.CompProduct(bodyOmega0);
-		relVeloc += Jt[k].m_jacobian_IM1.m_linear.CompProduct(bodyVeloc1);
-		relVeloc += Jt[k].m_jacobian_IM1.m_angular.CompProduct(bodyOmega1);
+		dgVector relVeloc (Jt[k].m_jacobian_IM0.m_linear.CompProduct3(bodyVeloc0));
+		relVeloc += Jt[k].m_jacobian_IM0.m_angular.CompProduct3(bodyOmega0);
+		relVeloc += Jt[k].m_jacobian_IM1.m_linear.CompProduct3(bodyVeloc1);
+		relVeloc += Jt[k].m_jacobian_IM1.m_angular.CompProduct3(bodyOmega1);
 		vRel = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
 		
 		penetrationCorrection = vRel * params.m_timeStep;

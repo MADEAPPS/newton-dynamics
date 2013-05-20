@@ -403,7 +403,7 @@ dgInt32 dgCollisionInstance::CalculatePlaneIntersection (const dgVector& normal,
 	dgVector normal1 (normal);
 	dgVector point1 (m_invScale.CompProduct4(point));
 	if (!m_scaleIsUniform) {
-		normal1 = m_scale.CompProduct(normal1);
+		normal1 = m_scale.CompProduct3(normal1);
 		normal1 = normal1.Scale3 (dgRsqrt (normal1 % normal1));
 	}
 
@@ -512,7 +512,7 @@ dgFloat32 dgCollisionInstance::RayCast (const dgVector& localP0, const dgVector&
 //					contactOut.m_userId = GetUserDataID();
 					contactOut.m_shapeId0 = GetUserDataID();
 					contactOut.m_shapeId1 = GetUserDataID();
-					dgVector n (m_scale.CompProduct (contactOut.m_normal));
+					dgVector n (m_scale.CompProduct3 (contactOut.m_normal));
 					contactOut.m_normal = n.Scale3 (dgRsqrt (n % n));
 				}
 				contactOut.m_collision0 = this;

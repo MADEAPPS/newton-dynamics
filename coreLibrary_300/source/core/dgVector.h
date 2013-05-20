@@ -174,7 +174,7 @@ class dgTemplateVector
 	}
 
 	// component wise multiplication
-	DG_INLINE dgTemplateVector<T> CompProduct (const dgTemplateVector<T> &A) const
+	DG_INLINE dgTemplateVector<T> CompProduct3 (const dgTemplateVector<T> &A) const
 	{
 		return dgTemplateVector<T> (m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, A.m_w);
 	}
@@ -508,7 +508,7 @@ class dgVector
 	}
 
 	// component wise multiplication
-	DG_INLINE dgVector CompProduct (const dgVector &A) const
+	DG_INLINE dgVector CompProduct3 (const dgVector &A) const
 	{
 		return _mm_mul_ps (m_type, A.m_type);
 	}
@@ -516,7 +516,7 @@ class dgVector
 	// component wise multiplication
 	DG_INLINE dgVector CompProduct4 (const dgVector &A) const
 	{
-		return CompProduct (A);
+		return _mm_mul_ps (m_type, A.m_type);
 	}
 
 	DG_INLINE dgVector AddHorizontal () const

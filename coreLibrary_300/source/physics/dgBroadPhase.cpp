@@ -120,8 +120,8 @@ class dgBroadPhase::dgNode
 		dgAssert (minBox.m_y <= maxBox.m_y);
 		dgAssert (minBox.m_z <= maxBox.m_z);
 
-		dgVector p0 (minBox.CompProduct(dgVector (DG_BROADPHASE_AABB_SCALE, DG_BROADPHASE_AABB_SCALE, DG_BROADPHASE_AABB_SCALE, dgFloat32 (0.0f))));
-		dgVector p1 (maxBox.CompProduct(dgVector (DG_BROADPHASE_AABB_SCALE, DG_BROADPHASE_AABB_SCALE, DG_BROADPHASE_AABB_SCALE, dgFloat32 (0.0f))));
+		dgVector p0 (minBox.CompProduct3(dgVector (DG_BROADPHASE_AABB_SCALE, DG_BROADPHASE_AABB_SCALE, DG_BROADPHASE_AABB_SCALE, dgFloat32 (0.0f))));
+		dgVector p1 (maxBox.CompProduct3(dgVector (DG_BROADPHASE_AABB_SCALE, DG_BROADPHASE_AABB_SCALE, DG_BROADPHASE_AABB_SCALE, dgFloat32 (0.0f))));
 
 		p0.m_x = dgFloor (p0.m_x) * DG_BROADPHASE_AABB_INV_SCALE; 
 		p0.m_y = dgFloor (p0.m_y) * DG_BROADPHASE_AABB_INV_SCALE;  

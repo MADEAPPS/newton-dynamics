@@ -338,12 +338,12 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertex(const dgVector& dir, dgInt
 	dgAssert (dgAbsf(dir % dir - dgFloat32 (1.0f)) < dgFloat32 (1.0e-2f));
 
 	if (m_scaleIsUniform) {
-		return m_scale.CompProduct (m_childShape->SupportVertex (dir, vertexIndex));
+		return m_scale.CompProduct3 (m_childShape->SupportVertex (dir, vertexIndex));
 	} else {
 		// support((p * m), n) = m * support (p, n * trans(m)) 
-		dgVector dir1 (m_scale.CompProduct(dir));
+		dgVector dir1 (m_scale.CompProduct3(dir));
 		dir1 = dir1.Scale3 (dgRsqrt (dir1 % dir1));
-		return m_scale.CompProduct(m_childShape->SupportVertex (dir1, vertexIndex));
+		return m_scale.CompProduct3(m_childShape->SupportVertex (dir1, vertexIndex));
 	}
 
 }
@@ -376,12 +376,12 @@ DG_INLINE dgInt32 dgCollisionInstance::GetConvexVertexCount() const
 
 DG_INLINE dgVector dgCollisionInstance::GetBoxSize() const
 {
-	return m_childShape->m_boxSize.CompProduct(m_scale);
+	return m_childShape->m_boxSize.CompProduct3(m_scale);
 }
 
 DG_INLINE dgVector dgCollisionInstance::GetBoxOrigin() const
 {
-	return m_childShape->m_boxOrigin.CompProduct(m_scale);
+	return m_childShape->m_boxOrigin.CompProduct3(m_scale);
 }
 
 DG_INLINE dgFloat32 dgCollisionInstance::GetUmbraClipSize () const

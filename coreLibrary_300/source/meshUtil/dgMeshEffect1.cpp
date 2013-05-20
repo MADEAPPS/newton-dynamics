@@ -1776,7 +1776,7 @@ void dgMeshEffect::BoxMapping (dgInt32 front, dgInt32 side, dgInt32 top)
 			dgEdge* ptr = edge;
 			do {
 				dgVertexAtribute& attrib = attribArray[dgInt32 (ptr->m_userData)];
-				dgBigVector p (scale.CompProduct(m_points[ptr->m_incidentVertex] - minVal));
+				dgBigVector p (scale.CompProduct3(m_points[ptr->m_incidentVertex] - minVal));
 				attrib.m_u0 = p[u];
 				attrib.m_v0 = p[v];
 				attrib.m_u1 = dgFloat64(0.0f);
