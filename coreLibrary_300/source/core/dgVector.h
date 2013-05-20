@@ -362,6 +362,7 @@ class dgVector
 	DG_INLINE dgVector (const dgFloat32* const ptr)
 		:m_type(_mm_loadu_ps (ptr))
 	{
+		m_type = _mm_and_ps (m_type, m_triplexMask.m_type);
 	}
 
 	DG_INLINE dgVector (const dgBigVector& copy)
@@ -418,7 +419,8 @@ class dgVector
 
 	DG_INLINE dgVector operator+ (const dgVector &A) const
 	{
-		return _mm_add_ps (m_type, A.m_type);	
+		dgVector tmp (A & m_triplexMask);
+		return _mm_add_ps (m_type, tmp.m_type);	
 	}
 
 	DG_INLINE dgVector Add4 (const dgVector &A) const
@@ -428,7 +430,8 @@ class dgVector
 
 	DG_INLINE dgVector operator- (const dgVector &A) const 
 	{
-		return _mm_sub_ps (m_type, A.m_type);	
+		dgVector tmp (A & m_triplexMask);
+		return _mm_sub_ps (m_type, tmp.m_type);	
 	}
 
 	DG_INLINE dgVector Sub4 (const dgVector &A) const
@@ -438,13 +441,15 @@ class dgVector
 
 	DG_INLINE dgVector &operator+= (const dgVector &A)
 	{
-		m_type = _mm_add_ps (m_type, A.m_type);
+		dgVector tmp (A & m_triplexMask);
+		m_type = _mm_add_ps (m_type, tmp.m_type);
 		return *this;
 	}
 
 	DG_INLINE dgVector &operator-= (const dgVector &A)
 	{
-		m_type = _mm_sub_ps (m_type, A.m_type);
+		dgVector tmp (A & m_triplexMask);
+		m_type = _mm_sub_ps (m_type, tmp.m_type);
 		return *this;
 	}
 
@@ -453,12 +458,12 @@ class dgVector
 	{
 		dgVector tmp (A & m_triplexMask);
 		dgAssert ((m_w * tmp.m_w) == dgFloat32 (0.0f));
-		return CompProduct(tmp).AddHorizontal().m_x;
+		return CompProduct4(tmp).AddHorizontal().m_x;
 	}
 
 	DG_INLINE dgFloat32 DotProduct4 (const dgVector &A) const
 	{
-		return CompProduct(A).AddHorizontal().m_x;
+		return CompProduct4(A).AddHorizontal().m_x;
 	}
 
 	// return cross product
@@ -510,7 +515,8 @@ class dgVector
 	// component wise multiplication
 	DG_INLINE dgVector CompProduct3 (const dgVector &A) const
 	{
-		return _mm_mul_ps (m_type, A.m_type);
+		dgVector tmp ((A & m_triplexMask) | m_wOne);
+		return _mm_mul_ps (m_type, tmp.m_type);
 	}
 
 	// component wise multiplication
@@ -531,6 +537,18 @@ class dgVector
 		return _mm_and_ps (m_type, data.m_type);	
 	}
 
+	DG_INLINE dgVector operator| (const dgVector& data) const
+	{
+		return _mm_or_ps (m_type, data.m_type);	
+	}
+
+	DG_INLINE dgVector AndNot (const dgVector& data) const
+	{
+		return _mm_andnot_ps (m_type, data.m_type);	
+	}
+
+
+
 	DG_CLASS_ALLOCATOR(allocator)
 	
 	union {
@@ -550,6 +568,7 @@ class dgVector
 		};
 	};
 
+	static dgVector m_wOne;
 	static dgVector m_triplexMask;
 } DG_GCC_VECTOR_ALIGMENT;
 

@@ -26,6 +26,7 @@
 
 #ifdef DG_SIMD_VECTOR_CLASS
 dgVector dgVector::m_triplexMask (0xffffffff, 0xffffffff, 0xffffffff, 0);
+dgVector dgVector::m_wOne (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (1.0f));
 #endif
 
 static dgMatrix zeroMatrix (dgVector (dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f)),
