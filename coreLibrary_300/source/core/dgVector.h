@@ -316,42 +316,75 @@ class dgVector: public dgTemplateVector<dgFloat32>
 		return *this;
 	}
 
-/*
-	DG_INLINE dgFloat32 dgVector::DotProductSimd (const dgVector& A) const
+	DG_INLINE dgVector AddHorizontal () const
 	{
-		dgFloat32 dot;
-		dgSimd temp (((dgSimd&)*this).DotProduct((dgSimd&)A));
-		temp.StoreScalar (&dot);
-		return dot;
+		dgFloat32 x = m_x + m_y + m_z + m_w;
+		return dgVector (x, x, x, x);
+	}
+	dgVector Abs () const
+	{
+		return dgVector ((m_x > dgFloat32 (0.0f)) ? m_x : -m_x,
+			             (m_y > dgFloat32 (0.0f)) ? m_y : -m_y,
+			             (m_z > dgFloat32 (0.0f)) ? m_z : -m_z,
+			             (m_w > dgFloat32 (0.0f)) ? m_w : -m_w);
 	}
 
-	DG_INLINE dgVector dgVector::CrossProductSimd (const dgVector &e10) const
+	dgVector GetMax (const dgVector& data) const
 	{
-		return ((dgSimd&)*this).CrossProduct((dgSimd&)e10);
+		return dgVector ((m_x > data.m_x) ? m_x : data.m_x,
+			             (m_y > data.m_y) ? m_y : data.m_y,
+			             (m_z > data.m_z) ? m_z : data.m_z,
+			             (m_w > data.m_w) ? m_w : data.m_w);
 	}
 
-	DG_INLINE dgVector dgVector::CompProductSimd (const dgVector &A) const
+	dgVector GetMin (const dgVector& data) const
 	{
-		return ((dgSimd&)*this) * (dgSimd&)A;
+		return dgVector ((m_x < data.m_x) ? m_x : data.m_x,
+			             (m_y < data.m_y) ? m_y : data.m_y,
+			             (m_z < data.m_z) ? m_z : data.m_z,
+			             (m_w < data.m_w) ? m_w : data.m_w);
 	}
 
+
+	// relational operators
+	DG_INLINE dgVector operator> (const dgVector& data) const
+	{
+		return dgVector ((m_x > data.m_x) ? 0xffffffff : 0.0f,
+					     (m_y > data.m_y) ? 0xffffffff : 0.0f,
+			             (m_z > data.m_z) ? 0xffffffff : 0.0f,
+			             (m_w > data.m_w) ? 0xffffffff : 0.0f);
+	}
+
+	DG_INLINE dgVector operator< (const dgVector& data) const
+	{
+		return dgVector ((m_x < data.m_x) ? 0xffffffff : 0.0f,
+					     (m_y < data.m_y) ? 0xffffffff : 0.0f,
+			             (m_z < data.m_z) ? 0xffffffff : 0.0f,
+			             (m_w < data.m_w) ? 0xffffffff : 0.0f);
+	}
 
 	// logical operations
 	DG_INLINE dgVector operator& (const dgVector& data) const
 	{
-		return _mm_and_ps (m_type, data.m_type);	
+		const dgInt32* const a = (dgInt32*)&m_x;
+		const dgInt32* const b = (dgInt32*)&data.m_x;
+		return dgVector (a[0] & b[0], a[1] & b[1], a[2] & b[2], a[3] & b[3]); 
 	}
 
 	DG_INLINE dgVector operator| (const dgVector& data) const
 	{
-		return _mm_or_ps (m_type, data.m_type);	
+		const dgInt32* const a = (dgInt32*)&m_x;
+		const dgInt32* const b = (dgInt32*)&data.m_x;
+		return dgVector (a[0] | b[0], a[1] | b[1], a[2] | b[2], a[3] | b[3]); 
 	}
 
 	DG_INLINE dgVector AndNot (const dgVector& data) const
 	{
-		return _mm_andnot_ps (m_type, data.m_type);	
+		const dgInt32* const a = (dgInt32*)&m_x;
+		const dgInt32* const b = (dgInt32*)&data.m_x;
+		return dgVector (a[0] & ~b[0], a[1] & ~b[1], a[2] & ~b[2], a[3] & ~b[3]); 
 	}
-
+/*
 	DG_INLINE dgVector MoveLow (const dgVector& data) const
 	{
 		return dgSimd (m_x, m_y, data.m_x, data.m_y); 
@@ -385,6 +418,26 @@ class dgVector: public dgTemplateVector<dgFloat32>
 		dst2 = tmp2.MoveLow (tmp3);
 		dst3 = tmp3.MoveHigh (tmp2);
 	}
+
+	DG_INLINE dgFloat32 dgVector::DotProductSimd (const dgVector& A) const
+	{
+		dgFloat32 dot;
+		dgSimd temp (((dgSimd&)*this).DotProduct((dgSimd&)A));
+		temp.StoreScalar (&dot);
+		return dot;
+	}
+
+	DG_INLINE dgVector dgVector::CrossProductSimd (const dgVector &e10) const
+	{
+		return ((dgSimd&)*this).CrossProduct((dgSimd&)e10);
+	}
+
+	DG_INLINE dgVector dgVector::CompProductSimd (const dgVector &A) const
+	{
+		return ((dgSimd&)*this) * (dgSimd&)A;
+	}
+
+
 */
 
 	static dgVector m_wOne;

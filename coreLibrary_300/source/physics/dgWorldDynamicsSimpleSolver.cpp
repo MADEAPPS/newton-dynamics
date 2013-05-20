@@ -839,9 +839,9 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 		}
 		firstPassCoef = dgFloat32 (1.0f);
 
-		dgFloat32 accNorm = maxAccNorm * dgFloat32 (2.0f);
-		for (dgInt32 passes = 0; (passes < maxPasses) && (accNorm > maxAccNorm); passes ++) {
-			accNorm = dgFloat32 (0.0f);
+		dgVector accNorm (maxAccNorm * dgFloat32 (2.0f));
+		for (dgInt32 passes = 0; (passes < maxPasses) && (accNorm.m_x > maxAccNorm); passes ++) {
+			accNorm = dgVector (0.0f);
 			for (dgInt32 curJoint = 0; curJoint < jointCount; curJoint ++) {
 				dgInt32 index = constraintArray[curJoint].m_autoPairstart;
 				dgInt32 rowsCount = constraintArray[curJoint].m_autoPaircount;
@@ -875,31 +875,37 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 					dgVector JMinvJacobianLinearM1 (row->m_Jt.m_jacobianM1.m_linear.Scale4 (invMass1));
 					dgVector JMinvJacobianAngularM1 (invInertia1.UnrotateVector (row->m_Jt.m_jacobianM1.m_angular));
 
-					dgVector acc (JMinvJacobianLinearM0.CompProduct4(linearM0) + JMinvJacobianAngularM0.CompProduct4(angularM0) + JMinvJacobianLinearM1.CompProduct4(linearM1) + JMinvJacobianAngularM1.CompProduct4(angularM1));
+					dgVector a (JMinvJacobianLinearM0.CompProduct4(linearM0) + JMinvJacobianAngularM0.CompProduct4(angularM0) + JMinvJacobianLinearM1.CompProduct4(linearM1) + JMinvJacobianAngularM1.CompProduct4(angularM1));
 
-					dgFloat32 a = row->m_coordenateAccel - acc.m_x - acc.m_y - acc.m_z - row->m_force * row->m_diagDamp;
-					dgFloat32 f = row->m_force + row->m_invDJMinvJt * a;
+					//dgFloat32 a = row->m_coordenateAccel - acc.m_x - acc.m_y - acc.m_z - row->m_force * row->m_diagDamp;
+					a = dgVector (row->m_coordenateAccel  - row->m_force * row->m_diagDamp) - a.AddHorizontal();
+
+					//dgFloat32 f = row->m_force + row->m_invDJMinvJt * a;
+					dgVector f (row->m_force + row->m_invDJMinvJt * a.m_x);
 
 					dgInt32 frictionIndex = row->m_normalForceIndex;
 					dgAssert (((frictionIndex < 0) && (normalForce[frictionIndex] == dgFloat32 (1.0f))) || ((frictionIndex >= 0) && (normalForce[frictionIndex] >= dgFloat32 (0.0f))));
 
 					dgFloat32 frictionNormal = normalForce[frictionIndex];
-					dgFloat32 lowerFrictionForce = frictionNormal * row->m_lowerBoundFrictionCoefficent;
-					dgFloat32 upperFrictionForce = frictionNormal * row->m_upperBoundFrictionCoefficent;
+					dgVector lowerFrictionForce = (frictionNormal * row->m_lowerBoundFrictionCoefficent);
+					dgVector upperFrictionForce = (frictionNormal * row->m_upperBoundFrictionCoefficent);
 
-					if (f > upperFrictionForce) {
-						a = dgFloat32 (0.0f);
-						f = upperFrictionForce;
-					} else if (f < lowerFrictionForce) {
-						a = dgFloat32 (0.0f);
-						f = lowerFrictionForce;
-					}
+					//if (f > upperFrictionForce) {
+					//	a = dgFloat32 (0.0f);
+					//	f = upperFrictionForce;
+					//} else if (f < lowerFrictionForce) {
+					//	a = dgFloat32 (0.0f);
+					//	f = lowerFrictionForce;
+					//}
+					a = a.AndNot((f > upperFrictionForce) | (f < lowerFrictionForce));
+					f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
 
-					accNorm = dgMax (accNorm, dgAbsf (a));
-					dgVector prevValue (f - row->m_force);
+					accNorm = accNorm.GetMax(a.Abs());
 
-					row->m_force = f;
-					normalForce[k] = f;
+					dgVector prevValue (f - dgVector (row->m_force));
+
+					row->m_force = f.m_x;
+					normalForce[k] = f.m_x;
 
 					linearM0 += row->m_Jt.m_jacobianM0.m_linear.CompProduct4 (prevValue);
 					angularM0 += row->m_Jt.m_jacobianM0.m_angular.CompProduct4 (prevValue);

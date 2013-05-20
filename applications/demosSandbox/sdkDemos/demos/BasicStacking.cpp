@@ -150,10 +150,12 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 	scene->LoadScene (fileName);
 #else
 	
-	int high = 10;
+	int high = 20;
 	PrimitiveType selection[] = {_BOX_PRIMITIVE, _CYLINDER_PRIMITIVE, _TAPERED_CYLINDER_PRIMITIVE, _REGULAR_CONVEX_HULL_PRIMITIVE};
 	for (int i = 0; i < 10; i ++) {
 		int index = dRand() % (sizeof (selection) / sizeof (selection[0]));
+
+index = 0;
 		dMatrix shapeMatrix (dRollMatrix(0.5f * 3.14159f));
 		if (selection[index] == _BOX_PRIMITIVE) {
 			shapeMatrix = GetIdentityMatrix();
@@ -168,7 +170,7 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 	high = 20;
 	for (int i = 0; i < 2; i ++) {
 		for (int j = 0; j < 2; j ++) {
-			BuildJenga (scene, 5.0f, dVector(-10.0f + j * 8, 0.0f, 10.0f + i * 8, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high);
+//			BuildJenga (scene, 5.0f, dVector(-10.0f + j * 8, 0.0f, 10.0f + i * 8, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high);
 		}
 	}
 #endif

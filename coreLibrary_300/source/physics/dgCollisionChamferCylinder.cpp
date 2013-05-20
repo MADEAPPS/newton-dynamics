@@ -78,6 +78,7 @@ void dgCollisionChamferCylinder::Init (dgFloat32 radius, dgFloat32 height)
 			m_vertex[index] = p0;
 			index ++;
 			p0 = rot.UnrotateVector (p0);
+			p0.m_w = dgFloat32 (1.0f);
 		}
 	}
 
