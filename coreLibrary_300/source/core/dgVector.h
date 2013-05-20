@@ -28,7 +28,7 @@
 #include "dgSimd.h"
 
 
-//#define DG_SIMD_VECTOR_CLASS
+#define DG_SIMD_VECTOR_CLASS
 
 #define dgCheckVector(x) (dgCheckFloat(x[0]) && dgCheckFloat(x[1]) && dgCheckFloat(x[2]) && dgCheckFloat(x[3]))
 
@@ -639,6 +639,35 @@ class dgVector
 		dgSimd tmp (_mm_hadd_ps (m_type, m_type));
 		return _mm_hadd_ps (tmp.m_type, tmp.m_type);
 	}
+
+	DG_INLINE dgVector Abs () const
+	{
+		__m128i shitSign = _mm_srli_epi32 (_mm_slli_epi32 (*((__m128i*) &m_type), 1), 1);
+		return *(__m128*)&shitSign;
+	}
+
+	dgVector GetMax (const dgVector& data) const
+	{
+		return _mm_max_ps (m_type, data.m_type);
+	}
+
+	dgVector GetMin (const dgVector& data) const
+	{
+		return _mm_min_ps (m_type, data.m_type);
+	}
+
+	
+	// relational operators
+	DG_INLINE dgVector operator> (const dgVector& data) const
+	{
+		return _mm_cmpgt_ps (m_type, data.m_type);	
+	}
+
+	DG_INLINE dgVector operator< (const dgVector& data) const
+	{
+		return _mm_cmplt_ps (m_type, data.m_type);	
+	}
+
 
 	// logical operations
 	DG_INLINE dgVector operator& (const dgVector& data) const
