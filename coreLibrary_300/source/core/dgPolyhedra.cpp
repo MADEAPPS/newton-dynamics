@@ -1830,10 +1830,10 @@ void dgPolyhedra::RefineTriangulation (const dgFloat64* const vertex, dgInt32 st
 			dgInt32 i2 = edge->m_next->m_next->m_incidentVertex * stride;
 			dgInt32 i3 = edge->m_twin->m_prev->m_incidentVertex * stride;
 
-			dgBigVector p0 (vertex[i0], vertex[i0 + 1], vertex[i0 + 2], dgFloat64 (0.0f));
-			dgBigVector p1 (vertex[i1], vertex[i1 + 1], vertex[i1 + 2], dgFloat64 (0.0f));
-			dgBigVector p2 (vertex[i2], vertex[i2 + 1], vertex[i2 + 2], dgFloat64 (0.0f));
-			dgBigVector p3 (vertex[i3], vertex[i3 + 1], vertex[i3 + 2], dgFloat64 (0.0f));
+			dgBigVector p0 (vertex[i0], vertex[i0 + 1], vertex[i0 + 2], dgFloat64 (1.0f));
+			dgBigVector p1 (vertex[i1], vertex[i1 + 1], vertex[i1 + 2], dgFloat64 (1.0f));
+			dgBigVector p2 (vertex[i2], vertex[i2 + 1], vertex[i2 + 2], dgFloat64 (1.0f));
+			dgBigVector p3 (vertex[i3], vertex[i3 + 1], vertex[i3 + 2], dgFloat64 (1.0f));
 
 			p0 = matrix.TransformVector(p0);
 			p1 = matrix.TransformVector(p1);

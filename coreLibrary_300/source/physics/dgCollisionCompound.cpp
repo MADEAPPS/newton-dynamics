@@ -496,8 +496,8 @@ void dgCollisionCompound::CalcAABB (const dgMatrix &matrix, dgVector& p0, dgVect
 
 		p0 = origin - size;
 		p1 = origin + size;
-		dgAssert (p0.m_w == dgFloat32 (0.0f));
-		dgAssert (p1.m_w == dgFloat32 (0.0f));
+		p0.m_w = dgFloat32 (0.0f);
+		p1.m_w = dgFloat32 (0.0f);
 	} else {
 		p0 = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 		p1 = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));

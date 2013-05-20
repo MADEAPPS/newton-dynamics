@@ -191,10 +191,7 @@ DG_INLINE dgMatrix dgMatrix::Transpose4X4 () const
 
 DG_INLINE dgVector dgMatrix::RotateVector (const dgVector &v) const
 {
-	return dgVector (v.m_x * m_front.m_x + v.m_y * m_up.m_x + v.m_z * m_right.m_x,
-					 v.m_x * m_front.m_y + v.m_y * m_up.m_y + v.m_z * m_right.m_y,
-					 v.m_x * m_front.m_z + v.m_y * m_up.m_z + v.m_z * m_right.m_z,
-					 dgFloat32 (0.0f));
+	return dgVector (m_front.Scale4(v.m_x) + m_up.Scale4(v.m_y) + m_right.Scale4(v.m_z));
 }
 
 
@@ -215,10 +212,13 @@ DG_INLINE dgVector dgMatrix::UnrotateVector (const dgVector &v) const
 
 DG_INLINE dgVector dgMatrix::TransformVector (const dgVector &v) const
 {
-	return dgVector (v.m_x * m_front.m_x + v.m_y * m_up.m_x + v.m_z * m_right.m_x + m_posit.m_x,
-					 v.m_x * m_front.m_y + v.m_y * m_up.m_y + v.m_z * m_right.m_y + m_posit.m_y,
-					 v.m_x * m_front.m_z + v.m_y * m_up.m_z + v.m_z * m_right.m_z + m_posit.m_z, v.m_w);
-
+/*
+	dgVector tmp0 (v.m_x * m_front.m_x + v.m_y * m_up.m_x + v.m_z * m_right.m_x + m_posit.m_x,
+				   v.m_x * m_front.m_y + v.m_y * m_up.m_y + v.m_z * m_right.m_y + m_posit.m_y,
+				   v.m_x * m_front.m_z + v.m_y * m_up.m_z + v.m_z * m_right.m_z + m_posit.m_z, v.m_w);
+	reurn dgVector (m_front.Scale4(v.m_x) + m_up.Scale4(v.m_y) + m_right.Scale4(v.m_z) + m_posit.Scale4(v.m_w));
+*/
+	return dgVector (m_front.Scale4(v.m_x) + m_up.Scale4(v.m_y) + m_right.Scale4(v.m_z) + m_posit);
 }
 
 DG_INLINE dgVector dgMatrix::UntransformVector (const dgVector &v) const

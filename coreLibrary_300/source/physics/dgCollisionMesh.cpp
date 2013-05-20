@@ -174,8 +174,8 @@ void dgCollisionMesh::CalcAABB(const dgMatrix &matrix, dgVector &p0, dgVector &p
 	p0 = origin - size;
 	p1 = origin + size;
 
-	dgAssert (p0.m_w == dgFloat32 (0.0f));
-	dgAssert (p1.m_w == dgFloat32 (0.0f));
+	p0.m_w = dgFloat32 (0.0f);
+	p1.m_w = dgFloat32 (0.0f);
 
 #ifdef DG_DEBUG_AABB
 	dgInt32 i;
