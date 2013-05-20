@@ -865,15 +865,17 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 				for (dgInt32 k = 0; k < rowsCount; k ++) {
 					dgJacobianMatrixElement* const row = &matrixRow[index];
 
-					dgVector JMinvJacobianLinearM0 (row->m_Jt.m_jacobianM0.m_linear.Scale3 (invMass0));
+					dgAssert (row->m_Jt.m_jacobianM0.m_linear.m_w == dgFloat32 (0.0f));
+					dgAssert (row->m_Jt.m_jacobianM0.m_angular.m_w == dgFloat32 (0.0f));
+					dgAssert (row->m_Jt.m_jacobianM1.m_linear.m_w == dgFloat32 (0.0f));
+					dgAssert (row->m_Jt.m_jacobianM1.m_angular.m_w == dgFloat32 (0.0f));
+
+					dgVector JMinvJacobianLinearM0 (row->m_Jt.m_jacobianM0.m_linear.Scale4 (invMass0));
 					dgVector JMinvJacobianAngularM0 (invInertia0.UnrotateVector (row->m_Jt.m_jacobianM0.m_angular));
-					dgVector JMinvJacobianLinearM1 (row->m_Jt.m_jacobianM1.m_linear.Scale3 (invMass1));
+					dgVector JMinvJacobianLinearM1 (row->m_Jt.m_jacobianM1.m_linear.Scale4 (invMass1));
 					dgVector JMinvJacobianAngularM1 (invInertia1.UnrotateVector (row->m_Jt.m_jacobianM1.m_angular));
 
-					dgVector acc (JMinvJacobianLinearM0.CompProduct3(linearM0) + 
-								  JMinvJacobianAngularM0.CompProduct3(angularM0) + 
-								  JMinvJacobianLinearM1.CompProduct3(linearM1) + 
-								  JMinvJacobianAngularM1.CompProduct3(angularM1));
+					dgVector acc (JMinvJacobianLinearM0.CompProduct4(linearM0) + JMinvJacobianAngularM0.CompProduct4(angularM0) + JMinvJacobianLinearM1.CompProduct4(linearM1) + JMinvJacobianAngularM1.CompProduct4(angularM1));
 
 					dgFloat32 a = row->m_coordenateAccel - acc.m_x - acc.m_y - acc.m_z - row->m_force * row->m_diagDamp;
 					dgFloat32 f = row->m_force + row->m_invDJMinvJt * a;
@@ -894,14 +896,15 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 					}
 
 					accNorm = dgMax (accNorm, dgAbsf (a));
-					dgFloat32 prevValue = f - row->m_force;
+					dgVector prevValue (f - row->m_force);
+
 					row->m_force = f;
 					normalForce[k] = f;
 
-					linearM0 += row->m_Jt.m_jacobianM0.m_linear.Scale3 (prevValue);
-					angularM0 += row->m_Jt.m_jacobianM0.m_angular.Scale3 (prevValue);
-					linearM1 += row->m_Jt.m_jacobianM1.m_linear.Scale3 (prevValue);
-					angularM1 += row->m_Jt.m_jacobianM1.m_angular.Scale3 (prevValue);
+					linearM0 += row->m_Jt.m_jacobianM0.m_linear.CompProduct4 (prevValue);
+					angularM0 += row->m_Jt.m_jacobianM0.m_angular.CompProduct4 (prevValue);
+					linearM1 += row->m_Jt.m_jacobianM1.m_linear.CompProduct4 (prevValue);
+					angularM1 += row->m_Jt.m_jacobianM1.m_angular.CompProduct4 (prevValue);
 					index ++;
 				}
 				internalForces[m0].m_linear = linearM0;

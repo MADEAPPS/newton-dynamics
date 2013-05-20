@@ -330,6 +330,61 @@ class dgVector: public dgTemplateVector<dgFloat32>
 		return ((dgSimd&)*this) * (dgSimd&)A;
 	}
 
+
+	// logical operations
+//	DG_INLINE dgVector operator& (const dgVector& data) const
+//	{
+//		return _mm_and_ps (m_type, data.m_type);	
+//	}
+
+//	DG_INLINE dgVector operator| (const dgVector& data) const
+//	{
+//		return _mm_or_ps (m_type, data.m_type);	
+//	}
+
+//	DG_INLINE dgVector AndNot (const dgVector& data) const
+//	{
+//		return _mm_andnot_ps (m_type, data.m_type);	
+//	}
+/*
+	DG_INLINE dgVector MoveLow (const dgVector& data) const
+	{
+		return dgSimd (m_x, m_y, data.m_x, data.m_y); 
+	}
+
+	DG_INLINE dgVector MoveHigh (const dgVector& data) const
+	{
+		return dgSimd (data.m_z, data.m_w, m_z, m_w); 
+	}
+
+	DG_INLINE dgVector PackLow (const dgVector& data) const
+	{
+		return dgSimd (m_x, data.m_x, m_y, data.m_y); 
+	}
+
+	DG_INLINE dgVector PackHigh (const dgVector& data) const
+	{
+		return dgSimd (m_z, data.m_z, m_w, data.m_w); 
+	}
+
+	DG_INLINE static void Transpose4x4 (dgVector& dst0, dgVector& dst1, dgVector& dst2, dgVector& dst3, 
+		const dgVector& src0, const dgVector& src1, const dgVector& src2, const dgVector& src3)
+	{
+		dgVector tmp0 (src0.PackLow(src1));
+		dgVector tmp1 (src2.PackLow(src3));
+		dgVector tmp2 (src0.PackHigh(src1));
+		dgVector tmp3 (src2.PackHigh(src3));
+
+		dst0 = tmp0.MoveLow (tmp1);
+		dst1 = tmp1.MoveHigh (tmp0);
+		dst2 = tmp2.MoveLow (tmp3);
+		dst3 = tmp3.MoveHigh (tmp2);
+	}
+*/
+
+	static dgVector m_wOne;
+	static dgVector m_triplexMask;
+
 }DG_GCC_VECTOR_ALIGMENT;
 
 
@@ -419,8 +474,9 @@ class dgVector
 
 	DG_INLINE dgVector operator+ (const dgVector &A) const
 	{
-		dgVector tmp (A & m_triplexMask);
-		return _mm_add_ps (m_type, tmp.m_type);	
+//		dgVector tmp (A & m_triplexMask);
+//		return _mm_add_ps (m_type, tmp.m_type);	
+		return _mm_add_ps (m_type, A.m_type);	
 	}
 
 	DG_INLINE dgVector Add4 (const dgVector &A) const
@@ -547,6 +603,40 @@ class dgVector
 		return _mm_andnot_ps (m_type, data.m_type);	
 	}
 
+	DG_INLINE dgVector MoveLow (const dgVector& data) const
+	{
+		return _mm_movelh_ps (m_type, data.m_type);
+	}
+
+	DG_INLINE dgVector MoveHigh (const dgVector& data) const
+	{
+		return _mm_movehl_ps (m_type, data.m_type);
+	}
+
+	DG_INLINE dgVector PackLow (const dgVector& data) const
+	{
+		return _mm_unpacklo_ps (m_type, data.m_type);
+	}
+
+	DG_INLINE dgVector PackHigh (const dgVector& data) const
+	{
+		return _mm_unpackhi_ps (m_type, data.m_type);
+	}
+
+
+	DG_INLINE static void Transpose4x4 (dgVector& dst0, dgVector& dst1, dgVector& dst2, dgVector& dst3, 
+										const dgVector& src0, const dgVector& src1, const dgVector& src2, const dgVector& src3)
+	{
+		dgVector tmp0 (src0.PackLow(src1));
+		dgVector tmp1 (src2.PackLow(src3));
+		dgVector tmp2 (src0.PackHigh(src1));
+		dgVector tmp3 (src2.PackHigh(src3));
+
+		dst0 = tmp0.MoveLow (tmp1);
+		dst1 = tmp1.MoveHigh (tmp0);
+		dst2 = tmp2.MoveLow (tmp3);
+		dst3 = tmp3.MoveHigh (tmp2);
+	}
 
 
 	DG_CLASS_ALLOCATOR(allocator)
