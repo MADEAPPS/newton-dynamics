@@ -189,7 +189,7 @@ DG_INLINE dgVector dgMatrix::UnrotateVector (const dgVector &v) const
 	dgVector x (v.CompProduct4(m_front));
 	dgVector y (v.CompProduct4(m_up));
 	dgVector z (v.CompProduct4(m_right));
-	dgVector w;
+	dgVector w (dgFloat32 (0.0f));
 	dgVector::Transpose4x4 (x, y, z, w, x, y, z, w); 
 	return x + y + z;
 #else

@@ -152,10 +152,10 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 	
 	int high = 20;
 	PrimitiveType selection[] = {_BOX_PRIMITIVE, _CYLINDER_PRIMITIVE, _TAPERED_CYLINDER_PRIMITIVE, _REGULAR_CONVEX_HULL_PRIMITIVE};
-	for (int i = 0; i < 10; i ++) {
+	for (int i = 0; i < 1; i ++) {
 		int index = dRand() % (sizeof (selection) / sizeof (selection[0]));
 
-index = 0;
+index = 3;
 		dMatrix shapeMatrix (dRollMatrix(0.5f * 3.14159f));
 		if (selection[index] == _BOX_PRIMITIVE) {
 			shapeMatrix = GetIdentityMatrix();

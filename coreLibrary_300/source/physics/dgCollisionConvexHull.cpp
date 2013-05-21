@@ -748,11 +748,10 @@ void dgCollisionConvexHull::DebugCollision (const dgMatrix& matrix, OnDebugColli
 	}
 }
 
-dgVector dgCollisionConvexHull::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
+dgVector dgCollisionConvexHull::SupportVertex (const dgVector& dirIn, dgInt32* const vertexIndex) const
 {
-//	dgVector p (dgCollisionConvex::SupportVertex (dir));
+	const dgVector dir (dirIn & dgVector::m_triplexMask);
 	dgInt32 index = -1;
-	
 	if (m_vertexCount > DG_CONVEX_VERTEX_CHUNK_SIZE) {
 		dgFloat32 distPool[32];
 		const dgConvexBox* stackPool[32];
@@ -767,8 +766,8 @@ dgVector dgCollisionConvexHull::SupportVertex (const dgVector& dir, dgInt32* con
 		dgVector leftP (leftBox.m_box[ix][0], leftBox.m_box[iy][1], leftBox.m_box[iz][2], dgFloat32 (0.0f));
 		dgVector rightP (rightBox.m_box[ix][0], rightBox.m_box[iy][1], rightBox.m_box[iz][2], dgFloat32 (0.0f));
 
-		dgFloat32 leftDist = leftP % dir;
-		dgFloat32 rightDist = rightP % dir;
+		dgFloat32 leftDist = leftP.DotProduct4(dir).m_x;
+		dgFloat32 rightDist = rightP.DotProduct4(dir).m_x;
 		if (rightDist >= leftDist) {
 			distPool[0] = leftDist;
 			stackPool[0] = &leftBox; 
@@ -784,7 +783,7 @@ dgVector dgCollisionConvexHull::SupportVertex (const dgVector& dir, dgInt32* con
 		}
 		
 		dgInt32 stack = 2;
-		dgFloat32 maxProj = dgFloat64 (-1.0e20f); 
+		dgFloat32 maxProj = dgFloat32 (-1.0e20f); 
 		while (stack) {
 			stack--;
 			dgFloat32 dist = distPool[stack];
@@ -799,8 +798,8 @@ dgVector dgCollisionConvexHull::SupportVertex (const dgVector& dir, dgInt32* con
 					dgVector leftP (leftBox.m_box[ix][0], leftBox.m_box[iy][1], leftBox.m_box[iz][2], dgFloat32 (0.0f));
 					dgVector rightP (rightBox.m_box[ix][0], rightBox.m_box[iy][1], rightBox.m_box[iz][2], dgFloat32 (0.0f));
 
-					dgFloat32 leftDist = leftP % dir;
-					dgFloat32 rightDist = rightP % dir;
+					dgFloat32 leftDist = leftP.DotProduct4(dir).m_x;
+					dgFloat32 rightDist = rightP.DotProduct4(dir).m_x;
 					if (rightDist >= leftDist) {
 						distPool[stack] = leftDist;
 						stackPool[stack] = &leftBox; 
@@ -822,10 +821,8 @@ dgVector dgCollisionConvexHull::SupportVertex (const dgVector& dir, dgInt32* con
 						stackPool[stack] = &leftBox; 
 						stack ++;
 						dgAssert (stack < sizeof (distPool)/sizeof (distPool[0]));
-
 					}
 				} else {
-
 					for (dgInt32 i = 0; i < box.m_vertexCount; i ++) {
 						const dgVector& p = m_vertex[box.m_vertexStart + i];
 						dgAssert (p.m_x >= box.m_box[0].m_x);
@@ -834,7 +831,7 @@ dgVector dgCollisionConvexHull::SupportVertex (const dgVector& dir, dgInt32* con
 						dgAssert (p.m_y <= box.m_box[1].m_y);
 						dgAssert (p.m_z >= box.m_box[0].m_z);
 						dgAssert (p.m_z <= box.m_box[1].m_z);
-						dgFloat32 dist = p % dir;
+						dgFloat32 dist = p.DotProduct4(dir).m_x;
 						if (dist > maxProj) {
 							maxProj = dist;
 							index = box.m_vertexStart + i;
@@ -844,10 +841,10 @@ dgVector dgCollisionConvexHull::SupportVertex (const dgVector& dir, dgInt32* con
 			}
 		}
 	} else {
-		dgFloat32 maxProj = dgFloat64 (-1.0e20f); 
+		dgFloat32 maxProj = dgFloat32 (-1.0e20f); 
 		for (dgInt32 i = 0; i < m_vertexCount; i ++) {
 			const dgVector& p = m_vertex[i];
-			dgFloat32 dist = p % dir;
+			dgFloat32 dist = p.DotProduct4(dir).m_x;
 			if (dist > maxProj) {
 				index = i;
 				maxProj = dist;
