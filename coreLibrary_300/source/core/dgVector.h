@@ -328,6 +328,10 @@ class dgVector: public dgTemplateVector<dgFloat32>
 		return dgVector (dgFloor (m_x), dgFloor (m_y), dgFloor (m_z), dgFloor (m_w));
 	}
 
+	DG_INLINE dgVector InvSqrt () const
+	{
+		return dgVector (dgRsqrt (m_x), dgRsqrt (m_y), dgRsqrt (m_z), dgRsqrt (m_w));
+	}
 
 	dgVector Abs () const
 	{
@@ -456,10 +460,11 @@ class dgVector: public dgTemplateVector<dgFloat32>
 		dst3 = tmp3.MoveHigh (tmp2);
 	}
 
+	static dgVector m_one;
 	static dgVector m_wOne;
-	static dgVector m_allOne;
+	static dgVector m_half;
+	static dgVector m_three;
 	static dgVector m_triplexMask;
-
 }DG_GCC_VECTOR_ALIGMENT;
 
 
@@ -684,6 +689,12 @@ class dgVector
 		dgAssert (ret.m_f[3] == dgFloor(m_f[3]));
 		return ret;
 	}
+
+	DG_INLINE dgVector InvSqrt () const
+	{
+		dgVector tmp0 (_mm_rsqrt_ps(m_type));
+		return m_half * tmp0 * (m_three - (*this) * tmp0 * tmp0);
+	}
 	
 	// relational operators
 	DG_INLINE dgVector operator> (const dgVector& data) const
@@ -705,8 +716,6 @@ class dgVector
 	{
 		return _mm_cmple_ps (m_type, data.m_type);	
 	}
-
-
 
 	// logical operations
 	DG_INLINE dgVector operator& (const dgVector& data) const
@@ -790,8 +799,10 @@ class dgVector
 		};
 	};
 
+	static dgVector m_one;
 	static dgVector m_wOne;
-	static dgVector m_allOne;
+	static dgVector m_half;
+	static dgVector m_three;
 	static dgVector m_triplexMask;
 } DG_GCC_VECTOR_ALIGMENT;
 
