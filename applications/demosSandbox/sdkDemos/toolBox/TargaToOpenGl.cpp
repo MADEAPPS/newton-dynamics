@@ -24,16 +24,13 @@ struct TextureEntry
 
 class TextureCache: public dTree<TextureEntry, dCRCTYPE>
 {
-public: 
-
+	public: 
 	GLuint GetTexture(const char* const texName)
 	{
 		GLuint texID = 0;
 		dAssert (texName);
 
 		TextureEntry entry;
-		//strcpy (entry.m_textureName, texName);
-		//strlwr (entry.m_textureName.GetStr());
 		entry.m_textureName = texName;
 		entry.m_textureName.ToLower();
 		dCRCTYPE crc = dCRC64 (entry.m_textureName.GetStr());
@@ -49,8 +46,6 @@ public:
 	{
 		TextureEntry entry;
 		entry.m_textureID = id;
-		//strcpy (entry.m_textureName, texName);
-		//strlwr (entry.m_textureName);
 		entry.m_textureName = texName;
 		entry.m_textureName.ToLower();
 		dCRCTYPE crc = dCRC64 (entry.m_textureName.GetStr());
@@ -62,7 +57,6 @@ public:
 	{
 		Iterator iter (*this);
 		for (iter.Begin(); iter; iter ++) {
-//			UnloadTexture (iter.GetNode()->GetInfo().m_textureID);
 			glDeleteTextures(1, &iter.GetNode()->GetInfo().m_textureID);
 		}
 	}
@@ -72,6 +66,7 @@ public:
 		Iterator iter (*this);
 		for (iter.Begin(); iter; iter ++) {
 			if (iter.GetNode()->GetInfo().m_textureID == id) {
+				glDeleteTextures(1, &id);
 				Remove (iter.GetNode());
 				break;
 			}
@@ -247,7 +242,6 @@ GLuint LoadTexture(const char* const filename)
 
 void UnloadTexture (GLuint texture)
 {
-	 glDeleteTextures(1, &texture);
 	 TextureCache::GetChache().RemoveById (texture);
 }
 

@@ -38,6 +38,10 @@ DemoSubMesh::DemoSubMesh ()
 
 DemoSubMesh::~DemoSubMesh ()
 {
+	if (m_textureHandle) {
+		UnloadTexture (m_textureHandle);
+	}
+
 	if (m_indexes) {
 		delete[] m_indexes;
 	}
