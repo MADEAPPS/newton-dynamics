@@ -682,7 +682,7 @@ class dgVector
 
 	DG_INLINE dgVector AndNot (const dgVector& data) const
 	{
-		return _mm_andnot_ps (m_type, data.m_type);	
+		return _mm_andnot_ps (data.m_type, m_type);	
 	}
 
 	DG_INLINE dgVector MoveLow (const dgVector& data) const

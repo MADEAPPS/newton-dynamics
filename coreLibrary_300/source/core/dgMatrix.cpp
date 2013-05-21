@@ -81,23 +81,10 @@ dgMatrix::dgMatrix (const dgQuaternion &rotation, const dgVector &position)
 
 dgMatrix dgMatrix::operator* (const dgMatrix &B) const
 {
-	const dgMatrix& A = *this;
-	return dgMatrix (dgVector (A[0][0] * B[0][0] + A[0][1] * B[1][0] + A[0][2] * B[2][0] + A[0][3] * B[3][0],
-							   A[0][0] * B[0][1] + A[0][1] * B[1][1] + A[0][2] * B[2][1] + A[0][3] * B[3][1],
-							   A[0][0] * B[0][2] + A[0][1] * B[1][2] + A[0][2] * B[2][2] + A[0][3] * B[3][2],
-							   A[0][0] * B[0][3] + A[0][1] * B[1][3] + A[0][2] * B[2][3] + A[0][3] * B[3][3]),
-					 dgVector (A[1][0] * B[0][0] + A[1][1] * B[1][0] + A[1][2] * B[2][0] + A[1][3] * B[3][0],
-							   A[1][0] * B[0][1] + A[1][1] * B[1][1] + A[1][2] * B[2][1] + A[1][3] * B[3][1],
-							   A[1][0] * B[0][2] + A[1][1] * B[1][2] + A[1][2] * B[2][2] + A[1][3] * B[3][2],
-							   A[1][0] * B[0][3] + A[1][1] * B[1][3] + A[1][2] * B[2][3] + A[1][3] * B[3][3]),
-					 dgVector (A[2][0] * B[0][0] + A[2][1] * B[1][0] + A[2][2] * B[2][0] + A[2][3] * B[3][0],
-							   A[2][0] * B[0][1] + A[2][1] * B[1][1] + A[2][2] * B[2][1] + A[2][3] * B[3][1],
-							   A[2][0] * B[0][2] + A[2][1] * B[1][2] + A[2][2] * B[2][2] + A[2][3] * B[3][2],
-							   A[2][0] * B[0][3] + A[2][1] * B[1][3] + A[2][2] * B[2][3] + A[2][3] * B[3][3]),
-					 dgVector (A[3][0] * B[0][0] + A[3][1] * B[1][0] + A[3][2] * B[2][0] + A[3][3] * B[3][0],
-							   A[3][0] * B[0][1] + A[3][1] * B[1][1] + A[3][2] * B[2][1] + A[3][3] * B[3][1],
-							   A[3][0] * B[0][2] + A[3][1] * B[1][2] + A[3][2] * B[2][2] + A[3][3] * B[3][2],
-							   A[3][0] * B[0][3] + A[3][1] * B[1][3] + A[3][2] * B[2][3] + A[3][3] * B[3][3]));
+	return dgMatrix (dgVector (B.m_front.Scale4(m_front.m_x) + B.m_up.Scale4(m_front.m_y) + B.m_right.Scale4(m_front.m_z) + B.m_posit.Scale4 (m_front.m_w)), 
+					 dgVector (B.m_front.Scale4(m_up.m_x)    + B.m_up.Scale4(m_up.m_y)    + B.m_right.Scale4(m_up.m_z)    + B.m_posit.Scale4 (m_up.m_w)), 
+					 dgVector (B.m_front.Scale4(m_right.m_x) + B.m_up.Scale4(m_right.m_y) + B.m_right.Scale4(m_right.m_z) + B.m_posit.Scale4 (m_right.m_w)), 
+					 dgVector (B.m_front.Scale4(m_posit.m_x) + B.m_up.Scale4(m_posit.m_y) + B.m_right.Scale4(m_posit.m_z) + B.m_posit.Scale4 (m_posit.m_w))); 
 }
 
 
