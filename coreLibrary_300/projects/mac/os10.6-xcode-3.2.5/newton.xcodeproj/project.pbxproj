@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FF805355174BA2E0009F1C62 /* dgNarrowPhaseCollision.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF805354174BA2E0009F1C62 /* dgNarrowPhaseCollision.cpp */; };
 		FF80B6861596686E00E8D3B8 /* dgMeshEffect5.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF80B6851596686E00E8D3B8 /* dgMeshEffect5.cpp */; };
 		FF85FFB617405B4500BEE80B /* dgCollisionDeformableClothPatch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF85FFB217405B4500BEE80B /* dgCollisionDeformableClothPatch.cpp */; };
 		FF85FFB717405B4500BEE80B /* dgCollisionDeformableClothPatch.h in Headers */ = {isa = PBXBuildFile; fileRef = FF85FFB317405B4500BEE80B /* dgCollisionDeformableClothPatch.h */; };
@@ -19,7 +20,6 @@
 		FFE8C10016304AF8008A1215 /* dgKinematicBody.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFE8C0FA16304AF8008A1215 /* dgKinematicBody.cpp */; };
 		FFE8C10116304AF8008A1215 /* dgKinematicBody.h in Headers */ = {isa = PBXBuildFile; fileRef = FFE8C0FB16304AF8008A1215 /* dgKinematicBody.h */; };
 		FFE8C10D16304BB7008A1215 /* dgAsyncThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFE8C10B16304BB7008A1215 /* dgAsyncThread.cpp */; };
-		FFE8C10E16304BB7008A1215 /* dgSimd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFE8C10C16304BB7008A1215 /* dgSimd.cpp */; };
 		FFE8C11016304C14008A1215 /* dgOpenclInstance.h in Headers */ = {isa = PBXBuildFile; fileRef = FFE8C10F16304C14008A1215 /* dgOpenclInstance.h */; };
 		FFF60DE41556B10C00E7B112 /* dgAsyncThread.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF60DD91556B10C00E7B112 /* dgAsyncThread.h */; };
 		FFF60DE51556B10C00E7B112 /* dgFastQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF60DDA1556B10C00E7B112 /* dgFastQueue.h */; };
@@ -42,8 +42,6 @@
 		FFF60E3A1556B95300E7B112 /* dgDeformableBody.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF60E291556B95300E7B112 /* dgDeformableBody.h */; };
 		FFF60E3B1556B95300E7B112 /* dgDeformableContact.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60E2A1556B95300E7B112 /* dgDeformableContact.cpp */; };
 		FFF60E3C1556B95300E7B112 /* dgDeformableContact.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF60E2B1556B95300E7B112 /* dgDeformableContact.h */; };
-		FFF60E3D1556B95300E7B112 /* dgWorldDynamicsParallelSolverSimd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60E2C1556B95300E7B112 /* dgWorldDynamicsParallelSolverSimd.cpp */; };
-		FFF60E3F1556B95300E7B112 /* dgWorldDynamicsSimpleSolverSimd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60E2E1556B95300E7B112 /* dgWorldDynamicsSimpleSolverSimd.cpp */; };
 		FFF60E481556B9B000E7B112 /* dgMeshEffect.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF60E411556B9B000E7B112 /* dgMeshEffect.h */; };
 		FFF60E491556B9B000E7B112 /* dgMeshEffect1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60E421556B9B000E7B112 /* dgMeshEffect1.cpp */; };
 		FFF60E4A1556B9B000E7B112 /* dgMeshEffect2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60E431556B9B000E7B112 /* dgMeshEffect2.cpp */; };
@@ -169,10 +167,6 @@
 		FFF89BB5132D17F600A262F2 /* dgCorkscrewConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B5F132D17F600A262F2 /* dgCorkscrewConstraint.h */; };
 		FFF89BB6132D17F600A262F2 /* dgHingeConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B60132D17F600A262F2 /* dgHingeConstraint.cpp */; };
 		FFF89BB7132D17F600A262F2 /* dgHingeConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B61132D17F600A262F2 /* dgHingeConstraint.h */; };
-		FFF89BBB132D17F600A262F2 /* dgMinkowskiConv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B65132D17F600A262F2 /* dgMinkowskiConv.cpp */; };
-		FFF89BBC132D17F600A262F2 /* dgMinkowskiConv.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B66132D17F600A262F2 /* dgMinkowskiConv.h */; };
-		FFF89BBD132D17F600A262F2 /* dgMinkowskiConvSimd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B67132D17F600A262F2 /* dgMinkowskiConvSimd.cpp */; };
-		FFF89BBE132D17F600A262F2 /* dgNarrowPhaseCollision.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B68132D17F600A262F2 /* dgNarrowPhaseCollision.cpp */; };
 		FFF89BBF132D17F600A262F2 /* dgPhysics.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B69132D17F600A262F2 /* dgPhysics.h */; };
 		FFF89BC0132D17F600A262F2 /* dgPhysicsStdafx.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF89B6A132D17F600A262F2 /* dgPhysicsStdafx.h */; };
 		FFF89BC3132D17F600A262F2 /* dgSlidingConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF89B6D132D17F600A262F2 /* dgSlidingConstraint.cpp */; };
@@ -194,6 +188,7 @@
 /* Begin PBXFileReference section */
 		32BAE0B70371A74B00C91783 /* newton_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = newton_Prefix.pch; sourceTree = "<group>"; };
 		D2AAC06F0554671400DB518D /* libnewton.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libnewton.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF805354174BA2E0009F1C62 /* dgNarrowPhaseCollision.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dgNarrowPhaseCollision.cpp; path = ../../../source/physics/dgNarrowPhaseCollision.cpp; sourceTree = "<group>"; };
 		FF80B6851596686E00E8D3B8 /* dgMeshEffect5.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dgMeshEffect5.cpp; path = ../../../source/meshUtil/dgMeshEffect5.cpp; sourceTree = SOURCE_ROOT; };
 		FF85FFB217405B4500BEE80B /* dgCollisionDeformableClothPatch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dgCollisionDeformableClothPatch.cpp; path = ../../../source/physics/dgCollisionDeformableClothPatch.cpp; sourceTree = "<group>"; };
 		FF85FFB317405B4500BEE80B /* dgCollisionDeformableClothPatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgCollisionDeformableClothPatch.h; path = ../../../source/physics/dgCollisionDeformableClothPatch.h; sourceTree = "<group>"; };
@@ -206,7 +201,6 @@
 		FFE8C0FA16304AF8008A1215 /* dgKinematicBody.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dgKinematicBody.cpp; path = ../../../source/physics/dgKinematicBody.cpp; sourceTree = SOURCE_ROOT; };
 		FFE8C0FB16304AF8008A1215 /* dgKinematicBody.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgKinematicBody.h; path = ../../../source/physics/dgKinematicBody.h; sourceTree = SOURCE_ROOT; };
 		FFE8C10B16304BB7008A1215 /* dgAsyncThread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dgAsyncThread.cpp; path = ../../../source/core/dgAsyncThread.cpp; sourceTree = SOURCE_ROOT; };
-		FFE8C10C16304BB7008A1215 /* dgSimd.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dgSimd.cpp; path = ../../../source/core/dgSimd.cpp; sourceTree = SOURCE_ROOT; };
 		FFE8C10F16304C14008A1215 /* dgOpenclInstance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgOpenclInstance.h; path = ../../../source/openCL/dgOpenclInstance.h; sourceTree = SOURCE_ROOT; };
 		FFF60DD91556B10C00E7B112 /* dgAsyncThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgAsyncThread.h; path = ../../../source/core/dgAsyncThread.h; sourceTree = SOURCE_ROOT; };
 		FFF60DDA1556B10C00E7B112 /* dgFastQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgFastQueue.h; path = ../../../source/core/dgFastQueue.h; sourceTree = SOURCE_ROOT; };
@@ -229,8 +223,6 @@
 		FFF60E291556B95300E7B112 /* dgDeformableBody.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgDeformableBody.h; path = ../../../source/physics/dgDeformableBody.h; sourceTree = SOURCE_ROOT; };
 		FFF60E2A1556B95300E7B112 /* dgDeformableContact.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dgDeformableContact.cpp; path = ../../../source/physics/dgDeformableContact.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60E2B1556B95300E7B112 /* dgDeformableContact.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgDeformableContact.h; path = ../../../source/physics/dgDeformableContact.h; sourceTree = SOURCE_ROOT; };
-		FFF60E2C1556B95300E7B112 /* dgWorldDynamicsParallelSolverSimd.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dgWorldDynamicsParallelSolverSimd.cpp; path = ../../../source/physics/dgWorldDynamicsParallelSolverSimd.cpp; sourceTree = SOURCE_ROOT; };
-		FFF60E2E1556B95300E7B112 /* dgWorldDynamicsSimpleSolverSimd.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dgWorldDynamicsSimpleSolverSimd.cpp; path = ../../../source/physics/dgWorldDynamicsSimpleSolverSimd.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60E411556B9B000E7B112 /* dgMeshEffect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgMeshEffect.h; path = ../../../source/meshUtil/dgMeshEffect.h; sourceTree = SOURCE_ROOT; };
 		FFF60E421556B9B000E7B112 /* dgMeshEffect1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dgMeshEffect1.cpp; path = ../../../source/meshUtil/dgMeshEffect1.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60E431556B9B000E7B112 /* dgMeshEffect2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dgMeshEffect2.cpp; path = ../../../source/meshUtil/dgMeshEffect2.cpp; sourceTree = SOURCE_ROOT; };
@@ -356,10 +348,6 @@
 		FFF89B5F132D17F600A262F2 /* dgCorkscrewConstraint.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgCorkscrewConstraint.h; path = ../../../source/physics/dgCorkscrewConstraint.h; sourceTree = SOURCE_ROOT; };
 		FFF89B60132D17F600A262F2 /* dgHingeConstraint.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgHingeConstraint.cpp; path = ../../../source/physics/dgHingeConstraint.cpp; sourceTree = SOURCE_ROOT; };
 		FFF89B61132D17F600A262F2 /* dgHingeConstraint.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgHingeConstraint.h; path = ../../../source/physics/dgHingeConstraint.h; sourceTree = SOURCE_ROOT; };
-		FFF89B65132D17F600A262F2 /* dgMinkowskiConv.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgMinkowskiConv.cpp; path = ../../../source/physics/dgMinkowskiConv.cpp; sourceTree = SOURCE_ROOT; };
-		FFF89B66132D17F600A262F2 /* dgMinkowskiConv.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgMinkowskiConv.h; path = ../../../source/physics/dgMinkowskiConv.h; sourceTree = SOURCE_ROOT; };
-		FFF89B67132D17F600A262F2 /* dgMinkowskiConvSimd.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgMinkowskiConvSimd.cpp; path = ../../../source/physics/dgMinkowskiConvSimd.cpp; sourceTree = SOURCE_ROOT; };
-		FFF89B68132D17F600A262F2 /* dgNarrowPhaseCollision.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgNarrowPhaseCollision.cpp; path = ../../../source/physics/dgNarrowPhaseCollision.cpp; sourceTree = SOURCE_ROOT; };
 		FFF89B69132D17F600A262F2 /* dgPhysics.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgPhysics.h; path = ../../../source/physics/dgPhysics.h; sourceTree = SOURCE_ROOT; };
 		FFF89B6A132D17F600A262F2 /* dgPhysicsStdafx.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = dgPhysicsStdafx.h; path = ../../../source/physics/dgPhysicsStdafx.h; sourceTree = SOURCE_ROOT; };
 		FFF89B6D132D17F600A262F2 /* dgSlidingConstraint.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = dgSlidingConstraint.cpp; path = ../../../source/physics/dgSlidingConstraint.cpp; sourceTree = SOURCE_ROOT; };
@@ -415,7 +403,6 @@
 			isa = PBXGroup;
 			children = (
 				FFE8C10B16304BB7008A1215 /* dgAsyncThread.cpp */,
-				FFE8C10C16304BB7008A1215 /* dgSimd.cpp */,
 				FFF60DD91556B10C00E7B112 /* dgAsyncThread.h */,
 				FFF60DDA1556B10C00E7B112 /* dgFastQueue.h */,
 				FFF60DDB1556B10C00E7B112 /* dgMutexThread.cpp */,
@@ -528,6 +515,7 @@
 		FFF899FA132D163E00A262F2 /* physics */ = {
 			isa = PBXGroup;
 			children = (
+				FF805354174BA2E0009F1C62 /* dgNarrowPhaseCollision.cpp */,
 				FF85FFB217405B4500BEE80B /* dgCollisionDeformableClothPatch.cpp */,
 				FF85FFB317405B4500BEE80B /* dgCollisionDeformableClothPatch.h */,
 				FF85FFB417405B4500BEE80B /* dgCollisionDeformableSolidMesh.cpp */,
@@ -552,8 +540,6 @@
 				FFF60E291556B95300E7B112 /* dgDeformableBody.h */,
 				FFF60E2A1556B95300E7B112 /* dgDeformableContact.cpp */,
 				FFF60E2B1556B95300E7B112 /* dgDeformableContact.h */,
-				FFF60E2C1556B95300E7B112 /* dgWorldDynamicsParallelSolverSimd.cpp */,
-				FFF60E2E1556B95300E7B112 /* dgWorldDynamicsSimpleSolverSimd.cpp */,
 				FFF89B28132D17F600A262F2 /* dgBallConstraint.cpp */,
 				FFF89B29132D17F600A262F2 /* dgBallConstraint.h */,
 				FFF89B2A132D17F600A262F2 /* dgBilateralConstraint.cpp */,
@@ -604,10 +590,6 @@
 				FFF89B5F132D17F600A262F2 /* dgCorkscrewConstraint.h */,
 				FFF89B60132D17F600A262F2 /* dgHingeConstraint.cpp */,
 				FFF89B61132D17F600A262F2 /* dgHingeConstraint.h */,
-				FFF89B65132D17F600A262F2 /* dgMinkowskiConv.cpp */,
-				FFF89B66132D17F600A262F2 /* dgMinkowskiConv.h */,
-				FFF89B67132D17F600A262F2 /* dgMinkowskiConvSimd.cpp */,
-				FFF89B68132D17F600A262F2 /* dgNarrowPhaseCollision.cpp */,
 				FFF89B69132D17F600A262F2 /* dgPhysics.h */,
 				FFF89B6A132D17F600A262F2 /* dgPhysicsStdafx.h */,
 				FFF89B6D132D17F600A262F2 /* dgSlidingConstraint.cpp */,
@@ -709,7 +691,6 @@
 				FFF89BB3132D17F600A262F2 /* dgContact.h in Headers */,
 				FFF89BB5132D17F600A262F2 /* dgCorkscrewConstraint.h in Headers */,
 				FFF89BB7132D17F600A262F2 /* dgHingeConstraint.h in Headers */,
-				FFF89BBC132D17F600A262F2 /* dgMinkowskiConv.h in Headers */,
 				FFF89BBF132D17F600A262F2 /* dgPhysics.h in Headers */,
 				FFF89BC0132D17F600A262F2 /* dgPhysicsStdafx.h in Headers */,
 				FFF89BC4132D17F600A262F2 /* dgSlidingConstraint.h in Headers */,
@@ -847,9 +828,6 @@
 				FFF89BB2132D17F600A262F2 /* dgContact.cpp in Sources */,
 				FFF89BB4132D17F600A262F2 /* dgCorkscrewConstraint.cpp in Sources */,
 				FFF89BB6132D17F600A262F2 /* dgHingeConstraint.cpp in Sources */,
-				FFF89BBB132D17F600A262F2 /* dgMinkowskiConv.cpp in Sources */,
-				FFF89BBD132D17F600A262F2 /* dgMinkowskiConvSimd.cpp in Sources */,
-				FFF89BBE132D17F600A262F2 /* dgNarrowPhaseCollision.cpp in Sources */,
 				FFF89BC3132D17F600A262F2 /* dgSlidingConstraint.cpp in Sources */,
 				FFF89BC5132D17F600A262F2 /* dgUniversalConstraint.cpp in Sources */,
 				FFF89BC7132D17F600A262F2 /* dgUpVectorConstraint.cpp in Sources */,
@@ -867,8 +845,6 @@
 				FFF60E371556B95300E7B112 /* dgCollisionTaperedCylinder.cpp in Sources */,
 				FFF60E391556B95300E7B112 /* dgDeformableBody.cpp in Sources */,
 				FFF60E3B1556B95300E7B112 /* dgDeformableContact.cpp in Sources */,
-				FFF60E3D1556B95300E7B112 /* dgWorldDynamicsParallelSolverSimd.cpp in Sources */,
-				FFF60E3F1556B95300E7B112 /* dgWorldDynamicsSimpleSolverSimd.cpp in Sources */,
 				FFF60E491556B9B000E7B112 /* dgMeshEffect1.cpp in Sources */,
 				FFF60E4A1556B9B000E7B112 /* dgMeshEffect2.cpp in Sources */,
 				FFF60E4B1556B9B000E7B112 /* dgMeshEffect3.cpp in Sources */,
@@ -878,9 +854,9 @@
 				FFE8C0FE16304AF8008A1215 /* dgDynamicBody.cpp in Sources */,
 				FFE8C10016304AF8008A1215 /* dgKinematicBody.cpp in Sources */,
 				FFE8C10D16304BB7008A1215 /* dgAsyncThread.cpp in Sources */,
-				FFE8C10E16304BB7008A1215 /* dgSimd.cpp in Sources */,
 				FF85FFB617405B4500BEE80B /* dgCollisionDeformableClothPatch.cpp in Sources */,
 				FF85FFB817405B4500BEE80B /* dgCollisionDeformableSolidMesh.cpp in Sources */,
+				FF805355174BA2E0009F1C62 /* dgNarrowPhaseCollision.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

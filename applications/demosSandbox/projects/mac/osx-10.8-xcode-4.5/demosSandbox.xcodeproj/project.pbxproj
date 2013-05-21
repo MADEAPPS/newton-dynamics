@@ -663,7 +663,6 @@
 		08FB7794FE84155DC02AAC07 /* newtonDemo */ = {
 			isa = PBXGroup;
 			children = (
-				FF850081174525BC00BEE80B /* persianRug.tga */,
 				FF506721173F3DDC00D01FDF /* assets */,
 				FFF184A113130A6F0077CF7A /* source */,
 				FF8C27F71313DB5500646B90 /* frameworks */,
@@ -700,6 +699,7 @@
 		FF506721173F3DDC00D01FDF /* assets */ = {
 			isa = PBXGroup;
 			children = (
+				FF850081174525BC00BEE80B /* persianRug.tga */,
 				FF5066FF173F3D8900D01FDF /* sponza.ngd */,
 				FF506700173F3D8900D01FDF /* stackPerformance20x20.ngd */,
 				FF506701173F3D8900D01FDF /* streaked.tga */,
