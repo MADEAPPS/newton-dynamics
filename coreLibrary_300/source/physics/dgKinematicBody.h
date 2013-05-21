@@ -63,7 +63,6 @@ class dgKinematicBody: public dgBody
 	virtual void Serialize (const dgTree<dgInt32, const dgCollision*>* const collisionNode, dgSerialize serializeCallback, void* const userData);
 
 	virtual void AddDampingAcceleration() {}
-	virtual void AddDampingAccelerationSimd() {}
 
 /*
 	virtual dgConstraint* GetFirstJoint() const;

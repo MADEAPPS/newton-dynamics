@@ -229,12 +229,6 @@ void dgCollisionChamferCylinder::SetCollisionBBox (const dgVector& p0__, const d
 
 
 
-dgVector dgCollisionChamferCylinder::SupportVertexSimd (const dgVector& dir, dgInt32* const vertexIndex) const
-{
-	return SupportVertex (dir, vertexIndex);
-}
-
-
 dgVector dgCollisionChamferCylinder::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
 	dgAssert (dgAbsf(dir % dir - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
@@ -270,13 +264,6 @@ void dgCollisionChamferCylinder::Serialize(dgSerialize callback, void* const use
 	callback (userData, &size, sizeof (dgVector));
 }
 
-
-
-
-dgFloat32 dgCollisionChamferCylinder::RayCastSimd (const dgVector& q0, const dgVector& q1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
-{
-	return RayCast (q0, q1, contactOut, body, userData);
-}
 
 
 dgFloat32 dgCollisionChamferCylinder::RayCast (const dgVector& q0, const dgVector& q1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
@@ -398,17 +385,6 @@ dgInt32 dgCollisionChamferCylinder::CalculateContacts (const dgVector& point, co
 }
 
 
-dgInt32 dgCollisionChamferCylinder::CalculatePlaneIntersectionSimd (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut) const
-{
-	dgInt32 count = 0;
-	if (dgAbsf (normal.m_x) < dgFloat32 (0.999f)) { 
-		contactsOut[0] = SupportVertexSimd(normal, NULL);
-		count = 1;
-	} else {
-		count = dgCollisionConvex::CalculatePlaneIntersectionSimd(normal, origin, contactsOut);
-	}
-	return count;
-}
 
 
 dgInt32 dgCollisionChamferCylinder::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut) const

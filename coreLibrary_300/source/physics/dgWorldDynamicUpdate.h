@@ -283,19 +283,6 @@ class dgWorldDynamicUpdate
 	static void KinematicCallbackUpdateParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
 	static dgInt32 SortJointInfoByColor (const dgParallelJointMap* const indirectIndexA, const dgParallelJointMap* const indirectIndexB, void* const constraintArray);
 
-
-	static void IntegrateInslandParallelKernelSimd (void* const context, void* const worldContext, dgInt32 threadID); 
-	static void InitilizeBodyArrayParallelKernelSimd (void* const context, void* const worldContext, dgInt32 threadID);
-	static void BuildJacobianMatrixParallelKernelSimd (void* const context, void* const worldContext, dgInt32 threadID); 
-	static void SolverInitInternalForcesParallelKernelSimd (void* const context, void* const worldContext, dgInt32 threadID); 
-	static void CalculateJointsAccelParallelKernelSimd (void* const context, void* const worldContext, dgInt32 threadID); 
-	static void CalculateJointsForceParallelKernelSimd (void* const context, void* const worldContext, dgInt32 threadID); 
-	static void CalculateJointsVelocParallelKernelSimd (void* const context, void* const worldContext, dgInt32 threadID); 
-	static void CalculateJointsImpulseVelocParallelKernelSimd (void* const context, void* const worldContext, dgInt32 threadID); 
-	static void UpdateFeedbackForcesParallelKernelSimd (void* const context, void* const worldContext, dgInt32 threadID); 
-	static void UpdateBodyVelocityParallelKernelSimd (void* const context, void* const worldContext, dgInt32 threadID); 
-	static void KinematicCallbackUpdateParallelKernelSimd (void* const context, void* const worldContext, dgInt32 threadID); 
-
 	
 	void GetJacobianDerivativesParallel (dgJointInfo* const jointInfo, dgInt32 threadID, bool bitMode, dgInt32 rowBase, dgFloat32 timestep) const;	
 	dgInt32 LinearizeBodyParallelArray(dgInt32 islandsCount, dgParallelSolverSyncData* const solverSyncData, const dgBodyInfo* const bodyArray, const dgIsland* const islandArray) const;
@@ -308,41 +295,15 @@ class dgWorldDynamicUpdate
 	void SolverInitInternalForcesParallel (dgParallelSolverSyncData* const syncData) const; 
 	void CalculateForcesGameModeParallel (dgParallelSolverSyncData* const syncData) const; 
 
-
-	void IntegrateInslandParallelSimd (dgParallelSolverSyncData* const syncData) const; 
-	void InitilizeBodyArrayParallelSimd (dgParallelSolverSyncData* const yncData) const; 
-	void BuildJacobianMatrixParallelSimd (dgParallelSolverSyncData* const syncData) const; 
-	void SolverInitInternalForcesParallelSimd (dgParallelSolverSyncData* const syncData) const; 
-	void CalculateForcesGameModeParallelSimd (dgParallelSolverSyncData* const syncData) const; 
-	
 	void CalculateReactionForcesParallel (const dgIsland* const island, dgInt32 inlansdCount, dgFloat32 timestep) const;
-	void CalculateReactionForcesParallelSimd (const dgIsland* const island, dgInt32 inlansdCount, dgFloat32 timestep) const;
-
 	dgFloat32 CalculateJointForces (const dgIsland* const island, dgInt32 rowStart, dgInt32 joint, dgFloat32* const forceStep, dgFloat32 maxAccNorm, const dgJacobianPair* const JMinv) const;
-	dgFloat32 CalculateJointForcesSimd (const dgIsland* const island, dgInt32 rowStart, dgInt32 joint, dgFloat32* const forceStep, dgFloat32 maxAccNorm, const dgJacobianPair* const JMinv) const;
-
 	void CalculateForcesSimulationMode (const dgIsland* const island, dgInt32 rowStart, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
-	void CalculateForcesSimulationModeSimd (const dgIsland* const island, dgInt32 rowStart, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
-	
-	
 	void CalculateIslandReactionForces (dgIsland* const island, dgFloat32 timestep, dgInt32 threadID) const;
-	void CalculateIslandReactionForcesSimd (dgIsland* const island, dgFloat32 timestep, dgInt32 threadID) const;
-
 	dgInt32 BuildJacobianMatrix (dgIsland* const island, dgInt32 threadID, dgFloat32 timestep) const;
-	dgInt32 BuildJacobianMatrixSimd (dgIsland* const island, dgInt32 threadID, dgFloat32 timestep) const; 
-
 	void CalculateForcesGameMode (const dgIsland* const island, dgInt32 rowStart, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
-	void CalculateForcesGameModeSimd (const dgIsland* const island, dgInt32 rowStart, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
-
 	void CalculateReactionsForces(const dgIsland* const island, dgInt32 rowStart, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
-	void CalculateReactionsForcesSimd(const dgIsland* const island, dgInt32 rowStart, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
-
 	void ApplyExternalForcesAndAcceleration(const dgIsland* const island, dgInt32 rowStart, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
-	void ApplyExternalForcesAndAccelerationSimd(const dgIsland* const island, dgInt32 rowStart, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
-
 	void CalculateSimpleBodyReactionsForces (const dgIsland* const island, dgInt32 rowStart, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
-	void CalculateSimpleBodyReactionsForcesSimd (const dgIsland* const island, dgInt32 rowStart, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
-
 	void IntegrateArray (const dgIsland* const island, dgFloat32 accelTolerance, dgFloat32 timestep, dgInt32 threadID) const;
 	dgInt32 GetJacobianDerivatives (const dgIsland* const island, dgInt32 threadID, bool bitMode, dgInt32 rowBase, dgInt32 rowCount, dgFloat32 timestep) const;	
 

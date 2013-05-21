@@ -614,7 +614,7 @@ void dgCollisionDeformableMesh::ApplyExternalAndInternalForces (dgDeformableBody
 
 
 
-void dgCollisionDeformableMesh::CalculateContactsToCollisionTree (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy, dgInt32 useSimd)
+void dgCollisionDeformableMesh::CalculateContactsToCollisionTree (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy)
 {
 	dgAssert (0);
 	/*
@@ -1530,7 +1530,7 @@ const dgInt16* dgCollisionDeformableMesh::GetSegmentIndexList (void* const segme
 }
 
 
-dgInt32 dgCollisionDeformableMesh::CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy, dgInt32 useSimd)
+dgInt32 dgCollisionDeformableMesh::CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy)
 {
 //dgAssert (0);
 return 0;
@@ -1540,19 +1540,19 @@ return 0;
 		dgAssert (IsType (dgCollision::dgCollisionDeformableMesh_RTTI));
 
 		if (pair->m_body1->m_collision->IsType (dgCollision::dgCollisionBVH_RTTI)) {
-			CalculateContactsToCollisionTree (pair, proxy, useSimd);
+			CalculateContactsToCollisionTree (pair, proxy);
 
 //		if (pair->m_body1->m_collision->IsType (dgCollision::dgCollisionConvexShape_RTTI)) {
-//			contactCount = CalculateContactsToSingle (pair, proxy, useSimd);
+//			contactCount = CalculateContactsToSingle (pair, proxy);
 //		} else if (pair->m_body1->m_collision->IsType (dgCollision::dgCollisionCompound_RTTI)) {
-//			contactCount = CalculateContactsToCompound (pair, proxy, useSimd);
+//			contactCount = CalculateContactsToCompound (pair, proxy);
 //		} else if (pair->m_body1->m_collision->IsType (dgCollision::dgCollisionBVH_RTTI)) {
-//			contactCount = CalculateContactsToCollisionTree (pair, proxy, useSimd);
+//			contactCount = CalculateContactsToCollisionTree (pair, proxy);
 //		} else if (pair->m_body1->m_collision->IsType (dgCollision::dgCollisionHeightField_RTTI)) {
-//			contactCount = CalculateContactsToHeightField (pair, proxy, useSimd);
+//			contactCount = CalculateContactsToHeightField (pair, proxy);
 //		} else {
 //			dgAssert (pair->m_body1->m_collision->IsType (dgCollision::dgCollisionUserMesh_RTTI));
-//			contactCount = CalculateContactsBruteForce (pair, proxy, useSimd);
+//			contactCount = CalculateContactsBruteForce (pair, proxy);
 //		}
 		} else {
 			dgAssert (0);

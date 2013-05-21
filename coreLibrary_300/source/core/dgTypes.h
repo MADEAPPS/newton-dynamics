@@ -188,8 +188,7 @@
 #endif
 
 
-#define DG_SIMD_WORD_SIZE		dgInt32 (sizeof (dgSimd) / sizeof (dgFloat32))
-//#define DG_SIMD_256_WORD_SIZE	(DG_SIMD_WORD_SIZE * 2)
+
 
 
 typedef char dgInt8;
@@ -606,14 +605,6 @@ dgInt32 dgVertexListToIndexList (dgFloat32* const vertexList, dgInt32 strideInBy
 dgInt32 dgVertexListToIndexList (dgFloat64* const vertexList, dgInt32 strideInBytes, dgInt32 compareCount, dgInt32 vertexCount, dgInt32* const indexListOut, dgFloat64 tolerance = dgEPSILON);
 
 
-
-enum dgCpuClass
-{
-	dgNoSimdPresent = 0,
-	dgSimdPresent,
-};
-
-
 #define PointerToInt(x) ((size_t)x)
 #define IntToPointer(x) ((void*)(size_t(x)))
 
@@ -712,8 +703,6 @@ void dgDeserializeMarker(dgDeserialize serializeCallback, void* const userData);
 
 
 typedef dgUnsigned32 (dgApi *OnGetPerformanceCountCallback) ();
-
-dgCpuClass dgApi dgGetCpuType ();
 
 
 class dgFloatExceptions

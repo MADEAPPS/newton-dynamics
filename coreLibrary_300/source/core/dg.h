@@ -29,7 +29,6 @@
 #include "dgRtti.h"
 #include "dgList.h"
 #include "dgTree.h"
-#include "dgSimd.h"
 #include "dgNode.h"
 #include "dgHeap.h"
 #include "dgArray.h"

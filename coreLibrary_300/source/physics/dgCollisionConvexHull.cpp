@@ -859,12 +859,6 @@ dgVector dgCollisionConvexHull::SupportVertex (const dgVector& dir, dgInt32* con
 	return m_vertex[index];
 }
 
-dgVector dgCollisionConvexHull::SupportVertexSimd (const dgVector& dir, dgInt32* const vertexIndex) const
-{
-	dgAssert (0);
-	return SupportVertex (dir, vertexIndex);
-}
-
 
 void dgCollisionConvexHull::GetCollisionInfo(dgCollisionInfo* const info) const
 {
@@ -1024,7 +1018,3 @@ dgFloat32 dgCollisionConvexHull::RayCast (const dgVector& localQ0, const dgVecto
 	}
 }
 
-dgFloat32 dgCollisionConvexHull::RayCastSimd (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
-{
-	return RayCast (localP0, localP1, contactOut, body, userData);
-}

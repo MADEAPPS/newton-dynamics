@@ -210,7 +210,6 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 	virtual void GetInfo (dgConstraintInfo* const info) const;
 	virtual dgUnsigned32 JacobianDerivative (dgContraintDescritor& params); 
 	virtual void JointAccelerations (dgJointAccelerationDecriptor* const params); 
-	virtual void JointAccelerationsSimd(dgJointAccelerationDecriptor* const params); 
 	virtual void JointVelocityCorrection(dgJointAccelerationDecriptor* const params); 
 	
 	virtual bool IsDeformable() const ;

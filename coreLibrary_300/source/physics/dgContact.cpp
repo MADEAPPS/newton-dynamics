@@ -260,59 +260,6 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 }
 
 
-
-void dgContact::JointAccelerationsSimd(dgJointAccelerationDecriptor* const params)
-{
-	dgSimd zero (dgFloat32 (0.0f));
-	dgSimd four (dgFloat32 (4.0f));
-	dgSimd negOne (dgFloat32 (-1.0f));
-	dgSimd tol002 (dgFloat32 (1.0e-2f));
-
-	dgSimd timestep (dgFloat32 (1.0f));
-	dgSimd invTimestep (dgFloat32 (1.0f));
-	if (params->m_timeStep > dgFloat32 (0.0f)) {
-		timestep = dgSimd(params->m_timeStep);
-		invTimestep = dgSimd(params->m_invTimeStep);
-	}
-
-	dgSimd bodyVeloc0 ((dgSimd&) m_body0->m_veloc);
-	dgSimd bodyOmega0 ((dgSimd&) m_body0->m_omega);
-	dgSimd bodyVeloc1 ((dgSimd&) m_body1->m_veloc);
-	dgSimd bodyOmega1 ((dgSimd&) m_body1->m_omega);
-
-	dgInt32 count = params->m_rowsCount;
-	dgJacobianMatrixElement* const rowMatrix = params->m_rowMatrix;
-
-	for (dgInt32 k = 0; k < count; k ++) {
-		if (!rowMatrix[k].m_accelIsMotor) {
-			dgJacobianMatrixElement* const row = &rowMatrix[k];
-			dgSimd relVeloc ((dgSimd&)row->m_Jt.m_jacobianM0.m_linear * bodyVeloc0 +
-							 (dgSimd&)row->m_Jt.m_jacobianM0.m_angular * bodyOmega0 + 
-							 (dgSimd&)row->m_Jt.m_jacobianM1.m_linear * bodyVeloc1 +
-							 (dgSimd&)row->m_Jt.m_jacobianM1.m_angular * bodyOmega1);
-
-			//dgAssert (relVeloc.m_type.m128_f32[3] == dgFloat32 (0.0f));
-			relVeloc = relVeloc.AddHorizontal();
-
-			dgSimd relAccel (row->m_deltaAccel);
-			if (row->m_normalForceIndex < 0) {
-				dgSimd restitution ((dgSimd (row->m_restitution) & (relVeloc <= zero)) - negOne);
-				dgSimd penetration (row->m_penetration);
-
-				dgSimd penetrationMask (penetration > tol002);
-				dgSimd velocMask (penetrationMask & (relVeloc > zero));
-				penetration = zero.GetMax(penetration - ((relVeloc * timestep) & velocMask));
-				dgSimd penetrationVeloc ((penetration * dgSimd (row->m_penetrationStiffness)) & penetrationMask);
-				penetration.StoreScalar(&row->m_penetration);
-				relVeloc = four.GetMin (relVeloc * restitution - penetrationVeloc);
-			}
-			dgSimd a (relAccel - relVeloc * invTimestep);
-			a.StoreScalar(&row->m_coordenateAccel);
-		}
-	}
-}
-
-
 void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 {
 	dgJacobianMatrixElement* const rowMatrix = params->m_rowMatrix;

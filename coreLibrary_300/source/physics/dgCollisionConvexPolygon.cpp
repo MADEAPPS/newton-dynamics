@@ -67,12 +67,6 @@ void dgCollisionConvexPolygon::Serialize(dgSerialize callback, void* const userD
 	dgAssert (0);
 }
 
-dgFloat32 dgCollisionConvexPolygon::RayCastSimd (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
-{
-	dgAssert (0);
-	return true;
-}
-
 
 dgFloat32 dgCollisionConvexPolygon::RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* userData) const
 {
@@ -115,38 +109,6 @@ dgVector dgCollisionConvexPolygon::SupportVertex (const dgVector& dir, dgInt32* 
 	return m_localPoly[index];
 }
 
-dgVector dgCollisionConvexPolygon::SupportVertexSimd (const dgVector& dir, dgInt32* const vertexIndex) const
-{
-	dgAssert (0);
-	return SupportVertex (dir, vertexIndex);
-/*
-	dgAssert (dgAbsf (dir % dir - 1.0f) < dgFloat32 (1.0e-3f));
-	dgSimd dirX (dgSimd(dir.m_x));
-	dgSimd dirY (dgSimd(dir.m_y));
-	dgSimd dirZ (dgSimd(dir.m_z));
-
-	dgSimd dot (dirX * m_localPolySimd[0] + dirY * m_localPolySimd[1] + dirZ * m_localPolySimd[2]);
-	dgSimd index (dgSimd::m_index_0123);
-	dgSimd indexAcc = index; 
-	dgSimd step (dgFloat32 (4.0f));
-	for (dgInt32 i = 3; i < m_paddedCount; i += 3) {
-		indexAcc = indexAcc + step;
-		dgSimd dot1 (dirX * m_localPolySimd[i + 0] + dirY * m_localPolySimd[i + 1] + dirZ * m_localPolySimd[i + 2]);
-		dgSimd mask (dot1 > dot);
-		dot = dot1.GetMax(dot);
-		index = (indexAcc & mask) | index.AndNot(mask);
-	}
-	dgInt32 m = dot.MaximunValue(index).GetInt();
-	return (dgSimd&)m_localPoly[m]; 
-*/
-}
-
-
-
-void dgCollisionConvexPolygon::BeamClippingSimd (const dgCollisionConvex* const hull, const dgVector& origin, dgFloat32 dist)
-{
-	dgAssert (0);
-}
 
 
 //void dgCollisionConvexPolygon::BeamClipping (const dgCollisionInstance* const hull, const dgMatrix& matrix, const dgVector& origin, dgFloat32 dist)
@@ -321,15 +283,8 @@ void dgCollisionConvexPolygon::BeamClipping (const dgCollisionInstance* const hu
 }
 
 
-dgInt32 dgCollisionConvexPolygon::CalculatePlaneIntersectionSimd (const dgVector& normalIn, const dgVector& origin, dgVector* const contactsOut) const
-{
-dgAssert (0);
-return 0;
-}
-
 void dgCollisionConvexPolygon::SetFeatureHit (dgInt32 featureCount, const dgInt32* const index)
 {
-
 	dgInt32 copy[3];
 	copy[0] = index[0];
 	copy[1] = index[1];

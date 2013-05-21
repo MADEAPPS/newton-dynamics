@@ -42,49 +42,52 @@ dgFastRayTest::dgFastRayTest(const dgVector& l0, const dgVector& l1)
 	m_p0.m_w = dgFloat32 (0.0f);
 	m_p1.m_w = dgFloat32 (0.0f);
 	m_diff.m_w = dgFloat32 (0.0f);
-	m_isParallel[0] = (dgAbsf (m_diff.m_x) > dgFloat32 (1.0e-8f)) ? 0 : dgInt32 (0xffffffff); 
-	m_isParallel[1] = (dgAbsf (m_diff.m_y) > dgFloat32 (1.0e-8f)) ? 0 : dgInt32 (0xffffffff); 
-	m_isParallel[2] = (dgAbsf (m_diff.m_z) > dgFloat32 (1.0e-8f)) ? 0 : dgInt32 (0xffffffff); 
-	m_isParallel[3] = 0;
 
-	m_dpInv.m_x = (!m_isParallel[0]) ? (dgFloat32 (1.0f) / m_diff.m_x) : dgFloat32 (1.0e20f);
-	m_dpInv.m_y = (!m_isParallel[1]) ? (dgFloat32 (1.0f) / m_diff.m_y) : dgFloat32 (1.0e20f);
-	m_dpInv.m_z = (!m_isParallel[2]) ? (dgFloat32 (1.0f) / m_diff.m_z) : dgFloat32 (1.0e20f);
+	dgInt32 isParallel[4];
+	isParallel[0] = (dgAbsf (m_diff.m_x) > dgFloat32 (1.0e-8f)) ? 0 : dgInt32 (0xffffffff); 
+	isParallel[1] = (dgAbsf (m_diff.m_y) > dgFloat32 (1.0e-8f)) ? 0 : dgInt32 (0xffffffff); 
+	isParallel[2] = (dgAbsf (m_diff.m_z) > dgFloat32 (1.0e-8f)) ? 0 : dgInt32 (0xffffffff); 
+	isParallel[3] = 0;
+	m_isParallel = dgVector (isParallel[0], isParallel[1], isParallel[2], isParallel[3]);
+
+	m_dpInv.m_x = (!isParallel[0]) ? (dgFloat32 (1.0f) / m_diff.m_x) : dgFloat32 (1.0e20f);
+	m_dpInv.m_y = (!isParallel[1]) ? (dgFloat32 (1.0f) / m_diff.m_y) : dgFloat32 (1.0e20f);
+	m_dpInv.m_z = (!isParallel[2]) ? (dgFloat32 (1.0f) / m_diff.m_z) : dgFloat32 (1.0e20f);
 	m_dpInv.m_w = dgFloat32 (0.0f);
 	m_dpBaseInv = m_dpInv;
 
-	m_ray_xxxx = dgSimd(m_diff.m_x);
-	m_ray_yyyy = dgSimd(m_diff.m_y);
-	m_ray_zzzz = dgSimd(m_diff.m_z);
+	m_ray_xxxx = dgVector(m_diff.m_x);
+	m_ray_yyyy = dgVector(m_diff.m_y);
+	m_ray_zzzz = dgVector(m_diff.m_z);
 
 	dgFloat32 mag = dgSqrt (m_diff % m_diff);
 	m_dirError = -dgFloat32 (0.0175f) * mag;
 	m_magRayTest = dgMax (mag, dgFloat32 (1.0f));
 }
 
-dgInt32 dgFastRayTest::BoxTestSimd (const dgVector& minBox, const dgVector& maxBox) const
-{
-	dgSimd boxP0 ((dgSimd&)minBox);
-	dgSimd boxP1 ((dgSimd&)maxBox);
 
-	//dgSimd tt0 (((dgSimd&)m_p0 <= boxP0) | ((dgSimd&)m_p0 >= boxP1) & (dgSimd&)m_isParallel);
-	dgSimd tt0 ((((dgSimd&)m_p0 <= boxP0) | ((dgSimd&)m_p0 >= boxP1)) & (dgSimd&)m_isParallel);
+dgInt32 dgFastRayTest::BoxTest (const dgVector& minBox, const dgVector& maxBox) const
+{
+#if 1
+//	dgVector boxP0 ((dgSimd&)minBox);
+//	dgVector boxP1 ((dgSimd&)maxBox);
+
+	dgVector tt0 (((m_p0 <= minBox) | (m_p0 >= maxBox)) & m_isParallel);
 	if (tt0.GetSignMask() & 0x07) {
 		return 0;
 	}
-	tt0 = (boxP0 - (dgSimd&)m_p0) * (dgSimd&)m_dpInv;
-	dgSimd tt1 ((boxP1 - (dgSimd&)m_p0) * (dgSimd&)m_dpInv);
-	dgSimd t0 (((dgSimd&)m_minT).GetMax(tt0.GetMin(tt1)));
-	dgSimd t1 (((dgSimd&)m_maxT).GetMin(tt0.GetMax(tt1)));
+	tt0 = (minBox - m_p0).CompProduct4(m_dpInv);
+	dgVector tt1 ((maxBox - m_p0).CompProduct4(m_dpInv));
+	dgVector t0 (m_minT.GetMax(tt0.GetMin(tt1)));
+	dgVector t1 (m_maxT.GetMin(tt0.GetMax(tt1)));
 	t0 = t0.GetMax(t0.ShiftTripleRight());
 	t1 = t1.GetMin(t1.ShiftTripleRight());
 	t0 = t0.GetMax(t0.ShiftTripleRight());
 	t1 = t1.GetMin(t1.ShiftTripleRight());
 	return ((t0 < t1).GetSignMask() & 1);
-}
 
-dgInt32 dgFastRayTest::BoxTest (const dgVector& minBox, const dgVector& maxBox) const
-{
+#else
+
 	dgFloat32 tmin = 0.0f;          
 	dgFloat32 tmax = 1.0f;
 
@@ -112,6 +115,7 @@ dgInt32 dgFastRayTest::BoxTest (const dgVector& minBox, const dgVector& maxBox) 
 		}
 	}
 	return 0x1;
+#endif
 }
 
 
@@ -151,8 +155,10 @@ dgFloat32 dgFastRayTest::PolygonIntersectFallback (const dgVector& normal, const
 }
 
 
-dgFloat32 dgFastRayTest::PolygonIntersectSimd (const dgVector& normal, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount) const
+
+dgFloat32 dgFastRayTest::PolygonIntersect (const dgVector& normal, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount) const
 {
+#if 0
 	dgAssert (m_p0.m_w == m_p1.m_w);
 	dgSimd normal1 ((dgSimd&)normal & dgSimd (-1, -1, -1, 0));
 	dgSimd dist (((dgSimd&)normal1).DotProduct((dgSimd&)m_diff));
@@ -199,8 +205,8 @@ dgFloat32 dgFastRayTest::PolygonIntersectSimd (const dgVector& normal, const dgF
 				dgSimd::Transpose4x4 (p0v1_x, p0v1_y, p0v1_z, test, p0v1, p0v2, p0v3, p0v4);
 
 				dgSimd volume = (m_ray_yyyy * p0v1_z - m_ray_zzzz * p0v1_y) * p0v0_x + 
-							    (m_ray_zzzz * p0v1_x - m_ray_xxxx * p0v1_z) * p0v0_y + 
-								(m_ray_xxxx * p0v1_y - m_ray_yyyy * p0v1_x) * p0v0_z;
+					(m_ray_zzzz * p0v1_x - m_ray_xxxx * p0v1_z) * p0v0_y + 
+					(m_ray_xxxx * p0v1_y - m_ray_yyyy * p0v1_x) * p0v0_z;
 
 				dgSimd volumeAbs (volume.Abs());
 				if ((volumeAbs < tolerance).GetSignMask()) {
@@ -225,11 +231,8 @@ dgFloat32 dgFastRayTest::PolygonIntersectSimd (const dgVector& normal, const dgF
 		}
 	}
 	return dgFloat32 (1.2f);
-}
 
-
-dgFloat32 dgFastRayTest::PolygonIntersect (const dgVector& normal, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount) const
-{
+#else
 	dgAssert (m_p0.m_w == m_p1.m_w);
 
 	dgFloat32 dist = normal % m_diff;
@@ -267,6 +270,7 @@ dgFloat32 dgFastRayTest::PolygonIntersect (const dgVector& normal, const dgFloat
 		}
 	}
 	return dgFloat32 (1.2f);
+#endif
 }
 
 

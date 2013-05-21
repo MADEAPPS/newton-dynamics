@@ -696,18 +696,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\source\physics\dgMinkowskiConv.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\source\physics\dgMinkowskiConv.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\source\physics\dgMinkowskiConvSimd.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\source\physics\dgNarrowPhaseCollision.cpp"
 				>
 			</File>
@@ -764,15 +752,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\source\physics\dgWorldDynamicsParallelSolverSimd.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\source\physics\dgWorldDynamicsSimpleSolver.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\source\physics\dgWorldDynamicsSimpleSolverSimd.cpp"
 				>
 			</File>
 			<File

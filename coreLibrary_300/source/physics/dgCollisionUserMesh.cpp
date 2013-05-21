@@ -101,12 +101,6 @@ bool dgCollisionUserMesh::AABBOvelapTest (const dgVector& boxP0, const dgVector&
 }
 
 
-dgFloat32 dgCollisionUserMesh::RayCastSimd (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
-{
-	return RayCast (localP0, localP1, contactOut, body, userData);
-}
-
-
 dgFloat32 dgCollisionUserMesh::RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body,	void* const userData) const
 {
 	dgFloat32 param = dgFloat32 (1.2f);
@@ -138,17 +132,6 @@ dgVector dgCollisionUserMesh::SupportVertex (const dgVector& dir) const
 	return dgVector (0, 0, 0, 0);
 }
 
-dgVector dgCollisionUserMesh::SupportVertexSimd (const dgVector& dir) const
-{
-	dgAssert (0);
-	return dgVector (0, 0, 0, 0);
-}
-
-
-void dgCollisionUserMesh::GetCollidingFacesSimd (dgPolygonMeshDesc* const data) const
-{
-	GetCollidingFaces (data);
-}
 
 void dgCollisionUserMesh::GetCollidingFaces (dgPolygonMeshDesc* const data) const
 {

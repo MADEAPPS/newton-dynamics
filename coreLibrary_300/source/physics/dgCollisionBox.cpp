@@ -99,11 +99,9 @@ void dgCollisionBox::Init (dgFloat32 size_x, dgFloat32 size_y, dgFloat32 size_z)
 	m_vertex[6]	= dgVector (-m_size[0].m_x,  m_size[0].m_y, -m_size[0].m_z, dgFloat32 (1.0f));
 	m_vertex[7]	= dgVector ( m_size[0].m_x,  m_size[0].m_y, -m_size[0].m_z, dgFloat32 (1.0f));
 
-	dgSimd tmp;
-	dgSimd::Transpose4x4 (m_vertex_sse[0], m_vertex_sse[1], m_vertex_sse[2], tmp, 
-						 (dgSimd&)m_vertex[0], (dgSimd&)m_vertex[1], (dgSimd&)m_vertex[2], (dgSimd&)m_vertex[3]);
-	dgSimd::Transpose4x4 (m_vertex_sse[3], m_vertex_sse[4], m_vertex_sse[5], tmp, 
-						 (dgSimd&)m_vertex[4], (dgSimd&)m_vertex[5], (dgSimd&)m_vertex[6], (dgSimd&)m_vertex[7]);
+	dgVector tmp;
+	dgVector::Transpose4x4 (m_vertex_soa[0], m_vertex_soa[1], m_vertex_soa[2], tmp, m_vertex[0], m_vertex[1], m_vertex[2], m_vertex[3]);
+	dgVector::Transpose4x4 (m_vertex_soa[3], m_vertex_soa[4], m_vertex_soa[5], tmp, m_vertex[4], m_vertex[5], m_vertex[6], m_vertex[7]);
 
 	dgCollisionConvex::m_vertex = m_vertex;
 	dgCollisionConvex::m_simplex = m_edgeArray;
@@ -166,12 +164,6 @@ dgVector dgCollisionBox::SupportVertex (const dgVector& dir, dgInt32* const vert
 }
 
 
-dgVector dgCollisionBox::SupportVertexSimd (const dgVector& dir, dgInt32* const vertexIndex) const
-{
-	dgSimd test ((dgSimd&)dir > dgSimd(dgFloat32 (0.0f)));
-	return ((dgSimd&)m_size[0] & test) | ((dgSimd&)m_size[1]).AndNot(test); 
-}
-
 
 void dgCollisionBox::CalcAABB (const dgMatrix &matrix, dgVector &p0, dgVector &p1) const
 {
@@ -192,16 +184,6 @@ void dgCollisionBox::CalcAABB (const dgMatrix &matrix, dgVector &p0, dgVector &p
 	p1.m_w = dgFloat32 (0.0f);
 }
 
-
-void dgCollisionBox::CalcAABBSimd (const dgMatrix &matrix, dgVector &p0, dgVector &p1) const
-{
-	dgSimd size (((dgSimd&)matrix[0] & dgSimd::m_signMask) * (dgSimd&) m_size_x + 
-				   ((dgSimd&)matrix[1] & dgSimd::m_signMask) * (dgSimd&) m_size_y + 
-				   ((dgSimd&)matrix[2] & dgSimd::m_signMask) * (dgSimd&) m_size_z); 
-
-	(dgSimd&)p0 = ((dgSimd&)matrix[3] - size) & dgSimd::m_triplexMask;
-	(dgSimd&)p1 = ((dgSimd&)matrix[3] + size) & dgSimd::m_triplexMask;
-}
 
 
 dgFloat32 dgCollisionBox::RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
@@ -252,10 +234,6 @@ dgFloat32 dgCollisionBox::RayCast (const dgVector& localP0, const dgVector& loca
 
 }
 
-dgFloat32 dgCollisionBox::RayCastSimd (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
-{
-	return RayCast (localP0, localP1, contactOut, body, userData);
-}
 
 void dgCollisionBox::MassProperties ()
 {
@@ -375,124 +353,6 @@ dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, cons
 }
 
 
-dgInt32 dgCollisionBox::CalculatePlaneIntersectionSimd (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const
-{
-	dgAssert (0);
-	return CalculatePlaneIntersection (normal, point, contactsOut);
-/*
-	dgInt32 count = 0;
-	dgSimd plane (((dgSimd&)normal & dgSimd::m_triplexMask));
-	plane = plane - plane.DotProduct((dgSimd&)point).AndNot(dgSimd::m_triplexMask);
-
-	dgSimd plane_a;
-	dgSimd plane_b;
-	dgSimd plane_c;
-	dgSimd plane_d;
-	dgSimd side[2];
-
-	dgSimd::Transpose4x4 (plane_a, plane_b, plane_c, plane_d, plane, plane, plane, plane);
-	
-	side[0] = plane_a * m_vertex_sse[0] + plane_b * m_vertex_sse[1] + plane_c * m_vertex_sse[2] + plane_d;
-	side[1] = plane_a * m_vertex_sse[3] + plane_b * m_vertex_sse[4] + plane_c * m_vertex_sse[5] + plane_d;
-	
-	dgSimd zero (dgFloat32 (0.0f));
-	dgSimd huge (dgFloat32 (1.0e20f));
-	dgSimd negOne (dgFloat32 (-1.0f));
-	
-	dgSimd sideTest (side[0] > zero);
-	dgSimd positiveSide0 ((side[0] & sideTest) | huge.AndNot(sideTest));
-	dgSimd index0 ((dgSimd::m_index_0123 & sideTest) | negOne.AndNot(sideTest));
-
-	sideTest = side[1] > zero;
-	dgSimd positiveSide1 ((side[1] & sideTest) | huge.AndNot(sideTest));
-	dgSimd index1 ((dgSimd::m_index_4567 & sideTest) | negOne.AndNot(sideTest));
-
-	sideTest = positiveSide0 < positiveSide1;
-	positiveSide0 = positiveSide0.GetMin(positiveSide1);
-	index0 = (index0 & sideTest) | index1.AndNot(sideTest);
-
-	positiveSide1 = positiveSide0.MoveHigh(positiveSide0);
-	sideTest = positiveSide0 < positiveSide1;
-	positiveSide0 = positiveSide0.GetMin(positiveSide1);
-	index0 = (index0 & sideTest) | index0.MoveHigh(index0).AndNot(sideTest);
-
-	positiveSide1 = positiveSide0.PackLow(positiveSide0);
-	sideTest = positiveSide0 < positiveSide1.MoveHigh(positiveSide1);
-	index1 = index0.PackLow(index0);
-	dgInt32 index = ((index0 & sideTest) | (index1.MoveHigh(index1).AndNot(sideTest))).GetInt();
-
-	if (index >= 0) {
-		dgConvexSimplexEdge* edge = m_supportVertexStarQuadrant[index];
-
-		const dgFloat32* const test = (dgFloat32*) &side[0];
-		dgAssert (test[edge->m_vertex] > dgFloat32 (0.0f));
-
-		dgConvexSimplexEdge* ptr = edge;
-		dgConvexSimplexEdge* firstEdge = NULL;
-
-		dgSimd side0 (test[edge->m_vertex]);
-		do {
-			dgAssert (m_vertex[ptr->m_twin->m_vertex].m_w == dgFloat32 (1.0f));
-			dgSimd side1 (test[ptr->m_twin->m_vertex]);
-			if ((side1 < side0).GetSignMask()) {
-				if ((side1 < zero).GetSignMask()) {
-					firstEdge = ptr;
-					break;
-				}
-				side0 = side1;
-				edge = ptr->m_twin;
-				ptr = edge;
-			}
-			ptr = ptr->m_twin->m_next;
-		} while (ptr != edge);
-
-		if (firstEdge) {
-			edge = firstEdge;
-			ptr = edge;
-			const dgSimd* const vertexArray = (dgSimd*) m_vertex ;
-			do {
-
-				dgInt32 index0 = ptr->m_vertex;
-				dgInt32 index1 = ptr->m_twin->m_vertex;
-				dgAssert (m_vertex[index0].m_w == dgFloat32 (1.0f));
-				dgAssert (m_vertex[index1].m_w == dgFloat32 (1.0f));
-
-				//dgSimd p1p0 (dgSimd&)m_vertex[index1] - (dgSimd&)m_vertex[index0]);
-				dgSimd p1p0 (vertexArray[index1] - vertexArray[index0]);
-				
-				dgSimd dot (plane.DotProduct(p1p0));
-				
-				// GCC do no like dgSimd den (dgSimd(test[index0]) / dot);
-				dgFloat32 a = test[index0];
-				dgSimd den (dgSimd(a) / dot);
-				den = zero.GetMin (negOne.GetMax (den));
-
-				//dgAssert (den.m_type.m128_f32[0] <= dgFloat32 (0.0f));
-				//dgAssert (den.m_type.m128_f32[0] >= dgFloat32 (-1.0f));
-				//(dgSimd&)contactsOut[count] = ((dgSimd&)m_vertex[index0] & dgSimd::m_triplexMask) - p1p0 * den;
-				(dgSimd&)contactsOut[count] = (vertexArray[index0] & dgSimd::m_triplexMask) - p1p0 * den;
-				count ++;
-
-				dgConvexSimplexEdge* ptr1 = ptr->m_next;
-				for (; ptr1 != ptr; ptr1 = ptr1->m_next) {
-					dgInt32 index0 = ptr1->m_twin->m_vertex;
-					if ((dgSimd (test[index0]) >= zero).GetSignMask()) {
-						dgAssert (test[ptr1->m_vertex] <= dgFloat32 (0.0f));
-						break;
-					}
-				}
-				dgAssert (ptr != ptr1);
-				ptr = ptr1->m_twin;
-
-			} while ((ptr != edge) && (count < 8));
-		}
-	}
-	if (count > 1) {
-		count = RectifyConvexSlice (count, normal, contactsOut);
-	}
-	return count;
-*/
-}
 
 void dgCollisionBox::GetCollisionInfo(dgCollisionInfo* const info) const
 {

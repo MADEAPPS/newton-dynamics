@@ -105,10 +105,6 @@ dgVector dgCollisionCompoundBreakable::dgCollisionConvexIntance::SupportVertex (
 	return m_myShape->SupportVertex (dir);
 }
 
-dgVector dgCollisionCompoundBreakable::dgCollisionConvexIntance::SupportVertexSimd (const dgVector& dir) const
-{
-	return m_myShape->SupportVertexSimd (dir);
-}
 
 
 void dgCollisionCompoundBreakable::dgCollisionConvexIntance::CalcAABB (const dgMatrix &matrix, dgVector& p0, dgVector& p1) const
@@ -116,10 +112,6 @@ void dgCollisionCompoundBreakable::dgCollisionConvexIntance::CalcAABB (const dgM
 	m_myShape->CalcAABB (matrix, p0, p1);
 }
 
-void dgCollisionCompoundBreakable::dgCollisionConvexIntance::CalcAABBSimd (const dgMatrix &matrix, dgVector &p0, dgVector &p1) const
-{
-	m_myShape->CalcAABBSimd (matrix, p0, p1);
-}
 
 void dgCollisionCompoundBreakable::dgCollisionConvexIntance::DebugCollision (const dgMatrix& matrix, OnDebugCollisionMeshCallback callback, void* const userData) const
 {
@@ -129,11 +121,6 @@ void dgCollisionCompoundBreakable::dgCollisionConvexIntance::DebugCollision (con
 dgFloat32 dgCollisionCompoundBreakable::dgCollisionConvexIntance::RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
 {
 	return m_myShape->RayCast (localP0, localP1, contactOut, body, userData);
-}
-
-dgFloat32 dgCollisionCompoundBreakable::dgCollisionConvexIntance::RayCastSimd (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
-{
-	return m_myShape->RayCastSimd (localP0, localP1, contactOut, body, userData);
 }
 
 
@@ -171,10 +158,6 @@ dgInt32 dgCollisionCompoundBreakable::dgCollisionConvexIntance::CalculatePlaneIn
 	return m_myShape->CalculatePlaneIntersection (normal, point, contactsOut);
 }
 
-dgInt32 dgCollisionCompoundBreakable::dgCollisionConvexIntance::CalculatePlaneIntersectionSimd (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const
-{
-	return m_myShape->CalculatePlaneIntersectionSimd (normal, point, contactsOut);
-}
 
 
 void dgCollisionCompoundBreakable::dgCollisionConvexIntance::GetCollisionInfo(dgCollisionInfo* const info) const

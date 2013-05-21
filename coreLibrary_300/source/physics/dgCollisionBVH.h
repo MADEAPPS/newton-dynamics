@@ -65,23 +65,17 @@ class dgCollisionBVH: public dgCollisionMesh, public dgAABBPolygonSoup
 
 	private:
 	static dgFloat32 RayHit (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount);
-	static dgFloat32 RayHitSimd (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount);
 	static dgFloat32 RayHitUser (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount);
-	static dgFloat32 RayHitUserSimd (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount);
 	static dgIntersectStatus GetPolygon (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount);
-	static dgIntersectStatus GetPolygonSimd (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount);
 	static dgIntersectStatus ShowDebugPolygon (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount);
 	static dgIntersectStatus GetTriangleCount (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount);
 	static dgIntersectStatus CollectVertexListIndexList (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount);
 
 	void Serialize(dgSerialize callback, void* const userData) const;
 	virtual dgVector SupportVertex (const dgVector& dir) const;
-	virtual dgVector SupportVertexSimd (const dgVector& dir) const;
 
 	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
-	virtual dgFloat32 RayCastSimd (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
 	virtual void GetCollidingFaces (dgPolygonMeshDesc* const data) const;
-	virtual void GetCollidingFacesSimd (dgPolygonMeshDesc* const data) const;
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
 
 	virtual void GetLocalAABB (const dgVector& p0, const dgVector& p1, dgVector& boxP0, dgVector& boxP1) const;

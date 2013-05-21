@@ -30,9 +30,9 @@
 #include "dgStack.h"
 #include "dgList.h"
 #include "dgMatrix.h"
-#include "dgPolygonSoupBuilder.h"
-#include "dgSimd.h"
 #include "dgAABBPolygonSoup.h"
+#include "dgPolygonSoupBuilder.h"
+
 
 
 #define DG_STACK_DEPTH 63
@@ -599,33 +599,28 @@ class dgAABBTree
 		return count;
 	}
 
-	DG_INLINE dgInt32 RayTestSimd (const dgFastRayTest& ray, const dgVector& minBox, const dgVector& maxBox) const
+	DG_INLINE dgInt32 RayTest (const dgFastRayTest& ray, const dgVector& minBox, const dgVector& maxBox) const
 	{
-//		dgSimd minBox (&vertexArray[m_minIndex].m_x);
-//		dgSimd maxBox (&vertexArray[m_maxIndex].m_x);
-
-		dgSimd paralletTest ((((dgSimd&)ray.m_p0 < (dgSimd&)minBox) | ((dgSimd&)ray.m_p0 > (dgSimd&)maxBox)) & (dgSimd&)ray.m_isParallel);
+#if 1
+		dgVector paralletTest (((ray.m_p0 < minBox) | (ray.m_p0 > maxBox)) & ray.m_isParallel);
 		if (paralletTest.GetSignMask()) {
 			return 0;
 		}
 
-		dgSimd tt0 (((dgSimd&)minBox - (dgSimd&)ray.m_p0) * (dgSimd&)ray.m_dpInv);
-		dgSimd tt1 (((dgSimd&)maxBox - (dgSimd&)ray.m_p0) * (dgSimd&)ray.m_dpInv);
-		dgSimd test (tt0 < tt1);
+		dgVector tt0 ((minBox - ray.m_p0).CompProduct4(ray.m_dpInv));
+		dgVector tt1 ((maxBox - ray.m_p0).CompProduct4(ray.m_dpInv));
+		dgVector test (tt0 < tt1);
 
-		dgSimd t0 (((tt0 & test) | tt1.AndNot(test)).GetMax((dgSimd&)ray.m_minT));
+		dgVector t0 (((tt0 & test) | tt1.AndNot(test)).GetMax(ray.m_minT));
 		t0 = t0.GetMax(t0.ShiftTripleRight());
 		t0 = t0.GetMax(t0.ShiftTripleRight());
 
-		dgSimd t1 (((tt1 & test) | tt0.AndNot(test)).GetMax((dgSimd&)ray.m_maxT));
+		dgVector t1 (((tt1 & test) | tt0.AndNot(test)).GetMax(ray.m_maxT));
 		t1 = t1.GetMin(t1.ShiftTripleRight());
 		t1 = t1.GetMin(t1.ShiftTripleRight());
 		return (t0 < t1).GetInt();
-	}
 
-
-	DG_INLINE dgInt32 RayTest (const dgFastRayTest& ray, const dgVector& minBox, const dgVector& maxBox) const
-	{
+#else
 		dgFloat32 tmin = 0.0f;          
 		dgFloat32 tmax = 1.0f;
 
@@ -652,18 +647,9 @@ class dgAABBTree
 				}
 			}
 		}
-
 		return 0xffffffff;
+#endif
 	}
-
-
-	DG_INLINE dgInt32 BoxIntersectSimd (const dgTriplex* const vertexArray, const dgVector& boxP0, const dgVector& boxP1) const
-	{
-		dgSimd minBox(&vertexArray[m_minIndex].m_x);
-		dgSimd maxBox(&vertexArray[m_maxIndex].m_x);
-		return dgOverlapTestSimd (minBox, maxBox, boxP0, boxP1) - 1;
-	}
-
 
 	DG_INLINE dgInt32 BoxIntersect (const dgTriplex* const vertexArray, const dgVector& boxP0, const dgVector& boxP1) const
 	{
@@ -671,17 +657,6 @@ class dgAABBTree
 		dgVector maxBox (vertexArray[m_maxIndex].m_x, vertexArray[m_maxIndex].m_y, vertexArray[m_maxIndex].m_z, dgFloat32 (0.0f));
 		return dgOverlapTest (minBox, maxBox, boxP0, boxP1) - 1;
 	}
-
-	DG_INLINE dgInt32 BoxIntersectSimd (const dgFastRayTest& ray, const dgTriplex* const vertexArray, const dgVector& boxP0, const dgVector& boxP1) const
-	{
-		dgVector p0 (vertexArray[m_minIndex].m_x, vertexArray[m_minIndex].m_y, vertexArray[m_minIndex].m_z, dgFloat32 (0.0f));
-		dgVector p1 (vertexArray[m_maxIndex].m_x, vertexArray[m_maxIndex].m_y, vertexArray[m_maxIndex].m_z, dgFloat32 (0.0f));
-
-		dgVector minBox (p0 - boxP1);
-		dgVector maxBox (p1 - boxP0);
-		return RayTestSimd (ray, minBox, maxBox);;
-	}
-
 
 	DG_INLINE dgInt32 BoxIntersect (const dgFastRayTest& ray, const dgTriplex* const vertexArray, const dgVector& boxP0, const dgVector& boxP1) const
 	{
@@ -693,96 +668,11 @@ class dgAABBTree
 		return RayTest (ray, minBox, maxBox);;
 	}
 
-
-	DG_INLINE dgInt32 RayTestSimd (const dgFastRayTest& ray, const dgTriplex* const vertexArray) const
-	{
-		dgVector minBox (&vertexArray[m_minIndex].m_x);
-		dgVector maxBox (&vertexArray[m_maxIndex].m_x);
-		return RayTestSimd (ray, minBox, maxBox);
-	}
-
 	DG_INLINE dgInt32 RayTest (const dgFastRayTest& ray, const dgTriplex* const vertexArray) const
 	{
 		dgVector minBox (&vertexArray[m_minIndex].m_x);
 		dgVector maxBox (&vertexArray[m_maxIndex].m_x);
 		return RayTest (ray, minBox, maxBox);
-	}
-
-
-	void ForAllSectorsSimd (const dgInt32* const indexArray, const dgFloat32* const vertexArray, const dgVector& minBox, const dgVector& maxBox, const dgVector& BoxDistanceTravel, dgAABBIntersectCallback callback, void* const context) const
-	{
-dgAssert (0);
-		const dgAABBTree *stackPool[DG_STACK_DEPTH];
-
-		dgInt32 stack = 1;
-		stackPool[0] = this;
-		if ((BoxDistanceTravel % BoxDistanceTravel) < dgFloat32 (1.0e-4f)) {
-			while (stack) {
-				stack --;
-				const dgAABBTree* const me = stackPool[stack];
-				if (me->BoxIntersectSimd ((dgTriplex*) vertexArray, minBox, maxBox) >= 0) {
-
-					if (me->m_back.IsLeaf()) {
-						dgInt32 index = dgInt32 (me->m_back.GetIndex());
-						dgInt32 vCount = me->m_back.GetCount();
-						if ((vCount > 0) && callback(context, vertexArray, sizeof (dgTriplex), &indexArray[index], vCount) == t_StopSearh) {
-							return;
-						}
-
-					} else {
-						dgAssert (stack < DG_STACK_DEPTH);
-						stackPool[stack] = me->m_back.GetNode(this);
-						stack++;
-					}
-
-					if (me->m_front.IsLeaf()) {
-						dgInt32 index = dgInt32 (me->m_front.GetIndex());
-						dgInt32 vCount = me->m_front.GetCount();
-						if ((vCount > 0) && callback(context, vertexArray, sizeof (dgTriplex), &indexArray[index], vCount) == t_StopSearh) {
-							return;
-						}
-					} else {
-						dgAssert (stack < DG_STACK_DEPTH);
-						stackPool[stack] = me->m_front.GetNode(this);
-						stack ++;
-					}
-				}
-			}
-		} else {
-			dgFastRayTest ray (dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)), BoxDistanceTravel);			
-
-			while (stack) {
-				stack --;
-				const dgAABBTree* const me = stackPool[stack];
-				if (me->BoxIntersectSimd (ray, (dgTriplex*) vertexArray, minBox, maxBox)) {
-
-					if (me->m_back.IsLeaf()) {
-						dgInt32 index = dgInt32 (me->m_back.GetIndex());
-						dgInt32 vCount = me->m_back.GetCount();
-						if ((vCount > 0) && callback(context, vertexArray, sizeof (dgTriplex), &indexArray[index], vCount) == t_StopSearh) {
-							return;
-						}
-
-					} else {
-						dgAssert (stack < DG_STACK_DEPTH);
-						stackPool[stack] = me->m_back.GetNode(this);
-						stack++;
-					}
-
-					if (me->m_front.IsLeaf()) {
-						dgInt32 index = dgInt32 (me->m_front.GetIndex());
-						dgInt32 vCount = me->m_front.GetCount();
-						if ((vCount > 0) && callback(context, vertexArray, sizeof (dgTriplex), &indexArray[index], vCount) == t_StopSearh) {
-							return;
-						}
-					} else {
-						dgAssert (stack < DG_STACK_DEPTH);
-						stackPool[stack] = me->m_front.GetNode(this);
-						stack ++;
-					}
-				}
-			}
-		}
 	}
 
 
@@ -863,69 +753,7 @@ dgAssert (0);
 		}
 	}
 
-
-	void ForAllSectorsRayHitSimd (const dgFastRayTest& raySrc, const dgInt32* const indexArray, const dgFloat32* const vertexArray, dgRayIntersectCallback callback, void* const context) const
-	{
-		const dgAABBTree *stackPool[DG_STACK_DEPTH];
-
-		dgFastRayTest ray (raySrc);
-		dgInt32 stack = 1;
-		dgFloat32 maxParam = dgFloat32 (1.0f);
-
-		stackPool[0] = this;
-		while (stack) {
-			stack --;
-
-			const dgAABBTree* const me = stackPool[stack];
-			if (me->RayTestSimd (ray, (dgTriplex*) vertexArray)) {
-				
-				if (me->m_back.IsLeaf()) {
-					dgInt32 vCount = me->m_back.GetCount();
-					if (vCount > 0) {
-						dgInt32 index = dgInt32 (me->m_back.GetIndex());
-
-						dgFloat32 param = callback(context, vertexArray, sizeof (dgTriplex), &indexArray[index], vCount);
-						dgAssert (param >= dgFloat32 (0.0f));
-						if (param < maxParam) {
-							maxParam = param;
-							if (maxParam == dgFloat32 (0.0f)) {
-								break;
-							}
-							ray.Reset (maxParam) ;
-						}
-					}
-
-				} else {
-					dgAssert (stack < DG_STACK_DEPTH);
-					stackPool[stack] = me->m_back.GetNode(this);
-					stack++;
-				}
-
-				if (me->m_front.IsLeaf()) {
-					dgInt32 vCount = me->m_front.GetCount();
-					if (vCount > 0) {
-						dgInt32 index = dgInt32 (me->m_front.GetIndex());
-						dgFloat32 param = callback(context, vertexArray, sizeof (dgTriplex), &indexArray[index], vCount);
-						dgAssert (param >= dgFloat32 (0.0f));
-						if (param < maxParam) {
-							maxParam = param;
-							if (maxParam == dgFloat32 (0.0f)) {
-								break;
-							}
-							ray.Reset (maxParam);
-						}
-					}
-
-
-				} else {
-					dgAssert (stack < DG_STACK_DEPTH);
-					stackPool[stack] = me->m_front.GetNode(this);
-					stack ++;
-				}
-			}
-		}
-	}
-
+	
 	void ForAllSectorsRayHit (const dgFastRayTest& raySrc, const dgInt32* const indexArray, const dgFloat32* const vertexArray, dgRayIntersectCallback callback, void* const context) const
 	{
 		const dgAABBTree *stackPool[DG_STACK_DEPTH];
@@ -1218,15 +1046,6 @@ void dgAABBPolygonSoup::GetNodeAABB(const void* const root, dgVector& p0, dgVect
 }
 
 
-void dgAABBPolygonSoup::ForAllSectorsSimd (const dgVector& minBox, const dgVector& maxBox, const dgVector& boxDistanceTravel, dgAABBIntersectCallback callback, void* const context) const
-{
-	if (m_aabb) {
-		dgAABBTree* const tree = (dgAABBTree*) m_aabb;
-		tree->ForAllSectorsSimd (m_indices, m_localVertex, minBox, maxBox, boxDistanceTravel, callback, context);
-	}
-}
-
-
 void dgAABBPolygonSoup::ForAllSectors (const dgVector& minBox, const dgVector& maxBox, const dgVector& boxDistanceTravel, dgAABBIntersectCallback callback, void* const context) const
 {
 	if (m_aabb) {
@@ -1264,14 +1083,6 @@ void dgAABBPolygonSoup::ForAllSectorsRayHit (const dgFastRayTest& ray, dgRayInte
 	if (m_aabb) {
 		dgAABBTree* const tree = (dgAABBTree*) m_aabb;
 		tree->ForAllSectorsRayHit (ray, m_indices, m_localVertex, callback, context);
-	}
-}
-
-void dgAABBPolygonSoup::ForAllSectorsRayHitSimd (const dgFastRayTest& ray, dgRayIntersectCallback callback, void* const context) const
-{
-	if (m_aabb) {
-		dgAABBTree* const tree = (dgAABBTree*) m_aabb;
-		tree->ForAllSectorsRayHitSimd (ray, m_indices, m_localVertex, callback, context);
 	}
 }
 

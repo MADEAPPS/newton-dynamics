@@ -37,10 +37,8 @@ class dgCollisionCone: public dgCollisionConvex
 	private:
 	void Init (dgFloat32 radius, dgFloat32 height);
 	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
-	virtual dgVector SupportVertexSimd (const dgVector& dir, dgInt32* const vertexIndex) const;
 
 	virtual dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut) const;
-	virtual dgInt32 CalculatePlaneIntersectionSimd (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const;
 
 	virtual void MassProperties ();
 	virtual void DebugCollision  (const dgMatrix& matrix, OnDebugCollisionMeshCallback callback, void* const userData) const;

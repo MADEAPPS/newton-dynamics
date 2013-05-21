@@ -83,10 +83,6 @@ void dgCollisionNull::CalcAABB (const dgMatrix &matrix, dgVector &p0, dgVector &
 	p1.m_w = 0.0f;
 }
 
-void dgCollisionNull::CalcAABBSimd (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const
-{
-	CalcAABB (matrix, p0, p1);
-}
 
 dgVector dgCollisionNull::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
@@ -94,24 +90,12 @@ dgVector dgCollisionNull::SupportVertex (const dgVector& dir, dgInt32* const ver
 	return dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 }
 
-dgVector dgCollisionNull::SupportVertexSimd (const dgVector& dir, dgInt32* const vertexIndex) const
-{
-	dgAssert (0);
-	return dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-}
-
-
 dgFloat32 dgCollisionNull::GetVolume () const
 {
 	return 0.0f;
 }
 
 dgFloat32 dgCollisionNull::RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
-{
-	return dgFloat32 (1.2f);
-}
-
-dgFloat32 dgCollisionNull::RayCastSimd (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
 {
 	return dgFloat32 (1.2f);
 }

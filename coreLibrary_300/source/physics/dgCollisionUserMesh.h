@@ -67,13 +67,10 @@ class dgCollisionUserMesh: public dgCollisionMesh
 	void Serialize(dgSerialize callback, void* const userData) const;
 
 	dgVector SupportVertex (const dgVector& dir) const;
-	dgVector SupportVertexSimd (const dgVector& dir) const;
 
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
 	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
-	virtual dgFloat32 RayCastSimd (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
 	virtual void GetCollidingFaces (dgPolygonMeshDesc* const data) const;
-	virtual void GetCollidingFacesSimd (dgPolygonMeshDesc* const data) const;
 	virtual void DebugCollision (const dgMatrix& matrixPtr, OnDebugCollisionMeshCallback callback, void* const userData) const;
 
 	void* m_userData;

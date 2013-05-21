@@ -120,54 +120,23 @@ class dgBroadPhase::dgNode
 		dgAssert (minBox.m_y <= maxBox.m_y);
 		dgAssert (minBox.m_z <= maxBox.m_z);
 
-		dgVector p0 (minBox.CompProduct3(dgVector (DG_BROADPHASE_AABB_SCALE, DG_BROADPHASE_AABB_SCALE, DG_BROADPHASE_AABB_SCALE, dgFloat32 (0.0f))));
-		dgVector p1 (maxBox.CompProduct3(dgVector (DG_BROADPHASE_AABB_SCALE, DG_BROADPHASE_AABB_SCALE, DG_BROADPHASE_AABB_SCALE, dgFloat32 (0.0f))));
+		dgVector p0 (minBox.CompProduct4(dgVector (DG_BROADPHASE_AABB_SCALE)));
+		dgVector p1 (maxBox.CompProduct4(dgVector (DG_BROADPHASE_AABB_SCALE)));
+		p1 +=  dgVector (dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f));
 
-		p0.m_x = dgFloor (p0.m_x) * DG_BROADPHASE_AABB_INV_SCALE; 
-		p0.m_y = dgFloor (p0.m_y) * DG_BROADPHASE_AABB_INV_SCALE;  
-		p0.m_z = dgFloor (p0.m_z) * DG_BROADPHASE_AABB_INV_SCALE;  
+		p0 = p0.Floor().CompProduct4(dgVector (DG_BROADPHASE_AABB_INV_SCALE));
+		p1 = p1.Floor().CompProduct4(dgVector (DG_BROADPHASE_AABB_INV_SCALE));
 
-		p1.m_x = dgFloor (p1.m_x + dgFloat32 (1.0f)) * DG_BROADPHASE_AABB_INV_SCALE;  
-		p1.m_y = dgFloor (p1.m_y + dgFloat32 (1.0f)) * DG_BROADPHASE_AABB_INV_SCALE;  
-		p1.m_z = dgFloor (p1.m_z + dgFloat32 (1.0f)) * DG_BROADPHASE_AABB_INV_SCALE;  
+		dgAssert (p0.m_w == dgFloat32 (0.0f));
+		dgAssert (p1.m_w == dgFloat32 (0.0f));
 
 		m_minBox = p0;
 		m_maxBox = p1;
-		m_minBox.m_w = dgFloat32 (0.0f);
-		m_maxBox.m_w = dgFloat32 (0.0f);
 
 		dgVector side0 (p1 - p0);
 		dgVector side1 (side0.m_y, side0.m_z, side0.m_x, dgFloat32 (0.0f));
-		m_surfaceArea = side0 % side1;
+		m_surfaceArea = side0.DotProduct4(side1);
 	}
-
-	void SetAABBSimd (const dgVector& minBox, const dgVector& maxBox)
-	{
-		dgAssert (minBox.m_x <= maxBox.m_x);
-		dgAssert (minBox.m_y <= maxBox.m_y);
-		dgAssert (minBox.m_z <= maxBox.m_z);
-		dgAssert (minBox.m_w == dgFloat32 (0.0f));
-		dgAssert (maxBox.m_w == dgFloat32 (0.0f));
-
-		dgSimd scale (DG_BROADPHASE_AABB_SCALE);
-		dgSimd invScale (DG_BROADPHASE_AABB_INV_SCALE);
-
-		dgSimd p0 ((dgSimd&)minBox * scale);
-		dgSimd p1 ((dgSimd&)maxBox * scale);
-
-		p0 = p0.Floor() * invScale; 
-		p1 = ((p1 + dgSimd::m_one).Floor() * invScale) & dgSimd::m_triplexMask; 
-
-		(dgSimd&) m_minBox = p0;
-		(dgSimd&) m_maxBox = p1;
-		//m_minBox.m_w = dgFloat32 (0.0f);
-		//m_maxBox.m_w = dgFloat32 (0.0f);
-
-		dgSimd size (p1 - p0);
-		size = size.DotProduct(size.ShiftTripleLeft());
-		size.StoreScalar(&m_surfaceArea);
-	}
-
 
 
 	dgVector m_minBox;
@@ -438,17 +407,6 @@ DG_INLINE dgFloat32 dgBroadPhase::CalculateSurfaceArea (const dgNode* const node
 	return side0 % side1;
 }
 
-DG_INLINE dgFloat32 dgBroadPhase::CalculateSurfaceAreaSimd (const dgNode* const node0, const dgNode* const node1, dgSimd& minBox, dgSimd& maxBox) const
-{
-	minBox = ((dgSimd&)node0->m_minBox).GetMin((dgSimd&)node1->m_minBox);
-	maxBox = ((dgSimd&)node0->m_maxBox).GetMax((dgSimd&)node1->m_maxBox);
-
-	dgSimd size (maxBox - minBox);
-	size = size.DotProduct(size.ShiftTripleLeft());
-	dgFloat32 dot;
-	size.StoreScalar(&dot);
-	return dot;
-}
 
 
 dgBroadPhase::dgNode* dgBroadPhase::InsertNode (dgNode* const node)
@@ -566,142 +524,6 @@ void dgBroadPhase::Remove (dgBody* const body)
 	}
 }
 
-
-void dgBroadPhase::ImproveNodeFitnessSimd (dgNode* const node)
-{
-	dgAssert (node->m_left);
-	dgAssert (node->m_right);
-
-	if (node->m_parent)	{
-		if (node->m_parent->m_left == node) {
-			dgFloat32 cost0 = node->m_surfaceArea;
-
-			dgSimd cost1P0;
-			dgSimd cost1P1;		
-			dgFloat32 cost1 = CalculateSurfaceAreaSimd (node->m_right, node->m_parent->m_right, cost1P0, cost1P1);
-
-			dgSimd cost2P0;
-			dgSimd cost2P1;		
-			dgFloat32 cost2 = CalculateSurfaceAreaSimd (node->m_left, node->m_parent->m_right, cost2P0, cost2P1);
-
-			if ((cost1 <= cost0) && (cost1 <= cost2)) {
-				dgNode* const parent = node->m_parent;
-				node->m_minBox = parent->m_minBox;
-				node->m_maxBox = parent->m_maxBox;
-				node->m_surfaceArea = parent->m_surfaceArea; 
-				if (parent->m_parent) {
-					if (parent->m_parent->m_left == parent) {
-						parent->m_parent->m_left = node;
-					} else {
-						dgAssert (parent->m_parent->m_right == parent);
-						parent->m_parent->m_right = node;
-					}
-				} else {
-					m_rootNode = node;
-				}
-				node->m_parent = parent->m_parent;
-				parent->m_parent = node;
-				node->m_right->m_parent = parent;
-				parent->m_left = node->m_right;
-				node->m_right = parent;
-				(dgSimd&)parent->m_minBox = cost1P0;
-				(dgSimd&)parent->m_maxBox = cost1P1;		
-				parent->m_surfaceArea = cost1;
-
-
-			} else if ((cost2 <= cost0) && (cost2 <= cost1)) {
-				dgNode* const parent = node->m_parent;
-				node->m_minBox = parent->m_minBox;
-				node->m_maxBox = parent->m_maxBox;
-				node->m_surfaceArea = parent->m_surfaceArea; 
-
-				if (parent->m_parent) {
-					if (parent->m_parent->m_left == parent) {
-						parent->m_parent->m_left = node;
-					} else {
-						dgAssert (parent->m_parent->m_right == parent);
-						parent->m_parent->m_right = node;
-					}
-				} else {
-					m_rootNode = node;
-				}
-				node->m_parent = parent->m_parent;
-				parent->m_parent = node;
-				node->m_left->m_parent = parent;
-				parent->m_left = node->m_left;
-				node->m_left = parent;
-
-				(dgSimd&)parent->m_minBox = cost2P0;
-				(dgSimd&)parent->m_maxBox = cost2P1;		
-				parent->m_surfaceArea = cost2;
-			}
-		} else {
-			dgFloat32 cost0 = node->m_surfaceArea;
-
-			dgSimd cost1P0;
-			dgSimd cost1P1;		
-			dgFloat32 cost1 = CalculateSurfaceAreaSimd (node->m_left, node->m_parent->m_left, cost1P0, cost1P1);
-
-			dgSimd cost2P0;
-			dgSimd cost2P1;		
-			dgFloat32 cost2 = CalculateSurfaceAreaSimd (node->m_right, node->m_parent->m_left, cost2P0, cost2P1);
-
-
-			if ((cost1 <= cost0) && (cost1 <= cost2)) {
-
-				dgNode* const parent = node->m_parent;
-				node->m_minBox = parent->m_minBox;
-				node->m_maxBox = parent->m_maxBox;
-				node->m_surfaceArea = parent->m_surfaceArea; 
-				if (parent->m_parent) {
-					if (parent->m_parent->m_left == parent) {
-						parent->m_parent->m_left = node;
-					} else {
-						dgAssert (parent->m_parent->m_right == parent);
-						parent->m_parent->m_right = node;
-					}
-				} else {
-					m_rootNode = node;
-				}
-				node->m_parent = parent->m_parent;
-				parent->m_parent = node;
-				node->m_left->m_parent = parent;
-				parent->m_right = node->m_left;
-				node->m_left = parent;
-
-				parent->m_minBox = cost1P0;
-				parent->m_maxBox = cost1P1;		
-				parent->m_surfaceArea = cost1;
-
-			} else if ((cost2 <= cost0) && (cost2 <= cost1)) {
-				dgNode* const parent = node->m_parent;
-				node->m_minBox = parent->m_minBox;
-				node->m_maxBox = parent->m_maxBox;
-				node->m_surfaceArea = parent->m_surfaceArea; 
-				if (parent->m_parent) {
-					if (parent->m_parent->m_left == parent) {
-						parent->m_parent->m_left = node;
-					} else {
-						dgAssert (parent->m_parent->m_right == parent);
-						parent->m_parent->m_right = node;
-					}
-				} else {
-					m_rootNode = node;
-				}
-				node->m_parent = parent->m_parent;
-				parent->m_parent = node;
-				node->m_right->m_parent = parent;
-				parent->m_right = node->m_right;
-				node->m_right = parent;
-
-				parent->m_minBox = cost2P0;
-				parent->m_maxBox = cost2P1;		
-				parent->m_surfaceArea = cost2;
-			}
-		}
-	}
-	dgAssert (!m_rootNode->m_parent);
-}
 
 
 void dgBroadPhase::ImproveNodeFitness (dgNode* const node)
@@ -843,21 +665,14 @@ void dgBroadPhase::ImproveNodeFitness (dgNode* const node)
 
 void dgBroadPhase::ImproveFitness()
 {
-	dgCpuClass cpu = m_world->m_cpu;
-
 	dgFloat64 cost0 = m_fitness.TotalCost ();
 	dgFloat64 cost1 = cost0;
 	do {
 		cost0 = cost1;
-		if (cpu == dgSimdPresent) {
-			for (dgFitnessList::dgListNode* node = m_fitness.GetFirst(); node; node = node->GetNext()) {
-				ImproveNodeFitnessSimd (node->GetInfo());
-			}
-		} else {
-			for (dgFitnessList::dgListNode* node = m_fitness.GetFirst(); node; node = node->GetNext()) {
-				ImproveNodeFitness (node->GetInfo());
-			}
+		for (dgFitnessList::dgListNode* node = m_fitness.GetFirst(); node; node = node->GetNext()) {
+			ImproveNodeFitness (node->GetInfo());
 		}
+	
 		cost1 = m_fitness.TotalCost ();
 	} while (cost1 < (dgFloat32 (0.95f)) * cost0);
 }
@@ -928,7 +743,6 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, dgInt32 th
 void dgBroadPhase::ApplyForceAndtorque (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID)
 {
 	dgFloat32 timestep = descriptor->m_timestep; 
-	bool simd = (m_world->m_cpu == dgSimdPresent);
 
 	dgBodyMasterList::dgListNode* node = NULL;
 	{
@@ -950,11 +764,7 @@ void dgBroadPhase::ApplyForceAndtorque (dgBroadphaseSyncDescriptor* const descri
 				dymamicBody->m_sleeping = false;
 				dymamicBody->m_equilibrium = false;
 				// update collision matrix only
-				if (simd) {
-					dymamicBody->UpdateCollisionMatrixSimd (timestep, threadID);
-				} else {
-					dymamicBody->UpdateCollisionMatrix (timestep, threadID);
-				}
+				dymamicBody->UpdateCollisionMatrix (timestep, threadID);
 			}
 			if (dymamicBody->GetInvMass().m_w == dgFloat32(0.0f) || body->m_collision->IsType(dgCollision::dgCollisionMesh_RTTI)) {
 				dymamicBody->m_sleeping = true;	
@@ -1043,31 +853,26 @@ void dgBroadPhase::CalculatePairContacts (dgBroadphaseSyncDescriptor* const desc
 	dgCollidingPairCollector::dgPair* const pairs = pairCollector->m_pairs;
 	const dgInt32 count = pairCollector->m_count;
 
-	if (m_world->m_cpu == dgSimdPresent) {
-		dgAssert (0);
-	} else {
+	for (dgInt32 i = dgAtomicExchangeAndAdd(&descriptor->m_pairsAtomicCounter, 1); i < count; i = dgAtomicExchangeAndAdd(&descriptor->m_pairsAtomicCounter, 1)) {
+		dgCollidingPairCollector::dgPair* const pair = &pairs[i];
+		pair->m_cacheIsValid = false;
+		pair->m_contactBuffer = contacts;
+		m_world->CalculateContacts (pair, timestep, false, threadID);
 
-		for (dgInt32 i = dgAtomicExchangeAndAdd(&descriptor->m_pairsAtomicCounter, 1); i < count; i = dgAtomicExchangeAndAdd(&descriptor->m_pairsAtomicCounter, 1)) {
-			dgCollidingPairCollector::dgPair* const pair = &pairs[i];
-			pair->m_cacheIsValid = false;
-			pair->m_contactBuffer = contacts;
-			m_world->CalculateContacts (pair, timestep, false, threadID);
-
-			if (pair->m_contactCount) {
-				dgAssert (pair->m_contactCount <= (DG_CONSTRAINT_MAX_ROWS / 3));
-				if (pair->m_isDeformable) {
-					m_world->ProcessDeformableContacts (pair, timestep, threadID);
-				} else {
-					m_world->ProcessContacts (pair, timestep, threadID);
-					KinematicBodyActivation (pair->m_contact);
-				}
+		if (pair->m_contactCount) {
+			dgAssert (pair->m_contactCount <= (DG_CONSTRAINT_MAX_ROWS / 3));
+			if (pair->m_isDeformable) {
+				m_world->ProcessDeformableContacts (pair, timestep, threadID);
 			} else {
-				if (pair->m_cacheIsValid) {
-					m_world->ProcessCachedContacts (pair->m_contact, timestep, threadID);
-					KinematicBodyActivation (pair->m_contact);
-				} else {
-					pair->m_contact->m_maxDOF = 0;
-				}
+				m_world->ProcessContacts (pair, timestep, threadID);
+				KinematicBodyActivation (pair->m_contact);
+			}
+		} else {
+			if (pair->m_cacheIsValid) {
+				m_world->ProcessCachedContacts (pair->m_contact, timestep, threadID);
+				KinematicBodyActivation (pair->m_contact);
+			} else {
+				pair->m_contact->m_maxDOF = 0;
 			}
 		}
 	}
@@ -1076,37 +881,6 @@ void dgBroadPhase::CalculatePairContacts (dgBroadphaseSyncDescriptor* const desc
 
 
 
-void dgBroadPhase::UpdateBodyBroadphaseSimd(dgBody* const body, dgInt32 threadIndex)
-{
-	if (m_rootNode) {
-
-		// if the body is move inside the world, then active it
-		// update bodies only if they are in the world
-		dgNode* const node = body->m_collisionCell;
-		dgAssert (!node->m_left);
-		dgAssert (!node->m_right);
-
-		if (!dgBoxInclusionTestSimd (body->m_minAABB, body->m_maxAABB, node->m_minBox, node->m_maxBox)) {
-			node->SetAABBSimd(body->m_minAABB, body->m_maxAABB);
-			for (dgNode* parent = node->m_parent; parent; parent = parent->m_parent) {
-				//dgVector minBox;
-				//dgVector maxBox;
-				dgSimd minBox;
-				dgSimd maxBox;		
-
-				dgFloat32 area = CalculateSurfaceAreaSimd (parent->m_left, parent->m_right, minBox, maxBox);
-				if (dgBoxInclusionTestSimd(minBox, maxBox, parent->m_minBox, parent->m_maxBox)) {
-					break;
-				}
-
-				dgThreadHiveScopeLock lock (m_world, &m_criticalSectionLock);
-				(dgSimd&)parent->m_minBox = minBox;
-				(dgSimd&)parent->m_maxBox = maxBox;
-				parent->m_surfaceArea = area;
-			}
-		}
-	}
-}
 
 void dgBroadPhase::UpdateBodyBroadphase(dgBody* const body, dgInt32 threadIndex)
 {
@@ -1214,12 +988,7 @@ void dgBroadPhase::UpdateSoftBodyForcesKernel (void* const context, void* const 
 
 bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* const body1) const
 {
-//	dgInt32 test1 = (-dgOverlapTestSimd (body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) >> 4) &
-//					!((body0->IsRTTIType (dgBody::m_kinematicBodyRTTI) && body1->m_invMass.m_w) || (body1->IsRTTIType (dgBody::m_kinematicBodyRTTI) && body0->m_invMass.m_w)) &
-//					!(body1->m_collision->IsType (dgCollision::dgCollisionNull_RTTI) | body0->m_collision->IsType (dgCollision::dgCollisionNull_RTTI)) &
-//					!(body0->GetSleepState() & body1->GetSleepState()) & 1;
-
-	return ( (-dgOverlapTestSimd (body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB)) >> 4) &
+	return ( (-dgOverlapTest (body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB)) >> 4) &
 		     (!body0->IsRTTIType (dgBody::m_kinematicBodyRTTI) || body1->m_invMass.m_w) & 
 			 (!body1->IsRTTIType (dgBody::m_kinematicBodyRTTI) || body0->m_invMass.m_w) &
 			 !(body1->m_collision->IsType (dgCollision::dgCollisionNull_RTTI) | body0->m_collision->IsType (dgCollision::dgCollisionNull_RTTI)) &
@@ -1235,39 +1004,36 @@ void dgBroadPhase::SubmitPairsStatic (dgNode* const bodyNode, dgNode* const node
 	dgBody* const body0 = bodyNode->m_body;
 	dgAssert (!body0->m_collision->IsType (dgCollision::dgCollisionNull_RTTI));
 
-	if (m_world->m_cpu == dgSimdPresent) {
-		dgAssert (0);
-	} else {
-		while (stack) {
-			stack --;
-			dgNode* const rootNode = pool[stack];
-			if (dgOverlapTest (rootNode->m_minBox, rootNode->m_maxBox, body0->m_minAABB, body0->m_maxAABB)) {
-				if (!rootNode->m_left) {
-					dgAssert (!rootNode->m_right);
-					dgBody* const body1 = rootNode->m_body;
-//					if (dgOverlapTest(body1->m_minAABB, body1->m_maxAABB, body0->m_minAABB, body0->m_maxAABB)) {
-//						if (!body1->m_collision->IsType (dgCollision::dgCollisionNull_RTTI)) {
-//							if (!(body0->GetSleepState() & body1->GetSleepState())) { 
-//								AddPair (body0, body1, threadID);
-//							}
+	while (stack) {
+		stack --;
+		dgNode* const rootNode = pool[stack];
+		if (dgOverlapTest (rootNode->m_minBox, rootNode->m_maxBox, body0->m_minAABB, body0->m_maxAABB)) {
+			if (!rootNode->m_left) {
+				dgAssert (!rootNode->m_right);
+				dgBody* const body1 = rootNode->m_body;
+//				if (dgOverlapTest(body1->m_minAABB, body1->m_maxAABB, body0->m_minAABB, body0->m_maxAABB)) {
+//					if (!body1->m_collision->IsType (dgCollision::dgCollisionNull_RTTI)) {
+//						if (!(body0->GetSleepState() & body1->GetSleepState())) { 
+//							AddPair (body0, body1, threadID);
 //						}
 //					}
-					if (TestOverlaping (body0, body1)) {
-						AddPair (body0, body1, threadID);
-					}
-
-				} else {
-					pool[stack] = rootNode->m_left;
-					stack ++;
-					dgAssert (stack < dgInt32 (sizeof (pool) / sizeof (pool[0])));
-
-					pool[stack] = rootNode->m_right;
-					stack ++;
-					dgAssert (stack < dgInt32 (sizeof (pool) / sizeof (pool[0])));
+//				}
+				if (TestOverlaping (body0, body1)) {
+					AddPair (body0, body1, threadID);
 				}
+
+			} else {
+				pool[stack] = rootNode->m_left;
+				stack ++;
+				dgAssert (stack < dgInt32 (sizeof (pool) / sizeof (pool[0])));
+
+				pool[stack] = rootNode->m_right;
+				stack ++;
+				dgAssert (stack < dgInt32 (sizeof (pool) / sizeof (pool[0])));
 			}
 		}
 	}
+
 }
 
 
@@ -1314,7 +1080,6 @@ void dgBroadPhase::FindCollidingPairsStatic (dgBroadphaseSyncDescriptor* const d
 void dgBroadPhase::FindCollidingPairsDynamics (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID)
 {
 	dgNode* pool[2 * DG_BROADPHASE_MAX_STACK_DEPTH];		
-
 	dgInt32 index;
 	while ((index = dgAtomicExchangeAndAdd(&descriptor->m_pairsCount, -1)) > 0) {
 		index --;
@@ -1322,7 +1087,9 @@ void dgBroadPhase::FindCollidingPairsDynamics (dgBroadphaseSyncDescriptor* const
 		pool[1] = descriptor->m_pairs[index * 2 + 1];
 
 		dgInt32 stack = 2;
-		if (m_world->m_cpu != dgNoSimdPresent) {
+		if (0) {
+			dgAssert (0);
+/*
 			while (stack) {
 				stack -=2;
 				dgNode* const left = pool[stack];
@@ -1407,7 +1174,7 @@ void dgBroadPhase::FindCollidingPairsDynamics (dgBroadphaseSyncDescriptor* const
 					}
 				}
 			}
-
+*/
 		} else {
 			while (stack) {
 				stack -=2;
@@ -1437,21 +1204,7 @@ void dgBroadPhase::FindCollidingPairsDynamics (dgBroadphaseSyncDescriptor* const
 					if (left->m_body && right->m_body) {
 						dgBody* const body0 = left->m_body;
 						dgBody* const body1 = right->m_body;
-//						if (dgOverlapTest(body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB)) {
-//							if (!body1->m_collision->IsType (dgCollision::dgCollisionNull_RTTI)) {
-//								if (!body0->m_collision->IsType (dgCollision::dgCollisionNull_RTTI)) {
-//									if (!(body0->GetSleepState() & body1->GetSleepState())) { 
-//										AddPair (body0, body1, threadID);
-//									}
-//								}
-//							}
-//						}
-//						dgInt32 test = (-dgOverlapTest(body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) >> 4) &
-//										!(body1->m_collision->IsType (dgCollision::dgCollisionNull_RTTI) | body0->m_collision->IsType (dgCollision::dgCollisionNull_RTTI)) &
-//										!(body0->GetSleepState() & body1->GetSleepState());
-//						if (test & 1) {
-//							AddPair (body0, body1, threadID);
-//						}
+
 						if (TestOverlaping (body0, body1)) {
 							AddPair (body0, body1, threadID);
 						}
@@ -1521,10 +1274,6 @@ void dgBroadPhase::FindCollidingPairsDynamics (dgBroadphaseSyncDescriptor* const
 	}
 }
 
-
-
-
-
 void dgBroadPhase::UpdateContactsBroadPhaseEnd ()
 {
 	// delete all non used contacts
@@ -1567,103 +1316,62 @@ void dgBroadPhase::RayCast (const dgVector& l0, const dgVector& l1, OnRayCastAct
 			dgFloat32 maxParam = dgFloat32 (1.2f);
 			const dgBody* const sentinel = m_world->GetSentinelBody();
 
-			if (m_world->m_cpu == dgSimdPresent) {
-				dgLineBox line;	
-
-				line.m_l0 = l0;
-				line.m_l1 = l1;
-				line.m_boxL0 = dgVector (((dgSimd&)l0).GetMin((dgSimd&)l1));
-				line.m_boxL1 = dgVector (((dgSimd&)l0).GetMax((dgSimd&)l1));
-
-				while (stack) {
-					stack --;
-					const dgNode* const node = stackPool[stack];
-
-					if (ray.BoxTestSimd(node->m_minBox, node->m_maxBox)) {
-
-						//if (!node->m_left) {
-						if (node->m_body) {
-							dgAssert (!node->m_left);
-							dgAssert (!node->m_right);
-							if (node->m_body != sentinel) {
-								dgFloat32 param = node->m_body->RayCastSimd(line, filter, prefilter, userData, maxParam);
-								if (param < maxParam) {
-									maxParam = param;
-									ray.Reset (maxParam);
-								}
-							}
-						} else {
-							dgAssert (node->m_left);
-							dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNode*)));
-							stackPool[stack] = node->m_left;
-							stack++;
-
-							dgAssert (node->m_right);
-							dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNode*)));
-							stackPool[stack] = node->m_right;
-							stack++;
-						}
-					}
-				}
-
+			dgLineBox line;	
+			line.m_l0 = l0;
+			line.m_l1 = l1;
+			if (line.m_l0.m_x <= line.m_l1.m_x) {
+				line.m_boxL0.m_x = line.m_l0.m_x;
+				line.m_boxL1.m_x = line.m_l1.m_x;
 			} else {
-				dgLineBox line;	
+				line.m_boxL0.m_x = line.m_l1.m_x;
+				line.m_boxL1.m_x = line.m_l0.m_x;
+			}
 
-				line.m_l0 = l0;
-				line.m_l1 = l1;
-				if (line.m_l0.m_x <= line.m_l1.m_x) {
-					line.m_boxL0.m_x = line.m_l0.m_x;
-					line.m_boxL1.m_x = line.m_l1.m_x;
-				} else {
-					line.m_boxL0.m_x = line.m_l1.m_x;
-					line.m_boxL1.m_x = line.m_l0.m_x;
-				}
+			if (line.m_l0.m_y <= line.m_l1.m_y) {
+				line.m_boxL0.m_y = line.m_l0.m_y;
+				line.m_boxL1.m_y = line.m_l1.m_y;
+			} else {
+				line.m_boxL0.m_y = line.m_l1.m_y;
+				line.m_boxL1.m_y = line.m_l0.m_y;
+			}
 
-				if (line.m_l0.m_y <= line.m_l1.m_y) {
-					line.m_boxL0.m_y = line.m_l0.m_y;
-					line.m_boxL1.m_y = line.m_l1.m_y;
-				} else {
-					line.m_boxL0.m_y = line.m_l1.m_y;
-					line.m_boxL1.m_y = line.m_l0.m_y;
-				}
+			if (line.m_l0.m_z <= line.m_l1.m_z) {
+				line.m_boxL0.m_z = line.m_l0.m_z;
+				line.m_boxL1.m_z = line.m_l1.m_z;
+			} else {
+				line.m_boxL0.m_z = line.m_l1.m_z;
+				line.m_boxL1.m_z = line.m_l0.m_z;
+			}
 
-				if (line.m_l0.m_z <= line.m_l1.m_z) {
-					line.m_boxL0.m_z = line.m_l0.m_z;
-					line.m_boxL1.m_z = line.m_l1.m_z;
-				} else {
-					line.m_boxL0.m_z = line.m_l1.m_z;
-					line.m_boxL1.m_z = line.m_l0.m_z;
-				}
+			while (stack) {
 
-				while (stack) {
+				stack --;
+				const dgNode* const node = stackPool[stack];
 
-					stack --;
-					const dgNode* const node = stackPool[stack];
-
-					if (ray.BoxTest (node->m_minBox, node->m_maxBox)) {
-						if (node->m_body) {
-							dgAssert (!node->m_left);
-							dgAssert (!node->m_right);
-							if (node->m_body != sentinel) {
-								dgFloat32 param = node->m_body->RayCast (line, filter, prefilter, userData, maxParam);
-								if (param < maxParam) {
-									maxParam = param;
-									ray.Reset (maxParam);
-								}
+				if (ray.BoxTest (node->m_minBox, node->m_maxBox)) {
+					if (node->m_body) {
+						dgAssert (!node->m_left);
+						dgAssert (!node->m_right);
+						if (node->m_body != sentinel) {
+							dgFloat32 param = node->m_body->RayCast (line, filter, prefilter, userData, maxParam);
+							if (param < maxParam) {
+								maxParam = param;
+								ray.Reset (maxParam);
 							}
-						} else {
-							dgAssert (node->m_left);
-							dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNode*)));
-							stackPool[stack] = node->m_left;
-							stack++;
-
-							dgAssert (node->m_right);
-							dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNode*)));
-							stackPool[stack] = node->m_right;
-							stack++;
 						}
+					} else {
+						dgAssert (node->m_left);
+						dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNode*)));
+						stackPool[stack] = node->m_left;
+						stack++;
+
+						dgAssert (node->m_right);
+						dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNode*)));
+						stackPool[stack] = node->m_right;
+						stack++;
 					}
 				}
+
 			}
 		}
 	}
@@ -1686,7 +1394,6 @@ dgInt32 dgBroadPhase::ConvexCast (dgCollisionInstance* const shape, const dgMatr
 
 	stackPool[0] = m_rootNode;
 
-	dgInt32 cpu = m_world->m_cpu;
 	const dgBody* const sentinel = m_world->GetSentinelBody();
 
 	dgVector velocA(target - matrix.m_posit);
@@ -1712,12 +1419,7 @@ dgInt32 dgBroadPhase::ConvexCast (dgCollisionInstance* const shape, const dgMatr
 				if (node->m_body != sentinel) {
 					dgBody* const body = node->m_body;
 					if (!PREFILTER_RAYCAST (prefilter, body, shape, userData)) {
-						dgInt32 count;
-						if (cpu == dgSimdPresent) {
-							count = m_world->CollideContinueSimd(shape, matrix, velocA, velocB, body->m_collision, body->m_matrix, velocB, velocB, time, points, normals, penetration, attributeA, attributeB, DG_CONVEX_CAST_POOLSIZE, threadIndex);
-						} else {
-							count = m_world->CollideContinue(shape, matrix, velocA, velocB, body->m_collision, body->m_matrix, velocB, velocB, time, points, normals, penetration, attributeA, attributeB, DG_CONVEX_CAST_POOLSIZE, threadIndex);
-						}
+						dgInt32 count = m_world->CollideContinue(shape, matrix, velocA, velocB, body->m_collision, body->m_matrix, velocB, velocB, time, points, normals, penetration, attributeA, attributeB, DG_CONVEX_CAST_POOLSIZE, threadIndex);
 
 						if (count) {
 							if (time < maxParam) {

@@ -80,13 +80,6 @@ dgInt32 dgCollisionMesh::CalculatePlaneIntersection (const dgVector& normal, con
 	return 0;
 }
 
-dgInt32 dgCollisionMesh::CalculatePlaneIntersectionSimd (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const
-{
-	dgAssert (0);
-	return 0;
-}
-
-
 void dgCollisionMesh::SetCollisionCallback (dgCollisionMeshCollisionCallback debugCallback)
 {
 	m_debugCallback = debugCallback;
@@ -155,13 +148,6 @@ dgVector dgCollisionMesh::SupportVertex (const dgVector& dir, dgInt32* const ver
 	return dgVector (0, 0, 0, 0);
 }
 
-dgVector dgCollisionMesh::SupportVertexSimd (const dgVector& dir, dgInt32* const vertexIndex) const
-{
-	dgAssert (0);
-	return dgVector (0, 0, 0, 0);
-}
-
-
 
 void dgCollisionMesh::CalcAABB(const dgMatrix &matrix, dgVector &p0, dgVector &p1) const
 {
@@ -194,12 +180,6 @@ void dgCollisionMesh::CalcAABB(const dgMatrix &matrix, dgVector &p0, dgVector &p
 	dgAssert ((err0 % err0) < err);
 	dgAssert ((err1 % err1) < err);
 #endif
-}
-
-
-void dgCollisionMesh::CalcAABBSimd(const dgMatrix &matrix,	dgVector &p0, dgVector &p1) const
-{
-	CalcAABB(matrix, p0, p1);
 }
 
 

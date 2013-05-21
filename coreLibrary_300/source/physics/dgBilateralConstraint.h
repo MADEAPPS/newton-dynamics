@@ -49,9 +49,7 @@ class dgBilateralConstraint: public dgConstraint
 
 
 	virtual void JointAccelerations(dgJointAccelerationDecriptor* const params); 
-	virtual void JointAccelerationsSimd(dgJointAccelerationDecriptor* const params);
 	virtual void JointVelocityCorrection(dgJointAccelerationDecriptor* const params); 
-
 
 	void SetMotorAcceleration (dgInt32 index, dgFloat32 accelration, dgContraintDescritor& desc);
 	void SetJacobianDerivative (dgInt32 index, dgContraintDescritor& desc, const dgFloat32* jacobianA, const dgFloat32* jacobianB, dgFloat32* const jointForce);

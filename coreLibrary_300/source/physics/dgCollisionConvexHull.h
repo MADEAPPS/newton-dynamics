@@ -48,7 +48,6 @@ class dgCollisionConvexHull: public dgCollisionConvex
 	bool CheckConvex (dgPolyhedra& polyhedra, const dgBigVector* hullVertexArray) const;
 
 	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
-	virtual dgVector SupportVertexSimd (const dgVector& dir, dgInt32* const vertexIndex) const;
 
 	virtual dgInt32 CalculateSignature () const;
 	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1);
@@ -57,7 +56,6 @@ class dgCollisionConvexHull: public dgCollisionConvex
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
 
 	virtual dgFloat32 RayCast (const dgVector& localQ0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
-	virtual dgFloat32 RayCastSimd (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
 
 	dgInt32 m_faceCount;
 	dgInt32 m_supportTreeCount;

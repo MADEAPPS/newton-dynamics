@@ -189,11 +189,7 @@ void dgBody::SetMatrix(const dgMatrix& matrix)
 	SetMatrixOriginAndRotation(matrix);
 
 	if (!m_inCallback) {
-		if (m_world->m_cpu == dgSimdPresent) {
-			UpdateCollisionMatrixSimd (dgFloat32 (0.0f), 0);
-		} else {
-			UpdateCollisionMatrix (dgFloat32 (0.0f), 0);
-		}
+		UpdateCollisionMatrix (dgFloat32 (0.0f), 0);
 	}
 }
 
@@ -208,35 +204,6 @@ void dgBody::UpdateWorlCollisionMatrix() const
 	m_collision->SetGlobalMatrix (m_collision->GetLocalMatrix() * m_matrix);
 }
 
-
-void dgBody::UpdateCollisionMatrixSimd (dgFloat32 timestep, dgInt32 threadIndex)
-{
-	dgVector oldP0 (m_minAABB);
-	dgVector oldP1 (m_maxAABB);
-	
-	m_collision->SetGlobalMatrix (m_collision->GetLocalMatrix().MultiplySimd (m_matrix));
-	m_collision->CalcAABBSimd(m_collision->GetGlobalMatrix(), m_minAABB, m_maxAABB);
-
-	if (m_continueCollisionMode) {
-		dgAssert (0);
-		dgVector predictiveVeloc (PredictLinearVelocity(timestep));
-		dgVector predictiveOmega (PredictAngularVelocity(timestep));
-		dgMovingAABB (m_minAABB, m_maxAABB, predictiveVeloc, predictiveOmega, timestep, m_collision->GetBoxMaxRadius(), m_collision->GetBoxMinRadius());
-	}
-
-	if (m_collisionCell) {
-		dgAssert (m_world);
-
-		if (!m_sleeping) {
-			if ((dgAbsf (oldP0.m_x - m_minAABB.m_x) > DG_AABB_ERROR) || (dgAbsf (oldP0.m_y - m_minAABB.m_y) > DG_AABB_ERROR) ||
-				(dgAbsf (oldP0.m_z - m_minAABB.m_z) > DG_AABB_ERROR) || (dgAbsf (oldP1.m_x - m_maxAABB.m_x) > DG_AABB_ERROR) || 
-				(dgAbsf (oldP1.m_y - m_maxAABB.m_y) > DG_AABB_ERROR) || (dgAbsf (oldP1.m_z - m_maxAABB.m_z) > DG_AABB_ERROR)) {
-					m_world->GetBroadPhase()->UpdateBodyBroadphaseSimd (this, threadIndex);
-			}
-		}
-	}
-
-}
 
 
 void dgBody::UpdateCollisionMatrix (dgFloat32 timestep, dgInt32 threadIndex)
@@ -266,50 +233,6 @@ void dgBody::UpdateCollisionMatrix (dgFloat32 timestep, dgInt32 threadIndex)
 	}
 }
 
-
-dgFloat32 dgBody::RayCastSimd (const dgLineBox& line, OnRayCastAction filter, OnRayPrecastAction preFilter, void* const userData, dgFloat32 minT) const
-{	
-/*
-	dgAssert (filter);
-	if (dgOverlapTestSimd (line.m_boxL0, line.m_boxL1, m_minAABB, m_maxAABB)) {
-		dgContactPoint contactOut;
-		const dgMatrix& globalMatrix = m_collision->GetGlobalMatrix();
-		dgVector localP0 (globalMatrix.UntransformVectorSimd(line.m_l0));
-		dgVector localP1 (globalMatrix.UntransformVectorSimd(line.m_l1));
-		dgFloat32 t = m_collision->RayCastSimd(localP0, localP1, contactOut, preFilter, this, userData);
-		if (t < minT) {
-			dgAssert (t >= 0.0f);
-			dgAssert (t <= 1.0f);
-			contactOut.m_normal = globalMatrix.RotateVectorSimd(contactOut.m_normal);
-			minT = filter (this, contactOut.m_normal, dgInt32 (contactOut.m_userId), userData, t);
-		}
-	}
-	return minT;
-*/
-
-	dgVector l0 (line.m_l0);
-	dgVector l1 (line.m_l1);
-	if (dgRayBoxClip (l0, l1, m_minAABB, m_maxAABB)) {
-		dgContactPoint contactOut;
-		const dgMatrix& globalMatrix = m_collision->GetGlobalMatrix();
-		dgVector localP0 (globalMatrix.UntransformVectorSimd(l0));
-		dgVector localP1 (globalMatrix.UntransformVectorSimd (l1));
-		dgFloat32 t = m_collision->RayCastSimd (localP0, localP1, contactOut, preFilter, this, userData);
-		if (t < dgFloat32 (1.0f)) {
-			dgVector p (globalMatrix.TransformVectorSimd(localP0 + (localP1 - localP0).Scale3(t)));
-			dgVector l1l0 (line.m_l1 - line.m_l0);
-			t = ((p - line.m_l0) % l1l0) / (l1l0 % l1l0);
-			if (t < minT) {
-				dgAssert (t >= 0.0f);
-				dgAssert (t <= 1.0f);
-				contactOut.m_normal = globalMatrix.RotateVectorSimd (contactOut.m_normal);
-				minT = filter (this, contactOut.m_collision0, contactOut.m_normal, (void*)contactOut.m_shapeId0, userData, t);
-			}
-		}
-	} 
-	return minT;
-
-}
 
 dgFloat32 dgBody::RayCast (const dgLineBox& line, OnRayCastAction filter, OnRayPrecastAction preFilter, void* const userData, dgFloat32 minT) const
 {
@@ -378,11 +301,7 @@ void dgBody::UpdateMatrix (dgFloat32 timestep, dgInt32 threadIndex)
 	if (m_matrixUpdate) {
 		m_matrixUpdate (*this, m_matrix, threadIndex);
 	}
-	if (m_world->m_cpu == dgSimdPresent) {
-		UpdateCollisionMatrixSimd (timestep, threadIndex);
-	} else {
-		UpdateCollisionMatrix (timestep, threadIndex);
-	}
+	UpdateCollisionMatrix (timestep, threadIndex);
 }
 
 
@@ -702,25 +621,6 @@ void dgBody::CalcInvInertiaMatrix ()
 	dgAssert (m_invWorldInertiaMatrix[2][3] == dgFloat32 (0.0f));
 	dgAssert (m_invWorldInertiaMatrix[3][3] == dgFloat32 (1.0f));
 }
-
-void dgBody::CalcInvInertiaMatrixSimd ()
-{
-	//	dgMatrix tmp;
-	dgSimd tmp[4];
-	dgSimd::Transpose4x4 (tmp[0], tmp[1], tmp[2], tmp[3], (dgSimd&)m_matrix[0], (dgSimd&)m_matrix[1], (dgSimd&)m_matrix[2], dgSimd(0.0f));
-
-	tmp[0] = tmp[0] * dgSimd (m_invMass[0]);
-	tmp[1] = tmp[1] * dgSimd (m_invMass[1]);
-	tmp[2] = tmp[2] * dgSimd (m_invMass[2]);
-	m_invWorldInertiaMatrix = ((dgMatrix&)tmp[0]).MultiplySimd(m_matrix);
-	m_invWorldInertiaMatrix[3] = dgSimd(dgFloat32 (1.0f)).AndNot(dgSimd::m_triplexMask);
-
-	dgAssert (m_invWorldInertiaMatrix[0][3] == dgFloat32 (0.0f));
-	dgAssert (m_invWorldInertiaMatrix[1][3] == dgFloat32 (0.0f));
-	dgAssert (m_invWorldInertiaMatrix[2][3] == dgFloat32 (0.0f));
-	dgAssert (m_invWorldInertiaMatrix[3][3] == dgFloat32 (1.0f));
-}
-
 
 void dgBody::InvalidateCache ()
 {

@@ -414,78 +414,12 @@ dgInt32 dgCollisionInstance::CalculatePlaneIntersection (const dgVector& normal,
 	return count;
 }
 
-dgInt32 dgCollisionInstance::CalculatePlaneIntersectionSimd (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const
-{
-	dgAssert (0);
-/*
-	if (m_scaleType == m_unit) {
-		return m_childShape->CalculatePlaneIntersectionSimd (normal, point, contactsOut);
-	} else if (m_scaleType == m_uniform) {
-		dgInt32 count = m_childShape->CalculatePlaneIntersectionSimd (normal, point, contactsOut);
-		for (dgInt32 i = 0; i < count; i ++) {
-			contactsOut[i] = contactsOut[i].Scale3 (m_maxScale);
-		}
-	} else {
-		dgAssert (0);
-		return 0;
-	}
-*/
-	return 0;
-}
-
-
 
 void dgCollisionInstance::CalcAABB (const dgMatrix &matrix, dgVector& p0, dgVector& p1) const
 {
 	m_childShape->CalcAABB (matrix, p0, p1);
 	p0 = matrix.m_posit + (p0 - matrix.m_posit).Scale3(m_maxScale) - m_padding;
 	p1 = matrix.m_posit + (p1 - matrix.m_posit).Scale3(m_maxScale) + m_padding;
-}
-
-void dgCollisionInstance::CalcAABBSimd (const dgMatrix &matrix, dgVector& p0, dgVector& p1) const
-{
-	m_childShape->CalcAABBSimd(matrix, p0, p1);
-	dgSimd scale (m_maxScale);
-	(dgSimd&) p0 = ((dgSimd&)matrix.m_posit + ((dgSimd&)p0 - (dgSimd&)matrix.m_posit) * scale - (dgSimd&)m_padding) & dgSimd::m_triplexMask;
-	(dgSimd&) p1 = ((dgSimd&)matrix.m_posit + ((dgSimd&)p1 - (dgSimd&)matrix.m_posit) * scale + (dgSimd&)m_padding) & dgSimd::m_triplexMask;
-}
-
-
-dgFloat32 dgCollisionInstance::RayCastSimd (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, OnRayPrecastAction preFilter, const dgBody* const body, void* const userData) const
-{
-	if (!preFilter || preFilter(body, this, userData)) {
-		if (m_scaleIsUnit) {
-			dgFloat32 t = m_childShape->RayCastSimd(localP0, localP1, contactOut, body, userData);
-			if (t <=dgFloat32 (1.0f)) {
-				if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
-//					contactOut.m_userId = GetUserDataID();
-					contactOut.m_shapeId0 = GetUserDataID();
-					contactOut.m_shapeId1 = GetUserDataID();
-				}
-				contactOut.m_collision0 = this;
-				contactOut.m_collision1 = this;
-			}
-			return t;
-		} else {
-			dgVector p0 ((dgSimd&)localP0 * (dgSimd&)m_invScale);
-			dgVector p1 ((dgSimd&)localP1 * (dgSimd&)m_invScale);
-			dgFloat32 t = m_childShape->RayCastSimd(p0, p1, contactOut, body, userData);
-			if (t <=dgFloat32 (1.0f)) {
-				if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
-//					contactOut.m_userId = GetUserDataID();
-					contactOut.m_shapeId0 = GetUserDataID();
-					contactOut.m_shapeId1 = GetUserDataID();
-					dgSimd n (((dgSimd&)m_scale * (dgSimd&)contactOut.m_normal) & dgSimd::m_triplexMask);
-					contactOut.m_normal = n * (n.DotProduct(n).InvSqrt());
-				}
-				contactOut.m_collision0 = (dgCollisionInstance*)this;
-				contactOut.m_collision1 = (dgCollisionInstance*)this;
-			}
-			return t;
-		}
-	}
-
-	return dgFloat32 (1.2f);
 }
 
 

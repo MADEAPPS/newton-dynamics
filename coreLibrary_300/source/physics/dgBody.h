@@ -157,8 +157,6 @@ class dgBody
 	virtual void SetLinearDamping (dgFloat32 linearDamp) = 0;
 	virtual void SetAngularDamping (const dgVector& angularDamp) = 0;
 	virtual void AddDampingAcceleration() = 0;
-	virtual void AddDampingAccelerationSimd() = 0;
-
 
 	virtual void SetMassMatrix (dgFloat32 mass, dgFloat32 Ix, dgFloat32 Iy, dgFloat32 Iz);
 	virtual void SetMassProperties (dgFloat32 mass, const dgCollisionInstance* const collision);
@@ -184,7 +182,7 @@ class dgBody
 	virtual void SetExtForceAndTorqueCallback (OnApplyExtForceAndTorque callback) = 0;
 
 	virtual dgFloat32 RayCast (const dgLineBox& line, OnRayCastAction filter, OnRayPrecastAction preFilter, void* const userData, dgFloat32 minT) const;
-	virtual dgFloat32 RayCastSimd (const dgLineBox& line, OnRayCastAction filter, OnRayPrecastAction preFilter, void* const userData, dgFloat32 minT) const;
+
 	
 	virtual void Serialize (const dgTree<dgInt32, const dgCollision*>* const collisionNode, dgSerialize serializeCallback, void* const userData);
 	
@@ -200,14 +198,11 @@ class dgBody
 	void SetMatrixOriginAndRotation(const dgMatrix& matrix);
 	void UpdateMatrix (dgFloat32 timestep, dgInt32 threadIndex);
 	void UpdateCollisionMatrix (dgFloat32 timestep, dgInt32 threadIndex);
-	void UpdateCollisionMatrixSimd (dgFloat32 timestep, dgInt32 threadIndex);
-
 
 		
 	// member variables:
 	protected:
 	void CalcInvInertiaMatrix ();
-	void CalcInvInertiaMatrixSimd ();
 	dgVector GetApparentMass() const;
 	void SetAparentMassMatrix (const dgVector& massMatrix);
 

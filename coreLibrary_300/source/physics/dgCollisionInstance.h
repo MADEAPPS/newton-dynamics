@@ -92,9 +92,7 @@ class dgCollisionInstance
 	dgCollisionID GetCollisionPrimityType () const;
 
 	void CalcAABB (const dgMatrix &matrix, dgVector& p0, dgVector& p1) const;
-	void CalcAABBSimd (const dgMatrix &matrix, dgVector& p0, dgVector& p1) const;
 	dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, OnRayPrecastAction preFilter, const dgBody* const body, void* const userData) const;
-	dgFloat32 RayCastSimd (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, OnRayPrecastAction preFilter, const dgBody* const body, void* const userData) const;
 
 	dgFloat32 GetBoxMinRadius () const; 
 	dgFloat32 GetBoxMaxRadius () const; 
@@ -103,10 +101,7 @@ class dgCollisionInstance
 	dgVector CalculateVolumeIntegral (const dgMatrix& globalMatrix, GetBuoyancyPlane bouyancyPlane, void* const context) const;
 
 	dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
-	dgVector SupportVertexSimd (const dgVector& dir, dgInt32* const vertexIndex) const;
-
 	dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const;
-	dgInt32 CalculatePlaneIntersectionSimd (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const;
 
 	dgInt32 CalculateSignature () const;
 	void SetCollisionBBox (const dgVector& p0, const dgVector& p1);
@@ -116,7 +111,6 @@ class dgCollisionInstance
 	void Serialize(dgSerialize callback, void* const userData, bool saveShape = true) const;
 
 	dgMatrix CalculateSpaceMatrix (const dgCollisionInstance* const instance) const;
-	dgMatrix CalculateSpaceMatrixSimd (const dgCollisionInstance* const instance) const;
 
 	// for use with collision mesh Only
 	bool PolygonOBBTest (const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount, const dgPolygonMeshDesc& descInfo) const;
@@ -348,12 +342,6 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertex(const dgVector& dir, dgInt
 
 }
 
-DG_INLINE dgVector dgCollisionInstance::SupportVertexSimd(const dgVector& dir, dgInt32* const vertexIndex) const
-{
-	dgAssert (0);
-	return dgVector (0, 0, 0, 0);
-}
-
 
 
 DG_INLINE void dgCollisionInstance::SetCollisionBBox (const dgVector& p0, const dgVector& p1)
@@ -393,21 +381,6 @@ DG_INLINE dgMatrix dgCollisionInstance::CalculateSpaceMatrix (const dgCollisionI
 {
 	dgMatrix matrix (instance->m_globalMatrix * m_globalMatrix.Inverse());
 
-	const dgVector& scale = instance->m_scale;
-	matrix[0] = matrix[0].Scale3(scale[0]);
-	matrix[1] = matrix[1].Scale3(scale[1]);
-	matrix[2] = matrix[2].Scale3(scale[2]);
-
-	matrix[0] = m_invScale.CompProduct4 (matrix[0]);
-	matrix[1] = m_invScale.CompProduct4 (matrix[1]);
-	matrix[2] = m_invScale.CompProduct4 (matrix[2]);
-	matrix[3] = m_invScale.CompProduct4 (matrix[3]);
-	return matrix;
-}
-
-DG_INLINE dgMatrix dgCollisionInstance::CalculateSpaceMatrixSimd (const dgCollisionInstance* const instance) const
-{
-	dgMatrix matrix (instance->m_globalMatrix * m_globalMatrix.Inverse());
 	const dgVector& scale = instance->m_scale;
 	matrix[0] = matrix[0].Scale3(scale[0]);
 	matrix[1] = matrix[1].Scale3(scale[1]);

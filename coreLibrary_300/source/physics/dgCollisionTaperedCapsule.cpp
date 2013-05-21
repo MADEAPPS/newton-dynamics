@@ -361,14 +361,6 @@ dgVector dgCollisionTaperedCapsule::SupportVertex (const dgVector& dir, dgInt32*
 	return p0;
 }
 
-dgVector dgCollisionTaperedCapsule::SupportVertexSimd (const dgVector& dir, dgInt32* const vertexIndex) const
-{
-	//	dgAssert (dgAbsf(dir % dir - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
-	//	dgSimd test ((dgSimd&)dir > dgSimd(dgFloat32 (0.0f)));
-	//	dgSimd h ((dgSimd(m_height) & test) | ((dgSimd(m_height[1])).AndNot(test)));
-	//	return (dgSimd&)dir * dgSimd(m_radio0) + h * dgSimd(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)); 
-	return SupportVertex (dir, vertexIndex);
-}
 
 
 dgFloat32 dgCollisionTaperedCapsule::RayCast (const dgVector& q0, const dgVector& q1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
@@ -412,10 +404,6 @@ dgFloat32 dgCollisionTaperedCapsule::RayCast (const dgVector& q0, const dgVector
 	return dgCollisionConvex::RayCast (q0, q1, contactOut, NULL, NULL);
 }
 
-dgFloat32 dgCollisionTaperedCapsule::RayCastSimd (const dgVector& q0, const dgVector& q1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
-{
-	return RayCast (q0, q1, contactOut, body, userData);
-}
 
 
 dgFloat32 dgCollisionTaperedCapsule::CalculateMassProperties (const dgMatrix& offset, dgVector& inertia, dgVector& crossInertia, dgVector& centerOfMass) const
@@ -530,12 +518,6 @@ dgInt32 dgCollisionTaperedCapsule::CalculateContacts (const dgVector& point, con
 		return CalculateSphereConicContacts (-m_height, m_radio1, normal, point, contactsOut);
 	}
 	return CalculateContactsGeneric (point, normal, proxy, contactsOut);
-}
-
-
-dgInt32 dgCollisionTaperedCapsule::CalculatePlaneIntersectionSimd (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut) const
-{
-	return dgCollisionTaperedCapsule::CalculatePlaneIntersection (normal, origin, contactsOut);
 }
 
 

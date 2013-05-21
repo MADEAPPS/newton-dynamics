@@ -977,8 +977,8 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 			dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
 
 			// the initial velocity and angular velocity were stored in net force and net torque, for memory saving
-			dgVector accel = (body->m_veloc - body->m_netForce).CompProduct4(invTimestepSrc);
-			dgVector alpha = (body->m_omega - body->m_netTorque).CompProduct4 (invTimestepSrc);
+			dgVector accel = (body->m_veloc - body->m_netForce).CompProduct4 (invTime);
+			dgVector alpha = (body->m_omega - body->m_netTorque).CompProduct4 (invTime);
 
 			if ((accel % accel) < maxAccNorm2) {
 				accel = zero;

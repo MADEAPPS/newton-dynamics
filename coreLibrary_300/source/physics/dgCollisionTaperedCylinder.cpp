@@ -205,11 +205,6 @@ void dgCollisionTaperedCylinder::DebugCollision (const dgMatrix& matrix, OnDebug
 }
 
 
-dgVector dgCollisionTaperedCylinder::SupportVertexSimd (const dgVector& dir, dgInt32* const vertexIndex) const
-{
-	return SupportVertex (dir, vertexIndex);
-}
-
 
 dgVector dgCollisionTaperedCylinder::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
@@ -352,32 +347,6 @@ dgInt32 dgCollisionTaperedCylinder::CalculatePlaneIntersection (const dgVector& 
 
 	} else {
 		count = dgCollisionConvex::CalculatePlaneIntersection (normal, origin, contactsOut);
-	}
-	return count;
-}
-
-dgInt32 dgCollisionTaperedCylinder::CalculatePlaneIntersectionSimd (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut) const
-{
-	dgAssert (0);
-	dgInt32 count;
-	if (dgAbsf (normal.m_x) < dgFloat32 (0.999f)) { 
-		dgSimd normalYZ ((dgSimd&) normal & dgSimd (0, -1, -1, 0));
-		normalYZ = normalYZ * normalYZ.DotProduct(normalYZ).InvSqrt();
-		dgVector sincos (normalYZ);
-		dgVector normal1 (normal.m_x, normal.m_y * sincos.m_y + normal.m_z * sincos.m_z, dgFloat32 (0.0f), dgFloat32 (0.0f));
-		dgVector origin1 (origin.m_x, origin.m_y * sincos.m_y + origin.m_z * sincos.m_z, 
-									  origin.m_z * sincos.m_y - origin.m_y * sincos.m_z, dgFloat32 (0.0f));
-
-		count = dgCollisionConvex::CalculatePlaneIntersectionSimd (normal1, origin1, contactsOut);
-		for (dgInt32 i = 0; i < count; i ++) {
-			dgFloat32 y = contactsOut[i].m_y;
-			dgFloat32 z = contactsOut[i].m_z;
-			contactsOut[i].m_y = y * sincos.m_y - z * normal.m_z; 
-			contactsOut[i].m_z = z * sincos.m_y + y * normal.m_z;
-		}
-
-	} else {
-		count = dgCollisionConvex::CalculatePlaneIntersectionSimd (normal, origin, contactsOut);
 	}
 	return count;
 }

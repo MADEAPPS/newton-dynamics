@@ -191,13 +191,6 @@ void dgCollisionCone::SetCollisionBBox (const dgVector& p0__, const dgVector& p1
 }
 
 
-
-dgVector dgCollisionCone::SupportVertexSimd (const dgVector& dir, dgInt32* const vertexIndex) const
-{
-	return SupportVertex (dir, vertexIndex);
-}
-
-
 dgVector dgCollisionCone::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
 	dgAssert (dgAbsf(dir % dir - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
@@ -261,33 +254,6 @@ dgInt32 dgCollisionCone::CalculatePlaneIntersection (const dgVector& normal, con
 
 }
 
-
-dgInt32 dgCollisionCone::CalculatePlaneIntersectionSimd (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut) const
-{
-	dgInt32 count;
-	if (dgAbsf (normal.m_x) < dgFloat32 (0.999f)) { 
-		dgSimd normalYZ ((dgSimd&) normal & dgSimd (0, -1, -1, 0));
-		normalYZ = normalYZ * normalYZ.DotProduct(normalYZ).InvSqrt();
-
-		dgVector sincos (normalYZ);
-		dgVector normal1 (normal.m_x, normal.m_y * sincos.m_y + normal.m_z * sincos.m_z, dgFloat32 (0.0f), dgFloat32 (0.0f));
-		dgVector origin1 (origin.m_x, origin.m_y * sincos.m_y + origin.m_z * sincos.m_z, 
-									  origin.m_z * sincos.m_y - origin.m_y * sincos.m_z, dgFloat32 (0.0f));
-
-		count = dgCollisionConvex::CalculatePlaneIntersectionSimd (normal1, origin1, contactsOut);
-		for (dgInt32 i = 0; i < count; i ++) {
-			dgFloat32 y = contactsOut[i].m_y;
-			dgFloat32 z = contactsOut[i].m_z;
-			contactsOut[i].m_y = y * sincos.m_y - z * normal.m_z; 
-			contactsOut[i].m_z = z * sincos.m_y + y * normal.m_z;
-		}
-
-	} else {
-		count = dgCollisionConvex::CalculatePlaneIntersectionSimd (normal, origin, contactsOut);
-	}
-
-	return count;
-}
 
 
 void dgCollisionCone::GetCollisionInfo(dgCollisionInfo* const info) const

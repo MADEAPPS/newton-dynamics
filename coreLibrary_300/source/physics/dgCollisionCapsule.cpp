@@ -299,15 +299,6 @@ dgVector dgCollisionCapsule::SupportVertex (const dgVector& dir, dgInt32* const 
 	return p0;
 }
 
-dgVector dgCollisionCapsule::SupportVertexSimd (const dgVector& dir, dgInt32* const vertexIndex) const
-{
-//	dgAssert (dgAbsf(dir % dir - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
-//	dgSimd test ((dgSimd&)dir > dgSimd(dgFloat32 (0.0f)));
-//	dgSimd h ((dgSimd(m_height) & test) | ((dgSimd(m_height[1])).AndNot(test)));
-//	return (dgSimd&)dir * dgSimd(m_radius) + h * dgSimd(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)); 
-	return SupportVertex (dir, vertexIndex);
-}
-
 
 dgFloat32 dgCollisionCapsule::RayCast (const dgVector& q0, const dgVector& q1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
 {
@@ -365,13 +356,6 @@ dgFloat32 dgCollisionCapsule::RayCast (const dgVector& q0, const dgVector& q1, d
 	
 	return dgFloat32 (1.2f);
 }
-
-dgFloat32 dgCollisionCapsule::RayCastSimd (const dgVector& q0, const dgVector& q1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
-{
-	return RayCast (q0, q1, contactOut, body, userData);
-}
-
-
 
 
 void dgCollisionCapsule::GetCollisionInfo(dgCollisionInfo* const info) const
@@ -460,12 +444,6 @@ dgInt32 dgCollisionCapsule::CalculateContacts (const dgVector& point, const dgVe
 		return 1;
 	}
 	return CalculateContactsGeneric (point, normal, proxy, contactsOut);
-}
-
-
-dgInt32 dgCollisionCapsule::CalculatePlaneIntersectionSimd (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut) const
-{
-	return dgCollisionCapsule::CalculatePlaneIntersection (normal, origin, contactsOut);
 }
 
 

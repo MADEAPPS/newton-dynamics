@@ -196,7 +196,6 @@ class dgConstraint
 	virtual dgUnsigned32 JacobianDerivative (dgContraintDescritor& params) = 0; 
 
 	virtual void JointAccelerations(dgJointAccelerationDecriptor* const params) = 0; 
-	virtual void JointAccelerationsSimd(dgJointAccelerationDecriptor* const params) = 0;  
 	virtual void JointVelocityCorrection(dgJointAccelerationDecriptor* const params) = 0; 
 
 	void SetUpdateFeedbackFunction (ConstraintsForceFeeback function);

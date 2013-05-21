@@ -248,23 +248,18 @@ class dgCollision
 	dgInt32 IsType (dgRTTI type) const; 
 	dgUnsigned32 GetSignature () const;
 	dgCollisionID GetCollisionPrimityType () const;
-
 	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const = 0;
-	virtual dgVector SupportVertexSimd (const dgVector& dir, dgInt32* const vertexIndex) const = 0;
-
 	virtual dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const = 0;
-	virtual dgInt32 CalculatePlaneIntersectionSimd (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const = 0;
+
 
 	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1) = 0;
 	virtual void CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const = 0;
-	virtual void CalcAABBSimd (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const = 0;
 
 	//virtual bool PolygonOBBTest (const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount, const dgVector& boxP0, const dgVector& boxP1) const {dgAssert (0); return true;}  
 	virtual bool PolygonOBBTest (const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount, const dgPolygonMeshDesc& descInfo) const {dgAssert (0); return true;}  
 
 	virtual void DebugCollision  (const dgMatrix& matrix, OnDebugCollisionMeshCallback callback, void* const userData) const = 0;
 	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const = 0;
-	virtual dgFloat32 RayCastSimd (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const = 0;
 
 	virtual dgFloat32 GetVolume () const = 0;
 	

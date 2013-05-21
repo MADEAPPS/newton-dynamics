@@ -100,14 +100,12 @@ class dgBroadPhase
 	void InvalidateCache ();
 	void UpdateContacts (dgFloat32 timestep);
 	void UpdateBodyBroadphase(dgBody* const body, dgInt32 threadIndex);
-	void UpdateBodyBroadphaseSimd(dgBody* const body, dgInt32 threadIndex);
 
 	void ImproveFitness();
 	void ImproveNodeFitness (dgNode* const node);
-	void ImproveNodeFitnessSimd (dgNode* const node);
 	dgNode* InsertNode (dgNode* const node);
 	dgFloat32 CalculateSurfaceArea (const dgNode* const node0, const dgNode* const node1, dgVector& minBox, dgVector& maxBox) const;
-	dgFloat32 CalculateSurfaceAreaSimd (const dgNode* const node0, const dgNode* const node1, dgSimd& minBox, dgSimd& maxBox) const;
+
 
 	void AddPair (dgBody* const body0, dgBody* const body1, dgInt32 threadID);
 

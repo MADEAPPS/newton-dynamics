@@ -145,13 +145,6 @@ void dgCollisionSphere::Init (dgFloat32 radius, dgMemoryAllocator* allocator)
 }
 
 
-
-dgVector dgCollisionSphere::SupportVertexSimd (const dgVector& dir, dgInt32* const vertexIndex) const
-{
-	dgAssert (dgAbsf(dir % dir - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
-	return dir.Scale3 (m_radius);
-}
-
 dgVector dgCollisionSphere::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
 	dgAssert (dgAbsf(dir % dir - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
@@ -231,26 +224,11 @@ void dgCollisionSphere::CalcAABB (const dgMatrix &matrix, dgVector &p0, dgVector
 	p1.m_w = dgFloat32 (0.0f);
 }
 
-void dgCollisionSphere::CalcAABBSimd (const dgMatrix &matrix, dgVector &p0, dgVector &p1) const
-{
-	dgSimd mask (-1, -1, -1, 0);
-	dgSimd radius (m_radius);
-	(dgSimd&)p0 = ((dgSimd&)matrix[3] - radius) & mask;
-	(dgSimd&)p1 = ((dgSimd&)matrix[3] + radius) & mask;
-}
 
 dgInt32 dgCollisionSphere::CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const
 {
 	dgAssert ((normal % normal) > dgFloat32 (0.999f));
 	contactsOut[0] = normal.Scale3 (normal % point);
-	return 1;
-}
-
-dgInt32 dgCollisionSphere::CalculatePlaneIntersectionSimd (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const
-{
-	dgAssert ((normal % normal) > dgFloat32 (0.999f));
-	dgSimd n (normal.m_x, normal.m_y, normal.m_z, dgFloat32(0.0f));
-	(dgSimd&)contactsOut[0] = n * n.DotProduct((dgSimd&)point);
 	return 1;
 }
 
@@ -301,12 +279,6 @@ dgVector dgCollisionPoint::SupportVertex (const dgVector& dir, dgInt32* const ve
 	return dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)); 
 }
 
-dgVector dgCollisionPoint::SupportVertexSimd (const dgVector& dir, dgInt32* const vertexIndex) const
-{
-	dgAssert (0);
-	return dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-}
-
 
 dgFloat32 dgCollisionSphere::RayCast (const dgVector& p0, const dgVector& p1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
 {
@@ -317,11 +289,6 @@ dgFloat32 dgCollisionSphere::RayCast (const dgVector& p0, const dgVector& p1, dg
 		//contactOut.m_userId = SetUserDataID();
 	}
 	return t;
-}
-
-dgFloat32 dgCollisionSphere::RayCastSimd (const dgVector& p0, const dgVector& p1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
-{
-	return RayCast (p0, p1, contactOut, body, userData);
 }
 
 

@@ -48,20 +48,16 @@ class dgCollisionConvexPolygon: public dgCollisionConvex
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
 	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1);
 	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
-	virtual dgFloat32 RayCastSimd (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
 
 	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
-	virtual dgVector SupportVertexSimd (const dgVector& dir, dgInt32* const vertexIndex) const;
 
 	virtual dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const;
-	virtual dgInt32 CalculatePlaneIntersectionSimd (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const;
 
 	virtual dgFloat32 GetVolume () const;
 	virtual dgFloat32 GetBoxMinRadius () const; 
 	virtual dgFloat32 GetBoxMaxRadius () const;
 
 	void BeamClipping (const dgCollisionInstance* const hull, const dgVector& origin, dgFloat32 size);
-	void BeamClippingSimd (const dgCollisionConvex* const hull, const dgVector& origin, dgFloat32 size);
 	void SetFeatureHit (dgInt32 featureCount, const dgInt32* const index);
     dgInt32 CalculateContactToConvexHullDescrete (dgCollisionParamProxy& proxy);
 
@@ -72,7 +68,7 @@ class dgCollisionConvexPolygon: public dgCollisionConvex
 
 	dgVector m_normal;
 	dgVector m_localPoly[DG_CONVEX_POLYGON_MAX_VERTEX_COUNT];
-	dgSimd m_localPolySimd[DG_CONVEX_POLYGON_MAX_VERTEX_COUNT * 3/4];
+//	dgSimd m_localPolySimd[DG_CONVEX_POLYGON_MAX_VERTEX_COUNT * 3/4];
 	dgInt32 m_clippEdgeNormal[DG_CONVEX_POLYGON_MAX_VERTEX_COUNT];
 	dgInt32 m_count;
 	dgInt32 m_paddedCount;

@@ -1478,13 +1478,6 @@ void dgCollisionConvex::CalcAABB (const dgMatrix &matrix, dgVector& p0, dgVector
 	#endif
 }
 
-void dgCollisionConvex::CalcAABBSimd (const dgMatrix &matrix, dgVector& p0, dgVector& p1) const
-{
-	dgSimd origin (matrix.TransformVectorSimd((dgSimd&)m_boxOrigin));
-	dgSimd size (((dgSimd&)matrix[0] & dgSimd::m_signMask) * (dgSimd&) m_size_x + ((dgSimd&)matrix[1] & dgSimd::m_signMask) * (dgSimd&) m_size_y + ((dgSimd&)matrix[2] & dgSimd::m_signMask) * (dgSimd&) m_size_z); 
-	(dgSimd&)p0 = (origin - size) & dgSimd::m_triplexMask;
-	(dgSimd&)p1 = (origin + size) & dgSimd::m_triplexMask;
-}
 
 
 void dgCollisionConvex::CalculateInertia (void* userData, int indexCount, const dgFloat32* const faceVertex, int faceId)
@@ -1924,13 +1917,6 @@ dgVector dgCollisionConvex::SupportVertex (const dgVector& dir, dgInt32* const v
 }
 
 
-dgVector dgCollisionConvex::SupportVertexSimd (const dgVector& dir, dgInt32* const vertexIndex) const
-{
-	dgAssert (0);
-	return SupportVertex (dir, vertexIndex);
-}
-
-
 
 bool dgCollisionConvex::SanityCheck(dgInt32 count, const dgVector& normal, dgVector* const contactsOut) const
 {
@@ -2201,152 +2187,6 @@ dgCollisionConvex::dgPerimenterEdge* dgCollisionConvex::ReduceContacts (dgPerime
 	return poly;
 }
 
-
-
-dgInt32 dgCollisionConvex::CalculatePlaneIntersectionSimd (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut) const
-{
-	dgConvexSimplexEdge* edge = &m_simplex[0];
-
-	dgSimd plane (((dgSimd&)normal & dgSimd::m_triplexMask));
-	plane = plane - plane.DotProduct((dgSimd&)origin).AndNot(dgSimd::m_triplexMask);
-
-	dgAssert (m_vertex[edge->m_vertex].m_w == dgFloat32 (1.0f));
-	dgSimd side0 = plane.DotProduct((dgSimd&)m_vertex[edge->m_vertex]);
-	dgSimd side1 = side0;
-	
-	dgSimd zero (dgFloat32 (0.0f));
-	dgSimd negOne (dgFloat32 (-1.0f));
-	dgSimd negativeTiny (dgFloat32(-1.0e-20f));
-	dgConvexSimplexEdge* firstEdge = NULL;
-	if ((side0 > zero).GetSignMask()) {
-
-		dgConvexSimplexEdge* ptr = edge;
-		do {
-			dgAssert (m_vertex[ptr->m_twin->m_vertex].m_w == dgFloat32 (1.0f));
-			side1 = plane.DotProduct((dgSimd&)m_vertex[ptr->m_twin->m_vertex]);
-			if ((side1 < side0).GetSignMask()) {
-				if ((side1 < zero).GetSignMask()) {
-					firstEdge = ptr;
-					break;
-				}
-				side0 = side1;
-				edge = ptr->m_twin;
-				ptr = edge;
-			}
-			ptr = ptr->m_twin->m_next;
-		} while (ptr != edge);
-
-#ifdef _DEBUG
-		if (!firstEdge) {
-			// we may have a local minimal in the convex hull do to a big flat face
-			for (dgInt32 i = 0; i < m_edgeCount; i ++) {
-				ptr = &m_simplex[i];
-				side0 = plane.DotProduct((dgSimd&)m_vertex[ptr->m_vertex]);
-				side1 = plane.DotProduct((dgSimd&)m_vertex[ptr->m_twin->m_vertex]);
-				dgSimd test ((side1 < zero) & (side0 > zero));
-				if (test.GetSignMask()) {
-					dgAssert (0);
-					firstEdge = ptr;
-					break;
-				}
-			}
-		}
-#endif
-	} else if ((side0 < zero).GetSignMask()) {
-		dgConvexSimplexEdge* ptr = edge;
-		do {
-			dgAssert (m_vertex[ptr->m_twin->m_vertex].m_w == dgFloat32 (1.0f));
-			side1 = plane.DotProduct((dgSimd&)m_vertex[ptr->m_twin->m_vertex]);
-			if ((side1 > side0).GetSignMask()) {
-				side0 = side1;
-				if ((side1 >= zero).GetSignMask()) {
-					firstEdge = ptr->m_twin;
-					break;
-				}
-				edge = ptr->m_twin;
-				ptr = edge;
-			}
-			ptr = ptr->m_twin->m_next;
-		} while (ptr != edge);
-
-#ifdef _DEBUG
-		if (!firstEdge) {
-			// we may have a local minimal in the convex hull do to a big flat face
-			for (dgInt32 i = 0; i < m_edgeCount; i ++) {
-				ptr = &m_simplex[i];
-				side0 = plane.DotProduct((dgSimd&)m_vertex[ptr->m_vertex]);
-				side1 = plane.DotProduct((dgSimd&)m_vertex[ptr->m_twin->m_vertex]);
-
-				dgSimd test ((side1 < zero) & (side0 > zero));
-				if (test.GetSignMask()) {
-					dgAssert (0);
-					firstEdge = ptr;
-					break;
-				}
-			}
-		}
-#endif
-	}
-
-	dgInt32 count = 0;
-	if (firstEdge) {
-		dgInt32 maxCount = 0;
-		dgConvexSimplexEdge* ptr = firstEdge;
-		do {
-			if ((side0 > zero).GetSignMask()) {
-				dgSimd deltaP = ((dgSimd&)m_vertex[ptr->m_twin->m_vertex] - (dgSimd&)m_vertex[ptr->m_vertex]);
-				dgAssert (((dgFloat32*)&deltaP)[3] == dgFloat32 (0.0f));
-				dgSimd t = plane.DotProduct(deltaP);
-				t = negativeTiny.GetMin(t);
-				t = side0 / t;
-				t = zero.GetMin(negOne.GetMax(t));
-				(dgSimd&)contactsOut[count] = ((dgSimd&)m_vertex[ptr->m_vertex] & dgSimd::m_triplexMask) - deltaP * t;
-
-				dgConvexSimplexEdge* ptr1 = ptr->m_next;
-				for (; ptr1 != ptr; ptr1 = ptr1->m_next) {
-					dgAssert (m_vertex[ptr1->m_twin->m_vertex].m_w = dgFloat32 (1.0f));
-					side0 = plane.DotProduct((dgSimd&)m_vertex[ptr1->m_twin->m_vertex]); 
-					if ((side0 >= zero).GetSignMask()) {
-						break;
-					}
-				}
-				dgAssert (ptr1 != ptr);
-				ptr = ptr1->m_twin;
-
-			} else {
-
-				(dgSimd &)contactsOut[count] =(dgSimd &) m_vertex[ptr->m_vertex];
-				dgConvexSimplexEdge* ptr1 = ptr->m_next;
-
-				for (; ptr1 != ptr; ptr1 = ptr1->m_next) {
-					side0 = plane.DotProduct((dgSimd&)m_vertex[ptr1->m_twin->m_vertex]); 
-					if ((side0 >= zero).GetSignMask()) {
-						break;
-					}
-				}
-				if (ptr1 == ptr) {
-					ptr = ptr1->m_prev->m_twin;
-				} else {
-					ptr = ptr1->m_twin;
-				}
-			}
-
-			count ++;
-			maxCount ++;
-			if (count >= DG_CLIP_MAX_POINT_COUNT) {
-				for (count = 0; count < (DG_CLIP_MAX_POINT_COUNT >> 1); count ++) {
-					(dgSimd &)contactsOut[count] = (dgSimd &)contactsOut[count * 2];
-				}
-			}
-		} while ((ptr != firstEdge) && (maxCount < DG_CLIP_MAX_COUNT));
-		dgAssert (maxCount < DG_CLIP_MAX_COUNT);
-
-		if (count > 1) {
-			count = RectifyConvexSlice (count, normal, contactsOut);
-		}
-	}
-	return count;
-}
 
 dgInt32 dgCollisionConvex::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut) const
 {
@@ -2676,12 +2516,6 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localQ0, const dgVector& l
 		}
 	}
 	return interset;
-}
-
-
-dgFloat32 dgCollisionConvex::RayCastSimd (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
-{
-	return RayCast (localP0, localP1, contactOut, body, userData);
 }
 
 

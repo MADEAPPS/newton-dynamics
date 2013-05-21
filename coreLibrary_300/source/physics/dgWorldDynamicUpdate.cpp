@@ -143,7 +143,6 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	m_rowCountAtomicIndex = 0;
 
 //world->m_useParallelSolver = true;
-//world->m_cpu = dgSimdPresent;
 
 	dgInt32 threadCount = world->GetThreadCount();	
 	dgWorldDynamicUpdateSyncDescriptor descriptor;
@@ -206,11 +205,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 		//dgInt32 parallelIslandCount = m_islands - unilarealJointsCount - singleBodiesStart;
 		dgInt32 parallelIslandCount = singleBodiesStart - unilarealJointsCount;
 		if (parallelIslandCount > 0) {
-			if (world->m_cpu == dgSimdPresent) {
-				CalculateReactionForcesParallelSimd (&islands[unilarealJointsCount], parallelIslandCount, timestep);
-			} else {
-				CalculateReactionForcesParallel (&islands[unilarealJointsCount], parallelIslandCount, timestep);
-			}
+			CalculateReactionForcesParallel (&islands[unilarealJointsCount], parallelIslandCount, timestep);
 		}
 			
 	} else {
@@ -478,7 +473,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body)
 				for (dgInt32 i = 0; i < jointCount; i ++) {
 					dgConstraint* const constraint = constraintArray[m_joints + i].m_joint;
 					constraint->m_dynamicsLru = m_markLru;
-					dgInt32 rows = dgInt32 ((constraint->m_maxDOF & (DG_SIMD_WORD_SIZE - 1)) ? ((constraint->m_maxDOF & (-DG_SIMD_WORD_SIZE)) + DG_SIMD_WORD_SIZE) : constraint->m_maxDOF);
+					dgInt32 rows = dgInt32 ((constraint->m_maxDOF & (dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)) - 1)) ? ((constraint->m_maxDOF & (-dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)))) + dgInt32 (sizeof (dgVector) / sizeof (dgFloat32))) : constraint->m_maxDOF);
 					rowsCount += rows;
 					constraintArray[m_joints + i].m_autoPaircount = rows;
 					if (constraint->GetId() == dgConstraint::m_contactConstraint) {
@@ -491,7 +486,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body)
 				for (dgInt32 i = 0; i < jointCount; i ++) {
 					dgConstraint* const constraint = constraintArray[m_joints + i].m_joint;
 					constraint->m_dynamicsLru = m_markLru;
-					dgInt32 rows = dgInt32 ((constraint->m_maxDOF & (DG_SIMD_WORD_SIZE - 1)) ? ((constraint->m_maxDOF & (-DG_SIMD_WORD_SIZE)) + DG_SIMD_WORD_SIZE) : constraint->m_maxDOF);
+					dgInt32 rows = dgInt32 ((constraint->m_maxDOF & (dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)) - 1)) ? ((constraint->m_maxDOF & (-dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)))) + dgInt32 (sizeof (dgVector) / sizeof (dgFloat32))) : constraint->m_maxDOF);
 					rowsCount += rows;
 					constraintArray[m_joints + i].m_autoPaircount = rows;
 				}
@@ -578,7 +573,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 						dgJointInfo* const constraintArray = (dgJointInfo*) &world->m_jointsMemory[0];
 						constraintArray[jointIndex].m_joint = constraint;
 
-						dgInt32 rows = dgInt32 ((constraint->m_maxDOF & (DG_SIMD_WORD_SIZE - 1)) ? ((constraint->m_maxDOF & (-DG_SIMD_WORD_SIZE)) + DG_SIMD_WORD_SIZE) : constraint->m_maxDOF);
+						dgInt32 rows = dgInt32 ((constraint->m_maxDOF & (dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)) - 1)) ? ((constraint->m_maxDOF & (-dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)))) + dgInt32 (sizeof (dgVector) / sizeof (dgFloat32))) : constraint->m_maxDOF);
 						rowsCount += (rows + (ccdMode ? DG_CCD_EXTRA_CONTACT_COUNT : 0));
  						constraintArray[jointIndex].m_autoPaircount = rows;
 
@@ -724,16 +719,9 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForcesKernel (void* const cont
 	dgInt32 count = descriptor->m_islandCount;
 	dgIsland* const islands = &((dgIsland*)&world->m_islandMemory[0])[descriptor->m_firstIsland];
 
-	if (world->m_cpu == dgSimdPresent) {
-		for (dgInt32 i = dgAtomicExchangeAndAdd(&descriptor->m_atomicCounter, 1); i < count; i = dgAtomicExchangeAndAdd(&descriptor->m_atomicCounter, 1)) {
-			dgIsland* const island = &islands[i]; 
-			world->CalculateIslandReactionForcesSimd (island, timestep, threadID);
-		}
-	} else {
-		for (dgInt32 i = dgAtomicExchangeAndAdd(&descriptor->m_atomicCounter, 1); i < count; i = dgAtomicExchangeAndAdd(&descriptor->m_atomicCounter, 1)) {
-			dgIsland* const island = &islands[i]; 
-			world->CalculateIslandReactionForces (island, timestep, threadID);
-		}
+	for (dgInt32 i = dgAtomicExchangeAndAdd(&descriptor->m_atomicCounter, 1); i < count; i = dgAtomicExchangeAndAdd(&descriptor->m_atomicCounter, 1)) {
+		dgIsland* const island = &islands[i]; 
+		world->CalculateIslandReactionForces (island, timestep, threadID);
 	}
 }
 
@@ -817,8 +805,8 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (const dgIsland* const isla
 				rowCount ++;
 			}
 
-			rowCount = (rowCount & (DG_SIMD_WORD_SIZE - 1)) ? ((rowCount & (-DG_SIMD_WORD_SIZE)) + DG_SIMD_WORD_SIZE) : rowCount;
-			dgAssert ((rowCount & (DG_SIMD_WORD_SIZE - 1)) == 0);
+			rowCount = (rowCount & (dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)) - 1)) ? ((rowCount & (-dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)))) + dgInt32 (sizeof (dgVector) / sizeof (dgFloat32))) : rowCount;
+			dgAssert ((rowCount & (dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)) - 1)) == 0);
 		}
 	}
 	return rowCount;

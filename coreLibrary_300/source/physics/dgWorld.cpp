@@ -293,7 +293,6 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	m_sleepTable[DG_SLEEP_ENTRIES - 1].m_steps = steps;
 
 	m_hardwaredIndex = 0;
-	m_cpu = dgNoSimdPresent;
 	SetThreadsCount (0);
 
 	//dgBroadPhase::Init ();
@@ -387,26 +386,10 @@ void dgWorld::SetFrictionMode (dgInt32 mode)
 	m_frictionMode = dgUnsigned32 (mode);
 }
 
-dgInt32 dgWorld::EnumerateCPUHardwareModes() const
-{
-	dgInt32 count = 1;
-	switch (dgGetCpuType ())
-	{
-		case dgNoSimdPresent:
-			count = 1;
-			break;
-
-		case dgSimdPresent:
-			count = 2;
-			break;
-	}
-
-	return count;
-}
 
 dgInt32 dgWorld::EnumerateHardwareModes() const
 {
-	dgInt32 count = EnumerateCPUHardwareModes();
+	dgInt32 count = 1;
 	#ifdef _NEWTON_OPENCL
 		if (m_openCL) {
 			count += m_openCL->GetPlatformsCount();
@@ -418,27 +401,12 @@ dgInt32 dgWorld::EnumerateHardwareModes() const
 void dgWorld::GetHardwareVendorString (dgInt32 deviceIndex, char* const description, dgInt32 maxlength) const
 {
 	deviceIndex = dgClamp(deviceIndex, 0, EnumerateHardwareModes() - 1);
-	dgInt32 cpuModes = EnumerateCPUHardwareModes();
-	if (deviceIndex < cpuModes) {
-		switch (deviceIndex) 
-		{
-			case 0:
-				sprintf (description, "x87");
-				break;
-
-			case 1:
-				sprintf (description, "simd");
-				break;
-
-			case 2:
-				sprintf (description, "avx");
-				break;
-
-		}
+	if (deviceIndex == 0) {
+		sprintf (description, "cpu");
 
 	} else if (m_openCL) {
 		#ifdef _NEWTON_OPENCL
-			m_openCL->GetVendorString (deviceIndex - cpuModes, description, maxlength);
+			m_openCL->GetVendorString (deviceIndex - 1, description, maxlength);
 		#endif
 	}
 }
@@ -450,27 +418,15 @@ void dgWorld::SetCurrentHardwareMode(dgInt32 deviceIndex)
 			m_openCL->CleanUp();
 		}
 	#endif
+
 	m_hardwaredIndex = dgClamp(deviceIndex, 0, EnumerateHardwareModes() - 1);
-
-	dgInt32 cpuModes = EnumerateCPUHardwareModes();
-	if (m_hardwaredIndex < cpuModes) {
-		switch (m_hardwaredIndex) 
-		{
-			case 0:
-				m_cpu = dgNoSimdPresent;
-				break;
-
-			case 1:
-				m_cpu = dgSimdPresent;
-				break;
-		}
-
-	} else if (m_openCL) {
+	if ((m_hardwaredIndex > 0) && m_openCL){
 		#ifdef _NEWTON_OPENCL
 			m_cpu = dgSimdPresent;
 			m_openCL->SelectPlaform (m_hardwaredIndex - cpuModes);
 		#endif
 	}
+
 }
 
 
@@ -1213,9 +1169,6 @@ void dgWorld::StepDynamics (dgFloat32 timestep)
 	//m_cpu = dgNoSimdPresent;
 #endif
 
-// !!!until I find out what is wrong with simd mode when running in multi threaded
-m_cpu = dgNoSimdPresent;
-
 	dgAssert (m_inUpdate == 0);
 //SerializeToFile ("xxx.bin");
 
@@ -1228,22 +1181,9 @@ m_cpu = dgNoSimdPresent;
 	m_inUpdate ++;
 	dgAssert (GetThreadCount() >= 1);
 
-	if (m_cpu != dgNoSimdPresent) {
+	m_broadPhase->UpdateContacts (timestep);
+	UpdateDynamics (timestep);
 
-		simd_env rounding = dgSimd::get_ctrl();
-		dgSimd::set_FZ_mode();
-
-m_cpu = dgNoSimdPresent;
-		m_broadPhase->UpdateContacts (timestep);
-m_cpu = dgSimdPresent;
-		UpdateDynamics (timestep);
-
-		dgSimd::set_ctrl (rounding);
-
-	} else {
-		m_broadPhase->UpdateContacts (timestep);
-		UpdateDynamics (timestep);
-	}
 	m_inUpdate --;
 
 	if (m_destroyBodyByExeciveForce) {

@@ -431,13 +431,6 @@ void dgCollisionDeformableSolidMesh::GetVertexListIndexList (const dgVector& p0,
 */
 
 
-dgFloat32 dgCollisionDeformableSolidMesh::RayCastSimd (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
-{
-dgAssert (0);
-return 0;
-//	return RayCast (localP0, localP1, contactOut, preFilter, body, userData);
-}
-
 
 dgFloat32 dgCollisionDeformableSolidMesh::RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
 {
@@ -473,11 +466,6 @@ return 0;
 }
 
 
-void dgCollisionDeformableSolidMesh::GetCollidingFacesSimd (dgPolygonMeshDesc* const data) const
-{
-	dgAssert (0);
-//	GetCollidingFaces (data);
-}
 
 void dgCollisionDeformableSolidMesh::GetCollidingFaces (dgPolygonMeshDesc* const data) const
 {
@@ -1127,7 +1115,7 @@ void dgCollisionDeformableSolidMesh::ApplyExternalAndInternalForces (dgDeformabl
 }
 
 
-dgInt32 dgCollisionDeformableSolidMesh::CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy, dgInt32 useSimd)
+dgInt32 dgCollisionDeformableSolidMesh::CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy)
 {
 dgAssert (0);
 return 0;
@@ -1137,19 +1125,19 @@ return 0;
 		dgAssert (IsType (dgCollision::dgCollisionDeformableSolidMesh_RTTI));
 
 		if (pair->m_body1->m_collision->IsType (dgCollision::dgCollisionBVH_RTTI)) {
-			CalculateContactsToCollisionTree (pair, proxy, useSimd);
+			CalculateContactsToCollisionTree (pair, proxy);
 
 //		if (pair->m_body1->m_collision->IsType (dgCollision::dgCollisionConvexShape_RTTI)) {
-//			contactCount = CalculateContactsToSingle (pair, proxy, useSimd);
+//			contactCount = CalculateContactsToSingle (pair, proxy);
 //		} else if (pair->m_body1->m_collision->IsType (dgCollision::dgCollisionCompound_RTTI)) {
-//			contactCount = CalculateContactsToCompound (pair, proxy, useSimd);
+//			contactCount = CalculateContactsToCompound (pair, proxy);
 //		} else if (pair->m_body1->m_collision->IsType (dgCollision::dgCollisionBVH_RTTI)) {
-//			contactCount = CalculateContactsToCollisionTree (pair, proxy, useSimd);
+//			contactCount = CalculateContactsToCollisionTree (pair, proxy);
 //		} else if (pair->m_body1->m_collision->IsType (dgCollision::dgCollisionHeightField_RTTI)) {
-//			contactCount = CalculateContactsToHeightField (pair, proxy, useSimd);
+//			contactCount = CalculateContactsToHeightField (pair, proxy);
 //		} else {
 //			dgAssert (pair->m_body1->m_collision->IsType (dgCollision::dgCollisionUserMesh_RTTI));
-//			contactCount = CalculateContactsBruteForce (pair, proxy, useSimd);
+//			contactCount = CalculateContactsBruteForce (pair, proxy);
 //		}
 		} else {
 			dgAssert (0);
@@ -1163,7 +1151,7 @@ return 0;
 
 
 
-void dgCollisionDeformableSolidMesh::CalculateContactsToCollisionTree (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy, dgInt32 useSimd)
+void dgCollisionDeformableSolidMesh::CalculateContactsToCollisionTree (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy)
 {
 	dgAssert (0);
 	/*

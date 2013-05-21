@@ -62,25 +62,21 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 
 	void CalculateAdjacendy ();
 	void Create (const dgPolygonSoupDatabaseBuilder& builder, bool optimizedBuild);
-	virtual void ForAllSectors (const dgVector& minBox, const dgVector& maxBox, const dgVector& boxDistanceTravel, dgAABBIntersectCallback callback, void* const context) const;
-	virtual void ForAllSectorsSimd (const dgVector& minBox, const dgVector& maxBox, const dgVector& boxDistanceTravel, dgAABBIntersectCallback callback, void* const context) const;
-	virtual void ForAllSectorsRayHit (const dgFastRayTest& ray, dgRayIntersectCallback callback, void* const context) const;
-	virtual void ForAllSectorsRayHitSimd (const dgFastRayTest& ray, dgRayIntersectCallback callback, void* const context) const;
-	virtual dgVector ForAllSectorsSupportVectex (const dgVector& dir) const;	
-
 	dgFloat32 CalculateFaceMaxSize (dgTriplex* const vertex, dgInt32 indexCount, const dgInt32* const indexArray) const;
+
+	virtual void ForAllSectors (const dgVector& minBox, const dgVector& maxBox, const dgVector& boxDistanceTravel, dgAABBIntersectCallback callback, void* const context) const;
+	virtual void ForAllSectorsRayHit (const dgFastRayTest& ray, dgRayIntersectCallback callback, void* const context) const;
+	virtual dgVector ForAllSectorsSupportVectex (const dgVector& dir) const;	
 
 	private:
 	static dgIntersectStatus CalculateManifoldFaceEdgeNormals (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount);
 	static dgIntersectStatus CalculateDisjointedFaceEdgeNormals (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount);
 	static dgIntersectStatus CalculateAllFaceEdgeNormals (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount);
 
-
 	dgInt32 m_nodesCount;
 	dgInt32 m_indexCount;
 	dgInt32 *m_indices;
 	void* m_aabb;
-
 };
 
 

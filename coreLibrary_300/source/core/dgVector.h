@@ -25,7 +25,6 @@
 #include "dgStdafx.h"
 #include "dgDebug.h"
 #include "dgMemory.h"
-#include "dgSimd.h"
 
 
 #define DG_SIMD_VECTOR_CLASS
@@ -264,21 +263,16 @@ DG_MSC_VECTOR_ALIGMENT
 class dgVector: public dgTemplateVector<dgFloat32>
 {
 	public:
-	DG_INLINE dgVector(const dgSimd& val)
-#ifndef _MSC_VER
-		// for GCC only
-		:dgTemplateVector<dgFloat32>(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
-#endif
-	{
-		dgAssert ((dgUnsigned64(this) & 0x0f) == 0);
-		(dgSimd&) *this = val;
-		dgAssert (dgCheckVector ((*this)));
-	}
-
 	DG_INLINE dgVector()
 		:dgTemplateVector<dgFloat32>()
 	{
 	}
+
+	DG_INLINE dgVector(dgFloat32 val)
+		:dgTemplateVector<dgFloat32>(val, val, val, val)
+	{
+	}
+
 
 	DG_INLINE dgVector (const dgTemplateVector<dgFloat32>& v)
 		:dgTemplateVector<dgFloat32>(v)
@@ -310,17 +304,22 @@ class dgVector: public dgTemplateVector<dgFloat32>
 		dgAssert (dgCheckVector ((*this)));
 	}
 
-	DG_INLINE dgVector dgVector::operator= (const dgSimd& val)
-	{
-		(dgSimd&)*this = val;
-		return *this;
-	}
-
 	DG_INLINE dgVector AddHorizontal () const
 	{
-		dgFloat32 x = m_x + m_y + m_z + m_w;
-		return dgVector (x, x, x, x);
+		return dgVector (m_x + m_y + m_z + m_w);
 	}
+
+	DG_INLINE dgInt32 GetInt () const
+	{
+		return int (m_x);
+	}
+
+	DG_INLINE dgVector Floor () const
+	{
+		return dgVector (dgFloor (m_x), dgFloor (m_y), dgFloor (m_z), dgFloor (m_w));
+	}
+
+
 	dgVector Abs () const
 	{
 		return dgVector ((m_x > dgFloat32 (0.0f)) ? m_x : -m_x,
@@ -349,19 +348,36 @@ class dgVector: public dgTemplateVector<dgFloat32>
 	// relational operators
 	DG_INLINE dgVector operator> (const dgVector& data) const
 	{
-		return dgVector ((m_x > data.m_x) ? 0xffffffff : 0.0f,
-					     (m_y > data.m_y) ? 0xffffffff : 0.0f,
-			             (m_z > data.m_z) ? 0xffffffff : 0.0f,
-			             (m_w > data.m_w) ? 0xffffffff : 0.0f);
+		return dgVector ((m_x > data.m_x) ? dgInt32 (0xffffffff) : 0,
+					     (m_y > data.m_y) ? dgInt32 (0xffffffff) : 0,
+			             (m_z > data.m_z) ? dgInt32 (0xffffffff) : 0,
+			             (m_w > data.m_w) ? dgInt32 (0xffffffff) : 0);
 	}
 
 	DG_INLINE dgVector operator< (const dgVector& data) const
 	{
-		return dgVector ((m_x < data.m_x) ? 0xffffffff : 0.0f,
-					     (m_y < data.m_y) ? 0xffffffff : 0.0f,
-			             (m_z < data.m_z) ? 0xffffffff : 0.0f,
-			             (m_w < data.m_w) ? 0xffffffff : 0.0f);
+		return dgVector ((m_x < data.m_x) ? dgInt32 (0xffffffff) : 0,
+					     (m_y < data.m_y) ? dgInt32 (0xffffffff) : 0,
+			             (m_z < data.m_z) ? dgInt32 (0xffffffff) : 0,
+			             (m_w < data.m_w) ? dgInt32 (0xffffffff) : 0);
 	}
+
+	DG_INLINE dgVector operator>= (const dgVector& data) const
+	{
+		return dgVector ((m_x >= data.m_x) ? dgInt32 (0xffffffff) : 0, 
+						 (m_y >= data.m_y) ? dgInt32 (0xffffffff) : 0,
+						 (m_z >= data.m_z) ? dgInt32 (0xffffffff) : 0,
+						 (m_w >= data.m_w) ? dgInt32 (0xffffffff) : 0);
+	}
+
+	DG_INLINE dgVector operator<= (const dgVector& data) const
+	{
+		return dgVector ((m_x <= data.m_x) ? dgInt32 (0xffffffff) : 0,
+						 (m_y <= data.m_y) ? dgInt32 (0xffffffff) : 0,
+						 (m_z <= data.m_z) ? dgInt32 (0xffffffff) : 0,
+						 (m_w <= data.m_w) ? dgInt32 (0xffffffff) : 0);
+	}
+
 
 	// logical operations
 	DG_INLINE dgVector operator& (const dgVector& data) const
@@ -384,29 +400,41 @@ class dgVector: public dgTemplateVector<dgFloat32>
 		const dgInt32* const b = (dgInt32*)&data.m_x;
 		return dgVector (a[0] & ~b[0], a[1] & ~b[1], a[2] & ~b[2], a[3] & ~b[3]); 
 	}
-/*
+
+	DG_INLINE dgInt32 GetSignMask() const
+	{
+		const dgInt32* const a = (dgInt32*)&m_x;
+		return (((a[0] & 0x80000000) ? 1 : 0) | ((a[1] & 0x80000000) ? 2 : 0) | ((a[2] & 0x80000000) ? 4 : 0) | ((a[3] & 0x80000000) ? 8 : 0));
+	} 
+
+	DG_INLINE dgVector ShiftTripleRight () const
+	{
+		return dgVector (m_z, m_x, m_y, m_w); 
+	}
+
+
 	DG_INLINE dgVector MoveLow (const dgVector& data) const
 	{
-		return dgSimd (m_x, m_y, data.m_x, data.m_y); 
+		return dgVector (m_x, m_y, data.m_x, data.m_y); 
 	}
 
 	DG_INLINE dgVector MoveHigh (const dgVector& data) const
 	{
-		return dgSimd (data.m_z, data.m_w, m_z, m_w); 
+		return dgVector (data.m_z, data.m_w, m_z, m_w); 
 	}
 
 	DG_INLINE dgVector PackLow (const dgVector& data) const
 	{
-		return dgSimd (m_x, data.m_x, m_y, data.m_y); 
+		return dgVector (m_x, data.m_x, m_y, data.m_y); 
 	}
 
 	DG_INLINE dgVector PackHigh (const dgVector& data) const
 	{
-		return dgSimd (m_z, data.m_z, m_w, data.m_w); 
+		return dgVector (m_z, data.m_z, m_w, data.m_w); 
 	}
 
 	DG_INLINE static void Transpose4x4 (dgVector& dst0, dgVector& dst1, dgVector& dst2, dgVector& dst3, 
-		const dgVector& src0, const dgVector& src1, const dgVector& src2, const dgVector& src3)
+										const dgVector& src0, const dgVector& src1, const dgVector& src2, const dgVector& src3)
 	{
 		dgVector tmp0 (src0.PackLow(src1));
 		dgVector tmp1 (src2.PackLow(src3));
@@ -419,26 +447,6 @@ class dgVector: public dgTemplateVector<dgFloat32>
 		dst3 = tmp3.MoveHigh (tmp2);
 	}
 
-	DG_INLINE dgFloat32 dgVector::DotProductSimd (const dgVector& A) const
-	{
-		dgFloat32 dot;
-		dgSimd temp (((dgSimd&)*this).DotProduct((dgSimd&)A));
-		temp.StoreScalar (&dot);
-		return dot;
-	}
-
-	DG_INLINE dgVector dgVector::CrossProductSimd (const dgVector &e10) const
-	{
-		return ((dgSimd&)*this).CrossProduct((dgSimd&)e10);
-	}
-
-	DG_INLINE dgVector dgVector::CompProductSimd (const dgVector &A) const
-	{
-		return ((dgSimd&)*this) * (dgSimd&)A;
-	}
-
-
-*/
 
 	static dgVector m_wOne;
 	static dgVector m_triplexMask;
@@ -451,7 +459,8 @@ class dgVector: public dgTemplateVector<dgFloat32>
 DG_MSC_VECTOR_ALIGMENT
 class dgVector
 {
-	protected:
+	#define PURMUT_MASK(w, z, y, x)		_MM_SHUFFLE (w, z, y, x)
+
 	public:
 	DG_INLINE dgVector() 
 	{
@@ -464,11 +473,6 @@ class dgVector
 
 	DG_INLINE dgVector (const dgFloat32 a)
 		: m_type(_mm_set_ps1(a)) 
-	{
-	}
-
-	DG_INLINE dgVector(const dgSimd& val)
-		:m_type (val.m_type)
 	{
 	}
 
@@ -492,17 +496,7 @@ class dgVector
 		:m_type(_mm_set_ps(*(dgFloat32*)&iw, *(dgFloat32*)&iz, *(dgFloat32*)&iy, *(dgFloat32*)&ix))
 	{
 	}
-
-
-	DG_INLINE dgVector operator= (const dgSimd& val)
-	{
-		m_type = val.m_type;
-		return *this;
-	}
-
-//	DG_INLINE dgFloat32 DotProductSimd (const dgVector& A) const;
-//	DG_INLINE dgVector CrossProductSimd (const dgVector &A) const;
-//	DG_INLINE dgVector CompProductSimd (const dgVector &A) const;
+	
 
 	DG_INLINE dgVector Scale3 (dgFloat32 s) const
 	{
@@ -636,7 +630,7 @@ class dgVector
 
 	DG_INLINE dgVector AddHorizontal () const
 	{
-		dgSimd tmp (_mm_hadd_ps (m_type, m_type));
+		dgVector tmp (_mm_hadd_ps (m_type, m_type));
 		return _mm_hadd_ps (tmp.m_type, tmp.m_type);
 	}
 
@@ -656,6 +650,23 @@ class dgVector
 		return _mm_min_ps (m_type, data.m_type);
 	}
 
+	DG_INLINE dgInt32 GetInt () const
+	{
+		return _mm_cvtss_si32(m_type);
+	}
+
+	DG_INLINE dgVector Floor () const
+	{
+		dgVector mask ((dgFloat32 (1.5f) * dgFloat32 (1<<23)));
+		dgVector ret (_mm_sub_ps(_mm_add_ps(m_type, mask.m_type), mask.m_type));
+		dgVector adjust (_mm_cmplt_ps (m_type, ret.m_type));
+		ret = _mm_sub_ps (ret.m_type, _mm_and_ps(_mm_set_ps1(1.0), adjust.m_type));
+		dgAssert (ret.m_f[0] == dgFloor(m_f[0]));
+		dgAssert (ret.m_f[1] == dgFloor(m_f[1]));
+		dgAssert (ret.m_f[2] == dgFloor(m_f[2]));
+		dgAssert (ret.m_f[3] == dgFloor(m_f[3]));
+		return ret;
+	}
 	
 	// relational operators
 	DG_INLINE dgVector operator> (const dgVector& data) const
@@ -667,6 +678,17 @@ class dgVector
 	{
 		return _mm_cmplt_ps (m_type, data.m_type);	
 	}
+
+	DG_INLINE dgVector operator>= (const dgVector& data) const
+	{
+		return _mm_cmpge_ps (m_type, data.m_type);	
+	}
+
+	DG_INLINE dgVector operator<= (const dgVector& data) const
+	{
+		return _mm_cmple_ps (m_type, data.m_type);	
+	}
+
 
 
 	// logical operations
@@ -684,6 +706,17 @@ class dgVector
 	{
 		return _mm_andnot_ps (data.m_type, m_type);	
 	}
+
+	DG_INLINE dgInt32 GetSignMask() const
+	{
+		return _mm_movemask_ps(m_type);
+	} 
+
+	DG_INLINE dgVector ShiftTripleRight () const
+	{
+		return _mm_shuffle_ps(m_type, m_type, PURMUT_MASK(3, 1, 0, 2));
+	}
+
 
 	DG_INLINE dgVector MoveLow (const dgVector& data) const
 	{

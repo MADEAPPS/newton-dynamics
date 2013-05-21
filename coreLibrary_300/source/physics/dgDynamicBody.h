@@ -80,7 +80,6 @@ class dgDynamicBody : public dgBody
 
 	private:
 	virtual void AddDampingAcceleration();
-	virtual void AddDampingAccelerationSimd();
 
 	dgVector m_accel;
 	dgVector m_alpha;
@@ -185,15 +184,6 @@ DG_INLINE void dgDynamicBody::AddDampingAcceleration()
 	omega -= omega.CompProduct4 (m_dampCoef);
 	m_omega = m_matrix.RotateVector (omega);
 }
-
-DG_INLINE void dgDynamicBody::AddDampingAccelerationSimd()
-{
-	(dgSimd&)m_veloc = (dgSimd&)m_veloc - ((dgSimd&)m_veloc) * dgSimd(m_dampCoef.m_w);
-	dgSimd omega (m_matrix.UnrotateVectorSimd(m_omega));
-	omega = omega - omega * (dgSimd&)m_dampCoef;
-	(dgSimd&)m_omega = m_matrix.RotateVectorSimd(omega);
-}
-
 
 
 DG_INLINE dgVector dgDynamicBody::PredictLinearVelocity(dgFloat32 timestep) const

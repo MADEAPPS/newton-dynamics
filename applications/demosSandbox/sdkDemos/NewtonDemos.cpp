@@ -190,8 +190,6 @@ class NewtonDemosApp: public wxApp
 		wxMenuEvent loadDemo (wxEVT_COMMAND_MENU_SELECTED, NewtonDemos::ID_RUN_DEMO + DEFAULT_SCENE);
 		frame->GetEventHandler()->ProcessEvent(loadDemo);
 
-//		wxMenuEvent autoSleep (wxEVT_COMMAND_MENU_SELECTED, NewtonDemos::ID_AUTOSLEEP_MODE);
-//		frame->GetEventHandler()->ProcessEvent(autoSleep);
 		return true;
 	}
 
@@ -395,9 +393,12 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 		optionsMenu->AppendSeparator();
 		int platformsCount = NewtonEnumrateDevices (m_scene->GetNewton());
 		for (int i = 0; i < platformsCount; i ++) {
+			char label[256];
 			char platform[256];
+			
 			NewtonGetDeviceString (m_scene->GetNewton(), i, platform, sizeof (platform));
-			optionsMenu->AppendRadioItem(ID_PLATFORMS + i, _(platform));
+			sprintf (label, " hardware mode %s", platform);
+			optionsMenu->AppendRadioItem(ID_PLATFORMS + i, _(label));
 		}
 		//optionsMenu->Check(ID_PLATFORMS, true);
 

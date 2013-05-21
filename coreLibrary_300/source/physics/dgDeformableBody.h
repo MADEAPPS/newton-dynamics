@@ -50,7 +50,6 @@ class dgDeformableBody: public dgBody
 	virtual const dgVector& GetForce() const {return m_dummy;}
 	virtual const dgVector& GetTorque() const {return m_dummy;}
 	virtual void AddDampingAcceleration() {}
-	virtual void AddDampingAccelerationSimd() {}
 
 	virtual void AddForce (const dgVector& force) {}
 	virtual void AddTorque (const dgVector& torque) {}
