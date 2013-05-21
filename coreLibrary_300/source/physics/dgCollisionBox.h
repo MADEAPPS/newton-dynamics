@@ -50,10 +50,8 @@ class dgCollisionBox: public dgCollisionConvex
 
 	static dgInt32 CalculateSignature (dgFloat32 dx, dgFloat32 dy, dgFloat32 dz);
 
-
 	dgVector m_size[2];
 	dgVector m_vertex[8];
-	dgVector m_vertex_soa[6];
 	
 	static dgConvexSimplexEdge m_edgeArray[];
 	static dgConvexSimplexEdge* m_vertexToEdgeMap[];

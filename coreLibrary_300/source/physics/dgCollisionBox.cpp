@@ -99,10 +99,6 @@ void dgCollisionBox::Init (dgFloat32 size_x, dgFloat32 size_y, dgFloat32 size_z)
 	m_vertex[6]	= dgVector (-m_size[0].m_x,  m_size[0].m_y, -m_size[0].m_z, dgFloat32 (1.0f));
 	m_vertex[7]	= dgVector ( m_size[0].m_x,  m_size[0].m_y, -m_size[0].m_z, dgFloat32 (1.0f));
 
-	dgVector tmp;
-	dgVector::Transpose4x4 (m_vertex_soa[0], m_vertex_soa[1], m_vertex_soa[2], tmp, m_vertex[0], m_vertex[1], m_vertex[2], m_vertex[3]);
-	dgVector::Transpose4x4 (m_vertex_soa[3], m_vertex_soa[4], m_vertex_soa[5], tmp, m_vertex[4], m_vertex[5], m_vertex[6], m_vertex[7]);
-
 	dgCollisionConvex::m_vertex = m_vertex;
 	dgCollisionConvex::m_simplex = m_edgeArray;
 
@@ -146,39 +142,26 @@ dgVector dgCollisionBox::SupportVertex (const dgVector& dir, dgInt32* const vert
 {
 	dgAssert (dgAbsf(dir % dir - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 
-#if 0
-	dgFloatSign* const ptr =  (dgFloatSign*) &dir; 
-
-	dgInt32 x = -(ptr[0].m_integer.m_iVal >> 31);
-	dgInt32 y = -(ptr[1].m_integer.m_iVal >> 31);
-	dgInt32 z = -(ptr[2].m_integer.m_iVal >> 31);
-	return dgVector (m_size[x].m_x, m_size[y].m_y, m_size[z].m_z, dgFloat32 (0.0f));
-
-#else
 	// according to Intel doc, with latest possessors this is better, because read after write are very, very expensive
-	return dgVector (dir.m_x < dgFloat32 (0.0f) ? m_size[1].m_x : m_size[0].m_x, 
-					 dir.m_y < dgFloat32 (0.0f) ? m_size[1].m_y : m_size[0].m_y, 
-					 dir.m_z < dgFloat32 (0.0f) ? m_size[1].m_z : m_size[0].m_z, dgFloat32 (0.0f));
-#endif
-
+	dgVector mask (dir < dgVector (dgFloat32 (0.0f)));
+//	return dgVector (dir.m_x < dgFloat32 (0.0f) ? m_size[1].m_x : m_size[0].m_x, 
+//					 dir.m_y < dgFloat32 (0.0f) ? m_size[1].m_y : m_size[0].m_y, 
+//					 dir.m_z < dgFloat32 (0.0f) ? m_size[1].m_z : m_size[0].m_z, dgFloat32 (0.0f));
+	return (m_size[1] & mask) + m_size[0].AndNot(mask);
 }
 
 
 
 void dgCollisionBox::CalcAABB (const dgMatrix &matrix, dgVector &p0, dgVector &p1) const
 {
-	dgFloat32 x = m_size[0].m_x * dgAbsf(matrix[0][0]) + m_size[0].m_y * dgAbsf(matrix[1][0]) + m_size[0].m_z * dgAbsf(matrix[2][0]);  
-	dgFloat32 y = m_size[0].m_x * dgAbsf(matrix[0][1]) + m_size[0].m_y * dgAbsf(matrix[1][1]) + m_size[0].m_z * dgAbsf(matrix[2][1]);  
-	dgFloat32 z = m_size[0].m_x * dgAbsf(matrix[0][2]) + m_size[0].m_y * dgAbsf(matrix[1][2]) + m_size[0].m_z * dgAbsf(matrix[2][2]);  
+//	dgFloat32 x = m_size[0].m_x * dgAbsf(matrix[0][0]) + m_size[0].m_y * dgAbsf(matrix[1][0]) + m_size[0].m_z * dgAbsf(matrix[2][0]);  
+//	dgFloat32 y = m_size[0].m_x * dgAbsf(matrix[0][1]) + m_size[0].m_y * dgAbsf(matrix[1][1]) + m_size[0].m_z * dgAbsf(matrix[2][1]);  
+//	dgFloat32 z = m_size[0].m_x * dgAbsf(matrix[0][2]) + m_size[0].m_y * dgAbsf(matrix[1][2]) + m_size[0].m_z * dgAbsf(matrix[2][2]);  
 
-	p0.m_x = matrix[3][0] - x;
-	p1.m_x = matrix[3][0] + x;
+	dgVector size (matrix[0].Abs().CompProduct4(m_size[0].m_x) + matrix[1].Abs().CompProduct4(m_size[0].m_y) + matrix[2].Abs().CompProduct4(m_size[0].m_z));
 
-	p0.m_y = matrix[3][1] - y;
-	p1.m_y = matrix[3][1] + y;
-
-	p0.m_z = matrix[3][2] - z;
-	p1.m_z = matrix[3][2] + z;
+	p0 = matrix[3] - size;
+	p1 = matrix[3] + size;
 
 	p0.m_w = dgFloat32 (0.0f);
 	p1.m_w = dgFloat32 (0.0f);
@@ -253,8 +236,10 @@ dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, cons
 	dgFloat32 test[8];
 	dgPlane plane (normal, - (normal % point));
 	for (dgInt32 i = 0; i < 8; i ++) {
-		test[i] = plane.Evalue (m_vertex[i]);
+		//test[i] = plane.Evalue (m_vertex[i]);
+		test[i] = plane.DotProduct4 (m_vertex[i]);
 	}
+
 
 	dgConvexSimplexEdge* edge = NULL;
 	for (dgInt32 i = 0; i < 8; i ++) {
@@ -349,10 +334,7 @@ dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, cons
 		count = RectifyConvexSlice (count, normal, contactsOut);
 	}
 	return count;
-
 }
-
-
 
 void dgCollisionBox::GetCollisionInfo(dgCollisionInfo* const info) const
 {
@@ -369,186 +351,4 @@ void dgCollisionBox::Serialize(dgSerialize callback, void* const userData) const
 	dgVector size (m_size[0].Scale3 (dgFloat32 (2.0f)));
 	callback (userData, &size, sizeof (dgVector));
 }
-
-/*
-dgInt32 dgWorld::CalculateBoxToBoxContacts (dgBody* box1, dgBody* box2, dgContactPoint* const contactOut) const
-{
-	dgAssert (0);
-	return 0;
-
-	dgInt32 i;
-	dgInt32 k;
-	dgInt32 count1;
-	dgInt32 count2;
-	dgFloat32 d1;
-	dgFloat32 d2;
-	dgFloat32 min;
-	dgFloat32 dist;
-	dgFloat32 test;
-	dgFloat32 minDist;
-	dgPlane plane; 
-	dgVector shape1[16];
-	dgVector shape2[16];
-	dgCollisionBox* collision1;
-	dgCollisionBox* collision2;
-
-	dgAssert (box1->m_collision->IsType (m_boxType));
-	dgAssert (box2->m_collision->IsType (m_boxType));
-
-	const dgMatrix& matrix1 = box1->m_collisionWorldMatrix;
-	const dgMatrix& matrix2 = box2->m_collisionWorldMatrix;
-
-	collision1 = (dgCollisionBox*) box1->m_collision;
-	collision2 = (dgCollisionBox*) box2->m_collision;
-
-	const dgVector& size1 = collision1->m_size;
-	const dgVector& size2 = collision2->m_size;
-
-	minDist = dgFloat32 (-1.0e10f);
-
-	dgMatrix mat12 (matrix1 * matrix2.Inverse ());
-	for (i = 0; i < 3; i ++) {
-		min = dgAbsf (mat12[0][i]) * size1[0] + dgAbsf (mat12[1][i]) * size1[1] + dgAbsf (mat12[2][i]) * size1[2];
-		dist = dgAbsf (mat12[3][i]) - size2[i] - min;
-		if (dist > (-DG_RESTING_CONTACT_PENETRATION)) {
-			return 0;
-		}
-		if (dist > minDist) {
-			minDist = dist;
-			plane[0] = dgFloat32 (0.0f);
-			plane[1] = dgFloat32 (0.0f);
-			plane[2] = dgFloat32 (0.0f);
-			plane[3] = - (size2[i] + dist * dgFloat32 (0.5f));
-
-			plane[i] = dgFloat32 (1.0f);
-			test = plane[3] + mat12[3][i] + min; 
-			if (test < dgFloat32 (0.0f)) {
-				plane[i] = dgFloat32 (-1.0f);
-			}
-			plane = matrix2.TransformPlane (plane);
-		}
-	}
-
-	//	dgMatrix mat21 (matrix2 * matrix1.Inverse ());
-	dgMatrix mat21 (mat12.Inverse ());
-	for (i = 0; i < 3; i ++) {
-		min = dgAbsf (mat21[0][i]) * size2[0] + dgAbsf (mat21[1][i]) * size2[1] + dgAbsf (mat21[2][i]) * size2[2];
-		dist = dgAbsf (mat21[3][i]) - size1[i] - min;
-		if (dist > (-DG_RESTING_CONTACT_PENETRATION)) {
-			return 0;
-		}
-		if (dist > minDist) {
-			minDist = dist;
-			plane[0] = dgFloat32 (0.0f);
-			plane[1] = dgFloat32 (0.0f);
-			plane[2] = dgFloat32 (0.0f);
-			plane[3] = - (size1[i] + dist * dgFloat32 (0.5f));
-
-			plane[i] = dgFloat32 (1.0f);
-
-			test = plane[3] + mat21[3][i] + min; 
-			if (test < dgFloat32 (0.0f)) {
-				plane[i] = dgFloat32 (-1.0f);
-			}
-			plane = matrix1.TransformPlane (plane).Scale3 (dgFloat32 (-1.0f));
-		}
-	}
-
-	for (k = 0; k < 3; k ++) {
-		for (i = 0; i < 3; i ++) { 
-			dgVector normal (matrix1[k] * matrix2[i]);
-			test = (normal % normal) ;
-			if (test > dgFloat32(1.0e-6f)) {
-				normal = normal.Scale3 (dgRsqrt (test));
-				d2 = size2[0] * dgAbsf (matrix2[0] % normal) + size2[1] * dgAbsf (matrix2[1] % normal) + size2[2] * dgAbsf (matrix2[2] % normal);
-				d1 = size1[0] * dgAbsf (matrix1[0] % normal) + size1[1] * dgAbsf (matrix1[1] % normal) + size1[2] * dgAbsf (matrix1[2] % normal);
-
-				dgVector q (matrix2[3] - normal.Scale3 (d2));
-				dgVector p (matrix1[3] + normal.Scale3 (d1));
-				dist = (q - p) % normal;
-				if (dist > (-DG_RESTING_CONTACT_PENETRATION)) {
-					return 0;
-				}
-
-				dgVector q1 (matrix2[3] + normal.Scale3 (d2));
-				dgVector p1 (matrix1[3] - normal.Scale3 (d1));
-				test = (p1 - q1) % normal;
-				if (test > (-DG_RESTING_CONTACT_PENETRATION)) {
-					return 0;
-				}
-
-				if (test > dist) {
-					dist = test;
-					p = p1;
-					q = q1;
-				}
-
-				if (dist > minDist) {
-					minDist = dist;
-					plane[0] = normal[0];
-					plane[1] = normal[1];
-					plane[2] = normal[2];
-					plane[3] = - dgFloat32 (0.5f) * ((q + p) % normal);
-
-					test = plane.Evalue (matrix1[3]); 
-					if (test < dgFloat32 (0.0f)) {
-						plane.m_x *= dgFloat32 (-1.0f);
-						plane.m_y *= dgFloat32 (-1.0f);
-						plane.m_z *= dgFloat32 (-1.0f);
-						plane.m_w *= dgFloat32 (-1.0f);
-					}
-				}
-			}
-		}
-	}
-
-	dgPlane plane1 (matrix1.UntransformPlane (plane));	
-	count1 = collision1->CalculatePlaneIntersection (plane1, shape1);
-	if (!count1) {
-		dgVector p1 (collision1->SupportVertex (plane1.Scale3 (dgFloat32 (-1.0f))));
-		dgPlane plane (plane1, - (plane1 % p1) - DG_ROBUST_PLANE_CLIP);
-		count1 = collision1->CalculatePlaneIntersection (plane, shape1);
-		if (count1) {
-			dgVector err (plane1.Scale3 (plane1.Evalue (shape1[0])));
-			for (i = 0; i < count1; i ++) {
-				shape1[i] -= err;
-			}
-		}
-	}
-	if (count1 == 0) {
-		return 0;
-	}
-
-	dgPlane plane2 (matrix2.UntransformPlane (plane));	
-	count2 = collision2->CalculatePlaneIntersection (plane2, shape2);
-	if (!count2) {
-		dgVector p2 (collision2->SupportVertex (plane2));
-		dgPlane plane (plane2, DG_ROBUST_PLANE_CLIP - (plane2 % p2));
-		count2 = collision2->CalculatePlaneIntersection (plane, shape2);
-		if (count2) {
-			dgVector err (plane2.Scale3 (plane2.Evalue (shape2[0])));
-			for (i = 0; i < count2; i ++) {
-				shape2[i] -= err;
-			}
-		}
-	}
-
-	if (count2 == 0) {
-		return 0;
-	}
-
-	dgAssert (count1 <= 6);
-	dgAssert (count2 <= 6);
-	matrix1.TransformTriplex (shape1, sizeof (dgVector), shape1, sizeof (dgVector), count1);
-	matrix2.TransformTriplex (shape2, sizeof (dgVector), shape2, sizeof (dgVector), count2);
-
-	minDist = (dgAbsf (minDist) - DG_IMPULSIVE_CONTACT_PENETRATION);
-	if (minDist < dgFloat32 (0.0f)) {
-		minDist = dgFloat32 (0.0f);
-	}
-	k = dgContactSolver::CalculateConvexShapeIntersection (plane, 0, minDist, count1, shape1, count2, shape2, contactOut);
-	return k;
-}
-*/
-
 

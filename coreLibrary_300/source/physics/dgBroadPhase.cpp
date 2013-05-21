@@ -1087,190 +1087,155 @@ void dgBroadPhase::FindCollidingPairsDynamics (dgBroadphaseSyncDescriptor* const
 		pool[1] = descriptor->m_pairs[index * 2 + 1];
 
 		dgInt32 stack = 2;
-		if (0) {
-			dgAssert (0);
+		while (stack) {
+			stack -=2;
+			dgNode* const left = pool[stack];
+			dgNode* const right = pool[stack + 1];
+
+			if (left == right) {
+				if (!left->m_body) {
+
+					//if (dgOverlapTest (left->m_left->m_minBox, left->m_left->m_maxBox, left->m_right->m_minBox, left->m_right->m_maxBox)) {
+					//	dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
+					//	pool[stack] = left->m_left;	
+					//	pool[stack + 1] = left->m_right;	
+					//	stack += 2;
+					//}
+
+					dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
+					pool[stack] = left->m_left;	
+					pool[stack + 1] = left->m_right;	
+					stack += (-dgOverlapTest (left->m_left->m_minBox, left->m_left->m_maxBox, left->m_right->m_minBox, left->m_right->m_maxBox) >> 4) & 2;
+
+					dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
+					pool[stack] = left->m_left;	
+					pool[stack + 1] = left->m_left;	
+					stack += 2;
+
+					dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
+					pool[stack] = left->m_right;	
+					pool[stack + 1] = left->m_right;	
+					stack += 2;
+				}
+			} else {
+				if (left->m_body && right->m_body) {
+					dgBody* const body0 = left->m_body;
+					dgBody* const body1 = right->m_body;
+
+					if (TestOverlaping (body0, body1)) {
+						AddPair (body0, body1, threadID);
+					}
+
+				} else if (!(left->m_body || right->m_body)) {
 /*
-			while (stack) {
-				stack -=2;
-				dgNode* const left = pool[stack];
-				dgNode* const right = pool[stack + 1];
-
-				if (left == right) {
-					if (!left->m_body) {
+					if (dgOverlapTest (left->m_left->m_minBox, left->m_left->m_maxBox, right->m_left->m_minBox, right->m_left->m_maxBox)) { 
 						dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
 						pool[stack] = left->m_left;	
-						pool[stack + 1] = left->m_right;	
-						stack += 2 & (-dgOverlapTestSimd (left->m_left->m_minBox, left->m_left->m_maxBox, left->m_right->m_minBox, left->m_right->m_maxBox) >> 4);
-
-						dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
-						pool[stack] = left->m_left;	
-						pool[stack + 1] = left->m_left;	
-						stack += 2;
-
-						dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
-						pool[stack] = left->m_right;	
-						pool[stack + 1] = left->m_right;	
+						pool[stack + 1] = right->m_left;	
 						stack += 2;
 					}
-				} else {
-					if (left->m_body && right->m_body) {
-						dgBody* const body0 = left->m_body;
-						dgBody* const body1 = right->m_body;
-//						dgInt32 test = (-dgOverlapTestSimd (body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) >> 4) &
-//									   !(body1->m_collision->IsType (dgCollision::dgCollisionNull_RTTI) | body0->m_collision->IsType (dgCollision::dgCollisionNull_RTTI)) &
-//									   !(body0->GetSleepState() & body1->GetSleepState());
-//						if (test & 1) {
-//							AddPair (body0, body1, threadID);
-//						}
-						if (TestOverlaping (body0, body1)) {
-							AddPair (body0, body1, threadID);
-						}
 
-					} else if (!(left->m_body || right->m_body)) {
-
-						dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
-						pool[stack] = left->m_left;	
-						pool[stack + 1] = right->m_left;	
-						stack += 2 & (-dgOverlapTestSimd (left->m_left->m_minBox, left->m_left->m_maxBox, right->m_left->m_minBox, right->m_left->m_maxBox) >> 4);
-
+					if (dgOverlapTest (left->m_left->m_minBox, left->m_left->m_maxBox, right->m_right->m_minBox, right->m_right->m_maxBox)) { 
 						dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
 						pool[stack] = left->m_left;	
 						pool[stack + 1] = right->m_right;	
-						stack += 2 & (-dgOverlapTestSimd (left->m_left->m_minBox, left->m_left->m_maxBox, right->m_right->m_minBox, right->m_right->m_maxBox) >> 4);
+						stack += 2;
+					}
 
+					if (dgOverlapTest (left->m_right->m_minBox, left->m_right->m_maxBox, right->m_left->m_minBox, right->m_left->m_maxBox)) { 
 						dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
 						pool[stack] = left->m_right;	
 						pool[stack + 1] = right->m_left;	
-						stack += 2 & (-dgOverlapTestSimd (left->m_right->m_minBox, left->m_right->m_maxBox, right->m_left->m_minBox, right->m_left->m_maxBox) >> 4);
+						stack += 2;
+					}
 
-						dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
+					if (dgOverlapTest (left->m_right->m_minBox, left->m_right->m_maxBox, right->m_right->m_minBox, right->m_right->m_maxBox)) { 
 						pool[stack] = left->m_right;	
 						pool[stack + 1] = right->m_right;	
-						stack += 2 & (-dgOverlapTestSimd (left->m_right->m_minBox, left->m_right->m_maxBox, right->m_right->m_minBox, right->m_right->m_maxBox) >> 4);
+						stack += 2;
+					}
+*/
 
-					} else if (left->m_body) {
-						dgAssert (!right->m_body);
-						dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
+					dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
+					pool[stack] = left->m_left;	
+					pool[stack + 1] = right->m_left;	
+					stack += (-dgOverlapTest (left->m_left->m_minBox, left->m_left->m_maxBox, right->m_left->m_minBox, right->m_left->m_maxBox) >> 4) & 2;
+
+					dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
+					pool[stack] = left->m_left;	
+					pool[stack + 1] = right->m_right;	
+					stack += (-dgOverlapTest (left->m_left->m_minBox, left->m_left->m_maxBox, right->m_right->m_minBox, right->m_right->m_maxBox) >> 4) & 2;
+
+					dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
+					pool[stack] = left->m_right;	
+					pool[stack + 1] = right->m_left;	
+					stack += (-dgOverlapTest (left->m_right->m_minBox, left->m_right->m_maxBox, right->m_left->m_minBox, right->m_left->m_maxBox) >> 4) & 2;
+
+					dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
+					pool[stack] = left->m_right;	
+					pool[stack + 1] = right->m_right;	
+					stack += (-dgOverlapTest (left->m_right->m_minBox, left->m_right->m_maxBox, right->m_right->m_minBox, right->m_right->m_maxBox) >> 4) & 2;
+
+
+				} else if (left->m_body) {
+/*
+					dgAssert (!right->m_body);
+					if (dgOverlapTest (left->m_minBox, left->m_maxBox, right->m_left->m_minBox, right->m_left->m_maxBox)) { 
 						pool[stack] = right->m_left;	
 						pool[stack + 1] = left;	
-						stack += 2 & (-dgOverlapTestSimd (left->m_minBox, left->m_maxBox, right->m_left->m_minBox, right->m_left->m_maxBox) >> 4);
+						stack += 2;
+					}
 
-						dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
+					if (dgOverlapTest (left->m_minBox, left->m_maxBox, right->m_right->m_minBox, right->m_right->m_maxBox)) { 
 						pool[stack] = right->m_right;	
 						pool[stack + 1] = left;	
-						stack += 2 & (-dgOverlapTestSimd (left->m_minBox, left->m_maxBox, right->m_right->m_minBox, right->m_right->m_maxBox) >> 4);
-
-					} else {
-						dgAssert (right->m_body);
-						dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
-						pool[stack] = left->m_left;	
-						pool[stack + 1] = right;	
-						stack += 2 & (-dgOverlapTestSimd (right->m_minBox, right->m_maxBox, left->m_left->m_minBox, left->m_left->m_maxBox) >> 4);
-
-						dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
-						pool[stack] = left->m_right;	
-						pool[stack + 1] = right;	
-						stack += 2 & (-dgOverlapTestSimd (right->m_minBox, right->m_maxBox, left->m_right->m_minBox, left->m_right->m_maxBox) >> 4);
+						stack += 2;
 					}
-				}
-			}
 */
-		} else {
-			while (stack) {
-				stack -=2;
-				dgNode* const left = pool[stack];
-				dgNode* const right = pool[stack + 1];
 
-				if (left == right) {
-					if (!left->m_body) {
-						if (dgOverlapTest (left->m_left->m_minBox, left->m_left->m_maxBox, left->m_right->m_minBox, left->m_right->m_maxBox)) {
-							dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
-							pool[stack] = left->m_left;	
-							pool[stack + 1] = left->m_right;	
-							stack += 2;
-						}
+					dgAssert (!right->m_body);
+					dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
+					pool[stack] = right->m_left;	
+					pool[stack + 1] = left;	
+					stack += (-dgOverlapTest (left->m_minBox, left->m_maxBox, right->m_left->m_minBox, right->m_left->m_maxBox) >> 4) & 2;
 
+					dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
+					pool[stack] = right->m_right;	
+					pool[stack + 1] = left;	
+					stack += (-dgOverlapTest (left->m_minBox, left->m_maxBox, right->m_right->m_minBox, right->m_right->m_maxBox) >> 4) & 2;
+
+				} else {
+/*
+					dgAssert (right->m_body);
+					if (dgOverlapTest (right->m_minBox, right->m_maxBox, left->m_left->m_minBox, left->m_left->m_maxBox)) { 
 						dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
 						pool[stack] = left->m_left;	
-						pool[stack + 1] = left->m_left;	
+						pool[stack + 1] = right;	
 						stack += 2;
+					}
 
+					if (dgOverlapTest (right->m_minBox, right->m_maxBox, left->m_right->m_minBox, left->m_right->m_maxBox)) { 
 						dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
 						pool[stack] = left->m_right;	
-						pool[stack + 1] = left->m_right;	
+						pool[stack + 1] = right;	
 						stack += 2;
 					}
-				} else {
-					if (left->m_body && right->m_body) {
-						dgBody* const body0 = left->m_body;
-						dgBody* const body1 = right->m_body;
+*/
 
-						if (TestOverlaping (body0, body1)) {
-							AddPair (body0, body1, threadID);
-						}
+					dgAssert (right->m_body);
+					dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
+					pool[stack] = left->m_left;	
+					pool[stack + 1] = right;	
+					stack += (-dgOverlapTest (right->m_minBox, right->m_maxBox, left->m_left->m_minBox, left->m_left->m_maxBox) >> 4) & 2;
 
-					} else if (!(left->m_body || right->m_body)) {
-
-						if (dgOverlapTest (left->m_left->m_minBox, left->m_left->m_maxBox, right->m_left->m_minBox, right->m_left->m_maxBox)) { 
-							dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
-							pool[stack] = left->m_left;	
-							pool[stack + 1] = right->m_left;	
-							stack += 2;
-						}
-
-						if (dgOverlapTest (left->m_left->m_minBox, left->m_left->m_maxBox, right->m_right->m_minBox, right->m_right->m_maxBox)) { 
-							dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
-							pool[stack] = left->m_left;	
-							pool[stack + 1] = right->m_right;	
-							stack += 2;
-						}
-
-						if (dgOverlapTest (left->m_right->m_minBox, left->m_right->m_maxBox, right->m_left->m_minBox, right->m_left->m_maxBox)) { 
-							dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
-							pool[stack] = left->m_right;	
-							pool[stack + 1] = right->m_left;	
-							stack += 2;
-						}
-
-						if (dgOverlapTest (left->m_right->m_minBox, left->m_right->m_maxBox, right->m_right->m_minBox, right->m_right->m_maxBox)) { 
-							pool[stack] = left->m_right;	
-							pool[stack + 1] = right->m_right;	
-							stack += 2;
-						}
-
-					} else if (left->m_body) {
-						dgAssert (!right->m_body);
-						if (dgOverlapTest (left->m_minBox, left->m_maxBox, right->m_left->m_minBox, right->m_left->m_maxBox)) { 
-							pool[stack] = right->m_left;	
-							pool[stack + 1] = left;	
-							stack += 2;
-						}
-
-						if (dgOverlapTest (left->m_minBox, left->m_maxBox, right->m_right->m_minBox, right->m_right->m_maxBox)) { 
-							pool[stack] = right->m_right;	
-							pool[stack + 1] = left;	
-							stack += 2;
-						}
-
-					} else {
-						dgAssert (right->m_body);
-						if (dgOverlapTest (right->m_minBox, right->m_maxBox, left->m_left->m_minBox, left->m_left->m_maxBox)) { 
-							dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
-							pool[stack] = left->m_left;	
-							pool[stack + 1] = right;	
-							stack += 2;
-						}
-
-						if (dgOverlapTest (right->m_minBox, right->m_maxBox, left->m_right->m_minBox, left->m_right->m_maxBox)) { 
-							dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
-							pool[stack] = left->m_right;	
-							pool[stack + 1] = right;	
-							stack += 2;
-						}
-					}
+					dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
+					pool[stack] = left->m_right;	
+					pool[stack + 1] = right;	
+					stack += (-dgOverlapTest (right->m_minBox, right->m_maxBox, left->m_right->m_minBox, left->m_right->m_maxBox) >> 4) & 2;
 				}
 			}
 		}
+
 	}
 }
 
