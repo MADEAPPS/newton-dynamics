@@ -135,7 +135,7 @@ class dgBroadPhase::dgNode
 
 		dgVector side0 (p1 - p0);
 		dgVector side1 (side0.m_y, side0.m_z, side0.m_x, dgFloat32 (0.0f));
-		m_surfaceArea = side0.DotProduct4(side1);
+		m_surfaceArea = side0.DotProduct4(side1).m_x;
 	}
 
 

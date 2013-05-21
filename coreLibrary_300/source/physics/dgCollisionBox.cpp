@@ -158,7 +158,7 @@ void dgCollisionBox::CalcAABB (const dgMatrix &matrix, dgVector &p0, dgVector &p
 //	dgFloat32 y = m_size[0].m_x * dgAbsf(matrix[0][1]) + m_size[0].m_y * dgAbsf(matrix[1][1]) + m_size[0].m_z * dgAbsf(matrix[2][1]);  
 //	dgFloat32 z = m_size[0].m_x * dgAbsf(matrix[0][2]) + m_size[0].m_y * dgAbsf(matrix[1][2]) + m_size[0].m_z * dgAbsf(matrix[2][2]);  
 
-	dgVector size (matrix[0].Abs().CompProduct4(m_size[0].m_x) + matrix[1].Abs().CompProduct4(m_size[0].m_y) + matrix[2].Abs().CompProduct4(m_size[0].m_z));
+	dgVector size (matrix[0].Abs().CompProduct4(dgVector(m_size[0].m_x)) + matrix[1].Abs().CompProduct4(dgVector(m_size[0].m_y)) + matrix[2].Abs().CompProduct4(dgVector(m_size[0].m_z)));
 
 	p0 = matrix[3] - size;
 	p1 = matrix[3] + size;
@@ -237,7 +237,7 @@ dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, cons
 	dgPlane plane (normal, - (normal % point));
 	for (dgInt32 i = 0; i < 8; i ++) {
 		//test[i] = plane.Evalue (m_vertex[i]);
-		test[i] = plane.DotProduct4 (m_vertex[i]);
+		test[i] = plane.DotProduct4 (m_vertex[i]).m_x;
 	}
 
 

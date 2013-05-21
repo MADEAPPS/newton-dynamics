@@ -26,8 +26,15 @@
 #include "dgDebug.h"
 #include "dgMemory.h"
 
-
 #define DG_SIMD_VECTOR_CLASS
+//#define DG_SIMD_VECTOR_CLASS_4
+
+#ifdef DG_SIMD_VECTOR_CLASS_4 
+	#ifndef DG_SIMD_VECTOR_CLASS
+		#define DG_SIMD_VECTOR_CLASS
+	#endif
+#endif
+
 
 #define dgCheckVector(x) (dgCheckFloat(x[0]) && dgCheckFloat(x[1]) && dgCheckFloat(x[2]) && dgCheckFloat(x[3]))
 
@@ -126,10 +133,17 @@ class dgTemplateVector
 		return dgTemplateVector<T> (m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w - A.m_w);
 	}
 
-	// return dot 4d dot product
-	DG_INLINE T DotProduct4 (const dgTemplateVector &A) const
+	DG_INLINE dgTemplateVector<T> AddHorizontal () const
 	{
-		return m_x * A.m_x + m_y * A.m_y + m_z * A.m_z + m_w * A.m_w;
+		T val (m_x + m_y + m_z + m_w); 
+		return dgTemplateVector<T> (val, val, val, val);
+	}
+
+	// return dot 4d dot product
+	DG_INLINE dgTemplateVector<T> DotProduct4 (const dgTemplateVector &A) const
+	{
+		T val (m_x * A.m_x + m_y * A.m_y + m_z * A.m_z + m_w * A.m_w);
+		return dgTemplateVector<T> (val, val, val, val);
 	}
 
 	
@@ -304,11 +318,6 @@ class dgVector: public dgTemplateVector<dgFloat32>
 		dgAssert (dgCheckVector ((*this)));
 	}
 
-	DG_INLINE dgVector AddHorizontal () const
-	{
-		return dgVector (m_x + m_y + m_z + m_w);
-	}
-
 	DG_INLINE dgInt32 GetInt () const
 	{
 		return int (m_x);
@@ -447,8 +456,8 @@ class dgVector: public dgTemplateVector<dgFloat32>
 		dst3 = tmp3.MoveHigh (tmp2);
 	}
 
-
 	static dgVector m_wOne;
+	static dgVector m_allOne;
 	static dgVector m_triplexMask;
 
 }DG_GCC_VECTOR_ALIGMENT;
@@ -559,14 +568,22 @@ class dgVector
 	// return dot product
 	DG_INLINE dgFloat32 operator% (const dgVector &A) const
 	{
-		dgVector tmp (A & m_triplexMask);
-		dgAssert ((m_w * tmp.m_w) == dgFloat32 (0.0f));
-		return CompProduct4(tmp).AddHorizontal().m_x;
+		#ifdef DG_SIMD_VECTOR_CLASS_4 
+			return dgVector (_mm_dp_ps (m_type, A.m_type, 0x77)).m_x; 
+		#else
+			dgVector tmp (A & m_triplexMask);
+			dgAssert ((m_w * tmp.m_w) == dgFloat32 (0.0f));
+			return CompProduct4(tmp).AddHorizontal().m_x;
+		#endif
 	}
 
-	DG_INLINE dgFloat32 DotProduct4 (const dgVector &A) const
+	DG_INLINE dgVector DotProduct4 (const dgVector &A) const
 	{
-		return CompProduct4(A).AddHorizontal().m_x;
+		#ifdef DG_SIMD_VECTOR_CLASS_4 
+			return _mm_dp_ps (m_type, A.m_type, 0xff); 
+		#else 
+			return CompProduct4(A).AddHorizontal();
+		#endif
 	}
 
 	// return cross product
@@ -774,6 +791,7 @@ class dgVector
 	};
 
 	static dgVector m_wOne;
+	static dgVector m_allOne;
 	static dgVector m_triplexMask;
 } DG_GCC_VECTOR_ALIGMENT;
 

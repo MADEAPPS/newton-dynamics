@@ -64,22 +64,26 @@ dgConvexHull4dTetraherum::dgTetrahedrumPlane::dgTetrahedrumPlane (const dgBigVec
 //	dgAssert (me.DotProduct4(me) > dgFloat64 (1.0e-64f));
 	dgFloat64 invMag2 = dgFloat32 (0.0f);
 //	if (me.DotProduct4(me) > dgFloat64 (1.0e-64)) {
-	if (me.DotProduct4(me) > dgFloat64 (1.0e-38)) {
-		invMag2 = dgFloat64 (1.0f) / sqrt (me.DotProduct4(me));
+//	if (me.DotProduct4(me) > dgFloat64 (1.0e-38)) {
+	dgFloat64 val = me.DotProduct4(me).m_x;
+	if (val > dgFloat64 (1.0e-38)) {
+		//invMag2 = dgFloat64 (1.0f) / sqrt (me.DotProduct4(me));
+		invMag2 = dgFloat64 (1.0f) / sqrt (val);
 	} else {
 		invMag2 = dgFloat32 (0.0f);
 	}
+
 	me.m_x *= invMag2;
 	me.m_y *= invMag2;
 	me.m_z *= invMag2;
 	me.m_w *= invMag2;
-	m_dist = - me.DotProduct4(p0);
+	m_dist = - me.DotProduct4(p0).m_x;
 }
 
 dgFloat64 dgConvexHull4dTetraherum::dgTetrahedrumPlane::Evalue (const dgBigVector& point) const
 {
 	const dgBigVector& me = *this;
-	return me.DotProduct4(point) + m_dist;
+	return me.DotProduct4(point).m_x + m_dist;
 }
 
 
@@ -131,7 +135,7 @@ void dgConvexHull4dTetraherum::Init (const dgHullVector* const points, dgInt32 v
 	dgBigVector p2p0 (points[v2].Sub4(points[v0]));
 	dgBigVector p3p0 (points[v3].Sub4(points[v0]));
 	dgBigVector normal (p1p0.CrossProduct4(p2p0, p3p0));
-	dgFloat64 volume = normal.DotProduct4(normal);
+	dgFloat64 volume = normal.DotProduct4(normal).m_x;
 	dgAssert (volume > dgFloat64 (0.0f));
 #endif
 }
@@ -412,11 +416,10 @@ dgInt32 dgConvexHull4d::SupportVertex (dgAABBPointTree4d** const treePointer, co
 
 			if (me->m_left && me->m_right) {
 				dgBigVector leftSupportPoint (me->m_left->m_box[ix].m_x, me->m_left->m_box[iy].m_y, me->m_left->m_box[iz].m_z, me->m_left->m_box[iw].m_w);
-				dgFloat64 leftSupportDist = leftSupportPoint.DotProduct4(dir);
+				dgFloat64 leftSupportDist = leftSupportPoint.DotProduct4(dir).m_x;
 
 				dgBigVector rightSupportPoint (me->m_right->m_box[ix].m_x, me->m_right->m_box[iy].m_y, me->m_right->m_box[iz].m_z, me->m_right->m_box[iw].m_w);
-				dgFloat64 rightSupportDist = rightSupportPoint.DotProduct4(dir);
-
+				dgFloat64 rightSupportDist = rightSupportPoint.DotProduct4(dir).m_x;
 
 				if (rightSupportDist >= leftSupportDist) {
 					aabbProjection[stack] = leftSupportDist;
@@ -451,7 +454,7 @@ dgInt32 dgConvexHull4d::SupportVertex (dgAABBPointTree4d** const treePointer, co
 					dgAssert (p.m_w >= clump->m_box[0].m_w);
 					dgAssert (p.m_w <= clump->m_box[1].m_w);
 					if (!p.m_mark) {
-						dgFloat64 dist = p.DotProduct4(dir);
+						dgFloat64 dist = p.DotProduct4(dir).m_x;
 						if (dist > maxProj) {
 							maxProj = dist;
 							index = clump->m_indices[i];
@@ -655,7 +658,7 @@ dgInt32 dgConvexHull4d::InitVertexArray(dgHullVector* const points, const dgBigV
 
 
 	dgBigVector boxSize (tree->m_box[1].Sub4(tree->m_box[0]));	
-	m_diag = dgFloat32 (sqrt (boxSize.DotProduct4(boxSize)));
+	m_diag = dgFloat32 (sqrt (boxSize.DotProduct4(boxSize).m_x));
 
 	m_points[4].m_x = dgFloat64 (0.0f);
 	dgHullVector* const convexPoints = &m_points[0]; 
@@ -675,7 +678,7 @@ dgInt32 dgConvexHull4d::InitVertexArray(dgHullVector* const points, const dgBigV
 		dgAssert (index >= 0);
 		e1 = points[index].Sub4(convexPoints[0]);
 		e1.m_w = dgFloat64 (0.0f);
-		dgFloat64 error2 = e1.DotProduct4(e1);
+		dgFloat64 error2 = e1.DotProduct4(e1).m_x;
 		if (error2 > (dgFloat32 (1.0e-4f) * m_diag * m_diag)) {
 			convexPoints[1] = points[index];
 			points[index].m_mark = 1;
@@ -692,7 +695,7 @@ dgInt32 dgConvexHull4d::InitVertexArray(dgHullVector* const points, const dgBigV
 	dgInt32 bestIndex = -1;
 	dgFloat64 bestValue = dgFloat64 (1.0f);
 	validTetrahedrum = false;
-	dgFloat64 lenght2 = e1.DotProduct4(e1);
+	dgFloat64 lenght2 = e1.DotProduct4(e1).m_x;
 	dgBigVector e2(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));;
 	for (dgInt32 i = 2; i < normalCount; i ++) {
 		dgInt32 index = SupportVertex (&tree, points, normalArray[i]);
@@ -700,10 +703,10 @@ dgInt32 dgConvexHull4d::InitVertexArray(dgHullVector* const points, const dgBigV
 		dgAssert (index < count);
 		e2 = points[index].Sub4(convexPoints[0]);
 		e2.m_w = dgFloat64 (0.0f);
-		dgFloat64 den = e2.DotProduct4(e2);
+		dgFloat64 den = e2.DotProduct4(e2).m_x;
 		if (fabs (den) > (dgFloat64 (1.0e-6f) * m_diag)) {
 			den = sqrt (lenght2 * den);
-			dgFloat64 num = e2.DotProduct4(e1);
+			dgFloat64 num = e2.DotProduct4(e1).m_x;
 			dgFloat64 cosAngle = fabs (num / den);
 			if (cosAngle < bestValue) {
 				bestValue = cosAngle;
