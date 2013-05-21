@@ -782,12 +782,13 @@ void DemoEntityManager::RenderFrame ()
 
 	}
 
-
+/*
 	//	DEBUG_DRAW_MODE mode = m_solid;
 	if (m_mainWindow->m_debugDisplayMode) {
 		DEBUG_DRAW_MODE mode = (m_mainWindow->m_debugDisplayMode == 1) ? m_solid : m_lines;
 		DebugRenderWorldCollision (GetNewton(), mode);
 	}
+*/
 
 	if (m_renderHood) {
 		// set display for 2d render mode
