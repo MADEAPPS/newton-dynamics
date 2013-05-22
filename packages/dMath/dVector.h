@@ -126,13 +126,13 @@ TemplateVector<T> TemplateVector<T>::Scale (T scale) const
 
 
 template<class T>
-TemplateVector<T> TemplateVector<T>::operator+ (const TemplateVector<T> &B) const
+TemplateVector<T> TemplateVector<T>::operator+ (const TemplateVector<T>& B) const
 {
 	return TemplateVector<T> (m_x + B.m_x, m_y + B.m_y, m_z + B.m_z, m_w);
 }
 
 template<class T>
-TemplateVector<T>& TemplateVector<T>::operator+= (const TemplateVector<T> &A) 
+TemplateVector<T>& TemplateVector<T>::operator+= (const TemplateVector<T>& A) 
 {
 	m_x += A.m_x;
 	m_y += A.m_y;
@@ -141,13 +141,13 @@ TemplateVector<T>& TemplateVector<T>::operator+= (const TemplateVector<T> &A)
 }
 
 template<class T>
-TemplateVector<T> TemplateVector<T>::operator- (const TemplateVector<T> &A) const
+TemplateVector<T> TemplateVector<T>::operator- (const TemplateVector<T>& A) const
 {
 	return TemplateVector<T> (m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w);
 }
 
 template<class T>
-TemplateVector<T>& TemplateVector<T>::operator-= (const TemplateVector<T> &A) 
+TemplateVector<T>& TemplateVector<T>::operator-= (const TemplateVector<T>& A) 
 {
 	m_x -= A.m_x;
 	m_y -= A.m_y;
@@ -157,14 +157,14 @@ TemplateVector<T>& TemplateVector<T>::operator-= (const TemplateVector<T> &A)
 
 
 template<class T>
-T TemplateVector<T>::operator% (const TemplateVector<T> &A) const
+T TemplateVector<T>::operator% (const TemplateVector<T>& A) const
 {
 	return m_x * A.m_x + m_y * A.m_y + m_z * A.m_z;
 }
 
 
 template<class T>
-TemplateVector<T> TemplateVector<T>::operator* (const TemplateVector<T> &B) const
+TemplateVector<T> TemplateVector<T>::operator* (const TemplateVector<T>& B) const
 {
 	return TemplateVector<T> (m_y * B.m_z - m_z * B.m_y,
  							    m_z * B.m_x - m_x * B.m_z,
@@ -174,7 +174,7 @@ TemplateVector<T> TemplateVector<T>::operator* (const TemplateVector<T> &B) cons
 
 
 template<class T>
-TemplateVector<T> TemplateVector<T>::CompProduct (const TemplateVector<T> &A) const
+TemplateVector<T> TemplateVector<T>::CompProduct (const TemplateVector<T>& A) const
 {
 	return TemplateVector<T> (m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, A.m_w);
 }

@@ -75,12 +75,12 @@ class dgTemplateVector
 		return dgTemplateVector<T> (m_x * scale, m_y * scale, m_z * scale, m_w * scale);
 	}
 
-	DG_INLINE dgTemplateVector<T> operator+ (const dgTemplateVector<T> &B) const
+	DG_INLINE dgTemplateVector<T> operator+ (const dgTemplateVector<T>& B) const
 	{
 		return dgTemplateVector<T> (m_x + B.m_x, m_y + B.m_y, m_z + B.m_z, m_w + B.m_w);
 	}
 
-	DG_INLINE dgTemplateVector<T>& operator+= (const dgTemplateVector<T> &A) 
+	DG_INLINE dgTemplateVector<T>& operator+= (const dgTemplateVector<T>& A) 
 	{
 		m_x += A.m_x;
 		m_y += A.m_y;
@@ -89,12 +89,12 @@ class dgTemplateVector
 		return *this;
 	}
 
-	DG_INLINE dgTemplateVector<T> operator- (const dgTemplateVector<T> &A) const
+	DG_INLINE dgTemplateVector<T> operator- (const dgTemplateVector<T>& A) const
 	{
 		return dgTemplateVector<T> (m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w - A.m_w);
 	}
 
-	DG_INLINE dgTemplateVector<T>& operator-= (const dgTemplateVector<T> &A) 
+	DG_INLINE dgTemplateVector<T>& operator-= (const dgTemplateVector<T>& A) 
 	{
 		m_x -= A.m_x;
 		m_y -= A.m_y;
@@ -103,13 +103,13 @@ class dgTemplateVector
 	}
 
 	// return dot product
-	DG_INLINE T operator% (const dgTemplateVector<T> &A) const
+	DG_INLINE T operator% (const dgTemplateVector<T>& A) const
 	{
 		return m_x * A.m_x + m_y * A.m_y + m_z * A.m_z;
 	}
 
 	// return cross product
-	DG_INLINE dgTemplateVector<T> operator* (const dgTemplateVector<T> &B) const
+	DG_INLINE dgTemplateVector<T> operator* (const dgTemplateVector<T>& B) const
 	{
 		return dgTemplateVector<T> (m_y * B.m_z - m_z * B.m_y,
 									m_z * B.m_x - m_x * B.m_z,
@@ -179,13 +179,13 @@ class dgTemplateVector
 	}
 
 	// component wise multiplication
-	DG_INLINE dgTemplateVector<T> CompProduct3 (const dgTemplateVector<T> &A) const
+	DG_INLINE dgTemplateVector<T> CompProduct3 (const dgTemplateVector<T>& A) const
 	{
 		return dgTemplateVector<T> (m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, A.m_w);
 	}
 
 	// component wise 4d multiplication
-	DG_INLINE dgTemplateVector<T> CompProduct4 (const dgTemplateVector<T> &A) const
+	DG_INLINE dgTemplateVector<T> CompProduct4 (const dgTemplateVector<T>& A) const
 	{
 		return dgTemplateVector<T> (m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, m_w * A.m_w);
 	}
@@ -489,6 +489,12 @@ class dgVector
 		m_type = _mm_and_ps (m_type, m_triplexMask.m_type);
 	}
 
+	DG_INLINE dgVector (const dgVector& copy)
+		:m_type(copy.m_type)
+	{
+	}
+
+
 	DG_INLINE dgVector (const dgBigVector& copy)
 		:m_type(_mm_set_ps(dgFloat32 (copy.m_w), dgFloat32 (copy.m_z), dgFloat32 (copy.m_y), dgFloat32 (copy.m_x)))
 	{
@@ -531,40 +537,40 @@ class dgVector
 		return m_f[i];
 	}
 
-	DG_INLINE dgVector operator+ (const dgVector &A) const
+	DG_INLINE dgVector operator+ (const dgVector& A) const
 	{
 		return _mm_add_ps (m_type, A.m_type);	
 	}
 
-	DG_INLINE dgVector Add4 (const dgVector &A) const
+	DG_INLINE dgVector Add4 (const dgVector& A) const
 	{
 		return _mm_add_ps (m_type, A.m_type);	
 	}
 
-	DG_INLINE dgVector operator- (const dgVector &A) const 
+	DG_INLINE dgVector operator- (const dgVector& A) const 
 	{
 		return _mm_sub_ps (m_type, A.m_type);	
 	}
 
-	DG_INLINE dgVector Sub4 (const dgVector &A) const
+	DG_INLINE dgVector Sub4 (const dgVector& A) const
 	{
 		return _mm_sub_ps (m_type, A.m_type);	
 	}
 
-	DG_INLINE dgVector &operator+= (const dgVector &A)
+	DG_INLINE dgVector &operator+= (const dgVector& A)
 	{
 		m_type = _mm_add_ps (m_type, A.m_type);
 		return *this;
 	}
 
-	DG_INLINE dgVector &operator-= (const dgVector &A)
+	DG_INLINE dgVector &operator-= (const dgVector& A)
 	{
 		m_type = _mm_sub_ps (m_type, A.m_type);
 		return *this;
 	}
 
 	// return dot product
-	DG_INLINE dgFloat32 operator% (const dgVector &A) const
+	DG_INLINE dgFloat32 operator% (const dgVector& A) const
 	{
 		#ifdef DG_SIMD_VECTOR_CLASS_4 
 			return dgVector (_mm_dp_ps (m_type, A.m_type, 0x77)).m_x; 
@@ -575,7 +581,7 @@ class dgVector
 		#endif
 	}
 
-	DG_INLINE dgVector DotProduct4 (const dgVector &A) const
+	DG_INLINE dgVector DotProduct4 (const dgVector& A) const
 	{
 		#ifdef DG_SIMD_VECTOR_CLASS_4 
 			return _mm_dp_ps (m_type, A.m_type, 0xff); 
@@ -585,14 +591,14 @@ class dgVector
 	}
 
 	// return cross product
-	DG_INLINE dgVector operator* (const dgVector &B) const
+	DG_INLINE dgVector operator* (const dgVector& B) const
 	{
 		return _mm_sub_ps (_mm_mul_ps (_mm_shuffle_ps (m_type, m_type, PURMUT_MASK(3, 0, 2, 1)), _mm_shuffle_ps (B.m_type, B.m_type, PURMUT_MASK(3, 1, 0, 2))),
 						   _mm_mul_ps (_mm_shuffle_ps (m_type, m_type, PURMUT_MASK(3, 1, 0, 2)), _mm_shuffle_ps (B.m_type, B.m_type, PURMUT_MASK(3, 0, 2, 1))));
 
 	}
 
-	DG_INLINE dgVector CrossProduct4 (const dgVector &A, const dgVector &B) const
+	DG_INLINE dgVector CrossProduct4 (const dgVector& A, const dgVector& B) const
 	{
 		dgFloat32 cofactor[3][3];
 		dgFloat32 array[4][4];
@@ -631,14 +637,14 @@ class dgVector
 	}
 
 	// component wise multiplication
-	DG_INLINE dgVector CompProduct3 (const dgVector &A) const
+	DG_INLINE dgVector CompProduct3 (const dgVector& A) const
 	{
 		dgVector tmp ((A & m_triplexMask) | m_wOne);
 		return _mm_mul_ps (m_type, tmp.m_type);
 	}
 
 	// component wise multiplication
-	DG_INLINE dgVector CompProduct4 (const dgVector &A) const
+	DG_INLINE dgVector CompProduct4 (const dgVector& A) const
 	{
 		return _mm_mul_ps (m_type, A.m_type);
 	}
