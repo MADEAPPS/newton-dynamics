@@ -23,17 +23,10 @@
 #define __dgVector__
 
 #include "dgStdafx.h"
+#include "dgTypes.h"
 #include "dgDebug.h"
 #include "dgMemory.h"
 
-#define DG_SIMD_VECTOR_CLASS
-//#define DG_SIMD_VECTOR_CLASS_4
-
-#ifdef DG_SIMD_VECTOR_CLASS_4 
-	#ifndef DG_SIMD_VECTOR_CLASS
-		#define DG_SIMD_VECTOR_CLASS
-	#endif
-#endif
 
 
 #define dgCheckVector(x) (dgCheckFloat(x[0]) && dgCheckFloat(x[1]) && dgCheckFloat(x[2]) && dgCheckFloat(x[3]))

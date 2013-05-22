@@ -22,11 +22,24 @@
 #ifndef __DGTYPES_H__
 #define __DGTYPES_H__
 
+#define DG_SIMD_VECTOR_CLASS
+//#define DG_SIMD_VECTOR_CLASS_4
 
-
-#if !(defined (__USE_DOUBLE_PRECISION__) || defined (__ppc__) || defined (ANDROID) || defined (IOS) || defined (__APPLE__))
-	#define DG_BUILD_SIMD_CODE
+#ifdef DG_SIMD_VECTOR_CLASS_4 
+	#ifndef DG_SIMD_VECTOR_CLASS
+		#define DG_SIMD_VECTOR_CLASS
+	#endif
 #endif
+
+
+#if defined (__USE_DOUBLE_PRECISION__) || defined (__ppc__) || defined (ANDROID) || defined (IOS)
+	#ifdef DG_SIMD_VECTOR_CLASS
+		#undef DG_SIMD_VECTOR_CLASS
+		#undef DG_SIMD_VECTOR_CLASS_4
+	#endif		
+#endif
+
+
 
 
 #ifdef _MSC_VER 
@@ -60,13 +73,6 @@
 	#include <float.h>
 	#include <stdarg.h>
 	#include <process.h>
-	
-	#if (_MSC_VER >= 1600) 
-		// VS 2010 or better supports AVX instruction
-		#ifdef DG_BUILD_SIMD_CODE
-			#define DG_BUILD_SIMD_256_CODE
-		#endif
-	#endif
 
 
 	#ifdef _DEBUG
