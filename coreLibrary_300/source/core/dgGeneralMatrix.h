@@ -630,9 +630,9 @@ bool dgGeneralMatrix<T>::CholeskyDecomposition()
 			factor = T(1.0e-12f);
 		}
 
-		factor = T (dgSqrt (dgFloat32(factor)));
+		factor = T (dgFloat64 (1.0) / T (sqrt (factor)));
 		rowJ[j] = factor;
-		factor = T(1.0f / dgFloat32(factor));
+		factor = T(1.0f / factor);
 
 		#ifdef DG_COUNT_FLOAT_OPS
 		memCount += 1;

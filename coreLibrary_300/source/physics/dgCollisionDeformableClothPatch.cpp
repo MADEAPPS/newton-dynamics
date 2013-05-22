@@ -368,7 +368,7 @@ void dgCollisionDeformableClothPatch::IntegrateParticles (dgFloat32 timestep)
 	// I am restricting all particle masses to be either infinite of constant value
 	// this allow me to express then by a value that can be either 0.0 (infinite mass) or 1.0 (constant mass)
 
-	dgFloat32 particleMass = 0.01f;
+//	dgFloat32 particleMass = 0.01f;
 	dgFloat32 invTimeStep = dgFloat32 (1.0f) / timestep;
 	dgVector gravity (0.0f, -9.8f, 0.0f, 0.0f);
 	//dgVector gravity (0.0f, -1.0f, 0.0f, 0.0f);
@@ -408,7 +408,7 @@ void dgCollisionDeformableClothPatch::IntegrateParticles (dgFloat32 timestep)
 void dgCollisionDeformableClothPatch::ResolvePositionsConstraints (dgFloat32 timestep)
 {
 	dgVector* const posit = m_particles.m_posit;
-	dgFloat32* const unitMass = m_particles.m_unitMass;
+//	dgFloat32* const unitMass = m_particles.m_unitMass;
 
 	for (dgInt32 i = 0; i < m_linksCount; i ++) {
 		dgClothLink* const link = &m_links[m_linkOrder[i]];

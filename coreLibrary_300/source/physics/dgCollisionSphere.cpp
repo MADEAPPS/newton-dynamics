@@ -163,11 +163,6 @@ void dgCollisionSphere::TesselateTriangle (dgInt32 level, const dgVector& p0, co
 		dgVector p12 (p1 + p2);
 		dgVector p20 (p2 + p0);
 
-//float a = p01 % p01;
-//float b = sqrt(a);
-//float c = 1.0f / b;
-//p01 = p01.Scale3 (c);
-
 		p01 = p01.Scale3 (dgRsqrt(p01 % p01));
 		p12 = p12.Scale3 (dgRsqrt(p12 % p12));
 		p20 = p20.Scale3 (dgRsqrt(p20 % p20));

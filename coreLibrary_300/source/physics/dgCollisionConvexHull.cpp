@@ -752,6 +752,7 @@ dgVector dgCollisionConvexHull::SupportVertex (const dgVector& dirIn, dgInt32* c
 {
 	const dgVector dir (dirIn & dgVector::m_triplexMask);
 	dgInt32 index = -1;
+	dgVector maxProj (dgFloat32 (-1.0e20f)); 
 	if (m_vertexCount > DG_CONVEX_VERTEX_CHUNK_SIZE) {
 		dgFloat32 distPool[32];
 		const dgConvexBox* stackPool[32];
@@ -783,11 +784,11 @@ dgVector dgCollisionConvexHull::SupportVertex (const dgVector& dirIn, dgInt32* c
 		}
 		
 		dgInt32 stack = 2;
-		dgFloat32 maxProj = dgFloat32 (-1.0e20f); 
+		
 		while (stack) {
 			stack--;
 			dgFloat32 dist = distPool[stack];
-			if (dist > maxProj) {
+			if (dist > maxProj.m_x) {
 				const dgConvexBox& box = *stackPool[stack];
 
 				if (box.m_leftBox > 0) {
@@ -831,24 +832,31 @@ dgVector dgCollisionConvexHull::SupportVertex (const dgVector& dirIn, dgInt32* c
 						dgAssert (p.m_y <= box.m_box[1].m_y);
 						dgAssert (p.m_z >= box.m_box[0].m_z);
 						dgAssert (p.m_z <= box.m_box[1].m_z);
-						dgFloat32 dist = p.DotProduct4(dir).m_x;
-						if (dist > maxProj) {
-							maxProj = dist;
-							index = box.m_vertexStart + i;
-						}
+						dgVector dist (p.DotProduct4(dir));
+						//if (dist.m_x > maxProj.m_x) {
+						//	maxProj = dist;
+						//	index = box.m_vertexStart + i;
+						//}
+						dgVector mask (dist > maxProj);
+						dgInt32 intMask = *((dgInt32*) &mask.m_x);
+						index = ((box.m_vertexStart + i) & intMask) | (index & ~intMask);
+						maxProj = maxProj.GetMax(dist);
 					}
 				}
 			}
 		}
 	} else {
-		dgFloat32 maxProj = dgFloat32 (-1.0e20f); 
 		for (dgInt32 i = 0; i < m_vertexCount; i ++) {
 			const dgVector& p = m_vertex[i];
-			dgFloat32 dist = p.DotProduct4(dir).m_x;
-			if (dist > maxProj) {
-				index = i;
-				maxProj = dist;
-			}
+			dgVector dist (p.DotProduct4(dir));
+			//if (dist.m_x > maxProj.m_x) {
+			//	index = i;
+			//	maxProj = dist;
+			//}
+			dgVector mask (dist > maxProj);
+			dgInt32 intMask = *((dgInt32*) &mask.m_x);
+			index = (i & intMask) | (index & ~intMask);
+			maxProj = maxProj.GetMax(dist);
 		}
 	}
 

@@ -690,8 +690,12 @@ DG_INLINE dgFloat32 dgCeil(dgFloat32 x)
 #endif
 }
 
+DG_INLINE dgFloat32 dgRsqrt(dgFloat32 x)	
+{
+	return dgFloat32 (1.0f) / dgFloat32 (sqrt(x));		
+}
+
 #define dgSqrt(x)			dgFloat32 (sqrt(x))	
-#define dgRsqrt(x)			(dgFloat32 (1.0f) / dgSqrt(x))		
 #define dgSin(x)			dgFloat32 (sin(x))
 #define dgCos(x)			dgFloat32 (cos(x))
 #define dgAsin(x)			dgFloat32 (asin(x))

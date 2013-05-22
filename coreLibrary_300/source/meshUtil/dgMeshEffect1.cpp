@@ -1601,7 +1601,7 @@ void dgMeshEffect::SphericalMapping (dgInt32 material)
 	for (dgInt32 i = 0; i < m_pointCount; i ++) {
 		dgBigVector point (m_points[i] - origin);
 		dgAssert ((point % point) > dgFloat32 (0.0f));
-		point = point.Scale3 (dgRsqrt (point % point));
+		point = point.Scale3 (dgFloat64 (1.0f) / sqrt (point % point));
 
 		dgFloat64 u = dgAsin (point.m_y);
 		dgFloat64 v = dgAtan2 (point.m_x, point.m_z);
@@ -1654,7 +1654,7 @@ void dgMeshEffect::CylindricalMapping (dgInt32 cylinderMaterial, dgInt32 capMate
 		dgFloat64 u = (point.m_x - pMin.m_x) * scale.m_x;
 
 		dgAssert ((point % point) > dgFloat32 (0.0f));
-		point = point.Scale3 (dgRsqrt (point % point));
+		point = point.Scale3 (dgFloat64 (1.0f) / sqrt (point % point));
 		dgFloat64 v = dgAtan2 (point.m_y, point.m_z);
 
 		v = (dgFloat64 (3.141592f) - v) / dgFloat64 (2.0f * 3.141592f);

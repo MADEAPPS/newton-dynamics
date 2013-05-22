@@ -1493,9 +1493,9 @@ dgEdge* dgPolyhedra::FindEarTip (dgEdge* const face, const dgFloat64* const pool
 	do {
 		dgBigVector p2 (&pool [ptr->m_next->m_incidentVertex * stride]);
 		dgBigVector d1 (p2 - p1);
-		dgFloat32 f = dgSqrt (d1 % d1);
-		if (f < dgFloat32 (1.0e-10f)) {
-			f = dgFloat32 (1.0e-10f);
+		dgFloat64 f = dgFloat64 (1.0f) / sqrt (d1 % d1);
+		if (f < dgFloat64 (1.0e-10f)) {
+			f = dgFloat64 (1.0e-10f);
 		}
 		d1 = d1.Scale3 (dgFloat32 (1.0f) / f);
 		dgBigVector n (d0 * d1);
@@ -2303,13 +2303,12 @@ void dgPolyhedra::ConvexPartition (const dgFloat64* const vertex, dgInt32 stride
 							dgBigVector p0 (&vertex[ptr->m_prev->m_incidentVertex * stride]);
 							dgBigVector p1 (&vertex[ptr->m_incidentVertex * stride]);
 							dgBigVector e0 (p1 - p0);
-							e0 = e0.Scale3 (dgRsqrt (e0 % e0) + dgFloat32 (1.0e-14f));
+							e0 = e0.Scale3 (dgFloat64 (1.0f) / sqrt ((e0 % e0) + dgFloat64 (1.0e-24f)));
 							do {
 								dgBigVector p2 (&vertex[ptr->m_next->m_incidentVertex * stride]);
 								dgBigVector e1 (p2 - p1);
-								e1 = e1.Scale3 (dgFloat32 (1.0f) / (sqrt (e1 % e1) + dgFloat32 (1.0e-14f)));
+								e1 = e1.Scale3 (dgFloat64 (1.0f) / sqrt ((e1 % e1) + dgFloat32 (1.0e-24f)));
 								dgFloat64 dot = (e0 * e1) % normal2;
-								//if (dot > dgFloat32 (0.0f)) {
 								if (dot > dgFloat32 (5.0e-3f)) {
 									isConvex = 0;
 									break;
