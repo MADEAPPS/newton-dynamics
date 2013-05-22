@@ -153,7 +153,11 @@
 #if defined (_WIN_32_VER) || defined (_WIN_64_VER)
 	#define dgAssert(x) _ASSERTE(x)
 #else 
-	#define dgAssert(x) assert(x)
+	#ifdef _DEBUG
+		#define dgAssert(x) assert(x)
+	#else 
+		#define dgAssert(x)
+	#endif
 #endif
 
 
