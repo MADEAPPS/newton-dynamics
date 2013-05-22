@@ -295,7 +295,7 @@ static void DebugShowBodyCollision (const NewtonBody* const body, DEBUG_DRAW_MOD
 				glColor3f(0.42f, 0.73f, 0.98f);
 			} else {
 				// body is active
-				glColor3f(0.5f, 0.5f, 0.5f);
+				glColor3f(1.0f, 1.0f, 1.0f);
 			}
 			break;
 		}

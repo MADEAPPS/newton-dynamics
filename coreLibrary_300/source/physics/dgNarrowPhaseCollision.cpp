@@ -1792,6 +1792,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue (dgCollisionParamPro
 
 	dgCollisionConvexPolygon polygon (m_allocator);
 	dgCollisionInstance polyInstance (*polySoupInstance, &polygon);
+	polyInstance.SetScale (dgVector (1.0f));
 	proxy.m_floatingCollision = &polyInstance;
 
 	polygon.m_vertex = data.m_vertex;
@@ -1816,6 +1817,8 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue (dgCollisionParamPro
 	const dgVector& scale = polySoupInstance->m_scale;
 	const dgVector& invScale = polySoupInstance->m_invScale;
 
+	dgFloat32 maxPolyScale = polySoupInstance->m_maxScale;
+
 	polyInstance.m_scaleIsUnit = true;
 	polyInstance.m_scaleIsUniform = true;
 
@@ -1838,7 +1841,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue (dgCollisionParamPro
 		polygon.m_count = data.m_faceIndexCount[j];
 		polygon.m_adjacentFaceEdgeNormalIndex = data.GetAdjacentFaceEdgeNormalArray (localIndexArray, polygon.m_count);
 		polygon.m_faceId = data.GetFaceId (localIndexArray, polygon.m_count);
-		polygon.m_faceClipSize = data.GetFaceSize (localIndexArray, polygon.m_count);
+		polygon.m_faceClipSize = data.GetFaceSize (localIndexArray, polygon.m_count) * maxPolyScale;
 		polygon.m_faceNormalIndex = data.GetNormalIndex (localIndexArray, polygon.m_count);
 		dgVector normal (&vertex[polygon.m_faceNormalIndex * polygon.m_stride]);
 		normal = invScale.CompProduct4(normal);
