@@ -422,8 +422,7 @@ void dgWorld::SetCurrentHardwareMode(dgInt32 deviceIndex)
 	m_hardwaredIndex = dgClamp(deviceIndex, 0, EnumerateHardwareModes() - 1);
 	if ((m_hardwaredIndex > 0) && m_openCL){
 		#ifdef _NEWTON_OPENCL
-			m_cpu = dgSimdPresent;
-			m_openCL->SelectPlaform (m_hardwaredIndex - cpuModes);
+			m_openCL->SelectPlaform (m_hardwaredIndex - 1);
 		#endif
 	}
 

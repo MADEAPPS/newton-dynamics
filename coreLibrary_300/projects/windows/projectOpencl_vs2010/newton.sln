@@ -12,9 +12,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ai", "ai.vcxproj", "{7D48CE
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "physics", "physics.vcxproj", "{39737A8F-6151-4259-8E39-25530345D4B4}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread", "..\..\..\..\packages\thirdParty\pthreads.2\pthread.vcxproj", "{03BCA23C-02A5-415B-A37B-26600BC2CE96}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "opencl", "opencl.vcxproj", "{F82A640A-EA6F-4227-A6CE-4C9374858358}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread", "..\..\..\..\packages\thirdParty\pthreads.2\VS_2010\pthread.vcxproj", "{03BCA23C-02A5-415B-A37B-26600BC2CE96}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -92,22 +92,6 @@ Global
 		{39737A8F-6151-4259-8E39-25530345D4B4}.releaseDll|Win32.Build.0 = release|Win32
 		{39737A8F-6151-4259-8E39-25530345D4B4}.releaseDll|x64.ActiveCfg = release|x64
 		{39737A8F-6151-4259-8E39-25530345D4B4}.releaseDll|x64.Build.0 = release|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debug|Win32.ActiveCfg = Debug|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debug|Win32.Build.0 = Debug|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debug|x64.ActiveCfg = Debug|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debug|x64.Build.0 = Debug|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debugDll|Win32.ActiveCfg = Debug|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debugDll|Win32.Build.0 = Debug|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debugDll|x64.ActiveCfg = Debug|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debugDll|x64.Build.0 = Debug|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release|Win32.ActiveCfg = Release|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release|Win32.Build.0 = Release|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release|x64.ActiveCfg = Release|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release|x64.Build.0 = Release|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.releaseDll|Win32.ActiveCfg = Release|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.releaseDll|Win32.Build.0 = Release|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.releaseDll|x64.ActiveCfg = Release|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.releaseDll|x64.Build.0 = Release|x64
 		{F82A640A-EA6F-4227-A6CE-4C9374858358}.debug|Win32.ActiveCfg = Debug|Win32
 		{F82A640A-EA6F-4227-A6CE-4C9374858358}.debug|Win32.Build.0 = Debug|Win32
 		{F82A640A-EA6F-4227-A6CE-4C9374858358}.debug|x64.ActiveCfg = Debug|x64
@@ -124,6 +108,20 @@ Global
 		{F82A640A-EA6F-4227-A6CE-4C9374858358}.releaseDll|Win32.Build.0 = Release|Win32
 		{F82A640A-EA6F-4227-A6CE-4C9374858358}.releaseDll|x64.ActiveCfg = Release|x64
 		{F82A640A-EA6F-4227-A6CE-4C9374858358}.releaseDll|x64.Build.0 = Release|x64
+		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debug|Win32.ActiveCfg = debug|Win32
+		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debug|Win32.Build.0 = debug|Win32
+		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debug|x64.ActiveCfg = debug|x64
+		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debug|x64.Build.0 = debug|x64
+		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debugDll|Win32.ActiveCfg = debug|x64
+		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debugDll|x64.ActiveCfg = debug|x64
+		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debugDll|x64.Build.0 = debug|x64
+		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release|Win32.ActiveCfg = release|Win32
+		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release|Win32.Build.0 = release|Win32
+		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release|x64.ActiveCfg = release|x64
+		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release|x64.Build.0 = release|x64
+		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.releaseDll|Win32.ActiveCfg = release|x64
+		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.releaseDll|x64.ActiveCfg = release|x64
+		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.releaseDll|x64.Build.0 = release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

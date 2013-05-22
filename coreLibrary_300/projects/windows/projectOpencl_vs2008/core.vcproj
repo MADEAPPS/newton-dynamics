@@ -656,14 +656,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\source\core\dgSimd.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\source\core\dgSimd.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\source\core\dgSmallDeterminant.cpp"
 				>
 			</File>

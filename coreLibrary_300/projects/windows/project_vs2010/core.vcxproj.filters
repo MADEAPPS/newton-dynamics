@@ -91,9 +91,6 @@
     <ClCompile Include="..\..\..\source\core\dgAsyncThread.cpp">
       <Filter>threading</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\core\dgSimd.cpp">
-      <Filter>math</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\source\core\dgAABBPolygonSoup.h">
@@ -221,9 +218,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\source\core\dgThreadProfiler.h">
       <Filter>threading</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\source\core\dgSimd.h">
-      <Filter>math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

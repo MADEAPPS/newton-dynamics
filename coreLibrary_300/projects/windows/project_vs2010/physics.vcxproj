@@ -308,8 +308,6 @@
     <ClCompile Include="..\..\..\source\physics\dgBody.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgBodyMasterList.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgDeformableBody.cpp" />
-    <ClCompile Include="..\..\..\source\physics\dgMinkowskiConv.cpp" />
-    <ClCompile Include="..\..\..\source\physics\dgMinkowskiConvSimd.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgNarrowPhaseCollision.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgWorld.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -318,9 +316,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\..\source\physics\dgWorldDynamicsParallelSolver.cpp" />
-    <ClCompile Include="..\..\..\source\physics\dgWorldDynamicsParallelSolverSimd.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgWorldDynamicsSimpleSolver.cpp" />
-    <ClCompile Include="..\..\..\source\physics\dgWorldDynamicsSimpleSolverSimd.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgWorldDynamicUpdate.cpp" />
     <ClCompile Include="..\..\..\source\meshUtil\dgMeshEffect1.cpp" />
     <ClCompile Include="..\..\..\source\meshUtil\dgMeshEffect2.cpp" />
@@ -369,7 +365,6 @@
     <ClInclude Include="..\..\..\source\physics\dgBody.h" />
     <ClInclude Include="..\..\..\source\physics\dgBodyMasterList.h" />
     <ClInclude Include="..\..\..\source\physics\dgDeformableBody.h" />
-    <ClInclude Include="..\..\..\source\physics\dgMinkowskiConv.h" />
     <ClInclude Include="..\..\..\source\physics\dgPhysics.h" />
     <ClInclude Include="..\..\..\source\physics\dgPhysicsStdafx.h" />
     <ClInclude Include="..\..\..\source\physics\dgWorld.h" />

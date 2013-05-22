@@ -258,7 +258,6 @@
     <ClCompile Include="..\..\..\source\core\dgCRC.cpp" />
     <ClCompile Include="..\..\..\source\core\dgDebug.cpp" />
     <ClCompile Include="..\..\..\source\core\dgMemory.cpp" />
-    <ClCompile Include="..\..\..\source\core\dgSimd.cpp" />
     <ClCompile Include="..\..\..\source\core\dgThread.cpp" />
     <ClCompile Include="..\..\..\source\core\dgThreadHive.cpp" />
     <ClCompile Include="..\..\..\source\core\dgTypes.cpp">
@@ -297,7 +296,6 @@
     <ClInclude Include="..\..\..\source\core\dgCRC.h" />
     <ClInclude Include="..\..\..\source\core\dgDebug.h" />
     <ClInclude Include="..\..\..\source\core\dgMemory.h" />
-    <ClInclude Include="..\..\..\source\core\dgSimd.h" />
     <ClInclude Include="..\..\..\source\core\dgStdafx.h" />
     <ClInclude Include="..\..\..\source\core\dgThread.h" />
     <ClInclude Include="..\..\..\source\core\dgThreadHive.h" />

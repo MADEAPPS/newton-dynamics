@@ -94,13 +94,7 @@
     <ClCompile Include="..\..\..\source\meshUtil\dgMeshEffect4.cpp">
       <Filter>meshUtil</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\physics\dgMinkowskiConv.cpp">
-      <Filter>systems</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\source\physics\dgNarrowPhaseCollision.cpp">
-      <Filter>systems</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\source\physics\dgMinkowskiConvSimd.cpp">
       <Filter>systems</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\source\physics\dgSlidingConstraint.cpp">
@@ -121,16 +115,10 @@
     <ClCompile Include="..\..\..\source\physics\dgWorldDynamicsSimpleSolver.cpp">
       <Filter>systems</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\physics\dgWorldDynamicsSimpleSolverSimd.cpp">
-      <Filter>systems</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\source\physics\dgWorldDynamicUpdate.cpp">
       <Filter>systems</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\source\physics\dgWorld.cpp">
-      <Filter>systems</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\source\physics\dgWorldDynamicsParallelSolverSimd.cpp">
       <Filter>systems</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\source\physics\dgCollisionInstance.cpp">
@@ -251,9 +239,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\source\meshUtil\dgMeshEffect.h">
       <Filter>meshUtil</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\source\physics\dgMinkowskiConv.h">
-      <Filter>systems</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgPhysics.h">
       <Filter>systems</Filter>
