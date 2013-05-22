@@ -7,15 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		FF7F20991730195E00AC6E4B /* callbacks.h in Headers */ = {isa = PBXBuildFile; fileRef = FF7F20901730195E00AC6E4B /* callbacks.h */; };
-		FF7F209A1730195E00AC6E4B /* enet.h in Headers */ = {isa = PBXBuildFile; fileRef = FF7F20911730195E00AC6E4B /* enet.h */; };
-		FF7F209B1730195E00AC6E4B /* list.h in Headers */ = {isa = PBXBuildFile; fileRef = FF7F20921730195E00AC6E4B /* list.h */; };
-		FF7F209C1730195E00AC6E4B /* protocol.h in Headers */ = {isa = PBXBuildFile; fileRef = FF7F20931730195E00AC6E4B /* protocol.h */; };
-		FF7F209D1730195E00AC6E4B /* time.h in Headers */ = {isa = PBXBuildFile; fileRef = FF7F20941730195E00AC6E4B /* time.h */; };
-		FF7F209E1730195E00AC6E4B /* types.h in Headers */ = {isa = PBXBuildFile; fileRef = FF7F20951730195E00AC6E4B /* types.h */; };
-		FF7F209F1730195E00AC6E4B /* unix.h in Headers */ = {isa = PBXBuildFile; fileRef = FF7F20961730195E00AC6E4B /* unix.h */; };
-		FF7F20A01730195E00AC6E4B /* utility.h in Headers */ = {isa = PBXBuildFile; fileRef = FF7F20971730195E00AC6E4B /* utility.h */; };
-		FF7F20A11730195E00AC6E4B /* win32.h in Headers */ = {isa = PBXBuildFile; fileRef = FF7F20981730195E00AC6E4B /* win32.h */; };
 		FF7F20AA1730198400AC6E4B /* callbacks.c in Sources */ = {isa = PBXBuildFile; fileRef = FF7F20A21730198400AC6E4B /* callbacks.c */; };
 		FF7F20AB1730198400AC6E4B /* host.c in Sources */ = {isa = PBXBuildFile; fileRef = FF7F20A31730198400AC6E4B /* host.c */; };
 		FF7F20AC1730198400AC6E4B /* list.c in Sources */ = {isa = PBXBuildFile; fileRef = FF7F20A41730198400AC6E4B /* list.c */; };
@@ -28,15 +19,6 @@
 
 /* Begin PBXFileReference section */
 		FF3B29D6173014AE007E6FEC /* libenet_osx.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libenet_osx.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		FF7F20901730195E00AC6E4B /* callbacks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = callbacks.h; path = ../include/enet/callbacks.h; sourceTree = "<group>"; };
-		FF7F20911730195E00AC6E4B /* enet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = enet.h; path = ../include/enet/enet.h; sourceTree = "<group>"; };
-		FF7F20921730195E00AC6E4B /* list.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = list.h; path = ../include/enet/list.h; sourceTree = "<group>"; };
-		FF7F20931730195E00AC6E4B /* protocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = protocol.h; path = ../include/enet/protocol.h; sourceTree = "<group>"; };
-		FF7F20941730195E00AC6E4B /* time.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = time.h; path = ../include/enet/time.h; sourceTree = "<group>"; };
-		FF7F20951730195E00AC6E4B /* types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = types.h; path = ../include/enet/types.h; sourceTree = "<group>"; };
-		FF7F20961730195E00AC6E4B /* unix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = unix.h; path = ../include/enet/unix.h; sourceTree = "<group>"; };
-		FF7F20971730195E00AC6E4B /* utility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = utility.h; path = ../include/enet/utility.h; sourceTree = "<group>"; };
-		FF7F20981730195E00AC6E4B /* win32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = win32.h; path = ../include/enet/win32.h; sourceTree = "<group>"; };
 		FF7F20A21730198400AC6E4B /* callbacks.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = callbacks.c; path = ../callbacks.c; sourceTree = "<group>"; };
 		FF7F20A31730198400AC6E4B /* host.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = host.c; path = ../host.c; sourceTree = "<group>"; };
 		FF7F20A41730198400AC6E4B /* list.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = list.c; path = ../list.c; sourceTree = "<group>"; };
@@ -85,15 +67,6 @@
 				FF7F20A71730198400AC6E4B /* protocol.c */,
 				FF7F20A81730198400AC6E4B /* unix.c */,
 				FF7F20A91730198400AC6E4B /* win32.c */,
-				FF7F20901730195E00AC6E4B /* callbacks.h */,
-				FF7F20911730195E00AC6E4B /* enet.h */,
-				FF7F20921730195E00AC6E4B /* list.h */,
-				FF7F20931730195E00AC6E4B /* protocol.h */,
-				FF7F20941730195E00AC6E4B /* time.h */,
-				FF7F20951730195E00AC6E4B /* types.h */,
-				FF7F20961730195E00AC6E4B /* unix.h */,
-				FF7F20971730195E00AC6E4B /* utility.h */,
-				FF7F20981730195E00AC6E4B /* win32.h */,
 			);
 			name = source;
 			sourceTree = "<group>";
@@ -105,15 +78,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FF7F20991730195E00AC6E4B /* callbacks.h in Headers */,
-				FF7F209A1730195E00AC6E4B /* enet.h in Headers */,
-				FF7F209B1730195E00AC6E4B /* list.h in Headers */,
-				FF7F209C1730195E00AC6E4B /* protocol.h in Headers */,
-				FF7F209D1730195E00AC6E4B /* time.h in Headers */,
-				FF7F209E1730195E00AC6E4B /* types.h in Headers */,
-				FF7F209F1730195E00AC6E4B /* unix.h in Headers */,
-				FF7F20A01730195E00AC6E4B /* utility.h in Headers */,
-				FF7F20A11730195E00AC6E4B /* win32.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

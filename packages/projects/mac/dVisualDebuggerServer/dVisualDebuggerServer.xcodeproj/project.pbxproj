@@ -8,21 +8,15 @@
 
 /* Begin PBXBuildFile section */
 		FFD274AD172E093000114513 /* DebuggerServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFD274A7172E093000114513 /* DebuggerServer.cpp */; };
-		FFD274AE172E093000114513 /* DebuggerServer.h in Headers */ = {isa = PBXBuildFile; fileRef = FFD274A8172E093000114513 /* DebuggerServer.h */; };
 		FFD274AF172E093000114513 /* NewtonDebuggerServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFD274A9172E093000114513 /* NewtonDebuggerServer.cpp */; };
-		FFD274B0172E093000114513 /* NewtonDebuggerServer.h in Headers */ = {isa = PBXBuildFile; fileRef = FFD274AA172E093000114513 /* NewtonDebuggerServer.h */; };
 		FFD274B1172E093000114513 /* ServerBodyProxyMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFD274AB172E093000114513 /* ServerBodyProxyMap.cpp */; };
-		FFD274B2172E093000114513 /* ServerBodyProxyMap.h in Headers */ = {isa = PBXBuildFile; fileRef = FFD274AC172E093000114513 /* ServerBodyProxyMap.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		FFD2749F172E08F400114513 /* libdVisualDebuggerServer.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libdVisualDebuggerServer.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		FFD274A7172E093000114513 /* DebuggerServer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DebuggerServer.cpp; path = ../../../dVisualDebuggerServer/DebuggerServer.cpp; sourceTree = "<group>"; };
-		FFD274A8172E093000114513 /* DebuggerServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DebuggerServer.h; path = ../../../dVisualDebuggerServer/DebuggerServer.h; sourceTree = "<group>"; };
 		FFD274A9172E093000114513 /* NewtonDebuggerServer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = NewtonDebuggerServer.cpp; path = ../../../dVisualDebuggerServer/NewtonDebuggerServer.cpp; sourceTree = "<group>"; };
-		FFD274AA172E093000114513 /* NewtonDebuggerServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NewtonDebuggerServer.h; path = ../../../dVisualDebuggerServer/NewtonDebuggerServer.h; sourceTree = "<group>"; };
 		FFD274AB172E093000114513 /* ServerBodyProxyMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ServerBodyProxyMap.cpp; path = ../../../dVisualDebuggerServer/ServerBodyProxyMap.cpp; sourceTree = "<group>"; };
-		FFD274AC172E093000114513 /* ServerBodyProxyMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ServerBodyProxyMap.h; path = ../../../dVisualDebuggerServer/ServerBodyProxyMap.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,11 +50,8 @@
 			isa = PBXGroup;
 			children = (
 				FFD274A7172E093000114513 /* DebuggerServer.cpp */,
-				FFD274A8172E093000114513 /* DebuggerServer.h */,
 				FFD274A9172E093000114513 /* NewtonDebuggerServer.cpp */,
-				FFD274AA172E093000114513 /* NewtonDebuggerServer.h */,
 				FFD274AB172E093000114513 /* ServerBodyProxyMap.cpp */,
-				FFD274AC172E093000114513 /* ServerBodyProxyMap.h */,
 			);
 			name = sourse;
 			sourceTree = "<group>";
@@ -72,9 +63,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FFD274AE172E093000114513 /* DebuggerServer.h in Headers */,
-				FFD274B0172E093000114513 /* NewtonDebuggerServer.h in Headers */,
-				FFD274B2172E093000114513 /* ServerBodyProxyMap.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

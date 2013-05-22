@@ -38,7 +38,7 @@ class StupidComplexOfConvexShapes: public DemoEntity
 
 		// create a pool of predefined convex mesh
 		PrimitiveType selection[] = {_SPHERE_PRIMITIVE,	_BOX_PRIMITIVE,	_CAPSULE_PRIMITIVE, _CYLINDER_PRIMITIVE, _CONE_PRIMITIVE, _TAPERED_CAPSULE_PRIMITIVE, _TAPERED_CYLINDER_PRIMITIVE, _CHAMFER_CYLINDER_PRIMITIVE, _RANDOM_CONVEX_HULL_PRIMITIVE, _REGULAR_CONVEX_HULL_PRIMITIVE};
-		for (int i = 0; i < sizeof (collisionArray) / sizeof (collisionArray[0]); i ++) {
+		for (int i = 0; i < int (sizeof (collisionArray) / sizeof (collisionArray[0])); i ++) {
 			int index = dRand() % (sizeof (selection) / sizeof (selection[0]));
 			dVector shapeSize (size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), 0.0f);
 			collisionArray[i] = CreateConvexCollision (world, GetIdentityMatrix(), shapeSize, selection[index], materialID);
@@ -75,7 +75,7 @@ class StupidComplexOfConvexShapes: public DemoEntity
 
 		// destroy all collision shapes after they are used
 		NewtonDestroyCollision(compound);
-		for (int i = 0; i < sizeof (collisionArray) / sizeof (collisionArray[0]); i ++) {
+		for (int i = 0; i < int (sizeof (collisionArray) / sizeof (collisionArray[0])); i ++) {
 			gemetries[i]->Release();
 			NewtonDestroyCollision(collisionArray[i]);
 		}

@@ -2467,7 +2467,7 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localQ0, const dgVector& l
 
 			if (i >= normalsCount) {
 				tetrahedrum[3] = bestPoint;
-				dgVector e3 (tetrahedrum[3] - tetrahedrum[0]);
+				//dgVector e3 (tetrahedrum[3] - tetrahedrum[0]);
 				error2 = maxError2;
 			}
 

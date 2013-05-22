@@ -8,50 +8,26 @@
 
 /* Begin PBXBuildFile section */
 		FF8C267A1313D31E00646B90 /* dBaseHierarchy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C26691313D31E00646B90 /* dBaseHierarchy.cpp */; };
-		FF8C267B1313D31E00646B90 /* dBaseHierarchy.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C266A1313D31E00646B90 /* dBaseHierarchy.h */; };
 		FF8C267C1313D31E00646B90 /* dClassInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C266B1313D31E00646B90 /* dClassInfo.cpp */; };
-		FF8C267D1313D31E00646B90 /* dClassInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C266C1313D31E00646B90 /* dClassInfo.h */; };
 		FF8C267E1313D31E00646B90 /* dContainersStdAfx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C266D1313D31E00646B90 /* dContainersStdAfx.cpp */; };
-		FF8C267F1313D31E00646B90 /* dContainersStdAfx.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C266E1313D31E00646B90 /* dContainersStdAfx.h */; };
 		FF8C26801313D31E00646B90 /* dCRC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C266F1313D31E00646B90 /* dCRC.cpp */; };
-		FF8C26811313D31E00646B90 /* dCRC.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C26701313D31E00646B90 /* dCRC.h */; };
-		FF8C26821313D31E00646B90 /* dHeap.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C26711313D31E00646B90 /* dHeap.h */; };
-		FF8C26831313D31E00646B90 /* dList.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C26721313D31E00646B90 /* dList.h */; };
 		FF8C26841313D31E00646B90 /* dRefCounter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C26731313D31E00646B90 /* dRefCounter.cpp */; };
-		FF8C26851313D31E00646B90 /* dRefCounter.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C26741313D31E00646B90 /* dRefCounter.h */; };
-		FF8C26861313D31E00646B90 /* dRtti.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C26751313D31E00646B90 /* dRtti.h */; };
 		FF8C26891313D31E00646B90 /* dTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C26781313D31E00646B90 /* dTree.cpp */; };
-		FF8C268A1313D31E00646B90 /* dTree.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C26791313D31E00646B90 /* dTree.h */; };
 		FFD2742B172D9F9000114513 /* dString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFD27429172D9F9000114513 /* dString.cpp */; };
-		FFD2742C172D9F9000114513 /* dString.h in Headers */ = {isa = PBXBuildFile; fileRef = FFD2742A172D9F9000114513 /* dString.h */; };
 		FFDE47C9166BF801006CFDE9 /* dUndoRedo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFDE47C5166BF801006CFDE9 /* dUndoRedo.cpp */; };
-		FFDE47CA166BF801006CFDE9 /* dUndoRedo.h in Headers */ = {isa = PBXBuildFile; fileRef = FFDE47C6166BF801006CFDE9 /* dUndoRedo.h */; };
-		FFDE4808166BF9E3006CFDE9 /* dMathDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = FFDE4807166BF9E3006CFDE9 /* dMathDefines.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		32BAE0B70371A74B00C91783 /* dContainers_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dContainers_Prefix.pch; sourceTree = "<group>"; };
 		D2AAC06F0554671400DB518D /* libdContainers.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libdContainers.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF8C26691313D31E00646B90 /* dBaseHierarchy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dBaseHierarchy.cpp; path = ../../../dContainers/dBaseHierarchy.cpp; sourceTree = SOURCE_ROOT; };
-		FF8C266A1313D31E00646B90 /* dBaseHierarchy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dBaseHierarchy.h; path = ../../../dContainers/dBaseHierarchy.h; sourceTree = SOURCE_ROOT; };
 		FF8C266B1313D31E00646B90 /* dClassInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dClassInfo.cpp; path = ../../../dContainers/dClassInfo.cpp; sourceTree = SOURCE_ROOT; };
-		FF8C266C1313D31E00646B90 /* dClassInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dClassInfo.h; path = ../../../dContainers/dClassInfo.h; sourceTree = SOURCE_ROOT; };
 		FF8C266D1313D31E00646B90 /* dContainersStdAfx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dContainersStdAfx.cpp; path = ../../../dContainers/dContainersStdAfx.cpp; sourceTree = SOURCE_ROOT; };
-		FF8C266E1313D31E00646B90 /* dContainersStdAfx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dContainersStdAfx.h; path = ../../../dContainers/dContainersStdAfx.h; sourceTree = SOURCE_ROOT; };
 		FF8C266F1313D31E00646B90 /* dCRC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dCRC.cpp; path = ../../../dContainers/dCRC.cpp; sourceTree = SOURCE_ROOT; };
-		FF8C26701313D31E00646B90 /* dCRC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dCRC.h; path = ../../../dContainers/dCRC.h; sourceTree = SOURCE_ROOT; };
-		FF8C26711313D31E00646B90 /* dHeap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dHeap.h; path = ../../../dContainers/dHeap.h; sourceTree = SOURCE_ROOT; };
-		FF8C26721313D31E00646B90 /* dList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dList.h; path = ../../../dContainers/dList.h; sourceTree = SOURCE_ROOT; };
 		FF8C26731313D31E00646B90 /* dRefCounter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dRefCounter.cpp; path = ../../../dContainers/dRefCounter.cpp; sourceTree = SOURCE_ROOT; };
-		FF8C26741313D31E00646B90 /* dRefCounter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dRefCounter.h; path = ../../../dContainers/dRefCounter.h; sourceTree = SOURCE_ROOT; };
-		FF8C26751313D31E00646B90 /* dRtti.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dRtti.h; path = ../../../dContainers/dRtti.h; sourceTree = SOURCE_ROOT; };
 		FF8C26781313D31E00646B90 /* dTree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dTree.cpp; path = ../../../dContainers/dTree.cpp; sourceTree = SOURCE_ROOT; };
-		FF8C26791313D31E00646B90 /* dTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dTree.h; path = ../../../dContainers/dTree.h; sourceTree = SOURCE_ROOT; };
 		FFD27429172D9F9000114513 /* dString.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dString.cpp; path = ../../../dContainers/dString.cpp; sourceTree = "<group>"; };
-		FFD2742A172D9F9000114513 /* dString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dString.h; path = ../../../dContainers/dString.h; sourceTree = "<group>"; };
 		FFDE47C5166BF801006CFDE9 /* dUndoRedo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dUndoRedo.cpp; path = ../../../dContainers/dUndoRedo.cpp; sourceTree = SOURCE_ROOT; };
-		FFDE47C6166BF801006CFDE9 /* dUndoRedo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dUndoRedo.h; path = ../../../dContainers/dUndoRedo.h; sourceTree = SOURCE_ROOT; };
-		FFDE4807166BF9E3006CFDE9 /* dMathDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dMathDefines.h; path = ../../../dMath/dMathDefines.h; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,25 +62,13 @@
 			isa = PBXGroup;
 			children = (
 				FFD27429172D9F9000114513 /* dString.cpp */,
-				FFD2742A172D9F9000114513 /* dString.h */,
-				FFDE4807166BF9E3006CFDE9 /* dMathDefines.h */,
 				FFDE47C5166BF801006CFDE9 /* dUndoRedo.cpp */,
-				FFDE47C6166BF801006CFDE9 /* dUndoRedo.h */,
 				FF8C26691313D31E00646B90 /* dBaseHierarchy.cpp */,
-				FF8C266A1313D31E00646B90 /* dBaseHierarchy.h */,
 				FF8C266B1313D31E00646B90 /* dClassInfo.cpp */,
-				FF8C266C1313D31E00646B90 /* dClassInfo.h */,
 				FF8C266D1313D31E00646B90 /* dContainersStdAfx.cpp */,
-				FF8C266E1313D31E00646B90 /* dContainersStdAfx.h */,
 				FF8C266F1313D31E00646B90 /* dCRC.cpp */,
-				FF8C26701313D31E00646B90 /* dCRC.h */,
-				FF8C26711313D31E00646B90 /* dHeap.h */,
-				FF8C26721313D31E00646B90 /* dList.h */,
 				FF8C26731313D31E00646B90 /* dRefCounter.cpp */,
-				FF8C26741313D31E00646B90 /* dRefCounter.h */,
-				FF8C26751313D31E00646B90 /* dRtti.h */,
 				FF8C26781313D31E00646B90 /* dTree.cpp */,
-				FF8C26791313D31E00646B90 /* dTree.h */,
 				32BAE0B70371A74B00C91783 /* dContainers_Prefix.pch */,
 			);
 			name = Source;
@@ -117,18 +81,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FF8C267B1313D31E00646B90 /* dBaseHierarchy.h in Headers */,
-				FF8C267D1313D31E00646B90 /* dClassInfo.h in Headers */,
-				FF8C267F1313D31E00646B90 /* dContainersStdAfx.h in Headers */,
-				FF8C26811313D31E00646B90 /* dCRC.h in Headers */,
-				FF8C26821313D31E00646B90 /* dHeap.h in Headers */,
-				FF8C26831313D31E00646B90 /* dList.h in Headers */,
-				FF8C26851313D31E00646B90 /* dRefCounter.h in Headers */,
-				FF8C26861313D31E00646B90 /* dRtti.h in Headers */,
-				FF8C268A1313D31E00646B90 /* dTree.h in Headers */,
-				FFDE47CA166BF801006CFDE9 /* dUndoRedo.h in Headers */,
-				FFDE4808166BF9E3006CFDE9 /* dMathDefines.h in Headers */,
-				FFD2742C172D9F9000114513 /* dString.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

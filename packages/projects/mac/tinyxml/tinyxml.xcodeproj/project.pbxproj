@@ -8,9 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		FF8C27BF1313DA9C00646B90 /* tinystr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C27B91313DA9C00646B90 /* tinystr.cpp */; };
-		FF8C27C01313DA9C00646B90 /* tinystr.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C27BA1313DA9C00646B90 /* tinystr.h */; };
 		FF8C27C11313DA9C00646B90 /* tinyxml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C27BB1313DA9C00646B90 /* tinyxml.cpp */; };
-		FF8C27C21313DA9C00646B90 /* tinyxml.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C27BC1313DA9C00646B90 /* tinyxml.h */; };
 		FF8C27C31313DA9C00646B90 /* tinyxmlerror.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C27BD1313DA9C00646B90 /* tinyxmlerror.cpp */; };
 		FF8C27C41313DA9C00646B90 /* tinyxmlparser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C27BE1313DA9C00646B90 /* tinyxmlparser.cpp */; };
 /* End PBXBuildFile section */
@@ -19,9 +17,7 @@
 		32BAE0B70371A74B00C91783 /* tinyxml_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tinyxml_Prefix.pch; sourceTree = "<group>"; };
 		D2AAC06F0554671400DB518D /* libtinyxml.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libtinyxml.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF8C27B91313DA9C00646B90 /* tinystr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tinystr.cpp; path = ../../../thirdParty/tinyxml/tinystr.cpp; sourceTree = SOURCE_ROOT; };
-		FF8C27BA1313DA9C00646B90 /* tinystr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tinystr.h; path = ../../../thirdParty/tinyxml/tinystr.h; sourceTree = SOURCE_ROOT; };
 		FF8C27BB1313DA9C00646B90 /* tinyxml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tinyxml.cpp; path = ../../../thirdParty/tinyxml/tinyxml.cpp; sourceTree = SOURCE_ROOT; };
-		FF8C27BC1313DA9C00646B90 /* tinyxml.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tinyxml.h; path = ../../../thirdParty/tinyxml/tinyxml.h; sourceTree = SOURCE_ROOT; };
 		FF8C27BD1313DA9C00646B90 /* tinyxmlerror.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tinyxmlerror.cpp; path = ../../../thirdParty/tinyxml/tinyxmlerror.cpp; sourceTree = SOURCE_ROOT; };
 		FF8C27BE1313DA9C00646B90 /* tinyxmlparser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tinyxmlparser.cpp; path = ../../../thirdParty/tinyxml/tinyxmlparser.cpp; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -58,9 +54,7 @@
 			isa = PBXGroup;
 			children = (
 				FF8C27B91313DA9C00646B90 /* tinystr.cpp */,
-				FF8C27BA1313DA9C00646B90 /* tinystr.h */,
 				FF8C27BB1313DA9C00646B90 /* tinyxml.cpp */,
-				FF8C27BC1313DA9C00646B90 /* tinyxml.h */,
 				FF8C27BD1313DA9C00646B90 /* tinyxmlerror.cpp */,
 				FF8C27BE1313DA9C00646B90 /* tinyxmlparser.cpp */,
 				32BAE0B70371A74B00C91783 /* tinyxml_Prefix.pch */,
@@ -75,8 +69,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FF8C27C01313DA9C00646B90 /* tinystr.h in Headers */,
-				FF8C27C21313DA9C00646B90 /* tinyxml.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

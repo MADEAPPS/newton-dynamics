@@ -8,30 +8,20 @@
 
 /* Begin PBXBuildFile section */
 		FF8C264E1313D28E00646B90 /* dMathDefines.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C26441313D28E00646B90 /* dMathDefines.cpp */; };
-		FF8C264F1313D28E00646B90 /* dMathDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C26451313D28E00646B90 /* dMathDefines.h */; };
 		FF8C26501313D28E00646B90 /* dMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C26461313D28E00646B90 /* dMatrix.cpp */; };
-		FF8C26511313D28E00646B90 /* dMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C26471313D28E00646B90 /* dMatrix.h */; };
 		FF8C26521313D28E00646B90 /* dQuaternion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C26481313D28E00646B90 /* dQuaternion.cpp */; };
-		FF8C26531313D28E00646B90 /* dQuaternion.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C26491313D28E00646B90 /* dQuaternion.h */; };
 		FF8C26541313D28E00646B90 /* dStdAfxMath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C264A1313D28E00646B90 /* dStdAfxMath.cpp */; };
-		FF8C26551313D28E00646B90 /* dStdAfxMath.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C264B1313D28E00646B90 /* dStdAfxMath.h */; };
 		FF8C26561313D28E00646B90 /* dVector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C264C1313D28E00646B90 /* dVector.cpp */; };
-		FF8C26571313D28E00646B90 /* dVector.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C264D1313D28E00646B90 /* dVector.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		32BAE0B70371A74B00C91783 /* dMath_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dMath_Prefix.pch; sourceTree = "<group>"; };
 		D2AAC06F0554671400DB518D /* libdMath.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libdMath.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF8C26441313D28E00646B90 /* dMathDefines.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dMathDefines.cpp; path = ../../../dMath/dMathDefines.cpp; sourceTree = SOURCE_ROOT; };
-		FF8C26451313D28E00646B90 /* dMathDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dMathDefines.h; path = ../../../dMath/dMathDefines.h; sourceTree = SOURCE_ROOT; };
 		FF8C26461313D28E00646B90 /* dMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dMatrix.cpp; path = ../../../dMath/dMatrix.cpp; sourceTree = SOURCE_ROOT; };
-		FF8C26471313D28E00646B90 /* dMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dMatrix.h; path = ../../../dMath/dMatrix.h; sourceTree = SOURCE_ROOT; };
 		FF8C26481313D28E00646B90 /* dQuaternion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dQuaternion.cpp; path = ../../../dMath/dQuaternion.cpp; sourceTree = SOURCE_ROOT; };
-		FF8C26491313D28E00646B90 /* dQuaternion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dQuaternion.h; path = ../../../dMath/dQuaternion.h; sourceTree = SOURCE_ROOT; };
 		FF8C264A1313D28E00646B90 /* dStdAfxMath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dStdAfxMath.cpp; path = ../../../dMath/dStdAfxMath.cpp; sourceTree = SOURCE_ROOT; };
-		FF8C264B1313D28E00646B90 /* dStdAfxMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dStdAfxMath.h; path = ../../../dMath/dStdAfxMath.h; sourceTree = SOURCE_ROOT; };
 		FF8C264C1313D28E00646B90 /* dVector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dVector.cpp; path = ../../../dMath/dVector.cpp; sourceTree = SOURCE_ROOT; };
-		FF8C264D1313D28E00646B90 /* dVector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dVector.h; path = ../../../dMath/dVector.h; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,15 +56,10 @@
 			isa = PBXGroup;
 			children = (
 				FF8C26441313D28E00646B90 /* dMathDefines.cpp */,
-				FF8C26451313D28E00646B90 /* dMathDefines.h */,
 				FF8C26461313D28E00646B90 /* dMatrix.cpp */,
-				FF8C26471313D28E00646B90 /* dMatrix.h */,
 				FF8C26481313D28E00646B90 /* dQuaternion.cpp */,
-				FF8C26491313D28E00646B90 /* dQuaternion.h */,
 				FF8C264A1313D28E00646B90 /* dStdAfxMath.cpp */,
-				FF8C264B1313D28E00646B90 /* dStdAfxMath.h */,
 				FF8C264C1313D28E00646B90 /* dVector.cpp */,
-				FF8C264D1313D28E00646B90 /* dVector.h */,
 				32BAE0B70371A74B00C91783 /* dMath_Prefix.pch */,
 			);
 			name = Source;
@@ -87,11 +72,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FF8C264F1313D28E00646B90 /* dMathDefines.h in Headers */,
-				FF8C26511313D28E00646B90 /* dMatrix.h in Headers */,
-				FF8C26531313D28E00646B90 /* dQuaternion.h in Headers */,
-				FF8C26551313D28E00646B90 /* dStdAfxMath.h in Headers */,
-				FF8C26571313D28E00646B90 /* dVector.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

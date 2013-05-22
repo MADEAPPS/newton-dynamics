@@ -7,17 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		FF0A4FF71731614C005D6C12 /* glew.h in Headers */ = {isa = PBXBuildFile; fileRef = FF0A4FF41731614C005D6C12 /* glew.h */; };
-		FF0A4FF81731614C005D6C12 /* glxew.h in Headers */ = {isa = PBXBuildFile; fileRef = FF0A4FF51731614C005D6C12 /* glxew.h */; };
-		FF0A4FF91731614C005D6C12 /* wglew.h in Headers */ = {isa = PBXBuildFile; fileRef = FF0A4FF61731614C005D6C12 /* wglew.h */; };
 		FF0A4FFB1731615F005D6C12 /* glew.c in Sources */ = {isa = PBXBuildFile; fileRef = FF0A4FFA1731615F005D6C12 /* glew.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		FF0A4FEC173160E6005D6C12 /* libglew-osx.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libglew-osx.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		FF0A4FF41731614C005D6C12 /* glew.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = glew.h; path = ../../include/GL/glew.h; sourceTree = "<group>"; };
-		FF0A4FF51731614C005D6C12 /* glxew.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = glxew.h; path = ../../include/GL/glxew.h; sourceTree = "<group>"; };
-		FF0A4FF61731614C005D6C12 /* wglew.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = wglew.h; path = ../../include/GL/wglew.h; sourceTree = "<group>"; };
 		FF0A4FFA1731615F005D6C12 /* glew.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = glew.c; path = ../../src/glew.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -52,9 +46,6 @@
 			isa = PBXGroup;
 			children = (
 				FF0A4FFA1731615F005D6C12 /* glew.c */,
-				FF0A4FF41731614C005D6C12 /* glew.h */,
-				FF0A4FF51731614C005D6C12 /* glxew.h */,
-				FF0A4FF61731614C005D6C12 /* wglew.h */,
 			);
 			name = source;
 			sourceTree = "<group>";
@@ -66,9 +57,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FF0A4FF71731614C005D6C12 /* glew.h in Headers */,
-				FF0A4FF81731614C005D6C12 /* glxew.h in Headers */,
-				FF0A4FF91731614C005D6C12 /* wglew.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
