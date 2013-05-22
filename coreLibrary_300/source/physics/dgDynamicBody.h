@@ -179,9 +179,9 @@ DG_INLINE void dgDynamicBody::SetTorque (const dgVector& torque)
 
 DG_INLINE void dgDynamicBody::AddDampingAcceleration()
 {
-	m_veloc -= m_veloc.Scale4 (m_dampCoef.m_w);
+	m_veloc = m_veloc - m_veloc.Scale4 (m_dampCoef.m_w);
 	dgVector omega (m_matrix.UnrotateVector (m_omega));
-	omega -= omega.CompProduct4 (m_dampCoef);
+	omega = omega - omega.CompProduct4 (m_dampCoef);
 	m_omega = m_matrix.RotateVector (omega);
 }
 

@@ -495,7 +495,7 @@ dgInt32 dgCollisionConvexPolygon::CalculatePlaneIntersection (const dgVector& no
 				dgVector e0 (contactsOut[1] - contactsOut[0]);
 				for (dgInt32 i = 2; i < count; i ++) {
 					dgVector e1 (contactsOut[i] - contactsOut[0]);
-					n += e0 * e1;
+					n = n + e0 * e1;
 					e0 = e1;
 				} 
 				n = n.Scale3 (dgRsqrt(n % n));

@@ -691,9 +691,9 @@ void dgCollisionCompound::MassProperties ()
 		dgFloat32 shapeVolume = collision->GetVolume();
 
 		volume += shapeVolume;
-		origin += shapeInertia.m_posit.Scale3(shapeVolume);
-		inertiaII += dgVector (shapeInertia[0][0], shapeInertia[0][0], shapeInertia[0][0], dgFloat32 (0.0f)).Scale3 (shapeVolume);
-		inertiaIJ += dgVector (shapeInertia[1][2], shapeInertia[0][2], shapeInertia[0][1], dgFloat32 (0.0f)).Scale3 (shapeVolume);
+		origin = origin + shapeInertia.m_posit.Scale3(shapeVolume);
+		inertiaII = inertiaII + dgVector (shapeInertia[0][0], shapeInertia[0][0], shapeInertia[0][0], dgFloat32 (0.0f)).Scale3 (shapeVolume);
+		inertiaIJ = inertiaIJ + dgVector (shapeInertia[1][2], shapeInertia[0][2], shapeInertia[0][1], dgFloat32 (0.0f)).Scale3 (shapeVolume);
 	}
 	dgFloat32 invVolume = dgFloat32 (1.0f)/volume;
 	m_inertia = inertiaII.Scale3 (invVolume);

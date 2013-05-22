@@ -1545,7 +1545,7 @@ dgBigVector dgMeshEffect::GetOrigin ()const
 {
 	dgBigVector origin (dgFloat64 (0.0f), dgFloat64 (0.0f), dgFloat64 (0.0f), dgFloat64 (0.0f));	
 	for (dgInt32 i = 0; i < m_pointCount; i ++) {
-		origin += m_points[i];
+		origin = origin + m_points[i];
 	}	
 	return origin.Scale3 (dgFloat64 (1.0f) / m_pointCount);
 }
@@ -1894,7 +1894,7 @@ void dgMeshEffect::CalculateNormals (dgFloat64 angleInRadians)
 				tmpAttributes[attribCount] = attibutes[dgInt32 (ptr->m_userData)];
 				attribCount ++;
 
-				normal += normal1;
+				normal = normal + normal1;
 				normal0 = normal1;
 			} 
 			normal = normal.Scale3 (dgFloat32 (1.0f) / (sqrt(normal % normal) + dgFloat32(1.0e-16f)));
@@ -3060,7 +3060,7 @@ dgCollisionInstance* dgMeshEffect::CreateConvexCollision(dgWorld* const world, d
 	}
 
 	dgMatrix matrix (srcMatrix);
-	matrix.m_posit += matrix.RotateVector(com);
+	matrix.m_posit = matrix.m_posit + matrix.RotateVector(com);
 	matrix.m_posit.m_w = dgFloat32 (1.0f);
 
 	dgUnsigned32 crc = dgCollisionConvexHull::CalculateSignature (count, &pool[0].m_x, sizeof (dgVector));

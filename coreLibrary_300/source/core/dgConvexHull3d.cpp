@@ -255,8 +255,8 @@ dgAABBPointTree3d* dgConvexHull3d::BuildTree (dgAABBPointTree3d* const parent, d
 			maxP.m_y = dgMax (p.m_y, maxP.m_y); 
 			maxP.m_z = dgMax (p.m_z, maxP.m_z); 
 
-			median += p;
-			varian += p.CompProduct3 (p);
+			median = median + p;
+			varian = varian + p.CompProduct3 (p);
 		}
 
 		varian = varian.Scale3 (dgFloat32 (count)) - median.CompProduct3(median);

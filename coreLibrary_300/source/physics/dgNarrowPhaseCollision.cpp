@@ -1562,7 +1562,7 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) 
 			dgContactPoint* const contactOut = proxy.m_contacts;
 			for (dgInt32 i = 0; i < count; i ++) {
 				contactOut[i].m_normal = contactOut[i].m_normal.Scale3 (dgFloat32 (-1.0f));
-				contactOut[i].m_point += step;
+				contactOut[i].m_point = contactOut[i].m_point + step;
 			}
 
 			proxy.m_normal = tmp.m_normal.Scale3(dgFloat32 (-1.0f));

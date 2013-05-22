@@ -80,27 +80,11 @@ class dgTemplateVector
 		return dgTemplateVector<T> (m_x + B.m_x, m_y + B.m_y, m_z + B.m_z, m_w + B.m_w);
 	}
 
-	DG_INLINE dgTemplateVector<T>& operator+= (const dgTemplateVector<T>& A) 
-	{
-		m_x += A.m_x;
-		m_y += A.m_y;
-		m_z += A.m_z;
-		m_w += A.m_w;
-		return *this;
-	}
-
 	DG_INLINE dgTemplateVector<T> operator- (const dgTemplateVector<T>& A) const
 	{
 		return dgTemplateVector<T> (m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w - A.m_w);
 	}
 
-	DG_INLINE dgTemplateVector<T>& operator-= (const dgTemplateVector<T>& A) 
-	{
-		m_x -= A.m_x;
-		m_y -= A.m_y;
-		m_z -= A.m_z;
-		return *this;
-	}
 
 	// return dot product
 	DG_INLINE T operator% (const dgTemplateVector<T>& A) const
@@ -555,18 +539,6 @@ class dgVector
 	DG_INLINE dgVector Sub4 (const dgVector& A) const
 	{
 		return _mm_sub_ps (m_type, A.m_type);	
-	}
-
-	DG_INLINE dgVector &operator+= (const dgVector& A)
-	{
-		m_type = _mm_add_ps (m_type, A.m_type);
-		return *this;
-	}
-
-	DG_INLINE dgVector &operator-= (const dgVector& A)
-	{
-		m_type = _mm_sub_ps (m_type, A.m_type);
-		return *this;
 	}
 
 	// return dot product

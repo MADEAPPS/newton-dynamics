@@ -162,10 +162,10 @@ namespace InternalSphere
 				centre = centre.Scale3 ((dgFloat32)area);
 			} 
 
-			totalArea += area;
-			massCenter += centre;
-			var += dgVector ((dgFloat32)Ixx, (dgFloat32)Iyy, (dgFloat32)Izz, dgFloat32 (0.0f));
-			cov += dgVector ((dgFloat32)Ixy, (dgFloat32)Ixz, (dgFloat32)Iyz, dgFloat32 (0.0f));
+			totalArea = totalArea + area;
+			massCenter = massCenter + centre;
+			var = var + dgVector ((dgFloat32)Ixx, (dgFloat32)Iyy, (dgFloat32)Izz, dgFloat32 (0.0f));
+			cov = cov + dgVector ((dgFloat32)Ixy, (dgFloat32)Ixz, (dgFloat32)Iyz, dgFloat32 (0.0f));
 		}
 
 		if (totalArea > dgEPSILON * 10.0) {
@@ -202,9 +202,9 @@ namespace InternalSphere
 			dgFloat32 y = ptr[1] * scaleVector.m_y;
 			dgFloat32 z = ptr[2] * scaleVector.m_z;
 			ptr += stride;
-			massCenter += dgBigVector (x, y, z, dgFloat32 (0.0f));
-			var += dgBigVector (x * x, y * y, z * z, dgFloat32 (0.0f));
-			cov += dgBigVector (x * y, x * z, y * z, dgFloat32 (0.0f));
+			massCenter = massCenter + dgBigVector (x, y, z, dgFloat32 (0.0f));
+			var = var + dgBigVector (x * x, y * y, z * z, dgFloat32 (0.0f));
+			cov = cov + dgBigVector (x * y, x * z, y * z, dgFloat32 (0.0f));
 		}
 	
 		dgFloat64 k = dgFloat64 (1.0) / vertexCount;

@@ -222,8 +222,8 @@ void dgDynamicBody::AddImpulse (const dgVector& pointDeltaVeloc, const dgVector&
 	dgVector dv (changeOfMomentum.Scale3 (m_invMass.m_w));
 	dgVector dw (invInertia.RotateVector (globalContact * changeOfMomentum));
 
-	m_veloc += dv;
-	m_omega += dw;
+	m_veloc = m_veloc + dv;
+	m_omega = m_omega + dw;
 
 	m_sleeping	= false;
 	m_equilibrium = false;
@@ -273,8 +273,8 @@ void dgDynamicBody::ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, 
 		dgVector L (impulseArray[index], impulseArray[index + 1], impulseArray[index + 2], dgFloat32 (0.0f));
 		dgVector Q ((r - com) * L);
 
-		impulse += L;
-		angularImpulse += Q;
+		impulse = impulse + L;
+		angularImpulse = angularImpulse + Q;
 	}
 
 	dgMatrix invInertia (CalculateInvInertiaMatrix());

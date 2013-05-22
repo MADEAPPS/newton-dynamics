@@ -289,7 +289,7 @@ bool dgApi dgRayBoxClip (dgVector& p0, dgVector& p1, const dgVector& boxP0, cons
 		} else {
 			dgFloat32 tmp1 = boxP1[i] - p1[i];
 			if (tmp1 > dgFloat32 (0.0f)) {
-				p0 += (p1 - p0).Scale3 (tmp0 / (p1[i] - p0[i])); 
+				p0 = p0 + (p1 - p0).Scale3 (tmp0 / (p1[i] - p0[i])); 
 				p0[i] = boxP1[i];
 			} else {
 				return false;
@@ -306,7 +306,7 @@ bool dgApi dgRayBoxClip (dgVector& p0, dgVector& p1, const dgVector& boxP0, cons
 		} else {
 			dgFloat32 tmp1 = boxP0[i] - p1[i];
 			if (tmp1 < dgFloat32 (0.0f)) {
-				p0 += (p1 - p0).Scale3 (tmp0 / (p1[i] - p0[i])); 
+				p0 = p0 + (p1 - p0).Scale3 (tmp0 / (p1[i] - p0[i])); 
 				p0[i] = boxP0[i];
 			} else {
 				return false;

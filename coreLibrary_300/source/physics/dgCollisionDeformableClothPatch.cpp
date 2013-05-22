@@ -376,8 +376,8 @@ void dgCollisionDeformableClothPatch::IntegrateParticles (dgFloat32 timestep)
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
 		veloc[i] = (posit[i] - m_posit[i]).Scale3 (invTimeStep);
 		m_posit[i] = posit[i];
-		veloc[i] += gravityStep.Scale3 (unitMass[i]);
-		posit[i] += veloc[i].Scale3 (timestep);
+		veloc[i] = veloc[i] + gravityStep.Scale3 (unitMass[i]);
+		posit[i] = posit[i] + veloc[i].Scale3 (timestep);
 	}
 /*
 	// calculate internal forces
@@ -427,8 +427,8 @@ void dgCollisionDeformableClothPatch::ResolvePositionsConstraints (dgFloat32 tim
 
 #endif
 		
-		posit[index0] -= relPosit.Scale3 (error * link->m_mass0_influence);
-		posit[index1] += relPosit.Scale3 (error * link->m_mass1_influence);
+		posit[index0] = posit[index0] - relPosit.Scale3 (error * link->m_mass0_influence);
+		posit[index1] = posit[index1] + relPosit.Scale3 (error * link->m_mass1_influence);
 	}
 
 }

@@ -22,7 +22,7 @@
 #ifndef __DGTYPES_H__
 #define __DGTYPES_H__
 
-#define DG_SIMD_VECTOR_CLASS
+//#define DG_SIMD_VECTOR_CLASS
 //#define DG_SIMD_VECTOR_CLASS_4
 
 #ifdef DG_SIMD_VECTOR_CLASS_4 
