@@ -866,8 +866,8 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 		dgAssert (collConicConvexInstance->IsType (dgCollision::dgCollisionConvexShape_RTTI));
 
 		dgInt32 simplexPointCount = 0;
-		dgFloat32 radiusA = m_myShape->GetBoxMaxRadius() * collConicConvexInstance->m_maxScale;
-		dgFloat32 radiusB = m_otherShape->GetBoxMaxRadius() * collConvexInstance->m_maxScale;
+		dgFloat32 radiusA = m_myShape->GetBoxMaxRadius() * collConicConvexInstance->m_maxScale.m_x;
+		dgFloat32 radiusB = m_otherShape->GetBoxMaxRadius() * collConvexInstance->m_maxScale.m_x;
 		if ((radiusA * dgFloat32 (8.0f) > radiusB) && (radiusB * dgFloat32 (8.0f) > radiusA)) {
 			simplexPointCount = CalculateClosestSimplex ();
 			if (simplexPointCount < 0) {
@@ -1449,10 +1449,11 @@ void dgCollisionConvex::DebugCollision (const dgMatrix& matrix, OnDebugCollision
 void dgCollisionConvex::CalcAABB (const dgMatrix &matrix, dgVector& p0, dgVector& p1) const
 {
 	dgVector origin (matrix.TransformVector(m_boxOrigin));
-	dgVector size (m_boxSize.m_x * dgAbsf(matrix[0][0]) + m_boxSize.m_y * dgAbsf(matrix[1][0]) + m_boxSize.m_z * dgAbsf(matrix[2][0]),  
-				   m_boxSize.m_x * dgAbsf(matrix[0][1]) + m_boxSize.m_y * dgAbsf(matrix[1][1]) + m_boxSize.m_z * dgAbsf(matrix[2][1]),  
-				   m_boxSize.m_x * dgAbsf(matrix[0][2]) + m_boxSize.m_y * dgAbsf(matrix[1][2]) + m_boxSize.m_z * dgAbsf(matrix[2][2]),
-				   dgFloat32 (0.0f));
+//	dgVector size (m_boxSize.m_x * dgAbsf(matrix[0][0]) + m_boxSize.m_y * dgAbsf(matrix[1][0]) + m_boxSize.m_z * dgAbsf(matrix[2][0]),  
+//				   m_boxSize.m_x * dgAbsf(matrix[0][1]) + m_boxSize.m_y * dgAbsf(matrix[1][1]) + m_boxSize.m_z * dgAbsf(matrix[2][1]),  
+//				   m_boxSize.m_x * dgAbsf(matrix[0][2]) + m_boxSize.m_y * dgAbsf(matrix[1][2]) + m_boxSize.m_z * dgAbsf(matrix[2][2]),
+//				   dgFloat32 (0.0f));
+	dgVector size (matrix.m_front.Abs().Scale4(m_boxSize.m_x) + matrix.m_up.Abs().Scale4(m_boxSize.m_y) + matrix.m_right.Abs().Scale4(m_boxSize.m_z));
 
 	p0 = origin - size;
 	p1 = origin + size;

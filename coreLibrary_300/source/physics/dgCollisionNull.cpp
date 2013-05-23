@@ -70,15 +70,8 @@ dgInt32 dgCollisionNull::CalculateSignature () const
 
 void dgCollisionNull::CalcAABB (const dgMatrix &matrix, dgVector &p0, dgVector &p1) const
 {
-	p0.m_x = matrix[3][0];
-	p1.m_x = matrix[3][0];
-
-	p0.m_y = matrix[3][1];
-	p1.m_y = matrix[3][1];
-
-	p0.m_z = matrix[3][2];
-	p1.m_z = matrix[3][2];
-
+	p0 = matrix[3];
+	p1 = matrix[3];
 	p0.m_w = 0.0f;
 	p1.m_w = 0.0f;
 }

@@ -1817,7 +1817,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue (dgCollisionParamPro
 	const dgVector& scale = polySoupInstance->m_scale;
 	const dgVector& invScale = polySoupInstance->m_invScale;
 
-	dgFloat32 maxPolyScale = polySoupInstance->m_maxScale;
+	dgFloat32 maxPolyScale = polySoupInstance->m_maxScale.m_x;
 
 	polyInstance.m_scaleIsUnit = true;
 	polyInstance.m_scaleIsUniform = true;

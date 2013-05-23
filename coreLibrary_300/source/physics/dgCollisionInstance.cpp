@@ -51,11 +51,11 @@ dgVector dgCollisionInstance::m_padding (DG_MAX_COLLISION_AABB_PADDING, DG_MAX_C
 dgCollisionInstance::dgCollisionInstance()
 	:m_globalMatrix(dgGetIdentityMatrix())
 	,m_localMatrix (dgGetIdentityMatrix())
-	,m_scale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f))
-	,m_invScale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f))
+	,m_scale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
+	,m_invScale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
+	,m_maxScale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
 	,m_userDataID(0)
 	,m_refCount(1)
-	,m_maxScale(dgFloat32 (1.0f))
 	,m_userData(NULL)
 	,m_world(NULL)
 	,m_childShape (NULL)
@@ -69,11 +69,11 @@ dgCollisionInstance::dgCollisionInstance()
 dgCollisionInstance::dgCollisionInstance(const dgWorld* const world, const dgCollision* const childCollision, dgInt32 shapeID, const dgMatrix &matrix)
 	:m_globalMatrix(matrix)
 	,m_localMatrix (matrix)
-	,m_scale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f))
-	,m_invScale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f))
+	,m_scale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
+	,m_invScale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
+	,m_maxScale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
 	,m_userDataID(shapeID)
 	,m_refCount(1)
-	,m_maxScale(dgFloat32 (1.0f))
 	,m_userData(NULL)
 	,m_world(world)
 	,m_childShape (childCollision)
@@ -89,9 +89,9 @@ dgCollisionInstance::dgCollisionInstance(const dgCollisionInstance& instance)
 	,m_localMatrix (instance.m_localMatrix)
 	,m_scale(instance.m_scale)
 	,m_invScale(instance.m_invScale)
+	,m_maxScale(instance.m_maxScale)
 	,m_userDataID(instance.m_userDataID)
 	,m_refCount(1)
-	,m_maxScale(instance.m_maxScale)
 	,m_userData(instance.m_userData)
 	,m_world(instance.m_world)
 	,m_childShape (instance.m_childShape)
@@ -126,11 +126,11 @@ dgCollisionInstance::dgCollisionInstance(const dgCollisionInstance& instance)
 dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDeserialize deserialization, void* const userData)
 	:m_globalMatrix(dgGetIdentityMatrix())
 	,m_localMatrix (dgGetIdentityMatrix())
-	,m_scale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f))
-	,m_invScale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f))
+	,m_scale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
+	,m_invScale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
+	,m_maxScale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
 	,m_userDataID(0)
 	,m_refCount(1)
-	,m_maxScale(dgFloat32 (1.0f))
 	,m_userData(NULL)
 	,m_world(constWorld)
 	,m_childShape (NULL)
@@ -146,8 +146,8 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 	deserialization (userData, &m_localMatrix, sizeof (m_localMatrix));
 	deserialization (userData, &m_scale, sizeof (m_scale));
 	deserialization (userData, &m_invScale, sizeof (m_scale));
-	deserialization (userData, &m_userDataID, sizeof (m_userDataID));
 	deserialization (userData, &m_maxScale, sizeof (m_maxScale));
+	deserialization (userData, &m_userDataID, sizeof (m_userDataID));
 	deserialization (userData, &m_flags, sizeof (m_flags));
 	deserialization (userData, &primitive, sizeof (primitive));
 	deserialization (userData, &signature, sizeof (signature));
@@ -316,8 +316,8 @@ void dgCollisionInstance::Serialize(dgSerialize callback, void* const userData, 
 	callback (userData, &m_localMatrix, sizeof (m_localMatrix));
 	callback (userData, &m_scale, sizeof (m_scale));
 	callback (userData, &m_invScale, sizeof (m_invScale));
-	callback (userData, &m_userDataID, sizeof (m_userDataID));
 	callback (userData, &m_maxScale, sizeof (m_maxScale));
+	callback (userData, &m_userDataID, sizeof (m_userDataID));
 	callback (userData, &m_flags, sizeof (m_flags));
 	callback (userData, &primitiveType, sizeof (primitiveType));
 	callback (userData, &signature, sizeof (signature));
@@ -342,21 +342,21 @@ void dgCollisionInstance::SetScale (const dgVector& scale)
 		m_scaleIsUniform = 1;
 		if ((dgAbsf (scaleX - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f))) {
 			m_scaleIsUnit = 1;
-			m_maxScale = 1.0f;
-			m_scale	= dgVector (dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f));	
+			m_scale	= dgVector (dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f));	
+			m_maxScale = m_scale;	
 			m_invScale = m_scale;
 		} else {
 			m_scaleIsUnit = 0;
-			m_maxScale = scaleX;
-			m_scale	= dgVector (scaleX, scaleX, scaleX, dgFloat32 (1.0f));	
-			m_invScale = dgVector (dgFloat32 (1.0f) / scaleX, dgFloat32 (1.0f) / scaleX, dgFloat32 (1.0f) / scaleX, dgFloat32 (1.0f));	
+			m_scale	= dgVector (scaleX, scaleX, scaleX, dgFloat32 (0.0f));	
+			m_maxScale = m_scale;	
+			m_invScale = dgVector (dgFloat32 (1.0f) / scaleX, dgFloat32 (1.0f) / scaleX, dgFloat32 (1.0f) / scaleX, dgFloat32 (0.0f));	
 		}
 	} else {
 		m_scaleIsUnit = 0;
 		m_scaleIsUniform = 0;
 		m_maxScale = dgMax(scaleX, scaleY, scaleZ);
-		m_scale	= dgVector (scaleX, scaleY, scaleZ, dgFloat32 (1.0f));	
-		m_invScale = dgVector (dgFloat32 (1.0f) / scaleX, dgFloat32 (1.0f) / scaleY, dgFloat32 (1.0f) / scaleZ, dgFloat32 (1.0f));	
+		m_scale	= dgVector (scaleX, scaleY, scaleZ, dgFloat32 (0.0f));	
+		m_invScale = dgVector (dgFloat32 (1.0f) / scaleX, dgFloat32 (1.0f) / scaleY, dgFloat32 (1.0f) / scaleZ, dgFloat32 (0.0f));	
 	}
 }
 
@@ -418,8 +418,8 @@ dgInt32 dgCollisionInstance::CalculatePlaneIntersection (const dgVector& normal,
 void dgCollisionInstance::CalcAABB (const dgMatrix &matrix, dgVector& p0, dgVector& p1) const
 {
 	m_childShape->CalcAABB (matrix, p0, p1);
-	p0 = matrix.m_posit + (p0 - matrix.m_posit).Scale3(m_maxScale) - m_padding;
-	p1 = matrix.m_posit + (p1 - matrix.m_posit).Scale3(m_maxScale) + m_padding;
+	p0 = matrix.m_posit + (p0 - matrix.m_posit).CompProduct4(m_maxScale) - m_padding;
+	p1 = matrix.m_posit + (p1 - matrix.m_posit).CompProduct4(m_maxScale) + m_padding;
 }
 
 

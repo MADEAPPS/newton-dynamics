@@ -119,9 +119,10 @@ class dgCollisionInstance
 	dgMatrix m_localMatrix;
 	dgVector m_scale;
 	dgVector m_invScale;
+	dgVector m_maxScale;
 	dgUnsigned32 m_userDataID;
 	dgInt32 m_refCount;
-	dgFloat32 m_maxScale;
+	
 	void* m_userData;
 	const dgWorld* m_world;
 	const dgCollision* m_childShape;
@@ -143,9 +144,9 @@ DG_INLINE dgCollisionInstance::dgCollisionInstance(const dgCollisionInstance& me
 	,m_localMatrix (meshInstance.m_localMatrix)
 	,m_scale(meshInstance.m_scale)
 	,m_invScale(meshInstance.m_invScale)
+	,m_maxScale(meshInstance.m_maxScale)
 	,m_userDataID(meshInstance.m_userDataID)
 	,m_refCount(1)
-	,m_maxScale(meshInstance.m_maxScale)
 	,m_userData(meshInstance.m_userData)
 	,m_world(meshInstance.m_world)
 	,m_childShape (shape)
@@ -312,12 +313,12 @@ DG_INLINE dgCollisionID dgCollisionInstance::GetCollisionPrimityType () const
 
 DG_INLINE dgFloat32 dgCollisionInstance::GetBoxMinRadius () const
 {
-	return m_childShape->GetBoxMinRadius() * m_maxScale;
+	return m_childShape->GetBoxMinRadius() * m_maxScale.m_x;
 } 
 
 DG_INLINE dgFloat32 dgCollisionInstance::GetBoxMaxRadius () const
 {
-	return m_childShape->GetBoxMaxRadius() * m_maxScale;
+	return m_childShape->GetBoxMaxRadius() * m_maxScale.m_x;
 } 
 
 
@@ -374,7 +375,7 @@ DG_INLINE dgVector dgCollisionInstance::GetBoxOrigin() const
 
 DG_INLINE dgFloat32 dgCollisionInstance::GetUmbraClipSize () const
 {
-	return m_childShape->GetUmbraClipSize() * m_maxScale;
+	return m_childShape->GetUmbraClipSize() * m_maxScale.m_x;
 }
 
 DG_INLINE dgMatrix dgCollisionInstance::CalculateSpaceMatrix (const dgCollisionInstance* const instance) const
@@ -382,9 +383,9 @@ DG_INLINE dgMatrix dgCollisionInstance::CalculateSpaceMatrix (const dgCollisionI
 	dgMatrix matrix (instance->m_globalMatrix * m_globalMatrix.Inverse());
 
 	const dgVector& scale = instance->m_scale;
-	matrix[0] = matrix[0].Scale3(scale[0]);
-	matrix[1] = matrix[1].Scale3(scale[1]);
-	matrix[2] = matrix[2].Scale3(scale[2]);
+	matrix[0] = matrix[0].Scale4(scale[0]);
+	matrix[1] = matrix[1].Scale4(scale[1]);
+	matrix[2] = matrix[2].Scale4(scale[2]);
 
 	matrix[0] = m_invScale.CompProduct4 (matrix[0]);
 	matrix[1] = m_invScale.CompProduct4 (matrix[1]);
