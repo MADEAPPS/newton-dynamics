@@ -291,7 +291,7 @@ void dRuntimeProfiler::RenderThreadPerformance ()
 
 		glColor3f(1.0, 1.0, 1.0);
 		glDisable (GL_LIGHTING);
-		glDisable(GL_TEXTURE_2D);
+		//glDisable(GL_TEXTURE_2D);
 
 		glMatrixMode(GL_TEXTURE);
 		glPushMatrix();
@@ -414,7 +414,7 @@ void dRuntimeProfiler::RenderConcurrentPerformance ()
 
 	glColor3f(1.0, 1.0, 1.0);
 	glDisable (GL_LIGHTING);
-	glDisable(GL_TEXTURE_2D);
+	//glDisable(GL_TEXTURE_2D);
 
 	glMatrixMode(GL_TEXTURE);
 	glPushMatrix();

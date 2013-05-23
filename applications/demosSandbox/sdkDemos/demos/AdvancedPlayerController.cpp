@@ -227,7 +227,6 @@ class AdvancePlayerControllerManager: public CustomPlayerControllerManager
 	void RenderPlayerHelp (DemoEntityManager* const scene) const
 	{
 		if (m_player->m_helpKey.GetPushButtonState()) {
-			glDisable(GL_TEXTURE_2D);
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 			scene->Print (color, 10, 200, "Navigation keys:");
 			scene->Print (color, 10, 220, "walk forward:        W");

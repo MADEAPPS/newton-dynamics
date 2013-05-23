@@ -616,7 +616,6 @@ void DemoEntityManager::Print (const dVector& color, dFloat x, dFloat y, const c
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
-y += 50;
 	glTranslated(x, y, 0);
 //	glRasterPos2f(x, y + 16);
 
@@ -627,7 +626,7 @@ y += 50;
 	vsprintf (string, fmt, argptr);
 	va_end( argptr );
 
-
+	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, m_fontImage);
 
 	glPushAttrib(GL_LIST_BIT);

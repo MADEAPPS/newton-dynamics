@@ -734,8 +734,6 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 	void DrawHelp(DemoEntityManager* const scene) const
 	{
 		if (m_player->m_helpKey.GetPushButtonState()) {
-			glDisable(GL_TEXTURE_2D);
-
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 			scene->Print (color, 10, 200, "Vehicle driving keyboard control:   Joystick control");
 			scene->Print (color, 10, 220, "accelerator : 'W'                   stick forward");
