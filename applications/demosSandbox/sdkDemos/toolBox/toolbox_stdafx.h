@@ -57,10 +57,16 @@ typedef long long unsigned64;
 	#include <time.h>
 	#include <tchar.h>
 	#include <crtdbg.h>
+
+	// opengl stuff
 	#include <GL/glew.h>
 	#include <GL/wglew.h>
 	#include <gl/gl.h>
 	#include <gl/glu.h>
+
+	// font library for open gl text
+	#include <ft2build.h>
+	#include FT_FREETYPE_H
 
 	// audio library support
 	#include <al/al.h>
@@ -71,6 +77,8 @@ typedef long long unsigned64;
 	#include <wx/event.h>
 	#include <wx/dcclient.h>
 	#include <wx/glcanvas.h>
+
+
 #endif
 	
 #ifdef _POSIX_VER
@@ -91,6 +99,8 @@ typedef long long unsigned64;
 	#include <wx/event.h>
 	#include <wx/dcclient.h>
 	#include <wx/glcanvas.h>
+
+
 #endif
 
 #ifdef _MACOSX_VER

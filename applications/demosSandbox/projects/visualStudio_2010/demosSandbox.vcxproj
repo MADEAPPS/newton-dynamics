@@ -148,7 +148,7 @@
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/ai;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAILibrary;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL\include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/ai;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAILibrary;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;AL_LIBTYPE_STATIC;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -187,7 +187,7 @@
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/ai;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAILibrary;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL\include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/ai;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAILibrary;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;AL_LIBTYPE_STATIC;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -222,7 +222,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/ai;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAILibrary;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL\include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/ai;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAILibrary;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;AL_LIBTYPE_STATIC;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -259,7 +259,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/ai;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAILibrary;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL\include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/ai;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAILibrary;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;AL_LIBTYPE_STATIC;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -295,7 +295,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/ai;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAILibrary;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL\include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/ai;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAILibrary;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;AL_LIBTYPE_STATIC;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -331,7 +331,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/ai;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAILibrary;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL\include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/ai;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAILibrary;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;AL_LIBTYPE_STATIC;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -364,7 +364,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debugDll|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;AL_LIBTYPE_STATIC;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/ai;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAILibrary;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL\include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/ai;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAILibrary;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -383,7 +383,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debugDll|x64'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;AL_LIBTYPE_STATIC;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/ai;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAILibrary;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL\include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/ai;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAILibrary;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -558,6 +558,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\thirdParty\enet-1.2\VS_2010\enet.vcxproj">
       <Project>{a862a496-668a-41ca-ba4b-8c86892006b7}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\packages\thirdParty\freetype-2.4.0\builds\win32\vc2010\freetype.vcxproj">
+      <Project>{78b079bd-9fc7-4b9e-b4a6-96da0f00248b}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\thirdParty\glew\build\VS_2010\glew.vcxproj">
       <Project>{0c9707f5-dec7-42eb-8ea1-a484df1e515b}</Project>
