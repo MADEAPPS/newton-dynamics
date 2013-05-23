@@ -262,6 +262,8 @@ GLuint LoadImage(const char* const cacheName, const char* const buffer, int widt
 
 		case m_luminace:
 			eFormat = GL_LUMINANCE;
+			//eFormat = GL_LUMINANCE_ALPHA;
+			//eFormat = GL_ALPHA;
 			iComponents = 1;
 			break;
 	};

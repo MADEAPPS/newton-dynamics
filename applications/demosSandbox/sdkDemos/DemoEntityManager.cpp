@@ -274,7 +274,7 @@ void DemoEntityManager::CreateOpenGlFont()
 			dAssert (!error);
 
 			FT_GlyphSlot slot = face[ch]->glyph;
-			if (slot && slot->bitmap.buffer) {
+			if (slot->bitmap.buffer) {
 				width += slot->bitmap.width;
 				height = (height > slot->bitmap.rows) ? height : slot->bitmap.rows;
 			}
@@ -292,7 +292,7 @@ void DemoEntityManager::CreateOpenGlFont()
 			FT_Face bitmap = face[ch];   
 			FT_GlyphSlot slot = bitmap->glyph;
 
-			if (slot && slot->bitmap.buffer) {
+			if (slot->bitmap.buffer) {
 				int width = slot->bitmap.width;
 				int height = slot->bitmap.rows;
 				int pitch =  slot->bitmap.pitch;
@@ -323,7 +323,11 @@ void DemoEntityManager::CreateOpenGlFont()
 			FT_GlyphSlot slot = bitmap->glyph;
 
 			width = 0;
-			if (slot && slot->bitmap.buffer) {
+
+			glPushMatrix();
+			glTranslatef(slot->bitmap_left, 64 - slot->bitmap_top, 0);
+
+			if (slot->bitmap.buffer) {
 				width = slot->bitmap.width;
 				int height = slot->bitmap.rows;
 
@@ -343,8 +347,11 @@ void DemoEntityManager::CreateOpenGlFont()
 
 				imageBase += width;
 			}
-			glTranslated(width + 1, 0, 0);
-			//glTranslated(maxWidth, 0, 0);
+			glPopMatrix();
+
+			//glTranslated(width + 1, 0, 0);
+			glTranslatef(slot->advance.x / 64, 0, 0);
+
 			glEndList();
 			FT_Done_Face(bitmap);
 		}
@@ -626,7 +633,13 @@ void DemoEntityManager::Print (const dVector& color, dFloat x, dFloat y, const c
 	vsprintf (string, fmt, argptr);
 	va_end( argptr );
 
-	glEnable(GL_TEXTURE_2D);
+    glDisable(GL_LIGHTING);
+    glEnable(GL_TEXTURE_2D);
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc (GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR);      
+	
 	glBindTexture(GL_TEXTURE_2D, m_fontImage);
 
 	glPushAttrib(GL_LIST_BIT);
@@ -634,6 +647,8 @@ void DemoEntityManager::Print (const dVector& color, dFloat x, dFloat y, const c
 	int lenght = (int) strlen (string);
 	glCallLists (lenght, GL_UNSIGNED_BYTE, string);	
 	glPopAttrib();				
+
+	glDisable(GL_BLEND);
 
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
@@ -644,6 +659,8 @@ void DemoEntityManager::Print (const dVector& color, dFloat x, dFloat y, const c
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
 	glLoadIdentity();
+
+
 }
 
 
