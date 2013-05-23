@@ -109,6 +109,7 @@ DemoEntityManager::DemoEntityManager(NewtonDemos* const parent)
 	// Set performance counters off
 	memset (m_showProfiler, 0, sizeof (m_showProfiler));
 	m_profiler.Init(this);
+
 }
 
 
@@ -220,6 +221,68 @@ void DemoEntityManager::RemoveEntity (DemoEntity* const ent)
 	}
 }
 
+void DemoEntityManager::CreateOpenGlFont()
+{
+	// create a fond for print in 3d window
+	m_font = glGenLists(96);	
+	wxClientDC dc(this);
+	wxFont font(9, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false);
+	dc.SetFont(font);
+
+#if defined (_MSC_VER)
+	wglUseFontBitmaps ((HDC)dc.GetHDC(), 32, 96, m_font);
+	//	dc.SelectOldObjects(dc.GetHDC());
+#elif defined(_POSIX_VER)
+
+#elif defined(_MACOSX_VER)
+
+#else
+	#error  "error: neet to implement \"wglUseFontBitmaps\" here for thsi platform"
+#endif
+
+
+	FT_Library  library;
+	FT_Error error = FT_Init_FreeType (&library);
+	if ( !error )
+	{
+		FT_Face face;   
+		char fileName[2048];
+		GetWorkingFileName ("arial.ttf", fileName);
+
+		error = FT_New_Face( library, fileName, 0, &face );
+		dAssert (!error);
+		error = FT_Set_Char_Size( face, 0, 16 * 64, 96, 96);
+		dAssert (!error);
+		for (int ch = 32; ch < 96; ch ++) {
+			// Load The Glyph For Our Character.
+
+			//FT_UInt index = FT_Get_Char_Index( face, ch );
+			FT_UInt index = FT_Get_Char_Index( face, 'A' );
+
+			error = FT_Load_Glyph( face, index, FT_LOAD_DEFAULT );
+			dAssert (!error);
+
+			error = FT_Render_Glyph (face->glyph, FT_RENDER_MODE_NORMAL); 
+			dAssert (!error);
+
+			FT_GlyphSlot slot = face->glyph;
+
+			// render the bitmap here
+			int width = TwosPower (slot->bitmap.width);
+			int height = TwosPower (slot->bitmap.rows);
+			//my_draw_bitmap( &slot->bitmap, pen_x + slot->bitmap_left, pen_y - slot->bitmap_top );
+			dAssert (!error);
+
+		}
+
+		// destroy the font
+		FT_Done_Face(face);
+
+		// destroy the free type library	
+		FT_Done_FreeType (library);
+	}
+}
+
 
 void DemoEntityManager::InitGraphicsSystem()
 {
@@ -239,23 +302,9 @@ void DemoEntityManager::InitGraphicsSystem()
 	#error  "error: neet to implement \"GetWorkingFileName\" here for thsi platform"
 #endif
 	
-	// create a fond for print in 3d window
-	m_font = glGenLists(96);	
-	wxClientDC dc(this);
-	wxFont font(9, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false);
-	dc.SetFont(font);
 
-#if defined (_MSC_VER)
-	wglUseFontBitmaps ((HDC)dc.GetHDC(), 32, 96, m_font);
-//	dc.SelectOldObjects(dc.GetHDC());
-#elif defined(_POSIX_VER)
-
-#elif defined(_MACOSX_VER)
-
-#else
-	#error  "error: neet to implement \"wglUseFontBitmaps\" here for thsi platform"
-#endif
-
+	// initialize free type library
+	CreateOpenGlFont();
 }
 
 

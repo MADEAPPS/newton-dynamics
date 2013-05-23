@@ -221,6 +221,13 @@ typedef long long unsigned64;
 unsigned dRand ();
 dFloat RandomVariable(dFloat amp);
 
+inline int TwosPower (int x)
+{
+	int rval=1;
+	for (; rval < x; rval *= 2);
+	return rval;
+}
+
 
 // for some reason specifying a relative does not seem to work in Linus
 // and i have to specify a absolute path

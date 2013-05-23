@@ -119,6 +119,8 @@ class DemoEntityManager: public wxGLCanvas, public dList <DemoEntity*>
 	dFloat CalculateInteplationParam () const;
 	void LoadVisualScene(dScene* const scene, EntityDictionary& dictionary);
 
+	void CreateOpenGlFont();
+
 
 	NewtonDemos* m_mainWindow;
 	NewtonWorld* m_world;
