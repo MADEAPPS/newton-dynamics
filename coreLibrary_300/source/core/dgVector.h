@@ -46,6 +46,12 @@ class dgTemplateVector
 		//	dgAssert (dgCheckVector ((*this)));
 	}
 
+	DG_INLINE dgTemplateVector (const dgTemplateVector<T>& copy)
+		:m_x(copy.m_x), m_y(copy.m_y), m_z(copy.m_z), m_w (copy.m_w)
+	{
+		//	dgAssert (dgCheckVector ((*this)));
+	}
+
 	DG_INLINE dgTemplateVector (T x, T y, T z, T w) 
 		:m_x(x), m_y(y), m_z(z), m_w (w)
 	{
@@ -228,6 +234,13 @@ class dgBigVector: public dgTemplateVector<dgFloat64>
 		dgAssert (dgCheckVector ((*this)));
 	}
 
+	DG_INLINE dgBigVector (const dgBigVector& copy)
+		:dgTemplateVector<dgFloat64>(copy)
+	{
+		//	dgAssert (dgCheckVector ((*this)));
+	}
+
+
 	DG_INLINE dgBigVector (const dgFloat32* const ptr)
 		:dgTemplateVector<dgFloat64>(ptr[0], ptr[1], ptr[2], dgFloat64 (0.0f))
 	{
@@ -273,6 +286,11 @@ class dgVector: public dgTemplateVector<dgFloat32>
 	{
 	}
 
+	DG_INLINE dgVector (const dgVector& v)
+		:dgTemplateVector<dgFloat32>(v)
+	{
+		dgAssert (dgCheckVector ((*this)));
+	}
 
 	DG_INLINE dgVector (const dgTemplateVector<dgFloat32>& v)
 		:dgTemplateVector<dgFloat32>(v)
