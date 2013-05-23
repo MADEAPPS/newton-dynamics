@@ -38,9 +38,6 @@ SkyBox::SkyBox()
 	m_textures[3] = LoadTexture("NewtonSky0004.tga");
 	m_textures[4] = LoadTexture("NewtonSky0005.tga");
 	m_textures[5] = LoadTexture("NewtonSky0006.tga");
-
-for (int i = 0; i < 6; i ++)
-m_textures[i] = 1;
 }
 
 
