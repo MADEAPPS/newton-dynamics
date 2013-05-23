@@ -120,20 +120,16 @@ class dgBroadPhase::dgNode
 		dgAssert (minBox.m_y <= maxBox.m_y);
 		dgAssert (minBox.m_z <= maxBox.m_z);
 
-		dgVector p0 (minBox.CompProduct4(dgVector (DG_BROADPHASE_AABB_SCALE)));
-		dgVector p1 (maxBox.CompProduct4(dgVector (DG_BROADPHASE_AABB_SCALE)));
-		p1 +=  dgVector (dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f));
+		dgVector p0 (minBox.CompProduct4(m_broadPhaseScale));
+		dgVector p1 (maxBox.CompProduct4(m_broadPhaseScale) + dgVector::m_one);
 
-		p0 = p0.Floor().CompProduct4(dgVector (DG_BROADPHASE_AABB_INV_SCALE));
-		p1 = p1.Floor().CompProduct4(dgVector (DG_BROADPHASE_AABB_INV_SCALE));
+		m_minBox = p0.Floor().CompProduct4(m_broadInvPhaseScale);
+		m_maxBox = p1.Floor().CompProduct4(m_broadInvPhaseScale);
 
-		dgAssert (p0.m_w == dgFloat32 (0.0f));
-		dgAssert (p1.m_w == dgFloat32 (0.0f));
+		dgAssert (m_minBox.m_w == dgFloat32 (0.0f));
+		dgAssert (m_maxBox.m_w == dgFloat32 (0.0f));
 
-		m_minBox = p0;
-		m_maxBox = p1;
-
-		dgVector side0 (p1 - p0);
+		dgVector side0 (m_maxBox - m_minBox);
 		dgVector side1 (side0.m_y, side0.m_z, side0.m_x, dgFloat32 (0.0f));
 		m_surfaceArea = side0.DotProduct4(side1).m_x;
 	}
@@ -147,12 +143,17 @@ class dgBroadPhase::dgNode
 	dgNode* m_right;
 	dgNode* m_parent;
 	dgList<dgNode*>::dgListNode* m_fitnessNode;
+	static dgVector m_broadPhaseScale;
+	static dgVector m_broadInvPhaseScale;
 
 	friend class dgBody;
 	friend class dgBroadPhase;
 	friend class dgBroadphaseSyncDescriptor;
 	friend class dgFitnessList;
 } DG_GCC_VECTOR_AVX_ALIGMENT;
+
+dgVector dgBroadPhase::dgNode::m_broadPhaseScale (DG_BROADPHASE_AABB_SCALE, DG_BROADPHASE_AABB_SCALE, DG_BROADPHASE_AABB_SCALE, dgFloat32 (0.0f));
+dgVector dgBroadPhase::dgNode::m_broadInvPhaseScale (DG_BROADPHASE_AABB_INV_SCALE, DG_BROADPHASE_AABB_INV_SCALE, DG_BROADPHASE_AABB_INV_SCALE, dgFloat32 (0.0f));
 
 
 

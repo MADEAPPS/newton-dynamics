@@ -213,7 +213,7 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 				if (timeToImpact > timeTol) {
 					timeRemaining -= timeToImpact;
 					for (dgInt32 j = 1; j < bodyCount; j ++) {
-						dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
+						dgDynamicBody* const body = (dgDynamicBody*) bodyArray[j].m_body;
 						if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
 							body->IntegrateVelocity(timeToImpact);
 							body->UpdateWorlCollisionMatrix();
@@ -246,16 +246,16 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 			}
 
 			if (timeRemaining > dgFloat32 (0.0)) {
-				for (dgInt32 i = 1; i < bodyCount; i ++) {
-					dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
+				for (dgInt32 j = 1; j < bodyCount; j ++) {
+					dgDynamicBody* const body = (dgDynamicBody*) bodyArray[j].m_body;
 					if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
 						body->IntegrateVelocity(timeRemaining);
 						body->UpdateMatrix (timeRemaining, threadID);
 					}
 				}
 			} else {
-				for (dgInt32 i = 1; i < bodyCount; i ++) {
-					dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
+				for (dgInt32 j = 1; j < bodyCount; j ++) {
+					dgDynamicBody* const body = (dgDynamicBody*) bodyArray[j].m_body;
 					if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
 						body->UpdateMatrix (timestep, threadID);
 					}
