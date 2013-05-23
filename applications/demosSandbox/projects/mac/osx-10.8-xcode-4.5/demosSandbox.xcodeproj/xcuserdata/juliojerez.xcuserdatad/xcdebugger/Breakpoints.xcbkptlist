@@ -2,19 +2,4 @@
 <Bucket
    type = "1"
    version = "1.0">
-   <FileBreakpoints>
-      <FileBreakpoint
-         shouldBeEnabled = "Yes"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/src/osx/glcanvas_osx.cpp"
-         timestampString = "390610010.58309"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "119"
-         endingLineNumber = "119"
-         landmarkName = "wxGLCanvas::wxGLCanvas(wxWindow *parent, const wxGLCanvas *shared, wxWindowID id, const wxPoint&amp; pos, const wxSize&amp; size, long style, const wxString&amp; name, const int *attribList, const wxPalette&amp; palette)"
-         landmarkType = "5">
-      </FileBreakpoint>
-   </FileBreakpoints>
 </Bucket>
