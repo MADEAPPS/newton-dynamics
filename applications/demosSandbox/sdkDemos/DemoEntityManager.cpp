@@ -254,13 +254,13 @@ void DemoEntityManager::CreateOpenGlFont()
 
 		int sizeInPixels = 32;
 
-		int ImageWidth = TwosPower ((sizeInPixels) * 8);
-		int ImageHeight = TwosPower ((sizeInPixels) * 8);
+		int ImageWidth = TwosPower ((sizeInPixels) * 8) * 2;
+		int ImageHeight = TwosPower ((sizeInPixels) * 8) * 2;
 
 		char* const image = new char[ImageWidth * ImageHeight];
 		memset (image, 0, ImageWidth * ImageHeight);
 
-		for (int ch = 32; ch < 96; ch ++) {
+		for (char ch = 32; ch < 96; ch ++) {
 
 			// Load The Glyph For Our Character.
 			error = FT_New_Face( library, fileName, 0, &face );
@@ -278,14 +278,13 @@ void DemoEntityManager::CreateOpenGlFont()
 			dAssert (!error);
 
 			FT_GlyphSlot slot = face->glyph;
-			if (slot->bitmap.buffer) {
+			if (slot && slot->bitmap.buffer) {
 				// render the bitmap here
 				int width = slot->bitmap.width;
 				int height = slot->bitmap.rows;
 				int pitch =  slot->bitmap.pitch;
 
-				int imageBase = (((ch - 32) / 8) * ImageWidth + ((ch - 32) % 8)) * sizeInPixels;
-				//my_draw_bitmap( &slot->bitmap, pen_x + slot->bitmap_left, pen_y - slot->bitmap_top );
+				int imageBase = ((2 * (ch - 32) / 8) * ImageWidth + ((ch - 32) % 8)) * sizeInPixels;
 				for (int j = 0; j < height; j ++) {
 					for (int i = 0; i < width; i ++) {
 						image[imageBase + i] = slot->bitmap.buffer[j * pitch + i];
