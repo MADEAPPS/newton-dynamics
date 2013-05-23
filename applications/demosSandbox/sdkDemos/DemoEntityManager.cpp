@@ -227,7 +227,8 @@ void DemoEntityManager::RemoveEntity (DemoEntity* const ent)
 void DemoEntityManager::CreateOpenGlFont()
 {
 	// create a fond for print in 3d window
-	m_font = glGenLists(96);	
+
+	m_font = glGenLists(96);
 	wxClientDC dc(this);
 	wxFont font(9, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false);
 	dc.SetFont(font);
@@ -243,7 +244,7 @@ void DemoEntityManager::CreateOpenGlFont()
 	#error  "error: neet to implement \"wglUseFontBitmaps\" here for thsi platform"
 #endif
 
-
+/*
 	FT_Library  library;
 	FT_Error error = FT_Init_FreeType (&library);
 	if ( !error )
@@ -288,8 +289,8 @@ void DemoEntityManager::CreateOpenGlFont()
 		int imageBase = 0;
 		for (char ch = 0; ch < 96; ch ++) {
 			FT_Face bitmap = face[ch];   
+			FT_GlyphSlot slot = bitmap->glyph;
 
-			FT_GlyphSlot slot = face[ch]->glyph;
 			if (slot && slot->bitmap.buffer) {
 				int width = slot->bitmap.width;
 				int height = slot->bitmap.rows;
@@ -304,18 +305,71 @@ void DemoEntityManager::CreateOpenGlFont()
 				}
 				imageBase += width;
 			}
-			
-			FT_Done_Face(bitmap);
 		}
 
 		// make th open gl displate list here
 	    m_fontImage = LoadImage("fontTexture", image, ImageWidth, ImageHeight, m_luminace);
+
+		glPushMatrix();
+
+		glMatrixMode(GL_PROJECTION);
+		glPushMatrix();
+		glLoadIdentity();
+		glOrtho(0.0, GetWidth(), GetHeight(), 0.0, 0.0, 1.0);
+
+		glMatrixMode(GL_MODELVIEW);
+		glPushMatrix();
+		glLoadIdentity();
+		glRasterPos2f(0, 0);
+
+		m_font = glGenLists(96);
+		glBindTexture(GL_TEXTURE_2D, m_fontImage);
+
+		imageBase = 0;
+		for (char ch = 0; ch < 96; ch ++) {
+			//glNewList(list_base+ch,GL_COMPILE);
+
+			FT_Face bitmap = face[ch];   
+			FT_GlyphSlot slot = bitmap->glyph;
+
+			if (slot && slot->bitmap.buffer) {
+				int width = slot->bitmap.width;
+				int height = slot->bitmap.rows;
+
+				glPushMatrix();
+				glTranslatef (imageBase, 0, 0);
+
+				glBegin(GL_QUADS);
+				glTexCoord2d(dFloat (imageBase) / ImageWidth, 0); 
+				glVertex2f(0, height);
+
+				glTexCoord2d( dFloat (imageBase) / ImageWidth, height); 
+				glVertex2f(0, 0);
+
+				glTexCoord2d(dFloat (imageBase + width) / ImageWidth, height); 
+				glVertex2f (width,0);
+
+				glTexCoord2d (dFloat (imageBase + width) / ImageWidth, 0); 
+				glVertex2f( width, height);
+				glEnd();
+
+				glPopMatrix();
+
+				imageBase += width;
+			}
+			FT_Done_Face(bitmap);
+		}
+
+	    glEndList();
+
+		glPopMatrix();
 
 		delete[] image; 
 
 		// destroy the free type library	
 		FT_Done_FreeType (library);
 	}
+*/
 }
 
 
