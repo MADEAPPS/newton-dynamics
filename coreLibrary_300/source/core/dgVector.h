@@ -468,6 +468,7 @@ class dgVector: public dgTemplateVector<dgFloat32>
 	static dgVector m_wOne;
 	static dgVector m_half;
 	static dgVector m_three;
+	static dgVector m_signMask;
 	static dgVector m_triplexMask;
 }DG_GCC_VECTOR_ALIGMENT;
 
@@ -666,8 +667,9 @@ class dgVector
 
 	DG_INLINE dgVector Abs () const
 	{
-		__m128i shitSign = _mm_srli_epi32 (_mm_slli_epi32 (*((__m128i*) &m_type), 1), 1);
-		return *(__m128*)&shitSign;
+//		__m128i shitSign = _mm_srli_epi32 (_mm_slli_epi32 (*((__m128i*) &m_type), 1), 1);
+//		return *(__m128*)&shitSign;
+		return _mm_and_ps (m_type, m_signMask.m_type);
 	}
 
 	dgVector GetMax (const dgVector& data) const
@@ -811,6 +813,7 @@ class dgVector
 	static dgVector m_wOne;
 	static dgVector m_half;
 	static dgVector m_three;
+	static dgVector m_signMask;
 	static dgVector m_triplexMask;
 } DG_GCC_VECTOR_ALIGMENT;
 

@@ -256,7 +256,6 @@ class dgBody
 	OnBodyDestroy m_destructor;
 	OnMatrixUpdateCallback m_matrixUpdate;
 
-
 	friend class dgWorld;
 	friend class dgContact;
 	friend class dgConstraint;

@@ -59,7 +59,7 @@ class dgFastRayTest
 
 	void Reset (dgFloat32 t) 
 	{
-		m_dpInv = m_dpBaseInv.Scale3 (dgFloat32 (1.0f) / (t + dgFloat32 (1.0e-12f)));
+		m_dpInv = m_dpBaseInv.Scale4 (dgFloat32 (1.0f) / (t + dgFloat32 (1.0e-12f)));
 	}
 
 	dgVector m_p0;
@@ -104,20 +104,10 @@ dgBigVector dgPointToTriangleDistance (const dgBigVector& point, const dgBigVect
 dgFloat32 dgApi dgRayCastBox (const dgVector& p0, const dgVector& p1, const dgVector& boxP0, const dgVector& boxP1, dgVector& normalOut);
 dgFloat32 dgApi dgRayCastSphere (const dgVector& p0, const dgVector& p1, const dgVector& origin, dgFloat32 radius);
 
-/*
-DG_INLINE dgInt32 dgBoxInclusionTestSimd (const dgVector& p0, const dgVector& p1, const dgVector& q0, const dgVector& q1)
-{
-	dgSimd val (((dgSimd&)p0 >= (dgSimd&)q0) & ((dgSimd&)p1 <= (dgSimd&)q1));
-	dgInt32 mask = val.GetSignMask();
-	return ((mask & 0x07) == 0x07);
-}
-
-*/
 DG_INLINE dgInt32 dgOverlapTest (const dgVector& p0, const dgVector& p1, const dgVector& q0, const dgVector& q1)
 {
 //	dgInt32 test = ((p0.m_x < q1.m_x) && (p1.m_x > q0.m_x) && (p0.m_z < q1.m_z) && (p1.m_z > q0.m_z) && (p0.m_y < q1.m_y) && (p1.m_y > q0.m_y));
 //	return  test
-
 	dgVector val ((p0 < q1) & (p1 > q0));
 	dgInt32 mask = val.GetSignMask();
 	return ((mask & 0x07) == 0x07);

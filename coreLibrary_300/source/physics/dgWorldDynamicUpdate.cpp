@@ -913,6 +913,7 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 
 	dgFloat32 speedFreeze = world->m_freezeSpeed2;
 	dgFloat32 accelFreeze = world->m_freezeAccel2;
+	dgVector forceDampVect (forceDamp, forceDamp, forceDamp, dgFloat32 (0.0f));
 	for (dgInt32 i = 0; i < count; i ++) {
 		dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
 
@@ -932,8 +933,8 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 			bool equilibrium = (accel2 < accelFreeze) && (alpha2 < accelFreeze) && (speed2 < speedFreeze) && (omega2 < speedFreeze);
 
 			if (equilibrium) {
-				body->m_veloc = body->m_veloc.Scale3 (forceDamp);
-				body->m_omega = body->m_omega.Scale3 (forceDamp);
+				body->m_veloc = body->m_veloc.CompProduct4(forceDampVect);
+				body->m_omega = body->m_omega.CompProduct4 (forceDampVect);
 			}
 			body->m_equilibrium = dgUnsigned32 (equilibrium);
 			stackSleeping &= equilibrium;
