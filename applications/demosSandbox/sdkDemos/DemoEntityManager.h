@@ -135,6 +135,7 @@ class DemoEntityManager: public wxGLCanvas, public dList <DemoEntity*>
 	void* m_renderHoodContext;
 	RenderHoodCallback m_renderHood;
 	GLuint m_font;
+	GLuint m_fontImage;
 	DemoSoundListener* m_soundManager;
 	DemoCameraListener* m_cameraManager;
 	DemoVisualDebugerListener* m_visualDebugger;
@@ -145,6 +146,8 @@ class DemoEntityManager: public wxGLCanvas, public dList <DemoEntity*>
 	dFloat m_mainThreadGraphicsTime;
 	dFloat m_mainThreadPhysicsTime;
 	dFloat m_physThreadTime;
+
+
 
 	static int m_attributes[];
 

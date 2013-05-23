@@ -11,15 +11,17 @@
 
 #include "toolbox_stdafx.h"
 #include "NewtonDemos.h"
-#include "DemoEntityManager.h"
+
 #include "SkyBox.h"
 #include "DemoMesh.h"
 #include "DemoEntity.h"
 #include "DemoCamera.h"
+#include "OpenGlUtil.h"
 #include "PhysicsUtils.h"
 #include "DebugDisplay.h"
-#include "dRuntimeProfiler.h"
-#include "OpenGlUtil.h"
+#include "TargaToOpenGl.h"
+#include "DemoEntityManager.h"
+#include "DemoEntityManager.h"
 
 #include "DemoAIListener.h"
 #include "DemoSoundListener.h"
@@ -92,6 +94,7 @@ DemoEntityManager::DemoEntityManager(NewtonDemos* const parent)
 	,m_renderHoodContext(NULL)
 	,m_renderHood(NULL)
 	,m_font(0)
+	,m_fontImage(0)
 	,m_soundManager(NULL)
 	,m_cameraManager(NULL)
 	,m_visualDebugger(NULL)
@@ -120,8 +123,8 @@ DemoEntityManager::~DemoEntityManager(void)
 		NewtonWaitForUpdateToFinish (m_world);
 	}
 
-
 	glDeleteLists(m_font, 96);	
+	UnloadTexture (m_fontImage);
 
 	Cleanup ();
 
@@ -249,15 +252,24 @@ void DemoEntityManager::CreateOpenGlFont()
 		char fileName[2048];
 		GetWorkingFileName ("arial.ttf", fileName);
 
-		error = FT_New_Face( library, fileName, 0, &face );
-		dAssert (!error);
-		error = FT_Set_Char_Size( face, 0, 16 * 64, 96, 96);
-		dAssert (!error);
-		for (int ch = 32; ch < 96; ch ++) {
-			// Load The Glyph For Our Character.
+		int sizeInPixels = 32;
 
-			//FT_UInt index = FT_Get_Char_Index( face, ch );
-			FT_UInt index = FT_Get_Char_Index( face, 'A' );
+		int ImageWidth = TwosPower ((sizeInPixels) * 8);
+		int ImageHeight = TwosPower ((sizeInPixels) * 8);
+
+		char* const image = new char[ImageWidth * ImageHeight];
+		memset (image, 0, ImageWidth * ImageHeight);
+
+		for (int ch = 32; ch < 96; ch ++) {
+
+			// Load The Glyph For Our Character.
+			error = FT_New_Face( library, fileName, 0, &face );
+			dAssert (!error);
+			error = FT_Set_Char_Size( face, 0, sizeInPixels * 64, 96, 96);
+			dAssert (!error);
+
+			FT_UInt index = FT_Get_Char_Index( face, ch );
+			//FT_UInt index = FT_Get_Char_Index( face, 'A' );
 
 			error = FT_Load_Glyph( face, index, FT_LOAD_DEFAULT );
 			dAssert (!error);
@@ -266,17 +278,31 @@ void DemoEntityManager::CreateOpenGlFont()
 			dAssert (!error);
 
 			FT_GlyphSlot slot = face->glyph;
+			if (slot->bitmap.buffer) {
+				// render the bitmap here
+				int width = slot->bitmap.width;
+				int height = slot->bitmap.rows;
+				int pitch =  slot->bitmap.pitch;
 
-			// render the bitmap here
-			int width = TwosPower (slot->bitmap.width);
-			int height = TwosPower (slot->bitmap.rows);
-			//my_draw_bitmap( &slot->bitmap, pen_x + slot->bitmap_left, pen_y - slot->bitmap_top );
-			dAssert (!error);
+				int imageBase = (((ch - 32) / 8) * ImageWidth + ((ch - 32) % 8)) * sizeInPixels;
+				//my_draw_bitmap( &slot->bitmap, pen_x + slot->bitmap_left, pen_y - slot->bitmap_top );
+				for (int j = 0; j < height; j ++) {
+					for (int i = 0; i < width; i ++) {
+						image[imageBase + i] = slot->bitmap.buffer[j * pitch + i];
+					}
+					imageBase += ImageWidth;
+				}
+			}
 
+			// destroy the font
+			FT_Done_Face(face);
 		}
 
-		// destroy the font
-		FT_Done_Face(face);
+		// make teh open gl displate list here
+	    m_fontImage = LoadImage("fontTexture", image, ImageWidth, ImageWidth, m_luminace);
+
+
+		delete[] image; 
 
 		// destroy the free type library	
 		FT_Done_FreeType (library);
@@ -365,28 +391,6 @@ void DemoEntityManager::BodyDeserialization (NewtonBody* const body, NewtonDeser
 	//for visual mesh we will collision mesh and convert it to a visual mesh using NewtonMesh 
 	NewtonCollision* const collision = NewtonBodyGetCollision(body);
 	DemoMesh* const mesh = new DemoMesh(bodyIndentification, collision, NULL, NULL, NULL);
-/*
-	int collisionID = NewtonCollisionGetType(collision) ;
-	DemoMesh* mesh = NULL;
-	switch (collisionID) 
-	{
-		case SERIALIZE_ID_HEIGHTFIELD:
-		{
-			NewtonCollisionInfoRecord info;
-			NewtonCollisionGetInfo(collision, &info);
-
-			const NewtonHeightFieldCollisionParam& heighfield = info.m_heightField;
-			mesh = new DemoMesh ("terrain", heighfield.m_elevation, heighfield.m_width, heighfield.m_horizonalScale, 1.0f/16.0f, 128); 
-
-
-			break;
-		}
-		
-		default:
-			mesh = new DemoMesh("cylinder_1", collision, NULL, NULL, NULL);
-			break;
-	}
-*/
 
 	entity->SetMesh(mesh);
 	mesh->Release();

@@ -16,7 +16,16 @@
 
 #include <toolbox_stdafx.h>
 
+
+enum TextureImageFormat
+{
+	m_rgb,
+	m_rgba,
+	m_luminace,
+};
+
 GLuint LoadTexture(const char* const filename);
+GLuint LoadImage(const char* const cacheName, const char* const buffer, int width, int hight, TextureImageFormat format);
 void UnloadTexture (GLuint texture);
 
 const char* FindTextureById (GLuint textureID);

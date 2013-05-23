@@ -239,6 +239,69 @@ GLuint LoadTexture(const char* const filename)
 	return texture;
 } 
 
+GLuint LoadImage(const char* const cacheName, const char* const buffer, int width, int hight, TextureImageFormat format)
+{
+	// Get width, height, and depth of texture
+	GLint iWidth = width;
+	GLint iHeight = width;
+   
+	GLenum eFormat = GL_RGBA;
+	GLint iComponents = 4;
+	switch(format)
+	{
+		case m_rgb:     
+			// Most likely case
+			eFormat = GL_BGR;
+			iComponents = 4;
+			break;
+
+		case m_rgba:
+			eFormat = GL_BGRA;
+			iComponents = 4;
+		break;
+
+		case m_luminace:
+			eFormat = GL_LUMINANCE;
+			iComponents = 1;
+			break;
+	};
+
+	GLuint texture = 0;
+	glGenTextures(1, &texture);
+	if (texture) {
+		//GLenum errr = glGetError ();
+		glBindTexture(GL_TEXTURE_2D, texture);
+
+	   // select modulate to mix texture with color for shading
+		glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+		
+
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	//	glTexImage2D(GL_TEXTURE_2D, 0, iComponents, iWidth, iHeight, 0, eFormat, GL_UNSIGNED_BYTE, pBits);
+
+		// when texture area is small, bilinear filter the closest mipmap
+	//  glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST );
+
+		// when texture area is small, trilinear filter mipmaped
+		glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+		// when texture area is large, bilinear filter the first mipmap
+		glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+
+		// build our texture mipmaps
+		gluBuild2DMipmaps (GL_TEXTURE_2D, iComponents, iWidth, iHeight, eFormat, GL_UNSIGNED_BYTE, buffer);
+		
+		// Done with File
+		TextureCache& cache = TextureCache::GetChache();
+		cache.InsertText (cacheName, texture);
+	}
+	
+	return texture;
+}
+
 
 void UnloadTexture (GLuint texture)
 {
