@@ -248,58 +248,68 @@ void DemoEntityManager::CreateOpenGlFont()
 	FT_Error error = FT_Init_FreeType (&library);
 	if ( !error )
 	{
-		FT_Face face;   
 		char fileName[2048];
 		GetWorkingFileName ("arial.ttf", fileName);
 
+		FT_Face face[96];   
 		int sizeInPixels = 32;
 
-		int ImageWidth = TwosPower ((sizeInPixels) * 8) * 2;
-		int ImageHeight = TwosPower ((sizeInPixels) * 8) * 2;
+		int width = 0;
+		int height = 0;
+		for (char ch = 0; ch < 96; ch ++) {
+			// Load The Glyph For Our Character.
+			error = FT_New_Face( library, fileName, 0, &face[ch] );
+			dAssert (!error);
+
+			error = FT_Set_Char_Size(face[ch], 0, sizeInPixels * 64, 96, 96);
+			dAssert (!error);
+
+			FT_UInt index = FT_Get_Char_Index( face[ch], ch + 32);
+
+			error = FT_Load_Glyph( face[ch], index, FT_LOAD_DEFAULT );
+			dAssert (!error);
+
+			error = FT_Render_Glyph (face[ch]->glyph, FT_RENDER_MODE_NORMAL); 
+			dAssert (!error);
+
+			FT_GlyphSlot slot = face[ch]->glyph;
+			if (slot && slot->bitmap.buffer) {
+				width += slot->bitmap.width;
+				height = (height > slot->bitmap.rows) ? height : slot->bitmap.rows;
+			}
+		}
+
+		int ImageWidth = TwosPower (width);
+		int ImageHeight = TwosPower (height);
 
 		char* const image = new char[ImageWidth * ImageHeight];
 		memset (image, 0, ImageWidth * ImageHeight);
 
-		for (char ch = 32; ch < 96; ch ++) {
+		int imageBase = 0;
+		for (char ch = 0; ch < 96; ch ++) {
+			FT_Face bitmap = face[ch];   
 
-			// Load The Glyph For Our Character.
-			error = FT_New_Face( library, fileName, 0, &face );
-			dAssert (!error);
-			error = FT_Set_Char_Size( face, 0, sizeInPixels * 64, 96, 96);
-			dAssert (!error);
-
-			FT_UInt index = FT_Get_Char_Index( face, ch );
-			//FT_UInt index = FT_Get_Char_Index( face, 'A' );
-
-			error = FT_Load_Glyph( face, index, FT_LOAD_DEFAULT );
-			dAssert (!error);
-
-			error = FT_Render_Glyph (face->glyph, FT_RENDER_MODE_NORMAL); 
-			dAssert (!error);
-
-			FT_GlyphSlot slot = face->glyph;
+			FT_GlyphSlot slot = face[ch]->glyph;
 			if (slot && slot->bitmap.buffer) {
-				// render the bitmap here
 				int width = slot->bitmap.width;
 				int height = slot->bitmap.rows;
 				int pitch =  slot->bitmap.pitch;
 
-				int imageBase = ((2 * (ch - 32) / 8) * ImageWidth + ((ch - 32) % 8)) * sizeInPixels;
+				int posit = imageBase;
 				for (int j = 0; j < height; j ++) {
 					for (int i = 0; i < width; i ++) {
-						image[imageBase + i] = slot->bitmap.buffer[j * pitch + i];
+						image[posit + i] = slot->bitmap.buffer[j * pitch + i];
 					}
-					imageBase += ImageWidth;
+					posit += ImageWidth;
 				}
+				imageBase += width;
 			}
-
-			// destroy the font
-			FT_Done_Face(face);
+			
+			FT_Done_Face(bitmap);
 		}
 
-		// make teh open gl displate list here
-	    m_fontImage = LoadImage("fontTexture", image, ImageWidth, ImageWidth, m_luminace);
-
+		// make th open gl displate list here
+	    m_fontImage = LoadImage("fontTexture", image, ImageWidth, ImageHeight, m_luminace);
 
 		delete[] image; 
 

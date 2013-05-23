@@ -243,7 +243,7 @@ GLuint LoadImage(const char* const cacheName, const char* const buffer, int widt
 {
 	// Get width, height, and depth of texture
 	GLint iWidth = width;
-	GLint iHeight = width;
+	GLint iHeight = hight;
    
 	GLenum eFormat = GL_RGBA;
 	GLint iComponents = 4;
