@@ -359,6 +359,19 @@ dgGoogol dgGoogol::operator/ (const dgGoogol &A) const
 }
 
 
+dgGoogol dgGoogol::operator+= (const dgGoogol &A)
+{
+	*this = *this + A;
+	return *this;
+}
+
+dgGoogol dgGoogol::operator-= (const dgGoogol &A)
+{
+	*this = *this - A;
+	return *this;
+}
+
+
 bool dgGoogol::operator> (const dgGoogol &A) const
 {
 	dgGoogol tmp (*this - A);
@@ -463,7 +476,7 @@ void dgGoogol::ToString (char* const string) const
 	while (tmp.m_mantissa[0]) {
 		tmp = tmp * base;
 		dgGoogol digit (tmp.Floor());
-		tmp = tmp - digit;
+		tmp -= digit;
 		dgFloat64 val = digit;
 		string[index] = char (val) + '0';
 		index ++;

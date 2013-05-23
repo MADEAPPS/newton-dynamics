@@ -2161,12 +2161,14 @@ clipperMeshBVH->m_mesh->Trace();
 			const dgHugeVector& p0 = curve.GetFirst()->GetInfo();
 			const dgHugeVector& p1 = curve.GetFirst()->GetNext()->GetInfo();
 
+//			p0.Trace();
+//			p1.Trace();
 			dgHugeVector e10 (p1 - p0);
 			for (dgList<dgHugeVector>::dgListNode* node = curve.GetFirst()->GetNext()->GetNext(); node; node = node->GetNext()) {
 				const dgHugeVector& p2 = node->GetInfo();
-
+//				p2.Trace();
 				dgHugeVector e20 (p2 - p0);
-				n = n + e10 * e20;
+				n += e10 * e20;
 				e10 = e20;
 			}
 
@@ -2645,7 +2647,7 @@ meshBVH->m_mesh->Trace();
 		for (edge = edge->m_next; edge != face; edge = edge->m_next) {
 			const dgHugeVector& p2 = m_vertexAlias[edge->m_incidentVertex]; 
 			dgHugeVector e2 (p2 - p0);
-			normal = normal + e1 * e2;
+			normal += e1 * e2;
 			e1 = e2;
 		} 
 		return normal;

@@ -426,7 +426,7 @@ dgBigVector dgPolyhedra::FaceNormal (dgEdge* const face, const dgFloat64* const 
 	for (edge = edge->m_next; edge != face; edge = edge->m_next) {
 		dgBigVector p2 (&pool[edge->m_incidentVertex * stride]);
 		dgBigVector e2 (p2 - p0);
-		normal = normal + e1 * e2;
+		normal += e1 * e2;
 		e1 = e2;
 	} 
 	return normal;
@@ -1743,10 +1743,10 @@ void dgPolyhedra::MarkAdjacentCoplanarFaces (dgPolyhedra& polyhedraOut, dgEdge* 
 								if (dist < distanceFromPlane) {
 									testPointsCount ++;
 
-									averageTestPoint = averageTestPoint + testPoint;
+									averageTestPoint += testPoint;
 									testPoint = averageTestPoint.Scale3 (dgFloat64 (1.0f) / dgFloat64(testPointsCount));
 
-									normalAverage = normalAverage + normal1;
+									normalAverage += normal1;
 									testNormal = normalAverage.Scale3 (dgFloat64 (1.0f) / sqrt (normalAverage % normalAverage));
 									testPlane = dgBigPlane (testNormal, - (testPoint % testNormal));
 

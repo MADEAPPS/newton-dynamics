@@ -684,7 +684,7 @@ class dgHACDClusterGraph
 		dgBigVector minAABB;
 		dgBigVector maxAABB;
 		mesh.CalculateAABB (minAABB, maxAABB);
-		maxAABB = maxAABB - minAABB;
+		maxAABB -= minAABB;
 		dgFloat32 rayDiagonalLength = dgFloat32 (sqrt (maxAABB % maxAABB));
 		m_diagonal = rayDiagonalLength;
 

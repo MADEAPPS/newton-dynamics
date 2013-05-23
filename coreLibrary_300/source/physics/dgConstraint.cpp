@@ -55,13 +55,13 @@ void dgConstraint::InitPointParam (dgPointParam& param, dgFloat32 stiffness, con
 	param.m_posit0 = p0Global;
 	param.m_veloc0 = m_body0->m_omega * param.m_r0;
 	param.m_centripetal0 = m_body0->m_omega * param.m_veloc0;
-	param.m_veloc0 = param.m_veloc0 + m_body0->m_veloc;
+	param.m_veloc0 += m_body0->m_veloc;
 
 	param.m_r1 = p1Global - m_body1->m_globalCentreOfMass;
 	param.m_posit1 = p1Global;
 	param.m_veloc1 = m_body1->m_omega * param.m_r1;
 	param.m_centripetal1 = m_body1->m_omega * param.m_veloc1;
-	param.m_veloc1 = param.m_veloc1 + m_body1->m_veloc;
+	param.m_veloc1 += m_body1->m_veloc;
 }
 
 

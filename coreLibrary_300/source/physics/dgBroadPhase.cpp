@@ -122,7 +122,7 @@ class dgBroadPhase::dgNode
 
 		dgVector p0 (minBox.CompProduct4(dgVector (DG_BROADPHASE_AABB_SCALE)));
 		dgVector p1 (maxBox.CompProduct4(dgVector (DG_BROADPHASE_AABB_SCALE)));
-		p1 = p1 + dgVector (dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f));
+		p1 +=  dgVector (dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f));
 
 		p0 = p0.Floor().CompProduct4(dgVector (DG_BROADPHASE_AABB_INV_SCALE));
 		p1 = p1.Floor().CompProduct4(dgVector (DG_BROADPHASE_AABB_INV_SCALE));

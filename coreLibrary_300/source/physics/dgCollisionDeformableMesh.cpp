@@ -1066,7 +1066,7 @@ void dgCollisionDeformableMesh::SetCollisionBBox (const dgVector& p0, const dgVe
 //	m_boxOrigin-= m_particles.m_com;
 
 	dgFloat32 padding = m_skinThickness + DG_DEFORMABLE_DEFAULT_SKIN_THICKNESS;
-	m_boxSize = m_boxSize + dgVector (padding, padding, padding, dgFloat32 (0.0f));
+	m_boxSize += dgVector (padding, padding, padding, dgFloat32 (0.0f));
 
 	m_size_x.m_x = m_boxSize.m_x;
 	m_size_x.m_y = m_boxSize.m_x;
@@ -1118,8 +1118,8 @@ dgCollisionDeformableMesh::dgDeformableNode* dgCollisionDeformableMesh::BuildTop
 		for (dgInt32 i = 0; i < count; i ++) {
 			const dgDeformableNode* const node = &children[i];
 			dgVector p ((node->m_minBox + node->m_maxBox).Scale3 (0.5f));
-			median = median + p;
-			varian = varian + p.CompProduct3 (p);
+			median += p;
+			varian += p.CompProduct3 (p);
 		}
 
 		varian = varian.Scale3 (dgFloat32 (count)) - median.CompProduct3(median);

@@ -1394,7 +1394,7 @@ bool dgCollisionConvex::SanityCheck (dgPolyhedra& hull) const
 		for (ptr = ptr->m_next; ptr != edge; ptr = ptr->m_next) {
 			dgVector p2 (m_vertex[ptr->m_incidentVertex]);
 			dgVector e2 (p2 - p0);
-			n0 = n0 + e1 * e2;
+			n0 += e1 * e2;
 			e1 = e2;
 		} 
 
@@ -1936,7 +1936,7 @@ bool dgCollisionConvex::SanityCheck(dgInt32 count, const dgVector& normal, dgVec
 			dgVector e0 (contactsOut[1] - contactsOut[0]);
 			for (dgInt32 i = 2; i < count; i ++) {
 				dgVector e1 (contactsOut[i] - contactsOut[0]);
-				n = n + e0 * e1;
+				n += e0 * e1;
 				e0 = e1;
 			} 
 			dgAssert ((n % n) > dgFloat32 (0.0f));
@@ -2997,11 +2997,11 @@ dgInt32 dgCollisionConvex::CalculateContactsGeneric (const dgVector& point, cons
 	dgVector support (SupportVertex(normal.Scale3(dgFloat32(-1.0f)), NULL));
 	dgFloat32 dist = normal % (support - point);
 	if (dist >= (-DG_ROBUST_PLANE_CLIP)) {
-		support = support + normal.Scale3 (DG_ROBUST_PLANE_CLIP);
+		support += normal.Scale3 (DG_ROBUST_PLANE_CLIP);
 		count1 = CalculatePlaneIntersection (normal, support, shape1);
 		dgVector err (normal.Scale3 (normal % (point - support)));
 		for (dgInt32 i = 0; i < count1; i ++) {
-			shape1[i] = shape1[i] + err;
+			shape1[i] += err;
 		}
 	} else {
 		count1 = CalculatePlaneIntersection (normal, point, shape1);
@@ -3022,11 +3022,11 @@ dgInt32 dgCollisionConvex::CalculateContactsGeneric (const dgVector& point, cons
 		support = otherShape->SupportVertex(n, &index);
 		dist = n % (support - p);
 		if (dist < DG_ROBUST_PLANE_CLIP) {
-			support = support + n.Scale3 (-DG_ROBUST_PLANE_CLIP);
+			support += n.Scale3 (-DG_ROBUST_PLANE_CLIP);
 			count2 = otherShape->CalculatePlaneIntersection (n, support, shape2);
 			dgVector err (n.Scale3 (n % (p - support)));
 			for (dgInt32 i = 0; i < count2; i ++) {
-				shape2[i] = shape2[i] + err;
+				shape2[i] += err;
 			}
 		} else {
 			count2 = otherShape->CalculatePlaneIntersection (n, p, shape2);

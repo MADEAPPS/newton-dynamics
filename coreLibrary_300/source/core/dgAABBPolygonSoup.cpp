@@ -490,8 +490,8 @@ class dgAABBTree
 
 							dgVector p ((p0 + p1).Scale3 (0.5f));
 
-							median = median + p;
-							varian = varian + p.CompProduct3 (p);
+							median += p;
+							varian += p.CompProduct3 (p);
 						}
 
 						varian = varian.Scale3 (dgFloat32 (boxCount)) - median.CompProduct3(median);
@@ -950,11 +950,11 @@ class dgAABBTree
 		dgVector varian (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 		for (dgInt32 i = 0; i < boxCount; i ++) {
 
-			median = median + boxArray[i]->m_p0;
-			median = median + boxArray[i]->m_p1;
-					  
-			varian = varian + boxArray[i]->m_p0.CompProduct3(boxArray[i]->m_p0);
-			varian = varian + boxArray[i]->m_p1.CompProduct3(boxArray[i]->m_p1);
+			median += boxArray[i]->m_p0;
+			median += boxArray[i]->m_p1;
+
+			varian += boxArray[i]->m_p0.CompProduct3(boxArray[i]->m_p0);
+			varian += boxArray[i]->m_p1.CompProduct3(boxArray[i]->m_p1);
 		}
 
 		boxCount *= 2;

@@ -160,7 +160,7 @@ dgBigVector dgCollisionConvexHull::FaceNormal (const dgEdge *face, const dgBigVe
 		dgFloat64 mag = normal % n1;
 		dgAssert ( mag >= -dgFloat32 (0.1f));
 #endif
-		normal = normal + n1;
+		normal += n1;
 		e1 = e2;
 	} 
 	dgFloat64 den = sqrt (normal % normal) + dgFloat64 (1.0e-24f);
@@ -283,7 +283,7 @@ bool dgCollisionConvexHull::CheckConvex (dgPolyhedra& polyhedra1, const dgBigVec
 		dgEdge* const edge = &(*iter);
 		if (edge->m_mark < mark) {
 			count ++;
-			center = center + hullVertexArray[edge->m_incidentVertex];
+			center += hullVertexArray[edge->m_incidentVertex];
 			dgEdge* ptr = edge;
 			do {
 				ptr->m_mark = mark;
@@ -571,8 +571,8 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 					maxP.m_y = dgMax (p.m_y, maxP.m_y); 
 					maxP.m_z = dgMax (p.m_z, maxP.m_z); 
 
-					median = median + p;
-					varian = varian + p.CompProduct3 (p);
+					median += p;
+					varian += p.CompProduct3 (p);
 				}
 
 				varian = varian.Scale3 (dgFloat32 (box.m_vertexCount)) - median.CompProduct3(median);

@@ -495,7 +495,7 @@ void dgPolygonSoupDatabaseBuilder::End(bool optimize)
 		for (dgInt32 j = 2; j < faceIndexCount - 1; j ++) {
 			dgBigVector v2 (&m_vertexPoints[ptr[j]].m_x);
 			dgBigVector e1 (v2 - v0);
-			normal = normal + e0 * e1;
+			normal += e0 * e1;
 			e0 = e1;
 		}
 		normal = normal.Scale3 (dgFloat64 (1.0f) / sqrt (normal % normal));
@@ -592,8 +592,8 @@ void dgPolygonSoupDatabaseBuilder::Optimize(dgInt32 faceId, const dgFaceBucket& 
 						p1.m_z = dgMax (p1.m_z, p.m_z);
 					}
 					dgBigVector p ((p0 + p1).Scale3 (0.5f));
-					median = median + p;
-					varian = varian + p.CompProduct3 (p);
+					median += p;
+					varian += p.CompProduct3 (p);
 				}
 
 				varian = varian.Scale3 (dgFloat32 (faceCount)) - median.CompProduct3(median);

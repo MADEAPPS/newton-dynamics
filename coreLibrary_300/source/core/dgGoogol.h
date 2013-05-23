@@ -45,6 +45,9 @@ class dgGoogol
 	dgGoogol operator* (const dgGoogol &A) const; 
 	dgGoogol operator/ (const dgGoogol &A) const; 
 
+	dgGoogol operator+= (const dgGoogol &A); 
+	dgGoogol operator-= (const dgGoogol &A); 
+
 	bool operator> (const dgGoogol &A) const; 
 	bool operator>= (const dgGoogol &A) const; 
 	bool operator< (const dgGoogol &A) const; 

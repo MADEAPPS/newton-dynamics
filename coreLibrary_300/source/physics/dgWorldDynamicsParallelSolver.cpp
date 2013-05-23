@@ -277,23 +277,23 @@ void dgWorldDynamicUpdate::SolverInitInternalForcesParallelKernel (void* const c
 
 			dgFloat32 val = row->m_force; 
 			dgAssert (dgCheckFloat(val));
-			y0.m_linear = y0.m_linear + row->m_Jt.m_jacobianM0.m_linear.Scale3 (val);
-			y0.m_angular = y0.m_angular + row->m_Jt.m_jacobianM0.m_angular.Scale3 (val);
-			y1.m_linear = y1.m_linear + row->m_Jt.m_jacobianM1.m_linear.Scale3 (val);
-			y1.m_angular = y1.m_angular + row->m_Jt.m_jacobianM1.m_angular.Scale3 (val);
+			y0.m_linear += row->m_Jt.m_jacobianM0.m_linear.Scale3 (val);
+			y0.m_angular += row->m_Jt.m_jacobianM0.m_angular.Scale3 (val);
+			y1.m_linear += row->m_Jt.m_jacobianM1.m_linear.Scale3 (val);
+			y1.m_angular += row->m_Jt.m_jacobianM1.m_angular.Scale3 (val);
 		}
 
 		dgInt32 m0 = jointInfo->m_m0;
 		dgInt32 m1 = jointInfo->m_m1;
 		dgAssert (m0 != m1);
 		if (m0) {
-			internalForces[m0].m_linear = internalForces[m0].m_linear + y0.m_linear;
-			internalForces[m0].m_angular = internalForces[m0].m_angular + y0.m_angular;
+			internalForces[m0].m_linear += y0.m_linear;
+			internalForces[m0].m_angular += y0.m_angular;
 		}
 
 		if (m1) {
-			internalForces[m1].m_linear = internalForces[m1].m_linear + y1.m_linear;
-			internalForces[m1].m_angular = internalForces[m1].m_angular + y1.m_angular;
+			internalForces[m1].m_linear += y1.m_linear;
+			internalForces[m1].m_angular += y1.m_angular;
 		}
 	}
 }
