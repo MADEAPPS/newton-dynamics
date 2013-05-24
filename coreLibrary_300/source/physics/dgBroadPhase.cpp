@@ -995,14 +995,21 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 //			 !(body1->m_collision->IsType (dgCollision::dgCollisionNull_RTTI) | body0->m_collision->IsType (dgCollision::dgCollisionNull_RTTI)) &
 //		     !(body0->GetSleepState() & body1->GetSleepState()) & 1;
 
-	int tier0 = (-dgOverlapTest (body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB)) >> 4;
-	int tier1 = !(body1->m_collision->IsType (dgCollision::dgCollisionNull_RTTI) | body0->m_collision->IsType (dgCollision::dgCollisionNull_RTTI));
-	int tier2 = !(body0->GetSleepState() & body1->GetSleepState()) & 1;
-//	int tier3 = !body0->IsRTTIType (dgBody::m_kinematicBodyRTTI) || body1->m_invMass.m_w; 
-//	int tier4 = !body1->IsRTTIType (dgBody::m_kinematicBodyRTTI) || body0->m_invMass.m_w;
-	int tier3 = body0->m_invMass.m_w || body1->m_invMass.m_w;
+	bool mass0 = (body0->m_invMass.m_w != dgFloat32 (0.0f)); 
+	bool mass1 = (body1->m_invMass.m_w != dgFloat32 (0.0f)); 
+	bool isDynamic0 = body0->IsRTTIType (dgBody::m_dynamicBodyRTTI) != 0;
+	bool isDynamic1 = body1->IsRTTIType (dgBody::m_dynamicBodyRTTI) != 0;
+	bool isKinematic0 = body0->IsRTTIType (dgBody::m_kinematicBodyRTTI) != 0;
+	bool isKinematic1 = body1->IsRTTIType (dgBody::m_kinematicBodyRTTI) != 0;
 
-	return tier0 & tier1 & tier2 & tier3 & 1;
+	bool tier0 = ((-dgOverlapTest (body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB)) >> 4) != 0;
+	bool tier1 = !(body1->m_collision->IsType (dgCollision::dgCollisionNull_RTTI) | body0->m_collision->IsType (dgCollision::dgCollisionNull_RTTI));
+	bool tier2 = !(body0->GetSleepState() & body1->GetSleepState());
+	bool tier3 = isDynamic0 & mass0; 
+	bool tier4 = isDynamic1 & mass1; 
+	bool tier5 = isKinematic0 & mass1; 
+	bool tier6 = isKinematic1 & mass0; 
+	return tier0 & tier1 & tier2 & (tier3 | tier4 | tier5 | tier6);
 }
 
 void dgBroadPhase::SubmitPairsStatic (dgNode* const bodyNode, dgNode* const node, dgInt32 threadID)
