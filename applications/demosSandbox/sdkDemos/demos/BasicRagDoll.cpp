@@ -11,17 +11,15 @@
 
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
-//#include "Custom6DOF.h"
-#include "CustomRagDoll.h"
-#include "RenderPrimitive.h"
-#include "../OGLMesh.h"
-#include "../OGLModel.h"
-#include "../MainFrame.h"
-#include "../SceneManager.h"
-#include "../PhysicsUtils.h"
-#include "../toolBox/MousePick.h"
-#include "../toolBox/OpenGlUtil.h"
-#include "../toolBox/DebugDisplay.h"
+#include "NewtonDemos.h"
+#include "PhysicsUtils.h"
+#include "TargaToOpenGl.h"
+#include "DemoMesh.h"
+#include "DemoEntityManager.h"
+#include "DemoCamera.h"
+#include "toolBox/DebugDisplay.h"
+#include "CustomPlayerControllerManager.h"
+
 
 #if 0
 
@@ -439,50 +437,8 @@ static void BuildFloorAndSceneRoot (SceneManager& system)
 }
 #endif
 
-void DescreteRagDoll (NewtonFrame& system)
-{
-_ASSERTE (0);
-/*
 
-	NewtonWorld* world;
-
-	world = system.m_world;
-
-	// create the sky box and the floor,
-	BuildFloorAndSceneRoot (system);
-
-
-	dVector posit (0.0f, 0.0f, 0.0f, 0.0f);
-	posit.m_y = FindFloor (system.m_world, 0.0f, 0.0f) + 2.0f;
-	InitEyePoint (dVector (1.0f, 0.0f, 0.0f), posit);
-
-
-	OGLModel ragDoll;
-	char fullPathName[2048];
-	GetWorkingFileName ("snowman.dae", fullPathName);
-	OGLLoaderContext context;
-	dMatrix rotMatrix (dYawMatrix (-3.14159265f * 0.5f));
-
-_ASSERTE (0);
-//	ragDoll.LoadCollada(fullPathName, context, rotMatrix, 1.0f);
-
-	int bonesCount = sizeof (snowManDefinition) / sizeof (snowManDefinition[0]);
-	for (int x = 0; x < 3; x ++) {
-		for (int z = 0; z < 3; z ++) {
-			dVector point (cameraEyepoint + dVector (x * 3.0f + 5.0f, 0.0f, z * 3.0f, 1.0f));
-			point.m_w = 1.0f;
-			dMatrix matrix (GetIdentityMatrix());
-			matrix.m_posit = point;
-			matrix.m_posit.m_y = FindFloor (system.m_world, point.m_x, point.m_z) + 1.2f;
-
-			RagDoll* ragdoll;
-			ragdoll = RagDoll::Create (ragDoll, bonesCount, snowManDefinition, &system, system.m_world, matrix);
-		}
-	}
-*/
-}
-
-void SkinRagDoll (NewtonFrame& system)
+void SkinRagDoll (DemoEntityManager* const scene)
 {
 _ASSERTE (0);
 /*
@@ -523,6 +479,49 @@ _ASSERTE (0);
 */
 }
 
+
+
+void DescreteRagDoll (DemoEntityManager* const scene)
+{
+	// load the sky box
+	scene->CreateSkyBox();
+
+	CreateLevelMesh (scene, "flatPlane.ngd", true);
+
+/*
+	dVector posit (0.0f, 0.0f, 0.0f, 0.0f);
+	posit.m_y = FindFloor (system.m_world, 0.0f, 0.0f) + 2.0f;
+	InitEyePoint (dVector (1.0f, 0.0f, 0.0f), posit);
+
+
+	OGLModel ragDoll;
+	char fullPathName[2048];
+	GetWorkingFileName ("snowman.dae", fullPathName);
+	OGLLoaderContext context;
+	dMatrix rotMatrix (dYawMatrix (-3.14159265f * 0.5f));
+
+_ASSERTE (0);
+//	ragDoll.LoadCollada(fullPathName, context, rotMatrix, 1.0f);
+
+	int bonesCount = sizeof (snowManDefinition) / sizeof (snowManDefinition[0]);
+	for (int x = 0; x < 3; x ++) {
+		for (int z = 0; z < 3; z ++) {
+			dVector point (cameraEyepoint + dVector (x * 3.0f + 5.0f, 0.0f, z * 3.0f, 1.0f));
+			point.m_w = 1.0f;
+			dMatrix matrix (GetIdentityMatrix());
+			matrix.m_posit = point;
+			matrix.m_posit.m_y = FindFloor (system.m_world, point.m_x, point.m_z) + 1.2f;
+
+			RagDoll* ragdoll;
+			ragdoll = RagDoll::Create (ragDoll, bonesCount, snowManDefinition, &system, system.m_world, matrix);
+		}
+	}
+*/
+
+	dVector origin (-10.0f, 2.0f, 0.0f, 0.0f);
+	dQuaternion rot;
+	scene->SetCameraMatrix(rot, origin);
+}
 
 
 

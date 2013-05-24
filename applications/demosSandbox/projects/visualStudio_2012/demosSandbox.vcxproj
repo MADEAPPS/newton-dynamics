@@ -415,6 +415,7 @@
     <ClCompile Include="..\..\sdkDemos\demos\AdvancedPlayerController.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicCar.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicPlayerController.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\BasicRagDoll.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicRestitution.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ConvexCast.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\HeavyVehicles.cpp" />

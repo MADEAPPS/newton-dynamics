@@ -1,5 +1,5 @@
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Express 2012 for Windows Desktop
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dependencies", "dependencies", "{83BEBBB2-B208-4B35-8E3E-1200B5BB775E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "newtonTools", "newtonTools", "{D854B47D-403C-430A-997B-5E525E46132B}"
@@ -49,6 +49,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread", "..\..\..\..\packages\thirdParty\pthreads.2\VS_2012\pthread.vcxproj", "{03BCA23C-02A5-415B-A37B-26600BC2CE96}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tinyxml", "..\..\..\..\packages\thirdParty\tinyxml\vs2012\tinyxml.vcxproj", "{18E509CF-46D2-4749-B3BB-160937CF2481}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "freetype", "..\..\..\..\packages\thirdParty\freetype-2.4.0\builds\win32\vc2012\freetype.vcxproj", "{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -218,6 +220,14 @@ Global
 		{18E509CF-46D2-4749-B3BB-160937CF2481}.Release|Win32.Build.0 = release|Win32
 		{18E509CF-46D2-4749-B3BB-160937CF2481}.Release|x64.ActiveCfg = release|x64
 		{18E509CF-46D2-4749-B3BB-160937CF2481}.Release|x64.Build.0 = release|x64
+		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Debug|Win32.Build.0 = Debug|Win32
+		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Debug|x64.ActiveCfg = Debug|x64
+		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Debug|x64.Build.0 = Debug|x64
+		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release|Win32.ActiveCfg = Release|Win32
+		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release|Win32.Build.0 = Release|Win32
+		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release|x64.ActiveCfg = Release|x64
+		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -233,6 +243,7 @@ Global
 		{CBE9E751-E58B-46C1-B6B0-873670D0F981} = {D854B47D-403C-430A-997B-5E525E46132B}
 		{B5EEC82D-938F-44C9-89BB-4A058581750B} = {D854B47D-403C-430A-997B-5E525E46132B}
 		{2FFEB5B8-8929-469F-BB13-4E391CD3213C} = {D854B47D-403C-430A-997B-5E525E46132B}
+		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B} = {D854B47D-403C-430A-997B-5E525E46132B}
 		{CF80628E-8E28-4299-8960-482BBFCBF897} = {01171988-1124-4AD7-BD17-54F74889F6E0}
 		{A862A496-668A-41CA-BA4B-8C86892006B7} = {01171988-1124-4AD7-BD17-54F74889F6E0}
 		{0C9707F5-DEC7-42EB-8EA1-A484DF1E515B} = {01171988-1124-4AD7-BD17-54F74889F6E0}

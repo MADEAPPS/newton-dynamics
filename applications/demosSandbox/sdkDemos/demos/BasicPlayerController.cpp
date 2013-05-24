@@ -15,10 +15,10 @@
 #include "NewtonDemos.h"
 #include "PhysicsUtils.h"
 #include "TargaToOpenGl.h"
-#include "../DemoMesh.h"
-#include "../DemoEntityManager.h"
-#include "../DemoCamera.h"
-#include "../toolBox/DebugDisplay.h"
+#include "DemoMesh.h"
+#include "DemoEntityManager.h"
+#include "DemoCamera.h"
+#include "toolBox/DebugDisplay.h"
 #include "CustomPlayerControllerManager.h"
 
 
@@ -361,7 +361,6 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	// set as the player with the camera
 	manager->SetAsPlayer(player);
 
-	
 
 
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());

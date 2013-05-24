@@ -49,14 +49,13 @@
 //#define DEFAULT_SCENE	23			// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	24			// continue collision
 //#define DEFAULT_SCENE	25			// puck slide continue collision
-//#define DEFAULT_SCENE	26			// basic car
-//#define DEFAULT_SCENE	27			// player controller
-#define DEFAULT_SCENE	28			// advanced player controller
-//#define DEFAULT_SCENE	29			// cloth patch			
-//#define DEFAULT_SCENE	30			// soft bodies			
-//#define DEFAULT_SCENE	31			// high performance super car
-
-
+#define DEFAULT_SCENE	26			// basic ragdoll
+//#define DEFAULT_SCENE	27			// basic car
+//#define DEFAULT_SCENE	28			// high performance super car
+//#define DEFAULT_SCENE	29			// player controller
+//#define DEFAULT_SCENE	30			// advanced player controller
+//#define DEFAULT_SCENE	31			// cloth patch			
+//#define DEFAULT_SCENE	32			// soft bodies			
 
 
 void Friction (DemoEntityManager* const scene);
@@ -85,14 +84,13 @@ void SimpleConvexShatter (DemoEntityManager* const scene);
 void UsingNewtonMeshTool (DemoEntityManager* const scene);
 void MultiRayCast (DemoEntityManager* const scene);
 void BasicCar (DemoEntityManager* const scene);
+void SuperCar (DemoEntityManager* const scene);
 void BasicPlayerController (DemoEntityManager* const scene);
 void AdvancedPlayerController (DemoEntityManager* const scene);
-void SuperCar (DemoEntityManager* const scene);
 void HeightFieldCollision (DemoEntityManager* const scene);
 void UserPlaneCollision (DemoEntityManager* const scene);
 void UserHeightFieldCollision (DemoEntityManager* const scene);
-
-
+void DescreteRagDoll (DemoEntityManager* const scene);
 
 
 NewtonDemos::SDKDemos NewtonDemos::m_demosSelection[] = 
@@ -123,13 +121,14 @@ NewtonDemos::SDKDemos NewtonDemos::m_demosSelection[] =
 	{"Parallel ray cast", "using the threading Job scheduler", MultiRayCast},
 	{"Continue collision", "show continue collision", ContinueCollision},
 	{"Puck slide", "show continue collision", PuckSlide},
-	{"Basic Car", "implement a basic car", BasicCar},
+	{"Basic ragdoll", "demonstrate simple rag doll", DescreteRagDoll},
+	{"Basic car", "implement a basic car", BasicCar},
+	//{"High performance super car", "implement a high performance ray cast car", SuperCar},
+	{"High performance super car", "implement a high performance ray cast car", BasicCar},
 	{"Basic player controller", "demonstrate simple player controller", BasicPlayerController},
 	{"Advanced player controller", "demonstrate player interacting with other objects", AdvancedPlayerController},
-//	{"High performance super car", "implement a high performance ray cast car", SuperCar},
 	{"Simple cloth Path", "show simple cloth path", ClothPath},
 	{"Simple soft Body", "show simple soft body", SoftBodies},
-
 
 //	{"basic convex hull stacking", "demonstrate convex hull stacking", BasicConvexStacks},
 //	{"basic unstable stacking", "demonstrate stability stacking unstable objects", UnstableStacks},
@@ -147,7 +146,7 @@ NewtonDemos::SDKDemos NewtonDemos::m_demosSelection[] =
 //	{"custom joints", "demonstrate custom joints", BasicCustomJoints},
 //	{"Simple robots", "demonstrate custom joints robot", BasicRobots},
 //	{"motorized robots", "demonstrate motorized custom joints robot", TracktionJoints},
-//	{"discrete rag doll", "demonstrate simple rag doll", DescreteRagDoll},
+
 //	{"skinned rag doll", "demonstrate simple rag doll", SkinRagDoll},
 };
 

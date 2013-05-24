@@ -160,6 +160,9 @@
     <ClCompile Include="..\..\sdkDemos\DemoCameraListener.cpp">
       <Filter>mainLogic\listeners</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\BasicRagDoll.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\sdkDemos\toolBox\DebugDisplay.h">
