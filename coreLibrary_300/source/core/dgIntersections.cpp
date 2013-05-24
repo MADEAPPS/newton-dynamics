@@ -1037,7 +1037,7 @@ dgFloat32 dgRayCastSphere (const dgVector& p0, const dgVector& p1, const dgVecto
 					return t0;
 				}
 			} else {
-				if (t1 <= dgFloat32 (1.0f)) {
+				if ((t1 >= dgFloat32 (0.0f)) && (t1 <= dgFloat32 (1.0f))) {
 					return t1;
 				}
 			}
@@ -1064,7 +1064,7 @@ dgFloat32 dgRayCastSphere (const dgVector& p0, const dgVector& p1, const dgVecto
 					return dgFloat32 (t0);
 				}
 			} else {
-				if (t1 <= dgFloat32 (1.0f)) {
+				if ((t1 >= dgFloat32 (0.0f)) && (t1 <= dgFloat32 (1.0f))) {
 					return dgFloat32 (t1);
 				}
 			}
