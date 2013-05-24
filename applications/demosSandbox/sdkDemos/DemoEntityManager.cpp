@@ -253,7 +253,8 @@ void DemoEntityManager::CreateOpenGlFont()
 		GetWorkingFileName ("arial.ttf", fileName);
 
 		FT_Face face[96];   
-		int sizeInPixels = 32;
+		int withInPixels = 22;
+		int heightInPixels = 32;
 
 		int width = 0;
 		int height = 0;
@@ -262,10 +263,11 @@ void DemoEntityManager::CreateOpenGlFont()
 			error = FT_New_Face( library, fileName, 0, &face[ch] );
 			dAssert (!error);
 
-			error = FT_Set_Char_Size(face[ch], 0, sizeInPixels * 64, 96, 96);
+			error = FT_Set_Char_Size(face[ch], withInPixels * 64, heightInPixels * 64, 96, 96);
 			dAssert (!error);
 
-			FT_UInt index = FT_Get_Char_Index( face[ch], ch + 32);
+			//FT_UInt index = FT_Get_Char_Index( face[ch], ch + 32);
+			FT_UInt index = FT_Get_Char_Index( face[ch], 'A');
 
 			error = FT_Load_Glyph( face[ch], index, FT_LOAD_DEFAULT );
 			dAssert (!error);
@@ -283,8 +285,8 @@ void DemoEntityManager::CreateOpenGlFont()
 		int ImageWidth = TwosPower (width);
 		int ImageHeight = TwosPower (height);
 
-		char* const image = new char[ImageWidth * ImageHeight];
-		memset (image, 0, ImageWidth * ImageHeight);
+		char* const image = new char[2 * ImageWidth * ImageHeight];
+		memset (image, 0, 2 * ImageWidth * ImageHeight);
 
 		int maxWidth = 0;
 		int imageBase = 0;
@@ -301,11 +303,13 @@ void DemoEntityManager::CreateOpenGlFont()
 				int posit = imageBase;
 				for (int j = 0; j < height; j ++) {
 					for (int i = 0; i < width; i ++) {
-						image[posit + i] = slot->bitmap.buffer[j * pitch + i];
+						int color = slot->bitmap.buffer[j * pitch + i];
+						image[posit + i * 2 + 0] = color;
+						image[posit + i * 2 + 1] = (color > 2) ? 255 : 0;
 					}
 					posit += ImageWidth;
 				}
-				imageBase += width;
+				imageBase += width * 2;
 			}
 		}
 
@@ -637,8 +641,8 @@ void DemoEntityManager::Print (const dVector& color, dFloat x, dFloat y, const c
     glEnable(GL_TEXTURE_2D);
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glBlendFunc (GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR);      
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc (GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR);      
 	
 	glBindTexture(GL_TEXTURE_2D, m_fontImage);
 

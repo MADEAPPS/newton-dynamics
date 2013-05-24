@@ -143,16 +143,16 @@ class BasicPlayerControllerManager: public CustomPlayerControllerManager
 	{
 		if (m_player->m_helpKey.GetPushButtonState()) {
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			scene->Print (color, 10, 200, "Navigation keys:");
-			scene->Print (color, 10, 220, "W - walk forward");
-			scene->Print (color, 10, 240, "S - walk backward");
-			scene->Print (color, 10, 260, "D - strafe right");
-			scene->Print (color, 10, 280, "A - strafe left");
-			scene->Print (color, 10, 320, "C - toggle Camera mode");
-			scene->Print (color, 10, 300, "Space - jump");
-			scene->Print (color, 10, 340, "H - hide Help");
-			scene->Print (color, 10, 360, "Left move button down and move mouse to orient the player direction and look up and down");
-			glEnable(GL_TEXTURE_2D);	
+			scene->Print (color, 10, 200, " ");
+//			scene->Print (color, 10, 200, "Navigation keys:");
+//			scene->Print (color, 10, 220, "W - walk forward");
+//			scene->Print (color, 10, 240, "S - walk backward");
+//			scene->Print (color, 10, 260, "D - strafe right");
+//			scene->Print (color, 10, 280, "A - strafe left");
+//			scene->Print (color, 10, 320, "C - toggle Camera mode");
+//			scene->Print (color, 10, 300, "Space - jump");
+//			scene->Print (color, 10, 340, "H - hide Help");
+//			scene->Print (color, 10, 360, "Left move button down and move mouse to orient the player direction and look up and down");
 		}
 	}
 

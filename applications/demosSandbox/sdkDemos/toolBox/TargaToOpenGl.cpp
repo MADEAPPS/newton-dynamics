@@ -195,8 +195,9 @@ GLuint LoadTexture(const char* const filename)
 			break;
 
 			case 1:
-				eFormat = GL_LUMINANCE;
-				iComponents = 1;
+				//eFormat = GL_LUMINANCE;
+				eFormat = GL_LUMINANCE_ALPHA;
+				iComponents = 4;
 				break;
 		};
 
@@ -261,10 +262,10 @@ GLuint LoadImage(const char* const cacheName, const char* const buffer, int widt
 		break;
 
 		case m_luminace:
-			eFormat = GL_LUMINANCE;
-			//eFormat = GL_LUMINANCE_ALPHA;
+			//eFormat = GL_LUMINANCE;
+			eFormat = GL_LUMINANCE_ALPHA;
 			//eFormat = GL_ALPHA;
-			iComponents = 1;
+			iComponents = 4;
 			break;
 	};
 
