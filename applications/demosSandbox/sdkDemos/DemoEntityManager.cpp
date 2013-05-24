@@ -250,10 +250,13 @@ void DemoEntityManager::CreateOpenGlFont()
 	if ( !error )
 	{
 		char fileName[2048];
-		GetWorkingFileName ("arial.ttf", fileName);
+		//GetWorkingFileName ("arial.ttf", fileName);
+		//GetWorkingFileName ("calibri.ttf", fileName);
+		GetWorkingFileName ("courbd.ttf", fileName);
+				
 
 		FT_Face face[96];   
-		int withInPixels = 32;
+		int withInPixels = 16;
 		//int heightInPixels = 32;
 
 		int width = 0;
@@ -291,7 +294,9 @@ void DemoEntityManager::CreateOpenGlFont()
 		char* const image = new char[2 * imageWidth * imageHeight];
 		memset (image, 0, 2 * imageWidth * imageHeight);
 
+		int maxWidth = 0;
 		int imageBase = 0;
+		
 		for (char ch = 0; ch < 96; ch ++) {
 			FT_Face bitmap = face[ch];   
 			FT_GlyphSlot slot = bitmap->glyph;
@@ -299,6 +304,8 @@ void DemoEntityManager::CreateOpenGlFont()
 			const FT_Glyph_Metrics& metrics = slot->metrics;
 			int w = metrics.width / 64;
 			int h = metrics.height / 64;
+
+			maxWidth = (w > maxWidth) ? w : maxWidth;
 			if (w) {
 				const unsigned char* const buffer = slot->bitmap.buffer;
 				int pitch =  slot->bitmap.pitch;
@@ -352,6 +359,8 @@ void DemoEntityManager::CreateOpenGlFont()
 				imageBase += w;
 			}
 			glPopMatrix();
+			
+			//glTranslatef(maxWidth, 0, 0);
 			glTranslatef(metrics.horiAdvance / 64, 0, 0);
 
 			glEndList();
