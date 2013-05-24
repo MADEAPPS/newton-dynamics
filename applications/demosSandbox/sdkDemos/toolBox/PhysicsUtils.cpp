@@ -846,7 +846,7 @@ NewtonBody* CreateSimpleSolid (DemoEntityManager* const scene, DemoMesh* const m
 
 
 
-void AddPrimitiveArray (DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat spacing, PrimitiveType type, int materialID, const dMatrix& shapeOffsetMatrix)
+void AddPrimitiveArray (DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat spacing, PrimitiveType type, int materialID, const dMatrix& shapeOffsetMatrix, dFloat startElevation)
 {
 	// create the shape and visual mesh as a common data to be re used
 	NewtonWorld* const world = scene->GetNewton();
@@ -855,7 +855,7 @@ void AddPrimitiveArray (DemoEntityManager* const scene, dFloat mass, const dVect
 	DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
 	//dFloat startElevation = 1000.0f;
-	dFloat startElevation = 20.0f;
+	//dFloat startElevation = 20.0f;
 
 	dMatrix matrix (GetIdentityMatrix());
 	for (int i = 0; i < xCount; i ++) {

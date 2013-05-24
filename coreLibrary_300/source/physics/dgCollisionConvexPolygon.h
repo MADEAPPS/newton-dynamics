@@ -25,7 +25,7 @@
 #include "dgCollisionConvexHull.h"
 
 
-#define DG_CONVEX_POLYGON_MAX_VERTEX_COUNT	32
+#define DG_CONVEX_POLYGON_MAX_VERTEX_COUNT	64
 
 DG_MSC_VECTOR_ALIGMENT 
 class dgCollisionConvexPolygon: public dgCollisionConvex	
@@ -68,7 +68,6 @@ class dgCollisionConvexPolygon: public dgCollisionConvex
 
 	dgVector m_normal;
 	dgVector m_localPoly[DG_CONVEX_POLYGON_MAX_VERTEX_COUNT];
-//	dgSimd m_localPolySimd[DG_CONVEX_POLYGON_MAX_VERTEX_COUNT * 3/4];
 	dgInt32 m_clippEdgeNormal[DG_CONVEX_POLYGON_MAX_VERTEX_COUNT];
 	dgInt32 m_count;
 	dgInt32 m_paddedCount;

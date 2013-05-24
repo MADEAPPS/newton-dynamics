@@ -110,13 +110,11 @@ dgVector dgCollisionConvexPolygon::SupportVertex (const dgVector& dir, dgInt32* 
 }
 
 
-
-//void dgCollisionConvexPolygon::BeamClipping (const dgCollisionInstance* const hull, const dgMatrix& matrix, const dgVector& origin, dgFloat32 dist)
 void dgCollisionConvexPolygon::BeamClipping (const dgCollisionInstance* const hull, const dgVector& origin, dgFloat32 dist)
 {
 	dgPlane planes[4];
 	dgVector points[sizeof (m_localPoly) / sizeof (m_localPoly[0]) + 8];
-	dgClippedFaceEdge clippedFace [sizeof (m_localPoly) / sizeof (m_localPoly[0]) + 8];
+	dgClippedFaceEdge clippedFace [2 * sizeof (m_localPoly) / sizeof (m_localPoly[0]) + 8];
 
 	//dgVector origin (matrix.UnrotateVector (matrix.m_posit.Scale3 (dgFloat32 (-1.0f))));	 
 	dgVector dir (m_localPoly[1] - m_localPoly[0]);
@@ -133,6 +131,8 @@ void dgCollisionConvexPolygon::BeamClipping (const dgCollisionInstance* const hu
 
 	for (dgInt32 i = 0; i < m_count; i ++) {
 		dgInt32 j = i << 1;
+		dgAssert (j < sizeof (clippedFace) / sizeof (clippedFace[0]));
+
 		points[i] = m_localPoly[i] - origin;
 
 		clippedFace[j + 0].m_twin = &clippedFace[j + 1];
@@ -149,7 +149,6 @@ void dgCollisionConvexPolygon::BeamClipping (const dgCollisionInstance* const hu
 	clippedFace[1].m_next = &clippedFace[m_count * 2 - 2 + 1];
 	clippedFace[m_count * 2 - 2].m_next = &clippedFace[0];
 	clippedFace[m_count * 2 - 2 + 1].m_incidentVertex = 0;
-
 
 	dgInt32 edgeCount = m_count * 2;
 	dgInt32 indexCount = m_count;
@@ -569,6 +568,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete (dgCollis
 		}
 		m_localPoly[i] = q1;
 		q0 = q1;
+		dgAssert (q1.m_w == dgFloat32 (0.0f));
 	}
 
 // hack to resolve the high energy bug until I fix the bug with the collision tree welder 
