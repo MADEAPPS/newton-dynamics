@@ -226,25 +226,6 @@ void DemoEntityManager::RemoveEntity (DemoEntity* const ent)
 
 void DemoEntityManager::CreateOpenGlFont()
 {
-/*
-	// create a fond for print in 3d window
-	m_font = glGenLists(96);
-	wxClientDC dc(this);
-	wxFont font(9, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false);
-	dc.SetFont(font);
-
-#if defined (_MSC_VER)
-	wglUseFontBitmaps ((HDC)dc.GetHDC(), 32, 96, m_font);
-	//	dc.SelectOldObjects(dc.GetHDC());
-#elif defined(_POSIX_VER)
-
-#elif defined(_MACOSX_VER)
-
-#else
-	#error  "error: neet to implement \"wglUseFontBitmaps\" here for thsi platform"
-#endif
-*/
-
 	FT_Library  library;
 	FT_Error error = FT_Init_FreeType (&library);
 	if ( !error )
@@ -256,8 +237,8 @@ void DemoEntityManager::CreateOpenGlFont()
 				
 
 		FT_Face face[96];   
-		int withInPixels = 16;
-		//int heightInPixels = 32;
+		int withInPixels = 12;
+		int heightInPixels = 16;
 
 		int width = 0;
 		int height = 0;
@@ -268,7 +249,7 @@ void DemoEntityManager::CreateOpenGlFont()
 
 			FT_Face bitmap = face[ch];   
 
-			error = FT_Set_Char_Size(bitmap, withInPixels * 64, 0, 96, 96);
+			error = FT_Set_Char_Size(bitmap, withInPixels * 64, heightInPixels * 64, 96, 96);
 			dAssert (!error);
 
 			FT_UInt index = FT_Get_Char_Index( face[ch], ch + ' ');
