@@ -745,8 +745,6 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 			scene->Print (color, 10, 340, "gear neutral: enter                 button 4");
 			scene->Print (color, 10, 360, "hand brakes : space                 button 1");
 			scene->Print (color, 10, 380, "hide help   : H");
-
-			glEnable(GL_TEXTURE_2D);	
 		}
 	}
 

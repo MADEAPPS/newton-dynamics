@@ -251,7 +251,6 @@ class dgCollision
 	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const = 0;
 	virtual dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const = 0;
 
-
 	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1) = 0;
 	virtual void CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const = 0;
 
@@ -267,10 +266,10 @@ class dgCollision
 	virtual dgFloat32 CalculateMassProperties (const dgMatrix& offset, dgVector& inertia, dgVector& crossInertia, dgVector& centerOfMass) const {dgAssert (0); return 0;}
 	virtual dgMatrix CalculateInertiaAndCenterOfMass (const dgVector& localScale, const dgMatrix& matrix) const {dgAssert (0); return dgGetZeroMatrix();}
 
-
+	virtual dgFloat32 GetSkinThickness () const; 
 	virtual dgFloat32 GetBoxMinRadius () const = 0; 
 	virtual dgFloat32 GetBoxMaxRadius () const = 0; 
-
+	
 	
 	virtual dgVector CalculateVolumeIntegral (const dgMatrix& globalMatrix, GetBuoyancyPlane bouyancyPlane, void* const context) const = 0;
 	virtual void Serialize(dgSerialize callback, void* const userData) const = 0;

@@ -211,10 +211,9 @@ class dConvexCastManager: public CustomControllerManager<dConvexCastRecord>
 	{
 		if (m_helpKey.GetPushButtonState()) {
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-
 			scene->Print (color, 10, 100, "mouse point and right click to cast current convex shape");
-			scene->Print (color, 10, 120, "space to change casting shape");
-			scene->Print (color, 10, 140, "hide help   : H");
+			scene->Print (color, 10, 120, "space	   : change casting shape");
+			scene->Print (color, 10, 140, "h		   : hide help");
 		}
 	}
 

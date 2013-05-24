@@ -989,11 +989,20 @@ void dgBroadPhase::UpdateSoftBodyForcesKernel (void* const context, void* const 
 
 bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* const body1) const
 {
-	return ( (-dgOverlapTest (body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB)) >> 4) &
-		     (!body0->IsRTTIType (dgBody::m_kinematicBodyRTTI) || body1->m_invMass.m_w) & 
-			 (!body1->IsRTTIType (dgBody::m_kinematicBodyRTTI) || body0->m_invMass.m_w) &
-			 !(body1->m_collision->IsType (dgCollision::dgCollisionNull_RTTI) | body0->m_collision->IsType (dgCollision::dgCollisionNull_RTTI)) &
-		     !(body0->GetSleepState() & body1->GetSleepState()) & 1;
+//	return ( (-dgOverlapTest (body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB)) >> 4) &
+//		     (!body0->IsRTTIType (dgBody::m_kinematicBodyRTTI) || body1->m_invMass.m_w) & 
+//			 (!body1->IsRTTIType (dgBody::m_kinematicBodyRTTI) || body0->m_invMass.m_w) &
+//			 !(body1->m_collision->IsType (dgCollision::dgCollisionNull_RTTI) | body0->m_collision->IsType (dgCollision::dgCollisionNull_RTTI)) &
+//		     !(body0->GetSleepState() & body1->GetSleepState()) & 1;
+
+	int tier0 = (-dgOverlapTest (body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB)) >> 4;
+	int tier1 = !(body1->m_collision->IsType (dgCollision::dgCollisionNull_RTTI) | body0->m_collision->IsType (dgCollision::dgCollisionNull_RTTI));
+	int tier2 = !(body0->GetSleepState() & body1->GetSleepState()) & 1;
+//	int tier3 = !body0->IsRTTIType (dgBody::m_kinematicBodyRTTI) || body1->m_invMass.m_w; 
+//	int tier4 = !body1->IsRTTIType (dgBody::m_kinematicBodyRTTI) || body0->m_invMass.m_w;
+	int tier3 = body0->m_invMass.m_w || body1->m_invMass.m_w;
+
+	return tier0 & tier1 & tier2 & tier3 & 1;
 }
 
 void dgBroadPhase::SubmitPairsStatic (dgNode* const bodyNode, dgNode* const node, dgInt32 threadID)

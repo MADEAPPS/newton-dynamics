@@ -765,7 +765,7 @@ extern "C" {
 	NEWTON_API void NewtonCollisionGetScale (const NewtonCollision* const collision, dFloat* const scaleX, dFloat* const scaleY, dFloat* const scaleZ);
 	NEWTON_API void NewtonDestroyCollision (const NewtonCollision* const collision);
 
-
+	NEWTON_API dFloat NewtonCollisionGetSkinThickness (const NewtonCollision* const collision);
 
 	NEWTON_API int NewtonCollisionPointDistance (const NewtonWorld* const newtonWorld, const dFloat* const point,
 		const NewtonCollision* const collision, const dFloat* const matrix, dFloat* const contact, dFloat* const normal, int threadIndex);

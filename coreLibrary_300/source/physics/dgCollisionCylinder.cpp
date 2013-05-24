@@ -230,7 +230,10 @@ void dgCollisionCylinder::MassProperties ()
 	m_centerOfMass.m_w = volume;
 }
 
-
+dgFloat32 dgCollisionCylinder::GetSkinThickness () const
+{
+	return DG_CYLINDER_SKIN_PADDING;
+}
 
 dgVector dgCollisionCylinder::ConvexConicSupporVertex (const dgVector& dir) const
 {

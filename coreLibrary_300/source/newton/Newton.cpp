@@ -3740,6 +3740,13 @@ void NewtonSceneCollisionOptimize (NewtonCollision* const scene)
 }
 */
 
+
+dFloat NewtonCollisionGetSkinThickness (const NewtonCollision* const collision)
+{
+	dgCollisionInstance* const instance = (dgCollisionInstance*) collision;
+	return instance->GetChildShape()->GetSkinThickness();
+}
+
 // **********************************************************************************************
 //
 // Name: Generic collision library functions

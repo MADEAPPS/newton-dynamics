@@ -232,6 +232,11 @@ dgVector dgCollisionTaperedCylinder::SupportVertex (const dgVector& dir, dgInt32
 	return p0;
 }
 
+dgFloat32 dgCollisionTaperedCylinder::GetSkinThickness () const
+{
+	return DG_TAPED_CYLINDER_SKIN_PADDING;
+}
+
 
 dgVector dgCollisionTaperedCylinder::ConvexConicSupporVertex (const dgVector& dir) const
 {
