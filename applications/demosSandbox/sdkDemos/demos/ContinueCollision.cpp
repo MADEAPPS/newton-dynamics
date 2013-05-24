@@ -49,22 +49,21 @@ void ContinueCollision (DemoEntityManager* const scene)
 
 	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
 	dQuaternion rot (camMatrix);
-	dVector origin (-5.0f, 5.0f, -10.0f, 0.0f);
-//	dVector origin (-10.0f, 5.0f, -10.0f, 0.0f);
-//	dVector origin (-15.0f, 5.0f, -10.0f, 0.0f);
+	dVector origin (FindFloor (scene->GetNewton(), dVector (-5.0f, 20.0f, -10.0f, 0.0f), 100.0f));
+	origin.m_y += 10.0f;
 	scene->SetCameraMatrix(rot, origin);
 
 
 	NewtonWorld* const world = scene->GetNewton();
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (world);
 
-	dVector location (0.0f, 0.0f, 0.0f, 0.0f);
+	dVector location (origin);
 //	dVector size (0.5f, 0.5f, 0.5f, 0.0f);
 //	dVector size (0.025f, 0.025f, 0.025f, 0.0f); 
 	dVector size (0.2f, 0.2f, 0.2f, 0.0f);
 
-location.m_x = 4.0f;
-location.m_z = 2.0f;
+	location.m_x += 30.0f;
+	location.m_z += 2.0f;
 	int count = 8;
 //	int count = 1;
 
