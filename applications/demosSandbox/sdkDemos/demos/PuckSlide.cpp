@@ -10,11 +10,11 @@
 */
 
 #include <toolbox_stdafx.h>
-#include "../DemoEntityManager.h"
-#include "../DemoCamera.h"
+#include "DemoEntityManager.h"
+#include "DemoCamera.h"
 #include "PhysicsUtils.h"
-#include "../DemoMesh.h"
-#include "../toolBox/OpenGlUtil.h"
+#include "DemoMesh.h"
+#include "toolBox/OpenGlUtil.h"
 
 #define PHYSICS_WORLD_SCALE			50.0f											// conversion from meters to world units
 
@@ -203,6 +203,8 @@ static void PhysicsNewton_CollisionPuckSurfaceCB(const NewtonJoint *pContactJoin
 // create physics scene
 void PuckSlide (DemoEntityManager* const scene)
 {
+	scene->CreateSkyBox();
+
 	NewtonWorld* const world = scene->GetNewton();
 
 	int	materialGroupIDs[SB_NUM_MATERIALS];
