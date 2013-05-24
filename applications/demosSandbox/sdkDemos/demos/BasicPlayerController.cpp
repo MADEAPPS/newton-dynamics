@@ -143,7 +143,8 @@ class BasicPlayerControllerManager: public CustomPlayerControllerManager
 	{
 		if (m_player->m_helpKey.GetPushButtonState()) {
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			scene->Print (color, 10, 200, " ");
+			//scene->Print (color, 50, 200, "abcdefghijk");
+			scene->Print (color, 50, 200, "ABCDEFG abcdef");
 //			scene->Print (color, 10, 200, "Navigation keys:");
 //			scene->Print (color, 10, 220, "W - walk forward");
 //			scene->Print (color, 10, 240, "S - walk backward");

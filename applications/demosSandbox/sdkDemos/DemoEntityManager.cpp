@@ -253,8 +253,8 @@ void DemoEntityManager::CreateOpenGlFont()
 		GetWorkingFileName ("arial.ttf", fileName);
 
 		FT_Face face[96];   
-		int withInPixels = 22;
-		int heightInPixels = 32;
+		int withInPixels = 32;
+		//int heightInPixels = 32;
 
 		int width = 0;
 		int height = 0;
@@ -263,98 +263,96 @@ void DemoEntityManager::CreateOpenGlFont()
 			error = FT_New_Face( library, fileName, 0, &face[ch] );
 			dAssert (!error);
 
-			error = FT_Set_Char_Size(face[ch], withInPixels * 64, heightInPixels * 64, 96, 96);
+			FT_Face bitmap = face[ch];   
+
+			error = FT_Set_Char_Size(bitmap, withInPixels * 64, 0, 96, 96);
 			dAssert (!error);
 
-			//FT_UInt index = FT_Get_Char_Index( face[ch], ch + 32);
-			FT_UInt index = FT_Get_Char_Index( face[ch], 'A');
+			FT_UInt index = FT_Get_Char_Index( face[ch], ch + ' ');
+			//FT_UInt index = FT_Get_Char_Index (bitmap, 'A');
 
-			error = FT_Load_Glyph( face[ch], index, FT_LOAD_DEFAULT );
+			error = FT_Load_Glyph (bitmap, index, FT_LOAD_DEFAULT );
 			dAssert (!error);
 
-			error = FT_Render_Glyph (face[ch]->glyph, FT_RENDER_MODE_NORMAL); 
+			error = FT_Render_Glyph (bitmap->glyph, FT_RENDER_MODE_NORMAL); 
 			dAssert (!error);
 
-			FT_GlyphSlot slot = face[ch]->glyph;
-			if (slot->bitmap.buffer) {
-				width += slot->bitmap.width;
-				height = (height > slot->bitmap.rows) ? height : slot->bitmap.rows;
-			}
+			const FT_Glyph_Metrics& metrics = bitmap->glyph->metrics;
+			int w = metrics.width / 64;
+			int h = metrics.height / 64;
+
+			width += w;
+			height = (height > h) ? height : h;
 		}
 
-		int ImageWidth = TwosPower (width);
-		int ImageHeight = TwosPower (height);
+		int imageWidth = TwosPower (width);
+		int imageHeight = TwosPower (height);
 
-		char* const image = new char[2 * ImageWidth * ImageHeight];
-		memset (image, 0, 2 * ImageWidth * ImageHeight);
+		char* const image = new char[2 * imageWidth * imageHeight];
+		memset (image, 0, 2 * imageWidth * imageHeight);
 
-		int maxWidth = 0;
 		int imageBase = 0;
 		for (char ch = 0; ch < 96; ch ++) {
 			FT_Face bitmap = face[ch];   
 			FT_GlyphSlot slot = bitmap->glyph;
 
-			if (slot->bitmap.buffer) {
-				int width = slot->bitmap.width;
-				int height = slot->bitmap.rows;
+			const FT_Glyph_Metrics& metrics = slot->metrics;
+			int w = metrics.width / 64;
+			int h = metrics.height / 64;
+			if (w) {
+				const unsigned char* const buffer = slot->bitmap.buffer;
 				int pitch =  slot->bitmap.pitch;
-				maxWidth = (width > maxWidth) ? width : maxWidth;
 
 				int posit = imageBase;
-				for (int j = 0; j < height; j ++) {
-					for (int i = 0; i < width; i ++) {
-						int color = slot->bitmap.buffer[j * pitch + i];
+				for (int j = 0; j < h; j ++) {
+					for (int i = 0; i < w; i ++) {
+						int color = buffer[j * pitch + i];
 						image[posit + i * 2 + 0] = color;
-						image[posit + i * 2 + 1] = (color > 2) ? 255 : 0;
+						image[posit + i * 2 + 1] = color;
 					}
-					posit += ImageWidth;
+					posit += imageWidth * 2;
 				}
-				imageBase += width * 2;
+				imageBase += w * 2;
 			}
 		}
 
-		// make th open gl displate list here
-	    m_fontImage = LoadImage("fontTexture", image, ImageWidth, ImageHeight, m_luminace);
+		// make th open gl display list here
+	    m_fontImage = LoadImage("fontTexture", image, imageWidth, imageHeight, m_luminace);
 
 		m_font = glGenLists(96);
 		glBindTexture(GL_TEXTURE_2D, m_fontImage);
 
 		imageBase = 0;
 		for (char ch = 0; ch < 96; ch ++) {
-
-			glNewList(m_font + ch, GL_COMPILE);
 			FT_Face bitmap = face[ch];   
 			FT_GlyphSlot slot = bitmap->glyph;
+			const FT_Glyph_Metrics& metrics = slot->metrics;
 
-			width = 0;
-
+			glNewList(m_font + ch, GL_COMPILE);
 			glPushMatrix();
 			glTranslatef(slot->bitmap_left, 64 - slot->bitmap_top, 0);
 
-			if (slot->bitmap.buffer) {
-				width = slot->bitmap.width;
-				int height = slot->bitmap.rows;
-
+			dFloat w = dFloat (metrics.width / 64);
+			dFloat h = dFloat (metrics.height / 64);
+			if (w) {
 				glBegin(GL_QUADS);
-				glTexCoord2d( dFloat (imageBase) / ImageWidth, 0); 
+				glTexCoord2d (dFloat (imageBase) / imageWidth, 0); 
 				glVertex2i(0, 0);
 
-				glTexCoord2d(dFloat (imageBase) / ImageWidth, 1); 
-				glVertex2i(0, height);
+				glTexCoord2d (dFloat (imageBase) / imageWidth, (h - 1.0f) / imageHeight); 
+				glVertex2i(0, h - 1);
 
-				glTexCoord2d (dFloat (imageBase + width) / ImageWidth, 1); 
-				glVertex2i( width, height);
+				glTexCoord2d (dFloat (imageBase + w - 1.0f) / imageWidth, (h - 1.0f) / imageHeight); 
+				glVertex2i (w - 1.0f, h - 1.0f);
 
-				glTexCoord2d(dFloat (imageBase + width) / ImageWidth, 0); 
-				glVertex2i (width, 0);
+				glTexCoord2d (dFloat (imageBase + w - 1.0f) / imageWidth, 0); 
+				glVertex2i (w - 1.0f, 0);
 				glEnd();
 
-				imageBase += width;
+				imageBase += w;
 			}
 			glPopMatrix();
-
-			//glTranslated(width + 1, 0, 0);
-			glTranslatef(slot->advance.x / 64, 0, 0);
+			glTranslatef(metrics.horiAdvance / 64, 0, 0);
 
 			glEndList();
 			FT_Done_Face(bitmap);
@@ -641,7 +639,7 @@ void DemoEntityManager::Print (const dVector& color, dFloat x, dFloat y, const c
     glEnable(GL_TEXTURE_2D);
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//glBlendFunc (GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR);      
 	
 	glBindTexture(GL_TEXTURE_2D, m_fontImage);
