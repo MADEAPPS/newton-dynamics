@@ -374,7 +374,7 @@ void DemoEntityManager::InitGraphicsSystem()
 
 #elif defined(_MACOSX_VER)
 	// aglSetInteger (AGL_SWAP_INTERVAL, 0);
-	wglSwapIntervalEXT (GetContext());
+    wglSwapIntervalEXT (GetContext()->GetWXGLContext());
 #else
 	#error  "error: neet to implement \"GetWorkingFileName\" here for thsi platform"
 #endif

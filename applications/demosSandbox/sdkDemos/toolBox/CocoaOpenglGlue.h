@@ -9,6 +9,5 @@
 * freely
 */
 
-class wxGLContext;
 
-void wglSwapIntervalEXT (wxGLContext* const context);
+void wglSwapIntervalEXT (void* const context);

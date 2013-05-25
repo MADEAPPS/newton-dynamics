@@ -236,6 +236,7 @@
 		FF5067F8173F3EAD00D01FDF /* engine_start.wav in Resources */ = {isa = PBXBuildFile; fileRef = FF50669C173F3D8800D01FDF /* engine_start.wav */; };
 		FF5067F9173F3EAD00D01FDF /* env1.tga in Resources */ = {isa = PBXBuildFile; fileRef = FF50669D173F3D8800D01FDF /* env1.tga */; };
 		FF5067FA173F3EAD00D01FDF /* f1.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF50669E173F3D8800D01FDF /* f1.ngd */; };
+		FF6FCF70175156940088B4D3 /* CocoaOpenglGlue.mm in Sources */ = {isa = PBXBuildFile; fileRef = FF6FCF6F175156940088B4D3 /* CocoaOpenglGlue.mm */; };
 		FF85000C1740605300BEE80B /* libdContainers.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF85FFE317405FDE00BEE80B /* libdContainers.a */; };
 		FF85000D1740605400BEE80B /* libdCustomJoints.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF85FFF217405FDE00BEE80B /* libdCustomJoints.a */; };
 		FF85000E1740605400BEE80B /* libdMath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF85000117405FDE00BEE80B /* libdMath.a */; };
@@ -544,6 +545,7 @@
 		FF50671E173F3D8A00D01FDF /* wood_4.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = wood_4.tga; path = ../../../../media/wood_4.tga; sourceTree = "<group>"; };
 		FF50671F173F3D8A00D01FDF /* x01_st.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = x01_st.tga; path = ../../../../media/x01_st.tga; sourceTree = "<group>"; };
 		FF506720173F3D8A00D01FDF /* yellow_p.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = yellow_p.tga; path = ../../../../media/yellow_p.tga; sourceTree = "<group>"; };
+		FF6FCF6F175156940088B4D3 /* CocoaOpenglGlue.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CocoaOpenglGlue.mm; path = ../../../sdkDemos/toolBox/CocoaOpenglGlue.mm; sourceTree = "<group>"; };
 		FF7F20861730187900AC6E4B /* enet_osx.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = enet_osx.xcodeproj; path = "../../../../../packages/thirdParty/enet-1.2/enet_osx/enet_osx.xcodeproj"; sourceTree = "<group>"; };
 		FF8402EB17353606008E038A /* wxcocoaStatic.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = wxcocoaStatic.xcodeproj; path = "../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/build/osx/wxcocoaStatic.xcodeproj"; sourceTree = "<group>"; };
 		FF850081174525BC00BEE80B /* persianRug.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = persianRug.tga; path = ../../../../media/persianRug.tga; sourceTree = "<group>"; };
@@ -1000,6 +1002,7 @@
 		FF9931B51316828C00D1C65B /* main */ = {
 			isa = PBXGroup;
 			children = (
+				FF6FCF6F175156940088B4D3 /* CocoaOpenglGlue.mm */,
 				FFD27435172DA06D00114513 /* DemoCameraListener.cpp */,
 				FFD2742E172DA02000114513 /* DemoListenerBase.cpp */,
 				FFF60F2D1556D9F100E7B112 /* DemoAIAgent.cpp */,
@@ -1477,6 +1480,7 @@
 				FF084A99173F1AD30059C41D /* DemoVisualDebugerListener.cpp in Sources */,
 				FF084A9B173F1AD30059C41D /* NewtonDemos.cpp in Sources */,
 				FF8B5E1C1750F4670076BE6C /* BasicRagDoll.cpp in Sources */,
+				FF6FCF70175156940088B4D3 /* CocoaOpenglGlue.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

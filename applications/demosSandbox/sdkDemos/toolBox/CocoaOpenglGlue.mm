@@ -9,9 +9,12 @@
 * freely
 */
 
-#include <toolbox_stdafx.h>
 
-void wglSwapIntervalEXT (wxGLContext* const context)
+#import <Foundation/Foundation.h>
+
+void wglSwapIntervalEXT (void* const context)
 {
-
+    // julio added this to unlock opengl vsync.
+    GLint swapInt = 0;
+    [(NSOpenGLContext*) context setValues:&swapInt forParameter:NSOpenGLCPSwapInterval];
 }
