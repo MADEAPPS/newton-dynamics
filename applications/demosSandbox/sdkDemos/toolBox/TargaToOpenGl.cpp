@@ -16,7 +16,7 @@
 
 
 
-struct TextureEntry
+struct TextureEntry: public dRefCounter
 {
 	GLuint m_textureID;
 	dString m_textureName;
@@ -24,7 +24,7 @@ struct TextureEntry
 
 class TextureCache: public dTree<TextureEntry, dCRCTYPE>
 {
-public: 
+	public: 
 	GLuint GetTexture(const char* const texName)
 	{
 		GLuint texID = 0;
@@ -37,6 +37,7 @@ public:
 
 		dTreeNode* node = Find(crc);
 		if (node) {
+			 node->GetInfo().AddRef();
 			texID = node->GetInfo().m_textureID;
 		}
 		return texID;
@@ -65,20 +66,24 @@ public:
 	{
 		Iterator iter (*this);
 		for (iter.Begin(); iter; iter ++) {
-			if (iter.GetNode()->GetInfo().m_textureID == id) {
-				glDeleteTextures(1, &id);
-				Remove (iter.GetNode());
+			TextureEntry& entry = iter.GetNode()->GetInfo();
+			if (entry.m_textureID == id) {
+				if (entry.GetRef() == 1) {
+					glDeleteTextures(1, &id);
+					Remove (iter.GetNode());
+				}
 				break;
 			}
 		}
 	}
 
-	const char* FindById (GLuint id) const
+	dTreeNode* FindById (GLuint id) const
 	{
 		Iterator iter (*this);
 		for (iter.Begin(); iter; iter ++) {
 			if (iter.GetNode()->GetInfo().m_textureID == id) {
-				return iter.GetNode()->GetInfo().m_textureName.GetStr();
+				//return iter.GetNode()->GetInfo().m_textureName.GetStr();
+				return iter.GetNode();
 			}
 		}
 		return NULL;
@@ -266,12 +271,28 @@ GLuint LoadImage(const char* const cacheName, const char* const buffer, int widt
 }
 
 
-void UnloadTexture (GLuint texture)
+void ReleaseTexture (GLuint texture)
 {
 	TextureCache::GetChache().RemoveById (texture);
 }
 
 const char* FindTextureById (GLuint textureID)
 {
-	return TextureCache::GetChache().FindById (textureID);	
+	TextureCache& cache = TextureCache::GetChache();	
+	TextureCache::dTreeNode* const node = cache.FindById (textureID);
+	if (node) {
+		return node->GetInfo().m_textureName.GetStr();
+	}
+	return NULL;
+}
+
+
+GLuint AddTextureRef (GLuint texture)
+{
+	TextureCache& cache = TextureCache::GetChache();	
+	TextureCache::dTreeNode* const node = cache.FindById (texture);
+	if (node) {
+		node->GetInfo().AddRef();
+	}
+	return texture;
 }

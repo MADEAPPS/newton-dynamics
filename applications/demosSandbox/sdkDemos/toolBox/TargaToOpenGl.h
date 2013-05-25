@@ -26,7 +26,9 @@ enum TextureImageFormat
 
 GLuint LoadTexture(const char* const filename);
 GLuint LoadImage(const char* const cacheName, const char* const buffer, int width, int hight, TextureImageFormat format);
-void UnloadTexture (GLuint texture);
+
+GLuint AddTextureRef (GLuint texture);
+void ReleaseTexture (GLuint texture);
 
 const char* FindTextureById (GLuint textureID);
 

@@ -39,7 +39,7 @@ DemoSubMesh::DemoSubMesh ()
 DemoSubMesh::~DemoSubMesh ()
 {
 	if (m_textureHandle) {
-		UnloadTexture (m_textureHandle);
+		ReleaseTexture(m_textureHandle);
 	}
 
 	if (m_indexes) {
@@ -557,10 +557,8 @@ void DemoMesh::SpliteSegment(dListNode* const node, int maxIndexCount)
 		leftSubMesh->AllocIndexData (leftCount);
 		rightSubMesh->AllocIndexData (rightCount);
 
-		leftSubMesh->m_textureHandle = segment.m_textureHandle;
-		rightSubMesh->m_textureHandle = segment.m_textureHandle;
-		//strcpy (leftSubMesh->m_textureName, segment.m_textureName);
-		//strcpy (rightSubMesh->m_textureName, segment.m_textureName);
+		leftSubMesh->m_textureHandle = AddTextureRef (segment.m_textureHandle);
+		rightSubMesh->m_textureHandle = AddTextureRef (segment.m_textureHandle);
 		leftSubMesh->m_textureName = segment.m_textureName;
 		rightSubMesh->m_textureName = segment.m_textureName;
 

@@ -124,7 +124,7 @@ DemoEntityManager::~DemoEntityManager(void)
 	}
 
 	glDeleteLists(m_font, 96);	
-	UnloadTexture (m_fontImage);
+	ReleaseTexture(m_fontImage);
 
 	Cleanup ();
 
