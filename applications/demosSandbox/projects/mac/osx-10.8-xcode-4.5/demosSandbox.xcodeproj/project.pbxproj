@@ -200,7 +200,6 @@
 		FF5067D3173F3EAD00D01FDF /* 01_STUB.tga in Resources */ = {isa = PBXBuildFile; fileRef = FF506677173F3D8700D01FDF /* 01_STUB.tga */; };
 		FF5067D4173F3EAD00D01FDF /* APTRACK2.TGA in Resources */ = {isa = PBXBuildFile; fileRef = FF506678173F3D8700D01FDF /* APTRACK2.TGA */; };
 		FF5067D5173F3EAD00D01FDF /* APTREES2.TGA in Resources */ = {isa = PBXBuildFile; fileRef = FF506679173F3D8700D01FDF /* APTREES2.TGA */; };
-		FF5067D6173F3EAD00D01FDF /* Arial.tga in Resources */ = {isa = PBXBuildFile; fileRef = FF50667A173F3D8700D01FDF /* Arial.tga */; };
 		FF5067D7173F3EAD00D01FDF /* Asphalt1.tga in Resources */ = {isa = PBXBuildFile; fileRef = FF50667B173F3D8700D01FDF /* Asphalt1.tga */; };
 		FF5067D8173F3EAD00D01FDF /* base_road.tga in Resources */ = {isa = PBXBuildFile; fileRef = FF50667C173F3D8700D01FDF /* base_road.tga */; };
 		FF5067D9173F3EAD00D01FDF /* bessel.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF50667D173F3D8800D01FDF /* bessel.ngd */; };
@@ -250,6 +249,10 @@
 		FF87BFAC173F269200472B56 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF87BFAB173F269200472B56 /* CoreFoundation.framework */; };
 		FF87BFAE173F26B900472B56 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF87BFAD173F26B900472B56 /* OpenGL.framework */; };
 		FF87BFB0173F26DF00472B56 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF87BFAF173F26DF00472B56 /* OpenAL.framework */; };
+		FF8B5E181750F1B80076BE6C /* calibri.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FF8B5E161750F1B80076BE6C /* calibri.ttf */; };
+		FF8B5E191750F1B80076BE6C /* courbd.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FF8B5E171750F1B80076BE6C /* courbd.ttf */; };
+		FF8B5E1A1750F3E70076BE6C /* libfreeType.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF8B5E101750EFC00076BE6C /* libfreeType.a */; };
+		FF8B5E1C1750F4670076BE6C /* BasicRagDoll.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8B5E1B1750F4670076BE6C /* BasicRagDoll.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -323,6 +326,13 @@
 			remoteGlobalIDString = 1D025E39C79E3E119D19686C;
 			remoteInfo = wxWidget;
 		};
+		FF8B5E0F1750EFC00076BE6C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FF8B5E081750EFC00076BE6C /* freeType.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = FF8B5D7C175056CD0076BE6C;
+			remoteInfo = freeType;
+		};
 		FF99361B1735F69E000533B7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = FF9936141735F69D000533B7 /* newton.xcodeproj */;
@@ -331,6 +341,18 @@
 			remoteInfo = newton;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		FF8B5E141750F1540076BE6C /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 7;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		FF084A25173F188A0059C41D /* demosSandbox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = demosSandbox.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -528,6 +550,10 @@
 		FF87BFAB173F269200472B56 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
 		FF87BFAD173F26B900472B56 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		FF87BFAF173F26DF00472B56 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = /System/Library/Frameworks/OpenAL.framework; sourceTree = "<absolute>"; };
+		FF8B5E081750EFC00076BE6C /* freeType.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = freeType.xcodeproj; path = "../../../../../packages/thirdParty/freetype-2.4.0/builds/osx/freeType.xcodeproj"; sourceTree = "<group>"; };
+		FF8B5E161750F1B80076BE6C /* calibri.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = calibri.ttf; path = ../../../../media/calibri.ttf; sourceTree = "<group>"; };
+		FF8B5E171750F1B80076BE6C /* courbd.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = courbd.ttf; path = ../../../../media/courbd.ttf; sourceTree = "<group>"; };
+		FF8B5E1B1750F4670076BE6C /* BasicRagDoll.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BasicRagDoll.cpp; path = ../../../sdkDemos/demos/BasicRagDoll.cpp; sourceTree = "<group>"; };
 		FF8C2CE91313DC3700646B90 /* dMath.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = dMath.xcodeproj; path = ../../../../../packages/projects/mac/dMath/dMath.xcodeproj; sourceTree = "<group>"; };
 		FF8C2CF41313DC6A00646B90 /* dContainers.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = dContainers.xcodeproj; path = ../../../../../packages/projects/mac/dContainers/dContainers.xcodeproj; sourceTree = "<group>"; };
 		FF8C2CFF1313DC7F00646B90 /* dScene.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = dScene.xcodeproj; path = ../../../../../packages/projects/mac/dScene/dScene.xcodeproj; sourceTree = "<group>"; };
@@ -588,6 +614,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FF8B5E1A1750F3E70076BE6C /* libfreeType.a in Frameworks */,
 				FF85000C1740605300BEE80B /* libdContainers.a in Frameworks */,
 				FF85000D1740605400BEE80B /* libdCustomJoints.a in Frameworks */,
 				FF85000E1740605400BEE80B /* libdMath.a in Frameworks */,
@@ -649,6 +676,8 @@
 		FF506721173F3DDC00D01FDF /* assets */ = {
 			isa = PBXGroup;
 			children = (
+				FF8B5E161750F1B80076BE6C /* calibri.ttf */,
+				FF8B5E171750F1B80076BE6C /* courbd.ttf */,
 				FF850081174525BC00BEE80B /* persianRug.tga */,
 				FF5066FF173F3D8900D01FDF /* sponza.ngd */,
 				FF506700173F3D8900D01FDF /* stackPerformance20x20.ngd */,
@@ -892,19 +921,28 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		FF8B5E091750EFC00076BE6C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FF8B5E101750EFC00076BE6C /* libfreeType.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		FF8C27F31313DB2700646B90 /* dependencies */ = {
 			isa = PBXGroup;
 			children = (
 				FF9936141735F69D000533B7 /* newton.xcodeproj */,
+				FF8C2CE91313DC3700646B90 /* dMath.xcodeproj */,
 				FF8C2CFF1313DC7F00646B90 /* dScene.xcodeproj */,
 				FFD2A799172E126900114513 /* dCustomJoints.xcodeproj */,
 				FF8C2CF41313DC6A00646B90 /* dContainers.xcodeproj */,
-				FF8C2CE91313DC3700646B90 /* dMath.xcodeproj */,
-				FFD2A77A172E0A1200114513 /* dVisualDebuggerServer.xcodeproj */,
 				FF8402EB17353606008E038A /* wxcocoaStatic.xcodeproj */,
 				FF0A5030173163D5005D6C12 /* glew-osx.xcodeproj */,
 				FF7F20861730187900AC6E4B /* enet_osx.xcodeproj */,
 				FF8C2D0A1313DC9500646B90 /* tinyxml.xcodeproj */,
+				FF8B5E081750EFC00076BE6C /* freeType.xcodeproj */,
+				FFD2A77A172E0A1200114513 /* dVisualDebuggerServer.xcodeproj */,
 			);
 			name = dependencies;
 			sourceTree = "<group>";
@@ -926,6 +964,7 @@
 		FF8F28D4131368B90019E923 /* demos */ = {
 			isa = PBXGroup;
 			children = (
+				FF8B5E1B1750F4670076BE6C /* BasicRagDoll.cpp */,
 				FF3B297817300D39007E6FEC /* PostCompoundCreateBuildTest.cpp */,
 				FF3B297917300D39007E6FEC /* PuckSlide.cpp */,
 				FF3B297A17300D39007E6FEC /* SimpleBooleans.cpp */,
@@ -1028,6 +1067,7 @@
 				FF084A21173F188A0059C41D /* Sources */,
 				FF084A22173F188A0059C41D /* Frameworks */,
 				FF084A23173F188A0059C41D /* Resources */,
+				FF8B5E141750F1540076BE6C /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -1084,6 +1124,10 @@
 				{
 					ProductGroup = FF85FFE417405FDE00BEE80B /* Products */;
 					ProjectRef = FF7F20861730187900AC6E4B /* enet_osx.xcodeproj */;
+				},
+				{
+					ProductGroup = FF8B5E091750EFC00076BE6C /* Products */;
+					ProjectRef = FF8B5E081750EFC00076BE6C /* freeType.xcodeproj */;
 				},
 				{
 					ProductGroup = FF85000217405FDE00BEE80B /* Products */;
@@ -1173,6 +1217,13 @@
 			remoteRef = FF85FFFB17405FDE00BEE80B /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		FF8B5E101750EFC00076BE6C /* libfreeType.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libfreeType.a;
+			remoteRef = FF8B5E0F1750EFC00076BE6C /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		FF99361C1735F69E000533B7 /* libnewton.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -1187,6 +1238,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FF8B5E181750F1B80076BE6C /* calibri.ttf in Resources */,
+				FF8B5E191750F1B80076BE6C /* courbd.ttf in Resources */,
 				FF850082174525BC00BEE80B /* persianRug.tga in Resources */,
 				FF506750173F3EAC00D01FDF /* streaked.tga in Resources */,
 				FF506751173F3EAC00D01FDF /* teapot.ngd in Resources */,
@@ -1322,7 +1375,6 @@
 				FF5067D3173F3EAD00D01FDF /* 01_STUB.tga in Resources */,
 				FF5067D4173F3EAD00D01FDF /* APTRACK2.TGA in Resources */,
 				FF5067D5173F3EAD00D01FDF /* APTREES2.TGA in Resources */,
-				FF5067D6173F3EAD00D01FDF /* Arial.tga in Resources */,
 				FF5067D7173F3EAD00D01FDF /* Asphalt1.tga in Resources */,
 				FF5067D8173F3EAD00D01FDF /* base_road.tga in Resources */,
 				FF5067D9173F3EAD00D01FDF /* bessel.ngd in Resources */,
@@ -1424,6 +1476,7 @@
 				FF084A97173F1AD30059C41D /* DemoSoundListener.cpp in Sources */,
 				FF084A99173F1AD30059C41D /* DemoVisualDebugerListener.cpp in Sources */,
 				FF084A9B173F1AD30059C41D /* NewtonDemos.cpp in Sources */,
+				FF8B5E1C1750F4670076BE6C /* BasicRagDoll.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1520,6 +1573,8 @@
 					../../../sdkDemos,
 					../../../sdkDemos/demos,
 					../../../sdkDemos/toolBox,
+					../../../../../coreLibrary_300/source/ai,
+					../../../../../coreLibrary_300/source/newton,
 					../../../../../packages/dMath,
 					../../../../../packages/dScene,
 					../../../../../packages/dContainers,
@@ -1528,8 +1583,7 @@
 					../../../../../packages/dVisualDebuggerServer,
 					../../../../../packages/thirdParty/tinyxml,
 					../../../../../packages/thirdParty/glew/include,
-					../../../../../coreLibrary_300/source/ai,
-					../../../../../coreLibrary_300/source/newton,
+					"../../../../../packages/thirdParty/freetype-2.4.0/include",
 					"../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include",
 					"../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/build/osx/setup/cocoa/include",
 				);
@@ -1595,6 +1649,8 @@
 					../../../sdkDemos,
 					../../../sdkDemos/demos,
 					../../../sdkDemos/toolBox,
+					../../../../../coreLibrary_300/source/ai,
+					../../../../../coreLibrary_300/source/newton,
 					../../../../../packages/dMath,
 					../../../../../packages/dScene,
 					../../../../../packages/dContainers,
@@ -1603,8 +1659,7 @@
 					../../../../../packages/dVisualDebuggerServer,
 					../../../../../packages/thirdParty/tinyxml,
 					../../../../../packages/thirdParty/glew/include,
-					../../../../../coreLibrary_300/source/ai,
-					../../../../../coreLibrary_300/source/newton,
+					"../../../../../packages/thirdParty/freetype-2.4.0/include",
 					"../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include",
 					"../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/build/osx/setup/cocoa/include",
 				);

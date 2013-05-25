@@ -440,7 +440,7 @@ static void BuildFloorAndSceneRoot (SceneManager& system)
 
 void SkinRagDoll (DemoEntityManager* const scene)
 {
-_ASSERTE (0);
+//_ASSERTE (0);
 /*
 
 	NewtonWorld* world;

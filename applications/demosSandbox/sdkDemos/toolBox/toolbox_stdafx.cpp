@@ -35,6 +35,18 @@ void operator delete (void *ptr)
 	::free (ptr); 
 }
 
+
+// for freeType library on OSX
+FT_BEGIN_HEADER
+    int z_verbose = 0;
+    void z_error (char* message)
+    {
+        //    (message);
+    }
+FT_END_HEADER
+
+
+
 unsigned dRand ()
 {
 	#define RAND_MUL 31415821u
