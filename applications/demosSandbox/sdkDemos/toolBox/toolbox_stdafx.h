@@ -114,6 +114,9 @@ typedef long long unsigned64;
 	#include <OpenAl/al.h>
 	#include <OpenAl/alc.h>
 
+	#include <ft2build.h>
+	#include FT_FREETYPE_H
+
 	// gui library includes
 	#include <wx/wx.h>
 	#include <wx/event.h>
