@@ -31,6 +31,10 @@
 #include "CustomPlayerControllerManager.h"
 #include "CustomVehicleControllerManager.h"
 
+#ifdef _MACOSX_VER
+	#include "CocoaOpenglGlue.h"
+#endif
+
 #define MAX_PHYSICS_LOOPS			1
 #define MAX_PHYSICS_FPS				120.0f
 #define PROJECTILE_INITIAL_SPEED	20.0f
@@ -370,6 +374,7 @@ void DemoEntityManager::InitGraphicsSystem()
 
 #elif defined(_MACOSX_VER)
 	// aglSetInteger (AGL_SWAP_INTERVAL, 0);
+	wglSwapIntervalEXT (GetContext());
 #else
 	#error  "error: neet to implement \"GetWorkingFileName\" here for thsi platform"
 #endif
