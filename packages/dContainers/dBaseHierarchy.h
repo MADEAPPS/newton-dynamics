@@ -50,6 +50,8 @@ class dBaseHierarchy
 	dBaseHierarchy (const dBaseHierarchy &clone);
 	virtual ~dBaseHierarchy ();
 
+	virtual dBaseHierarchy* CreateClone () const = 0;
+
 	private:
 	inline void Clear();
 
@@ -82,7 +84,6 @@ class dHierarchy: public dBaseHierarchy
 	protected:
 	dHierarchy (const T &clone);
 	virtual ~dHierarchy ();
-	dBaseHierarchy* CreateClone () const;
 };
 
 
@@ -170,11 +171,11 @@ dHierarchy<T>::~dHierarchy ()
 }
 
 
-template<class T>
-dBaseHierarchy* dHierarchy<T>::CreateClone () const
-{
-	return new T (*(T*)this);
-}
+//template<class T>
+//dBaseHierarchy* dHierarchy<T>::CreateClone () const
+//{
+//	return new T (*(T*)this);
+//}
 
 template<class T>
 void dHierarchy<T>::Attach (T* const parent, bool addFirst)

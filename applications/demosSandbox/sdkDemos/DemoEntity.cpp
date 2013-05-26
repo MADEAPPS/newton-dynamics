@@ -92,6 +92,23 @@ DemoEntity::DemoEntity(
 	}
 }
 
+DemoEntity::DemoEntity(const DemoEntity& copyFrom)
+	:dClassInfo()
+	,dHierarchy<DemoEntity>(copyFrom)
+	,m_matrix(copyFrom.m_matrix)
+	,m_curPosition(copyFrom.m_curPosition)
+	,m_nextPosition(copyFrom.m_nextPosition)
+	,m_curRotation(copyFrom.m_curRotation)
+	,m_nextRotation(copyFrom.m_nextRotation)
+	,m_lock(0)
+	,m_mesh(copyFrom.m_mesh)
+	,m_userData(NULL)
+{
+	if (m_mesh) {
+		m_mesh->AddRef();
+	}
+}
+
 DemoEntity::~DemoEntity(void)
 {
 	if (m_userData) {
@@ -99,6 +116,12 @@ DemoEntity::~DemoEntity(void)
 	}
 
 	SetMesh(NULL);
+}
+
+
+dBaseHierarchy* DemoEntity::CreateClone () const
+{
+	return new DemoEntity(*this);
 }
 
 void DemoEntity::LoadNGD_mesh (const char* const fileName, NewtonWorld* const world)

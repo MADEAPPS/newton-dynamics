@@ -11,19 +11,20 @@
 
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
+#include "DemoMesh.h"
+#include "DemoCamera.h"
 #include "NewtonDemos.h"
 #include "PhysicsUtils.h"
 #include "TargaToOpenGl.h"
-#include "DemoMesh.h"
+#include "CustomRagDoll.h"
 #include "DemoEntityManager.h"
-#include "DemoCamera.h"
 #include "toolBox/DebugDisplay.h"
 #include "CustomPlayerControllerManager.h"
 
 
-#if 0
 
-struct RAGGOLL_BONE_DEFINTION
+
+struct RAGDOLL_BONE_DEFINITION
 {
 	char m_boneName[32];
 	char m_shapeType[32];
@@ -39,8 +40,8 @@ struct RAGGOLL_BONE_DEFINTION
 	int m_collideWithNonImmidiateBodies;
 };
 
-
-static RAGGOLL_BONE_DEFINTION snowManDefinition[] =
+/*
+static RAGDOLL_BONE_DEFINITION snowManDefinition[] =
 {
 	{"pelvis",		"sphere", 20.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
 	{"torso",		"sphere",  8.0f, 30.0f,  -30.0f,  30.0f, 0.0f,  0.0f,  0.0f, 1}, 
@@ -61,9 +62,15 @@ static RAGGOLL_BONE_DEFINTION snowManDefinition[] =
 	{"leftCalf",	"capsule",  5.0f,  0.0f, -150.0f,  0.0f, 0.0f, 90.0f,  0.0f, 1}, 
 	{"leftFoot",	"box",	    2.0f,  0.0f,  -30.0f, 30.0f, 0.0f, 90.0f,  0.0f, 1}, 
 };
+*/
 
+static RAGDOLL_BONE_DEFINITION skeletonRagDoll[] =
+{
+	{"Bip01_Pelvis",		"capsule", 20.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
+};
 
-static RAGGOLL_BONE_DEFINTION gymnastDefinition[] =
+/*
+static RAGDOLL_BONE_DEFINITION gymnastDefinition[] =
 {
 	{"PELVIS",	    "convex", 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
 
@@ -90,24 +97,31 @@ static RAGGOLL_BONE_DEFINTION gymnastDefinition[] =
 	{"ANKLE_L",	    "convex",	2.0f,  0.0f,  -30.0f,	30.0f, 0.0f,   0.0f,  0.0f, 1}, 
 };
 
-
+*/
 
 class RagDoll: public CustomRagDoll
 {
 	public:
-
-	static RagDoll* Create (const dModel& ragDollMesh, int bonesCount, const RAGGOLL_BONE_DEFINTION* definition, SceneManager* system, NewtonWorld* nWorld, const dMatrix& matrix) 
+	//static RagDoll* Create (const dModel& ragDollMesh, int bonesCount, const RAGDOLL_BONE_DEFINITION* definition, SceneManager* system, NewtonWorld* nWorld, const dMatrix& matrix) 
+	static RagDoll* Create (DemoEntityManager* const scene, DemoEntity* const ragDollModel, int bonesCount, const RAGDOLL_BONE_DEFINITION* const definition, const dMatrix& matrix) 
 	{
-		OGLModel* model = new OGLModel;
-		model->InitFromModel (ragDollMesh);
+//		OGLModel* model = new OGLModel;
+//		model->InitFromModel (ragDollMesh);
+//		model->SetMatrix(matrix);
+//		DemoEntity* const model = new DemoEntity(*ragDollMesh);
+//		model->SetMatrix (matrix);
+//		scene->Append(model);
+//		model->Release;
 
-		model->SetMatrix(matrix);
+		DemoEntity* const model = (DemoEntity*) ragDollModel->CreateClone();
+		scene->Append(model);
 
-		system->AddModel___ (model);
-		model->Release();
+//		model->SetMatrix (matrix);
+		
 
 		// set all matrices from root bone to mesh root to identity
-//		dBone* rootBone = model->FindBone (definition[0].m_boneName);
+		DemoEntity* const rootBone = (DemoEntity*) model->Find (definition[0].m_boneName);
+/*
 //		model->SetMatrix (rootBone->CalcGlobalMatrix() * matrix);
 //		for (dBone* node = rootBone; node; node = node->GetParent()) {
 //			node->SetMatrix(GetIdentityMatrix());
@@ -158,9 +172,11 @@ class RagDoll: public CustomRagDoll
 		}
 
 		return ragDoll;
+*/
+		return NULL;
 	}
-
-protected:
+/*
+	protected:
 	RagDoll(OGLModel* model)
 		:CustomRagDoll ()
 	{
@@ -267,7 +283,7 @@ protected:
 		return NewtonCreateConvexHull (nWorld, vertexCount, &points[0].m_x, sizeof (dVector), 1.0e-3f, 0, NULL);
 	}
 
-	void AddBody (NewtonWorld* nWorld, const dBone* bone, const RAGGOLL_BONE_DEFINTION& definition, const dMeshInstance* skinMesh) 
+	void AddBody (NewtonWorld* nWorld, const dBone* bone, const RAGDOLL_BONE_DEFINITION& definition, const dMeshInstance* skinMesh) 
 	{
 		NewtonCollision* shape = NULL;
 		if (!strcmp (definition.m_shapeType, "sphere")) {
@@ -353,95 +369,14 @@ protected:
 	}
 
 	OGLModel* m_model;
+*/
 };
 
 
-static void SetDemoCallbacks (SceneManager& system)
-{
-	system.m_control = Keyboard;
-	system.m_autoSleep = AutoSleep;
-	system.m_showIslands = SetShowIslands;
-	system.m_showContacts = SetShowContacts; 
-	system.m_setMeshCollision = SetShowMeshCollision;
-}
-
-
-static void BuildFloorAndSceneRoot (SceneManager& system)
-{
-	NewtonWorld* world;
-	RenderPrimitive* floor;
-	NewtonBody* floorBody;
-	NewtonCollision* floorCollision;
-	OGLMesh* meshInstance;
-
-	world = system.m_world;
-	// /////////////////////////////////////////////////////////////////////
-	//
-	// create the sky box,
-	OGLModel* sky = new SkyBox ();
-	system.AddModel___ (sky);
-	sky->Release();
-
-
-	// create the the floor graphic objects
-	dVector floorSize (100.0f, 2.0f, 100.0f);
-	dMatrix location (GetIdentityMatrix());
-	location.m_posit.m_y = -5.0f; 
-
-	// create a box for floor 
-	floorCollision = NewtonCreateBox (world, floorSize.m_x, floorSize.m_y, floorSize.m_z, 0, NULL); 
-
-//	meshInstance = OGLMesh::MakeBox (world, size.m_x, size.m_y, size.m_z, "GrassAndDirt.tga");
-	meshInstance = new OGLMesh ("Floor", floorCollision, "GrassAndDirt.tga", "metal_30.tga", "metal_30.tga");
-	floor = new RenderPrimitive (location, meshInstance);
-	system.AddModel___ (floor);
-	floor->Release();
-	meshInstance->Release();
-
-	// create the the floor collision, and body with default values
-	floorBody = NewtonCreateBody (world, floorCollision);
-	NewtonReleaseCollision (world, floorCollision);
-
-
-	// set the transformation for this rigid body
-	NewtonBodySetMatrix (floorBody, &location[0][0]);
-
-	// save the pointer to the graphic object with the body.
-	NewtonBodySetUserData (floorBody, floor);
-
-	// set a destructor for this rigid body
-	NewtonBodySetDestructorCallback (floorBody, PhysicsBodyDestructor);
-
-
-	// get the default material ID
-	int defaultID;
-	defaultID = NewtonMaterialGetDefaultGroupID (world);
-
-	// set default material properties
-	NewtonMaterialSetDefaultSoftness (world, defaultID, defaultID, 0.05f);
-	NewtonMaterialSetDefaultElasticity (world, defaultID, defaultID, 0.4f);
-	NewtonMaterialSetDefaultCollidable (world, defaultID, defaultID, 1);
-	NewtonMaterialSetDefaultFriction (world, defaultID, defaultID, 1.0f, 0.5f);
-	NewtonMaterialSetCollisionCallback (world, defaultID, defaultID, NULL, NULL, GenericContactProcess); 
-
-//	NewtonMaterialSetSurfaceThickness(world, materialID, materialID, 0.1f);
-	NewtonMaterialSetSurfaceThickness(world, defaultID, defaultID, 0.0f);
-
-	// set the island update callback
-	NewtonSetIslandUpdateEvent (world, PhysicsIslandUpdate);
-
-	// save the callback
-	SetDemoCallbacks (system);
-
-	InitEyePoint (dVector (1.0f, 0.0f, 0.0f), dVector (-40.0f, 10.0f, 0.0f));
-}
-#endif
-
-
+/*
 void SkinRagDoll (DemoEntityManager* const scene)
 {
 //_ASSERTE (0);
-/*
 
 	NewtonWorld* world;
 
@@ -476,9 +411,8 @@ _ASSERTE (0);
 			ragdoll = RagDoll::Create (ragDoll, bonesCount, gymnastDefinition, &system, system.m_world, matrix);
 		}
 	}
-*/
 }
-
+*/
 
 
 void DescreteRagDoll (DemoEntityManager* const scene)
@@ -487,37 +421,26 @@ void DescreteRagDoll (DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
 
-	char fileName[2048];
-	GetWorkingFileName ("skeleton.ngd", fileName);
+//CreateLevelMesh (scene, "skeleton.ngd", true);
+	DemoEntity ragDollModel(GetIdentityMatrix(), NULL);
+	ragDollModel.LoadNGD_mesh ("skeleton.ngd", scene->GetNewton());
 
-	NewtonWorld* const world = scene->GetNewton();
-	dScene ragdollMesh (world);
-	ragdollMesh.Deserialize(fileName);
-CreateLevelMesh (scene, "skeleton.ngd", false);
-/*
+	dVector origin (-10.0f, 2.0f, 0.0f, 0.0f);
 
-	OGLModel ragDoll;
-	char fullPathName[2048];
-	GetWorkingFileName ("snowman.dae", fullPathName);
-	OGLLoaderContext context;
-	dMatrix rotMatrix (dYawMatrix (-3.14159265f * 0.5f));
-
-`	int bonesCount = sizeof (snowManDefinition) / sizeof (snowManDefinition[0]);
+	int bonesCount = sizeof (skeletonRagDoll) / sizeof (skeletonRagDoll[0]);
 	for (int x = 0; x < 3; x ++) {
 		for (int z = 0; z < 3; z ++) {
-			dVector point (cameraEyepoint + dVector (x * 3.0f + 5.0f, 0.0f, z * 3.0f, 1.0f));
+			dVector point (origin + dVector (x * 3.0f + 5.0f, 0.0f, z * 3.0f, 1.0f));
 			point.m_w = 1.0f;
 			dMatrix matrix (GetIdentityMatrix());
 			matrix.m_posit = point;
-			matrix.m_posit.m_y = FindFloor (system.m_world, point.m_x, point.m_z) + 1.2f;
+			//matrix.m_posit.m_y = FindFloor (system.m_world, point.m_x, point.m_z) + 1.2f;
+			matrix.m_posit = FindFloor (scene->GetNewton(), point, 10.0f);
 
-			RagDoll* ragdoll;
-			ragdoll = RagDoll::Create (ragDoll, bonesCount, snowManDefinition, &system, system.m_world, matrix);
+			RagDoll::Create (scene, &ragDollModel, bonesCount, skeletonRagDoll, matrix);
 		}
 	}
-*/
-
-	dVector origin (-10.0f, 2.0f, 0.0f, 0.0f);
+	
 	dQuaternion rot;
 	scene->SetCameraMatrix(rot, origin);
 }

@@ -12,37 +12,20 @@
 #include "dContainersStdAfx.h"
 #include "dBaseHierarchy.h"
 
-/*
+
 dBaseHierarchy::dBaseHierarchy (const dBaseHierarchy &clone)
 {
-//	dAssert (0);
-
-	dBaseHierarchy *obj;
-	dBaseHierarchy *newObj;
-
 	Clear ();
-
-	for (obj = clone.m_child; obj; obj = obj->m_sibling) {
-		newObj = obj->CreateClone ();
+	SetNameID (clone.m_name.GetStr());
+	for (dBaseHierarchy* obj = clone.m_child; obj; obj = obj->m_sibling) {
+		dBaseHierarchy* const newObj = obj->CreateClone ();
 		newObj->Attach (this);
-		newObj->Release();
 	}
-
 }
-*/
+
 
 dBaseHierarchy::~dBaseHierarchy () 
 {
-/*
-	if (m_child) {
-		delete m_child;
-	}
-
-	if (m_sibling) {
-		delete m_sibling;
-	}
-*/
-
 	Detach();
 	while (m_child) {
 		delete m_child;
@@ -50,12 +33,9 @@ dBaseHierarchy::~dBaseHierarchy ()
 }
 
 
+
 void dBaseHierarchy::Attach (dBaseHierarchy* const parentArg, bool addFirst)
 {
-//	dAssert (!m_parent);
-//	dAssert (!m_sibling);
-//	dAssert (parentArg);
-	
 	m_parent = parentArg;
 	if (m_parent->m_child) {
 		if (addFirst) {

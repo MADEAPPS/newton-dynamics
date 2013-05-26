@@ -35,7 +35,7 @@ class DemoEntity: public dHierarchy<DemoEntity>, virtual public dClassInfo
 		virtual void OnInterpolateMatrix (DemoEntityManager& world, dFloat param) const = 0;
 	};
 
-
+	DemoEntity(const DemoEntity& copyFrom);
 	DemoEntity(const dMatrix& matrix, DemoEntity* parent);
 	DemoEntity(DemoEntityManager& world, const dScene* scene, dScene::dTreeNode* rootSceneNode, dTree<DemoMesh*, dScene::dTreeNode*>& meshCache, 
 			   DemoEntityManager::EntityDictionary& entityDictionary, DemoEntity* parent = NULL);
@@ -47,7 +47,7 @@ class DemoEntity: public dHierarchy<DemoEntity>, virtual public dClassInfo
 	UserData* GetUserData ();
 	void SetUserData (UserData* const data);
 
-
+	dBaseHierarchy* CreateClone () const;
 	void LoadNGD_mesh (const char* const fileName, NewtonWorld* const world);
 
 
