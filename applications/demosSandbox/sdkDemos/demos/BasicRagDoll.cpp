@@ -485,14 +485,16 @@ void DescreteRagDoll (DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
-
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
 
-/*
-	dVector posit (0.0f, 0.0f, 0.0f, 0.0f);
-	posit.m_y = FindFloor (system.m_world, 0.0f, 0.0f) + 2.0f;
-	InitEyePoint (dVector (1.0f, 0.0f, 0.0f), posit);
+	char fileName[2048];
+	GetWorkingFileName ("skeleton.ngd", fileName);
 
+	NewtonWorld* const world = scene->GetNewton();
+	dScene ragdollMesh (world);
+	ragdollMesh.Deserialize(fileName);
+CreateLevelMesh (scene, "skeleton.ngd", false);
+/*
 
 	OGLModel ragDoll;
 	char fullPathName[2048];
@@ -500,10 +502,7 @@ void DescreteRagDoll (DemoEntityManager* const scene)
 	OGLLoaderContext context;
 	dMatrix rotMatrix (dYawMatrix (-3.14159265f * 0.5f));
 
-_ASSERTE (0);
-//	ragDoll.LoadCollada(fullPathName, context, rotMatrix, 1.0f);
-
-	int bonesCount = sizeof (snowManDefinition) / sizeof (snowManDefinition[0]);
+`	int bonesCount = sizeof (snowManDefinition) / sizeof (snowManDefinition[0]);
 	for (int x = 0; x < 3; x ++) {
 		for (int z = 0; z < 3; z ++) {
 			dVector point (cameraEyepoint + dVector (x * 3.0f + 5.0f, 0.0f, z * 3.0f, 1.0f));
