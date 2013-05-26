@@ -326,19 +326,27 @@ void DemoEntityManager::CreateOpenGlFont()
 
 			dFloat w = dFloat (metrics.width / 64);
 			dFloat h = dFloat (metrics.height / 64);
+
 			if (w) {
+				dFloat u0 = dFloat (imageBase) / imageWidth;
+				dFloat u1 = dFloat (imageBase + w - 1.0f) / imageWidth;
+
+				dFloat v0 = 0.0f;
+				dFloat v1 = (h - 1.0f) / imageHeight;
+
 				glBegin(GL_QUADS);
-				glTexCoord2d (dFloat (imageBase) / imageWidth, 0); 
+
+				glTexCoord2d (u0, v0); 
 				glVertex2i(0, 0);
 
-				glTexCoord2d (dFloat (imageBase) / imageWidth, (h - 1.0f) / imageHeight); 
+				glTexCoord2d (u0, v1); 
 				glVertex2i(0, h - 1);
 
-				glTexCoord2d (dFloat (imageBase + w - 1.0f) / imageWidth, (h - 1.0f) / imageHeight); 
-				glVertex2i (w - 1.0f, h - 1.0f);
+				glTexCoord2d (u1, v1); 
+				glVertex2i (w - 1, h - 1);
 
-				glTexCoord2d (dFloat (imageBase + w - 1.0f) / imageWidth, 0); 
-				glVertex2i (w - 1.0f, 0);
+				glTexCoord2d (u1, v0); 
+				glVertex2i (w - 1, 0);
 				glEnd();
 
 				imageBase += w;
@@ -368,17 +376,12 @@ void DemoEntityManager::InitGraphicsSystem()
 	
 #if defined (_MSC_VER)
 	wglSwapIntervalEXT(0);
-
 #elif defined(_POSIX_VER)
 	glXSwapIntervalSGI(0);  //NOTE check for GLX_SGI_swap_control extension : http://www.opengl.org/wiki/Swap_Interval#In_Linux_.2F_GLXw
-
 #elif defined(_MACOSX_VER)
 	// aglSetInteger (AGL_SWAP_INTERVAL, 0);
     wglSwapIntervalEXT (GetContext()->GetWXGLContext());
-#else
-	#error  "error: neet to implement \"GetWorkingFileName\" here for thsi platform"
 #endif
-	
 
 	// initialize free type library
 	CreateOpenGlFont();
