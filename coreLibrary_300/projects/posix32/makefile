@@ -61,6 +61,9 @@ DG_SRCS = \
 DG_INCLUDED_PHYSICS_PATH = ../../source/physics
 DG_PHYSICS_PATH = $(DG_INCLUDED_PHYSICS_PATH)/
 DG_PHYSICS_SRCS = \
+	$(DG_PHYSICS_PATH)dgBody.cpp \
+	$(DG_PHYSICS_PATH)dgDynamicBody.cpp \
+	$(DG_PHYSICS_PATH)dgKinematicBody.cpp \
 	$(DG_PHYSICS_PATH)dgBallConstraint.cpp \
 	$(DG_PHYSICS_PATH)dgBilateralConstraint.cpp \
 	$(DG_PHYSICS_PATH)dgBody.cpp \
@@ -80,6 +83,8 @@ DG_PHYSICS_SRCS = \
 	$(DG_PHYSICS_PATH)dgCollisionConvexPolygon.cpp \
 	$(DG_PHYSICS_PATH)dgCollision.cpp \
 	$(DG_PHYSICS_PATH)dgCollisionCylinder.cpp \
+	$(DG_PHYSICS_PATH)dgCollisionDeformableClothPatch.cpp \
+	$(DG_PHYSICS_PATH)dgCollisionDeformableSolidMesh.cpp \
 	$(DG_PHYSICS_PATH)dgCollisionDeformableMesh.cpp \
 	$(DG_PHYSICS_PATH)dgCollisionHeightField.cpp \
 	$(DG_PHYSICS_PATH)dgCollisionInstance.cpp \
@@ -96,8 +101,6 @@ DG_PHYSICS_SRCS = \
 	$(DG_PHYSICS_PATH)dgDeformableBody.cpp \
 	$(DG_PHYSICS_PATH)dgDeformableContact.cpp \
 	$(DG_PHYSICS_PATH)dgHingeConstraint.cpp \
-	$(DG_PHYSICS_PATH)dgMinkowskiConv.cpp \
-	$(DG_PHYSICS_PATH)dgMinkowskiConvSimd.cpp \
 	$(DG_PHYSICS_PATH)dgNarrowPhaseCollision.cpp \
 	$(DG_PHYSICS_PATH)dgSlidingConstraint.cpp \
 	$(DG_PHYSICS_PATH)dgUniversalConstraint.cpp \
@@ -105,9 +108,7 @@ DG_PHYSICS_SRCS = \
 	$(DG_PHYSICS_PATH)dgUserConstraint.cpp \
 	$(DG_PHYSICS_PATH)dgWorld.cpp \
 	$(DG_PHYSICS_PATH)dgWorldDynamicsParallelSolver.cpp \
-	$(DG_PHYSICS_PATH)dgWorldDynamicsParallelSolverSimd.cpp \
 	$(DG_PHYSICS_PATH)dgWorldDynamicsSimpleSolver.cpp \
-	$(DG_PHYSICS_PATH)dgWorldDynamicsSimpleSolverSimd.cpp \
 	$(DG_PHYSICS_PATH)dgWorldDynamicUpdate.cpp
 
 	
@@ -182,7 +183,7 @@ COMPILER = gcc
 #CPU_FLAGS = -m32 -O2 -fpic -g -msse -msse4.1 -mfpmath=sse -ffloat-store -ffast-math -freciprocal-math -funsafe-math-optimizations -fsingle-precision-constant
 CPU_FLAGS = -m32 -O2 -fpic -g -msse -msse2 -mfpmath=sse -ffloat-store -ffast-math -freciprocal-math -funsafe-math-optimizations -fsingle-precision-constant
 
-FLAGS = -c -Wall -Wno-strict-aliasing -D_POSIX_VER $(CPU_FLAGS) -I$(DG_INCLUDED_PATH) -I$(DG_INCLUDED_PHYSICS_PATH) -I$(DG_INCLUDED_MESH_PATH) -I$(DG_INCLUDED_OPENCL_PATH) -I$(DG_AI_PATH) 
+FLAGS = -c -Wall -Wno-strict-aliasing -DDG_SCALAR_VECTOR_CLASS -D_POSIX_VER $(CPU_FLAGS) -I$(DG_INCLUDED_PATH) -I$(DG_INCLUDED_PHYSICS_PATH) -I$(DG_INCLUDED_MESH_PATH) -I$(DG_INCLUDED_OPENCL_PATH) -I$(DG_AI_PATH) 
 
 
 .SUFFIXES : .o .cpp

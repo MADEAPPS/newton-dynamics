@@ -123,8 +123,8 @@ class dgCollisionParamProxy
 
 	dgCollisionParamProxy(dgContact* const contact, dgContactPoint* const contactBuffer, bool ccdMode, dgInt32 threadIndex)
 		:m_contactJoint(contact)
-		,m_polyMeshData(NULL)
 		,m_contacts(contactBuffer)
+		,m_polyMeshData(NULL)		
 		,m_threadIndex(threadIndex)
 		,m_continueCollision(ccdMode)
 	{
