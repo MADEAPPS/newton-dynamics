@@ -270,7 +270,7 @@ class dgBigVector: public dgTemplateVector<dgFloat64>
 // 128 bit single precision vector class declaration
 //
 // *****************************************************************************************
-#ifndef DG_SIMD_VECTOR_CLASS
+#ifdef DG_SCALAR_VECTOR_CLASS
 
 DG_MSC_VECTOR_ALIGMENT
 class dgVector: public dgTemplateVector<dgFloat32>
@@ -582,7 +582,7 @@ class dgVector
 	// return dot product
 	DG_INLINE dgFloat32 operator% (const dgVector& A) const
 	{
-		#ifdef DG_SIMD_VECTOR_CLASS_4 
+		#ifdef DG_SIMD4_VECTOR_CLASS 
 			return dgVector (_mm_dp_ps (m_type, A.m_type, 0x77)).m_x; 
 		#else
 			dgVector tmp (A & m_triplexMask);
@@ -593,7 +593,7 @@ class dgVector
 
 	DG_INLINE dgVector DotProduct4 (const dgVector& A) const
 	{
-		#ifdef DG_SIMD_VECTOR_CLASS_4 
+		#ifdef DG_SIMD4_VECTOR_CLASS 
 			return _mm_dp_ps (m_type, A.m_type, 0xff); 
 		#else 
 			return CompProduct4(A).AddHorizontal();

@@ -22,20 +22,20 @@
 #ifndef __DGTYPES_H__
 #define __DGTYPES_H__
 
-#define DG_SIMD_VECTOR_CLASS
-//#define DG_SIMD_VECTOR_CLASS_4
+#ifndef DG_SCALAR_VECTOR_CLASS
+	//#define DG_SIMD_VECTOR_CLASS
+#endif
 
-#ifdef DG_SIMD_VECTOR_CLASS_4 
-	#ifndef DG_SIMD_VECTOR_CLASS
-		#define DG_SIMD_VECTOR_CLASS
-	#endif
+
+#ifdef DG_SIMD4_VECTOR_CLASS
+	#undef DG_SCALAR_VECTOR_CLASS
 #endif
 
 
 #if defined (__USE_DOUBLE_PRECISION__) || defined (__ppc__) || defined (ANDROID) || defined (IOS)
-	#ifdef DG_SIMD_VECTOR_CLASS
-		#undef DG_SIMD_VECTOR_CLASS
-		#undef DG_SIMD_VECTOR_CLASS_4
+	#undef DG_SIMD4_VECTOR_CLASS
+	#ifndef DG_SCALAR_VECTOR_CLASS
+		#define DG_SCALAR_VECTOR_CLASS
 	#endif		
 #endif
 
