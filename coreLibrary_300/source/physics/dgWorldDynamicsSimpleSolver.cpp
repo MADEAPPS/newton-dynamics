@@ -307,6 +307,7 @@ dgInt32 dgWorldDynamicUpdate::BuildJacobianMatrix (dgIsland* const island, dgInt
 		rowCount = GetJacobianDerivatives (island, threadIndex, true, rowBase, rowCount, timestep);
 		dgAssert (rowCount <= island->m_rowsCount);
 
+		dgVector zero (dgFloat32 (0.0f));
 		dgFloat32 forceOrImpulseScale = (timestep > dgFloat32 (0.0f)) ? dgFloat32 (1.0f) : dgFloat32 (0.0f);
 
 		dgJacobianMatrixElement* const matrixRow = &m_solverMemory.m_memory[rowBase];
@@ -330,15 +331,15 @@ dgInt32 dgWorldDynamicUpdate::BuildJacobianMatrix (dgIsland* const island, dgInt
 			const dgVector invMass1 (body1->m_invMass[3]);
 			const dgMatrix& invInertia1 = body1->m_invWorldInertiaMatrix;
 
-			dgVector accel0 (dgFloat32 (0.0f)); 
-			dgVector alpha0 (dgFloat32 (0.0f)); 
+			dgVector accel0 (zero); 
+			dgVector alpha0 (zero); 
 			if (body0->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
 				accel0 = ((dgDynamicBody*)body0)->m_accel;
 				alpha0 = ((dgDynamicBody*)body0)->m_alpha;
 			}
 
-			dgVector accel1 (dgFloat32 (0.0f)); 
-			dgVector alpha1 (dgFloat32 (0.0f)); 
+			dgVector accel1 (zero); 
+			dgVector alpha1 (zero); 
 			if (body1->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
 				accel1 = ((dgDynamicBody*)body1)->m_accel;
 				alpha1 = ((dgDynamicBody*)body1)->m_alpha;
@@ -361,15 +362,10 @@ dgInt32 dgWorldDynamicUpdate::BuildJacobianMatrix (dgIsland* const island, dgInt
 				dgVector JMinvJacobianLinearM1 (row->m_Jt.m_jacobianM1.m_linear.CompProduct4 (invMass1));
 				dgVector JMinvJacobianAngularM1 (invInertia1.RotateVector (row->m_Jt.m_jacobianM1.m_angular));
 
-				dgVector tmpDiag (JMinvJacobianLinearM0.CompProduct4(row->m_Jt.m_jacobianM0.m_linear) +
-								  JMinvJacobianAngularM0.CompProduct4(row->m_Jt.m_jacobianM0.m_angular) +
-								  JMinvJacobianLinearM1.CompProduct4(row->m_Jt.m_jacobianM1.m_linear) +
-								  JMinvJacobianAngularM1.CompProduct4(row->m_Jt.m_jacobianM1.m_angular));
+				dgVector tmpDiag (JMinvJacobianLinearM0.CompProduct4(row->m_Jt.m_jacobianM0.m_linear) + JMinvJacobianAngularM0.CompProduct4(row->m_Jt.m_jacobianM0.m_angular) +
+								  JMinvJacobianLinearM1.CompProduct4(row->m_Jt.m_jacobianM1.m_linear) + JMinvJacobianAngularM1.CompProduct4(row->m_Jt.m_jacobianM1.m_angular));
 
-				dgVector tmpAccel (JMinvJacobianLinearM0.CompProduct4(accel0) +
-								   JMinvJacobianAngularM0.CompProduct4(alpha0) +
-							  	   JMinvJacobianLinearM1.CompProduct4(accel1) +
-								   JMinvJacobianAngularM1.CompProduct4(alpha1));
+				dgVector tmpAccel (JMinvJacobianLinearM0.CompProduct4(accel0) + JMinvJacobianAngularM0.CompProduct4(alpha0) + JMinvJacobianLinearM1.CompProduct4(accel1) + JMinvJacobianAngularM1.CompProduct4(alpha1));
 
 				dgFloat32 extenalAcceleration = -(tmpAccel.m_x + tmpAccel.m_y + tmpAccel.m_z);
 				row->m_deltaAccel = extenalAcceleration * forceOrImpulseScale;
@@ -876,6 +872,11 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 					dgAssert (row->m_Jt.m_jacobianM1.m_linear.m_w == dgFloat32 (0.0f));
 					dgAssert (row->m_Jt.m_jacobianM1.m_angular.m_w == dgFloat32 (0.0f));
 
+					//dgVector JMinvJacobianLinearM0 (row->m_Jt.m_jacobianM0.m_linear.Scale3 (invMass0));
+					//dgVector JMinvJacobianAngularM0 (invInertia0.UnrotateVector (row->m_Jt.m_jacobianM0.m_angular));
+					//dgVector JMinvJacobianLinearM1 (row->m_Jt.m_jacobianM1.m_linear.Scale3 (invMass1));
+					//dgVector JMinvJacobianAngularM1 (invInertia1.UnrotateVector (row->m_Jt.m_jacobianM1.m_angular));
+
 					dgVector JMinvJacobianLinearM0 (row->m_Jt.m_jacobianM0.m_linear.CompProduct4 (invMass0));
 					dgVector JMinvJacobianAngularM0 (invInertia0.RotateVector (row->m_Jt.m_jacobianM0.m_angular));
 					dgVector JMinvJacobianLinearM1 (row->m_Jt.m_jacobianM1.m_linear.CompProduct4 (invMass1));
@@ -929,6 +930,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 		}
 
 		if (timestep != dgFloat32 (0.0f)) {
+			dgVector timestep4 (timestep);
 			for (dgInt32 i = 1; i < bodyCount; i ++) {
 				dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
 				//dgVector force (body->m_accel + internalForces[i].m_linear);
@@ -942,8 +944,8 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 
 				dgVector accel (force.Scale4 (body->m_invMass.m_w));
 				dgVector alpha (body->m_invWorldInertiaMatrix.RotateVector (torque));
-				body->m_veloc += accel.Scale4(timestep);
-				body->m_omega += alpha.Scale4(timestep);
+				body->m_veloc += accel.CompProduct4(timestep4);
+				body->m_omega += alpha.CompProduct4(timestep4);
 			}
 		} else {
 			for (dgInt32 i = 1; i < bodyCount; i ++) {
