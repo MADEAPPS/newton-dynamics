@@ -28,6 +28,7 @@ int DebugDisplayOn();
 void SetDebugDisplayMode(int state);
 
 void RenderAABB (NewtonWorld* const world);
+void RenderCenterOfMass (NewtonWorld* const world);
 void RenderNormalForces (NewtonWorld* const world);
 void RenderContactPoints (NewtonWorld* const world); 
 void DebugRenderWorldCollision (const NewtonWorld* const world, DEBUG_DRAW_MODE mode);

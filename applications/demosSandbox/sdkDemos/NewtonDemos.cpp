@@ -234,6 +234,7 @@ BEGIN_EVENT_TABLE(NewtonDemos, wxFrame)
 	EVT_MENU(ID_SHOW_CONTACT_POINTS, NewtonDemos::OnShowContactPoints)
 	EVT_MENU(ID_SHOW_NORMAL_FORCES,	NewtonDemos::OnShowNormalForces)
 	EVT_MENU(ID_SHOW_AABB, NewtonDemos::OnShowAABB)
+	EVT_MENU(ID_SHOW_CENTER_OF_MASS, NewtonDemos::OnShowCenterOfMass)
 	EVT_MENU(ID_USE_PARALLEL_SOLVER, NewtonDemos::OnUseParallelSolver)
 
 	EVT_MENU_RANGE(ID_DYNAMICS_BROADPHASE, ID_HYBRID_BROADPHASE, NewtonDemos::OnBroadPhaseType)
@@ -276,6 +277,7 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	,m_showNormalForces(false)
 //	,m_showNormalForces(true)
 	,m_showAABB(false)
+	,m_showCenterOfMass(false)
 	,m_concurrentProfilerState(false)
 	,m_threadProfilerState(false)
 	,m_hasJoysticController(false)
@@ -385,6 +387,7 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 		optionsMenu->AppendCheckItem(ID_SHOW_CONTACT_POINTS, _("Show contact points"));
 		optionsMenu->AppendCheckItem(ID_SHOW_NORMAL_FORCES, _("Show normal forces"));
 		optionsMenu->AppendCheckItem(ID_SHOW_AABB, _("Show aabb"));
+		optionsMenu->AppendCheckItem(ID_SHOW_CENTER_OF_MASS, _("Show center of mass"));
 		optionsMenu->AppendCheckItem(ID_USE_PARALLEL_SOLVER, _("Parallel solver on"));
 
 		optionsMenu->Check (ID_AUTOSLEEP_MODE, m_autoSleepState);
@@ -708,6 +711,14 @@ void NewtonDemos::OnShowAABB(wxCommandEvent& event)
 	m_showAABB = event.IsChecked(); 
 	END_MENU_OPTION();
 }
+
+void NewtonDemos::OnShowCenterOfMass(wxCommandEvent& event)
+{
+	BEGIN_MENU_OPTION();
+	m_showCenterOfMass = event.IsChecked(); 
+	END_MENU_OPTION();
+}
+
 
 
 void NewtonDemos::OnUseParallelSolver(wxCommandEvent& event)

@@ -895,10 +895,12 @@ void DemoEntityManager::RenderFrame ()
 		}
 	}
 
-
 	if (m_mainWindow->m_showAABB) {
 		RenderAABB (GetNewton());
+	}
 
+	if (m_mainWindow->m_showCenterOfMass) {
+		RenderCenterOfMass (GetNewton());
 	}
 
 

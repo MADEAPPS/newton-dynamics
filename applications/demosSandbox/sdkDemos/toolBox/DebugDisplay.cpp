@@ -157,6 +157,43 @@ void RenderAABB (NewtonWorld* const world)
 	glEnd();
 }
 
+void RenderCenterOfMass (NewtonWorld* const world)
+{
+	glDisable (GL_LIGHTING);
+	glDisable(GL_TEXTURE_2D);
+
+	glColor3f(0.0f, 0.0f, 1.0f);
+
+	glBegin(GL_LINES);
+	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
+		dVector com; 
+		dMatrix matrix;
+
+		NewtonBodyGetCentreOfMass (body, &com[0]);
+		NewtonBodyGetMatrix (body, &matrix[0][0]);
+
+		dVector o (matrix.TransformVector (com));
+
+		dVector x (o + matrix.RotateVector (dVector (1.0f, 0.0f, 0.0f, 0.0f)));
+		glColor3f (1.0f, 0.0f, 0.0f);
+		glVertex3f (o.m_x, o.m_y, o.m_z);
+		glVertex3f (x.m_x, x.m_y, x.m_z);
+
+		dVector y (o + matrix.RotateVector (dVector (0.0f, 1.0f, 0.0f, 0.0f)));
+		glColor3f (0.0f, 1.0f, 0.0f);
+		glVertex3f (o.m_x, o.m_y, o.m_z);
+		glVertex3f (y.m_x, y.m_y, y.m_z);
+
+		dVector z (o + matrix.RotateVector (dVector (0.0f, 0.0f, 1.0f, 0.0f)));
+		glColor3f (0.0f, 0.0f, 1.0f);
+		glVertex3f (o.m_x, o.m_y, o.m_z);
+		glVertex3f (z.m_x, z.m_y, z.m_z);
+
+	}
+	glEnd();
+}
+
+
 void RenderContactPoints (NewtonWorld* const world)
 {
 	glDisable (GL_LIGHTING);

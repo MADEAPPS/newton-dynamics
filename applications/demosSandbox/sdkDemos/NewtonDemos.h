@@ -33,6 +33,7 @@ class NewtonDemos: public wxFrame
 		ID_SHOW_CONTACT_POINTS,
 		ID_SHOW_NORMAL_FORCES,
 		ID_SHOW_AABB,
+		ID_SHOW_CENTER_OF_MASS,
 		ID_USE_PARALLEL_SOLVER,
 
 		ID_DYNAMICS_BROADPHASE,
@@ -106,6 +107,7 @@ class NewtonDemos: public wxFrame
 	void OnShowContactPoints(wxCommandEvent& event);
 	void OnShowNormalForces(wxCommandEvent& event);
 	void OnShowAABB(wxCommandEvent& event);
+	void OnShowCenterOfMass(wxCommandEvent& event);
 	void OnUseParallelSolver(wxCommandEvent& event);
 	void OnBroadPhaseType(wxCommandEvent& event);
 	void OnShowConcurrentProfiler(wxCommandEvent& event);
@@ -139,6 +141,7 @@ class NewtonDemos: public wxFrame
 	bool m_showContactPoints;
 	bool m_showNormalForces;
 	bool m_showAABB;
+	bool m_showCenterOfMass;
 	bool m_concurrentProfilerState;
 	bool m_threadProfilerState;
 	bool m_hasJoysticController;
