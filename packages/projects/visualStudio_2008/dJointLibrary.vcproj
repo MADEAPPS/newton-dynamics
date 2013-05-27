@@ -763,11 +763,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\dCustomJoints\CustomSkeletonTransformManager.h"
+				RelativePath="..\..\dCustomJoints\CustomSkeletonTransformManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\dCustomJoints\CustomSkeletonTransformManagerManager.cpp"
+				RelativePath="..\..\dCustomJoints\CustomSkeletonTransformManager.h"
 				>
 			</File>
 			<File

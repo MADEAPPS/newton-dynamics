@@ -413,6 +413,7 @@
     <ClCompile Include="..\..\dCustomJoints\CustomPlayerControllerManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomPulley.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomRagDoll.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomSkeletonTransformManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomSlider.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomSlidingContact.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomTriggerManager.cpp" />
@@ -437,6 +438,7 @@
     <ClInclude Include="..\..\dCustomJoints\CustomPlayerControllerManager.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomPulley.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomRagDoll.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomSkeletonTransformManager.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomSlider.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomSlidingContact.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomTriggerManager.h" />
