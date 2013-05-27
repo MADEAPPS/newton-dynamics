@@ -49,14 +49,29 @@ void CustomSkeletonTransformController::Init (void* const userData)
 
 void CustomSkeletonTransformController::PostUpdate(dFloat timestep, int threadIndex)
 {
+	CustomSkeletonTransformManager* const manager = (CustomSkeletonTransformManager*) GetManager();
+//	NewtonWorld* const world = manager->GetWorld();
+
+	for (int i = 0; i < m_boneCount; i ++) {
+		const dSkeletonBone& bone = m_bones[i];
+		dMatrix matrix;
+		NewtonBodyGetMatrix(bone.m_body, &matrix[0][0]);
+		if (!bone.m_parent) {
+			manager->UpdateTransform (&bone, matrix);
+		} else {
+			dMatrix parentMatrix;
+			NewtonBodyGetMatrix(bone.m_parent->m_body, &parentMatrix[0][0]);
+			manager->UpdateTransform (&bone, matrix * parentMatrix.Inverse());
+		}
+
+	}
 }
 
 CustomSkeletonTransformController::dSkeletonBone* CustomSkeletonTransformController::AddBone (NewtonBody* const bone, dSkeletonBone* const parentBone)
 {
 	m_bones[m_boneCount].m_body = bone;
 	m_bones[m_boneCount].m_myController = this;
-	m_bones[m_boneCount].m_boneIndex = m_boneCount;
-	m_bones[m_boneCount].m_parentIndex = parentBone ? parentBone->m_parentIndex : -1;
+	m_bones[m_boneCount].m_parent = parentBone;
 
 	m_boneCount ++;
 	dAssert (m_boneCount < D_SKELETON_CONTROLLER_MAX_BONES);

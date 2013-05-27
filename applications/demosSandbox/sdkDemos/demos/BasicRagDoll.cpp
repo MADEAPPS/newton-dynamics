@@ -173,41 +173,15 @@ class RagDollManager: public CustomSkeletonTransformManager
 		return NULL;
 	}
 
-/*
-	void ApplyBoneMatrix (int boneIndex, void* userData, const dMatrix& matrix) const
+	
+	virtual void UpdateTransform (const CustomSkeletonTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
 	{
-		if (boneIndex == 0) {
-			dBone* boneNode = (dBone*) userData;
-			dMatrix rootMatrix (matrix);
-			while (boneNode->GetParent()) {
-				rootMatrix = boneNode->GetMatrix().Inverse() * rootMatrix;
-				boneNode = boneNode->GetParent();
-			}
-			m_model->SetMatrix(rootMatrix);
-		} else {
+		DemoEntity* const ent = (DemoEntity*) NewtonBodyGetUserData(bone->m_body);
 
-			dBone* boneNode = (dBone*) userData;
-			// check if the parent of this bone is also a bone, body1 is the parentBone
-			dBone* parentBone = (dBone*) NewtonBodyGetUserData (GetParentBone (boneIndex));
-			if (boneIndex && (boneNode->GetParent() != parentBone)) {
-				// this is not and immediate bone calculate the offset matrix
-				dBone* parent;
-				parent = boneNode->GetParent();
-				dMatrix offset (parent->GetMatrix());
-				for (parent = parent->GetParent(); parent != parentBone; parent = parent->GetParent()) {
-					offset = offset * parent->GetMatrix();
-				}
-
-				dMatrix localMatrix (matrix * offset.Inverse());
-				boneNode->SetMatrix (localMatrix);
-
-			} else {
-				boneNode->SetMatrix (matrix);
-			}
-		}
-
+		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(bone->m_body));
+		dQuaternion rot (localMatrix);
+//		ent->SetMatrix (*scene, rot, localMatrix.m_posit);
 	}
-*/
 
 	NewtonCollision* MakeConvexHull(DemoEntity* const bodyPart) const
 	{
@@ -272,12 +246,11 @@ class RagDollManager: public CustomSkeletonTransformManager
 		// save the user data with the bone body (usually the visual geometry)
 		NewtonBodySetUserData(bone, bodyPart);
 
-		// assign the materail for earlly collision culling
+		// assign the material for early collision culling
 		NewtonBodySetMaterialGroupID (bone, m_material);
 
 		// set the bod part force and torque call back to the gravity force, skip the transform callback
-		NewtonBodySetForceAndTorqueCallback (bone, PhysicsApplyGravityForce);
-
+//		NewtonBodySetForceAndTorqueCallback (bone, PhysicsApplyGravityForce);
 
 		// destroy the collision helper shape 
 		NewtonDestroyCollision (shape);

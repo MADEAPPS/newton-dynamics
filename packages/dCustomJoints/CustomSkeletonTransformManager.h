@@ -43,9 +43,8 @@ class CustomSkeletonTransformController
 	{
 		public: 
 		NewtonBody* m_body;
+		dSkeletonBone* m_parent;
 		CustomSkeletonTransformController* m_myController;
-		int m_boneIndex;
-		int m_parentIndex;
 		dBitFieldMask m_bitField;
 	};
 
@@ -83,10 +82,10 @@ class CustomSkeletonTransformManager: public CustomControllerManager<CustomSkele
 	}
 	virtual void PostUpdate(dFloat timestep);
 
+	virtual void UpdateTransform (const CustomSkeletonTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const = 0;
+
 	virtual void Debug () const {};
 	virtual CustomSkeletonTransformController* CreateTransformController (void* const userData);
-//	virtual void ApplyBoneTransform (const CustomSkeletonTransformController* const me, TriggerEventType eventType, NewtonBody* const visitor) const = 0;
-//	unsigned m_lru;
 };
 
 inline void CustomSkeletonTransformController::SetUserData(void* const userData)
