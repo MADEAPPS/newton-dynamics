@@ -28,8 +28,9 @@
 		FF32E226172E13BF0052D273 /* CustomUpVector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF32E1FA172E13BF0052D273 /* CustomUpVector.cpp */; };
 		FF32E228172E13BF0052D273 /* CustomUserBlank.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF32E1FC172E13BF0052D273 /* CustomUserBlank.cpp */; };
 		FF32E22A172E13BF0052D273 /* CustomVehicleControllerManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF32E1FE172E13BF0052D273 /* CustomVehicleControllerManager.cpp */; };
-		FF32E22C172E13BF0052D273 /* CustomWormGear.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF32E200172E13BF0052D273 /* CustomWormGear.cpp */; };
-		FF8053CC174D19BA009F1C62 /* CustomJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8053CB174D19BA009F1C62 /* CustomJoint.h */; };
+		FF856C021753A00100324FDC /* CustomSkeletonTransformManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF856C011753A00100324FDC /* CustomSkeletonTransformManager.cpp */; };
+		FF856C041753A0DC00324FDC /* CustomJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = FF856C031753A0DC00324FDC /* CustomJoint.h */; };
+		FF856C061753BDC300324FDC /* CustomRackAndPinion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF856C051753BDC300324FDC /* CustomRackAndPinion.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -54,8 +55,9 @@
 		FF32E1FA172E13BF0052D273 /* CustomUpVector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomUpVector.cpp; path = ../../../dCustomJoints/CustomUpVector.cpp; sourceTree = "<group>"; };
 		FF32E1FC172E13BF0052D273 /* CustomUserBlank.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomUserBlank.cpp; path = ../../../dCustomJoints/CustomUserBlank.cpp; sourceTree = "<group>"; };
 		FF32E1FE172E13BF0052D273 /* CustomVehicleControllerManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomVehicleControllerManager.cpp; path = ../../../dCustomJoints/CustomVehicleControllerManager.cpp; sourceTree = "<group>"; };
-		FF32E200172E13BF0052D273 /* CustomWormGear.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomWormGear.cpp; path = ../../../dCustomJoints/CustomWormGear.cpp; sourceTree = "<group>"; };
-		FF8053CB174D19BA009F1C62 /* CustomJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomJoint.h; path = ../../../dCustomJoints/CustomJoint.h; sourceTree = "<group>"; };
+		FF856C011753A00100324FDC /* CustomSkeletonTransformManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomSkeletonTransformManager.cpp; path = ../../../dCustomJoints/CustomSkeletonTransformManager.cpp; sourceTree = "<group>"; };
+		FF856C031753A0DC00324FDC /* CustomJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomJoint.h; path = ../../../dCustomJoints/CustomJoint.h; sourceTree = "<group>"; };
+		FF856C051753BDC300324FDC /* CustomRackAndPinion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomRackAndPinion.cpp; path = ../../../dCustomJoints/CustomRackAndPinion.cpp; sourceTree = "<group>"; };
 		FFD2A792172E123600114513 /* libdCustomJoints.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libdCustomJoints.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -89,10 +91,10 @@
 		FFD2A7A2172E128200114513 /* source */ = {
 			isa = PBXGroup;
 			children = (
-				FF8053CB174D19BA009F1C62 /* CustomJoint.h */,
+				FF856C051753BDC300324FDC /* CustomRackAndPinion.cpp */,
+				FF856C031753A0DC00324FDC /* CustomJoint.h */,
 				FF32E1D6172E13BF0052D273 /* Custom6DOF.cpp */,
 				FF32E1D8172E13BF0052D273 /* CustomBallAndSocket.cpp */,
-				FF32E1DA172E13BF0052D273 /* CustomControllerManager.cpp */,
 				FF32E1DC172E13BF0052D273 /* CustomCorkScrew.cpp */,
 				FF32E1DE172E13BF0052D273 /* CustomDryRollingFriction.cpp */,
 				FF32E1E0172E13BF0052D273 /* CustomGear.cpp */,
@@ -101,17 +103,18 @@
 				FF32E1E6172E13BF0052D273 /* CustomJointLibraryStdAfx.cpp */,
 				FF32E1E8172E13BF0052D273 /* CustomKinematicController.cpp */,
 				FF32E1EA172E13BF0052D273 /* CustomPathFollow.cpp */,
-				FF32E1EC172E13BF0052D273 /* CustomPlayerControllerManager.cpp */,
 				FF32E1EE172E13BF0052D273 /* CustomPulley.cpp */,
 				FF32E1F0172E13BF0052D273 /* CustomRagDoll.cpp */,
 				FF32E1F2172E13BF0052D273 /* CustomSlider.cpp */,
 				FF32E1F4172E13BF0052D273 /* CustomSlidingContact.cpp */,
-				FF32E1F6172E13BF0052D273 /* CustomTriggerManager.cpp */,
 				FF32E1F8172E13BF0052D273 /* CustomUniversal.cpp */,
 				FF32E1FA172E13BF0052D273 /* CustomUpVector.cpp */,
 				FF32E1FC172E13BF0052D273 /* CustomUserBlank.cpp */,
+				FF32E1F6172E13BF0052D273 /* CustomTriggerManager.cpp */,
+				FF856C011753A00100324FDC /* CustomSkeletonTransformManager.cpp */,
+				FF32E1DA172E13BF0052D273 /* CustomControllerManager.cpp */,
 				FF32E1FE172E13BF0052D273 /* CustomVehicleControllerManager.cpp */,
-				FF32E200172E13BF0052D273 /* CustomWormGear.cpp */,
+				FF32E1EC172E13BF0052D273 /* CustomPlayerControllerManager.cpp */,
 			);
 			name = source;
 			sourceTree = "<group>";
@@ -123,7 +126,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FF8053CC174D19BA009F1C62 /* CustomJoint.h in Headers */,
+				FF856C041753A0DC00324FDC /* CustomJoint.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -199,7 +202,8 @@
 				FF32E226172E13BF0052D273 /* CustomUpVector.cpp in Sources */,
 				FF32E228172E13BF0052D273 /* CustomUserBlank.cpp in Sources */,
 				FF32E22A172E13BF0052D273 /* CustomVehicleControllerManager.cpp in Sources */,
-				FF32E22C172E13BF0052D273 /* CustomWormGear.cpp in Sources */,
+				FF856C021753A00100324FDC /* CustomSkeletonTransformManager.cpp in Sources */,
+				FF856C061753BDC300324FDC /* CustomRackAndPinion.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
