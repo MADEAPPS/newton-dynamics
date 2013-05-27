@@ -18,7 +18,7 @@
 #include "CustomJointLibraryStdAfx.h"
 #include "CustomControllerManager.h"
 
-
+#define D_SKELETON_CONTROLLER_MAX_BONES	64
 
 #define SKELETON_TRANSFORM_PLUGIN_NAME	"skeletonTransformManager"
 
@@ -27,11 +27,34 @@ class CustomSkeletonTransformController
 {
 	CUSTOM_CONTROLLER_GLUE(CustomSkeletonTransformController);
 
+	class dBitFieldMask
+	{
+		public: 
+		dBitFieldMask()
+		{
+			memset (m_mask, 0xff, sizeof (m_mask));
+			//memset (m_mask, 0, sizeof (m_mask));
+		}
+		long long m_mask [D_SKELETON_CONTROLLER_MAX_BONES / (8 * sizeof (long long))];
+	};
+
+	class dSkeletonBone
+	{
+		public: 
+		NewtonBody* m_body;
+		int m_boneIndex;
+		int m_parentIndex;
+		dBitFieldMask m_bitField;
+	};
+
 	public:
 	void SetUserData(void* const userData);
 	const void* GetUserData() const;
 
-	void AddBone (NewtonBody* const bone, NewtonBody* const parent);
+	int AddBone (NewtonBody* const bone, int parentIndex = -1);
+	void SetDefaultBitFieldMask ();
+
+	bool TestCollisionMask () const;
 	
 	protected:
 	void Init (void* const userData);
@@ -41,6 +64,8 @@ class CustomSkeletonTransformController
 	
 	private:
 	void* m_usertData;
+	int m_boneCount;
+	dSkeletonBone m_bones[D_SKELETON_CONTROLLER_MAX_BONES];
 	friend class CustomSkeletonTransformManager;
 };
 

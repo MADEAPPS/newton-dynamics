@@ -54,29 +54,29 @@ struct RAGDOLL_BONE_DEFINITION
 
 static RAGDOLL_BONE_DEFINITION skeletonRagDoll[] =
 {
-//	{"Bip01_Pelvis",	 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.01f, 0.07f, 0.16f, 20.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
-{"Bip01_Pelvis",	 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.01f, 0.01f, 0.01f, 20.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
+	{"Bip01_Pelvis",	 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.01f, 0.07f, 0.16f, 20.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
 
 	{"Bip01_Spine",		 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.14f, 20.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
 	{"Bip01_Spine1",	 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.12f, 20.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
 	{"Bip01_Spine2",	 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.08f, 20.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
 
+//	{"Bip01_Neck",		 "capsule", 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.05f, 0.03f, 0.04f, 20.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
+	{"Bip01_Head",		 "sphere", 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.09f, 0.09f, 0.0f, 20.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
+
 	{"Bip01_L_UpperArm", "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
 //	{"Bip01_L_Forearm",  "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
 	{"Bip01_L_Hand",  "convexhull", 0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
 
-	
 	{"Bip01_R_UpperArm", "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
 //	{"Bip01_R_Forearm",  "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
 	{"Bip01_R_Hand",  "convexhull", 0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
 	
-	
 //	{"Bip01_L_Thigh", "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
-	{"Bip01_L_Calf", "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
+//	{"Bip01_L_Calf", "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
 //	{"Bip01_L_Foot",  "convexhull", 0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
 	
 //	{"Bip01_R_Thigh", "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
-	{"Bip01_R_Calf", "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
+//	{"Bip01_R_Calf", "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
 //	{"Bip01_R_Foot",  "convexhull", 0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
 	
 	
@@ -120,15 +120,17 @@ class RagDollManager: public CustomSkeletonTransformManager
 	}
 
 
-	NewtonCollision* MakeSphere(DemoEntity* const bodyPart) const
+	NewtonCollision* MakeSphere(DemoEntity* const bodyPart, const RAGDOLL_BONE_DEFINITION& definition) const
 	{
-//		dVector size;
-//		dVector origin;
-//		dMatrix matrix (GetIdentityMatrix());
-//		GetDimentions(bone, matrix.m_posit, size);
-//		return NewtonCreateSphere (nWorld, size.m_x, size.m_x, size.m_x, 0, &matrix[0][0]);
-		dAssert (0);
-		return NULL;
+		dVector size;
+		dVector origin;
+		dMatrix matrix (GetIdentityMatrix());
+
+		matrix.m_posit.m_x = definition.m_shape_x;
+		matrix.m_posit.m_y = definition.m_shape_y;
+		matrix.m_posit.m_z = definition.m_shape_z;
+		return NewtonCreateSphere(GetWorld(), definition.m_radio, 0, &matrix[0][0]);
+
 	}
 
 	NewtonCollision* MakeCapsule(DemoEntity* const bodyPart, const RAGDOLL_BONE_DEFINITION& definition) const
@@ -209,13 +211,11 @@ class RagDollManager: public CustomSkeletonTransformManager
 	}
 
 
-
-	//NewtonBody* CreateRagDollBodyPart (NewtonWorld* nWorld, const dBone* bone, const RAGDOLL_BONE_DEFINITION& definition, const dMeshInstance* skinMesh) 
 	NewtonBody* CreateRagDollBodyPart (DemoEntity* const bodyPart, const RAGDOLL_BONE_DEFINITION& definition) 
 	{
 		NewtonCollision* shape = NULL;
 		if (!strcmp (definition.m_shapeType, "sphere")) {
-			shape = MakeSphere (bodyPart);
+			shape = MakeSphere (bodyPart, definition);
 		} else if (!strcmp (definition.m_shapeType, "capsule")) {
 			shape = MakeCapsule(bodyPart, definition);
 		} else if (!strcmp (definition.m_shapeType, "box")) {
@@ -259,24 +259,6 @@ class RagDollManager: public CustomSkeletonTransformManager
 //		NewtonBodySetForceAndTorqueCallback (bone, PhysicsApplyGravityForce);
 
 
-//		CustomRagDollLimbJoint* joint = NULL;
-//		if (m_bonesCount == 0) {
-//			// this is the root bone, initialize ragdoll with the root Bone
-//			Init (1, bone, NULL);
-//			NewtonBodySetTransformCallback(bone, TransformCallback);
-//			parentBoneIndex = 0;
-//		} else {
-//			// this is a child bone, need to be connected to its parent by a joint 
-//			NewtonBody* const parent = m_bonesBodies[parentBoneIndex];
-//			joint = new CustomRagDollLimbJoint (pivotInGlobalSpace, bone, parent);
-//		}
-//		m_joints[m_bonesCount] = joint;
-//		m_bonesBodies[m_bonesCount] = bone;
-//		m_bonesParents[m_bonesCount] = m_bonesBodies[parentBoneIndex];
-//		m_bonesCount ++;
-//		return m_bonesCount - 1;
-
-
 		// destroy the collision helper shape 
 		NewtonDestroyCollision (shape);
 		return bone;
@@ -299,39 +281,45 @@ class RagDollManager: public CustomSkeletonTransformManager
 		// add the root bone
 		DemoEntity* const rootEntity = (DemoEntity*) ragDollEntity->Find (definition[0].m_boneName);
 		NewtonBody* const rootBone = CreateRagDollBodyPart (rootEntity, definition[0]);
-		controller->AddBone (rootBone, NULL);
+		int boneIndex = controller->AddBone (rootBone);
 
 		int stackIndex;
-		NewtonBody* parentBone[32];
+		int parentBoneIndex[32];
 		DemoEntity* childEntities[32];
 		stackIndex = 0;
 		for (DemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) {
-			parentBone[stackIndex] = rootBone;
+			parentBoneIndex[stackIndex] = boneIndex;
 			childEntities[stackIndex] = child;
 			stackIndex ++;
 		}
 
+		// walk model hierarchic adding all children designed as rigid body bones. 
 		while (stackIndex) {
 			stackIndex --;
 			DemoEntity* const entity = childEntities[stackIndex];
-			NewtonBody* parent = parentBone[stackIndex];
+			int parentIndex = parentBoneIndex[stackIndex];
 
 			const char* const name = entity->GetName().GetStr();
 			for (int i = 0; i < defintionCount; i ++) {
 				if (!strcmp (definition[i].m_boneName, name)) {
 					NewtonBody* const bone = CreateRagDollBodyPart (entity, definition[i]);
-					controller->AddBone (bone, parent);
-					parent = bone;
+					parentIndex = controller->AddBone (bone, parentIndex);
 					break;
 				}
 			}
 
 			for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
-				parentBone[stackIndex] = parent;
+				parentBoneIndex[stackIndex] = boneIndex;
 				childEntities[stackIndex] = child;
 				stackIndex ++;
 			}
 		}
+
+		// set the collision mask
+		// note this container work best with a material call back for setting bit field 
+
+
+
 
 //		matrix.m_posit = FindFloor (scene->GetNewton(), point, 10.0f);
 
