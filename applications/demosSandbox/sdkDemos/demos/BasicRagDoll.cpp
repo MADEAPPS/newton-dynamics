@@ -265,7 +265,7 @@ class RagDollManager: public CustomSkeletonTransformManager
 		NewtonBodySetMaterialGroupID (bone, m_material);
 
 		// set the bod part force and torque call back to the gravity force, skip the transform callback
-//		NewtonBodySetForceAndTorqueCallback (bone, PhysicsApplyGravityForce);
+		NewtonBodySetForceAndTorqueCallback (bone, PhysicsApplyGravityForce);
 
 
 		// destroy the collision helper shape 
