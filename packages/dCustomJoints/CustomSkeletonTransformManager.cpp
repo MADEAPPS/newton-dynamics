@@ -61,17 +61,18 @@ void CustomSkeletonTransformController::PostUpdate(dFloat timestep, int threadIn
 		} else {
 			dMatrix parentMatrix;
 			NewtonBodyGetMatrix(bone.m_parent->m_body, &parentMatrix[0][0]);
-			manager->UpdateTransform (&bone, matrix * parentMatrix.Inverse());
+			manager->UpdateTransform (&bone, matrix * parentMatrix.Inverse() * bone.m_bindMatrix);
 		}
 
 	}
 }
 
-CustomSkeletonTransformController::dSkeletonBone* CustomSkeletonTransformController::AddBone (NewtonBody* const bone, dSkeletonBone* const parentBone)
+CustomSkeletonTransformController::dSkeletonBone* CustomSkeletonTransformController::AddBone (NewtonBody* const bone, const dMatrix& bindMatrix, dSkeletonBone* const parentBone)
 {
 	m_bones[m_boneCount].m_body = bone;
 	m_bones[m_boneCount].m_myController = this;
 	m_bones[m_boneCount].m_parent = parentBone;
+	m_bones[m_boneCount].m_bindMatrix = bindMatrix;
 
 	m_boneCount ++;
 	dAssert (m_boneCount < D_SKELETON_CONTROLLER_MAX_BONES);
@@ -80,7 +81,11 @@ CustomSkeletonTransformController::dSkeletonBone* CustomSkeletonTransformControl
 
 void CustomSkeletonTransformController::SetDefaultBitFieldMask ()
 {
-
+	for (int i = 0; i < m_boneCount; i ++) {
+		const dSkeletonBone& bone = m_bones[i];
+		if (bone.m_parent) {
+		}
+	}
 }
 
 //bool TestCollisionMask (CustomSkeletonTransformController* const controller, int bone0, int bone1) const

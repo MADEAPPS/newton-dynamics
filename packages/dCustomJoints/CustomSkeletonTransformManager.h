@@ -42,6 +42,7 @@ class CustomSkeletonTransformController
 	class dSkeletonBone
 	{
 		public: 
+		dMatrix m_bindMatrix;
 		NewtonBody* m_body;
 		dSkeletonBone* m_parent;
 		CustomSkeletonTransformController* m_myController;
@@ -52,7 +53,7 @@ class CustomSkeletonTransformController
 	void SetUserData(void* const userData);
 	const void* GetUserData() const;
 
-	dSkeletonBone* AddBone (NewtonBody* const bone, dSkeletonBone* const parentBodne = NULL);
+	dSkeletonBone* AddBone (NewtonBody* const bone, const dMatrix& bindMatrix, dSkeletonBone* const parentBodne = NULL);
 	void SetDefaultBitFieldMask ();
 
 	bool TestCollisionMask () const;

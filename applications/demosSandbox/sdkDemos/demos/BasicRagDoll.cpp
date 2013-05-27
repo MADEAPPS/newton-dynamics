@@ -177,10 +177,10 @@ class RagDollManager: public CustomSkeletonTransformManager
 	virtual void UpdateTransform (const CustomSkeletonTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
 	{
 		DemoEntity* const ent = (DemoEntity*) NewtonBodyGetUserData(bone->m_body);
-
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(bone->m_body));
+		
 		dQuaternion rot (localMatrix);
-//		ent->SetMatrix (*scene, rot, localMatrix.m_posit);
+		ent->SetMatrix (*scene, rot, localMatrix.m_posit);
 	}
 
 	NewtonCollision* MakeConvexHull(DemoEntity* const bodyPart) const
@@ -219,15 +219,6 @@ class RagDollManager: public CustomSkeletonTransformManager
 		dMatrix matrix (bodyPart->CalculateGlobalMatrix());
 
 		// find the index of the bone parent
-//		int parentIndeIndex = -1;
-//		for (dBone* parentNode = bone->GetParent(); parentNode && (parentIndeIndex == -1); parentNode = parentNode->GetParent()) {
-//			for (int i = 0; i <  GetBoneCount(); i ++) {
-//				if (parentNode == NewtonBodyGetUserData (GetBone (i))) {
-//					parentIndeIndex = i;
-//					break;
-//				}
-//			}
-//		} 
 //		dMatrix pinAndPivot (dPitchMatrix (definition.m_pitch * 3.141592f / 180.0f) * dYawMatrix (definition.m_yaw * 3.141592f / 180.0f) * dRollMatrix (definition.m_roll * 3.141592f / 180.0f));
 //		pinAndPivot = pinAndPivot * rootMatrix;
 //		int boneIndex = AddBone (nWorld, parentIndeIndex, (void*) bone, rootMatrix, definition.m_mass, pinAndPivot, shape);
@@ -274,8 +265,8 @@ class RagDollManager: public CustomSkeletonTransformManager
 		// add the root bone
 		DemoEntity* const rootEntity = (DemoEntity*) ragDollEntity->Find (definition[0].m_boneName);
 		NewtonBody* const rootBone = CreateRagDollBodyPart (rootEntity, definition[0]);
-		CustomSkeletonTransformController::dSkeletonBone* const bone = controller->AddBone (rootBone);
-		// save the controller as te hcollsion user data, for collsion culling
+		CustomSkeletonTransformController::dSkeletonBone* const bone = controller->AddBone (rootBone, GetIdentityMatrix());
+		// save the controller as the collision user data, for collision culling
 		NewtonCollisionSetUserData (NewtonBodyGetCollision(rootBone), bone);
 
 		int stackIndex = 0;
@@ -297,7 +288,11 @@ class RagDollManager: public CustomSkeletonTransformManager
 			for (int i = 0; i < defintionCount; i ++) {
 				if (!strcmp (definition[i].m_boneName, name)) {
 					NewtonBody* const bone = CreateRagDollBodyPart (entity, definition[i]);
-					parentBone = controller->AddBone (bone, parentBone);
+
+					dMatrix bindMatrix (entity->GetParent()->CalculateGlobalMatrix ((DemoEntity*)NewtonBodyGetUserData (parentBone->m_body)).Inverse());
+
+					parentBone = controller->AddBone (bone, bindMatrix, parentBone);
+					// save the controller as the collision user data, for collision culling
 					NewtonCollisionSetUserData (NewtonBodyGetCollision(bone), parentBone);
 					break;
 				}
@@ -312,12 +307,10 @@ class RagDollManager: public CustomSkeletonTransformManager
 
 		// set the collision mask
 		// note this container work best with a material call back for setting bit field 
-
-
+		controller->SetDefaultBitFieldMask ();
 
 
 //		matrix.m_posit = FindFloor (scene->GetNewton(), point, 10.0f);
-
 	}
 
 	int m_material;
