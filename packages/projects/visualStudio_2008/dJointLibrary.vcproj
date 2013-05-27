@@ -687,6 +687,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\dCustomJoints\CustomRackAndPinion.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dCustomJoints\CustomRackAndPinion.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\dCustomJoints\CustomRagDoll.cpp"
 				>
 			</File>
@@ -732,14 +740,6 @@
 			</File>
 			<File
 				RelativePath="..\..\dCustomJoints\CustomUserBlank.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dCustomJoints\CustomWormGear.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dCustomJoints\CustomWormGear.h"
 				>
 			</File>
 		</Filter>

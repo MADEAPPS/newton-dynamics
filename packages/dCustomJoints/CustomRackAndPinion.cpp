@@ -15,14 +15,14 @@
 //
 //////////////////////////////////////////////////////////////////////
 #include "CustomJointLibraryStdAfx.h"
-#include "CustomWormGear.h"
+#include "CustomRackAndPinion.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-dInitRtti(CustomWormGear);
-CustomWormGear::CustomWormGear(
+dInitRtti(CustomRackAndPinion);
+CustomRackAndPinion::CustomRackAndPinion(
 	dFloat gearRatio, 
     const dVector& rotationalPin, 
 	const dVector& linearPin, 
@@ -49,13 +49,13 @@ CustomWormGear::CustomWormGear(
 	CalculateLocalMatrix (pinAndPivot1, dommyMatrix, m_localMatrix1);
 }
 
-CustomWormGear::~CustomWormGear()
+CustomRackAndPinion::~CustomRackAndPinion()
 {
 	
 }
 
 
-void CustomWormGear::SubmitConstraints (dFloat timestep, int threadIndex)
+void CustomRackAndPinion::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	dVector omega0;
 	dVector veloc1;
@@ -117,7 +117,7 @@ void CustomWormGear::SubmitConstraints (dFloat timestep, int threadIndex)
 }
 
 
-void CustomWormGear::GetInfo (NewtonJointRecord* const info) const
+void CustomRackAndPinion::GetInfo (NewtonJointRecord* const info) const
 {
 	strcpy (info->m_descriptionType, "wormGear");
 

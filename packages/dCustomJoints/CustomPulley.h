@@ -14,8 +14,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_CustomPulley_H__B631F556_468B_4331_B7D7_INCLUDED_)
-#define AFX_CustomPulley_H__B631F556_468B_4331_B7D7_INCLUDED_
+#ifndef _CustomPulley_H__
+#define _CustomPulley_H__
 
 #include "CustomJoint.h"
 
@@ -25,7 +25,7 @@
 // velErro = -(v0 + n * v1)
 // where v0 and v1 are the linear velocity
 // n is the number of turn on the pulley, in the case of this joint N coudl
-// be a velue with fraction, as this joint is a generalization of the pulley idea.
+// be a value with fraction, as this joint is a generalization of the pulley idea.
 class CustomPulley: public CustomJoint  
 {
 	public:

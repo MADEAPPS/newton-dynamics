@@ -412,6 +412,7 @@
     <ClCompile Include="..\..\dCustomJoints\CustomPathFollow.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomPlayerControllerManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomPulley.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomRackAndPinion.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomRagDoll.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomSkeletonTransformManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomSlider.cpp" />
@@ -421,7 +422,6 @@
     <ClCompile Include="..\..\dCustomJoints\CustomUpVector.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomUserBlank.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerManager.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomWormGear.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dCustomJoints\Custom6DOF.h" />
@@ -437,6 +437,7 @@
     <ClInclude Include="..\..\dCustomJoints\CustomPathFollow.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomPlayerControllerManager.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomPulley.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomRackAndPinion.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomRagDoll.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomSkeletonTransformManager.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomSlider.h" />
@@ -446,7 +447,6 @@
     <ClInclude Include="..\..\dCustomJoints\CustomUpVector.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomUserBlank.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerManager.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomWormGear.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\coreLibrary_300\projects\windows\project_vs2010\core.vcxproj">

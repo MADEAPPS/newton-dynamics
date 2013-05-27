@@ -14,8 +14,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_CustomGear_H__B631F556_B7D7_F85ECF3E9ADE_H)
-#define AFX_CustomGear_H__B631F556_B7D7_F85ECF3E9ADE_H
+#ifndef _CustomGear_H__
+#define _CustomGear_H__
 
 #include "CustomJoint.h"
 

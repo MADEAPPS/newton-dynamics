@@ -54,10 +54,31 @@ struct RAGDOLL_BONE_DEFINITION
 
 static RAGDOLL_BONE_DEFINITION skeletonRagDoll[] =
 {
-	{"Bip01_Pelvis",	"capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.00f, 0.07f, 0.16f, 20.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
-	{"Bip01_Spine",		"capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.05f, 0.07f, 0.15f, 20.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
-	{"Bip01_Spine1",	"capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.05f, 0.07f, 0.14f, 20.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
-	{"Bip01_Spine2",	"capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.05f, 0.07f, 0.12f, 20.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
+//	{"Bip01_Pelvis",	 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.01f, 0.07f, 0.16f, 20.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
+{"Bip01_Pelvis",	 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.01f, 0.01f, 0.01f, 20.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
+
+	{"Bip01_Spine",		 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.14f, 20.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
+	{"Bip01_Spine1",	 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.12f, 20.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
+	{"Bip01_Spine2",	 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.08f, 20.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
+
+	{"Bip01_L_UpperArm", "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
+//	{"Bip01_L_Forearm",  "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
+	{"Bip01_L_Hand",  "convexhull", 0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
+
+	
+	{"Bip01_R_UpperArm", "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
+//	{"Bip01_R_Forearm",  "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
+	{"Bip01_R_Hand",  "convexhull", 0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
+	
+	
+//	{"Bip01_L_Thigh", "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
+	{"Bip01_L_Calf", "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
+//	{"Bip01_L_Foot",  "convexhull", 0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
+	
+//	{"Bip01_R_Thigh", "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
+	{"Bip01_R_Calf", "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
+//	{"Bip01_R_Foot",  "convexhull", 0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f, 1}, 
+	
 	
 };
 
@@ -171,48 +192,20 @@ class RagDollManager: public CustomSkeletonTransformManager
 
 	NewtonCollision* MakeConvexHull(DemoEntity* const bodyPart) const
 	{
-		dAssert (0);
-/*
 		dVector points[1024 * 16];
 
-		int vertexCount = 0;
-		dSkinModifier* skinModifier = (dSkinModifier*) skinMeshInstance->GetModifier();
-		_ASSERTE (skinModifier);
+		DemoMesh* const mesh = bodyPart->GetMesh();
+		dAssert (mesh->m_vertexCount && (mesh->m_vertexCount < sizeof (points)/ sizeof (points[0])));
 
 		// go over the vertex array and find and collect all vertices's weighted by this bone.
-		const dVector* const weights = skinModifier->m_vertexWeight;	
-		const dBone** const skinnedBones = skinModifier->m_skinnedBones;
-		const dSkinModifier::dBoneWeightIndex* const indices = skinModifier->m_boneWeightIndex;
-		const dMesh* skin = skinMeshInstance->m_mesh;
-		for(int i = 0; i < skin->m_vertexCount; i ++) {
-			for (int j = 0 ;  (j < 4) && (weights[i][j] > 0.125f); j ++) {
-				int boneIndex = indices[i].m_index[j];
-				// if the vertex is weighted by this bone consider it part of the collision if the weight is the largest
-				if (skinnedBones[boneIndex] == bone) {
-					points[vertexCount].m_x = skin->m_vertex[i * 3 + 0];
-					points[vertexCount].m_y = skin->m_vertex[i * 3 + 1];
-					points[vertexCount].m_z = skin->m_vertex[i * 3 + 2];
-					vertexCount ++;
-					break;
-				}
-			}
+		dFloat* const array = mesh->m_vertex;
+		for (int i = 0; i < mesh->m_vertexCount; i ++) {
+			points[i].m_x = array[i * 3 + 0];
+			points[i].m_y = array[i * 3 + 1];
+			points[i].m_z = array[i * 3 + 2];
 		}
 
-		// here we have the vertex array the are part of the collision shape
-		_ASSERTE (vertexCount);
-
-		int bondMatrixIndex;
-		for (bondMatrixIndex = 0; bondMatrixIndex < skinModifier->m_bonesCount; bondMatrixIndex ++) {
-			if (bone == skinModifier->m_skinnedBones[bondMatrixIndex]) {
-				break;
-			}
-		}
-
-		const dMatrix matrix (skinModifier->m_shapeBindMatrix * skinModifier->m_bindingMatrices[bondMatrixIndex]);
-		matrix.TransformTriplex (&points[0].m_x, sizeof (dVector), &points[0].m_x, sizeof (dVector), vertexCount);
-		return NewtonCreateConvexHull (nWorld, vertexCount, &points[0].m_x, sizeof (dVector), 1.0e-3f, 0, NULL);
-*/
-		return NULL;
+		return NewtonCreateConvexHull (GetWorld(), mesh->m_vertexCount, &points[0].m_x, sizeof (dVector), 1.0e-3f, 0, NULL);
 	}
 
 
@@ -351,8 +344,6 @@ void DescreteRagDoll (DemoEntityManager* const scene)
 	// load the sky box
 	scene->CreateSkyBox();
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
-
-//CreateLevelMesh (scene, "skeleton.ngd", true);
 
 	// load a skeleton mesh for using as a ragdoll manager
 	DemoEntity ragDollModel(GetIdentityMatrix(), NULL);

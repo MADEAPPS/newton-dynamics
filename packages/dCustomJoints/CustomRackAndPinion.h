@@ -14,8 +14,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_CustomWormGear_H__B631F556_B7D7_F85ECF3E9ADE_H)
-#define AFX_CustomWormGear_H__B631F556_B7D7_F85ECF3E9ADE_H
+#ifndef _CustomWormGear_H_
+#define _CustomWormGear_H_
 
 #include "CustomJoint.h"
 
@@ -25,15 +25,13 @@
 // velErro = -(W0 * r0 + W1 * r1)
 // where w0 and W1 are the angular velocity
 // r0 and r1 are the radius of the spinning disk
-class CustomWormGear: public CustomJoint  
+class CustomRackAndPinion: public CustomJoint  
 {
 	public:
 	dAddRtti(CustomJoint);
 
-	CustomWormGear(dFloat gearRatio, 
-				   const dVector& rotationalPin, const dVector& linearPin, 
-			       NewtonBody* rotationalBody, NewtonBody* linearBody);
-	virtual ~CustomWormGear();
+	CustomRackAndPinion(dFloat gearRatio, const dVector& rotationalPin, const dVector& linearPin, NewtonBody* rotationalBody, NewtonBody* linearBody);
+	virtual ~CustomRackAndPinion();
 
 
 	protected:
