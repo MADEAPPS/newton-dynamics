@@ -49,6 +49,8 @@ void CustomTriggerController::PostUpdate(dFloat timestep, int threadIndex)
 
 void CustomTriggerController::Init (NewtonCollision* const convexShape, const dMatrix& matrix, void* const userData)
 {
+	m_userData = userData;
+
 	NewtonWorld* const world = GetManager()->GetWorld();
 
 	// create a trigger body and place in the scene

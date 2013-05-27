@@ -43,7 +43,7 @@ class CustomTriggerController
 	virtual void PostUpdate(dFloat timestep, int threadIndex);
 	
 	private:
-	void* m_usertData;
+	void* m_userData;
 	PassangerManifest m_manifest;
 	friend class CustomTriggerManager;
 };
@@ -77,12 +77,12 @@ class CustomTriggerManager: public CustomControllerManager<CustomTriggerControll
 
 inline void CustomTriggerController::SetUserData(void* const userData)
 {
-	m_usertData = userData;
+	m_userData = userData;
 }
 
 inline const void* CustomTriggerController::GetUserData() const
 {
-	return m_usertData;
+	return m_userData;
 }
 
 
