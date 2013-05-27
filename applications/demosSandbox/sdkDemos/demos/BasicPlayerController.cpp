@@ -21,7 +21,7 @@
 #include "toolBox/DebugDisplay.h"
 #include "CustomPlayerControllerManager.h"
 
-
+#define PLAYER_MASS						80.0f
 #define PLAYER_WALK_SPEED				4.0f
 #define PLAYER_THIRD_PERSON_VIEW_DIST	8.0f
 
@@ -51,7 +51,7 @@ class BasicPlayerEntity: public DemoEntity
 		playerAxis[3] = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 
 		// make the player controller, this function makes a kinematic body
-		m_controller = manager->CreatePlayer(80.0f, radius, radius * 0.5f, height, height * 0.33f, playerAxis);
+		m_controller = manager->CreatePlayer(PLAYER_MASS, radius, radius * 0.5f, height, height * 0.33f, playerAxis);
 
 		// players by default have the origin at the center of the lower bottom of the collision shape.
 		// you can change this by calling SetPlayerOrigin, for example if a player has it origin at the center of the AABB you can call 
@@ -338,13 +338,6 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	//CreateLevelMesh (scene, "sponza.ngd", true);
 	CreateLevelMesh (scene, "sibenik.ngd", true);
 
-//char xxx[256];
-//GetWorkingFileName ("test.bin", xxx);
-//FILE* const file = fopen (xxx, "rb");
-//dMatrix camMatrix(GetIdentityMatrix());
-//NewtonDeserializeBodyArray(scene->GetNewton(), DemoEntityManager::BodyDeserialization, DemoEntityManager::DeserializeFile, file);
-//fclose (file);
-
 
 	NewtonWorld* const world = scene->GetNewton();
 
@@ -364,12 +357,12 @@ void BasicPlayerController (DemoEntityManager* const scene)
 
 
 
-//	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
-//	location.m_posit.m_x += 5.0f;
-//	dVector size (2.0f, 2.0f, 2.0f, 0.0f);
-//	int count = 1;
-//	dMatrix shapeOffsetMatrix (GetIdentityMatrix());
-//	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
+	location.m_posit.m_x += 5.0f;
+	dVector size (2.0f, 2.0f, 2.0f, 0.0f);
+	int count = 1;
+	dMatrix shapeOffsetMatrix (GetIdentityMatrix());
+	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix, 10.0f);
 
 	dVector origin (-10.0f, 2.0f, 0.0f, 0.0f);
 	dQuaternion rot;
