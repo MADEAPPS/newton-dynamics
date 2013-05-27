@@ -105,32 +105,24 @@ class RagDoll: public CustomRagDoll
 	//static RagDoll* Create (const dModel& ragDollMesh, int bonesCount, const RAGDOLL_BONE_DEFINITION* definition, SceneManager* system, NewtonWorld* nWorld, const dMatrix& matrix) 
 	static RagDoll* Create (DemoEntityManager* const scene, DemoEntity* const ragDollModel, int bonesCount, const RAGDOLL_BONE_DEFINITION* const definition, const dMatrix& matrix) 
 	{
-//		OGLModel* model = new OGLModel;
-//		model->InitFromModel (ragDollMesh);
-//		model->SetMatrix(matrix);
-//		DemoEntity* const model = new DemoEntity(*ragDollMesh);
-//		model->SetMatrix (matrix);
-//		scene->Append(model);
-//		model->Release;
 
 		DemoEntity* const model = (DemoEntity*) ragDollModel->CreateClone();
 		scene->Append(model);
 
 //		model->SetMatrix (matrix);
 		
-
 		// set all matrices from root bone to mesh root to identity
 		DemoEntity* const rootBone = (DemoEntity*) model->Find (definition[0].m_boneName);
-/*
+
 //		model->SetMatrix (rootBone->CalcGlobalMatrix() * matrix);
 //		for (dBone* node = rootBone; node; node = node->GetParent()) {
 //			node->SetMatrix(GetIdentityMatrix());
 //		}
 
 		// Create the Rag doll
-		RagDoll *ragDoll = new RagDoll(model);
+//		RagDoll* const ragDoll = new RagDoll(model);
 
-
+/*
 		// find the skin mesh, if this is a skinned model
 		dMeshInstance* skinMeshInstance = NULL;
 		for (dList<dMeshInstance>::dListNode* list = model->m_meshList.GetFirst(); list; list = list->GetNext()) {
@@ -175,14 +167,15 @@ class RagDoll: public CustomRagDoll
 */
 		return NULL;
 	}
-/*
+
 	protected:
-	RagDoll(OGLModel* model)
+	RagDoll(DemoEntity* const model)
 		:CustomRagDoll ()
+		,m_model(model)
 	{
-		m_model = model;;
 	}
 
+/*
 	void GetDimentions(const dBone* bone, dVector& origin, dVector& size) const
 	{	
 		OGLMesh* mesh;
@@ -321,10 +314,11 @@ class RagDoll: public CustomRagDoll
 		// set the offset matrix 
 		NewtonReleaseCollision (nWorld, shape);
 	}
-
+*/
 
 	void ApplyBoneMatrix (int boneIndex, void* userData, const dMatrix& matrix) const
 	{
+/*
 		if (boneIndex == 0) {
 			dBone* boneNode = (dBone*) userData;
 			dMatrix rootMatrix (matrix);
@@ -354,11 +348,13 @@ class RagDoll: public CustomRagDoll
 				boneNode->SetMatrix (matrix);
 			}
 		}
+*/
 	}
 
 
 	void SubmitConstraints (dFloat timestep, int threadIndex)
 	{
+/*
 		CustomRagDoll::SubmitConstraints (timestep, threadIndex);
 
 		for (int i = 1; i < GetBoneCount(); i ++) {
@@ -366,10 +362,10 @@ class RagDoll: public CustomRagDoll
 			joint = GetJoint(i);
 			ShowJointInfo(joint);
 		}
+*/
 	}
 
-	OGLModel* m_model;
-*/
+	DemoEntity* m_model;
 };
 
 
