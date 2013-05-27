@@ -27,6 +27,7 @@ class CustomSkeletonTransformController
 {
 	CUSTOM_CONTROLLER_GLUE(CustomSkeletonTransformController);
 
+	public:
 	class dBitFieldMask
 	{
 		public: 
@@ -42,16 +43,17 @@ class CustomSkeletonTransformController
 	{
 		public: 
 		NewtonBody* m_body;
+		CustomSkeletonTransformController* m_myController;
 		int m_boneIndex;
 		int m_parentIndex;
 		dBitFieldMask m_bitField;
 	};
 
-	public:
+
 	void SetUserData(void* const userData);
 	const void* GetUserData() const;
 
-	int AddBone (NewtonBody* const bone, int parentIndex = -1);
+	dSkeletonBone* AddBone (NewtonBody* const bone, dSkeletonBone* const parentBodne = NULL);
 	void SetDefaultBitFieldMask ();
 
 	bool TestCollisionMask () const;

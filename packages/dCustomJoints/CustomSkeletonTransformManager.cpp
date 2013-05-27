@@ -51,16 +51,16 @@ void CustomSkeletonTransformController::PostUpdate(dFloat timestep, int threadIn
 {
 }
 
-int CustomSkeletonTransformController::AddBone (NewtonBody* const bone, int parentIndex)
+CustomSkeletonTransformController::dSkeletonBone* CustomSkeletonTransformController::AddBone (NewtonBody* const bone, dSkeletonBone* const parentBone)
 {
 	m_bones[m_boneCount].m_body = bone;
+	m_bones[m_boneCount].m_myController = this;
 	m_bones[m_boneCount].m_boneIndex = m_boneCount;
-	m_bones[m_boneCount].m_parentIndex = parentIndex;
-
+	m_bones[m_boneCount].m_parentIndex = parentBone ? parentBone->m_parentIndex : -1;
 
 	m_boneCount ++;
 	dAssert (m_boneCount < D_SKELETON_CONTROLLER_MAX_BONES);
-	return m_boneCount - 1;
+	return &m_bones[m_boneCount - 1];
 }
 
 void CustomSkeletonTransformController::SetDefaultBitFieldMask ()

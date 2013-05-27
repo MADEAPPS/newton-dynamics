@@ -95,6 +95,17 @@ class RagDollManager: public CustomSkeletonTransformManager
 
 	static int OnBoneAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
 	{
+		NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
+		NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
+		CustomSkeletonTransformController::dSkeletonBone* const bone0 = (CustomSkeletonTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision0);
+		CustomSkeletonTransformController::dSkeletonBone* const bone1 = (CustomSkeletonTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision1);
+
+		dAssert (bone0);
+		dAssert (bone1);
+		if (bone0->m_myController == bone0->m_myController) {
+
+		}
+
 		return 0;
 	}
 
@@ -290,14 +301,15 @@ class RagDollManager: public CustomSkeletonTransformManager
 		// add the root bone
 		DemoEntity* const rootEntity = (DemoEntity*) ragDollEntity->Find (definition[0].m_boneName);
 		NewtonBody* const rootBone = CreateRagDollBodyPart (rootEntity, definition[0]);
-		int boneIndex = controller->AddBone (rootBone);
+		CustomSkeletonTransformController::dSkeletonBone* const bone = controller->AddBone (rootBone);
+		// save the controller as te hcollsion user data, for collsion culling
+		NewtonCollisionSetUserData (NewtonBodyGetCollision(rootBone), bone);
 
-		int stackIndex;
-		int parentBoneIndex[32];
+		int stackIndex = 0;
 		DemoEntity* childEntities[32];
-		stackIndex = 0;
+		CustomSkeletonTransformController::dSkeletonBone* parentBones[32];
 		for (DemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) {
-			parentBoneIndex[stackIndex] = boneIndex;
+			parentBones[stackIndex] = bone;
 			childEntities[stackIndex] = child;
 			stackIndex ++;
 		}
@@ -306,19 +318,20 @@ class RagDollManager: public CustomSkeletonTransformManager
 		while (stackIndex) {
 			stackIndex --;
 			DemoEntity* const entity = childEntities[stackIndex];
-			int parentIndex = parentBoneIndex[stackIndex];
+			CustomSkeletonTransformController::dSkeletonBone* parentBone = parentBones[stackIndex];
 
 			const char* const name = entity->GetName().GetStr();
 			for (int i = 0; i < defintionCount; i ++) {
 				if (!strcmp (definition[i].m_boneName, name)) {
 					NewtonBody* const bone = CreateRagDollBodyPart (entity, definition[i]);
-					parentIndex = controller->AddBone (bone, parentIndex);
+					parentBone = controller->AddBone (bone, parentBone);
+					NewtonCollisionSetUserData (NewtonBodyGetCollision(bone), parentBone);
 					break;
 				}
 			}
 
 			for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
-				parentBoneIndex[stackIndex] = boneIndex;
+				parentBones[stackIndex] = parentBone;
 				childEntities[stackIndex] = child;
 				stackIndex ++;
 			}
