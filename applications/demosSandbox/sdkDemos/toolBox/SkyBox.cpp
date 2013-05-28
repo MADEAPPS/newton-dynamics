@@ -56,11 +56,11 @@ void SkyBox::Render(dFloat timeStep) const
 	glMultMatrix(&skyMatrix[0][0]);
 	
 
-	dVector color (1.0, 1.0f, 1.0f);
+	glColor3f(1.0f, 1.0f, 1.0f);
 
 	dFloat padd = 1.0e-3f;
-//	glDisable(GL_BLEND);
-//	glDisable (GL_LIGHTING);
+	glDisable(GL_BLEND);
+	glDisable (GL_LIGHTING);
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_TEXTURE_2D);	
 
@@ -122,7 +122,7 @@ void SkyBox::Render(dFloat timeStep) const
 
 //	glDepthMask(GL_TRUE);
 	glEnable(GL_DEPTH_TEST);
-//	glEnable (GL_LIGHTING);
+	glEnable (GL_LIGHTING);
 
 	// render the rest of the hierarchy
 	glPopMatrix();

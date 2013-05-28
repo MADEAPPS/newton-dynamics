@@ -160,11 +160,8 @@ void CustomLimitBallAndSocket::SubmitConstraints (dFloat timestep, int threadInd
 	    dVector q1 (p1 + twistDir1.Scale(MIN_JOINT_PIN_LENGTH));
 	    NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &twistDir0[0]);
 	} else {
-	    dFloat angle;
-
-
+	        dFloat angle = 0.0f;
 		dVector twistDirUp (matrix1.m_up - matrix0.m_front.Scale (matrix1.m_up % matrix0.m_front));
-		angle = 0.0f;
 		if ((twistDirUp % twistDirUp) > 0.25f) { 
 			dFloat x;
 			dFloat y;
