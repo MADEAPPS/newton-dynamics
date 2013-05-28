@@ -41,13 +41,11 @@ class CustomLimitBallAndSocket: public CustomBallAndSocket
 	public:
 	dAddRtti(CustomJoint);
 	CustomLimitBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
+	CustomLimitBallAndSocket(const dMatrix& childPinAndPivotFrame, NewtonBody* const child, const dMatrix& parentPinAndPivotFrame, NewtonBody* const parent);
 	virtual ~CustomLimitBallAndSocket();
-
-//	void SetChildOrientation (const dMatrix& matrix);
 
 	void SetConeAngle (dFloat angle);
 	void SetTwistAngle (dFloat minAngle, dFloat maxAngle);
-
 	protected:
 	virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	virtual void GetInfo (NewtonJointRecord* const info) const;

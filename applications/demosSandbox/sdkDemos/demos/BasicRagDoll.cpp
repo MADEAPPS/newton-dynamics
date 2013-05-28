@@ -16,8 +16,8 @@
 #include "NewtonDemos.h"
 #include "PhysicsUtils.h"
 #include "TargaToOpenGl.h"
-#include "CustomRagDollLimb.h"
 #include "DemoEntityManager.h"
+#include "CustomBallAndSocket.h"
 #include "toolBox/DebugDisplay.h"
 #include "CustomSkeletonTransformManager.h"
 
@@ -45,27 +45,31 @@ struct RAGDOLL_BONE_DEFINITION
 	dFloat m_minTwistAngle;
 	dFloat m_maxTwistAngle;
 
-	dFloat m_pitch;
-	dFloat m_yaw;
-	dFloat m_roll;
+	dFloat m_childPitch;
+	dFloat m_childYaw;
+	dFloat m_childRoll;
+
+	dFloat m_parentPitch;
+	dFloat m_parentYaw;
+	dFloat m_parentRoll;
 };
 
 
 static RAGDOLL_BONE_DEFINITION skeletonRagDoll[] =
 {
-	{"Bip01_Pelvis",	 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.01f, 0.07f, 0.16f, 30.0f,     0.0f,  -0.0f, 0.0f, 0.0f,  0.0f,  0.0f}, 
+	{"Bip01_Pelvis",	 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.01f, 0.07f, 0.16f, 30.0f,     0.0f,  -0.0f, 0.0f, 0.0f,  0.0f,  0.0f, 0.0f,  0.0f,  0.0f}, 
 
-//	{"Bip01_Spine",		 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.14f,  20.0f,   30.0f,  -30.0f, 30.0f,   0.0f, -90.0f, 0.0f}, 
-//	{"Bip01_Spine1",	 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.12f, 20.0f,    30.0f,  -30.0f, 30.0f,   0.0f, -90.0f, 0.0f}, 
-//	{"Bip01_Spine2",	 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.08f, 20.0f,    30.0f,  -30.0f, 30.0f,   0.0f, -90.0f, 0.0f}, 
+	{"Bip01_Spine",		 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.14f,  20.0f,   30.0f,  -30.0f, 30.0f,   0.0f, -90.0f, 0.0f, 0.0f, -90.0f, 0.0f}, 
+	{"Bip01_Spine1",	 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.12f, 20.0f,    30.0f,  -30.0f, 30.0f,   0.0f, -90.0f, 0.0f, 0.0f, -90.0f, 0.0f}, 
+	{"Bip01_Spine2",	 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.08f, 20.0f,    30.0f,  -30.0f, 30.0f,   0.0f, -90.0f, 0.0f, 0.0f, -90.0f, 0.0f}, 
 
-	{"Bip01_L_Thigh",	"capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,      80.0f,  0.0f,     0.0f,  90.0f, -30.0f, -90.0f}, 
-//	{"Bip01_L_Calf",    "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,      0.0f, -150.0f,    0.0f,  0.0f,   0.0f, -90.0f}, 
-//	{"Bip01_L_Foot", "convexhull", 0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f,  10.0f,      0.0f,  -45.0f,   45.0f,  0.0f,   0.0f, -90.0f}, 
+	{"Bip01_L_Thigh",	"capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,      80.0f,  0.0f,     0.0f,  0.0f, -90.0f,   0.0f,  90.0f, -30.0f, -90.0f}, 
+	{"Bip01_L_Calf",    "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,      0.0f, -150.0f,    0.0f,  0.0f,   0.0f, -90.0f,   0.0f,   0.0f, -90.0f}, 
+	{"Bip01_L_Foot", "convexhull", 0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f,  10.0f,      0.0f,  -45.0f,   45.0f,  0.0f,   0.0f, -90.0f,   0.0f,   0.0f, -90.0f}, 
 
-	{"Bip01_R_Thigh",   "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,      80.0f,  0.0f,     0.0f,  90.0f, -30.0f, 90.0f}, 
-//	{"Bip01_R_Calf",    "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  5.0f,      0.0f,    0.0f,  150.0f, 0.0f,    0.0f,  90.0f}, 
-//	{"Bip01_R_Foot",  "convexhull", 0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f, 3.0f,     0.0f,  -45.0f,   45.0f, 0.0f,    0.0f,  90.0f}, 
+	{"Bip01_R_Thigh",   "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,    80.0f,  0.0f,     0.0f,    0.0f, -90.0f,   0.0f,  90.0f, -30.0f, 90.0f}, 
+	{"Bip01_R_Calf",    "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  5.0f,      0.0f,  0.0f,  150.0f,	  0.0f,   0.0f,  90.0f,   0.0f,   0.0f, 90.0f}, 
+	{"Bip01_R_Foot",  "convexhull", 0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f, 3.0f,     0.0f,  -45.0f,   45.0f,    0.0f,   0.0f,  90.0f,   0.0f,   0.0f, 90.0f}, 
 
 //	{"Bip01_Neck",		 "capsule", 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.05f, 0.03f, 0.04f, 20.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f}, 
 //	{"Bip01_Head",		 "sphere", 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.09f, 0.09f, 0.0f, 20.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f}, 
@@ -233,7 +237,7 @@ class RagDollManager: public CustomSkeletonTransformManager
 		NewtonBodySetMaterialGroupID (bone, m_material);
 
 		// set the bod part force and torque call back to the gravity force, skip the transform callback
-//		NewtonBodySetForceAndTorqueCallback (bone, PhysicsApplyGravityForce);
+		NewtonBodySetForceAndTorqueCallback (bone, PhysicsApplyGravityForce);
 
 		// destroy the collision helper shape 
 		NewtonDestroyCollision (shape);
@@ -246,10 +250,13 @@ class RagDollManager: public CustomSkeletonTransformManager
 		dMatrix matrix;
 		NewtonBodyGetMatrix(bone, &matrix[0][0]);
 
-		dMatrix pinAndPivotInGlobalSpace (dPitchMatrix (definition.m_pitch * 3.141592f / 180.0f) * dYawMatrix (definition.m_yaw * 3.141592f / 180.0f) * dRollMatrix (definition.m_roll * 3.141592f / 180.0f));
-		pinAndPivotInGlobalSpace = pinAndPivotInGlobalSpace * matrix;
+		dMatrix parentPinAndPivotInGlobalSpace (dPitchMatrix (definition.m_parentPitch * 3.141592f / 180.0f) * dYawMatrix (definition.m_parentYaw * 3.141592f / 180.0f) * dRollMatrix (definition.m_parentRoll * 3.141592f / 180.0f));
+		parentPinAndPivotInGlobalSpace = parentPinAndPivotInGlobalSpace * matrix;
 
-		CustomRagDollLimb* const joint = new CustomRagDollLimb (pinAndPivotInGlobalSpace, bone, parent);
+		dMatrix childPinAndPivotInGlobalSpace (dPitchMatrix (definition.m_childPitch * 3.141592f / 180.0f) * dYawMatrix (definition.m_childYaw * 3.141592f / 180.0f) * dRollMatrix (definition.m_childRoll * 3.141592f / 180.0f));
+		childPinAndPivotInGlobalSpace = childPinAndPivotInGlobalSpace * matrix;
+
+		CustomLimitBallAndSocket* const joint = new CustomLimitBallAndSocket (childPinAndPivotInGlobalSpace, bone, parentPinAndPivotInGlobalSpace, parent);
 
 		joint->SetConeAngle (definition.m_coneAngle * 3.141592f / 180.0f);
 		joint->SetTwistAngle (definition.m_minTwistAngle * 3.141592f / 180.0f, definition.m_maxTwistAngle * 3.141592f / 180.0f);

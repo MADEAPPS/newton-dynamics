@@ -84,14 +84,17 @@ void CustomBallAndSocket::SubmitConstraints (dFloat timestep, int threadIndex)
 CustomLimitBallAndSocket::CustomLimitBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:CustomBallAndSocket(pinAndPivotFrame, child, parent)
 {
-	dMatrix matrix0;
-	dMatrix matrix1;
-
-	SetTwistAngle (0.0f, 0.0f);
 	SetConeAngle (0.0f);
+	SetTwistAngle (0.0f, 0.0f);
+}
 
-	// calculate the twist handle vector
-	CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
+CustomLimitBallAndSocket::CustomLimitBallAndSocket(const dMatrix& childPinAndPivotFrame, NewtonBody* const child, const dMatrix& parentPinAndPivotFrame, NewtonBody* const parent)
+	:CustomBallAndSocket(childPinAndPivotFrame, child, parent)
+{
+	SetConeAngle (0.0f);
+	SetTwistAngle (0.0f, 0.0f);
+	dMatrix matrix;
+	CalculateLocalMatrix (parentPinAndPivotFrame, matrix, m_localMatrix1);
 }
 
 
