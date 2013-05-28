@@ -16,7 +16,7 @@
 #include "NewtonDemos.h"
 #include "PhysicsUtils.h"
 #include "TargaToOpenGl.h"
-#include "CustomRagDoll.h"
+#include "CustomRagDollLimb.h"
 #include "DemoEntityManager.h"
 #include "toolBox/DebugDisplay.h"
 #include "CustomSkeletonTransformManager.h"

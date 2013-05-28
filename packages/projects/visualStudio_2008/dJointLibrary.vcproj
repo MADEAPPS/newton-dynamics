@@ -695,11 +695,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\dCustomJoints\CustomRagDoll.cpp"
+				RelativePath="..\..\dCustomJoints\CustomRagDollLimb.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\dCustomJoints\CustomRagDoll.h"
+				RelativePath="..\..\dCustomJoints\CustomRagDollLimb.h"
 				>
 			</File>
 			<File
