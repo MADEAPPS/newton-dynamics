@@ -49,10 +49,10 @@
 //#define DEFAULT_SCENE	23			// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	24			// continue collision
 //#define DEFAULT_SCENE	25			// puck slide continue collision
-#define DEFAULT_SCENE	26			// basic ragdoll
+//#define DEFAULT_SCENE	26			// basic ragdoll
 //#define DEFAULT_SCENE	27			// basic car
 //#define DEFAULT_SCENE	28			// high performance super car
-//#define DEFAULT_SCENE	29			// player controller
+#define DEFAULT_SCENE	29			// basic player controller
 //#define DEFAULT_SCENE	30			// advanced player controller
 //#define DEFAULT_SCENE	31			// cloth patch			
 //#define DEFAULT_SCENE	32			// soft bodies			

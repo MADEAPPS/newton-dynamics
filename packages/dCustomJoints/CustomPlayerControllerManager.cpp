@@ -21,8 +21,6 @@
 #define D_PLAYER_MAX_INTERGRATION_STEPS		8
 #define D_PLAYER_MAX_SOLVER_ITERATIONS		16
 
-//#define D_PLAYER_USE_CYLINDER_SHAPES
-
 
 CustomPlayerControllerManager::CustomPlayerControllerManager(NewtonWorld* const world)
 	:CustomControllerManager<CustomPlayerController> (world, PLAYER_PLUGIN_NAME)
@@ -60,6 +58,8 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 	CustomPlayerControllerManager* const manager = (CustomPlayerControllerManager*) GetManager();
 	NewtonWorld* const world = manager->GetWorld();
 
+	m_restrainingDistance = 0.0f;
+
 	m_outerRadio = outerRadius;
 	m_innerRadio = innerRadius;
 	m_height = height;
@@ -86,12 +86,8 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 	dAssert (cylinderHeight > 0.0f);
 	outerShapeMatrix.m_posit = outerShapeMatrix[0].Scale(cylinderHeight * 0.5f + stairStep);
 	outerShapeMatrix.m_posit.m_w = 1.0f;
-	#ifdef D_PLAYER_USE_CYLINDER_SHAPES
-		NewtonCollision* const bodyCylinder = NewtonCreateCylinder(world, m_outerRadio, cylinderHeight, 0, &outerShapeMatrix[0][0]);
-	#else
-		NewtonCollision* const bodyCylinder = NewtonCreateCapsule(world, 0.25f, 0.5f, 0, &outerShapeMatrix[0][0]);
-		NewtonCollisionSetScale(bodyCylinder, cylinderHeight, m_outerRadio * 4.0f, m_outerRadio * 4.0f);
-	#endif
+	NewtonCollision* const bodyCylinder = NewtonCreateCapsule(world, 0.25f, 0.5f, 0, &outerShapeMatrix[0][0]);
+	NewtonCollisionSetScale(bodyCylinder, cylinderHeight, m_outerRadio * 4.0f, m_outerRadio * 4.0f);
 
 	// compound collision player controller
 	NewtonCollision* const playerShape = NewtonCreateCompoundCollision(world, 0);
@@ -122,6 +118,7 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 
 	m_isJumping = false;
 }
+
 
 
 void CustomPlayerController::SetPlayerOrigin (dFloat originHigh)
@@ -261,8 +258,13 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 	int prevContactCount = 0;
 	CustomControllerFilterCastFilter castFilterData (body);
 	NewtonWorldConvexCastReturnInfo prevInfo[PLAYER_CONTROLLER_MAX_CONTACTS];
+
+	
+	dVector scale;
+	NewtonCollisionGetScale (m_collisionShape, &scale.m_x, &scale.m_y, &scale.m_z);
+	NewtonCollisionSetScale (m_collisionShape, m_height - m_stairStep, (m_outerRadio + m_restrainingDistance) * 4.0f, (m_outerRadio + m_restrainingDistance) * 4.0f);
 	for (int i = 0; (i < D_PLAYER_MAX_INTERGRATION_STEPS) && (normalizedTimeLeft > 1.0e-5f); i ++ ) {
-		if ((veloc % veloc) < 1.0e-5f) {
+		if ((veloc % veloc) < 1.0e-6f) {
 			break;
 		}
 
@@ -344,6 +346,7 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 			break;
 		}
 	}
+	NewtonCollisionSetScale (m_collisionShape, scale.m_x, scale.m_y, scale.m_z);
 
 	// determine if player is standing on some plane
 	if (step > 1.0e-6f) {

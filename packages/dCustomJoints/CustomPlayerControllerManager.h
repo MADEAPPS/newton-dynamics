@@ -44,6 +44,22 @@ class CustomPlayerController
 		m_maxSlope = dCos (dAbs(slopeInRadians));
 	}
 
+	dFloat GetClimbSlope () const
+	{
+		return dAcos (m_maxSlope);
+	}
+
+	void SetRestrainingDistance (dFloat distance)
+	{
+		m_restrainingDistance = dAbs (distance);
+	}
+
+	dFloat GetRestrainingDistance ()
+	{
+		return m_restrainingDistance;
+	}
+
+
 	const dVector& GetGroundPlane() const
 	{
 		return m_groundPlane;
@@ -74,6 +90,7 @@ class CustomPlayerController
 	dFloat m_height;
 	dFloat m_stairStep;
 	dFloat m_maxSlope;
+	dFloat m_restrainingDistance;
 	bool m_isJumping;
 	NewtonCollision* m_supportShape;
 	NewtonCollision* m_collisionShape;

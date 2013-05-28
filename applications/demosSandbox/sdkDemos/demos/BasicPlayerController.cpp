@@ -53,6 +53,10 @@ class BasicPlayerEntity: public DemoEntity
 		// make the player controller, this function makes a kinematic body
 		m_controller = manager->CreatePlayer(PLAYER_MASS, radius, radius * 0.5f, height, height * 0.33f, playerAxis);
 
+		// set a restraining distance that the player can not get closet than
+		m_controller->SetRestrainingDistance(0.5f);
+
+
 		// players by default have the origin at the center of the lower bottom of the collision shape.
 		// you can change this by calling SetPlayerOrigin, for example if a player has it origin at the center of the AABB you can call 
 		//m_controller->SetPlayerOrigin (height * 0.5f);
@@ -332,11 +336,11 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	// load the sky box
 	scene->CreateSkyBox();
 
-	//CreateLevelMesh (scene, "flatPlane.ngd", true);
+	CreateLevelMesh (scene, "flatPlane.ngd", true);
 	//CreateLevelMesh (scene, "playground.ngd", true);
 	//CreateLevelMesh (scene, "castle.ngd", true);
 	//CreateLevelMesh (scene, "sponza.ngd", true);
-	CreateLevelMesh (scene, "sibenik.ngd", true);
+	//CreateLevelMesh (scene, "sibenik.ngd", true);
 
 
 	NewtonWorld* const world = scene->GetNewton();
@@ -354,7 +358,6 @@ void BasicPlayerController (DemoEntityManager* const scene)
 
 	// set as the player with the camera
 	manager->SetAsPlayer(player);
-
 
 
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
