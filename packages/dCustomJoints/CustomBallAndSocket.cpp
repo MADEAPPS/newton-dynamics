@@ -45,11 +45,6 @@ void CustomBallAndSocket::GetInfo (NewtonJointRecord* const info) const
 	info->m_attachBody_0 = m_body0;
 	info->m_attachBody_1 = m_body1;
 
-//	dMatrix matrix0;
-//	dMatrix matrix1;
-//	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-//	CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
-
 	info->m_minLinearDof[0] = 0.0f;
 	info->m_maxLinearDof[0] = 0.0f;
 
@@ -125,9 +120,14 @@ void CustomLimitBallAndSocket::GetInfo (NewtonJointRecord* const info) const
 {
 	CustomBallAndSocket::GetInfo (info);
 
+	info->m_minAngularDof[0] = m_minTwistAngle;
+	info->m_maxAngularDof[0] = m_maxTwistAngle;
+	info->m_minAngularDof[1] = -dAcos (m_coneAngleCos);
+	info->m_maxAngularDof[1] =  dAcos (m_coneAngleCos);
+	info->m_minAngularDof[2] = -dAcos (m_coneAngleCos); 
+	info->m_maxAngularDof[2] =  dAcos (m_coneAngleCos);
+
 	strcpy (info->m_descriptionType, "limitballsocket");
-
-
 }
 
 void CustomLimitBallAndSocket::SubmitConstraints (dFloat timestep, int threadIndex)
