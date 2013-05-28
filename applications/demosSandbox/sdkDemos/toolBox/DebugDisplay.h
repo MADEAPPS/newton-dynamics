@@ -31,6 +31,8 @@ void RenderAABB (NewtonWorld* const world);
 void RenderCenterOfMass (NewtonWorld* const world);
 void RenderNormalForces (NewtonWorld* const world);
 void RenderContactPoints (NewtonWorld* const world); 
+void RenderJointsDebugInfo (NewtonWorld* const world, dFloat size);
+
 void DebugRenderWorldCollision (const NewtonWorld* const world, DEBUG_DRAW_MODE mode);
 
 void DebugDrawPoint (const dVector& p0, dFloat size);

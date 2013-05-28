@@ -53,19 +53,19 @@ struct RAGDOLL_BONE_DEFINITION
 
 static RAGDOLL_BONE_DEFINITION skeletonRagDoll[] =
 {
-	{"Bip01_Pelvis",	 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.01f, 0.07f, 0.16f, 20.0f,     0.0f,  -0.0f, 0.0f, 0.0f,  0.0f,  0.0f}, 
+	{"Bip01_Pelvis",	 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.01f, 0.07f, 0.16f, 30.0f,     0.0f,  -0.0f, 0.0f, 0.0f,  0.0f,  0.0f}, 
 
 	{"Bip01_Spine",		 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.14f,  20.0f,   30.0f,  -30.0f, 30.0f,   0.0f, -90.0f, 0.0f}, 
 	{"Bip01_Spine1",	 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.12f, 20.0f,    30.0f,  -30.0f, 30.0f,   0.0f, -90.0f, 0.0f}, 
 	{"Bip01_Spine2",	 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.06f, 0.07f, 0.08f, 20.0f,    30.0f,  -30.0f, 30.0f,   0.0f, -90.0f, 0.0f}, 
 
-//	{"Bip01_L_Thigh", "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f}, 
-//	{"Bip01_L_Calf",  "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f}, 
-//	{"Bip01_L_Foot",  "convexhull", 0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f}, 
+	{"Bip01_L_Thigh",	"capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,      0.0f,   -0.0f,    0.0f,  0.0f, -90.0f,   0.0f}, 
+	{"Bip01_L_Calf",    "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,      0.0f, -150.0f,    0.0f,  0.0f,   0.0f, -90.0f}, 
+	{"Bip01_L_Foot", "convexhull", 0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f,  10.0f,      0.0f,  -45.0f,   45.0f,  0.0f,   0.0f, -90.0f}, 
 
-//	{"Bip01_R_Thigh", "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f}, 
-//	{"Bip01_R_Calf",  "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f}, 
-//	{"Bip01_R_Foot",  "convexhull", 0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f}, 
+	{"Bip01_R_Thigh",   "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,      0.0f,   -0.0f,    0.0f, 0.0f,  -90.0f,  0.0f}, 
+	{"Bip01_R_Calf",    "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  5.0f,      0.0f,    0.0f,  150.0f, 0.0f,    0.0f,  90.0f}, 
+	{"Bip01_R_Foot",  "convexhull", 0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f, 3.0f,     0.0f,  -45.0f,   45.0f, 0.0f,    0.0f,  90.0f}, 
 
 //	{"Bip01_Neck",		 "capsule", 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.05f, 0.03f, 0.04f, 20.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f}, 
 //	{"Bip01_Head",		 "sphere", 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.09f, 0.09f, 0.0f, 20.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f}, 
@@ -320,8 +320,9 @@ NewtonBodySetMassMatrix(rootBone, 0.0f, 0.0f, 0.0f, 0.0f);
 		// note this container work best with a material call back for setting bit field 
 		controller->SetDefaultBitFieldMask ();
 
-
-//		matrix.m_posit = FindFloor (scene->GetNewton(), point, 10.0f);
+		// transform the entire contraction to its location
+		dMatrix worldMatrix (rootEntity->GetCurrentMatrix() * location);
+		NewtonBodySetMatrixRecursive (rootBone, &worldMatrix[0][0]);
 	}
 
 	int m_material;
@@ -339,7 +340,7 @@ void DescreteRagDoll (DemoEntityManager* const scene)
 	ragDollModel.LoadNGD_mesh ("skeleton.ngd", scene->GetNewton());
 
 
-	dVector origin (-10.0f, 2.0f, 0.0f, 0.0f);
+	dVector origin (-10.0f, 1.0f, 0.0f, 1.0f);
 
 	//  create a skeletal transform controller for controlling ragdoll
 	RagDollManager* const manager = new RagDollManager (scene);
@@ -348,7 +349,7 @@ void DescreteRagDoll (DemoEntityManager* const scene)
 
 	for (int x = 0; x < 1; x ++) {
 		for (int z = 0; z < 1; z ++) {
-			matrix.m_posit = origin + dVector (x * 3.0f + 5.0f, 0.0f, z * 3.0f, 1.0f);
+			matrix.m_posit = origin + dVector (x * 3.0f + 5.0f, 0.0f, z * 3.0f, 0.0f);
 			manager->CreateRagDoll (matrix, &ragDollModel, skeletonRagDoll, sizeof (skeletonRagDoll) / sizeof (skeletonRagDoll[0]));
 		}
 	}

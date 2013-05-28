@@ -49,10 +49,10 @@
 //#define DEFAULT_SCENE	23			// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	24			// continue collision
 //#define DEFAULT_SCENE	25			// puck slide continue collision
-//#define DEFAULT_SCENE	26			// basic ragdoll
+#define DEFAULT_SCENE	26			// basic ragdoll
 //#define DEFAULT_SCENE	27			// basic car
 //#define DEFAULT_SCENE	28			// high performance super car
-#define DEFAULT_SCENE	29			// basic player controller
+//#define DEFAULT_SCENE	29			// basic player controller
 //#define DEFAULT_SCENE	30			// advanced player controller
 //#define DEFAULT_SCENE	31			// cloth patch			
 //#define DEFAULT_SCENE	32			// soft bodies			
@@ -235,6 +235,7 @@ BEGIN_EVENT_TABLE(NewtonDemos, wxFrame)
 	EVT_MENU(ID_SHOW_NORMAL_FORCES,	NewtonDemos::OnShowNormalForces)
 	EVT_MENU(ID_SHOW_AABB, NewtonDemos::OnShowAABB)
 	EVT_MENU(ID_SHOW_CENTER_OF_MASS, NewtonDemos::OnShowCenterOfMass)
+	EVT_MENU(ID_SHOW_JOINTS, NewtonDemos::OnShowShowJoints)
 	EVT_MENU(ID_USE_PARALLEL_SOLVER, NewtonDemos::OnUseParallelSolver)
 
 	EVT_MENU_RANGE(ID_DYNAMICS_BROADPHASE, ID_HYBRID_BROADPHASE, NewtonDemos::OnBroadPhaseType)
@@ -277,6 +278,7 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	,m_showNormalForces(false)
 //	,m_showNormalForces(true)
 	,m_showAABB(false)
+	,m_showJoints(false)
 	,m_showCenterOfMass(false)
 	,m_concurrentProfilerState(false)
 	,m_threadProfilerState(false)
@@ -376,6 +378,8 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 		wxMenu* const optionsMenu = new wxMenu;;
 
 		optionsMenu->AppendCheckItem(ID_AUTOSLEEP_MODE, _("Auto sleep mode"), _("toogle auto sleep bodies"));
+//		optionsMenu->AppendCheckItem(ID_USE_PARALLEL_SOLVER, _("Parallel solver on"));
+		optionsMenu->Check (ID_AUTOSLEEP_MODE, m_autoSleepState);
 
 		optionsMenu->AppendSeparator();
 		optionsMenu->AppendRadioItem(ID_SHOW_COLLISION_MESH, _("Hide collision Mesh"));
@@ -388,9 +392,8 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 		optionsMenu->AppendCheckItem(ID_SHOW_NORMAL_FORCES, _("Show normal forces"));
 		optionsMenu->AppendCheckItem(ID_SHOW_AABB, _("Show aabb"));
 		optionsMenu->AppendCheckItem(ID_SHOW_CENTER_OF_MASS, _("Show center of mass"));
-		optionsMenu->AppendCheckItem(ID_USE_PARALLEL_SOLVER, _("Parallel solver on"));
-
-		optionsMenu->Check (ID_AUTOSLEEP_MODE, m_autoSleepState);
+		optionsMenu->AppendCheckItem(ID_SHOW_JOINTS, _("show Joint debug info"));
+	
 
 		optionsMenu->AppendSeparator();
 		int platformsCount = NewtonEnumrateDevices (m_scene->GetNewton());
@@ -719,6 +722,12 @@ void NewtonDemos::OnShowCenterOfMass(wxCommandEvent& event)
 	END_MENU_OPTION();
 }
 
+void NewtonDemos::OnShowShowJoints(wxCommandEvent& event)
+{
+	BEGIN_MENU_OPTION();
+	m_showJoints = event.IsChecked(); 
+	END_MENU_OPTION();
+}
 
 
 void NewtonDemos::OnUseParallelSolver(wxCommandEvent& event)

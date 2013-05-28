@@ -46,7 +46,6 @@ typedef void (dgApi *ConstraintsForceFeeback) (const dgConstraint& me, dgFloat32
 class dgConstraintInfo
 {
 	public:
-
 	dgMatrix m_attachMatrix_0;
 	dgMatrix m_attachMatrix_1;
 	dgFloat32 m_minLinearDof[3];
@@ -55,9 +54,9 @@ class dgConstraintInfo
 	dgFloat32 m_maxAngularDof[3];
 	dgBody* m_attachBody_0;
 	dgBody* m_attachBody_1;
-	dgFloat32 m_extraParameters[16];
+	dgFloat32 m_extraParameters[64];
 	dgInt32 m_collideCollisionOn;
-	char m_discriptionType[16];
+	char m_discriptionType[64];
 };
 
 

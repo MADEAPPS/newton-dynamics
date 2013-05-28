@@ -802,65 +802,20 @@ dgInt32 dgWorld::GetConstraintsCount() const
 }
 
 
-/*
-dgLink* dgWorld::FindConstraintLink (const dgBody* const body0, const dgBody* const body1) const
-{
-	dgAssert (0);
-
-	dgLink *ptr;
-	dgLink *link;
-
-	dgAssert (body0);
-	if (!body0) {
-		dgAssert (0);
-		Swap (body0, body1);
-	}
-
-	if (body0) {
-		link = body0->m_firstConstraintLink;
-		if (link) {
-			ptr = link;
-			do {
-				dgAssert (ptr->m_body == body0);
-				if (ptr->m_twin->m_body == body1) {
-					return ptr;
-				}
-			
-				ptr = ptr->m_twin->m_next;
-			} while (ptr != link);
-		}
-	}
-
-	return NULL;
-}
-*/
-/*
-dgConstraint* dgWorld::GetConstraint (const dgLink* constraintLink) const
-{
-	return constraintLink->m_constraint;
-}
-*/
-
-
-
 void dgWorld::BodySetMatrix (dgBody* const body, const dgMatrix& matrix)
 {
-
 	#define DG_RECURSIVE_SIZE	1024
-	dgInt32 index;
+
 	dgBody* queue[DG_RECURSIVE_SIZE];
 
-
-	index = 1;
+	dgInt32 index = 1;
 	queue[0] = body;
 	m_genericLRUMark ++;
 	body->m_genericLRUMark = m_genericLRUMark;
 	dgMatrix relMatrix (body->GetMatrix().Inverse() * matrix);
 	while (index) {
-		dgBody* body;
-		
 		index --;
-		body = queue[index];
+		dgBody* body = queue[index];
 		dgAssert (body != m_sentionelBody);
 
 		m_broadPhase->Remove (body);
@@ -890,183 +845,6 @@ void dgWorld::BodySetMatrix (dgBody* const body, const dgMatrix& matrix)
 	}
 }
 
-
-/*
-void dgWorld::AddBodyImpulse (dgBody* body, const dgVector& pointVeloc, const dgVector& pointPosit)
-{
-	if (body->m_invMass.m_w > dgFloat32 (0.0f)) {
-//		UnfreezeBody (body);
-		body->AddImpulse (pointVeloc, pointPosit);
-	}
-}
-
-void dgWorld::ApplyImpulseArray (dgBody* body, dgInt32 count, dgInt32 strideInBytes, const dgFloat32* const impulseArray, const dgFloat32* const pointArray)
-{
-	if (body->m_invMass.m_w > dgFloat32 (0.0f)) {
-		//		UnfreezeBody (body);
-		body->ApplyImpulseArray (count, strideInBytes, impulseArray, pointArray);
-	}
-}
-
-
-dgInt32 dgWorld::GetBodyArray (dgBody* root, dgBody** array, dgInt32 maxSize) const
-{
-	dgAssert (0);
-	return 0;
-
-	dgInt32 i;
-	dgInt32 count;
-	dgLink* ptr;
-	dgLink* link;
-	dgBody* body;
-	dgConstraint* constraint;
-	dgLink* stack[2048];
-	const dgInt64 mask = dgInt64 (65536) * dgInt64 (65536) * dgInt64 (65536) * dgInt64 (4096);
-
-	count = 0;
-	link = root->m_firstConstraintLink; 
-	if (link) {
-		root->m_lru |= mask;
-		stack[0] = link;
-		i = 1;
-		while (i) {
-			i --;
-			link = stack[i];
-			ptr = link;
-			do {
-				body = ptr->m_twin->m_body;
-				if (body) {
-					dgAssert (body);
-					if (~body->m_lru & mask) {
-						constraint = ptr->m_constraint;
-						if (constraint->IsBilateral()) {
-							if (count <	maxSize) {
-								array[count] = body; 
-								count ++;
-							}
-							stack[i] = ptr->m_twin;
-							i ++;
-						}
-						body->m_lru |= mask;
-					}
-				}
-
-				ptr = ptr->m_twin->m_next;
-			} while (ptr != link);
-		}
-
-		link = root->m_firstConstraintLink; 
-		root->m_lru &= ~ mask;
-		stack[0] = link;
-		i = 1;
-		while (i) {
-			i --;
-			link = stack[i];
-			ptr = link;
-			do {
-				body = ptr->m_twin->m_body;
-				if (body) {
-					dgAssert (body);
-					if (body->m_lru & mask) {
-						constraint = ptr->m_constraint;
-						if (constraint->IsBilateral()) {
-							stack[i] = ptr->m_twin;
-							i ++;
-						}
-						body->m_lru &= ~ mask;
-					}
-				}
-				ptr = ptr->m_twin->m_next;
-			} while (ptr != link);
-		}
-	}
-
-	return count;
-}
-
-
-dgInt32 dgWorld::GetConstraintArray (dgConstraint* root, dgConstraint** constraintArray, dgInt32 maxSize) const
-{
-dgAssert (0);
-return 0;
-
-	dgInt32 i;
-	dgInt32 stack;
-	dgInt32 count;
-	dgLink* ptr;
-	dgLink* link;
-	dgBody* body;
-	dgConstraint* constraint;
-	dgConstraint* constraintPtr;
-	dgConstraint* stackPool[2048];
-	const dgInt64 mask = dgInt64 (65536) * dgInt64 (65536) * dgInt64 (65536) * dgInt64 (4096);
-
-	count = 0;
-	stack = 1;
-	stackPool[0] = root;
-	root->m_lru |= mask;
-
-	while (stack && (count < maxSize)) {
-		stack --;
-		constraint = stackPool[stack];
-		constraintArray[count] = constraint;
-		count ++;
-
-		body = constraint->m_body0;
-		if (body && (body->m_invMass.m_w != dgFloat32 (0.0f))) {
-			link = body->m_firstConstraintLink; 
-			dgAssert (link);
-			ptr = link;
-			do {
-				constraintPtr = ptr->m_constraint;
-				if (!(constraintPtr->m_lru & mask)) {
-					constraintPtr->m_lru |= mask;
-					stackPool[stack] = constraintPtr;
-					stack ++;
-				}
-			
-				ptr = ptr->m_twin->m_next;
-			} while (ptr != link); 
-		}
-
-		body = constraint->m_body1;
-		if (body && (body->m_invMass.m_w != dgFloat32 (0.0f))) {
-			link = body->m_firstConstraintLink; 
-			dgAssert (link);
-			ptr = link;
-			do {
-				constraintPtr = ptr->m_constraint;
-				if (!(constraintPtr->m_lru & mask)) {
-					constraintPtr->m_lru |= mask;
-					stackPool[stack] = constraintPtr;
-					stack ++;
-				}
-
-				ptr = ptr->m_twin->m_next;
-			} while (ptr != link); 
-		}
-	} 
-
-	for (i = 0; i < stack; i ++) {
-		constraint = stackPool[i];
-		constraint->m_lru &= ~mask;
-	}
-
-	for (i = 0; i < count; i ++) {
-		constraint = constraintArray[i];
-		constraint->m_lru &= ~mask;
-
-		#ifdef _DEBUG
-		for (stack = i + 1; stack < count; stack ++) {                                                                 
-			dgAssert (constraint != constraintArray[stack]);
-		}
-		#endif                             
-	}
-
-	return count;
-
-}
-*/
 
 bool dgWorld::AreBodyConnectedByJoints (dgBody* const originSrc, dgBody* const targetSrc)
 {

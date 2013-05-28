@@ -903,6 +903,10 @@ void DemoEntityManager::RenderFrame ()
 		RenderCenterOfMass (GetNewton());
 	}
 
+	if (m_mainWindow->m_showJoints) {
+		RenderJointsDebugInfo (GetNewton(), 0.5f);
+	}
+
 
    DEBUG_DRAW_MODE mode = m_solid;
    if (m_mainWindow->m_debugDisplayMode) {

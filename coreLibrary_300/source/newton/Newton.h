@@ -272,9 +272,9 @@ extern "C" {
 		dFloat m_maxAngularDof[3];
 		const NewtonBody* m_attachBody_0;
 		const NewtonBody* m_attachBody_1;
-		dFloat m_extraParameters[16];
+		dFloat m_extraParameters[64];
 		int	m_bodiesCollisionOn;
-		char m_descriptionType[32];
+		char m_descriptionType[128];
 	};
 
 	

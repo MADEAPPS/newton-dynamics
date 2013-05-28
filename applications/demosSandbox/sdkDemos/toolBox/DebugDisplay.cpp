@@ -58,7 +58,6 @@ static void RenderBodyContactsAndTangentDiretions (NewtonBody* const body, float
 
 static void RenderBodyContactsForces (NewtonBody* const body, float scale)
 {
-
 	dFloat mass;
 	dFloat Ixx;
 	dFloat Iyy;
@@ -431,4 +430,72 @@ void ShowMeshCollidingFaces (const NewtonBody* const staticCollisionBody, const 
 
 	}
 #endif
+}
+
+
+
+void RenderJointsDebugInfo (NewtonWorld* const world, dFloat size)
+{
+	glDisable(GL_TEXTURE_2D);
+	glDisable (GL_LIGHTING);
+	glBegin(GL_LINES);
+
+	// this will go over the joint list twice, 
+	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {	
+		for (NewtonJoint* joint = NewtonBodyGetFirstJoint(body); joint; joint = NewtonBodyGetNextJoint(body, joint)) {
+			NewtonJointRecord info;
+			NewtonJointGetInfo (joint, &info);
+
+			// draw first frame
+			dMatrix matrix0;
+			NewtonBodyGetMatrix (info.m_attachBody_0, &matrix0[0][0]);
+
+			matrix0 = dMatrix (&info.m_attachmenMatrix_0[0][0]) * matrix0;
+
+			dVector o (matrix0.m_posit);
+
+			dVector x (o + matrix0.RotateVector (dVector (size, 0.0f, 0.0f, 0.0f)));
+			glColor3f (1.0f, 0.0f, 0.0f);
+			glVertex3f (o.m_x, o.m_y, o.m_z);
+			glVertex3f (x.m_x, x.m_y, x.m_z);
+
+			dVector y (o + matrix0.RotateVector (dVector (0.0f, size, 0.0f, 0.0f)));
+			glColor3f (0.0f, 1.0f, 0.0f);
+			glVertex3f (o.m_x, o.m_y, o.m_z);
+			glVertex3f (y.m_x, y.m_y, y.m_z);
+
+			dVector z (o + matrix0.RotateVector (dVector (0.0f, 0.0f, size, 0.0f)));
+			glColor3f (0.0f, 0.0f, 1.0f);
+			glVertex3f (o.m_x, o.m_y, o.m_z);
+			glVertex3f (z.m_x, z.m_y, z.m_z);
+
+
+			// draw second first frame
+			dMatrix matrix1;
+			NewtonBodyGetMatrix (info.m_attachBody_1, &matrix1[0][0]);
+
+			matrix1 = dMatrix (&info.m_attachmenMatrix_1[0][0]) * matrix1;
+
+			o = matrix1.m_posit;
+
+			x = o + matrix1.RotateVector (dVector (size, 0.0f, 0.0f, 0.0f));
+			glColor3f (1.0f, 0.0f, 0.0f);
+			glVertex3f (o.m_x, o.m_y, o.m_z);
+			glVertex3f (x.m_x, x.m_y, x.m_z);
+
+			y = o + matrix1.RotateVector (dVector (0.0f, size, 0.0f, 0.0f));
+			glColor3f (0.0f, 1.0f, 0.0f);
+			glVertex3f (o.m_x, o.m_y, o.m_z);
+			glVertex3f (y.m_x, y.m_y, y.m_z);
+
+			z = o + matrix1.RotateVector (dVector (0.0f, 0.0f, size, 0.0f));
+			glColor3f (0.0f, 0.0f, 1.0f);
+			glVertex3f (o.m_x, o.m_y, o.m_z);
+			glVertex3f (z.m_x, z.m_y, z.m_z);
+
+
+		}
+	}
+
+	glEnd();
 }

@@ -162,10 +162,8 @@ void  CustomJoint::SubmitConstraints (const NewtonJoint* const me, dFloat timest
 
 void CustomJoint::GetInfo (const NewtonJoint* const me, NewtonJointRecord* info)
 {
-	CustomJoint* joint;  
-
 	// get the pointer to the joint class
-	joint = (CustomJoint*) NewtonJointGetUserData (me);  
+	CustomJoint* const joint = (CustomJoint*) NewtonJointGetUserData (me);  
 	joint->GetInfo(info);
 }
 
