@@ -313,7 +313,7 @@
 			Name="debugDll|Win32"
 			OutputDirectory="$(PlatformName)/$(ProjectName)/$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)/$(ProjectName)/$(ConfigurationName)"
-			ConfigurationType="4"
+			ConfigurationType="2"
 			CharacterSet="1"
 			WholeProgramOptimization="0"
 			>
@@ -339,7 +339,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;_NEWTON_BUILD_DLL;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -362,11 +362,13 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/$(ProjectName)_d.lib"
+				Name="VCLinkerTool"
 			/>
 			<Tool
 				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -376,6 +378,9 @@
 			/>
 			<Tool
 				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -386,7 +391,7 @@
 			Name="debugDll|x64"
 			OutputDirectory="$(PlatformName)/$(ProjectName)/$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)/$(ProjectName)/$(ConfigurationName)"
-			ConfigurationType="4"
+			ConfigurationType="2"
 			CharacterSet="1"
 			WholeProgramOptimization="0"
 			>
@@ -413,7 +418,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;_NEWTON_BUILD_DLL;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -436,11 +441,13 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/$(ProjectName)_d.lib"
+				Name="VCLinkerTool"
 			/>
 			<Tool
 				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -452,6 +459,9 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
 				CommandLine=""
 			/>
@@ -460,7 +470,7 @@
 			Name="releaseDll|Win32"
 			OutputDirectory="$(PlatformName)/$(ProjectName)/$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)/$(ProjectName)/$(ConfigurationName)"
-			ConfigurationType="4"
+			ConfigurationType="2"
 			CharacterSet="1"
 			WholeProgramOptimization="0"
 			>
@@ -487,7 +497,7 @@
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="false"
 				AdditionalIncludeDirectories="../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_NEWTON_BUILD_DLL;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="0"
 				EnableEnhancedInstructionSet="0"
 				FloatingPointModel="0"
@@ -508,10 +518,13 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
+				Name="VCLinkerTool"
 			/>
 			<Tool
 				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -523,6 +536,9 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
 				CommandLine=""
 			/>
@@ -531,7 +547,7 @@
 			Name="releaseDll|x64"
 			OutputDirectory="$(PlatformName)/$(ProjectName)/$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)/$(ProjectName)/$(ConfigurationName)"
-			ConfigurationType="4"
+			ConfigurationType="2"
 			CharacterSet="1"
 			WholeProgramOptimization="0"
 			>
@@ -559,7 +575,7 @@
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="false"
 				AdditionalIncludeDirectories="../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_NEWTON_BUILD_DLL;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="0"
 				EnableEnhancedInstructionSet="0"
 				FloatingPointModel="2"
@@ -580,10 +596,13 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
+				Name="VCLinkerTool"
 			/>
 			<Tool
 				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -593,6 +612,9 @@
 			/>
 			<Tool
 				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"

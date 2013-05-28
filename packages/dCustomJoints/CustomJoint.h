@@ -35,7 +35,7 @@ typedef void (*JointUserSubmitConstraintCallback) (const NewtonUserJoint* const 
 
 // this is the base class to implement custom joints, it is not a joint it just provide functionality
 // for the user to implement it own joints
-class CustomJoint  
+class NEWTON_API CustomJoint  
 {
 	public:
 	struct AngularIntegration

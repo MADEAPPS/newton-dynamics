@@ -48,14 +48,6 @@
 #endif
 
 
-
-#ifndef _MSC_VER
-	#ifndef _NEWTON_STATIC_LIB
-		#define _NEWTON_STATIC_LIB
-	#endif
-#endif
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <Newton.h>
