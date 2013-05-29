@@ -876,10 +876,6 @@ void dTreeAllocator<OBJECT, KEY>::Free(void* const ptr)
 	}
 }
 
-
-//template<class OBJECT, class KEY, class Allocator> 
-//dTreeAllocator<OBJECT, KEY> dTree<OBJECT, KEY, Allocator>::m_allocator;
-
 #endif
 
 

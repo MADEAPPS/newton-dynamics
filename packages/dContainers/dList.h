@@ -330,22 +330,6 @@ typename dList<T, Allocator>::dListNode* dList<T, Allocator>::GetLast() const
 {
 	return m_last;
 }
-/*
-template<class T, class Allocator>
-typename dList<T, Allocator>::dListNode* dList<T, Allocator>::Append (dListNode* const node)
-{
-	m_count	++;
-	if (m_first == NULL) {
-		m_last = node;
-		m_first = node;
-	} else {
-		m_last->AddLast (node);
-		m_last = node;
-	}
-	dAssert (Sanity());
-	return m_last;
-}
-*/
 
 template<class T, class Allocator>
 typename dList<T, Allocator>::dListNode* dList<T, Allocator>::Append ()
@@ -382,21 +366,6 @@ typename dList<T, Allocator>::dListNode* dList<T, Allocator>::Append (const T &e
 	dAssert (Sanity());
 	return m_last;
 }
-/*
-template<class T, class Allocator>
-typename dList<T, Allocator>::dListNode* dList<T, Allocator>::Addtop (dListNode* const node)
-{
-	m_count	++;
-	if (m_last == NULL) {
-		m_last = node;
-		m_first = node;
-	} else {
-		m_first->AddFirst(node);
-		m_first = node;
-	}
-	return m_first;
-}
-*/
 
 template<class T, class Allocator>
 typename dList<T, Allocator>::dListNode* dList<T, Allocator>::Addtop ()
@@ -603,10 +572,6 @@ void dListAllocator<T>::Free(void* const ptr)
 		Flush();
 	}
 }
-
-
-//template<class T, class Allocator>
-//dListAllocator<T> dList<T, Allocator>::m_allocator;
 
 #endif
 
