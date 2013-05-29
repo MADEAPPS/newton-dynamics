@@ -132,7 +132,6 @@ class dgParallelSolverSyncData
 		memset (this, 0, sizeof (dgParallelSolverSyncData));
 	}
 
-//	dgWorld* m_world;
 	dgFloat32 m_timestep;
 	dgFloat32 m_invTimestep;
 	dgFloat32 m_invStepRK;
@@ -304,12 +303,14 @@ class dgWorldDynamicUpdate
 	void IntegrateArray (const dgIsland* const island, dgFloat32 accelTolerance, dgFloat32 timestep, dgInt32 threadID) const;
 	dgInt32 GetJacobianDerivatives (const dgIsland* const island, dgInt32 threadID, bool bitMode, dgInt32 rowBase, dgInt32 rowCount, dgFloat32 timestep) const;	
 
+	bool ValidateEquilibrium (dgConstraint* const joint);
 	void IntegrateSoftBody (dgWorldDynamicUpdateSyncDescriptor* const descriptor, dgInt32 threadID);
 
 	dgInt32 m_bodies;
 	dgInt32 m_joints;
 	dgInt32 m_islands;
 	dgUnsigned32 m_markLru;
+	dgUnsigned32 m_equilibriumMark;
 	mutable dgInt32 m_rowCountAtomicIndex;
 	dgJacobianMemory m_solverMemory;
 	dgThread::dgCriticalSection m_softBodyCriticalSectionLock;

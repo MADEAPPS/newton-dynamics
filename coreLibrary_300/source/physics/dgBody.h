@@ -229,6 +229,7 @@ class dgBody
 	dgInt32 m_type;
 	dgUnsigned32 m_dynamicsLru;	
 	dgUnsigned32 m_genericLRUMark;
+	dgUnsigned32 m_equilibriumMark;
 	dgThread::dgCriticalSection m_criticalSectionLock;
 
 	union 
