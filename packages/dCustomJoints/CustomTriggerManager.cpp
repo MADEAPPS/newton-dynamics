@@ -17,6 +17,59 @@
 #include "CustomTriggerManager.h"
 
 
+CustomTriggerController::PassangerManifest::PassangerManifest ()
+	:m_count(0)
+	,m_capacity(0)
+	,m_passangerList (NULL)
+{
+}
+
+CustomTriggerController::PassangerManifest::~PassangerManifest ()
+{
+	if (m_passangerList) {
+		NewtonFree(m_passangerList);
+	}
+}
+
+
+
+CustomTriggerController::PassangerManifest::Passenger* CustomTriggerController::PassangerManifest::Find (NewtonBody* const m_body)
+{
+	// for now just do a lnera search
+	// if m_count is even large that 16 then its time to chnag ethe algorithm 
+	dAssert (m_count < 16);
+	for (int i = 0; i < m_count; i ++) {
+		if (m_passangerList[i].m_body == m_body) {
+			return &m_passangerList[i];
+		}
+	}
+	return NULL;
+}
+
+CustomTriggerController::PassangerManifest::Passenger* CustomTriggerController::PassangerManifest::Insert (NewtonBody* const m_body)
+{
+	dAssert (m_count <= m_capacity);
+
+	if (m_count == m_capacity) {
+		if (m_capacity == 0) {
+			m_capacity = 4;
+			m_passangerList = (Passenger*) NewtonAlloc(m_capacity * sizeof (Passenger));
+		} else {
+			Passenger* const oldList = m_passangerList;
+			m_passangerList = (Passenger*) NewtonAlloc(2 * m_capacity * sizeof (Passenger));
+			memcpy (m_passangerList, oldList, m_capacity * sizeof (Passenger));
+			NewtonFree(oldList);
+			m_capacity = m_capacity * 2;
+		}
+	}
+	Passenger* const passenger = &m_passangerList[m_count];
+	passenger->m_lru = 0;
+	passenger->m_body = m_body;
+	m_count ++;
+	return passenger;
+}
+
+
 CustomTriggerManager::CustomTriggerManager(NewtonWorld* const world)
 	:CustomControllerManager<CustomTriggerController>(world, TRIGGER_PLUGIN_NAME)
 	,m_lru(0)
@@ -74,23 +127,25 @@ void CustomTriggerController::PreUpdate(dFloat timestep, int threadIndex)
 		NewtonBody* const body0 = NewtonJointGetBody0(joint);
 		NewtonBody* const body1 = NewtonJointGetBody1(joint);
 		NewtonBody* const passangerBody = (body0 != triggerBody) ? body0 : body1; 
-		PassangerManifest::dTreeNode* node = m_manifest.Find (passangerBody);
-		if (!node) {
-			node = m_manifest.Insert (passangerBody);
+		//PassangerManifest::dTreeNode* node = m_manifest.Find (passangerBody);
+		PassangerManifest::Passenger* passenger = m_manifest.Find (passangerBody);
+		if (!passenger) {
+			//node = m_manifest.Insert (passangerBody);
+			passenger = m_manifest.Insert (passangerBody);
 			manager->EventCallback (this, CustomTriggerManager::m_enterTrigger, passangerBody);
 		} else {
 			manager->EventCallback (this, CustomTriggerManager::m_inTrigger, passangerBody);
 		}
-		node->GetInfo() = lru;
+		passenger->m_lru = lru;
 	}
 	
-	PassangerManifest::Iterator iter (m_manifest);
-	for (iter.Begin(); iter; ) {
-		PassangerManifest::dTreeNode* const node = iter.GetNode();
-		iter ++;
-		if (node->GetInfo() != lru) {
-			manager->EventCallback (this, CustomTriggerManager::m_exitTrigger, node->GetKey());			
-			m_manifest.Remove(node);
+	for (int i = 0; i < m_manifest.m_count; i ++) {
+		PassangerManifest::Passenger* const node = &m_manifest.m_passangerList[i];
+		if (node->m_lru != lru) {
+			manager->EventCallback (this, CustomTriggerManager::m_exitTrigger, node->m_body);			
+			m_manifest.m_passangerList[i] = m_manifest.m_passangerList[m_manifest.m_count - 1];
+			i --;
+			m_manifest.m_count --;
 		}
 	}
 }

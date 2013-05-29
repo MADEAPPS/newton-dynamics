@@ -375,9 +375,13 @@ void DemoEntityManager::InitGraphicsSystem()
 	glewInit();
 	
 #if defined (_MSC_VER)
-	wglSwapIntervalEXT(0);
+	if (wglSwapIntervalEXT) {
+		wglSwapIntervalEXT(0);
+	}
 #elif defined(_POSIX_VER)
-	glXSwapIntervalSGI(0);  //NOTE check for GLX_SGI_swap_control extension : http://www.opengl.org/wiki/Swap_Interval#In_Linux_.2F_GLXw
+	if (glXSwapIntervalSGI) {
+		glXSwapIntervalSGI(0);  //NOTE check for GLX_SGI_swap_control extension : http://www.opengl.org/wiki/Swap_Interval#In_Linux_.2F_GLXw
+	}
 #elif defined(_MACOSX_VER)
 	// aglSetInteger (AGL_SWAP_INTERVAL, 0);
     wglSwapIntervalEXT (GetContext()->GetWXGLContext());

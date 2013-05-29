@@ -35,7 +35,26 @@ class CustomTriggerController
 	const void* GetUserData() const;
 	
 	protected:
-	class PassangerManifest: public dTree<unsigned, NewtonBody*>{};
+	class PassangerManifest
+	{
+		public:
+		class Passenger
+		{
+			public:
+			unsigned m_lru;
+			NewtonBody* m_body;
+		};
+
+		PassangerManifest ();
+		~PassangerManifest ();
+
+		Passenger* Find (NewtonBody* const m_body);
+		Passenger* Insert (NewtonBody* const m_body);
+
+		int m_count;
+		int m_capacity;
+		Passenger* m_passangerList;
+	};
 
 	void Init (NewtonCollision* const convexShape, const dMatrix& matrix, void* const userData);
 
