@@ -650,29 +650,6 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 		m_islands ++;
 		m_bodies += bodyCount;
 		m_joints += jointCount;
-
-/*		
-		#ifdef _DEBUG
-			dgIsland* const island = &islandArray[m_islands-1];
-			dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
-			dgJointInfo* const constraintArray = &constraintArrayPtr[island->m_jointStart];
-
-			dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
-			dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart]; 
-			for (dgInt32 i = 0; i < jointCount; i ++) {
-				dgJointInfo* const jointInfo = &constraintArray[i];
-				dgConstraint* const constraint = jointInfo->m_joint;
-
-				dgInt32 m0 = (constraint->m_body0->m_invMass.m_w != dgFloat32(0.0f)) ? constraint->m_body0->m_index: 0;
-				dgInt32 m1 = (constraint->m_body1->m_invMass.m_w != dgFloat32(0.0f)) ? constraint->m_body1->m_index: 0;
-
-				dgAssert (!m0 || (bodyArray[m0].m_body == constraint->m_body0));
-				dgAssert (!m1 || (bodyArray[m1].m_body == constraint->m_body1));
-				dgAssert (m0 < island->m_bodyCount);
-				dgAssert (m1 < island->m_bodyCount);
-			}
-		#endif
-*/
 	}
 }
 
