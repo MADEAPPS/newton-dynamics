@@ -570,6 +570,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 						dgAssert (!constraint->m_isUnilateral || (constraint->m_isUnilateral && ((constraint->m_body0 == world->m_sentionelBody) || (constraint->m_body1 == world->m_sentionelBody))));
 
 						constraint->m_index = dgUnsigned32 (jointCount);
+						constraint->m_equilibrium = false;
 						dgJointInfo* const constraintArray = (dgJointInfo*) &world->m_jointsMemory[0];
 						constraintArray[jointIndex].m_joint = constraint;
 
@@ -609,16 +610,18 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 		world->m_islandMemory.ExpandCapacityIfNeessesary (m_islands, sizeof (dgIsland));
 		dgJointInfo* const constraintArray = (dgJointInfo*) &world->m_jointsMemory[0];
 
-//		for (dgInt32 i = 0; i < jointCount; i ++) {
-//			dgConstraint* const joint = constraintArray[m_joints + i].m_joint;
-//			dgBody* const body0 = joint->m_body0;
-//			dgBody* const body1 = joint->m_body1;
-//			bool equilibrium = false;
-//			if (body0->m_equilibrium & body1->m_equilibrium) {
-//				equilibrium = true;
-//			}
-//			joint->m_equilibrium = equilibrium;
-//		}
+		if (jointCount > 64) {
+	//		for (dgInt32 i = 0; i < jointCount; i ++) {
+	//			dgConstraint* const joint = constraintArray[m_joints + i].m_joint;
+	//			dgBody* const body0 = joint->m_body0;
+	//			dgBody* const body1 = joint->m_body1;
+	//			bool equilibrium = false;
+	//			if (body0->m_equilibrium & body1->m_equilibrium) {
+	//				equilibrium = true;
+	//			}
+	//			joint->m_equilibrium = equilibrium;
+	//		}
+		}
 
 		dgIsland* const islandArray = (dgIsland*) &world->m_islandMemory[0];
 
