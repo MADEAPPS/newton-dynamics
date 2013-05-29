@@ -607,6 +607,18 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 		}
 
 		world->m_islandMemory.ExpandCapacityIfNeessesary (m_islands, sizeof (dgIsland));
+		dgJointInfo* const constraintArray = (dgJointInfo*) &world->m_jointsMemory[0];
+
+//		for (dgInt32 i = 0; i < jointCount; i ++) {
+//			dgConstraint* const joint = constraintArray[m_joints + i].m_joint;
+//			dgBody* const body0 = joint->m_body0;
+//			dgBody* const body1 = joint->m_body1;
+//			bool equilibrium = false;
+//			if (body0->m_equilibrium & body1->m_equilibrium) {
+//				equilibrium = true;
+//			}
+//			joint->m_equilibrium = equilibrium;
+//		}
 
 		dgIsland* const islandArray = (dgIsland*) &world->m_islandMemory[0];
 
@@ -624,7 +636,6 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 
 		if (hasExactSolverJoints) {
 			dgInt32 contactsCount = 0;
-			dgJointInfo* const constraintArray = (dgJointInfo*) &world->m_jointsMemory[0];
 			for (dgInt32 i = 0; i < jointCount; i ++) {
 				dgConstraint* const joint = constraintArray[m_joints + i].m_joint;
 				contactsCount += (joint->GetId() == dgConstraint::m_contactConstraint); 
