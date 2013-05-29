@@ -717,14 +717,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\dCustomJoints\CustomRagDollLimb.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dCustomJoints\CustomRagDollLimb.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\dCustomJoints\CustomSlider.cpp"
 				>
 			</File>
