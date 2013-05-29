@@ -23,7 +23,7 @@
 #define __DGTYPES_H__
 
 #ifndef DG_SCALAR_VECTOR_CLASS
-	//#define DG_SIMD_VECTOR_CLASS
+	//#define DG_SCALAR_VECTOR_CLASS
 #endif
 
 
