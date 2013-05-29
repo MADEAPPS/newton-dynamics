@@ -610,10 +610,6 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 
 		dgIsland* const islandArray = (dgIsland*) &world->m_islandMemory[0];
 
-#ifdef _DEBUG
-		islandArray[m_islands].m_islandId = m_islands;
-#endif
-
 		hasUnilateralJoints &= world->m_solverMode ? 1 : 0;
 
 		islandArray[m_islands].m_bodyStart = m_bodies;

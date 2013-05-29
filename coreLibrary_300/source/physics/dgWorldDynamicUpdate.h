@@ -82,9 +82,6 @@ class dgBodyInfo
 class dgIsland
 {
 	public:
-#ifdef _DEBUG
-	dgInt32 m_islandId;
-#endif
 	dgInt32 m_bodyCount;
 	dgInt32 m_bodyStart;
 	dgInt32 m_jointCount;
