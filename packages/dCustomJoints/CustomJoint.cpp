@@ -87,12 +87,12 @@ CustomJoint::~CustomJoint()
 
 void *CustomJoint::operator new (size_t size) 
 { 
-	return (void*) new char[size]; 
+	return NewtonAlloc(size);
 }
 
-void CustomJoint::operator delete (void *ptr) 
+void CustomJoint::operator delete (void* ptr) 
 { 
-	delete (char*)ptr;
+	NewtonFree(ptr);
 }
 
 

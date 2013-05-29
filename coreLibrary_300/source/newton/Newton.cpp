@@ -131,8 +131,19 @@ void NewtonSetMemorySystem (NewtonAllocMemory mallocFnt, NewtonFreeMemory mfreeF
 	}
 
 	dgSetGlobalAllocators (_malloc, _free);
-
 }
+
+
+void* NewtonAlloc (int sizeInBytes)
+{
+	return dgMallocStack(sizeInBytes);
+}
+
+void NewtonFree (void* const ptr)
+{
+	dgFreeStack(ptr); 
+}
+
 
 
 // ***************************************************************************************************************

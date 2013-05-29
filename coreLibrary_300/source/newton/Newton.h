@@ -434,6 +434,9 @@ extern "C" {
 	NEWTON_API void NewtonDestroy (const NewtonWorld* const newtonWorld);
 	NEWTON_API void NewtonDestroyAllBodies (const NewtonWorld* const newtonWorld);
 
+	NEWTON_API void* NewtonAlloc (int sizeInBytes);
+	NEWTON_API void NewtonFree (void* const ptr);
+
 	//	NEWTON_API void NewtonSetPlatformArchitecture (const NewtonWorld* const newtonWorld, int mode);
 	//	NEWTON_API int NewtonGetPlatformArchitecture(const NewtonWorld* const newtonWorld, char* description);
 
