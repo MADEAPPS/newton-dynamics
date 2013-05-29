@@ -78,9 +78,7 @@ class dList
 			}
 		}
 
-		// maybe this do nor have to be virtual, but I doe sno matter
-		//virtual ~dListNode()
-		~dListNode()
+		virtual ~dListNode()
 		{
 		}
 

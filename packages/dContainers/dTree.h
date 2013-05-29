@@ -52,7 +52,6 @@ class dRedBackNode
 	void RotateRight(dRedBackNode** const head); 
 	void RemoveFixup (dRedBackNode* const node, dRedBackNode** const head); 
 	void Unlink (dRedBackNode** const head);
-	//void Remove (dRedBackNode** const head);
 	void InsertFixup(dRedBackNode** const head); 
 	
 	bool m_color;
