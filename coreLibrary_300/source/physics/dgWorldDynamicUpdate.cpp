@@ -597,7 +597,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 		}
 	}
 
-static bool xxx = false;
+static bool xxx = true;
 	if (bodyCount > 1) {
 		if (isContinueCollisionIsland && jointCount && (rowsCount < 32)) {
 			rowsCount = 32;

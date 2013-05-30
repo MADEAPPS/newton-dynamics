@@ -828,6 +828,10 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 	cacheForce[3] = dgFloat32 (1.0f);
 	dgFloat32* const normalForce = &cacheForce[4];
 
+	dgVector speedFreeze2 (world->m_freezeSpeed2 * 0.1f);
+	dgVector freezeOmega2 (world->m_freezeOmega2 * 0.1f);
+
+
 	dgFloat32 firstPassCoef = dgFloat32 (0.0f);
 	dgInt32 maxPasses = dgInt32 (world->m_solverMode + DG_BASE_ITERATION_COUNT);
 	for (dgInt32 step = 0; step < LINEAR_SOLVER_SUB_STEPS; step ++) {
@@ -947,8 +951,6 @@ xxx ++;
 					internalForces[m1].m_angular = angularM1;
 				}
 			}
-
-xxx *= 1;
 //accNorm  = 1.0f;
 		}
 
@@ -964,10 +966,19 @@ xxx *= 1;
 					torque += body->m_alpha;
 				}
 
-				dgVector accel (force.Scale4 (body->m_invMass.m_w));
-				dgVector alpha (body->m_invWorldInertiaMatrix.RotateVector (torque));
-				body->m_veloc += accel.CompProduct4(timestep4);
-				body->m_omega += alpha.CompProduct4(timestep4);
+				dgVector velocStep ((force.Scale4 (body->m_invMass.m_w)).CompProduct4(timestep4));
+				dgVector omegaStep ((body->m_invWorldInertiaMatrix.RotateVector (torque)).CompProduct4(timestep4));
+				if (!body->m_resting) {
+					body->m_veloc += velocStep;
+					body->m_omega += omegaStep;
+				} else {
+					dgVector velocStep2 (velocStep.DotProduct4(velocStep));
+					dgVector omegaStep2 (omegaStep.DotProduct4(omegaStep));
+					dgVector test ((velocStep2 > speedFreeze2) | (omegaStep2 > omegaStep2));
+					if (test.GetSignMask()) {
+						body->m_resting = false;
+					}
+				}
 			}
 		} else {
 			for (dgInt32 i = 1; i < bodyCount; i ++) {
