@@ -20,7 +20,6 @@
 		FF32E216172E13BF0052D273 /* CustomPathFollow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF32E1EA172E13BF0052D273 /* CustomPathFollow.cpp */; };
 		FF32E218172E13BF0052D273 /* CustomPlayerControllerManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF32E1EC172E13BF0052D273 /* CustomPlayerControllerManager.cpp */; };
 		FF32E21A172E13BF0052D273 /* CustomPulley.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF32E1EE172E13BF0052D273 /* CustomPulley.cpp */; };
-		FF32E21C172E13BF0052D273 /* CustomRagDoll.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF32E1F0172E13BF0052D273 /* CustomRagDoll.cpp */; };
 		FF32E21E172E13BF0052D273 /* CustomSlider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF32E1F2172E13BF0052D273 /* CustomSlider.cpp */; };
 		FF32E220172E13BF0052D273 /* CustomSlidingContact.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF32E1F4172E13BF0052D273 /* CustomSlidingContact.cpp */; };
 		FF32E222172E13BF0052D273 /* CustomTriggerManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF32E1F6172E13BF0052D273 /* CustomTriggerManager.cpp */; };
@@ -47,7 +46,6 @@
 		FF32E1EA172E13BF0052D273 /* CustomPathFollow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomPathFollow.cpp; path = ../../../dCustomJoints/CustomPathFollow.cpp; sourceTree = "<group>"; };
 		FF32E1EC172E13BF0052D273 /* CustomPlayerControllerManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomPlayerControllerManager.cpp; path = ../../../dCustomJoints/CustomPlayerControllerManager.cpp; sourceTree = "<group>"; };
 		FF32E1EE172E13BF0052D273 /* CustomPulley.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomPulley.cpp; path = ../../../dCustomJoints/CustomPulley.cpp; sourceTree = "<group>"; };
-		FF32E1F0172E13BF0052D273 /* CustomRagDoll.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomRagDoll.cpp; path = ../../../dCustomJoints/CustomRagDoll.cpp; sourceTree = "<group>"; };
 		FF32E1F2172E13BF0052D273 /* CustomSlider.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomSlider.cpp; path = ../../../dCustomJoints/CustomSlider.cpp; sourceTree = "<group>"; };
 		FF32E1F4172E13BF0052D273 /* CustomSlidingContact.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomSlidingContact.cpp; path = ../../../dCustomJoints/CustomSlidingContact.cpp; sourceTree = "<group>"; };
 		FF32E1F6172E13BF0052D273 /* CustomTriggerManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomTriggerManager.cpp; path = ../../../dCustomJoints/CustomTriggerManager.cpp; sourceTree = "<group>"; };
@@ -104,7 +102,6 @@
 				FF32E1E8172E13BF0052D273 /* CustomKinematicController.cpp */,
 				FF32E1EA172E13BF0052D273 /* CustomPathFollow.cpp */,
 				FF32E1EE172E13BF0052D273 /* CustomPulley.cpp */,
-				FF32E1F0172E13BF0052D273 /* CustomRagDoll.cpp */,
 				FF32E1F2172E13BF0052D273 /* CustomSlider.cpp */,
 				FF32E1F4172E13BF0052D273 /* CustomSlidingContact.cpp */,
 				FF32E1F8172E13BF0052D273 /* CustomUniversal.cpp */,
@@ -194,7 +191,6 @@
 				FF32E216172E13BF0052D273 /* CustomPathFollow.cpp in Sources */,
 				FF32E218172E13BF0052D273 /* CustomPlayerControllerManager.cpp in Sources */,
 				FF32E21A172E13BF0052D273 /* CustomPulley.cpp in Sources */,
-				FF32E21C172E13BF0052D273 /* CustomRagDoll.cpp in Sources */,
 				FF32E21E172E13BF0052D273 /* CustomSlider.cpp in Sources */,
 				FF32E220172E13BF0052D273 /* CustomSlidingContact.cpp in Sources */,
 				FF32E222172E13BF0052D273 /* CustomTriggerManager.cpp in Sources */,
