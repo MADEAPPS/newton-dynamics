@@ -39,7 +39,7 @@ CustomControllerBase::~CustomControllerBase()
 
 void* CustomControllerBase::operator new (size_t size)
 {
-	return NewtonAlloc(size);
+	return NewtonAlloc(int (size));
 }
 
 void CustomControllerBase::operator delete (void* ptr)

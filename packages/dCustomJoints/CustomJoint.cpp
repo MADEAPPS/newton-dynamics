@@ -43,7 +43,7 @@
 
 	void* operator new (size_t size) 
 	{ 
-		return NewtonAlloc(size);
+		return NewtonAlloc(int (size));
 	}
 
 	void operator delete (void* ptr) 
@@ -98,7 +98,7 @@ CustomJoint::~CustomJoint()
 
 void* CustomJoint::operator new (size_t size)
 {
-	return NewtonAlloc(size);
+	return NewtonAlloc(int (size));
 }
 
 void CustomJoint::operator delete (void* ptr)
