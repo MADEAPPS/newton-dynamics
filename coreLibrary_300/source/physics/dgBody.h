@@ -221,7 +221,6 @@ class dgBody
 	dgVector m_localCentreOfMass;	
 	dgVector m_globalCentreOfMass;	
 	dgVector m_aparentMass;
-//	dgFloat32 m_invMassScale;
 	dgInt32 m_index;
 	dgInt32 m_uniqueID;
 	dgInt32 m_bodyGroupId;
@@ -245,6 +244,7 @@ class dgBody
 			dgUnsigned32 m_collideWithLinkedBodies  : 1;
 			dgUnsigned32 m_inCallback				: 1;
 			dgUnsigned32 m_collidable				: 1;
+			dgUnsigned32 m_active					: 1;
 		};
 	};
 

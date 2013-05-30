@@ -87,7 +87,6 @@ class dgIsland
 	dgInt32 m_jointCount;
 	dgInt32 m_jointStart;
 	dgInt32 m_rowsCount;
-//	dgInt32 m_activejointCount;
 	dgInt32 m_rowsCountBaseBlock;
 	dgUnsigned32 m_hasUnilateralJoints : 1;
 	dgUnsigned32 m_isContinueCollision : 1;
