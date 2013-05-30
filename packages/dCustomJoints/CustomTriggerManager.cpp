@@ -100,6 +100,18 @@ void CustomTriggerController::PostUpdate(dFloat timestep, int threadIndex)
 }
 
 
+void CustomTriggerController::SetUserData(void* const userData)
+{
+	m_userData = userData;
+}
+
+const void* CustomTriggerController::GetUserData() const
+{
+	return m_userData;
+}
+
+
+
 void CustomTriggerController::Init (NewtonCollision* const convexShape, const dMatrix& matrix, void* const userData)
 {
 	m_userData = userData;

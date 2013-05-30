@@ -30,10 +30,7 @@ class CustomTriggerController
 {
 	CUSTOM_CONTROLLER_GLUE(CustomTriggerController);
 
-	public:
-	void SetUserData(void* const userData);
-	const void* GetUserData() const;
-	
+
 	protected:
 	class PassangerManifest
 	{
@@ -56,8 +53,10 @@ class CustomTriggerController
 		Passenger* m_passangerList;
 	};
 
+	public:
+	const void* GetUserData() const;
+	void SetUserData(void* const userData);
 	void Init (NewtonCollision* const convexShape, const dMatrix& matrix, void* const userData);
-
 	virtual void PreUpdate(dFloat timestep, int threadIndex);
 	virtual void PostUpdate(dFloat timestep, int threadIndex);
 	
@@ -93,16 +92,6 @@ class CustomTriggerManager: public CustomControllerManager<CustomTriggerControll
 
 	unsigned m_lru;
 };
-
-inline void CustomTriggerController::SetUserData(void* const userData)
-{
-	m_userData = userData;
-}
-
-inline const void* CustomTriggerController::GetUserData() const
-{
-	return m_userData;
-}
 
 
 #endif 
