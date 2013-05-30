@@ -786,7 +786,6 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 	dgJacobianMatrixElement* const matrixRow = &m_solverMemory.m_memory[rowStart];
 
 	dgInt32 jointCount = island->m_jointCount;
-	dgInt32 activeJointCount = island->m_activejointCount;
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[island->m_jointStart];
 	for (dgInt32 i = 0; i < jointCount; i ++) {
@@ -835,7 +834,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 		joindDesc.m_timeStep = timestep;
 		joindDesc.m_invTimeStep = invTimestep;
 		joindDesc.m_firstPassCoefFlag = firstPassCoef;
-		for (dgInt32 curJoint = 0; curJoint < activeJointCount; curJoint ++) {
+		for (dgInt32 curJoint = 0; curJoint < jointCount; curJoint ++) {
 			joindDesc.m_rowsCount = constraintArray[curJoint].m_autoPaircount;
 			joindDesc.m_rowMatrix = &matrixRow[constraintArray[curJoint].m_autoPairstart];
 			constraintArray[curJoint].m_joint->JointAccelerations (&joindDesc);
@@ -845,7 +844,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 		dgVector accNorm (maxAccNorm * dgFloat32 (2.0f));
 		for (dgInt32 passes = 0; (passes < maxPasses) && (accNorm.m_x > maxAccNorm); passes ++) {
 			accNorm = dgVector (0.0f);
-			for (dgInt32 curJoint = 0; curJoint < activeJointCount; curJoint ++) {
+			for (dgInt32 curJoint = 0; curJoint < jointCount; curJoint ++) {
 				dgInt32 index = constraintArray[curJoint].m_autoPairstart;
 				dgInt32 rowsCount = constraintArray[curJoint].m_autoPaircount;
 				dgInt32 m0 = constraintArray[curJoint].m_m0;
@@ -859,12 +858,10 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 				const dgBody* const body0 = bodyArray[m0].m_body;
 				const dgBody* const body1 = bodyArray[m1].m_body;
 
-				const dgVector invMassScale0 (body0->m_invMassScale);
-				const dgVector invMass0 (body0->m_invMass[3] * body0->m_invMassScale);
+				const dgVector invMass0 (body0->m_invMass[3]);
 				const dgMatrix& invInertia0 = body0->m_invWorldInertiaMatrix;
 
-				const dgVector invMassScale1 (body0->m_invMassScale);
-				const dgVector invMass1 (body1->m_invMass[3] * body1->m_invMassScale);
+				const dgVector invMass1 (body1->m_invMass[3]);
 				const dgMatrix& invInertia1 = body1->m_invWorldInertiaMatrix;
 
 				for (dgInt32 k = 0; k < rowsCount; k ++) {
@@ -881,9 +878,9 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 					//dgVector JMinvJacobianAngularM1 (invInertia1.UnrotateVector (row->m_Jt.m_jacobianM1.m_angular));
 
 					dgVector JMinvJacobianLinearM0 (row->m_Jt.m_jacobianM0.m_linear.CompProduct4 (invMass0));
-					dgVector JMinvJacobianAngularM0 (invInertia0.RotateVector (row->m_Jt.m_jacobianM0.m_angular).CompProduct4(invMassScale0));
+					dgVector JMinvJacobianAngularM0 (invInertia0.RotateVector (row->m_Jt.m_jacobianM0.m_angular));
 					dgVector JMinvJacobianLinearM1 (row->m_Jt.m_jacobianM1.m_linear.CompProduct4 (invMass1));
-					dgVector JMinvJacobianAngularM1 (invInertia1.RotateVector (row->m_Jt.m_jacobianM1.m_angular).CompProduct4(invMassScale1));
+					dgVector JMinvJacobianAngularM1 (invInertia1.RotateVector (row->m_Jt.m_jacobianM1.m_angular));
 
 					dgVector a (JMinvJacobianLinearM0.CompProduct4(linearM0) + JMinvJacobianAngularM0.CompProduct4(angularM0) + JMinvJacobianLinearM1.CompProduct4(linearM1) + JMinvJacobianAngularM1.CompProduct4(angularM1));
 
@@ -936,19 +933,19 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 			dgVector timestep4 (timestep);
 			for (dgInt32 i = 1; i < bodyCount; i ++) {
 				dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
-				//dgVector force (body->m_accel + internalForces[i].m_linear);
-				//dgVector torque (body->m_alpha + internalForces[i].m_angular);
-				dgVector force (internalForces[i].m_linear);
-				dgVector torque (internalForces[i].m_angular);
-				if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
-					force += body->m_accel;
-					torque += body->m_alpha;
-				}
+					//dgVector force (body->m_accel + internalForces[i].m_linear);
+					//dgVector torque (body->m_alpha + internalForces[i].m_angular);
+					dgVector force (internalForces[i].m_linear);
+					dgVector torque (internalForces[i].m_angular);
+					if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+						force += body->m_accel;
+						torque += body->m_alpha;
+					}
 
-				dgVector accel (force.Scale4 (body->m_invMass.m_w));
-				dgVector alpha (body->m_invWorldInertiaMatrix.RotateVector (torque));
-				body->m_veloc += accel.CompProduct4(timestep4);
-				body->m_omega += alpha.CompProduct4(timestep4);
+					dgVector accel (force.Scale4 (body->m_invMass.m_w));
+					dgVector alpha (body->m_invWorldInertiaMatrix.RotateVector (torque));
+					body->m_veloc += accel.CompProduct4(timestep4);
+					body->m_omega += alpha.CompProduct4(timestep4);
 			}
 		} else {
 			for (dgInt32 i = 1; i < bodyCount; i ++) {
@@ -964,7 +961,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 
 	dgInt32 hasJointFeeback = 0;
 	if (timestep != dgFloat32 (0.0f)) {
-		for (dgInt32 i = 0; i < activeJointCount; i ++) {
+		for (dgInt32 i = 0; i < jointCount; i ++) {
 			dgInt32 first = constraintArray[i].m_autoPairstart;
 			dgInt32 count = constraintArray[i].m_autoPaircount;
 
