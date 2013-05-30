@@ -608,7 +608,8 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 		dgJointInfo* const constraintArray = (dgJointInfo*) &world->m_jointsMemory[0];
 
 		dgInt32 activeJoints = jointCount;
-		if (jointCount > 50) {
+		if (jointCount > 32) {
+/*
 			activeJoints = 0;
 			for (dgInt32 i = 0; i < jointCount; i ++) {
 				dgConstraint* const joint = constraintArray[m_joints + i].m_joint;
@@ -630,8 +631,8 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 					i0 ++;
 					i1 ++;
 				} while (i1 < jointCount);
-				dgTrace (("%d %d\n", activeJoints, jointCount));
 			}
+*/
 		}
 
 		dgIsland* const islandArray = (dgIsland*) &world->m_islandMemory[0];
