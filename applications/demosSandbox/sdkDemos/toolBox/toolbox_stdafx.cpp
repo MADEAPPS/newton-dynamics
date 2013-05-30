@@ -24,13 +24,13 @@ void *operator new (size_t size)
 	void* const ptr = ::malloc (size);
 	//	unsigned xxx = unsigned (ptr);
 	//	xxx &= 0xffff;
-	//	dAssert (xxx != 0xAB78);
+	//	dAssert (xxx != 0x7C90);
 	//	dAssert (!((xxx == 0xAB68) && (size >= 2080)));
 	//	dTrace (("%d %x\n", xxx, ptr))
 	return ptr; 
 }                                          
 
-void operator delete (void *ptr) 
+void operator delete (void* ptr) 
 { 
 	::free (ptr); 
 }

@@ -610,20 +610,20 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 		dgInt32 activeJoints = jointCount;
 		if (jointCount > 32) {
 /*
-			activeJoints = 0;
 			for (dgInt32 i = 0; i < jointCount; i ++) {
 				dgConstraint* const joint = constraintArray[m_joints + i].m_joint;
 				if (ValidateEquilibrium (joint)) {
 					joint->m_equilibrium = true;
-					activeJoints ++;
+					activeJoints --;
 				}
 			}
+			dgAssert (activeJoints >= 0);
 			if (activeJoints < jointCount) {
 				dgInt32 i0 = 0;
 				for ( ;!constraintArray[m_joints + i0].m_joint->m_equilibrium; i0 ++);
 				dgInt32 i1 = i0 + 1;
 				do {
-					for ( ; (i1 < jointCount)  && constraintArray[m_joints + i1].m_joint->m_equilibrium; i1 ++);
+					for ( ; (i1 < jointCount) && constraintArray[m_joints + i1].m_joint->m_equilibrium; i1 ++);
 					if (i1 < jointCount) {
 						dgSwap(constraintArray[m_joints + i0].m_joint->m_index, constraintArray[m_joints + i1].m_joint->m_index);
 						dgSwap(constraintArray[m_joints + i0], constraintArray[m_joints + i1]);
