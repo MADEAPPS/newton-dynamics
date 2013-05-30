@@ -287,7 +287,9 @@
       </AdditionalOptions>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2010\$(PlatformName)\newton\$(Configuration)\*.dll" "$(OutDir)/*.*"  /F /Y /R</Command>
+      <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2010/$(PlatformName)/newton/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
+xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLibrary/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
@@ -358,7 +360,9 @@
       </AdditionalOptions>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2010\$(PlatformName)\newton\$(Configuration)\*.dll" "$(OutDir)/*.*"  /F /Y /R</Command>
+      <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2010/$(PlatformName)/newton/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
+xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLibrary/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debugDll|Win32'">
@@ -376,7 +380,8 @@
       <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2010\$(PlatformName)\newton\$(Configuration)\*.dll" "$(OutDir)/*.*"  /F /Y /R
+      <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2010/$(PlatformName)/newton/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
+xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLibrary/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -395,7 +400,9 @@
       <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2010\$(PlatformName)\newton\$(Configuration)\*.dll" "$(OutDir)/*.*"  /F /Y /R</Command>
+      <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2010/$(PlatformName)/newton/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
+xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLibrary/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
