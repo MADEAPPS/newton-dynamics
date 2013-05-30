@@ -14,8 +14,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_CUSTOMCORKSCREW_H__B631F556_468B_4331_B7D7_F85ECF3E9ADE_H)
-#define AFX_CUSTOMCORKSCREW_H__B631F556_468B_4331_B7D7_F85ECF3E9ADE_H
+#ifndef _CUSTOMCORKSCREW_H_
+#define _CUSTOMCORKSCREW_H_
 
 #include "CustomJoint.h"
 
@@ -24,17 +24,17 @@ class CustomCorkScrew: public CustomJoint
 	public:
 	//dAddRtti(CustomJoint);
 
-	CustomCorkScrew (const dMatrix& pinAndPivotFrame, NewtonBody* child, NewtonBody* parent = NULL);
-	virtual ~CustomCorkScrew();
+	NEWTON_API CustomCorkScrew (const dMatrix& pinAndPivotFrame, NewtonBody* child, NewtonBody* parent = NULL);
+	NEWTON_API virtual ~CustomCorkScrew();
 
-	void EnableLinearLimits(bool state);
-	void EnableAngularLimits(bool state);
-	void SetLinearLimis(dFloat minAngle, dFloat maxAngle);
-	void SetAngularLimis(dFloat minAngle, dFloat maxAngle);
+	NEWTON_API void EnableLinearLimits(bool state);
+	NEWTON_API void EnableAngularLimits(bool state);
+	NEWTON_API void SetLinearLimis(dFloat minAngle, dFloat maxAngle);
+	NEWTON_API void SetAngularLimis(dFloat minAngle, dFloat maxAngle);
 
 	protected:
-	virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	virtual void GetInfo (NewtonJointRecord* const info) const;
+	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;

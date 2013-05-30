@@ -25,13 +25,13 @@ class CustomUserBlank: public CustomJoint
 	public:
 	//dAddRtti(CustomJoint);
 
-	CustomUserBlank(unsigned int maxDOF, NewtonBody* const child, NewtonBody* const parent = NULL);
-	virtual ~CustomUserBlank();
+	NEWTON_API CustomUserBlank(unsigned int maxDOF, NewtonBody* const child, NewtonBody* const parent = NULL);
+	NEWTON_API virtual ~CustomUserBlank();
 
 	protected:
-	virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	virtual void GetInfo (NewtonJointRecord* const info) const;
+	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
 };
 
-#endif // !defined(AFX_CUSTOM_USER_BLANK_INCLUDED_)
+#endif 
 

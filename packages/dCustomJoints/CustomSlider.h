@@ -25,17 +25,18 @@ class CustomSlider: public CustomJoint
 	public:
 	//dAddRtti(CustomJoint);
 
-	CustomSlider (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
-	virtual ~CustomSlider();
+	NEWTON_API CustomSlider (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
+	NEWTON_API virtual ~CustomSlider();
 
-	void EnableLimits(bool state);
-	void SetLimis(dFloat mindist, dFloat maxdist);
+	NEWTON_API void EnableLimits(bool state);
+	NEWTON_API void SetLimis(dFloat mindist, dFloat maxdist);
 
-	bool JoinHitLimit () const ;
+	NEWTON_API bool JoinHitLimit () const ;
 	
 	protected:
-	virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	virtual void GetInfo (NewtonJointRecord* const info) const;
+	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
+
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;
 

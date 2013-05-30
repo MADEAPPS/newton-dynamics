@@ -30,13 +30,13 @@ class CustomGear: public CustomJoint
 	public:
 	//dAddRtti(CustomJoint);
 
-	CustomGear(dFloat gearRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const parenPin, NewtonBody* const parent);
-	virtual ~CustomGear();
+	NEWTON_API CustomGear(dFloat gearRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const parenPin, NewtonBody* const parent);
+	NEWTON_API virtual ~CustomGear();
 
 
 	protected:
-	virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	virtual void GetInfo (NewtonJointRecord* const info) const;
+	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;

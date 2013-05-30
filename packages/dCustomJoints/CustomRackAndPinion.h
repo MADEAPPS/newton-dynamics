@@ -30,13 +30,13 @@ class CustomRackAndPinion: public CustomJoint
 	public:
 	//dAddRtti(CustomJoint);
 
-	CustomRackAndPinion(dFloat gearRatio, const dVector& rotationalPin, const dVector& linearPin, NewtonBody* rotationalBody, NewtonBody* linearBody);
-	virtual ~CustomRackAndPinion();
+	NEWTON_API CustomRackAndPinion(dFloat gearRatio, const dVector& rotationalPin, const dVector& linearPin, NewtonBody* rotationalBody, NewtonBody* linearBody);
+	NEWTON_API virtual ~CustomRackAndPinion();
 
 
 	protected:
-	virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	virtual void GetInfo (NewtonJointRecord* const info) const;
+	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;

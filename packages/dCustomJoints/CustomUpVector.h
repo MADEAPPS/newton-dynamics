@@ -14,9 +14,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_CUSTOMUPVECTOR_H__EAE1E36C_6FDF_4D86_B4EE_855E3D1046F4_H)
-#define AFX_CUSTOMUPVECTOR_H__EAE1E36C_6FDF_4D86_B4EE_855E3D1046F4_H
-
+#ifndef _CUSTOMUPVECTOR_H_
+#define _CUSTOMUPVECTOR_H_
 
 #include "CustomJoint.h"
 
@@ -26,15 +25,14 @@ class CustomUpVector: public CustomJoint
 	public:
 	//dAddRtti(CustomJoint);
 
-	CustomUpVector(const dVector& pin, NewtonBody* child);
-	virtual ~CustomUpVector();
+	NEWTON_API CustomUpVector(const dVector& pin, NewtonBody* child);
+	NEWTON_API virtual ~CustomUpVector();
 
-	void SetPinDir (const dVector& pin);
+	NEWTON_API void SetPinDir (const dVector& pin);
 
 	protected:
-	virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	virtual void GetInfo (NewtonJointRecord* const info) const;
-
+	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;

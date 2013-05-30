@@ -14,8 +14,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_DRY_ROLLOING_FRICTION3D1046F4_H)
-#define AFX_DRY_ROLLOING_FRICTION3D1046F4_H
+#ifndef _DRY_ROLLOING_FRICTION3D1046F4_
+#define _DRY_ROLLOING_FRICTION3D1046F4_
 
 
 #include "CustomJoint.h"
@@ -31,12 +31,12 @@ class CustomDryRollingFriction: public CustomJoint
 	public:
 	//dAddRtti(CustomJoint);
 
-	CustomDryRollingFriction(NewtonBody* const child, dFloat radius, dFloat coefficient);
-	virtual ~CustomDryRollingFriction();
+	NEWTON_API CustomDryRollingFriction(NewtonBody* const child, dFloat radius, dFloat coefficient);
+	NEWTON_API virtual ~CustomDryRollingFriction();
 
 	protected:
-	virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	virtual void GetInfo (NewtonJointRecord* const info) const;
+	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dFloat m_frictionCoef;
 	dFloat m_frictionTorque;

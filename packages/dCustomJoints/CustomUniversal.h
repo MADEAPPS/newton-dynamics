@@ -14,8 +14,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_CUSTOMUNIVERSAL_H__B631F556_468B_4331_B7D7_F85ECF3E9ADE_H)
-#define AFX_CUSTOMUNIVERSAL_H__B631F556_468B_4331_B7D7_F85ECF3E9ADE_H
+#ifndef _CUSTOMUNIVERSAL_H_
+#define _CUSTOMUNIVERSAL_H_
 
 #include "CustomJoint.h"
 
@@ -24,20 +24,20 @@ class CustomUniversal: public CustomJoint
 	public:
 	//dAddRtti(CustomJoint);
 
-	CustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* child, NewtonBody* parent = NULL);
-	virtual ~CustomUniversal();
+	NEWTON_API CustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* child, NewtonBody* parent = NULL);
+	NEWTON_API virtual ~CustomUniversal();
 
-	void EnableLimit_0(bool state);
-	void EnableLimit_1(bool state);
-	void SetLimis_0(dFloat minAngle, dFloat maxAngle);
-	void SetLimis_1(dFloat minAngle, dFloat maxAngle);
+	NEWTON_API void EnableLimit_0(bool state);
+	NEWTON_API void EnableLimit_1(bool state);
+	NEWTON_API void SetLimis_0(dFloat minAngle, dFloat maxAngle);
+	NEWTON_API void SetLimis_1(dFloat minAngle, dFloat maxAngle);
 
-	void EnableMotor_0(bool state);
-	void EnableMotor_1(bool state);
+	NEWTON_API void EnableMotor_0(bool state);
+	NEWTON_API void EnableMotor_1(bool state);
 
 	protected:
-	virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	virtual void GetInfo (NewtonJointRecord* const info) const;
+	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;
@@ -58,5 +58,5 @@ class CustomUniversal: public CustomJoint
 	dFloat m_angularAccel_1;
 };
 
-#endif // !defined(AFX_CUSTOMUNIVERSAL_H__B631F556_468B_4331_B7D7_F85ECF3E9ADE_H)
+#endif 
 

@@ -31,13 +31,13 @@ class CustomPulley: public CustomJoint
 	public:
 	//dAddRtti(CustomJoint);
 
-	CustomPulley(dFloat pulleyRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const parenPin, NewtonBody* const parent);
-	virtual ~CustomPulley();
+	NEWTON_API CustomPulley(dFloat pulleyRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const parenPin, NewtonBody* const parent);
+	NEWTON_API virtual ~CustomPulley();
 
 
 	protected:
-	virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	virtual void GetInfo (NewtonJointRecord* const info) const;
+	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;

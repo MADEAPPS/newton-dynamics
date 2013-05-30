@@ -25,14 +25,14 @@ class CustomPathFollow: public CustomJoint
 	public:
 	//dAddRtti(CustomJoint);
 
-	CustomPathFollow (const dMatrix& pinAndPivotFrame, NewtonBody* const body);
-	virtual ~CustomPathFollow();
+	NEWTON_API CustomPathFollow (const dMatrix& pinAndPivotFrame, NewtonBody* const body);
+	NEWTON_API virtual ~CustomPathFollow();
 
-	virtual dMatrix EvalueCurve (const dVector& posit);
+	NEWTON_API virtual dMatrix EvalueCurve (const dVector& posit);
 
 	protected:
-	virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	virtual void GetInfo (NewtonJointRecord* const info) const;
+	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dMatrix m_localMatrix0;
 };

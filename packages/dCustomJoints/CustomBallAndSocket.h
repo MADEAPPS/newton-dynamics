@@ -24,11 +24,11 @@ class CustomBallAndSocket: public CustomJoint
 	//dAddRtti(CustomJoint);
 
 	NEWTON_API CustomBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
-	virtual ~CustomBallAndSocket();
+	NEWTON_API virtual ~CustomBallAndSocket();
 
 	protected:
-	virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	virtual void GetInfo (NewtonJointRecord* const info) const;
+	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;
@@ -49,8 +49,8 @@ class CustomLimitBallAndSocket: public CustomBallAndSocket
 	NEWTON_API void SetConeAngle (dFloat angle);
 	NEWTON_API void SetTwistAngle (dFloat minAngle, dFloat maxAngle);
 	protected:
-	virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	virtual void GetInfo (NewtonJointRecord* const info) const;
+	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dFloat m_minTwistAngle;
 	dFloat m_maxTwistAngle;
