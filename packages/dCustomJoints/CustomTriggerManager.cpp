@@ -141,7 +141,7 @@ void CustomTriggerController::PreUpdate(dFloat timestep, int threadIndex)
 		NewtonBody* const body0 = NewtonJointGetBody0(joint);
 		NewtonBody* const body1 = NewtonJointGetBody1(joint);
 		NewtonBody* const passangerBody = (body0 != triggerBody) ? body0 : body1; 
-		//PassangerManifest::dTreeNode* node = m_manifest.Find (passangerBody);
+
 		PassangerManifest::Passenger* passenger = m_manifest.Find (passangerBody);
 		if (!passenger) {
 			//node = m_manifest.Insert (passangerBody);

@@ -337,8 +337,6 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body)
 				dgAssert ((constraint->m_body0 == srcBody) || (constraint->m_body1 == srcBody));
 				dgAssert ((constraint->m_body0 == linkBody) || (constraint->m_body1 == linkBody));
 				const dgContact* const contact = (constraint->GetId() == dgConstraint::m_contactConstraint) ? (dgContact*)constraint : NULL;
-				//if (linkBody->IsRTTIType(dgBody::m_dynamicBodyRTTI) && (!contact || contact->m_maxDOF || contact->m_continueCollisionMode)) { 
-				//if (linkBody->IsRTTIType(dgBody::m_dynamicBodyRTTI) && (!contact || contact->m_maxDOF || (srcBody->m_continueCollisionMode | linkBody->m_continueCollisionMode))) { 
 				if (linkBody->IsCollidable() && (!contact || contact->m_maxDOF || (srcBody->m_continueCollisionMode | linkBody->m_continueCollisionMode))) { 
 					dgDynamicBody* const body = (dgDynamicBody*)linkBody;
 
@@ -541,7 +539,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 				dgBodyInfo* const bodyArray = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
 				body->m_index = bodyCount; 
 				bodyArray[bodyIndex].m_body = body;
-
+				body->m_invMassScale = dgFloat32 (1.0f);
 				bodyCount ++;
 			}
 
@@ -554,9 +552,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 				dgAssert ((constraint->m_body0 == body) || (constraint->m_body1 == body));
 				dgAssert ((constraint->m_body0 == linkBody) || (constraint->m_body1 == linkBody));
 				const dgContact* const contact = (constraint->GetId() == dgConstraint::m_contactConstraint) ? (dgContact*)constraint : NULL;
-				//if (linkBody->IsRTTIType(dgBody::m_dynamicBodyRTTI) && (!contact || contact->m_maxDOF || contact->m_continueCollisionMode)) { 
 				dgInt32 ccdMode = contact ? (body->m_continueCollisionMode | linkBody->m_continueCollisionMode) : 0;
-				//if (linkBody->IsRTTIType(dgBody::m_dynamicBodyRTTI) && (!contact || contact->m_maxDOF || ccdMode)) { 
 				if (linkBody->IsCollidable() && (!contact || contact->m_maxDOF || ccdMode)) { 
 					dgDynamicBody* const body = (dgDynamicBody*)linkBody;
 
@@ -611,11 +607,31 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 		world->m_islandMemory.ExpandCapacityIfNeessesary (m_islands, sizeof (dgIsland));
 		dgJointInfo* const constraintArray = (dgJointInfo*) &world->m_jointsMemory[0];
 
-		if (jointCount > 64) {
-//			for (dgInt32 i = 0; i < jointCount; i ++) {
-//				dgConstraint* const joint = constraintArray[m_joints + i].m_joint;
-//				joint->m_equilibrium = ValidateEquilibrium (joint);
-//			}
+		dgInt32 activeJoints = jointCount;
+		if (jointCount > 50) {
+			activeJoints = 0;
+			for (dgInt32 i = 0; i < jointCount; i ++) {
+				dgConstraint* const joint = constraintArray[m_joints + i].m_joint;
+				if (ValidateEquilibrium (joint)) {
+					joint->m_equilibrium = true;
+					activeJoints ++;
+				}
+			}
+			if (activeJoints < jointCount) {
+				dgInt32 i0 = 0;
+				for ( ;!constraintArray[m_joints + i0].m_joint->m_equilibrium; i0 ++);
+				dgInt32 i1 = i0 + 1;
+				do {
+					for ( ; (i1 < jointCount)  && constraintArray[m_joints + i1].m_joint->m_equilibrium; i1 ++);
+					if (i1 < jointCount) {
+						dgSwap(constraintArray[m_joints + i0].m_joint->m_index, constraintArray[m_joints + i1].m_joint->m_index);
+						dgSwap(constraintArray[m_joints + i0], constraintArray[m_joints + i1]);
+					}
+					i0 ++;
+					i1 ++;
+				} while (i1 < jointCount);
+				dgTrace (("%d %d\n", activeJoints, jointCount));
+			}
 		}
 
 		dgIsland* const islandArray = (dgIsland*) &world->m_islandMemory[0];
@@ -627,6 +643,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 		islandArray[m_islands].m_bodyCount = bodyCount;
 		islandArray[m_islands].m_jointCount = jointCount;
 		islandArray[m_islands].m_rowsCount = rowsCount;
+		islandArray[m_islands].m_activejointCount = activeJoints;
 		islandArray[m_islands].m_rowsCountBaseBlock = -1;
 		islandArray[m_islands].m_hasUnilateralJoints = hasUnilateralJoints;
 		islandArray[m_islands].m_hasExactSolverJoints = hasExactSolverJoints;
@@ -1112,7 +1129,6 @@ dgInt32 dgWorldDynamicUpdate::LinearizeJointParallelArray(dgInt32 islandsCount, 
 
 				dgConstraint* const neiborgLink = cell.m_joint;
 				if ((neiborgLink != constraint) && (neiborgLink->m_maxDOF)) {
-					//dgJointInfo& info = constraintArray[jointInfoMap[neiborgLink->m_index]];
 					dgJointInfo& info = constraintArray[neiborgLink->m_index];
 					info.m_color |= color;
 				}
@@ -1127,7 +1143,6 @@ dgInt32 dgWorldDynamicUpdate::LinearizeJointParallelArray(dgInt32 islandsCount, 
 
 				dgConstraint* const neiborgLink = cell.m_joint;
 				if ((neiborgLink != constraint) && (neiborgLink->m_maxDOF)) {
-					//dgJointInfo& info = constraintArray[jointInfoMap[neiborgLink->m_index]];
 					dgJointInfo& info = constraintArray[neiborgLink->m_index];
 					info.m_color |= color;
 				}
