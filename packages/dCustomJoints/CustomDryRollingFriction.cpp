@@ -20,7 +20,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-dInitRtti(CustomDryRollingFriction);
+//dInitRtti(CustomDryRollingFriction);
 
 CustomDryRollingFriction::CustomDryRollingFriction(NewtonBody* child, dFloat radius, dFloat coefficient)
 	:CustomJoint(1, child, NULL)

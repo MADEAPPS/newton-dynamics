@@ -23,7 +23,8 @@
 class CustomSlider: public CustomJoint  
 {
 	public:
-	dAddRtti(CustomJoint);
+	//dAddRtti(CustomJoint);
+
 	CustomSlider (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
 	virtual ~CustomSlider();
 

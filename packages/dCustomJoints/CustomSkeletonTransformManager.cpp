@@ -34,6 +34,7 @@ CustomSkeletonTransformController* CustomSkeletonTransformManager::CreateTransfo
 }
 
 
+
 void CustomSkeletonTransformManager::PostUpdate(dFloat timestep)
 {
 	CustomControllerManager<CustomSkeletonTransformController>::PostUpdate(timestep);

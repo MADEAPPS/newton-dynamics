@@ -20,10 +20,11 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-dRttiRootClassSupportImplement(CustomJoint);
+//dRttiRootClassSupportImplement(CustomJoint);
 
-/*
-#ifndef D_JOINTLIBRARY_STATIC_LIB
+
+
+#ifdef _NEWTON_BUILD_DLL
 	BOOL APIENTRY DllMain( HMODULE hModule,
 						  DWORD  ul_reason_for_call,
 						  LPVOID lpReserved
@@ -31,16 +32,26 @@ dRttiRootClassSupportImplement(CustomJoint);
 	{
 		switch (ul_reason_for_call)
 		{
-		case DLL_PROCESS_ATTACH:
-		case DLL_THREAD_ATTACH:
-		case DLL_THREAD_DETACH:
-		case DLL_PROCESS_DETACH:
-			break;
+			case DLL_PROCESS_ATTACH:
+			case DLL_THREAD_ATTACH:
+			case DLL_THREAD_DETACH:
+			case DLL_PROCESS_DETACH:
+				break;
 		}
 		return TRUE;
 	}
+
+	void* operator new (size_t size) 
+	{ 
+		return NewtonAlloc(size);
+	}
+
+	void operator delete (void* ptr) 
+	{ 
+		NewtonFree(ptr);
+	}
+
 #endif
-*/
 
 
 
@@ -85,13 +96,13 @@ CustomJoint::~CustomJoint()
 	}
 }
 
-void *CustomJoint::operator new (size_t size) 
-{ 
+void* CustomJoint::operator new (size_t size)
+{
 	return NewtonAlloc(size);
 }
 
-void CustomJoint::operator delete (void* ptr) 
-{ 
+void CustomJoint::operator delete (void* ptr)
+{
 	NewtonFree(ptr);
 }
 

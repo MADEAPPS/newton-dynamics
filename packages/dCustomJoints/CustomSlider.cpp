@@ -23,7 +23,8 @@
 
 #define MIN_JOINT_PIN_LENGTH	50.0f
 
-dInitRtti(CustomSlider);
+//dInitRtti(CustomSlider);
+
 CustomSlider::CustomSlider (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:CustomJoint(6, child, parent)
 {

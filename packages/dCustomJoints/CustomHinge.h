@@ -22,23 +22,24 @@
 class CustomHinge: public CustomJoint  
 {
 	public:
-	dAddRtti(CustomJoint);
-	CustomHinge (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
+	//dAddRtti(CustomJoint);
+
+	NEWTON_API CustomHinge (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
 
 	// this is a special contributor that create a hinge with an error between the two matrices, the error is reduce to zero after few iterations 
 	// the error can not be too great, this is more for hinges with wiggle room
-	CustomHinge (const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent = NULL);
-	virtual ~CustomHinge();
+	NEWTON_API CustomHinge (const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent = NULL);
+	NEWTON_API virtual ~CustomHinge();
 
-	void EnableLimits(bool state);
-	void SetLimis(dFloat minAngle, dFloat maxAngle);
-	dFloat GetJointAngle () const;
-	dVector GetPinAxis () const;
-	dFloat GetJointOmega () const;
+	NEWTON_API void EnableLimits(bool state);
+	NEWTON_API void SetLimis(dFloat minAngle, dFloat maxAngle);
+	NEWTON_API dFloat GetJointAngle () const;
+	NEWTON_API dVector GetPinAxis () const;
+	NEWTON_API dFloat GetJointOmega () const;
 
 	protected:
-	virtual void GetInfo (NewtonJointRecord* const info) const;
-	virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
+	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;
@@ -50,5 +51,5 @@ class CustomHinge: public CustomJoint
 	AngularIntegration m_curJointAngle;
 };
 
-#endif // !defined(AFX_CUSTOMHINGE_H__B631F556_468B_4331_B7D7_F85ECF3E9ADE_H)
+#endif 
 

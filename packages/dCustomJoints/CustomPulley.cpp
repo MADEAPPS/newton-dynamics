@@ -17,7 +17,7 @@
 #include "CustomJointLibraryStdAfx.h"
 #include "CustomPulley.h"
 
-dInitRtti(CustomPulley);
+//dInitRtti(CustomPulley);
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

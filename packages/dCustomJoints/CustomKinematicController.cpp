@@ -20,7 +20,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-dInitRtti(CustomKinematicController);
+//dInitRtti(CustomKinematicController);
 
 CustomKinematicController::CustomKinematicController(NewtonBody* const body, const dVector& handleInGlobalSpace)
 	:CustomJoint(6, body, NULL)

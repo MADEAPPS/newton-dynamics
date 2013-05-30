@@ -22,7 +22,7 @@
 
 #define MIN_JOINT_PIN_LENGTH	50.0f
 
-dInitRtti(CustomPathFollow);
+//dInitRtti(CustomPathFollow);
 
 CustomPathFollow::CustomPathFollow (const dMatrix& pinAndPivotFrame, NewtonBody* const child)
 	:CustomJoint(6, child, NULL)

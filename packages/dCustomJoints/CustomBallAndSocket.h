@@ -21,8 +21,9 @@
 class CustomBallAndSocket: public CustomJoint  
 {
 	public:
-	dAddRtti(CustomJoint);
-	CustomBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
+	//dAddRtti(CustomJoint);
+
+	NEWTON_API CustomBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
 	virtual ~CustomBallAndSocket();
 
 	protected:
@@ -39,13 +40,14 @@ class CustomBallAndSocket: public CustomJoint
 class CustomLimitBallAndSocket: public CustomBallAndSocket  
 {
 	public:
-	dAddRtti(CustomJoint);
-	CustomLimitBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
-	CustomLimitBallAndSocket(const dMatrix& childPinAndPivotFrame, NewtonBody* const child, const dMatrix& parentPinAndPivotFrame, NewtonBody* const parent);
-	virtual ~CustomLimitBallAndSocket();
+	//dAddRtti(CustomJoint);
 
-	void SetConeAngle (dFloat angle);
-	void SetTwistAngle (dFloat minAngle, dFloat maxAngle);
+	NEWTON_API CustomLimitBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
+	NEWTON_API CustomLimitBallAndSocket(const dMatrix& childPinAndPivotFrame, NewtonBody* const child, const dMatrix& parentPinAndPivotFrame, NewtonBody* const parent);
+	NEWTON_API virtual ~CustomLimitBallAndSocket();
+
+	NEWTON_API void SetConeAngle (dFloat angle);
+	NEWTON_API void SetTwistAngle (dFloat minAngle, dFloat maxAngle);
 	protected:
 	virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	virtual void GetInfo (NewtonJointRecord* const info) const;

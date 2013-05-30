@@ -41,10 +41,10 @@
 #define VEHICLE_MAX_FRICTION_BOUND	            dFloat(1.0e15f)
 #define VEHICLE_MIN_FRICTION_BOUND			    -VEHICLE_MAX_FRICTION_BOUND
 
-
-
 #define VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SLIP_ANGLE 0.25f
 
+
+#if 0
 void CustomVehicleController::InterpolationCurve::InitalizeCurve (int points, const dFloat* const steps, const dFloat* const values)
 {
 	m_count = points;
@@ -1692,5 +1692,5 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 }
 
 
-
+#endif
 

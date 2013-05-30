@@ -28,6 +28,7 @@ class dRayCastRecord
 	CUSTOM_CONTROLLER_GLUE(dRayCastRecord);
 
 	public:
+
 	void PreUpdate(dFloat timestep, int threadIndex)
 	{
 	}
@@ -67,7 +68,7 @@ class LineOfSightRayCastEntity: public DemoEntity
 	public:
 	LineOfSightRayCastEntity (DemoEntityManager* const scene, CustomControllerManager<dRayCastRecord>* casterManager)
 		:DemoEntity (GetIdentityMatrix(), NULL)
-		,m_caterManager(casterManager)
+		,m_casterManager(casterManager)
 	{
 		scene->Append(this);
 	}
@@ -84,9 +85,9 @@ class LineOfSightRayCastEntity: public DemoEntity
 	
 		glColor3f(0.0f, 0.5f, 0.5f);
 		glBegin(GL_LINES);
-		for (void* node = m_caterManager->GetFirstControllerNode(); node; node = m_caterManager->GetNextControllerNode(node)) {
-			//RayCastRecord* const ray = &m_rays[i];
-			dRayCastRecord* const ray = (dRayCastRecord*) m_caterManager->GetControllerFromNode(node);
+		//for (void* node = m_caterManager->GetFirstController(); node; node = m_caterManager->GetNextController(node)) {
+		for (CustomControllerManager<dRayCastRecord>::CustomController* ray = m_casterManager->GetFirstController(); ray; ray = m_casterManager->GetNextController(ray)) {
+			//dRayCastRecord* const ray = (dRayCastRecord*) m_caterManager->GetControllerFromNode(node);
 			glVertex3f(ray->m_p0.m_x, ray->m_p0.m_y, ray->m_p0.m_z);
 			glVertex3f(ray->m_p1.m_x, ray->m_p1.m_y, ray->m_p1.m_z);
 		}
@@ -96,8 +97,8 @@ class LineOfSightRayCastEntity: public DemoEntity
 		glColor3f(1.0f, 0.0f, 0.0f);
 		glPointSize(6.0f);
 		glBegin(GL_POINTS);
-		for (void* node = m_caterManager->GetFirstControllerNode(); node; node = m_caterManager->GetNextControllerNode(node)) {
-			dRayCastRecord* const ray = (dRayCastRecord*) m_caterManager->GetControllerFromNode(node);
+		for (CustomControllerManager<dRayCastRecord>::CustomController* ray = m_casterManager->GetFirstController(); ray; ray = m_casterManager->GetNextController(ray)) {
+//			dRayCastRecord* const ray = (dRayCastRecord*) m_caterManager->GetControllerFromNode(node);
 			glVertex3f(ray->m_p1.m_x, ray->m_p1.m_y, ray->m_p1.m_z);
 		}
 		glEnd();
@@ -106,7 +107,7 @@ class LineOfSightRayCastEntity: public DemoEntity
 		glColor3f(1.0f, 1.0f, 1.0f);
 	}
 
-	CustomControllerManager<dRayCastRecord>* m_caterManager; 
+	CustomControllerManager<dRayCastRecord>* m_casterManager; 
 };
 
 

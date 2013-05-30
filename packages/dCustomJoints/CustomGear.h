@@ -28,7 +28,8 @@
 class CustomGear: public CustomJoint  
 {
 	public:
-	dAddRtti(CustomJoint);
+	//dAddRtti(CustomJoint);
+
 	CustomGear(dFloat gearRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const parenPin, NewtonBody* const parent);
 	virtual ~CustomGear();
 

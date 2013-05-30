@@ -18,24 +18,23 @@
 #define D_CUSTOM_CONTROLLER_MANAGER_H_
 
 #include "CustomJointLibraryStdAfx.h"
-#include "dList.h"
 #include "dMathDefines.h"
 #include "dVector.h"
 #include "dMatrix.h"
 #include "dQuaternion.h"
 
 
+
 class CustomControllerFilterCastFilter
 {	
 	public:
-	CustomControllerFilterCastFilter (const NewtonBody* const me)
+	NEWTON_API CustomControllerFilterCastFilter (const NewtonBody* const me)
 	{
 		m_count = 1;
 		m_filter[0] = me;
 	}
-	int m_count;
-	const NewtonBody* m_filter[32];
-	static unsigned ConvexStaticCastPrefilter(const NewtonBody* const body, const NewtonCollision* const myCollision, void* const userData)
+
+	NEWTON_API static unsigned ConvexStaticCastPrefilter(const NewtonBody* const body, const NewtonCollision* const myCollision, void* const userData)
 	{
 		CustomControllerFilterCastFilter* const filter = (CustomControllerFilterCastFilter*) userData;
 		const NewtonCollision* const collision = NewtonBodyGetCollision(body);
@@ -49,16 +48,19 @@ class CustomControllerFilterCastFilter
 		}
 		return 0;
 	}
+
+	int m_count;
+	const NewtonBody* m_filter[32];
 };
 
 
-#define CUSTOM_CONTROLLER_GLUE(ControllerClass)				\
-		public:												\
-		inline ControllerClass() {}							\
-		inline virtual ~ControllerClass() {}				\
-		virtual NewtonBody* GetBody() const = 0;			\
-		virtual void SetBody(NewtonBody* const body) = 0;	\
-		virtual CustomControllerManager<ControllerClass>* GetManager() const = 0;	\
+#define CUSTOM_CONTROLLER_GLUE(ControllerClass)													\
+		public:																					\
+		ControllerClass() {}																	\
+		virtual ~ControllerClass() {}															\
+		NEWTON_API virtual NewtonBody* GetBody() const = 0;										\
+		NEWTON_API virtual void SetBody(NewtonBody* const body) = 0;							\
+		NEWTON_API virtual CustomControllerManager<ControllerClass>* GetManager() const = 0;	\
 		private:
 
 
@@ -68,16 +70,20 @@ class CustomControllerBase
 	dFloat GetTimeStep() const {return m_curTimestep;}
 	NewtonWorld* GetWorld() const {return m_world;}
 	
-//	void *operator new (size_t size);
-//	void operator delete (void *ptr);
+	NEWTON_API void* operator new (size_t size);
+	NEWTON_API void operator delete (void *ptr);
 	virtual void Debug () const = 0;
 
 	protected:
-	CustomControllerBase(NewtonWorld* const world, const char* const managerName);
-	virtual ~CustomControllerBase();
-	
+	NEWTON_API CustomControllerBase(NewtonWorld* const world, const char* const managerName);
+	NEWTON_API virtual ~CustomControllerBase();
+
 	virtual void PreUpdate (dFloat timestep) = 0;
 	virtual void PostUpdate (dFloat timestep) = 0;
+
+	protected:
+	NEWTON_API void* AllocController (int size) const;
+	NEWTON_API void FreeController (void* const ptr) const;
 
 	private:
 	static void PreUpdate (const NewtonWorld* const world, void* const listenerUserData, dFloat timestep);
@@ -87,7 +93,7 @@ class CustomControllerBase
 	dFloat m_curTimestep;
 	NewtonWorld* m_world;
 	
-	dRttiRootClassSupportDeclare(CustomControllerBase);
+//	dRttiRootClassSupportDeclare(CustomControllerBase);
 };
 
 template<class CONTROLLER_BASE>
@@ -109,20 +115,20 @@ class CustomControllerManager: public CustomControllerBase
 
 		private:
 		NewtonBody* m_body;
+		CustomController* m_prev;
+		CustomController* m_next;
 		CustomControllerManager* m_manager; 
 		friend class CustomControllerManager;
 	};
 
-	class CustomControllerList: public dList <CustomController> {};
 	CustomControllerManager(NewtonWorld* const world, const char* const managerName);
 	virtual ~CustomControllerManager();
 
 	virtual CustomController* CreateController ();
 	virtual void DestroyController (CustomController* const controller);
 
-	void* GetFirstControllerNode() const;
-	void* GetNextControllerNode(void* const node) const;
-	CustomController* GetControllerFromNode(void* const node) const;
+	CustomController* GetFirstController() const;
+	CustomController* GetNextController(CustomController* const node) const;
 
 	protected:
 	virtual void PreUpdate (dFloat timestep);
@@ -130,7 +136,8 @@ class CustomControllerManager: public CustomControllerBase
 	static void PreUpdateKernel (NewtonWorld* const world, void* const context, int threadIndex);
 	static void PostUpdateKernel (NewtonWorld* const world, void* const context, int threadIndex);
 
-	CustomControllerList m_controllerList;
+	CustomController* m_controllerList;
+//	CustomControllerList m_controllerList;
 };
 
 
@@ -183,7 +190,7 @@ void CustomControllerManager<CONTROLLER_BASE>::CustomController::PostUpdate(dFlo
 template<class CONTROLLER_BASE>
 CustomControllerManager<CONTROLLER_BASE>::CustomControllerManager(NewtonWorld* const world, const char* const managerName)
 	:CustomControllerBase(world, managerName)
-	,m_controllerList()
+	,m_controllerList(NULL)
 {
 }
 
@@ -191,6 +198,9 @@ CustomControllerManager<CONTROLLER_BASE>::CustomControllerManager(NewtonWorld* c
 template<class CONTROLLER_BASE>
 CustomControllerManager<CONTROLLER_BASE>::~CustomControllerManager()
 {
+	while (m_controllerList) {
+		DestroyController (m_controllerList);
+	}
 }
 
 template<class CONTROLLER_BASE>
@@ -212,8 +222,7 @@ template<class CONTROLLER_BASE>
 void CustomControllerManager<CONTROLLER_BASE>::PreUpdate (dFloat timestep)
 {
 	NewtonWorld* const world = GetWorld();
-	for (typename CustomControllerList::dListNode* ptr =  m_controllerList.GetFirst(); ptr; ptr = ptr->GetNext()) {
-		CustomController* const controller = &ptr->GetInfo();
+	for (CustomController* controller = m_controllerList; controller; controller = controller->m_next) {
 		NewtonDispachThreadJob(world, PreUpdateKernel, controller);
 	}
 	NewtonSyncThreadJobs(world);
@@ -223,18 +232,23 @@ template<class CONTROLLER_BASE>
 void CustomControllerManager<CONTROLLER_BASE>::PostUpdate (dFloat timestep)
 {
 	NewtonWorld* const world = GetWorld();
-	for (typename CustomControllerList::dListNode* ptr =  m_controllerList.GetFirst(); ptr; ptr = ptr->GetNext()) {
-		CustomController* const controller = &ptr->GetInfo();
+	for (CustomController* controller = m_controllerList; controller; controller = controller->m_next) {
 		NewtonDispachThreadJob(world, PostUpdateKernel, controller);
 	}
 	NewtonSyncThreadJobs(world);
+
 }
 
 
 template<class CONTROLLER_BASE>
 typename CustomControllerManager<CONTROLLER_BASE>::CustomController* CustomControllerManager<CONTROLLER_BASE>::CreateController ()
 {
-	CustomController* const controller = &m_controllerList.Append()->GetInfo();
+	CustomController* const controller = new (AllocController (sizeof (CustomController))) CustomController();
+
+	controller->m_prev = NULL;
+	controller->m_next = m_controllerList;
+	m_controllerList = controller;
+
 	controller->m_manager = this;
 	return controller;
 }
@@ -242,30 +256,39 @@ typename CustomControllerManager<CONTROLLER_BASE>::CustomController* CustomContr
 template<class CONTROLLER_BASE>
 void CustomControllerManager<CONTROLLER_BASE>::DestroyController (CustomController* const controller) 
 {
-	NewtonDestroyBody (GetWorld(), controller->m_body);
-	m_controllerList.Remove(m_controllerList.GetNodeFromInfo(*controller));
+	if (controller == m_controllerList) {
+		m_controllerList = controller->m_next;
+	}
+
+	if (controller->m_body) {
+		NewtonDestroyBody (GetWorld(), controller->m_body);
+	}
+
+	if (controller->m_next) {
+		controller->m_next->m_prev = controller->m_prev;
+	}
+	if (controller->m_prev) {
+		controller->m_prev->m_next = controller->m_next;
+	}
+	controller->m_next = NULL;
+	controller->m_prev = NULL;
+
+	controller->~CustomController();
+	FreeController (controller);
 }
 
 template<class CONTROLLER_BASE>
-void* CustomControllerManager<CONTROLLER_BASE>::GetFirstControllerNode() const 
+typename CustomControllerManager<CONTROLLER_BASE>::CustomController* CustomControllerManager<CONTROLLER_BASE>::GetFirstController() const 
 {
-	return m_controllerList.GetFirst();
+	return m_controllerList;
 }
 
 template<class CONTROLLER_BASE>
-void* CustomControllerManager<CONTROLLER_BASE>::GetNextControllerNode(void* const node) const 
+typename CustomControllerManager<CONTROLLER_BASE>::CustomController* CustomControllerManager<CONTROLLER_BASE>::GetNextController(CustomController* const controller) const 
 {
-	typename CustomControllerManager<CONTROLLER_BASE>::CustomControllerList::dListNode* const controllerNode = (typename CustomControllerManager<CONTROLLER_BASE>::CustomControllerList::dListNode*) node;
-	return controllerNode->GetNext();
+	return controller->m_next;
 }
 
-
-template<class CONTROLLER_BASE>
-typename CustomControllerManager<CONTROLLER_BASE>::CustomController* CustomControllerManager<CONTROLLER_BASE>::GetControllerFromNode(void* const node) const 
-{
-	typename CustomControllerManager<CONTROLLER_BASE>::CustomControllerList::dListNode* const controllerNode = (typename CustomControllerManager<CONTROLLER_BASE>::CustomControllerList::dListNode*) node;
-	return &controllerNode->GetInfo();
-}
 
 
 

@@ -16,12 +16,13 @@
 #include "CustomJointLibraryStdAfx.h"
 #include "CustomCorkScrew.h"
 
-dInitRtti(CustomCorkScrew);
+#define MIN_JOINT_PIN_LENGTH	50.0f
+
+//dInitRtti(CustomCorkScrew);
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-
-#define MIN_JOINT_PIN_LENGTH	50.0f
 
 CustomCorkScrew::CustomCorkScrew (const dMatrix& pinAndPivotFrame, NewtonBody* child, NewtonBody* parent)
 	:CustomJoint(6, child, parent)

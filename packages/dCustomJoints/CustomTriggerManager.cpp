@@ -17,6 +17,7 @@
 #include "CustomTriggerManager.h"
 
 
+
 CustomTriggerController::PassangerManifest::PassangerManifest ()
 	:m_count(0)
 	,m_capacity(0)
@@ -95,9 +96,6 @@ void CustomTriggerManager::PreUpdate(dFloat timestep)
 }
 
 
-void CustomTriggerController::PostUpdate(dFloat timestep, int threadIndex)
-{
-}
 
 
 void CustomTriggerController::SetUserData(void* const userData)
@@ -127,6 +125,10 @@ void CustomTriggerController::Init (NewtonCollision* const convexShape, const dM
 	NewtonCollisionSetCollisonMode(collision, 0);
 }
 
+
+void CustomTriggerController::PostUpdate(dFloat timestep, int threadIndex)
+{
+}
 
 void CustomTriggerController::PreUpdate(dFloat timestep, int threadIndex)
 {

@@ -59,6 +59,7 @@
 				PrecompiledHeaderThrough="toolbox_stdafx.h"
 				AssemblerListingLocation="$(IntDir)\"
 				WarningLevel="4"
+				SuppressStartupBanner="false"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 			/>
@@ -146,6 +147,7 @@
 				PrecompiledHeaderThrough="toolbox_stdafx.h"
 				AssemblerListingLocation="$(IntDir)\"
 				WarningLevel="4"
+				SuppressStartupBanner="false"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 			/>
@@ -231,6 +233,7 @@
 				PrecompiledHeaderThrough="toolbox_stdafx.h"
 				AssemblerListingLocation="$(IntDir)\"
 				WarningLevel="4"
+				SuppressStartupBanner="false"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 			/>
@@ -317,6 +320,7 @@
 				PrecompiledHeaderThrough="toolbox_stdafx.h"
 				AssemblerListingLocation="$(IntDir)\"
 				WarningLevel="4"
+				SuppressStartupBanner="false"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 			/>
@@ -406,6 +410,7 @@
 				PrecompiledHeaderThrough="toolbox_stdafx.h"
 				AssemblerListingLocation="$(IntDir)\"
 				WarningLevel="4"
+				SuppressStartupBanner="false"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 			/>
@@ -451,7 +456,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy  &quot;../../../../coreLibrary_300/projects/windows/project_vs2008/$(PlatformName)/newton/$(ConfigurationName)/*.dll&quot; &quot;../../$(PlatformName)//*.*&quot;  /F /Y /R"
+				CommandLine="xcopy  &quot;../../../../coreLibrary_300/projects/windows/project_vs2008/$(PlatformName)/newton/$(ConfigurationName)/*.dll&quot; &quot;../../$(PlatformName)//*.*&quot;  /F /Y /R&#x0D;&#x0A;xcopy  &quot;../../../../packages/projects/visualStudio_2008/$(PlatformName)/dJointLibrary/$(ConfigurationName)/*.dll&quot; &quot;../../$(PlatformName)//*.*&quot;  /F /Y /R&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -493,6 +498,7 @@
 				PrecompiledHeaderThrough="toolbox_stdafx.h"
 				AssemblerListingLocation="$(IntDir)\"
 				WarningLevel="4"
+				SuppressStartupBanner="false"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 			/>
@@ -538,7 +544,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy  &quot;../../../../coreLibrary_300/projects/windows/project_vs2008/$(PlatformName)/newton/$(ConfigurationName)/*.dll&quot; &quot;../../$(PlatformName)//*.*&quot;  /F /Y /R"
+				CommandLine="xcopy  &quot;../../../../coreLibrary_300/projects/windows/project_vs2008/$(PlatformName)/newton/$(ConfigurationName)/*.dll&quot; &quot;../../$(PlatformName)//*.*&quot;  /F /Y /R&#x0D;&#x0A;xcopy  &quot;../../../../packages/projects/visualStudio_2008/$(PlatformName)/dJointLibrary/$(ConfigurationName)/*.dll&quot; &quot;../../$(PlatformName)//*.*&quot;  /F /Y /R&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -578,6 +584,7 @@
 				PrecompiledHeaderThrough="toolbox_stdafx.h"
 				AssemblerListingLocation="$(IntDir)\"
 				WarningLevel="4"
+				SuppressStartupBanner="false"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 			/>
@@ -625,7 +632,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy  &quot;../../../../coreLibrary_300/projects/windows/project_vs2008/$(PlatformName)/newton/$(ConfigurationName)/*.dll&quot; &quot;../../$(PlatformName)//*.*&quot;  /F /Y /R"
+				CommandLine="xcopy  &quot;../../../../coreLibrary_300/projects/windows/project_vs2008/$(PlatformName)/newton/$(ConfigurationName)/*.dll&quot; &quot;../../$(PlatformName)//*.*&quot;  /F /Y /R&#x0D;&#x0A;xcopy  &quot;../../../../packages/projects/visualStudio_2008/$(PlatformName)/dJointLibrary/$(ConfigurationName)/*.dll&quot; &quot;../../$(PlatformName)//*.*&quot;  /F /Y /R&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -664,6 +671,7 @@
 				PrecompiledHeaderThrough="toolbox_stdafx.h"
 				AssemblerListingLocation="$(IntDir)\"
 				WarningLevel="4"
+				SuppressStartupBanner="false"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 			/>
@@ -710,7 +718,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy  &quot;../../../../coreLibrary_300/projects/windows/project_vs2008/$(PlatformName)/newton/$(ConfigurationName)/*.dll&quot; &quot;../../$(PlatformName)//*.*&quot;  /F /Y /R"
+				CommandLine="xcopy  &quot;../../../../coreLibrary_300/projects/windows/project_vs2008/$(PlatformName)/newton/$(ConfigurationName)/*.dll&quot; &quot;../../$(PlatformName)//*.*&quot;  /F /Y /R&#x0D;&#x0A;xcopy  &quot;../../../../packages/projects/visualStudio_2008/$(PlatformName)/dJointLibrary/$(ConfigurationName)/*.dll&quot; &quot;../../$(PlatformName)//*.*&quot;  /F /Y /R&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>

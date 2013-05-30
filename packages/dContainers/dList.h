@@ -530,8 +530,9 @@ bool dListAllocator<T>::IsAlive() const
 template<class T>
 void dListAllocator<T>::Prefetch ()
 {
+	int sizeInBytes = sizeof (typename dList<T, dListAllocator<T> >::dListNode);
 	for (int i = 0; i < D_MAX_ENTRIES_IN_FREELIST; i ++) {
-		dFreeListNode* const data = (dFreeListNode*) new char[sizeof (typename dList<T, dListAllocator<T> >::dListNode)];
+		dFreeListNode* const data = (dFreeListNode*) new char[sizeInBytes];
 		data->m_count = i + 1; 
 		data->m_next = m_freeListNode; 
 		m_freeListNode = data;

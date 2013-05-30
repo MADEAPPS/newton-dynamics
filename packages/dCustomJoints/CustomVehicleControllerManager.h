@@ -23,7 +23,7 @@
 
 #define VEHICLE_PLUGIN_NAME			"vehicleManager"
 
-
+/*
 class CustomVehicleController
 {
 	public:
@@ -455,6 +455,7 @@ int xxx;
 	InterpolationCurve m_tireLateralSlipAngle;
 	InterpolationCurve m_tireLongitidialSlipRatio;
 	friend class CustomVehicleControllerManager;
+
 };
 
 
@@ -467,7 +468,7 @@ class CustomVehicleControllerManager: public CustomControllerManager<CustomVehic
 	virtual CustomController* CreateVehicle (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, const dVector& gravityVector);
 	virtual void DestroyController (CustomController* const controller);
 };
-
+*/
 
 #endif 
 

@@ -21,7 +21,8 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-dInitRtti(CustomRackAndPinion);
+//dInitRtti(CustomRackAndPinion);
+
 CustomRackAndPinion::CustomRackAndPinion(
 	dFloat gearRatio, 
     const dVector& rotationalPin, 

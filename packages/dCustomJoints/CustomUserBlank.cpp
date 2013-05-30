@@ -23,7 +23,7 @@
 
 #define MIN_JOINT_PIN_LENGTH   50.0f
 
-dInitRtti(CustomUserBlank);
+//dInitRtti(CustomUserBlank);
 
 CustomUserBlank::CustomUserBlank(unsigned int maxDOF, NewtonBody* const child, NewtonBody* const parent)
    :CustomJoint(maxDOF, child, parent)

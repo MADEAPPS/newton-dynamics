@@ -339,6 +339,8 @@ dgWorld::~dgWorld()
 	}
 	#endif
 
+	m_preListener.RemoveAll();
+	m_postListener.RemoveAll();
 
 	DestroyAllBodies();
 	RemoveAllGroupID();

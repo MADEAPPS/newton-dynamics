@@ -22,7 +22,8 @@
 class CustomUniversal: public CustomJoint  
 {
 	public:
-	dAddRtti(CustomJoint);
+	//dAddRtti(CustomJoint);
+
 	CustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* child, NewtonBody* parent = NULL);
 	virtual ~CustomUniversal();
 

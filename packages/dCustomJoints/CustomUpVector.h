@@ -24,7 +24,8 @@
 class CustomUpVector: public CustomJoint
 {
 	public:
-	dAddRtti(CustomJoint);
+	//dAddRtti(CustomJoint);
+
 	CustomUpVector(const dVector& pin, NewtonBody* child);
 	virtual ~CustomUpVector();
 

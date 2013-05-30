@@ -23,7 +23,8 @@
 class CustomPathFollow: public CustomJoint  
 {
 	public:
-	dAddRtti(CustomJoint);
+	//dAddRtti(CustomJoint);
+
 	CustomPathFollow (const dMatrix& pinAndPivotFrame, NewtonBody* const body);
 	virtual ~CustomPathFollow();
 

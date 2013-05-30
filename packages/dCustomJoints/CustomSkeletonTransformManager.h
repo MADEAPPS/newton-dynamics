@@ -50,19 +50,19 @@ class CustomSkeletonTransformController
 	};
 
 
-	void SetUserData(void* const userData);
-	const void* GetUserData() const;
+	NEWTON_API void SetUserData(void* const userData);
+	NEWTON_API const void* GetUserData() const;
 
-	dSkeletonBone* AddBone (NewtonBody* const bone, const dMatrix& bindMatrix, dSkeletonBone* const parentBodne = NULL);
-	void SetDefaultBitFieldMask ();
+	NEWTON_API dSkeletonBone* AddBone (NewtonBody* const bone, const dMatrix& bindMatrix, dSkeletonBone* const parentBodne = NULL);
+	NEWTON_API void SetDefaultBitFieldMask ();
 
-	bool TestCollisionMask () const;
+	NEWTON_API bool TestCollisionMask () const;
 	
 	protected:
-	void Init (void* const userData);
+	NEWTON_API void Init (void* const userData);
 
-	virtual void PreUpdate(dFloat timestep, int threadIndex) {};
-	virtual void PostUpdate(dFloat timestep, int threadIndex);
+	NEWTON_API virtual void PreUpdate(dFloat timestep, int threadIndex) {};
+	NEWTON_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 	
 	private:
 	void* m_usertData;
@@ -74,19 +74,19 @@ class CustomSkeletonTransformController
 class CustomSkeletonTransformManager: public CustomControllerManager<CustomSkeletonTransformController> 
 {
 	public:
-	CustomSkeletonTransformManager(NewtonWorld* const world);
-	virtual ~CustomSkeletonTransformManager();
+	NEWTON_API CustomSkeletonTransformManager(NewtonWorld* const world);
+	NEWTON_API virtual ~CustomSkeletonTransformManager();
 
 	virtual void PreUpdate(dFloat timestep)
 	{
 		// bypass the entire Post Update call by not calling the base class
 	}
-	virtual void PostUpdate(dFloat timestep);
+	NEWTON_API virtual void PostUpdate(dFloat timestep);
 
-	virtual void UpdateTransform (const CustomSkeletonTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const = 0;
+	NEWTON_API virtual void UpdateTransform (const CustomSkeletonTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const = 0;
 
 	virtual void Debug () const {};
-	virtual CustomSkeletonTransformController* CreateTransformController (void* const userData);
+	NEWTON_API virtual CustomSkeletonTransformController* CreateTransformController (void* const userData);
 };
 
 inline void CustomSkeletonTransformController::SetUserData(void* const userData)

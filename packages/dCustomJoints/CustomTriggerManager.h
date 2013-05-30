@@ -42,11 +42,11 @@ class CustomTriggerController
 			NewtonBody* m_body;
 		};
 
-		PassangerManifest ();
-		~PassangerManifest ();
+		NEWTON_API PassangerManifest ();
+		NEWTON_API ~PassangerManifest ();
 
-		Passenger* Find (NewtonBody* const m_body);
-		Passenger* Insert (NewtonBody* const m_body);
+		NEWTON_API Passenger* Find (NewtonBody* const m_body);
+		NEWTON_API Passenger* Insert (NewtonBody* const m_body);
 
 		int m_count;
 		int m_capacity;
@@ -54,11 +54,11 @@ class CustomTriggerController
 	};
 
 	public:
-	const void* GetUserData() const;
-	void SetUserData(void* const userData);
-	void Init (NewtonCollision* const convexShape, const dMatrix& matrix, void* const userData);
-	virtual void PreUpdate(dFloat timestep, int threadIndex);
-	virtual void PostUpdate(dFloat timestep, int threadIndex);
+	NEWTON_API const void* GetUserData() const;
+	NEWTON_API void SetUserData(void* const userData);
+	NEWTON_API void Init (NewtonCollision* const convexShape, const dMatrix& matrix, void* const userData);
+	NEWTON_API virtual void PreUpdate(dFloat timestep, int threadIndex);
+	NEWTON_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 	
 	private:
 	void* m_userData;
@@ -76,19 +76,19 @@ class CustomTriggerManager: public CustomControllerManager<CustomTriggerControll
 		m_exitTrigger,
 	};
 
-	CustomTriggerManager(NewtonWorld* const world);
-	virtual ~CustomTriggerManager();
+	NEWTON_API CustomTriggerManager(NewtonWorld* const world);
+	NEWTON_API virtual ~CustomTriggerManager();
 
-	virtual void PreUpdate(dFloat timestep);
+	NEWTON_API virtual void PreUpdate(dFloat timestep);
 	virtual void PostUpdate(dFloat timestep)
 	{
 		// bypass the entire Post Update call by not calling the base class
 	}
 
 	virtual void Debug () const {};
-	virtual CustomTriggerController* CreateTrigger (const dMatrix& matrix, NewtonCollision* const convexShape, void* const userData);
+	NEWTON_API virtual CustomTriggerController* CreateTrigger (const dMatrix& matrix, NewtonCollision* const convexShape, void* const userData);
 
-	virtual void EventCallback (const CustomTriggerController* const me, TriggerEventType eventType, NewtonBody* const visitor) const = 0;
+	NEWTON_API virtual void EventCallback (const CustomTriggerController* const me, TriggerEventType eventType, NewtonBody* const visitor) const = 0;
 
 	unsigned m_lru;
 };

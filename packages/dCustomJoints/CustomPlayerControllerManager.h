@@ -65,18 +65,18 @@ class CustomPlayerController
 		return m_groundPlane;
 	}
 
-	void SetPlayerOrigin (dFloat originHigh);
-	void SetPlayerVelocity (dFloat forwadSpeed, dFloat lateralSpeed, dFloat verticalSpeed, dFloat headinAngle, const dVector& gravity, dFloat timestep);
+	NEWTON_API void SetPlayerOrigin (dFloat originHigh);
+	NEWTON_API void SetPlayerVelocity (dFloat forwadSpeed, dFloat lateralSpeed, dFloat verticalSpeed, dFloat headinAngle, const dVector& gravity, dFloat timestep);
 
 
 	protected:
-	dVector CalculateDesiredOmega (dFloat headinAngle, dFloat timestep) const;
-	dVector CalculateDesiredVelocity (dFloat forwadSpeed, dFloat lateralSpeed, dFloat verticalSpeed, const dVector& gravity, dFloat timestep) const;
+	NEWTON_API dVector CalculateDesiredOmega (dFloat headinAngle, dFloat timestep) const;
+	NEWTON_API dVector CalculateDesiredVelocity (dFloat forwadSpeed, dFloat lateralSpeed, dFloat verticalSpeed, const dVector& gravity, dFloat timestep) const;
 
-	void Init(dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stepHigh, const dMatrix& localAxis);
+	NEWTON_API void Init(dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stepHigh, const dMatrix& localAxis);
 
-	virtual void PreUpdate(dFloat timestep, int threadIndex);
-	virtual void PostUpdate(dFloat timestep, int threadIndex);
+	NEWTON_API virtual void PreUpdate(dFloat timestep, int threadIndex);
+	NEWTON_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 	
 	private:
 	dFloat CalculateContactKinematics(const dVector& veloc, const NewtonWorldConvexCastReturnInfo* const contact) const;
@@ -101,16 +101,16 @@ class CustomPlayerController
 class CustomPlayerControllerManager: public CustomControllerManager<CustomPlayerController> 
 {
 	public:
-	CustomPlayerControllerManager(NewtonWorld* const world);
-	virtual ~CustomPlayerControllerManager();
+	NEWTON_API CustomPlayerControllerManager(NewtonWorld* const world);
+	NEWTON_API virtual ~CustomPlayerControllerManager();
 
 	virtual void Debug () const {};
 
-	virtual CustomController* CreatePlayer (dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dMatrix& localAxis);
-	virtual void ApplyPlayerMove (CustomPlayerController* const controller, dFloat timestep) = 0; 
+	NEWTON_API virtual CustomController* CreatePlayer (dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dMatrix& localAxis);
+	NEWTON_API virtual void ApplyPlayerMove (CustomPlayerController* const controller, dFloat timestep) = 0; 
 
 	// the client application can overload this function to customizer contacts
-	virtual int ProcessContacts (const CustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const; 
+	NEWTON_API virtual int ProcessContacts (const CustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const; 
 };
 
 

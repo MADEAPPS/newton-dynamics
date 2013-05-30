@@ -17,7 +17,7 @@
 #include "CustomJointLibraryStdAfx.h"
 #include "CustomGear.h"
 
-dInitRtti(CustomGear);
+//dInitRtti(CustomGear);
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

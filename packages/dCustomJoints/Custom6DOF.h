@@ -23,7 +23,7 @@
 class Custom6DOF: public CustomJoint  
 {
 	public:
-	dAddRtti(CustomJoint);
+//	dAddRtti(CustomJoint);
 
 	Custom6DOF (const dMatrix& pinsAndPivotChildFrame, const dMatrix& pinsAndPivotParentFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
 	virtual ~Custom6DOF();

@@ -56,8 +56,9 @@
 				PrecompiledHeaderThrough="DebuggerServer.h"
 				AssemblerListingLocation="$(IntDir)\"
 				WarningLevel="4"
+				SuppressStartupBanner="false"
 				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -125,6 +126,7 @@
 				PrecompiledHeaderThrough="DebuggerServer.h"
 				AssemblerListingLocation="$(IntDir)\"
 				WarningLevel="4"
+				SuppressStartupBanner="false"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 			/>
@@ -192,6 +194,7 @@
 				PrecompiledHeaderThrough="DebuggerServer.h"
 				AssemblerListingLocation="$(IntDir)\"
 				WarningLevel="4"
+				SuppressStartupBanner="false"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 			/>
@@ -257,6 +260,7 @@
 				PrecompiledHeaderThrough="DebuggerServer.h"
 				AssemblerListingLocation="$(IntDir)\"
 				WarningLevel="4"
+				SuppressStartupBanner="false"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 			/>

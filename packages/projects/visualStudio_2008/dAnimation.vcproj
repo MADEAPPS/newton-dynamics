@@ -55,6 +55,7 @@
 				PrecompiledHeaderThrough="dAnimationStdAfx.h"
 				AssemblerListingLocation="$(IntDir)\"
 				WarningLevel="4"
+				SuppressStartupBanner="false"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -124,6 +125,7 @@
 				PrecompiledHeaderThrough="dAnimationStdAfx.h"
 				AssemblerListingLocation="$(IntDir)\"
 				WarningLevel="4"
+				SuppressStartupBanner="false"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -197,6 +199,7 @@
 				PrecompiledHeaderThrough="dAnimationStdAfx.h"
 				AssemblerListingLocation="$(IntDir)\"
 				WarningLevel="4"
+				SuppressStartupBanner="false"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -271,6 +274,7 @@
 				PrecompiledHeaderThrough="dAnimationStdAfx.h"
 				AssemblerListingLocation="$(IntDir)\"
 				WarningLevel="4"
+				SuppressStartupBanner="false"
 				DebugInformationFormat="3"
 			/>
 			<Tool

@@ -24,23 +24,24 @@
 class CustomKinematicController: public CustomJoint
 {
 	public:
-	dAddRtti(CustomJoint);
-	CustomKinematicController (NewtonBody* const body, const dVector& attachmentPointInGlobalSpace);
-	virtual ~CustomKinematicController();
+	//dAddRtti(CustomJoint);
 
-	void SetPickMode (int mode);
-	void SetMaxLinearFriction(dFloat accel); 
-	void SetMaxAngularFriction(dFloat alpha); 
+	NEWTON_API CustomKinematicController (NewtonBody* const body, const dVector& attachmentPointInGlobalSpace);
+	NEWTON_API virtual ~CustomKinematicController();
+
+	NEWTON_API void SetPickMode (int mode);
+	NEWTON_API void SetMaxLinearFriction(dFloat accel); 
+	NEWTON_API void SetMaxAngularFriction(dFloat alpha); 
 	
-	void SetTargetRotation (const dQuaternion& rotation); 
-	void SetTargetPosit (const dVector& posit); 
-	void SetTargetMatrix (const dMatrix& matrix); 
+	NEWTON_API void SetTargetRotation (const dQuaternion& rotation); 
+	NEWTON_API void SetTargetPosit (const dVector& posit); 
+	NEWTON_API void SetTargetMatrix (const dMatrix& matrix); 
 
-	dMatrix GetTargetMatrix () const;
+	NEWTON_API dMatrix GetTargetMatrix () const;
 
 	protected:
-	virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	virtual void GetInfo (NewtonJointRecord* const info) const;
+	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dVector m_localHandle;
 	dVector m_targetPosit;

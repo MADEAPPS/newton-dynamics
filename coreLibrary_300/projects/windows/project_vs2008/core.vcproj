@@ -71,7 +71,7 @@
 				BrowseInformation="0"
 				WarningLevel="4"
 				WarnAsError="false"
-				SuppressStartupBanner="true"
+				SuppressStartupBanner="false"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 			/>
@@ -162,7 +162,7 @@
 				BrowseInformation="0"
 				WarningLevel="4"
 				WarnAsError="false"
-				SuppressStartupBanner="true"
+				SuppressStartupBanner="false"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 			/>
@@ -249,7 +249,7 @@
 				BrowseInformation="1"
 				WarningLevel="4"
 				WarnAsError="false"
-				SuppressStartupBanner="true"
+				SuppressStartupBanner="false"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 			/>
@@ -336,7 +336,7 @@
 				BrowseInformation="1"
 				WarningLevel="4"
 				WarnAsError="false"
-				SuppressStartupBanner="true"
+				SuppressStartupBanner="false"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 			/>

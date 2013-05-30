@@ -23,7 +23,8 @@
 
 #define MIN_JOINT_PIN_LENGTH	50.0f
 
-dInitRtti(CustomUniversal);
+//dInitRtti(CustomUniversal);
+
 CustomUniversal::CustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* child, NewtonBody* parent)
 	:CustomJoint(6, child, parent)
 {

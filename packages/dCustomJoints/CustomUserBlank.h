@@ -23,7 +23,8 @@
 class CustomUserBlank: public CustomJoint  
 {
 	public:
-	dAddRtti(CustomJoint);
+	//dAddRtti(CustomJoint);
+
 	CustomUserBlank(unsigned int maxDOF, NewtonBody* const child, NewtonBody* const parent = NULL);
 	virtual ~CustomUserBlank();
 
