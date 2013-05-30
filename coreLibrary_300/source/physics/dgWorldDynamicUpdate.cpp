@@ -567,7 +567,6 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 						dgAssert (!constraint->m_isUnilateral || (constraint->m_isUnilateral && ((constraint->m_body0 == world->m_sentionelBody) || (constraint->m_body1 == world->m_sentionelBody))));
 
 						constraint->m_index = dgUnsigned32 (jointCount);
-						constraint->m_active = true;
 						dgJointInfo* const constraintArray = (dgJointInfo*) &world->m_jointsMemory[0];
 						constraintArray[jointIndex].m_joint = constraint;
 
@@ -613,9 +612,8 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 				if (ValidateEquilibrium (joint)) {
 					dgBody* const body0 = joint->m_body0;
 					dgBody* const body1 = joint->m_body1;
-					body0->m_active = false;
-					body1->m_active = false;
-					joint->m_active = false;
+//					body0->m_active = false;
+//					body1->m_active = false;
 				}
 			}
 */
