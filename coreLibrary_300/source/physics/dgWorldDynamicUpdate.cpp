@@ -538,7 +538,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 
 				dgBodyInfo* const bodyArray = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
 				body->m_index = bodyCount; 
-				body->m_active = true;
+				body->m_resting = true;
 				bodyArray[bodyIndex].m_body = body;
 				bodyCount ++;
 			}
@@ -597,6 +597,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 		}
 	}
 
+static bool xxx = false;
 	if (bodyCount > 1) {
 		if (isContinueCollisionIsland && jointCount && (rowsCount < 32)) {
 			rowsCount = 32;
@@ -605,19 +606,15 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 		world->m_islandMemory.ExpandCapacityIfNeessesary (m_islands, sizeof (dgIsland));
 		dgJointInfo* const constraintArray = (dgJointInfo*) &world->m_jointsMemory[0];
 
-		if (jointCount > 32) {
-/*
-			for (dgInt32 i = 0; i < jointCount; i ++) {
-				dgConstraint* const joint = constraintArray[m_joints + i].m_joint;
-				if (ValidateEquilibrium (joint)) {
-					dgBody* const body0 = joint->m_body0;
-					dgBody* const body1 = joint->m_body1;
-//					body0->m_active = false;
-//					body1->m_active = false;
-				}
-			}
-*/
+		for (dgInt32 i = 0; i < jointCount; i ++) {
+			dgConstraint* const joint = constraintArray[m_joints + i].m_joint;
+			dgBody* const body0 = joint->m_body0;
+			dgBody* const body1 = joint->m_body1;
+			bool resting = body0->m_equilibrium & body1->m_equilibrium & xxx;
+			body0->m_resting &= resting;
+			body1->m_resting &= resting;
 		}
+
 
 		dgIsland* const islandArray = (dgIsland*) &world->m_islandMemory[0];
 
@@ -659,6 +656,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 	}
 }
 
+/*
 bool dgWorldDynamicUpdate::ValidateEquilibrium (dgConstraint* const joint)
 {
 	bool equilibrium = false;
@@ -720,6 +718,7 @@ bool dgWorldDynamicUpdate::ValidateEquilibrium (dgConstraint* const joint)
 	
 	return equilibrium;
 }
+*/
 
 void dgWorldDynamicUpdate::IntegrateSoftBody (dgWorldDynamicUpdateSyncDescriptor* const descriptor, dgInt32 threadID)
 {

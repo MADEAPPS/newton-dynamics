@@ -244,7 +244,7 @@ class dgBody
 			dgUnsigned32 m_collideWithLinkedBodies  : 1;
 			dgUnsigned32 m_inCallback				: 1;
 			dgUnsigned32 m_collidable				: 1;
-			dgUnsigned32 m_active					: 1;
+			dgUnsigned32 m_resting					: 1;
 		};
 	};
 

@@ -303,7 +303,7 @@ class dgWorldDynamicUpdate
 	void IntegrateArray (const dgIsland* const island, dgFloat32 accelTolerance, dgFloat32 timestep, dgInt32 threadID) const;
 	dgInt32 GetJacobianDerivatives (const dgIsland* const island, dgInt32 threadID, bool bitMode, dgInt32 rowBase, dgInt32 rowCount, dgFloat32 timestep) const;	
 
-	bool ValidateEquilibrium (dgConstraint* const joint);
+//	bool ValidateEquilibrium (dgConstraint* const joint);
 	void IntegrateSoftBody (dgWorldDynamicUpdateSyncDescriptor* const descriptor, dgInt32 threadID);
 
 	dgInt32 m_bodies;

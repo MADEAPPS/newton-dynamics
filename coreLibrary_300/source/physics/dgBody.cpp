@@ -73,6 +73,7 @@ dgBody::dgBody()
 	,m_destructor(NULL)
 	,m_matrixUpdate(NULL)
 {
+	m_resting = true;
 	m_autoSleep = true;
 	m_collidable = true;
 	m_collideWithLinkedBodies = true;
