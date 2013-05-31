@@ -1525,10 +1525,6 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingle (dgCollidingPairCollector
 	dgBody* const compoundBody = constraint->GetBody0();
 	dgBody* const otherBody = constraint->GetBody1();
 
-	if (compoundBody->m_equilibrium & otherBody->m_equilibrium & (constraint->m_closetDistance > (DG_CACHE_DIST_TOL * dgFloat32 (4.0f)))) {
-		return 0;
-	}
-
 	dgCollisionInstance* const compoundInstance = compoundBody->m_collision;
 	dgCollisionInstance* const otherInstance = otherBody->m_collision;
 

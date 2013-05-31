@@ -1200,7 +1200,6 @@ dgFloat32 dgWorld::CalculateTimeToImpact (dgContact* const contact, dgFloat32 ti
 dgInt32 dgWorld::CollideContinue (
 	const dgCollisionInstance* const collisionSrcA, const dgMatrix& matrixA, const dgVector& velocA, const dgVector& omegaA, 
 	const dgCollisionInstance* const collisionSrcB, const dgMatrix& matrixB, const dgVector& velocB, const dgVector& omegaB, 
-//	dgFloat32& retTimeStep, dgTriplex* const points, dgTriplex* const normals, dgFloat32* const penetration, dgInt32 maxSize, dgInt32 threadIndex)
 	dgFloat32& retTimeStep, dgTriplex* const points, dgTriplex* const normals, dgFloat32* const penetration, 
 	dgInt64* const attibuteA, dgInt64* const attibuteB, dgInt32 maxContacts, dgInt32 threadIndex)
 {
@@ -1424,10 +1423,6 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts (dgCollisionParamProxy& prox
 	dgBody* const soupBody = proxy.m_floatingBody; 
 	dgBody* const hullBody = proxy.m_referenceBody; 
 
-	if (!proxy.m_continueCollision & soupBody->m_equilibrium & hullBody->m_equilibrium & (proxy.m_contactJoint->m_closetDistance > (DG_CACHE_DIST_TOL * dgFloat32 (4.0f)))) {
-		return 0;
-	}
-
 	dgCollisionInstance* const polySoupInstance = proxy.m_floatingCollision;
 	dgCollisionMesh* const polysoup = (dgCollisionMesh *) polySoupInstance->GetChildShape();
 	dgAssert (proxy.m_referenceCollision->IsType (dgCollision::dgCollisionConvexShape_RTTI));
@@ -1522,10 +1517,6 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) 
 
 	dgContact* const contactJoint = proxy.m_contactJoint;
 	dgAssert (contactJoint);
-
-	if (!proxy.m_continueCollision & proxy.m_floatingBody->m_equilibrium & proxy.m_referenceBody->m_equilibrium & (contactJoint->m_closetDistance > (DG_CACHE_DIST_TOL * dgFloat32 (4.0f)))) {
-		return 0;
-	}
 
 	dgAssert (collision1->GetCollisionPrimityType() != m_nullCollision);
 	dgAssert (collision2->GetCollisionPrimityType() != m_nullCollision);

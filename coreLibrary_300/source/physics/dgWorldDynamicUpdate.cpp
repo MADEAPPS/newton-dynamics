@@ -598,7 +598,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 		}
 	}
 
-static bool xxx = false;
+
 	if (bodyCount > 1) {
 		if (isContinueCollisionIsland && jointCount && (rowsCount < 32)) {
 			rowsCount = 32;
@@ -611,7 +611,8 @@ static bool xxx = false;
 			dgConstraint* const joint = constraintArray[m_joints + i].m_joint;
 			dgBody* const body0 = joint->m_body0;
 			dgBody* const body1 = joint->m_body1;
-			bool resting = body0->m_equilibrium & body1->m_equilibrium & xxx;
+			bool resting = body0->m_equilibrium & body1->m_equilibrium;
+resting = false;
 			body0->m_resting &= resting;
 			body1->m_resting &= resting;
 		}

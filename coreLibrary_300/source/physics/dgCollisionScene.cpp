@@ -67,6 +67,8 @@ void dgCollisionScene::CollidePair (dgCollidingPairCollector::dgPair* const pair
 	dgAssert (proxy.m_contactJoint == pair->m_contact);
 	dgContact* const constraint = pair->m_contact;
 
+
+
 	dgBody* const otherBody = constraint->GetBody0();
 	dgBody* const sceneBody = constraint->GetBody1();
 	dgAssert (sceneBody->GetCollision()->GetChildShape() == this);
