@@ -874,7 +874,7 @@ void dgBroadPhase::CalculatePairContacts (dgBroadphaseSyncDescriptor* const desc
 			}
 		} else {
 			if (pair->m_cacheIsValid) {
-				m_world->ProcessCachedContacts (pair->m_contact, timestep, threadID);
+				//m_world->ProcessCachedContacts (pair->m_contact, timestep, threadID);
 				KinematicBodyActivation (pair->m_contact);
 			} else {
 				pair->m_contact->m_maxDOF = 0;

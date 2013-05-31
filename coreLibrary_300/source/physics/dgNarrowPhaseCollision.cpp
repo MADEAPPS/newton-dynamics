@@ -605,12 +605,6 @@ void dgWorld::ProcessCachedContacts (dgContact* const contact, dgFloat32 timeste
 		contactMaterial.m_dynamicFriction0 = material->m_dynamicFriction0;
 		contactMaterial.m_dynamicFriction1 = material->m_dynamicFriction1;
 
-		//		contactMaterial.m_collisionEnable = true;
-		//		contactMaterial.m_friction0Enable = material->m_friction0Enable;
-		//		contactMaterial.m_friction1Enable = material->m_friction1Enable;
-		//		contactMaterial.m_override0Accel = false;
-		//		contactMaterial.m_override1Accel = false;
-		//		contactMaterial.m_overrideNormalAccel = false;
 		contactMaterial.m_flags = dgContactMaterial::m_collisionEnable | (material->m_flags & (dgContactMaterial::m_friction0Enable | dgContactMaterial::m_friction1Enable));
 		contactMaterial.m_userData = material->m_userData;
 	}
