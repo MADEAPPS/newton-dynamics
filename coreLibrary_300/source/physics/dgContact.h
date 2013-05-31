@@ -241,10 +241,10 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 	friend class dgContactSolver;
 	friend class dgActiveContacts;
 	friend class dgCollisionConvex;
+	friend class dgCollisionCompound;
 	friend class dgWorldDynamicUpdate;
 	friend class dgSolverWorlkerThreads;
 	friend class dgCollidingPairCollector;
-	
 }DG_GCC_VECTOR_ALIGMENT;
 
 inline void dgContactMaterial::SetCollisionCallback (OnAABBOverlap aabbOverlap, OnContactCallback contact) 

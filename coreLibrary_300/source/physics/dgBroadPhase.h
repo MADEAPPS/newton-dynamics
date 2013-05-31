@@ -36,6 +36,8 @@ typedef void (dgApi *OnLeavingWorldAction) (dgBody* body, dgInt32 threadIndex);
 typedef dgUnsigned32 (dgApi *OnRayPrecastAction) (const dgBody* const body, const dgCollisionInstance* const collision, void* const userData);
 typedef dgFloat32 (dgApi *OnRayCastAction) (const dgBody* const body, const dgCollisionInstance* const collision, const dgVector& normal, void* collisionID, void* const userData, dgFloat32 intersetParam);
 
+#define DG_CACHE_DIST_TOL			dgFloat32 (1.0e-3f)
+//#define DG_PRUNE_PADDING_BYTES		128
 
 DG_MSC_VECTOR_ALIGMENT
 struct dgLineBox

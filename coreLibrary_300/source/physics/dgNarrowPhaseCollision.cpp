@@ -51,8 +51,8 @@
 #include "dgCollisionCompoundBreakable.h"
 #include "dgCollisionDeformableClothPatch.h"
 
-#define DG_PRUNE_PADDING_BYTES		128
-#define DG_CACHE_DIST_TOL			dgFloat32 (1.0e-3f)
+
+
 
 
 dgCollisionInstance* dgWorld::CreateNull ()
