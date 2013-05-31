@@ -3115,8 +3115,12 @@ bool dgCollisionConvex::CalculateClosestPoints (dgCollisionParamProxy& proxy) co
 	contactOut[0].m_normal = normal;
 	contactOut[0].m_point = matrix.TransformVector(scale.CompProduct4(p));
 
-	contactOut[1].m_normal = normal.Scale3 (-1.0f);
+	contactOut[1].m_normal = normal.Scale4 (dgFloat32 (-1.0f));
 	contactOut[1].m_point = matrix.TransformVector(scale.CompProduct4(minkHull.m_q));
+
+	dgContact* const contactJoint = proxy.m_contactJoint;
+	contactJoint->m_closetDistance = (contactOut[1].m_point - contactOut[0].m_point).DotProduct4 (normal).m_x;
+
 	return true;
 }
 
