@@ -247,13 +247,14 @@ void dRuntimeProfiler::Render (int mask)
 	}
 
 	{
+		int base_y = 60;
 		glColor3f(1.0, 1.0, 1.0);
-		DrawLabel (x0 - 20, y0 + (y1 - y0) * 0 / 4, "0");
+		DrawLabel (x0 - 30, y0 + (y1 - y0) * 0 / 4 + base_y, "0");
 
 		for (int i = 1; i < 5; i ++) {
 			char label[32];
 			sprintf (label, "%4.2f", (1000.0f / 60.0f) * (float)i / 4.0f );
-			DrawLabel (x0 - 42, y0 + (y1 - y0) * i / 4, label);
+			DrawLabel (x0 - 55, y0 + (y1 - y0) * i / 4 + base_y, label);
 		}
 	}
 
