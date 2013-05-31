@@ -835,13 +835,9 @@ void dgWorld::PopulateContacts (dgCollidingPairCollector::dgPair* const pair, dg
 void dgWorld::ProcessContacts (dgCollidingPairCollector::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex)
 {
 	dgContact* const contact = pair->m_contact;
-	dgBody* const body0 = contact->m_body0;
-	dgBody* const body1 = contact->m_body1;
-	dgAssert (body0);
-	dgAssert (body1);
-	dgAssert (body0 != body1);
-	dgAssert (contact->m_body0 == body0);
-	dgAssert (contact->m_body1 == body1);
+	dgAssert (contact->m_body0);
+	dgAssert (contact->m_body1);
+	dgAssert (contact->m_body0 != contact->m_body1);
 	dgAssert (contact->m_broadphaseLru == GetBroadPhase()->m_lru);
 
 	contact->m_positAcc = dgVector (dgFloat32 (0.0f));
