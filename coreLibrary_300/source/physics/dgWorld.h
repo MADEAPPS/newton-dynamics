@@ -379,7 +379,7 @@ class dgWorld:
 //	dgInt32 CalculateConvexToNonConvexContacts (dgFloat32& timestep, dgBody* conv, dgBody* nConv, dgContactPoint* const contact, dgInt32 maxContacts) const;
 //	dgInt32 CalculatecConvexConvexCastContacts (dgCollisionParamProxy& proxy, bool& algorithmSuccessful) const;
 	
-	dgInt32 ValidateContactCache (dgContact* const contact) const;
+	dgInt32 ValidateContactCache (dgContact* const contact, dgFloat32 timestep) const;
 	
 	dgInt32 CalculateConvexPolygonToHullContactsDescrete (dgCollisionParamProxy& proxy) const;
 

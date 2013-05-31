@@ -221,10 +221,12 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 	void AppendToActiveList();
 	void SwapBodies();
 
-	dgVector m_prevPosit0;
-	dgVector m_prevPosit1;
-	dgQuaternion m_prevRotation0;
-	dgQuaternion m_prevRotation1;
+	dgVector m_positAcc;
+	dgQuaternion m_rotationAcc;
+//	dgVector m_prevPosit0;
+//	dgVector m_prevPosit1;
+//	dgQuaternion m_prevRotation0;
+//	dgQuaternion m_prevRotation1;
 	dgVector m_separtingVector;
 	dgFloat32 m_closetDistance;
 
