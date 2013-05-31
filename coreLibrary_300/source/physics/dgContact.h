@@ -226,6 +226,7 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 	dgQuaternion m_prevRotation0;
 	dgQuaternion m_prevRotation1;
 	dgVector m_separtingVector;
+	dgFloat32 m_closetDistance;
 
 	dgFloat32 m_timeOfImpact;
 	dgWorld* m_world;
@@ -233,7 +234,7 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 	dgActiveContacts::dgListNode* m_contactNode;
 	dgUnsigned32 m_broadphaseLru;
 	dgUnsigned32 m_isNewContact				: 1;
-//	dgUnsigned32 m_continueCollisionMode	: 1;
+
 
 	friend class dgWorld;
 	friend class dgBroadPhase;

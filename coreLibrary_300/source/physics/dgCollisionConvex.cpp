@@ -3136,7 +3136,8 @@ dgInt32 dgCollisionConvex::CalculateConvexToConvexContact (dgCollisionParamProxy
 		dgVector contactPoint ((minkHull.m_p + minkHull.m_q).Scale3 (dgFloat32 (0.5f)));
 		count = CalculateContacts (contactPoint, minkHull.m_normal.Scale3 (-1.0f), proxy, minkHull.m_hullDiff);
 	}
-
+	proxy.m_contactJoint->m_closetDistance = - penetration;
+	
 	if (count) {
 		count = dgMin(proxy.m_maxContacts, count);
 		dgContactPoint* const contactOut = proxy.m_contacts;

@@ -1498,7 +1498,7 @@ void dgBroadPhase::UpdateContacts( dgFloat32 timestep)
 	dgUnsigned32 endTicks = m_world->m_getPerformanceCount();
 	m_world->m_perfomanceCounters[m_collisionTicks] = endTicks - ticks - m_world->m_perfomanceCounters[m_forceCallbackTicks];
 
-	// update sofbody dynamics phase 1
+	// update soft body dynamics phase 1
 	for (dgInt32 i = 0; i < threadsCount; i ++) {
 		m_world->QueueJob (UpdateSoftBodyForcesKernel, &syncPoints, m_world);
 	}
