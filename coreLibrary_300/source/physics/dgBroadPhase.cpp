@@ -989,12 +989,6 @@ void dgBroadPhase::UpdateSoftBodyForcesKernel (void* const context, void* const 
 
 bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* const body1) const
 {
-//	return ( (-dgOverlapTest (body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB)) >> 4) &
-//		     (!body0->IsRTTIType (dgBody::m_kinematicBodyRTTI) || body1->m_invMass.m_w) & 
-//			 (!body1->IsRTTIType (dgBody::m_kinematicBodyRTTI) || body0->m_invMass.m_w) &
-//			 !(body1->m_collision->IsType (dgCollision::dgCollisionNull_RTTI) | body0->m_collision->IsType (dgCollision::dgCollisionNull_RTTI)) &
-//		     !(body0->GetSleepState() & body1->GetSleepState()) & 1;
-
 	bool mass0 = (body0->m_invMass.m_w != dgFloat32 (0.0f)); 
 	bool mass1 = (body1->m_invMass.m_w != dgFloat32 (0.0f)); 
 	bool isDynamic0 = body0->IsRTTIType (dgBody::m_dynamicBodyRTTI) != 0;
@@ -1004,7 +998,7 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 
 	bool tier0 = ((-dgOverlapTest (body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB)) >> 4) != 0;
 	bool tier1 = !(body1->m_collision->IsType (dgCollision::dgCollisionNull_RTTI) | body0->m_collision->IsType (dgCollision::dgCollisionNull_RTTI));
-	bool tier2 = !(body0->GetSleepState() & body1->GetSleepState());
+	bool tier2 = !(body0->m_sleeping & body1->m_sleeping);
 	bool tier3 = isDynamic0 & mass0; 
 	bool tier4 = isDynamic1 & mass1; 
 	bool tier5 = isKinematic0 & mass1; 
@@ -1028,13 +1022,6 @@ void dgBroadPhase::SubmitPairsStatic (dgNode* const bodyNode, dgNode* const node
 			if (!rootNode->m_left) {
 				dgAssert (!rootNode->m_right);
 				dgBody* const body1 = rootNode->m_body;
-//				if (dgOverlapTest(body1->m_minAABB, body1->m_maxAABB, body0->m_minAABB, body0->m_maxAABB)) {
-//					if (!body1->m_collision->IsType (dgCollision::dgCollisionNull_RTTI)) {
-//						if (!(body0->GetSleepState() & body1->GetSleepState())) { 
-//							AddPair (body0, body1, threadID);
-//						}
-//					}
-//				}
 				if (TestOverlaping (body0, body1)) {
 					AddPair (body0, body1, threadID);
 				}

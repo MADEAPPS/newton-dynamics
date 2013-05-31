@@ -128,6 +128,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 		}
 	}
 
+	world->m_sentionelBody->m_resting = true;
 	dgIsland* const islands = (dgIsland*) &world->m_islandMemory[0];
 	dgSort (islands, m_islands, CompareIslands); 
 
@@ -597,7 +598,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 		}
 	}
 
-static bool xxx = true;
+static bool xxx = false;
 	if (bodyCount > 1) {
 		if (isContinueCollisionIsland && jointCount && (rowsCount < 32)) {
 			rowsCount = 32;
@@ -614,7 +615,7 @@ static bool xxx = true;
 			body0->m_resting &= resting;
 			body1->m_resting &= resting;
 		}
-
+		
 
 		dgIsland* const islandArray = (dgIsland*) &world->m_islandMemory[0];
 

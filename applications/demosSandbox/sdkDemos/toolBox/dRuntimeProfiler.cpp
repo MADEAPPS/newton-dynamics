@@ -72,6 +72,9 @@ void dRuntimeProfiler::DrawRectangle (dFloat x, dFloat y, dFloat dx, dFloat dy, 
 
 void dRuntimeProfiler::DrawTrack (dFloat x0, dFloat y0, const dVector& color, int start, const unsigned* const track) const
 {
+	glDisable(GL_LIGHTING);
+	glDisable(GL_TEXTURE_2D);
+
 	glColor3f(color.m_x, color.m_y, color.m_z);
 
 	unsigned buffer[2048];

@@ -863,7 +863,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 
 		dgVector accNorm (maxAccNorm * dgFloat32 (2.0f));
 		for (dgInt32 passes = 0; (passes < maxPasses) && (accNorm.m_x > maxAccNorm); passes ++) {
-int xxx = 0;
+
 			accNorm = dgVector (0.0f);
 			for (dgInt32 curJoint = 0; curJoint < jointCount; curJoint ++) {
 				dgInt32 m0 = constraintArray[curJoint].m_m0;
@@ -872,7 +872,7 @@ int xxx = 0;
 				const dgBody* const body1 = bodyArray[m1].m_body;
 
 				if (!(body0->m_resting & body1->m_resting)) {
-xxx ++;
+
 					dgInt32 index = constraintArray[curJoint].m_autoPairstart;
 					dgInt32 rowsCount = constraintArray[curJoint].m_autoPaircount;
 
