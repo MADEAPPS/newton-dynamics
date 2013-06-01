@@ -152,7 +152,6 @@ class dgContactMaterial: public dgContactPoint
 		m_override0Accel  = 1<<3,
 		m_override1Accel  = 1<<4,
 		m_overrideNormalAccel = 1<<5,
-//		m_collisionContinueCollisionEnable = 1<<6,
 	};
 
 	dgContactMaterial();

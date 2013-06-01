@@ -35,6 +35,8 @@
 #define DG_CCD_EXTRA_CONTACT_COUNT			(4 * 4)
 
 
+dgVector dgWorldDynamicUpdate::m_velocTol (dgFloat32 (1.0e-18f));
+
 class dgWorldDynamicUpdateSyncDescriptor
 {
 	public:
@@ -224,7 +226,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	world->m_perfomanceCounters[m_dynamicsSolveSpanningTreeTicks] = ticks - dynamicsTime;
 	world->m_perfomanceCounters[m_dynamicsTicks] = ticks - updateTime;
 
-	// integrate sofbody dynamics phase 2
+	// integrate soft body dynamics phase 2
 	const dgCollisionDeformableMeshList* const softBodyList = world;
 	descriptor.m_sofBodyNode = softBodyList->GetFirst();
 	descriptor.m_lock = &m_softBodyCriticalSectionLock;
@@ -612,7 +614,6 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 			dgBody* const body0 = joint->m_body0;
 			dgBody* const body1 = joint->m_body1;
 			bool resting = body0->m_equilibrium & body1->m_equilibrium;
-resting = false;
 			body0->m_resting &= resting;
 			body1->m_resting &= resting;
 		}
@@ -658,69 +659,6 @@ resting = false;
 	}
 }
 
-/*
-bool dgWorldDynamicUpdate::ValidateEquilibrium (dgConstraint* const joint)
-{
-	bool equilibrium = false;
-
-	dgBody* const body0 = joint->m_body0;
-	dgBody* const body1 = joint->m_body1;
-
-	if (body0->m_equilibrium & body1->m_equilibrium) {
-		m_equilibriumMark ++;
-
-		dgInt32 stack = 0;
-		dgBody* stackPool[64];
-		dgInt32 stackLevel[64];
-
-		dgInt32 level = 0;
-		if (body0->m_invMass.m_w > dgFloat32 (0.0f)) {
-			stackPool[stack] = body0;
-			stackLevel[stack] = level;
-			stack ++;
-		}
-
-		if (body1->m_invMass.m_w > dgFloat32 (0.0f)) {
-			stackPool[stack] = body1;
-			stackLevel[stack] = level;
-			stack ++;
-		}
-
-		while (stack) {
-			stack --;
-			dgInt32 level1 = stackLevel[stack] + 1;
-			if (level1 < 2) {
-				dgBody* const body = stackPool[stack];
-				if (body->m_equilibriumMark != m_equilibriumMark) {
-					body->m_equilibriumMark = m_equilibriumMark;
-					for (dgBodyMasterListRow::dgListNode* jointNode = body->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
-						dgBodyMasterListCell* const cell = &jointNode->GetInfo();
-						dgConstraint* const constraint = cell->m_joint;
-						dgBody* const linkBody = cell->m_bodyNode;
-						dgAssert (linkBody != body);
-
-						if (linkBody->IsCollidable() && constraint->m_maxDOF) { 
-							if (!linkBody->m_equilibrium) {
-								return false;
-							}
-
-							if (linkBody->m_invMass.m_w > dgFloat32 (0.0f)) {
-								stackPool[stack] = linkBody;
-								stackLevel[stack] = level1;
-								stack ++;
-								dgAssert (stack < sizeof (stackPool) / sizeof (stackPool[0]));
-							}
-						}
-					}
-				}
-			}
-		}
-		equilibrium = true;
-	}
-	
-	return equilibrium;
-}
-*/
 
 void dgWorldDynamicUpdate::IntegrateSoftBody (dgWorldDynamicUpdateSyncDescriptor* const descriptor, dgInt32 threadID)
 {
@@ -979,9 +917,12 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 			bool equilibrium = (accel2 < accelFreeze) && (alpha2 < accelFreeze) && (speed2 < speedFreeze) && (omega2 < speedFreeze);
 
 			if (equilibrium) {
-				body->m_veloc = body->m_veloc.CompProduct4(forceDampVect);
-				body->m_omega = body->m_omega.CompProduct4 (forceDampVect);
+				dgVector veloc (body->m_veloc.CompProduct4(forceDampVect));
+				dgVector omega = body->m_omega.CompProduct4 (forceDampVect);
+				body->m_veloc = (dgVector (veloc.DotProduct4(veloc)) > m_velocTol) & veloc;
+				body->m_omega = (dgVector (omega.DotProduct4(omega)) > m_velocTol) & omega;
 			}
+
 			body->m_equilibrium = dgUnsigned32 (equilibrium);
 			stackSleeping &= equilibrium;
 			isAutoSleep &= body->m_autoSleep;

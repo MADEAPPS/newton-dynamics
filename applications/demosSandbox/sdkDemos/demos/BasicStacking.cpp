@@ -97,9 +97,6 @@ static void BuildPyramid (DemoEntityManager* const scene, dFloat mass, const dVe
 
 	matrix.m_posit.m_y = floor.m_y + size.m_y / 2.0f; 
 
-//	dFloat stepz = size.m_z + 0.01f;
-//	dFloat stepy = size.m_y;
-
 	// get the dimension from shape itself
 	dVector minP;
 	dVector maxP;
@@ -113,7 +110,8 @@ static void BuildPyramid (DemoEntityManager* const scene, dFloat mass, const dVe
 	float z0 = matrix.m_posit.m_z - stepz * count / 2;
 
 	matrix.m_posit.m_y = y0;
-	for (int j = 0; j < count / 2; j ++) {
+	//for (int j = 0; j < count; j ++) {
+	for (int j = 0; j < count/2; j ++) {
 
 		matrix.m_posit.m_z = z0;
 		for (int i = 0; i < (count - j) ; i ++) {

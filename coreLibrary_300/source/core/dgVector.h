@@ -289,7 +289,7 @@ class dgVector: public dgTemplateVector<dgFloat32>
 	DG_INLINE dgVector (const dgVector& v)
 		:dgTemplateVector<dgFloat32>(v)
 	{
-		dgAssert (dgCheckVector ((*this)));
+		//dgAssert (dgCheckVector ((*this)));
 	}
 
 	DG_INLINE dgVector (const dgTemplateVector<dgFloat32>& v)
@@ -330,6 +330,11 @@ class dgVector: public dgTemplateVector<dgFloat32>
 	DG_INLINE dgVector Floor () const
 	{
 		return dgVector (dgFloor (m_x), dgFloor (m_y), dgFloor (m_z), dgFloor (m_w));
+	}
+
+	DG_INLINE dgVector InvMagSqrt () const
+	{
+		return dgVector (dgRsqrt (DotProduct4(*this).m_x));
 	}
 
 	DG_INLINE dgVector InvSqrt () const
@@ -701,11 +706,18 @@ class dgVector
 		return ret;
 	}
 
+
 	DG_INLINE dgVector InvSqrt () const
 	{
 		dgVector tmp0 (_mm_rsqrt_ps(m_type));
 		return m_half.CompProduct4(tmp0).CompProduct4((m_three - CompProduct4(tmp0).CompProduct4(tmp0)));
 	}
+
+	DG_INLINE dgVector InvMagSqrt () const
+	{
+		return DotProduct4(*this).InvSqrt();
+	}
+
 	
 	// relational operators
 	DG_INLINE dgVector operator> (const dgVector& data) const

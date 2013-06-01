@@ -31,9 +31,9 @@
 //#define DEFAULT_SCENE	5			// primitive collision
 //#define DEFAULT_SCENE	6 			// Kinematic bodies
 //#define DEFAULT_SCENE	7			// primitive convex cast 
-#define DEFAULT_SCENE	8			// Box stacks
+//#define DEFAULT_SCENE	8			// Box stacks
 //#define DEFAULT_SCENE	9			// simple level mesh collision
-//#define DEFAULT_SCENE	10			// optimized level mesh collision
+#define DEFAULT_SCENE	10			// optimized level mesh collision
 //#define DEFAULT_SCENE	11			// height field Collision
 //#define DEFAULT_SCENE	12			// infinite user plane collision
 //#define DEFAULT_SCENE	13			// user height field Collision
@@ -276,7 +276,6 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	,m_hideVisualMeshes(false)
 	,m_showContactPoints(false)
 	,m_showNormalForces(false)
-//	,m_showNormalForces(true)
 	,m_showAABB(false)
 	,m_showJoints(false)
 	,m_showCenterOfMass(false)
@@ -319,6 +318,12 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	m_statusbar->SetFieldsCount (sizeof (widths)/sizeof (widths[0]), widths);
 	CalculateFPS(0.0f);
 	m_mainMenu = CreateMainMenu();
+
+
+//m_autoSleepState = false;
+//m_debugDisplayMode = 2;
+//m_scene->m_showProfiler[6] = 1;
+//m_scene->m_showProfiler[0] = 1;
 }
 
 

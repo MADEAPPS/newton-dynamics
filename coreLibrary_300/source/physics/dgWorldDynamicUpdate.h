@@ -302,8 +302,6 @@ class dgWorldDynamicUpdate
 	void CalculateSimpleBodyReactionsForces (const dgIsland* const island, dgInt32 rowStart, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
 	void IntegrateArray (const dgIsland* const island, dgFloat32 accelTolerance, dgFloat32 timestep, dgInt32 threadID) const;
 	dgInt32 GetJacobianDerivatives (const dgIsland* const island, dgInt32 threadID, bool bitMode, dgInt32 rowBase, dgInt32 rowCount, dgFloat32 timestep) const;	
-
-//	bool ValidateEquilibrium (dgConstraint* const joint);
 	void IntegrateSoftBody (dgWorldDynamicUpdateSyncDescriptor* const descriptor, dgInt32 threadID);
 
 	dgInt32 m_bodies;
@@ -315,6 +313,7 @@ class dgWorldDynamicUpdate
 	dgJacobianMemory m_solverMemory;
 	dgThread::dgCriticalSection m_softBodyCriticalSectionLock;
 	dgBody* m_sentinelBody;
+	static dgVector m_velocTol;
 
 	friend class dgWorld;
 	friend class dgJacobianMemory;

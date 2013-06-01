@@ -35,16 +35,16 @@
 //////////////////////////////////////////////////////////////////////
 
 dgContactMaterial::dgContactMaterial()
-	:m_userData(NULL)
+	:m_dir0 (dgFloat32 (0.0f))
+	,m_dir1 (dgFloat32 (0.0f))
+	,m_userData(NULL)
 	,m_aabbOverlap(NULL)
 	,m_contactPoint(NULL)
 	,m_compoundAABBOverlap(NULL)
 {
 	//	dgAssert ( dgInt32 (sizeof (dgContactMaterial) & 15) == 0);
 	dgAssert ((((dgUnsigned64) this) & 15) == 0);
-	m_point.m_x = dgFloat32 (0.0f);
-	m_point.m_y = dgFloat32 (0.0f);
-	m_point.m_z = dgFloat32 (0.0f);
+	m_point = dgVector (dgFloat32 (0.0f));
 	m_softness = dgFloat32 (0.1f);
 	m_restitution = dgFloat32 (0.4f);
 
