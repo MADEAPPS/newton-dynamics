@@ -71,7 +71,7 @@ dgContact::dgContact(dgWorld* const world, const dgContactMaterial* const materi
 	,m_contactNode(NULL)
 	,m_broadphaseLru(0)
 	,m_isNewContact(true)
-	,m_closetDistance (dgFloat32 (0.0f))
+	,m_closestDistance (dgFloat32 (0.0f))
 {
 	dgAssert ((((dgUnsigned64) this) & 15) == 0);
 	m_maxDOF = 0;

@@ -3119,7 +3119,7 @@ bool dgCollisionConvex::CalculateClosestPoints (dgCollisionParamProxy& proxy) co
 	contactOut[1].m_point = matrix.TransformVector(scale.CompProduct4(minkHull.m_q));
 
 	dgContact* const contactJoint = proxy.m_contactJoint;
-	contactJoint->m_closetDistance = (contactOut[1].m_point - contactOut[0].m_point).DotProduct4 (normal).m_x;
+	contactJoint->m_closestDistance = (contactOut[1].m_point - contactOut[0].m_point).DotProduct4 (normal).m_x;
 
 	return true;
 }
@@ -3140,7 +3140,7 @@ dgInt32 dgCollisionConvex::CalculateConvexToConvexContact (dgCollisionParamProxy
 		dgVector contactPoint ((minkHull.m_p + minkHull.m_q).Scale3 (dgFloat32 (0.5f)));
 		count = CalculateContacts (contactPoint, minkHull.m_normal.Scale3 (-1.0f), proxy, minkHull.m_hullDiff);
 	}
-	proxy.m_contactJoint->m_closetDistance = - penetration;
+	proxy.m_contactJoint->m_closestDistance = - penetration;
 	
 	if (count) {
 		count = dgMin(proxy.m_maxContacts, count);

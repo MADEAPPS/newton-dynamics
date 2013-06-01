@@ -224,7 +224,7 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 	dgVector m_positAcc;
 	dgQuaternion m_rotationAcc;
 	dgVector m_separtingVector;
-	dgFloat32 m_closetDistance;
+	dgFloat32 m_closestDistance;
 
 	dgFloat32 m_timeOfImpact;
 	dgWorld* m_world;

@@ -735,7 +735,7 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, dgInt32 th
 			dgAssert (contact);
 			//if ( (body0->m_continueCollisionMode | body1->m_continueCollisionMode) | 
 			//	!(body0->m_equilibrium & body1->m_equilibrium & (contact->m_closetDistance > (DG_CACHE_DIST_TOL * dgFloat32 (4.0f))))) {
-			if (!(body0->m_equilibrium & body1->m_equilibrium & (contact->m_closetDistance > (DG_CACHE_DIST_TOL * dgFloat32 (4.0f))))) {
+			if (!(body0->m_equilibrium & body1->m_equilibrium & (contact->m_closestDistance > (DG_CACHE_DIST_TOL * dgFloat32 (4.0f))))) {
 				contact->m_broadphaseLru = m_lru;
 				contact->m_timeOfImpact = dgFloat32 (1.0e10f);
 				contactPairs->AddPair(contact, threadID);

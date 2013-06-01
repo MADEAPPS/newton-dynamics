@@ -467,6 +467,8 @@ class dgWorld:
 	dgArray<dgUnsigned8> m_internalForcesMemory;  
 	dgArray<dgUnsigned8> m_solverMatrixMemory;  
 	
+	static dgVector m_linearContactError2;
+	static dgVector m_angularContactError2;
 	
 	friend class dgBody;
 	friend class dgDeformableBody;

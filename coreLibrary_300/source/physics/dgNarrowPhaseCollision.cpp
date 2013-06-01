@@ -51,9 +51,10 @@
 #include "dgCollisionCompoundBreakable.h"
 #include "dgCollisionDeformableClothPatch.h"
 
-
-
-
+#define DG_CONTACT_TRANSLATION_ERROR (dgFloat32 (1.0e-3f))
+#define DG_CONTACT_ANGULAR_ERROR (dgFloat32 (0.25f * 3.141592f / 180.0f))
+dgVector dgWorld::m_angularContactError2 (DG_CONTACT_ANGULAR_ERROR * DG_CONTACT_ANGULAR_ERROR);
+dgVector dgWorld::m_linearContactError2 (DG_CONTACT_TRANSLATION_ERROR * DG_CONTACT_TRANSLATION_ERROR);
 
 dgCollisionInstance* dgWorld::CreateNull ()
 {
@@ -872,9 +873,6 @@ void dgWorld::ProcessDeformableContacts (dgCollidingPairCollector::dgPair* const
 
 dgInt32 dgWorld::ValidateContactCache (dgContact* const contact, dgFloat32 timestep) const
 {
-	#define dgLinearError (dgFloat32 (1.0e-3f))
-	#define dgAngleError (dgFloat32 (0.25f * 3.141592f / 180.0f))
-
 	dgAssert (contact && (contact->GetId() == dgConstraint::m_contactConstraint));
 
 	dgBody* const body0 = contact->GetBody0();
@@ -888,13 +886,10 @@ dgInt32 dgWorld::ValidateContactCache (dgContact* const contact, dgFloat32 times
 
 	dgVector angle (contact->m_rotationAcc.m_q1, contact->m_rotationAcc.m_q2, contact->m_rotationAcc.m_q3, dgFloat32 (0.0f)); 
 
-	dgVector positError (contact->m_positAcc.DotProduct4 (contact->m_positAcc));
-	dgVector rotatError (angle.DotProduct4(angle));
-
-	dgVector angleTol (dgAngleError * dgAngleError); 
-	dgVector positTol (dgLinearError * dgLinearError); 
+	dgVector positError2 (contact->m_positAcc.DotProduct4 (contact->m_positAcc));
+	dgVector rotatError2 (angle.DotProduct4(angle));
 	
-	dgVector mask ((positError < positTol) & (rotatError < dgAngleError));
+	dgVector mask ((positError2 < m_linearContactError2) & (rotatError2 < m_angularContactError2));
 
 	dgList<dgContactMaterial>& list = *contact;
 	return mask.GetInt() ? list.GetCount() : 0;
@@ -1325,7 +1320,7 @@ dgInt32 dgWorld::ClosestPoint (dgCollisionParamProxy& proxy) const
 
 	dgContact* const contactJoint = proxy.m_contactJoint;
 	dgAssert (contactJoint);
-	contactJoint->m_closetDistance = dgFloat32 (1.0e10f);
+	contactJoint->m_closestDistance = dgFloat32 (1.0e10f);
 
 	if (!(collision1->GetConvexVertexCount() && collision2->GetConvexVertexCount())) {
 		return 0;
@@ -1397,7 +1392,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts (dgCollisionParamProxy& prox
 
 	dgContact* const contactJoint = proxy.m_contactJoint;
 	dgAssert (contactJoint);
-	contactJoint->m_closetDistance = dgFloat32 (1.0e10f);
+	contactJoint->m_closestDistance = dgFloat32 (1.0e10f);
 
 	if (!convexInstance->GetConvexVertexCount()) {
 		return count;
@@ -1496,7 +1491,7 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) 
 	dgContact* const contactJoint = proxy.m_contactJoint;
 	dgAssert (contactJoint);
 
-	contactJoint->m_closetDistance = dgFloat32 (1.0e10f);
+	contactJoint->m_closestDistance = dgFloat32 (1.0e10f);
 	if (!(collision1->GetConvexVertexCount() && collision2->GetConvexVertexCount())) {
 		return count;
 	}
@@ -1700,7 +1695,7 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 		proxy.m_maxContacts = countleft;
 		proxy.m_contacts = &contactOut[count];
 		dgInt32 count1 = polygon.CalculateContactToConvexHullDescrete (proxy);
-		closestDist = dgMin(closestDist, contactJoint->m_closetDistance);
+		closestDist = dgMin(closestDist, contactJoint->m_closestDistance);
 
 		if (count1) {
 			count += count1;
@@ -1717,7 +1712,7 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 		indexCount += data.GetFaceIndexCount (data.m_faceIndexCount[i]);
 	}
 
-	contactJoint->m_closetDistance = closestDist;
+	contactJoint->m_closestDistance = closestDist;
 
 	// check for extreme obtuse contacts 
 	dgFloat32 penetrations[DG_MAX_CONTATCS];
@@ -1876,7 +1871,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue (dgCollisionParamPro
 	}
 
 	proxy.m_contacts = contactOut;
-	contactJoint->m_closetDistance = closestDist;
+	contactJoint->m_closestDistance = closestDist;
 
 	// restore the pointer
 	proxy.m_normal = n;

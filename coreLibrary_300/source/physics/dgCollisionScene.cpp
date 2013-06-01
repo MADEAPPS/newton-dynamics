@@ -124,7 +124,7 @@ void dgCollisionScene::CollidePair (dgCollidingPairCollector::dgPair* const pair
 						childInstance.SetGlobalMatrix(childInstance.GetLocalMatrix() * myMatrix);
 						proxy.m_floatingCollision = &childInstance;
 						m_world->SceneChildContacts (pair, proxy);
-						closestDist = dgMin(closestDist, constraint->m_closetDistance);
+						closestDist = dgMin(closestDist, constraint->m_closestDistance);
 					}
 
 				} else {
@@ -165,7 +165,7 @@ void dgCollisionScene::CollidePair (dgCollidingPairCollector::dgPair* const pair
 						childInstance.SetGlobalMatrix(childInstance.GetLocalMatrix() * myMatrix);
 						proxy.m_floatingCollision = &childInstance;
 						m_world->SceneChildContacts (pair, proxy);
-						closestDist = dgMin(closestDist, constraint->m_closetDistance);
+						closestDist = dgMin(closestDist, constraint->m_closestDistance);
 					}
 
 				} else {
@@ -181,7 +181,7 @@ void dgCollisionScene::CollidePair (dgCollidingPairCollector::dgPair* const pair
 			}
 		}
 	}
-	constraint->m_closetDistance = closestDist;
+	constraint->m_closestDistance = closestDist;
 }
 
 
@@ -246,7 +246,7 @@ void dgCollisionScene::CollideCompoundPair (dgCollidingPairCollector::dgPair* co
 						proxy.m_floatingCollision = &childInstance;
 						proxy.m_referenceCollision = &otherInstance;
 						m_world->SceneChildContacts (pair, proxy);
-						closestDist = dgMin(closestDist, constraint->m_closetDistance);
+						closestDist = dgMin(closestDist, constraint->m_closestDistance);
 					}
 
 				} else if (me->m_type == m_leaf) {
@@ -302,7 +302,7 @@ void dgCollisionScene::CollideCompoundPair (dgCollidingPairCollector::dgPair* co
 			}
 		}
 	}
-	constraint->m_closetDistance = closestDist;
+	constraint->m_closestDistance = closestDist;
 }
 
 
