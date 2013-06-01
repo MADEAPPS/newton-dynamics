@@ -689,22 +689,68 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, dgInt32 th
 	bool isCollidable = true;
 	dgContact* contact = NULL;
 	if ((body0->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI)) || (body0->GetInvMass().m_w != dgFloat32 (0.0f))) {
-		for (dgBodyMasterListRow::dgListNode* link = m_world->FindConstraintLink (body0, body1); isCollidable && link; link = m_world->FindConstraintLinkNext (link, body1)) {
+		//for (dgBodyMasterListRow::dgListNode* link = m_world->FindConstraintLink (body0, body1); isCollidable && link; link = m_world->FindConstraintLinkNext (link, body1)) {
+		//	if (constraint->GetId() == dgConstraint::m_contactConstraint) {
+		//		contact = (dgContact*)constraint;
+		//	}
+		//	isCollidable &= constraint->IsCollidable();
+		//}
+		for (dgBodyMasterListRow::dgListNode* link = body0->m_masterNode->GetInfo().GetFirst(); link; link = link->GetNext()) {
 			dgConstraint* const constraint = link->GetInfo().m_joint;
-			if (constraint->GetId() == dgConstraint::m_contactConstraint) {
-				contact = (dgContact*)constraint;
+			if (constraint->GetId() != dgConstraint::m_contactConstraint) {
+				break;
 			}
-			isCollidable &= constraint->IsCollidable();
+			if (link->GetInfo().m_bodyNode == body1) {
+				contact = (dgContact*)constraint;
+				isCollidable = true;
+				break;
+			}
 		}
+
+		if (contact) {
+			for (dgBodyMasterListRow::dgListNode* link = body0->m_masterNode->GetInfo().GetLast(); link; link = link->GetPrev()) {
+				dgConstraint* const constraint = link->GetInfo().m_joint;
+				if (constraint->GetId() == dgConstraint::m_contactConstraint) {
+					break;
+				}
+				if (link->GetInfo().m_bodyNode == body1) {
+					isCollidable = constraint->IsCollidable();
+				}
+			}
+		}
+
 	} else {
 		dgAssert ((body1->GetInvMass().m_w != dgFloat32 (0.0f)) || (body1->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI)));
-		for (dgBodyMasterListRow::dgListNode* link = m_world->FindConstraintLink (body1, body0); isCollidable && link; link = m_world->FindConstraintLinkNext (link, body0)) {
+		//for (dgBodyMasterListRow::dgListNode* link = m_world->FindConstraintLink (body1, body0); isCollidable && link; link = m_world->FindConstraintLinkNext (link, body0)) {
+		//	dgConstraint* const constraint = link->GetInfo().m_joint;
+		//	if (constraint->GetId() == dgConstraint::m_contactConstraint) {
+		//		contact = (dgContact*)constraint;
+		//		break;
+		//	} 
+		//	isCollidable &= constraint->IsCollidable();
+		//}
+		for (dgBodyMasterListRow::dgListNode* link = body1->m_masterNode->GetInfo().GetFirst(); link; link = link->GetNext()) {
 			dgConstraint* const constraint = link->GetInfo().m_joint;
-			if (constraint->GetId() == dgConstraint::m_contactConstraint) {
-				contact = (dgContact*)constraint;
+			if (constraint->GetId() != dgConstraint::m_contactConstraint) {
 				break;
-			} 
-			isCollidable &= constraint->IsCollidable();
+			}
+			if (link->GetInfo().m_bodyNode == body0) {
+				contact = (dgContact*)constraint;
+				isCollidable = true;
+				break;
+			}
+		}
+
+		if (contact) {
+			for (dgBodyMasterListRow::dgListNode* link = body1->m_masterNode->GetInfo().GetLast(); link; link = link->GetPrev()) {
+				dgConstraint* const constraint = link->GetInfo().m_joint;
+				if (constraint->GetId() == dgConstraint::m_contactConstraint) {
+					break;
+				}
+				if (link->GetInfo().m_bodyNode == body0) {
+					isCollidable = constraint->IsCollidable();
+				}
+			}
 		}
 	}
 

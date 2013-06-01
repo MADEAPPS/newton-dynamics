@@ -38,9 +38,18 @@ dgBodyMasterListRow::~dgBodyMasterListRow()
 }
 
 
-dgBodyMasterListRow::dgListNode* dgBodyMasterListRow::AddJoint (dgConstraint* const joint, dgBody* const body)
+dgBodyMasterListRow::dgListNode* dgBodyMasterListRow::AddContactJoint (dgConstraint* const joint, dgBody* const body)
 {
 	dgListNode* const node = Addtop();
+	node->GetInfo().m_joint = joint;
+	node->GetInfo().m_bodyNode = body;
+	return node;
+}
+
+
+dgBodyMasterListRow::dgListNode* dgBodyMasterListRow::AddBilateralJoint (dgConstraint* const joint, dgBody* const body)
+{
+	dgListNode* const node = Append();
 	node->GetInfo().m_joint = joint;
 	node->GetInfo().m_bodyNode = body;
 	return node;
@@ -167,12 +176,15 @@ void dgBodyMasterList::AttachConstraint(dgConstraint* const constraint,	dgBody* 
 
 	constraint->m_body0 = body0;
 	constraint->m_body1 = body1;
-	constraint->m_link0 = body0->m_masterNode->GetInfo().AddJoint (constraint, body1);
-	constraint->m_link1 = body1->m_masterNode->GetInfo().AddJoint (constraint, body0);
 
 	if (constraint->GetId() != dgConstraint::m_contactConstraint) {
 		body0->m_equilibrium = body0->GetInvMass().m_w ? false : true;
 		body1->m_equilibrium = body1->GetInvMass().m_w ? false : true;
+		constraint->m_link0 = body0->m_masterNode->GetInfo().AddBilateralJoint (constraint, body1);
+		constraint->m_link1 = body1->m_masterNode->GetInfo().AddBilateralJoint (constraint, body0);
+	} else {
+		constraint->m_link0 = body0->m_masterNode->GetInfo().AddContactJoint (constraint, body1);
+		constraint->m_link1 = body1->m_masterNode->GetInfo().AddContactJoint (constraint, body0);
 	}
 	m_constraintCount = m_constraintCount + 1;
 }

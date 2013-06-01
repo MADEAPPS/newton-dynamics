@@ -42,7 +42,9 @@ class dgBodyMasterListRow: public dgList<dgBodyMasterListCell>
 	dgBody* GetBody() const	{ return m_body;}
 
 	void RemoveAllJoints ();
-	dgListNode* AddJoint (dgConstraint* const joint, dgBody* const body);
+	dgListNode* AddContactJoint (dgConstraint* const joint, dgBody* const body);
+	dgListNode* AddBilateralJoint (dgConstraint* const joint, dgBody* const body);
+	
 
 	void SortList();
 
