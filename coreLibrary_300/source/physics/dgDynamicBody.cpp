@@ -28,6 +28,8 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
+dgVector dgDynamicBody::m_equilibriumError2 (DG_ErrTolerance2);
+
 
 dgDynamicBody::dgDynamicBody()
 	:dgBody()
@@ -137,27 +139,16 @@ void dgDynamicBody::AttachCollision (dgCollisionInstance* const collision)
 
 bool dgDynamicBody::IsInEquilibrium () const
 {
-	dgFloat32 invMassMag2 = m_invMass[3] * m_invMass[3];
 	if (m_equilibrium) {
-		dgVector error (m_accel - m_prevExternalForce);
-		dgFloat32 errMag2 = (error % error) * invMassMag2;
-		if (errMag2 < DG_ErrTolerance2) {
-			error = m_alpha - m_prevExternalTorque;
-			errMag2 = (error % error) * invMassMag2;
-			if (errMag2 < DG_ErrTolerance2) {
-				errMag2 = (m_netForce % m_netForce) * invMassMag2;
-				if (errMag2 < DG_ErrTolerance2) {
-					errMag2 = (m_netTorque % m_netTorque) * invMassMag2;
-					if (errMag2 < DG_ErrTolerance2) {
-						errMag2 = m_veloc % m_veloc;
-						if (errMag2 < DG_ErrTolerance2) {
-							errMag2 = m_omega % m_omega;
-							if (errMag2 < DG_ErrTolerance2) {
-								return true;
-							}
-						}
-					}
-				}
+		dgVector forceError (m_accel - m_prevExternalForce);
+		dgVector torqueError (m_alpha - m_prevExternalTorque);
+		dgVector mask0 ((forceError.DotProduct4(forceError) < m_equilibriumError2) & (torqueError.DotProduct4(torqueError) < m_equilibriumError2));
+		if (mask0.GetSignMask()) {
+			dgVector invMassMag2 (m_invMass[3] * m_invMass[3]);
+			dgVector mask1 ((invMassMag2.CompProduct4 (m_netForce.DotProduct4(m_netForce)) < m_equilibriumError2) & (invMassMag2.CompProduct4 (m_netTorque.DotProduct4(m_netTorque)) < m_equilibriumError2));
+			if (mask1.GetSignMask()) {
+				dgVector mask2 ((m_veloc.DotProduct4(m_veloc) < m_equilibriumError2) & (m_omega.DotProduct4(m_omega) < m_equilibriumError2));
+				return mask2.GetSignMask() ? true : false;
 			}
 		}
 	}

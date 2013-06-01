@@ -23,6 +23,7 @@
 #include "dgBody.h"
 #include "dgWorld.h"
 #include "dgConstraint.h"
+#include "dgDynamicBody.h"
 #include "dgBodyMasterList.h"
 
 
@@ -195,24 +196,32 @@ void dgBodyMasterList::RemoveConstraint (dgConstraint* const constraint)
 	m_constraintCount = m_constraintCount - 1;
 	dgAssert (((dgInt32)m_constraintCount) >= 0);
 
-	dgBody *const body0 = constraint->m_body0;
-	dgBody *const body1 = constraint->m_body1;
+	dgBody* const body0 = constraint->m_body0;
+	dgBody* const body1 = constraint->m_body1;
 	dgAssert (body0);
 	dgAssert (body1);
 	dgAssert (body0 == constraint->m_link1->GetInfo().m_bodyNode);
 	dgAssert (body1 == constraint->m_link0->GetInfo().m_bodyNode);
 
-
 	body0->m_masterNode->GetInfo().Remove(constraint->m_link0);
 	body1->m_masterNode->GetInfo().Remove(constraint->m_link1);
+
+	if (body0->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+		dgDynamicBody* const dynBody0 = (dgDynamicBody*) body0;
+		dynBody0->m_prevExternalForce = dgVector (dgFloat32 (0.0f));
+		dynBody0->m_prevExternalTorque = dgVector (dgFloat32 (0.0f));
+	}
+
+	if (body1->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+		dgDynamicBody* const dynBody1 = (dgDynamicBody*) body1;
+		dynBody1->m_prevExternalForce = dgVector (dgFloat32 (0.0f));
+		dynBody1->m_prevExternalTorque = dgVector (dgFloat32 (0.0f));
+	}
 
 	if (constraint->m_maxDOF) {
 		body0->m_equilibrium = body0->GetInvMass().m_w ? false : true;
 		body1->m_equilibrium = body1->GetInvMass().m_w ? false : true;
 	}
-
-//	body0->Unfreeze();
-//	body1->Unfreeze();
 }
 
 

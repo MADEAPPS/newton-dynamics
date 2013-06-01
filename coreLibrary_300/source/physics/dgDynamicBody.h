@@ -90,11 +90,14 @@ class dgDynamicBody : public dgBody
 	dgInt32 m_sleepingCounter;
 	dgUnsigned32 m_isInDestructionArrayLRU;
 
+	static dgVector m_equilibriumError2;
+
 	OnApplyExtForceAndTorque m_applyExtForces;
 
 	friend class dgWorld;
-	friend class dgWorldDynamicUpdate;
 	friend class dgBroadPhase;
+	friend class dgBodyMasterList;
+	friend class dgWorldDynamicUpdate;
 } DG_GCC_VECTOR_AVX_ALIGMENT;
 
 
