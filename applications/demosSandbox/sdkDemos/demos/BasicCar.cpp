@@ -24,7 +24,7 @@
 #include "UserPlaneCollision.h"
 #include "CustomVehicleControllerManager.h"
 
-#if 0
+
 // some figures form the 2000 SRT Viper data sheet, http://www.reefcorner.com/Viper/viper_specs.htm
 //the 2000 Vipers’ 8.4-liter engine generates
 // max speed: 164 miles per hours					= 73.0f meter per seconds		
@@ -175,7 +175,7 @@ class BasicVehicleEntity: public DemoEntity
 	{
 		DemoEntity::InterpolateMatrix (world, param);
 		if (m_controller){
-			for (CustomVehicleController::TireList::dListNode* node = m_controller->GetFirstTire(); node; node = node->GetNext()) {
+			for (CustomVehicleController::TireBodyState* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
 				DemoEntity* const tirePart = (DemoEntity*) m_controller->GetUserData(node);
 				tirePart->InterpolateMatrix (world, param);
 			}
@@ -229,7 +229,7 @@ class BasicVehicleEntity: public DemoEntity
 		NewtonDestroyCollision (collision);	
 	}
 
-	CustomVehicleController::TireList::dListNode* AddTire (const char* const tireName, dFloat width, dFloat radius, dFloat mass, dFloat suspensionLength, dFloat suspensionSpring, dFloat suspensionDamper) 
+	CustomVehicleController::TireBodyState* AddTire (const char* const tireName, dFloat width, dFloat radius, dFloat mass, dFloat suspensionLength, dFloat suspensionSpring, dFloat suspensionDamper) 
 	{
 		NewtonBody* const body = m_controller->GetBody();
 		DemoEntity* const entity = (DemoEntity*) NewtonBodyGetUserData(body);
@@ -272,7 +272,7 @@ class BasicVehicleEntity: public DemoEntity
 #if 0
 		// this is the general way for getting the tire matrices
 		dMatrix rootMatrixInv (GetNextMatrix().Inverse());
-		for (CustomVehicleController::TireList::dListNode* node = m_controller->GetFirstTire(); node; node = node->GetNext()) {
+		for (CustomVehicleController::TireBodyState* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
 			DemoEntity* const tirePart = (DemoEntity*) m_controller->GetUserData(node);
 			TireAligmentTransform* const aligmentMatrix = (TireAligmentTransform*)tirePart->GetUserData();
 			dMatrix matrix (aligmentMatrix->m_matrix * m_controller->GetTireGlobalMatrix(node) * rootMatrixInv);
@@ -281,7 +281,7 @@ class BasicVehicleEntity: public DemoEntity
 		}
 #else
 		// this is saves some calculation since it get the tire local to the chassis
-		for (CustomVehicleController::TireList::dListNode* node = m_controller->GetFirstTire(); node; node = node->GetNext()) {
+		for (CustomVehicleController::TireBodyState* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
 			DemoEntity* const tirePart = (DemoEntity*) m_controller->GetUserData(node);
 			TireAligmentTransform* const aligmentMatrix = (TireAligmentTransform*)tirePart->GetUserData();
 			dMatrix matrix (aligmentMatrix->m_matrix * m_controller->GetTireLocalMatrix(node));
@@ -304,13 +304,13 @@ class BasicVehicleEntity: public DemoEntity
 
 		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
 		CalculateTireDimensions ("fl_tire", width, radius);
-		CustomVehicleController::TireList::dListNode* const leftFrontTireHandle = AddTire ("fl_tire", width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
-		CustomVehicleController::TireList::dListNode* const rightFrontTireHandle = AddTire ("fr_tire", width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
+		CustomVehicleController::TireBodyState* const leftFrontTireHandle = AddTire ("fl_tire", width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
+		CustomVehicleController::TireBodyState* const rightFrontTireHandle = AddTire ("fr_tire", width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
 
 		// add real tires
 		CalculateTireDimensions ("rl_tire", width, radius);
-		CustomVehicleController::TireList::dListNode* const leftRearTireHandle = AddTire ("rl_tire", width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
-		CustomVehicleController::TireList::dListNode* const rightRearTireHandle = AddTire ("rr_tire", width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
+		CustomVehicleController::TireBodyState* const leftRearTireHandle = AddTire ("rl_tire", width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
+		CustomVehicleController::TireBodyState* const rightRearTireHandle = AddTire ("rr_tire", width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
 
 		// add an engine
 		// first make the gear Box
@@ -371,13 +371,13 @@ class BasicVehicleEntity: public DemoEntity
 
 		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
 		CalculateTireDimensions ("fl_tire", width, radius);
-		CustomVehicleController::TireList::dListNode* const leftFrontTireHandle = AddTire ("fl_tire", width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
-		CustomVehicleController::TireList::dListNode* const rightFrontTireHandle = AddTire ("fr_tire", width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
+		CustomVehicleController::TireBodyState* const leftFrontTireHandle = AddTire ("fl_tire", width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
+		CustomVehicleController::TireBodyState* const rightFrontTireHandle = AddTire ("fr_tire", width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
 
 		// add real tires
 		CalculateTireDimensions ("rl_tire", width, radius);
-		CustomVehicleController::TireList::dListNode* const leftRearTireHandle = AddTire ("rl_tire", width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
-		CustomVehicleController::TireList::dListNode* const rightRearTireHandle = AddTire ("rr_tire", width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
+		CustomVehicleController::TireBodyState* const leftRearTireHandle = AddTire ("rl_tire", width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
+		CustomVehicleController::TireBodyState* const rightRearTireHandle = AddTire ("rr_tire", width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
 
 		// add an engine
 		// first make the gear Box
@@ -574,8 +574,8 @@ class BasicVehicleEntity: public DemoEntity
 		glVertex3f (q0.m_x, q0.m_y, q0.m_z);
 		glVertex3f (q1.m_x, q1.m_y, q1.m_z);
 		
-		for (CustomVehicleController::TireList::dListNode* node = m_controller->GetFirstTire(); node; node = node->GetNext()) {
-			const CustomVehicleController::TireBodyState& tire = node->GetInfo();
+		for (CustomVehicleController::TireBodyState* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
+			const CustomVehicleController::TireBodyState& tire = *node;
 			dVector p0 (tire.m_globalCentreOfMass);
 
 			// draw the tire load 
@@ -796,9 +796,8 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 		NewtonWorld* const world = GetWorld(); 
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 		dSoundManager* const soundManager = scene->GetSoundManager();
-
-		for (CustomControllerList::dListNode* ptr =  m_controllerList.GetFirst(); ptr; ptr = ptr->GetNext()) {
-			CustomVehicleController* const controller = (CustomVehicleController*) &ptr->GetInfo();
+		for (CustomControllerManager::CustomController* ptr = GetFirstController(); ptr; ptr = GetNextController(ptr)) {
+			CustomVehicleController* const controller = (CustomVehicleController*) ptr;
 			
 			NewtonBody* const body = controller->GetBody();
 			BasicVehicleEntity* const vehicleEntity = (BasicVehicleEntity*) NewtonBodyGetUserData(body);
@@ -842,8 +841,8 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 		CustomVehicleControllerManager::PostUpdate(timestep);
 
 		// update the visual transformation matrices for all vehicle tires
-		for (CustomControllerList::dListNode* ptr = m_controllerList.GetFirst(); ptr; ptr = ptr->GetNext()) {
-			CustomVehicleController* const controller = (CustomVehicleController*) &ptr->GetInfo();
+		for (CustomControllerManager::CustomController* ptr = GetFirstController(); ptr; ptr = GetNextController(ptr)) {
+			CustomVehicleController* const controller = (CustomVehicleController*) ptr;
 			BasicVehicleEntity* const vehicleEntity = (BasicVehicleEntity*)NewtonBodyGetUserData (controller->GetBody());
 			vehicleEntity->UpdateTireTransforms();
 		}
@@ -884,8 +883,8 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 	// use this to display debug information about vehicle 
 	void Debug () const
 	{
-		for (CustomControllerList::dListNode* ptr = m_controllerList.GetFirst(); ptr; ptr = ptr->GetNext()) {
-			CustomVehicleController* const controller = (CustomVehicleController*) &ptr->GetInfo();
+		for (CustomControllerManager::CustomController* ptr = GetFirstController(); ptr; ptr = GetNextController(ptr)) {
+			CustomVehicleController* const controller = (CustomVehicleController*) ptr;
 			BasicVehicleEntity* const vehicleEntity = (BasicVehicleEntity*)NewtonBodyGetUserData (controller->GetBody());
 			vehicleEntity->Debug();
 		}
@@ -907,7 +906,7 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 	void* m_engineSounds[10];
 };
 
-#endif
+
 
 // *************************************************************************************************
 // 
@@ -916,7 +915,7 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 // *************************************************************************************************
 void BasicCar (DemoEntityManager* const scene)
 {
-/*
+
 	// load the sky box
 	scene->CreateSkyBox();
 	
@@ -984,6 +983,6 @@ void BasicCar (DemoEntityManager* const scene)
 //	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 
 //	NewtonSerializeToFile (scene->GetNewton(), "C:/Users/Julio/Desktop/newton-dynamics/applications/media/xxxxx.bin");
-*/
+
 }
 

@@ -713,6 +713,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\dCustomJoints\CustomList.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\dCustomJoints\CustomPathFollow.cpp"
 				>
 			</File>
@@ -774,6 +778,10 @@
 			</File>
 			<File
 				RelativePath="..\..\dCustomJoints\CustomUserBlank.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dCustomJoints\dCustomList.h"
 				>
 			</File>
 		</Filter>

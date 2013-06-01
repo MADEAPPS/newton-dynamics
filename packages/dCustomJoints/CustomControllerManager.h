@@ -18,6 +18,7 @@
 #define D_CUSTOM_CONTROLLER_MANAGER_H_
 
 #include "CustomJointLibraryStdAfx.h"
+#include "CustomList.h"
 #include "dMathDefines.h"
 #include "dVector.h"
 #include "dMatrix.h"
