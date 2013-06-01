@@ -468,6 +468,7 @@ class dgVector: public dgTemplateVector<dgFloat32>
 	static dgVector m_wOne;
 	static dgVector m_half;
 	static dgVector m_three;
+	static dgVector m_negOne;
 	static dgVector m_signMask;
 	static dgVector m_triplexMask;
 }DG_GCC_VECTOR_ALIGMENT;
@@ -703,7 +704,7 @@ class dgVector
 	DG_INLINE dgVector InvSqrt () const
 	{
 		dgVector tmp0 (_mm_rsqrt_ps(m_type));
-		return m_half * tmp0 * (m_three - (*this) * tmp0 * tmp0);
+		return m_half.CompProduct4(tmp0).CompProduct4((m_three - CompProduct4(tmp0).CompProduct4(tmp0)));
 	}
 	
 	// relational operators
@@ -813,6 +814,7 @@ class dgVector
 	static dgVector m_wOne;
 	static dgVector m_half;
 	static dgVector m_three;
+	static dgVector m_negOne;
 	static dgVector m_signMask;
 	static dgVector m_triplexMask;
 } DG_GCC_VECTOR_ALIGMENT;

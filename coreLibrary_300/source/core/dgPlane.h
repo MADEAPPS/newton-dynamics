@@ -30,12 +30,15 @@ class dgPlane: public dgVector
 {
 	public:
 	dgPlane ();
+	dgPlane (const dgVector& point);
 	dgPlane (dgFloat32 x, dgFloat32 y, dgFloat32 z, dgFloat32 w);
 	dgPlane (const dgVector &normal, dgFloat32 distance); 
 	dgPlane (const dgVector &P0, const dgVector &P1, const dgVector &P2);
 	dgPlane Scale (dgFloat32 s) const;
-	dgFloat32 Evalue (const dgFloat32 *point) const;
+	dgFloat32 Evalue (const dgFloat32* const point) const;
 	dgFloat32 Evalue (const dgVector &point) const;
+
+
 }DG_GCC_VECTOR_ALIGMENT;
 
 DG_MSC_VECTOR_ALIGMENT
@@ -47,9 +50,9 @@ class dgBigPlane: public dgBigVector
 	dgBigPlane (const dgBigVector &normal, dgFloat64 distance); 
 	dgBigPlane (const dgBigVector &P0, const dgBigVector &P1, const dgBigVector &P2);
 	dgBigPlane Scale (dgFloat64 s) const;
-	dgFloat64 Evalue (const dgFloat32 *point) const;
+	dgFloat64 Evalue (const dgFloat32* const point) const;
 #ifndef __USE_DOUBLE_PRECISION__
-	dgFloat64 Evalue (const dgFloat64 *point) const;
+	dgFloat64 Evalue (const dgFloat64* const point) const;
 #endif
 	dgFloat64 Evalue (const dgVector &point) const;
 	dgFloat64 Evalue (const dgBigVector &point) const;
@@ -60,6 +63,11 @@ class dgBigPlane: public dgBigVector
 
 DG_INLINE dgPlane::dgPlane () 
 	:dgVector () 
+{
+}
+
+DG_INLINE dgPlane::dgPlane (const dgVector& point)
+	:dgVector (point)
 {
 }
 
@@ -82,18 +90,21 @@ DG_INLINE dgPlane::dgPlane (const dgVector &P0, const dgVector &P1, const dgVect
 
 DG_INLINE dgPlane dgPlane::Scale (dgFloat32 s)	const
 {
-	return dgPlane (m_x * s, m_y * s, m_z * s, m_w * s);
+//	return dgPlane (m_x * s, m_y * s, m_z * s, m_w * s);
+	return dgPlane (CompProduct4 (dgVector (s)));
 }
 
 
-DG_INLINE dgFloat32 dgPlane::Evalue (const dgFloat32 *point) const
+DG_INLINE dgFloat32 dgPlane::Evalue (const dgFloat32* const point) const
 {
-	return m_x * point[0] + m_y * point[1] + m_z * point[2] + m_w;
+//	return m_x * point[0] + m_y * point[1] + m_z * point[2] + m_w;
+	return DotProduct4 (dgVector (point) | m_wOne).m_x;
 }
 
-DG_INLINE dgFloat32 dgPlane::Evalue (const dgVector &point) const
+DG_INLINE dgFloat32 dgPlane::Evalue (const dgVector& point) const
 {
-	return m_x * point.m_x + m_y * point.m_y + m_z * point.m_z + m_w;
+//	return m_x * point.m_x + m_y * point.m_y + m_z * point.m_z + m_w;
+	return DotProduct4 ((point & m_triplexMask) | m_wOne).m_x;
 }
 
 
@@ -126,13 +137,13 @@ DG_INLINE dgBigPlane dgBigPlane::Scale (dgFloat64 s) const
 	return dgBigPlane (m_x * s, m_y * s, m_z * s, m_w * s);
 }
 
-DG_INLINE dgFloat64 dgBigPlane::Evalue (const dgFloat32 *point) const
+DG_INLINE dgFloat64 dgBigPlane::Evalue (const dgFloat32* const point) const
 {
 	return m_x * point[0] + m_y * point[1] + m_z * point[2] + m_w;
 }
 
 #ifndef __USE_DOUBLE_PRECISION__
-DG_INLINE dgFloat64 dgBigPlane::Evalue (const dgFloat64 *point) const
+DG_INLINE dgFloat64 dgBigPlane::Evalue (const dgFloat64* const point) const
 {
 	return m_x * point[0] + m_y * point[1] + m_z * point[2] + m_w;
 }

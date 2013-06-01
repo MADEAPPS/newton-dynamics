@@ -220,8 +220,11 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 		dgAssert (dgAbsf (dir % dir - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 		dgVector p (m_myShape->ConvexConicSupporVertex(dir));
 
-		dgVector dir1 (m_scale.CompProduct4(m_matrix.UnrotateVector (m_invScale.CompProduct4(dir.Scale3 (dgFloat32 (-1.0f))))));
-		dir1 = dir1.Scale3 (dgRsqrt (dir1 % dir1));
+		dgVector dir1 (m_scale.CompProduct4(m_matrix.UnrotateVector (m_invScale.CompProduct4(dir.CompProduct4(dgVector::m_negOne)))));
+		dgAssert (dir1.m_w == dgFloat32 (0.0f));
+
+		//dir1 = dir1.Scale4 (dgRsqrt (dir1.DotProduct4(dir1).m_x));
+		dir1 = dir1.CompProduct4(dir1.DotProduct4(dir1).InvSqrt());
 		dgAssert (dgAbsf(dir1 % dir1 - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 
 		dgVector q (m_invScale.CompProduct4(m_matrix.TransformVector (m_scale.CompProduct4 (m_otherShape->SupportVertex (dir1, &m_polygonFaceIndex[vertexIndex])))));
@@ -993,7 +996,7 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 			dgVector e1;
 			dgVector e2;
 			dgVector e3;
-			dgVector normal (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+			dgVector normal (dgFloat32 (0.0f));
 
 			const dgInt32 nCount = dgInt32(sizeof(dgCollisionConvex::m_hullDirs) / sizeof(dgCollisionConvex::m_hullDirs[0]));
 			const dgFloat32 DG_CALCULATE_SEPARATING_PLANE_ERROR = dgFloat32 (1.0f / 1024.0f);
