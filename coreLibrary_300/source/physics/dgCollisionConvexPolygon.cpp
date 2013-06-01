@@ -524,6 +524,8 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete (dgCollis
 
 	const dgVector& scale = polygonInstance->m_scale;
 	const dgVector& invScale = polygonInstance->m_invScale;
+	dgContact* const contactJoint = proxy.m_contactJoint;
+
 	m_normal = m_normal.CompProduct4(invScale);
 	m_normal = m_normal.Scale3 (dgRsqrt (m_normal % m_normal));
 
@@ -535,8 +537,11 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete (dgCollis
 	dgVector q0 (scale.CompProduct4(dgVector (&m_vertex[m_vertexIndex[m_count - 1] * m_stride])));
 	dgFloat32 penetration = (q0 - p0) % m_normal + proxy.m_skinThickness + DG_IMPULSIVE_CONTACT_PENETRATION;
 	if (penetration < dgFloat32 (0.0f)) {
+		contactJoint->m_closetDistance = -penetration;
 		return 0;
 	}
+
+	contactJoint->m_closetDistance = dgFloat32 (0.0f);
 	dgFloat32 distance = (q0 - p1) % m_normal;
 	if (distance >= dgFloat32 (0.0f)) {
 		return 0;

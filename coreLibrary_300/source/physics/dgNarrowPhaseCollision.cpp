@@ -843,10 +843,6 @@ void dgWorld::ProcessContacts (dgCollidingPairCollector::dgPair* const pair, dgF
 	contact->m_positAcc = dgVector (dgFloat32 (0.0f));
 	contact->m_rotationAcc = dgVector (dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 
-//	contact->m_prevPosit0 = body0->m_matrix.m_posit;
-//	contact->m_prevPosit1 = body1->m_matrix.m_posit;
-//	contact->m_prevRotation0 = body0->m_rotation;
-//	contact->m_prevRotation1 = body1->m_rotation;
 	PopulateContacts (pair, timestep, threadIndex);
 }
 
@@ -902,45 +898,6 @@ dgInt32 dgWorld::ValidateContactCache (dgContact* const contact, dgFloat32 times
 
 	dgList<dgContactMaterial>& list = *contact;
 	return mask.GetInt() ? list.GetCount() : 0;
-
-/*
-	dgInt32 contactCount = 0;
-	dgVector error0 (contact->m_prevPosit0 - body0->m_matrix.m_posit);
-	dgFloat32 err2 = error0 % error0;
-	if (err2 < (DG_CACHE_DIST_TOL * DG_CACHE_DIST_TOL)) {
-		dgVector error1 (contact->m_prevPosit1 - body1->m_matrix.m_posit);
-		err2 = error1 % error1;
-		if (err2 < (DG_CACHE_DIST_TOL * DG_CACHE_DIST_TOL)) {
-			dgQuaternion errorRot0 (contact->m_prevRotation0 - body0->m_rotation);
-			err2 = errorRot0.DotProduct(errorRot0);
-			if (err2 < (DG_CACHE_DIST_TOL * DG_CACHE_DIST_TOL)) {
-				dgQuaternion errorRot1 (contact->m_prevRotation1 - body1->m_rotation);
-				err2 = errorRot1.DotProduct(errorRot1);
-				if (err2 < (DG_CACHE_DIST_TOL * DG_CACHE_DIST_TOL)) {
-					dgMatrix matrix0 (dgMatrix (contact->m_prevRotation0, contact->m_prevPosit0).Inverse() * body0->m_matrix);
-					dgMatrix matrix1 (dgMatrix (contact->m_prevRotation1, contact->m_prevPosit1).Inverse() * body1->m_matrix);
-
-					dgList<dgContactMaterial>& list = *contact;
-					for (dgList<dgContactMaterial>::dgListNode* ptr = list.GetFirst(); ptr; ptr = ptr->GetNext()) {
-						dgContactMaterial& contactMaterial = ptr->GetInfo();
-						dgVector p0 (matrix0.TransformVector (contactMaterial.m_point));
-						dgVector p1 (matrix1.TransformVector (contactMaterial.m_point));
-						dgVector error (p1 - p0);
-
-						err2 = error % error;
-						if (err2 > (DG_CACHE_DIST_TOL * DG_CACHE_DIST_TOL)) {
-							contactCount = 0;
-							break;
-						}
-						contactCount ++;
-					}
-				}
-			}
-		}
-	}
-
-	return contactCount;
-*/
 }
 
 
@@ -1365,11 +1322,14 @@ dgInt32 dgWorld::ClosestPoint (dgCollisionParamProxy& proxy) const
 {
 	dgCollisionInstance* const collision1 = proxy.m_referenceCollision;
 	dgCollisionInstance* const collision2 = proxy.m_floatingCollision;
+
+	dgContact* const contactJoint = proxy.m_contactJoint;
+	dgAssert (contactJoint);
+	contactJoint->m_closetDistance = dgFloat32 (1.0e10f);
+
 	if (!(collision1->GetConvexVertexCount() && collision2->GetConvexVertexCount())) {
 		return 0;
 	}
-
-	dgContact* const contactJoint = proxy.m_contactJoint;
 
 	dgAssert (contactJoint);
 	dgAssert (collision1->GetCollisionPrimityType() != m_nullCollision);
@@ -1434,6 +1394,11 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts (dgCollisionParamProxy& prox
 {
 	dgInt32 count = 0;
 	dgCollisionInstance* const convexInstance = proxy.m_referenceCollision;
+
+	dgContact* const contactJoint = proxy.m_contactJoint;
+	dgAssert (contactJoint);
+	contactJoint->m_closetDistance = dgFloat32 (1.0e10f);
+
 	if (!convexInstance->GetConvexVertexCount()) {
 		return count;
 	}
@@ -1528,13 +1493,13 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) 
 	dgInt32 count = 0;
 	dgCollisionInstance* const collision1 = proxy.m_referenceCollision;
 	dgCollisionInstance* const collision2 = proxy.m_floatingCollision;
+	dgContact* const contactJoint = proxy.m_contactJoint;
+	dgAssert (contactJoint);
 
+	contactJoint->m_closetDistance = dgFloat32 (1.0e10f);
 	if (!(collision1->GetConvexVertexCount() && collision2->GetConvexVertexCount())) {
 		return count;
 	}
-
-	dgContact* const contactJoint = proxy.m_contactJoint;
-	dgAssert (contactJoint);
 
 	dgAssert (collision1->GetCollisionPrimityType() != m_nullCollision);
 	dgAssert (collision2->GetCollisionPrimityType() != m_nullCollision);
@@ -1845,6 +1810,8 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue (dgCollisionParamPro
 	dgVector* const face = polygon.m_localPoly;
 	dgContactPoint* const contactOut = proxy.m_contacts;
 	dgContact* const contactJoint = proxy.m_contactJoint;
+	dgFloat32 closestDist = dgFloat32 (1.0e10f);
+
 	dgCollisionConvex* const convexShape = (dgCollisionConvex*) convexHullInstance->m_childShape;
 
 	dgUnsigned64 shapeFaceID = dgUnsigned64(-1);
@@ -1909,6 +1876,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue (dgCollisionParamPro
 	}
 
 	proxy.m_contacts = contactOut;
+	contactJoint->m_closetDistance = closestDist;
 
 	// restore the pointer
 	proxy.m_normal = n;

@@ -223,10 +223,6 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 
 	dgVector m_positAcc;
 	dgQuaternion m_rotationAcc;
-//	dgVector m_prevPosit0;
-//	dgVector m_prevPosit1;
-//	dgQuaternion m_prevRotation0;
-//	dgQuaternion m_prevRotation1;
 	dgVector m_separtingVector;
 	dgFloat32 m_closetDistance;
 
@@ -242,10 +238,12 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 	friend class dgBroadPhase;
 	friend class dgContactSolver;
 	friend class dgActiveContacts;
+	friend class dgCollisionScene;
 	friend class dgCollisionConvex;
 	friend class dgCollisionCompound;
 	friend class dgWorldDynamicUpdate;
 	friend class dgSolverWorlkerThreads;
+	friend class dgCollisionConvexPolygon;
 	friend class dgCollidingPairCollector;
 }DG_GCC_VECTOR_ALIGMENT;
 
