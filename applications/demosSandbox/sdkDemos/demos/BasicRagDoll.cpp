@@ -67,20 +67,20 @@ static RAGDOLL_BONE_DEFINITION skeletonRagDoll[] =
 	{"Bip01_L_Calf",    "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,      0.0f, -150.0f,  0.0f,		0.0f,   0.0f, -90.0f,   0.0f,   0.0f, -90.0f}, 
 	{"Bip01_L_Foot", "convexhull", 0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f,  10.0f,      0.0f,  -45.0f, 45.0f,		0.0f,   0.0f, -90.0f,   0.0f,   0.0f, -90.0f}, 
 
-	{"Bip01_R_Thigh",   "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,       80.0f,  0.0f,	   0.0f,	0.0f, -90.0f,   0.0f,  90.0f, -30.0f,  90.0f}, 
-	{"Bip01_R_Calf",    "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  5.0f,         0.0f,  0.0f,	 150.0f,	0.0f,   0.0f,  90.0f,   0.0f,   0.0f,  90.0f}, 
-	{"Bip01_R_Foot",  "convexhull", 0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f, 3.0f,        0.0f,  -45.0f,  45.0f,	0.0f,   0.0f,  90.0f,  0.0f,   0.0f,   90.0f}, 
+	{"Bip01_R_Thigh",   "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,      80.0f,  0.0f,	  0.0f,		0.0f, -90.0f,   0.0f,  90.0f, -30.0f,  90.0f}, 
+	{"Bip01_R_Calf",    "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  5.0f,        0.0f,  0.0f,	150.0f,		0.0f,   0.0f,  90.0f,   0.0f,   0.0f,  90.0f}, 
+	{"Bip01_R_Foot",  "convexhull", 0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f, 3.0f,        0.0f, -45.0f,  45.0f,		0.0f,   0.0f,  90.0f,  0.0f,   0.0f,   90.0f}, 
 
-//	{"Bip01_Neck",		 "capsule", 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.05f, 0.03f, 0.04f, 20.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f}, 
-//	{"Bip01_Head",		 "sphere", 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.09f, 0.09f, 0.0f, 20.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f}, 
+	{"Bip01_Neck",		 "capsule", 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.05f, 0.03f, 0.04f, 20.0f,		30.0f,  -30.0f,  30.0f,		0.0f, -90.0f, 0.0f,	   0.0f, -90.0f, 0.0f}, 
+	{"Bip01_Head",		 "sphere",  0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.09f, 0.09f, 0.0f, 20.0f,		30.0f,  -60.0f,  60.0f,		0.0f, -90.0f, 0.0f,	   0.0f, -90.0f, 0.0f}, 
 
-//	{"Bip01_L_UpperArm", "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f}, 
-//	{"Bip01_L_Forearm",  "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f}, 
-//	{"Bip01_L_Hand",     "convexhull", 0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f}, 
+	{"Bip01_L_UpperArm", "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 10.0f,		80.0f,  0.0f,   0.0f,		0.0f, -90.0f,   0.0f,  90.0f, -30.0f,  90.0f}, 
+	{"Bip01_L_Forearm",  "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 10.0f,		  0.0f,  0.0f,	150.0f,		0.0f,   0.0f,  90.0f,   0.0f,   0.0f,  90.0f},  
+	{"Bip01_L_Hand",  "convexhull", 0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f, 10.0f,		0.0f,  -45.0f,  45.0f,		0.0f,   0.0f,  90.0f,  0.0f,   0.0f,   90.0f}, 
 
-//	{"Bip01_R_UpperArm", "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f}, 
-//	{"Bip01_R_Forearm",  "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f}, 
-//	{"Bip01_R_Hand",     "convexhull", 0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f, 10.0f,  0.0f,  -0.0f,    0.0f, 0.0f,  0.0f,  0.0f}, 
+	{"Bip01_R_UpperArm", "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 10.0f,		  80.0f,  0.0f,   0.0f,		0.0f, -90.0f,   0.0f,  90.0f, -30.0f, -90.0f}, 
+	{"Bip01_R_Forearm",  "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f, 10.0f,		  0.0f, -150.0f,  0.0f,		0.0f,   0.0f, -90.0f,   0.0f,   0.0f, -90.0f}, 
+	{"Bip01_R_Hand",  "convexhull", 0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f, 10.0f,		  0.0f,  -45.0f, 45.0f,		0.0f,   0.0f, -90.0f,   0.0f,   0.0f, -90.0f}, 
 	
 };
 
@@ -279,7 +279,7 @@ class RagDollManager: public CustomSkeletonTransformManager
 		// add the root bone
 		DemoEntity* const rootEntity = (DemoEntity*) ragDollEntity->Find (definition[0].m_boneName);
 		NewtonBody* const rootBone = CreateRagDollBodyPart (rootEntity, definition[0]);
-NewtonBodySetMassMatrix(rootBone, 0.0f, 0.0f, 0.0f, 0.0f);
+//NewtonBodySetMassMatrix(rootBone, 0.0f, 0.0f, 0.0f, 0.0f);
 
 		CustomSkeletonTransformController::dSkeletonBone* const bone = controller->AddBone (rootBone, GetIdentityMatrix());
 		// save the controller as the collision user data, for collision culling
