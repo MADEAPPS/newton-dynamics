@@ -237,6 +237,9 @@ void dgThread::SuspendExecution (dgInt32 count, dgSemaphore* const semArray)
 
 void* dgThread::dgThreadSystemCallback(void* threadData)
 {
+	dgFloatExceptions exception;
+	dgSetPrecisionDouble precision;
+
 	dgFloatExceptions exceptions;
 	dgThread* const me = (dgThread*) threadData;
 	dgInterlockedExchange(&me->m_threadRunning, 1);
