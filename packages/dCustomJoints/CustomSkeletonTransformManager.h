@@ -34,7 +34,6 @@ class CustomSkeletonTransformController
 		dBitFieldMask()
 		{
 			memset (m_mask, 0xff, sizeof (m_mask));
-			//memset (m_mask, 0, sizeof (m_mask));
 		}
 
 		void GetAddress (int id, int& index, int& shift) const
@@ -50,7 +49,8 @@ class CustomSkeletonTransformController
 			int index;
 			int shift;
 			GetAddress (id, index, shift);
-			m_mask[index] |= long long(1) << shift;
+			long long bit = 1;
+			m_mask[index] |= (bit << shift);
 		}
 
 		void ResetBit (int id)
@@ -58,7 +58,8 @@ class CustomSkeletonTransformController
 			int index;
 			int shift;
 			GetAddress (id, index, shift);
-			m_mask[index] &= ~(long long(1) << shift);
+			long long bit = 1;
+			m_mask[index] &= ~(bit << shift);
 		}
 
 		bool TestMask (int id) const
@@ -66,7 +67,8 @@ class CustomSkeletonTransformController
 			int index;
 			int shift;
 			GetAddress (id, index, shift);
-			return (m_mask[index] & (long long(1) << shift)) ? true : false;
+			long long bit = 1;
+			return (m_mask[index] & (bit << shift)) ? true : false;
 		}
 
 		long long m_mask [D_SKELETON_CONTROLLER_MAX_BONES / (8 * sizeof (long long))];
