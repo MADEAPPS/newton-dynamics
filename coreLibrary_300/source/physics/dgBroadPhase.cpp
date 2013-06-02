@@ -689,12 +689,14 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, dgInt32 th
 	bool isCollidable = true;
 	dgContact* contact = NULL;
 	if ((body0->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI)) || (body0->GetInvMass().m_w != dgFloat32 (0.0f))) {
-		//for (dgBodyMasterListRow::dgListNode* link = m_world->FindConstraintLink (body0, body1); isCollidable && link; link = m_world->FindConstraintLinkNext (link, body1)) {
-		//	if (constraint->GetId() == dgConstraint::m_contactConstraint) {
-		//		contact = (dgContact*)constraint;
-		//	}
-		//	isCollidable &= constraint->IsCollidable();
-		//}
+//		for (dgBodyMasterListRow::dgListNode* link = m_world->FindConstraintLink (body0, body1); isCollidable && link; link = m_world->FindConstraintLinkNext (link, body1)) {
+//			dgConstraint* const constraint = link->GetInfo().m_joint;
+//			if (constraint->GetId() == dgConstraint::m_contactConstraint) {
+//				contact = (dgContact*)constraint;
+//			}
+//			isCollidable &= constraint->IsCollidable();
+//		}
+
 		for (dgBodyMasterListRow::dgListNode* link = body0->m_masterNode->GetInfo().GetFirst(); link; link = link->GetNext()) {
 			dgConstraint* const constraint = link->GetInfo().m_joint;
 			if (constraint->GetId() != dgConstraint::m_contactConstraint) {
@@ -707,15 +709,14 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, dgInt32 th
 			}
 		}
 
-		if (contact) {
-			for (dgBodyMasterListRow::dgListNode* link = body0->m_masterNode->GetInfo().GetLast(); link; link = link->GetPrev()) {
-				dgConstraint* const constraint = link->GetInfo().m_joint;
-				if (constraint->GetId() == dgConstraint::m_contactConstraint) {
-					break;
-				}
-				if (link->GetInfo().m_bodyNode == body1) {
-					isCollidable = constraint->IsCollidable();
-				}
+		for (dgBodyMasterListRow::dgListNode* link = body0->m_masterNode->GetInfo().GetLast(); link; link = link->GetPrev()) {
+			dgConstraint* const constraint = link->GetInfo().m_joint;
+			if (constraint->GetId() == dgConstraint::m_contactConstraint) {
+				break;
+			}
+			if (link->GetInfo().m_bodyNode == body1) {
+				isCollidable = constraint->IsCollidable();
+				break;
 			}
 		}
 
@@ -741,17 +742,17 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, dgInt32 th
 			}
 		}
 
-		if (contact) {
-			for (dgBodyMasterListRow::dgListNode* link = body1->m_masterNode->GetInfo().GetLast(); link; link = link->GetPrev()) {
-				dgConstraint* const constraint = link->GetInfo().m_joint;
-				if (constraint->GetId() == dgConstraint::m_contactConstraint) {
-					break;
-				}
-				if (link->GetInfo().m_bodyNode == body0) {
-					isCollidable = constraint->IsCollidable();
-				}
+		for (dgBodyMasterListRow::dgListNode* link = body1->m_masterNode->GetInfo().GetLast(); link; link = link->GetPrev()) {
+			dgConstraint* const constraint = link->GetInfo().m_joint;
+			if (constraint->GetId() == dgConstraint::m_contactConstraint) {
+				break;
+			}
+			if (link->GetInfo().m_bodyNode == body0) {
+				isCollidable = constraint->IsCollidable();
+				break;
 			}
 		}
+
 	}
 
 	if (isCollidable) {

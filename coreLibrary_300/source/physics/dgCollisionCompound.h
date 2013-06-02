@@ -88,8 +88,7 @@ class dgCollisionCompound: public dgCollision
 		{
 			dgVector minBox (m_p0 - boxP1);
 			dgVector maxBox (m_p1 - boxP0);
-
-			//return RayTest (ray, minBox, maxBox);
+#if 0
 			dgFloat32 tmin = 0.0f;          
 			dgFloat32 tmax = 1.0f;
 			for (dgInt32 i = 0; i < 3; i++) {
@@ -116,6 +115,22 @@ class dgCollisionCompound: public dgCollision
 				}
 			}
 			return 0xffffffff;
+#else
+			dgVector tt0 (((ray.m_p0 <= minBox) | (ray.m_p0 >= maxBox)) & ray.m_isParallel);
+			if (tt0.GetSignMask() & 0x07) {
+				return 0;
+			}
+			tt0 = (minBox - ray.m_p0).CompProduct4(ray.m_dpInv);
+			dgVector tt1 ((maxBox - ray.m_p0).CompProduct4(ray.m_dpInv));
+			dgVector t0 (ray.m_minT.GetMax(tt0.GetMin(tt1)));
+			dgVector t1 (ray.m_maxT.GetMin(tt0.GetMax(tt1)));
+			t0 = t0.GetMax(t0.ShiftTripleRight());
+			t1 = t1.GetMin(t1.ShiftTripleRight());
+			t0 = t0.GetMax(t0.ShiftTripleRight());
+			t1 = t1.GetMin(t1.ShiftTripleRight());
+			return ((t0 < t1).GetSignMask() & 1);
+#endif
+
 		}
 
 
