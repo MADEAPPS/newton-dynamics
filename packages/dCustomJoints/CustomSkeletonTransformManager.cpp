@@ -83,14 +83,20 @@ CustomSkeletonTransformController::dSkeletonBone* CustomSkeletonTransformControl
 void CustomSkeletonTransformController::SetDefaultBitFieldMask ()
 {
 	for (int i = 0; i < m_boneCount; i ++) {
-		const dSkeletonBone& bone = m_bones[i];
+		dSkeletonBone& bone = m_bones[i];
+		bone.m_bitField.ResetBit(i);
 		if (bone.m_parent) {
+			int parentId = bone.m_parent - m_bones;
+			bone.m_bitField.ResetBit(parentId);
+			bone.m_parent->m_bitField.ResetBit(i);
 		}
 	}
 }
 
-//bool TestCollisionMask (CustomSkeletonTransformController* const controller, int bone0, int bone1) const
-//{
-//	return false;
-//}
+bool CustomSkeletonTransformController::TestCollisionMask (dSkeletonBone* const bone0, dSkeletonBone* const bone1) const
+{
+	int id1 = bone1 - m_bones;
+	bool state = bone0->m_bitField.TestMask(id1);
+	return state;
+}
 

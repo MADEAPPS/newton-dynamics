@@ -36,6 +36,39 @@ class CustomSkeletonTransformController
 			memset (m_mask, 0xff, sizeof (m_mask));
 			//memset (m_mask, 0, sizeof (m_mask));
 		}
+
+		void GetAddress (int id, int& index, int& shift) const
+		{
+			int bits = 8 * sizeof (long long);
+			shift = id & (bits - 1);
+			index = id / (bits * sizeof (m_mask) / sizeof (m_mask[0]));
+		}
+
+
+		void SetBit (int id)
+		{
+			int index;
+			int shift;
+			GetAddress (id, index, shift);
+			m_mask[index] |= long long(1) << shift;
+		}
+
+		void ResetBit (int id)
+		{
+			int index;
+			int shift;
+			GetAddress (id, index, shift);
+			m_mask[index] &= ~(long long(1) << shift);
+		}
+
+		bool TestMask (int id) const
+		{
+			int index;
+			int shift;
+			GetAddress (id, index, shift);
+			return (m_mask[index] & (long long(1) << shift)) ? true : false;
+		}
+
 		long long m_mask [D_SKELETON_CONTROLLER_MAX_BONES / (8 * sizeof (long long))];
 	};
 
@@ -56,7 +89,7 @@ class CustomSkeletonTransformController
 	NEWTON_API dSkeletonBone* AddBone (NewtonBody* const bone, const dMatrix& bindMatrix, dSkeletonBone* const parentBodne = NULL);
 	NEWTON_API void SetDefaultBitFieldMask ();
 
-	NEWTON_API bool TestCollisionMask () const;
+	NEWTON_API bool TestCollisionMask (dSkeletonBone* const bone0, dSkeletonBone* const bone1) const;
 	
 	protected:
 	NEWTON_API void Init (void* const userData);

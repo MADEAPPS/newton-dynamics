@@ -92,7 +92,7 @@ class RagDollManager: public CustomSkeletonTransformManager
 	RagDollManager (DemoEntityManager* const scene)
 		:CustomSkeletonTransformManager (scene->GetNewton())
 	{
-		// create a material for earlly collision culling
+		// create a material for early collision culling
 		m_material = NewtonMaterialCreateGroupID(scene->GetNewton());
 		NewtonMaterialSetCollisionCallback (scene->GetNewton(), m_material, m_material, this, OnBoneAABBOverlap, NULL);
 	}
@@ -106,8 +106,8 @@ class RagDollManager: public CustomSkeletonTransformManager
 
 		dAssert (bone0);
 		dAssert (bone1);
-		if (bone0->m_myController == bone0->m_myController) {
-
+		if (bone0->m_myController == bone1->m_myController) {
+			return bone0->m_myController->TestCollisionMask (bone0, bone1) ? 1 : 0;
 		}
 
 		return 0;
