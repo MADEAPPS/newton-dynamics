@@ -18,7 +18,7 @@
 #include "DemoMesh.h"
 #include "DemoEntityManager.h"
 #include "DemoCamera.h"
-#include "toolBox/DebugDisplay.h"
+#include "DebugDisplay.h"
 #include "CustomPlayerControllerManager.h"
 
 #define PLAYER_MASS						80.0f

@@ -18,9 +18,9 @@
 #include "CustomHinge.h"
 #include "CustomTriggerManager.h"
 #include "CustomKinematicController.h"
-#include "../DemoMesh.h"
-#include "../DemoEntityManager.h"
-#include "../DemoCamera.h"
+#include "DemoMesh.h"
+#include "DemoEntityManager.h"
+#include "DemoCamera.h"
 #include "../toolBox/DebugDisplay.h"
 #include "CustomPlayerControllerManager.h"
 

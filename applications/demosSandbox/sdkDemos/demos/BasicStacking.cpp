@@ -12,8 +12,8 @@
 
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
-#include "../DemoEntityManager.h"
-#include "../DemoCamera.h"
+#include "DemoEntityManager.h"
+#include "DemoCamera.h"
 #include "DemoMesh.h"
 #include "PhysicsUtils.h"
 
@@ -112,8 +112,7 @@ static void BuildPyramid (DemoEntityManager* const scene, dFloat mass, const dVe
 	matrix.m_posit.m_y = y0;
 	//for (int j = 0; j < count; j ++) {
 	//for (int j = 0; j < count/2; j ++) {
-	//for (int j = 0; j < 25; j ++) {
-	for (int j = 0; j < 16; j ++) {
+	for (int j = 0; j < 25; j ++) {
 
 		matrix.m_posit.m_z = z0;
 		for (int i = 0; i < (count - j) ; i ++) {

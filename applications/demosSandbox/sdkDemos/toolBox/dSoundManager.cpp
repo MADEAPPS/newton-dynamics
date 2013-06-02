@@ -12,7 +12,7 @@
 
 #include "toolbox_stdafx.h"
 #include "dSoundManager.h"
-#include "../DemoEntityManager.h"
+#include "DemoEntityManager.h"
 
 dSoundManager::dSoundChannel::dSoundChannel()
 	:m_source(0)

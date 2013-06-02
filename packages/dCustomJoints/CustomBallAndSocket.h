@@ -52,6 +52,8 @@ class CustomLimitBallAndSocket: public CustomBallAndSocket
 	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
+
+	dMatrix m_rotationOffset;
 	dFloat m_minTwistAngle;
 	dFloat m_maxTwistAngle;
 

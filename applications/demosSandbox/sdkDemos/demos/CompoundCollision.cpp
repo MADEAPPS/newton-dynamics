@@ -14,9 +14,9 @@
 #include <toolbox_stdafx.h>
 #include "OpenGlUtil.h"
 #include "SkyBox.h"
-#include "../DemoMesh.h"
-#include "../DemoEntityManager.h"
-#include "../DemoCamera.h"
+#include "DemoMesh.h"
+#include "DemoEntityManager.h"
+#include "DemoCamera.h"
 #include "PhysicsUtils.h"
 #include "HeightFieldPrimitive.h"
 

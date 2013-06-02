@@ -1,9 +1,9 @@
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
-#include "../DemoEntityManager.h"
-#include "../DemoCamera.h"
+#include "DemoEntityManager.h"
+#include "DemoCamera.h"
 #include "PhysicsUtils.h"
-#include "../DemoMesh.h"
+#include "DemoMesh.h"
 #include "../toolBox/OpenGlUtil.h"
 
 

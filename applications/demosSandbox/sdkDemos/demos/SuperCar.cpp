@@ -13,10 +13,10 @@
 #include "SkyBox.h"
 #include "NewtonDemos.h"
 #include "TargaToOpenGl.h"
-#include "../DemoMesh.h"
+#include "DemoMesh.h"
 //#include "../DemoAIAgent.h"
-#include "../DemoEntityManager.h"
-#include "../DemoCamera.h"
+#include "DemoEntityManager.h"
+#include "DemoCamera.h"
 #include "PhysicsUtils.h"
 #include "../toolBox/DebugDisplay.h"
 

@@ -12,8 +12,8 @@
 
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
-#include "../DemoEntityManager.h"
-#include "../DemoCamera.h"
+#include "DemoEntityManager.h"
+#include "DemoCamera.h"
 #include "PhysicsUtils.h"
 
 #define FRICTION_VAR_NAME "friction"
