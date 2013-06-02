@@ -31,7 +31,7 @@
 #include "dgCollisionDeformableMesh.h"
 
 
-#define DG_PARALLEL_JOINT_COUNT_CUT_OFF		128
+#define DG_PARALLEL_JOINT_COUNT_CUT_OFF		(16 * DG_MAX_THREADS_HIVE_COUNT)
 #define DG_CCD_EXTRA_CONTACT_COUNT			(4 * 4)
 
 
@@ -155,14 +155,14 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 		dgInt32 i1 = m_islands - 1;
 		while ((i1 - i0) > 4) {
 			dgInt32 i = (i1 + i0) >> 1;
-			if (islands[i].m_jointCount <= 0) {
+			if (islands[i].m_jointCount <= DG_PARALLEL_JOINT_COUNT_CUT_OFF) {
 				i1 = i;
 			} else {
 				i0 = i;
 			}
 		}
 		dgInt32 singleBodiesStart = i0;
-		for (; (singleBodiesStart < m_islands) && (islands[singleBodiesStart].m_jointCount); singleBodiesStart ++);
+		for (; (singleBodiesStart < m_islands) && (islands[singleBodiesStart].m_jointCount >= DG_PARALLEL_JOINT_COUNT_CUT_OFF) ; singleBodiesStart ++);
 		
 		if (singleBodiesStart <= (m_islands - 1)) {
 			descriptor.m_firstIsland = singleBodiesStart;
