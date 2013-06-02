@@ -70,7 +70,7 @@ void dgThreadHive::dgThreadBee::SetPerfomanceCounter(OnGetPerformanceCountCallba
 
 void dgThreadHive::dgThreadBee::Execute (dgInt32 threadId)
 {
-	dgSetPrecisionDouble precision;
+	m_hive->OnBeginWorkerThread (threadId);
 
 	while (!m_terminate) {
 		dgInterlockedExchange(&m_isBusy, 0);
@@ -83,6 +83,8 @@ void dgThreadHive::dgThreadBee::Execute (dgInt32 threadId)
 	}
 
 	dgInterlockedExchange(&m_isBusy, 0);
+
+	m_hive->OnEndWorkerThread (threadId);
 }
 
 
@@ -213,6 +215,15 @@ void dgThreadHive::QueueJob (dgWorkerThreadTaskCallback callback, void* const co
 			}
 		#endif
 	}
+}
+
+
+void dgThreadHive::OnBeginWorkerThread (dgInt32 threadId)
+{
+}
+
+void dgThreadHive::OnEndWorkerThread (dgInt32 threadId)
+{
 }
 
 

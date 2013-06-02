@@ -618,7 +618,7 @@ class dgAABBTree
 		dgVector t1 (((tt1 & test) | tt0.AndNot(test)).GetMax(ray.m_maxT));
 		t1 = t1.GetMin(t1.ShiftTripleRight());
 		t1 = t1.GetMin(t1.ShiftTripleRight());
-		return (t0 < t1).GetInt();
+		return ((t0 < t1).GetSignMask() & 1);
 
 #else
 		dgFloat32 tmin = 0.0f;          

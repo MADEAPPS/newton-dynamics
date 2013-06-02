@@ -134,8 +134,6 @@ typedef void (dgApi *OnBodySerialize) (dgBody& me, dgSerialize funt, void* const
 typedef void (dgApi *OnBodyDeserialize) (dgBody& me, dgDeserialize funt, void* const serilalizeObject);
 
 
-
-
 class dgSolverSleepTherfesholds
 {
 	public:
@@ -144,6 +142,19 @@ class dgSolverSleepTherfesholds
 	dgFloat32 m_maxVeloc;
 	dgFloat32 m_maxOmega;
 	dgInt32 m_steps;
+};
+
+
+class dgWorldThreadPool: public dgThreadHive
+{
+	public:
+	dgWorldThreadPool(dgMemoryAllocator* const allocator)
+		:dgThreadHive(allocator)
+	{
+	}
+
+	virtual void OnBeginWorkerThread (dgInt32 threadId);
+	virtual void OnEndWorkerThread (dgInt32 threadId);
 };
 
 DG_MSC_VECTOR_ALIGMENT
@@ -157,7 +168,7 @@ class dgWorld:
 	public dgWorldDynamicUpdate,
 	public dgMutexThread,
 	public dgAsyncThread,
-	public dgThreadHive
+	public dgWorldThreadPool
 {
 	public:
 	class dgDetroyBodyByForce

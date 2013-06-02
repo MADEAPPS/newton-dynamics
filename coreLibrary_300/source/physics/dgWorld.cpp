@@ -219,7 +219,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	,dgWorldDynamicUpdate()
 	,dgMutexThread("dgMutexThread", DG_MUTEX_THREAD_ID)
 	,dgAsyncThread("dgAsyncThread", DG_ASYNC_THREAD_ID)
-	,dgThreadHive(allocator)
+	,dgWorldThreadPool(allocator)
 	,m_openCL(NULL)
 	,m_broadPhase(NULL)
 	,m_preListener(allocator)
@@ -984,29 +984,25 @@ void dgWorld::StepDynamics (dgFloat32 timestep)
 }
 
 
+void dgWorldThreadPool::OnBeginWorkerThread (dgInt32 threadId)
+{
+
+}
+
+void dgWorldThreadPool::OnEndWorkerThread (dgInt32 threadId)
+{
+
+}
+
+
 
 void dgWorld::Execute (dgInt32 threadID)
 {
-	// some graphics engines set this to 32 bit floats, and some newton algorithm 
-	// make sure the round mode is set to double, even when using single precision,
-//	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-//		#ifndef __USE_DOUBLE_PRECISION__
-//			dgUnsigned32 controlWorld = dgControlFP (0xffffffff, 0);
-//			dgControlFP (_PC_53, _MCW_PC);
-//		#endif
-//	#endif
-
 	if (threadID == DG_MUTEX_THREAD_ID) {
 		dgMutexThread::Execute (threadID);
 	} else {
 		dgAsyncThread::Execute (threadID);
 	}
-
-//	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-//		#ifndef __USE_DOUBLE_PRECISION__
-//			dgControlFP (controlWorld, _MCW_PC);
-//		#endif
-//	#endif
 }
 
 
@@ -1033,14 +1029,17 @@ void dgWorld::Update (dgFloat32 timestep)
 {
 	m_savetimestep = timestep;
 
-	#ifndef DG_USE_THREAD_EMULATION
-		// runs the update in a separate thread but wait until the update is completed before it returns.
-		// this will run well on single core systems, since the two thread are mutually exclusive 
-		dgMutexThread::Tick();
-	#else 
-		dgFloatExceptions exceptions;
+	#ifdef DG_USE_THREAD_EMULATION
+		dgFloatExceptions exception;
+		dgSetPrecisionDouble precision;
+
+		// runs the update in same separate thread as the calling application, as if it was a separate thread  
 		StepDynamics (m_savetimestep);
 		memcpy (m_perfomanceCountersBack, m_perfomanceCounters, sizeof (m_perfomanceCounters));
+	#else 
+		// runs the update in a separate thread and wait until the update is completed before it returns.
+		// this will run well on single core systems, since the two thread are mutually exclusive 
+		dgMutexThread::Tick();
 	#endif
 }
 
@@ -1049,13 +1048,12 @@ void dgWorld::UpdateAsync (dgFloat32 timestep)
 {
 	m_savetimestep = timestep;
 
-	#ifndef DG_USE_THREAD_EMULATION
-		// execute one update, but do not wait for the update to finish, instead return immediately to the caller
-		dgAsyncThread::Tick();
-	#else 
-		dgFloatExceptions exceptions;
+	#ifdef DG_USE_THREAD_EMULATION
 		StepDynamics (m_savetimestep);
 		memcpy (m_perfomanceCountersBack, m_perfomanceCounters, sizeof (m_perfomanceCounters));
+	#else 
+		// execute one update, but do not wait for the update to finish, instead return immediately to the caller
+		dgAsyncThread::Tick();
 	#endif
 }
 

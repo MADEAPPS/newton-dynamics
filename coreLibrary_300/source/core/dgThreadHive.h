@@ -84,7 +84,10 @@ class dgThreadHive
 	};
 
 	dgThreadHive(dgMemoryAllocator* const allocator);
-	~dgThreadHive();
+	virtual ~dgThreadHive();
+
+	virtual void OnBeginWorkerThread (dgInt32 threadId);
+	virtual void OnEndWorkerThread (dgInt32 threadId);
 
 	void SetMatertThread (dgThread* const mastertThread);
 
@@ -108,6 +111,7 @@ class dgThreadHive
 
 	private:
 	void DestroyThreads();
+	
 
 	dgInt32 m_beesCount;
 	dgInt32 m_currentIdleBee;

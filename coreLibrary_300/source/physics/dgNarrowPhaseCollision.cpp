@@ -892,7 +892,7 @@ dgInt32 dgWorld::ValidateContactCache (dgContact* const contact, dgFloat32 times
 	dgVector mask ((positError2 < m_linearContactError2) & (rotatError2 < m_angularContactError2));
 
 	dgList<dgContactMaterial>& list = *contact;
-	return mask.GetInt() ? list.GetCount() : 0;
+	return mask.GetSignMask() ? list.GetCount() : 0;
 }
 
 

@@ -69,9 +69,6 @@ dgFastRayTest::dgFastRayTest(const dgVector& l0, const dgVector& l1)
 dgInt32 dgFastRayTest::BoxTest (const dgVector& minBox, const dgVector& maxBox) const
 {
 #if 1
-//	dgVector boxP0 ((dgSimd&)minBox);
-//	dgVector boxP1 ((dgSimd&)maxBox);
-
 	dgVector tt0 (((m_p0 <= minBox) | (m_p0 >= maxBox)) & m_isParallel);
 	if (tt0.GetSignMask() & 0x07) {
 		return 0;
