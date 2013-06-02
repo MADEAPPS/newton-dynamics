@@ -301,10 +301,11 @@ dgInt32 dgWorldDynamicUpdate::BuildJacobianMatrix (dgIsland* const island, dgInt
 		dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
 		dgJointInfo* const constraintArray = &constraintArrayPtr[island->m_jointStart];
 
-		if (island->m_hasUnilateralJoints) {
-			rowCount = GetJacobianDerivatives (island, threadIndex, false, rowBase, rowCount, timestep);
-		}
-		rowCount = GetJacobianDerivatives (island, threadIndex, true, rowBase, rowCount, timestep);
+		//if (island->m_hasUnilateralJoints) {
+		//	rowCount = GetJacobianDerivatives (island, threadIndex, false, rowBase, rowCount, timestep);
+		//}
+		//rowCount = GetJacobianDerivatives (island, threadIndex, true, rowBase, rowCount, timestep);
+		rowCount = GetJacobianDerivatives (island, threadIndex, rowBase, rowCount, timestep);
 		dgAssert (rowCount <= island->m_rowsCount);
 
 		dgVector zero (dgFloat32 (0.0f));
@@ -828,8 +829,8 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 	cacheForce[3] = dgFloat32 (1.0f);
 	dgFloat32* const normalForce = &cacheForce[4];
 
-	dgVector speedFreeze2 (world->m_freezeSpeed2 * 0.1f);
-	dgVector freezeOmega2 (world->m_freezeOmega2 * 0.1f);
+	dgVector speedFreeze2 (world->m_freezeSpeed2 * dgFloat32 (0.1f));
+	dgVector freezeOmega2 (world->m_freezeOmega2 * dgFloat32 (0.1f));
 
 
 	dgFloat32 firstPassCoef = dgFloat32 (0.0f);
@@ -839,7 +840,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 		joindDesc.m_timeStep = timestep;
 		joindDesc.m_invTimeStep = invTimestep;
 		joindDesc.m_firstPassCoefFlag = firstPassCoef;
-		if (step == 0) {
+		if (firstPassCoef == dgFloat32 (0.0f)) {
 			for (dgInt32 curJoint = 0; curJoint < jointCount; curJoint ++) {
 				joindDesc.m_rowsCount = constraintArray[curJoint].m_autoPaircount;
 				joindDesc.m_rowMatrix = &matrixRow[constraintArray[curJoint].m_autoPairstart];

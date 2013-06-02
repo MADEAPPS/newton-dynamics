@@ -171,7 +171,7 @@ void dgBodyMasterList::AttachConstraint(dgConstraint* const constraint,	dgBody* 
 	dgBody* body1 = srcbody1;
 	if (!body1) {
 		body1 = body0->GetWorld()->GetSentinelBody();
-		constraint->m_isUnilateral = true;
+//		constraint->m_isUnilateral = true;
 	}
 	dgAssert (body1);
 

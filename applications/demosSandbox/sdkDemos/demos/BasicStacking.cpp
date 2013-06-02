@@ -111,7 +111,9 @@ static void BuildPyramid (DemoEntityManager* const scene, dFloat mass, const dVe
 
 	matrix.m_posit.m_y = y0;
 	//for (int j = 0; j < count; j ++) {
-	for (int j = 0; j < count/2; j ++) {
+	//for (int j = 0; j < count/2; j ++) {
+	//for (int j = 0; j < 25; j ++) {
+	for (int j = 0; j < 16; j ++) {
 
 		matrix.m_posit.m_z = z0;
 		for (int i = 0; i < (count - j) ; i ++) {
@@ -148,7 +150,7 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 	scene->LoadScene (fileName);
 #else
 	
-	int high = 50;
+	int high = 100;
 	PrimitiveType selection[] = {_BOX_PRIMITIVE, _CYLINDER_PRIMITIVE, _TAPERED_CYLINDER_PRIMITIVE, _REGULAR_CONVEX_HULL_PRIMITIVE};
 	for (int i = 0; i < 1; i ++) {
 		int index = i % (sizeof (selection) / sizeof (selection[0]));

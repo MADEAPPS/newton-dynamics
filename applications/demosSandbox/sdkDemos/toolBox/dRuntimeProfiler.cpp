@@ -54,6 +54,8 @@ void dRuntimeProfiler::DrawRectangle (dFloat x, dFloat y, dFloat dx, dFloat dy, 
 {
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_LIGHTING);
+	glDisable(GL_TEXTURE_2D);
 
 	glColor4f(color.m_x, color.m_y, color.m_z, color.m_w);
 
@@ -323,12 +325,12 @@ void dRuntimeProfiler::RenderThreadPerformance ()
 		for (int i = 0; i < threadCount; i ++) {
 			char label[32];
 			sprintf (label, "thread %d", i);
-			DrawLabel (x0 - 50, y0 + i * 20 + 5, label);
+			DrawLabel (x0 - 90, y0 + i * 22 + 50, label);
 		}
 
-		DrawLabel (x0, y0 - 20, "0.0 ms");
-		DrawLabel ((x1 + x0) * 0.5f, y0 - 20, "8.33 ms");
-		DrawLabel (x1, y0 - 20, "16.66 ms");
+		DrawLabel (x0, y0 - 20 + 50, "0.0 ms");
+		DrawLabel ((x1 + x0) * 0.5f, y0 - 20 + 50, "8.33 ms");
+		DrawLabel (x1, y0 - 20 + 50, "16.66 ms");
 
 		y0 -= 15.0f;
 		dVector color (1.0f, 0.0f, 0.0f, 1.0f/8.0f);
