@@ -553,6 +553,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 		world->m_islandMemory.ExpandCapacityIfNeessesary (m_islands, sizeof (dgIsland));
 		dgJointInfo* const constraintArray = (dgJointInfo*) &world->m_jointsMemory[0];
 
+		if (jointCount) {
 		for (dgInt32 i = 0; i < jointCount; i ++) {
 			dgConstraint* const joint = constraintArray[m_joints + i].m_joint;
 			constraintArray[m_joints + i].m_color = 0;
@@ -561,12 +562,15 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 			bool resting = body0->m_equilibrium & body1->m_equilibrium;
 			body0->m_resting &= resting;
 			body1->m_resting &= resting;
-		}
-		bodyArray[0].m_body->m_islandColor = 0;
-		bodyArray[0].m_body->m_alived0 = false;
-		bodyArray[0].m_body->m_alived1 = false;
-		bodyArray[0].m_body->m_resting = true;
 
+body0->m_alived1 = true;
+body1->m_alived1 = true;
+		}
+			bodyArray[m_bodies].m_body->m_islandColor = 0;
+			bodyArray[m_bodies].m_body->m_alived0 = false;
+			bodyArray[m_bodies].m_body->m_alived1 = false;
+			bodyArray[m_bodies].m_body->m_resting = true;
+/*
 		for (dgInt32 i = 1; i < bodyCount; i ++) {
 			dgBody* const body = bodyArray[i].m_body;
 			if (!body->m_resting) {
@@ -596,7 +600,15 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 				}
 			}
 		}
-
+*/
+		} else {
+			bodyArray[m_bodies].m_body->m_islandColor = 0;
+			bodyArray[m_bodies].m_body->m_alived0 = false;
+			bodyArray[m_bodies].m_body->m_alived1 = false;
+			bodyArray[m_bodies].m_body->m_resting = true;
+			bodyArray[m_bodies + 1].m_body->m_alived0 = true;
+			bodyArray[m_bodies + 1].m_body->m_alived1 = true;
+		}
 		
 
 		dgIsland* const islandArray = (dgIsland*) &world->m_islandMemory[0];
@@ -708,64 +720,69 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (const dgIsland* const isla
 		dgJointInfo* const jointInfo = &constraintArray[j];
 		dgConstraint* const constraint = jointInfo->m_joint;
 
-		dgInt32 dof = dgInt32 (constraint->m_maxDOF);
-		dgAssert (dof <= DG_CONSTRAINT_MAX_ROWS);
-		for (dgInt32 i = 0; i < dof; i ++) {
-			constraintParams.m_forceBounds[i].m_low = DG_MIN_BOUND;
-			constraintParams.m_forceBounds[i].m_upper = DG_MAX_BOUND;
-			constraintParams.m_forceBounds[i].m_jointForce = NULL;
-			constraintParams.m_forceBounds[i].m_normalIndex = DG_BILATERAL_CONSTRAINT;
-		}
-
 		dgAssert (constraint->m_body0);
 		dgAssert (constraint->m_body1);
 
-		constraint->m_body0->m_inCallback = true;
-		constraint->m_body1->m_inCallback = true;
+		dgBody* const body0 = constraint->m_body0;
+		dgBody* const body1 = constraint->m_body1;
+		if (body0->m_alived1 | body1->m_alived1) {
 
-		dof = dgInt32 (constraint->JacobianDerivative (constraintParams)); 
+			dgInt32 dof = dgInt32 (constraint->m_maxDOF);
+			dgAssert (dof <= DG_CONSTRAINT_MAX_ROWS);
+			for (dgInt32 i = 0; i < dof; i ++) {
+				constraintParams.m_forceBounds[i].m_low = DG_MIN_BOUND;
+				constraintParams.m_forceBounds[i].m_upper = DG_MAX_BOUND;
+				constraintParams.m_forceBounds[i].m_jointForce = NULL;
+				constraintParams.m_forceBounds[i].m_normalIndex = DG_BILATERAL_CONSTRAINT;
+			}
 
-		constraint->m_body0->m_inCallback = false;
-		constraint->m_body1->m_inCallback = false;
+			body0->m_inCallback = true;
+			body1->m_inCallback = true;
 
-		dgInt32 m0 = (constraint->m_body0->GetInvMass().m_w != dgFloat32(0.0f)) ? constraint->m_body0->m_index: 0;
-		dgInt32 m1 = (constraint->m_body1->GetInvMass().m_w != dgFloat32(0.0f)) ? constraint->m_body1->m_index: 0;
+			dof = dgInt32 (constraint->JacobianDerivative (constraintParams)); 
 
-		dgAssert (m0 < island->m_bodyCount);
-		dgAssert (m1 < island->m_bodyCount);
+			body0->m_inCallback = false;
+			body1->m_inCallback = false;
 
-		dgAssert (constraint->m_index == dgUnsigned32(j));
-		jointInfo->m_autoPairstart = rowCount;
-		jointInfo->m_autoPaircount = dof;
-		jointInfo->m_autoPairActiveCount = dof;
-		jointInfo->m_m0 = m0;
-		jointInfo->m_m1 = m1;
+			dgInt32 m0 = (body0->GetInvMass().m_w != dgFloat32(0.0f)) ? body0->m_index: 0;
+			dgInt32 m1 = (body1->GetInvMass().m_w != dgFloat32(0.0f)) ? body1->m_index: 0;
 
-		for (dgInt32 i = 0; i < dof; i ++) {
+			dgAssert (m0 < island->m_bodyCount);
+			dgAssert (m1 < island->m_bodyCount);
 
-			dgJacobianMatrixElement* const row = &matrixRow[rowCount];
-			dgAssert (constraintParams.m_forceBounds[i].m_jointForce);
-			row->m_Jt = constraintParams.m_jacobian[i]; 
+			dgAssert (constraint->m_index == dgUnsigned32(j));
+			jointInfo->m_autoPairstart = rowCount;
+			jointInfo->m_autoPaircount = dof;
+			jointInfo->m_autoPairActiveCount = dof;
+			jointInfo->m_m0 = m0;
+			jointInfo->m_m1 = m1;
 
-			dgAssert (constraintParams.m_jointStiffness[i] >= dgFloat32(0.1f));
-			dgAssert (constraintParams.m_jointStiffness[i] <= dgFloat32(100.0f));
+			for (dgInt32 i = 0; i < dof; i ++) {
 
-			row->m_diagDamp = constraintParams.m_jointStiffness[i];
-			row->m_coordenateAccel = constraintParams.m_jointAccel[i];
-			row->m_accelIsMotor = constraintParams.m_isMotor[i];
-			row->m_restitution = constraintParams.m_restitution[i];
-			row->m_penetration = constraintParams.m_penetration[i];
-			row->m_penetrationStiffness = constraintParams.m_penetrationStiffness[i];
-			row->m_lowerBoundFrictionCoefficent = constraintParams.m_forceBounds[i].m_low;
-			row->m_upperBoundFrictionCoefficent = constraintParams.m_forceBounds[i].m_upper;
-			row->m_jointFeebackForce = constraintParams.m_forceBounds[i].m_jointForce;
+				dgJacobianMatrixElement* const row = &matrixRow[rowCount];
+				dgAssert (constraintParams.m_forceBounds[i].m_jointForce);
+				row->m_Jt = constraintParams.m_jacobian[i]; 
 
-			row->m_normalForceIndex = constraintParams.m_forceBounds[i].m_normalIndex; 
-			rowCount ++;
+				dgAssert (constraintParams.m_jointStiffness[i] >= dgFloat32(0.1f));
+				dgAssert (constraintParams.m_jointStiffness[i] <= dgFloat32(100.0f));
+
+				row->m_diagDamp = constraintParams.m_jointStiffness[i];
+				row->m_coordenateAccel = constraintParams.m_jointAccel[i];
+				row->m_accelIsMotor = constraintParams.m_isMotor[i];
+				row->m_restitution = constraintParams.m_restitution[i];
+				row->m_penetration = constraintParams.m_penetration[i];
+				row->m_penetrationStiffness = constraintParams.m_penetrationStiffness[i];
+				row->m_lowerBoundFrictionCoefficent = constraintParams.m_forceBounds[i].m_low;
+				row->m_upperBoundFrictionCoefficent = constraintParams.m_forceBounds[i].m_upper;
+				row->m_jointFeebackForce = constraintParams.m_forceBounds[i].m_jointForce;
+
+				row->m_normalForceIndex = constraintParams.m_forceBounds[i].m_normalIndex; 
+				rowCount ++;
+			}
+
+			rowCount = (rowCount & (dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)) - 1)) ? ((rowCount & (-dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)))) + dgInt32 (sizeof (dgVector) / sizeof (dgFloat32))) : rowCount;
+			dgAssert ((rowCount & (dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)) - 1)) == 0);
 		}
-
-		rowCount = (rowCount & (dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)) - 1)) ? ((rowCount & (-dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)))) + dgInt32 (sizeof (dgVector) / sizeof (dgFloat32))) : rowCount;
-		dgAssert ((rowCount & (dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)) - 1)) == 0);
 	}
 	return rowCount;
 }
@@ -873,41 +890,44 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 	dgVector forceDampVect (forceDamp, forceDamp, forceDamp, dgFloat32 (0.0f));
 	for (dgInt32 i = 0; i < count; i ++) {
 		dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
+		if (body->m_alived1) {
+			if (body->m_invMass.m_w && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+				body->IntegrateVelocity(timestep);
 
-		if (body->m_invMass.m_w && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
-			body->IntegrateVelocity(timestep);
+				dgFloat32 accel2 = body->m_accel % body->m_accel;
+				dgFloat32 alpha2 = body->m_alpha % body->m_alpha;
+				dgFloat32 speed2 = body->m_veloc % body->m_veloc;
+				dgFloat32 omega2 = body->m_omega % body->m_omega;
 
-			dgFloat32 accel2 = body->m_accel % body->m_accel;
-			dgFloat32 alpha2 = body->m_alpha % body->m_alpha;
-			dgFloat32 speed2 = body->m_veloc % body->m_veloc;
-			dgFloat32 omega2 = body->m_omega % body->m_omega;
+				maxAccel = dgMax (maxAccel, accel2);
+				maxAlpha = dgMax (maxAlpha, alpha2);
+				maxSpeed = dgMax (maxSpeed, speed2);
+				maxOmega = dgMax (maxOmega, omega2);
 
-			maxAccel = dgMax (maxAccel, accel2);
-			maxAlpha = dgMax (maxAlpha, alpha2);
-			maxSpeed = dgMax (maxSpeed, speed2);
-			maxOmega = dgMax (maxOmega, omega2);
+				bool equilibrium = (accel2 < accelFreeze) && (alpha2 < accelFreeze) && (speed2 < speedFreeze) && (omega2 < speedFreeze);
 
-			bool equilibrium = (accel2 < accelFreeze) && (alpha2 < accelFreeze) && (speed2 < speedFreeze) && (omega2 < speedFreeze);
+				if (equilibrium) {
+					dgVector veloc (body->m_veloc.CompProduct4(forceDampVect));
+					dgVector omega = body->m_omega.CompProduct4 (forceDampVect);
+					body->m_veloc = (dgVector (veloc.DotProduct4(veloc)) > m_velocTol) & veloc;
+					body->m_omega = (dgVector (omega.DotProduct4(omega)) > m_velocTol) & omega;
+				}
 
-			if (equilibrium) {
-				dgVector veloc (body->m_veloc.CompProduct4(forceDampVect));
-				dgVector omega = body->m_omega.CompProduct4 (forceDampVect);
-				body->m_veloc = (dgVector (veloc.DotProduct4(veloc)) > m_velocTol) & veloc;
-				body->m_omega = (dgVector (omega.DotProduct4(omega)) > m_velocTol) & omega;
+				body->m_equilibrium = dgUnsigned32 (equilibrium);
+				stackSleeping &= equilibrium;
+				isAutoSleep &= body->m_autoSleep;
+
+				sleepCounter = dgMin (sleepCounter, body->m_sleepingCounter);
 			}
-
-			body->m_equilibrium = dgUnsigned32 (equilibrium);
-			stackSleeping &= equilibrium;
-			isAutoSleep &= body->m_autoSleep;
-
-			sleepCounter = dgMin (sleepCounter, body->m_sleepingCounter);
 		}
 	}
 
 	for (dgInt32 i = 0; i < count; i ++) {
 		dgBody* const body = bodyArray[i].m_body;
-		if (body->m_invMass.m_w && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
-			body->UpdateMatrix (timestep, threadIndex);
+		if (body->m_alived1) {
+			if (body->m_invMass.m_w && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+				body->UpdateMatrix (timestep, threadIndex);
+			}
 		}
 	}
 
@@ -915,11 +935,13 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 		if (stackSleeping) {
 			for (dgInt32 i = 0; i < count; i ++) {
 				dgBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
-				if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
-					body->m_netForce = zero;
-					body->m_netTorque = zero;
-					body->m_veloc = zero;
-					body->m_omega = zero;
+				if (body->m_alived1) {
+					if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+						body->m_netForce = zero;
+						body->m_netTorque = zero;
+						body->m_veloc = zero;
+						body->m_omega = zero;
+					}
 				}
 			}
 		} else {
@@ -929,8 +951,10 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 				(maxOmega > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxOmega)) {
 					for (dgInt32 i = 0; i < count; i ++) {
 						dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
-						if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
-							body->m_sleepingCounter = 0;
+						if (body->m_alived1) {
+							if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+								body->m_sleepingCounter = 0;
+							}
 						}
 					}
 			} else {
@@ -949,20 +973,24 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 				if (timeScaleSleepCount > world->m_sleepTable[index].m_steps) {
 					for (dgInt32 i = 0; i < count; i ++) {
 						dgBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
-						if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
-							body->m_netForce = zero;
-							body->m_netTorque = zero;
-							body->m_veloc = zero;
-							body->m_omega = zero;
-							body->m_equilibrium = true;
+						if (body->m_alived1) {
+							if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+								body->m_netForce = zero;
+								body->m_netTorque = zero;
+								body->m_veloc = zero;
+								body->m_omega = zero;
+								body->m_equilibrium = true;
+							}
 						}
 					}
 				} else {
 					sleepCounter ++;
 					for (dgInt32 i = 0; i < count; i ++) {
 						dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
-						if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
-							body->m_sleepingCounter = sleepCounter;
+						if (body->m_alived1) {
+							if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+								body->m_sleepingCounter = sleepCounter;
+							}
 						}
 					}
 				}
