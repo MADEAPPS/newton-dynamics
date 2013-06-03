@@ -40,6 +40,9 @@ class dgCollisionScene: public dgCollisionCompound
 	void CollideCompoundPair (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 	virtual void MassProperties ();
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
+
+	dgFloat32 GetBoxMinRadius () const;
+	dgFloat32 GetBoxMaxRadius () const;
 };
 
 #endif

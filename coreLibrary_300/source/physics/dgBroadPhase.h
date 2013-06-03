@@ -67,27 +67,15 @@ class dgBroadPhase
 	public:
 	DG_CLASS_ALLOCATOR(allocator);
 
-	enum dgType
-	{
-		m_dynamic,
-		m_static,
-		m_hybrid,
-	};
-
 	class dgNode;
-	
 
 	dgBroadPhase(dgWorld* const world);
 	~dgBroadPhase();
 
 	void GetWorldSize (dgVector& p0, dgVector& p1) const;
-//	void SetWorldSize (const dgVector& min, const dgVector& max);
 	void RayCast (const dgVector& p0, const dgVector& p1, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData) const;
 	dgInt32 ConvexCast (dgCollisionInstance* const shape, const dgMatrix& p0, const dgVector& p1, dgFloat32& timetoImpact, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const;
 	void ForEachBodyInAABB (const dgVector& q0, const dgVector& q1, OnBodiesInAABB callback, void* const userData) const;
-
-	dgInt32 GetBroadPhaseType () const;
-	void SelectBroadPhaseType (dgInt32 algorthmType);
 
 	protected:
 	class dgFitnessList: public dgList <dgNode*>
@@ -109,7 +97,7 @@ class dgBroadPhase
 	dgFloat32 CalculateSurfaceArea (const dgNode* const node0, const dgNode* const node1, dgVector& minBox, dgVector& maxBox) const;
 
 
-	void AddPair (dgBody* const body0, dgBody* const body1, dgInt32 threadID);
+	void AddPair (dgBody* const body0, dgBody* const body1, const dgVector& timestep2, dgInt32 threadID);
 
 	static void ForceAndToqueKernel (void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void CollidingPairsKernel (void* const descriptor, void* const worldContext, dgInt32 threadID);
@@ -122,10 +110,10 @@ class dgBroadPhase
 	void CalculatePairContacts (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID);
 	void UpdateSoftBodyForcesKernel (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID);
 	
-	void SubmitPairsStatic (dgNode* const body, dgNode* const node, dgInt32 threadID);
+//	void SubmitPairsStatic (dgNode* const body, dgNode* const node, dgInt32 threadID);
 	void FindCollidingPairsDynamics (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
-	void FindCollidingPairsStatic (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
-	void FindCollidingPairsHybrid (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
+//	void FindCollidingPairsStatic (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
+//	void FindCollidingPairsHybrid (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
 
 	void KinematicBodyActivation (dgContact* const contatJoint) const;
 
@@ -135,9 +123,10 @@ class dgBroadPhase
 	dgNode* m_rootNode;
 	dgUnsigned32 m_lru;
 	dgFitnessList m_fitness;
-	dgType m_broadPhaseType;
 	dgThread::dgCriticalSection m_contacJointLock;
 	dgThread::dgCriticalSection m_criticalSectionLock;
+
+	static dgVector m_conservativeRotAngle;
 
 	friend class dgBody;
 	friend class dgWorld;

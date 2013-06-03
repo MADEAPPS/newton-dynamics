@@ -37,10 +37,6 @@ class NewtonDemos: public wxFrame
 		ID_SHOW_CENTER_OF_MASS,
 		ID_USE_PARALLEL_SOLVER,
 
-		ID_DYNAMICS_BROADPHASE,
-		ID_STATIC_BROADPHASE,
-		ID_HYBRID_BROADPHASE,
-
 		ID_SERIALIZE,
 		ID_DESERIALIZE,
 
@@ -111,7 +107,6 @@ class NewtonDemos: public wxFrame
 	void OnShowShowJoints(wxCommandEvent& event);
 	void OnShowCenterOfMass(wxCommandEvent& event);
 	void OnUseParallelSolver(wxCommandEvent& event);
-	void OnBroadPhaseType(wxCommandEvent& event);
 	void OnShowConcurrentProfiler(wxCommandEvent& event);
 	void OnShowThreadProfiler(wxCommandEvent& event);
 	void OnShowProfiler(wxCommandEvent& event);
@@ -158,7 +153,6 @@ class NewtonDemos: public wxFrame
 	int m_framesCount;
 	int m_microthreadIndex;
 	int m_cpuInstructionsMode;
-	int m_broadPhaseMode;
 	float m_timestepAcc;
 	float m_fps;
 

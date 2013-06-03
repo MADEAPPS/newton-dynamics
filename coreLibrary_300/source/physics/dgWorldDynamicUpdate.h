@@ -150,7 +150,7 @@ class dgParallelSolverSyncData
 	dgInt32 m_islandCountCounter;
 
 	const dgIsland* m_islandArray;
-	dgInt32* m_bodyInfoMap;
+//	dgInt32* m_bodyInfoMap;
 	dgParallelJointMap* m_jointInfoMap;
 	JointsBashes m_jointBatches[64];
 	dgInt32 m_hasJointFeeback[DG_MAX_THREADS_HIVE_COUNT];
@@ -281,8 +281,9 @@ class dgWorldDynamicUpdate
 	
 	//void GetJacobianDerivativesParallel (dgJointInfo* const jointInfo, dgInt32 threadID, bool bitMode, dgInt32 rowBase, dgFloat32 timestep) const;	
 	void GetJacobianDerivativesParallel (dgJointInfo* const jointInfo, dgInt32 threadID, dgInt32 rowBase, dgFloat32 timestep) const;	
-	dgInt32 LinearizeBodyParallelArray(dgInt32 islandsCount, dgParallelSolverSyncData* const solverSyncData, const dgBodyInfo* const bodyArray, const dgIsland* const islandArray) const;
-	dgInt32 LinearizeJointParallelArray(dgInt32 islandsCount, dgParallelSolverSyncData* const solverSyncData, dgJointInfo* const constraintArray, const dgIsland* const islandArray) const;
+	//dgInt32 LinearizeBodyParallelArray(dgInt32 islandsCount, dgParallelSolverSyncData* const solverSyncData, const dgBodyInfo* const bodyArray, const dgIsland* const islandArray) const;
+	//dgInt32 LinearizeJointParallelArray(dgInt32 islandsCount, dgParallelSolverSyncData* const solverSyncData, dgJointInfo* const constraintArray, const dgIsland* const islandArray) const;
+	void LinearizeJointParallelArray(dgParallelSolverSyncData* const solverSyncData, dgJointInfo* const constraintArray, const dgIsland* const island) const;
 
 
 	void IntegrateInslandParallel(dgParallelSolverSyncData* const syncData) const; 
@@ -291,7 +292,7 @@ class dgWorldDynamicUpdate
 	void SolverInitInternalForcesParallel (dgParallelSolverSyncData* const syncData) const; 
 	void CalculateForcesGameModeParallel (dgParallelSolverSyncData* const syncData) const; 
 
-	void CalculateReactionForcesParallel (const dgIsland* const island, dgInt32 inlansdCount, dgFloat32 timestep) const;
+	void CalculateReactionForcesParallel (const dgIsland* const island, dgFloat32 timestep) const;
 	dgFloat32 CalculateJointForces (const dgIsland* const island, dgInt32 rowStart, dgInt32 joint, dgFloat32* const forceStep, dgFloat32 maxAccNorm, const dgJacobianPair* const JMinv) const;
 	void CalculateForcesSimulationMode (const dgIsland* const island, dgInt32 rowStart, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
 	void CalculateIslandReactionForces (dgIsland* const island, dgFloat32 timestep, dgInt32 threadID) const;

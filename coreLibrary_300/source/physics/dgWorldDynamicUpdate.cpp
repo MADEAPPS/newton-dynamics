@@ -31,7 +31,7 @@
 #include "dgCollisionDeformableMesh.h"
 
 
-#define DG_PARALLEL_JOINT_COUNT_CUT_OFF		(16 * DG_MAX_THREADS_HIVE_COUNT)
+#define DG_PARALLEL_JOINT_COUNT_CUT_OFF		(4 * DG_MAX_THREADS_HIVE_COUNT)
 #define DG_CCD_EXTRA_CONTACT_COUNT			(4 * 4)
 
 
@@ -150,44 +150,20 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	dgWorldDynamicUpdateSyncDescriptor descriptor;
 	descriptor.m_timestep = timestep;
 
-	if (world->m_useParallelSolver && (threadCount > 1) && (islands[0].m_jointCount > DG_PARALLEL_JOINT_COUNT_CUT_OFF)) {
-		dgInt32 i0 = 0;
-		dgInt32 i1 = m_islands - 1;
-		while ((i1 - i0) > 4) {
-			dgInt32 i = (i1 + i0) >> 1;
-			if (islands[i].m_jointCount <= DG_PARALLEL_JOINT_COUNT_CUT_OFF) {
-				i1 = i;
-			} else {
-				i0 = i;
-			}
+	dgInt32 singleBodiesStart = 0;
+	if (world->m_useParallelSolver && (threadCount > 1)) {
+		for ( ; (singleBodiesStart < m_islands) && (islands[singleBodiesStart].m_jointCount >= DG_PARALLEL_JOINT_COUNT_CUT_OFF) ; singleBodiesStart ++) {
+			CalculateReactionForcesParallel (&islands[singleBodiesStart], timestep);
 		}
-		dgInt32 singleBodiesStart = i0;
-		for (; (singleBodiesStart < m_islands) && (islands[singleBodiesStart].m_jointCount >= DG_PARALLEL_JOINT_COUNT_CUT_OFF) ; singleBodiesStart ++);
-		
-		if (singleBodiesStart <= (m_islands - 1)) {
-			descriptor.m_firstIsland = singleBodiesStart;
-			descriptor.m_islandCount = m_islands - singleBodiesStart;
-
-			for (dgInt32 i = 0; i < threadCount; i ++) {
-				world->QueueJob (CalculateIslandReactionForcesKernel, &descriptor, world);
-			}
-			world->SynchronizationBarrier();
-		}
-
-		dgInt32 parallelIslandCount = singleBodiesStart;
-		if (parallelIslandCount > 0) {
-			CalculateReactionForcesParallel (&islands[0], parallelIslandCount, timestep);
-		}
-			
-	} else {
-		descriptor.m_firstIsland = 0;
-		descriptor.m_islandCount = m_islands;
-
-		for (dgInt32 i = 0; i < threadCount; i ++) {
-			world->QueueJob (CalculateIslandReactionForcesKernel, &descriptor, world);
-		}
-		world->SynchronizationBarrier();
 	}
+
+	descriptor.m_firstIsland = singleBodiesStart;
+	descriptor.m_islandCount = m_islands - singleBodiesStart;
+	for (dgInt32 i = 0; i < threadCount; i ++) {
+		world->QueueJob (CalculateIslandReactionForcesKernel, &descriptor, world);
+	}
+	world->SynchronizationBarrier();
+
 
 	dgUnsigned32 ticks = world->m_getPerformanceCount();
 	world->m_perfomanceCounters[m_dynamicsSolveSpanningTreeTicks] = ticks - dynamicsTime;
@@ -229,8 +205,6 @@ void dgJacobianMemory::Init (dgWorld* const world, dgInt32 rowsCount, dgInt32 bo
 // sort from high to low
 dgInt32 dgWorldDynamicUpdate::CompareIslands (const dgIsland* const islandA, const dgIsland* const islandB, void* notUsed)
 {
-//	dgInt32 countA = islandA->m_jointCount + (islandA->m_hasExactSolverJoints << 28) + (islandA->m_hasUnilateralJoints << 29);
-//	dgInt32 countB = islandB->m_jointCount + (islandB->m_hasExactSolverJoints << 28) + (islandB->m_hasUnilateralJoints << 29);
 	dgInt32 countA = islandA->m_jointCount + (islandA->m_hasExactSolverJoints << 28);
 	dgInt32 countB = islandB->m_jointCount + (islandB->m_hasExactSolverJoints << 28);
 
@@ -582,6 +556,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 
 		for (dgInt32 i = 0; i < jointCount; i ++) {
 			dgConstraint* const joint = constraintArray[m_joints + i].m_joint;
+			constraintArray[m_joints + i].m_color = 0;
 			dgBody* const body0 = joint->m_body0;
 			dgBody* const body1 = joint->m_body1;
 			bool resting = body0->m_equilibrium & body1->m_equilibrium;
@@ -985,31 +960,24 @@ dgInt32 dgWorldDynamicUpdate::SortJointInfoByColor (const dgParallelJointMap* co
 }
 
 
-dgInt32 dgWorldDynamicUpdate::LinearizeJointParallelArray(dgInt32 islandsCount, dgParallelSolverSyncData* const solverSyncData, dgJointInfo* const constraintArray, const dgIsland* const islandArray) const
+//dgInt32 dgWorldDynamicUpdate::LinearizeJointParallelArray(dgInt32 islandsCount, dgParallelSolverSyncData* const solverSyncData, dgJointInfo* const constraintArray, const dgIsland* const islandArray) const
+void dgWorldDynamicUpdate::LinearizeJointParallelArray(dgParallelSolverSyncData* const solverSyncData, dgJointInfo* const constraintArray, const dgIsland* const island) const
 {
-	dgInt32 jointsCount = 0;	
-
 	dgParallelJointMap* const jointInfoMap = solverSyncData->m_jointInfoMap;
-	for (dgInt32 i = 0; i < islandsCount; i ++) {
-		dgInt32 count = islandArray[i].m_jointCount;
-		dgInt32 index = islandArray[i].m_jointStart;
-		for (dgInt32 j = 0; j < count; j ++) {
-			dgConstraint* const joint = constraintArray[index].m_joint;
+	dgInt32 count = island->m_jointCount;
+	dgInt32 index = island->m_jointStart;
+	for (dgInt32 j = 0; j < count; j ++) {
+		dgConstraint* const joint = constraintArray[index].m_joint;
+//		constraintArray[index].m_color = 0;
+		jointInfoMap[j].m_jointIndex = index;
+		joint->m_index = index;
+		index ++;
+	}
 
-			constraintArray[index].m_color = 0;
+	jointInfoMap[count].m_bashIndex = 0x7fffffff;
+	jointInfoMap[count].m_jointIndex= -1;
 
-			jointInfoMap[jointsCount].m_jointIndex = index;
-			joint->m_index = index;
-			index ++;
-			jointsCount ++;
-			dgAssert (jointsCount <= m_joints);
-		}
-	} 
-	dgAssert (jointsCount);
-	jointInfoMap[jointsCount].m_bashIndex = 0x7fffffff;
-	jointInfoMap[jointsCount].m_jointIndex= -1;
-
-	for (dgInt32 i = 0; i < jointsCount; i ++) {
+	for (dgInt32 i = 0; i < count; i ++) {
 		dgJointInfo& jointInfo = constraintArray[jointInfoMap[i].m_jointIndex];
 		
 		dgInt32 index = 0; 
@@ -1052,10 +1020,10 @@ dgInt32 dgWorldDynamicUpdate::LinearizeJointParallelArray(dgInt32 islandsCount, 
 		}
 	}
 
-	dgSort (jointInfoMap, jointsCount, SortJointInfoByColor, constraintArray);
+	dgSort (jointInfoMap, count, SortJointInfoByColor, constraintArray);
 
 	dgInt32 bash = 0;
-	for (int index = 0; index < jointsCount; index ++) {
+	for (int index = 0; index < count; index ++) {
 		dgInt32 count = 0; 
 		solverSyncData->m_jointBatches[bash].m_start = index;
 		while (jointInfoMap[index].m_bashIndex == bash) {
@@ -1067,8 +1035,5 @@ dgInt32 dgWorldDynamicUpdate::LinearizeJointParallelArray(dgInt32 islandsCount, 
 		index --;
 	}
 	solverSyncData->m_batchesCount = bash;
-
-	return jointsCount;
-
 }
 

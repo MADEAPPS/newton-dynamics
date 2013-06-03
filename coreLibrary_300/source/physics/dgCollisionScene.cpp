@@ -51,6 +51,17 @@ dgCollisionScene::~dgCollisionScene()
 {
 }
 
+dgFloat32 dgCollisionScene::GetBoxMinRadius () const
+{
+	return dgFloat32 (0.0f);  
+}
+
+dgFloat32 dgCollisionScene::GetBoxMaxRadius () const
+{
+	return dgFloat32 (0.0f);  
+}
+
+
 void dgCollisionScene::MassProperties ()
 {
 	m_inertia = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));

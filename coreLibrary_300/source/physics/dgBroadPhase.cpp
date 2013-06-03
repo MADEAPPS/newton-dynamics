@@ -36,6 +36,8 @@
 #define DG_BROADPHASE_AABB_SCALE		dgFloat32 (4.0f)
 #define DG_BROADPHASE_AABB_INV_SCALE	(dgFloat32 (1.0f) / DG_BROADPHASE_AABB_SCALE)
 
+dgVector dgBroadPhase::m_conservativeRotAngle (45.0f * 3.14159f / 180.0f);
+
 
 DG_MSC_VECTOR_AVX_ALIGMENT
 class dgBroadPhase::dgNode
@@ -160,7 +162,7 @@ dgVector dgBroadPhase::dgNode::m_broadInvPhaseScale (DG_BROADPHASE_AABB_INV_SCAL
 class dgBroadphaseSyncDescriptor
 {
 	public:
-		dgBroadphaseSyncDescriptor(dgBroadPhase::dgType broadPhaseType, dgThread::dgCriticalSection* const lock)
+		dgBroadphaseSyncDescriptor(dgThread::dgCriticalSection* const lock)
 		:m_lock(lock)
 		,m_pairsCount(0)
 		,m_pairsAtomicCounter(0)
@@ -169,7 +171,6 @@ class dgBroadphaseSyncDescriptor
 		,m_collindPairBodyNode(NULL)
 		,m_forceAndTorqueBodyNode(NULL)
 		,m_sofBodyNode(NULL)
-		,m_broadPhaseType(broadPhaseType)
 	{
 	}
 
@@ -278,7 +279,6 @@ class dgBroadphaseSyncDescriptor
 	dgBodyMasterList::dgListNode* m_collindPairBodyNode;
 	dgBodyMasterList::dgListNode* m_forceAndTorqueBodyNode;
 	dgCollisionDeformableMeshList::dgListNode* m_sofBodyNode;
-	dgBroadPhase::dgType m_broadPhaseType;
 	dgBroadPhase::dgNode* m_pairs[1024 * 4];	
 };
 
@@ -289,7 +289,6 @@ dgBroadPhase::dgBroadPhase(dgWorld* const world)
 	,m_rootNode (NULL)
 	,m_lru(0)
 	,m_fitness(world->GetAllocator())
-	,m_broadPhaseType(m_dynamic)
 	,m_contacJointLock()
 	,m_criticalSectionLock()
 {
@@ -365,36 +364,6 @@ void dgBroadPhase::ForEachBodyInAABB (const dgVector& q0, const dgVector& q1, On
 				}
 			}
 		}
-	}
-}
-
-
-dgInt32 dgBroadPhase::GetBroadPhaseType () const
-{
-	dgInt32 algorthmType = m_dynamic;
-	if (m_broadPhaseType == m_static) {
-		algorthmType = 1;
-	} else if (m_broadPhaseType == m_hybrid) {
-		algorthmType = 2;
-	}
-	return algorthmType;
-}
-
-void dgBroadPhase::SelectBroadPhaseType (dgInt32 algorthmType)
-{
-	switch (algorthmType) 
-	{
-		case 1:
-			m_broadPhaseType = m_static;
-			break;
-
-		case 2:
-			m_broadPhaseType = m_hybrid;
-			break;
-
-		default:
-			m_broadPhaseType = m_dynamic;
-			break;
 	}
 }
 
@@ -678,7 +647,7 @@ void dgBroadPhase::ImproveFitness()
 	} while (cost1 < (dgFloat32 (0.95f)) * cost0);
 }
 
-void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, dgInt32 threadID)
+void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgVector& timestep2, dgInt32 threadID)
 {
 	dgAssert ((body0->GetInvMass().m_w != dgFloat32 (0.0f)) || (body1->GetInvMass().m_w != dgFloat32 (0.0f)) || (body0->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI)) || (body1->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI)));
 
@@ -756,6 +725,7 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, dgInt32 th
 	}
 
 	if (isCollidable) {
+		bool newContact = false;
 		if (!contact) {
 			dgUnsigned32 group0_ID = dgUnsigned32 (body0->m_bodyGroupId);
 			dgUnsigned32 group1_ID = dgUnsigned32 (body1->m_bodyGroupId);
@@ -767,6 +737,7 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, dgInt32 th
 			const dgContactMaterial* const material = &materialList->Find (key)->GetInfo();
 
 			if (material->m_flags & dgContactMaterial::m_collisionEnable) {
+				newContact = true;
 				dgThreadHiveScopeLock lock (m_world, &m_contacJointLock);
 				if (body0->IsRTTIType (dgBody::m_deformableBodyRTTI) || body1->IsRTTIType (dgBody::m_deformableBodyRTTI)) {
 					contact = new (m_world->m_allocator) dgDeformableContact (m_world, material);
@@ -778,14 +749,28 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, dgInt32 th
 			}
 		}
 
-		if (contact) {
+		if (newContact) {
+			contact->m_broadphaseLru = m_lru;
+			contact->m_timeOfImpact = dgFloat32 (1.0e10f);
+			contactPairs->AddPair(contact, threadID);
+		} else if (contact) {
 			dgAssert (contact);
-			//if ( (body0->m_continueCollisionMode | body1->m_continueCollisionMode) | 
-			//	!(body0->m_equilibrium & body1->m_equilibrium & (contact->m_closetDistance > (DG_CACHE_DIST_TOL * dgFloat32 (4.0f))))) {
-			if (!(body0->m_equilibrium & body1->m_equilibrium & (contact->m_closestDistance > (DG_CACHE_DIST_TOL * dgFloat32 (4.0f))))) {
-				contact->m_broadphaseLru = m_lru;
-				contact->m_timeOfImpact = dgFloat32 (1.0e10f);
-				contactPairs->AddPair(contact, threadID);
+			bool kinematicBodyEquilibrium = (((body0->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body0->IsCollidable()) | ((body1->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body1->IsCollidable())) ? false : true;
+			if (!(body0->m_equilibrium & body1->m_equilibrium & kinematicBodyEquilibrium & (contact->m_closestDistance > (DG_CACHE_DIST_TOL * dgFloat32 (4.0f))))) {
+
+//				dgVector relVeloc (body0->m_veloc - body1->m_veloc);
+//				dgVector relOmega (body0->m_omega - body1->m_omega);
+//				dgVector radius0 (body0->m_collision->GetBoxMaxRadius());
+//				dgVector radius1 (body1->m_collision->GetBoxMaxRadius());
+//				dgVector conservativeRotAngle (relOmega.DotProduct4(relOmega).CompProduct4(timestep2).GetMin(m_conservativeRotAngle));
+//				dgVector angularDistance2 (conservativeRotAngle.CompProduct4(radius1.GetMax(radius0)));
+//				dgVector linearDistance2 (relVeloc.CompProduct4(relVeloc).CompProduct4(timestep2));
+//				dgVector canCollide ((linearDistance2 + angularDistance2) > dgVector (contact->m_closestDistance));
+//				if (canCollide.GetSignMask()) {
+					contact->m_broadphaseLru = m_lru;
+					contact->m_timeOfImpact = dgFloat32 (1.0e10f);
+					contactPairs->AddPair(contact, threadID);
+//				}
 			}
 		}
 	}
@@ -884,13 +869,27 @@ void dgBroadPhase::KinematicBodyActivation (dgContact* const contatJoint) const
 	if (body0->IsCollidable() | body1->IsCollidable()) {
 		if (body0->IsRTTIType(dgBody::m_kinematicBodyRTTI)) {
 			if (body1->IsRTTIType(dgBody::m_dynamicBodyRTTI) && (body1->GetInvMass().m_w > dgFloat32 (0.0f))) {
-				dgThreadHiveScopeLock lock (m_world, &body1->m_criticalSectionLock);
-				body1->m_sleeping = false;
+				if (body1->m_equilibrium) {
+					dgVector relVeloc (body0->m_veloc - body1->m_veloc);
+					dgVector relOmega (body0->m_omega - body1->m_omega);
+					dgVector mask2 ((relVeloc.DotProduct4(relVeloc) < dgDynamicBody::m_equilibriumError2) & (relOmega.DotProduct4(relOmega) < dgDynamicBody::m_equilibriumError2));
+
+					dgThreadHiveScopeLock lock (m_world, &body1->m_criticalSectionLock);
+					body1->m_sleeping = false;
+					body1->m_equilibrium = mask2.GetSignMask() ? true : false;
+				}
 			}
 		} else if (body1->IsRTTIType(dgBody::m_kinematicBodyRTTI)) {
 			if (body0->IsRTTIType(dgBody::m_dynamicBodyRTTI) && (body0->GetInvMass().m_w > dgFloat32 (0.0f))) {
-				dgThreadHiveScopeLock lock (m_world, &body0->m_criticalSectionLock);
-				body0->m_sleeping = false;
+				if (body0->m_equilibrium) {
+					dgVector relVeloc (body0->m_veloc - body1->m_veloc);
+					dgVector relOmega (body0->m_omega - body1->m_omega);
+					dgVector mask2 ((relVeloc.DotProduct4(relVeloc) < dgDynamicBody::m_equilibriumError2) & (relOmega.DotProduct4(relOmega) < dgDynamicBody::m_equilibriumError2));
+
+					dgThreadHiveScopeLock lock (m_world, &body0->m_criticalSectionLock);
+					body0->m_sleeping = false;
+					body0->m_equilibrium = mask2.GetSignMask() ? true : false;
+				}
 			}
 		}
 	}
@@ -985,32 +984,34 @@ void dgBroadPhase::CollidingPairsKernel (void* const context, void* const worldC
 
 	if (!threadID) {
 		dgUnsigned32 ticks0 = world->m_getPerformanceCount();
-		switch (descriptor->m_broadPhaseType) 
-		{
-			case dgBroadPhase::m_dynamic:
-				broadPhase->FindCollidingPairsDynamics (descriptor, threadID);
-				break;
-			case dgBroadPhase::m_static:
-				broadPhase->FindCollidingPairsStatic (descriptor, threadID);
-				break;
-			case dgBroadPhase::m_hybrid:
-				broadPhase->FindCollidingPairsHybrid (descriptor, threadID);
-				break;
-		}
+//		switch (descriptor->m_broadPhaseType) 
+//		{
+//			case dgBroadPhase::m_dynamic:
+//				broadPhase->FindCollidingPairsDynamics (descriptor, threadID);
+//				break;
+//			case dgBroadPhase::m_static:
+//				broadPhase->FindCollidingPairsStatic (descriptor, threadID);
+//				break;
+//			case dgBroadPhase::m_hybrid:
+//				broadPhase->FindCollidingPairsHybrid (descriptor, threadID);
+//				break;
+//		}
+		broadPhase->FindCollidingPairsDynamics (descriptor, threadID);
 		world->m_perfomanceCounters[m_broadPhaceTicks] = world->m_getPerformanceCount() - ticks0;
 	} else {
-		switch (descriptor->m_broadPhaseType) 
-		{
-			case dgBroadPhase::m_dynamic:
-				broadPhase->FindCollidingPairsDynamics (descriptor, threadID);
-				break;
-			case dgBroadPhase::m_static:
-				broadPhase->FindCollidingPairsStatic (descriptor, threadID);
-				break;
-			case dgBroadPhase::m_hybrid:
-				broadPhase->FindCollidingPairsHybrid (descriptor, threadID);
-				break;
-		}
+//		switch (descriptor->m_broadPhaseType) 
+//		{
+//			case dgBroadPhase::m_dynamic:
+//				broadPhase->FindCollidingPairsDynamics (descriptor, threadID);
+//				break;
+//			case dgBroadPhase::m_static:
+//				broadPhase->FindCollidingPairsStatic (descriptor, threadID);
+//				break;
+//			case dgBroadPhase::m_hybrid:
+//				broadPhase->FindCollidingPairsHybrid (descriptor, threadID);
+//				break;
+//		}
+		broadPhase->FindCollidingPairsDynamics (descriptor, threadID);
 	}
 }
 
@@ -1056,7 +1057,7 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 	bool tier6 = isKinematic1 & mass0; 
 	return tier0 & tier1 & tier2 & (tier3 | tier4 | tier5 | tier6);
 }
-
+/*
 void dgBroadPhase::SubmitPairsStatic (dgNode* const bodyNode, dgNode* const node, dgInt32 threadID)
 {
 	dgNode* pool[DG_BROADPHASE_MAX_STACK_DEPTH];
@@ -1066,6 +1067,7 @@ void dgBroadPhase::SubmitPairsStatic (dgNode* const bodyNode, dgNode* const node
 	dgBody* const body0 = bodyNode->m_body;
 	dgAssert (!body0->m_collision->IsType (dgCollision::dgCollisionNull_RTTI));
 
+	dgVector timeStep2 = 
 	while (stack) {
 		stack --;
 		dgNode* const rootNode = pool[stack];
@@ -1088,13 +1090,10 @@ void dgBroadPhase::SubmitPairsStatic (dgNode* const bodyNode, dgNode* const node
 			}
 		}
 	}
-
 }
-
 
 void dgBroadPhase::FindCollidingPairsHybrid (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID)
 {
-
 	dgBodyMasterList::dgListNode* node = NULL;
 	{
 		dgThreadHiveScopeLock lock (m_world, descriptor->m_lock);
@@ -1130,12 +1129,14 @@ void dgBroadPhase::FindCollidingPairsStatic (dgBroadphaseSyncDescriptor* const d
 {
 	FindCollidingPairsHybrid (descriptor, threadID);
 }
-
+*/
 
 void dgBroadPhase::FindCollidingPairsDynamics (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID)
 {
 	dgNode* pool[2 * DG_BROADPHASE_MAX_STACK_DEPTH];		
 	dgInt32 index;
+
+	dgVector timestep2 (descriptor->m_timestep * descriptor->m_timestep * dgFloat32 (4.0f));
 	while ((index = dgAtomicExchangeAndAdd(&descriptor->m_pairsCount, -1)) > 0) {
 		index --;
 		pool[0] = descriptor->m_pairs[index * 2];
@@ -1178,7 +1179,7 @@ void dgBroadPhase::FindCollidingPairsDynamics (dgBroadphaseSyncDescriptor* const
 					dgBody* const body1 = right->m_body;
 
 					if (TestOverlaping (body0, body1)) {
-						AddPair (body0, body1, threadID);
+						AddPair (body0, body1, timestep2, threadID);
 					}
 
 				} else if (!(left->m_body || right->m_body)) {
@@ -1442,10 +1443,8 @@ void dgBroadPhase::UpdateContacts( dgFloat32 timestep)
 
 	dgInt32 threadsCount = m_world->GetThreadCount();	
 
-	dgBroadphaseSyncDescriptor syncPoints(m_broadPhaseType, &m_criticalSectionLock);
-//	syncPoints.m_world = m_world;
+	dgBroadphaseSyncDescriptor syncPoints(&m_criticalSectionLock);
 	syncPoints.m_timestep = timestep;
-
 	
 	const dgBodyMasterList* const masterList = m_world;
 	const dgCollisionDeformableMeshList* const softBodyList = m_world;
@@ -1471,14 +1470,14 @@ void dgBroadPhase::UpdateContacts( dgFloat32 timestep)
 	}
 
 	ImproveFitness();
-	if (m_broadPhaseType == m_dynamic) {
-		syncPoints.CreatePairsJobs (m_rootNode);
-	}
+	syncPoints.CreatePairsJobs (m_rootNode);
 
 	for (dgInt32 i = 0; i < threadsCount; i ++) {
 		m_world->QueueJob (CollidingPairsKernel, &syncPoints, m_world);
 	}
 	m_world->SynchronizationBarrier();
+
+//dgTrace (("%d\n", contactPairs->m_count));
 
 	for (dgInt32 i = 0; i < threadsCount; i ++) {
 		m_world->QueueJob (UpdateContactsKernel, &syncPoints, m_world);
