@@ -131,6 +131,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 		}
 	}
 
+
 	dgIsland* const islands = (dgIsland*) &world->m_islandMemory[0];
 	dgSort (islands, m_islands, CompareIslands); 
 
@@ -570,7 +571,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 			bodyArray[m_bodies].m_body->m_resting = true;
 
 			for (dgInt32 i = 1; i < bodyCount; i ++) {
-				dgBody* const body = bodyArray[i].m_body;
+				dgBody* const body = bodyArray[m_bodies + i].m_body;
 				if (!body->m_resting) {
 					body->m_alived0 = true;
 					for (dgBodyMasterListRow::dgListNode* jointNode = body->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
@@ -585,7 +586,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 			}
 
 			for (dgInt32 i = 1; i < bodyCount; i ++) {
-				dgBody* const body = bodyArray[i].m_body;
+				dgBody* const body = bodyArray[m_bodies + i].m_body;
 				if (body->m_alived0) {
 					body->m_alived1 = true;
 					for (dgBodyMasterListRow::dgListNode* jointNode = body->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
@@ -602,7 +603,6 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 			for (dgInt32 i = 0; i < bodyCount; i ++) {
 				bodyArray[m_bodies + i].m_body->m_alived1 = true;
 			}
-
 
 		} else {
 			bodyArray[m_bodies].m_body->m_islandColor = 0;
