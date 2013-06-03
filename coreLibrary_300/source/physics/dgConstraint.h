@@ -216,6 +216,7 @@ class dgConstraint
 	dgUnsigned32 m_constId			:  6;		
 	dgUnsigned32 m_enableCollision	:  1;
 	dgUnsigned32 m_useExactSolver	:  1;
+	dgUnsigned32 m_alive			:  1;
 
 	friend class dgWorld;
 	friend class dgJacobianMemory;
@@ -240,6 +241,7 @@ inline dgConstraint::dgConstraint()
 	,m_constId(m_unknownConstraint)
 	,m_enableCollision(false)
 	,m_useExactSolver(false)
+	,m_alive(false)
 {
 	dgAssert ((((dgUnsigned64) this) & 15) == 0);
 }

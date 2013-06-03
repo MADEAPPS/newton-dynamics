@@ -244,8 +244,8 @@ class dgBody
 			dgUnsigned32 m_inCallback				: 1;
 			dgUnsigned32 m_collidable				: 1;
 			dgUnsigned32 m_resting					: 1;
-			dgUnsigned32 m_alived0					: 1;
-			dgUnsigned32 m_alived1					: 1;
+			dgUnsigned32 m_alive0					: 1;
+			dgUnsigned32 m_alive1					: 1;
 		};
 	};
 
