@@ -31,7 +31,7 @@
 //#define DEFAULT_SCENE	5			// primitive collision
 //#define DEFAULT_SCENE	6 			// Kinematic bodies
 //#define DEFAULT_SCENE	7			// primitive convex cast 
-//#define DEFAULT_SCENE	8			// Box stacks
+#define DEFAULT_SCENE	8			// Box stacks
 //#define DEFAULT_SCENE	9			// simple level mesh collision
 //#define DEFAULT_SCENE	10			// optimized level mesh collision
 //#define DEFAULT_SCENE	11			// height field Collision
@@ -53,7 +53,7 @@
 //#define DEFAULT_SCENE	27			// basic car
 //#define DEFAULT_SCENE	28			// high performance super car
 //#define DEFAULT_SCENE	29			// basic player controller
-#define DEFAULT_SCENE	30			// advanced player controller
+//#define DEFAULT_SCENE	30			// advanced player controller
 //#define DEFAULT_SCENE	31			// cloth patch			
 //#define DEFAULT_SCENE	32			// soft bodies			
 
@@ -227,6 +227,9 @@ BEGIN_EVENT_TABLE(NewtonDemos, wxFrame)
 	EVT_MENU_RANGE(ID_RUN_DEMO, ID_RUN_DEMO_RANGE, NewtonDemos::OnRunDemo)
 
 	EVT_MENU(ID_AUTOSLEEP_MODE,	NewtonDemos::OnAutoSleepMode)
+	EVT_MENU(ID_SHOW_STATISTICS, NewtonDemos::OnShowStatistics)
+	EVT_MENU(ID_USE_PARALLEL_SOLVER, NewtonDemos::OnUseParallelSolver)
+
 	EVT_MENU(ID_HIDE_VISUAL_MESHES,	NewtonDemos::OnHideVisualMeshes)
 
 	EVT_MENU_RANGE(ID_SHOW_COLLISION_MESH, ID_SHOW_COLLISION_MESH_RANGE, NewtonDemos::OnShowCollisionLines)
@@ -236,9 +239,9 @@ BEGIN_EVENT_TABLE(NewtonDemos, wxFrame)
 	EVT_MENU(ID_SHOW_AABB, NewtonDemos::OnShowAABB)
 	EVT_MENU(ID_SHOW_CENTER_OF_MASS, NewtonDemos::OnShowCenterOfMass)
 	EVT_MENU(ID_SHOW_JOINTS, NewtonDemos::OnShowShowJoints)
-	EVT_MENU(ID_USE_PARALLEL_SOLVER, NewtonDemos::OnUseParallelSolver)
+	
 
-	EVT_MENU_RANGE(ID_PLATFORMS, ID_PLATFORMS_MAX, NewtonDemos::OnSimdInstructions)
+	EVT_MENU_RANGE(ID_PLATFORMS, ID_PLATFORMS_MAX, NewtonDemos::OnSelectHardwareDevice)
 
 	EVT_MENU(ID_SHOW_CONCURRENCE_PROFILER, NewtonDemos::OnShowConcurrentProfiler)
 	EVT_MENU(ID_SHOW_PROFILER,	NewtonDemos::OnShowThreadProfiler)
@@ -278,6 +281,7 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	,m_showAABB(false)
 	,m_showJoints(false)
 	,m_showCenterOfMass(false)
+	,m_showStatistics(false)
 	,m_concurrentProfilerState(false)
 	,m_threadProfilerState(false)
 	,m_hasJoysticController(false)
@@ -289,7 +293,7 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	,m_joytickButtonMask(0)
 	,m_framesCount(0)
 	,m_microthreadIndex(0)
-	,m_cpuInstructionsMode(0)
+	,m_hardwareDevice(0)
 	,m_timestepAcc(0)
 	,m_fps(0.0f)
 {
@@ -381,8 +385,10 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 		wxMenu* const optionsMenu = new wxMenu;;
 
 		optionsMenu->AppendCheckItem(ID_AUTOSLEEP_MODE, _("Auto sleep mode"), _("toogle auto sleep bodies"));
-		optionsMenu->AppendCheckItem(ID_USE_PARALLEL_SOLVER, _("Parallel solver on"));
 		optionsMenu->Check (ID_AUTOSLEEP_MODE, m_autoSleepState);
+
+		optionsMenu->AppendCheckItem(ID_SHOW_STATISTICS, _("Show Stats on screen"), _("toogle on screen frame rate and other stats"));
+		optionsMenu->AppendCheckItem(ID_USE_PARALLEL_SOLVER, _("Parallel solver on"));
 
 		optionsMenu->AppendSeparator();
 		optionsMenu->AppendRadioItem(ID_SHOW_COLLISION_MESH, _("Hide collision Mesh"));
@@ -486,7 +492,7 @@ void NewtonDemos::END_MENU_OPTION()
 
 void NewtonDemos::RestoreSettings ()
 {
-	NewtonSetCurrentDevice (m_scene->GetNewton(), m_cpuInstructionsMode); 
+	NewtonSetCurrentDevice (m_scene->GetNewton(), m_hardwareDevice); 
 	NewtonSetThreadsCount(m_scene->GetNewton(), m_threadsTracks[m_microthreadIndex]); 
 }
 
@@ -626,7 +632,7 @@ void NewtonDemos::CalculateFPS(float timestep)
 		m_statusbar->SetStatusText (statusText, 5);
 
 		char floatMode[128];
-		NewtonGetDeviceString (m_scene->GetNewton(), m_cpuInstructionsMode, floatMode, sizeof (floatMode));
+		NewtonGetDeviceString (m_scene->GetNewton(), m_hardwareDevice, floatMode, sizeof (floatMode));
 		sprintf (statusText, "instructions: %s", floatMode);
 		m_statusbar->SetStatusText (statusText, 6);
 
@@ -804,11 +810,18 @@ void NewtonDemos::OnSelectNumberOfMicroThreads(wxCommandEvent& event)
 	END_MENU_OPTION();
 }
 
-void NewtonDemos::OnSimdInstructions(wxCommandEvent& event)
+void NewtonDemos::OnSelectHardwareDevice(wxCommandEvent& event)
 {
 	BEGIN_MENU_OPTION();
-	m_cpuInstructionsMode = event.GetId() - ID_PLATFORMS;
-	NewtonSetCurrentDevice (m_scene->GetNewton(), m_cpuInstructionsMode);
+	m_hardwareDevice = event.GetId() - ID_PLATFORMS;
+	NewtonSetCurrentDevice (m_scene->GetNewton(), m_hardwareDevice);
+	END_MENU_OPTION();
+}
+
+void NewtonDemos::OnShowStatistics(wxCommandEvent& event)
+{
+	BEGIN_MENU_OPTION();
+	m_showStatistics = event.IsChecked(); 
 	END_MENU_OPTION();
 }
 

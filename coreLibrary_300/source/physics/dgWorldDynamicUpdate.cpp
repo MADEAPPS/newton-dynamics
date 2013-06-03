@@ -453,9 +453,9 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 	dgWorld* const world = (dgWorld*) this;
 	world->m_bodiesMemory.ExpandCapacityIfNeessesary(m_bodies, sizeof (dgBodyInfo));
 
-	dgBodyInfo* const bodyArray = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
+	dgBodyInfo* const bodyArray0 = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
 
-	bodyArray[m_bodies].m_body = world->m_sentionelBody;
+	bodyArray0[m_bodies].m_body = world->m_sentionelBody;
 	dgAssert (world->m_sentionelBody->m_index == 0); 
 	dgAssert (dgInt32 (world->m_sentionelBody->m_dynamicsLru) == m_markLru); 
 
@@ -481,14 +481,14 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 			if (body->m_invMass.m_w > dgFloat32 (0.0f)) { 
 				dgInt32 bodyIndex = m_bodies + bodyCount;
 				world->m_bodiesMemory.ExpandCapacityIfNeessesary(bodyIndex, sizeof (dgBodyInfo));
+				dgBodyInfo* const bodyArray1 = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
 
-				dgBodyInfo* const bodyArray = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
 				body->m_index = bodyCount; 
 				body->m_alived0 = false;
 				body->m_alived1 = false;
 				body->m_resting = true;
 				body->m_islandColor = m_islandColor;
-				bodyArray[bodyIndex].m_body = body;
+				bodyArray1[bodyIndex].m_body = body;
 				bodyCount ++;
 			}
 
@@ -546,6 +546,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 
 
 	if (bodyCount > 1) {
+		dgBodyInfo* const bodyArray = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
 		if (isContinueCollisionIsland && jointCount && (rowsCount < 32)) {
 			rowsCount = 32;
 		}
@@ -554,18 +555,18 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 		dgJointInfo* const constraintArray = (dgJointInfo*) &world->m_jointsMemory[0];
 
 		if (jointCount) {
-		for (dgInt32 i = 0; i < jointCount; i ++) {
-			dgConstraint* const joint = constraintArray[m_joints + i].m_joint;
-			constraintArray[m_joints + i].m_color = 0;
-			dgBody* const body0 = joint->m_body0;
-			dgBody* const body1 = joint->m_body1;
-			bool resting = body0->m_equilibrium & body1->m_equilibrium;
-			body0->m_resting &= resting;
-			body1->m_resting &= resting;
+			for (dgInt32 i = 0; i < jointCount; i ++) {
+				dgConstraint* const joint = constraintArray[m_joints + i].m_joint;
+				constraintArray[m_joints + i].m_color = 0;
+				dgBody* const body0 = joint->m_body0;
+				dgBody* const body1 = joint->m_body1;
+				bool resting = body0->m_equilibrium & body1->m_equilibrium;
+				body0->m_resting &= resting;
+				body1->m_resting &= resting;
 
-body0->m_alived1 = true;
-body1->m_alived1 = true;
-		}
+	body0->m_alived1 = true;
+	body1->m_alived1 = true;
+			}
 			bodyArray[m_bodies].m_body->m_islandColor = 0;
 			bodyArray[m_bodies].m_body->m_alived0 = false;
 			bodyArray[m_bodies].m_body->m_alived1 = false;

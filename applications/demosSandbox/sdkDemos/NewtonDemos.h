@@ -25,17 +25,18 @@ class NewtonDemos: public wxFrame
 		ID_CANVAS = wxID_HIGHEST,
 
 		ID_AUTOSLEEP_MODE,
-		ID_HIDE_VISUAL_MESHES,
+		ID_SHOW_STATISTICS,
+		ID_USE_PARALLEL_SOLVER,
 
+		ID_HIDE_VISUAL_MESHES,
 		ID_SHOW_COLLISION_MESH,
 		ID_SHOW_COLLISION_MESH_RANGE = ID_SHOW_COLLISION_MESH + 4,
-
 		ID_SHOW_CONTACT_POINTS,
 		ID_SHOW_NORMAL_FORCES,
 		ID_SHOW_AABB,
 		ID_SHOW_JOINTS,
 		ID_SHOW_CENTER_OF_MASS,
-		ID_USE_PARALLEL_SOLVER,
+		
 
 		ID_SERIALIZE,
 		ID_DESERIALIZE,
@@ -114,7 +115,8 @@ class NewtonDemos: public wxFrame
 	void OnUnselectAllPerformanceChart(wxCommandEvent& event);
 	void OnRunPhysicsConcurrent(wxCommandEvent& event);
 	void OnSelectNumberOfMicroThreads(wxCommandEvent& event);
-	void OnSimdInstructions(wxCommandEvent& event);
+	void OnSelectHardwareDevice(wxCommandEvent& event);
+	void OnShowStatistics(wxCommandEvent& event);
 
 	void OnNew(wxCommandEvent& event);
 	void OnSerializeWorld(wxCommandEvent& event);
@@ -140,6 +142,7 @@ class NewtonDemos: public wxFrame
 	bool m_showAABB;
 	bool m_showJoints;
 	bool m_showCenterOfMass;
+	bool m_showStatistics;
 	bool m_concurrentProfilerState;
 	bool m_threadProfilerState;
 	bool m_hasJoysticController;
@@ -152,7 +155,8 @@ class NewtonDemos: public wxFrame
 	int m_joytickButtonMask;
 	int m_framesCount;
 	int m_microthreadIndex;
-	int m_cpuInstructionsMode;
+	int m_hardwareDevice;
+	
 	float m_timestepAcc;
 	float m_fps;
 
