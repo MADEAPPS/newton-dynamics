@@ -60,6 +60,7 @@ dgBody::dgBody()
 	,m_bodyGroupId(0)
 	,m_rtti(m_baseBodyRTTI)
 	,m_type(0)
+	,m_islandColor(0)
 	,m_dynamicsLru(0)
 	,m_genericLRUMark(0)
 	,m_criticalSectionLock()
@@ -72,6 +73,8 @@ dgBody::dgBody()
 	,m_destructor(NULL)
 	,m_matrixUpdate(NULL)
 {
+	m_alived0 = false;
+	m_alived1 = false;
 	m_resting = true;
 	m_autoSleep = true;
 	m_collidable = true;

@@ -226,6 +226,7 @@ class dgBody
 	dgInt32 m_bodyGroupId;
 	dgInt32 m_rtti;
 	dgInt32 m_type;
+	dgUnsigned32 m_islandColor;
 	dgUnsigned32 m_dynamicsLru;	
 	dgUnsigned32 m_genericLRUMark;
 	dgThread::dgCriticalSection m_criticalSectionLock;
@@ -244,6 +245,8 @@ class dgBody
 			dgUnsigned32 m_inCallback				: 1;
 			dgUnsigned32 m_collidable				: 1;
 			dgUnsigned32 m_resting					: 1;
+			dgUnsigned32 m_alived0					: 1;
+			dgUnsigned32 m_alived1					: 1;
 		};
 	};
 

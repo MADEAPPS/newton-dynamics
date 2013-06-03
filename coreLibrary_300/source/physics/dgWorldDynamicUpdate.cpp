@@ -74,6 +74,7 @@ dgWorldDynamicUpdate::dgWorldDynamicUpdate()
 	,m_joints(0)
 	,m_islands(0)
 	,m_markLru(0)
+	,m_islandColor(0)
 	,m_equilibriumMark(0)
 	,m_rowCountAtomicIndex(0)
 	,m_softBodyCriticalSectionLock()
@@ -130,7 +131,6 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 		}
 	}
 
-	world->m_sentionelBody->m_resting = true;
 	dgIsland* const islands = (dgIsland*) &world->m_islandMemory[0];
 	dgSort (islands, m_islands, CompareIslands); 
 
@@ -459,6 +459,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 	dgAssert (world->m_sentionelBody->m_index == 0); 
 	dgAssert (dgInt32 (world->m_sentionelBody->m_dynamicsLru) == m_markLru); 
 
+	m_islandColor ++;
 	while (!queue.IsEmpty()) {
 
 		dgInt32 count = queue.m_firstIndex - queue.m_lastIndex;
@@ -483,7 +484,10 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 
 				dgBodyInfo* const bodyArray = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
 				body->m_index = bodyCount; 
+				body->m_alived0 = false;
+				body->m_alived1 = false;
 				body->m_resting = true;
+				body->m_islandColor = m_islandColor;
 				bodyArray[bodyIndex].m_body = body;
 				bodyCount ++;
 			}
@@ -558,10 +562,44 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 			body0->m_resting &= resting;
 			body1->m_resting &= resting;
 		}
+		bodyArray[0].m_body->m_islandColor = 0;
+		bodyArray[0].m_body->m_alived0 = false;
+		bodyArray[0].m_body->m_alived1 = false;
+		bodyArray[0].m_body->m_resting = true;
+
+		for (dgInt32 i = 1; i < bodyCount; i ++) {
+			dgBody* const body = bodyArray[i].m_body;
+			if (!body->m_resting) {
+				body->m_alived0 = true;
+				for (dgBodyMasterListRow::dgListNode* jointNode = body->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
+					dgBodyMasterListCell* const cell = &jointNode->GetInfo();
+					dgBody* const linkBody = cell->m_bodyNode;
+
+					if (linkBody->m_islandColor == m_islandColor) {
+						linkBody->m_alived0 = true;
+					}
+				}
+			}
+		}
+
+		for (dgInt32 i = 1; i < bodyCount; i ++) {
+			dgBody* const body = bodyArray[i].m_body;
+			if (body->m_alived0) {
+				body->m_alived1 = true;
+				for (dgBodyMasterListRow::dgListNode* jointNode = body->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
+					dgBodyMasterListCell* const cell = &jointNode->GetInfo();
+					dgBody* const linkBody = cell->m_bodyNode;
+
+					if (linkBody->m_islandColor == m_islandColor) {
+						linkBody->m_alived1 = true;
+					}
+				}
+			}
+		}
+
 		
 
 		dgIsland* const islandArray = (dgIsland*) &world->m_islandMemory[0];
-
 
 		islandArray[m_islands].m_bodyStart = m_bodies;
 		islandArray[m_islands].m_jointStart = m_joints;
