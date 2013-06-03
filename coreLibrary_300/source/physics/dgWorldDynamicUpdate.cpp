@@ -563,45 +563,47 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 				bool resting = body0->m_equilibrium & body1->m_equilibrium;
 				body0->m_resting &= resting;
 				body1->m_resting &= resting;
-
-	body0->m_alived1 = true;
-	body1->m_alived1 = true;
 			}
 			bodyArray[m_bodies].m_body->m_islandColor = 0;
 			bodyArray[m_bodies].m_body->m_alived0 = false;
 			bodyArray[m_bodies].m_body->m_alived1 = false;
 			bodyArray[m_bodies].m_body->m_resting = true;
-/*
-		for (dgInt32 i = 1; i < bodyCount; i ++) {
-			dgBody* const body = bodyArray[i].m_body;
-			if (!body->m_resting) {
-				body->m_alived0 = true;
-				for (dgBodyMasterListRow::dgListNode* jointNode = body->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
-					dgBodyMasterListCell* const cell = &jointNode->GetInfo();
-					dgBody* const linkBody = cell->m_bodyNode;
 
-					if (linkBody->m_islandColor == m_islandColor) {
-						linkBody->m_alived0 = true;
+			for (dgInt32 i = 1; i < bodyCount; i ++) {
+				dgBody* const body = bodyArray[i].m_body;
+				if (!body->m_resting) {
+					body->m_alived0 = true;
+					for (dgBodyMasterListRow::dgListNode* jointNode = body->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
+						dgBodyMasterListCell* const cell = &jointNode->GetInfo();
+						dgBody* const linkBody = cell->m_bodyNode;
+
+						if (linkBody->m_islandColor == m_islandColor) {
+							linkBody->m_alived0 = true;
+						}
 					}
 				}
 			}
-		}
 
-		for (dgInt32 i = 1; i < bodyCount; i ++) {
-			dgBody* const body = bodyArray[i].m_body;
-			if (body->m_alived0) {
-				body->m_alived1 = true;
-				for (dgBodyMasterListRow::dgListNode* jointNode = body->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
-					dgBodyMasterListCell* const cell = &jointNode->GetInfo();
-					dgBody* const linkBody = cell->m_bodyNode;
+			for (dgInt32 i = 1; i < bodyCount; i ++) {
+				dgBody* const body = bodyArray[i].m_body;
+				if (body->m_alived0) {
+					body->m_alived1 = true;
+					for (dgBodyMasterListRow::dgListNode* jointNode = body->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
+						dgBodyMasterListCell* const cell = &jointNode->GetInfo();
+						dgBody* const linkBody = cell->m_bodyNode;
 
-					if (linkBody->m_islandColor == m_islandColor) {
-						linkBody->m_alived1 = true;
+						if (linkBody->m_islandColor == m_islandColor) {
+							linkBody->m_alived1 = true;
+						}
 					}
 				}
 			}
-		}
-*/
+			
+			for (dgInt32 i = 0; i < bodyCount; i ++) {
+				bodyArray[m_bodies + i].m_body->m_alived1 = true;
+			}
+
+
 		} else {
 			bodyArray[m_bodies].m_body->m_islandColor = 0;
 			bodyArray[m_bodies].m_body->m_alived0 = false;
