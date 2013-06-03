@@ -110,13 +110,8 @@ class dgBroadPhase
 	void CalculatePairContacts (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID);
 	void UpdateSoftBodyForcesKernel (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID);
 	
-//	void SubmitPairsStatic (dgNode* const body, dgNode* const node, dgInt32 threadID);
 	void FindCollidingPairsDynamics (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
-//	void FindCollidingPairsStatic (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
-//	void FindCollidingPairsHybrid (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
-
 	void KinematicBodyActivation (dgContact* const contatJoint) const;
-
 	bool TestOverlaping (const dgBody* const body0, const dgBody* const body1) const;
 
 	dgWorld* m_world;

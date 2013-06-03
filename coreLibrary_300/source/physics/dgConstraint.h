@@ -215,7 +215,6 @@ class dgConstraint
 	dgUnsigned32 m_maxDOF			:  6;
 	dgUnsigned32 m_constId			:  6;		
 	dgUnsigned32 m_enableCollision	:  1;
-//	dgUnsigned32 m_isUnilateral		:  1;
 	dgUnsigned32 m_useExactSolver	:  1;
 
 	friend class dgWorld;
@@ -240,7 +239,6 @@ inline dgConstraint::dgConstraint()
 	,m_maxDOF(6)
 	,m_constId(m_unknownConstraint)
 	,m_enableCollision(false)
-//	,m_isUnilateral(false)
 	,m_useExactSolver(false)
 {
 	dgAssert ((((dgUnsigned64) this) & 15) == 0);

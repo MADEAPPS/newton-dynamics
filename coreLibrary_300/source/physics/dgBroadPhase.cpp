@@ -984,33 +984,9 @@ void dgBroadPhase::CollidingPairsKernel (void* const context, void* const worldC
 
 	if (!threadID) {
 		dgUnsigned32 ticks0 = world->m_getPerformanceCount();
-//		switch (descriptor->m_broadPhaseType) 
-//		{
-//			case dgBroadPhase::m_dynamic:
-//				broadPhase->FindCollidingPairsDynamics (descriptor, threadID);
-//				break;
-//			case dgBroadPhase::m_static:
-//				broadPhase->FindCollidingPairsStatic (descriptor, threadID);
-//				break;
-//			case dgBroadPhase::m_hybrid:
-//				broadPhase->FindCollidingPairsHybrid (descriptor, threadID);
-//				break;
-//		}
 		broadPhase->FindCollidingPairsDynamics (descriptor, threadID);
 		world->m_perfomanceCounters[m_broadPhaceTicks] = world->m_getPerformanceCount() - ticks0;
 	} else {
-//		switch (descriptor->m_broadPhaseType) 
-//		{
-//			case dgBroadPhase::m_dynamic:
-//				broadPhase->FindCollidingPairsDynamics (descriptor, threadID);
-//				break;
-//			case dgBroadPhase::m_static:
-//				broadPhase->FindCollidingPairsStatic (descriptor, threadID);
-//				break;
-//			case dgBroadPhase::m_hybrid:
-//				broadPhase->FindCollidingPairsHybrid (descriptor, threadID);
-//				break;
-//		}
 		broadPhase->FindCollidingPairsDynamics (descriptor, threadID);
 	}
 }
@@ -1057,79 +1033,6 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 	bool tier6 = isKinematic1 & mass0; 
 	return tier0 & tier1 & tier2 & (tier3 | tier4 | tier5 | tier6);
 }
-/*
-void dgBroadPhase::SubmitPairsStatic (dgNode* const bodyNode, dgNode* const node, dgInt32 threadID)
-{
-	dgNode* pool[DG_BROADPHASE_MAX_STACK_DEPTH];
-	pool[0] = node;
-	dgInt32 stack = 1;
-
-	dgBody* const body0 = bodyNode->m_body;
-	dgAssert (!body0->m_collision->IsType (dgCollision::dgCollisionNull_RTTI));
-
-	dgVector timeStep2 = 
-	while (stack) {
-		stack --;
-		dgNode* const rootNode = pool[stack];
-		if (dgOverlapTest (rootNode->m_minBox, rootNode->m_maxBox, body0->m_minAABB, body0->m_maxAABB)) {
-			if (!rootNode->m_left) {
-				dgAssert (!rootNode->m_right);
-				dgBody* const body1 = rootNode->m_body;
-				if (TestOverlaping (body0, body1)) {
-					AddPair (body0, body1, threadID);
-				}
-
-			} else {
-				pool[stack] = rootNode->m_left;
-				stack ++;
-				dgAssert (stack < dgInt32 (sizeof (pool) / sizeof (pool[0])));
-
-				pool[stack] = rootNode->m_right;
-				stack ++;
-				dgAssert (stack < dgInt32 (sizeof (pool) / sizeof (pool[0])));
-			}
-		}
-	}
-}
-
-void dgBroadPhase::FindCollidingPairsHybrid (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID)
-{
-	dgBodyMasterList::dgListNode* node = NULL;
-	{
-		dgThreadHiveScopeLock lock (m_world, descriptor->m_lock);
-		node = descriptor->m_collindPairBodyNode;
-		if (node) {
-			descriptor->m_collindPairBodyNode = node->GetNext();
-		}
-	}
-	
-	for ( ;node; ) {
-		dgBody* const body = node->GetInfo().GetBody();
-		if (body->m_collisionCell) {
-			if (!body->m_collision->IsType (dgCollision::dgCollisionNull_RTTI)) {
-				dgNode* const bodyNode = body->m_collisionCell;
-				for (dgNode* ptr = bodyNode; ptr->m_parent; ptr = ptr->m_parent) {
-					dgNode* const sibling = ptr->m_parent->m_right;
-					if (sibling != ptr) {
-						SubmitPairsStatic (bodyNode, sibling, threadID);
-					}
-				}
-			}
-		}
-
-		dgThreadHiveScopeLock lock (m_world, descriptor->m_lock);
-		node = descriptor->m_collindPairBodyNode;
-		if (node) {
-			descriptor->m_collindPairBodyNode = node->GetNext();
-		}
-	}
-}
-
-void dgBroadPhase::FindCollidingPairsStatic (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID)
-{
-	FindCollidingPairsHybrid (descriptor, threadID);
-}
-*/
 
 void dgBroadPhase::FindCollidingPairsDynamics (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID)
 {
@@ -1150,13 +1053,6 @@ void dgBroadPhase::FindCollidingPairsDynamics (dgBroadphaseSyncDescriptor* const
 
 			if (left == right) {
 				if (!left->m_body) {
-
-					//if (dgOverlapTest (left->m_left->m_minBox, left->m_left->m_maxBox, left->m_right->m_minBox, left->m_right->m_maxBox)) {
-					//	dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
-					//	pool[stack] = left->m_left;	
-					//	pool[stack + 1] = left->m_right;	
-					//	stack += 2;
-					//}
 
 					dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
 					pool[stack] = left->m_left;	

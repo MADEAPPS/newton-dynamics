@@ -301,10 +301,6 @@ dgInt32 dgWorldDynamicUpdate::BuildJacobianMatrix (dgIsland* const island, dgInt
 		dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
 		dgJointInfo* const constraintArray = &constraintArrayPtr[island->m_jointStart];
 
-		//if (island->m_hasUnilateralJoints) {
-		//	rowCount = GetJacobianDerivatives (island, threadIndex, false, rowBase, rowCount, timestep);
-		//}
-		//rowCount = GetJacobianDerivatives (island, threadIndex, true, rowBase, rowCount, timestep);
 		rowCount = GetJacobianDerivatives (island, threadIndex, rowBase, rowCount, timestep);
 		dgAssert (rowCount <= island->m_rowsCount);
 
