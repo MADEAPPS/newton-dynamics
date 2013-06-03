@@ -49,11 +49,11 @@
 //#define DEFAULT_SCENE	23			// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	24			// continue collision
 //#define DEFAULT_SCENE	25			// puck slide continue collision
-#define DEFAULT_SCENE	26			// basic ragdoll
+//#define DEFAULT_SCENE	26			// basic ragdoll
 //#define DEFAULT_SCENE	27			// basic car
 //#define DEFAULT_SCENE	28			// high performance super car
 //#define DEFAULT_SCENE	29			// basic player controller
-//#define DEFAULT_SCENE	30			// advanced player controller
+#define DEFAULT_SCENE	30			// advanced player controller
 //#define DEFAULT_SCENE	31			// cloth patch			
 //#define DEFAULT_SCENE	32			// soft bodies			
 
@@ -238,7 +238,6 @@ BEGIN_EVENT_TABLE(NewtonDemos, wxFrame)
 	EVT_MENU(ID_SHOW_JOINTS, NewtonDemos::OnShowShowJoints)
 	EVT_MENU(ID_USE_PARALLEL_SOLVER, NewtonDemos::OnUseParallelSolver)
 
-	EVT_MENU_RANGE(ID_DYNAMICS_BROADPHASE, ID_HYBRID_BROADPHASE, NewtonDemos::OnBroadPhaseType)
 	EVT_MENU_RANGE(ID_PLATFORMS, ID_PLATFORMS_MAX, NewtonDemos::OnSimdInstructions)
 
 	EVT_MENU(ID_SHOW_CONCURRENCE_PROFILER, NewtonDemos::OnShowConcurrentProfiler)
@@ -291,7 +290,6 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	,m_framesCount(0)
 	,m_microthreadIndex(0)
 	,m_cpuInstructionsMode(0)
-	,m_broadPhaseMode (0)
 	,m_timestepAcc(0)
 	,m_fps(0.0f)
 {
@@ -413,11 +411,6 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 		//optionsMenu->Check(ID_PLATFORMS, true);
 
 		optionsMenu->AppendSeparator();
-		optionsMenu->AppendRadioItem(ID_DYNAMICS_BROADPHASE, _("dynamics broad phase"));
-		optionsMenu->AppendRadioItem(ID_STATIC_BROADPHASE, _("static broad phase"));
-		optionsMenu->AppendRadioItem(ID_HYBRID_BROADPHASE, _("hybrid broad phase"));
-
-		optionsMenu->AppendSeparator();
 		optionsMenu->Append(ID_SHOW_CONCURRENCE_PROFILER, _("Show concurrent profiler"));
 		optionsMenu->Append(ID_SHOW_PROFILER, _("Show micro thread profiler"));
 
@@ -495,7 +488,6 @@ void NewtonDemos::RestoreSettings ()
 {
 	NewtonSetCurrentDevice (m_scene->GetNewton(), m_cpuInstructionsMode); 
 	NewtonSetThreadsCount(m_scene->GetNewton(), m_threadsTracks[m_microthreadIndex]); 
-	NewtonSelectBroadphaseAlgorithm (m_scene->GetNewton(), m_broadPhaseMode);
 }
 
 
@@ -743,17 +735,6 @@ void NewtonDemos::OnUseParallelSolver(wxCommandEvent& event)
 	END_MENU_OPTION();
 }
 
-
-void NewtonDemos::OnBroadPhaseType(wxCommandEvent& event)
-{
-	BEGIN_MENU_OPTION();
-	m_broadPhaseMode = event.GetId() - ID_DYNAMICS_BROADPHASE;
-	dAssert (m_broadPhaseMode >= 0);
-	dAssert (m_broadPhaseMode <= 3);
-	NewtonSelectBroadphaseAlgorithm (m_scene->GetNewton(), m_broadPhaseMode);
-
-	END_MENU_OPTION();
-}
 
 void NewtonDemos::OnShowConcurrentProfiler(wxCommandEvent& event)
 {
