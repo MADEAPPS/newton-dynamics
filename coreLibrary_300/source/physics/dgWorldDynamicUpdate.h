@@ -310,7 +310,6 @@ class dgWorldDynamicUpdate
 	dgInt32 m_joints;
 	dgInt32 m_islands;
 	dgUnsigned32 m_markLru;
-	dgUnsigned32 m_islandColor;
 	dgUnsigned32 m_equilibriumMark;
 	mutable dgInt32 m_rowCountAtomicIndex;
 	dgJacobianMemory m_solverMemory;

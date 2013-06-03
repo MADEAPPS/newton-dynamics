@@ -74,7 +74,6 @@ dgWorldDynamicUpdate::dgWorldDynamicUpdate()
 	,m_joints(0)
 	,m_islands(0)
 	,m_markLru(0)
-	,m_islandColor(0)
 	,m_equilibriumMark(0)
 	,m_rowCountAtomicIndex(0)
 	,m_softBodyCriticalSectionLock()
@@ -104,6 +103,11 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 
 	world->m_sentionelBody->m_index = 0; 
 	world->m_sentionelBody->m_dynamicsLru = m_markLru;
+
+static int xxx;
+xxx ++;
+if (xxx >= 249)
+xxx *=1;
 
 	for (dgBodyMasterList::dgListNode* node = me.GetLast(); node; node = node->GetPrev()) {
 		const dgBodyMasterListRow& graphNode = node->GetInfo();
@@ -460,7 +464,6 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 	dgAssert (world->m_sentionelBody->m_index == 0); 
 	dgAssert (dgInt32 (world->m_sentionelBody->m_dynamicsLru) == m_markLru); 
 
-	m_islandColor ++;
 	while (!queue.IsEmpty()) {
 
 		dgInt32 count = queue.m_firstIndex - queue.m_lastIndex;
@@ -488,7 +491,6 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 				body->m_alived0 = false;
 				body->m_alived1 = false;
 				body->m_resting = true;
-				body->m_islandColor = m_islandColor;
 				bodyArray1[bodyIndex].m_body = body;
 				bodyCount ++;
 			}
@@ -565,39 +567,54 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 				body0->m_resting &= resting;
 				body1->m_resting &= resting;
 			}
-			bodyArray[m_bodies].m_body->m_islandColor = 0;
 			bodyArray[m_bodies].m_body->m_alived0 = false;
 			bodyArray[m_bodies].m_body->m_alived1 = false;
 			bodyArray[m_bodies].m_body->m_resting = true;
 
-			for (dgInt32 i = 1; i < bodyCount; i ++) {
-				dgBody* const body = bodyArray[m_bodies + i].m_body;
-				if (!body->m_resting) {
-					body->m_alived0 = true;
-					for (dgBodyMasterListRow::dgListNode* jointNode = body->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
-						dgBodyMasterListCell* const cell = &jointNode->GetInfo();
-						dgBody* const linkBody = cell->m_bodyNode;
+//			for (dgInt32 i = 1; i < bodyCount; i ++) {
+//				dgBody* const body = bodyArray[m_bodies + i].m_body;
+//				if (!body->m_resting) {
+//					body->m_alived0 = true;
+//					for (dgBodyMasterListRow::dgListNode* jointNode = body->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
+//						dgBodyMasterListCell* const cell = &jointNode->GetInfo();
+//						dgBody* const linkBody = cell->m_bodyNode;
+//
+//						if (linkBody->m_islandColor == m_islandColor) {
+//							linkBody->m_alived0 = true;
+//						}
+//					}
+//				}
+//			}
+//			for (dgInt32 i = 1; i < bodyCount; i ++) {
+//				dgBody* const body = bodyArray[m_bodies + i].m_body;
+//				if (body->m_alived0) {
+//					body->m_alived1 = true;
+//					for (dgBodyMasterListRow::dgListNode* jointNode = body->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
+//						dgBodyMasterListCell* const cell = &jointNode->GetInfo();
+//						dgBody* const linkBody = cell->m_bodyNode;
+//						if (linkBody->m_islandColor == m_islandColor) {
+//							linkBody->m_alived1 = true;
+//						}
+//					}
+//				}
+//			}
 
-						if (linkBody->m_islandColor == m_islandColor) {
-							linkBody->m_alived0 = true;
-						}
-					}
-				}
+			for (dgInt32 i = 0; i < jointCount; i ++) {
+				dgConstraint* const joint = constraintArray[m_joints + i].m_joint;
+				dgBody* const body0 = joint->m_body0;
+				dgBody* const body1 = joint->m_body1;
+				bool alive = !(body0->m_resting & body1->m_resting);
+				body0->m_alived0 = alive & !body0->m_index;
+				body1->m_alived0 = alive & !body1->m_index;
 			}
 
-			for (dgInt32 i = 1; i < bodyCount; i ++) {
-				dgBody* const body = bodyArray[m_bodies + i].m_body;
-				if (body->m_alived0) {
-					body->m_alived1 = true;
-					for (dgBodyMasterListRow::dgListNode* jointNode = body->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
-						dgBodyMasterListCell* const cell = &jointNode->GetInfo();
-						dgBody* const linkBody = cell->m_bodyNode;
-
-						if (linkBody->m_islandColor == m_islandColor) {
-							linkBody->m_alived1 = true;
-						}
-					}
-				}
+			for (dgInt32 i = 0; i < jointCount; i ++) {
+				dgConstraint* const joint = constraintArray[m_joints + i].m_joint;
+				dgBody* const body0 = joint->m_body0;
+				dgBody* const body1 = joint->m_body1;
+				bool alive = bool (body0->m_alived0) | bool(body1->m_alived0);
+				body0->m_alived1 = alive & !body0->m_index;
+				body1->m_alived1 = alive & !body1->m_index;
 			}
 			
 			for (dgInt32 i = 0; i < bodyCount; i ++) {
@@ -605,7 +622,6 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 			}
 
 		} else {
-			bodyArray[m_bodies].m_body->m_islandColor = 0;
 			bodyArray[m_bodies].m_body->m_alived0 = false;
 			bodyArray[m_bodies].m_body->m_alived1 = false;
 			bodyArray[m_bodies].m_body->m_resting = true;

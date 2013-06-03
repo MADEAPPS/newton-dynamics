@@ -298,7 +298,7 @@ dgInt32 dgWorldDynamicUpdate::BuildJacobianMatrix (dgIsland* const island, dgInt
 //		rowBase = dgAtomicExchangeAndAdd(&m_rowCountAtomicIndex, island->m_rowsCount);
 //		island->m_rowsCountBaseBlock = rowBase;
 //	}
-	dgInt32 rowBase = rowBase = dgAtomicExchangeAndAdd(&m_rowCountAtomicIndex, island->m_rowsCount);
+	dgInt32 rowBase = dgAtomicExchangeAndAdd(&m_rowCountAtomicIndex, island->m_rowsCount);
 	island->m_rowsCountBaseBlock = rowBase;
 
 	if (jointCount) {
