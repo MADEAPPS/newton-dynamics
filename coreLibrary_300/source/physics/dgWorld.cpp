@@ -345,7 +345,7 @@ dgWorld::~dgWorld()
 	DestroyAllBodies();
 	RemoveAllGroupID();
 	m_pointCollision->Release();
-	DestroyBody (m_sentionelBody);
+	DestroyBody (m_sentinelBody);
 
 
 	delete m_broadPhase;
@@ -367,14 +367,14 @@ void dgWorld::AddSentinelBody()
 	dgCollision* const collision = new  (m_allocator) dgCollisionNull (m_allocator, 0x4352fe67);
 	dgCollisionInstance* const instance = CreateInstance(collision, 0, dgGetIdentityMatrix());
 	collision->Release();
-	m_sentionelBody = CreateDynamicBody(instance, dgGetIdentityMatrix());
+	m_sentinelBody = CreateDynamicBody(instance, dgGetIdentityMatrix());
 	instance->Release();
-	dgCollidingPairCollector::m_sentinel = m_sentionelBody;
+	dgCollidingPairCollector::m_sentinel = m_sentinelBody;
 }
 
 dgBody* dgWorld::GetSentinelBody() const
 {
-	return m_sentionelBody;
+	return m_sentinelBody;
 }
 
 
@@ -467,7 +467,7 @@ void dgWorld::DestroyAllBodies ()
 	dgBodyMasterList& me = *this;
 
 	Sync ();
-	dgAssert (dgBodyMasterList::GetFirst()->GetInfo().GetBody() == m_sentionelBody);
+	dgAssert (dgBodyMasterList::GetFirst()->GetInfo().GetBody() == m_sentinelBody);
 	for (dgBodyMasterList::dgListNode* node = me.GetFirst()->GetNext(); node; ) {
 		dgBody* const body = node->GetInfo().GetBody();
 		node = node->GetNext();
@@ -818,7 +818,7 @@ void dgWorld::BodySetMatrix (dgBody* const body, const dgMatrix& matrix)
 	while (index) {
 		index --;
 		dgBody* body = queue[index];
-		dgAssert (body != m_sentionelBody);
+		dgAssert (body != m_sentinelBody);
 
 		m_broadPhase->Remove (body);
 		m_broadPhase->Add (body);
@@ -831,7 +831,7 @@ void dgWorld::BodySetMatrix (dgBody* const body, const dgMatrix& matrix)
 		for (dgBodyMasterListRow::dgListNode* jointNode = body->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
 			dgBodyMasterListCell& cell = jointNode->GetInfo();
 			body = cell.m_bodyNode;
-			if (body != m_sentionelBody) {
+			if (body != m_sentinelBody) {
 				if (body->m_genericLRUMark != m_genericLRUMark) {
 					dgConstraint* constraint;
 					constraint = cell.m_joint;

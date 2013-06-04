@@ -246,6 +246,9 @@ class dgBody
 			dgUnsigned32 m_resting					: 1;
 			dgUnsigned32 m_alive0					: 1;
 			dgUnsigned32 m_alive1					: 1;
+			dgUnsigned32 m_alive2					: 1;
+			dgUnsigned32 m_alive3					: 1;
+
 		};
 	};
 

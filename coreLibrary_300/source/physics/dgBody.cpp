@@ -72,8 +72,6 @@ dgBody::dgBody()
 	,m_destructor(NULL)
 	,m_matrixUpdate(NULL)
 {
-	m_alive0 = false;
-	m_alive1 = false;
 	m_resting = true;
 	m_autoSleep = true;
 	m_collidable = true;

@@ -451,7 +451,7 @@ class dgWorld:
 	
 	dgOpenclInstance* m_openCL;
 	dgBroadPhase* m_broadPhase; 
-	dgDynamicBody* m_sentionelBody;
+	dgDynamicBody* m_sentinelBody;
 	dgCollisionInstance* m_pointCollision;
 	
 	void* m_userData;
