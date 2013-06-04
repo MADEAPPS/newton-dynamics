@@ -106,8 +106,9 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 
 static int xxx;
 xxx ++;
-if (xxx >= 249)
+if (xxx >= 344)
 xxx *=1;
+
 
 	for (dgBodyMasterList::dgListNode* node = me.GetLast(); node; node = node->GetPrev()) {
 		const dgBodyMasterListRow& graphNode = node->GetInfo();
@@ -579,8 +580,8 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 				dgBody* const body0 = bodyArray[m_bodies + m0].m_body;
 				dgBody* const body1 = bodyArray[m_bodies + m1].m_body;
 				bool alive = !(body0->m_resting & body1->m_resting);
-				body0->m_alive0 |= (alive & (body0->m_index ? true : false));
-				body1->m_alive0 |= (alive & (body1->m_index ? true : false));
+				body0->m_alive0 |= (alive & (m0 ? true : false));
+				body1->m_alive0 |= (alive & (m1 ? true : false));
 			}
 
 			for (dgInt32 i = 0; i < jointCount; i ++) {
@@ -590,8 +591,8 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 				dgBody* const body0 = bodyArray[m_bodies + m0].m_body;
 				dgBody* const body1 = bodyArray[m_bodies + m1].m_body;
 				bool alive = bool (body0->m_alive0) | bool(body1->m_alive0);
-				body0->m_alive1 |= (alive & (body0->m_index ? true : false));
-				body1->m_alive1 |= (alive & (body1->m_index ? true : false));
+				body0->m_alive1 |= (alive & (m0 ? true : false));
+				body1->m_alive1 |= (alive & (m1 ? true : false));
 				joint->m_alive = alive;
 body0->m_alive1 = true;
 body1->m_alive1 = true;
@@ -697,7 +698,6 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForcesKernel (void* const cont
 }
 
 
-//dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (const dgIsland* const island, dgInt32 threadIndex, bool bitMode, dgInt32 rowBase, dgInt32 rowCount, dgFloat32 timestep) const
 dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (const dgIsland* const island, dgInt32 threadIndex, dgInt32 rowBase, dgInt32 rowCount, dgFloat32 timestep) const
 {
 	dgContraintDescritor constraintParams;
