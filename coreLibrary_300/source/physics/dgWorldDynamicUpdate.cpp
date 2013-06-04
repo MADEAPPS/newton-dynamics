@@ -159,7 +159,6 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	}
 	world->SynchronizationBarrier();
 
-//	world->m_sentionelBody->m_resting = true;
 	dgSort (islands, m_islands, CompareIslands); 
 
 	dgUnsigned32 dynamicsTime = world->m_getPerformanceCount();
@@ -667,7 +666,7 @@ void dgWorldDynamicUpdate::FindActiveJointAndBodies (dgIsland* const island)
 	dgJointInfo* const constraintArray = &constraintArrayPtr[island->m_jointStart];
 
 	dgInt32 jointCount = island->m_jointCount;
-	if (jointCount > 32) {
+	if (jointCount > 3200000) {
 		for (dgInt32 i = 0; i < jointCount; i ++) {
 			dgJointInfo* const jointInfo = &constraintArray[i];
 			dgConstraint* const joint = jointInfo->m_joint;
@@ -775,7 +774,7 @@ void dgWorldDynamicUpdate::FindActiveJointAndBodies (dgIsland* const island)
 			body0->m_resting &= (resting | !m0);
 			body1->m_resting &= (resting | !m1);
 			body0->m_alive3 |= !(!m0);
-			body0->m_alive3 |= !(!m1);
+			body1->m_alive3 |= !(!m1);
 			joint->m_alive = true;
 		}
 	} else {
@@ -1039,7 +1038,9 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 	for (dgInt32 i = 0; i < count; i ++) {
 		dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
 
-		if (body->m_invMass.m_w && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+//		if (body->m_invMass.m_w && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+		if (body->m_alive3 && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+			dgAssert (body->m_invMass.m_w);
 			body->IntegrateVelocity(timestep);
 
 			dgFloat32 accel2 = body->m_accel % body->m_accel;
@@ -1071,7 +1072,8 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 
 	for (dgInt32 i = 0; i < count; i ++) {
 		dgBody* const body = bodyArray[i].m_body;
-		if (body->m_invMass.m_w && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+//		if (body->m_invMass.m_w && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+		if (body->m_alive3 && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
 			body->UpdateMatrix (timestep, threadIndex);
 		}
 	}
@@ -1080,7 +1082,7 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 		if (stackSleeping) {
 			for (dgInt32 i = 0; i < count; i ++) {
 				dgBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
-				if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+				if (body->m_alive3 && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
 					body->m_netForce = zero;
 					body->m_netTorque = zero;
 					body->m_veloc = zero;
@@ -1094,7 +1096,7 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 				(maxOmega > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxOmega)) {
 					for (dgInt32 i = 0; i < count; i ++) {
 						dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
-						if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+						if (body->m_alive3 && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
 							body->m_sleepingCounter = 0;
 						}
 					}
@@ -1114,7 +1116,7 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 				if (timeScaleSleepCount > world->m_sleepTable[index].m_steps) {
 					for (dgInt32 i = 0; i < count; i ++) {
 						dgBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
-						if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+						if (body->m_alive3 && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
 							body->m_netForce = zero;
 							body->m_netTorque = zero;
 							body->m_veloc = zero;
@@ -1126,7 +1128,7 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 					sleepCounter ++;
 					for (dgInt32 i = 0; i < count; i ++) {
 						dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
-						if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+						if (body->m_alive3 && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
 							body->m_sleepingCounter = sleepCounter;
 						}
 					}
