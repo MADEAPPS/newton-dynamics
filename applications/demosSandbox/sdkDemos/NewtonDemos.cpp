@@ -321,10 +321,11 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	CalculateFPS(0.0f);
 	m_mainMenu = CreateMainMenu();
 
-//m_useParallelSolver = true;
-//m_autoSleepState = false;
+
 //m_debugDisplayMode = 2;
-//m_scene->m_showProfiler[6] = 1;
+m_autoSleepState = false;
+//m_useParallelSolver = true;
+m_scene->m_showProfiler[6] = 1;
 //m_scene->m_showProfiler[0] = 1;
 }
 

@@ -246,6 +246,7 @@ void dgDynamicBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex)
 	#endif
 #endif
 
+//_ASSERTE ((m_accel.m_y == -100.0f) || (m_accel.m_y == 0.0f)); 
 }
 
 
