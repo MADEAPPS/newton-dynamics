@@ -226,10 +226,11 @@ class dgBody
 	dgInt32 m_bodyGroupId;
 	dgInt32 m_rtti;
 	dgInt32 m_type;
+	dgInt32 m_activeMask;
 	dgUnsigned32 m_dynamicsLru;	
 	dgUnsigned32 m_genericLRUMark;
+	
 	dgThread::dgCriticalSection m_criticalSectionLock;
-
 	union 
 	{
 		dgUnsigned32 m_flags;
@@ -244,11 +245,7 @@ class dgBody
 			dgUnsigned32 m_inCallback				: 1;
 			dgUnsigned32 m_collidable				: 1;
 			dgUnsigned32 m_resting					: 1;
-			dgUnsigned32 m_alive0					: 1;
-			dgUnsigned32 m_alive1					: 1;
-			dgUnsigned32 m_alive2					: 1;
-			dgUnsigned32 m_alive3					: 1;
-
+			dgUnsigned32 m_active					: 1;
 		};
 	};
 

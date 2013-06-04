@@ -284,7 +284,7 @@ dgInt32 dgWorldDynamicUpdate::BuildJacobianMatrix (dgIsland* const island, dgInt
 
 	for (dgInt32 i = 1; i < bodyCount; i ++) {
 		dgBody* const body = bodyArray[i].m_body;
-		if (body->m_alive3) {
+		if (body->m_active) {
 			dgAssert (body->m_invMass.m_w > dgFloat32 (0.0f));
 			body->AddDampingAcceleration();
 			body->CalcInvInertiaMatrix ();
@@ -308,7 +308,7 @@ dgInt32 dgWorldDynamicUpdate::BuildJacobianMatrix (dgIsland* const island, dgInt
 		for (dgInt32 k = 0; k < jointCount; k ++) {
 			const dgJointInfo* const jointInfo = &constraintArray[k];
 			dgConstraint* const constraint = jointInfo->m_joint;
-			if (constraint->m_alive) {
+			if (constraint->m_active) {
 				dgInt32 index = jointInfo->m_autoPairstart;
 				dgInt32 count = jointInfo->m_autoPaircount;
 				dgInt32 m0 = jointInfo->m_m0;
@@ -769,7 +769,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 	dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
 	for (dgInt32 i = 1; i < bodyCount; i ++) {
 		dgBody* const body = bodyArray[i].m_body;
-		if (body->m_alive3) {
+		if (body->m_active) {
 			// re use these variables for temp storage 
 			body->m_netForce = body->m_veloc;
 			body->m_netTorque = body->m_omega;
@@ -791,7 +791,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 	for (dgInt32 i = 0; i < jointCount; i ++) {
 		dgJointInfo* const jointInfo = &constraintArray[i];
 		dgConstraint* const constraint = jointInfo->m_joint;
-		if (constraint->m_alive) {
+		if (constraint->m_active) {
 			dgJacobian y0;
 			dgJacobian y1;
 			y0.m_linear = zero;
@@ -845,7 +845,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 			for (dgInt32 curJoint = 0; curJoint < jointCount; curJoint ++) {
 				dgJointInfo* const jointInfo = &constraintArray[curJoint];
 				dgConstraint* const constraint = jointInfo->m_joint;
-				if (constraint->m_alive) {
+				if (constraint->m_active) {
 					joindDesc.m_rowsCount = constraintArray[curJoint].m_autoPaircount;
 					joindDesc.m_rowMatrix = &matrixRow[constraintArray[curJoint].m_autoPairstart];
 					constraint->JointAccelerations (&joindDesc);
@@ -856,7 +856,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 			for (dgInt32 curJoint = 0; curJoint < jointCount; curJoint ++) {
 				dgJointInfo* const jointInfo = &constraintArray[curJoint];
 				dgConstraint* const constraint = jointInfo->m_joint;
-				if (constraint->m_alive) {
+				if (constraint->m_active) {
 					dgInt32 m0 = constraintArray[curJoint].m_m0;
 					dgInt32 m1 = constraintArray[curJoint].m_m1;
 					const dgBody* const body0 = bodyArray[m0].m_body;
@@ -967,7 +967,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 			dgVector timestep4 (timestep);
 			for (dgInt32 i = 1; i < bodyCount; i ++) {
 				dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
-				if (body->m_alive3) {
+				if (body->m_active) {
 					dgVector force (internalForces[i].m_linear);
 					dgVector torque (internalForces[i].m_angular);
 					if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
@@ -993,7 +993,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 		} else {
 			for (dgInt32 i = 1; i < bodyCount; i ++) {
 				dgBody* const body = bodyArray[i].m_body;
-				if (body->m_alive3) {
+				if (body->m_active) {
 					const dgVector& linearMomentum = internalForces[i].m_linear;
 					const dgVector& angularMomentum = internalForces[i].m_angular;
 
@@ -1009,7 +1009,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 		for (dgInt32 i = 0; i < jointCount; i ++) {
 			dgJointInfo* const jointInfo = &constraintArray[i];
 			dgConstraint* const constraint = jointInfo->m_joint;
-			if (constraint->m_alive) {
+			if (constraint->m_active) {
 				dgInt32 first = constraintArray[i].m_autoPairstart;
 				dgInt32 count = constraintArray[i].m_autoPaircount;
 
@@ -1029,7 +1029,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 		for (dgInt32 i = 1; i < bodyCount; i ++) {
 			//dgDynamicBody* const body = bodyArray[i].m_body;
 			dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
-			if (body->m_alive3) {
+			if (body->m_active) {
 				// the initial velocity and angular velocity were stored in net force and net torque, for memory saving
 				dgVector accel = (body->m_veloc - body->m_netForce).CompProduct4 (invTime);
 				dgVector alpha = (body->m_omega - body->m_netTorque).CompProduct4 (invTime);
@@ -1062,7 +1062,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 	} else {
 		for (dgInt32 i = 1; i < bodyCount; i ++) {
 			dgBody* const body = bodyArray[i].m_body;
-			if (body->m_alive3) {
+			if (body->m_active) {
 				body->m_netForce = zero;
 				body->m_netTorque = zero;
 			}

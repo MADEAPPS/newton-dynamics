@@ -149,10 +149,8 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	descriptor.m_atomicCounter = 0;
 
 	sentinelBody->m_resting = true;
-	sentinelBody->m_alive0 = false;
-	sentinelBody->m_alive1 = false;
-	sentinelBody->m_alive2 = false;
-	sentinelBody->m_alive3 = false;
+	sentinelBody->m_active = false;
+	sentinelBody->m_activeMask = 0;
 	sentinelBody->m_equilibrium = true;
 	for (dgInt32 i = 0; i < threadCount; i ++) {
 		world->QueueJob (FindActiveJointAndBodies, &descriptor, world);
@@ -498,10 +496,8 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 				dgBodyInfo* const bodyArray1 = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
 
 				body->m_index = bodyCount; 
-				body->m_alive0 = false;
-				body->m_alive1 = false;
-				body->m_alive2 = false;
-				body->m_alive3 = false;
+				body->m_active = false;
+				body->m_activeMask = 0;
 				body->m_resting = true;
 				bodyArray1[bodyIndex].m_body = body;
 				bodyCount ++;
@@ -645,42 +641,31 @@ void dgWorldDynamicUpdate::FindActiveJointAndBodies (dgIsland* const island)
 			dgAssert ((body0 == jointInfo->m_joint->m_body0) || !m0);
 			dgAssert ((body1 == jointInfo->m_joint->m_body1) || !m1);
 
-			bool alive = !(!(!body0->m_resting) & !(!body1->m_resting));
-			body0->m_alive0 |= (alive & !(!m0));
-			body1->m_alive0 |= (alive & !(!m1));
+			dgUnsigned32 active = !(body0->m_resting & body1->m_resting);
+			body0->m_activeMask |= (active & !(!m0));
+			body1->m_activeMask |= (active & !(!m1));
 		}
 
-		for (dgInt32 i = 0; i < jointCount; i ++) {
-			dgJointInfo* const jointInfo = &constraintArray[i];
-			dgInt32 m0 = jointInfo->m_m0;
-			dgInt32 m1 = jointInfo->m_m1;
+		for (dgInt32 j = 0; j < (LINEAR_SOLVER_SUB_STEPS - 1); j ++) {
+			dgUnsigned32 mask = 1 << j;
+			dgUnsigned32 shift = (j + 1);
+			for (dgInt32 i = 0; i < jointCount; i ++) {
+				dgJointInfo* const jointInfo = &constraintArray[i];
+				dgInt32 m0 = jointInfo->m_m0;
+				dgInt32 m1 = jointInfo->m_m1;
 
-			dgBody* const body0 = bodyArray[m0].m_body;
-			dgBody* const body1 = bodyArray[m1].m_body;
-			dgAssert ((body0 == jointInfo->m_joint->m_body0) || !m0);
-			dgAssert ((body1 == jointInfo->m_joint->m_body1) || !m1);
+				dgBody* const body0 = bodyArray[m0].m_body;
+				dgBody* const body1 = bodyArray[m1].m_body;
+				dgAssert ((body0 == jointInfo->m_joint->m_body0) || !m0);
+				dgAssert ((body1 == jointInfo->m_joint->m_body1) || !m1);
 
-			bool alive = !(!body0->m_alive0) | !(!body1->m_alive0);
-			body0->m_alive1 |= (alive & !(!m0));
-			body1->m_alive1 |= (alive & !(!m1));
+				dgUnsigned32 active = ((body0->m_activeMask | body1->m_activeMask) & mask) << 1;
+				body0->m_activeMask |= (active & (!(!m0) << shift));
+				body1->m_activeMask |= (active & (!(!m1) << shift));
+			}
 		}
 
-
-		for (dgInt32 i = 0; i < jointCount; i ++) {
-			dgJointInfo* const jointInfo = &constraintArray[i];
-			dgInt32 m0 = jointInfo->m_m0;
-			dgInt32 m1 = jointInfo->m_m1;
-
-			dgBody* const body0 = bodyArray[m0].m_body;
-			dgBody* const body1 = bodyArray[m1].m_body;
-			dgAssert ((body0 == jointInfo->m_joint->m_body0) || !m0);
-			dgAssert ((body1 == jointInfo->m_joint->m_body1) || !m1);
-
-			bool alive = !(!body0->m_alive1) | !(!body1->m_alive1);
-			body0->m_alive2 |= (alive & !(!m0));
-			body1->m_alive2 |= (alive & !(!m1));
-		}
-
+		dgInt32 mask = 1 << (LINEAR_SOLVER_SUB_STEPS - 1);
 		for (dgInt32 i = 0; i < jointCount; i ++) {
 			dgJointInfo* const jointInfo = &constraintArray[i];
 			dgConstraint* const joint = jointInfo->m_joint;
@@ -693,12 +678,11 @@ void dgWorldDynamicUpdate::FindActiveJointAndBodies (dgIsland* const island)
 			dgAssert ((body0 == joint->m_body0) || !m0);
 			dgAssert ((body1 == joint->m_body1) || !m1);
 
-			bool alive = !(!body0->m_alive2) | !(!body1->m_alive2);
-			body0->m_alive3 |= (alive & !(!m0));
-			body1->m_alive3 |= (alive & !(!m1));
-			joint->m_alive = alive;
+			bool active = !(!((body0->m_activeMask | body1->m_activeMask) & mask));
+			body0->m_active |= (active & !(!m0));
+			body1->m_active |= (active & !(!m1));
+			joint->m_active = active;
 		}
-
 
 	} else if (jointCount) {
 		for (dgInt32 i = 0; i < jointCount; i ++) {
@@ -717,14 +701,14 @@ void dgWorldDynamicUpdate::FindActiveJointAndBodies (dgIsland* const island)
 			bool resting = body0->m_equilibrium & body1->m_equilibrium;
 			body0->m_resting &= (resting | !m0);
 			body1->m_resting &= (resting | !m1);
-			body0->m_alive3 |= !(!m0);
-			body1->m_alive3 |= !(!m1);
-			joint->m_alive = true;
+			body0->m_active |= !(!m0);
+			body1->m_active |= !(!m1);
+			joint->m_active = true;
 		}
 	} else {
 		dgAssert (island->m_bodyCount == 2);
 		dgBody* const body = bodyArray[1].m_body;
-		body->m_alive3 = true;
+		body->m_active = true;
 		body->m_resting = body->m_equilibrium;
 	}
 }
@@ -815,7 +799,7 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (const dgIsland* const isla
 		dgJointInfo* const jointInfo = &constraintArray[j];
 		dgConstraint* const constraint = jointInfo->m_joint;
 
-		if (constraint->m_alive) {
+		if (constraint->m_active) {
 			dgInt32 dof = dgInt32 (constraint->m_maxDOF);
 			dgAssert (dof <= DG_CONSTRAINT_MAX_ROWS);
 			for (dgInt32 i = 0; i < dof; i ++) {
@@ -985,7 +969,7 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 		dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
 
 //		if (body->m_invMass.m_w && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
-		if (body->m_alive3 && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+		if (body->m_active && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
 			dgAssert (body->m_invMass.m_w);
 			body->IntegrateVelocity(timestep);
 
@@ -1019,7 +1003,7 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 	for (dgInt32 i = 0; i < count; i ++) {
 		dgBody* const body = bodyArray[i].m_body;
 //		if (body->m_invMass.m_w && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
-		if (body->m_alive3 && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+		if (body->m_active && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
 			body->UpdateMatrix (timestep, threadIndex);
 		}
 	}
@@ -1028,7 +1012,7 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 		if (stackSleeping) {
 			for (dgInt32 i = 0; i < count; i ++) {
 				dgBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
-				if (body->m_alive3 && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+				if (body->m_active && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
 					body->m_netForce = zero;
 					body->m_netTorque = zero;
 					body->m_veloc = zero;
@@ -1042,7 +1026,7 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 				(maxOmega > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxOmega)) {
 					for (dgInt32 i = 0; i < count; i ++) {
 						dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
-						if (body->m_alive3 && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+						if (body->m_active && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
 							body->m_sleepingCounter = 0;
 						}
 					}
@@ -1062,7 +1046,7 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 				if (timeScaleSleepCount > world->m_sleepTable[index].m_steps) {
 					for (dgInt32 i = 0; i < count; i ++) {
 						dgBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
-						if (body->m_alive3 && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+						if (body->m_active && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
 							body->m_netForce = zero;
 							body->m_netTorque = zero;
 							body->m_veloc = zero;
@@ -1074,7 +1058,7 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 					sleepCounter ++;
 					for (dgInt32 i = 0; i < count; i ++) {
 						dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
-						if (body->m_alive3 && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+						if (body->m_active && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
 							body->m_sleepingCounter = sleepCounter;
 						}
 					}
