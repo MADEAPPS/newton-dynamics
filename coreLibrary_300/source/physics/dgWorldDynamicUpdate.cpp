@@ -574,20 +574,24 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 
 			for (dgInt32 i = 0; i < jointCount; i ++) {
 				dgConstraint* const joint = constraintArray[m_joints + i].m_joint;
-				dgBody* const body0 = joint->m_body0;
-				dgBody* const body1 = joint->m_body1;
+				dgInt32 m0 = (joint->m_body0->GetInvMass().m_w != dgFloat32(0.0f)) ? joint->m_body0->m_index: 0;
+				dgInt32 m1 = (joint->m_body1->GetInvMass().m_w != dgFloat32(0.0f)) ? joint->m_body1->m_index: 0;
+				dgBody* const body0 = bodyArray[m_bodies + m0].m_body;
+				dgBody* const body1 = bodyArray[m_bodies + m1].m_body;
 				bool alive = !(body0->m_resting & body1->m_resting);
-				body0->m_alive0 = alive & !body0->m_index;
-				body1->m_alive0 = alive & !body1->m_index;
+				body0->m_alive0 |= (alive & (body0->m_index ? true : false));
+				body1->m_alive0 |= (alive & (body1->m_index ? true : false));
 			}
 
 			for (dgInt32 i = 0; i < jointCount; i ++) {
 				dgConstraint* const joint = constraintArray[m_joints + i].m_joint;
-				dgBody* const body0 = joint->m_body0;
-				dgBody* const body1 = joint->m_body1;
+				dgInt32 m0 = (joint->m_body0->GetInvMass().m_w != dgFloat32(0.0f)) ? joint->m_body0->m_index: 0;
+				dgInt32 m1 = (joint->m_body1->GetInvMass().m_w != dgFloat32(0.0f)) ? joint->m_body1->m_index: 0;
+				dgBody* const body0 = bodyArray[m_bodies + m0].m_body;
+				dgBody* const body1 = bodyArray[m_bodies + m1].m_body;
 				bool alive = bool (body0->m_alive0) | bool(body1->m_alive0);
-				body0->m_alive1 = alive & !body0->m_index;
-				body1->m_alive1 = alive & !body1->m_index;
+				body0->m_alive1 |= (alive & (body0->m_index ? true : false));
+				body1->m_alive1 |= (alive & (body1->m_index ? true : false));
 				joint->m_alive = alive;
 body0->m_alive1 = true;
 body1->m_alive1 = true;
