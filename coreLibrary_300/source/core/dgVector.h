@@ -368,6 +368,14 @@ class dgVector: public dgTemplateVector<dgFloat32>
 
 
 	// relational operators
+	DG_INLINE dgVector operator== (const dgVector& data) const
+	{
+		return dgVector ((m_x == data.m_x) ? dgInt32 (0xffffffff) : 0,
+					     (m_y == data.m_y) ? dgInt32 (0xffffffff) : 0,
+			             (m_z == data.m_z) ? dgInt32 (0xffffffff) : 0,
+			             (m_w == data.m_w) ? dgInt32 (0xffffffff) : 0);
+	}
+
 	DG_INLINE dgVector operator> (const dgVector& data) const
 	{
 		return dgVector ((m_x > data.m_x) ? dgInt32 (0xffffffff) : 0,
@@ -414,6 +422,13 @@ class dgVector: public dgTemplateVector<dgFloat32>
 		const dgInt32* const a = (dgInt32*)&m_x;
 		const dgInt32* const b = (dgInt32*)&data.m_x;
 		return dgVector (a[0] | b[0], a[1] | b[1], a[2] | b[2], a[3] | b[3]); 
+	}
+
+	DG_INLINE dgVector operator^ (const dgVector& data) const
+	{
+		const dgInt32* const a = (dgInt32*)&m_x;
+		const dgInt32* const b = (dgInt32*)&data.m_x;
+		return dgVector (a[0] ^ b[0], a[1] ^ b[1], a[2] ^ b[2], a[3] ^ b[3]); 
 	}
 
 	DG_INLINE dgVector AndNot (const dgVector& data) const
@@ -725,6 +740,11 @@ class dgVector
 		return _mm_cmpgt_ps (m_type, data.m_type);	
 	}
 
+	DG_INLINE dgVector operator== (const dgVector& data) const
+	{
+		return _mm_cmpeq_ps (m_type, data.m_type);	
+	}
+
 	DG_INLINE dgVector operator< (const dgVector& data) const
 	{
 		return _mm_cmplt_ps (m_type, data.m_type);	
@@ -749,6 +769,11 @@ class dgVector
 	DG_INLINE dgVector operator| (const dgVector& data) const
 	{
 		return _mm_or_ps (m_type, data.m_type);	
+	}
+
+	DG_INLINE dgVector operator^ (const dgVector& data) const
+	{
+		return _mm_xor_ps (m_type, data.m_type);	
 	}
 
 	DG_INLINE dgVector AndNot (const dgVector& data) const

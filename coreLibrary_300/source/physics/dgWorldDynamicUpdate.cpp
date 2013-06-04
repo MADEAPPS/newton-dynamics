@@ -610,9 +610,11 @@ void dgWorldDynamicUpdate::FindActiveJointAndBodies (dgIsland* const island)
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[island->m_jointStart];
 
+static int xxx = 0;
+
 	dgInt32 jointCount = island->m_jointCount;
-	if (jointCount > 100000000) {
-//	if (jointCount > 3) {
+//	if (jointCount > 100000000) {
+	if (xxx) {
 		for (dgInt32 i = 0; i < jointCount; i ++) {
 			dgJointInfo* const jointInfo = &constraintArray[i];
 			dgConstraint* const joint = jointInfo->m_joint;
@@ -968,8 +970,10 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 	for (dgInt32 i = 0; i < count; i ++) {
 		dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
 
+		dgVector isMoving ((body->m_veloc | body->m_omega) == dgVector (dgFloat32 (0.0f)));
+
 //		if (body->m_invMass.m_w && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
-		if (body->m_active && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+		if (!(isMoving.GetSignMask() & 7) && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
 			dgAssert (body->m_invMass.m_w);
 			body->IntegrateVelocity(timestep);
 
@@ -997,16 +1001,17 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 			isAutoSleep &= body->m_autoSleep;
 
 			sleepCounter = dgMin (sleepCounter, body->m_sleepingCounter);
-		}
-	}
 
-	for (dgInt32 i = 0; i < count; i ++) {
-		dgBody* const body = bodyArray[i].m_body;
-//		if (body->m_invMass.m_w && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
-		if (body->m_active && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
 			body->UpdateMatrix (timestep, threadIndex);
 		}
 	}
+
+//	for (dgInt32 i = 0; i < count; i ++) {
+//		dgBody* const body = bodyArray[i].m_body;
+//		if (body->m_active && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+//			body->UpdateMatrix (timestep, threadIndex);
+//		}
+//	}
 
 	if (isAutoSleep) {
 		if (stackSleeping) {
