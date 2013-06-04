@@ -249,7 +249,7 @@ void dRuntimeProfiler::Render (int mask)
 	}
 
 	{
-		int base_y = 60;
+		int base_y = 0;
 		glColor3f(1.0, 1.0, 1.0);
 		DrawLabel (x0 - 30, y0 + (y1 - y0) * 0 / 4 + base_y, "0");
 
@@ -325,12 +325,12 @@ void dRuntimeProfiler::RenderThreadPerformance ()
 		for (int i = 0; i < threadCount; i ++) {
 			char label[32];
 			sprintf (label, "thread %d", i);
-			DrawLabel (x0 - 90, y0 + i * 22 + 50, label);
+			DrawLabel (x0 - 90, y0 + i * 22 - 10, label);
 		}
 
-		DrawLabel (x0, y0 - 20 + 50, "0.0 ms");
-		DrawLabel ((x1 + x0) * 0.5f, y0 - 20 + 50, "8.33 ms");
-		DrawLabel (x1, y0 - 20 + 50, "16.66 ms");
+		DrawLabel (x0, y0 - 30, "0.0 ms");
+		DrawLabel ((x1 + x0) * 0.5f, y0 - 30, "8.33 ms");
+		DrawLabel (x1, y0 - 30, "16.66 ms");
 
 		y0 -= 15.0f;
 		dVector color (1.0f, 0.0f, 0.0f, 1.0f/8.0f);
