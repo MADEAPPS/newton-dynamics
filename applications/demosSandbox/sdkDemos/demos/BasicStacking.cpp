@@ -149,9 +149,9 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 	scene->LoadScene (fileName);
 #else
 	
-	int high = 20;
+	int high = 30;
 	PrimitiveType selection[] = {_BOX_PRIMITIVE, _CYLINDER_PRIMITIVE, _TAPERED_CYLINDER_PRIMITIVE, _REGULAR_CONVEX_HULL_PRIMITIVE};
-	for (int i = 0; i < 2; i ++) {
+	for (int i = 0; i < 1; i ++) {
 		int index = i % (sizeof (selection) / sizeof (selection[0]));
 
 index = 0;

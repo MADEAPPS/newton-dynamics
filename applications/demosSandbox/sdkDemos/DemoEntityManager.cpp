@@ -37,6 +37,7 @@
 
 #define MAX_PHYSICS_LOOPS			1
 #define MAX_PHYSICS_FPS				120.0f
+//#define MAX_PHYSICS_FPS			60.0f
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
 BEGIN_EVENT_TABLE (DemoEntityManager, wxGLCanvas)
@@ -959,7 +960,7 @@ void DemoEntityManager::RenderFrame ()
 
 
 	// do all 2d drawing
-	m_profiler.m_nextLine = 0;
+	m_profiler.m_nextLine = 200;
 	int profileFlags = 0;
 	for (int i = 0; i < int (sizeof (m_showProfiler) / sizeof (m_showProfiler[0])); i ++) {
 		profileFlags |=  m_showProfiler[i] ? (1 << i) : 0;
@@ -980,7 +981,7 @@ void DemoEntityManager::RenderFrame ()
 	if (m_mainWindow->m_showStatistics) {
 		dVector color (1.0f, 1.0f, 1.0f, 0.0f);
 		Print (color, 10,  20, "render fps: %7.2f", m_mainWindow->m_fps);
-		Print (color, 10,  42, "physics time on main thread: %4.2f ms", GetPhysicsTime() * 1000.0f);
+		Print (color, 10,  42, "physics time on main thread: %d micro secunds", int (GetPhysicsTime() * 1000000.0f));
 		Print (color, 10,  64, "total memory: %d kbytes", NewtonGetMemoryUsed() / (1024));
 		Print (color, 10,  86, "number of bodies: %d", NewtonWorldGetBodyCount(GetNewton()));
 		Print (color, 10, 108, "number of threads: %d", NewtonGetThreadsCount(GetNewton()));
