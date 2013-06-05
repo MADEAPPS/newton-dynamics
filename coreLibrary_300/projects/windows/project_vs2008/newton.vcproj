@@ -115,7 +115,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="rem xcopy  &quot;$(OutDir)\$(TargetName).lib&quot; &quot;C:\Users\Julio\Downloads\NewtonTestApp\lib/*.*&quot;  /F /Y /R&#x0D;&#x0A;rem xcopy  &quot;$(OutDir)\$(TargetName).dll&quot; &quot;C:\Users\Julio\Downloads\NewtonTestApp\bin/*.*&quot;  /F /Y /R&#x0D;&#x0A;&#x0D;&#x0A;&#x0D;&#x0A;&#x0D;&#x0A;"
+				CommandLine="rem xcopy  &quot;$(OutDir)\$(TargetName).lib&quot; &quot;C:\Users\Julio\Downloads\NewtonTestApp\lib/*.*&quot;  /F /Y /R&#x0D;&#x0A;rem xcopy  &quot;$(OutDir)\$(TargetName).dll&quot; &quot;C:\Users\Julio\Downloads\NewtonTestApp\bin/*.*&quot;  /F /Y /R&#x0D;&#x0A;&#x0D;&#x0A;xcopy  &quot;$(OutDir)/../../../../../../source/newton/Newton.h&quot; &quot;C:\Users\Julio\Desktop\peelnewton\Physics/PINT_Newton/Newton/source\newton/*.*&quot;  /F /Y /R&#x0D;&#x0A;&#x0D;&#x0A;xcopy  &quot;$(OutDir)/$(TargetName).lib&quot; &quot;C:\Users\Julio\Desktop\peelnewton\Physics/PINT_Newton/*.*&quot;  /F /Y /R&#x0D;&#x0A;&#x0D;&#x0A;xcopy  &quot;$(OutDir)/$(TargetName).dll&quot; &quot;C:\Users\Julio\Desktop\peelnewton/Build/*.*&quot;  /F /Y /R&#x0D;&#x0A;xcopy  &quot;$(OutDir)/$(TargetName).pdb&quot; &quot;C:\Users\Julio\Desktop\peelnewton/Build/*.*&quot;  /F /Y /R&#x0D;&#x0A;&#x0D;&#x0A;xcopy  &quot;$(OutDir)/$(TargetName).dll&quot; &quot;C:\Users\Julio\Desktop\peelnewton\Physics/PINT_Newton/Newton/projects\windows\project_vs2008\Win32\newton\debugDll/*.*&quot;  /F /Y /R&#x0D;&#x0A;xcopy  &quot;$(OutDir)/$(TargetName).pdb&quot; &quot;C:\Users\Julio\Desktop\peelnewton\Physics/PINT_Newton/Newton/projects\windows\project_vs2008\Win32\newton\debugDll/*.*&quot;  /F /Y /R&#x0D;&#x0A;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
