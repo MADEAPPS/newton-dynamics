@@ -356,16 +356,19 @@ extern "C" {
 	typedef dFloat (*NewtonHeightFieldRayCastCallback) (const NewtonBody* const body, const NewtonCollision* const heightFieldCollision, dFloat intersection, int row, int col, dFloat* const normal, int faceId, void* const usedData);
 
 
+	typedef void (*NewtonCollisionDestructor) (const NewtonWorld* const newtonWorld, const NewtonCollision* const collision);
+
 	// collision tree call back (obsoleted no recommended)
 	typedef void (*NewtonTreeCollisionCallback) (const NewtonBody* const bodyWithTreeCollision, const NewtonBody* const body, int faceID, 
 												 int vertexCount, const dFloat* const vertex, int vertexStrideInBytes); 
+
+	
 
 	typedef void (*NewtonBodyDestructor) (const NewtonBody* const body);
 	typedef void (*NewtonApplyForceAndTorque) (const NewtonBody* const body, dFloat timestep, int threadIndex);
 	typedef void (*NewtonSetTransform) (const NewtonBody* const body, const dFloat* const matrix, int threadIndex);
 
 	typedef int (*NewtonIslandUpdate) (const NewtonWorld* const newtonWorld, const void* islandHandle, int bodyCount);
-	typedef void (*NewtonBodyLeaveWorld) (const NewtonBody* const body, int threadIndex);
 	typedef void (*NewtonDestroyBodyByExeciveForce) (const NewtonBody* const body, const NewtonJoint* const contact);
 	
 	typedef int (*NewtonCollisionCompoundBreakableCallback) (NewtonMesh* const mesh, void* const userData, dFloat* const planeMatrixOut);
@@ -462,7 +465,6 @@ extern "C" {
 
 	NEWTON_API void NewtonSetFrictionModel (const NewtonWorld* const newtonWorld, int model);
 	NEWTON_API void NewtonSetMinimumFrameRate (const NewtonWorld* const newtonWorld, dFloat frameRate);
-	NEWTON_API void NewtonSetBodyLeaveWorldEvent (const NewtonWorld* const newtonWorld, NewtonBodyLeaveWorld callback); 
 	NEWTON_API void NewtonSetIslandUpdateEvent (const NewtonWorld* const newtonWorld, NewtonIslandUpdate islandUpdate); 
 	NEWTON_API void NewtonSetDestroyBodyByExeciveForce (const NewtonWorld* const newtonWorld, NewtonDestroyBodyByExeciveForce callback); 
 
@@ -737,6 +739,8 @@ extern "C" {
 	// **********************************************************************************************
 
 	NEWTON_API NewtonCollision* NewtonCollisionCreateInstance (const NewtonCollision* const collision);
+	NEWTON_API void NewtonCollisionDestructorCallback (const NewtonCollision* const collision, NewtonCollisionDestructor destrutorCallback);	
+
 	NEWTON_API int NewtonCollisionGetType (const NewtonCollision* const collision);
 
 	NEWTON_API void NewtonCollisionSetUserData (const NewtonCollision* const collision, void* const userData);
@@ -837,7 +841,7 @@ extern "C" {
 	NEWTON_API int  NewtonBodyGetFreezeState(const NewtonBody* const body);
 	NEWTON_API void NewtonBodySetFreezeState (const NewtonBody* const body, int state);
 
-	NEWTON_API void  NewtonBodySetDestructorCallback (const NewtonBody* const body, NewtonBodyDestructor callback);
+	NEWTON_API void NewtonBodySetDestructorCallback (const NewtonBody* const body, NewtonBodyDestructor callback);
 	NEWTON_API NewtonBodyDestructor NewtonBodyGetDestructorCallback (const NewtonBody* const body);
 
 	NEWTON_API void  NewtonBodySetTransformCallback (const NewtonBody* const body, NewtonSetTransform callback);

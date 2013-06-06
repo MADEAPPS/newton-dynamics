@@ -237,7 +237,6 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 
 	m_allocator = allocator;
 	m_islandUpdate = NULL;
-	m_leavingWorldNotify = NULL;
 	m_getPerformanceCount = NULL;
 	m_destroyBodyByExeciveForce = NULL;
 
@@ -259,7 +258,6 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 
 	m_userData = NULL;
 	m_islandUpdate = NULL;
-	m_leavingWorldNotify = NULL;
 	m_destroyBodyByExeciveForce = NULL;
 
 	m_freezeAccel2 = DG_FREEZE_MAG2;
@@ -606,12 +604,6 @@ void* dgWorld::GetUserData() const
 void dgWorld::SetIslandUpdateCallback (OnIslandUpdate callback)
 {
 	m_islandUpdate = callback;
-}
-
-
-void dgWorld::SetLeavingWorldCallback (OnLeavingWorldAction callback) 
-{
-	m_leavingWorldNotify = callback;
 }
 
 

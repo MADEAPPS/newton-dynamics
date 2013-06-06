@@ -274,7 +274,6 @@ class dgWorld:
 
 
 	void SetIslandUpdateCallback (OnIslandUpdate callback); 
-	void SetLeavingWorldCallback (OnLeavingWorldAction callback); 
 	void SetBodyDestructionByExeciveForce (OnBodyDestructionByExeciveForce callback); 
 
 	void InitBody (dgBody* const body, dgCollisionInstance* const collision, const dgMatrix& matrix);
@@ -458,7 +457,6 @@ class dgWorld:
 	dgMemoryAllocator* m_allocator;
 	dgInt32 m_hardwaredIndex;
 	OnIslandUpdate m_islandUpdate;
-	OnLeavingWorldAction m_leavingWorldNotify;
 	OnGetPerformanceCountCallback m_getPerformanceCount;
 	OnBodyDestructionByExeciveForce m_destroyBodyByExeciveForce;
 

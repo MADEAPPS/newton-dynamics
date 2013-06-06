@@ -866,29 +866,6 @@ void NewtonSetDestroyBodyByExeciveForce(const NewtonWorld* const newtonWorld, Ne
 
 
 
-// Name: NewtonSetBodyLeaveWorldEvent 
-// Set the event callback function to be called in the event a body is escaping the limits of the world
-// during simulation time.
-//
-// Parameters:
-// *const NewtonWorld* *newtonWorld - is the pointer to the Newton world
-// *NewtonBodyLeaveWorld* callback - is the pointer to the function callback
-// 
-// Return: Nothing
-//
-// Remarks: When a body moves outside the bounding box that defines the world space the body is automatically disabled
-// and Newton calls the application defined callback function *NewtonBodyLeaveWorld callback*. 
-// The application should decide how to handle the event, because Newton will make the callback once.
-// The only options available to the application are: do nothing or destroy the object. 
-//
-// See also:  NewtonBodyGetFirstJoint, NewtonBodyGetNextJoint
-void NewtonSetBodyLeaveWorldEvent(const NewtonWorld* const newtonWorld, NewtonBodyLeaveWorld callback) 
-{
-	Newton* const world = (Newton *) newtonWorld;
-
-	TRACE_FUNCTION(__FUNCTION__);
-	world->SetLeavingWorldCallback ((OnLeavingWorldAction) callback);		
-}
 
 
 // Name: NewtonWorldGetFirstBody 
@@ -4069,6 +4046,12 @@ void NewtonCollisionForEachPolygonDo(const NewtonCollision* const collisionPtr, 
 	collision->DebugCollision (dgMatrix (matrixPtr), (OnDebugCollisionMeshCallback) callback, userDataPtr);
 }
 
+void NewtonCollisionDestructorCallback (const NewtonCollision* const collision, NewtonCollisionDestructor destructorCallback)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgCollisionInstance* const instance = (dgCollisionInstance*) collision;
+	instance->SetDestructor ((OnCollisionInstanceDestroy)destructorCallback);
+}
 
 int NewtonCollisionGetType(const NewtonCollision* const collision)
 {
