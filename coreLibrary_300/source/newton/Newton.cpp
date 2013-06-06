@@ -3071,7 +3071,11 @@ dFloat NewtonCollisionGetMaxBreakImpactImpulse(const NewtonCollision* const conv
 }
 */
 
-	
+int NewtonConvexHullGetVetexData (const NewtonCollision* const convexHullCollision, dFloat** const vertexData, int* strideInBytes)
+{
+	dgAssert (0);
+	return 0;
+}
 
 
 // Name: NewtonConvexHullGetFaceIndices 
@@ -3150,6 +3154,11 @@ void NewtonConvexCollisionCalculateInertialMatrix(const NewtonCollision* convexC
 	origin[2] = tmpInertia[3][2];
 }
 
+const void* NewtonCollisionDataPointer (const NewtonCollision* const convexCollision)
+{
+	dgCollisionInstance* const coll = (dgCollisionInstance*) convexCollision;
+	return coll->GetChildShape();
+}
 
 // **********************************************************************************************
 //

@@ -118,26 +118,6 @@ extern "C" {
 	typedef struct NewtonDeformableMeshSegment{} NewtonDeformableMeshSegment;
 	typedef struct NewtonBreakableComponentMesh{} NewtonBreakableComponentMesh;
 
-//	typedef struct NewtonBoxParam NewtonBoxParam;
-//	typedef struct NewtonConeParam NewtonConeParam;
-//	typedef struct NewtonSphereParam NewtonSphereParam;
-//	typedef struct NewtonCapsuleParam NewtonCapsuleParam;
-//	typedef struct NewtonCylinderParam NewtonCylinderParam;
-//	typedef struct NewtonConvexHullParam NewtonConvexHullParam;
-//	typedef struct NewtonCollisionTreeParam NewtonCollisionTreeParam;
-//	typedef struct NewtonDeformableMeshParam NewtonDeformableMeshParam;
-//	typedef struct NewtonSceneCollisionParam NewtonSceneCollisionParam;
-//	typedef struct NewtonTaperedCapsuleParam NewtonTaperedCapsuleParam;
-//	typedef struct NewtonTaperedCylinderParam NewtonTaperedCylinderParam;
-//	typedef struct NewtonChamferCylinderParam NewtonChamferCylinderParam;
-//	typedef struct NewtonCompoundCollisionParam NewtonCompoundCollisionParam;
-//	typedef struct NewtonHeightFieldCollisionParam NewtonHeightFieldCollisionParam;
-//	typedef struct NewtonCollisionInfoRecord NewtonCollisionInfoRecord;
-//	typedef struct NewtonJointRecord NewtonJointRecord;
-//	typedef struct NewtonHingeSliderUpdateDesc NewtonHingeSliderUpdateDesc;
-//	typedef struct NewtonUserMeshCollisionRayHitDesc NewtonUserMeshCollisionRayHitDesc;
-//	typedef struct NewtonUserMeshCollisionCollideDesc NewtonUserMeshCollisionCollideDesc;
-//	typedef struct NewtonWorldConvexCastReturnInfo NewtonWorldConvexCastReturnInfo;
 
 	struct NewtonBoxParam
 	{
@@ -286,7 +266,7 @@ extern "C" {
 		int m_threadNumber;							// current thread executing this query
 		int	m_faceCount;                        	// the application should set here how many polygons intersect the query box
 		int m_vertexStrideInBytes;              	// the application should set here the size of each vertex
-		dFloat m_skinThickness;                      // this is the minimum skin separation specified by the material between these two colliding shapes
+		dFloat m_skinThickness;                     // this is the minimum skin separation specified by the material between these two colliding shapes
 		void* m_userData;                       	// user data passed to the collision geometry at creation time
 
 		NewtonBody* m_objBody;                  	// pointer to the colliding body
@@ -311,7 +291,7 @@ extern "C" {
 		dFloat m_normal[4];						// surface normal at collision point in global space
 		dFloat m_normalOnHitPoint[4];           // surface normal at the surface of the hit body, 
 												// is the same as the normal calculated by a ray cast hitting the body at the hit point
-		dLong m_contactID;					// collision ID at contact point
+		dLong m_contactID;						// collision ID at contact point
 		const NewtonBody* m_hitBody;			// body hit at contact point
 		dFloat m_penetration;                   // contact penetration at collision point
 	};
@@ -321,7 +301,7 @@ extern "C" {
 		dFloat m_p0[4];							// ray origin in collision local space
 		dFloat m_p1[4];                         // ray destination in collision local space   
 		dFloat m_normalOut[4];					// copy here the normal at the ray intersection
-		dLong m_userIdOut;                   // copy here a user defined id for further feedback  
+		dLong m_userIdOut;						// copy here a user defined id for further feedback  
 		void* m_userData;                       // user data passed to the collision geometry at creation time
 	};
 
@@ -605,13 +585,20 @@ extern "C" {
 	NEWTON_API int NewtonCollisionGetMode(const NewtonCollision* const convexCollision);
 	NEWTON_API void NewtonCollisionSetCollisonMode (const NewtonCollision* convexCollision, int mode);
 
+	
+
 //	NEWTON_API void NewtonCollisionSetMaxBreakImpactImpulse(const NewtonCollision* const convexHullCollision, dFloat maxImpactImpulse);
 //	NEWTON_API dFloat NewtonCollisionGetMaxBreakImpactImpulse(const NewtonCollision* const convexHullCollision);
 
 	NEWTON_API int NewtonConvexHullGetFaceIndices (const NewtonCollision* const convexHullCollision, int face, int* const faceIndices);
+	NEWTON_API int NewtonConvexHullGetVetexData (const NewtonCollision* const convexHullCollision, dFloat** const vertexData, int* strideInBytes);
+	
 	NEWTON_API dFloat NewtonConvexCollisionCalculateVolume (const NewtonCollision* const convexCollision);
 	NEWTON_API void NewtonConvexCollisionCalculateInertialMatrix (const NewtonCollision* convexCollision, dFloat* const inertia, dFloat* const origin);	
 
+
+	NEWTON_API const void* NewtonCollisionDataPointer (const NewtonCollision* const convexCollision);
+	
 
 	// **********************************************************************************************
 	//
