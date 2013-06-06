@@ -822,13 +822,13 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (const dgIsland* const isla
 			constraint->m_body0->m_inCallback = false;
 			constraint->m_body1->m_inCallback = false;
 
-	//		dgInt32 m0 = (constraint->m_body0->GetInvMass().m_w != dgFloat32(0.0f)) ? constraint->m_body0->m_index: 0;
-	//		dgInt32 m1 = (constraint->m_body1->GetInvMass().m_w != dgFloat32(0.0f)) ? constraint->m_body1->m_index: 0;
-			dgInt32 m0 = jointInfo->m_m0;
-			dgInt32 m1 = jointInfo->m_m1;
+			//dgInt32 m0 = (constraint->m_body0->GetInvMass().m_w != dgFloat32(0.0f)) ? constraint->m_body0->m_index: 0;
+			//dgInt32 m1 = (constraint->m_body1->GetInvMass().m_w != dgFloat32(0.0f)) ? constraint->m_body1->m_index: 0;
+			//dgInt32 m0 = jointInfo->m_m0;
+			//dgInt32 m1 = jointInfo->m_m1;
 
-			dgAssert (m0 < island->m_bodyCount);
-			dgAssert (m1 < island->m_bodyCount);
+			dgAssert (jointInfo->m_m0 < island->m_bodyCount);
+			dgAssert (jointInfo->m_m1 < island->m_bodyCount);
 
 			dgAssert (constraint->m_index == dgUnsigned32(j));
 			jointInfo->m_autoPairstart = rowCount;
