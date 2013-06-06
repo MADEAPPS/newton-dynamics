@@ -240,6 +240,9 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	m_getPerformanceCount = NULL;
 	m_destroyBodyByExeciveForce = NULL;
 
+	m_onCollisionInstanceDestruction = NULL;
+	m_onCollisionInstanceCopyConstrutor = NULL;
+
 	m_inUpdate = 0;
 	m_bodyGroupID = 0;
 	
@@ -1134,6 +1137,12 @@ void dgWorld::OnBodySerializeToFile (dgBody& body, dgSerialize serializeCallback
 	serializeCallback (fileHandle, bodyIndentification, size);
 }
 
+
+void dgWorld::SetCollisionInstanceConstructorDestructor (OnCollisionInstanceDuplicate constructor, OnCollisionInstanceDestroy destructor)
+{
+	m_onCollisionInstanceDestruction = destructor;
+	m_onCollisionInstanceCopyConstrutor = constructor;
+}
 
 
 

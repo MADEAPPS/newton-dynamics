@@ -124,6 +124,9 @@ enum dgPerformanceCounters
 };
 
 class dgWorld;
+class dgCollisionInstance;
+
+
 
 typedef dgUnsigned32 (dgApi *OnIslandUpdate) (const dgWorld* const world, void* island, dgInt32 bodyCount);
 typedef void (dgApi *OnBodyDestructionByExeciveForce) (const dgBody* const body, const dgContact* joint);
@@ -132,6 +135,10 @@ typedef void (dgApi *OnListenerDestroyCallback) (const dgWorld* const world, voi
 
 typedef void (dgApi *OnBodySerialize) (dgBody& me, dgSerialize funt, void* const serilalizeObject);
 typedef void (dgApi *OnBodyDeserialize) (dgBody& me, dgDeserialize funt, void* const serilalizeObject);
+
+
+typedef void (dgApi *OnCollisionInstanceDestroy) (const dgWorld* const world, const dgCollisionInstance* const collision);
+typedef void (dgApi *OnCollisionInstanceDuplicate) (const dgWorld* const world, dgCollisionInstance* const collision, const dgCollisionInstance* const sourceCollision);
 
 
 class dgSolverSleepTherfesholds
@@ -311,10 +318,11 @@ class dgWorld:
 	dgCollisionInstance* CreateTaperedCylinder (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix = dgGetIdentityMatrix());
 	dgCollisionInstance* CreateChamferCylinder (dgFloat32 radius, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix = dgGetIdentityMatrix());
 	dgCollisionInstance* CreateCollisionCompound ();
-
 	
 	dgCollisionInstance* CreateDeformableMesh (dgMeshEffect* const mesh, dgInt32 shapeID);
 	dgCollisionInstance* CreateClothPatchMesh (dgMeshEffect* const mesh, dgInt32 shapeID, const dgClothPatchMaterial& structuralMaterial, const dgClothPatchMaterial& bendMaterial);
+
+	void SetCollisionInstanceConstructorDestructor (OnCollisionInstanceDuplicate constructor, OnCollisionInstanceDestroy destructor);
 
 
 //	dgCollision* CreateCollisionCompoundBreakable (dgInt32 count, const dgMeshEffect* const solidArray[], const dgInt32* const idArray,  const dgFloat32* const densities, const dgInt32* const internalFaceMaterial, dgInt32 debriID, dgFloat32 gap);
@@ -460,6 +468,9 @@ class dgWorld:
 	OnGetPerformanceCountCallback m_getPerformanceCount;
 	OnBodyDestructionByExeciveForce m_destroyBodyByExeciveForce;
 
+	OnCollisionInstanceDestroy	m_onCollisionInstanceDestruction;
+	OnCollisionInstanceDuplicate m_onCollisionInstanceCopyConstrutor;
+
 	dgDetroyBodyByForce m_destroyeddBodiesPool;
 
 	
@@ -480,19 +491,20 @@ class dgWorld:
 	static dgVector m_angularContactError2;
 	
 	friend class dgBody;
+	friend class dgBroadPhase;
 	friend class dgDeformableBody;
 	friend class dgActiveContacts;
-
 	friend class dgUserConstraint;
 	friend class dgBodyMasterList;
 	friend class dgJacobianMemory;
 	friend class dgCollisionScene;
 	friend class dgCollisionConvex;
+	friend class dgCollisionInstance;
 	friend class dgCollisionCompound;
 	friend class dgWorldDynamicUpdate;
 	friend class dgParallelSolverClear;	
 	friend class dgParallelSolverSolve;
-	friend class dgBroadPhase;
+
 	friend class dgCollisionHeightField;
 	friend class dgSolverWorlkerThreads;
 	friend class dgCollisionConvexPolygon;

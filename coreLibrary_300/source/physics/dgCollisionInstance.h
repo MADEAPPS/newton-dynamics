@@ -27,10 +27,6 @@
 
 #include "dgCollision.h"
 
-class dgCollisionInstance;
-
-typedef void (dgApi *OnCollisionInstanceDestroy) (const dgWorld* const world, const dgCollisionInstance* const me);
-
 class dgCollisionInstance
 {
 	public:
@@ -48,9 +44,6 @@ class dgCollisionInstance
 	dgCollisionInstance(const dgWorld* const world, const dgCollision* const childCollision, dgInt32 shapeID, const dgMatrix &matrix);
 	dgCollisionInstance(const dgWorld* const world, dgDeserialize deserialization, void* const userData);
 	~dgCollisionInstance();
-
-
-	void SetDestructor (OnCollisionInstanceDestroy destructor);
 
 	dgCollisionInstance* AddRef ();
 	dgInt32 Release ();
@@ -131,7 +124,6 @@ class dgCollisionInstance
 	void* m_userData;
 	const dgWorld* m_world;
 	const dgCollision* m_childShape;
-	OnCollisionInstanceDestroy m_destructor;
 	union 
 	{
 		dgUnsigned32 m_flags;

@@ -59,7 +59,6 @@ dgCollisionInstance::dgCollisionInstance()
 	,m_userData(NULL)
 	,m_world(NULL)
 	,m_childShape (NULL)
-	,m_destructor(NULL)
 	,m_scaleIsUnit(true)
 	,m_scaleIsUniform(true)
 	,m_collisionMode(true)
@@ -78,7 +77,6 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const world, const dgCol
 	,m_userData(NULL)
 	,m_world(world)
 	,m_childShape (childCollision)
-	,m_destructor(NULL)
 	,m_scaleIsUnit (true)
 	,m_scaleIsUniform (true)
 	,m_collisionMode(true)
@@ -97,7 +95,6 @@ dgCollisionInstance::dgCollisionInstance(const dgCollisionInstance& instance)
 	,m_userData(instance.m_userData)
 	,m_world(instance.m_world)
 	,m_childShape (instance.m_childShape)
-	,m_destructor(instance.m_destructor)
 	,m_scaleIsUnit (instance.m_scaleIsUnit)
 	,m_scaleIsUniform (instance.m_scaleIsUniform)
 	,m_collisionMode(instance.m_collisionMode)
@@ -124,6 +121,10 @@ dgCollisionInstance::dgCollisionInstance(const dgCollisionInstance& instance)
 	} else {
 		m_childShape->AddRef();
 	}
+
+	if (m_world->m_onCollisionInstanceCopyConstrutor) {
+		m_world->m_onCollisionInstanceCopyConstrutor (m_world, this, &instance);
+	}
 }
 
 dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDeserialize deserialization, void* const userData)
@@ -137,7 +138,6 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 	,m_userData(NULL)
 	,m_world(constWorld)
 	,m_childShape (NULL)
-	,m_destructor (NULL)
 	,m_scaleIsUnit (true)
 	,m_scaleIsUniform (true)
 	,m_collisionMode(true)
@@ -306,16 +306,12 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 
 dgCollisionInstance::~dgCollisionInstance()
 {
-	if (m_destructor) {
-		m_destructor (m_world, this);
+	if (m_world->m_onCollisionInstanceDestruction) {
+		m_world->m_onCollisionInstanceDestruction (m_world, this);
 	}
 	((dgWorld*) m_world)->ReleaseCollision(m_childShape);
 }
 
-void dgCollisionInstance::SetDestructor (OnCollisionInstanceDestroy destructor)
-{
-	m_destructor = destructor;
-}
 
 void dgCollisionInstance::Serialize(dgSerialize callback, void* const userData, bool saveShape) const
 {

@@ -356,7 +356,8 @@ extern "C" {
 	typedef dFloat (*NewtonHeightFieldRayCastCallback) (const NewtonBody* const body, const NewtonCollision* const heightFieldCollision, dFloat intersection, int row, int col, dFloat* const normal, int faceId, void* const usedData);
 
 
-	typedef void (*NewtonCollisionDestructor) (const NewtonWorld* const newtonWorld, const NewtonCollision* const collision);
+	typedef void (*NewtonCollisionCopyConstructionCallback) (const NewtonWorld* const newtonWorld, NewtonCollision* const collision, const NewtonCollision* const sourceCollision);
+	typedef void (*NewtonCollisionDestructorCallback) (const NewtonWorld* const newtonWorld, const NewtonCollision* const collision);
 
 	// collision tree call back (obsoleted no recommended)
 	typedef void (*NewtonTreeCollisionCallback) (const NewtonBody* const bodyWithTreeCollision, const NewtonBody* const body, int faceID, 
@@ -484,9 +485,11 @@ extern "C" {
 	NEWTON_API void*  NewtonWorldGetPostListener (const NewtonWorld* const newtonWorld, const char* const nameId);
 	NEWTON_API void* NewtonWorldAddPostListener (const NewtonWorld* const newtonWorld, const char* const nameId, void* const listenerUserData, NewtonWorldUpdateListenerCallback update, NewtonWorldDestroyListenerCallback destroy);
 
-
 	NEWTON_API void NewtonWorldSetDestructorCallback (const NewtonWorld* const newtonWorld, NewtonWorldDestructorCallback destructor);
 	NEWTON_API NewtonWorldDestructorCallback NewtonWorldGetDestructorCallback (const NewtonWorld* const newtonWorld);
+
+	NEWTON_API void NewtonWorldSetCollisionConstructorDestuctorCallback (const NewtonWorld* const newtonWorld, NewtonCollisionCopyConstructionCallback constructor, NewtonCollisionDestructorCallback destructor);
+
 
 	NEWTON_API void NewtonWorldRayCast (const NewtonWorld* const newtonWorld, const dFloat* const p0, const dFloat* const p1, NewtonWorldRayFilterCallback filter, void* const userData, 
 										NewtonWorldRayPrefilterCallback prefilter);
@@ -739,8 +742,6 @@ extern "C" {
 	// **********************************************************************************************
 
 	NEWTON_API NewtonCollision* NewtonCollisionCreateInstance (const NewtonCollision* const collision);
-	NEWTON_API void NewtonCollisionDestructorCallback (const NewtonCollision* const collision, NewtonCollisionDestructor destrutorCallback);	
-
 	NEWTON_API int NewtonCollisionGetType (const NewtonCollision* const collision);
 
 	NEWTON_API void NewtonCollisionSetUserData (const NewtonCollision* const collision, void* const userData);

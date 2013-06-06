@@ -1101,6 +1101,14 @@ NewtonWorldDestructorCallback NewtonWorldGetDestructorCallback(const NewtonWorld
 }
 
 
+void NewtonWorldSetCollisionConstructorDestuctorCallback (const NewtonWorld* const newtonWorld, NewtonCollisionCopyConstructionCallback constructor, NewtonCollisionDestructorCallback destructor)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *) newtonWorld;
+	world->SetCollisionInstanceConstructorDestructor((OnCollisionInstanceDuplicate) constructor, (OnCollisionInstanceDestroy)destructor);
+}
+
+
 NEWTON_API void* NewtonWorldGetListenerUserData (const NewtonWorld* const newtonWorld, void* const listener)
 {
 	TRACE_FUNCTION(__FUNCTION__);
@@ -4046,12 +4054,6 @@ void NewtonCollisionForEachPolygonDo(const NewtonCollision* const collisionPtr, 
 	collision->DebugCollision (dgMatrix (matrixPtr), (OnDebugCollisionMeshCallback) callback, userDataPtr);
 }
 
-void NewtonCollisionDestructorCallback (const NewtonCollision* const collision, NewtonCollisionDestructor destructorCallback)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgCollisionInstance* const instance = (dgCollisionInstance*) collision;
-	instance->SetDestructor ((OnCollisionInstanceDestroy)destructorCallback);
-}
 
 int NewtonCollisionGetType(const NewtonCollision* const collision)
 {
