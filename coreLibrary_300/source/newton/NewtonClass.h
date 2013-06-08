@@ -28,7 +28,7 @@
 
 
 #define DG_TIMESTEP (1.0f / 60.0f)	
-#define DG_MAX_TIMESTEP (1.0f / 60.0f)	
+#define DG_MAX_TIMESTEP (1.0f / 30.0f)	
 #define DG_MIN_TIMESTEP (1.0f / 1000.0f)	
 
 class Newton; 

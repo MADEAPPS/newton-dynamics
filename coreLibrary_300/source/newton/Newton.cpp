@@ -24,15 +24,6 @@
 #include "NewtonClass.h"
 
 
-#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-	#ifdef _DEBUG
-//		#define DG_USED_DEBUG_EXCEPTIONS
-	#endif
-#endif
-
-
-
-
 #ifdef _NEWTON_BUILD_DLL
 	#if (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
 		int main(int argc, char* argv[])
@@ -641,21 +632,6 @@ unsigned NewtonReadThreadPerformanceTicks (const NewtonWorld* newtonWorld, unsig
 }
 
 
-
-#ifdef DG_USED_DEBUG_EXCEPTIONS
-dgInt32 ExecptionHandler (void *exceptPtr)
-{
-	EXCEPTION_RECORD *record;
-
-	record = ((EXCEPTION_POINTERS *)exceptPtr)->ExceptionRecord;
-//	if (record->ExceptionCode != EXCEPTION_ACCESS_VIOLATION) {
-//		return 0;
-//	}
-	return 1;
-}
-#endif
-
-
 // Name: NewtonUpdate 
 // Advance the simulation by an amount of time.
 //
@@ -679,24 +655,11 @@ void NewtonUpdate(const NewtonWorld* const newtonWorld, dFloat timestep)
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
 
-	//timestep = ClampValue (timestep, MIN_TIMESTEP, MAX_TIMESTEP * 2.0f);
 	dgFloat32 minstep = dgFloat32 (DG_MIN_TIMESTEP);
 	dgFloat32 maxstep = dgFloat32 (DG_MAX_TIMESTEP);
+
 	timestep = dgClamp (dgFloat32 (timestep), minstep, maxstep);
-	dgInt32 count = dgInt32 (dgCeil (timestep / (DG_TIMESTEP + dgFloat32 (1.0e-10f))));
-	dgFloat32 time = timestep / count;
-	for (dgInt32 i = 0; i < count; i ++) {
-#ifdef DG_USED_DEBUG_EXCEPTIONS
-		__try {
-			world->UpdatePhysics (time);
-		} __except (ExecptionHandler (_exception_info ())){
-			dgAssert (0);
-//				world->UpdatePhysics (time);
-		}
-#else
-		world->UpdatePhysics (time);
-#endif
-	}
+	world->UpdatePhysics (timestep);
 }
 
 

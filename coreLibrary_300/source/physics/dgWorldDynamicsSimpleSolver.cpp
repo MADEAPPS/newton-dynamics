@@ -818,10 +818,12 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 		}
 	}
 
+	dgInt32 maxPasses = dgInt32 (world->m_solverMode + LINEAR_SOLVER_SUB_STEPS);
+
 	dgFloat32 invTimestepSrc = (timestepSrc > dgFloat32 (0.0f)) ? dgFloat32 (1.0f) / timestepSrc : dgFloat32 (0.0f);
-	dgFloat32 invStep = (dgFloat32 (1.0f) / dgFloat32 (LINEAR_SOLVER_SUB_STEPS));
+	dgFloat32 invStep = (dgFloat32 (1.0f) / dgFloat32 (maxPasses));
 	dgFloat32 timestep =  timestepSrc * invStep;
-	dgFloat32 invTimestep = invTimestepSrc * dgFloat32 (LINEAR_SOLVER_SUB_STEPS);
+	dgFloat32 invTimestep = invTimestepSrc * dgFloat32 (maxPasses);
 	dgAssert (bodyArray[0].m_body == world->m_sentinelBody);
 
 	dgFloat32 cacheForce[DG_CONSTRAINT_MAX_ROWS + 4];
@@ -835,8 +837,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 	dgVector freezeOmega2 (world->m_freezeOmega2 * dgFloat32 (0.1f));
 
 	dgFloat32 firstPassCoef = dgFloat32 (0.0f);
-	dgInt32 maxPasses = dgInt32 (world->m_solverMode + DG_BASE_ITERATION_COUNT);
-	for (dgInt32 step = 0; step < LINEAR_SOLVER_SUB_STEPS; step ++) {
+	for (dgInt32 step = 0; step < maxPasses; step ++) {
 		dgJointAccelerationDecriptor joindDesc;
 		joindDesc.m_timeStep = timestep;
 		joindDesc.m_invTimeStep = invTimestep;
@@ -871,7 +872,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 		}
 
 		dgVector accNorm (maxAccNorm * dgFloat32 (2.0f));
-		for (dgInt32 passes = 0; (passes < maxPasses) && (accNorm.m_x > maxAccNorm); passes ++) {
+		for (dgInt32 passes = 0; (passes < DG_BASE_ITERATION_COUNT) && (accNorm.m_x > maxAccNorm); passes ++) {
 
 			accNorm = dgVector (0.0f);
 			for (dgInt32 curJoint = 0; curJoint < jointCount; curJoint ++) {

@@ -36,14 +36,14 @@
 #define	DG_FREEZZING_VELOCITY_DRAG		dgFloat32 (0.9f)
 #define	DG_SOLVER_MAX_ERROR				(DG_FREEZE_MAG * dgFloat32 (0.5f))
 
-
-#define LINEAR_SOLVER_SUB_STEPS			4
-
 #ifdef _MAC_IPHONE
-	#define DG_BASE_ITERATION_COUNT		2
-#else
-	#define DG_BASE_ITERATION_COUNT		3
+	#define LINEAR_SOLVER_SUB_STEPS		2
+#else 
+	#define LINEAR_SOLVER_SUB_STEPS		3
 #endif
+
+#define DG_BASE_ITERATION_COUNT			4
+
 
 // the solver is a RK order, but instead of weighting the intermediate derivative by the usual 1/6, 1/3, 1/3, 1/6 coefficients
 // I am using 1/4, 1/4, 1/4, 1/4.
@@ -105,8 +105,6 @@ class dgJointInfo
 };
 
 
-#define DG_MAX_PARALLEL_PASSES	64
-
 
 class dgParallelJointMap
 {
@@ -147,6 +145,7 @@ class dgParallelSolverSyncData
 	dgInt32 m_jacobianMatrixRowAtomicIndex;
 	dgInt32 m_islandCount;
 	dgInt32 m_islandCountCounter;
+	dgInt32 m_maxPasses;
 
 	const dgIsland* m_islandArray;
 //	dgInt32* m_bodyInfoMap;

@@ -54,11 +54,14 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel (const dgIsland* cons
 	internalForces[0].m_linear = zero;
 	internalForces[0].m_angular = zero;
 
+	dgInt32 maxPasses = dgInt32 (world->m_solverMode + LINEAR_SOLVER_SUB_STEPS);
+
 	syncData.m_timestep = timestep;
 	syncData.m_invTimestep = (timestep > dgFloat32 (0.0f)) ? dgFloat32 (1.0f) / timestep : dgFloat32 (0.0f);
-	syncData.m_invStepRK = (dgFloat32 (1.0f) / dgFloat32 (LINEAR_SOLVER_SUB_STEPS));
+	syncData.m_invStepRK = (dgFloat32 (1.0f) / dgFloat32 (maxPasses));
 	syncData.m_timestepRK = syncData.m_timestep * syncData.m_invStepRK;
-	syncData.m_invTimestepRK = syncData.m_invTimestep * dgFloat32 (LINEAR_SOLVER_SUB_STEPS);
+	syncData.m_invTimestepRK = syncData.m_invTimestep * dgFloat32 (maxPasses);
+	syncData.m_maxPasses = maxPasses;
 
 	syncData.m_bodyCount = bodyCount;
 	syncData.m_jointCount = jointsCount;
@@ -385,7 +388,6 @@ void dgWorldDynamicUpdate::CalculateJointsForceParallelKernel (void* const conte
 	dgJointInfo* const constraintArray = (dgJointInfo*) &world->m_jointsMemory[0];
 	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForces[0];
 	dgJacobianMatrixElement* const matrixRow = &world->m_solverMemory.m_memory[0];
-//	const dgBodyInfo* const bodyArray = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
 	const dgIsland* const island = syncData->m_islandArray;
 	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
 	const dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
@@ -686,13 +688,9 @@ void dgWorldDynamicUpdate::CalculateForcesGameModeParallel (dgParallelSolverSync
 	dgWorld* const world = (dgWorld*) this;
 	dgInt32 threadCounts = world->GetThreadCount();	
 
-	dgInt32 maxPasses = dgInt32 (world->m_solverMode + DG_BASE_ITERATION_COUNT);
-	if (maxPasses > DG_MAX_PARALLEL_PASSES) {
-		maxPasses = DG_MAX_PARALLEL_PASSES;
-	}
-
+	dgInt32 maxPasses = syncData->m_maxPasses;
 	syncData->m_firstPassCoef = dgFloat32 (0.0f);
-	for (dgInt32 step = 0; step < LINEAR_SOLVER_SUB_STEPS; step ++) {
+	for (dgInt32 step = 0; step < maxPasses; step ++) {
 
 		for (int i = 0; i < syncData->m_batchesCount; i ++) {
 			syncData->m_atomicIndex = syncData->m_jointBatches[i].m_start;
@@ -706,7 +704,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameModeParallel (dgParallelSolverSync
 
 		dgFloat32 accNorm = DG_SOLVER_MAX_ERROR * dgFloat32 (2.0f);
 		//for (dgInt32 passes = 0; passes < maxPasses; passes ++) {
-		for (dgInt32 passes = 0; (passes < maxPasses) && (accNorm > DG_SOLVER_MAX_ERROR); passes ++) {
+		for (dgInt32 passes = 0; (passes < DG_BASE_ITERATION_COUNT) && (accNorm > DG_SOLVER_MAX_ERROR); passes ++) {
 			for (dgInt32 i = 0; i < threadCounts; i ++) {
 				syncData->m_accelNorm[i] = dgVector (0.0f);
 			}

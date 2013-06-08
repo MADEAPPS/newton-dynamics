@@ -648,7 +648,8 @@ static int xxx = 0;
 			body1->m_activeMask |= (active & !(!m1));
 		}
 
-		for (dgInt32 j = 0; j < (LINEAR_SOLVER_SUB_STEPS - 1); j ++) {
+		dgInt32 maxPasses = dgInt32 (world->m_solverMode + LINEAR_SOLVER_SUB_STEPS - 1);
+		for (dgInt32 j = 0; j < maxPasses; j ++) {
 			dgUnsigned32 mask = 1 << j;
 			dgUnsigned32 shift = (j + 1);
 			for (dgInt32 i = 0; i < jointCount; i ++) {
@@ -667,7 +668,7 @@ static int xxx = 0;
 			}
 		}
 
-		dgInt32 mask = 1 << (LINEAR_SOLVER_SUB_STEPS - 1);
+		dgInt32 mask = 1 << maxPasses;
 		for (dgInt32 i = 0; i < jointCount; i ++) {
 			dgJointInfo* const jointInfo = &constraintArray[i];
 			dgConstraint* const joint = jointInfo->m_joint;
