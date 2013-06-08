@@ -2998,17 +2998,22 @@ dgInt32 dgCollisionConvex::CalculateContactsGeneric (const dgVector& point, cons
 
 	dgInt32 count1 = 0;
 	dgVector* const shape1 = &contactsOut[baseCount];
-	dgVector support (SupportVertex(normal.Scale3(dgFloat32(-1.0f)), NULL));
-	dgFloat32 dist = normal % (support - point);
+	dgVector support0 (SupportVertex(normal.Scale3(dgFloat32(-1.0f)), NULL));
+	dgFloat32 dist = normal % (support0 - point);
 	if (dist >= (-DG_ROBUST_PLANE_CLIP)) {
-		support += normal.Scale3 (DG_ROBUST_PLANE_CLIP);
-		count1 = CalculatePlaneIntersection (normal, support, shape1);
-		dgVector err (normal.Scale3 (normal % (point - support)));
+		support0 += normal.Scale3 (DG_ROBUST_PLANE_CLIP);
+		count1 = CalculatePlaneIntersection (normal, support0, shape1);
+		dgVector err (normal.Scale3 (normal % (point - support0)));
 		for (dgInt32 i = 0; i < count1; i ++) {
 			shape1[i] += err;
 		}
 	} else {
 		count1 = CalculatePlaneIntersection (normal, point, shape1);
+		if (!count1) {
+			dgVector support1 (SupportVertex(normal, NULL));
+			dgVector center ((support0 + support1).Scale3 (dgFloat32 (0.5f)));
+			count1 = CalculatePlaneIntersection (normal, center, shape1);
+		}
 	}
 	if (count1) {
 		const dgVector& myScale = myInstance->m_scale;
@@ -3023,17 +3028,22 @@ dgInt32 dgCollisionConvex::CalculateContactsGeneric (const dgVector& point, cons
 		dgInt32 count2 = 0;
 		dgVector* const shape2 = &contactsOut[baseCount + count1];
 		dgInt32 index;
-		support = otherShape->SupportVertex(n, &index);
-		dist = n % (support - p);
+		dgVector support0 (otherShape->SupportVertex(n, &index));
+		dist = n % (support0 - p);
 		if (dist < DG_ROBUST_PLANE_CLIP) {
-			support += n.Scale3 (-DG_ROBUST_PLANE_CLIP);
-			count2 = otherShape->CalculatePlaneIntersection (n, support, shape2);
-			dgVector err (n.Scale3 (n % (p - support)));
+			support0 += n.Scale3 (-DG_ROBUST_PLANE_CLIP);
+			count2 = otherShape->CalculatePlaneIntersection (n, support0, shape2);
+			dgVector err (n.Scale3 (n % (p - support0)));
 			for (dgInt32 i = 0; i < count2; i ++) {
 				shape2[i] += err;
 			}
 		} else {
 			count2 = otherShape->CalculatePlaneIntersection (n, p, shape2);
+			if (!count2) {
+				dgVector support1 (otherShape->SupportVertex(n.Scale3 (dgFloat32 (-1.0f)), &index));
+				dgVector center ((support0 + support1).Scale3 (dgFloat32 (0.5f)));
+				count2 = otherShape->CalculatePlaneIntersection (n, center, shape2);
+			}
 		}
 		if (count2) {
 			dgAssert (count2);
