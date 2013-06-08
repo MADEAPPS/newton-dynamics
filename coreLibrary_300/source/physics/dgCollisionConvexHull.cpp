@@ -435,16 +435,17 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 	polyhedra.EndFace();
 
 	if (vertexCount > 4) {
-		bool edgeRemoved = false;
-		while (RemoveCoplanarEdge (polyhedra, hullVertexArray)) {
-			edgeRemoved = true;
-		}
-		if (edgeRemoved) {
-			if (!CheckConvex (polyhedra, hullVertexArray)) {
-				delete convexHull;
-				return false;
-			}
-		}
+//		bool edgeRemoved = false;
+//		while (RemoveCoplanarEdge (polyhedra, hullVertexArray)) {
+//			edgeRemoved = true;
+//		}
+//		if (edgeRemoved) {
+//			if (!CheckConvex (polyhedra, hullVertexArray)) {
+//				delete convexHull;
+//				return false;
+//			}
+//		}
+		while (RemoveCoplanarEdge (polyhedra, hullVertexArray));
 	}
 
 	dgStack<dgInt32> vertexMap(vertexCount);
