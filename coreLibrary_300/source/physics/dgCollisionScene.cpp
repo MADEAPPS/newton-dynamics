@@ -134,7 +134,17 @@ void dgCollisionScene::CollidePair (dgCollidingPairCollector::dgPair* const pair
 						dgCollisionInstance childInstance (*me->GetShape(), me->GetShape()->GetChildShape());
 						childInstance.SetGlobalMatrix(childInstance.GetLocalMatrix() * myMatrix);
 						proxy.m_floatingCollision = &childInstance;
+						dgInt32 count = pair->m_contactCount;
 						m_world->SceneChildContacts (pair, proxy);
+						if (pair->m_contactCount > count) {
+							dgContactPoint* const buffer = proxy.m_contacts;
+							for (dgInt32 i = 0; i < pair->m_contactCount; i ++) {
+								dgAssert (buffer[i].m_collision0 == proxy.m_referenceCollision);
+								if (buffer[i].m_collision1 == proxy.m_floatingCollision) {
+									buffer[i].m_collision1 = me->GetShape();
+								}
+							}
+						}
 						closestDist = dgMin(closestDist, constraint->m_closestDistance);
 					}
 
@@ -175,7 +185,17 @@ void dgCollisionScene::CollidePair (dgCollidingPairCollector::dgPair* const pair
 						dgCollisionInstance childInstance (*me->GetShape(), me->GetShape()->GetChildShape());
 						childInstance.SetGlobalMatrix(childInstance.GetLocalMatrix() * myMatrix);
 						proxy.m_floatingCollision = &childInstance;
+						dgInt32 count = pair->m_contactCount;
 						m_world->SceneChildContacts (pair, proxy);
+						if (pair->m_contactCount > count) {
+							dgContactPoint* const buffer = proxy.m_contacts;
+							for (dgInt32 i = 0; i < pair->m_contactCount; i ++) {
+								dgAssert (buffer[i].m_collision0 == proxy.m_referenceCollision);
+								if (buffer[i].m_collision1 == proxy.m_floatingCollision) {
+									buffer[i].m_collision1 = me->GetShape();
+								}
+							}
+						}
 						closestDist = dgMin(closestDist, constraint->m_closestDistance);
 					}
 
@@ -256,7 +276,21 @@ void dgCollisionScene::CollideCompoundPair (dgCollidingPairCollector::dgPair* co
 						otherInstance.SetGlobalMatrix(otherInstance.GetLocalMatrix() * otherMatrix);
 						proxy.m_floatingCollision = &childInstance;
 						proxy.m_referenceCollision = &otherInstance;
+
+						dgInt32 count = pair->m_contactCount;
 						m_world->SceneChildContacts (pair, proxy);
+						if (pair->m_contactCount > count) {
+							dgContactPoint* const buffer = proxy.m_contacts;
+							for (dgInt32 i = 0; i < pair->m_contactCount; i ++) {
+								if (buffer[i].m_collision0 == proxy.m_floatingCollision) {
+									buffer[i].m_collision0 = me->GetShape();
+								}
+								if (buffer[i].m_collision1 == proxy.m_referenceCollision) {
+									buffer[i].m_collision1 = other->GetShape();
+								}
+							}
+						}
+
 						closestDist = dgMin(closestDist, constraint->m_closestDistance);
 					}
 
