@@ -24,6 +24,7 @@
 
 #include "dgPhysicsStdafx.h"
 
+
 class dgBody;
 class dgWorld;
 class dgContact;
@@ -66,7 +67,14 @@ class dgBroadPhase
 	public:
 	DG_CLASS_ALLOCATOR(allocator);
 
+	enum dgType
+	{
+		m_generic = 0,
+		m_persistent,
+	};
+
 	class dgNode;
+
 
 	dgBroadPhase(dgWorld* const world);
 	~dgBroadPhase();
@@ -75,6 +83,9 @@ class dgBroadPhase
 	void RayCast (const dgVector& p0, const dgVector& p1, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData) const;
 	dgInt32 ConvexCast (dgCollisionInstance* const shape, const dgMatrix& p0, const dgVector& p1, dgFloat32& timetoImpact, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const;
 	void ForEachBodyInAABB (const dgVector& q0, const dgVector& q1, OnBodiesInAABB callback, void* const userData) const;
+
+	dgInt32 GetBroadPhaseType () const;
+	void SelectBroadPhaseType (dgInt32 algorthmType);
 
 	protected:
 	class dgFitnessList: public dgList <dgNode*>
@@ -109,19 +120,24 @@ class dgBroadPhase
 	void CalculatePairContacts (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID);
 	void UpdateSoftBodyForcesKernel (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID);
 	
-	void FindCollidingPairsDynamics (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
+
+	void FindCollidingPairsGeneric (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
+	void FindCollidingPairsPersistent (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
+	void SubmitPairsPersistent (dgNode* const body, dgNode* const node, const dgVector& timeStepBound, dgInt32 threadID);
+
 	void KinematicBodyActivation (dgContact* const contatJoint) const;
+
 	bool TestOverlaping (const dgBody* const body0, const dgBody* const body1) const;
 
 	dgWorld* m_world;
 	dgNode* m_rootNode;
 	dgUnsigned32 m_lru;
 	dgFitnessList m_fitness;
+	dgType m_broadPhaseType;
 	dgThread::dgCriticalSection m_contacJointLock;
 	dgThread::dgCriticalSection m_criticalSectionLock;
 
 	static dgVector m_conservativeRotAngle;
-
 	friend class dgBody;
 	friend class dgWorld;
 	friend class dgWorldDynamicUpdate;

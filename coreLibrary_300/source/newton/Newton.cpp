@@ -190,6 +190,23 @@ void NewtonDestroy(const NewtonWorld* const newtonWorld)
 }
 
 
+int NewtonGetBroadphaseAlgorithm (const NewtonWorld* const newtonWorld)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+
+	Newton* const world = (Newton *) newtonWorld;
+	return world->GetBroadPhase()->GetBroadPhaseType();
+}
+
+
+void NewtonSelectBroadphaseAlgorithm (const NewtonWorld* const newtonWorld, int algorithmType)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+
+	Newton* const world = (Newton *) newtonWorld;
+	world->GetBroadPhase()->SelectBroadPhaseType(algorithmType);
+}
+
 // Name: NewtonInvalidateCache 
 // Reset all internal states of the engine.
 //

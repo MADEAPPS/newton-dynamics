@@ -79,12 +79,14 @@ class dgBroadPhase::dgNode
 		dgNode* const left = m_left;
 		dgNode* const right = m_right;
 
-		m_minBox = dgVector (dgMin (left->m_minBox.m_x, right->m_minBox.m_x), dgMin (left->m_minBox.m_y, right->m_minBox.m_y), dgMin (left->m_minBox.m_z, right->m_minBox.m_z), dgFloat32 (0.0f));
-		m_maxBox = dgVector (dgMax (left->m_maxBox.m_x, right->m_maxBox.m_x), dgMax (left->m_maxBox.m_y, right->m_maxBox.m_y), dgMax (left->m_maxBox.m_z, right->m_maxBox.m_z), dgFloat32 (0.0f));
+//		m_minBox = dgVector (dgMin (left->m_minBox.m_x, right->m_minBox.m_x), dgMin (left->m_minBox.m_y, right->m_minBox.m_y), dgMin (left->m_minBox.m_z, right->m_minBox.m_z), dgFloat32 (0.0f));
+//		m_maxBox = dgVector (dgMax (left->m_maxBox.m_x, right->m_maxBox.m_x), dgMax (left->m_maxBox.m_y, right->m_maxBox.m_y), dgMax (left->m_maxBox.m_z, right->m_maxBox.m_z), dgFloat32 (0.0f));
+		m_minBox = left->m_minBox.GetMin(right->m_minBox);
+		m_maxBox = left->m_maxBox.GetMax(right->m_maxBox);
 
 		dgVector side0 (m_maxBox - m_minBox);
 		dgVector side1 (side0.m_y, side0.m_z, side0.m_x, dgFloat32 (0.0f));
-		m_surfaceArea = side0 % side1;
+		m_surfaceArea = side0.DotProduct4(side1).m_x;
 	}
 
 
@@ -162,7 +164,7 @@ dgVector dgBroadPhase::dgNode::m_broadInvPhaseScale (DG_BROADPHASE_AABB_INV_SCAL
 class dgBroadphaseSyncDescriptor
 {
 	public:
-		dgBroadphaseSyncDescriptor(dgThread::dgCriticalSection* const lock)
+		dgBroadphaseSyncDescriptor(dgBroadPhase::dgType broadPhaseType, dgThread::dgCriticalSection* const lock)
 		:m_lock(lock)
 		,m_pairsCount(0)
 		,m_pairsAtomicCounter(0)
@@ -171,6 +173,7 @@ class dgBroadphaseSyncDescriptor
 		,m_collindPairBodyNode(NULL)
 		,m_forceAndTorqueBodyNode(NULL)
 		,m_sofBodyNode(NULL)
+		,m_broadPhaseType(broadPhaseType)
 	{
 	}
 
@@ -279,6 +282,7 @@ class dgBroadphaseSyncDescriptor
 	dgBodyMasterList::dgListNode* m_collindPairBodyNode;
 	dgBodyMasterList::dgListNode* m_forceAndTorqueBodyNode;
 	dgCollisionDeformableMeshList::dgListNode* m_sofBodyNode;
+	dgBroadPhase::dgType m_broadPhaseType;
 	dgBroadPhase::dgNode* m_pairs[1024 * 4];	
 };
 
@@ -289,6 +293,7 @@ dgBroadPhase::dgBroadPhase(dgWorld* const world)
 	,m_rootNode (NULL)
 	,m_lru(0)
 	,m_fitness(world->GetAllocator())
+	,m_broadPhaseType(m_generic)
 	,m_contacJointLock()
 	,m_criticalSectionLock()
 {
@@ -368,13 +373,30 @@ void dgBroadPhase::ForEachBodyInAABB (const dgVector& q0, const dgVector& q1, On
 }
 
 
+dgInt32 dgBroadPhase::GetBroadPhaseType () const
+{
+	return m_broadPhaseType;
+}
+
+void dgBroadPhase::SelectBroadPhaseType (dgInt32 algorthmType)
+{
+	if (algorthmType == 0) {
+		m_broadPhaseType = m_generic;
+	} else {
+		m_broadPhaseType = m_persistent;
+	}
+}
+
+
 DG_INLINE dgFloat32 dgBroadPhase::CalculateSurfaceArea (const dgNode* const node0, const dgNode* const node1, dgVector& minBox, dgVector& maxBox) const
 {
-	minBox = dgVector (dgMin (node0->m_minBox.m_x, node1->m_minBox.m_x), dgMin (node0->m_minBox.m_y, node1->m_minBox.m_y), dgMin (node0->m_minBox.m_z, node1->m_minBox.m_z), dgFloat32 (0.0f));
-	maxBox = dgVector (dgMax (node0->m_maxBox.m_x, node1->m_maxBox.m_x), dgMax (node0->m_maxBox.m_y, node1->m_maxBox.m_y), dgMax (node0->m_maxBox.m_z, node1->m_maxBox.m_z), dgFloat32 (0.0f));		
+//	minBox = dgVector (dgMin (node0->m_minBox.m_x, node1->m_minBox.m_x), dgMin (node0->m_minBox.m_y, node1->m_minBox.m_y), dgMin (node0->m_minBox.m_z, node1->m_minBox.m_z), dgFloat32 (0.0f));
+//	maxBox = dgVector (dgMax (node0->m_maxBox.m_x, node1->m_maxBox.m_x), dgMax (node0->m_maxBox.m_y, node1->m_maxBox.m_y), dgMax (node0->m_maxBox.m_z, node1->m_maxBox.m_z), dgFloat32 (0.0f));		
+	minBox = node0->m_minBox.GetMin(node1->m_minBox);
+	maxBox = node0->m_maxBox.GetMax(node1->m_maxBox);
 	dgVector side0 (maxBox - minBox);
 	dgVector side1 (side0.m_y, side0.m_z, side0.m_x, dgFloat32 (0.0f));
-	return side0 % side1;
+	return side0.DotProduct4(side1).m_x;
 }
 
 
@@ -984,10 +1006,18 @@ void dgBroadPhase::CollidingPairsKernel (void* const context, void* const worldC
 
 	if (!threadID) {
 		dgUnsigned32 ticks0 = world->m_getPerformanceCount();
-		broadPhase->FindCollidingPairsDynamics (descriptor, threadID);
+		if (descriptor->m_broadPhaseType == dgBroadPhase::m_generic) {
+			broadPhase->FindCollidingPairsGeneric (descriptor, threadID);
+		} else {
+			broadPhase->FindCollidingPairsPersistent (descriptor, threadID);
+		}
 		world->m_perfomanceCounters[m_broadPhaceTicks] = world->m_getPerformanceCount() - ticks0;
 	} else {
-		broadPhase->FindCollidingPairsDynamics (descriptor, threadID);
+		if (descriptor->m_broadPhaseType == dgBroadPhase::m_generic) {
+			broadPhase->FindCollidingPairsGeneric (descriptor, threadID);
+		} else {
+			broadPhase->FindCollidingPairsPersistent (descriptor, threadID);
+		}
 	}
 }
 
@@ -1034,7 +1064,78 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 	return tier0 & tier1 & tier2 & (tier3 | tier4 | tier5 | tier6);
 }
 
-void dgBroadPhase::FindCollidingPairsDynamics (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID)
+void dgBroadPhase::SubmitPairsPersistent (dgNode* const bodyNode, dgNode* const node, const dgVector& timeStepBound, dgInt32 threadID)
+{
+	dgNode* pool[DG_BROADPHASE_MAX_STACK_DEPTH];
+	pool[0] = node;
+	dgInt32 stack = 1;
+
+	dgBody* const body0 = bodyNode->m_body;
+	dgAssert (!body0->m_collision->IsType (dgCollision::dgCollisionNull_RTTI));
+	
+	while (stack) {
+		stack --;
+		dgNode* const rootNode = pool[stack];
+		if (dgOverlapTest (rootNode->m_minBox, rootNode->m_maxBox, body0->m_minAABB, body0->m_maxAABB)) {
+			if (!rootNode->m_left) {
+				dgAssert (!rootNode->m_right);
+				dgBody* const body1 = rootNode->m_body;
+				if (TestOverlaping (body0, body1)) {
+					AddPair (body0, body1, timeStepBound, threadID);
+				}
+
+			} else {
+				pool[stack] = rootNode->m_left;
+				stack ++;
+				dgAssert (stack < dgInt32 (sizeof (pool) / sizeof (pool[0])));
+
+				pool[stack] = rootNode->m_right;
+				stack ++;
+				dgAssert (stack < dgInt32 (sizeof (pool) / sizeof (pool[0])));
+			}
+		}
+	}
+}
+
+
+void dgBroadPhase::FindCollidingPairsPersistent (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID)
+{
+
+	dgVector timestep2 (descriptor->m_timestep * descriptor->m_timestep * dgFloat32 (4.0f));
+	dgBodyMasterList::dgListNode* node = NULL;
+	{
+		dgThreadHiveScopeLock lock (m_world, descriptor->m_lock);
+		node = descriptor->m_collindPairBodyNode;
+		if (node) {
+			descriptor->m_collindPairBodyNode = node->GetNext();
+		}
+	}
+	
+	for ( ;node; ) {
+		dgBody* const body = node->GetInfo().GetBody();
+		if (body->m_collisionCell) {
+			if (!body->m_collision->IsType (dgCollision::dgCollisionNull_RTTI)) {
+				dgNode* const bodyNode = body->m_collisionCell;
+				for (dgNode* ptr = bodyNode; ptr->m_parent; ptr = ptr->m_parent) {
+					dgNode* const sibling = ptr->m_parent->m_right;
+					if (sibling != ptr) {
+						SubmitPairsPersistent (bodyNode, sibling, timestep2, threadID);
+					}
+				}
+			}
+		}
+
+		dgThreadHiveScopeLock lock (m_world, descriptor->m_lock);
+		node = descriptor->m_collindPairBodyNode;
+		if (node) {
+			descriptor->m_collindPairBodyNode = node->GetNext();
+		}
+	}
+}
+
+
+
+void dgBroadPhase::FindCollidingPairsGeneric (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID)
 {
 	dgNode* pool[2 * DG_BROADPHASE_MAX_STACK_DEPTH];		
 	dgInt32 index;
@@ -1339,7 +1440,8 @@ void dgBroadPhase::UpdateContacts( dgFloat32 timestep)
 
 	dgInt32 threadsCount = m_world->GetThreadCount();	
 
-	dgBroadphaseSyncDescriptor syncPoints(&m_criticalSectionLock);
+	dgBroadphaseSyncDescriptor syncPoints(m_broadPhaseType, &m_criticalSectionLock);
+//	syncPoints.m_world = m_world;
 	syncPoints.m_timestep = timestep;
 	
 	const dgBodyMasterList* const masterList = m_world;
@@ -1366,7 +1468,9 @@ void dgBroadPhase::UpdateContacts( dgFloat32 timestep)
 	}
 
 	ImproveFitness();
-	syncPoints.CreatePairsJobs (m_rootNode);
+	if (m_broadPhaseType == m_generic) {
+		syncPoints.CreatePairsJobs (m_rootNode);
+	}
 
 	for (dgInt32 i = 0; i < threadsCount; i ++) {
 		m_world->QueueJob (CollidingPairsKernel, &syncPoints, m_world);
