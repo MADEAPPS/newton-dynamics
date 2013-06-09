@@ -602,9 +602,8 @@ void GenericContactProcess (const NewtonJoint* contactJoint, dFloat timestep, in
 		dVector dir0;	
 		dVector dir1;	
 		dVector force;
-		NewtonMaterial* material;
 
-		material = NewtonContactGetMaterial (contact);
+		NewtonMaterial* const material = NewtonContactGetMaterial (contact);
 
 		NewtonMaterialGetContactForce (material, body, &force.m_x);
 		NewtonMaterialGetContactPositionAndNormal (material, body, &point.m_x, &normal.m_x);
