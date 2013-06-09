@@ -26,6 +26,7 @@
 
 CustomCorkScrew::CustomCorkScrew (const dMatrix& pinAndPivotFrame, NewtonBody* child, NewtonBody* parent)
 	:CustomJoint(6, child, parent)
+	,m_curJointAngle()
 {
 	m_limitsLinearOn = false;
 	m_limitsAngularOn = false;
@@ -119,6 +120,48 @@ void CustomCorkScrew::SubmitConstraints (dFloat timestep, int threadIndex)
 			NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
 		}
 	}
+
+	dFloat angle;
+	dFloat sinAngle;
+	dFloat cosAngle;
+	sinAngle = (matrix0.m_up * matrix1.m_up) % matrix0.m_front;
+	cosAngle = matrix0.m_up % matrix1.m_up;
+	angle = m_curJointAngle.CalculateJointAngle (cosAngle, sinAngle);
+
+	if (m_limitsAngularOn) {
+		// the joint angle can be determine by getting the angle between any two non parallel vectors
+		if (angle < m_minAngularDist) {
+			dFloat relAngle = angle - m_minAngularDist;
+			// the angle was clipped save the new clip limit
+			m_curJointAngle.m_angle = m_minAngularDist;
+
+			// tell joint error will minimize the exceeded angle error
+			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix0.m_front[0]);
+
+			// need high stiffness here
+			NewtonUserJointSetRowStiffness (m_joint, 1.0f);
+
+			// allow the joint to move back freely 
+			NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
+
+
+		} else if (angle  > m_maxAngularDist) {
+			dFloat relAngle = angle - m_maxAngularDist;
+
+			// the angle was clipped save the new clip limit
+			m_curJointAngle.m_angle = m_maxAngularDist;
+
+			// tell joint error will minimize the exceeded angle error
+			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix0.m_front[0]);
+
+			// need high stiffness here
+			NewtonUserJointSetRowStiffness (m_joint, 1.0f);
+
+			// allow the joint to move back freely
+			NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
+		}
+	}
+
 
 	if (m_angularmotorOn) {
 		dVector omega0 (0.0f, 0.0f, 0.0f);

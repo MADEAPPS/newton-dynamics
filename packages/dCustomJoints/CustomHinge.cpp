@@ -26,15 +26,13 @@
 //dInitRtti(CustomHinge);
 
 CustomHinge::CustomHinge (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
-	:CustomJoint(6, child, parent), m_curJointAngle()
+	:CustomJoint(6, child, parent)
+	,m_curJointAngle()
 {
 	m_limitsOn = false;
 	m_jointOmega = 0.0f;
 	m_minAngle = -45.0f * 3.141592f / 180.0f;
 	m_maxAngle =  45.0f * 3.141592f / 180.0f;
-
-//	// the joint current angle is zero at joint creation time
-//	m_curJointAngle = 0.0f;
 
 	// calculate the two local matrix of the pivot point
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
@@ -48,9 +46,6 @@ CustomHinge::CustomHinge (const dMatrix& pinAndPivotFrameChild, const dMatrix& p
 	m_jointOmega = 0.0f;
 	m_minAngle = -45.0f * 3.141592f / 180.0f;
 	m_maxAngle =  45.0f * 3.141592f / 180.0f;
-
-	//	// the joint current angle is zero at joint creation time
-	//	m_curJointAngle = 0.0f;
 
 	dMatrix	dummy;
 	CalculateLocalMatrix (pinAndPivotFrameChild, m_localMatrix0, dummy);
@@ -126,16 +121,8 @@ void CustomHinge::SubmitConstraints (dFloat timestep, int threadIndex)
 
 	// if limit are enable ...
 	if (m_limitsOn) {
-
 		// the joint angle can be determine by getting the angle between any two non parallel vectors
-//		sinAngle = (matrix0.m_up * matrix1.m_up) % matrix0.m_front;
-//		cosAngle = matrix0.m_up % matrix1.m_up;
-//		angle = dAtan2 (sinAngle, cosAngle);
-
-
-//		if (angle < m_minAngle) {
 		if (angle < m_minAngle) {
-//			relAngle = angle - m_minAngle;
 			dFloat relAngle = angle - m_minAngle;
 			// the angle was clipped save the new clip limit
 			m_curJointAngle.m_angle = m_minAngle;
@@ -151,7 +138,6 @@ void CustomHinge::SubmitConstraints (dFloat timestep, int threadIndex)
 
 
 		} else if (angle  > m_maxAngle) {
-//			relAngle = angle - m_maxAngle;
 			dFloat relAngle = angle - m_maxAngle;
 
 			// the angle was clipped save the new clip limit
@@ -165,7 +151,6 @@ void CustomHinge::SubmitConstraints (dFloat timestep, int threadIndex)
 
 			// allow the joint to move back freely
 			NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
-
 		}
 	}
 

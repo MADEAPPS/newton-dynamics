@@ -23,30 +23,18 @@
 
 //dInitRtti(CustomRackAndPinion);
 
-CustomRackAndPinion::CustomRackAndPinion(
-	dFloat gearRatio, 
-    const dVector& rotationalPin, 
-	const dVector& linearPin, 
-    NewtonBody* rotationalBody, 
-	NewtonBody* linearBody)
+CustomRackAndPinion::CustomRackAndPinion(dFloat gearRatio, const dVector& rotationalPin, const dVector& linearPin, NewtonBody* rotationalBody, NewtonBody* linearBody)
 	:CustomJoint(1, rotationalBody, linearBody)
 {
 	m_gearRatio = gearRatio;
 
-	// calculate the two local matrix of the pivot point
-//	dVector pivot (0.0f, 0.0f, 0.0f);
-
 	dMatrix dommyMatrix;
-	// calculate the local matrix for body body0
 
 	dMatrix pinAndPivot0 (dgGrammSchmidt (rotationalPin));
-//	CalculateLocalMatrix (pivot, rotationalPin, m_localMatrix0, dommyMatrix);
 	CalculateLocalMatrix (pinAndPivot0, m_localMatrix0, dommyMatrix);
 
 	// calculate the local matrix for body body1  
-//	dAssert (0);
 	dMatrix pinAndPivot1 (dgGrammSchmidt(linearPin));
-//	CalculateLocalMatrix (pivot, linearPin, dommyMatrix, m_localMatrix1);
 	CalculateLocalMatrix (pinAndPivot1, dommyMatrix, m_localMatrix1);
 }
 
@@ -96,14 +84,14 @@ void CustomRackAndPinion::SubmitConstraints (dFloat timestep, int threadIndex)
 	jacobian0[2] = 0.0f;
 
 	// set the angular part of Jacobian 0 pin vector		
-	jacobian0[3] = 	matrix0.m_front[0];
-	jacobian0[4] = 	matrix0.m_front[1];
-	jacobian0[5] = 	matrix0.m_front[2];
+	jacobian0[3] = matrix0.m_front[0];
+	jacobian0[4] = matrix0.m_front[1];
+	jacobian0[5] = matrix0.m_front[2];
 
 	// set the linear part of Jacobian 1 to translational pin vector	
-	jacobian1[0] = 	matrix1.m_front[0];
-	jacobian1[1] = 	matrix1.m_front[1];
-	jacobian1[2] = 	matrix1.m_front[2];
+	jacobian1[0] = matrix1.m_front[0];
+	jacobian1[1] = matrix1.m_front[1];
+	jacobian1[2] = matrix1.m_front[2];
 
 	// set the rotational part of Jacobian 1 to zero
 	jacobian1[3] = 	0.0f;

@@ -30,7 +30,8 @@ class CustomGear: public CustomJoint
 	public:
 	//dAddRtti(CustomJoint);
 
-	NEWTON_API CustomGear(dFloat gearRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const parenPin, NewtonBody* const parent);
+	NEWTON_API CustomGear(dFloat gearRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const child, NewtonBody* const parent);
+	NEWTON_API CustomGear(int dof, NewtonBody* const child, NewtonBody* const parent);
 	NEWTON_API virtual ~CustomGear();
 
 
@@ -44,5 +45,20 @@ class CustomGear: public CustomJoint
 	dFloat m_gearRatio;
 };
 
-#endif // !defined(AFX_CustomGear_H__B631F556_468B_4331_B7D7_F85ECF3E9ADE_H)
+class CustomGearAndSlide: public CustomGear
+{
+	public:
+	//dAddRtti(CustomGearAndSlide);
+	NEWTON_API CustomGearAndSlide (dFloat gearRatio, dFloat slideRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const parenPin, NewtonBody* const parent);
+	NEWTON_API virtual ~CustomGearAndSlide();
+
+	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
+
+	protected:
+	dFloat m_slideRatio;
+};
+
+
+#endif 
 

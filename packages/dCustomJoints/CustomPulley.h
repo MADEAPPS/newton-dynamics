@@ -34,6 +34,24 @@ class CustomPulley: public CustomJoint
 	NEWTON_API CustomPulley(dFloat pulleyRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const parenPin, NewtonBody* const parent);
 	NEWTON_API virtual ~CustomPulley();
 
+	protected:
+	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
+
+	dMatrix m_localMatrix0;
+	dMatrix m_localMatrix1;
+
+	dFloat m_gearRatio;
+};
+
+/*
+class CustomPulleyAndTwist: public CustomPulley
+{
+	public:
+	//dAddRtti(CustomPulleyAndTwist);
+
+	NEWTON_API CustomPulleyAndTwist(dFloat pulleyRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const parenPin, NewtonBody* const parent);
+	NEWTON_API virtual ~CustomPulley();
 
 	protected:
 	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
@@ -44,6 +62,7 @@ class CustomPulley: public CustomJoint
 
 	dFloat m_gearRatio;
 };
+*/
 
 #endif 
 

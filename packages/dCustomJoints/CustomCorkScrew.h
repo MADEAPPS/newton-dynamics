@@ -49,7 +49,7 @@ class CustomCorkScrew: public CustomJoint
 	bool m_angularmotorOn;
 	dFloat m_angularDamp;
 	dFloat m_angularAccel;
-	
+	AngularIntegration m_curJointAngle;
 };
 
 #endif // !defined(AFX_CUSTOMCORKSCREW_H__B631F556_468B_4331_B7D7_F85ECF3E9ADE_H)
