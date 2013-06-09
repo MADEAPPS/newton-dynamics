@@ -422,8 +422,14 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 		}
 	}
 
-
+	dgAssert (convexHull);
 	dgInt32 vertexCount = convexHull->GetVertexCount();
+	if (vertexCount < 4) {
+		delete convexHull;
+		return false;
+	}
+	
+
 	const dgBigVector* const hullVertexArray = convexHull->GetVertexPool();
 
 	dgPolyhedra polyhedra (GetAllocator());
