@@ -1914,16 +1914,19 @@ return NULL;
 */
 
 
-dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator* const allocator, dgInt32 pointCount, dgInt32 pointStrideInBytes, const dgFloat32* const pointCloud, dgInt32 materialId, const dgMatrix& textureProjectionMatrix, dgFloat32 borderSize)
+dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator* const allocator, dgInt32 pointCount, dgInt32 pointStrideInBytes, const dgFloat32* const pointCloud, dgInt32 materialId, const dgMatrix& textureProjectionMatrix)
 {
 	dgFloat32 normalAngleInRadians = 30.0f * 3.1416f / 180.0f;
 
-	dgStack<dgBigVector> buffer(pointCount);
+	dgStack<dgBigVector> buffer(pointCount + 16);
 	dgBigVector* const pool = &buffer[0];
 	dgInt32 count = 0;
 	dgFloat64 quantizeFactor = dgFloat64 (16.0f);
 	dgFloat64 invQuantizeFactor = dgFloat64 (1.0f) / quantizeFactor;
 	dgInt32 stride = pointStrideInBytes / sizeof (dgFloat32); 
+
+	dgBigVector pMin (dgFloat32 (1.0e10f), dgFloat32 (1.0e10f), dgFloat32 (1.0e10f), dgFloat32 (0.0f));
+	dgBigVector pMax (dgFloat32 (-1.0e10f), dgFloat32 (-1.0e10f), dgFloat32 (-1.0e10f), dgFloat32 (0.0f));
 	for (dgInt32 i = 0; i < pointCount; i ++) {
 		dgFloat64 x = pointCloud[i * stride + 0];
 		dgFloat64 y	= pointCloud[i * stride + 1];
@@ -1932,11 +1935,34 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 		y = floor (y * quantizeFactor) * invQuantizeFactor;
 		z = floor (z * quantizeFactor) * invQuantizeFactor;
 		dgBigVector p (x, y, z, dgFloat64 (0.0f));
+		pMin = dgBigVector (dgMin (x, pMin.m_x), dgMin (y, pMin.m_y), dgMin (z, pMin.m_z), dgFloat64 (0.0f));
+		pMax = dgBigVector (dgMax (x, pMax.m_x), dgMax (y, pMax.m_y), dgMax (z, pMax.m_z), dgFloat64 (0.0f));
 		pool[count] = p;
 		count ++;
 	}
+	// add the bbox as a barrier
+	pool[count + 0] = dgBigVector ( pMin.m_x, pMin.m_y, pMin.m_z, dgFloat64 (0.0f));
+	pool[count + 1] = dgBigVector ( pMax.m_x, pMin.m_y, pMin.m_z, dgFloat64 (0.0f));
+	pool[count + 2] = dgBigVector ( pMin.m_x, pMax.m_y, pMin.m_z, dgFloat64 (0.0f));
+	pool[count + 3] = dgBigVector ( pMax.m_x, pMax.m_y, pMin.m_z, dgFloat64 (0.0f));
+	pool[count + 4] = dgBigVector ( pMin.m_x, pMin.m_y, pMax.m_z, dgFloat64 (0.0f));
+	pool[count + 5] = dgBigVector ( pMax.m_x, pMin.m_y, pMax.m_z, dgFloat64 (0.0f));
+	pool[count + 6] = dgBigVector ( pMin.m_x, pMax.m_y, pMax.m_z, dgFloat64 (0.0f));
+	pool[count + 7] = dgBigVector ( pMax.m_x, pMax.m_y, pMax.m_z, dgFloat64 (0.0f));
 
-	dgAssert (count >= 4);
+	// add the a guard zone, so that we do no have to clip
+	dgInt32 guadVertexKey = count;
+	pool[count + 0] = dgBigVector ( pMin.m_x * dgFloat32 (2.0f), pMin.m_y * dgFloat32 (2.0f), pMin.m_z * dgFloat32 (2.0f), dgFloat64 (0.0f));
+	pool[count + 1] = dgBigVector ( pMax.m_x * dgFloat32 (2.0f), pMin.m_y * dgFloat32 (2.0f), pMin.m_z * dgFloat32 (2.0f), dgFloat64 (0.0f));
+	pool[count + 2] = dgBigVector ( pMin.m_x * dgFloat32 (2.0f), pMax.m_y * dgFloat32 (2.0f), pMin.m_z * dgFloat32 (2.0f), dgFloat64 (0.0f));
+	pool[count + 3] = dgBigVector ( pMax.m_x * dgFloat32 (2.0f), pMax.m_y * dgFloat32 (2.0f), pMin.m_z * dgFloat32 (2.0f), dgFloat64 (0.0f));
+	pool[count + 4] = dgBigVector ( pMin.m_x * dgFloat32 (2.0f), pMin.m_y * dgFloat32 (2.0f), pMax.m_z * dgFloat32 (2.0f), dgFloat64 (0.0f));
+	pool[count + 5] = dgBigVector ( pMax.m_x * dgFloat32 (2.0f), pMin.m_y * dgFloat32 (2.0f), pMax.m_z * dgFloat32 (2.0f), dgFloat64 (0.0f));
+	pool[count + 6] = dgBigVector ( pMin.m_x * dgFloat32 (2.0f), pMax.m_y * dgFloat32 (2.0f), pMax.m_z * dgFloat32 (2.0f), dgFloat64 (0.0f));
+	pool[count + 7] = dgBigVector ( pMax.m_x * dgFloat32 (2.0f), pMax.m_y * dgFloat32 (2.0f), pMax.m_z * dgFloat32 (2.0f), dgFloat64 (0.0f));
+
+
+	dgAssert (count >= 12);
 	dgStack<dgInt32> indexList(count);
 	count = dgVertexListToIndexList(&pool[0].m_x, sizeof (dgBigVector), 3, count, &indexList[0], dgFloat64 (1.0e-5f));	
 	if (count < 4) {
@@ -1947,7 +1973,7 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 	delaunayTetrahedras.RemoveUpperHull ();
 
 	dgInt32 tetraCount = delaunayTetrahedras.GetCount();
-	dgStack<dgBigVector> voronoiPoints(tetraCount);
+	dgStack<dgBigVector> voronoiPoints(tetraCount + 32);
 	dgStack<dgDelaunayTetrahedralization::dgListNode*> tetradrumNode(tetraCount);
 	dgTree<dgList<dgInt32>, dgInt32> delanayNodes (allocator);	
 
@@ -1955,8 +1981,7 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 	const dgHullVector* const delanayPoints = delaunayTetrahedras.GetHullVertexArray();
 	for (dgDelaunayTetrahedralization::dgListNode* node = delaunayTetrahedras.GetFirst(); node; node = node->GetNext()) {
 		dgConvexHull4dTetraherum& tetra = node->GetInfo();
-		dgBigVector origin (tetra.CircumSphereCenter (delanayPoints));
-		voronoiPoints[index] = dgBigVector (dgFloat64 (origin.m_x), dgFloat64 (origin.m_y), dgFloat64 (origin.m_z), dgFloat64 (0.0f));
+		voronoiPoints[index] = tetra.CircumSphereCenter (delanayPoints);
 		tetradrumNode[index] = node;
 
 		for (dgInt32 i = 0; i < 3; i ++) {
@@ -1967,7 +1992,6 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 			}
 			header->GetInfo().Append (index);
 		}
-
 		dgTree<dgList<dgInt32>, dgInt32>::dgTreeNode* header = delanayNodes.Find(tetra.m_faces[0].m_otherVertex);
 		if (!header) {
 			dgList<dgInt32> list (allocator);
@@ -1976,14 +2000,6 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 		header->GetInfo().Append (index);
 		index ++;
 	}
-
-
-//	dgBigVector minBox;
-//	dgBigVector maxBox;
-//	CalculateAABB (minBox, maxBox);
-//	maxBox -= minBox;
-//	dgFloat32 bboxDiagnalFactor = 2.0f;
-//	dgFloat64 perimeterConvexBound = bboxDiagnalFactor * sqrt(maxBox % maxBox);
 
 
 	dgMeshEffect* const voronoiPartition = new (allocator) dgMeshEffect (allocator);
@@ -1998,6 +2014,7 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 		dgTree<dgList<dgInt32>, dgInt32>::dgTreeNode* const nodeNode = iter.GetNode();
 		const dgList<dgInt32>& list = nodeNode->GetInfo();
 		dgInt32 key = nodeNode->GetKey();
+/*
 		for (dgList<dgInt32>::dgListNode* ptr = list.GetFirst(); ptr; ptr = ptr->GetNext()) {
 
 			dgInt32 i = ptr->GetInfo();
@@ -2024,7 +2041,17 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 			count ++;
 			dgAssert (count < dgInt32 (sizeof (pointArray) / sizeof (pointArray[0])));
 		}
+*/
+		if (key < guadVertexKey) {
+			for (dgList<dgInt32>::dgListNode* ptr = list.GetFirst(); ptr; ptr = ptr->GetNext()) {
+				dgInt32 i = ptr->GetInfo();
+				pointArray[count] = voronoiPoints[i];
+				count ++;
+				dgAssert (count < dgInt32 (sizeof (pointArray) / sizeof (pointArray[0])));
+			}
+		}
 
+		count = dgVertexListToIndexList(&pointArray[0].m_x, sizeof (dgBigVector), 3, count, &indexList[0], dgFloat64 (1.0e-3f));	
 		dgMeshEffect convexMesh (allocator, &pointArray[0].m_x, count, sizeof (dgBigVector), dgFloat64 (0.0f));
 		if (convexMesh.GetCount()) {
 			convexMesh.CalculateNormals(normalAngleInRadians);
@@ -2042,7 +2069,7 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 			layer += dgFloat64 (1.0f);
 		}
 	}
-	voronoiPartition->EndPolygon(dgFloat64 (1.0e-8f));
+	voronoiPartition->EndPolygon(dgFloat64 (1.0e-8f), false);
 
 //voronoiPartition->SaveOFF("xxxxxxx.off");
 

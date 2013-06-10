@@ -2142,7 +2142,7 @@ void dgMeshEffect::AddPolygon (dgInt32 count, const dgFloat32* const vertexList,
 	AddPolygon (count, &points[0].m_vertex.m_x, sizeof (dgVertexAtribute), material);
 }
 
-void dgMeshEffect::EndPolygon (dgFloat64 tol)
+void dgMeshEffect::EndPolygon (dgFloat64 tol, bool fixTjoint)
 {
 	dgStack<dgInt32>indexMap(m_pointCount);
 	dgStack<dgInt32>attrIndexMap(m_atribCount);
@@ -2208,8 +2208,9 @@ void dgMeshEffect::EndPolygon (dgFloat64 tol)
 	}
 	EndFace();
 
-	RepairTJoints ();
-
+	if (fixTjoint) {
+		RepairTJoints ();
+	}
 
 #ifdef _DEBUG
 	dgPolyhedra::Iterator iter (*this);	

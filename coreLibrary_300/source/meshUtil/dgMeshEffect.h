@@ -168,6 +168,9 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	dgMeshEffect* Intersection (const dgMatrix& matrix, const dgMeshEffect* const clipper) const;
 	void ClipMesh (const dgMatrix& matrix, const dgMeshEffect* const clipper, dgMeshEffect** const top, dgMeshEffect** const bottom) const;
 
+
+	dgMeshEffect* ConvexConvexMeshIntersection (const dgMeshEffect* const convexMesh) const;
+
 	dgMeshEffect* GetFirstLayer ();
 	dgMeshEffect* GetNextLayer (dgMeshEffect* const layer);
 
@@ -178,7 +181,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	void BeginPolygon ();
 	void AddPolygon (dgInt32 count, const dgFloat32* const vertexList, dgInt32 stride, dgInt32 material);
 	void AddPolygon (dgInt32 count, const dgFloat64* const vertexList, dgInt32 stride, dgInt32 material);
-	void EndPolygon (dgFloat64 tol);
+	void EndPolygon (dgFloat64 tol, bool fixTjoint = true);
 
 	void PackVertexArrays ();
 
@@ -242,7 +245,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	dgMeshEffect* CreateConvexApproximation (dgFloat32 maxConcavity, dgFloat32 backFaceDistanceFactor, dgInt32 maxHullOuputCount, dgInt32 maxVertexPerHull, dgReportProgress reportProgressCallback) const;
 
 	static dgMeshEffect* CreateDelaunayTetrahedralization (dgMemoryAllocator* const allocator, dgInt32 pointCount, dgInt32 pointStrideInBytes, const dgFloat32* const pointCloud, dgInt32 materialId, const dgMatrix& textureProjectionMatrix);
-	static dgMeshEffect* CreateVoronoiConvexDecomposition (dgMemoryAllocator* const allocator, dgInt32 pointCount, dgInt32 pointStrideInBytes, const dgFloat32* const pointCloud, dgInt32 materialId, const dgMatrix& textureProjectionMatrix, dgFloat32 borderSize);
+	static dgMeshEffect* CreateVoronoiConvexDecomposition (dgMemoryAllocator* const allocator, dgInt32 pointCount, dgInt32 pointStrideInBytes, const dgFloat32* const pointCloud, dgInt32 materialId, const dgMatrix& textureProjectionMatrix);
 	
 
 	dgVertexAtribute& GetAttribute (dgInt32 index) const;

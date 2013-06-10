@@ -7734,11 +7734,11 @@ NewtonMesh* NewtonMeshCreateDelaunayTetrahedralization (const NewtonWorld* const
 	return (NewtonMesh*) dgMeshEffect::CreateDelaunayTetrahedralization (world->dgWorld::GetAllocator(), pointCount, strideInBytes, vertexCloud, materialID, dgMatrix (textureMatrix));
 }
 
-NewtonMesh* NewtonMeshCreateVoronoiConvexDecomposition (const NewtonWorld* const newtonWorld, int pointCount, const dFloat* const vertexCloud, int strideInBytes, int materialID, const dFloat* const textureMatrix, dFloat boderConvexSize)
+NewtonMesh* NewtonMeshCreateVoronoiConvexDecomposition (const NewtonWorld* const newtonWorld, int pointCount, const dFloat* const vertexCloud, int strideInBytes, int materialID, const dFloat* const textureMatrix)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *) newtonWorld;
-	return (NewtonMesh*) dgMeshEffect::CreateVoronoiConvexDecomposition (world->dgWorld::GetAllocator(), pointCount, strideInBytes, vertexCloud, materialID, dgMatrix (textureMatrix), boderConvexSize);
+	return (NewtonMesh*) dgMeshEffect::CreateVoronoiConvexDecomposition (world->dgWorld::GetAllocator(), pointCount, strideInBytes, vertexCloud, materialID, dgMatrix (textureMatrix));
 }
 
 
@@ -7886,6 +7886,12 @@ NewtonMesh* NewtonMeshIntersection (const NewtonMesh* const mesh, const NewtonMe
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	return (NewtonMesh*) ((dgMeshEffect*) mesh)->Intersection (dgMatrix (clipperMatrix), (dgMeshEffect*)clipper);
+}
+
+NewtonMesh* NewtonMeshConvexConvexMeshIntersection (const NewtonMesh* const convexMeshA, const NewtonMesh* const convexMeshB)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	return (NewtonMesh*) ((dgMeshEffect*) convexMeshA)->ConvexConvexMeshIntersection ((dgMeshEffect*)convexMeshB);
 }
 
 void NewtonRemoveUnusedVertices(const NewtonMesh* const mesh, int* const vertexRemapTable)

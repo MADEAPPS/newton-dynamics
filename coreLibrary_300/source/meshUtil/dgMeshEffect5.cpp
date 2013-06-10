@@ -2956,3 +2956,9 @@ dgMeshEffect* dgMeshEffect::Intersection (const dgMatrix& matrix, const dgMeshEf
 
 }
 
+dgMeshEffect* dgMeshEffect::ConvexConvexMeshIntersection (const dgMeshEffect* const convexMesh) const
+{
+	dgMeshEffect* const convexIntersection = new (GetAllocator()) dgMeshEffect (*this);
+	convexIntersection->RemoveUnusedVertices(NULL);
+	return convexIntersection;
+}
