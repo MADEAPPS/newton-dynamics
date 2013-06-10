@@ -168,7 +168,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	dgMeshEffect* Intersection (const dgMatrix& matrix, const dgMeshEffect* const clipper) const;
 	void ClipMesh (const dgMatrix& matrix, const dgMeshEffect* const clipper, dgMeshEffect** const top, dgMeshEffect** const bottom) const;
 
-
+	bool PlaneClip (const dgBigPlane& plane);
 	dgMeshEffect* ConvexConvexMeshIntersection (const dgMeshEffect* const convexMesh) const;
 
 	dgMeshEffect* GetFirstLayer ();

@@ -2440,7 +2440,6 @@ clipperMeshBVH->m_mesh->Trace();
 				}
 			}
 
-static int xxx;
 
 			if (GetCount()) {
 				dgList<dgEdge*> facePerimeter (clipperMeshBVH->m_mesh->GetAllocator());
@@ -2457,10 +2456,6 @@ static int xxx;
 					found = false;
 					dgList<dgHugeVector> clipperCurve (clipperMeshBVH->m_mesh->GetAllocator());
 
-xxx ++;
-if (xxx >= 5){
-meshBVH->m_mesh->Trace();
-}
 					dgEdge* const firstClipperEdge = FindFirstClipperEdge (normal, origin, clipperMeshBVH, clipperMark);
 					if (firstClipperEdge) {
 						dgAssert (firstClipperEdge->m_mark == clusterColor);
@@ -2953,12 +2948,131 @@ dgMeshEffect* dgMeshEffect::Intersection (const dgMatrix& matrix, const dgMeshEf
 
 	dgAssert (0);
 	return NULL;
-
 }
+
+
+bool dgMeshEffect::PlaneClip (const dgBigPlane& plane)
+{
+	dgInt32 neutral = 0;
+	dgInt32 positive = 0;
+	dgInt32 negative = 0;
+	dgInt32 pointCount = GetVertexCount();
+
+	const dgInt32 extraVertex = 256;
+	dgStack <dgFloat64> test (pointCount + extraVertex);
+
+	for (dgInt32 i = 0; i < pointCount; i ++) {
+		test[i] = plane.Evalue (m_points[i]);
+		if (test[i] > dgFloat32 (1.0e-5f)) {
+			positive ++;
+		} else if (test[i] < -dgFloat32 (1.0e-5f)) {
+			negative ++;
+		} else {
+			neutral ++;
+			test[i] = dgFloat64 (0.0f);
+		}
+	}
+
+	if ((positive + neutral) == pointCount) {
+		return false;
+	}
+
+	if ((negative + neutral) < pointCount) {
+//		dgInt32 neutralMark = IncLRU();
+//		dgInt32 posMark = IncLRU();
+//		dgInt32 negMark = IncLRU();
+		dgPolyhedra::Iterator iter (*this);
+
+		for (iter.Begin(); iter; iter ++){
+			dgEdge* const edge = &(*iter);
+			
+			dgFloat64 side0 = test[edge->m_prev->m_incidentVertex];
+			dgFloat64 side1 = test[edge->m_incidentVertex];
+
+			if ((side0 < dgFloat32 (0.0f)) && (side1 > dgFloat64 (0.0f))) {
+				dgBigVector dp (m_points[edge->m_incidentVertex] - m_points[edge->m_prev->m_incidentVertex]);
+				dgFloat64 param = - side0 / (plane % dp);
+
+				dgEdge* const splitEdge = InsertEdgeVertex (edge->m_prev, param);
+				test[splitEdge->m_next->m_incidentVertex] = dgFloat64 (0.0f);
+			} 
+		}
+		
+		
+		for (iter.Begin(); iter; iter ++){
+			dgEdge* const edge0 = &(*iter);
+			dgFloat64 side = test[edge0->m_incidentVertex];
+			if (side == dgFloat32 (0.0f)) {
+				dgEdge* edge1 = edge0->m_next;
+				do {
+					dgFloat64 side = test[edge1->m_incidentVertex];
+					if (side == dgFloat32 (0.0f)) {
+						if ((edge1->m_next != edge0) && (edge1->m_prev != edge0) && !FindEdge(edge0->m_incidentVertex, edge1->m_incidentVertex)) {
+							ConnectVertex (edge0, edge1);
+						}
+						break;
+					}
+					edge1 = edge1->m_next;
+				} while (edge1 != edge0);
+			}
+		}
+
+		dgList<dgEdge*> edgeEdge (GetAllocator());
+		dgInt32 mark = IncLRU();
+		for (iter.Begin(); iter; iter ++){
+			dgEdge* const edge = &(*iter);
+			dgFloat64 side = test[edge->m_incidentVertex];
+			if ((edge->m_mark != mark) && (side > dgFloat32 (0.0f))) {
+				edgeEdge.Append(edge);
+				edge->m_twin->m_mark = mark;
+			}
+		}
+	
+		for (dgList<dgEdge*>::dgListNode* ptr = edgeEdge.GetFirst(); ptr; ptr = ptr->GetNext()) {
+			dgEdge* const edge = ptr->GetInfo();
+			DeleteEdge(edge);
+		}
+		
+		for (iter.Begin(); iter; iter ++){
+			dgEdge* const edge = &(*iter);
+			if (edge->m_incidentFace < 0) {
+				edge->m_incidentFace = 1;
+			}
+		}
+	}
+
+	RemoveUnusedVertices(NULL);
+	return true;
+}
+
+
+
 
 dgMeshEffect* dgMeshEffect::ConvexConvexMeshIntersection (const dgMeshEffect* const convexMesh) const
 {
 	dgMeshEffect* const convexIntersection = new (GetAllocator()) dgMeshEffect (*this);
 	convexIntersection->RemoveUnusedVertices(NULL);
+
+	dgInt32 mark = convexMesh->IncLRU();
+	dgPolyhedra::Iterator iter (*convexMesh);
+	for (iter.Begin(); iter; iter ++){
+		 dgEdge* const face = &(*iter);
+		if (face->m_mark != mark) {
+			dgEdge* ptr = face;
+			do {
+				ptr->m_mark = mark;
+				ptr = ptr->m_next;
+			} while (ptr != face);
+			dgBigVector normal (FaceNormal(face, &convexMesh->m_points[0].m_x, sizeof(dgBigVector)));
+			dgBigPlane plane (normal, - (convexMesh->m_points[face->m_incidentVertex] % normal));
+			plane = plane.Scale (dgFloat64(1.0f)/ sqrt (plane % plane));
+			if (!convexIntersection->PlaneClip(plane)) {
+				delete convexIntersection;
+				return NULL;
+			}
+		}
+	}
+
+	
 	return convexIntersection;
 }
