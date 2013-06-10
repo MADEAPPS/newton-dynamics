@@ -25,6 +25,8 @@
 #include "dgMeshEffect.h"
 #include "dgCollisionConvexHull.h"
 
+
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -487,6 +489,7 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 	}
 	delete convexHull;
 
+	vertexCount = m_vertexCount;
 	mark = polyhedra.IncLRU();;
 	for (iter.Begin(); iter; iter ++) {
 		dgEdge* const edge = &iter.GetNode()->GetInfo();
