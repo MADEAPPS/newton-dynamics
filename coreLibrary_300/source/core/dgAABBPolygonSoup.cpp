@@ -598,61 +598,6 @@ class dgAABBTree
 		delete tree;
 		return count;
 	}
-/*
-	DG_INLINE dgInt32 RayTest (const dgFastRayTest& ray, const dgVector& minBox, const dgVector& maxBox) const
-	{
-#if 1
-		//dgVector paralletTest (((ray.m_p0 < minBox) | (ray.m_p0 > maxBox)) & ray.m_isParallel);
-		dgVector paralletTest (((ray.m_p0 >= minBox) & (ray.m_p0 <= maxBox)) | ray.m_isParallel);
-		//if (paralletTest.GetSignMask()) {
-		if ((paralletTest.GetSignMask() & 0x07) == 0x07) {
-			return 0;
-		}
-
-		dgVector tt0 ((minBox - ray.m_p0).CompProduct4(ray.m_dpInv));
-		dgVector tt1 ((maxBox - ray.m_p0).CompProduct4(ray.m_dpInv));
-		dgVector test (tt0 < tt1);
-
-		dgVector t0 (((tt0 & test) | tt1.AndNot(test)).GetMax(ray.m_minT));
-		t0 = t0.GetMax(t0.ShiftTripleRight());
-		t0 = t0.GetMax(t0.ShiftTripleRight());
-
-		dgVector t1 (((tt1 & test) | tt0.AndNot(test)).GetMax(ray.m_maxT));
-		t1 = t1.GetMin(t1.ShiftTripleRight());
-		t1 = t1.GetMin(t1.ShiftTripleRight());
-		return ((t0 < t1).GetSignMask() & 1);
-
-#else
-		dgFloat32 tmin = 0.0f;          
-		dgFloat32 tmax = 1.0f;
-
-		for (dgInt32 i = 0; i < 3; i++) {
-			if (ray.m_isParallel[i]) {
-				if (ray.m_p0[i] < minBox[i] || ray.m_p0[i] > maxBox[i]) {
-					return 0;
-				}
-			} else {
-				dgFloat32 t1 = (minBox[i] - ray.m_p0[i]) * ray.m_dpInv[i];
-				dgFloat32 t2 = (maxBox[i] - ray.m_p0[i]) * ray.m_dpInv[i];
-
-				if (t1 > t2) {
-					dgSwap(t1, t2);
-				}
-				if (t1 > tmin) {
-					tmin = t1;
-				}
-				if (t2 < tmax) {
-					tmax = t2;
-				}
-				if (tmin > tmax) {
-					return 0;
-				}
-			}
-		}
-		return 0xffffffff;
-#endif
-	}
-*/
 
 	DG_INLINE dgInt32 BoxIntersect (const dgTriplex* const vertexArray, const dgVector& boxP0, const dgVector& boxP1) const
 	{

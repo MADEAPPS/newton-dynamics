@@ -64,8 +64,8 @@ class dgFastRayTest
 	DG_INLINE dgInt32 BoxTest (const dgVector& minBox, const dgVector& maxBox) const
 	{
 		#if 1
-			dgVector test (((m_p0 >= minBox) & (m_p0 <= maxBox)) | m_isParallel);
-			if ((test.GetSignMask() & 0x07) == 0x07) {
+			dgVector test (((m_p0 <= minBox) | (m_p0 >= maxBox)) & m_isParallel);
+			if (test.GetSignMask() & 0x07) {
 				return 0;
 			}
 			dgVector tt0 = (minBox - m_p0).CompProduct4(m_dpInv);
