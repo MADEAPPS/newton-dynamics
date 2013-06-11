@@ -34,85 +34,23 @@
 
 
 dgFastRayTest::dgFastRayTest(const dgVector& l0, const dgVector& l1)
-	:m_p0 (l0), m_p1(l1), m_diff (l1 - l0)
-	,m_minT(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))  
-	,m_maxT(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f))
-	,m_zero(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)) 
+	:m_p0 (l0), m_p1(l1), m_diff ((l1 - l0) | dgVector::m_wOne)
+	,m_minT(dgFloat32 (0.0f))  
+	,m_maxT(dgFloat32 (1.0f))
+	,m_zero(dgFloat32 (0.0f)) 
 {
-	m_p0.m_w = dgFloat32 (0.0f);
-	m_p1.m_w = dgFloat32 (0.0f);
-	m_diff.m_w = dgFloat32 (0.0f);
+	dgAssert (m_p0.m_w == dgFloat32 (0.0f));
+	dgAssert (m_p1.m_w == dgFloat32 (0.0f));
+	dgAssert (m_diff.m_w == dgFloat32 (1.0f));
 
-	dgInt32 isParallel[4];
-	isParallel[0] = (dgAbsf (m_diff.m_x) > dgFloat32 (1.0e-8f)) ? 0 : dgInt32 (0xffffffff); 
-	isParallel[1] = (dgAbsf (m_diff.m_y) > dgFloat32 (1.0e-8f)) ? 0 : dgInt32 (0xffffffff); 
-	isParallel[2] = (dgAbsf (m_diff.m_z) > dgFloat32 (1.0e-8f)) ? 0 : dgInt32 (0xffffffff); 
-	isParallel[3] = 0;
-	m_isParallel = dgVector (isParallel[0], isParallel[1], isParallel[2], isParallel[3]);
+	m_isParallel = (m_diff.Abs() < dgVector (1.0e-8f));
 
-	m_dpInv.m_x = (!isParallel[0]) ? (dgFloat32 (1.0f) / m_diff.m_x) : dgFloat32 (1.0e20f);
-	m_dpInv.m_y = (!isParallel[1]) ? (dgFloat32 (1.0f) / m_diff.m_y) : dgFloat32 (1.0e20f);
-	m_dpInv.m_z = (!isParallel[2]) ? (dgFloat32 (1.0f) / m_diff.m_z) : dgFloat32 (1.0e20f);
-	m_dpInv.m_w = dgFloat32 (0.0f);
+	m_dpInv = (((dgVector (dgFloat32 (1.0e-20)) & m_isParallel) | m_diff.AndNot(m_isParallel)).Reciproc ()) & dgVector::m_triplexMask;
 	m_dpBaseInv = m_dpInv;
-
-	m_ray_xxxx = dgVector(m_diff.m_x);
-	m_ray_yyyy = dgVector(m_diff.m_y);
-	m_ray_zzzz = dgVector(m_diff.m_z);
 
 	dgFloat32 mag = dgSqrt (m_diff % m_diff);
 	m_dirError = -dgFloat32 (0.0175f) * mag;
 	m_magRayTest = dgMax (mag, dgFloat32 (1.0f));
-}
-
-
-dgInt32 dgFastRayTest::BoxTest (const dgVector& minBox, const dgVector& maxBox) const
-{
-#if 1
-	dgVector tt0 (((m_p0 <= minBox) | (m_p0 >= maxBox)) & m_isParallel);
-	if (tt0.GetSignMask() & 0x07) {
-		return 0;
-	}
-	tt0 = (minBox - m_p0).CompProduct4(m_dpInv);
-	dgVector tt1 ((maxBox - m_p0).CompProduct4(m_dpInv));
-	dgVector t0 (m_minT.GetMax(tt0.GetMin(tt1)));
-	dgVector t1 (m_maxT.GetMin(tt0.GetMax(tt1)));
-	t0 = t0.GetMax(t0.ShiftTripleRight());
-	t1 = t1.GetMin(t1.ShiftTripleRight());
-	t0 = t0.GetMax(t0.ShiftTripleRight());
-	t1 = t1.GetMin(t1.ShiftTripleRight());
-	return ((t0 < t1).GetSignMask() & 1);
-
-#else
-
-	dgFloat32 tmin = 0.0f;          
-	dgFloat32 tmax = 1.0f;
-
-	for (dgInt32 i = 0; i < 3; i++) {
-		if (m_isParallel[i]) {
-			if (m_p0[i] <= minBox[i] || m_p0[i] >= maxBox[i]) {
-				return 0;
-			}
-		} else {
-			dgFloat32 t1 = (minBox[i] - m_p0[i]) * m_dpInv[i];
-			dgFloat32 t2 = (maxBox[i] - m_p0[i]) * m_dpInv[i];
-
-			if (t1 > t2) {
-				dgSwap(t1, t2);
-			}
-			if (t1 > tmin) {
-				tmin = t1;
-			}
-			if (t2 < tmax) {
-				tmax = t2;
-			}
-			if (tmin > tmax) {
-				return 0;
-			}
-		}
-	}
-	return 0x1;
-#endif
 }
 
 
@@ -275,18 +213,22 @@ dgFloat32 dgFastRayTest::PolygonIntersect (const dgVector& normal, const dgFloat
 
 bool dgApi dgRayBoxClip (dgVector& p0, dgVector& p1, const dgVector& boxP0, const dgVector& boxP1) 
 {	
+	dgAssert (p0.m_w == dgFloat32(0.0f));
+	dgAssert (p1.m_w == dgFloat32(0.0f));
+	dgAssert (boxP0.m_w == dgFloat32(0.0f));
+	dgAssert (boxP1.m_w == dgFloat32(0.0f));
 	for (int i = 0; i < 3; i ++) {
 		dgFloat32 tmp0 = boxP1[i] - p0[i];
 		if (tmp0 > dgFloat32 (0.0f)) {
 			dgFloat32 tmp1 = boxP1[i] - p1[i];
 			if (tmp1 < dgFloat32 (0.0f)) {
-				p1 = p0 + (p1 - p0).Scale3 (tmp0 / (p1[i] - p0[i])); 
+				p1 = p0 + (p1 - p0).Scale4 (tmp0 / (p1[i] - p0[i])); 
 				p1[i] = boxP1[i];
 			}
 		} else {
 			dgFloat32 tmp1 = boxP1[i] - p1[i];
 			if (tmp1 > dgFloat32 (0.0f)) {
-				p0 += (p1 - p0).Scale3 (tmp0 / (p1[i] - p0[i])); 
+				p0 += (p1 - p0).Scale4 (tmp0 / (p1[i] - p0[i])); 
 				p0[i] = boxP1[i];
 			} else {
 				return false;
@@ -297,13 +239,13 @@ bool dgApi dgRayBoxClip (dgVector& p0, dgVector& p1, const dgVector& boxP0, cons
 		if (tmp0 < dgFloat32 (0.0f)) {
 			dgFloat32 tmp1 = boxP0[i] - p1[i];
 			if (tmp1 > dgFloat32 (0.0f)) {
-				p1 = p0 + (p1 - p0).Scale3 (tmp0 / (p1[i] - p0[i])); 
+				p1 = p0 + (p1 - p0).Scale4 (tmp0 / (p1[i] - p0[i])); 
 				p1[i] = boxP0[i];
 			}
 		} else {
 			dgFloat32 tmp1 = boxP0[i] - p1[i];
 			if (tmp1 < dgFloat32 (0.0f)) {
-				p0 += (p1 - p0).Scale3 (tmp0 / (p1[i] - p0[i])); 
+				p0 += (p1 - p0).Scale4 (tmp0 / (p1[i] - p0[i])); 
 				p0[i] = boxP0[i];
 			} else {
 				return false;

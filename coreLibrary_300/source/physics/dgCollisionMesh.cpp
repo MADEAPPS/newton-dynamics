@@ -158,8 +158,8 @@ void dgCollisionMesh::CalcAABB(const dgMatrix &matrix, dgVector &p0, dgVector &p
 	//	             dgFloat32 (0.0f));
 	dgVector size (matrix.m_front.Abs().Scale4(m_boxSize.m_x) + matrix.m_up.Abs().Scale4(m_boxSize.m_y) + matrix.m_right.Abs().Scale4(m_boxSize.m_z));
 
-	p0 = origin - size;
-	p1 = origin + size;
+	p0 = (origin - size) & dgVector::m_triplexMask;
+	p1 = (origin + size) & dgVector::m_triplexMask;
 
 	p0.m_w = dgFloat32 (0.0f);
 	p1.m_w = dgFloat32 (0.0f);

@@ -337,6 +337,12 @@ class dgVector: public dgTemplateVector<dgFloat32>
 		return dgVector (dgRsqrt (DotProduct4(*this).m_x));
 	}
 
+	DG_INLINE dgVector Reciproc () const
+	{
+		return dgVector (dgFloat32 (1.0f) / m_x, dgFloat32 (1.0f) / m_y, dgFloat32 (1.0f) / m_z, dgFloat32 (1.0f) / m_w);
+	}
+
+
 	DG_INLINE dgVector InvSqrt () const
 	{
 		return dgVector (dgRsqrt (m_x), dgRsqrt (m_y), dgRsqrt (m_z), dgRsqrt (m_w));
@@ -672,6 +678,11 @@ class dgVector
 	{
 		dgVector tmp ((A & m_triplexMask) | m_wOne);
 		return _mm_mul_ps (m_type, tmp.m_type);
+	}
+
+	DG_INLINE dgVector Reciproc () const
+	{
+		return _mm_div_ps (m_one.m_type, m_type);
 	}
 
 	// component wise multiplication

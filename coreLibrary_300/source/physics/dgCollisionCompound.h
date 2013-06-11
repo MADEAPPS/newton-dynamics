@@ -116,11 +116,12 @@ class dgCollisionCompound: public dgCollision
 			}
 			return 0xffffffff;
 #else
-			dgVector tt0 (((ray.m_p0 <= minBox) | (ray.m_p0 >= maxBox)) & ray.m_isParallel);
-			if (tt0.GetSignMask() & 0x07) {
+			//dgVector tt0 (((ray.m_p0 <= minBox) | (ray.m_p0 >= maxBox)) & ray.m_isParallel);
+			dgVector test (((ray.m_p0 >= minBox) & (ray.m_p0 <= maxBox)) | ray.m_isParallel);
+			if ((test.GetSignMask() & 0x07) == 0x07) {
 				return 0;
 			}
-			tt0 = (minBox - ray.m_p0).CompProduct4(ray.m_dpInv);
+			dgVector tt0 ((minBox - ray.m_p0).CompProduct4(ray.m_dpInv));
 			dgVector tt1 ((maxBox - ray.m_p0).CompProduct4(ray.m_dpInv));
 			dgVector t0 (ray.m_minT.GetMax(tt0.GetMin(tt1)));
 			dgVector t1 (ray.m_maxT.GetMin(tt0.GetMax(tt1)));

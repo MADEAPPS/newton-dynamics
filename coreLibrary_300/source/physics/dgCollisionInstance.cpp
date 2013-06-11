@@ -425,8 +425,8 @@ dgInt32 dgCollisionInstance::CalculatePlaneIntersection (const dgVector& normal,
 void dgCollisionInstance::CalcAABB (const dgMatrix &matrix, dgVector& p0, dgVector& p1) const
 {
 	m_childShape->CalcAABB (matrix, p0, p1);
-	p0 = matrix.m_posit + (p0 - matrix.m_posit).CompProduct4(m_maxScale) - m_padding;
-	p1 = matrix.m_posit + (p1 - matrix.m_posit).CompProduct4(m_maxScale) + m_padding;
+	p0 = (matrix.m_posit + (p0 - matrix.m_posit).CompProduct4(m_maxScale) - m_padding) & dgVector::m_triplexMask;
+	p1 = (matrix.m_posit + (p1 - matrix.m_posit).CompProduct4(m_maxScale) + m_padding) & dgVector::m_triplexMask;
 }
 
 

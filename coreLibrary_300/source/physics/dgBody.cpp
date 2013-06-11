@@ -198,9 +198,6 @@ void dgBody::UpdateWorlCollisionMatrix() const
 
 void dgBody::UpdateCollisionMatrix (dgFloat32 timestep, dgInt32 threadIndex)
 {
-//	dgVector oldP0 (m_minAABB);
-//	dgVector oldP1 (m_maxAABB);
-
 	m_collision->SetGlobalMatrix (m_collision->GetLocalMatrix() * m_matrix);
 	m_collision->CalcAABB (m_collision->GetGlobalMatrix(), m_minAABB, m_maxAABB);
 
@@ -214,13 +211,7 @@ void dgBody::UpdateCollisionMatrix (dgFloat32 timestep, dgInt32 threadIndex)
 		dgAssert (m_world);
 		
 		if (!m_sleeping) {
-//			if ((dgAbsf (oldP0.m_x - m_minAABB.m_x) > DG_AABB_ERROR) || (dgAbsf (oldP0.m_y - m_minAABB.m_y) > DG_AABB_ERROR) ||
-//				(dgAbsf (oldP0.m_z - m_minAABB.m_z) > DG_AABB_ERROR) || (dgAbsf (oldP1.m_x - m_maxAABB.m_x) > DG_AABB_ERROR) || 
-//				(dgAbsf (oldP1.m_y - m_maxAABB.m_y) > DG_AABB_ERROR) || (dgAbsf (oldP1.m_z - m_maxAABB.m_z) > DG_AABB_ERROR)) {
-//			dgInt32 mask = (((oldP0 - m_minAABB).Abs() > m_aabbTol) | ((oldP1 - m_maxAABB).Abs() > m_aabbTol)).GetSignMask() & 7;
-//			if ( mask) {
-				m_world->GetBroadPhase()->UpdateBodyBroadphase (this, threadIndex);
-//			}
+			m_world->GetBroadPhase()->UpdateBodyBroadphase (this, threadIndex);
 		}
 	}
 }

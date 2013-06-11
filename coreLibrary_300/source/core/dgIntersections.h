@@ -53,13 +53,61 @@ class dgFastRayTest
 	public:
 	dgFastRayTest(const dgVector& l0, const dgVector& l1);
 
-	dgInt32 BoxTest (const dgVector& minBox, const dgVector& maxBox) const;
 	dgFloat32 PolygonIntersect (const dgVector& normal, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount) const;
 	dgFloat32 PolygonIntersectFallback (const dgVector& normal, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount) const;
 
-	void Reset (dgFloat32 t) 
+	DG_INLINE void Reset (dgFloat32 t) 
 	{
 		m_dpInv = m_dpBaseInv.Scale4 (dgFloat32 (1.0f) / (t + dgFloat32 (1.0e-12f)));
+	}
+
+	DG_INLINE dgInt32 BoxTest (const dgVector& minBox, const dgVector& maxBox) const
+	{
+		#if 1
+			dgVector test (((m_p0 >= minBox) & (m_p0 <= maxBox)) | m_isParallel);
+			if ((test.GetSignMask() & 0x07) == 0x07) {
+				return 0;
+			}
+			dgVector tt0 = (minBox - m_p0).CompProduct4(m_dpInv);
+			dgVector tt1 ((maxBox - m_p0).CompProduct4(m_dpInv));
+			dgVector t0 (m_minT.GetMax(tt0.GetMin(tt1)));
+			dgVector t1 (m_maxT.GetMin(tt0.GetMax(tt1)));
+			t0 = t0.GetMax(t0.ShiftTripleRight());
+			t1 = t1.GetMin(t1.ShiftTripleRight());
+			t0 = t0.GetMax(t0.ShiftTripleRight());
+			t1 = t1.GetMin(t1.ShiftTripleRight());
+			return ((t0 < t1).GetSignMask() & 1);
+
+		#else
+
+			dgFloat32 tmin = 0.0f;          
+			dgFloat32 tmax = 1.0f;
+
+			for (dgInt32 i = 0; i < 3; i++) {
+				if (m_isParallel[i]) {
+					if (m_p0[i] <= minBox[i] || m_p0[i] >= maxBox[i]) {
+						return 0;
+					}
+				} else {
+					dgFloat32 t1 = (minBox[i] - m_p0[i]) * m_dpInv[i];
+					dgFloat32 t2 = (maxBox[i] - m_p0[i]) * m_dpInv[i];
+
+					if (t1 > t2) {
+						dgSwap(t1, t2);
+					}
+					if (t1 > tmin) {
+						tmin = t1;
+					}
+					if (t2 < tmax) {
+						tmax = t2;
+					}
+					if (tmin > tmax) {
+						return 0;
+					}
+				}
+			}
+			return 0x1;
+		#endif
 	}
 
 	dgVector m_p0;
@@ -70,12 +118,7 @@ class dgFastRayTest
 	dgVector m_minT;
 	dgVector m_maxT;
 	dgVector m_zero;
-
-	dgVector m_ray_xxxx;
-	dgVector m_ray_yyyy;
-	dgVector m_ray_zzzz;
 	dgVector m_isParallel;
-
 	dgFloat32 m_dirError;
 	dgFloat32 m_magRayTest;
 }DG_GCC_VECTOR_ALIGMENT;

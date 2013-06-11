@@ -598,12 +598,14 @@ class dgAABBTree
 		delete tree;
 		return count;
 	}
-
+/*
 	DG_INLINE dgInt32 RayTest (const dgFastRayTest& ray, const dgVector& minBox, const dgVector& maxBox) const
 	{
 #if 1
-		dgVector paralletTest (((ray.m_p0 < minBox) | (ray.m_p0 > maxBox)) & ray.m_isParallel);
-		if (paralletTest.GetSignMask()) {
+		//dgVector paralletTest (((ray.m_p0 < minBox) | (ray.m_p0 > maxBox)) & ray.m_isParallel);
+		dgVector paralletTest (((ray.m_p0 >= minBox) & (ray.m_p0 <= maxBox)) | ray.m_isParallel);
+		//if (paralletTest.GetSignMask()) {
+		if ((paralletTest.GetSignMask() & 0x07) == 0x07) {
 			return 0;
 		}
 
@@ -650,6 +652,7 @@ class dgAABBTree
 		return 0xffffffff;
 #endif
 	}
+*/
 
 	DG_INLINE dgInt32 BoxIntersect (const dgTriplex* const vertexArray, const dgVector& boxP0, const dgVector& boxP1) const
 	{
@@ -665,14 +668,16 @@ class dgAABBTree
 
 		dgVector minBox (p0 - boxP1);
 		dgVector maxBox (p1 - boxP0);
-		return RayTest (ray, minBox, maxBox);;
+		//return RayTest (ray, minBox, maxBox);;
+		return ray.BoxTest (minBox, maxBox);
 	}
 
 	DG_INLINE dgInt32 RayTest (const dgFastRayTest& ray, const dgTriplex* const vertexArray) const
 	{
 		dgVector minBox (&vertexArray[m_minIndex].m_x);
 		dgVector maxBox (&vertexArray[m_maxIndex].m_x);
-		return RayTest (ray, minBox, maxBox);
+		//return RayTest (ray, minBox, maxBox);
+		return ray.BoxTest (minBox, maxBox);
 	}
 
 

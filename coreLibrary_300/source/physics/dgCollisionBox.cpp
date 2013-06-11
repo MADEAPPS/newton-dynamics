@@ -160,17 +160,17 @@ void dgCollisionBox::CalcAABB (const dgMatrix &matrix, dgVector &p0, dgVector &p
 
 	dgVector size (matrix[0].Abs().CompProduct4(dgVector(m_size[0].m_x)) + matrix[1].Abs().CompProduct4(dgVector(m_size[0].m_y)) + matrix[2].Abs().CompProduct4(dgVector(m_size[0].m_z)));
 
-	p0 = matrix[3] - size;
-	p1 = matrix[3] + size;
-
-	p0.m_w = dgFloat32 (0.0f);
-	p1.m_w = dgFloat32 (0.0f);
+	p0 = (matrix[3] - size) & dgVector::m_triplexMask;
+	p1 = (matrix[3] + size) & dgVector::m_triplexMask;
 }
 
 
 
 dgFloat32 dgCollisionBox::RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
 {
+	dgAssert (localP0.m_w == dgFloat32 (0.0f));
+	dgAssert (localP1.m_w == dgFloat32 (0.0f));
+
 	dgInt32 index = 0;
 	dgFloat32 signDir = dgFloat32 (0.0f);
 	dgFloat32 tmin = dgFloat32 (0.0f);
@@ -204,6 +204,8 @@ dgFloat32 dgCollisionBox::RayCast (const dgVector& localP0, const dgVector& loca
 			}
 		}
 	}
+
+
 
 	if (tmin > dgFloat32 (0.0f)) {
 		dgAssert (tmin < 1.0f);
