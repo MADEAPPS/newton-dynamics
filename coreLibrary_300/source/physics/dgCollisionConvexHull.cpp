@@ -918,17 +918,23 @@ void dgCollisionConvexHull::Serialize(dgSerialize callback, void* const userData
 }
 
 
-dgFloat32 dgCollisionConvexHull::RayCast (const dgVector& localQ0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
+dgFloat32 dgCollisionConvexHull::RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
 {
-	if (m_faceCount > 16) {
-		return dgCollisionConvex::RayCast (localQ0, localP1, contactOut, body, userData);
+//	if (m_faceCount > 16) {
+	if (m_faceCount > 1) {
+//dgVector x0 (dgVector (0.0f));
+//dgVector x1 (dgVector (0.0f));
+//x0.m_x = localP0.m_x;
+//x1.m_x = localP1.m_x;
+//dgCollisionConvex::RayCast (x0, x1, contactOut, body, userData);
+		return dgCollisionConvex::RayCast (localP0, localP1, contactOut, body, userData);
 	} else {
 		dgFloat32 interset = dgFloat32 (1.2f);
 
 		dgFloat32 tMin = dgFloat32 (0.0f);
 		dgFloat32 tMax = dgFloat32 (1.0f);
 
-		dgVector p0 (localQ0 - m_boxOrigin); 
+		dgVector p0 (localP0 - m_boxOrigin); 
 		dgVector p1 (localP1 - m_boxOrigin); 
 		dgVector paddedBox (m_boxSize.Scale3 (1.1f));
 		for (dgInt32 i = 0; i < 3; i ++) {
@@ -967,7 +973,7 @@ dgFloat32 dgCollisionConvexHull::RayCast (const dgVector& localQ0, const dgVecto
 		}
 
 		if (tMin < dgFloat32 (1.0f)) {
-			dgVector localP0 (localQ0 + (localP1 - localQ0).Scale3(tMin));
+			dgVector localP0 (localP0 + (localP1 - localP0).Scale3(tMin));
 
 			dgVector hitNormal(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 
@@ -1021,8 +1027,8 @@ dgFloat32 dgCollisionConvexHull::RayCast (const dgVector& localQ0, const dgVecto
 
 			if (hasHit) {
 				//interset = tE;	
-				dgVector numVector (localP0 + dS.Scale3(tE) - localQ0);
-				dgVector denVector (localP1 - localQ0);
+				dgVector numVector (localP0 + dS.Scale3(tE) - localP0);
+				dgVector denVector (localP1 - localP0);
 				interset = (numVector % denVector) / (denVector % denVector);
 
 				contactOut.m_normal = hitNormal.Scale3 (dgRsqrt(hitNormal % hitNormal));

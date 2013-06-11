@@ -2535,12 +2535,16 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& l
 	dgVector point (localP0);
 	dgVector p0p1 (localP0 - localP1);
 
+//	bool pointfound = false;
+	dgFloat32 param = dgFloat32 (0.0f);
+
+	dgInt32 index = 0;
 	memset (sum, 0, sizeof (sum));
 	dgVector dir (p0p1.CompProduct4 (p0p1.DotProduct4(p0p1).InvSqrt ()));
-	simplex[0] = SupportVertex (dir, NULL) - localP0;
+	simplex[0] = SupportVertex (dir, NULL) - point;
 	do {
 
-		dgInt32 index = 1;
+		index = 1;
 		dgInt32 iter = 0;
 		dgInt32 cycling = 0;
 		dgFloat32 minDist = dgFloat32 (1.0e20f);
@@ -2548,8 +2552,8 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& l
 		do {
 			dgFloat32 dist = v % v;
 			if (dist < dgFloat32 (1.0e-9f)) {
-				dgAssert (0);
-//				return -index; 
+				index = -1; 
+				break;
 			}
 
 			if (dist < minDist) {
@@ -2564,7 +2568,7 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& l
 			}
 
 			dgVector dir (v.Scale3 (-dgRsqrt(dist)));
-			simplex[index] = SupportVertex (dir, NULL) - localP0;
+			simplex[index] = SupportVertex (dir, NULL) - point;
 			const dgVector& w = simplex[index];
 			dgVector wv (w - v);
 			dist = dir % wv;
@@ -2590,8 +2594,7 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& l
 
 				case 4:
 				{
-					_ASSERTE (0);
-//					v = ReduceTetrahedrum (index, m_hullDiff, m_hullSum, m_polygonFaceIndex);
+					v = dgMinkHull::ReduceTetrahedrum (index, simplex, sum, indexArray);
 					break;
 				}
 			}
@@ -2600,27 +2603,47 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& l
 			cycling ++;
 		} while (iter < DG_CONNICS_CONTATS_ITERATIONS); 
 
-		switch (index) 
-		{
-			case 2:
+		if (index > 0.0f) {
+			dgFloat32 t1 = dgFloat32 (0.0f);
+			switch (index) 
 			{
-				dgAssert(0);
-				break;
-			}
+				case 1:
+				case 2:
+				{
+					t1 = -(v % p0p1) / (p0p1 % p0p1);
+					break;
+				}
 
-			case 3:
-			{
-				dgVector q (localP0 + v);
-				dgAssert(0);
-				break;
+				case 3:
+				{
+					dgFloat32 den = normal % p0p1;
+					dgAssert (den != 0.0f);
+					t1 = -(normal % v) / den;
+					break;
+				}
+				
+				default:
+					dgAssert(0);
 			}
-			
-			default:
-				dgAssert(0);
+			if (t1 < param) {
+				index = -1;
+				t1 = dgFloat32 (0.0f);
+			} else if (t1 > dgFloat32 (1.0f)) {
+				index = -1;
+				t1 = dgFloat32 (1.0f);
+			}
+			param = t1;
+			point = localP0 - p0p1.Scale4 (param);
 		}
+	} while (index >= 0);
 
-	} while (1);
-	return 0;
+	if ((param > dgFloat32 (0.0f)) && (param < dgFloat32 (1.0f))) {
+		contactOut.m_normal = normal;
+	} else {
+		param = dgFloat32 (1.2f);
+	}
+
+	return param;
 }
 #endif
 
