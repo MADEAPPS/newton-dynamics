@@ -484,7 +484,7 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 	for (dgInt32 i = 0; i < vertexCount; i ++) {
 		if (vertexMap[i] != -1) {
 			m_vertex[vertexMap[i]] = hullVertexArray[i];
-			m_vertex[vertexMap[i]].m_w = dgFloat32 (1.0f);
+			m_vertex[vertexMap[i]].m_w = dgFloat32 (0.0f);
 		}
 	}
 	delete convexHull;
@@ -917,16 +917,10 @@ void dgCollisionConvexHull::Serialize(dgSerialize callback, void* const userData
 	}
 }
 
-
+/*
 dgFloat32 dgCollisionConvexHull::RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
 {
-//	if (m_faceCount > 16) {
-	if (m_faceCount > 1) {
-//dgVector x0 (dgVector (0.0f));
-//dgVector x1 (dgVector (0.0f));
-//x0.m_x = localP0.m_x;
-//x1.m_x = localP1.m_x;
-//dgCollisionConvex::RayCast (x0, x1, contactOut, body, userData);
+	if (m_faceCount > 16) {
 		return dgCollisionConvex::RayCast (localP0, localP1, contactOut, body, userData);
 	} else {
 		dgFloat32 interset = dgFloat32 (1.2f);
@@ -1038,4 +1032,4 @@ dgFloat32 dgCollisionConvexHull::RayCast (const dgVector& localP0, const dgVecto
 		return interset;
 	}
 }
-
+*/

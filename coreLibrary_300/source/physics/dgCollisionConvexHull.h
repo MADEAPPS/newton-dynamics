@@ -55,7 +55,7 @@ class dgCollisionConvexHull: public dgCollisionConvex
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
 
-	virtual dgFloat32 RayCast (const dgVector& localQ0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
+//	virtual dgFloat32 RayCast (const dgVector& localQ0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
 
 	dgInt32 m_faceCount;
 	dgInt32 m_supportTreeCount;

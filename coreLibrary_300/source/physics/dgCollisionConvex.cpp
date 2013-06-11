@@ -2091,7 +2091,7 @@ dgInt32 dgCollisionConvex::CalculatePlaneIntersection (const dgVector& normal, c
 	if (side0 > dgFloat32 (0.0f)) {
 		dgConvexSimplexEdge* ptr = edge;
 		do {
-			dgAssert (m_vertex[ptr->m_twin->m_vertex].m_w == dgFloat32 (1.0f));
+			dgAssert (m_vertex[ptr->m_twin->m_vertex].m_w == dgFloat32 (0.0f));
 			side1 = plane.Evalue (m_vertex[ptr->m_twin->m_vertex]);
 			if (side1 < side0) {
 				if (side1 < dgFloat32 (0.0f)) {
@@ -2123,7 +2123,7 @@ dgInt32 dgCollisionConvex::CalculatePlaneIntersection (const dgVector& normal, c
 	} else if (side0 < dgFloat32 (0.0f)) {
 		dgConvexSimplexEdge* ptr = edge;
 		do {
-			dgAssert (m_vertex[ptr->m_twin->m_vertex].m_w == dgFloat32 (1.0f));
+			dgAssert (m_vertex[ptr->m_twin->m_vertex].m_w == dgFloat32 (0.0f));
 			side1 = plane.Evalue (m_vertex[ptr->m_twin->m_vertex]);
 			if (side1 > side0) {
 				if (side1 >= dgFloat32 (0.0f)) {
@@ -2187,7 +2187,7 @@ dgInt32 dgCollisionConvex::CalculatePlaneIntersection (const dgVector& normal, c
 
 				dgConvexSimplexEdge* ptr1 = ptr->m_next;
 				for (; ptr1 != ptr; ptr1 = ptr1->m_next) {
-					dgAssert (m_vertex[ptr->m_twin->m_vertex].m_w == dgFloat32 (1.0f));
+					dgAssert (m_vertex[ptr->m_twin->m_vertex].m_w == dgFloat32 (0.0f));
 					side0 = plane.Evalue (m_vertex[ptr1->m_twin->m_vertex]); 
 					if (side0 >= dgFloat32 (0.0f)) {
 						break;
@@ -2231,7 +2231,7 @@ dgInt32 dgCollisionConvex::CalculatePlaneIntersection (const dgVector& normal, c
 	return count;
 }
 
-#if 1
+#if 0
 dgInt32 dgCollisionConvex::RayCastClosestFace (dgVector* tetrahedrum, const dgVector& origin, dgFloat32& pointDist) const
 {
 	#define PLANE_MAX_ITERATION 128
@@ -2527,15 +2527,14 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& l
 
 dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
 {
-	dgVector simplex[4];
 	dgVector sum[4];
+	dgVector simplex[4];
 	dgInt32 indexArray[4];
 
 	dgVector normal;
 	dgVector point (localP0);
 	dgVector p0p1 (localP0 - localP1);
 
-//	bool pointfound = false;
 	dgFloat32 param = dgFloat32 (0.0f);
 
 	dgInt32 index = 0;
@@ -2543,12 +2542,12 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& l
 	dgVector dir (p0p1.CompProduct4 (p0p1.DotProduct4(p0p1).InvSqrt ()));
 	simplex[0] = SupportVertex (dir, NULL) - point;
 	do {
-
 		index = 1;
 		dgInt32 iter = 0;
 		dgInt32 cycling = 0;
 		dgFloat32 minDist = dgFloat32 (1.0e20f);
 		dgVector v (simplex[0]);
+		dgAssert (v.m_w == dgFloat32 (0.0f));
 		do {
 			dgFloat32 dist = v % v;
 			if (dist < dgFloat32 (1.0e-9f)) {
@@ -2567,10 +2566,12 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& l
 //				return -index;
 			}
 
-			dgVector dir (v.Scale3 (-dgRsqrt(dist)));
+			dgVector dir (v.Scale4 (-dgRsqrt(dist)));
+			dgAssert (dir.m_w == dgFloat32 (0.0f));
 			simplex[index] = SupportVertex (dir, NULL) - point;
 			const dgVector& w = simplex[index];
 			dgVector wv (w - v);
+			dgAssert (wv.m_w == dgFloat32 (0.0f));
 			dist = dir % wv;
 			if (dist < dgFloat32 (1.0e-3f)) {
 				normal = dir;
@@ -2604,27 +2605,12 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& l
 		} while (iter < DG_CONNICS_CONTATS_ITERATIONS); 
 
 		if (index > 0.0f) {
-			dgFloat32 t1 = dgFloat32 (0.0f);
-			switch (index) 
-			{
-				case 1:
-				case 2:
-				{
-					t1 = -(v % p0p1) / (p0p1 % p0p1);
-					break;
-				}
+			dgVector q (v + point);
+			dgFloat32 den = normal % p0p1;
+			dgAssert (den != 0.0f);
+			//dgFloat32 t1 = - (normal % v) / den;
+			dgFloat32 t1 = (normal % (localP0 - q)) / den;
 
-				case 3:
-				{
-					dgFloat32 den = normal % p0p1;
-					dgAssert (den != 0.0f);
-					t1 = -(normal % v) / den;
-					break;
-				}
-				
-				default:
-					dgAssert(0);
-			}
 			if (t1 < param) {
 				index = -1;
 				t1 = dgFloat32 (0.0f);
@@ -2634,6 +2620,10 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& l
 			}
 			param = t1;
 			point = localP0 - p0p1.Scale4 (param);
+
+			dgVector dir ((point - v) & dgVector::m_triplexMask);
+			dir = dir.CompProduct4(dir.DotProduct4(dir).InvSqrt());
+			simplex[0] = SupportVertex (dir, NULL) - point;
 		}
 	} while (index >= 0);
 
