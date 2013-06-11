@@ -161,8 +161,7 @@ class ShatterEffect: public dList<ShatterAtom>
 
 		// now we call create we decompose the mesh into several convex pieces 
 		//NewtonMesh* const debriMeshPieces = NewtonMeshVoronoiDecomposition (mesh, count, sizeof (dVector), &points[0].m_x, interiorMaterial, &textureMatrix[0][0]);
-		dFloat dist = 0.2f;
-		NewtonMesh* const debriMeshPieces = NewtonMeshCreateVoronoiConvexDecomposition (m_world, count, &points[0].m_x, sizeof (dVector), interiorMaterial, &textureMatrix[0][0], dist);
+		NewtonMesh* const debriMeshPieces = NewtonMeshCreateVoronoiConvexDecomposition (m_world, count, &points[0].m_x, sizeof (dVector), interiorMaterial, &textureMatrix[0][0]);
 		dAssert (debriMeshPieces);
 
 		// TODO:  clip the voronoid convexes against the mesh 
