@@ -24,7 +24,7 @@
 #define NUMBER_OF_INTERNAL_PARTS		20
 //#define NUMBER_OF_INTERNAL_PARTS		4
 
-#define BREAK_FORCE_IN_GRAVITIES	10
+#define BREAK_FORCE_IN_GRAVITIES	6
 //#define BREAK_FORCE_IN_GRAVITIES	1
 
 #if 0
@@ -143,7 +143,7 @@ class ShatterEffect: public dList<ShatterAtom>
 
 		// pepper the inside of the BBox box of the mesh with random points
 		int count = 0;
-		dVector points[NUMBER_OF_INTERNAL_PARTS + 1];
+		dVector points[NUMBER_OF_INTERNAL_PARTS + 8];
 		while (count < NUMBER_OF_INTERNAL_PARTS) {			
 			dFloat x = RandomVariable(size.m_x);
 			dFloat y = RandomVariable(size.m_y);
@@ -154,39 +154,60 @@ class ShatterEffect: public dList<ShatterAtom>
 			}
 		} 
 
+		// add the boudning box as a safeguard area
+		points[count + 0] = dVector (size.m_x, size.m_y, size.m_z, 0.0f);
+		points[count + 1] = dVector (size.m_x, size.m_y, -size.m_z, 0.0f);
+		points[count + 2] = dVector (size.m_x, size.m_y, size.m_z, 0.0f);
+		points[count + 3] = dVector (size.m_x, size.m_y, -size.m_z, 0.0f);
+		points[count + 4] = dVector (size.m_x, -size.m_y, size.m_z, 0.0f);
+		points[count + 5] = dVector (size.m_x, -size.m_y, -size.m_z, 0.0f);
+		points[count + 6] = dVector (size.m_x, -size.m_y, size.m_z, 0.0f);
+		points[count + 7] = dVector (size.m_x, -size.m_y, -size.m_z, 0.0f);
+		count += 8;
+
 		// create a texture matrix, for applying the material's UV to all internal faces
 		dMatrix textureMatrix (GetIdentityMatrix());
 		textureMatrix[0][0] = 1.0f / size.m_x;
 		textureMatrix[1][1] = 1.0f / size.m_y;
-
-		// now we call create we decompose the mesh into several convex pieces 
-		//NewtonMesh* const debriMeshPieces = NewtonMeshVoronoiDecomposition (mesh, count, sizeof (dVector), &points[0].m_x, interiorMaterial, &textureMatrix[0][0]);
-		NewtonMesh* const debriMeshPieces = NewtonMeshCreateVoronoiConvexDecomposition (m_world, count, &points[0].m_x, sizeof (dVector), interiorMaterial, &textureMatrix[0][0]);
-		dAssert (debriMeshPieces);
-
-		// TODO:  clip the voronoid convexes against the mesh 
-		//
-
 
 		// Get the volume of the original mesh
 		NewtonCollision* const collision = NewtonCreateConvexHullFromMesh (m_world, mesh, 0.0f, 0);
 		dFloat volume = NewtonConvexCollisionCalculateVolume (collision);
 		NewtonDestroyCollision(collision);
 
+		// now we call create we decompose the mesh into several convex pieces 
+		//NewtonMesh* const debriMeshPieces = NewtonMeshVoronoiDecomposition (mesh, count, sizeof (dVector), &points[0].m_x, interiorMaterial, &textureMatrix[0][0]);
+		NewtonMesh* const debriMeshPieces = NewtonMeshCreateVoronoiConvexDecomposition (m_world, count, &points[0].m_x, sizeof (dVector), interiorMaterial, &textureMatrix[0][0]);
+		dAssert (debriMeshPieces);
+
+		
+
 		// now we iterate over each pieces and for each one we create a visual entity and a rigid body
 		NewtonMesh* nextDebri;
+		//for (NewtonMesh* debri = NewtonMeshCreateFirstSingleSegment (voronoi); debri; debri = nextDebri) {
+			// get next segment layar
+			//nextDebri = NewtonMeshCreateNextSingleSegment (debriMeshPieces, debri);
 		for (NewtonMesh* debri = NewtonMeshCreateFirstLayer (debriMeshPieces); debri; debri = nextDebri) {
+			// get next segment piece
 			nextDebri = NewtonMeshCreateNextLayer (debriMeshPieces, debri); 
-
-			NewtonCollision* const collision = NewtonCreateConvexHullFromMesh (m_world, debri, 0.0f, 0);
-			if (collision) {
-				ShatterAtom& atom = Append()->GetInfo();
-				atom.m_mesh = new DemoMesh(debri);
-				atom.m_collision = collision;
-				NewtonConvexCollisionCalculateInertialMatrix (atom.m_collision, &atom.m_momentOfInirtia[0], &atom.m_centerOfMass[0]);	
-				dFloat debriVolume = NewtonConvexCollisionCalculateVolume (atom.m_collision);
-				atom.m_massFraction = debriVolume / volume;
+			
+			//clip the voronoid convexes against the mesh 
+			NewtonMesh* const fracturePiece = NewtonMeshConvexConvexMeshIntersection (debri, mesh);
+			if (fracturePiece) {
+				// make a conve hull collsion shape
+				NewtonCollision* const collision = NewtonCreateConvexHullFromMesh (m_world, fracturePiece, 0.0f, 0);
+				if (collision) {
+					// we have a piece which has a convex collsion  representation, add that to the list
+					ShatterAtom& atom = Append()->GetInfo();
+					atom.m_mesh = new DemoMesh(fracturePiece);
+					atom.m_collision = collision;
+					NewtonConvexCollisionCalculateInertialMatrix (atom.m_collision, &atom.m_momentOfInirtia[0], &atom.m_centerOfMass[0]);	
+					dFloat debriVolume = NewtonConvexCollisionCalculateVolume (atom.m_collision);
+					atom.m_massFraction = debriVolume / volume;
+				}
+				NewtonMeshDestroy(fracturePiece);
 			}
+
 			NewtonMeshDestroy(debri);
 		}
 
@@ -231,17 +252,15 @@ class SimpleShatterEffectEntity: public DemoEntity
 	}
 
 
-	void SimulationLister(DemoEntityManager* const scene, DemoEntityManager::dListNode* const mynode, dFloat timeStep)
+	void SimulationPostListener(DemoEntityManager* const scene, DemoEntityManager::dListNode* const mynode, dFloat timeStep)
 	{
-		dAssert (0);
-/*
 		m_delay --;
 		if (m_delay > 0) {
 			return;
 		}
 
 		// see if the net force on the body comes fr a high impact collision
-		dFloat maxInternalForce = 0.0f;
+		dFloat maxInternalForceMag2 = 0.0f;
 		for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint(m_myBody); joint; joint = NewtonBodyGetNextContactJoint(m_myBody, joint)) {
 			for (void* contact = NewtonContactJointGetFirstContact (joint); contact; contact = NewtonContactJointGetNextContact (joint, contact)) {
 				//dVector point;
@@ -251,18 +270,20 @@ class SimpleShatterEffectEntity: public DemoEntity
 				//NewtonMaterialGetContactPositionAndNormal (material, &point.m_x, &normal.m_x);
 				NewtonMaterialGetContactForce(material, m_myBody, &contactForce[0]);
 				dFloat forceMag = contactForce % contactForce;
-				if (forceMag > maxInternalForce) {
-					maxInternalForce = forceMag;
+				if (forceMag > maxInternalForceMag2) {
+					maxInternalForceMag2 = forceMag;
 				}
 			}
 		}
+	
 
-		
+		// if the force is bigger than N time Gravities, It is considered a collision force
+//		dFloat maxForce = BREAK_FORCE_IN_GRAVITIES * m_myweight;
+		dFloat maxForce = 0;
 
-		// if the force is bigger than 4 Gravities, It is considered a collision force
-		dFloat maxForce = BREAK_FORCE_IN_GRAVITIES * m_myweight;
+//dTrace (("%f %f\n", sqrtf (maxInternalForceMag2), maxForce));
 
-		if (maxInternalForce > (maxForce * maxForce)) {
+		if (maxInternalForceMag2 > (maxForce * maxForce)) {
 			NewtonWorld* const world = NewtonBodyGetWorld(m_myBody);
 
 			dFloat Ixx; 
@@ -296,20 +317,20 @@ class SimpleShatterEffectEntity: public DemoEntity
 				int materialId = 0;
 
 				dFloat debriMass = mass * atom.m_massFraction;
-				dFloat Ixx = debriMass * atom.m_momentOfInirtia.m_x;
-				dFloat Iyy = debriMass * atom.m_momentOfInirtia.m_y;
-				dFloat Izz = debriMass * atom.m_momentOfInirtia.m_z;
+				//dFloat Ixx = debriMass * atom.m_momentOfInirtia.m_x;
+				//dFloat Iyy = debriMass * atom.m_momentOfInirtia.m_y;
+				//dFloat Izz = debriMass * atom.m_momentOfInirtia.m_z;
 
 				//create the rigid body
-				NewtonBody* const rigidBody = NewtonCreateBody (world, atom.m_collision, &matrix[0][0]);
+				NewtonBody* const rigidBody = NewtonCreateDynamicBody (world, atom.m_collision, &matrix[0][0]);
 
 				// set the correct center of gravity for this body
-				NewtonBodySetCentreOfMass (rigidBody, &atom.m_centerOfMass[0]);
-
+				// NewtonBodySetCentreOfMass (rigidBody, &atom.m_centerOfMass[0]);
 				// calculate the center of mas of the debris
-				dVector center (matrix.TransformVector(atom.m_centerOfMass));
+				NewtonBodySetMassProperties (rigidBody, mass, atom.m_collision);
 
 				// calculate debris initial velocity
+				dVector center (matrix.TransformVector(atom.m_centerOfMass));
 				dVector v (veloc + omega * (center - com));
 
 				// set initial velocity
@@ -348,7 +369,6 @@ class SimpleShatterEffectEntity: public DemoEntity
 			NewtonDestroyBody(world, m_myBody);
 			scene->RemoveEntity	(mynode);
 		}
-*/
 	};
 
 	int m_delay;
@@ -360,9 +380,6 @@ class SimpleShatterEffectEntity: public DemoEntity
 
 static void AddShatterEntity (DemoEntityManager* const scene, DemoMesh* const visualMesh, NewtonCollision* const collision, const ShatterEffect& shatterEffect, const dVector& location)
 {
-	dAssert (0);
-
-/*
 	dQuaternion rotation;
 	SimpleShatterEffectEntity* const entity = new SimpleShatterEffectEntity (visualMesh, shatterEffect);
 	entity->SetMatrix(*scene, rotation, location);
@@ -373,32 +390,24 @@ static void AddShatterEntity (DemoEntityManager* const scene, DemoMesh* const vi
 	dVector inertia;
 	NewtonConvexCollisionCalculateInertialMatrix (collision, &inertia[0], &origin[0]);	
 
-float mass = 10.0f;
-int materialId = 0;
-
-	dFloat Ixx = mass * inertia[0];
-	dFloat Iyy = mass * inertia[1];
-	dFloat Izz = mass * inertia[2];
+	float mass = 10.0f;
+	int materialId = 0;
 
 	//create the rigid body
 	dMatrix matrix (GetIdentityMatrix());
 	matrix.m_posit = location;
 
 	NewtonWorld* const world = scene->GetNewton();
-	NewtonBody* const rigidBody = NewtonCreateBody (world, collision, &matrix[0][0]);
-
+	NewtonBody* const rigidBody = NewtonCreateDynamicBody (world, collision, &matrix[0][0]);
 
 	entity->m_myBody = rigidBody;
 	entity->m_myweight = dAbs (mass * DEMO_GRAVITY);
 
 	// set the correct center of gravity for this body
-	NewtonBodySetCentreOfMass (rigidBody, &origin[0]);
+	//NewtonBodySetCentreOfMass (rigidBody, &origin[0]);
 
 	// set the mass matrix
-	NewtonBodySetMassMatrix (rigidBody, mass, Ixx, Iyy, Izz);
-
-	// activate 
-	//	NewtonBodyCoriolisForcesMode (blockBoxBody, 1);
+	NewtonBodySetMassProperties (rigidBody, mass, collision);
 
 	// save the pointer to the graphic object with the body.
 	NewtonBodySetUserData (rigidBody, entity);
@@ -417,14 +426,12 @@ int materialId = 0;
 
 	// set the force and torque call back function
 	NewtonBodySetForceAndTorqueCallback (rigidBody, PhysicsApplyGravityForce);
-*/
 }
 
 
 
 static void AddShatterPrimitive (DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat spacing, PrimitiveType type, int materialID, const dMatrix& shapeOffsetMatrix)
 {
-
 	// create the shape and visual mesh as a common data to be re used
 	NewtonWorld* const world = scene->GetNewton();
 	NewtonCollision* const collision = CreateConvexCollision (world, shapeOffsetMatrix, size, type, materialID);
@@ -473,6 +480,7 @@ void SimpleConvexShatter (DemoEntityManager* const scene)
 {
 	// load the skybox
 	scene->CreateSkyBox();
+return;
 
 	// load the scene from a ngd file format
 	CreateLevelMesh (scene, "flatPlane.ngd", false);
@@ -487,7 +495,7 @@ void SimpleConvexShatter (DemoEntityManager* const scene)
 	dVector size (0.5f, 0.5f, 0.5f, 0.0f);
 	dMatrix shapeOffsetMatrix (GetIdentityMatrix());
 
-	int count = 5;
+	int count = 1;
 
 
 //	AddShatterPrimitive(scene, 10.0f, location, size, count, count, 3.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
