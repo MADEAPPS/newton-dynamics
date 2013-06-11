@@ -1631,118 +1631,6 @@ dgFloat32 dgCollisionConvex::GetBoxMaxRadius () const
 } 
 
 
-dgInt32 dgCollisionConvex::RayCastClosestFace (dgVector* tetrahedrum, const dgVector& origin, dgFloat32& pointDist) const
-{
-	#define PLANE_MAX_ITERATION 128
-
-	dgInt32 face = 0;
-	dgInt32 plane = -1;
-	dgFloat32 maxDist = dgFloat32 (1.0e10f);
-
-	dgInt32 j = 0;
-	for (; (face != -1) && (j < PLANE_MAX_ITERATION); j ++) {
-		face = -1;
-
-		// initialize distance to zero (very important)
-		maxDist = dgFloat32 (0.0f);
-		dgVector normal (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-		for (dgInt32 i = 0; i < 4; i ++) {
-			dgInt32 i0 = m_rayCastSimplex[i][0];
-			dgInt32 i1 = m_rayCastSimplex[i][1];
-			dgInt32 i2 = m_rayCastSimplex[i][2];
-			const dgVector& p0 = tetrahedrum[i0];
-			const dgVector& p1 = tetrahedrum[i1];
-			const dgVector& p2 = tetrahedrum[i2];
-			dgVector e0 (p1 - p0);
-			dgVector e1 (p2 - p0);
-			dgVector n (e0 * e1);
-
-			dgFloat32 dist = n % n;
-			if (dist > dgFloat32 (1.0e-24f)) {
-				n = n.Scale3 (dgRsqrt (n % n));
-				dist = n % (origin - p0);
-				// find the plane farther away from the origin
-				if (dist >= maxDist) {
-					maxDist = dist;
-					normal = n;
-					face = i;
-				}
-			}
-		}
-
-		if (face != -1) {
-			dgInt32 j0 = m_rayCastSimplex[face][0];
-			dgVector p (SupportVertex (normal, NULL));
-			dgFloat32 dist = normal % (p - tetrahedrum[j0]);
-			if(dist < dgFloat32 (1.0e-5f)) {
-				plane = face;
-				break;
-			}
-
-			dgInt32 j1 = m_rayCastSimplex[face][1];
-			dgInt32 j3 = m_rayCastSimplex[face][3];
-			tetrahedrum[j3] = p;
-			dgSwap (tetrahedrum[j0], tetrahedrum[j1]);
-
-			dgInt32 i0 = m_rayCastSimplex[0][0];
-			dgInt32 i1 = m_rayCastSimplex[0][1];
-			dgInt32 i2 = m_rayCastSimplex[0][2];
-			dgInt32 i3 = m_rayCastSimplex[0][3];
-
-			dgVector e0 (tetrahedrum[i1] - tetrahedrum[i0]);
-			dgVector e1 (tetrahedrum[i2] - tetrahedrum[i0]);
-			dgVector e2 (tetrahedrum[i3] - tetrahedrum[i0]);
-
-			dist = (e1 * e0) % e2;
-			if (dgAbsf (dist) < dgFloat32 (1.0e-4)) {
-				dgBigVector p0 (tetrahedrum[i0]);
-				dgBigVector p1 (tetrahedrum[i1]);
-				dgBigVector p2 (tetrahedrum[i2]);
-				dgBigVector p3 (tetrahedrum[i3]);
-				dgBigVector e0 (p1 - p0);
-				dgBigVector e1 (p2 - p0);
-				dgBigVector e2 (p3 - p0);
-				dgFloat64 dist1 = (e1 * e0) % e2;
-				if (dist1 <= dgFloat64 (0.0f)) {
-					dgSwap (tetrahedrum[1], tetrahedrum[2]);
-				}
-			} else if (dist <= dgFloat32 (0.0f)) {
-				dgSwap (tetrahedrum[1], tetrahedrum[2]);
-			}
-
-		}
-	} 
-
-	if (j >= PLANE_MAX_ITERATION) {
-		plane = -1;
-		if ((face != -1) && (maxDist >= dgFloat32 (0.0f))) {
-			for (dgInt32 i = 0; i < 4; i ++) {
-				dgInt32 i0 = m_rayCastSimplex[i][0];
-				dgInt32 i1 = m_rayCastSimplex[i][1];
-				dgInt32 i2 = m_rayCastSimplex[i][2];
-				const dgVector& p0 = tetrahedrum[i0];
-				const dgVector& p1 = tetrahedrum[i1];
-				const dgVector& p2 = tetrahedrum[i2];
-				dgVector e0 (p1 - p0);
-				dgVector e1 (p2 - p0);
-				dgVector n (e0 * e1);
-
-				dgFloat32 dist = n % n;
-				if (dist > dgFloat32 (1.0e-24f)) {
-					n = n.Scale3 (dgRsqrt (n % n));
-					dist = n % (origin - p0);
-					if (dist >= maxDist) {
-						maxDist = dist;
-						plane = i;
-					}
-				}
-			}
-		}
-	}
-	pointDist = maxDist;
-	return plane;
-}
-
 
 dgVector dgCollisionConvex::CalculateVolumeIntegral (
 	const dgMatrix& globalMatrix, 
@@ -2343,8 +2231,121 @@ dgInt32 dgCollisionConvex::CalculatePlaneIntersection (const dgVector& normal, c
 	return count;
 }
 
+#if 1
+dgInt32 dgCollisionConvex::RayCastClosestFace (dgVector* tetrahedrum, const dgVector& origin, dgFloat32& pointDist) const
+{
+	#define PLANE_MAX_ITERATION 128
 
-dgFloat32 dgCollisionConvex::RayCast (const dgVector& localQ0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
+	dgInt32 face = 0;
+	dgInt32 plane = -1;
+	dgFloat32 maxDist = dgFloat32 (1.0e10f);
+
+	dgInt32 j = 0;
+	for (; (face != -1) && (j < PLANE_MAX_ITERATION); j ++) {
+		face = -1;
+
+		// initialize distance to zero (very important)
+		maxDist = dgFloat32 (0.0f);
+		dgVector normal (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+		for (dgInt32 i = 0; i < 4; i ++) {
+			dgInt32 i0 = m_rayCastSimplex[i][0];
+			dgInt32 i1 = m_rayCastSimplex[i][1];
+			dgInt32 i2 = m_rayCastSimplex[i][2];
+			const dgVector& p0 = tetrahedrum[i0];
+			const dgVector& p1 = tetrahedrum[i1];
+			const dgVector& p2 = tetrahedrum[i2];
+			dgVector e0 (p1 - p0);
+			dgVector e1 (p2 - p0);
+			dgVector n (e0 * e1);
+
+			dgFloat32 dist = n % n;
+			if (dist > dgFloat32 (1.0e-24f)) {
+				n = n.Scale3 (dgRsqrt (n % n));
+				dist = n % (origin - p0);
+				// find the plane farther away from the origin
+				if (dist >= maxDist) {
+					maxDist = dist;
+					normal = n;
+					face = i;
+				}
+			}
+		}
+
+		if (face != -1) {
+			dgInt32 j0 = m_rayCastSimplex[face][0];
+			dgVector p (SupportVertex (normal, NULL));
+			dgFloat32 dist = normal % (p - tetrahedrum[j0]);
+			if(dist < dgFloat32 (1.0e-5f)) {
+				plane = face;
+				break;
+			}
+
+			dgInt32 j1 = m_rayCastSimplex[face][1];
+			dgInt32 j3 = m_rayCastSimplex[face][3];
+			tetrahedrum[j3] = p;
+			dgSwap (tetrahedrum[j0], tetrahedrum[j1]);
+
+			dgInt32 i0 = m_rayCastSimplex[0][0];
+			dgInt32 i1 = m_rayCastSimplex[0][1];
+			dgInt32 i2 = m_rayCastSimplex[0][2];
+			dgInt32 i3 = m_rayCastSimplex[0][3];
+
+			dgVector e0 (tetrahedrum[i1] - tetrahedrum[i0]);
+			dgVector e1 (tetrahedrum[i2] - tetrahedrum[i0]);
+			dgVector e2 (tetrahedrum[i3] - tetrahedrum[i0]);
+
+			dist = (e1 * e0) % e2;
+			if (dgAbsf (dist) < dgFloat32 (1.0e-4)) {
+				dgBigVector p0 (tetrahedrum[i0]);
+				dgBigVector p1 (tetrahedrum[i1]);
+				dgBigVector p2 (tetrahedrum[i2]);
+				dgBigVector p3 (tetrahedrum[i3]);
+				dgBigVector e0 (p1 - p0);
+				dgBigVector e1 (p2 - p0);
+				dgBigVector e2 (p3 - p0);
+				dgFloat64 dist1 = (e1 * e0) % e2;
+				if (dist1 <= dgFloat64 (0.0f)) {
+					dgSwap (tetrahedrum[1], tetrahedrum[2]);
+				}
+			} else if (dist <= dgFloat32 (0.0f)) {
+				dgSwap (tetrahedrum[1], tetrahedrum[2]);
+			}
+
+		}
+	} 
+
+	if (j >= PLANE_MAX_ITERATION) {
+		plane = -1;
+		if ((face != -1) && (maxDist >= dgFloat32 (0.0f))) {
+			for (dgInt32 i = 0; i < 4; i ++) {
+				dgInt32 i0 = m_rayCastSimplex[i][0];
+				dgInt32 i1 = m_rayCastSimplex[i][1];
+				dgInt32 i2 = m_rayCastSimplex[i][2];
+				const dgVector& p0 = tetrahedrum[i0];
+				const dgVector& p1 = tetrahedrum[i1];
+				const dgVector& p2 = tetrahedrum[i2];
+				dgVector e0 (p1 - p0);
+				dgVector e1 (p2 - p0);
+				dgVector n (e0 * e1);
+
+				dgFloat32 dist = n % n;
+				if (dist > dgFloat32 (1.0e-24f)) {
+					n = n.Scale3 (dgRsqrt (n % n));
+					dist = n % (origin - p0);
+					if (dist >= maxDist) {
+						maxDist = dist;
+						plane = i;
+					}
+				}
+			}
+		}
+	}
+	pointDist = maxDist;
+	return plane;
+}
+
+
+dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
 {
 	#define DG_LEN  (0.01f)
 	#define DG_AREA (DG_LEN * DG_LEN)
@@ -2355,7 +2356,7 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localQ0, const dgVector& l
 	dgFloat32 tMin = dgFloat32 (0.0f);
 	dgFloat32 tMax = dgFloat32 (1.0f);
 
-	dgVector p0 (localQ0 - m_boxOrigin); 
+	dgVector p0 (localP0 - m_boxOrigin); 
 	dgVector p1 (localP1 - m_boxOrigin); 
 	dgVector paddedBox (m_boxSize.Scale3 (1.1f));
 	for (dgInt32 i = 0; i < 3; i ++) {
@@ -2396,7 +2397,7 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localQ0, const dgVector& l
 	if (tMin < dgFloat32 (1.0f)) {
 		dgVector tetrahedrum[4];
 
-		dgVector localP0 (localQ0 + (localP1 - localQ0).Scale3(tMin));
+		dgVector localP0 (localP0 + (localP1 - localP0).Scale3(tMin));
 		dgVector bestPoint (dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
 		dgVector normal (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 		dgVector step (localP1 - localP0); 
@@ -2510,8 +2511,8 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localQ0, const dgVector& l
 				}
 
 				if (error2 < dgFloat32 (1.0e-4f)) {
-					dgVector numVector (localP0 + step.Scale3(t0) - localQ0);
-					dgVector denVector (localP1 - localQ0);
+					dgVector numVector (localP0 + step.Scale3(t0) - localP0);
+					dgVector denVector (localP1 - localP0);
 					interset = (numVector % denVector) / (denVector % denVector);
 					contactOut.m_normal = normal.Scale3 (dgRsqrt(normal % normal));
 					//contactOut.m_userId = SetUserDataID();
@@ -2522,6 +2523,106 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localQ0, const dgVector& l
 	return interset;
 }
 
+#else 
+
+dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
+{
+	dgVector simplex[4];
+	dgVector sum[4];
+	dgInt32 indexArray[4];
+
+	dgVector normal;
+	dgVector point (localP0);
+	dgVector p0p1 (localP0 - localP1);
+
+	memset (sum, 0, sizeof (sum));
+	dgVector dir (p0p1.CompProduct4 (p0p1.DotProduct4(p0p1).InvSqrt ()));
+	simplex[0] = SupportVertex (dir, NULL) - localP0;
+	do {
+
+		dgInt32 index = 1;
+		dgInt32 iter = 0;
+		dgInt32 cycling = 0;
+		dgFloat32 minDist = dgFloat32 (1.0e20f);
+		dgVector v (simplex[0]);
+		do {
+			dgFloat32 dist = v % v;
+			if (dist < dgFloat32 (1.0e-9f)) {
+				dgAssert (0);
+//				return -index; 
+			}
+
+			if (dist < minDist) {
+				minDist = dist;
+				cycling = -1;
+			}
+			cycling ++;
+			if (cycling > 4) {
+				dgAssert (0);
+				// for now return -1
+//				return -index;
+			}
+
+			dgVector dir (v.Scale3 (-dgRsqrt(dist)));
+			simplex[index] = SupportVertex (dir, NULL) - localP0;
+			const dgVector& w = simplex[index];
+			dgVector wv (w - v);
+			dist = dir % wv;
+			if (dist < dgFloat32 (1.0e-3f)) {
+				normal = dir;
+				break;
+			}
+
+			index ++;
+			switch (index) 
+			{
+				case 2:
+				{
+					v = dgMinkHull::ReduceLine (index, simplex, sum, indexArray);
+					break;
+				}
+
+				case 3:
+				{
+					v = dgMinkHull::ReduceTriangle (index, simplex, sum, indexArray);
+					break;
+				}
+
+				case 4:
+				{
+					_ASSERTE (0);
+//					v = ReduceTetrahedrum (index, m_hullDiff, m_hullSum, m_polygonFaceIndex);
+					break;
+				}
+			}
+
+			iter ++;
+			cycling ++;
+		} while (iter < DG_CONNICS_CONTATS_ITERATIONS); 
+
+		switch (index) 
+		{
+			case 2:
+			{
+				dgAssert(0);
+				break;
+			}
+
+			case 3:
+			{
+				dgVector q (localP0 + v);
+				dgAssert(0);
+				break;
+			}
+			
+			default:
+				dgAssert(0);
+		}
+
+	} while (1);
+	return 0;
+}
+#endif
 
 dgVector dgCollisionConvex::ConvexConicSupporVertex (const dgVector& dir) const 
 {

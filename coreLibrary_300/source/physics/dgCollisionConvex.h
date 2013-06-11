@@ -81,7 +81,6 @@ class dgCollisionConvex: public dgCollision
 	dgInt32 SimplifyClipPolygon (dgInt32 count, const dgVector& normal, dgVector* const polygon) const;
 
 	dgVector CalculateVolumeIntegral (const dgPlane& plane) const; 
-//	dgConvexSimplexEdge* GetSupportEdge (const dgVector& dir) const;
 	
 	void SetVolumeAndCG ();
 	bool SanityCheck (dgPolyhedra& hull) const;
