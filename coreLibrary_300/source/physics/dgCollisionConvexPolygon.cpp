@@ -71,8 +71,15 @@ void dgCollisionConvexPolygon::Serialize(dgSerialize callback, void* const userD
 dgFloat32 dgCollisionConvexPolygon::RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* userData) const
 {
 	dgAssert (0);
-	return dgFloat32 (0.0f);
+	return dgFloat32 (1.2f);
 }
+
+dgFloat32 dgCollisionConvexPolygon::ConvexRayCast (const dgCollisionInstance* const convexShape, const dgMatrix& origin, const dgVector& veloc, dgFloat32 minT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const 
+{
+	dgAssert (0);
+	return minT + dgFloat32 (1.2f);
+}
+
 
 dgFloat32 dgCollisionConvexPolygon::GetVolume () const
 {

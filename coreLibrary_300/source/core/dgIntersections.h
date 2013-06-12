@@ -68,7 +68,7 @@ class dgFastRayTest
 			if (test.GetSignMask() & 0x07) {
 				return 0;
 			}
-			dgVector tt0 = (minBox - m_p0).CompProduct4(m_dpInv);
+			dgVector tt0 ((minBox - m_p0).CompProduct4(m_dpInv));
 			dgVector tt1 ((maxBox - m_p0).CompProduct4(m_dpInv));
 			dgVector t0 (m_minT.GetMax(tt0.GetMin(tt1)));
 			dgVector t1 (m_maxT.GetMin(tt0.GetMax(tt1)));

@@ -472,7 +472,12 @@ dgFloat32 dgCollisionInstance::ConvexRayCast (const dgCollisionInstance* const c
 		if (m_scaleIsUnit) {
 			dgFloat32 t = m_childShape->ConvexRayCast (convexShape, localMatrix, localVeloc, minT, contactOut, body, userData);
 			if (t <= minT) {
-				dgAssert (0);
+				if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
+					contactOut.m_shapeId0 = GetUserDataID();
+					contactOut.m_shapeId1 = GetUserDataID();
+				}
+				contactOut.m_collision0 = this;
+				contactOut.m_collision1 = this;
 			}
 		} else {
 			dgAssert (0);

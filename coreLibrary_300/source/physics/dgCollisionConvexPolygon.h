@@ -48,6 +48,7 @@ class dgCollisionConvexPolygon: public dgCollisionConvex
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
 	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1);
 	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
+	virtual dgFloat32 ConvexRayCast (const dgCollisionInstance* const convexShape, const dgMatrix& origin, const dgVector& veloc, dgFloat32 maxT, dgContactPoint& contactsOut, const dgBody* const body, void* const userData) const; 
 
 	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
 

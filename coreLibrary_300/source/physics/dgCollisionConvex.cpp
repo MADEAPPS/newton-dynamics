@@ -2637,6 +2637,13 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& l
 }
 #endif
 
+
+dgFloat32 dgCollisionConvex::ConvexRayCast (const dgCollisionInstance* const convexShape, const dgMatrix& origin, const dgVector& veloc, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const 
+{
+	return 0.1f;
+}
+
+
 dgVector dgCollisionConvex::ConvexConicSupporVertex (const dgVector& dir) const 
 {
 	return SupportVertex(dir, NULL);

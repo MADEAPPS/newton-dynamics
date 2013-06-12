@@ -234,8 +234,8 @@ dgFloat32 dgBody::RayCast (const dgLineBox& line, OnRayCastAction filter, OnRayP
 			dgVector l1l0 (line.m_l1 - line.m_l0);
 			t = ((p - line.m_l0) % l1l0) / (l1l0 % l1l0);
 			if (t < minT) {
-				dgAssert (t >= 0.0f);
-				dgAssert (t <= 1.0f);
+				dgAssert (t >= dgFloat32 (0.0f));
+				dgAssert (t <= dgFloat32 (1.0f));
 				contactOut.m_normal = globalMatrix.RotateVector (contactOut.m_normal);
 				minT = filter (this, contactOut.m_collision0, contactOut.m_normal, (void*)contactOut.m_shapeId0, userData, t);
 			}
@@ -253,21 +253,16 @@ dgFloat32 dgBody::ConvexRayCast (const dgFastRayTest& ray, const dgCollisionInst
 		const dgMatrix& globalMatrix = m_collision->GetGlobalMatrix();
 		dgMatrix matrix (origin * globalMatrix.Inverse());
 		dgVector veloc (globalMatrix.UnrotateVector(shapeVeloc));
-//		dgVector localP0 (globalMatrix.UntransformVector (l0));
-//		dgVector localP1 (globalMatrix.UntransformVector (l1));
-//		dgFloat32 t = m_collision->RayCast (localP0, localP1, contactOut, preFilter, this, userData);
 		dgFloat32 t = m_collision->ConvexRayCast (convexShape, matrix, veloc, minT, contactOut, preFilter, this, userData);
-		if (t < dgFloat32 (1.0f)) {
-			dgAssert(0);
-//			dgVector p (globalMatrix.TransformVector(localP0 + (localP1 - localP0).Scale3(t)));
+		if (t < minT) {
+//			dgVector p (globalMatrix.TransformVector(line.m_l0 + (line.m_l1 - line.m_l0).Scale3(t)));
 //			dgVector l1l0 (line.m_l1 - line.m_l0);
 //			t = ((p - line.m_l0) % l1l0) / (l1l0 % l1l0);
 //			if (t < minT) {
-//				dgAssert (t >= 0.0f);
-//				dgAssert (t <= 1.0f);
-//				contactOut.m_normal = globalMatrix.RotateVector (contactOut.m_normal);
+			dgAssert (t >= dgFloat32 (0.0f));
+			dgAssert (t <= dgFloat32 (1.0f));
+			contactOut.m_normal = globalMatrix.RotateVector (contactOut.m_normal);
 //				minT = filter (this, contactOut.m_collision0, contactOut.m_normal, (void*)contactOut.m_shapeId0, userData, t);
-//			}
 		}
 	} 
 
