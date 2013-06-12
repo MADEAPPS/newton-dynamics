@@ -466,4 +466,18 @@ dgFloat32 dgCollisionInstance::RayCast (const dgVector& localP0, const dgVector&
 	return dgFloat32 (1.2f);
 }
 
+dgFloat32 dgCollisionInstance::ConvexRayCast (const dgCollisionInstance* const convexShape, const dgMatrix& localMatrix, const dgVector& localVeloc, dgFloat32 minT, dgContactPoint& contactOut, OnRayPrecastAction preFilter, const dgBody* const body, void* const userData) const
+{
+	if (!preFilter || preFilter(body, this, userData)) {
+		if (m_scaleIsUnit) {
+			dgFloat32 t = m_childShape->ConvexRayCast (convexShape, localMatrix, localVeloc, minT, contactOut, body, userData);
+			if (t <= minT) {
+				dgAssert (0);
+			}
+		} else {
+			dgAssert (0);
+		}
+	}
 
+	return minT;
+}

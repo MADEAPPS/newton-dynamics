@@ -1208,15 +1208,14 @@ void NewtonWorldRayCast(const NewtonWorld* const newtonWorld, const dFloat* cons
 	}
 }
 
-NEWTON_API void NewtonWorldConvexRay (const NewtonWorld* const newtonWorld, const dFloat* const p0, const dFloat* const p1, NewtonWorldRayFilterCallback filter, void* const userData, NewtonWorldRayPrefilterCallback prefilter)
+NEWTON_API void NewtonWorldConvexRayCast (const NewtonWorld* const newtonWorld, const NewtonCollision* const shape, const dFloat* const matrix, const dFloat* const p1, NewtonWorldRayFilterCallback filter, void* const userData, NewtonWorldRayPrefilterCallback prefilter)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	_ASSERTE (0);
 	if (filter) {
-		dgVector pp0 (p0[0], p0[1], p0[2], dgFloat32 (0.0f));
+		dgMatrix pp0 (matrix);
 		dgVector pp1 (p1[0], p1[1], p1[2], dgFloat32 (0.0f));
 		Newton* const world = (Newton *) newtonWorld;
-		world->GetBroadPhase()->RayCast (pp0, pp1, (OnRayCastAction) filter, (OnRayPrecastAction) prefilter, userData);
+		world->GetBroadPhase()->ConvexRayCast ((dgCollisionInstance*) shape, pp0, pp1, (OnRayCastAction) filter, (OnRayPrecastAction) prefilter, userData);
 	}
 }
 
