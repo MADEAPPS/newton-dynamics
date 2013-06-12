@@ -72,13 +72,12 @@ void dgCollisionChamferCylinder::Init (dgFloat32 radius, dgFloat32 height)
 	dgMatrix rot (dgPitchMatrix (breakStep));	
 	dgInt32 index = 0;
 	for (dgInt32 j = 0; j <= DG_CHAMFERCYLINDER_SLICES; j ++) {
-		dgVector p0 (-m_height * dgCos(sliceAngle), dgFloat32 (0.0f), m_radius + m_height * dgSin(sliceAngle), dgFloat32 (1.0f));
+		dgVector p0 (-m_height * dgCos(sliceAngle), dgFloat32 (0.0f), m_radius + m_height * dgSin(sliceAngle), dgFloat32 (0.0f));
 		sliceAngle += sliceStep;
 		for (dgInt32 i = 0; i < DG_CHAMFERCYLINDER_BRAKES; i ++) {
 			m_vertex[index] = p0;
 			index ++;
 			p0 = rot.UnrotateVector (p0);
-			p0.m_w = dgFloat32 (1.0f);
 		}
 	}
 

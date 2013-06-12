@@ -60,8 +60,8 @@ void dgCollisionCylinder::Init (dgFloat32 radius, dgFloat32 height)
 	for (dgInt32 i = 0; i < DG_CYLINDER_SEGMENTS; i ++) {
 		dgFloat32 z = dgSin (angle) * m_radius;
 		dgFloat32 y = dgCos (angle) * m_radius;
-		m_vertex[i                       ] = dgVector (- m_height, y, z, dgFloat32 (1.0f));
-		m_vertex[i + DG_CYLINDER_SEGMENTS] = dgVector (  m_height, y, z, dgFloat32 (1.0f));
+		m_vertex[i                       ] = dgVector (- m_height, y, z, dgFloat32 (0.0f));
+		m_vertex[i + DG_CYLINDER_SEGMENTS] = dgVector (  m_height, y, z, dgFloat32 (0.0f));
 		angle += dgPI2 / DG_CYLINDER_SEGMENTS;
 	}
 

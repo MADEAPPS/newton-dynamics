@@ -77,8 +77,8 @@ void dgCollisionCapsule::Init (dgFloat32 radius, dgFloat32 height)
 		for (dgInt32 i = 0; i < DG_CAPSULE_SEGMENTS; i ++) {
 			dgFloat32 z = dgSin (angle) * r;
 			dgFloat32 y = dgCos (angle) * r;
-			m_vertex[i0] = dgVector (- (m_height + x), y, z, dgFloat32 (1.0f));
-			m_vertex[i1] = dgVector (  (m_height + x), y, z, dgFloat32 (1.0f));
+			m_vertex[i0] = dgVector (- (m_height + x), y, z, dgFloat32 (0.0f));
+			m_vertex[i1] = dgVector (  (m_height + x), y, z, dgFloat32 (0.0f));
 			i0 ++;
 			i1 ++;
 			angle += dgPI2 / DG_CAPSULE_SEGMENTS;

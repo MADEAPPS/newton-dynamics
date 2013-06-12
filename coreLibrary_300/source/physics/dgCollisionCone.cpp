@@ -71,7 +71,7 @@ void dgCollisionCone::Init (dgFloat32 radius, dgFloat32 height)
 	for (dgInt32 i = 0; i < DG_CONE_SEGMENTS; i ++) {
 		dgFloat32 z = dgSin (angle) * m_radius;
 		dgFloat32 y = dgCos (angle) * m_radius;
-		m_vertex[i] = dgVector (- m_height, y, z, dgFloat32 (1.0f));
+		m_vertex[i] = dgVector (- m_height, y, z, dgFloat32 (0.0f));
 
 		angle += dgPI2 / DG_CONE_SEGMENTS;
 	}

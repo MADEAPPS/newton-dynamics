@@ -280,7 +280,7 @@ class dMousePickClass
 		return (NewtonBodyGetType(body) == NEWTON_DYNAMIC_BODY) ? 1 : 0;
 	}
 
-	static dFloat RayCastFilter (const NewtonBody* const body, const NewtonCollision* const collisionHit, const dFloat* const normal, int* const collisionID, void* const userData, dFloat intersetParam)
+	static dFloat RayCastFilter (const NewtonBody* const body, const NewtonCollision* const collisionHit, const dFloat* const contact, const dFloat* const normal, int* const collisionID, void* const userData, dFloat intersetParam)
 	{
 		dFloat mass;
 		dFloat Ixx;

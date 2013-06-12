@@ -56,7 +56,7 @@ void GetConnectedBodiesByJoints (NewtonBody* const body)
 
 
 
-static dFloat RayCastPlacement (const NewtonBody* const body, const NewtonCollision* const collisionHit, const dFloat* const normal, int* const collisionID, void* const userData, dFloat intersetParam)
+static dFloat RayCastPlacement (const NewtonBody* const body, const NewtonCollision* const collisionHit, const dFloat* const contact, const dFloat* const normal, int* const collisionID, void* const userData, dFloat intersetParam)
 {
 	dFloat* const paramPtr = (dFloat*)userData;
 	if (intersetParam < paramPtr[0]) {
