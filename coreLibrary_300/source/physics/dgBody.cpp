@@ -250,15 +250,15 @@ dgFloat32 dgBody::ConvexRayCast (const dgFastRayTest& ray, const dgCollisionInst
 	dgVector maxBox (m_maxAABB - shapeMinBox);
 	if (ray.BoxTest (minBox, maxBox)) {
 		dgContactPoint contactOut;
-		const dgMatrix& globalMatrix = m_collision->GetGlobalMatrix();
-		dgMatrix matrix (origin * globalMatrix.Inverse());
-		dgVector veloc (globalMatrix.UnrotateVector(shapeVeloc));
-		dgFloat32 t = m_collision->ConvexRayCast (convexShape, matrix, veloc, minT, contactOut, preFilter, this, userData);
+//		const dgMatrix& globalMatrix = m_collision->GetGlobalMatrix();
+//		dgMatrix matrix (origin * globalMatrix.Inverse());
+//		dgVector veloc (globalMatrix.UnrotateVector(shapeVeloc));
+		dgFloat32 t = m_collision->ConvexRayCast (convexShape, origin, shapeVeloc, minT, contactOut, preFilter, this, m_collision, userData);
 		if (t < minT) {
 			dgAssert (t >= dgFloat32 (0.0f));
 			dgAssert (t <= dgFloat32 (1.0f));
-			contactOut.m_normal = globalMatrix.RotateVector (contactOut.m_normal);
-			contactOut.m_point = globalMatrix.TransformVector(contactOut.m_point);
+			//contactOut.m_normal = globalMatrix.RotateVector (contactOut.m_normal);
+			//contactOut.m_point = globalMatrix.TransformVector(contactOut.m_point);
 			minT = filter (this, contactOut.m_collision0, contactOut.m_point, contactOut.m_normal, (void*)contactOut.m_shapeId0, userData, t);
 		}
 	} 

@@ -2525,7 +2525,7 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& l
 
 #else 
 
-dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
+dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData___) const
 {
 	dgVector sum[4];
 	dgVector simplex[4];
@@ -2638,32 +2638,53 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& l
 #endif
 
 
-dgFloat32 dgCollisionConvex::ConvexRayCast (const dgCollisionInstance* const convexShape, const dgMatrix& origin, const dgVector& veloc, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const 
+dgFloat32 dgCollisionConvex::ConvexRayCast (const dgCollisionInstance* const castingShape, const dgMatrix& shapeMatrix, const dgVector& shapeVeloc, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const referenceBody, const dgCollisionInstance* const collConicConvexInstance, void* const userData) const 
 {
-/*
-	dgBody* const floatingBody = proxy.m_floatingBody;
-	dgBody* const referenceBody = proxy.m_referenceBody;
+//	dgBody* const floatingBody = proxy.m_floatingBody;
+//	dgBody* const referenceBody = proxy.m_referenceBody;
+//	dgVector floatingVeloc (floatingBody->m_veloc);
+//	dgVector referenceVeloc (referenceBody->m_veloc);
+	dgVector floatingVeloc (shapeVeloc);
+	dgVector referenceVeloc (dgFloat32 (0.0f));
+//	dgCollisionInstance* const collConicConvexInstance = proxy.m_referenceCollision;
 
-	dgVector floatingVeloc (floatingBody->m_veloc);
-	dgVector referenceVeloc (referenceBody->m_veloc);
+	dgCollisionInstance shapeInstance (*castingShape, castingShape->GetChildShape());
+	shapeInstance.SetGlobalMatrix (castingShape->GetLocalMatrix() * shapeMatrix);
 
-	dgCollisionInstance* const collConicConvexInstance = proxy.m_referenceCollision;
 	const dgVector& scale = collConicConvexInstance->m_scale;
 	const dgVector& invScale = collConicConvexInstance->m_invScale;
 	const dgMatrix& matrix = collConicConvexInstance->GetGlobalMatrix();
 	dgInt32 isNonUniformScale = !collConicConvexInstance->m_scaleIsUniform;
 
 	dgVector veloc (matrix.UnrotateVector(floatingVeloc - referenceVeloc));
-	//dgAssert ((veloc % veloc) > dgFloat32 (0.0f));
+	dgAssert (veloc.m_w == dgFloat32 (0.0f));
 
 	dgInt32 iter = 0;
 	dgInt32 count = 0;
 	dgFloat32 tacc = dgFloat32 (0.0f);
-	dgFloat32 timestep = proxy.m_timestep;
+//	dgFloat32 timestep = proxy.m_timestep;
+	dgFloat32 timestep = maxT;
+
+	dgContactMaterial material;
+	material.m_penetration = dgFloat32 (0.0f);
+	dgContact contactJoint (referenceBody->GetWorld(), &material);
+	contactJoint.m_separtingVector = veloc.CompProduct4 (veloc.DotProduct4 (veloc).InvSqrt());
+
+	dgCollisionParamProxy proxy (&contactJoint, NULL, true, 0);
+	proxy.m_maxContacts = 0;
+	proxy.m_referenceBody = NULL;
+	proxy.m_floatingBody = NULL;
+	proxy.m_referenceCollision = referenceBody->GetCollision();
+	proxy.m_floatingCollision = &shapeInstance;
+	proxy.m_timestep = dgFloat32 (0.0f);
+	proxy.m_skinThickness = dgFloat32 (0.0f);
+	proxy.m_matrix = proxy.m_floatingCollision->m_globalMatrix * proxy.m_referenceCollision->m_globalMatrix.Inverse();
+
 	dgMinkHull minkHull (proxy);
 	do {
 		minkHull.CalculateClosestPoints ();
 		dgVector normal (minkHull.m_normal);
+
 		if (isNonUniformScale) {
 			normal = normal.CompProduct4(invScale);
 			normal = normal.Scale3(dgRsqrt (normal % normal));
@@ -2685,6 +2706,8 @@ dgFloat32 dgCollisionConvex::ConvexRayCast (const dgCollisionInstance* const con
 		dgVector diff (scale.CompProduct3(minkHull.m_q - minkHull.m_p));
 		dgFloat32 num = minkHull.m_normal % diff;
 		if (num <= dgFloat32 (0.0f)) {
+			dgAssert (0);
+/*
 			// bodies collide at time tacc, but we do not set it yet
 			//proxy.m_normal = matrix.RotateVector(invScale.CompProduct4(minkHull.m_normal.Scale3 (-1.0f)));
 			//proxy.m_normal = proxy.m_normal.Scale3(dgRsqrt(proxy.m_normal % proxy.m_normal ));
@@ -2712,6 +2735,7 @@ dgFloat32 dgCollisionConvex::ConvexRayCast (const dgCollisionInstance* const con
 			} else {
 				proxy.m_timestep = tacc;
 			}
+*/
 			break;
 		}
 
@@ -2728,11 +2752,10 @@ dgFloat32 dgCollisionConvex::ConvexRayCast (const dgCollisionInstance* const con
 			break;
 		}
 		minkHull.m_matrix.m_posit = proxy.m_matrix.m_posit + veloc.Scale3(tacc);
-
 		iter ++;
 	} while (iter < DG_SEPARATION_PLANES_ITERATIONS);
 
-*/	
+	shapeInstance.SetUserData (NULL);
 	return 0.1f;
 }
 

@@ -91,7 +91,7 @@ class dgCollisionInstance
 
 	void CalcAABB (const dgMatrix &matrix, dgVector& p0, dgVector& p1) const;
 	dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, OnRayPrecastAction preFilter, const dgBody* const body, void* const userData) const;
-	dgFloat32 ConvexRayCast (const dgCollisionInstance* const convexShape, const dgMatrix& localMatrix, const dgVector& localVeloc, dgFloat32 maxT, dgContactPoint& contactOut, OnRayPrecastAction preFilter, const dgBody* const body, void* const userData) const; 
+	dgFloat32 ConvexRayCast (const dgCollisionInstance* const convexShape, const dgMatrix& localMatrix, const dgVector& localVeloc, dgFloat32 maxT, dgContactPoint& contactOut, OnRayPrecastAction preFilter, const dgBody* const referenceBody, const dgCollisionInstance* const referenceShape, void* const userData) const; 
 
 	dgFloat32 GetBoxMinRadius () const; 
 	dgFloat32 GetBoxMaxRadius () const; 
