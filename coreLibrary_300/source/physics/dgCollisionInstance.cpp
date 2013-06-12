@@ -479,6 +479,7 @@ dgFloat32 dgCollisionInstance::ConvexRayCast (const dgCollisionInstance* const c
 				contactOut.m_collision0 = this;
 				contactOut.m_collision1 = this;
 			}
+			return t;
 		} else {
 			dgAssert (0);
 		}

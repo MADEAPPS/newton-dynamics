@@ -1351,19 +1351,14 @@ void dgBroadPhase::ConvexRayCast (dgCollisionInstance* const shape, const dgMatr
 
 		stackPool[0] = m_rootNode;
 
-int xxx = 0;
 		const dgBody* const sentinel = m_world->GetSentinelBody();
 		dgVector velocA((target - matrix.m_posit) & dgVector::m_triplexMask);
-//		dgVector velocB(dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
-//		dgInt32 totalCount = 0;
-//		dgFloat32 time = dgFloat32 (1.0f);
 		dgFloat32 maxParam = dgFloat32 (1.2f);
 		dgFastRayTest ray (dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)), velocA);
 
 		while (stack) {
 			stack --;
 			const dgNode* const node = stackPool[stack];
-xxx ++;
 			dgVector minBox (node->m_minBox - boxP1);
 			dgVector maxBox (node->m_maxBox - boxP0);
 			if (ray.BoxTest (minBox, maxBox)) {
@@ -1376,33 +1371,8 @@ xxx ++;
 						if (!PREFILTER_RAYCAST (prefilter, body, shape, userData)) {
 							dgFloat32 param = body->ConvexRayCast (ray, shape,boxP0, boxP1, matrix, velocA, filter, prefilter, userData, maxParam);
 							if (param < maxParam) {
-								_ASSERTE (0);
-/*
-								if (time < maxParam) {
-									ray.Reset (time);
-
-									if ((time - maxParam) < dgFloat32(-1.0e-3f)) {
-										totalCount = 0;
-									}
-									maxParam = time;
-									if (count >= (maxContacts - totalCount)) {
-										count = maxContacts - totalCount;
-									}
-
-									for (dgInt32 i = 0; i < count; i++) {
-										info[totalCount].m_hitBody = body;
-										info[totalCount].m_point[0] = points[i].m_x;
-										info[totalCount].m_point[1] = points[i].m_y;
-										info[totalCount].m_point[2] = points[i].m_z;
-										info[totalCount].m_normal[0] = normals[i].m_x;
-										info[totalCount].m_normal[1] = normals[i].m_y;
-										info[totalCount].m_normal[2] = normals[i].m_z;
-										info[totalCount].m_penetration = penetration[i];
-										info[totalCount].m_contaID = attributeB[i];
-										totalCount++;
-									}
-								}
-*/
+								ray.Reset (param);
+								maxParam = param;
 							}
 						}
 					}
@@ -1420,9 +1390,7 @@ xxx ++;
 			}
 		}
 	}
-
 }
-
 
 
 dgInt32 dgBroadPhase::ConvexCast (dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, dgFloat32& timeToImpact, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const

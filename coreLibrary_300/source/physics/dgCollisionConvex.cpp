@@ -2878,10 +2878,6 @@ bool dgCollisionConvex::SeparetingVectorTest (dgCollisionParamProxy& proxy) cons
 
 
 
-
-//dgInt32 dgContactSolver::CalculateConvexShapeIntersectionLine (dgMatrix& matrix, const dgVector& normal, dgUnsigned32 id, dgFloat32 penetration,
-//	dgInt32 count1, dgVector* const shape1, 
-//	dgInt32 count2, dgVector* const shape2, dgContactPoint* const contactOut)
 dgInt32 dgCollisionConvex::ConvexPolygonToLineIntersection (const dgVector& normal, dgInt32 count1, dgVector* const shape1, dgInt32 count2, dgVector* const shape2, dgVector* const contactOut, dgVector* const mem) const
 {
 	dgInt32 count = 0;
