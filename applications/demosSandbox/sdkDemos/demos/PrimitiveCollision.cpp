@@ -44,7 +44,7 @@ class ShowCollisionCollide: public DemoEntity::UserData
 		NewtonWorldForEachBodyInAABBDo(world, &p0[0], &p1[0], CalculateContacts, (void*)this);
 	}
 
-	static void CalculateContacts (const NewtonBody* const otherBody, void* const userData)
+	static int CalculateContacts (const NewtonBody* const otherBody, void* const userData)
 	{
 		ShowCollisionCollide* const me = (ShowCollisionCollide*)userData;
 		if (me->m_body != otherBody) {
@@ -83,6 +83,7 @@ class ShowCollisionCollide: public DemoEntity::UserData
 				ShowMousePicking (p0, p1, originColor, lineColor);
 			}
 		}
+		return 1;
 	}
 
 	NewtonBody* m_body;
