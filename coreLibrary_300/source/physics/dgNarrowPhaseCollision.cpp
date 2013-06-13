@@ -444,6 +444,47 @@ dgInt32 dgWorld::ClosestPoint(const dgCollisionInstance* const collisionSrcA, co
 }
 
 
+bool dgWorld::IntersectionTest (const dgCollisionInstance* const collisionSrcA, const dgMatrix& matrixA, 
+							    const dgCollisionInstance* const collisionSrcB, const dgMatrix& matrixB, 
+							    dgInt32 threadIndex)
+{
+	dgKinematicBody collideBodyA;
+	dgKinematicBody collideBodyB;
+	dgCollisionInstance collisionA(*collisionSrcA, collisionSrcA->GetChildShape());
+	dgCollisionInstance collisionB(*collisionSrcB, collisionSrcB->GetChildShape());
+
+//	dgContactPoint contacts[DG_MAX_CONTATCS];
+	collideBodyA.m_world = this;
+	collideBodyA.SetContinuesCollisionMode(false); 
+	collideBodyA.m_matrix = matrixA;
+	collideBodyA.m_collision = &collisionA;
+	collideBodyA.UpdateCollisionMatrix(dgFloat32 (0.0f), 0);
+
+	collideBodyB.m_world = this;
+	collideBodyB.SetContinuesCollisionMode(false); 
+	collideBodyB.m_matrix = matrixB;
+	collideBodyB.m_collision = &collisionB;
+	collideBodyB.UpdateCollisionMatrix(dgFloat32 (0.0f), 0);
+
+	dgContactMaterial material; 
+	material.m_penetration = dgFloat32 (0.0f);
+
+	dgContact contactJoint (this, &material);
+	contactJoint.SetBodies (&collideBodyA, &collideBodyB);
+
+	dgCollidingPairCollector::dgPair pair;
+	pair.m_contactCount = 0;
+	pair.m_contact = &contactJoint;
+	pair.m_contactBuffer = NULL; 
+	pair.m_timeOfImpact = dgFloat32 (0.0f);
+	pair.m_isDeformable = 0;
+	pair.m_cacheIsValid = 0;
+//	CalculateContacts (&pair, dgFloat32 (0.0f), threadIndex, false, false);
+//	return (pair.m_contactCount == -1) ? true : false;
+	return false;
+}
+
+
 dgInt32 dgWorld::ClosestCompoundPoint (dgBody* const compoundConvexA, dgBody* const collisionB, dgTriplex& contactA, dgTriplex& contactB, dgTriplex& normalAB, dgInt32 threadIndex) const
 {
 	dgCollisionInstance* const instance = compoundConvexA->m_collision;

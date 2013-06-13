@@ -261,6 +261,10 @@ class dgWorld:
 		                     dgFloat32& timeStep, dgTriplex* const points, dgTriplex* const normals, dgFloat32* const penetration, 
 							 dgInt64* const attibuteA, dgInt64* const attibuteB, dgInt32 maxContacts, dgInt32 threadIndex);
 
+	bool IntersectionTest (const dgCollisionInstance* const collisionA, const dgMatrix& matrixA, 
+						   const dgCollisionInstance* const collisionB, const dgMatrix& matrixB, 
+						   dgInt32 threadIndex);
+	
 	dgInt32 ClosestPoint (dgTriplex& point, const dgCollisionInstance* const collision, const dgMatrix& matrix, dgTriplex& contact, dgTriplex& normal, dgInt32 threadIndex);
 	dgInt32 ClosestPoint (const dgCollisionInstance* const collisionA, const dgMatrix& matrixA, 
 						  const dgCollisionInstance* const collisionB, const dgMatrix& matrixB, 

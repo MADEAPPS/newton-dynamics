@@ -3803,19 +3803,19 @@ int NewtonCollisionClosestPoint(const NewtonWorld* const newtonWorld,
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-
-	// with VS 2010 in 64 bit mode uses SSE, and matrix may not be aligned therefore we need to make a local copy here
 	return world->ClosestPoint ((dgCollisionInstance*)collisionA, dgMatrix (matrixA), 
 								(dgCollisionInstance*)collisionB, dgMatrix (matrixB), 
 								*((dgTriplex*) contactA), *((dgTriplex*) contactB), *((dgTriplex*) normalAB), threadIndex);
 }
 
 
-int NewtonCollisionIntersectionTest (const NewtonWorld* const newtonWorld, const NewtonCollision* const collisionA, const dFloat* const matrixA, const NewtonCollision* const collisionB, const dFloat* const matrixB)
+int NewtonCollisionIntersectionTest (const NewtonWorld* const newtonWorld, const NewtonCollision* const collisionA, const dFloat* const matrixA, const NewtonCollision* const collisionB, const dFloat* const matrixB, int threadIndex)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-	return false;
+	return world->IntersectionTest ((dgCollisionInstance*)collisionA, dgMatrix (matrixA), 
+									(dgCollisionInstance*)collisionB, dgMatrix (matrixB), 
+									threadIndex) ? 1 : 0;
 }
 
 

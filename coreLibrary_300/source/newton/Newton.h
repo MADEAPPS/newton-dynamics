@@ -763,7 +763,7 @@ extern "C" {
 
 	NEWTON_API int NewtonCollisionIntersectionTest (const NewtonWorld* const newtonWorld, 
 		const NewtonCollision* const collisionA, const dFloat* const matrixA, 
-		const NewtonCollision* const collisionB, const dFloat* const matrixB);
+		const NewtonCollision* const collisionB, const dFloat* const matrixB, int threadIndex);
 
 	NEWTON_API int NewtonCollisionPointDistance (const NewtonWorld* const newtonWorld, const dFloat* const point,
 		const NewtonCollision* const collision, const dFloat* const matrix, dFloat* const contact, dFloat* const normal, int threadIndex);
