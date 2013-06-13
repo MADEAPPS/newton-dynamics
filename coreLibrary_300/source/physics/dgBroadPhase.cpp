@@ -355,7 +355,9 @@ void dgBroadPhase::ForEachBodyInAABB (const dgVector& q0, const dgVector& q1, On
 					dgBody* const body = rootNode->m_body;
 					if (dgOverlapTest (body->m_minAABB, body->m_maxAABB, q0, q1)) {
 						if (body != sentinel) {
-							callback (body, userData);
+							if (!callback (body, userData)) {
+								break;
+							}
 						}
 					}
 				} else {

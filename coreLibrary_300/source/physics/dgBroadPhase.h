@@ -32,7 +32,7 @@ class dgCollision;
 class dgCollisionInstance;
 class dgBroadphaseSyncDescriptor;
 
-typedef void (dgApi *OnBodiesInAABB) (dgBody* body, void* const userData);
+typedef dgInt32 (dgApi *OnBodiesInAABB) (dgBody* body, void* const userData);
 typedef dgUnsigned32 (dgApi *OnRayPrecastAction) (const dgBody* const body, const dgCollisionInstance* const collision, void* const userData);
 typedef dgFloat32 (dgApi *OnRayCastAction) (const dgBody* const body, const dgCollisionInstance* const collision, const dgVector& contact, const dgVector& normal, void* collisionID, void* const userData, dgFloat32 intersetParam);
 
