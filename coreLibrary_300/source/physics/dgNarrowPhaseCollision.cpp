@@ -1293,6 +1293,7 @@ dgInt32 dgWorld::Collide (
 	count = pair.m_contactCount;
 	if (count > maxContacts) {
 		count = ReduceContacts (count, contacts, maxContacts, DG_REDUCE_CONTACT_TOLERANCE);
+		count = dgMin (count, maxContacts);
 	}
 
 	dgFloat32 swapContactScale = (contactJoint.GetBody0() != &collideBodyA) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f);
