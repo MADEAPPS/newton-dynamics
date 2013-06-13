@@ -761,6 +761,10 @@ extern "C" {
 
 	NEWTON_API dFloat NewtonCollisionGetSkinThickness (const NewtonCollision* const collision);
 
+	NEWTON_API int NewtonCollisionIntersectionTest (const NewtonWorld* const newtonWorld, 
+		const NewtonCollision* const collisionA, const dFloat* const matrixA, 
+		const NewtonCollision* const collisionB, const dFloat* const matrixB);
+
 	NEWTON_API int NewtonCollisionPointDistance (const NewtonWorld* const newtonWorld, const dFloat* const point,
 		const NewtonCollision* const collision, const dFloat* const matrix, dFloat* const contact, dFloat* const normal, int threadIndex);
 
@@ -768,7 +772,7 @@ extern "C" {
 		const NewtonCollision* const collisionA, const dFloat* const matrixA, 
 		const NewtonCollision* const collisionB, const dFloat* const matrixB,
 		dFloat* const contactA, dFloat* const contactB, dFloat* const normalAB, int threadIndex);
-	
+
 	NEWTON_API int NewtonCollisionCollide (const NewtonWorld* const newtonWorld, int maxSize,
 		const NewtonCollision* const collisionA, const dFloat* const matrixA, 
 		const NewtonCollision* const collisionB, const dFloat* const matrixB,

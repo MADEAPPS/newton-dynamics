@@ -3768,7 +3768,6 @@ int NewtonCollisionPointDistance(const NewtonWorld* const newtonWorld, const dFl
 }
 
 
-
 // Name: NewtonCollisionClosestPoint 
 // Calculate the closest points between two disjoint convex collision primitive.
 //
@@ -3809,6 +3808,14 @@ int NewtonCollisionClosestPoint(const NewtonWorld* const newtonWorld,
 	return world->ClosestPoint ((dgCollisionInstance*)collisionA, dgMatrix (matrixA), 
 								(dgCollisionInstance*)collisionB, dgMatrix (matrixB), 
 								*((dgTriplex*) contactA), *((dgTriplex*) contactB), *((dgTriplex*) normalAB), threadIndex);
+}
+
+
+int NewtonCollisionIntersectionTest (const NewtonWorld* const newtonWorld, const NewtonCollision* const collisionA, const dFloat* const matrixA, const NewtonCollision* const collisionB, const dFloat* const matrixB)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *)newtonWorld;
+	return false;
 }
 
 
