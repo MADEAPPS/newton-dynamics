@@ -447,12 +447,11 @@ void dgCollisionCompound::DebugCollision (const dgMatrix& matrix, OnDebugCollisi
 
 dgFloat32 dgCollisionCompound::RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
 {
-	const dgNodeBase* stackPool[DG_COMPOUND_STACK_DEPTH];
-
 	if (!m_root) {
 		return dgFloat32 (1.2f);
 	}
 
+	const dgNodeBase* stackPool[DG_COMPOUND_STACK_DEPTH];
 	dgInt32 stack = 1;
 	stackPool[0] = m_root;
 	dgFloat32 maxParam = dgFloat32 (1.2f);
@@ -461,8 +460,9 @@ dgFloat32 dgCollisionCompound::RayCast (const dgVector& localP0, const dgVector&
 	while (stack) {
 		stack --;
 		const dgNodeBase* const me = stackPool[stack];
+		dgAssert (me);
 
-		if (me && ray.BoxTest (me->m_p0, me->m_p1)) {
+		if (ray.BoxTest (me->m_p0, me->m_p1)) {
 			if (me->m_type == m_leaf) {
 				dgContactPoint tmpContactOut;
 				dgCollisionInstance* const shape = me->GetShape();
@@ -492,6 +492,67 @@ dgFloat32 dgCollisionCompound::RayCast (const dgVector& localP0, const dgVector&
 	return maxParam;
 }
 
+dgFloat32 dgCollisionCompound::ConvexRayCast (const dgCollisionInstance* const convexShape, const dgMatrix& shapeMatrix, const dgVector& shapeVeloc, dgFloat32 minT, dgContactPoint& contactOut, const dgBody* const referenceBody, const dgCollisionInstance* const referenceShape, void* const userData) const
+{
+	dgAssert (referenceShape->GetChildShape() == this);
+
+	if (!m_root) {
+		return dgFloat32 (1.2f);
+	}
+
+	const dgNodeBase* stackPool[DG_COMPOUND_STACK_DEPTH];
+	dgInt32 stack = 1;
+	stackPool[0] = m_root;
+//	dgFloat32 maxParam = dgFloat32 (1.2f);
+
+	dgAssert (referenceShape->IsType(dgCollision::dgCollisionCompound_RTTI));
+	const dgMatrix& compoundMatrix = referenceShape->m_globalMatrix;
+	dgMatrix shapeGlobalMatrix (convexShape->m_localMatrix * shapeMatrix);
+
+	dgMatrix localMatrix (shapeGlobalMatrix * compoundMatrix.Inverse());
+	dgVector localVeloc (compoundMatrix.UnrotateVector(shapeVeloc));
+
+	dgVector shapeLocalP0; 
+	dgVector shapeLocalP1; 
+	convexShape->CalcAABB (localMatrix, shapeLocalP0, shapeLocalP1);
+
+	dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), localVeloc);
+	while (stack) {
+		stack --;
+		const dgNodeBase* const me = stackPool[stack];
+		dgAssert (me);
+
+		dgVector minBox (me->m_p0 - shapeLocalP1);
+		dgVector maxBox (me->m_p1 - shapeLocalP0);
+		if (ray.BoxTest (minBox, maxBox)) {
+			if (me->m_type == m_leaf) {
+				dgCollisionInstance* const subShape = me->GetShape();
+				dgCollisionInstance childInstance (*subShape, subShape->GetChildShape());
+				childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * compoundMatrix;
+
+				dgContactPoint tmpContact;
+				dgFloat32 t = childInstance.ConvexRayCast (convexShape, shapeMatrix, shapeVeloc, minT, tmpContact, NULL, referenceBody, userData);
+				if (t < minT) {
+					contactOut = tmpContact;
+					ray.Reset (t);
+					minT = t;
+				}
+
+			} else {
+				dgAssert (me->m_type == m_node);
+				stackPool[stack] = me->m_left;
+				stack++;
+				dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNodeBase*)));
+
+				stackPool[stack] = me->m_right;
+				stack++;
+				dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNodeBase*)));
+			}
+		}
+	}
+
+	return dgFloat32 (1.2f);
+}
 
 
 dgFloat32 dgCollisionCompound::GetVolume () const
@@ -554,101 +615,34 @@ dgFloat32 dgCollisionCompound::CalculateMassProperties (const dgMatrix& offset, 
 
 dgMatrix dgCollisionCompound::CalculateInertiaAndCenterOfMass (const dgVector& localScale, const dgMatrix& matrix) const
 {
-/*
-	if ((dgAbsf (localScale.m_x - localScale.m_y) < dgFloat32 (1.0e-5f)) && (dgAbsf (localScale.m_x - localScale.m_z) < dgFloat32 (1.0e-5f))) {
-		// using general central theorem, is much faster and more accurate;
-		//IImatrix = IIorigin + mass * [(displacemnet % displacemnet) * identityMatrix - transpose(displacement) * displacement)];
-#ifdef _DEBUG
-		dgVector inertiaII__;
-		dgVector crossInertia__;
-		dgVector centerOfMass__;
-		dgMatrix scaledMatrix__(matrix);
-		scaledMatrix__[0] = scaledMatrix__[0].Scale3(localScale.m_x);
-		scaledMatrix__[1] = scaledMatrix__[1].Scale3(localScale.m_y);
-		scaledMatrix__[2] = scaledMatrix__[2].Scale3(localScale.m_z);
-		dgFloat32 volume__ = CalculateMassProperties (scaledMatrix__, inertiaII__, crossInertia__, centerOfMass__);
-		if (volume__ < DG_MAX_MIN_VOLUME) {
-			volume__ = DG_MAX_MIN_VOLUME;
-		}
+	dgVector inertiaII;
+	dgVector crossInertia;
+	dgVector centerOfMass;
+	dgMatrix scaledMatrix(matrix);
+	scaledMatrix[0] = scaledMatrix[0].Scale3(localScale.m_x);
+	scaledMatrix[1] = scaledMatrix[1].Scale3(localScale.m_y);
+	scaledMatrix[2] = scaledMatrix[2].Scale3(localScale.m_z);
+	dgFloat32 volume = CalculateMassProperties (scaledMatrix, inertiaII, crossInertia, centerOfMass);
+	if (volume < DG_MAX_MIN_VOLUME) {
+		volume = DG_MAX_MIN_VOLUME;
+	}
 
-		dgFloat32 invVolume__ = dgFloat32 (1.0f) / volume__;
-		centerOfMass__ = centerOfMass__.Scale3(invVolume__);
-		inertiaII__ = inertiaII__.Scale3 (invVolume__);
-		crossInertia__ = crossInertia__.Scale3 (invVolume__);
-		dgMatrix inertia__ (dgGetIdentityMatrix());
-		inertia__[0][0] = inertiaII__[0];
-		inertia__[1][1] = inertiaII__[1];
-		inertia__[2][2] = inertiaII__[2];
-		inertia__[0][1] = crossInertia__[2];
-		inertia__[1][0] = crossInertia__[2];
-		inertia__[0][2] = crossInertia__[1];
-		inertia__[2][0] = crossInertia__[1];
-		inertia__[1][2] = crossInertia__[0];
-		inertia__[2][1] = crossInertia__[0];
-		inertia__[3] = centerOfMass__;
-#endif
-
-		dgFloat32 mag2 = localScale.m_x * localScale.m_x;
-		dgMatrix inertia (dgGetIdentityMatrix());
-		inertia[0][0] = m_inertia[0] * mag2;
-		inertia[1][1] = m_inertia[1] * mag2;
-		inertia[2][2] = m_inertia[2] * mag2;
-		inertia[0][1] = m_crossInertia[2] * mag2;
-		inertia[1][0] = m_crossInertia[2] * mag2;
-		inertia[0][2] = m_crossInertia[1] * mag2;
-		inertia[2][0] = m_crossInertia[1] * mag2;
-		inertia[1][2] = m_crossInertia[0] * mag2;
-		inertia[2][1] = m_crossInertia[0] * mag2;
-		inertia = matrix.Inverse() * inertia * matrix;
-
-		dgVector origin (matrix.TransformVector (m_centerOfMass.CompProduct(localScale)));
-		dgFloat32 mag = origin % origin;
-
-		dgFloat32 unitMass = dgFloat32 (1.0f);
-		for (dgInt32 i = 0; i < 3; i ++) {
-			inertia[i][i] += unitMass * (mag - origin[i] * origin[i]);
-			for (dgInt32 j = i + 1; j < 3; j ++) {
-				dgFloat32 crossIJ = - unitMass * origin[i] * origin[j];
-				inertia[i][j] += crossIJ;
-				inertia[j][i] += crossIJ;
-			}
-		}
-
-		inertia.m_posit = origin;
-		inertia.m_posit.m_w = 1.0f;
-		return inertia;
-	} else {
-*/
-		// for non uniform scale we need to the general divergence theorem
-		dgVector inertiaII;
-		dgVector crossInertia;
-		dgVector centerOfMass;
-		dgMatrix scaledMatrix(matrix);
-		scaledMatrix[0] = scaledMatrix[0].Scale3(localScale.m_x);
-		scaledMatrix[1] = scaledMatrix[1].Scale3(localScale.m_y);
-		scaledMatrix[2] = scaledMatrix[2].Scale3(localScale.m_z);
-		dgFloat32 volume = CalculateMassProperties (scaledMatrix, inertiaII, crossInertia, centerOfMass);
-		if (volume < DG_MAX_MIN_VOLUME) {
-			volume = DG_MAX_MIN_VOLUME;
-		}
-
-		dgFloat32 invVolume = dgFloat32 (1.0f) / volume;
-		centerOfMass = centerOfMass.Scale3(invVolume);
-		inertiaII = inertiaII.Scale3 (invVolume);
-		crossInertia = crossInertia.Scale3 (invVolume);
-		dgMatrix inertia (dgGetIdentityMatrix());
-		inertia[0][0] = inertiaII[0];
-		inertia[1][1] = inertiaII[1];
-		inertia[2][2] = inertiaII[2];
-		inertia[0][1] = crossInertia[2];
-		inertia[1][0] = crossInertia[2];
-		inertia[0][2] = crossInertia[1];
-		inertia[2][0] = crossInertia[1];
-		inertia[1][2] = crossInertia[0];
-		inertia[2][1] = crossInertia[0];
-		inertia[3] = centerOfMass;
-		return inertia;
-//	}
+	dgFloat32 invVolume = dgFloat32 (1.0f) / volume;
+	centerOfMass = centerOfMass.Scale3(invVolume);
+	inertiaII = inertiaII.Scale3 (invVolume);
+	crossInertia = crossInertia.Scale3 (invVolume);
+	dgMatrix inertia (dgGetIdentityMatrix());
+	inertia[0][0] = inertiaII[0];
+	inertia[1][1] = inertiaII[1];
+	inertia[2][2] = inertiaII[2];
+	inertia[0][1] = crossInertia[2];
+	inertia[1][0] = crossInertia[2];
+	inertia[0][2] = crossInertia[1];
+	inertia[2][0] = crossInertia[1];
+	inertia[1][2] = crossInertia[0];
+	inertia[2][1] = crossInertia[0];
+	inertia[3] = centerOfMass;
+	return inertia;
 }
 
 
@@ -1560,7 +1554,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingle (dgCollidingPairCollector
 						processContacts = material->m_compoundAABBOverlap (*material, compoundBody, me, otherBody, NULL, proxy.m_threadIndex);
 					}
 					if (processContacts) {
-						dgCollisionInstance childInstance (*subShape);
+						dgCollisionInstance childInstance (*subShape, subShape->GetChildShape());
 						childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * myMatrix;
 						proxy.m_referenceCollision = &childInstance; 
 
@@ -1579,6 +1573,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingle (dgCollidingPairCollector
 						if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
 							contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
 						}
+						//childInstance.SetUserData(NULL);
 					}
 				}
 
@@ -1629,7 +1624,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgCollidingPairCo
 	dgVector boxP1;
 	otherInstance->CalcAABB(matrix, boxP0, boxP1);
 	dgVector relVeloc (myMatrix.UnrotateVector (otherBody->GetVelocity() - compoundBody->GetVelocity()));
-	dgFastRayTest ray (dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)), relVeloc);
+	dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), relVeloc);
 
 	dgInt32 stack = 1;
 	stackPool[0] = m_root;
@@ -1656,7 +1651,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgCollidingPairCo
 						processContacts = material->m_compoundAABBOverlap (*material, compoundBody, me, otherBody, NULL, proxy.m_threadIndex);
 					}
 					if (processContacts) {
-						dgCollisionInstance childInstance (*subShape);
+						dgCollisionInstance childInstance (*subShape, subShape->GetChildShape());
 						childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * myMatrix;
 						proxy.m_referenceCollision = &childInstance; 
 
@@ -1696,6 +1691,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgCollidingPairCo
 								}
 							}
 						}
+						//childInstance.SetUserData(NULL);
 					}
 				}
 			} else {
@@ -1764,11 +1760,14 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompound (dgCollidingPairCollect
 				}
 				if (processContacts) {
 					if (me->GetShape()->GetCollisionMode() & other->GetShape()->GetCollisionMode()) {
-						dgCollisionInstance childInstance (*me->GetShape());
+						const dgCollisionInstance* const subShape = me->GetShape();
+						const dgCollisionInstance* const otherSubShape = other->GetShape();
+
+						dgCollisionInstance childInstance (*subShape, subShape->GetChildShape());
 						childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * myMatrix;
 						proxy.m_referenceCollision = &childInstance; 
 
-						dgCollisionInstance otherChildInstance (*other->GetShape());
+						dgCollisionInstance otherChildInstance (*otherSubShape, otherSubShape->GetChildShape());
 						otherChildInstance.m_globalMatrix = otherChildInstance.GetLocalMatrix() * otherMatrix;
 						proxy.m_floatingCollision = &otherChildInstance; 
 
@@ -1781,13 +1780,15 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompound (dgCollidingPairCollect
 						for (dgInt32 i = 0; i < count; i ++) {
 							dgAssert (contacts[contactCount + i].m_collision0 == &childInstance);
 							dgAssert (contacts[contactCount + i].m_collision1 == &otherChildInstance);
-							contacts[contactCount + i].m_collision0 = me->GetShape();
-							contacts[contactCount + i].m_collision1 = other->GetShape();
+							contacts[contactCount + i].m_collision0 = subShape;
+							contacts[contactCount + i].m_collision1 = otherSubShape;
 						}
 						contactCount += count;
 						if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
 							contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
 						}
+						//childInstance.SetUserData(NULL);
+						//otherChildInstance.SetUserData(NULL);
 					}
 				}
 
@@ -1926,7 +1927,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTree (dgCollidingPairCo
 						processContacts = material->m_compoundAABBOverlap (*material, myBody, me, treeBody, NULL, proxy.m_threadIndex);
 					}
 					if (processContacts) {
-						dgCollisionInstance childInstance (*subShape);
+						dgCollisionInstance childInstance (*subShape, subShape->GetChildShape());
 						childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * myMatrix;
 						proxy.m_referenceCollision = &childInstance; 
 
@@ -1946,6 +1947,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTree (dgCollidingPairCo
 						if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
 							contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
 						}
+						//childInstance.SetUserData(NULL);
 					}
 				}
 
@@ -2203,7 +2205,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToHeightField (dgCollidingPairColl
 						processContacts = material->m_compoundAABBOverlap (*material, myBody, me, terrainBody, NULL, proxy.m_threadIndex);
 					}
 					if (processContacts) {
-						dgCollisionInstance childInstance (*subShape);
+						dgCollisionInstance childInstance (*subShape, subShape->GetChildShape());
 						childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * myMatrix;
 						proxy.m_referenceCollision = &childInstance; 
 
@@ -2223,6 +2225,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToHeightField (dgCollidingPairColl
 						if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
 							contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
 						}
+						//childInstance.SetUserData(NULL);
 					}
 				}
 
@@ -2296,7 +2299,7 @@ dgInt32 dgCollisionCompound::CalculateContactsUserDefinedCollision (dgCollidingP
 						processContacts = material->m_compoundAABBOverlap (*material, myBody, me, userBody, NULL, proxy.m_threadIndex);
 					}
 					if (processContacts) {
-						dgCollisionInstance childInstance (*subShape);
+						dgCollisionInstance childInstance (*subShape, subShape->GetChildShape());
 						childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * myMatrix;
 						proxy.m_referenceCollision = &childInstance; 
 
@@ -2316,6 +2319,7 @@ dgInt32 dgCollisionCompound::CalculateContactsUserDefinedCollision (dgCollidingP
 						if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
 							contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
 						}
+						//childInstance.SetUserData(NULL);
 					}
 				}
 

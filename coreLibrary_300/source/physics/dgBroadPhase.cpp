@@ -1354,11 +1354,12 @@ void dgBroadPhase::ConvexRayCast (dgCollisionInstance* const shape, const dgMatr
 		const dgBody* const sentinel = m_world->GetSentinelBody();
 		dgVector velocA((target - matrix.m_posit) & dgVector::m_triplexMask);
 		dgFloat32 maxParam = dgFloat32 (1.2f);
-		dgFastRayTest ray (dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)), velocA);
+		dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), velocA);
 
 		while (stack) {
 			stack --;
 			const dgNode* const node = stackPool[stack];
+			dgAssert (node);
 			dgVector minBox (node->m_minBox - boxP1);
 			dgVector maxBox (node->m_maxBox - boxP0);
 			if (ray.BoxTest (minBox, maxBox)) {

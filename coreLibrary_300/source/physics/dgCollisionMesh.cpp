@@ -227,3 +227,10 @@ dgInt32 dgCollisionMesh::CalculatePlaneIntersection (const dgFloat32* const vert
 	return count;
 }
 
+
+dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const convexShape, const dgMatrix& origin, const dgVector& veloc, dgFloat32 minT, dgContactPoint& contactOut, const dgBody* const referenceBody, const dgCollisionInstance* const referenceShape, void* const userData) const
+{
+	dgAssert (0);
+	return  minT;
+}
+

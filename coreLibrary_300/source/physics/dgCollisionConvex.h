@@ -48,7 +48,7 @@ class dgCollisionConvex: public dgCollision
 	virtual bool PolygonOBBTest (const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount, const dgPolygonMeshDesc& descInfo) const;
 	
 	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
-	virtual dgFloat32 ConvexRayCast (const dgCollisionInstance* const convexShape, const dgMatrix& origin, const dgVector& veloc, dgFloat32 maxT, dgContactPoint& contactsOut, const dgBody* const referenceBody, const dgCollisionInstance* const referenceShape, void* const userData) const; 
+	virtual dgFloat32 ConvexRayCast (const dgCollisionInstance* const convexShape, const dgMatrix& origin, const dgVector& veloc, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const referenceBody, const dgCollisionInstance* const referenceShape, void* const userData) const; 
 
 	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
 

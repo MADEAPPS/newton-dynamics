@@ -2680,6 +2680,8 @@ dgFloat32 dgCollisionConvex::ConvexRayCast (const dgCollisionInstance* const cas
 	dgVector floatingVeloc (shapeVeloc);
 	dgVector referenceVeloc (dgFloat32 (0.0f));
 
+	dgAssert (collConicConvexInstance->GetChildShape() == this);
+
 	dgCollisionInstance shapeInstance (*castingShape, castingShape->GetChildShape());
 	shapeInstance.SetGlobalMatrix (castingShape->GetLocalMatrix() * shapeMatrix);
 
@@ -2710,7 +2712,7 @@ dgFloat32 dgCollisionConvex::ConvexRayCast (const dgCollisionInstance* const cas
 	proxy.m_skinThickness = dgFloat32 (0.0f);
 	proxy.m_matrix = proxy.m_floatingCollision->m_globalMatrix * proxy.m_referenceCollision->m_globalMatrix.Inverse();
 
-
+	//dgVector lastDiff(dgFloat32 (0.0f));
 	dgContactPoint lastContact;
 	contactOut.m_normal = dgVector (dgFloat32 (0.0f));
 	contactOut.m_point = dgVector (dgFloat32 (0.0f));
@@ -2738,14 +2740,15 @@ dgFloat32 dgCollisionConvex::ConvexRayCast (const dgCollisionInstance* const cas
 		minkHull.m_p = ConvexConicSupporVertex(minkHull.m_p, minkHull.m_normal);
 		dgVector diff (scale.CompProduct3(minkHull.m_q - minkHull.m_p));
 		dgFloat32 num = minkHull.m_normal % diff;
-		if (num <= dgFloat32 (1.0e-4f)) {
+		if (num <= dgFloat32 (1.0e-6f)) {
 			// bodies collide at time tacc, but we do not set it yet
+			//lastDiff = diff;
 			lastContact.m_point = matrix.TransformVector(scale.CompProduct4(minkHull.m_p));
 			lastContact.m_normal = matrix.RotateVector(normal);
 			break;
 		}
 
-		num += DG_RESTING_CONTACT_PENETRATION; 
+		//num += DG_RESTING_CONTACT_PENETRATION; 
 		tacc -= (num / den); 
 		if (tacc >= timestep) {
 			// object do not collide on this timestep
@@ -2754,6 +2757,7 @@ dgFloat32 dgCollisionConvex::ConvexRayCast (const dgCollisionInstance* const cas
 		}
 		minkHull.m_matrix.m_posit = proxy.m_matrix.m_posit + veloc.Scale4(tacc);
 
+		//lastDiff = diff;
 		lastContact.m_normal = matrix.RotateVector(normal);
 		lastContact.m_point = matrix.TransformVector(scale.CompProduct4(minkHull.m_p));
 
@@ -2761,6 +2765,8 @@ dgFloat32 dgCollisionConvex::ConvexRayCast (const dgCollisionInstance* const cas
 	} while (iter < DG_SEPARATION_PLANES_ITERATIONS);
 
 	if (tacc <= dgFloat32(1.0f)) {
+		//dgFloat32 xxx = - lastDiff.DotProduct4(lastContact.m_normal).m_w / (shapeVeloc.DotProduct4(lastContact.m_normal)).m_w;
+		//dgAssert (dgAbsf ((xxx - tacc) < dgFloat32 (1.0e-3f)));
 		contactOut.m_point = lastContact.m_point;
 		contactOut.m_normal = lastContact.m_normal;
 	}
