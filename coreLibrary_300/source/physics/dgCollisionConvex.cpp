@@ -1094,14 +1094,14 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 		PushFace(f2);
 		PushFace(f3);
 
-//static dgMinkHull* xxxxx = this;
-//static int xxxx;
-//xxxx ++;
-//if (xxxx== 790529) {
-//xxxx *= 1;
-//}
-//static float xxxDist0;
-//static float xxxDist1;
+
+		int iterCount = 0;
+		dgInt32 cycling = 0;
+		dgFloat32 cyclingMem[4];
+		cyclingMem[0] = dgFloat32 (1.0e10f);
+		cyclingMem[1] = dgFloat32 (1.0e10f);
+		cyclingMem[2] = dgFloat32 (1.0e10f);
+		cyclingMem[3] = dgFloat32 (1.0e10f);
 
 		dgFloat32 resolutionScale = dgFloat32 (0.125f);
 		dgFloat32 minTolerance = dgFloat32 (DG_IMPULSIVE_CONTACT_PENETRATION / dgFloat32 (4.0f));
@@ -1119,8 +1119,6 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 				dgFloat32 dist = faceNode->m_plane.Evalue (p);
 				dgFloat32 distTolerance = dgMax (dgAbsf(faceNode->m_plane.m_w) * resolutionScale, minTolerance);
 
-//xxxDist0 = dist;
-//xxxDist1 = distTolerance;
 
 				if (dist < distTolerance) {
 //if (xxx > 1000){
@@ -1144,88 +1142,109 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 					return 3;
 				}
 
-				//dgAssert (Sanity());
-				m_faceStack[0] = faceNode;
-				dgInt32 stackIndex = 1;
-				dgInt32 deletedCount = 0;
+				iterCount ++;
+				bool isCycling = false;
+				cyclingMem[cycling] = dist;
+				if (iterCount > 10) {
+					dgInt32 cyclingIndex = cycling;
+					for (dgInt32 i = 0; i < 3; i ++) {
+						dgInt32 cyclingIndex0 = (cyclingIndex - 1) & 3;	
+						if (((cyclingMem[cyclingIndex0] - cyclingMem[cyclingIndex]) < dgFloat32 (-1.0e-5f))) {
+							isCycling = true;
+							cyclingMem[0] = dgFloat32 (1.0e10f);
+							cyclingMem[1] = dgFloat32 (1.0e10f);
+							cyclingMem[2] = dgFloat32 (1.0e10f);
+							cyclingMem[3] = dgFloat32 (1.0e10f);
+							break;
+						}
+						cyclingIndex = cyclingIndex0;
+					}
+				}
+				cycling = (cycling + 1) & 3;
 
-				while (stackIndex) {
-					stackIndex --;
-					dgMinkFace* const face = m_faceStack[stackIndex];
+				if(!isCycling) {
+					m_faceStack[0] = faceNode;
+					dgInt32 stackIndex = 1;
+					dgInt32 deletedCount = 0;
 
-					if (!face->m_mark && (face->m_plane.Evalue(p) > dgFloat32(0.0f))) { 
-						#ifdef _DEBUG
-							for (dgInt32 i = 0; i < deletedCount; i ++) {
-								dgAssert (m_deletedFaceList[i] != face);
+					while (stackIndex) {
+						stackIndex --;
+						dgMinkFace* const face = m_faceStack[stackIndex];
+
+						if (!face->m_mark && (face->m_plane.Evalue(p) > dgFloat32(0.0f))) { 
+							#ifdef _DEBUG
+								for (dgInt32 i = 0; i < deletedCount; i ++) {
+									dgAssert (m_deletedFaceList[i] != face);
+								}
+							#endif
+
+							m_deletedFaceList[deletedCount] = face;
+							deletedCount ++;
+							dgAssert (deletedCount < sizeof (m_deletedFaceList)/sizeof (m_deletedFaceList[0]));
+							face->m_mark = 1;
+
+							for (dgInt32 i = 0; i < 3; i ++) {
+								dgMinkFace* const twinFace = face->m_twin[i];
+								if (!twinFace->m_mark) {
+									m_faceStack[stackIndex] = twinFace;
+									stackIndex ++;
+									dgAssert (stackIndex < sizeof (m_faceStack)/sizeof (m_faceStack[0]));
+								}
 							}
-						#endif
+						}
+					}
 
-						m_deletedFaceList[deletedCount] = face;
-						deletedCount ++;
-						dgAssert (deletedCount < sizeof (m_deletedFaceList)/sizeof (m_deletedFaceList[0]));
-						face->m_mark = 1;
-
-						for (dgInt32 i = 0; i < 3; i ++) {
-							dgMinkFace* const twinFace = face->m_twin[i];
+					//dgAssert (SanityCheck());
+					dgInt32 newCount = 0;
+					for (dgInt32 i = 0; i < deletedCount; i ++) {
+						dgMinkFace* const face = m_deletedFaceList[i];
+						face->m_alive = 0;
+						dgAssert (face->m_mark == 1);
+						dgInt32 j0 = 2;
+						for (dgInt32 j1 = 0; j1 < 3; j1 ++) {
+							dgMinkFace* const twinFace = face->m_twin[j0];
 							if (!twinFace->m_mark) {
-								m_faceStack[stackIndex] = twinFace;
-								stackIndex ++;
-								dgAssert (stackIndex < sizeof (m_faceStack)/sizeof (m_faceStack[0]));
+								dgMinkFace* const newFace = AddFace (m_vertexIndex, face->m_vertex[j0], face->m_vertex[j1]);
+								PushFace(newFace);
+
+								newFace->m_twin[1] = twinFace;
+								dgInt32 index = (twinFace->m_twin[0] == face) ? 0 : ((twinFace->m_twin[1] == face) ? 1 : 2);
+								twinFace->m_twin[index] = newFace;
+
+								m_coneFaceList[newCount] = newFace;
+								newCount ++;
+								dgAssert (newCount < sizeof (m_coneFaceList)/sizeof (m_coneFaceList[0]));
 							}
+							j0 = j1;
 						}
 					}
-				}
 
-				//dgAssert (SanityCheck());
-				dgInt32 newCount = 0;
-				for (dgInt32 i = 0; i < deletedCount; i ++) {
-					dgMinkFace* const face = m_deletedFaceList[i];
-					face->m_alive = 0;
-					dgAssert (face->m_mark == 1);
-					dgInt32 j0 = 2;
-					for (dgInt32 j1 = 0; j1 < 3; j1 ++) {
-						dgMinkFace* const twinFace = face->m_twin[j0];
-						if (!twinFace->m_mark) {
-							dgMinkFace* const newFace = AddFace (m_vertexIndex, face->m_vertex[j0], face->m_vertex[j1]);
-							PushFace(newFace);
+					dgInt32 i0 = newCount - 1;
+					for (dgInt32 i1 = 0; i1 < newCount; i1 ++) {
+						dgMinkFace* const faceA = m_coneFaceList[i0];
+						dgAssert (faceA->m_mark == 0);
 
-							newFace->m_twin[1] = twinFace;
-							dgInt32 index = (twinFace->m_twin[0] == face) ? 0 : ((twinFace->m_twin[1] == face) ? 1 : 2);
-							twinFace->m_twin[index] = newFace;
-
-							m_coneFaceList[newCount] = newFace;
-							newCount ++;
-							dgAssert (newCount < sizeof (m_coneFaceList)/sizeof (m_coneFaceList[0]));
-						}
-						j0 = j1;
-					}
-				}
-
-				dgInt32 i0 = newCount - 1;
-				for (dgInt32 i1 = 0; i1 < newCount; i1 ++) {
-					dgMinkFace* const faceA = m_coneFaceList[i0];
-					dgAssert (faceA->m_mark == 0);
-
-					dgInt32 j0 = newCount - 1;
-					for (dgInt32 j1 = 0; j1 < newCount; j1 ++) {
-						if (i0 != j0) {
-							dgMinkFace* const faceB = m_coneFaceList[j0];
-							dgAssert (faceB->m_mark == 0);
-							if (faceA->m_vertex[2] == faceB->m_vertex[1]) {
-								faceA->m_twin[2] = faceB;
-								faceB->m_twin[0] = faceA;
-								break;
+						dgInt32 j0 = newCount - 1;
+						for (dgInt32 j1 = 0; j1 < newCount; j1 ++) {
+							if (i0 != j0) {
+								dgMinkFace* const faceB = m_coneFaceList[j0];
+								dgAssert (faceB->m_mark == 0);
+								if (faceA->m_vertex[2] == faceB->m_vertex[1]) {
+									faceA->m_twin[2] = faceB;
+									faceB->m_twin[0] = faceA;
+									break;
+								}
 							}
+							j0 = j1;
 						}
-						j0 = j1;
+						i0 = i1;
 					}
-					i0 = i1;
+
+					m_vertexIndex ++;
+					dgAssert (m_vertexIndex < sizeof (m_hullDiff)/sizeof (m_hullDiff[0]));
+
+					dgAssert (SanityCheck());
 				}
-
-				m_vertexIndex ++;
-				dgAssert (m_vertexIndex < sizeof (m_hullDiff)/sizeof (m_hullDiff[0]));
-
-				dgAssert (SanityCheck());
 			} else {
 				DeleteFace(faceNode);
 			}
@@ -2580,8 +2599,8 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& l
 			cycling ++;
 			if (cycling > 4) {
 				dgAssert (0);
-				// for now return -1
-//				return -index;
+				index = -1; 
+				break;
 			}
 
 			dgVector dir (v.Scale4 (-dgRsqrt(dist)));
@@ -2721,13 +2740,7 @@ dgFloat32 dgCollisionConvex::ConvexRayCast (const dgCollisionInstance* const cas
 		dgFloat32 num = minkHull.m_normal % diff;
 		if (num <= dgFloat32 (1.0e-4f)) {
 			// bodies collide at time tacc, but we do not set it yet
-			//dgVector step (veloc.Scale3(tacc));
-			//proxy.m_timestep = tacc;
-			//proxy.m_normal = matrix.RotateVector(normal.CompProduct4 (dgVctor::m_negOne));
-			//proxy.m_closestPointBody0 = matrix.TransformVector(scale.CompProduct3(minkHull.m_p));
-			//proxy.m_closestPointBody1 = matrix.TransformVector(scale.CompProduct3(minkHull.m_q - step));
 			lastContact.m_point = matrix.TransformVector(scale.CompProduct4(minkHull.m_p));
-			//contactOut.m_normal = matrix.RotateVector(normal.CompProduct4 (dgVector::m_negOne));
 			lastContact.m_normal = matrix.RotateVector(normal);
 			break;
 		}
@@ -2736,7 +2749,6 @@ dgFloat32 dgCollisionConvex::ConvexRayCast (const dgCollisionInstance* const cas
 		tacc -= (num / den); 
 		if (tacc >= timestep) {
 			// object do not collide on this timestep
-			dgAssert (0);
 			tacc = dgFloat32 (1.2f);
 			break;
 		}
