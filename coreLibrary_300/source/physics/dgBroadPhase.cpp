@@ -932,7 +932,7 @@ void dgBroadPhase::CalculatePairContacts (dgBroadphaseSyncDescriptor* const desc
 		dgCollidingPairCollector::dgPair* const pair = &pairs[i];
 		pair->m_cacheIsValid = false;
 		pair->m_contactBuffer = contacts;
-		m_world->CalculateContacts (pair, timestep, false, threadID);
+		m_world->CalculateContacts (pair, timestep, threadID, false, false);
 
 		if (pair->m_contactCount) {
 			dgAssert (pair->m_contactCount <= (DG_CONSTRAINT_MAX_ROWS / 3));

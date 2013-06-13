@@ -386,7 +386,7 @@ class dgWorld:
 	
 	private:
 	
-	void CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgFloat32 timestep, bool ccdMode, dgInt32 threadIndex);
+	void CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex, bool ccdMode, bool intersectionTestOnly);
 
 	dgInt32 PruneContacts (dgInt32 count, dgContactPoint* const contact, dgInt32 maxCount = (DG_CONSTRAINT_MAX_ROWS / 3)) const;
 	dgInt32 ReduceContacts (dgInt32 count, dgContactPoint* const contact, dgInt32 maxCount, dgFloat32 tol, dgInt32 arrayIsSorted = 0) const;

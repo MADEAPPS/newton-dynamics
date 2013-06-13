@@ -102,6 +102,16 @@ DG_MSC_VECTOR_ALIGMENT
 class dgCollisionParamProxy
 {	
 	public:
+	dgCollisionParamProxy(dgContact* const contact, dgContactPoint* const contactBuffer, dgInt32 threadIndex, bool ccdMode, bool intersectionTestOnly)
+		:m_contactJoint(contact)
+		,m_contacts(contactBuffer)
+		,m_polyMeshData(NULL)		
+		,m_threadIndex(threadIndex)
+		,m_continueCollision(ccdMode)
+		,m_intersectionTestOnly(intersectionTestOnly)
+	{
+	}
+
 	dgMatrix m_matrix;
 	dgVector m_normal;
 	dgVector m_closestPointBody0;
@@ -120,15 +130,8 @@ class dgCollisionParamProxy
 	dgInt32 m_threadIndex;
 	dgInt32 m_maxContacts;
 	bool m_continueCollision;
+	bool m_intersectionTestOnly;
 
-	dgCollisionParamProxy(dgContact* const contact, dgContactPoint* const contactBuffer, bool ccdMode, dgInt32 threadIndex)
-		:m_contactJoint(contact)
-		,m_contacts(contactBuffer)
-		,m_polyMeshData(NULL)		
-		,m_threadIndex(threadIndex)
-		,m_continueCollision(ccdMode)
-	{
-	}
 }DG_GCC_VECTOR_ALIGMENT;
 
 

@@ -400,7 +400,7 @@ dgInt32 dgWorld::ClosestPoint(const dgCollisionInstance* const collisionSrcA, co
 	dgContact contactJoint (this, &material);
 	contactJoint.SetBodies (&collideBodyA, &collideBodyB);
 
-	dgCollisionParamProxy proxy(&contactJoint, contacts, false, threadIndex);
+	dgCollisionParamProxy proxy(&contactJoint, contacts, threadIndex, false, false);
 
 	if (collisionA.IsType (dgCollision::dgCollisionCompound_RTTI)) {
 		dgAssert (0);
@@ -479,9 +479,8 @@ bool dgWorld::IntersectionTest (const dgCollisionInstance* const collisionSrcA, 
 	pair.m_timeOfImpact = dgFloat32 (0.0f);
 	pair.m_isDeformable = 0;
 	pair.m_cacheIsValid = 0;
-//	CalculateContacts (&pair, dgFloat32 (0.0f), threadIndex, false, false);
-//	return (pair.m_contactCount == -1) ? true : false;
-	return false;
+	CalculateContacts (&pair, dgFloat32 (0.0f), threadIndex, false, true);
+	return (pair.m_contactCount == -1) ? true : false;
 }
 
 
@@ -1107,13 +1106,13 @@ void dgWorld::SceneContacts (dgCollidingPairCollector::dgPair* const pair, dgCol
 }
 
 
-void dgWorld::CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgFloat32 timestep, bool ccdMode, dgInt32 threadIndex)
+void dgWorld::CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex, bool ccdMode, bool intersectionTestOnly)
 {
 	dgContact* const contact = pair->m_contact;
 	dgBody* const body0 = contact->m_body0;
 	dgBody* const body1 = contact->m_body1;
 	const dgContactMaterial* const material = contact->m_material;
-	dgCollisionParamProxy proxy(contact, pair->m_contactBuffer, ccdMode, threadIndex);
+	dgCollisionParamProxy proxy(contact, pair->m_contactBuffer, threadIndex, ccdMode, intersectionTestOnly);
 
 	proxy.m_timestep = timestep;
 	proxy.m_maxContacts = DG_MAX_CONTATCS;
@@ -1159,7 +1158,7 @@ dgFloat32 dgWorld::CalculateTimeToImpact (dgContact* const contact, dgFloat32 ti
 	dgBody* const body0 = contact->m_body0;
 	dgBody* const body1 = contact->m_body1;
 	const dgContactMaterial* const material = contact->m_material;
-	dgCollisionParamProxy proxy(contact, NULL, true, threadIndex);
+	dgCollisionParamProxy proxy(contact, NULL, threadIndex, true, false);
 
 	proxy.m_maxContacts = 0;
 	proxy.m_timestep = timestep;
@@ -1259,7 +1258,7 @@ dgInt32 dgWorld::CollideContinue (
 	pair.m_contactCount = 0;
 	pair.m_isDeformable = 0;
 	pair.m_cacheIsValid = 0;
-	CalculateContacts (&pair, time, true, threadIndex);
+	CalculateContacts (&pair, time, threadIndex, true, false);
 
 	if (pair.m_timeOfImpact < dgFloat32 (1.0f)) {
 		retTimeStep = pair.m_timeOfImpact;
@@ -1329,7 +1328,7 @@ dgInt32 dgWorld::Collide (
 	pair.m_timeOfImpact = dgFloat32 (0.0f);
 	pair.m_isDeformable = 0;
 	pair.m_cacheIsValid = 0;
-	CalculateContacts (&pair, dgFloat32 (0.0f), false, threadIndex);
+	CalculateContacts (&pair, dgFloat32 (0.0f), threadIndex, false, false);
 
 	count = pair.m_contactCount;
 	if (count > maxContacts) {
@@ -1380,7 +1379,7 @@ dgInt32 dgWorld::ClosestPoint (dgCollisionParamProxy& proxy) const
 
 	bool flipShape = m_collisionSwapPriority[id1][id2];
 	if (flipShape) {
-		dgCollisionParamProxy tmp(proxy.m_contactJoint, proxy.m_contacts, proxy.m_continueCollision, proxy.m_threadIndex);
+		dgCollisionParamProxy tmp(proxy.m_contactJoint, proxy.m_contacts, proxy.m_threadIndex, proxy.m_continueCollision, proxy.m_intersectionTestOnly);
 		tmp.m_referenceBody = proxy.m_floatingBody;
 		tmp.m_floatingBody = proxy.m_referenceBody;
 		tmp.m_referenceCollision = proxy.m_floatingCollision;
@@ -1550,7 +1549,7 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) 
 
 	if (proxy.m_continueCollision) {
 		if (flipShape) {
-			dgCollisionParamProxy tmp(proxy.m_contactJoint, proxy.m_contacts, proxy.m_continueCollision, proxy.m_threadIndex);
+			dgCollisionParamProxy tmp(proxy.m_contactJoint, proxy.m_contacts, proxy.m_threadIndex, proxy.m_continueCollision, proxy.m_intersectionTestOnly);
 			tmp.m_referenceBody = proxy.m_floatingBody;
 			tmp.m_floatingBody = proxy.m_referenceBody;
 			tmp.m_referenceCollision = proxy.m_floatingCollision;
@@ -1603,7 +1602,7 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) 
 		}
 	} else {
 		if (flipShape) {
-			dgCollisionParamProxy tmp(proxy.m_contactJoint, proxy.m_contacts, proxy.m_continueCollision, proxy.m_threadIndex);
+			dgCollisionParamProxy tmp(proxy.m_contactJoint, proxy.m_contacts, proxy.m_threadIndex, proxy.m_continueCollision, proxy.m_intersectionTestOnly);
 			tmp.m_referenceBody = proxy.m_floatingBody;
 			tmp.m_floatingBody = proxy.m_referenceBody;
 			tmp.m_referenceCollision = proxy.m_floatingCollision;

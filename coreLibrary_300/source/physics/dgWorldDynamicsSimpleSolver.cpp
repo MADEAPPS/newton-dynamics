@@ -232,7 +232,7 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 							pair.m_contact = contact;
 							pair.m_cacheIsValid = false;
 							pair.m_contactBuffer = contactArray;
-							world->CalculateContacts (&pair, timeRemaining, false, threadID);
+							world->CalculateContacts (&pair, timeRemaining, threadID, false, false);
 
 							if (pair.m_contactCount) {
 								dgAssert (pair.m_contactCount <= (DG_CONSTRAINT_MAX_ROWS / 3));
