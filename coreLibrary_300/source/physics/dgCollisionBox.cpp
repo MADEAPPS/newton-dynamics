@@ -238,8 +238,8 @@ dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, cons
 	dgFloat32 test[8];
 	dgPlane plane (normal, - (normal % point));
 	for (dgInt32 i = 0; i < 8; i ++) {
-		//test[i] = plane.Evalue (m_vertex[i]);
-		test[i] = plane.DotProduct4 (m_vertex[i]).m_x;
+		//test[i] = plane.DotProduct4 (m_vertex[i]).m_x;
+		test[i] = plane.Evalue (m_vertex[i]);
 	}
 
 
