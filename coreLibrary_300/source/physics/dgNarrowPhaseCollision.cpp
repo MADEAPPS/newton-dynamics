@@ -567,45 +567,47 @@ dgInt32 dgWorld::ReduceContacts (dgInt32 count, dgContactPoint* const contact,  
 
 dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contact, dgInt32 maxCount) const
 {
-	dgUnsigned8 mask[DG_MAX_CONTATCS];
+	if (count > 0) {
+		dgUnsigned8 mask[DG_MAX_CONTATCS];
 
-	dgInt32 index = 0;
-	dgInt32 packContacts = 0;
-	dgFloat32 window = DG_PRUNE_CONTACT_TOLERANCE;
-	dgFloat32 window2 = window * window;
+		dgInt32 index = 0;
+		dgInt32 packContacts = 0;
+		dgFloat32 window = DG_PRUNE_CONTACT_TOLERANCE;
+		dgFloat32 window2 = window * window;
 
-	memset (mask, 0, size_t (count));
-	dgSort (contact, count, CompareContact, NULL);
+		memset (mask, 0, size_t (count));
+		dgSort (contact, count, CompareContact, NULL);
 
-	for (dgInt32 i = 0; i < count; i ++) {
-		if (!mask[i]) {
-			dgFloat32 val = contact[i].m_point[index] + window;
-			for (dgInt32 j = i + 1; (j < count) && (contact[j].m_point[index] < val) ; j ++) {
-				if (!mask[j]) {
-					dgVector dp (contact[j].m_point - contact[i].m_point);
-					dgFloat32 dist2 = dp % dp;
-					if (dist2 < window2) {
-						mask[j] = 1;
-						packContacts = 1;
+		for (dgInt32 i = 0; i < count; i ++) {
+			if (!mask[i]) {
+				dgFloat32 val = contact[i].m_point[index] + window;
+				for (dgInt32 j = i + 1; (j < count) && (contact[j].m_point[index] < val) ; j ++) {
+					if (!mask[j]) {
+						dgVector dp (contact[j].m_point - contact[i].m_point);
+						dgFloat32 dist2 = dp % dp;
+						if (dist2 < window2) {
+							mask[j] = 1;
+							packContacts = 1;
+						}
 					}
 				}
 			}
 		}
-	}
 
-	if (packContacts) {
-		dgInt32 j = 0;
-		for (dgInt32 i = 0; i < count; i ++) {
-			if (!mask[i]) {
-				contact[j] = contact[i];
-				j ++;
+		if (packContacts) {
+			dgInt32 j = 0;
+			for (dgInt32 i = 0; i < count; i ++) {
+				if (!mask[i]) {
+					contact[j] = contact[i];
+					j ++;
+				}
 			}
+			count = j;
 		}
-		count = j;
-	}
 
-	if (count > maxCount) {
-		count = ReduceContacts (count, contact, maxCount, window * dgFloat32 (2.0f), 1);
+		if (count > maxCount) {
+			count = ReduceContacts (count, contact, maxCount, window * dgFloat32 (2.0f), 1);
+		}
 	}
 	return count;
 }
@@ -1507,14 +1509,16 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts (dgCollisionParamProxy& prox
 			count = CalculatePolySoupToHullContactsDescrete (proxy);
 		}
 
-		count = PruneContacts (count, proxy.m_contacts);
-		dgContactPoint* const contactOut = proxy.m_contacts;
-		for (dgInt32 i = 0; i < count; i ++) {
-			dgAssert ((dgAbsf(contactOut[i].m_normal % contactOut[i].m_normal) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
-			contactOut[i].m_body0 = proxy.m_referenceBody;
-			contactOut[i].m_body1 = proxy.m_floatingBody;
-			contactOut[i].m_collision0 = proxy.m_referenceCollision;
-			contactOut[i].m_collision1 = proxy.m_floatingCollision;
+		if (count > 0) {
+			count = PruneContacts (count, proxy.m_contacts);
+			dgContactPoint* const contactOut = proxy.m_contacts;
+			for (dgInt32 i = 0; i < count; i ++) {
+				dgAssert ((dgAbsf(contactOut[i].m_normal % contactOut[i].m_normal) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
+				contactOut[i].m_body0 = proxy.m_referenceBody;
+				contactOut[i].m_body1 = proxy.m_floatingBody;
+				contactOut[i].m_collision0 = proxy.m_referenceCollision;
+				contactOut[i].m_collision1 = proxy.m_floatingCollision;
+			}
 		}
 	}
 	return count;
@@ -1748,6 +1752,9 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 				dgAssert (countleft >= 0); 
 				proxy.m_maxContacts = countleft;
 			}
+		} else if (count1 == -1) {
+			count = -1;
+			break;
 		}
 
 		indexCount += data.GetFaceIndexCount (data.m_faceIndexCount[i]);
