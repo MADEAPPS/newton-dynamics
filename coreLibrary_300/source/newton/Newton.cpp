@@ -1197,7 +1197,7 @@ int NewtonWorldGetConstraintCount(const NewtonWorld* const newtonWorld)
 // as excessive use of it can degrade performance.
 //
 // See also: NewtonWorldConvexCast  
-void NewtonWorldRayCast(const NewtonWorld* const newtonWorld, const dFloat* const p0, const dFloat* const p1, NewtonWorldRayFilterCallback filter, void* const userData, NewtonWorldRayPrefilterCallback prefilter)
+void NewtonWorldRayCast(const NewtonWorld* const newtonWorld, const dFloat* const p0, const dFloat* const p1, NewtonWorldRayFilterCallback filter, void* const userData, NewtonWorldRayPrefilterCallback prefilter, int threadIndex)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	if (filter) {
@@ -1208,7 +1208,7 @@ void NewtonWorldRayCast(const NewtonWorld* const newtonWorld, const dFloat* cons
 	}
 }
 
-NEWTON_API void NewtonWorldConvexRayCast (const NewtonWorld* const newtonWorld, const NewtonCollision* const shape, const dFloat* const matrix, const dFloat* const p1, NewtonWorldRayFilterCallback filter, void* const userData, NewtonWorldRayPrefilterCallback prefilter)
+NEWTON_API void NewtonWorldConvexRayCast (const NewtonWorld* const newtonWorld, const NewtonCollision* const shape, const dFloat* const matrix, const dFloat* const p1, NewtonWorldRayFilterCallback filter, void* const userData, NewtonWorldRayPrefilterCallback prefilter, int threadIndex)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	if (filter) {

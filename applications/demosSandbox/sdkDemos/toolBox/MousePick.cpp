@@ -336,7 +336,7 @@ NewtonBody* MousePickByForce (NewtonWorld* const nWorld, const dVector& origin, 
 //	dVector p1 (ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
 
 	dMousePickClass rayCast;
-	NewtonWorldRayCast(nWorld, &origin[0], &end[0], dMousePickClass::RayCastFilter, &rayCast, dMousePickClass::RayCastPrefilter);
+	NewtonWorldRayCast(nWorld, &origin[0], &end[0], dMousePickClass::RayCastFilter, &rayCast, dMousePickClass::RayCastPrefilter, 0);
 
 	if (rayCast.m_body) {
 		positionOut = origin + (end - origin).Scale (rayCast.m_param);

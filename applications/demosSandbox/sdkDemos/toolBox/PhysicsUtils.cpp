@@ -74,7 +74,7 @@ dVector FindFloor (const NewtonWorld* world, const dVector& origin, dFloat dist)
 	dVector p1 (origin - dVector (0.0f, dAbs (dist), 0.0f, 0.0f)); 
 
 	dFloat parameter = 1.2f;
-	NewtonWorldRayCast (world, &p0[0], &p1[0], RayCastPlacement, &parameter, NULL);
+	NewtonWorldRayCast (world, &p0[0], &p1[0], RayCastPlacement, &parameter, NULL, 0);
 	if (parameter < 1.0f) {
 		p0 -= dVector (0.0f, dAbs (dist) * parameter, 0.0f, 0.0f);
 	}
