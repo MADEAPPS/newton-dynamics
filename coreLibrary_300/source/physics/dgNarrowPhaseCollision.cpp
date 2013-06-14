@@ -1379,7 +1379,7 @@ dgInt32 dgWorld::ClosestPoint (dgCollisionParamProxy& proxy) const
 	dgAssert (id1 < m_nullCollision);
 	dgAssert (id2 < m_nullCollision);
 
-	bool flipShape = m_collisionSwapPriority[id1][id2];
+	bool flipShape = dgCollisionConvex::m_priorityOrder.m_swapPriority[id1][id2];
 	if (flipShape) {
 		dgCollisionParamProxy tmp(proxy.m_contactJoint, proxy.m_contacts, proxy.m_threadIndex, proxy.m_continueCollision, proxy.m_intersectionTestOnly);
 		tmp.m_referenceBody = proxy.m_floatingBody;
@@ -1549,8 +1549,8 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) 
 	dgCollisionID id2 = collision2->GetCollisionPrimityType();
 	dgAssert (id1 < m_nullCollision);
 	dgAssert (id2 < m_nullCollision);
-	bool flipShape = m_collisionSwapPriority[id1][id2];
-
+//	bool flipShape = m_collisionSwapPriority[id1][id2];
+	bool flipShape = dgCollisionConvex::m_priorityOrder.m_swapPriority[id1][id2];
 	if (proxy.m_continueCollision) {
 		if (flipShape) {
 			dgCollisionParamProxy tmp(proxy.m_contactJoint, proxy.m_contacts, proxy.m_threadIndex, proxy.m_continueCollision, proxy.m_intersectionTestOnly);

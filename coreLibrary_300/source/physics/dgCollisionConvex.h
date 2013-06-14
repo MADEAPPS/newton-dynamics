@@ -42,6 +42,26 @@ class dgCollisionConvex: public dgCollision
 	class dgMinkFace;
 	class dgMinkHull;
 	class dgPerimenterEdge;
+	class dgCollisionPriority
+	{
+		public:
+		dgCollisionPriority()
+		{
+			// set all entry to be no swap order
+			memset (m_swapPriority, false, sizeof (m_swapPriority));
+			for (dgInt32 i = m_sphereCollision; i < m_boxCollision; i ++) {
+				for (dgInt32 j = m_sphereCollision; j < i; j ++) {
+					m_swapPriority[i][j] = true;
+				}
+			}
+			for (dgInt32 i = m_boxCollision; i < m_nullCollision; i ++) {
+				for (dgInt32 j = m_sphereCollision; j < m_boxCollision; j ++) {
+					m_swapPriority[i][j] = true;
+				}
+			}
+		}
+		bool m_swapPriority[m_nullCollision][m_nullCollision];
+	};
 
 	public:
 	virtual void CalcAABB (const dgMatrix &matrix, dgVector& p0, dgVector& p1) const;
@@ -110,6 +130,8 @@ class dgCollisionConvex: public dgCollision
 	dgInt32 CalculateContactsGeneric (const dgVector& point, const dgVector& normal, dgCollisionParamProxy& proxy, dgVector* const contactsOut) const;
 	dgInt32 ConvexPolygonsIntersection (const dgVector& nornal, dgInt32 count1, dgVector* const shape1, dgInt32 count2, dgVector* const shape2, dgVector* const contactOut, dgInt32 maxContacts) const;
 	dgInt32 ConvexPolygonToLineIntersection (const dgVector& normal, dgInt32 count1, dgVector* const shape1, dgInt32 count2, dgVector* const shape2, dgVector* const contactOut, dgVector* const mem) const;
+	dgFloat32 ConvexConicConvexRayCast (const dgCollisionInstance* const convexConicShape, const dgMatrix& conicShapeMatrix, const dgCollisionInstance* const convexCastingShape, const dgMatrix& castingMatrix, const dgVector& castingVeloc, dgFloat32 maxT, dgContactPoint& contactOut) const;
+									
 
 	
 
@@ -149,6 +171,7 @@ class dgCollisionConvex: public dgCollision
 	static dgVector m_hullDirs[14]; 
 	static dgVector m_dummySum[4];
 	static dgInt32 m_rayCastSimplex[4][4];
+	static dgCollisionPriority m_priorityOrder;
 	
 	friend class dgWorld;
 	friend class dgMinkowskiConv;

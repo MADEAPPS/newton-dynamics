@@ -52,6 +52,7 @@ class dgPolygonSoupRayHitDesc;
 
 enum dgCollisionID
 {
+	// do not change the order of these enum
 	m_sphereCollision = 0,
 	m_capsuleCollision,
 	m_chamferCylinderCollision,
@@ -61,7 +62,8 @@ enum dgCollisionID
 	m_boxCollision,
 	m_coneCollision,
 	m_convexHullCollision,
-	m_nullCollision,
+	// this must be the last convex shape ID
+	m_nullCollision,					
 	
 	m_compoundCollision,
 	m_boundingBoxHierachy,

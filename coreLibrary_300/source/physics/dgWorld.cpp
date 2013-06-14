@@ -309,18 +309,6 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	SetPerfomanceCounter(NULL);
 
 
-	// set all entry to be no swap order
-	memset (m_collisionSwapPriority, false, sizeof (m_collisionSwapPriority));
-	for (dgInt32 i = m_sphereCollision; i < m_boxCollision; i ++) {
-		for (dgInt32 j = m_sphereCollision; j < i; j ++) {
-			m_collisionSwapPriority[i][j] = true;
-		}
-	}
-	for (dgInt32 i = m_boxCollision; i < m_nullCollision; i ++) {
-		for (dgInt32 j = m_sphereCollision; j < m_boxCollision; j ++) {
-			m_collisionSwapPriority[i][j] = true;
-		}
-	}
 
 	#ifdef _NEWTON_OPENCL
 	//m_openCL = dgOpencl::GetOpenCL(GetAllocator());

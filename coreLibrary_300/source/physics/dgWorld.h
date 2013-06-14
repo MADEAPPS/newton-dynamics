@@ -458,7 +458,7 @@ class dgWorld:
 	dgFloat32 m_savetimestep;
 
 	dgSolverSleepTherfesholds m_sleepTable[DG_SLEEP_ENTRIES];
-	bool m_collisionSwapPriority[m_nullCollision][m_nullCollision];
+	
 	
 	dgOpenclInstance* m_openCL;
 	dgBroadPhase* m_broadPhase; 
