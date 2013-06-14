@@ -2736,11 +2736,9 @@ dgFloat32 dgCollisionConvex::ConvexRayCast (const dgCollisionInstance* const cas
 	proxy.m_skinThickness = dgFloat32 (0.0f);
 	proxy.m_matrix = proxy.m_floatingCollision->m_globalMatrix * proxy.m_referenceCollision->m_globalMatrix.Inverse();
 
-	//dgVector lastDiff(dgFloat32 (0.0f));
 	dgContactPoint lastContact;
 	contactOut.m_normal = dgVector (dgFloat32 (0.0f));
 	contactOut.m_point = dgVector (dgFloat32 (0.0f));
-
 
 	dgFloat32 den2 = veloc % veloc;
 	dgAssert (den2 > dgFloat32 (0.0f));
@@ -2751,7 +2749,6 @@ dgFloat32 dgCollisionConvex::ConvexRayCast (const dgCollisionInstance* const cas
 		if (!minkHull.IntersectionTest()) {
 			break;
 		}
-//		minkHull.m_resolveIntersections = false;
 
 		dgVector normal (minkHull.m_normal);
 		if (isNonUniformScale) {
@@ -2767,20 +2764,16 @@ dgFloat32 dgCollisionConvex::ConvexRayCast (const dgCollisionInstance* const cas
 		}
 
 		minkHull.m_p = ConvexConicSupporVertex(minkHull.m_p, minkHull.m_normal);
-//		dgVector diff (scale.CompProduct4(minkHull.m_q - minkHull.m_p));
 		dgVector diff (scale.CompProduct4(minkHull.m_p - minkHull.m_q));
-//		dgFloat32 num = minkHull.m_normal % diff;
 		dgFloat32 t = (diff % veloc) * invDen2;
 		if (t <= dgFloat32 (1.0e-6f)) {
 			// bodies collide at time tacc, but we do not set it yet
-			//lastDiff = diff;
 			lastContact.m_point = matrix.TransformVector(scale.CompProduct4(minkHull.m_p));
 			lastContact.m_normal = matrix.RotateVector(normal);
 			break;
 		}
 
 		//num += DG_RESTING_CONTACT_PENETRATION; 
-//		tacc -= (num / den); 
 		tacc += t; 
 		if (tacc >= timestep) {
 			// object do not collide on this timestep
