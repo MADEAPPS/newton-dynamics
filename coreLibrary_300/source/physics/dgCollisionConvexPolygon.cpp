@@ -611,7 +611,7 @@ isConcaveCap = 0;
 		} else {
 			dgCollisionConvex* const convexShape = (dgCollisionConvex*) hull->m_childShape;
 			count = convexShape->CalculateConvexToConvexContact (proxy);
-			dgAssert (count >= 0);
+			dgAssert (proxy.m_intersectionTestOnly || (count >= 0));
 			if (count >= 1) {
 				dgContactPoint* const contactsOut = proxy.m_contacts;
 				if (m_closestFeatureType == 3) {

@@ -1738,7 +1738,7 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 		dgInt32 count1 = polygon.CalculateContactToConvexHullDescrete (proxy);
 		closestDist = dgMin(closestDist, contactJoint->m_closestDistance);
 
-		if (count1) {
+		if (count1 > 0) {
 			count += count1;
 			countleft -= count1;
 			dgAssert (countleft >= 0); 
@@ -1880,7 +1880,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue (dgCollisionParamPro
 		proxy.m_contacts = &contactOut[count];
 		proxy.m_shapeFaceID = polygon.m_faceId;
 		dgInt32 count1 = convexShape->CalculateConvexCastContacts (proxy);
-		if (count1) {
+		if (count1 > 0) {
 			dgFloat32 error = proxy.m_timestep - saveTimeStep;
 			if (error < epsilon) {
 				count = 0;
