@@ -74,12 +74,6 @@ dgFloat32 dgCollisionConvexPolygon::RayCast (const dgVector& localP0, const dgVe
 	return dgFloat32 (1.2f);
 }
 
-dgFloat32 dgCollisionConvexPolygon::ConvexRayCast (const dgCollisionInstance* const convexShape, const dgMatrix& origin, const dgVector& veloc, dgFloat32 minT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const 
-{
-	dgAssert (0);
-	return minT + dgFloat32 (1.2f);
-}
-
 
 dgFloat32 dgCollisionConvexPolygon::GetVolume () const
 {

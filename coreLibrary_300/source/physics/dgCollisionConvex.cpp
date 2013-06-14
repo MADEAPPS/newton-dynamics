@@ -2897,9 +2897,9 @@ dgFloat32 dgCollisionConvex::ConvexRayCast (const dgCollisionInstance* const cas
 #else
 	dgCollisionID id1 = referenceCollision->GetCollisionPrimityType();
 	dgCollisionID id2 = castingShape->GetCollisionPrimityType();
-	dgAssert (id1 < m_nullCollision);
+	dgAssert ((id1 == m_polygonCollision) || (id1 < m_nullCollision));
 	dgAssert (id2 < m_nullCollision);
-	bool flipShape = m_priorityOrder.m_swapPriority[id1][id2];
+	bool flipShape = (id1 == m_polygonCollision) ? true : m_priorityOrder.m_swapPriority[id1][id2];
 
 	if (flipShape) {
 		dgContactPoint tmpContat;
