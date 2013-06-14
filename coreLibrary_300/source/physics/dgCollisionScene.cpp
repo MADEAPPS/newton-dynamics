@@ -195,6 +195,8 @@ void dgCollisionScene::CollidePair (dgCollidingPairCollector::dgPair* const pair
 									buffer[i].m_collision1 = me->GetShape();
 								}
 							}
+						} else if (pair->m_contactCount == -1) {
+							break;
 						}
 						closestDist = dgMin(closestDist, constraint->m_closestDistance);
 					}

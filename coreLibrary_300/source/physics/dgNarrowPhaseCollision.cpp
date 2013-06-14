@@ -1086,7 +1086,7 @@ void dgWorld::SceneContacts (dgCollidingPairCollector::dgPair* const pair, dgCol
 
 		dgCollisionScene* const scene = (dgCollisionScene*)sceneInstance->GetChildShape();
 		scene->CollidePair (pair, proxy);
-		if (pair->m_contactCount) {
+		if (pair->m_contactCount > 0) {
 			// prune close contacts
 			pair->m_contactCount = dgInt16 (PruneContacts (pair->m_contactCount, proxy.m_contacts));
 		}
@@ -1098,7 +1098,7 @@ void dgWorld::SceneContacts (dgCollidingPairCollector::dgPair* const pair, dgCol
 
 		dgCollisionScene* const scene = (dgCollisionScene*)sceneInstance->GetChildShape();
 		scene->CollideCompoundPair (pair, proxy);
-		if (pair->m_contactCount) {
+		if (pair->m_contactCount > 0) {
 			// prune close contacts
 			pair->m_contactCount = dgInt16 (PruneContacts (pair->m_contactCount, proxy.m_contacts));
 		}
