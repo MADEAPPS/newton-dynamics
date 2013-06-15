@@ -551,7 +551,7 @@ dgFloat32 dgCollisionCompound::ConvexRayCast (const dgCollisionInstance* const c
 		}
 	}
 
-	return dgFloat32 (1.2f);
+	return minT;
 }
 
 

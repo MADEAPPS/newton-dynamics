@@ -2949,7 +2949,7 @@ bool dgCollisionConvex::PolygonOBBTest (const dgFloat32* const polygon, dgInt32 
 			return false;
 		}
 	}
-	
+/*	
 	dgVector box[2];
 	dgVector face[64];
 	dgVector simplex[4];
@@ -3107,7 +3107,7 @@ bool dgCollisionConvex::PolygonOBBTest (const dgFloat32* const polygon, dgInt32 
 			iter ++;
 		} while ((iter < DG_SEPARATION_PLANES_ITERATIONS) && ((dir % dir) > skinThickness2));
 	}
-
+*/
 
 	return true;
 }
