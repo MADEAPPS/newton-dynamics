@@ -112,8 +112,8 @@ void dgCollisionTaperedCapsule::Init (dgFloat32 radio0, dgFloat32 radio1, dgFloa
 		for (dgInt32 i = 0; i < DG_CAPSULE_SEGMENTS; i ++) {
 			dgFloat32 z = dgSin (angle);
 			dgFloat32 y = dgCos (angle);
-			m_vertex[i0] = dgVector ( m_height + x0, y * r0, z * r0, dgFloat32 (1.0f));
-			m_vertex[i1] = dgVector (-m_height + x1, y * r1, z * r1, dgFloat32 (1.0f));
+			m_vertex[i0] = dgVector ( m_height + x0, y * r0, z * r0, dgFloat32 (0.0f));
+			m_vertex[i1] = dgVector (-m_height + x1, y * r1, z * r1, dgFloat32 (0.0f));
 			i0 ++;
 			i1 ++;
 			angle += dgPI2 / DG_CAPSULE_SEGMENTS;

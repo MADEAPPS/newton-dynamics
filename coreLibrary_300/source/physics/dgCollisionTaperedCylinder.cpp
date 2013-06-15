@@ -68,8 +68,8 @@ void dgCollisionTaperedCylinder::Init (dgFloat32 radio0, dgFloat32 radio1, dgFlo
 	for (dgInt32 i = 0; i < DG_CYLINDER_SEGMENTS; i ++) {
 		dgFloat32 sinAngle = dgSin (angle);
 		dgFloat32 cosAngle = dgCos (angle);
-		m_vertex[i                       ] = dgVector (- m_height, m_radio1 * cosAngle, m_radio1 * sinAngle, dgFloat32 (1.0f));
-		m_vertex[i + DG_CYLINDER_SEGMENTS] = dgVector (  m_height, m_radio0 * cosAngle, m_radio0 * sinAngle,  dgFloat32 (1.0f));
+		m_vertex[i                       ] = dgVector (- m_height, m_radio1 * cosAngle, m_radio1 * sinAngle, dgFloat32 (0.0f));
+		m_vertex[i + DG_CYLINDER_SEGMENTS] = dgVector (  m_height, m_radio0 * cosAngle, m_radio0 * sinAngle,  dgFloat32 (0.0f));
 		angle += dgPI2 / DG_CYLINDER_SEGMENTS;
 	}
 
