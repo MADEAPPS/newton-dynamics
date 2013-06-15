@@ -228,7 +228,7 @@ dgInt32 dgCollisionMesh::CalculatePlaneIntersection (const dgFloat32* const vert
 }
 
 
-dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const castingShape, const dgMatrix& shapeMatrix, const dgVector& shapeVeloc, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const referenceBody, const dgCollisionInstance* const referenceCollision, void* const userData) const
+dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const castingShape, const dgMatrix& shapeMatrix, const dgVector& shapeVeloc, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const referenceBody, const dgCollisionInstance* const referenceCollision, void* const userData, dgInt32 threadId) const
 {
 	dgAssert (castingShape->IsType (dgCollision::dgCollisionConvexShape_RTTI));
 	dgAssert (referenceCollision->IsType (dgCollision::dgCollisionMesh_RTTI));
@@ -249,7 +249,7 @@ dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const casti
 	dgPolygonMeshDesc data;
 	castingShape->CalcAABB (polySoupScaledMatrix, data.m_boxP0, data.m_boxP1);
 	data.m_vertex = NULL;
-//	data.m_threadNumber = proxy.m_threadIndex;
+	data.m_threadNumber = threadId;
 	data.m_faceCount = 0;
 	data.m_vertexStrideInBytes = 0;
 	data.m_skinThickness = dgFloat32 (0.0f);
@@ -299,7 +299,13 @@ dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const casti
 		polygon.m_normal = normal.Scale4(dgRsqrt (normal % normal));
 		dgAssert (polygon.m_normal.m_w == dgFloat32 (0.0f));
 
-		dgFloat32 t = polygon.ConvexRayCast (castingShape, shapeMatrix, shapeVeloc, maxT, contactOut, referenceBody, &polyInstance, userData);
+		for (dgInt32 i = 0; i < polygon.m_count; i ++) {
+			dgInt32 index = localIndexArray[i] * stride;
+			polygon.m_localPoly[i] = scale.CompProduct4(dgVector (&vertex[index]));
+			dgAssert (polygon.m_localPoly[i].m_w == dgFloat32 (0.0f));
+		}
+
+		dgFloat32 t = polygon.ConvexRayCast (castingShape, shapeMatrix, shapeVeloc, maxT, contactOut, referenceBody, &polyInstance, userData, threadId);
 		if (t < maxT) {
 			maxT = t;
 		}

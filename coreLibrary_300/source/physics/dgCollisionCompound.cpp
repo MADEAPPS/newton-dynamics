@@ -492,7 +492,7 @@ dgFloat32 dgCollisionCompound::RayCast (const dgVector& localP0, const dgVector&
 	return maxParam;
 }
 
-dgFloat32 dgCollisionCompound::ConvexRayCast (const dgCollisionInstance* const convexShape, const dgMatrix& shapeMatrix, const dgVector& shapeVeloc, dgFloat32 minT, dgContactPoint& contactOut, const dgBody* const referenceBody, const dgCollisionInstance* const referenceShape, void* const userData) const
+dgFloat32 dgCollisionCompound::ConvexRayCast (const dgCollisionInstance* const convexShape, const dgMatrix& shapeMatrix, const dgVector& shapeVeloc, dgFloat32 minT, dgContactPoint& contactOut, const dgBody* const referenceBody, const dgCollisionInstance* const referenceShape, void* const userData, dgInt32 threadId) const
 {
 	dgAssert (referenceShape->GetChildShape() == this);
 
@@ -531,7 +531,7 @@ dgFloat32 dgCollisionCompound::ConvexRayCast (const dgCollisionInstance* const c
 				childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * compoundMatrix;
 
 				dgContactPoint tmpContact;
-				dgFloat32 t = childInstance.ConvexRayCast (convexShape, shapeMatrix, shapeVeloc, minT, tmpContact, NULL, referenceBody, userData);
+				dgFloat32 t = childInstance.ConvexRayCast (convexShape, shapeMatrix, shapeVeloc, minT, tmpContact, NULL, referenceBody, userData, threadId);
 				if (t < minT) {
 					contactOut = tmpContact;
 					ray.Reset (t);

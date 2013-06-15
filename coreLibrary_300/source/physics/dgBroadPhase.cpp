@@ -1340,7 +1340,7 @@ void dgBroadPhase::RayCast (const dgVector& l0, const dgVector& l1, OnRayCastAct
 
 
 
-void dgBroadPhase::ConvexRayCast (dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData) const
+void dgBroadPhase::ConvexRayCast (dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData, dgInt32 threadId) const
 {
 	if (filter && m_rootNode && shape->IsType(dgCollision::dgCollisionConvexShape_RTTI)) {
 
@@ -1372,7 +1372,7 @@ void dgBroadPhase::ConvexRayCast (dgCollisionInstance* const shape, const dgMatr
 
 						dgBody* const body = node->m_body;
 						if (!PREFILTER_RAYCAST (prefilter, body, shape, userData)) {
-							dgFloat32 param = body->ConvexRayCast (ray, shape,boxP0, boxP1, matrix, velocA, filter, prefilter, userData, maxParam);
+							dgFloat32 param = body->ConvexRayCast (ray, shape,boxP0, boxP1, matrix, velocA, filter, prefilter, userData, maxParam, threadId);
 							if (param < maxParam) {
 								ray.Reset (param);
 								maxParam = param;

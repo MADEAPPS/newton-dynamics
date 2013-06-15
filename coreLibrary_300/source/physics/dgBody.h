@@ -182,7 +182,7 @@ class dgBody
 	virtual void SetExtForceAndTorqueCallback (OnApplyExtForceAndTorque callback) = 0;
 
 	virtual dgFloat32 RayCast (const dgLineBox& line, OnRayCastAction filter, OnRayPrecastAction preFilter, void* const userData, dgFloat32 minT) const;
-	virtual dgFloat32 ConvexRayCast (const dgFastRayTest& ray, const dgCollisionInstance* const convexShape, const dgVector& shapeMinBox, const dgVector& shapeMaxBox, const dgMatrix& origin, const dgVector& shapeVeloc, OnRayCastAction filter, OnRayPrecastAction preFilter, void* const userData, dgFloat32 minT) const;
+	virtual dgFloat32 ConvexRayCast (const dgFastRayTest& ray, const dgCollisionInstance* const convexShape, const dgVector& shapeMinBox, const dgVector& shapeMaxBox, const dgMatrix& origin, const dgVector& shapeVeloc, OnRayCastAction filter, OnRayPrecastAction preFilter, void* const userData, dgFloat32 minT, dgInt32 threadId) const;
 
 	
 	virtual void Serialize (const dgTree<dgInt32, const dgCollision*>* const collisionNode, dgSerialize serializeCallback, void* const userData);

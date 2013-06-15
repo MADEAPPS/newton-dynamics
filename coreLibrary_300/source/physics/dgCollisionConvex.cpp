@@ -2797,7 +2797,7 @@ dgFloat32 dgCollisionConvex::ConvexConicConvexRayCast (const dgCollisionInstance
 }
 
 
-dgFloat32 dgCollisionConvex::ConvexRayCast (const dgCollisionInstance* const castingShape, const dgMatrix& shapeMatrix, const dgVector& shapeVeloc, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const referenceBody, const dgCollisionInstance* const referenceCollision, void* const userData) const 
+dgFloat32 dgCollisionConvex::ConvexRayCast (const dgCollisionInstance* const castingShape, const dgMatrix& shapeMatrix, const dgVector& shapeVeloc, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const referenceBody, const dgCollisionInstance* const referenceCollision, void* const userData, dgInt32 threadId) const 
 {
 #if 0
 	dgVector floatingVeloc (shapeVeloc);

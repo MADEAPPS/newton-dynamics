@@ -1215,7 +1215,7 @@ NEWTON_API void NewtonWorldConvexRayCast (const NewtonWorld* const newtonWorld, 
 		dgMatrix pp0 (matrix);
 		dgVector pp1 (p1[0], p1[1], p1[2], dgFloat32 (0.0f));
 		Newton* const world = (Newton *) newtonWorld;
-		world->GetBroadPhase()->ConvexRayCast ((dgCollisionInstance*) shape, pp0, pp1, (OnRayCastAction) filter, (OnRayPrecastAction) prefilter, userData);
+		world->GetBroadPhase()->ConvexRayCast ((dgCollisionInstance*) shape, pp0, pp1, (OnRayCastAction) filter, (OnRayPrecastAction) prefilter, userData, threadIndex);
 	}
 }
 
