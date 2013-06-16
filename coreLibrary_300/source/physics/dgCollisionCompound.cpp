@@ -409,7 +409,7 @@ dgInt32 dgCollisionCompound::CalculateSignature () const
 
 
 
-void dgCollisionCompound::CalcAABB (const dgMatrix &matrix, dgVector& p0, dgVector& p1) const
+void dgCollisionCompound::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const
 {
 	if (m_root) {
 		dgVector origin (matrix.TransformVector(m_root->m_origin));

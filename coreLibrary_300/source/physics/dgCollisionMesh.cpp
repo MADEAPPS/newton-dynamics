@@ -149,7 +149,7 @@ dgVector dgCollisionMesh::SupportVertex (const dgVector& dir, dgInt32* const ver
 }
 
 
-void dgCollisionMesh::CalcAABB(const dgMatrix &matrix, dgVector &p0, dgVector &p1) const
+void dgCollisionMesh::CalcAABB(const dgMatrix& matrix, dgVector &p0, dgVector &p1) const
 {
 	dgVector origin (matrix.TransformVector(m_boxOrigin));
 	//dgVector size (m_boxSize.m_x * dgAbsf(matrix[0][0]) + m_boxSize.m_y * dgAbsf(matrix[1][0]) + m_boxSize.m_z * dgAbsf(matrix[2][0]),  

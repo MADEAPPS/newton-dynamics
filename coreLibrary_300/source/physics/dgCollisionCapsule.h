@@ -40,8 +40,7 @@ class dgCollisionCapsule: public dgCollisionConvex
 
 	private:
 	void Init (dgFloat32 radius, dgFloat32 height);
-	void TesselateTriangle (dgInt32 level, const dgVector& p0, const dgVector& p1, const dgVector& p2, dgInt32& count, dgVector* ouput) const;
-
+	virtual void CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
 	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
 	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
 
@@ -67,7 +66,7 @@ class dgCollisionCapsule: public dgCollisionConvex
 	//dgInt32 CalculateSphereConicContacts (dgFloat32 posit, const dgVector& normal, const dgVector& point, dgVector* const contact) const;
 	virtual dgInt32 CalculateContacts (const dgVector& point, const dgVector& normal, dgCollisionParamProxy& proxy, dgVector* const contactsOut) const;
 
-
+	void TesselateTriangle (dgInt32 level, const dgVector& p0, const dgVector& p1, const dgVector& p2, dgInt32& count, dgVector* ouput) const;
 
 	dgFloat32 m_radius;
 	dgFloat32 m_height;

@@ -66,7 +66,7 @@ dgCollisionInstance::dgCollisionInstance()
 }
 
 
-dgCollisionInstance::dgCollisionInstance(const dgWorld* const world, const dgCollision* const childCollision, dgInt32 shapeID, const dgMatrix &matrix)
+dgCollisionInstance::dgCollisionInstance(const dgWorld* const world, const dgCollision* const childCollision, dgInt32 shapeID, const dgMatrix& matrix)
 	:m_globalMatrix(matrix)
 	,m_localMatrix (matrix)
 	,m_scale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
@@ -422,7 +422,7 @@ dgInt32 dgCollisionInstance::CalculatePlaneIntersection (const dgVector& normal,
 }
 
 
-void dgCollisionInstance::CalcAABB (const dgMatrix &matrix, dgVector& p0, dgVector& p1) const
+void dgCollisionInstance::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const
 {
 	m_childShape->CalcAABB (matrix, p0, p1);
 	p0 = (matrix.m_posit + (p0 - matrix.m_posit).CompProduct4(m_maxScale) - m_padding) & dgVector::m_triplexMask;

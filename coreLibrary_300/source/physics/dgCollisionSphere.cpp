@@ -203,9 +203,9 @@ dgInt32 dgCollisionSphere::CalculateSignature () const
 	return CalculateSignature(m_radius);
 }
 
-void dgCollisionSphere::CalcAABB (const dgMatrix &matrix, dgVector &p0, dgVector &p1) const
+void dgCollisionSphere::CalcAABB (const dgMatrix& matrix, dgVector &p0, dgVector &p1) const
 {
-	dgVector radius (m_radius, m_radius, m_radius, dgFloat32 (0.0f));
+	dgVector radius (m_radius);
 	p0 = (matrix[3] - radius) & dgVector::m_triplexMask;
 	p1 = (matrix[3] + radius) & dgVector::m_triplexMask;
 }

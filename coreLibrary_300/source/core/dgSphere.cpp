@@ -55,7 +55,7 @@ namespace InternalSphere
 	}
 	
 
-	static void BoundingBox (const dgMatrix &matrix, const dgFloat32 vertex[], dgInt32 stride, const dgInt32 index[], dgInt32 indexCount, dgVector &min, dgVector &max)
+	static void BoundingBox (const dgMatrix& matrix, const dgFloat32 vertex[], dgInt32 stride, const dgInt32 index[], dgInt32 indexCount, dgVector &min, dgVector &max)
 	{
 	   dgFloat32 xmin = dgFloat32 (1.0e10f);
 	   dgFloat32 ymin = dgFloat32 (1.0e10f);
@@ -348,7 +348,7 @@ dgSphere::dgSphere (const dgQuaternion &quat, const dgVector &position, const dg
 //	planeTest = FrontTest;
 }
 
-dgSphere::dgSphere(const dgMatrix &matrix, const dgVector& dim)
+dgSphere::dgSphere(const dgMatrix& matrix, const dgVector& dim)
 	:dgMatrix(matrix)
 {
    SetDimensions (dim.m_x, dim.m_y, dim.m_z);
@@ -632,7 +632,7 @@ void dgSphere::Swept_Volume (
 
 /*
 dgInt32 dgSphere::FrontTest (
-	const dgMatrix &matrix, 
+	const dgMatrix& matrix, 
 	const dgPlane* plane) const
 {
 	dgFloat32 R;
@@ -650,7 +650,7 @@ dgInt32 dgSphere::FrontTest (
 	return InternalSphere::CodeTbl[flag0.i | flag1.i];
 }
 
-dgInt32 dgSphere::RearTest (const dgMatrix &matrix, const dgPlane* plane) const
+dgInt32 dgSphere::RearTest (const dgMatrix& matrix, const dgPlane* plane) const
 {
 	dgFloat32 R;
 	dgFloat32 dR;
@@ -668,7 +668,7 @@ dgInt32 dgSphere::RearTest (const dgMatrix &matrix, const dgPlane* plane) const
 }
 
 
-dgInt32 dgSphere::LeftTest (const dgMatrix &matrix, const dgPlane* plane) const
+dgInt32 dgSphere::LeftTest (const dgMatrix& matrix, const dgPlane* plane) const
 {
 	dgFloat32 R;
 	dgFloat32 dR;
@@ -687,7 +687,7 @@ dgInt32 dgSphere::LeftTest (const dgMatrix &matrix, const dgPlane* plane) const
 	return InternalSphere::CodeTbl[flag0.i | flag1.i];
 }
 
-dgInt32 dgSphere::RightTest (const dgMatrix &matrix, const dgPlane* plane) const
+dgInt32 dgSphere::RightTest (const dgMatrix& matrix, const dgPlane* plane) const
 {
 	dgFloat32 R;
 	dgFloat32 dR;
@@ -706,7 +706,7 @@ dgInt32 dgSphere::RightTest (const dgMatrix &matrix, const dgPlane* plane) const
 	return InternalSphere::CodeTbl[flag0.i | flag1.i];
 }
 
-dgInt32 dgSphere::BottomTest (const dgMatrix &matrix, const dgPlane* plane) const
+dgInt32 dgSphere::BottomTest (const dgMatrix& matrix, const dgPlane* plane) const
 {
 	dgFloat32 R;
 	dgFloat32 dR;
@@ -727,7 +727,7 @@ dgInt32 dgSphere::BottomTest (const dgMatrix &matrix, const dgPlane* plane) cons
 	return InternalSphere::CodeTbl[flag0.i | flag1.i];
 }
 
-dgInt32 dgSphere::TopTest (const dgMatrix &matrix, const dgPlane* plane) const
+dgInt32 dgSphere::TopTest (const dgMatrix& matrix, const dgPlane* plane) const
 {
 	dgFloat32 R;
 	dgFloat32 dR;

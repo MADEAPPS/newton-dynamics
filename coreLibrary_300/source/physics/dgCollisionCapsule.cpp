@@ -150,6 +150,15 @@ void dgCollisionCapsule::Init (dgFloat32 radius, dgFloat32 height)
 }
 
 
+void dgCollisionCapsule::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const
+{
+	dgVector radius (m_radius);
+	dgVector q0 (matrix[0].Scale4 (m_height));
+	dgVector q1 (q0.CompProduct4(dgVector::m_negOne));
+	p0 = (matrix[3] - radius + q0.GetMin(q1)) & dgVector::m_triplexMask;
+	p1 = (matrix[3] + radius + q0.GetMax(q1)) & dgVector::m_triplexMask;
+}
+
 
 dgInt32 dgCollisionCapsule::CalculateSignature (dgFloat32 radius, dgFloat32 height)
 {

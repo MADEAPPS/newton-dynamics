@@ -36,7 +36,7 @@ class dgCollisionBox: public dgCollisionConvex
 
 	protected:
 	void Init (dgFloat32 size_x, dgFloat32 size_y, dgFloat32 size_z);
-	virtual void CalcAABB (const dgMatrix &matrix, dgVector& p0, dgVector& p1) const;
+	virtual void CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
 	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
 	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
 	virtual dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const;

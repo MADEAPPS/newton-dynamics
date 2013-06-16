@@ -32,7 +32,7 @@ class dgQuaternion
 {
 	public:
 	dgQuaternion (); 
-	dgQuaternion (const dgMatrix &matrix);
+	dgQuaternion (const dgMatrix& matrix);
 	dgQuaternion (dgFloat32 q0, dgFloat32 q1, dgFloat32 q2, dgFloat32 q3); 
 	dgQuaternion (const dgVector &unit_Axis, dgFloat32 angle = dgFloat32 (0.0f));
 	

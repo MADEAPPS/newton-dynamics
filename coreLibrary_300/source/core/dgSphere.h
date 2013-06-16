@@ -39,7 +39,7 @@ class dgSphere: public dgMatrix
 	public:
 	dgSphere ();
 	dgSphere (const dgQuaternion &quat, const dgVector &position, const dgVector& dim = dgVector(0, 0, 0, 0));
-	dgSphere (const dgMatrix &matrix, const dgVector& dim = dgVector(0, 0, 0, 0));
+	dgSphere (const dgMatrix& matrix, const dgVector& dim = dgVector(0, 0, 0, 0));
 
 	dgSphere &operator= (const dgMatrix &arg);
 	void Scale (dgFloat32 Ws, dgFloat32 Hs, dgFloat32 Bs) ;

@@ -163,7 +163,7 @@ class dgCollisionMesh: public dgCollision
 	virtual dgInt32 CalculateSignature () const;
 	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
 
-	virtual void CalcAABB (const dgMatrix &matrix, dgVector& p0, dgVector& p1) const;
+	virtual void CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
 	virtual void DebugCollision  (const dgMatrix& matrix, OnDebugCollisionMeshCallback callback, void* const userData) const;
 
 	virtual dgVector CalculateVolumeIntegral (const dgMatrix& globalMatrix, GetBuoyancyPlane bouyancyPlane, void* const context) const;

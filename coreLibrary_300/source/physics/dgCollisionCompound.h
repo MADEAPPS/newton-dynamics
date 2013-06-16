@@ -152,7 +152,7 @@ class dgCollisionCompound: public dgCollision
 	virtual dgFloat32 GetBoxMaxRadius () const;
 	
 	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
-	virtual void CalcAABB (const dgMatrix &matrix, dgVector& p0, dgVector& p1) const;
+	virtual void CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
 
 	
 	static void CalculateInertia (void* userData, int vertexCount, const dgFloat32* const FaceArray, int faceId);

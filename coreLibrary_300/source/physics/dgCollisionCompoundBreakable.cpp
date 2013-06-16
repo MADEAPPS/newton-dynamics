@@ -107,7 +107,7 @@ dgVector dgCollisionCompoundBreakable::dgCollisionConvexIntance::SupportVertex (
 
 
 
-void dgCollisionCompoundBreakable::dgCollisionConvexIntance::CalcAABB (const dgMatrix &matrix, dgVector& p0, dgVector& p1) const
+void dgCollisionCompoundBreakable::dgCollisionConvexIntance::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const
 {
 	m_myShape->CalcAABB (matrix, p0, p1);
 }

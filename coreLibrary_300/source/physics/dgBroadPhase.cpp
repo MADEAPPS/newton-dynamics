@@ -1346,7 +1346,7 @@ void dgBroadPhase::ConvexRayCast (dgCollisionInstance* const shape, const dgMatr
 
 		dgVector boxP0;
 		dgVector boxP1;
-		shape->CalcAABB(matrix, boxP0, boxP1);
+		shape->CalcAABB(shape->m_localMatrix * matrix, boxP0, boxP1);
 
 		dgInt32 stack = 1;
 		dgNode* stackPool[DG_BROADPHASE_MAX_STACK_DEPTH];		
@@ -1357,6 +1357,7 @@ void dgBroadPhase::ConvexRayCast (dgCollisionInstance* const shape, const dgMatr
 		dgVector velocA((target - matrix.m_posit) & dgVector::m_triplexMask);
 		dgFloat32 maxParam = dgFloat32 (1.2f);
 		dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), velocA);
+		dgFloat32 quantizeStep = dgMax (dgFloat32 (1.0f) / velocA.DotProduct4(velocA).m_x, dgFloat32 (0.01f));
 
 		while (stack) {
 			stack --;
@@ -1369,13 +1370,13 @@ void dgBroadPhase::ConvexRayCast (dgCollisionInstance* const shape, const dgMatr
 					dgAssert (!node->m_left);
 					dgAssert (!node->m_right);
 					if (node->m_body != sentinel) {
-
 						dgBody* const body = node->m_body;
 						if (!PREFILTER_RAYCAST (prefilter, body, shape, userData)) {
 							dgFloat32 param = body->ConvexRayCast (ray, shape,boxP0, boxP1, matrix, velocA, filter, prefilter, userData, maxParam, threadId);
 							if (param < maxParam) {
+								param = dgMin (param + quantizeStep, dgFloat32 (1.0f));
 								maxParam = param;
-								ray.Reset (dgMin (param + dgFloat32 (0.1f), dgFloat32 (1.0f)));
+								ray.Reset (param);
 							}
 						}
 					}

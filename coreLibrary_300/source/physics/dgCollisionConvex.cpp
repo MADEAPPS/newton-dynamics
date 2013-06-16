@@ -1537,7 +1537,7 @@ void dgCollisionConvex::DebugCollision (const dgMatrix& matrix, OnDebugCollision
 	}
 }
 
-void dgCollisionConvex::CalcAABB (const dgMatrix &matrix, dgVector& p0, dgVector& p1) const
+void dgCollisionConvex::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const
 {
 	dgVector origin (matrix.TransformVector(m_boxOrigin));
 //	dgVector size (m_boxSize.m_x * dgAbsf(matrix[0][0]) + m_boxSize.m_y * dgAbsf(matrix[1][0]) + m_boxSize.m_z * dgAbsf(matrix[2][0]),  
@@ -2384,7 +2384,6 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& l
 			dgVector q (v + point);
 			dgFloat32 den = normal % p0p1;
 			dgAssert (den != 0.0f);
-			//dgFloat32 t1 = - (normal % v) / den;
 			dgFloat32 t1 = (normal % (localP0 - q)) / den;
 
 			if (t1 < param) {
@@ -2422,14 +2421,12 @@ dgFloat32 dgCollisionConvex::ConvexConicConvexRayCast (const dgCollisionInstance
 	shapeInstance.SetGlobalMatrix (convexCastingShape->GetLocalMatrix() * castingMatrix);
 
 	dgMatrix matrix (convexConicShape->m_localMatrix * conicShapeMatrix);
-//	dgInt32 isNonUniformScale = !convexConicShape->m_scaleIsUniform;
 
 	dgVector veloc (matrix.UnrotateVector(castingVeloc));
 	dgAssert (veloc.m_w == dgFloat32 (0.0f));
 
 	dgInt32 iter = 0;
 	dgFloat32 tacc = dgFloat32 (0.0f);
-	dgFloat32 timestep = maxT;
 
 	dgContactMaterial material;
 	material.m_penetration = dgFloat32 (0.0f);
@@ -2444,22 +2441,21 @@ dgFloat32 dgCollisionConvex::ConvexConicConvexRayCast (const dgCollisionInstance
 	proxy.m_floatingCollision = &shapeInstance;
 	proxy.m_timestep = dgFloat32 (0.0f);
 	proxy.m_skinThickness = dgFloat32 (0.0f);
-	proxy.m_matrix = proxy.m_floatingCollision->m_globalMatrix * matrix.Inverse();
+	proxy.m_matrix = shapeInstance.m_globalMatrix * matrix.Inverse();
 
 	dgContactPoint lastContact;
 	contactOut.m_normal = dgVector (dgFloat32 (0.0f));
 	contactOut.m_point = dgVector (dgFloat32 (0.0f));
 
-	dgFloat32 den2 = veloc % veloc;
-	dgAssert (den2 > dgFloat32 (0.0f));
-	dgFloat32 invDen2 = dgFloat32 (1.0f / den2);
-
 	bool isScaled = !(convexConicShape->m_scaleIsUnit & convexCastingShape->m_scaleIsUnit) ? true : false;
 	const dgVector& scale = convexConicShape->m_scale;
 	const dgVector& invScale = convexConicShape->m_invScale;
 
+	dgFloat32 param = dgFloat32 (1.2f);
 	dgMinkHull minkHull (proxy);
 	minkHull.m_scaleIsUnit = !isScaled;
+
+	dgInt32 makingProgressCount = 0;
 	do {
 		if (!minkHull.IntersectionTest()) {
 			break;
@@ -2472,46 +2468,43 @@ dgFloat32 dgCollisionConvex::ConvexConicConvexRayCast (const dgCollisionInstance
 			normal = normal.CompProduct4(normal.DotProduct4(normal).InvSqrt());
 		}
 
-		dgFloat32 den = normal % veloc;
-		if (den >= dgFloat32 (0.0f)) {
-			// bodies are residing form each other, even if they are touching they are not considered to be colliding because the motion will move them apart 
-			// get the closet point and the normal at contact point
-			tacc = dgFloat32 (1.2f);
+		dgFloat32 den = normal.DotProduct4 (veloc).m_w;
+		if (dgAbsf(den) < dgFloat32 (1.0e-8f)) {
 			break;
 		}
 
 		minkHull.m_p = ConvexConicSupporVertex(minkHull.m_p, minkHull.m_normal);
-		dgVector diff (scale.CompProduct4(minkHull.m_p - minkHull.m_q));
-		dgFloat32 t = (diff % veloc) * invDen2;
-		if (t <= dgFloat32 (1.0e-6f)) {
-			// bodies collide at time tacc, but we do not set it yet
-			lastContact.m_point = minkHull.m_p;
-			lastContact.m_normal = normal;
-			break;
-		}
+		dgVector p (normal.CompProduct4 (normal.DotProduct4(minkHull.m_p - minkHull.m_q)));
 
-		//num += DG_RESTING_CONTACT_PENETRATION; 
-		tacc += t; 
-		if (tacc >= timestep) {
-			// object do not collide on this timestep
+		dgFloat32 dt = (normal.DotProduct4(p)).m_x / den;
+		if (dt <= dgFloat32 (-1.0e-4f)) {
 			tacc = dgFloat32 (1.2f);
 			break;
 		}
-		minkHull.m_matrix.m_posit = proxy.m_matrix.m_posit + veloc.Scale4(tacc);
+		tacc += dt; 
+		if (tacc >= maxT) {
+			tacc = dgFloat32 (1.2f);
+			break;
+		}
 
+		param = tacc;
+		dgVector step (veloc.Scale4(dt));
 		lastContact.m_normal = normal;
 		lastContact.m_point = minkHull.m_p;
+		minkHull.m_matrix.m_posit += step;
+
+		makingProgressCount += (step.DotProduct4(step).m_x < dgFloat32(1.0e-4f)) ? 1 : 0;
 
 		iter ++;
-	} while (iter < DG_SEPARATION_PLANES_ITERATIONS);
+	} while ((iter < DG_SEPARATION_PLANES_ITERATIONS) && (makingProgressCount < 2));
 
-	if (tacc <= dgFloat32(1.0f)) {
+	if ((param >= dgFloat32 (0.0f)) && (param <= dgFloat32(1.0f))) {
 		contactOut.m_normal = matrix.RotateVector(lastContact.m_normal);
 		contactOut.m_point = matrix.TransformVector(scale.CompProduct4(lastContact.m_point));
 	}
 
 	shapeInstance.SetUserData (NULL);
-	return tacc;
+	return param;
 
 }
 

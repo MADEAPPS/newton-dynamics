@@ -25,7 +25,7 @@
 #include "dgQuaternion.h"
 
 
-dgQuaternion::dgQuaternion (const dgMatrix &matrix)
+dgQuaternion::dgQuaternion (const dgMatrix& matrix)
 {
 	enum QUAT_INDEX
 	{

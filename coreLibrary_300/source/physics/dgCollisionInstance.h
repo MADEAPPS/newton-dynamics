@@ -41,7 +41,7 @@ class dgCollisionInstance
 	dgCollisionInstance();
 	dgCollisionInstance(const dgCollisionInstance& instance);
 	dgCollisionInstance(const dgCollisionInstance& meshInstance, const dgCollision* const shape);
-	dgCollisionInstance(const dgWorld* const world, const dgCollision* const childCollision, dgInt32 shapeID, const dgMatrix &matrix);
+	dgCollisionInstance(const dgWorld* const world, const dgCollision* const childCollision, dgInt32 shapeID, const dgMatrix& matrix);
 	dgCollisionInstance(const dgWorld* const world, dgDeserialize deserialization, void* const userData);
 	~dgCollisionInstance();
 
@@ -89,7 +89,7 @@ class dgCollisionInstance
 	dgUnsigned32 GetSignature () const;
 	dgCollisionID GetCollisionPrimityType () const;
 
-	void CalcAABB (const dgMatrix &matrix, dgVector& p0, dgVector& p1) const;
+	void CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
 	dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, OnRayPrecastAction preFilter, const dgBody* const body, void* const userData) const;
 	dgFloat32 ConvexRayCast (const dgCollisionInstance* const convexShape, const dgMatrix& localMatrix, const dgVector& localVeloc, dgFloat32 maxT, dgContactPoint& contactOut, OnRayPrecastAction preFilter, const dgBody* const referenceBody, void* const userData, dgInt32 threadId) const; 
 
