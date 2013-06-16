@@ -539,8 +539,6 @@ void dgCollisionHeightField::GetLocalAABB (const dgVector& p0, const dgVector& p
 
 void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) const
 {
-	dgAssert (0);
-/*
 	dgVector boxP0;
 	dgVector boxP1;
 
@@ -619,10 +617,12 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 					dgVector n0 (e1 *  e2);
 
 					//normalBase 
-					n0 = n0.Scale3 (dgRsqrt(n0 % n0));
+					//n0 = n0.Scale3 (dgRsqrt(n0 % n0));
+					n0 = n0.CompProduct4(n0.DotProduct4(n0).InvSqrt());
 					vertex[normalBase] = n0;
 					
-					n1 = n1.Scale3 (dgRsqrt(n1 % n1));
+					//n1 = n1.Scale3 (dgRsqrt(n1 % n1));
+					n1 = n1.CompProduct4(n1.DotProduct4(n1).InvSqrt());
 					vertex[normalBase + 1] = n1;
 
 					faceIndexCount[faceCount] = 3;
@@ -714,10 +714,12 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 					dgVector n0 (e1 *  e2);
 
 					//normalBase 
-					n0 = n0.Scale3 (dgRsqrt(n0 % n0));
+					//n0 = n0.Scale3 (dgRsqrt(n0 % n0));
+					n0 = n0.CompProduct4(n0.DotProduct4(n0).InvSqrt());
 					vertex[normalBase] = n0;
 
-					n1 = n1.Scale3 (dgRsqrt(n1 % n1));
+					//n1 = n1.Scale3 (dgRsqrt(n1 % n1));
+					n1 = n1.CompProduct4(n1.DotProduct4(n1).InvSqrt());
 					vertex[normalBase + 1] = n1;
 
 					faceIndexCount[faceCount] = 3;
@@ -797,16 +799,38 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 		}
 
 		// do not forget to add face obb test (high density maps can generate lots of faces)
+		dgInt32 stride = sizeof (dgVector) / sizeof (dgFloat32);
 		dgInt32 faceCount0 = 0; 
 		dgInt32 faceIndexCount0 = 0; 
 		dgInt32 faceIndexCount1 = 0; 
-		for (dgInt32 i = 0; i < faceCount; i ++) {
-			if (data->m_objCollision->PolygonOBBTest (&vertex[0].m_x, sizeof (dgVector), &indices[faceIndexCount1], 3, *data)) {
-				memcpy (&indices[faceIndexCount0], &indices[faceIndexCount1], 9 * sizeof (dgInt32));
-				faceCount0 ++;
-				faceIndexCount0 += 9;
+
+		dgVector boxOrigin ((data->m_boxP1 + data->m_boxP0).Scale4 (dgFloat32 (0.5f)));
+		dgVector boxSize ((data->m_boxP1 - data->m_boxP0).Scale4 (dgFloat32 (0.5f)));
+
+		if (data->m_doContinuesCollisionTest) {
+			for (dgInt32 i = 0; i < faceCount; i ++) {
+//				if (data->m_objCollision->PolygonOBBTest (&vertex[0].m_x, sizeof (dgVector), &indices[faceIndexCount1], 3, *data)) {
+				const dgInt32* const indexArray = &indices[faceIndexCount1]; 
+				const dgVector& faceNormal = vertex[indexArray[4]];
+				if (PolygonBoxOBBRayTest (faceNormal, 3, indexArray, stride, &vertex[0].m_x, boxOrigin, boxSize, data->m_boxDistanceTravelInMeshSpace)) {
+					memcpy (&indices[faceIndexCount0], indexArray, 9 * sizeof (dgInt32));
+					faceCount0 ++;
+					faceIndexCount0 += 9;
+				}
+				faceIndexCount1 += 9;
 			}
-			faceIndexCount1 += 9;
+		} else {
+			for (dgInt32 i = 0; i < faceCount; i ++) {
+				//if (data->m_objCollision->PolygonOBBTest (&vertex[0].m_x, sizeof (dgVector), &indices[faceIndexCount1], 3, *data)) {
+				const dgInt32* const indexArray = &indices[faceIndexCount1]; 
+				const dgVector& faceNormal = vertex[indexArray[4]];
+				if (PolygonBoxOBBTest (faceNormal, 3, indexArray, stride, &vertex[0].m_x, boxOrigin, boxSize)) {
+					memcpy (&indices[faceIndexCount0], indexArray, 9 * sizeof (dgInt32));
+					faceCount0 ++;
+					faceIndexCount0 += 9;
+				}
+				faceIndexCount1 += 9;
+			}
 		}
 
 		if (faceCount0) {
@@ -836,6 +860,5 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 			}
 		}
 	}
-*/
 }
 

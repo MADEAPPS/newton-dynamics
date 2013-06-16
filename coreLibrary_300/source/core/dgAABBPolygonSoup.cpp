@@ -621,75 +621,6 @@ class dgAABBTree
 		return ray.BoxTest (minBox, maxBox);
 	}
 
-	DG_INLINE dgInt32 PolygonBoxOBBTest (dgInt32 indexCount, const dgInt32* const indexArray, const dgTriplex* const vertexArray, const dgVector& boxOrigin, const dgVector& boxSize) const
-	{
-		dgMatrix matrix;
-		dgVector origin (dgVector (&vertexArray[indexArray[0]].m_x));
-
-		dgInt32 normalIndex = indexArray[indexCount + 1];
-		matrix[0] = dgVector (&vertexArray[normalIndex].m_x);
-		matrix[1] = dgVector (&vertexArray[indexArray[1]].m_x) - origin;
-		matrix[1] = matrix[1].CompProduct4 (matrix[1].DotProduct4(matrix[1]).InvSqrt());
-		matrix[2] = matrix[0] * matrix[1];
-		matrix[3] = origin | dgVector::m_wOne; 
-		matrix = matrix.Inverse();
-
-		dgVector faceBoxP0 (dgFloat32 (0.0f));
-		dgVector faceBoxP1 (dgFloat32 (0.0f));
-		for (dgInt32 i = 1; i < indexCount; i ++) {
-			dgInt32 index = indexArray[i];
-			dgVector p (matrix.TransformVector (dgVector (&vertexArray[index].m_x)));
-			faceBoxP0 = faceBoxP0.GetMin(p); 
-			faceBoxP1 = faceBoxP1.GetMax(p); 
-		}
-		faceBoxP0 = faceBoxP0 & dgVector::m_triplexMask;
-		faceBoxP1 = faceBoxP1 & dgVector::m_triplexMask;
-
-		dgVector boxCenter (matrix.TransformVector(boxOrigin));
-		dgVector size (matrix[0].Abs().CompProduct4(dgVector(boxSize.m_x)) + matrix[1].Abs().CompProduct4(dgVector(boxSize.m_y)) + matrix[2].Abs().CompProduct4(dgVector(boxSize.m_z)));
-		dgVector boxP0 ((boxCenter - size) & dgVector::m_triplexMask);
-		dgVector boxP1 ((boxCenter + size) & dgVector::m_triplexMask);
-		return dgOverlapTest (boxP0, boxP1, faceBoxP0, faceBoxP1);
-	}
-
-	DG_INLINE dgInt32 PolygonBoxOBBRayTest (dgInt32 indexCount, const dgInt32* const indexArray, const dgTriplex* const vertexArray, const dgVector& boxOrigin, const dgVector& boxSize, const dgVector& boxVeloc) const
-	{
-		dgMatrix matrix;
-		dgVector origin (dgVector (&vertexArray[indexArray[0]].m_x));
-
-		dgInt32 normalIndex = indexArray[indexCount + 1];
-		matrix[0] = dgVector (&vertexArray[normalIndex].m_x);
-		matrix[1] = dgVector (&vertexArray[indexArray[1]].m_x) - origin;
-		matrix[1] = matrix[1].CompProduct4 (matrix[1].DotProduct4(matrix[1]).InvSqrt());
-		matrix[2] = matrix[0] * matrix[1];
-		matrix[3] = origin | dgVector::m_wOne; 
-		matrix = matrix.Inverse();
-
-		dgVector faceBoxP0 (dgFloat32 (0.0f));
-		dgVector faceBoxP1 (dgFloat32 (0.0f));
-		for (dgInt32 i = 1; i < indexCount; i ++) {
-			dgInt32 index = indexArray[i];
-			dgVector p (matrix.TransformVector (dgVector (&vertexArray[index].m_x)));
-			faceBoxP0 = faceBoxP0.GetMin(p); 
-			faceBoxP1 = faceBoxP1.GetMax(p); 
-		}
-		faceBoxP0 = faceBoxP0 & dgVector::m_triplexMask;
-		faceBoxP1 = faceBoxP1 & dgVector::m_triplexMask;
-
-		dgVector boxCenter (matrix.TransformVector(boxOrigin));
-		dgVector size (matrix[0].Abs().CompProduct4(dgVector(boxSize.m_x)) + matrix[1].Abs().CompProduct4(dgVector(boxSize.m_y)) + matrix[2].Abs().CompProduct4(dgVector(boxSize.m_z)));
-		dgVector boxP0 ((boxCenter - size) & dgVector::m_triplexMask);
-		dgVector boxP1 ((boxCenter + size) & dgVector::m_triplexMask);
-
-		dgVector minBox (faceBoxP0 - boxP1);
-		dgVector maxBox (faceBoxP1 - boxP0);
-
-		dgVector veloc (matrix.RotateVector(boxVeloc));
-		dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), veloc);
-		return ray.BoxTest (minBox, maxBox);
-	}
-
-
 
 	DG_INLINE dgInt32 RayTest (const dgFastRayTest& ray, const dgTriplex* const vertexArray) const
 	{
@@ -707,9 +638,9 @@ class dgAABBTree
 		dgInt32 stack = 1;
 		stackPool[0] = this;
 
+		const dgInt32 stride = sizeof (dgTriplex) / sizeof (dgFloat32);
 		dgVector origin ((maxBox + minBox).Scale4 (dgFloat32 (0.5f)));
 		dgVector size ((maxBox - minBox).Scale4 (dgFloat32 (0.5f)));
-
 		if ((boxDistanceTravel % boxDistanceTravel) < dgFloat32 (1.0e-8f)) {
 			while (stack) {
 				stack --;
@@ -721,8 +652,11 @@ class dgAABBTree
 						dgInt32 vCount = me->m_back.GetCount();
 						//if ((vCount > 0) && callback(context, vertexArray, sizeof (dgTriplex), &indexArray[index], vCount) == t_StopSearh) {
 						if (vCount > 0) {
-							if (PolygonBoxOBBTest (vCount, &indexArray[index], (dgTriplex*) vertexArray, origin, size)) {
-								if (callback(context, vertexArray, sizeof (dgTriplex), &indexArray[index], vCount) == t_StopSearh) {
+							const dgInt32* const indices = &indexArray[index];
+							dgInt32 normalIndex = indices[vCount + 1] * stride;
+							dgVector faceNormal (&vertexArray[normalIndex]);
+							if (PolygonBoxOBBTest (faceNormal, vCount, indices, stride, vertexArray, origin, size)) {
+								if (callback(context, vertexArray, sizeof (dgTriplex), indices, vCount) == t_StopSearh) {
 									return;
 								}
 							}
@@ -739,8 +673,11 @@ class dgAABBTree
 						dgInt32 vCount = me->m_front.GetCount();
 						//if ((vCount > 0) && callback(context, vertexArray, sizeof (dgTriplex), &indexArray[index], vCount) == t_StopSearh) {
 						if (vCount > 0) {
-							if (PolygonBoxOBBTest (vCount, &indexArray[index], (dgTriplex*) vertexArray, origin, size)) {
-								if (callback(context, vertexArray, sizeof (dgTriplex), &indexArray[index], vCount) == t_StopSearh) {
+							const dgInt32* const indices = &indexArray[index];
+							dgInt32 normalIndex = indices[vCount + 1] * stride;
+							dgVector faceNormal (&vertexArray[normalIndex]);
+							if (PolygonBoxOBBTest (faceNormal, vCount, indices, stride, vertexArray, origin, size)) {
+								if (callback(context, vertexArray, sizeof (dgTriplex), indices, vCount) == t_StopSearh) {
 									return;
 								}
 							}
@@ -765,8 +702,11 @@ class dgAABBTree
 						dgInt32 index = dgInt32 (me->m_back.GetIndex());
 						dgInt32 vCount = me->m_back.GetCount();
 						if (vCount > 0) {
-							if (PolygonBoxOBBRayTest (vCount, &indexArray[index], (dgTriplex*) vertexArray, origin, size, boxDistanceTravel)) {
-								if (callback(context, vertexArray, sizeof (dgTriplex), &indexArray[index], vCount) == t_StopSearh) {
+							const dgInt32* const indices = &indexArray[index];
+							dgInt32 normalIndex = indices[vCount + 1] * stride;
+							dgVector faceNormal (&vertexArray[normalIndex]);
+							if (PolygonBoxOBBRayTest (faceNormal, vCount, indices, stride, vertexArray, origin, size, boxDistanceTravel)) {
+								if (callback(context, vertexArray, sizeof (dgTriplex), indices, vCount) == t_StopSearh) {
 									return;
 								}
 							}
@@ -783,8 +723,11 @@ class dgAABBTree
 						dgInt32 vCount = me->m_front.GetCount();
 						//if ((vCount > 0) && callback(context, vertexArray, sizeof (dgTriplex), &indexArray[index], vCount) == t_StopSearh) {
 						if (vCount > 0) {
-							if (PolygonBoxOBBRayTest (vCount, &indexArray[index], (dgTriplex*) vertexArray, origin, size, boxDistanceTravel)) {
-								if (callback(context, vertexArray, sizeof (dgTriplex), &indexArray[index], vCount) == t_StopSearh) {
+							const dgInt32* const indices = &indexArray[index];
+							dgInt32 normalIndex = indices[vCount + 1] * stride;
+							dgVector faceNormal (&vertexArray[normalIndex]);
+							if (PolygonBoxOBBRayTest (faceNormal, vCount, indices, stride, vertexArray, origin, size, boxDistanceTravel)) {
+								if (callback(context, vertexArray, sizeof (dgTriplex), indices, vCount) == t_StopSearh) {
 									return;
 								}
 							}
