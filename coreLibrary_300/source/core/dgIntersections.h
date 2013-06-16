@@ -52,7 +52,7 @@ DG_MSC_VECTOR_ALIGMENT
 class dgFastRayTest
 {
 	public:
-	DG_INLINE dgFastRayTest::dgFastRayTest(const dgVector& l0, const dgVector& l1)
+	DG_INLINE dgFastRayTest(const dgVector& l0, const dgVector& l1)
 		:m_p0 (l0), m_p1(l1), m_diff ((l1 - l0) | dgVector::m_wOne)
 		,m_minT(dgFloat32 (0.0f))  
 		,m_maxT(dgFloat32 (1.0f))
