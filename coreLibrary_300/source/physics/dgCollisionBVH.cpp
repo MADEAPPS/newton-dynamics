@@ -288,37 +288,35 @@ dgIntersectStatus dgCollisionBVH::GetPolygon (void* const context, const dgFloat
 		return t_StopSearh;
 	}
 
-	if (data.m_objCollision->PolygonOBBTest (polygon, strideInBytes, indexArray, indexCount, data)) {
-	
-		if (data.m_me->GetDebugCollisionCallback()) { 
-			dgTriplex triplex[128];
-			dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat32));
-			const dgMatrix& matrix = data.m_polySoupCollision->GetGlobalMatrix();
-			for (dgInt32 i = 0; i < indexCount; i ++ ) {
-				dgVector p (&polygon[indexArray[i] * stride]);
-				p = matrix.TransformVector(p);
-				triplex[i].m_x = p.m_x;
-				triplex[i].m_y = p.m_y;
-				triplex[i].m_z = p.m_z;
-			}
-			data.m_me->GetDebugCollisionCallback() (data.m_polySoupBody, data.m_objBody, indexArray[indexCount], indexCount, &triplex[0].m_x, sizeof (dgTriplex));
+	if (data.m_me->GetDebugCollisionCallback()) { 
+		dgTriplex triplex[128];
+		dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat32));
+		const dgMatrix& matrix = data.m_polySoupCollision->GetGlobalMatrix();
+		for (dgInt32 i = 0; i < indexCount; i ++ ) {
+			dgVector p (&polygon[indexArray[i] * stride]);
+			p = matrix.TransformVector(p);
+			triplex[i].m_x = p.m_x;
+			triplex[i].m_y = p.m_y;
+			triplex[i].m_z = p.m_z;
 		}
-
-		dgAssert (data.m_vertex == polygon);
-
-		data.m_faceIndexCount[data.m_faceCount] = indexCount;
-		data.m_faceCount ++;
-		dgInt32 count = indexCount * 2 + 3;
-		dgInt32* const dst = &data.m_faceVertexIndex[data.m_globalIndexCount];
-
-		//the docks say memcpy is an intrinsic function but as usual this is another microsoft lie
-		//memcpy (dst, indexArray, sizeof (dgInt32) * count);
-		for (dgInt32 i = 0; i < count; i ++) {
-			dst[i] = indexArray[i];
-		}
-		
-		data.m_globalIndexCount += count;
+		data.m_me->GetDebugCollisionCallback() (data.m_polySoupBody, data.m_objBody, indexArray[indexCount], indexCount, &triplex[0].m_x, sizeof (dgTriplex));
 	}
+
+	dgAssert (data.m_vertex == polygon);
+
+	data.m_faceIndexCount[data.m_faceCount] = indexCount;
+	data.m_faceCount ++;
+	dgInt32 count = indexCount * 2 + 3;
+	dgInt32* const dst = &data.m_faceVertexIndex[data.m_globalIndexCount];
+
+	//the docks say memcpy is an intrinsic function but as usual this is another microsoft lie
+	//memcpy (dst, indexArray, sizeof (dgInt32) * count);
+	for (dgInt32 i = 0; i < count; i ++) {
+		dst[i] = indexArray[i];
+	}
+	
+	data.m_globalIndexCount += count;
+	
 	return t_ContinueSearh;
 }
 

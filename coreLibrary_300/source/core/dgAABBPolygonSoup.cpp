@@ -623,7 +623,33 @@ class dgAABBTree
 
 	DG_INLINE dgInt32 PolygonBoxOBBTest (dgInt32 indexCount, const dgInt32* const indexArray, const dgTriplex* const vertexArray, const dgVector& boxOrigin, const dgVector& boxSize) const
 	{
-		return 1;
+		dgMatrix matrix;
+		dgVector origin (dgVector (&vertexArray[indexArray[0]].m_x));
+
+		dgInt32 normalIndex = indexArray[indexCount + 1];
+		matrix[0] = dgVector (&vertexArray[normalIndex].m_x);
+		matrix[1] = dgVector (&vertexArray[indexArray[1]].m_x) - origin;
+		matrix[1] = matrix[1].CompProduct4 (matrix[1].DotProduct4(matrix[1]).InvSqrt());
+		matrix[2] = matrix[0] * matrix[1];
+		matrix[3] = origin | dgVector::m_wOne; 
+		matrix = matrix.Inverse();
+
+		dgVector faceBoxP0 (dgFloat32 (0.0f));
+		dgVector faceBoxP1 (dgFloat32 (0.0f));
+		for (dgInt32 i = 1; i < indexCount; i ++) {
+			dgInt32 index = indexArray[i];
+			dgVector p (matrix.TransformVector (dgVector (&vertexArray[index].m_x)));
+			faceBoxP0 = faceBoxP0.GetMin(p); 
+			faceBoxP1 = faceBoxP1.GetMax(p); 
+		}
+		faceBoxP0 = faceBoxP0 & dgVector::m_triplexMask;
+		faceBoxP1 = faceBoxP1 & dgVector::m_triplexMask;
+
+		dgVector boxCenter (matrix.TransformVector(boxOrigin));
+		dgVector size (matrix[0].Abs().CompProduct4(dgVector(boxSize.m_x)) + matrix[1].Abs().CompProduct4(dgVector(boxSize.m_y)) + matrix[2].Abs().CompProduct4(dgVector(boxSize.m_z)));
+		dgVector boxP0 ((boxCenter - size) & dgVector::m_triplexMask);
+		dgVector boxP1 ((boxCenter + size) & dgVector::m_triplexMask);
+		return dgOverlapTest (boxP0, boxP1, faceBoxP0, faceBoxP1);
 	}
 
 	DG_INLINE dgInt32 PolygonBoxOBBRayTest (dgInt32 indexCount, const dgInt32* const indexArray, const dgTriplex* const vertexArray, const dgVector& boxOrigin, const dgVector& boxSize, const dgVector& boxVeloc) const
@@ -655,8 +681,12 @@ class dgAABBTree
 		dgVector boxP0 ((boxCenter - size) & dgVector::m_triplexMask);
 		dgVector boxP1 ((boxCenter + size) & dgVector::m_triplexMask);
 
+		dgVector minBox (faceBoxP0 - boxP1);
+		dgVector maxBox (faceBoxP1 - boxP0);
 
-		return 1;
+		dgVector veloc (matrix.RotateVector(boxVeloc));
+		dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), veloc);
+		return ray.BoxTest (minBox, maxBox);
 	}
 
 

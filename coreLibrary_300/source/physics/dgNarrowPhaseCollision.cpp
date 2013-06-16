@@ -1475,7 +1475,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts (dgCollisionParamProxy& prox
 	data.m_polySoupBody = soupBody;
 	data.m_objCollision = convexInstance;
 	data.m_polySoupCollision = polySoupInstance;
-	data.m_meshToShapeMatrix = convexInstance->CalculateSpaceMatrix(polySoupInstance);
+//	data.m_meshToShapeMatrix = convexInstance->CalculateSpaceMatrix(polySoupInstance);
 
 	if (proxy.m_continueCollision) {
 		data.m_doContinuesCollisionTest = true;
@@ -1493,7 +1493,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts (dgCollisionParamProxy& prox
 			dgVector upperBoundVeloc (hullVeloc.Scale3 (proxy.m_timestep * upperBoundSpeed / baseLinearSpeed));
 
 			data.m_boxDistanceTravelInMeshSpace = polySoupInstance->m_invScale.CompProduct4(soupMatrix.UnrotateVector(upperBoundVeloc.CompProduct4(convexInstance->m_invScale)));
-			data.m_distanceTravelInCollidingShapeSpace = convexInstance->m_invScale.CompProduct4(hullMatrix.UnrotateVector(upperBoundVeloc.CompProduct4(polySoupInstance->m_invScale)));
+//			data.m_distanceTravelInCollidingShapeSpace = convexInstance->m_invScale.CompProduct4(hullMatrix.UnrotateVector(upperBoundVeloc.CompProduct4(polySoupInstance->m_invScale)));
 		}
 	}
 

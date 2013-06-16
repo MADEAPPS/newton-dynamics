@@ -262,12 +262,12 @@ dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const casti
 	data.m_polySoupBody = NULL;
 	data.m_objCollision = (dgCollisionInstance*)castingShape;
 	data.m_polySoupCollision = (dgCollisionInstance*)referenceCollision;
-	data.m_meshToShapeMatrix = castingShape->CalculateSpaceMatrix(referenceCollision);
+//	data.m_meshToShapeMatrix = castingShape->CalculateSpaceMatrix(referenceCollision);
 
 	data.m_doContinuesCollisionTest = true;
 	dgVector distanceTravel (shapeVeloc.Scale4 ((maxT > dgFloat32 (1.0f)) ? dgFloat32 (1.0f) : maxT));
 	data.m_boxDistanceTravelInMeshSpace = referenceCollision->m_invScale.CompProduct4(soupMatrix.UnrotateVector(distanceTravel.CompProduct4(castingShape->m_invScale)));
-	data.m_distanceTravelInCollidingShapeSpace = castingShape->m_invScale.CompProduct4(hullMatrix.UnrotateVector(distanceTravel.CompProduct4(referenceCollision->m_invScale)));
+//	data.m_distanceTravelInCollidingShapeSpace = castingShape->m_invScale.CompProduct4(hullMatrix.UnrotateVector(distanceTravel.CompProduct4(referenceCollision->m_invScale)));
 
 	polysoup->GetCollidingFaces (&data);
 

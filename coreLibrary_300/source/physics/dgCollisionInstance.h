@@ -108,11 +108,7 @@ class dgCollisionInstance
 	dgInt32 GetConvexVertexCount() const; 
 
 	void Serialize(dgSerialize callback, void* const userData, bool saveShape = true) const;
-
-	dgMatrix CalculateSpaceMatrix (const dgCollisionInstance* const instance) const;
-
-	// for use with collision mesh Only
-	bool PolygonOBBTest (const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount, const dgPolygonMeshDesc& descInfo) const;
+//	dgMatrix CalculateSpaceMatrix (const dgCollisionInstance* const instance) const;
 
 	dgMatrix m_globalMatrix;
 	dgMatrix m_localMatrix;
@@ -377,7 +373,7 @@ DG_INLINE dgFloat32 dgCollisionInstance::GetUmbraClipSize () const
 {
 	return m_childShape->GetUmbraClipSize() * m_maxScale.m_x;
 }
-
+/*
 DG_INLINE dgMatrix dgCollisionInstance::CalculateSpaceMatrix (const dgCollisionInstance* const instance) const
 {
 	dgMatrix matrix (instance->m_globalMatrix * m_globalMatrix.Inverse());
@@ -393,12 +389,7 @@ DG_INLINE dgMatrix dgCollisionInstance::CalculateSpaceMatrix (const dgCollisionI
 	matrix[3] = m_invScale.CompProduct4 (matrix[3]);
 	return matrix;
 }
-
-
-DG_INLINE bool dgCollisionInstance::PolygonOBBTest (const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount, const dgPolygonMeshDesc& descInfo) const
-{
-	return m_childShape->PolygonOBBTest (polygon, strideInBytes, indexArray, indexCount, descInfo);
-}
+*/
 
 #endif 
 

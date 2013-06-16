@@ -539,6 +539,8 @@ void dgCollisionHeightField::GetLocalAABB (const dgVector& p0, const dgVector& p
 
 void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) const
 {
+	dgAssert (0);
+/*
 	dgVector boxP0;
 	dgVector boxP1;
 
@@ -834,5 +836,6 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 			}
 		}
 	}
+*/
 }
 

@@ -97,8 +97,8 @@ class dgPolygonMeshDesc
 	dgInt32 m_globalIndexCount;
 	bool m_doContinuesCollisionTest;
 
-	dgMatrix m_meshToShapeMatrix;
-	dgVector m_distanceTravelInCollidingShapeSpace;
+//	dgMatrix m_meshToShapeMatrix;
+//	dgVector m_distanceTravelInCollidingShapeSpace;
 	dgInt32 m_globalFaceIndexCount[DG_MAX_COLLIDING_FACES];
 	dgInt32 m_globalFaceVertexIndex[DG_MAX_COLLIDING_VERTEX];
 } DG_GCC_VECTOR_ALIGMENT;
