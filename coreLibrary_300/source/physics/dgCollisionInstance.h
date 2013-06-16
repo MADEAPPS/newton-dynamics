@@ -373,23 +373,6 @@ DG_INLINE dgFloat32 dgCollisionInstance::GetUmbraClipSize () const
 {
 	return m_childShape->GetUmbraClipSize() * m_maxScale.m_x;
 }
-/*
-DG_INLINE dgMatrix dgCollisionInstance::CalculateSpaceMatrix (const dgCollisionInstance* const instance) const
-{
-	dgMatrix matrix (instance->m_globalMatrix * m_globalMatrix.Inverse());
-
-	const dgVector& scale = instance->m_scale;
-	matrix[0] = matrix[0].Scale4(scale[0]);
-	matrix[1] = matrix[1].Scale4(scale[1]);
-	matrix[2] = matrix[2].Scale4(scale[2]);
-
-	matrix[0] = m_invScale.CompProduct4 (matrix[0]);
-	matrix[1] = m_invScale.CompProduct4 (matrix[1]);
-	matrix[2] = m_invScale.CompProduct4 (matrix[2]);
-	matrix[3] = m_invScale.CompProduct4 (matrix[3]);
-	return matrix;
-}
-*/
 
 #endif 
 

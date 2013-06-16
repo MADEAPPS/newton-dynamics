@@ -2520,102 +2520,6 @@ dgFloat32 dgCollisionConvex::ConvexConicConvexRayCast (const dgCollisionInstance
 
 dgFloat32 dgCollisionConvex::ConvexRayCast (const dgCollisionInstance* const castingShape, const dgMatrix& shapeMatrix, const dgVector& shapeVeloc, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const referenceBody, const dgCollisionInstance* const referenceCollision, void* const userData, dgInt32 threadId) const 
 {
-#if 0
-	dgVector floatingVeloc (shapeVeloc);
-	dgVector referenceVeloc (dgFloat32 (0.0f));
-
-	dgAssert (referenceCollision->GetChildShape() == this);
-
-	dgCollisionInstance shapeInstance (*castingShape, castingShape->GetChildShape());
-	shapeInstance.SetGlobalMatrix (castingShape->GetLocalMatrix() * shapeMatrix);
-
-	const dgVector& scale = referenceCollision->m_scale;
-	const dgVector& invScale = referenceCollision->m_invScale;
-	const dgMatrix& matrix = referenceCollision->GetGlobalMatrix();
-	dgInt32 isNonUniformScale = !referenceCollision->m_scaleIsUniform;
-
-	dgVector veloc (matrix.UnrotateVector(floatingVeloc - referenceVeloc));
-	dgAssert (veloc.m_w == dgFloat32 (0.0f));
-
-	dgInt32 iter = 0;
-	dgFloat32 tacc = dgFloat32 (0.0f);
-	dgFloat32 timestep = maxT;
-
-	dgContactMaterial material;
-	material.m_penetration = dgFloat32 (0.0f);
-	dgContact contactJoint (referenceBody->GetWorld(), &material);
-	contactJoint.m_separtingVector = veloc.CompProduct4 (veloc.DotProduct4 (veloc).InvSqrt());
-
-	dgCollisionParamProxy proxy (&contactJoint, NULL, 0, true, false);
-	proxy.m_maxContacts = 0;
-	proxy.m_referenceBody = NULL;
-	proxy.m_floatingBody = NULL;
-	proxy.m_referenceCollision = (dgCollisionInstance*) referenceCollision;
-	proxy.m_floatingCollision = &shapeInstance;
-	proxy.m_timestep = dgFloat32 (0.0f);
-	proxy.m_skinThickness = dgFloat32 (0.0f);
-	proxy.m_matrix = proxy.m_floatingCollision->m_globalMatrix * proxy.m_referenceCollision->m_globalMatrix.Inverse();
-
-	dgContactPoint lastContact;
-	contactOut.m_normal = dgVector (dgFloat32 (0.0f));
-	contactOut.m_point = dgVector (dgFloat32 (0.0f));
-
-	dgFloat32 den2 = veloc % veloc;
-	dgAssert (den2 > dgFloat32 (0.0f));
-	dgFloat32 invDen2 = dgFloat32 (1.0f / den2);
-
-	dgMinkHull minkHull (proxy);
-	do {
-		if (!minkHull.IntersectionTest()) {
-			break;
-		}
-
-		dgVector normal (minkHull.m_normal);
-		if (isNonUniformScale) {
-			normal = normal.CompProduct4(invScale);
-			normal = normal.Scale3(dgRsqrt (normal % normal));
-		}
-		dgFloat32 den = normal % veloc;
-		if (den >= dgFloat32 (0.0f)) {
-			// bodies are residing form each other, even if they are touching they are not considered to be colliding because the motion will move them apart 
-			// get the closet point and the normal at contact point
-			tacc = dgFloat32 (1.2f);
-			break;
-		}
-
-		minkHull.m_p = ConvexConicSupporVertex(minkHull.m_p, minkHull.m_normal);
-		dgVector diff (scale.CompProduct4(minkHull.m_p - minkHull.m_q));
-		dgFloat32 t = (diff % veloc) * invDen2;
-		if (t <= dgFloat32 (1.0e-6f)) {
-			// bodies collide at time tacc, but we do not set it yet
-			lastContact.m_point = minkHull.m_p;
-			lastContact.m_normal = normal;
-			break;
-		}
-
-		//num += DG_RESTING_CONTACT_PENETRATION; 
-		tacc += t; 
-		if (tacc >= timestep) {
-			// object do not collide on this timestep
-			tacc = dgFloat32 (1.2f);
-			break;
-		}
-		minkHull.m_matrix.m_posit = proxy.m_matrix.m_posit + veloc.Scale4(tacc);
-
-		lastContact.m_normal = normal;
-		lastContact.m_point = minkHull.m_p;
-
-		iter ++;
-	} while (iter < DG_SEPARATION_PLANES_ITERATIONS);
-
-	if (tacc <= dgFloat32(1.0f)) {
-		contactOut.m_point = matrix.TransformVector(scale.CompProduct4(lastContact.m_point));
-		contactOut.m_normal = matrix.RotateVector(lastContact.m_normal);
-	}
-
-	shapeInstance.SetUserData (NULL);
-	return tacc;
-#else
 	dgCollisionID id1 = referenceCollision->GetCollisionPrimityType();
 	dgCollisionID id2 = castingShape->GetCollisionPrimityType();
 	dgAssert ((id1 == m_polygonCollision) || (id1 < m_nullCollision));
@@ -2638,7 +2542,6 @@ dgFloat32 dgCollisionConvex::ConvexRayCast (const dgCollisionInstance* const cas
 		dgCollisionConvex* const conicConvexShape = (dgCollisionConvex*)referenceCollision->GetChildShape();
 		return conicConvexShape->ConvexConicConvexRayCast (referenceCollision, referenceBody->m_matrix, castingShape, shapeMatrix, shapeVeloc, maxT, contactOut);
 	}
-#endif
 }
 
 

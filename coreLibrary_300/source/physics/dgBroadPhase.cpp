@@ -1374,8 +1374,8 @@ void dgBroadPhase::ConvexRayCast (dgCollisionInstance* const shape, const dgMatr
 						if (!PREFILTER_RAYCAST (prefilter, body, shape, userData)) {
 							dgFloat32 param = body->ConvexRayCast (ray, shape,boxP0, boxP1, matrix, velocA, filter, prefilter, userData, maxParam, threadId);
 							if (param < maxParam) {
-								ray.Reset (param);
 								maxParam = param;
+								ray.Reset (dgMin (param + dgFloat32 (0.1f), dgFloat32 (1.0f)));
 							}
 						}
 					}
