@@ -221,17 +221,21 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 		if (m_scaleIsUnit) {
 			dgAssert (dgAbsf (dir % dir - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 			dgVector p (m_myShape->ConvexConicSupporVertex(dir));
+			dgAssert (p.m_w == dgFloat32 (0.0f));
 
 			dgVector dir1 (m_matrix.UnrotateVector (dir.CompProduct4(dgVector::m_negOne)));
 			dgAssert (dir1.m_w == dgFloat32 (0.0f));
 			dgAssert (dgAbsf(dir1 % dir1 - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
-			dgVector q (m_matrix.TransformVector (m_otherShape->SupportVertex (dir1, &m_polygonFaceIndex[vertexIndex])));
+			dgVector q (m_matrix.TransformVector (m_otherShape->SupportVertex (dir1, &m_polygonFaceIndex[vertexIndex])) & dgVector::m_triplexMask);
+			dgAssert (q.m_w == dgFloat32 (0.0f));
+
 			m_hullDiff[vertexIndex] = p - q;
 			m_hullSum[vertexIndex] = p + q;
 
 		} else {
 			dgAssert (dgAbsf (dir % dir - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 			dgVector p (m_myShape->ConvexConicSupporVertex(dir));
+			dgAssert (p.m_w == dgFloat32 (0.0f));
 
 			dgVector dir1 (m_scale.CompProduct4(m_matrix.UnrotateVector (m_invScale.CompProduct4(dir.CompProduct4(dgVector::m_negOne)))));
 			dgAssert (dir1.m_w == dgFloat32 (0.0f));
@@ -240,6 +244,7 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 			dgAssert (dgAbsf(dir1 % dir1 - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 
 			dgVector q (m_invScale.CompProduct4(m_matrix.TransformVector (m_scale.CompProduct4 (m_otherShape->SupportVertex (dir1, &m_polygonFaceIndex[vertexIndex])))));
+			dgAssert (q.m_w == dgFloat32 (0.0f));
 
 			m_hullDiff[vertexIndex] = p - q;
 			m_hullSum[vertexIndex] = p + q;
@@ -636,10 +641,21 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 		return origin;
 	}
 
+	void TranslateSimplex (const dgVector& step)
+	{
+		m_matrix.m_posit += step;
+		for(dgInt32 i = 0; i < m_vertexIndex; i ++) {
+			m_hullSum[i] += step;
+			m_hullDiff[i] -= step;
+		}
+
+
+	}
+
 	dgInt32 CalculateClosestSimplex ()
 	{
 		dgInt32 index = 1;
-		SupportVertex (m_contactJoint->m_separtingVector, 0);
+			SupportVertex (m_contactJoint->m_separtingVector, 0);
 		dgVector v (m_hullDiff[0]);
 
 		dgInt32 iter = 0;
@@ -1532,23 +1548,6 @@ void dgCollisionConvex::CalcAABB (const dgMatrix &matrix, dgVector& p0, dgVector
 
 	p0 = (origin - size) & dgVector::m_triplexMask;
 	p1 = (origin + size) & dgVector::m_triplexMask;
-	#ifdef DG_DEBUG_AABB
-		dgInt32 i;
-		dgVector q0;
-		dgVector q1;
-		dgMatrix trans (matrix.Transpose());
-		for (i = 0; i < 3; i ++) {
-			q0[i] = matrix.m_posit[i] + matrix.RotateVector (SupportVertex(trans[i].Scale3 (-dgFloat32 (1.0f))))[i];
-			q1[i] = matrix.m_posit[i] + matrix.RotateVector (SupportVertex(trans[i]))[i];
-		}
-
-		dgVector err0 (p0 - q0);
-		dgVector err1 (p1 - q1);
-		dgFloat32 err; 
-		err = dgMax (size.m_x, size.m_y, size.m_z) * 0.5f; 
-		dgAssert ((err0 % err0) < err * err);
-		dgAssert ((err1 % err1) < err * err);
-	#endif
 }
 
 
@@ -2470,7 +2469,6 @@ dgFloat32 dgCollisionConvex::ConvexConicConvexRayCast (const dgCollisionInstance
 		if (isScaled) {
 			normal = minkHull.m_normal.CompProduct4(invScale);
 			dgAssert (normal.m_w == dgFloat32 (0.0f));
-			//normal = normal.Scale3(dgRsqrt (normal % normal));
 			normal = normal.CompProduct4(normal.DotProduct4(normal).InvSqrt());
 		}
 
@@ -2563,47 +2561,6 @@ dgInt32 dgCollisionConvex::CalculateContacts (const dgVector& point, const dgVec
 }
 
 
-
-bool dgCollisionConvex::SeparetingVectorTest (dgCollisionParamProxy& proxy) const
-{
-#if 0
-	// this is fine but no necessary
-	dgCollisionInstance* const collConvexInstance = proxy.m_floatingCollision;
-	dgCollisionInstance* const collConicConvexInstance = proxy.m_referenceCollision;
-
-	dgAssert (collConicConvexInstance->m_childShape == this);
-	dgAssert (collConicConvexInstance->IsType (dgCollision::dgCollisionConvexShape_RTTI));
-	dgCollisionConvex* const convexShape = (dgCollisionConvex*)collConvexInstance->GetChildShape();
-	dgContact* const contactJoint = proxy.m_contactJoint;
-
-	dgVector sum;
-	dgVector diff;
-	ConvexSupportVertex (contactJoint->m_separtingVector, collConvexInstance->m_scale, proxy.m_localMatrixInv, collConicConvexInstance->m_invScale, convexShape, diff, sum);
-
-	dgFloat32 mag2 = diff % diff;
-	if (mag2 < dgFloat32 (1.0e-6f)) {
-		return false;
-	}
-	dgVector dir (diff.Scale3 (-dgRsqrt (mag2)));
-	dgInt32 iter = 0;	
-	do {	
-		ConvexSupportVertex (dir, collConvexInstance->m_scale, proxy.m_localMatrixInv, collConicConvexInstance->m_invScale, convexShape, diff, sum);
-		dgAssert ((diff % diff) > dgFloat32 (0.0f));
-		dgVector negDiff (diff.Scale3(dgFloat32 (-1.0f)));
-		negDiff = negDiff.Scale3 (dgRsqrt (negDiff % negDiff));
-		dgFloat32 dist = negDiff % dir;
-		if (dist >= dgFloat32 (0.0f)) {
-			contactJoint->m_separtingVector = dir;
-			return true;
-		}
-		dir -= negDiff.Scale3 (dgFloat32 (2.0f) * (dist));
-		dgAssert (dgAbsf(dir % dir - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
-		iter ++;
-	} while (iter < DG_SEPARATION_PLANES_ITERATIONS);
-#endif
-
-	return false;
-}
 
 
 

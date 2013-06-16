@@ -287,16 +287,24 @@ dgVector dgCollisionCapsule::SupportVertex (const dgVector& dir, dgInt32* const 
 {
 	dgAssert (dgAbsf(dir % dir - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 
-	dgVector p0(dir.Scale3 (m_radius));
+//	dgVector p0(dir.Scale3 (m_radius));
+//	dgVector p1(p0);
+//	p0.m_x += m_height;
+//	p1.m_x -= m_height;
+//	dgFloat32 dir0 = p0 % dir;
+//	dgFloat32 dir1 = p1 % dir;
+//	if (dir1 > dir0) {
+//		p0 = p1;
+//	}
+//	return p0;
+
+	dgVector p0(dir.Scale4 (m_radius));
 	dgVector p1(p0);
-	p0.m_x += m_height;
-	p1.m_x -= m_height;
-	dgFloat32 dir0 = p0 % dir;
-	dgFloat32 dir1 = p1 % dir;
-	if (dir1 > dir0) {
-		p0 = p1;
-	}
-	return p0;
+	dgVector height (m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	p0 += height;
+	p1 -= height;
+	dgVector mask (p1.DotProduct4(dir) > p0.DotProduct4(dir));
+	return (p1 & mask) | p0.AndNot(mask);
 }
 
 
@@ -419,15 +427,6 @@ dgVector dgCollisionCapsule::ConvexConicSupporVertex (const dgVector& point, con
 	}
 	return p;
 }
-
-
-//dgInt32 dgCollisionCapsule::CalculateSphereConicContacts (dgFloat32 posit, const dgVector& normal, const dgVector& point, dgVector* const contact) const
-//{
-//	dgVector r (posit, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-//	dgFloat32 t = normal % (r - point);
-//	contact[0] = r + normal.Scale3 (t);
-//	return 1;
-//}
 
 
 dgInt32 dgCollisionCapsule::CalculateContacts (const dgVector& point, const dgVector& normal, dgCollisionParamProxy& proxy, dgVector* const contactsOut) const

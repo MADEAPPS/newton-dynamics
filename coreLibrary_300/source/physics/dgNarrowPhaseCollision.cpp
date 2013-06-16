@@ -1628,7 +1628,7 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) 
 					contactJoint->m_separtingVector =  dgVector(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 				}
 			}
-			if (contactJoint->GetCount() || !convexShape->SeparetingVectorTest(tmp)) {
+			if (contactJoint->GetCount()) {
 				count = convexShape->CalculateConvexToConvexContact (tmp);
 				proxy.m_timestep = tmp.m_timestep;
 
@@ -1656,7 +1656,7 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) 
 					contactJoint->m_separtingVector =  dgVector(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 				}
 			}
-			if (contactJoint->GetCount() || !convexShape->SeparetingVectorTest(proxy)) {
+			if (contactJoint->GetCount()) {
 				count = convexShape->CalculateConvexToConvexContact (proxy);
 			}
 		}

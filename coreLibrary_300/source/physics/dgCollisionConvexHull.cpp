@@ -758,9 +758,10 @@ void dgCollisionConvexHull::DebugCollision (const dgMatrix& matrix, OnDebugColli
 	}
 }
 
-dgVector dgCollisionConvexHull::SupportVertex (const dgVector& dirIn, dgInt32* const vertexIndex) const
+dgVector dgCollisionConvexHull::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
-	const dgVector dir (dirIn & dgVector::m_triplexMask);
+//	const dgVector dir (dirIn & dgVector::m_triplexMask);
+	dgAssert (dir.m_w == dgFloat32 (0.0f));
 	dgInt32 index = -1;
 	dgVector maxProj (dgFloat32 (-1.0e20f)); 
 	if (m_vertexCount > DG_CONVEX_VERTEX_CHUNK_SIZE) {

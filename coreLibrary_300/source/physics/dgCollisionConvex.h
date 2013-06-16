@@ -74,7 +74,6 @@ class dgCollisionConvex: public dgCollision
 	virtual dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const;
 	virtual dgInt32 GetConvexVertexCount() const { return m_vertexCount;}
 
-	bool SeparetingVectorTest (dgCollisionParamProxy& proxy) const;
 	bool IntesectionTest (dgCollisionParamProxy& proxy) const;
 	bool CalculateClosestPoints (dgCollisionParamProxy& proxy) const;
 
