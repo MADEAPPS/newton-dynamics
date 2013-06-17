@@ -114,8 +114,8 @@ void dgCollisionBVH::GetCollisionInfo(dgCollisionInfo* const info) const
 	data.m_triangleCount = 0; 
 	dgVector p0 (-1.0e10f, -1.0e10f, -1.0e10f, 1.0f);
 	dgVector p1 ( 1.0e10f,  1.0e10f,  1.0e10f, 1.0f);
-	dgVector zero (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	ForAllSectors (p0, p1, zero, GetTriangleCount, &data);
+	dgVector zero (dgFloat32 (0.0f));
+	ForAllSectors (p0, p1, zero, dgFloat32 (1.0f), GetTriangleCount, &data);
 
 	info->m_bvhCollision.m_vertexCount = GetVertexCount();
 	info->m_bvhCollision.m_indexCount = data.m_triangleCount * 3;
@@ -125,8 +125,8 @@ void dgCollisionBVH::ForEachFace (dgAABBIntersectCallback callback, void* const 
 {
 	dgVector p0 (-1.0e10f, -1.0e10f, -1.0e10f, 1.0f);
 	dgVector p1 ( 1.0e10f,  1.0e10f,  1.0e10f, 1.0f);
-	dgVector zero (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	ForAllSectors (p0, p1, zero, callback, context);
+	dgVector zero (dgFloat32 (0.0f));
+	ForAllSectors (p0, p1, zero, dgFloat32 (1.0f), callback, context);
 }
 
 
@@ -180,7 +180,7 @@ dgIntersectStatus dgCollisionBVH::GetTriangleCount (void* const context, const d
 
 void dgCollisionBVH::GetVertexListIndexList (const dgVector& p0, const dgVector& p1, dgMeshVertexListIndexList &data) const
 {
-	ForAllSectors (p0, p1, dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)), CollectVertexListIndexList, &data);
+	ForAllSectors (p0, p1, dgVector (dgFloat32 (0.0f)), dgFloat32 (1.0f), CollectVertexListIndexList, &data);
 
 	data.m_veterxArray = GetLocalVertexPool(); 
 	data.m_vertexCount = GetVertexCount(); 
@@ -280,11 +280,11 @@ dgIntersectStatus dgCollisionBVH::GetPolygon (void* const context, const dgFloat
 {
 	dgPolygonMeshDesc& data = (*(dgPolygonMeshDesc*) context);
 	if (data.m_faceCount >= DG_MAX_COLLIDING_FACES) {
-		dgAssert (0);
+		dgTrace (("buffer Overfloat, try use a lower resolution mesh for collision\n"));
 		return t_StopSearh;
 	}
 	if ((data.m_globalIndexCount + indexCount * 2 + 1) >= DG_MAX_COLLIDING_VERTEX) {
-		dgAssert (0);
+		dgTrace (("buffer Overfloat, try use a lower resolution mesh for collision\n"));
 		return t_StopSearh;
 	}
 
@@ -333,7 +333,7 @@ void dgCollisionBVH::GetCollidingFaces (dgPolygonMeshDesc* const data) const
 	data->m_globalIndexCount = 0;
 	data->m_faceIndexCount = data->m_globalFaceIndexCount;
 	data->m_faceVertexIndex = data->m_globalFaceVertexIndex;
-	ForAllSectors (data->m_boxP0, data->m_boxP1, data->m_boxDistanceTravelInMeshSpace, GetPolygon, data);
+	ForAllSectors (data->m_boxP0, data->m_boxP1, data->m_boxDistanceTravelInMeshSpace, data->m_maxT, GetPolygon, data);
 }
 
 
@@ -385,5 +385,5 @@ void dgCollisionBVH::DebugCollision (const dgMatrix& matrixPtr, OnDebugCollision
 
 	dgVector p0 (dgFloat32 (-1.0e20f), dgFloat32 (-1.0e20f), dgFloat32 (-1.0e20f), dgFloat32 (0.0f));
 	dgVector p1 (dgFloat32 ( 1.0e20f), dgFloat32 ( 1.0e20f), dgFloat32 ( 1.0e20f), dgFloat32 (0.0f));
-	ForAllSectors (p0, p1, dgVector(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)) , ShowDebugPolygon, &context);
+	ForAllSectors (p0, p1, dgVector(dgFloat32 (0.0f)), dgFloat32 (1.0f), ShowDebugPolygon, &context);
 }

@@ -28,7 +28,7 @@
 #include "dgCollisionInstance.h"
 
 
-#define DG_MAX_COLLIDING_FACES				(1024 * 2)
+#define DG_MAX_COLLIDING_FACES				(512)
 #define DG_MAX_COLLIDING_VERTEX				(DG_MAX_COLLIDING_FACES * 8)
 
 
@@ -44,7 +44,8 @@ class dgPolygonMeshDesc
 	public:
 	// colliding box in polygonSoup local space
 	dgPolygonMeshDesc()
-		:m_boxDistanceTravelInMeshSpace(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
+		:m_boxDistanceTravelInMeshSpace(dgFloat32 (0.0f))
+		,m_maxT(dgFloat32 (1.0f))
 		,m_doContinuesCollisionTest(false)
 	{
 	}
@@ -95,6 +96,7 @@ class dgPolygonMeshDesc
 	// private data;
 	const dgCollisionMesh* m_me;
 	dgInt32 m_globalIndexCount;
+	dgFloat32 m_maxT;
 	bool m_doContinuesCollisionTest;
 
 	dgInt32 m_globalFaceIndexCount[DG_MAX_COLLIDING_FACES];
@@ -175,14 +177,6 @@ class dgCollisionMesh: public dgCollision
 
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
-
-	struct dgFaceSortEntry
-	{
-		dgFloat32 m_distance;
-		dgInt32 m_adress;
-	};
-
-	static dgInt32 SortFaces (const dgFaceSortEntry* const A, const dgFaceSortEntry* const B, void* const context);
 
 
 #ifdef DG_DEBUG_AABB

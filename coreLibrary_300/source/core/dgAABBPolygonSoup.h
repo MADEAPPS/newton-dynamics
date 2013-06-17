@@ -64,7 +64,7 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 	void Create (const dgPolygonSoupDatabaseBuilder& builder, bool optimizedBuild);
 	dgFloat32 CalculateFaceMaxSize (dgTriplex* const vertex, dgInt32 indexCount, const dgInt32* const indexArray) const;
 
-	virtual void ForAllSectors (const dgVector& minBox, const dgVector& maxBox, const dgVector& boxDistanceTravel, dgAABBIntersectCallback callback, void* const context) const;
+	virtual void ForAllSectors (const dgVector& minBox, const dgVector& maxBox, const dgVector& boxDistanceTravel, dgFloat32 m_maxT, dgAABBIntersectCallback callback, void* const context) const;
 	virtual void ForAllSectorsRayHit (const dgFastRayTest& ray, dgRayIntersectCallback callback, void* const context) const;
 	virtual dgVector ForAllSectorsSupportVectex (const dgVector& dir) const;	
 
