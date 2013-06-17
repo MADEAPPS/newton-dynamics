@@ -601,25 +601,34 @@ class dgAABBTree
 
 	DG_INLINE dgInt32 BoxTest (const dgTriplex* const vertexArray, const dgVector& boxP0, const dgVector& boxP1) const
 	{
-//		dgVector minBox (vertexArray[m_minIndex].m_x, vertexArray[m_minIndex].m_y, vertexArray[m_minIndex].m_z, dgFloat32 (0.0f));
-//		dgVector maxBox (vertexArray[m_maxIndex].m_x, vertexArray[m_maxIndex].m_y, vertexArray[m_maxIndex].m_z, dgFloat32 (0.0f));
 		dgVector minBox (&vertexArray[m_minIndex].m_x);
 		dgVector maxBox (&vertexArray[m_maxIndex].m_x);
-		//return dgOverlapTest (minBox, maxBox, boxP0, boxP1) - 1;
 		return dgOverlapTest (minBox, maxBox, boxP0, boxP1);
 	}
 
-	//DG_INLINE dgInt32 BoxIntersect (const dgFastRayTest& ray, const dgTriplex* const vertexArray, const dgVector& boxP0, const dgVector& boxP1) const
+	DG_INLINE dgFloat32 BoxPenetration (const dgTriplex* const vertexArray, const dgVector& boxP0, const dgVector& boxP1) const
+	{
+		dgVector p0 (&vertexArray[m_minIndex].m_x);
+		dgVector p1 (&vertexArray[m_maxIndex].m_x);
+		dgVector minBox (p0 - boxP1);
+		dgVector maxBox (p1 - boxP0);
+		dgVector mask ((minBox.CompProduct4(maxBox)) < dgVector (dgFloat32 (0.0f)));
+		mask = mask & mask.ShiftTripleRight();
+		mask = mask & mask.ShiftTripleRight();
+		dgVector dist (maxBox.GetMax (minBox.Abs()) & mask);
+		dist = dist.GetMax(dist.ShiftTripleRight());
+		dist = dist.GetMax(dist.ShiftTripleRight());
+		return dist.m_x;
+	}
+
+
 	DG_INLINE dgFloat32 BoxIntersect (const dgFastRayTest& ray, const dgTriplex* const vertexArray, const dgVector& boxP0, const dgVector& boxP1) const
 	{
-		//dgVector p0 (vertexArray[m_minIndex].m_x, vertexArray[m_minIndex].m_y, vertexArray[m_minIndex].m_z, dgFloat32 (0.0f));
-		//dgVector p1 (vertexArray[m_maxIndex].m_x, vertexArray[m_maxIndex].m_y, vertexArray[m_maxIndex].m_z, dgFloat32 (0.0f));
 		dgVector p0 (&vertexArray[m_minIndex].m_x);
 		dgVector p1 (&vertexArray[m_maxIndex].m_x);
 
 		dgVector minBox (p0 - boxP1);
 		dgVector maxBox (p1 - boxP0);
-		//return ray.BoxTest (minBox, maxBox);
 		return ray.BoxIntersect(minBox, maxBox);
 	}
 
@@ -632,7 +641,164 @@ class dgAABBTree
 		return ray.BoxTest (minBox, maxBox);
 	}
 
+#if 0
+	void ForAllSectors (const dgInt32* const indexArray, const dgFloat32* const vertexArray, const dgVector& minBox, const dgVector& maxBox, const dgVector& boxDistanceTravel, dgFloat32 m_maxT, dgAABBIntersectCallback callback, void* const context) const
+	{
+		dgFloat32 distance[DG_STACK_DEPTH];
+		const dgAABBTree* stackPool[DG_STACK_DEPTH];
+		
+		dgInt32 stack = 1;
+		const dgInt32 stride = sizeof (dgTriplex) / sizeof (dgFloat32);
+		dgVector origin ((maxBox + minBox).Scale4 (dgFloat32 (0.5f)));
+		dgVector size ((maxBox - minBox).Scale4 (dgFloat32 (0.5f)));
 
+		if ((boxDistanceTravel % boxDistanceTravel) < dgFloat32 (1.0e-8f)) {
+			stackPool[0] = this;
+			distance[0] = BoxPenetration ((dgTriplex*)vertexArray, minBox, maxBox);
+
+			while (stack) {
+				stack --;
+				dgFloat32 dist =  distance[stack];
+				const dgAABBTree* const me = stackPool[stack];
+//				if (me->BoxTest ((dgTriplex*) vertexArray, minBox, maxBox)) {
+				if (dist > dgFloat32 (0.0f)) {
+					if (me->m_back.IsLeaf()) {
+						dgInt32 index = dgInt32 (me->m_back.GetIndex());
+						dgInt32 vCount = me->m_back.GetCount();
+						if (vCount > 0) {
+							const dgInt32* const indices = &indexArray[index];
+							dgInt32 normalIndex = indices[vCount + 1] * stride;
+							dgVector faceNormal (&vertexArray[normalIndex]);
+
+							dgFloat32 dist = me->BoxPenetration ((dgTriplex*)vertexArray, minBox, maxBox);
+
+							if (PolygonBoxOBBTest (faceNormal, vCount, indices, stride, vertexArray, origin, size)) {
+								if (callback(context, vertexArray, sizeof (dgTriplex), indices, vCount, dgFloat32 (0.0f)) == t_StopSearh) {
+									return;
+								}
+							}
+						}
+
+					} else {
+						dgAssert (stack < DG_STACK_DEPTH);
+						const dgAABBTree* const node = me->m_back.GetNode(this);
+						dgFloat32 dist = node->BoxPenetration ((dgTriplex*)vertexArray, minBox, maxBox);
+						if (dist > dgFloat32 (0.0f)) {
+							stackPool[stack] = node;
+							distance[stack] = dist;
+							stack++;
+						}
+					}
+
+					if (me->m_front.IsLeaf()) {
+						dgInt32 index = dgInt32 (me->m_front.GetIndex());
+						dgInt32 vCount = me->m_front.GetCount();
+						if (vCount > 0) {
+							const dgInt32* const indices = &indexArray[index];
+							dgInt32 normalIndex = indices[vCount + 1] * stride;
+							dgVector faceNormal (&vertexArray[normalIndex]);
+
+							dgFloat32 dist = me->BoxPenetration ((dgTriplex*)vertexArray, minBox, maxBox);
+
+							if (PolygonBoxOBBTest (faceNormal, vCount, indices, stride, vertexArray, origin, size)) {
+								if (callback(context, vertexArray, sizeof (dgTriplex), indices, vCount, dgFloat32 (0.0f)) == t_StopSearh) {
+									return;
+								}
+							}
+						}
+
+					} else {
+						dgAssert (stack < DG_STACK_DEPTH);
+						const dgAABBTree* const node = me->m_front.GetNode(this);
+						dgFloat32 dist = node->BoxPenetration ((dgTriplex*)vertexArray, minBox, maxBox);
+						if (dist > dgFloat32 (0.0f)) {
+							stackPool[stack] = node;
+							distance[stack] = dist;
+							stack++;
+						}
+					}
+				}
+			}
+		} else {
+			
+			dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), boxDistanceTravel);
+			
+			stackPool[0] = this;
+			distance [0] = BoxIntersect (ray, (dgTriplex*) vertexArray, minBox, maxBox);
+
+			while (stack) {
+				stack --;
+				const dgFloat32 dist = distance[stack];
+				const dgAABBTree* const me = stackPool[stack];
+				if (dist < dgFloat32 (1.0f)) {
+
+					if (me->m_back.IsLeaf()) {
+						dgInt32 index = dgInt32 (me->m_back.GetIndex());
+						dgInt32 vCount = me->m_back.GetCount();
+						if (vCount > 0) {
+							const dgInt32* const indices = &indexArray[index];
+							dgInt32 normalIndex = indices[vCount + 1] * stride;
+							dgVector faceNormal (&vertexArray[normalIndex]);
+							dgFloat32 hitDistance = PolygonBoxOBBRayTest (faceNormal, vCount, indices, stride, vertexArray, origin, size, boxDistanceTravel);
+							if (hitDistance < dgFloat32 (1.0f)) {
+								if (callback(context, vertexArray, sizeof (dgTriplex), indices, vCount, dgMax (hitDistance, dist)) == t_StopSearh) {
+									return;
+								}
+							}
+						}
+
+					} else {
+						dgAssert (stack < DG_STACK_DEPTH);
+						const dgAABBTree* const node = me->m_back.GetNode(this);
+						dgFloat32 dist = node->BoxIntersect (ray, (dgTriplex*) vertexArray, minBox, maxBox);
+						if (dist < dgFloat32 (1.0f)) {
+							dgInt32 j = stack;
+							for ( ; j && (dist > distance[j - 1]); j --) {
+								stackPool[j] = stackPool[j - 1];
+								distance[j] = distance[j - 1];
+							}
+							stackPool[j] = node;
+							distance[j] = dist;
+							stack++;
+						}
+					}
+
+					if (me->m_front.IsLeaf()) {
+						dgInt32 index = dgInt32 (me->m_front.GetIndex());
+						dgInt32 vCount = me->m_front.GetCount();
+						if (vCount > 0) {
+							const dgInt32* const indices = &indexArray[index];
+							dgInt32 normalIndex = indices[vCount + 1] * stride;
+							dgVector faceNormal (&vertexArray[normalIndex]);
+							dgFloat32 hitDistance = PolygonBoxOBBRayTest (faceNormal, vCount, indices, stride, vertexArray, origin, size, boxDistanceTravel);
+							if (hitDistance < dgFloat32 (1.0f)) {
+								if (callback(context, vertexArray, sizeof (dgTriplex), indices, vCount, dgMax (hitDistance, dist)) == t_StopSearh) {
+									return;
+								}
+							}
+						}
+
+					} else {
+						dgAssert (stack < DG_STACK_DEPTH);
+						const dgAABBTree* const node = me->m_front.GetNode(this);
+						dgFloat32 dist = node->BoxIntersect (ray, (dgTriplex*) vertexArray, minBox, maxBox);
+						if (dist < dgFloat32 (1.0f)) {
+							dgInt32 j = stack;
+							for ( ; j && (dist > distance[j - 1]); j --) {
+								stackPool[j] = stackPool[j - 1];
+								distance[j] = distance[j - 1];
+							}
+							stackPool[j] = node;
+							distance[j] = dist;
+							stack ++;
+						}
+					}
+				}
+			}
+		}
+	}
+
+#else
 	void ForAllSectors (const dgInt32* const indexArray, const dgFloat32* const vertexArray, const dgVector& minBox, const dgVector& maxBox, const dgVector& boxDistanceTravel, dgFloat32 m_maxT, dgAABBIntersectCallback callback, void* const context) const
 	{
 		const dgAABBTree* stackPool[DG_STACK_DEPTH];
@@ -772,6 +938,7 @@ class dgAABBTree
 		}
 	}
 
+#endif
 	
 	void ForAllSectorsRayHit (const dgFastRayTest& raySrc, const dgInt32* const indexArray, const dgFloat32* const vertexArray, dgRayIntersectCallback callback, void* const context) const
 	{
