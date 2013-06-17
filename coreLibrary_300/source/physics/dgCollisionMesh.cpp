@@ -310,8 +310,8 @@ dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const casti
 	
 	indexCount = 0;
 	dgContactPoint tmpContact;
-	dgFloat32 bound = dgFloat32 (1.0e10f);
-	for (dgInt32 j = 0; (j < data.m_faceCount) && (data.m_globalHitDistance[j] < bound); j ++) {
+//	dgFloat32 bound = dgFloat32 (1.0e10f);
+	for (dgInt32 j = 0; (j < data.m_faceCount) && (data.m_globalHitDistance[j] < maxT); j ++) {
 		const dgInt32* const localIndexArray = &indexArray[faceAdresses[j]];
 
 		polygon.m_vertexIndex = localIndexArray;
@@ -336,7 +336,7 @@ dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const casti
 		dgFloat32 t = polygon.ConvexRayCast (castingShape, shapeMatrix, shapeVeloc, maxT, tmpContact, referenceBody, &polyInstance, userData, threadId);
 		if (t < maxT) {
 			maxT = t;
-			bound = t;
+			//bound = t;
 			contactOut = tmpContact;
 		}
 		

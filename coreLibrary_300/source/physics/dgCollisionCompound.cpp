@@ -550,6 +550,7 @@ dgFloat32 dgCollisionCompound::ConvexRayCast (const dgCollisionInstance* const c
 		}
 	}
 
+dgAssert (xxx <= 1);
 	return minT;
 }
 

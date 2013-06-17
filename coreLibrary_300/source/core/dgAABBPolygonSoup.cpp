@@ -652,7 +652,6 @@ class dgAABBTree
 					if (me->m_back.IsLeaf()) {
 						dgInt32 index = dgInt32 (me->m_back.GetIndex());
 						dgInt32 vCount = me->m_back.GetCount();
-						//if ((vCount > 0) && callback(context, vertexArray, sizeof (dgTriplex), &indexArray[index], vCount) == t_StopSearh) {
 						if (vCount > 0) {
 							const dgInt32* const indices = &indexArray[index];
 							dgInt32 normalIndex = indices[vCount + 1] * stride;
@@ -673,7 +672,6 @@ class dgAABBTree
 					if (me->m_front.IsLeaf()) {
 						dgInt32 index = dgInt32 (me->m_front.GetIndex());
 						dgInt32 vCount = me->m_front.GetCount();
-						//if ((vCount > 0) && callback(context, vertexArray, sizeof (dgTriplex), &indexArray[index], vCount) == t_StopSearh) {
 						if (vCount > 0) {
 							const dgInt32* const indices = &indexArray[index];
 							dgInt32 normalIndex = indices[vCount + 1] * stride;
