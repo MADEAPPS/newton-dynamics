@@ -176,6 +176,14 @@ class dgCollisionMesh: public dgCollision
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
 
+	struct dgFaceSortEntry
+	{
+		dgFloat32 m_distance;
+		dgInt32 m_adress;
+	};
+
+	static dgInt32 SortFaces (const dgFaceSortEntry* const A, const dgFaceSortEntry* const B, void* const context);
+
 
 #ifdef DG_DEBUG_AABB
 	dgVector BoxSupportMapping  (const dgVector& dir) const;

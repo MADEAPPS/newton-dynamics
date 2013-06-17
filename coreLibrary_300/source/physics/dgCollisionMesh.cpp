@@ -227,6 +227,15 @@ dgInt32 dgCollisionMesh::CalculatePlaneIntersection (const dgFloat32* const vert
 	return count;
 }
 
+dgInt32 dgCollisionMesh::SortFaces (const dgFaceSortEntry* const A, const dgFaceSortEntry* const B, void* const context)
+{
+	if (A->m_distance < B->m_distance){
+		return -1;
+	} else if (A->m_distance > B->m_distance){
+		return 1;
+	}
+	return 0;
+}
 
 dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const castingShape, const dgMatrix& shapeMatrix, const dgVector& shapeVeloc, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const referenceBody, const dgCollisionInstance* const referenceCollision, void* const userData, dgInt32 threadId) const
 {
@@ -265,7 +274,8 @@ dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const casti
 //	data.m_meshToShapeMatrix = castingShape->CalculateSpaceMatrix(referenceCollision);
 
 	data.m_doContinuesCollisionTest = true;
-	dgVector distanceTravel (shapeVeloc.Scale4 ((maxT > dgFloat32 (1.0f)) ? dgFloat32 (1.0f) : maxT));
+	dgFloat32 maxTime = (maxT > dgFloat32 (1.0f)) ? dgFloat32 (1.0f) : maxT;
+	dgVector distanceTravel (shapeVeloc.Scale4 (maxTime));
 	data.m_boxDistanceTravelInMeshSpace = referenceCollision->m_invScale.CompProduct4(soupMatrix.UnrotateVector(distanceTravel.CompProduct4(castingShape->m_invScale)));
 //	data.m_distanceTravelInCollidingShapeSpace = castingShape->m_invScale.CompProduct4(hullMatrix.UnrotateVector(distanceTravel.CompProduct4(referenceCollision->m_invScale)));
 
@@ -282,13 +292,26 @@ dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const casti
 	const dgFloat32* const vertex = polygon.m_vertex;
 
 	dgFloat32 maxPolyScale = referenceCollision->m_maxScale.m_x;
-	dgInt32 indexCount = 0;
 	dgInt32* const indexArray = (dgInt32*)data.m_faceVertexIndex;
-	
 
-	dgContactPoint tmpContact;
+	dgInt32 indexCount = 0;
+	dgFaceSortEntry faceAdresses[DG_MAX_COLLIDING_FACES];
 	for (dgInt32 j = 0; j < data.m_faceCount; j ++) {
-		const dgInt32* const localIndexArray = &indexArray[indexCount];
+		dgInt32 count = data.GetFaceIndexCount (data.m_faceIndexCount[j]);
+		faceAdresses[j].m_adress = indexCount;
+		faceAdresses[j].m_distance = data.m_globalHitDistance[j] * maxTime;
+		indexCount += count;
+	}
+	dgSort (faceAdresses, data.m_faceCount, SortFaces);
+
+	
+	indexCount = 0;
+	dgContactPoint tmpContact;
+	dgFloat32 bound = dgFloat32 (1.0e10f);
+//	for (dgInt32 j = 0; (j < data.m_faceCount); j ++) {
+	for (dgInt32 j = 0; (j < data.m_faceCount) && (faceAdresses[j].m_distance < bound); j ++) {
+		//const dgInt32* const localIndexArray = &indexArray[indexCount];
+		const dgInt32* const localIndexArray = &indexArray[faceAdresses[j].m_adress];
 
 		polygon.m_vertexIndex = localIndexArray;
 		polygon.m_count = data.m_faceIndexCount[j];
@@ -312,9 +335,11 @@ dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const casti
 		dgFloat32 t = polygon.ConvexRayCast (castingShape, shapeMatrix, shapeVeloc, maxT, tmpContact, referenceBody, &polyInstance, userData, threadId);
 		if (t < maxT) {
 			maxT = t;
+			bound = t;
 			contactOut = tmpContact;
 		}
-		indexCount += data.GetFaceIndexCount (data.m_faceIndexCount[j]);
+		
+		//indexCount += data.GetFaceIndexCount (data.m_faceIndexCount[j]);
 	}
 
 	return  maxT;
