@@ -648,15 +648,44 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 			m_hullSum[i] += step;
 			m_hullDiff[i] -= step;
 		}
-
-
 	}
 
 	dgInt32 CalculateClosestSimplex ()
 	{
+		dgVector v;
 		dgInt32 index = 1;
+		if (m_vertexIndex <= 0) {
 			SupportVertex (m_contactJoint->m_separtingVector, 0);
-		dgVector v (m_hullDiff[0]);
+			v = m_hullDiff[0];
+		} else {
+			switch (m_vertexIndex) 
+			{
+				case 1:
+				{
+					v = m_hullDiff[0];
+					break;
+				}
+
+				case 2:
+				{
+					v = ReduceLine (m_vertexIndex, m_hullDiff, m_hullSum, m_polygonFaceIndex);
+					break;
+				}
+
+				case 3:
+				{
+					v = ReduceTriangle (m_vertexIndex, m_hullDiff, m_hullSum, m_polygonFaceIndex);
+					break;
+				}
+
+				case 4:
+				{
+					v = ReduceTetrahedrum (m_vertexIndex, m_hullDiff, m_hullSum, m_polygonFaceIndex);
+					break;
+				}
+			}
+			index = m_vertexIndex;
+		}
 
 		dgInt32 iter = 0;
 		dgInt32 cycling = 0;
@@ -721,9 +750,40 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 
 	dgInt32 CalculateClosestSimplexLarge ()
 	{
+		dgVector v;
 		dgInt32 index = 1;
-		SupportVertex (m_contactJoint->m_separtingVector, 0);
-		dgVector v (m_hullDiff[0]);
+		if (m_vertexIndex <= 0) {
+			SupportVertex (m_contactJoint->m_separtingVector, 0);
+			v = m_hullDiff[0];
+		} else {
+			switch (m_vertexIndex) 
+			{
+				case 1:
+				{
+					v = m_hullDiff[0];
+					break;
+				}
+
+				case 2:
+				{
+					v = ReduceLine (m_vertexIndex, m_hullDiff, m_hullSum, m_polygonFaceIndex);
+					break;
+				}
+
+				case 3:
+				{
+					v = ReduceTriangle (m_vertexIndex, m_hullDiff, m_hullSum, m_polygonFaceIndex);
+					break;
+				}
+
+				case 4:
+				{
+					v = ReduceTetrahedrum (m_vertexIndex, m_hullDiff, m_hullSum, m_polygonFaceIndex);
+					break;
+				}
+			}
+			index = m_vertexIndex;
+		}
 
 		dgInt32 iter = 0;
 		dgInt32 cycling = 0;
@@ -942,6 +1002,7 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 				polygonShape->SetFeatureHit (simplexPointCount, m_polygonFaceIndex);
 			}
 			CalculateContactFromFeacture(simplexPointCount);
+			m_vertexIndex = simplexPointCount;
 			return true;
 		}
 		return false;
@@ -2491,7 +2552,8 @@ dgFloat32 dgCollisionConvex::ConvexConicConvexRayCast (const dgCollisionInstance
 		dgVector step (veloc.Scale4(dt));
 		lastContact.m_normal = normal;
 		lastContact.m_point = minkHull.m_p;
-		minkHull.m_matrix.m_posit += step;
+		//minkHull.m_matrix.m_posit += step;
+		minkHull.TranslateSimplex(step);
 
 		makingProgressCount += (step.DotProduct4(step).m_x < dgFloat32(1.0e-4f)) ? 1 : 0;
 
