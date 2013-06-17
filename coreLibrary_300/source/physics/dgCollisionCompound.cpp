@@ -516,6 +516,7 @@ dgFloat32 dgCollisionCompound::ConvexRayCast (const dgCollisionInstance* const c
 	dgVector shapeLocalP1; 
 	convexShape->CalcAABB (localMatrix, shapeLocalP0, shapeLocalP1);
 
+	dgContactPoint tmpContact;
 	dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), localVeloc);
 	while (stack) {
 		stack --;
@@ -529,8 +530,6 @@ dgFloat32 dgCollisionCompound::ConvexRayCast (const dgCollisionInstance* const c
 				dgCollisionInstance* const subShape = me->GetShape();
 				dgCollisionInstance childInstance (*subShape, subShape->GetChildShape());
 				childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * compoundMatrix;
-
-				dgContactPoint tmpContact;
 				dgFloat32 t = childInstance.ConvexRayCast (convexShape, shapeMatrix, shapeVeloc, minT, tmpContact, NULL, referenceBody, userData, threadId);
 				if (t < minT) {
 					contactOut = tmpContact;

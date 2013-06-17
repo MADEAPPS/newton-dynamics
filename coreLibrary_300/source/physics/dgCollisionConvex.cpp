@@ -2545,6 +2545,7 @@ dgFloat32 dgCollisionConvex::ConvexConicConvexRayCast (const dgCollisionInstance
 		tacc += dt; 
 		if (tacc >= maxT) {
 			tacc = dgFloat32 (1.2f);
+			param = dgFloat32 (1.2f);
 			break;
 		}
 
