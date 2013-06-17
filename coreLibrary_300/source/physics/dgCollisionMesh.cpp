@@ -284,6 +284,7 @@ dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const casti
 	dgFloat32 maxPolyScale = referenceCollision->m_maxScale.m_x;
 	dgInt32 indexCount = 0;
 	dgInt32* const indexArray = (dgInt32*)data.m_faceVertexIndex;
+	
 
 	dgContactPoint tmpContact;
 	for (dgInt32 j = 0; j < data.m_faceCount; j ++) {
@@ -300,12 +301,14 @@ dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const casti
 		polygon.m_normal = normal.Scale4(dgRsqrt (normal % normal));
 		dgAssert (polygon.m_normal.m_w == dgFloat32 (0.0f));
 
+		dgVector origin (scale.CompProduct4 (dgVector (&vertex[localIndexArray[0] * stride])));
 		for (dgInt32 i = 0; i < polygon.m_count; i ++) {
 			dgInt32 index = localIndexArray[i] * stride;
-			polygon.m_localPoly[i] = scale.CompProduct4(dgVector (&vertex[index]));
+			polygon.m_localPoly[i] = scale.CompProduct4(dgVector (&vertex[index])) - origin;
 			dgAssert (polygon.m_localPoly[i].m_w == dgFloat32 (0.0f));
 		}
-
+		polyInstance.m_localMatrix.m_posit = referenceCollision->m_localMatrix.TransformVector(origin);
+		polyInstance.m_globalMatrix.m_posit = referenceCollision->m_globalMatrix.TransformVector(origin);
 		dgFloat32 t = polygon.ConvexRayCast (castingShape, shapeMatrix, shapeVeloc, maxT, tmpContact, referenceBody, &polyInstance, userData, threadId);
 		if (t < maxT) {
 			maxT = t;

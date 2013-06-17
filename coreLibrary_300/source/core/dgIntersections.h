@@ -40,7 +40,7 @@ enum dgIntersectStatus
 
 typedef dgIntersectStatus (*dgAABBIntersectCallback) (void* const context, 
 													  const dgFloat32* const polygon, dgInt32 strideInBytes,
-													  const dgInt32* const indexArray, dgInt32 indexCount);
+													  const dgInt32* const indexArray, dgInt32 indexCount, dgFloat32 hitDistance);
 
 typedef dgFloat32 (*dgRayIntersectCallback) (void* const context, 
 											 const dgFloat32* const polygon, dgInt32 strideInBytes,
@@ -129,6 +129,29 @@ class dgFastRayTest
 			return 0x1;
 		#endif
 	}
+
+	DG_INLINE dgFloat32 BoxIntersect (const dgVector& minBox, const dgVector& maxBox) const
+	{
+		dgVector test (((m_p0 <= minBox) | (m_p0 >= maxBox)) & m_isParallel);
+		if (test.GetSignMask() & 0x07) {
+			return dgFloat32 (0.0f);
+		}
+		dgVector tt0 ((minBox - m_p0).CompProduct4(m_dpInv));
+		dgVector tt1 ((maxBox - m_p0).CompProduct4(m_dpInv));
+		dgVector t0 (m_minT.GetMax(tt0.GetMin(tt1)));
+		dgVector t1 (m_maxT.GetMin(tt0.GetMax(tt1)));
+		t0 = t0.GetMax(t0.ShiftTripleRight());
+		t1 = t1.GetMin(t1.ShiftTripleRight());
+		t0 = t0.GetMax(t0.ShiftTripleRight());
+		t1 = t1.GetMin(t1.ShiftTripleRight());
+		dgVector mask (t0 < t1);
+		dgVector maxDist (dgFloat32 (1.2f));
+		t0 = (t0 & mask) | maxDist.AndNot(mask);
+//		return ((t0 < t1).GetSignMask() & 1);
+		dgAssert ((mask.GetSignMask() & 1) == (t0.m_x < 1.0f));
+		return t0.m_x;
+	}
+
 
 	dgVector m_p0;
 	dgVector m_p1;
@@ -266,7 +289,7 @@ DG_INLINE dgInt32 PolygonBoxOBBTest (const dgVector& faceNormal, dgInt32 indexCo
 }
 
 
-DG_INLINE dgInt32 PolygonBoxOBBRayTest (const dgVector& faceNormal, dgInt32 indexCount, const dgInt32* const indexArray, dgInt32 stride, const dgFloat32* const vertexArray, const dgVector& boxOrigin, const dgVector& boxSize, const dgVector& boxVeloc)
+DG_INLINE dgFloat32 PolygonBoxOBBRayTest (const dgVector& faceNormal, dgInt32 indexCount, const dgInt32* const indexArray, dgInt32 stride, const dgFloat32* const vertexArray, const dgVector& boxOrigin, const dgVector& boxSize, const dgVector& boxVeloc)
 {
 	dgMatrix matrix;
 	dgVector origin (&vertexArray[indexArray[0] * stride]);
@@ -299,7 +322,8 @@ DG_INLINE dgInt32 PolygonBoxOBBRayTest (const dgVector& faceNormal, dgInt32 inde
 
 	dgVector veloc (matrix.RotateVector(boxVeloc) & dgVector::m_triplexMask);
 	dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), veloc);
-	return ray.BoxTest (minBox, maxBox);
+//	return ray.BoxTest (minBox, maxBox);
+	return ray.BoxIntersect(minBox, maxBox);
 }
 
 

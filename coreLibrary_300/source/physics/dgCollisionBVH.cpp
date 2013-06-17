@@ -131,7 +131,7 @@ void dgCollisionBVH::ForEachFace (dgAABBIntersectCallback callback, void* const 
 
 
 
-dgIntersectStatus dgCollisionBVH::CollectVertexListIndexList (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount)
+dgIntersectStatus dgCollisionBVH::CollectVertexListIndexList (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount, dgFloat32 hitDistance)
 {
 	dgMeshVertexListIndexList& data = (*(dgMeshVertexListIndexList*) context);
 
@@ -164,7 +164,7 @@ dgIntersectStatus dgCollisionBVH::CollectVertexListIndexList (void* const contex
 
 
 
-dgIntersectStatus dgCollisionBVH::GetTriangleCount (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount)
+dgIntersectStatus dgCollisionBVH::GetTriangleCount (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount, dgFloat32 hitDistance)
 {
 	dgMeshVertexListIndexList& data = (*(dgMeshVertexListIndexList*) context);
 
@@ -276,7 +276,7 @@ dgFloat32 dgCollisionBVH::RayCast (const dgVector& localP0, const dgVector& loca
 	return param;
 }
 
-dgIntersectStatus dgCollisionBVH::GetPolygon (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount)
+dgIntersectStatus dgCollisionBVH::GetPolygon (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount, dgFloat32 hitDistance)
 {
 	dgPolygonMeshDesc& data = (*(dgPolygonMeshDesc*) context);
 	if (data.m_faceCount >= DG_MAX_COLLIDING_FACES) {
@@ -305,6 +305,7 @@ dgIntersectStatus dgCollisionBVH::GetPolygon (void* const context, const dgFloat
 	dgAssert (data.m_vertex == polygon);
 
 	data.m_faceIndexCount[data.m_faceCount] = indexCount;
+	data.m_globalHitDistance[data.m_faceCount] = hitDistance;
 	data.m_faceCount ++;
 	dgInt32 count = indexCount * 2 + 3;
 	dgInt32* const dst = &data.m_faceVertexIndex[data.m_globalIndexCount];
@@ -355,7 +356,7 @@ struct dgCollisionBVHShowPolyContext
 	OnDebugCollisionMeshCallback m_callback;
 };
 
-dgIntersectStatus dgCollisionBVH::ShowDebugPolygon (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount)
+dgIntersectStatus dgCollisionBVH::ShowDebugPolygon (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount, dgFloat32 hitDistance)
 {
 	dgTriplex triplex[128];
 	dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat32));

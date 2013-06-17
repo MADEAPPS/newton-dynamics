@@ -656,7 +656,7 @@ class dgAABBTree
 							dgInt32 normalIndex = indices[vCount + 1] * stride;
 							dgVector faceNormal (&vertexArray[normalIndex]);
 							if (PolygonBoxOBBTest (faceNormal, vCount, indices, stride, vertexArray, origin, size)) {
-								if (callback(context, vertexArray, sizeof (dgTriplex), indices, vCount) == t_StopSearh) {
+								if (callback(context, vertexArray, sizeof (dgTriplex), indices, vCount, dgFloat32 (0.0f)) == t_StopSearh) {
 									return;
 								}
 							}
@@ -677,7 +677,7 @@ class dgAABBTree
 							dgInt32 normalIndex = indices[vCount + 1] * stride;
 							dgVector faceNormal (&vertexArray[normalIndex]);
 							if (PolygonBoxOBBTest (faceNormal, vCount, indices, stride, vertexArray, origin, size)) {
-								if (callback(context, vertexArray, sizeof (dgTriplex), indices, vCount) == t_StopSearh) {
+								if (callback(context, vertexArray, sizeof (dgTriplex), indices, vCount, dgFloat32 (0.0f)) == t_StopSearh) {
 									return;
 								}
 							}
@@ -705,8 +705,9 @@ class dgAABBTree
 							const dgInt32* const indices = &indexArray[index];
 							dgInt32 normalIndex = indices[vCount + 1] * stride;
 							dgVector faceNormal (&vertexArray[normalIndex]);
-							if (PolygonBoxOBBRayTest (faceNormal, vCount, indices, stride, vertexArray, origin, size, boxDistanceTravel)) {
-								if (callback(context, vertexArray, sizeof (dgTriplex), indices, vCount) == t_StopSearh) {
+							dgFloat32 hitDistance = PolygonBoxOBBRayTest (faceNormal, vCount, indices, stride, vertexArray, origin, size, boxDistanceTravel);
+							if (hitDistance < dgFloat32 (1.0f)) {
+								if (callback(context, vertexArray, sizeof (dgTriplex), indices, vCount, hitDistance) == t_StopSearh) {
 									return;
 								}
 							}
@@ -726,8 +727,9 @@ class dgAABBTree
 							const dgInt32* const indices = &indexArray[index];
 							dgInt32 normalIndex = indices[vCount + 1] * stride;
 							dgVector faceNormal (&vertexArray[normalIndex]);
-							if (PolygonBoxOBBRayTest (faceNormal, vCount, indices, stride, vertexArray, origin, size, boxDistanceTravel)) {
-								if (callback(context, vertexArray, sizeof (dgTriplex), indices, vCount) == t_StopSearh) {
+							dgFloat32 hitDistance = PolygonBoxOBBRayTest (faceNormal, vCount, indices, stride, vertexArray, origin, size, boxDistanceTravel);
+							if (hitDistance < dgFloat32 (1.0f)) {
+								if (callback(context, vertexArray, sizeof (dgTriplex), indices, vCount, hitDistance) == t_StopSearh) {
 									return;
 								}
 							}
@@ -1157,7 +1159,7 @@ dgIntersectStatus dgAABBPolygonSoup::CalculateManifoldFaceEdgeNormals (void* con
 }
 
 
-dgIntersectStatus dgAABBPolygonSoup::CalculateDisjointedFaceEdgeNormals (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount)
+dgIntersectStatus dgAABBPolygonSoup::CalculateDisjointedFaceEdgeNormals (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount, dgFloat32 hitDistance)
 {
 	#define DG_WELDING_TOL (1.0e-2f)
 	#define DG_WELDING_TOL2 (DG_WELDING_TOL * DG_WELDING_TOL)
@@ -1257,7 +1259,7 @@ dgIntersectStatus dgAABBPolygonSoup::CalculateDisjointedFaceEdgeNormals (void* c
 
 
 
-dgIntersectStatus dgAABBPolygonSoup::CalculateAllFaceEdgeNormals (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount)
+dgIntersectStatus dgAABBPolygonSoup::CalculateAllFaceEdgeNormals (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount, dgFloat32 hitDistance)
 {
 	dgAABBPolygonSoup* const me = (dgAABBPolygonSoup*) context;
 
