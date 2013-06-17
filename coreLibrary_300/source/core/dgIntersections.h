@@ -134,7 +134,7 @@ class dgFastRayTest
 	{
 		dgVector test (((m_p0 <= minBox) | (m_p0 >= maxBox)) & m_isParallel);
 		if (test.GetSignMask() & 0x07) {
-			return dgFloat32 (0.0f);
+			return dgFloat32 (1.2f);
 		}
 		dgVector tt0 ((minBox - m_p0).CompProduct4(m_dpInv));
 		dgVector tt1 ((maxBox - m_p0).CompProduct4(m_dpInv));
@@ -148,7 +148,7 @@ class dgFastRayTest
 		dgVector maxDist (dgFloat32 (1.2f));
 		t0 = (t0 & mask) | maxDist.AndNot(mask);
 //		return ((t0 < t1).GetSignMask() & 1);
-		dgAssert ((mask.GetSignMask() & 1) == (t0.m_x < 1.0f));
+		dgAssert ((mask.GetSignMask() & 1) == (t0.m_x < dgFloat32 (1.0f)));
 		return t0.m_x;
 	}
 
