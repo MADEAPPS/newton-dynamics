@@ -1393,8 +1393,8 @@ dgInt32 dgWorld::ClosestPoint (dgCollisionParamProxy& proxy) const
 
 		dgCollisionConvex* const convexShape = (dgCollisionConvex*) collision2->m_childShape;
 
-		dgVector v (tmp.m_matrix.m_posit);
-		dgFloat32 mag2 = v % v;
+		dgVector v (tmp.m_matrix.m_posit & dgVector::m_triplexMask);
+		dgFloat32 mag2 = v.DotProduct4(v).m_x;
 		if (mag2 > dgFloat32 (0.0f)) {
 			contactJoint->m_separtingVector = v.Scale3 (dgRsqrt (mag2));
 		} else {
@@ -1412,8 +1412,8 @@ dgInt32 dgWorld::ClosestPoint (dgCollisionParamProxy& proxy) const
 		proxy.m_matrix = collision2->m_globalMatrix * collision1->m_globalMatrix.Inverse();
 		dgCollisionConvex* const convexShape = (dgCollisionConvex*) collision1->m_childShape;
 
-		dgVector v (proxy.m_matrix.m_posit);
-		dgFloat32 mag2 = v % v;
+		dgVector v (proxy.m_matrix.m_posit & dgVector::m_triplexMask);
+		dgFloat32 mag2 = v.DotProduct4(v).m_x;
 		if (mag2 > dgFloat32 (0.0f)) {
 			contactJoint->m_separtingVector = v.Scale3 (dgRsqrt (mag2));
 		} else {
@@ -1566,8 +1566,8 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) 
 			dgCollisionConvex* const convexShape = (dgCollisionConvex*) collision2->m_childShape;
 			if (contactJoint->m_isNewContact) {
 				contactJoint->m_isNewContact = false;
-				dgVector v (tmp.m_matrix.m_posit);
-				dgFloat32 mag2 = v % v;
+				dgVector v (tmp.m_matrix.m_posit & dgVector::m_triplexMask);
+				dgFloat32 mag2 = v.DotProduct4(v).m_x;
 				if (mag2 > dgFloat32 (0.0f)) {
 					contactJoint->m_separtingVector = v.Scale3 (dgRsqrt (mag2));
 				} else {
@@ -1594,8 +1594,8 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) 
 
 			if (contactJoint->m_isNewContact) {
 				contactJoint->m_isNewContact = false;
-				dgVector v (proxy.m_matrix.m_posit);
-				dgFloat32 mag2 = v % v;
+				dgVector v (proxy.m_matrix.m_posit & dgVector::m_triplexMask);
+				dgFloat32 mag2 = v.DotProduct4(v).m_x;
 				if (mag2 > dgFloat32 (0.0f)) {
 					contactJoint->m_separtingVector = v.Scale3 (dgRsqrt (mag2));
 				} else {
@@ -1620,22 +1620,21 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) 
 
 			if (contactJoint->m_isNewContact) {
 				contactJoint->m_isNewContact = false;
-				dgVector v (tmp.m_matrix.m_posit);
-				dgFloat32 mag2 = v % v;
+				dgVector v (tmp.m_matrix.m_posit | dgVector::m_triplexMask);
+				dgFloat32 mag2 = v.DotProduct4(v).m_x;
 				if (mag2 > dgFloat32 (0.0f)) {
 					contactJoint->m_separtingVector = v.Scale3 (dgRsqrt (mag2));
 				} else {
 					contactJoint->m_separtingVector =  dgVector(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 				}
 			}
-			if (contactJoint->GetCount()) {
-				count = convexShape->CalculateConvexToConvexContact (tmp);
-				proxy.m_timestep = tmp.m_timestep;
 
-				dgContactPoint* const contactOut = proxy.m_contacts;
-				for (dgInt32 i = 0; i < count; i ++) {
-					contactOut[i].m_normal = contactOut[i].m_normal.Scale3 (dgFloat32 (-1.0f));
-				}
+			count = convexShape->CalculateConvexToConvexContact (tmp);
+			proxy.m_timestep = tmp.m_timestep;
+
+			dgContactPoint* const contactOut = proxy.m_contacts;
+			for (dgInt32 i = 0; i < count; i ++) {
+				contactOut[i].m_normal = contactOut[i].m_normal.Scale3 (dgFloat32 (-1.0f));
 			}
 
 			proxy.m_normal = tmp.m_normal.Scale3(dgFloat32 (-1.0f));
@@ -1648,17 +1647,15 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) 
 
 			if (contactJoint->m_isNewContact) {
 				contactJoint->m_isNewContact = false;
-				dgVector v (proxy.m_matrix.m_posit);
-				dgFloat32 mag2 = v % v;
+				dgVector v (proxy.m_matrix.m_posit & dgVector::m_triplexMask);
+				dgFloat32 mag2 = v.DotProduct4(v).m_x;
 				if (mag2 > dgFloat32 (0.0f)) {
 					contactJoint->m_separtingVector = v.Scale3 (dgRsqrt (mag2));
 				} else {
 					contactJoint->m_separtingVector =  dgVector(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 				}
 			}
-			if (contactJoint->GetCount()) {
-				count = convexShape->CalculateConvexToConvexContact (proxy);
-			}
+			count = convexShape->CalculateConvexToConvexContact (proxy);
 		}
 	}
 
