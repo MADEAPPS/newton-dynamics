@@ -218,6 +218,8 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 
 	void SupportVertex (const dgVector& dir, dgInt32 vertexIndex)
 	{
+		dgAssert (dir.m_w == dgFloat32 (0.0f));
+
 		if (m_scaleIsUnit) {
 			dgAssert (dgAbsf (dir % dir - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 			dgVector p (m_myShape->ConvexConicSupporVertex(dir));
@@ -1207,7 +1209,7 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 		PushFace(f3);
 
 
-		int iterCount = 0;
+		dgInt32 iterCount = 0;
 		dgInt32 cycling = 0;
 		dgFloat32 cyclingMem[4];
 		cyclingMem[0] = dgFloat32 (1.0e10f);
@@ -1226,20 +1228,19 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 
 //SaveOFF ("xxx.off");
 
-				SupportVertex (faceNode->m_plane, m_vertexIndex);
+				SupportVertex (faceNode->m_plane & dgVector::m_triplexMask, m_vertexIndex);
 				const dgVector& p = m_hullDiff[m_vertexIndex];
 				dgFloat32 dist = faceNode->m_plane.Evalue (p);
 				dgFloat32 distTolerance = dgMax (dgAbsf(faceNode->m_plane.m_w) * resolutionScale, minTolerance);
-
 
 				if (dist < distTolerance) {
 //if (xxx > 1000){
 //	SaveOFF ("xxx.off");
 //}
-					m_normal = faceNode->m_plane;
 					dgVector sum[3];
 					dgVector diff[3];
 					dgInt32 index[3];
+					m_normal = faceNode->m_plane & dgVector::m_triplexMask;
 					for (dgInt32 i = 0; i < 3; i ++) {
 						dgInt32 j = faceNode->m_vertex[i];
 						sum[i] = m_hullSum[j];
