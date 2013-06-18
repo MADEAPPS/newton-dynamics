@@ -19,12 +19,6 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-/****************************************************************************
-*
-*  File Name  : Bitmap.C
-*  Visual C++ 4.0 base by Julio Jerez
-*
-****************************************************************************/
 #ifndef __DG_AABB_POLYGON_SOUP_H_
 #define __DG_AABB_POLYGON_SOUP_H_
 

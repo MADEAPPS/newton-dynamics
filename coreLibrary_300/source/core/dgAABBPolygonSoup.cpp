@@ -84,13 +84,6 @@ class dgAABBTree
 		};
 	};
 
-	class dgHeapNodePair
-	{
-		public:
-		dgInt32 m_nodeA;
-		dgInt32 m_nodeB;
-	};
-
 	class dgConstructionTree
 	{
 		public:
@@ -121,6 +114,7 @@ class dgAABBTree
 
 
 
+	
 	public: 
 	void CalcExtends (dgTriplex* const vertex, dgInt32 indexCount, const dgInt32* const indexArray) 
 	{
@@ -255,24 +249,19 @@ class dgAABBTree
 
 	dgFloat32 CalculateArea (dgConstructionTree* const node0, dgConstructionTree* const node1) const
 	{
-		dgVector p0 (dgMin (node0->m_p0.m_x, node1->m_p0.m_x), dgMin (node0->m_p0.m_y, node1->m_p0.m_y), dgMin (node0->m_p0.m_z, node1->m_p0.m_z), dgFloat32 (0.0f));
-		dgVector p1 (dgMax (node0->m_p1.m_x, node1->m_p1.m_x), dgMax (node0->m_p1.m_y, node1->m_p1.m_y), dgMax (node0->m_p1.m_z, node1->m_p1.m_z), dgFloat32 (0.0f));		
-		dgVector side0 (p1 - p0);
-		dgVector side1 (side0.m_y, side0.m_z, side0.m_x, dgFloat32 (0.0f));
-		return side0 % side1;
+		dgVector p0 (node0->m_p0.GetMin(node1->m_p0));
+		dgVector p1 (node0->m_p1.GetMax(node1->m_p1));
+
+		dgVector size (p1 - p0);
+		return size.DotProduct4(size.ShiftTripleRight()).m_x;
 	}
 
 	void SetBox (dgConstructionTree* const node) const
 	{
-		node->m_p0.m_x = dgMin (node->m_back->m_p0.m_x, node->m_front->m_p0.m_x);
-		node->m_p0.m_y = dgMin (node->m_back->m_p0.m_y, node->m_front->m_p0.m_y);
-		node->m_p0.m_z = dgMin (node->m_back->m_p0.m_z, node->m_front->m_p0.m_z);
-		node->m_p1.m_x = dgMax (node->m_back->m_p1.m_x, node->m_front->m_p1.m_x);
-		node->m_p1.m_y = dgMax (node->m_back->m_p1.m_y, node->m_front->m_p1.m_y);
-		node->m_p1.m_z = dgMax (node->m_back->m_p1.m_z, node->m_front->m_p1.m_z);
-		dgVector side0 (node->m_p1 - node->m_p0);
-		dgVector side1 (side0.m_y, side0.m_z, side0.m_x, dgFloat32 (0.0f));
-		node->m_surfaceArea = side0 % side1;
+		node->m_p0 = node->m_back->m_p0.GetMin(node->m_front->m_p0);
+		node->m_p1 = node->m_back->m_p1.GetMin(node->m_front->m_p1);
+		dgVector size (node->m_p1 - node->m_p0);
+		node->m_surfaceArea = size.DotProduct4(size.ShiftTripleRight()).m_x;
 	}
 
 	void ImproveNodeFitness (dgConstructionTree* const node) const
@@ -437,8 +426,8 @@ class dgAABBTree
 				dgSpliteInfo (dgAABBTree* const boxArray, dgInt32 boxCount, const dgTriplex* const vertexArray, const dgConstructionTree* const tree)
 				{
 
-					dgVector minP ( dgFloat32 (1.0e15f),  dgFloat32 (1.0e15f),  dgFloat32 (1.0e15f), dgFloat32 (0.0f)); 
-					dgVector maxP (-dgFloat32 (1.0e15f), -dgFloat32 (1.0e15f), -dgFloat32 (1.0e15f), dgFloat32 (0.0f)); 
+					dgVector minP ( dgFloat32 (1.0e15f)); 
+					dgVector maxP (-dgFloat32 (1.0e15f)); 
 
 					if (boxCount == 2) {
 						m_axis = 1;
@@ -447,8 +436,8 @@ class dgAABBTree
 							dgInt32 j0 = boxArray[i].m_minIndex;
 							dgInt32 j1 = boxArray[i].m_maxIndex;
 
-							dgVector p0 (vertexArray[j0].m_x, vertexArray[j0].m_y, vertexArray[j0].m_z, dgFloat32 (0.0f));
-							dgVector p1 (vertexArray[j1].m_x, vertexArray[j1].m_y, vertexArray[j1].m_z, dgFloat32 (0.0f));
+							dgVector p0 (&vertexArray[j0].m_x);
+							dgVector p1 (&vertexArray[j1].m_x);
 
 							minP.m_x = dgMin (p0.m_x, minP.m_x); 
 							minP.m_y = dgMin (p0.m_y, minP.m_y); 
@@ -460,8 +449,8 @@ class dgAABBTree
 						}
 
 					} else {
-						dgVector median (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-						dgVector varian (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+						dgVector median (dgFloat32 (0.0f));
+						dgVector varian (dgFloat32 (0.0f));
 						for (dgInt32 i = 0; i < boxCount; i ++) {
 
 							dgInt32 j0 = boxArray[i].m_minIndex;
@@ -1007,6 +996,8 @@ class dgAABBTree
 	TreeNode m_front;
 	friend class dgAABBPolygonSoup;
 };
+
+
 
 
 
