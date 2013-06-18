@@ -37,10 +37,6 @@
 
 #define DG_STACK_DEPTH 256
 
-#ifdef _WIN_32_VER
-#pragma warning (disable: 4201)//nonstandard extension used : nameless struct/union
-#endif
-
 
 class dgAABBTree
 {
