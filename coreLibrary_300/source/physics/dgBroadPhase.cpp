@@ -79,14 +79,10 @@ class dgBroadPhase::dgNode
 		dgNode* const left = m_left;
 		dgNode* const right = m_right;
 
-//		m_minBox = dgVector (dgMin (left->m_minBox.m_x, right->m_minBox.m_x), dgMin (left->m_minBox.m_y, right->m_minBox.m_y), dgMin (left->m_minBox.m_z, right->m_minBox.m_z), dgFloat32 (0.0f));
-//		m_maxBox = dgVector (dgMax (left->m_maxBox.m_x, right->m_maxBox.m_x), dgMax (left->m_maxBox.m_y, right->m_maxBox.m_y), dgMax (left->m_maxBox.m_z, right->m_maxBox.m_z), dgFloat32 (0.0f));
 		m_minBox = left->m_minBox.GetMin(right->m_minBox);
 		m_maxBox = left->m_maxBox.GetMax(right->m_maxBox);
-
 		dgVector side0 (m_maxBox - m_minBox);
-		dgVector side1 (side0.m_y, side0.m_z, side0.m_x, dgFloat32 (0.0f));
-		m_surfaceArea = side0.DotProduct4(side1).m_x;
+		m_surfaceArea = side0.DotProduct4(side0.ShiftTripleRight()).m_x;
 	}
 
 
@@ -134,8 +130,7 @@ class dgBroadPhase::dgNode
 		dgAssert (m_maxBox.m_w == dgFloat32 (0.0f));
 
 		dgVector side0 (m_maxBox - m_minBox);
-		dgVector side1 (side0.m_y, side0.m_z, side0.m_x, dgFloat32 (0.0f));
-		m_surfaceArea = side0.DotProduct4(side1).m_x;
+		m_surfaceArea = side0.DotProduct4(side0.ShiftTripleRight()).m_x;
 	}
 
 
@@ -392,13 +387,10 @@ void dgBroadPhase::SelectBroadPhaseType (dgInt32 algorthmType)
 
 DG_INLINE dgFloat32 dgBroadPhase::CalculateSurfaceArea (const dgNode* const node0, const dgNode* const node1, dgVector& minBox, dgVector& maxBox) const
 {
-//	minBox = dgVector (dgMin (node0->m_minBox.m_x, node1->m_minBox.m_x), dgMin (node0->m_minBox.m_y, node1->m_minBox.m_y), dgMin (node0->m_minBox.m_z, node1->m_minBox.m_z), dgFloat32 (0.0f));
-//	maxBox = dgVector (dgMax (node0->m_maxBox.m_x, node1->m_maxBox.m_x), dgMax (node0->m_maxBox.m_y, node1->m_maxBox.m_y), dgMax (node0->m_maxBox.m_z, node1->m_maxBox.m_z), dgFloat32 (0.0f));		
 	minBox = node0->m_minBox.GetMin(node1->m_minBox);
 	maxBox = node0->m_maxBox.GetMax(node1->m_maxBox);
 	dgVector side0 (maxBox - minBox);
-	dgVector side1 (side0.m_y, side0.m_z, side0.m_x, dgFloat32 (0.0f));
-	return side0.DotProduct4(side1).m_x;
+	return side0.DotProduct4(side0.ShiftTripleRight()).m_x;
 }
 
 

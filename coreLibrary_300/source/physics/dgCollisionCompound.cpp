@@ -65,8 +65,8 @@ dgCollisionCompound::dgOOBBTestData::dgOOBBTestData (const dgMatrix& matrix)
 dgCollisionCompound::dgOOBBTestData::dgOOBBTestData (const dgMatrix& matrix, const dgVector& p0, const dgVector& p1)
 	:m_matrix (matrix), m_localP0(p0), m_localP1(p1)
 {
-	m_size = (m_localP1 - m_localP0).Scale3 (dgFloat32 (0.5f));
-	m_origin = (m_localP1 + m_localP0).Scale3 (dgFloat32 (0.5f));
+	m_size = (m_localP1 - m_localP0).CompProduct4 (dgVector::m_half);
+	m_origin = (m_localP1 + m_localP0).CompProduct4 (dgVector::m_half);
 
 	for (dgInt32 i = 0; i < 3; i ++) {
 		m_absMatrix[i][3] = dgFloat32 (0.0f);
@@ -151,8 +151,10 @@ dgCollisionCompound::dgNodeBase::dgNodeBase (dgNodeBase* const left, dgNodeBase*
 	m_left->m_parent = this;
 	m_right->m_parent = this;
 
-	dgVector p0 (dgMin (left->m_p0.m_x, right->m_p0.m_x), dgMin (left->m_p0.m_y, right->m_p0.m_y), dgMin (left->m_p0.m_z, right->m_p0.m_z), dgFloat32 (0.0f));
-	dgVector p1 (dgMax (left->m_p1.m_x, right->m_p1.m_x), dgMax (left->m_p1.m_y, right->m_p1.m_y), dgMax (left->m_p1.m_z, right->m_p1.m_z), dgFloat32 (0.0f));
+//	dgVector p0 (dgMin (left->m_p0.m_x, right->m_p0.m_x), dgMin (left->m_p0.m_y, right->m_p0.m_y), dgMin (left->m_p0.m_z, right->m_p0.m_z), dgFloat32 (0.0f));
+//	dgVector p1 (dgMax (left->m_p1.m_x, right->m_p1.m_x), dgMax (left->m_p1.m_y, right->m_p1.m_y), dgMax (left->m_p1.m_z, right->m_p1.m_z), dgFloat32 (0.0f));
+	dgVector p0 (left->m_p0.GetMin(right->m_p0));
+	dgVector p1 (left->m_p1.GetMax(right->m_p1));
 	SetBox(p0, p1);
 }
 
@@ -174,13 +176,11 @@ void dgCollisionCompound::dgNodeBase::SetBox (const dgVector& p0, const dgVector
 {
 	m_p0 = p0;
 	m_p1 = p1;
-	m_p0.m_w = 0.0f;
-	m_p1.m_w = 0.0f;
-	m_size = (m_p1 - m_p0).Scale3 (dgFloat32 (0.5f));
-	m_origin = (m_p1 + m_p0).Scale3 (dgFloat32 (0.5f));
-
-	dgVector size1(m_size.m_y, m_size.m_z, m_size.m_x, dgFloat32 (0.0f));
-	m_area = m_size % size1;
+	dgAssert (m_p0.m_w == dgFloat32 (0.0f));
+	dgAssert (m_p1.m_w == dgFloat32 (0.0f));
+	m_size = (m_p1 - m_p0).CompProduct4 (dgVector::m_half);
+	m_origin = (m_p1 + m_p0).CompProduct4 (dgVector::m_half);
+	m_area = m_size.DotProduct4(m_size.ShiftTripleRight()).m_x;
 }
 
 bool dgCollisionCompound::dgNodeBase::BoxTest (const dgOOBBTestData& data) const
@@ -1055,11 +1055,10 @@ void dgCollisionCompound::Serialize(dgSerialize callback, void* const userData) 
 
 dgFloat32 dgCollisionCompound::CalculateSurfaceArea (dgNodeBase* const node0, dgNodeBase* const node1, dgVector& minBox, dgVector& maxBox) const
 {
-	minBox = dgVector (dgMin (node0->m_p0.m_x, node1->m_p0.m_x), dgMin (node0->m_p0.m_y, node1->m_p0.m_y), dgMin (node0->m_p0.m_z, node1->m_p0.m_z), dgFloat32 (0.0f));
-	maxBox = dgVector (dgMax (node0->m_p1.m_x, node1->m_p1.m_x), dgMax (node0->m_p1.m_y, node1->m_p1.m_y), dgMax (node0->m_p1.m_z, node1->m_p1.m_z), dgFloat32 (0.0f));		
-	dgVector side0 ((maxBox - minBox).Scale3 (dgFloat32 (0.5f)));
-	dgVector side1 (side0.m_y, side0.m_z, side0.m_x, dgFloat32 (0.0f));
-	return side0 % side1;
+	minBox = node0->m_p0.GetMin(node1->m_p0);
+	maxBox = node0->m_p1.GetMax(node1->m_p1);
+	dgVector side0 ((maxBox - minBox).CompProduct4 (dgVector::m_half));
+	return side0.DotProduct4(side0.ShiftTripleRight()).m_x;
 }
 
 

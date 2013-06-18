@@ -24,8 +24,8 @@
 *  Visual C++ 6.0 created by: Julio Jerez
 *
 ****************************************************************************/
-#ifndef __dgPolygonSoupDatabase0x23413452233__
-#define __dgPolygonSoupDatabase0x23413452233__
+#ifndef __dgPolygonSoupDatabase_H_
+#define __dgPolygonSoupDatabase_H_
 
 
 #include "dgStdafx.h"
@@ -37,7 +37,7 @@ class dgMatrix;
 
 
 
-class dgPolygonSoupDatabase//: public dgRef
+class dgPolygonSoupDatabase
 {
 	public:
 	dgFloat32 GetRadius() const;
@@ -56,9 +56,8 @@ class dgPolygonSoupDatabase//: public dgRef
 	
 	protected:
 	virtual void ForAllSectors (const dgVector& minBox, const dgVector& maxBox, const dgVector& boxVelocity, dgAABBIntersectCallback callback, void* const context) const;
-	virtual void ForAllSectorsSimd (const dgVector& minBox, const dgVector& maxBox, const dgVector& boxVelocity, dgAABBIntersectCallback callback, void* const context) const;
 	virtual void ForAllSectorsRayHit (const dgFastRayTest& ray, dgRayIntersectCallback callback, void* const context) const;
-	virtual void ForAllSectorsRayHitSimd (const dgFastRayTest& ray, dgRayIntersectCallback callback, void* const context) const;
+
 
 	dgPolygonSoupDatabase(const char* const name = NULL);
 	virtual ~dgPolygonSoupDatabase ();
@@ -115,12 +114,6 @@ inline dgFloat32 dgPolygonSoupDatabase::GetRadius() const
 	return 0.0f;
 }
 
-inline void dgPolygonSoupDatabase::ForAllSectorsSimd (const dgVector& minBox, const dgVector& maxBox, const dgVector& boxVelocity, dgAABBIntersectCallback callback, void* const context) const
-{
-	dgAssert (0);
-}
-
-
 
 inline void dgPolygonSoupDatabase::ForAllSectors (const dgVector& minBox, const dgVector& maxBox, const dgVector& boxVelocity, dgAABBIntersectCallback callback, void* const context) const
 {
@@ -134,11 +127,6 @@ inline void dgPolygonSoupDatabase::GetAABB (dgVector& p0, dgVector& p1) const
 
 
 inline void dgPolygonSoupDatabase::ForAllSectorsRayHit (const dgFastRayTest& ray, dgRayIntersectCallback callback, void* const context) const
-{
-	dgAssert (0);
-}
-
-inline void dgPolygonSoupDatabase::ForAllSectorsRayHitSimd (const dgFastRayTest& ray, dgRayIntersectCallback callback, void* const context) const
 {
 	dgAssert (0);
 }
