@@ -1878,24 +1878,24 @@ void dgAABBPolygonSoup::Create (dgMemoryAllocator* const allocator, const dgPoly
 			} 
 		}
 
-		{
-			dgFloat64 newCost = dgFloat32 (1.0e20f);
-			dgFloat64 prevCost = newCost;
-			do {
-				prevCost = newCost;
-				for (dgList<dgNodeBuilder*>::dgListNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) {
-					dgNodeBuilder* const node = listNode->GetInfo();
-					ImproveNodeFitness (node);
-				}
 
-				newCost = dgFloat32 (0.0f);
-				for (dgList<dgNodeBuilder*>::dgListNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) {
-					dgNodeBuilder* const node = listNode->GetInfo();
-					newCost += node->m_area;
-				}
-			} while (newCost < (prevCost * dgFloat32 (0.9999f)));
-		}
+		dgFloat64 newCost = dgFloat32 (1.0e20f);
+		dgFloat64 prevCost = newCost;
+		do {
+			prevCost = newCost;
+			for (dgList<dgNodeBuilder*>::dgListNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) {
+				dgNodeBuilder* const node = listNode->GetInfo();
+				ImproveNodeFitness (node);
+			}
 
+			newCost = dgFloat32 (0.0f);
+			for (dgList<dgNodeBuilder*>::dgListNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) {
+				dgNodeBuilder* const node = listNode->GetInfo();
+				newCost += node->m_area;
+			}
+		} while (newCost < (prevCost * dgFloat32 (0.9999f)));
+
+		root = list.GetLast()->GetInfo();
 		while (root->m_parent) {
 			root = root->m_parent;
 		}
@@ -2231,7 +2231,7 @@ void dgAABBPolygonSoup::ForAllSectors (const dgVector& minBox, const dgVector& m
 	dgInt32 stack = 1;
 	dgVector size ((maxBox - minBox).CompProduct4(dgVector::m_half));
 	dgVector origin ((maxBox + minBox).CompProduct4(dgVector::m_half));
-	
+
 	const dgTriplex* const vertexArray = (dgTriplex*) m_localVertex;
 
 	if ((boxDistanceTravel % boxDistanceTravel) < dgFloat32 (1.0e-8f)) {
