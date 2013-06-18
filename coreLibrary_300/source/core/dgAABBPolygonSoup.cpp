@@ -1353,16 +1353,6 @@ dgIntersectStatus dgAABBPolygonSoup::CalculateDisjointedFaceEdgeNormals (void* c
 
 	AdjacentdFaces& adjacentFaces = *((AdjacentdFaces*)context);
 
-
-//if ((adjacentFaces.m_index[0] == 29404) && (adjacentFaces.m_index[1] == 23332) && (adjacentFaces.m_index[2] == 18503) && (adjacentFaces.m_index[3] == 1560))
-//{
-//	if ((indexArray[0] == 29636) && (indexArray[1] == 31197) && (indexArray[2] == 0) && (indexArray[3] == 1175))
-//		indexCount *=1;
-//	if ((indexArray[0] == 1560) && (indexArray[1] == 2585) && (indexArray[2] == 28583) && (indexArray[3] == 29404))
-//		indexCount *=1;
-//}
-
-
 	if (adjacentFaces.m_index != indexArray) {	
 		dgInt32 adjacentCount = adjacentFaces.m_count;
 		dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat32));
