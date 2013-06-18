@@ -66,14 +66,14 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 			return ray.BoxTest (p0, p1);
 		}
 
-//		DG_INLINE dgFloat32 BoxIntersect (const dgFastRayTest& ray, const dgTriplex* const vertexArray, const dgVector& boxP0, const dgVector& boxP1) const
-//		{
-//			dgVector p0 (&vertexArray[m_indexBox0].m_x);
-//			dgVector p1 (&vertexArray[m_indexBox1].m_x);
-//			dgVector minBox (p0 - boxP1);
-//			dgVector maxBox (p1 - boxP0);
-//			return ray.BoxIntersect(minBox, maxBox);
-//		}
+		DG_INLINE dgFloat32 BoxIntersect (const dgFastRayTest& ray, const dgTriplex* const vertexArray, const dgVector& boxP0, const dgVector& boxP1) const
+		{
+			dgVector p0 (&vertexArray[m_indexBox0].m_x);
+			dgVector p1 (&vertexArray[m_indexBox1].m_x);
+			dgVector minBox (p0 - boxP1);
+			dgVector maxBox (p1 - boxP0);
+			return ray.BoxIntersect(minBox, maxBox);
+		}
 
 		DG_INLINE dgFloat32 BoxPenetration (const dgTriplex* const vertexArray, const dgVector& boxP0, const dgVector& boxP1) const
 		{
