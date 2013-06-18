@@ -25,8 +25,8 @@
 *  Visual C++ 4.0 base by Julio Jerez
 *
 ****************************************************************************/
-#ifndef __dgAABBCollisionGeometry0x2341753767__
-#define __dgAABBCollisionGeometry0x2341753767__
+#ifndef __DG_AABB_POLYGON_SOUP_H_
+#define __DG_AABB_POLYGON_SOUP_H_
 
 #include "dgStdafx.h"
 #include "dgPolygonSoupDatabase.h"
@@ -34,6 +34,84 @@
 
 class dgPolygonSoupDatabaseBuilder;
 
+//#define DG_NEW_AABB_TREE
+
+#ifdef DG_NEW_AABB_TREE
+
+class dgAABBPolygonSoup: public dgPolygonSoupDatabase
+{
+	public:
+	DG_MSC_VECTOR_AVX_ALIGMENT
+	class dgNode
+	{
+		public:
+		dgNode ()
+			:m_indexBox0(0)
+			,m_indexBox1(0)
+			,m_left(NULL)
+			,m_right(NULL)
+		{
+		}
+
+		dgInt32 m_indexBox0;
+		dgInt32 m_indexBox1;
+		dgNode* m_left;
+		dgNode* m_right;
+	} DG_GCC_VECTOR_AVX_ALIGMENT;
+
+	class dgNodeBuilder;
+
+//	dgInt32 GetIndexCount() const
+//	{
+//		return m_indexCount;
+//	}
+
+//	dgInt32* GetIndexPool() const
+//	{
+//		return m_indices;
+//	}
+
+//	virtual void GetAABB (dgVector& p0, dgVector& p1) const;
+	virtual void Serialize (dgSerialize callback, void* const userData) const {dgAssert (0);}
+	virtual void Deserialize (dgDeserialize callback, void* const userData) {dgAssert (0);}
+
+	protected:
+	dgAABBPolygonSoup ();
+	virtual ~dgAABBPolygonSoup ();
+
+	void Create (dgMemoryAllocator* const allocator, const dgPolygonSoupDatabaseBuilder& builder, bool optimizedBuild);
+	virtual void ForAllSectors (const dgVector& minBox, const dgVector& maxBox, const dgVector& boxDistanceTravel, dgFloat32 m_maxT, dgAABBIntersectCallback callback, void* const context) const {dgAssert (0);}
+
+	void* GetRootNode() const {dgAssert (0);return NULL;}
+	void* GetBackNode(const void* const root) const {dgAssert (0);return NULL;}
+	void* GetFrontNode(const void* const root) const {dgAssert (0);return NULL;}
+	void GetNodeAABB(const void* const root, dgVector& p0, dgVector& p1) const {dgAssert (0);}
+	virtual dgVector ForAllSectorsSupportVectex (const dgVector& dir) const {dgAssert (0); return dgVector(0.0f);}	
+/*
+	void CalculateAdjacendy ();
+	
+	dgFloat32 CalculateFaceMaxSize (dgTriplex* const vertex, dgInt32 indexCount, const dgInt32* const indexArray) const;
+
+	virtual void ForAllSectorsRayHit (const dgFastRayTest& ray, dgRayIntersectCallback callback, void* const context) const;
+*/	
+
+	private:
+//	static dgIntersectStatus CalculateManifoldFaceEdgeNormals (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount);
+//	static dgIntersectStatus CalculateDisjointedFaceEdgeNormals (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount, dgFloat32 hitDistance);
+//	static dgIntersectStatus CalculateAllFaceEdgeNormals (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount, dgFloat32 hitDistance);
+//	dgInt32 m_nodesCount;
+//	dgInt32 m_indexCount;
+//	dgInt32 *m_indices;
+//	void* m_aabb;
+	void ImproveNodeFitness (dgNodeBuilder* const node) const;
+
+	dgInt32 m_nodesCount;
+	dgInt32 m_indexCount;
+	dgNode* m_aabb;
+	dgInt32* m_indices;
+};
+
+#else
 class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 {
 	public:
@@ -61,7 +139,7 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 	void GetNodeAABB(const void* const root, dgVector& p0, dgVector& p1) const;
 
 	void CalculateAdjacendy ();
-	void Create (const dgPolygonSoupDatabaseBuilder& builder, bool optimizedBuild);
+	void Create (dgMemoryAllocator* const allocator, const dgPolygonSoupDatabaseBuilder& builder, bool optimizedBuild);
 	dgFloat32 CalculateFaceMaxSize (dgTriplex* const vertex, dgInt32 indexCount, const dgInt32* const indexArray) const;
 
 	virtual void ForAllSectors (const dgVector& minBox, const dgVector& maxBox, const dgVector& boxDistanceTravel, dgFloat32 m_maxT, dgAABBIntersectCallback callback, void* const context) const;
@@ -79,7 +157,7 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 	void* m_aabb;
 };
 
-
+#endif
 
 #endif
 
