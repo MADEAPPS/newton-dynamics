@@ -804,12 +804,14 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 		dgInt32 faceIndexCount0 = 0; 
 		dgInt32 faceIndexCount1 = 0; 
 
+
+dgAssert (0);
+/*
 		dgVector boxOrigin ((data->m_boxP1 + data->m_boxP0).Scale4 (dgFloat32 (0.5f)));
 		dgVector boxSize ((data->m_boxP1 - data->m_boxP0).Scale4 (dgFloat32 (0.5f)));
 
 		if (data->m_doContinuesCollisionTest) {
 			for (dgInt32 i = 0; i < faceCount; i ++) {
-//				if (data->m_objCollision->PolygonOBBTest (&vertex[0].m_x, sizeof (dgVector), &indices[faceIndexCount1], 3, *data)) {
 				const dgInt32* const indexArray = &indices[faceIndexCount1]; 
 				const dgVector& faceNormal = vertex[indexArray[4]];
 				if (PolygonBoxOBBRayTest (faceNormal, 3, indexArray, stride, &vertex[0].m_x, boxOrigin, boxSize, data->m_boxDistanceTravelInMeshSpace)) {
@@ -859,6 +861,7 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 				}
 			}
 		}
+*/
 	}
 }
 

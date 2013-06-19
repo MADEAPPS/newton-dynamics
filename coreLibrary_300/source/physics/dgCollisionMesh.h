@@ -28,8 +28,9 @@
 #include "dgCollisionInstance.h"
 
 
-#define DG_MAX_COLLIDING_FACES				(256)
-#define DG_MAX_COLLIDING_VERTEX				(DG_MAX_COLLIDING_FACES * 8)
+#define DG_MAX_COLLIDING_FACES				(128)
+#define DG_MAX_COLLIDING_INDICES			(2 * DG_MAX_COLLIDING_FACES * 5)
+//#define DG_MAX_COLLIDING_VERTEX___			(DG_MAX_COLLIDING_FACES * 8)
 
 
 class dgCollisionMesh;
@@ -100,7 +101,7 @@ class dgPolygonMeshDesc
 	bool m_doContinuesCollisionTest;
 
 	dgInt32 m_globalFaceIndexCount[DG_MAX_COLLIDING_FACES];
-	dgInt32 m_globalFaceVertexIndex[DG_MAX_COLLIDING_VERTEX];
+	dgInt32 m_globalFaceVertexIndex[DG_MAX_COLLIDING_INDICES];
 	dgFloat32 m_globalHitDistance[DG_MAX_COLLIDING_FACES];
 } DG_GCC_VECTOR_ALIGMENT;
 

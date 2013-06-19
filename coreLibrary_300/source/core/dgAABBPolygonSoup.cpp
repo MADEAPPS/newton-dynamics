@@ -1244,6 +1244,7 @@ void dgAABBPolygonSoup::ForAllSectors (const dgVector& minBox, const dgVector& m
 
 	} else {
 		dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), boxDistanceTravel);
+		dgFastAABBInfo aabbIndo (minBox, maxBox);
 
 		dgInt32 stack = 1;
 		stackPool[0] = m_aabb;
@@ -1262,7 +1263,8 @@ void dgAABBPolygonSoup::ForAllSectors (const dgVector& minBox, const dgVector& m
 						const dgInt32* const indices = &m_indices[index];
 						dgInt32 normalIndex = indices[vCount + 1];
 						dgVector faceNormal (&vertexArray[normalIndex].m_x);
-						dgFloat32 hitDistance = PolygonBoxOBBRayTest (faceNormal, vCount, indices, stride, &vertexArray[0].m_x, origin, size, boxDistanceTravel);
+						//dgFloat32 hitDistance = PolygonBoxOBBRayTest (faceNormal, vCount, indices, stride, &vertexArray[0].m_x, origin, size, boxDistanceTravel);
+						dgFloat32 hitDistance = aabbIndo.PolygonBoxOBBRayTest (faceNormal, vCount, indices, stride, &vertexArray[0].m_x, ray);
 						if (hitDistance < dgFloat32 (1.0f)) {
 							if (callback(context, &vertexArray[0].m_x, sizeof (dgTriplex), indices, vCount, hitDistance) == t_StopSearh) {
 								return;
@@ -1294,7 +1296,8 @@ void dgAABBPolygonSoup::ForAllSectors (const dgVector& minBox, const dgVector& m
 						const dgInt32* const indices = &m_indices[index];
 						dgInt32 normalIndex = indices[vCount + 1];
 						dgVector faceNormal (&vertexArray[normalIndex].m_x);
-						dgFloat32 hitDistance = PolygonBoxOBBRayTest (faceNormal, vCount, indices, stride, &vertexArray[0].m_x, origin, size, boxDistanceTravel);
+						//dgFloat32 hitDistance = PolygonBoxOBBRayTest (faceNormal, vCount, indices, stride, &vertexArray[0].m_x, origin, size, boxDistanceTravel);
+						dgFloat32 hitDistance = aabbIndo.PolygonBoxOBBRayTest (faceNormal, vCount, indices, stride, &vertexArray[0].m_x, ray);
 						if (hitDistance < dgFloat32 (1.0f)) {
 							if (callback(context, &vertexArray[0].m_x, sizeof (dgTriplex), indices, vCount, hitDistance) == t_StopSearh) {
 								return;
