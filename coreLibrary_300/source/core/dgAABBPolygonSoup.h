@@ -35,7 +35,6 @@ class dgPolygonSoupDatabaseBuilder;
 class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 {
 	public:
-	DG_MSC_VECTOR_AVX_ALIGMENT
 	class dgNode
 	{
 		public:
@@ -44,6 +43,57 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 			m_binary = 0,
 			m_leaf,
 		};
+
+		class dgLeafNodePtr
+		{
+			#define DG_INDEX_COUNT_BITS 6
+
+			public:
+			inline dgLeafNodePtr ()
+			{
+				dgAssert (0);
+			}
+
+			inline dgLeafNodePtr (dgUnsigned32 node)
+			{
+				m_node = node;
+				dgAssert (!IsLeaf());
+			}
+
+			inline dgUnsigned32 IsLeaf () const 
+			{
+				return m_node & 0x80000000;
+			}
+
+			inline dgUnsigned32 GetCount() const 
+			{
+				dgAssert (IsLeaf());
+				return (m_node & (~0x80000000)) >> (32 - DG_INDEX_COUNT_BITS - 1);
+			}
+
+			inline dgUnsigned32 GetIndex() const 
+			{
+				dgAssert (IsLeaf());
+				return m_node & (~(-(1 << (32 - DG_INDEX_COUNT_BITS - 1))));
+			}
+
+
+			inline dgLeafNodePtr (dgUnsigned32 faceIndexCount, dgUnsigned32 faceIndexStart)
+			{
+				dgAssert (faceIndexCount < (1<<DG_INDEX_COUNT_BITS));
+				m_node = 0x80000000 | (faceIndexCount << (32 - DG_INDEX_COUNT_BITS - 1)) | faceIndexStart;
+			}
+
+			inline dgNode* GetNode (const void* const root) const
+			{
+				return ((dgNode*) root) + m_node;
+			}
+
+			union {
+				dgUnsigned32 m_node;
+			};
+		};
+
 
 		dgNode ()
 			:m_indexBox0(0)
@@ -84,26 +134,14 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 			return dist.m_x;
 		}
 
-
-
 		dgInt32 m_indexBox0;
-		dgInt32 m_indexBox1 : 31;
-		dgInt32 m_nodeType	:  1;
-		dgNode* m_left;
-		dgNode* m_right;
-	} DG_GCC_VECTOR_AVX_ALIGMENT;
+		dgInt32 m_indexBox1;
+		dgLeafNodePtr m_left;
+		dgLeafNodePtr m_right;
+	};
 
 	class dgNodeBuilder;
 
-//	dgInt32 GetIndexCount() const
-//	{
-//		return m_indexCount;
-//	}
-
-//	dgInt32* GetIndexPool() const
-//	{
-//		return m_indices;
-//	}
 
 	virtual void GetAABB (dgVector& p0, dgVector& p1) const;
 	virtual void Serialize (dgSerialize callback, void* const userData) const {dgAssert (0);}
@@ -124,14 +162,18 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 
 	void* GetBackNode(const void* const root) const 
 	{
-		dgNode* const node = ((dgNode*)root)->m_left;
-		return (node->m_nodeType & dgNode::m_leaf) ? NULL: node;
+		dgAssert (0);
+		return NULL;
+//		dgNode* const node = ((dgNode*)root)->m_left;
+//		return (node->m_nodeType & dgNode::m_leaf) ? NULL: node;
 	}
 
 	void* GetFrontNode(const void* const root) const 
 	{
-		dgNode* const node = ((dgNode*)root)->m_right;
-		return (node->m_nodeType & dgNode::m_leaf) ? NULL: node;
+		dgAssert (0);
+		return NULL;
+//		dgNode* const node = ((dgNode*)root)->m_right;
+//		return (node->m_nodeType & dgNode::m_leaf) ? NULL: node;
 	}
 
 	void GetNodeAABB(const void* const root, dgVector& p0, dgVector& p1) const 

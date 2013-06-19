@@ -1478,7 +1478,11 @@ class dgAABBPolygonSoup::dgNodeBuilder: public dgAABBPolygonSoup::dgNode
 	dgNodeBuilder (dgTriplex* const vertexArray, dgInt32 faceIndex, dgInt32 indexCount, const dgInt32* const indexArray)
 		:dgNode()
 		,m_parent (NULL)
-		,m_enumeration(0)
+		,m_right (NULL)
+		,m_left (NULL)
+		,m_indexBox0(0)
+		,m_indexBox1(0)
+		,m_enumeration(-1)
 		,m_faceIndex(faceIndex)
 		,m_indexCount(indexCount)
 		,m_faceIndices(indexArray)
@@ -1501,15 +1505,17 @@ class dgAABBPolygonSoup::dgNodeBuilder: public dgAABBPolygonSoup::dgNode
 	dgNodeBuilder (dgNodeBuilder* const left, dgNodeBuilder* const right)
 		:dgNode()
 		,m_parent(NULL)
-		,m_enumeration(0)
+		,m_left(left)
+		,m_right(right)
+		,m_indexBox0(0)
+		,m_indexBox1(0)
+		,m_enumeration(-1)
 		,m_faceIndex(0)
 		,m_indexCount(0)
 		,m_faceIndices(NULL)
 	{
-		m_left = left;
-		m_right = right;
-		((dgNodeBuilder*)m_left)->m_parent = this;
-		((dgNodeBuilder*)m_right)->m_parent = this;
+		m_left->m_parent = this;
+		m_right->m_parent = this;
 
 		dgVector p0 (left->m_p0.GetMin(right->m_p0));
 		dgVector p1 (left->m_p1.GetMax(right->m_p1));
@@ -1541,6 +1547,10 @@ class dgAABBPolygonSoup::dgNodeBuilder: public dgAABBPolygonSoup::dgNode
 	dgVector m_origin;
 	dgFloat32 m_area;
 	dgNodeBuilder* m_parent;
+	dgNodeBuilder* m_right;
+	dgNodeBuilder* m_left;
+	dgInt32 m_indexBox0;
+	dgInt32 m_indexBox1;
 	dgInt32 m_enumeration;
 	dgInt32 m_faceIndex;
 	dgInt32 m_indexCount;
@@ -1579,11 +1589,11 @@ void dgAABBPolygonSoup::ImproveNodeFitness (dgNodeBuilder* const node) const
 
 			dgVector cost1P0;
 			dgVector cost1P1;		
-			dgFloat32 cost1 = dgNodeBuilder::CalculateSurfaceArea ((dgNodeBuilder*)(node->m_right), (dgNodeBuilder*)(node->m_parent->m_right), cost1P0, cost1P1);
+			dgFloat32 cost1 = dgNodeBuilder::CalculateSurfaceArea (node->m_right, node->m_parent->m_right, cost1P0, cost1P1);
 
 			dgVector cost2P0;
 			dgVector cost2P1;		
-			dgFloat32 cost2 = dgNodeBuilder::CalculateSurfaceArea ((dgNodeBuilder*)(node->m_left), (dgNodeBuilder*)(node->m_parent->m_right), cost2P0, cost2P1);
+			dgFloat32 cost2 = dgNodeBuilder::CalculateSurfaceArea (node->m_left, node->m_parent->m_right, cost2P0, cost2P1);
 
 			if ((cost1 <= cost0) && (cost1 <= cost2)) {
 				dgNodeBuilder* const parent = node->m_parent;
@@ -1603,7 +1613,7 @@ void dgAABBPolygonSoup::ImproveNodeFitness (dgNodeBuilder* const node) const
 				}
 				node->m_parent = parent->m_parent;
 				parent->m_parent = node;
-				((dgNodeBuilder*)node->m_right)->m_parent = parent;
+				node->m_right->m_parent = parent;
 				parent->m_left = node->m_right;
 				node->m_right = parent;
 				parent->m_p0 = cost1P0;
@@ -1630,7 +1640,7 @@ void dgAABBPolygonSoup::ImproveNodeFitness (dgNodeBuilder* const node) const
 				}
 				node->m_parent = parent->m_parent;
 				parent->m_parent = node;
-				((dgNodeBuilder*)node->m_left)->m_parent = parent;
+				node->m_left->m_parent = parent;
 				parent->m_left = node->m_left;
 				node->m_left = parent;
 
@@ -1645,11 +1655,11 @@ void dgAABBPolygonSoup::ImproveNodeFitness (dgNodeBuilder* const node) const
 
 			dgVector cost1P0;
 			dgVector cost1P1;		
-			dgFloat32 cost1 = dgNodeBuilder::CalculateSurfaceArea ((dgNodeBuilder*)(node->m_left), (dgNodeBuilder*)(node->m_parent->m_left), cost1P0, cost1P1);
+			dgFloat32 cost1 = dgNodeBuilder::CalculateSurfaceArea (node->m_left, node->m_parent->m_left, cost1P0, cost1P1);
 
 			dgVector cost2P0;
 			dgVector cost2P1;		
-			dgFloat32 cost2 = dgNodeBuilder::CalculateSurfaceArea ((dgNodeBuilder*)(node->m_right), (dgNodeBuilder*)(node->m_parent->m_left), cost2P0, cost2P1);
+			dgFloat32 cost2 = dgNodeBuilder::CalculateSurfaceArea (node->m_right, node->m_parent->m_left, cost2P0, cost2P1);
 
 			if ((cost1 <= cost0) && (cost1 <= cost2)) {
 				dgNodeBuilder* const parent = node->m_parent;
@@ -1669,7 +1679,7 @@ void dgAABBPolygonSoup::ImproveNodeFitness (dgNodeBuilder* const node) const
 				}
 				node->m_parent = parent->m_parent;
 				parent->m_parent = node;
-				((dgNodeBuilder*)node->m_left)->m_parent = parent;
+				node->m_left->m_parent = parent;
 				parent->m_right = node->m_left;
 				node->m_left = parent;
 
@@ -1697,7 +1707,7 @@ void dgAABBPolygonSoup::ImproveNodeFitness (dgNodeBuilder* const node) const
 				}
 				node->m_parent = parent->m_parent;
 				parent->m_parent = node;
-				((dgNodeBuilder*)node->m_right)->m_parent = parent;
+				node->m_right->m_parent = parent;
 				parent->m_right = node->m_right;
 				node->m_right = parent;
 
@@ -1752,9 +1762,10 @@ void dgAABBPolygonSoup::Create (dgMemoryAllocator* const allocator, const dgPoly
 	if (builder.m_faceCount == 0) {
 		return;
 	}
-	
+	dgAssert (builder.m_faceCount >= 2);
 	m_strideInBytes = sizeof (dgTriplex);
-	m_nodesCount = builder.m_faceCount * 2 - 1;
+	//m_nodesCount = builder.m_faceCount * 2 - 1;
+	m_nodesCount = builder.m_faceCount - 1;
 	m_indexCount = builder.m_indexCount * 2 + builder.m_faceCount;
 	m_vertexCount = builder.m_normalCount + builder.m_vertexCount;
 	m_aabb = (dgNode*) dgMallocStack (sizeof (dgNode) * m_nodesCount);
@@ -1775,12 +1786,12 @@ void dgAABBPolygonSoup::Create (dgMemoryAllocator* const allocator, const dgPoly
 	}
 
 	dgInt32 polygonIndex = 0;
+	dgInt32 constructorNodesCount = builder.m_faceCount * 2 - 1;
 	const dgInt32* const indices = &builder.m_vertexIndex[0];
-	dgStack<dgNodeBuilder> constructor (m_nodesCount); 
+	dgStack<dgNodeBuilder> constructor (constructorNodesCount); 
 
 	dgNodeBuilder* root = NULL;
 	dgInt32 allocatorIndex = 0;
-
 
 	for (dgInt32 i = 0; i < builder.m_faceCount; i ++) {
 		dgInt32 indexCount = builder.m_faceVertexCount[i] - 1;
@@ -1804,19 +1815,19 @@ void dgAABBPolygonSoup::Create (dgMemoryAllocator* const allocator, const dgPoly
 
 				dgVector leftP0;
 				dgVector leftP1;		
-				dgFloat32 leftSurfaceArea = dgNodeBuilder::CalculateSurfaceArea (newNode, (dgNodeBuilder*)sibling->m_left, leftP0, leftP1);
+				dgFloat32 leftSurfaceArea = dgNodeBuilder::CalculateSurfaceArea (newNode, sibling->m_left, leftP0, leftP1);
 
 				dgVector rightP0;
 				dgVector rightP1;		
-				dgFloat32 rightSurfaceArea = dgNodeBuilder::CalculateSurfaceArea (newNode, (dgNodeBuilder*)sibling->m_right, rightP0, rightP1);
+				dgFloat32 rightSurfaceArea = dgNodeBuilder::CalculateSurfaceArea (newNode, sibling->m_right, rightP0, rightP1);
 
 				if (leftSurfaceArea < rightSurfaceArea) {
-					sibling = (dgNodeBuilder*)sibling->m_left;
+					sibling = sibling->m_left;
 					p0 = leftP0;
 					p1 = leftP1;
 					surfaceArea = leftSurfaceArea;
 				} else {
-					sibling = (dgNodeBuilder*)sibling->m_right;
+					sibling = sibling->m_right;
 					p0 = rightP0;
 					p1 = rightP1;
 					surfaceArea = rightSurfaceArea;
@@ -1826,21 +1837,21 @@ void dgAABBPolygonSoup::Create (dgMemoryAllocator* const allocator, const dgPoly
 			if (!sibling->m_parent) {
 				root = new (&constructor[allocatorIndex]) dgNodeBuilder (sibling, newNode);
 				allocatorIndex ++;
-				dgAssert (allocatorIndex <= m_nodesCount);
+				dgAssert (allocatorIndex <= constructorNodesCount);
 			} else {
 
 				dgNodeBuilder* const parent = sibling->m_parent;
 				if (parent->m_left == sibling) {
 					dgNodeBuilder* const node = new (&constructor[allocatorIndex]) dgNodeBuilder (sibling, newNode);
 					allocatorIndex ++;
-					dgAssert (allocatorIndex <= m_nodesCount);
+					dgAssert (allocatorIndex <= constructorNodesCount);
 					parent->m_left = node;
 					node->m_parent = parent;
 				} else {
 					dgAssert (parent->m_right == sibling); 
 					dgNodeBuilder* const node = new (&constructor[allocatorIndex]) dgNodeBuilder (sibling, newNode);
 					allocatorIndex ++;
-					dgAssert (allocatorIndex <= m_nodesCount);
+					dgAssert (allocatorIndex <= constructorNodesCount);
 					parent->m_right = node;
 					node->m_parent = parent;
 				}
@@ -1864,11 +1875,10 @@ void dgAABBPolygonSoup::Create (dgMemoryAllocator* const allocator, const dgPoly
 			if (node->m_left) {
 				dgAssert (node->m_right);
 				list.Append(node);
-				stack.Append((dgNodeBuilder*)node->m_right);
-				stack.Append((dgNodeBuilder*)node->m_left);
+				stack.Append(node->m_right);
+				stack.Append(node->m_left);
 			} 
 		}
-
 
 		dgFloat64 newCost = dgFloat32 (1.0e20f);
 		dgFloat64 prevCost = newCost;
@@ -1899,14 +1909,14 @@ void dgAABBPolygonSoup::Create (dgMemoryAllocator* const allocator, const dgPoly
 	dgInt32 nodeIndex = 0;
 	while (list.GetCount())  {
 		dgNodeBuilder* const node = list.GetFirst()->GetInfo();
-		node->m_enumeration = nodeIndex;
-		nodeIndex ++;
 		list.Remove(list.GetFirst());
 
 		if (node->m_left) {
+			node->m_enumeration = nodeIndex;
+			nodeIndex ++;
 			dgAssert (node->m_right);
-			list.Append((dgNodeBuilder*)node->m_left);
-			list.Append((dgNodeBuilder*)node->m_right);
+			list.Append(node->m_left);
+			list.Append(node->m_right);
 		}
 	}
 	dgAssert(!list.GetCount());
@@ -1914,64 +1924,77 @@ void dgAABBPolygonSoup::Create (dgMemoryAllocator* const allocator, const dgPoly
 	dgStack<dgVector> aabbMem (2 * m_nodesCount);
 	dgVector* const aabbPoints = &aabbMem[0];
 
-
 	dgInt32 vertexIndex = 0;
 	dgInt32 aabbNodeIndex = 0;
 	list.Append(root);
-	dgInt32* indexMap = m_indices;
+//	dgInt32* indexMap = m_indices;
+	dgInt32 indexMap = 0;
 	while (list.GetCount())  {
 
 		dgNodeBuilder* const node = list.GetFirst()->GetInfo();
 		list.Remove(list.GetFirst());
 
-		dgNode& aabbNode = m_aabb[aabbNodeIndex];
-		aabbNodeIndex ++;
-		dgAssert (aabbNodeIndex <= (builder.m_faceCount * 2 - 1));
-
-		if (node->m_left) {
+		if (node->m_enumeration >= 0) {
+			dgAssert (node->m_left);
 			dgAssert (node->m_right);
-			aabbNode.m_nodeType = dgNode::m_binary;
-			aabbNode.m_left = &m_aabb[((dgNodeBuilder*)node->m_left)->m_enumeration];
-			aabbNode.m_right = &m_aabb[((dgNodeBuilder*)node->m_right)->m_enumeration];
+			dgNode& aabbNode = m_aabb[aabbNodeIndex];
+			aabbNodeIndex ++;
+			dgAssert (aabbNodeIndex <= m_nodesCount);
+
+			if (node->m_parent) {
+				if (node->m_parent->m_left == node) {
+					m_aabb[node->m_parent->m_enumeration].m_left = dgNode::dgLeafNodePtr (&m_aabb[node->m_parent->m_enumeration] - m_aabb);
+				} else {
+					dgAssert (node->m_parent->m_right == node);
+					m_aabb[node->m_parent->m_enumeration].m_right = dgNode::dgLeafNodePtr (&m_aabb[node->m_parent->m_enumeration] - m_aabb);
+				}
+			}
+
+			aabbPoints[vertexIndex].m_x = node->m_p0.m_x;
+			aabbPoints[vertexIndex].m_y = node->m_p0.m_y;
+			aabbPoints[vertexIndex].m_z = node->m_p0.m_z;
+
+			aabbPoints[vertexIndex + 1].m_x = node->m_p1.m_x;
+			aabbPoints[vertexIndex + 1].m_y = node->m_p1.m_y;
+			aabbPoints[vertexIndex + 1].m_z = node->m_p1.m_z;
+
+			aabbNode.m_indexBox0 = vertexIndex;
+			aabbNode.m_indexBox1 = vertexIndex + 1;
+
+			vertexIndex += 2;
+
 		} else {
+			dgAssert (!node->m_left);
 			dgAssert (!node->m_right);
-			aabbNode.m_nodeType = dgNode::m_leaf;
-			aabbNode.m_left = (dgNode*) node->m_indexCount;
-			aabbNode.m_right = (dgNode*) indexMap;
+			if (node->m_parent) {
+				if (node->m_parent->m_left == node) {
+					m_aabb[node->m_parent->m_enumeration].m_left = dgNode::dgLeafNodePtr (node->m_indexCount, indexMap);
+				} else {
+					dgAssert (node->m_parent->m_right == node);
+					m_aabb[node->m_parent->m_enumeration].m_right = dgNode::dgLeafNodePtr (node->m_indexCount, indexMap);
+				}
+			}
 
 			// index format i0, i1, i2, ... , id, normal, e0Normal, e1Normal, e2Normal, ..., faceSize
 			for (dgInt32 j = 0; j < node->m_indexCount; j ++) {
-				indexMap[j] = node->m_faceIndices[ + j];
-				indexMap[j + node->m_indexCount + 2] = -1;
+				m_indices[indexMap + j] = node->m_faceIndices[j];
+				m_indices[indexMap + j + node->m_indexCount + 2] = -1;
 			}
 
 			// face attribute
-			indexMap[node->m_indexCount] = node->m_faceIndices[node->m_indexCount];
+			m_indices[indexMap + node->m_indexCount] = node->m_faceIndices[node->m_indexCount];
 			// face normal
-			indexMap[node->m_indexCount + 1] = builder.m_vertexCount + builder.m_normalIndex[node->m_faceIndex];
+			m_indices[indexMap + node->m_indexCount + 1] = builder.m_vertexCount + builder.m_normalIndex[node->m_faceIndex];
 			// face size
-			indexMap[node->m_indexCount * 2 + 2] = dgInt32 (CalculateFaceMaxSize (&tmpVertexArray[0], dgInt32 (aabbNode.m_left), (dgInt32*) aabbNode.m_right));
+			m_indices[indexMap + node->m_indexCount * 2 + 2] = dgInt32 (CalculateFaceMaxSize (&tmpVertexArray[0], node->m_indexCount, node->m_faceIndices));
 
 			indexMap += node->m_indexCount * 2 + 3;
 		}
 
-		aabbPoints[vertexIndex].m_x = node->m_p0.m_x;
-		aabbPoints[vertexIndex].m_y = node->m_p0.m_y;
-		aabbPoints[vertexIndex].m_z = node->m_p0.m_z;
-
-		aabbPoints[vertexIndex + 1].m_x = node->m_p1.m_x;
-		aabbPoints[vertexIndex + 1].m_y = node->m_p1.m_y;
-		aabbPoints[vertexIndex + 1].m_z = node->m_p1.m_z;
-
-		aabbNode.m_indexBox0 = vertexIndex;
-		aabbNode.m_indexBox1 = vertexIndex + 1;
-
-		vertexIndex += 2;
-
 		if (node->m_left) {
 			dgAssert (node->m_right);
-			list.Append((dgNodeBuilder*)node->m_left);
-			list.Append((dgNodeBuilder*)node->m_right);
+			list.Append(node->m_left);
+			list.Append(node->m_right);
 		}
 	}
 
@@ -2019,6 +2042,8 @@ void dgAABBPolygonSoup::CalculateAdjacendy ()
 	GetAABB (p0, p1);
 	ForAllSectors (p0, p1, dgVector (dgFloat32 (0.0f)), dgFloat32 (1.0f), CalculateAllFaceEdgeNormals, this);
 
+	dgAssert (0);
+/*
 	for (dgInt32 i = 0; i < m_nodesCount; i ++) {
 		const dgNode* const node = &m_aabb[i];
 		if (node->m_nodeType & dgNode::m_leaf) {
@@ -2031,6 +2056,7 @@ void dgAABBPolygonSoup::CalculateAdjacendy ()
 			}
 		}
 	}
+*/
 }
 
 
@@ -2176,6 +2202,8 @@ dgIntersectStatus dgAABBPolygonSoup::CalculateDisjointedFaceEdgeNormals (void* c
 
 void dgAABBPolygonSoup::ForAllSectorsRayHit (const dgFastRayTest& raySrc, dgRayIntersectCallback callback, void* const context) const
 {
+dgAssert (0);
+/*
 	const dgNode *stackPool[DG_STACK_DEPTH];
 	dgFastRayTest ray (raySrc);
 
@@ -2211,11 +2239,14 @@ void dgAABBPolygonSoup::ForAllSectorsRayHit (const dgFastRayTest& raySrc, dgRayI
 			}
 		}
 	}
+*/
 }
 
 
 void dgAABBPolygonSoup::ForAllSectors (const dgVector& minBox, const dgVector& maxBox, const dgVector& boxDistanceTravel, dgFloat32 m_maxT, dgAABBIntersectCallback callback, void* const context) const 
 {
+dgAssert (0);
+/*
 	dgFloat32 distance[DG_STACK_DEPTH];
 	const dgNode* stackPool[DG_STACK_DEPTH];
 
@@ -2331,6 +2362,7 @@ void dgAABBPolygonSoup::ForAllSectors (const dgVector& minBox, const dgVector& m
 			}
 		}
 	}
+*/
 }
 
 
