@@ -1296,8 +1296,8 @@ dgFloat32 dgAABBPolygonSoup::CalculateFaceMaxSize (const dgVector* const vertex,
 		dgFloat32 minVal = dgFloat32 ( 1.0e10f);
 		for (dgInt32 j = 0; j < indexCount; j ++) {
 			dgInt32 index = indexArray[j];
-			dgVector q (vertex[index]);
-			dgFloat32 val = dir % q;
+			const dgVector& q = vertex[index];
+			dgFloat32 val = dir.DotProduct4(q).m_x;
 			minVal = dgMin(minVal, val);
 			maxVal = dgMax(maxVal, val);
 		}
