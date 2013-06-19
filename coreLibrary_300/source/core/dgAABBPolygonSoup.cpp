@@ -241,7 +241,7 @@ class dgNode
 	void SetBox (dgConstructionTree* const node) const
 	{
 		node->m_p0 = node->m_back->m_p0.GetMin(node->m_front->m_p0);
-		node->m_p1 = node->m_back->m_p1.GetMin(node->m_front->m_p1);
+		node->m_p1 = node->m_back->m_p1.GetMax(node->m_front->m_p1);
 		dgVector size (node->m_p1 - node->m_p0);
 		node->m_surfaceArea = size.DotProduct4(size.ShiftTripleRight()).m_x;
 	}
