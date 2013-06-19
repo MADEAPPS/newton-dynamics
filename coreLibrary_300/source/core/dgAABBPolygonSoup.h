@@ -49,42 +49,42 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 			#define DG_INDEX_COUNT_BITS 6
 
 			public:
-			inline dgLeafNodePtr ()
+			DG_INLINE dgLeafNodePtr ()
 			{
 				dgAssert (0);
 			}
 
-			inline dgLeafNodePtr (dgUnsigned32 node)
+			DG_INLINE dgLeafNodePtr (dgUnsigned32 node)
 			{
 				m_node = node;
 				dgAssert (!IsLeaf());
 			}
 
-			inline dgUnsigned32 IsLeaf () const 
+			DG_INLINE dgUnsigned32 IsLeaf () const 
 			{
 				return m_node & 0x80000000;
 			}
 
-			inline dgUnsigned32 GetCount() const 
+			DG_INLINE dgUnsigned32 GetCount() const 
 			{
 				dgAssert (IsLeaf());
 				return (m_node & (~0x80000000)) >> (32 - DG_INDEX_COUNT_BITS - 1);
 			}
 
-			inline dgUnsigned32 GetIndex() const 
+			DG_INLINE dgUnsigned32 GetIndex() const 
 			{
 				dgAssert (IsLeaf());
 				return m_node & (~(-(1 << (32 - DG_INDEX_COUNT_BITS - 1))));
 			}
 
 
-			inline dgLeafNodePtr (dgUnsigned32 faceIndexCount, dgUnsigned32 faceIndexStart)
+			DG_INLINE dgLeafNodePtr (dgUnsigned32 faceIndexCount, dgUnsigned32 faceIndexStart)
 			{
 				dgAssert (faceIndexCount < (1<<DG_INDEX_COUNT_BITS));
 				m_node = 0x80000000 | (faceIndexCount << (32 - DG_INDEX_COUNT_BITS - 1)) | faceIndexStart;
 			}
 
-			inline dgNode* GetNode (const void* const root) const
+			DG_INLINE dgNode* GetNode (const void* const root) const
 			{
 				return ((dgNode*) root) + m_node;
 			}
@@ -155,39 +155,35 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 	virtual void ForAllSectorsRayHit (const dgFastRayTest& ray, dgRayIntersectCallback callback, void* const context) const;
 	virtual void ForAllSectors (const dgVector& minBox, const dgVector& maxBox, const dgVector& boxDistanceTravel, dgFloat32 m_maxT, dgAABBIntersectCallback callback, void* const context) const;
 
-	void* GetRootNode() const 
+	DG_INLINE void* GetRootNode() const 
 	{
 		return m_aabb;
 	}
 
-	void* GetBackNode(const void* const root) const 
+	DG_INLINE void* GetBackNode(const void* const root) const 
 	{
-		dgAssert (0);
-		return NULL;
-//		dgNode* const node = ((dgNode*)root)->m_left;
-//		return (node->m_nodeType & dgNode::m_leaf) ? NULL: node;
+		dgNode* const node = (dgNode*) root;
+		return node->m_left.IsLeaf() ? NULL : node->m_left.GetNode(m_aabb);
 	}
 
-	void* GetFrontNode(const void* const root) const 
+	DG_INLINE void* GetFrontNode(const void* const root) const 
 	{
-		dgAssert (0);
-		return NULL;
-//		dgNode* const node = ((dgNode*)root)->m_right;
-//		return (node->m_nodeType & dgNode::m_leaf) ? NULL: node;
+		dgNode* const node = (dgNode*) root;
+		return node->m_right.IsLeaf() ? NULL : node->m_right.GetNode(m_aabb);
 	}
 
-	void GetNodeAABB(const void* const root, dgVector& p0, dgVector& p1) const 
+	DG_INLINE void GetNodeAABB(const void* const root, dgVector& p0, dgVector& p1) const 
 	{
-		dgNode* const node = (dgNode*)root;
-		p0 = dgVector (&m_aabbPoints[node->m_indexBox0].m_x);
-		p1 = dgVector (&m_aabbPoints[node->m_indexBox1].m_x);
+		const dgNode* const node = (dgNode*)root;
+		p0 = dgVector (&((dgTriplex*)m_localVertex)[node->m_indexBox0].m_x);
+		p1 = dgVector (&((dgTriplex*)m_localVertex)[node->m_indexBox1].m_x);
 	}
 	virtual dgVector ForAllSectorsSupportVectex (const dgVector& dir) const {dgAssert (0); return dgVector(0.0f);}	
 	
 
 	private:
 	void CalculateAdjacendy ();
-	dgFloat32 CalculateFaceMaxSize (dgTriplex* const vertex, dgInt32 indexCount, const dgInt32* const indexArray) const;
+	dgFloat32 CalculateFaceMaxSize (const dgVector* const vertex, dgInt32 indexCount, const dgInt32* const indexArray) const;
 //	static dgIntersectStatus CalculateManifoldFaceEdgeNormals (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount);
 	static dgIntersectStatus CalculateDisjointedFaceEdgeNormals (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount, dgFloat32 hitDistance);
 	static dgIntersectStatus CalculateAllFaceEdgeNormals (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount, dgFloat32 hitDistance);
@@ -197,7 +193,6 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 	dgInt32 m_indexCount;
 	dgNode* m_aabb;
 	dgInt32* m_indices;
-	dgTriplex* m_aabbPoints;
 };
 
 #else
