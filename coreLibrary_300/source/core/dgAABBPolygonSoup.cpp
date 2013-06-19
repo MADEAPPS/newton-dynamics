@@ -461,14 +461,14 @@ class dgNode
 
 						dgInt32 i0 = 0;
 						dgInt32 i1 = boxCount - 1;
-						dgInt32 step = sizeof (dgTriplex) / sizeof (dgFloat32);
-						const dgFloat32* const points = &vertexArray[0].m_x;
+						//dgInt32 step = sizeof (dgTriplex) / sizeof (dgFloat32);
+						//const dgVector* const points = vertexArray;
 						do {    
 							for (; i0 <= i1; i0 ++) {
 								dgInt32 j0 = boxArray[i0].m_minIndex;
 								dgInt32 j1 = boxArray[i0].m_maxIndex;
 
-								dgFloat32 val = (points[j0 * step + index] + points[j1 * step + index]) * dgFloat32 (0.5f);
+								dgFloat32 val = (vertexArray[j0][index] + vertexArray[j1][index]) * dgFloat32 (0.5f);
 								if (val > test) {
 									break;
 								}
@@ -478,7 +478,7 @@ class dgNode
 								dgInt32 j0 = boxArray[i1].m_minIndex;
 								dgInt32 j1 = boxArray[i1].m_maxIndex;
 
-								dgFloat32 val = (points[j0 * step + index] + points[j1 * step + index]) * dgFloat32 (0.5f);
+								dgFloat32 val = (vertexArray[j0][index] + vertexArray[j1][index]) * dgFloat32 (0.5f);
 								if (val < test) {
 									break;
 								}
