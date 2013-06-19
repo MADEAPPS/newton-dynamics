@@ -151,7 +151,7 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 	dgAABBPolygonSoup ();
 	virtual ~dgAABBPolygonSoup ();
 
-	void Create (dgMemoryAllocator* const allocator, const dgPolygonSoupDatabaseBuilder& builder, bool optimizedBuild);
+	void Create (const dgPolygonSoupDatabaseBuilder& builder, bool optimizedBuild);
 	virtual void ForAllSectorsRayHit (const dgFastRayTest& ray, dgRayIntersectCallback callback, void* const context) const;
 	virtual void ForAllSectors (const dgVector& minBox, const dgVector& maxBox, const dgVector& boxDistanceTravel, dgFloat32 m_maxT, dgAABBIntersectCallback callback, void* const context) const;
 
@@ -199,16 +199,6 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 {
 	public:
-	dgInt32 GetIndexCount() const
-	{
-		return m_indexCount;
-	}
-
-	dgInt32* GetIndexPool() const
-	{
-		return m_indices;
-	}
-
 	virtual void GetAABB (dgVector& p0, dgVector& p1) const;
 	virtual void Serialize (dgSerialize callback, void* const userData) const;
 	virtual void Deserialize (dgDeserialize callback, void* const userData);
@@ -223,8 +213,8 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 	void GetNodeAABB(const void* const root, dgVector& p0, dgVector& p1) const;
 
 	void CalculateAdjacendy ();
-	void Create (dgMemoryAllocator* const allocator, const dgPolygonSoupDatabaseBuilder& builder, bool optimizedBuild);
-	dgFloat32 CalculateFaceMaxSize (dgTriplex* const vertex, dgInt32 indexCount, const dgInt32* const indexArray) const;
+	void Create (const dgPolygonSoupDatabaseBuilder& builder, bool optimizedBuild);
+	dgFloat32 CalculateFaceMaxSize (const dgVector* const vertex, dgInt32 indexCount, const dgInt32* const indexArray) const;
 
 	virtual void ForAllSectors (const dgVector& minBox, const dgVector& maxBox, const dgVector& boxDistanceTravel, dgFloat32 m_maxT, dgAABBIntersectCallback callback, void* const context) const;
 	virtual void ForAllSectorsRayHit (const dgFastRayTest& ray, dgRayIntersectCallback callback, void* const context) const;

@@ -710,7 +710,7 @@ class dgHACDClusterGraph
 			builder.AddMesh(&polygon[0].m_x, count, sizeof (dgVector), 1, &count, indexList, &cluster.m_color, matrix);
 		}
 		builder.End(false);
-		Create (GetAllocator(), builder, false);
+		Create (builder, false);
 
 
 		dgFloat32 distanceThreshold = rayDiagonalLength * backFaceDistanceFactor;

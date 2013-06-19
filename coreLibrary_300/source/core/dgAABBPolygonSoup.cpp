@@ -32,51 +32,51 @@
 
 #ifndef DG_NEW_AABB_TREE
 
-class dgAABBTree
+class dgNode
 {
-	class TreeNode
+	class dgLeafNodePtr
 	{
 		#define DG_INDEX_COUNT_BITS 6
 
 		public:
-		inline TreeNode ()
+		DG_INLINE dgLeafNodePtr ()
 		{
 			dgAssert (0);
 		}
 
-		inline TreeNode (dgUnsigned32 node)
+		DG_INLINE dgLeafNodePtr (dgUnsigned32 node)
 		{
 			m_node = node;
 			dgAssert (!IsLeaf());
 		}
 
-		inline dgUnsigned32 IsLeaf () const 
+		DG_INLINE dgUnsigned32 IsLeaf () const 
 		{
 			return m_node & 0x80000000;
 		}
 
-		inline dgUnsigned32 GetCount() const 
+		DG_INLINE dgUnsigned32 GetCount() const 
 		{
 			dgAssert (IsLeaf());
 			return (m_node & (~0x80000000)) >> (32 - DG_INDEX_COUNT_BITS - 1);
 		}
 
-		inline dgUnsigned32 GetIndex() const 
+		DG_INLINE dgUnsigned32 GetIndex() const 
 		{
 			dgAssert (IsLeaf());
 			return m_node & (~(-(1 << (32 - DG_INDEX_COUNT_BITS - 1))));
 		}
 
 
-		inline TreeNode (dgUnsigned32 faceIndexCount, dgUnsigned32 faceIndexStart)
+		DG_INLINE dgLeafNodePtr (dgUnsigned32 faceIndexCount, dgUnsigned32 faceIndexStart)
 		{
 			dgAssert (faceIndexCount < (1<<DG_INDEX_COUNT_BITS));
 			m_node = 0x80000000 | (faceIndexCount << (32 - DG_INDEX_COUNT_BITS - 1)) | faceIndexStart;
 		}
 
-		inline dgAABBTree* GetNode (const void* root) const
+		DG_INLINE dgNode* GetNode (const void* root) const
 		{
-			return ((dgAABBTree*) root) + m_node;
+			return ((dgNode*) root) + m_node;
 		}
 
 		union {
@@ -112,38 +112,24 @@ class dgAABBTree
 		dgConstructionTree* m_parent;
 	};
 
-
-
-	
 	public: 
-	void CalcExtends (dgTriplex* const vertex, dgInt32 indexCount, const dgInt32* const indexArray) 
+	void CalcExtends (dgVector* const vertex, dgInt32 indexCount, const dgInt32* const indexArray) 
 	{
 		dgVector minP ( dgFloat32 (1.0e15f),  dgFloat32 (1.0e15f),  dgFloat32 (1.0e15f), dgFloat32 (0.0f)); 
 		dgVector maxP (-dgFloat32 (1.0e15f), -dgFloat32 (1.0e15f), -dgFloat32 (1.0e15f), dgFloat32 (0.0f)); 
 		for (dgInt32 i = 0; i < indexCount; i ++) {
 			dgInt32 index = indexArray[i];
-			dgVector p (&vertex[index].m_x);
-
-			minP.m_x = dgMin (p.m_x, minP.m_x); 
-			minP.m_y = dgMin (p.m_y, minP.m_y); 
-			minP.m_z = dgMin (p.m_z, minP.m_z); 
-
-			maxP.m_x = dgMax (p.m_x, maxP.m_x); 
-			maxP.m_y = dgMax (p.m_y, maxP.m_y); 
-			maxP.m_z = dgMax (p.m_z, maxP.m_z); 
+			const dgVector p = vertex[index];
+			minP = minP.GetMin(p);
+			maxP = maxP.GetMax(p);
 		}
-
-		vertex[m_minIndex].m_x = minP.m_x - dgFloat32 (1.0e-3f);
-		vertex[m_minIndex].m_y = minP.m_y - dgFloat32 (1.0e-3f);
-		vertex[m_minIndex].m_z = minP.m_z - dgFloat32 (1.0e-3f);
-		vertex[m_maxIndex].m_x = maxP.m_x + dgFloat32 (1.0e-3f);
-		vertex[m_maxIndex].m_y = maxP.m_y + dgFloat32 (1.0e-3f);
-		vertex[m_maxIndex].m_z = maxP.m_z + dgFloat32 (1.0e-3f);
+		vertex[m_minIndex] = (minP - dgVector (dgFloat32 (1.0e-3f))) & dgVector::m_triplexMask;
+		vertex[m_maxIndex] = (maxP + dgVector (dgFloat32 (1.0e-3f))) & dgVector::m_triplexMask;
 	}
 
-	dgInt32 BuildTree (dgConstructionTree* const root, dgAABBTree* const boxArray, dgAABBTree* const boxCopy, dgTriplex* const vertexArrayOut, dgInt32 &treeVCount)
+	dgInt32 BuildTree (dgConstructionTree* const root, dgNode* const boxArray, dgNode* const boxCopy, dgVector* const vertexArrayOut, dgInt32 &treeVCount)
 	{
-		TreeNode* parent[128];
+		dgLeafNodePtr* parent[128];
 		dgConstructionTree* pool[128];
 
 		dgInt32 index = 0;
@@ -154,34 +140,30 @@ class dgAABBTree
 			stack --;
 
 			dgConstructionTree* const node = pool[stack];
-			TreeNode* const parentNode = parent[stack];
+			dgLeafNodePtr* const parentNode = parent[stack];
 			if (node->m_boxIndex != -1) {
 				if (parentNode) {
 					*parentNode = boxCopy[node->m_boxIndex].m_back;
 				} else {
 
 					//dgAssert (boxCount == 1);
-					dgAABBTree* const newNode = &boxArray[index];
+					dgNode* const newNode = &boxArray[index];
 					*newNode = boxCopy[node->m_boxIndex];
 					index ++;
 				}
 
 			} else {
-				dgAABBTree* const newNode = &boxArray[index];
+				dgNode* const newNode = &boxArray[index];
 
 				newNode->m_minIndex = treeVCount;
-				vertexArrayOut[treeVCount].m_x = node->m_p0.m_x;
-				vertexArrayOut[treeVCount].m_y = node->m_p0.m_y;
-				vertexArrayOut[treeVCount].m_z = node->m_p0.m_z;
+				vertexArrayOut[treeVCount] = node->m_p0;
 
 				newNode->m_maxIndex = treeVCount + 1;
-				vertexArrayOut[treeVCount + 1].m_x = node->m_p1.m_x;
-				vertexArrayOut[treeVCount + 1].m_y = node->m_p1.m_y;
-				vertexArrayOut[treeVCount + 1].m_z = node->m_p1.m_z;
+				vertexArrayOut[treeVCount + 1] = node->m_p1;
 				treeVCount += 2;
 
 				if (parentNode) {
-					*parentNode = TreeNode (dgUnsigned32(index));
+					*parentNode = dgLeafNodePtr (dgUnsigned32(index));
 				}
 				index ++;
 
@@ -372,7 +354,7 @@ class dgAABBTree
 		return cost;
 	}
 
-	dgConstructionTree* ImproveTotalFitness (dgConstructionTree* const root, dgAABBTree* const boxArray, dgMemoryAllocator* const allocator)
+	dgConstructionTree* ImproveTotalFitness (dgConstructionTree* const root, dgNode* const boxArray, dgMemoryAllocator* const allocator)
 	{
 		dgList<dgConstructionTree*> nodesList(allocator);
 
@@ -402,7 +384,7 @@ class dgAABBTree
 		return newRoot;
 	}
 
-	dgConstructionTree* BuildTree (dgMemoryAllocator* const allocator, dgInt32 firstBox, dgInt32 lastBox, dgAABBTree* const boxArray, const dgTriplex* const vertexArray, dgConstructionTree* parent)
+	dgConstructionTree* BuildTree (dgMemoryAllocator* const allocator, dgInt32 firstBox, dgInt32 lastBox, dgNode* const boxArray, const dgVector* const vertexArray, dgConstructionTree* parent)
 	{
 		dgConstructionTree* const tree = new (allocator) dgConstructionTree();
 		dgAssert (firstBox >= 0);
@@ -413,8 +395,8 @@ class dgAABBTree
 		if (lastBox == firstBox) {
 			dgInt32 j0 = boxArray[firstBox].m_minIndex;
 			dgInt32 j1 = boxArray[firstBox].m_maxIndex;
-			tree->m_p0 = dgVector (vertexArray[j0].m_x, vertexArray[j0].m_y, vertexArray[j0].m_z, dgFloat32 (0.0f));
-			tree->m_p1 = dgVector (vertexArray[j1].m_x, vertexArray[j1].m_y, vertexArray[j1].m_z, dgFloat32 (0.0f));
+			tree->m_p0 = vertexArray[j0];
+			tree->m_p1 = vertexArray[j1];
 			
 			tree->m_boxIndex = firstBox;
 			tree->m_back = NULL;
@@ -423,7 +405,7 @@ class dgAABBTree
 
 			struct dgSpliteInfo
 			{
-				dgSpliteInfo (dgAABBTree* const boxArray, dgInt32 boxCount, const dgTriplex* const vertexArray, const dgConstructionTree* const tree)
+				dgSpliteInfo (dgNode* const boxArray, dgInt32 boxCount, const dgVector* const vertexArray, const dgConstructionTree* const tree)
 				{
 
 					dgVector minP ( dgFloat32 (1.0e15f)); 
@@ -436,16 +418,10 @@ class dgAABBTree
 							dgInt32 j0 = boxArray[i].m_minIndex;
 							dgInt32 j1 = boxArray[i].m_maxIndex;
 
-							dgVector p0 (&vertexArray[j0].m_x);
-							dgVector p1 (&vertexArray[j1].m_x);
-
-							minP.m_x = dgMin (p0.m_x, minP.m_x); 
-							minP.m_y = dgMin (p0.m_y, minP.m_y); 
-							minP.m_z = dgMin (p0.m_z, minP.m_z); 
-							
-							maxP.m_x = dgMax (p1.m_x, maxP.m_x); 
-							maxP.m_y = dgMax (p1.m_y, maxP.m_y); 
-							maxP.m_z = dgMax (p1.m_z, maxP.m_z); 
+							const dgVector& p0 = vertexArray[j0];
+							const dgVector& p1 = vertexArray[j1];
+							minP = minP.GetMin (p0); 
+							maxP = maxP.GetMax (p1); 
 						}
 
 					} else {
@@ -456,24 +432,18 @@ class dgAABBTree
 							dgInt32 j0 = boxArray[i].m_minIndex;
 							dgInt32 j1 = boxArray[i].m_maxIndex;
 
-							dgVector p0 (vertexArray[j0].m_x, vertexArray[j0].m_y, vertexArray[j0].m_z, dgFloat32 (0.0f));
-							dgVector p1 (vertexArray[j1].m_x, vertexArray[j1].m_y, vertexArray[j1].m_z, dgFloat32 (0.0f));
+							const dgVector& p0 = vertexArray[j0];
+							const dgVector& p1 = vertexArray[j1];
 
-							minP.m_x = dgMin (p0.m_x, minP.m_x); 
-							minP.m_y = dgMin (p0.m_y, minP.m_y); 
-							minP.m_z = dgMin (p0.m_z, minP.m_z); 
-
-							maxP.m_x = dgMax (p1.m_x, maxP.m_x); 
-							maxP.m_y = dgMax (p1.m_y, maxP.m_y); 
-							maxP.m_z = dgMax (p1.m_z, maxP.m_z); 
-
-							dgVector p ((p0 + p1).Scale3 (0.5f));
+							minP = minP.GetMin (p0); 
+							maxP = maxP.GetMax (p1); 
+							dgVector p ((p0 + p1).CompProduct4(dgVector::m_half));
 
 							median += p;
-							varian += p.CompProduct3 (p);
+							varian += p.CompProduct4(p);
 						}
 
-						varian = varian.Scale3 (dgFloat32 (boxCount)) - median.CompProduct3(median);
+						varian = varian.Scale4 (dgFloat32 (boxCount)) - median.CompProduct4(median);
 
 
 						dgInt32 index = 0;
@@ -485,7 +455,7 @@ class dgAABBTree
 							}
 						}
 	
-						dgVector center = median.Scale3 (dgFloat32 (1.0f) / dgFloat32 (boxCount));
+						dgVector center = median.Scale4 (dgFloat32 (1.0f) / dgFloat32 (boxCount));
 
 						dgFloat32 test = center[index];
 
@@ -554,17 +524,16 @@ class dgAABBTree
 		}
 
 		dgVector side0 (tree->m_p1 - tree->m_p0);
-		dgVector side1 (side0.m_y, side0.m_z, side0.m_x, dgFloat32 (0.0f));
-		tree->m_surfaceArea = side0 % side1; 
-	
+		//dgVector side1 (side0.m_y, side0.m_z, side0.m_x, dgFloat32 (0.0f));
+		tree->m_surfaceArea = side0.CompProduct4(side0.ShiftTripleRight()).m_x; 
 		return tree;
 	}
 
 
-	dgInt32 BuildTopDown (dgMemoryAllocator* const allocator, dgInt32 boxCount, dgAABBTree* const boxArray, dgTriplex* const vertexArrayOut, dgInt32 &treeVCount, bool optimizedBuild)
+	dgInt32 BuildTopDown (dgMemoryAllocator* const allocator, dgInt32 boxCount, dgNode* const boxArray, dgVector* const vertexArrayOut, dgInt32 &treeVCount, bool optimizedBuild)
 	{
-		dgStack <dgAABBTree> boxCopy (boxCount);
-		memcpy (&boxCopy[0], boxArray, boxCount * sizeof (dgAABBTree));
+		dgStack <dgNode> boxCopy (boxCount);
+		memcpy (&boxCopy[0], boxArray, boxCount * sizeof (dgNode));
 
 		dgConstructionTree* tree = BuildTree (allocator, 0, boxCount - 1, &boxCopy[0], vertexArrayOut, NULL);
 
@@ -622,7 +591,7 @@ class dgAABBTree
 
 	void ForAllSectors (const dgInt32* const indexArray, const dgFloat32* const vertexArray, const dgVector& minBox, const dgVector& maxBox, const dgVector& boxDistanceTravel, dgFloat32 m_maxT, dgAABBIntersectCallback callback, void* const context) const
 	{
-		const dgAABBTree* stackPool[DG_STACK_DEPTH];
+		const dgNode* stackPool[DG_STACK_DEPTH];
 
 		const dgInt32 stride = sizeof (dgTriplex) / sizeof (dgFloat32);
 		dgVector origin ((maxBox + minBox).Scale4 (dgFloat32 (0.5f)));
@@ -633,7 +602,7 @@ class dgAABBTree
 
 			while (stack) {
 				stack --;
-				const dgAABBTree* const me = stackPool[stack];
+				const dgNode* const me = stackPool[stack];
 				if (me->BoxTest ((dgTriplex*) vertexArray, minBox, maxBox)) {
 
 					if (me->m_back.IsLeaf()) {
@@ -689,7 +658,7 @@ class dgAABBTree
 			while (stack) {
 				stack --;
 				const dgFloat32 dist = distance[stack];
-				const dgAABBTree* const me = stackPool[stack];
+				const dgNode* const me = stackPool[stack];
 				if (dist < dgFloat32 (1.0f)) {
 
 					if (me->m_back.IsLeaf()) {
@@ -710,7 +679,7 @@ class dgAABBTree
 					} else {
 						dgAssert (stack < DG_STACK_DEPTH);
 
-						const dgAABBTree* const node = me->m_back.GetNode(this);
+						const dgNode* const node = me->m_back.GetNode(this);
 						dgFloat32 dist = node->BoxIntersect (ray, (dgTriplex*) vertexArray, minBox, maxBox);
 						if (dist < dgFloat32 (1.0f)) {
 							dgInt32 j = stack;
@@ -741,7 +710,7 @@ class dgAABBTree
 
 					} else {
 						dgAssert (stack < DG_STACK_DEPTH);
-						const dgAABBTree* const node = me->m_front.GetNode(this);
+						const dgNode* const node = me->m_front.GetNode(this);
 						dgFloat32 dist = node->BoxIntersect (ray, (dgTriplex*) vertexArray, minBox, maxBox);
 						if (dist < dgFloat32 (1.0f)) {
 							dgInt32 j = stack;
@@ -762,7 +731,7 @@ class dgAABBTree
 	
 	void ForAllSectorsRayHit (const dgFastRayTest& raySrc, const dgInt32* const indexArray, const dgFloat32* const vertexArray, dgRayIntersectCallback callback, void* const context) const
 	{
-		const dgAABBTree *stackPool[DG_STACK_DEPTH];
+		const dgNode *stackPool[DG_STACK_DEPTH];
 		dgFastRayTest ray (raySrc);
 		
 		dgInt32 stack = 1;
@@ -771,7 +740,7 @@ class dgAABBTree
 		stackPool[0] = this;
 		while (stack) {
 			stack --;
-			const dgAABBTree *const me = stackPool[stack];
+			const dgNode *const me = stackPool[stack];
 			if (me->RayTest (ray, (dgTriplex*) vertexArray)) {
 				
 				if (me->m_back.IsLeaf()) {
@@ -823,7 +792,7 @@ class dgAABBTree
 	dgVector ForAllSectorsSupportVertex (const dgVector& dir, const dgInt32* const indexArray, const dgFloat32* const vertexArray) const
 	{
 		dgFloat32 aabbProjection[DG_STACK_DEPTH];
-		const dgAABBTree *stackPool[DG_STACK_DEPTH];
+		const dgNode *stackPool[DG_STACK_DEPTH];
 
 		dgInt32 stack = 1;
 		stackPool[0] = this;
@@ -844,7 +813,7 @@ class dgAABBTree
 			if (boxSupportValue > maxProj) {
 				dgFloat32 backSupportDist = dgFloat32 (0.0f);
 				dgFloat32 frontSupportDist = dgFloat32 (0.0f);
-				const dgAABBTree* const me = stackPool[stack];
+				const dgNode* const me = stackPool[stack];
 				if (me->m_back.IsLeaf()) {
 					backSupportDist = dgFloat32 (-1.0e20f);
 					dgInt32 index = dgInt32 (me->m_back.GetIndex());
@@ -867,7 +836,7 @@ class dgAABBTree
 
 				} else {
 					dgVector box[2];
-					const dgAABBTree* const node = me->m_back.GetNode(this);
+					const dgNode* const node = me->m_back.GetNode(this);
 					box[0].m_x = boxArray[node->m_minIndex].m_x;
 					box[0].m_y = boxArray[node->m_minIndex].m_y;
 					box[0].m_z = boxArray[node->m_minIndex].m_z;
@@ -900,7 +869,7 @@ class dgAABBTree
 
 				} else {
 					dgVector box[2];
-					const dgAABBTree* const node = me->m_front.GetNode(this);
+					const dgNode* const node = me->m_front.GetNode(this);
 					box[0].m_x = boxArray[node->m_minIndex].m_x;
 					box[0].m_y = boxArray[node->m_minIndex].m_y;
 					box[0].m_z = boxArray[node->m_minIndex].m_z;
@@ -992,8 +961,8 @@ class dgAABBTree
 
 	dgInt32 m_minIndex;
 	dgInt32 m_maxIndex;
-	TreeNode m_back;
-	TreeNode m_front;
+	dgLeafNodePtr m_back;
+	dgLeafNodePtr m_front;
 	friend class dgAABBPolygonSoup;
 };
 
@@ -1026,20 +995,20 @@ void* dgAABBPolygonSoup::GetRootNode() const
 
 void* dgAABBPolygonSoup::GetBackNode(const void* const root) const
 {
-	dgAABBTree* const node = (dgAABBTree*) root;
+	dgNode* const node = (dgNode*) root;
 	return node->m_back.IsLeaf() ? NULL : node->m_back.GetNode(m_aabb);
 }
 
 void* dgAABBPolygonSoup::GetFrontNode(const void* const root) const
 {
-	dgAABBTree* const node = (dgAABBTree*) root;
+	dgNode* const node = (dgNode*) root;
 	return node->m_front.IsLeaf() ? NULL : node->m_front.GetNode(m_aabb);
 }
 
 
 void dgAABBPolygonSoup::GetNodeAABB(const void* const root, dgVector& p0, dgVector& p1) const
 {
-	dgAABBTree* const node = (dgAABBTree*) root;
+	dgNode* const node = (dgNode*) root;
 	const dgTriplex* const vertex = (dgTriplex*) m_localVertex;
 
 	p0 = dgVector (vertex[node->m_minIndex].m_x, vertex[node->m_minIndex].m_y, vertex[node->m_minIndex].m_z, dgFloat32 (0.0f));
@@ -1050,7 +1019,7 @@ void dgAABBPolygonSoup::GetNodeAABB(const void* const root, dgVector& p0, dgVect
 void dgAABBPolygonSoup::ForAllSectors (const dgVector& minBox, const dgVector& maxBox, const dgVector& boxDistanceTravel, dgFloat32 m_maxT, dgAABBIntersectCallback callback, void* const context) const
 {
 	if (m_aabb) {
-		dgAABBTree* const tree = (dgAABBTree*) m_aabb;
+		dgNode* const tree = (dgNode*) m_aabb;
 		tree->ForAllSectors (m_indices, m_localVertex, minBox, maxBox, boxDistanceTravel, m_maxT, callback, context);
 	}
 }
@@ -1058,7 +1027,7 @@ void dgAABBPolygonSoup::ForAllSectors (const dgVector& minBox, const dgVector& m
 dgVector dgAABBPolygonSoup::ForAllSectorsSupportVectex (const dgVector& dir) const
 {
 	if (m_aabb) {
-		dgAABBTree* const tree = (dgAABBTree*) m_aabb;
+		dgNode* const tree = (dgNode*) m_aabb;
 		return tree->ForAllSectorsSupportVertex (dir, m_indices, m_localVertex);
 	} else {
 		return dgVector (0, 0, 0, 0);
@@ -1069,12 +1038,13 @@ dgVector dgAABBPolygonSoup::ForAllSectorsSupportVectex (const dgVector& dir) con
 void dgAABBPolygonSoup::GetAABB (dgVector& p0, dgVector& p1) const
 {
 	if (m_aabb) { 
-		dgAABBTree* const tree = (dgAABBTree*) m_aabb;
-		p0 = dgVector (&m_localVertex[tree->m_minIndex * 3]);
-		p1 = dgVector (&m_localVertex[tree->m_maxIndex * 3]);
+		dgNode* const tree = (dgNode*) m_aabb;
+		const dgTriplex* const localVertex = (dgTriplex*) m_localVertex;
+		p0 = dgVector (&localVertex[tree->m_minIndex].m_x);
+		p1 = dgVector (&localVertex[tree->m_maxIndex].m_x);
 	} else {
-		p0 = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-		p1 = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+		p0 = dgVector (dgFloat32 (0.0f));
+		p1 = dgVector (dgFloat32 (0.0f));
 	}
 }
 
@@ -1082,7 +1052,7 @@ void dgAABBPolygonSoup::GetAABB (dgVector& p0, dgVector& p1) const
 void dgAABBPolygonSoup::ForAllSectorsRayHit (const dgFastRayTest& ray, dgRayIntersectCallback callback, void* const context) const
 {
 	if (m_aabb) {
-		dgAABBTree* const tree = (dgAABBTree*) m_aabb;
+		dgNode* const tree = (dgNode*) m_aabb;
 		tree->ForAllSectorsRayHit (ray, m_indices, m_localVertex, callback, context);
 	}
 }
@@ -1090,7 +1060,7 @@ void dgAABBPolygonSoup::ForAllSectorsRayHit (const dgFastRayTest& ray, dgRayInte
 
 void dgAABBPolygonSoup::Serialize (dgSerialize callback, void* const userData) const
 {
-	dgAABBTree* const tree = (dgAABBTree*) m_aabb;
+	dgNode* const tree = (dgNode*) m_aabb;
 	callback (userData, &m_vertexCount, sizeof (dgInt32));
 	callback (userData, &m_indexCount, sizeof (dgInt32));
 	callback (userData, &m_nodesCount, sizeof (dgInt32));
@@ -1098,7 +1068,7 @@ void dgAABBPolygonSoup::Serialize (dgSerialize callback, void* const userData) c
 	if (tree) {
 		callback (userData,  m_localVertex, sizeof (dgTriplex) * m_vertexCount);
 		callback (userData,  m_indices, sizeof (dgInt32) * m_indexCount);
-		callback (userData, tree, sizeof (dgAABBTree) * m_nodesCount);
+		callback (userData, tree, sizeof (dgNode) * m_nodesCount);
 	}
 }
 
@@ -1106,7 +1076,7 @@ void dgAABBPolygonSoup::Serialize (dgSerialize callback, void* const userData) c
 void dgAABBPolygonSoup::Deserialize (dgDeserialize callback, void* const userData)
 {
 //	dgInt32 nodes;
-	dgAABBTree* tree;;
+	dgNode* tree;;
 
 	m_strideInBytes = sizeof (dgTriplex);
 	callback (userData, &m_vertexCount, sizeof (dgInt32));
@@ -1117,11 +1087,11 @@ void dgAABBPolygonSoup::Deserialize (dgDeserialize callback, void* const userDat
 	if (m_vertexCount) {
 		m_localVertex = (dgFloat32*) dgMallocStack (sizeof (dgTriplex) * m_vertexCount);
 		m_indices = (dgInt32*) dgMallocStack (sizeof (dgInt32) * m_indexCount);
-		tree = (dgAABBTree*) dgMallocStack (sizeof (dgAABBTree) * m_nodesCount);
+		tree = (dgNode*) dgMallocStack (sizeof (dgNode) * m_nodesCount);
 
 		callback (userData, m_localVertex, sizeof (dgTriplex) * m_vertexCount);
 		callback (userData, m_indices, sizeof (dgInt32) * m_indexCount);
-		callback (userData, tree, sizeof (dgAABBTree) * m_nodesCount);
+		callback (userData, tree, sizeof (dgNode) * m_nodesCount);
 	} else {
 		m_localVertex = NULL;
 		m_indices = NULL;
@@ -1310,23 +1280,23 @@ dgIntersectStatus dgAABBPolygonSoup::CalculateAllFaceEdgeNormals (void* const co
 	return t_ContinueSearh;
 }
 
-dgFloat32 dgAABBPolygonSoup::CalculateFaceMaxSize (dgTriplex* const vertex, dgInt32 indexCount, const dgInt32* const indexArray) const
+dgFloat32 dgAABBPolygonSoup::CalculateFaceMaxSize (const dgVector* const vertex, dgInt32 indexCount, const dgInt32* const indexArray) const
 {
 	dgFloat32 maxSize = dgFloat32 (0.0f);
 	dgInt32 index = indexArray[indexCount - 1];
-	dgVector p0 (vertex[index].m_x, vertex[index].m_y, vertex[index].m_z, dgFloat32 (0.0f));
+	dgVector p0 (vertex[index]);
 	for (dgInt32 i = 0; i < indexCount; i ++) {
 		dgInt32 index = indexArray[i];
-		dgVector p1 (vertex[index].m_x, vertex[index].m_y, vertex[index].m_z, dgFloat32 (0.0f));
+		dgVector p1 (vertex[index]);
 
 		dgVector dir (p1 - p0);
-		dir = dir.Scale3 (dgRsqrt (dir % dir));
+		dir = dir.Scale4(dgRsqrt (dir % dir));
 
 		dgFloat32 maxVal = dgFloat32 (-1.0e10f);
 		dgFloat32 minVal = dgFloat32 ( 1.0e10f);
 		for (dgInt32 j = 0; j < indexCount; j ++) {
 			dgInt32 index = indexArray[j];
-			dgVector q (vertex[index].m_x, vertex[index].m_y, vertex[index].m_z, dgFloat32 (0.0f));
+			dgVector q (vertex[index]);
 			dgFloat32 val = dir % q;
 			minVal = dgMin(minVal, val);
 			maxVal = dgMax(maxVal, val);
@@ -1347,9 +1317,9 @@ void dgAABBPolygonSoup::CalculateAdjacendy ()
 	GetAABB (p0, p1);
 	ForAllSectors (p0, p1, dgVector (dgFloat32 (0.0f)), dgFloat32 (1.0f), CalculateAllFaceEdgeNormals, this);
 
-	dgAABBTree* const tree = (dgAABBTree*) m_aabb;
+	dgNode* const tree = (dgNode*) m_aabb;
 	for (dgInt32 i = 0; i < m_nodesCount; i ++) {
-		dgAABBTree* const node = &tree[i];
+		dgNode* const node = &tree[i];
 		if (node->m_back.IsLeaf()) {
 			dgInt32 vCount = node->m_back.GetCount();
 			dgInt32 index = dgInt32 (node->m_back.GetIndex());
@@ -1374,7 +1344,7 @@ void dgAABBPolygonSoup::CalculateAdjacendy ()
 	}
 }
 
-void dgAABBPolygonSoup::Create (dgMemoryAllocator* const allocator, const dgPolygonSoupDatabaseBuilder& builder, bool optimizedBuild)
+void dgAABBPolygonSoup::Create (const dgPolygonSoupDatabaseBuilder& builder, bool optimizedBuild)
 {
 	if (builder.m_faceCount == 0) {
 		return;
@@ -1383,22 +1353,20 @@ void dgAABBPolygonSoup::Create (dgMemoryAllocator* const allocator, const dgPoly
 	m_strideInBytes = sizeof (dgTriplex);
 	m_indexCount = builder.m_indexCount * 2 + builder.m_faceCount;
 	m_indices = (dgInt32*) dgMallocStack (sizeof (dgInt32) * m_indexCount);
-	m_aabb = (dgAABBTree*) dgMallocStack (sizeof (dgAABBTree) * builder.m_faceCount);
-	m_localVertex = (dgFloat32*) dgMallocStack (sizeof (dgTriplex) * (builder.m_vertexCount + builder.m_normalCount + builder.m_faceCount * 4));
+	m_aabb = (dgNode*) dgMallocStack (sizeof (dgNode) * builder.m_faceCount);
+//	m_localVertex = (dgFloat32*) dgMallocStack (sizeof (dgTriplex) * (builder.m_vertexCount + builder.m_normalCount + builder.m_faceCount * 4));
 
-	dgAABBTree* const tree = (dgAABBTree*) m_aabb;
-	dgTriplex* const tmpVertexArray = (dgTriplex*)m_localVertex;
+	dgNode* const tree = (dgNode*) m_aabb;
+//	dgTriplex* const tmpVertexArray = (dgTriplex*)m_localVertex;
+	dgStack<dgVector> tmpVertexArray(builder.m_vertexCount + builder.m_normalCount + builder.m_faceCount * 4);
+//	dgTriplex* const tmpVertexArray = (dgTriplex*)m_localVertex;
 	
 	for (dgInt32 i = 0; i < builder.m_vertexCount; i ++) {
-		tmpVertexArray[i].m_x = dgFloat32 (builder.m_vertexPoints[i].m_x);
-		tmpVertexArray[i].m_y = dgFloat32 (builder.m_vertexPoints[i].m_y);
-		tmpVertexArray[i].m_z = dgFloat32 (builder.m_vertexPoints[i].m_z);
+		tmpVertexArray[i] = builder.m_vertexPoints[i];
 	}
 
 	for (dgInt32 i = 0; i < builder.m_normalCount; i ++) {
-		tmpVertexArray[i + builder.m_vertexCount].m_x = dgFloat32 (builder.m_normalPoints[i].m_x); 
-		tmpVertexArray[i + builder.m_vertexCount].m_y = dgFloat32 (builder.m_normalPoints[i].m_y); 
-		tmpVertexArray[i + builder.m_vertexCount].m_z = dgFloat32 (builder.m_normalPoints[i].m_z); 
+		tmpVertexArray[i + builder.m_vertexCount] = builder.m_normalPoints[i]; 
 	}
 
 	dgInt32 polygonIndex = 0;
@@ -1409,14 +1377,13 @@ void dgAABBPolygonSoup::Create (dgMemoryAllocator* const allocator, const dgPoly
 	for (dgInt32 i = 0; i < builder.m_faceCount; i ++) {
 
 		dgInt32 indexCount = builder.m_faceVertexCount[i] - 1;
-		dgAABBTree& box = tree[i];
+		dgNode& box = tree[i];
 
 		box.m_minIndex = builder.m_normalCount + builder.m_vertexCount + i * 2;
 		box.m_maxIndex = builder.m_normalCount + builder.m_vertexCount + i * 2 + 1;
 
-		box.m_front = dgAABBTree::TreeNode(0, 0);
-		//box.m_back = dgAABBTree::TreeNode (dgUnsigned32 (indexCount * 2), dgUnsigned32 (indexMap - m_indices));
-		box.m_back = dgAABBTree::TreeNode (dgUnsigned32 (indexCount), dgUnsigned32 (indexMap - m_indices));
+		box.m_front = dgNode::dgLeafNodePtr(0, 0);
+		box.m_back = dgNode::dgLeafNodePtr (indexCount, indexMap - m_indices);
 		box.CalcExtends (&tmpVertexArray[0], indexCount, &indices[polygonIndex]);
 
 		dgInt32 normalIndex = builder.m_vertexCount + builder.m_normalIndex[i];;
@@ -1438,33 +1405,41 @@ void dgAABBPolygonSoup::Create (dgMemoryAllocator* const allocator, const dgPoly
 		polygonIndex += indexCount + 1;
 	}
 
-	dgInt32 extraVertexCount = builder.m_normalCount + builder.m_vertexCount + builder.m_faceCount * 2;
-
+	dgInt32 baseVertexCount = builder.m_normalCount + builder.m_vertexCount + builder.m_faceCount * 2;
+	dgInt32 extraVertexCount = baseVertexCount;
 	m_nodesCount = tree->BuildTopDown (builder.m_allocator, builder.m_faceCount, tree, &tmpVertexArray[0], extraVertexCount, optimizedBuild);
 
-	m_localVertex[tree->m_minIndex * 3 + 0] -= dgFloat32 (0.1f);
-	m_localVertex[tree->m_minIndex * 3 + 1] -= dgFloat32 (0.1f);
-	m_localVertex[tree->m_minIndex * 3 + 2] -= dgFloat32 (0.1f);
-	m_localVertex[tree->m_maxIndex * 3 + 0] += dgFloat32 (0.1f);
-	m_localVertex[tree->m_maxIndex * 3 + 1] += dgFloat32 (0.1f);
-	m_localVertex[tree->m_maxIndex * 3 + 2] += dgFloat32 (0.1f);
+	tmpVertexArray[tree->m_minIndex] -= dgVector (dgFloat32 (0.1f));
+	tmpVertexArray[tree->m_maxIndex] += dgVector (dgFloat32 (0.1f));
 
+	dgInt32 aabbVeterxCount = extraVertexCount - baseVertexCount;
+	dgStack<dgInt32> indexArray (aabbVeterxCount);
+	aabbVeterxCount = dgVertexListToIndexList (&tmpVertexArray[baseVertexCount].m_x, sizeof (dgVector), sizeof (dgTriplex), 0, aabbVeterxCount, &indexArray[0], dgFloat32 (1.0e-6f));
 
-	extraVertexCount -= (builder.m_normalCount + builder.m_vertexCount);
+	m_vertexCount = builder.m_normalCount + builder.m_vertexCount + aabbVeterxCount;
+	m_localVertex = (dgFloat32*) dgMallocStack (sizeof (dgTriplex) * m_vertexCount);
+	dgTriplex* const dstPoints = (dgTriplex*)m_localVertex;
+	for (dgInt32 i = 0; i < (builder.m_normalCount + builder.m_vertexCount); i ++) {
+		dstPoints[i].m_x = tmpVertexArray[i].m_x;
+		dstPoints[i].m_y = tmpVertexArray[i].m_y;
+		dstPoints[i].m_z = tmpVertexArray[i].m_z;
+	}
 
-	dgStack<dgInt32> indexArray (extraVertexCount);
-	extraVertexCount = dgVertexListToIndexList (&tmpVertexArray[builder.m_normalCount + builder.m_vertexCount].m_x, sizeof (dgTriplex), sizeof (dgTriplex), 0, extraVertexCount, &indexArray[0], dgFloat32 (1.0e-6f));
+	for (dgInt32 i = 0; i < aabbVeterxCount; i ++) {
+		dstPoints[builder.m_normalCount + builder.m_vertexCount + i].m_x = tmpVertexArray[baseVertexCount + i].m_x;
+		dstPoints[builder.m_normalCount + builder.m_vertexCount + i].m_y = tmpVertexArray[baseVertexCount + i].m_y;
+		dstPoints[builder.m_normalCount + builder.m_vertexCount + i].m_z = tmpVertexArray[baseVertexCount + i].m_z;
+	}
 
 	for (dgInt32 i = 0; i < m_nodesCount; i ++) {
-		dgAABBTree& box = tree[i];
+		dgNode& box = tree[i];
 
-		dgInt32 j = box.m_minIndex - builder.m_normalCount - builder.m_vertexCount;
+		dgInt32 j = box.m_minIndex - baseVertexCount;
 		box.m_minIndex = indexArray[j] + builder.m_normalCount + builder.m_vertexCount;
-		j = box.m_maxIndex - builder.m_normalCount - builder.m_vertexCount;
+
+		j = box.m_maxIndex - baseVertexCount;
 		box.m_maxIndex = indexArray[j] + builder.m_normalCount + builder.m_vertexCount;
 	}
-	m_vertexCount = extraVertexCount + builder.m_normalCount + builder.m_vertexCount;
-
 	CalculateAdjacendy();
 }
 
@@ -1756,7 +1731,7 @@ dgFloat32 dgAABBPolygonSoup::CalculateFaceMaxSize (const dgVector* const vertex,
 
 
 
-void dgAABBPolygonSoup::Create (dgMemoryAllocator* const allocator, const dgPolygonSoupDatabaseBuilder& builder, bool optimizedBuild)
+void dgAABBPolygonSoup::Create (const dgPolygonSoupDatabaseBuilder& builder, bool optimizedBuild)
 {
 	if (builder.m_faceCount == 0) {
 		return;
@@ -1765,11 +1740,8 @@ void dgAABBPolygonSoup::Create (dgMemoryAllocator* const allocator, const dgPoly
 	m_strideInBytes = sizeof (dgTriplex);
 	m_nodesCount = builder.m_faceCount - 1;
 	m_indexCount = builder.m_indexCount * 2 + builder.m_faceCount;
-//	m_vertexCount = builder.m_normalCount + builder.m_vertexCount;
 	m_aabb = (dgNode*) dgMallocStack (sizeof (dgNode) * m_nodesCount);
 	m_indices = (dgInt32*) dgMallocStack (sizeof (dgInt32) * m_indexCount);
-//	m_localVertex = (dgFloat32*) dgMallocStack (sizeof (dgTriplex) * m_vertexCount);
-//	dgTriplex* const tmpVertexArray = (dgTriplex*) m_localVertex;
 	dgStack<dgVector> tmpVertexArray(builder.m_vertexCount + builder.m_normalCount + builder.m_faceCount * 2);
 
 	for (dgInt32 i = 0; i < builder.m_vertexCount; i ++) {
@@ -1861,8 +1833,8 @@ void dgAABBPolygonSoup::Create (dgMemoryAllocator* const allocator, const dgPoly
 	if (root->m_left) {
 
 		dgAssert (root->m_right);
-		dgList<dgNodeBuilder*> list (allocator);
-		dgList<dgNodeBuilder*> stack (allocator);
+		dgList<dgNodeBuilder*> list (builder.m_allocator);
+		dgList<dgNodeBuilder*> stack (builder.m_allocator);
 		stack.Append(root);
 		while (stack.GetCount()) {
 			dgList<dgNodeBuilder*>::dgListNode* const stackNode = stack.GetLast();
@@ -1899,7 +1871,7 @@ void dgAABBPolygonSoup::Create (dgMemoryAllocator* const allocator, const dgPoly
 		}
 	}
 
-	dgList<dgNodeBuilder*> list (allocator);
+	dgList<dgNodeBuilder*> list (builder.m_allocator);
 
 	list.Append(root);
 	dgInt32 nodeIndex = 0;
@@ -1940,10 +1912,10 @@ void dgAABBPolygonSoup::Create (dgMemoryAllocator* const allocator, const dgPoly
 
 			if (node->m_parent) {
 				if (node->m_parent->m_left == node) {
-					m_aabb[node->m_parent->m_enumeration].m_left = dgNode::dgLeafNodePtr (&m_aabb[node->m_parent->m_enumeration] - m_aabb);
+					m_aabb[node->m_parent->m_enumeration].m_left = dgNode::dgLeafNodePtr (&m_aabb[node->m_enumeration] - m_aabb);
 				} else {
 					dgAssert (node->m_parent->m_right == node);
-					m_aabb[node->m_parent->m_enumeration].m_right = dgNode::dgLeafNodePtr (&m_aabb[node->m_parent->m_enumeration] - m_aabb);
+					m_aabb[node->m_parent->m_enumeration].m_right = dgNode::dgLeafNodePtr (&m_aabb[node->m_enumeration] - m_aabb);
 				}
 			}
 
@@ -2293,7 +2265,7 @@ void dgAABBPolygonSoup::ForAllSectors (const dgVector& minBox, const dgVector& m
 					if (vCount > 0) {
 						dgInt32 index = dgInt32 (me->m_left.GetIndex());
 						const dgInt32* const indices = &m_indices[index];
-						dgInt32 normalIndex = indices[vCount + 1] * stride;
+						dgInt32 normalIndex = indices[vCount + 1];
 						dgVector faceNormal (&vertexArray[normalIndex].m_x);
 						if (PolygonBoxOBBTest (faceNormal, vCount, indices, stride, &vertexArray[0].m_x, origin, size)) {
 							if (callback(context, &vertexArray[0].m_x, sizeof (dgTriplex), indices, vCount, dgFloat32 (0.0f)) == t_StopSearh) {
@@ -2302,9 +2274,14 @@ void dgAABBPolygonSoup::ForAllSectors (const dgVector& minBox, const dgVector& m
 						}
 					}
 				} else {
-					dgAssert (stack < DG_STACK_DEPTH);
-					stackPool[stack] = me->m_left.GetNode(this);
-					stack++;
+					const dgNode* const left = me->m_left.GetNode(m_aabb);
+					dgFloat32 dist = left->BoxPenetration (vertexArray, minBox, maxBox);
+					if (dist > dgFloat32 (0.0f)) {
+						dgAssert (stack < DG_STACK_DEPTH);
+						distance[stack] = dist;
+						stackPool[stack] = left;
+						stack++;
+					}
 				}
 
 				if (me->m_right.IsLeaf()) {
@@ -2312,7 +2289,7 @@ void dgAABBPolygonSoup::ForAllSectors (const dgVector& minBox, const dgVector& m
 					if (vCount > 0) {
 						dgInt32 index = dgInt32 (me->m_right.GetIndex());
 						const dgInt32* const indices = &m_indices[index];
-						dgInt32 normalIndex = indices[vCount + 1] * stride;
+						dgInt32 normalIndex = indices[vCount + 1];
 						dgVector faceNormal (&vertexArray[normalIndex].m_x);
 						if (PolygonBoxOBBTest (faceNormal, vCount, indices, stride, &vertexArray[0].m_x, origin, size)) {
 							if (callback(context, &vertexArray[0].m_x, sizeof (dgTriplex), indices, vCount, dgFloat32 (0.0f)) == t_StopSearh) {
@@ -2322,75 +2299,93 @@ void dgAABBPolygonSoup::ForAllSectors (const dgVector& minBox, const dgVector& m
 					}
 
 				} else {
-					dgAssert (stack < DG_STACK_DEPTH);
-					stackPool[stack] = me->m_right.GetNode(this);
-					stack ++;
+					const dgNode* const right = me->m_right.GetNode(m_aabb);
+					dgFloat32 dist = right->BoxPenetration (vertexArray, minBox, maxBox);
+					if (dist > dgFloat32 (0.0f)) {
+						dgAssert (stack < DG_STACK_DEPTH);
+						distance[stack] = dist;
+						stackPool[stack] = right;
+						stack++;
+					}
 				}
 			}
 		}
 	} else {
-		dgAssert(0);
-/*
 		dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), boxDistanceTravel);
 
-		const dgInt32 stride = sizeof (dgTriplex) / sizeof (dgFloat32);
 		stackPool[0] = m_aabb;
-		distance [0] = m_aabb->BoxIntersect (ray, m_aabbPoints, minBox, maxBox);
-
+		distance [0] = m_aabb->BoxIntersect (ray, vertexArray, minBox, maxBox);
 		while (stack) {
-
 			stack --;
 			const dgFloat32 dist = distance[stack];
 			if (dist < dgFloat32 (1.0f)) {
 				const dgNode* const me = stackPool[stack];
-				if (me->m_nodeType & dgNode::m_leaf) {
-					dgInt32 vCount = dgInt32 (me->m_left);
-					dgAssert (vCount);
-					const dgInt32* const indices = (dgInt32*) me->m_right;
-					dgInt32 normalIndex = indices[vCount + 1];
-					dgVector faceNormal (&vertexArray[normalIndex].m_x);
-					dgFloat32 hitDistance = PolygonBoxOBBRayTest (faceNormal, vCount, indices, stride, &vertexArray[0].m_x, origin, size, boxDistanceTravel);
-					if (hitDistance < dgFloat32 (1.0f)) {
-						if (callback(context, &vertexArray[0].m_x, sizeof (dgTriplex), indices, vCount, dgMax (hitDistance, dist)) == t_StopSearh) {
-							return;
-
+				if (me->m_left.IsLeaf()) {
+					dgInt32 vCount = me->m_left.GetCount();
+					if (vCount > 0) {
+						dgInt32 index = dgInt32 (me->m_left.GetIndex());
+						const dgInt32* const indices = &m_indices[index];
+						dgInt32 normalIndex = indices[vCount + 1];
+						dgVector faceNormal (&vertexArray[normalIndex].m_x);
+						dgFloat32 hitDistance = PolygonBoxOBBRayTest (faceNormal, vCount, indices, stride, &vertexArray[0].m_x, origin, size, boxDistanceTravel);
+						if (hitDistance < dgFloat32 (1.0f)) {
+							if (callback(context, &vertexArray[0].m_x, sizeof (dgTriplex), indices, vCount, dgMax (hitDistance, dist)) == t_StopSearh) {
+								return;
+							}
 						}
 					}
+
 				} else {
 					dgAssert (stack < DG_STACK_DEPTH);
-					const dgNode* const left = me->m_left;
-					dgFloat32 dist = left->BoxIntersect (ray, m_aabbPoints, minBox, maxBox);
+
+					const dgNode* const node = me->m_left.GetNode(m_aabb);
+					dgFloat32 dist = node->BoxIntersect (ray, vertexArray, minBox, maxBox);
 					if (dist < dgFloat32 (1.0f)) {
 						dgInt32 j = stack;
 						for ( ; j && (dist > distance[j - 1]); j --) {
 							stackPool[j] = stackPool[j - 1];
 							distance[j] = distance[j - 1];
 						}
-						stackPool[j] = left;
+						stackPool[j] = node;
 						distance[j] = dist;
-						stack ++;
+						stack++;
+					}
+				}
+
+				if (me->m_right.IsLeaf()) {
+					dgInt32 index = dgInt32 (me->m_right.GetIndex());
+					dgInt32 vCount = me->m_right.GetCount();
+					if (vCount > 0) {
+						const dgInt32* const indices = &m_indices[index];
+						dgInt32 normalIndex = indices[vCount + 1];
+
+						dgVector faceNormal (&vertexArray[normalIndex].m_x);
+						dgFloat32 hitDistance = PolygonBoxOBBRayTest (faceNormal, vCount, indices, stride, &vertexArray[0].m_x, origin, size, boxDistanceTravel);
+						if (hitDistance < dgFloat32 (1.0f)) {
+							if (callback(context, &vertexArray[0].m_x, sizeof (dgTriplex), indices, vCount, dgMax (hitDistance, dist)) == t_StopSearh) {
+								return;
+							}
+						}
 					}
 
+				} else {
 					dgAssert (stack < DG_STACK_DEPTH);
-					const dgNode* const right = me->m_right;
-					dist = right->BoxIntersect (ray, m_aabbPoints, minBox, maxBox);
+					const dgNode* const node = me->m_right.GetNode(m_aabb);
+					dgFloat32 dist = node->BoxIntersect (ray, vertexArray, minBox, maxBox);
 					if (dist < dgFloat32 (1.0f)) {
 						dgInt32 j = stack;
 						for ( ; j && (dist > distance[j - 1]); j --) {
 							stackPool[j] = stackPool[j - 1];
 							distance[j] = distance[j - 1];
 						}
-						stackPool[j] = right;
+						stackPool[j] = node;
 						distance[j] = dist;
 						stack ++;
 					}
-
 				}
 			}
 		}
-*/
 	}
-
 }
 
 

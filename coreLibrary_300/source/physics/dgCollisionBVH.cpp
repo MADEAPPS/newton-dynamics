@@ -91,9 +91,8 @@ void dgCollisionBVH::EndBuild(dgInt32 optimize)
 	bool state = optimize ? true : false;
 
 	m_builder->End(state);
-	Create (GetAllocator(), *m_builder, state);
+	Create (*m_builder, state);
 	
-
 	GetAABB (p0, p1);
 	SetCollisionBBox (p0, p1);
 
