@@ -28,22 +28,13 @@
 
 class dgPolygonSoupDatabaseBuilder;
 
-//#define DG_NEW_AABB_TREE
-
-#ifdef DG_NEW_AABB_TREE
 
 class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 {
-	public:
+	class dgConstructionTree;
+
 	class dgNode
 	{
-		public:
-		enum dgNodeType
-		{
-			m_binary = 0,
-			m_leaf,
-		};
-
 		class dgLeafNodePtr
 		{
 			#define DG_INDEX_COUNT_BITS 6
@@ -84,7 +75,7 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 				m_node = 0x80000000 | (faceIndexCount << (32 - DG_INDEX_COUNT_BITS - 1)) | faceIndexStart;
 			}
 
-			DG_INLINE dgNode* GetNode (const void* const root) const
+			DG_INLINE dgNode* GetNode (const void* root) const
 			{
 				return ((dgNode*) root) + m_node;
 			}
@@ -94,110 +85,92 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 			};
 		};
 
-
-		dgNode ()
-			:m_indexBox0(0)
-			,m_indexBox1(0)
-			,m_left(NULL)
-			,m_right(NULL)
+		void CalcExtends (dgVector* const vertex, dgInt32 indexCount, const dgInt32* const indexArray) 
 		{
+			dgVector minP ( dgFloat32 (1.0e15f),  dgFloat32 (1.0e15f),  dgFloat32 (1.0e15f), dgFloat32 (0.0f)); 
+			dgVector maxP (-dgFloat32 (1.0e15f), -dgFloat32 (1.0e15f), -dgFloat32 (1.0e15f), dgFloat32 (0.0f)); 
+			for (dgInt32 i = 0; i < indexCount; i ++) {
+				dgInt32 index = indexArray[i];
+				const dgVector p = vertex[index];
+				minP = minP.GetMin(p);
+				maxP = maxP.GetMax(p);
+			}
+			vertex[m_minIndex] = (minP - dgVector (dgFloat32 (1.0e-3f))) & dgVector::m_triplexMask;
+			vertex[m_maxIndex] = (maxP + dgVector (dgFloat32 (1.0e-3f))) & dgVector::m_triplexMask;
 		}
 
-		DG_INLINE dgInt32 RayTest (const dgFastRayTest& ray, const dgTriplex* const vertexArray) const
-		{
-			dgVector p0 (&vertexArray[m_indexBox0].m_x);
-			dgVector p1 (&vertexArray[m_indexBox1].m_x);
-			return ray.BoxTest (p0, p1);
-		}
 
-		DG_INLINE dgFloat32 BoxIntersect (const dgFastRayTest& ray, const dgTriplex* const vertexArray, const dgVector& boxP0, const dgVector& boxP1) const
+		DG_INLINE dgInt32 BoxTest (const dgTriplex* const vertexArray, const dgVector& boxP0, const dgVector& boxP1) const
 		{
-			dgVector p0 (&vertexArray[m_indexBox0].m_x);
-			dgVector p1 (&vertexArray[m_indexBox1].m_x);
-			dgVector minBox (p0 - boxP1);
-			dgVector maxBox (p1 - boxP0);
-			return ray.BoxIntersect(minBox, maxBox);
+			dgVector minBox (&vertexArray[m_minIndex].m_x);
+			dgVector maxBox (&vertexArray[m_maxIndex].m_x);
+			return dgOverlapTest (minBox, maxBox, boxP0, boxP1);
 		}
 
 		DG_INLINE dgFloat32 BoxPenetration (const dgTriplex* const vertexArray, const dgVector& boxP0, const dgVector& boxP1) const
 		{
-			dgVector p0 (&vertexArray[m_indexBox0].m_x);
-			dgVector p1 (&vertexArray[m_indexBox1].m_x);
+			dgVector p0 (&vertexArray[m_minIndex].m_x);
+			dgVector p1 (&vertexArray[m_maxIndex].m_x);
 			dgVector minBox (p0 - boxP1);
 			dgVector maxBox (p1 - boxP0);
 			dgVector mask ((minBox.CompProduct4(maxBox)) < dgVector (dgFloat32 (0.0f)));
 			mask = mask & mask.ShiftTripleRight();
 			mask = mask & mask.ShiftTripleRight();
-			dgVector dist (maxBox.GetMin (minBox.Abs()) & mask);
-			dist = dist.GetMin(dist.ShiftTripleRight());
-			dist = dist.GetMin(dist.ShiftTripleRight());
+			dgVector dist (maxBox.GetMax (minBox.Abs()) & mask);
+			dist = dist.GetMax(dist.ShiftTripleRight());
+			dist = dist.GetMax(dist.ShiftTripleRight());
 			return dist.m_x;
 		}
 
-		dgInt32 m_indexBox0;
-		dgInt32 m_indexBox1;
-		dgLeafNodePtr m_left;
-		dgLeafNodePtr m_right;
+
+		DG_INLINE dgFloat32 BoxIntersect (const dgFastRayTest& ray, const dgTriplex* const vertexArray, const dgVector& boxP0, const dgVector& boxP1) const
+		{
+			dgVector p0 (&vertexArray[m_minIndex].m_x);
+			dgVector p1 (&vertexArray[m_maxIndex].m_x);
+
+			dgVector minBox (p0 - boxP1);
+			dgVector maxBox (p1 - boxP0);
+			return ray.BoxIntersect(minBox, maxBox);
+		}
+
+
+		DG_INLINE dgInt32 RayTest (const dgFastRayTest& ray, const dgTriplex* const vertexArray) const
+		{
+			dgVector minBox (&vertexArray[m_minIndex].m_x);
+			dgVector maxBox (&vertexArray[m_maxIndex].m_x);
+			//return RayTest (ray, minBox, maxBox);
+			return ray.BoxTest (minBox, maxBox);
+		}
+
+//		dgFloat64 TotalFitness (dgList<dgConstructionTree*>& nodeList) const;
+//		dgConstructionTree* ImproveTotalFitness (dgConstructionTree* const root, dgNode* const boxArray, dgMemoryAllocator* const allocator);
+//		void SetBox (dgConstructionTree* const node) const;
+//		dgInt32 CalculateMaximunDepth (dgConstructionTree* const tree) const;
+//		void ImproveNodeFitness (dgConstructionTree* const node) const;
+//		void PushNodes (dgConstructionTree* const root, dgList<dgConstructionTree*>& list) const;
+//		void CalcExtends (dgVector* const vertex, dgInt32 indexCount, const dgInt32* const indexArray);
+//		dgFloat32 CalculateArea (dgConstructionTree* const node0, dgConstructionTree* const node1) const;
+//		dgInt32 BuildTree (dgConstructionTree* const root, dgNode* const boxArray, dgNode* const boxCopy, dgVector* const vertexArrayOut, dgInt32 &treeVCount);
+//		dgInt32 BuildTopDown (dgMemoryAllocator* const allocator, dgInt32 boxCount, dgNode* const boxArray, dgVector* const vertexArrayOut, dgInt32 &treeVCount, bool optimizedBuild);
+//		dgConstructionTree* BuildTree (dgMemoryAllocator* const allocator, dgInt32 firstBox, dgInt32 lastBox, dgNode* const boxArray, const dgVector* const vertexArray, dgConstructionTree* parent);
+//		dgInt32 GetAxis (dgConstructionTree** const boxArray, dgInt32 boxCount) const;
+//		static dgInt32 CompareBox (const dgConstructionTree* const boxA, const dgConstructionTree* const boxB, void* const context);
+
+
+		dgVector ForAllSectorsSupportVertex (const dgVector& dir, const dgInt32* const indexArray, const dgFloat32* const vertexArray) const;
+		void ForAllSectorsRayHit (const dgFastRayTest& raySrc, const dgInt32* const indexArray, const dgFloat32* const vertexArray, dgRayIntersectCallback callback, void* const context) const;
+		void ForAllSectors (const dgInt32* const indexArray, const dgFloat32* const vertexArray, const dgVector& minBox, const dgVector& maxBox, const dgVector& boxDistanceTravel, dgFloat32 m_maxT, dgAABBIntersectCallback callback, void* const context) const;
+		
+
+		dgInt32 m_minIndex;
+		dgInt32 m_maxIndex;
+		dgLeafNodePtr m_back;
+		dgLeafNodePtr m_front;
+		friend class dgAABBPolygonSoup;
 	};
 
-	class dgNodeBuilder;
-
-
-	virtual void GetAABB (dgVector& p0, dgVector& p1) const;
-	virtual void Serialize (dgSerialize callback, void* const userData) const {dgAssert (0);}
-	virtual void Deserialize (dgDeserialize callback, void* const userData) {dgAssert (0);}
-
-	protected:
-	dgAABBPolygonSoup ();
-	virtual ~dgAABBPolygonSoup ();
-
-	void Create (const dgPolygonSoupDatabaseBuilder& builder, bool optimizedBuild);
-	virtual void ForAllSectorsRayHit (const dgFastRayTest& ray, dgRayIntersectCallback callback, void* const context) const;
-	virtual void ForAllSectors (const dgVector& minBox, const dgVector& maxBox, const dgVector& boxDistanceTravel, dgFloat32 m_maxT, dgAABBIntersectCallback callback, void* const context) const;
-
-	DG_INLINE void* GetRootNode() const 
-	{
-		return m_aabb;
-	}
-
-	DG_INLINE void* GetBackNode(const void* const root) const 
-	{
-		dgNode* const node = (dgNode*) root;
-		return node->m_left.IsLeaf() ? NULL : node->m_left.GetNode(m_aabb);
-	}
-
-	DG_INLINE void* GetFrontNode(const void* const root) const 
-	{
-		dgNode* const node = (dgNode*) root;
-		return node->m_right.IsLeaf() ? NULL : node->m_right.GetNode(m_aabb);
-	}
-
-	DG_INLINE void GetNodeAABB(const void* const root, dgVector& p0, dgVector& p1) const 
-	{
-		const dgNode* const node = (dgNode*)root;
-		p0 = dgVector (&((dgTriplex*)m_localVertex)[node->m_indexBox0].m_x);
-		p1 = dgVector (&((dgTriplex*)m_localVertex)[node->m_indexBox1].m_x);
-	}
-	virtual dgVector ForAllSectorsSupportVectex (const dgVector& dir) const {dgAssert (0); return dgVector(0.0f);}	
 	
 
-	private:
-	void CalculateAdjacendy ();
-	dgFloat32 CalculateFaceMaxSize (const dgVector* const vertex, dgInt32 indexCount, const dgInt32* const indexArray) const;
-//	static dgIntersectStatus CalculateManifoldFaceEdgeNormals (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount);
-	static dgIntersectStatus CalculateDisjointedFaceEdgeNormals (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount, dgFloat32 hitDistance);
-	static dgIntersectStatus CalculateAllFaceEdgeNormals (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount, dgFloat32 hitDistance);
-	void ImproveNodeFitness (dgNodeBuilder* const node) const;
-
-	dgInt32 m_nodesCount;
-	dgInt32 m_indexCount;
-	dgNode* m_aabb;
-	dgInt32* m_indices;
-};
-
-#else
-class dgAABBPolygonSoup: public dgPolygonSoupDatabase
-{
 	public:
 	virtual void GetAABB (dgVector& p0, dgVector& p1) const;
 	virtual void Serialize (dgSerialize callback, void* const userData) const;
@@ -221,6 +194,7 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 	virtual dgVector ForAllSectorsSupportVectex (const dgVector& dir) const;	
 
 	private:
+	dgInt32 BuildTopDown (dgMemoryAllocator* const allocator, dgInt32 boxCount, dgNode* const boxArray, dgVector* const vertexArrayOut, dgInt32 &treeVCount, bool optimizedBuild);
 	static dgIntersectStatus CalculateManifoldFaceEdgeNormals (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount);
 	static dgIntersectStatus CalculateDisjointedFaceEdgeNormals (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount, dgFloat32 hitDistance);
 	static dgIntersectStatus CalculateAllFaceEdgeNormals (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount, dgFloat32 hitDistance);
@@ -230,8 +204,6 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 	dgInt32 *m_indices;
 	void* m_aabb;
 };
-
-#endif
 
 #endif
 
