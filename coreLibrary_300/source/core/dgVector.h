@@ -535,7 +535,7 @@ class dgVector
 
 
 	DG_INLINE dgVector (const dgBigVector& copy)
-		:m_type(_mm_set_ps(dgFloat32 (copy.m_w), dgFloat32 (copy.m_z), dgFloat32 (copy.m_y), dgFloat32 (copy.m_x)))
+		:m_type(_mm_set_ps(dgFloat32 (copy.m_w), dgFloat32 (copy.m_z), dgFloat32 (copy.m_y), dgFloat32 (copy.m_w)))
 	{
 	}
 
