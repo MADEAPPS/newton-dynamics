@@ -142,25 +142,10 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 			return ray.BoxTest (minBox, maxBox);
 		}
 
-//		dgFloat64 TotalFitness (dgList<dgConstructionTree*>& nodeList) const;
-//		dgConstructionTree* ImproveTotalFitness (dgConstructionTree* const root, dgNode* const boxArray, dgMemoryAllocator* const allocator);
-//		void SetBox (dgConstructionTree* const node) const;
-//		dgInt32 CalculateMaximunDepth (dgConstructionTree* const tree) const;
-//		void ImproveNodeFitness (dgConstructionTree* const node) const;
-//		void PushNodes (dgConstructionTree* const root, dgList<dgConstructionTree*>& list) const;
-//		void CalcExtends (dgVector* const vertex, dgInt32 indexCount, const dgInt32* const indexArray);
-//		dgFloat32 CalculateArea (dgConstructionTree* const node0, dgConstructionTree* const node1) const;
-//		dgInt32 BuildTree (dgConstructionTree* const root, dgNode* const boxArray, dgNode* const boxCopy, dgVector* const vertexArrayOut, dgInt32 &treeVCount);
-//		dgInt32 BuildTopDown (dgMemoryAllocator* const allocator, dgInt32 boxCount, dgNode* const boxArray, dgVector* const vertexArrayOut, dgInt32 &treeVCount, bool optimizedBuild);
-//		dgConstructionTree* BuildTree (dgMemoryAllocator* const allocator, dgInt32 firstBox, dgInt32 lastBox, dgNode* const boxArray, const dgVector* const vertexArray, dgConstructionTree* parent);
-//		dgInt32 GetAxis (dgConstructionTree** const boxArray, dgInt32 boxCount) const;
-//		static dgInt32 CompareBox (const dgConstructionTree* const boxA, const dgConstructionTree* const boxB, void* const context);
-
 
 		dgVector ForAllSectorsSupportVertex (const dgVector& dir, const dgInt32* const indexArray, const dgFloat32* const vertexArray) const;
 		void ForAllSectorsRayHit (const dgFastRayTest& raySrc, const dgInt32* const indexArray, const dgFloat32* const vertexArray, dgRayIntersectCallback callback, void* const context) const;
-		void ForAllSectors (const dgInt32* const indexArray, const dgFloat32* const vertexArray, const dgVector& minBox, const dgVector& maxBox, const dgVector& boxDistanceTravel, dgFloat32 m_maxT, dgAABBIntersectCallback callback, void* const context) const;
-		
+	
 
 		dgInt32 m_minIndex;
 		dgInt32 m_maxIndex;
@@ -202,7 +187,7 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 	dgInt32 m_nodesCount;
 	dgInt32 m_indexCount;
 	dgInt32 *m_indices;
-	void* m_aabb;
+	dgNode* m_aabb;
 };
 
 #endif
