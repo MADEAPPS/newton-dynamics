@@ -251,6 +251,14 @@ class dgAABBPolygonSoup::dgConstructionTree
 					//dgAssert (boxCount == 1);
 					dgNode* const newNode = &boxArray[index];
 					*newNode = boxCopy[node->m_boxIndex];
+
+					newNode->m_minIndex = treeVCount;
+					vertexArrayOut[treeVCount] = node->m_p0;
+
+					newNode->m_maxIndex = treeVCount + 1;
+					vertexArrayOut[treeVCount + 1] = node->m_p1;
+					treeVCount += 2;
+
 					index ++;
 				}
 
@@ -1169,15 +1177,6 @@ void dgAABBPolygonSoup::Create (const dgPolygonSoupDatabaseBuilder& builder, boo
 }
 
 
-//void dgAABBPolygonSoup::ForAllSectors (const dgVector& minBox, const dgVector& maxBox, const dgVector& boxDistanceTravel, dgFloat32 m_maxT, dgAABBIntersectCallback callback, void* const context) const
-//{
-//	if (m_aabb) {
-//		dgNode* const tree = (dgNode*) m_aabb;
-//		tree->ForAllSectors (m_indices, m_localVertex, minBox, maxBox, boxDistanceTravel, m_maxT, callback, context);
-//	}
-//}
-
-//void dgAABBPolygonSoup::dgNode::ForAllSectors (const dgInt32* const indexArray, const dgFloat32* const vertexArray, const dgVector& minBox, const dgVector& maxBox, const dgVector& boxDistanceTravel, dgFloat32 m_maxT, dgAABBIntersectCallback callback, void* const context) const
 void dgAABBPolygonSoup::ForAllSectors (const dgVector& minBox, const dgVector& maxBox, const dgVector& boxDistanceTravel, dgFloat32 m_maxT, dgAABBIntersectCallback callback, void* const context) const
 {
 	if (!m_aabb) {
@@ -1265,7 +1264,7 @@ void dgAABBPolygonSoup::ForAllSectors (const dgVector& minBox, const dgVector& m
 						dgVector faceNormal (&vertexArray[normalIndex].m_x);
 						dgFloat32 hitDistance = PolygonBoxOBBRayTest (faceNormal, vCount, indices, stride, &vertexArray[0].m_x, origin, size, boxDistanceTravel);
 						if (hitDistance < dgFloat32 (1.0f)) {
-							if (callback(context, &vertexArray[0].m_x, sizeof (dgTriplex), indices, vCount, dgMax (hitDistance, dist)) == t_StopSearh) {
+							if (callback(context, &vertexArray[0].m_x, sizeof (dgTriplex), indices, vCount, hitDistance) == t_StopSearh) {
 								return;
 							}
 						}
@@ -1297,7 +1296,7 @@ void dgAABBPolygonSoup::ForAllSectors (const dgVector& minBox, const dgVector& m
 						dgVector faceNormal (&vertexArray[normalIndex].m_x);
 						dgFloat32 hitDistance = PolygonBoxOBBRayTest (faceNormal, vCount, indices, stride, &vertexArray[0].m_x, origin, size, boxDistanceTravel);
 						if (hitDistance < dgFloat32 (1.0f)) {
-							if (callback(context, &vertexArray[0].m_x, sizeof (dgTriplex), indices, vCount, dgMax (hitDistance, dist)) == t_StopSearh) {
+							if (callback(context, &vertexArray[0].m_x, sizeof (dgTriplex), indices, vCount, hitDistance) == t_StopSearh) {
 								return;
 							}
 						}

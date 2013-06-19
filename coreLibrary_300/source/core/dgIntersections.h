@@ -286,38 +286,58 @@ DG_INLINE dgInt32 PolygonBoxOBBTest (const dgVector& faceNormal, dgInt32 indexCo
 
 DG_INLINE dgFloat32 PolygonBoxOBBRayTest (const dgVector& faceNormal, dgInt32 indexCount, const dgInt32* const indexArray, dgInt32 stride, const dgFloat32* const vertexArray, const dgVector& boxOrigin, const dgVector& boxSize, const dgVector& boxVeloc)
 {
-	dgMatrix matrix;
-	dgVector origin (&vertexArray[indexArray[0] * stride]);
-
-	matrix[0] = faceNormal;
-	matrix[1] = dgVector (&vertexArray[indexArray[1] * stride]) - origin;
-	matrix[1] = matrix[1].CompProduct4 (matrix[1].DotProduct4(matrix[1]).InvSqrt());
-	matrix[2] = matrix[0] * matrix[1];
-	matrix[3] = origin | dgVector::m_wOne; 
-	matrix = matrix.Inverse();
-
-	dgVector faceBoxP0 (dgFloat32 (0.0f));
-	dgVector faceBoxP1 (dgFloat32 (0.0f));
+	dgVector faceBoxP0 (&vertexArray[indexArray[0] * stride]);
+	dgVector faceBoxP1 (faceBoxP0);
 	for (dgInt32 i = 1; i < indexCount; i ++) {
 		dgInt32 index = indexArray[i] * stride;
-		dgVector p (matrix.TransformVector (dgVector (&vertexArray[index])));
+		dgVector p (&vertexArray[index]);
 		faceBoxP0 = faceBoxP0.GetMin(p); 
 		faceBoxP1 = faceBoxP1.GetMax(p); 
 	}
-	faceBoxP0 = faceBoxP0 & dgVector::m_triplexMask;
-	faceBoxP1 = faceBoxP1 & dgVector::m_triplexMask;
+	dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), boxVeloc);
 
-	dgVector boxCenter (matrix.TransformVector(boxOrigin));
-	dgVector size (matrix[0].Abs().CompProduct4(dgVector(boxSize.m_x)) + matrix[1].Abs().CompProduct4(dgVector(boxSize.m_y)) + matrix[2].Abs().CompProduct4(dgVector(boxSize.m_z)));
-	dgVector boxP0 ((boxCenter - size) & dgVector::m_triplexMask);
-	dgVector boxP1 ((boxCenter + size) & dgVector::m_triplexMask);
-
+	dgVector boxP0 (boxOrigin - boxSize);
+	dgVector boxP1 (boxOrigin + boxSize);
 	dgVector minBox (faceBoxP0 - boxP1);
 	dgVector maxBox (faceBoxP1 - boxP0);
+	dgFloat32 dist0 = ray.BoxIntersect(minBox, maxBox);
 
-	dgVector veloc (matrix.RotateVector(boxVeloc) & dgVector::m_triplexMask);
-	dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), veloc);
-	return ray.BoxIntersect(minBox, maxBox);
+	if (dist0 < dgFloat32 (1.0f)) {
+		dgMatrix matrix;
+		dgVector origin (&vertexArray[indexArray[0] * stride]);
+
+		matrix[0] = faceNormal;
+		matrix[1] = dgVector (&vertexArray[indexArray[1] * stride]) - origin;
+		matrix[1] = matrix[1].CompProduct4 (matrix[1].DotProduct4(matrix[1]).InvSqrt());
+		matrix[2] = matrix[0] * matrix[1];
+		matrix[3] = origin | dgVector::m_wOne; 
+		matrix = matrix.Inverse();
+
+		dgVector faceBoxP0 (dgFloat32 (0.0f));
+		dgVector faceBoxP1 (dgFloat32 (0.0f));
+		for (dgInt32 i = 1; i < indexCount; i ++) {
+			dgInt32 index = indexArray[i] * stride;
+			dgVector p (matrix.TransformVector (dgVector (&vertexArray[index])));
+			faceBoxP0 = faceBoxP0.GetMin(p); 
+			faceBoxP1 = faceBoxP1.GetMax(p); 
+		}
+		faceBoxP0 = faceBoxP0 & dgVector::m_triplexMask;
+		faceBoxP1 = faceBoxP1 & dgVector::m_triplexMask;
+
+		dgVector boxCenter (matrix.TransformVector(boxOrigin));
+		dgVector size (matrix[0].Abs().CompProduct4(dgVector(boxSize.m_x)) + matrix[1].Abs().CompProduct4(dgVector(boxSize.m_y)) + matrix[2].Abs().CompProduct4(dgVector(boxSize.m_z)));
+		dgVector boxP0 ((boxCenter - size) & dgVector::m_triplexMask);
+		dgVector boxP1 ((boxCenter + size) & dgVector::m_triplexMask);
+
+		dgVector minBox (faceBoxP0 - boxP1);
+		dgVector maxBox (faceBoxP1 - boxP0);
+
+		dgVector veloc (matrix.RotateVector(boxVeloc) & dgVector::m_triplexMask);
+		dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), veloc);
+		dgFloat32 dist1 = ray.BoxIntersect(minBox, maxBox);
+		dist0 = dgMax (dist1, dist0);
+	}
+	return dist0;
 }
 
 #endif
