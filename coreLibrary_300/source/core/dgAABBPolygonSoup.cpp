@@ -1186,20 +1186,19 @@ void dgAABBPolygonSoup::ForAllSectors (const dgVector& minBox, const dgVector& m
 	const dgNode* stackPool[DG_STACK_DEPTH];
 
 	const dgInt32 stride = sizeof (dgTriplex) / sizeof (dgFloat32);
-	dgVector origin ((maxBox + minBox).Scale4 (dgFloat32 (0.5f)));
-	dgVector size ((maxBox - minBox).Scale4 (dgFloat32 (0.5f)));
-
+	dgFastAABBInfo aabbIndo (minBox, maxBox);
 	const dgTriplex* const vertexArray = (dgTriplex*) m_localVertex;
 
 	if ((boxDistanceTravel % boxDistanceTravel) < dgFloat32 (1.0e-8f)) {
 		dgInt32 stack = 1;
 		stackPool[0] = m_aabb;
+		distance[0] = m_aabb->BoxPenetration(vertexArray, minBox, maxBox);
 
 		while (stack) {
 			stack --;
-			const dgNode* const me = stackPool[stack];
-			if (me->BoxTest (vertexArray, minBox, maxBox)) {
-
+			dgFloat32 dist = distance[stack];
+			if (dist > dgFloat32 (0.0f)) {
+				const dgNode* const me = stackPool[stack];
 				if (me->m_back.IsLeaf()) {
 					dgInt32 index = dgInt32 (me->m_back.GetIndex());
 					dgInt32 vCount = me->m_back.GetCount();
@@ -1207,17 +1206,28 @@ void dgAABBPolygonSoup::ForAllSectors (const dgVector& minBox, const dgVector& m
 						const dgInt32* const indices = &m_indices[index];
 						dgInt32 normalIndex = indices[vCount + 1];
 						dgVector faceNormal (&vertexArray[normalIndex].m_x);
-						if (PolygonBoxOBBTest (faceNormal, vCount, indices, stride, &vertexArray[0].m_x, origin, size)) {
-							if (callback(context, &vertexArray[0].m_x, sizeof (dgTriplex), indices, vCount, dgFloat32 (0.0f)) == t_StopSearh) {
+						dgFloat32 dist1 = aabbIndo.PolygonBoxDistance (faceNormal, vCount, indices, stride, &vertexArray[0].m_x);
+						if (dist1 > dgFloat32 (0.0f)) {
+							if (callback(context, &vertexArray[0].m_x, sizeof (dgTriplex), indices, vCount, dist1) == t_StopSearh) {
 								return;
 							}
 						}
 					}
 
 				} else {
-					dgAssert (stack < DG_STACK_DEPTH);
-					stackPool[stack] = me->m_back.GetNode(m_aabb);
-					stack++;
+					const dgNode* const node = me->m_back.GetNode(m_aabb);
+					dgFloat32 dist = node->BoxPenetration(vertexArray, minBox, maxBox);
+					if (dist > dgFloat32 (0.0f)) {
+						dgInt32 j = stack;
+						for ( ; j && (dist > distance[j - 1]); j --) {
+							stackPool[j] = stackPool[j - 1];
+							distance[j] = distance[j - 1];
+						}
+						dgAssert (stack < DG_STACK_DEPTH);
+						stackPool[j] = node;
+						distance[j] = dist;
+						stack++;
+					}
 				}
 
 				if (me->m_front.IsLeaf()) {
@@ -1227,25 +1237,34 @@ void dgAABBPolygonSoup::ForAllSectors (const dgVector& minBox, const dgVector& m
 						const dgInt32* const indices = &m_indices[index];
 						dgInt32 normalIndex = indices[vCount + 1];
 						dgVector faceNormal (&vertexArray[normalIndex].m_x);
-						if (PolygonBoxOBBTest (faceNormal, vCount, indices, stride, &vertexArray[0].m_x, origin, size)) {
-							if (callback(context, &vertexArray[0].m_x, sizeof (dgTriplex), indices, vCount, dgFloat32 (0.0f)) == t_StopSearh) {
+						dgFloat32 dist1 = aabbIndo.PolygonBoxDistance (faceNormal, vCount, indices, stride, &vertexArray[0].m_x);
+						if (dist1 > dgFloat32 (0.0f)) {
+							if (callback(context, &vertexArray[0].m_x, sizeof (dgTriplex), indices, vCount, dist1) == t_StopSearh) {
 								return;
 							}
 						}
 					}
 
 				} else {
-					dgAssert (stack < DG_STACK_DEPTH);
-					stackPool[stack] = me->m_front.GetNode(m_aabb);
-					stack ++;
+					const dgNode* const node = me->m_front.GetNode(m_aabb);
+					dgFloat32 dist = node->BoxPenetration(vertexArray, minBox, maxBox);
+					if (dist > dgFloat32 (0.0f)) {
+						dgInt32 j = stack;
+						for ( ; j && (dist > distance[j - 1]); j --) {
+							stackPool[j] = stackPool[j - 1];
+							distance[j] = distance[j - 1];
+						}
+						dgAssert (stack < DG_STACK_DEPTH);
+						stackPool[j] = node;
+						distance[j] = dist;
+						stack++;
+					}
 				}
 			}
 		}
 
 	} else {
 		dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), boxDistanceTravel);
-		dgFastAABBInfo aabbIndo (minBox, maxBox);
-
 		dgInt32 stack = 1;
 		stackPool[0] = m_aabb;
 		distance [0] = m_aabb->BoxIntersect (ray, vertexArray, minBox, maxBox);
@@ -1263,8 +1282,7 @@ void dgAABBPolygonSoup::ForAllSectors (const dgVector& minBox, const dgVector& m
 						const dgInt32* const indices = &m_indices[index];
 						dgInt32 normalIndex = indices[vCount + 1];
 						dgVector faceNormal (&vertexArray[normalIndex].m_x);
-						//dgFloat32 hitDistance = PolygonBoxOBBRayTest (faceNormal, vCount, indices, stride, &vertexArray[0].m_x, origin, size, boxDistanceTravel);
-						dgFloat32 hitDistance = aabbIndo.PolygonBoxOBBRayTest (faceNormal, vCount, indices, stride, &vertexArray[0].m_x, ray);
+						dgFloat32 hitDistance = aabbIndo.PolygonBoxRayDistance (faceNormal, vCount, indices, stride, &vertexArray[0].m_x, ray);
 						if (hitDistance < dgFloat32 (1.0f)) {
 							if (callback(context, &vertexArray[0].m_x, sizeof (dgTriplex), indices, vCount, hitDistance) == t_StopSearh) {
 								return;
@@ -1296,8 +1314,7 @@ void dgAABBPolygonSoup::ForAllSectors (const dgVector& minBox, const dgVector& m
 						const dgInt32* const indices = &m_indices[index];
 						dgInt32 normalIndex = indices[vCount + 1];
 						dgVector faceNormal (&vertexArray[normalIndex].m_x);
-						//dgFloat32 hitDistance = PolygonBoxOBBRayTest (faceNormal, vCount, indices, stride, &vertexArray[0].m_x, origin, size, boxDistanceTravel);
-						dgFloat32 hitDistance = aabbIndo.PolygonBoxOBBRayTest (faceNormal, vCount, indices, stride, &vertexArray[0].m_x, ray);
+						dgFloat32 hitDistance = aabbIndo.PolygonBoxRayDistance (faceNormal, vCount, indices, stride, &vertexArray[0].m_x, ray);
 						if (hitDistance < dgFloat32 (1.0f)) {
 							if (callback(context, &vertexArray[0].m_x, sizeof (dgTriplex), indices, vCount, hitDistance) == t_StopSearh) {
 								return;
