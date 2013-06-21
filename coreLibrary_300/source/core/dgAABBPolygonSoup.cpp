@@ -1066,7 +1066,6 @@ dgInt32 dgAABBPolygonSoup::BuildTopDown (dgMemoryAllocator* const allocator, dgI
 	dgStack <dgNode> boxCopy (boxCount);
 	memcpy (&boxCopy[0], boxArray, boxCount * sizeof (dgNode));
 
-//	dgConstructionTree* tree = BuildTree (allocator, 0, boxCount - 1, &boxCopy[0], vertexArrayOut, NULL);
 	dgConstructionTree* root = new (allocator) dgConstructionTree (allocator, 0, boxCount - 1, &boxCopy[0], vertexArrayOut, NULL);
 	
 	optimizedBuild = true;
@@ -1092,7 +1091,6 @@ void dgAABBPolygonSoup::Create (const dgPolygonSoupDatabaseBuilder& builder, boo
 	m_indices = (dgInt32*) dgMallocStack (sizeof (dgInt32) * m_indexCount);
 	m_aabb = (dgNode*) dgMallocStack (sizeof (dgNode) * builder.m_faceCount);
 
-	//dgNode* const tree = (dgNode*) m_aabb;
 	dgStack<dgVector> tmpVertexArray(builder.m_vertexCount + builder.m_normalCount + builder.m_faceCount * 4);
 
 	for (dgInt32 i = 0; i < builder.m_vertexCount; i ++) {

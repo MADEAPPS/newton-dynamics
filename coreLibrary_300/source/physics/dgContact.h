@@ -123,7 +123,7 @@ class dgCollisionParamProxy
 	dgCollisionInstance* m_floatingCollision;
 	dgCollisionInstance* m_referenceCollision;
 	dgContactPoint* m_contacts;
-	const dgPolygonMeshDesc* m_polyMeshData;
+	dgPolygonMeshDesc* m_polyMeshData;
 	
 	dgFloat32 m_timestep;
 	dgFloat32 m_skinThickness;

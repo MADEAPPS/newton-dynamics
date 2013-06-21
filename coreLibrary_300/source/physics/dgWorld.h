@@ -440,6 +440,15 @@ class dgWorld:
 	virtual void TickCallback (dgInt32 threadID);
 
 
+	class dgAdressDistPair
+	{
+		public:
+		dgInt32 m_adress;
+		dgFloat32 m_dist;
+	};
+	static dgInt32 SortFaces (const dgAdressDistPair* const A, const dgAdressDistPair* const B, void* const context);
+
+
 	dgUnsigned32 m_dynamicsLru;
 	dgUnsigned32 m_inUpdate;
 	dgUnsigned32 m_solverMode;
