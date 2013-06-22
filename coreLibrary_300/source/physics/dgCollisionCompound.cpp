@@ -486,16 +486,9 @@ dgFloat32 dgCollisionCompound::RayCast (const dgVector& localP0, const dgVector&
 				}
 
 			} else {
-				dgAssert (me->m_type == m_node);
-//				stackPool[stack] = me->m_left;
-//				stack++;
-//				dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNodeBase*)));
-//				
-//				stackPool[stack] = me->m_right;
-//				stack++;
-//				dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNodeBase*)));
 				{
 					const dgNodeBase* const node = me->m_left;
+					dgAssert (me->m_type == m_node);
 					dgFloat32 dist = ray.BoxIntersect(node->m_p0, node->m_p1);
 					if (dist < maxParam) {
 						dgInt32 j = stack;
@@ -512,6 +505,7 @@ dgFloat32 dgCollisionCompound::RayCast (const dgVector& localP0, const dgVector&
 
 				{
 					const dgNodeBase* const node = me->m_right;
+					dgAssert (me->m_type == m_node);
 					dgFloat32 dist = ray.BoxIntersect(node->m_p0, node->m_p1);
 					if (dist < maxParam) {
 						dgInt32 j = stack;
