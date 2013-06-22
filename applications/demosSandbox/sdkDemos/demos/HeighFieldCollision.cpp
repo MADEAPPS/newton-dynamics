@@ -42,7 +42,7 @@ void HeightFieldCollision (DemoEntityManager* const scene)
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 	dVector location (origin);
 	location.m_x += 20.0f;
-	location.m_z += 20.0f;
+	location.m_z += 0.0f;
 	dVector size (0.5f, 0.5f, 0.75f, 0.0f);
 
 //	int count = 5;

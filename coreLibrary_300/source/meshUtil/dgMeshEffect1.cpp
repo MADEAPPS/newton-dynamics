@@ -735,7 +735,8 @@ dgMeshEffect::dgMeshBVH::dgMeshBVHNode* dgMeshEffect::dgMeshBVH::FaceRayCast (co
 				if (param < maxParam) {
 					node = me;
 					maxParam = param;
-					ray.Reset (dgFloat32 (maxParam + 0.01));
+dgAssert (0);
+//					ray.Reset (dgFloat32 (maxParam + 0.01));
 				}
 
 			} else {

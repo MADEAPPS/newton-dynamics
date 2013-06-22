@@ -482,13 +482,15 @@ dgFloat32 dgCollisionCompound::RayCast (const dgVector& localP0, const dgVector&
 					contactOut.m_normal = shape->GetLocalMatrix().RotateVector (tmpContactOut.m_normal);;
 //					contactOut.m_userId = tmpContactOut.m_userId;
 					contactOut.m_shapeId0 = tmpContactOut.m_shapeId0;
-					ray.Reset (maxParam) ;
+dgAssert (0);
+//					ray.Reset (maxParam) ;
 				}
 
 			} else {
+				dgAssert (me->m_type == m_node);
 				{
 					const dgNodeBase* const node = me->m_left;
-					dgAssert (me->m_type == m_node);
+					dgAssert (node);
 					dgFloat32 dist = ray.BoxIntersect(node->m_p0, node->m_p1);
 					if (dist < maxParam) {
 						dgInt32 j = stack;
@@ -499,13 +501,13 @@ dgFloat32 dgCollisionCompound::RayCast (const dgVector& localP0, const dgVector&
 						stackPool[j] = node;
 						distance[j] = dist;
 						stack++;
-						dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNodeBase*)));
+						dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (stackPool[0])));
 					}
 				}
 
 				{
 					const dgNodeBase* const node = me->m_right;
-					dgAssert (me->m_type == m_node);
+					dgAssert (node);
 					dgFloat32 dist = ray.BoxIntersect(node->m_p0, node->m_p1);
 					if (dist < maxParam) {
 						dgInt32 j = stack;
@@ -516,7 +518,7 @@ dgFloat32 dgCollisionCompound::RayCast (const dgVector& localP0, const dgVector&
 						stackPool[j] = node;
 						distance[j] = dist;
 						stack++;
-						dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNodeBase*)));
+						dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (stackPool[0])));
 					}
 				}
 			}
@@ -566,7 +568,8 @@ dgFloat32 dgCollisionCompound::ConvexRayCast (const dgCollisionInstance* const c
 				dgFloat32 t = childInstance.ConvexRayCast (convexShape, shapeMatrix, shapeVeloc, minT, tmpContact, NULL, referenceBody, userData, threadId);
 				if (t < minT) {
 					contactOut = tmpContact;
-					ray.Reset (t);
+dgAssert (0);
+//					ray.Reset (t);
 					minT = t;
 				}
 
@@ -1696,7 +1699,8 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgCollidingPairCo
 							dgFloat32 param = proxy.m_timestep;
 							dgAssert (param >= dgFloat32 (0.0f));
 							if (param < maxParam) {
-								ray.Reset (param);
+dgAssert (0);
+//								ray.Reset (param);
 
 								if (contactCount && ((param - maxParam) * invMaxParam) < dgFloat32(-1.0e-3f)) {
 									for (dgInt32 i = 0; i < count; i ++) {

@@ -1286,7 +1286,8 @@ void dgAABBPolygonSoup::ForAllSectorsRayHit (const dgFastRayTest& raySrc, dgRayI
 						if (maxParam == dgFloat32 (0.0f)) {
 							break;
 						}
-						ray.Reset (maxParam) ;
+dgAssert (0);
+						//ray.Reset (maxParam) ;
 					}
 				}
 
@@ -1317,7 +1318,8 @@ void dgAABBPolygonSoup::ForAllSectorsRayHit (const dgFastRayTest& raySrc, dgRayI
 						if (maxParam == dgFloat32 (0.0f)) {
 							break;
 						}
-						ray.Reset (maxParam);
+dgAssert (0);
+						//ray.Reset (maxParam);
 					}
 				}
 
