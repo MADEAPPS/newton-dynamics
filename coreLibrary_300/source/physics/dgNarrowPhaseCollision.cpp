@@ -1470,12 +1470,12 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts (dgCollisionParamProxy& prox
 	data.m_skinThickness = proxy.m_skinThickness;
 	data.m_faceIndexCount = NULL;
 	data.m_faceVertexIndex = NULL;
+	data.m_hitDistance = NULL;
 	data.m_userData = polySoupInstance->GetUserData();
 	data.m_objBody = hullBody;
 	data.m_polySoupBody = soupBody;
 	data.m_objCollision = convexInstance;
 	data.m_polySoupCollision = polySoupInstance;
-//	data.m_meshToShapeMatrix = convexInstance->CalculateSpaceMatrix(polySoupInstance);
 
 	if (proxy.m_continueCollision) {
 		data.m_doContinuesCollisionTest = true;
@@ -1493,7 +1493,6 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts (dgCollisionParamProxy& prox
 			dgVector upperBoundVeloc (hullVeloc.Scale3 (proxy.m_timestep * upperBoundSpeed / baseLinearSpeed));
 
 			data.m_boxDistanceTravelInMeshSpace = polySoupInstance->m_invScale.CompProduct4(soupMatrix.UnrotateVector(upperBoundVeloc.CompProduct4(convexInstance->m_invScale)));
-//			data.m_distanceTravelInCollidingShapeSpace = convexInstance->m_invScale.CompProduct4(hullMatrix.UnrotateVector(upperBoundVeloc.CompProduct4(polySoupInstance->m_invScale)));
 		}
 	}
 
@@ -1672,15 +1671,6 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) 
 
 }
 
-dgInt32 dgWorld::SortFaces (const dgAdressDistPair* const A, const dgAdressDistPair* const B, void* const context)
-{
-	if (A->m_dist < B->m_dist) {
-		return 1;
-	} else if (A->m_dist > B->m_dist) {
-		return -1;
-	}
-	return 0;
-}
 
 dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy& proxy) const
 {
@@ -1692,7 +1682,6 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 	dgPolygonMeshDesc& data = *proxy.m_polyMeshData;
 
 	dgAssert (data.m_faceCount); 
-	dgInt32* const indexArray = (dgInt32*)data.m_faceVertexIndex;
 
 	dgCollisionConvexPolygon polygon (m_allocator);
 	dgCollisionInstance polyInstance (*polySoupInstance, &polygon);
@@ -1729,21 +1718,12 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 	dgFloat32 closestDist = dgFloat32 (1.0e10f);
 	dgContactPoint* const contactOut = proxy.m_contacts;
 	dgContact* const contactJoint = proxy.m_contactJoint;
+	dgInt32* const indexArray = (dgInt32*)data.m_faceVertexIndex;
+	data.SortFaceArray();
 
-	dgInt32 address = 0;	
-	dgAdressDistPair faceAddresses[DG_MAX_COLLIDING_FACES];
-	for (dgInt32 j = 0; j < data.m_faceCount; j ++) {
-		dgInt32 count = data.GetFaceIndexCount (data.m_faceIndexCount[j]);
-		faceAddresses[j].m_adress = address;
-		faceAddresses[j].m_dist = data.m_globalHitDistance[j];
-		address += count;
-	}
-	dgSort (faceAddresses, data.m_faceCount, SortFaces);
-
-//	for (dgInt32 i = 0; i < data.m_faceCount; i ++) {
 	for (dgInt32 i = 0; (i < data.m_faceCount) && (count < 16); i ++) {
-		const dgInt32* const localIndexArray = &indexArray[faceAddresses[i].m_adress];
-		//const dgInt32* const localIndexArray = &indexArray[indexCount];
+		dgInt32 address = data.m_faceIndexStart[i];
+		const dgInt32* const localIndexArray = &indexArray[address];
 
 		polygon.m_vertexIndex = localIndexArray;
 		polygon.m_count = data.m_faceIndexCount[i];
@@ -1774,10 +1754,7 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 			count = -1;
 			break;
 		}
-
-		//indexCount += data.GetFaceIndexCount (data.m_faceIndexCount[i]);
 	}
-
 
 	contactJoint->m_closestDistance = closestDist;
 
@@ -1818,9 +1795,7 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 
 	// restore the pointer
 	proxy.m_floatingCollision = polySoupInstance;
-
 	return count;
-
 }
 
 
@@ -1832,10 +1807,10 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue (dgCollisionParamPro
 
 	dgCollisionInstance* const polySoupInstance = proxy.m_floatingCollision;
 	dgCollisionInstance* const convexHullInstance = proxy.m_referenceCollision;
-	const dgPolygonMeshDesc& data = *proxy.m_polyMeshData;
+	dgPolygonMeshDesc& data = *proxy.m_polyMeshData;
 
 	dgAssert (data.m_faceCount); 
-	dgInt32* const indexArray = (dgInt32*)data.m_faceVertexIndex;
+	
 
 	dgCollisionConvexPolygon polygon (m_allocator);
 	dgCollisionInstance polyInstance (*polySoupInstance, &polygon);
@@ -1845,7 +1820,6 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue (dgCollisionParamPro
 	polygon.m_vertex = data.m_vertex;
 	polygon.m_stride = dgInt32 (data.m_vertexStrideInBytes / sizeof (dgFloat32));
 
-	dgInt32 indexCount = 0;
 	dgInt32 maxContacts = proxy.m_maxContacts;
 	dgInt32 maxReduceLimit = maxContacts >> 2;
 	dgInt32 countleft = maxContacts;
@@ -1877,14 +1851,18 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue (dgCollisionParamPro
 	dgCollisionConvex* const convexShape = (dgCollisionConvex*) convexHullInstance->m_childShape;
 
 	dgUnsigned64 shapeFaceID = dgUnsigned64(-1);
-	dgVector n (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	dgVector p (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	dgVector q (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	
+	dgVector n (dgFloat32 (0.0f));
+	dgVector p (dgFloat32 (0.0f));
+	dgVector q (dgFloat32 (0.0f));
+
+	data.SortFaceArray();
+
+	dgInt32* const indexArray = (dgInt32*)data.m_faceVertexIndex;
 	dgFloat32 saveTimeStep = proxy.m_timestep;
 	dgFloat32 epsilon = dgFloat32 (-1.0e-3f) * proxy.m_timestep;
-	for (dgInt32 j = 0; j < data.m_faceCount; j ++) {
-		const dgInt32* const localIndexArray = &indexArray[indexCount];
+	for (dgInt32 j = data.m_faceCount - 1; (j >= 0) && (data.m_hitDistance[j] < (closestDist + dgFloat32 (1.0e-3f))); j --) {
+		dgInt32 address = data.m_faceIndexStart[j];
+		const dgInt32* const localIndexArray = &indexArray[address];
 
 		polygon.m_vertexIndex = localIndexArray;
 		polygon.m_count = data.m_faceIndexCount[j];
@@ -1920,21 +1898,20 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue (dgCollisionParamPro
 			dgAssert (countleft >= 0); 
 			if (count >= maxReduceLimit) {
 				count = ReduceContacts (count, contactOut, maxReduceLimit >> 1, dgFloat32 (1.0e-2f));
-				//countleft = proxy.m_maxContacts - count;
 				countleft = maxContacts - count;
 				dgAssert (countleft >= 0); 
 			}
 		}
 
-		if (proxy.m_timestep <= saveTimeStep) {
+		closestDist = dgMin (closestDist, contactJoint->m_closestDistance);
+
+		if (proxy.m_timestep < saveTimeStep) {
 			saveTimeStep = proxy.m_timestep;
 			n = proxy.m_normal;
 			p = proxy.m_closestPointBody0;
 			q = proxy.m_closestPointBody1;
 			shapeFaceID = proxy.m_shapeFaceID;
 		}
-
-		indexCount += data.GetFaceIndexCount (data.m_faceIndexCount[j]);
 	}
 
 	proxy.m_contacts = contactOut;

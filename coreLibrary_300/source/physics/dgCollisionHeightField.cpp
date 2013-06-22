@@ -596,9 +596,9 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 		dgInt32 index = 0;
 		dgInt32 faceCount = 0;
 		dgInt32 step = x1 - x0 + 1;
-
 		dgInt32* const indices = data->m_globalFaceVertexIndex;
-		dgInt32* const faceIndexCount = data->m_globalFaceIndexCount;
+		//dgInt32* const faceIndexCount = data->m_globalFaceIndexCount;
+		dgInt32* const faceIndexCount = data->m_meshData.m_globalFaceIndexCount;
 		dgInt32 faceSize = dgInt32 (m_horizontalScale * dgFloat32 (2.0f)); 
 		if (m_diagonalMode) {
 			for (dgInt32 z = z0; z < z1; z ++) {
@@ -795,26 +795,26 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 					}
 				}
 			}
-
 		}
 
-		// do not forget to add face obb test (high density maps can generate lots of faces)
 		dgInt32 stride = sizeof (dgVector) / sizeof (dgFloat32);
 		dgInt32 faceCount0 = 0; 
 		dgInt32 faceIndexCount0 = 0; 
 		dgInt32 faceIndexCount1 = 0; 
 
-
-dgAssert (0);
-/*
-		dgVector boxOrigin ((data->m_boxP1 + data->m_boxP0).Scale4 (dgFloat32 (0.5f)));
-		dgVector boxSize ((data->m_boxP1 - data->m_boxP0).Scale4 (dgFloat32 (0.5f)));
-
+		dgFastAABBInfo aabb (data->m_boxP0, data->m_boxP1);
+		dgInt32* const address = data->m_meshData.m_globalFaceIndexStart;
+		dgFloat32* const hitDistance = data->m_meshData.m_globalHitDistance;
+		
 		if (data->m_doContinuesCollisionTest) {
+			dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), data->m_boxDistanceTravelInMeshSpace);
 			for (dgInt32 i = 0; i < faceCount; i ++) {
 				const dgInt32* const indexArray = &indices[faceIndexCount1]; 
 				const dgVector& faceNormal = vertex[indexArray[4]];
-				if (PolygonBoxOBBRayTest (faceNormal, 3, indexArray, stride, &vertex[0].m_x, boxOrigin, boxSize, data->m_boxDistanceTravelInMeshSpace)) {
+				dgFloat32 dist = aabb.PolygonBoxRayDistance (faceNormal, 3, indexArray, stride, &vertex[0].m_x, ray);
+				if (dist < dgFloat32 (1.0f)) {
+					hitDistance[faceCount0] = dist;
+					address[faceCount0] = faceIndexCount0;
 					memcpy (&indices[faceIndexCount0], indexArray, 9 * sizeof (dgInt32));
 					faceCount0 ++;
 					faceIndexCount0 += 9;
@@ -823,10 +823,12 @@ dgAssert (0);
 			}
 		} else {
 			for (dgInt32 i = 0; i < faceCount; i ++) {
-				//if (data->m_objCollision->PolygonOBBTest (&vertex[0].m_x, sizeof (dgVector), &indices[faceIndexCount1], 3, *data)) {
 				const dgInt32* const indexArray = &indices[faceIndexCount1]; 
 				const dgVector& faceNormal = vertex[indexArray[4]];
-				if (PolygonBoxOBBTest (faceNormal, 3, indexArray, stride, &vertex[0].m_x, boxOrigin, boxSize)) {
+				dgFloat32 dist = aabb.PolygonBoxDistance (faceNormal, 3, indexArray, stride, &vertex[0].m_x);
+				if (dist > dgFloat32 (0.0f)) {
+					hitDistance[faceCount0] = dist;
+					address[faceCount0] = faceIndexCount0;
 					memcpy (&indices[faceIndexCount0], indexArray, 9 * sizeof (dgInt32));
 					faceCount0 ++;
 					faceIndexCount0 += 9;
@@ -840,28 +842,27 @@ dgAssert (0);
 			data->m_faceCount = faceCount0;
 			data->m_vertex = &vertex[0].m_x;
 			data->m_faceVertexIndex = indices;
+			data->m_faceIndexStart = address;
+			data->m_hitDistance = hitDistance;
 			data->m_faceIndexCount = faceIndexCount;
 			data->m_vertexStrideInBytes = sizeof (dgVector);
 
 			if (GetDebugCollisionCallback()) { 
 				dgTriplex triplex[3];
 				const dgMatrix& matrix = data->m_polySoupCollision->GetGlobalMatrix();
-
-				dgInt32 indexBase = 0;;
 				for (dgInt32 i = 0; i < data->m_faceCount; i ++) {
+					dgInt32 base = address[i];
 					for (dgInt32 j = 0; j < 3; j ++) {
-						dgInt32 index = data->m_faceVertexIndex[indexBase + j];
+						dgInt32 index = data->m_faceVertexIndex[base + j];
 						dgVector p (matrix.TransformVector(vertex[index]));
 						triplex[j].m_x = p.m_x;
 						triplex[j].m_y = p.m_y;
 						triplex[j].m_z = p.m_z;
 					}
-					GetDebugCollisionCallback() (data->m_polySoupBody, data->m_objBody, data->m_faceVertexIndex[indexBase + 4], 3, &triplex[0].m_x, sizeof (dgTriplex));
-					indexBase += 9;
+					GetDebugCollisionCallback() (data->m_polySoupBody, data->m_objBody, data->m_faceVertexIndex[base + 4], 3, &triplex[0].m_x, sizeof (dgTriplex));
 				}
 			}
 		}
-*/
 	}
 }
 

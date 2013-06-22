@@ -302,11 +302,13 @@ dgIntersectStatus dgCollisionBVH::GetPolygon (void* const context, const dgFloat
 	}
 
 	dgAssert (data.m_vertex == polygon);
+	dgInt32 count = indexCount * 2 + 3;
 
 	data.m_faceIndexCount[data.m_faceCount] = indexCount;
-	data.m_globalHitDistance[data.m_faceCount] = hitDistance;
+//	data.m_faceIndexStart[data.m_faceCount] = data.m_faceCount ? (data.m_faceIndexStart[data.m_faceCount - 1] + data.m_faceIndexCount[data.m_faceCount - 1]) : 0;
+	data.m_faceIndexStart[data.m_faceCount] = data.m_globalIndexCount;
+	data.m_hitDistance[data.m_faceCount] = hitDistance;
 	data.m_faceCount ++;
-	dgInt32 count = indexCount * 2 + 3;
 	dgInt32* const dst = &data.m_faceVertexIndex[data.m_globalIndexCount];
 
 	//the docks say memcpy is an intrinsic function but as usual this is another microsoft lie
@@ -330,8 +332,10 @@ void dgCollisionBVH::GetCollidingFaces (dgPolygonMeshDesc* const data) const
 
 	data->m_faceCount = 0;
 	data->m_globalIndexCount = 0;
-	data->m_faceIndexCount = data->m_globalFaceIndexCount;
+	data->m_faceIndexCount = data->m_meshData.m_globalFaceIndexCount;
+	data->m_faceIndexStart = data->m_meshData.m_globalFaceIndexStart;
 	data->m_faceVertexIndex = data->m_globalFaceVertexIndex;
+	data->m_hitDistance = data->m_meshData.m_globalHitDistance;
 	ForAllSectors (data->m_boxP0, data->m_boxP1, data->m_boxDistanceTravelInMeshSpace, data->m_maxT, GetPolygon, data);
 }
 

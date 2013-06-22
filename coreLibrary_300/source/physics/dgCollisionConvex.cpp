@@ -3071,6 +3071,8 @@ dgInt32 dgCollisionConvex::CalculateConvexCastContacts(dgCollisionParamProxy& pr
 	dgInt32 count = 0;
 	dgFloat32 tacc = dgFloat32 (0.0f);
 	dgFloat32 timestep = proxy.m_timestep;
+	proxy.m_contactJoint->m_closestDistance = dgFloat32 (1.0e10f);
+
 	dgMinkHull minkHull (proxy);
 	do {
 		minkHull.CalculateClosestPoints ();
@@ -3104,11 +3106,12 @@ dgInt32 dgCollisionConvex::CalculateConvexCastContacts(dgCollisionParamProxy& pr
 			proxy.m_closestPointBody0 = matrix.TransformVector(scale.CompProduct3(minkHull.m_p));
 			proxy.m_closestPointBody1 = matrix.TransformVector(scale.CompProduct3(minkHull.m_q - step));
 
+			dgFloat32 penetration = dgMax(num * dgFloat32 (-1.0f) - DG_IMPULSIVE_CONTACT_PENETRATION, dgFloat32 (0.0f));
 			if (proxy.m_contacts) {
-				dgFloat32 penetration = dgMax(num * dgFloat32 (-1.0f) - DG_IMPULSIVE_CONTACT_PENETRATION, dgFloat32 (0.0f));
 				dgVector contactPoint ((minkHull.m_p + minkHull.m_q).Scale3 (dgFloat32 (0.5f)));
 				count = CalculateContacts (contactPoint, minkHull.m_normal.Scale3 (-1.0f), proxy, minkHull.m_hullDiff);
 				if (count) {
+					proxy.m_contactJoint->m_closestDistance = penetration;
 					proxy.m_timestep = tacc;
 					count = dgMin(proxy.m_maxContacts, count);
 					dgContactPoint* const contactOut = proxy.m_contacts;
@@ -3121,6 +3124,7 @@ dgInt32 dgCollisionConvex::CalculateConvexCastContacts(dgCollisionParamProxy& pr
 					}
 				}
 			} else {
+				proxy.m_contactJoint->m_closestDistance = penetration;
 				proxy.m_timestep = tacc;
 			}
 			break;

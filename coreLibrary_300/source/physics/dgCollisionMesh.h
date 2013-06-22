@@ -78,6 +78,17 @@ class dgPolygonMeshDesc
 		return dgFloat32 ((size >= 1) ? size : dgFloat32 (1.0f));
 	}
 
+
+	void SortFaceArray ();
+
+	class dgMesh
+	{
+		public:
+		dgInt32 m_globalFaceIndexCount[DG_MAX_COLLIDING_FACES];
+		dgInt32 m_globalFaceIndexStart[DG_MAX_COLLIDING_FACES];
+		dgFloat32 m_globalHitDistance[DG_MAX_COLLIDING_FACES];
+	};
+
 	dgVector m_boxP0;                           
 	dgVector m_boxP1;
 	dgVector m_boxDistanceTravelInMeshSpace;
@@ -92,17 +103,17 @@ class dgPolygonMeshDesc
 	dgCollisionInstance* m_polySoupCollision;
 	dgFloat32* m_vertex;
 	dgInt32* m_faceIndexCount;
+	dgInt32* m_faceIndexStart;
 	dgInt32* m_faceVertexIndex;
+	dgFloat32* m_hitDistance;
 
 	// private data;
 	const dgCollisionMesh* m_me;
 	dgInt32 m_globalIndexCount;
 	dgFloat32 m_maxT;
 	bool m_doContinuesCollisionTest;
-
-	dgInt32 m_globalFaceIndexCount[DG_MAX_COLLIDING_FACES];
 	dgInt32 m_globalFaceVertexIndex[DG_MAX_COLLIDING_INDICES];
-	dgFloat32 m_globalHitDistance[DG_MAX_COLLIDING_FACES];
+	dgMesh m_meshData;
 } DG_GCC_VECTOR_ALIGMENT;
 
 DG_MSC_VECTOR_ALIGMENT 

@@ -337,10 +337,10 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 	//CreateLevelMesh (scene, "flatPlane.ngd", true);
-	CreateLevelMesh (scene, "playground.ngd", true);
+	//CreateLevelMesh (scene, "playground.ngd", true);
 	//CreateLevelMesh (scene, "castle.ngd", true);
 	//CreateLevelMesh (scene, "sponza.ngd", true);
-	//CreateLevelMesh (scene, "sibenik.ngd", true);
+	CreateLevelMesh (scene, "sibenik.ngd", true);
 
 
 	NewtonWorld* const world = scene->GetNewton();
