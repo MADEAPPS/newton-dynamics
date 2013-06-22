@@ -113,13 +113,6 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 			dgVector p1 (&vertexArray[m_maxIndex].m_x);
 			dgVector minBox (p0 - boxP1);
 			dgVector maxBox (p1 - boxP0);
-//			dgVector mask ((minBox.CompProduct4(maxBox)) < dgVector (dgFloat32 (0.0f)));
-//			mask = mask & mask.ShiftTripleRight();
-//			mask = mask & mask.ShiftTripleRight();
-//			dgVector dist (maxBox.GetMin (minBox.Abs()) & mask);
-//			dist = dist.GetMin(dist.ShiftTripleRight());
-//			dist = dist.GetMin(dist.ShiftTripleRight());
-//			return dist.m_x;
 			return ::BoxPenetration (minBox, maxBox);
 		}
 
