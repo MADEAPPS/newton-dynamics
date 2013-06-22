@@ -1203,7 +1203,6 @@ void dgAABBPolygonSoup::ForAllSectors (const dgVector& minBox, const dgVector& m
 					}
 
 				} else {
-
 					const dgNode* const node = me->m_back.GetNode(m_aabb);
 					dgFloat32 dist = node->BoxIntersect (ray, vertexArray, minBox, maxBox);
 					if (dist < dgFloat32 (1.0f)) {
@@ -1260,6 +1259,7 @@ void dgAABBPolygonSoup::ForAllSectors (const dgVector& minBox, const dgVector& m
 void dgAABBPolygonSoup::ForAllSectorsRayHit (const dgFastRayTest& raySrc, dgRayIntersectCallback callback, void* const context) const
 {
 	const dgNode *stackPool[DG_STACK_DEPTH];
+	dgFloat32 distance[DG_STACK_DEPTH];
 	dgFastRayTest ray (raySrc);
 
 	dgInt32 stack = 1;
@@ -1267,11 +1267,14 @@ void dgAABBPolygonSoup::ForAllSectorsRayHit (const dgFastRayTest& raySrc, dgRayI
 	const dgTriplex* const vertexArray = (dgTriplex*) m_localVertex;
 
 	stackPool[0] = m_aabb;
+	distance[0] = m_aabb->RayDistance(ray, vertexArray);
 	while (stack) {
 		stack --;
-		const dgNode *const me = stackPool[stack];
-		if (me->RayTest (ray, vertexArray)) {
-
+		dgFloat32 dist = distance[stack];
+		if (dist > maxParam) {
+			break;
+		} else {
+			const dgNode *const me = stackPool[stack];
 			if (me->m_back.IsLeaf()) {
 				dgInt32 vCount = me->m_back.GetCount();
 				if (vCount > 0) {
@@ -1288,9 +1291,19 @@ void dgAABBPolygonSoup::ForAllSectorsRayHit (const dgFastRayTest& raySrc, dgRayI
 				}
 
 			} else {
-				dgAssert (stack < DG_STACK_DEPTH);
-				stackPool[stack] = me->m_back.GetNode(m_aabb);
-				stack++;
+				const dgNode* const node = me->m_back.GetNode(m_aabb);
+				dgFloat32 dist = node->RayDistance(ray, vertexArray);
+				if (dist < maxParam) {
+					dgInt32 j = stack;
+					for ( ; j && (dist > distance[j - 1]); j --) {
+						stackPool[j] = stackPool[j - 1];
+						distance[j] = distance[j - 1];
+					}
+					dgAssert (stack < DG_STACK_DEPTH);
+					stackPool[j] = node;
+					distance[j] = dist;
+					stack++;
+				}
 			}
 
 			if (me->m_front.IsLeaf()) {
@@ -1309,9 +1322,19 @@ void dgAABBPolygonSoup::ForAllSectorsRayHit (const dgFastRayTest& raySrc, dgRayI
 				}
 
 			} else {
-				dgAssert (stack < DG_STACK_DEPTH);
-				stackPool[stack] = me->m_front.GetNode(m_aabb);
-				stack ++;
+				const dgNode* const node = me->m_front.GetNode(m_aabb);
+				dgFloat32 dist = node->RayDistance(ray, vertexArray);
+				if (dist < maxParam) {
+					dgInt32 j = stack;
+					for ( ; j && (dist > distance[j - 1]); j --) {
+						stackPool[j] = stackPool[j - 1];
+						distance[j] = distance[j - 1];
+					}
+					dgAssert (stack < DG_STACK_DEPTH);
+					stackPool[j] = node;
+					distance[j] = dist;
+					stack++;
+				}
 			}
 		}
 	}

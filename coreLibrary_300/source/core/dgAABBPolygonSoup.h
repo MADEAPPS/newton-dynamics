@@ -99,14 +99,6 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 			vertex[m_maxIndex] = (maxP + dgVector (dgFloat32 (1.0e-3f))) & dgVector::m_triplexMask;
 		}
 
-
-		DG_INLINE dgInt32 BoxTest (const dgTriplex* const vertexArray, const dgVector& boxP0, const dgVector& boxP1) const
-		{
-			dgVector minBox (&vertexArray[m_minIndex].m_x);
-			dgVector maxBox (&vertexArray[m_maxIndex].m_x);
-			return dgOverlapTest (minBox, maxBox, boxP0, boxP1);
-		}
-
 		DG_INLINE dgFloat32 BoxPenetration (const dgTriplex* const vertexArray, const dgVector& boxP0, const dgVector& boxP1) const
 		{
 			dgVector p0 (&vertexArray[m_minIndex].m_x);
@@ -115,7 +107,6 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 			dgVector maxBox (p1 - boxP0);
 			return ::BoxPenetration (minBox, maxBox);
 		}
-
 
 		DG_INLINE dgFloat32 BoxIntersect (const dgFastRayTest& ray, const dgTriplex* const vertexArray, const dgVector& boxP0, const dgVector& boxP1) const
 		{
@@ -127,12 +118,24 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 			return ray.BoxIntersect(minBox, maxBox);
 		}
 
+//		DG_INLINE dgInt32 BoxTest (const dgTriplex* const vertexArray, const dgVector& boxP0, const dgVector& boxP1) const
+//		{
+//			dgVector minBox (&vertexArray[m_minIndex].m_x);
+//			dgVector maxBox (&vertexArray[m_maxIndex].m_x);
+//			return dgOverlapTest (minBox, maxBox, boxP0, boxP1);
+//		}
+
+		DG_INLINE dgFloat32 RayDistance (const dgFastRayTest& ray, const dgTriplex* const vertexArray) const
+		{
+			dgVector minBox (&vertexArray[m_minIndex].m_x);
+			dgVector maxBox (&vertexArray[m_maxIndex].m_x);
+			return ray.BoxIntersect(minBox, maxBox);
+		}
 
 		DG_INLINE dgInt32 RayTest (const dgFastRayTest& ray, const dgTriplex* const vertexArray) const
 		{
 			dgVector minBox (&vertexArray[m_minIndex].m_x);
 			dgVector maxBox (&vertexArray[m_maxIndex].m_x);
-			//return RayTest (ray, minBox, maxBox);
 			return ray.BoxTest (minBox, maxBox);
 		}
 

@@ -149,7 +149,6 @@ class dgFastRayTest
 		dgVector mask (t0 < t1);
 		dgVector maxDist (dgFloat32 (1.2f));
 		t0 = (t0 & mask) | maxDist.AndNot(mask);
-//		return ((t0 < t1).GetSignMask() & 1);
 		dgAssert ((mask.GetSignMask() & 1) == (t0.m_x < dgFloat32 (1.0f)));
 		return t0.m_x;
 	}
