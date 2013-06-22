@@ -451,18 +451,26 @@ dgFloat32 dgCollisionCompound::RayCast (const dgVector& localP0, const dgVector&
 		return dgFloat32 (1.2f);
 	}
 
+	dgFloat32 distance[DG_COMPOUND_STACK_DEPTH];
 	const dgNodeBase* stackPool[DG_COMPOUND_STACK_DEPTH];
+	
+	dgFloat32 maxParam = dgFloat32 (1.2f);
+	dgFastRayTest ray (localP0, localP1);
+
 	dgInt32 stack = 1;
 	stackPool[0] = m_root;
-	dgFloat32 maxParam = dgFloat32 (1.2f);
-
-	dgFastRayTest ray (localP0, localP1);
+	distance[0] = ray.BoxIntersect(m_root->m_p0, m_root->m_p1);
+	
 	while (stack) {
 		stack --;
-		const dgNodeBase* const me = stackPool[stack];
-		dgAssert (me);
+		dgFloat32 dist = distance[stack];
 
-		if (ray.BoxTest (me->m_p0, me->m_p1)) {
+		if (dist > maxParam) {
+			break;
+		} else {
+//		if (ray.BoxTest (me->m_p0, me->m_p1)) {
+			const dgNodeBase* const me = stackPool[stack];
+			dgAssert (me);
 			if (me->m_type == m_leaf) {
 				dgContactPoint tmpContactOut;
 				dgCollisionInstance* const shape = me->GetShape();
@@ -479,13 +487,44 @@ dgFloat32 dgCollisionCompound::RayCast (const dgVector& localP0, const dgVector&
 
 			} else {
 				dgAssert (me->m_type == m_node);
-				stackPool[stack] = me->m_left;
-				stack++;
-				dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNodeBase*)));
-				
-				stackPool[stack] = me->m_right;
-				stack++;
-				dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNodeBase*)));
+//				stackPool[stack] = me->m_left;
+//				stack++;
+//				dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNodeBase*)));
+//				
+//				stackPool[stack] = me->m_right;
+//				stack++;
+//				dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNodeBase*)));
+				{
+					const dgNodeBase* const node = me->m_left;
+					dgFloat32 dist = ray.BoxIntersect(node->m_p0, node->m_p1);
+					if (dist < maxParam) {
+						dgInt32 j = stack;
+						for ( ; j && (dist > distance[j - 1]); j --) {
+							stackPool[j] = stackPool[j - 1];
+							distance[j] = distance[j - 1];
+						}
+						stackPool[j] = node;
+						distance[j] = dist;
+						stack++;
+						dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNodeBase*)));
+					}
+				}
+
+				{
+					const dgNodeBase* const node = me->m_right;
+					dgFloat32 dist = ray.BoxIntersect(node->m_p0, node->m_p1);
+					if (dist < maxParam) {
+						dgInt32 j = stack;
+						for ( ; j && (dist > distance[j - 1]); j --) {
+							stackPool[j] = stackPool[j - 1];
+							distance[j] = distance[j - 1];
+						}
+						stackPool[j] = node;
+						distance[j] = dist;
+						stack++;
+						dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNodeBase*)));
+					}
+				}
 			}
 		}
 	}
