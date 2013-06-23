@@ -238,11 +238,8 @@ void dgCollisionHeightField::CalculateMinExtend3d (const dgVector& p0, const dgV
 }
 
 
-dgFloat32 dgCollisionHeightField::RayCastCell (const dgFastRayTest& ray, dgInt32 xIndex0, dgInt32 zIndex0, dgVector& normalOut) const
+dgFloat32 dgCollisionHeightField::RayCastCell (const dgFastRayTest& ray, dgInt32 xIndex0, dgInt32 zIndex0, dgVector& normalOut, dgFloat32 maxT) const
 {
-	dgAssert (0);
-	return 0;
-/*
 	dgVector points[4];
 	dgInt32 triangle[3];
 
@@ -251,6 +248,8 @@ dgFloat32 dgCollisionHeightField::RayCastCell (const dgFastRayTest& ray, dgInt32
 		return dgFloat32 (1.2f);
 	}
 	
+dgAssert (maxT >= 1.0);
+
 	dgInt32 base = zIndex0 * m_width + xIndex0;
 	
 	points[0 * 2 + 0] = dgVector ((xIndex0 + 0) * m_horizontalScale, dgFloat32 (m_elevationMap[base]),			     (zIndex0 + 0) * m_horizontalScale, dgFloat32 (0.0f));
@@ -267,9 +266,9 @@ dgFloat32 dgCollisionHeightField::RayCastCell (const dgFastRayTest& ray, dgInt32
 		dgVector e10 (points[2] - points[1]);
 		dgVector e20 (points[3] - points[1]);
 		dgVector normal (e10 * e20);
-		normal = normal.Scale3 (dgRsqrt (normal % normal));
-		t = ray.PolygonIntersect (normal, &points[0].m_x, sizeof (dgVector), triangle, 3);
-		if (t < dgFloat32 (1.0f)){
+		normal = normal.CompProduct4(normal.DotProduct4(normal).InvSqrt());
+		t = ray.PolygonIntersect (normal, maxT, &points[0].m_x, sizeof (dgVector), triangle, 3);
+		if (t < maxT){
 			normalOut = normal;
 			return t;
 		}
@@ -280,9 +279,10 @@ dgFloat32 dgCollisionHeightField::RayCastCell (const dgFastRayTest& ray, dgInt32
 
 		dgVector e30 (points[0] - points[1]);
 		normal = e30 * e10;
-		normal = normal.Scale3 (dgRsqrt (normal % normal));
-		t = ray.PolygonIntersect (normal, &points[0].m_x, sizeof (dgVector), triangle, 3);
-		if (t < dgFloat32 (1.0f)){
+		//normal = normal.Scale3 (dgRsqrt (normal % normal));
+		normal = normal.CompProduct4(normal.DotProduct4(normal).InvSqrt());
+		t = ray.PolygonIntersect (normal, maxT, &points[0].m_x, sizeof (dgVector), triangle, 3);
+		if (t < maxT){
 			normalOut = normal;
 			return t;
 		}
@@ -295,9 +295,9 @@ dgFloat32 dgCollisionHeightField::RayCastCell (const dgFastRayTest& ray, dgInt32
 		dgVector e10 (points[2] - points[0]);
 		dgVector e20 (points[3] - points[0]);
 		dgVector normal (e10 * e20);
-		normal = normal.Scale3 (dgRsqrt (normal % normal));
-		t = ray.PolygonIntersect (normal, &points[0].m_x, sizeof (dgVector), triangle, 3);
-		if (t < dgFloat32 (1.0f)){
+		normal = normal.CompProduct4(normal.DotProduct4(normal).InvSqrt());
+		t = ray.PolygonIntersect (normal, maxT, &points[0].m_x, sizeof (dgVector), triangle, 3);
+		if (t < maxT){
 			normalOut = normal;
 			return t;
 		}
@@ -308,23 +308,20 @@ dgFloat32 dgCollisionHeightField::RayCastCell (const dgFastRayTest& ray, dgInt32
 
 		dgVector e30 (points[1] - points[0]);
 		normal = e20 * e30;
-		normal = normal.Scale3 (dgRsqrt (normal % normal));
-		t = ray.PolygonIntersect (normal, &points[0].m_x, sizeof (dgVector), triangle, 3);
-		if (t < dgFloat32 (1.0f)){
+		normal = normal.CompProduct4(normal.DotProduct4(normal).InvSqrt());
+		t = ray.PolygonIntersect (normal, maxT, &points[0].m_x, sizeof (dgVector), triangle, 3);
+		if (t < maxT){
 			normalOut = normal;
 			return t;
 		}
 	}
 	return t;
-*/
+
 }
 
 
 dgFloat32 dgCollisionHeightField::RayCast (const dgVector& q0, const dgVector& q1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
 {
-	dgAssert (0);
-	return 0;
-/*
 	dgVector boxP0;
 	dgVector boxP1;
 
@@ -365,8 +362,9 @@ dgFloat32 dgCollisionHeightField::RayCast (const dgVector& q0, const dgVector& q
 		}
 
 		dgInt32 zInc;
-		dgFloat32 stepZ;
 		dgFloat32 tz;
+		dgFloat32 stepZ;
+		
 		if (dp.m_z > dgFloat32 (0.0f)) {
 			zInc = 1;
 			dgFloat32 val = dgFloat32 (1.0f) / dp.m_z;
@@ -391,8 +389,8 @@ dgFloat32 dgCollisionHeightField::RayCast (const dgVector& q0, const dgVector& q
 
 		// for each cell touched by the line
 		do {
-			dgFloat32 t = RayCastCell (ray, xIndex0, zIndex0, normalOut);
-			if (t < dgFloat32 (1.0f)) {
+			dgFloat32 t = RayCastCell (ray, xIndex0, zIndex0, normalOut, maxT);
+			if (t < maxT) {
 				// bail out at the first intersection and copy the data into the descriptor
 				contactOut.m_normal = normalOut.Scale3 (dgRsqrt (normalOut % normalOut));
 				contactOut.m_shapeId0 = m_atributeMap[zIndex0 * m_width + xIndex0];
@@ -420,7 +418,7 @@ dgFloat32 dgCollisionHeightField::RayCast (const dgVector& q0, const dgVector& q
 
 	// if no cell was hit, return a large value
 	return dgFloat32 (1.2f);
-*/
+
 }
 
 

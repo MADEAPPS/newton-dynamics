@@ -454,7 +454,8 @@ dgFloat32 dgCollisionCompound::RayCast (const dgVector& localP0, const dgVector&
 	dgFloat32 distance[DG_COMPOUND_STACK_DEPTH];
 	const dgNodeBase* stackPool[DG_COMPOUND_STACK_DEPTH];
 	
-	dgFloat32 maxParam = dgFloat32 (1.2f);
+//	dgFloat32 maxParam = dgFloat32 (1.2f);
+	dgFloat32 maxParam = maxT;
 	dgFastRayTest ray (localP0, localP1);
 
 	dgInt32 stack = 1;

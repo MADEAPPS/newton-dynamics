@@ -435,7 +435,7 @@ dgFloat32 dgCollisionInstance::RayCast (const dgVector& localP0, const dgVector&
 	if (!preFilter || preFilter(body, this, userData)) {
 		if (m_scaleIsUnit) {
 			dgFloat32 t = m_childShape->RayCast (localP0, localP1, maxT, contactOut, body, userData);
-			if (t <=dgFloat32 (1.0f)) {
+			if (t <= maxT) {
 				if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
 					contactOut.m_shapeId0 = GetUserDataID();
 					contactOut.m_shapeId1 = GetUserDataID();
@@ -448,7 +448,7 @@ dgFloat32 dgCollisionInstance::RayCast (const dgVector& localP0, const dgVector&
 			dgVector p0 (localP0.CompProduct4(m_invScale));
 			dgVector p1 (localP1.CompProduct4(m_invScale));
 			dgFloat32 t = m_childShape->RayCast (p0, p1, maxT, contactOut, body, userData);
-			if (t <=dgFloat32 (1.0f)) {
+			if (t <= maxT) {
 				if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
 //					contactOut.m_userId = GetUserDataID();
 					contactOut.m_shapeId0 = GetUserDataID();

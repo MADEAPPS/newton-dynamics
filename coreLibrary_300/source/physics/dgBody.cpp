@@ -220,7 +220,6 @@ void dgBody::UpdateCollisionMatrix (dgFloat32 timestep, dgInt32 threadIndex)
 dgFloat32 dgBody::RayCast (const dgLineBox& line, OnRayCastAction filter, OnRayPrecastAction preFilter, void* const userData, dgFloat32 maxT) const
 {
 	dgAssert (filter);
-dgAssert (maxT > 1.0f);
 	dgVector l0 (line.m_l0);
 //	dgVector l1 (line.m_l1);
 	dgVector l1 (line.m_l0 + (line.m_l1 - line.m_l0).Scale4 (dgMin(maxT, dgFloat32 (1.0f))));

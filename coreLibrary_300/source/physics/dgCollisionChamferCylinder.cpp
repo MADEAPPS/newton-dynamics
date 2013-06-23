@@ -267,9 +267,6 @@ void dgCollisionChamferCylinder::Serialize(dgSerialize callback, void* const use
 
 dgFloat32 dgCollisionChamferCylinder::RayCast (const dgVector& q0, const dgVector& q1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
 {
-	dgAssert (0);
-	return 0;
-/*
 	if (q0.m_x > m_height) {
 		if (q1.m_x < m_height) {
 			dgFloat32 t1 = (m_height - q0.m_x) / (q1.m_x - q0.m_x);
@@ -300,7 +297,7 @@ dgFloat32 dgCollisionChamferCylinder::RayCast (const dgVector& q0, const dgVecto
 	dgAssert ((dq % dq) > 0.0f);
 	dgVector dir (dq.Scale3 (dgRsqrt(dq % dq)));
 	if (dgAbsf (dir.m_x) > 0.9999f) {
-		return dgCollisionConvex::RayCast (q0, q1, contactOut, NULL, NULL);
+		return dgCollisionConvex::RayCast (q0, q1, maxT, contactOut, NULL, NULL);
 	}
 
 	dgVector p0 (q0);
@@ -330,23 +327,26 @@ dgFloat32 dgCollisionChamferCylinder::RayCast (const dgVector& q0, const dgVecto
 		dgFloat32 t1 = dgRayCastSphere (q0, q1, origin1, m_height);
 		if (t0 < t1) {
 			if ((t0 >= 0.0f) && (t0 <= 1.0f)) {
-				contactOut.m_normal = q0 + dq.Scale3 (t0) - origin0;
-				contactOut.m_normal = contactOut.m_normal.Scale3 (dgRsqrt (contactOut.m_normal % contactOut.m_normal));
+				contactOut.m_normal = q0 + dq.Scale4 (t0) - origin0;
+				dgAssert (contactOut.m_normal.m_w == dgFloat32 (0.0f));
+				//contactOut.m_normal = contactOut.m_normal.Scale3 (dgRsqrt (contactOut.m_normal % contactOut.m_normal));
+				contactOut.m_normal = contactOut.m_normal.CompProduct4(contactOut.m_normal.DotProduct4(contactOut.m_normal).InvSqrt());
 				//contactOut.m_userId = SetUserDataID();
 				return t0; 
 			}
 		} else {
 			if ((t1 >= 0.0f) && (t1 <= 1.0f)) {
-				contactOut.m_normal = q0 + dq.Scale3 (t1) - origin1;
-				contactOut.m_normal = contactOut.m_normal.Scale3 (dgRsqrt (contactOut.m_normal % contactOut.m_normal));
+				contactOut.m_normal = q0 + dq.Scale4 (t1) - origin1;
+				dgAssert (contactOut.m_normal.m_w == dgFloat32 (0.0f));
+				//contactOut.m_normal = contactOut.m_normal.Scale3 (dgRsqrt (contactOut.m_normal % contactOut.m_normal));
+				contactOut.m_normal = contactOut.m_normal.CompProduct4(contactOut.m_normal.DotProduct4(contactOut.m_normal).InvSqrt());
 				//contactOut.m_userId = SetUserDataID();
 				return t1; 
 			}
 		}
 	}
 
-	return dgFloat32 (1.2f)	;
-*/
+	return dgFloat32 (1.2f);
 }
 
 

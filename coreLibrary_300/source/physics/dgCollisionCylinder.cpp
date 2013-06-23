@@ -304,10 +304,8 @@ dgInt32 dgCollisionCylinder::CalculatePlaneIntersection (const dgVector& normal,
 
 dgFloat32 dgCollisionCylinder::RayCast (const dgVector& q0, const dgVector& q1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
 {
-	dgAssert (0);
-	return 0;
-/*
-	dgFloat32 t = dgFloat32 (1.2f);
+//	dgFloat32 t = dgFloat32 (1.2f);
+	dgFloat32 t = maxT;
 	dgVector p0 (q0);
 	p0.m_x = dgFloat32 (0.0f);
 	dgFloat32 c = (p0 % p0) - m_radius * m_radius;
@@ -319,11 +317,12 @@ dgFloat32 dgCollisionCylinder::RayCast (const dgVector& q0, const dgVector& q1, 
 		dgFloat32 b = dgFloat32 (2.0f) * (p0 % dp);
 
 		dgFloat32 desc = b * b - dgFloat32 (4.0f) * a * c;
-		if (desc > 1.0e-8f) {
+		if (desc > dgFloat32 (1.0e-8f)) {
 			desc = dgSqrt (desc);
 			a = dgFloat32 (1.0f) / (dgFloat32 (2.0f) * a);
 			dgFloat32 t1 = dgMin ((- b + desc) * a, (- b - desc) * a);
-			if ((t1 < dgFloat32 (1.0f)) && (t1 >= dgFloat32 (0.0f))) {
+			//if ((t1 < dgFloat32 (1.0f)) && (t1 >= dgFloat32 (0.0f))) {
+			if ((t1 < maxT) && (t1 >= dgFloat32 (0.0f))) {
 				dgVector dq (q1 - q0);
 				dgVector contact (q0 + dq.Scale3 (t1));
 				if (contact.m_x > m_height) {
@@ -383,7 +382,6 @@ dgFloat32 dgCollisionCylinder::RayCast (const dgVector& q0, const dgVector& q1, 
 		}
 	}
 	return t;
-*/
 }
 
 

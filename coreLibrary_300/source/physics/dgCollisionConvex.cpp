@@ -2365,9 +2365,6 @@ dgInt32 dgCollisionConvex::CalculatePlaneIntersection (const dgVector& normal, c
 
 dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
 {
-	dgAssert (0);
-	return 0;
-/*
 	dgVector sum[4];
 	dgVector simplex[4];
 	dgInt32 indexArray[4];
@@ -2454,7 +2451,7 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& l
 			if (t1 < param) {
 				index = -1;
 				t1 = dgFloat32 (0.0f);
-			} else if (t1 > dgFloat32 (1.0f)) {
+			} else if (t1 > maxT) {
 				index = -1;
 				t1 = dgFloat32 (1.0f);
 			}
@@ -2467,14 +2464,13 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& l
 		}
 	} while (index >= 0);
 
-	if ((param > dgFloat32 (0.0f)) && (param < dgFloat32 (1.0f))) {
+	if ((param > dgFloat32 (0.0f)) && (param < maxT)) {
 		contactOut.m_normal = normal;
 	} else {
 		param = dgFloat32 (1.2f);
 	}
 
 	return param;
-*/
 }
 
 
