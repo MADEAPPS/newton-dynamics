@@ -776,7 +776,7 @@ class dgHACDClusterGraph
 		dgVector end (origin - dgVector (faceA.m_normal).Scale3 (rayDistance));
 
 		dgHACDRayCasterContext ray (origin, end, this, clusterA.m_color);
-		ForAllSectorsRayHit(ray, RayHit, &ray);
+		ForAllSectorsRayHit(ray, dgFloat32 (1.0f), RayHit, &ray);
 
 		if (ray.m_colorHit != -1) {
 			dgAssert (ray.m_colorHit != ray.m_myColor);
@@ -930,7 +930,7 @@ class dgHACDClusterGraph
 	{
 		dgHACDRayCasterContext& me = *((dgHACDRayCasterContext*) context);
 		dgVector normal (&polygon[indexArray[indexCount + 1] * (strideInBytes / sizeof (dgFloat32))]);
-		dgFloat32 t = me.PolygonIntersect (normal, polygon, strideInBytes, indexArray, indexCount);
+		dgFloat32 t = me.PolygonIntersect (normal, dgFloat32 (1.0f), polygon, strideInBytes, indexArray, indexCount);
 		if (t < me.m_param) {
 			dgInt32 faceColor = me.m_me->GetTagId(indexArray, indexCount);
 			if (faceColor != me.m_myColor) {

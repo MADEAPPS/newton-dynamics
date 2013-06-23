@@ -240,6 +240,9 @@ void dgCollisionHeightField::CalculateMinExtend3d (const dgVector& p0, const dgV
 
 dgFloat32 dgCollisionHeightField::RayCastCell (const dgFastRayTest& ray, dgInt32 xIndex0, dgInt32 zIndex0, dgVector& normalOut) const
 {
+	dgAssert (0);
+	return 0;
+/*
 	dgVector points[4];
 	dgInt32 triangle[3];
 
@@ -313,11 +316,15 @@ dgFloat32 dgCollisionHeightField::RayCastCell (const dgFastRayTest& ray, dgInt32
 		}
 	}
 	return t;
+*/
 }
 
 
-dgFloat32 dgCollisionHeightField::RayCast (const dgVector& q0, const dgVector& q1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
+dgFloat32 dgCollisionHeightField::RayCast (const dgVector& q0, const dgVector& q1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
 {
+	dgAssert (0);
+	return 0;
+/*
 	dgVector boxP0;
 	dgVector boxP1;
 
@@ -413,6 +420,7 @@ dgFloat32 dgCollisionHeightField::RayCast (const dgVector& q0, const dgVector& q
 
 	// if no cell was hit, return a large value
 	return dgFloat32 (1.2f);
+*/
 }
 
 

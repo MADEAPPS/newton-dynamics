@@ -265,8 +265,11 @@ void dgCollisionChamferCylinder::Serialize(dgSerialize callback, void* const use
 
 
 
-dgFloat32 dgCollisionChamferCylinder::RayCast (const dgVector& q0, const dgVector& q1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
+dgFloat32 dgCollisionChamferCylinder::RayCast (const dgVector& q0, const dgVector& q1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
 {
+	dgAssert (0);
+	return 0;
+/*
 	if (q0.m_x > m_height) {
 		if (q1.m_x < m_height) {
 			dgFloat32 t1 = (m_height - q0.m_x) / (q1.m_x - q0.m_x);
@@ -343,6 +346,7 @@ dgFloat32 dgCollisionChamferCylinder::RayCast (const dgVector& q0, const dgVecto
 	}
 
 	return dgFloat32 (1.2f)	;
+*/
 }
 
 

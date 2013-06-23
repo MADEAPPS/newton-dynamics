@@ -193,27 +193,25 @@ dgFloat32 dgCollisionBVH::RayHit (void* const context, const dgFloat32* const po
 {
 	dgBVHRay& me = *((dgBVHRay*) context);
 	dgVector normal (&polygon[indexArray[indexCount + 1] * (strideInBytes / sizeof (dgFloat32))]);
-	dgFloat32 t = me.PolygonIntersect (normal, polygon, strideInBytes, indexArray, indexCount);
-	if (t < dgFloat32 (1.0f)) {
-		if (t <= (me.m_t * dgFloat32 (1.0001f))) {
-			if ((t * dgFloat32 (1.0001f)) >= me.m_t) {
-				dgFloat32 dist0;
-				dgFloat32 dist1;
-				dist0 = me.m_diff % normal;
-				dist1 = me.m_diff % me.m_normal;
-				if (dist0 < dist1) {
-					me.m_t = t;
-					me.m_normal = normal;
-					me.m_id = me.m_me->GetTagId(indexArray, indexCount);
-				} else {
-					t = me.m_t;
-				}
-			} else {
-				me.m_t = t;
-				me.m_normal = normal;
-				me.m_id = me.m_me->GetTagId(indexArray, indexCount);
-			}
-		}
+	dgFloat32 t = me.PolygonIntersect (normal, me.m_t, polygon, strideInBytes, indexArray, indexCount);
+	if (t <= (me.m_t * dgFloat32 (1.0001f))) {
+//		if ((t * dgFloat32 (1.0001f)) >= me.m_t) {
+//			dgFloat32 dist0;
+//			dgFloat32 dist1;
+//			dist0 = me.m_diff % normal;
+//			dist1 = me.m_diff % me.m_normal;
+//			if (dist0 < dist1) {
+//				me.m_t = t;
+//				me.m_normal = normal;
+//				me.m_id = me.m_me->GetTagId(indexArray, indexCount);
+//			} else {
+//				t = me.m_t;
+//			}
+//		} else {
+			me.m_t = t;
+			me.m_normal = normal;
+			me.m_id = me.m_me->GetTagId(indexArray, indexCount);
+//		}
 	}
 	return t;
 }
@@ -222,10 +220,12 @@ dgFloat32 dgCollisionBVH::RayHit (void* const context, const dgFloat32* const po
 
 dgFloat32 dgCollisionBVH::RayHitUser (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount)
 {
+	dgAssert (0);
 	dgFloat32 t = dgFloat32 (1.2f);
 	dgBVHRay& me = *((dgBVHRay*) context);
 	dgVector normal (&polygon[indexArray[indexCount + 1] * (strideInBytes / sizeof (dgFloat32))]);
-	t = me.PolygonIntersect (normal, polygon, strideInBytes, indexArray, indexCount);
+dgAssert (0);
+	t = me.PolygonIntersect (normal, me.m_t, polygon, strideInBytes, indexArray, indexCount);
 	if (t < dgFloat32 (1.0f)) {
 		if (t < me.m_t) {
 			me.m_t = t;
@@ -240,18 +240,16 @@ dgFloat32 dgCollisionBVH::RayHitUser (void* const context, const dgFloat32* cons
 
 
 
-dgFloat32 dgCollisionBVH::RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
+dgFloat32 dgCollisionBVH::RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
 {
-	dgFloat32 param = dgFloat32 (1.2f);
-
 	dgBVHRay ray (localP0, localP1);
-	ray.m_t = 2.0f;
+	ray.m_t = dgMin(maxT, dgFloat32 (1.0f));
 	ray.m_me = this;
 	ray.m_userData = userData;
 	if (!m_userRayCastCallback) {
-		ForAllSectorsRayHit (ray, RayHit, &ray);
-		if (ray.m_t <= dgFloat32 (1.0f)) {
-			param = ray.m_t; 
+		ForAllSectorsRayHit (ray, maxT, RayHit, &ray);
+		if (ray.m_t <= maxT) {
+			maxT = ray.m_t; 
 			contactOut.m_normal = ray.m_normal.Scale3 (dgRsqrt ((ray.m_normal % ray.m_normal) + dgFloat32 (1.0e-8f)));
 //			contactOut.m_userId = ray.m_id;
 			contactOut.m_shapeId0 = ray.m_id;
@@ -263,16 +261,16 @@ dgFloat32 dgCollisionBVH::RayCast (const dgVector& localP0, const dgVector& loca
 			ray.m_matrix = body->m_collision->GetGlobalMatrix();
 		}
 		
-		ForAllSectorsRayHit (ray, RayHitUser, &ray);
+		ForAllSectorsRayHit (ray, maxT, RayHitUser, &ray);
 		if (ray.m_t <= dgFloat32 (1.0f)) {
-			param = ray.m_t; 
+			maxT = ray.m_t; 
 			contactOut.m_normal = ray.m_normal.Scale3 (dgRsqrt ((ray.m_normal % ray.m_normal) + dgFloat32 (1.0e-8f)));
 //			contactOut.m_userId = ray.m_id;
 			contactOut.m_shapeId0 = ray.m_id;
 			contactOut.m_shapeId1 = ray.m_id;
 		}
 	}
-	return param;
+	return maxT;
 }
 
 dgIntersectStatus dgCollisionBVH::GetPolygon (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount, dgFloat32 hitDistance)

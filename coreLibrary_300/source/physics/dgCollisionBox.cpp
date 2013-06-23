@@ -166,8 +166,11 @@ void dgCollisionBox::CalcAABB (const dgMatrix& matrix, dgVector &p0, dgVector &p
 
 
 
-dgFloat32 dgCollisionBox::RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
+dgFloat32 dgCollisionBox::RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
 {
+	dgAssert (0);
+	return 0;
+/*
 	dgAssert (localP0.m_w == dgFloat32 (0.0f));
 	dgAssert (localP1.m_w == dgFloat32 (0.0f));
 
@@ -216,7 +219,7 @@ dgFloat32 dgCollisionBox::RayCast (const dgVector& localP0, const dgVector& loca
 		tmin = dgFloat32 (1.2f);
 	}
 	return tmin;
-
+*/
 }
 
 

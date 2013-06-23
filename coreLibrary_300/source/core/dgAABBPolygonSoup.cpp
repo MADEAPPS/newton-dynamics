@@ -1256,14 +1256,13 @@ void dgAABBPolygonSoup::ForAllSectors (const dgVector& minBox, const dgVector& m
 
 
 
-void dgAABBPolygonSoup::ForAllSectorsRayHit (const dgFastRayTest& raySrc, dgRayIntersectCallback callback, void* const context) const
+void dgAABBPolygonSoup::ForAllSectorsRayHit (const dgFastRayTest& raySrc, dgFloat32 maxParam, dgRayIntersectCallback callback, void* const context) const
 {
 	const dgNode *stackPool[DG_STACK_DEPTH];
 	dgFloat32 distance[DG_STACK_DEPTH];
 	dgFastRayTest ray (raySrc);
 
 	dgInt32 stack = 1;
-	dgFloat32 maxParam = dgFloat32 (1.0f);
 	const dgTriplex* const vertexArray = (dgTriplex*) m_localVertex;
 
 	stackPool[0] = m_aabb;
@@ -1286,8 +1285,6 @@ void dgAABBPolygonSoup::ForAllSectorsRayHit (const dgFastRayTest& raySrc, dgRayI
 						if (maxParam == dgFloat32 (0.0f)) {
 							break;
 						}
-dgAssert (0);
-						//ray.Reset (maxParam) ;
 					}
 				}
 
@@ -1318,8 +1315,6 @@ dgAssert (0);
 						if (maxParam == dgFloat32 (0.0f)) {
 							break;
 						}
-dgAssert (0);
-						//ray.Reset (maxParam);
 					}
 				}
 

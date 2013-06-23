@@ -445,7 +445,7 @@ void dgCollisionCompound::DebugCollision (const dgMatrix& matrix, OnDebugCollisi
 }
 
 
-dgFloat32 dgCollisionCompound::RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
+dgFloat32 dgCollisionCompound::RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
 {
 	if (!m_root) {
 		return dgFloat32 (1.2f);
@@ -460,7 +460,6 @@ dgFloat32 dgCollisionCompound::RayCast (const dgVector& localP0, const dgVector&
 	dgInt32 stack = 1;
 	stackPool[0] = m_root;
 	distance[0] = ray.BoxIntersect(m_root->m_p0, m_root->m_p1);
-	
 	while (stack) {
 		stack --;
 		dgFloat32 dist = distance[stack];
@@ -468,7 +467,6 @@ dgFloat32 dgCollisionCompound::RayCast (const dgVector& localP0, const dgVector&
 		if (dist > maxParam) {
 			break;
 		} else {
-//		if (ray.BoxTest (me->m_p0, me->m_p1)) {
 			const dgNodeBase* const me = stackPool[stack];
 			dgAssert (me);
 			if (me->m_type == m_leaf) {
@@ -476,14 +474,12 @@ dgFloat32 dgCollisionCompound::RayCast (const dgVector& localP0, const dgVector&
 				dgCollisionInstance* const shape = me->GetShape();
 				dgVector p0 (shape->GetLocalMatrix().UntransformVector (localP0));
 				dgVector p1 (shape->GetLocalMatrix().UntransformVector (localP1));
-				dgFloat32 param = shape->RayCast (p0, p1, tmpContactOut, NULL, body, userData);
+				dgFloat32 param = shape->RayCast (p0, p1, maxParam, tmpContactOut, NULL, body, userData);
 				if (param < maxParam) {
 					maxParam = param;
 					contactOut.m_normal = shape->GetLocalMatrix().RotateVector (tmpContactOut.m_normal);;
 //					contactOut.m_userId = tmpContactOut.m_userId;
 					contactOut.m_shapeId0 = tmpContactOut.m_shapeId0;
-dgAssert (0);
-//					ray.Reset (maxParam) ;
 				}
 
 			} else {

@@ -75,13 +75,13 @@ class dgFastRayTest
 	}
 	
 
-	dgFloat32 PolygonIntersect (const dgVector& normal, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount) const;
-	dgFloat32 PolygonIntersectFallback (const dgVector& normal, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount) const;
+	dgFloat32 PolygonIntersect (const dgVector& normal, dgFloat32 maxT, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount) const;
+	dgFloat32 PolygonIntersectFallback (const dgVector& normal, dgFloat32 maxT, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount) const;
 
-	DG_INLINE void Reset____ (dgFloat32 t) 
-	{
-		m_dpInv = m_dpBaseInv.Scale4 (dgFloat32 (1.0f) / (t + dgFloat32 (1.0e-12f)));
-	}
+//	DG_INLINE void Reset____ (dgFloat32 t) 
+//	{
+//		m_dpInv = m_dpBaseInv.Scale4 (dgFloat32 (1.0f) / (t + dgFloat32 (1.0e-12f)));
+//	}
 
 	DG_INLINE dgInt32 BoxTest (const dgVector& minBox, const dgVector& maxBox) const
 	{

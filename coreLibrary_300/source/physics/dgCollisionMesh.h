@@ -30,7 +30,6 @@
 
 #define DG_MAX_COLLIDING_FACES				(128)
 #define DG_MAX_COLLIDING_INDICES			(2 * DG_MAX_COLLIDING_FACES * 5)
-//#define DG_MAX_COLLIDING_VERTEX___			(DG_MAX_COLLIDING_FACES * 8)
 
 
 class dgCollisionMesh;
@@ -180,7 +179,7 @@ class dgCollisionMesh: public dgCollision
 	virtual void DebugCollision  (const dgMatrix& matrix, OnDebugCollisionMeshCallback callback, void* const userData) const;
 
 	virtual dgVector CalculateVolumeIntegral (const dgMatrix& globalMatrix, GetBuoyancyPlane bouyancyPlane, void* const context) const;
-	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const = 0;
+	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const = 0;
 	virtual dgFloat32 ConvexRayCast (const dgCollisionInstance* const convexShape, const dgMatrix& origin, const dgVector& veloc, dgFloat32 minT, dgContactPoint& contactOut, const dgBody* const referenceBody, const dgCollisionInstance* const referenceShape, void* const userData, dgInt32 threadId) const;
 
 	dgInt32 CalculatePlaneIntersection (const dgFloat32* const vertex, const dgInt32* const index, dgInt32 indexCount, dgInt32 strideInFloat, const dgPlane& localPlane, dgVector* const contactsOut) const;

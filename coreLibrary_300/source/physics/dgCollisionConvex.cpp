@@ -2363,8 +2363,11 @@ dgInt32 dgCollisionConvex::CalculatePlaneIntersection (const dgVector& normal, c
 
 
 
-dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
+dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
 {
+	dgAssert (0);
+	return 0;
+/*
 	dgVector sum[4];
 	dgVector simplex[4];
 	dgInt32 indexArray[4];
@@ -2471,6 +2474,7 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& l
 	}
 
 	return param;
+*/
 }
 
 

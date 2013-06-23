@@ -172,7 +172,7 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 	dgFloat32 CalculateFaceMaxSize (const dgVector* const vertex, dgInt32 indexCount, const dgInt32* const indexArray) const;
 
 	virtual void ForAllSectors (const dgVector& minBox, const dgVector& maxBox, const dgVector& boxDistanceTravel, dgFloat32 m_maxT, dgAABBIntersectCallback callback, void* const context) const;
-	virtual void ForAllSectorsRayHit (const dgFastRayTest& ray, dgRayIntersectCallback callback, void* const context) const;
+	virtual void ForAllSectorsRayHit (const dgFastRayTest& ray, dgFloat32 maxT, dgRayIntersectCallback callback, void* const context) const;
 	virtual dgVector ForAllSectorsSupportVectex (const dgVector& dir) const;	
 
 	private:

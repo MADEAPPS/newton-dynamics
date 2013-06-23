@@ -86,7 +86,7 @@ dgFloat32 dgCollisionNull::GetVolume () const
 	return 0.0f;
 }
 
-dgFloat32 dgCollisionNull::RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
+dgFloat32 dgCollisionNull::RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
 {
 	return dgFloat32 (1.2f);
 }

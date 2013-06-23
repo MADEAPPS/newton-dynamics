@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#if !defined(AFX_dgCollisionNull_H__4969D514_69A9_4D96_82B2_E5B0EA3D413F_H)
-#define AFX_dgCollisionNull_H__4969D514_69A9_4D96_82B2_E5B0EA3D413F_H
+#ifndef _dgCollisionNull_H__
+#define _dgCollisionNull_H__
 
 
 #include "dgCollisionConvex.h"
@@ -42,7 +42,7 @@ class dgCollisionNull: public dgCollisionConvex
 	virtual void DebugCollision  (const dgMatrix& matrix, OnDebugCollisionMeshCallback callback, void* const userData) const;
 	
 	virtual dgVector CalculateVolumeIntegral (const dgMatrix& globalMatrix, GetBuoyancyPlane bouyancyPlane, void* const context) const;
-	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
+	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
 
 	private:
 	virtual dgInt32 CalculateSignature () const;
@@ -55,5 +55,5 @@ class dgCollisionNull: public dgCollisionConvex
 };
 
 
-#endif // !defined(AFX_dgCollisionNull_H__4969D514_69A9_4D96_82B2_E5B0EA3D413F_H)
+#endif 
 

@@ -1303,14 +1303,9 @@ void dgBroadPhase::RayCast (const dgVector& l0, const dgVector& l1, OnRayCastAct
 				line.m_boxL1.m_z = line.m_l0.m_z;
 			}
 
-			dgVector p2 (ray.m_p1);
-
 			while (stack) {
-
 				stack --;
 				dgFloat32 dist = distance[stack];
-
-				dgFloat32 den (dgFloat32 (1.0f) / dist2);
 				if (dist > maxParam) {
 					break;
 				} else {
@@ -1321,14 +1316,8 @@ void dgBroadPhase::RayCast (const dgVector& l0, const dgVector& l1, OnRayCastAct
 						dgAssert (!me->m_right);
 						if (me->m_body != sentinel) {
 							dgFloat32 param = me->m_body->RayCast (line, filter, prefilter, userData, maxParam);
-							if (param < dgFloat32 (1.0f)) {
-								dgVector step (p2 - ray.m_p0);
-								p2 = ray.m_p0 + step.Scale4 (param);
-								param *= (step % segment) * den;
-								if (param < maxParam) {
-									maxParam = param;
-									ray.Reset____ (maxParam);
-								}
+							if (param < maxParam) {
+								maxParam = param;
 							}
 						}
 					} else {
@@ -1336,20 +1325,16 @@ void dgBroadPhase::RayCast (const dgVector& l0, const dgVector& l1, OnRayCastAct
 							const dgNode* const node = me->m_left;
 							dgAssert (node);
 							dgFloat32 dist = ray.BoxIntersect(node->m_minBox, node->m_maxBox);
-							if (dist < dgFloat32 (1.0f)) {
-								dgVector step (p2 - ray.m_p0);
-								dist *= (step % segment) * den;
-								if (dist < maxParam) {
-									dgInt32 j = stack;
-									for ( ; j && (dist > distance[j - 1]); j --) {
-										stackPool[j] = stackPool[j - 1];
-										distance[j] = distance[j - 1];
-									}
-									stackPool[j] = node;
-									distance[j] = dist;
-									stack++;
-									dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNode*)));
+							if (dist < maxParam) {
+								dgInt32 j = stack;
+								for ( ; j && (dist > distance[j - 1]); j --) {
+									stackPool[j] = stackPool[j - 1];
+									distance[j] = distance[j - 1];
 								}
+								stackPool[j] = node;
+								distance[j] = dist;
+								stack++;
+								dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNode*)));
 							}
 						}
 
@@ -1357,20 +1342,16 @@ void dgBroadPhase::RayCast (const dgVector& l0, const dgVector& l1, OnRayCastAct
 							const dgNode* const node = me->m_right;
 							dgAssert (node);
 							dgFloat32 dist = ray.BoxIntersect(node->m_minBox, node->m_maxBox);
-							if (dist < dgFloat32 (1.0f)) {
-								dgVector step (p2 - ray.m_p0);
-								dist *= (step % segment) * den;
-								if (dist < maxParam) {
-									dgInt32 j = stack;
-									for ( ; j && (dist > distance[j - 1]); j --) {
-										stackPool[j] = stackPool[j - 1];
-										distance[j] = distance[j - 1];
-									}
-									stackPool[j] = node;
-									distance[j] = dist;
-									stack++;
-									dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNode*)));
+							if (dist < maxParam) {
+								dgInt32 j = stack;
+								for ( ; j && (dist > distance[j - 1]); j --) {
+									stackPool[j] = stackPool[j - 1];
+									distance[j] = distance[j - 1];
 								}
+								stackPool[j] = node;
+								distance[j] = dist;
+								stack++;
+								dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNode*)));
 							}
 						}
 					}

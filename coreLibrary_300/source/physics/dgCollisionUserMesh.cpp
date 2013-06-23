@@ -101,8 +101,11 @@ bool dgCollisionUserMesh::AABBOvelapTest (const dgVector& boxP0, const dgVector&
 }
 
 
-dgFloat32 dgCollisionUserMesh::RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body,	void* const userData) const
+dgFloat32 dgCollisionUserMesh::RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body,	void* const userData) const
 {
+	dgAssert (0);
+	return 0;
+/*
 	dgFloat32 param = dgFloat32 (1.2f);
 	if (m_rayHitCallback) {
 		dgCollisionMeshRayHitDesc data;
@@ -123,6 +126,7 @@ dgFloat32 dgCollisionUserMesh::RayCast (const dgVector& localP0, const dgVector&
 		} 
 	}
 	return param;
+*/
 }
 
 

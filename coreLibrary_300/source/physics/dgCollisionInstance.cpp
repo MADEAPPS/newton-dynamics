@@ -430,11 +430,11 @@ void dgCollisionInstance::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVect
 }
 
 
-dgFloat32 dgCollisionInstance::RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, OnRayPrecastAction preFilter, const dgBody* const body, void* const userData) const
+dgFloat32 dgCollisionInstance::RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, OnRayPrecastAction preFilter, const dgBody* const body, void* const userData) const
 {
 	if (!preFilter || preFilter(body, this, userData)) {
 		if (m_scaleIsUnit) {
-			dgFloat32 t = m_childShape->RayCast (localP0, localP1, contactOut, body, userData);
+			dgFloat32 t = m_childShape->RayCast (localP0, localP1, maxT, contactOut, body, userData);
 			if (t <=dgFloat32 (1.0f)) {
 				if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
 					contactOut.m_shapeId0 = GetUserDataID();
@@ -447,7 +447,7 @@ dgFloat32 dgCollisionInstance::RayCast (const dgVector& localP0, const dgVector&
 		} else {
 			dgVector p0 (localP0.CompProduct4(m_invScale));
 			dgVector p1 (localP1.CompProduct4(m_invScale));
-			dgFloat32 t = m_childShape->RayCast (p0, p1, contactOut, body, userData);
+			dgFloat32 t = m_childShape->RayCast (p0, p1, maxT, contactOut, body, userData);
 			if (t <=dgFloat32 (1.0f)) {
 				if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
 //					contactOut.m_userId = GetUserDataID();

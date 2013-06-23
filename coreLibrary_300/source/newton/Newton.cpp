@@ -3979,7 +3979,7 @@ dFloat NewtonCollisionRayCast(const NewtonCollision* const collisionPtr, const d
 	dgVector q1 (matrix.UntransformVector (dgVector (p1[0], p1[1], p1[2], dgFloat32 (0.0f)))); 
 	dgContactPoint contact;
 
-	dFloat t = collision->RayCast (q0, q1, contact, NULL, NULL, NULL);
+	dFloat t = collision->RayCast (q0, q1, dgFloat32 (1.0f), contact, NULL, NULL, NULL);
 	if (t >= dFloat (0.0f) && t <= dFloat (dgFloat32(1.0f))) {
 		attribute[0] = (dLong) contact.m_shapeId0;
 

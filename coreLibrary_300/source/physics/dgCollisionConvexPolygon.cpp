@@ -68,7 +68,7 @@ void dgCollisionConvexPolygon::Serialize(dgSerialize callback, void* const userD
 }
 
 
-dgFloat32 dgCollisionConvexPolygon::RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* userData) const
+dgFloat32 dgCollisionConvexPolygon::RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* userData) const
 {
 	dgAssert (0);
 	return dgFloat32 (1.2f);

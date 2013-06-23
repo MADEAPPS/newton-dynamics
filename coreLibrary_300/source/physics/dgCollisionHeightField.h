@@ -51,7 +51,7 @@ class dgCollisionHeightField: public dgCollisionMesh
 	dgFloat32 RayCastCell (const dgFastRayTest& ray, dgInt32 xIndex0, dgInt32 zIndex0, dgVector& normalOut) const;
 
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
-	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
+	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
 	virtual void GetCollidingFaces (dgPolygonMeshDesc* const data) const;
 
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;

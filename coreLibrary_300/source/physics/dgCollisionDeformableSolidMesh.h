@@ -73,7 +73,7 @@ class dgCollisionDeformableSolidMesh: public dgCollisionDeformableMesh
 
 	
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
-	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
+	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
 	virtual void GetCollidingFaces (dgPolygonMeshDesc* const data) const;
 
 	virtual void DebugCollision (const dgMatrix& matrixPtr, OnDebugCollisionMeshCallback callback, void* const userData) const;
