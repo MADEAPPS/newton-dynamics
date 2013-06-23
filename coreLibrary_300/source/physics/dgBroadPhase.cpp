@@ -43,8 +43,8 @@ DG_MSC_VECTOR_AVX_ALIGMENT
 class dgBroadPhase::dgNode
 {
 	public: 
-
 	DG_CLASS_ALLOCATOR(allocator)
+	
 	dgNode (dgBody* const body)
 		:m_minBox (body->m_minAABB)
 		,m_maxBox (body->m_maxAABB)
@@ -85,7 +85,6 @@ class dgBroadPhase::dgNode
 		m_surfaceArea = side0.DotProduct4(side0.ShiftTripleRight()).m_x;
 	}
 
-
 	dgNode (dgNode* const parent, const dgVector& minBox, const dgVector& maxBox)
 		:m_minBox (minBox)
 		,m_maxBox(maxBox)
@@ -96,6 +95,7 @@ class dgBroadPhase::dgNode
 		,m_fitnessNode(NULL) 
 	{
 	}
+
 
 	~dgNode ()
 	{
@@ -282,11 +282,119 @@ class dgBroadphaseSyncDescriptor
 };
 
 
+class dgBroadPhase::dgSpliteInfo
+{
+	public:
+	dgSpliteInfo (dgNode** const boxArray, dgInt32 boxCount)
+	{
+		dgVector minP ( dgFloat32 (1.0e15f)); 
+		dgVector maxP (-dgFloat32 (1.0e15f)); 
+
+		if (boxCount == 2) {
+			m_axis = 1;
+			for (dgInt32 i = 0; i < boxCount; i ++) {
+				dgNode* const node = boxArray[i];
+				dgAssert (node->m_body);
+				//dgInt32 j0 = boxArray[i].m_minIndex;
+				//dgInt32 j1 = boxArray[i].m_maxIndex;
+				//const dgVector& p0 = vertexArray[j0];
+				//const dgVector& p1 = vertexArray[j1];
+				//minP = minP.GetMin (p0); 
+				//maxP = maxP.GetMax (p1); 
+				minP = minP.GetMin (node->m_minBox); 
+				maxP = maxP.GetMax (node->m_maxBox); 
+			}
+		} else {
+			dgVector median (dgFloat32 (0.0f));
+			dgVector varian (dgFloat32 (0.0f));
+
+			for (dgInt32 i = 0; i < boxCount; i ++) {
+				dgNode* const node = boxArray[i];
+				dgAssert (node->m_body);
+				minP = minP.GetMin (node->m_minBox); 
+				maxP = maxP.GetMax (node->m_maxBox); 
+				dgVector p ((node->m_minBox + node->m_maxBox).CompProduct4(dgVector::m_half));
+
+				median += p;
+				varian += p.CompProduct4(p);
+			}
+
+			varian = varian.Scale4 (dgFloat32 (boxCount)) - median.CompProduct4(median);
+
+			dgInt32 index = 0;
+			dgFloat32 maxVarian = dgFloat32 (-1.0e10f);
+			for (dgInt32 i = 0; i < 3; i ++) {
+				if (varian[i] > maxVarian) {
+					index = i;
+					maxVarian = varian[i];
+				}
+			}
+
+			dgVector center = median.Scale4 (dgFloat32 (1.0f) / dgFloat32 (boxCount));
+
+			dgFloat32 test = center[index];
+
+			dgInt32 i0 = 0;
+			dgInt32 i1 = boxCount - 1;
+			do {    
+				for (; i0 <= i1; i0 ++) {
+					dgNode* const node = boxArray[i0];
+					//dgInt32 j0 = boxArray[i0].m_minIndex;
+					//dgInt32 j1 = boxArray[i0].m_maxIndex;
+					//dgFloat32 val = (vertexArray[j0][index] + vertexArray[j1][index]) * dgFloat32 (0.5f);
+					dgFloat32 val = (node->m_minBox[index] + node->m_maxBox[index]) * dgFloat32 (0.5f);
+					if (val > test) {
+						break;
+					}
+				}
+
+				for (; i1 >= i0; i1 --) {
+					dgNode* const node = boxArray[i1];
+					//dgInt32 j0 = boxArray[i1].m_minIndex;
+					//dgInt32 j1 = boxArray[i1].m_maxIndex;
+					//dgFloat32 val = (vertexArray[j0][index] + vertexArray[j1][index]) * dgFloat32 (0.5f);
+					dgFloat32 val = (node->m_minBox[index] + node->m_maxBox[index]) * dgFloat32 (0.5f);
+					if (val < test) {
+						break;
+					}
+				}
+
+				if (i0 < i1)	{
+					dgSwap(boxArray[i0], boxArray[i1]);
+					i0++; 
+					i1--;
+				}
+
+			} while (i0 <= i1);
+
+			if (i0 > 0){
+				i0 --;
+			}
+			if ((i0 + 1) >= boxCount) {
+				i0 = boxCount - 2;
+			}
+
+			m_axis = i0 + 1;
+		}
+
+		dgAssert (maxP.m_x - minP.m_x >= dgFloat32 (0.0f));
+		dgAssert (maxP.m_y - minP.m_y >= dgFloat32 (0.0f));
+		dgAssert (maxP.m_z - minP.m_z >= dgFloat32 (0.0f));
+		m_p0 = minP;
+		m_p1 = maxP;
+	}
+
+	dgInt32 m_axis;
+	dgVector m_p0;
+	dgVector m_p1;
+};
+
 
 dgBroadPhase::dgBroadPhase(dgWorld* const world)
 	:m_world(world)
 	,m_rootNode (NULL)
 	,m_lru(0)
+	,m_treeEntropy(dgFloat32 (0.0f))
 	,m_fitness(world->GetAllocator())
 	,m_broadPhaseType(m_generic)
 	,m_contacJointLock()
@@ -649,6 +757,37 @@ void dgBroadPhase::ImproveNodeFitness (dgNode* const node)
 }
 
 
+dgBroadPhase::dgNode* dgBroadPhase::BuildTopDown (dgNode** const leafArray, dgInt32 firstBox, dgInt32 lastBox, dgFitnessList::dgListNode** const nextNode)
+{
+	dgAssert (firstBox >= 0);
+	dgAssert (lastBox >= 0);
+
+	if (lastBox == firstBox) {
+		return leafArray[firstBox];
+	} else {
+		dgSpliteInfo info (&leafArray[firstBox], lastBox - firstBox + 1);
+
+		dgNode* const parent = (*nextNode)->GetInfo();
+		parent->m_parent = NULL;
+		*nextNode = (*nextNode)->GetNext();
+
+		parent->m_minBox = info.m_p0;
+		parent->m_maxBox = info.m_p1;
+		dgVector side0 (parent->m_maxBox - parent->m_minBox);
+		parent->m_surfaceArea = side0.CompProduct4(side0.ShiftTripleRight()).m_x; 
+		
+//		m_front = new (allocator) dgConstructionTree (allocator, firstBox + info.m_axis, lastBox, boxArray, vertexArray, this);
+		parent->m_right = BuildTopDown (leafArray, firstBox + info.m_axis, lastBox, nextNode);
+		parent->m_right->m_parent = parent;
+
+//		m_back = new (allocator) dgConstructionTree (allocator, firstBox, firstBox + info.m_axis - 1, boxArray, vertexArray, this);
+		parent->m_left = BuildTopDown (leafArray, firstBox, firstBox + info.m_axis - 1, nextNode);
+		parent->m_left->m_parent = parent;
+		return parent;
+	}
+
+}
+
 void dgBroadPhase::ImproveFitness()
 {
 	dgFloat64 cost0 = m_fitness.TotalCost ();
@@ -658,9 +797,33 @@ void dgBroadPhase::ImproveFitness()
 		for (dgFitnessList::dgListNode* node = m_fitness.GetFirst(); node; node = node->GetNext()) {
 			ImproveNodeFitness (node->GetInfo());
 		}
-	
 		cost1 = m_fitness.TotalCost ();
 	} while (cost1 < (dgFloat32 (0.95f)) * cost0);
+
+	if ((cost1 > m_treeEntropy * dgFloat32 (2.0f)) || (cost1 < m_treeEntropy * dgFloat32 (0.5f))) {
+
+		dgWorld* const world = m_world;
+		dgInt32 count = m_fitness.GetCount() * 2 + 12;
+		world->m_pairMemoryBuffer.ExpandCapacityIfNeessesary (count, sizeof (dgNode*));
+
+		dgInt32 leafNodesCount = 0;
+		dgNode** const leafArray = (dgNode**)&world->m_pairMemoryBuffer[0];
+		for (dgFitnessList::dgListNode* nodePtr = m_fitness.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
+			dgNode* const node = nodePtr->GetInfo();
+			if (node->m_left->m_body) {
+				leafArray[leafNodesCount] = node->m_left;
+				leafNodesCount ++;
+			}
+			if (node->m_right->m_body) {
+				leafArray[leafNodesCount] = node->m_right;
+				leafNodesCount ++;
+			}
+		}
+
+		dgFitnessList::dgListNode* nodePtr = m_fitness.GetFirst();
+		m_rootNode = BuildTopDown (leafArray, 0, leafNodesCount - 1, &nodePtr);
+		m_treeEntropy = m_fitness.TotalCost ();
+	}
 }
 
 void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgVector& timestep2, dgInt32 threadID)
@@ -917,7 +1080,8 @@ void dgBroadPhase::CalculatePairContacts (dgBroadphaseSyncDescriptor* const desc
 	
 	dgFloat32 timestep = descriptor->m_timestep;
 	dgCollidingPairCollector* const pairCollector = m_world;
-	dgCollidingPairCollector::dgPair* const pairs = pairCollector->m_pairs;
+//	dgCollidingPairCollector::dgPair* const pairs = pairCollector->m_pairs;
+	dgCollidingPairCollector::dgPair* const pairs = (dgCollidingPairCollector::dgPair*) &m_world->m_pairMemoryBuffer[0];
 	const dgInt32 count = pairCollector->m_count;
 
 	for (dgInt32 i = dgAtomicExchangeAndAdd(&descriptor->m_pairsAtomicCounter, 1); i < count; i = dgAtomicExchangeAndAdd(&descriptor->m_pairsAtomicCounter, 1)) {
@@ -1234,8 +1398,9 @@ void dgBroadPhase::UpdateContactsBroadPhaseEnd ()
 	dgUnsigned32 lru = m_lru;
 
 	dgActiveContacts* const contactList = m_world;
-	dgCollidingPairCollector& contactPair = *m_world;
-	dgContact** const deadContacs = (dgContact**) contactPair.m_pairs;
+	//dgCollidingPairCollector& contactPair = *m_world;
+	//dgContact** const deadContacs = (dgContact**) contactPair.m_pairs;
+	dgContact** const deadContacs = (dgContact**) &m_world->m_pairMemoryBuffer[0];
 
 	for (dgActiveContacts::dgListNode* contactNode = contactList->GetFirst(); contactNode; contactNode = contactNode->GetNext()) {
 		dgContact* const contact = contactNode->GetInfo();

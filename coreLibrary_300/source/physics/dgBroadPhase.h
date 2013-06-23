@@ -76,7 +76,7 @@ class dgBroadPhase
 	};
 
 	class dgNode;
-
+	class dgSpliteInfo;
 
 	dgBroadPhase(dgWorld* const world);
 	~dgBroadPhase();
@@ -124,6 +124,7 @@ class dgBroadPhase
 	void CalculatePairContacts (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID);
 	void UpdateSoftBodyForcesKernel (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID);
 	
+	dgNode* BuildTopDown (dgNode** const leafArray, dgInt32 firstBox, dgInt32 lastBox, dgFitnessList::dgListNode** const nextNode);
 
 	void FindCollidingPairsGeneric (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
 	void FindCollidingPairsPersistent (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
@@ -137,6 +138,7 @@ class dgBroadPhase
 	dgNode* m_rootNode;
 	dgUnsigned32 m_lru;
 	dgFitnessList m_fitness;
+	dgFloat64 m_treeEntropy;
 	dgType m_broadPhaseType;
 	dgThread::dgCriticalSection m_contacJointLock;
 	dgThread::dgCriticalSection m_criticalSectionLock;

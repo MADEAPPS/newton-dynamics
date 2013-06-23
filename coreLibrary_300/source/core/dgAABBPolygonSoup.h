@@ -31,6 +31,7 @@ class dgPolygonSoupDatabaseBuilder;
 
 class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 {
+	class dgSpliteInfo;
 	class dgConstructionTree;
 
 	class dgNode

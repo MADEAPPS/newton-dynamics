@@ -30,6 +30,117 @@
 
 #define DG_STACK_DEPTH 256
 
+
+class dgAABBPolygonSoup::dgSpliteInfo
+{
+	public:
+	dgSpliteInfo (dgNode* const boxArray, dgInt32 boxCount, const dgVector* const vertexArray, const dgConstructionTree* const tree)
+	{
+
+		dgVector minP ( dgFloat32 (1.0e15f)); 
+		dgVector maxP (-dgFloat32 (1.0e15f)); 
+
+		if (boxCount == 2) {
+			m_axis = 1;
+
+			for (dgInt32 i = 0; i < boxCount; i ++) {
+				dgInt32 j0 = boxArray[i].m_minIndex;
+				dgInt32 j1 = boxArray[i].m_maxIndex;
+
+				const dgVector& p0 = vertexArray[j0];
+				const dgVector& p1 = vertexArray[j1];
+				minP = minP.GetMin (p0); 
+				maxP = maxP.GetMax (p1); 
+			}
+
+		} else {
+			dgVector median (dgFloat32 (0.0f));
+			dgVector varian (dgFloat32 (0.0f));
+			for (dgInt32 i = 0; i < boxCount; i ++) {
+
+				dgInt32 j0 = boxArray[i].m_minIndex;
+				dgInt32 j1 = boxArray[i].m_maxIndex;
+
+				const dgVector& p0 = vertexArray[j0];
+				const dgVector& p1 = vertexArray[j1];
+
+				minP = minP.GetMin (p0); 
+				maxP = maxP.GetMax (p1); 
+				dgVector p ((p0 + p1).CompProduct4(dgVector::m_half));
+
+				median += p;
+				varian += p.CompProduct4(p);
+			}
+
+			varian = varian.Scale4 (dgFloat32 (boxCount)) - median.CompProduct4(median);
+
+
+			dgInt32 index = 0;
+			dgFloat32 maxVarian = dgFloat32 (-1.0e10f);
+			for (dgInt32 i = 0; i < 3; i ++) {
+				if (varian[i] > maxVarian) {
+					index = i;
+					maxVarian = varian[i];
+				}
+			}
+
+			dgVector center = median.Scale4 (dgFloat32 (1.0f) / dgFloat32 (boxCount));
+
+			dgFloat32 test = center[index];
+
+			dgInt32 i0 = 0;
+			dgInt32 i1 = boxCount - 1;
+			do {    
+				for (; i0 <= i1; i0 ++) {
+					dgInt32 j0 = boxArray[i0].m_minIndex;
+					dgInt32 j1 = boxArray[i0].m_maxIndex;
+
+					dgFloat32 val = (vertexArray[j0][index] + vertexArray[j1][index]) * dgFloat32 (0.5f);
+					if (val > test) {
+						break;
+					}
+				}
+
+				for (; i1 >= i0; i1 --) {
+					dgInt32 j0 = boxArray[i1].m_minIndex;
+					dgInt32 j1 = boxArray[i1].m_maxIndex;
+
+					dgFloat32 val = (vertexArray[j0][index] + vertexArray[j1][index]) * dgFloat32 (0.5f);
+					if (val < test) {
+						break;
+					}
+				}
+
+				if (i0 < i1)	{
+					dgSwap(boxArray[i0], boxArray[i1]);
+					i0++; 
+					i1--;
+				}
+			} while (i0 <= i1);
+
+			if (i0 > 0){
+				i0 --;
+			}
+			if ((i0 + 1) >= boxCount) {
+				i0 = boxCount - 2;
+			}
+
+			m_axis = i0 + 1;
+		}
+
+		dgAssert (maxP.m_x - minP.m_x >= dgFloat32 (0.0f));
+		dgAssert (maxP.m_y - minP.m_y >= dgFloat32 (0.0f));
+		dgAssert (maxP.m_z - minP.m_z >= dgFloat32 (0.0f));
+		m_p0 = minP;
+		m_p1 = maxP;
+	}
+
+	dgInt32 m_axis;
+	dgVector m_p0;
+	dgVector m_p1;
+};
+
+
 class dgAABBPolygonSoup::dgConstructionTree
 {
 	public:
@@ -51,115 +162,6 @@ class dgAABBPolygonSoup::dgConstructionTree
 			m_back = NULL;
 			m_front = NULL;
 		} else {
-
-			struct dgSpliteInfo
-			{
-				dgSpliteInfo (dgNode* const boxArray, dgInt32 boxCount, const dgVector* const vertexArray, const dgConstructionTree* const tree)
-				{
-
-					dgVector minP ( dgFloat32 (1.0e15f)); 
-					dgVector maxP (-dgFloat32 (1.0e15f)); 
-
-					if (boxCount == 2) {
-						m_axis = 1;
-
-						for (dgInt32 i = 0; i < boxCount; i ++) {
-							dgInt32 j0 = boxArray[i].m_minIndex;
-							dgInt32 j1 = boxArray[i].m_maxIndex;
-
-							const dgVector& p0 = vertexArray[j0];
-							const dgVector& p1 = vertexArray[j1];
-							minP = minP.GetMin (p0); 
-							maxP = maxP.GetMax (p1); 
-						}
-
-					} else {
-						dgVector median (dgFloat32 (0.0f));
-						dgVector varian (dgFloat32 (0.0f));
-						for (dgInt32 i = 0; i < boxCount; i ++) {
-
-							dgInt32 j0 = boxArray[i].m_minIndex;
-							dgInt32 j1 = boxArray[i].m_maxIndex;
-
-							const dgVector& p0 = vertexArray[j0];
-							const dgVector& p1 = vertexArray[j1];
-
-							minP = minP.GetMin (p0); 
-							maxP = maxP.GetMax (p1); 
-							dgVector p ((p0 + p1).CompProduct4(dgVector::m_half));
-
-							median += p;
-							varian += p.CompProduct4(p);
-						}
-
-						varian = varian.Scale4 (dgFloat32 (boxCount)) - median.CompProduct4(median);
-
-
-						dgInt32 index = 0;
-						dgFloat32 maxVarian = dgFloat32 (-1.0e10f);
-						for (dgInt32 i = 0; i < 3; i ++) {
-							if (varian[i] > maxVarian) {
-								index = i;
-								maxVarian = varian[i];
-							}
-						}
-
-						dgVector center = median.Scale4 (dgFloat32 (1.0f) / dgFloat32 (boxCount));
-
-						dgFloat32 test = center[index];
-
-						dgInt32 i0 = 0;
-						dgInt32 i1 = boxCount - 1;
-						do {    
-							for (; i0 <= i1; i0 ++) {
-								dgInt32 j0 = boxArray[i0].m_minIndex;
-								dgInt32 j1 = boxArray[i0].m_maxIndex;
-
-								dgFloat32 val = (vertexArray[j0][index] + vertexArray[j1][index]) * dgFloat32 (0.5f);
-								if (val > test) {
-									break;
-								}
-							}
-
-							for (; i1 >= i0; i1 --) {
-								dgInt32 j0 = boxArray[i1].m_minIndex;
-								dgInt32 j1 = boxArray[i1].m_maxIndex;
-
-								dgFloat32 val = (vertexArray[j0][index] + vertexArray[j1][index]) * dgFloat32 (0.5f);
-								if (val < test) {
-									break;
-								}
-							}
-
-							if (i0 < i1)	{
-								dgSwap(boxArray[i0], boxArray[i1]);
-								i0++; 
-								i1--;
-							}
-						} while (i0 <= i1);
-
-						if (i0 > 0){
-							i0 --;
-						}
-						if ((i0 + 1) >= boxCount) {
-							i0 = boxCount - 2;
-						}
-
-						m_axis = i0 + 1;
-					}
-
-					dgAssert (maxP.m_x - minP.m_x >= dgFloat32 (0.0f));
-					dgAssert (maxP.m_y - minP.m_y >= dgFloat32 (0.0f));
-					dgAssert (maxP.m_z - minP.m_z >= dgFloat32 (0.0f));
-					m_p0 = minP;
-					m_p1 = maxP;
-				}
-
-				dgInt32 m_axis;
-				dgVector m_p0;
-				dgVector m_p1;
-			};
-
 			dgSpliteInfo info (&boxArray[firstBox], lastBox - firstBox + 1, vertexArray, this);
 
 			m_boxIndex = -1;
