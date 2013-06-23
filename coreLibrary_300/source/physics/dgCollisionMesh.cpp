@@ -234,35 +234,10 @@ dgVector dgCollisionMesh::SupportVertex (const dgVector& dir, dgInt32* const ver
 void dgCollisionMesh::CalcAABB(const dgMatrix& matrix, dgVector &p0, dgVector &p1) const
 {
 	dgVector origin (matrix.TransformVector(m_boxOrigin));
-	//dgVector size (m_boxSize.m_x * dgAbsf(matrix[0][0]) + m_boxSize.m_y * dgAbsf(matrix[1][0]) + m_boxSize.m_z * dgAbsf(matrix[2][0]),  
-	//			     m_boxSize.m_x * dgAbsf(matrix[0][1]) + m_boxSize.m_y * dgAbsf(matrix[1][1]) + m_boxSize.m_z * dgAbsf(matrix[2][1]),  
-	//			     m_boxSize.m_x * dgAbsf(matrix[0][2]) + m_boxSize.m_y * dgAbsf(matrix[1][2]) + m_boxSize.m_z * dgAbsf(matrix[2][2]),
-	//	             dgFloat32 (0.0f));
 	dgVector size (matrix.m_front.Abs().Scale4(m_boxSize.m_x) + matrix.m_up.Abs().Scale4(m_boxSize.m_y) + matrix.m_right.Abs().Scale4(m_boxSize.m_z));
 
 	p0 = (origin - size) & dgVector::m_triplexMask;
 	p1 = (origin + size) & dgVector::m_triplexMask;
-
-	p0.m_w = dgFloat32 (0.0f);
-	p1.m_w = dgFloat32 (0.0f);
-
-#ifdef DG_DEBUG_AABB
-	dgInt32 i;
-	dgVector q0;
-	dgVector q1;
-	dgMatrix trans (matrix.Transpose());
-	for (i = 0; i < 3; i ++) {
-		q0[i] = matrix.m_posit[i] + matrix.RotateVector (BoxSupportMapping(trans[i].Scale3 (-1.0f)))[i];
-		q1[i] = matrix.m_posit[i] + matrix.RotateVector (BoxSupportMapping(trans[i]))[i];
-	}
-
-	dgVector err0 (p0 - q0);
-	dgVector err1 (p1 - q1);
-	dgFloat32 err; 
-	err = dgMax (size.m_x, size.m_y, size.m_z) * 0.5f; 
-	dgAssert ((err0 % err0) < err);
-	dgAssert ((err1 % err1) < err);
-#endif
 }
 
 

@@ -141,12 +141,8 @@ dgInt32 dgCollisionBox::CalculateSignature () const
 dgVector dgCollisionBox::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
 	dgAssert (dgAbsf(dir % dir - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
-
-	// according to Intel doc, with latest possessors this is better, because read after write are very, very expensive
+	dgAssert (dir.m_w == dgFloat32 (0.0f));
 	dgVector mask (dir < dgVector (dgFloat32 (0.0f)));
-//	return dgVector (dir.m_x < dgFloat32 (0.0f) ? m_size[1].m_x : m_size[0].m_x, 
-//					 dir.m_y < dgFloat32 (0.0f) ? m_size[1].m_y : m_size[0].m_y, 
-//					 dir.m_z < dgFloat32 (0.0f) ? m_size[1].m_z : m_size[0].m_z, dgFloat32 (0.0f));
 	return (m_size[1] & mask) + m_size[0].AndNot(mask);
 }
 
@@ -157,9 +153,7 @@ void dgCollisionBox::CalcAABB (const dgMatrix& matrix, dgVector &p0, dgVector &p
 //	dgFloat32 x = m_size[0].m_x * dgAbsf(matrix[0][0]) + m_size[0].m_y * dgAbsf(matrix[1][0]) + m_size[0].m_z * dgAbsf(matrix[2][0]);  
 //	dgFloat32 y = m_size[0].m_x * dgAbsf(matrix[0][1]) + m_size[0].m_y * dgAbsf(matrix[1][1]) + m_size[0].m_z * dgAbsf(matrix[2][1]);  
 //	dgFloat32 z = m_size[0].m_x * dgAbsf(matrix[0][2]) + m_size[0].m_y * dgAbsf(matrix[1][2]) + m_size[0].m_z * dgAbsf(matrix[2][2]);  
-
 	dgVector size (matrix[0].Abs().CompProduct4(dgVector(m_size[0].m_x)) + matrix[1].Abs().CompProduct4(dgVector(m_size[0].m_y)) + matrix[2].Abs().CompProduct4(dgVector(m_size[0].m_z)));
-
 	p0 = (matrix[3] - size) & dgVector::m_triplexMask;
 	p1 = (matrix[3] + size) & dgVector::m_triplexMask;
 }
@@ -168,6 +162,8 @@ void dgCollisionBox::CalcAABB (const dgMatrix& matrix, dgVector &p0, dgVector &p
 
 dgFloat32 dgCollisionBox::RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
 {
+//	return dgCollisionConvex::RayCast (localP0, localP1, maxT, contactOut, body, userData);
+
 	dgAssert (localP0.m_w == dgFloat32 (0.0f));
 	dgAssert (localP1.m_w == dgFloat32 (0.0f));
 

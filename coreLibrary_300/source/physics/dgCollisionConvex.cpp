@@ -2386,16 +2386,17 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& l
 		dgInt32 iter = 0;
 		dgInt32 cycling = 0;
 		dgFloat32 minDist = dgFloat32 (1.0e20f);
-		dgAssert (v.m_w == dgFloat32 (0.0f));
 		do {
-			dgFloat32 dist = v % v;
-			if (dist < dgFloat32 (1.0e-9f)) {
+			dgAssert (v.m_w == dgFloat32 (0.0f));
+			dgVector dist (v.DotProduct4(v));
+			dgFloat32 distance = dist.m_x;
+			if (distance < dgFloat32 (1.0e-9f)) {
 				index = -1; 
 				break;
 			}
 
-			if (dist < minDist) {
-				minDist = dist;
+			if (distance < minDist) {
+				minDist = distance;
 				cycling = -1;
 			}
 			cycling ++;
@@ -2405,14 +2406,15 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& l
 				break;
 			}
 
-			dgVector dir (v.Scale4 (-dgRsqrt(dist)));
+			//dgVector dir (v.Scale4 (-dgRsqrt(dist)));
+			dgVector dir (v.CompProduct4(dist.InvSqrt().CompProduct4(dgVector::m_negOne)));
 			dgAssert (dir.m_w == dgFloat32 (0.0f));
 			simplex[index] = SupportVertex (dir, NULL) - point;
 			const dgVector& w = simplex[index];
 			dgVector wv (w - v);
 			dgAssert (wv.m_w == dgFloat32 (0.0f));
-			dist = dir % wv;
-			if (dist < dgFloat32 (1.0e-3f)) {
+			distance = dir.DotProduct4(wv).m_x;
+			if (distance < dgFloat32 (1.0e-3f)) {
 				normal = dir;
 				break;
 			}
@@ -2446,7 +2448,7 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& l
 		dgAssert (index);
 		if (index > 0) {
 			dgVector q (v + point);
-			dgFloat32 den = normal % p0p1;
+			dgFloat32 den = normal.DotProduct4(p0p1).m_x;
 			dgAssert (den != 0.0f);
 			dgFloat32 t1 = (normal % (localP0 - q)) / den;
 

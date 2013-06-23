@@ -33,7 +33,7 @@
 
 #define DG_CONVEX_CAST_POOLSIZE			32
 #define DG_BROADPHASE_MAX_STACK_DEPTH	256
-#define DG_BROADPHASE_AABB_SCALE		dgFloat32 (4.0f)
+#define DG_BROADPHASE_AABB_SCALE		dgFloat32 (8.0f)
 #define DG_BROADPHASE_AABB_INV_SCALE	(dgFloat32 (1.0f) / DG_BROADPHASE_AABB_SCALE)
 
 dgVector dgBroadPhase::m_conservativeRotAngle (45.0f * 3.14159f / 180.0f);
@@ -1279,29 +1279,10 @@ void dgBroadPhase::RayCast (const dgVector& l0, const dgVector& l1, OnRayCastAct
 			dgLineBox line;	
 			line.m_l0 = l0;
 			line.m_l1 = l1;
-			if (line.m_l0.m_x <= line.m_l1.m_x) {
-				line.m_boxL0.m_x = line.m_l0.m_x;
-				line.m_boxL1.m_x = line.m_l1.m_x;
-			} else {
-				line.m_boxL0.m_x = line.m_l1.m_x;
-				line.m_boxL1.m_x = line.m_l0.m_x;
-			}
 
-			if (line.m_l0.m_y <= line.m_l1.m_y) {
-				line.m_boxL0.m_y = line.m_l0.m_y;
-				line.m_boxL1.m_y = line.m_l1.m_y;
-			} else {
-				line.m_boxL0.m_y = line.m_l1.m_y;
-				line.m_boxL1.m_y = line.m_l0.m_y;
-			}
-
-			if (line.m_l0.m_z <= line.m_l1.m_z) {
-				line.m_boxL0.m_z = line.m_l0.m_z;
-				line.m_boxL1.m_z = line.m_l1.m_z;
-			} else {
-				line.m_boxL0.m_z = line.m_l1.m_z;
-				line.m_boxL1.m_z = line.m_l0.m_z;
-			}
+			dgVector test (line.m_l0 <= line.m_l1);
+			line.m_boxL0 = (line.m_l0 & test) | line.m_l1.AndNot(test);
+			line.m_boxL1 = (line.m_l1 & test) | line.m_l0.AndNot(test);
 
 			while (stack) {
 				stack --;
@@ -1528,7 +1509,6 @@ void dgBroadPhase::UpdateContacts( dgFloat32 timestep)
 	dgInt32 threadsCount = m_world->GetThreadCount();	
 
 	dgBroadphaseSyncDescriptor syncPoints(m_broadPhaseType, &m_criticalSectionLock);
-//	syncPoints.m_world = m_world;
 	syncPoints.m_timestep = timestep;
 	
 	const dgBodyMasterList* const masterList = m_world;
