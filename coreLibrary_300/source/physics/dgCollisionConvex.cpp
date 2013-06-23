@@ -2371,6 +2371,7 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& l
 
 	dgVector normal;
 	dgVector point (localP0);
+	dgVector point0 (localP0);
 	dgVector p0p1 (localP0 - localP1);
 
 	dgFloat32 param = dgFloat32 (0.0f);
@@ -2379,12 +2380,12 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& l
 	memset (sum, 0, sizeof (sum));
 	dgVector dir (p0p1.CompProduct4 (p0p1.DotProduct4(p0p1).InvSqrt ()));
 	simplex[0] = SupportVertex (dir, NULL) - point;
+	dgVector v (simplex[0]);
+	index = 1;
 	do {
-		index = 1;
 		dgInt32 iter = 0;
 		dgInt32 cycling = 0;
 		dgFloat32 minDist = dgFloat32 (1.0e20f);
-		dgVector v (simplex[0]);
 		dgAssert (v.m_w == dgFloat32 (0.0f));
 		do {
 			dgFloat32 dist = v % v;
@@ -2442,7 +2443,8 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& l
 			cycling ++;
 		} while (iter < DG_CONNICS_CONTATS_ITERATIONS); 
 
-		if (index > 0.0f) {
+		dgAssert (index);
+		if (index > 0) {
 			dgVector q (v + point);
 			dgFloat32 den = normal % p0p1;
 			dgAssert (den != 0.0f);
@@ -2456,11 +2458,45 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& l
 				t1 = dgFloat32 (1.0f);
 			}
 			param = t1;
+	
 			point = localP0 - p0p1.Scale4 (param);
+			dgVector step (point0 - point);
+			point0 = point;
+			for(dgInt32 i = 0; i < index; i ++) {
+				simplex[i] += step;
+			}
 
-			dgVector dir ((point - v) & dgVector::m_triplexMask);
-			dir = dir.CompProduct4(dir.DotProduct4(dir).InvSqrt());
-			simplex[0] = SupportVertex (dir, NULL) - point;
+			switch (index) 
+			{
+				case 1:
+				{
+					v = simplex[0];
+					break;
+				}
+
+				case 2:
+				{
+					v = dgMinkHull::ReduceLine (index, simplex, sum, indexArray);
+					break;
+				}
+
+				case 3:
+				{
+					v = dgMinkHull::ReduceTriangle (index, simplex, sum, indexArray);
+					break;
+				}
+
+				case 4:
+				{
+					v = dgMinkHull::ReduceTetrahedrum (index, simplex, sum, indexArray);
+					break;
+				}
+			}
+
+			
+			//dgVector dir ((point - v) & dgVector::m_triplexMask);
+			//dir = dir.CompProduct4(dir.DotProduct4(dir).InvSqrt());
+			//simplex[0] = SupportVertex (dir, NULL) - point;
 		}
 	} while (index >= 0);
 
@@ -2554,7 +2590,6 @@ dgFloat32 dgCollisionConvex::ConvexConicConvexRayCast (const dgCollisionInstance
 		dgVector step (veloc.Scale4(dt));
 		lastContact.m_normal = normal;
 		lastContact.m_point = minkHull.m_p;
-		//minkHull.m_matrix.m_posit += step;
 		minkHull.TranslateSimplex(step);
 
 		makingProgressCount += (step.DotProduct4(step).m_x < dgFloat32(1.0e-4f)) ? 1 : 0;
