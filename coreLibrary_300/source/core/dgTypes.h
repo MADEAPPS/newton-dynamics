@@ -27,13 +27,13 @@
 #endif
 
 
-#ifdef DG_SIMD4_VECTOR_CLASS
+#ifdef DG_SSE4_INSTRUCTIONS_SET
 	#undef DG_SCALAR_VECTOR_CLASS
 #endif
 
 
 #if defined (__USE_DOUBLE_PRECISION__) || defined (__ppc__) || defined (ANDROID) || defined (IOS)
-	#undef DG_SIMD4_VECTOR_CLASS
+	#undef DG_SSE4_INSTRUCTIONS_SET
 	#ifndef DG_SCALAR_VECTOR_CLASS
 		#define DG_SCALAR_VECTOR_CLASS
 	#endif		

@@ -609,7 +609,7 @@ class dgVector
 	// return dot product
 	DG_INLINE dgFloat32 operator% (const dgVector& A) const
 	{
-		#ifdef DG_SIMD4_VECTOR_CLASS 
+		#ifdef DG_SSE4_INSTRUCTIONS_SET 
 			return dgVector (_mm_dp_ps (m_type, A.m_type, 0x77)).m_x; 
 		#else
 			dgVector tmp (A & m_triplexMask);
@@ -620,7 +620,7 @@ class dgVector
 
 	DG_INLINE dgVector DotProduct4 (const dgVector& A) const
 	{
-		#ifdef DG_SIMD4_VECTOR_CLASS 
+		#ifdef DG_SSE4_INSTRUCTIONS_SET 
 			return _mm_dp_ps (m_type, A.m_type, 0xff); 
 		#else 
 			return CompProduct4(A).AddHorizontal();
