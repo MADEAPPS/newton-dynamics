@@ -182,8 +182,8 @@ CPU_FLAGS = -O2 -fpic -g -msse -msse2 -mfpmath=sse -ffloat-store -ffast-math -fr
 # optimized
 #CPU_PLAGS = -O3 -march=native -fpic -msse -msse2 -mfpmath=sse -ffloat-store -ffast-math -freciprocal-math -funsafe-math-optimizations -fsingle-precision-constant
 
-#FLAGS = -c -Wall -Wno-strict-aliasing -DDG_SCALAR_VECTOR_CLASS -D_POSIX_VER -D_POSIX_VER_64 $(CPU_FLAGS) -I$(DG_INCLUDED_PATH) -I$(DG_INCLUDED_PHYSICS_PATH) -I$(DG_INCLUDED_MESH_PATH) -I$(DG_INCLUDED_OPENCL_PATH) -I$(DG_AI_PATH) 
-FLAGS = -c -Wall -Wno-strict-aliasing -D_POSIX_VER -D_POSIX_VER_64 $(CPU_FLAGS) -I$(DG_INCLUDED_PATH) -I$(DG_INCLUDED_PHYSICS_PATH) -I$(DG_INCLUDED_MESH_PATH) -I$(DG_INCLUDED_OPENCL_PATH) -I$(DG_AI_PATH) 
+#FLAGS = -c -Wall -Wno-strict-aliasing -DDG_SCALAR_VECTOR_CLASS -D_POSIX_VER_64 $(CPU_FLAGS) -I$(DG_INCLUDED_PATH) -I$(DG_INCLUDED_PHYSICS_PATH) -I$(DG_INCLUDED_MESH_PATH) -I$(DG_INCLUDED_OPENCL_PATH) -I$(DG_AI_PATH) 
+FLAGS = -c -Wall -Wno-strict-aliasing -D_POSIX_VER_64 $(CPU_FLAGS) -I$(DG_INCLUDED_PATH) -I$(DG_INCLUDED_PHYSICS_PATH) -I$(DG_INCLUDED_MESH_PATH) -I$(DG_INCLUDED_OPENCL_PATH) -I$(DG_AI_PATH) 
 
 .SUFFIXES : .o .cpp
 .cpp.o :

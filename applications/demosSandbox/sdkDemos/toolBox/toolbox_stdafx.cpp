@@ -91,7 +91,7 @@ void GetWorkingFileName (const char* const name, char* const outPathName)
 		CFRelease( appURL ); 
 		CFRelease( filePath );
 	
-	#elif defined(_POSIX_VER)
+	#elif (defined (_POSIX_VER) || defined (_POSIX_VER_64))
 
 		char id[2048];
 		char path[2048];

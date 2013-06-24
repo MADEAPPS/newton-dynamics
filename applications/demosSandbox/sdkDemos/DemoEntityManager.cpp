@@ -380,7 +380,7 @@ void DemoEntityManager::InitGraphicsSystem()
 	if (wglSwapIntervalEXT) {
 		wglSwapIntervalEXT(0);
 	}
-#elif defined(_POSIX_VER)
+#elif (defined (_POSIX_VER) || defined (_POSIX_VER_64))
 	if (glXSwapIntervalSGI) {
 		glXSwapIntervalSGI(0);  //NOTE check for GLX_SGI_swap_control extension : http://www.opengl.org/wiki/Swap_Interval#In_Linux_.2F_GLXw
 	}

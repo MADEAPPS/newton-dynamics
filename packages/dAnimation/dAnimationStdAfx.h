@@ -29,7 +29,7 @@
 #endif
 
 
-#if (defined (_POSIX_VER) || defined (_MACOSX_VER))
+#if (defined (_POSIX_VER) || defined (_POSIX_VER_64) || defined (_MACOSX_VER))
 	#define dAssert(x)
 #endif
 

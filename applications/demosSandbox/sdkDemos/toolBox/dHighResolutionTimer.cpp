@@ -39,7 +39,7 @@ void dResetTimer()
 
 	#endif
 
-	#ifdef _POSIX_VER
+	#if (defined (_POSIX_VER) || defined (_POSIX_VER_64))
 		timespec ts;
 		clock_gettime(CLOCK_REALTIME, &ts); // Works on Linux
 		//baseCount = ts.tv_nsec / 1000;
@@ -66,7 +66,7 @@ unsigned64 dGetTimeInMicrosenconds()
 
 	#endif
 
-	#ifdef _POSIX_VER
+	#if (defined (_POSIX_VER) || defined (_POSIX_VER_64))
 		timespec ts;
 		clock_gettime(CLOCK_REALTIME, &ts); // Works on Linux
 		//return unsigned64 (ts.tv_nsec / 1000) - baseCount;

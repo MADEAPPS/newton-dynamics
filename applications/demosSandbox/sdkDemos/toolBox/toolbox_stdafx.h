@@ -81,7 +81,7 @@ typedef long long unsigned64;
 
 #endif
 	
-#ifdef _POSIX_VER
+#if (defined (_POSIX_VER) || defined (_POSIX_VER_64))
 	#include <stdlib.h>
 	#include <unistd.h>
 	#include <time.h>

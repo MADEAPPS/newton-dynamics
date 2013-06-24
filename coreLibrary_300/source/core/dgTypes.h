@@ -122,20 +122,21 @@
 	#include <vecLib/veclib.h>
 #endif
 
-#ifdef _POSIX_VER
+
+
+#if (defined (_POSIX_VER) || defined (_POSIX_VER_64))
 	#include <unistd.h>
 	#include <assert.h>
-	#ifdef DG_BUILD_SIMD_CODE
-		extern "C" 
-		{ 
-			// for SSE3 and up
-			// #include <pmmintrin.h> 
-			// #include <immintrin.h>   
-			// #include <smmintrin.h> 
-			#include <emmintrin.h> 
-			#include <mmintrin.h> 
+	extern "C" 
+	{ 
+		// for SSE3 and up
+		// #include <pmmintrin.h> 
+		// #include <immintrin.h>   
+		// #include <smmintrin.h> 
+		#include <emmintrin.h> 
+		#include <mmintrin.h> 
 	} 
-	#endif
+
 #endif
 
 #ifdef _MACOSX_VER
@@ -769,7 +770,7 @@ DG_INLINE dgInt32 dgAtomicExchangeAndAdd (dgInt32* const addend, dgInt32 amount)
 		return _InterlockedExchangeAdd((long*) addend, long (amount));
 	#endif
 
-	#if (defined (_POSIX_VER) || defined (_MACOSX_VER))
+	#if (defined (_POSIX_VER) || defined (_POSIX_VER_64) ||defined (_MACOSX_VER))
 		return __sync_fetch_and_add ((int32_t*)addend, amount );
 	#endif
 }
@@ -781,7 +782,7 @@ DG_INLINE dgInt32 dgInterlockedExchange(dgInt32* const ptr, dgInt32 value)
 		return _InterlockedExchange((long*) ptr, value);
 	#endif
 
-	#if (defined (_POSIX_VER) || defined (_MACOSX_VER))
+	#if (defined (_POSIX_VER) || defined (_POSIX_VER_64) ||defined (_MACOSX_VER))
 		//__sync_synchronize();
 		return __sync_lock_test_and_set((int32_t*)ptr, value);
 	#endif

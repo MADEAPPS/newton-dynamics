@@ -927,10 +927,6 @@ void dgWorld::StepDynamics (dgFloat32 timestep)
 //m_cpu = dgSimdPresent;
 //m_cpu = dgNoSimdPresent;
 
-#ifdef _POSIX_VER
-	//m_cpu = dgNoSimdPresent;
-#endif
-
 	dgAssert (m_inUpdate == 0);
 //SerializeToFile ("xxx.bin");
 
