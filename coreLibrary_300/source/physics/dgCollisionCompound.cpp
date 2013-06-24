@@ -260,15 +260,112 @@ bool dgCollisionCompound::dgNodeBase::BoxTest (const dgOOBBTestData& data, const
 
 
 
+class dgCollisionCompound::dgSpliteInfo
+{
+	public:
+	dgSpliteInfo (dgNodeBase** const boxArray, dgInt32 boxCount)
+	{
+		dgVector minP ( dgFloat32 (1.0e15f)); 
+		dgVector maxP (-dgFloat32 (1.0e15f)); 
+
+		if (boxCount == 2) {
+			m_axis = 1;
+			for (dgInt32 i = 0; i < boxCount; i ++) {
+				dgNodeBase* const node = boxArray[i];
+				dgAssert (node->m_type == m_leaf);
+				minP = minP.GetMin (node->m_p0); 
+				maxP = maxP.GetMax (node->m_p1); 
+			}
+		} else {
+			dgVector median (dgFloat32 (0.0f));
+			dgVector varian (dgFloat32 (0.0f));
+
+			for (dgInt32 i = 0; i < boxCount; i ++) {
+				dgNodeBase* const node = boxArray[i];
+				dgAssert (node->m_type == m_leaf);
+				minP = minP.GetMin (node->m_p0); 
+				maxP = maxP.GetMax (node->m_p1); 
+				dgVector p ((node->m_p0 + node->m_p1).CompProduct4(dgVector::m_half));
+				median += p;
+				varian += p.CompProduct4(p);
+			}
+
+			varian = varian.Scale4 (dgFloat32 (boxCount)) - median.CompProduct4(median);
+
+			dgInt32 index = 0;
+			dgFloat32 maxVarian = dgFloat32 (-1.0e10f);
+			for (dgInt32 i = 0; i < 3; i ++) {
+				if (varian[i] > maxVarian) {
+					index = i;
+					maxVarian = varian[i];
+				}
+			}
+
+			dgVector center = median.Scale4 (dgFloat32 (1.0f) / dgFloat32 (boxCount));
+
+			dgFloat32 test = center[index];
+
+			dgInt32 i0 = 0;
+			dgInt32 i1 = boxCount - 1;
+			do {    
+				for (; i0 <= i1; i0 ++) {
+					dgNodeBase* const node = boxArray[i0];
+					dgFloat32 val = (node->m_p0[index] + node->m_p1[index]) * dgFloat32 (0.5f);
+					if (val > test) {
+						break;
+					}
+				}
+
+				for (; i1 >= i0; i1 --) {
+					dgNodeBase* const node = boxArray[i1];
+					dgFloat32 val = (node->m_p0[index] + node->m_p1[index]) * dgFloat32 (0.5f);
+					if (val < test) {
+						break;
+					}
+				}
+
+				if (i0 < i1)	{
+					dgSwap(boxArray[i0], boxArray[i1]);
+					i0++; 
+					i1--;
+				}
+
+			} while (i0 <= i1);
+
+			if (i0 > 0){
+				i0 --;
+			}
+			if ((i0 + 1) >= boxCount) {
+				i0 = boxCount - 2;
+			}
+
+			m_axis = i0 + 1;
+		}
+
+		dgAssert (maxP.m_x - minP.m_x >= dgFloat32 (0.0f));
+		dgAssert (maxP.m_y - minP.m_y >= dgFloat32 (0.0f));
+		dgAssert (maxP.m_z - minP.m_z >= dgFloat32 (0.0f));
+		m_p0 = minP;
+		m_p1 = maxP;
+	}
+
+	dgInt32 m_axis;
+	dgVector m_p0;
+	dgVector m_p1;
+};
+
+
+
+
 dgCollisionCompound::dgCollisionCompound(dgWorld* const world)
 	:dgCollision (world->GetAllocator(), 0, m_compoundCollision) 
 	,m_boxMinRadius (dgFloat32 (0.0f))
 	,m_boxMaxRadius (dgFloat32 (0.0f))
+	,m_treeEntropy (dgFloat32 (0.0f))
 	,m_world(world)
 	,m_root(NULL)
 	,m_criticalSectionLock()
 	,m_array (world->GetAllocator())
-//	,m_preCollisionFilter(NULL)
 {
 	m_rtti |= dgCollisionCompound_RTTI;
 }
@@ -277,11 +374,12 @@ dgCollisionCompound::dgCollisionCompound (const dgCollisionCompound& source)
 	:dgCollision (source) 
 	,m_boxMinRadius(source.m_boxMinRadius)
 	,m_boxMaxRadius(source.m_boxMaxRadius)
+	,m_treeEntropy(source.m_treeEntropy)
 	,m_world (source.m_world)	
 	,m_root(NULL)
 	,m_criticalSectionLock()
 	,m_array (source.GetAllocator())
-//	,m_preCollisionFilter(source.m_preCollisionFilter)
+
 {
 	m_rtti |= dgCollisionCompound_RTTI;
 
@@ -356,11 +454,11 @@ dgCollisionCompound::dgCollisionCompound (dgWorld* const world, dgDeserialize de
 	:dgCollision (world, deserialization, userData)
 	,m_boxMinRadius (dgFloat32 (0.0f))
 	,m_boxMaxRadius (dgFloat32 (0.0f))
+	,m_treeEntropy (dgFloat32 (0.0f))
 	,m_world(world)
 	,m_root(NULL)
 	,m_criticalSectionLock()
 	,m_array (world->GetAllocator())
-//	,m_preCollisionFilter(NULL)
 {
 	dgAssert (m_rtti | dgCollisionCompound_RTTI);
 
@@ -453,8 +551,7 @@ dgFloat32 dgCollisionCompound::RayCast (const dgVector& localP0, const dgVector&
 
 	dgFloat32 distance[DG_COMPOUND_STACK_DEPTH];
 	const dgNodeBase* stackPool[DG_COMPOUND_STACK_DEPTH];
-	
-//	dgFloat32 maxParam = dgFloat32 (1.2f);
+
 	dgFloat32 maxParam = maxT;
 	dgFastRayTest ray (localP0, localP1);
 
@@ -735,18 +832,59 @@ void dgCollisionCompound::BeginAddRemove ()
 }
 
 
+dgCollisionCompound::dgNodeBase* dgCollisionCompound::BuildTopDown (dgNodeBase** const leafArray, dgInt32 firstBox, dgInt32 lastBox, dgList<dgNodeBase*>::dgListNode** const nextNode)
+{
+	dgAssert (firstBox >= 0);
+	dgAssert (lastBox >= 0);
+
+	if (lastBox == firstBox) {
+		return leafArray[firstBox];
+	} else {
+		dgSpliteInfo info (&leafArray[firstBox], lastBox - firstBox + 1);
+
+		dgNodeBase* const parent = (*nextNode)->GetInfo();
+		parent->m_parent = NULL;
+		*nextNode = (*nextNode)->GetNext();
+
+		parent->SetBox (info.m_p0, info.m_p1);
+		parent->m_right = BuildTopDown (leafArray, firstBox + info.m_axis, lastBox, nextNode);
+		parent->m_right->m_parent = parent;
+
+		parent->m_left = BuildTopDown (leafArray, firstBox, firstBox + info.m_axis - 1, nextNode);
+		parent->m_left->m_parent = parent;
+		return parent;
+	}
+}
+
+dgFloat64 dgCollisionCompound::CalculateEntropy (dgList<dgNodeBase*>& list)
+{
+	dgFloat64 cost0 = dgFloat32 (1.0e20f);
+	dgFloat64 cost1 = cost0;
+	do {
+		cost1 = cost0;
+		for (dgList<dgNodeBase*>::dgListNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) {
+			dgNodeBase* const node = listNode->GetInfo();
+			ImproveNodeFitness (node);
+		}
+
+		cost0 = dgFloat32 (0.0f);
+		for (dgList<dgNodeBase*>::dgListNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) {
+			dgNodeBase* const node = listNode->GetInfo();
+			cost0 += node->m_area;
+		}
+	} while (cost0 < (cost1 * dgFloat32 (0.9999f)));
+	return cost0;
+}
+
 void dgCollisionCompound::EndAddRemove ()
 {
 	if (m_root) {
 		if (m_root->m_type == m_node) {
 
 			dgWorld* const world = m_world;
-			dgInt32 maxPasses = 2 * dgExp2 (m_array.GetCount() * 2) + 1;
-			dgFloat64 newCost = dgFloat32 (1.0e20f);
-			dgFloat64 prevCost = newCost;
 
+			dgThreadHiveScopeLock lock (world, &m_criticalSectionLock);
 			dgList<dgNodeBase*> list (GetAllocator());
-			//dgNodeBase* pool[DG_COMPOUND_STACK_DEPTH];
 			dgList<dgNodeBase*> stack (GetAllocator());
 			stack.Append(m_root);
 			while (stack.GetCount()) {
@@ -764,25 +902,27 @@ void dgCollisionCompound::EndAddRemove ()
 				} 
 			}
 
-			{
-				dgThreadHiveScopeLock lock (world, &m_criticalSectionLock);
-				do {
-					prevCost = newCost;
-					for (dgList<dgNodeBase*>::dgListNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) {
-						dgNodeBase* const node = listNode->GetInfo();
-						ImproveNodeFitness (node);
+			dgFloat64 cost = CalculateEntropy (list);
+			if ((cost > m_treeEntropy * dgFloat32 (2.0f)) || (cost < m_treeEntropy * dgFloat32 (0.5f))) {
+				dgInt32 count = list.GetCount() * 2 + 12;
+				dgInt32 leafNodesCount = 0;
+				dgStack<dgNodeBase*> leafArray(count);
+				for (dgList<dgNodeBase*>::dgListNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) {
+					dgNodeBase* const node = listNode->GetInfo();
+					if (node->m_left->m_type == m_leaf) {
+						leafArray[leafNodesCount] = node->m_left;
+						leafNodesCount ++;
 					}
-
-					newCost = dgFloat32 (0.0f);
-					for (dgList<dgNodeBase*>::dgListNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) {
-						dgNodeBase* const node = listNode->GetInfo();
-						newCost += node->m_area;
+					if (node->m_right->m_type == m_leaf) {
+						leafArray[leafNodesCount] = node->m_right;
+						leafNodesCount ++;
 					}
+				}
 
-					maxPasses --;
-				} while (maxPasses && (newCost < (prevCost * dgFloat32 (0.9999f))));
+				dgList<dgNodeBase*>::dgListNode* nodePtr = list.GetFirst();
+				m_root = BuildTopDown (&leafArray[0], 0, leafNodesCount - 1, &nodePtr);
+				m_treeEntropy = CalculateEntropy (list);
 			}
-
 
 			while (m_root->m_parent) {
 				m_root = m_root->m_parent;

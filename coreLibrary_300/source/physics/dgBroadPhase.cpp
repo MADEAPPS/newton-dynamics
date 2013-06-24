@@ -295,12 +295,6 @@ class dgBroadPhase::dgSpliteInfo
 			for (dgInt32 i = 0; i < boxCount; i ++) {
 				dgNode* const node = boxArray[i];
 				dgAssert (node->m_body);
-				//dgInt32 j0 = boxArray[i].m_minIndex;
-				//dgInt32 j1 = boxArray[i].m_maxIndex;
-				//const dgVector& p0 = vertexArray[j0];
-				//const dgVector& p1 = vertexArray[j1];
-				//minP = minP.GetMin (p0); 
-				//maxP = maxP.GetMax (p1); 
 				minP = minP.GetMin (node->m_minBox); 
 				maxP = maxP.GetMax (node->m_maxBox); 
 			}
@@ -339,9 +333,6 @@ class dgBroadPhase::dgSpliteInfo
 			do {    
 				for (; i0 <= i1; i0 ++) {
 					dgNode* const node = boxArray[i0];
-					//dgInt32 j0 = boxArray[i0].m_minIndex;
-					//dgInt32 j1 = boxArray[i0].m_maxIndex;
-					//dgFloat32 val = (vertexArray[j0][index] + vertexArray[j1][index]) * dgFloat32 (0.5f);
 					dgFloat32 val = (node->m_minBox[index] + node->m_maxBox[index]) * dgFloat32 (0.5f);
 					if (val > test) {
 						break;
@@ -350,9 +341,6 @@ class dgBroadPhase::dgSpliteInfo
 
 				for (; i1 >= i0; i1 --) {
 					dgNode* const node = boxArray[i1];
-					//dgInt32 j0 = boxArray[i1].m_minIndex;
-					//dgInt32 j1 = boxArray[i1].m_maxIndex;
-					//dgFloat32 val = (vertexArray[j0][index] + vertexArray[j1][index]) * dgFloat32 (0.5f);
 					dgFloat32 val = (node->m_minBox[index] + node->m_maxBox[index]) * dgFloat32 (0.5f);
 					if (val < test) {
 						break;
@@ -771,21 +759,14 @@ dgBroadPhase::dgNode* dgBroadPhase::BuildTopDown (dgNode** const leafArray, dgIn
 		parent->m_parent = NULL;
 		*nextNode = (*nextNode)->GetNext();
 
-		parent->m_minBox = info.m_p0;
-		parent->m_maxBox = info.m_p1;
-		dgVector side0 (parent->m_maxBox - parent->m_minBox);
-		parent->m_surfaceArea = side0.CompProduct4(side0.ShiftTripleRight()).m_x; 
-		
-//		m_front = new (allocator) dgConstructionTree (allocator, firstBox + info.m_axis, lastBox, boxArray, vertexArray, this);
+		parent->SetAABB (info.m_p0, info.m_p1);
 		parent->m_right = BuildTopDown (leafArray, firstBox + info.m_axis, lastBox, nextNode);
 		parent->m_right->m_parent = parent;
 
-//		m_back = new (allocator) dgConstructionTree (allocator, firstBox, firstBox + info.m_axis - 1, boxArray, vertexArray, this);
 		parent->m_left = BuildTopDown (leafArray, firstBox, firstBox + info.m_axis - 1, nextNode);
 		parent->m_left->m_parent = parent;
 		return parent;
 	}
-
 }
 
 void dgBroadPhase::ImproveFitness()

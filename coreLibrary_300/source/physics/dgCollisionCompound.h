@@ -119,7 +119,7 @@ class dgCollisionCompound: public dgCollision
 		dgNodeBase* m_myNode;
 	};
 
-
+	class dgSpliteInfo;
 	class dgHeapNodePair;
 
 	public:
@@ -190,6 +190,10 @@ class dgCollisionCompound: public dgCollision
 #endif
 	
 	protected:
+	dgNodeBase* BuildTopDown (dgNodeBase** const leafArray, dgInt32 firstBox, dgInt32 lastBox, dgList<dgNodeBase*>::dgListNode** const nextNode);
+
+	dgFloat64 CalculateEntropy (dgList<dgNodeBase*>& list);
+
 	void CalculateCollisionTreeArea(dgNodePairs& pairOut, const dgCollisionBVH* const collisionTree, const void* const treeNode) const;
 	void ImproveNodeFitness (dgNodeBase* const node) const;
 	dgFloat32 CalculateSurfaceArea (dgNodeBase* const node0, dgNodeBase* const node1, dgVector& minBox, dgVector& maxBox) const;
@@ -198,11 +202,12 @@ class dgCollisionCompound: public dgCollision
 
 	dgFloat32 m_boxMinRadius;
 	dgFloat32 m_boxMaxRadius;
+	dgFloat64 m_treeEntropy;
 	dgWorld* m_world;	
 	dgNodeBase* m_root;
 	dgThread::dgCriticalSection m_criticalSectionLock;
 	dgTree<dgNodeBase*, dgInt32> m_array;
-//	OnCompoundCollisionPrefilter* m_preCollisionFilter;
+
 
 	friend class dgBody;
 	friend class dgWorld;
