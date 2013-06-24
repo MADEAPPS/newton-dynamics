@@ -1495,7 +1495,6 @@ void dgBroadPhase::ConvexRayCast (dgCollisionInstance* const shape, const dgMatr
 		dgFloat32 distance[DG_COMPOUND_STACK_DEPTH];
 		const dgNode* stackPool[DG_BROADPHASE_MAX_STACK_DEPTH];		
 
-
 //		const dgBody* const sentinel = m_world->GetSentinelBody();
 		dgVector velocA((target - matrix.m_posit) & dgVector::m_triplexMask);
 		dgFloat32 maxParam = dgFloat32 (1.2f);

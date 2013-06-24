@@ -131,9 +131,9 @@ void dgConvexHull4dTetraherum::Init (const dgHullVector* const points, dgInt32 v
 	}
 
 #ifdef _DEBUG
-	dgBigVector p1p0 (points[v1].Sub4(points[v0]));
-	dgBigVector p2p0 (points[v2].Sub4(points[v0]));
-	dgBigVector p3p0 (points[v3].Sub4(points[v0]));
+	dgBigVector p1p0 (points[v1] - points[v0]);
+	dgBigVector p2p0 (points[v2] - points[v0]);
+	dgBigVector p3p0 (points[v3] - points[v0]);
 	dgBigVector normal (p1p0.CrossProduct4(p2p0, p3p0));
 	dgFloat64 volume = normal.DotProduct4(normal).m_x;
 	dgAssert (volume > dgFloat64 (0.0f));
