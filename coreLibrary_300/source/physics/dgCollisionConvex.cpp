@@ -2369,7 +2369,7 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& l
 	dgVector simplex[4];
 	dgInt32 indexArray[4];
 
-	dgVector normal;
+	dgVector normal(dgFloat32 (0.0f));
 	dgVector point (localP0);
 	dgVector point0 (localP0);
 	dgVector p0p1 (localP0 - localP1);
