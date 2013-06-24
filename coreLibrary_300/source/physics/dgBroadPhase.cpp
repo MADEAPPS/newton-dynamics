@@ -1412,7 +1412,6 @@ void dgBroadPhase::RayCast (const dgVector& l0, const dgVector& l1, OnRayCastAct
 			dgFloat32 distance[DG_COMPOUND_STACK_DEPTH];
 			const dgNode* stackPool[DG_BROADPHASE_MAX_STACK_DEPTH];
 
-
 			dgFastRayTest ray (l0, l1);
 
 			dgInt32 stack = 1;
@@ -1420,7 +1419,7 @@ void dgBroadPhase::RayCast (const dgVector& l0, const dgVector& l1, OnRayCastAct
 			distance[0] = ray.BoxIntersect(m_rootNode->m_minBox, m_rootNode->m_maxBox);
 			
 			dgFloat32 maxParam = dgFloat32 (1.2f);
-			const dgBody* const sentinel = m_world->GetSentinelBody();
+			//const dgBody* const sentinel = m_world->GetSentinelBody();
 
 			dgLineBox line;	
 			line.m_l0 = l0;
@@ -1441,45 +1440,39 @@ void dgBroadPhase::RayCast (const dgVector& l0, const dgVector& l1, OnRayCastAct
 					if (me->m_body) {
 						dgAssert (!me->m_left);
 						dgAssert (!me->m_right);
-						if (me->m_body != sentinel) {
-							dgFloat32 param = me->m_body->RayCast (line, filter, prefilter, userData, maxParam);
-							if (param < maxParam) {
-								maxParam = param;
-							}
+						dgFloat32 param = me->m_body->RayCast (line, filter, prefilter, userData, maxParam);
+						if (param < maxParam) {
+							maxParam = param;
 						}
 					} else {
-						{
-							const dgNode* const node = me->m_left;
-							dgAssert (node);
-							dgFloat32 dist = ray.BoxIntersect(node->m_minBox, node->m_maxBox);
-							if (dist < maxParam) {
-								dgInt32 j = stack;
-								for ( ; j && (dist > distance[j - 1]); j --) {
-									stackPool[j] = stackPool[j - 1];
-									distance[j] = distance[j - 1];
-								}
-								stackPool[j] = node;
-								distance[j] = dist;
-								stack++;
-								dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNode*)));
+						const dgNode* const left = me->m_left;
+						dgAssert (left);
+						dgFloat32 dist = ray.BoxIntersect(left->m_minBox, left->m_maxBox);
+						if (dist < maxParam) {
+							dgInt32 j = stack;
+							for ( ; j && (dist > distance[j - 1]); j --) {
+								stackPool[j] = stackPool[j - 1];
+								distance[j] = distance[j - 1];
 							}
+							stackPool[j] = left;
+							distance[j] = dist;
+							stack++;
+							dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNode*)));
 						}
 
-						{
-							const dgNode* const node = me->m_right;
-							dgAssert (node);
-							dgFloat32 dist = ray.BoxIntersect(node->m_minBox, node->m_maxBox);
-							if (dist < maxParam) {
-								dgInt32 j = stack;
-								for ( ; j && (dist > distance[j - 1]); j --) {
-									stackPool[j] = stackPool[j - 1];
-									distance[j] = distance[j - 1];
-								}
-								stackPool[j] = node;
-								distance[j] = dist;
-								stack++;
-								dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNode*)));
+						const dgNode* const right = me->m_right;
+						dgAssert (right);
+						dist = ray.BoxIntersect(right->m_minBox, right->m_maxBox);
+						if (dist < maxParam) {
+							dgInt32 j = stack;
+							for ( ; j && (dist > distance[j - 1]); j --) {
+								stackPool[j] = stackPool[j - 1];
+								distance[j] = distance[j - 1];
 							}
+							stackPool[j] = right;
+							distance[j] = dist;
+							stack++;
+							dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNode*)));
 						}
 					}
 				}
@@ -1499,48 +1492,77 @@ void dgBroadPhase::ConvexRayCast (dgCollisionInstance* const shape, const dgMatr
 		shape->CalcAABB(shape->m_localMatrix * matrix, boxP0, boxP1);
 
 		dgInt32 stack = 1;
-		dgNode* stackPool[DG_BROADPHASE_MAX_STACK_DEPTH];		
+		dgFloat32 distance[DG_COMPOUND_STACK_DEPTH];
+		const dgNode* stackPool[DG_BROADPHASE_MAX_STACK_DEPTH];		
 
-		stackPool[0] = m_rootNode;
 
-		const dgBody* const sentinel = m_world->GetSentinelBody();
+//		const dgBody* const sentinel = m_world->GetSentinelBody();
 		dgVector velocA((target - matrix.m_posit) & dgVector::m_triplexMask);
 		dgFloat32 maxParam = dgFloat32 (1.2f);
 		dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), velocA);
-		dgFloat32 quantizeStep = dgMax (dgFloat32 (1.0f) / velocA.DotProduct4(velocA).m_x, dgFloat32 (0.01f));
-dgAssert (0);
+		dgFloat32 quantizeStep = dgMax (dgFloat32 (1.0f) / velocA.DotProduct4(velocA).m_x, dgFloat32 (0.001f));
+
+
+		dgVector minBox (m_rootNode->m_minBox - boxP1);
+		dgVector maxBox (m_rootNode->m_maxBox - boxP0);
+		stackPool[0] = m_rootNode;
+		distance[0] = ray.BoxIntersect(minBox, maxBox);
+
 		while (stack) {
 			stack --;
-			const dgNode* const node = stackPool[stack];
-			dgAssert (node);
-			dgVector minBox (node->m_minBox - boxP1);
-			dgVector maxBox (node->m_maxBox - boxP0);
-			if (ray.BoxTest (minBox, maxBox)) {
-				if (node->m_body) {
-					dgAssert (!node->m_left);
-					dgAssert (!node->m_right);
-					if (node->m_body != sentinel) {
-						dgBody* const body = node->m_body;
-						if (!PREFILTER_RAYCAST (prefilter, body, shape, userData)) {
-							dgFloat32 param = body->ConvexRayCast (ray, shape,boxP0, boxP1, matrix, velocA, filter, prefilter, userData, maxParam, threadId);
-							if (param < maxParam) {
-								param = dgMin (param + quantizeStep, dgFloat32 (1.0f));
-								maxParam = param;
-dgAssert (0);
-								//ray.Reset (param);
-							}
+			dgFloat32 dist = distance[stack];
+			if (dist > maxParam) {
+				break;
+			} else {
+				const dgNode* const me = stackPool[stack];
+				dgAssert (me);
+				if (me->m_body) {
+					dgAssert (!me->m_left);
+					dgAssert (!me->m_right);
+//					if (me->m_body != sentinel) {
+					dgBody* const body = me->m_body;
+					if (!PREFILTER_RAYCAST (prefilter, body, shape, userData)) {
+						dgFloat32 param = body->ConvexRayCast (ray, shape,boxP0, boxP1, matrix, velocA, filter, prefilter, userData, maxParam, threadId);
+						if (param < maxParam) {
+							param = dgMin (param + quantizeStep, dgFloat32 (1.0f));
+							maxParam = param;
 						}
 					}
+//					}
 				} else {
-					dgAssert (node->m_left);
-					dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNode*)));
-					stackPool[stack] = node->m_left;
-					stack++;
+					const dgNode* const left = me->m_left;
+					dgAssert (left);
+					dgVector minBox (left->m_minBox - boxP1);
+					dgVector maxBox (left->m_maxBox - boxP0);
+					dgFloat32 dist = ray.BoxIntersect(minBox, maxBox);
+					if (dist < maxParam) {
+						dgInt32 j = stack;
+						for ( ; j && (dist > distance[j - 1]); j --) {
+							stackPool[j] = stackPool[j - 1];
+							distance[j] = distance[j - 1];
+						}
+						stackPool[j] = left;
+						distance[j] = dist;
+						stack++;
+						dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNode*)));
+					}
 
-					dgAssert (node->m_right);
-					dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNode*)));
-					stackPool[stack] = node->m_right;
-					stack++;
+					const dgNode* const right = me->m_right;
+					dgAssert (right);
+					minBox = right->m_minBox - boxP1;
+					maxBox = right->m_maxBox - boxP0;
+					dist = ray.BoxIntersect(minBox, maxBox);
+					if (dist < maxParam) {
+						dgInt32 j = stack;
+						for ( ; j && (dist > distance[j - 1]); j --) {
+							stackPool[j] = stackPool[j - 1];
+							distance[j] = distance[j - 1];
+						}
+						stackPool[j] = right;
+						distance[j] = dist;
+						stack++;
+						dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNode*)));
+					}
 				}
 			}
 		}
