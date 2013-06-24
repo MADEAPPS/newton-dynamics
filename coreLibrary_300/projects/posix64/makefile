@@ -178,9 +178,7 @@ COMPILER = gcc
 #CPU_FLAGS = -O0 -fPIC -g -msse -msse2 -mfpmath=sse 
 #CPU_FLAGS = -O0 -fPIC -g -msse -msse4.1 -mfpmath=sse 
 #CPU_FLAGS = -O2 -fpic -g -msse -msse4.1 -mfpmath=sse -ffloat-store -ffast-math -freciprocal-math -funsafe-math-optimizations -fsingle-precision-constant
-CPU_FLAGS = -O2 -fpic -g -msse -msse2 -mfpmath=sse -ffloat-store -ffast-math -freciprocal-math -funsafe-math-optimizations -fsingle-precision-constant
-# optimized
-#CPU_PLAGS = -O3 -march=native -fpic -msse -msse3 -mfpmath=sse -ffloat-store -ffast-math -freciprocal-math -funsafe-math-optimizations -fsingle-precision-constant
+CPU_FLAGS = -O2 -fpic -g -msse -msse3 -mfpmath=sse -ffloat-store -ffast-math -freciprocal-math -funsafe-math-optimizations -fsingle-precision-constant
 
 #FLAGS = -c -Wall -Wno-strict-aliasing -DDG_SCALAR_VECTOR_CLASS -D_POSIX_VER_64 $(CPU_FLAGS) -I$(DG_INCLUDED_PATH) -I$(DG_INCLUDED_PHYSICS_PATH) -I$(DG_INCLUDED_MESH_PATH) -I$(DG_INCLUDED_OPENCL_PATH) -I$(DG_AI_PATH) 
 FLAGS = -c -Wall -Wno-strict-aliasing -D_POSIX_VER_64 $(CPU_FLAGS) -I$(DG_INCLUDED_PATH) -I$(DG_INCLUDED_PHYSICS_PATH) -I$(DG_INCLUDED_MESH_PATH) -I$(DG_INCLUDED_OPENCL_PATH) -I$(DG_AI_PATH) 
