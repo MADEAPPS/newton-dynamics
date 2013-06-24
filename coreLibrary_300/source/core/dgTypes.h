@@ -130,9 +130,10 @@
 	extern "C" 
 	{ 
 		// for SSE3 and up
-		// #include <pmmintrin.h> 
+		#include <pmmintrin.h> 
 		// #include <immintrin.h>   
 		// #include <smmintrin.h> 
+
 		#include <emmintrin.h> 
 		#include <mmintrin.h> 
 	} 
