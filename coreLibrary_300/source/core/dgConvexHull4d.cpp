@@ -58,7 +58,7 @@ public:
 
 
 dgConvexHull4dTetraherum::dgTetrahedrumPlane::dgTetrahedrumPlane (const dgBigVector& p0, const dgBigVector& p1, const dgBigVector& p2, const dgBigVector& p3)
-	:dgBigVector (p1.Sub4(p0).CrossProduct4 (p2.Sub4(p0), p3.Sub4(p0)))
+	:dgBigVector ((p1 - p0).CrossProduct4 (p2 - p0, p3 - p0))
 {
 	dgBigVector& me = *this;
 //	dgAssert (me.DotProduct4(me) > dgFloat64 (1.0e-64f));
@@ -558,11 +558,15 @@ dgAABBPointTree4d* dgConvexHull4d::BuildTree (dgAABBPointTree4d* const parent, d
 			maxP.m_z = dgMax (p.m_z, maxP.m_z); 
 			maxP.m_w = dgMax (p.m_w, maxP.m_w); 
 
-			median = median.Add4 (p);
-			varian = varian.Add4(p.CompProduct4 (p));
+			//median = median.Add4 (p);
+			//varian = varian.Add4(p.CompProduct4 (p));
+			median = median + p;
+			varian = varian + p.CompProduct4(p);
 		}
 
-		varian = varian.Scale4 (dgFloat32 (count)).Sub4 (median.CompProduct4(median));
+		//varian = varian.Scale4 (dgFloat32 (count)).Sub4 (median.CompProduct4(median));
+		varian = varian.Scale4 (dgFloat32 (count)) - median.CompProduct4(median);
+
 		dgInt32 index = 0;
 		dgFloat64 maxVarian = dgFloat64 (-1.0e10f);
 		for (dgInt32 i = 0; i < 4; i ++) {
@@ -657,7 +661,8 @@ dgInt32 dgConvexHull4d::InitVertexArray(dgHullVector* const points, const dgBigV
 	dgAABBPointTree4d* tree = BuildTree (NULL, points, count, 0, (dgInt8**) &memoryPool, maxMemSize);
 
 
-	dgBigVector boxSize (tree->m_box[1].Sub4(tree->m_box[0]));	
+	//dgBigVector boxSize (tree->m_box[1].Sub4(tree->m_box[0]));	
+	dgBigVector boxSize (tree->m_box[1] - tree->m_box[0]);	
 	m_diag = dgFloat32 (sqrt (boxSize.DotProduct4(boxSize).m_x));
 
 	m_points[4].m_x = dgFloat64 (0.0f);
@@ -676,7 +681,8 @@ dgInt32 dgConvexHull4d::InitVertexArray(dgHullVector* const points, const dgBigV
 	for (dgInt32 i = 1; i < normalCount; i ++) {
 		dgInt32 index = SupportVertex (&tree, points, normalArray[i]);
 		dgAssert (index >= 0);
-		e1 = points[index].Sub4(convexPoints[0]);
+		//e1 = points[index].Sub4(convexPoints[0]);
+		e1 = points[index] - convexPoints[0];
 		e1.m_w = dgFloat64 (0.0f);
 		dgFloat64 error2 = e1.DotProduct4(e1).m_x;
 		if (error2 > (dgFloat32 (1.0e-4f) * m_diag * m_diag)) {
@@ -701,7 +707,8 @@ dgInt32 dgConvexHull4d::InitVertexArray(dgHullVector* const points, const dgBigV
 		dgInt32 index = SupportVertex (&tree, points, normalArray[i]);
 		dgAssert (index >= 0);
 		dgAssert (index < count);
-		e2 = points[index].Sub4(convexPoints[0]);
+		//e2 = points[index].Sub4(convexPoints[0]);
+		e2 = points[index] - convexPoints[0];
 		e2.m_w = dgFloat64 (0.0f);
 		dgFloat64 den = e2.DotProduct4(e2).m_x;
 		if (fabs (den) > (dgFloat64 (1.0e-6f) * m_diag)) {
@@ -740,7 +747,8 @@ dgInt32 dgConvexHull4d::InitVertexArray(dgHullVector* const points, const dgBigV
 		dgAssert (index >= 0);
 		dgAssert (index < count);
 
-		e3 = points[index].Sub4(convexPoints[0]);
+		//e3 = points[index].Sub4(convexPoints[0]);
+		e3 = points[index] - convexPoints[0];
 		e3.m_w = dgFloat64 (0.0f);
 		dgFloat64 volume = (e1 * e2) % e3;		
 		if (fabs (volume) > (dgFloat64 (1.0e-4f) * m_diag * m_diag * m_diag)) {
