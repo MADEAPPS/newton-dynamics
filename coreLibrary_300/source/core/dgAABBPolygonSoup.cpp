@@ -774,8 +774,8 @@ dgIntersectStatus dgAABBPolygonSoup::CalculateAllFaceEdgeNormals (void* const co
 		i0 = i1;
 	}
 
-	p0 = (p0 + dgVector (dgFloat32 (0.25f)) & dgVector::m_triplexMask);
-	p1 = (p1 + dgVector (dgFloat32 (0.25f)) & dgVector::m_triplexMask);
+	p0 = (p0 + dgVector (dgFloat32 (0.25f))) & dgVector::m_triplexMask;
+	p1 = (p1 + dgVector (dgFloat32 (0.25f))) & dgVector::m_triplexMask;
 
 	//me->ForAllSectors (p0, p1, dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)), CalculateManifoldFaceEdgeNormals, &adjacentFaces);
 	me->ForAllSectors (p0, p1, dgVector (dgFloat32 (0.0f)), dgFloat32 (1.0f), CalculateDisjointedFaceEdgeNormals, &adjacentFaces);
