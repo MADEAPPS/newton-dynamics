@@ -654,7 +654,7 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 
 	dgInt32 CalculateClosestSimplex ()
 	{
-		dgVector v;
+		dgVector v(dgFloat32 (0.0f));
 		dgInt32 index = 1;
 		if (m_vertexIndex <= 0) {
 			SupportVertex (m_contactJoint->m_separtingVector, 0);
@@ -752,7 +752,7 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 
 	dgInt32 CalculateClosestSimplexLarge ()
 	{
-		dgVector v;
+		dgVector v(dgFloat32 (0.0f));
 		dgInt32 index = 1;
 		if (m_vertexIndex <= 0) {
 			SupportVertex (m_contactJoint->m_separtingVector, 0);
@@ -2543,9 +2543,10 @@ dgFloat32 dgCollisionConvex::ConvexConicConvexRayCast (const dgCollisionInstance
 	proxy.m_skinThickness = dgFloat32 (0.0f);
 	proxy.m_matrix = shapeInstance.m_globalMatrix * matrix.Inverse();
 
-	dgContactPoint lastContact;
+	
 	contactOut.m_normal = dgVector (dgFloat32 (0.0f));
 	contactOut.m_point = dgVector (dgFloat32 (0.0f));
+	dgContactPoint lastContact(contactOut);
 
 	bool isScaled = !(convexConicShape->m_scaleIsUnit & convexCastingShape->m_scaleIsUnit) ? true : false;
 	const dgVector& scale = convexConicShape->m_scale;
