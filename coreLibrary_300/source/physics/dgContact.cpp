@@ -70,8 +70,8 @@ dgContact::dgContact(dgWorld* const world, const dgContactMaterial* const materi
 	,m_material(material)
 	,m_contactNode(NULL)
 	,m_broadphaseLru(0)
-	,m_isNewContact(true)
 	,m_closestDistance (dgFloat32 (0.0f))
+	,m_isNewContact(true)
 {
 	dgAssert ((((dgUnsigned64) this) & 15) == 0);
 	m_maxDOF = 0;
