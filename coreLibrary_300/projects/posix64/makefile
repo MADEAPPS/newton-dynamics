@@ -43,7 +43,6 @@ DG_SRCS = \
 	$(DG_PATH)dgRandom.cpp \
 	$(DG_PATH)dgRefCounter.cpp \
 	$(DG_PATH)dgRef.cpp \
-	$(DG_PATH)dgSimd.cpp \
 	$(DG_PATH)dgSmallDeterminant.cpp \
 	$(DG_PATH)dgSPDMatrix.cpp \
 	$(DG_PATH)dgSphere.cpp \
