@@ -136,9 +136,9 @@ class dgBroadPhase
 
 	dgWorld* m_world;
 	dgNode* m_rootNode;
+	dgFloat64 m_treeEntropy;
 	dgUnsigned32 m_lru;
 	dgFitnessList m_fitness;
-	dgFloat64 m_treeEntropy;
 	dgType m_broadPhaseType;
 	dgThread::dgCriticalSection m_contacJointLock;
 	dgThread::dgCriticalSection m_criticalSectionLock;
