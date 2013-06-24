@@ -65,12 +65,12 @@ dgContactMaterial::dgContactMaterial()
 
 dgContact::dgContact(dgWorld* const world, const dgContactMaterial* const material)
 	:dgConstraint(), dgList<dgContactMaterial>(world->GetAllocator())
+	,m_closestDistance (dgFloat32 (0.0f))
 	,m_timeOfImpact(dgFloat32 (0.0f))
 	,m_world(world)
 	,m_material(material)
 	,m_contactNode(NULL)
 	,m_broadphaseLru(0)
-	,m_closestDistance (dgFloat32 (0.0f))
 	,m_isNewContact(true)
 {
 	dgAssert ((((dgUnsigned64) this) & 15) == 0);
