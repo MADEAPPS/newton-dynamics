@@ -346,6 +346,9 @@ static void DebugShowBodyCollision (const NewtonBody* const body, DEBUG_DRAW_MOD
 	}
 	dMatrix matrix;
 	NewtonBodyGetMatrix(body, &matrix[0][0]);
+
+
+
 	NewtonCollisionForEachPolygonDo (NewtonBodyGetCollision(body), &matrix[0][0], DebugShowGeometryCollision, (void*) mode);
 }
 
@@ -360,7 +363,33 @@ void DebugRenderWorldCollision (const NewtonWorld* const world, DEBUG_DRAW_MODE 
 		glBegin(GL_TRIANGLES);
 	}
 	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
-		DebugShowBodyCollision (body, mode);
+		NewtonCollision* const collision = NewtonBodyGetCollision(body);
+		int collisionType = NewtonCollisionGetType (collision);
+		switch (collisionType) 
+		{
+			//SERIALIZE_ID_SPHERE:
+			//SERIALIZE_ID_CAPSULE:
+			//SERIALIZE_ID_CHAMFERCYLINDER:
+			//SERIALIZE_ID_TAPEREDCAPSULE:
+			//SERIALIZE_ID_CYLINDER:
+			//SERIALIZE_ID_TAPEREDCYLINDER:
+			//SERIALIZE_ID_BOX:
+			//SERIALIZE_ID_CONE:
+			//SERIALIZE_ID_CONVEXHULL:
+			//SERIALIZE_ID_NULL:
+			//SERIALIZE_ID_COMPOUND:
+			//SERIALIZE_ID_CLOTH_PATCH:
+			//SERIALIZE_ID_DEFORMABLE_SOLID:
+
+			case SERIALIZE_ID_TREE:
+			case SERIALIZE_ID_HEIGHTFIELD:
+			case SERIALIZE_ID_USERMESH:
+			case SERIALIZE_ID_SCENE:
+			case SERIALIZE_ID_COMPOUND_BREAKABLE:
+				break;
+			default: 
+				DebugShowBodyCollision (body, mode);
+		}
 	}
 	glEnd();
 

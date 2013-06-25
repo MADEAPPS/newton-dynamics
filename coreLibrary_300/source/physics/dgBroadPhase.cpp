@@ -1419,7 +1419,6 @@ void dgBroadPhase::RayCast (const dgVector& l0, const dgVector& l1, OnRayCastAct
 			distance[0] = ray.BoxIntersect(m_rootNode->m_minBox, m_rootNode->m_maxBox);
 			
 			dgFloat32 maxParam = dgFloat32 (1.2f);
-			//const dgBody* const sentinel = m_world->GetSentinelBody();
 
 			dgLineBox line;	
 			line.m_l0 = l0;
@@ -1495,7 +1494,6 @@ void dgBroadPhase::ConvexRayCast (dgCollisionInstance* const shape, const dgMatr
 		dgFloat32 distance[DG_COMPOUND_STACK_DEPTH];
 		const dgNode* stackPool[DG_BROADPHASE_MAX_STACK_DEPTH];		
 
-//		const dgBody* const sentinel = m_world->GetSentinelBody();
 		dgVector velocA((target - matrix.m_posit) & dgVector::m_triplexMask);
 		dgFloat32 maxParam = dgFloat32 (1.2f);
 		dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), velocA);
@@ -1518,7 +1516,6 @@ void dgBroadPhase::ConvexRayCast (dgCollisionInstance* const shape, const dgMatr
 				if (me->m_body) {
 					dgAssert (!me->m_left);
 					dgAssert (!me->m_right);
-//					if (me->m_body != sentinel) {
 					dgBody* const body = me->m_body;
 					if (!PREFILTER_RAYCAST (prefilter, body, shape, userData)) {
 						dgFloat32 param = body->ConvexRayCast (ray, shape,boxP0, boxP1, matrix, velocA, filter, prefilter, userData, maxParam, threadId);
@@ -1527,7 +1524,6 @@ void dgBroadPhase::ConvexRayCast (dgCollisionInstance* const shape, const dgMatr
 							maxParam = param;
 						}
 					}
-//					}
 				} else {
 					const dgNode* const left = me->m_left;
 					dgAssert (left);
@@ -1583,13 +1579,10 @@ dgInt32 dgBroadPhase::ConvexCast (dgCollisionInstance* const shape, const dgMatr
 		dgFloat32 penetration[DG_CONVEX_CAST_POOLSIZE];
 		dgInt64 attributeA[DG_CONVEX_CAST_POOLSIZE];
 		dgInt64 attributeB[DG_CONVEX_CAST_POOLSIZE];
-		dgNode* stackPool[DG_BROADPHASE_MAX_STACK_DEPTH];		
 
-dgAssert (0);
-		stackPool[0] = m_rootNode;
-
-		const dgBody* const sentinel = m_world->GetSentinelBody();
-
+		dgFloat32 distance[DG_COMPOUND_STACK_DEPTH];
+		const dgNode* stackPool[DG_BROADPHASE_MAX_STACK_DEPTH];		
+		
 		dgVector velocA((target - matrix.m_posit) & dgVector::m_triplexMask);
 		dgVector velocB(dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
 
@@ -1597,62 +1590,101 @@ dgAssert (0);
 		dgFloat32 maxParam = dgFloat32 (1.2f);
 		dgFastRayTest ray (dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)), velocA);
 
+		dgVector minBox (m_rootNode->m_minBox - boxP1);
+		dgVector maxBox (m_rootNode->m_maxBox - boxP0);
+		stackPool[0] = m_rootNode;
+		distance[0] = ray.BoxIntersect(minBox, maxBox);
+
+static int xxx;
+xxx ++;
+if (xxx >= 2000)
+xxx *=1;
+
 		while (stack) {
 			stack --;
-			const dgNode* const node = stackPool[stack];
 
-			dgVector minBox (node->m_minBox - boxP1);
-			dgVector maxBox (node->m_maxBox - boxP0);
+			dgFloat32 dist = distance[stack];
 
-			if (ray.BoxTest (minBox, maxBox)) {
-				if (node->m_body) {
-					dgAssert (!node->m_left);
-					dgAssert (!node->m_right);
-					if (node->m_body != sentinel) {
-						dgBody* const body = node->m_body;
-						if (!PREFILTER_RAYCAST (prefilter, body, shape, userData)) {
-							dgInt32 count = m_world->CollideContinue(shape, matrix, velocA, velocB, body->m_collision, body->m_matrix, velocB, velocB, time, points, normals, penetration, attributeA, attributeB, DG_CONVEX_CAST_POOLSIZE, threadIndex);
+			if (dist > maxParam) {
+				break;
+			} else {
+				const dgNode* const me = stackPool[stack];
+				if (me->m_body) {
+					dgAssert (!me->m_left);
+					dgAssert (!me->m_right);
+					dgBody* const body = me->m_body;
+					if (!PREFILTER_RAYCAST (prefilter, body, shape, userData)) {
+						dgInt32 count = m_world->CollideContinue(shape, matrix, velocA, velocB, body->m_collision, body->m_matrix, velocB, velocB, time, points, normals, penetration, attributeA, attributeB, DG_CONVEX_CAST_POOLSIZE, threadIndex);
 
-							if (count) {
-								if (time < maxParam) {
-dgAssert (0);
-//									ray.Reset (time);
+						if (count) {
+							if (time < maxParam) {
+								if ((time - maxParam) < dgFloat32(-1.0e-3f)) {
+									totalCount = 0;
+								}
+								maxParam = time;
+								if (count >= (maxContacts - totalCount)) {
+									count = maxContacts - totalCount;
+								}
 
-									if ((time - maxParam) < dgFloat32(-1.0e-3f)) {
-										totalCount = 0;
-									}
-									maxParam = time;
-									if (count >= (maxContacts - totalCount)) {
-										count = maxContacts - totalCount;
-									}
-
-									for (dgInt32 i = 0; i < count; i++) {
-										info[totalCount].m_hitBody = body;
-										info[totalCount].m_point[0] = points[i].m_x;
-										info[totalCount].m_point[1] = points[i].m_y;
-										info[totalCount].m_point[2] = points[i].m_z;
-										info[totalCount].m_normal[0] = normals[i].m_x;
-										info[totalCount].m_normal[1] = normals[i].m_y;
-										info[totalCount].m_normal[2] = normals[i].m_z;
-										info[totalCount].m_penetration = penetration[i];
-										info[totalCount].m_contaID = attributeB[i];
-										totalCount++;
-									}
+								for (dgInt32 i = 0; i < count; i++) {
+									info[totalCount].m_hitBody = body;
+									info[totalCount].m_point[0] = points[i].m_x;
+									info[totalCount].m_point[1] = points[i].m_y;
+									info[totalCount].m_point[2] = points[i].m_z;
+									info[totalCount].m_normal[0] = normals[i].m_x;
+									info[totalCount].m_normal[1] = normals[i].m_y;
+									info[totalCount].m_normal[2] = normals[i].m_z;
+									info[totalCount].m_penetration = penetration[i];
+									info[totalCount].m_contaID = attributeB[i];
+									totalCount++;
 								}
 							}
 						}
 					}
 
 				} else {
-					dgAssert (node->m_left);
-					dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNode*)));
-					stackPool[stack] = node->m_left;
-					stack++;
+//					dgAssert (node->m_left);
+//					dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNode*)));
+//					stackPool[stack] = node->m_left;
+//					stack++;
+//					dgAssert (node->m_right);
+//					dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNode*)));
+//					stackPool[stack] = node->m_right;
+//					stack++;
 
-					dgAssert (node->m_right);
-					dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNode*)));
-					stackPool[stack] = node->m_right;
-					stack++;
+					const dgNode* const left = me->m_left;
+					dgAssert (left);
+					dgVector minBox (left->m_minBox - boxP1);
+					dgVector maxBox (left->m_maxBox - boxP0);
+					dgFloat32 dist = ray.BoxIntersect(minBox, maxBox);
+					if (dist < maxParam) {
+						dgInt32 j = stack;
+						for ( ; j && (dist > distance[j - 1]); j --) {
+							stackPool[j] = stackPool[j - 1];
+							distance[j] = distance[j - 1];
+						}
+						stackPool[j] = left;
+						distance[j] = dist;
+						stack++;
+						dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNode*)));
+					}
+
+					const dgNode* const right = me->m_right;
+					dgAssert (right);
+					minBox = right->m_minBox - boxP1;
+					maxBox = right->m_maxBox - boxP0;
+					dist = ray.BoxIntersect(minBox, maxBox);
+					if (dist < maxParam) {
+						dgInt32 j = stack;
+						for ( ; j && (dist > distance[j - 1]); j --) {
+							stackPool[j] = stackPool[j - 1];
+							distance[j] = distance[j - 1];
+						}
+						stackPool[j] = right;
+						distance[j] = dist;
+						stack++;
+						dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNode*)));
+					}
 				}
 			}
 		}

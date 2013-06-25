@@ -54,7 +54,7 @@ class BasicPlayerEntity: public DemoEntity
 		m_controller = manager->CreatePlayer(PLAYER_MASS, radius, radius * 0.5f, height, height * 0.33f, playerAxis);
 
 		// set a restraining distance that the player can not get closet than
-		m_controller->SetRestrainingDistance(0.5f);
+		m_controller->SetRestrainingDistance(0.1f);
 
 
 		// players by default have the origin at the center of the lower bottom of the collision shape.
@@ -209,7 +209,7 @@ class BasicPlayerControllerManager: public CustomPlayerControllerManager
 		}
 
 #if 0
-	#if 0
+	#if 1
 		static FILE* file = fopen ("log.bin", "wb");
 		if (file) {
 			fwrite (&player->m_headinAngle, sizeof (dFloat), 1, file);
