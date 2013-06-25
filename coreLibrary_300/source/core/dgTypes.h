@@ -794,6 +794,12 @@ DG_INLINE void dgThreadYield()
 	sched_yield();
 }
 
+DG_INLINE void PrefetchMem(const void* const mem)
+{
+	#if !(defined (__ppc__) || defined (ANDROID) || defined (IOS))
+		_mm_prefetch ((const char*)mem, _MM_HINT_T0);
+	#endif
+}
 
 #endif
 
