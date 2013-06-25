@@ -91,6 +91,7 @@ void dgCollisionBVH::EndBuild(dgInt32 optimize)
 	bool state = optimize ? true : false;
 
 	m_builder->End(state);
+m_builder->m_faceCount = 2;
 	Create (*m_builder, state);
 	
 	GetAABB (p0, p1);

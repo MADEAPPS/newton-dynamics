@@ -157,6 +157,8 @@ class dgAABBPolygonSoup::dgConstructionTree
 			dgInt32 j1 = boxArray[firstBox].m_maxIndex;
 			m_p0 = vertexArray[j0];
 			m_p1 = vertexArray[j1];
+			dgVector side (m_p1 - m_p0);
+			m_surfaceArea = side.DotProduct4(side.ShiftTripleRight()).m_x; 
 
 			m_boxIndex = firstBox;
 			m_back = NULL;
@@ -167,13 +169,12 @@ class dgAABBPolygonSoup::dgConstructionTree
 			m_boxIndex = -1;
 			m_p0 = info.m_p0;
 			m_p1 = info.m_p1;
+			dgVector side (m_p1 - m_p0);
+			m_surfaceArea = side.DotProduct4(side.ShiftTripleRight()).m_x; 
 
 			m_front = new (allocator) dgConstructionTree (allocator, firstBox + info.m_axis, lastBox, boxArray, vertexArray, this);
 			m_back = new (allocator) dgConstructionTree (allocator, firstBox, firstBox + info.m_axis - 1, boxArray, vertexArray, this);
 		}
-
-		dgVector side0 (m_p1 - m_p0);
-		m_surfaceArea = side0.CompProduct4(side0.ShiftTripleRight()).m_x; 
 	}
 
 	~dgConstructionTree ()
