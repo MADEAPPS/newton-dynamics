@@ -297,7 +297,8 @@ dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, cons
 			do {
 				dgVector dp (m_vertex[ptr->m_twin->m_vertex] - m_vertex[ptr->m_vertex]);
 
-				dgFloat32 t = plane % dp;
+				//dgFloat32 t = plane % dp;
+				dgFloat32 t = plane.DotProduct4(dp).m_x;
 				if (t >= dgFloat32 (-1.e-24f)) {
 					t = dgFloat32 (0.0f);
 				} else {
@@ -312,7 +313,7 @@ dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, cons
 
 				dgAssert (t <= dgFloat32 (0.01f));
 				dgAssert (t >= dgFloat32 (-1.05f));
-				contactsOut[count] = m_vertex[ptr->m_vertex] - dp.Scale3 (t);
+				contactsOut[count] = m_vertex[ptr->m_vertex] - dp.Scale4 (t);
 				count ++;
 
 				dgConvexSimplexEdge* ptr1 = ptr->m_next;
