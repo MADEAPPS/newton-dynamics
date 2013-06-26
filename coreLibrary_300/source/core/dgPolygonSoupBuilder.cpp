@@ -503,6 +503,7 @@ void dgPolygonSoupDatabaseBuilder::End(bool optimize)
 		m_normalPoints[i].m_x = normal.m_x;
 		m_normalPoints[i].m_y = normal.m_y;
 		m_normalPoints[i].m_z = normal.m_z;
+		m_normalPoints[i].m_w = dgFloat32 (0.0f);
 		indexCount += faceIndexCount;
 	}
 	// compress normals array

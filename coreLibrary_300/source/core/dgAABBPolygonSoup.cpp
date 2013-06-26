@@ -653,13 +653,14 @@ void dgAABBPolygonSoup::Create (const dgPolygonSoupDatabaseBuilder& builder, boo
 	m_strideInBytes = sizeof (dgTriplex);
 	m_nodesCount = ((builder.m_faceCount - 1) < 1) ? 1 : builder.m_faceCount - 1;
 	m_aabb = (dgNode*) dgMallocStack (sizeof (dgNode) * m_nodesCount);
-	m_indexCount = (builder.m_indexCount - builder.m_faceCount) * 2 + 3;
+	m_indexCount = builder.m_indexCount * 2 + builder.m_faceCount;
 	if (builder.m_faceCount == 1) {
 		m_indexCount *= 2;
 	}
 	m_indices = (dgInt32*) dgMallocStack (sizeof (dgInt32) * m_indexCount);
-	dgStack<dgVector> tmpVertexArray(builder.m_vertexCount + builder.m_normalCount + builder.m_faceCount * 2 + 4);
+	dgStack<dgVector> tmpVertexArrayCont(builder.m_vertexCount + builder.m_normalCount + builder.m_faceCount * 2 + 4);
 
+	dgVector* const tmpVertexArray = &tmpVertexArrayCont[0];
 	for (dgInt32 i = 0; i < builder.m_vertexCount; i ++) {
 		tmpVertexArray[i] = builder.m_vertexPoints[i];
 	}
@@ -749,7 +750,10 @@ void dgAABBPolygonSoup::Create (const dgPolygonSoupDatabaseBuilder& builder, boo
 	dgAssert(!list.GetCount());
 
 	dgInt32 aabbBase = builder.m_vertexCount + builder.m_normalCount;
+
+
 	dgVector* const aabbPoints = &tmpVertexArray[aabbBase];
+
 
 	dgInt32 vertexIndex = 0;
 	dgInt32 aabbNodeIndex = 0;
