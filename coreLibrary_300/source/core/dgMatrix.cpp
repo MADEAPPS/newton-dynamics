@@ -27,16 +27,16 @@
 
 dgVector dgVector::m_triplexMask (0xffffffff, 0xffffffff, 0xffffffff, 0);
 dgVector dgVector::m_signMask (0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff);
-dgVector dgVector::m_one  (dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f));
+dgVector dgVector::m_one  (dgFloat32 (1.0f));
 dgVector dgVector::m_wOne (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (1.0f));
-dgVector dgVector::m_half (dgFloat32 (0.5f), dgFloat32 (0.5f), dgFloat32 (0.5f), dgFloat32 (0.5f));
-dgVector dgVector::m_three (dgFloat32 (3.0f), dgFloat32 (3.0f), dgFloat32 (3.0f), dgFloat32 (3.0f));
-dgVector dgVector::m_negOne (dgFloat32 (-1.0f), dgFloat32 (-1.0f), dgFloat32 (-1.0f), dgFloat32 (-1.0f));
+dgVector dgVector::m_half (dgFloat32 (0.5f));
+dgVector dgVector::m_three (dgFloat32 (3.0f));
+dgVector dgVector::m_negOne (dgFloat32 (-1.0f));
 
-static dgMatrix zeroMatrix (dgVector (dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f)),
-							dgVector (dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f)),
-							dgVector (dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f)),
-							dgVector (dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f)));
+static dgMatrix zeroMatrix (dgVector (dgFloat32(0.0f)),
+							dgVector (dgFloat32(0.0f)),
+							dgVector (dgFloat32(0.0f)),
+							dgVector (dgFloat32(0.0f)));
 
 static dgMatrix identityMatrix (dgVector (dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f)),
 								dgVector (dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f)),

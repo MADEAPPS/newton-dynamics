@@ -649,13 +649,16 @@ void dgAABBPolygonSoup::Create (const dgPolygonSoupDatabaseBuilder& builder, boo
 	if (builder.m_faceCount == 0) {
 		return;
 	}
-	dgAssert (builder.m_faceCount >= 2);
+	dgAssert (builder.m_faceCount >= 1);
 	m_strideInBytes = sizeof (dgTriplex);
-	m_nodesCount = builder.m_faceCount - 1;
-	m_indexCount = builder.m_indexCount * 2 + builder.m_faceCount;
+	m_nodesCount = ((builder.m_faceCount - 1) < 1) ? 1 : builder.m_faceCount - 1;
 	m_aabb = (dgNode*) dgMallocStack (sizeof (dgNode) * m_nodesCount);
+	m_indexCount = (builder.m_indexCount - builder.m_faceCount) * 2 + 3;
+	if (builder.m_faceCount == 1) {
+		m_indexCount *= 2;
+	}
 	m_indices = (dgInt32*) dgMallocStack (sizeof (dgInt32) * m_indexCount);
-	dgStack<dgVector> tmpVertexArray(builder.m_vertexCount + builder.m_normalCount + builder.m_faceCount * 2);
+	dgStack<dgVector> tmpVertexArray(builder.m_vertexCount + builder.m_normalCount + builder.m_faceCount * 2 + 4);
 
 	for (dgInt32 i = 0; i < builder.m_vertexCount; i ++) {
 		tmpVertexArray[i] = builder.m_vertexPoints[i];
@@ -665,16 +668,18 @@ void dgAABBPolygonSoup::Create (const dgPolygonSoupDatabaseBuilder& builder, boo
 		tmpVertexArray[i + builder.m_vertexCount] = builder.m_normalPoints[i];
 	}
 
-	dgInt32 polygonIndex = 0;
-	dgInt32 constructorNodesCount = builder.m_faceCount * 2 - 1;
 	const dgInt32* const indices = &builder.m_vertexIndex[0];
-	dgStack<dgNodeBuilder> constructor (constructorNodesCount); 
+	dgStack<dgNodeBuilder> constructor (builder.m_faceCount * 2 + 16); 
 
-//	dgNodeBuilder* root = NULL;
+	dgInt32 polygonIndex = 0;
 	dgInt32 allocatorIndex = 0;
+	if (builder.m_faceCount == 1) {
+		dgInt32 indexCount = builder.m_faceVertexCount[0] - 1;
+		new (&constructor[allocatorIndex]) dgNodeBuilder (&tmpVertexArray[0], 0, indexCount, &indices[0]);
+		allocatorIndex ++;
+	}
 	for (dgInt32 i = 0; i < builder.m_faceCount; i ++) {
 		dgInt32 indexCount = builder.m_faceVertexCount[i] - 1;
-		//dgNodeBuilder* const newNode = new (&constructor[allocatorIndex]) dgNodeBuilder (&tmpVertexArray[0], i, indexCount, &indices[polygonIndex]);
 		new (&constructor[allocatorIndex]) dgNodeBuilder (&tmpVertexArray[0], i, indexCount, &indices[polygonIndex]);
 		allocatorIndex ++;
 		polygonIndex += (indexCount + 1);
@@ -815,7 +820,6 @@ void dgAABBPolygonSoup::Create (const dgPolygonSoupDatabaseBuilder& builder, boo
 		}
 	}
 
-	dgAssert (vertexIndex == 2 * m_nodesCount);
 	dgStack<dgInt32> indexArray (vertexIndex);
 	dgInt32 aabbPointCount = dgVertexListToIndexList (&aabbPoints[0].m_x, sizeof (dgVector), sizeof (dgTriplex), 0, vertexIndex, &indexArray[0], dgFloat32 (1.0e-6f));
 
@@ -837,6 +841,10 @@ void dgAABBPolygonSoup::Create (const dgPolygonSoupDatabaseBuilder& builder, boo
 
 		j = box.m_indexBox1 - aabbBase;
 		box.m_indexBox1 = indexArray[j] + aabbBase;
+	}
+
+	if (builder.m_faceCount == 1) {
+		m_aabb[0].m_right = dgNode::dgLeafNodePtr (0, 0);
 	}
 	CalculateAdjacendy();
 }

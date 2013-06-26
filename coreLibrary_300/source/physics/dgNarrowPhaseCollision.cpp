@@ -1619,7 +1619,7 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) 
 
 			if (contactJoint->m_isNewContact) {
 				contactJoint->m_isNewContact = false;
-				dgVector v (tmp.m_matrix.m_posit | dgVector::m_triplexMask);
+				dgVector v (tmp.m_matrix.m_posit & dgVector::m_triplexMask);
 				dgFloat32 mag2 = v.DotProduct4(v).m_x;
 				if (mag2 > dgFloat32 (0.0f)) {
 					contactJoint->m_separtingVector = v.Scale3 (dgRsqrt (mag2));
@@ -1697,7 +1697,7 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 	proxy.m_floatingCollision = &polyInstance;
 
 	dgAssert (proxy.m_contactJoint);
-	dgVector separatingVector (proxy.m_matrix.m_posit | dgVector::m_triplexMask);
+	dgVector separatingVector (proxy.m_matrix.m_posit & dgVector::m_triplexMask);
 	dgFloat32 mag2 = separatingVector.DotProduct4 (separatingVector).m_x;
 	if (mag2 > dgFloat32 (0.0f)) {
 		separatingVector = separatingVector.Scale3 (dgRsqrt (mag2));
@@ -1825,7 +1825,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue (dgCollisionParamPro
 	dgInt32 countleft = maxContacts;
 
 	dgAssert (proxy.m_contactJoint);
-	dgVector separatingVector (proxy.m_matrix.m_posit | dgVector::m_triplexMask);
+	dgVector separatingVector (proxy.m_matrix.m_posit & dgVector::m_triplexMask);
 	dgFloat32 mag2 = separatingVector.DotProduct4(separatingVector).m_x;
 	if (mag2 > dgFloat32 (0.0f)) {
 		separatingVector = separatingVector.Scale3 (dgRsqrt (mag2));

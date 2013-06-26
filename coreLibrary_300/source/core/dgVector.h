@@ -389,6 +389,13 @@ class dgVector
 		return int (m_x);
 	}
 
+	DG_INLINE dgVector TestZero() const
+	{
+		dgAssert (0);
+//		return ;
+	}
+
+
 	DG_INLINE dgVector Floor () const
 	{
 		return dgVector (dgFloor (m_x), dgFloor (m_y), dgFloor (m_z), dgFloor (m_w));
@@ -591,6 +598,11 @@ class dgVector
 	{
 	}
 
+	DG_INLINE dgVector(const __m128i type)
+		:m_typeInt (type)
+	{
+	}
+
 	DG_INLINE dgVector (const dgFloat32 a)
 		: m_type(_mm_set_ps1(a)) 
 	{
@@ -784,6 +796,11 @@ class dgVector
 		return _mm_cvtss_si32(m_type);
 	}
 
+	DG_INLINE dgVector TestZero() const
+	{
+		return _mm_cmpeq_epi32 (m_typeInt, dgVector (dgFloat32 (0.0f)).m_typeInt);
+	}
+
 	DG_INLINE dgVector Floor () const
 	{
 		dgVector mask ((dgFloat32 (1.5f) * dgFloat32 (1<<23)));
@@ -908,6 +925,7 @@ class dgVector
 	
 	union {
 		__m128 m_type;
+		__m128i m_typeInt;
 		dgFloat32 m_f[4];
 		struct {
 			dgFloat32 m_x;

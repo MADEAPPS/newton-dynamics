@@ -971,9 +971,7 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 	for (dgInt32 i = 0; i < count; i ++) {
 		dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
 
-		dgVector isMoving ((body->m_veloc | body->m_omega | body->m_accel | body->m_alpha) == dgVector (dgFloat32 (0.0f)));
-
-//		if (body->m_invMass.m_w && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+		dgVector isMoving ((body->m_veloc | body->m_omega | body->m_accel | body->m_alpha).TestZero());
 		if (((isMoving.GetSignMask() & 7) != 7) && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
 			dgAssert (body->m_invMass.m_w);
 			body->IntegrateVelocity(timestep);
