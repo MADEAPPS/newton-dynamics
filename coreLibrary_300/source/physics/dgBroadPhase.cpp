@@ -413,6 +413,19 @@ dgFloat64 dgBroadPhase::dgFitnessList::TotalCost () const
 	return cost;
 }
 
+dgFloat64 dgBroadPhase::CalculateEmptropy ()
+{
+	dgFloat64 cost0 = m_fitness.TotalCost ();
+	dgFloat64 cost1 = cost0;
+	do {
+		cost0 = cost1;
+		for (dgFitnessList::dgListNode* node = m_fitness.GetFirst(); node; node = node->GetNext()) {
+			ImproveNodeFitness (node->GetInfo());
+		}
+		cost1 = m_fitness.TotalCost ();
+	} while (cost1 < (dgFloat32 (0.99f)) * cost0);
+	return cost1;
+}
 
 
 
@@ -771,17 +784,8 @@ dgBroadPhase::dgNode* dgBroadPhase::BuildTopDown (dgNode** const leafArray, dgIn
 
 void dgBroadPhase::ImproveFitness()
 {
-	dgFloat64 cost0 = m_fitness.TotalCost ();
-	dgFloat64 cost1 = cost0;
-	do {
-		cost0 = cost1;
-		for (dgFitnessList::dgListNode* node = m_fitness.GetFirst(); node; node = node->GetNext()) {
-			ImproveNodeFitness (node->GetInfo());
-		}
-		cost1 = m_fitness.TotalCost ();
-	} while (cost1 < (dgFloat32 (0.95f)) * cost0);
-
-	if ((cost1 > m_treeEntropy * dgFloat32 (2.0f)) || (cost1 < m_treeEntropy * dgFloat32 (0.5f))) {
+	dgFloat64 cost = CalculateEmptropy();
+	if ((cost > m_treeEntropy * dgFloat32 (2.0f)) || (cost < m_treeEntropy * dgFloat32 (0.5f))) {
 
 		dgWorld* const world = m_world;
 		dgInt32 count = m_fitness.GetCount() * 2 + 12;
@@ -803,7 +807,7 @@ void dgBroadPhase::ImproveFitness()
 
 		dgFitnessList::dgListNode* nodePtr = m_fitness.GetFirst();
 		m_rootNode = BuildTopDown (leafArray, 0, leafNodesCount - 1, &nodePtr);
-		m_treeEntropy = m_fitness.TotalCost ();
+		m_treeEntropy = CalculateEmptropy();
 	}
 }
 

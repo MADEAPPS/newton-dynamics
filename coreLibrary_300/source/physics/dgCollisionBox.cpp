@@ -58,7 +58,10 @@ dgConvexSimplexEdge dgCollisionBox::m_edgeArray[24] =
 	{&m_edgeArray[20], &m_edgeArray[17], &m_edgeArray[19], 5}, 
 };
 
-dgConvexSimplexEdge* dgCollisionBox::m_vertexToEdgeMap[8] = {&m_edgeArray[3], &m_edgeArray[0], &m_edgeArray[1], &m_edgeArray[4], &m_edgeArray[11], &m_edgeArray[8], &m_edgeArray[5], &m_edgeArray[2]};
+//dgConvexSimplexEdge* dgCollisionBox::m_vertexToEdgeMap[8] = {&m_edgeArray[3], &m_edgeArray[0], &m_edgeArray[1], &m_edgeArray[4], &m_edgeArray[11], &m_edgeArray[8], &m_edgeArray[5], &m_edgeArray[2]};
+dgConvexSimplexEdge* dgCollisionBox::m_vertexToEdgeMap[] = {&m_edgeArray[1], &m_edgeArray[3], &m_edgeArray[4], &m_edgeArray[7], 
+															&m_edgeArray[11], &m_edgeArray[8], &m_edgeArray[5], &m_edgeArray[2],
+															&m_edgeArray[14], &m_edgeArray[16], &m_edgeArray[17], &m_edgeArray[20]};
 
 dgCollisionBox::dgCollisionBox(dgMemoryAllocator* allocator, dgUnsigned32 signature, dgFloat32 size_x, dgFloat32 size_y, dgFloat32 size_z)
 	:dgCollisionConvex(allocator, signature, m_boxCollision)
@@ -239,7 +242,7 @@ dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, cons
 
 
 	dgConvexSimplexEdge* edge = NULL;
-	for (dgInt32 i = 0; i < 8; i ++) {
+	for (dgInt32 i = 0; i < dgInt32 (sizeof (m_vertexToEdgeMap)/sizeof (m_vertexToEdgeMap[0])); i ++) {
 		dgConvexSimplexEdge* const ptr = m_vertexToEdgeMap[i];
 		dgFloat32 side0 = test[ptr->m_vertex];
 		dgFloat32 side1 = test[ptr->m_twin->m_vertex];
@@ -250,7 +253,7 @@ dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, cons
 	}
 
 	if (!edge) {
-		for (dgInt32 i = 0; i < 8; i ++) {
+		for (dgInt32 i = 0; i < dgInt32 (sizeof (m_vertexToEdgeMap)/sizeof (m_vertexToEdgeMap[0])); i ++) {
 			dgConvexSimplexEdge* const ptr = m_vertexToEdgeMap[i];
 			dgFloat32 side0 = test[ptr->m_vertex];
 			dgFloat32 side1 = test[ptr->m_twin->m_vertex];
