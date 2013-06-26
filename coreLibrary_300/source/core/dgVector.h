@@ -391,8 +391,11 @@ class dgVector
 
 	DG_INLINE dgVector TestZero() const
 	{
-		dgAssert (0);
-//		return ;
+		const dgInt32* const a = (dgInt32*)&m_x;
+		return dgVector ((a[0] == 0) ? dgInt32 (0xffffffff) : dgInt32 (0),
+						 (a[1] == 0) ? dgInt32 (0xffffffff) : dgInt32 (0),
+						 (a[2] == 0) ? dgInt32 (0xffffffff) : dgInt32 (0),
+					     (a[3] == 0) ? dgInt32 (0xffffffff) : dgInt32 (0));
 	}
 
 
