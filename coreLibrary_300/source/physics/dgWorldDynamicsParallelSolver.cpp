@@ -97,8 +97,7 @@ void dgWorldDynamicUpdate::InitilizeBodyArrayParallelKernel (void* const context
 	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
 	dgWorld* const world = (dgWorld*) worldContext;
 	dgInt32* const atomicIndex = &syncData->m_atomicIndex; 
-//	const dgInt32* const bodyInfoIndexArray = syncData->m_bodyInfoMap;
-//	dgBodyInfo* const bodyArray = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
+
 	const dgIsland* const island = syncData->m_islandArray;
 	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
 	dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
@@ -110,7 +109,6 @@ void dgWorldDynamicUpdate::InitilizeBodyArrayParallelKernel (void* const context
 		dgAssert (bodyArray[0].m_body->IsRTTIType (dgBody::m_dynamicBodyRTTI) || (((dgDynamicBody*)bodyArray[0].m_body)->m_accel % ((dgDynamicBody*)bodyArray[0].m_body)->m_accel) == dgFloat32 (0.0f));
 		dgAssert (bodyArray[0].m_body->IsRTTIType (dgBody::m_dynamicBodyRTTI) || (((dgDynamicBody*)bodyArray[0].m_body)->m_alpha % ((dgDynamicBody*)bodyArray[0].m_body)->m_alpha) == dgFloat32 (0.0f));
 
-//		dgInt32 index = bodyInfoIndexArray[i + 1];
 		dgInt32 index = i + 1;
 		dgBody* const body = bodyArray[index].m_body;
 		dgAssert (body->m_invMass.m_w > dgFloat32 (0.0f));

@@ -971,8 +971,9 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 	for (dgInt32 i = 0; i < count; i ++) {
 		dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
 
-		dgVector isMovingMask = (body->m_veloc | body->m_omega | body->m_accel | body->m_alpha) & dgVector::m_signMask;
-		if (((isMovingMask.TestZero().GetSignMask() & 7) != 7) && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+//		dgVector isMovingMask = (body->m_veloc | body->m_omega | body->m_accel | body->m_alpha) & dgVector::m_signMask;
+//		if (((isMovingMask.TestZero().GetSignMask() & 7) != 7) && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+		if (!body->m_equilibrium) {
 			dgAssert (body->m_invMass.m_w);
 			body->IntegrateVelocity(timestep);
 
@@ -1004,13 +1005,6 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 			body->UpdateMatrix (timestep, threadIndex);
 		}
 	}
-
-//	for (dgInt32 i = 0; i < count; i ++) {
-//		dgBody* const body = bodyArray[i].m_body;
-//		if (body->m_active && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
-//			body->UpdateMatrix (timestep, threadIndex);
-//		}
-//	}
 
 	if (isAutoSleep) {
 		if (stackSleeping) {
