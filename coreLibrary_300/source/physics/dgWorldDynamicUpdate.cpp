@@ -150,7 +150,6 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 
 	sentinelBody->m_resting = true;
 	sentinelBody->m_active = false;
-	sentinelBody->m_activeMask = 0;
 	sentinelBody->m_equilibrium = true;
 	for (dgInt32 i = 0; i < threadCount; i ++) {
 		world->QueueJob (FindActiveJointAndBodies, &descriptor, world);
@@ -497,7 +496,6 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 
 				body->m_index = bodyCount; 
 				body->m_active = false;
-				body->m_activeMask = 0;
 				body->m_resting = true;
 				bodyArray1[bodyIndex].m_body = body;
 				bodyCount ++;
@@ -631,6 +629,7 @@ xxx *=-1;
 	dgInt32 jointCount = island->m_jointCount;
 //	if (jointCount > 100000000) {
 	if (0) {
+/*
 		for (dgInt32 i = 0; i < jointCount; i ++) {
 			dgJointInfo* const jointInfo = &constraintArray[i];
 			dgConstraint* const joint = jointInfo->m_joint;
@@ -644,7 +643,8 @@ xxx *=-1;
 			dgBody* const body0 = bodyArray[m0].m_body;
 			dgBody* const body1 = bodyArray[m1].m_body;
 
-			bool resting = !(!body0->m_equilibrium) & !(!body1->m_equilibrium);
+			//bool resting = !(!body0->m_equilibrium) & !(!body1->m_equilibrium);
+			bool resting = body0->m_equilibrium & body1->m_equilibrium;
 			body0->m_resting &= (resting | !m0);
 			body1->m_resting &= (resting | !m1);
 		}
@@ -702,7 +702,7 @@ xxx *=-1;
 			body1->m_active |= (active & !(!m1));
 			joint->m_active = active;
 		}
-
+*/
 	} else if (jointCount) {
 		for (dgInt32 i = 0; i < jointCount; i ++) {
 			dgJointInfo* const jointInfo = &constraintArray[i];

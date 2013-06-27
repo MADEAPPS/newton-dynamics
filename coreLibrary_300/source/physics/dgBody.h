@@ -227,7 +227,6 @@ class dgBody
 	dgInt32 m_bodyGroupId;
 	dgInt32 m_rtti;
 	dgInt32 m_type;
-	dgInt32 m_activeMask;
 	dgUnsigned32 m_dynamicsLru;	
 	dgUnsigned32 m_genericLRUMark;
 	
