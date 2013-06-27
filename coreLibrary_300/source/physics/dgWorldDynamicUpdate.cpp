@@ -609,12 +609,28 @@ void dgWorldDynamicUpdate::FindActiveJointAndBodies (dgIsland* const island)
 
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[island->m_jointStart];
+/*
+static int xxx;
+static FILE* file = fopen ("data.txt", "wb");
+for (dgInt32 i = 1; i < island->m_bodyCount; i ++) {
+	dgBody* const body = bodyArray[i].m_body;
+	fprintf (file, "%d %d -> ", xxx, body->m_uniqueID);
+	fprintf (file, "%f %f %f ", body->m_veloc[0], body->m_veloc[1], body->m_veloc[2]);
+	fprintf (file, "%f %f %f ", body->m_omega[0], body->m_omega[1], body->m_omega[2]);
+	fprintf (file, "\n");
+if (body->m_uniqueID == 18)
+xxx*=1;
+}
+fflush(file);
 
-static int xxx = 0;
+xxx ++;
+if (xxx > 100000)
+xxx *=-1;
+*/
 
 	dgInt32 jointCount = island->m_jointCount;
 //	if (jointCount > 100000000) {
-	if (xxx) {
+	if (0) {
 		for (dgInt32 i = 0; i < jointCount; i ++) {
 			dgJointInfo* const jointInfo = &constraintArray[i];
 			dgConstraint* const joint = jointInfo->m_joint;
@@ -944,7 +960,7 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 	dgWorld* const world = (dgWorld*) this;
 
 
-	dgVector zero (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	dgVector zero (dgFloat32 (0.0f));
 
 	dgFloat32 forceDamp = DG_FREEZZING_VELOCITY_DRAG;
 	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
