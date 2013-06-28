@@ -74,6 +74,8 @@ void dNewton::ResetTimer()
 		baseCount = microsecunds;
 	#endif
 */
+
+	m_microsecunds = GetTimeInMicrosenconds();
 }
 
 
@@ -153,7 +155,6 @@ void dNewton::Update (dFloat timestepInSecunds)
 	if (loops >= CNEWTON_MAX_PHYSICS_LOOPS) {
 		ResetTimer();
 	}
-
 }
 
 void dNewton::UpdateAsync (dFloat timestepInSecunds)
