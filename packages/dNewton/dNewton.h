@@ -35,28 +35,24 @@ class dNewtonBody;
 class dNewton  
 {
 	public:
-	dNewton();
-	virtual ~dNewton();
+	CNEWTON_API void *operator new (size_t size);
+	CNEWTON_API void operator delete (void *ptr);
 
-	
+	CNEWTON_API dNewton();
+	CNEWTON_API virtual ~dNewton();
 
-	void Update (dFloat timestepInSecunds);
-	void UpdateAsync (dFloat timestepInSecunds);
+	CNEWTON_API void Update (dFloat timestepInSecunds);
+	CNEWTON_API void UpdateAsync (dFloat timestepInSecunds);
 
 	protected:
-	void ResetTimer();
-	dLong GetTimeInMicrosenconds() const; 
+	CNEWTON_API void ResetTimer();
+	CNEWTON_API dLong GetTimeInMicrosenconds() const; 
 
 	private:
 	// default memory allocation funtions if not other is provided 
-	static void SetAllocationDrivers (CNewtonAllocMemory alloc, CNewtonFreeMemory free);
-	static void* DefualtAlloc (int sizeInBytes);
-	static void DefaultFree (void* ptr, int sizeInBytes);
-
+	CNEWTON_API static void SetAllocationDrivers (CNewtonAllocMemory alloc, CNewtonFreeMemory free);
 
 	NewtonWorld* m_world;
-	static int m_totalMemoryUsed;
-	static bool m_memorySystemInitialized;
 
 	dLong m_frequency;
 	dLong m_baseCount;

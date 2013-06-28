@@ -24,13 +24,23 @@
 
 
 
-dNewtonBody::dNewtonBody(dNewton* const world, dNewtonCollision* const collision, const dMatrix& location)
+dNewtonBody::dNewtonBody()
 {
 	_ASSERT (0);
 }
 
 dNewtonBody::~dNewtonBody()
 {
+}
+
+void* dNewtonBody::operator new (size_t size)
+{
+	return NewtonAlloc(int (size));
+}
+
+void dNewtonBody::operator delete (void* ptr)
+{
+	NewtonFree(ptr);
 }
 
 

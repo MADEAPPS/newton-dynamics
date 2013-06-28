@@ -43,5 +43,14 @@ dNewtonCollision::~dNewtonCollision()
 }
 
 
+void* dNewtonCollision::operator new (size_t size)
+{
+	return NewtonAlloc(int (size));
+}
+
+void dNewtonCollision::operator delete (void* ptr)
+{
+	NewtonFree(ptr);
+}
 
 

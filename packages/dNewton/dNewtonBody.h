@@ -30,11 +30,13 @@ class dNewtonCollision;
 class dNewtonBody  
 {
 	public:
-	dNewtonBody(dNewton* const world, dNewtonCollision* const collision, const dMatrix& location);
-	virtual ~dNewtonBody();
+	CNEWTON_API void *operator new (size_t size);
+	CNEWTON_API void operator delete (void *ptr);
 
-
+	CNEWTON_API virtual ~dNewtonBody();
 	protected:
+	CNEWTON_API dNewtonBody();
+
 	NewtonBody* m_body;
 };
 

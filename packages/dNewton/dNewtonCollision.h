@@ -29,12 +29,15 @@ class dNewton;
 class dNewtonCollision
 {
 	public:
-	dNewtonCollision(dNewton* const world);
-	dNewtonCollision(const dNewtonCollision& cpySrc);
-	virtual ~dNewtonCollision();
+	CNEWTON_API void *operator new (size_t size);
+	CNEWTON_API void operator delete (void *ptr);
+
+	CNEWTON_API dNewtonCollision(dNewton* const world);
+	CNEWTON_API dNewtonCollision(const dNewtonCollision& cpySrc);
+	CNEWTON_API virtual ~dNewtonCollision();
 
 	protected:
-	virtual dNewtonCollision* Clone() const; 
+	CNEWTON_API virtual dNewtonCollision* Clone() const; 
 
 	NewtonBody* m_body;
 };

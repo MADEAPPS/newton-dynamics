@@ -22,32 +22,47 @@
 #include "dStdAfxNewton.h"
 #include "dNewton.h"
 
-
-int dNewton::m_totalMemoryUsed = 0;
-bool dNewton::m_memorySystemInitialized = false;
-
-
-void* dNewton::DefualtAlloc (int sizeInBytes)
+dNewton::dNewton()
 {
-	m_totalMemoryUsed += sizeInBytes;
-	return new char[sizeInBytes];
+	// create a newtop world
+	m_world = NewtonCreate();
+
+	// for two way comunication between low and high lever, link the world with this class for 
+	NewtonWorldSetUserData(m_world, this);
+
+	// set the simplified solver mode (faster but less accurate)
+	NewtonSetSolverModel (m_world, 1);
+
+	// by default runs on fout micro threads
+	NewtonSetThreadsCount(m_world, 4);
+
+	// set th timer
+	ResetTimer();
 }
 
-// memory free use by the engine
-void dNewton::DefaultFree (void* ptr, int sizeInBytes)
+dNewton::~dNewton()
 {
-	m_totalMemoryUsed -= sizeInBytes;
-	delete[] (char*)ptr;
+	NewtonWaitForUpdateToFinish (m_world);
+	NewtonDestroy (m_world);
 }
-
 
 void dNewton::SetAllocationDrivers (CNewtonAllocMemory alloc, CNewtonFreeMemory free)
 {
-	if (!m_memorySystemInitialized) {
-		m_memorySystemInitialized = true;
-		NewtonSetMemorySystem (alloc, free);
-	}
+	NewtonSetMemorySystem (alloc, free);
 }
+
+
+
+void* dNewton::operator new (size_t size)
+{
+	return NewtonAlloc(int (size));
+}
+
+void dNewton::operator delete (void* ptr)
+{
+	NewtonFree(ptr);
+}
+
 
 void dNewton::ResetTimer()
 {
@@ -108,35 +123,6 @@ dLong dNewton::GetTimeInMicrosenconds() const
 */
 }
 
-
-
-dNewton::dNewton()
-{
-	if (!m_memorySystemInitialized) {
-		SetAllocationDrivers (DefualtAlloc, DefaultFree);
-	}
-
-	// create a newtop world
-	m_world = NewtonCreate();
-
-	// for two way comunication between low and high lever, link the world with this class for 
-	NewtonWorldSetUserData(m_world, this);
-
-	// set the simplified solver mode (faster but less accurate)
-	NewtonSetSolverModel (m_world, 1);
-
-	// by default runs on fout micro threads
-	NewtonSetThreadsCount(m_world, 4);
-
-	// set th timer
-	ResetTimer();
-}
-
-dNewton::~dNewton()
-{
-	NewtonWaitForUpdateToFinish (m_world);
-	NewtonDestroy (m_world);
-}
 
 
 void dNewton::Update (dFloat timestepInSecunds)
