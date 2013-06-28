@@ -28,6 +28,8 @@ typedef void* (*CNewtonAllocMemory) (int sizeInBytes);
 typedef void (*CNewtonFreeMemory) (void* const ptr, int sizeInBytes);
 
 
+#define CNEWTON_MAX_PHYSICS_LOOPS 2	
+
 class dNewtonBody;
 
 class dNewton  
@@ -36,20 +38,29 @@ class dNewton
 	dNewton();
 	virtual ~dNewton();
 
+	
+
 	void Update (dFloat timestepInSecunds);
 	void UpdateAsync (dFloat timestepInSecunds);
 
-  
+	protected:
+	void ResetTimer();
+	dLong GetTimeInMicrosenconds() const; 
+
 	private:
 	// default memory allocation funtions if not other is provided 
 	static void SetAllocationDrivers (CNewtonAllocMemory alloc, CNewtonFreeMemory free);
 	static void* DefualtAlloc (int sizeInBytes);
-	static void DefualtFree (void* ptr, int sizeInBytes);
+	static void DefaultFree (void* ptr, int sizeInBytes);
 
 
 	NewtonWorld* m_world;
 	static int m_totalMemoryUsed;
 	static bool m_memorySystemInitialized;
+
+	dLong m_frequency;
+	dLong m_baseCount;
+	dLong m_microsecunds;
 };
 
 #endif

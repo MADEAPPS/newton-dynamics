@@ -34,7 +34,7 @@ void* dNewton::DefualtAlloc (int sizeInBytes)
 }
 
 // memory free use by the engine
-void dNewton::DefualtFree (void* ptr, int sizeInBytes)
+void dNewton::DefaultFree (void* ptr, int sizeInBytes)
 {
 	m_totalMemoryUsed -= sizeInBytes;
 	delete[] (char*)ptr;
@@ -49,10 +49,69 @@ void dNewton::SetAllocationDrivers (CNewtonAllocMemory alloc, CNewtonFreeMemory 
 	}
 }
 
+void dNewton::ResetTimer()
+{
+	#ifdef _MSC_VER
+		LARGE_INTEGER baseCount;
+		LARGE_INTEGER frequency;
+		QueryPerformanceFrequency(&frequency);
+		QueryPerformanceCounter (&baseCount);
+		m_baseCount = dLong (baseCount.QuadPart);
+		m_frequency = dLong (frequency.QuadPart);
+	#endif
+/*
+	#if (defined (_POSIX_VER) || defined (_POSIX_VER_64))
+		timespec ts;
+		clock_gettime(CLOCK_REALTIME, &ts); // Works on Linux
+		//baseCount = ts.tv_nsec / 1000;
+		baseCount = unsigned64 (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000;
+	#endif
+
+	#ifdef _MACOSX_VER
+		timeval tp;
+		gettimeofday(&tp, NULL);
+		unsigned64 microsecunds =  unsigned64 (tp.tv_sec) * 1000000 + tp.tv_usec;
+		baseCount = microsecunds;
+	#endif
+*/
+}
+
+
+
+dLong dNewton::GetTimeInMicrosenconds() const 
+{
+	#ifdef _MSC_VER
+		LARGE_INTEGER count;
+		QueryPerformanceCounter (&count);
+		count.QuadPart -= m_baseCount;
+		dLong ticks = count.QuadPart * LONGLONG (1000000) / m_frequency;
+		return ticks;
+	#endif
+/*
+	#if (defined (_POSIX_VER) || defined (_POSIX_VER_64))
+		timespec ts;
+		clock_gettime(CLOCK_REALTIME, &ts); // Works on Linux
+		//return unsigned64 (ts.tv_nsec / 1000) - baseCount;
+		
+		return unsigned64 (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000 - baseCount;
+	#endif
+
+
+	#ifdef _MACOSX_VER
+		timeval tp;
+		gettimeofday(&tp, NULL);
+		unsigned64 microsecunds =  unsigned64 (tp.tv_sec) * 1000000 + tp.tv_usec;
+		return microsecunds - baseCount;
+	#endif
+*/
+}
+
+
+
 dNewton::dNewton()
 {
 	if (!m_memorySystemInitialized) {
-		SetAllocationDrivers (DefualtAlloc, DefualtFree);
+		SetAllocationDrivers (DefualtAlloc, DefaultFree);
 	}
 
 	// create a newtop world
@@ -66,6 +125,9 @@ dNewton::dNewton()
 
 	// by default runs on fout micro threads
 	NewtonSetThreadsCount(m_world, 4);
+
+	// set th timer
+	ResetTimer();
 }
 
 dNewton::~dNewton()
@@ -77,10 +139,37 @@ dNewton::~dNewton()
 
 void dNewton::Update (dFloat timestepInSecunds)
 {
-	NewtonUpdate (m_world, timestepInSecunds);
+	dLong timestepMicrosecunds = dLong (double (timestepInSecunds) * 1000000.0f);
+	dLong currentTime = GetTimeInMicrosenconds ();
+
+	dLong nextTime = currentTime - m_microsecunds;
+	int loops = 0;
+	while ((nextTime >= timestepMicrosecunds) && (loops < CNEWTON_MAX_PHYSICS_LOOPS)) {
+		loops ++;
+		NewtonUpdate (m_world, timestepInSecunds);
+		nextTime -= timestepMicrosecunds;
+		m_microsecunds += timestepMicrosecunds;
+	}
+	if (loops >= CNEWTON_MAX_PHYSICS_LOOPS) {
+		ResetTimer();
+	}
+
 }
 
 void dNewton::UpdateAsync (dFloat timestepInSecunds)
 {
-	NewtonUpdateAsync(m_world, timestepInSecunds);
+	dLong timestepMicrosecunds = dLong (double (timestepInSecunds) * 1000000.0f);
+	dLong currentTime = GetTimeInMicrosenconds ();
+
+	dLong nextTime = currentTime - m_microsecunds;
+	int loops = 0;
+	while ((nextTime >= timestepMicrosecunds) && (loops < CNEWTON_MAX_PHYSICS_LOOPS)) {
+		loops ++;
+		NewtonUpdateAsync (m_world, timestepInSecunds);
+		nextTime -= timestepMicrosecunds;
+		m_microsecunds += timestepMicrosecunds;
+	}
+	if (loops >= CNEWTON_MAX_PHYSICS_LOOPS) {
+		ResetTimer();
+	}
 }
