@@ -607,103 +607,12 @@ void dgWorldDynamicUpdate::FindActiveJointAndBodies (dgIsland* const island)
 
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[island->m_jointStart];
-/*
-static int xxx;
-static FILE* file = fopen ("data.txt", "wb");
-for (dgInt32 i = 1; i < island->m_bodyCount; i ++) {
-	dgBody* const body = bodyArray[i].m_body;
-	fprintf (file, "%d %d -> ", xxx, body->m_uniqueID);
-	fprintf (file, "%f %f %f ", body->m_veloc[0], body->m_veloc[1], body->m_veloc[2]);
-	fprintf (file, "%f %f %f ", body->m_omega[0], body->m_omega[1], body->m_omega[2]);
-	fprintf (file, "\n");
-if (body->m_uniqueID == 18)
-xxx*=1;
-}
-fflush(file);
-
-xxx ++;
-if (xxx > 100000)
-xxx *=-1;
-*/
 
 
 	dgInt32 jointCount = island->m_jointCount;
 //	if (jointCount > 100000000) {
 	if (0) {
-/*
-		for (dgInt32 i = 0; i < jointCount; i ++) {
-			dgJointInfo* const jointInfo = &constraintArray[i];
-			dgConstraint* const joint = jointInfo->m_joint;
 
-			dgInt32 m0 = (joint->m_body0->GetInvMass().m_w != dgFloat32(0.0f)) ? joint->m_body0->m_index: 0;
-			dgInt32 m1 = (joint->m_body1->GetInvMass().m_w != dgFloat32(0.0f)) ? joint->m_body1->m_index: 0;
-
-			jointInfo->m_m0 = m0;
-			jointInfo->m_m1 = m1;
-
-			dgBody* const body0 = bodyArray[m0].m_body;
-			dgBody* const body1 = bodyArray[m1].m_body;
-
-			//bool resting = !(!body0->m_equilibrium) & !(!body1->m_equilibrium);
-			bool resting = body0->m_equilibrium & body1->m_equilibrium;
-			body0->m_resting &= (resting | !m0);
-			body1->m_resting &= (resting | !m1);
-		}
-
-		for (dgInt32 i = 0; i < jointCount; i ++) {
-			dgJointInfo* const jointInfo = &constraintArray[i];
-			dgInt32 m0 = jointInfo->m_m0;
-			dgInt32 m1 = jointInfo->m_m1;
-			
-			dgBody* const body0 = bodyArray[m0].m_body;
-			dgBody* const body1 = bodyArray[m1].m_body;
-			dgAssert ((body0 == jointInfo->m_joint->m_body0) || !m0);
-			dgAssert ((body1 == jointInfo->m_joint->m_body1) || !m1);
-
-			dgUnsigned32 active = !(body0->m_resting & body1->m_resting);
-			body0->m_activeMask |= (active & !(!m0));
-			body1->m_activeMask |= (active & !(!m1));
-		}
-
-		dgInt32 maxPasses = dgInt32 (world->m_solverMode + LINEAR_SOLVER_SUB_STEPS - 1);
-		for (dgInt32 j = 0; j < maxPasses; j ++) {
-			dgUnsigned32 mask = 1 << j;
-			dgUnsigned32 shift = (j + 1);
-			for (dgInt32 i = 0; i < jointCount; i ++) {
-				dgJointInfo* const jointInfo = &constraintArray[i];
-				dgInt32 m0 = jointInfo->m_m0;
-				dgInt32 m1 = jointInfo->m_m1;
-
-				dgBody* const body0 = bodyArray[m0].m_body;
-				dgBody* const body1 = bodyArray[m1].m_body;
-				dgAssert ((body0 == jointInfo->m_joint->m_body0) || !m0);
-				dgAssert ((body1 == jointInfo->m_joint->m_body1) || !m1);
-
-				dgUnsigned32 active = ((body0->m_activeMask | body1->m_activeMask) & mask) << 1;
-				body0->m_activeMask |= (active & (!(!m0) << shift));
-				body1->m_activeMask |= (active & (!(!m1) << shift));
-			}
-		}
-
-		dgInt32 mask = 1 << maxPasses;
-		for (dgInt32 i = 0; i < jointCount; i ++) {
-			dgJointInfo* const jointInfo = &constraintArray[i];
-			dgConstraint* const joint = jointInfo->m_joint;
-
-			dgInt32 m0 = jointInfo->m_m0;
-			dgInt32 m1 = jointInfo->m_m1;
-
-			dgBody* const body0 = bodyArray[m0].m_body;
-			dgBody* const body1 = bodyArray[m1].m_body;
-			dgAssert ((body0 == joint->m_body0) || !m0);
-			dgAssert ((body1 == joint->m_body1) || !m1);
-
-			bool active = !(!((body0->m_activeMask | body1->m_activeMask) & mask));
-			body0->m_active |= (active & !(!m0));
-			body1->m_active |= (active & !(!m1));
-			joint->m_active = active;
-		}
-*/
 	} else if (jointCount) {
 		for (dgInt32 i = 0; i < jointCount; i ++) {
 			dgJointInfo* const jointInfo = &constraintArray[i];

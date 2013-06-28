@@ -39,7 +39,7 @@
 dgVector dgBroadPhase::m_conservativeRotAngle (45.0f * 3.14159f / 180.0f);
 
 
-DG_MSC_VECTOR_AVX_ALIGMENT
+DG_MSC_VECTOR_ALIGMENT
 class dgBroadPhase::dgNode
 {
 	public: 
@@ -149,7 +149,7 @@ class dgBroadPhase::dgNode
 	friend class dgBroadPhase;
 	friend class dgBroadphaseSyncDescriptor;
 	friend class dgFitnessList;
-} DG_GCC_VECTOR_AVX_ALIGMENT;
+} DG_GCC_VECTOR_ALIGMENT;
 
 dgVector dgBroadPhase::dgNode::m_broadPhaseScale (DG_BROADPHASE_AABB_SCALE, DG_BROADPHASE_AABB_SCALE, DG_BROADPHASE_AABB_SCALE, dgFloat32 (0.0f));
 dgVector dgBroadPhase::dgNode::m_broadInvPhaseScale (DG_BROADPHASE_AABB_INV_SCALE, DG_BROADPHASE_AABB_INV_SCALE, DG_BROADPHASE_AABB_INV_SCALE, dgFloat32 (0.0f));

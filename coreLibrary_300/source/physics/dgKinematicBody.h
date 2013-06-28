@@ -27,7 +27,7 @@
 
 
 //DG_MSC_VECTOR_ALIGMENT
-DG_MSC_VECTOR_AVX_ALIGMENT
+DG_MSC_VECTOR_ALIGMENT
 class dgKinematicBody: public dgBody 
 {
 	public:
@@ -78,7 +78,7 @@ class dgKinematicBody: public dgBody
 	friend class dgWorld;
 	friend class dgWorldDynamicUpdate;
 	friend class dgBroadPhase;
-} DG_GCC_VECTOR_AVX_ALIGMENT;
+} DG_GCC_VECTOR_ALIGMENT;
 
 
 

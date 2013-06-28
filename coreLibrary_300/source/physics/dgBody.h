@@ -51,7 +51,7 @@ typedef dgUnsigned32 (dgApi *GetBuoyancyPlane) (void* collisionID, void* context
 
 
 //DG_MSC_VECTOR_ALIGMENT
-DG_MSC_VECTOR_AVX_ALIGMENT
+DG_MSC_VECTOR_ALIGMENT
 class dgBody  
 {
 	public:
@@ -274,7 +274,7 @@ class dgBody
 	friend class dgCollisionConvexPolygon;
 	friend class dgCollidingPairCollector;
 
-} DG_GCC_VECTOR_AVX_ALIGMENT;
+} DG_GCC_VECTOR_ALIGMENT;
 
 // *****************************************************************************
 // 

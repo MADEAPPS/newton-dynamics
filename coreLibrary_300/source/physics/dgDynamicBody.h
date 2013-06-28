@@ -36,7 +36,7 @@
 
 
 //DG_MSC_VECTOR_ALIGMENT
-DG_MSC_VECTOR_AVX_ALIGMENT
+DG_MSC_VECTOR_ALIGMENT
 class dgDynamicBody : public dgBody 
 {
 	public:
@@ -98,7 +98,7 @@ class dgDynamicBody : public dgBody
 	friend class dgBroadPhase;
 	friend class dgBodyMasterList;
 	friend class dgWorldDynamicUpdate;
-} DG_GCC_VECTOR_AVX_ALIGMENT;
+} DG_GCC_VECTOR_ALIGMENT;
 
 
 DG_INLINE const dgVector& dgDynamicBody::GetForce() const

@@ -183,20 +183,14 @@
 
 
 #define DG_VECTOR_SIMD_SIZE		16
-#define DG_VECTOR_AVX_SIZE		32
+
 
 #if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-	#define	DG_MSC_VECTOR_ALIGMENT			__declspec(align(DG_VECTOR_SIMD_SIZE))
-	#define	DG_MSC_VECTOR_AVX_ALIGMENT		__declspec(align(DG_VECTOR_AVX_SIZE))
-
 	#define	DG_GCC_VECTOR_ALIGMENT	
-	#define	DG_GCC_VECTOR_AVX_ALIGMENT	
+	#define	DG_MSC_VECTOR_ALIGMENT			__declspec(align(DG_VECTOR_SIMD_SIZE))
 #else
 	#define	DG_MSC_VECTOR_ALIGMENT			
-	#define	DG_MSC_VECTOR_AVX_ALIGMENT
-
 	#define	DG_GCC_VECTOR_ALIGMENT			__attribute__ ((aligned (DG_VECTOR_SIMD_SIZE)))
-	#define	DG_GCC_VECTOR_AVX_ALIGMENT		__attribute__ ((aligned (DG_VECTOR_AVX_SIZE)))
 #endif
 
 

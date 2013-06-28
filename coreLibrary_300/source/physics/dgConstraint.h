@@ -80,21 +80,21 @@ class dgBilateralBounds
 };
 
 //DG_MSC_VECTOR_ALIGMENT
-DG_MSC_VECTOR_AVX_ALIGMENT
+DG_MSC_VECTOR_ALIGMENT
 class dgJacobian
 {
 	public:
 	dgVector m_linear;
 	dgVector m_angular;
-} DG_GCC_VECTOR_AVX_ALIGMENT;
+} DG_GCC_VECTOR_ALIGMENT;
 
-DG_MSC_VECTOR_AVX_ALIGMENT
+DG_MSC_VECTOR_ALIGMENT
 class dgJacobianPair
 {
 	public:
 	dgJacobian m_jacobianM0;
 	dgJacobian m_jacobianM1;
-} DG_GCC_VECTOR_AVX_ALIGMENT;
+} DG_GCC_VECTOR_ALIGMENT;
 
 class dgJacobianMatrixElement;
 class dgJointAccelerationDecriptor
@@ -108,7 +108,7 @@ class dgJointAccelerationDecriptor
 };
 
 
-DG_MSC_VECTOR_AVX_ALIGMENT
+DG_MSC_VECTOR_ALIGMENT
 class dgContraintDescritor
 {
 	public:
@@ -124,13 +124,13 @@ class dgContraintDescritor
 	dgInt32 m_threadIndex;
 	dgFloat32 m_timestep;
 	dgFloat32 m_invTimestep;
-} DG_GCC_VECTOR_AVX_ALIGMENT;
+} DG_GCC_VECTOR_ALIGMENT;
 
 
 typedef void (dgApi *OnConstraintDestroy) (dgConstraint& me);
 
 //DG_MSC_VECTOR_ALIGMENT
-DG_MSC_VECTOR_AVX_ALIGMENT
+DG_MSC_VECTOR_ALIGMENT
 class dgConstraint
 {
 	public:
@@ -226,7 +226,7 @@ class dgConstraint
 	friend class dgParallelSolverInitFeedbackUpdate;
 	friend class dgParallelSolverBuildJacobianMatrix;
 	friend class dgBroadPhaseMaterialCallbackWorkerThread;
-} DG_GCC_VECTOR_AVX_ALIGMENT;
+} DG_GCC_VECTOR_ALIGMENT;
 
 inline dgConstraint::dgConstraint() 
 	:m_userData(NULL)

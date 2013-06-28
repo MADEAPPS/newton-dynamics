@@ -36,7 +36,7 @@ const dgMatrix& dgGetZeroMatrix ();
 const dgMatrix& dgGetIdentityMatrix();
 
 
-DG_MSC_VECTOR_AVX_ALIGMENT
+DG_MSC_VECTOR_ALIGMENT
 class dgMatrix
 {
 	public:
@@ -93,7 +93,7 @@ class dgMatrix
 	dgVector m_up;
 	dgVector m_right;
 	dgVector m_posit;
-} DG_GCC_VECTOR_AVX_ALIGMENT;
+} DG_GCC_VECTOR_ALIGMENT;
 
 
 
