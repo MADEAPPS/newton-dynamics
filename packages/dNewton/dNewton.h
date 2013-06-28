@@ -24,6 +24,10 @@
 
 #include <newton.h>
 
+typedef void* (*CNewtonAllocMemory) (int sizeInBytes);
+typedef void (*CNewtonFreeMemory) (void* const ptr, int sizeInBytes);
+
+
 class dNewtonBody;
 
 class dNewton  
@@ -35,8 +39,16 @@ class dNewton
 
   
 	private:
+	// default memory allocation funtions if not other is provided 
+	static void SetAllocationDrivers (CNewtonAllocMemory alloc, CNewtonFreeMemory free);
+	static void* DefualtAlloc (int sizeInBytes);
+	static void DefualtFree (void* ptr, int sizeInBytes);
+
+
 
 	NewtonWorld* m_world;
+	static int m_totalMemoryUsed;
+	static bool m_memorySystemInitialized;
 };
 
 #endif

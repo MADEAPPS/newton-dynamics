@@ -22,8 +22,50 @@
 #include "dStdAfxNewton.h"
 #include "dNewton.h"
 
+
+int dNewton::m_totalMemoryUsed = 0;
+bool dNewton::m_memorySystemInitialized = false;
+
+
+void* dNewton::DefualtAlloc (int sizeInBytes)
+{
+	m_totalMemoryUsed += sizeInBytes;
+	return new char[sizeInBytes];
+}
+
+// memory free use by the engine
+void dNewton::DefualtFree (void* ptr, int sizeInBytes)
+{
+	m_totalMemoryUsed -= sizeInBytes;
+	delete[] (char*)ptr;
+}
+
+
+void dNewton::SetAllocationDrivers (CNewtonAllocMemory alloc, CNewtonFreeMemory free)
+{
+	if (!m_memorySystemInitialized) {
+		m_memorySystemInitialized = true;
+		NewtonSetMemorySystem (alloc, free);
+	}
+}
+
 dNewton::dNewton()
 {
+	if (!m_memorySystemInitialized) {
+		SetAllocationDrivers (DefualtAlloc, DefualtFree);
+	}
+
+	// create a newtop world
+	m_world = NewtonCreate();
+
+	// for two way comunication between low and high lever, link the world with this class for 
+	NewtonWorldSetUserData(m_world, this);
+
+	// set the simplified solver mode (faster but less accurate)
+	NewtonSetSolverModel (m_world, 1);
+
+	// by default runs on fout micro threads
+	NewtonSetThreadsCount(m_world, 4);
 }
 
 dNewton::~dNewton()
