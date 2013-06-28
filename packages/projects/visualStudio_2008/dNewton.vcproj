@@ -324,6 +324,22 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\dNewton\dNewtonBody.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dNewton\dNewtonBody.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dNewton\dNewtonCollision.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dNewton\dNewtonCollision.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\dNewton\dStdAfxNewton.cpp"
 			>
 			<FileConfiguration

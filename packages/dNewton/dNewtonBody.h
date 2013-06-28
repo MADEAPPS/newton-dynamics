@@ -19,48 +19,23 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _D_NEWTON_H_
-#define _D_NEWTON_H_
+#ifndef _D_NEWTON_BODY_H_
+#define _D_NEWTON_BODY_H_
 
 #include "dStdAfxNewton.h"
 
-typedef void* (*CNewtonAllocMemory) (int sizeInBytes);
-typedef void (*CNewtonFreeMemory) (void* const ptr, int sizeInBytes);
+class dNewton;
+class dNewtonCollision;
 
-
-#define CNEWTON_MAX_PHYSICS_LOOPS 2	
-
-class dNewtonBody;
-
-class dNewton  
+class dNewtonBody  
 {
 	public:
-	dNewton();
-	virtual ~dNewton();
+	dNewtonBody(dNewton* const world, dNewtonCollision* const collision, const dMatrix& location);
+	virtual ~dNewtonBody();
 
-	
-
-	void Update (dFloat timestepInSecunds);
-	void UpdateAsync (dFloat timestepInSecunds);
 
 	protected:
-	void ResetTimer();
-	dLong GetTimeInMicrosenconds() const; 
-
-	private:
-	// default memory allocation funtions if not other is provided 
-	static void SetAllocationDrivers (CNewtonAllocMemory alloc, CNewtonFreeMemory free);
-	static void* DefualtAlloc (int sizeInBytes);
-	static void DefaultFree (void* ptr, int sizeInBytes);
-
-
-	NewtonWorld* m_world;
-	static int m_totalMemoryUsed;
-	static bool m_memorySystemInitialized;
-
-	dLong m_frequency;
-	dLong m_baseCount;
-	dLong m_microsecunds;
+	NewtonBody* m_body;
 };
 
 #endif
