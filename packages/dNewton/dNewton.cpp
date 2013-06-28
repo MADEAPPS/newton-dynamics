@@ -70,4 +70,17 @@ dNewton::dNewton()
 
 dNewton::~dNewton()
 {
+	NewtonWaitForUpdateToFinish (m_world);
+	NewtonDestroy (m_world);
+}
+
+
+void dNewton::Update (dFloat timestepInSecunds)
+{
+	NewtonUpdate (m_world, timestepInSecunds);
+}
+
+void dNewton::UpdateAsync (dFloat timestepInSecunds)
+{
+	NewtonUpdateAsync(m_world, timestepInSecunds);
 }

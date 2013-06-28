@@ -36,6 +36,8 @@ class dNewton
 	dNewton();
 	virtual ~dNewton();
 
+	void Update (dFloat timestepInSecunds);
+	void UpdateAsync (dFloat timestepInSecunds);
 
   
 	private:
@@ -43,7 +45,6 @@ class dNewton
 	static void SetAllocationDrivers (CNewtonAllocMemory alloc, CNewtonFreeMemory free);
 	static void* DefualtAlloc (int sizeInBytes);
 	static void DefualtFree (void* ptr, int sizeInBytes);
-
 
 
 	NewtonWorld* m_world;
