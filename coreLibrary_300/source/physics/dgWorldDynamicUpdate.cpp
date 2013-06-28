@@ -626,6 +626,7 @@ if (xxx > 100000)
 xxx *=-1;
 */
 
+
 	dgInt32 jointCount = island->m_jointCount;
 //	if (jointCount > 100000000) {
 	if (0) {

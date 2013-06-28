@@ -436,9 +436,6 @@ void dgWorldDynamicUpdate::ApplyExternalForcesAndAcceleration(const dgIsland* co
 			y1.m_angular += row->m_Jt.m_jacobianM1.m_angular.CompProduct4 (force);
 		}
 
-		//if (constraintArray[i].m_joint->GetId() == dgContactConstraintId) {
-		//		m_world->AddToBreakQueue ((dgContact*)constraintArray[i].m_joint, maxForce);
-		//}
 		hasJointFeeback |= (constraintArray[i].m_joint->m_updaFeedbackCallback ? 1 : 0);
 
 		internalForces[m0].m_linear += y0.m_linear;
@@ -759,11 +756,9 @@ dgAssert (0);
 
 void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island, dgInt32 rowStart, dgInt32 threadIndex, dgFloat32 timestepSrc, dgFloat32 maxAccNorm) const
 {
-	//dgJacobian* const internalVeloc = &m_solverMemory.m_internalVeloc[island->m_bodyStart];
 	dgJacobian* const internalForces = &m_solverMemory.m_internalForces[island->m_bodyStart];
 	dgVector zero(dgFloat32 (0.0f));
 
-	//	sleepCount = 0;
 	dgWorld* const world = (dgWorld*) this;
 	dgInt32 bodyCount = island->m_bodyCount;
 	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
@@ -966,7 +961,6 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 					}
 				}
 			}
-//accNorm  = 1.0f;
 		}
 
 		if (timestep != dgFloat32 (0.0f)) {
@@ -1033,7 +1027,6 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 		dgVector invTime (invTimestepSrc);
 		dgFloat32 maxAccNorm2 = maxAccNorm * maxAccNorm;
 		for (dgInt32 i = 1; i < bodyCount; i ++) {
-			//dgDynamicBody* const body = bodyArray[i].m_body;
 			dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
 			if (body->m_active) {
 				// the initial velocity and angular velocity were stored in net force and net torque, for memory saving
@@ -1102,10 +1095,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForces (const dgIsland* const isla
 		dgJacobianMatrixElement* const row = &matrixRow[j];
 
 		dgInt32 frictionIndex = row->m_normalForceIndex;
-		//dgAssert (((frictionIndex <0) && (force[frictionIndex] == dgFloat32 (1.0f))) || ((frictionIndex >= 0) && (force[frictionIndex] >= dgFloat32 (0.0f))));
-		//dgAssert (((frictionIndex <0) && (matrixRow[frictionIndex].m_force == dgFloat32 (1.0f))) || ((frictionIndex >= 0) && (matrixRow[frictionIndex].m_force >= dgFloat32 (0.0f))));
 		dgAssert ((frictionIndex < 0) || ((frictionIndex >= 0) && (matrixRow[frictionIndex].m_force >= dgFloat32 (0.0f))));
-		//dgFloat32 val = matrixRow[k].m_force;
 		dgFloat32 val = (frictionIndex < 0) ? dgFloat32 (1.0f) : matrixRow[frictionIndex].m_force;
 		lowBound[j] = val * row->m_lowerBoundFrictionCoefficent;
 		highBound[j] = val * row->m_upperBoundFrictionCoefficent;
@@ -1246,7 +1236,6 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForces (const dgIsland* const isla
 				deltaForce[j] = row->m_accel * row->m_invDJMinvJt * activeRow[j];
 				akNum += deltaForce[j] * row->m_accel;
 			}
-			//force[clampedForceIndex + first] = clampedForceIndexValue;
 			matrixRow[clampedForceIndex].m_force = clampedForceIndexValue;
 
 			i = -1;
