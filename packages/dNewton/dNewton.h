@@ -22,6 +22,7 @@
 #ifndef _D_NEWTON_H_
 #define _D_NEWTON_H_
 
+#include <newton.h>
 
 class dNewtonBody;
 
@@ -31,18 +32,11 @@ class dNewton
 	dNewton();
 	virtual ~dNewton();
 
-	// application implementation
-	virtual void Update (dFloat timestep);
-	virtual void OnBodyLeaveWorld (dNewtonBody* body);
-	virtual void* Alloc (int size) = 0;
-	virtual void* Free (void *ptr, int size) = 0;
+
   
 	private:
-	static void  BodyLeaveWorld (const NewtonWorld* newtonWorld, const NewtonBody* body);
-	static void*  AllocMemory (int size);
-	static void  FreeMemory (void *ptr, int size);
 
 	NewtonWorld* m_world;
 };
 
-
+#endif
