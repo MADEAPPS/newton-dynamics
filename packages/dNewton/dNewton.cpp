@@ -21,6 +21,7 @@
 
 #include "dStdAfxNewton.h"
 #include "dNewton.h"
+#include "dNewtonCollision.h"
 
 dNewton::dNewton()
 	:m_maxUpdatePerIterations(2)
@@ -34,8 +35,11 @@ dNewton::dNewton()
 	// set the simplified solver mode (faster but less accurate)
 	NewtonSetSolverModel (m_world, 1);
 
-	// by default runs on fout micro threads
+	// by default runs on four micro threads
 	NewtonSetThreadsCount(m_world, 4);
+
+	// set the collision copy constructor callback
+	NewtonWorldSetCollisionConstructorDestuctorCallback (m_world, OnCollisionCopyConstruct, OnCollisionDestructorCallback);
 
 	// set th timer
 	ResetTimer();
@@ -57,7 +61,26 @@ void dNewton::SetAllocationDrivers (CNewtonAllocMemory alloc, CNewtonFreeMemory 
 	NewtonSetMemorySystem (alloc, free);
 }
 
+void dNewton::OnCollisionDestructorCallback (const NewtonWorld* const newtonWorld, const NewtonCollision* const collision)
+{
+	dNewtonCollision* const srcColl = (dNewtonCollision*) NewtonCollisionGetUserData(collision);
+	if (srcColl) {
+		delete srcColl;
+	}
+}
 
+void dNewton::OnCollisionCopyConstruct (const NewtonWorld* const world, NewtonCollision* const collision, const NewtonCollision* const sourceCollision)
+{
+	dNewtonCollision* const srcColl = (dNewtonCollision*) NewtonCollisionGetUserData(sourceCollision);
+	dAssert (srcColl);
+	srcColl->Clone(collision);
+}
+
+
+NewtonWorld* dNewton::GetNewton () const
+{
+	return m_world;
+}
 
 void* dNewton::operator new (size_t size)
 {

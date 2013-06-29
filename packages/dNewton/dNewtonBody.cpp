@@ -25,12 +25,16 @@
 
 
 dNewtonBody::dNewtonBody()
+	:m_body(NULL)
 {
-	_ASSERT (0);
 }
 
 dNewtonBody::~dNewtonBody()
 {
+	if (NewtonBodyGetDestructorCallback(m_body)) {
+		NewtonBodySetDestructorCallback (m_body, NULL);
+		NewtonDestroyBody(NewtonBodyGetWorld(m_body), m_body);
+	}
 }
 
 void* dNewtonBody::operator new (size_t size)
@@ -43,4 +47,19 @@ void dNewtonBody::operator delete (void* ptr)
 	NewtonFree(ptr);
 }
 
+void dNewtonBody::SetBody (NewtonBody* const body)
+{
+	m_body = body;
+	NewtonBodySetUserData(m_body, this);
+	NewtonBodySetDestructorCallback (m_body, OnBodyDestroy);
+}
 
+
+void dNewtonBody::OnBodyDestroy (const NewtonBody* const body)
+{
+	dNewtonBody* const me = (dNewtonBody*) NewtonBodyGetUserData(body);
+	if (me) {
+		NewtonBodySetDestructorCallback (me->m_body, NULL);
+		delete me;
+	}
+}

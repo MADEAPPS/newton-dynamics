@@ -45,6 +45,8 @@ class dNewton
 
 	CNEWTON_API void SetMaxUpdatesPerIterations (int update);
 
+	CNEWTON_API NewtonWorld* GetNewton () const;
+
 	protected:
 	CNEWTON_API void ResetTimer();
 	CNEWTON_API dLong GetTimeInMicrosenconds() const; 
@@ -53,9 +55,12 @@ class dNewton
 	// default memory allocation functions if not other is provided 
 	CNEWTON_API static void SetAllocationDrivers (CNewtonAllocMemory alloc, CNewtonFreeMemory free);
 
-	NewtonWorld* m_world;
-
+	CNEWTON_API static void OnCollisionDestructorCallback (const NewtonWorld* const newtonWorld, const NewtonCollision* const collision);
+	CNEWTON_API static void OnCollisionCopyConstruct (const NewtonWorld* const newtonWorld, NewtonCollision* const collision, const NewtonCollision* const sourceCollision);
 	
+
+
+	NewtonWorld* m_world;
 	dLong m_frequency;
 	dLong m_baseCount;
 	dLong m_microsecunds;

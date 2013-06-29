@@ -24,22 +24,29 @@
 
 
 
-dNewtonCollision::dNewtonCollision(dNewton* const world)
+dNewtonCollision::dNewtonCollision(NewtonCollision* const shape)
+	:m_shape (shape)
 {
+	NewtonCollisionSetUserData (m_shape, this);
 }
 
-dNewtonCollision::dNewtonCollision(const dNewtonCollision& cpySrc)
-{
-}
 
-dNewtonCollision* dNewtonCollision::Clone() const
+dNewtonCollision* dNewtonCollision::Clone(NewtonCollision* const shape) const
 {
-	_ASSERTE (0);
-	return NULL;
+	return new dNewtonCollision (shape);
 }
 
 dNewtonCollision::~dNewtonCollision()
 {
+	if (m_shape) {
+		NewtonCollisionSetUserData (m_shape, NULL);
+		NewtonDestroyCollision(m_shape);
+	}
+}
+
+NewtonCollision* dNewtonCollision::GetShape() const
+{
+	return m_shape;
 }
 
 

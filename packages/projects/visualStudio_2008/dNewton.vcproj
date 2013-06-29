@@ -632,6 +632,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\dNewton\dNewtonSceneBody.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dNewton\dNewtonSceneBody.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\dNewton\dStdAfxNewton.cpp"
 			>
 			<FileConfiguration

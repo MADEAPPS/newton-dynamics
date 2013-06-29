@@ -19,30 +19,18 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _D_NEWTON_COLLISION_H_
-#define _D_NEWTON_COLLISION_H_
+#ifndef _D_NEWTON_SCENE_BODY_H_
+#define _D_NEWTON_SCENE_BODY_H_
+
 
 #include "dStdAfxNewton.h"
+#include "dNewtonBody.h"
 
-class dNewton;
-
-class dNewtonCollision
+class dNewtonSceneBody: public dNewtonBody  
 {
 	public:
-	CNEWTON_API void *operator new (size_t size);
-	CNEWTON_API void operator delete (void* ptr);
-
-	CNEWTON_API dNewtonCollision(NewtonCollision* const shape);
-	CNEWTON_API virtual ~dNewtonCollision();
-
-	NewtonCollision* GetShape() const;
-
-	protected:
-	CNEWTON_API virtual dNewtonCollision* Clone(NewtonCollision* const shape) const; 
-	
-	NewtonCollision* m_shape;
-
-	friend dNewton;
+	CNEWTON_API dNewtonSceneBody(dNewton* const world);
+	CNEWTON_API virtual ~dNewtonSceneBody();
 };
 
 #endif

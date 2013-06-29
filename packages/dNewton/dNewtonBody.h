@@ -34,8 +34,13 @@ class dNewtonBody
 	CNEWTON_API void operator delete (void* ptr);
 
 	CNEWTON_API virtual ~dNewtonBody();
+
 	protected:
 	CNEWTON_API dNewtonBody();
+	void SetBody (NewtonBody* const body);
+
+	private: 
+	CNEWTON_API static void OnBodyDestroy (const NewtonBody* const body);
 
 	NewtonBody* m_body;
 };

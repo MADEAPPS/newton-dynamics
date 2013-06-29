@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2013> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2011> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -19,30 +19,25 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _D_NEWTON_COLLISION_H_
-#define _D_NEWTON_COLLISION_H_
-
 #include "dStdAfxNewton.h"
+#include "dNewton.h"
+#include "dNewtonCollision.h"
+#include "dNewtonSceneBody.h"
 
-class dNewton;
 
-class dNewtonCollision
+
+dNewtonSceneBody::dNewtonSceneBody(dNewton* const dWorld)
+	:dNewtonBody()
 {
-	public:
-	CNEWTON_API void *operator new (size_t size);
-	CNEWTON_API void operator delete (void* ptr);
+	NewtonWorld* const world = dWorld->GetNewton ();
 
-	CNEWTON_API dNewtonCollision(NewtonCollision* const shape);
-	CNEWTON_API virtual ~dNewtonCollision();
+	dNewtonCollision collision (NewtonCreateSceneCollision(world, 0));
 
-	NewtonCollision* GetShape() const;
+	dMatrix matrix (GetIdentityMatrix());
+	SetBody (NewtonCreateDynamicBody (world, collision.GetShape(), &matrix[0][0]));
+}
 
-	protected:
-	CNEWTON_API virtual dNewtonCollision* Clone(NewtonCollision* const shape) const; 
-	
-	NewtonCollision* m_shape;
+dNewtonSceneBody::~dNewtonSceneBody()
+{
+}
 
-	friend dNewton;
-};
-
-#endif
