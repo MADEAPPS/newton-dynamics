@@ -10,9 +10,8 @@
 */
 
 
-#ifndef __dCustomList__
-#define __dCustomList__
-
+#ifndef _CUSTOM_LIST_H_
+#define _CUSTOM_LIST_H_
 
 
 // this is a small double link list container similar to STL, 

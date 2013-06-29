@@ -780,10 +780,6 @@
 				RelativePath="..\..\dCustomJoints\CustomUserBlank.h"
 				>
 			</File>
-			<File
-				RelativePath="..\..\dCustomJoints\dCustomList.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="extentions"

@@ -28,35 +28,38 @@ typedef void* (*CNewtonAllocMemory) (int sizeInBytes);
 typedef void (*CNewtonFreeMemory) (void* const ptr, int sizeInBytes);
 
 
-#define CNEWTON_MAX_PHYSICS_LOOPS 2	
 
 class dNewtonBody;
 
 class dNewton  
 {
 	public:
-	CNEWTON_API void *operator new (size_t size);
-	CNEWTON_API void operator delete (void *ptr);
-
 	CNEWTON_API dNewton();
 	CNEWTON_API virtual ~dNewton();
 
+	CNEWTON_API void *operator new (size_t size);
+	CNEWTON_API void operator delete (void* ptr);
+
 	CNEWTON_API void Update (dFloat timestepInSecunds);
 	CNEWTON_API void UpdateAsync (dFloat timestepInSecunds);
+
+	CNEWTON_API void SetMaxUpdatesPerIterations (int update);
 
 	protected:
 	CNEWTON_API void ResetTimer();
 	CNEWTON_API dLong GetTimeInMicrosenconds() const; 
 
 	private:
-	// default memory allocation funtions if not other is provided 
+	// default memory allocation functions if not other is provided 
 	CNEWTON_API static void SetAllocationDrivers (CNewtonAllocMemory alloc, CNewtonFreeMemory free);
 
 	NewtonWorld* m_world;
 
+	
 	dLong m_frequency;
 	dLong m_baseCount;
 	dLong m_microsecunds;
+	int m_maxUpdatePerIterations;
 };
 
 #endif

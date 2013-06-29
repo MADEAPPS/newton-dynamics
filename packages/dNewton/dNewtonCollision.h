@@ -30,7 +30,7 @@ class dNewtonCollision
 {
 	public:
 	CNEWTON_API void *operator new (size_t size);
-	CNEWTON_API void operator delete (void *ptr);
+	CNEWTON_API void operator delete (void* ptr);
 
 	CNEWTON_API dNewtonCollision(dNewton* const world);
 	CNEWTON_API dNewtonCollision(const dNewtonCollision& cpySrc);

@@ -31,7 +31,7 @@ class dNewtonBody
 {
 	public:
 	CNEWTON_API void *operator new (size_t size);
-	CNEWTON_API void operator delete (void *ptr);
+	CNEWTON_API void operator delete (void* ptr);
 
 	CNEWTON_API virtual ~dNewtonBody();
 	protected:

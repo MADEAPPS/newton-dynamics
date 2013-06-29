@@ -23,11 +23,12 @@
 #include "dNewton.h"
 
 dNewton::dNewton()
+	:m_maxUpdatePerIterations(2)
 {
-	// create a newtop world
+	// create a newton world
 	m_world = NewtonCreate();
 
-	// for two way comunication between low and high lever, link the world with this class for 
+	// for two way communication between low and high lever, link the world with this class for 
 	NewtonWorldSetUserData(m_world, this);
 
 	// set the simplified solver mode (faster but less accurate)
@@ -44,6 +45,11 @@ dNewton::~dNewton()
 {
 	NewtonWaitForUpdateToFinish (m_world);
 	NewtonDestroy (m_world);
+}
+
+void dNewton::SetMaxUpdatesPerIterations (int update)
+{
+	m_maxUpdatePerIterations = update;
 }
 
 void dNewton::SetAllocationDrivers (CNewtonAllocMemory alloc, CNewtonFreeMemory free)
@@ -132,13 +138,13 @@ void dNewton::Update (dFloat timestepInSecunds)
 
 	dLong nextTime = currentTime - m_microsecunds;
 	int loops = 0;
-	while ((nextTime >= timestepMicrosecunds) && (loops < CNEWTON_MAX_PHYSICS_LOOPS)) {
+	while ((nextTime >= timestepMicrosecunds) && (loops < m_maxUpdatePerIterations)) {
 		loops ++;
 		NewtonUpdate (m_world, timestepInSecunds);
 		nextTime -= timestepMicrosecunds;
 		m_microsecunds += timestepMicrosecunds;
 	}
-	if (loops >= CNEWTON_MAX_PHYSICS_LOOPS) {
+	if (loops >= m_maxUpdatePerIterations) {
 		ResetTimer();
 	}
 }
@@ -150,13 +156,13 @@ void dNewton::UpdateAsync (dFloat timestepInSecunds)
 
 	dLong nextTime = currentTime - m_microsecunds;
 	int loops = 0;
-	while ((nextTime >= timestepMicrosecunds) && (loops < CNEWTON_MAX_PHYSICS_LOOPS)) {
+	while ((nextTime >= timestepMicrosecunds) && (loops < m_maxUpdatePerIterations)) {
 		loops ++;
 		NewtonUpdateAsync (m_world, timestepInSecunds);
 		nextTime -= timestepMicrosecunds;
 		m_microsecunds += timestepMicrosecunds;
 	}
-	if (loops >= CNEWTON_MAX_PHYSICS_LOOPS) {
+	if (loops >= m_maxUpdatePerIterations) {
 		ResetTimer();
 	}
 }
