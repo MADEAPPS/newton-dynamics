@@ -35,7 +35,7 @@ class dNewtonCollision
 	CNEWTON_API dNewtonCollision(NewtonCollision* const shape);
 	CNEWTON_API virtual ~dNewtonCollision();
 
-	NewtonCollision* GetShape() const;
+	CNEWTON_API NewtonCollision* GetShape() const;
 
 	protected:
 	CNEWTON_API virtual dNewtonCollision* Clone(NewtonCollision* const shape) const; 
