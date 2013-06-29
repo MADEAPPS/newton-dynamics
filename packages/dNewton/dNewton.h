@@ -46,6 +46,7 @@ class dNewton
 	CNEWTON_API void SetMaxUpdatesPerIterations (int update);
 
 	CNEWTON_API NewtonWorld* GetNewton () const;
+	CNEWTON_API dLong GetPhysicsTimeInMicroSeconds() const;
 
 	protected:
 	CNEWTON_API void ResetTimer();
@@ -63,7 +64,8 @@ class dNewton
 	NewtonWorld* m_world;
 	dLong m_frequency;
 	dLong m_baseCount;
-	dLong m_microsecunds;
+	dLong m_microseconds;
+	dLong m_lastPhysicTimeInMicroseconds;
 	int m_maxUpdatePerIterations;
 };
 
