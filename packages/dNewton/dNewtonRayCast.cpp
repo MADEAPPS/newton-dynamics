@@ -27,8 +27,7 @@
 
 
 dNewtonRayCast::dNewtonRayCast(dNewton* const dWorld)
-	:m_param(1.0f)
-	,m_world(dWorld)
+	:m_world(dWorld)
 {
 }
 
@@ -39,7 +38,6 @@ dNewtonRayCast::~dNewtonRayCast()
 
 void dNewtonRayCast::CastRay (const dFloat* const p0, const dFloat* const p1, int threadIndex)
 {
-	m_param = 1.2f;
 	NewtonWorldRayCast (m_world->GetNewton(), p0, p1, RayFilterCallback, this, PrefilterCallback, threadIndex);	
 }
 

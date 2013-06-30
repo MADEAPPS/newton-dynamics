@@ -48,7 +48,6 @@ class dNewtonRayCast
 	CNEWTON_API static dFloat RayFilterCallback(const NewtonBody* const body, const NewtonCollision* const shapeHit, const dFloat* const hitContact, const dFloat* const hitNormal, int* const collisionID, void* const userData, dFloat intersectParam);
 	CNEWTON_API static unsigned PrefilterCallback(const NewtonBody* const body, const NewtonCollision* const collision, void* const userData);
 
-	dFloat m_param;
 	dNewton* m_world;
 };
 
