@@ -21,11 +21,14 @@
 
 #include "dStdAfxNewton.h"
 #include "dNewton.h"
+#include "dNewtonBody.h"
 #include "dNewtonRayCast.h"
+#include "dNewtonCollision.h"
 
 
 dNewtonRayCast::dNewtonRayCast(dNewton* const dWorld)
-	:m_world(dWorld)
+	:m_param(1.0f)
+	,m_world(dWorld)
 {
 }
 
@@ -36,19 +39,24 @@ dNewtonRayCast::~dNewtonRayCast()
 
 void dNewtonRayCast::CastRay (const dFloat* const p0, const dFloat* const p1, int threadIndex)
 {
-	dAssert (0);
+	m_param = 1.2f;
+	NewtonWorldRayCast (m_world->GetNewton(), p0, p1, RayFilterCallback, this, PrefilterCallback, threadIndex);	
 }
 
 
 dFloat dNewtonRayCast::RayFilterCallback(const NewtonBody* const body, const NewtonCollision* const shapeHit, const dFloat* const hitContact, const dFloat* const hitNormal, int* const collisionID, void* const userData, dFloat intersectParam)
 {
-	dAssert (0);
-	return 0;
+	dNewtonRayCast* const me = (dNewtonRayCast*) userData;
+	const dNewtonBody* const myBody = (dNewtonBody*) NewtonBodyGetUserData(body);
+	const dNewtonCollision* const myCollision = (dNewtonCollision*) NewtonCollisionGetUserData(shapeHit);
+	return me->OnRayHit (myBody, myCollision, hitContact, hitNormal, collisionID, intersectParam);
 }
 
 unsigned dNewtonRayCast::PrefilterCallback(const NewtonBody* const body, const NewtonCollision* const collision, void* const userData)
 {
-	dAssert (0);
-	return 0;
+	dNewtonRayCast* const me = (dNewtonRayCast*) userData;
+	const dNewtonBody* const myBody = (dNewtonBody*) NewtonBodyGetUserData(body);
+	const dNewtonCollision* const myCollision = (dNewtonCollision*) NewtonCollisionGetUserData(collision);
+	return me->OnPrefilter (myBody, myCollision);
 }
 

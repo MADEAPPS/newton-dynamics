@@ -49,8 +49,15 @@ void dNewtonSceneBody::BeginAddRemoveCollision()
 
 void dNewtonSceneBody::EndAddRemoveCollision()
 {
+	
 	dNewtonCollisionScene* const scene = (dNewtonCollisionScene*) GetCollision();
 	scene->EndAddRemoveCollision();
+
+	// need to update the aabb in the broad phase, for this we call set matrix
+	dMatrix matrix;
+	NewtonBody* const body = GetNewtonBody();
+	NewtonBodyGetMatrix(body, &matrix[0][0]);
+	NewtonBodySetMatrix(body, &matrix[0][0]);
 }
 
 void* dNewtonSceneBody::AddCollision(const dNewtonCollision* const collision)
