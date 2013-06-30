@@ -1065,7 +1065,6 @@ void dgBroadPhase::CalculatePairContacts (dgBroadphaseSyncDescriptor* const desc
 	
 	dgFloat32 timestep = descriptor->m_timestep;
 	dgCollidingPairCollector* const pairCollector = m_world;
-//	dgCollidingPairCollector::dgPair* const pairs = pairCollector->m_pairs;
 	dgCollidingPairCollector::dgPair* const pairs = (dgCollidingPairCollector::dgPair*) &m_world->m_pairMemoryBuffer[0];
 	const dgInt32 count = pairCollector->m_count;
 

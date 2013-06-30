@@ -333,8 +333,10 @@ dgCollidingPairCollector::~dgCollidingPairCollector ()
 
 void dgCollidingPairCollector::Init ()
 {
-	//dgWorld* const world = (dgWorld*) this;
+	dgWorld* const world = (dgWorld*) this;
 	//m_pairs = (dgPair*) &world->m_pairMemoryBuffer[0];
+	// need to expand teh buffer is needed 
+	world->m_pairMemoryBuffer[0];
 	m_count = 0;
 }
 
@@ -371,10 +373,8 @@ void dgCollidingPairCollector::AddPair (dgContact* const contact, dgInt32 thread
 			dgThreadHiveScopeLock lock (world, &m_lock);
 			if (world->m_pairMemoryBuffer.ExpandCapacityIfNeessesary (m_count, sizeof (dgPair))) {
 				m_maxSize = dgInt32 (world->m_pairMemoryBuffer.GetBytesCapacity() / sizeof (dgPair));
-				//m_pairs = (dgPair*) &world->m_pairMemoryBuffer[0];
 			}
 			dgPair* const pairs = (dgPair*) &world->m_pairMemoryBuffer[0];
-			//dgPair* const pair = &m_pairs[m_count];
 			dgPair* const pair = &pairs[m_count];
 			m_count ++;
 			pair->m_contact = contact;
