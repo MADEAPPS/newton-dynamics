@@ -31,6 +31,7 @@ class dNewtonCollision
 	public:
 	enum dCollsionType
 	{
+		m_box,
 		m_mesh,
 		m_scene,
 	};
@@ -56,11 +57,32 @@ class dNewtonCollision
 };
 
 
+class dNewtonCollisionBox: public dNewtonCollision
+{
+	public: 
+	dNewtonCollisionBox (dNewton* const world, dFloat x, dFloat y, dFloat z, int id);
+	dNewtonCollision* Clone(NewtonCollision* const shape) const 
+	{
+		return new dNewtonCollisionBox (shape, m_type);
+	}
+
+	protected:
+	dNewtonCollisionBox (NewtonCollision* const shape, dCollsionType type)
+		:dNewtonCollision (shape, type)
+	{
+	}
+};
+
+
 class dNewtonCollisionMesh: public dNewtonCollision
 {
 	public: 
 	CNEWTON_API dNewtonCollisionMesh (dNewton* const world);
-	CNEWTON_API dNewtonCollision* Clone(NewtonCollision* const shape) const;
+	dNewtonCollision* Clone(NewtonCollision* const shape) const 
+	{
+		return new dNewtonCollisionMesh (shape, m_type);
+	}
+
 	CNEWTON_API virtual void BeginFace();
 	CNEWTON_API virtual void AddFace(int vertexCount, const dFloat* const vertexPtr, int strideInBytes, int faceAttribute);
 	CNEWTON_API virtual void EndFace();
@@ -70,7 +92,6 @@ class dNewtonCollisionMesh: public dNewtonCollision
 		:dNewtonCollision (shape, type)
 	{
 	}
-
 };
 
 
@@ -78,7 +99,12 @@ class dNewtonCollisionScene: public dNewtonCollision
 {
 	public: 
 	CNEWTON_API dNewtonCollisionScene (dNewton* const world);
-	CNEWTON_API dNewtonCollision* Clone(NewtonCollision* const shape) const;
+	dNewtonCollision* Clone(NewtonCollision* const shape) const 
+	{
+		dAssert (m_type == m_scene);
+		return new dNewtonCollisionScene (shape, m_type);
+	}
+
 
 	CNEWTON_API virtual void BeginAddRemoveCollision();
 	CNEWTON_API virtual void* AddCollision(const dNewtonCollision* const collision);

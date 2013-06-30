@@ -77,14 +77,6 @@ dNewtonCollisionMesh::dNewtonCollisionMesh(dNewton* const world)
 	SetShape (NewtonCreateTreeCollision(world->GetNewton(), 0));
 }
 
-dNewtonCollision* dNewtonCollisionMesh::Clone(NewtonCollision* const shape) const 
-{
-	dAssert(0);
-	return 0;
-//	dAssert (m_type == m_mesh);
-//	return new dNewtonCollisionScene (shape);
-}
-
 
 
 
@@ -111,11 +103,6 @@ dNewtonCollisionScene::dNewtonCollisionScene(dNewton* const world)
 	SetShape (NewtonCreateSceneCollision(world->GetNewton(), 0));
 }
 
-dNewtonCollision* dNewtonCollisionScene::Clone(NewtonCollision* const shape) const 
-{
-	dAssert (m_type == m_scene);
-	return new dNewtonCollisionScene (shape, m_type);
-}
 
 
 void dNewtonCollisionScene::BeginAddRemoveCollision()
@@ -138,3 +125,9 @@ void dNewtonCollisionScene::EndAddRemoveCollision()
 	NewtonSceneCollisionEndAddRemove(m_shape);	
 }
 
+
+dNewtonCollisionBox::dNewtonCollisionBox (dNewton* const world, dFloat x, dFloat y, dFloat z, int id)
+	:dNewtonCollision(m_box)
+{
+	SetShape (NewtonCreateBox(world->GetNewton(), x, y, z, id, NULL));
+}
