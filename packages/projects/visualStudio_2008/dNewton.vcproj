@@ -632,6 +632,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\dNewton\dNewtonRayCast.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dNewton\dNewtonRayCast.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\dNewton\dNewtonSceneBody.cpp"
 			>
 		</File>
