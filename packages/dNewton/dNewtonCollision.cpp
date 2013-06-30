@@ -90,8 +90,7 @@ dNewtonCollision* dNewtonCollisionMesh::Clone(NewtonCollision* const shape) cons
 
 void dNewtonCollisionMesh::BeginFace()
 {
-	dAssert(0);
-	//NewtonTreeCollisionBeginBuild(m_col);
+	NewtonTreeCollisionBeginBuild(m_shape);
 }
 
 void dNewtonCollisionMesh::AddFace(int vertexCount, const dFloat* const vertexPtr, int strideInBytes, int faceAttribute)
@@ -102,7 +101,8 @@ void dNewtonCollisionMesh::AddFace(int vertexCount, const dFloat* const vertexPt
 
 void dNewtonCollisionMesh::EndFace()
 {
-	dAssert(0);
+	//NewtonTreeCollisionEndBuild (m_shape, 1);
+	NewtonTreeCollisionEndBuild (m_shape, 0);
 }
 
 
