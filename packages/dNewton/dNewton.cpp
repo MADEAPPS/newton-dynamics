@@ -21,7 +21,22 @@
 
 #include "dStdAfxNewton.h"
 #include "dNewton.h"
+#include "dNewtonBody.h"
 #include "dNewtonCollision.h"
+
+dNewton::ScopeLock::ScopeLock (unsigned* const lock)
+	:m_atomicLock(lock)
+{
+	while (NewtonAtomicSwap((int*)m_atomicLock, 1)) {
+		NewtonYield();
+	}
+}
+
+dNewton::ScopeLock::~ScopeLock()
+{
+	NewtonAtomicSwap((int*)m_atomicLock, 0);	
+}
+
 
 dNewton::dNewton()
 	:m_maxUpdatePerIterations(2)
@@ -90,6 +105,18 @@ void* dNewton::operator new (size_t size)
 void dNewton::operator delete (void* ptr)
 {
 	NewtonFree(ptr);
+}
+
+dNewtonBody* dNewton::GetFirstBody() const
+{
+	NewtonBody* const newtonBody = NewtonWorldGetFirstBody(m_world);
+	return newtonBody ? (dNewtonBody*) NewtonBodyGetUserData(newtonBody) : NULL;
+}
+
+dNewtonBody* dNewton::GetNextBody(const dNewtonBody* const body) const
+{
+	NewtonBody* const newtonBody = NewtonWorldGetNextBody(m_world, body->GetNewtonBody());
+	return newtonBody ? (dNewtonBody*) NewtonBodyGetUserData(newtonBody) : NULL;
 }
 
 

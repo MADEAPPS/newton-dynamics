@@ -34,6 +34,15 @@ class dNewtonBody;
 class dNewton  
 {
 	public:
+	class ScopeLock
+	{
+		public:
+		CNEWTON_API ScopeLock (unsigned* const lock);
+		CNEWTON_API ~ScopeLock();
+
+		unsigned* m_atomicLock;
+	};
+
 	CNEWTON_API dNewton();
 	CNEWTON_API virtual ~dNewton();
 
@@ -48,6 +57,9 @@ class dNewton
 	CNEWTON_API NewtonWorld* GetNewton () const;
 	CNEWTON_API dLong GetPhysicsTimeInMicroSeconds() const;
 
+	CNEWTON_API dNewtonBody* GetFirstBody() const;
+	CNEWTON_API dNewtonBody* GetNextBody(const dNewtonBody* const body) const;
+
 	protected:
 	CNEWTON_API void ResetTimer();
 	CNEWTON_API dLong GetTimeInMicrosenconds() const; 
@@ -59,7 +71,6 @@ class dNewton
 	CNEWTON_API static void OnCollisionDestructorCallback (const NewtonWorld* const newtonWorld, const NewtonCollision* const collision);
 	CNEWTON_API static void OnCollisionCopyConstruct (const NewtonWorld* const newtonWorld, NewtonCollision* const collision, const NewtonCollision* const sourceCollision);
 	
-
 
 	NewtonWorld* m_world;
 	dLong m_frequency;

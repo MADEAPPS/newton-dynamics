@@ -34,8 +34,11 @@ class dNewtonBody
 	CNEWTON_API void operator delete (void* ptr);
 
 	CNEWTON_API virtual ~dNewtonBody();
-	CNEWTON_API NewtonBody* GetNewtonBody () const;
 
+	CNEWTON_API virtual void OnBodyTransform (const dFloat* const matrix, int threadIndex);
+
+	CNEWTON_API dNewton* GetNewton () const;
+	CNEWTON_API NewtonBody* GetNewtonBody () const;
 	CNEWTON_API dNewtonCollision* GetCollision() const;
 
 	protected:
@@ -44,8 +47,16 @@ class dNewtonBody
 
 	private: 
 	CNEWTON_API static void OnBodyDestroy (const NewtonBody* const body);
+	CNEWTON_API static void OnBodyTransform (const NewtonBody* const body, const dFloat* const matrix, int threadIndex);
 
+	dVector m_posit0;
+	dVector m_posit1;
+	dQuaternion m_rotat0;
+	dQuaternion m_rotat1;
 	NewtonBody* m_body;
+
+	unsigned m_lock;
+	
 };
 
 #endif

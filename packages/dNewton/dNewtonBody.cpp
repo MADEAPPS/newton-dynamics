@@ -20,12 +20,18 @@
 */
 
 #include "dStdAfxNewton.h"
+#include "dNewton.h"
 #include "dNewtonBody.h"
 #include "dNewtonCollision.h"
 
 
 dNewtonBody::dNewtonBody()
-	:m_body(NULL)
+	:m_posit0 (0.0f, 0.0f, 0.0f, 0.0f)
+	,m_posit1 (0.0f, 0.0f, 0.0f, 0.0f)
+	,m_rotat0()
+	,m_rotat1()
+	,m_body(NULL)
+	,m_lock(0)
 {
 }
 
@@ -52,10 +58,16 @@ NewtonBody* dNewtonBody::GetNewtonBody () const
 	return m_body;
 }
 
+dNewton* dNewtonBody::GetNewton () const
+{
+	return (dNewton*) NewtonWorldGetUserData(NewtonBodyGetWorld(m_body));
+}
+
 void dNewtonBody::SetBody (NewtonBody* const body)
 {
 	m_body = body;
 	NewtonBodySetUserData(m_body, this);
+	NewtonBodySetTransformCallback (m_body, OnBodyTransform);
 	NewtonBodySetDestructorCallback (m_body, OnBodyDestroy);
 }
 
@@ -67,6 +79,30 @@ void dNewtonBody::OnBodyDestroy (const NewtonBody* const body)
 		NewtonBodySetDestructorCallback (me->m_body, NULL);
 		delete me;
 	}
+}
+
+void dNewtonBody::OnBodyTransform (const dFloat* const matrix, int threadIndex)
+{
+	dMatrix transform (matrix);
+	dQuaternion rot (transform);
+	dNewton::ScopeLock scopelock (&m_lock);
+
+	m_posit0 = m_posit1;
+	m_rotat0 = m_rotat1;
+	m_posit1 = transform.m_posit;
+	m_rotat1 = rot;
+
+	dFloat angle = m_rotat0.DotProduct(m_rotat1);
+	if (angle < 0.0f) {
+		m_rotat1.Scale(-1.0f);
+	}
+}
+
+void dNewtonBody::OnBodyTransform (const NewtonBody* const body, const dFloat* const matrix, int threadIndex)
+{
+	dNewtonBody* const me = (dNewtonBody*) NewtonBodyGetUserData(body);
+	dAssert (me);
+	me->OnBodyTransform (matrix, threadIndex);
 }
 
 
