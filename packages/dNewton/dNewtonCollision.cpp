@@ -20,21 +20,25 @@
 */
 
 #include "dStdAfxNewton.h"
+#include "dNewton.h"
 #include "dNewtonCollision.h"
 
 
+dNewtonCollision::dNewtonCollision(dCollsionType type)
+	:m_shape (NULL)
+	,m_type (type)
+{
+}
 
-dNewtonCollision::dNewtonCollision(NewtonCollision* const shape)
+
+
+dNewtonCollision::dNewtonCollision(NewtonCollision* const shape, dCollsionType type)
 	:m_shape (shape)
+	,m_type (type)
 {
-	NewtonCollisionSetUserData (m_shape, this);
+	SetShape (shape);
 }
 
-
-dNewtonCollision* dNewtonCollision::Clone(NewtonCollision* const shape) const
-{
-	return new dNewtonCollision (shape);
-}
 
 dNewtonCollision::~dNewtonCollision()
 {
@@ -49,6 +53,11 @@ NewtonCollision* dNewtonCollision::GetShape() const
 	return m_shape;
 }
 
+void dNewtonCollision::SetShape (NewtonCollision* const shape)
+{
+	m_shape = shape;
+	NewtonCollisionSetUserData (m_shape, this);
+}
 
 void* dNewtonCollision::operator new (size_t size)
 {
@@ -60,4 +69,74 @@ void dNewtonCollision::operator delete (void* ptr)
 	NewtonFree(ptr);
 }
 
+
+
+dNewtonCollisionMesh::dNewtonCollisionMesh(dNewton* const world)
+	:dNewtonCollision(m_mesh)
+{
+	SetShape (NewtonCreateTreeCollision(world->GetNewton(), 0));
+}
+
+dNewtonCollision* dNewtonCollisionMesh::Clone(NewtonCollision* const shape) const 
+{
+	dAssert(0);
+	return 0;
+//	dAssert (m_type == m_mesh);
+//	return new dNewtonCollisionScene (shape);
+}
+
+
+
+
+void dNewtonCollisionMesh::BeginFace()
+{
+	dAssert(0);
+	//NewtonTreeCollisionBeginBuild(m_col);
+}
+
+void dNewtonCollisionMesh::AddFace(int vertexCount, const dFloat* const vertexPtr, int strideInBytes, int faceAttribute)
+{
+	dAssert(0);
+//	 NewtonTreeCollisionAddFace (m_shape, vertexCount, vertexPtr, strideInBytes, faceAttribute);
+}
+
+void dNewtonCollisionMesh::EndFace()
+{
+	dAssert(0);
+}
+
+
+dNewtonCollisionScene::dNewtonCollisionScene(dNewton* const world)
+	:dNewtonCollision(m_scene)
+{
+	SetShape (NewtonCreateSceneCollision(world->GetNewton(), 0));
+}
+
+dNewtonCollision* dNewtonCollisionScene::Clone(NewtonCollision* const shape) const 
+{
+	dAssert (m_type == m_scene);
+	return new dNewtonCollisionScene (shape, m_type);
+}
+
+
+void dNewtonCollisionScene::BeginAddRemoveCollision()
+{
+	NewtonSceneCollisionBeginAddRemove (m_shape);	
+}
+
+void* dNewtonCollisionScene::AddCollision(const dNewtonCollision* const collision)
+{
+	dAssert(0);
+	return NULL;
+}
+
+void dNewtonCollisionScene::RemoveCollision (void* const handle)
+{
+	dAssert(0);
+}
+
+void dNewtonCollisionScene::EndAddRemoveCollision()
+{
+	NewtonSceneCollisionEndAddRemove(m_shape);	
+}
 

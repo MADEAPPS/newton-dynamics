@@ -34,6 +34,9 @@ class dNewtonBody
 	CNEWTON_API void operator delete (void* ptr);
 
 	CNEWTON_API virtual ~dNewtonBody();
+	CNEWTON_API NewtonBody* GetNewtonBody () const;
+
+	CNEWTON_API dNewtonCollision* GetCollision() const;
 
 	protected:
 	CNEWTON_API dNewtonBody();

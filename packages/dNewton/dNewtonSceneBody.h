@@ -29,8 +29,13 @@
 class dNewtonSceneBody: public dNewtonBody  
 {
 	public:
-	CNEWTON_API dNewtonSceneBody(dNewton* const world);
+	CNEWTON_API dNewtonSceneBody (dNewton* const world);
 	CNEWTON_API virtual ~dNewtonSceneBody();
+
+	CNEWTON_API virtual void BeginAddRemoveCollision();
+	CNEWTON_API virtual void* AddCollision(const dNewtonCollision* const collision);
+	CNEWTON_API virtual void RemoveCollision (void* const handle);
+	CNEWTON_API virtual void EndAddRemoveCollision();
 };
 
 #endif

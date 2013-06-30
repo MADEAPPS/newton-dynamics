@@ -21,7 +21,7 @@
 
 #include "dStdAfxNewton.h"
 #include "dNewtonBody.h"
-
+#include "dNewtonCollision.h"
 
 
 dNewtonBody::dNewtonBody()
@@ -47,6 +47,11 @@ void dNewtonBody::operator delete (void* ptr)
 	NewtonFree(ptr);
 }
 
+NewtonBody* dNewtonBody::GetNewtonBody () const
+{
+	return m_body;
+}
+
 void dNewtonBody::SetBody (NewtonBody* const body)
 {
 	m_body = body;
@@ -62,4 +67,10 @@ void dNewtonBody::OnBodyDestroy (const NewtonBody* const body)
 		NewtonBodySetDestructorCallback (me->m_body, NULL);
 		delete me;
 	}
+}
+
+
+dNewtonCollision* dNewtonBody::GetCollision() const
+{
+	return (dNewtonCollisionScene*) NewtonCollisionGetUserData(NewtonBodyGetCollision (m_body));
 }

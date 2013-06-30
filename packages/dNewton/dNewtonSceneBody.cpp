@@ -31,7 +31,7 @@ dNewtonSceneBody::dNewtonSceneBody(dNewton* const dWorld)
 {
 	NewtonWorld* const world = dWorld->GetNewton ();
 
-	dNewtonCollision collision (NewtonCreateSceneCollision(world, 0));
+	dNewtonCollisionScene collision (dWorld);
 
 	dMatrix matrix (GetIdentityMatrix());
 	SetBody (NewtonCreateDynamicBody (world, collision.GetShape(), &matrix[0][0]));
@@ -40,4 +40,30 @@ dNewtonSceneBody::dNewtonSceneBody(dNewton* const dWorld)
 dNewtonSceneBody::~dNewtonSceneBody()
 {
 }
+
+void dNewtonSceneBody::BeginAddRemoveCollision()
+{
+	dNewtonCollisionScene* const scene = (dNewtonCollisionScene*) GetCollision();
+	scene->BeginAddRemoveCollision();
+}
+
+void dNewtonSceneBody::EndAddRemoveCollision()
+{
+	dNewtonCollisionScene* const scene = (dNewtonCollisionScene*) GetCollision();
+	scene->EndAddRemoveCollision();
+}
+
+void* dNewtonSceneBody::AddCollision(const dNewtonCollision* const collision)
+{
+	dNewtonCollisionScene* const scene = (dNewtonCollisionScene*) GetCollision();
+	return scene->AddCollision(collision);
+}
+
+void dNewtonSceneBody::RemoveCollision (void* const handle)
+{
+	dNewtonCollisionScene* const scene = (dNewtonCollisionScene*) GetCollision();
+	scene->RemoveCollision(handle);
+}
+
+
 

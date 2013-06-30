@@ -725,7 +725,7 @@ extern "C" {
 
 	NEWTON_API void NewtonTreeCollisionSetUserRayCastCallback (const NewtonCollision* const treeCollision, NewtonCollisionTreeRayCastCallback rayHitCallback);
 
-	NEWTON_API void NewtonTreeCollisionBeginBuild (const NewtonCollision* treeCollision);
+	NEWTON_API void NewtonTreeCollisionBeginBuild (const NewtonCollision* const treeCollision);
 	NEWTON_API void NewtonTreeCollisionAddFace (const NewtonCollision* const treeCollision, int vertexCount, const dFloat* const vertexPtr, int strideInBytes, int faceAttribute);
 	NEWTON_API void NewtonTreeCollisionEndBuild (const NewtonCollision* const treeCollision, int optimize);
 

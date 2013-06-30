@@ -3324,7 +3324,7 @@ void NewtonHeightFieldSetUserRayCastCallback (const NewtonCollision* const heigh
 // Return: Nothing.
 //
 // See also: NewtonTreeCollisionAddFace, NewtonTreeCollisionEndBuild
-void NewtonTreeCollisionBeginBuild(const NewtonCollision* treeCollision)
+void NewtonTreeCollisionBeginBuild(const NewtonCollision* const treeCollision)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionBVH* const collision = (dgCollisionBVH*) ((dgCollisionInstance*)treeCollision)->GetChildShape();
