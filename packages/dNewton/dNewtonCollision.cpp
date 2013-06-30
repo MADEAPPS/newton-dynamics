@@ -95,8 +95,7 @@ void dNewtonCollisionMesh::BeginFace()
 
 void dNewtonCollisionMesh::AddFace(int vertexCount, const dFloat* const vertexPtr, int strideInBytes, int faceAttribute)
 {
-	dAssert(0);
-//	 NewtonTreeCollisionAddFace (m_shape, vertexCount, vertexPtr, strideInBytes, faceAttribute);
+	NewtonTreeCollisionAddFace (m_shape, vertexCount, vertexPtr, strideInBytes, faceAttribute);
 }
 
 void dNewtonCollisionMesh::EndFace()
@@ -126,13 +125,12 @@ void dNewtonCollisionScene::BeginAddRemoveCollision()
 
 void* dNewtonCollisionScene::AddCollision(const dNewtonCollision* const collision)
 {
-	dAssert(0);
-	return NULL;
+	return NewtonSceneCollisionAddSubCollision (m_shape, collision->GetShape());
 }
 
 void dNewtonCollisionScene::RemoveCollision (void* const handle)
 {
-	dAssert(0);
+	NewtonSceneCollisionRemoveSubCollision (m_shape, handle);
 }
 
 void dNewtonCollisionScene::EndAddRemoveCollision()
