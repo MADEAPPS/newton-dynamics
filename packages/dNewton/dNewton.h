@@ -52,10 +52,14 @@ class dNewton
 	CNEWTON_API void Update (dFloat timestepInSecunds);
 	CNEWTON_API void UpdateAsync (dFloat timestepInSecunds);
 
+	CNEWTON_API dFloat GetInteplationParam(dFloat timestepInSecunds) const;
+
+
 	CNEWTON_API void SetMaxUpdatesPerIterations (int update);
 
 	CNEWTON_API NewtonWorld* GetNewton () const;
 
+	
 
 	CNEWTON_API dNewtonBody* GetFirstBody() const;
 	CNEWTON_API dNewtonBody* GetNextBody(const dNewtonBody* const body) const;

@@ -93,12 +93,36 @@ void dNewtonBody::OnBodyDestroy (const NewtonBody* const body)
 	}
 }
 
+bool dNewtonBody::GetSleepState() const
+{
+	return NewtonBodyGetSleepState(m_body) ? true : false;
+}
+
+dMatrix dNewtonBody::GetVisualMatrix (dFloat param) const
+{
+	dVector p0 (0.0f, 0.0f,0.0f, 0.0f);
+	dVector p1 (0.0f, 0.0f,0.0f, 0.0f);
+	dQuaternion r0;
+	dQuaternion r1;
+	{
+		dNewton::ScopeLock scopelock (&m_lock);
+		p0 = m_posit0;
+		p1 = m_posit1;
+		r0 = m_rotat0;
+		r1 = m_rotat1;
+	}
+
+	dVector posit (p0 + (p1 - p0).Scale (param));
+	dQuaternion rotation (r0.Slerp(r1, param));
+	return dMatrix (rotation, posit);
+}
+
 void dNewtonBody::OnBodyTransform (const dFloat* const matrix, int threadIndex)
 {
 	dMatrix transform (matrix);
 	dQuaternion rot (transform);
-	dNewton::ScopeLock scopelock (&m_lock);
 
+	dNewton::ScopeLock scopelock (&m_lock);
 	m_posit0 = m_posit1;
 	m_rotat0 = m_rotat1;
 	m_posit1 = transform.m_posit;

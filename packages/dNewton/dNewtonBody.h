@@ -44,6 +44,9 @@ class dNewtonBody
 	CNEWTON_API NewtonBody* GetNewtonBody () const;
 	CNEWTON_API dNewtonCollision* GetCollision() const;
 
+	CNEWTON_API bool GetSleepState() const;
+	CNEWTON_API dMatrix GetVisualMatrix (dFloat param) const;
+
 	protected:
 	CNEWTON_API dNewtonBody();
 	void SetBody (NewtonBody* const body);
@@ -59,7 +62,7 @@ class dNewtonBody
 	NewtonBody* m_body;
 	void* m_userData;
 
-	unsigned m_lock;
+	mutable unsigned m_lock;
 	
 };
 
