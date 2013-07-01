@@ -32,6 +32,7 @@ dNewtonBody::dNewtonBody()
 	,m_rotat1()
 	,m_body(NULL)
 	,m_lock(0)
+	,m_userData(NULL)
 {
 }
 
@@ -57,6 +58,17 @@ NewtonBody* dNewtonBody::GetNewtonBody () const
 {
 	return m_body;
 }
+
+void dNewtonBody::SetUserData(void* const userData)
+{
+	m_userData = userData;
+}
+
+void* dNewtonBody::GetUserData() const
+{
+	return m_userData;
+}
+
 
 dNewton* dNewtonBody::GetNewton () const
 {

@@ -149,10 +149,6 @@ void dNewton::ResetTimer()
 	m_microseconds = GetTimeInMicrosenconds();
 }
 
-dLong dNewton::GetPhysicsTimeInMicroSeconds() const
-{
-	return m_lastPhysicTimeInMicroseconds;
-}
 
 dLong dNewton::GetTimeInMicrosenconds() const 
 {
@@ -200,7 +196,7 @@ void dNewton::Update (dFloat timestepInSecunds)
 	if (loops >= m_maxUpdatePerIterations) {
 		ResetTimer();
 	}
-	m_lastPhysicTimeInMicroseconds = GetTimeInMicrosenconds () - currentTime;
+	
 }
 
 void dNewton::UpdateAsync (dFloat timestepInSecunds)
@@ -219,5 +215,4 @@ void dNewton::UpdateAsync (dFloat timestepInSecunds)
 	if (loops >= m_maxUpdatePerIterations) {
 		ResetTimer();
 	}
-	m_lastPhysicTimeInMicroseconds = GetTimeInMicrosenconds () - currentTime;
 }
