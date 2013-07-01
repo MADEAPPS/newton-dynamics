@@ -36,7 +36,7 @@ dNewtonBody::dNewtonBody()
 {
 }
 
-dNewtonBody::dNewtonBody (dNewton* const dWorld, const dNewtonCollision* const collision, void* const userData, const dMatrix& location)
+dNewtonBody::dNewtonBody (dNewton* const dWorld, dFloat mass, const dNewtonCollision* const collision, void* const userData, const dMatrix& location)
 	:m_posit0 (location.m_posit)
 	,m_posit1 (location.m_posit)
 	,m_rotat0(dQuaternion(location))
@@ -45,7 +45,12 @@ dNewtonBody::dNewtonBody (dNewton* const dWorld, const dNewtonCollision* const c
 	,m_userData(userData)
 {
 	NewtonWorld* const world = dWorld->GetNewton ();
-	SetBody (NewtonCreateDynamicBody (world, collision->GetShape(), &location[0][0]));
+	NewtonBody* const body = NewtonCreateDynamicBody (world, collision->GetShape(), &location[0][0]);
+
+	NewtonCollision* const shape = NewtonBodyGetCollision(body);
+	NewtonBodySetMassProperties(body, mass, shape);
+
+	SetBody (body);
 }
 
 dNewtonBody::~dNewtonBody()
@@ -81,6 +86,21 @@ void* dNewtonBody::GetUserData() const
 	return m_userData;
 }
 
+void dNewtonBody::SetForce (const dFloat* const force) const
+{
+	NewtonBodySetForce(m_body, force);
+}
+
+void dNewtonBody::SetTorque (const dFloat* const torque) const
+{
+	NewtonBodySetTorque(m_body, torque);
+}
+
+
+void dNewtonBody::GetMassAndInertia (dFloat& mass, dFloat& Ixx, dFloat& Iyy, dFloat& Izz) const
+{
+	NewtonBodyGetMassMatrix(m_body, &mass, &Ixx, &Iyy, &Izz);
+}
 
 dNewton* dNewtonBody::GetNewton () const
 {
@@ -93,6 +113,7 @@ void dNewtonBody::SetBody (NewtonBody* const body)
 	NewtonBodySetUserData(m_body, this);
 	NewtonBodySetTransformCallback (m_body, OnBodyTransform);
 	NewtonBodySetDestructorCallback (m_body, OnBodyDestroy);
+	NewtonBodySetForceAndTorqueCallback(m_body, OnForceAndTorque);
 }
 
 
