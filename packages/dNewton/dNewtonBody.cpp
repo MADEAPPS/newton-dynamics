@@ -36,6 +36,18 @@ dNewtonBody::dNewtonBody()
 {
 }
 
+dNewtonBody::dNewtonBody (dNewton* const dWorld, const dNewtonCollision* const collision, void* const userData, const dMatrix& location)
+	:m_posit0 (location.m_posit)
+	,m_posit1 (location.m_posit)
+	,m_rotat0(dQuaternion(location))
+	,m_rotat1(dQuaternion(location))
+	,m_lock(0)
+	,m_userData(userData)
+{
+	NewtonWorld* const world = dWorld->GetNewton ();
+	SetBody (NewtonCreateDynamicBody (world, collision->GetShape(), &location[0][0]));
+}
+
 dNewtonBody::~dNewtonBody()
 {
 	if (NewtonBodyGetDestructorCallback(m_body)) {

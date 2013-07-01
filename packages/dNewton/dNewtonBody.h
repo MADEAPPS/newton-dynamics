@@ -33,6 +33,7 @@ class dNewtonBody
 	CNEWTON_API void *operator new (size_t size);
 	CNEWTON_API void operator delete (void* ptr);
 
+	CNEWTON_API dNewtonBody(dNewton* const world, const dNewtonCollision* const collision, void* const userData, const dMatrix& location);
 	CNEWTON_API virtual ~dNewtonBody();
 
 	CNEWTON_API virtual void OnForceAndTorque (dFloat timestep, int threadIndex) = 0;
