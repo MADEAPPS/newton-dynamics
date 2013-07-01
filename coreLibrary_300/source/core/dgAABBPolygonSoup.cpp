@@ -773,10 +773,10 @@ void dgAABBPolygonSoup::Create (const dgPolygonSoupDatabaseBuilder& builder, boo
 
 			if (node->m_parent) {
 				if (node->m_parent->m_left == node) {
-					m_aabb[node->m_parent->m_enumeration].m_left = dgNode::dgLeafNodePtr (&m_aabb[node->m_enumeration] - m_aabb);
+					m_aabb[node->m_parent->m_enumeration].m_left = dgNode::dgLeafNodePtr (dgUnsigned32 (&m_aabb[node->m_enumeration] - m_aabb));
 				} else {
 					dgAssert (node->m_parent->m_right == node);
-					m_aabb[node->m_parent->m_enumeration].m_right = dgNode::dgLeafNodePtr (&m_aabb[node->m_enumeration] - m_aabb);
+					m_aabb[node->m_parent->m_enumeration].m_right = dgNode::dgLeafNodePtr (dgUnsigned32 (&m_aabb[node->m_enumeration] - m_aabb));
 				}
 			}
 
