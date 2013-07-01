@@ -36,6 +36,19 @@ class dNewtonCollision
 		m_scene,
 	};
 
+	class dDebugRenderer
+	{
+		public:
+		dDebugRenderer (dNewtonCollision* const me)
+			:m_collision(me)
+		{
+		}
+		
+		virtual void OnDrawFace (int vertexCount, const dFloat* const faceVertex, int id) = NULL;
+
+		dNewtonCollision* m_collision;
+	};
+
 	CNEWTON_API void *operator new (size_t size);
 	CNEWTON_API void operator delete (void* ptr);
 
@@ -53,12 +66,17 @@ class dNewtonCollision
 	CNEWTON_API void SetMatrix (const dFloat* const matrix);
 	CNEWTON_API void GetMatrix (dFloat* const matrix) const;
 
+	CNEWTON_API virtual void DebugRender (const dFloat* const matrix, dDebugRenderer* const renderer) const;
+
 
 	protected:
 	CNEWTON_API dNewtonCollision (const dNewtonCollision& srcCollision, NewtonCollision* const shape);
 
 	CNEWTON_API void SetShape (NewtonCollision* const shape) ;
 	virtual dNewtonCollision* Clone (NewtonCollision* const shape) const = 0; 
+
+	CNEWTON_API static void DebugRender (void* userData, int vertexCount, const dFloat* faceVertec, int id);
+	
 
 	NewtonCollision* m_shape;
 	void* m_userData;

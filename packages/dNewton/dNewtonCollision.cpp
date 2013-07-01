@@ -91,6 +91,18 @@ void dNewtonCollision::SetShape (NewtonCollision* const shape)
 	NewtonCollisionSetUserData (m_shape, this);
 }
 
+void dNewtonCollision::DebugRender (void* userData, int vertexCount, const dFloat* faceVertec, int id)
+{
+	dDebugRenderer* const renderer = (dDebugRenderer*) userData;
+	renderer->OnDrawFace (vertexCount, faceVertec, id);
+}
+
+
+void dNewtonCollision::DebugRender (const dFloat* const matrix, dDebugRenderer* const renderer) const
+{
+	NewtonCollisionForEachPolygonDo (m_shape, matrix, DebugRender, renderer);
+}
+
 void* dNewtonCollision::operator new (size_t size)
 {
 	return NewtonAlloc(int (size));
@@ -100,7 +112,6 @@ void dNewtonCollision::operator delete (void* ptr)
 {
 	NewtonFree(ptr);
 }
-
 
 
 dNewtonCollisionMesh::dNewtonCollisionMesh(dNewton* const world)
