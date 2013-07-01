@@ -47,6 +47,13 @@ class dNewtonCollision
 	CNEWTON_API void* GetUserData() const;
 	CNEWTON_API void SetUserData(void* const userData);
 
+	CNEWTON_API void SetScale(dFloat x, dFloat y, dFloat z);
+	CNEWTON_API void GetScale(dFloat& x, dFloat& y, dFloat& z) const;
+
+	CNEWTON_API void SetMatrix (const dFloat* const matrix);
+	CNEWTON_API void GetMatrix (dFloat* const matrix) const;
+
+
 	protected:
 	CNEWTON_API dNewtonCollision (const dNewtonCollision& srcCollision, NewtonCollision* const shape);
 
@@ -60,21 +67,6 @@ class dNewtonCollision
 };
 
 
-class dNewtonCollisionBox: public dNewtonCollision
-{
-	public: 
-	dNewtonCollisionBox (dNewton* const world, dFloat x, dFloat y, dFloat z, int id);
-	dNewtonCollision* Clone(NewtonCollision* const shape) const 
-	{
-		return new dNewtonCollisionBox (*this, shape);
-	}
-
-	protected:
-	dNewtonCollisionBox (const dNewtonCollisionBox& srcCollision, NewtonCollision* const shape)
-		:dNewtonCollision (srcCollision, shape)
-	{
-	}
-};
 
 
 class dNewtonCollisionMesh: public dNewtonCollision
@@ -120,6 +112,27 @@ class dNewtonCollisionScene: public dNewtonCollision
 	}
 };
 
+
+class dNewtonCollisionBox: public dNewtonCollision
+{
+	public: 
+	dNewtonCollisionBox (dNewton* const world, dFloat x, dFloat y, dFloat z, int id)
+		:dNewtonCollision(m_box)
+	{
+		SetShape (NewtonCreateBox(world->GetNewton(), x, y, z, id, NULL));
+	}
+
+	dNewtonCollision* Clone(NewtonCollision* const shape) const 
+	{
+		return new dNewtonCollisionBox (*this, shape);
+	}
+
+	protected:
+	dNewtonCollisionBox (const dNewtonCollisionBox& srcCollision, NewtonCollision* const shape)
+		:dNewtonCollision (srcCollision, shape)
+	{
+	}
+};
 
 
 #endif

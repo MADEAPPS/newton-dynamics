@@ -59,6 +59,26 @@ void dNewtonCollision::SetUserData(void* const userData)
 	m_userData = userData;
 }
 
+void dNewtonCollision::SetMatrix (const dFloat* const matrix)
+{
+	NewtonCollisionSetMatrix(m_shape, matrix);
+}
+
+void dNewtonCollision::GetMatrix (dFloat* const matrix) const
+{
+	NewtonCollisionGetMatrix(m_shape, matrix);
+}
+
+
+void dNewtonCollision::SetScale(dFloat x, dFloat y, dFloat z)
+{
+	NewtonCollisionSetScale(m_shape, x, y, z);
+}
+void dNewtonCollision::GetScale(dFloat& x, dFloat& y, dFloat& z) const
+{
+	NewtonCollisionGetScale(m_shape, &x, &y, &z);
+}
+
 
 NewtonCollision* dNewtonCollision::GetShape() const
 {
@@ -138,8 +158,3 @@ void dNewtonCollisionScene::EndAddRemoveCollision()
 }
 
 
-dNewtonCollisionBox::dNewtonCollisionBox (dNewton* const world, dFloat x, dFloat y, dFloat z, int id)
-	:dNewtonCollision(m_box)
-{
-	SetShape (NewtonCreateBox(world->GetNewton(), x, y, z, id, NULL));
-}
