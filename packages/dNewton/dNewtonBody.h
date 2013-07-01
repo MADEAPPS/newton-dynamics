@@ -38,9 +38,10 @@ class dNewtonBody
 	CNEWTON_API virtual void OnForceAndTorque (dFloat timestep, int threadIndex) = 0;
 	CNEWTON_API virtual void OnBodyTransform (const dFloat* const matrix, int threadIndex);
 
+	CNEWTON_API void* GetUserData() const;
 	CNEWTON_API void SetUserData(void* const userData);
 
-	CNEWTON_API void* GetUserData() const;
+	
 	CNEWTON_API dNewton* GetNewton () const;
 	CNEWTON_API NewtonBody* GetNewtonBody () const;
 	CNEWTON_API dNewtonCollision* GetCollision() const;

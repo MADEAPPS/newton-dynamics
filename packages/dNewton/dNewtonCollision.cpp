@@ -26,17 +26,18 @@
 
 dNewtonCollision::dNewtonCollision(dCollsionType type)
 	:m_shape (NULL)
+	,m_userData(NULL)
 	,m_type (type)
 {
 }
 
 
-
-dNewtonCollision::dNewtonCollision(NewtonCollision* const shape, dCollsionType type)
+dNewtonCollision::dNewtonCollision(const dNewtonCollision& srcCollision, NewtonCollision* const shape)
 	:m_shape (shape)
-	,m_type (type)
+	,m_userData(srcCollision.m_userData)
+	,m_type (srcCollision.m_type)
 {
-	SetShape (shape);
+	SetShape(shape);
 }
 
 
@@ -47,6 +48,17 @@ dNewtonCollision::~dNewtonCollision()
 		NewtonDestroyCollision(m_shape);
 	}
 }
+
+void* dNewtonCollision::GetUserData() const
+{
+	return m_userData;
+}
+
+void dNewtonCollision::SetUserData(void* const userData)
+{
+	m_userData = userData;
+}
+
 
 NewtonCollision* dNewtonCollision::GetShape() const
 {
