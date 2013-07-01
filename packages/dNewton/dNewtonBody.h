@@ -35,6 +35,7 @@ class dNewtonBody
 
 	CNEWTON_API virtual ~dNewtonBody();
 
+	CNEWTON_API virtual void OnForceAndTorque (dFloat timestep, int threadIndex) = 0;
 	CNEWTON_API virtual void OnBodyTransform (const dFloat* const matrix, int threadIndex);
 
 	CNEWTON_API void SetUserData(void* const userData);
@@ -53,6 +54,7 @@ class dNewtonBody
 
 	private: 
 	CNEWTON_API static void OnBodyDestroy (const NewtonBody* const body);
+	CNEWTON_API static void OnForceAndTorque (const NewtonBody* body, dFloat timestep, int threadIndex);
 	CNEWTON_API static void OnBodyTransform (const NewtonBody* const body, const dFloat* const matrix, int threadIndex);
 
 	dVector m_posit0;

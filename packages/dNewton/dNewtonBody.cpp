@@ -117,6 +117,7 @@ dMatrix dNewtonBody::GetVisualMatrix (dFloat param) const
 	return dMatrix (rotation, posit);
 }
 
+
 void dNewtonBody::OnBodyTransform (const dFloat* const matrix, int threadIndex)
 {
 	dMatrix transform (matrix);
@@ -139,6 +140,13 @@ void dNewtonBody::OnBodyTransform (const NewtonBody* const body, const dFloat* c
 	dNewtonBody* const me = (dNewtonBody*) NewtonBodyGetUserData(body);
 	dAssert (me);
 	me->OnBodyTransform (matrix, threadIndex);
+}
+
+void dNewtonBody::OnForceAndTorque (const NewtonBody* body, dFloat timestep, int threadIndex)
+{
+	dNewtonBody* const me = (dNewtonBody*) NewtonBodyGetUserData(body);
+	dAssert (me);
+	me->OnForceAndTorque (timestep, threadIndex);
 }
 
 
