@@ -86,6 +86,17 @@ void* dNewtonBody::GetUserData() const
 	return m_userData;
 }
 
+void dNewtonBody::SetMatrix (const dFloat* const matrix)
+{
+	NewtonBodySetMatrix(m_body, matrix);
+}
+
+void dNewtonBody::GetMatrix (dFloat* const matrix) const
+{
+	NewtonBodyGetMatrix(m_body, matrix);
+}
+
+
 void dNewtonBody::SetForce (const dFloat* const force) const
 {
 	NewtonBodySetForce(m_body, force);

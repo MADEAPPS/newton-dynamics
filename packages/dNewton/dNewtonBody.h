@@ -36,6 +36,9 @@ class dNewtonBody
 	CNEWTON_API dNewtonBody(dNewton* const world, dFloat mass, const dNewtonCollision* const collision, void* const userData, const dMatrix& location);
 	CNEWTON_API virtual ~dNewtonBody();
 
+	CNEWTON_API void SetMatrix (const dFloat* const matrix);
+	CNEWTON_API void GetMatrix (dFloat* const matrix) const;
+
 	CNEWTON_API void SetForce (const dFloat* const force) const;
 	CNEWTON_API void SetTorque (const dFloat* const torque) const;
 
