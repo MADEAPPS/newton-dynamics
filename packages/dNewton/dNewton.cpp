@@ -200,10 +200,9 @@ void dNewton::Update (dFloat timestepInSecunds)
 		nextTime -= timestepMicrosecunds;
 		m_microseconds += timestepMicrosecunds;
 	}
-	if (loops >= m_maxUpdatePerIterations) {
-		ResetTimer();
-	}
-	
+//	if (loops >= m_maxUpdatePerIterations) {
+//		ResetTimer();
+//	}
 }
 
 void dNewton::UpdateAsync (dFloat timestepInSecunds)
@@ -219,7 +218,7 @@ void dNewton::UpdateAsync (dFloat timestepInSecunds)
 		nextTime -= timestepMicrosecunds;
 		m_microseconds += timestepMicrosecunds;
 	}
-	if (loops >= m_maxUpdatePerIterations) {
-		ResetTimer();
-	}
+//	if (loops >= m_maxUpdatePerIterations) {
+//		ResetTimer();
+//	}
 }
