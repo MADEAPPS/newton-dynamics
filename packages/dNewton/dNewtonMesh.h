@@ -26,13 +26,19 @@
 #include "dNewtonAlloc.h"
 
 class dNewton;
-//class dNewtonCollision;
+class dNewtonCollision;
 
 class dNewtonMesh: public dNewtonAlloc
 {
 	public:
 	CNEWTON_API dNewtonMesh(dNewton* const world);
 	CNEWTON_API dNewtonMesh(const dNewtonMesh& clone);
+	CNEWTON_API dNewtonMesh(const dNewtonCollision& collision);
+	CNEWTON_API dNewtonMesh(dNewton* const world, int pointCount, const dFloat* const vertexCloud, int strideInBytes, dFloat tolerance);
+
+	CNEWTON_API void CreateVoronoiConvexDecomposition (const dNewtonMesh& convexMesh);
+	CNEWTON_API void CreateApproximateConvexDecomposition (const dNewtonMesh& mesh, dFloat maxConcavity, dFloat backFaceDistanceFactor, int maxCount, int maxVertexPerHull);
+	
 	CNEWTON_API virtual ~dNewtonMesh();
 
 	protected:

@@ -22,6 +22,7 @@
 #include "dStdAfxNewton.h"
 #include "dNewton.h"
 #include "dNewtonMesh.h"
+#include "dNewtonCollision.h"
 
 
 dNewtonMesh::dNewtonMesh(dNewton* const world)
@@ -34,7 +35,35 @@ dNewtonMesh::dNewtonMesh(const dNewtonMesh& clone)
 {
 }
 
+dNewtonMesh::dNewtonMesh(const dNewtonCollision& collision)
+	:m_mesh (NewtonMeshCreateFromCollision(collision.GetShape()))
+{
+}
+
+dNewtonMesh::dNewtonMesh(dNewton* const world, int pointCount, const dFloat* const vertexCloud, int strideInBytes, dFloat tolerance)
+	:m_mesh (NewtonMeshCreateConvexHull (world->GetNewton(), pointCount, vertexCloud, strideInBytes, tolerance))
+{
+}
+
+void dNewtonMesh::CreateVoronoiConvexDecomposition (const dNewtonMesh& contexMesh)
+{
+	NewtonMeshDestroy (m_mesh);
+	dAssert (0);
+//	m_mesh = NewtonMeshCreateVoronoiConvexDecomposition (const NewtonWorld* const newtonWorld, int pointCount, const dFloat* const vertexCloud, int strideInBytes, int materialID, const dFloat* const textureMatrix);
+}
+
+void dNewtonMesh::CreateApproximateConvexDecomposition (const dNewtonMesh& mesh, dFloat maxConcavity, dFloat backFaceDistanceFactor, int maxCount, int maxVertexPerHull)
+{
+	NewtonMeshDestroy (m_mesh);
+	m_mesh = NewtonMeshApproximateConvexDecomposition (mesh.m_mesh, maxConcavity, backFaceDistanceFactor, maxCount, maxVertexPerHull, NULL);
+}
+
+
+
 dNewtonMesh::~dNewtonMesh()
 {
 	NewtonMeshDestroy (m_mesh);
 }
+
+
+
