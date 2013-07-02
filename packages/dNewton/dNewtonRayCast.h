@@ -24,12 +24,13 @@
 
 
 #include "dStdAfxNewton.h"
+#include "dNewtonAlloc.h"
 
 class dNewton;
 class dNewtonBody;
 class dNewtonCollision;
 
-class dNewtonRayCast
+class dNewtonRayCast: public dNewtonAlloc  
 {
 	public:
 	CNEWTON_API dNewtonRayCast (dNewton* const world);

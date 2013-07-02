@@ -23,15 +23,14 @@
 #define _D_NEWTON_BODY_H_
 
 #include "dStdAfxNewton.h"
+#include "dNewtonAlloc.h"
 
 class dNewton;
 class dNewtonCollision;
 
-class dNewtonBody  
+class dNewtonBody: public dNewtonAlloc
 {
 	public:
-	CNEWTON_API void *operator new (size_t size);
-	CNEWTON_API void operator delete (void* ptr);
 
 	CNEWTON_API dNewtonBody(dNewton* const world, dFloat mass, const dNewtonCollision* const collision, void* const userData, const dMatrix& location);
 	CNEWTON_API virtual ~dNewtonBody();

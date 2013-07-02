@@ -61,15 +61,6 @@ dNewtonBody::~dNewtonBody()
 	}
 }
 
-void* dNewtonBody::operator new (size_t size)
-{
-	return NewtonAlloc(int (size));
-}
-
-void dNewtonBody::operator delete (void* ptr)
-{
-	NewtonFree(ptr);
-}
 
 NewtonBody* dNewtonBody::GetNewtonBody () const
 {

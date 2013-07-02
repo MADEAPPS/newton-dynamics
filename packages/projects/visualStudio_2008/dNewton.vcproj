@@ -616,6 +616,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\dNewton\dNewtonAlloc.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dNewton\dNewtonAlloc.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\dNewton\dNewtonBody.cpp"
 			>
 		</File>
@@ -629,6 +637,14 @@
 		</File>
 		<File
 			RelativePath="..\..\dNewton\dNewtonCollision.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dNewton\dNewtonMesh.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dNewton\dNewtonMesh.h"
 			>
 		</File>
 		<File

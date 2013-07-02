@@ -23,10 +23,11 @@
 #define _D_NEWTON_COLLISION_H_
 
 #include "dStdAfxNewton.h"
+#include "dNewtonAlloc.h"
 
 class dNewton;
 
-class dNewtonCollision
+class dNewtonCollision: public dNewtonAlloc
 {
 	public:
 	enum dCollsionType
@@ -48,9 +49,6 @@ class dNewtonCollision
 
 		dNewtonCollision* m_collision;
 	};
-
-	CNEWTON_API void *operator new (size_t size);
-	CNEWTON_API void operator delete (void* ptr);
 
 	CNEWTON_API dNewtonCollision (dCollsionType type);
 	CNEWTON_API virtual ~dNewtonCollision();

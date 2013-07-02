@@ -71,10 +71,6 @@ void dNewton::SetMaxUpdatesPerIterations (int update)
 	m_maxUpdatePerIterations = update;
 }
 
-void dNewton::SetAllocationDrivers (CNewtonAllocMemory alloc, CNewtonFreeMemory free)
-{
-	NewtonSetMemorySystem (alloc, free);
-}
 
 void dNewton::OnCollisionDestructorCallback (const NewtonWorld* const newtonWorld, const NewtonCollision* const collision)
 {
@@ -97,15 +93,6 @@ NewtonWorld* dNewton::GetNewton () const
 	return m_world;
 }
 
-void* dNewton::operator new (size_t size)
-{
-	return NewtonAlloc(int (size));
-}
-
-void dNewton::operator delete (void* ptr)
-{
-	NewtonFree(ptr);
-}
 
 dNewtonBody* dNewton::GetFirstBody() const
 {
@@ -200,9 +187,6 @@ void dNewton::Update (dFloat timestepInSecunds)
 		nextTime -= timestepMicrosecunds;
 		m_microseconds += timestepMicrosecunds;
 	}
-//	if (loops >= m_maxUpdatePerIterations) {
-//		ResetTimer();
-//	}
 }
 
 void dNewton::UpdateAsync (dFloat timestepInSecunds)
@@ -218,7 +202,4 @@ void dNewton::UpdateAsync (dFloat timestepInSecunds)
 		nextTime -= timestepMicrosecunds;
 		m_microseconds += timestepMicrosecunds;
 	}
-//	if (loops >= m_maxUpdatePerIterations) {
-//		ResetTimer();
-//	}
 }

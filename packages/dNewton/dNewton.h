@@ -23,15 +23,11 @@
 #define _D_NEWTON_H_
 
 #include "dStdAfxNewton.h"
-
-typedef void* (*CNewtonAllocMemory) (int sizeInBytes);
-typedef void (*CNewtonFreeMemory) (void* const ptr, int sizeInBytes);
-
-
+#include "dNewtonAlloc.h"
 
 class dNewtonBody;
 
-class dNewton  
+class dNewton: public dNewtonAlloc
 {
 	public:
 	class ScopeLock
@@ -45,9 +41,6 @@ class dNewton
 
 	CNEWTON_API dNewton();
 	CNEWTON_API virtual ~dNewton();
-
-	CNEWTON_API void *operator new (size_t size);
-	CNEWTON_API void operator delete (void* ptr);
 
 	CNEWTON_API void Update (dFloat timestepInSecunds);
 	CNEWTON_API void UpdateAsync (dFloat timestepInSecunds);
@@ -69,9 +62,6 @@ class dNewton
 	CNEWTON_API dLong GetTimeInMicrosenconds() const; 
 
 	private:
-	// default memory allocation functions if not other is provided 
-	CNEWTON_API static void SetAllocationDrivers (CNewtonAllocMemory alloc, CNewtonFreeMemory free);
-
 	CNEWTON_API static void OnCollisionDestructorCallback (const NewtonWorld* const newtonWorld, const NewtonCollision* const collision);
 	CNEWTON_API static void OnCollisionCopyConstruct (const NewtonWorld* const newtonWorld, NewtonCollision* const collision, const NewtonCollision* const sourceCollision);
 	

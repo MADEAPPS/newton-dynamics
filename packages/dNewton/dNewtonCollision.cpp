@@ -103,15 +103,6 @@ void dNewtonCollision::DebugRender (const dFloat* const matrix, dDebugRenderer* 
 	NewtonCollisionForEachPolygonDo (m_shape, matrix, DebugRender, renderer);
 }
 
-void* dNewtonCollision::operator new (size_t size)
-{
-	return NewtonAlloc(int (size));
-}
-
-void dNewtonCollision::operator delete (void* ptr)
-{
-	NewtonFree(ptr);
-}
 
 
 dNewtonCollisionMesh::dNewtonCollisionMesh(dNewton* const world)
