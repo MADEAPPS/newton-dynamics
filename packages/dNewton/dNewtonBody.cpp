@@ -87,13 +87,33 @@ void dNewtonBody::GetMatrix (dFloat* const matrix) const
 	NewtonBodyGetMatrix(m_body, matrix);
 }
 
+void dNewtonBody::SetVeloc (const dFloat* const veloc)
+{
+	NewtonBodySetVelocity(m_body, veloc);
+}
 
-void dNewtonBody::SetForce (const dFloat* const force) const
+void dNewtonBody::GetVeloc (dFloat* const veloc) const
+{
+	NewtonBodyGetVelocity(m_body, veloc);
+}
+
+void dNewtonBody::SetOmega (const dFloat* const omega)
+{
+	NewtonBodySetOmega(m_body, omega);
+}
+
+void dNewtonBody::GetOmega (dFloat* const omega) const
+{
+	NewtonBodyGetOmega(m_body, omega);
+}
+
+
+void dNewtonBody::SetForce (const dFloat* const force)
 {
 	NewtonBodySetForce(m_body, force);
 }
 
-void dNewtonBody::SetTorque (const dFloat* const torque) const
+void dNewtonBody::SetTorque (const dFloat* const torque)
 {
 	NewtonBodySetTorque(m_body, torque);
 }
@@ -109,6 +129,11 @@ dNewton* dNewtonBody::GetNewton () const
 	return (dNewton*) NewtonWorldGetUserData(NewtonBodyGetWorld(m_body));
 }
 
+void dNewtonBody::GetPointVeloc (const dFloat* const point, dFloat* const veloc) const
+{
+	NewtonBodyGetPointVelocity (m_body, &point[0], &veloc[0]);
+}
+
 void dNewtonBody::SetBody (NewtonBody* const body)
 {
 	m_body = body;
@@ -118,6 +143,10 @@ void dNewtonBody::SetBody (NewtonBody* const body)
 	NewtonBodySetForceAndTorqueCallback(m_body, OnForceAndTorque);
 }
 
+void dNewtonBody::ApplyImpulseToDesiredPointVeloc (const dFloat* const point, const dFloat* const desiredveloc)
+{
+	NewtonBodyAddImpulse (m_body, &desiredveloc[0], &point[0]);
+}
 
 void dNewtonBody::OnBodyDestroy (const NewtonBody* const body)
 {

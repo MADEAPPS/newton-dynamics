@@ -38,8 +38,17 @@ class dNewtonBody: public dNewtonAlloc
 	CNEWTON_API void SetMatrix (const dFloat* const matrix);
 	CNEWTON_API void GetMatrix (dFloat* const matrix) const;
 
-	CNEWTON_API void SetForce (const dFloat* const force) const;
-	CNEWTON_API void SetTorque (const dFloat* const torque) const;
+	CNEWTON_API void SetVeloc (const dFloat* const veloc);
+	CNEWTON_API void GetVeloc (dFloat* const veloc) const;
+
+	CNEWTON_API void SetOmega (const dFloat* const omega);
+	CNEWTON_API void GetOmega (dFloat* const omega) const;
+
+	CNEWTON_API void SetForce (const dFloat* const force);
+	CNEWTON_API void SetTorque (const dFloat* const torque);
+
+	CNEWTON_API void GetPointVeloc (const dFloat* const point, dFloat* const veloc) const;
+	CNEWTON_API void ApplyImpulseToDesiredPointVeloc (const dFloat* const point, const dFloat* const desiredveloc);
 
 	CNEWTON_API void GetMassAndInertia (dFloat& mass, dFloat& Ixx, dFloat& Iyy, dFloat& Izz) const;
 
@@ -73,6 +82,7 @@ class dNewtonBody: public dNewtonAlloc
 	NewtonBody* m_body;
 	void* m_userData;
 
+	protected:
 	mutable unsigned m_lock;
 	
 };
