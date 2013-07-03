@@ -40,17 +40,6 @@
 		}
 		return TRUE;
 	}
-
-	void* operator new (size_t size) 
-	{ 
-		return NewtonAlloc(int (size));
-	}
-
-	void operator delete (void* ptr) 
-	{ 
-		NewtonFree(ptr);
-	}
-
 #endif
 
 
@@ -96,15 +85,6 @@ CustomJoint::~CustomJoint()
 	}
 }
 
-void* CustomJoint::operator new (size_t size)
-{
-	return NewtonAlloc(int (size));
-}
-
-void CustomJoint::operator delete (void* ptr)
-{
-	NewtonFree(ptr);
-}
 
 
 void CustomJoint::Init (int maxDOF, NewtonBody* const body0, NewtonBody* const body1)

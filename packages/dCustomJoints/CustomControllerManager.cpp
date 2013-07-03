@@ -37,15 +37,6 @@ CustomControllerBase::~CustomControllerBase()
 {
 }
 
-void* CustomControllerBase::operator new (size_t size)
-{
-	return NewtonAlloc(int (size));
-}
-
-void CustomControllerBase::operator delete (void* ptr)
-{
-	NewtonFree(ptr);
-}
 
 
 
@@ -74,12 +65,3 @@ void CustomControllerBase::Destroy (const NewtonWorld* const world, void* const 
 }
 
 
-void* CustomControllerBase::AllocController (int size) const
-{
-	return NewtonAlloc(size);
-}
-
-void CustomControllerBase::FreeController (void* const ptr) const
-{
-	NewtonFree(ptr);
-}

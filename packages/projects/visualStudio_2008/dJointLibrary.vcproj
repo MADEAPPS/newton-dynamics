@@ -1120,6 +1120,14 @@
 			</File>
 		</Filter>
 		<File
+			RelativePath="..\..\dCustomJoints\CustomAlloc.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dCustomJoints\CustomAlloc.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\dCustomJoints\CustomJointLibraryStdAfx.cpp"
 			>
 			<FileConfiguration

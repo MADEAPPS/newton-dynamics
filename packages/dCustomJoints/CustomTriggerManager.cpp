@@ -28,7 +28,7 @@ CustomTriggerController::PassangerManifest::PassangerManifest ()
 CustomTriggerController::PassangerManifest::~PassangerManifest ()
 {
 	if (m_passangerList) {
-		NewtonFree(m_passangerList);
+		NewtonFree (m_passangerList);
 	}
 }
 
@@ -59,7 +59,7 @@ CustomTriggerController::PassangerManifest::Passenger* CustomTriggerController::
 			Passenger* const oldList = m_passangerList;
 			m_passangerList = (Passenger*) NewtonAlloc(2 * m_capacity * sizeof (Passenger));
 			memcpy (m_passangerList, oldList, m_capacity * sizeof (Passenger));
-			NewtonFree(oldList);
+			delete oldList;
 			m_capacity = m_capacity * 2;
 		}
 	}

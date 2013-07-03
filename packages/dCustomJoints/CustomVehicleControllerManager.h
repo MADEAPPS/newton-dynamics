@@ -18,6 +18,7 @@
 #define D_CUSTOM_VEHICLE_CONTROLLER_MANAGER_H_
 
 #include "CustomJointLibraryStdAfx.h"
+#include "CustomAlloc.h"
 #include "CustomControllerManager.h"
 
 
@@ -75,7 +76,7 @@ class CustomVehicleController
 	};
 
 
-	class Component
+	class Component: public CustomAlloc  
 	{
 		public:
 		void SetParam(dFloat param)
@@ -87,9 +88,6 @@ class CustomVehicleController
 		{
 			return m_param;
 		}
-
-		NEWTON_API void* operator new (size_t size);
-		NEWTON_API void operator delete (void* ptr);
 
 		protected:
 		Component (CustomVehicleController* const controller)
@@ -121,9 +119,6 @@ class CustomVehicleController
 				m_firstGear,
 				m_maxGears = 16
 			};
-
-			NEWTON_API void* operator new (size_t size);
-			NEWTON_API void operator delete (void* ptr);
 
 			NEWTON_API GearBox(CustomVehicleController* const controller, dFloat reverseGearRatio, int gearCount, const dFloat* const gearBoxRatios);
 

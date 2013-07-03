@@ -23,7 +23,7 @@
 #include "dVector.h"
 #include "dMatrix.h"
 #include "dQuaternion.h"
-
+#include "CustomAlloc.h"
 
 
 class CustomControllerFilterCastFilter
@@ -65,14 +65,12 @@ class CustomControllerFilterCastFilter
 		private:
 
 
-class CustomControllerBase
+class CustomControllerBase: public CustomAlloc   
 {
 	public:
 	dFloat GetTimeStep() const {return m_curTimestep;}
 	NewtonWorld* GetWorld() const {return m_world;}
 	
-	NEWTON_API void* operator new (size_t size);
-	NEWTON_API void operator delete (void *ptr);
 	virtual void Debug () const = 0;
 
 	protected:
@@ -81,10 +79,6 @@ class CustomControllerBase
 
 	virtual void PreUpdate (dFloat timestep) = 0;
 	virtual void PostUpdate (dFloat timestep) = 0;
-
-	protected:
-	NEWTON_API void* AllocController (int size) const;
-	NEWTON_API void FreeController (void* const ptr) const;
 
 	private:
 	static void PreUpdate (const NewtonWorld* const world, void* const listenerUserData, dFloat timestep);
@@ -101,7 +95,7 @@ template<class CONTROLLER_BASE>
 class CustomControllerManager: public CustomControllerBase  
 {
 	public:
-	class CustomController: public CONTROLLER_BASE
+	class CustomController: public CustomAlloc, public CONTROLLER_BASE   
 	{
 		public:
 		CustomController();
@@ -244,7 +238,7 @@ void CustomControllerManager<CONTROLLER_BASE>::PostUpdate (dFloat timestep)
 template<class CONTROLLER_BASE>
 typename CustomControllerManager<CONTROLLER_BASE>::CustomController* CustomControllerManager<CONTROLLER_BASE>::CreateController ()
 {
-	CustomController* const controller = new (AllocController (sizeof (CustomController))) CustomController();
+	CustomController* const controller = new CustomController();
 
 	controller->m_prev = NULL;
 	controller->m_next = m_controllerList;
@@ -273,9 +267,7 @@ void CustomControllerManager<CONTROLLER_BASE>::DestroyController (CustomControll
 	}
 	controller->m_next = NULL;
 	controller->m_prev = NULL;
-
-	controller->~CustomController();
-	FreeController (controller);
+	delete controller;
 }
 
 template<class CONTROLLER_BASE>

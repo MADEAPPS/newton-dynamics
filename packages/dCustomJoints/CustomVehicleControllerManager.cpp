@@ -74,25 +74,7 @@ dFloat CustomVehicleController::InterpolationCurve::GetValue (dFloat param) cons
 	return interplatedValue * sign;
 }
 
-void* CustomVehicleController::Component::operator new (size_t size)
-{
-	return NewtonAlloc(int (size));
-}
 
-void CustomVehicleController::Component::operator delete (void* ptr)
-{
-	NewtonFree(ptr);
-}
-
-void* CustomVehicleController::EngineComponent::GearBox::operator new (size_t size)
-{
-	return NewtonAlloc(int (size));
-}
-
-void CustomVehicleController::EngineComponent::GearBox::operator delete (void* ptr)
-{
-	NewtonFree(ptr);
-}
 
 
 

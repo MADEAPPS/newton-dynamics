@@ -22,7 +22,7 @@
 #include "dVector.h"
 #include "dMatrix.h"
 #include "dQuaternion.h"
-
+#include "CustomAlloc.h"
 
 struct NewtonUserJoint;
 typedef void (*JointUserDestructorCallback) (const NewtonUserJoint* const me);	
@@ -31,7 +31,7 @@ typedef void (*JointUserSubmitConstraintCallback) (const NewtonUserJoint* const 
 
 // this is the base class to implement custom joints, it is not a joint it just provide functionality
 // for the user to implement it own joints
-class CustomJoint  
+class CustomJoint: public CustomAlloc  
 {
 	public:
 	struct AngularIntegration
@@ -55,9 +55,6 @@ class CustomJoint
 		}
 		dFloat m_angle;
 	};
-
-	NEWTON_API void *operator new (size_t size);
-	NEWTON_API void operator delete (void *ptr);
 
 	NEWTON_API CustomJoint();
 	NEWTON_API CustomJoint(int maxDOF, NewtonBody* const body0, NewtonBody* const body1);

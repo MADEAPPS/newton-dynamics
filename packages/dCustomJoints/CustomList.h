@@ -12,17 +12,17 @@
 
 #ifndef _CUSTOM_LIST_H_
 #define _CUSTOM_LIST_H_
-
+#include "CustomAlloc.h"
 
 // this is a small double link list container similar to STL, 
 // it is used to provide low level support for this demos.
 // it implements an iterators, and all the basics operation on list found on the STL class
 
 template<class T>
-class CustomList 
+class CustomList: public CustomAlloc   
 {
 	public:
-	class CustomListNode
+	class CustomListNode: public CustomAlloc  
 	{
 		CustomListNode (CustomListNode* const prev, CustomListNode* const next) 
 			:m_info () 
@@ -70,7 +70,8 @@ class CustomList
 		void Remove()
 		{
 			Unlink();
-			this->~CustomListNode();
+			//this->~CustomListNode();
+			delete this;
 		}
 
 		void AddLast(CustomListNode* const node) 
@@ -121,9 +122,6 @@ class CustomList
 	CustomList ();
 	virtual ~CustomList ();
 
-	void* operator new (size_t size);
-	void operator delete (void* ptr);
-
 	operator int() const;
 	int GetCount() const;
 	CustomListNode* GetLast() const;
@@ -172,18 +170,6 @@ CustomList<T>::~CustomList ()
 }
 
 
-template<class T>
-void* CustomList<T>::operator new (size_t size)
-{
-	return new char[size];
-}
-
-template<class T>
-void CustomList<T>::operator delete (void *ptr)
-{
-	delete[] (char*)ptr;
-}
-
 
 template<class T>
 int CustomList<T>::GetCount() const
@@ -214,10 +200,10 @@ typename CustomList<T>::CustomListNode* CustomList<T>::Append ()
 {
 	m_count	++;
 	if (m_first == NULL) {
-		m_first = new (NewtonAlloc(sizeof (CustomListNode))) CustomListNode(NULL, NULL);
+		m_first = new CustomListNode(NULL, NULL);
 		m_last = m_first;
 	} else {
-		m_last = new (NewtonAlloc(sizeof (CustomListNode))) CustomListNode(m_last, NULL);
+		m_last = new CustomListNode(m_last, NULL);
 	}
 	return m_last;
 }
@@ -235,10 +221,10 @@ typename CustomList<T>::CustomListNode* CustomList<T>::Append (const T &element)
 {
 	m_count	++;
 	if (m_first == NULL) {
-		m_first = new (NewtonAlloc(sizeof (CustomListNode))) CustomListNode(element, NULL, NULL);
+		m_first = new CustomListNode(element, NULL, NULL);
 		m_last = m_first;
 	} else {
-		m_last = new (NewtonAlloc(sizeof (CustomListNode))) CustomListNode(element, m_last, NULL);
+		m_last = new CustomListNode(element, m_last, NULL);
 	}
 	return m_last;
 }
@@ -248,10 +234,10 @@ typename CustomList<T>::CustomListNode* CustomList<T>::Addtop ()
 {
 	m_count	++;
 	if (m_last == NULL) {
-		m_last = new (NewtonAlloc(sizeof (CustomListNode))) CustomListNode(NULL, NULL);
+		m_last = new CustomListNode(NULL, NULL);
 		m_first = m_last;
 	} else {
-		m_first = new (NewtonAlloc(sizeof (CustomListNode))) CustomListNode(NULL, m_first);
+		m_first = new CustomListNode(NULL, m_first);
 	}
 	return m_first;
 }
@@ -262,10 +248,10 @@ typename CustomList<T>::CustomListNode* CustomList<T>::Addtop (const T &element)
 {
 	m_count	++;
 	if (m_last == NULL) {
-		m_last = new (NewtonAlloc(sizeof (CustomListNode))) CustomListNode(element, NULL, NULL);
+		m_last = new CustomListNode(element, NULL, NULL);
 		m_first = m_last;
 	} else {
-		m_first = new (NewtonAlloc(sizeof (CustomListNode))) CustomListNode(element, NULL, m_first);
+		m_first = new CustomListNode(element, NULL, m_first);
 	}
 	return m_first;
 }
@@ -366,7 +352,6 @@ void CustomList<T>::Remove (CustomListNode* const node)
 		m_last = m_last->GetPrev();
 	}
 	node->Remove();
-	NewtonFree(node);
 }
 
 template<class T>
