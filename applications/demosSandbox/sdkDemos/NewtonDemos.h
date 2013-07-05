@@ -12,6 +12,8 @@
 #ifndef __NEWTON_DEMOS_H__
 #define __NEWTON_DEMOS_H__
 
+#include <toolbox_stdafx.h>
+
 class DemoMenu;
 class DemoEntityManager;
 
