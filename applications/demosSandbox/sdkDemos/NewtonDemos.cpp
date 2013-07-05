@@ -410,10 +410,17 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 		int platformsCount = NewtonEnumrateDevices (m_scene->GetNewton());
 		for (int i = 0; i < platformsCount; i ++) {
 			wxString label;
-			wxChar platform[256];
+			char platform[256];
 			
+
 			NewtonGetDeviceString (m_scene->GetNewton(), i, platform, sizeof (platform));
-			label.Printf (label, wxT(" hardware mode %s"), wxT(platform));
+			#ifndef wxUSE_UNICODE
+				wxChar wPlatform[256];
+				mbstowcs (wPlatform, platform, sizeof (platform));
+				label.Printf (wxT(" hardware mode %s"), wxT(wPlatform));
+			#else 
+				label.Printf (wxT(" hardware mode %s"), wxT(platform));
+			#endif
 			optionsMenu->AppendRadioItem(ID_PLATFORMS + i, label);
 		}
 		//optionsMenu->Check(ID_PLATFORMS, true);
