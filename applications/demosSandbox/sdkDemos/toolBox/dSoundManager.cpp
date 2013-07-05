@@ -114,10 +114,9 @@ dSoundManager::dSoundAsset::~dSoundAsset()
 
 
 dSoundManager::dSoundManager()
-	:m_coordinateSystem (GetIdentityMatrix())
-	,m_device(alcOpenDevice(NULL))
-//	,m_device(NULL)
+	:m_device(alcOpenDevice(NULL))
 	,m_context(NULL)
+	,m_coordinateSystem (GetIdentityMatrix())
 {
 	if (m_device) {
 		m_context = alcCreateContext(m_device, NULL);
