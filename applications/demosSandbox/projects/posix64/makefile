@@ -48,6 +48,9 @@ SDK_VISUALDEBUGGER_PATH = ../../../../packages/dVisualDebuggerServer
 SDK_AILIBRARY_PATH = ../../../../packages/dAILibrary
 SDK_XML_PATH = ../../../../packages/thirdParty/tinyxml
 
+FREE_TYPE_PATH = usr/freetype2/freetype
+FREE_TYPE_CONFIG_PATH = usr/freetype2/freetype/config
+
 
 SDK_INCLUDE_PATH = \
 		-I ../../../../coreLibrary_300/source/newton \
@@ -63,8 +66,9 @@ SDK_INCLUDE_PATH = \
 		-I $(SDK_JOINTS_PATH) \
 		-I $(SDK_VISUALDEBUGGER_PATH) \
 		-I $(SDK_AILIBRARY_PATH) \
-		-I $(SDK_XML_PATH)	
-
+		-I $(SDK_XML_PATH)	\
+		-I $(FREE_TYPE_PATH) \
+		-I $(FREE_TYPE_CONFIG_PATH)
 
 
 # sub project path
