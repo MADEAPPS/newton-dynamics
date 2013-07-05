@@ -172,11 +172,11 @@ class NewtonDemosApp: public wxApp
 		NewtonSetMemorySystem (PhysicsAlloc, PhysicsFree);
 
 		int version = NewtonWorldGetVersion();
-		char tittle[256]; 
+		 char tittle[256]; 
 		sprintf (tittle, "Newton %d.%02d SDK demos", version / 100, version % 100);
 		
 		//NewtonDemos* const frame = new NewtonDemos(wxString(&tittle[0], strlen(tittle)), wxDefaultPosition, wxSize(1024, 768));
-		NewtonDemos* const frame = new NewtonDemos(wxString(wxT(tittle)), wxDefaultPosition, wxSize(1024, 768));
+		NewtonDemos* const frame = new NewtonDemos(wxCStrData (tittle), wxDefaultPosition, wxSize(1024, 768));
 		
 
 		frame->Show(true);
