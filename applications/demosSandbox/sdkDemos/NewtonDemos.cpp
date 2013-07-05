@@ -414,7 +414,7 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 			
 
 			NewtonGetDeviceString (m_scene->GetNewton(), i, platform, sizeof (platform));
-			#ifndef wxUSE_UNICODE
+			#ifdef _POSIX_VER
 				wxChar wPlatform[256];
 				mbstowcs (wPlatform, platform, sizeof (platform));
 				label.Printf (wxT(" hardware mode %s"), wxT(wPlatform));
