@@ -516,7 +516,7 @@ void NewtonDemos::LoadDemo (int index)
 
 
 
-void NewtonDemos::KeyPress(const wxKeyEvent &event)
+void NewtonDemos::KeyDown(const wxKeyEvent &event)
 {
 	int keyCode = event.GetKeyCode();
 	if (keyCode == WXK_ESCAPE)  {

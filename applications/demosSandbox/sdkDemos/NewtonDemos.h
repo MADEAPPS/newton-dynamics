@@ -14,7 +14,6 @@
 
 
 class DemoMenu;
-class wxKeyEvent;
 class DemoEntityManager;
 
 class NewtonDemos: public wxFrame
@@ -84,8 +83,9 @@ class NewtonDemos: public wxFrame
 	void END_MENU_OPTION();
 	void RestoreSettings ();
 
-	void KeyPress(const wxKeyEvent& event);
-	void KeyRelease(const wxKeyEvent& event);
+	void KeyUp(const wxKeyEvent& event);
+	void KeyDown(const wxKeyEvent& event);
+	
 	void MouseAction(const wxMouseEvent &event);
 
 	bool GetKeyState (int key) const;
