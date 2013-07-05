@@ -64,10 +64,6 @@ typedef long long unsigned64;
 	#include <gl/gl.h>
 	#include <gl/glu.h>
 
-	// font library for open gl text
-	#include <ft2build.h>
-	#include FT_FREETYPE_H
-
 	// audio library support
 	#include <al/al.h>
 	#include <al/alc.h>
@@ -97,11 +93,12 @@ typedef long long unsigned64;
 	// audio library support
 	#include <OpenAl/al.h>
 	#include <OpenAl/alc.h>
-
-	#include <ft2build.h>
-	#include FT_FREETYPE_H
 #endif
 
+
+// font library for open gl text
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
 // gui library includes
 #include <wx/wx.h>
