@@ -70,7 +70,7 @@ class DemoCameraListener: public DemoListenerBase
 	static NewtonBodyDestructor m_bodyDestructor;
 	static NewtonApplyForceAndTorque m_chainPickBodyForceCallback; 
 
-	friend DemoCamera;
+	friend class DemoCamera;
 };
 
 #endif 
