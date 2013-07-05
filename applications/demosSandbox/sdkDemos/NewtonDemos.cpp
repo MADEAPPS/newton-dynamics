@@ -852,7 +852,7 @@ void NewtonDemos::OnSerializeWorld (wxCommandEvent& event)
 	wxFileDialog open (this, wxT("Export a Newton Dynamics Serialized Physics Scene"), wxT("../../../media"), wxT(""), wxT("*.bin"));
 	if (open.ShowModal() == wxID_OK) {
 		wxString currentDocPath (open.GetPath());
-		m_scene->SerializedPhysicScene (currentDocPath.c_str());
+		m_scene->SerializedPhysicScene (currentDocPath.mb_str());
 	}
 	m_scene->ResetTimer();
 
@@ -865,10 +865,9 @@ void NewtonDemos::OnDeserializeWorld(wxCommandEvent& event)
 
 	wxFileDialog save (this, wxT("Import a Newton Dynamics Serialized Physics Scene"), wxT("../../../media"), wxT(""), wxT("*.bin"));
 	if (save.ShowModal() == wxID_OK) {
-//		m_scene->makeCurrent();
 		wxString currentDocPath (save.GetPath());
-		m_scene->DeserializedPhysicScene (currentDocPath.c_str());
-//		m_scene->makeNonCurrent();
+		//m_scene->DeserializedPhysicScene (currentDocPath.c_str());
+		m_scene->DeserializedPhysicScene (currentDocPath.mb_str());
 		RestoreSettings ();
 	}
 
