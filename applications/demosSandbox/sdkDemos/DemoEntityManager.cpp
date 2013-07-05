@@ -247,7 +247,7 @@ void DemoEntityManager::CreateOpenGlFont()
 
 		int width = 0;
 		int height = 0;
-		for (char ch = 0; ch < 96; ch ++) {
+		for (int ch = 0; ch < 96; ch ++) {
 			// Load The Glyph For Our Character.
 			error = FT_New_Face( library, fileName, 0, &face[ch] );
 			dAssert (!error);
@@ -316,7 +316,7 @@ void DemoEntityManager::CreateOpenGlFont()
 		glBindTexture(GL_TEXTURE_2D, m_fontImage);
 
 		imageBase = 0;
-		for (char ch = 0; ch < 96; ch ++) {
+		for (int ch = 0; ch < 96; ch ++) {
 			FT_Face bitmap = face[ch];   
 			FT_GlyphSlot slot = bitmap->glyph;
 			const FT_Glyph_Metrics& metrics = slot->metrics;
