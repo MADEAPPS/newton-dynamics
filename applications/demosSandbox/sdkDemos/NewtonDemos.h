@@ -69,8 +69,8 @@ class NewtonDemos: public wxFrame
 	class SDKDemos
 	{
 		public:
-		const char *m_name;
-		const char *m_description;
+		const wxChar *m_name;
+		const wxChar *m_description;
 		LaunchSDKDemoCallback m_launchDemoCallback;
 	};
 	
