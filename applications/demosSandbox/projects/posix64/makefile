@@ -29,7 +29,7 @@
 
 
 # generic sdk flags
-SDK_FLAGS = -m64 -O0 -fpic -msse -msse2 -c -Wall -D_POSIX_VER -D__WXGTK__ -DD_JOINTLIBRARY_STATIC_LIB -g
+SDK_FLAGS = -m64 -O0 -fpic -msse -msse2 -c -Wall -D_POSIX_VER -DD_JOINTLIBRARY_STATIC_LIB -g `wx-config --libs` `wx-config --cxxflags`
 #SDK_FLAGS = -m64 -O3 -fpic -msse -msse2 -c -Wall -Werror -D_POSIX_VER -g 
 #SDK_FLAGS = -m64 -O3 -fpic -msse -msse2 -c -Wall -D_POSIX_VER -g 
 
