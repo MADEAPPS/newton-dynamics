@@ -148,8 +148,8 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 	class dgNodeBuilder;
 
 	virtual void GetAABB (dgVector& p0, dgVector& p1) const;
-	virtual void Serialize (dgSerialize callback, void* const userData) const {dgAssert (0);}
-	virtual void Deserialize (dgDeserialize callback, void* const userData) {dgAssert (0);}
+	virtual void Serialize (dgSerialize callback, void* const userData) const;
+	virtual void Deserialize (dgDeserialize callback, void* const userData);
 
 	protected:
 	dgAABBPolygonSoup ();
