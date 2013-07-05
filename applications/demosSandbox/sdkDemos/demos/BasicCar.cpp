@@ -883,7 +883,7 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 	// use this to display debug information about vehicle 
 	void Debug () const
 	{
-		for (CustomControllerManager::CustomController* ptr = GetFirstController(); ptr; ptr = GetNextController(ptr)) {
+		for (CustomController* ptr = GetFirstController(); ptr; ptr = GetNextController(ptr)) {
 			CustomVehicleController* const controller = (CustomVehicleController*) ptr;
 			BasicVehicleEntity* const vehicleEntity = (BasicVehicleEntity*)NewtonBodyGetUserData (controller->GetBody());
 			vehicleEntity->Debug();
