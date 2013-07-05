@@ -29,8 +29,7 @@
 
 
 # generic sdk flags
-SDK_FLAGS = -m64 -O0 -fpic -msse -msse2 -c -Wall -D_POSIX_VER -DD_JOINTLIBRARY_STATIC_LIB -g
-# -pg
+SDK_FLAGS = -m64 -O0 -fpic -msse -msse2 -c -Wall -D_POSIX_VER -D__WXGTK__ -DD_JOINTLIBRARY_STATIC_LIB -g
 #SDK_FLAGS = -m64 -O3 -fpic -msse -msse2 -c -Wall -Werror -D_POSIX_VER -g 
 #SDK_FLAGS = -m64 -O3 -fpic -msse -msse2 -c -Wall -D_POSIX_VER -g 
 
@@ -85,7 +84,7 @@ SDK_XML_MAKE = ../../../../packages/projects/$(PLATFORM)/thirdParty/tinyxml
 
 
 
-LIBS  = -L/usr/lib -lstdc++ -lrt -lm -lGL -lGLU -lGLEW -lpthread -lFOX-1.6 -lenet -lopenal
+LIBS  = -L/usr/lib -lstdc++ -lrt -lm -lGL -lGLU -lGLEW -lpthread -lgtk-x11-2.0 -lenet -lopenal
 
 # this use newton as shared or static library
 NEWTON_LIB = \
