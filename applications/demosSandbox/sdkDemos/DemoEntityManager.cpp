@@ -730,13 +730,13 @@ dFloat DemoEntityManager::CalculateInteplationParam () const
 
 void DemoEntityManager::OnKeyUp( wxKeyEvent &event )
 {
-	m_mainWindow->KeyRelease(event);
+	m_mainWindow->KeyUp(event);
 }
 
 
 void DemoEntityManager::OnKeyDown( wxKeyEvent &event )
 {
-	m_mainWindow->KeyPress(event);
+	m_mainWindow->KeyDown(event);
 }
 
 void DemoEntityManager::OnMouse(wxMouseEvent &event)

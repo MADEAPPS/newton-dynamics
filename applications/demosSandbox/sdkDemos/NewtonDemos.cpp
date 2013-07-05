@@ -174,7 +174,7 @@ class NewtonDemosApp: public wxApp
 		int version = NewtonWorldGetVersion();
 		char tittle[256]; 
 		sprintf (tittle, "Newton %d.%02d SDK demos", version / 100, version % 100);
-		NewtonDemos* const frame = new NewtonDemos(tittle, wxDefaultPosition, wxSize(1024, 768));
+		NewtonDemos* const frame = new NewtonDemos(_T(tittle), wxDefaultPosition, wxSize(1024, 768));
 
 		frame->Show(true);
 		SetTopWindow(frame);
@@ -533,7 +533,7 @@ void NewtonDemos::KeyDown(const wxKeyEvent &event)
 }
 
 
-void NewtonDemos::KeyRelease(const wxKeyEvent &event)
+void NewtonDemos::KeyUp(const wxKeyEvent &event)
 {
 	if (!event.GetModifiers()) {
 		int keyCode = event.GetKeyCode();
