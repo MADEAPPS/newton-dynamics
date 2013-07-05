@@ -48,11 +48,6 @@ SDK_VISUALDEBUGGER_PATH = ../../../../packages/dVisualDebuggerServer
 SDK_AILIBRARY_PATH = ../../../../packages/dAILibrary
 SDK_XML_PATH = ../../../../packages/thirdParty/tinyxml
 
-#WX_WIDGETS_INCLUDE = /usr/include/wx-2.8
-
-
-
-
 
 SDK_INCLUDE_PATH = \
 		-I ../../../../coreLibrary_300/source/newton \
@@ -69,8 +64,6 @@ SDK_INCLUDE_PATH = \
 		-I $(SDK_VISUALDEBUGGER_PATH) \
 		-I $(SDK_AILIBRARY_PATH) \
 		-I $(SDK_XML_PATH)	
-
-
 
 
 

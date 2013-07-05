@@ -47,11 +47,14 @@
 	#pragma warning (disable: 4127) //conditional expression is constant
 #endif
 
-#include <new.h>
+#include <new>
 #include <stdio.h>
 #include <stdlib.h>
 #include <Newton.h>
 #include <CustomJoint.h>
+
+#if (defined (_POSIX_VER) || defined (_POSIX_VER_64))
+#endif
 
 #endif
 

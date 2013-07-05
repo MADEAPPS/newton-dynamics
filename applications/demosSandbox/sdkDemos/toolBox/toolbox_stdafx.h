@@ -71,14 +71,6 @@ typedef long long unsigned64;
 	// audio library support
 	#include <al/al.h>
 	#include <al/alc.h>
-
-	// gui library includes
-	#include <wx/wx.h>
-	#include <wx/event.h>
-	#include <wx/dcclient.h>
-	#include <wx/glcanvas.h>
-
-
 #endif
 	
 #if (defined (_POSIX_VER) || defined (_POSIX_VER_64))
@@ -93,14 +85,6 @@ typedef long long unsigned64;
 	// audio library support
 	#include <AL/al.h>
 	#include <AL/alc.h>
-
-	// gui library includes
-	#include <wx/wx.h>
-	#include <wx/event.h>
-	#include <wx/dcclient.h>
-	#include <wx/glcanvas.h>
-
-
 #endif
 
 #ifdef _MACOSX_VER
@@ -116,13 +100,14 @@ typedef long long unsigned64;
 
 	#include <ft2build.h>
 	#include FT_FREETYPE_H
-
-	// gui library includes
-	#include <wx/wx.h>
-	#include <wx/event.h>
-	#include <wx/dcclient.h>
-	#include <wx/glcanvas.h>
 #endif
+
+
+// gui library includes
+#include <wx/wx.h>
+#include <wx/event.h>
+#include <wx/dcclient.h>
+#include <wx/glcanvas.h>
 
 
 
