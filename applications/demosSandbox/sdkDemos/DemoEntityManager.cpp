@@ -488,11 +488,9 @@ void DemoEntityManager::DeserializedPhysicScene (const char* const name)
 	FILE* const file = fopen (name, "rb");
 
 	if (file) {
-		// read the application data use to initialize the engine and other application related stuff.
-		// reading the camera orientation
-		dMatrix camMatrix(GetIdentityMatrix());
-	//	DeserializeFile (file, &camMatrix, sizeof (camMatrix));
-	//	SetCameraMatrix(dQuaternion (camMatrix), camMatrix.m_posit);
+		dQuaternion rot;
+		dVector origin (-30.0f, 10.0f, 10.0f, 0.0f);
+		SetCameraMatrix(rot, origin);
 
 		NewtonDeserializeBodyArray(m_world, BodyDeserialization, DeserializeFile, file);
 		fclose (file);
