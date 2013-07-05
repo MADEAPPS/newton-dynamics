@@ -796,7 +796,7 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 		NewtonWorld* const world = GetWorld(); 
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 		dSoundManager* const soundManager = scene->GetSoundManager();
-		for (CustomControllerManager::CustomController* ptr = GetFirstController(); ptr; ptr = GetNextController(ptr)) {
+		for (CustomController* ptr = GetFirstController(); ptr; ptr = GetNextController(ptr)) {
 			CustomVehicleController* const controller = (CustomVehicleController*) ptr;
 			
 			NewtonBody* const body = controller->GetBody();
