@@ -131,7 +131,7 @@ void SkyBox::Render(dFloat timeStep) const
 	
 SkyBox::~SkyBox()
 {
-	for (int i = 0; i < sizeof (m_textures) / sizeof (m_textures[0]); i ++) {
+	for (int i = 0; i < int (sizeof (m_textures) / sizeof (m_textures[0])); i ++) {
 		ReleaseTexture(m_textures[i]);
 	}
 }
