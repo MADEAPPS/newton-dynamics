@@ -173,7 +173,7 @@ class NewtonDemosApp: public wxApp
 
 		int version = NewtonWorldGetVersion();
 		wxString tittle;
-		tittle.sprintf ("Newton %d.%02d SDK demos", version / 100, version % 100);
+		tittle.Printf ("Newton %d.%02d SDK demos", version / 100, version % 100);
 		NewtonDemos* const frame = new NewtonDemos(tittle, wxDefaultPosition, wxSize(1024, 768));
 		
 
