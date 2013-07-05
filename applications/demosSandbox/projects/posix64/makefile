@@ -115,32 +115,33 @@ SDK_DEMOS_SRC = \
 		$(SDK_DEMOS_PATH)/AdvancedPlayerController.cpp \
 		$(SDK_DEMOS_PATH)/BasicCar.cpp \
 		$(SDK_DEMOS_PATH)/BasicFriction.cpp \
-		$(SDK_DEMOS_PATH)/BasicSphereSpin.cpp \
+		$(SDK_DEMOS_PATH)/BasicPlayerController.cpp \
+		$(SDK_DEMOS_PATH)/BasicRagDoll.cpp \
+		$(SDK_DEMOS_PATH)/BasicRestitution.cpp \
 		$(SDK_DEMOS_PATH)/BasicStacking.cpp \
 		$(SDK_DEMOS_PATH)/ClosestDistance.cpp \
-		$(SDK_DEMOS_PATH)/KinematicBodies.cpp \
-		$(SDK_DEMOS_PATH)/ConvexApproximation.cpp \
-		$(SDK_DEMOS_PATH)/MeshCollision.cpp \
-		$(SDK_DEMOS_PATH)/SceneCollision.cpp \
-		$(SDK_DEMOS_PATH)/SoftBodies.cpp \
-		$(SDK_DEMOS_PATH)/SimpleConvexShatter.cpp \
-		$(SDK_DEMOS_PATH)/UsingNewtonMeshTool.cpp \
-		$(SDK_DEMOS_PATH)/BasicRestitution.cpp \
-		$(SDK_DEMOS_PATH)/PrecessingTops.cpp \
-		$(SDK_DEMOS_PATH)/PrimitiveCollision.cpp \
-		$(SDK_DEMOS_PATH)/ConvexCast.cpp \
-		$(SDK_DEMOS_PATH)/SimpleBooleans.cpp \
-		$(SDK_DEMOS_PATH)/UserStaticCollision.cpp \
-		$(SDK_DEMOS_PATH)/HeighFieldCollision.cpp \
 		$(SDK_DEMOS_PATH)/CompoundCollision.cpp \
-		$(SDK_DEMOS_PATH)/ScaledCollision.cpp \
+		$(SDK_DEMOS_PATH)/ContinueCollision.cpp \
+		$(SDK_DEMOS_PATH)/ConvexApproximation.cpp \
+		$(SDK_DEMOS_PATH)/ConvexCast.cpp \
+		$(SDK_DEMOS_PATH)/HeavyVehicles.cpp \
+		$(SDK_DEMOS_PATH)/HeighFieldCollision.cpp \
+		$(SDK_DEMOS_PATH)/KinematicBodies.cpp \
+		$(SDK_DEMOS_PATH)/MeshCollision.cpp \
 		$(SDK_DEMOS_PATH)/MultiRayCasting.cpp \
 		$(SDK_DEMOS_PATH)/PostCompoundCreateBuildTest.cpp \
+		$(SDK_DEMOS_PATH)/PrecessingTops.cpp \
+		$(SDK_DEMOS_PATH)/PrimitiveCollision.cpp \
 		$(SDK_DEMOS_PATH)/PuckSlide.cpp \
-		$(SDK_DEMOS_PATH)/BasicPlayerController.cpp \
-		$(SDK_DEMOS_PATH)/HeavyVehicles.cpp \
+		$(SDK_DEMOS_PATH)/ScaledCollision.cpp \
+		$(SDK_DEMOS_PATH)/SceneCollision.cpp \
+		$(SDK_DEMOS_PATH)/SimpleBooleans.cpp \
+		$(SDK_DEMOS_PATH)/SimpleConvexShatter.cpp \
+		$(SDK_DEMOS_PATH)/SoftBodies.cpp \
 		$(SDK_DEMOS_PATH)/SuperCar.cpp \
-		$(SDK_DEMOS_PATH)/ContinueCollision.cpp
+		$(SDK_DEMOS_PATH)/UserStaticCollision.cpp \
+		$(SDK_DEMOS_PATH)/UsingNewtonMeshTool.cpp
+		
 #	$(SDK_DEMOS_PATH)/ArchimedesBuoyancy.cpp \
 #	$(SDK_DEMOS_PATH)/BasicCustomJoints.cpp \
 #	$(SDK_DEMOS_PATH)/BasicRobots.cpp \
@@ -163,7 +164,6 @@ SDK_DEMOS_SRC = \
 
 
 SDK_TOOLBOX_SRC = \
-		$(SDK_TOOLBOX_PATH)/UserPlaneCollision.cpp \
 		$(SDK_TOOLBOX_PATH)/DebugDisplay.cpp \
 		$(SDK_TOOLBOX_PATH)/dHighResolutionTimer.cpp \
 		$(SDK_TOOLBOX_PATH)/dRuntimeProfiler.cpp \
@@ -174,8 +174,9 @@ SDK_TOOLBOX_SRC = \
 		$(SDK_TOOLBOX_PATH)/PhysicsUtils.cpp \
 		$(SDK_TOOLBOX_PATH)/SkyBox.cpp \
 		$(SDK_TOOLBOX_PATH)/TargaToOpenGl.cpp \
-		$(SDK_TOOLBOX_PATH)/toolbox_stdafx.cpp
-#		$(SDK_TOOLBOX_PATH)/UserHeightFieldCollision.cpp
+		$(SDK_TOOLBOX_PATH)/toolbox_stdafx.cpp \
+		$(SDK_TOOLBOX_PATH)/UserHeightFieldCollision.cpp \
+		$(SDK_TOOLBOX_PATH)/UserPlaneCollision.cpp
 #		$(SDK_TOOLBOX_PATH)/LevelPrimitive.cpp \
 #		$(SDK_TOOLBOX_PATH)/PlaneCollision.cpp \
 #		$(SDK_TOOLBOX_PATH)/ShaderPrograms.cpp \

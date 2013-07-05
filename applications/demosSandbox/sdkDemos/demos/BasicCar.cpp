@@ -841,7 +841,7 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 		CustomVehicleControllerManager::PostUpdate(timestep);
 
 		// update the visual transformation matrices for all vehicle tires
-		for (CustomControllerManager::CustomController* ptr = GetFirstController(); ptr; ptr = GetNextController(ptr)) {
+		for (CustomController* ptr = GetFirstController(); ptr; ptr = GetNextController(ptr)) {
 			CustomVehicleController* const controller = (CustomVehicleController*) ptr;
 			BasicVehicleEntity* const vehicleEntity = (BasicVehicleEntity*)NewtonBodyGetUserData (controller->GetBody());
 			vehicleEntity->UpdateTireTransforms();
