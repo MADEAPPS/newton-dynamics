@@ -417,7 +417,8 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 			#ifdef _POSIX_VER
 				wxChar wPlatform[256];
 				mbstowcs (wPlatform, platform, sizeof (platform));
-				label.Printf (wxT(" hardware mode %s"), wxT(wPlatform));
+				wxString tmp (wPlatform);
+				label.Printf (wxT(" hardware mode %s"), tmp.c_str());
 			#else 
 				label.Printf (wxT(" hardware mode %s"), wxT(platform));
 			#endif
@@ -616,33 +617,33 @@ void NewtonDemos::CalculateFPS(float timestep)
 		m_timestepAcc -= 0.25f;
 		m_framesCount = 0.0f;
 
-		char statusText [512] ;
+		wxString statusText;
 		NewtonWorld* const world = m_scene->GetNewton();
 		char platform[256];
 		NewtonGetDeviceString(world, NewtonGetCurrentDevice(world), platform, sizeof (platform));
 		int memoryUsed = NewtonGetMemoryUsed() / (1024) ;
 		
-		sprintf (statusText, "render fps: %7.2f", m_fps);
+		statusText.Printf (wxT ("render fps: %7.2f"), m_fps);
 		m_statusbar->SetStatusText (statusText, 0);
 
-		sprintf (statusText, "physics time: %4.2f ms", m_scene->GetPhysicsTime() * 1000.0f);
+		statusText.Printf (wxT ("physics time: %4.2f ms"), m_scene->GetPhysicsTime() * 1000.0f);
 		m_statusbar->SetStatusText (statusText, 1);
 
-		sprintf (statusText, "memory: %d kbytes", memoryUsed);
+		statusText.Printf (wxT ("memory: %d kbytes"), memoryUsed);
 		m_statusbar->SetStatusText (statusText, 2);
 
-		sprintf (statusText, "bodies: %d", NewtonWorldGetBodyCount(world));
+		statusText.Printf (wxT ("bodies: %d"), NewtonWorldGetBodyCount(world));
 		m_statusbar->SetStatusText (statusText, 3);
 
-		sprintf (statusText, "threads: %d", NewtonGetThreadsCount(world));
+		statusText.Printf (wxT ("threads: %d"), NewtonGetThreadsCount(world));
 		m_statusbar->SetStatusText (statusText, 4);
 
-		sprintf (statusText, "auto sleep: %s", m_autoSleepState ? "on" : "off");
+		statusText.Printf (wxT ("auto sleep: %s"), m_autoSleepState ? "on" : "off");
 		m_statusbar->SetStatusText (statusText, 5);
 
 		char floatMode[128];
 		NewtonGetDeviceString (m_scene->GetNewton(), m_hardwareDevice, floatMode, sizeof (floatMode));
-		sprintf (statusText, "instructions: %s", floatMode);
+		statusText.Printf (wxT ("instructions: %s"), floatMode);
 		m_statusbar->SetStatusText (statusText, 6);
 
 	}
