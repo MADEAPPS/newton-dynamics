@@ -344,31 +344,31 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 	{
 		wxMenu* const fileMenu = new wxMenu;
 
-		fileMenu->Append(wxID_ABOUT, _("About"));
+		fileMenu->Append(wxID_ABOUT, wxT("About"));
 		
 		fileMenu->AppendSeparator();
-		fileMenu->Append(wxID_PREFERENCES, _("Preferences"));
+		fileMenu->Append(wxID_PREFERENCES, wxT("Preferences"));
 
 		fileMenu->AppendSeparator();
-		fileMenu->Append(wxID_NEW, _("&New"), _("Create a blank new scene"));
+		fileMenu->Append(wxID_NEW, wxT("&New"), wxT("Create a blank new scene"));
 
 		fileMenu->AppendSeparator();
-		fileMenu->Append(wxID_OPEN, _("&Open"), _("Open visual scene in dScene newton format"));
-		fileMenu->Append(wxID_SAVE, _("&Save"), _("Save visual scene in dScene newton format"));
+		fileMenu->Append(wxID_OPEN, wxT("&Open"), wxT("Open visual scene in dScene newton format"));
+		fileMenu->Append(wxID_SAVE, wxT("&Save"), wxT("Save visual scene in dScene newton format"));
 
 		fileMenu->AppendSeparator();
-		fileMenu->Append(ID_SERIALIZE, _T("&Serialize"), _T("Serialize scene to binary file"));
-		fileMenu->Append(ID_DESERIALIZE, _T("&Deserialize"), _T("Load previuoslly serialized scame"));
+		fileMenu->Append(ID_SERIALIZE, wxT("&Serialize"), wxT("Serialize scene to binary file"));
+		fileMenu->Append(ID_DESERIALIZE, wxT("&Deserialize"), wxT("Load previuoslly serialized scame"));
 
 	//	fileMenu->AppendSeparator();
-	//	fileMenu->Append(m_idImportPhysics, _T("&Open physics scene"), _T("Open physics scene in collada format"));
-	//	fileMenu->Append(m_idExportPhysics, _T("&Save physics scene"), _T("Save physics in collada format"));
+	//	fileMenu->Append(m_idImportPhysics, wxT("&Open physics scene"), wxT("Open physics scene in collada format"));
+	//	fileMenu->Append(m_idExportPhysics, wxT("&Save physics scene"), wxT("Save physics in collada format"));
 
 		fileMenu->AppendSeparator();
-		fileMenu->Append(wxID_EXIT, _("E&xit\tAlt-X"), _("Quit SDK sample") );
+		fileMenu->Append(wxID_EXIT, wxT("E&xit\tAlt-X"), wxT("Quit SDK sample") );
 
 		// add main menus to menu bar
-		mainMenu->Append(fileMenu, _("&File"));
+		mainMenu->Append(fileMenu, wxT("&File"));
 	}
 
 	// engine all demo examples
@@ -379,31 +379,31 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 			sdkDemos->AppendRadioItem (NewtonDemos::ID_RUN_DEMO + i,  m_demosSelection[i].m_name, m_demosSelection[i].m_description);
 		}
 
-		mainMenu->Append(sdkDemos, _("&Demos"));
+		mainMenu->Append(sdkDemos, wxT("&Demos"));
 	}
 
 	// option menu
 	{
 		wxMenu* const optionsMenu = new wxMenu;;
 
-		optionsMenu->AppendCheckItem(ID_AUTOSLEEP_MODE, _("Auto sleep mode"), _("toogle auto sleep bodies"));
+		optionsMenu->AppendCheckItem(ID_AUTOSLEEP_MODE, wxT("Auto sleep mode"), wxT("toogle auto sleep bodies"));
 		optionsMenu->Check (ID_AUTOSLEEP_MODE, m_autoSleepState);
 
-		optionsMenu->AppendCheckItem(ID_SHOW_STATISTICS, _("Show Stats on screen"), _("toogle on screen frame rate and other stats"));
-		optionsMenu->AppendCheckItem(ID_USE_PARALLEL_SOLVER, _("Parallel solver on"));
+		optionsMenu->AppendCheckItem(ID_SHOW_STATISTICS, wxT("Show Stats on screen"), wxT("toogle on screen frame rate and other stats"));
+		optionsMenu->AppendCheckItem(ID_USE_PARALLEL_SOLVER, wxT("Parallel solver on"));
 
 		optionsMenu->AppendSeparator();
-		optionsMenu->AppendRadioItem(ID_SHOW_COLLISION_MESH, _("Hide collision Mesh"));
-		optionsMenu->AppendRadioItem(ID_SHOW_COLLISION_MESH + 1, _("Show solid collision Mesh"));
-		optionsMenu->AppendRadioItem(ID_SHOW_COLLISION_MESH + 2, _("Show wire frame collision Mesh"));
+		optionsMenu->AppendRadioItem(ID_SHOW_COLLISION_MESH, wxT("Hide collision Mesh"));
+		optionsMenu->AppendRadioItem(ID_SHOW_COLLISION_MESH + 1, wxT("Show solid collision Mesh"));
+		optionsMenu->AppendRadioItem(ID_SHOW_COLLISION_MESH + 2, wxT("Show wire frame collision Mesh"));
 
 		optionsMenu->AppendSeparator();
-		optionsMenu->AppendCheckItem(ID_HIDE_VISUAL_MESHES, _("Hide visual meshes"));
-		optionsMenu->AppendCheckItem(ID_SHOW_CONTACT_POINTS, _("Show contact points"));
-		optionsMenu->AppendCheckItem(ID_SHOW_NORMAL_FORCES, _("Show normal forces"));
-		optionsMenu->AppendCheckItem(ID_SHOW_AABB, _("Show aabb"));
-		optionsMenu->AppendCheckItem(ID_SHOW_CENTER_OF_MASS, _("Show center of mass"));
-		optionsMenu->AppendCheckItem(ID_SHOW_JOINTS, _("show Joint debug info"));
+		optionsMenu->AppendCheckItem(ID_HIDE_VISUAL_MESHES, wxT("Hide visual meshes"));
+		optionsMenu->AppendCheckItem(ID_SHOW_CONTACT_POINTS, wxT("Show contact points"));
+		optionsMenu->AppendCheckItem(ID_SHOW_NORMAL_FORCES, wxT("Show normal forces"));
+		optionsMenu->AppendCheckItem(ID_SHOW_AABB, wxT("Show aabb"));
+		optionsMenu->AppendCheckItem(ID_SHOW_CENTER_OF_MASS, wxT("Show center of mass"));
+		optionsMenu->AppendCheckItem(ID_SHOW_JOINTS, wxT("show Joint debug info"));
 	
 
 		optionsMenu->AppendSeparator();
@@ -414,37 +414,37 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 			
 			NewtonGetDeviceString (m_scene->GetNewton(), i, platform, sizeof (platform));
 			sprintf (label, " hardware mode %s", platform);
-			optionsMenu->AppendRadioItem(ID_PLATFORMS + i, _(label));
+			optionsMenu->AppendRadioItem(ID_PLATFORMS + i, wxT(label));
 		}
 		//optionsMenu->Check(ID_PLATFORMS, true);
 
 		optionsMenu->AppendSeparator();
-		optionsMenu->Append(ID_SHOW_CONCURRENCE_PROFILER, _("Show concurrent profiler"));
-		optionsMenu->Append(ID_SHOW_PROFILER, _("Show micro thread profiler"));
+		optionsMenu->Append(ID_SHOW_CONCURRENCE_PROFILER, wxT("Show concurrent profiler"));
+		optionsMenu->Append(ID_SHOW_PROFILER, wxT("Show micro thread profiler"));
 
 		optionsMenu->AppendSeparator();
-		optionsMenu->Append(ID_SELECT_ALL_PROFILERS, _("select all profiler"));
-		optionsMenu->Append(ID_UNSELECT_ALL_PROFILERS, _("unselect all profiler"));
+		optionsMenu->Append(ID_SELECT_ALL_PROFILERS, wxT("select all profiler"));
+		optionsMenu->Append(ID_UNSELECT_ALL_PROFILERS, wxT("unselect all profiler"));
 
 		wxMenu* const profilerSubMenu = new wxMenu;
-		m_profilerTracksMenu[0] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 0, _("show global physics update performance chart"));
-		m_profilerTracksMenu[1] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 1, _("global collision update performance chart"));
-		m_profilerTracksMenu[2] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 2, _("broad phase collision performance chart"));
-		m_profilerTracksMenu[3] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 3, _("narrow phase collision performance chart"));
-		m_profilerTracksMenu[4] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 4, _("global dynamics update performance chart"));
-		m_profilerTracksMenu[5] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 5, _("dynamics setup performance chart"));
-		m_profilerTracksMenu[6] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 6, _("dynamics solver performance chart"));
-		m_profilerTracksMenu[7] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 7, _("force and torque callback performance chart"));
-		m_profilerTracksMenu[8] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 8, _("pre-simulation listener"));
-		m_profilerTracksMenu[9] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 9, _("post-simulation listener"));
+		m_profilerTracksMenu[0] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 0, wxT("show global physics update performance chart"));
+		m_profilerTracksMenu[1] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 1, wxT("global collision update performance chart"));
+		m_profilerTracksMenu[2] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 2, wxT("broad phase collision performance chart"));
+		m_profilerTracksMenu[3] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 3, wxT("narrow phase collision performance chart"));
+		m_profilerTracksMenu[4] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 4, wxT("global dynamics update performance chart"));
+		m_profilerTracksMenu[5] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 5, wxT("dynamics setup performance chart"));
+		m_profilerTracksMenu[6] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 6, wxT("dynamics solver performance chart"));
+		m_profilerTracksMenu[7] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 7, wxT("force and torque callback performance chart"));
+		m_profilerTracksMenu[8] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 8, wxT("pre-simulation listener"));
+		m_profilerTracksMenu[9] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 9, wxT("post-simulation listener"));
 //		if (mainFrame->m_physicProfilerState) {
 //			m_profilerTracksMenu[0]->setCheck(true);
 //		}
-		optionsMenu->AppendSubMenu (profilerSubMenu, _("select sub profiler"));
+		optionsMenu->AppendSubMenu (profilerSubMenu, wxT("select sub profiler"));
 
 
 		optionsMenu->AppendSeparator();
-		optionsMenu->AppendCheckItem(ID_CONCURRENT_PHYSICS_UPDATE, _("Concurrent physics update"));
+		optionsMenu->AppendCheckItem(ID_CONCURRENT_PHYSICS_UPDATE, wxT("Concurrent physics update"));
 
 		wxMenu* const microThreadedsSubMenu = new wxMenu;
 		for (int i = 0 ; i < int (sizeof (m_threadsTracks)/ sizeof (m_threadsTracks[0])); i ++) {
@@ -452,19 +452,19 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 			msg.Printf(wxT ("%d micro threads"), m_threadsTracks[i]);
 			microThreadedsSubMenu->AppendRadioItem(ID_SELECT_MICROTHREADS + i, msg);
 		}
-		optionsMenu->AppendSubMenu (microThreadedsSubMenu, _("select microThread count"));
+		optionsMenu->AppendSubMenu (microThreadedsSubMenu, wxT("select microThread count"));
 
 
-		mainMenu->Append(optionsMenu, _("&Options"));
+		mainMenu->Append(optionsMenu, wxT("&Options"));
 	}
 
 	// add help menu
 	{
 		wxMenu* const helpMenu = new wxMenu;;
 
-		helpMenu->Append(wxID_HELP, _("About"));
-//		helpMenu->Append(NewtonDemos::ID_ON_ABOUT, _T("About"));
-		mainMenu->Append(helpMenu, _("&Help"));
+		helpMenu->Append(wxID_HELP, wxT("About"));
+//		helpMenu->Append(NewtonDemos::ID_ON_ABOUT, wxT("About"));
+		mainMenu->Append(helpMenu, wxT("&Help"));
 	}
 
 	SetMenuBar(mainMenu);
@@ -841,7 +841,7 @@ void NewtonDemos::OnSerializeWorld (wxCommandEvent& event)
 {
 	BEGIN_MENU_OPTION();
 
-	wxFileDialog open (this, _("Export a Newton Dynamics Serialized Physics Scene"), _("../../../media"), _(""), _T("*.bin"));
+	wxFileDialog open (this, wxT("Export a Newton Dynamics Serialized Physics Scene"), wxT("../../../media"), wxT(""), wxT("*.bin"));
 	if (open.ShowModal() == wxID_OK) {
 		wxString currentDocPath (open.GetPath());
 		m_scene->SerializedPhysicScene (currentDocPath.c_str());
@@ -855,7 +855,7 @@ void NewtonDemos::OnDeserializeWorld(wxCommandEvent& event)
 {
 	BEGIN_MENU_OPTION();
 
-	wxFileDialog save (this, _("Import a Newton Dynamics Serialized Physics Scene"), _("../../../media"), _(""), _T("*.bin"));
+	wxFileDialog save (this, wxT("Import a Newton Dynamics Serialized Physics Scene"), wxT("../../../media"), wxT(""), wxT("*.bin"));
 	if (save.ShowModal() == wxID_OK) {
 //		m_scene->makeCurrent();
 		wxString currentDocPath (save.GetPath());
