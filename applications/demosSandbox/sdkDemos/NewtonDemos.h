@@ -12,13 +12,10 @@
 #ifndef __NEWTON_DEMOS_H__
 #define __NEWTON_DEMOS_H__
 
-#include <toolbox_stdafx.h>
 
 class DemoMenu;
+class wxKeyEvent;
 class DemoEntityManager;
-
-
-
 
 class NewtonDemos: public wxFrame
 {
@@ -87,8 +84,8 @@ class NewtonDemos: public wxFrame
 	void END_MENU_OPTION();
 	void RestoreSettings ();
 
-	void KeyPress(const wxKeyEvent &event);
-	void KeyRelease(const wxKeyEvent &event);
+	void KeyPress(const wxKeyEvent& event);
+	void KeyRelease(const wxKeyEvent& event);
 	void MouseAction(const wxMouseEvent &event);
 
 	bool GetKeyState (int key) const;
