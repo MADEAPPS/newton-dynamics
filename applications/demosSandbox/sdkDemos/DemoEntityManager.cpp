@@ -283,7 +283,7 @@ void DemoEntityManager::CreateOpenGlFont()
 		int maxWidth = 0;
 		int imageBase = 0;
 		
-		for (char ch = 0; ch < 96; ch ++) {
+		for (int ch = 0; ch < 96; ch ++) {
 			FT_Face bitmap = face[ch];   
 			FT_GlyphSlot slot = bitmap->glyph;
 

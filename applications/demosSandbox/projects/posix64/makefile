@@ -96,20 +96,19 @@ NEWTON_LIB = \
 	$(SDK_NEWTON_PATH)/libTinyXML.a
 
 
-
 SDK_MAIN_SRC = \
-		$(SDK_MAIN_PATH)/NewtonDemos.cpp \
+		$(SDK_MAIN_PATH)/DemoAIListener.cpp \
+		$(SDK_MAIN_PATH)/DemoCameraListener.cpp \
+		$(SDK_MAIN_PATH)/DemoEntityListener.cpp \
+		$(SDK_MAIN_PATH)/DemoListenerBase.cpp \
+		$(SDK_MAIN_PATH)/DemoSoundListener.cpp \
+		$(SDK_MAIN_PATH)/DemoVisualDebugerListener.cpp \
 		$(SDK_MAIN_PATH)/DemoAIAgent.cpp \
 		$(SDK_MAIN_PATH)/DemoCamera.cpp \
 		$(SDK_MAIN_PATH)/DemoEntity.cpp \
 		$(SDK_MAIN_PATH)/DemoEntityManager.cpp \
-		$(SDK_MAIN_PATH)/DemoMenu.cpp \
 		$(SDK_MAIN_PATH)/DemoMesh.cpp \
-		$(SDK_MAIN_PATH)/DemoListenerBase.cpp \
-		$(SDK_MAIN_PATH)/DemoAIListener.cpp \
-		$(SDK_MAIN_PATH)/DemoEntityListener.cpp \
-		$(SDK_MAIN_PATH)/DemoSoundListener.cpp \
-		$(SDK_MAIN_PATH)/DemoVisualDebugerListener.cpp
+		$(SDK_MAIN_PATH)/NewtonDemos.cpp
 		
 
 SDK_DEMOS_SRC = \
