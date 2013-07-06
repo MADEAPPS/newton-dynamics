@@ -1598,11 +1598,6 @@ dgInt32 dgBroadPhase::ConvexCast (dgCollisionInstance* const shape, const dgMatr
 		stackPool[0] = m_rootNode;
 		distance[0] = ray.BoxIntersect(minBox, maxBox);
 
-static int xxx;
-xxx ++;
-if (xxx >= 2000)
-xxx *=1;
-
 		while (stack) {
 			stack --;
 

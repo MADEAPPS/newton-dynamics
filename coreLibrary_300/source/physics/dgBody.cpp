@@ -243,6 +243,8 @@ dgFloat32 dgBody::RayCast (const dgLineBox& line, OnRayCastAction filter, OnRayP
 	return maxT;
 }
 
+
+
 dgFloat32 dgBody::ConvexRayCast (const dgFastRayTest& ray, const dgCollisionInstance* const convexShape, const dgVector& shapeMinBox, const dgVector& shapeMaxBox, const dgMatrix& origin, const dgVector& shapeVeloc, OnRayCastAction filter, OnRayPrecastAction preFilter, void* const userData, dgFloat32 minT, dgInt32 threadId) const
 {
 	dgVector minBox (m_minAABB - shapeMaxBox);
