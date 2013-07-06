@@ -27,27 +27,30 @@ SDK_CONTAINERS = ../../../dContainers
 NEWTON_SDK = ../../../posix64
 
 LIB_SRCS = \
+	$(SRC_PATH)/CustomAlloc.cpp \
+	$(SRC_PATH)/CustomJointLibraryStdAfx.cpp \
 	$(SRC_PATH)/Custom6DOF.cpp \
 	$(SRC_PATH)/CustomBallAndSocket.cpp \
-	$(SRC_PATH)/CustomControllerManager.cpp \
 	$(SRC_PATH)/CustomCorkScrew.cpp \
 	$(SRC_PATH)/CustomDryRollingFriction.cpp \
 	$(SRC_PATH)/CustomGear.cpp \
 	$(SRC_PATH)/CustomHinge.cpp \
 	$(SRC_PATH)/CustomJoint.cpp \
-	$(SRC_PATH)/CustomJointLibraryStdAfx.cpp \
 	$(SRC_PATH)/CustomKinematicController.cpp \
 	$(SRC_PATH)/CustomPathFollow.cpp \
-	$(SRC_PATH)/CustomPlayerControllerManager.cpp \
 	$(SRC_PATH)/CustomPulley.cpp \
-	$(SRC_PATH)/CustomRagDoll.cpp \
+	$(SRC_PATH)/CustomRackAndPinion.cpp \
 	$(SRC_PATH)/CustomSlider.cpp \
 	$(SRC_PATH)/CustomSlidingContact.cpp \
 	$(SRC_PATH)/CustomUniversal.cpp \
 	$(SRC_PATH)/CustomUpVector.cpp \
 	$(SRC_PATH)/CustomUserBlank.cpp \
-	$(SRC_PATH)/CustomVehicleControllerManager.cpp \
-	$(SRC_PATH)/CustomWormGear.cpp
+	$(SRC_PATH)/CustomControllerManager.cpp \
+	$(SRC_PATH)/CustomSkeletonTransformManager.cpp \
+	$(SRC_PATH)/CustomTriggerManager.cpp \
+	$(SRC_PATH)/CustomPlayerControllerManager.cpp \
+	$(SRC_PATH)/CustomVehicleControllerManager.cpp
+
 
 # ******************************************************
 #
