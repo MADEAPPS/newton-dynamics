@@ -79,9 +79,9 @@ class dgAABBPolygonSoup::dgNodeBuilder: public dgAABBPolygonSoup::dgNode
 
 	dgNodeBuilder (dgNodeBuilder* const left, dgNodeBuilder* const right)
 		:dgNode()
-		,m_parent(NULL)
 		,m_left(left)
 		,m_right(right)
+		,m_parent(NULL)
 		,m_indexBox0(0)
 		,m_indexBox1(0)
 		,m_enumeration(-1)
@@ -121,9 +121,10 @@ class dgAABBPolygonSoup::dgNodeBuilder: public dgAABBPolygonSoup::dgNode
 	dgVector m_size;
 	dgVector m_origin;
 	dgFloat32 m_area;
-	dgNodeBuilder* m_parent;
-	dgNodeBuilder* m_right;
+	
 	dgNodeBuilder* m_left;
+	dgNodeBuilder* m_right;
+	dgNodeBuilder* m_parent;
 	dgInt32 m_indexBox0;
 	dgInt32 m_indexBox1;
 	dgInt32 m_enumeration;
