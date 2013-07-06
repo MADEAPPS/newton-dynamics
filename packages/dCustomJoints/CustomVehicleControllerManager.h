@@ -155,7 +155,12 @@ class CustomVehicleController
 		NEWTON_API void SetIdleFakeInertia(dFloat inertia);
 		NEWTON_API void SetTopSpeed (dFloat topSpeedMeterPerSecunds);
 		NEWTON_API dFloat CaculateEngineRPS (const TireBodyState* const tire, dFloat gearGain) const;
-		
+
+		GearBox* m_gearBox;
+		TireList::CustomListNode* m_leftTire;
+		TireList::CustomListNode* m_righTire;
+		InterpolationCurve m_torqueCurve;
+
 		dFloat m_speedMPS;
 		dFloat m_currentRPS;
 		dFloat m_topSpeedMPS;
@@ -163,11 +168,6 @@ class CustomVehicleController
 		dFloat m_engineInternalInertia;
 		dFloat m_differentialGearRatio;
 		dFloat m_engineOptimalRevPerSec;
-
-		GearBox* m_gearBox;
-		TireList::CustomListNode* m_leftTire;
-		TireList::CustomListNode* m_righTire;
-		InterpolationCurve m_torqueCurve;
 	};
 
 	class BrakeComponent: public Component

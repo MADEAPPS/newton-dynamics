@@ -93,16 +93,16 @@ CustomVehicleController::EngineComponent::GearBox::GearBox(CustomVehicleControll
 
 CustomVehicleController::EngineComponent::EngineComponent (CustomVehicleController* const controller, GearBox* const gearBox, TireBodyState* const leftTire, TireBodyState* const righTire)
 	:Component (controller)
+	,m_gearBox(gearBox)
+	,m_leftTire(controller->m_tireList.GetNodeFromInfo (*leftTire))
+	,m_righTire(controller->m_tireList.GetNodeFromInfo (*righTire))
 	,m_speedMPS(0.0f)
-	,m_topSpeedMPS(0.0f)
 	,m_currentRPS(0.0f)
+	,m_topSpeedMPS(0.0f)
 	,m_fakeIdleInertia (0.05f)
 	,m_engineInternalInertia (0.0f)
 	,m_differentialGearRatio(1.0f)
 	,m_engineOptimalRevPerSec(0.0f)
-	,m_gearBox(gearBox)
-	,m_leftTire(controller->m_tireList.GetNodeFromInfo (*leftTire))
-	,m_righTire(controller->m_tireList.GetNodeFromInfo (*righTire))
 {
 }
 
