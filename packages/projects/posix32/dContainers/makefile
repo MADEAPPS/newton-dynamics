@@ -31,6 +31,7 @@ LIB_SRCS = \
 	$(SRC_PATH)/dContainersStdAfx.cpp \
 	$(SRC_PATH)/dCRC.cpp \
 	$(SRC_PATH)/dRefCounter.cpp \
+	$(SRC_PATH)/dString.cpp \
 	$(SRC_PATH)/dTree.cpp \
 	$(SRC_PATH)/dUndoRedo.cpp
 
