@@ -78,8 +78,6 @@ SDK_AILIBRARY_MAKE = ../../../../packages/projects/$(PLATFORM)/dAILibrary
 SDK_XML_MAKE = ../../../../packages/projects/$(PLATFORM)/thirdParty/tinyxml
 
 
-
-`
 #LIBS  = -L/usr/lib -lstdc++ -lrt -lm -lGL -lGLU -lGLEW -lpthread -lgtk-x11-2.0 -lenet -lopenal
 LIBS  = -L/usr/lib -lstdc++ -lrt -lm -lGL -lGLU -lGLEW -lpthread -lenet -lopenal `wx-config --libs` `freetype-config --libs`
 
