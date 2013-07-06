@@ -87,8 +87,6 @@ class CustomControllerBase: public CustomAlloc
 	
 	dFloat m_curTimestep;
 	NewtonWorld* m_world;
-	
-//	dRttiRootClassSupportDeclare(CustomControllerBase);
 };
 
 template<class CONTROLLER_BASE>

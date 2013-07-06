@@ -20,10 +20,6 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-//dRttiRootClassSupportImplement(CustomJoint);
-
-
-
 #ifdef _NEWTON_BUILD_DLL
 	BOOL APIENTRY DllMain( HMODULE hModule,
 						  DWORD  ul_reason_for_call,
@@ -45,15 +41,15 @@
 
 
 CustomJoint::CustomJoint ()
-	:m_maxDof(0)
-	,m_autoDestroy(0)
-	,m_userData(NULL)
+	:m_userData(NULL)
 	,m_body0(NULL)
 	,m_body1(NULL)
 	,m_joint(NULL)
 	,m_world(NULL)
 	,m_userDestructor(NULL)
 	,m_userConstrationCallback(NULL)
+	,m_maxDof(0)
+	,m_autoDestroy(0)
 {
 }
 

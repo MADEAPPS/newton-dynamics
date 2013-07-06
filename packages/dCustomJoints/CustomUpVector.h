@@ -23,8 +23,6 @@
 class CustomUpVector: public CustomJoint
 {
 	public:
-	//dAddRtti(CustomJoint);
-
 	NEWTON_API CustomUpVector(const dVector& pin, NewtonBody* child);
 	NEWTON_API virtual ~CustomUpVector();
 

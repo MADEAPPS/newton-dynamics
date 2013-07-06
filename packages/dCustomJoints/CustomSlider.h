@@ -23,8 +23,6 @@
 class CustomSlider: public CustomJoint  
 {
 	public:
-	//dAddRtti(CustomJoint);
-
 	NEWTON_API CustomSlider (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
 	NEWTON_API virtual ~CustomSlider();
 

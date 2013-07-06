@@ -19,11 +19,6 @@
 #include "CustomControllerManager.h"
 
 
-
-//dRttiRootClassSupportImplement(CustomControllerBase);
-
-
-
 CustomControllerBase::CustomControllerBase(NewtonWorld* const world, const char* const managerName)
 	:m_curTimestep(0.0f)
 	,m_world(world)

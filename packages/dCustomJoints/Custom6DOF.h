@@ -23,8 +23,6 @@
 class Custom6DOF: public CustomJoint  
 {
 	public:
-//	dAddRtti(CustomJoint);
-
 	NEWTON_API Custom6DOF (const dMatrix& pinsAndPivotChildFrame, const dMatrix& pinsAndPivotParentFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
 	NEWTON_API virtual ~Custom6DOF();
 

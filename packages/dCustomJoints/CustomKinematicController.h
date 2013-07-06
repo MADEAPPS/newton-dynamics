@@ -24,8 +24,6 @@
 class CustomKinematicController: public CustomJoint
 {
 	public:
-	//dAddRtti(CustomJoint);
-
 	NEWTON_API CustomKinematicController (NewtonBody* const body, const dVector& attachmentPointInGlobalSpace);
 	NEWTON_API virtual ~CustomKinematicController();
 

@@ -28,8 +28,6 @@
 class CustomRackAndPinion: public CustomJoint  
 {
 	public:
-	//dAddRtti(CustomJoint);
-
 	NEWTON_API CustomRackAndPinion(dFloat gearRatio, const dVector& rotationalPin, const dVector& linearPin, NewtonBody* rotationalBody, NewtonBody* linearBody);
 	NEWTON_API virtual ~CustomRackAndPinion();
 

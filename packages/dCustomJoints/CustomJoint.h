@@ -104,8 +104,6 @@ class CustomJoint: public CustomAlloc
 	JointUserSubmitConstraintCallback m_userConstrationCallback;
 	int m_maxDof;
 	int m_autoDestroy;
-
-//	dRttiRootClassSupportDeclare(CustomJoint);
 };
 
 

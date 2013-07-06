@@ -23,8 +23,6 @@
 class CustomPathFollow: public CustomJoint  
 {
 	public:
-	//dAddRtti(CustomJoint);
-
 	NEWTON_API CustomPathFollow (const dMatrix& pinAndPivotFrame, NewtonBody* const body);
 	NEWTON_API virtual ~CustomPathFollow();
 

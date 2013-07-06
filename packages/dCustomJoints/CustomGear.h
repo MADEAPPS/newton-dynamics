@@ -28,8 +28,6 @@
 class CustomGear: public CustomJoint  
 {
 	public:
-	//dAddRtti(CustomJoint);
-
 	NEWTON_API CustomGear(dFloat gearRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const child, NewtonBody* const parent);
 	NEWTON_API CustomGear(int dof, NewtonBody* const child, NewtonBody* const parent);
 	NEWTON_API virtual ~CustomGear();
@@ -48,7 +46,6 @@ class CustomGear: public CustomJoint
 class CustomGearAndSlide: public CustomGear
 {
 	public:
-	//dAddRtti(CustomGearAndSlide);
 	NEWTON_API CustomGearAndSlide (dFloat gearRatio, dFloat slideRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const parenPin, NewtonBody* const parent);
 	NEWTON_API virtual ~CustomGearAndSlide();
 

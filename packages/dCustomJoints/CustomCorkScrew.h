@@ -22,8 +22,6 @@
 class CustomCorkScrew: public CustomJoint  
 {
 	public:
-	//dAddRtti(CustomJoint);
-
 	NEWTON_API CustomCorkScrew (const dMatrix& pinAndPivotFrame, NewtonBody* child, NewtonBody* parent = NULL);
 	NEWTON_API virtual ~CustomCorkScrew();
 

@@ -21,8 +21,6 @@
 class CustomBallAndSocket: public CustomJoint  
 {
 	public:
-	//dAddRtti(CustomJoint);
-
 	NEWTON_API CustomBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
 	NEWTON_API virtual ~CustomBallAndSocket();
 
@@ -40,8 +38,6 @@ class CustomBallAndSocket: public CustomJoint
 class CustomLimitBallAndSocket: public CustomBallAndSocket  
 {
 	public:
-	//dAddRtti(CustomJoint);
-
 	NEWTON_API CustomLimitBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
 	NEWTON_API CustomLimitBallAndSocket(const dMatrix& childPinAndPivotFrame, NewtonBody* const child, const dMatrix& parentPinAndPivotFrame, NewtonBody* const parent);
 	NEWTON_API virtual ~CustomLimitBallAndSocket();

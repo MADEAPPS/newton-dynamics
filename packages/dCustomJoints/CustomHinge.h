@@ -22,8 +22,6 @@
 class CustomHinge: public CustomJoint  
 {
 	public:
-	//dAddRtti(CustomJoint);
-
 	NEWTON_API CustomHinge (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
 
 	// this is a special contributor that create a hinge with an error between the two matrices, the error is reduce to zero after few iterations 

@@ -29,8 +29,6 @@
 class CustomPulley: public CustomJoint  
 {
 	public:
-	//dAddRtti(CustomJoint);
-
 	NEWTON_API CustomPulley(dFloat pulleyRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const parenPin, NewtonBody* const parent);
 	NEWTON_API virtual ~CustomPulley();
 
@@ -48,8 +46,6 @@ class CustomPulley: public CustomJoint
 class CustomPulleyAndTwist: public CustomPulley
 {
 	public:
-	//dAddRtti(CustomPulleyAndTwist);
-
 	NEWTON_API CustomPulleyAndTwist(dFloat pulleyRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const parenPin, NewtonBody* const parent);
 	NEWTON_API virtual ~CustomPulley();
 

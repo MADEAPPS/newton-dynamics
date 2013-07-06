@@ -29,8 +29,6 @@
 class CustomDryRollingFriction: public CustomJoint  
 {
 	public:
-	//dAddRtti(CustomJoint);
-
 	NEWTON_API CustomDryRollingFriction(NewtonBody* const child, dFloat radius, dFloat coefficient);
 	NEWTON_API virtual ~CustomDryRollingFriction();
 

@@ -23,8 +23,6 @@
 class CustomSlidingContact: public CustomJoint  
 {
 	public:
-	//dAddRtti(CustomJoint);
-
 	NEWTON_API CustomSlidingContact (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
 	NEWTON_API virtual ~CustomSlidingContact();
 
