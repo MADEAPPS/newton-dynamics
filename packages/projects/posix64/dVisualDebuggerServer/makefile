@@ -64,4 +64,5 @@ libTemp.a : $(DG_OBJ_FILES)
 # clean all objects target
 clean :
 	rm $(DG_OBJ_FILES)
+	rm *.a
 	touch $(ALL_SRC_FILES)
