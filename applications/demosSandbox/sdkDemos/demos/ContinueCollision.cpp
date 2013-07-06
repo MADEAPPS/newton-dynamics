@@ -17,6 +17,7 @@
 #include "PhysicsUtils.h"
 #include "HeightFieldPrimitive.h"
 
+/*
 static void PlaceLargeFloorBox (DemoEntityManager* const scene)
 {
 	NewtonWorld* const world = scene->GetNewton();
@@ -31,7 +32,7 @@ static void PlaceLargeFloorBox (DemoEntityManager* const scene)
 		NewtonBodyGetTransformCallback(body) (body, &mat[0][0], 0);
 	}
 }
-
+*/
 
 void ContinueCollision (DemoEntityManager* const scene)
 {
