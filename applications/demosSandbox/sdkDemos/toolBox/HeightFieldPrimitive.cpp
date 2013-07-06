@@ -235,7 +235,7 @@ freq *= 0.5f;
 	{
 		float* map[4096 + 1];
 		int size = (1 << sizeInPowerOfTwos) + 1;
-		dAssert (size < int sizeof (map) / sizeof map[0]);
+		dAssert (size < int (sizeof (map) / sizeof map[0]));
 		MakeMap (elevation, map, size);
 
 		dFloat f = GetElevation (size, elevationScale, maxElevation, minElevation, roughness);
