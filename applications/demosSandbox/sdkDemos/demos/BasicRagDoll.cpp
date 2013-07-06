@@ -193,7 +193,7 @@ class RagDollManager: public CustomSkeletonTransformManager
 		dVector points[1024 * 16];
 
 		DemoMesh* const mesh = bodyPart->GetMesh();
-		dAssert (mesh->m_vertexCount && (mesh->m_vertexCount < sizeof (points)/ sizeof (points[0])));
+		dAssert (mesh->m_vertexCount && (mesh->m_vertexCount < int (sizeof (points)/ sizeof (points[0]))));
 
 		// go over the vertex array and find and collect all vertices's weighted by this bone.
 		dFloat* const array = mesh->m_vertex;
