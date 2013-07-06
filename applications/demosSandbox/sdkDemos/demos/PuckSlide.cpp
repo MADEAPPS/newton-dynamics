@@ -44,7 +44,7 @@ enum eSBMaterials
 
 static void	NewtonRigidBodySetForceCB(const NewtonBody* const body, float timestep, int threadIndex);
 static void PhysicsNewton_CollisionPuckSurfaceCB(const NewtonJoint *pContactJoint,dFloat fTimeStep,int ThreadIndex);
-static void RenderBodyContactsAndTangentDiretions (NewtonBody* const body, float length);
+//static void RenderBodyContactsAndTangentDiretions (NewtonBody* const body, float length);
 
 
 class PuckEntity: public DemoEntity
