@@ -37,9 +37,9 @@ class dgAABBPolygonSoup::dgNodeBuilder: public dgAABBPolygonSoup::dgNode
 	public:
 	dgNodeBuilder (const dgVector& p0, const dgVector& p1)
 		:dgNode()
-		,m_parent (NULL)
-		,m_right (NULL)
 		,m_left (NULL)
+		,m_right (NULL)
+		,m_parent (NULL)
 		,m_indexBox0(0)
 		,m_indexBox1(0)
 		,m_enumeration(-1)
@@ -52,9 +52,9 @@ class dgAABBPolygonSoup::dgNodeBuilder: public dgAABBPolygonSoup::dgNode
 
 	dgNodeBuilder (const dgVector* const vertexArray, dgInt32 faceIndex, dgInt32 indexCount, const dgInt32* const indexArray)
 		:dgNode()
-		,m_parent (NULL)
-		,m_right (NULL)
 		,m_left (NULL)
+		,m_right (NULL)
+		,m_parent (NULL)
 		,m_indexBox0(0)
 		,m_indexBox1(0)
 		,m_enumeration(-1)
