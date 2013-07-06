@@ -100,9 +100,9 @@ void GetWorkingFileName (const char* const name, char* const outPathName)
 		memset (path, 0, sizeof (path));
 		readlink(id, path, 1024);
 		//char* const end = strrchr (path, '/');
-		char* const end = strstr (path, "demosSandbox");
+		char* const ptr = strstr (appPath, "applications");
 		*end = 0;
-		sprintf (outPathName, "%smedia", path);
+		sprintf (outPathName, "%sapplications/media/%s", appPath, name);
 
 	#else
 		#error  "error: neet to implement \"GetWorkingFileName\" here for thsi platform"
