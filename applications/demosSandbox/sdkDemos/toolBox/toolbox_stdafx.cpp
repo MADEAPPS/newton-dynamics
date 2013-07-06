@@ -99,9 +99,10 @@ void GetWorkingFileName (const char* const name, char* const outPathName)
 		sprintf(id, "/proc/%d/exe", getpid());
 		memset (path, 0, sizeof (path));
 		readlink(id, path, 1024);
-		char* const end = strrchr (path, '/');
+		//char* const end = strrchr (path, '/');
+		char* const end = strstr (path, "demosSandbox");
 		*end = 0;
-		sprintf (outPathName, "%s/bin/%s", path, name);
+		sprintf (outPathName, "%smedia", path);
 
 	#else
 		#error  "error: neet to implement \"GetWorkingFileName\" here for thsi platform"
