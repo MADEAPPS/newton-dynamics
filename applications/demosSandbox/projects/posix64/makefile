@@ -199,7 +199,7 @@ NewtonDemos : $(SDK_OBJS)
 	make -C $(SDK_SCENE_MAKE)
 	make -C $(SDK_CONTAINERS_MAKE)
 	make -C $(SDK_JOINTS_MAKE)	
-#	make -C $(SDK_XML_MAKE)
+	make -C $(SDK_XML_MAKE)
 #	make -C $(SDK_AILIBRARY_MAKE)
 #	make -C $(SDK_VISUALDEBUGGER_MAKE)
 	gcc $? $(NEWTON_LIB) $(LIBS) -o $@.elf
