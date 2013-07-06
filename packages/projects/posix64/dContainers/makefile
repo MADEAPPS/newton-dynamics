@@ -19,6 +19,8 @@
 LIB_NAME = libdContainers.a
 
 INCLUDED_PATH = ../../../dContainers
+INCLUDED_MATH_PATH = ../../../dMath
+
 SRC_PATH = ../../../dContainers
 
 NEWTON_SDK = ../../../posix64
@@ -44,7 +46,7 @@ COMPILER = gcc
 
 # POSIX options	 gcc 4.2.2
 CPU_FLAGS = -O2 -msse -g -msse2 -ffloat-store -ffast-math -freciprocal-math -funsafe-math-optimizations -fsingle-precision-constant
-FLAGS = -c -Wall -Wno-strict-aliasing -D_POSIX_VER  $(CPU_FLAGS) -I$(INCLUDED_PATH) 
+FLAGS = -c -Wall -Wno-strict-aliasing -D_POSIX_VER  $(CPU_FLAGS) -I$(INCLUDED_PATH) -I$(INCLUDED_MATH_PATH)
 
 
 .SUFFIXES : .o .cpp
