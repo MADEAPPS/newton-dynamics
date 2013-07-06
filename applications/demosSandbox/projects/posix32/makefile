@@ -29,7 +29,7 @@
 
 
 # generic sdk flags
-SDK_FLAGS = -m32 -O0 -fpic -msse -msse2 -c -Wall -D_POSIX_VER -DD_JOINTLIBRARY_STATIC_LIB -g `wx-config --libs` `wx-config --cxxflags` `freetype-config --cflags` `freetype-config --libs`
+SDK_FLAGS = -m32 -O0 -fpic -msse -msse2 -c -Wall -D_POSIX_VER -DD_JOINTLIBRARY_STATIC_LIB -g `wx-config --cxxflags` `freetype-config --cflags`
 
 # -pg
 #SDK_FLAGS = -m32 -O3 -fpic -msse -msse2 -c -Wall -Werror -D_POSIX_VER -g 
@@ -82,7 +82,8 @@ SDK_AILIBRARY_MAKE = ../../../../packages/projects/$(PLATFORM)/dAILibrary
 SDK_XML_MAKE = ../../../../packages/projects/$(PLATFORM)/thirdParty/tinyxml
 
 
-LIBS  = -L/usr/lib -lstdc++ -lrt -lm -lGL -lGLU -lGLEW -lpthread -lenet -lopenal
+
+LIBS  = -L/usr/lib -lstdc++ -lrt -lm -lGL -lGLU -lGLEW -lpthread -lenet -lopenal `wx-config --libs` `freetype-config --libs`
 
 
 # this use newton as shared or static library
