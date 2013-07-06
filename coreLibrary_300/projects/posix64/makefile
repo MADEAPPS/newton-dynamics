@@ -139,19 +139,6 @@ DG_OPENCL_PATH = $(DG_INCLUDED_OPENCL_PATH)/
 #	$(DG_OPENCL_PATH)dgOpenclBroadPhase.cpp
 	
 
-# ******************************************************
-#
-# Newton AI
-#
-# ******************************************************
-DG_INCLUDED_AI_PATH = ../../source/ai
-DG_AI_PATH = $(DG_INCLUDED_AI_PATH)/
-#DG_AI_SRCS = \
-#	$(DG_AI_PATH)dgAIAgent.cpp \
-#	$(DG_AI_PATH)dgAIStdafx.cpp \
-#	$(DG_AI_PATH)dgAIWorld.cpp \
-#	$(DG_AI_PATH)NewtonAI.cpp
-
 
 # ******************************************************
 #
@@ -180,8 +167,8 @@ COMPILER = gcc
 #CPU_FLAGS = -O2 -fpic -g -msse -msse4.1 -mfpmath=sse -ffloat-store -ffast-math -freciprocal-math -funsafe-math-optimizations -fsingle-precision-constant
 CPU_FLAGS = -O2 -fpic -g -msse -msse3 -mfpmath=sse -ffloat-store -ffast-math -freciprocal-math -funsafe-math-optimizations -fsingle-precision-constant
 
-#FLAGS = -c -Wall -Wno-strict-aliasing -DDG_SCALAR_VECTOR_CLASS -D_POSIX_VER_64 $(CPU_FLAGS) -I$(DG_INCLUDED_PATH) -I$(DG_INCLUDED_PHYSICS_PATH) -I$(DG_INCLUDED_MESH_PATH) -I$(DG_INCLUDED_OPENCL_PATH) -I$(DG_AI_PATH) 
-FLAGS = -c -Wall -Wno-strict-aliasing -D_POSIX_VER_64 $(CPU_FLAGS) -I$(DG_INCLUDED_PATH) -I$(DG_INCLUDED_PHYSICS_PATH) -I$(DG_INCLUDED_MESH_PATH) -I$(DG_INCLUDED_OPENCL_PATH) -I$(DG_AI_PATH) 
+#FLAGS = -c -Wall -Wno-strict-aliasing -DDG_SCALAR_VECTOR_CLASS -D_POSIX_VER_64 $(CPU_FLAGS) -I$(DG_INCLUDED_PATH) -I$(DG_INCLUDED_PHYSICS_PATH) -I$(DG_INCLUDED_MESH_PATH) -I$(DG_INCLUDED_OPENCL_PATH)
+FLAGS = -c -Wall -Wno-strict-aliasing -D_POSIX_VER_64 $(CPU_FLAGS) -I$(DG_INCLUDED_PATH) -I$(DG_INCLUDED_PHYSICS_PATH) -I$(DG_INCLUDED_MESH_PATH) -I$(DG_INCLUDED_OPENCL_PATH)
 
 .SUFFIXES : .o .cpp
 .cpp.o :

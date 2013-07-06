@@ -47,7 +47,6 @@ SDK_SCENE_PATH = ../../../../packages/dScene
 SDK_JOINTS_PATH = ../../../../packages/dCustomJoints
 SDK_CONTAINERS_PATH = ../../../../packages/dContainers
 SDK_VISUALDEBUGGER_PATH = ../../../../packages/dVisualDebuggerServer
-SDK_AILIBRARY_PATH = ../../../../packages/dAILibrary
 SDK_XML_PATH = ../../../../packages/thirdParty/tinyxml
 
 
@@ -65,7 +64,6 @@ SDK_INCLUDE_PATH = \
 		-I $(SDK_SCENE_PATH) \
 		-I $(SDK_JOINTS_PATH) \
 		-I $(SDK_VISUALDEBUGGER_PATH) \
-		-I $(SDK_AILIBRARY_PATH) \
 		-I $(SDK_XML_PATH)
 
 
@@ -181,15 +179,8 @@ SDK_TOOLBOX_SRC = \
 #		$(SDK_TOOLBOX_PATH)/PlaneCollision.cpp \
 #		$(SDK_TOOLBOX_PATH)/ShaderPrograms.cpp \
 
-#NOTE as long as no NewtonAI headers in Newton.h
-DG_AI_PATH = ../../../../coreLibrary_300/source/ai/
-SDK_AI_SRCS = \
-	$(DG_AI_PATH)dgAIAgent.cpp \
-	$(DG_AI_PATH)dgAIStdafx.cpp \
-	$(DG_AI_PATH)dgAIWorld.cpp \
-	$(DG_AI_PATH)NewtonAI.cpp
 
-SDK_SRCS = $(SDK_MAIN_SRC) $(SDK_DEMOS_SRC) $(SDK_TOOLBOX_SRC) $(SDK_AI_SRCS)
+SDK_SRCS = $(SDK_MAIN_SRC) $(SDK_DEMOS_SRC) $(SDK_TOOLBOX_SRC)
 
 SDK_OBJS = $(SDK_SRCS:.cpp=.o)
 
@@ -224,5 +215,5 @@ clean :
 	make clean -C $(SDK_SCENE_MAKE)
 	make clean -C $(SDK_JOINTS_MAKE)
 	make clean -C $(SDK_CONTAINERS_MAKE)
-	make clean -C $(SDK_AILIBRARY_MAKE)
+#	make clean -C $(SDK_AILIBRARY_MAKE)
 	make clean -C $(SDK_VISUALDEBUGGER_MAKE)
