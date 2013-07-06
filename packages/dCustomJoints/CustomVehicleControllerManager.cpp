@@ -1475,7 +1475,7 @@ void CustomVehicleController::CalculateReactionsForces (int jointCount, VehicleJ
 
 		state->m_myIndex = stateIndex;
 		stateIndex ++;
-		dAssert (stateIndex < sizeof (stateVeloc)/sizeof (stateVeloc[0]));
+		dAssert (stateIndex < int (sizeof (stateVeloc)/sizeof (stateVeloc[0])));
 	}
 
 	for (int i = 0; i < jointCount; i ++) {
