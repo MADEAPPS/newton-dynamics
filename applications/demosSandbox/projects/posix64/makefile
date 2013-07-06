@@ -204,13 +204,13 @@ FLAGS = $(SDK_FLAGS) $(SDK_INCLUDE_PATH)
 # main target
 NewtonDemos : $(SDK_OBJS)
 	make -C $(NEWTON_CORE_MAKE)
-	make -C $(SDK_XML_MAKE)
-	make -C $(SDK_MATH_MAKE)
-	make -C $(SDK_SCENE_MAKE)
-	make -C $(SDK_JOINTS_MAKE)
-	make -C $(SDK_CONTAINERS_MAKE)
-	make -C $(SDK_AILIBRARY_MAKE)
-	make -C $(SDK_VISUALDEBUGGER_MAKE)
+#	make -C $(SDK_XML_MAKE)
+#	make -C $(SDK_MATH_MAKE)
+#	make -C $(SDK_SCENE_MAKE)
+#	make -C $(SDK_JOINTS_MAKE)
+#	make -C $(SDK_CONTAINERS_MAKE)
+#	make -C $(SDK_AILIBRARY_MAKE)
+#	make -C $(SDK_VISUALDEBUGGER_MAKE)
 #	gcc $? $(NEWTON_LIB) $(FOX_LIB) $(FMOD_LIB) $(ENET_LIB) $(LIBS) -o $@.elf
 	gcc $? $(NEWTON_LIB) $(LIBS) -o $@.elf
 
