@@ -73,8 +73,8 @@ void GetWorkingFileName (const char* const name, char* const outPathName)
 		GetModuleFileNameA(NULL, appPath, sizeof (appPath));
 		strlwr (appPath);
 
-		char* const ptr = strstr (appPath, "applications");
-		ptr [0] = 0;
+		char* const end = strstr (appPath, "applications");
+		end [0] = 0;
 		sprintf (outPathName, "%sapplications/media/%s", appPath, name);
 
 	#elif defined(_MACOSX_VER)
@@ -94,18 +94,17 @@ void GetWorkingFileName (const char* const name, char* const outPathName)
 	#elif (defined (_POSIX_VER) || defined (_POSIX_VER_64))
 
 		char id[2048];
-		char path[2048];
+		char appPath[2048];
 
 		sprintf(id, "/proc/%d/exe", getpid());
-		memset (path, 0, sizeof (path));
-		readlink(id, path, 1024);
-		//char* const end = strrchr (path, '/');
-		char* const ptr = strstr (appPath, "applications");
+		memset (appPath, 0, sizeof (appPath));
+		readlink(id, appPath, sizeof (appPath));
+		char* const end = strstr (appPath, "applications");
 		*end = 0;
 		sprintf (outPathName, "%sapplications/media/%s", appPath, name);
 
 	#else
-		#error  "error: neet to implement \"GetWorkingFileName\" here for thsi platform"
+		#error  "error: need to implement \"GetWorkingFileName\" here for this platform"
 	#endif
 }
 
