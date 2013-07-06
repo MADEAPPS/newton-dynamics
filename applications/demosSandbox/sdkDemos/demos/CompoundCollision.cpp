@@ -56,7 +56,7 @@ static void GetCollisionSubShape(const NewtonJoint* const contactJoint, NewtonBo
 			if (i < 0) {
 				collidingSubShapeArrar[count] = subShape;
 				count ++;
-				dAssert (count < (sizeof (collidingSubShapeArrar) / sizeof (collidingSubShapeArrar[0])));
+				dAssert (count < int (sizeof (collidingSubShapeArrar) / sizeof (collidingSubShapeArrar[0])));
 
 				// you can also get the forces here, however when tho function is call form a contact material
 				// we can only get resting forces, impulsive forces can not be read here since they has no being calculated yet.
