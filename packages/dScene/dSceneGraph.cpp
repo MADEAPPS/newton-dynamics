@@ -157,7 +157,7 @@ bool dSceneGraph::HasLinkToRoot (dTreeNode* const node)
 					parentEdge[stack] = 0;
 				}
 				stack ++;
-				dAssert (stack < (sizeof (parentEdge) / sizeof (parentEdge[0])));
+				dAssert (stack < int (sizeof (parentEdge) / sizeof (parentEdge[0])));
 			}
 		}
 
@@ -168,7 +168,7 @@ bool dSceneGraph::HasLinkToRoot (dTreeNode* const node)
 				pool[stack] = link->GetInfo();
 				parentEdge[stack] = 1;
 				stack ++;
-				dAssert (stack < (sizeof (parentEdge) / sizeof (parentEdge[0])));
+				dAssert (stack < int (sizeof (parentEdge) / sizeof (parentEdge[0])));
 			}
 		}
 	}
@@ -379,7 +379,7 @@ void dSceneGraph::DeleteNode (dTreeNode* const node)
 					info.SetLRU(lru);
 					pool[stack] = link->GetInfo();
 					stack ++;
-					dAssert (stack < (sizeof (pool) / sizeof (pool[0])));
+					dAssert (stack < int (sizeof (pool) / sizeof (pool[0])));
 				}
 			}
 
@@ -390,7 +390,7 @@ void dSceneGraph::DeleteNode (dTreeNode* const node)
 					info.SetLRU(lru);
 					pool[stack] = link->GetInfo();
 					stack ++;
-					dAssert (stack < (sizeof (pool) / sizeof (pool[0])));
+					dAssert (stack < int (sizeof (pool) / sizeof (pool[0])));
 				}
 			}
 		}
@@ -481,7 +481,7 @@ void dSceneGraph::Serialize (TiXmlElement* const rootNode) const
 //			if (edge) {
 				indexList[nodeCount] = edge->GetInfo();
 				nodeCount ++;
-				dAssert (nodeCount < (sizeof (indexList) / sizeof (indexList[0])));
+				dAssert (nodeCount < int (sizeof (indexList) / sizeof (indexList[0])));
 //			}
 		}
 		if (nodeCount) {
@@ -499,7 +499,7 @@ void dSceneGraph::Serialize (TiXmlElement* const rootNode) const
 //			if (edge) {
 				indexList[nodeCount] = edge->GetInfo();
 				nodeCount ++;
-				dAssert (nodeCount < (sizeof (indexList) / sizeof (indexList[0])));
+				dAssert (nodeCount < int (sizeof (indexList) / sizeof (indexList[0])));
 //			}
 		}
 		if (nodeCount) {
