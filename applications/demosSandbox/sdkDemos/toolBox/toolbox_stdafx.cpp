@@ -95,7 +95,6 @@ void GetWorkingFileName (const char* const name, char* const outPathName)
 
 		char id[2048];
 		char path[2048];
-		char *end;
 
 		sprintf(id, "/proc/%d/exe", getpid());
 		memset (path, 0, sizeof (path));
