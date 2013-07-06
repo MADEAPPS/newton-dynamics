@@ -27,7 +27,7 @@
 #include "DemoSoundListener.h"
 #include "DemoEntityListener.h"
 #include "DemoCameraListener.h"
-#include "DemoVisualDebugerListener.h"
+//#include "DemoVisualDebugerListener.h"
 #include "CustomPlayerControllerManager.h"
 #include "CustomVehicleControllerManager.h"
 
@@ -102,7 +102,7 @@ DemoEntityManager::DemoEntityManager(NewtonDemos* const parent)
 	,m_fontImage(0)
 	,m_soundManager(NULL)
 	,m_cameraManager(NULL)
-	,m_visualDebugger(NULL)
+//	,m_visualDebugger(NULL)
 	,m_profiler(60, 40)
 	,m_mainThreadGraphicsTime(0.0f)
 	,m_mainThreadPhysicsTime(0.0f)

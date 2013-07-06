@@ -14,6 +14,8 @@
 #include "DemoEntityManager.h"
 #include "DemoVisualDebugerListener.h"
 
+#if 0
+
 #define USE_VISUAL_DEBUGGER
 
 DemoVisualDebugerListener::DemoVisualDebugerListener(DemoEntityManager* const scene)
@@ -52,3 +54,4 @@ void DemoVisualDebugerListener::PostUpdate (const NewtonWorld* const world, dFlo
 
 }
 
+#endif

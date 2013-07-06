@@ -15,6 +15,7 @@
 #include "toolbox_stdafx.h"
 #include "DemoListenerBase.h"
 
+#if 0
 class DemoVisualDebugerListener: public DemoListenerBase
 {
 	public:
@@ -26,6 +27,6 @@ class DemoVisualDebugerListener: public DemoListenerBase
 
 	void* m_visualDebugger;
 };
-
+#endif
 
 #endif

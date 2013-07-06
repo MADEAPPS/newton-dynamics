@@ -17,7 +17,7 @@
 #include "DemoEntityListener.h"
 #include "DemoListenerBase.h"
 #include "dHighResolutionTimer.h"
-#include "DemoVisualDebugerListener.h"
+//#include "DemoVisualDebugerListener.h"
 
 class DemoMesh;
 class DemoEntity;
@@ -138,7 +138,7 @@ class DemoEntityManager: public wxGLCanvas, public dList <DemoEntity*>
 	GLuint m_fontImage;
 	DemoSoundListener* m_soundManager;
 	DemoCameraListener* m_cameraManager;
-	DemoVisualDebugerListener* m_visualDebugger;
+//	DemoVisualDebugerListener* m_visualDebugger;
 
 	int m_showProfiler[10]; 
 	dRuntimeProfiler m_profiler;
