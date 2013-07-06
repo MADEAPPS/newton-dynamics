@@ -48,7 +48,7 @@
 void CustomVehicleController::InterpolationCurve::InitalizeCurve (int points, const dFloat* const steps, const dFloat* const values)
 {
 	m_count = points;
-	dAssert (points < (sizeof(m_nodes)/sizeof (m_nodes[0])));
+	dAssert (points < int (sizeof(m_nodes)/sizeof (m_nodes[0])));
 	memset (m_nodes, 0, sizeof (m_nodes));
 	for (int i = 0; i < m_count; i ++) {
 		m_nodes[i].m_param = steps[i];
