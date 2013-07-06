@@ -92,9 +92,10 @@ NEWTON_LIB = \
 	$(SDK_NEWTON_PATH)/libdScene.a \
 	$(SDK_NEWTON_PATH)/libdContainers.a \
 	$(SDK_NEWTON_PATH)/libdJointLibrary.a \
+	$(SDK_NEWTON_PATH)/libTinyXML.a	
 #	$(SDK_NEWTON_PATH)/libdVisualDebuggerServer.a \
 #	$(SDK_NEWTON_PATH)/libdAILibrary.a \
-	$(SDK_NEWTON_PATH)/libTinyXML.a
+	
 
 
 		
