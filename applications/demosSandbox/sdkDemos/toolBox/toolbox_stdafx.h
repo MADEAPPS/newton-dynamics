@@ -131,11 +131,11 @@ typedef long long unsigned64;
 #include <CustomControllerManager.h>
 
 // AI wrapper 
-#include <dAI.h>
-#include <dAIAgent.h>
-#include <dAIAgentState.h>
-#include <dAIAgentVehicleController.h>
-#include <dAIAgentCharacterController.h>
+//#include <dAI.h>
+//#include <dAIAgent.h>
+//#include <dAIAgentState.h>
+//#include <dAIAgentVehicleController.h>
+//#include <dAIAgentCharacterController.h>
 
 #include <dCRC.h>
 #include <dHeap.h>

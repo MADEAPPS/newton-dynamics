@@ -71,7 +71,7 @@ class DemoEntityManager: public wxGLCanvas, public dList <DemoEntity*>
 	int GetWidth() const;
 	int GetHeight() const;
 
-	dAI* GetAI() const;
+//	dAI* GetAI() const;
 	NewtonWorld* GetNewton() const;
 	NewtonDemos* GetRootWindow() const;
 
@@ -125,7 +125,7 @@ class DemoEntityManager: public wxGLCanvas, public dList <DemoEntity*>
 	NewtonDemos* m_mainWindow;
 	NewtonWorld* m_world;
 	
-	dAI* m_aiWorld;
+//	dAI* m_aiWorld;
 	DemoEntity* m_sky;
 	unsigned64 m_microsecunds;
 	dFloat m_physicsTime;
@@ -180,10 +180,10 @@ inline NewtonWorld* DemoEntityManager::GetNewton() const
 	return m_world;
 }
 
-inline dAI* DemoEntityManager::GetAI() const
-{
-	return m_aiWorld;
-}
+//inline dAI* DemoEntityManager::GetAI() const
+//{
+//	return m_aiWorld;
+//}
 
 inline NewtonDemos* DemoEntityManager::GetRootWindow () const
 {
