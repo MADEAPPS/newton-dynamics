@@ -84,7 +84,7 @@ SDK_XML_MAKE = ../../../../packages/projects/$(PLATFORM)/thirdParty/tinyxml
 
 
 
-LIBS  = -L/usr/lib -lstdc++ -lrt -lm -lGL -lGLU -lGLEW -lpthread -lFOX-1.6 -lenet -lopenal
+LIBS  = -L/usr/lib -lstdc++ -lrt -lm -lGL -lGLU -lGLEW -lpthread -lenet -lopenal
 
 
 # this use newton as shared or static library
@@ -94,8 +94,8 @@ NEWTON_LIB = \
 	$(SDK_NEWTON_PATH)/libdScene.a \
 	$(SDK_NEWTON_PATH)/libdContainers.a \
 	$(SDK_NEWTON_PATH)/libdJointLibrary.a \
-	$(SDK_NEWTON_PATH)/libdVisualDebuggerServer.a \
-	$(SDK_NEWTON_PATH)/libdAILibrary.a \
+#	$(SDK_NEWTON_PATH)/libdVisualDebuggerServer.a \
+#	$(SDK_NEWTON_PATH)/libdAILibrary.a \
 	$(SDK_NEWTON_PATH)/libTinyXML.a
 
 
@@ -218,7 +218,6 @@ NewtonDemos : $(SDK_OBJS)
 	make -C $(SDK_CONTAINERS_MAKE)
 #	make -C $(SDK_AILIBRARY_MAKE)
 	make -C $(SDK_VISUALDEBUGGER_MAKE)
-#	gcc $? $(NEWTON_LIB) $(FOX_LIB) $(FMOD_LIB) $(ENET_LIB) $(LIBS) -o $@.elf
 	gcc $? $(NEWTON_LIB) $(LIBS) -o $@.elf
 
 # clean all objects target
