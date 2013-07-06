@@ -24,7 +24,6 @@
 #include "dgWorld.h"
 #include "dgContact.h"
 #include "dgCollisionMesh.h"
-#include "dgMinkowskiConv.h"
 #include "dgCollisionConvex.h"
 #include "dgCollisionInstance.h"
 #include "dgCollisionConvexHull.h"

@@ -28,7 +28,6 @@
 #include "dgKinematicBody.h"
 #include "dgCollisionNull.h"
 #include "dgCollisionCone.h"
-#include "dgMinkowskiConv.h"
 #include "dgDeformableBody.h"
 #include "dgCollisionScene.h"
 #include "dgCollisionSphere.h"

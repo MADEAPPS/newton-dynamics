@@ -30,7 +30,6 @@
 #include "dgKinematicBody.h"
 #include "dgCollisionCone.h"
 #include "dgCollisionNull.h"
-#include "dgMinkowskiConv.h"
 #include "dgBodyMasterList.h"
 #include "dgCollisionScene.h"
 #include "dgCollisionSphere.h"

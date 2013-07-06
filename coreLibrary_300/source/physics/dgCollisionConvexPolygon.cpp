@@ -23,7 +23,6 @@
 #include "dgBody.h"
 #include "dgWorld.h"
 #include "dgContact.h"
-#include "dgMinkowskiConv.h"
 #include "dgCollisionInstance.h"
 #include "dgCollisionConvexPolygon.h"
 
