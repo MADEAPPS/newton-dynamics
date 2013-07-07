@@ -25,7 +25,7 @@
 #include "dNewtonSceneBody.h"
 
 
-
+/*
 dNewtonSceneBody::dNewtonSceneBody(dNewton* const dWorld)
 	:dNewtonBody()
 {
@@ -71,6 +71,6 @@ void dNewtonSceneBody::RemoveCollision (void* const handle)
 	dNewtonCollisionScene* const scene = (dNewtonCollisionScene*) GetCollision();
 	scene->RemoveCollision(handle);
 }
-
+*/
 
 

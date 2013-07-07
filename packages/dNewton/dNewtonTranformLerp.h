@@ -19,25 +19,30 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _D_NEWTON_SCENE_BODY_H_
-#define _D_NEWTON_SCENE_BODY_H_
-
+#ifndef _D_NEWTON_TRANSFORM_LERP_H_
+#define _D_NEWTON_TRANSFORM_LERP_H_
 
 #include "dStdAfxNewton.h"
-#include "dNewtonBody.h"
-/*
-class dNewtonSceneBody: public dNewtonBody  
+
+class dNewtonTransformLerp
 {
 	public:
-	CNEWTON_API dNewtonSceneBody (dNewton* const world);
-	CNEWTON_API virtual ~dNewtonSceneBody();
+	CNEWTON_API dNewtonTransformLerp ();
+	CNEWTON_API dNewtonTransformLerp (const dFloat* const matrix);
+	CNEWTON_API virtual ~dNewtonTransformLerp();
 
-	CNEWTON_API virtual void OnForceAndTorque (dFloat timestep, int threadIndex) {};
+	CNEWTON_API void Update (const dFloat* const matrix);
+	CNEWTON_API void ResetMatrix (const dFloat* const matrix);
 
-	CNEWTON_API virtual void BeginAddRemoveCollision();
-	CNEWTON_API virtual void* AddCollision(const dNewtonCollision* const collision);
-	CNEWTON_API virtual void RemoveCollision (void* const handle);
-	CNEWTON_API virtual void EndAddRemoveCollision();
+	
+	
+
+	CNEWTON_API void InterplateMatrix (dFloat param, dFloat* const matrix) const;
+
+	dVector m_posit0;
+	dVector m_posit1;
+	dQuaternion m_rotat0;
+	dQuaternion m_rotat1;
 };
-*/
+
 #endif

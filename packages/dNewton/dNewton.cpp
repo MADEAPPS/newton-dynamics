@@ -183,7 +183,9 @@ void dNewton::Update (dFloat timestepInSecunds)
 	int loops = 0;
 	while ((nextTime >= timestepMicrosecunds) && (loops < m_maxUpdatePerIterations)) {
 		loops ++;
+		OnBeginUpdate (timestepInSecunds);
 		NewtonUpdate (m_world, timestepInSecunds);
+		OnEndUpdate (timestepInSecunds);
 		nextTime -= timestepMicrosecunds;
 		m_microseconds += timestepMicrosecunds;
 	}
@@ -198,7 +200,9 @@ void dNewton::UpdateAsync (dFloat timestepInSecunds)
 	int loops = 0;
 	while ((nextTime >= timestepMicrosecunds) && (loops < m_maxUpdatePerIterations)) {
 		loops ++;
+		OnBeginUpdate (timestepInSecunds);
 		NewtonUpdateAsync (m_world, timestepInSecunds);
+		OnEndUpdate (timestepInSecunds);
 		nextTime -= timestepMicrosecunds;
 		m_microseconds += timestepMicrosecunds;
 	}

@@ -42,8 +42,16 @@ class dNewton: public dNewtonAlloc
 	CNEWTON_API dNewton();
 	CNEWTON_API virtual ~dNewton();
 
-	CNEWTON_API void Update (dFloat timestepInSecunds);
-	CNEWTON_API void UpdateAsync (dFloat timestepInSecunds);
+	CNEWTON_API virtual void OnBeginUpdate (dFloat timestepInSecunds) 
+	{
+	}
+
+	CNEWTON_API virtual void OnEndUpdate (dFloat timestepInSecunds)
+	{
+	}
+
+	CNEWTON_API virtual void Update (dFloat timestepInSecunds);
+	CNEWTON_API virtual void UpdateAsync (dFloat timestepInSecunds);
 
 	CNEWTON_API dFloat GetInteplationParam(dFloat timestepInSecunds) const;
 
@@ -51,7 +59,6 @@ class dNewton: public dNewtonAlloc
 	CNEWTON_API void SetMaxUpdatesPerIterations (int update);
 
 	CNEWTON_API NewtonWorld* GetNewton () const;
-
 	
 
 	CNEWTON_API dNewtonBody* GetFirstBody() const;

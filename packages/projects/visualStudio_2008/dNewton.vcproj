@@ -664,6 +664,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\dNewton\dNewtonTranformLerp.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dNewton\dNewtonTranformLerp.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\dNewton\dStdAfxNewton.cpp"
 			>
 			<FileConfiguration

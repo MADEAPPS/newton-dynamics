@@ -24,19 +24,22 @@
 
 #include "dStdAfxNewton.h"
 #include "dNewtonAlloc.h"
+#include "dNewtonTranformLerp.h"
 
 class dNewton;
 class dNewtonCollision;
 
-class dNewtonBody: public dNewtonAlloc
+class dNewtonBody: public dNewtonAlloc, public dNewtonTransformLerp
 {
 	public:
 
-	CNEWTON_API dNewtonBody(dNewton* const world, dFloat mass, const dNewtonCollision* const collision, void* const userData, const dMatrix& location);
+	CNEWTON_API dNewtonBody(dNewton* const world, dFloat mass, const dNewtonCollision* const collision, void* const userData, const dFloat* const matrix);
 	CNEWTON_API virtual ~dNewtonBody();
 
 	CNEWTON_API void SetMatrix (const dFloat* const matrix);
 	CNEWTON_API void GetMatrix (dFloat* const matrix) const;
+
+	void GetVisualMatrix (dFloat param, dFloat* const matrix) const;
 
 	CNEWTON_API void SetVeloc (const dFloat* const veloc);
 	CNEWTON_API void GetVeloc (dFloat* const veloc) const;
@@ -64,7 +67,7 @@ class dNewtonBody: public dNewtonAlloc
 	CNEWTON_API dNewtonCollision* GetCollision() const;
 
 	CNEWTON_API bool GetSleepState() const;
-	CNEWTON_API dMatrix GetVisualMatrix (dFloat param) const;
+	
 
 	protected:
 	CNEWTON_API dNewtonBody();
