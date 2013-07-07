@@ -545,6 +545,21 @@ DG_INLINE const dgVector& dgBody::GetNetTorque() const
 }
 
 
+DG_INLINE void dgBody::CalcInvInertiaMatrix ()
+{
+	dgAssert (m_invWorldInertiaMatrix[0][3] == dgFloat32 (0.0f));
+	dgAssert (m_invWorldInertiaMatrix[1][3] == dgFloat32 (0.0f));
+	dgAssert (m_invWorldInertiaMatrix[2][3] == dgFloat32 (0.0f));
+	dgAssert (m_invWorldInertiaMatrix[3][3] == dgFloat32 (1.0f));
+
+	m_invWorldInertiaMatrix = CalculateInvInertiaMatrix ();
+
+	dgAssert (m_invWorldInertiaMatrix[0][3] == dgFloat32 (0.0f));
+	dgAssert (m_invWorldInertiaMatrix[1][3] == dgFloat32 (0.0f));
+	dgAssert (m_invWorldInertiaMatrix[2][3] == dgFloat32 (0.0f));
+	dgAssert (m_invWorldInertiaMatrix[3][3] == dgFloat32 (1.0f));
+}
+
 
 #endif 
 

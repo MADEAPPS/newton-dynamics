@@ -588,38 +588,19 @@ void dgBody::SetMassProperties (dgFloat32 mass, const dgCollisionInstance* const
 dgMatrix dgBody::CalculateInertiaMatrix () const
 {
 	dgMatrix tmp (m_matrix.Transpose());
-	tmp[0] = tmp[0].Scale4 (m_mass[0]);
-	tmp[1] = tmp[1].Scale4 (m_mass[1]);
-	tmp[2] = tmp[2].Scale4 (m_mass[2]);
+	tmp[0] = tmp[0].CompProduct4 (m_mass);
+	tmp[1] = tmp[1].CompProduct4 (m_mass);
+	tmp[2] = tmp[2].CompProduct4 (m_mass);
 	return tmp * m_matrix;
 }
 
 dgMatrix dgBody::CalculateInvInertiaMatrix () const
 {
 	dgMatrix tmp (m_matrix.Transpose());
-	tmp[0] = tmp[0].Scale4 (m_invMass[0]);
-	tmp[1] = tmp[1].Scale4 (m_invMass[1]);
-	tmp[2] = tmp[2].Scale4 (m_invMass[2]);
+	tmp[0] = tmp[0].CompProduct4(m_invMass);
+	tmp[1] = tmp[1].CompProduct4(m_invMass);
+	tmp[2] = tmp[2].CompProduct4(m_invMass);
 	return tmp * m_matrix;
-}
-
-void dgBody::CalcInvInertiaMatrix ()
-{
-	dgAssert (m_invWorldInertiaMatrix[0][3] == dgFloat32 (0.0f));
-	dgAssert (m_invWorldInertiaMatrix[1][3] == dgFloat32 (0.0f));
-	dgAssert (m_invWorldInertiaMatrix[2][3] == dgFloat32 (0.0f));
-	dgAssert (m_invWorldInertiaMatrix[3][3] == dgFloat32 (1.0f));
-	
-	dgMatrix tmp (m_matrix.Transpose());
-	tmp[0] = tmp[0].Scale4 (m_invMass[0]);
-	tmp[1] = tmp[1].Scale4 (m_invMass[1]);
-	tmp[2] = tmp[2].Scale4 (m_invMass[2]);
-	m_invWorldInertiaMatrix = tmp * m_matrix;
-
-	dgAssert (m_invWorldInertiaMatrix[0][3] == dgFloat32 (0.0f));
-	dgAssert (m_invWorldInertiaMatrix[1][3] == dgFloat32 (0.0f));
-	dgAssert (m_invWorldInertiaMatrix[2][3] == dgFloat32 (0.0f));
-	dgAssert (m_invWorldInertiaMatrix[3][3] == dgFloat32 (1.0f));
 }
 
 void dgBody::InvalidateCache ()
