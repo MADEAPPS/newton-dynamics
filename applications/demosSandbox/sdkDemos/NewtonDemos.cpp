@@ -420,7 +420,7 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 				wxString tmp (wPlatform);
 				label.Printf (wxT(" hardware mode %s"), tmp.c_str());
 			#else 
-				label.Printf (wxT(" hardware mode %s"), wxT(platform));
+				label.Printf (wxT(" hardware mode %s"), wxString(platform));
 			#endif
 			optionsMenu->AppendRadioItem(ID_PLATFORMS + i, label);
 		}
