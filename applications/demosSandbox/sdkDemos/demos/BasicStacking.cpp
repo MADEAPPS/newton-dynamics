@@ -154,21 +154,21 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 	for (int i = 0; i < 1; i ++) {
 		int index = i % (sizeof (selection) / sizeof (selection[0]));
 
-index = 0;
+//index = 0;
 		dMatrix shapeMatrix (dRollMatrix(0.5f * 3.14159f));
 		if (selection[index] == _BOX_PRIMITIVE) {
 			shapeMatrix = GetIdentityMatrix();
 		}
-//		BuildPyramid (scene, 10.0f, dVector(-10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high, selection[index], shapeMatrix);
+		BuildPyramid (scene, 10.0f, dVector(-10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high, selection[index], shapeMatrix);
 //		BuildPyramid (scene, 10.0f, dVector(-10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high, _BOX_PRIMITIVE);
 //		BuildPyramid (scene, 10.0f, dVector(-10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high, _CYLINDER_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
 //		BuildPyramid (scene, 10.0f, dVector(-10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high, _TAPERED_CYLINDER_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
 //		BuildPyramid (scene, 10.0f, dVector(-10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high, _REGULAR_CONVEX_HULL_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
 	}
 
-	high = 40;
-	for (int i = 0; i < 1; i ++) {
-		for (int j = 0; j < 1; j ++) {
+	high = 20;
+	for (int i = 0; i < 2; i ++) {
+		for (int j = 0; j < 2; j ++) {
 			BuildJenga (scene, 5.0f, dVector(-10.0f + j * 8, 0.0f, 10.0f + i * 8, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high);
 		}
 	}
