@@ -52,6 +52,8 @@ class dNewton: public dNewtonAlloc
 
 	CNEWTON_API virtual void Update (dFloat timestepInSecunds);
 	CNEWTON_API virtual void UpdateAsync (dFloat timestepInSecunds);
+	CNEWTON_API void WaitForUpdateToFinish ();
+
 
 	CNEWTON_API dFloat GetInteplationParam(dFloat timestepInSecunds) const;
 

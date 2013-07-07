@@ -173,6 +173,10 @@ dFloat dNewton::GetInteplationParam(dFloat timestepInSecunds) const
 	return dClamp (param, 0.0f, 1.0f);
 }
 
+void dNewton::WaitForUpdateToFinish ()
+{
+	NewtonWaitForUpdateToFinish(m_world);
+}
 
 void dNewton::Update (dFloat timestepInSecunds)
 {
