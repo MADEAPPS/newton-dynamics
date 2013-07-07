@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Express 2012 for Windows Desktop
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ai", "..\..\..\coreLibrary_300\projects\windows\project_vs2012\ai.vcxproj", "{7D48CEE3-5263-46CA-BD69-924881F0EA2F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "core", "..\..\..\coreLibrary_300\projects\windows\project_vs2012\core.vcxproj", "{57AC4F2D-B115-4931-8F6E-AF8AD616B6AA}"
@@ -20,6 +20,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dScene", "dScene.vcxproj", "{B5EEC82D-938F-44C9-89BB-4A058581750B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread", "..\..\thirdParty\pthreads.2\VS_2012\pthread.vcxproj", "{03BCA23C-02A5-415B-A37B-26600BC2CE96}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dNewton", "dNewton.vcxproj", "{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -193,6 +195,22 @@ Global
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.releaseDll|Win32.Build.0 = release|Win32
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.releaseDll|x64.ActiveCfg = release|x64
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.releaseDll|x64.Build.0 = release|x64
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.Debug|Win32.Build.0 = Debug|Win32
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.Debug|x64.ActiveCfg = debug|x64
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.Debug|x64.Build.0 = debug|x64
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.debugDll|Win32.ActiveCfg = Debug|Win32
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.debugDll|Win32.Build.0 = Debug|Win32
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.debugDll|x64.ActiveCfg = debug|x64
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.debugDll|x64.Build.0 = debug|x64
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.Release|Win32.ActiveCfg = release|Win32
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.Release|Win32.Build.0 = release|Win32
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.Release|x64.ActiveCfg = release|x64
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.Release|x64.Build.0 = release|x64
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.releaseDll|Win32.ActiveCfg = release|Win32
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.releaseDll|Win32.Build.0 = release|Win32
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.releaseDll|x64.ActiveCfg = release|x64
+		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.releaseDll|x64.Build.0 = release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
