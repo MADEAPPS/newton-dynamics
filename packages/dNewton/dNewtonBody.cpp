@@ -114,6 +114,17 @@ void dNewtonBody::SetTorque (const dFloat* const torque)
 	NewtonBodySetTorque(m_body, torque);
 }
 
+void dNewtonBody::AddForce (const dFloat* const force)
+{
+	NewtonBodyAddForce(m_body, force);
+}
+
+void dNewtonBody::AddTorque (const dFloat* const torque)
+{
+	NewtonBodyAddTorque(m_body, torque);
+}
+
+
 
 void dNewtonBody::GetMassAndInertia (dFloat& mass, dFloat& Ixx, dFloat& Iyy, dFloat& Izz) const
 {
