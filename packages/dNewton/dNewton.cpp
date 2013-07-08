@@ -106,6 +106,10 @@ dNewtonBody* dNewton::GetNextBody(const dNewtonBody* const body) const
 	return newtonBody ? (dNewtonBody*) NewtonBodyGetUserData(newtonBody) : NULL;
 }
 
+void dNewton::DestroyAllBodies()
+{
+	NewtonDestroyAllBodies (m_world);
+}
 
 void dNewton::ResetTimer()
 {

@@ -45,6 +45,13 @@ dNewtonMesh::dNewtonMesh(dNewton* const world, int pointCount, const dFloat* con
 {
 }
 
+dNewtonMesh::~dNewtonMesh()
+{
+	NewtonMeshDestroy (m_mesh);
+}
+
+
+
 void dNewtonMesh::CreateVoronoiConvexDecomposition (const dNewtonMesh& contexMesh)
 {
 	NewtonMeshDestroy (m_mesh);
@@ -60,10 +67,108 @@ void dNewtonMesh::CreateApproximateConvexDecomposition (const dNewtonMesh& mesh,
 
 
 
-dNewtonMesh::~dNewtonMesh()
+void dNewtonMesh::Polygonize ()
 {
-	NewtonMeshDestroy (m_mesh);
+	NewtonMeshPolygonize (m_mesh);
+}
+
+void dNewtonMesh::Triangulate ()
+{
+	NewtonMeshTriangulate (m_mesh);
+}
+
+int dNewtonMesh::GetPointCount() const
+{
+	return NewtonMeshGetPointCount (m_mesh);
+}
+
+void dNewtonMesh::GetVectexStreams(dPoint* const posit, dPoint* const normal, dUV* const uv0, dUV* const uv1) const
+{
+	NewtonMeshGetVertexStreams (m_mesh, sizeof (dPoint), &posit[0].m_x, sizeof (dPoint), &normal[0].m_x, sizeof (dUV), &uv0[0].m_u, sizeof (dUV), &uv1[0].m_u);
+}
+
+
+int dNewtonMesh::GetTotalIndexCount() const
+{
+	return NewtonMeshGetTotalIndexCount (m_mesh); 
+}
+
+int dNewtonMesh::GetTotalFaceCount() const
+{
+	return NewtonMeshGetTotalFaceCount (m_mesh); 
+}
+
+void* dNewtonMesh::BeginMaterialHandle () const
+{
+	return NewtonMeshBeginHandle (m_mesh); 
+}
+
+void dNewtonMesh::EndMaterialHandle (void* const materialHandle) const
+{
+	NewtonMeshEndHandle (m_mesh, materialHandle); 
+}
+
+int dNewtonMesh::GetMaterialIndex (void* const materialHandle) const
+{
+	return NewtonMeshFirstMaterial (m_mesh, materialHandle);
+}
+
+int dNewtonMesh::GetNextMaterialIndex (void* const materialHandle, int materialIndex) const
+{
+	return NewtonMeshNextMaterial (m_mesh, materialHandle, materialIndex);
 }
 
 
 
+/*
+AllocVertexData(NewtonMeshGetPointCount (mesh));
+NewtonMeshGetVertexStreams (mesh, 3 * sizeof (dFloat), (dFloat*) m_vertex, 3 * sizeof (dFloat), (dFloat*) m_normal,	2 * sizeof (dFloat), (dFloat*) m_uv, 2 * sizeof (dFloat), (dFloat*) m_uv);
+
+//	dTree<dScene::dTreeNode*, int> materialMap;
+//	for (void* ptr = scene->GetFirstChild(meshNode); ptr; ptr = scene->GetNextChild (meshNode, ptr)) {
+//		dScene::dTreeNode* node = scene->GetNodeFromLink(ptr);
+//		dNodeInfo* info = scene->GetInfoFromNode(node);
+//		if (info->GetTypeId() == dMaterialNodeInfo::GetRttiType()) {
+//			dMaterialNodeInfo* const material = (dMaterialNodeInfo*)info;
+//			materialMap.Insert(node, material->GetId());
+//		}
+//	}
+
+// extract the materials index array for mesh
+void* const meshCookie = NewtonMeshBeginHandle (mesh); 
+for (int handle = NewtonMeshFirstMaterial (mesh, meshCookie); handle != -1; handle = NewtonMeshNextMaterial (mesh, meshCookie, handle)) {
+	int textureId = NewtonMeshMaterialGetMaterial (mesh, meshCookie, handle); 
+	int indexCount = NewtonMeshMaterialGetIndexCount (mesh, meshCookie, handle); 
+	DemoSubMesh* const segment = AddSubMesh();
+
+	//		dTree<dScene::dTreeNode*, int>::dTreeNode* matNodeCache = materialMap.Find(materialIndex);
+	//		if (matNodeCache) {
+	//			dScene::dTreeNode* const matNode = matNodeCache->GetInfo();
+	//			dMaterialNodeInfo* const material = (dMaterialNodeInfo*) scene->GetInfoFromNode(matNode);
+	//			if (material->GetDiffuseTextId() != -1) {
+	//				dScene::dTreeNode* const node = scene->FindTextureByTextId(matNode, material->GetDiffuseTextId());
+	//				dAssert (node);
+	//				dTextureNodeInfo* const texture = (dTextureNodeInfo*)scene->GetInfoFromNode(node);
+	//
+	//				segment->m_textureHandle = LoadTexture(texture->GetPathName());
+	//				strcpy (segment->m_textureName, texture->GetPathName());
+	//			}
+
+
+	segment->m_shiness = 1.0f;
+	segment->m_ambient = dVector (0.8f, 0.8f, 0.8f, 1.0f);
+	segment->m_diffuse = dVector (0.8f, 0.8f, 0.8f, 1.0f);
+	segment->m_specular = dVector (0.0f, 0.0f, 0.0f, 1.0f);
+	//		}
+
+	segment->m_textureHandle = textureId;
+
+	segment->AllocIndexData (indexCount);
+	// for 16 bit indices meshes
+	//NewtonMeshMaterialGetIndexStreamShort (mesh, meshCookie, handle, (short int*)segment->m_indexes); 
+
+	// for 32 bit indices mesh
+	NewtonMeshMaterialGetIndexStream (mesh, meshCookie, handle, (int*)segment->m_indexes); 
+}
+NewtonMeshEndHandle (mesh, meshCookie); 
+*/
