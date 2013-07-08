@@ -50,6 +50,10 @@ class dNewtonMesh: public dNewtonAlloc
 	CNEWTON_API dNewtonMesh(const dNewtonMesh& clone);
 	CNEWTON_API dNewtonMesh(const dNewtonCollision& collision);
 	CNEWTON_API dNewtonMesh(dNewton* const world, int pointCount, const dFloat* const vertexCloud, int strideInBytes, dFloat tolerance);
+	CNEWTON_API virtual ~dNewtonMesh();
+
+	CNEWTON_API void CreateVoronoiConvexDecomposition (const dNewtonMesh& convexMesh);
+	CNEWTON_API void CreateApproximateConvexDecomposition (const dNewtonMesh& mesh, dFloat maxConcavity, dFloat backFaceDistanceFactor, int maxCount, int maxVertexPerHull);
 
 	CNEWTON_API int GetPointCount() const;
 	CNEWTON_API void GetVectexStreams(dPoint* const posit, dPoint* const normal, dUV* const uv0, dUV* const uv1) const;
@@ -63,14 +67,12 @@ class dNewtonMesh: public dNewtonAlloc
 	CNEWTON_API int GetMaterialIndex (void* const materialHandle) const; 
 	CNEWTON_API int GetNextMaterialIndex (void* const materialHandle, int materialIndex) const; 
 
+	int MaterialGetMaterial (void* const materialHandle, int materialIndex) const; 
+	int MaterialGetIndexCount (void* const materialHandle, int materialIndex) const; 
+	void MaterialGetIndexStream (void* const materialHandle, int materialIndex, int* const indexes) const; 
 
 	CNEWTON_API void Polygonize ();
 	CNEWTON_API void Triangulate ();
-
-	CNEWTON_API void CreateVoronoiConvexDecomposition (const dNewtonMesh& convexMesh);
-	CNEWTON_API void CreateApproximateConvexDecomposition (const dNewtonMesh& mesh, dFloat maxConcavity, dFloat backFaceDistanceFactor, int maxCount, int maxVertexPerHull);
-	
-	CNEWTON_API virtual ~dNewtonMesh();
 
 	protected:
 	NewtonMesh* m_mesh;

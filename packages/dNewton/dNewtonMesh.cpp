@@ -118,7 +118,20 @@ int dNewtonMesh::GetNextMaterialIndex (void* const materialHandle, int materialI
 	return NewtonMeshNextMaterial (m_mesh, materialHandle, materialIndex);
 }
 
+int dNewtonMesh::MaterialGetMaterial (void* const materialHandle, int materialIndex) const
+{
+	return NewtonMeshMaterialGetMaterial (m_mesh, materialHandle, materialIndex); 
+}
 
+int dNewtonMesh::MaterialGetIndexCount (void* const materialHandle, int materialIndex) const
+{
+	return NewtonMeshMaterialGetIndexCount (m_mesh, materialHandle, materialIndex); 
+}
+
+void dNewtonMesh::MaterialGetIndexStream (void* const materialHandle, int materialIndex, int* const indexes) const
+{
+	NewtonMeshMaterialGetIndexStream (m_mesh, materialHandle, materialIndex, indexes); 
+}
 
 /*
 AllocVertexData(NewtonMeshGetPointCount (mesh));
