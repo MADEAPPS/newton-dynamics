@@ -172,7 +172,7 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 			dgFloat32 timeRemaining = timestep;
 			const dgFloat32 timeTol = dgFloat32 (0.01f) * timestep;
 			for (dgInt32 i = 0; (i < DG_MAX_CONTINUE_COLLISON_STEPS) && (timeRemaining > timeTol); i ++) {
-dgAssert((i +1) < DG_MAX_CONTINUE_COLLISON_STEPS);
+				dgAssert((i + 1) < DG_MAX_CONTINUE_COLLISON_STEPS);
 				// calculate the closest time to impact 
 				dgFloat32 timeToImpact = timeRemaining;
 				for (dgInt32 j = 0; j < jointCount; j ++) {
