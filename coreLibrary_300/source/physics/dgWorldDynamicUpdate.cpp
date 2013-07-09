@@ -710,7 +710,6 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForcesKernel (void* const cont
 }
 
 
-//dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (const dgIsland* const island, dgInt32 threadIndex, dgInt32 rowBase, dgInt32 rowCount, dgFloat32 timestep) const
 void dgWorldDynamicUpdate::GetJacobianDerivatives (const dgIsland* const island, dgInt32 threadIndex, dgInt32 rowCount, dgFloat32 timestep) const
 {
 	dgContraintDescritor constraintParams;

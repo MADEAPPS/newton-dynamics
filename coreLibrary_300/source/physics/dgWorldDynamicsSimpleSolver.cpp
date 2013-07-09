@@ -58,6 +58,7 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 		dgFloat32 maxSpeed = dgFloat32 (0.0f);
 		dgFloat32 maxOmega = dgFloat32 (0.0f);
 
+		dgInt32 cycling = 0;
 		dgFloat32 speedFreeze = world->m_freezeSpeed2;
 		dgFloat32 accelFreeze = world->m_freezeAccel2;
 		dgVector forceDampVect (forceDamp, forceDamp, forceDamp, dgFloat32 (0.0f));
@@ -214,7 +215,12 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 					}
 				}
 
+				if ((cycling >= 1) && (timeToImpact == dgFloat32 (0.0f))) {
+					timeToImpact = dgMin (timestep * dgFloat32 (1.0f / DG_MAX_CONTINUE_COLLISON_STEPS), timeRemaining);
+				}
+
 				if (timeToImpact > timeTol) {
+					cycling = 0;
 					timeRemaining -= timeToImpact;
 					for (dgInt32 j = 1; j < bodyCount; j ++) {
 						dgDynamicBody* const body = (dgDynamicBody*) bodyArray[j].m_body;
@@ -224,6 +230,7 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 						}
 					}
 				} else {
+					cycling ++;
 					for (dgInt32 j = 0; j < jointCount; j ++) {
 						dgContact* const contact = (dgContact*) constraintArray[j].m_joint;
 						if (contact->GetId() == dgConstraint::m_contactConstraint) {
