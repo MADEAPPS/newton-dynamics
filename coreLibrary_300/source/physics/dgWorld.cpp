@@ -900,31 +900,14 @@ void dgWorld::FlushCache()
 
 void dgWorld::StepDynamics (dgFloat32 timestep)
 {
-	//timestep = 1.0f/ 60.0f;
-	//timestep = 1.0f/ 120.0f;
-	//timestep = 1.0f/ 180.0f;
-	//timestep = 1.0f/ 240.0f;
-	//timestep = 1.0f/ 300.0f;
-	//timestep = 1.0f/ 600.0f;
-	//timestep = 1.0f/ 1000.0f;
 
-	//m_cpu = dgNoSimdPresent;
-	//m_cpu = dgSimdPresent;
-	//m_solverMode = 1;
-
-	//static int xxx ;
-	//xxx ++;
-	//if (xxx >= 2000)
-	//xxx *=1;
+//static int xxx ;
+//xxx ++;
+//dgTrace (("%d\n", xxx));
+//if (xxx >= 2000)
+//xxx *=1;
 
 	//xxxxx();
-
-	//static int xxx;
-	//dgTrace (("pass %d\n", xxx));
-	//xxx ++;
-
-//m_cpu = dgSimdPresent;
-//m_cpu = dgNoSimdPresent;
 
 	dgAssert (m_inUpdate == 0);
 //SerializeToFile ("xxx.bin");
@@ -941,8 +924,6 @@ void dgWorld::StepDynamics (dgFloat32 timestep)
 	m_broadPhase->UpdateContacts (timestep);
 	UpdateDynamics (timestep);
 
-	m_inUpdate --;
-
 	if (m_destroyBodyByExeciveForce) {
 		for (dgInt32 i = 0; i < m_destroyeddBodiesPool.m_count; i ++) {
 			m_destroyBodyByExeciveForce (m_destroyeddBodiesPool.m_bodies[i], m_destroyeddBodiesPool.m_joint[i]);
@@ -958,6 +939,7 @@ void dgWorld::StepDynamics (dgFloat32 timestep)
 		m_perfomanceCounters[m_postUpdataListerTicks] = m_getPerformanceCount() - ticks;
 	}
 
+	m_inUpdate --;
 	m_perfomanceCounters[m_worldTicks] = m_getPerformanceCount() - ticks;
 }
 
