@@ -87,6 +87,7 @@ class dgIsland
 	dgInt32 m_jointCount;
 	dgInt32 m_jointStart;
 	dgInt32 m_rowsCount;
+	dgInt32 m_rowsStart;
 	dgUnsigned32 m_isContinueCollision	: 1;
 	dgUnsigned32 m_hasExactSolverJoints : 1;
 };
@@ -148,7 +149,6 @@ class dgParallelSolverSyncData
 	dgInt32 m_maxPasses;
 
 	const dgIsland* m_islandArray;
-//	dgInt32* m_bodyInfoMap;
 	dgParallelJointMap* m_jointInfoMap;
 	JointsBashes m_jointBatches[64];
 	dgInt32 m_hasJointFeeback[DG_MAX_THREADS_HIVE_COUNT];
@@ -292,22 +292,21 @@ class dgWorldDynamicUpdate
 
 	void CalculateReactionForcesParallel (const dgIsland* const island, dgFloat32 timestep) const;
 	dgFloat32 CalculateJointForces (const dgIsland* const island, dgInt32 rowStart, dgInt32 joint, dgFloat32* const forceStep, dgFloat32 maxAccNorm, const dgJacobianPair* const JMinv) const;
-	void CalculateForcesSimulationMode (const dgIsland* const island, dgInt32 rowStart, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
+	void CalculateForcesSimulationMode (const dgIsland* const island, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
 	void CalculateIslandReactionForces (dgIsland* const island, dgFloat32 timestep, dgInt32 threadID) const;
-	dgInt32 BuildJacobianMatrix (dgIsland* const island, dgInt32 threadID, dgFloat32 timestep) const;
-	void CalculateForcesGameMode (const dgIsland* const island, dgInt32 rowStart, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
-	void CalculateReactionsForces(const dgIsland* const island, dgInt32 rowStart, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
-	void ApplyExternalForcesAndAcceleration(const dgIsland* const island, dgInt32 rowStart, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
+	void BuildJacobianMatrix (dgIsland* const island, dgInt32 threadID, dgFloat32 timestep) const;
+	void CalculateForcesGameMode (const dgIsland* const island, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
+	void CalculateReactionsForces(const dgIsland* const island, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
+	void ApplyExternalForcesAndAcceleration(const dgIsland* const island, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
 	void CalculateSimpleBodyReactionsForces (const dgIsland* const island, dgInt32 rowStart, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
 	void IntegrateArray (const dgIsland* const island, dgFloat32 accelTolerance, dgFloat32 timestep, dgInt32 threadID) const;
-	dgInt32 GetJacobianDerivatives (const dgIsland* const island, dgInt32 threadID, dgInt32 rowBase, dgInt32 rowCount, dgFloat32 timestep) const;	
+	void GetJacobianDerivatives (const dgIsland* const island, dgInt32 threadID, dgInt32 rowCount, dgFloat32 timestep) const;	
 	void IntegrateSoftBody (dgWorldDynamicUpdateSyncDescriptor* const descriptor, dgInt32 threadID);
 
 	dgInt32 m_bodies;
 	dgInt32 m_joints;
 	dgInt32 m_islands;
 	dgUnsigned32 m_markLru;
-	mutable dgInt32 m_rowCountAtomicIndex;
 	dgJacobianMemory m_solverMemory;
 	dgThread::dgCriticalSection m_softBodyCriticalSectionLock;
 	dgBody* m_sentinelBody;

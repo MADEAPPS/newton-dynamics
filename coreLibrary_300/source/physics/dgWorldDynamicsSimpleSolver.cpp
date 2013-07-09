@@ -32,13 +32,13 @@
 void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island, dgFloat32 timestep, dgInt32 threadID) const
 {
 	if (!(island->m_isContinueCollision && island->m_jointCount)) {
-		dgInt32 rowBase = BuildJacobianMatrix (island, threadID, timestep);
-		CalculateReactionsForces (island, rowBase, threadID, timestep, DG_SOLVER_MAX_ERROR);
+		BuildJacobianMatrix (island, threadID, timestep);
+		CalculateReactionsForces (island, threadID, timestep, DG_SOLVER_MAX_ERROR);
 		IntegrateArray (island, DG_SOLVER_MAX_ERROR, timestep, threadID); 
 	} else {
 		// calculate reaction force sand new velocities
-		dgInt32 rowBase = BuildJacobianMatrix (island, threadID, timestep);
-		CalculateReactionsForces (island, rowBase, threadID, timestep, DG_SOLVER_MAX_ERROR);
+		BuildJacobianMatrix (island, threadID, timestep);
+		CalculateReactionsForces (island, threadID, timestep, DG_SOLVER_MAX_ERROR);
 
 		// see if the island goes to sleep
 		bool isAutoSleep = true;
@@ -50,7 +50,7 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 		dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
 		dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
 
-		dgVector zero (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+		dgVector zero (dgFloat32 (0.0f));
 
 		dgFloat32 forceDamp = DG_FREEZZING_VELOCITY_DRAG;
 		dgFloat32 maxAccel = dgFloat32 (0.0f);
@@ -78,8 +78,11 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 
 				bool equilibrium = (accel2 < accelFreeze) && (alpha2 < accelFreeze) && (speed2 < speedFreeze) && (omega2 < speedFreeze);
 				if (equilibrium) {
-					body->m_veloc = body->m_veloc.CompProduct4(forceDampVect);
-					body->m_omega = body->m_omega.CompProduct4 (forceDampVect);
+					dgVector veloc (body->m_veloc.CompProduct4(forceDampVect));
+					dgVector omega = body->m_omega.CompProduct4 (forceDampVect);
+					body->m_veloc = (dgVector (veloc.DotProduct4(veloc)) > m_velocTol) & veloc;
+					body->m_omega = (dgVector (omega.DotProduct4(omega)) > m_velocTol) & omega;
+
 				}
 				body->m_equilibrium = dgUnsigned32 (equilibrium);
 				stackSleeping &= equilibrium;
@@ -106,7 +109,7 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 					}
 				}
 			} else {
-				// island is no sleeping but may be at reat with small residual veliduty for a long time
+				// island is no sleeping but may be resting with small residual velocity for a long time
 				// see if we can force to go to sleep
 				if ((maxAccel > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxAccel) ||
 					(maxAlpha > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxAlpha) ||
@@ -169,7 +172,7 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 			dgFloat32 timeRemaining = timestep;
 			const dgFloat32 timeTol = dgFloat32 (0.01f) * timestep;
 			for (dgInt32 i = 0; (i < DG_MAX_CONTINUE_COLLISON_STEPS) && (timeRemaining > timeTol); i ++) {
-
+dgAssert((i +1) < DG_MAX_CONTINUE_COLLISON_STEPS);
 				// calculate the closest time to impact 
 				dgFloat32 timeToImpact = timeRemaining;
 				for (dgInt32 j = 0; j < jointCount; j ++) {
@@ -241,8 +244,8 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 						}
 					}
 
-					dgInt32 rowBase = BuildJacobianMatrix (island, threadID, 0.0f);
-					CalculateReactionsForces (island, rowBase, threadID, 0.0f, DG_SOLVER_MAX_ERROR);
+					BuildJacobianMatrix (island, threadID, 0.0f);
+					CalculateReactionsForces (island, threadID, 0.0f, DG_SOLVER_MAX_ERROR);
 				}
 			}
 
@@ -268,7 +271,7 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 
 
 
-dgInt32 dgWorldDynamicUpdate::BuildJacobianMatrix (dgIsland* const island, dgInt32 threadIndex, dgFloat32 timestep) const 
+void dgWorldDynamicUpdate::BuildJacobianMatrix (dgIsland* const island, dgInt32 threadIndex, dgFloat32 timestep) const 
 {
 	dgAssert (island->m_bodyCount >= 2);
 
@@ -291,21 +294,21 @@ dgInt32 dgWorldDynamicUpdate::BuildJacobianMatrix (dgIsland* const island, dgInt
 			body->CalcInvInertiaMatrix ();
 		}
 	}
-
 	dgInt32 jointCount = island->m_jointCount;
-	dgInt32 rowBase = dgAtomicExchangeAndAdd(&m_rowCountAtomicIndex, island->m_rowsCount);
+//	dgInt32 rowBase = dgAtomicExchangeAndAdd(&m_rowCountAtomicIndex, island->m_rowsCount);
 	if (jointCount) {
 		dgInt32 rowCount = 0;
 		dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
 		dgJointInfo* const constraintArray = &constraintArrayPtr[island->m_jointStart];
 
-		rowCount = GetJacobianDerivatives (island, threadIndex, rowBase, rowCount, timestep);
-		dgAssert (rowCount <= island->m_rowsCount);
+//		rowCount = GetJacobianDerivatives (island, threadIndex, rowBase, rowCount, timestep);
+//		dgAssert (rowCount <= island->m_rowsCount);
+		GetJacobianDerivatives (island, threadIndex, rowCount, timestep);
 
 		dgVector zero (dgFloat32 (0.0f));
 		dgFloat32 forceOrImpulseScale = (timestep > dgFloat32 (0.0f)) ? dgFloat32 (1.0f) : dgFloat32 (0.0f);
 
-		dgJacobianMatrixElement* const matrixRow = &m_solverMemory.m_memory[rowBase];
+		dgJacobianMatrixElement* const matrixRow = &m_solverMemory.m_memory[island->m_rowsStart];
 		for (dgInt32 k = 0; k < jointCount; k ++) {
 			const dgJointInfo* const jointInfo = &constraintArray[k];
 			dgConstraint* const constraint = jointInfo->m_joint;
@@ -386,11 +389,10 @@ dgInt32 dgWorldDynamicUpdate::BuildJacobianMatrix (dgIsland* const island, dgInt
 			}
 		}
 	}
-	return rowBase;
 }
 
 
-void dgWorldDynamicUpdate::ApplyExternalForcesAndAcceleration(const dgIsland* const island, dgInt32 rowStart, dgInt32 threadIndex, dgFloat32 timestep, dgFloat32 maxAccNorm) const
+void dgWorldDynamicUpdate::ApplyExternalForcesAndAcceleration(const dgIsland* const island, dgInt32 threadIndex, dgFloat32 timestep, dgFloat32 maxAccNorm) const
 {
 	dgJacobian* const internalForces = &m_solverMemory.m_internalForces[island->m_bodyStart];
 
@@ -407,7 +409,7 @@ void dgWorldDynamicUpdate::ApplyExternalForcesAndAcceleration(const dgIsland* co
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[island->m_jointStart];
 
-	dgJacobianMatrixElement* const matrixRow = &m_solverMemory.m_memory[rowStart];
+	dgJacobianMatrixElement* const matrixRow = &m_solverMemory.m_memory[island->m_rowsStart];
 	for (dgInt32 i = 0; i < jointCount; i ++) {
 		dgInt32 first = constraintArray[i].m_autoPairstart;
 		dgInt32 count = constraintArray[i].m_autoPaircount;
@@ -754,7 +756,7 @@ dgAssert (0);
 }
 
 
-void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island, dgInt32 rowStart, dgInt32 threadIndex, dgFloat32 timestepSrc, dgFloat32 maxAccNorm) const
+void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island, dgInt32 threadIndex, dgFloat32 timestepSrc, dgFloat32 maxAccNorm) const
 {
 	dgJacobian* const internalForces = &m_solverMemory.m_internalForces[island->m_bodyStart];
 	dgVector zero(dgFloat32 (0.0f));
@@ -779,7 +781,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 	internalForces[0].m_linear = zero;
 	internalForces[0].m_angular = zero;
 
-	dgJacobianMatrixElement* const matrixRow = &m_solverMemory.m_memory[rowStart];
+	dgJacobianMatrixElement* const matrixRow = &m_solverMemory.m_memory[island->m_rowsStart];
 
 	dgInt32 jointCount = island->m_jointCount;
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
@@ -1279,7 +1281,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForces (const dgIsland* const isla
 }
 
 
-void dgWorldDynamicUpdate::CalculateForcesSimulationMode (const dgIsland* const island, dgInt32 rowStart, dgInt32 threadIndex, dgFloat32 timestep, dgFloat32 maxAccNorm) const
+void dgWorldDynamicUpdate::CalculateForcesSimulationMode (const dgIsland* const island, dgInt32 threadIndex, dgFloat32 timestep, dgFloat32 maxAccNorm) const
 {
 dgAssert (0);
 /*
@@ -1795,10 +1797,10 @@ dgAssert (0);
 }
 
 
-void dgWorldDynamicUpdate::CalculateReactionsForces(const dgIsland* const island, dgInt32 rowStart, dgInt32 threadIndex, dgFloat32 timestep, dgFloat32 maxAccNorm) const
+void dgWorldDynamicUpdate::CalculateReactionsForces(const dgIsland* const island, dgInt32 threadIndex, dgFloat32 timestep, dgFloat32 maxAccNorm) const
 {
 	if (island->m_jointCount == 0) {
-		ApplyExternalForcesAndAcceleration (island, rowStart, threadIndex, timestep, 0.0f);
+		ApplyExternalForcesAndAcceleration (island, threadIndex, timestep, 0.0f);
 
 //	} else if (island->m_jointCount == 1) {
 //		CalculateSimpleBodyReactionsForces (island, rowStart, threadIndex, timestep, maxAccNorm);
@@ -1806,11 +1808,11 @@ void dgWorldDynamicUpdate::CalculateReactionsForces(const dgIsland* const island
 	} else {
 		dgWorld* const world = (dgWorld*) this;
 		if (world->m_solverMode && !island->m_hasExactSolverJoints) {
-			CalculateForcesGameMode (island, rowStart, threadIndex, timestep, maxAccNorm);
+			CalculateForcesGameMode (island, threadIndex, timestep, maxAccNorm);
 		} else {
 			dgAssert (timestep > dgFloat32 (0.0f));
 			// remember to make the change for the impulsive solver for CC
-			CalculateForcesSimulationMode (island, rowStart, threadIndex, timestep, maxAccNorm);
+			CalculateForcesSimulationMode (island, threadIndex, timestep, maxAccNorm);
 		}
 	}
 }

@@ -2328,7 +2328,7 @@ dgInt32 dgCollisionConvex::CalculatePlaneIntersection (const dgVector& normal, c
 				contactsOut[count] = m_vertex[ptr->m_vertex];
 				dgConvexSimplexEdge* ptr1 = ptr->m_next;
 				for (; ptr1 != ptr; ptr1 = ptr1->m_next) {
-					dgAssert (m_vertex[ptr1->m_twin->m_vertex].m_w == dgFloat32 (1.0f));
+					dgAssert (m_vertex[ptr1->m_twin->m_vertex].m_w == dgFloat32 (0.0f));
 					side0 = plane.Evalue (m_vertex[ptr1->m_twin->m_vertex]); 
 					if (side0 >= dgFloat32 (0.0f)) {
 						break;

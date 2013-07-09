@@ -74,7 +74,7 @@ dgWorldDynamicUpdate::dgWorldDynamicUpdate()
 	,m_joints(0)
 	,m_islands(0)
 	,m_markLru(0)
-	,m_rowCountAtomicIndex(0)
+//	,m_rowCountAtomicIndex(0)
 	,m_softBodyCriticalSectionLock()
 {
 }
@@ -130,15 +130,15 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 		}
 	}
 
-	dgIsland* const islands = (dgIsland*) &world->m_islandMemory[0];
-
 	dgInt32 maxRowCount = 0;
+	dgIsland* const islands = (dgIsland*) &world->m_islandMemory[0];
 	for (dgInt32 i = 0; i < m_islands; i ++) {
+		islands[i].m_rowsStart = maxRowCount;
 		maxRowCount += islands[i].m_rowsCount;
 	}
 	m_solverMemory.Init (world, maxRowCount, m_bodies);
 
-	m_rowCountAtomicIndex = 0;
+//	m_rowCountAtomicIndex = 0;
 
 	dgInt32 threadCount = world->GetThreadCount();	
 
@@ -568,6 +568,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 		islandArray[m_islands].m_bodyCount = bodyCount;
 		islandArray[m_islands].m_jointCount = jointCount;
 		islandArray[m_islands].m_rowsCount = rowsCount;
+		islandArray[m_islands].m_rowsStart = 0;
 
 		islandArray[m_islands].m_hasExactSolverJoints = hasExactSolverJoints;
 		islandArray[m_islands].m_isContinueCollision = isContinueCollisionIsland;
@@ -709,7 +710,8 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForcesKernel (void* const cont
 }
 
 
-dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (const dgIsland* const island, dgInt32 threadIndex, dgInt32 rowBase, dgInt32 rowCount, dgFloat32 timestep) const
+//dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (const dgIsland* const island, dgInt32 threadIndex, dgInt32 rowBase, dgInt32 rowCount, dgFloat32 timestep) const
+void dgWorldDynamicUpdate::GetJacobianDerivatives (const dgIsland* const island, dgInt32 threadIndex, dgInt32 rowCount, dgFloat32 timestep) const
 {
 	dgContraintDescritor constraintParams;
 	dgWorld* const world = (dgWorld*) this;
@@ -722,7 +724,7 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (const dgIsland* const isla
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[island->m_jointStart];
 
-	dgJacobianMatrixElement* const matrixRow = &m_solverMemory.m_memory[rowBase];
+	dgJacobianMatrixElement* const matrixRow = &m_solverMemory.m_memory[island->m_rowsStart];
 	dgInt32 jointCount = island->m_jointCount;
 	for (dgInt32 j = 0; j < jointCount; j ++) {
 		dgJointInfo* const jointInfo = &constraintArray[j];
@@ -788,9 +790,10 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (const dgIsland* const isla
 
 			rowCount = (rowCount & (dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)) - 1)) ? ((rowCount & (-dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)))) + dgInt32 (sizeof (dgVector) / sizeof (dgFloat32))) : rowCount;
 			dgAssert ((rowCount & (dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)) - 1)) == 0);
+			dgAssert (rowCount < island->m_rowsCount);
 		}
 	}
-	return rowCount;
+//	return rowCount;
 }
 
 
