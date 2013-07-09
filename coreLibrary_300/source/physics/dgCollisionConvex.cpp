@@ -1177,6 +1177,7 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 		}
 
 		// clear the face cache!!
+		Flush();
 		m_faceIndex = 0;
 		m_vertexIndex = 4;
 		m_freeFace = NULL;
@@ -3157,6 +3158,8 @@ dgInt32 dgCollisionConvex::CalculateConvexCastContacts(dgCollisionParamProxy& pr
 			break;
 		}
 		minkHull.m_matrix.m_posit = proxy.m_matrix.m_posit + veloc.Scale3(tacc);
+// hack;
+minkHull.m_vertexIndex = 0;
 
 		iter ++;
 	} while (iter < DG_SEPARATION_PLANES_ITERATIONS);
