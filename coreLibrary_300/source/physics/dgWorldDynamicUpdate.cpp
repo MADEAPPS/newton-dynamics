@@ -32,7 +32,7 @@
 
 
 #define DG_PARALLEL_JOINT_COUNT_CUT_OFF		(4 * DG_MAX_THREADS_HIVE_COUNT)
-#define DG_CCD_EXTRA_CONTACT_COUNT			(4 * 4)
+#define DG_CCD_EXTRA_CONTACT_COUNT			(4 * 3)
 
 
 dgVector dgWorldDynamicUpdate::m_velocTol (dgFloat32 (1.0e-18f));
@@ -789,7 +789,7 @@ void dgWorldDynamicUpdate::GetJacobianDerivatives (const dgIsland* const island,
 
 			rowCount = (rowCount & (dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)) - 1)) ? ((rowCount & (-dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)))) + dgInt32 (sizeof (dgVector) / sizeof (dgFloat32))) : rowCount;
 			dgAssert ((rowCount & (dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)) - 1)) == 0);
-			dgAssert (rowCount < island->m_rowsCount);
+			dgAssert (rowCount <= island->m_rowsCount);
 		}
 	}
 //	return rowCount;
