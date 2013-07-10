@@ -175,7 +175,7 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 //				dgAssert((i + 1) < DG_MAX_CONTINUE_COLLISON_STEPS);
 				// calculate the closest time to impact 
 				dgFloat32 timeToImpact = timeRemaining;
-				for (dgInt32 j = 0; j < jointCount; j ++) {
+				for (dgInt32 j = 0; (j < jointCount) && (timeToImpact > timeTol); j ++) {
 					dgContact* const contact = (dgContact*) constraintArray[j].m_joint;
 					if (contact->GetId() == dgConstraint::m_contactConstraint) {
 						dgDynamicBody* const body0 = (dgDynamicBody*)contact->m_body0;
@@ -212,7 +212,7 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 								timeToImpact = t;
 							}
 */
-							timeToImpact = world->CalculateTimeToImpact (contact, timeToImpact, threadID, p, q, normal);
+							timeToImpact = dgMin (timeToImpact, world->CalculateTimeToImpact (contact, timeToImpact, threadID, p, q, normal));
 						}
 					}
 				}
