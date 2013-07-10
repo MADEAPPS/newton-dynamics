@@ -82,7 +82,7 @@ int dNewtonMesh::GetPointCount() const
 	return NewtonMeshGetPointCount (m_mesh);
 }
 
-void dNewtonMesh::GetVectexStreams(dPoint* const posit, dPoint* const normal, dUV* const uv0, dUV* const uv1) const
+void dNewtonMesh::GetVertexStreams(dPoint* const posit, dPoint* const normal, dUV* const uv0, dUV* const uv1) const
 {
 	NewtonMeshGetVertexStreams (m_mesh, sizeof (dPoint), &posit[0].m_x, sizeof (dPoint), &normal[0].m_x, sizeof (dUV), &uv0[0].m_u, sizeof (dUV), &uv1[0].m_u);
 }

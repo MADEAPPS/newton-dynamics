@@ -56,7 +56,7 @@ class dNewtonMesh: public dNewtonAlloc
 	CNEWTON_API void CreateApproximateConvexDecomposition (const dNewtonMesh& mesh, dFloat maxConcavity, dFloat backFaceDistanceFactor, int maxCount, int maxVertexPerHull);
 
 	CNEWTON_API int GetPointCount() const;
-	CNEWTON_API void GetVectexStreams(dPoint* const posit, dPoint* const normal, dUV* const uv0, dUV* const uv1) const;
+	CNEWTON_API void GetVertexStreams(dPoint* const posit, dPoint* const normal, dUV* const uv0, dUV* const uv1) const;
 
 	CNEWTON_API int GetTotalIndexCount() const;
 	CNEWTON_API int GetTotalFaceCount() const;
