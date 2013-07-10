@@ -229,8 +229,8 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 					BuildJacobianMatrix (island, threadID, 0.0f);
 					CalculateReactionsForces (island, threadID, 0.0f, DG_SOLVER_MAX_ERROR);
 
-					bool islandColliding = false;
-					for (dgInt32 k = 0; (k < DG_MAX_CONTINUE_COLLISON_STEPS) && !islandColliding; k ++) {
+					bool islandResinding = true;
+					for (dgInt32 k = 0; (k < DG_MAX_CONTINUE_COLLISON_STEPS) && islandResinding; k ++) {
 						dgFloat32 smallTimeStep = dgMin (timestep * dgFloat32 (1.0f / 8.0f), timeRemaining);
 						timeRemaining -= smallTimeStep;
 						for (dgInt32 j = 1; j < bodyCount; j ++) {
@@ -241,31 +241,36 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 							}
 						}
 
-						islandColliding = true;
-						CalculateIslandContacts (island, timeRemaining, lru, threadID);
-						for (dgInt32 j = 0; (j < jointCount) && islandColliding; j ++) {
-							dgContact* const contact = (dgContact*) constraintArray[j].m_joint;
-							if (contact->GetId() == dgConstraint::m_contactConstraint) {
+						islandResinding = false;
+						if (timeRemaining > timeTol) {
+							CalculateIslandContacts (island, timeRemaining, lru, threadID);
 
-								const dgVector& veloc0 = contact->m_body0->m_veloc;
-								const dgVector& veloc1 = contact->m_body1->m_veloc;
+							bool isColliding = false;
+							for (dgInt32 j = 0; (j < jointCount) && !isColliding; j ++) {
+								dgContact* const contact = (dgContact*) constraintArray[j].m_joint;
+								if (contact->GetId() == dgConstraint::m_contactConstraint) {
 
-								const dgVector& omega0 = contact->m_body0->m_omega;
-								const dgVector& omega1 = contact->m_body1->m_omega;
+									const dgVector& veloc0 = contact->m_body0->m_veloc;
+									const dgVector& veloc1 = contact->m_body1->m_veloc;
 
-								const dgVector& com0 = contact->m_body0->m_globalCentreOfMass;
-								const dgVector& com1 = contact->m_body1->m_globalCentreOfMass;
+									const dgVector& omega0 = contact->m_body0->m_omega;
+									const dgVector& omega1 = contact->m_body1->m_omega;
 
-								for (dgList<dgContactMaterial>::dgListNode* node = contact->GetFirst(); node && islandColliding; node = node->GetNext()) {
-									const dgContactMaterial* const contactMaterial = &node->GetInfo();
-									dgVector vel0 (veloc0 + omega0 * (contactMaterial->m_point - com0));
-									dgVector vel1 (veloc1 + omega1 * (contactMaterial->m_point - com1));
-									dgVector vRel (vel1 - vel0);
-									dgAssert (contactMaterial->m_normal.m_w == dgFloat32 (0.0f));
-									dgFloat32 speed = vRel.DotProduct4(contactMaterial->m_normal).m_w;
-									islandColliding = (speed <= dgFloat32 (0.1f));
+									const dgVector& com0 = contact->m_body0->m_globalCentreOfMass;
+									const dgVector& com1 = contact->m_body1->m_globalCentreOfMass;
+									
+									for (dgList<dgContactMaterial>::dgListNode* node = contact->GetFirst(); node; node = node->GetNext()) {
+										const dgContactMaterial* const contactMaterial = &node->GetInfo();
+										dgVector vel0 (veloc0 + omega0 * (contactMaterial->m_point - com0));
+										dgVector vel1 (veloc1 + omega1 * (contactMaterial->m_point - com1));
+										dgVector vRel (vel0 - vel1);
+										dgAssert (contactMaterial->m_normal.m_w == dgFloat32 (0.0f));
+										dgFloat32 speed = vRel.DotProduct4(contactMaterial->m_normal).m_w;
+										isColliding |= (speed < dgFloat32 (0.0f));
+									}
 								}
 							}
+							islandResinding = !isColliding;
 						}
 					}
 				}
