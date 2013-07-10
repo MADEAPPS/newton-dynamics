@@ -342,13 +342,25 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (dgIsland* const island, dgInt32 
 	dgAssert ((((dgDynamicBody*)bodyArray[0].m_body)->m_accel % ((dgDynamicBody*)bodyArray[0].m_body)->m_accel) == dgFloat32 (0.0f));
 	dgAssert ((((dgDynamicBody*)bodyArray[0].m_body)->m_alpha % ((dgDynamicBody*)bodyArray[0].m_body)->m_alpha) == dgFloat32 (0.0f));
 
-	for (dgInt32 i = 1; i < bodyCount; i ++) {
-		dgBody* const body = bodyArray[i].m_body;
-//		if (body->m_active) {
-		if (!body->m_equilibrium) {
-			dgAssert (body->m_invMass.m_w > dgFloat32 (0.0f));
-			body->AddDampingAcceleration();
-			body->CalcInvInertiaMatrix ();
+	if (timestep != dgFloat32 (0.0f)) {
+		for (dgInt32 i = 1; i < bodyCount; i ++) {
+			dgBody* const body = bodyArray[i].m_body;
+			//if (body->m_active) {
+			if (!body->m_equilibrium) {
+				dgAssert (body->m_invMass.m_w > dgFloat32 (0.0f));
+				body->AddDampingAcceleration();
+				body->CalcInvInertiaMatrix ();
+			}
+		}
+
+	} else {
+		for (dgInt32 i = 1; i < bodyCount; i ++) {
+			dgBody* const body = bodyArray[i].m_body;
+	//		if (body->m_active) {
+			if (!body->m_equilibrium) {
+				dgAssert (body->m_invMass.m_w > dgFloat32 (0.0f));
+				body->CalcInvInertiaMatrix ();
+			}
 		}
 	}
 	dgInt32 jointCount = island->m_jointCount;
