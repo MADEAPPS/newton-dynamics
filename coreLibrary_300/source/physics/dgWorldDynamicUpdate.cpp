@@ -555,8 +555,8 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 
 
 	if (bodyCount > 1) {
-		if (isContinueCollisionIsland && jointCount && (rowsCount < 32)) {
-			rowsCount = 32;
+		if (isContinueCollisionIsland && jointCount && (rowsCount < 64)) {
+			rowsCount = 64;
 		}
 
 		world->m_islandMemory.ExpandCapacityIfNeessesary (m_islands, sizeof (dgIsland));
