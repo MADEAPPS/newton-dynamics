@@ -62,6 +62,7 @@ class dNewton: public dNewtonAlloc
 	CNEWTON_API dNewtonBody* GetFirstBody() const;
 	CNEWTON_API dNewtonBody* GetNextBody(const dNewtonBody* const body) const;
 
+	CNEWTON_API int GetBodyCount() const;
 	CNEWTON_API void DestroyAllBodies();
 
 	protected:

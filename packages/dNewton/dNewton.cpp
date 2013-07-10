@@ -93,6 +93,10 @@ NewtonWorld* dNewton::GetNewton () const
 	return m_world;
 }
 
+int dNewton::GetBodyCount() const
+{
+	return NewtonWorldGetBodyCount(m_world);
+}
 
 dNewtonBody* dNewton::GetFirstBody() const
 {
