@@ -692,17 +692,21 @@ void dgWorld::PopulateContacts (dgCollidingPairCollector::dgPair* const pair, dg
 
 	const dgVector& v0 = body0->m_veloc;
 	const dgVector& w0 = body0->m_omega;
-	const dgMatrix& matrix0 = body0->m_matrix;
+	//const dgMatrix& matrix0 = body0->m_matrix;
+	const dgVector& com0 = body0->m_globalCentreOfMass;
 
 	const dgVector& v1 = body1->m_veloc;
 	const dgVector& w1 = body1->m_omega;
-	const dgMatrix& matrix1 = body1->m_matrix;
+	//const dgMatrix& matrix1 = body1->m_matrix;
+	const dgVector& com1 = body1->m_globalCentreOfMass;
 
 	dgVector controlDir0 (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	dgVector controlDir1 (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	dgVector controlNormal (contactArray[0].m_normal);
-	dgVector vel0 (v0 + w0 * (contactArray[0].m_point - matrix0.m_posit));
-	dgVector vel1 (v1 + w1 * (contactArray[0].m_point - matrix1.m_posit));
+	//dgVector vel0 (v0 + w0 * (contactArray[0].m_point - matrix0.m_posit));
+	//dgVector vel1 (v1 + w1 * (contactArray[0].m_point - matrix1.m_posit));
+	dgVector vel0 (v0 + w0 * (contactArray[0].m_point - com0));
+	dgVector vel1 (v1 + w1 * (contactArray[0].m_point - com1));
 	dgVector vRel (vel1 - vel0);
 	dgVector tangDir (vRel - controlNormal.Scale3 (vRel % controlNormal));
 	dgFloat32 diff = tangDir % tangDir;
@@ -808,8 +812,10 @@ void dgWorld::PopulateContacts (dgCollidingPairCollector::dgPair* const pair, dg
 			}
 		} else {
 
-			dgVector vel0 (v0 + w0 * (contactMaterial->m_point - matrix0.m_posit));
-			dgVector vel1 (v1 + w1 * (contactMaterial->m_point - matrix1.m_posit));
+			//dgVector vel0 (v0 + w0 * (contactMaterial->m_point - matrix0.m_posit));
+			//dgVector vel1 (v1 + w1 * (contactMaterial->m_point - matrix1.m_posit));
+			dgVector vel0 (v0 + w0 * (contactMaterial->m_point - com0));
+			dgVector vel1 (v1 + w1 * (contactMaterial->m_point - com1));
 			dgVector vRel (vel1 - vel0);
 
 			dgFloat32 impulse = vRel % contactMaterial->m_normal;

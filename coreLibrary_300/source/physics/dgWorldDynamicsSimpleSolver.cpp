@@ -46,31 +46,30 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 		dgInt32 sleepCounter = 10000;
 
 		dgWorld* const world = (dgWorld*) this;
-		dgInt32 bodyCount = island->m_bodyCount;
+		const dgInt32 bodyCount = island->m_bodyCount;
 		dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
 		dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
 
 		dgVector zero (dgFloat32 (0.0f));
 
-		dgFloat32 forceDamp = DG_FREEZZING_VELOCITY_DRAG;
+		const dgFloat32 forceDamp = DG_FREEZZING_VELOCITY_DRAG;
 		dgFloat32 maxAccel = dgFloat32 (0.0f);
 		dgFloat32 maxAlpha = dgFloat32 (0.0f);
 		dgFloat32 maxSpeed = dgFloat32 (0.0f);
 		dgFloat32 maxOmega = dgFloat32 (0.0f);
 
-		dgInt32 cycling = 0;
-		dgFloat32 speedFreeze = world->m_freezeSpeed2;
-		dgFloat32 accelFreeze = world->m_freezeAccel2;
-		dgVector forceDampVect (forceDamp, forceDamp, forceDamp, dgFloat32 (0.0f));
+		const dgFloat32 speedFreeze = world->m_freezeSpeed2;
+		const dgFloat32 accelFreeze = world->m_freezeAccel2;
+		const dgVector forceDampVect (forceDamp, forceDamp, forceDamp, dgFloat32 (0.0f));
 		for (dgInt32 i = 1; i < bodyCount; i ++) {
 			dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
 			if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
 				dgAssert (body->m_invMass.m_w);
 
-				dgFloat32 accel2 = body->m_accel % body->m_accel;
-				dgFloat32 alpha2 = body->m_alpha % body->m_alpha;
-				dgFloat32 speed2 = body->m_veloc % body->m_veloc;
-				dgFloat32 omega2 = body->m_omega % body->m_omega;
+				const dgFloat32 accel2 = body->m_accel % body->m_accel;
+				const dgFloat32 alpha2 = body->m_alpha % body->m_alpha;
+				const dgFloat32 speed2 = body->m_veloc % body->m_veloc;
+				const dgFloat32 omega2 = body->m_omega % body->m_omega;
 
 				maxAccel = dgMax (maxAccel, accel2);
 				maxAlpha = dgMax (maxAlpha, alpha2);
@@ -165,15 +164,15 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 		if (!(isAutoSleep & stackSleeping)) {
 			// island is not sleeping, need to integrate island velocity
 
-			dgUnsigned32 lru = world->GetBroadPhase()->m_lru;
-			dgInt32 jointCount = island->m_jointCount;
+			const dgUnsigned32 lru = world->GetBroadPhase()->m_lru;
+			const dgInt32 jointCount = island->m_jointCount;
 			dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
 			dgJointInfo* const constraintArray = &constraintArrayPtr[island->m_jointStart];
 
 			dgFloat32 timeRemaining = timestep;
 			const dgFloat32 timeTol = dgFloat32 (0.01f) * timestep;
 			for (dgInt32 i = 0; (i < DG_MAX_CONTINUE_COLLISON_STEPS) && (timeRemaining > timeTol); i ++) {
-//				dgAssert((i + 1) < DG_MAX_CONTINUE_COLLISON_STEPS);
+				dgAssert((i + 1) < DG_MAX_CONTINUE_COLLISON_STEPS);
 				// calculate the closest time to impact 
 				dgFloat32 timeToImpact = timeRemaining;
 				for (dgInt32 j = 0; j < jointCount; j ++) {
@@ -215,12 +214,7 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 					}
 				}
 
-				if ((cycling >= 1) && (timeToImpact == dgFloat32 (0.0f))) {
-					timeToImpact = dgMin (timestep * dgFloat32 (1.0f / DG_MAX_CONTINUE_COLLISON_STEPS), timeRemaining);
-				}
-
 				if (timeToImpact > timeTol) {
-					cycling = 0;
 					timeRemaining -= timeToImpact;
 					for (dgInt32 j = 1; j < bodyCount; j ++) {
 						dgDynamicBody* const body = (dgDynamicBody*) bodyArray[j].m_body;
@@ -230,29 +224,50 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 						}
 					}
 				} else {
-					cycling ++;
-					for (dgInt32 j = 0; j < jointCount; j ++) {
-						dgContact* const contact = (dgContact*) constraintArray[j].m_joint;
-						if (contact->GetId() == dgConstraint::m_contactConstraint) {
-							dgContactPoint contactArray[DG_MAX_CONTATCS];
-							dgCollidingPairCollector::dgPair pair;
+					
+					CalculateIslandContacts (island, timeRemaining, lru, threadID);
+					BuildJacobianMatrix (island, threadID, 0.0f);
+					CalculateReactionsForces (island, threadID, 0.0f, DG_SOLVER_MAX_ERROR);
 
-							contact->m_maxDOF = 0;
-							contact->m_broadphaseLru = lru;
-							pair.m_contact = contact;
-							pair.m_cacheIsValid = false;
-							pair.m_contactBuffer = contactArray;
-							world->CalculateContacts (&pair, timeRemaining, threadID, false, false);
+					bool islandColliding = true;
+					for (dgInt32 k = 0; (k < DG_MAX_CONTINUE_COLLISON_STEPS) && islandColliding; k ++) {
+						dgFloat32 smallTimeStep = dgMin (timestep * dgFloat32 (1.0f / 8.0f), timeRemaining);
+						timeRemaining -= smallTimeStep;
+						for (dgInt32 j = 1; j < bodyCount; j ++) {
+							dgDynamicBody* const body = (dgDynamicBody*) bodyArray[j].m_body;
+							if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+								body->IntegrateVelocity (smallTimeStep);
+								body->UpdateWorlCollisionMatrix();
+							}
+						}
 
-							if (pair.m_contactCount) {
-								dgAssert (pair.m_contactCount <= (DG_CONSTRAINT_MAX_ROWS / 3));
-								world->ProcessContacts (&pair, timeRemaining, threadID);
+						islandColliding = false;
+						CalculateIslandContacts (island, timeRemaining, lru, threadID);
+						for (dgInt32 j = 0; (j < jointCount); j ++) {
+							dgContact* const contact = (dgContact*) constraintArray[j].m_joint;
+							if (contact->GetId() == dgConstraint::m_contactConstraint) {
+
+								const dgVector& veloc0 = contact->m_body0->m_veloc;
+								const dgVector& veloc1 = contact->m_body1->m_veloc;
+
+								const dgVector& omega0 = contact->m_body0->m_omega;
+								const dgVector& omega1 = contact->m_body1->m_omega;
+
+								const dgVector& com0 = contact->m_body0->m_globalCentreOfMass;
+								const dgVector& com1 = contact->m_body1->m_globalCentreOfMass;
+
+								for (dgList<dgContactMaterial>::dgListNode* node = contact->GetFirst(); node && !islandColliding; node = node->GetNext()) {
+									const dgContactMaterial* const contactMaterial = &node->GetInfo();
+									dgVector vel0 (veloc0 + omega0 * (contactMaterial->m_point - com0));
+									dgVector vel1 (veloc1 + omega1 * (contactMaterial->m_point - com1));
+									dgVector vRel (vel1 - vel0);
+									dgAssert (contactMaterial->m_normal.m_w == dgFloat32 (0.0f));
+									dgFloat32 speed = vRel.DotProduct4(contactMaterial->m_normal).m_w;
+									islandColliding = (speed >= dgFloat32 (0.1f));
+								}
 							}
 						}
 					}
-
-					BuildJacobianMatrix (island, threadID, 0.0f);
-					CalculateReactionsForces (island, threadID, 0.0f, DG_SOLVER_MAX_ERROR);
 				}
 			}
 
@@ -276,6 +291,33 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 	}
 }
 
+
+void dgWorldDynamicUpdate::CalculateIslandContacts (dgIsland* const island, dgFloat32 timestep, dgInt32 currLru, dgInt32 threadID) const
+{
+	dgWorld* const world = (dgWorld*) this;
+	dgInt32 jointCount = island->m_jointCount;
+	dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
+	dgJointInfo* const constraintArray = &constraintArrayPtr[island->m_jointStart];
+
+	for (dgInt32 j = 0; (j < jointCount); j ++) {
+		dgContact* const contact = (dgContact*) constraintArray[j].m_joint;
+		if (contact->GetId() == dgConstraint::m_contactConstraint) {
+			dgContactPoint contactArray[DG_MAX_CONTATCS];
+			dgCollidingPairCollector::dgPair pair;
+
+			contact->m_maxDOF = 0;
+			contact->m_broadphaseLru = currLru;
+			pair.m_contact = contact;
+			pair.m_cacheIsValid = false;
+			pair.m_contactBuffer = contactArray;
+			world->CalculateContacts (&pair, timestep, threadID, false, false);
+			if (pair.m_contactCount) {
+				dgAssert (pair.m_contactCount <= (DG_CONSTRAINT_MAX_ROWS / 3));
+				world->ProcessContacts (&pair, timestep, threadID);
+			}
+		}
+	}
+}
 
 
 void dgWorldDynamicUpdate::BuildJacobianMatrix (dgIsland* const island, dgInt32 threadIndex, dgFloat32 timestep) const 

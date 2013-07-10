@@ -302,6 +302,8 @@ class dgWorldDynamicUpdate
 	void IntegrateArray (const dgIsland* const island, dgFloat32 accelTolerance, dgFloat32 timestep, dgInt32 threadID) const;
 	void GetJacobianDerivatives (const dgIsland* const island, dgInt32 threadID, dgInt32 rowCount, dgFloat32 timestep) const;	
 	void IntegrateSoftBody (dgWorldDynamicUpdateSyncDescriptor* const descriptor, dgInt32 threadID);
+	void CalculateIslandContacts (dgIsland* const island, dgFloat32 timestep, dgInt32 currLru, dgInt32 threadID) const;
+	
 
 	dgInt32 m_bodies;
 	dgInt32 m_joints;
