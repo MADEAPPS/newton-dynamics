@@ -133,55 +133,8 @@ void dNewtonMesh::MaterialGetIndexStream (void* const materialHandle, int materi
 	NewtonMeshMaterialGetIndexStream (m_mesh, materialHandle, materialIndex, indexes); 
 }
 
-/*
-AllocVertexData(NewtonMeshGetPointCount (mesh));
-NewtonMeshGetVertexStreams (mesh, 3 * sizeof (dFloat), (dFloat*) m_vertex, 3 * sizeof (dFloat), (dFloat*) m_normal,	2 * sizeof (dFloat), (dFloat*) m_uv, 2 * sizeof (dFloat), (dFloat*) m_uv);
-
-//	dTree<dScene::dTreeNode*, int> materialMap;
-//	for (void* ptr = scene->GetFirstChild(meshNode); ptr; ptr = scene->GetNextChild (meshNode, ptr)) {
-//		dScene::dTreeNode* node = scene->GetNodeFromLink(ptr);
-//		dNodeInfo* info = scene->GetInfoFromNode(node);
-//		if (info->GetTypeId() == dMaterialNodeInfo::GetRttiType()) {
-//			dMaterialNodeInfo* const material = (dMaterialNodeInfo*)info;
-//			materialMap.Insert(node, material->GetId());
-//		}
-//	}
-
-// extract the materials index array for mesh
-void* const meshCookie = NewtonMeshBeginHandle (mesh); 
-for (int handle = NewtonMeshFirstMaterial (mesh, meshCookie); handle != -1; handle = NewtonMeshNextMaterial (mesh, meshCookie, handle)) {
-	int textureId = NewtonMeshMaterialGetMaterial (mesh, meshCookie, handle); 
-	int indexCount = NewtonMeshMaterialGetIndexCount (mesh, meshCookie, handle); 
-	DemoSubMesh* const segment = AddSubMesh();
-
-	//		dTree<dScene::dTreeNode*, int>::dTreeNode* matNodeCache = materialMap.Find(materialIndex);
-	//		if (matNodeCache) {
-	//			dScene::dTreeNode* const matNode = matNodeCache->GetInfo();
-	//			dMaterialNodeInfo* const material = (dMaterialNodeInfo*) scene->GetInfoFromNode(matNode);
-	//			if (material->GetDiffuseTextId() != -1) {
-	//				dScene::dTreeNode* const node = scene->FindTextureByTextId(matNode, material->GetDiffuseTextId());
-	//				dAssert (node);
-	//				dTextureNodeInfo* const texture = (dTextureNodeInfo*)scene->GetInfoFromNode(node);
-	//
-	//				segment->m_textureHandle = LoadTexture(texture->GetPathName());
-	//				strcpy (segment->m_textureName, texture->GetPathName());
-	//			}
-
-
-	segment->m_shiness = 1.0f;
-	segment->m_ambient = dVector (0.8f, 0.8f, 0.8f, 1.0f);
-	segment->m_diffuse = dVector (0.8f, 0.8f, 0.8f, 1.0f);
-	segment->m_specular = dVector (0.0f, 0.0f, 0.0f, 1.0f);
-	//		}
-
-	segment->m_textureHandle = textureId;
-
-	segment->AllocIndexData (indexCount);
-	// for 16 bit indices meshes
-	//NewtonMeshMaterialGetIndexStreamShort (mesh, meshCookie, handle, (short int*)segment->m_indexes); 
-
-	// for 32 bit indices mesh
-	NewtonMeshMaterialGetIndexStream (mesh, meshCookie, handle, (int*)segment->m_indexes); 
+void dNewtonMesh::ApplyBoxMapping (int topMatId, int sideMatId, int frontMatId)
+{
+	NewtonMeshApplyBoxMapping(m_mesh, topMatId, sideMatId, frontMatId);
 }
-NewtonMeshEndHandle (mesh, meshCookie); 
-*/
+

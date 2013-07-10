@@ -77,7 +77,6 @@ class dgCollidingPairCollector
 	
 	dgInt32 m_count;
 	dgInt32 m_maxSize;
-//	dgPair* m_pairs;
 	dgBody* m_sentinel;
 	dgThread::dgCriticalSection m_lock;
 };

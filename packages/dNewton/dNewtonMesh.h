@@ -64,6 +64,9 @@ class dNewtonMesh: public dNewtonAlloc
 	CNEWTON_API void* BeginMaterialHandle () const; 
 	CNEWTON_API void EndMaterialHandle (void* const materialHandle) const; 
 
+	CNEWTON_API void ApplyBoxMapping (int topMatId, int sideMatId, int frontMatId); 
+	
+
 	CNEWTON_API int GetMaterialIndex (void* const materialHandle) const; 
 	CNEWTON_API int GetNextMaterialIndex (void* const materialHandle, int materialIndex) const; 
 

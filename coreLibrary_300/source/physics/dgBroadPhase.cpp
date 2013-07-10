@@ -822,14 +822,7 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgVe
 	bool isCollidable = true;
 	dgContact* contact = NULL;
 	if ((body0->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI)) || (body0->GetInvMass().m_w != dgFloat32 (0.0f))) {
-//		for (dgBodyMasterListRow::dgListNode* link = m_world->FindConstraintLink (body0, body1); isCollidable && link; link = m_world->FindConstraintLinkNext (link, body1)) {
-//			dgConstraint* const constraint = link->GetInfo().m_joint;
-//			if (constraint->GetId() == dgConstraint::m_contactConstraint) {
-//				contact = (dgContact*)constraint;
-//			}
-//			isCollidable &= constraint->IsCollidable();
-//		}
-
+xxxxxxxxxxx
 		for (dgBodyMasterListRow::dgListNode* link = body0->m_masterNode->GetInfo().GetFirst(); link; link = link->GetNext()) {
 			dgConstraint* const constraint = link->GetInfo().m_joint;
 			if (constraint->GetId() != dgConstraint::m_contactConstraint) {
@@ -855,14 +848,6 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgVe
 
 	} else {
 		dgAssert ((body1->GetInvMass().m_w != dgFloat32 (0.0f)) || (body1->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI)));
-		//for (dgBodyMasterListRow::dgListNode* link = m_world->FindConstraintLink (body1, body0); isCollidable && link; link = m_world->FindConstraintLinkNext (link, body0)) {
-		//	dgConstraint* const constraint = link->GetInfo().m_joint;
-		//	if (constraint->GetId() == dgConstraint::m_contactConstraint) {
-		//		contact = (dgContact*)constraint;
-		//		break;
-		//	} 
-		//	isCollidable &= constraint->IsCollidable();
-		//}
 		for (dgBodyMasterListRow::dgListNode* link = body1->m_masterNode->GetInfo().GetFirst(); link; link = link->GetNext()) {
 			dgConstraint* const constraint = link->GetInfo().m_joint;
 			if (constraint->GetId() != dgConstraint::m_contactConstraint) {
@@ -885,7 +870,6 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgVe
 				break;
 			}
 		}
-
 	}
 
 	if (isCollidable) {
@@ -921,20 +905,9 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgVe
 			dgAssert (contact);
 			bool kinematicBodyEquilibrium = (((body0->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body0->IsCollidable()) | ((body1->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body1->IsCollidable())) ? false : true;
 			if (!(body0->m_equilibrium & body1->m_equilibrium & kinematicBodyEquilibrium & (contact->m_closestDistance > (DG_CACHE_DIST_TOL * dgFloat32 (4.0f))))) {
-
-//				dgVector relVeloc (body0->m_veloc - body1->m_veloc);
-//				dgVector relOmega (body0->m_omega - body1->m_omega);
-//				dgVector radius0 (body0->m_collision->GetBoxMaxRadius());
-//				dgVector radius1 (body1->m_collision->GetBoxMaxRadius());
-//				dgVector conservativeRotAngle (relOmega.DotProduct4(relOmega).CompProduct4(timestep2).GetMin(m_conservativeRotAngle));
-//				dgVector angularDistance2 (conservativeRotAngle.CompProduct4(radius1.GetMax(radius0)));
-//				dgVector linearDistance2 (relVeloc.CompProduct4(relVeloc).CompProduct4(timestep2));
-//				dgVector canCollide ((linearDistance2 + angularDistance2) > dgVector (contact->m_closestDistance));
-//				if (canCollide.GetSignMask()) {
-					contact->m_broadphaseLru = m_lru;
-					contact->m_timeOfImpact = dgFloat32 (1.0e10f);
-					contactPairs->AddPair(contact, threadID);
-//				}
+				contact->m_broadphaseLru = m_lru;
+				contact->m_timeOfImpact = dgFloat32 (1.0e10f);
+				contactPairs->AddPair(contact, threadID);
 			}
 		}
 	}
