@@ -32,7 +32,7 @@
 
 
 #define DG_PARALLEL_JOINT_COUNT_CUT_OFF		(4 * DG_MAX_THREADS_HIVE_COUNT)
-#define DG_CCD_EXTRA_CONTACT_COUNT			(4 * 3)
+#define DG_CCD_EXTRA_CONTACT_COUNT			(8 * 3)
 
 
 dgVector dgWorldDynamicUpdate::m_velocTol (dgFloat32 (1.0e-18f));
