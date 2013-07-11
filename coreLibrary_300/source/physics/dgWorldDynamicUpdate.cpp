@@ -620,7 +620,6 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgFloat3
 						const dgInt32 ccdContactCount = world->CollideContinue (collision0, body0->m_matrix, veloc0, omega0, collision1, body1->m_matrix, veloc1, omega1, 
 																				timeToImpact, points, normals, penetrations, attrib0, attrib1, 6, 0);
 
-						dgInt32 ccdJoint = false;
 						for (dgInt32 j = 0; j < ccdContactCount; j ++) {
 							dgVector point (&points[j].m_x);
 							dgVector normal (&normals[j].m_x);
