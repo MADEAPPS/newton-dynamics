@@ -184,34 +184,6 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 							dgVector p;
 							dgVector q;
 							dgVector normal;
-/*
-							dgFloat32 t = world->CalculateTimeToImpact (contact, timeToImpact, threadID, p, q, normal);
-							if (t < timeToImpact) {
-								if (t == dgFloat32 (0.0f)) {
-									// apply resolve penetration resolution
-									dgAssert (dgAbsf (normal % normal - dgFloat32 (1.0f)) < dgFloat32 (1.0e-2f));
-									// determine if bodies are residing away
-									dgVector veloc0 (body0->m_veloc + ((p - body0->m_globalCentreOfMass) * body0->m_omega));
-									dgVector veloc1 (body1->m_veloc + ((q - body1->m_globalCentreOfMass) * body1->m_omega));
-									dgVector relVeloc (veloc1 - veloc0);
-									dgFloat32 speed (relVeloc % normal);
-									if (speed > dgFloat32 (0.0f)) {
-										// bodies are moving toward each other, check if the speed is too small
-										if (speed < dgFloat32 (2.0f)) {
-											speed = dgMax (dgFloat32 (1.0e-3f), speed);
-											dgFloat32 distance = dgMax (body0->m_collision->GetBoxMinRadius(), body1->m_collision->GetBoxMinRadius()) * dgFloat32 (0.25f);
-											dgAssert (distance > dgFloat32 (0.0f));
-											dgFloat32 maxtime = distance / speed;
-											t = dgMax(timeTol * dgFloat32 (2.0f), dgMin(maxtime, timeRemaining));
-										}
-									} else {
-										// bodies are residing, let the move by a fraction of the tome step
-										t = timeRemaining;
-									}
-								}
-								timeToImpact = t;
-							}
-*/
 							timeToImpact = dgMin (timeToImpact, world->CalculateTimeToImpact (contact, timeToImpact, threadID, p, q, normal));
 						}
 					}
@@ -253,14 +225,17 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 								dgContact* const contact = (dgContact*) constraintArray[j].m_joint;
 								if (contact->GetId() == dgConstraint::m_contactConstraint) {
 
-									const dgVector& veloc0 = contact->m_body0->m_veloc;
-									const dgVector& veloc1 = contact->m_body1->m_veloc;
+									const dgBody* const body0 = contact->m_body0;
+									const dgBody* const body1 = contact->m_body1;
 
-									const dgVector& omega0 = contact->m_body0->m_omega;
-									const dgVector& omega1 = contact->m_body1->m_omega;
+									const dgVector& veloc0 = body0->m_veloc;
+									const dgVector& veloc1 = body1->m_veloc;
 
-									const dgVector& com0 = contact->m_body0->m_globalCentreOfMass;
-									const dgVector& com1 = contact->m_body1->m_globalCentreOfMass;
+									const dgVector& omega0 = body0->m_omega;
+									const dgVector& omega1 = body1->m_omega;
+
+									const dgVector& com0 = body0->m_globalCentreOfMass;
+									const dgVector& com1 = body1->m_globalCentreOfMass;
 									
 									for (dgList<dgContactMaterial>::dgListNode* node = contact->GetFirst(); node; node = node->GetNext()) {
 										const dgContactMaterial* const contactMaterial = &node->GetInfo();
