@@ -52,6 +52,11 @@ class dNewtonMesh: public dNewtonAlloc
 	CNEWTON_API dNewtonMesh(dNewton* const world, int pointCount, const dFloat* const vertexCloud, int strideInBytes, dFloat tolerance);
 	CNEWTON_API virtual ~dNewtonMesh();
 
+	CNEWTON_API void BeginPolygon();
+	CNEWTON_API void AddFace (int vertexCount, const dFloat* const vertex, int strideInBytes, int materialIndex);
+	CNEWTON_API void EndPolygon();
+
+
 	CNEWTON_API void CreateVoronoiConvexDecomposition (const dNewtonMesh& convexMesh);
 	CNEWTON_API void CreateApproximateConvexDecomposition (const dNewtonMesh& mesh, dFloat maxConcavity, dFloat backFaceDistanceFactor, int maxCount, int maxVertexPerHull);
 

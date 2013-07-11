@@ -111,6 +111,11 @@ dNewtonCollisionMesh::dNewtonCollisionMesh(dNewton* const world)
 	SetShape (NewtonCreateTreeCollision(world->GetNewton(), 0));
 }
 
+dNewtonCollisionMesh::dNewtonCollisionMesh (const dNewtonMesh& mesh)
+	:dNewtonCollision(m_mesh)
+{
+	dAssert (0);
+}
 
 
 

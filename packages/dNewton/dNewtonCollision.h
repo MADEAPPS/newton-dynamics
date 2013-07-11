@@ -26,6 +26,7 @@
 #include "dNewtonAlloc.h"
 
 class dNewton;
+class dNewtonMesh;
 
 class dNewtonCollision: public dNewtonAlloc
 {
@@ -92,6 +93,8 @@ class dNewtonCollisionMesh: public dNewtonCollision
 {
 	public: 
 	CNEWTON_API dNewtonCollisionMesh (dNewton* const world);
+	CNEWTON_API dNewtonCollisionMesh (const dNewtonMesh& mesh);
+
 	dNewtonCollision* Clone (NewtonCollision* const shape) const 
 	{
 		return new dNewtonCollisionMesh (*this, shape);
