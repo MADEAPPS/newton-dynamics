@@ -243,7 +243,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body)
 	dgUnsigned32 lruMark = m_markLru - 1;
 	dgInt32 isInEquilibrium = 1;
 	dgInt32 hasExactSolverJoints = 0;
-	dgInt32 isContinueCollisionIsland = 0;
+//	dgInt32 isContinueCollisionIsland = 0;
 	dgFloat32 haviestMass = dgFloat32 (0.0f);
 
 	dgDynamicBody* heaviestBody = NULL;
@@ -277,11 +277,8 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body)
 			dgBodyInfo* const bodyArray = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
 			bodyArray[bodyIndex].m_body = srcBody;
 
-// hack to test stability
-//isInEquilibrium = 0;
-
 			srcBody->m_sleeping = false;
-			isContinueCollisionIsland |= srcBody->m_continueCollisionMode;
+//			isContinueCollisionIsland |= srcBody->m_continueCollisionMode;
 
 			if (srcBody->m_mass.m_w > haviestMass) {
 				haviestMass = srcBody->m_mass.m_w;
@@ -415,7 +412,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body)
 			}
 		}
 
-		dgInt32 rowsCount = 0;
+//		dgInt32 rowsCount = 0;
 		if (staticCount) {
 			queue.Reset ();
 			for (dgInt32 i = 0; i < staticCount; i ++) {
@@ -424,7 +421,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body)
 				queue.Insert (body);
 				dgAssert (dgInt32 (body->m_dynamicsLru) == m_markLru);
 			}
-
+/*
 			if (isContinueCollisionIsland) {
 				for (dgInt32 i = 0; i < jointCount; i ++) {
 					dgConstraint* const constraint = constraintArray[m_joints + i].m_joint;
@@ -447,17 +444,24 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body)
 					constraintArray[m_joints + i].m_autoPaircount = rows;
 				}
 			}
+*/
+			for (dgInt32 i = 0; i < jointCount; i ++) {
+				dgConstraint* const constraint = constraintArray[m_joints + i].m_joint;
+				constraint->m_dynamicsLru = m_markLru;
+			}
 		} else {
 			dgAssert (heaviestBody);
 			queue.Insert (heaviestBody);
 			heaviestBody->m_dynamicsLru = m_markLru;
 		}
 
-		BuildIsland (queue, jointCount, rowsCount, isContinueCollisionIsland, hasExactSolverJoints);
+		//BuildIsland (queue, jointCount, rowsCount, isContinueCollisionIsland, hasExactSolverJoints);
+		BuildIsland (queue, jointCount, hasExactSolverJoints);
 	}
 }
 
-void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 jointCount, dgInt32 rowsCount, dgInt32 isContinueCollisionIsland, dgInt32 hasExactSolverJoints)
+//void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 jointCount, dgInt32 rowsCount, dgInt32 isContinueCollisionIsland, dgInt32 hasExactSolverJoints)
+void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 jointCount, dgInt32 hasExactSolverJoints)
 {
 	dgInt32 bodyCount = 1;
 	dgUnsigned32 lruMark = m_markLru;
@@ -527,7 +531,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 						constraintArray[jointIndex].m_joint = constraint;
 
 						dgInt32 rows = dgInt32 ((constraint->m_maxDOF & (dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)) - 1)) ? ((constraint->m_maxDOF & (-dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)))) + dgInt32 (sizeof (dgVector) / sizeof (dgFloat32))) : constraint->m_maxDOF);
-						rowsCount += (rows + (ccdMode ? DG_CCD_EXTRA_CONTACT_COUNT : 0));
+						//rowsCount += (rows + (ccdMode ? DG_CCD_EXTRA_CONTACT_COUNT : 0));
  						constraintArray[jointIndex].m_autoPaircount = rows;
 
 						jointCount ++;
@@ -555,43 +559,68 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgInt32 
 
 
 	if (bodyCount > 1) {
-		if (isContinueCollisionIsland && jointCount && (rowsCount < 64)) {
-			rowsCount = 64;
-		}
+//		if (isContinueCollisionIsland && jointCount && (rowsCount < 64)) {
+//			rowsCount = 64;
+//		}
 
 		world->m_islandMemory.ExpandCapacityIfNeessesary (m_islands, sizeof (dgIsland));
-		dgJointInfo* const constraintArray = (dgJointInfo*) &world->m_jointsMemory[0];
 		dgIsland* const islandArray = (dgIsland*) &world->m_islandMemory[0];
 
 		islandArray[m_islands].m_bodyStart = m_bodies;
 		islandArray[m_islands].m_jointStart = m_joints;
 		islandArray[m_islands].m_bodyCount = bodyCount;
 		islandArray[m_islands].m_jointCount = jointCount;
-		islandArray[m_islands].m_rowsCount = rowsCount;
+		
 		islandArray[m_islands].m_rowsStart = 0;
 
 		islandArray[m_islands].m_hasExactSolverJoints = hasExactSolverJoints;
+//		islandArray[m_islands].m_isContinueCollision = isContinueCollisionIsland;
+		islandArray[m_islands].m_isContinueCollision = false;
+
+		dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
+		dgJointInfo* const constraintArray = &constraintArrayPtr[m_joints];
+
+		dgInt32 rowsCount = 0;
+		dgInt32 isContinueCollisionIsland = 0;
+		for (dgInt32 i = 0; i < jointCount; i ++) {
+			dgConstraint* const joint = constraintArray[i].m_joint;
+			rowsCount += constraintArray[i].m_autoPaircount;
+			if (joint->GetId() == dgConstraint::m_contactConstraint) {
+				dgBody* const body0 = joint->m_body0;
+				dgBody* const body1 = joint->m_body1;
+				dgInt32 ccdJoint = body0->m_continueCollisionMode | body1->m_continueCollisionMode;
+				isContinueCollisionIsland |= ccdJoint;
+				rowsCount += ccdJoint ? DG_CCD_EXTRA_CONTACT_COUNT : 0;
+			}
+		}
+		if (isContinueCollisionIsland) {
+			rowsCount = dgMax(rowsCount, 64);
+		}
+		islandArray[m_islands].m_rowsCount = rowsCount;
 		islandArray[m_islands].m_isContinueCollision = isContinueCollisionIsland;
 
+
 		if (hasExactSolverJoints) {
-			dgInt32 contactsCount = 0;
+			dgInt32 contactJointCount = 0;
 			for (dgInt32 i = 0; i < jointCount; i ++) {
-				dgConstraint* const joint = constraintArray[m_joints + i].m_joint;
-				contactsCount += (joint->GetId() == dgConstraint::m_contactConstraint); 
+				dgConstraint* const joint = constraintArray[i].m_joint;
+				contactJointCount += (joint->GetId() == dgConstraint::m_contactConstraint); 
 			}
 
 			for (dgInt32 i = 0; i < jointCount; i ++) {
-				dgConstraint* const joint = constraintArray[m_joints + i].m_joint;
+				dgConstraint* const joint = constraintArray[i].m_joint;
 				if (joint->m_useExactSolver) {
 					dgAssert (joint->IsBilateral());
 					dgBilateralConstraint* const bilateralJoint = (dgBilateralConstraint*) joint;
-					if (bilateralJoint->m_useExactSolver && (bilateralJoint->m_useExactSolverContactLimit < contactsCount)) {
+					if (bilateralJoint->m_useExactSolver && (bilateralJoint->m_useExactSolverContactLimit < contactJointCount)) {
 						islandArray[m_islands].m_hasExactSolverJoints = 0;
 						break;
 					}
 				}
 			}
 		}
+
+
 
 		m_islands ++;
 		m_bodies += bodyCount;
