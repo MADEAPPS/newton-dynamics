@@ -32,7 +32,10 @@ class dNewtonCollision: public dNewtonAlloc
 	public:
 	enum dCollsionType
 	{
+		m_sphere,
+		m_capsule,
 		m_box,
+		
 		m_mesh,
 		m_scene,
 	};
@@ -123,6 +126,50 @@ class dNewtonCollisionScene: public dNewtonCollision
 
 	protected:
 	dNewtonCollisionScene (const dNewtonCollisionScene& srcCollision, NewtonCollision* const shape)
+		:dNewtonCollision (srcCollision, shape)
+	{
+	}
+};
+
+
+class dNewtonCollisionSphere: public dNewtonCollision
+{
+	public: 
+	dNewtonCollisionSphere (dNewton* const world, dFloat radio, int id)
+		:dNewtonCollision(m_sphere)
+	{
+		SetShape (NewtonCreateSphere(world->GetNewton(), radio, id, NULL));
+	}
+
+	dNewtonCollision* Clone(NewtonCollision* const shape) const 
+	{
+		return new dNewtonCollisionSphere (*this, shape);
+	}
+
+	protected:
+	dNewtonCollisionSphere (const dNewtonCollisionSphere& srcCollision, NewtonCollision* const shape)
+		:dNewtonCollision (srcCollision, shape)
+	{
+	}
+};
+
+
+class dNewtonCollisionCapsule: public dNewtonCollision
+{
+	public: 
+	dNewtonCollisionCapsule (dNewton* const world, dFloat radio, dFloat high, int id)
+		:dNewtonCollision(m_capsule)
+	{
+		SetShape (NewtonCreateCapsule (world->GetNewton(), radio, high, id, NULL));
+	}
+
+	dNewtonCollision* Clone(NewtonCollision* const shape) const 
+	{
+		return new dNewtonCollisionCapsule (*this, shape);
+	}
+
+	protected:
+	dNewtonCollisionCapsule (const dNewtonCollisionCapsule& srcCollision, NewtonCollision* const shape)
 		:dNewtonCollision (srcCollision, shape)
 	{
 	}

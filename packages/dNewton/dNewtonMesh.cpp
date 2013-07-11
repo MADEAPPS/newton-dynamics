@@ -138,3 +138,13 @@ void dNewtonMesh::ApplyBoxMapping (int topMatId, int sideMatId, int frontMatId)
 	NewtonMeshApplyBoxMapping(m_mesh, topMatId, sideMatId, frontMatId);
 }
 
+void dNewtonMesh::ApplySphericalMapping (int matId)
+{
+	NewtonMeshApplySphericalMapping(m_mesh, matId);
+}
+
+void dNewtonMesh::ApplyCylindricalMapping (int cylinderMatId, int capMatId)
+{
+	NewtonMeshApplyCylindricalMapping(m_mesh, cylinderMatId, capMatId);
+}
+
