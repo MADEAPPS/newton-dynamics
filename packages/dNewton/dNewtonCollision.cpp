@@ -21,6 +21,7 @@
 
 #include "dStdAfxNewton.h"
 #include "dNewton.h"
+#include "dNewtonMesh.h"
 #include "dNewtonCollision.h"
 
 
@@ -111,10 +112,10 @@ dNewtonCollisionMesh::dNewtonCollisionMesh(dNewton* const world)
 	SetShape (NewtonCreateTreeCollision(world->GetNewton(), 0));
 }
 
-dNewtonCollisionMesh::dNewtonCollisionMesh (const dNewtonMesh& mesh)
+dNewtonCollisionMesh::dNewtonCollisionMesh (dNewton* const world, const dNewtonMesh& mesh, int id)
 	:dNewtonCollision(m_mesh)
 {
-	dAssert (0);
+	SetShape (NewtonCreateTreeCollisionFromMesh (world->GetNewton(), mesh.GetMesh(), id));
 }
 
 

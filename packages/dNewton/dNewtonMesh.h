@@ -52,6 +52,8 @@ class dNewtonMesh: public dNewtonAlloc
 	CNEWTON_API dNewtonMesh(dNewton* const world, int pointCount, const dFloat* const vertexCloud, int strideInBytes, dFloat tolerance);
 	CNEWTON_API virtual ~dNewtonMesh();
 
+	CNEWTON_API NewtonMesh* GetMesh() const;
+
 	CNEWTON_API void BeginPolygon();
 	CNEWTON_API void AddFace (int vertexCount, const dFloat* const vertex, int strideInBytes, int materialIndex);
 	CNEWTON_API void EndPolygon();

@@ -93,7 +93,7 @@ class dNewtonCollisionMesh: public dNewtonCollision
 {
 	public: 
 	CNEWTON_API dNewtonCollisionMesh (dNewton* const world);
-	CNEWTON_API dNewtonCollisionMesh (const dNewtonMesh& mesh);
+	CNEWTON_API dNewtonCollisionMesh (dNewton* const world, const dNewtonMesh& mesh, int id);
 
 	dNewtonCollision* Clone (NewtonCollision* const shape) const 
 	{

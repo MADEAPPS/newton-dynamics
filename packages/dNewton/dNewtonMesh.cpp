@@ -50,6 +50,11 @@ dNewtonMesh::~dNewtonMesh()
 	NewtonMeshDestroy (m_mesh);
 }
 
+NewtonMesh* dNewtonMesh::GetMesh() const
+{
+	return m_mesh;
+}
+
 void dNewtonMesh::BeginPolygon()
 {
 	NewtonMeshBeginFace(m_mesh);
