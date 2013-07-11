@@ -339,14 +339,11 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (dgIsland* const island, dgInt32 
 		}
 	}
 	dgInt32 jointCount = island->m_jointCount;
-//	dgInt32 rowBase = dgAtomicExchangeAndAdd(&m_rowCountAtomicIndex, island->m_rowsCount);
 	if (jointCount) {
 		dgInt32 rowCount = 0;
 		dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
 		dgJointInfo* const constraintArray = &constraintArrayPtr[island->m_jointStart];
 
-//		rowCount = GetJacobianDerivatives (island, threadIndex, rowBase, rowCount, timestep);
-//		dgAssert (rowCount <= island->m_rowsCount);
 		GetJacobianDerivatives (island, threadIndex, rowCount, timestep);
 
 		dgVector zero (dgFloat32 (0.0f));

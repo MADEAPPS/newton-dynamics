@@ -244,7 +244,6 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgFloat32 ti
 	dgUnsigned32 lruMark = m_markLru - 1;
 	dgInt32 isInEquilibrium = 1;
 	dgInt32 hasExactSolverJoints = 0;
-//	dgInt32 isContinueCollisionIsland = 0;
 	dgFloat32 haviestMass = dgFloat32 (0.0f);
 
 	dgDynamicBody* heaviestBody = NULL;
@@ -279,7 +278,6 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgFloat32 ti
 			bodyArray[bodyIndex].m_body = srcBody;
 
 			srcBody->m_sleeping = false;
-//			isContinueCollisionIsland |= srcBody->m_continueCollisionMode;
 
 			if (srcBody->m_mass.m_w > haviestMass) {
 				haviestMass = srcBody->m_mass.m_w;
@@ -413,7 +411,6 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgFloat32 ti
 			}
 		}
 
-//		dgInt32 rowsCount = 0;
 		if (staticCount) {
 			queue.Reset ();
 			for (dgInt32 i = 0; i < staticCount; i ++) {
@@ -422,30 +419,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgFloat32 ti
 				queue.Insert (body);
 				dgAssert (dgInt32 (body->m_dynamicsLru) == m_markLru);
 			}
-/*
-			if (isContinueCollisionIsland) {
-				for (dgInt32 i = 0; i < jointCount; i ++) {
-					dgConstraint* const constraint = constraintArray[m_joints + i].m_joint;
-					constraint->m_dynamicsLru = m_markLru;
-					dgInt32 rows = dgInt32 ((constraint->m_maxDOF & (dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)) - 1)) ? ((constraint->m_maxDOF & (-dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)))) + dgInt32 (sizeof (dgVector) / sizeof (dgFloat32))) : constraint->m_maxDOF);
-					rowsCount += rows;
-					constraintArray[m_joints + i].m_autoPaircount = rows;
-					if (constraint->GetId() == dgConstraint::m_contactConstraint) {
-						// add some padding for extra contacts in a continue  
-						// 4 extra contacts three rows each
-						rowsCount += DG_CCD_EXTRA_CONTACT_COUNT;
-					}
-				}
-			} else {
-				for (dgInt32 i = 0; i < jointCount; i ++) {
-					dgConstraint* const constraint = constraintArray[m_joints + i].m_joint;
-					constraint->m_dynamicsLru = m_markLru;
-					dgInt32 rows = dgInt32 ((constraint->m_maxDOF & (dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)) - 1)) ? ((constraint->m_maxDOF & (-dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)))) + dgInt32 (sizeof (dgVector) / sizeof (dgFloat32))) : constraint->m_maxDOF);
-					rowsCount += rows;
-					constraintArray[m_joints + i].m_autoPaircount = rows;
-				}
-			}
-*/
+
 			const dgInt32 vectorStride = dgInt32 (sizeof (dgVector) / sizeof (dgFloat32));
 			for (dgInt32 i = 0; i < jointCount; i ++) {
 				dgConstraint* const constraint = constraintArray[m_joints + i].m_joint;
@@ -459,10 +433,10 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgFloat32 ti
 			heaviestBody->m_dynamicsLru = m_markLru;
 		}
 
-		//BuildIsland (queue, jointCount, rowsCount, isContinueCollisionIsland, hasExactSolverJoints);
 		BuildIsland (queue, timestep, jointCount, hasExactSolverJoints);
 	}
 }
+
 
 
 void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgFloat32 timestep, dgInt32 jointCount, dgInt32 hasExactSolverJoints)
@@ -564,7 +538,6 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgFloat3
 		}
 	}
 
-
 	if (bodyCount > 1) {
 		world->m_islandMemory.ExpandCapacityIfNeessesary (m_islands, sizeof (dgIsland));
 		dgIsland* const islandArray = (dgIsland*) &world->m_islandMemory[0];
@@ -632,7 +605,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgFloat3
 					}
 					//ccdJoint = body0->m_continueCollisionMode | body1->m_continueCollisionMode;
 					isContinueCollisionIsland |= ccdJoint;
-					rowsCount += ccdJoint ? DG_CCD_EXTRA_CONTACT_COUNT : 0;
+					rowsCount += DG_CCD_EXTRA_CONTACT_COUNT;
 				}
 			}
 		}
@@ -822,11 +795,6 @@ void dgWorldDynamicUpdate::GetJacobianDerivatives (const dgIsland* const island,
 			constraint->m_body0->m_inCallback = false;
 			constraint->m_body1->m_inCallback = false;
 
-			//dgInt32 m0 = (constraint->m_body0->GetInvMass().m_w != dgFloat32(0.0f)) ? constraint->m_body0->m_index: 0;
-			//dgInt32 m1 = (constraint->m_body1->GetInvMass().m_w != dgFloat32(0.0f)) ? constraint->m_body1->m_index: 0;
-			//dgInt32 m0 = jointInfo->m_m0;
-			//dgInt32 m1 = jointInfo->m_m1;
-
 			dgAssert (jointInfo->m_m0 < island->m_bodyCount);
 			dgAssert (jointInfo->m_m1 < island->m_bodyCount);
 
@@ -835,9 +803,7 @@ void dgWorldDynamicUpdate::GetJacobianDerivatives (const dgIsland* const island,
 			jointInfo->m_autoPaircount = dof;
 			jointInfo->m_autoPairActiveCount = dof;
 
-			//dgInt32 firstForceOffset = -rowBase;
 			for (dgInt32 i = 0; i < dof; i ++) {
-
 				dgJacobianMatrixElement* const row = &matrixRow[rowCount];
 				dgAssert (constraintParams.m_forceBounds[i].m_jointForce);
 				row->m_Jt = constraintParams.m_jacobian[i]; 

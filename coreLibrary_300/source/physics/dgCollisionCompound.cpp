@@ -1872,9 +1872,6 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgCollidingPairCo
 							dgFloat32 param = proxy.m_timestep;
 							dgAssert (param >= dgFloat32 (0.0f));
 							if (param < maxParam) {
-dgAssert (0);
-//								ray.Reset (param);
-
 								if (contactCount && ((param - maxParam) * invMaxParam) < dgFloat32(-1.0e-3f)) {
 									for (dgInt32 i = 0; i < count; i ++) {
 										contacts[i] = contacts[contactCount + i];
