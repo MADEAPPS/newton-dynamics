@@ -591,6 +591,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgFloat3
 				const dgBody* const body0 = joint->m_body0;
 				const dgBody* const body1 = joint->m_body1;
 				if (body0->m_continueCollisionMode | body1->m_continueCollisionMode) {
+					dgInt32 ccdJoint = false;
 					const dgVector& veloc0 = body0->m_veloc;
 					const dgVector& veloc1 = body1->m_veloc;
 
@@ -603,25 +604,32 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgFloat3
 					const dgCollisionInstance* const collision0 = body0->m_collision;
 					const dgCollisionInstance* const collision1 = body1->m_collision;
 					dgFloat32 dist = dgMax (body0->m_collision->GetBoxMinRadius(), body1->m_collision->GetBoxMinRadius()) * dgFloat32 (0.25f);
-					
-					dgTriplex normals[16];
-					dgTriplex points[16];
-					dgInt64 attrib0[16];
-					dgInt64 attrib1[16];
-					dgFloat32 penetrations[16];
-					dgFloat32 timeToImpact = timestep;
-					const dgInt32 ccdContactCount = world->CollideContinue (collision0, body0->m_matrix, veloc0, omega0, collision1, body1->m_matrix, veloc1, omega1, 
-																			timeToImpact, points, normals, penetrations, attrib0, attrib1, 6, 0);
 
-					dgInt32 ccdJoint = false;
-					for (dgInt32 j = 0; j < ccdContactCount; j ++) {
-						dgVector point (&points[j].m_x);
-						dgVector normal (&normals[j].m_x);
-						dgVector vel0 (veloc0 + omega0 * (point - com0));
-						dgVector vel1 (veloc1 + omega1 * (point - com1));
-						dgVector vRel (vel1 - vel0);
-						dgFloat32 contactDistTravel = vRel.DotProduct4(normal).m_w * timestep;
-						ccdJoint |= (contactDistTravel > dist);
+					dgVector relVeloc (veloc1 - veloc0);
+					dgVector relOmega (omega1 - omega0);
+					dgVector relVelocMag2 (relVeloc.DotProduct4 (relVeloc));
+					dgVector relOmegaMag2 (relOmega.DotProduct4 (relOmega));
+
+					if ((relOmegaMag2.m_w > dgFloat32 (1.0f)) || ((relVelocMag2.m_w * timestep * timestep) > (dist * dist))) {
+						dgTriplex normals[16];
+						dgTriplex points[16];
+						dgInt64 attrib0[16];
+						dgInt64 attrib1[16];
+						dgFloat32 penetrations[16];
+						dgFloat32 timeToImpact = timestep;
+						const dgInt32 ccdContactCount = world->CollideContinue (collision0, body0->m_matrix, veloc0, omega0, collision1, body1->m_matrix, veloc1, omega1, 
+																				timeToImpact, points, normals, penetrations, attrib0, attrib1, 6, 0);
+
+						dgInt32 ccdJoint = false;
+						for (dgInt32 j = 0; j < ccdContactCount; j ++) {
+							dgVector point (&points[j].m_x);
+							dgVector normal (&normals[j].m_x);
+							dgVector vel0 (veloc0 + omega0 * (point - com0));
+							dgVector vel1 (veloc1 + omega1 * (point - com1));
+							dgVector vRel (vel1 - vel0);
+							dgFloat32 contactDistTravel = vRel.DotProduct4(normal).m_w * timestep;
+							ccdJoint |= (contactDistTravel > dist);
+						}
 					}
 					//ccdJoint = body0->m_continueCollisionMode | body1->m_continueCollisionMode;
 					isContinueCollisionIsland |= ccdJoint;
