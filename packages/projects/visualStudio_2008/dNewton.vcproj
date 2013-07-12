@@ -664,6 +664,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\dNewton\dNewtonScopeBuffer.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dNewton\dNewtonScopeBuffer.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\dNewton\dNewtonTranformLerp.cpp"
 			>
 		</File>
