@@ -3515,7 +3515,7 @@ void dgMeshEffect::RepairTJoints ()
 
 //	dgAssert (Sanity ());
 	DeleteDegenerateFaces(&m_points[0].m_x, sizeof (m_points[0]), dgFloat64 (1.0e-7f));
-//	dgAssert (Sanity ());
+	dgAssert (Sanity ());
 
 	// delete straight line edges
 	dirty = true;
@@ -3543,7 +3543,6 @@ void dgMeshEffect::RepairTJoints ()
 				dgFloat64 magab2 = ab * ab;
 				dgFloat64 magaabb = aa * bb * tol2;
 				if (magab2 >= magaabb) {
-					//dgAssert (Sanity ());
 					if ((edge->m_incidentFace > 0) && (edge->m_twin->m_incidentFace > 0)) {
 						if (edge->m_twin->m_prev == edge->m_next->m_twin) {
 							dgEdge* const newEdge = AddHalfEdge(edge->m_incidentVertex, edge->m_next->m_next->m_incidentVertex);
@@ -3589,7 +3588,6 @@ void dgMeshEffect::RepairTJoints ()
 
 								DeleteEdge(edge);
 								DeleteEdge(nextEdge);
-								//dgAssert (Sanity ());
 
 							} else if (edge->m_next->m_next->m_next == edge) {
 								dirty = true;
@@ -3725,7 +3723,6 @@ void dgMeshEffect::RepairTJoints ()
 									deletedEdge->m_next = deletedEdge->m_twin;
 									deletedEdge->m_prev = deletedEdge->m_twin;
 									DeleteEdge(deletedEdge);
-									//dgAssert (Sanity ());
 								}
 							}
 						}
@@ -3734,6 +3731,18 @@ void dgMeshEffect::RepairTJoints ()
 			}
 		}
 	}
+
+	DeleteDegenerateFaces(&m_points[0].m_x, sizeof (m_points[0]), dgFloat64 (1.0e-7f));
+	for (iter.Begin(); iter; iter ++) {
+		dgEdge* const edge = &iter.GetNode()->GetInfo();
+		if (edge->m_incidentFace > 0) {
+			dgBigVector p0 (m_points[edge->m_incidentVertex]);
+			m_attrib[edge->m_userData].m_vertex.m_x = p0.m_x;
+			m_attrib[edge->m_userData].m_vertex.m_y = p0.m_y;
+			m_attrib[edge->m_userData].m_vertex.m_z = p0.m_z;
+		}
+	}
+
 
 	dgAssert (Sanity ());
 }
