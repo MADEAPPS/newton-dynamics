@@ -27,6 +27,14 @@
 
 #define DG_HIGHTFILD_DATA_ID 0x45AF5E07
 
+
+dgInt32 dgCollisionHeightField::m_cellIndices[][6] =
+{
+	{2, 0, 3, 1, 0, 1},
+	{0, 1, 2, 3, 1, 0}
+};
+
+
 dgCollisionHeightField::dgCollisionHeightField(
 	dgWorld* const world,
 	dgInt32 width, 
@@ -41,7 +49,7 @@ dgCollisionHeightField::dgCollisionHeightField(
 	m_rtti |= dgCollisionHeightField_RTTI;
 	m_width = width;
 	m_height = height;
-	m_diagonalMode = contructionMode;
+	m_diagonalMode = dgCollisionHeightFieldGridConstruction  (dgClamp (contructionMode, dgInt32 (m_normalDiagonals), dgInt32 (m_starInvertexDiagonals)));
 	m_horizontalScale = horizontalScale;
 
 	m_elevationMap = (dgFloat32 *)dgMallocStack(m_width * m_height * sizeof (dgFloat32));
@@ -49,7 +57,143 @@ dgCollisionHeightField::dgCollisionHeightField(
 
 	dgInt32 attibutePaddedMapSize = (m_width * m_height + 4) & -4; 
 	m_atributeMap = (dgInt8 *)dgMallocStack(attibutePaddedMapSize * sizeof (dgInt8));
+	m_diagonals = (dgInt8 *)dgMallocStack(attibutePaddedMapSize * sizeof (dgInt8));
+
+	switch (m_diagonalMode)
+	{
+		case m_normalDiagonals:
+		{
+			memset (m_diagonals, 0, m_width * m_height * sizeof (dgInt8));
+			break;
+		}
+		case m_invertedDiagonals:
+		{
+			memset (m_diagonals, 1, m_width * m_height * sizeof (dgInt8));
+			break;
+		}
+
+		case m_alternateOddRowsDiagonals:
+		{
+			for (dgInt32 j = 0; j < m_height; j += 2) {
+				dgInt32 index = j * m_width;
+				for (dgInt32 i = 0; i < m_width; i ++) {
+					m_diagonals[index + i] = 0;
+				}
+			}
+
+			for (dgInt32 j = 1; j < m_height; j += 2) {
+				dgInt32 index = j * m_width;
+				for (dgInt32 i = 0; i < m_width; i ++) {
+					m_diagonals[index + i] = 1;
+				}
+			}
+			break;
+		}
+
+		case m_alternateEvenRowsDiagonals:
+		{
+			for (dgInt32 j = 0; j < m_height; j += 2) {
+				dgInt32 index = j * m_width;
+				for (dgInt32 i = 0; i < m_width; i ++) {
+					m_diagonals[index + i] = 1;
+				}
+			}
+
+			for (dgInt32 j = 1; j < m_height; j += 2) {
+				dgInt32 index = j * m_width;
+				for (dgInt32 i = 0; i < m_width; i ++) {
+					m_diagonals[index + i] = 0;
+				}
+			}
+			break;
+		}
+
+
+		case m_alternateOddColumsDiagonals:
+		{
+			for (dgInt32 j = 0; j < m_height; j ++) {
+				dgInt32 index = j * m_width;
+				for (dgInt32 i = 0; i < m_width; i += 2) {
+					m_diagonals[index + i] = 0;
+				}
+
+				for (dgInt32 i = 1; i < m_width; i += 2) {
+					m_diagonals[index + i] = 1;
+				}
+			}
+			break;
+		}
+
+		case m_alternateEvenColumsDiagonals:
+		{
+			for (dgInt32 j = 0; j < m_height; j ++) {
+				dgInt32 index = j * m_width;
+				for (dgInt32 i = 0; i < m_width; i += 2) {
+					m_diagonals[index + i] = 1;
+				}
+
+				for (dgInt32 i = 1; i < m_width; i += 2) {
+					m_diagonals[index + i] = 0;
+				}
+			}
+			break;
+		}
+
+		case m_starDiagonals:
+		{
+			for (dgInt32 j = 0; j < m_height; j += 2) {
+				dgInt32 index = j * m_width;
+				for (dgInt32 i = 0; i < m_width; i += 2) {
+					m_diagonals[index + i] = 0;
+				}
+				for (dgInt32 i = 1; i < m_width; i += 2) {
+					m_diagonals[index + i] = 1;
+				}
+			}
+
+			for (dgInt32 j = 1; j < m_height; j += 2) {
+				dgInt32 index = j * m_width;
+				for (dgInt32 i = 0; i < m_width; i += 2) {
+					m_diagonals[index + i] = 1;
+				}
+				for (dgInt32 i = 1; i < m_width; i += 2) {
+					m_diagonals[index + i] = 0;
+				}
+			}
+			break;
+		}
+
+		case m_starInvertexDiagonals:
+		{
+			for (dgInt32 j = 0; j < m_height; j += 2) {
+				dgInt32 index = j * m_width;
+				for (dgInt32 i = 0; i < m_width; i += 2) {
+					m_diagonals[index + i] = 1;
+				}
+				for (dgInt32 i = 1; i < m_width; i += 2) {
+					m_diagonals[index + i] = 0;
+				}
+			}
+
+			for (dgInt32 j = 1; j < m_height; j += 2) {
+				dgInt32 index = j * m_width;
+				for (dgInt32 i = 0; i < m_width; i += 2) {
+					m_diagonals[index + i] = 0;
+				}
+				for (dgInt32 i = 1; i < m_width; i += 2) {
+					m_diagonals[index + i] = 1;
+				}
+			}
+
+			break;
+		}
+
+		default:
+			dgAssert (0);
+		
+	}
 	memcpy (m_atributeMap, atributeMap, m_width * m_height * sizeof (dgInt8));
+
 
 	dgFloat32 y0 = dgFloat32 (dgFloat32 (1.0e10f));
 	dgFloat32 y1 = dgFloat32 (-dgFloat32 (1.0e10f));
@@ -99,10 +243,11 @@ dgCollisionHeightField::dgCollisionHeightField (dgWorld* const world, dgDeserial
 
 	dgInt32 attibutePaddedMapSize = (m_width * m_height + 4) & -4; 
 	m_atributeMap = (dgInt8 *)dgMallocStack(attibutePaddedMapSize * sizeof (dgInt8));
+	m_diagonals = (dgInt8 *)dgMallocStack(attibutePaddedMapSize * sizeof (dgInt8));
 
 	deserialization (userData, m_elevationMap, m_width * m_height * sizeof (dgFloat32));
 	deserialization (userData, m_atributeMap, attibutePaddedMapSize * sizeof (dgInt8));
-
+	deserialization (userData, m_diagonals, attibutePaddedMapSize * sizeof (dgInt8));
 
 	m_horizontalScaleInv = dgFloat32 (1.0f) / m_horizontalScale;
 	dgTree<void*, unsigned>::dgTreeNode* nodeData = world->m_perInstanceData.Find(DG_HIGHTFILD_DATA_ID);
@@ -137,6 +282,7 @@ dgCollisionHeightField::~dgCollisionHeightField(void)
 	}
 	dgFreeStack(m_elevationMap);
 	dgFreeStack(m_atributeMap);
+	dgFreeStack(m_diagonals);
 }
 
 void dgCollisionHeightField::Serialize(dgSerialize callback, void* const userData) const
@@ -154,6 +300,7 @@ void dgCollisionHeightField::Serialize(dgSerialize callback, void* const userDat
 
 	dgInt32 attibutePaddedMapSize = (m_width * m_height + 4) & -4; 
 	callback (userData, m_atributeMap, attibutePaddedMapSize * sizeof (dgInt8));
+	callback (userData, m_diagonals, attibutePaddedMapSize * sizeof (dgInt8));
 }
 
 void dgCollisionHeightField::SetCollisionRayCastCallback (dgCollisionHeightFieldRayCastCallback rayCastCallback)
@@ -248,7 +395,7 @@ dgFloat32 dgCollisionHeightField::RayCastCell (const dgFastRayTest& ray, dgInt32
 		return dgFloat32 (1.2f);
 	}
 	
-dgAssert (maxT >= 1.0);
+	dgAssert (maxT >= 1.0);
 
 	dgInt32 base = zIndex0 * m_width + xIndex0;
 	
@@ -258,7 +405,7 @@ dgAssert (maxT >= 1.0);
 	points[1 * 2 + 0] = dgVector ((xIndex0 + 0) * m_horizontalScale, dgFloat32 (m_elevationMap[base + m_width + 0]), (zIndex0 + 1) * m_horizontalScale, dgFloat32 (0.0f));
 	
 	dgFloat32 t = dgFloat32 (1.2f);
-	if (!m_diagonalMode) {
+	if (!m_diagonals[base]) {
 		triangle[0] = 1;
 		triangle[1] = 2;
 		triangle[2] = 3;
@@ -316,7 +463,6 @@ dgAssert (maxT >= 1.0);
 		}
 	}
 	return t;
-
 }
 
 
@@ -449,61 +595,39 @@ void dgCollisionHeightField::DebugCollision (const dgMatrix& matrix, OnDebugColl
 			dgTriplex triangle[3];
 			points[0 * 2 + 1] = matrix.TransformVector(dgVector ((x + 1) * m_horizontalScale, dgFloat32 (m_elevationMap[base + x +           1]), (z + 0) * m_horizontalScale, dgFloat32 (0.0f)));
 			points[1 * 2 + 1] = matrix.TransformVector(dgVector ((x + 1) * m_horizontalScale, dgFloat32 (m_elevationMap[base + x + m_width + 1]), (z + 1) * m_horizontalScale, dgFloat32 (0.0f)));
-			
-			if (m_diagonalMode) {
-				triangle[0].m_x = points[0].m_x;
-				triangle[0].m_y = points[0].m_y;
-				triangle[0].m_z = points[0].m_z;
+			const dgInt32* const indirectIndex = &m_cellIndices[m_diagonals[z * m_width + x]][0];
 
-				triangle[1].m_x = points[2].m_x;
-				triangle[1].m_y = points[2].m_y;
-				triangle[1].m_z = points[2].m_z;
+			dgInt32 i0 = indirectIndex[0];
+			dgInt32 i1 = indirectIndex[1];
+			dgInt32 i2 = indirectIndex[2];
+			dgInt32 i3 = indirectIndex[3];
 
-				triangle[2].m_x = points[1].m_x;
-				triangle[2].m_y = points[1].m_y;
-				triangle[2].m_z = points[1].m_z;
-				callback (userData, 3, &triangle[0].m_x, m_atributeMap[base]);
+			triangle[0].m_x = points[i1].m_x;
+			triangle[0].m_y = points[i1].m_y;
+			triangle[0].m_z = points[i1].m_z;
 
-				triangle[0].m_x = points[1].m_x;
-				triangle[0].m_y = points[1].m_y;
-				triangle[0].m_z = points[1].m_z;
+			triangle[1].m_x = points[i0].m_x;
+			triangle[1].m_y = points[i0].m_y;
+			triangle[1].m_z = points[i0].m_z;
 
-				triangle[1].m_x = points[2].m_x;
-				triangle[1].m_y = points[2].m_y;
-				triangle[1].m_z = points[2].m_z;
+			triangle[2].m_x = points[i2].m_x;
+			triangle[2].m_y = points[i2].m_y;
+			triangle[2].m_z = points[i2].m_z;
+			callback (userData, 3, &triangle[0].m_x, m_atributeMap[base]);
 
-				triangle[2].m_x = points[3].m_x;
-				triangle[2].m_y = points[3].m_y;
-				triangle[2].m_z = points[3].m_z;
-				callback (userData, 3, &triangle[0].m_x, m_atributeMap[base]);
+			triangle[0].m_x = points[i1].m_x;
+			triangle[0].m_y = points[i1].m_y;
+			triangle[0].m_z = points[i1].m_z;
 
-			} else {
-				triangle[0].m_x = points[0].m_x;
-				triangle[0].m_y = points[0].m_y;
-				triangle[0].m_z = points[0].m_z;
+			triangle[1].m_x = points[i2].m_x;
+			triangle[1].m_y = points[i2].m_y;
+			triangle[1].m_z = points[i2].m_z;
 
-				triangle[1].m_x = points[2].m_x;
-				triangle[1].m_y = points[2].m_y;
-				triangle[1].m_z = points[2].m_z;
+			triangle[2].m_x = points[i3].m_x;
+			triangle[2].m_y = points[i3].m_y;
+			triangle[2].m_z = points[i3].m_z;
+			callback (userData, 3, &triangle[0].m_x, m_atributeMap[base]);
 
-				triangle[2].m_x = points[3].m_x;
-				triangle[2].m_y = points[3].m_y;
-				triangle[2].m_z = points[3].m_z;
-				callback (userData, 3, &triangle[0].m_x, m_atributeMap[base]);
-
-				triangle[0].m_x = points[0].m_x;
-				triangle[0].m_y = points[0].m_y;
-				triangle[0].m_z = points[0].m_z;
-
-				triangle[1].m_x = points[3].m_x;
-				triangle[1].m_y = points[3].m_y;
-				triangle[1].m_z = points[3].m_z;
-
-				triangle[2].m_x = points[1].m_x;
-				triangle[2].m_y = points[1].m_y;
-				triangle[2].m_z = points[1].m_z;
-				callback (userData, 3, &triangle[0].m_x, m_atributeMap[base]);
-			}
 			points[0 * 2 + 0] = points[0 * 2 + 1];
 			points[1 * 2 + 0] = points[1 * 2 + 1];
 		}
@@ -543,6 +667,7 @@ void dgCollisionHeightField::GetLocalAABB (const dgVector& p0, const dgVector& p
 }
 
 
+
 void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) const
 {
 	dgVector boxP0;
@@ -575,7 +700,6 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 	}
 
 
-
 	if (!((maxHeight < boxP0.m_y) || (minHeight > boxP1.m_y))) {
 		// scan the vertices's intersected by the box extend
 		base = (z1 - z0 + 1) * (x1 - x0 + 1) + 2 * (z1 - z0) * (x1 - x0);
@@ -603,205 +727,196 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 		dgInt32 faceCount = 0;
 		dgInt32 step = x1 - x0 + 1;
 		dgInt32* const indices = data->m_globalFaceVertexIndex;
-		//dgInt32* const faceIndexCount = data->m_globalFaceIndexCount;
 		dgInt32* const faceIndexCount = data->m_meshData.m_globalFaceIndexCount;
 		dgInt32 faceSize = dgInt32 (m_horizontalScale * dgFloat32 (2.0f)); 
-		if (m_diagonalMode) {
-			for (dgInt32 z = z0; z < z1; z ++) {
-				dgInt32 zStep = z * m_width;
-				for (dgInt32 x = x0; x < x1; x ++) {
-					dgInt32 i0 = vertexIndex;
-					dgInt32 i1 = vertexIndex + step;
-					dgInt32 i2 = vertexIndex + 1;
-					dgInt32 i3 = vertexIndex + step + 1;
 
-					// calculate the the normal
-					dgVector e0 (vertex[i1] - vertex[i0]);
-					dgVector e1 (vertex[i3] - vertex[i0]);
-					dgVector e2 (vertex[i2] - vertex[i0]);
-					dgVector n1 (e0 *  e1);
-					dgVector n0 (e1 *  e2);
+		for (dgInt32 z = z0; z < z1; z ++) {
+			dgInt32 zStep = z * m_width;
+			for (dgInt32 x = x0; x < x1; x ++) {
+				const dgInt32* const indirectIndex = &m_cellIndices[m_diagonals[zStep + x]][0];
 
-					//normalBase 
-					//n0 = n0.Scale3 (dgRsqrt(n0 % n0));
-					n0 = n0.CompProduct4(n0.DotProduct4(n0).InvSqrt());
-					vertex[normalBase] = n0;
-					
-					//n1 = n1.Scale3 (dgRsqrt(n1 % n1));
-					n1 = n1.CompProduct4(n1.DotProduct4(n1).InvSqrt());
-					vertex[normalBase + 1] = n1;
+				dgInt32 vIndex[4];
+				vIndex[0] = vertexIndex;
+				vIndex[1] = vertexIndex + step;
+				vIndex[2] = vertexIndex + 1;
+				vIndex[3] = vertexIndex + step + 1;
 
-					faceIndexCount[faceCount] = 3;
-					indices[index + 0 + 0] = i0;
-					indices[index + 0 + 1] = i3;
-					indices[index + 0 + 2] = i2;
-					indices[index + 0 + 3] = m_atributeMap[zStep + x];
-					indices[index + 0 + 4] = normalBase;
-					indices[index + 0 + 5] = normalBase;
-					indices[index + 0 + 6] = normalBase;
-					indices[index + 0 + 7] = normalBase;
-					indices[index + 0 + 8] = faceSize;
+				dgInt32 i0 = vIndex[indirectIndex[0]];
+				dgInt32 i1 = vIndex[indirectIndex[1]];
+				dgInt32 i2 = vIndex[indirectIndex[2]];
+				dgInt32 i3 = vIndex[indirectIndex[3]];
 
-					faceIndexCount[faceCount + 1] = 3;
-					indices[index + 9 + 0] = i3;
-					indices[index + 9 + 1] = i0;
-					indices[index + 9 + 2] = i1;
-					indices[index + 9 + 3] = m_atributeMap[zStep + x];
-					indices[index + 9 + 4] = normalBase + 1;
-					indices[index + 9 + 5] = normalBase + 1;
-					indices[index + 9 + 6] = normalBase + 1;
-					indices[index + 9 + 7] = normalBase + 1;
-					indices[index + 9 + 8] = faceSize;
-					
-					dgFloat32 dist (n0 % (vertex[i1] - vertex[i2]));
-					if (dist < -dgFloat32 (1.0e-3f)) {
-						indices[index + 0 + 5] = normalBase + 1;
-						indices[index + 9 + 5] = normalBase;
-					}
+				dgVector e0 (vertex[i1] - vertex[i0]);
+				dgVector e1 (vertex[i3] - vertex[i0]);
+				dgVector e2 (vertex[i2] - vertex[i0]);
+				dgVector n1 (e0 *  e1);
+				dgVector n0 (e1 *  e2);
 
-					index += 9 * 2;
-					normalBase += 2;
-					faceCount += 2;
-					vertexIndex ++;
+				//normalBase 
+				dgInt32 normalIndex0 = normalBase + indirectIndex[5];
+				n0 = n0.CompProduct4(n0.DotProduct4(n0).InvSqrt());
+				vertex[normalIndex0] = n0;
+
+				dgInt32 normalIndex1 = normalBase + indirectIndex[6];
+				n1 = n1.CompProduct4(n1.DotProduct4(n1).InvSqrt());
+				vertex[normalIndex1] = n1;
+
+				faceIndexCount[faceCount] = 3;
+				indices[index + 0 + 0] = i0;
+				indices[index + 0 + 1] = i1;
+				indices[index + 0 + 2] = i3;
+				indices[index + 0 + 3] = m_atributeMap[zStep + x];
+				indices[index + 0 + 4] = normalIndex0;
+				indices[index + 0 + 5] = normalIndex0;
+				indices[index + 0 + 6] = normalIndex0;
+				indices[index + 0 + 7] = normalIndex0;
+				indices[index + 0 + 8] = faceSize;
+
+				faceIndexCount[faceCount + 1] = 3;
+				indices[index + 9 + 0] = i0;
+				indices[index + 9 + 1] = i3;
+				indices[index + 9 + 2] = i2;
+				indices[index + 9 + 3] = m_atributeMap[zStep + x];
+				indices[index + 9 + 4] = normalIndex1;
+				indices[index + 9 + 5] = normalIndex1;
+				indices[index + 9 + 6] = normalIndex1;
+				indices[index + 9 + 7] = normalIndex1;
+				indices[index + 9 + 8] = faceSize;
+
+				dgFloat32 dist (n0 % (vertex[i1] - vertex[i2]));
+				if (dist < -dgFloat32 (1.0e-3f)) {
+					indices[index + 0 + 7] = normalIndex0;
+					indices[index + 0 + 5] = normalIndex1;
 				}
+
+				index += 9 * 2;
+				normalBase += 2;
+				faceCount += 2;
 				vertexIndex ++;
 			}
+			vertexIndex ++;
+		}
 
-			step = x1 - x0;
-			for (dgInt32 z = z0; z < z1; z ++) {
-				dgInt32 triangleIndexBase = (z - z0) * step * 18;
-				for (dgInt32 x = x0; x < (x1 - 1); x ++) {
-					dgInt32* const triangles = &indices[triangleIndexBase + (x - x0) * 18];
-					const dgVector& origin = vertex[triangles[0]];
-					const dgVector& testPoint = vertex[triangles[27]];
-					const dgVector& normal = vertex[triangles[4]];
+/*
+		step = x1 - x0;
+		for (dgInt32 z = z0; z < z1; z ++) {
+			dgInt32 vertexBase = (z - z0) * step;
+			dgInt32 triangleIndexBase = vertexBase * (2 * 9);
+			for (dgInt32 x = x0; x < (x1 - 1); x ++) {
+				dgInt32* const triangles = &indices[triangleIndexBase + (x - x0) * (2 * 9)];
+				if (m_diagonals[vertexBase + x]) {
+					const dgVector& origin = vertex[triangles[0 * 9 + 0]];
+					if (m_diagonals[vertexBase + x + 1]) {
+						const dgVector& testPoint = vertex[triangles[3 * 9 + 0]];
+						const dgVector& normal = vertex[triangles[0 * 9 + 4]];
+						dgFloat32 dist (normal % (testPoint - origin));
+						if (dist < -dgFloat32 (1.0e-3f)) {
+							dgInt32 i0 = 0 * 9 + 6;
+							dgInt32 i1 = 3 * 9 + 6;
+							triangles[i0] = triangles[3 * 9 + 4];
+							triangles[i1] = triangles[1 * 9 + 4];
+						}
+					} else {
+						const dgVector& testPoint = vertex[triangles[2 * 9 + 2]];
+						const dgVector& normal = vertex[triangles[0 * 9 + 4]];
 
-					dgFloat32 dist (normal % (testPoint - origin));
-					if (dist < -dgFloat32 (1.0e-3f)) {
-						dgInt32 i0 = 6;
-						dgInt32 i1 = 27 + 6;
-						triangles[i0] = triangles[27 + 4];
-						triangles[i1] = triangles[9 + 4];
+						dgFloat32 dist (normal % (testPoint - origin));
+						if (dist < -dgFloat32 (1.0e-3f)) {
+							dgInt32 i0 = 0 * 9 + 6;
+							dgInt32 i1 = 2 * 9 + 0;
+							triangles[i0] = triangles[2 * 9 + 4];
+							triangles[i1] = triangles[0 * 9 + 4];
+						}
 					}
-				}
-			}
+				} else {
+					const dgVector& origin = vertex[triangles[1 * 9 + 0]];
+					if (m_diagonals[vertexBase + x + 1]) {
+						const dgVector& testPoint = vertex[triangles[2 * 9 + 2]];
+						const dgVector& normal = vertex[triangles[1 * 9 + 4]];
+						dgFloat32 dist (normal % (testPoint - origin));
+						if (dist < -dgFloat32 (1.0e-3f)) {
+							dgInt32 i0 = 0 * 9 + 7;
+							dgInt32 i1 = 3 * 9 + 0;
+							triangles[i0] = triangles[2 * 9 + 4];
+							triangles[i1] = triangles[0 * 9 + 4];
+						}
+					} else {
+						const dgVector& testPoint = vertex[triangles[3 * 9 + 0]];
+						const dgVector& normal = vertex[triangles[1 * 9 + 4]];
 
-			for (dgInt32 x = x0; x < x1; x ++) {
-				dgInt32 triangleIndexBase = (x - x0) * 18;
-				for (dgInt32 z = z0; z < (z1 - 1); z ++) {	
-					dgInt32* const triangles = &indices[triangleIndexBase + (z - z0) * step * 18];
-					const dgVector& origin = vertex[triangles[9]];
-					const dgVector& testPoint = vertex[triangles[step * 18 + 1]];
-					const dgVector& normal = vertex[triangles[9 + 4]];
-					dgFloat32 dist (normal % (testPoint - origin));
-
-					if (dist < -dgFloat32 (1.0e-3f)) {
-						dgInt32 i0 = 9 + 7;
-						dgInt32 i1 = step * 18 + 7;
-						triangles[i0] = triangles[step * 18 + 4];
-						triangles[i1] = triangles[9 + 4];
-					}
-				}
-			}
-		} else {
-			for (dgInt32 z = z0; z < z1; z ++) {
-				dgInt32 zStep = z * m_width;
-				for (dgInt32 x = x0; x < x1; x ++) {
-					dgInt32 i0 = vertexIndex;
-					dgInt32 i1 = vertexIndex + step;
-					dgInt32 i2 = vertexIndex + 1;
-					dgInt32 i3 = vertexIndex + step + 1;
-
-					// calculate the the normal
-					dgVector e0 (vertex[i0] - vertex[i2]);
-					dgVector e1 (vertex[i1] - vertex[i2]);
-					dgVector e2 (vertex[i3] - vertex[i2]);
-					dgVector n1 (e0 *  e1);
-					dgVector n0 (e1 *  e2);
-
-					//normalBase 
-					//n0 = n0.Scale3 (dgRsqrt(n0 % n0));
-					n0 = n0.CompProduct4(n0.DotProduct4(n0).InvSqrt());
-					vertex[normalBase] = n0;
-
-					//n1 = n1.Scale3 (dgRsqrt(n1 % n1));
-					n1 = n1.CompProduct4(n1.DotProduct4(n1).InvSqrt());
-					vertex[normalBase + 1] = n1;
-
-					faceIndexCount[faceCount] = 3;
-					indices[index + 0 + 0] = i0;
-					indices[index + 0 + 1] = i1;
-					indices[index + 0 + 2] = i2;
-					indices[index + 0 + 3] = m_atributeMap[zStep + x];
-					indices[index + 0 + 4] = normalBase;
-					indices[index + 0 + 5] = normalBase;
-					indices[index + 0 + 6] = normalBase;
-					indices[index + 0 + 7] = normalBase;
-					indices[index + 0 + 8] = faceSize;
-
-
-					faceIndexCount[faceCount + 1] = 3;
-					indices[index + 9 + 0] = i2;
-					indices[index + 9 + 1] = i1;
-					indices[index + 9 + 2] = i3;
-					indices[index + 9 + 3] = m_atributeMap[zStep + x];
-					indices[index + 9 + 4] = normalBase + 1;
-					indices[index + 9 + 5] = normalBase + 1;
-					indices[index + 9 + 6] = normalBase + 1;
-					indices[index + 9 + 7] = normalBase + 1;
-					indices[index + 9 + 8] = faceSize;
-
-					dgFloat32 dist (n0 % (vertex[i3] - vertex[i0]));
-					if (dist < -dgFloat32 (1.0e-3f)) {
-						indices[index + 0 + 6] = normalBase + 1;
-						indices[index + 9 + 5] = normalBase;
-					}
-
-					index += 9 * 2;
-					normalBase += 2;
-					faceCount += 2;
-					vertexIndex ++;
-				}
-				vertexIndex ++;
-			}
-
-			step = x1 - x0;
-			for (dgInt32 z = z0; z < z1; z ++) {
-				dgInt32 triangleIndexBase = (z - z0) * step * 18;
-				for (dgInt32 x = x0; x < (x1 - 1); x ++) {
-					dgInt32* const triangles = &indices[triangleIndexBase + (x - x0) * 18];
-					const dgVector& origin = vertex[triangles[9 + 0]];
-					const dgVector& testPoint = vertex[triangles[20]];
-					const dgVector& normal = vertex[triangles[9 + 4]];
-
-					dgFloat32 dist (normal % (testPoint - origin));
-					if (dist < -dgFloat32 (1.0e-3f)) {
-						dgInt32 i0 = 9 + 7;
-						dgInt32 i1 = 18 + 5;
-						triangles[i0] = triangles[18 + 4];
-						triangles[i1] = triangles[9 + 4];
-					}
-				}
-			}
-
-			for (dgInt32 x = x0; x < x1; x ++) {
-				dgInt32 triangleIndexBase = (x - x0) * 18;
-				for (dgInt32 z = z0; z < (z1 - 1); z ++) {	
-					dgInt32* const triangles = &indices[triangleIndexBase + (z - z0) * step * 18];
-					const dgVector& origin = vertex[triangles[9]];
-					const dgVector& testPoint = vertex[triangles[step * 18 + 1]];
-					const dgVector& normal = vertex[triangles[9 + 4]];
-					dgFloat32 dist (normal % (testPoint - origin));
-
-					if (dist < -dgFloat32 (1.0e-3f)) {
-						dgInt32 i0 = 9 + 6;
-						dgInt32 i1 = step * 18 + 7;
-						triangles[i0] = triangles[step * 18 + 4];
-						triangles[i1] = triangles[9 + 4];
+						dgFloat32 dist (normal % (testPoint - origin));
+						if (dist < -dgFloat32 (1.0e-3f)) {
+							dgInt32 i0 = 0 * 9 + 7;
+							dgInt32 i1 = 3 * 9 + 1;
+							triangles[i0] = triangles[3 * 9 + 4];
+							triangles[i1] = triangles[1 * 9 + 4];
+						}
 					}
 				}
 			}
 		}
+
+		for (dgInt32 x = x0; x < x1; x ++) {
+			dgInt32 triangleIndexBase = x - x0;
+			for (dgInt32 z = z0; z < (z1 - 1); z ++) {	
+				dgInt32 baseIndex = (z - z0) * step + triangleIndexBase;
+				dgInt32* const triangles = &indices[baseIndex * (2 * 9)];
+				const dgVector& origin = vertex[triangles[1 * 9]];
+				if (m_diagonals[baseIndex]) {
+					if (m_diagonals[baseIndex + step]) {
+						const dgVector& testPoint = vertex[triangles[step * (2 * 9) + 1]];
+						const dgVector& normal = vertex[triangles[1 * 9 + 4]];
+						dgFloat32 dist (normal % (testPoint - origin));
+
+						if (dist < -dgFloat32 (1.0e-3f)) {
+							dgInt32 i0 = 1 * 9 + 7;
+							dgInt32 i1 = step * (2 * 9) + 5;
+							triangles[i0] = triangles[step * (2 * 9) + 4];
+							triangles[i1] = triangles[1 * 9 + 4];
+						}
+					} else {
+						const dgVector& testPoint = vertex[triangles[step * (2 * 9) + 1]];
+						const dgVector& normal = vertex[triangles[1 * 9 + 4]];
+						dgFloat32 dist (normal % (testPoint - origin));
+
+						if (dist < -dgFloat32 (1.0e-3f)) {
+							dgInt32 i0 = 1 * 9 + 7;
+							dgInt32 i1 = step * (2 * 9) + 7;
+							triangles[i0] = triangles[step * (2 * 9) + 4];
+							triangles[i1] = triangles[1 * 9 + 4];
+						}
+					}
+
+				} else {
+					
+					if (m_diagonals[baseIndex + step]) {
+						const dgVector& testPoint = vertex[triangles[step * (2 * 9) + 1]];
+						const dgVector& normal = vertex[triangles[1 * 9 + 4]];
+						dgFloat32 dist (normal % (testPoint - origin));
+
+						if (dist < -dgFloat32 (1.0e-3f)) {
+							dgInt32 i0 = 1 * 9 + 6;
+							dgInt32 i1 = step * (2 * 9) + 5;
+							triangles[i0] = triangles[step * (2 * 9) + 4];
+							triangles[i1] = triangles[1 * 9 + 4];
+						}
+					} else {
+						const dgVector& testPoint = vertex[triangles[step * (2 * 9) + 1]];
+						const dgVector& normal = vertex[triangles[1 * 9 + 4]];
+						dgFloat32 dist (normal % (testPoint - origin));
+
+						if (dist < -dgFloat32 (1.0e-3f)) {
+							dgInt32 i0 = 1 * 9 + 7;
+							dgInt32 i1 = step * (2 * 9) + 7;
+							triangles[i0] = triangles[step * (2 * 9) + 4];
+							triangles[i1] = triangles[1 * 9 + 4];
+						}
+					}
+				}
+			}
+		}
+*/
+
 
 		dgInt32 stride = sizeof (dgVector) / sizeof (dgFloat32);
 		dgInt32 faceCount0 = 0; 

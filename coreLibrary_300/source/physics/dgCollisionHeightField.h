@@ -32,6 +32,17 @@ typedef dgFloat32 (*dgCollisionHeightFieldRayCastCallback) (const dgBody* const 
 class dgCollisionHeightField: public dgCollisionMesh
 {
 	public:
+	enum dgCollisionHeightFieldGridConstruction
+	{
+		m_normalDiagonals = 0,
+		m_invertedDiagonals,
+		m_alternateOddRowsDiagonals,
+		m_alternateEvenRowsDiagonals,
+		m_alternateOddColumsDiagonals,
+		m_alternateEvenColumsDiagonals,
+		m_starDiagonals,
+		m_starInvertexDiagonals,
+	};
 	dgCollisionHeightField (dgWorld* const world, dgInt32 width, dgInt32 height, dgInt32 contructionMode, 
 							const dgFloat32* const elevationMap, const dgInt8* const atributeMap, dgFloat32 horizontalScale);
 
@@ -66,6 +77,7 @@ class dgCollisionHeightField: public dgCollisionMesh
 	dgInt32 m_height;
 	dgInt32 m_diagonalMode;
 	dgInt8* m_atributeMap;
+	dgInt8* m_diagonals;
 	dgFloat32* m_elevationMap;
 	dgFloat32 m_horizontalScale;
 	dgFloat32 m_horizontalScaleInv;
@@ -82,6 +94,7 @@ class dgCollisionHeightField: public dgCollisionMesh
 		dgVector *m_vertex[DG_MAX_THREADS_HIVE_COUNT];
 	};
 
+	static dgInt32 m_cellIndices[][6];
 	dgPerIntanceData* m_instanceData;
 	friend class dgCollisionCompound;
 };
