@@ -39,6 +39,7 @@ class dNewtonCollision: public dNewtonAlloc
 		
 		m_mesh,
 		m_scene,
+		m_heighfield,
 	};
 
 	class dDebugRenderer
@@ -121,7 +122,6 @@ class dNewtonCollisionScene: public dNewtonCollision
 		return new dNewtonCollisionScene (*this, shape);
 	}
 
-
 	CNEWTON_API virtual void BeginAddRemoveCollision();
 	CNEWTON_API virtual void* AddCollision(const dNewtonCollision* const collision);
 	CNEWTON_API virtual void RemoveCollision (void* const handle);
@@ -129,6 +129,28 @@ class dNewtonCollisionScene: public dNewtonCollision
 
 	protected:
 	dNewtonCollisionScene (const dNewtonCollisionScene& srcCollision, NewtonCollision* const shape)
+		:dNewtonCollision (srcCollision, shape)
+	{
+	}
+};
+
+
+class dNewtonCollisionHeightField: public dNewtonCollision
+{
+	public: 
+	dNewtonCollisionHeightField (dNewton* const world, int width, int height, int gridsDiagonals, dFloat horizontalScale, const dFloat* const elevationMap, const char* const attributeMap, int shapeID)
+		:dNewtonCollision(m_heighfield)
+	{
+		SetShape (NewtonCreateHeightFieldCollision (world->GetNewton(), width, height, gridsDiagonals, elevationMap, attributeMap, horizontalScale, shapeID));
+	}
+
+	dNewtonCollision* Clone (NewtonCollision* const shape) const 
+	{
+		return new dNewtonCollisionHeightField (*this, shape);
+	}
+
+	protected:
+	dNewtonCollisionHeightField (const dNewtonCollisionHeightField& srcCollision, NewtonCollision* const shape)
 		:dNewtonCollision (srcCollision, shape)
 	{
 	}
