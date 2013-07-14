@@ -34,12 +34,20 @@ dgInt32 dgCollisionHeightField::m_cellIndices[][4] =
 	{1, 3, 0, 2}
 };
 
+dgInt32 dgCollisionHeightField::m_verticalEdgeMap[][7] = 
+{
+	{1 * 9 + 1, 0 * 9 + 0, 1 * 9 + 4, 1 * 9 + 6, 0 * 9 + 6, 1 * 9 + 4, 0 * 9 + 4},
+	{1 * 9 + 1, 3 * 9 + 0, 1 * 9 + 4, 1 * 9 + 6, 3 * 9 + 6, 1 * 9 + 4, 3 * 9 + 4},
+	{1 * 9 + 2, 2 * 9 + 2, 0 * 9 + 4, 1 * 9 + 7, 2 * 9 + 7, 0 * 9 + 4, 2 * 9 + 4},
+	{1 * 9 + 0, 0 * 9 + 1, 1 * 9 + 4, 1 * 9 + 7, 0 * 9 + 7, 1 * 9 + 4, 0 * 9 + 4}
+};
+
 dgInt32 dgCollisionHeightField::m_horizontalEdgeMap[][7] =
 {
 	{1 * 9 + 0, 2 * 9 + 1, 1 * 9 + 4, 1 * 9 + 7, 2 * 9 + 7, 1 * 9 + 4, 2 * 9 + 4},
 	{1 * 9 + 0, 3 * 9 + 0, 1 * 9 + 4, 1 * 9 + 7, 3 * 9 + 6, 1 * 9 + 4, 3 * 9 + 4},
-	{0 * 9 + 1, 2 * 9 + 1, 0 * 9 + 4, 2 * 9 + 6, 2 * 9 + 7, 0 * 9 + 4, 2 * 9 + 4},
-	{0 * 9 + 1, 3 * 9 + 0, 0 * 9 + 4, 2 * 9 + 6, 3 * 9 + 6, 0 * 9 + 4, 3 * 9 + 4}
+	{0 * 9 + 1, 2 * 9 + 1, 0 * 9 + 4, 1 * 9 + 7, 2 * 9 + 7, 0 * 9 + 4, 2 * 9 + 4},
+	{0 * 9 + 1, 3 * 9 + 0, 0 * 9 + 4, 0 * 9 + 6, 3 * 9 + 6, 0 * 9 + 4, 3 * 9 + 4}
 };
 
 
@@ -53,7 +61,7 @@ dgCollisionHeightField::dgCollisionHeightField(
 	dgFloat32 horizontalScale)
 	:dgCollisionMesh (world, m_heightField)
 {
-contructionMode = 0;
+contructionMode = 1;
 	m_userRayCastCallback = NULL;
 	m_rtti |= dgCollisionHeightField_RTTI;
 	m_width = width;
@@ -811,6 +819,8 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 			dgInt32 triangleIndexBase = vertexBase * (2 * 9);
 			for (dgInt32 x = x0; x < (x1 - 1); x ++) {
 				const dgInt32 code = (m_diagonals[vertexBase + x] << 1) + m_diagonals[vertexBase + x + 1];
+dgAssert (code != 1);
+dgAssert (code != 2);
 				const dgInt32* const edgeMap = &m_horizontalEdgeMap[code][0];
 
 				dgInt32* const triangles = &indices[triangleIndexBase + (x - x0) * (2 * 9)];
@@ -834,67 +844,38 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 			}
 		}
 
-/*
+		dgInt32 stepBase = step * (2 * 9);
 		for (dgInt32 x = x0; x < x1; x ++) {
-			dgInt32 triangleIndexBase = x - x0;
+			const dgInt32 triangleIndexBase = x - x0;
 			for (dgInt32 z = z0; z < (z1 - 1); z ++) {	
-				dgInt32 baseIndex = (z - z0) * step + triangleIndexBase;
-				dgInt32* const triangles = &indices[baseIndex * (2 * 9)];
-				const dgVector& origin = vertex[triangles[1 * 9]];
-				if (m_diagonals[baseIndex]) {
-					if (m_diagonals[baseIndex + step]) {
-						const dgVector& testPoint = vertex[triangles[step * (2 * 9) + 1]];
-						const dgVector& normal = vertex[triangles[1 * 9 + 4]];
-						dgFloat32 dist (normal % (testPoint - origin));
+				const dgInt32 baseIndex = (z - z0) * step + triangleIndexBase;
 
-						if (dist < -dgFloat32 (1.0e-3f)) {
-							dgInt32 i0 = 1 * 9 + 7;
-							dgInt32 i1 = step * (2 * 9) + 5;
-							triangles[i0] = triangles[step * (2 * 9) + 4];
-							triangles[i1] = triangles[1 * 9 + 4];
-						}
-					} else {
-						const dgVector& testPoint = vertex[triangles[step * (2 * 9) + 1]];
-						const dgVector& normal = vertex[triangles[1 * 9 + 4]];
-						dgFloat32 dist (normal % (testPoint - origin));
+				const dgInt32 code = (m_diagonals[baseIndex] << 1) + m_diagonals[baseIndex + step];
+				const dgInt32* const edgeMap = &m_verticalEdgeMap[code][0];
 
-						if (dist < -dgFloat32 (1.0e-3f)) {
-							dgInt32 i0 = 1 * 9 + 7;
-							dgInt32 i1 = step * (2 * 9) + 7;
-							triangles[i0] = triangles[step * (2 * 9) + 4];
-							triangles[i1] = triangles[1 * 9 + 4];
-						}
-					}
+dgAssert (code != 1);
+dgAssert (code != 2);
 
-				} else {
-					
-					if (m_diagonals[baseIndex + step]) {
-						const dgVector& testPoint = vertex[triangles[step * (2 * 9) + 1]];
-						const dgVector& normal = vertex[triangles[1 * 9 + 4]];
-						dgFloat32 dist (normal % (testPoint - origin));
+				dgInt32* const triangles = &indices[triangleIndexBase + (x - x0) * (2 * 9)];
+				const dgInt32 i0 = triangles[edgeMap[0]];
+				const dgInt32 i1 = triangles[edgeMap[1] + stepBase];
+				const dgInt32 i2 = triangles[edgeMap[2]];
 
-						if (dist < -dgFloat32 (1.0e-3f)) {
-							dgInt32 i0 = 1 * 9 + 6;
-							dgInt32 i1 = step * (2 * 9) + 5;
-							triangles[i0] = triangles[step * (2 * 9) + 4];
-							triangles[i1] = triangles[1 * 9 + 4];
-						}
-					} else {
-						const dgVector& testPoint = vertex[triangles[step * (2 * 9) + 1]];
-						const dgVector& normal = vertex[triangles[1 * 9 + 4]];
-						dgFloat32 dist (normal % (testPoint - origin));
+				const dgVector& origin = vertex[i0];
+				const dgVector& testPoint = vertex[i1];
+				const dgVector& normal = vertex[i2];
+				dgFloat32 dist (normal % (testPoint - origin));
 
-						if (dist < -dgFloat32 (1.0e-3f)) {
-							dgInt32 i0 = 1 * 9 + 7;
-							dgInt32 i1 = step * (2 * 9) + 7;
-							triangles[i0] = triangles[step * (2 * 9) + 4];
-							triangles[i1] = triangles[1 * 9 + 4];
-						}
-					}
+				if (dist < -dgFloat32 (1.0e-3f)) {
+					const dgInt32 i3 = edgeMap[3];
+					const dgInt32 i4 = edgeMap[4] + stepBase;
+					const dgInt32 i5 = edgeMap[5];
+					const dgInt32 i6 = edgeMap[6] + stepBase;
+					triangles[i3] = triangles[i6];
+					triangles[i4] = triangles[i5];
 				}
 			}
 		}
-*/
 
 
 		dgInt32 stride = sizeof (dgVector) / sizeof (dgFloat32);

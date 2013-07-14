@@ -95,6 +95,7 @@ class dgCollisionHeightField: public dgCollisionMesh
 	};
 
 	static dgInt32 m_cellIndices[][4];
+	static dgInt32 m_verticalEdgeMap[][7];
 	static dgInt32 m_horizontalEdgeMap[][7];
 	dgPerIntanceData* m_instanceData;
 	friend class dgCollisionCompound;
