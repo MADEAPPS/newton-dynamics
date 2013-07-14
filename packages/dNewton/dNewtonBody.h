@@ -32,7 +32,6 @@ class dNewtonCollision;
 class dNewtonBody: public dNewtonAlloc, public dNewtonTransformLerp
 {
 	public:
-
 	CNEWTON_API dNewtonBody(dNewton* const world, dFloat mass, const dNewtonCollision* const collision, void* const userData, const dFloat* const matrix);
 	CNEWTON_API virtual ~dNewtonBody();
 
@@ -47,51 +46,35 @@ class dNewtonBody: public dNewtonAlloc, public dNewtonTransformLerp
 	CNEWTON_API void SetOmega (const dFloat* const omega);
 	CNEWTON_API void GetOmega (dFloat* const omega) const;
 
-	CNEWTON_API void SetForce (const dFloat* const force);
-	CNEWTON_API void SetTorque (const dFloat* const torque);
-
-	CNEWTON_API void AddForce (const dFloat* const force);
-	CNEWTON_API void AddTorque (const dFloat* const torque);
-
-
-	CNEWTON_API void GetPointVeloc (const dFloat* const point, dFloat* const veloc) const;
-	CNEWTON_API void ApplyImpulseToDesiredPointVeloc (const dFloat* const point, const dFloat* const desiredveloc);
-
+//	CNEWTON_API void GetPointVeloc (const dFloat* const point, dFloat* const veloc) const;
+//	CNEWTON_API void ApplyImpulseToDesiredPointVeloc (const dFloat* const point, const dFloat* const desiredveloc);
 	CNEWTON_API void GetMassAndInertia (dFloat& mass, dFloat& Ixx, dFloat& Iyy, dFloat& Izz) const;
 
-	CNEWTON_API virtual void OnForceAndTorque (dFloat timestep, int threadIndex) = 0;
 	CNEWTON_API virtual void OnBodyTransform (const dFloat* const matrix, int threadIndex);
 
 	CNEWTON_API void* GetUserData() const;
 	CNEWTON_API void SetUserData(void* const userData);
-
 	
 	CNEWTON_API dNewton* GetNewton () const;
 	CNEWTON_API NewtonBody* GetNewtonBody () const;
 	CNEWTON_API dNewtonCollision* GetCollision() const;
 
-	CNEWTON_API bool GetSleepState() const;
-	
-
 	protected:
 	CNEWTON_API dNewtonBody();
-	void SetBody (NewtonBody* const body);
+	virtual void SetBody (NewtonBody* const body);
 
 	private: 
 	CNEWTON_API static void OnBodyDestroy (const NewtonBody* const body);
-	CNEWTON_API static void OnForceAndTorque (const NewtonBody* body, dFloat timestep, int threadIndex);
 	CNEWTON_API static void OnBodyTransform (const NewtonBody* const body, const dFloat* const matrix, int threadIndex);
 
+	protected:
 	dVector m_posit0;
 	dVector m_posit1;
 	dQuaternion m_rotat0;
 	dQuaternion m_rotat1;
 	NewtonBody* m_body;
 	void* m_userData;
-
-	protected:
 	mutable unsigned m_lock;
-	
 };
 
 #endif

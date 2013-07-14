@@ -104,28 +104,6 @@ void dNewtonBody::GetOmega (dFloat* const omega) const
 }
 
 
-void dNewtonBody::SetForce (const dFloat* const force)
-{
-	NewtonBodySetForce(m_body, force);
-}
-
-void dNewtonBody::SetTorque (const dFloat* const torque)
-{
-	NewtonBodySetTorque(m_body, torque);
-}
-
-void dNewtonBody::AddForce (const dFloat* const force)
-{
-	NewtonBodyAddForce(m_body, force);
-}
-
-void dNewtonBody::AddTorque (const dFloat* const torque)
-{
-	NewtonBodyAddTorque(m_body, torque);
-}
-
-
-
 void dNewtonBody::GetMassAndInertia (dFloat& mass, dFloat& Ixx, dFloat& Iyy, dFloat& Izz) const
 {
 	NewtonBodyGetMassMatrix(m_body, &mass, &Ixx, &Iyy, &Izz);
@@ -136,23 +114,13 @@ dNewton* dNewtonBody::GetNewton () const
 	return (dNewton*) NewtonWorldGetUserData(NewtonBodyGetWorld(m_body));
 }
 
-void dNewtonBody::GetPointVeloc (const dFloat* const point, dFloat* const veloc) const
-{
-	NewtonBodyGetPointVelocity (m_body, &point[0], &veloc[0]);
-}
-
 void dNewtonBody::SetBody (NewtonBody* const body)
 {
 	m_body = body;
 	NewtonBodySetUserData(m_body, this);
 	NewtonBodySetTransformCallback (m_body, OnBodyTransform);
 	NewtonBodySetDestructorCallback (m_body, OnBodyDestroy);
-	NewtonBodySetForceAndTorqueCallback(m_body, OnForceAndTorque);
-}
-
-void dNewtonBody::ApplyImpulseToDesiredPointVeloc (const dFloat* const point, const dFloat* const desiredveloc)
-{
-	NewtonBodyAddImpulse (m_body, &desiredveloc[0], &point[0]);
+//	NewtonBodySetForceAndTorqueCallback(m_body, OnForceAndTorque);
 }
 
 void dNewtonBody::OnBodyDestroy (const NewtonBody* const body)
@@ -162,11 +130,6 @@ void dNewtonBody::OnBodyDestroy (const NewtonBody* const body)
 		NewtonBodySetDestructorCallback (me->m_body, NULL);
 		delete me;
 	}
-}
-
-bool dNewtonBody::GetSleepState() const
-{
-	return NewtonBodyGetSleepState(m_body) ? true : false;
 }
 
 
@@ -188,13 +151,6 @@ void dNewtonBody::OnBodyTransform (const NewtonBody* const body, const dFloat* c
 	dNewtonBody* const me = (dNewtonBody*) NewtonBodyGetUserData(body);
 	dAssert (me);
 	me->OnBodyTransform (matrix, threadIndex);
-}
-
-void dNewtonBody::OnForceAndTorque (const NewtonBody* body, dFloat timestep, int threadIndex)
-{
-	dNewtonBody* const me = (dNewtonBody*) NewtonBodyGetUserData(body);
-	dAssert (me);
-	me->OnForceAndTorque (timestep, threadIndex);
 }
 
 

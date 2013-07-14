@@ -640,6 +640,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\dNewton\dNewtonDynamicBody.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dNewton\dNewtonDynamicBody.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\dNewton\dNewtonMesh.cpp"
 			>
 		</File>
