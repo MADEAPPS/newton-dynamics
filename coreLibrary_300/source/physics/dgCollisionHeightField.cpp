@@ -37,8 +37,8 @@ dgInt32 dgCollisionHeightField::m_cellIndices[][4] =
 dgInt32 dgCollisionHeightField::m_verticalEdgeMap[][7] = 
 {
 	{1 * 9 + 1, 0 * 9 + 0, 1 * 9 + 4, 1 * 9 + 6, 0 * 9 + 6, 1 * 9 + 4, 0 * 9 + 4},
-	{1 * 9 + 1, 3 * 9 + 0, 1 * 9 + 4, 1 * 9 + 6, 3 * 9 + 6, 1 * 9 + 4, 3 * 9 + 4},
-	{1 * 9 + 2, 2 * 9 + 2, 0 * 9 + 4, 1 * 9 + 7, 2 * 9 + 7, 0 * 9 + 4, 2 * 9 + 4},
+	{1 * 9 + 2, 0 * 9 + 1, 1 * 9 + 4, 1 * 9 + 6, 0 * 9 + 7, 1 * 9 + 4, 0 * 9 + 4},
+	{1 * 9 + 2, 0 * 9 + 0, 1 * 9 + 4, 1 * 9 + 7, 0 * 9 + 6, 1 * 9 + 4, 0 * 9 + 4},
 	{1 * 9 + 0, 0 * 9 + 1, 1 * 9 + 4, 1 * 9 + 7, 0 * 9 + 7, 1 * 9 + 4, 0 * 9 + 4}
 };
 
@@ -61,7 +61,6 @@ dgCollisionHeightField::dgCollisionHeightField(
 	dgFloat32 horizontalScale)
 	:dgCollisionMesh (world, m_heightField)
 {
-//contructionMode = 4;
 	m_userRayCastCallback = NULL;
 	m_rtti |= dgCollisionHeightField_RTTI;
 	m_width = width;
@@ -852,7 +851,6 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 				const dgInt32 code = (m_diagonals[diagBase + x] << 1) + m_diagonals[diagBase + m_width + x];
 				const dgInt32* const edgeMap = &m_verticalEdgeMap[code][0];
 
-dgAssert (code != 1);
 dgAssert (code != 2);
 
 				dgInt32* const triangles = &indices[triangleIndexBase + (x - x0) * (2 * 9)];
