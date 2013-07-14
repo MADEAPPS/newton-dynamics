@@ -61,7 +61,7 @@ dgCollisionHeightField::dgCollisionHeightField(
 	dgFloat32 horizontalScale)
 	:dgCollisionMesh (world, m_heightField)
 {
-contructionMode = 1;
+//contructionMode = 4;
 	m_userRayCastCallback = NULL;
 	m_rtti |= dgCollisionHeightField_RTTI;
 	m_width = width;
@@ -815,12 +815,12 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 
 		step = x1 - x0;
 		for (dgInt32 z = z0; z < z1; z ++) {
-			dgInt32 vertexBase = (z - z0) * step;
-			dgInt32 triangleIndexBase = vertexBase * (2 * 9);
+
+			const dgInt32 diagBase = m_width * z;
+			const dgInt32 vertexBase = (z - z0) * step;
+			const dgInt32 triangleIndexBase = vertexBase * (2 * 9);
 			for (dgInt32 x = x0; x < (x1 - 1); x ++) {
-				const dgInt32 code = (m_diagonals[vertexBase + x] << 1) + m_diagonals[vertexBase + x + 1];
-dgAssert (code != 1);
-dgAssert (code != 2);
+				const dgInt32 code = (m_diagonals[diagBase + x] << 1) + m_diagonals[diagBase + x + 1];
 				const dgInt32* const edgeMap = &m_horizontalEdgeMap[code][0];
 
 				dgInt32* const triangles = &indices[triangleIndexBase + (x - x0) * (2 * 9)];
@@ -848,9 +848,8 @@ dgAssert (code != 2);
 		for (dgInt32 x = x0; x < x1; x ++) {
 			const dgInt32 triangleIndexBase = x - x0;
 			for (dgInt32 z = z0; z < (z1 - 1); z ++) {	
-				const dgInt32 baseIndex = (z - z0) * step + triangleIndexBase;
-
-				const dgInt32 code = (m_diagonals[baseIndex] << 1) + m_diagonals[baseIndex + step];
+				const dgInt32 diagBase = m_width * z;
+				const dgInt32 code = (m_diagonals[diagBase + x] << 1) + m_diagonals[diagBase + m_width + x];
 				const dgInt32* const edgeMap = &m_verticalEdgeMap[code][0];
 
 dgAssert (code != 1);
