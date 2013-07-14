@@ -821,20 +821,18 @@ void dgCollisionCompound::CalculateInertia (void* userData, int indexCount, cons
 void dgCollisionCompound::MassProperties ()
 {
 #ifdef _DEBUG
-	dgVector origin_ (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	dgVector inertia_ (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	dgVector crossInertia_ (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-
-	dgPolyhedraMassProperties localData;
-	DebugCollision (dgGetIdentityMatrix(), CalculateInertia, &localData);
-	dgFloat32 volume_ = localData.MassProperties (origin_, inertia_, crossInertia_);
-	dgAssert (volume_ > dgFloat32 (0.0f));
-
-	dgFloat32 invVolume_ = dgFloat32 (1.0f)/volume_;
-	m_centerOfMass = origin_.Scale3 (invVolume_);
-	m_centerOfMass.m_w = volume_;
-	m_inertia = inertia_.Scale3 (invVolume_);
-	m_crossInertia = crossInertia_.Scale3(invVolume_);
+//	dgVector origin_ (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+//	dgVector inertia_ (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+//	dgVector crossInertia_ (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+//	dgPolyhedraMassProperties localData;
+//	DebugCollision (dgGetIdentityMatrix(), CalculateInertia, &localData);
+//	dgFloat32 volume_ = localData.MassProperties (origin_, inertia_, crossInertia_);
+//	dgAssert (volume_ > dgFloat32 (0.0f));
+//	dgFloat32 invVolume_ = dgFloat32 (1.0f)/volume_;
+//	m_centerOfMass = origin_.Scale3 (invVolume_);
+//	m_centerOfMass.m_w = volume_;
+//	m_inertia = inertia_.Scale3 (invVolume_);
+//	m_crossInertia = crossInertia_.Scale3(invVolume_);
 #endif
 
 
@@ -853,11 +851,13 @@ void dgCollisionCompound::MassProperties ()
 		inertiaII += dgVector (shapeInertia[0][0], shapeInertia[0][0], shapeInertia[0][0], dgFloat32 (0.0f)).Scale3 (shapeVolume);
 		inertiaIJ += dgVector (shapeInertia[1][2], shapeInertia[0][2], shapeInertia[0][1], dgFloat32 (0.0f)).Scale3 (shapeVolume);
 	}
-	dgFloat32 invVolume = dgFloat32 (1.0f)/volume;
-	m_inertia = inertiaII.Scale3 (invVolume);
-	m_crossInertia = inertiaIJ.Scale3 (invVolume);
-	m_centerOfMass = origin.Scale3 (invVolume);
-	m_centerOfMass.m_w = volume;
+	if (volume > dgFloat32 (0.0f)) { 
+		dgFloat32 invVolume = dgFloat32 (1.0f)/volume;
+		m_inertia = inertiaII.Scale3 (invVolume);
+		m_crossInertia = inertiaIJ.Scale3 (invVolume);
+		m_centerOfMass = origin.Scale3 (invVolume);
+		m_centerOfMass.m_w = volume;
+	}
 
 	dgCollision::MassProperties ();
 }
