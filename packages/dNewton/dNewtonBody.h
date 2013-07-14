@@ -32,8 +32,17 @@ class dNewtonCollision;
 class dNewtonBody: public dNewtonAlloc, public dNewtonTransformLerp
 {
 	public:
-	CNEWTON_API dNewtonBody(dNewton* const world, dFloat mass, const dNewtonCollision* const collision, void* const userData, const dFloat* const matrix);
+	enum dBodyType
+	{
+		m_dynamic,
+		m_kinematic,
+		m_unknown,
+	};
+
+	CNEWTON_API dNewtonBody(dNewton* const world, dFloat mass, const dNewtonCollision* const collision, void* const userData, const dFloat* const matrix, dBodyType m_type);
 	CNEWTON_API virtual ~dNewtonBody();
+
+	dBodyType GetType() const {return m_bodyType;}
 
 	CNEWTON_API void SetMatrix (const dFloat* const matrix);
 	CNEWTON_API void GetMatrix (dFloat* const matrix) const;
@@ -60,7 +69,7 @@ class dNewtonBody: public dNewtonAlloc, public dNewtonTransformLerp
 	CNEWTON_API dNewtonCollision* GetCollision() const;
 
 	protected:
-	CNEWTON_API dNewtonBody();
+	CNEWTON_API dNewtonBody(dBodyType type);
 	virtual void SetBody (NewtonBody* const body);
 
 	private: 
@@ -74,6 +83,7 @@ class dNewtonBody: public dNewtonAlloc, public dNewtonTransformLerp
 	dQuaternion m_rotat1;
 	NewtonBody* m_body;
 	void* m_userData;
+	dBodyType m_bodyType;
 	mutable unsigned m_lock;
 };
 

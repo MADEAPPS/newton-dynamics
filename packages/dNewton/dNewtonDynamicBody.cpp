@@ -26,14 +26,13 @@
 #include "dNewtonTranformLerp.h"
 
 dNewtonDynamicBody::dNewtonDynamicBody()
-	:dNewtonBody()
+	:dNewtonBody(m_dynamic)
 {
 }
 
 dNewtonDynamicBody::dNewtonDynamicBody (dNewton* const dWorld, dFloat mass, const dNewtonCollision* const collision, void* const userData, const dFloat* const matrix)
-	:dNewtonBody(dWorld, mass, collision, userData, matrix)
+	:dNewtonBody(dWorld, mass, collision, userData, matrix, m_dynamic)
 {
-	dAssert (0);
 	NewtonBodySetForceAndTorqueCallback(m_body, OnForceAndTorque);
 }
 
