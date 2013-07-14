@@ -94,7 +94,8 @@ class dgCollisionHeightField: public dgCollisionMesh
 		dgVector *m_vertex[DG_MAX_THREADS_HIVE_COUNT];
 	};
 
-	static dgInt32 m_cellIndices[][6];
+	static dgInt32 m_cellIndices[][4];
+	static dgInt32 m_horizontalEdgeMap[][7];
 	dgPerIntanceData* m_instanceData;
 	friend class dgCollisionCompound;
 };

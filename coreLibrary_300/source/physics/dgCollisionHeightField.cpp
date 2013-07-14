@@ -28,10 +28,18 @@
 #define DG_HIGHTFILD_DATA_ID 0x45AF5E07
 
 
-dgInt32 dgCollisionHeightField::m_cellIndices[][6] =
+dgInt32 dgCollisionHeightField::m_cellIndices[][4] =
 {
-	{2, 0, 3, 1, 0, 1},
-	{0, 1, 2, 3, 1, 0}
+	{0, 1, 2, 3},
+	{1, 3, 0, 2}
+};
+
+dgInt32 dgCollisionHeightField::m_horizontalEdgeMap[][7] =
+{
+	{1 * 9 + 0, 2 * 9 + 1, 1 * 9 + 4, 1 * 9 + 7, 2 * 9 + 7, 1 * 9 + 4, 2 * 9 + 4},
+	{1 * 9 + 0, 3 * 9 + 0, 1 * 9 + 4, 1 * 9 + 7, 3 * 9 + 6, 1 * 9 + 4, 3 * 9 + 4},
+	{0 * 9 + 1, 2 * 9 + 1, 0 * 9 + 4, 2 * 9 + 6, 2 * 9 + 7, 0 * 9 + 4, 2 * 9 + 4},
+	{0 * 9 + 1, 3 * 9 + 0, 0 * 9 + 4, 2 * 9 + 6, 3 * 9 + 6, 0 * 9 + 4, 3 * 9 + 4}
 };
 
 
@@ -45,6 +53,7 @@ dgCollisionHeightField::dgCollisionHeightField(
 	dgFloat32 horizontalScale)
 	:dgCollisionMesh (world, m_heightField)
 {
+contructionMode = 0;
 	m_userRayCastCallback = NULL;
 	m_rtti |= dgCollisionHeightField_RTTI;
 	m_width = width;
@@ -667,7 +676,6 @@ void dgCollisionHeightField::GetLocalAABB (const dgVector& p0, const dgVector& p
 }
 
 
-
 void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) const
 {
 	dgVector boxP0;
@@ -737,34 +745,34 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 
 				dgInt32 vIndex[4];
 				vIndex[0] = vertexIndex;
-				vIndex[1] = vertexIndex + step;
-				vIndex[2] = vertexIndex + 1;
+				vIndex[1] = vertexIndex + 1;
+				vIndex[2] = vertexIndex + step;
 				vIndex[3] = vertexIndex + step + 1;
 
-				dgInt32 i0 = vIndex[indirectIndex[0]];
-				dgInt32 i1 = vIndex[indirectIndex[1]];
-				dgInt32 i2 = vIndex[indirectIndex[2]];
-				dgInt32 i3 = vIndex[indirectIndex[3]];
+				const dgInt32 i0 = vIndex[indirectIndex[0]];
+				const dgInt32 i1 = vIndex[indirectIndex[1]];
+				const dgInt32 i2 = vIndex[indirectIndex[2]];
+				const dgInt32 i3 = vIndex[indirectIndex[3]];
 
-				dgVector e0 (vertex[i1] - vertex[i0]);
-				dgVector e1 (vertex[i3] - vertex[i0]);
-				dgVector e2 (vertex[i2] - vertex[i0]);
-				dgVector n1 (e0 *  e1);
-				dgVector n0 (e1 *  e2);
+				const dgVector e0 (vertex[i0] - vertex[i1]);
+				const dgVector e1 (vertex[i2] - vertex[i1]);
+				const dgVector e2 (vertex[i3] - vertex[i1]);
+				dgVector n0 (e0 *  e1);
+				dgVector n1 (e1 *  e2);
 
 				//normalBase 
-				dgInt32 normalIndex0 = normalBase + indirectIndex[5];
+				const dgInt32 normalIndex0 = normalBase;
 				n0 = n0.CompProduct4(n0.DotProduct4(n0).InvSqrt());
-				vertex[normalIndex0] = n0;
+				vertex[normalBase] = n0;
 
-				dgInt32 normalIndex1 = normalBase + indirectIndex[6];
+				const dgInt32 normalIndex1 = normalBase + 1;
 				n1 = n1.CompProduct4(n1.DotProduct4(n1).InvSqrt());
 				vertex[normalIndex1] = n1;
 
 				faceIndexCount[faceCount] = 3;
-				indices[index + 0 + 0] = i0;
+				indices[index + 0 + 0] = i2;
 				indices[index + 0 + 1] = i1;
-				indices[index + 0 + 2] = i3;
+				indices[index + 0 + 2] = i0;
 				indices[index + 0 + 3] = m_atributeMap[zStep + x];
 				indices[index + 0 + 4] = normalIndex0;
 				indices[index + 0 + 5] = normalIndex0;
@@ -773,9 +781,9 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 				indices[index + 0 + 8] = faceSize;
 
 				faceIndexCount[faceCount + 1] = 3;
-				indices[index + 9 + 0] = i0;
-				indices[index + 9 + 1] = i3;
-				indices[index + 9 + 2] = i2;
+				indices[index + 9 + 0] = i1;
+				indices[index + 9 + 1] = i2;
+				indices[index + 9 + 2] = i3;
 				indices[index + 9 + 3] = m_atributeMap[zStep + x];
 				indices[index + 9 + 4] = normalIndex1;
 				indices[index + 9 + 5] = normalIndex1;
@@ -783,10 +791,10 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 				indices[index + 9 + 7] = normalIndex1;
 				indices[index + 9 + 8] = faceSize;
 
-				dgFloat32 dist (n0 % (vertex[i1] - vertex[i2]));
+				dgFloat32 dist (n0 % (vertex[i3] - vertex[i1]));
 				if (dist < -dgFloat32 (1.0e-3f)) {
-					indices[index + 0 + 7] = normalIndex0;
 					indices[index + 0 + 5] = normalIndex1;
+					indices[index + 9 + 5] = normalIndex0;
 				}
 
 				index += 9 * 2;
@@ -797,65 +805,36 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 			vertexIndex ++;
 		}
 
-/*
 		step = x1 - x0;
 		for (dgInt32 z = z0; z < z1; z ++) {
 			dgInt32 vertexBase = (z - z0) * step;
 			dgInt32 triangleIndexBase = vertexBase * (2 * 9);
 			for (dgInt32 x = x0; x < (x1 - 1); x ++) {
+				const dgInt32 code = (m_diagonals[vertexBase + x] << 1) + m_diagonals[vertexBase + x + 1];
+				const dgInt32* const edgeMap = &m_horizontalEdgeMap[code][0];
+
 				dgInt32* const triangles = &indices[triangleIndexBase + (x - x0) * (2 * 9)];
-				if (m_diagonals[vertexBase + x]) {
-					const dgVector& origin = vertex[triangles[0 * 9 + 0]];
-					if (m_diagonals[vertexBase + x + 1]) {
-						const dgVector& testPoint = vertex[triangles[3 * 9 + 0]];
-						const dgVector& normal = vertex[triangles[0 * 9 + 4]];
-						dgFloat32 dist (normal % (testPoint - origin));
-						if (dist < -dgFloat32 (1.0e-3f)) {
-							dgInt32 i0 = 0 * 9 + 6;
-							dgInt32 i1 = 3 * 9 + 6;
-							triangles[i0] = triangles[3 * 9 + 4];
-							triangles[i1] = triangles[1 * 9 + 4];
-						}
-					} else {
-						const dgVector& testPoint = vertex[triangles[2 * 9 + 2]];
-						const dgVector& normal = vertex[triangles[0 * 9 + 4]];
+				const dgInt32 i0 = triangles[edgeMap[0]];
+				const dgInt32 i1 = triangles[edgeMap[1]];
+				const dgInt32 i2 = triangles[edgeMap[2]];
 
-						dgFloat32 dist (normal % (testPoint - origin));
-						if (dist < -dgFloat32 (1.0e-3f)) {
-							dgInt32 i0 = 0 * 9 + 6;
-							dgInt32 i1 = 2 * 9 + 0;
-							triangles[i0] = triangles[2 * 9 + 4];
-							triangles[i1] = triangles[0 * 9 + 4];
-						}
-					}
-				} else {
-					const dgVector& origin = vertex[triangles[1 * 9 + 0]];
-					if (m_diagonals[vertexBase + x + 1]) {
-						const dgVector& testPoint = vertex[triangles[2 * 9 + 2]];
-						const dgVector& normal = vertex[triangles[1 * 9 + 4]];
-						dgFloat32 dist (normal % (testPoint - origin));
-						if (dist < -dgFloat32 (1.0e-3f)) {
-							dgInt32 i0 = 0 * 9 + 7;
-							dgInt32 i1 = 3 * 9 + 0;
-							triangles[i0] = triangles[2 * 9 + 4];
-							triangles[i1] = triangles[0 * 9 + 4];
-						}
-					} else {
-						const dgVector& testPoint = vertex[triangles[3 * 9 + 0]];
-						const dgVector& normal = vertex[triangles[1 * 9 + 4]];
+				const dgVector& origin = vertex[i0];
+				const dgVector& testPoint = vertex[i1];
+				const dgVector& normal = vertex[i2];
+				dgFloat32 dist (normal % (testPoint - origin));
 
-						dgFloat32 dist (normal % (testPoint - origin));
-						if (dist < -dgFloat32 (1.0e-3f)) {
-							dgInt32 i0 = 0 * 9 + 7;
-							dgInt32 i1 = 3 * 9 + 1;
-							triangles[i0] = triangles[3 * 9 + 4];
-							triangles[i1] = triangles[1 * 9 + 4];
-						}
-					}
+				if (dist < -dgFloat32 (1.0e-3f)) {
+					const dgInt32 i3 = edgeMap[3];
+					const dgInt32 i4 = edgeMap[4];
+					const dgInt32 i5 = edgeMap[5];
+					const dgInt32 i6 = edgeMap[6];
+					triangles[i3] = triangles[i6];
+					triangles[i4] = triangles[i5];
 				}
 			}
 		}
 
+/*
 		for (dgInt32 x = x0; x < x1; x ++) {
 			dgInt32 triangleIndexBase = x - x0;
 			for (dgInt32 z = z0; z < (z1 - 1); z ++) {	
