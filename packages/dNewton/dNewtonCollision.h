@@ -69,6 +69,8 @@ class dNewtonCollision: public dNewtonAlloc
 	CNEWTON_API void SetMatrix (const dFloat* const matrix);
 	CNEWTON_API void GetMatrix (dFloat* const matrix) const;
 
+	CNEWTON_API void CalculateAABB (const dFloat* const matrix, dFloat* const p0, dFloat* const p1) const;
+
 	CNEWTON_API virtual void DebugRender (const dFloat* const matrix, dDebugRenderer* const renderer) const;
 
 

@@ -105,6 +105,12 @@ void dNewtonCollision::DebugRender (const dFloat* const matrix, dDebugRenderer* 
 }
 
 
+void dNewtonCollision::CalculateAABB (const dFloat* const matrix, dFloat* const p0, dFloat* const p1) const
+{
+	NewtonCollisionCalculateAABB (m_shape, matrix, p0, p1);
+}
+
+
 
 dNewtonCollisionMesh::dNewtonCollisionMesh(dNewton* const world)
 	:dNewtonCollision(m_mesh)

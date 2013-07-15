@@ -117,7 +117,7 @@ void dMeshNodeInfo::BakeTransform (const dMatrix& transform)
 	matrix.PolarDecomposition (m_matrix, scale, stretchMatrix);
 	matrix = transform * dMatrix (GetIdentityMatrix(), scale, stretchMatrix);
 
-	NewtonMesApplyTransform (m_mesh, &matrix[0][0]);
+	NewtonMeshApplyTransform (m_mesh, &matrix[0][0]);
 }
 
 void dMeshNodeInfo::BuildFromVertexListIndexList(int faceCount, const int* const faceIndexCount, const int* faceMaterialIndex, 

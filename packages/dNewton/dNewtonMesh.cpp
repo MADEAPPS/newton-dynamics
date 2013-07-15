@@ -167,3 +167,7 @@ void dNewtonMesh::ApplyCylindricalMapping (int cylinderMatId, int capMatId)
 	NewtonMeshApplyCylindricalMapping(m_mesh, cylinderMatId, capMatId);
 }
 
+void dNewtonMesh::ApplyTransform (const dFloat* const matrix)
+{
+	NewtonMeshApplyTransform (m_mesh, matrix);
+}

@@ -7784,7 +7784,7 @@ NewtonMesh* NewtonMeshLoadOFF(const NewtonWorld* const newtonWorld, const char* 
 }
 
 
-void NewtonMesApplyTransform (const NewtonMesh* const mesh, const dFloat* const matrix)
+void NewtonMeshApplyTransform (const NewtonMesh* const mesh, const dFloat* const matrix)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
