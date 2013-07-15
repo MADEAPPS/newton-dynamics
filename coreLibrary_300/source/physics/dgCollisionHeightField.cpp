@@ -717,15 +717,16 @@ void dgCollisionHeightField::DebugCollision (const dgMatrix& matrix, OnDebugColl
 				case m_float32Bit:
 				{
 					const dgFloat32* const elevation = (dgFloat32*)m_elevationMap;
-					points[0 * 2 + 1] = dgVector ((x + 1) * m_horizontalScale, m_verticalScale * elevation[base + x +           1], (z + 1) * m_horizontalScale, dgFloat32 (0.0f));
+					points[0 * 2 + 1] = dgVector ((x + 1) * m_horizontalScale, m_verticalScale * elevation[base + x +           1], (z + 0) * m_horizontalScale, dgFloat32 (0.0f));
 					points[1 * 2 + 1] = dgVector ((x + 1) * m_horizontalScale, m_verticalScale * elevation[base + x + m_width + 1], (z + 1) * m_horizontalScale, dgFloat32 (0.0f));
 					break;
 				}
 
+
 				case m_unsigned16Bit:
 				{
 					const dgUnsigned16* const elevation = (dgUnsigned16*)m_elevationMap;
-					points[0 * 2 + 1] = dgVector ((x + 1) * m_horizontalScale, m_verticalScale * dgFloat32 (elevation[base + x +           1]), (z + 1) * m_horizontalScale, dgFloat32 (0.0f));
+					points[0 * 2 + 1] = dgVector ((x + 1) * m_horizontalScale, m_verticalScale * dgFloat32 (elevation[base + x +           1]), (z + 0) * m_horizontalScale, dgFloat32 (0.0f));
 					points[1 * 2 + 1] = dgVector ((x + 1) * m_horizontalScale, m_verticalScale * dgFloat32 (elevation[base + x + m_width + 1]), (z + 1) * m_horizontalScale, dgFloat32 (0.0f));
 					break;
 				}
