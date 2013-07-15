@@ -83,8 +83,9 @@ void dNewton::OnCollisionDestructorCallback (const NewtonWorld* const newtonWorl
 void dNewton::OnCollisionCopyConstruct (const NewtonWorld* const world, NewtonCollision* const collision, const NewtonCollision* const sourceCollision)
 {
 	dNewtonCollision* const srcColl = (dNewtonCollision*) NewtonCollisionGetUserData(sourceCollision);
-	dAssert (srcColl);
-	srcColl->Clone(collision);
+	if (srcColl) {
+		srcColl->Clone(collision);
+	}
 }
 
 
