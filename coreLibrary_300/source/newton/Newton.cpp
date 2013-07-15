@@ -3512,15 +3512,17 @@ int NewtonTreeCollisionGetVertexListTriangleListInAABB(const NewtonCollision* co
 //
 // Return: Pointer to the collision.
 //
-NewtonCollision* NewtonCreateHeightFieldCollision(const NewtonWorld* const newtonWorld, int width, int height, int cellsDiagonals,
-												  const dFloat* const elevationMap, const char* const atributeMap,
-												  dFloat horizontalScale, int shapeID)
+//NewtonCollision* NewtonCreateHeightFieldCollision(const NewtonWorld* const newtonWorld, int width, int height, int cellsDiagonals,
+//												  const dFloat* const elevationMap, const char* const atributeMap,
+//												  dFloat horizontalScale, int shapeID)
+ NEWTON_API NewtonCollision* NewtonCreateHeightFieldCollision (const NewtonWorld* const newtonWorld, int width, int height, int gridsDiagonals, dgInt32 elevationdatType,
+															   const void* const elevationMap, const char* const attributeMap, dFloat verticalScale, dFloat horizontalScale, int shapeID)
+
 {
 	Newton* const world = (Newton *)newtonWorld;
 
 	TRACE_FUNCTION(__FUNCTION__);
-
-	dgCollisionInstance* const collision = world->CreateHeightFieldCollision(width, height, cellsDiagonals, elevationMap, atributeMap, horizontalScale);
+	dgCollisionInstance* const collision = world->CreateHeightFieldCollision(width, height, gridsDiagonals, elevationdatType, elevationMap, attributeMap, verticalScale, horizontalScale);
 	collision->SetUserDataID(dgUnsigned32 (shapeID));
 	return (NewtonCollision*) collision;
 }

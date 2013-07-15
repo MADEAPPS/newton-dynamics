@@ -52,24 +52,36 @@ dgInt32 dgCollisionHeightField::m_horizontalEdgeMap[][7] =
 
 
 dgCollisionHeightField::dgCollisionHeightField(
-	dgWorld* const world,
-	dgInt32 width, 
-	dgInt32 height, 
-	dgInt32 contructionMode, 
-	const dgFloat32* const elevationMap, 
-	const dgInt8* const atributeMap, 
-	dgFloat32 horizontalScale)
+	dgWorld* const world, dgInt32 width, dgInt32 height, dgInt32 contructionMode, 
+	const void* const elevationMap, dgElevationType elevationDataType, dgFloat32 verticalScale, 
+	const dgInt8* const atributeMap, dgFloat32 horizontalScale)
 	:dgCollisionMesh (world, m_heightField)
+	,m_width(width)
+	,m_height(height)
+	,m_diagonalMode (dgCollisionHeightFieldGridConstruction  (dgClamp (contructionMode, dgInt32 (m_normalDiagonals), dgInt32 (m_starInvertexDiagonals))))
+	,m_verticalScale(verticalScale)
+	,m_horizontalScale(horizontalScale)
+	,m_horizontalScaleInv (dgFloat32 (1.0f) / m_horizontalScale)
+	,m_userRayCastCallback(NULL)
+	,m_elevationDataType(elevationDataType)
 {
-	m_userRayCastCallback = NULL;
 	m_rtti |= dgCollisionHeightField_RTTI;
-	m_width = width;
-	m_height = height;
-	m_diagonalMode = dgCollisionHeightFieldGridConstruction  (dgClamp (contructionMode, dgInt32 (m_normalDiagonals), dgInt32 (m_starInvertexDiagonals)));
-	m_horizontalScale = horizontalScale;
 
-	m_elevationMap = (dgFloat32 *)dgMallocStack(m_width * m_height * sizeof (dgFloat32));
-	memcpy (m_elevationMap, elevationMap, m_width * m_height * sizeof (dgFloat32));
+	switch (m_elevationDataType) 
+	{
+		case m_float32Bit:
+		{
+			m_elevationMap = dgMallocStack(m_width * m_height * sizeof (dgFloat32));
+			memcpy (m_elevationMap, elevationMap, m_width * m_height * sizeof (dgFloat32));
+			break;
+		}
+
+		case m_unsigned16Bit:
+		{
+			m_elevationMap = dgMallocStack(m_width * m_height * sizeof (dgUnsigned16));
+			memcpy (m_elevationMap, elevationMap, m_width * m_height * sizeof (dgUnsigned16));
+		}
+	}
 
 	dgInt32 attibutePaddedMapSize = (m_width * m_height + 4) & -4; 
 	m_atributeMap = (dgInt8 *)dgMallocStack(attibutePaddedMapSize * sizeof (dgInt8));
@@ -211,19 +223,6 @@ dgCollisionHeightField::dgCollisionHeightField(
 	memcpy (m_atributeMap, atributeMap, m_width * m_height * sizeof (dgInt8));
 
 
-	dgFloat32 y0 = dgFloat32 (dgFloat32 (1.0e10f));
-	dgFloat32 y1 = dgFloat32 (-dgFloat32 (1.0e10f));
-	for (dgInt32 i = 0; i < m_width * m_height; i ++) {
-		y0 = dgMin(y0, dgFloat32 (m_elevationMap[i]));
-		y1 = dgMax(y1, dgFloat32 (m_elevationMap[i]));
-	}
-
-
-	m_minBox = dgVector (dgFloat32 (dgFloat32 (0.0f)), y0, dgFloat32 (dgFloat32 (0.0f)), dgFloat32 (0.0f)); 
-	m_maxBox = dgVector (dgFloat32 (m_width-1) * m_horizontalScale, y1, dgFloat32 (m_height-1) * m_horizontalScale, dgFloat32 (0.0f)); 
-
-	m_horizontalScaleInv = dgFloat32 (1.0f) / m_horizontalScale;
-
 	dgTree<void*, unsigned>::dgTreeNode* nodeData = world->m_perInstanceData.Find(DG_HIGHTFILD_DATA_ID);
 	if (!nodeData) {
 		m_instanceData = (dgPerIntanceData*) dgMallocStack (sizeof (dgPerIntanceData));
@@ -239,6 +238,8 @@ dgCollisionHeightField::dgCollisionHeightField(
 	m_instanceData = (dgPerIntanceData*) nodeData->GetInfo();
 
 	m_instanceData->m_refCount ++;
+
+	CalculateAABB();
 	SetCollisionBBox(m_minBox, m_maxBox);
 }
 
@@ -246,22 +247,42 @@ dgCollisionHeightField::dgCollisionHeightField (dgWorld* const world, dgDeserial
 	:dgCollisionMesh (world, deserialization, userData)
 {
 	dgAssert (m_rtti | dgCollisionHeightField_RTTI);
+	
+	dgInt32 elevationDataType;
 
 	m_userRayCastCallback = NULL;
 	deserialization (userData, &m_width, sizeof (dgInt32));
 	deserialization (userData, &m_height, sizeof (dgInt32));
 	deserialization (userData, &m_diagonalMode, sizeof (dgInt32));
+	deserialization (userData, &elevationDataType, sizeof (dgInt32));
+	deserialization (userData, &m_verticalScale, sizeof (dgFloat32));
 	deserialization (userData, &m_horizontalScale, sizeof (dgFloat32));
 	deserialization (userData, &m_minBox.m_x, sizeof (dgVector)); 
 	deserialization (userData, &m_maxBox.m_x, sizeof (dgVector)); 
 
-	m_elevationMap = (dgFloat32 *)dgMallocStack(m_width * m_height * sizeof (dgFloat32));
+	m_elevationDataType = dgElevationType (elevationDataType);
 
 	dgInt32 attibutePaddedMapSize = (m_width * m_height + 4) & -4; 
 	m_atributeMap = (dgInt8 *)dgMallocStack(attibutePaddedMapSize * sizeof (dgInt8));
 	m_diagonals = (dgInt8 *)dgMallocStack(attibutePaddedMapSize * sizeof (dgInt8));
 
-	deserialization (userData, m_elevationMap, m_width * m_height * sizeof (dgFloat32));
+	switch (m_elevationDataType) 
+	{
+		case m_float32Bit:
+		{
+			m_elevationMap = dgMallocStack(m_width * m_height * sizeof (dgFloat32));
+			deserialization (userData, m_elevationMap, m_width * m_height * sizeof (dgFloat32));
+			break;
+		}
+
+		case m_unsigned16Bit:
+		{
+			m_elevationMap = dgMallocStack(m_width * m_height * sizeof (dgUnsigned16));
+			deserialization (userData, m_elevationMap, m_width * m_height * sizeof (dgUnsigned16));
+			break;
+		}
+	}
+	
 	deserialization (userData, m_atributeMap, attibutePaddedMapSize * sizeof (dgInt8));
 	deserialization (userData, m_diagonals, attibutePaddedMapSize * sizeof (dgInt8));
 
@@ -305,14 +326,30 @@ void dgCollisionHeightField::Serialize(dgSerialize callback, void* const userDat
 {
 	SerializeLow(callback, userData);
 
+	dgInt32 elevationDataType = m_elevationDataType;
+
 	callback (userData, &m_width, sizeof (dgInt32));
 	callback (userData, &m_height, sizeof (dgInt32));
 	callback (userData, &m_diagonalMode, sizeof (dgInt32));
+	callback (userData, &elevationDataType, sizeof (dgInt32));
+	callback (userData, &m_verticalScale, sizeof (dgFloat32));
 	callback (userData, &m_horizontalScale, sizeof (dgFloat32));
 	callback (userData, &m_minBox.m_x, sizeof (dgVector)); 
 	callback (userData, &m_maxBox.m_x, sizeof (dgVector)); 
 
-	callback (userData, m_elevationMap, m_width * m_height * sizeof (dgFloat32));
+	switch (m_elevationDataType) 
+	{
+		case m_float32Bit:
+		{
+			callback (userData, m_elevationMap, m_width * m_height * sizeof (dgFloat32));
+			break;
+		}
+		case m_unsigned16Bit:
+		{
+			callback (userData, m_elevationMap, m_width * m_height * sizeof (dgUnsigned16));
+			break;
+		}
+	}
 
 	dgInt32 attibutePaddedMapSize = (m_width * m_height + 4) & -4; 
 	callback (userData, m_atributeMap, attibutePaddedMapSize * sizeof (dgInt8));
@@ -338,6 +375,35 @@ void dgCollisionHeightField::AllocateVertex(dgWorld* const world, dgInt32 thread
 }
 
 
+void dgCollisionHeightField::CalculateAABB()
+{
+	dgFloat32 y0 = dgFloat32 (dgFloat32 (1.0e10f));
+	dgFloat32 y1 = dgFloat32 (-dgFloat32 (1.0e10f));
+	switch (m_elevationDataType) 
+	{
+		case m_float32Bit:
+		{
+			const dgFloat32* const elevation = (dgFloat32*)m_elevationMap;
+			for (dgInt32 i = 0; i < m_width * m_height; i ++) {
+				y0 = dgMin(y0, elevation[i]);
+				y1 = dgMax(y1, elevation[i]);
+			}
+			break;
+		}
+
+		case m_unsigned16Bit:
+		{
+			const dgUnsigned16* const elevation = (dgUnsigned16*)m_elevationMap;
+			for (dgInt32 i = 0; i < m_width * m_height; i ++) {
+				y0 = dgMin(y0, dgFloat32 (elevation[i]));
+				y1 = dgMax(y1, dgFloat32 (elevation[i]));
+			}
+		}
+	}
+	m_minBox = dgVector (dgFloat32 (dgFloat32 (0.0f)),                y0 * m_verticalScale, dgFloat32 (dgFloat32 (0.0f)),               dgFloat32 (0.0f)); 
+	m_maxBox = dgVector (dgFloat32 (m_width - 1) * m_horizontalScale, y1 * m_verticalScale, dgFloat32 (m_height-1) * m_horizontalScale, dgFloat32 (0.0f)); 
+}
+
 
 void dgCollisionHeightField::GetCollisionInfo(dgCollisionInfo* const info) const
 {
@@ -347,8 +413,9 @@ void dgCollisionHeightField::GetCollisionInfo(dgCollisionInfo* const info) const
 	data.m_width = m_width;
 	data.m_height = m_height;
 	data.m_gridsDiagonals = m_diagonalMode;
+	data.m_elevationDataType = m_elevationDataType;
+	data.m_verticalScale = m_verticalScale;
 	data.m_horizonalScale = m_horizontalScale;
-	data.m_verticalScale = dgFloat32 (1.0f);
 	data.m_atributes = m_atributeMap;
 	data.m_elevation = m_elevationMap;
 }
@@ -415,10 +482,28 @@ dgFloat32 dgCollisionHeightField::RayCastCell (const dgFastRayTest& ray, dgInt32
 
 	dgInt32 base = zIndex0 * m_width + xIndex0;
 	
-	points[0 * 2 + 0] = dgVector ((xIndex0 + 0) * m_horizontalScale, dgFloat32 (m_elevationMap[base]),			     (zIndex0 + 0) * m_horizontalScale, dgFloat32 (0.0f));
-	points[0 * 2 + 1] = dgVector ((xIndex0 + 1) * m_horizontalScale, dgFloat32 (m_elevationMap[base + 1]),           (zIndex0 + 0) * m_horizontalScale, dgFloat32 (0.0f));
-	points[1 * 2 + 1] = dgVector ((xIndex0 + 1) * m_horizontalScale, dgFloat32 (m_elevationMap[base + m_width + 1]), (zIndex0 + 1) * m_horizontalScale, dgFloat32 (0.0f));
-	points[1 * 2 + 0] = dgVector ((xIndex0 + 0) * m_horizontalScale, dgFloat32 (m_elevationMap[base + m_width + 0]), (zIndex0 + 1) * m_horizontalScale, dgFloat32 (0.0f));
+	switch (m_elevationDataType) 
+	{
+		case m_float32Bit:
+		{
+			const dgFloat32* const elevation = (dgFloat32*)m_elevationMap;
+			points[0 * 2 + 0] = dgVector ((xIndex0 + 0) * m_horizontalScale, m_verticalScale * elevation[base],			      (zIndex0 + 0) * m_horizontalScale, dgFloat32 (0.0f));
+			points[0 * 2 + 1] = dgVector ((xIndex0 + 1) * m_horizontalScale, m_verticalScale * elevation[base + 1],           (zIndex0 + 0) * m_horizontalScale, dgFloat32 (0.0f));
+			points[1 * 2 + 1] = dgVector ((xIndex0 + 1) * m_horizontalScale, m_verticalScale * elevation[base + m_width + 1], (zIndex0 + 1) * m_horizontalScale, dgFloat32 (0.0f));
+			points[1 * 2 + 0] = dgVector ((xIndex0 + 0) * m_horizontalScale, m_verticalScale * elevation[base + m_width + 0], (zIndex0 + 1) * m_horizontalScale, dgFloat32 (0.0f));
+			break;
+		}
+
+		case m_unsigned16Bit:
+		{
+			const dgUnsigned16* const elevation = (dgUnsigned16*)m_elevationMap;
+			points[0 * 2 + 0] = dgVector ((xIndex0 + 0) * m_horizontalScale,  m_verticalScale * dgFloat32 (elevation[base]),			   (zIndex0 + 0) * m_horizontalScale, dgFloat32 (0.0f));
+			points[0 * 2 + 1] = dgVector ((xIndex0 + 1) * m_horizontalScale,  m_verticalScale * dgFloat32 (elevation[base + 1]),           (zIndex0 + 0) * m_horizontalScale, dgFloat32 (0.0f));
+			points[1 * 2 + 1] = dgVector ((xIndex0 + 1) * m_horizontalScale,  m_verticalScale * dgFloat32 (elevation[base + m_width + 1]), (zIndex0 + 1) * m_horizontalScale, dgFloat32 (0.0f));
+			points[1 * 2 + 0] = dgVector ((xIndex0 + 0) * m_horizontalScale,  m_verticalScale * dgFloat32 (elevation[base + m_width + 0]), (zIndex0 + 1) * m_horizontalScale, dgFloat32 (0.0f));
+			break;
+		}
+	}
 	
 	dgFloat32 t = dgFloat32 (1.2f);
 	if (!m_diagonals[base]) {
@@ -604,13 +689,51 @@ void dgCollisionHeightField::DebugCollision (const dgMatrix& matrix, OnDebugColl
 
 	dgInt32 base = 0;
 	for (dgInt32 z = 0; z < m_height - 1; z ++) {
-		points[0 * 2 + 0] = matrix.TransformVector(dgVector ((0 + 0) * m_horizontalScale, dgFloat32 (m_elevationMap[base + 0              ]), (z + 0) * m_horizontalScale, dgFloat32 (0.0f)));
-		points[1 * 2 + 0] = matrix.TransformVector(dgVector ((0 + 0) * m_horizontalScale, dgFloat32 (m_elevationMap[base + 0 + m_width + 0]), (z + 1) * m_horizontalScale, dgFloat32 (0.0f)));
+		switch (m_elevationDataType) 
+		{
+			case m_float32Bit:
+			{
+				const dgFloat32* const elevation = (dgFloat32*)m_elevationMap;
+				points[0 * 2 + 0] = dgVector ((0 + 0) * m_horizontalScale, m_verticalScale * elevation[base + 0              ], (z + 0) * m_horizontalScale, dgFloat32 (0.0f));
+				points[1 * 2 + 0] = dgVector ((0 + 0) * m_horizontalScale, m_verticalScale * elevation[base + 0 + m_width + 0], (z + 1) * m_horizontalScale, dgFloat32 (0.0f));
+				break;
+			}
+
+			case m_unsigned16Bit:
+			{
+				const dgUnsigned16* const elevation = (dgUnsigned16*)m_elevationMap;
+				points[0 * 2 + 0] = dgVector ((0 + 0) * m_horizontalScale, m_verticalScale * dgFloat32 (elevation[base + 0              ]), (z + 0) * m_horizontalScale, dgFloat32 (0.0f));
+				points[1 * 2 + 0] = dgVector ((0 + 0) * m_horizontalScale, m_verticalScale * dgFloat32 (elevation[base + 0 + m_width + 0]), (z + 1) * m_horizontalScale, dgFloat32 (0.0f));
+				break;
+			}
+		}
+		points[0 * 2 + 0] = matrix.TransformVector(points[0 * 2 + 0]);
+		points[1 * 2 + 0] = matrix.TransformVector(points[1 * 2 + 0]);
 
 		for (dgInt32 x = 0; x < m_width - 1; x ++) {
 			dgTriplex triangle[3];
-			points[0 * 2 + 1] = matrix.TransformVector(dgVector ((x + 1) * m_horizontalScale, dgFloat32 (m_elevationMap[base + x +           1]), (z + 0) * m_horizontalScale, dgFloat32 (0.0f)));
-			points[1 * 2 + 1] = matrix.TransformVector(dgVector ((x + 1) * m_horizontalScale, dgFloat32 (m_elevationMap[base + x + m_width + 1]), (z + 1) * m_horizontalScale, dgFloat32 (0.0f)));
+			switch (m_elevationDataType) 
+			{
+				case m_float32Bit:
+				{
+					const dgFloat32* const elevation = (dgFloat32*)m_elevationMap;
+					points[0 * 2 + 1] = dgVector ((x + 1) * m_horizontalScale, m_verticalScale * elevation[base + x +           1], (z + 1) * m_horizontalScale, dgFloat32 (0.0f));
+					points[1 * 2 + 1] = dgVector ((x + 1) * m_horizontalScale, m_verticalScale * elevation[base + x + m_width + 1], (z + 1) * m_horizontalScale, dgFloat32 (0.0f));
+					break;
+				}
+
+				case m_unsigned16Bit:
+				{
+					const dgUnsigned16* const elevation = (dgUnsigned16*)m_elevationMap;
+					points[0 * 2 + 1] = dgVector ((x + 1) * m_horizontalScale, m_verticalScale * dgFloat32 (elevation[base + x +           1]), (z + 1) * m_horizontalScale, dgFloat32 (0.0f));
+					points[1 * 2 + 1] = dgVector ((x + 1) * m_horizontalScale, m_verticalScale * dgFloat32 (elevation[base + x + m_width + 1]), (z + 1) * m_horizontalScale, dgFloat32 (0.0f));
+					break;
+				}
+			}
+			points[0 * 2 + 1] = matrix.TransformVector(points[0 * 2 + 1]);
+			points[1 * 2 + 1] = matrix.TransformVector(points[1 * 2 + 1]);
+
+
 			const dgInt32* const indirectIndex = &m_cellIndices[m_diagonals[z * m_width + x]][0];
 
 			dgInt32 i0 = indirectIndex[0];
@@ -665,21 +788,47 @@ void dgCollisionHeightField::GetLocalAABB (const dgVector& p0, const dgVector& p
 	dgFloat32 minHeight = dgFloat32 (1.0e10f);
 	dgFloat32 maxHeight = dgFloat32 (-1.0e10f);
 	dgInt32 base = z0 * m_width;
-	for (dgInt32 z = z0; z <= z1; z ++) {
-		for (dgInt32 x = x0; x <= x1; x ++) {
-			dgFloat32 high = m_elevationMap[base + x];
-			if (high < minHeight) {
-				minHeight = high;
+	switch (m_elevationDataType) 
+	{
+		case m_float32Bit:
+		{
+			const dgFloat32* const elevation = (dgFloat32*)m_elevationMap;
+			for (dgInt32 z = z0; z <= z1; z ++) {
+				for (dgInt32 x = x0; x <= x1; x ++) {
+					dgFloat32 high = elevation[base + x];
+					if (high < minHeight) {
+						minHeight = high;
+					}
+					if (high > maxHeight) {
+						maxHeight = high;
+					}
+				}
+				base += m_width;
 			}
-			if (high > maxHeight) {
-				maxHeight = high;
-			}
+			break;
 		}
-		base += m_width;
+
+		case m_unsigned16Bit:
+		{
+			const dgUnsigned16* const elevation = (dgUnsigned16*)m_elevationMap;
+			for (dgInt32 z = z0; z <= z1; z ++) {
+				for (dgInt32 x = x0; x <= x1; x ++) {
+					dgFloat32 high = dgFloat32 (elevation[base + x]);
+					if (high < minHeight) {
+						minHeight = high;
+					}
+					if (high > maxHeight) {
+						maxHeight = high;
+					}
+				}
+				base += m_width;
+			}
+			break;
+		}
 	}
 
-	boxP0.m_y = minHeight;
-	boxP1.m_y = maxHeight;
+	boxP0.m_y = m_verticalScale * minHeight;
+	boxP1.m_y = m_verticalScale * maxHeight;
 }
 
 
@@ -699,21 +848,45 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 
 	dgFloat32 minHeight = dgFloat32 (1.0e10f);
 	dgFloat32 maxHeight = dgFloat32 (-1.0e10f);
-
 	dgInt32 base = z0 * m_width;
-	for (dgInt32 z = z0; z <= z1; z ++) {
-		for (dgInt32 x = x0; x <= x1; x ++) {
-			dgFloat32 high = m_elevationMap[base + x];
-			if (high < minHeight) {
-				minHeight = high;
+	switch (m_elevationDataType) 
+	{
+		case m_float32Bit:
+		{
+			const dgFloat32* const elevation = (dgFloat32*)m_elevationMap;
+			for (dgInt32 z = z0; z <= z1; z ++) {
+				for (dgInt32 x = x0; x <= x1; x ++) {
+					dgFloat32 high = elevation[base + x];
+					if (high < minHeight) {
+						minHeight = high;
+					}
+					if (high > maxHeight) {
+						maxHeight = high;
+					}
+				}
+				base += m_width;
 			}
-			if (high > maxHeight) {
-				maxHeight = high;
-			}
+			break;
 		}
-		base += m_width;
-	}
 
+		case m_unsigned16Bit:
+		{
+			const dgUnsigned16* const elevation = (dgUnsigned16*)m_elevationMap;
+			for (dgInt32 z = z0; z <= z1; z ++) {
+				for (dgInt32 x = x0; x <= x1; x ++) {
+					dgFloat32 high = dgFloat32 (elevation[base + x]);
+					if (high < minHeight) {
+						minHeight = high;
+					}
+					if (high > maxHeight) {
+						maxHeight = high;
+					}
+				}
+				base += m_width;
+			}
+			break;
+		}
+	}
 
 	if (!((maxHeight < boxP0.m_y) || (minHeight > boxP1.m_y))) {
 		// scan the vertices's intersected by the box extend
@@ -726,16 +899,37 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 		base = z0 * m_width;
 		dgVector* const vertex = m_instanceData->m_vertex[data->m_threadNumber];
 
-		for (dgInt32 z = z0; z <= z1; z ++) {
-			for (dgInt32 x = x0; x <= x1; x ++) {
-				vertex[vertexIndex] = dgVector(m_horizontalScale * x, m_elevationMap[base + x], m_horizontalScale * z, dgFloat32 (0.0f));
-				vertexIndex ++;
-				dgAssert (vertexIndex <= m_instanceData->m_vertexCount[data->m_threadNumber]); 
+		switch (m_elevationDataType) 
+		{
+			case m_float32Bit:
+			{
+				const dgFloat32* const elevation = (dgFloat32*)m_elevationMap;
+				for (dgInt32 z = z0; z <= z1; z ++) {
+					for (dgInt32 x = x0; x <= x1; x ++) {
+						vertex[vertexIndex] = dgVector(m_horizontalScale * x, m_verticalScale * elevation[base + x], m_horizontalScale * z, dgFloat32 (0.0f));
+						vertexIndex ++;
+						dgAssert (vertexIndex <= m_instanceData->m_vertexCount[data->m_threadNumber]); 
+					}
+					base += m_width;
+				}
+				break;
 			}
-			base += m_width;
+
+			case m_unsigned16Bit:
+			{
+				const dgUnsigned16* const elevation = (dgUnsigned16*)m_elevationMap;
+				for (dgInt32 z = z0; z <= z1; z ++) {
+					for (dgInt32 x = x0; x <= x1; x ++) {
+						vertex[vertexIndex] = dgVector(m_horizontalScale * x, m_verticalScale * dgFloat32 (elevation[base + x]), m_horizontalScale * z, dgFloat32 (0.0f));
+						vertexIndex ++;
+						dgAssert (vertexIndex <= m_instanceData->m_vertexCount[data->m_threadNumber]); 
+					}
+					base += m_width;
+				}
+				break;
+			}
 		}
 	
-
 		dgInt32 normalBase = vertexIndex;
 		vertexIndex = 0;
 		dgInt32 index = 0;
@@ -850,8 +1044,6 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 				const dgInt32 diagBase = m_width * z;
 				const dgInt32 code = (m_diagonals[diagBase + x] << 1) + m_diagonals[diagBase + m_width + x];
 				const dgInt32* const edgeMap = &m_verticalEdgeMap[code][0];
-
-dgAssert (code != 2);
 
 				dgInt32* const triangles = &indices[triangleIndexBase + (x - x0) * (2 * 9)];
 				const dgInt32 i0 = triangles[edgeMap[0]];

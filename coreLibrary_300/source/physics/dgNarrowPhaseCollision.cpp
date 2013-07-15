@@ -244,10 +244,12 @@ dgCollisionInstance* dgWorld::CreateStaticUserMesh (const dgVector& boxP0, const
 }
 
 dgCollisionInstance* dgWorld::CreateHeightFieldCollision(
-	dgInt32 width, dgInt32 height, dgInt32 contructionMode, 
-	const dgFloat32* const elevationMap, const dgInt8* const atributeMap, dgFloat32 horizontalScale)
+	dgInt32 width, dgInt32 height, dgInt32 contructionMode, dgInt32 elevationDataType, 
+	const void* const elevationMap, const dgInt8* const atributeMap, dgFloat32 verticalScale, dgFloat32 horizontalScale)
 {
-	dgCollision* const collision = new  (m_allocator) dgCollisionHeightField (this, width, height, contructionMode, elevationMap, atributeMap, horizontalScale);
+	dgCollision* const collision = new  (m_allocator) dgCollisionHeightField (this, width, height, contructionMode, elevationMap, 
+																			  elevationDataType	? dgCollisionHeightField::m_unsigned16Bit : dgCollisionHeightField::m_float32Bit,	
+																			  verticalScale, atributeMap, horizontalScale);
 	dgCollisionInstance* const instance = CreateInstance (collision, 0, dgGetIdentityMatrix()); 
 	collision->Release();
 	return instance;

@@ -142,11 +142,8 @@ void dgCollisionMesh::SetCollisionBBox (const dgVector& p0, const dgVector& p1)
 	dgAssert (p0.m_y <= p1.m_y);
 	dgAssert (p0.m_z <= p1.m_z);
 
-	m_boxSize = (p1 - p0).Scale3 (dgFloat32 (0.5f)); 
-	m_boxOrigin = (p1 + p0).Scale3 (dgFloat32 (0.5f)); 
-
-	m_boxSize.m_w = dgFloat32 (0.0f);
-	m_boxOrigin.m_w = dgFloat32 (0.0f);
+	m_boxSize = (p1 - p0).Scale4 (dgFloat32 (0.5f)) & dgVector::m_triplexMask;
+	m_boxOrigin = (p1 + p0).Scale4 (dgFloat32 (0.5f)) & dgVector::m_triplexMask; 
 }
 
 dgInt32 dgCollisionMesh::CalculateSignature () const

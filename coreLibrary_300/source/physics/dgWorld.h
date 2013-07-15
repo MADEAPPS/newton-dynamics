@@ -334,8 +334,8 @@ class dgWorld:
 
 	dgCollisionInstance* CreateBVH ();	
 	dgCollisionInstance* CreateStaticUserMesh (const dgVector& boxP0, const dgVector& boxP1, const dgUserMeshCreation& data);
-	dgCollisionInstance* CreateHeightFieldCollision(dgInt32 width, dgInt32 height, dgInt32 contructionMode, 
-										 const dgFloat32* const elevationMap, const dgInt8* const atributeMap, dgFloat32 horizontalScale);
+	dgCollisionInstance* CreateHeightFieldCollision(dgInt32 width, dgInt32 height, dgInt32 contructionMode, dgInt32 elevationDataType, 
+													const void* const elevationMap, const dgInt8* const atributeMap, dgFloat32 verticalScale, dgFloat32 horizontalScale);
 	dgCollisionInstance* CreateScene ();	
 
 	static void OnSerializeToFile (void* const userData, const void* const buffer, size_t size);

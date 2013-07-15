@@ -32,6 +32,12 @@ typedef dgFloat32 (*dgCollisionHeightFieldRayCastCallback) (const dgBody* const 
 class dgCollisionHeightField: public dgCollisionMesh
 {
 	public:
+	enum dgElevationType
+	{
+		m_float32Bit = 0,
+		m_unsigned16Bit,
+	};
+
 	enum dgCollisionHeightFieldGridConstruction
 	{
 		m_normalDiagonals = 0,
@@ -44,7 +50,8 @@ class dgCollisionHeightField: public dgCollisionMesh
 		m_starInvertexDiagonals,
 	};
 	dgCollisionHeightField (dgWorld* const world, dgInt32 width, dgInt32 height, dgInt32 contructionMode, 
-							const dgFloat32* const elevationMap, const dgInt8* const atributeMap, dgFloat32 horizontalScale);
+							const void* const elevationMap, dgElevationType elevationDataType, dgFloat32 verticalScale, 
+							const dgInt8* const atributeMap, dgFloat32 horizontalScale);
 
 	dgCollisionHeightField (dgWorld* const world, dgDeserialize deserialization, void* const userData);
 
@@ -55,6 +62,16 @@ class dgCollisionHeightField: public dgCollisionMesh
 
 
 	private:
+	class dgPerIntanceData
+	{
+		public:
+		dgWorld* m_world;
+		dgInt32 m_refCount;
+		dgInt32 m_vertexCount[DG_MAX_THREADS_HIVE_COUNT];
+		dgVector *m_vertex[DG_MAX_THREADS_HIVE_COUNT];
+	};
+
+	void CalculateAABB();
 	
 	void AllocateVertex(dgWorld* const world, dgInt32 thread) const;
 	void CalculateMinExtend2d (const dgVector& p0, const dgVector& p1, dgVector& boxP0, dgVector& boxP1) const;
@@ -72,27 +89,20 @@ class dgCollisionHeightField: public dgCollisionMesh
 
 	void GetLocalAABB (const dgVector& p0, const dgVector& p1, dgVector& boxP0, dgVector& boxP1) const;
 
+	dgVector m_minBox;
+	dgVector m_maxBox;
 
 	dgInt32 m_width;
 	dgInt32 m_height;
 	dgInt32 m_diagonalMode;
 	dgInt8* m_atributeMap;
 	dgInt8* m_diagonals;
-	dgFloat32* m_elevationMap;
+	void* m_elevationMap;
+	dgFloat32 m_verticalScale;
 	dgFloat32 m_horizontalScale;
 	dgFloat32 m_horizontalScaleInv;
 	dgCollisionHeightFieldRayCastCallback m_userRayCastCallback;
-
-	dgVector m_minBox;
-	dgVector m_maxBox;
-
-	struct dgPerIntanceData
-	{
-		dgWorld* m_world;
-		dgInt32 m_refCount;
-		dgInt32 m_vertexCount[DG_MAX_THREADS_HIVE_COUNT];
-		dgVector *m_vertex[DG_MAX_THREADS_HIVE_COUNT];
-	};
+	dgElevationType m_elevationDataType;
 
 	static dgInt32 m_cellIndices[][4];
 	static dgInt32 m_verticalEdgeMap[][7];

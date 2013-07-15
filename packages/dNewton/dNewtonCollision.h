@@ -140,10 +140,10 @@ class dNewtonCollisionScene: public dNewtonCollision
 class dNewtonCollisionHeightField: public dNewtonCollision
 {
 	public: 
-	dNewtonCollisionHeightField (dNewton* const world, int width, int height, int gridsDiagonals, dFloat horizontalScale, const dFloat* const elevationMap, const char* const attributeMap, int shapeID)
+	dNewtonCollisionHeightField (dNewton* const world, int width, int height, int gridsDiagonals, int elevationdataType, dFloat vertcalScale, dFloat horizontalScale, const void* const elevationMap, const char* const attributeMap, int shapeID)
 		:dNewtonCollision(m_heighfield)
 	{
-		SetShape (NewtonCreateHeightFieldCollision (world->GetNewton(), width, height, gridsDiagonals, elevationMap, attributeMap, horizontalScale, shapeID));
+		SetShape (NewtonCreateHeightFieldCollision (world->GetNewton(), width, height, gridsDiagonals, elevationdataType, elevationMap, attributeMap, vertcalScale, horizontalScale, shapeID));
 	}
 
 	dNewtonCollision* Clone (NewtonCollision* const shape) const 
