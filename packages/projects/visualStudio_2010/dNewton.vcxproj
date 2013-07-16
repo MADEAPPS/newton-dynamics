@@ -70,6 +70,8 @@
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)_d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -92,7 +94,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Lib>
-      <OutputFile>$(OutDir)$(ProjectName)_d.lib</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
     <PostBuildEvent>
       <Command>
@@ -148,7 +150,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Lib>
-      <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
     <PostBuildEvent>
       <Command>
@@ -188,9 +190,12 @@
     <ClCompile Include="..\..\dNewton\dNewtonAlloc.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonBody.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonCollision.cpp" />
+    <ClCompile Include="..\..\dNewton\dNewtonDynamicBody.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonMesh.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonRayCast.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonSceneBody.cpp" />
+    <ClCompile Include="..\..\dNewton\dNewtonScopeBuffer.cpp" />
+    <ClCompile Include="..\..\dNewton\dNewtonTranformLerp.cpp" />
     <ClCompile Include="..\..\dNewton\dStdAfxNewton.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">Create</PrecompiledHeader>
@@ -203,9 +208,12 @@
     <ClInclude Include="..\..\dNewton\dNewtonAlloc.h" />
     <ClInclude Include="..\..\dNewton\dNewtonBody.h" />
     <ClInclude Include="..\..\dNewton\dNewtonCollision.h" />
+    <ClInclude Include="..\..\dNewton\dNewtonDynamicBody.h" />
     <ClInclude Include="..\..\dNewton\dNewtonMesh.h" />
     <ClInclude Include="..\..\dNewton\dNewtonRayCast.h" />
     <ClInclude Include="..\..\dNewton\dNewtonSceneBody.h" />
+    <ClInclude Include="..\..\dNewton\dNewtonScopeBuffer.h" />
+    <ClInclude Include="..\..\dNewton\dNewtonTranformLerp.h" />
     <ClInclude Include="..\..\dNewton\dStdAfxNewton.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
