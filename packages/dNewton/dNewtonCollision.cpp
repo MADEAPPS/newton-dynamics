@@ -150,7 +150,6 @@ dNewtonCollisionScene::dNewtonCollisionScene(dNewton* const world)
 }
 
 
-
 void dNewtonCollisionScene::BeginAddRemoveCollision()
 {
 	NewtonSceneCollisionBeginAddRemove (m_shape);	
@@ -171,4 +170,24 @@ void dNewtonCollisionScene::EndAddRemoveCollision()
 	NewtonSceneCollisionEndAddRemove(m_shape);	
 }
 
+
+void dNewtonCollisionCompound::BeginAddRemoveCollision()
+{
+	NewtonSceneCollisionBeginAddRemove (m_shape);	
+}
+
+void* dNewtonCollisionCompound::AddCollision(const dNewtonCollision* const collision)
+{
+	return NewtonSceneCollisionAddSubCollision (m_shape, collision->GetShape());
+}
+
+void dNewtonCollisionCompound::RemoveCollision (void* const handle)
+{
+	NewtonSceneCollisionRemoveSubCollision (m_shape, handle);
+}
+
+void dNewtonCollisionCompound::EndAddRemoveCollision()
+{
+	NewtonSceneCollisionEndAddRemove(m_shape);	
+}
 

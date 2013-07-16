@@ -45,8 +45,6 @@ class dNewtonAlloc
 
 	// default memory allocation functions if not other is provided 
 	CNEWTON_API static void SetAllocationDrivers (CNewtonAllocMemory alloc, CNewtonFreeMemory free);
-
-
 };
 
 #endif

@@ -23,28 +23,36 @@
 #define _D_NEWTON_SCOPE_BUFFER_H_
 
 #include "dStdAfxNewton.h"
+#include "dNewtonAlloc.h"
 
+
+class dNewtonScopeBufferBase: public dNewtonAlloc  
+{
+	protected:
+	CNEWTON_API dNewtonScopeBufferBase (int sizeInBytes);
+	CNEWTON_API ~dNewtonScopeBufferBase ();
+	void* m_ptr;
+};
 
 
 template<class T>
-class dNewtonScopeBuffer: public dNewtonAlloc  
+class dNewtonScopeBuffer: public dNewtonScopeBufferBase
 {
 	public:
 
 	dNewtonScopeBuffer (int size)
-		:m_size(size)
-		,m_ptr((T*)NewtonAlloc (size * sizeof (T)))
+		:dNewtonScopeBufferBase (size * sizeof (T))
+		,m_size(size)
 	{
 	}
 
 	~dNewtonScopeBuffer ()
 	{
-		NewtonFree(m_ptr);
 	}
 
 	int GetSizeInBytes() const
 	{
-		return size * sizeof (T);
+		return m_size * sizeof (T);
 	}
 
 	int GetElementsCount() const
@@ -56,19 +64,18 @@ class dNewtonScopeBuffer: public dNewtonAlloc
 	{
 		dAssert (entry >= 0);
 		dAssert ((entry < m_size) || ((m_size == 0) && (entry == 0)));
-		return m_ptr[entry];
+		return ((T*)m_ptr)[entry];
 	}
 
 	const T& operator[] (int entry) const
 	{
 		dAssert (entry >= 0);
 		dAssert ((entry < m_size) || ((m_size == 0) && (entry == 0)));
-		return m_ptr[entry];
+		return ((T*)m_ptr)[entry];
 	}
 
 	private:
 	int m_size;
-	T* m_ptr;
 };
 
 #endif

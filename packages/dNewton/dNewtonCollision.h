@@ -402,6 +402,11 @@ class dNewtonCollisionCompound: public dNewtonCollision
 		return new dNewtonCollisionCompound (*this, shape);
 	}
 
+	CNEWTON_API virtual void BeginAddRemoveCollision();
+	CNEWTON_API virtual void* AddCollision(const dNewtonCollision* const collision);
+	CNEWTON_API virtual void RemoveCollision (void* const handle);
+	CNEWTON_API virtual void EndAddRemoveCollision();
+
 	protected:
 	dNewtonCollisionCompound (const dNewtonCollisionCompound& srcCollision, NewtonCollision* const shape)
 		:dNewtonCollision (srcCollision, shape)
