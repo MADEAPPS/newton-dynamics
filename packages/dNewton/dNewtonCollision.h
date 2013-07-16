@@ -325,10 +325,10 @@ class dNewtonCollisionCylinder: public dNewtonCollision
 class dNewtonCollisionTaperedCylinder: public dNewtonCollision
 {
 	public: 
-	dNewtonCollisionTaperedCylinder (dNewton* const world, dFloat radio, dFloat height, int id)
+	dNewtonCollisionTaperedCylinder (dNewton* const world, dFloat radio0, dFloat radio1, dFloat height, int id)
 		:dNewtonCollision(m_taperedCyinder)
 	{
-		SetShape (NewtonCreateCylinder (world->GetNewton(), radio, height, id, NULL));
+		SetShape (NewtonCreateTaperedCylinder(world->GetNewton(), radio0, radio1, height, id, NULL));
 	}
 
 	dNewtonCollision* Clone(NewtonCollision* const shape) const 
@@ -366,10 +366,10 @@ class dNewtonCollisionChamferedCylinder: public dNewtonCollision
 };
 
 
-class dNewtonCollisionConveHull: public dNewtonCollision
+class dNewtonCollisionConvexHull: public dNewtonCollision
 {
 	public: 
-	dNewtonCollisionConveHull (dNewton* const world, int vertexCount, const dFloat* const vertexCloud, int strideInBytes, dFloat tolerance, int shapeID)
+	dNewtonCollisionConvexHull (dNewton* const world, int vertexCount, const dFloat* const vertexCloud, int strideInBytes, dFloat tolerance, int shapeID)
 		:dNewtonCollision(m_convex)
 	{
 		SetShape (NewtonCreateConvexHull (world->GetNewton(), vertexCount, vertexCloud, strideInBytes, tolerance, shapeID, NULL));
@@ -377,11 +377,11 @@ class dNewtonCollisionConveHull: public dNewtonCollision
 
 	dNewtonCollision* Clone(NewtonCollision* const shape) const 
 	{
-		return new dNewtonCollisionConveHull (*this, shape);
+		return new dNewtonCollisionConvexHull (*this, shape);
 	}
 
 	protected:
-	dNewtonCollisionConveHull (const dNewtonCollisionConveHull& srcCollision, NewtonCollision* const shape)
+	dNewtonCollisionConvexHull (const dNewtonCollisionConvexHull& srcCollision, NewtonCollision* const shape)
 		:dNewtonCollision (srcCollision, shape)
 	{
 	}
