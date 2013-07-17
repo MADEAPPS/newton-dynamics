@@ -20,52 +20,36 @@
 */
 
 
-#ifndef __STDAFXNEWTON_H__
-#define __STDAFXNEWTON_H__
+#ifndef _D_NEWTON_PLAYER_MANAGER_H_
+#define _D_NEWTON_PLAYER_MANAGER_H_
+
+#include "dStdAfxNewton.h"
+//#include "dNewtonAlloc.h"
+
+class dNewtonPlayerManager: public CustomPlayerControllerManager
+{
+	public:
+	CNEWTON_API dNewtonPlayerManager (dNewton* const world);
+	CNEWTON_API virtual ~dNewtonPlayerManager ();
+
+//	virtual dPlayerController* CreatePlayer (Real mass, Real outerRadius, Real innerRadius, Real height, Real stairStep);
+//	virtual void DestroyPlayer (dPlayerController* const player);
+//	virtual void ApplyPlayerMove (CustomPlayerController* const controller, Real timestep);
+};
+
+/*
+class dPlayerController: public dNewtonAlloc
+{
+	public:
+	~dPlayerController();
+
+	private:
+	dPlayerController (CustomPlayerControllerManager::CustomController* const controller);
+	CustomPlayerControllerManager::CustomController* m_controller;
+
+	friend class dNewtonPlayerManager;
+};
+*/
 
 
-#ifdef _CNEWTON_STATIC_LIB
-	#define CNEWTON_API
-#else 
-	#ifdef _CNEWTON_BUILD_DLL
-		#ifdef _WIN32
-			#define CNEWTON_API __declspec (dllexport)
-		#else
-			#define CNEWTON_API __attribute__ ((visibility("default")))
-		#endif
-	#else
-		#ifdef _WIN32
-			#define CNEWTON_API __declspec (dllimport)
-		#else
-			#define CNEWTON_API
-		#endif
-	#endif
 #endif
-
-
-#ifdef _MSC_VER
-	#ifndef WIN32_LEAN_AND_MEAN
-		#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
-	#endif
-	#include <windows.h>
-	#include <crtdbg.h>
-#endif
-
-#if ( defined (_MINGW_32_VER) || defined (_MINGW_64_VER) )
-	#include <crtdbg.h>
-#endif
-
-#include <stdio.h>
-#include <assert.h>
-#endif
-
-#include <new>
-#include <stdio.h>
-#include <stdlib.h>
-#include <Newton.h>
-#include <CustomJoint.h>
-#include <CustomControllerManager.h>
-#include <CustomPlayerControllerManager.h>
-
-
-

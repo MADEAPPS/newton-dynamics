@@ -656,6 +656,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\dNewton\dNewtonPlayerManager.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dNewton\dNewtonPlayerManager.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\dNewton\dNewtonRayCast.cpp"
 			>
 		</File>
