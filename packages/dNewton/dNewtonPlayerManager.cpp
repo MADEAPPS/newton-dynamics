@@ -114,11 +114,15 @@ dNewtonPlayerManager::dNewtonPlayer::dNewtonPlayer (dNewtonPlayerManager* const 
 				dAssert (0);
 		}
 	}
-
-
 }
 
 dNewtonPlayerManager::dNewtonPlayer::~dNewtonPlayer ()
 {
 	dAssert (0);
+}
+
+
+void dNewtonPlayerManager::dNewtonPlayer::SetPlayerVelocity (dFloat forwardSpeed, dFloat lateralSpeed, dFloat verticalSpeed, dFloat headingAngle, const dFloat* const gravity, dFloat timestep)
+{
+	m_controller->SetPlayerVelocity (forwardSpeed, lateralSpeed, verticalSpeed, headingAngle, dVector(gravity), timestep);
 }

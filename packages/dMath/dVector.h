@@ -95,7 +95,7 @@ TemplateVector<T>::TemplateVector() {}
 
 template<class T>
 TemplateVector<T>::TemplateVector(const T *ptr)
-	:m_x (ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w(1.0)
+	:m_x (ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w(0.0f)
 {
 }
 

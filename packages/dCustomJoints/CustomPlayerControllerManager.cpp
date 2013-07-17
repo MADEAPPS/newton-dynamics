@@ -54,6 +54,8 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 	dAssert (innerRadius >= 0.0f);
 	dAssert (outerRadius >= innerRadius);
 	dAssert (height >= stairStep);
+	dAssert (localAxis[0].m_w == dFloat (0.0f));
+	dAssert (localAxis[1].m_w == dFloat (0.0f));
 
 	CustomPlayerControllerManager* const manager = (CustomPlayerControllerManager*) GetManager();
 	NewtonWorld* const world = manager->GetWorld();
@@ -150,10 +152,10 @@ void CustomPlayerController::PreUpdate(dFloat timestep, int threadIndex)
 }
 
 
-dVector CustomPlayerController::CalculateDesiredOmega (dFloat headinAngle, dFloat timestep) const
+dVector CustomPlayerController::CalculateDesiredOmega (dFloat headingAngle, dFloat timestep) const
 {
 	dQuaternion playerRotation;
-	dQuaternion targetRotation (m_upVector, headinAngle);
+	dQuaternion targetRotation (m_upVector, headingAngle);
 	NewtonBodyGetRotation(GetBody(), &playerRotation.m_q0);
 	return playerRotation.CalcAverageOmega (targetRotation, 0.5f / timestep);
 }
@@ -202,10 +204,10 @@ dVector CustomPlayerController::CalculateDesiredVelocity (dFloat forwardSpeed, d
 	return veloc;
 }
 
-void CustomPlayerController::SetPlayerVelocity (dFloat forwadSpeed, dFloat lateralSpeed, dFloat verticalSpeed, dFloat headinAngle, const dVector& gravity, dFloat timestep)
+void CustomPlayerController::SetPlayerVelocity (dFloat forwardSpeed, dFloat lateralSpeed, dFloat verticalSpeed, dFloat headingAngle, const dVector& gravity, dFloat timestep)
 {
-	dVector omega (CalculateDesiredOmega (headinAngle, timestep));
-	dVector veloc (CalculateDesiredVelocity (forwadSpeed, lateralSpeed, verticalSpeed, gravity, timestep));			
+	dVector omega (CalculateDesiredOmega (headingAngle, timestep));
+	dVector veloc (CalculateDesiredVelocity (forwardSpeed, lateralSpeed, verticalSpeed, gravity, timestep));			
 
 	NewtonBody* const body = GetBody();
 	NewtonBodySetOmega(body, &omega[0]);

@@ -66,12 +66,12 @@ class CustomPlayerController
 	}
 
 	NEWTON_API void SetPlayerOrigin (dFloat originHigh);
-	NEWTON_API void SetPlayerVelocity (dFloat forwadSpeed, dFloat lateralSpeed, dFloat verticalSpeed, dFloat headinAngle, const dVector& gravity, dFloat timestep);
+	NEWTON_API void SetPlayerVelocity (dFloat forwardSpeed, dFloat lateralSpeed, dFloat verticalSpeed, dFloat headingAngle, const dVector& gravity, dFloat timestep);
 
 
 	protected:
-	NEWTON_API dVector CalculateDesiredOmega (dFloat headinAngle, dFloat timestep) const;
-	NEWTON_API dVector CalculateDesiredVelocity (dFloat forwadSpeed, dFloat lateralSpeed, dFloat verticalSpeed, const dVector& gravity, dFloat timestep) const;
+	NEWTON_API dVector CalculateDesiredOmega (dFloat headingAngle, dFloat timestep) const;
+	NEWTON_API dVector CalculateDesiredVelocity (dFloat forwardSpeed, dFloat lateralSpeed, dFloat verticalSpeed, const dVector& gravity, dFloat timestep) const;
 
 	NEWTON_API void Init(dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stepHigh, const dMatrix& localAxis);
 
