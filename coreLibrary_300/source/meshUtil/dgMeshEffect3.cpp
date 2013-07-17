@@ -170,6 +170,10 @@ class dgHACDClusterGraph
 				dgBigVector p0(pool[tail][0]);
 				dgBigVector p1(pool[tail][1]);
 				dgBigVector p2(pool[tail][2]);
+				p0.m_w = dgFloat32 (0.0f);
+				p1.m_w = dgFloat32 (0.0f);
+				p2.m_w = dgFloat32 (0.0f);
+
 				tail = (tail + 1) & mask;
 
 				dgBigVector q1((p0 + p1 + p2).Scale3(dgFloat64(1.0f / 3.0f)));
@@ -724,9 +728,13 @@ class dgHACDClusterGraph
 
 			dgVector p0 (points[ptr->m_incidentVertex]);
 			dgVector p1 (points[ptr->m_next->m_incidentVertex]);
+			p0 = p0 & dgVector::m_triplexMask;
+			p1 = p1 & dgVector::m_triplexMask;
+
 			ptr = ptr->m_next->m_next;
 			do {
 				dgVector p2 (points[ptr->m_incidentVertex]);
+				p2 = p2 & dgVector::m_triplexMask;
 				dgVector p01 ((p0 + p1).Scale3 (dgFloat32 (0.5f)));
 				dgVector p12 ((p1 + p2).Scale3 (dgFloat32 (0.5f)));
 				dgVector p20 ((p2 + p0).Scale3 (dgFloat32 (0.5f)));
