@@ -19,25 +19,37 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
-#ifndef _D_NEWTON_PLAYER_MANAGER_H_
-#define _D_NEWTON_PLAYER_MANAGER_H_
-
 #include "dStdAfxNewton.h"
+#include "dNewton.h"
+#include "dNewtonCollision.h"
 #include "dNewtonKinematicBody.h"
 
-class dNewtonPlayerManager: public CustomPlayerControllerManager
+dNewtonKinematicBody::dNewtonKinematicBody()
+	:dNewtonBody(m_dynamic)
 {
-	public:
-	CNEWTON_API dNewtonPlayerManager (dNewton* const world);
-	CNEWTON_API virtual ~dNewtonPlayerManager ();
+}
 
-	CNEWTON_API virtual CustomController* CreateController (dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dFloat* const upDir, const dFloat* const frontDir);
-//	virtual void DestroyPlayer (dPlayerController* const player);
-//	virtual void ApplyPlayerMove (CustomPlayerController* const controller, dFloat timestep);
-};
+dNewtonKinematicBody::dNewtonKinematicBody (dNewton* const dWorld, dFloat mass, const dNewtonCollision* const collision, void* const userData, const dFloat* const matrix)
+	:dNewtonBody(dWorld, mass, collision, userData, matrix, m_dynamic)
+{
+}
+
+dNewtonKinematicBody::~dNewtonKinematicBody()
+{
+}
 
 
 
 
-#endif
+/*
+void dNewtonKinematicBody::GetPointVeloc (const dFloat* const point, dFloat* const veloc) const
+{
+	NewtonBodyGetPointVelocity (m_body, &point[0], &veloc[0]);
+}
+*/
+
+bool dNewtonKinematicBody::GetSleepState() const
+{
+	return NewtonBodyGetSleepState(m_body) ? true : false;
+}
+

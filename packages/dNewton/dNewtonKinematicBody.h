@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2011> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2013> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -19,25 +19,26 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
-#ifndef _D_NEWTON_PLAYER_MANAGER_H_
-#define _D_NEWTON_PLAYER_MANAGER_H_
+#ifndef _D_NEWTON_KINEMATIC_BODY_H_
+#define _D_NEWTON_KINEMATIC_BODY_H_
 
 #include "dStdAfxNewton.h"
-#include "dNewtonKinematicBody.h"
+#include "dNewtonBody.h"
 
-class dNewtonPlayerManager: public CustomPlayerControllerManager
+
+class dNewton;
+class dNewtonCollision;
+
+class dNewtonKinematicBody: public dNewtonBody
 {
 	public:
-	CNEWTON_API dNewtonPlayerManager (dNewton* const world);
-	CNEWTON_API virtual ~dNewtonPlayerManager ();
+	CNEWTON_API dNewtonKinematicBody (dNewton* const world, dFloat mass, const dNewtonCollision* const collision, void* const userData, const dFloat* const matrix);
+	CNEWTON_API virtual ~dNewtonKinematicBody();
+	CNEWTON_API bool GetSleepState() const;
 
-	CNEWTON_API virtual CustomController* CreateController (dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dFloat* const upDir, const dFloat* const frontDir);
-//	virtual void DestroyPlayer (dPlayerController* const player);
-//	virtual void ApplyPlayerMove (CustomPlayerController* const controller, dFloat timestep);
+	protected:
+	CNEWTON_API dNewtonKinematicBody();
+
 };
-
-
-
 
 #endif

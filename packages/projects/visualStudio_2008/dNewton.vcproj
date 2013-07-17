@@ -648,6 +648,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\dNewton\dNewtonKinematicBody.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dNewton\dNewtonKinematicBody.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\dNewton\dNewtonMesh.cpp"
 			>
 		</File>

@@ -36,41 +36,51 @@ dNewtonPlayerManager::~dNewtonPlayerManager ()
 }
 
 /*
-void dNewtonPlayerManager::ApplyPlayerMove (CustomPlayerController* const controller, Real timestep)
+void dNewtonPlayerManager::ApplyPlayerMove (CustomPlayerController* const controller, dFloat timestep)
 {
 }
+*/
 
-
-dPlayerController* dNewtonPlayerManager::CreatePlayer (Real mass, Real outerRadius, Real innerRadius, Real height, Real stairStep)
+dNewtonPlayerManager::CustomController* dNewtonPlayerManager::CreateController (dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dFloat* const updir, const dFloat* const frontDir)
 {
-	dMatrix playerAxis; 
-	playerAxis[0] = dVector (0.0f, 1.0f,  0.0f, 0.0f); // the y axis is the character up vector
-	playerAxis[1] = dVector (0.0f, 0.0f, -1.0f, 0.0f); // the x axis is the character front direction
-	playerAxis[2] = playerAxis[0] * playerAxis[1];
-	playerAxis[3] = dVector (0.0f, 0.0f, 0.0f, 1.0f);
-
-	CustomController* const controller = CustomPlayerControllerManager::CreatePlayer(mass, outerRadius, innerRadius, height, stairStep, playerAxis);
-	return new dPlayerController(controller);
+	dAssert (0);
+//	dMatrix playerAxis; 
+//	playerAxis[0] = dVector (updir); // the y axis is the character up vector
+//	playerAxis[1] = dVector (frontDir); // the x axis is the character front direction
+//	playerAxis[2] = playerAxis[0] * playerAxis[1];
+//	playerAxis[3] = dVector (0.0f, 0.0f, 0.0f, 1.0f);
+//	CustomController* const controller = CustomPlayerControllerManager::CreatePlayer(mass, outerRadius, innerRadius, height, stairStep, playerAxis);
+//	return new dPlayerController(controller);
+	return NULL;
 }
 
+/*
 void dNewtonPlayerManager::DestroyPlayer (dPlayerController* const player)
 {
-
 }
 
 
 dPlayerController::dPlayerController (CustomPlayerControllerManager::CustomController* const controller)
 	:dNewtonAlloc()
 {
-
 }
 
 dPlayerController::~dPlayerController()
 {
 
 }
-
 */
 
+/*
+dNewtonPlayerManager::dNetwonPlayer::dNetwonPlayer (dNewtonPlayerManager* const myManager, dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep)
+	:dNewtonKinematicBody()
+{
+	dAssert (0);
+}
 
+dNewtonPlayerManager::dNetwonPlayer::~dNetwonPlayer ()
+{
+	dAssert (0);
+}
+*/
 
