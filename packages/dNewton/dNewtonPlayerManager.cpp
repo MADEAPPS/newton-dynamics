@@ -35,24 +35,14 @@ dNewtonPlayerManager::~dNewtonPlayerManager ()
 {
 }
 
-/*
+
 void dNewtonPlayerManager::ApplyPlayerMove (CustomPlayerController* const controller, dFloat timestep)
 {
+	dNewtonPlayer* const body = (dNewtonPlayer*) NewtonBodyGetUserData(controller->GetBody());
+	body->OnPlayerMove (timestep);
 }
-*/
 
-dNewtonPlayerManager::CustomController* dNewtonPlayerManager::CreateController (dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dFloat* const updir, const dFloat* const frontDir)
-{
-	dAssert (0);
-//	dMatrix playerAxis; 
-//	playerAxis[0] = dVector (updir); // the y axis is the character up vector
-//	playerAxis[1] = dVector (frontDir); // the x axis is the character front direction
-//	playerAxis[2] = playerAxis[0] * playerAxis[1];
-//	playerAxis[3] = dVector (0.0f, 0.0f, 0.0f, 1.0f);
-//	CustomController* const controller = CustomPlayerControllerManager::CreatePlayer(mass, outerRadius, innerRadius, height, stairStep, playerAxis);
-//	return new dPlayerController(controller);
-	return NULL;
-}
+
 
 /*
 void dNewtonPlayerManager::DestroyPlayer (dPlayerController* const player)
@@ -72,15 +62,36 @@ dPlayerController::~dPlayerController()
 */
 
 /*
-dNewtonPlayerManager::dNetwonPlayer::dNetwonPlayer (dNewtonPlayerManager* const myManager, dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep)
+dNewtonPlayerManager::dNewtonPlayer::dNewtonPlayer (dNewtonPlayerManager* const myManager, dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep)
 	:dNewtonKinematicBody()
 {
 	dAssert (0);
 }
 
-dNewtonPlayerManager::dNetwonPlayer::~dNetwonPlayer ()
+dNewtonPlayerManager::dNewtonPlayer::~dNewtonPlayer ()
 {
 	dAssert (0);
 }
 */
 
+
+
+dNewtonPlayerManager::dNewtonPlayer::dNewtonPlayer (dNewtonPlayerManager* const manager, void* const userData, dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dFloat* const upDir, const dFloat* const frontDir)
+	:dNewtonKinematicBody()
+{
+	dMatrix playerAxis; 
+	playerAxis[0] = dVector (upDir); // the y axis is the character up vector
+	playerAxis[1] = dVector (frontDir); // the x axis is the character front direction
+	playerAxis[2] = playerAxis[0] * playerAxis[1];
+	playerAxis[3] = dVector (0.0f, 0.0f, 0.0f, 1.0f);
+
+	m_controller = manager->CreatePlayer(mass, outerRadius, innerRadius, height, stairStep, playerAxis);
+
+	SetUserData (userData);
+	SetBody (m_controller->GetBody());
+}
+
+dNewtonPlayerManager::dNewtonPlayer::~dNewtonPlayer ()
+{
+	dAssert (0);
+}

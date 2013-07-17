@@ -25,12 +25,12 @@
 #include "dNewtonKinematicBody.h"
 
 dNewtonKinematicBody::dNewtonKinematicBody()
-	:dNewtonBody(m_dynamic)
+	:dNewtonBody(m_kinematic)
 {
 }
 
 dNewtonKinematicBody::dNewtonKinematicBody (dNewton* const dWorld, dFloat mass, const dNewtonCollision* const collision, void* const userData, const dFloat* const matrix)
-	:dNewtonBody(dWorld, mass, collision, userData, matrix, m_dynamic)
+	:dNewtonBody(dWorld, mass, collision, userData, matrix, m_kinematic)
 {
 }
 
