@@ -397,6 +397,9 @@ class dNewtonCollisionCompound: public dNewtonCollision
 		SetShape (NewtonCreateCompoundCollision (world->GetNewton(), shapeID));
 	}
 
+	CNEWTON_API dNewtonCollisionCompound (dNewton* const world, const dNewtonMesh& mesh, int shapeID);
+
+
 	dNewtonCollision* Clone(NewtonCollision* const shape) const 
 	{
 		return new dNewtonCollisionCompound (*this, shape);

@@ -171,23 +171,30 @@ void dNewtonCollisionScene::EndAddRemoveCollision()
 }
 
 
+dNewtonCollisionCompound::dNewtonCollisionCompound (dNewton* const world, const dNewtonMesh& mesh, int shapeID)
+	:dNewtonCollision(m_compound)
+{
+	SetShape (NewtonCreateCompoundCollisionFromMesh (world->GetNewton(), mesh.GetMesh(), 0.001f, shapeID, shapeID));
+}
+
+
 void dNewtonCollisionCompound::BeginAddRemoveCollision()
 {
-	NewtonSceneCollisionBeginAddRemove (m_shape);	
+	NewtonCompoundCollisionBeginAddRemove (m_shape);	
 }
 
 void* dNewtonCollisionCompound::AddCollision(const dNewtonCollision* const collision)
 {
-	return NewtonSceneCollisionAddSubCollision (m_shape, collision->GetShape());
+	return NewtonCompoundCollisionAddSubCollision(m_shape, collision->GetShape());
 }
 
 void dNewtonCollisionCompound::RemoveCollision (void* const handle)
 {
-	NewtonSceneCollisionRemoveSubCollision (m_shape, handle);
+	NewtonCompoundCollisionRemoveSubCollision (m_shape, handle);
 }
 
 void dNewtonCollisionCompound::EndAddRemoveCollision()
 {
-	NewtonSceneCollisionEndAddRemove(m_shape);	
+	NewtonCompoundCollisionEndAddRemove(m_shape);	
 }
 

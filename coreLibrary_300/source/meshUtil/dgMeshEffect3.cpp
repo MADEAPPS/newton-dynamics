@@ -142,7 +142,6 @@ class dgHACDClusterGraph
 			:dgConvexHull3d(allocator, &points[0].m_x, sizeof (dgBigVector),count, dgFloat64 (0.0f))
 			,m_mark(1)
 		{
-
 		}
 
 		dgFloat64 CalculateTriangleConcavity(const dgBigVector& normal, dgInt32 i0, dgInt32 i1, dgInt32 i2, const dgBigVector* const points)

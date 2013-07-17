@@ -317,8 +317,8 @@ dgAABBPointTree3d* dgConvexHull3d::BuildTree (dgAABBPointTree3d* const parent, d
 
 	dgAssert (tree);
 	tree->m_parent = parent;
-	tree->m_box[0] = minP - dgBigVector (dgFloat64 (1.0e-3f), dgFloat64 (1.0e-3f), dgFloat64 (1.0e-3f), dgFloat64 (1.0f));
-	tree->m_box[1] = maxP + dgBigVector (dgFloat64 (1.0e-3f), dgFloat64 (1.0e-3f), dgFloat64 (1.0e-3f), dgFloat64 (1.0f));
+	tree->m_box[0] = minP - dgBigVector (dgFloat64 (1.0e-3f), dgFloat64 (1.0e-3f), dgFloat64 (1.0e-3f), dgFloat64 (0.0f));
+	tree->m_box[1] = maxP + dgBigVector (dgFloat64 (1.0e-3f), dgFloat64 (1.0e-3f), dgFloat64 (1.0e-3f), dgFloat64 (0.0f));
 	return tree;
 }
 

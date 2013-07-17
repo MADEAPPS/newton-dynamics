@@ -45,6 +45,11 @@ dNewtonMesh::dNewtonMesh(dNewton* const world, int pointCount, const dFloat* con
 {
 }
 
+//dNewtonMesh(NewtonMesh* const mesh)
+//	:m_mesh(mesh)
+//{
+//}
+
 dNewtonMesh::~dNewtonMesh()
 {
 	NewtonMeshDestroy (m_mesh);
