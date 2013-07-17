@@ -88,7 +88,34 @@ dNewtonPlayerManager::dNewtonPlayer::dNewtonPlayer (dNewtonPlayerManager* const 
 	m_controller = manager->CreatePlayer(mass, outerRadius, innerRadius, height, stairStep, playerAxis);
 
 	SetUserData (userData);
-	SetBody (m_controller->GetBody());
+
+	NewtonBody* const body = m_controller->GetBody();
+	SetBody (body);
+	NewtonCollision* const collision = NewtonBodyGetCollision(body);
+	new dNewtonCollisionCompound (collision);
+
+	for (void* node = NewtonCompoundCollisionGetFirstNode (collision); node; node = NewtonCompoundCollisionGetNextNode (collision, node)) {
+		NewtonCollision* const childShape = NewtonCompoundCollisionGetCollisionFromNode (collision, node);
+
+		switch (NewtonCollisionGetType (childShape)) 
+		{
+			case SERIALIZE_ID_CAPSULE:
+			{
+				new dNewtonCollisionCapsule (collision);
+				break;
+			}
+
+			case SERIALIZE_ID_CYLINDER:
+			{
+				new dNewtonCollisionCylinder (collision);
+				break;
+			}
+			default: 
+				dAssert (0);
+		}
+	}
+
+
 }
 
 dNewtonPlayerManager::dNewtonPlayer::~dNewtonPlayer ()

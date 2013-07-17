@@ -236,6 +236,12 @@ class dNewtonCollisionSphere: public dNewtonCollision
 class dNewtonCollisionCapsule: public dNewtonCollision
 {
 	public: 
+	dNewtonCollisionCapsule (NewtonCollision* const shape)
+		:dNewtonCollision(m_capsule)
+	{
+		SetShape (shape);
+	}
+
 	dNewtonCollisionCapsule (dNewton* const world, dFloat radio, dFloat height, int id)
 		:dNewtonCollision(m_capsule)
 	{
@@ -303,6 +309,12 @@ class dNewtonCollisionCone: public dNewtonCollision
 class dNewtonCollisionCylinder: public dNewtonCollision
 {
 	public: 
+	dNewtonCollisionCylinder (NewtonCollision* const shape)
+		:dNewtonCollision(m_cylinder)
+	{
+		SetShape (shape);
+	}
+
 	dNewtonCollisionCylinder (dNewton* const world, dFloat radio, dFloat height, int id)
 		:dNewtonCollision(m_cylinder)
 	{
@@ -391,6 +403,12 @@ class dNewtonCollisionConvexHull: public dNewtonCollision
 class dNewtonCollisionCompound: public dNewtonCollision
 {
 	public: 
+	dNewtonCollisionCompound (NewtonCollision* const shape)
+		:dNewtonCollision(m_compound)
+	{
+		SetShape (shape);
+	}
+
 	dNewtonCollisionCompound (dNewton* const world, int shapeID)
 		:dNewtonCollision(m_compound)
 	{
