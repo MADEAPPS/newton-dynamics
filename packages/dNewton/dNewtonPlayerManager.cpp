@@ -101,24 +101,30 @@ dNewtonPlayerManager::dNewtonPlayer::dNewtonPlayer (dNewtonPlayerManager* const 
 		{
 			case SERIALIZE_ID_CAPSULE:
 			{
-				new dNewtonCollisionCapsule (collision);
+				new dNewtonCollisionCapsule (childShape);
 				break;
 			}
 
 			case SERIALIZE_ID_CYLINDER:
 			{
-				new dNewtonCollisionCylinder (collision);
+				new dNewtonCollisionCylinder (childShape);
 				break;
 			}
 			default: 
 				dAssert (0);
 		}
 	}
+
 }
 
 dNewtonPlayerManager::dNewtonPlayer::~dNewtonPlayer ()
 {
-	dAssert (0);
+	NewtonBody* const body = m_controller->GetBody();	
+	if (NewtonBodyGetDestructorCallback(body)) {
+		SetBody(NULL);
+		dNewtonPlayerManager* const manager = (dNewtonPlayerManager*)m_controller->GetManager();
+		manager->DestroyController (m_controller);
+	}
 }
 
 

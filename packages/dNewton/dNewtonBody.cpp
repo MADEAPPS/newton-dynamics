@@ -53,7 +53,7 @@ dNewtonBody::dNewtonBody (dNewton* const dWorld, dFloat mass, const dNewtonColli
 
 dNewtonBody::~dNewtonBody()
 {
-	if (NewtonBodyGetDestructorCallback(m_body)) {
+	if (m_body && NewtonBodyGetDestructorCallback(m_body)) {
 		NewtonBodySetDestructorCallback (m_body, NULL);
 		NewtonDestroyBody(NewtonBodyGetWorld(m_body), m_body);
 	}
@@ -118,11 +118,16 @@ dNewton* dNewtonBody::GetNewton () const
 
 void dNewtonBody::SetBody (NewtonBody* const body)
 {
+	if (body) {
+		NewtonBodySetUserData(body, this);
+		NewtonBodySetTransformCallback (body, OnBodyTransform);
+		NewtonBodySetDestructorCallback (body, OnBodyDestroy);
+	} else if (m_body) {
+		NewtonBodySetUserData(m_body, NULL);
+		NewtonBodySetTransformCallback (m_body, NULL);
+		NewtonBodySetDestructorCallback (m_body, NULL);
+	}
 	m_body = body;
-	NewtonBodySetUserData(m_body, this);
-	NewtonBodySetTransformCallback (m_body, OnBodyTransform);
-	NewtonBodySetDestructorCallback (m_body, OnBodyDestroy);
-//	NewtonBodySetForceAndTorqueCallback(m_body, OnForceAndTorque);
 }
 
 void dNewtonBody::OnBodyDestroy (const NewtonBody* const body)
