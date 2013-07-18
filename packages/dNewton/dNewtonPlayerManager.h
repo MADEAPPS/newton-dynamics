@@ -41,13 +41,17 @@ class dNewtonPlayerManager: public CustomPlayerControllerManager
 
 		private:
 		CustomController* m_controller;
+
+		friend class dNewtonPlayerManager;
 	};
 
 	CNEWTON_API dNewtonPlayerManager (dNewton* const world);
 	CNEWTON_API virtual ~dNewtonPlayerManager ();
 
-//	virtual void DestroyPlayer (dPlayerController* const player);
-	virtual void ApplyPlayerMove (CustomPlayerController* const controller, dFloat timestep);
+	CNEWTON_API dNewtonPlayer* GetFirstPlayer() const;
+	CNEWTON_API dNewtonPlayer* GetNextPlayer(const dNewtonPlayer* const player) const;
+
+	CNEWTON_API virtual void ApplyPlayerMove (CustomPlayerController* const controller, dFloat timestep);
 };
 
 

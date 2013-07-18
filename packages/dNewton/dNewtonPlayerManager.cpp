@@ -35,45 +35,32 @@ dNewtonPlayerManager::~dNewtonPlayerManager ()
 {
 }
 
+dNewtonPlayerManager::dNewtonPlayer* dNewtonPlayerManager::GetFirstPlayer() const
+{
+	CustomController* const controller = GetFirstController();
+	if (controller) {
+		return (dNewtonPlayerManager::dNewtonPlayer*) NewtonBodyGetUserData (controller->GetBody());
+	}
+	return NULL;
+}
+
+dNewtonPlayerManager::dNewtonPlayer* dNewtonPlayerManager::GetNextPlayer(const dNewtonPlayer* const player) const
+{
+	dAssert (player);
+	CustomController* const controller = GetNextController (player->m_controller);
+	if (controller) {
+		return (dNewtonPlayerManager::dNewtonPlayer*) NewtonBodyGetUserData (controller->GetBody());
+	}
+	return NULL;
+}
+
+
 
 void dNewtonPlayerManager::ApplyPlayerMove (CustomPlayerController* const controller, dFloat timestep)
 {
 	dNewtonPlayer* const body = (dNewtonPlayer*) NewtonBodyGetUserData(controller->GetBody());
 	body->OnPlayerMove (timestep);
 }
-
-
-
-/*
-void dNewtonPlayerManager::DestroyPlayer (dPlayerController* const player)
-{
-}
-
-
-dPlayerController::dPlayerController (CustomPlayerControllerManager::CustomController* const controller)
-	:dNewtonAlloc()
-{
-}
-
-dPlayerController::~dPlayerController()
-{
-
-}
-*/
-
-/*
-dNewtonPlayerManager::dNewtonPlayer::dNewtonPlayer (dNewtonPlayerManager* const myManager, dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep)
-	:dNewtonKinematicBody()
-{
-	dAssert (0);
-}
-
-dNewtonPlayerManager::dNewtonPlayer::~dNewtonPlayer ()
-{
-	dAssert (0);
-}
-*/
-
 
 
 dNewtonPlayerManager::dNewtonPlayer::dNewtonPlayer (dNewtonPlayerManager* const manager, void* const userData, dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dFloat* const upDir, const dFloat* const frontDir)
