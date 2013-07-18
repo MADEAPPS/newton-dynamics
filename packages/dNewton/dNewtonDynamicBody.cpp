@@ -77,10 +77,6 @@ void dNewtonDynamicBody::ApplyImpulseToDesiredPointVeloc (const dFloat* const po
 	NewtonBodyAddImpulse (m_body, &desiredveloc[0], &point[0]);
 }
 
-bool dNewtonDynamicBody::GetSleepState() const
-{
-	return NewtonBodyGetSleepState(m_body) ? true : false;
-}
 
 void dNewtonDynamicBody::OnForceAndTorque (const NewtonBody* body, dFloat timestep, int threadIndex)
 {

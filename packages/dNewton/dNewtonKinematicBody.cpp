@@ -48,8 +48,3 @@ void dNewtonKinematicBody::GetPointVeloc (const dFloat* const point, dFloat* con
 }
 */
 
-bool dNewtonKinematicBody::GetSleepState() const
-{
-	return NewtonBodyGetSleepState(m_body) ? true : false;
-}
-

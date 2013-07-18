@@ -59,11 +59,16 @@ dNewtonBody::~dNewtonBody()
 	}
 }
 
-
 NewtonBody* dNewtonBody::GetNewtonBody () const
 {
 	return m_body;
 }
+
+bool dNewtonBody::GetSleepState() const
+{
+	return NewtonBodyGetSleepState(m_body) ? true : false;
+}
+
 
 void dNewtonBody::SetUserData(void* const userData)
 {

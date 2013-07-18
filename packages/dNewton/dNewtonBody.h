@@ -44,6 +44,8 @@ class dNewtonBody: public dNewtonAlloc, public dNewtonTransformLerp
 
 	dBodyType GetType() const {return m_bodyType;}
 
+	CNEWTON_API bool GetSleepState() const;
+
 	CNEWTON_API void SetMatrix (const dFloat* const matrix);
 	CNEWTON_API void GetMatrix (dFloat* const matrix) const;
 
@@ -54,11 +56,12 @@ class dNewtonBody: public dNewtonAlloc, public dNewtonTransformLerp
 
 	CNEWTON_API void SetOmega (const dFloat* const omega);
 	CNEWTON_API void GetOmega (dFloat* const omega) const;
-
-//	CNEWTON_API void GetPointVeloc (const dFloat* const point, dFloat* const veloc) const;
-//	CNEWTON_API void ApplyImpulseToDesiredPointVeloc (const dFloat* const point, const dFloat* const desiredveloc);
 	CNEWTON_API void GetMassAndInertia (dFloat& mass, dFloat& Ixx, dFloat& Iyy, dFloat& Izz) const;
 
+	// applications can overload this to update game object information each time there transformation changes 
+	CNEWTON_API virtual void OnApplicationPostTransform (dFloat timestep) {};
+
+	// call each time the physics update the body transformation 
 	CNEWTON_API virtual void OnBodyTransform (const dFloat* const matrix, int threadIndex);
 
 	CNEWTON_API void* GetUserData() const;
@@ -77,10 +80,6 @@ class dNewtonBody: public dNewtonAlloc, public dNewtonTransformLerp
 	CNEWTON_API static void OnBodyTransform (const NewtonBody* const body, const dFloat* const matrix, int threadIndex);
 
 	protected:
-	dVector m_posit0;
-	dVector m_posit1;
-	dQuaternion m_rotat0;
-	dQuaternion m_rotat1;
 	NewtonBody* m_body;
 	void* m_userData;
 	dBodyType m_bodyType;

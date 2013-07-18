@@ -45,7 +45,7 @@ class dNewtonDynamicBody: public dNewtonBody
 	CNEWTON_API void ApplyImpulseToDesiredPointVeloc (const dFloat* const point, const dFloat* const desiredveloc);
 
 	CNEWTON_API virtual void OnForceAndTorque (dFloat timestep, int threadIndex) = 0;
-	CNEWTON_API bool GetSleepState() const;
+
 
 	protected:
 	CNEWTON_API dNewtonDynamicBody();

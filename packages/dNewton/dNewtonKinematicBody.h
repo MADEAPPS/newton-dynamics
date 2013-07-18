@@ -34,7 +34,6 @@ class dNewtonKinematicBody: public dNewtonBody
 	public:
 	CNEWTON_API dNewtonKinematicBody (dNewton* const world, dFloat mass, const dNewtonCollision* const collision, void* const userData, const dFloat* const matrix);
 	CNEWTON_API virtual ~dNewtonKinematicBody();
-	CNEWTON_API bool GetSleepState() const;
 
 	protected:
 	CNEWTON_API dNewtonKinematicBody();
