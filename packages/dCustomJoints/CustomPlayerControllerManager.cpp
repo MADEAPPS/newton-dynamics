@@ -71,6 +71,7 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 	m_frontVector = localAxis[1];
 
 	m_groundPlane = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+	m_groundContact =  dVector (0.0f, -1.0e15f, 0.0f, 0.0f);
 	m_groundVelocity = dVector (0.0f, 0.0f, 0.0f, 0.0f);
 
 
@@ -229,6 +230,55 @@ dFloat CustomPlayerController::CalculateContactKinematics(const dVector& veloc, 
 	return (reboundVelocMag > 0.0f) ? reboundVelocMag : 0.0f; 
 }
 
+
+void CustomPlayerController::UpdateGroundPlane (dMatrix& matrix, const dMatrix& castMatrix, const dVector& dst, CustomControllerFilterCastFilter& castFilterData, int threadIndex)
+{
+	CustomPlayerControllerManager* const manager = (CustomPlayerControllerManager*) GetManager();
+	NewtonWorld* const world = manager->GetWorld();
+
+//static int xxxx;
+//if (xxxx >= 1054)
+//xxxx *=1;
+//xxxx++;
+
+	dFloat timetoImpact;
+	NewtonWorldConvexCastReturnInfo info[4];
+
+	int contactCount = NewtonWorldConvexCast (world, &castMatrix[0][0], &dst[0], m_supportShape, &timetoImpact, &castFilterData, CustomControllerFilterCastFilter::ConvexStaticCastPrefilter, info, sizeof (info) / sizeof (info[0]), threadIndex);
+	m_groundPlane = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+	m_groundContact = dVector (0.0f, -1.0e15f, 0.0f, 0.0f);
+	m_groundVelocity = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+	if (contactCount) {
+		bool foundSupportPoint = false;
+		dVector updir (castMatrix.RotateVector(m_upVector));
+		dFloat maxProjection = -1.0e15f;
+		dVector plane (0.0f, 0.0f, 0.0f, 0.0f);
+		dVector contact (0.0f, -1.0e15f, 0.0f, 0.0f);
+		dVector planeVeloc (0.0f, 0.0f, 0.0f, 0.0f);
+		for (int i = 0; i < contactCount; i ++) {
+			dVector point (info[i].m_point);
+			dFloat projection = updir % point;
+			if (projection > maxProjection) {
+				foundSupportPoint = true;
+				maxProjection = projection;
+				plane = info[i].m_normal;
+				contact = point;
+				plane.m_w = - (plane % contact );
+				NewtonBodyGetPointVelocity (info[i].m_hitBody, &contact.m_x, &planeVeloc[0]);
+			}
+		}
+
+		// only plane lower than 25% are considered ground plane
+		if (foundSupportPoint) {
+			m_isJumping = false;
+			m_groundPlane = plane;
+			m_groundContact = contact;
+			m_groundVelocity = planeVeloc;
+			matrix.m_posit = castMatrix.m_posit + (dst - castMatrix.m_posit).Scale(timetoImpact);
+		}
+	}
+}
+
 void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 {
 	dVector veloc; 
@@ -247,6 +297,13 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 	NewtonBodyGetMatrix(body, &matrix[0][0]);
 	NewtonBodyGetVelocity(body, &veloc[0]);
 	NewtonBodyGetOmega(body, &omega[0]);
+
+//static int xxx;
+//if (xxx >= 1054)
+//xxx *=1;
+//if (xxx > 1000)
+//dTrace (("%d %f %f\n", xxx, matrix.m_posit.m_y));
+//xxx ++;
 
 	// integrate body angular velocity
 	NewtonBodyGetRotation (body, &bodyRotation.m_q0); 
@@ -352,9 +409,6 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 
 	// determine if player is standing on some plane
 	if (step > 1.0e-6f) {
-		dFloat timetoImpact;
-		NewtonWorldConvexCastReturnInfo info[4];
-
 		dMatrix supportMatrix (matrix);
 		dVector updir (matrix.RotateVector(m_upVector));
 		supportMatrix.m_posit += updir.Scale (m_stairStep);
@@ -362,60 +416,11 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 		if (!m_isJumping) {
 			step = dAbs (updir % veloc.Scale (timestep));
 			dFloat castDist = ((m_groundPlane % m_groundPlane) > 0.0f) ? m_stairStep : step;
-
 			dVector dst (matrix.m_posit - updir.Scale (castDist * 2.0f));
-			int contactCount = NewtonWorldConvexCast (world, &supportMatrix[0][0], &dst[0], m_supportShape, &timetoImpact, &castFilterData, CustomControllerFilterCastFilter::ConvexStaticCastPrefilter, info, sizeof (info) / sizeof (info[0]), threadIndex);
-			m_groundPlane = dVector (0.0f, 0.0f, 0.0f, 0.0f);
-			m_groundVelocity = dVector (0.0f, 0.0f, 0.0f, 0.0f);
-			if (contactCount) {
-				dFloat maxNormnal = -1.0f;
-				dVector plane (0.0f, 0.0f, 0.0f, 0.0f);
-				dVector planeVeloc (0.0f, 0.0f, 0.0f, 0.0f);
-				for (int i = 0; i < contactCount; i ++) {
-					dFloat dot = updir % info[i].m_normal;
-					if (dot > maxNormnal) {
-						maxNormnal = dot;
-						plane = info[i].m_normal;
-						plane.m_w = - (plane % info[i].m_point);
-						NewtonBodyGetPointVelocity (info[i].m_hitBody, info[i].m_point, &planeVeloc[0]);
-					}
-				}
-
-				// only plane lower than 25% are considered ground plane
-				if ((plane % updir) > 0.25f) {
-					m_isJumping = false;
-					m_groundPlane = plane;
-					m_groundVelocity = planeVeloc;
-					matrix.m_posit = supportMatrix.m_posit + (dst - supportMatrix.m_posit).Scale(timetoImpact);
-				}
-			}
+			UpdateGroundPlane (matrix, supportMatrix, dst, castFilterData, threadIndex);
 		} else {
 			dVector dst (matrix.m_posit);
-			int contactCount = NewtonWorldConvexCast (world, &supportMatrix[0][0], &dst[0], m_supportShape, &timetoImpact, &castFilterData, CustomControllerFilterCastFilter::ConvexStaticCastPrefilter, info, sizeof (info) / sizeof (info[0]), threadIndex);
-			m_groundPlane = dVector (0.0f, 0.0f, 0.0f, 0.0f);
-			m_groundVelocity = dVector (0.0f, 0.0f, 0.0f, 0.0f);
-			if (contactCount) {
-				dFloat maxNormnal = -1.0f;
-				dVector plane (0.0f, 0.0f, 0.0f, 0.0f);
-				dVector planeVeloc (0.0f, 0.0f, 0.0f, 0.0f);
-				for (int i = 0; i < contactCount; i ++) {
-					dFloat dot = updir % info[i].m_normal;
-					if (dot > maxNormnal) {
-						maxNormnal = dot;
-						plane = info[i].m_normal;
-						plane.m_w = - (plane % info[i].m_point);
-						NewtonBodyGetPointVelocity (info[i].m_hitBody, info[i].m_point, &planeVeloc[0]);
-					}
-				}
-
-				// only plane lower than 25% are considered ground plane
-				if ((plane % updir) > 0.25f) {
-					m_isJumping = false;
-					m_groundPlane = plane;
-					m_groundVelocity = planeVeloc;
-					matrix.m_posit = supportMatrix.m_posit + (dst - supportMatrix.m_posit).Scale(timetoImpact);
-				}
-			}
+			UpdateGroundPlane (matrix, supportMatrix, dst, castFilterData, threadIndex);
 		}
 	}
 

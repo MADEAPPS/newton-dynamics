@@ -59,7 +59,8 @@ class dgCollisionConvexPolygon: public dgCollisionConvex
 
 	void BeamClipping (const dgCollisionInstance* const hull, const dgVector& origin, dgFloat32 size);
 	void SetFeatureHit (dgInt32 featureCount, const dgInt32* const index);
-    dgInt32 CalculateContactToConvexHullDescrete (dgCollisionParamProxy& proxy);
+    dgInt32 CalculateContactToConvexHullDescrete (dgCollisionParamProxy& proxy, const dgVector& polyInstanceScale, const dgVector& polyInstanceInvScale);
+	dgInt32 CalculateContactToConvexHullContinue (dgCollisionParamProxy& proxy, const dgVector& polyInstanceScale, const dgVector& polyInstanceInvScale);
 
 //	dgVector ClosestDistanceToTriangle (const dgVector& point, const dgVector& p0, const dgVector& p1, const dgVector& p2, bool& isEdge) const;
 //	bool PointToPolygonDistance (const dgVector& point, dgFloat32 radius, dgVector& out, bool& isEdge);

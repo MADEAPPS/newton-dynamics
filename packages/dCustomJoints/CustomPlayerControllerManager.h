@@ -65,6 +65,11 @@ class CustomPlayerController
 		return m_groundPlane;
 	}
 
+	const dVector& GetGroundContact() const
+	{
+		return m_groundContact;
+	}
+
 	NEWTON_API void SetPlayerOrigin (dFloat originHigh);
 	NEWTON_API void SetPlayerVelocity (dFloat forwardSpeed, dFloat lateralSpeed, dFloat verticalSpeed, dFloat headingAngle, const dVector& gravity, dFloat timestep);
 
@@ -79,11 +84,13 @@ class CustomPlayerController
 	NEWTON_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 	
 	private:
+	void UpdateGroundPlane (dMatrix& matrix, const dMatrix& castMatrix, const dVector& target, CustomControllerFilterCastFilter& castFilterData, int threadIndex);
 	dFloat CalculateContactKinematics(const dVector& veloc, const NewtonWorldConvexCastReturnInfo* const contact) const;
 
 	dVector m_upVector;
 	dVector m_frontVector;
 	dVector m_groundPlane;
+	dVector m_groundContact;
 	dVector m_groundVelocity;
 	dFloat m_outerRadio;
 	dFloat m_innerRadio;

@@ -2055,10 +2055,10 @@ dgInt32 dgCollisionConvex::RectifyConvexSlice (dgInt32 count, const dgVector& no
 	DG_CONVEX_FIXUP_FACE linkFace[DG_CLIP_MAX_POINT_COUNT * 2];
 
 	dgAssert (count > 2);
-
 	DG_CONVEX_FIXUP_FACE* poly = &linkFace[0];
 	for (dgInt32 i = 0; i < count; i ++) {
-		contactsOut[i].m_w = dgFloat32 (1.0f);
+//		contactsOut[i].m_w = dgFloat32 (1.0f);
+		dgAssert (contactsOut[i].m_w == dgFloat32 (0.0f));
 		linkFace[i].m_vertex = i;
 		linkFace[i].m_next = &linkFace[i + 1];
 	}
@@ -2081,7 +2081,7 @@ dgInt32 dgCollisionConvex::RectifyConvexSlice (dgInt32 count, const dgVector& no
 				} 
 				restart = 1;
 				tmpCount --;
-				contactsOut[i1].m_w = dgFloat32 (0.0f);
+				contactsOut[i1].m_w = dgFloat32 (1.0f);
 				ptr->m_next = ptr->m_next->m_next;
 			} else {
 				ptr = ptr->m_next;
@@ -2110,7 +2110,7 @@ dgInt32 dgCollisionConvex::RectifyConvexSlice (dgInt32 count, const dgVector& no
 				}
 				restart = 1;
 				tmpCount --;
-				contactsOut[i1].m_w = dgFloat32 (0.0f);
+				contactsOut[i1].m_w = dgFloat32 (1.0f);
 				ptr->m_next = ptr->m_next->m_next;
 			} else {
 				ptr = ptr->m_next;
@@ -2122,13 +2122,13 @@ dgInt32 dgCollisionConvex::RectifyConvexSlice (dgInt32 count, const dgVector& no
 	if (tmpCount < count) {
 		dgInt32 newCount = 0;
 		for (; newCount < count; newCount ++) {
-			if (contactsOut[newCount].m_w == dgFloat32 (0.0f)) {
+			if (contactsOut[newCount].m_w == dgFloat32 (1.0f)) {
 				break;
 			}
 		}
 
 		for (dgInt32 i = newCount + 1; i < count; i ++) {
-			if (contactsOut[i].m_w != dgFloat32 (0.0f)) {
+			if (contactsOut[i].m_w == dgFloat32 (0.0f)) {
 				contactsOut[newCount] = contactsOut[i];
 				newCount ++;
 			}
