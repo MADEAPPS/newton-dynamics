@@ -672,14 +672,19 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete (dgCollis
 
 dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue (dgCollisionParamProxy& proxy, const dgVector& polyInstanceScale, const dgVector& polyInstanceInvScale)
 {
-
 	dgAssert (proxy.m_referenceCollision->IsType (dgCollision::dgCollisionConvexShape_RTTI));
 	dgAssert (proxy.m_floatingCollision->IsType (dgCollision::dgCollisionConvexPolygon_RTTI));
 
+//	dgContact* const contactJoint = proxy.m_contactJoint;
+	const dgCollisionInstance* const hull = proxy.m_referenceCollision;
 	dgCollisionInstance* const polygonInstance = proxy.m_floatingCollision;
+
 	dgAssert (this == polygonInstance->GetChildShape());
 	dgAssert (m_count);
 	dgAssert (m_count < dgInt32 (sizeof (m_localPoly) / sizeof (m_localPoly[0])));
+
+	dgBody* const floatingBody = proxy.m_floatingBody;
+	dgBody* const referenceBody = proxy.m_referenceBody;
 
 	dgInt32 count = 0;
 
@@ -687,6 +692,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue (dgCollis
 	dgAssert (m_normal.m_w == dgFloat32 (0.0f));
 	m_normal = m_normal.CompProduct4(m_normal.DotProduct4(m_normal).InvSqrt());
 	dgVector savedFaceNormal (m_normal);
+
 	for (dgInt32 i = 0; i < m_count; i ++) {
 		m_localPoly[i] = polyInstanceScale.CompProduct4(dgVector (&m_vertex[m_vertexIndex[i] * m_stride]));
 		dgAssert (m_localPoly[i].m_w == dgFloat32 (0.0f));
@@ -702,26 +708,32 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue (dgCollis
 	polygonMatrix[2] = m_normal;
 	polygonMatrix[3] = (hullOrigin - m_normal.CompProduct4(m_normal.DotProduct4(hullOrigin - m_localPoly[0]))) | dgVector::m_wOne;
 
+	dgVector polyBoxP0 (dgFloat32 ( 1.0e15f));
+	dgVector polyBoxP1 (dgFloat32 (-1.0e15f));
 	m_normal = polygonMatrix.UnrotateVector(m_normal);
 	for (dgInt32 i = 0; i < m_count; i ++) {
 		m_localPoly[i] = polygonMatrix.UntransformVector(m_localPoly[i]);
 		dgAssert (m_localPoly[i].m_w == dgFloat32 (0.0f));
+		polyBoxP0 = polyBoxP0.GetMin (m_localPoly[i]);
+		polyBoxP1 = polyBoxP1.GetMax (m_localPoly[i]);
 	}
 
 	dgMatrix savedProxyMatrix (proxy.m_matrix);
 	proxy.m_matrix = polygonMatrix * proxy.m_matrix;
 
-	dgContact* const contactJoint = proxy.m_contactJoint;
-	const dgCollisionInstance* const hull = proxy.m_referenceCollision;
+	dgVector hullBoxP0;
+	dgVector hullBoxP1;
+	hull->CalcAABB (proxy.m_matrix.Inverse(), hullBoxP0, hullBoxP1);
 
-	dgBody* const floatingBody = proxy.m_floatingBody;
-	dgBody* const referenceBody = proxy.m_referenceBody;
+	dgVector minBox (hullBoxP1 - polyBoxP0);
+	dgVector maxBox (hullBoxP0 - polyBoxP1);
 
 	dgVector floatingVeloc (floatingBody->m_veloc);
 	dgVector referenceVeloc (referenceBody->m_veloc);
-	dgCollisionInstance* const collConicConvexInstance = proxy.m_referenceCollision;
-	const dgMatrix& matrix = collConicConvexInstance->GetGlobalMatrix();
+	const dgMatrix& matrix = hull->GetGlobalMatrix();
 	dgVector veloc (proxy.m_matrix.UnrotateVector (matrix.UnrotateVector(floatingVeloc - referenceVeloc)));
+
+
 
 
 /*
