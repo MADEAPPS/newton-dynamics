@@ -733,6 +733,10 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue (dgCollis
 	const dgMatrix& matrix = hull->GetGlobalMatrix();
 	dgVector veloc (proxy.m_matrix.UnrotateVector (matrix.UnrotateVector(floatingVeloc - referenceVeloc)));
 
+	dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), veloc);
+	dgFloat32 distance = ray.BoxIntersect(minBox, maxBox);
+	if (distance < dgFloat32 (1.0f)) {
+		dgAssert (0);
 
 
 
@@ -854,5 +858,6 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue (dgCollis
 
 	proxy.m_matrix = savedProxyMatrix;
 */
+	}
 	return count;
 }

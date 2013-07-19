@@ -1559,11 +1559,11 @@ dgInt32 dgBroadPhase::ConvexCast (dgCollisionInstance* const shape, const dgMatr
 		const dgNode* stackPool[DG_BROADPHASE_MAX_STACK_DEPTH];		
 		
 		dgVector velocA((target - matrix.m_posit) & dgVector::m_triplexMask);
-		dgVector velocB(dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
+		dgVector velocB(dgFloat32(0.0f));
 
 		dgFloat32 time = dgFloat32 (1.0f);
 		dgFloat32 maxParam = dgFloat32 (1.2f);
-		dgFastRayTest ray (dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)), velocA);
+		dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), velocA);
 
 		dgVector minBox (m_rootNode->m_minBox - boxP1);
 		dgVector maxBox (m_rootNode->m_maxBox - boxP0);
