@@ -675,7 +675,6 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue (dgCollis
 	dgAssert (proxy.m_referenceCollision->IsType (dgCollision::dgCollisionConvexShape_RTTI));
 	dgAssert (proxy.m_floatingCollision->IsType (dgCollision::dgCollisionConvexPolygon_RTTI));
 
-//	
 	const dgCollisionInstance* const hull = proxy.m_referenceCollision;
 	dgCollisionInstance* const polygonInstance = proxy.m_floatingCollision;
 
@@ -687,6 +686,9 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue (dgCollis
 	dgBody* const referenceBody = proxy.m_referenceBody;
 
 	dgInt32 count = 0;
+
+	dgContact* const contactJoint = proxy.m_contactJoint;
+	contactJoint->m_closestDistance = dgFloat32 (1.0e10f);
 
 	m_normal = m_normal.CompProduct4(polyInstanceInvScale);
 	dgAssert (m_normal.m_w == dgFloat32 (0.0f));
@@ -781,8 +783,6 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue (dgCollis
 			i0 = i;
 		}
 
-		dgContact* const contactJoint = proxy.m_contactJoint;
-		contactJoint->m_closestDistance = dgFloat32 (0.0f);
 		const dgInt32 hullId = hull->GetUserDataID();
 		if (inside) {
 			dgVector normalInHull (proxy.m_matrix.RotateVector (m_normal));

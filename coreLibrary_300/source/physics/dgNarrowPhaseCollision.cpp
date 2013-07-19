@@ -1939,7 +1939,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue (dgCollisionParamPro
 	dgAssert (proxy.m_referenceCollision->IsType (dgCollision::dgCollisionConvexShape_RTTI));
 
 	dgCollisionInstance* const polySoupInstance = proxy.m_floatingCollision;
-	dgCollisionInstance* const convexHullInstance = proxy.m_referenceCollision;
+//	dgCollisionInstance* const convexHullInstance = proxy.m_referenceCollision;
 	dgPolygonMeshDesc& data = *proxy.m_polyMeshData;
 	dgAssert (data.m_faceCount); 
 
@@ -1980,6 +1980,13 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue (dgCollisionParamPro
 	dgInt32* const indexArray = (dgInt32*)data.m_faceVertexIndex;
 	data.SortFaceArray();
 
+	dgVector n (dgFloat32 (0.0f));
+	dgVector p (dgFloat32 (0.0f));
+	dgVector q (dgFloat32 (0.0f));
+	dgUnsigned64 shapeFaceID = dgUnsigned64(-1);
+	dgFloat32 saveTimeStep = proxy.m_timestep;
+	dgFloat32 epsilon = dgFloat32 (-1.0e-3f) * proxy.m_timestep;
+
 	for (dgInt32 i = 0; (i < data.m_faceCount) && (count < 16); i ++) {
 		dgInt32 address = data.m_faceIndexStart[i];
 		const dgInt32* const localIndexArray = &indexArray[address];
@@ -2015,49 +2022,86 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue (dgCollisionParamPro
 			break;
 		}
 */
-	}
 
-/*
-	contactJoint->m_closestDistance = closestDist;
-
-	// check for extreme obtuse contacts 
-	dgFloat32 penetrations[DG_MAX_CONTATCS];
-	const dgCollisionInstance* const convexInstance = proxy.m_referenceCollision;
-	const dgMatrix& matrix = convexInstance->m_globalMatrix;
-	for (dgInt32 i = 0; i < count; i ++) {
-		const dgVector& normal = contactOut[i].m_normal;
-		dgVector minPenetration (contactOut[i].m_point - matrix.TransformVector(convexInstance->SupportVertex (matrix.UnrotateVector(normal.Scale3 (dgFloat32 (-1.0f))), NULL)));
-		penetrations[i] = minPenetration % normal;
-	}
-
-	for (dgInt32 i = 0; i < count; i ++) {
-		const dgVector& n0 = contactOut[i].m_normal;
-		for (dgInt32 j = i + 1; j < count; j ++) {
-			const dgVector& n1 = contactOut[j].m_normal;
-			dgFloat32 dir = n0 % n1;
-			if (dir < dgFloat32 (-0.995f)) {
-				dgFloat32 dist0 = penetrations[i];
-				dgFloat32 dist1 = penetrations[j];
-				count --;
-				if (dist0 <= dist1) {
-					contactOut[j] = contactOut[count];
-					penetrations[j] = penetrations[count];
-					j --;
-				} else {
-					contactOut[i] = contactOut[count];
-					penetrations[i] = penetrations[count];
-					i --;
-					break;
+		if (count1 > 0) {
+			dgFloat32 error = proxy.m_timestep - saveTimeStep;
+			if (error < epsilon) {
+				count = 0;
+				countleft = maxContacts;
+				for (dgInt32 i = 0; i < count1; i ++) {
+					contactOut[i] = proxy.m_contacts[i];
 				}
 			}
+			count += count1;
+			countleft -= count1;
+			dgAssert (countleft >= 0); 
+			if (count >= maxReduceLimit) {
+				count = ReduceContacts (count, contactOut, maxReduceLimit >> 1, dgFloat32 (1.0e-2f));
+				countleft = maxContacts - count;
+				dgAssert (countleft >= 0); 
+			}
 		}
-	} 
 
-	proxy.m_contacts = contactOut;
+		closestDist = dgMin (closestDist, contactJoint->m_closestDistance);
+
+		if (proxy.m_timestep <= saveTimeStep) {
+			saveTimeStep = proxy.m_timestep;
+			n = proxy.m_normal;
+			p = proxy.m_closestPointBody0;
+			q = proxy.m_closestPointBody1;
+			shapeFaceID = proxy.m_shapeFaceID;
+		}
+
+	}
+
+//	contactJoint->m_closestDistance = closestDist;
+	// check for extreme obtuse contacts 
+//	dgFloat32 penetrations[DG_MAX_CONTATCS];
+//	const dgCollisionInstance* const convexInstance = proxy.m_referenceCollision;
+//	const dgMatrix& matrix = convexInstance->m_globalMatrix;
+//	for (dgInt32 i = 0; i < count; i ++) {
+//		const dgVector& normal = contactOut[i].m_normal;
+//		dgVector minPenetration (contactOut[i].m_point - matrix.TransformVector(convexInstance->SupportVertex (matrix.UnrotateVector(normal.Scale3 (dgFloat32 (-1.0f))), NULL)));
+//		penetrations[i] = minPenetration % normal;
+//	}
+//	for (dgInt32 i = 0; i < count; i ++) {
+//		const dgVector& n0 = contactOut[i].m_normal;
+//		for (dgInt32 j = i + 1; j < count; j ++) {
+//			const dgVector& n1 = contactOut[j].m_normal;
+//			dgFloat32 dir = n0 % n1;
+//			if (dir < dgFloat32 (-0.995f)) {
+//				dgFloat32 dist0 = penetrations[i];
+//				dgFloat32 dist1 = penetrations[j];
+//				count --;
+//				if (dist0 <= dist1) {
+//					contactOut[j] = contactOut[count];
+//					penetrations[j] = penetrations[count];
+//					j --;
+//				} else {
+//					contactOut[i] = contactOut[count];
+//					penetrations[i] = penetrations[count];
+//					i --;
+//					break;
+//				}
+//			}
+//		}
+//	} 
+//	proxy.m_contacts = contactOut;
 
 	// restore the pointer
+//	proxy.m_floatingCollision = polySoupInstance;
+
+
+	proxy.m_contacts = contactOut;
+	contactJoint->m_closestDistance = closestDist;
+
+	// restore the pointer
+	proxy.m_normal = n;
+	proxy.m_closestPointBody0 = p;
+	proxy.m_closestPointBody1 = q;
 	proxy.m_floatingCollision = polySoupInstance;
-*/
+	proxy.m_shapeFaceID = shapeFaceID;
+
 #endif
 	return count;
 }
