@@ -889,6 +889,9 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 		}
 	}
 
+	minHeight *= m_verticalScale;
+	maxHeight *= m_verticalScale;
+
 	if (!((maxHeight < boxP0.m_y) || (minHeight > boxP1.m_y))) {
 		// scan the vertices's intersected by the box extend
 		base = (z1 - z0 + 1) * (x1 - x0 + 1) + 2 * (z1 - z0) * (x1 - x0);
