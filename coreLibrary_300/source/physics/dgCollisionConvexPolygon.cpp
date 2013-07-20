@@ -110,30 +110,31 @@ dgVector dgCollisionConvexPolygon::SupportVertex (const dgVector& dir, dgInt32* 
 }
 
 
-void dgCollisionConvexPolygon::BeamClipping (const dgCollisionInstance* const hull, const dgVector& origin, dgFloat32 dist)
+void dgCollisionConvexPolygon::BeamClipping (dgFloat32 dist)
 {
 	dgPlane planes[4];
 	dgVector points[sizeof (m_localPoly) / sizeof (m_localPoly[0]) + 8];
 	dgClippedFaceEdge clippedFace [2 * sizeof (m_localPoly) / sizeof (m_localPoly[0]) + 8];
 
-	//dgVector origin (matrix.UnrotateVector (matrix.m_posit.Scale3 (dgFloat32 (-1.0f))));	 
 	dgVector dir (m_localPoly[1] - m_localPoly[0]);
-
+	dgAssert (dir.m_w == dgFloat32 (0.0f));
 	dgAssert ((dir % dir) > dgFloat32 (1.0e-8f));
 
-	dir = dir.Scale3 (dgRsqrt (dir % dir));
+	//dir = dir.Scale3 (dgRsqrt (dir % dir));
+	dir = dir.CompProduct4 (dir.InvMagSqrt());
 	planes[0] = dgPlane (dir, dist);
-	planes[2] = dgPlane (dir.Scale3 (dgFloat32 (-1.0f)), dist);
+	planes[2] = dgPlane (dir.Scale4 (dgFloat32 (-1.0f)), dist);
 
 	dir = m_normal * dir;
 	planes[1] = dgPlane (dir, dist);
-	planes[3] = dgPlane (dir.Scale3 (dgFloat32 (-1.0f)), dist);
+	planes[3] = dgPlane (dir.Scale4 (dgFloat32 (-1.0f)), dist);
 
 	for (dgInt32 i = 0; i < m_count; i ++) {
 		dgInt32 j = i << 1;
 		dgAssert (j < sizeof (clippedFace) / sizeof (clippedFace[0]));
 
-		points[i] = m_localPoly[i] - origin;
+		//points[i] = m_localPoly[i] - origin;
+		points[i] = m_localPoly[i];
 
 		clippedFace[j + 0].m_twin = &clippedFace[j + 1];
 		clippedFace[j + 0].m_next = &clippedFace[j + 2];
@@ -273,7 +274,8 @@ void dgCollisionConvexPolygon::BeamClipping (const dgCollisionInstance* const hu
 	do {
 		m_clippEdgeNormal[count] = ptr->m_incidentNormal;
 		isConvexCap |= (ptr->m_incidentNormal - m_faceNormalIndex);
-		m_localPoly[count] = points[ptr->m_incidentVertex] + origin;
+		//m_localPoly[count] = points[ptr->m_incidentVertex] + origin;
+		m_localPoly[count] = points[ptr->m_incidentVertex];
 		count ++;
 		ptr = ptr->m_next;
 	} while (ptr != first);
@@ -615,11 +617,11 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete (dgCollis
 	} else {
 		dgFloat32 convexSphapeUmbra = hull->GetUmbraClipSize ();
 		if (m_faceClipSize > convexSphapeUmbra) {
-			const dgBody* const refBody = proxy.m_referenceBody;
+			//const dgBody* const refBody = proxy.m_referenceBody;
 			//dgVector origin (polygonInstance->m_globalMatrix.UntransformVector((refBody->m_minAABB + refBody->m_maxAABB).Scale3 (dgFloat32 (0.5f))));
-			dgVector origin ((refBody->m_minAABB + refBody->m_maxAABB).Scale4 (dgFloat32 (0.5f)));
-			origin = proxy.m_matrix.UntransformVector(hull->GetGlobalMatrix().UntransformVector(origin));
-			BeamClipping (hull, origin, convexSphapeUmbra);
+			//dgVector origin ((refBody->m_minAABB + refBody->m_maxAABB).Scale4 (dgFloat32 (0.5f)));
+			//origin = proxy.m_matrix.UntransformVector(hull->GetGlobalMatrix().UntransformVector(origin));
+			BeamClipping (convexSphapeUmbra);
 			m_faceClipSize = hull->m_childShape->GetBoxMaxRadius();
 		}
 
@@ -701,14 +703,14 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue (dgCollis
 	}
 
 	dgVector hullOrigin (proxy.m_matrix.UntransformVector(dgVector (dgFloat32 (0.0f))));
-
+	hullOrigin = (hullOrigin - m_normal.CompProduct4(m_normal.DotProduct4(hullOrigin - m_localPoly[0]))) | dgVector::m_wOne;
 
 	dgMatrix polygonMatrix;
 	polygonMatrix[0] = m_localPoly[1] - m_localPoly[0];
 	polygonMatrix[0] = polygonMatrix[0].CompProduct4 (polygonMatrix[0].DotProduct4(polygonMatrix[0]).InvSqrt());
 	polygonMatrix[1] = m_normal * polygonMatrix[0];
 	polygonMatrix[2] = m_normal;
-	polygonMatrix[3] = (hullOrigin - m_normal.CompProduct4(m_normal.DotProduct4(hullOrigin - m_localPoly[0]))) | dgVector::m_wOne;
+	polygonMatrix[3] = hullOrigin;
 
 	dgVector polyBoxP0 (dgFloat32 ( 1.0e15f));
 	dgVector polyBoxP1 (dgFloat32 (-1.0e15f));
@@ -754,19 +756,23 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue (dgCollis
 	//		proxy.m_matrix = savedProxyMatrix;
 	//		return 0;
 	//	}
-		const dgVector& boxSize = hull->GetBoxSize();
+	//	const dgVector& boxSize = hull->GetBoxSize();
 	//	const dgVector& boxOrigin = hull->GetBoxOrigin();
-		dgVector boxOrigin ((hullBoxP0 + hullBoxP1).Scale4 (dgFloat32 (0.5f)));
+		dgVector boxSize ((hullBoxP1 - hullBoxP0).Scale4 (dgFloat32 (0.5f)));
+		dgVector boxOrigin ((hullBoxP1 + hullBoxP0).Scale4 (dgFloat32 (0.5f)));
 		boxOrigin += veloc.Scale4 (distance);
 
+//dgVector xxx[10];
 		bool inside = true;
 		dgInt32 i0 = m_count - 1;
 		for (dgInt32 i = 0; i < m_count; i ++) {
 
+//xxx[i] = proxy.m_matrix.TransformVector(m_localPoly[i]);
+
 			dgVector e (m_localPoly[i] - m_localPoly[i0]);
 			dgVector n (m_normal * e);
 			dgPlane plane (n, - (m_localPoly[i0] % n));
-			//plane = proxy.m_matrix.TransformPlane(plane);
+
 
 			dgVector supportDist (plane.Abs().DotProduct4 (boxSize)); 
 			dgFloat32 centerDist = plane.Evalue(boxOrigin);
@@ -815,23 +821,23 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue (dgCollis
 			}
 	*/
 		} else {
-			dgAssert (0);
-	/*
 			dgFloat32 convexSphapeUmbra = hull->GetUmbraClipSize ();
 			if (m_faceClipSize > convexSphapeUmbra) {
-				const dgBody* const refBody = proxy.m_referenceBody;
-				//dgVector origin (polygonInstance->m_globalMatrix.UntransformVector((refBody->m_minAABB + refBody->m_maxAABB).Scale3 (dgFloat32 (0.5f))));
-				dgVector origin ((refBody->m_minAABB + refBody->m_maxAABB).Scale4 (dgFloat32 (0.5f)));
-				origin = proxy.m_matrix.UntransformVector(hull->GetGlobalMatrix().UntransformVector(origin));
-				BeamClipping (hull, origin, convexSphapeUmbra);
+				//hullOrigin = polygonMatrix.UntransformVector(hullOrigin);
+				//BeamClipping (hullOrigin, convexSphapeUmbra);
+				BeamClipping (convexSphapeUmbra);
 				m_faceClipSize = hull->m_childShape->GetBoxMaxRadius();
 			}
 
+
 			dgCollisionConvex* const convexShape = (dgCollisionConvex*) hull->m_childShape;
-			count = convexShape->CalculateConvexToConvexContact (proxy);
-			dgAssert (proxy.m_intersectionTestOnly || (count >= 0));
+			//count = convexShape->CalculateConvexToConvexContact (proxy);
+			count = convexShape->CalculateConvexCastContacts (proxy);
+
+//			dgAssert (proxy.m_intersectionTestOnly || (count >= 0));
 			if (count >= 1) {
 				dgContactPoint* const contactsOut = proxy.m_contacts;
+
 				if (m_closestFeatureType == 3) {
 					for (dgInt32 i = 0; i < count; i ++) {
 						//contactsOut[i].m_userId = m_faceId;
@@ -839,6 +845,8 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue (dgCollis
 						contactsOut[i].m_shapeId1 = m_faceId;
 					}
 				} else {
+					dgAssert(0);
+/*
 					//const dgVector& polyNormal = m_normal;
 					dgVector normal (polygonInstance->m_globalMatrix.UnrotateVector(contactsOut[0].m_normal)); 
 					if ((normal % savedFaceNormal) < dgFloat32 (0.995f)) {
@@ -864,9 +872,9 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue (dgCollis
 							contactsOut[i].m_shapeId1 = m_faceId;
 						}
 					}
+*/
 				}
 			}
-	*/
 		}
 	}
 	proxy.m_matrix = savedProxyMatrix;
