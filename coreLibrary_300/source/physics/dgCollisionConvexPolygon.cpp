@@ -734,45 +734,23 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue (dgCollis
 
 	dgVector floatingVeloc (floatingBody->m_veloc);
 	dgVector referenceVeloc (referenceBody->m_veloc);
-	const dgMatrix& matrix = hull->GetGlobalMatrix();
-	dgVector veloc (proxy.m_matrix.UnrotateVector (matrix.UnrotateVector(referenceVeloc - floatingVeloc)));
+	const dgMatrix& hullMatrix = hull->GetGlobalMatrix();
+	dgVector hullRelativeVeloc (hullMatrix.UnrotateVector(referenceVeloc - floatingVeloc));
+	dgVector polyRelativeVeloc (proxy.m_matrix.UnrotateVector (hullRelativeVeloc));
 
-	dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), veloc);
+	dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), polyRelativeVeloc);
 	dgFloat32 distance = ray.BoxIntersect(minBox, maxBox);
 	if (distance < dgFloat32 (1.0f)) {
-	//	dgVector normalInHull (proxy.m_matrix.RotateVector (m_normal));
-	//	dgVector pointInHull (hull->SupportVertex (normalInHull.Scale4 (dgFloat32 (-1.0f)), NULL));
-	//	dgVector p0 (proxy.m_matrix.UntransformVector (pointInHull));
-	//	dgVector p1 (proxy.m_matrix.UntransformVector (hull->SupportVertex (normalInHull, NULL)));
-	//	dgFloat32 penetration = (m_localPoly[0] - p0) % m_normal + proxy.m_skinThickness + DG_IMPULSIVE_CONTACT_PENETRATION;
-	//	if (penetration < dgFloat32 (0.0f)) {
-	//		contactJoint->m_closestDistance = -penetration;
-	//		proxy.m_matrix = savedProxyMatrix;
-	//		return 0;
-	//	}
-	//	contactJoint->m_closestDistance = dgFloat32 (0.0f);
-	//	dgFloat32 distance = (m_localPoly[0] - p1) % m_normal;
-	//	if (distance >= dgFloat32 (0.0f)) {
-	//		proxy.m_matrix = savedProxyMatrix;
-	//		return 0;
-	//	}
-	//	const dgVector& boxSize = hull->GetBoxSize();
-	//	const dgVector& boxOrigin = hull->GetBoxOrigin();
 		dgVector boxSize ((hullBoxP1 - hullBoxP0).Scale4 (dgFloat32 (0.5f)));
 		dgVector boxOrigin ((hullBoxP1 + hullBoxP0).Scale4 (dgFloat32 (0.5f)));
-		boxOrigin += veloc.Scale4 (distance);
+		boxOrigin += polyRelativeVeloc.Scale4 (distance);
 
-//dgVector xxx[10];
 		bool inside = true;
 		dgInt32 i0 = m_count - 1;
 		for (dgInt32 i = 0; i < m_count; i ++) {
-
-//xxx[i] = proxy.m_matrix.TransformVector(m_localPoly[i]);
-
 			dgVector e (m_localPoly[i] - m_localPoly[i0]);
 			dgVector n (m_normal * e);
 			dgPlane plane (n, - (m_localPoly[i0] % n));
-
 
 			dgVector supportDist (plane.Abs().DotProduct4 (boxSize)); 
 			dgFloat32 centerDist = plane.Evalue(boxOrigin);
@@ -789,49 +767,51 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue (dgCollis
 			i0 = i;
 		}
 
+inside = false;
 		const dgInt32 hullId = hull->GetUserDataID();
 		if (inside) {
-			dgVector normalInHull (proxy.m_matrix.RotateVector (m_normal));
-			dgVector pointInHull (hull->SupportVertex (normalInHull.Scale4 (dgFloat32 (-1.0f)), NULL));
+			dgVector normalInHull (proxy.m_matrix.RotateVector (m_normal.Scale4 (dgFloat32 (-1.0f))));
+			dgVector pointInHull (hull->SupportVertex (normalInHull, NULL));
 			dgVector p0 (proxy.m_matrix.UntransformVector (pointInHull));
-			//dgVector p1 (proxy.m_matrix.UntransformVector (hull->SupportVertex (normalInHull, NULL)));
+
+			dgFloat32 timetoImpact = dgFloat32 (0.0f);
+			dgFloat32 closestDistance = dgFloat32 (0.0f);
+			
 			dgFloat32 penetration = (m_localPoly[0] - p0) % m_normal + proxy.m_skinThickness + DG_IMPULSIVE_CONTACT_PENETRATION;
 			if (penetration < dgFloat32 (0.0f)) {
-				dgFloat32 timetoImpact = penetration / (veloc % m_normal);
+				timetoImpact = penetration / (polyRelativeVeloc % m_normal);
 				dgAssert (timetoImpact >= dgFloat32 (0.0f));
-				contactJoint->m_closestDistance = -penetration;
+				closestDistance = -penetration;
 			}
 
-	/*
-			dgVector pointsContacts[64];
-			dgVector point (pointInHull + normalInHull.Scale4(dgMax (penetration - DG_IMPULSIVE_CONTACT_PENETRATION, DG_IMPULSIVE_CONTACT_PENETRATION)));
+			if (timetoImpact <= proxy.m_timestep) {
+				dgVector pointsContacts[64];
 
-			count = hull->CalculatePlaneIntersection (normalInHull.Scale4 (dgFloat32 (-1.0f)), point, pointsContacts);
-			dgVector step (normalInHull.Scale4((penetration - proxy.m_skinThickness) * dgFloat32 (0.5f)));
-			penetration = dgMax(dgAbsf (penetration) - DG_IMPULSIVE_CONTACT_PENETRATION, dgFloat32 (0.0f));
-			const dgMatrix& worldMatrix = hull->m_globalMatrix;
-			dgContactPoint* const contactsOut = proxy.m_contacts;
-			dgVector globalNormal (worldMatrix.RotateVector(normalInHull));
-			for (dgInt32 i = 0; i < count; i ++) {
-				contactsOut[i].m_point = worldMatrix.TransformVector (pointsContacts[i] + step);
-				contactsOut[i].m_normal = globalNormal;
-				contactsOut[i].m_shapeId0 = hullId;
-				contactsOut[i].m_shapeId1 = m_faceId;
-				contactsOut[i].m_penetration = penetration;
+				contactJoint->m_closestDistance = penetration;
+				dgVector point (pointInHull - normalInHull.Scale4(DG_IMPULSIVE_CONTACT_PENETRATION));
+				count = hull->CalculatePlaneIntersection (normalInHull, point, pointsContacts);
+				dgVector step (hullRelativeVeloc.Scale3 (timetoImpact) + normalInHull.Scale4(DG_IMPULSIVE_CONTACT_PENETRATION));
+
+				penetration = dgMax (penetration, dgFloat32 (0.0f));
+				const dgMatrix& worldMatrix = hull->m_globalMatrix;
+				dgContactPoint* const contactsOut = proxy.m_contacts;
+				dgVector globalNormal (worldMatrix.RotateVector(normalInHull));
+				for (dgInt32 i = 0; i < count; i ++) {
+					contactsOut[i].m_point = worldMatrix.TransformVector (pointsContacts[i] + step);
+					contactsOut[i].m_normal = globalNormal;
+					contactsOut[i].m_shapeId0 = hullId;
+					contactsOut[i].m_shapeId1 = m_faceId;
+					contactsOut[i].m_penetration = penetration;
+				}
 			}
-	*/
 		} else {
 			dgFloat32 convexSphapeUmbra = hull->GetUmbraClipSize ();
 			if (m_faceClipSize > convexSphapeUmbra) {
-				//hullOrigin = polygonMatrix.UntransformVector(hullOrigin);
-				//BeamClipping (hullOrigin, convexSphapeUmbra);
 				BeamClipping (convexSphapeUmbra);
 				m_faceClipSize = hull->m_childShape->GetBoxMaxRadius();
 			}
 
-
 			dgCollisionConvex* const convexShape = (dgCollisionConvex*) hull->m_childShape;
-			//count = convexShape->CalculateConvexToConvexContact (proxy);
 			count = convexShape->CalculateConvexCastContacts (proxy);
 
 //			dgAssert (proxy.m_intersectionTestOnly || (count >= 0));
@@ -840,7 +820,6 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue (dgCollis
 
 				if (m_closestFeatureType == 3) {
 					for (dgInt32 i = 0; i < count; i ++) {
-						//contactsOut[i].m_userId = m_faceId;
 						contactsOut[i].m_shapeId0 = hullId;
 						contactsOut[i].m_shapeId1 = m_faceId;
 					}
