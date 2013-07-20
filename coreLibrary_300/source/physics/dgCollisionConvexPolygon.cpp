@@ -756,7 +756,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue (dgCollis
 			dgFloat32 centerDist = plane.Evalue(boxOrigin);
 
 			if ((centerDist + supportDist.m_x) < dgFloat32 (0.0f)) {
-				dgAssert (0);
+//				dgAssert (0);
 				proxy.m_matrix = savedProxyMatrix;
 				return 0;
 			}

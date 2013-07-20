@@ -3025,7 +3025,7 @@ dgFloat32 dgCollisionConvex::ConvexConicConvexRayCast (const dgCollisionInstance
 			normal = normal.CompProduct4(normal.DotProduct4(normal).InvSqrt());
 		}
 
-		dgFloat32 den = normal.DotProduct4 (veloc).m_w;
+		dgFloat32 den = normal.DotProduct4 (veloc).m_x;
 		if (dgAbsf(den) < dgFloat32 (1.0e-8f)) {
 			break;
 		}
@@ -3035,12 +3035,12 @@ dgFloat32 dgCollisionConvex::ConvexConicConvexRayCast (const dgCollisionInstance
 
 		dgFloat32 dt = (normal.DotProduct4(p)).m_x / den;
 		if (dt <= dgFloat32 (-1.0e-4f)) {
-			tacc = dgFloat32 (1.2f);
+			//tacc = dgFloat32 (1.2f);
 			break;
 		}
 		tacc += dt; 
 		if (tacc >= maxT) {
-			tacc = dgFloat32 (1.2f);
+			//tacc = dgFloat32 (1.2f);
 			param = dgFloat32 (1.2f);
 			break;
 		}
@@ -3066,15 +3066,9 @@ dgFloat32 dgCollisionConvex::ConvexConicConvexRayCast (const dgCollisionInstance
 }
 
 
-dgInt32 dgCollisionConvex::CalculateConvexCastContacts(dgCollisionParamProxy& proxy) const
+
+dgInt32 dgCollisionConvex::CalculateConvexCastContacts___(dgCollisionParamProxy& proxy) const
 {
-
-static int xxx;
-xxx ++;
-if (xxx == 2)
-xxx *=1;
-
-
 	dgBody* const floatingBody = proxy.m_floatingBody;
 	dgBody* const referenceBody = proxy.m_referenceBody;
 
@@ -3166,9 +3160,143 @@ xxx *=1;
 		}
 		minkHull.m_matrix.m_posit = proxy.m_matrix.m_posit + veloc.Scale3(tacc);
 // hack;
-minkHull.m_vertexIndex = 0;
+		minkHull.m_vertexIndex = 0;
 
 		iter ++;
 	} while (iter < DG_SEPARATION_PLANES_ITERATIONS);
 	return count;
+}
+
+
+
+dgInt32 dgCollisionConvex::CalculateConvexCastContacts(dgCollisionParamProxy& proxy) const
+{
+	return CalculateConvexCastContacts___(proxy);
+/*
+	dgBody* const floatingBody = proxy.m_floatingBody;
+	dgBody* const referenceBody = proxy.m_referenceBody;
+	dgCollisionInstance* const otherInstance = proxy.m_floatingCollision;
+	dgCollisionInstance* const collConicConvexInstance = proxy.m_referenceCollision;
+
+	dgVector floatingVeloc (floatingBody->m_veloc);
+	dgVector referenceVeloc (referenceBody->m_veloc);
+	const dgVector& scale = collConicConvexInstance->m_scale;
+	const dgVector& invScale = collConicConvexInstance->m_invScale;
+	const dgMatrix& matrix = collConicConvexInstance->GetGlobalMatrix();
+	dgVector veloc (matrix.UnrotateVector(floatingVeloc - referenceVeloc));
+	bool isScaled = !(collConicConvexInstance->m_scaleIsUnit & otherInstance->m_scaleIsUnit) ? true : false;
+
+	dgInt32 iter = 0;
+	dgInt32 count = 0;
+	dgFloat32 tacc = dgFloat32 (0.0f);
+	//dgFloat32 timestep = proxy.m_timestep;
+	proxy.m_contactJoint->m_closestDistance = dgFloat32 (1.0e10f);
+
+	dgContactPoint lastContact;
+
+	dgFloat32 param = proxy.m_timestep;
+	dgMinkHull minkHull (proxy);
+	minkHull.m_scaleIsUnit = !isScaled;
+	dgInt32 makingProgressCount = 0;
+
+	do {
+		if (!minkHull.IntersectionTest()) {
+			dgAssert (0);
+			break;
+		}
+
+		dgVector normal (minkHull.m_normal);
+		if (isScaled) {
+			normal = minkHull.m_normal.CompProduct4(invScale);
+			dgAssert (normal.m_w == dgFloat32 (0.0f));
+			normal = normal.CompProduct4(normal.DotProduct4(normal).InvSqrt());
+		}
+
+		dgFloat32 den = normal.DotProduct4 (veloc).m_x;
+		if (dgAbsf(den) < dgFloat32 (1.0e-8f)) {
+			dgAssert (0);
+			break;
+		}
+
+		minkHull.m_p = ConvexConicSupporVertex(minkHull.m_p, minkHull.m_normal);
+		dgVector p (normal.CompProduct4 (normal.DotProduct4(minkHull.m_p - minkHull.m_q)));
+
+		dgFloat32 dt = (normal.DotProduct4(p)).m_x / den;
+		if (dt <= dgFloat32 (-1.0e-4f)) {
+//			dgAssert (0);
+//			count = 0;
+//			tacc = dgFloat32 (1.0e10f);
+//			param = dgFloat32 (1.0e10f);
+//			dgVector diff (scale.CompProduct3(minkHull.m_q - minkHull.m_p));
+//			dgFloat32 penetration = minkHull.m_normal.DotProduct4(diff).m_x;
+//			proxy.m_normal = matrix.RotateVector(invScale.CompProduct4(minkHull.m_normal.Scale3 (-1.0f)));
+//			proxy.m_normal = proxy.m_normal.Scale3(dgRsqrt(proxy.m_normal % proxy.m_normal ));
+//			proxy.m_closestPointBody0 = matrix.TransformVector(scale.CompProduct4(minkHull.m_p));
+//			proxy.m_closestPointBody1 = matrix.TransformVector(scale.CompProduct4(minkHull.m_q));
+//			proxy.m_contactJoint->m_closestDistance = penetration;
+			break;
+		}
+		tacc += dt; 
+		if (tacc > proxy.m_timestep) {
+			count = 0;
+			tacc = dgFloat32 (1.0e10f);
+			param = dgFloat32 (1.0e10f);
+
+			dgVector diff (scale.CompProduct3(minkHull.m_q - minkHull.m_p));
+			dgFloat32 penetration = minkHull.m_normal.DotProduct4(diff).m_x;
+
+			proxy.m_normal = matrix.RotateVector(invScale.CompProduct4(minkHull.m_normal.Scale3 (-1.0f)));
+			proxy.m_normal = proxy.m_normal.Scale3(dgRsqrt(proxy.m_normal % proxy.m_normal ));
+			proxy.m_closestPointBody0 = matrix.TransformVector(scale.CompProduct4(minkHull.m_p));
+			proxy.m_closestPointBody1 = matrix.TransformVector(scale.CompProduct4(minkHull.m_q));
+			proxy.m_contactJoint->m_closestDistance = penetration;
+			break;
+		}
+
+		param = tacc;
+		dgVector step (veloc.Scale4(dt));
+		lastContact.m_normal = normal;
+		lastContact.m_point = minkHull.m_p;
+		minkHull.TranslateSimplex(step);
+
+		makingProgressCount += (step.DotProduct4(step).m_x < dgFloat32(1.0e-4f)) ? 1 : 0;
+
+		iter ++;
+	} while ((iter < DG_SEPARATION_PLANES_ITERATIONS) && (makingProgressCount < 2));
+
+	if ((param >= dgFloat32 (0.0f)) && (param <= proxy.m_timestep)) {
+		dgVector diff (scale.CompProduct3(minkHull.m_q - minkHull.m_p));
+		dgFloat32 penetration = minkHull.m_normal.DotProduct4(diff).m_x;
+
+		dgVector step (veloc.Scale4(param));
+		proxy.m_normal = matrix.RotateVector(invScale.CompProduct4(minkHull.m_normal.Scale3 (-1.0f)));
+		proxy.m_normal = proxy.m_normal.Scale3(dgRsqrt(proxy.m_normal % proxy.m_normal ));
+		proxy.m_closestPointBody0 = matrix.TransformVector(scale.CompProduct4(minkHull.m_p));
+		proxy.m_closestPointBody1 = matrix.TransformVector(scale.CompProduct4(minkHull.m_q - step));
+
+		penetration = dgMax (penetration - DG_IMPULSIVE_CONTACT_PENETRATION, dgFloat32 (0.0f));
+		if (proxy.m_contacts) {
+			dgVector contactPoint ((minkHull.m_p + minkHull.m_q).Scale3 (dgFloat32 (0.5f)));
+			count = CalculateContacts (contactPoint, minkHull.m_normal.Scale3 (-1.0f), proxy, minkHull.m_hullDiff);
+			if (count) {
+				proxy.m_timestep = param;
+				proxy.m_contactJoint->m_closestDistance = penetration;
+				
+				count = dgMin(proxy.m_maxContacts, count);
+				dgContactPoint* const contactOut = proxy.m_contacts;
+				for (dgInt32 i = 0; i < count; i ++) {
+					contactOut[i].m_point = matrix.TransformVector(scale.CompProduct3(minkHull.m_hullDiff[i] - step));
+					contactOut[i].m_normal = proxy.m_normal;
+					contactOut[i].m_penetration = penetration;
+					contactOut[i].m_shapeId0 = collConicConvexInstance->GetUserDataID();
+					contactOut[i].m_shapeId1 = proxy.m_shapeFaceID;
+				}
+			}
+		} else {
+			proxy.m_timestep = param ;
+			proxy.m_contactJoint->m_closestDistance = penetration;
+		}
+	}
+	return count;
+*/
 }
