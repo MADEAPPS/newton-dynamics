@@ -77,7 +77,6 @@ class dgCollisionConvex: public dgCollision
 	bool IntesectionTest (dgCollisionParamProxy& proxy) const;
 	bool CalculateClosestPoints (dgCollisionParamProxy& proxy) const;
 
-	dgInt32 CalculateConvexCastContacts___ (dgCollisionParamProxy& proxy) const;
 	dgInt32 CalculateConvexCastContacts (dgCollisionParamProxy& proxy) const;
 	dgInt32 CalculateConvexToConvexContact (dgCollisionParamProxy& proxy) const;
 	//dgInt32 ConvexCastContacts (const dgMatrix& matrix, const dgMatrix& invMatrix, const dgVector& veloc, dgFloat32& timeStep, const dgCollisionConvex* const convexShape, dgContactPoint* const contact) const;
