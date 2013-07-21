@@ -3074,6 +3074,12 @@ dgFloat32 dgCollisionConvex::ConvexConicConvexRayCast (const dgCollisionInstance
 
 dgInt32 dgCollisionConvex::CalculateConvexCastContacts___(dgCollisionParamProxy& proxy) const
 {
+static int xxx;
+xxx ++;
+if (xxx == 2)
+xxx *=1;
+
+
 	dgBody* const floatingBody = proxy.m_floatingBody;
 	dgBody* const referenceBody = proxy.m_referenceBody;
 
@@ -3176,16 +3182,17 @@ dgInt32 dgCollisionConvex::CalculateConvexCastContacts___(dgCollisionParamProxy&
 
 dgInt32 dgCollisionConvex::CalculateConvexCastContacts(dgCollisionParamProxy& proxy) const
 {
+static int xxx;
+xxx ++;
+if (xxx >= 100)
+xxx *=1;
+
+
 //dgCollisionParamProxy xxx(proxy);
 dgInt32 count1 = CalculateConvexCastContacts___(proxy);
 return count1;
 //proxy = xxx;
 
-
-static int xxx;
-xxx ++;
-if (xxx >= 100)
-xxx *=1;
 
 	dgBody* const floatingBody = proxy.m_floatingBody;
 	dgBody* const referenceBody = proxy.m_referenceBody;
