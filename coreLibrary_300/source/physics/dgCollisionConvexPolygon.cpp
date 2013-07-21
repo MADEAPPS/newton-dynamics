@@ -514,7 +514,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete (dgCollis
 	dgAssert (proxy.m_referenceCollision->IsType (dgCollision::dgCollisionConvexShape_RTTI));
 	dgAssert (proxy.m_floatingCollision->IsType (dgCollision::dgCollisionConvexPolygon_RTTI));
 
-	dgCollisionInstance* const polygonInstance = proxy.m_floatingCollision;
+	const dgCollisionInstance* const polygonInstance = proxy.m_floatingCollision;
 	dgAssert (this == polygonInstance->GetChildShape());
 	dgAssert (m_count);
 	dgAssert (m_count < dgInt32 (sizeof (m_localPoly) / sizeof (m_localPoly[0])));
@@ -637,7 +637,6 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete (dgCollis
 					contactsOut[i].m_shapeId1 = m_faceId;
 				}
 			} else {
-				//const dgVector& polyNormal = m_normal;
 				dgVector normal (polygonInstance->m_globalMatrix.UnrotateVector(contactsOut[0].m_normal)); 
 				if ((normal % savedFaceNormal) < dgFloat32 (0.995f)) {
 					dgInt32 index = m_adjacentFaceEdgeNormalIndex[m_closestFeatureStartIndex];
@@ -678,14 +677,14 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue (dgCollis
 	dgAssert (proxy.m_floatingCollision->IsType (dgCollision::dgCollisionConvexPolygon_RTTI));
 
 	const dgCollisionInstance* const hull = proxy.m_referenceCollision;
-	dgCollisionInstance* const polygonInstance = proxy.m_floatingCollision;
+	const dgCollisionInstance* const polygonInstance = proxy.m_floatingCollision;
 
 	dgAssert (this == polygonInstance->GetChildShape());
 	dgAssert (m_count);
 	dgAssert (m_count < dgInt32 (sizeof (m_localPoly) / sizeof (m_localPoly[0])));
 
-	dgBody* const floatingBody = proxy.m_floatingBody;
-	dgBody* const referenceBody = proxy.m_referenceBody;
+	const dgBody* const floatingBody = proxy.m_floatingBody;
+	const dgBody* const referenceBody = proxy.m_referenceBody;
 
 	dgInt32 count = 0;
 
@@ -695,7 +694,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue (dgCollis
 	m_normal = m_normal.CompProduct4(polyInstanceInvScale);
 	dgAssert (m_normal.m_w == dgFloat32 (0.0f));
 	m_normal = m_normal.CompProduct4(m_normal.DotProduct4(m_normal).InvSqrt());
-	dgVector savedFaceNormal (m_normal);
+	const dgVector savedFaceNormal (m_normal);
 
 	for (dgInt32 i = 0; i < m_count; i ++) {
 		m_localPoly[i] = polyInstanceScale.CompProduct4(dgVector (&m_vertex[m_vertexIndex[i] * m_stride]));
@@ -756,7 +755,6 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue (dgCollis
 			dgFloat32 centerDist = plane.Evalue(boxOrigin);
 
 			if ((centerDist + supportDist.m_x) < dgFloat32 (0.0f)) {
-//				dgAssert (0);
 				proxy.m_matrix = savedProxyMatrix;
 				return 0;
 			}
@@ -767,6 +765,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue (dgCollis
 			i0 = i;
 		}
 
+// for the time being for the minkoske contact calculation
 inside = false;
 		const dgInt32 hullId = hull->GetUserDataID();
 		if (inside) {
@@ -817,16 +816,13 @@ inside = false;
 //			dgAssert (proxy.m_intersectionTestOnly || (count >= 0));
 			if (count >= 1) {
 				dgContactPoint* const contactsOut = proxy.m_contacts;
-
+/*
 				if (m_closestFeatureType == 3) {
 					for (dgInt32 i = 0; i < count; i ++) {
 						contactsOut[i].m_shapeId0 = hullId;
 						contactsOut[i].m_shapeId1 = m_faceId;
 					}
 				} else {
-					dgAssert(0);
-/*
-					//const dgVector& polyNormal = m_normal;
 					dgVector normal (polygonInstance->m_globalMatrix.UnrotateVector(contactsOut[0].m_normal)); 
 					if ((normal % savedFaceNormal) < dgFloat32 (0.995f)) {
 						dgInt32 index = m_adjacentFaceEdgeNormalIndex[m_closestFeatureStartIndex];
@@ -851,7 +847,12 @@ inside = false;
 							contactsOut[i].m_shapeId1 = m_faceId;
 						}
 					}
+				}
 */
+
+				for (dgInt32 i = 0; i < count; i ++) {
+					contactsOut[i].m_shapeId0 = hullId;
+					contactsOut[i].m_shapeId1 = m_faceId;
 				}
 			}
 		}

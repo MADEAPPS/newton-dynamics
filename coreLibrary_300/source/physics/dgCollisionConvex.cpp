@@ -3099,44 +3099,49 @@ dgInt32 dgCollisionConvex::CalculateConvexCastContacts(dgCollisionParamProxy& pr
 	do {
 		minkHull.CalculateClosestPoints ();
 		dgVector normal (minkHull.m_normal);
+		dgAssert (normal.m_w == dgFloat32 (0.0f));
 		if (isNonUniformScale) {
 			normal = normal.CompProduct4(invScale);
-			normal = normal.Scale3(dgRsqrt (normal % normal));
+			//normal = normal.Scale3(dgRsqrt (normal % normal));
+			normal = normal.CompProduct4(normal.InvMagSqrt());
 		}
 		dgFloat32 den = normal % veloc;
 		if (den >= dgFloat32 (0.0f)) {
-			// bodies are residing form each other, even if they are touching they are not considered to be colliding because the motion will move them apart 
+			// bodies are residing from each other, even if they are touching they are not considered to be colliding because the motion will move them apart 
 			// get the closet point and the normal at contact point
 			count = 0;
 			proxy.m_timestep = timestep;
-			proxy.m_normal = matrix.RotateVector(invScale.CompProduct4(minkHull.m_normal.Scale3 (-1.0f)));
-			proxy.m_normal = proxy.m_normal.Scale3(dgRsqrt(proxy.m_normal % proxy.m_normal ));
-			proxy.m_closestPointBody0 = matrix.TransformVector(scale.CompProduct3(minkHull.m_p)) & dgVector::m_triplexMask;
-			proxy.m_closestPointBody1 = matrix.TransformVector(scale.CompProduct3(minkHull.m_q)) & dgVector::m_triplexMask;
+			proxy.m_normal = matrix.RotateVector(invScale.CompProduct4(minkHull.m_normal.Scale4 (-1.0f)));
+			dgAssert (proxy.m_normal.m_w == dgFloat32 (0.0f));
+			//proxy.m_normal = proxy.m_normal.Scale3(dgRsqrt(proxy.m_normal % proxy.m_normal ));
+			proxy.m_normal = proxy.m_normal.CompProduct4(proxy.m_normal.InvMagSqrt());
+			proxy.m_closestPointBody0 = matrix.TransformVector(scale.CompProduct4(minkHull.m_p)) & dgVector::m_triplexMask;
+			proxy.m_closestPointBody1 = matrix.TransformVector(scale.CompProduct4(minkHull.m_q)) & dgVector::m_triplexMask;
 			break;
 		}
 
 		minkHull.m_p = ConvexConicSupporVertex(minkHull.m_p, minkHull.m_normal);
-		dgVector diff (scale.CompProduct3(minkHull.m_q - minkHull.m_p));
-		dgFloat32 num = minkHull.m_normal % diff;
+		dgVector diff (scale.CompProduct4(minkHull.m_q - minkHull.m_p));
+		dgFloat32 num = minkHull.m_normal.DotProduct4(diff).m_x;
 		if (num <= dgFloat32 (0.0f)) {
 			// bodies collide at time tacc, but we do not set it yet
-			proxy.m_normal = matrix.RotateVector(normal.Scale3 (-1.0f));
-			dgVector step (veloc.Scale3(tacc));
-			proxy.m_closestPointBody0 = matrix.TransformVector(scale.CompProduct3(minkHull.m_p)) & dgVector::m_triplexMask;
-			proxy.m_closestPointBody1 = matrix.TransformVector(scale.CompProduct3(minkHull.m_q - step)) & dgVector::m_triplexMask;
+			proxy.m_normal = matrix.RotateVector(normal.Scale4 (-1.0f));
+			dgVector step (veloc.Scale4(tacc));
+			proxy.m_closestPointBody0 = matrix.TransformVector(scale.CompProduct4(minkHull.m_p)) & dgVector::m_triplexMask;
+			proxy.m_closestPointBody1 = matrix.TransformVector(scale.CompProduct4(minkHull.m_q - step)) & dgVector::m_triplexMask;
+			proxy.m_contactJoint->m_closestDistance = proxy.m_normal.DotProduct4(proxy.m_closestPointBody0 - proxy.m_closestPointBody1).m_x;
 
 			dgFloat32 penetration = dgMax(num * dgFloat32 (-1.0f) - DG_IMPULSIVE_CONTACT_PENETRATION, dgFloat32 (0.0f));
 			if (proxy.m_contacts) {
 				dgVector contactPoint ((minkHull.m_p + minkHull.m_q).Scale3 (dgFloat32 (0.5f)));
-				count = CalculateContacts (contactPoint, minkHull.m_normal.Scale3 (-1.0f), proxy, minkHull.m_hullDiff);
+				count = CalculateContacts (contactPoint, minkHull.m_normal.Scale4 (-1.0f), proxy, minkHull.m_hullDiff);
 				if (count) {
-					proxy.m_contactJoint->m_closestDistance = penetration;
+					
 					proxy.m_timestep = tacc;
 					count = dgMin(proxy.m_maxContacts, count);
 					dgContactPoint* const contactOut = proxy.m_contacts;
 					for (dgInt32 i = 0; i < count; i ++) {
-						contactOut[i].m_point = matrix.TransformVector(scale.CompProduct3(minkHull.m_hullDiff[i] - step)) & dgVector::m_triplexMask;
+						contactOut[i].m_point = matrix.TransformVector(scale.CompProduct4(minkHull.m_hullDiff[i] - step)) & dgVector::m_triplexMask;
 						contactOut[i].m_normal = proxy.m_normal;
 						contactOut[i].m_penetration = penetration;
 						contactOut[i].m_shapeId0 = collConicConvexInstance->GetUserDataID();
@@ -3156,10 +3161,11 @@ dgInt32 dgCollisionConvex::CalculateConvexCastContacts(dgCollisionParamProxy& pr
 			// object do not collide on this timestep
 			count = 0;
 			proxy.m_timestep = timestep;
-			proxy.m_normal = matrix.RotateVector(invScale.CompProduct4(minkHull.m_normal.Scale3 (-1.0f)));
-			proxy.m_normal = proxy.m_normal.Scale3(dgRsqrt(proxy.m_normal % proxy.m_normal ));
-			proxy.m_closestPointBody0 = matrix.TransformVector(scale.CompProduct3(minkHull.m_p)) & dgVector::m_triplexMask;
-			proxy.m_closestPointBody1 = matrix.TransformVector(scale.CompProduct3(minkHull.m_q)) & dgVector::m_triplexMask;
+			proxy.m_normal = matrix.RotateVector(invScale.CompProduct4(minkHull.m_normal.Scale4 (-1.0f)));
+			//proxy.m_normal = proxy.m_normal.Scale3(dgRsqrt(proxy.m_normal % proxy.m_normal ));
+			proxy.m_normal = proxy.m_normal.CompProduct4(proxy.m_normal.InvMagSqrt());
+			proxy.m_closestPointBody0 = matrix.TransformVector(scale.CompProduct4(minkHull.m_p)) & dgVector::m_triplexMask;
+			proxy.m_closestPointBody1 = matrix.TransformVector(scale.CompProduct4(minkHull.m_q)) & dgVector::m_triplexMask;
 			break;
 		}
 

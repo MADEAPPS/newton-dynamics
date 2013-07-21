@@ -50,8 +50,8 @@ void dgPolygonMeshDesc::SortFaceArray ()
 				dgInt32 j = hi;
 				dgFloat32 dist = m_hitDistance[(lo + hi) >> 1];
 				do {    
-					while (m_hitDistance[i] > dist) i ++;
-					while (m_hitDistance[j] < dist) j --;
+					while (m_hitDistance[i] < dist) i ++;
+					while (m_hitDistance[j] > dist) j --;
 
 					if (i <= j)	{
 						dgSwap (m_hitDistance[i], m_hitDistance[j]);
@@ -82,7 +82,7 @@ void dgPolygonMeshDesc::SortFaceArray ()
 		stride = m_faceCount;
 	}
 	for (dgInt32 i = 1; i < stride; i ++) {
-		if (m_hitDistance[i] > m_hitDistance[0]) {
+		if (m_hitDistance[i] < m_hitDistance[0]) {
 			dgSwap (m_hitDistance[i], m_hitDistance[0]);
 			dgSwap (m_faceIndexStart[i], m_faceIndexStart[0]);
 			dgSwap (m_faceIndexCount[i], m_faceIndexCount[0]);
@@ -94,7 +94,7 @@ void dgPolygonMeshDesc::SortFaceArray ()
 		dgInt32 ptr = m_faceIndexStart[i];
 		dgInt32 count = m_faceIndexCount[i];
 		dgFloat32 dist = m_hitDistance[i];
-		for ( ; dist > m_hitDistance[j - 1]; j --) {
+		for ( ; dist < m_hitDistance[j - 1]; j --) {
 			dgAssert (j > 0);
 			m_hitDistance[j] = m_hitDistance [j-1];
 			m_faceIndexStart[j] = m_faceIndexStart[j-1];
@@ -107,7 +107,7 @@ void dgPolygonMeshDesc::SortFaceArray ()
 
 #ifdef _DEBUG
 	for (dgInt32 i = 0; i < m_faceCount - 1; i ++) {
-		dgAssert (m_hitDistance[i] >= m_hitDistance[i+1]);
+		dgAssert (m_hitDistance[i] <= m_hitDistance[i+1]);
 	}
 #endif
 }
@@ -364,9 +364,11 @@ dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const casti
 //	}
 //	indexCount = 0;
 
+dgAssert (0);
 	data.SortFaceArray();
 	dgContactPoint tmpContact;
-	for (dgInt32 j = data.m_faceCount - 1; (j >= 0) && (data.m_hitDistance[j] < maxT); j --) {
+//	for (dgInt32 j = data.m_faceCount - 1; (j >= 0) && (data.m_hitDistance[j] < maxT); j --) {
+	for (dgInt32 j = 0; (j < data.m_faceCount) && (data.m_hitDistance[j] < maxT); j --) {
 		dgInt32 address = data.m_faceIndexStart[j];
 		const dgInt32* const localIndexArray = &indexArray[address];
 

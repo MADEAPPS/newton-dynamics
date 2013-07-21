@@ -43,6 +43,14 @@ DG_MSC_VECTOR_ALIGMENT
 class dgPolygonMeshDesc
 {
 	public:
+	class dgMesh
+	{
+		public:
+		dgInt32 m_globalFaceIndexCount[DG_MAX_COLLIDING_FACES];
+		dgInt32 m_globalFaceIndexStart[DG_MAX_COLLIDING_FACES];
+		dgFloat32 m_globalHitDistance[DG_MAX_COLLIDING_FACES];
+	};
+
 	// colliding box in polygonSoup local space
 	dgPolygonMeshDesc()
 		:m_boxDistanceTravelInMeshSpace(dgFloat32 (0.0f))
@@ -78,16 +86,8 @@ class dgPolygonMeshDesc
 		return dgFloat32 ((size >= 1) ? size : dgFloat32 (1.0f));
 	}
 
-
 	void SortFaceArray ();
 
-	class dgMesh
-	{
-		public:
-		dgInt32 m_globalFaceIndexCount[DG_MAX_COLLIDING_FACES];
-		dgInt32 m_globalFaceIndexStart[DG_MAX_COLLIDING_FACES];
-		dgFloat32 m_globalHitDistance[DG_MAX_COLLIDING_FACES];
-	};
 
 	dgVector m_boxP0;                           
 	dgVector m_boxP1;

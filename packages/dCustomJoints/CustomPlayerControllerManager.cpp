@@ -236,11 +236,6 @@ void CustomPlayerController::UpdateGroundPlane (dMatrix& matrix, const dMatrix& 
 	CustomPlayerControllerManager* const manager = (CustomPlayerControllerManager*) GetManager();
 	NewtonWorld* const world = manager->GetWorld();
 
-//static int xxxx;
-//if (xxxx >= 1054)
-//xxxx *=1;
-//xxxx++;
-
 	dFloat timetoImpact;
 	NewtonWorldConvexCastReturnInfo info[4];
 
@@ -297,13 +292,6 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 	NewtonBodyGetMatrix(body, &matrix[0][0]);
 	NewtonBodyGetVelocity(body, &veloc[0]);
 	NewtonBodyGetOmega(body, &omega[0]);
-
-//static int xxx;
-//if (xxx >= 1054)
-//xxx *=1;
-//if (xxx > 1000)
-//dTrace (("%d %f %f\n", xxx, matrix.m_posit.m_y));
-//xxx ++;
 
 	// integrate body angular velocity
 	NewtonBodyGetRotation (body, &bodyRotation.m_q0); 
