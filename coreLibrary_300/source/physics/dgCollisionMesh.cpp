@@ -364,7 +364,6 @@ dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const casti
 //	}
 //	indexCount = 0;
 
-dgAssert (0);
 	data.SortFaceArray();
 	dgContactPoint tmpContact;
 //	for (dgInt32 j = data.m_faceCount - 1; (j >= 0) && (data.m_hitDistance[j] < maxT); j --) {

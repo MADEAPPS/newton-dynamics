@@ -208,7 +208,7 @@ class BasicPlayerControllerManager: public CustomPlayerControllerManager
 			// velocity is set by AI script
 		}
 
-#if 1
+#if 0
 	#if 0
 		static FILE* file = fopen ("log.bin", "wb");
 		if (file) {
@@ -251,21 +251,12 @@ class BasicPlayerControllerManager: public CustomPlayerControllerManager
 		// update all characters physics
 		CustomPlayerControllerManager::PostUpdate(timestep);
 
-Sleep(10);
-static int xxx;
-xxx ++;
-
 		// now overwrite the camera to match the player character location 
 		if (m_player) {
 			dMatrix playerMatrix (m_player->GetNextMatrix()); 
-
-dTrace (("%d %f\n", xxx, playerMatrix.m_posit.m_y));
-
 			dFloat height = m_player->m_controller->GetHight();
 			dVector upDir (m_player->m_controller->GetUpDir());
 			playerMatrix.m_posit += upDir.Scale(height);
-
-
 
 			DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
 			DemoCamera* const camera = scene->GetCamera();
@@ -374,7 +365,7 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	dVector size (2.0f, 2.0f, 2.0f, 0.0f);
 	int count = 1;
 	dMatrix shapeOffsetMatrix (GetIdentityMatrix());
-//	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix, 10.0f);
+	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix, 10.0f);
 
 	dVector origin (-10.0f, 2.0f, 0.0f, 0.0f);
 	dQuaternion rot;
