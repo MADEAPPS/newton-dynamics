@@ -92,7 +92,7 @@ dgMeshEffect::dgMeshBVH::dgMeshBVHNode::dgMeshBVHNode (const dgMeshEffect* const
 
 
 	SetBox (dgVector (dgFloat32 (p0.m_x) - dgFloat32 (0.1f), dgFloat32 (p0.m_y) - dgFloat32 (0.1f), dgFloat32 (p0.m_z) - dgFloat32 (0.1f), 0.0f), 
-		dgVector (dgFloat32 (p1.m_x) + dgFloat32 (0.1f), dgFloat32 (p1.m_y) + dgFloat32 (0.1f), dgFloat32 (p1.m_z) + dgFloat32 (0.1f), 0.0f));
+			dgVector (dgFloat32 (p1.m_x) + dgFloat32 (0.1f), dgFloat32 (p1.m_y) + dgFloat32 (0.1f), dgFloat32 (p1.m_z) + dgFloat32 (0.1f), 0.0f));
 }
 
 dgMeshEffect::dgMeshBVH::dgMeshBVHNode::dgMeshBVHNode (dgMeshBVHNode* const left, dgMeshBVHNode* const right)
@@ -157,6 +157,51 @@ dgMeshEffect* dgMeshEffect::CreateFromSerialization (dgMemoryAllocator* const al
 void dgMeshEffect::Serialize (dgSerialize callback, void* const userData) const
 {
 	dgAssert (0);
+
+	dgInt32 faceCount = 0;
+	dgTree<dgEdge*, dgEdge*>filter(GetAllocator());
+	Iterator iter (*this);
+	for (iter.Begin(); iter; iter ++) {
+		dgEdge* const face = &iter.GetNode()->GetInfo();
+		if (!filter.Find(face) && (face->m_incidentFace > 0)) {
+			faceCount ++;
+			dgEdge* edge = face; 
+			do {
+				filter.Insert(edge, edge);
+				edge = edge->m_next;
+			} while (edge != face);
+		}
+	}
+
+	callback (userData, &faceCount, sizeof (dgInt32));
+	callback (userData, &m_pointCount, sizeof (dgInt32));
+	callback (userData, &m_atribCount, sizeof (dgInt32));
+	callback (userData, &m_atribCount, sizeof (dgInt32));
+
+	callback (userData, m_points, m_pointCount * sizeof (dgBigVector));
+	callback (userData, m_attrib, m_atribCount * sizeof (dgVertexAtribute));
+
+	filter.RemoveAll();
+	for (iter.Begin(); iter; iter ++) {
+		dgEdge* const face = &iter.GetNode()->GetInfo();
+		if (!filter.Find(face) && (face->m_incidentFace > 0)) {
+			dgInt32 indices[1024];
+			dgInt32 attibuteIndex[1024];
+			dgInt32 vertexCount = 0;
+			dgEdge* edge = face; 
+			do {
+				indices[vertexCount] = edge->m_incidentVertex;
+				attibuteIndex[vertexCount] = dgInt32 (edge->m_userData);
+				vertexCount ++;
+				filter.Insert(edge, edge);
+				edge = edge->m_next;
+			} while (edge != face);
+
+			callback (userData, &vertexCount, sizeof (dgInt32));
+			callback (userData, indices, vertexCount * sizeof (dgInt32));
+			callback (userData, attibuteIndex, vertexCount * sizeof (dgInt32));
+		}
+	}
 }
 
 void dgMeshEffect::dgMeshBVH::Build ()
