@@ -148,6 +148,17 @@ dgMeshEffect::dgMeshBVH::~dgMeshBVH()
 	Cleanup ();
 }
 
+dgMeshEffect* dgMeshEffect::CreateFromSerialization (dgMemoryAllocator* const allocator, dgDeserialize deserialization, void* const userData)
+{
+	dgAssert (0);
+	return NULL;
+}
+
+void dgMeshEffect::Serialize (dgSerialize callback, void* const userData) const
+{
+	dgAssert (0);
+}
+
 void dgMeshEffect::dgMeshBVH::Build ()
 {
 	for (void* faceNode = m_mesh->GetFirstFace (); faceNode; faceNode = m_mesh->GetNextFace(faceNode)) {

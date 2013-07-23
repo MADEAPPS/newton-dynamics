@@ -7760,13 +7760,25 @@ NewtonMesh* NewtonMeshCreateVoronoiConvexDecomposition (const NewtonWorld* const
 	return (NewtonMesh*) dgMeshEffect::CreateVoronoiConvexDecomposition (world->dgWorld::GetAllocator(), pointCount, strideInBytes, vertexCloud, materialID, dgMatrix (textureMatrix));
 }
 
-
+NEWTON_API NewtonMesh* NewtonMeshCreateFromSerialization (const NewtonWorld* const newtonWorld, NewtonDeserializeCallback deserializeFunction, void* const serializeHandle)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *) newtonWorld;
+	return (NewtonMesh*) dgMeshEffect::CreateFromSerialization (world->dgWorld::GetAllocator(), (dgDeserialize) deserializeFunction, serializeHandle);
+}
 
 void NewtonMeshDestroy(const NewtonMesh* const mesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
 	delete meshEffect;
+}
+
+void NewtonMeshSerialize (const NewtonMesh* const mesh, NewtonSerializeCallback serializeFunction, void* const serializeHandle)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
+	meshEffect->Serialize ((dgSerialize) serializeFunction, serializeHandle);
 }
 
 void NewtonMeshSaveOFF(const NewtonMesh* const mesh, const char* const filename)

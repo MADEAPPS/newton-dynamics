@@ -137,6 +137,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	dgMeshEffect(dgCollisionInstance* const collision);
 	dgMeshEffect(const dgMeshEffect& source);
 	dgMeshEffect(dgPolyhedra& mesh, const dgMeshEffect& source);
+	dgMeshEffect(dgMemoryAllocator* const allocator, dgDeserialize deserialization, void* const userData);
 
 	// create from OFF or PLY file format
 	dgMeshEffect(dgMemoryAllocator* const allocator, const char* const fileName);
@@ -246,7 +247,9 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 	static dgMeshEffect* CreateDelaunayTetrahedralization (dgMemoryAllocator* const allocator, dgInt32 pointCount, dgInt32 pointStrideInBytes, const dgFloat32* const pointCloud, dgInt32 materialId, const dgMatrix& textureProjectionMatrix);
 	static dgMeshEffect* CreateVoronoiConvexDecomposition (dgMemoryAllocator* const allocator, dgInt32 pointCount, dgInt32 pointStrideInBytes, const dgFloat32* const pointCloud, dgInt32 materialId, const dgMatrix& textureProjectionMatrix);
-	
+	static dgMeshEffect* CreateFromSerialization (dgMemoryAllocator* const allocator, dgDeserialize deserialization, void* const userData);
+
+	void Serialize (dgSerialize callback, void* const userData) const;
 
 	dgVertexAtribute& GetAttribute (dgInt32 index) const;
 	void TransformMesh (const dgMatrix& matrix);
@@ -288,9 +291,9 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	void AddAtribute (const dgVertexAtribute& attib);
 	void AddPoint(const dgFloat64* vertexList, dgInt32 material);
 
+	
 
 	protected:
-
 	void Init ();
 	dgBigVector GetOrigin ()const;
 	dgInt32 CalculateMaxAttributes () const;
