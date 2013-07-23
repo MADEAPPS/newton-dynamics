@@ -26,22 +26,22 @@
 #include "CustomAlloc.h"
 
 
-class CustomControllerFilterCastFilter
+class CustomControllerConvexCastPreFilter
 {	
 	public:
-	NEWTON_API CustomControllerFilterCastFilter (const NewtonBody* const me)
+	NEWTON_API CustomControllerConvexCastPreFilter (const NewtonBody* const me)
+		:m_bodiesToSkipCount(1)
 	{
-		m_count = 1;
-		m_filter[0] = me;
+		m_bodiesToSkip[0] = me;
 	}
 
-	NEWTON_API static unsigned ConvexStaticCastPrefilter(const NewtonBody* const body, const NewtonCollision* const myCollision, void* const userData)
+	NEWTON_API static unsigned Prefilter(const NewtonBody* const body, const NewtonCollision* const myCollision, void* const userData)
 	{
-		CustomControllerFilterCastFilter* const filter = (CustomControllerFilterCastFilter*) userData;
+		CustomControllerConvexCastPreFilter* const filter = (CustomControllerConvexCastPreFilter*) userData;
 		const NewtonCollision* const collision = NewtonBodyGetCollision(body);
 		if (NewtonCollisionGetMode(collision)) {
-			for (int i = 0; i < filter->m_count; i ++) {
-				if (body == filter->m_filter[i]) {
+			for (int i = 0; i < filter->m_bodiesToSkipCount; i ++) {
+				if (body == filter->m_bodiesToSkip[i]) {
 					return 0;
 				}
 			}
@@ -50,9 +50,46 @@ class CustomControllerFilterCastFilter
 		return 0;
 	}
 
-	int m_count;
-	const NewtonBody* m_filter[32];
+	const NewtonBody* m_bodiesToSkip[16];
+	int m_bodiesToSkipCount;
 };
+
+
+class CustomControllerConvexRayFilter: public CustomControllerConvexCastPreFilter
+{	
+	public:
+	NEWTON_API CustomControllerConvexRayFilter (const NewtonBody* const me)
+		:CustomControllerConvexCastPreFilter(me)
+		,m_hitBody(NULL)
+		,m_shapeHit(NULL)
+		,m_collisionID(NULL) 
+		,m_intersectParam(1.2f)
+	{
+	}
+
+	NEWTON_API static dFloat Filter (const NewtonBody* const body, const NewtonCollision* const shapeHit, const dFloat* const hitContact, const dFloat* const hitNormal, dLong collisionID, void* const userData, dFloat intersectParam)
+	{
+		CustomControllerConvexRayFilter* const filter = (CustomControllerConvexRayFilter*) userData;
+		dAssert (body != filter->m_bodiesToSkip[0]);
+		if (intersectParam < filter->m_intersectParam) {
+			filter->m_hitBody = body;	
+			filter->m_shapeHit = shapeHit;
+			filter->m_collisionID = collisionID;
+			filter->m_intersectParam = intersectParam;
+			filter->m_hitContact = dVector(hitContact[0], hitContact[1], hitContact[2], 0.0f); 
+			filter->m_hitNormal = dVector(hitNormal[0], hitNormal[1], hitNormal[2], 0.0f); 
+		}
+		return intersectParam;
+	}
+	
+	dVector m_hitContact; 
+	dVector m_hitNormal;
+	const NewtonBody* m_hitBody;
+	const NewtonCollision* m_shapeHit;
+	dLong m_collisionID; 
+	dFloat m_intersectParam;
+};
+
 
 
 #define CUSTOM_CONTROLLER_GLUE(ControllerClass)													\

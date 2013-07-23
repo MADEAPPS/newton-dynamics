@@ -42,7 +42,7 @@ void dNewtonRayCast::CastRay (const dFloat* const p0, const dFloat* const p1, in
 }
 
 
-dFloat dNewtonRayCast::RayFilterCallback(const NewtonBody* const body, const NewtonCollision* const shapeHit, const dFloat* const hitContact, const dFloat* const hitNormal, int* const collisionID, void* const userData, dFloat intersectParam)
+dFloat dNewtonRayCast::RayFilterCallback(const NewtonBody* const body, const NewtonCollision* const shapeHit, const dFloat* const hitContact, const dFloat* const hitNormal, dLong collisionID, void* const userData, dFloat intersectParam)
 {
 	dNewtonRayCast* const me = (dNewtonRayCast*) userData;
 	const dNewtonBody* const myBody = (dNewtonBody*) NewtonBodyGetUserData(body);

@@ -365,7 +365,7 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	dVector size (2.0f, 2.0f, 2.0f, 0.0f);
 	int count = 1;
 	dMatrix shapeOffsetMatrix (GetIdentityMatrix());
-	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix, 10.0f);
+//	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix, 10.0f);
 
 	dVector origin (-10.0f, 2.0f, 0.0f, 0.0f);
 	dQuaternion rot;

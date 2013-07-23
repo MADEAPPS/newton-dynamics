@@ -60,14 +60,9 @@ class CustomPlayerController
 	}
 
 
-	const dVector& GetGroundPlane() const
+	const dVector& GetGroundPlane____() const
 	{
 		return m_groundPlane;
-	}
-
-	const dVector& GetGroundContact() const
-	{
-		return m_groundContact;
 	}
 
 	NEWTON_API void SetPlayerOrigin (dFloat originHigh);
@@ -79,18 +74,18 @@ class CustomPlayerController
 	NEWTON_API dVector CalculateDesiredVelocity (dFloat forwardSpeed, dFloat lateralSpeed, dFloat verticalSpeed, const dVector& gravity, dFloat timestep) const;
 
 	NEWTON_API void Init(dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stepHigh, const dMatrix& localAxis);
+	NEWTON_API void Cleanup();
 
 	NEWTON_API virtual void PreUpdate(dFloat timestep, int threadIndex);
 	NEWTON_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 	
 	private:
-	void UpdateGroundPlane (dMatrix& matrix, const dMatrix& castMatrix, const dVector& target, CustomControllerFilterCastFilter& castFilterData, int threadIndex);
+	void UpdateGroundPlane (dMatrix& matrix, const dMatrix& castMatrix, const dVector& target, int threadIndex);
 	dFloat CalculateContactKinematics(const dVector& veloc, const NewtonWorldConvexCastReturnInfo* const contact) const;
 
 	dVector m_upVector;
 	dVector m_frontVector;
 	dVector m_groundPlane;
-	dVector m_groundContact;
 	dVector m_groundVelocity;
 	dFloat m_outerRadio;
 	dFloat m_innerRadio;
@@ -99,8 +94,9 @@ class CustomPlayerController
 	dFloat m_maxSlope;
 	dFloat m_restrainingDistance;
 	bool m_isJumping;
+	NewtonCollision* m_castingSphere;
 	NewtonCollision* m_supportShape;
-	NewtonCollision* m_collisionShape;
+	NewtonCollision* m_upperBodyShape;
 
 	friend class CustomPlayerControllerManager;
 };
@@ -118,6 +114,9 @@ class CustomPlayerControllerManager: public CustomControllerManager<CustomPlayer
 
 	// the client application can overload this function to customizer contacts
 	NEWTON_API virtual int ProcessContacts (const CustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const; 
+
+	protected:
+	virtual void DestroyController (CustomController* const controller);
 };
 
 

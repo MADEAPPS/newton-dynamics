@@ -34,7 +34,7 @@ class dRayCastRecord
 	}
 
 
-	static dFloat RayCast (const NewtonBody* const body, const NewtonCollision* const collisionHit, const dFloat* const contact, const dFloat* const normal, int* const collisionID, void* const userData, dFloat intersetParam)
+	static dFloat RayCast (const NewtonBody* const body, const NewtonCollision* const collisionHit, const dFloat* const contact, const dFloat* const normal, dLong collisionID, void* const userData, dFloat intersetParam)
 	{
 		dFloat* const paramPtr = (dFloat*)userData;
 		if (intersetParam < paramPtr[0]) {

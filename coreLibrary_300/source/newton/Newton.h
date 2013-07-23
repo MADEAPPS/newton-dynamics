@@ -377,7 +377,7 @@ extern "C" {
 
 	typedef int (*NewtonGetBuoyancyPlane) (int collisionID, void* const context, const dFloat* const globalSpaceMatrix, dFloat* const globalSpacePlane);
 	typedef unsigned (*NewtonWorldRayPrefilterCallback)(const NewtonBody* const body, const NewtonCollision* const collision, void* const userData);
-	typedef dFloat (*NewtonWorldRayFilterCallback)(const NewtonBody* const body, const NewtonCollision* const shapeHit, const dFloat* const hitContact, const dFloat* const hitNormal, int* const collisionID, void* const userData, dFloat intersectParam);
+	typedef dFloat (*NewtonWorldRayFilterCallback)(const NewtonBody* const body, const NewtonCollision* const shapeHit, const dFloat* const hitContact, const dFloat* const hitNormal, dLong collisionID, void* const userData, dFloat intersectParam);
 	
 
 	typedef void (*NewtonContactsProcess) (const NewtonJoint* const contact, dFloat timestep, int threadIndex);

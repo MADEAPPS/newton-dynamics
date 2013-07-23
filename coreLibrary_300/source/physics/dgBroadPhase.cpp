@@ -1470,7 +1470,7 @@ void dgBroadPhase::ConvexRayCast (dgCollisionInstance* const shape, const dgMatr
 		const dgNode* stackPool[DG_BROADPHASE_MAX_STACK_DEPTH];		
 
 		dgVector velocA((target - matrix.m_posit) & dgVector::m_triplexMask);
-		dgFloat32 maxParam = dgFloat32 (1.2f);
+		dgFloat32 maxParam = dgFloat32 (1.02f);
 		dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), velocA);
 		dgFloat32 quantizeStep = dgMax (dgFloat32 (1.0f) / velocA.DotProduct4(velocA).m_x, dgFloat32 (0.001f));
 

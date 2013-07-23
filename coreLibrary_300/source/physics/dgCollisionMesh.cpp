@@ -393,12 +393,13 @@ dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const casti
 		dgFloat32 t = polygon.ConvexRayCast (castingShape, shapeMatrix, shapeVeloc, maxT, tmpContact, referenceBody, &polyInstance, userData, threadId);
 		if (t < maxT) {
 			maxT = t;
-			//bound = t;
 			contactOut = tmpContact;
+			contactOut.m_shapeId0 = polygon.m_faceId;
+			contactOut.m_shapeId1 = polygon.m_faceId;
 		}
 	}
 
-	return  maxT;
+	return maxT;
 }
 
 

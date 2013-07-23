@@ -236,7 +236,7 @@ dgFloat32 dgBody::RayCast (const dgLineBox& line, OnRayCastAction filter, OnRayP
 				dgAssert (t >= dgFloat32 (0.0f));
 				dgAssert (t <= dgFloat32 (1.0f));
 				contactOut.m_normal = globalMatrix.RotateVector (contactOut.m_normal);
-				maxT = filter (this, contactOut.m_collision0, p, contactOut.m_normal, (void*)contactOut.m_shapeId0, userData, t);
+				maxT = filter (this, contactOut.m_collision0, p, contactOut.m_normal, contactOut.m_shapeId0, userData, t);
 			}
 		}
 	} 
@@ -254,8 +254,8 @@ dgFloat32 dgBody::ConvexRayCast (const dgFastRayTest& ray, const dgCollisionInst
 		dgFloat32 t = m_collision->ConvexRayCast (convexShape, origin, shapeVeloc, minT, contactOut, preFilter, this, userData, threadId);
 		if (t < minT) {
 			dgAssert (t >= dgFloat32 (0.0f));
-			dgAssert (t <= dgFloat32 (1.0f));
-			minT = filter (this, contactOut.m_collision0, contactOut.m_point, contactOut.m_normal, (void*)contactOut.m_shapeId0, userData, t);
+			dgAssert (t <= dgFloat32 (1.1f));
+			minT = filter (this, contactOut.m_collision0, contactOut.m_point, contactOut.m_normal, contactOut.m_shapeId0, userData, t);
 		}
 	} 
 	return minT;

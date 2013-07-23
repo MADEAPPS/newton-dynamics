@@ -972,7 +972,7 @@ dMatrix CustomVehicleController::TireBodyState::CalculateMatrix () const
 	return dPitchMatrix(m_rotationAngle) * CalculateSteeringMatrix ();
 }
 
-void CustomVehicleController::TireBodyState::Collide (CustomControllerFilterCastFilter& filter, dFloat timestepInv)
+void CustomVehicleController::TireBodyState::Collide (CustomControllerConvexCastPreFilter& filter, dFloat timestepInv)
 {
 	NewtonBody* const body = m_controller->GetBody();
 	NewtonWorld* const world = NewtonBodyGetWorld(body);
@@ -991,7 +991,7 @@ void CustomVehicleController::TireBodyState::Collide (CustomControllerFilterCast
 
 	m_contactJoint.m_contactCount = 0;
 	NewtonCollisionSetScale (m_controller->m_tireCastShape, m_width, m_radio, m_radio);
-	m_contactJoint.m_contactCount = NewtonWorldConvexCast (world, &tireMatrix[0][0], &rayDestination[0], m_controller->m_tireCastShape, &hitParam, &filter, CustomControllerFilterCastFilter::ConvexStaticCastPrefilter, m_contactJoint.m_contacts, sizeof (m_contactJoint.m_contacts) / sizeof (m_contactJoint.m_contacts[0]), 0);
+	m_contactJoint.m_contactCount = NewtonWorldConvexCast (world, &tireMatrix[0][0], &rayDestination[0], m_controller->m_tireCastShape, &hitParam, &filter, CustomControllerConvexCastPreFilter::Prefilter, m_contactJoint.m_contacts, sizeof (m_contactJoint.m_contacts) / sizeof (m_contactJoint.m_contacts[0]), 0);
 	if (m_contactJoint.m_contactCount) {
 		// this tire hit something generate contact point and normals, 
 		// do not forget to filter bad contacts
@@ -1652,7 +1652,7 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 	// apply all external forces and torques to chassis and all tire velocities
 	dFloat timestepInv = 1.0f / timestep;
 	NewtonBody* const body = GetBody();
-	CustomControllerFilterCastFilter castFilter (body);
+	CustomControllerConvexCastPreFilter castFilter (body);
 	m_chassisState.UpdateDynamicInputs();
 	for (TireList::CustomListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
 		TireBodyState* const tire = &node->GetInfo();

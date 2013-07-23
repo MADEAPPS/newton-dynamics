@@ -296,7 +296,9 @@ dgIntersectStatus dgCollisionBVH::GetPolygon (void* const context, const dgFloat
 			triplex[i].m_y = p.m_y;
 			triplex[i].m_z = p.m_z;
 		}
-		data.m_me->GetDebugCollisionCallback() (data.m_polySoupBody, data.m_objBody, indexArray[indexCount], indexCount, &triplex[0].m_x, sizeof (dgTriplex));
+		if (data.m_polySoupBody) {
+			data.m_me->GetDebugCollisionCallback() (data.m_polySoupBody, data.m_objBody, indexArray[indexCount], indexCount, &triplex[0].m_x, sizeof (dgTriplex));
+		}
 	}
 
 	dgAssert (data.m_vertex == polygon);

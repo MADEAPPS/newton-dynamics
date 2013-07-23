@@ -368,7 +368,7 @@ class CustomVehicleController
 		NEWTON_API dMatrix CalculateSteeringMatrix () const;
 		NEWTON_API dMatrix CalculateSuspensionMatrix () const;
 		
-		NEWTON_API void Collide (CustomControllerFilterCastFilter& filter, dFloat timestepInv);
+		NEWTON_API void Collide (CustomControllerConvexCastPreFilter& filter, dFloat timestepInv);
 		NEWTON_API void UpdateDynamicInputs(dFloat timestep);
 
 		NEWTON_API void UpdateTransform ();

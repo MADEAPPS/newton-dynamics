@@ -43,10 +43,10 @@ class dNewtonRayCast: public dNewtonAlloc
 	{
 		return true;
 	}
-	CNEWTON_API virtual dFloat OnRayHit (const dNewtonBody* const body, const dNewtonCollision* const shape, const dFloat* const contact, const dFloat* const normal, const int* const collisionID, dFloat intersectParam) = 0;
+	CNEWTON_API virtual dFloat OnRayHit (const dNewtonBody* const body, const dNewtonCollision* const shape, const dFloat* const contact, const dFloat* const normal, dLong collisionID, dFloat intersectParam) = 0;
 	
 	private:
-	CNEWTON_API static dFloat RayFilterCallback(const NewtonBody* const body, const NewtonCollision* const shapeHit, const dFloat* const hitContact, const dFloat* const hitNormal, int* const collisionID, void* const userData, dFloat intersectParam);
+	CNEWTON_API static dFloat RayFilterCallback(const NewtonBody* const body, const NewtonCollision* const shapeHit, const dFloat* const hitContact, const dFloat* const hitNormal, dLong collisionID, void* const userData, dFloat intersectParam);
 	CNEWTON_API static unsigned PrefilterCallback(const NewtonBody* const body, const NewtonCollision* const collision, void* const userData);
 
 	dNewton* m_world;
