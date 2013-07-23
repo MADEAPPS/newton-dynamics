@@ -367,7 +367,7 @@ dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const casti
 	data.SortFaceArray();
 	dgContactPoint tmpContact;
 //	for (dgInt32 j = data.m_faceCount - 1; (j >= 0) && (data.m_hitDistance[j] < maxT); j --) {
-	for (dgInt32 j = 0; (j < data.m_faceCount) && (data.m_hitDistance[j] < maxT); j --) {
+	for (dgInt32 j = 0; (j < data.m_faceCount) && (data.m_hitDistance[j] < maxT); j ++) {
 		dgInt32 address = data.m_faceIndexStart[j];
 		const dgInt32* const localIndexArray = &indexArray[address];
 
