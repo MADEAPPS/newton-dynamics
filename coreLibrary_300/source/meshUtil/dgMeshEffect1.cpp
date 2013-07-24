@@ -143,6 +143,7 @@ dgMeshEffect::dgMeshBVH::dgMeshBVH (dgMeshEffect* const mesh)
 {
 }
 
+
 dgMeshEffect::dgMeshBVH::~dgMeshBVH()
 {
 	Cleanup ();
@@ -150,8 +151,7 @@ dgMeshEffect::dgMeshBVH::~dgMeshBVH()
 
 dgMeshEffect* dgMeshEffect::CreateFromSerialization (dgMemoryAllocator* const allocator, dgDeserialize deserialization, void* const userData)
 {
-	dgAssert (0);
-	return NULL;
+	return new (allocator) dgMeshEffect(allocator, deserialization, userData);
 }
 
 void dgMeshEffect::Serialize (dgSerialize callback, void* const userData) const
@@ -186,12 +186,12 @@ void dgMeshEffect::Serialize (dgSerialize callback, void* const userData) const
 		dgEdge* const face = &iter.GetNode()->GetInfo();
 		if (!filter.Find(face) && (face->m_incidentFace > 0)) {
 			dgInt32 indices[1024];
-			dgInt32 attibuteIndex[1024];
+			dgInt64 attibuteIndex[1024];
 			dgInt32 vertexCount = 0;
 			dgEdge* edge = face; 
 			do {
 				indices[vertexCount] = edge->m_incidentVertex;
-				attibuteIndex[vertexCount] = dgInt32 (edge->m_userData);
+				attibuteIndex[vertexCount] = edge->m_userData;
 				vertexCount ++;
 				filter.Insert(edge, edge);
 				edge = edge->m_next;
@@ -199,7 +199,7 @@ void dgMeshEffect::Serialize (dgSerialize callback, void* const userData) const
 
 			callback (userData, &vertexCount, sizeof (dgInt32));
 			callback (userData, indices, vertexCount * sizeof (dgInt32));
-			callback (userData, attibuteIndex, vertexCount * sizeof (dgInt32));
+			callback (userData, attibuteIndex, vertexCount * sizeof (dgInt64));
 		}
 	}
 }
@@ -1022,8 +1022,6 @@ dgMeshEffect::dgMeshEffect(dgCollisionInstance* const collision)
 dgMeshEffect::dgMeshEffect(dgMemoryAllocator* const allocator, const char* const fileName)
 	:dgPolyhedra (allocator) 
 {
-	
-
 	class ParceOFF
 	{
 		public:
@@ -1140,6 +1138,40 @@ dgMeshEffect::dgMeshEffect(dgMemoryAllocator* const allocator, const char* const
 		fclose (file);
 	}
 }
+
+dgMeshEffect::dgMeshEffect (dgMemoryAllocator* const allocator, dgDeserialize deserialization, void* const userData)
+	:dgPolyhedra (allocator) 
+{
+	dgAssert (0);
+
+	dgInt32 faceCount;
+	deserialization (userData, &faceCount, sizeof (dgInt32));
+	deserialization (userData, &m_pointCount, sizeof (dgInt32));
+	deserialization (userData, &m_atribCount, sizeof (dgInt32));
+	deserialization (userData, &m_atribCount, sizeof (dgInt32));
+
+	m_maxPointCount = m_pointCount;
+	m_maxAtribCount = m_atribCount;
+
+	m_points = (dgBigVector*) GetAllocator()->MallocLow(dgInt32 (m_pointCount * sizeof(dgBigVector)));
+	m_attrib = (dgVertexAtribute*) GetAllocator()->MallocLow(dgInt32 (m_atribCount * sizeof(dgVertexAtribute)));
+
+	deserialization (userData, m_points, m_pointCount * sizeof (dgBigVector));
+	deserialization (userData, m_attrib, m_atribCount * sizeof (dgVertexAtribute));
+
+	BeginFace();
+	for (dgInt32 i = 0; i < faceCount; i ++) {
+		dgInt32 vertexCount;
+		dgInt32 face[1024];
+		dgInt64 attrib[1024];
+		deserialization (userData, &vertexCount, sizeof (dgInt32));
+		deserialization (userData, face, vertexCount * sizeof (dgInt32));
+		deserialization (userData, attrib, vertexCount * sizeof (dgInt64));
+		AddFace (vertexCount, face, attrib);
+	}
+	EndFace();
+}
+
 
 dgMeshEffect::~dgMeshEffect(void)
 {

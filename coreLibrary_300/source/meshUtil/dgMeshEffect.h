@@ -137,7 +137,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	dgMeshEffect(dgCollisionInstance* const collision);
 	dgMeshEffect(const dgMeshEffect& source);
 	dgMeshEffect(dgPolyhedra& mesh, const dgMeshEffect& source);
-	dgMeshEffect(dgMemoryAllocator* const allocator, dgDeserialize deserialization, void* const userData);
+	dgMeshEffect (dgMemoryAllocator* const allocator, dgDeserialize deserialization, void* const userData);
 
 	// create from OFF or PLY file format
 	dgMeshEffect(dgMemoryAllocator* const allocator, const char* const fileName);
