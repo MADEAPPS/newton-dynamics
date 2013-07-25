@@ -89,18 +89,19 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 
 	// create the outer thick cylinder
 	dMatrix outerShapeMatrix (localAxis);
-	dFloat cylinderHeight = m_height - stairStep;
-	dAssert (cylinderHeight > 0.0f);
-	outerShapeMatrix.m_posit = outerShapeMatrix[0].Scale(cylinderHeight * 0.5f + stairStep);
+	dFloat capsuleHigh = m_height - stairStep;
+	dAssert (capsuleHigh > 0.0f);
+	m_sphereCastOrigin = capsuleHigh * 0.5f + stairStep;
+	outerShapeMatrix.m_posit = outerShapeMatrix[0].Scale(m_sphereCastOrigin);
 	outerShapeMatrix.m_posit.m_w = 1.0f;
-	NewtonCollision* const bodyCylinder = NewtonCreateCapsule(world, 0.25f, 0.5f, 0, &outerShapeMatrix[0][0]);
-	NewtonCollisionSetScale(bodyCylinder, cylinderHeight, m_outerRadio * 4.0f, m_outerRadio * 4.0f);
+	NewtonCollision* const bodyCapsule = NewtonCreateCapsule(world, 0.25f, 0.5f, 0, &outerShapeMatrix[0][0]);
+	NewtonCollisionSetScale(bodyCapsule, capsuleHigh, m_outerRadio * 4.0f, m_outerRadio * 4.0f);
 
 	// compound collision player controller
 	NewtonCollision* const playerShape = NewtonCreateCompoundCollision(world, 0);
 	NewtonCompoundCollisionBeginAddRemove(playerShape);	
 	NewtonCompoundCollisionAddSubCollision (playerShape, supportShape);
-	NewtonCompoundCollisionAddSubCollision (playerShape, bodyCylinder);
+	NewtonCompoundCollisionAddSubCollision (playerShape, bodyCapsule);
 	NewtonCompoundCollisionEndAddRemove (playerShape);	
 
 	// create the kinematic body
@@ -125,7 +126,7 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 	m_supportShape = NewtonCompoundCollisionGetCollisionFromNode (shape, NewtonCompoundCollisionGetNodeByIndex (shape, 0));
 	m_upperBodyShape = NewtonCompoundCollisionGetCollisionFromNode (shape, NewtonCompoundCollisionGetNodeByIndex (shape, 1));
 
-	NewtonDestroyCollision (bodyCylinder);
+	NewtonDestroyCollision (bodyCapsule);
 	NewtonDestroyCollision (supportShape);
 	NewtonDestroyCollision (playerShape);
 
@@ -433,7 +434,8 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 	if (step > 1.0e-6f) {
 		dMatrix supportMatrix (matrix);
 		dVector updir (matrix.RotateVector(m_upVector));
-		supportMatrix.m_posit += updir.Scale (m_stairStep);
+		//supportMatrix.m_posit += updir.Scale (m_stairStep);
+		supportMatrix.m_posit += updir.Scale (m_sphereCastOrigin);
 
 		if (m_isJumping) {
 			dVector dst (matrix.m_posit);

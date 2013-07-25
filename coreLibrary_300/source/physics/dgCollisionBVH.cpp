@@ -280,7 +280,7 @@ dgIntersectStatus dgCollisionBVH::GetPolygon (void* const context, const dgFloat
 		dgTrace (("buffer Overfloat, try using a lower resolution mesh for collision\n"));
 		return t_StopSearh;
 	}
-	if ((data.m_globalIndexCount + indexCount * 2 + 1) >= DG_MAX_COLLIDING_INDICES) {
+	if ((data.m_globalIndexCount + indexCount * 2 + 3) >= DG_MAX_COLLIDING_INDICES) {
 		dgTrace (("buffer Overfloat, try using a lower resolution mesh for collision\n"));
 		return t_StopSearh;
 	}

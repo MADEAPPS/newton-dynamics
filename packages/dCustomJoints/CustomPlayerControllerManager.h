@@ -60,7 +60,7 @@ class CustomPlayerController
 	}
 
 
-	const dVector& GetGroundPlane____() const
+	const dVector& GetGroundPlane() const
 	{
 		return m_groundPlane;
 	}
@@ -92,6 +92,7 @@ class CustomPlayerController
 	dFloat m_height;
 	dFloat m_stairStep;
 	dFloat m_maxSlope;
+	dFloat m_sphereCastOrigin;
 	dFloat m_restrainingDistance;
 	bool m_isJumping;
 	NewtonCollision* m_castingSphere;

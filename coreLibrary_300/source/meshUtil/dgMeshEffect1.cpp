@@ -156,8 +156,6 @@ dgMeshEffect* dgMeshEffect::CreateFromSerialization (dgMemoryAllocator* const al
 
 void dgMeshEffect::Serialize (dgSerialize callback, void* const userData) const
 {
-	dgAssert (0);
-
 	dgInt32 faceCount = 0;
 	dgTree<dgEdge*, dgEdge*>filter(GetAllocator());
 	Iterator iter (*this);
