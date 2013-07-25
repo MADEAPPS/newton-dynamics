@@ -106,6 +106,7 @@ dNewtonPlayerManager::dNewtonPlayer::dNewtonPlayer (dNewtonPlayerManager* const 
 
 dNewtonPlayerManager::dNewtonPlayer::~dNewtonPlayer ()
 {
+	m_controller->Cleanup();
 	NewtonBody* const body = m_controller->GetBody();	
 	if (NewtonBodyGetDestructorCallback(body)) {
 		SetBody(NULL);

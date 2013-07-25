@@ -141,7 +141,10 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 
 void CustomPlayerController::Cleanup()
 {
-	NewtonDestroyCollision (m_castingShape);
+	if (m_castingShape) {
+		NewtonDestroyCollision (m_castingShape);
+	}
+	m_castingShape = NULL;
 }
 
 void CustomPlayerController::SetPlayerOrigin (dFloat originHigh)
