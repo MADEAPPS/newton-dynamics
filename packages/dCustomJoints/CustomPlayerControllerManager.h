@@ -95,7 +95,7 @@ class CustomPlayerController
 	dFloat m_sphereCastOrigin;
 	dFloat m_restrainingDistance;
 	bool m_isJumping;
-	NewtonCollision* m_castingSphere;
+	NewtonCollision* m_castingShape;
 	NewtonCollision* m_supportShape;
 	NewtonCollision* m_upperBodyShape;
 

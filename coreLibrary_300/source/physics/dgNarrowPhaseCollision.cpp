@@ -266,7 +266,16 @@ dgCollisionInstance* dgWorld::CreateScene ()
 
 dgCollisionInstance* dgWorld::CreateInstance (const dgCollision* const child, dgInt32 shapeID, const dgMatrix& offsetMatrix)
 {
-	dgCollisionInstance* const instance = new  (m_allocator) dgCollisionInstance (this, child, shapeID, offsetMatrix);;
+	dgAssert (dgAbsf (offsetMatrix[0] % offsetMatrix[0] - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
+	dgAssert (dgAbsf (offsetMatrix[1] % offsetMatrix[1] - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
+	dgAssert (dgAbsf (offsetMatrix[2] % offsetMatrix[2] - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
+	dgAssert (dgAbsf ((offsetMatrix[0] * offsetMatrix[1]) % offsetMatrix[2] - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
+
+	dgAssert (offsetMatrix[0][3] == dgFloat32 (0.0f));
+	dgAssert (offsetMatrix[1][3] == dgFloat32 (0.0f));
+	dgAssert (offsetMatrix[2][3] == dgFloat32 (0.0f));
+	dgAssert (offsetMatrix[3][3] == dgFloat32 (1.0f));
+	dgCollisionInstance* const instance = new  (m_allocator) dgCollisionInstance (this, child, shapeID, offsetMatrix);
 	return instance;
 }
 

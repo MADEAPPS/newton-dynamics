@@ -118,9 +118,15 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 	SetBody (body);
 
 	dMatrix castSphereMatrix (localAxis);
-	castSphereMatrix.m_posit = castSphereMatrix[0].Scale (m_innerRadio * 0.5f);
+//	castSphereMatrix.m_posit = castSphereMatrix[0].Scale (-m_innerRadio * 0.5f);
+//	castSphereMatrix.m_posit.m_w = 1.0f;
+//	m_castingSphere = NewtonCreateSphere (world, m_innerRadio * 0.5f, 0, &castSphereMatrix[0][0]);
+
+	dFloat castHigh = capsuleHigh * 0.4f;
+	dFloat castRadio = (m_innerRadio * 0.5f > 0.05f) ? m_innerRadio * 0.5f : 0.05f;
+	castSphereMatrix.m_posit = castSphereMatrix[0].Scale (-castHigh * 0.5f);
 	castSphereMatrix.m_posit.m_w = 1.0f;
-	m_castingSphere = NewtonCreateSphere (world, m_innerRadio * 0.5f, 0, &castSphereMatrix[0][0]);
+	m_castingShape = NewtonCreateCylinder(world, castRadio, castHigh, 0, &castSphereMatrix[0][0]);
 	
 
 	m_supportShape = NewtonCompoundCollisionGetCollisionFromNode (shape, NewtonCompoundCollisionGetNodeByIndex (shape, 0));
@@ -135,7 +141,7 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 
 void CustomPlayerController::Cleanup()
 {
-	NewtonDestroyCollision (m_castingSphere);
+	NewtonDestroyCollision (m_castingShape);
 }
 
 void CustomPlayerController::SetPlayerOrigin (dFloat originHigh)
@@ -263,32 +269,12 @@ void CustomPlayerController::UpdateGroundPlane (dMatrix& matrix, const dMatrix& 
 //	int contactCount = NewtonWorldConvexCast (world, &castMatrix[0][0], &dst[0], m_supportShape, &timetoImpact, &castFilterData, CustomControllerConvexCastPreFilter::Prefilter, info, sizeof (info) / sizeof (info[0]), threadIndex);
 
 	CustomControllerConvexRayFilter filter(GetBody());
-	NewtonWorldConvexRayCast (world, m_castingSphere, &castMatrix[0][0], &dst[0], CustomControllerConvexRayFilter::Filter, &filter, CustomControllerConvexRayFilter::Prefilter, threadIndex);
+	NewtonWorldConvexRayCast (world, m_castingShape, &castMatrix[0][0], &dst[0], CustomControllerConvexRayFilter::Filter, &filter, CustomControllerConvexRayFilter::Prefilter, threadIndex);
 
 	m_groundPlane = dVector (0.0f, 0.0f, 0.0f, 0.0f);
-//	m_groundContact = dVector (0.0f, -1.0e15f, 0.0f, 0.0f);
 	m_groundVelocity = dVector (0.0f, 0.0f, 0.0f, 0.0f);
 
 	if (filter.m_hitBody) {
-		//bool foundSupportPoint = false;
-//		dVector updir (castMatrix.RotateVector(m_upVector));
-//		dFloat maxProjection = -1.0e15f;
-//		dVector plane (0.0f, 0.0f, 0.0f, 0.0f);
-//		dVector contact (0.0f, -1.0e15f, 0.0f, 0.0f);
-//		dVector planeVeloc (0.0f, 0.0f, 0.0f, 0.0f);
-//		for (int i = 0; i < contactCount; i ++) {
-//			dVector point (info[i].m_point);
-//			dFloat projection = updir % point;
-//			if (projection > maxProjection) {
-//				foundSupportPoint = true;
-//				maxProjection = projection;
-//				plane = info[i].m_normal;
-//				contact = point;
-//				plane.m_w = - (plane % contact );
-//				NewtonBodyGetPointVelocity (info[i].m_hitBody, &contact.m_x, &planeVeloc[0]);
-//			}
-//		}
-
 		m_isJumping = false;
 		dVector supportPoint (castMatrix.m_posit + (dst - castMatrix.m_posit).Scale (filter.m_intersectParam));
 		m_groundPlane = filter.m_hitNormal;
@@ -296,15 +282,6 @@ void CustomPlayerController::UpdateGroundPlane (dMatrix& matrix, const dMatrix& 
 		NewtonBodyGetPointVelocity (filter.m_hitBody, &supportPoint.m_x, &m_groundVelocity[0]);
 		matrix.m_posit = supportPoint;
 		matrix.m_posit.m_w = 1.0f;
-
-		// only plane lower than 25% are considered ground plane
-//		if (foundSupportPoint) {
-//			m_isJumping = false;
-//			m_groundPlane = plane;
-//			m_groundContact = contact;
-//			m_groundVelocity = planeVeloc;
-//			matrix.m_posit = castMatrix.m_posit + (dst - castMatrix.m_posit).Scale(timetoImpact);
-//		}
 	}
 
 }
