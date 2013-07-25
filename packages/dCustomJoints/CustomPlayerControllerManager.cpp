@@ -124,7 +124,7 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 
 	dFloat castHigh = capsuleHigh * 0.4f;
 	dFloat castRadio = (m_innerRadio * 0.5f > 0.05f) ? m_innerRadio * 0.5f : 0.05f;
-	castSphereMatrix.m_posit = castSphereMatrix[0].Scale (-castHigh * 0.5f);
+	castSphereMatrix.m_posit = castSphereMatrix[0].Scale (castHigh * 0.5f);
 	castSphereMatrix.m_posit.m_w = 1.0f;
 	m_castingShape = NewtonCreateCylinder(world, castRadio, castHigh, 0, &castSphereMatrix[0][0]);
 	
