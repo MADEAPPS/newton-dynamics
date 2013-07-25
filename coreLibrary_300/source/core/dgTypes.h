@@ -708,16 +708,21 @@ class dgFloatExceptions
 {
 	public:
 	//#define DG_FLOAT_EXECTIONS_MASK (_EM_INVALID | _EM_DENORMAL | _EM_ZERODIVIDE | _EM_OVERFLOW | _EM_UNDERFLOW| _EM_INEXACT)
-	#define DG_FLOAT_EXECTIONS_MASK (_EM_INVALID | _EM_DENORMAL | _EM_ZERODIVIDE)
+	//#define DG_FLOAT_EXECTIONS_MASK (_EM_INVALID | _EM_DENORMAL | _EM_ZERODIVIDE)
 	//#define DG_FLOAT_EXECTIONS_MASK (_EM_DENORMAL | _EM_ZERODIVIDE)
+	enum dgFloatExceptionMask
+	{
+		m_InvalidDenormalAndivideByZero = _EM_INVALID | _EM_DENORMAL | _EM_ZERODIVIDE,
+		m_allExepctions = _EM_INVALID | _EM_DENORMAL | _EM_ZERODIVIDE | _EM_OVERFLOW | _EM_UNDERFLOW,
+	};
 
-	dgFloatExceptions()
+	dgFloatExceptions(dgFloatExceptionMask mask = m_InvalidDenormalAndivideByZero)
 		:m_mask (0)
 	{
 		#if (defined (_MSC_VER) && defined (_DEBUG))
 			dgClearFP();
 			m_mask = dgControlFP(0, 0);
-			dgControlFP(m_mask & dgUnsigned32 (~DG_FLOAT_EXECTIONS_MASK), _MCW_EM);
+			dgControlFP (m_mask & dgUnsigned32 (~mask), _MCW_EM);
 		#endif
 	}
 
@@ -725,11 +730,11 @@ class dgFloatExceptions
 	{
 		#if (defined (_MSC_VER) && defined (_DEBUG))
 			dgClearFP();
-			dgControlFP(m_mask | dgUnsigned32(DG_FLOAT_EXECTIONS_MASK), _MCW_EM);
+			dgControlFP(m_mask, _MCW_EM);
 		#endif
 	}
 
-	dgInt32 m_mask; 
+	dgInt32 m_mask;
 };
 
 

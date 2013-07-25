@@ -872,6 +872,9 @@ void dgCollisionCompound::ConvertChildToConvexHull (void* userData, int vertexCo
 
 void dgCollisionCompound::ApplyScale (const dgVector& scale)
 {
+	dgFloatExceptions exception (dgFloatExceptions::m_allExepctions);
+
+
 	dgMatrix scaleMatrix (dgGetIdentityMatrix());
 	scaleMatrix[0][0] = scale.m_x;
 	scaleMatrix[1][1] = scale.m_y;
