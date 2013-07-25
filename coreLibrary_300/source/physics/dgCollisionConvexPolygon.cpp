@@ -677,9 +677,9 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue (dgCollis
 	dgAssert (proxy.m_floatingCollision->IsType (dgCollision::dgCollisionConvexPolygon_RTTI));
 
 	const dgCollisionInstance* const hull = proxy.m_referenceCollision;
-	const dgCollisionInstance* const polygonInstance = proxy.m_floatingCollision;
+	//const dgCollisionInstance* const polygonInstance = proxy.m_floatingCollision;
 
-	dgAssert (this == polygonInstance->GetChildShape());
+	dgAssert (this == proxy.m_floatingCollision->GetChildShape());
 	dgAssert (m_count);
 	dgAssert (m_count < dgInt32 (sizeof (m_localPoly) / sizeof (m_localPoly[0])));
 
