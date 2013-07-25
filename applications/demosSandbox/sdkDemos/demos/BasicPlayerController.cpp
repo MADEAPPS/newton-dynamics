@@ -208,7 +208,7 @@ class BasicPlayerControllerManager: public CustomPlayerControllerManager
 			// velocity is set by AI script
 		}
 
-#if 0
+#if 1
 	#if 0
 		static FILE* file = fopen ("log.bin", "wb");
 		if (file) {
@@ -338,9 +338,9 @@ void BasicPlayerController (DemoEntityManager* const scene)
 
 	//CreateLevelMesh (scene, "flatPlane.ngd", true);
 	//CreateLevelMesh (scene, "playground.ngd", true);
-	//CreateLevelMesh (scene, "castle.ngd", true);
+	CreateLevelMesh (scene, "castle.ngd", true);
 	//CreateLevelMesh (scene, "sponza.ngd", true);
-	CreateLevelMesh (scene, "sibenik.ngd", true);
+	//CreateLevelMesh (scene, "sibenik.ngd", true);
 
 
 	NewtonWorld* const world = scene->GetNewton();
@@ -365,7 +365,7 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	dVector size (2.0f, 2.0f, 2.0f, 0.0f);
 	int count = 1;
 	dMatrix shapeOffsetMatrix (GetIdentityMatrix());
-	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix, 10.0f);
+//	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix, 10.0f);
 
 	dVector origin (-10.0f, 2.0f, 0.0f, 0.0f);
 	dQuaternion rot;

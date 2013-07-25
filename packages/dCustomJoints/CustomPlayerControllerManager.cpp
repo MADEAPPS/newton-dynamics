@@ -274,6 +274,11 @@ void CustomPlayerController::UpdateGroundPlane (dMatrix& matrix, const dMatrix& 
 	CustomControllerConvexRayFilter filter(GetBody());
 	NewtonWorldConvexRayCast (world, m_castingShape, &castMatrix[0][0], &dst[0], CustomControllerConvexRayFilter::Filter, &filter, CustomControllerConvexRayFilter::Prefilter, threadIndex);
 
+static int xxxx;
+xxxx ++;
+if (xxxx >= 837)
+xxxx *=1;
+
 	m_groundPlane = dVector (0.0f, 0.0f, 0.0f, 0.0f);
 	m_groundVelocity = dVector (0.0f, 0.0f, 0.0f, 0.0f);
 
