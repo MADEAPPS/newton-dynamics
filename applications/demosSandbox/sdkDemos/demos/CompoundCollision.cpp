@@ -214,6 +214,7 @@ static void MakeFunnyCompound (DemoEntityManager* const scene, const dVector& or
 		NewtonCompoundCollisionEndAddRemove(compound);	
 	}
 
+//	NewtonCollisionSetScale(compound, 0.5f, 0.25f, 0.125f);
 
 #else 
 

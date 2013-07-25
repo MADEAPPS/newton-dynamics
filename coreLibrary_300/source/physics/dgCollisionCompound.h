@@ -106,6 +106,32 @@ class dgCollisionCompound: public dgCollision
 
 	
 	protected:
+	class dgConvertChildToConvexHullContext
+	{
+		public: 
+		dgConvertChildToConvexHullContext ()
+			:m_count(0)
+			,m_pool ((dgVector*)dgMallocStack (1024 * 4 * sizeof (dgVector)))
+		{
+
+		}
+		~dgConvertChildToConvexHullContext ()
+		{
+			dgFreeStack(m_pool);
+		}
+
+		void AddPoint (const dgVector& point)
+		{
+			dgAssert (m_count < (1024 * 4));
+			m_pool[m_count] = point;
+			m_count ++;
+		}
+
+		dgInt32 m_count;
+		dgVector* m_pool;
+	};
+
+
 	class dgNodePairs
 	{
 		public:
@@ -135,6 +161,7 @@ class dgCollisionCompound: public dgCollision
 	void SetCollisionMatrix (dgTree<dgNodeBase*, dgInt32>::dgTreeNode* const node, const dgMatrix& matrix);
 	void EndAddRemove ();
 
+	void ApplyScale (const dgVector& scale);
 	void GetAABB (dgVector& p0, dgVector& p1) const;
 
 	dgInt32 GetNodeIndex(dgTree<dgNodeBase*, dgInt32>::dgTreeNode* const node) const;
@@ -153,13 +180,14 @@ class dgCollisionCompound: public dgCollision
 	
 	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
 	virtual void CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
-
 	
 	static void CalculateInertia (void* userData, int vertexCount, const dgFloat32* const FaceArray, int faceId);
 
 	virtual void MassProperties ();
 	dgMatrix CalculateInertiaAndCenterOfMass (const dgVector& localScale, const dgMatrix& matrix) const;
 	dgFloat32 CalculateMassProperties (const dgMatrix& offset, dgVector& inertia, dgVector& crossInertia, dgVector& centerOfMass) const;
+
+	
 	
 	virtual dgVector CalculateVolumeIntegral (const dgMatrix& globalMatrix, GetBuoyancyPlane bouyancyPlane, void* const context) const;
 
@@ -193,6 +221,8 @@ class dgCollisionCompound: public dgCollision
 	dgNodeBase* BuildTopDown (dgNodeBase** const leafArray, dgInt32 firstBox, dgInt32 lastBox, dgList<dgNodeBase*>::dgListNode** const nextNode);
 
 	dgFloat64 CalculateEntropy (dgList<dgNodeBase*>& list);
+
+	static void ConvertChildToConvexHull (void* userData, int vertexCount, const dgFloat32* FaceArray, int faceId);
 
 	void CalculateCollisionTreeArea(dgNodePairs& pairOut, const dgCollisionBVH* const collisionTree, const void* const treeNode) const;
 	void ImproveNodeFitness (dgNodeBase* const node) const;

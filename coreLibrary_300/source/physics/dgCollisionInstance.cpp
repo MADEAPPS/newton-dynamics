@@ -365,6 +365,17 @@ void dgCollisionInstance::SetScale (const dgVector& scale)
 		m_scale	= dgVector (scaleX, scaleY, scaleZ, dgFloat32 (0.0f));	
 		m_invScale = dgVector (dgFloat32 (1.0f) / scaleX, dgFloat32 (1.0f) / scaleY, dgFloat32 (1.0f) / scaleZ, dgFloat32 (0.0f));	
 	}
+
+	if (GetCollisionPrimityType() == m_compoundCollision) {
+		dgCollisionCompound* const compound = (dgCollisionCompound*) m_childShape;
+		compound->ApplyScale(m_scale);
+
+		m_scaleIsUnit = 1;
+		m_scaleIsUniform = 1;
+		m_scale	= dgVector (dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f));	
+		m_maxScale = m_scale;	
+		m_invScale = m_scale;
+	}
 }
 
 

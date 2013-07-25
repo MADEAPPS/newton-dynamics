@@ -50,9 +50,6 @@ class dgMatrix
 	// create a orthonormal normal vector basis
 	dgMatrix (const dgVector &front);
 
-
-	
-
 	dgVector& operator[] (dgInt32 i);
 	const dgVector& operator[] (dgInt32 i) const;
 
@@ -88,6 +85,7 @@ class dgMatrix
 	// and this function take a parameter to a symmetric matrix
 	void EigenVectors (dgVector &eigenValues, const dgMatrix& initialGuess = dgGetIdentityMatrix());
 	void EigenVectors (const dgMatrix& initialGuess = dgGetIdentityMatrix());
+	void PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, dgMatrix& stretchAxis, const dgMatrix& initialStretchAxis = dgGetIdentityMatrix()) const;
 
 	dgVector m_front;
 	dgVector m_up;

@@ -362,13 +362,9 @@ void dgMatrix::EigenVectors (dgVector &eigenValues, const dgMatrix& initialGuess
 	dgFloat32 z[3];
 	dgFloat32 d[3];
 
-	//	dgMatrix eigenVectors (initialGuess.Transpose4X4());
-	//	dgMatrix &mat = *this;
-
 	dgMatrix& mat = *this;
 	dgMatrix eigenVectors (initialGuess.Transpose4X4());
 	mat = initialGuess * mat * eigenVectors;
-
 
 	b[0] = mat[0][0]; 
 	b[1] = mat[1][1];
@@ -637,3 +633,72 @@ void dgMatrix::EigenVectors (dgVector &eigenValues, const dgMatrix& initialGuess
 	*this = dgGetIdentityMatrix();
 }
 
+
+void dgMatrix::PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, dgMatrix& stretchAxis, const dgMatrix& initialStretchAxis) const
+{
+	// a polar decomposition decompose matrix A = O * S
+	// where S = sqrt (transpose (L) * L)
+
+	// calculate transpose (L) * L 
+	dgMatrix LL ((*this) * Transpose());
+
+
+	// check is this is a pure uniformScale * rotation * translation
+	dgFloat32 det2 = (LL[0][0] + LL[1][1] + LL[2][2]) * dgFloat32 (1.0f / 3.0f);
+
+	dgFloat32 invdet2 = 1.0f / det2;
+
+	dgMatrix pureRotation (LL);
+	pureRotation[0] = pureRotation[0].Scale3 (invdet2);
+	pureRotation[1] = pureRotation[1].Scale3 (invdet2);
+	pureRotation[2] = pureRotation[2].Scale3 (invdet2);
+
+	dgFloat32 det = (pureRotation[0] * pureRotation[1]) % pureRotation[2];
+	if (dgAbsf (det - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f)) {
+		// this is a pure scale * rotation * translation
+		det = dgSqrt (det2);
+		scale[0] = det;
+		scale[1] = det;
+		scale[2] = det;
+		det = dgFloat32 (1.0f)/ det;
+		transformMatrix.m_front = m_front.Scale3 (det);
+		transformMatrix.m_up = m_up.Scale3 (det);
+		transformMatrix.m_right = m_right.Scale3 (det);
+		transformMatrix[0][3] = dgFloat32 (0.0f);
+		transformMatrix[1][3] = dgFloat32 (0.0f);
+		transformMatrix[2][3] = dgFloat32 (0.0f);
+		transformMatrix.m_posit = m_posit;
+		stretchAxis = dgGetIdentityMatrix();
+
+	} else {
+		//stretchAxis = LL.JacobiDiagonalization(scale, initialStretchAxis);
+		stretchAxis = LL;
+		stretchAxis.EigenVectors (scale);
+
+//dgMatrix xxx (dgGetIdentityMatrix());
+//xxx[0][0] = scale.m_x;
+//xxx[1][1] = scale.m_y;
+//xxx[2][2] = scale.m_z;
+//dgMatrix xxx2 (stretchAxis.Transpose() * xxx * stretchAxis);
+
+
+		// I need to deal with by seeing of some of the Scale are duplicated
+		// do this later (maybe by a given rotation around the non uniform axis but I do not know if it will work)
+		// for now just us the matrix
+
+		scale[0] = dgSqrt (scale[0]);
+		scale[1] = dgSqrt (scale[1]);
+		scale[2] = dgSqrt (scale[2]);
+		scale[3] = dgFloat32 (0.0f);
+
+		dgMatrix scaledAxis;
+		scaledAxis[0] = stretchAxis[0].Scale3 (dgFloat32 (1.0f) / scale[0]);
+		scaledAxis[1] = stretchAxis[1].Scale3 (dgFloat32 (1.0f) / scale[1]);
+		scaledAxis[2] = stretchAxis[2].Scale3 (dgFloat32 (1.0f) / scale[2]);
+		scaledAxis[3] = stretchAxis[3];
+		dgMatrix symetricInv (stretchAxis.Transpose() * scaledAxis);
+
+		transformMatrix = symetricInv * (*this);
+		transformMatrix.m_posit = m_posit;
+	}
+}
