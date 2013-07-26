@@ -20,6 +20,7 @@
 #define D_DESCRETE_MOTION_STEPS				8
 #define D_PLAYER_MAX_INTERGRATION_STEPS		8
 #define D_PLAYER_MAX_SOLVER_ITERATIONS		16
+#define D_PLAYER_DISTANCE_CONTACT			0.025f
 
 
 CustomPlayerControllerManager::CustomPlayerControllerManager(NewtonWorld* const world)
@@ -329,11 +330,18 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 	CustomControllerConvexCastPreFilter castFilterData (body);
 	NewtonWorldConvexCastReturnInfo prevInfo[PLAYER_CONTROLLER_MAX_CONTACTS];
 
+
+static int xxx;
+xxx ++;
+if (xxx >= 939)
+xxx *=1;
+
 	dVector scale;
 	NewtonCollisionGetScale (m_upperBodyShape, &scale.m_x, &scale.m_y, &scale.m_z);
-//	NewtonCollisionSetScale (m_upperBodyShape, m_height - m_stairStep, (m_outerRadio + m_restrainingDistance) * 4.0f, (m_outerRadio + m_restrainingDistance) * 4.0f);
-	NewtonCollisionSetScale (m_upperBodyShape, m_height - m_stairStep, m_outerRadio * 4.0f, m_outerRadio * 4.0f);
-	for (int i = 0; (i < D_PLAYER_MAX_INTERGRATION_STEPS) && (normalizedTimeLeft > 1.0e-5f); i ++ ) {
+	//const dFloat radio = (m_outerRadio + m_restrainingDistance) * 4.0f;
+	const dFloat radio = m_outerRadio * 4.0f;
+	NewtonCollisionSetScale (m_upperBodyShape, m_height - m_stairStep, radio, radio);
+	for (int j = 0; (j < D_PLAYER_MAX_INTERGRATION_STEPS) && (normalizedTimeLeft > 1.0e-5f); j ++ ) {
 		if ((veloc % veloc) < 1.0e-6f) {
 			break;
 		}
@@ -349,6 +357,15 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 		if (contactCount) {
 			if (timetoImpact > 0.0f) {
 				matrix.m_posit += veloc.Scale (timetoImpact * timestep);
+				matrix.m_posit -= veloc.Scale (D_PLAYER_DISTANCE_CONTACT / dSqrt (veloc % veloc)) ; 
+			} else {
+				dAssert (timetoImpact > 0.0f);
+				const dFloat radio1 = radio + D_PLAYER_DISTANCE_CONTACT;
+				for (k = 0; k < 4; k ++) {
+					for (int i = 0; i < contactCount; i ++) {
+
+					}
+				}
 			}
 			normalizedTimeLeft -= timetoImpact;
 
