@@ -65,7 +65,7 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 	CustomPlayerControllerManager* const manager = (CustomPlayerControllerManager*) GetManager();
 	NewtonWorld* const world = manager->GetWorld();
 
-	m_restrainingDistance = 0.0f;
+	SetRestrainingDistance (0.0f);
 
 	m_outerRadio = outerRadius;
 	m_innerRadio = innerRadius;
@@ -274,11 +274,6 @@ void CustomPlayerController::UpdateGroundPlane (dMatrix& matrix, const dMatrix& 
 	CustomControllerConvexRayFilter filter(GetBody());
 	NewtonWorldConvexRayCast (world, m_castingShape, &castMatrix[0][0], &dst[0], CustomControllerConvexRayFilter::Filter, &filter, CustomControllerConvexRayFilter::Prefilter, threadIndex);
 
-static int xxxx;
-xxxx ++;
-if (xxxx >= 837)
-xxxx *=1;
-
 	m_groundPlane = dVector (0.0f, 0.0f, 0.0f, 0.0f);
 	m_groundVelocity = dVector (0.0f, 0.0f, 0.0f, 0.0f);
 
@@ -296,10 +291,10 @@ xxxx *=1;
 
 void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 {
-	dVector veloc; 
-	dVector omega; 
 	dMatrix matrix; 
 	dQuaternion bodyRotation;
+	dVector veloc(0.0f, 0.0f, 0.0f, 0.0f); 
+	dVector omega(0.0f, 0.0f, 0.0f, 0.0f);  
 
 	CustomPlayerControllerManager* const manager = (CustomPlayerControllerManager*) GetManager();
 	NewtonWorld* const world = manager->GetWorld();
@@ -326,10 +321,10 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 	CustomControllerConvexCastPreFilter castFilterData (body);
 	NewtonWorldConvexCastReturnInfo prevInfo[PLAYER_CONTROLLER_MAX_CONTACTS];
 
-	
 	dVector scale;
 	NewtonCollisionGetScale (m_upperBodyShape, &scale.m_x, &scale.m_y, &scale.m_z);
-	NewtonCollisionSetScale (m_upperBodyShape, m_height - m_stairStep, (m_outerRadio + m_restrainingDistance) * 4.0f, (m_outerRadio + m_restrainingDistance) * 4.0f);
+//	NewtonCollisionSetScale (m_upperBodyShape, m_height - m_stairStep, (m_outerRadio + m_restrainingDistance) * 4.0f, (m_outerRadio + m_restrainingDistance) * 4.0f);
+	NewtonCollisionSetScale (m_upperBodyShape, m_height - m_stairStep, m_outerRadio * 4.0f, m_outerRadio * 4.0f);
 	for (int i = 0; (i < D_PLAYER_MAX_INTERGRATION_STEPS) && (normalizedTimeLeft > 1.0e-5f); i ++ ) {
 		if ((veloc % veloc) < 1.0e-6f) {
 			break;
@@ -356,14 +351,14 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 			int count = 0;
 			for (int i = 0; i < contactCount; i ++) {
 				speed[count] = 0.0f;
-				bounceNormal[count] = info[i].m_normal;
+				bounceNormal[count] = dVector (info[i].m_normal);
 				bounceSpeed[count] = CalculateContactKinematics(veloc, &info[i]);
 				count ++;
 			}
 
 			for (int i = 0; i < prevContactCount; i ++) {
 				speed[count] = 0.0f;
-				bounceNormal[count] = prevInfo[i].m_normal;
+				bounceNormal[count] = dVector (prevInfo[i].m_normal);
 				bounceSpeed[count] = CalculateContactKinematics(veloc, &prevInfo[i]);
 				count ++;
 			}

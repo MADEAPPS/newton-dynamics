@@ -366,7 +366,6 @@ dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const casti
 
 	data.SortFaceArray();
 	dgContactPoint tmpContact;
-//	for (dgInt32 j = data.m_faceCount - 1; (j >= 0) && (data.m_hitDistance[j] < maxT); j --) {
 	for (dgInt32 j = 0; (j < data.m_faceCount) && (data.m_hitDistance[j] < maxT); j ++) {
 		dgInt32 address = data.m_faceIndexStart[j];
 		const dgInt32* const localIndexArray = &indexArray[address];
@@ -382,11 +381,10 @@ dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const casti
 		polygon.m_normal = normal.Scale4(dgRsqrt (normal % normal));
 		dgAssert (polygon.m_normal.m_w == dgFloat32 (0.0f));
 
-		dgVector origin (scale.CompProduct4 (dgVector (&vertex[localIndexArray[0] * stride])));
+		const dgVector& origin = hullMatrix.m_posit;
 		for (dgInt32 i = 0; i < polygon.m_count; i ++) {
 			dgInt32 index = localIndexArray[i] * stride;
-			polygon.m_localPoly[i] = scale.CompProduct4(dgVector (&vertex[index])) - origin;
-			dgAssert (polygon.m_localPoly[i].m_w == dgFloat32 (0.0f));
+			polygon.m_localPoly[i] = (scale.CompProduct4(dgVector (&vertex[index])) - origin) & dgVector::m_triplexMask;
 		}
 		polyInstance.m_localMatrix.m_posit = referenceCollision->m_localMatrix.TransformVector(origin);
 		polyInstance.m_globalMatrix.m_posit = referenceCollision->m_globalMatrix.TransformVector(origin);

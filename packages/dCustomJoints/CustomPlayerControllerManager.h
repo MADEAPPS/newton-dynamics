@@ -23,6 +23,7 @@
 
 #define PLAYER_PLUGIN_NAME				"playerManager"
 #define PLAYER_CONTROLLER_MAX_CONTACTS	32
+#define PLAYER_MIN_RESTRAINING_DISTANCE	1.0e-2f
 
 class CustomPlayerController
 {
@@ -51,7 +52,7 @@ class CustomPlayerController
 
 	void SetRestrainingDistance (dFloat distance)
 	{
-		m_restrainingDistance = dAbs (distance);
+		m_restrainingDistance = dMax (dAbs (distance), PLAYER_MIN_RESTRAINING_DISTANCE);
 	}
 
 	dFloat GetRestrainingDistance ()

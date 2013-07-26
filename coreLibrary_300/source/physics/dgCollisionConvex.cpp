@@ -2970,12 +2970,12 @@ dgFloat32 dgCollisionConvex::ConvexRayCast (const dgCollisionInstance* const cas
 }
 
 
-dgFloat32 dgCollisionConvex::ConvexConicConvexRayCast (const dgCollisionInstance* const convexConicShape, const dgMatrix& conicShapeMatrix, const dgCollisionInstance* const convexCastingShape, const dgMatrix& castingMatrix, const dgVector& castingVeloc, dgFloat32 maxT, dgContactPoint& contactOut) const 
+dgFloat32 dgCollisionConvex::ConvexConicConvexRayCast (const dgCollisionInstance* const convexConicShape, const dgMatrix& conicShapeMatrix, const dgCollisionInstance* const otherConvexShapeInstance, const dgMatrix& otherShapeGlobalMatrix, const dgVector& castingVeloc, dgFloat32 maxT, dgContactPoint& contactOut) const 
 {
 	dgAssert (convexConicShape->GetChildShape() == this);
 
-	dgCollisionInstance shapeInstance (*convexCastingShape, convexCastingShape->GetChildShape());
-	shapeInstance.SetGlobalMatrix (convexCastingShape->GetLocalMatrix() * castingMatrix);
+	dgCollisionInstance shapeInstance (*otherConvexShapeInstance, otherConvexShapeInstance->GetChildShape());
+	shapeInstance.SetGlobalMatrix (otherConvexShapeInstance->GetLocalMatrix() * otherShapeGlobalMatrix);
 
 	dgMatrix matrix (convexConicShape->m_localMatrix * conicShapeMatrix);
 
@@ -3005,7 +3005,7 @@ dgFloat32 dgCollisionConvex::ConvexConicConvexRayCast (const dgCollisionInstance
 	contactOut.m_point = dgVector (dgFloat32 (0.0f));
 	dgContactPoint lastContact(contactOut);
 
-	bool isScaled = !(convexConicShape->m_scaleIsUnit & convexCastingShape->m_scaleIsUnit) ? true : false;
+	bool isScaled = !(convexConicShape->m_scaleIsUnit & otherConvexShapeInstance->m_scaleIsUnit) ? true : false;
 	const dgVector& scale = convexConicShape->m_scale;
 	const dgVector& invScale = convexConicShape->m_invScale;
 
@@ -3029,7 +3029,7 @@ dgFloat32 dgCollisionConvex::ConvexConicConvexRayCast (const dgCollisionInstance
 		dgFloat32 den = normal.DotProduct4 (veloc).m_x;
 		if (dgAbsf(den) < dgFloat32 (1.0e-8f)) {
 			if (tacc == dgFloat32 (0.0f)) {
-				// initiaally interpenetration for now just assert
+				// initially inter penetration for now just assert
 				dgAssert (0);
 			}
 
@@ -3042,6 +3042,7 @@ dgFloat32 dgCollisionConvex::ConvexConicConvexRayCast (const dgCollisionInstance
 		dgFloat32 dt = (normal.DotProduct4(p)).m_x / den;
 		if (dt <= dgFloat32 (-1.0e-4f)) {
 			//tacc = dgFloat32 (1.2f);
+			param = dgFloat32 (1.2f);
 			break;
 		}
 		tacc += dt; 
