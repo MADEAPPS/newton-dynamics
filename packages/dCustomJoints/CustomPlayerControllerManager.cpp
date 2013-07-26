@@ -214,13 +214,20 @@ dVector CustomPlayerController::CalculateDesiredVelocity (dFloat forwardSpeed, d
 			// player is in a legal slope, he is in full control of his movement
 			dVector bodyVeloc;
 			NewtonBodyGetVelocity(body, &bodyVeloc[0]);
-			veloc = frontDir.Scale (forwardSpeed) + rightDir.Scale (lateralSpeed) + updir.Scale(bodyVeloc % updir);
-			veloc += updir.Scale(verticalSpeed);
-			veloc += gravity.Scale (timestep);
+			veloc = updir.Scale(bodyVeloc % updir) + gravity.Scale (timestep) + frontDir.Scale (forwardSpeed) + rightDir.Scale (lateralSpeed) + updir.Scale(verticalSpeed);
 			veloc += (m_groundVelocity - updir.Scale (updir % m_groundVelocity));
 			dFloat normalVeloc = m_groundPlane % (veloc - m_groundVelocity);
 			if (normalVeloc < 0.0f) {
 				veloc -= m_groundPlane.Scale (normalVeloc);
+			}
+			dFloat speedLimitMag2 = forwardSpeed * forwardSpeed + lateralSpeed * lateralSpeed + verticalSpeed * verticalSpeed;
+			dFloat speedMag2 = veloc % veloc;
+			if (speedMag2 > speedLimitMag2) {
+				if (speedLimitMag2 < dFloat (1.0e-6f)) {
+					veloc = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+				} else {
+					veloc = veloc.Scale (dSqrt (speedLimitMag2 / speedMag2));
+				}
 			}
 		} else {
 			// player is in an illegal ramp, he slides down hill an loses control of his movement 
