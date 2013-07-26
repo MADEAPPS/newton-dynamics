@@ -82,12 +82,8 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 	dVector convexPoints[2][steps];
 
 	// create an inner thin cylinder
-//	dMatrix supportShapeMatrix (localAxis);
 	dFloat shapeHigh = height;
 	dAssert (shapeHigh > 0.0f);
-//	supportShapeMatrix.m_posit = supportShapeMatrix[0].Scale(shapeHigh * 0.5f);
-//	supportShapeMatrix.m_posit.m_w = 1.0f;
-//	NewtonCollision* const supportShape = NewtonCreateCylinder(world, m_innerRadio, shapeHigh, 0, &supportShapeMatrix[0][0]);
 	dVector p0 (0.0f, m_innerRadio, 0.0f, 0.0f);
 	dVector p1 (shapeHigh, m_innerRadio, 0.0f, 0.0f);
 	for (int i = 0; i < steps; i ++) {
@@ -127,12 +123,8 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 	
 	SetBody (body);
 
-//	dMatrix castShapeMatrix (localAxis);
 	dFloat castHigh = capsuleHigh * 0.4f;
 	dFloat castRadio = (m_innerRadio * 0.5f > 0.05f) ? m_innerRadio * 0.5f : 0.05f;
-//	castShapeMatrix.m_posit = castShapeMatrix[0].Scale (castHigh * 0.5f);
-//	castShapeMatrix.m_posit.m_w = 1.0f;
-//	m_castingShape = NewtonCreateCylinder(world, castRadio, castHigh, 0, &castShapeMatrix[0][0]);
 
 	dVector q0 (0.0f, castRadio, 0.0f, 0.0f);
 	dVector q1 (castHigh, castRadio, 0.0f, 0.0f);
@@ -281,11 +273,6 @@ void CustomPlayerController::UpdateGroundPlane (dMatrix& matrix, const dMatrix& 
 	CustomPlayerControllerManager* const manager = (CustomPlayerControllerManager*) GetManager();
 	NewtonWorld* const world = manager->GetWorld();
 
-//	dFloat timetoImpact;
-//	CustomControllerConvexCastPreFilter castFilterData (GetBody());
-//	NewtonWorldConvexCastReturnInfo info[4];
-//	int contactCount = NewtonWorldConvexCast (world, &castMatrix[0][0], &dst[0], m_supportShape, &timetoImpact, &castFilterData, CustomControllerConvexCastPreFilter::Prefilter, info, sizeof (info) / sizeof (info[0]), threadIndex);
-
 	CustomControllerConvexRayFilter filter(GetBody());
 	NewtonWorldConvexRayCast (world, m_castingShape, &castMatrix[0][0], &dst[0], CustomControllerConvexRayFilter::Filter, &filter, CustomControllerConvexRayFilter::Prefilter, threadIndex);
 
@@ -428,7 +415,6 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 	if (step > 1.0e-6f) {
 		dMatrix supportMatrix (matrix);
 		dVector updir (matrix.RotateVector(m_upVector));
-		//supportMatrix.m_posit += updir.Scale (m_stairStep);
 		supportMatrix.m_posit += updir.Scale (m_sphereCastOrigin);
 
 		if (m_isJumping) {

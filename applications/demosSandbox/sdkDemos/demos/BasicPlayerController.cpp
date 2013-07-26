@@ -208,7 +208,7 @@ class BasicPlayerControllerManager: public CustomPlayerControllerManager
 			// velocity is set by AI script
 		}
 
-#if 0
+#if 1
 	#if 0
 		static FILE* file = fopen ("log.bin", "wb");
 		if (file) {
@@ -337,8 +337,8 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 	//CreateLevelMesh (scene, "flatPlane.ngd", true);
-	//CreateLevelMesh (scene, "playground.ngd", true);
-	CreateLevelMesh (scene, "castle.ngd", true);
+	CreateLevelMesh (scene, "playground.ngd", true);
+	//CreateLevelMesh (scene, "castle.ngd", true);
 	//CreateLevelMesh (scene, "sponza.ngd", true);
 	//CreateLevelMesh (scene, "sibenik.ngd", true);
 
