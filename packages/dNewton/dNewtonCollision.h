@@ -381,6 +381,13 @@ class dNewtonCollisionChamferedCylinder: public dNewtonCollision
 class dNewtonCollisionConvexHull: public dNewtonCollision
 {
 	public: 
+	dNewtonCollisionConvexHull (NewtonCollision* const shape)
+		:dNewtonCollision(m_convex)
+	{
+		SetShape (shape);
+	}
+
+
 	dNewtonCollisionConvexHull (dNewton* const world, int vertexCount, const dFloat* const vertexCloud, int strideInBytes, dFloat tolerance, int shapeID)
 		:dNewtonCollision(m_convex)
 	{

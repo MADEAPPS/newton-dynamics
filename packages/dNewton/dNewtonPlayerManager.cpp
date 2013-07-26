@@ -97,6 +97,13 @@ dNewtonPlayerManager::dNewtonPlayer::dNewtonPlayer (dNewtonPlayerManager* const 
 				new dNewtonCollisionCylinder (childShape);
 				break;
 			}
+
+			case SERIALIZE_ID_CONVEXHULL:
+			{
+				new dNewtonCollisionConvexHull (childShape);
+				break;
+			}
+
 			default: 
 				dAssert (0);
 		}
