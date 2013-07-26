@@ -120,3 +120,8 @@ void dNewtonPlayerManager::dNewtonPlayer::SetPlayerVelocity (dFloat forwardSpeed
 {
 	m_controller->SetPlayerVelocity (forwardSpeed, lateralSpeed, verticalSpeed, headingAngle, dVector(gravity), timestep);
 }
+
+dFloat dNewtonPlayerManager::dNewtonPlayer::GetPlayerHigh() const
+{
+	return m_controller->GetHigh();
+}

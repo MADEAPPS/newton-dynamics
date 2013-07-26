@@ -42,25 +42,39 @@ dNewtonTransformLerp::~dNewtonTransformLerp()
 {
 }
 
-void dNewtonTransformLerp::ResetMatrix (const dFloat* const matrix)
+
+void dNewtonTransformLerp::GetTargetMatrix (dFloat* const matrix) const
 {
-	m_posit0 = dVector (matrix[12], matrix[13], matrix[14], 1.0f);
-	m_posit1 = m_posit0;
-	m_rotat0 = dMatrix (matrix);
-	m_rotat1 = m_rotat0;
+	dMatrix mat (m_rotat1, m_posit0);
+	memcpy (matrix, &mat[0][0], sizeof (dMatrix));
 }
 
-void dNewtonTransformLerp::Update (const dFloat* const matrix)
+void dNewtonTransformLerp::SetTargetMatrix (const dFloat* const matrix)
 {
-	m_posit0 = m_posit1;
-	m_rotat0 = m_rotat1;
-	m_posit1 = dVector (matrix[12], matrix[13], matrix[14], 1.0f);
-	m_rotat1 = dMatrix (matrix);
+	dMatrix mat (matrix);
+	m_posit1 = mat.m_posit;
+	m_rotat1 = dQuaternion (mat);
 
 	dFloat angle = m_rotat0.DotProduct(m_rotat1);
 	if (angle < 0.0f) {
 		m_rotat1.Scale(-1.0f);
 	}
+}
+
+
+void dNewtonTransformLerp::ResetMatrix (const dFloat* const matrix)
+{
+	SetTargetMatrix (matrix);
+	m_posit0 = m_posit1;
+	m_rotat0 = m_rotat1;
+}
+
+
+void dNewtonTransformLerp::Update (const dFloat* const matrix)
+{
+	m_posit0 = m_posit1;
+	m_rotat0 = m_rotat1;
+	SetTargetMatrix (matrix);
 }
 
 

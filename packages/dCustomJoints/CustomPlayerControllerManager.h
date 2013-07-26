@@ -30,7 +30,7 @@ class CustomPlayerController
 	CUSTOM_CONTROLLER_GLUE(CustomPlayerController);
 	
 	public:
-	dFloat GetHight() const 
+	dFloat GetHigh() const 
 	{
 		return m_height;
 	}
