@@ -208,7 +208,7 @@ class BasicPlayerControllerManager: public CustomPlayerControllerManager
 			// velocity is set by AI script
 		}
 
-#if 1
+#if 0
 	#if 0
 		static FILE* file = fopen ("log.bin", "wb");
 		if (file) {
@@ -254,7 +254,7 @@ class BasicPlayerControllerManager: public CustomPlayerControllerManager
 		// now overwrite the camera to match the player character location 
 		if (m_player) {
 			dMatrix playerMatrix (m_player->GetNextMatrix()); 
-			dFloat height = m_player->m_controller->GetHight();
+			dFloat height = m_player->m_controller->GetHigh();
 			dVector upDir (m_player->m_controller->GetUpDir());
 			playerMatrix.m_posit += upDir.Scale(height);
 

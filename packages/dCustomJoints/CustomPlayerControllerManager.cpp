@@ -78,14 +78,24 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 	m_groundPlane = dVector (0.0f, 0.0f, 0.0f, 0.0f);
 	m_groundVelocity = dVector (0.0f, 0.0f, 0.0f, 0.0f);
 
+	const int steps = 12;
+	dVector convexPoints[2][steps];
 
-	dMatrix supportShapeMatrix (localAxis);
 	// create an inner thin cylinder
+//	dMatrix supportShapeMatrix (localAxis);
 	dFloat shapeHigh = height;
 	dAssert (shapeHigh > 0.0f);
-	supportShapeMatrix.m_posit = supportShapeMatrix[0].Scale(shapeHigh * 0.5f);
-	supportShapeMatrix.m_posit.m_w = 1.0f;
-	NewtonCollision* const supportShape = NewtonCreateCylinder(world, m_innerRadio, shapeHigh, 0, &supportShapeMatrix[0][0]);
+//	supportShapeMatrix.m_posit = supportShapeMatrix[0].Scale(shapeHigh * 0.5f);
+//	supportShapeMatrix.m_posit.m_w = 1.0f;
+//	NewtonCollision* const supportShape = NewtonCreateCylinder(world, m_innerRadio, shapeHigh, 0, &supportShapeMatrix[0][0]);
+	dVector p0 (0.0f, m_innerRadio, 0.0f, 0.0f);
+	dVector p1 (shapeHigh, m_innerRadio, 0.0f, 0.0f);
+	for (int i = 0; i < steps; i ++) {
+		dMatrix rotation (dPitchMatrix (i * 2.0f * 3.141592f / steps));
+		convexPoints[0][i] = localAxis.RotateVector(rotation.RotateVector(p0));
+		convexPoints[1][i] = localAxis.RotateVector(rotation.RotateVector(p1));
+	}
+	NewtonCollision* const supportShape = NewtonCreateConvexHull(world, steps * 2, &convexPoints[0][0].m_x, sizeof (dVector), 0.0f, 0, NULL); 
 
 	// create the outer thick cylinder
 	dMatrix outerShapeMatrix (localAxis);
@@ -117,18 +127,23 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 	
 	SetBody (body);
 
-	dMatrix castSphereMatrix (localAxis);
-//	castSphereMatrix.m_posit = castSphereMatrix[0].Scale (-m_innerRadio * 0.5f);
-//	castSphereMatrix.m_posit.m_w = 1.0f;
-//	m_castingSphere = NewtonCreateSphere (world, m_innerRadio * 0.5f, 0, &castSphereMatrix[0][0]);
-
+//	dMatrix castShapeMatrix (localAxis);
 	dFloat castHigh = capsuleHigh * 0.4f;
 	dFloat castRadio = (m_innerRadio * 0.5f > 0.05f) ? m_innerRadio * 0.5f : 0.05f;
-	castSphereMatrix.m_posit = castSphereMatrix[0].Scale (castHigh * 0.5f);
-	castSphereMatrix.m_posit.m_w = 1.0f;
-	m_castingShape = NewtonCreateCylinder(world, castRadio, castHigh, 0, &castSphereMatrix[0][0]);
-	
+//	castShapeMatrix.m_posit = castShapeMatrix[0].Scale (castHigh * 0.5f);
+//	castShapeMatrix.m_posit.m_w = 1.0f;
+//	m_castingShape = NewtonCreateCylinder(world, castRadio, castHigh, 0, &castShapeMatrix[0][0]);
 
+	dVector q0 (0.0f, castRadio, 0.0f, 0.0f);
+	dVector q1 (castHigh, castRadio, 0.0f, 0.0f);
+	for (int i = 0; i < steps; i ++) {
+		dMatrix rotation (dPitchMatrix (i * 2.0f * 3.141592f / steps));
+		convexPoints[0][i] = localAxis.RotateVector(rotation.RotateVector(q0));
+		convexPoints[1][i] = localAxis.RotateVector(rotation.RotateVector(q1));
+	}
+	m_castingShape = NewtonCreateConvexHull(world, steps * 2, &convexPoints[0][0].m_x, sizeof (dVector), 0.0f, 0, NULL); 
+
+	
 	m_supportShape = NewtonCompoundCollisionGetCollisionFromNode (shape, NewtonCompoundCollisionGetNodeByIndex (shape, 0));
 	m_upperBodyShape = NewtonCompoundCollisionGetCollisionFromNode (shape, NewtonCompoundCollisionGetNodeByIndex (shape, 1));
 
@@ -286,7 +301,6 @@ void CustomPlayerController::UpdateGroundPlane (dMatrix& matrix, const dMatrix& 
 		matrix.m_posit = supportPoint;
 		matrix.m_posit.m_w = 1.0f;
 	}
-
 }
 
 void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
