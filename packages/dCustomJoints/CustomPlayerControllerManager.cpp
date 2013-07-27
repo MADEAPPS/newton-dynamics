@@ -20,7 +20,6 @@
 #define D_DESCRETE_MOTION_STEPS				8
 #define D_PLAYER_MAX_INTERGRATION_STEPS		8
 #define D_PLAYER_MAX_SOLVER_ITERATIONS		16
-#define D_PLAYER_DISTANCE_CONTACT			0.025f
 
 
 CustomPlayerControllerManager::CustomPlayerControllerManager(NewtonWorld* const world)
@@ -330,12 +329,15 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 	CustomControllerConvexCastPreFilter castFilterData (body);
 	NewtonWorldConvexCastReturnInfo prevInfo[PLAYER_CONTROLLER_MAX_CONTACTS];
 
-
+/*
 static int xxx;
 xxx ++;
 if (xxx >= 939)
 xxx *=1;
 
+//if (xxx >= 941)
+//return;
+*/
 	dVector scale;
 	NewtonCollisionGetScale (m_upperBodyShape, &scale.m_x, &scale.m_y, &scale.m_z);
 	//const dFloat radio = (m_outerRadio + m_restrainingDistance) * 4.0f;
@@ -358,74 +360,96 @@ xxx *=1;
 			if (timetoImpact > 0.0f) {
 				matrix.m_posit += veloc.Scale (timetoImpact * timestep);
 				matrix.m_posit -= veloc.Scale (D_PLAYER_DISTANCE_CONTACT / dSqrt (veloc % veloc)) ; 
+
+				normalizedTimeLeft -= timetoImpact;
+
+				dFloat speed[PLAYER_CONTROLLER_MAX_CONTACTS * 2];
+				dFloat bounceSpeed[PLAYER_CONTROLLER_MAX_CONTACTS * 2];
+				dVector bounceNormal[PLAYER_CONTROLLER_MAX_CONTACTS * 2];
+
+				int count = 0;
+				for (int i = 0; i < contactCount; i ++) {
+					speed[count] = 0.0f;
+					bounceNormal[count] = dVector (info[i].m_normal);
+					bounceSpeed[count] = CalculateContactKinematics(veloc, &info[i]);
+					count ++;
+				}
+
+				for (int i = 0; i < prevContactCount; i ++) {
+					speed[count] = 0.0f;
+					bounceNormal[count] = dVector (prevInfo[i].m_normal);
+					bounceSpeed[count] = CalculateContactKinematics(veloc, &prevInfo[i]);
+					count ++;
+				}
+
+				dFloat residual = 10.0f;
+				dVector auxBounceVeloc (0.0f, 0.0f, 0.0f, 0.0f);
+				for (int i = 0; (i < D_PLAYER_MAX_SOLVER_ITERATIONS) && (residual > 1.0e-3f); i ++) {
+					residual = 0.0f;
+					for (int k = 0; k < count; k ++) {
+						dVector normal (bounceNormal[k]);
+						dFloat v = bounceSpeed[k] - normal % auxBounceVeloc;
+						dFloat x = speed[k] + v;
+						if (x < 0.0f) {
+							v = 0.0f;
+							x = 0.0f;
+						}
+
+						if (dAbs (v) > residual) {
+							residual = dAbs (v);
+						}
+
+						auxBounceVeloc += normal.Scale (x - speed[k]);
+						speed[k] = x;
+					}
+				}
+
+				dVector velocStep (0.0f, 0.0f, 0.0f, 0.0f);
+				for (int i = 0; i < count; i ++) {
+					dVector normal (bounceNormal[i]);
+					velocStep += normal.Scale (speed[i]);
+				}
+				veloc += velocStep;
+
+				dFloat velocMag2 = velocStep % velocStep;
+				if (velocMag2 < 1.0e-6f) {
+					dFloat advanceTime = dMin (descreteTimeStep, normalizedTimeLeft * timestep);
+					matrix.m_posit += veloc.Scale (advanceTime);
+					normalizedTimeLeft -= advanceTime / timestep;
+				}
+
+				prevContactCount = contactCount;
+				memcpy (prevInfo, info, prevContactCount * sizeof (NewtonWorldConvexCastReturnInfo));
+
 			} else {
-				dAssert (timetoImpact > 0.0f);
-				const dFloat radio1 = radio + D_PLAYER_DISTANCE_CONTACT;
-				for (k = 0; k < 4; k ++) {
-					for (int i = 0; i < contactCount; i ++) {
-
+/*
+				dVector planes[PLAYER_CONTROLLER_MAX_CONTACTS];
+				for (int i = 0; i < contactCount; i ++) {
+					planes[i] = dVector (info[i].m_normal);
+					dVector p (matrix.m_posit + planes[i].Scale (radio - D_PLAYER_DISTANCE_CONTACT));
+					planes[i].m_w = - (planes[i] % p);
+				}
+				int planeCount = contactCount;
+				for (int i = 0; i < (planeCount - 1); i ++) {
+					for (int k = i + 1; k < planeCount; k ++) {
+						dVector diff (planes[i] - planes[k]);
+						dFloat dist = planes[i].m_w - planes[k].m_w;
+						dFloat erro2 = diff % diff + dist * dist;
+						if (erro2 < 1.0e-3f) {
+							planes[k] = planes[planeCount - 1];
+							k --;
+							planeCount --;
+						}
 					}
 				}
-			}
-			normalizedTimeLeft -= timetoImpact;
 
-			dFloat speed[PLAYER_CONTROLLER_MAX_CONTACTS * 2];
-			dFloat bounceSpeed[PLAYER_CONTROLLER_MAX_CONTACTS * 2];
-			dVector bounceNormal[PLAYER_CONTROLLER_MAX_CONTACTS * 2];
-
-			int count = 0;
-			for (int i = 0; i < contactCount; i ++) {
-				speed[count] = 0.0f;
-				bounceNormal[count] = dVector (info[i].m_normal);
-				bounceSpeed[count] = CalculateContactKinematics(veloc, &info[i]);
-				count ++;
-			}
-
-			for (int i = 0; i < prevContactCount; i ++) {
-				speed[count] = 0.0f;
-				bounceNormal[count] = dVector (prevInfo[i].m_normal);
-				bounceSpeed[count] = CalculateContactKinematics(veloc, &prevInfo[i]);
-				count ++;
-			}
-
-			dFloat residual = 10.0f;
-			dVector auxBounceVeloc (0.0f, 0.0f, 0.0f, 0.0f);
-			for (int i = 0; (i < D_PLAYER_MAX_SOLVER_ITERATIONS) && (residual > 1.0e-3f); i ++) {
-				residual = 0.0f;
-				for (int k = 0; k < count; k ++) {
-					dVector normal (bounceNormal[k]);
-					dFloat v = bounceSpeed[k] - normal % auxBounceVeloc;
-					dFloat x = speed[k] + v;
-					if (x < 0.0f) {
-						v = 0.0f;
-						x = 0.0f;
-					}
-
-					if (dAbs (v) > residual) {
-						residual = dAbs (v);
-					}
-
-					auxBounceVeloc += normal.Scale (x - speed[k]);
-					speed[k] = x;
+				for (int i = 0; i < planeCount; i ++) {
+					dFloat t = planes[i] % matrix.m_posit + planes[i].m_w; 
+					matrix.m_posit = matrix.m_posit - planes[i].Scale (t);
+					matrix.m_posit -= planes[i].Scale (radio);
 				}
+*/
 			}
-
-			dVector velocStep (0.0f, 0.0f, 0.0f, 0.0f);
-			for (int i = 0; i < count; i ++) {
-				dVector normal (bounceNormal[i]);
-				velocStep += normal.Scale (speed[i]);
-			}
-			veloc += velocStep;
-
-			dFloat velocMag2 = velocStep % velocStep;
-			if (velocMag2 < 1.0e-6f) {
-				dFloat advanceTime = dMin (descreteTimeStep, normalizedTimeLeft * timestep);
-				matrix.m_posit += veloc.Scale (advanceTime);
-				normalizedTimeLeft -= advanceTime / timestep;
-			}
-
-			prevContactCount = contactCount;
-			memcpy (prevInfo, info, prevContactCount * sizeof (NewtonWorldConvexCastReturnInfo));
 
 		} else {
 			matrix.m_posit = destPosit;
