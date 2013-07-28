@@ -115,9 +115,6 @@
     <ClCompile Include="..\..\sdkDemos\toolBox\PhysicsUtils.cpp">
       <Filter>tooBox</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\demos\PostCompoundCreateBuildTest.cpp">
-      <Filter>demos</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\SimpleBooleans.cpp">
       <Filter>demos</Filter>
     </ClCompile>
@@ -161,6 +158,9 @@
       <Filter>mainLogic\listeners</Filter>
     </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\BasicRagDoll.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\ArchimedesBuoyancy.cpp">
       <Filter>demos</Filter>
     </ClCompile>
   </ItemGroup>

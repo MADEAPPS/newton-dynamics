@@ -412,6 +412,7 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLi
     <ClCompile Include="..\..\sdkDemos\DemoListenerBase.cpp" />
     <ClCompile Include="..\..\sdkDemos\DemoSoundListener.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\AdvancedPlayerController.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\ArchimedesBuoyancy.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicCar.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicPlayerController.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicRagDoll.cpp" />
@@ -420,7 +421,6 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLi
     <ClCompile Include="..\..\sdkDemos\demos\HeavyVehicles.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\HeighFieldCollision.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\KinematicBodies.cpp" />
-    <ClCompile Include="..\..\sdkDemos\demos\PostCompoundCreateBuildTest.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\PrecessingTops.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\PrimitiveCollision.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\PuckSlide.cpp" />
