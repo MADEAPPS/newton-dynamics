@@ -52,6 +52,7 @@ class BasicPlayerEntity: public DemoEntity
 
 		// make the player controller, this function makes a kinematic body
 		m_controller = manager->CreatePlayer(PLAYER_MASS, radius, radius * 0.5f, height, height * 0.33f, playerAxis);
+		//m_controller = manager->CreatePlayer(200.0f, 0.4207f, 0.105f, 2.0f, 0.5, playerAxis);
 
 		// set a restraining distance that the player can not get closet than
 		m_controller->SetRestrainingDistance(0.1f);
@@ -337,8 +338,8 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 	//CreateLevelMesh (scene, "flatPlane.ngd", true);
-	CreateLevelMesh (scene, "playground.ngd", true);
-	//CreateLevelMesh (scene, "castle.ngd", true);
+	//CreateLevelMesh (scene, "playground.ngd", true);
+	CreateLevelMesh (scene, "castle.ngd", true);
 	//CreateLevelMesh (scene, "sponza.ngd", true);
 	//CreateLevelMesh (scene, "sibenik.ngd", true);
 
@@ -353,6 +354,11 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	location.m_posit.m_x = -4.0f;
 	location.m_posit.m_y = 5.0f;
 	location.m_posit.m_z = 0.0f;
+
+//location.m_posit.m_x = 96.7f;
+//location.m_posit.m_y = -5.0f;
+//location.m_posit.m_z = 22.8f;
+
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 10.0f);
 	BasicPlayerEntity* const player = new BasicPlayerEntity (scene, manager, 0.5f, 1.9f, location);
 
@@ -365,7 +371,7 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	dVector size (2.0f, 2.0f, 2.0f, 0.0f);
 	int count = 1;
 	dMatrix shapeOffsetMatrix (GetIdentityMatrix());
-//	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix, 10.0f);
+	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix, 10.0f);
 
 	dVector origin (-10.0f, 2.0f, 0.0f, 0.0f);
 	dQuaternion rot;

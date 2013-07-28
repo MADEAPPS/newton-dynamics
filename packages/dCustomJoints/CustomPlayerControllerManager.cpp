@@ -358,6 +358,9 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 	CustomControllerConvexCastPreFilter castFilterData (body);
 	NewtonWorldConvexCastReturnInfo prevInfo[PLAYER_CONTROLLER_MAX_CONTACTS];
 
+
+	dVector updir (matrix.RotateVector(m_upVector));
+
 	dVector scale;
 	NewtonCollisionGetScale (m_upperBodyShape, &scale.m_x, &scale.m_y, &scale.m_z);
 	//const dFloat radio = m_outerRadio * 4.0f;
@@ -391,7 +394,13 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 			int count = 0;
 			for (int i = 0; i < contactCount; i ++) {
 				speed[count] = 0.0f;
-				bounceNormal[count] = dVector (info[i].m_normal);
+				dVector normal (info[i].m_normal);
+				normal -= updir.Scale(updir % normal);
+				normal = normal.Scale (1.0f / dSqrt (normal % normal));
+				bounceNormal[count] = normal;
+				info[i].m_normal[0] = normal.m_x;
+				info[i].m_normal[1] = normal.m_y;
+				info[i].m_normal[2] = normal.m_z;
 				bounceSpeed[count] = CalculateContactKinematics(veloc, &info[i]);
 				count ++;
 			}
@@ -453,7 +462,7 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 	// determine if player is standing on some plane
 	if (step > 1.0e-6f) {
 		dMatrix supportMatrix (matrix);
-		dVector updir (matrix.RotateVector(m_upVector));
+		
 		supportMatrix.m_posit += updir.Scale (m_sphereCastOrigin);
 
 		if (m_isJumping) {
