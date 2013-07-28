@@ -905,6 +905,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\sdkDemos\demos\ArchimedesBuoyancy.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\sdkDemos\demos\BasicCar.cpp"
 				>
 			</File>
@@ -966,10 +970,6 @@
 			</File>
 			<File
 				RelativePath="..\..\sdkDemos\demos\MultiRayCasting.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\sdkDemos\demos\PostCompoundCreateBuildTest.cpp"
 				>
 			</File>
 			<File
