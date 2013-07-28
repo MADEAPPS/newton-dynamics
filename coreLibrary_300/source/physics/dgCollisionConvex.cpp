@@ -982,7 +982,7 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 		m_vertexIndex = simplexPointCount;
 	}
 
-	bool IntersectionTest ()
+	bool DisjointTest ()
 	{
 		const dgCollisionInstance* const collConvexInstance = m_proxy->m_floatingCollision;
 		const dgCollisionInstance* const collConicConvexInstance = m_proxy->m_referenceCollision;
@@ -2894,7 +2894,7 @@ dgInt32 dgCollisionConvex::CalculateConvexToConvexContact (dgCollisionParamProxy
 	dgMinkHull minkHull (proxy);
 
 	if (proxy.m_intersectionTestOnly) {
-		if (!minkHull.IntersectionTest ()) {
+		if (!minkHull.DisjointTest ()) {
 			return -1;
 		}
 		minkHull.m_p = ConvexConicSupporVertex(minkHull.m_p, minkHull.m_normal);
@@ -3015,7 +3015,8 @@ dgFloat32 dgCollisionConvex::ConvexConicConvexRayCast (const dgCollisionInstance
 
 	dgInt32 makingProgressCount = 0;
 	do {
-		if (!minkHull.IntersectionTest()) {
+		bool disjoint = minkHull.DisjointTest();
+		if (!disjoint) {
 			break;
 		}
 

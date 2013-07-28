@@ -284,6 +284,12 @@ void CustomPlayerController::UpdateGroundPlane (dMatrix& matrix, const dMatrix& 
 	CustomControllerConvexRayFilter filter(GetBody());
 	NewtonWorldConvexRayCast (world, m_castingShape, &castMatrix[0][0], &dst[0], CustomControllerConvexRayFilter::Filter, &filter, CustomControllerConvexRayFilter::Prefilter, threadIndex);
 
+//static int xxx;
+//xxx ++;
+//if (xxx >= 559)
+//dTrace (("%d p(%f %f %f) x(%f %f %f)\n", xxx, filter.m_hitContact.m_x, filter.m_hitContact.m_y, filter.m_hitContact.m_z, filter.m_hitNormal.m_x, filter.m_hitNormal.m_y, filter.m_hitNormal.m_z));
+
+
 	m_groundPlane = dVector (0.0f, 0.0f, 0.0f, 0.0f);
 	m_groundVelocity = dVector (0.0f, 0.0f, 0.0f, 0.0f);
 
@@ -358,6 +364,11 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 	CustomControllerConvexCastPreFilter castFilterData (body);
 	NewtonWorldConvexCastReturnInfo prevInfo[PLAYER_CONTROLLER_MAX_CONTACTS];
 
+
+//static int xxx;
+//xxx ++;
+//if (xxx > 674)
+//dTrace (("%d %f %f %f\n", xxx, matrix.m_posit.m_x, matrix.m_posit.m_y, matrix.m_posit.m_z));
 
 	dVector updir (matrix.RotateVector(m_upVector));
 
