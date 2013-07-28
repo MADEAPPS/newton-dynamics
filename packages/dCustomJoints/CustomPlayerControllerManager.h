@@ -118,7 +118,7 @@ class CustomPlayerControllerManager: public CustomControllerManager<CustomPlayer
 	NEWTON_API virtual int ProcessContacts (const CustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const; 
 
 	protected:
-	virtual void DestroyController (CustomController* const controller);
+	NEWTON_API virtual void DestroyController (CustomController* const controller);
 };
 
 
