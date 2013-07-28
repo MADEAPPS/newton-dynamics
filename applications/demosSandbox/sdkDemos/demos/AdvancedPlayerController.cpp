@@ -57,7 +57,8 @@ class TriggerManager: public CustomTriggerManager
 		if (entity) {
 			// map the event massage 
 			int message = -1;
-			switch (event) {
+			switch (event) 
+			{
 				case m_enterTrigger:
 					message = ENTER_TRIGGER;
 					break;
