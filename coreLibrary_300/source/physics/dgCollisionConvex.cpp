@@ -3107,7 +3107,8 @@ dgInt32 dgCollisionConvex::CalculateConvexCastContacts(dgCollisionParamProxy& pr
 			normal = normal.CompProduct4(normal.InvMagSqrt());
 		}
 		dgFloat32 den = normal % veloc;
-		if (den >= dgFloat32 (0.0f)) {
+		//if (den >= dgFloat32 (0.0f)) {
+		if (den >= dgFloat32 (-1.0e-6f)) {
 			// bodies are residing from each other, even if they are touching they are not considered to be colliding because the motion will move them apart 
 			// get the closet point and the normal at contact point
 			count = 0;
