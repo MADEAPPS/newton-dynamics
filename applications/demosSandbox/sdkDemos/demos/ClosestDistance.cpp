@@ -20,7 +20,7 @@
 
 
 
-class dClosestDistanceRecord: public CustomControllerBase_
+class dClosestDistanceRecord: public CustomControllerBase
 {
 	class ClosestDistanceEntity: public DemoEntity
 	{

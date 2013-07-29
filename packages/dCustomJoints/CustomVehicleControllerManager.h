@@ -25,7 +25,7 @@
 #define VEHICLE_PLUGIN_NAME			"vehicleManager"
 
 
-class CustomVehicleController: public CustomControllerBase_
+class CustomVehicleController: public CustomControllerBase
 {
 	public:
 	class BodyState;

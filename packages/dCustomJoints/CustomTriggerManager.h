@@ -26,7 +26,7 @@
 
 // a trigger is volume of space that is there to send a message to other objects when and object enter of leave the trigger region  
 // they are not visible and do not collide with bodies, but the generate contacts
-class CustomTriggerController: public CustomControllerBase_
+class CustomTriggerController: public CustomControllerBase
 {
 
 	protected:

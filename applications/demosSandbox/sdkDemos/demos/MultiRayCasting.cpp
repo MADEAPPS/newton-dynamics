@@ -23,7 +23,7 @@
 
 #define PARALLET_RAYS_COUNT 1000
 
-class dRayCastRecord: public CustomControllerBase_
+class dRayCastRecord: public CustomControllerBase
 {
 	public:
 	void PreUpdate(dFloat timestep, int threadIndex)

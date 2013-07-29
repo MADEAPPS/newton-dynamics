@@ -91,17 +91,17 @@ class CustomControllerConvexRayFilter: public CustomControllerConvexCastPreFilte
 };
 
 
-class CustomControllerBase_
+class CustomControllerBase
 {
 	public:
-	CustomControllerBase_ ()
+	CustomControllerBase ()
 		:m_userData(NULL)
 		,m_body(NULL)
 		,m_manager(NULL)
 	{
 	}
 
-	virtual ~CustomControllerBase_ ()
+	virtual ~CustomControllerBase ()
 	{
 	}
 
@@ -242,14 +242,14 @@ void CustomControllerManager_<CONTROLLER_BASE>::Destroy (const NewtonWorld* cons
 template<class CONTROLLER_BASE>
 void CustomControllerManager_<CONTROLLER_BASE>::PreUpdateKernel (NewtonWorld* const world, void* const context, int threadIndex)
 {
-	CustomControllerBase_* const controller = (CustomControllerBase_*) context;
+	CustomControllerBase* const controller = (CustomControllerBase*) context;
 	controller->PreUpdate(((CustomControllerManager_*)controller->m_manager)->GetTimeStep(), threadIndex);
 }
 
 template<class CONTROLLER_BASE>
 void CustomControllerManager_<CONTROLLER_BASE>::PostUpdateKernel (NewtonWorld* const world, void* const context, int threadIndex)
 {
-	class CustomControllerBase_* const controller = (CustomControllerBase_*) context;
+	class CustomControllerBase* const controller = (CustomControllerBase*) context;
 	controller->PostUpdate(((CustomControllerManager_*)controller->m_manager)->GetTimeStep(), threadIndex);
 }
 

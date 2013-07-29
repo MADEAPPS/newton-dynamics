@@ -25,7 +25,7 @@
 #define PLAYER_CONTROLLER_MAX_CONTACTS	32
 #define PLAYER_MIN_RESTRAINING_DISTANCE	1.0e-2f
 
-class CustomPlayerController: public CustomControllerBase_
+class CustomPlayerController: public CustomControllerBase
 {
 	public:
 	NEWTON_API CustomPlayerController();

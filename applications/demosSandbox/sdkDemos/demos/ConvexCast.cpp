@@ -170,7 +170,7 @@ class StupidComplexOfConvexShapes: public DemoEntity
 };
 
 
-class dConvexCastRecord: public CustomControllerBase_
+class dConvexCastRecord: public CustomControllerBase
 {
 	public:
 	void PreUpdate(dFloat timestep, int threadIndex)
