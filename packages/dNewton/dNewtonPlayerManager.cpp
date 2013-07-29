@@ -37,22 +37,21 @@ dNewtonPlayerManager::~dNewtonPlayerManager ()
 
 dNewtonPlayerManager::dNewtonPlayer* dNewtonPlayerManager::GetFirstPlayer() const
 {
-	dAssert (0);
-//	CustomController* const controller = GetFirstController();
-//	if (controller) {
-//		return (dNewtonPlayerManager::dNewtonPlayer*) NewtonBodyGetUserData (controller->GetBody());
-//	}
+	CustomListNode* const node = GetFirst();
+	if (node) {
+		return (dNewtonPlayerManager::dNewtonPlayer*) NewtonBodyGetUserData (node->GetInfo().GetBody());
+	}
 	return NULL;
 }
 
 dNewtonPlayerManager::dNewtonPlayer* dNewtonPlayerManager::GetNextPlayer(const dNewtonPlayer* const player) const
 {
-	dAssert (0);
 	dAssert (player);
-//	CustomController* const controller = GetNextController (player->m_controller);
-//	if (controller) {
-//		return (dNewtonPlayerManager::dNewtonPlayer*) NewtonBodyGetUserData (controller->GetBody());
-//	}
+	dAssert (FindNodeFromInfo(*player->m_controller));
+	CustomListNode* const node = GetNodeFromInfo(*player->m_controller)->GetNext();
+	if (node) {
+		return (dNewtonPlayerManager::dNewtonPlayer*) NewtonBodyGetUserData (node->GetInfo().GetBody());
+	}
 	return NULL;
 }
 
@@ -76,10 +75,11 @@ dNewtonPlayerManager::dNewtonPlayer::dNewtonPlayer (dNewtonPlayerManager* const 
 
 	m_controller = manager->CreatePlayer(mass, outerRadius, innerRadius, height, stairStep, playerAxis);
 
-	SetUserData (userData);
-
 	NewtonBody* const body = m_controller->GetBody();
+
 	SetBody (body);
+	SetUserData (userData);
+	
 	NewtonCollision* const collision = NewtonBodyGetCollision(body);
 	new dNewtonCollisionCompound (collision);
 
@@ -115,14 +115,12 @@ dNewtonPlayerManager::dNewtonPlayer::dNewtonPlayer (dNewtonPlayerManager* const 
 
 dNewtonPlayerManager::dNewtonPlayer::~dNewtonPlayer ()
 {
-	dAssert(0);
-//	m_controller->Cleanup();
-//	NewtonBody* const body = m_controller->GetBody();	
-//	if (NewtonBodyGetDestructorCallback(body)) {
-//		SetBody(NULL);
-//		dNewtonPlayerManager* const manager = (dNewtonPlayerManager*)m_controller->GetManager();
-//		manager->DestroyController (m_controller);
-//	}
+	NewtonBody* const body = m_controller->GetBody();	
+	if (NewtonBodyGetDestructorCallback(body)) {
+		SetBody(NULL);
+		dNewtonPlayerManager* const manager = (dNewtonPlayerManager*)m_controller->GetManager();
+		manager->DestroyController (m_controller);
+	}
 }
 
 
