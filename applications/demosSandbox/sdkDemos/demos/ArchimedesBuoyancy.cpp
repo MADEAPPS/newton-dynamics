@@ -100,9 +100,9 @@ class MyTriggerManager: public CustomTriggerManager
 
 
 
-void AlchemedesBuoyancy(DemoEntityManager* const scene)
+void AlchimedesBuoyancy(DemoEntityManager* const scene)
 {
-	// load the skybox
+	// load the sky box
 	scene->CreateSkyBox();
 
 
@@ -110,7 +110,7 @@ void AlchemedesBuoyancy(DemoEntityManager* const scene)
 	CreateLevelMesh (scene, "swimmingPool.ngd", false);
 
 
-	// add a triget Managet to teh workld
+	// add a trigger Manager to the world
 	MyTriggerManager* const triggerManager = new MyTriggerManager(scene->GetNewton());
 
 	dMatrix triggerLocation (GetIdentityMatrix());

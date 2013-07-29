@@ -153,6 +153,7 @@ class CustomControllerManager: public CustomList<CONTROLLER_BASE>
 	virtual CONTROLLER_BASE* CreateController ();
 	virtual void DestroyController (CONTROLLER_BASE* const controller);
 
+    virtual void Debug () const;
 	virtual void PreUpdate(dFloat timestep);
 	virtual void PostUpdate(dFloat timestep);
 
@@ -192,6 +193,11 @@ void CustomControllerManager<CONTROLLER_BASE>::DestroyAllController ()
 	while (GetCount()) {
 		DestroyController (&GetLast()->GetInfo());
 	}
+}
+
+template<class CONTROLLER_BASE>
+void CustomControllerManager<CONTROLLER_BASE>::Debug () const
+{
 }
 
 template<class CONTROLLER_BASE>

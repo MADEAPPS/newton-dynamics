@@ -38,7 +38,7 @@
 //#define DEFAULT_SCENE	12			// infinite user plane collision
 //#define DEFAULT_SCENE	13			// user height field Collision
 //#define DEFAULT_SCENE	14			// compound Collision
-//#define DEFAULT_SCENE	15			// simple alchemedes buoyancy
+#define DEFAULT_SCENE	15			// simple alchimedes buoyancy
 //#define DEFAULT_SCENE	16			// uniform Scaled Collision
 //#define DEFAULT_SCENE	17			// non Uniform Scaled Collision
 //#define DEFAULT_SCENE	18			// scaled mesh collision
@@ -52,7 +52,7 @@
 //#define DEFAULT_SCENE	26			// basic rag doll
 //#define DEFAULT_SCENE	27			// basic car
 //#define DEFAULT_SCENE	28			// high performance super car
-#define DEFAULT_SCENE	29			// basic player controller
+//#define DEFAULT_SCENE	29			// basic player controller
 //#define DEFAULT_SCENE	30			// advanced player controller
 //#define DEFAULT_SCENE	31			// cloth patch			
 //#define DEFAULT_SCENE	32			// soft bodies			
@@ -77,7 +77,7 @@ void ContinueCollision (DemoEntityManager* const scene);
 void PuckSlide (DemoEntityManager* const scene);
 void SceneCollision (DemoEntityManager* const scene);
 void CompoundCollision(DemoEntityManager* const scene);
-void AlchemedesBuoyancy(DemoEntityManager* const scene);
+void AlchimedesBuoyancy(DemoEntityManager* const scene);
 void SimpleConvexApproximation(DemoEntityManager* const scene);
 void SimpleBooleanOperations(DemoEntityManager* const scene);
 void SimpleConvexShatter (DemoEntityManager* const scene);
@@ -110,7 +110,7 @@ NewtonDemos::SDKDemos NewtonDemos::m_demosSelection[] =
 	{wxT("User infinite Plane collision mesh"), wxT("show high file collision mesh"), UserPlaneCollision},
 	{wxT("User Height field collision mesh"), wxT("show high file collision mesh"), UserHeightFieldCollision},
 	{wxT("Compound collision shape"), wxT("demonstrate compound collision"), CompoundCollision},
-	{wxT("Alchemedes Buoyancy"), wxT("show Alchemedes Buoyancy using the trigger volumen manager"), AlchemedesBuoyancy},
+	{wxT("Alchemedes Buoyancy"), wxT("show Alchemedes Buoyancy using the trigger volumen manager"), AlchimedesBuoyancy},
 	{wxT("Uniform scaled collision shape"), wxT("demonstrate scaling shape"), UniformScaledCollision},
 	{wxT("Non uniform scaled collision shape"), wxT("demonstrate scaling shape"), NonUniformScaledCollision},
 	{wxT("Scaled mesh collision"), wxT("demonstrate scaling mesh scaling collision"), ScaledMeshCollision},

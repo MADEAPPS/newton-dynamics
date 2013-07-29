@@ -889,15 +889,13 @@ void DemoEntityManager::RenderFrame ()
 		void* const vehListerNode =  NewtonWorldGetPreListener (GetNewton(), VEHICLE_PLUGIN_NAME);
 		if (vehListerNode) {
 			CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*) NewtonWorldGetListenerUserData(GetNewton(), vehListerNode);
-			dAssert (0);
-//			manager->Debug();
+			manager->Debug();
 		}
 
 		void* const characterListerNode =  NewtonWorldGetPreListener (GetNewton(), PLAYER_PLUGIN_NAME);
 		if (characterListerNode) {
 			CustomPlayerControllerManager* const manager = (CustomPlayerControllerManager*) NewtonWorldGetListenerUserData(GetNewton(), characterListerNode);
-			dAssert (0);
-			//manager->Debug();
+			manager->Debug();
 		}
 	}
 
