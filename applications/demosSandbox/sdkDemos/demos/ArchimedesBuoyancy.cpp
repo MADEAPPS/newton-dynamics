@@ -63,6 +63,13 @@ class MyTriggerManager: public CustomTriggerManager
 		BuoyancyForce* const buoyancyForce = new BuoyancyForce (controller);
 		controller->SetUserData (buoyancyForce);
 	}
+
+	void DestroyController (CustomTriggerController* const controller)
+	{
+		TriggerCallback* const userData = (TriggerCallback*) controller->GetUserData();
+		delete userData;
+		CustomTriggerManager::DestroyController (controller);
+	}
 	
 
 	virtual void EventCallback (const CustomTriggerController* const me, TriggerEventType event, NewtonBody* const visitor) const

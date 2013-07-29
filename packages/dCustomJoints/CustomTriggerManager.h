@@ -26,10 +26,8 @@
 
 // a trigger is volume of space that is there to send a message to other objects when and object enter of leave the trigger region  
 // they are not visible and do not collide with bodies, but the generate contacts
-class CustomTriggerController
+class CustomTriggerController: public CustomControllerBase_
 {
-	CUSTOM_CONTROLLER_GLUE(CustomTriggerController);
-
 
 	protected:
 	class PassangerManifest
@@ -54,8 +52,9 @@ class CustomTriggerController
 	};
 
 	public:
-	NEWTON_API const void* GetUserData() const;
-	NEWTON_API void SetUserData(void* const userData);
+	NEWTON_API CustomTriggerController();
+	NEWTON_API ~CustomTriggerController();
+
 	NEWTON_API void Init (NewtonCollision* const convexShape, const dMatrix& matrix, void* const userData);
 	NEWTON_API virtual void PreUpdate(dFloat timestep, int threadIndex);
 	NEWTON_API virtual void PostUpdate(dFloat timestep, int threadIndex);
@@ -66,7 +65,7 @@ class CustomTriggerController
 	friend class CustomTriggerManager;
 };
 
-class CustomTriggerManager: public CustomControllerManager<CustomTriggerController> 
+class CustomTriggerManager: public CustomControllerManager_<CustomTriggerController> 
 {
 	public:
 	enum TriggerEventType

@@ -392,6 +392,8 @@ class CustomControllerManager_: public CustomList<CONTROLLER_BASE>
 	virtual void PostUpdate(dFloat timestep);
 
 	private:
+	void DestroyAllController ();
+
 	static void Destroy (const NewtonWorld* const world, void* const listenerUserData);
 	static void PreUpdate (const NewtonWorld* const world, void* const listenerUserData, dFloat timestep);
 	static void PostUpdate (const NewtonWorld* const world, void* const listenerUserData, dFloat timestep);
@@ -417,11 +419,15 @@ CustomControllerManager_<CONTROLLER_BASE>::CustomControllerManager_(NewtonWorld*
 template<class CONTROLLER_BASE>
 CustomControllerManager_<CONTROLLER_BASE>::~CustomControllerManager_()
 {
+}
+
+template<class CONTROLLER_BASE>
+void CustomControllerManager_<CONTROLLER_BASE>::DestroyAllController ()
+{
 	while (GetCount()) {
 		DestroyController (&GetLast()->GetInfo());
 	}
 }
-
 
 template<class CONTROLLER_BASE>
 void CustomControllerManager_<CONTROLLER_BASE>::PreUpdate(dFloat timestep)
@@ -463,6 +469,7 @@ template<class CONTROLLER_BASE>
 void CustomControllerManager_<CONTROLLER_BASE>::Destroy (const NewtonWorld* const world, void* const listenerUserData)
 {
 	CustomControllerManager_* const me = (CustomControllerManager_*) listenerUserData;
+	me->DestroyAllController ();
 	delete me;
 }
 

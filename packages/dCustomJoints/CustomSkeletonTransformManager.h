@@ -23,10 +23,8 @@
 #define SKELETON_TRANSFORM_PLUGIN_NAME	"skeletonTransformManager"
 
 // a Skeleton Transform controller is use to calculate local transform on contractions of rigid bodies and joint that form part of a hierarchical Skeleton
-class CustomSkeletonTransformController
+class CustomSkeletonTransformController: public CustomControllerBase_
 {
-	CUSTOM_CONTROLLER_GLUE(CustomSkeletonTransformController);
-
 	public:
 	class dBitFieldMask
 	{
@@ -106,7 +104,7 @@ class CustomSkeletonTransformController
 	friend class CustomSkeletonTransformManager;
 };
 
-class CustomSkeletonTransformManager: public CustomControllerManager<CustomSkeletonTransformController> 
+class CustomSkeletonTransformManager: public CustomControllerManager_<CustomSkeletonTransformController> 
 {
 	public:
 	NEWTON_API CustomSkeletonTransformManager(NewtonWorld* const world);

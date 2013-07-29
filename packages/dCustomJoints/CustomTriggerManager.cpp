@@ -72,7 +72,7 @@ CustomTriggerController::PassangerManifest::Passenger* CustomTriggerController::
 
 
 CustomTriggerManager::CustomTriggerManager(NewtonWorld* const world)
-	:CustomControllerManager<CustomTriggerController>(world, TRIGGER_PLUGIN_NAME)
+	:CustomControllerManager_<CustomTriggerController>(world, TRIGGER_PLUGIN_NAME)
 	,m_lru(0)
 {
 }
@@ -92,36 +92,31 @@ CustomTriggerController* CustomTriggerManager::CreateTrigger (const dMatrix& mat
 void CustomTriggerManager::PreUpdate(dFloat timestep)
 {
 	m_lru ++;
-	CustomControllerManager<CustomTriggerController>::PreUpdate(timestep);
+	CustomControllerManager_<CustomTriggerController>::PreUpdate(timestep);
 }
 
 
-
-
-void CustomTriggerController::SetUserData(void* const userData)
+CustomTriggerController::CustomTriggerController()
 {
-	m_userData = userData;
 }
 
-const void* CustomTriggerController::GetUserData() const
+CustomTriggerController::~CustomTriggerController()
 {
-	return m_userData;
+	NewtonDestroyBody(m_body);
 }
-
 
 
 void CustomTriggerController::Init (NewtonCollision* const convexShape, const dMatrix& matrix, void* const userData)
 {
 	m_userData = userData;
 
-	NewtonWorld* const world = GetManager()->GetWorld();
+	NewtonWorld* const world = ((CustomTriggerManager*)GetManager())->GetWorld();
 
 	// create a trigger body and place in the scene
-	NewtonBody* const body = NewtonCreateKinematicBody(world, convexShape, &matrix[0][0]);
-	SetBody (body);
+	m_body = NewtonCreateKinematicBody(world, convexShape, &matrix[0][0]);
 	
 	// set this shape do not collide with other bodies
-	NewtonCollision* const collision = NewtonBodyGetCollision (body);
+	NewtonCollision* const collision = NewtonBodyGetCollision (m_body);
 	NewtonCollisionSetCollisonMode(collision, 0);
 }
 

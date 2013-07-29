@@ -18,7 +18,7 @@
 
 
 CustomSkeletonTransformManager::CustomSkeletonTransformManager(NewtonWorld* const world)
-	:CustomControllerManager<CustomSkeletonTransformController>(world, SKELETON_TRANSFORM_PLUGIN_NAME)
+	:CustomControllerManager_<CustomSkeletonTransformController>(world, SKELETON_TRANSFORM_PLUGIN_NAME)
 {
 }
 
@@ -37,7 +37,7 @@ CustomSkeletonTransformController* CustomSkeletonTransformManager::CreateTransfo
 
 void CustomSkeletonTransformManager::PostUpdate(dFloat timestep)
 {
-	CustomControllerManager<CustomSkeletonTransformController>::PostUpdate(timestep);
+	CustomControllerManager_<CustomSkeletonTransformController>::PostUpdate(timestep);
 }
 
 
