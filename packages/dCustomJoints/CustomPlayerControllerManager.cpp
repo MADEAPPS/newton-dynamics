@@ -23,34 +23,14 @@
 #define D_PLAYER_CONTACT_SKIN_THICKNESS		0.025f
 
 
-CustomPlayerControllerManager::CustomPlayerControllerManager(NewtonWorld* const world)
-	:CustomControllerManager<CustomPlayerController> (world, PLAYER_PLUGIN_NAME)
+CustomPlayerController::CustomPlayerController()
 {
 }
 
-CustomPlayerControllerManager::~CustomPlayerControllerManager()
+CustomPlayerController::~CustomPlayerController()
 {
-}
-
-CustomPlayerControllerManager::CustomController* CustomPlayerControllerManager::CreatePlayer (dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dMatrix& localAxis)
-{
-	CustomPlayerControllerManager::CustomController* const controller = CreateController();
-	controller->Init (mass, outerRadius, innerRadius, height, stairStep, localAxis);
-	return controller;
-}
-
-void CustomPlayerControllerManager::DestroyController (CustomController* const controller)
-{
-	controller->Cleanup();
-}
-
-int CustomPlayerControllerManager::ProcessContacts (const CustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int contactCount) const 
-{
-	//	for (int i = 0; i < contactCount; i ++) {
-	//		const dgVector normal = contacts[i].m_normal;
-	//		const dgVector position = contacts[i].m_normal;
-	//	}
-	return contactCount;
+	NewtonDestroyBody(m_body);
+	NewtonDestroyCollision (m_castingShape);
 }
 
 
@@ -113,16 +93,14 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 
 	// create the kinematic body
 	dMatrix locationMatrix (GetIdentityMatrix());
-	NewtonBody* const body = NewtonCreateKinematicBody(world, playerShape, &locationMatrix[0][0]);
+	m_body = NewtonCreateKinematicBody(world, playerShape, &locationMatrix[0][0]);
 
 	// players must have weight, otherwise they are infinitely strong when they collide
-	NewtonCollision* const shape = NewtonBodyGetCollision(body);
-	NewtonBodySetMassProperties(body, mass, shape);
+	NewtonCollision* const shape = NewtonBodyGetCollision(m_body);
+	NewtonBodySetMassProperties(m_body, mass, shape);
 
 	// make the body collidable with other dynamics bodies, by default
-	NewtonSetBodyCollidable (body, true);
-	
-	SetBody (body);
+	NewtonSetBodyCollidable (m_body, true);
 
 	dFloat castHigh = capsuleHigh * 0.4f;
 	dFloat castRadio = (m_innerRadio * 0.5f > 0.05f) ? m_innerRadio * 0.5f : 0.05f;
@@ -136,7 +114,7 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 	}
 	m_castingShape = NewtonCreateConvexHull(world, steps * 2, &convexPoints[0][0].m_x, sizeof (dVector), 0.0f, 0, NULL); 
 
-	
+
 	m_supportShape = NewtonCompoundCollisionGetCollisionFromNode (shape, NewtonCompoundCollisionGetNodeByIndex (shape, 0));
 	m_upperBodyShape = NewtonCompoundCollisionGetCollisionFromNode (shape, NewtonCompoundCollisionGetNodeByIndex (shape, 1));
 
@@ -147,18 +125,32 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 	m_isJumping = false;
 }
 
-void CustomPlayerController::Cleanup()
+
+
+CustomPlayerControllerManager::CustomPlayerControllerManager(NewtonWorld* const world)
+	:CustomControllerManager_<CustomPlayerController> (world, PLAYER_PLUGIN_NAME)
 {
-	dAssert (0);
-	if (m_castingShape) {
-		NewtonDestroyCollision (m_castingShape);
-	}
-	m_castingShape = NULL;
+
 }
+
+CustomPlayerControllerManager::~CustomPlayerControllerManager()
+{
+}
+
+CustomPlayerController* CustomPlayerControllerManager::CreatePlayer (dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dMatrix& localAxis)
+{
+	CustomPlayerController* const controller = CreateController ();
+	controller->Init (mass, outerRadius, innerRadius, height, stairStep, localAxis);	
+	return controller;
+}
+
+
+
 
 void CustomPlayerController::SetPlayerOrigin (dFloat originHigh)
 {
-	NewtonCollision* const playerShape = NewtonBodyGetCollision(GetBody());
+	dAssert (0);
+	NewtonCollision* const playerShape = NewtonBodyGetCollision(m_body);
 	NewtonCompoundCollisionBeginAddRemove(playerShape);	
 
 		dMatrix supportShapeMatrix (GetIdentityMatrix());
@@ -182,128 +174,10 @@ void CustomPlayerController::SetPlayerOrigin (dFloat originHigh)
 	dFloat Iyy;
 	dFloat Izz;
 	dFloat mass;
-	NewtonBodyGetMassMatrix(GetBody(), &mass, &Ixx, &Iyy, &Izz);
-	NewtonBodySetMassProperties(GetBody(), mass, playerShape);
+	NewtonBodyGetMassMatrix(m_body, &mass, &Ixx, &Iyy, &Izz);
+	NewtonBodySetMassProperties(m_body, mass, playerShape);
 }
 
-void CustomPlayerController::PreUpdate(dFloat timestep, int threadIndex)
-{
-}
-
-
-dVector CustomPlayerController::CalculateDesiredOmega (dFloat headingAngle, dFloat timestep) const
-{
-	dQuaternion playerRotation;
-	dQuaternion targetRotation (m_upVector, headingAngle);
-	NewtonBodyGetRotation(GetBody(), &playerRotation.m_q0);
-	return playerRotation.CalcAverageOmega (targetRotation, 0.5f / timestep);
-}
-
-dVector CustomPlayerController::CalculateDesiredVelocity (dFloat forwardSpeed, dFloat lateralSpeed, dFloat verticalSpeed, const dVector& gravity, dFloat timestep) const
-{
-	NewtonBody* const body = GetBody();
-	dMatrix matrix;
-	NewtonBodyGetMatrix(body, &matrix[0][0]);
-	dVector updir (matrix.RotateVector(m_upVector));
-	dVector frontDir (matrix.RotateVector(m_frontVector));
-	dVector rightDir (frontDir * updir);
-	
-
-	dVector veloc (0.0f, 0.0f, 0.0f, 0.0f);
-	if ((verticalSpeed <= 0.0f) && (m_groundPlane % m_groundPlane) > 0.0f) {
-		// plane is supported by a ground plane, apply the player input velocity
-		if ((m_groundPlane % updir) >= m_maxSlope) {
-			// player is in a legal slope, he is in full control of his movement
-			dVector bodyVeloc;
-			NewtonBodyGetVelocity(body, &bodyVeloc[0]);
-			veloc = updir.Scale(bodyVeloc % updir) + gravity.Scale (timestep) + frontDir.Scale (forwardSpeed) + rightDir.Scale (lateralSpeed) + updir.Scale(verticalSpeed);
-			veloc += (m_groundVelocity - updir.Scale (updir % m_groundVelocity));
-			dFloat normalVeloc = m_groundPlane % (veloc - m_groundVelocity);
-			if (normalVeloc < 0.0f) {
-				veloc -= m_groundPlane.Scale (normalVeloc);
-			}
-			dFloat speedLimitMag2 = forwardSpeed * forwardSpeed + lateralSpeed * lateralSpeed + verticalSpeed * verticalSpeed;
-			dFloat speedMag2 = veloc % veloc;
-			if (speedMag2 > speedLimitMag2) {
-				if (speedLimitMag2 < dFloat (1.0e-6f)) {
-					veloc = dVector (0.0f, 0.0f, 0.0f, 0.0f);
-				} else {
-					veloc = veloc.Scale (dSqrt (speedLimitMag2 / speedMag2));
-				}
-			}
-		} else {
-			// player is in an illegal ramp, he slides down hill an loses control of his movement 
-			NewtonBodyGetVelocity(body, &veloc[0]);
-			veloc += updir.Scale(verticalSpeed);
-			veloc += gravity.Scale (timestep);
-			dFloat normalVeloc = m_groundPlane % (veloc - m_groundVelocity);
-			if (normalVeloc < 0.0f) {
-				veloc -= m_groundPlane.Scale (normalVeloc);
-			}
-		}
-	} else {
-		// player is on free fall, only apply the gravity
-		NewtonBodyGetVelocity(body, &veloc[0]);
-		veloc += updir.Scale(verticalSpeed);
-		veloc += gravity.Scale (timestep);
-	}
-	return veloc;
-}
-
-void CustomPlayerController::SetPlayerVelocity (dFloat forwardSpeed, dFloat lateralSpeed, dFloat verticalSpeed, dFloat headingAngle, const dVector& gravity, dFloat timestep)
-{
-	dVector omega (CalculateDesiredOmega (headingAngle, timestep));
-	dVector veloc (CalculateDesiredVelocity (forwardSpeed, lateralSpeed, verticalSpeed, gravity, timestep));			
-
-	NewtonBody* const body = GetBody();
-	NewtonBodySetOmega(body, &omega[0]);
-	NewtonBodySetVelocity(body, &veloc[0]);
-
-	if ((verticalSpeed > 0.0f)) {
-		m_isJumping = true;
-	}
-}
-
-dFloat CustomPlayerController::CalculateContactKinematics(const dVector& veloc, const NewtonWorldConvexCastReturnInfo* const contactInfo) const
-{
-	dVector contactVeloc;
-	NewtonBodyGetPointVelocity (contactInfo->m_hitBody, contactInfo->m_point, &contactVeloc[0]);
-
-	const dFloat restitution = 0.0f;
-	dVector normal (contactInfo->m_normal);
-	dFloat reboundVelocMag = -((veloc - contactVeloc)% normal) * (1.0f + restitution);
-	return (reboundVelocMag > 0.0f) ? reboundVelocMag : 0.0f; 
-}
-
-
-
-void CustomPlayerController::UpdateGroundPlane (dMatrix& matrix, const dMatrix& castMatrix, const dVector& dst, int threadIndex)
-{
-	CustomPlayerControllerManager* const manager = (CustomPlayerControllerManager*) GetManager();
-	NewtonWorld* const world = manager->GetWorld();
-
-	CustomControllerConvexRayFilter filter(GetBody());
-	NewtonWorldConvexRayCast (world, m_castingShape, &castMatrix[0][0], &dst[0], CustomControllerConvexRayFilter::Filter, &filter, CustomControllerConvexRayFilter::Prefilter, threadIndex);
-
-//static int xxx;
-//xxx ++;
-//if (xxx >= 559)
-//dTrace (("%d p(%f %f %f) x(%f %f %f)\n", xxx, filter.m_hitContact.m_x, filter.m_hitContact.m_y, filter.m_hitContact.m_z, filter.m_hitNormal.m_x, filter.m_hitNormal.m_y, filter.m_hitNormal.m_z));
-
-
-	m_groundPlane = dVector (0.0f, 0.0f, 0.0f, 0.0f);
-	m_groundVelocity = dVector (0.0f, 0.0f, 0.0f, 0.0f);
-
-	if (filter.m_hitBody) {
-		m_isJumping = false;
-		dVector supportPoint (castMatrix.m_posit + (dst - castMatrix.m_posit).Scale (filter.m_intersectParam));
-		m_groundPlane = filter.m_hitNormal;
-		m_groundPlane.m_w = - (supportPoint % filter.m_hitNormal);
-		NewtonBodyGetPointVelocity (filter.m_hitBody, &supportPoint.m_x, &m_groundVelocity[0]);
-		matrix.m_posit = supportPoint;
-		matrix.m_posit.m_w = 1.0f;
-	}
-}
 
 /*
 dVector planes[PLAYER_CONTROLLER_MAX_CONTACTS];
@@ -333,6 +207,124 @@ for (int i = 0; i < planeCount; i ++) {
 }
 */
 
+
+
+int CustomPlayerControllerManager::ProcessContacts (const CustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int contactCount) const 
+{
+	//	for (int i = 0; i < contactCount; i ++) {
+	//		const dgVector normal = contacts[i].m_normal;
+	//		const dgVector position = contacts[i].m_normal;
+	//	}
+	return contactCount;
+}
+
+dVector CustomPlayerController::CalculateDesiredOmega (dFloat headingAngle, dFloat timestep) const
+{
+	dQuaternion playerRotation;
+	dQuaternion targetRotation (m_upVector, headingAngle);
+	NewtonBodyGetRotation(m_body, &playerRotation.m_q0);
+	return playerRotation.CalcAverageOmega (targetRotation, 0.5f / timestep);
+}
+
+dVector CustomPlayerController::CalculateDesiredVelocity (dFloat forwardSpeed, dFloat lateralSpeed, dFloat verticalSpeed, const dVector& gravity, dFloat timestep) const
+{
+	dMatrix matrix;
+	NewtonBodyGetMatrix(m_body, &matrix[0][0]);
+	dVector updir (matrix.RotateVector(m_upVector));
+	dVector frontDir (matrix.RotateVector(m_frontVector));
+	dVector rightDir (frontDir * updir);
+
+	dVector veloc (0.0f, 0.0f, 0.0f, 0.0f);
+	if ((verticalSpeed <= 0.0f) && (m_groundPlane % m_groundPlane) > 0.0f) {
+		// plane is supported by a ground plane, apply the player input velocity
+		if ((m_groundPlane % updir) >= m_maxSlope) {
+			// player is in a legal slope, he is in full control of his movement
+			dVector bodyVeloc;
+			NewtonBodyGetVelocity(m_body, &bodyVeloc[0]);
+			veloc = updir.Scale(bodyVeloc % updir) + gravity.Scale (timestep) + frontDir.Scale (forwardSpeed) + rightDir.Scale (lateralSpeed) + updir.Scale(verticalSpeed);
+			veloc += (m_groundVelocity - updir.Scale (updir % m_groundVelocity));
+			dFloat normalVeloc = m_groundPlane % (veloc - m_groundVelocity);
+			if (normalVeloc < 0.0f) {
+				veloc -= m_groundPlane.Scale (normalVeloc);
+			}
+			dFloat speedLimitMag2 = forwardSpeed * forwardSpeed + lateralSpeed * lateralSpeed + verticalSpeed * verticalSpeed;
+			dFloat speedMag2 = veloc % veloc;
+			if (speedMag2 > speedLimitMag2) {
+				if (speedLimitMag2 < dFloat (1.0e-6f)) {
+					veloc = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+				} else {
+					veloc = veloc.Scale (dSqrt (speedLimitMag2 / speedMag2));
+				}
+			}
+		} else {
+			// player is in an illegal ramp, he slides down hill an loses control of his movement 
+			NewtonBodyGetVelocity(m_body, &veloc[0]);
+			veloc += updir.Scale(verticalSpeed);
+			veloc += gravity.Scale (timestep);
+			dFloat normalVeloc = m_groundPlane % (veloc - m_groundVelocity);
+			if (normalVeloc < 0.0f) {
+				veloc -= m_groundPlane.Scale (normalVeloc);
+			}
+		}
+	} else {
+		// player is on free fall, only apply the gravity
+		NewtonBodyGetVelocity(m_body, &veloc[0]);
+		veloc += updir.Scale(verticalSpeed);
+		veloc += gravity.Scale (timestep);
+	}
+	return veloc;
+}
+
+
+void CustomPlayerController::SetPlayerVelocity (dFloat forwardSpeed, dFloat lateralSpeed, dFloat verticalSpeed, dFloat headingAngle, const dVector& gravity, dFloat timestep)
+{
+	dVector omega (CalculateDesiredOmega (headingAngle, timestep));
+	dVector veloc (CalculateDesiredVelocity (forwardSpeed, lateralSpeed, verticalSpeed, gravity, timestep));			
+
+	NewtonBodySetOmega(m_body, &omega[0]);
+	NewtonBodySetVelocity(m_body, &veloc[0]);
+
+	if ((verticalSpeed > 0.0f)) {
+		m_isJumping = true;
+	}
+}
+
+
+dFloat CustomPlayerController::CalculateContactKinematics(const dVector& veloc, const NewtonWorldConvexCastReturnInfo* const contactInfo) const
+{
+	dVector contactVeloc;
+	NewtonBodyGetPointVelocity (contactInfo->m_hitBody, contactInfo->m_point, &contactVeloc[0]);
+
+	const dFloat restitution = 0.0f;
+	dVector normal (contactInfo->m_normal);
+	dFloat reboundVelocMag = -((veloc - contactVeloc)% normal) * (1.0f + restitution);
+	return (reboundVelocMag > 0.0f) ? reboundVelocMag : 0.0f; 
+}
+
+
+void CustomPlayerController::UpdateGroundPlane (dMatrix& matrix, const dMatrix& castMatrix, const dVector& dst, int threadIndex)
+{
+	CustomPlayerControllerManager* const manager = (CustomPlayerControllerManager*) GetManager();
+	NewtonWorld* const world = manager->GetWorld();
+
+	CustomControllerConvexRayFilter filter(m_body);
+	NewtonWorldConvexRayCast (world, m_castingShape, &castMatrix[0][0], &dst[0], CustomControllerConvexRayFilter::Filter, &filter, CustomControllerConvexRayFilter::Prefilter, threadIndex);
+
+	m_groundPlane = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+	m_groundVelocity = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+
+	if (filter.m_hitBody) {
+		m_isJumping = false;
+		dVector supportPoint (castMatrix.m_posit + (dst - castMatrix.m_posit).Scale (filter.m_intersectParam));
+		m_groundPlane = filter.m_hitNormal;
+		m_groundPlane.m_w = - (supportPoint % filter.m_hitNormal);
+		NewtonBodyGetPointVelocity (filter.m_hitBody, &supportPoint.m_x, &m_groundVelocity[0]);
+		matrix.m_posit = supportPoint;
+		matrix.m_posit.m_w = 1.0f;
+	}
+}
+
+
 void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 {
 	dMatrix matrix; 
@@ -342,18 +334,17 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 
 	CustomPlayerControllerManager* const manager = (CustomPlayerControllerManager*) GetManager();
 	NewtonWorld* const world = manager->GetWorld();
-	NewtonBody* const body = GetBody();
 
 	// apply the player motion, by calculation the desired plane linear and angular velocity
 	manager->ApplyPlayerMove (this, timestep);
 
 	// get the body motion state 
-	NewtonBodyGetMatrix(body, &matrix[0][0]);
-	NewtonBodyGetVelocity(body, &veloc[0]);
-	NewtonBodyGetOmega(body, &omega[0]);
+	NewtonBodyGetMatrix(m_body, &matrix[0][0]);
+	NewtonBodyGetVelocity(m_body, &veloc[0]);
+	NewtonBodyGetOmega(m_body, &omega[0]);
 
 	// integrate body angular velocity
-	NewtonBodyGetRotation (body, &bodyRotation.m_q0); 
+	NewtonBodyGetRotation (m_body, &bodyRotation.m_q0); 
 	bodyRotation = bodyRotation.IntegrateOmega(omega, timestep);
 	matrix = dMatrix (bodyRotation, matrix.m_posit);
 
@@ -362,14 +353,8 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 	dFloat step = timestep * dSqrt (veloc % veloc) ;
 	dFloat descreteTimeStep = timestep * (1.0f / D_DESCRETE_MOTION_STEPS);
 	int prevContactCount = 0;
-	CustomControllerConvexCastPreFilter castFilterData (body);
+	CustomControllerConvexCastPreFilter castFilterData (m_body);
 	NewtonWorldConvexCastReturnInfo prevInfo[PLAYER_CONTROLLER_MAX_CONTACTS];
-
-
-//static int xxx;
-//xxx ++;
-//if (xxx > 674)
-//dTrace (("%d %f %f %f\n", xxx, matrix.m_posit.m_x, matrix.m_posit.m_y, matrix.m_posit.m_z));
 
 	dVector updir (matrix.RotateVector(m_upVector));
 
@@ -474,7 +459,7 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 	// determine if player is standing on some plane
 	if (step > 1.0e-6f) {
 		dMatrix supportMatrix (matrix);
-		
+
 		supportMatrix.m_posit += updir.Scale (m_sphereCastOrigin);
 
 		if (m_isJumping) {
@@ -489,7 +474,6 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 	}
 
 	// set player velocity, position and orientation
-	NewtonBodySetVelocity(body, &veloc[0]);
-	NewtonBodySetMatrix (body, &matrix[0][0]);
+	NewtonBodySetVelocity(m_body, &veloc[0]);
+	NewtonBodySetMatrix (m_body, &matrix[0][0]);
 }
-

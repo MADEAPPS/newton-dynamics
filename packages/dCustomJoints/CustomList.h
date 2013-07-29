@@ -136,8 +136,8 @@ class CustomList: public CustomAlloc
 	void RotateToBegin (CustomListNode* const node);
 	void InsertAfter (CustomListNode* const root, CustomListNode* const node);
 
-	CustomListNode* Find (const T &element) const;
-	CustomListNode* GetNodeFromInfo (T &m_info) const;
+	CustomListNode* FindNodeFromInfo (const T &element) const;
+	CustomListNode* GetNodeFromInfo (const T &m_info) const;
 	void Remove (CustomListNode* const node);
 	void Remove (const T &element);
 	void RemoveAll ();
@@ -309,11 +309,11 @@ void CustomList<T>::RotateToBegin (CustomListNode* const node)
 
 
 template<class T>
-typename CustomList<T>::CustomListNode* CustomList<T>::Find (const T &element) const
+typename CustomList<T>::CustomListNode* CustomList<T>::FindNodeFromInfo (const T &element) const
 {
 	CustomListNode* node;
 	for (node = m_first; node; node = node->GetNext()) {
-		if (element	== node->m_info) {
+		if (&element == &node->m_info) {
 			break;
 		}
 	}
@@ -322,7 +322,7 @@ typename CustomList<T>::CustomListNode* CustomList<T>::Find (const T &element) c
 
 
 template<class T>
-typename CustomList<T>::CustomListNode* CustomList<T>::GetNodeFromInfo (T &info) const
+typename CustomList<T>::CustomListNode* CustomList<T>::GetNodeFromInfo (const T &info) const
 {
 	CustomListNode* const node = (CustomListNode*) &info;
 	long long offset = ((char*) &node->m_info) - ((char*)node);

@@ -811,7 +811,7 @@ extern "C" {
 	NEWTON_API NewtonBody* NewtonCreateKinematicBody (const NewtonWorld* const newtonWorld, const NewtonCollision* const collision, const dFloat* const matrix);
 	NEWTON_API NewtonBody* NewtonCreateDeformableBody (const NewtonWorld* const newtonWorld, const NewtonCollision* const deformableMesh, const dFloat* const matrix);
 
-	NEWTON_API void  NewtonDestroyBody(const NewtonWorld* const newtonWorld, const NewtonBody* const body);
+	NEWTON_API void  NewtonDestroyBody(const NewtonBody* const body);
 
 	NEWTON_API int NewtonBodyGetType (const NewtonBody* const body);
 	NEWTON_API void NewtonSetBodyCollidable (const NewtonBody* const body, int collidableState);

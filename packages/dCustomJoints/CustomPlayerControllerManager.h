@@ -25,11 +25,14 @@
 #define PLAYER_CONTROLLER_MAX_CONTACTS	32
 #define PLAYER_MIN_RESTRAINING_DISTANCE	1.0e-2f
 
-class CustomPlayerController
+class CustomPlayerController: public CustomControllerBase_
 {
-	CUSTOM_CONTROLLER_GLUE(CustomPlayerController);
-	
 	public:
+	NEWTON_API CustomPlayerController();
+	NEWTON_API ~CustomPlayerController();
+
+	NEWTON_API void Init(dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stepHigh, const dMatrix& localAxis);
+
 	dFloat GetHigh() const 
 	{
 		return m_height;
@@ -39,15 +42,9 @@ class CustomPlayerController
 	{
 		return m_upVector;	
 	}
-
-	void SetClimbSlope (dFloat slopeInRadians)
+	const dVector& GetGroundPlane() const
 	{
-		m_maxSlope = dCos (dAbs(slopeInRadians));
-	}
-
-	dFloat GetClimbSlope () const
-	{
-		return dAcos (m_maxSlope);
+		return m_groundPlane;
 	}
 
 	void SetRestrainingDistance (dFloat distance)
@@ -55,31 +52,23 @@ class CustomPlayerController
 		m_restrainingDistance = dMax (dAbs (distance), PLAYER_MIN_RESTRAINING_DISTANCE);
 	}
 
-	dFloat GetRestrainingDistance ()
+	void SetClimbSlope (dFloat slopeInRadians)
 	{
-		return m_restrainingDistance;
+		m_maxSlope = dCos (dAbs(slopeInRadians));
 	}
 
-
-	const dVector& GetGroundPlane() const
+	virtual void PreUpdate(dFloat timestep, int threadIndex)
 	{
-		return m_groundPlane;
 	}
 
 	NEWTON_API void SetPlayerOrigin (dFloat originHigh);
-	NEWTON_API void SetPlayerVelocity (dFloat forwardSpeed, dFloat lateralSpeed, dFloat verticalSpeed, dFloat headingAngle, const dVector& gravity, dFloat timestep);
-	NEWTON_API void Cleanup();
 
-	protected:
 	NEWTON_API dVector CalculateDesiredOmega (dFloat headingAngle, dFloat timestep) const;
 	NEWTON_API dVector CalculateDesiredVelocity (dFloat forwardSpeed, dFloat lateralSpeed, dFloat verticalSpeed, const dVector& gravity, dFloat timestep) const;
-
-	NEWTON_API void Init(dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stepHigh, const dMatrix& localAxis);
 	
-
-	NEWTON_API virtual void PreUpdate(dFloat timestep, int threadIndex);
 	NEWTON_API virtual void PostUpdate(dFloat timestep, int threadIndex);
-	
+	NEWTON_API void SetPlayerVelocity (dFloat forwardSpeed, dFloat lateralSpeed, dFloat verticalSpeed, dFloat headingAngle, const dVector& gravity, dFloat timestep);
+
 	private:
 	void UpdateGroundPlane (dMatrix& matrix, const dMatrix& castMatrix, const dVector& target, int threadIndex);
 	dFloat CalculateContactKinematics(const dVector& veloc, const NewtonWorldConvexCastReturnInfo* const contact) const;
@@ -99,28 +88,24 @@ class CustomPlayerController
 	NewtonCollision* m_castingShape;
 	NewtonCollision* m_supportShape;
 	NewtonCollision* m_upperBodyShape;
-
-	friend class CustomPlayerControllerManager;
 };
 
-class CustomPlayerControllerManager: public CustomControllerManager<CustomPlayerController> 
+
+class CustomPlayerControllerManager: public CustomControllerManager_<CustomPlayerController>
 {
 	public:
 	NEWTON_API CustomPlayerControllerManager(NewtonWorld* const world);
-	NEWTON_API virtual ~CustomPlayerControllerManager();
+	NEWTON_API ~CustomPlayerControllerManager();
 
-	virtual void Debug () const {};
+	virtual void PreUpdate(dFloat timestep)
+	{
+	}
 
-	NEWTON_API virtual CustomController* CreatePlayer (dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dMatrix& localAxis);
 	NEWTON_API virtual void ApplyPlayerMove (CustomPlayerController* const controller, dFloat timestep) = 0; 
 
-	// the client application can overload this function to customizer contacts
+	NEWTON_API virtual CustomPlayerController* CreatePlayer (dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dMatrix& localAxis);
 	NEWTON_API virtual int ProcessContacts (const CustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const; 
-
-	protected:
-	NEWTON_API virtual void DestroyController (CustomController* const controller);
 };
-
 
 #endif 
 

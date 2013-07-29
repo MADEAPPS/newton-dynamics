@@ -55,7 +55,7 @@ dNewtonBody::~dNewtonBody()
 {
 	if (m_body && NewtonBodyGetDestructorCallback(m_body)) {
 		NewtonBodySetDestructorCallback (m_body, NULL);
-		NewtonDestroyBody(NewtonBodyGetWorld(m_body), m_body);
+		NewtonDestroyBody(m_body);
 	}
 }
 

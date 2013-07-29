@@ -38,7 +38,7 @@
 //#define DEFAULT_SCENE	12			// infinite user plane collision
 //#define DEFAULT_SCENE	13			// user height field Collision
 //#define DEFAULT_SCENE	14			// compound Collision
-#define DEFAULT_SCENE	15			// simple alchemedes buoyancy
+//#define DEFAULT_SCENE	15			// simple alchemedes buoyancy
 //#define DEFAULT_SCENE	16			// uniform Scaled Collision
 //#define DEFAULT_SCENE	17			// non Uniform Scaled Collision
 //#define DEFAULT_SCENE	18			// scaled mesh collision
@@ -52,7 +52,7 @@
 //#define DEFAULT_SCENE	26			// basic rag doll
 //#define DEFAULT_SCENE	27			// basic car
 //#define DEFAULT_SCENE	28			// high performance super car
-//#define DEFAULT_SCENE	29			// basic player controller
+#define DEFAULT_SCENE	29			// basic player controller
 //#define DEFAULT_SCENE	30			// advanced player controller
 //#define DEFAULT_SCENE	31			// cloth patch			
 //#define DEFAULT_SCENE	32			// soft bodies			

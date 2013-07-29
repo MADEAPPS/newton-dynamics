@@ -291,7 +291,7 @@ void CustomControllerManager<CONTROLLER_BASE>::DestroyController (CustomControll
 	}
 
 	if (controller->m_body) {
-		NewtonDestroyBody (GetWorld(), controller->m_body);
+		NewtonDestroyBody (controller->m_body);
 	}
 
 	if (controller->m_next) {
@@ -318,7 +318,187 @@ typename CustomControllerManager<CONTROLLER_BASE>::CustomController* CustomContr
 }
 
 
+// ********************************************************************************************************************************************
+//
+//
+//
+// ********************************************************************************************************************************************
 
+
+
+class CustomControllerBase_
+{
+	public:
+	CustomControllerBase_ ()
+		:m_userData(NULL)
+		,m_body(NULL)
+		,m_manager(NULL)
+	{
+	}
+
+	virtual ~CustomControllerBase_ ()
+	{
+	}
+
+	void* GetUserData () const 
+	{
+		return m_userData;
+	}
+
+	void SetUserData (void* const userData)
+	{
+		m_userData = userData;
+	}
+
+	NewtonBody* GetBody() const 
+	{
+		return m_body;
+	}
+
+	void* GetManager() const 
+	{
+		return m_manager;
+	}
+
+	virtual void PreUpdate (dFloat timestep, int threadIndex) = 0;
+	virtual void PostUpdate (dFloat timestep, int threadIndex) = 0;
+
+	void* m_userData;
+	NewtonBody* m_body;
+	void* m_manager;
+};
+
+template<class CONTROLLER_BASE>
+class CustomControllerManager_: public CustomList<CONTROLLER_BASE>
+{
+	public:
+	CustomControllerManager_(NewtonWorld* const world, const char* const managerName);
+	~CustomControllerManager_();
+
+	NewtonWorld* GetWorld() const 
+	{
+		return m_world;
+	}
+
+	dFloat GetTimeStep() const 
+	{
+		return m_curTimestep;
+	}
+
+	virtual CONTROLLER_BASE* CreateController ();
+	virtual void DestroyController (CONTROLLER_BASE* const controller);
+
+	virtual void PreUpdate(dFloat timestep);
+	virtual void PostUpdate(dFloat timestep);
+
+	private:
+	static void Destroy (const NewtonWorld* const world, void* const listenerUserData);
+	static void PreUpdate (const NewtonWorld* const world, void* const listenerUserData, dFloat timestep);
+	static void PostUpdate (const NewtonWorld* const world, void* const listenerUserData, dFloat timestep);
+
+	static void PreUpdateKernel (NewtonWorld* const world, void* const context, int threadIndex);
+	static void PostUpdateKernel (NewtonWorld* const world, void* const context, int threadIndex);
+
+	protected:
+	NewtonWorld* m_world;
+	dFloat m_curTimestep;
+};
+
+
+template<class CONTROLLER_BASE>
+CustomControllerManager_<CONTROLLER_BASE>::CustomControllerManager_(NewtonWorld* const world, const char* const managerName)
+	:m_world(world)
+	,m_curTimestep(0.0f)
+{
+	NewtonWorldAddPreListener (world, managerName, this, PreUpdate, NULL);
+	NewtonWorldAddPostListener (world, managerName, this, PostUpdate, Destroy);
+}
+
+template<class CONTROLLER_BASE>
+CustomControllerManager_<CONTROLLER_BASE>::~CustomControllerManager_()
+{
+	while (GetCount()) {
+		DestroyController (&GetLast()->GetInfo());
+	}
+}
+
+
+template<class CONTROLLER_BASE>
+void CustomControllerManager_<CONTROLLER_BASE>::PreUpdate(dFloat timestep)
+{
+	//	NewtonWorld* const world = GetWorld();
+	for (CustomListNode* node = GetFirst(); node; node = node->GetNext()) {
+		NewtonDispachThreadJob(m_world, PreUpdateKernel, &node->GetInfo());
+	}
+	NewtonSyncThreadJobs(m_world);
+}
+
+template<class CONTROLLER_BASE>
+void CustomControllerManager_<CONTROLLER_BASE>::PostUpdate(dFloat timestep)
+{
+	for (CustomListNode* node = GetFirst(); node; node = node->GetNext()) {
+		NewtonDispachThreadJob(m_world, PostUpdateKernel, &node->GetInfo());
+	}
+	NewtonSyncThreadJobs(m_world);
+}
+
+
+template<class CONTROLLER_BASE>
+void CustomControllerManager_<CONTROLLER_BASE>::PreUpdate (const NewtonWorld* const world, void* const listenerUserData, dFloat timestep)
+{
+	CustomControllerManager_* const me = (CustomControllerManager_*) listenerUserData;
+	me->m_curTimestep = timestep;
+	me->PreUpdate(timestep);
+}
+
+template<class CONTROLLER_BASE>
+void CustomControllerManager_<CONTROLLER_BASE>::PostUpdate (const NewtonWorld* const world, void* const listenerUserData, dFloat timestep)
+{
+	CustomControllerManager_* const me = (CustomControllerManager_*) listenerUserData;
+	me->m_curTimestep = timestep;
+	me->PostUpdate(timestep);
+}
+
+template<class CONTROLLER_BASE>
+void CustomControllerManager_<CONTROLLER_BASE>::Destroy (const NewtonWorld* const world, void* const listenerUserData)
+{
+	CustomControllerManager_* const me = (CustomControllerManager_*) listenerUserData;
+	delete me;
+}
+
+
+template<class CONTROLLER_BASE>
+void CustomControllerManager_<CONTROLLER_BASE>::PreUpdateKernel (NewtonWorld* const world, void* const context, int threadIndex)
+{
+	CustomControllerBase_* const controller = (CustomControllerBase_*) context;
+	controller->PreUpdate(((CustomControllerManager_*)controller->m_manager)->GetTimeStep(), threadIndex);
+}
+
+template<class CONTROLLER_BASE>
+void CustomControllerManager_<CONTROLLER_BASE>::PostUpdateKernel (NewtonWorld* const world, void* const context, int threadIndex)
+{
+	class CustomControllerBase_* const controller = (CustomControllerBase_*) context;
+	controller->PostUpdate(((CustomControllerManager_*)controller->m_manager)->GetTimeStep(), threadIndex);
+}
+
+
+
+template<class CONTROLLER_BASE>
+CONTROLLER_BASE* CustomControllerManager_<CONTROLLER_BASE>::CreateController ()
+{
+	CONTROLLER_BASE* const controller = &Append()->GetInfo();
+
+	controller->m_manager = this;
+	return controller;
+}
+
+template<class CONTROLLER_BASE>
+void CustomControllerManager_<CONTROLLER_BASE>::DestroyController (CONTROLLER_BASE* const controller)
+{
+	dAssert (FindNodeFromInfo (*controller));
+	CustomListNode* const node = GetNodeFromInfo (*controller);
+	Remove (node);
+}
 
 #endif 
 

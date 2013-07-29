@@ -134,7 +134,7 @@ class AdvancePlayerEntity: public DemoEntity
 	~AdvancePlayerEntity ()
 	{
 		// destroy the player controller and its rigid body
-		m_controller->GetManager()->DestroyController(m_controller);
+		((CustomPlayerControllerManager*)m_controller->GetManager())->DestroyController(m_controller);
 	}
 
 	virtual void Render(dFloat timeStep) const
@@ -187,7 +187,7 @@ class AdvancePlayerEntity: public DemoEntity
 	
 	NewtonBody* m_currentTrigger;
 	PlaformEntityEntity* m_currentPlatform;
-	CustomPlayerControllerManager::CustomController* m_controller; 
+	CustomPlayerController* m_controller; 
 };
 
 class AdvancePlayerControllerManager: public CustomPlayerControllerManager

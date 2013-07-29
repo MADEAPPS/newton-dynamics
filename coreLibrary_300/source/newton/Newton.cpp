@@ -4489,11 +4489,11 @@ NewtonBody* NewtonCreateKinematicBody(const NewtonWorld* const newtonWorld, cons
 // geometry will be destroyed. This function will destroy all joints associated with this body.
 //
 // See also: NewtonCreateBody
-void NewtonDestroyBody(const NewtonWorld* const newtonWorld, const NewtonBody* const bodyPtr)
+void NewtonDestroyBody (const NewtonBody* const bodyPtr)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)bodyPtr;
-	Newton* const world = (Newton *)newtonWorld;
+	dgWorld* const world = body->GetWorld();
 	world->DestroyBody(body);
 }
 

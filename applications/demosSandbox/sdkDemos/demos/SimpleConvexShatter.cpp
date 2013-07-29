@@ -366,7 +366,7 @@ class SimpleShatterEffectEntity: public DemoEntity
 				NewtonBodySetForceAndTorqueCallback (rigidBody, PhysicsApplyGravityForce);
 			}
 
-			NewtonDestroyBody(world, m_myBody);
+			NewtonDestroyBody(m_myBody);
 			scene->RemoveEntity	(mynode);
 		}
 	};

@@ -37,20 +37,22 @@ dNewtonPlayerManager::~dNewtonPlayerManager ()
 
 dNewtonPlayerManager::dNewtonPlayer* dNewtonPlayerManager::GetFirstPlayer() const
 {
-	CustomController* const controller = GetFirstController();
-	if (controller) {
-		return (dNewtonPlayerManager::dNewtonPlayer*) NewtonBodyGetUserData (controller->GetBody());
-	}
+	dAssert (0);
+//	CustomController* const controller = GetFirstController();
+//	if (controller) {
+//		return (dNewtonPlayerManager::dNewtonPlayer*) NewtonBodyGetUserData (controller->GetBody());
+//	}
 	return NULL;
 }
 
 dNewtonPlayerManager::dNewtonPlayer* dNewtonPlayerManager::GetNextPlayer(const dNewtonPlayer* const player) const
 {
+	dAssert (0);
 	dAssert (player);
-	CustomController* const controller = GetNextController (player->m_controller);
-	if (controller) {
-		return (dNewtonPlayerManager::dNewtonPlayer*) NewtonBodyGetUserData (controller->GetBody());
-	}
+//	CustomController* const controller = GetNextController (player->m_controller);
+//	if (controller) {
+//		return (dNewtonPlayerManager::dNewtonPlayer*) NewtonBodyGetUserData (controller->GetBody());
+//	}
 	return NULL;
 }
 
@@ -113,13 +115,14 @@ dNewtonPlayerManager::dNewtonPlayer::dNewtonPlayer (dNewtonPlayerManager* const 
 
 dNewtonPlayerManager::dNewtonPlayer::~dNewtonPlayer ()
 {
-	m_controller->Cleanup();
-	NewtonBody* const body = m_controller->GetBody();	
-	if (NewtonBodyGetDestructorCallback(body)) {
-		SetBody(NULL);
-		dNewtonPlayerManager* const manager = (dNewtonPlayerManager*)m_controller->GetManager();
-		manager->DestroyController (m_controller);
-	}
+	dAssert(0);
+//	m_controller->Cleanup();
+//	NewtonBody* const body = m_controller->GetBody();	
+//	if (NewtonBodyGetDestructorCallback(body)) {
+//		SetBody(NULL);
+//		dNewtonPlayerManager* const manager = (dNewtonPlayerManager*)m_controller->GetManager();
+//		manager->DestroyController (m_controller);
+//	}
 }
 
 

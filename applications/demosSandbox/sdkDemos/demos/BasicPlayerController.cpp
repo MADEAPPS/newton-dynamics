@@ -84,7 +84,7 @@ class BasicPlayerEntity: public DemoEntity
 	~BasicPlayerEntity ()
 	{
 		// destroy the player controller and its rigid body
-		m_controller->GetManager()->DestroyController(m_controller);
+		((CustomPlayerControllerManager*)m_controller->GetManager())->DestroyController(m_controller);
 	}
 
 	virtual void Render(dFloat timeStep) const
@@ -106,7 +106,7 @@ class BasicPlayerEntity: public DemoEntity
 	dFloat m_jumpSpeed;
 	int m_shootProp;
 
-	CustomPlayerControllerManager::CustomController* m_controller; 
+	CustomPlayerController* m_controller; 
 };
 
 class BasicPlayerControllerManager: public CustomPlayerControllerManager

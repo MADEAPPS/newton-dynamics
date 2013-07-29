@@ -41,7 +41,7 @@ class dNewtonPlayerManager: public CustomPlayerControllerManager
 		CNEWTON_API void SetPlayerVelocity (dFloat forwardSpeed, dFloat lateralSpeed, dFloat verticalSpeed, dFloat headingAngle, const dFloat* const gravity, dFloat timestep);
 
 		private:
-		CustomController* m_controller;
+		CustomPlayerController* m_controller;
 
 		friend class dNewtonPlayerManager;
 	};
