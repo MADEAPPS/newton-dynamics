@@ -72,7 +72,7 @@ CustomTriggerController::PassangerManifest::Passenger* CustomTriggerController::
 
 
 CustomTriggerManager::CustomTriggerManager(NewtonWorld* const world)
-	:CustomControllerManager_<CustomTriggerController>(world, TRIGGER_PLUGIN_NAME)
+	:CustomControllerManager<CustomTriggerController>(world, TRIGGER_PLUGIN_NAME)
 	,m_lru(0)
 {
 }
@@ -92,7 +92,7 @@ CustomTriggerController* CustomTriggerManager::CreateTrigger (const dMatrix& mat
 void CustomTriggerManager::PreUpdate(dFloat timestep)
 {
 	m_lru ++;
-	CustomControllerManager_<CustomTriggerController>::PreUpdate(timestep);
+	CustomControllerManager<CustomTriggerController>::PreUpdate(timestep);
 }
 
 

@@ -457,7 +457,7 @@ class CustomVehicleController: public CustomControllerBase
 };
 
 
-class CustomVehicleControllerManager: public CustomControllerManager_<CustomVehicleController> 
+class CustomVehicleControllerManager: public CustomControllerManager<CustomVehicleController> 
 {
 	public:
 	NEWTON_API CustomVehicleControllerManager(NewtonWorld* const world);

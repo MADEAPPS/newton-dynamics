@@ -91,7 +91,7 @@ class CustomPlayerController: public CustomControllerBase
 };
 
 
-class CustomPlayerControllerManager: public CustomControllerManager_<CustomPlayerController>
+class CustomPlayerControllerManager: public CustomControllerManager<CustomPlayerController>
 {
 	public:
 	NEWTON_API CustomPlayerControllerManager(NewtonWorld* const world);

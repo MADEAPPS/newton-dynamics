@@ -104,7 +104,7 @@ class CustomSkeletonTransformController: public CustomControllerBase
 	friend class CustomSkeletonTransformManager;
 };
 
-class CustomSkeletonTransformManager: public CustomControllerManager_<CustomSkeletonTransformController> 
+class CustomSkeletonTransformManager: public CustomControllerManager<CustomSkeletonTransformController> 
 {
 	public:
 	NEWTON_API CustomSkeletonTransformManager(NewtonWorld* const world);

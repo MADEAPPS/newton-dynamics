@@ -187,11 +187,11 @@ class dConvexCastRecord: public CustomControllerBase
 };
 
 
-class dConvexCastManager: public CustomControllerManager_<dConvexCastRecord> 
+class dConvexCastManager: public CustomControllerManager<dConvexCastRecord> 
 {
 	public:
 	dConvexCastManager(DemoEntityManager* const scene, StupidComplexOfConvexShapes* const stupidLevel)
-		:CustomControllerManager_<dConvexCastRecord>(scene->GetNewton(), "dConvexCastManager")
+		:CustomControllerManager<dConvexCastRecord>(scene->GetNewton(), "dConvexCastManager")
 		,m_helpKey (true)
 		,m_selectShape (true)
 		,m_stupidLevel(stupidLevel)

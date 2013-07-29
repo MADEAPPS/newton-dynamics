@@ -65,7 +65,7 @@ class CustomTriggerController: public CustomControllerBase
 	friend class CustomTriggerManager;
 };
 
-class CustomTriggerManager: public CustomControllerManager_<CustomTriggerController> 
+class CustomTriggerManager: public CustomControllerManager<CustomTriggerController> 
 {
 	public:
 	enum TriggerEventType

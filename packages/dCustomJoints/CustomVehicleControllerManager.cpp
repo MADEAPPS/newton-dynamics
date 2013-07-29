@@ -1087,7 +1087,7 @@ void CustomVehicleController::TireBodyState::IntegrateForce (dFloat timestep, co
 }
 
 CustomVehicleControllerManager::CustomVehicleControllerManager(NewtonWorld* const world)
-	:CustomControllerManager_<CustomVehicleController> (world, VEHICLE_PLUGIN_NAME)
+	:CustomControllerManager<CustomVehicleController> (world, VEHICLE_PLUGIN_NAME)
 {
 }
 
@@ -1107,7 +1107,7 @@ CustomVehicleController* CustomVehicleControllerManager::CreateVehicle (NewtonCo
 void CustomVehicleControllerManager::DestroyController (CustomVehicleController* const controller)
 {
 	controller->Cleanup();
-	CustomControllerManager_<CustomVehicleController>::DestroyController(controller);
+	CustomControllerManager<CustomVehicleController>::DestroyController(controller);
 }
 
 

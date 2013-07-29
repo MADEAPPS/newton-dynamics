@@ -128,7 +128,7 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 
 
 CustomPlayerControllerManager::CustomPlayerControllerManager(NewtonWorld* const world)
-	:CustomControllerManager_<CustomPlayerController> (world, PLAYER_PLUGIN_NAME)
+	:CustomControllerManager<CustomPlayerController> (world, PLAYER_PLUGIN_NAME)
 {
 
 }

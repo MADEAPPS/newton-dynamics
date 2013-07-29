@@ -100,7 +100,7 @@ class dClosestDistanceRecord: public CustomControllerBase
 
 		CreatCasterBody(location_x, location_z, shapeType, materialID);
 
-		NewtonWorld* const world = ((CustomControllerManager_<dClosestDistanceRecord>*)GetManager())->GetWorld();
+		NewtonWorld* const world = ((CustomControllerManager<dClosestDistanceRecord>*)GetManager())->GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 
 		dMatrix matrix;
@@ -113,7 +113,7 @@ class dClosestDistanceRecord: public CustomControllerBase
 	private:
 	void CreatCasterBody(dFloat location_x, dFloat location_z, PrimitiveType shapeType, int materialID)
 	{
-		NewtonWorld* const world = ((CustomControllerManager_<dClosestDistanceRecord>*)GetManager())->GetWorld();
+		NewtonWorld* const world = ((CustomControllerManager<dClosestDistanceRecord>*)GetManager())->GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 
 		//dMatrix matrix (GetIdentityMatrix());
@@ -149,11 +149,11 @@ class dClosestDistanceRecord: public CustomControllerBase
 };
 
 
-class dClosestDistanceManager: public CustomControllerManager_<dClosestDistanceRecord> 
+class dClosestDistanceManager: public CustomControllerManager<dClosestDistanceRecord> 
 {
 	public:
 	dClosestDistanceManager(DemoEntityManager* const scene)
-		:CustomControllerManager_<dClosestDistanceRecord>(scene->GetNewton(), "dConvexCastManager")
+		:CustomControllerManager<dClosestDistanceRecord>(scene->GetNewton(), "dConvexCastManager")
 	{
 	}
 
