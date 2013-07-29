@@ -72,7 +72,7 @@ CustomTriggerController::PassangerManifest::Passenger* CustomTriggerController::
 
 
 CustomTriggerManager::CustomTriggerManager(NewtonWorld* const world)
-	:CustomControllerManager<CustomTriggerController>(world, TRIGGER_PLUGIN_NAME)
+	:CustomControllerManager____<CustomTriggerController>(world, TRIGGER_PLUGIN_NAME)
 	,m_lru(0)
 {
 }
@@ -84,15 +84,19 @@ CustomTriggerManager::~CustomTriggerManager()
 	
 CustomTriggerController* CustomTriggerManager::CreateTrigger (const dMatrix& matrix, NewtonCollision* const convexShape, void* const userData)
 {
+	dAssert (0);
+	return NULL;
+/*
 	CustomTriggerController* const trigger = (CustomTriggerController*) CreateController();
 	trigger->Init (convexShape, matrix, userData);
 	return trigger;
+*/
 }
 
 void CustomTriggerManager::PreUpdate(dFloat timestep)
 {
 	m_lru ++;
-	CustomControllerManager<CustomTriggerController>::PreUpdate(timestep);
+	CustomControllerManager____<CustomTriggerController>::PreUpdate(timestep);
 }
 
 
@@ -112,6 +116,8 @@ const void* CustomTriggerController::GetUserData() const
 
 void CustomTriggerController::Init (NewtonCollision* const convexShape, const dMatrix& matrix, void* const userData)
 {
+dAssert (0);
+/*
 	m_userData = userData;
 
 	NewtonWorld* const world = GetManager()->GetWorld();
@@ -123,6 +129,7 @@ void CustomTriggerController::Init (NewtonCollision* const convexShape, const dM
 	// set this shape do not collide with other bodies
 	NewtonCollision* const collision = NewtonBodyGetCollision (body);
 	NewtonCollisionSetCollisonMode(collision, 0);
+*/
 }
 
 
@@ -132,6 +139,8 @@ void CustomTriggerController::PostUpdate(dFloat timestep, int threadIndex)
 
 void CustomTriggerController::PreUpdate(dFloat timestep, int threadIndex)
 {
+dAssert (0);
+/*
 	CustomTriggerManager* const manager = (CustomTriggerManager*)GetManager();
 
 	unsigned lru = manager->m_lru;
@@ -162,4 +171,5 @@ void CustomTriggerController::PreUpdate(dFloat timestep, int threadIndex)
 			m_manifest.m_count --;
 		}
 	}
+*/
 }

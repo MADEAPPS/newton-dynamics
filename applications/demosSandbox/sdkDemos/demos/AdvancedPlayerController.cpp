@@ -52,6 +52,8 @@ class TriggerManager: public CustomTriggerManager
 
 	virtual void EventCallback (const CustomTriggerController* const me, TriggerEventType event, NewtonBody* const visitor) const
 	{
+dAssert (0);
+/*
 		// send this message to the entity
 		DemoEntity* const entity = (DemoEntity*) NewtonBodyGetUserData(visitor);
 		if (entity) {
@@ -74,6 +76,7 @@ class TriggerManager: public CustomTriggerManager
 			// pass the controller pointer as the user data of this massage
 			entity->MessageHandler(me->GetBody(), message, (void*)me);
 		}
+*/
 	}
 	AdvancePlayerControllerManager* m_playerManager;
 };
@@ -554,6 +557,8 @@ class PlaformEntityEntity: public DemoEntity
 
 	virtual void MessageHandler (NewtonBody* const sender, int message, void* const data)
 	{
+dAssert (0);
+/*
 		DemoEntity::MessageHandler (sender, message, data);
 		switch (message) 
 		{
@@ -578,6 +583,7 @@ class PlaformEntityEntity: public DemoEntity
 				break;
 			}
 		}
+*/
 	}
 	FerryDriver* m_driver;
 };
@@ -658,6 +664,8 @@ static void LoadFloor(DemoEntityManager* const scene, NewtonCollision* const sce
 
 static void LoadFerryBridge (DemoEntityManager* const scene, TriggerManager* const triggerManager, NewtonCollision* const sceneCollision, const char* const name, const dMatrix& location, NewtonBody* const playGroundBody)
 {
+dAssert (0);
+/*
 	NewtonWorld* const world = scene->GetNewton();
 	DemoEntityManager::dListNode* const bridgeNodes = scene->GetLast();
 	LoadScene(scene, name, location);
@@ -724,11 +732,14 @@ static void LoadFerryBridge (DemoEntityManager* const scene, TriggerManager* con
 			scene->RemoveEntity(entity);
 		}
 	}
+*/
 }
 
 
 static void LoadSlide (DemoEntityManager* const scene, TriggerManager* const triggerManager, NewtonCollision* const sceneCollision, const char* const name, const dMatrix& location, NewtonBody* const playGroundBody)
 {
+dAssert (0);
+/*
 	NewtonWorld* const world = scene->GetNewton();
 	DemoEntityManager::dListNode* const bridgeNodes = scene->GetLast();
 	LoadScene(scene, name, location);
@@ -795,7 +806,7 @@ static void LoadSlide (DemoEntityManager* const scene, TriggerManager* const tri
 			scene->RemoveEntity(entity);
 		}
 	}
-
+*/
 }
 
 

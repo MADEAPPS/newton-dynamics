@@ -28,8 +28,7 @@
 // they are not visible and do not collide with bodies, but the generate contacts
 class CustomTriggerController
 {
-	CUSTOM_CONTROLLER_GLUE(CustomTriggerController);
-
+//	CUSTOM_CONTROLLER_GLUE(CustomTriggerController);
 
 	protected:
 	class PassangerManifest
@@ -66,7 +65,7 @@ class CustomTriggerController
 	friend class CustomTriggerManager;
 };
 
-class CustomTriggerManager: public CustomControllerManager<CustomTriggerController> 
+class CustomTriggerManager: public CustomControllerManager____<CustomTriggerController> 
 {
 	public:
 	enum TriggerEventType
