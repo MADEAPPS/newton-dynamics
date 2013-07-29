@@ -170,10 +170,8 @@ class StupidComplexOfConvexShapes: public DemoEntity
 };
 
 
-class dConvexCastRecord
+class dConvexCastRecord: public CustomControllerBase_
 {
-	CUSTOM_CONTROLLER_GLUE(dConvexCastRecord);
-
 	public:
 	void PreUpdate(dFloat timestep, int threadIndex)
 	{
@@ -183,17 +181,17 @@ class dConvexCastRecord
 	{
 	}
 
-	void Init (dFloat location_x, dFloat location_z, PrimitiveType shapeType, int materialID, PrimitiveType castingShapeType)
-	{
-	}
+//	void Init (dFloat location_x, dFloat location_z, PrimitiveType shapeType, int materialID, PrimitiveType castingShapeType)
+//	{
+//	}
 };
 
 
-class dConvexCastManager: public CustomControllerManager<dConvexCastRecord> 
+class dConvexCastManager: public CustomControllerManager_<dConvexCastRecord> 
 {
 	public:
 	dConvexCastManager(DemoEntityManager* const scene, StupidComplexOfConvexShapes* const stupidLevel)
-		:CustomControllerManager<dConvexCastRecord>(scene->GetNewton(), "dConvexCastManager")
+		:CustomControllerManager_<dConvexCastRecord>(scene->GetNewton(), "dConvexCastManager")
 		,m_helpKey (true)
 		,m_selectShape (true)
 		,m_stupidLevel(stupidLevel)
