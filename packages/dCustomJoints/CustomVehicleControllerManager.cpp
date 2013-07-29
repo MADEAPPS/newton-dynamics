@@ -1087,7 +1087,7 @@ void CustomVehicleController::TireBodyState::IntegrateForce (dFloat timestep, co
 }
 
 CustomVehicleControllerManager::CustomVehicleControllerManager(NewtonWorld* const world)
-	:CustomControllerManager<CustomVehicleController> (world, VEHICLE_PLUGIN_NAME)
+	:CustomControllerManager_<CustomVehicleController> (world, VEHICLE_PLUGIN_NAME)
 {
 }
 
@@ -1097,19 +1097,17 @@ CustomVehicleControllerManager::~CustomVehicleControllerManager()
 
 
 
-CustomVehicleControllerManager::CustomController* CustomVehicleControllerManager::CreateVehicle (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, const dVector& gravityVector)
+CustomVehicleController* CustomVehicleControllerManager::CreateVehicle (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, const dVector& gravityVector)
 {
-	CustomVehicleControllerManager::CustomController* const controller = CreateController();
+	CustomVehicleController* const controller = CreateController();
 	controller->Init(chassisShape, vehicleFrame, mass, gravityVector);
 	return controller;
 }
 
-void CustomVehicleControllerManager::DestroyController (CustomController* const controller)
+void CustomVehicleControllerManager::DestroyController (CustomVehicleController* const controller)
 {
-	CustomVehicleController* const vehController = (CustomVehicleController*) controller;
-	vehController->Cleanup();
-
-	CustomControllerManager<CustomVehicleController>::DestroyController(controller);
+	controller->Cleanup();
+	CustomControllerManager_<CustomVehicleController>::DestroyController(controller);
 }
 
 
@@ -1134,22 +1132,21 @@ void CustomVehicleController::Init (NewtonCollision* const chassisShape, const d
 
 	// create the rigid body for this vehicle
 	dMatrix locationMatrix (GetIdentityMatrix());
-	NewtonBody* const body = NewtonCreateDynamicBody(world, vehShape, &locationMatrix[0][0]);
-	SetBody (body);
+	m_body = NewtonCreateDynamicBody(world, vehShape, &locationMatrix[0][0]);
 
 	// set vehicle mass, inertia and center of mass
-	NewtonBodySetMassProperties (body, mass, vehShape);
+	NewtonBodySetMassProperties (m_body, mass, vehShape);
 
 	// set linear and angular drag to zero
 	dVector drag(0.0f, 0.0f, 0.0f, 0.0f);
-	NewtonBodySetLinearDamping(body, 0);
-	NewtonBodySetAngularDamping(body, &drag[0]);
+	NewtonBodySetLinearDamping(m_body, 0);
+	NewtonBodySetAngularDamping(m_body, &drag[0]);
 
 	// destroy the collision help shape
 	NewtonDestroyCollision (vehShape);
 
 	// initialize vehicle internal components
-	NewtonBodyGetCentreOfMass (body, &m_chassisState.m_com[0]);
+	NewtonBodyGetCentreOfMass (m_body, &m_chassisState.m_com[0]);
 
 	m_chassisState.m_gravity = gravityVector;
     m_chassisState.Init(this, vehicleFrame);

@@ -167,7 +167,7 @@ class BasicVehicleEntity: public DemoEntity
 
 	~BasicVehicleEntity ()
 	{
-		m_controller->GetManager()->DestroyController(m_controller);
+		((CustomVehicleControllerManager*)m_controller->GetManager())->DestroyController(m_controller);
 	}
 
 	// interpolate all skeleton transform 
@@ -603,7 +603,7 @@ class BasicVehicleEntity: public DemoEntity
 	}
 
 
-	CustomVehicleControllerManager::CustomController* m_controller;
+	CustomVehicleController* m_controller;
 	DemoEntityManager::ButtonKey m_helpKey;
 	DemoEntityManager::ButtonKey m_gearUpKey;
 	DemoEntityManager::ButtonKey m_gearDownKey;
@@ -796,8 +796,8 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 		NewtonWorld* const world = GetWorld(); 
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 		dSoundManager* const soundManager = scene->GetSoundManager();
-		for (CustomController* ptr = GetFirstController(); ptr; ptr = GetNextController(ptr)) {
-			CustomVehicleController* const controller = (CustomVehicleController*) ptr;
+		for (CustomListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
+			CustomVehicleController* const controller = &ptr->GetInfo();
 			
 			NewtonBody* const body = controller->GetBody();
 			BasicVehicleEntity* const vehicleEntity = (BasicVehicleEntity*) NewtonBodyGetUserData(body);
@@ -841,8 +841,8 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 		CustomVehicleControllerManager::PostUpdate(timestep);
 
 		// update the visual transformation matrices for all vehicle tires
-		for (CustomController* ptr = GetFirstController(); ptr; ptr = GetNextController(ptr)) {
-			CustomVehicleController* const controller = (CustomVehicleController*) ptr;
+		for (CustomListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
+			CustomVehicleController* const controller = &ptr->GetInfo();
 			BasicVehicleEntity* const vehicleEntity = (BasicVehicleEntity*)NewtonBodyGetUserData (controller->GetBody());
 			vehicleEntity->UpdateTireTransforms();
 		}
@@ -883,8 +883,8 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 	// use this to display debug information about vehicle 
 	void Debug () const
 	{
-		for (CustomController* ptr = GetFirstController(); ptr; ptr = GetNextController(ptr)) {
-			CustomVehicleController* const controller = (CustomVehicleController*) ptr;
+		for (CustomListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
+			CustomVehicleController* const controller = &ptr->GetInfo();
 			BasicVehicleEntity* const vehicleEntity = (BasicVehicleEntity*)NewtonBodyGetUserData (controller->GetBody());
 			vehicleEntity->Debug();
 		}

@@ -25,7 +25,7 @@
 #define VEHICLE_PLUGIN_NAME			"vehicleManager"
 
 
-class CustomVehicleController
+class CustomVehicleController: public CustomControllerBase_
 {
 	public:
 	class BodyState;
@@ -399,8 +399,6 @@ class CustomVehicleController
 		ContactJoint m_contactJoint;
 	};
 
-
-	CUSTOM_CONTROLLER_GLUE(CustomVehicleController);
 	public:
 
 	// public functions
@@ -456,18 +454,17 @@ class CustomVehicleController
 	InterpolationCurve m_tireLateralSlipAngle;
 	InterpolationCurve m_tireLongitidialSlipRatio;
 	friend class CustomVehicleControllerManager;
-
 };
 
 
-class CustomVehicleControllerManager: public CustomControllerManager<CustomVehicleController> 
+class CustomVehicleControllerManager: public CustomControllerManager_<CustomVehicleController> 
 {
 	public:
 	NEWTON_API CustomVehicleControllerManager(NewtonWorld* const world);
 	NEWTON_API virtual ~CustomVehicleControllerManager();
 
-	NEWTON_API virtual CustomController* CreateVehicle (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, const dVector& gravityVector);
-	NEWTON_API virtual void DestroyController (CustomController* const controller);
+	NEWTON_API virtual CustomVehicleController* CreateVehicle (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, const dVector& gravityVector);
+	NEWTON_API virtual void DestroyController (CustomVehicleController* const controller);
 };
 
 
