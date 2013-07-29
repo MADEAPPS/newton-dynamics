@@ -111,7 +111,7 @@ void AlchemedesBuoyancy(DemoEntityManager* const scene)
 	triggerLocation.m_posit.m_y = -3.5f;
 
 	NewtonCollision* const poolBox = NewtonCreateBox (scene->GetNewton(), 30.0f, 6.0f, 20.0f, 0, NULL);  
-//	triggerManager->CreateBuoyancyTrigger (triggerLocation, poolBox);
+	triggerManager->CreateBuoyancyTrigger (triggerLocation, poolBox);
 	NewtonDestroyCollision (poolBox);
 
 
