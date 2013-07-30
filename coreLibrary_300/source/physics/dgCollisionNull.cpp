@@ -92,7 +92,7 @@ dgFloat32 dgCollisionNull::RayCast (const dgVector& localP0, const dgVector& loc
 }
 
 
-dgVector dgCollisionNull::CalculateVolumeIntegral (const dgMatrix& matrix__, GetBuoyancyPlane buoyancuPlane__, void* context__) const
+dgVector dgCollisionNull::CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& plane) const
 {
 	dgAssert (0);
 	return dgVector (0.0f, 0.0f, 0.0f, 0.0f);

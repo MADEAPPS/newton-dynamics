@@ -179,7 +179,7 @@ dgVector dgCollisionMesh::BoxSupportMapping  (const dgVector& dir) const
 
 
 
-dgVector dgCollisionMesh::CalculateVolumeIntegral (const dgMatrix& globalMatrix__, GetBuoyancyPlane buoyancuPlane__, void* context__) const
+dgVector dgCollisionMesh::CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& plane) const
 {
 	return dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 }

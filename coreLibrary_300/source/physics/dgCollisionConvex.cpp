@@ -1763,12 +1763,12 @@ dgFloat32 dgCollisionConvex::GetBoxMaxRadius () const
 
 
 
-dgVector dgCollisionConvex::CalculateVolumeIntegral (
-	const dgMatrix& globalMatrix, 
-	GetBuoyancyPlane buoyancyPlane, 
-	void* context) const
+//dgVector dgCollisionConvex::CalculateVolumeIntegral (const dgMatrix& globalMatrix, GetBuoyancyPlane buoyancyPlane, void* context) const
+dgVector dgCollisionConvex::CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& plane) const
 {
-
+dgAssert (0);
+return dgVector (0.0f);
+/*
 	dgVector cg  (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	if (buoyancyPlane) {
 		dgPlane globalPlane;
@@ -1784,7 +1784,7 @@ dgVector dgCollisionConvex::CalculateVolumeIntegral (
 	cg.m_w = volume;
 
 	return cg;
-
+*/
 }
 
 

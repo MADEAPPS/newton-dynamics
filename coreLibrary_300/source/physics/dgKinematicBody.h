@@ -68,7 +68,6 @@ class dgKinematicBody: public dgBody
 	virtual dgConstraint* GetNextJoint(dgConstraint* const joint) const;
 	virtual dgConstraint* GetFirstContact() const;
 	virtual dgConstraint* GetNextContact(dgConstraint* const joint) const;
-	virtual void AddBuoyancyForce (dgFloat32 fluidDensity, dgFloat32 fluidLinearViscousity, dgFloat32 fluidAngularViscousity,  const dgVector& gravityVector, GetBuoyancyPlane buoyancyPlane, void* const context);
 	virtual dgVector CalculateInverseDynamicForce (const dgVector& desiredVeloc, dgFloat32 timestep) const;
 */
 

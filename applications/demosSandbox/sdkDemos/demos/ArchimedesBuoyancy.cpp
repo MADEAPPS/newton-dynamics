@@ -23,15 +23,15 @@ class MyTriggerManager: public CustomTriggerManager
 		{
 		}
 
-		virtual void OnEnter()
+		virtual void OnEnter(NewtonBody* const visitor)
 		{
 		}
 
-		virtual void OnInside()
+		virtual void OnInside(NewtonBody* const visitor)
 		{
 		}
 
-		virtual void OnExit()
+		virtual void OnExit(NewtonBody* const visitor)
 		{
 		}
 
@@ -44,10 +44,28 @@ class MyTriggerManager: public CustomTriggerManager
 		BuoyancyForce(CustomTriggerController* const controller)
 			:TriggerCallback (controller)
 		{
+			// get the fluid plane for the upper face of the trigger volume
+			//NewtonBody* const body = m_controller->GetBody();
 		}
 
-		void OnInside()
+		void OnInside(NewtonBody* const visitor)
 		{
+			dFloat Ixx;
+			dFloat Iyy;
+			dFloat Izz;
+			dFloat mass;
+			
+			NewtonBodyGetMassMatrix(visitor, &mass, &Ixx, &Iyy, &Izz);
+			if (mass > 0.0f) {
+				dVector accel;
+				dVector alpha;
+				dVector gravity (0.0f, DEMO_GRAVITY, 0.0f, 0.0f);
+				dVector plane (0.0f, 1.0f, 0.0f, -2.0f);
+
+				NewtonCollision* const collision = NewtonBodyGetCollision(visitor);
+				NewtonConvexCollisionCalculateBuoyancyAcceleration (collision, &gravity[0], &plane[0], 0.1f, 0.1f, &accel[0], &alpha[0]);
+
+			}
 		}
 	};
 
@@ -79,19 +97,19 @@ class MyTriggerManager: public CustomTriggerManager
 		{
 			case m_enterTrigger:
 			{
-				callback->OnEnter();
+				callback->OnEnter(visitor);
 				break;
 			}
 
 			case m_exitTrigger:
 			{
-				callback->OnExit();
+				callback->OnExit(visitor);
 				break;
 			}
 
 			case m_inTrigger:
 			{
-				callback->OnInside();
+				callback->OnInside(visitor);
 				break;
 			}
 		}

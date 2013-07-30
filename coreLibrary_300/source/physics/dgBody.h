@@ -42,13 +42,7 @@ class dgCollisionInstance;
 typedef void (dgApi *OnBodyDestroy) (dgBody& me);
 typedef void (dgApi *OnApplyExtForceAndTorque) (dgBody& me, dgFloat32 timestep, dgInt32 threadIndex);
 typedef void (dgApi *OnMatrixUpdateCallback) (const dgBody& me, const dgMatrix& matrix, dgInt32 threadIndex);
-
-
-typedef dgUnsigned32 (dgApi *GetBuoyancyPlane) (void* collisionID, void* context, const dgMatrix& matrix, dgPlane& plane);
-
 #define OverlapTest(body0,body1) dgOverlapTest ((body0)->m_minAABB, (body0)->m_maxAABB, (body1)->m_minAABB, (body1)->m_maxAABB)
-
-
 
 //DG_MSC_VECTOR_ALIGMENT
 DG_MSC_VECTOR_ALIGMENT
@@ -191,7 +185,6 @@ class dgBody
 	virtual dgConstraint* GetNextJoint(dgConstraint* const joint) const;
 	virtual dgConstraint* GetFirstContact() const;
 	virtual dgConstraint* GetNextContact(dgConstraint* const joint) const;
- 	virtual void AddBuoyancyForce (dgFloat32 fluidDensity, dgFloat32 fluidLinearViscousity, dgFloat32 fluidAngularViscousity,  const dgVector& gravityVector, GetBuoyancyPlane buoyancyPlane, void* const context);
 	virtual dgVector CalculateInverseDynamicForce (const dgVector& desiredVeloc, dgFloat32 timestep) const;
 
 	protected:

@@ -124,7 +124,7 @@ dgFloat32 dgCollisionCompoundBreakable::dgCollisionConvexIntance::RayCast (const
 }
 
 
-dgVector dgCollisionCompoundBreakable::dgCollisionConvexIntance::CalculateVolumeIntegral (const dgMatrix& globalMatrix, GetBuoyancyPlane bouyancyPlane, void* const context) const
+dgVector dgCollisionCompoundBreakable::dgCollisionConvexIntance::CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& plane) const
 {
 	return ((dgCollision*)m_myShape)->CalculateVolumeIntegral (globalMatrix, bouyancyPlane, context);
 }

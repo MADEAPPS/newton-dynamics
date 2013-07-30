@@ -97,7 +97,7 @@ class dgCollisionInstance
 	dgFloat32 GetBoxMaxRadius () const; 
 	dgMatrix CalculateInertia () const;
 	void DebugCollision  (const dgMatrix& matrix, OnDebugCollisionMeshCallback callback, void* const userData) const;
-	dgVector CalculateVolumeIntegral (const dgMatrix& globalMatrix, GetBuoyancyPlane bouyancyPlane, void* const context) const;
+//	dgVector CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& plane) const;
 
 	dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
 	dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const;
@@ -109,6 +109,9 @@ class dgCollisionInstance
 
 	void Serialize(dgSerialize callback, void* const userData, bool saveShape = true) const;
 //	dgMatrix CalculateSpaceMatrix (const dgCollisionInstance* const instance) const;
+
+	void CalculateBuoyancyAcceleration (const dgVector& gravity, const dgVector& fluidPlane, dgFloat32 fluidDensity, dgFloat32 fluidViscosity, dgVector& accel, dgVector& alpha);
+	
 
 	dgMatrix m_globalMatrix;
 	dgMatrix m_localMatrix;
@@ -319,10 +322,10 @@ DG_INLINE dgFloat32 dgCollisionInstance::GetBoxMaxRadius () const
 
 
 
-DG_INLINE dgVector dgCollisionInstance::CalculateVolumeIntegral (const dgMatrix& globalMatrix, GetBuoyancyPlane bouyancyPlane, void* const context) const
-{
-	return m_childShape->CalculateVolumeIntegral(globalMatrix,bouyancyPlane,context);
-}
+//DG_INLINE dgVector dgCollisionInstance::CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& plane) const
+//{
+//	return m_childShape->CalculateVolumeIntegral(globalMatrix,bouyancyPlane,context);
+//}
 
 DG_INLINE dgVector dgCollisionInstance::SupportVertex(const dgVector& dir, dgInt32* const vertexIndex) const
 {
@@ -336,7 +339,6 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertex(const dgVector& dir, dgInt
 		dir1 = dir1.Scale3 (dgRsqrt (dir1 % dir1));
 		return m_scale.CompProduct3(m_childShape->SupportVertex (dir1, vertexIndex));
 	}
-
 }
 
 

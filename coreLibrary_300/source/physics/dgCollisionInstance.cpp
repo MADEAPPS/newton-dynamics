@@ -498,3 +498,41 @@ dgFloat32 dgCollisionInstance::ConvexRayCast (const dgCollisionInstance* const c
 
 	return dgFloat32 (1.2f);
 }
+
+void dgCollisionInstance::CalculateBuoyancyAcceleration (const dgVector& gravity, const dgVector& fluidPlane, dgFloat32 fluidDensity, dgFloat32 fluidViscosity, dgVector& accel, dgVector& alpha)
+{
+
+/*
+void dgBody::AddBuoyancyForce (dgFloat32 fluidDensity, dgFloat32 fluidLinearViscousity, dgFloat32 fluidAngularViscousity, const dgVector& gravityVector, GetBuoyancyPlane buoyancuPlane, void* const context)
+{
+	dgAssert (0);
+
+	if (m_mass.m_w > dgFloat32 (1.0e-2f)) {
+		dgVector volumeIntegral (m_collision->CalculateVolumeIntegral (m_collision->GetGlobalMatrix(), buoyancuPlane, context));
+		if (volumeIntegral.m_w > dgFloat32 (1.0e-4f)) {
+
+//			dgVector buoyanceCenter (volumeIntegral - m_matrix.m_posit);
+			dgVector buoyanceCenter (volumeIntegral - m_globalCentreOfMass);
+
+			dgVector force (gravityVector.Scale3 (-fluidDensity * volumeIntegral.m_w));
+			dgVector torque (buoyanceCenter * force);
+
+			dgFloat32 damp = GetMax (GetMin ((m_veloc % m_veloc) * dgFloat32 (100.0f) * fluidLinearViscousity, dgFloat32 (1.0f)), dgFloat32(dgFloat32 (10.0f)));
+			force -= m_veloc.Scale3 (damp);
+
+			//damp = (m_omega % m_omega) * dgFloat32 (10.0f) * fluidAngularViscousity;
+			damp = GetMax (GetMin ((m_omega % m_omega) * dgFloat32 (1000.0f) * fluidAngularViscousity, dgFloat32(0.25f)), dgFloat32(2.0f));
+			torque -= m_omega.Scale3 (damp);
+
+//			dgAssert (dgSqrt (force % force) < (dgSqrt (gravityVector % gravityVector) * m_mass.m_w * dgFloat32 (100.0f)));
+//			dgAssert (dgSqrt (torque % torque) < (dgSqrt (gravityVector % gravityVector) * m_mass.m_w * dgFloat32 (100.0f) * dgFloat32 (10.0f)));
+			
+			dgThreadHiveScopeLock lock (m_world, &m_criticalSectionLock);
+			m_accel += force;
+			m_alpha += torque;
+ 		}
+	}
+
+}
+*/
+}
