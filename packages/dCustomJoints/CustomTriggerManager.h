@@ -28,7 +28,6 @@
 // they are not visible and do not collide with bodies, but the generate contacts
 class CustomTriggerController: public CustomControllerBase
 {
-
 	protected:
 	class PassangerManifest
 	{
@@ -38,13 +37,14 @@ class CustomTriggerController: public CustomControllerBase
 			public:
 			unsigned m_lru;
 			NewtonBody* m_body;
+			CustomTriggerController* m_controller;
 		};
 
 		NEWTON_API PassangerManifest ();
 		NEWTON_API ~PassangerManifest ();
 
 		NEWTON_API Passenger* Find (NewtonBody* const m_body);
-		NEWTON_API Passenger* Insert (NewtonBody* const m_body);
+		NEWTON_API Passenger* Insert (NewtonBody* const m_body, CustomTriggerController* const controller);
 		NEWTON_API void Pack();
 
 		int m_count;
@@ -90,9 +90,16 @@ class CustomTriggerManager: public CustomControllerManager<CustomTriggerControll
 
 	NEWTON_API virtual void EventCallback (const CustomTriggerController* const me, TriggerEventType eventType, NewtonBody* const visitor) const = 0;
 
+	private:
+	void UpdateTrigger (CustomTriggerController* const controller);
+	static void EnterTriggerKernel (NewtonWorld* const world, void* const context, int threadIndex);
+	static void InTriggerKernel (NewtonWorld* const world, void* const context, int threadIndex);
+
 	unsigned m_lru;
+	friend class CustomTriggerController;
 };
 
 
 #endif 
+
 

@@ -137,6 +137,24 @@ template<class CONTROLLER_BASE>
 class CustomControllerManager: public CustomList<CONTROLLER_BASE>
 {
 	public:
+	class ScopeLock
+	{
+		public:
+		ScopeLock (unsigned* const lock)
+			:m_atomicLock(lock)
+		{
+			while (NewtonAtomicSwap((int*)m_atomicLock, 1)) {
+				NewtonYield();
+			}
+		}
+		~ScopeLock()
+		{
+			NewtonAtomicSwap((int*)m_atomicLock, 0);	
+		}
+
+		unsigned* m_atomicLock;
+	};
+
 	CustomControllerManager(NewtonWorld* const world, const char* const managerName);
 	~CustomControllerManager();
 

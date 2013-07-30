@@ -56,7 +56,7 @@ CustomTriggerController::PassangerManifest::Passenger* CustomTriggerController::
 	return NULL;
 }
 
-CustomTriggerController::PassangerManifest::Passenger* CustomTriggerController::PassangerManifest::Insert (NewtonBody* const body)
+CustomTriggerController::PassangerManifest::Passenger* CustomTriggerController::PassangerManifest::Insert (NewtonBody* const body, CustomTriggerController* const controller)
 {
 	dAssert (m_count <= m_capacity);
 
@@ -85,6 +85,7 @@ CustomTriggerController::PassangerManifest::Passenger* CustomTriggerController::
 	Passenger* const passenger = &m_passangerList[index];
 	passenger->m_lru = 0;
 	passenger->m_body = body;
+	passenger->m_controller = controller;
 	m_count ++;
 	return passenger;
 }
@@ -129,7 +130,56 @@ CustomTriggerController* CustomTriggerManager::CreateTrigger (const dMatrix& mat
 void CustomTriggerManager::PreUpdate(dFloat timestep)
 {
 	m_lru ++;
+	for (CustomListNode* node = GetFirst(); node; node = node->GetNext()) {
+		UpdateTrigger (&node->GetInfo());
+	}
 	CustomControllerManager<CustomTriggerController>::PreUpdate(timestep);
+}
+
+static CustomTriggerController* xxxx;
+
+void CustomTriggerManager::EnterTriggerKernel (NewtonWorld* const world, void* const context, int threadIndex)
+{
+	const CustomTriggerController::PassangerManifest::Passenger* const passenger = (CustomTriggerController::PassangerManifest::Passenger*) context;
+	CustomTriggerController* const controller = passenger->m_controller;
+	CustomTriggerManager* const manager = (CustomTriggerManager*)controller->GetManager();
+	manager->EventCallback (controller, m_enterTrigger, passenger->m_body);
+}
+
+
+void CustomTriggerManager::InTriggerKernel (NewtonWorld* const world, void* const context, int threadIndex)
+{
+	const CustomTriggerController::PassangerManifest::Passenger* const passenger = (CustomTriggerController::PassangerManifest::Passenger*) context;
+	CustomTriggerController* const controller = passenger->m_controller;
+	CustomTriggerManager* const manager = (CustomTriggerManager*)controller->GetManager();
+	manager->EventCallback (controller, m_inTrigger, passenger->m_body);
+}
+
+
+void CustomTriggerManager::UpdateTrigger (CustomTriggerController* const controller)
+{
+xxxx = controller;
+
+	NewtonBody* const triggerBody = controller->GetBody();
+	CustomTriggerController::PassangerManifest& manifest = controller->m_manifest;
+
+	for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint (triggerBody); joint; joint = NewtonBodyGetNextContactJoint (triggerBody, joint)) {
+		NewtonBody* const body0 = NewtonJointGetBody0(joint);
+		NewtonBody* const body1 = NewtonJointGetBody1(joint);
+		NewtonBody* const passangerBody = (body0 != triggerBody) ? body0 : body1; 
+
+		CustomTriggerController::PassangerManifest::Passenger* passenger = manifest.Find (passangerBody);
+		if (!passenger) {
+			passenger = manifest.Insert (passangerBody, controller);
+			//NewtonDispachThreadJob (m_world, EnterTriggerKernel, passenger);
+			EventCallback (controller, m_enterTrigger, passenger->m_body);
+		} else {
+			//NewtonDispachThreadJob (m_world, InTriggerKernel, passenger);
+			EventCallback (controller, m_inTrigger, passenger->m_body);
+		}
+		passenger->m_lru = m_lru;
+	}
+//	NewtonSyncThreadJobs(m_world);
 }
 
 
@@ -165,26 +215,8 @@ void CustomTriggerController::PostUpdate(dFloat timestep, int threadIndex)
 void CustomTriggerController::PreUpdate(dFloat timestep, int threadIndex)
 {
 	CustomTriggerManager* const manager = (CustomTriggerManager*)GetManager();
-
 	unsigned lru = manager->m_lru;
 
-	NewtonBody* const triggerBody = GetBody();
-	for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint (triggerBody); joint; joint = NewtonBodyGetNextContactJoint (triggerBody, joint)) {
-		NewtonBody* const body0 = NewtonJointGetBody0(joint);
-		NewtonBody* const body1 = NewtonJointGetBody1(joint);
-		NewtonBody* const passangerBody = (body0 != triggerBody) ? body0 : body1; 
-
-		PassangerManifest::Passenger* passenger = m_manifest.Find (passangerBody);
-		if (!passenger) {
-			//node = m_manifest.Insert (passangerBody);
-			passenger = m_manifest.Insert (passangerBody);
-			manager->EventCallback (this, CustomTriggerManager::m_enterTrigger, passangerBody);
-		} else {
-			manager->EventCallback (this, CustomTriggerManager::m_inTrigger, passangerBody);
-		}
-		passenger->m_lru = lru;
-	}
-	
 	bool packArray = false;
 	for (int i = 0; i < m_manifest.m_count; i ++) {
 		PassangerManifest::Passenger* const node = &m_manifest.m_passangerList[i];
