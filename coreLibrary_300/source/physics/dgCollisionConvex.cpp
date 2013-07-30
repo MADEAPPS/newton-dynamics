@@ -1764,27 +1764,15 @@ dgFloat32 dgCollisionConvex::GetBoxMaxRadius () const
 
 
 //dgVector dgCollisionConvex::CalculateVolumeIntegral (const dgMatrix& globalMatrix, GetBuoyancyPlane buoyancyPlane, void* context) const
-dgVector dgCollisionConvex::CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& plane) const
+dgVector dgCollisionConvex::CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& globalPlane) const
 {
-dgAssert (0);
-return dgVector (0.0f);
-/*
-	dgVector cg  (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	if (buoyancyPlane) {
-		dgPlane globalPlane;
-		if (buoyancyPlane (0, context, globalMatrix, globalPlane)) {
-		//if (buoyancyPlane ((void*)SetUserDataID(), context, globalMatrix, globalPlane)) {
-			globalPlane = globalMatrix.UntransformPlane (globalPlane);
-			cg  = CalculateVolumeIntegral (globalPlane);
-		}
-	}
+	dgPlane localPlane (globalMatrix.UntransformPlane (globalPlane));
+	dgVector cg (CalculateVolumeIntegral (localPlane));
 	
 	dgFloat32 volume = cg.m_w;
 	cg = globalMatrix.TransformVector (cg);
 	cg.m_w = volume;
-
 	return cg;
-*/
 }
 
 
@@ -1795,7 +1783,7 @@ dgVector dgCollisionConvex::CalculateVolumeIntegral (const dgPlane& plane) const
 	dgFloat32 test[DG_MAX_EDGE_COUNT];
 	dgVector faceVertex[256];
 
-	dgVector cg (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)); 
+	
 
 	dgInt32 positive = 0;
 	dgInt32 negative = 0;
@@ -1811,7 +1799,7 @@ dgVector dgCollisionConvex::CalculateVolumeIntegral (const dgPlane& plane) const
 	}
 
 	if (positive == m_vertexCount) {
-		return cg;
+		return dgVector (0.0f);
 	}
 
 	if (negative == m_vertexCount) {
@@ -1823,7 +1811,7 @@ dgVector dgCollisionConvex::CalculateVolumeIntegral (const dgPlane& plane) const
 	dgPolyhedraMassProperties localData;
 	dgConvexSimplexEdge* capEdge = NULL;
 
-	//	m_mark ++;
+	dgVector cg (dgFloat32 (0.0f)); 
 	memset (mark, 0, sizeof (mark));
 	for (dgInt32 i = 0; i < m_edgeCount; i ++) {
 		if (!mark[i]) {

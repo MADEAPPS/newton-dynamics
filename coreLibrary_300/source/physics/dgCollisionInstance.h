@@ -108,9 +108,7 @@ class dgCollisionInstance
 	dgInt32 GetConvexVertexCount() const; 
 
 	void Serialize(dgSerialize callback, void* const userData, bool saveShape = true) const;
-//	dgMatrix CalculateSpaceMatrix (const dgCollisionInstance* const instance) const;
-
-	void CalculateBuoyancyAcceleration (const dgVector& gravity, const dgVector& fluidPlane, dgFloat32 fluidDensity, dgFloat32 fluidViscosity, dgVector& accel, dgVector& alpha);
+	void CalculateBuoyancyAcceleration (const dgMatrix& matrix, const dgVector& gravity, const dgVector& fluidPlane, dgFloat32 fluidDensity, dgFloat32 fluidViscosity, dgVector& accel, dgVector& alpha);
 	
 
 	dgMatrix m_globalMatrix;

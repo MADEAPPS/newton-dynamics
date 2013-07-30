@@ -46,6 +46,7 @@ class MyTriggerManager: public CustomTriggerManager
 		{
 			// get the fluid plane for the upper face of the trigger volume
 			//NewtonBody* const body = m_controller->GetBody();
+			m_plane = dVector (0.0f, 1.0f, 0.0f, 1.5f);
 		}
 
 		void OnInside(NewtonBody* const visitor)
@@ -57,16 +58,24 @@ class MyTriggerManager: public CustomTriggerManager
 			
 			NewtonBodyGetMassMatrix(visitor, &mass, &Ixx, &Iyy, &Izz);
 			if (mass > 0.0f) {
-				dVector accel;
-				dVector alpha;
-				dVector gravity (0.0f, DEMO_GRAVITY, 0.0f, 0.0f);
-				dVector plane (0.0f, 1.0f, 0.0f, -2.0f);
+				dMatrix matrix;
+				dVector accelPerUnitMass;
+				dVector torquePerUnitMass;
+				const dVector gravity (0.0f, DEMO_GRAVITY, 0.0f, 0.0f);
 
+				NewtonBodyGetMatrix (visitor, &matrix[0][0]);
 				NewtonCollision* const collision = NewtonBodyGetCollision(visitor);
-				NewtonConvexCollisionCalculateBuoyancyAcceleration (collision, &gravity[0], &plane[0], 0.1f, 0.1f, &accel[0], &alpha[0]);
+				NewtonConvexCollisionCalculateBuoyancyAcceleration (collision, &matrix[0][0], &gravity[0], &m_plane[0], 0.1f, 0.1f, &accelPerUnitMass[0], &torquePerUnitMass[0]);
 
+				dVector force (accelPerUnitMass.Scale (mass));
+				dVector torque (torquePerUnitMass.Scale (mass));
+
+				NewtonBodyAddForce (visitor, &force[0]);
+				NewtonBodyAddTorque (visitor, &torque[0]);
 			}
 		}
+
+		dVector m_plane;
 	};
 
 
@@ -157,7 +166,7 @@ void AlchimedesBuoyancy(DemoEntityManager* const scene)
 
 	int count = 1;
 	dVector size (1.0f, 0.25f, 0.5f);
-	dVector location (.0f, 0.0f, 0.0f, 0.0f);
+	dVector location (10.0f, 0.0f, 0.0f, 0.0f);
 	dMatrix shapeOffsetMatrix (GetIdentityMatrix());
 
 //	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
