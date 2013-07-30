@@ -45,6 +45,7 @@ class CustomTriggerController: public CustomControllerBase
 
 		NEWTON_API Passenger* Find (NewtonBody* const m_body);
 		NEWTON_API Passenger* Insert (NewtonBody* const m_body);
+		NEWTON_API void Pack();
 
 		int m_count;
 		int m_capacity;

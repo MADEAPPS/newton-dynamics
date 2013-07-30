@@ -34,20 +34,29 @@ CustomTriggerController::PassangerManifest::~PassangerManifest ()
 
 
 
-CustomTriggerController::PassangerManifest::Passenger* CustomTriggerController::PassangerManifest::Find (NewtonBody* const m_body)
+CustomTriggerController::PassangerManifest::Passenger* CustomTriggerController::PassangerManifest::Find (NewtonBody* const body)
 {
-	// for now just do a lnera search
-	// if m_count is even large that 16 then its time to chnag ethe algorithm 
-	dAssert (m_count < 16);
-	for (int i = 0; i < m_count; i ++) {
-		if (m_passangerList[i].m_body == m_body) {
+	int i0 = 0;
+	int i1 = m_count - 1;
+	while ((i1 - i0) >= 4) {
+		int i = (i1 + i0) >> 1;
+		if (body < m_passangerList[i].m_body) {
+			i1 = i;
+		} else {
+			i0 = i;
+		}
+	}
+
+//	dAssert (!m_count || (m_passangerList[i0].m_body <= body));
+	for (int i = i0; (i < m_count) && (m_passangerList[i].m_body <= body); i ++) {
+		if (m_passangerList[i].m_body == body) {
 			return &m_passangerList[i];
 		}
 	}
 	return NULL;
 }
 
-CustomTriggerController::PassangerManifest::Passenger* CustomTriggerController::PassangerManifest::Insert (NewtonBody* const m_body)
+CustomTriggerController::PassangerManifest::Passenger* CustomTriggerController::PassangerManifest::Insert (NewtonBody* const body)
 {
 	dAssert (m_count <= m_capacity);
 
@@ -63,13 +72,41 @@ CustomTriggerController::PassangerManifest::Passenger* CustomTriggerController::
 			m_capacity = m_capacity * 2;
 		}
 	}
-	Passenger* const passenger = &m_passangerList[m_count];
+
+	int index = m_count;
+	for (int i = m_count - 1; i >= 0; i --) {
+		if (m_passangerList[i].m_body > body) {
+			index = i;
+			m_passangerList[i + 1] = m_passangerList[i];
+		} else {
+			break;
+		}
+	}
+	Passenger* const passenger = &m_passangerList[index];
 	passenger->m_lru = 0;
-	passenger->m_body = m_body;
+	passenger->m_body = body;
 	m_count ++;
 	return passenger;
 }
 
+void CustomTriggerController::PassangerManifest::Pack ()
+{
+	for (int index = 0; index < m_count; index ++) {
+		if (!m_passangerList[index].m_body) {
+			for (int i = index + 1; i < m_count; i ++) {
+				if (m_passangerList[i].m_body) {
+					m_passangerList[index] = m_passangerList[i];
+					m_passangerList[i].m_body = NULL;
+					break;
+				}
+			}
+		}
+	}
+	
+	while ((m_count > 0) && !m_passangerList[m_count - 1].m_body) {
+		m_count --;
+	}
+}
 
 CustomTriggerManager::CustomTriggerManager(NewtonWorld* const world)
 	:CustomControllerManager<CustomTriggerController>(world, TRIGGER_PLUGIN_NAME)
@@ -148,13 +185,16 @@ void CustomTriggerController::PreUpdate(dFloat timestep, int threadIndex)
 		passenger->m_lru = lru;
 	}
 	
+	bool packArray = false;
 	for (int i = 0; i < m_manifest.m_count; i ++) {
 		PassangerManifest::Passenger* const node = &m_manifest.m_passangerList[i];
 		if (node->m_lru != lru) {
+			packArray = true;
 			manager->EventCallback (this, CustomTriggerManager::m_exitTrigger, node->m_body);			
-			m_manifest.m_passangerList[i] = m_manifest.m_passangerList[m_manifest.m_count - 1];
-			i --;
-			m_manifest.m_count --;
+			m_manifest.m_passangerList[i].m_body = NULL;
 		}
+	}
+	if (packArray) {
+		m_manifest.Pack();
 	}
 }
