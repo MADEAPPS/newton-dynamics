@@ -29,17 +29,17 @@
 class CustomTriggerController: public CustomControllerBase
 {
 	protected:
-	class PassangerManifest
+	class Passenger
 	{
 		public:
-		class Passenger
-		{
-			public:
-			unsigned m_lru;
-			NewtonBody* m_body;
-			CustomTriggerController* m_controller;
-		};
+		unsigned m_lru;
+		NewtonBody* m_body;
+		CustomTriggerController* m_controller;
+	};
 
+	class PassangerManifest: public CustomList<Passenger>
+	{
+		public:
 		NEWTON_API PassangerManifest ();
 		NEWTON_API ~PassangerManifest ();
 
@@ -49,7 +49,7 @@ class CustomTriggerController: public CustomControllerBase
 
 		int m_count;
 		int m_capacity;
-		Passenger* m_passangerList;
+		CustomListNode** m_passangerList;
 	};
 
 	public:
