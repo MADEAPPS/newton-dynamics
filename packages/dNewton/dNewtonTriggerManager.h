@@ -32,7 +32,7 @@ class dNewtonTriggerManager: public CustomTriggerManager
 	class dNewtonTrigger: public dNewtonKinematicBody
 	{
 		public:
-		CNEWTON_API dNewtonTrigger (dNewtonTriggerManager* const manager, NewtonCollision* const convexShape, void* const userData, const dFloat* const matrix);
+		CNEWTON_API dNewtonTrigger (dNewtonTriggerManager* const manager, const dNewtonCollision& convexShape, void* const userData, const dFloat* const matrix);
 		CNEWTON_API ~dNewtonTrigger ();
 
 		virtual void OnEnter(NewtonBody* const visitor) = 0;

@@ -56,16 +56,14 @@ dNewtonTriggerManager::dNewtonTrigger* dNewtonTriggerManager::GetNextTrigger(con
 }
 
 
-dNewtonTriggerManager::dNewtonTrigger::dNewtonTrigger (dNewtonTriggerManager* const manager, NewtonCollision* const convexShape, void* const userData, const dFloat* const matrix)
+dNewtonTriggerManager::dNewtonTrigger::dNewtonTrigger (dNewtonTriggerManager* const manager, const dNewtonCollision& convexShape, void* const userData, const dFloat* const matrix)
 	:dNewtonKinematicBody()
 {
-	m_controller = manager->CreateTrigger (matrix, convexShape, this);
-//	m_controller = manager->CreatePlayer(mass, outerRadius, innerRadius, height, stairStep, playerAxis);
-
-	NewtonBody* const body = m_controller->GetBody();
-
-	SetBody (body);
-	SetUserData (userData);
+	dAssert (0);
+//	m_controller = manager->CreateTrigger (matrix, convexShape->GetShape(), this);
+//	NewtonBody* const body = m_controller->GetBody();
+//	SetBody (body);
+//	SetUserData (userData);
 }
 
 dNewtonTriggerManager::dNewtonTrigger::~dNewtonTrigger ()
