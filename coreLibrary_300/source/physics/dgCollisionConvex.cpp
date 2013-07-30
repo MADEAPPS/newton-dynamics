@@ -1778,12 +1778,9 @@ dgVector dgCollisionConvex::CalculateVolumeIntegral (const dgMatrix& globalMatri
 
 dgVector dgCollisionConvex::CalculateVolumeIntegral (const dgPlane& plane) const 
 {
-
 	dgInt8 mark[DG_MAX_EDGE_COUNT];
 	dgFloat32 test[DG_MAX_EDGE_COUNT];
 	dgVector faceVertex[256];
-
-	
 
 	dgInt32 positive = 0;
 	dgInt32 negative = 0;
@@ -1803,9 +1800,10 @@ dgVector dgCollisionConvex::CalculateVolumeIntegral (const dgPlane& plane) const
 	}
 
 	if (negative == m_vertexCount) {
-		dgVector volume (this->GetVolume());
-		volume.m_w = m_simplexVolume;
-		return volume;
+		//dgVector volume (this->GetVolume());
+		//volume.m_w = m_simplexVolume;
+		//return volume;
+		return m_centerOfMass;
 	}
 
 	dgPolyhedraMassProperties localData;
@@ -1858,14 +1856,14 @@ dgVector dgCollisionConvex::CalculateVolumeIntegral (const dgPlane& plane) const
 	if (capEdge) {
 		dgInt32 count = 0;
 		dgConvexSimplexEdge* edge = capEdge;
-		dgConvexSimplexEdge *ptr = NULL;
+		dgConvexSimplexEdge* ptr = NULL;
 		do {
 			dgVector dp (m_vertex[edge->m_twin->m_vertex] - m_vertex[edge->m_vertex]);
 			faceVertex[count] = m_vertex[edge->m_vertex] - dp.Scale3 (test[edge->m_vertex] / (plane % dp));
 			count ++;
 			if (count == 127) {
 				// something is wrong return zero
-				return dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+				return dgVector (dgFloat32 (0.0f));
 			}
 
 			for (ptr = edge->m_next; ptr != edge; ptr = ptr->m_next) {
@@ -1885,7 +1883,7 @@ dgVector dgCollisionConvex::CalculateVolumeIntegral (const dgPlane& plane) const
 	dgVector inertia;
 	dgVector crossInertia;
 	dgFloat32 volume = localData.MassProperties (cg, inertia, crossInertia);
-	cg = cg.Scale3 (dgFloat32 (1.0f) / dgMax (volume, dgFloat32 (1.0e-4f)));
+	cg = cg.Scale3 (dgFloat32 (1.0f) / dgMax (volume, dgFloat32 (1.0e-6f)));
 	cg.m_w = volume;
 	return cg; 
 }

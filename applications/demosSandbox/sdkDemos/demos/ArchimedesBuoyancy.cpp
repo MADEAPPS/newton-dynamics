@@ -59,13 +59,20 @@ class MyTriggerManager: public CustomTriggerManager
 			NewtonBodyGetMassMatrix(visitor, &mass, &Ixx, &Iyy, &Izz);
 			if (mass > 0.0f) {
 				dMatrix matrix;
+				dVector cog;
 				dVector accelPerUnitMass;
 				dVector torquePerUnitMass;
 				const dVector gravity (0.0f, DEMO_GRAVITY, 0.0f, 0.0f);
 
 				NewtonBodyGetMatrix (visitor, &matrix[0][0]);
+				NewtonBodyGetCentreOfMass(visitor, &cog[0]);
+				cog = matrix.TransformVector (cog);
 				NewtonCollision* const collision = NewtonBodyGetCollision(visitor);
-				NewtonConvexCollisionCalculateBuoyancyAcceleration (collision, &matrix[0][0], &gravity[0], &m_plane[0], 0.1f, 0.1f, &accelPerUnitMass[0], &torquePerUnitMass[0]);
+
+				dFloat shapeVolume = NewtonConvexCollisionCalculateVolume (collision);
+				dFloat fluidDentity = 1.1f / shapeVolume;
+
+				NewtonConvexCollisionCalculateBuoyancyAcceleration (collision, &matrix[0][0], &cog[0], &gravity[0], &m_plane[0], fluidDentity, 0.1f, &accelPerUnitMass[0], &torquePerUnitMass[0]);
 
 				dVector force (accelPerUnitMass.Scale (mass));
 				dVector torque (torquePerUnitMass.Scale (mass));

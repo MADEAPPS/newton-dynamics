@@ -3152,17 +3152,19 @@ void NewtonConvexCollisionCalculateInertialMatrix(const NewtonCollision* convexC
 // of compound collision geometry with different IDs. 
 //
 // See also: NewtonConvexCollisionCalculateVolume
-void NewtonConvexCollisionCalculateBuoyancyAcceleration (const NewtonCollision* const convexCollision, const dFloat* const matrix, const dFloat* const gravityVector, const dFloat* const fluidPlane, dFloat fluidDensity, dFloat fluidViscosity, dFloat* const accel, dFloat* const alpha)
+void NewtonConvexCollisionCalculateBuoyancyAcceleration (const NewtonCollision* const convexCollision, const dFloat* const matrix, const dFloat* const shapeOrigin, const dFloat* const gravityVector, const dFloat* const fluidPlane, dFloat fluidDensity, dFloat fluidViscosity, dFloat* const accel, dFloat* const alpha)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 
 	dgCollisionInstance* const instance = (dgCollisionInstance*)convexCollision;
+	
+	dgVector origin (shapeOrigin);
+	dgVector gravity (gravityVector);
 	dgVector plane (fluidPlane[0], fluidPlane[1], fluidPlane[2], fluidPlane[3]);
-	dgVector gravity (gravityVector[0], gravityVector[1], gravityVector[2], dgFloat32 (0.0f));
 
 	dgVector force;
 	dgVector torque;
-	instance->CalculateBuoyancyAcceleration (dgMatrix (matrix), gravity, plane, fluidDensity, fluidViscosity, force, torque);
+	instance->CalculateBuoyancyAcceleration (dgMatrix (matrix), origin, gravity, plane, fluidDensity, fluidViscosity, force, torque);
 
 	accel[0] = force.m_x;
 	accel[1] = force.m_y;
