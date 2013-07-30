@@ -23,7 +23,7 @@
 #include "dNewton.h"
 #include "dNewtonBody.h"
 #include "dNewtonCollision.h"
-#include "dNewtonTranformLerp.h"
+#include "dNewtonTransformLerp.h"
 
 dNewtonBody::dNewtonBody(dBodyType type)
 	:dNewtonAlloc()

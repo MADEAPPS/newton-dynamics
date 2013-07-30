@@ -20,7 +20,7 @@
 */
 
 #include "dStdAfxNewton.h"
-#include "dNewtonTranformLerp.h"
+#include "dNewtonTransformLerp.h"
 
 dNewtonTransformLerp::dNewtonTransformLerp ()
 	:m_posit0(0.0f, 0.0f, 0.0f, 1.0f)

@@ -696,11 +696,19 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\dNewton\dNewtonTranformLerp.cpp"
+			RelativePath="..\..\dNewton\dNewtonTransformLerp.cpp"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dNewton\dNewtonTranformLerp.h"
+			RelativePath="..\..\dNewton\dNewtonTransformLerp.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dNewton\dNewtonTriggerManager.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dNewton\dNewtonTriggerManager.h"
 			>
 		</File>
 		<File

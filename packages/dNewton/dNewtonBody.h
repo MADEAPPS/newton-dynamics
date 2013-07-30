@@ -24,7 +24,7 @@
 
 #include "dStdAfxNewton.h"
 #include "dNewtonAlloc.h"
-#include "dNewtonTranformLerp.h"
+#include "dNewtonTransformLerp.h"
 
 class dNewton;
 class dNewtonCollision;

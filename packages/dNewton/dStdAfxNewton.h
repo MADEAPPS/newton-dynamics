@@ -64,6 +64,7 @@
 #include <stdlib.h>
 #include <Newton.h>
 #include <CustomJoint.h>
+#include <CustomTriggerManager.h>
 #include <CustomControllerManager.h>
 #include <CustomPlayerControllerManager.h>
 

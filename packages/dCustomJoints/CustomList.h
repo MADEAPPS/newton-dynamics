@@ -137,7 +137,7 @@ class CustomList: public CustomAlloc
 	void InsertAfter (CustomListNode* const root, CustomListNode* const node);
 
 	CustomListNode* FindNodeFromInfo (const T &element) const;
-	CustomListNode* GetNodeFromInfo (const T &m_info) const;
+	CustomListNode* GetNodeFromInfo (const T &info) const;
 	void Remove (CustomListNode* const node);
 	void Remove (const T &element);
 	void RemoveAll ();
@@ -335,10 +335,11 @@ typename CustomList<T>::CustomListNode* CustomList<T>::GetNodeFromInfo (const T 
 template<class T> 
 void CustomList<T>::Remove (const T &element)
 {
-	CustomListNode* const node = Find (element);
-	if (node) {
-		Remove (node);
-	}
+	dAssert (0);
+//	CustomListNode* const node = Find (element);
+//	if (node) {
+//		Remove (node);
+//	}
 }
 
 template<class T>
