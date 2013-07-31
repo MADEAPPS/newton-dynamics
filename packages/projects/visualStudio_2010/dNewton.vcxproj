@@ -191,11 +191,13 @@
     <ClCompile Include="..\..\dNewton\dNewtonBody.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonCollision.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonDynamicBody.cpp" />
+    <ClCompile Include="..\..\dNewton\dNewtonJoint.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonMesh.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonRayCast.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonSceneBody.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonScopeBuffer.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonTranformLerp.cpp" />
+    <ClCompile Include="..\..\dNewton\dNewtonTriggerManager.cpp" />
     <ClCompile Include="..\..\dNewton\dStdAfxNewton.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">Create</PrecompiledHeader>
@@ -209,11 +211,13 @@
     <ClInclude Include="..\..\dNewton\dNewtonBody.h" />
     <ClInclude Include="..\..\dNewton\dNewtonCollision.h" />
     <ClInclude Include="..\..\dNewton\dNewtonDynamicBody.h" />
+    <ClInclude Include="..\..\dNewton\dNewtonJoint.h" />
     <ClInclude Include="..\..\dNewton\dNewtonMesh.h" />
     <ClInclude Include="..\..\dNewton\dNewtonRayCast.h" />
     <ClInclude Include="..\..\dNewton\dNewtonSceneBody.h" />
     <ClInclude Include="..\..\dNewton\dNewtonScopeBuffer.h" />
     <ClInclude Include="..\..\dNewton\dNewtonTranformLerp.h" />
+    <ClInclude Include="..\..\dNewton\dNewtonTriggerManager.h" />
     <ClInclude Include="..\..\dNewton\dStdAfxNewton.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

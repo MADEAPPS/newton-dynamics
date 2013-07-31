@@ -23,7 +23,7 @@
 #include "dNewton.h"
 #include "dNewtonCollision.h"
 #include "dNewtonDynamicBody.h"
-//#include "dNewtonTranformLerp.h"
+
 
 dNewtonDynamicBody::dNewtonDynamicBody()
 	:dNewtonBody(m_dynamic)
