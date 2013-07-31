@@ -306,7 +306,7 @@ void dgCollisionSphere::Serialize(dgSerialize callback, void* const userData) co
 
 dgVector dgCollisionSphere::ConvexConicSupporVertex (const dgVector& dir) const 
 {
-	return dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	return dgVector (dgFloat32 (0.0f));
 }
 
 dgVector dgCollisionSphere::ConvexConicSupporVertex (const dgVector& point, const dgVector& dir) const

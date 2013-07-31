@@ -1089,8 +1089,12 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 				SupportVertex (normal, 3);
 				volume = -((m_hullDiff[3] - m_hullDiff[0]) % normal);
 				if (dgAbsf(volume) < dgFloat32 (1.0e-10f)) {
-					// the simple is wrong, try building a simple by a different starting point, for now just assert
-					dgAssert (0);
+					// there is somethomg wrong, try building a simple by a different starting point, for now just assert
+					//dgAssert (0);
+					volume = dgFloat32 (0.0f);
+					//for (int i = 0; i < 4; i ++) {
+					//	m_hullDiff[i] = dgVector (dgFloat32 (0.0f));
+					//}
 				}
 			}
 			count = 4;
