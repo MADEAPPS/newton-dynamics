@@ -67,9 +67,12 @@ class dNewtonCollision: public dNewtonAlloc
 	CNEWTON_API virtual ~dNewtonCollision();
 
 	CNEWTON_API NewtonCollision* GetShape() const;
+	virtual dNewtonCollision* Clone (NewtonCollision* const shape) const = 0; 
 
 	CNEWTON_API void* GetUserData() const;
 	CNEWTON_API void SetUserData(void* const userData);
+
+	CNEWTON_API dFloat GetVolume () const;
 
 	CNEWTON_API void SetScale(dFloat x, dFloat y, dFloat z);
 	CNEWTON_API void GetScale(dFloat& x, dFloat& y, dFloat& z) const;
@@ -78,16 +81,13 @@ class dNewtonCollision: public dNewtonAlloc
 	CNEWTON_API void GetMatrix (dFloat* const matrix) const;
 
 	CNEWTON_API void CalculateAABB (const dFloat* const matrix, dFloat* const p0, dFloat* const p1) const;
-
 	CNEWTON_API virtual void DebugRender (const dFloat* const matrix, dDebugRenderer* const renderer) const;
 
+	CNEWTON_API void CalculateBuoyancyAcceleration (const dFloat* const matrix, const dFloat* const shapeOrigin, const dFloat* const gravityVector, const dFloat* const fluidPlane, dFloat fluidDensity, dFloat fluidViscosity, dFloat* const accel, dFloat* const alpha);
 
 	protected:
 	CNEWTON_API dNewtonCollision (const dNewtonCollision& srcCollision, NewtonCollision* const shape);
-
 	CNEWTON_API void SetShape (NewtonCollision* const shape) ;
-	virtual dNewtonCollision* Clone (NewtonCollision* const shape) const = 0; 
-
 	CNEWTON_API static void DebugRender (void* userData, int vertexCount, const dFloat* faceVertec, int id);
 	
 

@@ -61,7 +61,6 @@ class CustomTriggerController: public CustomControllerBase
 	NEWTON_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 	
 	private:
-	void* m_userData;
 	PassangerManifest m_manifest;
 	friend class CustomTriggerManager;
 };
@@ -88,7 +87,7 @@ class CustomTriggerManager: public CustomControllerManager<CustomTriggerControll
 	virtual void Debug () const {};
 	NEWTON_API virtual CustomTriggerController* CreateTrigger (const dMatrix& matrix, NewtonCollision* const convexShape, void* const userData);
 
-	NEWTON_API virtual void EventCallback (const CustomTriggerController* const me, TriggerEventType eventType, NewtonBody* const visitor) const = 0;
+	NEWTON_API virtual void EventCallback (const CustomTriggerController* const me, TriggerEventType eventType, NewtonBody* const guess) const = 0;
 
 	private:
 	void UpdateTrigger (CustomTriggerController* const controller);

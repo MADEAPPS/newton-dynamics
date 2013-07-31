@@ -59,11 +59,10 @@ dNewtonTriggerManager::dNewtonTrigger* dNewtonTriggerManager::GetNextTrigger(con
 dNewtonTriggerManager::dNewtonTrigger::dNewtonTrigger (dNewtonTriggerManager* const manager, const dNewtonCollision& convexShape, void* const userData, const dFloat* const matrix)
 	:dNewtonKinematicBody()
 {
-	dAssert (0);
-//	m_controller = manager->CreateTrigger (matrix, convexShape->GetShape(), this);
-//	NewtonBody* const body = m_controller->GetBody();
-//	SetBody (body);
-//	SetUserData (userData);
+	m_controller = manager->CreateTrigger (matrix, convexShape.GetShape(), this);
+	NewtonBody* const body = m_controller->GetBody();
+	SetBody (body);
+	SetUserData (userData);
 }
 
 dNewtonTriggerManager::dNewtonTrigger::~dNewtonTrigger ()
@@ -77,26 +76,27 @@ dNewtonTriggerManager::dNewtonTrigger::~dNewtonTrigger ()
 }
 
 
-void dNewtonTriggerManager::EventCallback (const CustomTriggerController* const trigger, TriggerEventType event, NewtonBody* const visitor) const
+void dNewtonTriggerManager::EventCallback (const CustomTriggerController* const trigger, TriggerEventType event, NewtonBody* const guess) const
 {
 	dNewtonTrigger* const callback = (dNewtonTrigger*) trigger->GetUserData();
+	dNewtonBody* const guessBody = (dNewtonBody*) NewtonBodyGetUserData(guess);
 	switch (event) 
 	{
 		case m_enterTrigger:
 		{
-			callback->OnEnter(visitor);
+			callback->OnEnter(guessBody);
 			break;
 		}
 
 		case m_exitTrigger:
 		{
-			callback->OnExit(visitor);
+			callback->OnExit(guessBody);
 			break;
 		}
 
 		case m_inTrigger:
 		{
-			callback->OnInside(visitor);
+			callback->OnInside(guessBody);
 			break;
 		}
 	}

@@ -97,17 +97,25 @@ CustomTriggerController::Passenger* CustomTriggerController::PassangerManifest::
 void CustomTriggerController::PassangerManifest::Pack ()
 {
 	for (int index = 0; index < m_count; index ++) {
-		if (!m_passangerList[index]->GetInfo().m_body) {
+		if (!m_passangerList[index]) {
 			for (int i = index + 1; i < m_count; i ++) {
-				if (m_passangerList[i]->GetInfo().m_body) {
-					Remove(m_passangerList[index]);
+				if (m_passangerList[i]) {
 					m_passangerList[index] = m_passangerList[i];
+					m_passangerList[i] = NULL;
 					break;
 				}
 			}
 		}
 	}
 	m_count = GetCount();	
+
+	#ifdef _DEBUG
+	for (int i = 0; i < m_count; i ++) {
+		CustomListNode* const node = m_passangerList[i];
+		dAssert (node);
+		dAssert (node->GetInfo().m_body);
+	}
+	#endif
 }
 
 CustomTriggerManager::CustomTriggerManager(NewtonWorld* const world)
@@ -214,11 +222,13 @@ void CustomTriggerController::PreUpdate(dFloat timestep, int threadIndex)
 
 	bool packArray = false;
 	for (int i = 0; i < m_manifest.m_count; i ++) {
-		Passenger* const node = &m_manifest.m_passangerList[i]->GetInfo();
-		if (node->m_lru != lru) {
+		dAssert (m_manifest.m_passangerList[i]);
+		Passenger* const passenger = &m_manifest.m_passangerList[i]->GetInfo();
+		if (passenger->m_lru != lru) {
 			packArray = true;
-			manager->EventCallback (this, CustomTriggerManager::m_exitTrigger, node->m_body);			
-			m_manifest.m_passangerList[i]->GetInfo().m_body = NULL;
+			manager->EventCallback (this, CustomTriggerManager::m_exitTrigger, passenger->m_body);	
+			m_manifest.Remove(m_manifest.m_passangerList[i]);
+			m_manifest.m_passangerList[i] = NULL;
 		}
 	}
 	if (packArray) {

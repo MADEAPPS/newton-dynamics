@@ -40,25 +40,6 @@ dNewtonDynamicBody::~dNewtonDynamicBody()
 {
 }
 
-void dNewtonDynamicBody::SetForce (const dFloat* const force)
-{
-	NewtonBodySetForce(m_body, force);
-}
-
-void dNewtonDynamicBody::SetTorque (const dFloat* const torque)
-{
-	NewtonBodySetTorque(m_body, torque);
-}
-
-void dNewtonDynamicBody::AddForce (const dFloat* const force)
-{
-	NewtonBodyAddForce(m_body, force);
-}
-
-void dNewtonDynamicBody::AddTorque (const dFloat* const torque)
-{
-	NewtonBodyAddTorque(m_body, torque);
-}
 
 
 void dNewtonDynamicBody::GetPointVeloc (const dFloat* const point, dFloat* const veloc) const

@@ -60,6 +60,11 @@ void dNewtonCollision::SetUserData(void* const userData)
 	m_userData = userData;
 }
 
+dFloat dNewtonCollision::GetVolume () const
+{
+	return NewtonConvexCollisionCalculateVolume (m_shape);
+}
+
 void dNewtonCollision::SetMatrix (const dFloat* const matrix)
 {
 	NewtonCollisionSetMatrix(m_shape, matrix);
@@ -109,6 +114,12 @@ void dNewtonCollision::CalculateAABB (const dFloat* const matrix, dFloat* const 
 {
 	NewtonCollisionCalculateAABB (m_shape, matrix, p0, p1);
 }
+
+void dNewtonCollision::CalculateBuoyancyAcceleration (const dFloat* const matrix, const dFloat* const shapeOrigin, const dFloat* const gravityVector, const dFloat* const fluidPlane, dFloat fluidDensity, dFloat fluidViscosity, dFloat* const accel, dFloat* const alpha)
+{
+	NewtonConvexCollisionCalculateBuoyancyAcceleration (m_shape, matrix, shapeOrigin, gravityVector, fluidPlane, fluidDensity, fluidViscosity, accel, alpha);
+}
+
 
 
 

@@ -26,6 +26,8 @@
 #include "dStdAfxNewton.h"
 #include "dNewtonKinematicBody.h"
 
+class dNewtonBody;
+
 class dNewtonTriggerManager: public CustomTriggerManager
 {
 	public:
@@ -35,9 +37,9 @@ class dNewtonTriggerManager: public CustomTriggerManager
 		CNEWTON_API dNewtonTrigger (dNewtonTriggerManager* const manager, const dNewtonCollision& convexShape, void* const userData, const dFloat* const matrix);
 		CNEWTON_API ~dNewtonTrigger ();
 
-		virtual void OnEnter(NewtonBody* const visitor) = 0;
-		virtual void OnInside(NewtonBody* const visitor) = 0;
-		virtual void OnExit(NewtonBody* const visitor) = 0;
+		virtual void OnEnter (dNewtonBody* const visitor) = 0;
+		virtual void OnInside (dNewtonBody* const visitor) = 0;
+		virtual void OnExit (dNewtonBody* const visitor) = 0;
 
 		private:
 		CustomTriggerController* m_controller;
@@ -50,7 +52,7 @@ class dNewtonTriggerManager: public CustomTriggerManager
 
 	CNEWTON_API dNewtonTrigger* GetFirstTrigger() const;
 	CNEWTON_API dNewtonTrigger* GetNextTrigger(const dNewtonTrigger* const trigger) const;
-	CNEWTON_API virtual void EventCallback (const CustomTriggerController* const trigger, TriggerEventType event, NewtonBody* const visitor) const;
+	CNEWTON_API virtual void EventCallback (const CustomTriggerController* const trigger, TriggerEventType event, NewtonBody* const guess) const;
 };
 
 

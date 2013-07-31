@@ -35,12 +35,6 @@ class dNewtonDynamicBody: public dNewtonBody
 	CNEWTON_API dNewtonDynamicBody(dNewton* const world, dFloat mass, const dNewtonCollision* const collision, void* const userData, const dFloat* const matrix);
 	CNEWTON_API virtual ~dNewtonDynamicBody();
 
-	CNEWTON_API void SetForce (const dFloat* const force);
-	CNEWTON_API void SetTorque (const dFloat* const torque);
-
-	CNEWTON_API void AddForce (const dFloat* const force);
-	CNEWTON_API void AddTorque (const dFloat* const torque);
-
 	CNEWTON_API void GetPointVeloc (const dFloat* const point, dFloat* const veloc) const;
 	CNEWTON_API void ApplyImpulseToDesiredPointVeloc (const dFloat* const point, const dFloat* const desiredveloc);
 

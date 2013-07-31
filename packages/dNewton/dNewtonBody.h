@@ -56,6 +56,16 @@ class dNewtonBody: public dNewtonAlloc, public dNewtonTransformLerp
 
 	CNEWTON_API void SetOmega (const dFloat* const omega);
 	CNEWTON_API void GetOmega (dFloat* const omega) const;
+
+	CNEWTON_API void SetForce (const dFloat* const force);
+	CNEWTON_API void AddForce (const dFloat* const force);
+	//CNEWTON_API void GetForce (dFloat* const force) const;
+
+	CNEWTON_API void SetTorque (const dFloat* const torque);
+	CNEWTON_API void AddTorque (const dFloat* const torque);
+	//CNEWTON_API void GetTorque (dFloat* const torque) const;
+
+	CNEWTON_API void GetCenterOnMass (dFloat* const com) const;
 	CNEWTON_API void GetMassAndInertia (dFloat& mass, dFloat& Ixx, dFloat& Iyy, dFloat& Izz) const;
 
 	// applications can overload this to update game object information each time there transformation changes 
