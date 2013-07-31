@@ -745,16 +745,12 @@ dgFloat32 dgCollisionCompound::GetBoxMaxRadius () const
 
 dgVector dgCollisionCompound::CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& plane) const
 {
-dgAssert (0);
-return dgVector (0.0f);
-/*
 	dgVector totalVolume (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	dgTree<dgNodeBase*, dgInt32>::Iterator iter (m_array);
-	for (iter.Begin(); iter; iter ++)
-	{
+	for (iter.Begin(); iter; iter ++) {
 		dgCollisionConvex* const collision = (dgCollisionConvex*)iter.GetNode()->GetInfo()->GetShape()->GetChildShape();
 		dgMatrix matrix (iter.GetNode()->GetInfo()->GetShape()->m_localMatrix * globalMatrix);
-		dgVector vol (collision->CalculateVolumeIntegral (matrix, bouyancyPlane, context));
+		dgVector vol (collision->CalculateVolumeIntegral (matrix, plane));
 		totalVolume.m_x += vol.m_x * vol.m_w;
 		totalVolume.m_y += vol.m_y * vol.m_w;
 		totalVolume.m_z += vol.m_z * vol.m_w;
@@ -770,7 +766,6 @@ return dgVector (0.0f);
 	totalVolume.m_z *= scale;
 
 	return totalVolume;
-*/
 }
 
 dgFloat32 dgCollisionCompound::CalculateMassProperties (const dgMatrix& offset, dgVector& inertia, dgVector& crossInertia, dgVector& centerOfMass) const
