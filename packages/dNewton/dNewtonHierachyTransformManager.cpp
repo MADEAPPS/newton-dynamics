@@ -27,58 +27,64 @@
 
 
 dNewtonHierachyTransformManager::dNewtonHierachyTransformManager (dNewton* const world)
-	:CustomSkeletonTransformController (world->GetNewton())
+	:CustomSkeletonTransformManager (world->GetNewton())
 {
 }
 
 dNewtonHierachyTransformManager::~dNewtonHierachyTransformManager ()
 {
 }
-/*
-dNewtonHierachyTransformManager::dNewtonTrigger* dNewtonHierachyTransformManager::GetFirstTrigger() const
+
+dNewtonHierachyTransformManager::dNewtonHierachyTransformController* dNewtonHierachyTransformManager::GetFirstController() const
 {
+	dAssert (0);
 	CustomListNode* const node = GetFirst();
 	if (node) {
-		return (dNewtonHierachyTransformManager::dNewtonTrigger*) NewtonBodyGetUserData (node->GetInfo().GetBody());
+		return (dNewtonHierachyTransformManager::dNewtonHierachyTransformController*) NewtonBodyGetUserData (node->GetInfo().GetBody());
 	}
 	return NULL;
 }
 
-dNewtonHierachyTransformManager::dNewtonTrigger* dNewtonHierachyTransformManager::GetNextTrigger(const dNewtonTrigger* const trigger) const
+dNewtonHierachyTransformManager::dNewtonHierachyTransformController* dNewtonHierachyTransformManager::GetNextController(const dNewtonHierachyTransformController* const controller) const
 {
-	dAssert (trigger);
-	dAssert (FindNodeFromInfo(*trigger->m_controller));
-	CustomListNode* const node = GetNodeFromInfo(*trigger->m_controller)->GetNext();
+	dAssert (0);
+	dAssert (controller);
+	dAssert (FindNodeFromInfo(*controller->m_controller));
+	CustomListNode* const node = GetNodeFromInfo(*controller->m_controller)->GetNext();
 	if (node) {
-		return (dNewtonHierachyTransformManager::dNewtonTrigger*) NewtonBodyGetUserData (node->GetInfo().GetBody());
+		return (dNewtonHierachyTransformManager::dNewtonHierachyTransformController*) NewtonBodyGetUserData (node->GetInfo().GetBody());
 	}
 	return NULL;
 }
 
 
-dNewtonHierachyTransformManager::dNewtonTrigger::dNewtonTrigger (dNewtonHierachyTransformManager* const manager, const dNewtonCollision& convexShape, void* const userData, const dFloat* const matrix)
-	:dNewtonKinematicBody()
+dNewtonHierachyTransformManager::dNewtonHierachyTransformController::dNewtonHierachyTransformController (dNewtonHierachyTransformManager* const manager)
+	:dNewtonAlloc()
 {
-	m_controller = manager->CreateTrigger (matrix, convexShape.GetShape(), this);
-	NewtonBody* const body = m_controller->GetBody();
-	SetBody (body);
-	SetUserData (userData);
+	dAssert (0);
+//	m_controller = manager->CreateTrigger (matrix, convexShape.GetShape(), this);
+//	NewtonBody* const body = m_controller->GetBody();
+//	SetBody (body);
+//	SetUserData (userData);
 }
 
-dNewtonHierachyTransformManager::dNewtonTrigger::~dNewtonTrigger ()
+dNewtonHierachyTransformManager::dNewtonHierachyTransformController::~dNewtonHierachyTransformController ()
 {
+	dAssert (0);
+/*
 	NewtonBody* const body = m_controller->GetBody();	
 	if (NewtonBodyGetDestructorCallback(body)) {
 		SetBody(NULL);
 		dNewtonHierachyTransformManager* const manager = (dNewtonHierachyTransformManager*)m_controller->GetManager();
 		manager->DestroyController (m_controller);
 	}
+*/
 }
 
-
+/*
 void dNewtonHierachyTransformManager::EventCallback (const CustomTriggerController* const trigger, TriggerEventType event, NewtonBody* const guess) const
 {
-	dNewtonTrigger* const callback = (dNewtonTrigger*) trigger->GetUserData();
+	dNewtonHierachyTransformController* const callback = (dNewtonHierachyTransformController*) trigger->GetUserData();
 	dNewtonBody* const guessBody = (dNewtonBody*) NewtonBodyGetUserData(guess);
 	switch (event) 
 	{

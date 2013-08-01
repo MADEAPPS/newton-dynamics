@@ -26,14 +26,14 @@
 #include "dStdAfxNewton.h"
 
 
-class dNewtonHierachyTransformManager: public CustomSkeletonTransformController
+class dNewtonHierachyTransformManager: public CustomSkeletonTransformManager
 {
 	public:
 	class dNewtonHierachyTransformController: public dNewtonAlloc
 	{
 		public:
 		CNEWTON_API dNewtonHierachyTransformController (dNewtonHierachyTransformManager* const manager);
-		CNEWTON_API ~dNewtonTrigger ();
+		CNEWTON_API ~dNewtonHierachyTransformController ();
 
 		private:
 		CustomSkeletonTransformController* m_controller;
@@ -44,7 +44,7 @@ class dNewtonHierachyTransformManager: public CustomSkeletonTransformController
 	CNEWTON_API virtual ~dNewtonHierachyTransformManager ();
 
 	CNEWTON_API dNewtonHierachyTransformController* GetFirstController() const;
-	CNEWTON_API dNewtonHierachyTransformController* GetNextController(const dNewtonController* const trigger) const;
+	CNEWTON_API dNewtonHierachyTransformController* GetNextController(const dNewtonHierachyTransformController* const controller) const;
 //	CNEWTON_API virtual void EventCallback (const CustomTriggerController* const trigger, TriggerEventType event, NewtonBody* const guess) const;
 };
 
