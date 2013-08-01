@@ -648,6 +648,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\dNewton\dNewtonHierachyTransformManager.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dNewton\dNewtonHierachyTransformManager.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\dNewton\dNewtonJoint.cpp"
 			>
 		</File>
