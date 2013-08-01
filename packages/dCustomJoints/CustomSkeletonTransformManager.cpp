@@ -59,8 +59,6 @@ void CustomSkeletonTransformController::Init (void* const userData)
 void CustomSkeletonTransformController::PostUpdate(dFloat timestep, int threadIndex)
 {
 	CustomSkeletonTransformManager* const manager = (CustomSkeletonTransformManager*) GetManager();
-//	NewtonWorld* const world = manager->GetWorld();
-
 	for (int i = 0; i < m_boneCount; i ++) {
 		const dSkeletonBone& bone = m_bones[i];
 		dMatrix matrix;
@@ -72,7 +70,6 @@ void CustomSkeletonTransformController::PostUpdate(dFloat timestep, int threadIn
 			NewtonBodyGetMatrix(bone.m_parent->m_body, &parentMatrix[0][0]);
 			manager->UpdateTransform (&bone, matrix * parentMatrix.Inverse() * bone.m_bindMatrix);
 		}
-
 	}
 }
 

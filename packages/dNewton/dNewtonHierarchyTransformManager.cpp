@@ -82,41 +82,16 @@ dNewtonHierarchyTransformManager::dNewtonHierarchyTransformController::~dNewtonH
 	}
 }
 
+
+void* dNewtonHierarchyTransformManager::dNewtonHierarchyTransformController::AddBone (dNewtonBody* const bone, const dFloat* const bindMatrix, void* const parentBone)
+{
+	return m_controller->AddBone (bone->GetNewtonBody(), dMatrix (bindMatrix), (CustomSkeletonTransformController::dSkeletonBone*) parentBone);
+}
+
 void dNewtonHierarchyTransformManager::UpdateTransform (const CustomSkeletonTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
 {
-	dAssert (0);
-
-//	DemoEntity* const ent = (DemoEntity*) NewtonBodyGetUserData(bone->m_body);
-//	DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(bone->m_body));
-	
-//	dQuaternion rot (localMatrix);
-//	ent->SetMatrix (*scene, rot, localMatrix.m_posit);
+	dNewtonBody* const boneBody = (dNewtonBody*)NewtonBodyGetUserData (bone->m_body);
+	dNewtonHierarchyTransformController* const controller = (dNewtonHierarchyTransformController*)bone->m_myController->GetUserData();
+	controller->UpdateTransform(boneBody, &localMatrix[0][0]);
 }
 
-/*
-void dNewtonHierarchyTransformManager::EventCallback (const CustomTriggerController* const trigger, TriggerEventType event, NewtonBody* const guess) const
-{
-	dNewtonHierarchyTransformController* const callback = (dNewtonHierarchyTransformController*) trigger->GetUserData();
-	dNewtonBody* const guessBody = (dNewtonBody*) NewtonBodyGetUserData(guess);
-	switch (event) 
-	{
-		case m_enterTrigger:
-		{
-			callback->OnEnter(guessBody);
-			break;
-		}
-
-		case m_exitTrigger:
-		{
-			callback->OnExit(guessBody);
-			break;
-		}
-
-		case m_inTrigger:
-		{
-			callback->OnInside(guessBody);
-			break;
-		}
-	}
-}
-*/

@@ -25,6 +25,7 @@
 
 #include "dStdAfxNewton.h"
 
+class dNewtonBody;
 
 class dNewtonHierarchyTransformManager: public CustomSkeletonTransformManager
 {
@@ -34,6 +35,9 @@ class dNewtonHierarchyTransformManager: public CustomSkeletonTransformManager
 		public:
 		CNEWTON_API dNewtonHierarchyTransformController (dNewtonHierarchyTransformManager* const manager);
 		CNEWTON_API ~dNewtonHierarchyTransformController ();
+
+		NEWTON_API virtual void UpdateTransform (dNewtonBody* const bone, const dFloat* const localMatrix) = 0;
+		NEWTON_API void* AddBone (dNewtonBody* const bone, const dFloat* const bindMatrix, void* const parentBodne = NULL);
 
 		private:
 		CustomSkeletonTransformController* m_controller;
