@@ -82,9 +82,8 @@ class CustomSkeletonTransformController: public CustomControllerBase
 		dBitFieldMask m_bitField;
 	};
 
-
-	NEWTON_API void SetUserData(void* const userData);
-	NEWTON_API const void* GetUserData() const;
+	NEWTON_API CustomSkeletonTransformController();
+	NEWTON_API ~CustomSkeletonTransformController();
 
 	NEWTON_API dSkeletonBone* AddBone (NewtonBody* const bone, const dMatrix& bindMatrix, dSkeletonBone* const parentBodne = NULL);
 	NEWTON_API void SetDefaultBitFieldMask ();
@@ -98,7 +97,7 @@ class CustomSkeletonTransformController: public CustomControllerBase
 	NEWTON_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 	
 	private:
-	void* m_usertData;
+//	void* m_usertData;
 	int m_boneCount;
 	dSkeletonBone m_bones[D_SKELETON_CONTROLLER_MAX_BONES];
 	friend class CustomSkeletonTransformManager;
@@ -121,16 +120,6 @@ class CustomSkeletonTransformManager: public CustomControllerManager<CustomSkele
 	virtual void Debug () const {};
 	NEWTON_API virtual CustomSkeletonTransformController* CreateTransformController (void* const userData);
 };
-
-inline void CustomSkeletonTransformController::SetUserData(void* const userData)
-{
-	m_usertData = userData;
-}
-
-inline const void* CustomSkeletonTransformController::GetUserData() const
-{
-	return m_usertData;
-}
 
 
 #endif 

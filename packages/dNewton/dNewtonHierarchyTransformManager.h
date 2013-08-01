@@ -26,25 +26,29 @@
 #include "dStdAfxNewton.h"
 
 
-class dNewtonHierachyTransformManager: public CustomSkeletonTransformManager
+class dNewtonHierarchyTransformManager: public CustomSkeletonTransformManager
 {
 	public:
-	class dNewtonHierachyTransformController: public dNewtonAlloc
+	class dNewtonHierarchyTransformController: public dNewtonAlloc
 	{
 		public:
-		CNEWTON_API dNewtonHierachyTransformController (dNewtonHierachyTransformManager* const manager);
-		CNEWTON_API ~dNewtonHierachyTransformController ();
+		CNEWTON_API dNewtonHierarchyTransformController (dNewtonHierarchyTransformManager* const manager);
+		CNEWTON_API ~dNewtonHierarchyTransformController ();
 
 		private:
 		CustomSkeletonTransformController* m_controller;
-		friend class dNewtonHierachyTransformManager;
+		friend class dNewtonHierarchyTransformManager;
 	};
 
-	CNEWTON_API dNewtonHierachyTransformManager (dNewton* const world);
-	CNEWTON_API virtual ~dNewtonHierachyTransformManager ();
+	CNEWTON_API dNewtonHierarchyTransformManager (dNewton* const world);
+	CNEWTON_API virtual ~dNewtonHierarchyTransformManager ();
 
-	CNEWTON_API dNewtonHierachyTransformController* GetFirstController() const;
-	CNEWTON_API dNewtonHierachyTransformController* GetNextController(const dNewtonHierachyTransformController* const controller) const;
+	NEWTON_API virtual void UpdateTransform (const CustomSkeletonTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const;
+	NEWTON_API void DestroyController (CustomSkeletonTransformController* const controller);
+
+
+	CNEWTON_API dNewtonHierarchyTransformController* GetFirstController() const;
+	CNEWTON_API dNewtonHierarchyTransformController* GetNextController(const dNewtonHierarchyTransformController* const controller) const;
 //	CNEWTON_API virtual void EventCallback (const CustomTriggerController* const trigger, TriggerEventType event, NewtonBody* const guess) const;
 };
 

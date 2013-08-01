@@ -40,11 +40,19 @@ void CustomSkeletonTransformManager::PostUpdate(dFloat timestep)
 	CustomControllerManager<CustomSkeletonTransformController>::PostUpdate(timestep);
 }
 
+CustomSkeletonTransformController::CustomSkeletonTransformController()
+{
+}
+
+CustomSkeletonTransformController::~CustomSkeletonTransformController()
+{
+}
+
 
 void CustomSkeletonTransformController::Init (void* const userData)
 {
 	m_boneCount = 0;
-	m_usertData = userData;
+	m_userData = userData;
 }
 
 
