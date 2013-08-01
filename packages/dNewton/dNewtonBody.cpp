@@ -136,6 +136,17 @@ void dNewtonBody::GetCenterOnMass (dFloat* const com) const
 	NewtonBodyGetCentreOfMass (m_body, com);
 }
 
+void dNewtonBody::SetCCDMode (bool mode)
+{
+	NewtonBodySetContinuousCollisionMode(m_body, mode ? 1 : 0);
+}
+
+bool dNewtonBody::GetCCDMode () const
+{
+	return NewtonBodyGetContinuousCollisionMode(m_body) ? true : false;
+}
+
+
 void dNewtonBody::GetMassAndInertia (dFloat& mass, dFloat& Ixx, dFloat& Iyy, dFloat& Izz) const
 {
 	NewtonBodyGetMassMatrix(m_body, &mass, &Ixx, &Iyy, &Izz);

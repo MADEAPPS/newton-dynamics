@@ -68,6 +68,9 @@ class dNewtonBody: public dNewtonAlloc, public dNewtonTransformLerp
 	CNEWTON_API void GetCenterOnMass (dFloat* const com) const;
 	CNEWTON_API void GetMassAndInertia (dFloat& mass, dFloat& Ixx, dFloat& Iyy, dFloat& Izz) const;
 
+	CNEWTON_API void SetCCDMode (bool mode);
+	CNEWTON_API bool GetCCDMode () const;
+
 	// applications can overload this to update game object information each time there transformation changes 
 	CNEWTON_API virtual void OnApplicationPostTransform (dFloat timestep) {};
 
