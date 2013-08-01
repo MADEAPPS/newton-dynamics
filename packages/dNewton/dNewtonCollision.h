@@ -387,6 +387,8 @@ class dNewtonCollisionConvexHull: public dNewtonCollision
 		SetShape (shape);
 	}
 
+	CNEWTON_API dNewtonCollisionConvexHull (dNewton* const world, const dNewtonMesh& mesh, int id);
+
 
 	dNewtonCollisionConvexHull (dNewton* const world, int vertexCount, const dFloat* const vertexCloud, int strideInBytes, dFloat tolerance, int shapeID)
 		:dNewtonCollision(m_convex)

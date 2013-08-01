@@ -182,6 +182,12 @@ void dNewtonCollisionScene::EndAddRemoveCollision()
 }
 
 
+dNewtonCollisionConvexHull::dNewtonCollisionConvexHull (dNewton* const world, const dNewtonMesh& mesh, int id)
+	:dNewtonCollision(m_convex)
+{
+	SetShape (NewtonCreateConvexHullFromMesh (world->GetNewton(), mesh.GetMesh(), 0.001f, id));
+}
+
 dNewtonCollisionCompound::dNewtonCollisionCompound (dNewton* const world, const dNewtonMesh& mesh, int shapeID)
 	:dNewtonCollision(m_compound)
 {
