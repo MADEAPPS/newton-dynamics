@@ -66,6 +66,7 @@ class dNewtonCollision: public dNewtonAlloc
 	CNEWTON_API dNewtonCollision (dCollsionType type);
 	CNEWTON_API virtual ~dNewtonCollision();
 
+	dCollsionType GetType() const {return m_type;}
 	CNEWTON_API NewtonCollision* GetShape() const;
 	virtual dNewtonCollision* Clone (NewtonCollision* const shape) const = 0; 
 
@@ -94,7 +95,7 @@ class dNewtonCollision: public dNewtonAlloc
 	NewtonCollision* m_shape;
 	void* m_userData;
 	dCollsionType m_type;
-	friend dNewton;
+	friend class dNewton;
 };
 
 
