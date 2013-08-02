@@ -42,14 +42,6 @@ class dNewton: public dNewtonAlloc
 	CNEWTON_API dNewton();
 	CNEWTON_API virtual ~dNewton();
 
-	CNEWTON_API virtual void OnBeginUpdate (dFloat timestepInSecunds) 
-	{
-	}
-
-	CNEWTON_API virtual void OnEndUpdate (dFloat timestepInSecunds)
-	{
-	}
-
 	CNEWTON_API virtual void Update (dFloat timestepInSecunds);
 	CNEWTON_API virtual void UpdateAsync (dFloat timestepInSecunds);
 	CNEWTON_API void WaitForUpdateToFinish ();

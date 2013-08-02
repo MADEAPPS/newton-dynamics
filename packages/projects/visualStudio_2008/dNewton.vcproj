@@ -656,6 +656,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\dNewton\dNewtonInputManager.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dNewton\dNewtonInputManager.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\dNewton\dNewtonJoint.cpp"
 			>
 		</File>
