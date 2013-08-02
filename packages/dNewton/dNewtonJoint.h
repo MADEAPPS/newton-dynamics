@@ -34,9 +34,8 @@ class dNewtonJoint: public dNewtonAlloc
 	enum dJointType
 	{
 		m_ballAndSocket,
-//		m_dynamic,
-//		m_kinematic,
-//		m_unknown,
+		m_hinge,
+		m_unknown,
 	};
 	
 	CNEWTON_API virtual ~dNewtonJoint();
@@ -56,13 +55,23 @@ class dNewtonJoint: public dNewtonAlloc
 	CustomJoint* m_joint;
 };
 
-class dNewtonBandAndSocketJoint: public dNewtonJoint 
+class dNewtonBallAndSocketJoint: public dNewtonJoint 
 {
 	public:
-	CNEWTON_API dNewtonBandAndSocketJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1 = NULL)
+	CNEWTON_API dNewtonBallAndSocketJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1 = NULL)
 		:dNewtonJoint(m_ballAndSocket)
 	{
 		SetJoint (new CustomBallAndSocket (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
+	}
+};
+
+class dNewtonHingeJoint: public dNewtonJoint 
+{
+	public:
+	CNEWTON_API dNewtonHingeJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1 = NULL)
+		:dNewtonJoint(m_hinge)
+	{
+		SetJoint (new CustomHinge (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
 	}
 };
 

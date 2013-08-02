@@ -64,6 +64,7 @@
 #include <stdlib.h>
 #include <Newton.h>
 #include <CustomJoint.h>
+#include <CustomHinge.h>
 #include <CustomBallAndSocket.h>
 #include <CustomTriggerManager.h>
 #include <CustomControllerManager.h>
