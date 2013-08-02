@@ -55,4 +55,7 @@ void dNewtonJoint::OnJointDestroyCallback (const NewtonUserJoint* const me)
 
 void dNewtonJoint::OnSubmitConstraintCallback (const NewtonUserJoint* const me, dFloat timestep, int threadIndex)
 {
+	CustomJoint* const customJoint = (CustomJoint*)me;
+	dNewtonJoint* const joint = (dNewtonJoint*) customJoint->GetUserData();
+	joint->OnSubmitConstraint (timestep, threadIndex);
 }

@@ -47,6 +47,10 @@ class dNewtonJoint: public dNewtonAlloc
 	{
 	}
 
+	CNEWTON_API virtual void OnSubmitConstraint (dFloat timestep, int threadIndex)
+	{
+	}
+
 	CNEWTON_API void SetJoint(CustomJoint* const joint);
 	CNEWTON_API static void OnJointDestroyCallback (const NewtonUserJoint* const me);
 	CNEWTON_API static void OnSubmitConstraintCallback (const NewtonUserJoint* const me, dFloat timestep, int threadIndex);
