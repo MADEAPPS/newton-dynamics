@@ -35,12 +35,22 @@ void dNewtonJoint::SetJoint(CustomJoint* const joint)
 
 dNewtonJoint::~dNewtonJoint()
 {
-	dAssert (0);
+	if (m_joint && m_joint->GetUserData()) {
+		m_joint->SetUserData (NULL);
+		m_joint->SetUserDestructorCallback (NULL);
+		m_joint->SetUserSubmintConstraintCallback (NULL);
+		delete m_joint;
+	}
 }
 
 void dNewtonJoint::OnJointDestroyCallback (const NewtonUserJoint* const me)
 {
-	dAssert (0);
+	CustomJoint* const customJoint = (CustomJoint*)me;
+
+	dNewtonJoint* const joint = (dNewtonJoint*) customJoint->GetUserData();
+	joint->m_joint = NULL;
+	customJoint->SetUserData(NULL);
+	delete joint;
 }
 
 void dNewtonJoint::OnSubmitConstraintCallback (const NewtonUserJoint* const me, dFloat timestep, int threadIndex)
