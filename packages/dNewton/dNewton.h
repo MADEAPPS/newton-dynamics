@@ -57,6 +57,13 @@ class dNewton: public dNewtonAlloc
 	CNEWTON_API int GetBodyCount() const;
 	CNEWTON_API void DestroyAllBodies();
 
+//	CNEWTON_API int OnBodiesAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex);
+	CNEWTON_API virtual int OnBodiesAABBOverlap (const dNewtonBody* const body0, const dNewtonBody* const body1, int threadIndex)
+	{
+		return 1;
+	}
+
+
 	protected:
 	CNEWTON_API void ResetTimer();
 	CNEWTON_API dLong GetTimeInMicrosenconds() const; 
@@ -64,7 +71,7 @@ class dNewton: public dNewtonAlloc
 	private:
 	CNEWTON_API static void OnCollisionDestructorCallback (const NewtonWorld* const newtonWorld, const NewtonCollision* const collision);
 	CNEWTON_API static void OnCollisionCopyConstruct (const NewtonWorld* const newtonWorld, NewtonCollision* const collision, const NewtonCollision* const sourceCollision);
-	
+	CNEWTON_API static int OnBodiesAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex);
 
 	NewtonWorld* m_world;
 	dLong m_frequency;

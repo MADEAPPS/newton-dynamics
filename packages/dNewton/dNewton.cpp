@@ -56,7 +56,11 @@ dNewton::dNewton()
 	// set the collision copy constructor callback
 	NewtonWorldSetCollisionConstructorDestuctorCallback (m_world, OnCollisionCopyConstruct, OnCollisionDestructorCallback);
 
-	// set th timer
+	// use defualt material to implemnet traditonal "Game style" one side material system
+	int defaultMaterial = NewtonMaterialGetDefaultGroupID (m_world);
+	NewtonMaterialSetCollisionCallback (m_world, defaultMaterial, defaultMaterial, m_world, OnBodiesAABBOverlap, NULL);
+
+	// set the timer
 	ResetTimer();
 }
 
@@ -71,6 +75,14 @@ void dNewton::SetMaxUpdatesPerIterations (int update)
 	m_maxUpdatePerIterations = update;
 }
 
+int dNewton::OnBodiesAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
+{
+	dAssert (NewtonBodyGetWorld (body0) == NewtonBodyGetWorld (body1));
+	dNewton* const world = (dNewton*) NewtonWorldGetUserData(NewtonBodyGetWorld (body0));
+	dNewtonBody* const dBody0 = (dNewtonBody*) NewtonBodyGetUserData (body0);
+	dNewtonBody* const dBody1 = (dNewtonBody*) NewtonBodyGetUserData (body1);
+	return world->OnBodiesAABBOverlap(dBody0, dBody1, threadIndex);
+}
 
 void dNewton::OnCollisionDestructorCallback (const NewtonWorld* const newtonWorld, const NewtonCollision* const collision)
 {
@@ -220,3 +232,5 @@ void dNewton::UpdateAsync (dFloat timestepInSecunds)
 		m_microseconds += timestepMicrosecunds;
 	}
 }
+
+

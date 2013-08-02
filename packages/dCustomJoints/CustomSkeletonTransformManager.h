@@ -36,7 +36,7 @@ class CustomSkeletonTransformController: public CustomControllerBase
 
 		void GetAddress (int id, int& index, int& shift) const
 		{
-			int bits = 8 * sizeof (long long);
+			int bits = 8 * sizeof (dLong);
 			shift = id & (bits - 1);
 			index = id / (bits * sizeof (m_mask) / sizeof (m_mask[0]));
 		}
@@ -47,7 +47,7 @@ class CustomSkeletonTransformController: public CustomControllerBase
 			int index;
 			int shift;
 			GetAddress (id, index, shift);
-			long long bit = 1;
+			dLong bit = 1;
 			m_mask[index] |= (bit << shift);
 		}
 
@@ -56,7 +56,7 @@ class CustomSkeletonTransformController: public CustomControllerBase
 			int index;
 			int shift;
 			GetAddress (id, index, shift);
-			long long bit = 1;
+			dLong bit = 1;
 			m_mask[index] &= ~(bit << shift);
 		}
 
@@ -65,11 +65,11 @@ class CustomSkeletonTransformController: public CustomControllerBase
 			int index;
 			int shift;
 			GetAddress (id, index, shift);
-			long long bit = 1;
+			dLong bit = 1;
 			return (m_mask[index] & (bit << shift)) ? true : false;
 		}
 
-		long long m_mask [D_SKELETON_CONTROLLER_MAX_BONES / (8 * sizeof (long long))];
+		dLong m_mask [D_SKELETON_CONTROLLER_MAX_BONES / (8 * sizeof (dLong))];
 	};
 
 	class dSkeletonBone
@@ -97,7 +97,6 @@ class CustomSkeletonTransformController: public CustomControllerBase
 	NEWTON_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 	
 	private:
-//	void* m_usertData;
 	int m_boneCount;
 	dSkeletonBone m_bones[D_SKELETON_CONTROLLER_MAX_BONES];
 	friend class CustomSkeletonTransformManager;
