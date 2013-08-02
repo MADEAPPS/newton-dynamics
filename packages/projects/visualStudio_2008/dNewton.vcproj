@@ -607,6 +607,26 @@
 	<References>
 	</References>
 	<Files>
+		<Filter
+			Name="dJoints"
+			>
+			<File
+				RelativePath="..\..\dNewton\dNewtonActuatorJoints.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dNewton\dNewtonActuatorJoints.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dNewton\dNewtonJoint.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dNewton\dNewtonJoint.h"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath="..\..\dNewton\dNewton.cpp"
 			>
@@ -661,14 +681,6 @@
 		</File>
 		<File
 			RelativePath="..\..\dNewton\dNewtonInputManager.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dNewton\dNewtonJoint.cpp"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dNewton\dNewtonJoint.h"
 			>
 		</File>
 		<File
