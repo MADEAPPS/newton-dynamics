@@ -108,7 +108,7 @@ class RagDollManager: public CustomSkeletonTransformManager
 		dAssert (bone0);
 		dAssert (bone1);
 		if (bone0->m_myController == bone1->m_myController) {
-			return bone0->m_myController->TestCollisionMask (bone0, bone1) ? 1 : 0;
+			return bone0->m_myController->SelfCollisionTest (bone0, bone1) ? 1 : 0;
 		}
 
 		return 1;
@@ -327,7 +327,7 @@ class RagDollManager: public CustomSkeletonTransformManager
 
 		// set the collision mask
 		// note this container work best with a material call back for setting bit field 
-		controller->SetDefaultBitFieldMask ();
+		controller->SetDefaultSelfCollisionMask ();
 
 		// transform the entire contraction to its location
 		dMatrix worldMatrix (rootEntity->GetCurrentMatrix() * location);

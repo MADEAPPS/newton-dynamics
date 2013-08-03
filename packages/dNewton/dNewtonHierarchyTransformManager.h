@@ -37,7 +37,12 @@ class dNewtonHierarchyTransformManager: public CustomSkeletonTransformManager
 		CNEWTON_API ~dNewtonHierarchyTransformController ();
 
 		NEWTON_API virtual void UpdateTransform (dNewtonBody* const bone, const dFloat* const localMatrix) = 0;
-		NEWTON_API void* AddBone (dNewtonBody* const bone, const dFloat* const bindMatrix, void* const parentBodne = NULL);
+		NEWTON_API virtual void* AddBone (dNewtonBody* const bone, const dFloat* const bindMatrix, void* const parentBodne = NULL);
+
+		NEWTON_API void DisableAllSelfCollision ();
+		NEWTON_API void SetDefaultSelfCollisionMask ();
+		NEWTON_API void SetSelfCollisionMask (void* const boneNode0, void* const boneNode1, bool mode);
+		NEWTON_API bool SelfCollisionTest (const void* const boneNode0, const void* const boneNode1) const;
 
 		private:
 		CustomSkeletonTransformController* m_controller;
@@ -47,13 +52,16 @@ class dNewtonHierarchyTransformManager: public CustomSkeletonTransformManager
 	CNEWTON_API dNewtonHierarchyTransformManager (dNewton* const world);
 	CNEWTON_API virtual ~dNewtonHierarchyTransformManager ();
 
+	NEWTON_API void DisableAllSelfCollision (CustomSkeletonTransformController* const controller);
+	NEWTON_API void SetDefaultSelfCollisionMask (CustomSkeletonTransformController* const controller);
+	NEWTON_API void SetSelfCollisionMask (void* const boneNode0, void* const boneNode1, bool mode);
+	NEWTON_API bool SelfCollisionTest (const void* const boneNode0, const void* const boneNode1) const;
+
 	NEWTON_API virtual void UpdateTransform (const CustomSkeletonTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const;
 	NEWTON_API void DestroyController (CustomSkeletonTransformController* const controller);
 
-
 	CNEWTON_API dNewtonHierarchyTransformController* GetFirstController() const;
 	CNEWTON_API dNewtonHierarchyTransformController* GetNextController(const dNewtonHierarchyTransformController* const controller) const;
-//	CNEWTON_API virtual void EventCallback (const CustomTriggerController* const trigger, TriggerEventType event, NewtonBody* const guess) const;
 };
 
 
