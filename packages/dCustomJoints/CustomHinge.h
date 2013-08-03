@@ -34,6 +34,7 @@ class CustomHinge: public CustomJoint
 	NEWTON_API dFloat GetJointAngle () const;
 	NEWTON_API dVector GetPinAxis () const;
 	NEWTON_API dFloat GetJointOmega () const;
+	NEWTON_API void CalculateGlobalMatrix(dMatrix& matrix0, dMatrix& matrix1) const;
 
 	protected:
 	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;

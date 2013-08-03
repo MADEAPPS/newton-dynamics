@@ -37,16 +37,17 @@ class dNewtonHingeActuator: public dNewtonHingeJoint
 	{
 	}
 
-	CNEWTON_API dFloat GetAngle() const
+	CNEWTON_API dFloat GetTargetAngle() const
 	{
 		return m_angle;
 	}
 
-	CNEWTON_API void Setangle(dFloat angle)
+	CNEWTON_API void SetTargetAngle(dFloat angle)
 	{
 		m_angle = dClamp (angle, m_minAngle, m_maxAngle);
 	}
 	
+	CNEWTON_API dFloat GetActuatorAngle() const;
 	CNEWTON_API virtual void OnSubmitConstraint (dFloat timestep, int threadIndex);
 
 	private:
