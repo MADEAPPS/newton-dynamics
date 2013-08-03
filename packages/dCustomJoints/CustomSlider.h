@@ -28,8 +28,11 @@ class CustomSlider: public CustomJoint
 
 	NEWTON_API void EnableLimits(bool state);
 	NEWTON_API void SetLimis(dFloat mindist, dFloat maxdist);
-
 	NEWTON_API bool JoinHitLimit () const ;
+
+	NEWTON_API dFloat GetJointPosit () const;
+	NEWTON_API dFloat GetJointSpeed () const;
+	NEWTON_API void CalculateGlobalMatrix(dMatrix& matrix0, dMatrix& matrix1) const;
 	
 	protected:
 	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);

@@ -43,43 +43,31 @@ void dNewtonHingeActuator::OnSubmitConstraint (dFloat timestep, int threadIndex)
 	dMatrix matrix1;
 	hinge->CalculateGlobalMatrix (matrix0, matrix1);
 
-/*
-	// the joint angle can be determine by getting the angle between any two non parallel vectors
-	if (angle < m_minAngle) {
-		dFloat relAngle = angle - m_minAngle;
-		// the angle was clipped save the new clip limit
-		m_curJointAngle.m_angle = m_minAngle;
-
-		// tell joint error will minimize the exceeded angle error
-		NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix0.m_front[0]);
-
-		// need high stiffness here
-		NewtonUserJointSetRowStiffness (m_joint, 1.0f);
-
-		// allow the joint to move back freely 
-		NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
-
-	} else if (angle  > m_maxAngle) {
-		dFloat relAngle = angle - m_maxAngle;
-
-		// the angle was clipped save the new clip limit
-		m_curJointAngle.m_angle = m_maxAngle;
-
-		// tell joint error will minimize the exceeded angle error
-		NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix0.m_front[0]);
-
-		// need high stiffness here
-		NewtonUserJointSetRowStiffness (m_joint, 1.0f);
-
-		// allow the joint to move back freely
-		NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
-
-	} else {
-		dFloat relAngle = angle - m_angle;
-		NewtonUserJointAddAngularRow (joint, relAngle, &matrix0.m_front[0]);
-	}
-*/
-
 	dFloat relAngle = angle - m_angle;
 	NewtonUserJointAddAngularRow (joint, relAngle, &matrix0.m_front[0]);
+}
+
+
+dFloat dNewtonSliderActuator::GetActuatorPosit() const
+{
+	CustomSlider* const slider = (CustomSlider*) m_joint;
+	return slider->GetJointPosit();
+}
+
+void dNewtonSliderActuator::OnSubmitConstraint (dFloat timestep, int threadIndex)
+{
+	dNewtonSliderJoint::OnSubmitConstraint (timestep, threadIndex);
+
+	CustomSlider* const hinge = (CustomSlider*) m_joint;
+	NewtonJoint* const joint = m_joint->GetJoint();
+
+	dFloat posit = hinge->GetJointPosit();
+
+	dMatrix matrix0;
+	dMatrix matrix1;
+	hinge->CalculateGlobalMatrix (matrix0, matrix1);
+
+	dFloat relPosit = posit - m_posit;
+	dVector posit1 (matrix0.m_posit - matrix0.m_front.Scale (relPosit));
+	NewtonUserJointAddLinearRow (joint, &matrix0.m_posit[0], &posit1[0], &matrix0.m_front[0]);
 }

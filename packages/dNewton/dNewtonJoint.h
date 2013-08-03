@@ -35,6 +35,10 @@ class dNewtonJoint: public dNewtonAlloc
 	{
 		m_ballAndSocket,
 		m_hinge,
+		m_slider,
+
+
+		m_hingeActuator,
 		m_unknown,
 	};
 	
@@ -78,5 +82,16 @@ class dNewtonHingeJoint: public dNewtonJoint
 		SetJoint (new CustomHinge (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
 	}
 };
+
+class dNewtonSliderJoint: public dNewtonJoint 
+{
+	public:
+	CNEWTON_API dNewtonSliderJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1 = NULL)
+		:dNewtonJoint(m_slider)
+	{
+		SetJoint (new CustomSlider (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
+	}
+};
+
 
 #endif
