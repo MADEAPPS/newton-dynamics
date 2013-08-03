@@ -58,7 +58,8 @@ dNewton::dNewton()
 
 	// use defualt material to implemnet traditonal "Game style" one side material system
 	int defaultMaterial = NewtonMaterialGetDefaultGroupID (m_world);
-	NewtonMaterialSetCollisionCallback (m_world, defaultMaterial, defaultMaterial, m_world, OnBodiesAABBOverlap, NULL);
+	NewtonMaterialSetCompoundCollisionCallback(m_world, defaultMaterial, defaultMaterial, OnCompoundSubCollisionAABBOverlap);
+	NewtonMaterialSetCollisionCallback (m_world, defaultMaterial, defaultMaterial, m_world, OnBodiesAABBOverlap, OnContactProcess);
 
 	// set the timer
 	ResetTimer();
@@ -81,7 +82,34 @@ int dNewton::OnBodiesAABBOverlap (const NewtonMaterial* const material, const Ne
 	dNewton* const world = (dNewton*) NewtonWorldGetUserData(NewtonBodyGetWorld (body0));
 	dNewtonBody* const dBody0 = (dNewtonBody*) NewtonBodyGetUserData (body0);
 	dNewtonBody* const dBody1 = (dNewtonBody*) NewtonBodyGetUserData (body1);
-	return world->OnBodiesAABBOverlap(dBody0, dBody1, threadIndex);
+
+	return world->OnBodiesAABBOverlap(NULL, dBody0, dBody1, threadIndex);
+}
+
+int dNewton::OnCompoundSubCollisionAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const void* const collisionNode0, const NewtonBody* const body1, const void* const collisionNode1, int threadIndex)
+{
+	dAssert (NewtonBodyGetWorld (body0) == NewtonBodyGetWorld (body1));
+	dNewton* const world = (dNewton*) NewtonWorldGetUserData(NewtonBodyGetWorld (body0));
+	dNewtonBody* const dBody0 = (dNewtonBody*) NewtonBodyGetUserData (body0);
+	dNewtonBody* const dBody1 = (dNewtonBody*) NewtonBodyGetUserData (body1);
+
+	NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
+	NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
+	NewtonCollision* const subCollision0 = collisionNode0 ? (NewtonCollision*) NewtonCompoundCollisionGetCollisionFromNode (collision0, (void*)collisionNode0) : collision0;
+	NewtonCollision* const subCollision1 = collisionNode1 ? (NewtonCollision*) NewtonCompoundCollisionGetCollisionFromNode (collision1, (void*)collisionNode1) : collision1;
+
+	dNewtonCollision* const dsubCollision0 = (dNewtonCollision*)NewtonCollisionGetUserData(subCollision0);
+	dNewtonCollision* const dsubCollision1 = (dNewtonCollision*)NewtonCollisionGetUserData(subCollision1);
+	dAssert (dsubCollision0);
+	dAssert (dsubCollision1);
+	return world->OnCompoundSubCollisionAABBOverlap (NULL, dBody0, dsubCollision0, dBody1, dsubCollision1, threadIndex);
+}
+
+void dNewton::OnContactProcess (const NewtonJoint* const contact, dFloat timestep, int threadIndex)
+{
+	NewtonBody* const body = NewtonJointGetBody0 (contact);
+	dNewton* const world = (dNewton*) NewtonWorldGetUserData(NewtonBodyGetWorld (body));
+	world->OnContactProcess ((dNewtonContactMaterial*)NULL, timestep, threadIndex);
 }
 
 void dNewton::OnCollisionDestructorCallback (const NewtonWorld* const newtonWorld, const NewtonCollision* const collision)

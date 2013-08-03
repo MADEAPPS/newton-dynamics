@@ -127,7 +127,7 @@ void dgCollisionScene::CollidePair (dgCollidingPairCollector::dgPair* const pair
 					dgAssert (!me->m_right);
 					bool processContacts = true;
 					if (material->m_compoundAABBOverlap) {
-						processContacts = material->m_compoundAABBOverlap (*material, sceneBody, me, otherBody, NULL, proxy.m_threadIndex);
+						processContacts = material->m_compoundAABBOverlap (*material, sceneBody, me->m_myNode, otherBody, NULL, proxy.m_threadIndex);
 					}
 
 					if (processContacts) {
@@ -178,7 +178,7 @@ void dgCollisionScene::CollidePair (dgCollidingPairCollector::dgPair* const pair
 					dgAssert (!me->m_right);
 					bool processContacts = true;
 					if (material->m_compoundAABBOverlap) {
-						processContacts = material->m_compoundAABBOverlap (*material, sceneBody, me, otherBody, NULL, proxy.m_threadIndex);
+						processContacts = material->m_compoundAABBOverlap (*material, sceneBody, me->m_myNode, otherBody, NULL, proxy.m_threadIndex);
 					}
 
 					if (processContacts) {
@@ -267,7 +267,7 @@ void dgCollisionScene::CollideCompoundPair (dgCollidingPairCollector::dgPair* co
 
 					bool processContacts = true;
 					if (material->m_compoundAABBOverlap) {
-						processContacts = material->m_compoundAABBOverlap (*material, myBody, me, otherBody, other, proxy.m_threadIndex);
+						processContacts = material->m_compoundAABBOverlap (*material, myBody, me->m_myNode, otherBody, other->m_myNode, proxy.m_threadIndex);
 					}
 
 					if (processContacts) {

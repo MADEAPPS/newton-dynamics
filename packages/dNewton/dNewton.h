@@ -26,6 +26,9 @@
 #include "dNewtonAlloc.h"
 
 class dNewtonBody;
+class dNewtonMaterial;
+class dNewtonCollision;
+class dNewtonContactMaterial;
 
 class dNewton: public dNewtonAlloc
 {
@@ -57,12 +60,20 @@ class dNewton: public dNewtonAlloc
 	CNEWTON_API int GetBodyCount() const;
 	CNEWTON_API void DestroyAllBodies();
 
-//	CNEWTON_API int OnBodiesAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex);
-	CNEWTON_API virtual int OnBodiesAABBOverlap (const dNewtonBody* const body0, const dNewtonBody* const body1, int threadIndex)
+	CNEWTON_API virtual int OnBodiesAABBOverlap (const dNewtonMaterial* const material, const dNewtonBody* const body0, const dNewtonBody* const body1, int threadIndex)
 	{
 		return 1;
 	}
 
+	CNEWTON_API virtual int OnCompoundSubCollisionAABBOverlap (const dNewtonMaterial* const material, const dNewtonBody* const body0, const dNewtonCollision* const subShape0, const dNewtonBody* const body1, const dNewtonCollision* const subShape1, int threadIndex)
+	{
+		return 1;
+	}
+
+
+	CNEWTON_API virtual void OnContactProcess (dNewtonContactMaterial* const contacts, dFloat timestep, int threadIndex)
+	{
+	}
 
 	protected:
 	CNEWTON_API void ResetTimer();
@@ -72,6 +83,8 @@ class dNewton: public dNewtonAlloc
 	CNEWTON_API static void OnCollisionDestructorCallback (const NewtonWorld* const newtonWorld, const NewtonCollision* const collision);
 	CNEWTON_API static void OnCollisionCopyConstruct (const NewtonWorld* const newtonWorld, NewtonCollision* const collision, const NewtonCollision* const sourceCollision);
 	CNEWTON_API static int OnBodiesAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex);
+	CNEWTON_API static int OnCompoundSubCollisionAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const void* const collsionNode0, const NewtonBody* const body1, const void* const collsionNode1, int threadIndex);
+	CNEWTON_API static void OnContactProcess (const NewtonJoint* const contact, dFloat timestep, int threadIndex);
 
 	NewtonWorld* m_world;
 	dLong m_frequency;

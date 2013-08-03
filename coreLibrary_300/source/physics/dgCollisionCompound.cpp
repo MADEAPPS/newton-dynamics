@@ -1822,7 +1822,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingle (dgCollidingPairCollector
 				if (subShape->GetCollisionMode()) {
 					bool processContacts = true;
 					if (material->m_compoundAABBOverlap) {
-						processContacts = material->m_compoundAABBOverlap (*material, compoundBody, me, otherBody, NULL, proxy.m_threadIndex);
+						processContacts = material->m_compoundAABBOverlap (*material, compoundBody, me->m_myNode, otherBody, NULL, proxy.m_threadIndex);
 					}
 					if (processContacts) {
 						dgCollisionInstance childInstance (*subShape, subShape->GetChildShape());
@@ -1919,7 +1919,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgCollidingPairCo
 				if (subShape->GetCollisionMode()) {
 					bool processContacts = true;
 					if (material->m_compoundAABBOverlap) {
-						processContacts = material->m_compoundAABBOverlap (*material, compoundBody, me, otherBody, NULL, proxy.m_threadIndex);
+						processContacts = material->m_compoundAABBOverlap (*material, compoundBody, me->m_myNode, otherBody, NULL, proxy.m_threadIndex);
 					}
 					if (processContacts) {
 						dgCollisionInstance childInstance (*subShape, subShape->GetChildShape());
@@ -2025,7 +2025,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompound (dgCollidingPairCollect
 			if ((me->m_type == m_leaf) && (other->m_type == m_leaf)) {
 				bool processContacts = true;
 				if (material->m_compoundAABBOverlap) {
-					processContacts = material->m_compoundAABBOverlap (*material, myBody, me, otherBody, other, proxy.m_threadIndex);
+					processContacts = material->m_compoundAABBOverlap (*material, myBody, me->m_myNode, otherBody, other->m_myNode, proxy.m_threadIndex);
 				}
 				if (processContacts) {
 					if (me->GetShape()->GetCollisionMode() & other->GetShape()->GetCollisionMode()) {
@@ -2193,7 +2193,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTree (dgCollidingPairCo
 				if (subShape->GetCollisionMode()) {
 					bool processContacts = true;
 					if (material->m_compoundAABBOverlap) {
-						processContacts = material->m_compoundAABBOverlap (*material, myBody, me, treeBody, NULL, proxy.m_threadIndex);
+						processContacts = material->m_compoundAABBOverlap (*material, myBody, me->m_myNode, treeBody, NULL, proxy.m_threadIndex);
 					}
 					if (processContacts) {
 						dgCollisionInstance childInstance (*subShape, subShape->GetChildShape());
@@ -2471,7 +2471,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToHeightField (dgCollidingPairColl
 				if (subShape->GetCollisionMode()) {
 					bool processContacts = true;
 					if (material->m_compoundAABBOverlap) {
-						processContacts = material->m_compoundAABBOverlap (*material, myBody, me, terrainBody, NULL, proxy.m_threadIndex);
+						processContacts = material->m_compoundAABBOverlap (*material, myBody, me->m_myNode, terrainBody, NULL, proxy.m_threadIndex);
 					}
 					if (processContacts) {
 						dgCollisionInstance childInstance (*subShape, subShape->GetChildShape());
@@ -2565,7 +2565,7 @@ dgInt32 dgCollisionCompound::CalculateContactsUserDefinedCollision (dgCollidingP
 				if (subShape->GetCollisionMode()) {
 					bool processContacts = true;
 					if (material->m_compoundAABBOverlap) {
-						processContacts = material->m_compoundAABBOverlap (*material, myBody, me, userBody, NULL, proxy.m_threadIndex);
+						processContacts = material->m_compoundAABBOverlap (*material, myBody, me->m_myNode, userBody, NULL, proxy.m_threadIndex);
 					}
 					if (processContacts) {
 						dgCollisionInstance childInstance (*subShape, subShape->GetChildShape());
