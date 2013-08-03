@@ -43,10 +43,9 @@ void dNewtonHingeActuator::OnSubmitConstraint (dFloat timestep, int threadIndex)
 	dMatrix matrix1;
 	hinge->CalculateGlobalMatrix (matrix0, matrix1);
 
+/*
 	// the joint angle can be determine by getting the angle between any two non parallel vectors
 	if (angle < m_minAngle) {
-		dAssert(0);
-/*
 		dFloat relAngle = angle - m_minAngle;
 		// the angle was clipped save the new clip limit
 		m_curJointAngle.m_angle = m_minAngle;
@@ -59,11 +58,8 @@ void dNewtonHingeActuator::OnSubmitConstraint (dFloat timestep, int threadIndex)
 
 		// allow the joint to move back freely 
 		NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
-*/
 
 	} else if (angle  > m_maxAngle) {
-		dAssert(0);
-/*
 		dFloat relAngle = angle - m_maxAngle;
 
 		// the angle was clipped save the new clip limit
@@ -77,9 +73,13 @@ void dNewtonHingeActuator::OnSubmitConstraint (dFloat timestep, int threadIndex)
 
 		// allow the joint to move back freely
 		NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
-*/
+
 	} else {
 		dFloat relAngle = angle - m_angle;
 		NewtonUserJointAddAngularRow (joint, relAngle, &matrix0.m_front[0]);
 	}
+*/
+
+	dFloat relAngle = angle - m_angle;
+	NewtonUserJointAddAngularRow (joint, relAngle, &matrix0.m_front[0]);
 }
