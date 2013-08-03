@@ -138,6 +138,10 @@ class dNewtonCollisionScene: public dNewtonCollision
 	CNEWTON_API virtual void RemoveCollision (void* const handle);
 	CNEWTON_API virtual void EndAddRemoveCollision();
 
+	NEWTON_API void* GetFirstNode () const;;
+	NEWTON_API void* GetNextNode (void* const collisionNode) const;
+	dNewtonCollision* GetChildFromNode(void* const collisionNode) const; 
+
 	protected:
 	dNewtonCollisionScene (const dNewtonCollisionScene& srcCollision, NewtonCollision* const shape)
 		:dNewtonCollision (srcCollision, shape)
@@ -437,6 +441,10 @@ class dNewtonCollisionCompound: public dNewtonCollision
 	CNEWTON_API virtual void* AddCollision(const dNewtonCollision* const collision);
 	CNEWTON_API virtual void RemoveCollision (void* const handle);
 	CNEWTON_API virtual void EndAddRemoveCollision();
+
+	NEWTON_API void* GetFirstNode () const;;
+	NEWTON_API void* GetNextNode (void* const collisionNode) const;
+	dNewtonCollision* GetChildFromNode(void* const collisionNode) const; 
 
 	protected:
 	dNewtonCollisionCompound (const dNewtonCollisionCompound& srcCollision, NewtonCollision* const shape)

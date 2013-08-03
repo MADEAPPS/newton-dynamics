@@ -181,6 +181,22 @@ void dNewtonCollisionScene::EndAddRemoveCollision()
 	NewtonSceneCollisionEndAddRemove(m_shape);	
 }
 
+void* dNewtonCollisionScene::GetFirstNode () const 
+{
+	return NewtonSceneCollisionGetFirstNode (m_shape);
+}
+
+void* dNewtonCollisionScene::GetNextNode (void* const collisionNode) const 
+{
+	return NewtonSceneCollisionGetNextNode (m_shape, collisionNode);
+}
+
+dNewtonCollision* dNewtonCollisionScene::GetChildFromNode(void* const collisionNode) const
+{
+	NewtonCollision* const collision = NewtonSceneCollisionGetCollisionFromNode (m_shape, collisionNode);
+	return (dNewtonCollision*) NewtonCollisionGetUserData (collision);
+}
+
 
 dNewtonCollisionConvexHull::dNewtonCollisionConvexHull (dNewton* const world, const dNewtonMesh& mesh, int id)
 	:dNewtonCollision(m_convex)
@@ -192,6 +208,12 @@ dNewtonCollisionCompound::dNewtonCollisionCompound (dNewton* const world, const 
 	:dNewtonCollision(m_compound)
 {
 	SetShape (NewtonCreateCompoundCollisionFromMesh (world->GetNewton(), mesh.GetMesh(), 0.001f, shapeID, shapeID));
+	
+	for (void* node = GetFirstNode(); node; node = GetNextNode(node)) {
+		NewtonCollision* const collision = NewtonCompoundCollisionGetCollisionFromNode (m_shape, node);
+		dAssert (NewtonCollisionGetType (collision) == SERIALIZE_ID_CONVEXHULL);
+		new dNewtonCollisionConvexHull (collision);
+	}
 }
 
 
@@ -215,3 +237,18 @@ void dNewtonCollisionCompound::EndAddRemoveCollision()
 	NewtonCompoundCollisionEndAddRemove(m_shape);	
 }
 
+void* dNewtonCollisionCompound::GetFirstNode () const 
+{
+	return NewtonCompoundCollisionGetFirstNode (m_shape);
+}
+
+void* dNewtonCollisionCompound::GetNextNode (void* const collisionNode) const 
+{
+	return NewtonCompoundCollisionGetNextNode (m_shape, collisionNode);
+}
+
+dNewtonCollision* dNewtonCollisionCompound::GetChildFromNode(void* const collisionNode) const
+{
+	NewtonCollision* const collision = NewtonCompoundCollisionGetCollisionFromNode (m_shape, collisionNode);
+	return (dNewtonCollision*) NewtonCollisionGetUserData (collision);
+}
