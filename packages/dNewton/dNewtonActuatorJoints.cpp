@@ -97,11 +97,11 @@ void dNewtonUniversalActuator::OnSubmitConstraint (dFloat timestep, int threadIn
 	if (m_flag0) {
 //		CustomUniversal* const universal = (CustomUniversal*) m_joint;
 //		dFloat posit = universal->GetJointPosit();
-		dAssert (0);
+//		dAssert (0);
 	}
 
 	if (m_flag1) {
 //		CustomUniversal* const universal = (CustomUniversal*) m_joint;
-		dAssert (0);
+//		dAssert (0);
 	}
 }
