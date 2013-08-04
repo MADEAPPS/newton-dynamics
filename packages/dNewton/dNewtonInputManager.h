@@ -27,7 +27,7 @@
 class dNewton;
 
 
-#define D_NEWTON_INPUT_MANGER_PLUGIN_NAME	"__d_netwon_inputManager__"
+#define D_NEWTON_INPUT_MANGER_PLUGIN_NAME	"__dnetwon_inputManager__"
 
 
 class dNewtonInputController: public CustomControllerBase
