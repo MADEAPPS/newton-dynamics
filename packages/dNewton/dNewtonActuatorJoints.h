@@ -123,11 +123,10 @@ class dNewtonUniversalActuator: public dNewtonUniversalJoint
 		m_flag1 = flag;
 	}
 
-	bool GetEnableFlag (bool flag) const
+	bool GetEnableFlag1 (bool flag) const
 	{
 		return m_flag1;
 	}
-
 
 	CNEWTON_API dFloat GetActuatorAngle0() const;
 	CNEWTON_API dFloat GetActuatorAngle1() const;
@@ -170,12 +169,12 @@ class dNewtonSliderActuator: public dNewtonSliderJoint
 		m_posit = dClamp (posit, m_minPosit, m_maxPosit);
 	}
 
-	void SetEnableFlag0 (bool flag)
+	void SetEnableFlag (bool flag)
 	{
 		m_flag = flag;
 	}
 
-	bool GetEnableFlag0 (bool flag) const
+	bool GetEnableFlag (bool flag) const
 	{
 		return m_flag;
 	}
