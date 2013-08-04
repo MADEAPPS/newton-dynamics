@@ -32,7 +32,7 @@ class dNewtonPlayerManager: public CustomPlayerControllerManager
 	class dNewtonPlayer: public dNewtonKinematicBody
 	{
 		public:
-		CNEWTON_API dNewtonPlayer (dNewtonPlayerManager* const manager, void* const userData, dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dFloat* const upDir, const dFloat* const frontDir);
+		CNEWTON_API dNewtonPlayer (dNewtonPlayerManager* const manager, void* const userData, dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dFloat* const upDir, const dFloat* const frontDir, dLong collisionMask);
 		CNEWTON_API ~dNewtonPlayer ();
 
 		virtual void OnPlayerMove (dFloat timestep) = 0;

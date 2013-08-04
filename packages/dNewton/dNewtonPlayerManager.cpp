@@ -64,7 +64,7 @@ void dNewtonPlayerManager::ApplyPlayerMove (CustomPlayerController* const contro
 }
 
 
-dNewtonPlayerManager::dNewtonPlayer::dNewtonPlayer (dNewtonPlayerManager* const manager, void* const userData, dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dFloat* const upDir, const dFloat* const frontDir)
+dNewtonPlayerManager::dNewtonPlayer::dNewtonPlayer (dNewtonPlayerManager* const manager, void* const userData, dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dFloat* const upDir, const dFloat* const frontDir, dLong collisionMask)
 	:dNewtonKinematicBody()
 {
 	dMatrix playerAxis; 
@@ -81,7 +81,7 @@ dNewtonPlayerManager::dNewtonPlayer::dNewtonPlayer (dNewtonPlayerManager* const 
 	SetUserData (userData);
 	
 	NewtonCollision* const collision = NewtonBodyGetCollision(body);
-	new dNewtonCollisionCompound (collision);
+	new dNewtonCollisionCompound (collision, collisionMask);
 
 	for (void* node = NewtonCompoundCollisionGetFirstNode (collision); node; node = NewtonCompoundCollisionGetNextNode (collision, node)) {
 		NewtonCollision* const childShape = NewtonCompoundCollisionGetCollisionFromNode (collision, node);
@@ -90,19 +90,19 @@ dNewtonPlayerManager::dNewtonPlayer::dNewtonPlayer (dNewtonPlayerManager* const 
 		{
 			case SERIALIZE_ID_CAPSULE:
 			{
-				new dNewtonCollisionCapsule (childShape);
+				new dNewtonCollisionCapsule (childShape, collisionMask);
 				break;
 			}
 
 			case SERIALIZE_ID_CYLINDER:
 			{
-				new dNewtonCollisionCylinder (childShape);
+				new dNewtonCollisionCylinder (childShape, collisionMask);
 				break;
 			}
 
 			case SERIALIZE_ID_CONVEXHULL:
 			{
-				new dNewtonCollisionConvexHull (childShape);
+				new dNewtonCollisionConvexHull (childShape, collisionMask);
 				break;
 			}
 

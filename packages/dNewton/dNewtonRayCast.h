@@ -25,15 +25,17 @@
 
 #include "dStdAfxNewton.h"
 #include "dNewtonAlloc.h"
+#include "dNewtonMaterial.h"
+#include "dNewtonCollision.h"
 
 class dNewton;
 class dNewtonBody;
-class dNewtonCollision;
 
-class dNewtonRayCast: public dNewtonAlloc  
+
+class dNewtonRayCast: virtual public dNewtonAlloc, public dNewtonMaterial  
 {
 	public:
-	CNEWTON_API dNewtonRayCast (dNewton* const world);
+	CNEWTON_API dNewtonRayCast (dNewton* const world, dLong collisionMask);
 	CNEWTON_API virtual ~dNewtonRayCast();
 
 	CNEWTON_API virtual void CastRay (const dFloat* const p0, const dFloat* const p1, int threadIndex = 0);
@@ -41,7 +43,7 @@ class dNewtonRayCast: public dNewtonAlloc
 	protected:
 	virtual bool OnPrefilter (const dNewtonBody* const body, const dNewtonCollision* const shape) const 
 	{
-		return true;
+		return (shape->m_collisionMask & m_collisionMask) ? true : false;
 	}
 	CNEWTON_API virtual dFloat OnRayHit (const dNewtonBody* const body, const dNewtonCollision* const shape, const dFloat* const contact, const dFloat* const normal, dLong collisionID, dFloat intersectParam) = 0;
 	

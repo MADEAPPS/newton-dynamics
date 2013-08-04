@@ -692,6 +692,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\dNewton\dNewtonMaterial.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dNewton\dNewtonMaterial.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\dNewton\dNewtonMesh.cpp"
 			>
 		</File>

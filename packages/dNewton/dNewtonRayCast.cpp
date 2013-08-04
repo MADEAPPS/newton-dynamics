@@ -26,8 +26,10 @@
 #include "dNewtonCollision.h"
 
 
-dNewtonRayCast::dNewtonRayCast(dNewton* const dWorld)
-	:m_world(dWorld)
+dNewtonRayCast::dNewtonRayCast(dNewton* const dWorld, dLong mask)
+	:dNewtonAlloc()
+	,dNewtonMaterial(mask)  
+	,m_world(dWorld)
 {
 }
 
