@@ -47,6 +47,9 @@ class dNewtonBody: public dNewtonAlloc, public dNewtonTransformLerp
 	CNEWTON_API bool GetSleepState() const;
 	CNEWTON_API void SetSleepState(bool state) const;
 
+	CNEWTON_API bool GetAutoSleepMode() const;
+	CNEWTON_API void SetAutoSleepMode(bool mode);
+
 	CNEWTON_API void SetMatrix (const dFloat* const matrix);
 	CNEWTON_API void GetMatrix (dFloat* const matrix) const;
 

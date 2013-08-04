@@ -51,6 +51,10 @@ class dNewtonInputManager: public CustomControllerManager<dNewtonInputController
 	CNEWTON_API dNewtonInputManager (dNewton* const world);
 	CNEWTON_API virtual ~dNewtonInputManager();
 
+	unsigned* GetLockHandle()
+	{
+		return &m_lock;
+	}
 	virtual void OnBeginUpdate (dFloat timestepInSecunds) = 0;
 	virtual void OnEndUpdate (dFloat timestepInSecunds) = 0;
 

@@ -74,6 +74,17 @@ void dNewtonBody::SetSleepState(bool state) const
 	NewtonBodySetSleepState(m_body, state ? 1 : 0);
 }
 
+bool dNewtonBody::GetAutoSleepMode() const
+{
+	return NewtonBodyGetSleepState(m_body) ? true : false;
+}
+
+void dNewtonBody::SetAutoSleepMode(bool mode)
+{
+	NewtonBodySetAutoSleep(m_body, mode ? 1 : 0);
+}
+
+
 
 void dNewtonBody::SetUserData(void* const userData)
 {
