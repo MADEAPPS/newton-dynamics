@@ -65,7 +65,7 @@ dFloat CustomSlider::GetJointPosit () const
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
-	CustomJoint::CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
+	CalculateGlobalMatrix (matrix0, matrix1);
 	return (matrix0.m_posit - matrix1.m_posit) % matrix0.m_front;
 }
 
@@ -75,16 +75,12 @@ dFloat CustomSlider::GetJointSpeed () const
 	dMatrix matrix1;
 	dVector veloc0;
 	dVector veloc1;
-	CustomJoint::CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
+	CalculateGlobalMatrix (matrix0, matrix1);
 	NewtonBodyGetVelocity(m_body0, &veloc0[0]);
 	NewtonBodyGetVelocity(m_body1, &veloc1[0]);
 	return (veloc0 - veloc1) % matrix0.m_front;
 }
 
-void CustomSlider::CalculateGlobalMatrix(dMatrix& matrix0, dMatrix& matrix1) const
-{
-	CustomJoint::CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
-}
 
 
 void CustomSlider::SubmitConstraints (dFloat timestep, int threadIndex)
@@ -93,7 +89,7 @@ void CustomSlider::SubmitConstraints (dFloat timestep, int threadIndex)
 	dMatrix matrix1;
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	CustomJoint::CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
+	CalculateGlobalMatrix (matrix0, matrix1);
 
 	// Restrict the movement on the pivot point along all tree orthonormal direction
 	dVector p0 (matrix0.m_posit);
@@ -190,7 +186,7 @@ void CustomSlider::GetInfo (NewtonJointRecord* const info) const
 		dMatrix matrix1;
 
 		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-		CustomJoint::CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
+		CalculateGlobalMatrix (matrix0, matrix1);
 		dist = (matrix0.m_posit - matrix1.m_posit) % matrix0.m_front;
 
 		info->m_minLinearDof[0] = m_minDist - dist;

@@ -105,6 +105,26 @@ class dNewtonUniversalJoint: public dNewtonJoint
 	{
 		SetJoint (new CustomUniversal (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
 	}
+
+	NEWTON_API void EnableLimit_0(bool state)
+	{
+		((CustomUniversal*) m_joint)->EnableLimit_0(state);
+	}
+
+	NEWTON_API void EnableLimit_1(bool state)
+	{
+		((CustomUniversal*) m_joint)->EnableLimit_1(state);
+	}
+
+
+	NEWTON_API void SetLimis_0(dFloat minAngle, dFloat maxAngle)
+	{
+		((CustomUniversal*) m_joint)->SetLimis_0 (minAngle, maxAngle);
+	}
+	NEWTON_API void SetLimis_1(dFloat minAngle, dFloat maxAngle)
+	{
+		((CustomUniversal*) m_joint)->SetLimis_1 (minAngle, maxAngle);
+	}
 };
 
 

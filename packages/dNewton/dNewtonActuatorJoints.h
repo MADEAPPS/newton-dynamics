@@ -86,6 +86,9 @@ class dNewtonUniversalActuator: public dNewtonUniversalJoint
 		,m_flag1(true)
 	{
 		m_type = m_universalActuator;
+		// disable limit on both axis
+		EnableLimit_0(false);
+		EnableLimit_1(false);
 	}
 
 	CNEWTON_API dFloat GetTargetAngle0() const

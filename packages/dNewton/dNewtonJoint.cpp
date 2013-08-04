@@ -59,3 +59,4 @@ void dNewtonJoint::OnSubmitConstraintCallback (const NewtonUserJoint* const me, 
 	dNewtonJoint* const joint = (dNewtonJoint*) customJoint->GetUserData();
 	joint->OnSubmitConstraint (timestep, threadIndex);
 }
+

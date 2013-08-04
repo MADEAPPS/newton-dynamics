@@ -88,10 +88,6 @@ dFloat CustomHinge::GetJointOmega () const
 	return m_jointOmega;
 }
 
-void CustomHinge::CalculateGlobalMatrix(dMatrix& matrix0, dMatrix& matrix1) const
-{
-	CustomJoint::CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
-}
 
 void CustomHinge::SubmitConstraints (dFloat timestep, int threadIndex)
 {
@@ -99,7 +95,7 @@ void CustomHinge::SubmitConstraints (dFloat timestep, int threadIndex)
 	dMatrix matrix1;
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	CustomJoint::CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
+	CalculateGlobalMatrix (matrix0, matrix1);
 
 	// Restrict the movement on the pivot point along all tree orthonormal direction
 	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix0.m_front[0]);
@@ -192,7 +188,7 @@ void CustomHinge::GetInfo (NewtonJointRecord* const info) const
 		dMatrix matrix0;
 		dMatrix matrix1;
 		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-		CustomJoint::CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
+		CalculateGlobalMatrix (matrix0, matrix1);
 		sinAngle = (matrix0.m_up * matrix1.m_up) % matrix0.m_front;
 		cosAngle = matrix0.m_up % matrix1.m_up;
 		angle = dAtan2 (sinAngle, cosAngle);

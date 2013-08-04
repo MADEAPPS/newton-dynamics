@@ -32,7 +32,11 @@ class CustomSlider: public CustomJoint
 
 	NEWTON_API dFloat GetJointPosit () const;
 	NEWTON_API dFloat GetJointSpeed () const;
-	NEWTON_API void CalculateGlobalMatrix(dMatrix& matrix0, dMatrix& matrix1) const;
+	void CalculateGlobalMatrix(dMatrix& matrix0, dMatrix& matrix1) const
+	{
+		CustomJoint::CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
+	}
+
 	
 	protected:
 	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);

@@ -112,7 +112,7 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 	dMatrix matrix1;
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
+	CalculateGlobalMatrix (matrix0, matrix1);
 
 	// get the pin fixed to the first body
 	const dVector& dir0 = matrix0.m_front;
@@ -266,7 +266,7 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 	 dMatrix matrix0;
 	 dMatrix matrix1;
 	 // calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	 CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
+	 CalculateGlobalMatrix (matrix0, matrix1);
 
 	 info->m_minLinearDof[0] = 0.0f;
 	 info->m_maxLinearDof[0] = 0.0f;

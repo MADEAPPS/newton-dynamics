@@ -32,6 +32,10 @@ class CustomUniversal: public CustomJoint
 
 	NEWTON_API void EnableMotor_0(bool state);
 	NEWTON_API void EnableMotor_1(bool state);
+	void CalculateGlobalMatrix(dMatrix& matrix0, dMatrix& matrix1) const
+	{
+		CustomJoint::CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
+	}
 
 	protected:
 	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
