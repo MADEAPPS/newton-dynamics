@@ -608,6 +608,7 @@ void* dgWorld::AddPreListener (const char* const nameid, void* const userData, O
 	dgListenerList::dgListNode* const node = m_preListener.Append();
 	dgListener& listener = node->GetInfo();
 	strncpy (listener.m_name, nameid, sizeof (listener.m_name));
+	listener.m_world = this;
 	listener.m_userData = userData;
 	listener.m_onListenerUpdate = updateCallback;
 	listener.m_onListenerDestroy = destroyCallback;
@@ -620,6 +621,7 @@ void* dgWorld::AddPostListener (const char* const nameid, void* const userData, 
 	dgListenerList::dgListNode* const node = m_postListener.Append();
 	dgListener& listener = node->GetInfo();
 	strncpy (listener.m_name, nameid, sizeof (listener.m_name));
+	listener.m_world = this;
 	listener.m_userData = userData;
 	listener.m_onListenerUpdate = updateCallback;
 	listener.m_onListenerDestroy = destroyCallback;
