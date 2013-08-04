@@ -66,6 +66,7 @@
 #include <CustomJoint.h>
 #include <CustomHinge.h>
 #include <CustomSlider.h>
+#include <CustomUniversal.h>
 #include <CustomBallAndSocket.h>
 #include <CustomTriggerManager.h>
 #include <CustomControllerManager.h>

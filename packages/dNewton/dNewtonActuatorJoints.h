@@ -34,6 +34,7 @@ class dNewtonHingeActuator: public dNewtonHingeJoint
 		,m_angle(0.0f)
 		,m_minAngle(minAngle)
 		,m_maxAngle(maxAngle)
+		,m_flag(true)
 	{
 		m_type = m_hingeActuator;
 	}
@@ -47,6 +48,17 @@ class dNewtonHingeActuator: public dNewtonHingeJoint
 	{
 		m_angle = dClamp (angle, m_minAngle, m_maxAngle);
 	}
+
+	void SetEnableFlag (bool flag)
+	{
+		m_flag = flag;
+	}
+
+	bool GetEnableFlag (bool flag) const
+	{
+		return m_flag;
+	}
+
 	
 	CNEWTON_API dFloat GetActuatorAngle() const;
 	CNEWTON_API virtual void OnSubmitConstraint (dFloat timestep, int threadIndex);
@@ -55,7 +67,84 @@ class dNewtonHingeActuator: public dNewtonHingeJoint
 	dFloat m_angle;
 	dFloat m_minAngle;
 	dFloat m_maxAngle;
+	bool m_flag;
 };
+
+
+class dNewtonUniversalActuator: public dNewtonUniversalJoint
+{
+	public:
+	CNEWTON_API dNewtonUniversalActuator(const dFloat* const pinAndPivotFrame, dFloat minAngle0, dFloat maxAngle0, dFloat minAngle1, dFloat maxAngle1, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
+		:dNewtonUniversalJoint(pinAndPivotFrame, body0, body1)
+		,m_angle0(0.0f)
+		,m_minAngle0(minAngle0)
+		,m_maxAngle0(maxAngle0)
+		,m_angle1(0.0f)
+		,m_minAngle1(minAngle1)
+		,m_maxAngle1(maxAngle1)
+		,m_flag0(true)
+		,m_flag1(true)
+	{
+		m_type = m_universalActuator;
+	}
+
+	CNEWTON_API dFloat GetTargetAngle0() const
+	{
+		return m_angle0;
+	}
+
+	CNEWTON_API void SetTargetAngle0(dFloat angle)
+	{
+		m_angle0 = dClamp (angle, m_minAngle0, m_maxAngle0);
+	}
+
+	CNEWTON_API dFloat GetTargetAngle1() const
+	{
+		return m_angle1;
+	}
+
+	CNEWTON_API void SetTargetAngle1(dFloat angle)
+	{
+		m_angle0 = dClamp (angle, m_minAngle1, m_maxAngle1);
+	}
+
+	void SetEnableFlag0 (bool flag)
+	{
+		m_flag0 = flag;
+	}
+
+	bool GetEnableFlag0 (bool flag) const
+	{
+		return m_flag0;
+	}
+
+	void SetEnableFlag1 (bool flag)
+	{
+		m_flag1 = flag;
+	}
+
+	bool GetEnableFlag (bool flag) const
+	{
+		return m_flag1;
+	}
+
+
+	CNEWTON_API dFloat GetActuatorAngle0() const;
+	CNEWTON_API dFloat GetActuatorAngle1() const;
+	CNEWTON_API virtual void OnSubmitConstraint (dFloat timestep, int threadIndex);
+
+	private:
+	dFloat m_angle0;
+	dFloat m_minAngle0;
+	dFloat m_maxAngle0;
+
+	dFloat m_angle1;
+	dFloat m_minAngle1;
+	dFloat m_maxAngle1;
+	bool m_flag0;
+	bool m_flag1;
+};
+
 
 
 class dNewtonSliderActuator: public dNewtonSliderJoint
@@ -66,8 +155,9 @@ class dNewtonSliderActuator: public dNewtonSliderJoint
 		,m_posit(0.0f)
 		,m_minPosit(minPosit)
 		,m_maxPosit(maxPosit)
+		,m_flag(true)
 	{
-		m_type = m_hingeActuator;
+		m_type = m_sliderActuator;
 	}
 
 	CNEWTON_API dFloat GetTargetPosit() const
@@ -80,6 +170,16 @@ class dNewtonSliderActuator: public dNewtonSliderJoint
 		m_posit = dClamp (posit, m_minPosit, m_maxPosit);
 	}
 
+	void SetEnableFlag0 (bool flag)
+	{
+		m_flag = flag;
+	}
+
+	bool GetEnableFlag0 (bool flag) const
+	{
+		return m_flag;
+	}
+
 	CNEWTON_API dFloat GetActuatorPosit() const;
 	CNEWTON_API virtual void OnSubmitConstraint (dFloat timestep, int threadIndex);
 
@@ -87,7 +187,10 @@ class dNewtonSliderActuator: public dNewtonSliderJoint
 	dFloat m_posit;
 	dFloat m_minPosit;
 	dFloat m_maxPosit;
+	bool m_flag;
 };
+
+
 
 
 #endif

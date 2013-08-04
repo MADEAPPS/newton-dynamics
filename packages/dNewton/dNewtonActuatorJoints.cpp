@@ -71,3 +71,23 @@ void dNewtonSliderActuator::OnSubmitConstraint (dFloat timestep, int threadIndex
 	dVector posit1 (matrix0.m_posit - matrix0.m_front.Scale (relPosit));
 	NewtonUserJointAddLinearRow (joint, &matrix0.m_posit[0], &posit1[0], &matrix0.m_front[0]);
 }
+
+
+dFloat dNewtonUniversalActuator::GetActuatorAngle0() const
+{
+	dAssert (0);
+	return 0;
+}
+
+dFloat dNewtonUniversalActuator::GetActuatorAngle1() const
+{
+	dAssert (0);
+	return 0;
+}
+
+void dNewtonUniversalActuator::OnSubmitConstraint (dFloat timestep, int threadIndex)
+{
+	dNewtonUniversalJoint::OnSubmitConstraint (timestep, threadIndex);
+
+
+}
