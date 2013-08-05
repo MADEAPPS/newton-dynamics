@@ -208,7 +208,7 @@ CustomControllerManager<CONTROLLER_BASE>::~CustomControllerManager()
 template<class CONTROLLER_BASE>
 void CustomControllerManager<CONTROLLER_BASE>::DestroyAllController ()
 {
-	while (GetCount()) {
+	while (CustomList<CONTROLLER_BASE>::GetCount()) {
 		DestroyController (&GetLast()->GetInfo());
 	}
 }

@@ -98,7 +98,7 @@ class RagDollManager: public CustomSkeletonTransformManager
 		NewtonMaterialSetCollisionCallback (scene->GetNewton(), m_material, m_material, this, OnBoneAABBOverlap, NULL);
 	}
 
-	virtual void OnPreUpdate (CustomSkeletonTransformController* constroller, dFloat timestep, int threadIndex) const
+	virtual void OnPreUpdate (CustomSkeletonTransformController* const constroller, dFloat timestep, int threadIndex) const
 	{
 	}
 
