@@ -47,6 +47,7 @@ void dNewtonHingeActuator::OnSubmitConstraint (dFloat timestep, int threadIndex)
 
 		dFloat relAngle = angle - m_angle;
 		NewtonUserJointAddAngularRow (newtonHinge, relAngle, &matrix0.m_front[0]);
+		NewtonUserJointSetRowStiffness (newtonHinge, 1.0f);
 	}
 }
 
@@ -74,6 +75,7 @@ void dNewtonSliderActuator::OnSubmitConstraint (dFloat timestep, int threadIndex
 		dFloat relPosit = posit - m_posit;
 		dVector posit1 (matrix0.m_posit - matrix0.m_front.Scale (relPosit));
 		NewtonUserJointAddLinearRow (newtonSlider, &matrix0.m_posit[0], &posit1[0], &matrix0.m_front[0]);
+		NewtonUserJointSetRowStiffness (newtonSlider, 1.0f);
 	}
 }
 
@@ -108,12 +110,14 @@ void dNewtonUniversalActuator::OnSubmitConstraint (dFloat timestep, int threadIn
 			dFloat angle = customUniversal->GetJointAngle_0();
 			dFloat relAngle = angle - m_angle0;
 			NewtonUserJointAddAngularRow (newtonUniversal, relAngle, &matrix0.m_front[0]);
+			NewtonUserJointSetRowStiffness (newtonUniversal, 1.0f);
 		}
 
 		if (m_flag1) {
 			dFloat angle = customUniversal->GetJointAngle_1();
 			dFloat relAngle = angle - m_angle1;
 			NewtonUserJointAddAngularRow (newtonUniversal, relAngle, &matrix1.m_up[0]);
+			NewtonUserJointSetRowStiffness (newtonUniversal, 1.0f);
 		}
 	}
 }
