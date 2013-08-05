@@ -117,6 +117,7 @@ SDK_MAIN_SRC = \
 
 
 SDK_DEMOS_SRC = \
+		$(SDK_DEMOS_PATH)/ArchimedesBuoyancy.cpp \
 		$(SDK_DEMOS_PATH)/AdvancedPlayerController.cpp \
 		$(SDK_DEMOS_PATH)/BasicCar.cpp \
 		$(SDK_DEMOS_PATH)/BasicFriction.cpp \
