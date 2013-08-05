@@ -711,13 +711,17 @@ class dgFloatExceptions
 	//#define DG_FLOAT_EXECTIONS_MASK (_EM_INVALID | _EM_DENORMAL | _EM_ZERODIVIDE | _EM_OVERFLOW | _EM_UNDERFLOW| _EM_INEXACT)
 	//#define DG_FLOAT_EXECTIONS_MASK (_EM_INVALID | _EM_DENORMAL | _EM_ZERODIVIDE)
 	//#define DG_FLOAT_EXECTIONS_MASK (_EM_DENORMAL | _EM_ZERODIVIDE)
-	#if (defined (_MSC_VER) && defined (_DEBUG))
-		enum dgFloatExceptionMask
-		{
+	
+	enum dgFloatExceptionMask
+	{
+		#if (defined (_MSC_VER) && defined (_DEBUG))
 			m_InvalidDenormalAndivideByZero = _EM_INVALID | _EM_DENORMAL | _EM_ZERODIVIDE,
 			m_allExepctions = _EM_INVALID | _EM_DENORMAL | _EM_ZERODIVIDE | _EM_OVERFLOW | _EM_UNDERFLOW,
-		};
-	#endif
+		#else
+			m_InvalidDenormalAndivideByZero,
+			m_allExepctions,
+		#endif			
+	};
 
 	dgFloatExceptions(dgFloatExceptionMask mask = m_InvalidDenormalAndivideByZero)
 		:m_mask (0)
