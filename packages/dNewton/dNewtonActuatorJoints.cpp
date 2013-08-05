@@ -106,7 +106,7 @@ void dNewtonUniversalActuator::OnSubmitConstraint (dFloat timestep, int threadIn
 		//dVector xxx1(customUniversal->GetPinAxis_1());
 		if (m_flag0) {
 			dFloat angle = customUniversal->GetJointAngle_0();
-			dFloat relAngle = angle - m_angle1;
+			dFloat relAngle = angle - m_angle0;
 			NewtonUserJointAddAngularRow (newtonUniversal, relAngle, &matrix0.m_front[0]);
 		}
 

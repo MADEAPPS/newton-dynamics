@@ -108,7 +108,7 @@ class dNewtonUniversalActuator: public dNewtonUniversalJoint
 
 	CNEWTON_API void SetTargetAngle1(dFloat angle)
 	{
-		m_angle0 = dClamp (angle, m_minAngle1, m_maxAngle1);
+		m_angle1 = dClamp (angle, m_minAngle1, m_maxAngle1);
 	}
 
 	void SetEnableFlag0 (bool flag)
