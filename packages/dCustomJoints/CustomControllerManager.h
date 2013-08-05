@@ -281,7 +281,7 @@ void CustomControllerManager<CONTROLLER_BASE>::PostUpdateKernel (NewtonWorld* co
 template<class CONTROLLER_BASE>
 CONTROLLER_BASE* CustomControllerManager<CONTROLLER_BASE>::CreateController ()
 {
-	CONTROLLER_BASE* const controller = &Append()->GetInfo();
+	CONTROLLER_BASE* const controller = &CustomControllerManager<CONTROLLER_BASE>::Append()->GetInfo();
 
 	controller->m_manager = this;
 	return controller;
@@ -291,7 +291,7 @@ template<class CONTROLLER_BASE>
 void CustomControllerManager<CONTROLLER_BASE>::DestroyController (CONTROLLER_BASE* const controller)
 {
 	dAssert (FindNodeFromInfo (*controller));
-	CustomListNode* const node = GetNodeFromInfo (*controller);
+	typename CustomControllerManager<CONTROLLER_BASE>::CustomListNode* const node = CustomControllerManager<CONTROLLER_BASE>::GetNodeFromInfo (*controller);
 	Remove (node);
 }
 
