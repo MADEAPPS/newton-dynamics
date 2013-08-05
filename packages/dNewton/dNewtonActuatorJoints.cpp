@@ -35,16 +35,19 @@ void dNewtonHingeActuator::OnSubmitConstraint (dFloat timestep, int threadIndex)
 {
 	dNewtonHingeJoint::OnSubmitConstraint (timestep, threadIndex);
 
-	CustomHinge* const hinge = (CustomHinge*) m_joint;
-	NewtonJoint* const joint = m_joint->GetJoint();
-	dFloat angle = hinge->GetJointAngle();
+	if (m_flag) {
+		dMatrix matrix0;
+		dMatrix matrix1;
 
-	dMatrix matrix0;
-	dMatrix matrix1;
-	hinge->CalculateGlobalMatrix (matrix0, matrix1);
+		CustomHinge* const customHinge = (CustomHinge*) m_joint;
+		NewtonJoint* const newtonHinge = m_joint->GetJoint();
 
-	dFloat relAngle = angle - m_angle;
-	NewtonUserJointAddAngularRow (joint, relAngle, &matrix0.m_front[0]);
+		customHinge->CalculateGlobalMatrix (matrix0, matrix1);
+		dFloat angle = customHinge->GetJointAngle();
+
+		dFloat relAngle = angle - m_angle;
+		NewtonUserJointAddAngularRow (newtonHinge, relAngle, &matrix0.m_front[0]);
+	}
 }
 
 
@@ -58,50 +61,59 @@ void dNewtonSliderActuator::OnSubmitConstraint (dFloat timestep, int threadIndex
 {
 	dNewtonSliderJoint::OnSubmitConstraint (timestep, threadIndex);
 
-	CustomSlider* const hinge = (CustomSlider*) m_joint;
-	NewtonJoint* const joint = m_joint->GetJoint();
+	if (m_flag) {
+		dMatrix matrix0;
+		dMatrix matrix1;
 
-	dFloat posit = hinge->GetJointPosit();
+		CustomSlider* const customSlider = (CustomSlider*) m_joint;
+		NewtonJoint* const newtonSlider = m_joint->GetJoint();
 
-	dMatrix matrix0;
-	dMatrix matrix1;
-	hinge->CalculateGlobalMatrix (matrix0, matrix1);
+		dFloat posit = customSlider->GetJointPosit();
+		customSlider->CalculateGlobalMatrix (matrix0, matrix1);
 
-	dFloat relPosit = posit - m_posit;
-	dVector posit1 (matrix0.m_posit - matrix0.m_front.Scale (relPosit));
-	NewtonUserJointAddLinearRow (joint, &matrix0.m_posit[0], &posit1[0], &matrix0.m_front[0]);
+		dFloat relPosit = posit - m_posit;
+		dVector posit1 (matrix0.m_posit - matrix0.m_front.Scale (relPosit));
+		NewtonUserJointAddLinearRow (newtonSlider, &matrix0.m_posit[0], &posit1[0], &matrix0.m_front[0]);
+	}
 }
 
 
 dFloat dNewtonUniversalActuator::GetActuatorAngle0() const
 {
-	dAssert (0);
-	return 0;
+	CustomUniversal* const customUniversal = (CustomUniversal*) m_joint;
+	return customUniversal->GetJointAngle_0();
 }
 
 dFloat dNewtonUniversalActuator::GetActuatorAngle1() const
 {
-	dAssert (0);
-	return 0;
+	CustomUniversal* const customUniversal = (CustomUniversal*) m_joint;
+	return customUniversal->GetJointAngle_1();
 }
 
 void dNewtonUniversalActuator::OnSubmitConstraint (dFloat timestep, int threadIndex)
 {
 	dNewtonUniversalJoint::OnSubmitConstraint (timestep, threadIndex);
 
-	CustomUniversal* const universal = (CustomUniversal*) m_joint;
-	dMatrix matrix0;
-	dMatrix matrix1;
-	universal->CalculateGlobalMatrix (matrix0, matrix1);
+	if (m_flag0 | m_flag1){
+		dMatrix matrix0;
+		dMatrix matrix1;
+		CustomUniversal* const customUniversal = (CustomUniversal*) m_joint;
+		NewtonJoint* const newtonUniversal = m_joint->GetJoint();
 
-	if (m_flag0) {
-//		CustomUniversal* const universal = (CustomUniversal*) m_joint;
-//		dFloat posit = universal->GetJointPosit();
-//		dAssert (0);
-	}
+		customUniversal->CalculateGlobalMatrix (matrix0, matrix1);
 
-	if (m_flag1) {
-//		CustomUniversal* const universal = (CustomUniversal*) m_joint;
-//		dAssert (0);
+		//dVector xxx0(customUniversal->GetPinAxis_0());
+		//dVector xxx1(customUniversal->GetPinAxis_1());
+		if (m_flag0) {
+			dFloat angle = customUniversal->GetJointAngle_0();
+			dFloat relAngle = angle - m_angle1;
+			NewtonUserJointAddAngularRow (newtonUniversal, relAngle, &matrix0.m_front[0]);
+		}
+
+		if (m_flag1) {
+			dFloat angle = customUniversal->GetJointAngle_1();
+			dFloat relAngle = angle - m_angle1;
+			NewtonUserJointAddAngularRow (newtonUniversal, relAngle, &matrix1.m_up[0]);
+		}
 	}
 }
