@@ -93,6 +93,7 @@
 #include <stdarg.h>
 #include <time.h>
 #include <math.h>
+#include <float.h>
 #include <ctype.h>
 #include <pthread.h>
 #include <sched.h>
