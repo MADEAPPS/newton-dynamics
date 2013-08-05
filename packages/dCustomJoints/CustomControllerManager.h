@@ -221,7 +221,7 @@ void CustomControllerManager<CONTROLLER_BASE>::Debug () const
 template<class CONTROLLER_BASE>
 void CustomControllerManager<CONTROLLER_BASE>::PreUpdate(dFloat timestep)
 {
-	for (CustomControllerManager<CONTROLLER_BASE>::CustomListNode* node = CustomControllerManager<CONTROLLER_BASE>::GetFirst(); node; node = node->GetNext()) {
+	for (typename CustomControllerManager<CONTROLLER_BASE>::CustomListNode* node = CustomControllerManager<CONTROLLER_BASE>::GetFirst(); node; node = node->GetNext()) {
 		NewtonDispachThreadJob(m_world, PreUpdateKernel, &node->GetInfo());
 	}
 	NewtonSyncThreadJobs(m_world);
@@ -230,7 +230,7 @@ void CustomControllerManager<CONTROLLER_BASE>::PreUpdate(dFloat timestep)
 template<class CONTROLLER_BASE>
 void CustomControllerManager<CONTROLLER_BASE>::PostUpdate(dFloat timestep)
 {
-	for (CustomList<CONTROLLER_BASE>::CustomListNode* node = CustomList<CONTROLLER_BASE>::GetFirst(); node; node = node->GetNext()) {
+	for (typename CustomList<CONTROLLER_BASE>::CustomListNode* node = CustomList<CONTROLLER_BASE>::GetFirst(); node; node = node->GetNext()) {
 		NewtonDispachThreadJob(m_world, PostUpdateKernel, &node->GetInfo());
 	}
 	NewtonSyncThreadJobs(m_world);
