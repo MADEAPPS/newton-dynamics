@@ -30,6 +30,15 @@ class CustomUniversal: public CustomJoint
 	NEWTON_API void SetLimis_0(dFloat minAngle, dFloat maxAngle);
 	NEWTON_API void SetLimis_1(dFloat minAngle, dFloat maxAngle);
 
+	NEWTON_API dFloat GetJointAngle_0 () const;
+	NEWTON_API dFloat GetJointAngle_1 () const;
+
+	NEWTON_API dVector GetPinAxis_0 () const;
+	NEWTON_API dVector GetPinAxis_1 () const;
+
+	NEWTON_API dFloat GetJointOmega_0 () const;
+	NEWTON_API dFloat GetJointOmega_1 () const;
+
 	NEWTON_API void EnableMotor_0(bool state);
 	NEWTON_API void EnableMotor_1(bool state);
 	void CalculateGlobalMatrix(dMatrix& matrix0, dMatrix& matrix1) const
@@ -53,11 +62,13 @@ class CustomUniversal: public CustomJoint
 	dFloat m_maxAngle_0;
 	dFloat m_angularDamp_0;
 	dFloat m_angularAccel_0;
+	AngularIntegration m_curJointAngle_0;
 
 	dFloat m_minAngle_1;
 	dFloat m_maxAngle_1;
 	dFloat m_angularDamp_1;
 	dFloat m_angularAccel_1;
+	AngularIntegration m_curJointAngle_1;
 };
 
 #endif 

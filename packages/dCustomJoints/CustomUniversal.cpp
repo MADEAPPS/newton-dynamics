@@ -27,6 +27,8 @@
 
 CustomUniversal::CustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* child, NewtonBody* parent)
 	:CustomJoint(6, child, parent)
+	,m_curJointAngle_0()
+	,m_curJointAngle_1()
 {
 	dMatrix matrix0;
 
@@ -103,11 +105,75 @@ void CustomUniversal::SetLimis_1(dFloat minAngle, dFloat maxAngle)
 }
 
 
+dFloat CustomUniversal::GetJointAngle_0 () const
+{
+	return m_curJointAngle_0.m_angle;
+}
+
+dFloat CustomUniversal::GetJointAngle_1 () const
+{
+	return m_curJointAngle_1.m_angle;
+}
+
+
+dFloat CustomUniversal::GetJointOmega_0 () const
+{
+	dVector omega0 (0.0f, 0.0f, 0.0f);
+	dVector omega1 (0.0f, 0.0f, 0.0f);
+
+	dMatrix matrix0;
+	dMatrix matrix1;
+	CalculateGlobalMatrix (matrix0, matrix1);
+
+	// get relative angular velocity
+	dAssert (m_body1);
+	NewtonBodyGetOmega(m_body0, &omega0[0]);
+	NewtonBodyGetOmega(m_body1, &omega1[0]);
+
+	// calculate the desired acceleration
+	return (omega0 - omega1) % matrix0.m_front;
+}
+
+dFloat CustomUniversal::GetJointOmega_1 () const
+{
+	dVector omega0 (0.0f, 0.0f, 0.0f);
+	dVector omega1 (0.0f, 0.0f, 0.0f);
+
+	dMatrix matrix0;
+	dMatrix matrix1;
+	CalculateGlobalMatrix (matrix0, matrix1);
+
+	// get relative angular velocity
+	dAssert (m_body1);
+	NewtonBodyGetOmega(m_body0, &omega0[0]);
+	NewtonBodyGetOmega(m_body1, &omega1[0]);
+
+	// calculate the desired acceleration
+	return (omega0 - omega1) % matrix1.m_up;
+}
+
+dVector CustomUniversal::GetPinAxis_0 () const
+{
+	dMatrix matrix0;
+	dMatrix matrix1;
+	CalculateGlobalMatrix (matrix0, matrix1);
+	return matrix0.m_front;
+}
+
+dVector CustomUniversal::GetPinAxis_1 () const
+{
+	dMatrix matrix0;
+	dMatrix matrix1;
+	CalculateGlobalMatrix (matrix0, matrix1);
+	return matrix1.m_up;
+}
+
+
 void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 {
-	dFloat angle;
-	dFloat sinAngle;
-	dFloat cosAngle;
+//	dFloat angle;
+//	dFloat sinAngle;
+//	dFloat cosAngle;
 	dMatrix matrix0;
 	dMatrix matrix1;
 
@@ -140,15 +206,16 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 	NewtonUserJointSetRowStiffness (m_joint, 1.0f);
 
 
+	dFloat sinAngle_0 = (matrix0.m_up * matrix1.m_up) % matrix0.m_front;
+	dFloat cosAngle_0 = matrix0.m_up % matrix1.m_up;
+	//dFloat angle_0 = dAtan2 (sinAngle, cosAngle);
+	m_curJointAngle_0.CalculateJointAngle (cosAngle_0, sinAngle_0);
+
 	// check is the joint limit are enable
 	if (m_limit_0_On) {
-		sinAngle = (matrix0.m_up * matrix1.m_up) % matrix0.m_front;
-		cosAngle = matrix0.m_up % matrix1.m_up;
-		angle = dAtan2 (sinAngle, cosAngle);
 
-		if (angle < m_minAngle_0) {
-			dFloat relAngle;
-			relAngle = angle - m_minAngle_0;
+		if (m_curJointAngle_0.m_angle < m_minAngle_0) {
+			dFloat relAngle = m_curJointAngle_0.m_angle - m_minAngle_0;
 
 			// tell joint error will minimize the exceeded angle error
 			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix0.m_front[0]);
@@ -159,9 +226,8 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 			// allow the joint to move back freely
 			NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
 
-		} else if (angle > m_maxAngle_0) {
-			dFloat relAngle;
-			relAngle = angle - m_maxAngle_0;
+		} else if (m_curJointAngle_0.m_angle > m_maxAngle_0) {
+			dFloat relAngle = m_curJointAngle_0.m_angle - m_maxAngle_0;
 
 			// tell joint error will minimize the exceeded angle error
 			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix0.m_front[0]);
@@ -175,9 +241,6 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 
 		// check is the joint limit motor is enable
 	} else if (m_angularMotor_0_On) {
-
-		dFloat relOmega;
-		dFloat relAccel;
 		dVector omega0 (0.0f, 0.0f, 0.0f);
 		dVector omega1 (0.0f, 0.0f, 0.0f);
 
@@ -188,8 +251,8 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 		}
 
 		// calculate the desired acceleration
-		relOmega = (omega0 - omega1) % matrix0.m_front;
-		relAccel = m_angularAccel_0 - m_angularDamp_0 * relOmega;
+		dFloat relOmega = (omega0 - omega1) % matrix0.m_front;
+		dFloat relAccel = m_angularAccel_0 - m_angularDamp_0 * relOmega;
 
 		// add and angular constraint row to that will set the relative acceleration to zero
 		NewtonUserJointAddAngularRow (m_joint, 0.0f, &matrix0.m_front[0]);
@@ -200,14 +263,18 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 
 
 	// if limit are enable ...
+	dFloat sinAngle_1 = (matrix0.m_front * matrix1.m_front) % matrix1.m_up;
+	dFloat cosAngle_1 = matrix0.m_front % matrix1.m_front;
+	//angle = dAtan2 (sinAngle, cosAngle);
+	m_curJointAngle_1.CalculateJointAngle (cosAngle_1, sinAngle_1);
+
 	if (m_limit_1_On) {
-		sinAngle = (matrix0.m_front * matrix1.m_front) % matrix1.m_up;
-		cosAngle = matrix0.m_front % matrix1.m_front;
-		angle = dAtan2 (sinAngle, cosAngle);
+//		sinAngle = (matrix0.m_front * matrix1.m_front) % matrix1.m_up;
+//		cosAngle = matrix0.m_front % matrix1.m_front;
+//		angle = dAtan2 (sinAngle, cosAngle);
  
-		if (angle < m_minAngle_1) {
-			dFloat relAngle;
-			relAngle = angle - m_minAngle_1;
+		if (m_curJointAngle_1.m_angle < m_minAngle_1) {
+			dFloat relAngle = m_curJointAngle_1.m_angle - m_minAngle_1;
 
 			// tell joint error will minimize the exceeded angle error
 			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix1.m_up[0]);
@@ -218,9 +285,8 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 			// allow the joint to move back freely 
 			NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
 
-		} else if (angle > m_maxAngle_1) {
-			dFloat relAngle;
-			relAngle = angle - m_maxAngle_1;
+		} else if (m_curJointAngle_1.m_angle > m_maxAngle_1) {
+			dFloat relAngle = m_curJointAngle_1.m_angle - m_maxAngle_1;
 			
 			// tell joint error will minimize the exceeded angle error
 			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix1.m_up[0]);
@@ -232,8 +298,6 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 			NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
   		}
 	} else if (m_angularMotor_1_On) {
-		dFloat relOmega;
-		dFloat relAccel;
 		dVector omega0 (0.0f, 0.0f, 0.0f);
 		dVector omega1 (0.0f, 0.0f, 0.0f);
 
@@ -244,8 +308,8 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 		}
 
 		// calculate the desired acceleration
-		relOmega = (omega0 - omega1) % matrix1.m_up;
-		relAccel = m_angularAccel_1 - m_angularDamp_1 * relOmega;
+		dFloat relOmega = (omega0 - omega1) % matrix1.m_up;
+		dFloat relAccel = m_angularAccel_1 - m_angularDamp_1 * relOmega;
 
 		// add and angular constraint row to that will set the relative acceleration to zero
 		NewtonUserJointAddAngularRow (m_joint, 0.0f, &matrix1.m_up[0]);

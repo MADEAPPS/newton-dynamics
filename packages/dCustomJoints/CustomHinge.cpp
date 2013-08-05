@@ -111,12 +111,9 @@ void CustomHinge::SubmitConstraints (dFloat timestep, int threadIndex)
 	NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &matrix0.m_right[0]);
 
 	// the joint angle can be determine by getting the angle between any two non parallel vectors
-	dFloat angle;
-	dFloat sinAngle;
-	dFloat cosAngle;
-	sinAngle = (matrix0.m_up * matrix1.m_up) % matrix0.m_front;
-	cosAngle = matrix0.m_up % matrix1.m_up;
-	angle = m_curJointAngle.CalculateJointAngle (cosAngle, sinAngle);
+	dFloat sinAngle = (matrix0.m_up * matrix1.m_up) % matrix0.m_front;
+	dFloat cosAngle = matrix0.m_up % matrix1.m_up;
+	dFloat angle = m_curJointAngle.CalculateJointAngle (cosAngle, sinAngle);
 
 	// if limit are enable ...
 	if (m_limitsOn) {

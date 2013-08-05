@@ -967,6 +967,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\dCustomJoints\CustomdHingeActuator.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dCustomJoints\CustomdHingeActuator.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\dCustomJoints\CustomDryRollingFriction.cpp"
 				>
 			</File>
