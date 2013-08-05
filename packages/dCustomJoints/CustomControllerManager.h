@@ -231,6 +231,9 @@ void CustomControllerManager<CONTROLLER_BASE>::PreUpdate(dFloat timestep)
 template<class CONTROLLER_BASE>
 void CustomControllerManager<CONTROLLER_BASE>::PostUpdate(dFloat timestep)
 {
+CustomList<CONTROLLER_BASE>::CustomListNode* xxx = CustomList<CONTROLLER_BASE>::GetFirst();
+CustomListNode* xxx1 = CustomList<CONTROLLER_BASE>::GetFirst();
+
 	for (CustomList<CONTROLLER_BASE>::CustomListNode* node = CustomList<CONTROLLER_BASE>::GetFirst(); node; node = node->GetNext()) {
 		NewtonDispachThreadJob(m_world, PostUpdateKernel, &node->GetInfo());
 	}
