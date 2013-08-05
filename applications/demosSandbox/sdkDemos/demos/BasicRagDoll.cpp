@@ -98,6 +98,10 @@ class RagDollManager: public CustomSkeletonTransformManager
 		NewtonMaterialSetCollisionCallback (scene->GetNewton(), m_material, m_material, this, OnBoneAABBOverlap, NULL);
 	}
 
+	virtual void OnPreUpdate (CustomSkeletonTransformController* constroller, dFloat timestep, int threadIndex) const
+	{
+	}
+
 	static int OnBoneAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
 	{
 		NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
@@ -179,7 +183,7 @@ class RagDollManager: public CustomSkeletonTransformManager
 	}
 
 	
-	virtual void UpdateTransform (const CustomSkeletonTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
+	virtual void OnUpdateTransform (const CustomSkeletonTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
 	{
 		DemoEntity* const ent = (DemoEntity*) NewtonBodyGetUserData(bone->m_body);
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(bone->m_body));

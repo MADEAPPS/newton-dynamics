@@ -95,7 +95,7 @@ class CustomSkeletonTransformController: public CustomControllerBase
 	protected:
 	NEWTON_API void Init (void* const userData);
 
-	NEWTON_API virtual void PreUpdate(dFloat timestep, int threadIndex) {};
+	NEWTON_API virtual void PreUpdate(dFloat timestep, int threadIndex);
 	NEWTON_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 	
 	private:
@@ -113,21 +113,15 @@ class CustomSkeletonTransformManager: public CustomControllerManager<CustomSkele
 	virtual void Debug () const 
 	{
 	}
-
-	virtual void PreUpdate(dFloat timestep)
-	{
-		// bypass the entire Post Update call by not calling the base class
-	}
-	NEWTON_API virtual void PostUpdate(dFloat timestep);
-
 	
 	NEWTON_API virtual void DisableAllSelfCollision (CustomSkeletonTransformController* const controller);
 	NEWTON_API virtual void SetDefaultSelfCollisionMask (CustomSkeletonTransformController* const controller);
 	
 	NEWTON_API virtual void SetCollisionMask (CustomSkeletonTransformController::dSkeletonBone* const bone0, CustomSkeletonTransformController::dSkeletonBone* const bone1, bool mode);
 	NEWTON_API virtual bool SelfCollisionTest (const CustomSkeletonTransformController::dSkeletonBone* const bone0, const CustomSkeletonTransformController::dSkeletonBone* const bone1) const;
-	
-	NEWTON_API virtual void UpdateTransform (const CustomSkeletonTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const = 0;
+
+	NEWTON_API virtual void OnPreUpdate (CustomSkeletonTransformController* const constroller, dFloat timestep, int threadIndex) const = 0;
+	NEWTON_API virtual void OnUpdateTransform (const CustomSkeletonTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const = 0;
 	NEWTON_API virtual CustomSkeletonTransformController* CreateTransformController (void* const userData);
 };
 

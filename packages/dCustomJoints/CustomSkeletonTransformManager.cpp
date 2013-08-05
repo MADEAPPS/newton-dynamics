@@ -35,10 +35,10 @@ CustomSkeletonTransformController* CustomSkeletonTransformManager::CreateTransfo
 
 
 
-void CustomSkeletonTransformManager::PostUpdate(dFloat timestep)
-{
-	CustomControllerManager<CustomSkeletonTransformController>::PostUpdate(timestep);
-}
+//void CustomSkeletonTransformManager::PostUpdate(dFloat timestep)
+//{
+//	CustomControllerManager<CustomSkeletonTransformController>::PostUpdate(timestep);
+//}
 
 
 void CustomSkeletonTransformManager::SetCollisionMask (CustomSkeletonTransformController::dSkeletonBone* const bone0, CustomSkeletonTransformController::dSkeletonBone* const bone1, bool mode)
@@ -82,6 +82,11 @@ void CustomSkeletonTransformController::Init (void* const userData)
 	m_userData = userData;
 }
 
+void CustomSkeletonTransformController::PreUpdate(dFloat timestep, int threadIndex)
+{
+	CustomSkeletonTransformManager* const manager = (CustomSkeletonTransformManager*) GetManager();
+	manager->OnPreUpdate(this, timestep, threadIndex);
+}
 
 void CustomSkeletonTransformController::PostUpdate(dFloat timestep, int threadIndex)
 {
@@ -91,11 +96,11 @@ void CustomSkeletonTransformController::PostUpdate(dFloat timestep, int threadIn
 		dMatrix matrix;
 		NewtonBodyGetMatrix(bone.m_body, &matrix[0][0]);
 		if (!bone.m_parent) {
-			manager->UpdateTransform (&bone, matrix);
+			manager->OnUpdateTransform (&bone, matrix);
 		} else {
 			dMatrix parentMatrix;
 			NewtonBodyGetMatrix(bone.m_parent->m_body, &parentMatrix[0][0]);
-			manager->UpdateTransform (&bone, matrix * parentMatrix.Inverse() * bone.m_bindMatrix);
+			manager->OnUpdateTransform (&bone, matrix * parentMatrix.Inverse() * bone.m_bindMatrix);
 		}
 	}
 }

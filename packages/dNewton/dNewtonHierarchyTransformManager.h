@@ -36,7 +36,8 @@ class dNewtonHierarchyTransformManager: public CustomSkeletonTransformManager
 		CNEWTON_API dNewtonHierarchyTransformController (dNewtonHierarchyTransformManager* const manager);
 		CNEWTON_API ~dNewtonHierarchyTransformController ();
 
-		NEWTON_API virtual void UpdateTransform (dNewtonBody* const bone, const dFloat* const localMatrix) = 0;
+		NEWTON_API virtual void OnPreUpdate (dFloat timestep) = 0;
+		NEWTON_API virtual void OnUpdateBoneTransform (dNewtonBody* const bone, const dFloat* const localMatrix) = 0;
 		NEWTON_API virtual void* AddBone (dNewtonBody* const bone, const dFloat* const bindMatrix, void* const parentBodne = NULL);
 
 		NEWTON_API void DisableAllSelfCollision ();
@@ -57,7 +58,8 @@ class dNewtonHierarchyTransformManager: public CustomSkeletonTransformManager
 	NEWTON_API void SetSelfCollisionMask (void* const boneNode0, void* const boneNode1, bool mode);
 	NEWTON_API bool SelfCollisionTest (const void* const boneNode0, const void* const boneNode1) const;
 
-	NEWTON_API virtual void UpdateTransform (const CustomSkeletonTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const;
+	NEWTON_API virtual void OnPreUpdate (CustomSkeletonTransformController* const constroller, dFloat timestep, int threadIndex) const;
+	NEWTON_API virtual void OnUpdateTransform (const CustomSkeletonTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const;
 	NEWTON_API void DestroyController (CustomSkeletonTransformController* const controller);
 
 	CNEWTON_API dNewtonHierarchyTransformController* GetFirstController() const;

@@ -113,11 +113,17 @@ void* dNewtonHierarchyTransformManager::dNewtonHierarchyTransformController::Add
 	return m_controller->AddBone (bone->GetNewtonBody(), dMatrix (bindMatrix), (CustomSkeletonTransformController::dSkeletonBone*) parentBone);
 }
 
-void dNewtonHierarchyTransformManager::UpdateTransform (const CustomSkeletonTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
+void dNewtonHierarchyTransformManager::OnPreUpdate (CustomSkeletonTransformController* const controller, dFloat timestep, int threadIndex) const
+{
+	dNewtonHierarchyTransformController* const dcontroller = (dNewtonHierarchyTransformController*) controller->GetUserData();
+	dcontroller->OnPreUpdate (timestep);
+}
+
+void dNewtonHierarchyTransformManager::OnUpdateTransform (const CustomSkeletonTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
 {
 	dNewtonBody* const boneBody = (dNewtonBody*)NewtonBodyGetUserData (bone->m_body);
 	dNewtonHierarchyTransformController* const controller = (dNewtonHierarchyTransformController*)bone->m_myController->GetUserData();
-	controller->UpdateTransform (boneBody, &localMatrix[0][0]);
+	controller->OnUpdateBoneTransform (boneBody, &localMatrix[0][0]);
 }
 
 void dNewtonHierarchyTransformManager::DisableAllSelfCollision (CustomSkeletonTransformController* const controller)
