@@ -33,7 +33,7 @@ class dNewtonHierarchyTransformManager: public CustomHierarchicalTransformManage
 	class dNewtonHierarchyTransformController: public dNewtonAlloc
 	{
 		public:
-		CNEWTON_API dNewtonHierarchyTransformController (dNewtonHierarchyTransformManager* const manager);
+		CNEWTON_API dNewtonHierarchyTransformController (dNewtonHierarchyTransformManager* const manager, bool projectError);
 		CNEWTON_API ~dNewtonHierarchyTransformController ();
 
 		NEWTON_API virtual void OnPreUpdate (dFloat timestep) = 0;

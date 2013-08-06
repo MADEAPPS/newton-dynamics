@@ -335,8 +335,7 @@ dgVector dgBody::CalculateInverseDynamicForce (const dgVector& desiredVeloc, dgF
 dgConstraint* dgBody::GetFirstJoint() const
 {
 	for (dgBodyMasterListRow::dgListNode* node = m_masterNode->GetInfo().GetFirst(); node; node = node->GetNext()) {
-		dgConstraint* joint;
-		joint = node->GetInfo().m_joint;
+		dgConstraint* const joint = node->GetInfo().m_joint;
 		if (joint->GetId() >= dgConstraint::m_unknownConstraint) {
 			return joint;
 		}
@@ -353,8 +352,7 @@ dgConstraint* dgBody::GetNextJoint(dgConstraint* const joint) const
 
 	if (node->GetInfo().m_joint == joint) {
 		for (node = node->GetNext(); node; node = node->GetNext()) {
-			dgConstraint* joint;
-			joint = node->GetInfo().m_joint;
+			dgConstraint* const joint = node->GetInfo().m_joint;
 			if (joint->GetId() >= dgConstraint::m_unknownConstraint) {
 				return joint;
 			}

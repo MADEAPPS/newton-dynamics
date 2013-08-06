@@ -67,10 +67,10 @@ NEWTON_API void dNewtonHierarchyTransformManager::DestroyController (CustomHiera
 	CustomHierarchicalTransformManager::DestroyController (controller);
 }
 
-dNewtonHierarchyTransformManager::dNewtonHierarchyTransformController::dNewtonHierarchyTransformController (dNewtonHierarchyTransformManager* const manager)
+dNewtonHierarchyTransformManager::dNewtonHierarchyTransformController::dNewtonHierarchyTransformController (dNewtonHierarchyTransformManager* const manager, bool projectError)
 	:dNewtonAlloc()
 {
-	m_controller = manager->CreateTransformController( this);
+	m_controller = manager->CreateTransformController(this, projectError);
 }
 
 dNewtonHierarchyTransformManager::dNewtonHierarchyTransformController::~dNewtonHierarchyTransformController ()

@@ -26,19 +26,12 @@ CustomHierarchicalTransformManager::~CustomHierarchicalTransformManager()
 {
 }
 
-CustomHierarchicalTransformController* CustomHierarchicalTransformManager::CreateTransformController (void* const userData)
+CustomHierarchicalTransformController* CustomHierarchicalTransformManager::CreateTransformController (void* const userData, bool errorCorrectionMode)
 {
 	CustomHierarchicalTransformController* const controller = (CustomHierarchicalTransformController*) CreateController();
-	controller->Init (userData);
+	controller->Init (userData, errorCorrectionMode);
 	return controller;
 }
-
-
-
-//void CustomSkeletonTransformManager::PostUpdate(dFloat timestep)
-//{
-//	CustomControllerManager<CustomSkeletonTransformController>::PostUpdate(timestep);
-//}
 
 
 void CustomHierarchicalTransformManager::SetCollisionMask (CustomHierarchicalTransformController::dSkeletonBone* const bone0, CustomHierarchicalTransformController::dSkeletonBone* const bone1, bool mode)
@@ -76,11 +69,23 @@ CustomHierarchicalTransformController::~CustomHierarchicalTransformController()
 }
 
 
-void CustomHierarchicalTransformController::Init (void* const userData)
+void CustomHierarchicalTransformController::Init (void* const userData, bool errorCorrection)
 {
 	m_boneCount = 0;
 	m_userData = userData;
+	SetErrorProjectionMode (errorCorrection);
 }
+
+void CustomHierarchicalTransformController::SetErrorProjectionMode (bool mode)
+{
+	m_errorProjectionMode = mode;
+}
+
+bool CustomHierarchicalTransformController::GetErrorProjectionMode () const
+{
+	return m_errorProjectionMode;
+}
+
 
 void CustomHierarchicalTransformController::PreUpdate(dFloat timestep, int threadIndex)
 {
@@ -88,8 +93,85 @@ void CustomHierarchicalTransformController::PreUpdate(dFloat timestep, int threa
 	manager->OnPreUpdate(this, timestep, threadIndex);
 }
 
+void CustomHierarchicalTransformController::ProjectErrors ()
+{
+	dMatrix localMatrix [D_HIERACHICAL_CONTROLLER_MAX_BONES];
+	dVector localVeloc [D_HIERACHICAL_CONTROLLER_MAX_BONES];
+	dVector localOmega [D_HIERACHICAL_CONTROLLER_MAX_BONES];
+
+	bool inError = true;
+	for (int i = m_boneCount - 1; i > 0; i --) {
+		const dSkeletonBone* const bone = &m_bones[i];
+		dAssert (bone->m_parent);
+		const NewtonBody* const child = bone->m_body;
+		const NewtonBody* const parent = bone->m_parent->m_body;
+
+		NewtonJoint* joint = NewtonBodyGetFirstJoint(child);
+		for ( ; joint; joint = NewtonBodyGetNextJoint(child, joint)) {
+			if ((NewtonJointGetBody0(joint) == parent) || (NewtonJointGetBody1(joint) == parent)) {
+				break;
+			}
+		}
+		dAssert (joint);
+		CustomJoint* const cJoint = (CustomJoint*) NewtonJointGetUserData(joint);
+
+		const NewtonBody* const body0 = cJoint->GetBody0();
+		inError &= cJoint->ProjectError (body0 != child);
+
+		dMatrix childMatrix;
+		dMatrix parentMatrix;
+		dVector childVeloc;
+		dVector parentVeloc;
+		dVector childOmega;
+		dVector parentOmega;
+
+		NewtonBodyGetMatrix (child, &childMatrix[0][0]);
+		NewtonBodyGetMatrix (parent, &parentMatrix[0][0]);
+		
+		NewtonBodyGetVelocity(child, &childVeloc[0]);
+		NewtonBodyGetVelocity(parent, &parentVeloc[0]);
+
+		NewtonBodyGetOmega(child, &childOmega[0]);
+		NewtonBodyGetOmega(parent, &parentOmega[0]);
+
+		localMatrix[i] = childMatrix * parentMatrix.Inverse();
+		localVeloc[i] = parentMatrix.UnrotateVector (childVeloc - parentVeloc);
+		localOmega[i] = parentMatrix.UnrotateVector (childOmega - parentOmega);
+	}
+
+	if (inError) {
+		for (int i = 1; i < m_boneCount; i ++) {
+			dMatrix parentMatrix;
+			dVector parentVeloc;
+			dVector parentOmega;
+
+			const dSkeletonBone* const bone = &m_bones[i];
+			const NewtonBody* const child = bone->m_body;
+			const NewtonBody* const parent = bone->m_parent->m_body;
+
+			NewtonBodyGetMatrix (parent, &parentMatrix[0][0]);
+			NewtonBodyGetVelocity(parent, &parentVeloc[0]);
+			NewtonBodyGetOmega(parent, &parentOmega[0]);
+
+			dMatrix childMatrix (localMatrix[i] * parentMatrix);
+			dVector childVeloc (parentMatrix.RotateVector(parentVeloc + localVeloc[i]));
+			dVector childOmega (parentMatrix.RotateVector(parentOmega + localOmega[i]));
+
+			NewtonBodySetMatrix (child, &childMatrix[0][0]);
+			NewtonBodySetVelocity (child, &childVeloc[0]);
+			NewtonBodySetOmega (child, &childOmega[0]);
+		}
+	}
+}
+
 void CustomHierarchicalTransformController::PostUpdate(dFloat timestep, int threadIndex)
 {
+	if (m_errorProjectionMode && m_boneCount && (NewtonBodyGetSleepState(m_bones[0].m_body) == 0)) {
+		ProjectErrors ();
+	} else {
+		dAssert (0);
+	}
+
 	CustomHierarchicalTransformManager* const manager = (CustomHierarchicalTransformManager*) GetManager();
 	for (int i = 0; i < m_boneCount; i ++) {
 		const dSkeletonBone& bone = m_bones[i];

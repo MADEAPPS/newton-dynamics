@@ -85,6 +85,9 @@ class CustomHierarchicalTransformController: public CustomControllerBase
 	NEWTON_API CustomHierarchicalTransformController();
 	NEWTON_API ~CustomHierarchicalTransformController();
 
+	NEWTON_API void SetErrorProjectionMode (bool mode);
+	NEWTON_API bool GetErrorProjectionMode () const;
+
 	NEWTON_API void DisableAllSelfCollision ();
 	NEWTON_API void SetDefaultSelfCollisionMask ();
 	NEWTON_API void SetSelfCollisionMask (dSkeletonBone* const bone0, dSkeletonBone* const bone1, bool mode);
@@ -93,14 +96,18 @@ class CustomHierarchicalTransformController: public CustomControllerBase
 	NEWTON_API dSkeletonBone* AddBone (NewtonBody* const bone, const dMatrix& bindMatrix, dSkeletonBone* const parentBodne = NULL);
 	
 	protected:
-	NEWTON_API void Init (void* const userData);
+	NEWTON_API void Init (void* const userData, bool errorCorrectionMode);
 
 	NEWTON_API virtual void PreUpdate(dFloat timestep, int threadIndex);
 	NEWTON_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 	
 	private:
-	int m_boneCount;
+	NEWTON_API virtual void ProjectErrors ();
+
+
 	dSkeletonBone m_bones[D_HIERACHICAL_CONTROLLER_MAX_BONES];
+	int m_boneCount;
+	bool m_errorProjectionMode;
 	friend class CustomHierarchicalTransformManager;
 };
 
@@ -113,6 +120,8 @@ class CustomHierarchicalTransformManager: public CustomControllerManager<CustomH
 	virtual void Debug () const 
 	{
 	}
+
+	NEWTON_API virtual CustomHierarchicalTransformController* CreateTransformController (void* const userData, bool errorCorrectionMode);
 	
 	NEWTON_API virtual void DisableAllSelfCollision (CustomHierarchicalTransformController* const controller);
 	NEWTON_API virtual void SetDefaultSelfCollisionMask (CustomHierarchicalTransformController* const controller);
@@ -122,7 +131,6 @@ class CustomHierarchicalTransformManager: public CustomControllerManager<CustomH
 
 	NEWTON_API virtual void OnPreUpdate (CustomHierarchicalTransformController* const constroller, dFloat timestep, int threadIndex) const = 0;
 	NEWTON_API virtual void OnUpdateTransform (const CustomHierarchicalTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const = 0;
-	NEWTON_API virtual CustomHierarchicalTransformController* CreateTransformController (void* const userData);
 };
 
 

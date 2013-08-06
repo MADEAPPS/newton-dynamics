@@ -21,10 +21,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #ifdef _NEWTON_BUILD_DLL
-	BOOL APIENTRY DllMain( HMODULE hModule,
-						  DWORD  ul_reason_for_call,
-						  LPVOID lpReserved
-						  )
+	BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
 	{
 		switch (ul_reason_for_call)
 		{
@@ -194,8 +191,10 @@ void CustomJoint::GetInfo (NewtonJointRecord* const info) const
 	dAssert (0);
 }
 
-void CustomJoint::ProjectError () const
+
+bool CustomJoint::ProjectError (bool flipOrder) const
 {
+	return false;
 }
 
 void CustomJoint::SetBodiesCollisionState (int state)
