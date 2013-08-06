@@ -10,3 +10,13 @@
 
 cmake_minimum_required( VERSION 2.8 )
 project (newtonSDK)
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR})
+
+file(GLOB_RECURSE NewtonLibSrc ${CMAKE_SOURCE_DIR}/coreLibrary_300/source/*.cpp)
+file(GLOB_RECURSE NewtonLibH ${CMAKE_SOURCE_DIR}/coreLibrary_300/source/*.h)
+
+
+set (LIB_TYPE SHARED)
+add_library(Newton ${LIB_TYPE} ${NewtonLibH} ${NewtonLibSrc})
+
