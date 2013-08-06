@@ -99,7 +99,7 @@ void CustomHierarchicalTransformController::ProjectErrors ()
 	dVector localVeloc [D_HIERACHICAL_CONTROLLER_MAX_BONES];
 	dVector localOmega [D_HIERACHICAL_CONTROLLER_MAX_BONES];
 
-	bool inError = true;
+	bool inError = false;
 	for (int i = m_boneCount - 1; i > 0; i --) {
 		const dSkeletonBone* const bone = &m_bones[i];
 		dAssert (bone->m_parent);
@@ -116,7 +116,7 @@ void CustomHierarchicalTransformController::ProjectErrors ()
 		CustomJoint* const cJoint = (CustomJoint*) NewtonJointGetUserData(joint);
 
 		const NewtonBody* const body0 = cJoint->GetBody0();
-		inError &= cJoint->ProjectError (body0 != child);
+		inError |= cJoint->ProjectError (body0 != child);
 
 		dMatrix childMatrix;
 		dMatrix parentMatrix;
