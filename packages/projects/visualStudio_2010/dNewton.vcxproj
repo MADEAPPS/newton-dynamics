@@ -187,16 +187,22 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\dNewton\dNewton.cpp" />
+    <ClCompile Include="..\..\dNewton\dNewtonActuatorJoints.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonAlloc.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonBody.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonCollision.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonDynamicBody.cpp" />
+    <ClCompile Include="..\..\dNewton\dNewtonHierarchyTransformManager.cpp" />
+    <ClCompile Include="..\..\dNewton\dNewtonInputManager.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonJoint.cpp" />
+    <ClCompile Include="..\..\dNewton\dNewtonKinematicBody.cpp" />
+    <ClCompile Include="..\..\dNewton\dNewtonMaterial.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonMesh.cpp" />
+    <ClCompile Include="..\..\dNewton\dNewtonPlayerManager.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonRayCast.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonSceneBody.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonScopeBuffer.cpp" />
-    <ClCompile Include="..\..\dNewton\dNewtonTranformLerp.cpp" />
+    <ClCompile Include="..\..\dNewton\dNewtonTransformLerp.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonTriggerManager.cpp" />
     <ClCompile Include="..\..\dNewton\dStdAfxNewton.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -207,16 +213,22 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dNewton\dNewton.h" />
+    <ClInclude Include="..\..\dNewton\dNewtonActuatorJoints.h" />
     <ClInclude Include="..\..\dNewton\dNewtonAlloc.h" />
     <ClInclude Include="..\..\dNewton\dNewtonBody.h" />
     <ClInclude Include="..\..\dNewton\dNewtonCollision.h" />
     <ClInclude Include="..\..\dNewton\dNewtonDynamicBody.h" />
+    <ClInclude Include="..\..\dNewton\dNewtonHierarchyTransformManager.h" />
+    <ClInclude Include="..\..\dNewton\dNewtonInputManager.h" />
     <ClInclude Include="..\..\dNewton\dNewtonJoint.h" />
+    <ClInclude Include="..\..\dNewton\dNewtonKinematicBody.h" />
+    <ClInclude Include="..\..\dNewton\dNewtonMaterial.h" />
     <ClInclude Include="..\..\dNewton\dNewtonMesh.h" />
+    <ClInclude Include="..\..\dNewton\dNewtonPlayerManager.h" />
     <ClInclude Include="..\..\dNewton\dNewtonRayCast.h" />
     <ClInclude Include="..\..\dNewton\dNewtonSceneBody.h" />
     <ClInclude Include="..\..\dNewton\dNewtonScopeBuffer.h" />
-    <ClInclude Include="..\..\dNewton\dNewtonTranformLerp.h" />
+    <ClInclude Include="..\..\dNewton\dNewtonTransformLerp.h" />
     <ClInclude Include="..\..\dNewton\dNewtonTriggerManager.h" />
     <ClInclude Include="..\..\dNewton\dStdAfxNewton.h" />
   </ItemGroup>

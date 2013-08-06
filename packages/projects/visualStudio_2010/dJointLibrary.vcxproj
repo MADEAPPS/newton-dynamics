@@ -405,6 +405,7 @@
     <ClCompile Include="..\..\dCustomJoints\CustomCorkScrew.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomDryRollingFriction.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomGear.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomHierarchicalTransformManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomHinge.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomJoint.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomJointLibraryStdAfx.cpp">
@@ -422,7 +423,6 @@
     <ClCompile Include="..\..\dCustomJoints\CustomPlayerControllerManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomPulley.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomRackAndPinion.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomSkeletonTransformManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomSlider.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomSlidingContact.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomTriggerManager.cpp" />
@@ -439,6 +439,7 @@
     <ClInclude Include="..\..\dCustomJoints\CustomCorkScrew.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomDryRollingFriction.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomGear.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomHierarchicalTransformManager.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomHinge.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomJoint.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomJointLibraryStdAfx.h" />
@@ -447,7 +448,6 @@
     <ClInclude Include="..\..\dCustomJoints\CustomPlayerControllerManager.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomPulley.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomRackAndPinion.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomSkeletonTransformManager.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomSlider.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomSlidingContact.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomTriggerManager.h" />
