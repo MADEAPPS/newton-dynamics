@@ -88,6 +88,52 @@ dFloat CustomHinge::GetJointOmega () const
 	return m_jointOmega;
 }
 
+bool CustomHinge::ProjectError () const
+{
+/*
+	dMatrix matrix0;
+	dMatrix matrix1;
+
+static int xxx;
+xxx ++;
+if (xxx >= 500)
+xxx *=1;
+		
+	CalculateGlobalMatrix (matrix0, matrix1);
+
+	dFloat sinAngle = (matrix0.m_up * matrix1.m_up) % matrix1.m_front;
+	dFloat cosAngle = matrix0.m_up % matrix1.m_up;
+
+	dMatrix picthMatrix0 (GetIdentityMatrix());
+	picthMatrix[1][1] = cosAngle;
+	picthMatrix[1][2] = sinAngle;
+	picthMatrix[2][2] = cosAngle;
+	picthMatrix[2][1] = -sinAngle;
+
+	dMatrix picthMatrix1 ();	
+
+//dMatrix matrix___ (picthMatrix * matrix0);
+//	dMatrix matrix (picthMatrix * matrix0 * matrix1.Inverse());
+
+//	dMatrix errorMatrix(matrix * m_localMatrix0.Inverse());
+//	if ((errorMatrix.m_posit % errorMatrix.m_posit) > 1.0e-4f) {
+//		dAssert (0);
+//	} else {
+//		dQuaternion error (errorMatrix);
+//		if (dAbs (error.m_q0 - 1.0f) > 1.0e-5f) {
+		//	dAssert (0);
+//		}
+//	}
+	
+//		NewtonBodyGetVelocity(child, &childVeloc[0]);
+//		NewtonBodyGetVelocity(parent, &parentVeloc[0]);
+
+//		NewtonBodyGetOmega(child, &childOmega[0]);
+//		NewtonBodyGetOmega(parent, &parentOmega[0]);
+*/
+
+	return false;
+}
 
 void CustomHinge::SubmitConstraints (dFloat timestep, int threadIndex)
 {
@@ -98,20 +144,20 @@ void CustomHinge::SubmitConstraints (dFloat timestep, int threadIndex)
 	CalculateGlobalMatrix (matrix0, matrix1);
 
 	// Restrict the movement on the pivot point along all tree orthonormal direction
-	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix0.m_front[0]);
-	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix0.m_up[0]);
-	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix0.m_right[0]);
+	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
+	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_up[0]);
+	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_right[0]);
 	
 	// get a point along the pin axis at some reasonable large distance from the pivot
 	dVector q0 (matrix0.m_posit + matrix0.m_front.Scale(MIN_JOINT_PIN_LENGTH));
 	dVector q1 (matrix1.m_posit + matrix1.m_front.Scale(MIN_JOINT_PIN_LENGTH));
 
 	// two constraints row perpendicular to the pin vector
- 	NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &matrix0.m_up[0]);
-	NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &matrix0.m_right[0]);
+ 	NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &matrix1.m_up[0]);
+	NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &matrix1.m_right[0]);
 
 	// the joint angle can be determine by getting the angle between any two non parallel vectors
-	dFloat sinAngle = (matrix0.m_up * matrix1.m_up) % matrix0.m_front;
+	dFloat sinAngle = (matrix0.m_up * matrix1.m_up) % matrix1.m_front;
 	dFloat cosAngle = matrix0.m_up % matrix1.m_up;
 	dFloat angle = m_curJointAngle.CalculateJointAngle (cosAngle, sinAngle);
 
@@ -124,7 +170,7 @@ void CustomHinge::SubmitConstraints (dFloat timestep, int threadIndex)
 			m_curJointAngle.m_angle = m_minAngle;
 
 			// tell joint error will minimize the exceeded angle error
-			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix0.m_front[0]);
+			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix1.m_front[0]);
 
 			// need high stiffness here
 			NewtonUserJointSetRowStiffness (m_joint, 1.0f);
@@ -140,7 +186,7 @@ void CustomHinge::SubmitConstraints (dFloat timestep, int threadIndex)
 			m_curJointAngle.m_angle = m_maxAngle;
 			
 			// tell joint error will minimize the exceeded angle error
-			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix0.m_front[0]);
+			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix1.m_front[0]);
 
 			// need high stiffness here
 			NewtonUserJointSetRowStiffness (m_joint, 1.0f);

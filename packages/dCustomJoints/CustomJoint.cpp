@@ -192,7 +192,7 @@ void CustomJoint::GetInfo (NewtonJointRecord* const info) const
 }
 
 
-bool CustomJoint::ProjectError (bool flipOrder) const
+bool CustomJoint::ProjectError () const
 {
 	return false;
 }

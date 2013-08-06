@@ -40,6 +40,7 @@ class CustomHinge: public CustomJoint
 	}
 
 	protected:
+	NEWTON_API virtual bool ProjectError () const;
 	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
 	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 

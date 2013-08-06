@@ -117,9 +117,7 @@ void CustomHierarchicalTransformController::ProjectErrors ()
 		if (joint) {
 			hasJoint[i] = true;
 			CustomJoint* const cJoint = (CustomJoint*) NewtonJointGetUserData(joint);
-
-			const NewtonBody* const body0 = cJoint->GetBody0();
-			inError |= cJoint->ProjectError (body0 != child);
+			inError |= cJoint->ProjectError ();
 
 			dMatrix childMatrix;
 			dMatrix parentMatrix;
@@ -172,9 +170,9 @@ void CustomHierarchicalTransformController::ProjectErrors ()
 
 void CustomHierarchicalTransformController::PostUpdate(dFloat timestep, int threadIndex)
 {
-	if (m_errorProjectionMode && m_boneCount && (NewtonBodyGetSleepState(m_bones[0].m_body) == 0)) {
+//	if (m_errorProjectionMode && m_boneCount && (NewtonBodyGetSleepState(m_bones[0].m_body) == 0)) {
 		ProjectErrors ();
-	}
+//	}
 
 	CustomHierarchicalTransformManager* const manager = (CustomHierarchicalTransformManager*) GetManager();
 	for (int i = 0; i < m_boneCount; i ++) {
