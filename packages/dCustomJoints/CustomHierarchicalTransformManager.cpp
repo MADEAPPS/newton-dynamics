@@ -98,6 +98,7 @@ void CustomHierarchicalTransformController::ProjectErrors ()
 	dMatrix localMatrix [D_HIERACHICAL_CONTROLLER_MAX_BONES];
 	dVector localVeloc [D_HIERACHICAL_CONTROLLER_MAX_BONES];
 	dVector localOmega [D_HIERACHICAL_CONTROLLER_MAX_BONES];
+	bool hasJoint [D_HIERACHICAL_CONTROLLER_MAX_BONES];
 
 	bool inError = false;
 	for (int i = m_boneCount - 1; i > 0; i --) {
@@ -112,54 +113,59 @@ void CustomHierarchicalTransformController::ProjectErrors ()
 				break;
 			}
 		}
-		dAssert (joint);
-		CustomJoint* const cJoint = (CustomJoint*) NewtonJointGetUserData(joint);
+		hasJoint[i] = false;
+		if (joint) {
+			hasJoint[i] = true;
+			CustomJoint* const cJoint = (CustomJoint*) NewtonJointGetUserData(joint);
 
-		const NewtonBody* const body0 = cJoint->GetBody0();
-		inError |= cJoint->ProjectError (body0 != child);
+			const NewtonBody* const body0 = cJoint->GetBody0();
+			inError |= cJoint->ProjectError (body0 != child);
 
-		dMatrix childMatrix;
-		dMatrix parentMatrix;
-		dVector childVeloc;
-		dVector parentVeloc;
-		dVector childOmega;
-		dVector parentOmega;
+			dMatrix childMatrix;
+			dMatrix parentMatrix;
+			dVector childVeloc;
+			dVector parentVeloc;
+			dVector childOmega;
+			dVector parentOmega;
 
-		NewtonBodyGetMatrix (child, &childMatrix[0][0]);
-		NewtonBodyGetMatrix (parent, &parentMatrix[0][0]);
-		
-		NewtonBodyGetVelocity(child, &childVeloc[0]);
-		NewtonBodyGetVelocity(parent, &parentVeloc[0]);
+			NewtonBodyGetMatrix (child, &childMatrix[0][0]);
+			NewtonBodyGetMatrix (parent, &parentMatrix[0][0]);
+			
+			NewtonBodyGetVelocity(child, &childVeloc[0]);
+			NewtonBodyGetVelocity(parent, &parentVeloc[0]);
 
-		NewtonBodyGetOmega(child, &childOmega[0]);
-		NewtonBodyGetOmega(parent, &parentOmega[0]);
+			NewtonBodyGetOmega(child, &childOmega[0]);
+			NewtonBodyGetOmega(parent, &parentOmega[0]);
 
-		localMatrix[i] = childMatrix * parentMatrix.Inverse();
-		localVeloc[i] = parentMatrix.UnrotateVector (childVeloc - parentVeloc);
-		localOmega[i] = parentMatrix.UnrotateVector (childOmega - parentOmega);
+			localMatrix[i] = childMatrix * parentMatrix.Inverse();
+			localVeloc[i] = parentMatrix.UnrotateVector (childVeloc - parentVeloc);
+			localOmega[i] = parentMatrix.UnrotateVector (childOmega - parentOmega);
+		}
 	}
 
 	if (inError) {
 		for (int i = 1; i < m_boneCount; i ++) {
-			dMatrix parentMatrix;
-			dVector parentVeloc;
-			dVector parentOmega;
+			if (hasJoint[i]) {
+				dMatrix parentMatrix;
+				dVector parentVeloc;
+				dVector parentOmega;
 
-			const dSkeletonBone* const bone = &m_bones[i];
-			const NewtonBody* const child = bone->m_body;
-			const NewtonBody* const parent = bone->m_parent->m_body;
+				const dSkeletonBone* const bone = &m_bones[i];
+				const NewtonBody* const child = bone->m_body;
+				const NewtonBody* const parent = bone->m_parent->m_body;
 
-			NewtonBodyGetMatrix (parent, &parentMatrix[0][0]);
-			NewtonBodyGetVelocity(parent, &parentVeloc[0]);
-			NewtonBodyGetOmega(parent, &parentOmega[0]);
+				NewtonBodyGetMatrix (parent, &parentMatrix[0][0]);
+				NewtonBodyGetVelocity(parent, &parentVeloc[0]);
+				NewtonBodyGetOmega(parent, &parentOmega[0]);
 
-			dMatrix childMatrix (localMatrix[i] * parentMatrix);
-			dVector childVeloc (parentMatrix.RotateVector(parentVeloc + localVeloc[i]));
-			dVector childOmega (parentMatrix.RotateVector(parentOmega + localOmega[i]));
+				dMatrix childMatrix (localMatrix[i] * parentMatrix);
+				dVector childVeloc (parentMatrix.RotateVector(parentVeloc + localVeloc[i]));
+				dVector childOmega (parentMatrix.RotateVector(parentOmega + localOmega[i]));
 
-			NewtonBodySetMatrix (child, &childMatrix[0][0]);
-			NewtonBodySetVelocity (child, &childVeloc[0]);
-			NewtonBodySetOmega (child, &childOmega[0]);
+				NewtonBodySetMatrix (child, &childMatrix[0][0]);
+				NewtonBodySetVelocity (child, &childVeloc[0]);
+				NewtonBodySetOmega (child, &childOmega[0]);
+			}
 		}
 	}
 }
@@ -168,8 +174,6 @@ void CustomHierarchicalTransformController::PostUpdate(dFloat timestep, int thre
 {
 	if (m_errorProjectionMode && m_boneCount && (NewtonBodyGetSleepState(m_bones[0].m_body) == 0)) {
 		ProjectErrors ();
-	} else {
-		dAssert (0);
 	}
 
 	CustomHierarchicalTransformManager* const manager = (CustomHierarchicalTransformManager*) GetManager();
