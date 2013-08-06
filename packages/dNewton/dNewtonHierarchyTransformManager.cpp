@@ -27,7 +27,7 @@
 
 
 dNewtonHierarchyTransformManager::dNewtonHierarchyTransformManager (dNewton* const world)
-	:CustomSkeletonTransformManager (world->GetNewton())
+	:CustomHierarchicalTransformManager (world->GetNewton())
 {
 }
 
@@ -57,14 +57,14 @@ dNewtonHierarchyTransformManager::dNewtonHierarchyTransformController* dNewtonHi
 	return NULL;
 }
 
-NEWTON_API void dNewtonHierarchyTransformManager::DestroyController (CustomSkeletonTransformController* const controller)
+NEWTON_API void dNewtonHierarchyTransformManager::DestroyController (CustomHierarchicalTransformController* const controller)
 {
 	dNewtonHierarchyTransformController* const myController = (dNewtonHierarchyTransformController*) controller->GetUserData();
 	controller->SetUserData(NULL);
 	if (myController) {
 		delete myController;
 	}
-	CustomSkeletonTransformManager::DestroyController (controller);
+	CustomHierarchicalTransformManager::DestroyController (controller);
 }
 
 dNewtonHierarchyTransformManager::dNewtonHierarchyTransformController::dNewtonHierarchyTransformController (dNewtonHierarchyTransformManager* const manager)
@@ -95,45 +95,45 @@ void dNewtonHierarchyTransformManager::dNewtonHierarchyTransformController::SetD
 
 void dNewtonHierarchyTransformManager::dNewtonHierarchyTransformController::SetSelfCollisionMask (void* const boneNode0, void* const boneNode1, bool mode)
 {
-	CustomSkeletonTransformController::dSkeletonBone* const bone0 = (CustomSkeletonTransformController::dSkeletonBone*) boneNode0;
-	CustomSkeletonTransformController::dSkeletonBone* const bone1 = (CustomSkeletonTransformController::dSkeletonBone*) boneNode1;
+	CustomHierarchicalTransformController::dSkeletonBone* const bone0 = (CustomHierarchicalTransformController::dSkeletonBone*) boneNode0;
+	CustomHierarchicalTransformController::dSkeletonBone* const bone1 = (CustomHierarchicalTransformController::dSkeletonBone*) boneNode1;
 	m_controller->SetSelfCollisionMask (bone0, bone1,  mode);
 }
 
 bool dNewtonHierarchyTransformManager::dNewtonHierarchyTransformController::SelfCollisionTest (const void* const boneNode0, const void* const boneNode1) const
 {
-	CustomSkeletonTransformController::dSkeletonBone* const bone0 = (CustomSkeletonTransformController::dSkeletonBone*) boneNode0;
-	CustomSkeletonTransformController::dSkeletonBone* const bone1 = (CustomSkeletonTransformController::dSkeletonBone*) boneNode1;
+	CustomHierarchicalTransformController::dSkeletonBone* const bone0 = (CustomHierarchicalTransformController::dSkeletonBone*) boneNode0;
+	CustomHierarchicalTransformController::dSkeletonBone* const bone1 = (CustomHierarchicalTransformController::dSkeletonBone*) boneNode1;
 	return m_controller->SelfCollisionTest (bone0, bone1);
 }
 
 
 void* dNewtonHierarchyTransformManager::dNewtonHierarchyTransformController::AddBone (dNewtonBody* const bone, const dFloat* const bindMatrix, void* const parentBone)
 {
-	return m_controller->AddBone (bone->GetNewtonBody(), dMatrix (bindMatrix), (CustomSkeletonTransformController::dSkeletonBone*) parentBone);
+	return m_controller->AddBone (bone->GetNewtonBody(), dMatrix (bindMatrix), (CustomHierarchicalTransformController::dSkeletonBone*) parentBone);
 }
 
-void dNewtonHierarchyTransformManager::OnPreUpdate (CustomSkeletonTransformController* const controller, dFloat timestep, int threadIndex) const
+void dNewtonHierarchyTransformManager::OnPreUpdate (CustomHierarchicalTransformController* const controller, dFloat timestep, int threadIndex) const
 {
 	dNewtonHierarchyTransformController* const dcontroller = (dNewtonHierarchyTransformController*) controller->GetUserData();
 	dcontroller->OnPreUpdate (timestep);
 }
 
-void dNewtonHierarchyTransformManager::OnUpdateTransform (const CustomSkeletonTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
+void dNewtonHierarchyTransformManager::OnUpdateTransform (const CustomHierarchicalTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
 {
 	dNewtonBody* const boneBody = (dNewtonBody*)NewtonBodyGetUserData (bone->m_body);
 	dNewtonHierarchyTransformController* const controller = (dNewtonHierarchyTransformController*)bone->m_myController->GetUserData();
 	controller->OnUpdateBoneTransform (boneBody, &localMatrix[0][0]);
 }
 
-void dNewtonHierarchyTransformManager::DisableAllSelfCollision (CustomSkeletonTransformController* const controller)
+void dNewtonHierarchyTransformManager::DisableAllSelfCollision (CustomHierarchicalTransformController* const controller)
 {
 	dNewtonHierarchyTransformController* const myController = (dNewtonHierarchyTransformController*) controller->GetUserData();
 	dAssert (myController);
 	myController->DisableAllSelfCollision();
 }
 
-void dNewtonHierarchyTransformManager::SetDefaultSelfCollisionMask (CustomSkeletonTransformController* const controller)
+void dNewtonHierarchyTransformManager::SetDefaultSelfCollisionMask (CustomHierarchicalTransformController* const controller)
 {
 	dNewtonHierarchyTransformController* const myController = (dNewtonHierarchyTransformController*) controller->GetUserData();
 	dAssert (myController);
@@ -142,16 +142,16 @@ void dNewtonHierarchyTransformManager::SetDefaultSelfCollisionMask (CustomSkelet
 
 void dNewtonHierarchyTransformManager::SetSelfCollisionMask (void* const boneNode0, void* const boneNode1, bool mode)
 {
-	CustomSkeletonTransformController::dSkeletonBone* const bone0 = (CustomSkeletonTransformController::dSkeletonBone*) boneNode0;
-	CustomSkeletonTransformController::dSkeletonBone* const bone1 = (CustomSkeletonTransformController::dSkeletonBone*) boneNode1;
+	CustomHierarchicalTransformController::dSkeletonBone* const bone0 = (CustomHierarchicalTransformController::dSkeletonBone*) boneNode0;
+	CustomHierarchicalTransformController::dSkeletonBone* const bone1 = (CustomHierarchicalTransformController::dSkeletonBone*) boneNode1;
 	dAssert (bone0->m_myController == bone1->m_myController);
 	bone0->m_myController->SetSelfCollisionMask (bone0, bone1, mode);
 }
 
 bool dNewtonHierarchyTransformManager::SelfCollisionTest (const void* const boneNode0, const void* const boneNode1) const
 {
-	CustomSkeletonTransformController::dSkeletonBone* const bone0 = (CustomSkeletonTransformController::dSkeletonBone*) boneNode0;
-	CustomSkeletonTransformController::dSkeletonBone* const bone1 = (CustomSkeletonTransformController::dSkeletonBone*) boneNode1;
+	CustomHierarchicalTransformController::dSkeletonBone* const bone0 = (CustomHierarchicalTransformController::dSkeletonBone*) boneNode0;
+	CustomHierarchicalTransformController::dSkeletonBone* const bone1 = (CustomHierarchicalTransformController::dSkeletonBone*) boneNode1;
 	return bone0->m_myController->SelfCollisionTest (bone0, bone1);
 }
 

@@ -72,6 +72,8 @@ class CustomJoint: public CustomAlloc
 	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 
+
+
 	// these member function are only used by the C interface or for hooking callback to customize a particular 
 	// joint without deriving a new one
 	// note: this is not a extension of a virtual function, DO NOT CALL the base class SubmitConstraints!! 
@@ -89,6 +91,8 @@ class CustomJoint: public CustomAlloc
 
 	protected:
 	NEWTON_API void Init (int maxDOF, NewtonBody* const body0, NewtonBody* const body1);
+	NEWTON_API virtual void ProjectError () const;
+
 	// the application needs to implement this function for each derived joint. See examples for more detail
 	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	NEWTON_API void CalculateGlobalMatrix (const dMatrix& localMatrix0, const dMatrix& localMatrix1, dMatrix& matrix0, dMatrix& matrix1) const;

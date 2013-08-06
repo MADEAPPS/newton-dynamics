@@ -194,6 +194,10 @@ void CustomJoint::GetInfo (NewtonJointRecord* const info) const
 	dAssert (0);
 }
 
+void CustomJoint::ProjectError () const
+{
+}
+
 void CustomJoint::SetBodiesCollisionState (int state)
 {
 	NewtonJointSetCollisionState (m_joint, state);

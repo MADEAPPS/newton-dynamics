@@ -1095,19 +1095,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\dCustomJoints\CustomHierarchicalTransformManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dCustomJoints\CustomHierarchicalTransformManager.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\dCustomJoints\CustomPlayerControllerManager.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\dCustomJoints\CustomPlayerControllerManager.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dCustomJoints\CustomSkeletonTransformManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dCustomJoints\CustomSkeletonTransformManager.h"
 				>
 			</File>
 			<File

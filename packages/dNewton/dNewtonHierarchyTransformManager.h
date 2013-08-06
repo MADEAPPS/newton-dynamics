@@ -27,7 +27,7 @@
 
 class dNewtonBody;
 
-class dNewtonHierarchyTransformManager: public CustomSkeletonTransformManager
+class dNewtonHierarchyTransformManager: public CustomHierarchicalTransformManager
 {
 	public:
 	class dNewtonHierarchyTransformController: public dNewtonAlloc
@@ -46,21 +46,21 @@ class dNewtonHierarchyTransformManager: public CustomSkeletonTransformManager
 		NEWTON_API bool SelfCollisionTest (const void* const boneNode0, const void* const boneNode1) const;
 
 		private:
-		CustomSkeletonTransformController* m_controller;
+		CustomHierarchicalTransformController* m_controller;
 		friend class dNewtonHierarchyTransformManager;
 	};
 
 	CNEWTON_API dNewtonHierarchyTransformManager (dNewton* const world);
 	CNEWTON_API virtual ~dNewtonHierarchyTransformManager ();
 
-	NEWTON_API void DisableAllSelfCollision (CustomSkeletonTransformController* const controller);
-	NEWTON_API void SetDefaultSelfCollisionMask (CustomSkeletonTransformController* const controller);
+	NEWTON_API void DisableAllSelfCollision (CustomHierarchicalTransformController* const controller);
+	NEWTON_API void SetDefaultSelfCollisionMask (CustomHierarchicalTransformController* const controller);
 	NEWTON_API void SetSelfCollisionMask (void* const boneNode0, void* const boneNode1, bool mode);
 	NEWTON_API bool SelfCollisionTest (const void* const boneNode0, const void* const boneNode1) const;
 
-	NEWTON_API virtual void OnPreUpdate (CustomSkeletonTransformController* const constroller, dFloat timestep, int threadIndex) const;
-	NEWTON_API virtual void OnUpdateTransform (const CustomSkeletonTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const;
-	NEWTON_API void DestroyController (CustomSkeletonTransformController* const controller);
+	NEWTON_API virtual void OnPreUpdate (CustomHierarchicalTransformController* const constroller, dFloat timestep, int threadIndex) const;
+	NEWTON_API virtual void OnUpdateTransform (const CustomHierarchicalTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const;
+	NEWTON_API void DestroyController (CustomHierarchicalTransformController* const controller);
 
 	CNEWTON_API dNewtonHierarchyTransformController* GetFirstController() const;
 	CNEWTON_API dNewtonHierarchyTransformController* GetNextController(const dNewtonHierarchyTransformController* const controller) const;
