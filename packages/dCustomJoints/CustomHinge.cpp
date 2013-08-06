@@ -90,49 +90,52 @@ dFloat CustomHinge::GetJointOmega () const
 
 bool CustomHinge::ProjectError () const
 {
-/*
-	dMatrix matrix0;
-	dMatrix matrix1;
+
+	dMatrix body0Matrix;
+	dMatrix body1Matrix;
 
 static int xxx;
 xxx ++;
 if (xxx >= 500)
 xxx *=1;
 		
-	CalculateGlobalMatrix (matrix0, matrix1);
+	
+	NewtonBodyGetMatrix(m_body0, &body0Matrix[0][0]);
+	NewtonBodyGetMatrix(m_body1, &body1Matrix[0][0]);
+
+	dMatrix matrix0 (m_localMatrix0 * body0Matrix);
+	dMatrix matrix1 (m_localMatrix1 * body1Matrix);
 
 	dFloat sinAngle = (matrix0.m_up * matrix1.m_up) % matrix1.m_front;
 	dFloat cosAngle = matrix0.m_up % matrix1.m_up;
 
-	dMatrix picthMatrix0 (GetIdentityMatrix());
-	picthMatrix[1][1] = cosAngle;
-	picthMatrix[1][2] = sinAngle;
-	picthMatrix[2][2] = cosAngle;
-	picthMatrix[2][1] = -sinAngle;
+	const dMatrix& identity = GetIdentityMatrix();
+	dMatrix angleMatrix (identity);
+	angleMatrix[1][1] = cosAngle;
+	angleMatrix[1][2] = -sinAngle;
+	angleMatrix[2][2] = cosAngle;
+	angleMatrix[2][1] = sinAngle;
 
-	dMatrix picthMatrix1 ();	
+	dMatrix expectedMatrix0 (angleMatrix * matrix1);
+	dMatrix errorMatrix (matrix0 * expectedMatrix0.Inverse());
 
-//dMatrix matrix___ (picthMatrix * matrix0);
-//	dMatrix matrix (picthMatrix * matrix0 * matrix1.Inverse());
+	bool error = false;
+	for (int i = 0; !error && (i < 4); i ++) {
+		for (int j = 0; !error && (j < 4); j ++) {
+			if (dAbs (errorMatrix[i][j]-identity[i][j]) > 1.0e-4f) {
+				error = true;
+				//dTrace (("%d\n", xxx));
+			}
+		}
+	}
 
-//	dMatrix errorMatrix(matrix * m_localMatrix0.Inverse());
-//	if ((errorMatrix.m_posit % errorMatrix.m_posit) > 1.0e-4f) {
-//		dAssert (0);
-//	} else {
-//		dQuaternion error (errorMatrix);
-//		if (dAbs (error.m_q0 - 1.0f) > 1.0e-5f) {
-		//	dAssert (0);
-//		}
-//	}
-	
-//		NewtonBodyGetVelocity(child, &childVeloc[0]);
-//		NewtonBodyGetVelocity(parent, &parentVeloc[0]);
+	if (error) {
+		body0Matrix = m_localMatrix0.Inverse() * expectedMatrix0; 
+		NewtonBodySetMatrix(m_body0, &body0Matrix[0][0]);
+	}
 
-//		NewtonBodyGetOmega(child, &childOmega[0]);
-//		NewtonBodyGetOmega(parent, &parentOmega[0]);
-*/
 
-	return false;
+	return error;
 }
 
 void CustomHinge::SubmitConstraints (dFloat timestep, int threadIndex)
