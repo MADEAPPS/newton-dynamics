@@ -784,30 +784,33 @@ dgBroadPhase::dgNode* dgBroadPhase::BuildTopDown (dgNode** const leafArray, dgIn
 
 void dgBroadPhase::ImproveFitness()
 {
-	dgFloat64 cost = CalculateEmptropy();
-	if ((cost > m_treeEntropy * dgFloat32 (2.0f)) || (cost < m_treeEntropy * dgFloat32 (0.5f))) {
+	dgFloat64 entropy = CalculateEmptropy();
+	if ((entropy > m_treeEntropy * dgFloat32 (2.0f)) || (entropy < m_treeEntropy * dgFloat32 (0.5f))) {
+		if (m_fitness.GetFirst()) {
+			dgWorld* const world = m_world;
+			dgInt32 count = m_fitness.GetCount() * 2 + 12;
+			world->m_pairMemoryBuffer.ExpandCapacityIfNeessesary (count, sizeof (dgNode*));
 
-		dgWorld* const world = m_world;
-		dgInt32 count = m_fitness.GetCount() * 2 + 12;
-		world->m_pairMemoryBuffer.ExpandCapacityIfNeessesary (count, sizeof (dgNode*));
+			dgInt32 leafNodesCount = 0;
+			dgNode** const leafArray = (dgNode**)&world->m_pairMemoryBuffer[0];
+			for (dgFitnessList::dgListNode* nodePtr = m_fitness.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
+				dgNode* const node = nodePtr->GetInfo();
+				if (node->m_left->m_body) {
+					leafArray[leafNodesCount] = node->m_left;
+					leafNodesCount ++;
+				}
+				if (node->m_right->m_body) {
+					leafArray[leafNodesCount] = node->m_right;
+					leafNodesCount ++;
+				}
+			}
 
-		dgInt32 leafNodesCount = 0;
-		dgNode** const leafArray = (dgNode**)&world->m_pairMemoryBuffer[0];
-		for (dgFitnessList::dgListNode* nodePtr = m_fitness.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
-			dgNode* const node = nodePtr->GetInfo();
-			if (node->m_left->m_body) {
-				leafArray[leafNodesCount] = node->m_left;
-				leafNodesCount ++;
-			}
-			if (node->m_right->m_body) {
-				leafArray[leafNodesCount] = node->m_right;
-				leafNodesCount ++;
-			}
+			dgFitnessList::dgListNode* nodePtr = m_fitness.GetFirst();
+			m_rootNode = BuildTopDown (leafArray, 0, leafNodesCount - 1, &nodePtr);
+			m_treeEntropy = CalculateEmptropy();
+		} else {
+			m_treeEntropy = entropy;
 		}
-
-		dgFitnessList::dgListNode* nodePtr = m_fitness.GetFirst();
-		m_rootNode = BuildTopDown (leafArray, 0, leafNodesCount - 1, &nodePtr);
-		m_treeEntropy = CalculateEmptropy();
 	}
 }
 

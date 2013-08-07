@@ -117,7 +117,6 @@ void CustomHinge::ProjectError () const
 		for (int j = 0; !error && (j < 4); j ++) {
 			if (dAbs (errorMatrix[i][j]-identity[i][j]) > 1.0e-4f) {
 				error = true;
-				//dTrace (("%d\n", xxx));
 			}
 		}
 	}
@@ -125,6 +124,25 @@ void CustomHinge::ProjectError () const
 	if (error) {
 		dMatrix correctedBody0Matrix (m_localMatrix0.Inverse() * expectedMatrix0); 
 		NewtonBodySetMatrix(m_body0, &correctedBody0Matrix[0][0]);
+	}
+
+	dVector veloc0;
+	dVector veloc1;
+	NewtonBodyGetVelocity(m_body0, &veloc0[0]);
+	NewtonBodyGetVelocity(m_body1, &veloc1[0]);
+	dVector velocError (veloc0 - veloc1);
+	if ((velocError % velocError) > 1.0e-4f) {
+		NewtonBodySetVelocity(m_body0, &veloc1[0]);
+	}
+
+	dVector omega0;
+	dVector omega1;
+	NewtonBodyGetOmega(m_body0, &omega0[0]);
+	NewtonBodyGetOmega(m_body1, &omega1[0]);
+	dVector expectedOmega0 (omega1 + matrix1.m_front.Scale ((omega0 - omega1) % matrix1.m_front));
+	dVector omegaError (omega0 - expectedOmega0);
+	if ((omegaError % omegaError) > 1.0e-4f) {
+		NewtonBodySetOmega(m_body0, &expectedOmega0[0]);
 	}
 }
 
@@ -196,7 +214,7 @@ void CustomHinge::SubmitConstraints (dFloat timestep, int threadIndex)
 	if (m_body1) {
 		NewtonBodyGetOmega(m_body1, &omega1[0]);
 	}
-	m_jointOmega = (omega0 - omega1) % matrix0.m_front;
+	m_jointOmega = (omega0 - omega1) % matrix1.m_front;
  }
 
 
