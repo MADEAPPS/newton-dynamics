@@ -101,6 +101,9 @@ void CustomHinge::ProjectError () const
 
 	dFloat sinAngle = (matrix0.m_up * matrix1.m_up) % matrix1.m_front;
 	dFloat cosAngle = matrix0.m_up % matrix1.m_up;
+	dFloat angleMag = 1.0f / dSqrt (sinAngle * sinAngle + cosAngle * cosAngle);
+	sinAngle *= angleMag;
+	cosAngle *= angleMag;
 
 	const dMatrix& identity = GetIdentityMatrix();
 	dMatrix angleMatrix (identity);
@@ -215,7 +218,7 @@ void CustomHinge::SubmitConstraints (dFloat timestep, int threadIndex)
 		NewtonBodyGetOmega(m_body1, &omega1[0]);
 	}
 	m_jointOmega = (omega0 - omega1) % matrix1.m_front;
- }
+}
 
 
 void CustomHinge::GetInfo (NewtonJointRecord* const info) const

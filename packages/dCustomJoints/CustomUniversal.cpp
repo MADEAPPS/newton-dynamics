@@ -168,12 +168,85 @@ dVector CustomUniversal::GetPinAxis_1 () const
 	return matrix1.m_up;
 }
 
+void CustomUniversal::ProjectError () const
+{
+	dMatrix body0Matrix;
+	dMatrix body1Matrix;
+
+	NewtonBodyGetMatrix(m_body0, &body0Matrix[0][0]);
+	NewtonBodyGetMatrix(m_body1, &body1Matrix[0][0]);
+
+	const dMatrix& identity = GetIdentityMatrix();
+
+	dMatrix matrix0 (m_localMatrix0 * body0Matrix);
+	dMatrix matrix1 (m_localMatrix1 * body1Matrix);
+
+	dFloat sinAngle_0 = (matrix0.m_up * matrix1.m_up) % matrix0.m_front;
+	dFloat cosAngle_0 = matrix0.m_up % matrix1.m_up;
+	dFloat angleMag_0 = 1.0f / dSqrt (sinAngle_0 * sinAngle_0 + cosAngle_0 * cosAngle_0);
+	sinAngle_0 *= angleMag_0;
+	cosAngle_0 *= angleMag_0;
+	
+	dMatrix angleMatrix0 (identity);
+	angleMatrix0[1][1] = cosAngle_0;
+	angleMatrix0[1][2] = -sinAngle_0;
+	angleMatrix0[2][2] = cosAngle_0;
+	angleMatrix0[2][1] = sinAngle_0;
+
+	dFloat sinAngle_1 = (matrix0.m_front * matrix1.m_front) % matrix1.m_up;
+	dFloat cosAngle_1 = matrix0.m_front % matrix1.m_front;
+	dFloat angleMag_1 = 1.0f / dSqrt (sinAngle_1 * sinAngle_1 + cosAngle_1 * cosAngle_1);
+	sinAngle_1 *= angleMag_1;
+	cosAngle_1 *= angleMag_1;
+
+	dMatrix angleMatrix1 (identity);
+	angleMatrix1[0][0] = cosAngle_1;
+	angleMatrix1[0][2] = -sinAngle_1;
+	angleMatrix1[2][2] = cosAngle_1;
+	angleMatrix1[2][0] = sinAngle_1;
+
+	dMatrix offsetMatrix (angleMatrix0 * angleMatrix1);
+	dMatrix expectedMatrix0 (offsetMatrix * matrix1);
+	dMatrix errorMatrix (matrix0 * expectedMatrix0.Inverse());
+
+	bool error = false;
+	for (int i = 0; !error && (i < 4); i ++) {
+		for (int j = 0; !error && (j < 4); j ++) {
+			if (dAbs (errorMatrix[i][j]-identity[i][j]) > 1.0e-4f) {
+				error = true;
+			}
+		}
+	}
+
+	if (error) {
+		dMatrix correctedBody0Matrix (m_localMatrix0.Inverse() * expectedMatrix0); 
+		NewtonBodySetMatrix(m_body0, &correctedBody0Matrix[0][0]);
+	}
+/*
+	dVector veloc0;
+	dVector veloc1;
+	NewtonBodyGetVelocity(m_body0, &veloc0[0]);
+	NewtonBodyGetVelocity(m_body1, &veloc1[0]);
+	dVector velocError (veloc0 - veloc1);
+	if ((velocError % velocError) > 1.0e-4f) {
+		NewtonBodySetVelocity(m_body0, &veloc1[0]);
+	}
+
+	dVector omega0;
+	dVector omega1;
+	NewtonBodyGetOmega(m_body0, &omega0[0]);
+	NewtonBodyGetOmega(m_body1, &omega1[0]);
+	dVector expectedOmega0 (omega1 + matrix1.m_front.Scale ((omega0 - omega1) % matrix1.m_front));
+	dVector omegaError (omega0 - expectedOmega0);
+	if ((omegaError % omegaError) > 1.0e-4f) {
+		NewtonBodySetOmega(m_body0, &expectedOmega0[0]);
+	}
+*/
+}
+
 
 void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 {
-//	dFloat angle;
-//	dFloat sinAngle;
-//	dFloat cosAngle;
 	dMatrix matrix0;
 	dMatrix matrix1;
 
@@ -198,22 +271,22 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &dir2[0]);
 	NewtonUserJointSetRowStiffness (m_joint, 1.0f);
 
-
 	dVector dir3 (dir2 * dir0);
 	dVector q0 (p0 + dir3.Scale(MIN_JOINT_PIN_LENGTH));
 	dVector q1 (p1 + dir1.Scale(MIN_JOINT_PIN_LENGTH));
 	NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &dir0[0]);
 	NewtonUserJointSetRowStiffness (m_joint, 1.0f);
 
-
 	dFloat sinAngle_0 = (matrix0.m_up * matrix1.m_up) % matrix0.m_front;
 	dFloat cosAngle_0 = matrix0.m_up % matrix1.m_up;
-	//dFloat angle_0 = dAtan2 (sinAngle, cosAngle);
 	m_curJointAngle_0.CalculateJointAngle (cosAngle_0, sinAngle_0);
+
+	dFloat sinAngle_1 = (matrix0.m_front * matrix1.m_front) % matrix1.m_up;
+	dFloat cosAngle_1 = matrix0.m_front % matrix1.m_front;
+	m_curJointAngle_1.CalculateJointAngle (cosAngle_1, sinAngle_1);
 
 	// check is the joint limit are enable
 	if (m_limit_0_On) {
-
 		if (m_curJointAngle_0.m_angle < m_minAngle_0) {
 			dFloat relAngle = m_curJointAngle_0.m_angle - m_minAngle_0;
 
@@ -261,18 +334,8 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 		NewtonUserJointSetRowAcceleration (m_joint, relAccel);
 	}
 
-
 	// if limit are enable ...
-	dFloat sinAngle_1 = (matrix0.m_front * matrix1.m_front) % matrix1.m_up;
-	dFloat cosAngle_1 = matrix0.m_front % matrix1.m_front;
-	//angle = dAtan2 (sinAngle, cosAngle);
-	m_curJointAngle_1.CalculateJointAngle (cosAngle_1, sinAngle_1);
-
 	if (m_limit_1_On) {
-//		sinAngle = (matrix0.m_front * matrix1.m_front) % matrix1.m_up;
-//		cosAngle = matrix0.m_front % matrix1.m_front;
-//		angle = dAtan2 (sinAngle, cosAngle);
- 
 		if (m_curJointAngle_1.m_angle < m_minAngle_1) {
 			dFloat relAngle = m_curJointAngle_1.m_angle - m_minAngle_1;
 
@@ -317,71 +380,71 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 		// override the joint acceleration.
 		NewtonUserJointSetRowAcceleration (m_joint, relAccel);
 	}
- }
+}
 
 
- void CustomUniversal::GetInfo (NewtonJointRecord* const info) const
- {
-	 strcpy (info->m_descriptionType, "universal");
+void CustomUniversal::GetInfo (NewtonJointRecord* const info) const
+{
+	strcpy (info->m_descriptionType, "universal");
 
-	 info->m_attachBody_0 = m_body0;
-	 info->m_attachBody_1 = m_body1;
+	info->m_attachBody_0 = m_body0;
+	info->m_attachBody_1 = m_body1;
 
-	 dMatrix matrix0;
-	 dMatrix matrix1;
-	 // calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	 CalculateGlobalMatrix (matrix0, matrix1);
+	dMatrix matrix0;
+	dMatrix matrix1;
+	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
+	CalculateGlobalMatrix (matrix0, matrix1);
 
-	 info->m_minLinearDof[0] = 0.0f;
-	 info->m_maxLinearDof[0] = 0.0f;
+	info->m_minLinearDof[0] = 0.0f;
+	info->m_maxLinearDof[0] = 0.0f;
 
-	 info->m_minLinearDof[1] = 0.0f;
-	 info->m_maxLinearDof[1] = 0.0f;;
+	info->m_minLinearDof[1] = 0.0f;
+	info->m_maxLinearDof[1] = 0.0f;;
 
-	 info->m_minLinearDof[2] = 0.0f;
-	 info->m_maxLinearDof[2] = 0.0f;
+	info->m_minLinearDof[2] = 0.0f;
+	info->m_maxLinearDof[2] = 0.0f;
 
-//	 info->m_minAngularDof[0] = m_minAngle_0 * 180.0f / 3.141592f ;
-//	 info->m_maxAngularDof[0] = m_maxAngle_0 * 180.0f / 3.141592f ;
+	//	 info->m_minAngularDof[0] = m_minAngle_0 * 180.0f / 3.141592f ;
+	//	 info->m_maxAngularDof[0] = m_maxAngle_0 * 180.0f / 3.141592f ;
 
-	 if (m_limit_0_On) {
-		 dFloat angle;
-		 dFloat sinAngle;
-		 dFloat cosAngle;
+	if (m_limit_0_On) {
+		dFloat angle;
+		dFloat sinAngle;
+		dFloat cosAngle;
 
-		 sinAngle = (matrix0.m_front * matrix1.m_front) % matrix1.m_up;
-		 cosAngle = matrix0.m_front % matrix1.m_front;
-		 angle = dAtan2 (sinAngle, cosAngle);
+		sinAngle = (matrix0.m_front * matrix1.m_front) % matrix1.m_up;
+		cosAngle = matrix0.m_front % matrix1.m_front;
+		angle = dAtan2 (sinAngle, cosAngle);
 
-		 info->m_minAngularDof[0] = (m_minAngle_0 - angle) * 180.0f / 3.141592f ;
-		 info->m_maxAngularDof[0] = (m_maxAngle_0 - angle) * 180.0f / 3.141592f ;
-	 } else {
-		 info->m_minAngularDof[0] = -FLT_MAX ;
-		 info->m_maxAngularDof[0] =  FLT_MAX ;
-	 }
+		info->m_minAngularDof[0] = (m_minAngle_0 - angle) * 180.0f / 3.141592f ;
+		info->m_maxAngularDof[0] = (m_maxAngle_0 - angle) * 180.0f / 3.141592f ;
+	} else {
+		info->m_minAngularDof[0] = -FLT_MAX ;
+		info->m_maxAngularDof[0] =  FLT_MAX ;
+	}
 
-//	 info->m_minAngularDof[1] = m_minAngle_1 * 180.0f / 3.141592f;
-//	 info->m_maxAngularDof[1] = m_maxAngle_1 * 180.0f / 3.141592f;
+	//	 info->m_minAngularDof[1] = m_minAngle_1 * 180.0f / 3.141592f;
+	//	 info->m_maxAngularDof[1] = m_maxAngle_1 * 180.0f / 3.141592f;
 
-	 if (m_limit_1_On) {
-		 dFloat angle;
-		 dFloat sinAngle;
-		 dFloat cosAngle;
+	if (m_limit_1_On) {
+		dFloat angle;
+		dFloat sinAngle;
+		dFloat cosAngle;
 
-		 sinAngle = (matrix0.m_up * matrix1.m_up) % matrix0.m_front;
-		 cosAngle = matrix0.m_up % matrix1.m_up;
-		 angle = dAtan2 (sinAngle, cosAngle);
+		sinAngle = (matrix0.m_up * matrix1.m_up) % matrix0.m_front;
+		cosAngle = matrix0.m_up % matrix1.m_up;
+		angle = dAtan2 (sinAngle, cosAngle);
 
-		 info->m_minAngularDof[1] = (m_minAngle_1 - angle) * 180.0f / 3.141592f ;
-		 info->m_maxAngularDof[1] = (m_maxAngle_1 - angle) * 180.0f / 3.141592f ;
-	 } else {
-		 info->m_minAngularDof[1] = -FLT_MAX ;
-		 info->m_maxAngularDof[1] =  FLT_MAX ;
-	 }
+		info->m_minAngularDof[1] = (m_minAngle_1 - angle) * 180.0f / 3.141592f ;
+		info->m_maxAngularDof[1] = (m_maxAngle_1 - angle) * 180.0f / 3.141592f ;
+	} else {
+		info->m_minAngularDof[1] = -FLT_MAX ;
+		info->m_maxAngularDof[1] =  FLT_MAX ;
+	}
 
-	 info->m_minAngularDof[2] = 0.0f;
-	 info->m_maxAngularDof[2] = 0.0f;
+	info->m_minAngularDof[2] = 0.0f;
+	info->m_maxAngularDof[2] = 0.0f;
 
-	 memcpy (info->m_attachmenMatrix_0, &m_localMatrix0, sizeof (dMatrix));
-	 memcpy (info->m_attachmenMatrix_1, &m_localMatrix1, sizeof (dMatrix));
- }
+	memcpy (info->m_attachmenMatrix_0, &m_localMatrix0, sizeof (dMatrix));
+	memcpy (info->m_attachmenMatrix_1, &m_localMatrix1, sizeof (dMatrix));
+}

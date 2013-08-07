@@ -47,6 +47,7 @@ class CustomUniversal: public CustomJoint
 	}
 
 	protected:
+	NEWTON_API virtual void ProjectError () const;
 	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
