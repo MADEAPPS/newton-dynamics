@@ -88,18 +88,11 @@ dFloat CustomHinge::GetJointOmega () const
 	return m_jointOmega;
 }
 
-bool CustomHinge::ProjectError () const
+void CustomHinge::ProjectError () const
 {
-
 	dMatrix body0Matrix;
 	dMatrix body1Matrix;
 
-static int xxx;
-xxx ++;
-if (xxx >= 500)
-xxx *=1;
-		
-	
 	NewtonBodyGetMatrix(m_body0, &body0Matrix[0][0]);
 	NewtonBodyGetMatrix(m_body1, &body1Matrix[0][0]);
 
@@ -130,12 +123,9 @@ xxx *=1;
 	}
 
 	if (error) {
-		body0Matrix = m_localMatrix0.Inverse() * expectedMatrix0; 
-		NewtonBodySetMatrix(m_body0, &body0Matrix[0][0]);
+		dMatrix correctedBody0Matrix (m_localMatrix0.Inverse() * expectedMatrix0); 
+		NewtonBodySetMatrix(m_body0, &correctedBody0Matrix[0][0]);
 	}
-
-
-	return error;
 }
 
 void CustomHinge::SubmitConstraints (dFloat timestep, int threadIndex)

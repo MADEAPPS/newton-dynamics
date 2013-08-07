@@ -70,7 +70,7 @@ class CustomJoint: public CustomAlloc
 
 	// the application needs to implement this function for serialization
 	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
-	NEWTON_API virtual bool ProjectError () const;
+	NEWTON_API virtual void ProjectError () const;
 
 	// these member function are only used by the C interface or for hooking callback to customize a particular 
 	// joint without deriving a new one

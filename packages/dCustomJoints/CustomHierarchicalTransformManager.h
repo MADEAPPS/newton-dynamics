@@ -102,9 +102,6 @@ class CustomHierarchicalTransformController: public CustomControllerBase
 	NEWTON_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 	
 	private:
-	NEWTON_API virtual void ProjectErrors ();
-
-
 	dSkeletonBone m_bones[D_HIERACHICAL_CONTROLLER_MAX_BONES];
 	int m_boneCount;
 	bool m_errorProjectionMode;

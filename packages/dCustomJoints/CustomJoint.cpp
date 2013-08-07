@@ -192,9 +192,8 @@ void CustomJoint::GetInfo (NewtonJointRecord* const info) const
 }
 
 
-bool CustomJoint::ProjectError () const
+void CustomJoint::ProjectError () const
 {
-	return false;
 }
 
 void CustomJoint::SetBodiesCollisionState (int state)
