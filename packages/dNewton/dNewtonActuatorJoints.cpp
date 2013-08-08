@@ -43,11 +43,12 @@ void dNewtonHingeActuator::OnSubmitConstraint (dFloat timestep, int threadIndex)
 		NewtonJoint* const newtonHinge = m_joint->GetJoint();
 
 		customHinge->CalculateGlobalMatrix (matrix0, matrix1);
-		dFloat angle = customHinge->GetJointAngle();
-
-		dFloat relAngle = angle - m_angle;
+		dFloat relAngle = m_angle - customHinge->GetJointAngle();
 		NewtonUserJointAddAngularRow (newtonHinge, relAngle, &matrix0.m_front[0]);
 		NewtonUserJointSetRowStiffness (newtonHinge, 1.0f);
+
+		//NewtonBodySetSleepState(m_joint->GetBody0(), false);
+		//NewtonBodySetSleepState(m_joint->GetBody1(), false);
 	}
 }
 
@@ -68,6 +69,9 @@ void dNewtonSliderActuator::OnSubmitConstraint (dFloat timestep, int threadIndex
 
 		CustomSlider* const customSlider = (CustomSlider*) m_joint;
 		NewtonJoint* const newtonSlider = m_joint->GetJoint();
+
+		//NewtonBodySetSleepState(m_joint->GetBody0(), false);
+		//NewtonBodySetSleepState(m_joint->GetBody1(), false);
 
 		dFloat posit = customSlider->GetJointPosit();
 		customSlider->CalculateGlobalMatrix (matrix0, matrix1);
@@ -102,20 +106,23 @@ void dNewtonUniversalActuator::OnSubmitConstraint (dFloat timestep, int threadIn
 		CustomUniversal* const customUniversal = (CustomUniversal*) m_joint;
 		NewtonJoint* const newtonUniversal = m_joint->GetJoint();
 
+		//NewtonBodySetSleepState(m_joint->GetBody0(), false);
+		//NewtonBodySetSleepState(m_joint->GetBody1(), false);
+
 		customUniversal->CalculateGlobalMatrix (matrix0, matrix1);
 
 		//dVector xxx0(customUniversal->GetPinAxis_0());
 		//dVector xxx1(customUniversal->GetPinAxis_1());
 		if (m_flag0) {
 			dFloat angle = customUniversal->GetJointAngle_0();
-			dFloat relAngle = angle - m_angle0;
+			dFloat relAngle = m_angle0 - angle;
 			NewtonUserJointAddAngularRow (newtonUniversal, relAngle, &matrix0.m_front[0]);
 			NewtonUserJointSetRowStiffness (newtonUniversal, 1.0f);
 		}
 
 		if (m_flag1) {
 			dFloat angle = customUniversal->GetJointAngle_1();
-			dFloat relAngle = angle - m_angle1;
+			dFloat relAngle = m_angle1 - angle;
 			NewtonUserJointAddAngularRow (newtonUniversal, relAngle, &matrix1.m_up[0]);
 			NewtonUserJointSetRowStiffness (newtonUniversal, 1.0f);
 		}

@@ -673,7 +673,7 @@ void dgWorldDynamicUpdate::FindActiveJointAndBodies (dgIsland* const island)
 			dgBody* const body0 = bodyArray[m0].m_body;
 			dgBody* const body1 = bodyArray[m1].m_body;
 
-			bool resting = body0->m_equilibrium & body1->m_equilibrium;
+			bool resting = body0->m_equilibrium & body1->m_equilibrium & ((joint->GetId() == dgConstraint::m_contactConstraint) ? true : false);
 			body0->m_resting &= (resting | !m0);
 			body1->m_resting &= (resting | !m1);
 			body0->m_active |= !(!m0);

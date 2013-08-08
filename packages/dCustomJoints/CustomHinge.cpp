@@ -88,6 +88,13 @@ dFloat CustomHinge::GetJointOmega () const
 	return m_jointOmega;
 }
 
+void CustomHinge::CalculatePitchAngle (const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const
+{
+	sinAngle = (matrix1.m_up * matrix0.m_up) % matrix0.m_front;
+	cosAngle = matrix0.m_up % matrix1.m_up;
+}
+
+
 void CustomHinge::ProjectError () const
 {
 	dMatrix body0Matrix;
@@ -99,8 +106,9 @@ void CustomHinge::ProjectError () const
 	dMatrix matrix0 (m_localMatrix0 * body0Matrix);
 	dMatrix matrix1 (m_localMatrix1 * body1Matrix);
 
-	dFloat sinAngle = (matrix0.m_up * matrix1.m_up) % matrix1.m_front;
-	dFloat cosAngle = matrix0.m_up % matrix1.m_up;
+	dFloat sinAngle;
+	dFloat cosAngle;
+	CalculatePitchAngle (matrix0, matrix1, sinAngle, cosAngle);
 	dFloat angleMag = 1.0f / dSqrt (sinAngle * sinAngle + cosAngle * cosAngle);
 	sinAngle *= angleMag;
 	cosAngle *= angleMag;
@@ -108,23 +116,13 @@ void CustomHinge::ProjectError () const
 	const dMatrix& identity = GetIdentityMatrix();
 	dMatrix angleMatrix (identity);
 	angleMatrix[1][1] = cosAngle;
-	angleMatrix[1][2] = -sinAngle;
+	angleMatrix[1][2] = sinAngle;
 	angleMatrix[2][2] = cosAngle;
-	angleMatrix[2][1] = sinAngle;
+	angleMatrix[2][1] = -sinAngle;
 
 	dMatrix expectedMatrix0 (angleMatrix * matrix1);
 	dMatrix errorMatrix (matrix0 * expectedMatrix0.Inverse());
-
-	bool error = false;
-	for (int i = 0; !error && (i < 4); i ++) {
-		for (int j = 0; !error && (j < 4); j ++) {
-			if (dAbs (errorMatrix[i][j]-identity[i][j]) > 1.0e-4f) {
-				error = true;
-			}
-		}
-	}
-
-	if (error) {
+	if (!TestIdentityMatrix(errorMatrix)) {
 		dMatrix correctedBody0Matrix (m_localMatrix0.Inverse() * expectedMatrix0); 
 		NewtonBodySetMatrix(m_body0, &correctedBody0Matrix[0][0]);
 	}
@@ -171,8 +169,9 @@ void CustomHinge::SubmitConstraints (dFloat timestep, int threadIndex)
 	NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &matrix1.m_right[0]);
 
 	// the joint angle can be determine by getting the angle between any two non parallel vectors
-	dFloat sinAngle = (matrix0.m_up * matrix1.m_up) % matrix1.m_front;
-	dFloat cosAngle = matrix0.m_up % matrix1.m_up;
+	dFloat sinAngle;
+	dFloat cosAngle;
+	CalculatePitchAngle (matrix0, matrix1, sinAngle, cosAngle);
 	dFloat angle = m_curJointAngle.CalculateJointAngle (cosAngle, sinAngle);
 
 	// if limit are enable ...

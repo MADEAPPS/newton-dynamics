@@ -47,6 +47,9 @@ class CustomUniversal: public CustomJoint
 	}
 
 	protected:
+	void CalculatePitchAngle (const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const;
+	void CalculateYawAngle (const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const;
+
 	NEWTON_API virtual void ProjectError () const;
 	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;

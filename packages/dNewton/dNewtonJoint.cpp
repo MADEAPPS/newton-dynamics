@@ -23,7 +23,7 @@
 #include "dNewton.h"
 #include "dNewtonBody.h"
 #include "dNewtonJoint.h"
-
+#include "dNewtonDynamicBody.h"
 
 void dNewtonJoint::SetJoint(CustomJoint* const joint)
 {
@@ -42,6 +42,17 @@ dNewtonJoint::~dNewtonJoint()
 		delete m_joint;
 	}
 }
+
+dNewtonDynamicBody* dNewtonJoint::GetBody0 () const
+{
+	return (dNewtonDynamicBody*)NewtonBodyGetUserData (m_joint->GetBody0()); 
+}
+
+dNewtonDynamicBody* dNewtonJoint::GetBody1 () const
+{
+	return  m_joint->GetBody1() ? (dNewtonDynamicBody*)NewtonBodyGetUserData (m_joint->GetBody1()) : NULL; 
+}
+
 
 void dNewtonJoint::OnJointDestroyCallback (const NewtonUserJoint* const me)
 {

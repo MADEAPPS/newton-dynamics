@@ -168,6 +168,19 @@ dVector CustomUniversal::GetPinAxis_1 () const
 	return matrix1.m_up;
 }
 
+void CustomUniversal::CalculatePitchAngle (const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const
+{
+	sinAngle = (matrix1.m_up * matrix0.m_up) % matrix0.m_front;
+	cosAngle = matrix0.m_up % matrix1.m_up;
+}
+
+void CustomUniversal::CalculateYawAngle (const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const
+{
+	sinAngle = (matrix1.m_front * matrix0.m_front) % matrix1.m_up;
+	cosAngle = matrix0.m_front % matrix1.m_front;
+}
+
+
 void CustomUniversal::ProjectError () const
 {
 	dMatrix body0Matrix;
@@ -181,20 +194,22 @@ void CustomUniversal::ProjectError () const
 	dMatrix matrix0 (m_localMatrix0 * body0Matrix);
 	dMatrix matrix1 (m_localMatrix1 * body1Matrix);
 
-	dFloat sinAngle_0 = (matrix0.m_up * matrix1.m_up) % matrix0.m_front;
-	dFloat cosAngle_0 = matrix0.m_up % matrix1.m_up;
+	dFloat sinAngle_0;
+	dFloat cosAngle_0;
+	CalculatePitchAngle (matrix0, matrix1, sinAngle_0, cosAngle_0);
 	dFloat angleMag_0 = 1.0f / dSqrt (sinAngle_0 * sinAngle_0 + cosAngle_0 * cosAngle_0);
 	sinAngle_0 *= angleMag_0;
 	cosAngle_0 *= angleMag_0;
 	
 	dMatrix angleMatrix0 (identity);
 	angleMatrix0[1][1] = cosAngle_0;
-	angleMatrix0[1][2] = -sinAngle_0;
+	angleMatrix0[1][2] = sinAngle_0;
 	angleMatrix0[2][2] = cosAngle_0;
-	angleMatrix0[2][1] = sinAngle_0;
+	angleMatrix0[2][1] = -sinAngle_0;
 
-	dFloat sinAngle_1 = (matrix0.m_front * matrix1.m_front) % matrix1.m_up;
-	dFloat cosAngle_1 = matrix0.m_front % matrix1.m_front;
+	dFloat sinAngle_1;
+	dFloat cosAngle_1;
+	CalculateYawAngle (matrix0, matrix1, sinAngle_1, cosAngle_1);
 	dFloat angleMag_1 = 1.0f / dSqrt (sinAngle_1 * sinAngle_1 + cosAngle_1 * cosAngle_1);
 	sinAngle_1 *= angleMag_1;
 	cosAngle_1 *= angleMag_1;
@@ -209,16 +224,7 @@ void CustomUniversal::ProjectError () const
 	dMatrix expectedMatrix0 (offsetMatrix * matrix1);
 	dMatrix errorMatrix (matrix0 * expectedMatrix0.Inverse());
 
-	bool error = false;
-	for (int i = 0; !error && (i < 4); i ++) {
-		for (int j = 0; !error && (j < 4); j ++) {
-			if (dAbs (errorMatrix[i][j]-identity[i][j]) > 1.0e-4f) {
-				error = true;
-			}
-		}
-	}
-
-	if (error) {
+	if (!TestIdentityMatrix(errorMatrix)) {
 		dMatrix correctedBody0Matrix (m_localMatrix0.Inverse() * expectedMatrix0); 
 		NewtonBodySetMatrix(m_body0, &correctedBody0Matrix[0][0]);
 	}
@@ -277,12 +283,14 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 	NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &dir0[0]);
 	NewtonUserJointSetRowStiffness (m_joint, 1.0f);
 
-	dFloat sinAngle_0 = (matrix0.m_up * matrix1.m_up) % matrix0.m_front;
-	dFloat cosAngle_0 = matrix0.m_up % matrix1.m_up;
+	dFloat sinAngle_0;
+	dFloat cosAngle_0;
+	CalculatePitchAngle (matrix0, matrix1, sinAngle_0, cosAngle_0);
 	m_curJointAngle_0.CalculateJointAngle (cosAngle_0, sinAngle_0);
 
-	dFloat sinAngle_1 = (matrix0.m_front * matrix1.m_front) % matrix1.m_up;
-	dFloat cosAngle_1 = matrix0.m_front % matrix1.m_front;
+	dFloat sinAngle_1;
+	dFloat cosAngle_1;
+	CalculateYawAngle (matrix0, matrix1, sinAngle_1, cosAngle_1);
 	m_curJointAngle_1.CalculateJointAngle (cosAngle_1, sinAngle_1);
 
 	// check is the joint limit are enable

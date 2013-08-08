@@ -88,8 +88,21 @@ class CustomJoint: public CustomAlloc
 	
 
 	protected:
+	bool TestIdentityMatrix(const dMatrix& matrix) const 
+	{
+		const dMatrix& identity = GetIdentityMatrix();
+
+		bool isIdentity = true;
+		for (int i = 0; isIdentity && (i < 3); i ++) {
+			isIdentity &= dAbs (matrix[3][i]) < 1.0e-4f;
+			for (int j = i; isIdentity && (j < 3); j ++) {
+				isIdentity &= dAbs (matrix[i][j]-identity[i][j]) < 1.0e-4f;
+			}
+		}
+		return isIdentity;
+	}
+
 	NEWTON_API void Init (int maxDOF, NewtonBody* const body0, NewtonBody* const body1);
-	
 
 	// the application needs to implement this function for each derived joint. See examples for more detail
 	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);

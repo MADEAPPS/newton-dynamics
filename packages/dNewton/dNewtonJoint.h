@@ -54,6 +54,8 @@ class dNewtonJoint: public dNewtonAlloc
 	{
 	}
 
+	CNEWTON_API dNewtonDynamicBody* GetBody0 () const;
+	CNEWTON_API dNewtonDynamicBody* GetBody1 () const;
 	CNEWTON_API virtual void OnSubmitConstraint (dFloat timestep, int threadIndex)
 	{
 	}
