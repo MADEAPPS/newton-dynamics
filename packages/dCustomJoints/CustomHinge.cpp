@@ -130,7 +130,8 @@ void CustomHinge::ProjectError () const
 	dVector omega1;
 	NewtonBodyGetOmega(m_body0, &omega0[0]);
 	NewtonBodyGetOmega(m_body1, &omega1[0]);
-	dVector expectedOmega0 (omega1 + matrix1.m_front.Scale ((omega0 - omega1) % matrix1.m_front));
+	dVector deltaOmega (omega0 - omega1);
+	dVector expectedOmega0 (omega1 + matrix1.m_front.Scale (deltaOmega % matrix1.m_front));
 	dVector omegaError (omega0 - expectedOmega0);
 	if ((omegaError % omegaError) > 1.0e-4f) {
 		NewtonBodySetOmega(m_body0, &expectedOmega0[0]);

@@ -225,29 +225,38 @@ void CustomUniversal::ProjectError () const
 	dMatrix errorMatrix (matrix0 * expectedMatrix0.Inverse());
 
 	if (!TestIdentityMatrix(errorMatrix)) {
-		dMatrix correctedBody0Matrix (m_localMatrix0.Inverse() * expectedMatrix0); 
-//		NewtonBodySetMatrix(m_body0, &correctedBody0Matrix[0][0]);
-	}
-/*
-	dVector veloc0;
-	dVector veloc1;
-	NewtonBodyGetVelocity(m_body0, &veloc0[0]);
-	NewtonBodyGetVelocity(m_body1, &veloc1[0]);
-	dVector velocError (veloc0 - veloc1);
-	if ((velocError % velocError) > 1.0e-4f) {
-		NewtonBodySetVelocity(m_body0, &veloc1[0]);
+		body0Matrix = m_localMatrix0.Inverse() * expectedMatrix0; 
+		NewtonBodySetMatrix(m_body0, &body0Matrix[0][0]);
 	}
 
 	dVector omega0;
 	dVector omega1;
 	NewtonBodyGetOmega(m_body0, &omega0[0]);
 	NewtonBodyGetOmega(m_body1, &omega1[0]);
-	dVector expectedOmega0 (omega1 + matrix1.m_front.Scale ((omega0 - omega1) % matrix1.m_front));
+	dVector deltaOmega (omega0 - omega1);
+	dVector expectedOmega0 (omega1 + matrix0.m_front.Scale (deltaOmega % matrix0.m_front) + matrix1.m_up.Scale (deltaOmega % matrix1.m_up));
 	dVector omegaError (omega0 - expectedOmega0);
 	if ((omegaError % omegaError) > 1.0e-4f) {
 		NewtonBodySetOmega(m_body0, &expectedOmega0[0]);
 	}
-*/
+
+	dVector com0;
+	dVector com1;
+	dVector veloc0;
+	dVector veloc1;
+	NewtonBodyGetVelocity(m_body0, &veloc0[0]);
+	NewtonBodyGetVelocity(m_body1, &veloc1[0]);
+	NewtonBodyGetCentreOfMass(m_body0, &com0[0]);
+	NewtonBodyGetCentreOfMass(m_body1, &com1[0]);
+	com0 = body0Matrix.TransformVector (com0);
+	com1 = body1Matrix.TransformVector (com1);
+	dVector relOmega (expectedOmega0 - omega1);
+	dVector pivot0 (body0Matrix.TransformVector(m_localMatrix0.m_posit) - com0);
+	dVector expectedVeloc0 (veloc1 + (com0 - com1) * omega1 + pivot0 * relOmega);
+	dVector velocError (expectedVeloc0 - veloc0);
+	if ((velocError % velocError) > 1.0e-4f) {
+		NewtonBodySetVelocity(m_body0, &expectedVeloc0[0]);
+	}
 }
 
 

@@ -147,9 +147,14 @@ void dNewtonBody::AddTorque (const dFloat* const torque)
 }
 
 
-void dNewtonBody::GetCenterOnMass (dFloat* const com) const
+void dNewtonBody::GetCenterOfMass (dFloat* const com) const
 {
 	NewtonBodyGetCentreOfMass (m_body, com);
+}
+
+void dNewtonBody::SetCenterOfMass (const dFloat* const com)
+{
+	NewtonBodySetCentreOfMass (m_body, com);
 }
 
 void dNewtonBody::SetCCDMode (bool mode)
