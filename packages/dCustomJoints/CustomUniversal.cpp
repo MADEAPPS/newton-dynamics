@@ -226,7 +226,7 @@ void CustomUniversal::ProjectError () const
 
 	if (!TestIdentityMatrix(errorMatrix)) {
 		dMatrix correctedBody0Matrix (m_localMatrix0.Inverse() * expectedMatrix0); 
-		NewtonBodySetMatrix(m_body0, &correctedBody0Matrix[0][0]);
+//		NewtonBodySetMatrix(m_body0, &correctedBody0Matrix[0][0]);
 	}
 /*
 	dVector veloc0;

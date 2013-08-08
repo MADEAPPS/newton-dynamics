@@ -123,19 +123,9 @@ void CustomHinge::ProjectError () const
 	dMatrix expectedMatrix0 (angleMatrix * matrix1);
 	dMatrix errorMatrix (matrix0 * expectedMatrix0.Inverse());
 	if (!TestIdentityMatrix(errorMatrix)) {
-		dMatrix correctedBody0Matrix (m_localMatrix0.Inverse() * expectedMatrix0); 
-		NewtonBodySetMatrix(m_body0, &correctedBody0Matrix[0][0]);
+		body0Matrix = m_localMatrix0.Inverse() * expectedMatrix0; 
+		NewtonBodySetMatrix(m_body0, &body0Matrix[0][0]);
 	}
-
-	dVector veloc0;
-	dVector veloc1;
-	NewtonBodyGetVelocity(m_body0, &veloc0[0]);
-	NewtonBodyGetVelocity(m_body1, &veloc1[0]);
-	dVector velocError (veloc0 - veloc1);
-	if ((velocError % velocError) > 1.0e-4f) {
-		NewtonBodySetVelocity(m_body0, &veloc1[0]);
-	}
-
 	dVector omega0;
 	dVector omega1;
 	NewtonBodyGetOmega(m_body0, &omega0[0]);
@@ -144,6 +134,24 @@ void CustomHinge::ProjectError () const
 	dVector omegaError (omega0 - expectedOmega0);
 	if ((omegaError % omegaError) > 1.0e-4f) {
 		NewtonBodySetOmega(m_body0, &expectedOmega0[0]);
+	}
+
+	dVector com0;
+	dVector com1;
+	dVector veloc0;
+	dVector veloc1;
+	NewtonBodyGetVelocity(m_body0, &veloc0[0]);
+	NewtonBodyGetVelocity(m_body1, &veloc1[0]);
+	NewtonBodyGetCentreOfMass(m_body0, &com0[0]);
+	NewtonBodyGetCentreOfMass(m_body1, &com1[0]);
+	com0 = body0Matrix.TransformVector (com0);
+	com1 = body1Matrix.TransformVector (com1);
+	dVector relOmega (expectedOmega0 - omega1);
+	dVector pivot0 (body0Matrix.TransformVector(m_localMatrix0.m_posit) - com0);
+	dVector expectedVeloc0 (veloc1 + (com0 - com1) * omega1 + pivot0 * relOmega);
+	dVector velocError (expectedVeloc0 - veloc0);
+	if ((velocError % velocError) > 1.0e-4f) {
+		NewtonBodySetVelocity(m_body0, &expectedVeloc0[0]);
 	}
 }
 
