@@ -428,7 +428,9 @@ void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* con
 								   Jt.m_jacobianM1.m_angular.CompProduct3(bodyOmega1));
 
 				dgFloat32 vRel = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
-				//aRel = params.m_externAccelaration[k];
+
+				//dgFloat32 aRel = jacobianMatrixElements[k].m_deltaAccel;
+				//dgFloat32 aRel = jacobianMatrixElements[k].m_coordenateAccel;
 				dgFloat32 aRel = params->m_firstPassCoefFlag ? jacobianMatrixElements[k].m_deltaAccel : jacobianMatrixElements[k].m_coordenateAccel;
 				//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
 				//alphaError = num / den;
