@@ -83,7 +83,7 @@ int dNewton::OnBodiesAABBOverlap (const NewtonMaterial* const material, const Ne
 	dNewtonBody* const dBody0 = (dNewtonBody*) NewtonBodyGetUserData (body0);
 	dNewtonBody* const dBody1 = (dNewtonBody*) NewtonBodyGetUserData (body1);
 
-	return world->OnBodiesAABBOverlap(NULL, dBody0, dBody1, threadIndex);
+	return world->OnBodiesAABBOverlap(dBody0, dBody1, threadIndex);
 }
 
 int dNewton::OnCompoundSubCollisionAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const void* const collisionNode0, const NewtonBody* const body1, const void* const collisionNode1, int threadIndex)
@@ -102,13 +102,39 @@ int dNewton::OnCompoundSubCollisionAABBOverlap (const NewtonMaterial* const mate
 	dNewtonCollision* const dsubCollision1 = (dNewtonCollision*)NewtonCollisionGetUserData(subCollision1);
 	dAssert (dsubCollision0);
 	dAssert (dsubCollision1);
-	return world->OnCompoundSubCollisionAABBOverlap (NULL, dBody0, dsubCollision0, dBody1, dsubCollision1, threadIndex);
+	return world->OnCompoundSubCollisionAABBOverlap (dBody0, dsubCollision0, dBody1, dsubCollision1, threadIndex);
 }
 
-void dNewton::OnContactProcess (const NewtonJoint* const contact, dFloat timestep, int threadIndex)
+void dNewton::OnContactProcess (const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
 {
-	NewtonBody* const body = NewtonJointGetBody0 (contact);
+	NewtonBody* const body = NewtonJointGetBody0 (contactJoint);
 	dNewton* const world = (dNewton*) NewtonWorldGetUserData(NewtonBodyGetWorld (body));
+
+//	NewtonBody* const body = NewtonJointGetBody0(contactJoint);
+	for (void* contact = NewtonContactJointGetFirstContact (contactJoint); contact; contact = NewtonContactJointGetNextContact (contactJoint, contact)) {
+
+//		dFloat speed;
+//		dVector point;
+//		dVector normal;	
+//		dVector dir0;	
+//		dVector dir1;	
+//		dVector force;
+		NewtonMaterial* const material = NewtonContactGetMaterial (contact);
+		NewtonMaterialSetContactFrictionCoef (material, 1.0f, 1.0f, 0);
+		NewtonMaterialSetContactFrictionCoef (material, 1.0f, 1.0f, 1);
+/*
+		NewtonMaterialGetContactForce (material, body, &force.m_x);
+		NewtonMaterialGetContactPositionAndNormal (material, body, &point.m_x, &normal.m_x);
+		NewtonMaterialGetContactTangentDirections (material, body, &dir0.m_x, &dir1.m_x);
+		speed = NewtonMaterialGetContactNormalSpeed(material);
+
+
+		//speed = NewtonMaterialGetContactNormalSpeed(material);
+		// play sound base of the contact speed.
+		//
+*/
+	}
+
 	world->OnContactProcess ((dNewtonContactMaterial*)NULL, timestep, threadIndex);
 }
 
@@ -236,9 +262,7 @@ void dNewton::Update (dFloat timestepInSecunds)
 	int loops = 0;
 	while ((nextTime >= timestepMicrosecunds) && (loops < m_maxUpdatePerIterations)) {
 		loops ++;
-//		OnBeginUpdate (timestepInSecunds);
 		NewtonUpdate (m_world, timestepInSecunds);
-//		OnEndUpdate (timestepInSecunds);
 		nextTime -= timestepMicrosecunds;
 		m_microseconds += timestepMicrosecunds;
 	}
@@ -253,9 +277,7 @@ void dNewton::UpdateAsync (dFloat timestepInSecunds)
 	int loops = 0;
 	while ((nextTime >= timestepMicrosecunds) && (loops < m_maxUpdatePerIterations)) {
 		loops ++;
-//		OnBeginUpdate (timestepInSecunds);
 		NewtonUpdateAsync (m_world, timestepInSecunds);
-//		OnEndUpdate (timestepInSecunds);
 		nextTime -= timestepMicrosecunds;
 		m_microseconds += timestepMicrosecunds;
 	}

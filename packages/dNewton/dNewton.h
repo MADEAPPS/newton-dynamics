@@ -60,18 +60,17 @@ class dNewton: public dNewtonAlloc
 	CNEWTON_API int GetBodyCount() const;
 	CNEWTON_API void DestroyAllBodies();
 
-	CNEWTON_API virtual int OnBodiesAABBOverlap (const dNewtonMaterial* const material, const dNewtonBody* const body0, const dNewtonBody* const body1, int threadIndex)
+	CNEWTON_API virtual bool OnBodiesAABBOverlap (const dNewtonBody* const body0, const dNewtonBody* const body1, int threadIndex) const
 	{
-		return 1;
+		return true;
 	}
 
-	CNEWTON_API virtual int OnCompoundSubCollisionAABBOverlap (const dNewtonMaterial* const material, const dNewtonBody* const body0, const dNewtonCollision* const subShape0, const dNewtonBody* const body1, const dNewtonCollision* const subShape1, int threadIndex)
+	CNEWTON_API virtual bool OnCompoundSubCollisionAABBOverlap (const dNewtonBody* const body0, const dNewtonCollision* const subShape0, const dNewtonBody* const body1, const dNewtonCollision* const subShape1, int threadIndex) const
 	{
-		return 1;
+		return true;
 	}
 
-
-	CNEWTON_API virtual void OnContactProcess (dNewtonContactMaterial* const contacts, dFloat timestep, int threadIndex)
+	CNEWTON_API virtual void OnContactProcess (dNewtonContactMaterial* const contacts, dFloat timestep, int threadIndex) const
 	{
 	}
 
