@@ -1084,7 +1084,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="extentions"
+			Name="factories"
 			>
 			<File
 				RelativePath="..\..\dCustomJoints\CustomControllerManager.cpp"
