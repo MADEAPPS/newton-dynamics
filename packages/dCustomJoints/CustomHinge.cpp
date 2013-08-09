@@ -149,7 +149,7 @@ void CustomHinge::ProjectError () const
 	com1 = body1Matrix.TransformVector (com1);
 	dVector relOmega (expectedOmega0 - omega1);
 	dVector pivot0 (body0Matrix.TransformVector(m_localMatrix0.m_posit) - com0);
-	dVector expectedVeloc0 (veloc1 + (com0 - com1) * omega1 + pivot0 * relOmega);
+	dVector expectedVeloc0 (veloc1 +  omega1 * (com0 - com1) + relOmega * pivot0);
 	dVector velocError (expectedVeloc0 - veloc0);
 	if ((velocError % velocError) > 1.0e-4f) {
 		NewtonBodySetVelocity(m_body0, &expectedVeloc0[0]);
