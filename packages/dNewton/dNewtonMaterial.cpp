@@ -44,3 +44,9 @@ void* dNewtonContactMaterial::GetNextContact(void* const contact) const
 {
 	return NewtonContactJointGetNextContact ((NewtonJoint*)m_materialHandle, contact);
 }
+
+void dNewtonContactMaterial::RotateTangentDirections (const void* contact, const dFloat* const directionVector)
+{
+	NewtonMaterial* const material = NewtonContactGetMaterial (contact);
+	NewtonMaterialContactRotateTangentDirections (material, directionVector);
+}

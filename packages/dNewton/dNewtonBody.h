@@ -82,7 +82,7 @@ class dNewtonBody: public dNewtonAlloc, public dNewtonTransformLerp
 	// call each time the physics update the body transformation 
 	CNEWTON_API virtual void OnBodyTransform (const dFloat* const matrix, int threadIndex);
 
-	CNEWTON_API virtual void OnContactProcess (dNewtonContactMaterial* const contacts, dFloat timestep, int threadIndex) const
+	CNEWTON_API virtual void OnContactProcess (dNewtonContactMaterial* const contactMaterial, dFloat timestep, int threadIndex) const
 	{
 	}
 
