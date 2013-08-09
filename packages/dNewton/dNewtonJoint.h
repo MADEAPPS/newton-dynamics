@@ -38,7 +38,6 @@ class dNewtonJoint: public dNewtonAlloc
 		m_slider,
 		m_universal,
 
-
 		m_hingeActuator,
 		m_sliderActuator,
 		m_universalActuator,
@@ -47,6 +46,10 @@ class dNewtonJoint: public dNewtonAlloc
 	
 	CNEWTON_API virtual ~dNewtonJoint();
 
+	CNEWTON_API dNewtonDynamicBody* GetBody0 () const;
+	CNEWTON_API dNewtonDynamicBody* GetBody1 () const;
+
+
 	protected:
 	CNEWTON_API dNewtonJoint(dJointType type)
 		:m_type(type) 
@@ -54,16 +57,16 @@ class dNewtonJoint: public dNewtonAlloc
 	{
 	}
 
-	CNEWTON_API dNewtonDynamicBody* GetBody0 () const;
-	CNEWTON_API dNewtonDynamicBody* GetBody1 () const;
+	CNEWTON_API void SetJoint(CustomJoint* const joint);
 	CNEWTON_API virtual void OnSubmitConstraint (dFloat timestep, int threadIndex)
 	{
 	}
 
-	CNEWTON_API void SetJoint(CustomJoint* const joint);
+	private:
 	CNEWTON_API static void OnJointDestroyCallback (const NewtonUserJoint* const me);
 	CNEWTON_API static void OnSubmitConstraintCallback (const NewtonUserJoint* const me, dFloat timestep, int threadIndex);
 
+	protected:
 	dJointType m_type;
 	CustomJoint* m_joint;
 };
@@ -85,6 +88,16 @@ class dNewtonHingeJoint: public dNewtonJoint
 		:dNewtonJoint(m_hinge)
 	{
 		SetJoint (new CustomHinge (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
+	}
+
+	CNEWTON_API dFloat GetFriction () const
+	{
+		return ((CustomHinge*)m_joint)->GetFriction();
+	}
+
+	CNEWTON_API void SetFriction (dFloat friction)
+	{
+		((CustomHinge*)m_joint)->SetFriction(friction);
 	}
 };
 

@@ -34,6 +34,10 @@ class CustomHinge: public CustomJoint
 	NEWTON_API dFloat GetJointAngle () const;
 	NEWTON_API dVector GetPinAxis () const;
 	NEWTON_API dFloat GetJointOmega () const;
+
+	NEWTON_API void SetFriction (dFloat frictionTorque);
+	NEWTON_API dFloat GetFriction () const;
+
 	void CalculateGlobalMatrix(dMatrix& matrix0, dMatrix& matrix1) const
 	{
 		CustomJoint::CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
@@ -50,8 +54,10 @@ class CustomHinge: public CustomJoint
 
 	dFloat m_minAngle;
 	dFloat m_maxAngle;
+	dFloat m_friction;
 	dFloat m_jointOmega;
 	AngularIntegration m_curJointAngle;
+	
 	bool m_limitsOn;
 };
 

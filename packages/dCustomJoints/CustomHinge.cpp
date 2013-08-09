@@ -30,6 +30,7 @@ CustomHinge::CustomHinge (const dMatrix& pinAndPivotFrame, NewtonBody* const chi
 	,m_curJointAngle()
 {
 	m_limitsOn = false;
+	m_friction = 0.0f;
 	m_jointOmega = 0.0f;
 	m_minAngle = -45.0f * 3.141592f / 180.0f;
 	m_maxAngle =  45.0f * 3.141592f / 180.0f;
@@ -43,6 +44,7 @@ CustomHinge::CustomHinge (const dMatrix& pinAndPivotFrameChild, const dMatrix& p
 	:CustomJoint(6, child, parent), m_curJointAngle()
 {
 	m_limitsOn = false;
+	m_friction = 0.0f;
 	m_jointOmega = 0.0f;
 	m_minAngle = -45.0f * 3.141592f / 180.0f;
 	m_maxAngle =  45.0f * 3.141592f / 180.0f;
@@ -86,11 +88,23 @@ dFloat CustomHinge::GetJointOmega () const
 	return m_jointOmega;
 }
 
+void CustomHinge::SetFriction (dFloat frictionTorque)
+{
+	m_friction = frictionTorque;
+}
+
+dFloat CustomHinge::GetFriction () const
+{
+	return m_friction;
+}
+
+
 void CustomHinge::CalculatePitchAngle (const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const
 {
 	sinAngle = (matrix1.m_up * matrix0.m_up) % matrix0.m_front;
 	cosAngle = matrix0.m_up % matrix1.m_up;
 }
+
 
 
 void CustomHinge::ProjectError () const
@@ -179,13 +193,31 @@ void CustomHinge::SubmitConstraints (dFloat timestep, int threadIndex)
 	dFloat sinAngle;
 	dFloat cosAngle;
 	CalculatePitchAngle (matrix0, matrix1, sinAngle, cosAngle);
-	dFloat angle = m_curJointAngle.CalculateJointAngle (cosAngle, sinAngle);
+	m_curJointAngle.CalculateJointAngle (cosAngle, sinAngle);
+
+	// save the current joint Omega
+	dVector omega0(0.0f, 0.0f, 0.0f, 0.0f);
+	dVector omega1(0.0f, 0.0f, 0.0f, 0.0f);
+	NewtonBodyGetOmega(m_body0, &omega0[0]);
+	if (m_body1) {
+		NewtonBodyGetOmega(m_body1, &omega1[0]);
+	}
+	m_jointOmega = (omega0 - omega1) % matrix1.m_front;
+
+	if (m_friction != 0.0f) {
+		dFloat alpha = m_jointOmega / timestep;
+		NewtonUserJointAddAngularRow (m_joint, 0, &matrix1.m_front[0]);		
+		NewtonUserJointSetRowAcceleration (m_joint, -alpha);
+		NewtonUserJointSetRowMinimumFriction (m_joint, -m_friction);
+		NewtonUserJointSetRowMaximumFriction (m_joint,  m_friction);
+		NewtonUserJointSetRowStiffness (m_joint, 1.0f);
+	}
 
 	// if limit are enable ...
 	if (m_limitsOn) {
 		// the joint angle can be determine by getting the angle between any two non parallel vectors
-		if (angle < m_minAngle) {
-			dFloat relAngle = angle - m_minAngle;
+		if (m_curJointAngle.m_angle < m_minAngle) {
+			dFloat relAngle = m_curJointAngle.m_angle - m_minAngle;
 			// the angle was clipped save the new clip limit
 			m_curJointAngle.m_angle = m_minAngle;
 
@@ -199,8 +231,8 @@ void CustomHinge::SubmitConstraints (dFloat timestep, int threadIndex)
 			NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
 
 
-		} else if (angle  > m_maxAngle) {
-			dFloat relAngle = angle - m_maxAngle;
+		} else if (m_curJointAngle.m_angle  > m_maxAngle) {
+			dFloat relAngle = m_curJointAngle.m_angle - m_maxAngle;
 
 			// the angle was clipped save the new clip limit
 			m_curJointAngle.m_angle = m_maxAngle;
@@ -215,15 +247,6 @@ void CustomHinge::SubmitConstraints (dFloat timestep, int threadIndex)
 			NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
 		}
 	}
-
-	// save the current joint Omega
-	dVector omega0(0.0f, 0.0f, 0.0f, 0.0f);
-	dVector omega1(0.0f, 0.0f, 0.0f, 0.0f);
-	NewtonBodyGetOmega(m_body0, &omega0[0]);
-	if (m_body1) {
-		NewtonBodyGetOmega(m_body1, &omega1[0]);
-	}
-	m_jointOmega = (omega0 - omega1) % matrix1.m_front;
 }
 
 
