@@ -45,10 +45,13 @@ class CustomSlider: public CustomJoint
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;
 
-	bool m_limitsOn;
-	bool m_hitLimitOnLastUpdate;
+	dFloat m_speed;
+	dFloat m_posit;
 	dFloat m_minDist;
 	dFloat m_maxDist;
+
+	bool m_limitsOn;
+	bool m_hitLimitOnLastUpdate;
 };
 
 #endif // !defined(AFX_CUSTOMSLIDER_H__B631F556_468B_4331_B7D7_F85ECF3E9ADE_H)

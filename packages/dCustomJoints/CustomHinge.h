@@ -48,11 +48,11 @@ class CustomHinge: public CustomJoint
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;
 
-	bool m_limitsOn;
 	dFloat m_minAngle;
 	dFloat m_maxAngle;
 	dFloat m_jointOmega;
 	AngularIntegration m_curJointAngle;
+	bool m_limitsOn;
 };
 
 #endif 

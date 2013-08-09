@@ -36,6 +36,7 @@ CustomUniversal::CustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* ch
 	m_angularMotor_0_On = false;
 	m_angularDamp_0 = 0.5f;
 	m_angularAccel_0 = -4.0f;
+	m_jointOmega_0 = 0.0f;
 	m_minAngle_0 = -45.0f * 3.141592f / 180.0f;
 	m_maxAngle_0 =  45.0f * 3.141592f / 180.0f;
 
@@ -43,6 +44,7 @@ CustomUniversal::CustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* ch
 	m_angularMotor_1_On = false; 
 	m_angularDamp_1 = 0.3f;
 	m_angularAccel_1 = -4.0f;
+	m_jointOmega_1 = 0.0f;
 	m_minAngle_1 = -45.0f * 3.141592f / 180.0f;
 	m_maxAngle_1 =  45.0f * 3.141592f / 180.0f;
 
@@ -115,41 +117,14 @@ dFloat CustomUniversal::GetJointAngle_1 () const
 	return m_curJointAngle_1.m_angle;
 }
 
-
 dFloat CustomUniversal::GetJointOmega_0 () const
 {
-	dVector omega0 (0.0f, 0.0f, 0.0f);
-	dVector omega1 (0.0f, 0.0f, 0.0f);
-
-	dMatrix matrix0;
-	dMatrix matrix1;
-	CalculateGlobalMatrix (matrix0, matrix1);
-
-	// get relative angular velocity
-	dAssert (m_body1);
-	NewtonBodyGetOmega(m_body0, &omega0[0]);
-	NewtonBodyGetOmega(m_body1, &omega1[0]);
-
-	// calculate the desired acceleration
-	return (omega0 - omega1) % matrix0.m_front;
+	return m_jointOmega_0;
 }
 
 dFloat CustomUniversal::GetJointOmega_1 () const
 {
-	dVector omega0 (0.0f, 0.0f, 0.0f);
-	dVector omega1 (0.0f, 0.0f, 0.0f);
-
-	dMatrix matrix0;
-	dMatrix matrix1;
-	CalculateGlobalMatrix (matrix0, matrix1);
-
-	// get relative angular velocity
-	dAssert (m_body1);
-	NewtonBodyGetOmega(m_body0, &omega0[0]);
-	NewtonBodyGetOmega(m_body1, &omega1[0]);
-
-	// calculate the desired acceleration
-	return (omega0 - omega1) % matrix1.m_up;
+	return m_jointOmega_1;
 }
 
 dVector CustomUniversal::GetPinAxis_0 () const
@@ -302,6 +277,16 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 	CalculateYawAngle (matrix0, matrix1, sinAngle_1, cosAngle_1);
 	m_curJointAngle_1.CalculateJointAngle (cosAngle_1, sinAngle_1);
 
+	dVector omega0 (0.0f, 0.0f, 0.0f);
+	dVector omega1 (0.0f, 0.0f, 0.0f);
+	NewtonBodyGetOmega(m_body0, &omega0[0]);
+	NewtonBodyGetOmega(m_body1, &omega1[0]);
+
+	// calculate the desired acceleration
+	dVector relOmega (omega0 - omega1);
+	m_jointOmega_0 = relOmega % matrix0.m_front;
+	m_jointOmega_1 = relOmega % matrix1.m_up;
+	
 	// check is the joint limit are enable
 	if (m_limit_0_On) {
 		if (m_curJointAngle_0.m_angle < m_minAngle_0) {
@@ -331,18 +316,9 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 
 		// check is the joint limit motor is enable
 	} else if (m_angularMotor_0_On) {
-		dVector omega0 (0.0f, 0.0f, 0.0f);
-		dVector omega1 (0.0f, 0.0f, 0.0f);
-
-		// get relative angular velocity
-		NewtonBodyGetOmega(m_body0, &omega0[0]);
-		if (m_body1) {
-			NewtonBodyGetOmega(m_body1, &omega1[0]);
-		}
-
 		// calculate the desired acceleration
-		dFloat relOmega = (omega0 - omega1) % matrix0.m_front;
-		dFloat relAccel = m_angularAccel_0 - m_angularDamp_0 * relOmega;
+//		dFloat relOmega = (omega0 - omega1) % matrix0.m_front;
+		dFloat relAccel = m_angularAccel_0 - m_angularDamp_0 * m_jointOmega_0;
 
 		// add and angular constraint row to that will set the relative acceleration to zero
 		NewtonUserJointAddAngularRow (m_joint, 0.0f, &matrix0.m_front[0]);
@@ -378,18 +354,8 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 			NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
   		}
 	} else if (m_angularMotor_1_On) {
-		dVector omega0 (0.0f, 0.0f, 0.0f);
-		dVector omega1 (0.0f, 0.0f, 0.0f);
-
-		// get relative angular velocity
-		NewtonBodyGetOmega(m_body0, &omega0[0]);
-		if (m_body1) {
-			NewtonBodyGetOmega(m_body1, &omega1[0]);
-		}
-
 		// calculate the desired acceleration
-		dFloat relOmega = (omega0 - omega1) % matrix1.m_up;
-		dFloat relAccel = m_angularAccel_1 - m_angularDamp_1 * relOmega;
+		dFloat relAccel = m_angularAccel_1 - m_angularDamp_1 * m_jointOmega_1;
 
 		// add and angular constraint row to that will set the relative acceleration to zero
 		NewtonUserJointAddAngularRow (m_joint, 0.0f, &matrix1.m_up[0]);
@@ -421,8 +387,6 @@ void CustomUniversal::GetInfo (NewtonJointRecord* const info) const
 	info->m_minLinearDof[2] = 0.0f;
 	info->m_maxLinearDof[2] = 0.0f;
 
-	//	 info->m_minAngularDof[0] = m_minAngle_0 * 180.0f / 3.141592f ;
-	//	 info->m_maxAngularDof[0] = m_maxAngle_0 * 180.0f / 3.141592f ;
 
 	if (m_limit_0_On) {
 		dFloat angle;

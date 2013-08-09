@@ -64,8 +64,6 @@ void CustomHinge::EnableLimits(bool state)
 
 void CustomHinge::SetLimis(dFloat minAngle, dFloat maxAngle)
 {
-	//dAssert (minAngle < 0.0f);
-	//dAssert (maxAngle > 0.0f);
 	m_minAngle = minAngle;
 	m_maxAngle = maxAngle;
 }

@@ -57,43 +57,6 @@ void dNewtonHingeActuator::OnSubmitConstraint (dFloat timestep, int threadIndex)
 }
 
 
-dFloat dNewtonSliderActuator::GetActuatorPosit() const
-{
-	CustomSlider* const slider = (CustomSlider*) m_joint;
-	return slider->GetJointPosit();
-}
-
-void dNewtonSliderActuator::OnSubmitConstraint (dFloat timestep, int threadIndex)
-{
-	dNewtonSliderJoint::OnSubmitConstraint (timestep, threadIndex);
-/*
-	if (m_flag) {
-		dMatrix matrix0;
-		dMatrix matrix1;
-
-		CustomSlider* const customSlider = (CustomSlider*) m_joint;
-		NewtonJoint* const newtonSlider = m_joint->GetJoint();
-
-		//NewtonBodySetSleepState(m_joint->GetBody0(), false);
-		//NewtonBodySetSleepState(m_joint->GetBody1(), false);
-
-		dFloat posit = customSlider->GetJointPosit();
-		customSlider->CalculateGlobalMatrix (matrix0, matrix1);
-
-		dFloat relPosit = m_posit - posit;
-		dVector posit1 (matrix0.m_posit + matrix1.m_front.Scale (relPosit));
-		NewtonUserJointAddLinearRow (newtonSlider, &matrix0.m_posit[0], &posit1[0], &matrix1.m_front[0]);
-		dFloat step = m_linearRate * timestep;
-		if (dAbs (relPosit) > 2.0f * dAbs (step)) {
-			dFloat speed = customSlider->GetJointSpeed ();
-			//dFloat accel = (relPosit >= 0.0f) ? (m_linearRate - speed) / timestep : -(m_linearRate + speed) / timestep;
-//			dFloat accel = (relPosit >= 0.0f) ? 0.1f : -0.1f;
-//			NewtonUserJointSetRowAcceleration (newtonSlider, accel);
-		}
-		NewtonUserJointSetRowStiffness (newtonSlider, 1.0f);
-	}
-*/
-}
 
 
 dFloat dNewtonUniversalActuator::GetActuatorAngle0() const
@@ -144,5 +107,39 @@ void dNewtonUniversalActuator::OnSubmitConstraint (dFloat timestep, int threadIn
 			}
 			NewtonUserJointSetRowStiffness (newtonUniversal, 1.0f);
 		}
+	}
+}
+
+
+dFloat dNewtonSliderActuator::GetActuatorPosit() const
+{
+	CustomSlider* const slider = (CustomSlider*) m_joint;
+	return slider->GetJointPosit();
+}
+
+void dNewtonSliderActuator::OnSubmitConstraint (dFloat timestep, int threadIndex)
+{
+	dNewtonSliderJoint::OnSubmitConstraint (timestep, threadIndex);
+
+	if (m_flag) {
+		dMatrix matrix0;
+		dMatrix matrix1;
+
+		CustomSlider* const customSlider = (CustomSlider*) m_joint;
+		NewtonJoint* const newtonSlider = m_joint->GetJoint();
+		customSlider->CalculateGlobalMatrix (matrix0, matrix1);
+		
+		dVector posit1 (matrix1.m_posit);
+		dVector posit0 (matrix0.m_posit - matrix1.m_front.Scale (m_posit));
+		NewtonUserJointAddLinearRow (newtonSlider, &posit0[0], &posit1[0], &matrix1.m_front[0]);
+
+		dFloat relPosit = m_posit - customSlider->GetJointPosit();
+		dFloat step = m_linearRate * timestep;
+		if (dAbs (relPosit) > 2.0f * dAbs (step)) {
+			dFloat speed = customSlider->GetJointSpeed ();
+			dFloat accel = (relPosit >= 0.0f) ? (m_linearRate - speed) / timestep : -(m_linearRate + speed) / timestep;
+			NewtonUserJointSetRowAcceleration (newtonSlider, accel);
+		}
+		NewtonUserJointSetRowStiffness (newtonSlider, 1.0f);
 	}
 }

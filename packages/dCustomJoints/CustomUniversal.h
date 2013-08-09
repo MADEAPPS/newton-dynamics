@@ -64,12 +64,14 @@ class CustomUniversal: public CustomJoint
 
 	dFloat m_minAngle_0;
 	dFloat m_maxAngle_0;
+	dFloat m_jointOmega_0;
 	dFloat m_angularDamp_0;
 	dFloat m_angularAccel_0;
 	AngularIntegration m_curJointAngle_0;
 
 	dFloat m_minAngle_1;
 	dFloat m_maxAngle_1;
+	dFloat m_jointOmega_1;
 	dFloat m_angularDamp_1;
 	dFloat m_angularAccel_1;
 	AngularIntegration m_curJointAngle_1;

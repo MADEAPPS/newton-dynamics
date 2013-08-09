@@ -30,6 +30,9 @@ CustomSlider::CustomSlider (const dMatrix& pinAndPivotFrame, NewtonBody* const c
 {
 	m_limitsOn = false;
 	m_hitLimitOnLastUpdate = false;
+
+	m_speed = 0.0f;
+	m_posit = 0.0f;
 	m_minDist = -1.0f;
 	m_maxDist =  1.0f;
 
@@ -63,24 +66,13 @@ bool CustomSlider::JoinHitLimit () const
 
 dFloat CustomSlider::GetJointPosit () const
 {
-	dMatrix matrix0;
-	dMatrix matrix1;
-	CalculateGlobalMatrix (matrix0, matrix1);
-	return (matrix0.m_posit - matrix1.m_posit) % matrix1.m_front;
+	return m_posit;
 }
 
 dFloat CustomSlider::GetJointSpeed () const
 {
-	dMatrix matrix0;
-	dMatrix matrix1;
-	dVector veloc0;
-	dVector veloc1;
-	CalculateGlobalMatrix (matrix0, matrix1);
-	NewtonBodyGetVelocity(m_body0, &veloc0[0]);
-	NewtonBodyGetVelocity(m_body1, &veloc1[0]);
-	return (veloc0 - veloc1) % matrix1.m_front;
+	return m_speed;
 }
-
 
 
 void CustomSlider::SubmitConstraints (dFloat timestep, int threadIndex)
@@ -94,48 +86,52 @@ void CustomSlider::SubmitConstraints (dFloat timestep, int threadIndex)
 	// Restrict the movement on the pivot point along all tree orthonormal direction
 	dVector p0 (matrix0.m_posit);
 	dVector p1 (matrix1.m_posit + matrix1.m_front.Scale ((p0 - matrix1.m_posit) % matrix1.m_front));
-
 	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_up[0]);
 	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_right[0]);
 	
+	// two constraints row perpendicular to the pin
 	// get a point along the ping axis at some reasonable large distance from the pivot
 	dVector q0 (p0 + matrix0.m_front.Scale(MIN_JOINT_PIN_LENGTH));
 	dVector q1 (p1 + matrix1.m_front.Scale(MIN_JOINT_PIN_LENGTH));
-
-	// two constraints row perpendicular to the pin
  	NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &matrix0.m_up[0]);
 	NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &matrix0.m_right[0]);
 
+	// one constraint row perpendicular to the pin
 	// get a point along the ping axis at some reasonable large distance from the pivot
 	dVector r0 (p0 + matrix0.m_up.Scale(MIN_JOINT_PIN_LENGTH));
 	dVector r1 (p1 + matrix1.m_up.Scale(MIN_JOINT_PIN_LENGTH));
+ 	NewtonUserJointAddLinearRow (m_joint, &r0[0], &r1[0], &matrix1.m_right[0]);
 
-	// one constraint row perpendicular to the pin
- 	NewtonUserJointAddLinearRow (m_joint, &r0[0], &r1[0], &matrix0.m_right[0]);
+	// calculate position and speed	
+	dVector veloc0; 
+	dVector veloc1; 
+	NewtonBodyGetVelocity(m_body0, &veloc0[0]);
+	NewtonBodyGetVelocity(m_body1, &veloc1[0]);
+	m_posit = (matrix0.m_posit - matrix1.m_posit) % matrix1.m_front;
+	m_speed = (veloc0 - veloc1) % matrix1.m_front;
 
 	// if limit are enable ...
 	m_hitLimitOnLastUpdate = false;
 	if (m_limitsOn) {
-		dFloat dist = (matrix0.m_posit - matrix1.m_posit) % matrix0.m_front;
-		if (dist < m_minDist) {
+		if (m_posit < m_minDist) {
 			// indicate that this row hit a limit
 			m_hitLimitOnLastUpdate = true;
 
 			// get a point along the up vector and set a constraint  
 			const dVector& p0 = matrix0.m_posit;
-			dVector p1 (p0 + matrix0.m_front.Scale (m_minDist - dist));
+			dVector p1 (p0 + matrix0.m_front.Scale (m_minDist - m_posit));
 			NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
 			// allow the object to return but not to kick going forward
 			NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
 			
-		} else if (dist > m_maxDist) {
+		} else if (m_posit > m_maxDist) {
 			// indicate that this row hit a limit
 			m_hitLimitOnLastUpdate = true;
 
 			// get a point along the up vector and set a constraint  
 
 			const dVector& p0 = matrix0.m_posit;
-			dVector p1 (p0 + matrix0.m_front.Scale (m_maxDist - dist));
+			dVector p1 (p0 + matrix0.m_front.Scale (m_maxDist - m_posit));
 			NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
 			// allow the object to return but not to kick going forward
 			NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
