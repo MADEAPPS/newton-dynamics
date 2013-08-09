@@ -66,7 +66,7 @@ dFloat CustomSlider::GetJointPosit () const
 	dMatrix matrix0;
 	dMatrix matrix1;
 	CalculateGlobalMatrix (matrix0, matrix1);
-	return (matrix0.m_posit - matrix1.m_posit) % matrix0.m_front;
+	return (matrix0.m_posit - matrix1.m_posit) % matrix1.m_front;
 }
 
 dFloat CustomSlider::GetJointSpeed () const
@@ -78,7 +78,7 @@ dFloat CustomSlider::GetJointSpeed () const
 	CalculateGlobalMatrix (matrix0, matrix1);
 	NewtonBodyGetVelocity(m_body0, &veloc0[0]);
 	NewtonBodyGetVelocity(m_body1, &veloc1[0]);
-	return (veloc0 - veloc1) % matrix0.m_front;
+	return (veloc0 - veloc1) % matrix1.m_front;
 }
 
 
