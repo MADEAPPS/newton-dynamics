@@ -70,9 +70,8 @@ class dNewton: public dNewtonAlloc
 		return true;
 	}
 
-	CNEWTON_API virtual void OnContactProcess (dNewtonContactMaterial* const contacts, dFloat timestep, int threadIndex) const
-	{
-	}
+	CNEWTON_API virtual void OnContactProcess (dNewtonContactMaterial* const contacts, dFloat timestep, int threadIndex) const;
+
 
 	protected:
 	CNEWTON_API void ResetTimer();

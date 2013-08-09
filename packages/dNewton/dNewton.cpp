@@ -22,6 +22,7 @@
 #include "dStdAfxNewton.h"
 #include "dNewton.h"
 #include "dNewtonBody.h"
+#include "dNewtonMaterial.h"
 #include "dNewtonCollision.h"
 
 dNewton::ScopeLock::ScopeLock (unsigned* const lock)
@@ -75,6 +76,15 @@ void dNewton::SetMaxUpdatesPerIterations (int update)
 {
 	m_maxUpdatePerIterations = update;
 }
+
+void dNewton::OnContactProcess (dNewtonContactMaterial* const contactMaterial, dFloat timestep, int threadIndex) const
+{
+	dNewtonBody* const body0 = contactMaterial->GetBody0();
+	dNewtonBody* const body1 = contactMaterial->GetBody1();
+	body0->OnContactProcess (contactMaterial, timestep, threadIndex);
+	body1->OnContactProcess (contactMaterial, timestep, threadIndex);
+}
+
 
 int dNewton::OnBodiesAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
 {
@@ -135,7 +145,8 @@ void dNewton::OnContactProcess (const NewtonJoint* const contactJoint, dFloat ti
 */
 	}
 
-	world->OnContactProcess ((dNewtonContactMaterial*)NULL, timestep, threadIndex);
+	dNewtonContactMaterial contactMaterial ((void*)contactJoint);
+	world->OnContactProcess (&contactMaterial, timestep, threadIndex);
 }
 
 void dNewton::OnCollisionDestructorCallback (const NewtonWorld* const newtonWorld, const NewtonCollision* const collision)

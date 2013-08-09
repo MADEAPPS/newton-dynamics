@@ -22,4 +22,25 @@
 #include "dStdAfxNewton.h"
 #include "dNewtonMaterial.h"
 
+dNewtonBody* dNewtonContactMaterial::GetBody0 () const
+{
+	NewtonBody* const body = NewtonJointGetBody0 ((NewtonJoint*)m_materialHandle);
+	return (dNewtonBody*) NewtonBodyGetUserData (body);
+}
 
+dNewtonBody* dNewtonContactMaterial::GetBody1 () const
+{
+	NewtonBody* const body = NewtonJointGetBody1 ((NewtonJoint*)m_materialHandle);
+	return (dNewtonBody*) NewtonBodyGetUserData (body);
+}
+
+
+void* dNewtonContactMaterial::GetFirstContact() const
+{
+	return NewtonContactJointGetFirstContact ((NewtonJoint*)m_materialHandle);
+}
+
+void* dNewtonContactMaterial::GetNextContact(void* const contact) const
+{
+	return NewtonContactJointGetNextContact ((NewtonJoint*)m_materialHandle, contact);
+}

@@ -25,6 +25,7 @@
 #include "dStdAfxNewton.h"
 #include "dNewtonAlloc.h"
 
+class dNewtonBody;
 
 class dNewtonMaterial: virtual public dNewtonAlloc
 {
@@ -39,10 +40,25 @@ class dNewtonMaterial: virtual public dNewtonAlloc
 	{
 	}
 
-
-
 	dLong m_collisionMask;
+};
 
+class dNewtonContactMaterial
+{
+	public:
+	dNewtonContactMaterial(void* const materialHandle)
+		:m_materialHandle(materialHandle)
+	{
+	}
+
+	CNEWTON_API dNewtonBody* GetBody0 () const;
+	CNEWTON_API dNewtonBody* GetBody1 () const;
+
+	CNEWTON_API void* GetFirstContact() const;
+	CNEWTON_API void* GetNextContact(void* const contact) const;
+
+	private:
+	void* m_materialHandle; 
 };
 
 #endif
