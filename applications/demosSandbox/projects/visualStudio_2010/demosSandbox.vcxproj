@@ -413,6 +413,7 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLi
     <ClCompile Include="..\..\sdkDemos\DemoSoundListener.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\AdvancedPlayerController.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ArchimedesBuoyancy.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\ArticulateJoints.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicCar.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicPlayerController.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicRagDoll.cpp" />
@@ -543,6 +544,9 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLi
     <ProjectReference Include="..\..\..\..\coreLibrary_300\projects\windows\project_vs2010\physics.vcxproj">
       <Project>{39737a8f-6151-4259-8e39-25530345d4b4}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\coreLibrary_300\source\pthreads.2\VS_2010\pthread.vcxproj">
+      <Project>{03bca23c-02a5-415b-a37b-26600bc2ce96}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010\dAILibrary.vcxproj">
       <Project>{2f95c24f-6935-4288-a71c-dab402e4eabc}</Project>
     </ProjectReference>
@@ -575,9 +579,6 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLi
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\thirdParty\openAL\VS_2010\openAL.vcxproj">
       <Project>{9f1fac3f-ff22-41e0-825c-034802f5ea24}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\thirdParty\pthreads.2\VS_2010\pthread.vcxproj">
-      <Project>{03bca23c-02a5-415b-a37b-26600bc2ce96}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\thirdParty\tinyxml\vs2010\tinyxml.vcxproj">
       <Project>{18e509cf-46d2-4749-b3bb-160937cf2481}</Project>
