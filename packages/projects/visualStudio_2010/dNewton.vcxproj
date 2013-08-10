@@ -189,10 +189,10 @@
     <ClCompile Include="..\..\dNewton\dNewton.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonActuatorJoints.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonAlloc.cpp" />
+    <ClCompile Include="..\..\dNewton\dNewtonArticulatedTransformManager.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonBody.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonCollision.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonDynamicBody.cpp" />
-    <ClCompile Include="..\..\dNewton\dNewtonHierarchyTransformManager.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonInputManager.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonJoint.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonKinematicBody.cpp" />
@@ -215,10 +215,10 @@
     <ClInclude Include="..\..\dNewton\dNewton.h" />
     <ClInclude Include="..\..\dNewton\dNewtonActuatorJoints.h" />
     <ClInclude Include="..\..\dNewton\dNewtonAlloc.h" />
+    <ClInclude Include="..\..\dNewton\dNewtonArticulatedTransformManager.h" />
     <ClInclude Include="..\..\dNewton\dNewtonBody.h" />
     <ClInclude Include="..\..\dNewton\dNewtonCollision.h" />
     <ClInclude Include="..\..\dNewton\dNewtonDynamicBody.h" />
-    <ClInclude Include="..\..\dNewton\dNewtonHierarchyTransformManager.h" />
     <ClInclude Include="..\..\dNewton\dNewtonInputManager.h" />
     <ClInclude Include="..\..\dNewton\dNewtonJoint.h" />
     <ClInclude Include="..\..\dNewton\dNewtonKinematicBody.h" />

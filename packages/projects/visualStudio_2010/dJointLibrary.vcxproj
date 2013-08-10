@@ -400,12 +400,12 @@
   <ItemGroup>
     <ClCompile Include="..\..\dCustomJoints\Custom6DOF.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomAlloc.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomArcticulatedTransformManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomBallAndSocket.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomControllerManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomCorkScrew.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomDryRollingFriction.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomGear.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomHierarchicalTransformManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomHinge.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomJoint.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomJointLibraryStdAfx.cpp">
@@ -434,12 +434,12 @@
   <ItemGroup>
     <ClInclude Include="..\..\dCustomJoints\Custom6DOF.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomAlloc.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomArcticulatedTransformManager.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomBallAndSocket.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomControllerManager.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomCorkScrew.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomDryRollingFriction.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomGear.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomHierarchicalTransformManager.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomHinge.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomJoint.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomJointLibraryStdAfx.h" />

@@ -300,7 +300,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 		}
 	}
 	
-	origin.m_x -= 25.0f;
+	origin.m_x -= 5.0f;
 	origin.m_y += 5.0f;
 	dQuaternion rot;
 	scene->SetCameraMatrix(rot, origin);
