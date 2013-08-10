@@ -284,7 +284,8 @@ class RagDollManager: public CustomArticulaledTransformManager
 		// add the root bone
 		DemoEntity* const rootEntity = (DemoEntity*) ragDollEntity->Find (definition[0].m_boneName);
 		NewtonBody* const rootBone = CreateRagDollBodyPart (rootEntity, definition[0]);
-//NewtonBodySetMassMatrix(rootBone, 0.0f, 0.0f, 0.0f, 0.0f);
+		// for debugging
+		//NewtonBodySetMassMatrix(rootBone, 0.0f, 0.0f, 0.0f, 0.0f);
 
 		CustomArcticulatedTransformController::dSkeletonBone* const bone = controller->AddBone (rootBone, GetIdentityMatrix());
 		// save the controller as the collision user data, for collision culling
@@ -298,7 +299,6 @@ class RagDollManager: public CustomArticulaledTransformManager
 			childEntities[stackIndex] = child;
 			stackIndex ++;
 		}
-
 
 		// walk model hierarchic adding all children designed as rigid body bones. 
 		while (stackIndex) {

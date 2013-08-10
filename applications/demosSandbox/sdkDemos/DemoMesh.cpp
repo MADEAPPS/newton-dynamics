@@ -496,6 +496,45 @@ DemoMesh::~DemoMesh()
 }
 
 
+NewtonMesh* DemoMesh::CreateNewtonMesh(NewtonWorld* const world)
+{
+	NewtonMesh* const mesh = NewtonMeshCreate(world);
+
+	NewtonMeshBeginFace (mesh);
+
+
+	int id = 0;
+	dFloat point[3][12];
+	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
+		DemoSubMesh& segment = node->GetInfo();
+		for (int i = 0; i < segment.m_indexCount; i += 3) {
+			for (int j = 0; j < 3; j ++) {
+				int index = segment.m_indexes[i + j];
+				point[j][0] = m_vertex[index * 3 + 0];
+				point[j][1] = m_vertex[index * 3 + 1];
+				point[j][2] = m_vertex[index * 3 + 2];
+				point[j][3] = 0.0f;
+
+				point[j][4] = m_normal[index * 3 + 0];
+				point[j][5] = m_normal[index * 3 + 1];
+				point[j][6] = m_normal[index * 3 + 2];
+
+				point[j][7] = m_uv[index * 2 + 0];
+				point[j][8] = m_uv[index * 2 + 1];
+
+				point[j][9] = 0.0f;
+				point[j][10] = 0.0f;
+
+			}
+			NewtonMeshAddFace(mesh, 3, &point[0][0], sizeof (point) / 3, id);
+		}
+		id ++;
+	}
+
+	NewtonMeshEndFace(mesh);
+	return mesh;
+}
+
 const dString& DemoMesh::GetName () const
 {
 //	strcpy (nameOut, m_name);

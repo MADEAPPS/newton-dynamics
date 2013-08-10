@@ -93,7 +93,7 @@ void CustomArcticulatedTransformController::PreUpdate(dFloat timestep, int threa
 
 void CustomArcticulatedTransformController::PostUpdate(dFloat timestep, int threadIndex)
 {
-//	if (m_errorProjectionMode && m_boneCount && (NewtonBodyGetSleepState(m_bones[0].m_body) == 0)) {
+	if (m_errorProjectionMode && m_boneCount && (NewtonBodyGetSleepState(m_bones[0].m_body) == 0)) {
 		for (int i = 1; i < m_boneCount; i ++) {
 			const dSkeletonBone* const bone = &m_bones[i];
 			dAssert (bone->m_parent);
@@ -107,7 +107,7 @@ void CustomArcticulatedTransformController::PostUpdate(dFloat timestep, int thre
 				}
 			}
 		}
-//	}
+	}
 
 	CustomArticulaledTransformManager* const manager = (CustomArticulaledTransformManager*) GetManager();
 	for (int i = 0; i < m_boneCount; i ++) {
