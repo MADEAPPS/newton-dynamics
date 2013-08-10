@@ -644,6 +644,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\dNewton\dNewtonArticulatedTransformManager.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dNewton\dNewtonArticulatedTransformManager.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\dNewton\dNewtonBody.cpp"
 			>
 		</File>
@@ -665,14 +673,6 @@
 		</File>
 		<File
 			RelativePath="..\..\dNewton\dNewtonDynamicBody.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dNewton\dNewtonHierarchyTransformManager.cpp"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dNewton\dNewtonHierarchyTransformManager.h"
 			>
 		</File>
 		<File

@@ -23,6 +23,47 @@
 #include "CustomArcticulatedTransformManager.h"
 
 
+class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
+{
+	public:
+	ArticulatedVehicleManagerManager (DemoEntityManager* const scene)
+		:CustomArticulaledTransformManager (scene->GetNewton())
+	{
+		// create a material for early collision culling
+//		m_material = NewtonMaterialCreateGroupID(scene->GetNewton());
+//		NewtonMaterialSetCollisionCallback (scene->GetNewton(), m_material, m_material, this, OnBoneAABBOverlap, NULL);
+	}
+
+	virtual void OnPreUpdate (CustomArcticulatedTransformController* const constroller, dFloat timestep, int threadIndex) const
+	{
+	}
+
+	static int OnBoneAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
+	{
+//		NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
+//		NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
+//		CustomArcticulatedTransformController::dSkeletonBone* const bone0 = (CustomArcticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision0);
+//		CustomArcticulatedTransformController::dSkeletonBone* const bone1 = (CustomArcticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision1);
+//		dAssert (bone0);
+//		dAssert (bone1);
+//		if (bone0->m_myController == bone1->m_myController) {
+//			return bone0->m_myController->SelfCollisionTest (bone0, bone1) ? 1 : 0;
+//		}
+		return 1;
+	}
+
+	virtual void OnUpdateTransform (const CustomArcticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
+	{
+		DemoEntity* const ent = (DemoEntity*) NewtonBodyGetUserData(bone->m_body);
+		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(bone->m_body));
+
+		dQuaternion rot (localMatrix);
+		ent->SetMatrix (*scene, rot, localMatrix.m_posit);
+	}
+
+
+};
+
 
 void ArticulatedJoints (DemoEntityManager* const scene)
 {
@@ -31,9 +72,10 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
 	//CreateHeightFieldTerrain (scene, 9, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
 
-	// load a skeleton mesh for using as a ragdoll manager
+	// load a the mesh of the articulate vehicle
 	DemoEntity ragDollModel(GetIdentityMatrix(), NULL);
-	ragDollModel.LoadNGD_mesh ("skeleton.ngd", scene->GetNewton());
+	ragDollModel.LoadNGD_mesh ("forklift.ngd", scene->GetNewton());
+
 
 	//  create a skeletal transform controller for controlling rag doll
 //	RagDollManager* const manager = new RagDollManager (scene);
