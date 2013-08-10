@@ -66,9 +66,10 @@ static ARTICULATED_VEHICLE_DEFINITION forkliftDefinition[] =
 	{"lift_4",		"convexHull",			50.0f}, 
 	{"left_teeth",  "convexHullAggregate",	50.0f}, 
 	{"right_teeth", "convexHullAggregate",	50.0f}, 
-	
-
-
+	{"rr_tire",		"tireShape",			40.0f}, 
+	{"rl_tire",		"tireShape",			40.0f}, 
+	{"fr_tire",		"tireShape",			40.0f}, 
+	{"fl_tire",		"tireShape",			40.0f}, 
 };
 
 class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
@@ -109,6 +110,25 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		ent->SetMatrix (*scene, rot, localMatrix.m_posit);
 	}
 
+	NewtonCollision* MakeTireShape (DemoEntity* const bodyPart) const
+	{
+		dVector points[1024 * 16];
+
+		DemoMesh* const mesh = bodyPart->GetMesh();
+		dAssert (mesh->m_vertexCount && (mesh->m_vertexCount < int (sizeof (points)/ sizeof (points[0]))));
+
+		// go over the vertex array and find and collect all vertices's weighted by this bone.
+		dFloat* const array = mesh->m_vertex;
+		for (int i = 0; i < mesh->m_vertexCount; i ++) {
+			points[i].m_x = array[i * 3 + 0];
+			points[i].m_y = array[i * 3 + 1];
+			points[i].m_z = array[i * 3 + 2];
+		}
+		return NewtonCreateConvexHull (GetWorld(), mesh->m_vertexCount, &points[0].m_x, sizeof (dVector), 1.0e-3f, 0, NULL);
+	}
+
+
+
 	NewtonCollision* MakeConvexHull(DemoEntity* const bodyPart) const
 	{
 		dVector points[1024 * 16];
@@ -144,6 +164,8 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		if (!strcmp (definition.m_shapeType, "sphere")) {
 			dAssert (0);
 //			shape = MakeSphere (bodyPart, definition);
+		} else if (!strcmp (definition.m_shapeType, "tireShape")) {
+			shape = MakeTireShape(bodyPart);
 		} else if (!strcmp (definition.m_shapeType, "capsule")) {
 			dAssert (0);
 //			shape = MakeCapsule(bodyPart, definition);
