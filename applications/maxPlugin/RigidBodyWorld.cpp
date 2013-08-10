@@ -61,7 +61,7 @@ void RigidBodyData::DeleteBody()
 {
 	if (m_body) {
 	RigidBodyWorldDesc* const plugin = (RigidBodyWorldDesc*) RigidBodyWorldDesc::GetDescriptor();
-		NewtonDestroyBody(NewtonBodyGetWorld(m_body), m_body);
+		NewtonDestroyBody(m_body);
 	}
 	m_body = NULL;
 }
