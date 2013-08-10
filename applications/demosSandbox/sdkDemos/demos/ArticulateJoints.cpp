@@ -26,50 +26,25 @@
 struct ARTICULATED_VEHICLE_DEFINITION
 {
 	char m_boneName[32];
-	char m_shapeType[32];
-
+	char m_shapeTypeName[32];
 	dFloat m_mass;
-
-//	dFloat m_shapePitch;
-//	dFloat m_shapeYaw;
-//	dFloat m_shapeRoll;
-
-//	dFloat m_shape_x;
-//	dFloat m_shape_y;
-//	dFloat m_shape_z;
-
-//	dFloat m_radio;
-//	dFloat m_height;
-
-	
-
-//	dFloat m_coneAngle;
-//	dFloat m_minTwistAngle;
-//	dFloat m_maxTwistAngle;
-
-//	dFloat m_childPitch;
-//	dFloat m_childYaw;
-//	dFloat m_childRoll;
-
-//	dFloat m_parentPitch;
-//	dFloat m_parentYaw;
-//	dFloat m_parentRoll;
+	char m_articulationName[32];
 };
 
 
 static ARTICULATED_VEHICLE_DEFINITION forkliftDefinition[] =
 {
-	{"body",		"convexHull",			600.0f}, 
-	{"lift_1",		"convexHull",			50.0f}, 
-	{"lift_2",		"convexHull",			50.0f}, 
-	{"lift_3",		"convexHull",			50.0f}, 
-	{"lift_4",		"convexHull",			50.0f}, 
-	{"left_teeth",  "convexHullAggregate",	50.0f}, 
-	{"right_teeth", "convexHullAggregate",	50.0f}, 
-	{"rr_tire",		"tireShape",			40.0f}, 
-	{"rl_tire",		"tireShape",			40.0f}, 
-	{"fr_tire",		"tireShape",			40.0f}, 
-	{"fl_tire",		"tireShape",			40.0f}, 
+	{"body",		"convexHull",			600.0f},
+	{"fr_tire",		"tireShape",			 40.0f, "frontTire"}, 
+	{"fl_tire",		"tireShape",			 40.0f}, 
+	{"rr_tire",		"tireShape",			 40.0f}, 
+	{"rl_tire",		"tireShape",			 40.0f}, 
+	{"lift_1",		"convexHull",			 50.0f}, 
+	{"lift_2",		"convexHull",			 50.0f}, 
+	{"lift_3",		"convexHull",			 50.0f}, 
+	{"lift_4",		"convexHull",			 50.0f}, 
+	{"left_teeth",  "convexHullAggregate",	 50.0f}, 
+	{"right_teeth", "convexHullAggregate",	 50.0f}, 
 };
 
 class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
@@ -161,20 +136,11 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 	NewtonBody* CreateBodyPart (DemoEntity* const bodyPart, const ARTICULATED_VEHICLE_DEFINITION& definition) 
 	{
 		NewtonCollision* shape = NULL;
-		if (!strcmp (definition.m_shapeType, "sphere")) {
-			dAssert (0);
-//			shape = MakeSphere (bodyPart, definition);
-		} else if (!strcmp (definition.m_shapeType, "tireShape")) {
+		if (!strcmp (definition.m_shapeTypeName, "tireShape")) {
 			shape = MakeTireShape(bodyPart);
-		} else if (!strcmp (definition.m_shapeType, "capsule")) {
-			dAssert (0);
-//			shape = MakeCapsule(bodyPart, definition);
-		} else if (!strcmp (definition.m_shapeType, "box")) {
-			dAssert (0);
-//			shape = MakeBox (bodyPart);
-		} else if (!strcmp (definition.m_shapeType, "convexHull")) {
+		} else if (!strcmp (definition.m_shapeTypeName, "convexHull")) {
 			shape = MakeConvexHull(bodyPart);
-		} else if (!strcmp (definition.m_shapeType, "convexHullAggregate")) {
+		} else if (!strcmp (definition.m_shapeTypeName, "convexHullAggregate")) {
 			shape = MakeConvexHullAggregate(bodyPart);
 		} else {
 			dAssert (0);
@@ -205,6 +171,22 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		return bone;
 	}
 
+	void LinkFrontTire (NewtonBody* const parent, NewtonBody* const child)
+	{
+
+	}
+
+
+	void ConnectBodyPart (NewtonBody* const parent, NewtonBody* const child, const dString& jointArticulation)
+	{
+		if (jointArticulation == "") {
+			// this is the root body do nothing
+
+		} else if (jointArticulation == "frontTire") {
+			LinkFrontTire (parent, child);
+		}
+
+	}
 
 
 	void CreateForklift (const dMatrix& location, const DemoEntity* const model, int bodyPartsCount, ARTICULATED_VEHICLE_DEFINITION* const definition)
@@ -248,7 +230,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 					NewtonBody* const bone = CreateBodyPart (entity, definition[i]);
 
 					// connect this body part to its parent with a vehicle joint
-//					ConnectBodyParts (bone, parentBone->m_body, definition[i]);
+					ConnectBodyPart (parentBone->m_body, bone, definition[i].m_articulationName);
 
 					dMatrix bindMatrix (entity->GetParent()->CalculateGlobalMatrix ((DemoEntity*)NewtonBodyGetUserData (parentBone->m_body)).Inverse());
 					parentBone = controller->AddBone (bone, bindMatrix, parentBone);
