@@ -38,7 +38,7 @@
 //#define DEFAULT_SCENE	12			// infinite user plane collision
 //#define DEFAULT_SCENE	13			// user height field Collision
 //#define DEFAULT_SCENE	14			// compound Collision
-//#define DEFAULT_SCENE	15			// simple alchimedes buoyancy
+//#define DEFAULT_SCENE	15			// simple Archimedes buoyancy
 //#define DEFAULT_SCENE	16			// uniform Scaled Collision
 //#define DEFAULT_SCENE	17			// non Uniform Scaled Collision
 //#define DEFAULT_SCENE	18			// scaled mesh collision
@@ -49,13 +49,14 @@
 //#define DEFAULT_SCENE	23			// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	24			// continue collision
 //#define DEFAULT_SCENE	25			// puck slide continue collision
-#define DEFAULT_SCENE	26			// basic rag doll
-//#define DEFAULT_SCENE	27			// basic car
-//#define DEFAULT_SCENE	28			// high performance super car
-//#define DEFAULT_SCENE	29			// basic player controller
-//#define DEFAULT_SCENE	30			// advanced player controller
-//#define DEFAULT_SCENE	31			// cloth patch			
-//#define DEFAULT_SCENE	32			// soft bodies			
+#define DEFAULT_SCENE	26			// articulated joints
+//#define DEFAULT_SCENE	27			// basic rag doll
+//#define DEFAULT_SCENE	28			// basic car
+//#define DEFAULT_SCENE	29			// high performance super car
+//#define DEFAULT_SCENE	30			// basic player controller
+//#define DEFAULT_SCENE	31			// advanced player controller
+//#define DEFAULT_SCENE	32			// cloth patch			
+//#define DEFAULT_SCENE	33			// soft bodies			
 
 
 void Friction (DemoEntityManager* const scene);
@@ -91,6 +92,7 @@ void HeightFieldCollision (DemoEntityManager* const scene);
 void UserPlaneCollision (DemoEntityManager* const scene);
 void UserHeightFieldCollision (DemoEntityManager* const scene);
 void DescreteRagDoll (DemoEntityManager* const scene);
+void ArticulatedJoints (DemoEntityManager* const scene);
 
 
 NewtonDemos::SDKDemos NewtonDemos::m_demosSelection[] = 
@@ -121,6 +123,7 @@ NewtonDemos::SDKDemos NewtonDemos::m_demosSelection[] =
 	{wxT("Parallel ray cast"), wxT("using the threading Job scheduler"), MultiRayCast},
 	{wxT("Continue collision"), wxT("show continue collision"), ContinueCollision},
 	{wxT("Puck slide"), wxT("show continue collision"), PuckSlide},
+	{wxT("Articulated joints"), wxT("demonstrate complex array of bodies interconect by joints"), ArticulatedJoints},
 	{wxT("Basic ragdoll"), wxT("demonstrate simple rag doll"), DescreteRagDoll},
 	{wxT("Basic car"), wxT("implement a basic car"), BasicCar},
 	//{wxT("High performance super car"), wxT("implement a high performance ray cast car"), SuperCar},

@@ -363,8 +363,8 @@ void DescreteRagDoll (DemoEntityManager* const scene)
 	dVector origin (FindFloor (world, dVector (-10.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
 
 	int count = 8;
-	for (int x = 0; x < 8; x ++) {
-		for (int z = 0; z < 8; z ++) {
+	for (int x = 0; x < count; x ++) {
+		for (int z = 0; z < count; z ++) {
 			dVector p (origin + dVector ((x - count / 2) * 3.0f - count / 2, 0.0f, (z - count / 2) * 3.0f, 0.0f));
 			matrix.m_posit = FindFloor (world, p, 100.0f);
 			matrix.m_posit.m_y += 3.0f;
