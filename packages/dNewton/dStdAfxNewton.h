@@ -71,7 +71,7 @@
 #include <CustomTriggerManager.h>
 #include <CustomControllerManager.h>
 #include <CustomPlayerControllerManager.h>
-#include <CustomHierarchicalTransformManager.h>
+#include <CustomArcticulatedTransformManager.h>
 
 
 

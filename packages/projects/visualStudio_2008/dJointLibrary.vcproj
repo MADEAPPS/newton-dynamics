@@ -1087,19 +1087,19 @@
 			Name="factories"
 			>
 			<File
+				RelativePath="..\..\dCustomJoints\CustomArcticulatedTransformManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dCustomJoints\CustomArcticulatedTransformManager.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\dCustomJoints\CustomControllerManager.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\dCustomJoints\CustomControllerManager.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dCustomJoints\CustomHierarchicalTransformManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dCustomJoints\CustomHierarchicalTransformManager.h"
 				>
 			</File>
 			<File

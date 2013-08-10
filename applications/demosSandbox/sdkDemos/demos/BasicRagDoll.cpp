@@ -20,7 +20,7 @@
 #include "CustomBallAndSocket.h"
 #include "DebugDisplay.h"
 #include "HeightFieldPrimitive.h"
-#include "CustomHierarchicalTransformManager.h"
+#include "CustomArcticulatedTransformManager.h"
 
 
 
@@ -87,18 +87,18 @@ static RAGDOLL_BONE_DEFINITION skeletonRagDoll[] =
 
 
 
-class RagDollManager: public CustomHierarchicalTransformManager
+class RagDollManager: public CustomArticulaledTransformManager
 {
 	public: 
 	RagDollManager (DemoEntityManager* const scene)
-		:CustomHierarchicalTransformManager (scene->GetNewton())
+		:CustomArticulaledTransformManager (scene->GetNewton())
 	{
 		// create a material for early collision culling
 		m_material = NewtonMaterialCreateGroupID(scene->GetNewton());
 		NewtonMaterialSetCollisionCallback (scene->GetNewton(), m_material, m_material, this, OnBoneAABBOverlap, NULL);
 	}
 
-	virtual void OnPreUpdate (CustomHierarchicalTransformController* const constroller, dFloat timestep, int threadIndex) const
+	virtual void OnPreUpdate (CustomArcticulatedTransformController* const constroller, dFloat timestep, int threadIndex) const
 	{
 	}
 
@@ -106,8 +106,8 @@ class RagDollManager: public CustomHierarchicalTransformManager
 	{
 		NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
 		NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
-		CustomHierarchicalTransformController::dSkeletonBone* const bone0 = (CustomHierarchicalTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision0);
-		CustomHierarchicalTransformController::dSkeletonBone* const bone1 = (CustomHierarchicalTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision1);
+		CustomArcticulatedTransformController::dSkeletonBone* const bone0 = (CustomArcticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision0);
+		CustomArcticulatedTransformController::dSkeletonBone* const bone1 = (CustomArcticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision1);
 
 		dAssert (bone0);
 		dAssert (bone1);
@@ -183,7 +183,7 @@ class RagDollManager: public CustomHierarchicalTransformManager
 	}
 
 	
-	virtual void OnUpdateTransform (const CustomHierarchicalTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
+	virtual void OnUpdateTransform (const CustomArcticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
 	{
 		DemoEntity* const ent = (DemoEntity*) NewtonBodyGetUserData(bone->m_body);
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(bone->m_body));
@@ -279,20 +279,20 @@ class RagDollManager: public CustomHierarchicalTransformManager
 
 		// build the ragdoll with rigid bodies connected by joints
 		// create a transform controller
-		CustomHierarchicalTransformController* const controller = CreateTransformController (ragDollEntity, false);
+		CustomArcticulatedTransformController* const controller = CreateTransformController (ragDollEntity, false);
 
 		// add the root bone
 		DemoEntity* const rootEntity = (DemoEntity*) ragDollEntity->Find (definition[0].m_boneName);
 		NewtonBody* const rootBone = CreateRagDollBodyPart (rootEntity, definition[0]);
 //NewtonBodySetMassMatrix(rootBone, 0.0f, 0.0f, 0.0f, 0.0f);
 
-		CustomHierarchicalTransformController::dSkeletonBone* const bone = controller->AddBone (rootBone, GetIdentityMatrix());
+		CustomArcticulatedTransformController::dSkeletonBone* const bone = controller->AddBone (rootBone, GetIdentityMatrix());
 		// save the controller as the collision user data, for collision culling
 		NewtonCollisionSetUserData (NewtonBodyGetCollision(rootBone), bone);
 
 		int stackIndex = 0;
 		DemoEntity* childEntities[32];
-		CustomHierarchicalTransformController::dSkeletonBone* parentBones[32];
+		CustomArcticulatedTransformController::dSkeletonBone* parentBones[32];
 		for (DemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) {
 			parentBones[stackIndex] = bone;
 			childEntities[stackIndex] = child;
@@ -304,7 +304,7 @@ class RagDollManager: public CustomHierarchicalTransformManager
 		while (stackIndex) {
 			stackIndex --;
 			DemoEntity* const entity = childEntities[stackIndex];
-			CustomHierarchicalTransformController::dSkeletonBone* parentBone = parentBones[stackIndex];
+			CustomArcticulatedTransformController::dSkeletonBone* parentBone = parentBones[stackIndex];
 
 			const char* const name = entity->GetName().GetStr();
 			for (int i = 0; i < defintionCount; i ++) {

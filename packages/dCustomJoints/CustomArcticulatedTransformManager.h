@@ -12,18 +12,18 @@
 
 //////////////////////////////////////////////////////////////////////
 
-#ifndef D_CUSTOM_HIERACHICAL_TRANSFORM_MANAGER_H_
-#define D_CUSTOM_HIERACHICAL_TRANSFORM_MANAGER_H_
+#ifndef D_CUSTOM_ARTICULATED_TRANSFORM_MANAGER_H_
+#define D_CUSTOM_ARTICULATED_TRANSFORM_MANAGER_H_
 
 #include "CustomJointLibraryStdAfx.h"
 #include "CustomControllerManager.h"
 
 #define D_HIERACHICAL_CONTROLLER_MAX_BONES	64
 
-#define HIERACHICAL_TRANSFORM_PLUGIN_NAME	"__hierachicalTransformManager__"
+#define HIERACHICAL_ARTICULATED_PLUGIN_NAME	"__articulatedTransformManager__"
 
 // a Skeleton Transform controller is use to calculate local transform on contractions of rigid bodies and joint that form part of a hierarchical Skeleton
-class CustomHierarchicalTransformController: public CustomControllerBase
+class CustomArcticulatedTransformController: public CustomControllerBase
 {
 	public:
 	class dSelfCollisionBitmask
@@ -78,12 +78,12 @@ class CustomHierarchicalTransformController: public CustomControllerBase
 		dMatrix m_bindMatrix;
 		NewtonBody* m_body;
 		dSkeletonBone* m_parent;
-		CustomHierarchicalTransformController* m_myController;
+		CustomArcticulatedTransformController* m_myController;
 		dSelfCollisionBitmask m_bitField;
 	};
 
-	NEWTON_API CustomHierarchicalTransformController();
-	NEWTON_API ~CustomHierarchicalTransformController();
+	NEWTON_API CustomArcticulatedTransformController();
+	NEWTON_API ~CustomArcticulatedTransformController();
 
 	NEWTON_API void SetErrorProjectionMode (bool mode);
 	NEWTON_API bool GetErrorProjectionMode () const;
@@ -105,29 +105,29 @@ class CustomHierarchicalTransformController: public CustomControllerBase
 	dSkeletonBone m_bones[D_HIERACHICAL_CONTROLLER_MAX_BONES];
 	int m_boneCount;
 	bool m_errorProjectionMode;
-	friend class CustomHierarchicalTransformManager;
+	friend class CustomArticulaledTransformManager;
 };
 
-class CustomHierarchicalTransformManager: public CustomControllerManager<CustomHierarchicalTransformController> 
+class CustomArticulaledTransformManager: public CustomControllerManager<CustomArcticulatedTransformController> 
 {
 	public:
-	NEWTON_API CustomHierarchicalTransformManager(NewtonWorld* const world);
-	NEWTON_API virtual ~CustomHierarchicalTransformManager();
+	NEWTON_API CustomArticulaledTransformManager(NewtonWorld* const world);
+	NEWTON_API virtual ~CustomArticulaledTransformManager();
 
 	virtual void Debug () const 
 	{
 	}
 
-	NEWTON_API virtual CustomHierarchicalTransformController* CreateTransformController (void* const userData, bool errorCorrectionMode);
+	NEWTON_API virtual CustomArcticulatedTransformController* CreateTransformController (void* const userData, bool errorCorrectionMode);
 	
-	NEWTON_API virtual void DisableAllSelfCollision (CustomHierarchicalTransformController* const controller);
-	NEWTON_API virtual void SetDefaultSelfCollisionMask (CustomHierarchicalTransformController* const controller);
+	NEWTON_API virtual void DisableAllSelfCollision (CustomArcticulatedTransformController* const controller);
+	NEWTON_API virtual void SetDefaultSelfCollisionMask (CustomArcticulatedTransformController* const controller);
 	
-	NEWTON_API virtual void SetCollisionMask (CustomHierarchicalTransformController::dSkeletonBone* const bone0, CustomHierarchicalTransformController::dSkeletonBone* const bone1, bool mode);
-	NEWTON_API virtual bool SelfCollisionTest (const CustomHierarchicalTransformController::dSkeletonBone* const bone0, const CustomHierarchicalTransformController::dSkeletonBone* const bone1) const;
+	NEWTON_API virtual void SetCollisionMask (CustomArcticulatedTransformController::dSkeletonBone* const bone0, CustomArcticulatedTransformController::dSkeletonBone* const bone1, bool mode);
+	NEWTON_API virtual bool SelfCollisionTest (const CustomArcticulatedTransformController::dSkeletonBone* const bone0, const CustomArcticulatedTransformController::dSkeletonBone* const bone1) const;
 
-	NEWTON_API virtual void OnPreUpdate (CustomHierarchicalTransformController* const constroller, dFloat timestep, int threadIndex) const = 0;
-	NEWTON_API virtual void OnUpdateTransform (const CustomHierarchicalTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const = 0;
+	NEWTON_API virtual void OnPreUpdate (CustomArcticulatedTransformController* const constroller, dFloat timestep, int threadIndex) const = 0;
+	NEWTON_API virtual void OnUpdateTransform (const CustomArcticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const = 0;
 };
 
 
