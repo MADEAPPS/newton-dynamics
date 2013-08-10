@@ -40,6 +40,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 	static int OnBoneAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
 	{
+		dAssert (0);
 //		NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
 //		NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
 //		CustomArcticulatedTransformController::dSkeletonBone* const bone0 = (CustomArcticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision0);
@@ -54,6 +55,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 	virtual void OnUpdateTransform (const CustomArcticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
 	{
+		dAssert (0);
 		DemoEntity* const ent = (DemoEntity*) NewtonBodyGetUserData(bone->m_body);
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(bone->m_body));
 
@@ -62,6 +64,17 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 	}
 
 
+	void CreateForklift (const dMatrix& location, const DemoEntity* const model)
+	{
+		NewtonWorld* const world = GetWorld(); 
+		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
+
+		// make a clone of the mesh 
+		DemoEntity* const vehicleModel = (DemoEntity*) model->CreateClone();
+		scene->Append(vehicleModel);
+
+
+	}
 };
 
 
@@ -73,12 +86,11 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	//CreateHeightFieldTerrain (scene, 9, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
 
 	// load a the mesh of the articulate vehicle
-	DemoEntity ragDollModel(GetIdentityMatrix(), NULL);
-	ragDollModel.LoadNGD_mesh ("forklift.ngd", scene->GetNewton());
-
+	DemoEntity forkliffModel(GetIdentityMatrix(), NULL);
+	forkliffModel.LoadNGD_mesh ("forklift.ngd", scene->GetNewton());
 
 	//  create a skeletal transform controller for controlling rag doll
-//	RagDollManager* const manager = new RagDollManager (scene);
+	ArticulatedVehicleManagerManager* const manager = new ArticulatedVehicleManagerManager (scene);
 
 	NewtonWorld* const world = scene->GetNewton();
 	dMatrix matrix (GetIdentityMatrix());
@@ -91,7 +103,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 			dVector p (origin + dVector ((x - count / 2) * 3.0f - count / 2, 0.0f, (z - count / 2) * 3.0f, 0.0f));
 			matrix.m_posit = FindFloor (world, p, 100.0f);
 			matrix.m_posit.m_y += 3.0f;
-//			manager->CreateRagDoll (matrix, &ragDollModel, skeletonRagDoll, sizeof (skeletonRagDoll) / sizeof (skeletonRagDoll[0]));
+			manager->CreateForklift (matrix, &forkliffModel);
 		}
 	}
 	
