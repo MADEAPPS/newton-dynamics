@@ -32,8 +32,8 @@ class dNewtonHingeActuator: public dNewtonHingeJoint
 	CNEWTON_API dNewtonHingeActuator(const dFloat* const pinAndPivotFrame, dFloat angularRate, dFloat minAngle, dFloat maxAngle, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
 		:dNewtonHingeJoint(pinAndPivotFrame, body0, body1)
 		,m_angle(0.0f)
-		,m_minAngle(-30.0f * 3.141592f / 180.0f)
-		,m_maxAngle(30.0f * 3.141592f / 180.0f)
+		,m_minAngle(minAngle)
+		,m_maxAngle(maxAngle)
 		,m_angularRate(angularRate)
 		,m_flag(true)
 	{
