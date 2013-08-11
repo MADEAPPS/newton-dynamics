@@ -667,7 +667,6 @@ dgBallConstraint* dgWorld::CreateBallConstraint (
 	
 	dgAssert (body0);
 	dgAssert (body0 != body1);
-//	constraint = dgBallConstraint::Create(this);
 	constraint = new (m_allocator) dgBallConstraint;
 
 	AttachConstraint (constraint, body0, body1);
@@ -686,7 +685,6 @@ dgHingeConstraint* dgWorld::CreateHingeConstraint (
 
 	dgAssert (body0);
 	dgAssert (body0 != body1);
-//	constraint = dgHingeConstraint::Create(this);
 	constraint = new (m_allocator) dgHingeConstraint;
 
 	AttachConstraint (constraint, body0, body1);
@@ -700,7 +698,6 @@ dgUpVectorConstraint* dgWorld::CreateUpVectorConstraint (const dgVector& pin, dg
 	dgUpVectorConstraint *constraint;
 	
 	dgAssert (body);
-//	constraint = dgUpVectorConstraint::Create(this);
 	constraint = new (m_allocator) dgUpVectorConstraint;
 
 	AttachConstraint (constraint, body, NULL);
@@ -720,7 +717,6 @@ dgSlidingConstraint* dgWorld::CreateSlidingConstraint (
 
 	dgAssert (body0);
 	dgAssert (body0 != body1);
-//	constraint = dgSlidingConstraint::Create(this);
 	constraint = new (m_allocator) dgSlidingConstraint;
 
 	AttachConstraint (constraint, body0, body1);
@@ -739,7 +735,6 @@ dgCorkscrewConstraint* dgWorld::CreateCorkscrewConstraint (
 
 	dgAssert (body0);
 	dgAssert (body0 != body1);
-//	constraint = dgCorkscrewConstraint::Create(this);
 	constraint = new (m_allocator) dgCorkscrewConstraint;
 
 	AttachConstraint (constraint, body0, body1);
@@ -759,7 +754,6 @@ dgUniversalConstraint* dgWorld::CreateUniversalConstraint (
 
 	dgAssert (body0);
 	dgAssert (body0 != body1);
-//	constraint = dgUniversalConstraint::Create(this);
 	constraint = new (m_allocator) dgUniversalConstraint;
 
 	AttachConstraint (constraint, body0, body1);

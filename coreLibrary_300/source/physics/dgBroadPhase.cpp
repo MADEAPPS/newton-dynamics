@@ -825,6 +825,7 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgVe
 	bool isCollidable = true;
 	dgContact* contact = NULL;
 	if ((body0->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI)) || (body0->GetInvMass().m_w != dgFloat32 (0.0f))) {
+		dgThreadHiveScopeLock lock (m_world, &m_contacJointLock);
 		for (dgBodyMasterListRow::dgListNode* link = body0->m_masterNode->GetInfo().GetFirst(); link; link = link->GetNext()) {
 			dgConstraint* const constraint = link->GetInfo().m_joint;
 			if (constraint->GetId() != dgConstraint::m_contactConstraint) {
@@ -847,8 +848,8 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgVe
 				break;
 			}
 		}
-
 	} else {
+		dgThreadHiveScopeLock lock (m_world, &m_contacJointLock);
 		dgAssert ((body1->GetInvMass().m_w != dgFloat32 (0.0f)) || (body1->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI)));
 		for (dgBodyMasterListRow::dgListNode* link = body1->m_masterNode->GetInfo().GetFirst(); link; link = link->GetNext()) {
 			dgConstraint* const constraint = link->GetInfo().m_joint;

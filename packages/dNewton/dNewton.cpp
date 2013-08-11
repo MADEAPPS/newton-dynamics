@@ -57,7 +57,7 @@ dNewton::dNewton()
 	// set the collision copy constructor callback
 	NewtonWorldSetCollisionConstructorDestuctorCallback (m_world, OnCollisionCopyConstruct, OnCollisionDestructorCallback);
 
-	// use defualt material to implemnet traditonal "Game style" one side material system
+	// use default material to implement traditional "Game style" one side material system
 	int defaultMaterial = NewtonMaterialGetDefaultGroupID (m_world);
 	NewtonMaterialSetCompoundCollisionCallback(m_world, defaultMaterial, defaultMaterial, OnCompoundSubCollisionAABBOverlap);
 	NewtonMaterialSetCollisionCallback (m_world, defaultMaterial, defaultMaterial, m_world, OnBodiesAABBOverlap, OnContactProcess);
