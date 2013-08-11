@@ -23,6 +23,7 @@
 #include "CustomHingeActuator.h"
 #include "CustomSliderActuator.h"
 #include "HeightFieldPrimitive.h"
+#include "CustomUniversalActuator.h"
 #include "CustomArcticulatedTransformManager.h"
 
 
@@ -107,8 +108,12 @@ class ArticulatedEntityModel: public DemoEntity
 		chassisMatrix = dYawMatrix(90.0f * 3.141592f / 180.0f) * chassisMatrix;
 		chassisMatrix.m_posit = tireMatrix.m_posit;
 
-		// for now use hinges
-		m_rearTireJoints[m_frontTiresCount] = new CustomHinge (&chassisMatrix[0][0], tire, chassis);
+		dFloat angleLimit = 30.0f * 3.141592f / 180.0f;
+		dFloat angularRate = 60.0f * 3.141592f / 180.0f;
+		m_rearTireJoints[m_frontTiresCount] = new CustomUniversalActuator (&chassisMatrix[0][0], angularRate, -angleLimit, angleLimit, angularRate, -angleLimit, angleLimit, tire, chassis);
+		m_rearTireJoints[m_frontTiresCount]->SetEnableFlag0 (false);
+//m_rearTireJoints[m_frontTiresCount]->SetTargetAngle1(angleLimit);
+
 		m_rearTiresCount ++;
 	}
 
@@ -157,11 +162,10 @@ class ArticulatedEntityModel: public DemoEntity
 	int m_paletteActuatorsCount;
 		
 	NewtonBody* m_fronTires[2];
-	
-	CustomHinge* m_rearTireJoints[2];
 	CustomHinge* m_frontTireJoints[2];
 	CustomSliderActuator* m_liftJoints[3];
 	CustomSliderActuator* m_paletteJoints[3];
+	CustomUniversalActuator* m_rearTireJoints[2];
 	
 	CustomHingeActuator* m_angularActuator;
 };
