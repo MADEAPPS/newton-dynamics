@@ -25,12 +25,6 @@
 #include "dNewtonActuatorJoints.h"
 
 
-dFloat dNewtonHingeActuator::GetActuatorAngle() const
-{
-	CustomHinge* const hinge = (CustomHinge*) m_joint;
-	return hinge->GetJointAngle();
-}
-
 void dNewtonHingeActuator::OnSubmitConstraint (dFloat timestep, int threadIndex)
 {
 	dNewtonHingeJoint::OnSubmitConstraint (timestep, threadIndex);

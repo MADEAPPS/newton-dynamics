@@ -967,14 +967,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\dCustomJoints\CustomdHingeActuator.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dCustomJoints\CustomdHingeActuator.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\dCustomJoints\CustomDryRollingFriction.cpp"
 				>
 			</File>
@@ -996,6 +988,14 @@
 			</File>
 			<File
 				RelativePath="..\..\dCustomJoints\CustomHinge.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dCustomJoints\CustomHingeActuator.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dCustomJoints\CustomHingeActuator.h"
 				>
 			</File>
 			<File

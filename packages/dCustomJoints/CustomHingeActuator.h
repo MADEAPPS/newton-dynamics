@@ -20,8 +20,8 @@
 */
 
 
-#ifndef _CUSTOMHINGE_ACTUATOR_H_
-#define _CUSTOMHINGE_ACTUATOR_H_
+#ifndef _CUSTOM_HINGE_ACTUATOR_H_
+#define _CUSTOM_HINGE_ACTUATOR_H_
 
 #include "CustomJoint.h"
 #include "CustomHinge.h"
@@ -29,47 +29,31 @@
 class CustomHingeActuator: public CustomHinge
 {
 	public:
-	NEWTON_API CustomHingeActuator(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL, dFloat minAngle = 30.0f * 3.141592f / 180.0f, dFloat maxAngle = 30.0f * 3.141592f / 180.0f)
-		:CustomHinge (pinAndPivotFrame, child, parent)
-		,m_targetAngle(0.0f)
-		,m_minAngle(minAngle)
-		,m_maxAngle(maxAngle)
-		,m_flag(true)
-	{
-		EnableLimits(false);
-	}
+	NEWTON_API CustomHingeActuator(const dMatrix& pinAndPivotFrame, dFloat angularRate, dFloat minAngle, dFloat maxAngle, NewtonBody* const child, NewtonBody* const parent = NULL);
 
-	NEWTON_API dFloat GetTargetAngle() const
-	{
-		return m_targetAngle;
-	}
+	NEWTON_API dFloat GetActuatorAngle() const;
+	NEWTON_API bool GetEnableFlag (bool flag) const;
+	NEWTON_API void SetEnableFlag (bool flag);
 
-	NEWTON_API void SetTargetAngle(dFloat angle)
-	{
-		m_targetAngle = dClamp (angle, m_minAngle, m_maxAngle);
-	}
+	NEWTON_API dFloat GetTargetAngle() const;
+	NEWTON_API void SetTargetAngle(dFloat angle);
 
-	void SetEnableFlag (bool flag)
-	{
-		m_flag = flag;
-	}
+	NEWTON_API dFloat GetMinAngularLimit() const;
+	NEWTON_API void SetMinAngularLimit(dFloat limit);
 
-	bool GetEnableFlag (bool flag) const
-	{
-		return m_flag;
-	}
-	
-	NEWTON_API dFloat GetActuatorAngle() const
-	{
-		return GetJointAngle();
-	}
+	NEWTON_API dFloat GetMaxAngularLimit() const;
+	NEWTON_API void SetMaxAngularLimit(dFloat limit);
+
+	NEWTON_API dFloat GetAngularRate() const;
+	NEWTON_API void SetAngularRate(dFloat rate);
 
 	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 
 	private:
-	dFloat m_targetAngle;
+	dFloat m_angle;
 	dFloat m_minAngle;
 	dFloat m_maxAngle;
+	dFloat m_angularRate;
 	bool m_flag;
 };
 

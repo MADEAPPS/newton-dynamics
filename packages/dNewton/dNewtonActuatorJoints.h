@@ -32,8 +32,8 @@ class dNewtonHingeActuator: public dNewtonHingeJoint
 	CNEWTON_API dNewtonHingeActuator(const dFloat* const pinAndPivotFrame, dFloat angularRate, dFloat minAngle, dFloat maxAngle, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
 		:dNewtonHingeJoint(pinAndPivotFrame, body0, body1)
 		,m_angle(0.0f)
-		,m_minAngle(minAngle)
-		,m_maxAngle(maxAngle)
+		,m_minAngle(-30.0f * 3.141592f / 180.0f)
+		,m_maxAngle(30.0f * 3.141592f / 180.0f)
 		,m_angularRate(angularRate)
 		,m_flag(true)
 	{
@@ -87,12 +87,18 @@ class dNewtonHingeActuator: public dNewtonHingeJoint
 		m_angle = dClamp (angle, m_minAngle, m_maxAngle);
 	}
 
-	void SetEnableFlag (bool flag)
+	CNEWTON_API void SetEnableFlag (bool flag)
 	{
 		m_flag = flag;
 	}
 	
-	CNEWTON_API dFloat GetActuatorAngle() const;
+	CNEWTON_API dFloat GetActuatorAngle() const
+	{
+		CustomHinge* const hinge = (CustomHinge*) m_joint;
+		return hinge->GetJointAngle();
+	}
+
+
 	CNEWTON_API virtual void OnSubmitConstraint (dFloat timestep, int threadIndex);
 
 	private:

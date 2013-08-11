@@ -20,6 +20,7 @@
 #include "CustomBallAndSocket.h"
 #include "DebugDisplay.h"
 #include "CustomHinge.h"
+#include "CustomHingeActuator.h"
 #include "HeightFieldPrimitive.h"
 #include "CustomArcticulatedTransformManager.h"
 
@@ -36,11 +37,11 @@ struct ARTICULATED_VEHICLE_DEFINITION
 static ARTICULATED_VEHICLE_DEFINITION forkliftDefinition[] =
 {
 	{"body",		"convexHull",			600.0f},
-	{"fr_tire",		"tireShape",			 40.0f, "frontTire"}, 
-	{"fl_tire",		"tireShape",			 40.0f, "frontTire"}, 
-	{"rr_tire",		"tireShape",			 40.0f}, 
-	{"rl_tire",		"tireShape",			 40.0f}, 
-	{"lift_1",		"convexHull",			 50.0f}, 
+	{"fr_tire",		"tireShape",			 40.0f, "frontTire"},
+	{"fl_tire",		"tireShape",			 40.0f, "frontTire"},
+	{"rr_tire",		"tireShape",			 40.0f, "rearTire"},
+	{"rl_tire",		"tireShape",			 40.0f, "rearTire"},
+	{"lift_1",		"convexHull",			 50.0f, "hingeActuator"},
 	{"lift_2",		"convexHull",			 50.0f}, 
 	{"lift_3",		"convexHull",			 50.0f}, 
 	{"lift_4",		"convexHull",			 50.0f}, 
@@ -53,6 +54,7 @@ class ArticulatedEntityModel: public DemoEntity
 	public:
 	ArticulatedEntityModel(DemoEntityManager* const scene, const char* const name)
 		:DemoEntity(GetIdentityMatrix(), NULL)
+		,m_rearTiresCount(0)
 		,m_frontTiresCount(0)
 	{
 		LoadNGD_mesh (name, scene->GetNewton());
@@ -60,6 +62,7 @@ class ArticulatedEntityModel: public DemoEntity
 
 	ArticulatedEntityModel (const ArticulatedEntityModel& copy)
 		:DemoEntity(copy)
+		,m_rearTiresCount(0)
 		,m_frontTiresCount(0)
 	{
 	}
@@ -82,17 +85,46 @@ class ArticulatedEntityModel: public DemoEntity
 		chassisMatrix = dYawMatrix(90.0f * 3.141592f / 180.0f) * chassisMatrix;
 		chassisMatrix.m_posit = tireMatrix.m_posit;
 
-		m_frontTireJopint[m_frontTiresCount] = new CustomHinge (&chassisMatrix[0][0], tire, chassis);
+		m_frontTireJoints[m_frontTiresCount] = new CustomHinge (&chassisMatrix[0][0], tire, chassis);
 		m_fronTires[m_frontTiresCount] = tire;
 		m_frontTiresCount ++;
 	}
 
+	void LinkRearTire (NewtonBody* const chassis, NewtonBody* const tire)
+	{
+		dMatrix tireMatrix;
+		dMatrix chassisMatrix;
+
+		// calculate the tire location matrix
+		NewtonBodyGetMatrix(tire, &tireMatrix[0][0]);
+		NewtonBodyGetMatrix(chassis, &chassisMatrix[0][0]);
+
+		chassisMatrix = dYawMatrix(90.0f * 3.141592f / 180.0f) * chassisMatrix;
+		chassisMatrix.m_posit = tireMatrix.m_posit;
+
+		// for now use hinges
+		m_rearTireJoints[m_frontTiresCount] = new CustomHinge (&chassisMatrix[0][0], tire, chassis);
+		m_rearTiresCount ++;
+	}
+
+	void LinkHingeActuator (NewtonBody* const parent, NewtonBody* const child)
+	{
+		dMatrix baseMatrix;
+		NewtonBodyGetMatrix (child, &baseMatrix[0][0]);
+
+		dFloat angleLimit = 20.0f * 3.141592f / 180.0f;
+		dFloat angularRate = 30.0f * 3.141592f / 180.0f;
+		m_angularActuator = new CustomHingeActuator (&baseMatrix[0][0], angularRate, -angleLimit, angleLimit, child, parent);
+	}
+
+	int m_rearTiresCount;
 	int m_frontTiresCount;
+		
 	NewtonBody* m_fronTires[2];
-	CustomHinge* m_frontTireJopint[2];
-
-
-
+	
+	CustomHinge* m_rearTireJoints[2];
+	CustomHinge* m_frontTireJoints[2];
+	CustomHingeActuator* m_angularActuator;
 };
 
 class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
@@ -135,21 +167,23 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 	NewtonCollision* MakeTireShape (DemoEntity* const bodyPart) const
 	{
-		dVector points[1024 * 16];
+		
+
+		dFloat radius = 0.0f;
+		dFloat maxWidth = 0.0f;
+		dFloat minWidth = 0.0f;
 
 		DemoMesh* const mesh = bodyPart->GetMesh();
-		dAssert (mesh->m_vertexCount && (mesh->m_vertexCount < int (sizeof (points)/ sizeof (points[0]))));
-
-		// go over the vertex array and find and collect all vertices's weighted by this bone.
 		dFloat* const array = mesh->m_vertex;
 		for (int i = 0; i < mesh->m_vertexCount; i ++) {
-			points[i].m_x = array[i * 3 + 0];
-			points[i].m_y = array[i * 3 + 1];
-			points[i].m_z = array[i * 3 + 2];
+			maxWidth = dMax (array[i * 3 + 0], maxWidth);
+			minWidth = dMin (array[i * 3 + 0], minWidth);
+			radius = dMax (array[i * 3 + 1], radius);
 		}
-		return NewtonCreateConvexHull (GetWorld(), mesh->m_vertexCount, &points[0].m_x, sizeof (dVector), 1.0e-3f, 0, NULL);
+		dFloat width = maxWidth - minWidth;
+		radius -= width * 0.5f;
+		return NewtonCreateChamferCylinder (GetWorld(), radius, width, 0, NULL);
 	}
-
 
 
 	NewtonCollision* MakeConvexHull(DemoEntity* const bodyPart) const
@@ -228,6 +262,10 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 		} else if (jointArticulation == "frontTire") {
 			vehicleModel->LinkFrontTire (parent, child);
+		} else if (jointArticulation == "rearTire") {
+			vehicleModel->LinkRearTire (parent, child);
+		} else if (jointArticulation == "hingeActuator") {
+			vehicleModel->LinkHingeActuator (parent, child);
 		}
 	}
 
@@ -244,13 +282,12 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		CustomArticulatedTransformController* const controller = CreateTransformController (vehicleModel, true);
 
 		DemoEntity* const rootEntity = (DemoEntity*) vehicleModel->Find (definition[0].m_boneName);
-		NewtonBody* const rootBone = CreateBodyPart (rootEntity, definition[0]);
-
+		NewtonBody* const rootBody = CreateBodyPart (rootEntity, definition[0]);
 
 		// add the root bone to the articulation manager
-		CustomArticulatedTransformController::dSkeletonBone* const bone = controller->AddBone (rootBone, GetIdentityMatrix());
+		CustomArticulatedTransformController::dSkeletonBone* const bone = controller->AddBone (rootBody, GetIdentityMatrix());
 		// save the bone as the shape use data for self collision test
-		NewtonCollisionSetUserData (NewtonBodyGetCollision(rootBone), bone);
+		NewtonCollisionSetUserData (NewtonBodyGetCollision(rootBody), bone);
 
 		// walk down the model hierarchy an add all the components 
 		int stackIndex = 0;
