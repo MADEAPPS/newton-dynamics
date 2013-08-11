@@ -46,8 +46,8 @@ static ARTICULATED_VEHICLE_DEFINITION forkliftDefinition[] =
 	{"lift_2",		"convexHull",			 50.0f, "liftActuator"},
 	{"lift_3",		"convexHull",			 50.0f, "liftActuator"},
 	{"lift_4",		"convexHull",			 50.0f, "liftActuator"},
-	{"left_teeth",  "convexHullAggregate",	 50.0f}, 
-	{"right_teeth", "convexHullAggregate",	 50.0f}, 
+	{"left_teeth",  "convexHullAggregate",	 50.0f, "paletteActuator"},
+	{"right_teeth", "convexHullAggregate",	 50.0f, "paletteActuator"},
 };
 
 class ArticulatedEntityModel: public DemoEntity
@@ -58,6 +58,7 @@ class ArticulatedEntityModel: public DemoEntity
 		,m_rearTiresCount(0)
 		,m_frontTiresCount(0)
 		,m_liftActuatorsCount(0)
+		,m_paletteActuatorsCount(0)
 	{
 		LoadNGD_mesh (name, scene->GetNewton());
 	}
@@ -67,6 +68,7 @@ class ArticulatedEntityModel: public DemoEntity
 		,m_rearTiresCount(0)
 		,m_frontTiresCount(0)
 		,m_liftActuatorsCount(0)
+		,m_paletteActuatorsCount(0)
 	{
 	}
 
@@ -118,7 +120,7 @@ class ArticulatedEntityModel: public DemoEntity
 		dFloat angleLimit = 20.0f * 3.141592f / 180.0f;
 		dFloat angularRate = 30.0f * 3.141592f / 180.0f;
 		m_angularActuator = new CustomHingeActuator (&baseMatrix[0][0], angularRate, -angleLimit, angleLimit, child, parent);
-m_angularActuator->SetTargetAngle(angleLimit);
+//m_angularActuator->SetTargetAngle(angleLimit);
 	}
 
 	void LinkLiftActuator (NewtonBody* const parent, NewtonBody* const child)
@@ -129,22 +131,38 @@ m_angularActuator->SetTargetAngle(angleLimit);
 		dFloat minLimit = -0.25f;
 		dFloat maxLimit = 1.5f;
 		dFloat linearRate = 0.3f;
-		m_liftTireJoints[m_liftActuatorsCount] = new CustomSliderActuator (&baseMatrix[0][0], linearRate, minLimit, maxLimit, child, parent);
+		m_liftJoints[m_liftActuatorsCount] = new CustomSliderActuator (&baseMatrix[0][0], linearRate, minLimit, maxLimit, child, parent);
 
-m_liftTireJoints[m_liftActuatorsCount]->SetTargetPosit(maxLimit);
+//m_liftJoints[m_liftActuatorsCount]->SetTargetPosit(maxLimit);
 		m_liftActuatorsCount ++;
+	}
+
+	void LinkPaletteActuator (NewtonBody* const parent, NewtonBody* const child)
+	{
+		dMatrix baseMatrix;
+		NewtonBodyGetMatrix (child, &baseMatrix[0][0]);
+
+		dFloat minLimit = -0.25f;
+		dFloat maxLimit = 0.2f;
+		dFloat linearRate = 0.25f;
+		m_paletteJoints[m_paletteActuatorsCount] = new CustomSliderActuator (&baseMatrix[0][0], linearRate, minLimit, maxLimit, child, parent);
+//m_paletteJoints[m_paletteActuatorsCount]->SetTargetPosit(minLimit);
+		m_paletteActuatorsCount ++;
 	}
 
 
 	int m_rearTiresCount;
 	int m_frontTiresCount;
 	int m_liftActuatorsCount;
+	int m_paletteActuatorsCount;
 		
 	NewtonBody* m_fronTires[2];
 	
 	CustomHinge* m_rearTireJoints[2];
 	CustomHinge* m_frontTireJoints[2];
-	CustomSliderActuator* m_liftTireJoints[3];
+	CustomSliderActuator* m_liftJoints[3];
+	CustomSliderActuator* m_paletteJoints[3];
+	
 	CustomHingeActuator* m_angularActuator;
 };
 
@@ -288,7 +306,9 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		} else if (jointArticulation == "hingeActuator") {
 			vehicleModel->LinkHingeActuator (parent, child);
 		} else if (jointArticulation == "liftActuator") {
-			vehicleModel->LinkLiftActuator(parent, child);
+			vehicleModel->LinkLiftActuator (parent, child);
+		} else if (jointArticulation == "paletteActuator") {
+			vehicleModel->LinkPaletteActuator (parent, child);
 		} else {
 			dAssert (0);
 		}
