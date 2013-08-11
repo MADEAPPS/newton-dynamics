@@ -15,8 +15,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#ifndef _CUSTOMSLIDER_H__
-#define _CUSTOMSLIDER_H__
+#ifndef _CUSTOM_SLIDER_H__
+#define _CUSTOM_SLIDER_H__
 
 #include "CustomJoint.h"
 
@@ -54,5 +54,5 @@ class CustomSlider: public CustomJoint
 	bool m_hitLimitOnLastUpdate;
 };
 
-#endif // !defined(AFX_CUSTOMSLIDER_H__B631F556_468B_4331_B7D7_F85ECF3E9ADE_H)
+#endif
 

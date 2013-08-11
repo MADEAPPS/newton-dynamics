@@ -1051,6 +1051,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\dCustomJoints\CustomSliderActuator.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dCustomJoints\CustomSliderActuator.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\dCustomJoints\CustomSlidingContact.cpp"
 				>
 			</File>

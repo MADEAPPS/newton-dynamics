@@ -407,6 +407,7 @@
     <ClCompile Include="..\..\dCustomJoints\CustomDryRollingFriction.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomGear.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomHinge.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomHingeActuator.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomJoint.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomJointLibraryStdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debugDll|Win32'">Create</PrecompiledHeader>
@@ -424,6 +425,7 @@
     <ClCompile Include="..\..\dCustomJoints\CustomPulley.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomRackAndPinion.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomSlider.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomSliderActuator.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomSlidingContact.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomTriggerManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomUniversal.cpp" />
@@ -441,6 +443,7 @@
     <ClInclude Include="..\..\dCustomJoints\CustomDryRollingFriction.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomGear.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomHinge.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomHingeActuator.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomJoint.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomJointLibraryStdAfx.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomKinematicController.h" />
@@ -449,6 +452,7 @@
     <ClInclude Include="..\..\dCustomJoints\CustomPulley.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomRackAndPinion.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomSlider.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomSliderActuator.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomSlidingContact.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomTriggerManager.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomUniversal.h" />

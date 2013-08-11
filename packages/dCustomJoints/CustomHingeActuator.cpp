@@ -92,6 +92,11 @@ dFloat CustomHingeActuator::GetActuatorAngle() const
 	return GetJointAngle();
 }
 
+void CustomHingeActuator::GetInfo (NewtonJointRecord* const info) const
+{
+	dAssert (0);
+}
+
 
 void CustomHingeActuator::SubmitConstraints (dFloat timestep, int threadIndex)
 {

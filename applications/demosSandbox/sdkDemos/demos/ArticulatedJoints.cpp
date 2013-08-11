@@ -21,6 +21,7 @@
 #include "DebugDisplay.h"
 #include "CustomHinge.h"
 #include "CustomHingeActuator.h"
+#include "CustomSliderActuator.h"
 #include "HeightFieldPrimitive.h"
 #include "CustomArcticulatedTransformManager.h"
 
@@ -42,9 +43,9 @@ static ARTICULATED_VEHICLE_DEFINITION forkliftDefinition[] =
 	{"rr_tire",		"tireShape",			 40.0f, "rearTire"},
 	{"rl_tire",		"tireShape",			 40.0f, "rearTire"},
 	{"lift_1",		"convexHull",			 50.0f, "hingeActuator"},
-	{"lift_2",		"convexHull",			 50.0f}, 
-	{"lift_3",		"convexHull",			 50.0f}, 
-	{"lift_4",		"convexHull",			 50.0f}, 
+	{"lift_2",		"convexHull",			 50.0f, "liftActuator"},
+	{"lift_3",		"convexHull",			 50.0f, "liftActuator"},
+	{"lift_4",		"convexHull",			 50.0f, "liftActuator"},
 	{"left_teeth",  "convexHullAggregate",	 50.0f}, 
 	{"right_teeth", "convexHullAggregate",	 50.0f}, 
 };
@@ -56,6 +57,7 @@ class ArticulatedEntityModel: public DemoEntity
 		:DemoEntity(GetIdentityMatrix(), NULL)
 		,m_rearTiresCount(0)
 		,m_frontTiresCount(0)
+		,m_liftActuatorsCount(0)
 	{
 		LoadNGD_mesh (name, scene->GetNewton());
 	}
@@ -64,6 +66,7 @@ class ArticulatedEntityModel: public DemoEntity
 		:DemoEntity(copy)
 		,m_rearTiresCount(0)
 		,m_frontTiresCount(0)
+		,m_liftActuatorsCount(0)
 	{
 	}
 
@@ -115,15 +118,33 @@ class ArticulatedEntityModel: public DemoEntity
 		dFloat angleLimit = 20.0f * 3.141592f / 180.0f;
 		dFloat angularRate = 30.0f * 3.141592f / 180.0f;
 		m_angularActuator = new CustomHingeActuator (&baseMatrix[0][0], angularRate, -angleLimit, angleLimit, child, parent);
+m_angularActuator->SetTargetAngle(angleLimit);
 	}
+
+	void LinkLiftActuator (NewtonBody* const parent, NewtonBody* const child)
+	{
+		dMatrix baseMatrix;
+		NewtonBodyGetMatrix (child, &baseMatrix[0][0]);
+
+		dFloat minLimit = -0.25f;
+		dFloat maxLimit = 1.5f;
+		dFloat linearRate = 0.3f;
+		m_liftTireJoints[m_liftActuatorsCount] = new CustomSliderActuator (&baseMatrix[0][0], linearRate, minLimit, maxLimit, child, parent);
+
+m_liftTireJoints[m_liftActuatorsCount]->SetTargetPosit(maxLimit);
+		m_liftActuatorsCount ++;
+	}
+
 
 	int m_rearTiresCount;
 	int m_frontTiresCount;
+	int m_liftActuatorsCount;
 		
 	NewtonBody* m_fronTires[2];
 	
 	CustomHinge* m_rearTireJoints[2];
 	CustomHinge* m_frontTireJoints[2];
+	CustomSliderActuator* m_liftTireJoints[3];
 	CustomHingeActuator* m_angularActuator;
 };
 
@@ -266,6 +287,10 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			vehicleModel->LinkRearTire (parent, child);
 		} else if (jointArticulation == "hingeActuator") {
 			vehicleModel->LinkHingeActuator (parent, child);
+		} else if (jointArticulation == "liftActuator") {
+			vehicleModel->LinkLiftActuator(parent, child);
+		} else {
+			dAssert (0);
 		}
 	}
 
