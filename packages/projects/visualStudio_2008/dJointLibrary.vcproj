@@ -1075,6 +1075,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\dCustomJoints\CustomUniversalActuator.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dCustomJoints\CustomUniversalActuator.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\dCustomJoints\CustomUpVector.cpp"
 				>
 			</File>

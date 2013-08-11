@@ -429,6 +429,7 @@
     <ClCompile Include="..\..\dCustomJoints\CustomSlidingContact.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomTriggerManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomUniversal.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomUniversalActuator.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomUpVector.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomUserBlank.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerManager.cpp" />
@@ -456,6 +457,7 @@
     <ClInclude Include="..\..\dCustomJoints\CustomSlidingContact.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomTriggerManager.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomUniversal.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomUniversalActuator.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomUpVector.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomUserBlank.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerManager.h" />

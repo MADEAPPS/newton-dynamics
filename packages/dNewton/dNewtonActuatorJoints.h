@@ -110,6 +110,89 @@ class dNewtonHingeActuator: public dNewtonHingeJoint
 };
 
 
+
+
+
+class dNewtonSliderActuator: public dNewtonSliderJoint
+{
+	public:
+	CNEWTON_API dNewtonSliderActuator(const dFloat* const pinAndPivotFrame, dFloat speed, dFloat minPosit, dFloat maxPosit, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
+		:dNewtonSliderJoint(pinAndPivotFrame, body0, body1)
+		,m_linearRate(speed)
+		,m_posit(0.0f)
+		,m_minPosit(minPosit)
+		,m_maxPosit(maxPosit)
+		,m_flag(true)
+	{
+		m_type = m_sliderActuator;
+	}
+
+	bool GetEnableFlag (bool flag) const
+	{
+		return m_flag;
+	}
+
+	CNEWTON_API dFloat GetTargetPosit() const
+	{
+		return m_posit;
+	}
+
+	CNEWTON_API dFloat GetLinearRate() const
+	{
+		return m_linearRate;
+	}
+
+
+	CNEWTON_API dFloat GetMinPositLimit() const
+	{
+		return m_minPosit;
+	}
+
+	CNEWTON_API dFloat GetMaxPositLimit() const
+	{
+		return m_maxPosit;
+	}
+
+
+	CNEWTON_API void SetTargetPosit(dFloat posit)
+	{
+		m_posit = dClamp (posit, m_minPosit, m_maxPosit);
+	}
+
+
+	CNEWTON_API void SetMinPositLimit(dFloat limit)
+	{
+		m_minPosit = limit;
+	}
+
+	CNEWTON_API void SetMaxPositLimit(dFloat limit)
+	{
+		m_maxPosit = limit;
+	}
+
+	CNEWTON_API void SetLinearRate(dFloat rate)
+	{
+		m_linearRate = rate;
+	}
+
+	void SetEnableFlag (bool flag)
+	{
+		m_flag = flag;
+	}
+
+
+	CNEWTON_API dFloat GetActuatorPosit() const;
+	CNEWTON_API virtual void OnSubmitConstraint (dFloat timestep, int threadIndex);
+
+	private:
+	dFloat m_linearRate;
+	dFloat m_posit;
+	dFloat m_minPosit;
+	dFloat m_maxPosit;
+	bool m_flag;
+};
+
+
 class dNewtonUniversalActuator: public dNewtonUniversalJoint
 {
 	public:
@@ -255,86 +338,5 @@ class dNewtonUniversalActuator: public dNewtonUniversalJoint
 
 
 
-class dNewtonSliderActuator: public dNewtonSliderJoint
-{
-	public:
-	CNEWTON_API dNewtonSliderActuator(const dFloat* const pinAndPivotFrame, dFloat speed, dFloat minPosit, dFloat maxPosit, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
-		:dNewtonSliderJoint(pinAndPivotFrame, body0, body1)
-		,m_linearRate(speed)
-		,m_posit(0.0f)
-		,m_minPosit(minPosit)
-		,m_maxPosit(maxPosit)
-		,m_flag(true)
-	{
-		m_type = m_sliderActuator;
-	}
-
-	bool GetEnableFlag (bool flag) const
-	{
-		return m_flag;
-	}
-
-	CNEWTON_API dFloat GetTargetPosit() const
-	{
-		return m_posit;
-	}
-
-	CNEWTON_API dFloat GetLinearRate() const
-	{
-		return m_linearRate;
-	}
-
-
-	CNEWTON_API dFloat GetMinPositLimit() const
-	{
-		return m_minPosit;
-	}
-
-	CNEWTON_API dFloat GetMaxPositLimit() const
-	{
-		return m_maxPosit;
-	}
-
-
-	CNEWTON_API void SetTargetPosit(dFloat posit)
-	{
-		m_posit = dClamp (posit, m_minPosit, m_maxPosit);
-	}
-
-
-	CNEWTON_API void SetMinPositLimit(dFloat limit)
-	{
-		m_minPosit = limit;
-	}
-
-	CNEWTON_API void SetMaxPositLimit(dFloat limit)
-	{
-		m_maxPosit = limit;
-	}
-
-	CNEWTON_API void SetLinearRate(dFloat rate)
-	{
-		m_linearRate = rate;
-	}
-
-	void SetEnableFlag (bool flag)
-	{
-		m_flag = flag;
-	}
-
-
-	CNEWTON_API dFloat GetActuatorPosit() const;
-	CNEWTON_API virtual void OnSubmitConstraint (dFloat timestep, int threadIndex);
-
-	private:
-	dFloat m_linearRate;
-	dFloat m_posit;
-	dFloat m_minPosit;
-	dFloat m_maxPosit;
-	bool m_flag;
-};
-
-
-
-
 #endif
+

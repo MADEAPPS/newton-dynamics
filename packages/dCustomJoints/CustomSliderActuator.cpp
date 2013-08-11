@@ -32,6 +32,11 @@ CustomSliderActuator::CustomSliderActuator (const dMatrix& pinAndPivotFrame, dFl
 {
 }
 
+CustomSliderActuator::~CustomSliderActuator()
+{
+}
+
+
 bool CustomSliderActuator::GetEnableFlag (bool flag) const
 {
 	return m_flag;

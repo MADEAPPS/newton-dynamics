@@ -34,6 +34,9 @@ CustomHingeActuator::CustomHingeActuator(const dMatrix& pinAndPivotFrame, dFloat
 	EnableLimits(false);
 }
 
+CustomHingeActuator::~CustomHingeActuator()
+{
+}
 
 bool CustomHingeActuator::GetEnableFlag (bool flag) const
 {

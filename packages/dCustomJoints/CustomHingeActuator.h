@@ -30,6 +30,7 @@ class CustomHingeActuator: public CustomHinge
 {
 	public:
 	NEWTON_API CustomHingeActuator(const dMatrix& pinAndPivotFrame, dFloat angularRate, dFloat minAngle, dFloat maxAngle, NewtonBody* const child, NewtonBody* const parent = NULL);
+	NEWTON_API virtual ~CustomHingeActuator();
 
 	NEWTON_API dFloat GetActuatorAngle() const;
 	NEWTON_API bool GetEnableFlag (bool flag) const;
@@ -47,10 +48,10 @@ class CustomHingeActuator: public CustomHinge
 	NEWTON_API dFloat GetAngularRate() const;
 	NEWTON_API void SetAngularRate(dFloat rate);
 
+	protected:
 	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
 	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 
-	private:
 	dFloat m_angle;
 	dFloat m_minAngle;
 	dFloat m_maxAngle;

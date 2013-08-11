@@ -1,0 +1,197 @@
+/* Copyright (c) <2009> <Newton Game Dynamics>
+* 
+* This software is provided 'as-is', without any express or implied
+* warranty. In no event will the authors be held liable for any damages
+* arising from the use of this software.
+* 
+* Permission is granted to anyone to use this software for any purpose,
+* including commercial applications, and to alter it and redistribute it
+* freely
+*/
+
+
+
+// CustomUniversal.cpp: implementation of the CustomUniversal class.
+//
+//////////////////////////////////////////////////////////////////////
+#include "CustomJointLibraryStdAfx.h"
+#include "CustomUniversalActuator.h"
+
+
+
+CustomUniversalActuator::CustomUniversalActuator (const dMatrix& pinAndPivotFrame, dFloat angularRate0, dFloat minAngle0, dFloat maxAngle0, dFloat angularRate1, dFloat minAngle1, dFloat maxAngle1, NewtonBody* const child, NewtonBody* const parent)
+	:CustomUniversal(pinAndPivotFrame, child, parent)
+	,m_angle0(0.0f)
+	,m_minAngle0(minAngle0)
+	,m_maxAngle0(maxAngle0)
+	,m_angularRate0(angularRate0)
+	,m_angle1(0.0f)
+	,m_minAngle1(minAngle1)
+	,m_maxAngle1(maxAngle1)
+	,m_angularRate1(angularRate1)
+	,m_flag0(true)
+	,m_flag1(true)
+{
+	EnableLimit_0(false);
+	EnableLimit_1(false);
+}
+
+CustomUniversalActuator::~CustomUniversalActuator()
+{
+}
+
+bool CustomUniversalActuator::GetEnableFlag0 (bool flag) const
+{
+	return m_flag0;
+}
+
+dFloat CustomUniversalActuator::GetTargetAngle0() const
+{
+	return m_angle0;
+}
+
+dFloat CustomUniversalActuator::GetAngularRate0() const
+{
+	return m_angularRate0;
+}
+
+dFloat CustomUniversalActuator::GetMinAngularLimit0() const
+{
+	return m_minAngle0;
+}
+
+dFloat CustomUniversalActuator::GetMaxAngularLimit0() const
+{
+	return m_maxAngle0;
+}
+
+bool CustomUniversalActuator::GetEnableFlag1 (bool flag) const
+{
+	return m_flag1;
+}
+
+dFloat CustomUniversalActuator::GetTargetAngle1() const
+{
+	return m_angle1;
+}
+
+dFloat CustomUniversalActuator::GetAngularRate1() const
+{
+	return m_angularRate1;
+}
+
+dFloat CustomUniversalActuator::GetMinAngularLimit1() const
+{
+	return m_minAngle1;
+}
+
+dFloat CustomUniversalActuator::GetMaxAngularLimit1() const
+{
+	return m_maxAngle1;
+}
+
+
+void CustomUniversalActuator::SetEnableFlag0 (bool flag)
+{
+	m_flag0 = flag;
+}
+
+void CustomUniversalActuator::SetTargetAngle0(dFloat angle)
+{
+	m_angle0 = dClamp (angle, m_minAngle0, m_maxAngle0);
+}
+
+void CustomUniversalActuator::SetMinAngularLimit0(dFloat limit)
+{
+	m_minAngle0 = limit;
+}
+
+void CustomUniversalActuator::SetMaxAngularLimit0(dFloat limit)
+{
+	m_maxAngle0 = limit;
+}
+
+void CustomUniversalActuator::SetAngularRate0(dFloat rate)
+{
+	m_angularRate0 = rate;
+}
+
+void CustomUniversalActuator::SetEnableFlag1 (bool flag)
+{
+	m_flag1 = flag;
+}
+
+void CustomUniversalActuator::SetTargetAngle1(dFloat angle)
+{
+	m_angle1 = dClamp (angle, m_minAngle1, m_maxAngle1);
+}
+
+
+void CustomUniversalActuator::SetAngularRate1(dFloat rate)
+{
+	m_angularRate1 = rate;
+}
+
+void CustomUniversalActuator::SetMinAngularLimit1(dFloat limit)
+{
+	m_minAngle1 = limit;
+}
+
+void CustomUniversalActuator::SetMaxAngularLimit1(dFloat limit)
+{
+	m_maxAngle1 = limit;
+}
+
+dFloat CustomUniversalActuator::GetActuatorAngle0() const
+{
+	return GetJointAngle_0();
+}
+
+dFloat CustomUniversalActuator::GetActuatorAngle1() const
+{
+	return GetJointAngle_1();
+}
+
+void CustomUniversalActuator::GetInfo (NewtonJointRecord* const info) const
+{
+	dAssert (0);
+}
+
+void CustomUniversalActuator::SubmitConstraints (dFloat timestep, int threadIndex)
+{
+	CustomUniversal::SubmitConstraints (timestep, threadIndex);
+
+	if (m_flag0 | m_flag1){
+		dMatrix matrix0;
+		dMatrix matrix1;
+
+		CalculateGlobalMatrix (matrix0, matrix1);
+		if (m_flag0) {
+			dFloat angle = GetJointAngle_0();
+			dFloat relAngle = m_angle0 - angle;
+			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix0.m_front[0]);
+			dFloat step = m_angularRate0 * timestep;
+			if (dAbs (relAngle) > 2.0f * dAbs (step)) {
+				dFloat speed = GetJointOmega_0 ();
+				dFloat accel = (relAngle >= 0.0f) ? (m_angularRate0 - speed) / timestep : -(m_angularRate0 + speed) / timestep;
+				NewtonUserJointSetRowAcceleration (m_joint, accel);
+			}
+			NewtonUserJointSetRowStiffness (m_joint, 1.0f);
+		}
+
+		if (m_flag1) {
+			dFloat angle = GetJointAngle_1();
+			dFloat relAngle = m_angle1 - angle;
+			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix1.m_up[0]);
+			dFloat step = m_angularRate1 * timestep;
+			if (dAbs (relAngle) > 2.0f * dAbs (step)) {
+				dFloat speed = GetJointOmega_1 ();
+				dFloat accel = (relAngle >= 0.0f) ? (m_angularRate1 - speed) / timestep : -(m_angularRate1 + speed) / timestep;
+				NewtonUserJointSetRowAcceleration (m_joint, accel);
+			}
+			NewtonUserJointSetRowStiffness (m_joint, 1.0f);
+		}
+	}
+}
+
+
