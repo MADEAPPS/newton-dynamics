@@ -909,7 +909,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\sdkDemos\demos\ArticulateJoints.cpp"
+				RelativePath="..\..\sdkDemos\demos\ArticulatedJoints.cpp"
 				>
 			</File>
 			<File

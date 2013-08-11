@@ -46,21 +46,21 @@ class dNewtonArticulatedTransformManager: public CustomArticulaledTransformManag
 		NEWTON_API bool SelfCollisionTest (const void* const boneNode0, const void* const boneNode1) const;
 
 		private:
-		CustomArcticulatedTransformController* m_controller;
+		CustomArticulatedTransformController* m_controller;
 		friend class dNewtonArticulatedTransformManager;
 	};
 
 	CNEWTON_API dNewtonArticulatedTransformManager (dNewton* const world);
 	CNEWTON_API virtual ~dNewtonArticulatedTransformManager ();
 
-	NEWTON_API void DisableAllSelfCollision (CustomArcticulatedTransformController* const controller);
-	NEWTON_API void SetDefaultSelfCollisionMask (CustomArcticulatedTransformController* const controller);
+	NEWTON_API void DisableAllSelfCollision (CustomArticulatedTransformController* const controller);
+	NEWTON_API void SetDefaultSelfCollisionMask (CustomArticulatedTransformController* const controller);
 	NEWTON_API void SetSelfCollisionMask (void* const boneNode0, void* const boneNode1, bool mode);
 	NEWTON_API bool SelfCollisionTest (const void* const boneNode0, const void* const boneNode1) const;
 
-	NEWTON_API virtual void OnPreUpdate (CustomArcticulatedTransformController* const constroller, dFloat timestep, int threadIndex) const;
-	NEWTON_API virtual void OnUpdateTransform (const CustomArcticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const;
-	NEWTON_API void DestroyController (CustomArcticulatedTransformController* const controller);
+	NEWTON_API virtual void OnPreUpdate (CustomArticulatedTransformController* const constroller, dFloat timestep, int threadIndex) const;
+	NEWTON_API virtual void OnUpdateTransform (const CustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const;
+	NEWTON_API void DestroyController (CustomArticulatedTransformController* const controller);
 
 	CNEWTON_API dNewtonArticulatedTransformController* GetFirstController() const;
 	CNEWTON_API dNewtonArticulatedTransformController* GetNextController(const dNewtonArticulatedTransformController* const controller) const;

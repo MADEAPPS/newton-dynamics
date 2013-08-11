@@ -15,7 +15,7 @@
 
 
 CustomArticulaledTransformManager::CustomArticulaledTransformManager(NewtonWorld* const world)
-	:CustomControllerManager<CustomArcticulatedTransformController>(world, HIERACHICAL_ARTICULATED_PLUGIN_NAME)
+	:CustomControllerManager<CustomArticulatedTransformController>(world, HIERACHICAL_ARTICULATED_PLUGIN_NAME)
 {
 }
 
@@ -23,75 +23,76 @@ CustomArticulaledTransformManager::~CustomArticulaledTransformManager()
 {
 }
 
-CustomArcticulatedTransformController* CustomArticulaledTransformManager::CreateTransformController (void* const userData, bool errorCorrectionMode)
+CustomArticulatedTransformController* CustomArticulaledTransformManager::CreateTransformController (void* const userData, bool errorCorrectionMode)
 {
-	CustomArcticulatedTransformController* const controller = (CustomArcticulatedTransformController*) CreateController();
+	CustomArticulatedTransformController* const controller = (CustomArticulatedTransformController*) CreateController();
 	controller->Init (userData, errorCorrectionMode);
 	return controller;
 }
 
 
-void CustomArticulaledTransformManager::SetCollisionMask (CustomArcticulatedTransformController::dSkeletonBone* const bone0, CustomArcticulatedTransformController::dSkeletonBone* const bone1, bool mode)
+void CustomArticulaledTransformManager::SetCollisionMask (CustomArticulatedTransformController::dSkeletonBone* const bone0, CustomArticulatedTransformController::dSkeletonBone* const bone1, bool mode)
 {
 	dAssert (bone0->m_myController);
 	dAssert (bone0->m_myController == bone1->m_myController);
-	CustomArcticulatedTransformController* const controller = bone0->m_myController; 
+	CustomArticulatedTransformController* const controller = bone0->m_myController; 
 	controller->SetSelfCollisionMask (bone0, bone1, mode);
 }
 
-void CustomArticulaledTransformManager::SetDefaultSelfCollisionMask (CustomArcticulatedTransformController* const controller)
+void CustomArticulaledTransformManager::SetDefaultSelfCollisionMask (CustomArticulatedTransformController* const controller)
 {
 	controller->SetDefaultSelfCollisionMask();
 }
 
-void CustomArticulaledTransformManager::DisableAllSelfCollision (CustomArcticulatedTransformController* const controller)
+void CustomArticulaledTransformManager::DisableAllSelfCollision (CustomArticulatedTransformController* const controller)
 {
 	controller->DisableAllSelfCollision ();
 }
 
-bool CustomArticulaledTransformManager::SelfCollisionTest (const CustomArcticulatedTransformController::dSkeletonBone* const bone0, const CustomArcticulatedTransformController::dSkeletonBone* const bone1) const
+bool CustomArticulaledTransformManager::SelfCollisionTest (const CustomArticulatedTransformController::dSkeletonBone* const bone0, const CustomArticulatedTransformController::dSkeletonBone* const bone1) const
 {
-	CustomArcticulatedTransformController* const controller0 = bone0->m_myController; 
-	CustomArcticulatedTransformController* const controller1 = bone1->m_myController; 
+	CustomArticulatedTransformController* const controller0 = bone0->m_myController; 
+	CustomArticulatedTransformController* const controller1 = bone1->m_myController; 
 	return (controller0 == controller1) ? controller0->SelfCollisionTest (bone0, bone1) : false;
 }
 
 
-CustomArcticulatedTransformController::CustomArcticulatedTransformController()
+CustomArticulatedTransformController::CustomArticulatedTransformController()
 {
 }
 
-CustomArcticulatedTransformController::~CustomArcticulatedTransformController()
+CustomArticulatedTransformController::~CustomArticulatedTransformController()
 {
+//	CustomArticulaledTransformManager* const manager = (CustomArticulaledTransformManager*) GetManager();
 }
 
 
-void CustomArcticulatedTransformController::Init (void* const userData, bool errorCorrection)
+void CustomArticulatedTransformController::Init (void* const userData, bool errorCorrection)
 {
 	m_boneCount = 0;
 	m_userData = userData;
 	SetErrorProjectionMode (errorCorrection);
 }
 
-void CustomArcticulatedTransformController::SetErrorProjectionMode (bool mode)
+void CustomArticulatedTransformController::SetErrorProjectionMode (bool mode)
 {
 	m_errorProjectionMode = mode;
 }
 
-bool CustomArcticulatedTransformController::GetErrorProjectionMode () const
+bool CustomArticulatedTransformController::GetErrorProjectionMode () const
 {
 	return m_errorProjectionMode;
 }
 
 
-void CustomArcticulatedTransformController::PreUpdate(dFloat timestep, int threadIndex)
+void CustomArticulatedTransformController::PreUpdate(dFloat timestep, int threadIndex)
 {
 	CustomArticulaledTransformManager* const manager = (CustomArticulaledTransformManager*) GetManager();
 	manager->OnPreUpdate(this, timestep, threadIndex);
 }
 
 
-void CustomArcticulatedTransformController::PostUpdate(dFloat timestep, int threadIndex)
+void CustomArticulatedTransformController::PostUpdate(dFloat timestep, int threadIndex)
 {
 	if (m_errorProjectionMode && m_boneCount && (NewtonBodyGetSleepState(m_bones[0].m_body) == 0)) {
 		for (int i = 1; i < m_boneCount; i ++) {
@@ -124,7 +125,7 @@ void CustomArcticulatedTransformController::PostUpdate(dFloat timestep, int thre
 	}
 }
 
-CustomArcticulatedTransformController::dSkeletonBone* CustomArcticulatedTransformController::AddBone (NewtonBody* const bone, const dMatrix& bindMatrix, dSkeletonBone* const parentBone)
+CustomArticulatedTransformController::dSkeletonBone* CustomArticulatedTransformController::AddBone (NewtonBody* const bone, const dMatrix& bindMatrix, dSkeletonBone* const parentBone)
 {
 	m_bones[m_boneCount].m_body = bone;
 	m_bones[m_boneCount].m_myController = this;
@@ -136,7 +137,7 @@ CustomArcticulatedTransformController::dSkeletonBone* CustomArcticulatedTransfor
 	return &m_bones[m_boneCount - 1];
 }
 
-void CustomArcticulatedTransformController::SetDefaultSelfCollisionMask ()
+void CustomArticulatedTransformController::SetDefaultSelfCollisionMask ()
 {
 	for (int i = 0; i < m_boneCount; i ++) {
 		dSkeletonBone& bone = m_bones[i];
@@ -151,7 +152,7 @@ void CustomArcticulatedTransformController::SetDefaultSelfCollisionMask ()
 	}
 }
 
-void CustomArcticulatedTransformController::DisableAllSelfCollision ()
+void CustomArticulatedTransformController::DisableAllSelfCollision ()
 {
 	for (int i = 0; i < m_boneCount; i ++) {
 		for (int j = i + 1; j < m_boneCount; j ++) {
@@ -160,7 +161,7 @@ void CustomArcticulatedTransformController::DisableAllSelfCollision ()
 	}
 }
 
-void CustomArcticulatedTransformController::SetSelfCollisionMask (dSkeletonBone* const bone0, dSkeletonBone* const bone1, bool mode)
+void CustomArticulatedTransformController::SetSelfCollisionMask (dSkeletonBone* const bone0, dSkeletonBone* const bone1, bool mode)
 {
 	int boneId0 = int (bone0 - m_bones);
 	int boneId1 = int (bone1 - m_bones);
@@ -175,7 +176,7 @@ void CustomArcticulatedTransformController::SetSelfCollisionMask (dSkeletonBone*
 	}
 }
 
-bool CustomArcticulatedTransformController::SelfCollisionTest (const dSkeletonBone* const bone0, const dSkeletonBone* const bone1) const
+bool CustomArticulatedTransformController::SelfCollisionTest (const dSkeletonBone* const bone0, const dSkeletonBone* const bone1) const
 {
 	int id1 = int (bone1 - m_bones);
 	bool state = bone0->m_bitField.TestMask(id1);

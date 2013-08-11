@@ -163,7 +163,7 @@
     <ClCompile Include="..\..\sdkDemos\demos\ArchimedesBuoyancy.cpp">
       <Filter>demos</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\demos\ArticulateJoints.cpp">
+    <ClCompile Include="..\..\sdkDemos\demos\ArticulatedJoints.cpp">
       <Filter>demos</Filter>
     </ClCompile>
   </ItemGroup>

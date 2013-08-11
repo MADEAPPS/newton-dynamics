@@ -23,7 +23,7 @@
 #define HIERACHICAL_ARTICULATED_PLUGIN_NAME	"__articulatedTransformManager__"
 
 // a Skeleton Transform controller is use to calculate local transform on contractions of rigid bodies and joint that form part of a hierarchical Skeleton
-class CustomArcticulatedTransformController: public CustomControllerBase
+class CustomArticulatedTransformController: public CustomControllerBase
 {
 	public:
 	class dSelfCollisionBitmask
@@ -78,12 +78,12 @@ class CustomArcticulatedTransformController: public CustomControllerBase
 		dMatrix m_bindMatrix;
 		NewtonBody* m_body;
 		dSkeletonBone* m_parent;
-		CustomArcticulatedTransformController* m_myController;
+		CustomArticulatedTransformController* m_myController;
 		dSelfCollisionBitmask m_bitField;
 	};
 
-	NEWTON_API CustomArcticulatedTransformController();
-	NEWTON_API ~CustomArcticulatedTransformController();
+	NEWTON_API CustomArticulatedTransformController();
+	NEWTON_API ~CustomArticulatedTransformController();
 
 	NEWTON_API void SetErrorProjectionMode (bool mode);
 	NEWTON_API bool GetErrorProjectionMode () const;
@@ -108,7 +108,7 @@ class CustomArcticulatedTransformController: public CustomControllerBase
 	friend class CustomArticulaledTransformManager;
 };
 
-class CustomArticulaledTransformManager: public CustomControllerManager<CustomArcticulatedTransformController> 
+class CustomArticulaledTransformManager: public CustomControllerManager<CustomArticulatedTransformController> 
 {
 	public:
 	NEWTON_API CustomArticulaledTransformManager(NewtonWorld* const world);
@@ -118,16 +118,16 @@ class CustomArticulaledTransformManager: public CustomControllerManager<CustomAr
 	{
 	}
 
-	NEWTON_API virtual CustomArcticulatedTransformController* CreateTransformController (void* const userData, bool errorCorrectionMode);
+	NEWTON_API virtual CustomArticulatedTransformController* CreateTransformController (void* const userData, bool errorCorrectionMode);
 	
-	NEWTON_API virtual void DisableAllSelfCollision (CustomArcticulatedTransformController* const controller);
-	NEWTON_API virtual void SetDefaultSelfCollisionMask (CustomArcticulatedTransformController* const controller);
+	NEWTON_API virtual void DisableAllSelfCollision (CustomArticulatedTransformController* const controller);
+	NEWTON_API virtual void SetDefaultSelfCollisionMask (CustomArticulatedTransformController* const controller);
 	
-	NEWTON_API virtual void SetCollisionMask (CustomArcticulatedTransformController::dSkeletonBone* const bone0, CustomArcticulatedTransformController::dSkeletonBone* const bone1, bool mode);
-	NEWTON_API virtual bool SelfCollisionTest (const CustomArcticulatedTransformController::dSkeletonBone* const bone0, const CustomArcticulatedTransformController::dSkeletonBone* const bone1) const;
+	NEWTON_API virtual void SetCollisionMask (CustomArticulatedTransformController::dSkeletonBone* const bone0, CustomArticulatedTransformController::dSkeletonBone* const bone1, bool mode);
+	NEWTON_API virtual bool SelfCollisionTest (const CustomArticulatedTransformController::dSkeletonBone* const bone0, const CustomArticulatedTransformController::dSkeletonBone* const bone1) const;
 
-	NEWTON_API virtual void OnPreUpdate (CustomArcticulatedTransformController* const constroller, dFloat timestep, int threadIndex) const = 0;
-	NEWTON_API virtual void OnUpdateTransform (const CustomArcticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const = 0;
+	NEWTON_API virtual void OnPreUpdate (CustomArticulatedTransformController* const constroller, dFloat timestep, int threadIndex) const = 0;
+	NEWTON_API virtual void OnUpdateTransform (const CustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const = 0;
 };
 
 

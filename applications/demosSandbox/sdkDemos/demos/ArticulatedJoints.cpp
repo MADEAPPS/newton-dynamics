@@ -19,6 +19,7 @@
 #include "DemoEntityManager.h"
 #include "CustomBallAndSocket.h"
 #include "DebugDisplay.h"
+#include "CustomHinge.h"
 #include "HeightFieldPrimitive.h"
 #include "CustomArcticulatedTransformManager.h"
 
@@ -36,7 +37,7 @@ static ARTICULATED_VEHICLE_DEFINITION forkliftDefinition[] =
 {
 	{"body",		"convexHull",			600.0f},
 	{"fr_tire",		"tireShape",			 40.0f, "frontTire"}, 
-	{"fl_tire",		"tireShape",			 40.0f}, 
+	{"fl_tire",		"tireShape",			 40.0f, "frontTire"}, 
 	{"rr_tire",		"tireShape",			 40.0f}, 
 	{"rl_tire",		"tireShape",			 40.0f}, 
 	{"lift_1",		"convexHull",			 50.0f}, 
@@ -45,6 +46,53 @@ static ARTICULATED_VEHICLE_DEFINITION forkliftDefinition[] =
 	{"lift_4",		"convexHull",			 50.0f}, 
 	{"left_teeth",  "convexHullAggregate",	 50.0f}, 
 	{"right_teeth", "convexHullAggregate",	 50.0f}, 
+};
+
+class ArticulatedEntityModel: public DemoEntity
+{
+	public:
+	ArticulatedEntityModel(DemoEntityManager* const scene, const char* const name)
+		:DemoEntity(GetIdentityMatrix(), NULL)
+		,m_frontTiresCount(0)
+	{
+		LoadNGD_mesh (name, scene->GetNewton());
+	}
+
+	ArticulatedEntityModel (const ArticulatedEntityModel& copy)
+		:DemoEntity(copy)
+		,m_frontTiresCount(0)
+	{
+	}
+
+	DemoEntity* CreateClone() const
+	{
+		return new ArticulatedEntityModel(*this);
+	}
+
+
+	void LinkFrontTire (NewtonBody* const chassis, NewtonBody* const tire)
+	{
+		dMatrix tireMatrix;
+		dMatrix chassisMatrix;
+
+		// calculate the tire location matrix
+		NewtonBodyGetMatrix(tire, &tireMatrix[0][0]);
+		NewtonBodyGetMatrix(chassis, &chassisMatrix[0][0]);
+
+		chassisMatrix = dYawMatrix(90.0f * 3.141592f / 180.0f) * chassisMatrix;
+		chassisMatrix.m_posit = tireMatrix.m_posit;
+
+		m_frontTireJopint[m_frontTiresCount] = new CustomHinge (&chassisMatrix[0][0], tire, chassis);
+		m_fronTires[m_frontTiresCount] = tire;
+		m_frontTiresCount ++;
+	}
+
+	int m_frontTiresCount;
+	NewtonBody* m_fronTires[2];
+	CustomHinge* m_frontTireJopint[2];
+
+
+
 };
 
 class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
@@ -58,7 +106,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		NewtonMaterialSetCollisionCallback (scene->GetNewton(), m_material, m_material, this, OnBoneAABBOverlap, NULL);
 	}
 
-	virtual void OnPreUpdate (CustomArcticulatedTransformController* const constroller, dFloat timestep, int threadIndex) const
+	virtual void OnPreUpdate (CustomArticulatedTransformController* const constroller, dFloat timestep, int threadIndex) const
 	{
 	}
 
@@ -66,8 +114,8 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 	{
 		NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
 		NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
-		CustomArcticulatedTransformController::dSkeletonBone* const bone0 = (CustomArcticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision0);
-		CustomArcticulatedTransformController::dSkeletonBone* const bone1 = (CustomArcticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision1);
+		CustomArticulatedTransformController::dSkeletonBone* const bone0 = (CustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision0);
+		CustomArticulatedTransformController::dSkeletonBone* const bone1 = (CustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision1);
 		dAssert (bone0);
 		dAssert (bone1);
 		if (bone0->m_myController == bone1->m_myController) {
@@ -76,7 +124,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		return 1;
 	}
 
-	virtual void OnUpdateTransform (const CustomArcticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
+	virtual void OnUpdateTransform (const CustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
 	{
 		DemoEntity* const ent = (DemoEntity*) NewtonBodyGetUserData(bone->m_body);
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(bone->m_body));
@@ -171,21 +219,16 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		return bone;
 	}
 
-	void LinkFrontTire (NewtonBody* const parent, NewtonBody* const child)
-	{
-
-	}
 
 
-	void ConnectBodyPart (NewtonBody* const parent, NewtonBody* const child, const dString& jointArticulation)
+	void ConnectBodyPart (ArticulatedEntityModel* const vehicleModel, NewtonBody* const parent, NewtonBody* const child, const dString& jointArticulation)
 	{
 		if (jointArticulation == "") {
 			// this is the root body do nothing
 
 		} else if (jointArticulation == "frontTire") {
-			LinkFrontTire (parent, child);
+			vehicleModel->LinkFrontTire (parent, child);
 		}
-
 	}
 
 
@@ -195,24 +238,24 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 
 		// make a clone of the mesh 
-		DemoEntity* const vehicleModel = (DemoEntity*) model->CreateClone();
+		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*) model->CreateClone();
 		scene->Append(vehicleModel);
 
-		CustomArcticulatedTransformController* const controller = CreateTransformController (vehicleModel, true);
+		CustomArticulatedTransformController* const controller = CreateTransformController (vehicleModel, true);
 
 		DemoEntity* const rootEntity = (DemoEntity*) vehicleModel->Find (definition[0].m_boneName);
 		NewtonBody* const rootBone = CreateBodyPart (rootEntity, definition[0]);
 
 
 		// add the root bone to the articulation manager
-		CustomArcticulatedTransformController::dSkeletonBone* const bone = controller->AddBone (rootBone, GetIdentityMatrix());
+		CustomArticulatedTransformController::dSkeletonBone* const bone = controller->AddBone (rootBone, GetIdentityMatrix());
 		// save the bone as the shape use data for self collision test
 		NewtonCollisionSetUserData (NewtonBodyGetCollision(rootBone), bone);
 
 		// walk down the model hierarchy an add all the components 
 		int stackIndex = 0;
 		DemoEntity* childEntities[32];
-		CustomArcticulatedTransformController::dSkeletonBone* parentBones[32];
+		CustomArticulatedTransformController::dSkeletonBone* parentBones[32];
 		for (DemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) {
 			parentBones[stackIndex] = bone;
 			childEntities[stackIndex] = child;
@@ -222,7 +265,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		while (stackIndex) {
 			stackIndex --;
 			DemoEntity* const entity = childEntities[stackIndex];
-			CustomArcticulatedTransformController::dSkeletonBone* parentBone = parentBones[stackIndex];
+			CustomArticulatedTransformController::dSkeletonBone* parentBone = parentBones[stackIndex];
 
 			const char* const name = entity->GetName().GetStr();
 			for (int i = 0; i < bodyPartsCount; i ++) {
@@ -230,7 +273,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 					NewtonBody* const bone = CreateBodyPart (entity, definition[i]);
 
 					// connect this body part to its parent with a vehicle joint
-					ConnectBodyPart (parentBone->m_body, bone, definition[i].m_articulationName);
+					ConnectBodyPart (vehicleModel, parentBone->m_body, bone, definition[i].m_articulationName);
 
 					dMatrix bindMatrix (entity->GetParent()->CalculateGlobalMatrix ((DemoEntity*)NewtonBodyGetUserData (parentBone->m_body)).Inverse());
 					parentBone = controller->AddBone (bone, bindMatrix, parentBone);
@@ -247,6 +290,9 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 				stackIndex ++;
 			}
 		}
+
+		// disable self collision between all body parts
+		controller->DisableAllSelfCollision();
 	}
 
 	int m_material;
@@ -261,8 +307,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	//CreateHeightFieldTerrain (scene, 9, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
 
 	// load a the mesh of the articulate vehicle
-	DemoEntity forkliffModel(GetIdentityMatrix(), NULL);
-	forkliffModel.LoadNGD_mesh ("forklift.ngd", scene->GetNewton());
+	ArticulatedEntityModel forkliffModel(scene, "forklift.ngd");
 
 	//  create a skeletal transform controller for controlling rag doll
 	ArticulatedVehicleManagerManager* const manager = new ArticulatedVehicleManagerManager (scene);
