@@ -209,7 +209,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		NewtonMaterialSetCollisionCallback (scene->GetNewton(), m_material, m_material, this, OnBoneAABBOverlap, NULL);
 	}
 
-	virtual void OnPreUpdate (CustomArticulatedTransformController* const constroller, dFloat timestep, int threadIndex) const
+	virtual void OnPreUpdate (CustomArticulatedTransformController* const controller, dFloat timestep, int threadIndex) const
 	{
 	}
 
@@ -238,8 +238,6 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 	NewtonCollision* MakeTireShape (DemoEntity* const bodyPart) const
 	{
-		
-
 		dFloat radius = 0.0f;
 		dFloat maxWidth = 0.0f;
 		dFloat minWidth = 0.0f;
