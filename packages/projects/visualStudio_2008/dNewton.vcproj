@@ -756,6 +756,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\dNewton\dNewtonVehicleManager.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dNewton\dNewtonVehicleManager.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\dNewton\dStdAfxNewton.cpp"
 			>
 			<FileConfiguration
