@@ -9,16 +9,16 @@
 # freely
 
 set (projectName dgPhysics)
-include_directories ("${path}/core") 
-include_directories ("${path}/physics") 
-include_directories ("${path}/meshUtil") 
-include_directories ("${path}/pthreads.2") 
+include_directories ("${corePath}/core") 
+include_directories ("${corePath}/physics") 
+include_directories ("${corePath}/meshUtil") 
+include_directories ("${corePath}/pthreads.2") 
 
 
-file(GLOB_RECURSE headers *.h ${path}/meshUtil/*.h)
-file(GLOB_RECURSE sources *.cpp ${path}/meshUtil/*.cpp)
-#file(GLOB_RECURSE headers ${path}/openCL/*.h)
-#file(GLOB_RECURSE sources ${path}/openCL/*.cpp)
+file(GLOB_RECURSE headers *.h ${corePath}/meshUtil/*.h)
+file(GLOB_RECURSE sources *.cpp ${corePath}/meshUtil/*.cpp)
+#file(GLOB_RECURSE headers ${corePath}/openCL/*.h)
+#file(GLOB_RECURSE sources ${corePath}/openCL/*.cpp)
 add_library(${projectName} ${headers} ${sources})
 
 if (MSVC)

@@ -8,15 +8,11 @@
 # including commercial applications, and to alter it and redistribute it
 # freely
 
-cmake_minimum_required( VERSION 2.8 )
-project (newtonSDK)
+set (packagesPath ${PROJECT_SOURCE_DIR}/packages)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR})
-
-file(GLOB_RECURSE NewtonLibSrc ${CMAKE_SOURCE_DIR}/coreLibrary_300/source/*.cpp)
-file(GLOB_RECURSE NewtonLibH ${CMAKE_SOURCE_DIR}/coreLibrary_300/source/*.h)
-
-
-set (LIB_TYPE SHARED)
-add_library(Newton ${LIB_TYPE} ${NewtonLibH} ${NewtonLibSrc})
+add_subdirectory ("${packagesPath}/dMath")
+#add_subdirectory ("${packagesPath}/core")
+#add_subdirectory ("${packagesPath}/newton")
+#add_subdirectory ("${packagesPath}/physics")
+#add_subdirectory ("${packagesPath}/pthreads.2")
 

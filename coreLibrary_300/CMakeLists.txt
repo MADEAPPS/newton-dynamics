@@ -8,13 +8,13 @@
 # including commercial applications, and to alter it and redistribute it
 # freely
 
-set (path ${PROJECT_SOURCE_DIR}/coreLibrary_300/source)
+set (corePath ${PROJECT_SOURCE_DIR}/coreLibrary_300/source)
 
-add_subdirectory ("${path}/ai")
-add_subdirectory ("${path}/core")
-add_subdirectory ("${path}/newton")
-add_subdirectory ("${path}/physics")
-add_subdirectory ("${path}/pthreads.2")
+add_subdirectory ("${corePath}/ai")
+add_subdirectory ("${corePath}/core")
+add_subdirectory ("${corePath}/newton")
+add_subdirectory ("${corePath}/physics")
+add_subdirectory ("${corePath}/pthreads.2")
 
 #
 # for some reason I can not foguret out hwo to set depencies with CMake, I get the follwing error
@@ -26,7 +26,7 @@ add_subdirectory ("${path}/pthreads.2")
 #
 # if anyone knows how to fix this, please let me know, for now dependencies will not work an teh lib may have to build one at a time
 #  
-# target_link_libraries (dgCore ${path}/pthreads.2/dgThreads)
-# target_link_libraries (${path}/core/dgCore ${path}/pthreads.2/dgThreads)
+# target_link_libraries (dgCore ${corePath}/pthreads.2/dgThreads)
+# target_link_libraries (${corePath}/core/dgCore ${corePath}/pthreads.2/dgThreads)
 # target_link_libraries (dgPhysics dgThreads dgCore)
 

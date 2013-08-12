@@ -9,19 +9,18 @@
 # freely
 
 set (projectName dgAI)
-include_directories ("${path}/ai") 
-include_directories ("${path}/core") 
-include_directories ("${path}/newton") 
-include_directories ("${path}/physics") 
-include_directories ("${path}/meshUtil") 
-include_directories ("${path}/pthreads.2") 
+include_directories ("${corePath}/ai") 
+include_directories ("${corePath}/core") 
+include_directories ("${corePath}/newton") 
+include_directories ("${corePath}/physics") 
+include_directories ("${corePath}/meshUtil") 
+include_directories ("${corePath}/pthreads.2") 
 
 file(GLOB_RECURSE headers *.h)
 file(GLOB_RECURSE sources *.cpp)
 add_library(${projectName} ${headers} ${sources})
 
 if (MSVC)
-
 	set_target_properties (${projectName} PROPERTIES COMPILE_FLAGS "/YudgAIStdafx.h")
 	set_source_files_properties(dgAIStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcdgAIStdafx.h")
 	set_target_properties (${projectName} PROPERTIES COMPILE_DEFINITIONS "_NEWTON_STATIC_LIB;_WIN_32_VER;PTW32_BUILD;PTW32_STATIC_LIB;_CRT_SECURE_NO_WARNINGS")

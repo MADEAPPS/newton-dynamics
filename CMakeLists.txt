@@ -13,7 +13,11 @@ project (newtonSDK)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR})
 
+set (corePath ${PROJECT_SOURCE_DIR}/coreLibrary_300/source)
+
+include_directories ("${PROJECT_SOURCE_DIR}/packages") 
 include_directories ("${PROJECT_SOURCE_DIR}/coreLibrary_300") 
+add_subdirectory (packages)
 add_subdirectory (coreLibrary_300)
 
 #set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR})

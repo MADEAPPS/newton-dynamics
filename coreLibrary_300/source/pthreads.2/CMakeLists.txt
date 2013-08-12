@@ -8,9 +8,7 @@
 # including commercial applications, and to alter it and redistribute it
 # freely
 
-
-#set (libPathName ${path}/pthreads.2) 
-include_directories ("${path}/pthreads.2") 
+include_directories ("${corePath}/pthreads.2") 
 
 # add the thread core library library
 file(GLOB_RECURSE sources pthread.c)

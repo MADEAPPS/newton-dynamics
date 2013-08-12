@@ -9,13 +9,13 @@
 # freely
 
 set (projectName dgCore)
-include_directories ("${path}/core") 
-include_directories ("${path}/pthreads.2") 
+include_directories ("${corePath}/core") 
+include_directories ("${corePath}/pthreads.2") 
 
 file(GLOB_RECURSE headers *.h)
 file(GLOB_RECURSE sources *.cpp)
 add_library(${projectName} ${headers} ${sources})
-target_link_libraries (${projectName} ${path}/pthreads.2/dgThreads)
+target_link_libraries (${projectName} ${corePath}/pthreads.2/dgThreads)
 
 if (MSVC)
   set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudgStdafx.h")
