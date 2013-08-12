@@ -61,7 +61,11 @@ class ArticulatedEntityModel: public DemoEntity
 		,m_liftActuatorsCount(0)
 		,m_paletteActuatorsCount(0)
 	{
+		// load the vehicle model
 		LoadNGD_mesh (name, scene->GetNewton());
+
+		// plug a callback for 2d help display
+		scene->Set2DDisplayRenderFunction (RenderPlayerHelp, this);
 	}
 
 	ArticulatedEntityModel (const ArticulatedEntityModel& copy)
@@ -76,6 +80,30 @@ class ArticulatedEntityModel: public DemoEntity
 	DemoEntity* CreateClone() const
 	{
 		return new ArticulatedEntityModel(*this);
+	}
+
+
+	void RenderPlayerHelp (DemoEntityManager* const scene, int lineNumber) const
+	{
+//		if (m_player->m_helpKey.GetPushButtonState()) {
+			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
+			lineNumber += 20;
+			scene->Print (color, 10, lineNumber + 00, "Navigation               Key");
+			scene->Print (color, 10, lineNumber + 20, "drive forward:           W");
+			scene->Print (color, 10, lineNumber + 40, "drive backward:          S");
+			scene->Print (color, 10, lineNumber + 60, "turn right:              D");
+			scene->Print (color, 10, lineNumber + 80, "turn left:               A");
+//			scene->Print (color, 10, lineNumber + 00, "toggle camera mode:      C");
+//			scene->Print (color, 10, lineNumber + 20, "jump:                    Space");
+//			scene->Print (color, 10, lineNumber + 40, "hide help:               H");
+//			scene->Print (color, 10, lineNumber + 60, "change player direction: Left mouse button");
+//		}
+	}
+
+	static void RenderPlayerHelp (DemoEntityManager* const scene, void* const context, int lineNumber)
+	{
+		ArticulatedEntityModel* const me = (ArticulatedEntityModel*) context;
+		me->RenderPlayerHelp (scene, lineNumber);
 	}
 
 

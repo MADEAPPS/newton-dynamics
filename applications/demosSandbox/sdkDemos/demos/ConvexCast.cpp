@@ -199,15 +199,16 @@ class dConvexCastManager: public CustomControllerManager<dConvexCastRecord>
 		scene->Set2DDisplayRenderFunction (RenderHelp, this);
 	}
 
-	static void RenderHelp (DemoEntityManager* const scene, void* const context)
+	static void RenderHelp (DemoEntityManager* const scene, void* const context, int lineNumber)
 	{
 		dConvexCastManager* const me = (dConvexCastManager*) context;
-		me->RenderHelp (scene);
+		me->RenderHelp (scene, lineNumber);
 	}
 
-	void RenderHelp (DemoEntityManager* const scene)
+	void RenderHelp (DemoEntityManager* const scene, int lineNumber)
 	{
 		if (m_helpKey.GetPushButtonState()) {
+			dAssert (0);
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 			scene->Print (color, 10, 100, "mouse point and right click to cast current convex shape");
 			scene->Print (color, 10, 120, "space	   : change casting shape");

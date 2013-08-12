@@ -208,10 +208,10 @@ class AdvancePlayerControllerManager: public CustomPlayerControllerManager
 	{
 	}
 
-	static void RenderPlayerHelp (DemoEntityManager* const scene, void* const context)
+	static void RenderPlayerHelp (DemoEntityManager* const scene, void* const context, int lineNumber)
 	{
 		AdvancePlayerControllerManager* const me = (AdvancePlayerControllerManager*) context;
-		me->RenderPlayerHelp (scene);
+		me->RenderPlayerHelp (scene, lineNumber);
 	}
 
 
@@ -225,20 +225,21 @@ class AdvancePlayerControllerManager: public CustomPlayerControllerManager
 		player->m_isPlayer = true;
 	}
 
-	void RenderPlayerHelp (DemoEntityManager* const scene) const
+	void RenderPlayerHelp (DemoEntityManager* const scene, int lineNumber) const
 	{
 		if (m_player->m_helpKey.GetPushButtonState()) {
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			scene->Print (color, 10, 200, "Navigation               Key");
-			scene->Print (color, 10, 220, "walk forward:            W");
-			scene->Print (color, 10, 240, "walk backward:           S");
-			scene->Print (color, 10, 260, "strafe right:            D");
-			scene->Print (color, 10, 280, "strafe left:             A");
-			scene->Print (color, 10, 300, "toggle camera mode:      C");
-			scene->Print (color, 10, 320, "jump:                    Space");
-			scene->Print (color, 10, 340, "shoot random prop:       Enter");
-			scene->Print (color, 10, 360, "hide help:               H");
-			scene->Print (color, 10, 380, "change player direction: Left mouse button");
+			dAssert (0);
+			scene->Print (color, 10, lineNumber + 0, "Navigation               Key");
+			scene->Print (color, 10, lineNumber + 220, "walk forward:            W");
+			scene->Print (color, 10, lineNumber + 240, "walk backward:           S");
+			scene->Print (color, 10, lineNumber + 260, "strafe right:            D");
+			scene->Print (color, 10, lineNumber + 280, "strafe left:             A");
+			scene->Print (color, 10, lineNumber + 300, "toggle camera mode:      C");
+			scene->Print (color, 10, lineNumber + 320, "jump:                    Space");
+			scene->Print (color, 10, lineNumber + 340, "shoot random prop:       Enter");
+			scene->Print (color, 10, lineNumber + 360, "hide help:               H");
+			scene->Print (color, 10, lineNumber + 380, "change player direction: Left mouse button");
 		}
 	}
 

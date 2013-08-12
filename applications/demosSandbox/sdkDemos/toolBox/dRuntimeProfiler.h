@@ -30,13 +30,14 @@ class dRuntimeProfiler
 	~dRuntimeProfiler(void);
 
 	void Init (DemoEntityManager* const scene);
-	void Render (int mask);
+	int Render (int mask, int lineNumber);
+	int RenderConcurrentPerformance (int lineNumber);
 
 	void DrawLabel (dFloat x, dFloat y, const char* const label) const;
 	void DrawRectangle (dFloat x, dFloat y, dFloat dx, dFloat dy, const dVector& color) const;
 	void DrawTrack (dFloat x, dFloat y, const dVector& color, int start, const unsigned* const track) const;
 	void RenderThreadPerformance ();
-	void RenderConcurrentPerformance ();
+
 
 
 	void DrawConcurrentChart(int count, const dFloat* const times, const dVector* colors);

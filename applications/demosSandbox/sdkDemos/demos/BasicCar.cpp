@@ -661,10 +661,10 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 	{
 	}
 	
-	static void RenderVehicleHud (DemoEntityManager* const scene, void* const context)
+	static void RenderVehicleHud (DemoEntityManager* const scene, void* const context, int lineNumber)
 	{
 		BasicVehicleControllerManager* const me = (BasicVehicleControllerManager*) context;
-		me->RenderVehicleHud (scene);
+		me->RenderVehicleHud (scene, lineNumber);
 	}
 
 	void DrawGage(GLuint gage, GLuint needle, dFloat param, dFloat origin_x, dFloat origin_y, dFloat size) const
@@ -749,8 +749,9 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 	}
 
 
-	void RenderVehicleHud (DemoEntityManager* const scene) const
+	void RenderVehicleHud (DemoEntityManager* const scene, int lineNumber) const
 	{
+		dAssert (0);
 		// set to transparent color
 		glEnable (GL_BLEND);
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

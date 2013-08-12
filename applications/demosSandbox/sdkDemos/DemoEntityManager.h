@@ -27,7 +27,7 @@ class DemoEntityManager;
 class DemoCameraListener;
 
 
-typedef void (*RenderHoodCallback) (DemoEntityManager* const manager, void* const context);
+typedef void (*RenderHoodCallback) (DemoEntityManager* const manager, void* const context, int lineNumber);
 
 class DemoEntityManager: public wxGLCanvas, public dList <DemoEntity*>
 {

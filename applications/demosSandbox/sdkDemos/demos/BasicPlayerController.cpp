@@ -127,10 +127,10 @@ class BasicPlayerControllerManager: public CustomPlayerControllerManager
 	{
 	}
 
-	static void RenderPlayerHelp (DemoEntityManager* const scene, void* const context)
+	static void RenderPlayerHelp (DemoEntityManager* const scene, void* const context, int lineNumber)
 	{
 		BasicPlayerControllerManager* const me = (BasicPlayerControllerManager*) context;
-		me->RenderPlayerHelp (scene);
+		me->RenderPlayerHelp (scene, lineNumber);
 	}
 
 
@@ -144,9 +144,10 @@ class BasicPlayerControllerManager: public CustomPlayerControllerManager
 		player->m_isPlayer = true;
 	}
 
-	void RenderPlayerHelp (DemoEntityManager* const scene) const
+	void RenderPlayerHelp (DemoEntityManager* const scene, int lineNumber) const
 	{
 		if (m_player->m_helpKey.GetPushButtonState()) {
+			dAssert (0);
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 			scene->Print (color, 10, 200, "Navigation               Key");
 			scene->Print (color, 10, 220, "walk forward:            W");

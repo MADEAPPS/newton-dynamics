@@ -918,8 +918,39 @@ void DemoEntityManager::RenderFrame ()
       DebugRenderWorldCollision (GetNewton(), mode);
    }
 
+	// do all 2d drawing
+	int profileFlags = 0;
+	for (int i = 0; i < int (sizeof (m_showProfiler) / sizeof (m_showProfiler[0])); i ++) {
+		profileFlags |=  m_showProfiler[i] ? (1 << i) : 0;
+	}
+
+
+	if (m_mainWindow->m_showStatistics) {
+		dVector color (1.0f, 1.0f, 1.0f, 0.0f);
+		Print (color, 10,  20, "render fps: %7.2f", m_mainWindow->m_fps);
+		Print (color, 10,  42, "physics time on main thread: %d micro secunds", int (GetPhysicsTime() * 1000000.0f));
+		Print (color, 10,  64, "total memory: %d kbytes", NewtonGetMemoryUsed() / (1024));
+		Print (color, 10,  86, "number of bodies: %d", NewtonWorldGetBodyCount(GetNewton()));
+		Print (color, 10, 108, "number of threads: %d", NewtonGetThreadsCount(GetNewton()));
+		Print (color, 10, 130, "auto sleep: %s", m_mainWindow->m_autoSleepState ? "on" : "off");
+	}
+
+	int lineNumber = 130 + 22;
+
+	if (m_mainWindow->m_concurrentProfilerState) {
+		lineNumber = m_profiler.RenderConcurrentPerformance(lineNumber);
+	}
+
+	if (profileFlags) {
+		lineNumber = m_profiler.Render (profileFlags, lineNumber);
+	}
+
+	if (m_mainWindow->m_threadProfilerState) {
+		m_profiler.RenderThreadPerformance ();
+	}
 
 	if (m_renderHood) {
+
 		// set display for 2d render mode
 
 		dFloat width = GetWidth();
@@ -943,9 +974,8 @@ void DemoEntityManager::RenderFrame ()
 
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-
 		// render 2d display
-		m_renderHood (this, m_renderHoodContext);
+		m_renderHood (this, m_renderHoodContext, lineNumber);
 
 		// restore display mode
 		glPopMatrix();
@@ -956,35 +986,6 @@ void DemoEntityManager::RenderFrame ()
 		glMatrixMode(GL_MODELVIEW);
 	}
 
-
-	// do all 2d drawing
-	m_profiler.m_nextLine = 200;
-	int profileFlags = 0;
-	for (int i = 0; i < int (sizeof (m_showProfiler) / sizeof (m_showProfiler[0])); i ++) {
-		profileFlags |=  m_showProfiler[i] ? (1 << i) : 0;
-	}
-
-	if (m_mainWindow->m_concurrentProfilerState) {
-		m_profiler.RenderConcurrentPerformance();
-	}
-
-	if (profileFlags) {
-		m_profiler.Render (profileFlags);
-	}
-
-	if (m_mainWindow->m_threadProfilerState) {
-		m_profiler.RenderThreadPerformance ();
-	}
-
-	if (m_mainWindow->m_showStatistics) {
-		dVector color (1.0f, 1.0f, 1.0f, 0.0f);
-		Print (color, 10,  20, "render fps: %7.2f", m_mainWindow->m_fps);
-		Print (color, 10,  42, "physics time on main thread: %d micro secunds", int (GetPhysicsTime() * 1000000.0f));
-		Print (color, 10,  64, "total memory: %d kbytes", NewtonGetMemoryUsed() / (1024));
-		Print (color, 10,  86, "number of bodies: %d", NewtonWorldGetBodyCount(GetNewton()));
-		Print (color, 10, 108, "number of threads: %d", NewtonGetThreadsCount(GetNewton()));
-		Print (color, 10, 130, "auto sleep: %s", m_mainWindow->m_autoSleepState ? "on" : "off");
-	}
 
 	// draw everything and swap the display buffer
 	glFlush();

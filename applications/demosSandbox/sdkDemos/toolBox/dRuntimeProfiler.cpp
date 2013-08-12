@@ -103,7 +103,7 @@ void dRuntimeProfiler::DrawTrack (dFloat x0, dFloat y0, const dVector& color, in
 }
 
 
-void dRuntimeProfiler::Render (int mask)
+int dRuntimeProfiler::Render (int mask, int lineNumber)
 {
 	struct GLViewPort
 	{
@@ -175,7 +175,7 @@ void dRuntimeProfiler::Render (int mask)
 	glEnd();
 
 	DrawLabel (10, m_height  - m_nextLine, "Profiler legend");
-	m_nextLine += 20;
+	m_nextLine = lineNumber;
 
 	// total engine time
 	if (mask & 1) {
@@ -274,6 +274,8 @@ void dRuntimeProfiler::Render (int mask)
 	m_frameIndex = (m_frameIndex + 1) % MAX_FRAMES;
 
 	glColor3f(1.0, 1.0, 1.0);
+
+	return m_nextLine + 20;
 }
 
 
@@ -403,7 +405,7 @@ void dRuntimeProfiler::DrawConcurrentChart(int count, const dFloat* const times,
 }
 
 
-void dRuntimeProfiler::RenderConcurrentPerformance ()
+int dRuntimeProfiler::RenderConcurrentPerformance (int lineNumber)
 {
 	struct GLViewPort
 	{
@@ -440,7 +442,7 @@ void dRuntimeProfiler::RenderConcurrentPerformance ()
 	glDisable(GL_BLEND);
 
 	DrawLabel (10, m_height - m_nextLine, "Concurrent profiler,    red = physcis;      blue = graphics      green = idle");
-	m_nextLine += 20;
+	m_nextLine = lineNumber;
 
 	dFloat times[10];
 	dVector colors[10];
@@ -453,7 +455,6 @@ void dRuntimeProfiler::RenderConcurrentPerformance ()
 	m_nextLine += 30;
 	DrawConcurrentChart(2, times, colors);
 	m_nextLine += 30;
-
 
 	colors[0] = dVector (1.0f, 0.0f, 0.0f, 0.5f);
 	times[0] = m_scene->m_physThreadTime;
@@ -474,6 +475,8 @@ void dRuntimeProfiler::RenderConcurrentPerformance ()
 	glDisable(GL_BLEND);
 	glEnable (GL_DEPTH_TEST);
 	glColor3f(1.0, 1.0, 1.0);
+
+	return m_nextLine + 30;
 }
 
 
