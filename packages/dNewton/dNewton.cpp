@@ -252,7 +252,7 @@ dLong dNewton::GetTimeInMicrosenconds() const
 }
 
 
-dFloat dNewton::GetInteplationParam(dFloat timestepInSecunds) const
+dFloat dNewton::GetInterpolationParam(dFloat timestepInSecunds) const
 {
 	dLong timeStep = GetTimeInMicrosenconds () - m_microseconds;
 	dFloat param = (dFloat (timeStep) * 1.0e-6f) / timestepInSecunds;

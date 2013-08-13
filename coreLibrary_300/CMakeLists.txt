@@ -8,7 +8,6 @@
 # including commercial applications, and to alter it and redistribute it
 # freely
 
-set (corePath ${PROJECT_SOURCE_DIR}/coreLibrary_300/source)
 
 add_subdirectory ("${corePath}/ai")
 add_subdirectory ("${corePath}/core")
