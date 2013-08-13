@@ -65,7 +65,6 @@ class dNewtonInputManager: public CustomControllerManager<dNewtonInputController
 
 	protected:
 	dNewton* m_world;
-//	unsigned m_lock____;
 };
 
 #endif

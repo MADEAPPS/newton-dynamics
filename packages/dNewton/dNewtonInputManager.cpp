@@ -29,7 +29,6 @@
 dNewtonInputManager::dNewtonInputManager (dNewton* const world)
 	:CustomControllerManager<dNewtonInputController>(world->GetNewton(), D_NEWTON_INPUT_MANGER_PLUGIN_NAME)
 	,m_world(world)
-//	,m_lock(0)
 {
 }
 
@@ -40,14 +39,12 @@ dNewtonInputManager::~dNewtonInputManager()
 
 void dNewtonInputManager::PostUpdate (dFloat timestep)
 {
-//	dNewton::ScopeLock scopelock (&m_lock);
 	OnEndUpdate (timestep);
 }
 
 
 void dNewtonInputManager::PreUpdate(dFloat timestep)
 {
-//	dNewton::ScopeLock scopelock (&m_lock);
 	OnBeginUpdate (timestep);
 }
 
