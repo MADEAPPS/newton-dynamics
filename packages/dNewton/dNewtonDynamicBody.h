@@ -32,7 +32,7 @@ class dNewtonCollision;
 class dNewtonDynamicBody: public dNewtonBody
 {
 	public:
-	CNEWTON_API dNewtonDynamicBody(dNewton* const world, dFloat mass, const dNewtonCollision* const collision, void* const userData, const dFloat* const matrix);
+	CNEWTON_API dNewtonDynamicBody(dNewton* const world, dFloat mass, const dNewtonCollision* const collision, void* const userData, const dFloat* const matrix, dNewtonBody* const parent);
 	CNEWTON_API virtual ~dNewtonDynamicBody();
 
 	CNEWTON_API void GetPointVeloc (const dFloat* const point, dFloat* const veloc) const;
@@ -42,7 +42,7 @@ class dNewtonDynamicBody: public dNewtonBody
 
 
 	protected:
-	CNEWTON_API dNewtonDynamicBody();
+	CNEWTON_API dNewtonDynamicBody(dNewtonBody* const parent);
 	virtual void SetBody (NewtonBody* const body);
 
 	private: 

@@ -25,13 +25,13 @@
 #include "dNewtonDynamicBody.h"
 
 
-dNewtonDynamicBody::dNewtonDynamicBody()
-	:dNewtonBody(m_dynamic)
+dNewtonDynamicBody::dNewtonDynamicBody(dNewtonBody* const parent)
+	:dNewtonBody(m_dynamic, parent)
 {
 }
 
-dNewtonDynamicBody::dNewtonDynamicBody (dNewton* const dWorld, dFloat mass, const dNewtonCollision* const collision, void* const userData, const dFloat* const matrix)
-	:dNewtonBody(dWorld, mass, collision, userData, matrix, m_dynamic)
+dNewtonDynamicBody::dNewtonDynamicBody (dNewton* const dWorld, dFloat mass, const dNewtonCollision* const collision, void* const userData, const dFloat* const matrix, dNewtonBody* const parent)
+	:dNewtonBody(dWorld, mass, collision, userData, matrix, m_dynamic, parent)
 {
 	NewtonBodySetForceAndTorqueCallback(m_body, OnForceAndTorque);
 }

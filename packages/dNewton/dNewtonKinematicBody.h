@@ -32,11 +32,11 @@ class dNewtonCollision;
 class dNewtonKinematicBody: public dNewtonBody
 {
 	public:
-	CNEWTON_API dNewtonKinematicBody (dNewton* const world, dFloat mass, const dNewtonCollision* const collision, void* const userData, const dFloat* const matrix);
+	CNEWTON_API dNewtonKinematicBody (dNewton* const world, dFloat mass, const dNewtonCollision* const collision, void* const userData, const dFloat* const matrix, dNewtonBody* const parent);
 	CNEWTON_API virtual ~dNewtonKinematicBody();
 
 	protected:
-	CNEWTON_API dNewtonKinematicBody();
+	CNEWTON_API dNewtonKinematicBody(dNewtonBody* const parent);
 
 };
 

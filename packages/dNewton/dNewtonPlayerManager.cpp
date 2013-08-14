@@ -65,7 +65,7 @@ void dNewtonPlayerManager::ApplyPlayerMove (CustomPlayerController* const contro
 
 
 dNewtonPlayerManager::dNewtonPlayer::dNewtonPlayer (dNewtonPlayerManager* const manager, void* const userData, dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dFloat* const upDir, const dFloat* const frontDir, dLong collisionMask)
-	:dNewtonKinematicBody()
+	:dNewtonKinematicBody(NULL)
 {
 	dMatrix playerAxis; 
 	playerAxis[0] = dVector (upDir); // the y axis is the character up vector

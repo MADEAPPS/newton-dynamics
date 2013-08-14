@@ -24,13 +24,13 @@
 #include "dNewtonCollision.h"
 #include "dNewtonKinematicBody.h"
 
-dNewtonKinematicBody::dNewtonKinematicBody()
-	:dNewtonBody(m_kinematic)
+dNewtonKinematicBody::dNewtonKinematicBody(dNewtonBody* const parent)
+	:dNewtonBody(m_kinematic, parent)
 {
 }
 
-dNewtonKinematicBody::dNewtonKinematicBody (dNewton* const dWorld, dFloat mass, const dNewtonCollision* const collision, void* const userData, const dFloat* const matrix)
-	:dNewtonBody(dWorld, mass, collision, userData, matrix, m_kinematic)
+dNewtonKinematicBody::dNewtonKinematicBody (dNewton* const dWorld, dFloat mass, const dNewtonCollision* const collision, void* const userData, const dFloat* const matrix, dNewtonBody* const parent)
+	:dNewtonBody(dWorld, mass, collision, userData, matrix, m_kinematic, parent)
 {
 }
 

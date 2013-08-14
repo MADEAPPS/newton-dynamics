@@ -39,7 +39,7 @@ class dNewtonBody: public dNewtonAlloc, public dNewtonTransformLerp
 		m_unknown,
 	};
 
-	CNEWTON_API dNewtonBody(dNewton* const world, dFloat mass, const dNewtonCollision* const collision, void* const userData, const dFloat* const matrix, dBodyType m_type);
+	CNEWTON_API dNewtonBody (dNewton* const world, dFloat mass, const dNewtonCollision* const collision, void* const userData, const dFloat* const matrix, dBodyType m_type, dNewtonBody* const parent);
 	CNEWTON_API virtual ~dNewtonBody();
 
 	dBodyType GetType() const {return m_bodyType;}
@@ -88,13 +88,18 @@ class dNewtonBody: public dNewtonAlloc, public dNewtonTransformLerp
 
 	CNEWTON_API void* GetUserData() const;
 	CNEWTON_API void SetUserData(void* const userData);
+
+	CNEWTON_API NewtonBody* GetParent() const;
+	CNEWTON_API NewtonBody* GetChild() const;
+	CNEWTON_API NewtonBody* GetSibling() const;
 	
 	CNEWTON_API dNewton* GetNewton () const;
+
 	CNEWTON_API NewtonBody* GetNewtonBody () const;
 	CNEWTON_API dNewtonCollision* GetCollision() const;
 
 	protected:
-	CNEWTON_API dNewtonBody(dBodyType type);
+	CNEWTON_API dNewtonBody(dBodyType type, dNewtonBody* const parent);
 	virtual void SetBody (NewtonBody* const body);
 
 	private: 
@@ -103,9 +108,11 @@ class dNewtonBody: public dNewtonAlloc, public dNewtonTransformLerp
 
 	protected:
 	NewtonBody* m_body;
+	dNewtonBody* m_child;
+	dNewtonBody* m_sibling;
+	dNewtonBody* m_parent;
 	void* m_userData;
 	dBodyType m_bodyType;
-//	mutable unsigned m_lock;
 };
 
 #endif

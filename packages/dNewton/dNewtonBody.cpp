@@ -25,18 +25,25 @@
 #include "dNewtonCollision.h"
 #include "dNewtonTransformLerp.h"
 
-dNewtonBody::dNewtonBody(dBodyType type)
+dNewtonBody::dNewtonBody(dBodyType type, dNewtonBody* const parent)
 	:dNewtonAlloc()
 	,dNewtonTransformLerp()
 	,m_body(NULL)
+	,m_child(NULL) 
+	,m_sibling(NULL) 
+	,m_parent(parent) 
 	,m_userData(NULL)
 	,m_bodyType(type)
 {
 }
 
-dNewtonBody::dNewtonBody (dNewton* const dWorld, dFloat mass, const dNewtonCollision* const collision, void* const userData, const dFloat* const matrix, dBodyType type)
+dNewtonBody::dNewtonBody (dNewton* const dWorld, dFloat mass, const dNewtonCollision* const collision, void* const userData, const dFloat* const matrix, dBodyType type, dNewtonBody* const parent)
 	:dNewtonAlloc()
 	,dNewtonTransformLerp(matrix)
+	,m_body(NULL)
+	,m_child(NULL) 
+	,m_sibling(NULL) 
+	,m_parent(parent) 
 	,m_userData(userData)
 	,m_bodyType(type)
 {
