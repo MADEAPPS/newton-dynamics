@@ -101,8 +101,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="$(PlatformName)/$(ProjectName)/$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)/$(ProjectName)/$(ConfigurationName)"
 			ConfigurationType="4"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
@@ -262,8 +262,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="$(PlatformName)/$(ProjectName)/$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)/$(ProjectName)/$(ConfigurationName)"
 			ConfigurationType="4"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
@@ -6765,6 +6765,10 @@
 			UniqueIdentifier="{63537534-1833-5C1F-8DBD-359A84F294C8}"
 			>
 			<File
+				RelativePath="..\..\include\wx\univ\setup.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\include\wx\msw\setup.h"
 				>
 				<FileConfiguration
@@ -6807,10 +6811,6 @@
 						Outputs="..\..\lib\$(PlatformName)\wx\setup.h"
 					/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\..\include\wx\univ\setup.h"
-				>
 			</File>
 		</Filter>
 		<Filter
@@ -8482,11 +8482,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\wx\panel.h"
+				RelativePath="..\..\include\wx\ribbon\panel.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\wx\ribbon\panel.h"
+				RelativePath="..\..\include\wx\panel.h"
 				>
 			</File>
 			<File
@@ -8834,11 +8834,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\wx\persist\toplevel.h"
+				RelativePath="..\..\include\wx\toplevel.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\wx\toplevel.h"
+				RelativePath="..\..\include\wx\persist\toplevel.h"
 				>
 			</File>
 			<File
@@ -8846,11 +8846,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\wx\persist\treebook.h"
+				RelativePath="..\..\include\wx\treebook.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\wx\treebook.h"
+				RelativePath="..\..\include\wx\persist\treebook.h"
 				>
 			</File>
 			<File
