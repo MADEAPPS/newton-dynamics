@@ -29,7 +29,6 @@ dNewtonBody::dNewtonBody(dBodyType type)
 	:dNewtonAlloc()
 	,dNewtonTransformLerp()
 	,m_body(NULL)
-	,m_lock(0)
 	,m_userData(NULL)
 	,m_bodyType(type)
 {
@@ -38,7 +37,6 @@ dNewtonBody::dNewtonBody(dBodyType type)
 dNewtonBody::dNewtonBody (dNewton* const dWorld, dFloat mass, const dNewtonCollision* const collision, void* const userData, const dFloat* const matrix, dBodyType type)
 	:dNewtonAlloc()
 	,dNewtonTransformLerp(matrix)
-	,m_lock(0)
 	,m_userData(userData)
 	,m_bodyType(type)
 {
@@ -204,14 +202,12 @@ void dNewtonBody::OnBodyDestroy (const NewtonBody* const body)
 
 void dNewtonBody::GetVisualMatrix (dFloat param, dFloat* const matrix) const
 {
-	dNewton::ScopeLock scopelock (&m_lock);
 	InterplateMatrix (param, matrix);
 }
 
 
 void dNewtonBody::OnBodyTransform (const dFloat* const matrix, int threadIndex)
 {
-	dNewton::ScopeLock scopelock (&m_lock);
 	Update (matrix);
 }
 

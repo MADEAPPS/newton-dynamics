@@ -36,14 +36,17 @@ class dNewtonTransformLerp
 
 	CNEWTON_API void GetTargetMatrix (dFloat* const matrix) const;
 	CNEWTON_API void SetTargetMatrix (const dFloat* const matrix);
-	
 
 	CNEWTON_API void InterplateMatrix (dFloat param, dFloat* const matrix) const;
+
+	private:
+	void SetTargetMatrixLow (const dFloat* const matrix);
 
 	dVector m_posit0;
 	dVector m_posit1;
 	dQuaternion m_rotat0;
 	dQuaternion m_rotat1;
+	mutable unsigned m_lock;
 };
 
 #endif

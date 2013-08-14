@@ -105,7 +105,7 @@ class dNewtonBody: public dNewtonAlloc, public dNewtonTransformLerp
 	NewtonBody* m_body;
 	void* m_userData;
 	dBodyType m_bodyType;
-	mutable unsigned m_lock;
+//	mutable unsigned m_lock;
 };
 
 #endif

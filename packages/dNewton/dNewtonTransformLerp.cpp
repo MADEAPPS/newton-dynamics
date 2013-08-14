@@ -20,6 +20,7 @@
 */
 
 #include "dStdAfxNewton.h"
+#include "dNewton.h"
 #include "dNewtonTransformLerp.h"
 
 dNewtonTransformLerp::dNewtonTransformLerp ()
@@ -27,6 +28,7 @@ dNewtonTransformLerp::dNewtonTransformLerp ()
 	,m_posit1(m_posit0)
 	,m_rotat0()
 	,m_rotat1(m_rotat0)
+	,m_lock(0)
 {
 }
 
@@ -35,6 +37,7 @@ dNewtonTransformLerp::dNewtonTransformLerp (const dFloat* const matrix)
 	,m_posit1(m_posit0)
 	,m_rotat0(dMatrix (matrix))
 	,m_rotat1(m_rotat0)
+	,m_lock(0)
 {
 }
 
@@ -43,13 +46,7 @@ dNewtonTransformLerp::~dNewtonTransformLerp()
 }
 
 
-void dNewtonTransformLerp::GetTargetMatrix (dFloat* const matrix) const
-{
-	dMatrix mat (m_rotat1, m_posit0);
-	memcpy (matrix, &mat[0][0], sizeof (dMatrix));
-}
-
-void dNewtonTransformLerp::SetTargetMatrix (const dFloat* const matrix)
+void dNewtonTransformLerp::SetTargetMatrixLow (const dFloat* const matrix)
 {
 	dMatrix mat (matrix);
 	m_posit1 = mat.m_posit;
@@ -62,9 +59,24 @@ void dNewtonTransformLerp::SetTargetMatrix (const dFloat* const matrix)
 }
 
 
+void dNewtonTransformLerp::GetTargetMatrix (dFloat* const matrix) const
+{
+	dNewton::ScopeLock scopelock (&m_lock);
+	dMatrix mat (m_rotat1, m_posit0);
+	memcpy (matrix, &mat[0][0], sizeof (dMatrix));
+}
+
+void dNewtonTransformLerp::SetTargetMatrix (const dFloat* const matrix)
+{
+	dNewton::ScopeLock scopelock (&m_lock);
+	SetTargetMatrixLow (matrix);
+}
+
+
 void dNewtonTransformLerp::ResetMatrix (const dFloat* const matrix)
 {
-	SetTargetMatrix (matrix);
+	dNewton::ScopeLock scopelock (&m_lock);
+	SetTargetMatrixLow (matrix);
 	m_posit0 = m_posit1;
 	m_rotat0 = m_rotat1;
 }
@@ -72,14 +84,16 @@ void dNewtonTransformLerp::ResetMatrix (const dFloat* const matrix)
 
 void dNewtonTransformLerp::Update (const dFloat* const matrix)
 {
+	dNewton::ScopeLock scopelock (&m_lock);
 	m_posit0 = m_posit1;
 	m_rotat0 = m_rotat1;
-	SetTargetMatrix (matrix);
+	SetTargetMatrixLow (matrix);
 }
 
 
 void dNewtonTransformLerp::InterplateMatrix (dFloat param, dFloat* const matrix) const
 {
+	dNewton::ScopeLock scopelock (&m_lock);
 	dVector posit (m_posit0 + (m_posit1 - m_posit0).Scale (param));
 	dQuaternion rotation (m_rotat0.Slerp(m_rotat1, param));
 	dMatrix tmpMatrix (rotation, posit);
