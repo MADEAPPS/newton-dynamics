@@ -43,6 +43,7 @@ class MyTriggerManager: public CustomTriggerManager
 		public:
 		BuoyancyForce(CustomTriggerController* const controller)
 			:TriggerCallback (controller)
+			,m_waterToSolidVolumeRatio(0.9f)
 		{
 			// get the fluid plane for the upper face of the trigger volume
 			//NewtonBody* const body = m_controller->GetBody();
@@ -69,8 +70,9 @@ class MyTriggerManager: public CustomTriggerManager
 				cog = matrix.TransformVector (cog);
 				NewtonCollision* const collision = NewtonBodyGetCollision(visitor);
 
+				
 				dFloat shapeVolume = NewtonConvexCollisionCalculateVolume (collision);
-				dFloat fluidDentity = 1.1f / shapeVolume;
+				dFloat fluidDentity = 1.0f / (m_waterToSolidVolumeRatio * shapeVolume);
 
 				NewtonConvexCollisionCalculateBuoyancyAcceleration (collision, &matrix[0][0], &cog[0], &gravity[0], &m_plane[0], fluidDentity, 0.1f, &accelPerUnitMass[0], &torquePerUnitMass[0]);
 
@@ -83,7 +85,9 @@ class MyTriggerManager: public CustomTriggerManager
 		}
 
 		dVector m_plane;
+		dFloat m_waterToSolidVolumeRatio;
 	};
+
 
 
 	MyTriggerManager(NewtonWorld* const world)
@@ -155,11 +159,9 @@ void AlchimedesBuoyancy(DemoEntityManager* const scene)
 	triggerManager->CreateBuoyancyTrigger (triggerLocation, poolBox);
 	NewtonDestroyCollision (poolBox);
 
-
 	// customize the scene after loading
 	// set a user friction variable in the body for variable friction demos
 	// later this will be done using LUA script
-//	NewtonWorld* const world = scene->GetNewton();
 	dMatrix offsetMatrix (GetIdentityMatrix());
 
 	// place camera into position
@@ -185,6 +187,6 @@ void AlchimedesBuoyancy(DemoEntityManager* const scene)
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _TAPERED_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _COMPOUND_CONVEX_CRUZ_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _COMPOUND_CONVEX_CRUZ_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 }
