@@ -312,21 +312,23 @@ dgGoogol dgGoogol::operator* (const dgGoogol &A) const
 				A.ScaleMantissa (&mantissaScale[i], a);
 
 				dgUnsigned64 carrier = 0;
-				for (dgInt32 j = 2 * DG_GOOGOL_SIZE - 1; j >= 0; j --) {
-					dgUnsigned64 m0 = mantissaAcc[j];
-					dgUnsigned64 m1 = mantissaScale[j];
-					mantissaAcc[j] = m0 + m1 + carrier;
+				for (dgInt32 j = 0; j < 2 * DG_GOOGOL_SIZE; j ++) {
+					const dgInt32 k = 2 * DG_GOOGOL_SIZE - 1 - j;
+					dgUnsigned64 m0 = mantissaAcc[k];
+					dgUnsigned64 m1 = mantissaScale[k];
+					mantissaAcc[k] = m0 + m1 + carrier;
 					carrier = CheckCarrier (m0, m1) | CheckCarrier (m0 + m1, carrier);
 				}
 			}
 		}
 		
 		dgUnsigned64 carrier = 0;
-		dgInt32 bits = LeadingZeros (mantissaAcc[0]) - 2;
-		for (dgInt32 i = 2 * DG_GOOGOL_SIZE - 1; i >= 0; i --) {
-			dgUnsigned64 a = mantissaAcc[i];
-			mantissaAcc[i] = (a << bits) | carrier;
-			carrier = a >> (64 - bits);
+		dgInt32 bits = dgUnsigned64(LeadingZeros (mantissaAcc[0]) - 2);
+		for (dgInt32 i = 0; i < 2 * DG_GOOGOL_SIZE; i ++) {
+			const dgInt32 k = 2 * DG_GOOGOL_SIZE - 1 - i;
+			dgUnsigned64 a = mantissaAcc[k];
+			mantissaAcc[k] = (a << dgUnsigned64(bits)) | carrier;
+			carrier = a >> dgUnsigned64(64 - bits);
 		}
 
 		dgInt32 exp = m_exponent + A.m_exponent - (bits - 2);
