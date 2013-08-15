@@ -69,6 +69,8 @@ class dNewtonBody: public dNewtonAlloc, public dNewtonTransformLerp
 	CNEWTON_API void AddTorque (const dFloat* const torque);
 	//CNEWTON_API void GetTorque (dFloat* const torque) const;
 
+	
+
 	CNEWTON_API void GetCenterOfMass (dFloat* const com) const;
 	CNEWTON_API void SetCenterOfMass (const dFloat* const com);
 	CNEWTON_API void GetMassAndInertia (dFloat& mass, dFloat& Ixx, dFloat& Iyy, dFloat& Izz) const;
@@ -82,16 +84,17 @@ class dNewtonBody: public dNewtonAlloc, public dNewtonTransformLerp
 	// call each time the physics update the body transformation 
 	CNEWTON_API virtual void OnBodyTransform (const dFloat* const matrix, int threadIndex);
 
-	CNEWTON_API virtual void OnContactProcess (dNewtonContactMaterial* const contactMaterial, dFloat timestep, int threadIndex) const
-	{
-	}
+	CNEWTON_API virtual void OnContactProcess (dNewtonContactMaterial* const contactMaterial, dFloat timestep, int threadIndex) const {}
 
 	CNEWTON_API void* GetUserData() const;
 	CNEWTON_API void SetUserData(void* const userData);
 
-	CNEWTON_API NewtonBody* GetParent() const;
-	CNEWTON_API NewtonBody* GetChild() const;
-	CNEWTON_API NewtonBody* GetSibling() const;
+	
+	CNEWTON_API dNewtonBody* GetParent() const;
+	CNEWTON_API dNewtonBody* GetChild() const;
+	CNEWTON_API dNewtonBody* GetSibling() const;
+	CNEWTON_API void AttachChild (dNewtonBody* const child);
+	
 	
 	CNEWTON_API dNewton* GetNewton () const;
 
@@ -104,7 +107,7 @@ class dNewtonBody: public dNewtonAlloc, public dNewtonTransformLerp
 
 	private: 
 	CNEWTON_API static void OnBodyDestroy (const NewtonBody* const body);
-	CNEWTON_API static void OnBodyTransform (const NewtonBody* const body, const dFloat* const matrix, int threadIndex);
+	//CNEWTON_API static void OnBodyTransform (const NewtonBody* const body, const dFloat* const matrix, int threadIndex);
 
 	protected:
 	NewtonBody* m_body;

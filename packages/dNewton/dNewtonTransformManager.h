@@ -1,0 +1,48 @@
+/* Copyright (c) <2009> <Newton Game Dynamics>
+* 
+* This software is provided 'as-is', without any express or implied
+* warranty. In no event will the authors be held liable for any damages
+* arising from the use of this software.
+* 
+* Permission is granted to anyone to use this software for any purpose,
+* including commercial applications, and to alter it and redistribute it
+* freely
+*/
+
+
+//////////////////////////////////////////////////////////////////////
+
+#ifndef D_CUSTOM_TRANSFORM_MANAGER_H_
+#define D_CUSTOM_TRANSFORM_MANAGER_H_
+
+#include "CustomJointLibraryStdAfx.h"
+#include "CustomControllerManager.h"
+
+class dNewton;
+
+// a Skeleton Transform controller is use to calculate local transform on contractions of rigid bodies and joint that form part of a hierarchical Skeleton
+class dNewtonTransformController: public CustomControllerBase
+{
+	public:
+	private:
+	CNEWTON_API virtual void PreUpdate(dFloat timestep, int threadIndex){}
+	NEWTON_API virtual void PostUpdate(dFloat timestep, int threadIndex){}
+};
+
+class dNewtonTransformManager: public CustomControllerManager<dNewtonTransformController> 
+{
+	public:
+	NEWTON_API dNewtonTransformManager (dNewton* const world);
+	NEWTON_API virtual ~dNewtonTransformManager();
+
+	private:
+	CNEWTON_API virtual void Debug () const {};
+	CNEWTON_API virtual void PreUpdate(dFloat timestep){};
+	CNEWTON_API virtual void PostUpdate (dFloat timestep);
+
+	static void UpdateTransformKernel (NewtonWorld* const world, void* const context, int threadIndex);
+};
+
+
+#endif 
+

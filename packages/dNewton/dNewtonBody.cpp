@@ -187,11 +187,11 @@ void dNewtonBody::SetBody (NewtonBody* const body)
 {
 	if (body) {
 		NewtonBodySetUserData(body, this);
-		NewtonBodySetTransformCallback (body, OnBodyTransform);
+		//NewtonBodySetTransformCallback (body, OnBodyTransform);
 		NewtonBodySetDestructorCallback (body, OnBodyDestroy);
 	} else if (m_body) {
 		NewtonBodySetUserData(m_body, NULL);
-		NewtonBodySetTransformCallback (m_body, NULL);
+		//NewtonBodySetTransformCallback (m_body, NULL);
 		NewtonBodySetDestructorCallback (m_body, NULL);
 	}
 	m_body = body;
@@ -218,15 +218,45 @@ void dNewtonBody::OnBodyTransform (const dFloat* const matrix, int threadIndex)
 	Update (matrix);
 }
 
+/*
 void dNewtonBody::OnBodyTransform (const NewtonBody* const body, const dFloat* const matrix, int threadIndex)
 {
 	dNewtonBody* const me = (dNewtonBody*) NewtonBodyGetUserData(body);
 	dAssert (me);
 	me->OnBodyTransform (matrix, threadIndex);
 }
-
+*/
 
 dNewtonCollision* dNewtonBody::GetCollision() const
 {
 	return (dNewtonCollisionScene*) NewtonCollisionGetUserData(NewtonBodyGetCollision (m_body));
+}
+
+
+dNewtonBody* dNewtonBody::GetParent() const 
+{	
+	return m_parent;
+}
+
+dNewtonBody* dNewtonBody::GetChild() const 
+{
+	return m_child;
+}
+
+dNewtonBody* dNewtonBody::GetSibling() const 
+{
+	return m_sibling;
+}
+
+void dNewtonBody::AttachChild(dNewtonBody* const child)
+{
+	dAssert (!child->m_parent);
+	child->m_parent = this;
+
+	if (!m_child) {
+		m_child = child;
+	} else {
+		child->m_sibling = m_child;
+		m_child = child;
+	}
 }

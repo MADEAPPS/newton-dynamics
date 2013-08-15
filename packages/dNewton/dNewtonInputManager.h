@@ -23,22 +23,17 @@
 #ifndef _D_NEWTON_RAY_PEEKING_H_
 #define _D_NEWTON_RAY_PEEKING_H_
 
-
 class dNewton;
-
-
-#define D_NEWTON_INPUT_MANGER_PLUGIN_NAME	"__dnetwon_inputManager__"
-
 
 class dNewtonInputController: public CustomControllerBase
 {
 	public:
-	virtual void PreUpdate(dFloat timestep, int threadIndex)
+	CNEWTON_API virtual void PreUpdate(dFloat timestep, int threadIndex)
 	{
 		//do nothing;
 	}
 
-	virtual void PostUpdate(dFloat timestep, int threadIndex)
+	CNEWTON_API virtual void PostUpdate(dFloat timestep, int threadIndex)
 	{
 		//do nothing;
 	}
@@ -51,20 +46,16 @@ class dNewtonInputManager: public CustomControllerManager<dNewtonInputController
 	CNEWTON_API dNewtonInputManager (dNewton* const world);
 	CNEWTON_API virtual ~dNewtonInputManager();
 
-//	unsigned* GetLockHandle____()
-//	{
-//		return &m_lock____;
-//	}
 	virtual void OnBeginUpdate (dFloat timestepInSecunds) = 0;
 	virtual void OnEndUpdate (dFloat timestepInSecunds) = 0;
 
 	private:
-	CNEWTON_API void PreUpdate(dFloat timestep);
-	CNEWTON_API void PostUpdate (dFloat timestep);
-	virtual void Debug () const {};
+	CNEWTON_API virtual void PreUpdate(dFloat timestep);
+	CNEWTON_API virtual void PostUpdate (dFloat timestep);
+	CNEWTON_API virtual void Debug () const {};
 
 	protected:
-	dNewton* m_world;
+	dNewton* m_dworld;
 };
 
 #endif

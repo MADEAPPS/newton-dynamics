@@ -111,12 +111,10 @@ class CustomArticulatedTransformController: public CustomControllerBase
 class CustomArticulaledTransformManager: public CustomControllerManager<CustomArticulatedTransformController> 
 {
 	public:
-	NEWTON_API CustomArticulaledTransformManager(NewtonWorld* const world);
+	NEWTON_API CustomArticulaledTransformManager(NewtonWorld* const world, bool applyLocalTransform);
 	NEWTON_API virtual ~CustomArticulaledTransformManager();
 
-	virtual void Debug () const 
-	{
-	}
+	NEWTON_API virtual void Debug () const {}
 
 	NEWTON_API virtual CustomArticulatedTransformController* CreateTransformController (void* const userData, bool errorCorrectionMode);
 	
@@ -128,6 +126,11 @@ class CustomArticulaledTransformManager: public CustomControllerManager<CustomAr
 
 	NEWTON_API virtual void OnPreUpdate (CustomArticulatedTransformController* const constroller, dFloat timestep, int threadIndex) const = 0;
 	NEWTON_API virtual void OnUpdateTransform (const CustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const = 0;
+
+	private: 
+	bool m_applyLocalTransform;
+
+	friend class CustomArticulatedTransformController;
 };
 
 

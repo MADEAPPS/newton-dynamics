@@ -644,11 +644,11 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\dNewton\dNewtonArticulatedTransformManager.cpp"
+			RelativePath="..\..\dNewton\dNewtonArticulationManager.cpp"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dNewton\dNewtonArticulatedTransformManager.h"
+			RelativePath="..\..\dNewton\dNewtonArticulationManager.h"
 			>
 		</File>
 		<File
@@ -745,6 +745,14 @@
 		</File>
 		<File
 			RelativePath="..\..\dNewton\dNewtonTransformLerp.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dNewton\dNewtonTransformManager.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dNewton\dNewtonTransformManager.h"
 			>
 		</File>
 		<File

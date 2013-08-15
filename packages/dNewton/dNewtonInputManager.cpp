@@ -27,8 +27,8 @@
 
 
 dNewtonInputManager::dNewtonInputManager (dNewton* const world)
-	:CustomControllerManager<dNewtonInputController>(world->GetNewton(), D_NEWTON_INPUT_MANGER_PLUGIN_NAME)
-	,m_world(world)
+	:CustomControllerManager<dNewtonInputController>(world->GetNewton(), "__dnetwon_inputManager__")
+	,m_dworld(world)
 {
 }
 

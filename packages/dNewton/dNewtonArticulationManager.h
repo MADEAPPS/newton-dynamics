@@ -27,14 +27,14 @@
 
 class dNewtonBody;
 
-class dNewtonArticulatedTransformManager: public CustomArticulaledTransformManager
+class dNewtonArticulationManager: public CustomArticulaledTransformManager
 {
 	public:
-	class dNewtonArticulatedTransformController: public dNewtonAlloc
+	class dNewtonArticulationController: public dNewtonAlloc
 	{
 		public:
-		CNEWTON_API dNewtonArticulatedTransformController (dNewtonArticulatedTransformManager* const manager, bool projectError);
-		CNEWTON_API ~dNewtonArticulatedTransformController ();
+		CNEWTON_API dNewtonArticulationController (dNewtonArticulationManager* const manager, bool projectError);
+		CNEWTON_API ~dNewtonArticulationController ();
 
 		NEWTON_API virtual void OnPreUpdate (dFloat timestep) = 0;
 		NEWTON_API virtual void OnUpdateBoneTransform (dNewtonBody* const bone, const dFloat* const localMatrix) = 0;
@@ -47,11 +47,11 @@ class dNewtonArticulatedTransformManager: public CustomArticulaledTransformManag
 
 		private:
 		CustomArticulatedTransformController* m_controller;
-		friend class dNewtonArticulatedTransformManager;
+		friend class dNewtonArticulationManager;
 	};
 
-	CNEWTON_API dNewtonArticulatedTransformManager (dNewton* const world);
-	CNEWTON_API virtual ~dNewtonArticulatedTransformManager ();
+	CNEWTON_API dNewtonArticulationManager (dNewton* const world);
+	CNEWTON_API virtual ~dNewtonArticulationManager ();
 
 	NEWTON_API void DisableAllSelfCollision (CustomArticulatedTransformController* const controller);
 	NEWTON_API void SetDefaultSelfCollisionMask (CustomArticulatedTransformController* const controller);
@@ -62,8 +62,8 @@ class dNewtonArticulatedTransformManager: public CustomArticulaledTransformManag
 	NEWTON_API virtual void OnUpdateTransform (const CustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const;
 	NEWTON_API void DestroyController (CustomArticulatedTransformController* const controller);
 
-	CNEWTON_API dNewtonArticulatedTransformController* GetFirstController() const;
-	CNEWTON_API dNewtonArticulatedTransformController* GetNextController(const dNewtonArticulatedTransformController* const controller) const;
+	CNEWTON_API dNewtonArticulationController* GetFirstController() const;
+	CNEWTON_API dNewtonArticulationController* GetNextController(const dNewtonArticulationController* const controller) const;
 };
 
 

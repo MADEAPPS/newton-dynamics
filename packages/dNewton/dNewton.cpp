@@ -24,6 +24,7 @@
 #include "dNewtonBody.h"
 #include "dNewtonMaterial.h"
 #include "dNewtonCollision.h"
+#include "dNewtonTransformManager.h"
 
 dNewton::ScopeLock::ScopeLock (unsigned* const lock)
 	:m_atomicLock(lock)
@@ -61,6 +62,9 @@ dNewton::dNewton()
 	int defaultMaterial = NewtonMaterialGetDefaultGroupID (m_world);
 	NewtonMaterialSetCompoundCollisionCallback(m_world, defaultMaterial, defaultMaterial, OnCompoundSubCollisionAABBOverlap);
 	NewtonMaterialSetCollisionCallback (m_world, defaultMaterial, defaultMaterial, m_world, OnBodiesAABBOverlap, OnContactProcess);
+
+	// add a hierarchical transform manage to update local transforms
+	new dNewtonTransformManager (this);
 
 	// set the timer
 	ResetTimer();

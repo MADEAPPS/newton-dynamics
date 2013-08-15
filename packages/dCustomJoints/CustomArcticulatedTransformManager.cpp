@@ -14,8 +14,9 @@
 #include "CustomArcticulatedTransformManager.h"
 
 
-CustomArticulaledTransformManager::CustomArticulaledTransformManager(NewtonWorld* const world)
+CustomArticulaledTransformManager::CustomArticulaledTransformManager(NewtonWorld* const world, bool applyLocalTransform)
 	:CustomControllerManager<CustomArticulatedTransformController>(world, HIERACHICAL_ARTICULATED_PLUGIN_NAME)
+	,m_applyLocalTransform(applyLocalTransform)
 {
 }
 
@@ -111,16 +112,18 @@ void CustomArticulatedTransformController::PostUpdate(dFloat timestep, int threa
 	}
 
 	CustomArticulaledTransformManager* const manager = (CustomArticulaledTransformManager*) GetManager();
-	for (int i = 0; i < m_boneCount; i ++) {
-		const dSkeletonBone& bone = m_bones[i];
-		dMatrix matrix;
-		NewtonBodyGetMatrix(bone.m_body, &matrix[0][0]);
-		if (!bone.m_parent) {
-			manager->OnUpdateTransform (&bone, matrix);
-		} else {
-			dMatrix parentMatrix;
-			NewtonBodyGetMatrix(bone.m_parent->m_body, &parentMatrix[0][0]);
-			manager->OnUpdateTransform (&bone, matrix * parentMatrix.Inverse() * bone.m_bindMatrix);
+	if (manager->m_applyLocalTransform) {
+		for (int i = 0; i < m_boneCount; i ++) {
+			const dSkeletonBone& bone = m_bones[i];
+			dMatrix matrix;
+			NewtonBodyGetMatrix(bone.m_body, &matrix[0][0]);
+			if (!bone.m_parent) {
+				manager->OnUpdateTransform (&bone, matrix);
+			} else {
+				dMatrix parentMatrix;
+				NewtonBodyGetMatrix(bone.m_parent->m_body, &parentMatrix[0][0]);
+				manager->OnUpdateTransform (&bone, matrix * parentMatrix.Inverse() * bone.m_bindMatrix);
+			}
 		}
 	}
 }
