@@ -202,7 +202,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 {
 	public:
 	ArticulatedVehicleManagerManager (DemoEntityManager* const scene)
-		:CustomArticulaledTransformManager (scene->GetNewton())
+		:CustomArticulaledTransformManager (scene->GetNewton(), true)
 	{
 		// create a material for early collision culling
 		m_material = NewtonMaterialCreateGroupID(scene->GetNewton());
