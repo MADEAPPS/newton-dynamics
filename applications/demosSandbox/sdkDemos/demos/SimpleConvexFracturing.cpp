@@ -28,7 +28,7 @@
 //#define BREAK_FORCE_IN_GRAVITIES	1
 
 #if 0
-static void CreateSimpleVoronoiShatter (DemoEntityManager* const scene)
+static void CreateSimpleVoronoiFracture (DemoEntityManager* const scene)
 {
 	// create a collision primitive
 //	dVector size (2.0f, 2.0f, 2.0f);
@@ -116,7 +116,7 @@ mesh2->Release();
 #endif
 
 
-class ShatterAtom
+class FractureAtom
 {
 	public:
 	dVector m_centerOfMass;
@@ -126,12 +126,12 @@ class ShatterAtom
 	dFloat m_massFraction;
 };
 
-class ShatterEffect: public dList<ShatterAtom> 
+class FractureEffect: public dList<FractureAtom> 
 {
 	public:
 
-	ShatterEffect(NewtonWorld* const world, NewtonMesh* const mesh, int interiorMaterial)
-		:dList<ShatterAtom>(), m_world (world)
+	FractureEffect(NewtonWorld* const world, NewtonMesh* const mesh, int interiorMaterial)
+		:dList<FractureAtom>(), m_world (world)
 	{
 		// first we populate the bounding Box area with few random point to get some interior subdivisions.
 		// the subdivision are local to the point placement, by placing these points visual ally with a 3d tool
@@ -184,21 +184,18 @@ class ShatterEffect: public dList<ShatterAtom>
 
 		// now we iterate over each pieces and for each one we create a visual entity and a rigid body
 		NewtonMesh* nextDebri;
-		//for (NewtonMesh* debri = NewtonMeshCreateFirstSingleSegment (voronoi); debri; debri = nextDebri) {
-			// get next segment layar
-			//nextDebri = NewtonMeshCreateNextSingleSegment (debriMeshPieces, debri);
 		for (NewtonMesh* debri = NewtonMeshCreateFirstLayer (debriMeshPieces); debri; debri = nextDebri) {
 			// get next segment piece
 			nextDebri = NewtonMeshCreateNextLayer (debriMeshPieces, debri); 
 			
-			//clip the voronoid convexes against the mesh 
+			//clip the voronoi convexes against the mesh 
 			NewtonMesh* const fracturePiece = NewtonMeshConvexConvexMeshIntersection (debri, mesh);
 			if (fracturePiece) {
-				// make a conve hull collsion shape
+				// make a convex hull collision shape
 				NewtonCollision* const collision = NewtonCreateConvexHullFromMesh (m_world, fracturePiece, 0.0f, 0);
 				if (collision) {
-					// we have a piece which has a convex collsion  representation, add that to the list
-					ShatterAtom& atom = Append()->GetInfo();
+					// we have a piece which has a convex collision  representation, add that to the list
+					FractureAtom& atom = Append()->GetInfo();
 					atom.m_mesh = new DemoMesh(fracturePiece);
 					atom.m_collision = collision;
 					NewtonConvexCollisionCalculateInertialMatrix (atom.m_collision, &atom.m_momentOfInirtia[0], &atom.m_centerOfMass[0]);	
@@ -214,20 +211,20 @@ class ShatterEffect: public dList<ShatterAtom>
 		NewtonMeshDestroy(debriMeshPieces);
 	}
 
-	ShatterEffect (const ShatterEffect& list)
-		:dList<ShatterAtom>(), m_world(list.m_world)
+	FractureEffect (const FractureEffect& list)
+		:dList<FractureAtom>(), m_world(list.m_world)
 	{
 		for (dListNode* node = list.GetFirst(); node; node = node->GetNext()) {
-			ShatterAtom& atom = Append(node->GetInfo())->GetInfo();
+			FractureAtom& atom = Append(node->GetInfo())->GetInfo();
 			atom.m_mesh->AddRef();
 			atom.m_collision = NewtonCollisionCreateInstance (atom.m_collision);
 		}
 	}
 
-	~ShatterEffect()
+	~FractureEffect()
 	{
 		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
-			ShatterAtom& atom = node->GetInfo();
+			FractureAtom& atom = node->GetInfo();
 			NewtonDestroyCollision (atom.m_collision);
 			atom.m_mesh->Release();
 		}
@@ -238,16 +235,16 @@ class ShatterEffect: public dList<ShatterAtom>
 
 
 
-class SimpleShatterEffectEntity: public DemoEntity
+class SimpleFracturedEffectEntity: public DemoEntity
 {
 	public:
-	SimpleShatterEffectEntity (DemoMesh* const mesh, const ShatterEffect& columnDebris)
+	SimpleFracturedEffectEntity (DemoMesh* const mesh, const FractureEffect& columnDebris)
 		:DemoEntity (GetIdentityMatrix(), NULL), m_delay (INITIAL_DELAY), m_effect(columnDebris), m_myBody(NULL)
 	{
 		SetMesh(mesh);
 	}
 
-	~SimpleShatterEffectEntity ()
+	~SimpleFracturedEffectEntity ()
 	{
 	}
 
@@ -275,13 +272,13 @@ class SimpleShatterEffectEntity: public DemoEntity
 				}
 			}
 		}
-	
+
 
 		// if the force is bigger than N time Gravities, It is considered a collision force
-//		dFloat maxForce = BREAK_FORCE_IN_GRAVITIES * m_myweight;
+		//		dFloat maxForce = BREAK_FORCE_IN_GRAVITIES * m_myweight;
 		dFloat maxForce = 0;
 
-//dTrace (("%f %f\n", sqrtf (maxInternalForceMag2), maxForce));
+		//dTrace (("%f %f\n", sqrtf (maxInternalForceMag2), maxForce));
 
 		if (maxInternalForceMag2 > (maxForce * maxForce)) {
 			NewtonWorld* const world = NewtonBodyGetWorld(m_myBody);
@@ -290,7 +287,7 @@ class SimpleShatterEffectEntity: public DemoEntity
 			dFloat Iyy; 
 			dFloat Izz; 
 			dFloat mass; 
-			NewtonBodyGetMassMatrix(m_myBody, &mass, &Ixx, &Iyy, &Izz);
+
 
 			dVector com;
 			dVector veloc;
@@ -301,12 +298,13 @@ class SimpleShatterEffectEntity: public DemoEntity
 			NewtonBodyGetOmega(m_myBody, &omega[0]);
 			NewtonBodyGetCentreOfMass(m_myBody, &com[0]);
 			NewtonBodyGetMatrix(m_myBody, &bodyMatrix[0][0]);
-			com = bodyMatrix.TransformVector (com);
+			NewtonBodyGetMassMatrix(m_myBody, &mass, &Ixx, &Iyy, &Izz);
 
+			com = bodyMatrix.TransformVector (com);
 			dMatrix matrix (GetCurrentMatrix());
 			dQuaternion rotation (matrix);
-			for (ShatterEffect::dListNode* node = m_effect.GetFirst(); node; node = node->GetNext()) {
-				ShatterAtom& atom = node->GetInfo();
+			for (FractureEffect::dListNode* node = m_effect.GetFirst(); node; node = node->GetNext()) {
+				FractureAtom& atom = node->GetInfo();
 
 				DemoEntity* const entity = new DemoEntity (dMatrix (rotation, matrix.m_posit), NULL);
 				entity->SetMesh (atom.m_mesh);
@@ -324,11 +322,6 @@ class SimpleShatterEffectEntity: public DemoEntity
 				//create the rigid body
 				NewtonBody* const rigidBody = NewtonCreateDynamicBody (world, atom.m_collision, &matrix[0][0]);
 
-				// set the correct center of gravity for this body
-				// NewtonBodySetCentreOfMass (rigidBody, &atom.m_centerOfMass[0]);
-				// calculate the center of mas of the debris
-				NewtonBodySetMassProperties (rigidBody, mass, atom.m_collision);
-
 				// calculate debris initial velocity
 				dVector center (matrix.TransformVector(atom.m_centerOfMass));
 				dVector v (veloc + omega * (center - com));
@@ -337,15 +330,8 @@ class SimpleShatterEffectEntity: public DemoEntity
 				NewtonBodySetVelocity(rigidBody, &v[0]);
 				NewtonBodySetOmega(rigidBody, &omega[0]);
 
-				// set the  debrie center of mass
-				NewtonBodySetCentreOfMass (rigidBody, &atom.m_centerOfMass[0]);
-
-
-				// set the mass matrix
-				NewtonBodySetMassMatrix (rigidBody, debriMass, Ixx, Iyy, Izz);
-
-				// activate 
-				//	NewtonBodyCoriolisForcesMode (blockBoxBody, 1);
+				// set the debris mass properties, mass, center of mass, and inertia 
+				NewtonBodySetMassProperties (rigidBody, debriMass, atom.m_collision);
 
 				// save the pointer to the graphic object with the body.
 				NewtonBodySetUserData (rigidBody, entity);
@@ -369,19 +355,20 @@ class SimpleShatterEffectEntity: public DemoEntity
 			NewtonDestroyBody(m_myBody);
 			scene->RemoveEntity	(mynode);
 		}
-	};
+	}
 
+	
 	int m_delay;
-	ShatterEffect m_effect;
+	FractureEffect m_effect;
 	NewtonBody* m_myBody;
 	dFloat m_myweight; 
 };
 
 
-static void AddShatterEntity (DemoEntityManager* const scene, DemoMesh* const visualMesh, NewtonCollision* const collision, const ShatterEffect& shatterEffect, const dVector& location)
+static void AddFracturedEntity (DemoEntityManager* const scene, DemoMesh* const visualMesh, NewtonCollision* const collision, const FractureEffect& fractureEffect, const dVector& location)
 {
 	dQuaternion rotation;
-	SimpleShatterEffectEntity* const entity = new SimpleShatterEffectEntity (visualMesh, shatterEffect);
+	SimpleFracturedEffectEntity* const entity = new SimpleFracturedEffectEntity (visualMesh, fractureEffect);
 	entity->SetMatrix(*scene, rotation, location);
 	entity->InterpolateMatrix (*scene, 1.0f);
 	scene->Append(entity);
@@ -430,7 +417,7 @@ static void AddShatterEntity (DemoEntityManager* const scene, DemoMesh* const vi
 
 
 
-static void AddShatterPrimitive (DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat spacing, PrimitiveType type, int materialID, const dMatrix& shapeOffsetMatrix)
+static void AddFracturedPrimitive (DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat spacing, PrimitiveType type, int materialID, const dMatrix& shapeOffsetMatrix)
 {
 	// create the shape and visual mesh as a common data to be re used
 	NewtonWorld* const world = scene->GetNewton();
@@ -446,7 +433,7 @@ static void AddShatterPrimitive (DemoEntityManager* const scene, dFloat mass, co
 	NewtonMeshApplyBoxMapping(mesh, externalMaterial, externalMaterial, externalMaterial);
 
 	// create a newton mesh from the collision primitive
-	ShatterEffect shatter (world, mesh, internalMaterial);
+	FractureEffect fracture (world, mesh, internalMaterial);
 
 	DemoMesh* const visualMesh = new DemoMesh(mesh);
 
@@ -461,7 +448,7 @@ static void AddShatterPrimitive (DemoEntityManager* const scene, dFloat mass, co
 			matrix.m_posit.m_z = z;
 			dVector floor (FindFloor (world, dVector (matrix.m_posit.m_x, startElevation, matrix.m_posit.m_z, 0.0f), 2.0f * startElevation));
 			matrix.m_posit.m_y = floor.m_y + 1.0f;
-			AddShatterEntity (scene, visualMesh, collision, shatter, matrix.m_posit);
+			AddFracturedEntity (scene, visualMesh, collision, fracture, matrix.m_posit);
 		}
 	}
 
@@ -476,11 +463,10 @@ static void AddShatterPrimitive (DemoEntityManager* const scene, dFloat mass, co
 
 
 
-void SimpleConvexShatter (DemoEntityManager* const scene)
+void SimpleConvexFracturing (DemoEntityManager* const scene)
 {
 	// load the skybox
 	scene->CreateSkyBox();
-return;
 
 	// load the scene from a ngd file format
 	CreateLevelMesh (scene, "flatPlane.ngd", false);
@@ -488,7 +474,7 @@ return;
 //	CreateLevelMesh (scene, "sponza.ngd", true);
 
 	// create a shattered mesh array
-//CreateSimpleVoronoiShatter (scene);
+//CreateSimpleVoronoiFracture (scene);
 
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 	dVector location (0.0f, 0.0f, 0.0f, 0.0f);
@@ -496,18 +482,16 @@ return;
 	dMatrix shapeOffsetMatrix (GetIdentityMatrix());
 
 	int count = 1;
-
-
-//	AddShatterPrimitive(scene, 10.0f, location, size, count, count, 3.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddShatterPrimitive(scene, 10.0f, location, size, count, count, 3.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddShatterPrimitive(scene, 10.0f, location, size, count, count, 3.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddShatterPrimitive(scene, 10.0f, location, size, count, count, 3.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddShatterPrimitive(scene, 10.0f, location, size, count, count, 3.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddShatterPrimitive(scene, 10.0f, location, size, count, count, 3.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddShatterPrimitive(scene, 10.0f, location, size, count, count, 3.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 3.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 3.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 3.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 3.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 3.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 3.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 3.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 
 //for (int i = 0; i < 1; i ++)
-//AddShatterPrimitive(scene, 10.0f, location, size, count, count, 1.7f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 1.7f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 
 	// place camera into position
 	dQuaternion rot;

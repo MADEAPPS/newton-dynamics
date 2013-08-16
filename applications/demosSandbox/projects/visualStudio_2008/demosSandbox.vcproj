@@ -1001,7 +1001,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\sdkDemos\demos\SimpleConvexShatter.cpp"
+				RelativePath="..\..\sdkDemos\demos\SimpleConvexFracturing.cpp"
 				>
 			</File>
 			<File

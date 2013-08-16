@@ -45,11 +45,11 @@
 //#define DEFAULT_SCENE	19			// simple convex decomposition
 //#define DEFAULT_SCENE	20			// scene Collision
 //#define DEFAULT_SCENE	21          // simple boolean operators 
-//#define DEFAULT_SCENE	22			// simple convex Shatter
+#define DEFAULT_SCENE	22			// simple convex fracturing 
 //#define DEFAULT_SCENE	23			// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	24			// continue collision
 //#define DEFAULT_SCENE	25			// puck slide continue collision
-#define DEFAULT_SCENE	26			// articulated joints
+//#define DEFAULT_SCENE	26			// articulated joints
 //#define DEFAULT_SCENE	27			// basic rag doll
 //#define DEFAULT_SCENE	28			// basic car
 //#define DEFAULT_SCENE	29			// high performance super car
@@ -81,7 +81,7 @@ void CompoundCollision(DemoEntityManager* const scene);
 void AlchimedesBuoyancy(DemoEntityManager* const scene);
 void SimpleConvexApproximation(DemoEntityManager* const scene);
 void SimpleBooleanOperations(DemoEntityManager* const scene);
-void SimpleConvexShatter (DemoEntityManager* const scene);
+void SimpleConvexFracturing (DemoEntityManager* const scene);
 void UsingNewtonMeshTool (DemoEntityManager* const scene);
 void MultiRayCast (DemoEntityManager* const scene);
 void BasicCar (DemoEntityManager* const scene);
@@ -119,7 +119,7 @@ NewtonDemos::SDKDemos NewtonDemos::m_demosSelection[] =
 	{wxT("Simple convex decomposition"), wxT("demonstrate convex decomposition and compound collision"), SimpleConvexApproximation},
 	{wxT("Multi geometry collision"), wxT("show static mesh with the ability of moving internal parts"), SceneCollision},
 	{wxT("Simple boolean operations"), wxT("demonstrate simple boolean operations "), SimpleBooleanOperations},
-	{wxT("Simple convex Shatter"), wxT("demonstrate fracture destruction using Voronoi partition"), SimpleConvexShatter},
+	{wxT("Simple convex Shatter"), wxT("demonstrate fracture destruction using Voronoi partition"), SimpleConvexFracturing},
 	{wxT("Parallel ray cast"), wxT("using the threading Job scheduler"), MultiRayCast},
 	{wxT("Continue collision"), wxT("show continue collision"), ContinueCollision},
 	{wxT("Puck slide"), wxT("show continue collision"), PuckSlide},
