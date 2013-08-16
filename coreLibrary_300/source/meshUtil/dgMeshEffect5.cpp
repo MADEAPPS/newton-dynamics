@@ -2951,12 +2951,20 @@ dgMeshEffect* dgMeshEffect::Intersection (const dgMatrix& matrix, const dgMeshEf
 }
 
 
-bool dgMeshEffect::PlaneClip (const dgBigPlane& plane)
+bool dgMeshEffect::PlaneClip (const dgMeshEffect& convexMesh, const dgEdge* const convexFace, dgInt32& faceIdEnumeration)
 {
+
+static int xxx;
+xxx ++;
+
 	dgInt32 neutral = 0;
 	dgInt32 positive = 0;
 	dgInt32 negative = 0;
 	dgInt32 pointCount = GetVertexCount();
+
+	dgBigVector normal (convexMesh.FaceNormal(convexFace, &convexMesh.m_points[0].m_x, sizeof(dgBigVector)));
+	dgBigPlane plane (normal, - (convexMesh.m_points[convexFace->m_incidentVertex] % normal));
+	plane = plane.Scale (dgFloat64(1.0f)/ sqrt (plane % plane));
 
 	const dgInt32 extraVertex = 256;
 	dgStack <dgFloat64> test (pointCount + extraVertex);
@@ -2978,9 +2986,6 @@ bool dgMeshEffect::PlaneClip (const dgBigPlane& plane)
 	}
 
 	if ((negative + neutral) < pointCount) {
-//		dgInt32 neutralMark = IncLRU();
-//		dgInt32 posMark = IncLRU();
-//		dgInt32 negMark = IncLRU();
 		dgPolyhedra::Iterator iter (*this);
 
 		for (iter.Begin(); iter; iter ++){
@@ -2998,7 +3003,9 @@ bool dgMeshEffect::PlaneClip (const dgBigPlane& plane)
 			} 
 		}
 		
-		
+		dgInt32 capCount = 0;
+		dgEdge* capEdges[extraVertex];
+
 		for (iter.Begin(); iter; iter ++){
 			dgEdge* const edge0 = &(*iter);
 			dgFloat64 side = test[edge0->m_incidentVertex];
@@ -3008,7 +3015,44 @@ bool dgMeshEffect::PlaneClip (const dgBigPlane& plane)
 					dgFloat64 side = test[edge1->m_incidentVertex];
 					if (side == dgFloat32 (0.0f)) {
 						if ((edge1->m_next != edge0) && (edge1->m_prev != edge0) && !FindEdge(edge0->m_incidentVertex, edge1->m_incidentVertex)) {
-							ConnectVertex (edge0, edge1);
+							dgEdge* devideEdge = ConnectVertex (edge1, edge0);
+							
+
+							bool found = false;
+							dgEdge* ptr = devideEdge->m_next->m_next;
+							do {
+								if (test[ptr->m_incidentVertex] != dgFloat32 (0.0f)) {
+									if (test[ptr->m_incidentVertex] < dgFloat32 (0.0f)) {
+										devideEdge = devideEdge->m_twin;
+									}
+									found = true;
+									break;
+								}
+								ptr = ptr->m_next;
+							} while (ptr != devideEdge);
+
+							if (!found) {
+								dgAssert (0);
+								dgEdge* ptr = devideEdge->m_next->m_next;
+								do {
+									if (test[ptr->m_incidentVertex] != dgFloat32 (0.0f)) {
+										if (test[ptr->m_incidentVertex] < dgFloat32 (0.0f)) {
+											devideEdge = devideEdge->m_twin;
+										}
+										found = true;
+										break;
+									}
+									ptr = ptr->m_next;
+								} while (ptr != devideEdge);
+							}
+							dgAssert(found);
+
+
+							capEdges[capCount] = devideEdge;
+							dgAssert (capEdges[capCount]);
+							capCount ++;
+							dgAssert (capCount < sizeof (capEdges)/ sizeof (capEdges[0]));
+
 						}
 						break;
 					}
@@ -3027,52 +3071,91 @@ bool dgMeshEffect::PlaneClip (const dgBigPlane& plane)
 				edge->m_twin->m_mark = mark;
 			}
 		}
-	
+
+
 		for (dgList<dgEdge*>::dgListNode* ptr = edgeEdge.GetFirst(); ptr; ptr = ptr->GetNext()) {
 			dgEdge* const edge = ptr->GetInfo();
 			DeleteEdge(edge);
 		}
-		
-		for (iter.Begin(); iter; iter ++){
-			dgEdge* const edge = &(*iter);
-			if (edge->m_incidentFace < 0) {
-				edge->m_incidentFace = 1;
-			}
+
+		for (dgInt32 i = 0; i < capCount; i ++) {
+			dgEdge* const edge = capEdges[i];
+			edge->m_incidentFace = faceIdEnumeration;
 		}
+		faceIdEnumeration ++;
 	}
 
-	RemoveUnusedVertices(NULL);
+/*
+#ifdef _DEBUG
+	dgPolyhedra::Iterator iter (*this);
+	for (iter.Begin(); iter; iter ++){
+		 dgEdge* const face = &(*iter);
+
+		 dgInt32 id = face->m_incidentFace;
+		 dgEdge* ptr = face;
+		 do {
+			 dgAssert (ptr->m_incidentFace == id);
+			 ptr = ptr->m_next;
+		 } while (ptr != face);
+	}
+#endif
+*/
+//	RemoveUnusedVertices(NULL);
 	return true;
 }
 
 
 
 
-dgMeshEffect* dgMeshEffect::ConvexConvexMeshIntersection (const dgMeshEffect* const convexMesh) const
+dgMeshEffect* dgMeshEffect::ConvexMeshIntersection (const dgMeshEffect* const convexMesh) const
 {
 	dgMeshEffect* const convexIntersection = new (GetAllocator()) dgMeshEffect (*this);
 	convexIntersection->RemoveUnusedVertices(NULL);
 
+	const dgInt32 enunBase = 10000000;
+	dgInt32 faceIdEnumeration = enunBase;
 	dgInt32 mark = convexMesh->IncLRU();
 	dgPolyhedra::Iterator iter (*convexMesh);
+
+	dgTree<dgEdge*,dgInt32> faceMap(GetAllocator());
 	for (iter.Begin(); iter; iter ++){
-		 dgEdge* const face = &(*iter);
-		if (face->m_mark != mark) {
-			dgEdge* ptr = face;
+		 dgEdge* const convexFace = &(*iter);
+		if (convexFace->m_mark != mark) {
+			dgEdge* ptr = convexFace;
 			do {
 				ptr->m_mark = mark;
 				ptr = ptr->m_next;
-			} while (ptr != face);
-			dgBigVector normal (FaceNormal(face, &convexMesh->m_points[0].m_x, sizeof(dgBigVector)));
-			dgBigPlane plane (normal, - (convexMesh->m_points[face->m_incidentVertex] % normal));
-			plane = plane.Scale (dgFloat64(1.0f)/ sqrt (plane % plane));
-			if (!convexIntersection->PlaneClip(plane)) {
+			} while (ptr != convexFace);
+			faceMap.Insert(convexFace, faceIdEnumeration);
+			if (!convexIntersection->PlaneClip(*convexMesh, convexFace, faceIdEnumeration)) {
 				delete convexIntersection;
 				return NULL;
 			}
 		}
 	}
 
+	mark = convexIntersection->IncLRU();
+	dgPolyhedra::Iterator convexIntersectionIter (*convexIntersection);
+	for (convexIntersectionIter.Begin(); convexIntersectionIter; convexIntersectionIter ++){
+		 dgEdge* const face = &(*convexIntersectionIter);
+		 if ((face->m_incidentFace >= enunBase) && (face->m_mark != mark)) {
+			 dgEdge* ptr = face;
+			 dgAssert (faceMap.Find(face->m_incidentFace));
+			 dgEdge* const convexFace = faceMap.Find(face->m_incidentFace)->GetInfo();
+			 do {
+				 dgAssert (face->m_incidentFace == ptr->m_incidentFace);
+				 const dgBigVector& point = convexIntersection->m_points[ptr->m_incidentVertex];
+//				 dgVertexAtribute attibute (convexMesh->InterpolateVertex (point, convexFace));
+//				 convexIntersection->AddAtribute (attibute);
+//				 ptr->m_userData = m_atribCount - 1;
+
+				 ptr->m_mark = mark;
+				 ptr = ptr->m_next;
+			 } while (ptr != face);
+		 }
+	}
+
+	convexIntersection->RemoveUnusedVertices(NULL);
 	
 	return convexIntersection;
 }

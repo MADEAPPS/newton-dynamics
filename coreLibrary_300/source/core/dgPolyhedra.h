@@ -104,7 +104,7 @@ class dgPolyhedra: public dgTree <dgEdge, dgEdgeKey>
 	
 	bool FlipEdge (dgEdge* const edge);
 	dgEdge* SpliteEdge (dgInt32 newIndex, dgEdge* const edge);
-	dgBigVector FaceNormal (dgEdge* const face, const dgFloat64* const vertex, dgInt32 strideInBytes) const;
+	dgBigVector FaceNormal (const dgEdge* const face, const dgFloat64* const vertex, dgInt32 strideInBytes) const;
 
 	void BeginConectedSurface() const;
 	bool GetConectedSurface (dgPolyhedra &polyhedra) const;

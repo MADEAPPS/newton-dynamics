@@ -7928,10 +7928,10 @@ NewtonMesh* NewtonMeshIntersection (const NewtonMesh* const mesh, const NewtonMe
 	return (NewtonMesh*) ((dgMeshEffect*) mesh)->Intersection (dgMatrix (clipperMatrix), (dgMeshEffect*)clipper);
 }
 
-NewtonMesh* NewtonMeshConvexConvexMeshIntersection (const NewtonMesh* const convexMeshA, const NewtonMesh* const convexMeshB)
+NewtonMesh* NewtonMeshConvexMeshIntersection (const NewtonMesh* const mesh, const NewtonMesh* const convexMesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	return (NewtonMesh*) ((dgMeshEffect*) convexMeshA)->ConvexConvexMeshIntersection ((dgMeshEffect*)convexMeshB);
+	return (NewtonMesh*) ((dgMeshEffect*) mesh)->ConvexMeshIntersection ((dgMeshEffect*)convexMesh);
 }
 
 void NewtonRemoveUnusedVertices(const NewtonMesh* const mesh, int* const vertexRemapTable)

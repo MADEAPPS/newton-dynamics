@@ -3263,16 +3263,24 @@ dgEdge* dgMeshEffect::InsertEdgeVertex (dgEdge* const edge, dgFloat64 param)
 
 
 
-dgMeshEffect::dgVertexAtribute dgMeshEffect::InterpolateVertex (const dgBigVector& srcPoint, dgEdge* const face) const
+dgMeshEffect::dgVertexAtribute dgMeshEffect::InterpolateVertex (const dgBigVector& srcPoint, const dgEdge* const face) const
 {
 	const dgBigVector point (srcPoint);
 
 	dgVertexAtribute attribute;
 	memset (&attribute, 0, sizeof (attribute));
+
+//	dgBigVector normal (FaceNormal(face, &m_points[0].m_x, sizeof(dgBigVector)));
+//	normal = normal.Scale3 (dgFloat64 (1.0f) / sqrt (normal % normal));
+//	attribute.m_vertex = srcPoint;
+//	attribute.m_normal_x = normal.m_x;
+//	attribute.m_normal_y = normal.m_y;
+//	attribute.m_normal_z = normal.m_z;
+
 	dgFloat64 tol = dgFloat32 (1.0e-4f);
 	for (dgInt32 i = 0; i < 4; i ++) {
-		dgEdge* ptr = face;
-		dgEdge* const edge0 = ptr;
+		const dgEdge* ptr = face;
+		const dgEdge* const edge0 = ptr;
 		dgBigVector q0 (m_points[ptr->m_incidentVertex]);
 
 		ptr = ptr->m_next;

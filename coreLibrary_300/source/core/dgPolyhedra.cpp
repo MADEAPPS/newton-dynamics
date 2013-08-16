@@ -413,10 +413,10 @@ void dgPolyhedra::DeleteFace(dgEdge* const face)
 
 
 
-dgBigVector dgPolyhedra::FaceNormal (dgEdge* const face, const dgFloat64* const pool, dgInt32 strideInBytes) const
+dgBigVector dgPolyhedra::FaceNormal (const dgEdge* const face, const dgFloat64* const pool, dgInt32 strideInBytes) const
 {
 	dgInt32 stride = strideInBytes / sizeof (dgFloat64);
-	dgEdge* edge = face;
+	const dgEdge* edge = face;
 	dgBigVector p0 (&pool[edge->m_incidentVertex * stride]);
 	edge = edge->m_next;
 	dgBigVector p1 (&pool[edge->m_incidentVertex * stride]);

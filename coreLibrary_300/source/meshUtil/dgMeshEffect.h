@@ -169,8 +169,9 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	dgMeshEffect* Intersection (const dgMatrix& matrix, const dgMeshEffect* const clipper) const;
 	void ClipMesh (const dgMatrix& matrix, const dgMeshEffect* const clipper, dgMeshEffect** const top, dgMeshEffect** const bottom) const;
 
-	bool PlaneClip (const dgBigPlane& plane);
-	dgMeshEffect* ConvexConvexMeshIntersection (const dgMeshEffect* const convexMesh) const;
+	//bool PlaneClip (const dgBigPlane& plane);
+	
+	dgMeshEffect* ConvexMeshIntersection (const dgMeshEffect* const convexMesh) const;
 
 	dgMeshEffect* GetFirstLayer ();
 	dgMeshEffect* GetNextLayer (dgMeshEffect* const layer);
@@ -282,7 +283,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	void SetFaceMaterial (const void* const face, int materialID) const;
 
 	
-	dgVertexAtribute InterpolateVertex (const dgBigVector& point, dgEdge* const face) const;
+	dgVertexAtribute InterpolateVertex (const dgBigVector& point, const dgEdge* const face) const;
 
 	bool Sanity () const;
 
@@ -309,9 +310,9 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 //	void ReverseMergeFaces (dgMeshEffect* const source);
 	dgVertexAtribute InterpolateEdge (dgEdge* const edge, dgFloat64 param) const;
 
+	bool PlaneClip (const dgMeshEffect& convexMesh, const dgEdge* const face, dgInt32& faceIdEnumeration);
+
 	dgMeshEffect* GetNextLayer (dgInt32 mark);
-
-
 	dgMeshEffect* CreateVoronoiConvex (const dgBigVector* const conevexPointCloud, dgInt32 count, dgInt32 materialId, const dgMatrix& textureProjectionMatrix, dgFloat32 normalAngleInRadians) const;
 
 
