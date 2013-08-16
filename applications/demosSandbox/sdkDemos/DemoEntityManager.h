@@ -87,10 +87,9 @@ class DemoEntityManager: public wxGLCanvas, public dList <DemoEntity*>
 	void LoadScene (const char* const name);
 	void SerializedPhysicScene (const char* const name);
 	void DeserializedPhysicScene (const char* const name);
-
 	
 
-	void Print (const dVector& color, dFloat x, dFloat y, const char *fmt, ... ) const;
+	int Print (const dVector& color, dFloat x, dFloat y, const char *fmt, ... ) const;
 
 
 	void Cleanup ();

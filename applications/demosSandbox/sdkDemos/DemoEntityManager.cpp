@@ -613,7 +613,7 @@ float DemoEntityManager::GetPhysicsTime()
 
 
 
-void DemoEntityManager::Print (const dVector& color, dFloat x, dFloat y, const char *fmt, ... ) const
+int DemoEntityManager::Print (const dVector& color, dFloat x, dFloat y, const char *fmt, ... ) const
 {
 	glColor3f(color.m_x, color.m_y, color.m_z);
 
@@ -664,7 +664,7 @@ void DemoEntityManager::Print (const dVector& color, dFloat x, dFloat y, const c
 	glPopMatrix();
 	glLoadIdentity();
 
-
+	return y;
 }
 
 

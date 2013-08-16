@@ -229,17 +229,16 @@ class AdvancePlayerControllerManager: public CustomPlayerControllerManager
 	{
 		if (m_player->m_helpKey.GetPushButtonState()) {
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			dAssert (0);
-			scene->Print (color, 10, lineNumber + 0, "Navigation               Key");
-			scene->Print (color, 10, lineNumber + 220, "walk forward:            W");
-			scene->Print (color, 10, lineNumber + 240, "walk backward:           S");
-			scene->Print (color, 10, lineNumber + 260, "strafe right:            D");
-			scene->Print (color, 10, lineNumber + 280, "strafe left:             A");
-			scene->Print (color, 10, lineNumber + 300, "toggle camera mode:      C");
-			scene->Print (color, 10, lineNumber + 320, "jump:                    Space");
-			scene->Print (color, 10, lineNumber + 340, "shoot random prop:       Enter");
-			scene->Print (color, 10, lineNumber + 360, "hide help:               H");
-			scene->Print (color, 10, lineNumber + 380, "change player direction: Left mouse button");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "Navigation               Key");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "walk forward:            W");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "walk backward:           S");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "strafe right:            D");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "strafe left:             A");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "toggle camera mode:      C");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "jump:                    Space");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "shoot random prop:       Enter");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help:               H");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "change player direction: Left mouse button");
 		}
 	}
 

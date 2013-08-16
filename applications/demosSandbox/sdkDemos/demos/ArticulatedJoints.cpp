@@ -87,16 +87,15 @@ class ArticulatedEntityModel: public DemoEntity
 	{
 //		if (m_player->m_helpKey.GetPushButtonState()) {
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			lineNumber += 20;
-			scene->Print (color, 10, lineNumber + 00, "Navigation               Key");
-			scene->Print (color, 10, lineNumber + 20, "drive forward:           W");
-			scene->Print (color, 10, lineNumber + 40, "drive backward:          S");
-			scene->Print (color, 10, lineNumber + 60, "turn right:              D");
-			scene->Print (color, 10, lineNumber + 80, "turn left:               A");
-//			scene->Print (color, 10, lineNumber + 00, "toggle camera mode:      C");
-//			scene->Print (color, 10, lineNumber + 20, "jump:                    Space");
-//			scene->Print (color, 10, lineNumber + 40, "hide help:               H");
-//			scene->Print (color, 10, lineNumber + 60, "change player direction: Left mouse button");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "Navigation               Key");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "drive forward:           W");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "drive backward:          S");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right:              D");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn left:               A");
+//			lineNumber = scene->Print (color, 10, lineNumber + 20, "toggle camera mode:      C");
+//			lineNumber = scene->Print (color, 10, lineNumber + 20, "jump:                    Space");
+//			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help:               H");
+//			lineNumber = scene->Print (color, 10, lineNumber + 20, "change player direction: Left mouse button");
 //		}
 	}
 

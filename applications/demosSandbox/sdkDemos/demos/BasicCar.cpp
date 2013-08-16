@@ -731,20 +731,20 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 		glEnd();
 	}
 
-	void DrawHelp(DemoEntityManager* const scene) const
+	void DrawHelp(DemoEntityManager* const scene, int lineNumber) const
 	{
 		if (m_player->m_helpKey.GetPushButtonState()) {
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			scene->Print (color, 10, 200, "Vehicle driving keyboard control:   Joystick control");
-			scene->Print (color, 10, 220, "accelerator : 'W'                   stick forward");
-			scene->Print (color, 10, 240, "brakes      : 'S'                   stick back");
-			scene->Print (color, 10, 260, "turn right  : 'D'                   stick right");
-			scene->Print (color, 10, 280, "turn right  : 'S'                   stick left");
-			scene->Print (color, 10, 300, "gear up     : '>'                   button 2");
-			scene->Print (color, 10, 320, "gear down   : '<'                   button 4");
-			scene->Print (color, 10, 340, "gear neutral: enter                 button 4");
-			scene->Print (color, 10, 360, "hand brakes : space                 button 1");
-			scene->Print (color, 10, 380, "hide help   : H");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "Vehicle driving keyboard control:   Joystick control");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "accelerator : 'W'                   stick forward");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "brakes      : 'S'                   stick back");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right  : 'D'                   stick right");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right  : 'S'                   stick left");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear up     : '>'                   button 2");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear down   : '<'                   button 4");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear neutral: enter                 button 4");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "hand brakes : space                 button 1");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help   : H");
 		}
 	}
 
@@ -778,7 +778,7 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 		DrawGear(speed, x, y, m_player->m_gearMap[engine->GetGear()], gageSize);
 
 		//print controllers help 
-		DrawHelp(scene);
+		DrawHelp(scene, lineNumber);
 
 		// restore color and blend mode
 		glDisable (GL_BLEND);

@@ -208,11 +208,10 @@ class dConvexCastManager: public CustomControllerManager<dConvexCastRecord>
 	void RenderHelp (DemoEntityManager* const scene, int lineNumber)
 	{
 		if (m_helpKey.GetPushButtonState()) {
-			dAssert (0);
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			scene->Print (color, 10, 100, "mouse point and right click to cast current convex shape");
-			scene->Print (color, 10, 120, "space	   : change casting shape");
-			scene->Print (color, 10, 140, "h		   : hide help");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "mouse point and right click to cast current convex shape");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "space	   : change casting shape");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "h		   : hide help");
 		}
 	}
 
