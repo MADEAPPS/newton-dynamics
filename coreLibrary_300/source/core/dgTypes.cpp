@@ -89,15 +89,15 @@ static inline dgInt32 cmp_vertex (const dgFloat64* const v1, const dgFloat64* co
 
 static dgInt32 SortVertices (dgFloat64* const vertexList,  dgInt32 stride, dgInt32 compareCount, dgInt32 vertexCount, dgFloat64 tolerance)
 {
-	dgFloat64 xc = 0;
-	dgFloat64 yc = 0;
-	dgFloat64 zc = 0;
-	dgFloat64 x2c = 0;
-	dgFloat64 y2c = 0;
-	dgFloat64 z2c = 0;
+	dgFloat64 xc = dgFloat64 (0.0f);
+	dgFloat64 yc = dgFloat64 (0.0f);
+	dgFloat64 zc = dgFloat64 (0.0f);
+	dgFloat64 x2c = dgFloat64 (0.0f);
+	dgFloat64 y2c = dgFloat64 (0.0f);
+	dgFloat64 z2c = dgFloat64 (0.0f);
 
-	dgBigVector minP (1e10, 1e10, 1e10, 0);
-	dgBigVector maxP (-1e10, -1e10, -1e10, 0);
+	dgBigVector minP (dgFloat64 (1.0e10f), dgFloat64 (1.0e10f), dgFloat64 (1.0e10f), dgFloat64 (0.0f));
+	dgBigVector maxP (dgFloat64 (-1.0e10f), dgFloat64 (-1.0e10f), dgFloat64 (-1.0e10f), dgFloat64 (0.0f));
 	dgInt32 k = 0;
 	for (dgInt32 i = 0; i < vertexCount; i ++) {
 		dgFloat64 x  = vertexList[k + 2];
@@ -137,13 +137,13 @@ static dgInt32 SortVertices (dgFloat64* const vertexList,  dgInt32 stride, dgInt
 
 	dgBigVector del (maxP - minP);
 	dgFloat64 minDist = dgMin (del.m_x, del.m_y, del.m_z);
-	if (minDist < 1.0e-3) {
-		minDist = 1.0e-3;
+	if (minDist < dgFloat64 (1.0e-3f)) {
+		minDist = dgFloat64 (1.0e-3f);
 	}
 
-	dgFloat64 tol = tolerance * minDist + 1.0e-12f;
-	dgFloat64 sweptWindow = 2.0 * tol;
-	sweptWindow += 1.0e-4;
+	dgFloat64 tol = tolerance * minDist + dgFloat64 (1.0e-12f);
+	dgFloat64 sweptWindow = dgFloat64 (2.0f) * tol;
+	sweptWindow += dgFloat64 (1.0e-4f);
 
 	x2c = vertexCount * x2c - xc * xc;
 	y2c = vertexCount * y2c - yc * yc;
