@@ -29,7 +29,9 @@
 dNewton::ScopeLock::ScopeLock (unsigned* const lock)
 	:m_atomicLock(lock)
 {
-	while (NewtonAtomicSwap((int*)m_atomicLock, 1)) {
+//	while (NewtonAtomicSwap((int*)m_atomicLock, 1)) {
+	const int maxCount = 1024 * 32;
+	for (int i = 0; (i < maxCount) && NewtonAtomicSwap((int*)m_atomicLock, 1); i ++) {
 		NewtonYield();
 	}
 }
