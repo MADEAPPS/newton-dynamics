@@ -1951,12 +1951,9 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 	pool[count + 7] = dgBigVector ( pMax.m_x, pMax.m_y, pMax.m_z, dgFloat64 (0.0f));
 	count += 8;
 
-	dgAssert (count >= 12);
 	dgStack<dgInt32> indexList(count);
 	count = dgVertexListToIndexList(&pool[0].m_x, sizeof (dgBigVector), 3, count, &indexList[0], dgFloat64 (5.0e-2f));	
-	if (count < 4) {
-		return NULL;
-	}
+	dgAssert (count >= 8);
 
 	dgFloat64 maxSize = dgMax(pMax.m_x - pMin.m_x, pMax.m_y - pMin.m_y, pMax.m_z - pMin.m_z);
 	pMin -= dgBigVector (maxSize, maxSize, maxSize, dgFloat64 (0.0f));
