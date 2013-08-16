@@ -174,10 +174,6 @@ dgFloat64 dgConvexHull4dTetraherum::Evalue (const dgHullVector* const pointArray
 		exactMatrix[2][i] = dgGoogol(p3[i]) - dgGoogol(p0[i]);
 		exactMatrix[3][i] = dgGoogol(point[i]) - dgGoogol(p0[i]);
 	}
-
-//	dgGoogol exactDet (Determinant4x4(exactMatrix));
-//	det = exactDet.GetAproximateValue();
-//	return det;
 	return Determinant4x4(exactMatrix);
 }
 
@@ -199,7 +195,6 @@ dgBigVector dgConvexHull4dTetraherum::CircumSphereCenter (const dgHullVector* co
 		matrix[i][3] = dgGoogol (1.0f);
 	}
 	dgGoogol det (Determinant4x4(matrix));
-	//dgFloat64 invDen = dgFloat64 (1.0f) / (det.GetAproximateValue() * dgFloat32 (2.0f));
 	dgFloat64 invDen = dgFloat64 (1.0f) / (dgFloat64(det) * dgFloat64 (2.0f));
 
 	dgBigVector centerOut;
@@ -214,17 +209,11 @@ dgBigVector dgConvexHull4dTetraherum::CircumSphereCenter (const dgHullVector* co
 			matrix[i][3] = dgGoogol (1.0f);
 		}
 		dgGoogol det (Determinant4x4(matrix));
-		//dgFloat64 val = det.GetAproximateValue() * sign;
 		dgFloat64 val = dgFloat64 (det) * sign;
 		sign *= dgFloat64 (-1.0f);
 		centerOut[k] = val * invDen; 
 	}
 	centerOut[3] = dgFloat32 (0.0f);
-//	dgBigVector radius (points[0] - centerOut);
-//dgFloat32 a = (points[0] - centerOut) % (points[0] - centerOut);
-//dgFloat32 b = (points[1] - centerOut) % (points[1] - centerOut);
-//dgFloat32 c = (points[2] - centerOut) % (points[2] - centerOut);
-//dgFloat32 d = (points[3] - centerOut) % (points[3] - centerOut);
 	return centerOut;
 }
 
@@ -246,35 +235,6 @@ dgConvexHull4d::dgConvexHull4d (dgMemoryAllocator* const allocator)
 dgConvexHull4d::dgConvexHull4d (dgMemoryAllocator* const allocator, const dgBigVector* const vertexCloud, dgInt32 count, dgFloat32 distTol)
 	:dgList<dgConvexHull4dTetraherum>(allocator), m_mark(0), m_count (0), m_diag(), m_points(count, allocator) 
 {
-/*
-#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-	dgUnsigned32 controlWorld = dgControlFP (0xffffffff, 0);
-	dgControlFP (_PC_53, _MCW_PC);
-#endif
-
-//	InitVertexArray(vertexCloud, count);
-
-	dgInt32 treeCount = count / (DG_VERTEX_CLUMP_SIZE_4D>>1); 
-	if (treeCount < 4) {
-		treeCount = 4;
-	}
-	treeCount *= 2;
-
-	dgStack<dgHullVector> points (count);
-	dgStack<dgHullVector> convexPoints (count);
-	dgStack<dgAABBPointTree4dClump> treePool (treeCount);
-
-	count = InitVertexArray(&convexPoints[0], &points[0], vertexCloud, count);
-
-	if (m_count >= 4) {
-		dgAssert (0);
-//		CalculateConvexHull (distTol);
-	}
-
-#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-	dgControlFP (controlWorld, _MCW_PC);
-#endif
-*/
 	BuildHull (allocator, vertexCloud, count, distTol);
 }
 
@@ -300,8 +260,6 @@ dgFloat64 dgConvexHull4d::RoundToFloat (dgFloat64 val) const
 
 void dgConvexHull4d::BuildHull (dgMemoryAllocator* const allocator, const dgBigVector* const vertexCloud, dgInt32 count, dgFloat64 distTol)
 {
-	//	InitVertexArray(vertexCloud, count);
-
 	dgInt32 treeCount = count / (DG_VERTEX_CLUMP_SIZE_4D>>1); 
 	if (treeCount < 4) {
 		treeCount = 4;
@@ -380,29 +338,17 @@ dgInt32 dgConvexHull4d::BuildNormalList (dgBigVector* const normalArray) const
 	start = 7;
 	TessellateTriangle  (subdivitions, p4, p1, p3, count, normalArray, start);
 
-/*
-	for (dgInt32 i = 0; i < count; i ++) {
-		dgBigVector p = normalArray[i];
-		p.m_w = 1.0f;
-		p = p.Scale4 (1.0f / sqrt (p.DotProduct4(p)));
-		normalArray[count + i * 2] = p;
-		p = p.Scale4(dgFloat64 (-1.0f));
-		normalArray[count + i * 2 + 1] = p;
-	}
-	count *= 3;
-*/
 	return count;
 }
 
 
-//dgInt32 dgConvexHull4d::SupportVertex (int count, const dgHullVector* const points, const dgBigVector& dir) const
 dgInt32 dgConvexHull4d::SupportVertex (dgAABBPointTree4d** const treePointer, const dgHullVector* const points, const dgBigVector& dir) const
 {
 /*
 	dgFloat64 dist = dgFloat32 (-1.0e10f);
 	dgInt32 index = -1;
-	for (dgInt32 i = 0; i < count; i ++) {
-		dgFloat64 dist1 = dir.DotProduct4(points[i]);
+	for (dgInt32 i = 0; i < m_count; i ++) {
+		dgFloat64 dist1 = dir.DotProduct4(points[i]).m_x;
 		if (dist1 > dist) {
 			dist = dist1;
 			index = i;
@@ -657,7 +603,6 @@ dgInt32 dgConvexHull4d::InitVertexArray(dgHullVector* const points, const dgBigV
 		points[i].m_mark = 0;
 	}
 
-
 	dgSort(points, count, ConvexCompareVertex);
 	dgInt32 indexCount = 0;
 	for (int i = 1; i < count; i ++) {
@@ -678,8 +623,6 @@ dgInt32 dgConvexHull4d::InitVertexArray(dgHullVector* const points, const dgBigV
 
 	dgAABBPointTree4d* tree = BuildTree (NULL, points, count, 0, (dgInt8**) &memoryPool, maxMemSize);
 
-
-	//dgBigVector boxSize (tree->m_box[1].Sub4(tree->m_box[0]));	
 	dgBigVector boxSize (tree->m_box[1] - tree->m_box[0]);	
 	m_diag = dgFloat32 (sqrt (boxSize.DotProduct4(boxSize).m_x));
 
@@ -692,7 +635,6 @@ dgInt32 dgConvexHull4d::InitVertexArray(dgHullVector* const points, const dgBigV
 	dgInt32 index = SupportVertex (&tree, points, normalArray[0]);
 	convexPoints[0] = points[index];
 	points[index].m_mark = 1;
-
 
 	bool validTetrahedrum = false;
 	dgBigVector e1 (dgFloat64 (0.0f), dgFloat64 (0.0f), dgFloat64 (0.0f), dgFloat64 (0.0f)) ;
@@ -725,7 +667,6 @@ dgInt32 dgConvexHull4d::InitVertexArray(dgHullVector* const points, const dgBigV
 		dgInt32 index = SupportVertex (&tree, points, normalArray[i]);
 		dgAssert (index >= 0);
 		dgAssert (index < count);
-		//e2 = points[index].Sub4(convexPoints[0]);
 		e2 = points[index] - convexPoints[0];
 		e2.m_w = dgFloat64 (0.0f);
 		dgFloat64 den = e2.DotProduct4(e2).m_x;
@@ -739,9 +680,6 @@ dgInt32 dgConvexHull4d::InitVertexArray(dgHullVector* const points, const dgBigV
 			}
 
 			if (cosAngle < 0.9f) {
-//				convexPoints[2] = points[index];
-//				points[index].m_mark = 1;
-//				validTetrahedrum = true;
 				break;
 			}
 		}
@@ -999,9 +937,6 @@ void dgConvexHull4d::CalculateConvexHull (dgAABBPointTree4d* vertexTree, dgHullV
 	distTol = fabs (distTol) * m_diag;
 	dgListNode* const nodes0 = AddFace (0, 1, 2, 3);
 	dgListNode* const nodes1 = AddFace (0, 1, 3, 2);
-	//	nodes[2] = AddFace (3, 2, 0, 4);
-	//	nodes[3] = AddFace (3, 1, 2, 4);
-	//	nodes[4] = AddFace (3, 0, 1, 4);
 
 	dgList<dgListNode*> boundaryFaces(GetAllocator());
 	boundaryFaces.Append(nodes0);
@@ -1022,7 +957,6 @@ void dgConvexHull4d::CalculateConvexHull (dgAABBPointTree4d* vertexTree, dgHullV
 		dgConvexHull4dTetraherum* const face = &faceNode->GetInfo();
 		dgConvexHull4dTetraherum::dgTetrahedrumPlane planeEquation (face->GetPlaneEquation (hullVertexArray));
 
-		//dgInt32 index = SupportVertex (count, &hullVertexArray[currentIndex], planeEquation) + currentIndex;
 		dgInt32 index = SupportVertex (&vertexTree, points, planeEquation);
 
 		const dgHullVector& p = points[index];
