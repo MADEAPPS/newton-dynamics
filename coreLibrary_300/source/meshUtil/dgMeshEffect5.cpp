@@ -3109,6 +3109,8 @@ xxx ++;
 
 dgMeshEffect* dgMeshEffect::ConvexMeshIntersection (const dgMeshEffect* const convexMesh) const
 {
+return new (GetAllocator()) dgMeshEffect (*convexMesh);
+
 	dgMeshEffect* const convexIntersection = new (GetAllocator()) dgMeshEffect (*this);
 	convexIntersection->RemoveUnusedVertices(NULL);
 

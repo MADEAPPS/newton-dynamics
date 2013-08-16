@@ -95,7 +95,10 @@ dgConvexHull4dTetraherum::dgConvexHull4dTetraherum()
 	m_debugID = debugID;
 	debugID ++;
 #endif
+	static dgInt32 m_monotonicID;
 
+	m_uniqueID = m_monotonicID;
+	m_monotonicID ++;
 }
 
 void dgConvexHull4dTetraherum::Init (const dgHullVector* const points, dgInt32 v0, dgInt32 v1, dgInt32 v2, dgInt32 v3)
@@ -279,6 +282,21 @@ dgConvexHull4d::dgConvexHull4d (dgMemoryAllocator* const allocator, const dgBigV
 dgConvexHull4d::~dgConvexHull4d(void)
 {
 }
+
+
+dgFloat64 dgConvexHull4d::RoundToFloat (dgFloat64 val) const
+{
+	dgInt32 exp;
+	dgFloat64 mantissa = frexp(val, &exp);
+
+	const dgFloat64 power = 1<<23;
+	const dgFloat64 invPower = dgFloat64 (1.0f) / power;
+	mantissa = floor(mantissa * power) * invPower;
+
+	dgFloat64 val1 = ldexp (mantissa, exp);
+	return val1;
+}
+
 
 void dgConvexHull4d::BuildHull (dgMemoryAllocator* const allocator, const dgBigVector* const vertexCloud, dgInt32 count, dgFloat64 distTol)
 {
@@ -929,7 +947,7 @@ void dgConvexHull4d::InsertNewVertex(dgInt32 vertexIndex, dgListNode* const fron
 		}
 	}
 
-	dgTree<dgListNode*, dgListNode*> perimeter(GetAllocator());
+    dgTree<dgListNode*, dgInt32> perimeter(GetAllocator());
 	for (dgList<dgListNode*>::dgListNode* deleteNode = deletedFaces.GetFirst(); deleteNode; deleteNode = deleteNode->GetNext()) {
 		dgListNode* const deleteTetraNode = deleteNode->GetInfo();
 		dgConvexHull4dTetraherum* const deletedTetra = &deleteTetraNode->GetInfo();
@@ -939,8 +957,8 @@ void dgConvexHull4d::InsertNewVertex(dgInt32 vertexIndex, dgListNode* const fron
 			dgConvexHull4dTetraherum* const twinTetra = &twinNode->GetInfo();
 
 			if (twinTetra->GetMark() != mark) {
-				if (!perimeter.Find(twinNode)) {
-					perimeter.Insert(twinNode, twinNode);
+				if (!perimeter.Find(twinTetra->m_uniqueID)) {
+					perimeter.Insert(twinNode, twinTetra->m_uniqueID);
 				}
 			}
 			deletedTetra->m_faces[i].m_twin = NULL;
@@ -948,7 +966,7 @@ void dgConvexHull4d::InsertNewVertex(dgInt32 vertexIndex, dgListNode* const fron
 	}
 
 	dgList<dgListNode*> coneList(GetAllocator());
-	dgTree<dgListNode*, dgListNode*>::Iterator iter (perimeter);
+	dgTree<dgListNode*, dgInt32>::Iterator iter (perimeter);
 	for (iter.Begin(); iter; iter ++) {
 		dgListNode* const perimeterNode = iter.GetNode()->GetInfo();
 		dgConvexHull4dTetraherum* const perimeterTetra = &perimeterNode->GetInfo();

@@ -20,9 +20,8 @@
 #include "PhysicsUtils.h"
 
 #define INITIAL_DELAY				1000
-//#define INITIAL_DELAY				0
-#define NUMBER_OF_INTERNAL_PARTS		20
-//#define NUMBER_OF_INTERNAL_PARTS		4
+//#define NUMBER_OF_INTERNAL_PARTS		20
+#define NUMBER_OF_INTERNAL_PARTS		0
 
 #define BREAK_FORCE_IN_GRAVITIES	6
 //#define BREAK_FORCE_IN_GRAVITIES	1
@@ -288,7 +287,6 @@ class SimpleFracturedEffectEntity: public DemoEntity
 			dFloat Izz; 
 			dFloat mass; 
 
-
 			dVector com;
 			dVector veloc;
 			dVector omega;
@@ -311,7 +309,7 @@ class SimpleFracturedEffectEntity: public DemoEntity
 				//entity->SetMatrix(*scene, rotation, matrix.m_posit);
 				//entity->InterpolateMatrix (*scene, 1.0f);
 				scene->Append(entity);
-
+/*
 				int materialId = 0;
 
 				dFloat debriMass = mass * atom.m_massFraction;
@@ -350,6 +348,7 @@ class SimpleFracturedEffectEntity: public DemoEntity
 
 				// set the force and torque call back function
 				NewtonBodySetForceAndTorqueCallback (rigidBody, PhysicsApplyGravityForce);
+*/
 			}
 
 			NewtonDestroyBody(m_myBody);

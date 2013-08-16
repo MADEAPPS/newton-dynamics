@@ -55,9 +55,6 @@
     <ClCompile Include="..\..\sdkDemos\demos\SceneCollision.cpp">
       <Filter>demos</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\demos\SimpleConvexShatter.cpp">
-      <Filter>demos</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\sdkDemos\toolBox\SkyBox.cpp">
       <Filter>tooBox</Filter>
     </ClCompile>
@@ -164,6 +161,9 @@
       <Filter>demos</Filter>
     </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\ArticulatedJoints.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\SimpleConvexFracturing.cpp">
       <Filter>demos</Filter>
     </ClCompile>
   </ItemGroup>

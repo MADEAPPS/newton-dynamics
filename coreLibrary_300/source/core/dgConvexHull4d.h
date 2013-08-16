@@ -86,6 +86,8 @@ class dgConvexHull4dTetraherum
 	public:
 	dgTetrahedrumFace m_faces[4];
 	dgInt32 m_mark;
+	dgInt32 m_uniqueID;
+
 #ifdef _DEBUG
 	dgInt32 m_debugID;
 #endif
@@ -132,6 +134,8 @@ class dgConvexHull4d: public dgList<dgConvexHull4dTetraherum>
 
 	dgAABBPointTree4d* BuildTree (dgAABBPointTree4d* const parent, dgHullVector* const points, dgInt32 count, dgInt32 baseIndex, dgInt8** const memoryPool, dgInt32& maxMemSize) const;
 
+	protected:
+	dgFloat64 RoundToFloat (dgFloat64 val) const;
 	dgInt32 m_mark;
 	dgInt32 m_count;
 	dgFloat64 m_diag;

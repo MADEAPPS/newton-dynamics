@@ -427,6 +427,7 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLi
     <ClCompile Include="..\..\sdkDemos\demos\PuckSlide.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ScaledCollision.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\SimpleBooleans.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\SimpleConvexFracturing.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\UserStaticCollision.cpp" />
     <ClCompile Include="..\..\sdkDemos\DemoVisualDebugerListener.cpp" />
     <ClCompile Include="..\..\sdkDemos\toolBox\DebugDisplay.cpp" />
@@ -460,7 +461,6 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLi
     <ClCompile Include="..\..\sdkDemos\demos\MeshCollision.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\MultiRayCasting.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\SceneCollision.cpp" />
-    <ClCompile Include="..\..\sdkDemos\demos\SimpleConvexShatter.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\SoftBodies.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\SuperCar.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\UsingNewtonMeshTool.cpp" />
