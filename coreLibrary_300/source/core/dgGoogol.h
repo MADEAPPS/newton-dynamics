@@ -28,7 +28,7 @@
 #include "dgArray.h"
 #include "dgVector.h"
 
-
+#define _IMPLEMENT_USING_INTEGER_ARITHMETIC_
 
 //#define DG_GOOGOL_SIZE	16
 #define DG_GOOGOL_SIZE		4
@@ -60,11 +60,9 @@ class dgGoogol
 	dgGoogol InvSqrt () const;
 	dgGoogol Floor () const;
 	
-
-#ifdef _DEBUG
 	void Trace () const;
 	void ToString (char* const string) const;
-#endif
+
 
 	private:
 	void InitFloatFloat (dgFloat64 value);
@@ -78,9 +76,14 @@ class dgGoogol
 	void ExtendeMultiply (dgUnsigned64 a, dgUnsigned64 b, dgUnsigned64& high, dgUnsigned64& low) const;
 	void ScaleMantissa (dgUnsigned64* const out, dgUnsigned64 scale) const;
 
+#ifdef _IMPLEMENT_USING_INTEGER_ARITHMETIC_
 	dgInt32 m_sign;
 	dgInt32 m_exponent;
 	dgUnsigned64 m_mantissa[DG_GOOGOL_SIZE];
+#else
+	dgFloat64 m_value;
+#endif
+	
 
 	public:
 	static dgGoogol m_zero; 
@@ -118,9 +121,6 @@ class dgHugeVector: public dgTemplateVector<dgGoogol>
 	{
 		return (point % (*this)) + m_w;
 	}
-
-
-
 
 #ifdef _DEBUG
 	void Trace () const

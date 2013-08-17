@@ -93,10 +93,7 @@ dgDelaunayTetrahedralization::dgDelaunayTetrahedralization(dgMemoryAllocator* co
 	}
 #endif
 
-#ifdef _DEBUG
 	SortVertexArray ();
-#endif
-
 }
 
 dgDelaunayTetrahedralization::~dgDelaunayTetrahedralization()
@@ -117,7 +114,7 @@ dgInt32 dgDelaunayTetrahedralization::AddVertex (const dgBigVector& vertex)
 }
 
 
-#ifdef _DEBUG
+
 dgInt32 dgDelaunayTetrahedralization::CompareVertexByIndex(const dgHullVector* const  A, const dgHullVector* const B, void* const context)
 {
 	if (A->m_index < B ->m_index) {
@@ -136,9 +133,7 @@ void dgDelaunayTetrahedralization::SortVertexArray ()
 		dgConvexHull4dTetraherum* const tetra = &node->GetInfo();
 		for (dgInt32 i = 0; i < 4; i ++) {
 			dgConvexHull4dTetraherum::dgTetrahedrumFace& face = tetra->m_faces[i];
-			dgInt32 index = face.m_otherVertex;
-			face.m_otherVertex = points[index].m_index;
-			for (dgInt32 j = 0; j < 3; j ++) {
+			for (dgInt32 j = 0; j < 4; j ++) {
 				dgInt32 index = face.m_index[j];
 				face.m_index[j] = points[index].m_index;
 			}
@@ -148,7 +143,6 @@ void dgDelaunayTetrahedralization::SortVertexArray ()
 	dgSort(points, m_count, CompareVertexByIndex);
 }
 
-#endif
 
 
 void dgDelaunayTetrahedralization::RemoveUpperHull ()
@@ -156,18 +150,11 @@ void dgDelaunayTetrahedralization::RemoveUpperHull ()
 	dgSetPrecisionDouble precision;
 
 	dgListNode* nextNode = NULL;
-//	const dgHullVector* const points = &m_points[0];
 	for (dgListNode* node = GetFirst(); node; node = nextNode) {
 		nextNode = node->GetNext();
 
 		dgConvexHull4dTetraherum* const tetra = &node->GetInfo();
 		tetra->SetMark(0);
-
-//		const dgBigVector &p0 = points[tetra->m_faces[0].m_index[0]];
-//		const dgBigVector &p1 = points[tetra->m_faces[0].m_index[1]];
-//		const dgBigVector &p2 = points[tetra->m_faces[0].m_index[2]];
-//		const dgBigVector &p3 = points[tetra->m_faces[0].m_otherVertex];
-//		dgFloat64 w = GetTetraVolume (p0, p1, p2, p3);
 		dgFloat64 w = GetTetraVolume (tetra);
 		if (w >= dgFloat64 (0.0f)) {
 			DeleteFace(node);
@@ -194,21 +181,14 @@ void dgDelaunayTetrahedralization::DeleteFace (dgListNode* const node)
 	dgConvexHull4d::DeleteFace (node);
 }
 
-//dgFloat64 dgDelaunayTetrahedralization::GetTetraVolume (const dgBigVector& p0, const dgBigVector& p1, const dgBigVector& p2, const dgBigVector& p3) const
+
 dgFloat64 dgDelaunayTetrahedralization::GetTetraVolume (const dgConvexHull4dTetraherum* const tetra) const
 {
-	//	dgBigVector p1p0 (p1.Sub4(p0));
-	//	dgBigVector p2p0 (p2.Sub4(p0));
-	//	dgBigVector p3p0 (p3.Sub4(p0));
-	//	dgBigVector normal (p1p0.CrossProduct4 (p2p0, p3p0));
-	//  dgFloat64 det = normal.m_w;
-
 	const dgHullVector* const points = &m_points[0];
 	const dgBigVector &p0 = points[tetra->m_faces[0].m_index[0]];
 	const dgBigVector &p1 = points[tetra->m_faces[0].m_index[1]];
 	const dgBigVector &p2 = points[tetra->m_faces[0].m_index[2]];
-	const dgBigVector &p3 = points[tetra->m_faces[0].m_otherVertex];
-
+	const dgBigVector &p3 = points[tetra->m_faces[0].m_index[3]];
 
 	dgFloat64 matrix[3][3];
 	for (dgInt32 i = 0; i < 3; i ++) {
@@ -234,9 +214,6 @@ dgFloat64 dgDelaunayTetrahedralization::GetTetraVolume (const dgConvexHull4dTetr
 		exactMatrix[2][i] = dgGoogol(p3[i]) - dgGoogol(p0[i]);
 	}
 
-//	dgGoogol exactDet (Determinant3x3(exactMatrix));
-//	det = exactDet.GetAproximateValue();
-//	return det;
 	return Determinant3x3(exactMatrix);
 }
 

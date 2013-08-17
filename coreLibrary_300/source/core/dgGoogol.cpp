@@ -29,30 +29,350 @@ dgGoogol dgGoogol::m_two(2.0);
 dgGoogol dgGoogol::m_three(3.0);   
 dgGoogol dgGoogol::m_half(0.5);   
 
+#ifdef _IMPLEMENT_USING_INTEGER_ARITHMETIC_
 
-dgGoogol::dgGoogol(void)
-	:m_sign(0)
-	,m_exponent(0)
-{
-	memset (m_mantissa, 0, sizeof (m_mantissa));
-}
+	dgGoogol::dgGoogol(void)
+		:m_sign(0)
+		,m_exponent(0)
+	{
+		memset (m_mantissa, 0, sizeof (m_mantissa));
+	}
 
-dgGoogol::dgGoogol(dgFloat64 value)
-	:m_sign(0)
-	,m_exponent(0)
-{
-	dgInt32 exp;
-	dgFloat64 mantissa = fabs (frexp(value, &exp));
+	dgGoogol::dgGoogol(dgFloat64 value)
+		:m_sign(0)
+		,m_exponent(0)
+	{
+		dgInt32 exp;
+		dgFloat64 mantissa = fabs (frexp(value, &exp));
 
-	m_exponent = dgInt16 (exp);
-	m_sign = (value >= 0) ? 0 : 1;
+		m_exponent = dgInt16 (exp);
+		m_sign = (value >= 0) ? 0 : 1;
 
-	memset (m_mantissa, 0, sizeof (m_mantissa));
-	m_mantissa[0] = (dgInt64 (dgFloat64 (dgUnsigned64(1)<<62) * mantissa));
+		memset (m_mantissa, 0, sizeof (m_mantissa));
+		m_mantissa[0] = (dgInt64 (dgFloat64 (dgUnsigned64(1)<<62) * mantissa));
 
-	// it looks like GCC have problems with this
-	dgAssert (m_mantissa[0] >= 0);
-}
+		// it looks like GCC have problems with this
+		dgAssert (m_mantissa[0] >= 0);
+	}
+
+	void dgGoogol::CopySignedMantissa (dgUnsigned64* const mantissa) const
+	{
+		memcpy (mantissa, m_mantissa, sizeof (m_mantissa));
+		if (m_sign) {
+			NegateMantissa (mantissa);
+		}
+	}
+
+	dgGoogol::operator double() const
+	{
+		dgFloat64 mantissa = (dgFloat64(1.0f) / dgFloat64 (dgUnsigned64(1)<<62)) * dgFloat64 (m_mantissa[0]);
+		mantissa = ldexp(mantissa, m_exponent) * (m_sign ?  dgFloat64 (-1.0f) : dgFloat64 (1.0f));
+		return mantissa;
+	}
+
+	dgGoogol dgGoogol::operator+ (const dgGoogol &A) const
+	{
+		dgGoogol tmp;
+		dgAssert (dgInt64 (m_mantissa[0]) >= 0);
+		dgAssert (dgInt64 (A.m_mantissa[0]) >= 0);
+
+		if (m_mantissa[0] && A.m_mantissa[0]) {
+			dgUnsigned64 mantissa0[DG_GOOGOL_SIZE];
+			dgUnsigned64 mantissa1[DG_GOOGOL_SIZE];
+			dgUnsigned64 mantissa[DG_GOOGOL_SIZE];
+
+			CopySignedMantissa (mantissa0);
+			A.CopySignedMantissa (mantissa1);
+
+			dgInt32 exponetDiff = m_exponent - A.m_exponent;
+			dgInt32 exponent = m_exponent;
+			if (exponetDiff > 0) {
+				ShiftRightMantissa (mantissa1, exponetDiff);
+			} else if (exponetDiff < 0) {
+				exponent = A.m_exponent;
+				ShiftRightMantissa (mantissa0, -exponetDiff);
+			} 
+
+			dgUnsigned64 carrier = 0;
+			for (dgInt32 i = DG_GOOGOL_SIZE - 1; i >= 0; i --) {
+				dgUnsigned64 m0 = mantissa0[i];
+				dgUnsigned64 m1 = mantissa1[i];
+				mantissa[i] = m0 + m1 + carrier;
+				carrier = CheckCarrier (m0, m1) | CheckCarrier (m0 + m1, carrier);
+			}
+
+			dgInt8 sign = 0;
+			if (dgInt64 (mantissa[0]) < 0) {
+				sign = 1;
+				NegateMantissa (mantissa);
+			}
+
+			dgInt32 bits = NormalizeMantissa (mantissa);
+			if (bits <= (-64 * DG_GOOGOL_SIZE)) {
+				tmp.m_sign = 0;
+				tmp.m_exponent = 0;
+			} else {
+				tmp.m_sign = sign;
+				tmp.m_exponent =  dgInt16 (exponent + bits);
+			}
+
+			memcpy (tmp.m_mantissa, mantissa, sizeof (m_mantissa));
+
+
+		} else if (A.m_mantissa[0]) {
+			tmp = A;
+		} else {
+			tmp = *this;
+		}
+
+		dgAssert (dgInt64 (tmp.m_mantissa[0]) >= 0);
+		return tmp;
+	}
+
+	dgGoogol dgGoogol::operator- (const dgGoogol &A) const
+	{
+		dgGoogol tmp (A);
+		tmp.m_sign = !tmp.m_sign;
+		return *this + tmp;
+	}
+
+	void dgGoogol::ScaleMantissa (dgUnsigned64* const dst, dgUnsigned64 scale) const
+	{
+		dgUnsigned64 carrier = 0;
+		for (dgInt32 i = DG_GOOGOL_SIZE - 1; i >= 0; i --) {
+			if (m_mantissa[i]) {
+				dgUnsigned64 low;
+				dgUnsigned64 high;
+				ExtendeMultiply (scale, m_mantissa[i], high, low);
+				dgUnsigned64 acc = low + carrier;
+				carrier = CheckCarrier (low, carrier);	
+				dgAssert (CheckCarrier (carrier, high) == 0);
+				carrier += high;
+				dst[i + 1] = acc;
+			} else {
+				dst[i + 1] = carrier;
+				carrier = 0;
+			}
+
+		}
+		dst[0] = carrier;
+	}
+
+	dgGoogol dgGoogol::operator* (const dgGoogol &A) const
+	{
+		dgAssert (dgInt64 (m_mantissa[0]) >= 0);
+		dgAssert (dgInt64 (A.m_mantissa[0]) >= 0);
+
+		if (m_mantissa[0] && A.m_mantissa[0]) {
+			dgUnsigned64 mantissaAcc[DG_GOOGOL_SIZE * 2];
+			memset (mantissaAcc, 0, sizeof (mantissaAcc));
+			for (dgInt32 i = DG_GOOGOL_SIZE - 1; i >= 0; i --) {
+				dgUnsigned64 a = m_mantissa[i];
+				if (a) {
+					dgUnsigned64 mantissaScale[2 * DG_GOOGOL_SIZE];
+					memset (mantissaScale, 0, sizeof (mantissaScale));
+					A.ScaleMantissa (&mantissaScale[i], a);
+
+					dgUnsigned64 carrier = 0;
+					for (dgInt32 j = 0; j < 2 * DG_GOOGOL_SIZE; j ++) {
+						const dgInt32 k = 2 * DG_GOOGOL_SIZE - 1 - j;
+						dgUnsigned64 m0 = mantissaAcc[k];
+						dgUnsigned64 m1 = mantissaScale[k];
+						mantissaAcc[k] = m0 + m1 + carrier;
+						carrier = CheckCarrier (m0, m1) | CheckCarrier (m0 + m1, carrier);
+					}
+				}
+			}
+
+			dgUnsigned64 carrier = 0;
+			dgInt32 bits = dgUnsigned64(LeadingZeros (mantissaAcc[0]) - 2);
+			for (dgInt32 i = 0; i < 2 * DG_GOOGOL_SIZE; i ++) {
+				const dgInt32 k = 2 * DG_GOOGOL_SIZE - 1 - i;
+				dgUnsigned64 a = mantissaAcc[k];
+				mantissaAcc[k] = (a << dgUnsigned64(bits)) | carrier;
+				carrier = a >> dgUnsigned64(64 - bits);
+			}
+
+			dgInt32 exp = m_exponent + A.m_exponent - (bits - 2);
+
+			dgGoogol tmp;
+			tmp.m_sign = m_sign ^ A.m_sign;
+			tmp.m_exponent = dgInt16 (exp);
+			memcpy (tmp.m_mantissa, mantissaAcc, sizeof (m_mantissa));
+
+			return tmp;
+		} 
+		return dgGoogol(0.0);
+	}
+
+	dgGoogol dgGoogol::operator/ (const dgGoogol &A) const
+	{
+		dgGoogol tmp (1.0 / A);
+		tmp = tmp * (m_two - A * tmp);
+		tmp = tmp * (m_two - A * tmp);
+		int test = 0;
+		dgInt32 passes = 0;
+		do {
+			passes ++;
+			dgGoogol tmp0 (tmp);
+			tmp = tmp * (m_two - A * tmp);
+			test = memcmp (&tmp0, &tmp, sizeof (dgGoogol));
+		} while (test && (passes < (2 * DG_GOOGOL_SIZE)));	
+		dgAssert (passes <= (2 * DG_GOOGOL_SIZE));
+		return (*this) * tmp;
+	}
+
+
+	dgGoogol dgGoogol::Abs () const
+	{
+		dgGoogol tmp (*this);
+		tmp.m_sign = 0;
+		return tmp;
+	}
+
+	dgGoogol dgGoogol::Floor () const
+	{
+		if (m_exponent < 1) {
+			return dgGoogol (0.0);
+		} 
+		dgInt32 bits = m_exponent + 2;
+		dgInt32 start = 0;
+		while (bits >= 64) {
+			bits -= 64;
+			start ++;
+		}
+
+		dgGoogol tmp (*this);
+		for (dgInt32 i = DG_GOOGOL_SIZE - 1; i > start; i --) {
+			tmp.m_mantissa[i] = 0;
+		}
+		dgUnsigned64 mask = (-1LL) << (64 - bits);
+		tmp.m_mantissa[start] &= mask;
+		if (m_sign) {
+			dgAssert (0);
+		}
+
+		return tmp;
+	}
+
+	dgGoogol dgGoogol::InvSqrt () const
+	{
+		const dgGoogol& me = *this;
+		dgGoogol x (1.0f / sqrt (me));
+
+		dgInt32 test = 0;
+		dgInt32 passes = 0;
+		do {
+			passes ++;
+			dgGoogol tmp (x);
+			x = m_half * x * (m_three - me * x * x);
+			test = memcmp (&x, &tmp, sizeof (dgGoogol));
+		} while (test && (passes < (2 * DG_GOOGOL_SIZE)));	
+		dgAssert (passes <= (2 * DG_GOOGOL_SIZE));
+		return x;
+	}
+
+	dgGoogol dgGoogol::Sqrt () const
+	{
+		return *this * InvSqrt();
+	}
+
+	void dgGoogol::ToString (char* const string) const
+	{
+		dgGoogol tmp (*this);
+		dgGoogol base (10.0);
+		while (dgFloat64 (tmp) > 1.0) {
+			tmp = tmp/base;
+		}
+
+		dgInt32 index = 0;
+		while (tmp.m_mantissa[0]) {
+			tmp = tmp * base;
+			dgGoogol digit (tmp.Floor());
+			tmp -= digit;
+			dgFloat64 val = digit;
+			string[index] = char (val) + '0';
+			index ++;
+		}
+		string[index] = 0;
+	}
+
+
+#else 
+
+	dgGoogol::dgGoogol(void)
+		:m_value(0.0)
+	{
+	}
+
+	dgGoogol::dgGoogol(dgFloat64 value)
+		:m_value (value)
+	{
+	}
+
+	void dgGoogol::CopySignedMantissa (dgUnsigned64* const mantissa) const
+	{
+	}
+
+	dgGoogol::operator double() const
+	{
+		return m_value;
+	}
+
+	dgGoogol dgGoogol::operator+ (const dgGoogol &A) const
+	{
+		return m_value + A.m_value;
+	}
+
+
+	dgGoogol dgGoogol::operator- (const dgGoogol &A) const
+	{
+		return m_value - A.m_value;
+	}
+
+	dgGoogol dgGoogol::operator* (const dgGoogol &A) const
+	{
+		return m_value * A.m_value;
+	}
+
+	dgGoogol dgGoogol::operator/ (const dgGoogol &A) const
+	{
+		return m_value / A.m_value;
+	}
+
+
+	dgGoogol dgGoogol::Abs () const
+	{
+		return fabs (m_value);
+	}
+
+	dgGoogol dgGoogol::InvSqrt () const
+	{
+		return 1.0 / sqrt (m_value);
+	}
+
+	dgGoogol dgGoogol::Sqrt () const
+	{
+		return sqrt(m_value);
+	}
+
+
+	dgGoogol dgGoogol::Floor () const
+	{
+		return floor (m_value);
+	}
+
+	void dgGoogol::ToString (char* const string) const
+	{
+		sprintf (string, "%f", m_value);
+	}
+
+	void dgGoogol::ScaleMantissa (dgUnsigned64* const dst, dgUnsigned64 scale) const
+	{
+	}
+
+#endif
+
 
 
 void dgGoogol::NegateMantissa (dgUnsigned64* const mantissa) const
@@ -67,13 +387,6 @@ void dgGoogol::NegateMantissa (dgUnsigned64* const mantissa) const
 	}
 }
 
-void dgGoogol::CopySignedMantissa (dgUnsigned64* const mantissa) const
-{
-	memcpy (mantissa, m_mantissa, sizeof (m_mantissa));
-	if (m_sign) {
-		NegateMantissa (mantissa);
-	}
-}
 
 void dgGoogol::ShiftRightMantissa (dgUnsigned64* const mantissa, dgInt32 bits) const
 {
@@ -172,80 +485,6 @@ dgUnsigned64 dgGoogol::CheckCarrier (dgUnsigned64 a, dgUnsigned64 b) const
 	return ((dgUnsigned64 (-1) - b) < a) ? 1 : 0;
 }
 
-dgGoogol::operator double() const
-{
-	dgFloat64 mantissa = (dgFloat64(1.0f) / dgFloat64 (dgUnsigned64(1)<<62)) * dgFloat64 (m_mantissa[0]);
-	mantissa = ldexp(mantissa, m_exponent) * (m_sign ?  dgFloat64 (-1.0f) : dgFloat64 (1.0f));
-	return mantissa;
-}
-
-dgGoogol dgGoogol::operator+ (const dgGoogol &A) const
-{
-	dgGoogol tmp;
-	dgAssert (dgInt64 (m_mantissa[0]) >= 0);
-	dgAssert (dgInt64 (A.m_mantissa[0]) >= 0);
-
-	if (m_mantissa[0] && A.m_mantissa[0]) {
-		dgUnsigned64 mantissa0[DG_GOOGOL_SIZE];
-		dgUnsigned64 mantissa1[DG_GOOGOL_SIZE];
-		dgUnsigned64 mantissa[DG_GOOGOL_SIZE];
-
-		CopySignedMantissa (mantissa0);
-		A.CopySignedMantissa (mantissa1);
-
-		dgInt32 exponetDiff = m_exponent - A.m_exponent;
-		dgInt32 exponent = m_exponent;
-		if (exponetDiff > 0) {
-			ShiftRightMantissa (mantissa1, exponetDiff);
-		} else if (exponetDiff < 0) {
-			exponent = A.m_exponent;
-			ShiftRightMantissa (mantissa0, -exponetDiff);
-		} 
-
-		dgUnsigned64 carrier = 0;
-		for (dgInt32 i = DG_GOOGOL_SIZE - 1; i >= 0; i --) {
-			dgUnsigned64 m0 = mantissa0[i];
-			dgUnsigned64 m1 = mantissa1[i];
-			mantissa[i] = m0 + m1 + carrier;
-			carrier = CheckCarrier (m0, m1) | CheckCarrier (m0 + m1, carrier);
-		}
-
-		dgInt8 sign = 0;
-		if (dgInt64 (mantissa[0]) < 0) {
-			sign = 1;
-			NegateMantissa (mantissa);
-		}
-
-		dgInt32 bits = NormalizeMantissa (mantissa);
-		if (bits <= (-64 * DG_GOOGOL_SIZE)) {
-			tmp.m_sign = 0;
-			tmp.m_exponent = 0;
-		} else {
-			tmp.m_sign = sign;
-			tmp.m_exponent =  dgInt16 (exponent + bits);
-		}
-
-		memcpy (tmp.m_mantissa, mantissa, sizeof (m_mantissa));
-		
-
-	} else if (A.m_mantissa[0]) {
-		tmp = A;
-	} else {
-		tmp = *this;
-	}
-
-	dgAssert (dgInt64 (tmp.m_mantissa[0]) >= 0);
-	return tmp;
-}
-
-
-dgGoogol dgGoogol::operator- (const dgGoogol &A) const
-{
-	dgGoogol tmp (A);
-	tmp.m_sign = !tmp.m_sign;
-	return *this + tmp;
-}
-
 
 void dgGoogol::ExtendeMultiply (dgUnsigned64 a, dgUnsigned64 b, dgUnsigned64& high, dgUnsigned64& low) const
 {
@@ -274,91 +513,8 @@ void dgGoogol::ExtendeMultiply (dgUnsigned64 a, dgUnsigned64 b, dgUnsigned64& hi
 	high = hh;
 }
 
-void dgGoogol::ScaleMantissa (dgUnsigned64* const dst, dgUnsigned64 scale) const
-{
-	dgUnsigned64 carrier = 0;
-	for (dgInt32 i = DG_GOOGOL_SIZE - 1; i >= 0; i --) {
-		if (m_mantissa[i]) {
-			dgUnsigned64 low;
-			dgUnsigned64 high;
-			ExtendeMultiply (scale, m_mantissa[i], high, low);
-			dgUnsigned64 acc = low + carrier;
-			carrier = CheckCarrier (low, carrier);	
-			dgAssert (CheckCarrier (carrier, high) == 0);
-			carrier += high;
-			dst[i + 1] = acc;
-		} else {
-			dst[i + 1] = carrier;
-			carrier = 0;
-		}
 
-	}
-	dst[0] = carrier;
-}
 
-dgGoogol dgGoogol::operator* (const dgGoogol &A) const
-{
-	dgAssert (dgInt64 (m_mantissa[0]) >= 0);
-	dgAssert (dgInt64 (A.m_mantissa[0]) >= 0);
-
-	if (m_mantissa[0] && A.m_mantissa[0]) {
-		dgUnsigned64 mantissaAcc[DG_GOOGOL_SIZE * 2];
-		memset (mantissaAcc, 0, sizeof (mantissaAcc));
-		for (dgInt32 i = DG_GOOGOL_SIZE - 1; i >= 0; i --) {
-			dgUnsigned64 a = m_mantissa[i];
-			if (a) {
-				dgUnsigned64 mantissaScale[2 * DG_GOOGOL_SIZE];
-				memset (mantissaScale, 0, sizeof (mantissaScale));
-				A.ScaleMantissa (&mantissaScale[i], a);
-
-				dgUnsigned64 carrier = 0;
-				for (dgInt32 j = 0; j < 2 * DG_GOOGOL_SIZE; j ++) {
-					const dgInt32 k = 2 * DG_GOOGOL_SIZE - 1 - j;
-					dgUnsigned64 m0 = mantissaAcc[k];
-					dgUnsigned64 m1 = mantissaScale[k];
-					mantissaAcc[k] = m0 + m1 + carrier;
-					carrier = CheckCarrier (m0, m1) | CheckCarrier (m0 + m1, carrier);
-				}
-			}
-		}
-		
-		dgUnsigned64 carrier = 0;
-		dgInt32 bits = dgUnsigned64(LeadingZeros (mantissaAcc[0]) - 2);
-		for (dgInt32 i = 0; i < 2 * DG_GOOGOL_SIZE; i ++) {
-			const dgInt32 k = 2 * DG_GOOGOL_SIZE - 1 - i;
-			dgUnsigned64 a = mantissaAcc[k];
-			mantissaAcc[k] = (a << dgUnsigned64(bits)) | carrier;
-			carrier = a >> dgUnsigned64(64 - bits);
-		}
-
-		dgInt32 exp = m_exponent + A.m_exponent - (bits - 2);
-
-		dgGoogol tmp;
-		tmp.m_sign = m_sign ^ A.m_sign;
-		tmp.m_exponent = dgInt16 (exp);
-		memcpy (tmp.m_mantissa, mantissaAcc, sizeof (m_mantissa));
-
-		return tmp;
-	} 
-	return dgGoogol(0.0);
-}
-
-dgGoogol dgGoogol::operator/ (const dgGoogol &A) const
-{
-	dgGoogol tmp (1.0 / A);
-	tmp = tmp * (m_two - A * tmp);
-	tmp = tmp * (m_two - A * tmp);
-	int test = 0;
-	dgInt32 passes = 0;
-	do {
-		passes ++;
-		dgGoogol tmp0 (tmp);
-		tmp = tmp * (m_two - A * tmp);
-		test = memcmp (&tmp0, &tmp, sizeof (dgGoogol));
-	} while (test && (passes < (2 * DG_GOOGOL_SIZE)));	
-	dgAssert (passes <= (2 * DG_GOOGOL_SIZE));
-	return (*this) * tmp;
-}
 
 
 dgGoogol dgGoogol::operator+= (const dgGoogol &A)
@@ -411,84 +567,17 @@ bool dgGoogol::operator!= (const dgGoogol &A) const
 }
 
 
-dgGoogol dgGoogol::Abs () const
-{
-	dgGoogol tmp (*this);
-	tmp.m_sign = 0;
-	return tmp;
-}
 
-dgGoogol dgGoogol::Floor () const
-{
-	if (m_exponent < 1) {
-		return dgGoogol (0.0);
-	} 
-	dgInt32 bits = m_exponent + 2;
-	dgInt32 start = 0;
-	while (bits >= 64) {
-		bits -= 64;
-		start ++;
-	}
-	
-	dgGoogol tmp (*this);
-	for (dgInt32 i = DG_GOOGOL_SIZE - 1; i > start; i --) {
-		tmp.m_mantissa[i] = 0;
-	}
-	dgUnsigned64 mask = (-1LL) << (64 - bits);
-	tmp.m_mantissa[start] &= mask;
-	if (m_sign) {
-		dgAssert (0);
-	}
 
-	return tmp;
-}
-
-dgGoogol dgGoogol::InvSqrt () const
-{
-	const dgGoogol& me = *this;
-	dgGoogol x (1.0f / sqrt (me));
-
-	dgInt32 test = 0;
-	dgInt32 passes = 0;
-	do {
-		passes ++;
-		dgGoogol tmp (x);
-		x = m_half * x * (m_three - me * x * x);
-		test = memcmp (&x, &tmp, sizeof (dgGoogol));
-	} while (test && (passes < (2 * DG_GOOGOL_SIZE)));	
-	dgAssert (passes <= (2 * DG_GOOGOL_SIZE));
-	return x;
-}
-
-dgGoogol dgGoogol::Sqrt () const
-{
-	return *this * InvSqrt();
-}
-
-#ifdef _DEBUG
-void dgGoogol::ToString (char* const string) const
-{
-	dgGoogol tmp (*this);
-	dgGoogol base (10.0);
-	while (dgFloat64 (tmp) > 1.0) {
-		tmp = tmp/base;
-	}
-
-	dgInt32 index = 0;
-	while (tmp.m_mantissa[0]) {
-		tmp = tmp * base;
-		dgGoogol digit (tmp.Floor());
-		tmp -= digit;
-		dgFloat64 val = digit;
-		string[index] = char (val) + '0';
-		index ++;
-	}
-	string[index] = 0;
-}
 
 void dgGoogol::Trace () const
 {
 	dgTrace (("%f ", dgFloat64 (*this)));
 }
 
-#endif
+
+
+
+
+
+

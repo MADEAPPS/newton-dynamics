@@ -57,8 +57,7 @@ class dgConvexHull4dTetraherum
 	class dgTetrahedrumFace 
 	{
 		public:
-		dgInt32 m_index[3];
-		dgInt32 m_otherVertex;
+		dgInt32 m_index[4];
 		dgList<dgConvexHull4dTetraherum>::dgListNode* m_twin;
 	};
 
@@ -109,6 +108,7 @@ class dgConvexHull4d: public dgList<dgConvexHull4dTetraherum>
 	const dgHullVector* GetHullVertexArray() const;
 
 	dgInt32 IncMark (); 
+	void Save (const char* const filename) const;
 
 	protected:
 	dgConvexHull4d(dgMemoryAllocator* const allocator);
@@ -118,23 +118,20 @@ class dgConvexHull4d: public dgList<dgConvexHull4dTetraherum>
 	virtual dgInt32 AddVertex (const dgBigVector& vertex);
 	virtual dgInt32 InitVertexArray(dgHullVector* const points, const dgBigVector* const vertexCloud, dgInt32 count, void* const memoryPool, dgInt32 maxMemSize);
 	virtual dgListNode* AddFace (dgInt32 i0, dgInt32 i1, dgInt32 i2, dgInt32 i3);
-	virtual void DeleteFace (dgListNode* const node) ;
+	virtual void DeleteFace (dgListNode* const node);
 
 	dgListNode* FindFacingNode(const dgBigVector& vertex);
-	
 	dgInt32 BuildNormalList (dgBigVector* const normalArray) const;
 	void InsertNewVertex(dgInt32 vertexIndex, dgListNode* const frontFace, dgList<dgListNode*>& deletedFaces, dgList<dgListNode*>& newFaces);
 	dgInt32 SupportVertex (dgAABBPointTree4d** const tree, const dgHullVector* const points, const dgBigVector& dir) const;
 	void TessellateTriangle (dgInt32 level, const dgVector& p0, const dgVector& p1, const dgVector& p2, dgInt32& count, dgBigVector* const ouput, dgInt32& start) const;
-
 	void CalculateConvexHull (dgAABBPointTree4d* vertexTree, dgHullVector* const points, dgInt32 count, dgFloat64 distTol);
 	void LinkSibling (dgListNode* node0, dgListNode* node1)	const;
 	bool Sanity() const;
-	static dgInt32 ConvexCompareVertex(const dgHullVector* const  A, const dgHullVector* const B, void* const context);
-
 	dgAABBPointTree4d* BuildTree (dgAABBPointTree4d* const parent, dgHullVector* const points, dgInt32 count, dgInt32 baseIndex, dgInt8** const memoryPool, dgInt32& maxMemSize) const;
 
-	protected:
+	static dgInt32 ConvexCompareVertex(const dgHullVector* const  A, const dgHullVector* const B, void* const context);
+	
 	dgFloat64 RoundToFloat (dgFloat64 val) const;
 	dgInt32 m_mark;
 	dgInt32 m_count;

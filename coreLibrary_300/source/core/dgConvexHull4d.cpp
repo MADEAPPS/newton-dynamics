@@ -29,6 +29,9 @@
 
 #define DG_VERTEX_CLUMP_SIZE_4D		8 
 
+
+
+
 class dgAABBPointTree4d
 {
 	public:
@@ -51,7 +54,7 @@ class dgAABBPointTree4d
 
 class dgAABBPointTree4dClump: public dgAABBPointTree4d
 {
-public:
+	public:
 	dgInt32 m_count;
 	dgInt32 m_indices[DG_VERTEX_CLUMP_SIZE_4D];
 };
@@ -111,22 +114,22 @@ void dgConvexHull4dTetraherum::Init (const dgHullVector* const points, dgInt32 v
 	m_faces[0].m_index[0] = v0;
 	m_faces[0].m_index[1] = v1;
 	m_faces[0].m_index[2] = v2;
-	m_faces[0].m_otherVertex = v3;
+	m_faces[0].m_index[3] = v3;
 
 	m_faces[1].m_index[0] = v3;
 	m_faces[1].m_index[1] = v0;
 	m_faces[1].m_index[2] = v2;
-	m_faces[1].m_otherVertex = v1;
+	m_faces[1].m_index[3] = v1;
 
 	m_faces[2].m_index[0] = v3;
 	m_faces[2].m_index[1] = v2;
 	m_faces[2].m_index[2] = v1;
-	m_faces[2].m_otherVertex = v0;
+	m_faces[2].m_index[3] = v0;
 
 	m_faces[3].m_index[0] = v3;
 	m_faces[3].m_index[1] = v1;
 	m_faces[3].m_index[2] = v0;
-	m_faces[3].m_otherVertex = v2;
+	m_faces[3].m_index[3] = v2;
 
 	SetMark (0); 
 	for (dgInt32 i = 0; i < 4; i ++) {
@@ -149,7 +152,7 @@ dgFloat64 dgConvexHull4dTetraherum::Evalue (const dgHullVector* const pointArray
 	const dgBigVector &p0 = pointArray[m_faces[0].m_index[0]];
 	const dgBigVector &p1 = pointArray[m_faces[0].m_index[1]];
 	const dgBigVector &p2 = pointArray[m_faces[0].m_index[2]];
-	const dgBigVector &p3 = pointArray[m_faces[0].m_otherVertex];
+	const dgBigVector &p3 = pointArray[m_faces[0].m_index[3]];
 
 	dgFloat64 matrix[4][4];
 	for (dgInt32 i = 0; i < 4; i ++) {
@@ -186,7 +189,7 @@ dgBigVector dgConvexHull4dTetraherum::CircumSphereCenter (const dgHullVector* co
 	points[0] = pointArray[m_faces[0].m_index[0]];
 	points[1] = pointArray[m_faces[0].m_index[1]];
 	points[2] = pointArray[m_faces[0].m_index[2]];
-	points[3] = pointArray[m_faces[0].m_otherVertex];
+	points[3] = pointArray[m_faces[0].m_index[3]];
 
 	for (dgInt32 i = 0; i < 4; i ++) {
 		for (dgInt32 j = 0; j < 3; j ++) {
@@ -222,7 +225,7 @@ dgConvexHull4dTetraherum::dgTetrahedrumPlane dgConvexHull4dTetraherum::GetPlaneE
 	const dgBigVector &p0 = points[m_faces[0].m_index[0]];
 	const dgBigVector &p1 = points[m_faces[0].m_index[1]];
 	const dgBigVector &p2 = points[m_faces[0].m_index[2]];
-	const dgBigVector &p3 = points[m_faces[0].m_otherVertex];
+	const dgBigVector &p3 = points[m_faces[0].m_index[3]];
 	return dgTetrahedrumPlane (p0, p1, p2, p3);
 }
 
@@ -244,6 +247,30 @@ dgConvexHull4d::~dgConvexHull4d(void)
 }
 
 
+void dgConvexHull4d::Save (const char* const filename) const
+{
+	FILE* const file = fopen (filename, "wb");
+	int index = 0;
+	fprintf (file, "final\n");
+	for (dgListNode* nodePtr = GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
+		fprintf (file, "tetra %d\n", index);
+		index ++;
+		const dgConvexHull4dTetraherum& face = nodePtr->GetInfo();
+		const dgBigVector& p0 = m_points[face.m_faces[0].m_index[0]];
+		const dgBigVector& p1 = m_points[face.m_faces[0].m_index[1]];
+		const dgBigVector& p2 = m_points[face.m_faces[0].m_index[2]];
+		const dgBigVector& p3 = m_points[face.m_faces[0].m_index[3]];
+		fprintf (file, "p0(%f %f %f %f)\n", p0[0], p0[1], p0[2], p0[3]);
+		fprintf (file, "p1(%f %f %f %f)\n", p1[0], p1[1], p1[2], p1[3]);
+		fprintf (file, "p2(%f %f %f %f)\n", p2[0], p2[1], p2[2], p2[3]);
+		fprintf (file, "p3(%f %f %f %f)\n", p3[0], p3[1], p3[2], p3[3]);
+	}
+	fprintf (file, "\n");
+
+	fclose (file);
+}
+
+
 dgFloat64 dgConvexHull4d::RoundToFloat (dgFloat64 val) const
 {
 	dgInt32 exp;
@@ -258,22 +285,6 @@ dgFloat64 dgConvexHull4d::RoundToFloat (dgFloat64 val) const
 }
 
 
-void dgConvexHull4d::BuildHull (dgMemoryAllocator* const allocator, const dgBigVector* const vertexCloud, dgInt32 count, dgFloat64 distTol)
-{
-	dgInt32 treeCount = count / (DG_VERTEX_CLUMP_SIZE_4D>>1); 
-	if (treeCount < 4) {
-		treeCount = 4;
-	}
-	treeCount *= 2;
-
-	dgStack<dgHullVector> points (count);
-	dgStack<dgAABBPointTree4dClump> treePool (treeCount + 256);
-
-	count = InitVertexArray(&points[0], vertexCloud, count, &treePool[0], treePool.GetSizeInBytes());
-	if (m_count >= 4) {
-		CalculateConvexHull (&treePool[0], &points[0], count, distTol);
-	}
-}
 
 void dgConvexHull4d::TessellateTriangle (dgInt32 level, const dgVector& p0, const dgVector& p1, const dgVector& p2, dgInt32& count, dgBigVector* const ouput, dgInt32& start) const
 {
@@ -485,7 +496,6 @@ dgAABBPointTree4d* dgConvexHull4d::BuildTree (dgAABBPointTree4d* const parent, d
 		maxMemSize -= sizeof (dgAABBPointTree4dClump);
 		dgAssert (maxMemSize >= 0);
 
-
 		clump->m_count = count;
 		for (dgInt32 i = 0; i < count; i ++) {
 			clump->m_indices[i] = i + baseIndex;
@@ -522,13 +532,10 @@ dgAABBPointTree4d* dgConvexHull4d::BuildTree (dgAABBPointTree4d* const parent, d
 			maxP.m_z = dgMax (p.m_z, maxP.m_z); 
 			maxP.m_w = dgMax (p.m_w, maxP.m_w); 
 
-			//median = median.Add4 (p);
-			//varian = varian.Add4(p.CompProduct4 (p));
 			median = median + p;
 			varian = varian + p.CompProduct4(p);
 		}
 
-		//varian = varian.Scale4 (dgFloat32 (count)).Sub4 (median.CompProduct4(median));
 		varian = varian.Scale4 (dgFloat32 (count)) - median.CompProduct4(median);
 
 		dgInt32 index = 0;
@@ -620,7 +627,6 @@ dgInt32 dgConvexHull4d::InitVertexArray(dgHullVector* const points, const dgBigV
 		return count;
 	}
 
-
 	dgAABBPointTree4d* tree = BuildTree (NULL, points, count, 0, (dgInt8**) &memoryPool, maxMemSize);
 
 	dgBigVector boxSize (tree->m_box[1] - tree->m_box[0]);	
@@ -641,7 +647,6 @@ dgInt32 dgConvexHull4d::InitVertexArray(dgHullVector* const points, const dgBigV
 	for (dgInt32 i = 1; i < normalCount; i ++) {
 		dgInt32 index = SupportVertex (&tree, points, normalArray[i]);
 		dgAssert (index >= 0);
-		//e1 = points[index].Sub4(convexPoints[0]);
 		e1 = points[index] - convexPoints[0];
 		e1.m_w = dgFloat64 (0.0f);
 		dgFloat64 error2 = e1.DotProduct4(e1).m_x;
@@ -703,7 +708,6 @@ dgInt32 dgConvexHull4d::InitVertexArray(dgHullVector* const points, const dgBigV
 		dgAssert (index >= 0);
 		dgAssert (index < count);
 
-		//e3 = points[index].Sub4(convexPoints[0]);
 		e3 = points[index] - convexPoints[0];
 		e3.m_w = dgFloat64 (0.0f);
 		dgFloat64 volume = (e1 * e2) % e3;		
@@ -762,7 +766,7 @@ bool dgConvexHull4d::Sanity() const
 		const dgBigVector &p0 = points[tetra->m_faces[0].m_index[0]];
 		const dgBigVector &p1 = points[tetra->m_faces[0].m_index[1]];
 		const dgBigVector &p2 = points[tetra->m_faces[0].m_index[2]];
-		const dgBigVector &p3 = points[tetra->m_faces[0].m_otherVertex];
+		const dgBigVector &p3 = points[tetra->m_faces[0].m_index[3]];
 
 		dgBigVector p1p0 (p1.Sub4(p0));
 		dgBigVector p2p0 (p2.Sub4(p0));
@@ -782,7 +786,7 @@ bool dgConvexHull4d::Sanity() const
 		index0[0] = tetra0->m_faces[0].m_index[0];
 		index0[1] = tetra0->m_faces[0].m_index[1];
 		index0[2] = tetra0->m_faces[0].m_index[2];
-		index0[3] = tetra0->m_faces[0].m_otherVertex;
+		index0[3] = tetra0->m_faces[0].m_index[3];
 
 		const dgBigVector &p0 = points[index0[0]];
 		const dgBigVector &p1 = points[index0[1]];
@@ -796,7 +800,7 @@ bool dgConvexHull4d::Sanity() const
 			index1[0] = tetra1->m_faces[0].m_index[0];
 			index1[1] = tetra1->m_faces[0].m_index[1];
 			index1[2] = tetra1->m_faces[0].m_index[2];
-			index1[3] = tetra1->m_faces[0].m_otherVertex;
+			index1[3] = tetra1->m_faces[0].m_index[3];
 
 			for (dgInt32 i = 0; i < 4; i ++) {
 				dgInt32 count = 0;
@@ -932,58 +936,6 @@ void dgConvexHull4d::InsertNewVertex(dgInt32 vertexIndex, dgListNode* const fron
 	}
 }
 
-void dgConvexHull4d::CalculateConvexHull (dgAABBPointTree4d* vertexTree, dgHullVector* const points, dgInt32 count, dgFloat64 distTol)
-{
-	distTol = fabs (distTol) * m_diag;
-	dgListNode* const nodes0 = AddFace (0, 1, 2, 3);
-	dgListNode* const nodes1 = AddFace (0, 1, 3, 2);
-
-	dgList<dgListNode*> boundaryFaces(GetAllocator());
-	boundaryFaces.Append(nodes0);
-	boundaryFaces.Append(nodes1);
-
-	LinkSibling (nodes0, nodes1);
-	LinkSibling (nodes0, nodes1);
-	LinkSibling (nodes0, nodes1);
-	LinkSibling (nodes0, nodes1);
-
-	IncMark();
-	count -= 4;
-	dgInt32 currentIndex = 4;
-	while (boundaryFaces.GetCount() && count) {
-
-		dgHullVector* const hullVertexArray = &m_points[0]; 
-		dgListNode* const faceNode = boundaryFaces.GetFirst()->GetInfo();
-		dgConvexHull4dTetraherum* const face = &faceNode->GetInfo();
-		dgConvexHull4dTetraherum::dgTetrahedrumPlane planeEquation (face->GetPlaneEquation (hullVertexArray));
-
-		dgInt32 index = SupportVertex (&vertexTree, points, planeEquation);
-
-		const dgHullVector& p = points[index];
-		dgFloat64 dist = planeEquation.Evalue(p);
-
-		if ((dist > distTol) && (face->Evalue(hullVertexArray, p) > dgFloat64(0.0f))) {
-
-			m_points[currentIndex] = p;
-			points[index].m_mark = 1;
-
-			dgList<dgListNode*> deleteList(GetAllocator());
-			InsertNewVertex(currentIndex, faceNode, deleteList, boundaryFaces);
-
-			for (dgList<dgListNode*>::dgListNode* deleteNode = deleteList.GetFirst(); deleteNode; deleteNode = deleteNode->GetNext()) {
-				dgListNode* const node = deleteNode->GetInfo();
-				boundaryFaces.Remove (node);
-				DeleteFace (node); 
-			}
-
-			currentIndex ++;
-			count --;
-		} else {
-			boundaryFaces.Remove (faceNode);
-		}
-	}
-	m_count = currentIndex;
-}
 
 
 dgConvexHull4d::dgListNode* dgConvexHull4d::FindFacingNode(const dgBigVector& vertex)
@@ -1062,3 +1014,73 @@ dgInt32 dgConvexHull4d::AddVertex (const dgBigVector& vertex)
 	return index;
 }
 
+
+void dgConvexHull4d::BuildHull (dgMemoryAllocator* const allocator, const dgBigVector* const vertexCloud, dgInt32 count, dgFloat64 distTol)
+{
+	dgInt32 treeCount = count / (DG_VERTEX_CLUMP_SIZE_4D>>1); 
+	if (treeCount < 4) {
+		treeCount = 4;
+	}
+	treeCount *= 2;
+
+	dgStack<dgHullVector> points (count);
+	dgStack<dgAABBPointTree4dClump> treePool (treeCount + 256);
+
+
+	count = InitVertexArray(&points[0], vertexCloud, count, &treePool[0], treePool.GetSizeInBytes());
+	if (m_count >= 4) {
+		CalculateConvexHull (&treePool[0], &points[0], count, distTol);
+	}
+}
+
+
+void dgConvexHull4d::CalculateConvexHull (dgAABBPointTree4d* vertexTree, dgHullVector* const points, dgInt32 count, dgFloat64 distTol)
+{
+	distTol = fabs (distTol) * m_diag;
+	dgListNode* const nodes0 = AddFace (0, 1, 2, 3);
+	dgListNode* const nodes1 = AddFace (0, 1, 3, 2);
+
+	dgList<dgListNode*> boundaryFaces(GetAllocator());
+	boundaryFaces.Append(nodes0);
+	boundaryFaces.Append(nodes1);
+
+	LinkSibling (nodes0, nodes1);
+	LinkSibling (nodes0, nodes1);
+	LinkSibling (nodes0, nodes1);
+	LinkSibling (nodes0, nodes1);
+
+	IncMark();
+	count -= 4;
+	dgInt32 currentIndex = 4;
+	while (boundaryFaces.GetCount() && count) {
+		dgHullVector* const hullVertexArray = &m_points[0]; 
+		dgListNode* const faceNode = boundaryFaces.GetFirst()->GetInfo();
+		dgConvexHull4dTetraherum* const face = &faceNode->GetInfo();
+		dgConvexHull4dTetraherum::dgTetrahedrumPlane planeEquation (face->GetPlaneEquation (hullVertexArray));
+
+		dgInt32 index = SupportVertex (&vertexTree, points, planeEquation);
+
+		const dgHullVector& p = points[index];
+		dgFloat64 dist = planeEquation.Evalue(p);
+		if ((dist > distTol) && (face->Evalue(hullVertexArray, p) > dgFloat64(0.0f))) {
+
+			m_points[currentIndex] = p;
+			points[index].m_mark = 1;
+
+			dgList<dgListNode*> deleteList(GetAllocator());
+			InsertNewVertex(currentIndex, faceNode, deleteList, boundaryFaces);
+
+			for (dgList<dgListNode*>::dgListNode* deleteNode = deleteList.GetFirst(); deleteNode; deleteNode = deleteNode->GetNext()) {
+				dgListNode* const node = deleteNode->GetInfo();
+				boundaryFaces.Remove (node);
+				DeleteFace (node); 
+			}
+
+			currentIndex ++;
+			count --;
+		} else {
+			boundaryFaces.Remove (faceNode);
+		}
+	}
+	m_count = currentIndex;
+}

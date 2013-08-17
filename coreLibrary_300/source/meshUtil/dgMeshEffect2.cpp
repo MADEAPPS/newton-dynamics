@@ -1975,6 +1975,9 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 	dgDelaunayTetrahedralization delaunayTetrahedras (allocator, &pool[0].m_x, count, sizeof (dgBigVector), dgFloat32 (0.0f));
 	delaunayTetrahedras.RemoveUpperHull ();
 
+
+//	delaunayTetrahedras.Save("xxx0.txt");
+
 	dgInt32 tetraCount = delaunayTetrahedras.GetCount();
 	dgStack<dgBigVector> voronoiPoints(tetraCount + 32);
 	dgStack<dgDelaunayTetrahedralization::dgListNode*> tetradrumNode(tetraCount);
@@ -1987,7 +1990,7 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 		voronoiPoints[index] = tetra.CircumSphereCenter (delanayPoints);
 		tetradrumNode[index] = node;
 
-		for (dgInt32 i = 0; i < 3; i ++) {
+		for (dgInt32 i = 0; i < 4; i ++) {
 			dgTree<dgList<dgInt32>, dgInt32>::dgTreeNode* header = delanayNodes.Find(tetra.m_faces[0].m_index[i]);
 			if (!header) {
 				dgList<dgInt32> list (allocator);
@@ -1995,15 +1998,8 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 			}
 			header->GetInfo().Append (index);
 		}
-		dgTree<dgList<dgInt32>, dgInt32>::dgTreeNode* header = delanayNodes.Find(tetra.m_faces[0].m_otherVertex);
-		if (!header) {
-			dgList<dgInt32> list (allocator);
-			header = delanayNodes.Insert(list, tetra.m_faces[0].m_otherVertex);
-		}
-		header->GetInfo().Append (index);
 		index ++;
 	}
-
 
 	dgMeshEffect* const voronoiPartition = new (allocator) dgMeshEffect (allocator);
 	voronoiPartition->BeginPolygon();
@@ -2016,6 +2012,7 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 		dgInt32 key = nodeNode->GetKey();
 
 		if (key < guadVertexKey) {
+
 			dgInt32 count = 0;
 			dgBigVector pointArray[512];
 			for (dgList<dgInt32>::dgListNode* ptr = list.GetFirst(); ptr; ptr = ptr->GetNext()) {
@@ -2024,8 +2021,7 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 				count ++;
 				dgAssert (count < dgInt32 (sizeof (pointArray) / sizeof (pointArray[0])));
 			}
-		
-			//count = dgVertexListToIndexList(&pointArray[0].m_x, sizeof (dgBigVector), 3, count, &indexList[0], dgFloat64 (1.0e-3f));	
+
 			dgMeshEffect convexMesh (allocator, &pointArray[0].m_x, count, sizeof (dgBigVector), dgFloat64 (0.0f));
 			if (convexMesh.GetCount()) {
 				convexMesh.CalculateNormals(normalAngleInRadians);
@@ -2045,7 +2041,7 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 	}
 	voronoiPartition->EndPolygon(dgFloat64 (1.0e-8f), false);
 
-//voronoiPartition->SaveOFF("xxxxxxx.off");
+//	voronoiPartition->SaveOFF("xxx0.off");
 
 	//voronoiPartition->ConvertToPolygons();
 	return voronoiPartition;
