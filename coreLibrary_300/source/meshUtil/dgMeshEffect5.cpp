@@ -3080,21 +3080,6 @@ bool dgMeshEffect::PlaneClip (const dgMeshEffect& convexMesh, const dgEdge* cons
 		
 	}
 
-#ifdef _DEBUG
-	dgPolyhedra::Iterator iter (*this);
-	for (iter.Begin(); iter; iter ++){
-		 dgEdge* const face = &(*iter);
-
-		 dgInt32 id = face->m_incidentFace;
-		 dgEdge* ptr = face;
-		 do {
-			 dgAssert (ptr->m_incidentFace == id);
-			 ptr = ptr->m_next;
-		 } while (ptr != face);
-	}
-#endif
-
-
 	return true;
 }
 
@@ -3130,7 +3115,7 @@ dgMeshEffect* dgMeshEffect::ConvexMeshIntersection (const dgMeshEffect* const co
 			faceIdEnumeration ++;
 		}
 	}
-
+/*
 	mark = convexIntersection->IncLRU();
 	dgPolyhedra::Iterator convexIntersectionIter (*convexIntersection);
 	for (convexIntersectionIter.Begin(); convexIntersectionIter; convexIntersectionIter ++){
@@ -3151,7 +3136,7 @@ dgMeshEffect* dgMeshEffect::ConvexMeshIntersection (const dgMeshEffect* const co
 			 } while (ptr != face);
 		 }
 	}
-
+*/
 	convexIntersection->RemoveUnusedVertices(NULL);
 	
 	return convexIntersection;

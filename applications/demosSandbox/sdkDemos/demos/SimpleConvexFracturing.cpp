@@ -19,9 +19,9 @@
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
 
-#define INITIAL_DELAY				1000
-//#define NUMBER_OF_INTERNAL_PARTS		20
-#define NUMBER_OF_INTERNAL_PARTS		0
+#define INITIAL_DELAY					1000
+#define NUMBER_OF_INTERNAL_PARTS		8
+//#define NUMBER_OF_INTERNAL_PARTS		0
 
 #define BREAK_FORCE_IN_GRAVITIES	6
 //#define BREAK_FORCE_IN_GRAVITIES	1
@@ -143,17 +143,7 @@ class FractureEffect: public dList<FractureAtom>
 
 		dVector points[NUMBER_OF_INTERNAL_PARTS + 8];
 		
-		// add the bounding box as a safeguard area
-		points[0] = dVector ( size.m_x,  size.m_y,  size.m_z, 0.0f);
-		points[1] = dVector ( size.m_x,  size.m_y, -size.m_z, 0.0f);
-		points[2] = dVector ( size.m_x, -size.m_y,  size.m_z, 0.0f);
-		points[3] = dVector ( size.m_x, -size.m_y, -size.m_z, 0.0f);
-		points[4] = dVector (-size.m_x,  size.m_y,  size.m_z, 0.0f);
-		points[5] = dVector (-size.m_x,  size.m_y, -size.m_z, 0.0f);
-		points[6] = dVector (-size.m_x, -size.m_y,  size.m_z, 0.0f);
-		points[7] = dVector (-size.m_x, -size.m_y, -size.m_z, 0.0f);
-
-		int count = 8;
+		int count = 0;		
 		// pepper the inside of the BBox box of the mesh with random points
 		while (count < NUMBER_OF_INTERNAL_PARTS) {			
 			dFloat x = RandomVariable(size.m_x);
@@ -164,6 +154,17 @@ class FractureEffect: public dList<FractureAtom>
 				count ++;
 			}
 		} 
+		
+		// add the bounding box as a safeguard area
+		points[count + 0] = dVector ( size.m_x,  size.m_y,  size.m_z, 0.0f);
+		points[count + 1] = dVector ( size.m_x,  size.m_y, -size.m_z, 0.0f);
+		points[count + 2] = dVector ( size.m_x, -size.m_y,  size.m_z, 0.0f);
+		points[count + 3] = dVector ( size.m_x, -size.m_y, -size.m_z, 0.0f);
+		points[count + 4] = dVector (-size.m_x,  size.m_y,  size.m_z, 0.0f);
+		points[count + 5] = dVector (-size.m_x,  size.m_y, -size.m_z, 0.0f);
+		points[count + 6] = dVector (-size.m_x, -size.m_y,  size.m_z, 0.0f);
+		points[count + 7] = dVector (-size.m_x, -size.m_y, -size.m_z, 0.0f);
+		count += 8;
 
 
 		// create a texture matrix, for applying the material's UV to all internal faces
@@ -301,6 +302,10 @@ class SimpleFracturedEffectEntity: public DemoEntity
 			com = bodyMatrix.TransformVector (com);
 			dMatrix matrix (GetCurrentMatrix());
 			dQuaternion rotation (matrix);
+
+			// we need to lock the world before creation a bunch of bodies
+			scene->Lock(m_lock);
+
 			for (FractureEffect::dListNode* node = m_effect.GetFirst(); node; node = node->GetNext()) {
 				FractureAtom& atom = node->GetInfo();
 
@@ -352,6 +357,9 @@ class SimpleFracturedEffectEntity: public DemoEntity
 
 			NewtonDestroyBody(m_myBody);
 			scene->RemoveEntity	(mynode);
+
+			// unlock the work after done with the effect 
+			scene->Unlock(m_lock);
 		}
 	}
 
@@ -360,7 +368,11 @@ class SimpleFracturedEffectEntity: public DemoEntity
 	FractureEffect m_effect;
 	NewtonBody* m_myBody;
 	dFloat m_myweight; 
+
+	static unsigned m_lock;
 };
+
+unsigned SimpleFracturedEffectEntity::m_lock;
 
 
 static void AddFracturedEntity (DemoEntityManager* const scene, DemoMesh* const visualMesh, NewtonCollision* const collision, const FractureEffect& fractureEffect, const dVector& location)
@@ -476,14 +488,14 @@ void SimpleConvexFracturing (DemoEntityManager* const scene)
 
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 	dVector location (0.0f, 0.0f, 0.0f, 0.0f);
-	dVector size (0.5f, 0.5f, 0.5f, 0.0f);
+	dVector size (0.75f, 0.75f, 0.75f, 0.0f);
 	dMatrix shapeOffsetMatrix (GetIdentityMatrix());
 
-	int count = 1;
+	int count = 5;
 	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 3.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 3.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 3.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 3.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 3.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 3.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 3.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 3.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 3.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 3.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);

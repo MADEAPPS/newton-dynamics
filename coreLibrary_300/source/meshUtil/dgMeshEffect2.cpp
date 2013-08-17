@@ -2024,8 +2024,8 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 
 			dgMeshEffect convexMesh (allocator, &pointArray[0].m_x, count, sizeof (dgBigVector), dgFloat64 (0.0f));
 			if (convexMesh.GetCount()) {
-				convexMesh.CalculateNormals(normalAngleInRadians);
-				convexMesh.UniformBoxMapping (materialId, textureProjectionMatrix);
+				//convexMesh.CalculateNormals(normalAngleInRadians);
+				//convexMesh.UniformBoxMapping (materialId, textureProjectionMatrix);
 
 				for (dgInt32 i = 0; i < convexMesh.m_pointCount; i ++) {
 					convexMesh.m_points[i].m_w = layer;
