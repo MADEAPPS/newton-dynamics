@@ -3115,6 +3115,13 @@ dgMeshEffect* dgMeshEffect::ConvexMeshIntersection (const dgMeshEffect* const co
 			faceIdEnumeration ++;
 		}
 	}
+
+	convexIntersection->RemoveUnusedVertices(NULL);
+	if (!convexIntersection->GetVertexCount()) {
+		delete convexIntersection;
+		return NULL;
+	}
+
 /*
 	mark = convexIntersection->IncLRU();
 	dgPolyhedra::Iterator convexIntersectionIter (*convexIntersection);
