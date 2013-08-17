@@ -2951,12 +2951,8 @@ dgMeshEffect* dgMeshEffect::Intersection (const dgMatrix& matrix, const dgMeshEf
 }
 
 
-bool dgMeshEffect::PlaneClip (const dgMeshEffect& convexMesh, const dgEdge* const convexFace, dgInt32& faceIdEnumeration)
+bool dgMeshEffect::PlaneClip (const dgMeshEffect& convexMesh, const dgEdge* const convexFace, const dgInt32 faceIdEnumeration)
 {
-
-static int xxx;
-xxx ++;
-
 	dgInt32 neutral = 0;
 	dgInt32 positive = 0;
 	dgInt32 negative = 0;
@@ -3016,7 +3012,6 @@ xxx ++;
 					if (side == dgFloat32 (0.0f)) {
 						if ((edge1->m_next != edge0) && (edge1->m_prev != edge0) && !FindEdge(edge0->m_incidentVertex, edge1->m_incidentVertex)) {
 							dgEdge* devideEdge = ConnectVertex (edge1, edge0);
-							
 
 							bool found = false;
 							dgEdge* ptr = devideEdge->m_next->m_next;
@@ -3082,10 +3077,9 @@ xxx ++;
 			dgEdge* const edge = capEdges[i];
 			edge->m_incidentFace = faceIdEnumeration;
 		}
-		faceIdEnumeration ++;
+		
 	}
 
-/*
 #ifdef _DEBUG
 	dgPolyhedra::Iterator iter (*this);
 	for (iter.Begin(); iter; iter ++){
@@ -3099,8 +3093,8 @@ xxx ++;
 		 } while (ptr != face);
 	}
 #endif
-*/
-//	RemoveUnusedVertices(NULL);
+
+
 	return true;
 }
 
@@ -3109,7 +3103,7 @@ xxx ++;
 
 dgMeshEffect* dgMeshEffect::ConvexMeshIntersection (const dgMeshEffect* const convexMesh) const
 {
-return new (GetAllocator()) dgMeshEffect (*convexMesh);
+//return new (GetAllocator()) dgMeshEffect (*convexMesh);
 
 	dgMeshEffect* const convexIntersection = new (GetAllocator()) dgMeshEffect (*this);
 	convexIntersection->RemoveUnusedVertices(NULL);
@@ -3133,6 +3127,7 @@ return new (GetAllocator()) dgMeshEffect (*convexMesh);
 				delete convexIntersection;
 				return NULL;
 			}
+			faceIdEnumeration ++;
 		}
 	}
 
@@ -3147,9 +3142,9 @@ return new (GetAllocator()) dgMeshEffect (*convexMesh);
 			 do {
 				 dgAssert (face->m_incidentFace == ptr->m_incidentFace);
 				 const dgBigVector& point = convexIntersection->m_points[ptr->m_incidentVertex];
-//				 dgVertexAtribute attibute (convexMesh->InterpolateVertex (point, convexFace));
-//				 convexIntersection->AddAtribute (attibute);
-//				 ptr->m_userData = m_atribCount - 1;
+				 dgVertexAtribute attibute (convexMesh->InterpolateVertex (point, convexFace));
+				 convexIntersection->AddAtribute (attibute);
+				 ptr->m_userData = convexIntersection->m_atribCount - 1;
 
 				 ptr->m_mark = mark;
 				 ptr = ptr->m_next;

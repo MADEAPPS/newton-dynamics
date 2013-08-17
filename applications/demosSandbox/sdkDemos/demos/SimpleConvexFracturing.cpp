@@ -309,7 +309,7 @@ class SimpleFracturedEffectEntity: public DemoEntity
 				//entity->SetMatrix(*scene, rotation, matrix.m_posit);
 				//entity->InterpolateMatrix (*scene, 1.0f);
 				scene->Append(entity);
-/*
+
 				int materialId = 0;
 
 				dFloat debriMass = mass * atom.m_massFraction;
@@ -348,7 +348,6 @@ class SimpleFracturedEffectEntity: public DemoEntity
 
 				// set the force and torque call back function
 				NewtonBodySetForceAndTorqueCallback (rigidBody, PhysicsApplyGravityForce);
-*/
 			}
 
 			NewtonDestroyBody(m_myBody);
