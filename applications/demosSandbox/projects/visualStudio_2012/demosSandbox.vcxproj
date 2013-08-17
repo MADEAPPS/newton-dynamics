@@ -205,7 +205,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <AdditionalOptions>
       </AdditionalOptions>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <AdditionalDependencies>comctl32.lib;opengl32.lib;glu32.lib;winmm.lib;wsock32.lib;Ws2_32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -295,8 +295,8 @@
       </AdditionalOptions>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2010/$(PlatformName)/newton/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
-xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLibrary/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
+      <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2012/$(PlatformName)/newton/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
+xcopy  "../../../../packages/projects/visualStudio_2012/$(PlatformName)/dJointLibrary/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -314,7 +314,7 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLi
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <AdditionalOptions>
       </AdditionalOptions>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
@@ -350,7 +350,7 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLi
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <AdditionalOptions>
       </AdditionalOptions>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
@@ -368,8 +368,8 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLi
       </AdditionalOptions>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2010/$(PlatformName)/newton/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
-xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLibrary/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
+      <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2012/$(PlatformName)/newton/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
+xcopy  "../../../../packages/projects/visualStudio_2012/$(PlatformName)/dJointLibrary/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -388,8 +388,8 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLi
       <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2010/$(PlatformName)/newton/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
-xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLibrary/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
+      <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2012/$(PlatformName)/newton/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
+xcopy  "../../../../packages/projects/visualStudio_2012/$(PlatformName)/dJointLibrary/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -400,7 +400,7 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLi
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
@@ -408,8 +408,8 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLi
       <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2010/$(PlatformName)/newton/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
-xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLibrary/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
+      <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2012/$(PlatformName)/newton/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
+xcopy  "../../../../packages/projects/visualStudio_2012/$(PlatformName)/dJointLibrary/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -421,6 +421,7 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLi
     <ClCompile Include="..\..\sdkDemos\DemoSoundListener.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\AdvancedPlayerController.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ArchimedesBuoyancy.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\ArticulatedJoints.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicCar.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicPlayerController.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicRagDoll.cpp" />
@@ -434,6 +435,7 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLi
     <ClCompile Include="..\..\sdkDemos\demos\PuckSlide.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ScaledCollision.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\SimpleBooleans.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\SimpleConvexFracturing.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\UserStaticCollision.cpp" />
     <ClCompile Include="..\..\sdkDemos\DemoVisualDebugerListener.cpp" />
     <ClCompile Include="..\..\sdkDemos\toolBox\DebugDisplay.cpp" />
@@ -467,7 +469,6 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLi
     <ClCompile Include="..\..\sdkDemos\demos\MeshCollision.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\MultiRayCasting.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\SceneCollision.cpp" />
-    <ClCompile Include="..\..\sdkDemos\demos\SimpleConvexShatter.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\SoftBodies.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\SuperCar.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\UsingNewtonMeshTool.cpp" />
@@ -551,6 +552,9 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLi
     <ProjectReference Include="..\..\..\..\coreLibrary_300\projects\windows\project_vs2012\physics.vcxproj">
       <Project>{39737a8f-6151-4259-8e39-25530345d4b4}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\coreLibrary_300\source\pthreads.2\VS_2012\pthread.vcxproj">
+      <Project>{03bca23c-02a5-415b-a37b-26600bc2ce96}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2012\dAILibrary.vcxproj">
       <Project>{2f95c24f-6935-4288-a71c-dab402e4eabc}</Project>
     </ProjectReference>
@@ -565,6 +569,9 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLi
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2012\dMath.vcxproj">
       <Project>{cbe9e751-e58b-46c1-b6b0-873670d0f981}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2012\dNewton.vcxproj">
+      <Project>{8a04a234-b1ca-464d-a2dd-34ceb583ba6a}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2012\dScene.vcxproj">
       <Project>{b5eec82d-938f-44c9-89bb-4a058581750b}</Project>
@@ -583,9 +590,6 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLi
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\thirdParty\openAL\VS_2012\openAL.vcxproj">
       <Project>{9f1fac3f-ff22-41e0-825c-034802f5ea24}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\thirdParty\pthreads.2\VS_2012\pthread.vcxproj">
-      <Project>{03bca23c-02a5-415b-a37b-26600bc2ce96}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\thirdParty\tinyxml\vs2012\tinyxml.vcxproj">
       <Project>{18e509cf-46d2-4749-b3bb-160937cf2481}</Project>
