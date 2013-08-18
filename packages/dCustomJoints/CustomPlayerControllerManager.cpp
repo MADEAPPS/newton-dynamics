@@ -244,7 +244,7 @@ dVector CustomPlayerController::CalculateDesiredVelocity (dFloat forwardSpeed, d
 			veloc = updir.Scale(bodyVeloc % updir) + gravity.Scale (timestep) + frontDir.Scale (forwardSpeed) + rightDir.Scale (lateralSpeed) + updir.Scale(verticalSpeed);
 			veloc += (m_groundVelocity - updir.Scale (updir % m_groundVelocity));
 
-			dFloat speedLimitMag2 = forwardSpeed * forwardSpeed + lateralSpeed * lateralSpeed + verticalSpeed * verticalSpeed + 0.1f;
+			dFloat speedLimitMag2 = forwardSpeed * forwardSpeed + lateralSpeed * lateralSpeed + verticalSpeed * verticalSpeed + m_groundVelocity % m_groundVelocity + 0.1f;
 			dFloat speedMag2 = veloc % veloc;
 			if (speedMag2 > speedLimitMag2) {
 				veloc = veloc.Scale (dSqrt (speedLimitMag2 / speedMag2));
