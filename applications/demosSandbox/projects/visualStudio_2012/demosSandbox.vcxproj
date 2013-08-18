@@ -542,15 +542,6 @@ xcopy  "../../../../packages/projects/visualStudio_2012/$(PlatformName)/dJointLi
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\coreLibrary_300\projects\windows\project_vs2012\newton.vcxproj">
-      <Project>{68d9962c-0ec7-445a-b0fd-f87b16d43901}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\coreLibrary_300\projects\windows\project_vs2012\physics.vcxproj">
-      <Project>{39737a8f-6151-4259-8e39-25530345d4b4}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\coreLibrary_300\source\pthreads.2\VS_2012\pthread.vcxproj">
-      <Project>{03bca23c-02a5-415b-a37b-26600bc2ce96}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2012\dJointLibrary.vcxproj">
       <Project>{721c99ce-4716-4146-9817-59bc2671b844}</Project>
     </ProjectReference>
@@ -565,24 +556,6 @@ xcopy  "../../../../packages/projects/visualStudio_2012/$(PlatformName)/dJointLi
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2012\dVisualDebuggerServer.vcxproj">
       <Project>{2ffeb5b8-8929-469f-bb13-4e391cd3213c}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\thirdParty\enet-1.2\VS_2012\enet.vcxproj">
-      <Project>{a862a496-668a-41ca-ba4b-8c86892006b7}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\thirdParty\freetype-2.4.0\builds\win32\vc2012\freetype.vcxproj">
-      <Project>{78b079bd-9fc7-4b9e-b4a6-96da0f00248b}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\thirdParty\glew\build\VS_2012\glew.vcxproj">
-      <Project>{0c9707f5-dec7-42eb-8ea1-a484df1e515b}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\thirdParty\openAL\VS_2012\openAL.vcxproj">
-      <Project>{9f1fac3f-ff22-41e0-825c-034802f5ea24}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\thirdParty\tinyxml\vs2012\tinyxml.vcxproj">
-      <Project>{18e509cf-46d2-4749-b3bb-160937cf2481}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2012\wx_vc9_gl.vcxproj">
-      <Project>{da8b15ef-6750-5928-bc0e-c748213cf9b2}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
