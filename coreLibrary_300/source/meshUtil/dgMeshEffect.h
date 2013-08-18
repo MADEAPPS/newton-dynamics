@@ -310,7 +310,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 //	void ReverseMergeFaces (dgMeshEffect* const source);
 	dgVertexAtribute InterpolateEdge (dgEdge* const edge, dgFloat64 param) const;
 
-	bool PlaneClip (const dgMeshEffect& convexMesh, const dgEdge* const face, const dgInt32 faceIdEnumeration);
+	bool PlaneClip (const dgMeshEffect& convexMesh, const dgEdge* const face);
 
 	dgMeshEffect* GetNextLayer (dgInt32 mark);
 	dgMeshEffect* CreateVoronoiConvex (const dgBigVector* const conevexPointCloud, dgInt32 count, dgInt32 materialId, const dgMatrix& textureProjectionMatrix, dgFloat32 normalAngleInRadians) const;

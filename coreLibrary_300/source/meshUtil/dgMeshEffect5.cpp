@@ -2951,17 +2951,23 @@ dgMeshEffect* dgMeshEffect::Intersection (const dgMatrix& matrix, const dgMeshEf
 }
 
 
-bool dgMeshEffect::PlaneClip (const dgMeshEffect& convexMesh, const dgEdge* const convexFace, const dgInt32 faceIdEnumeration)
+bool dgMeshEffect::PlaneClip (const dgMeshEffect& convexMesh, const dgEdge* const convexFace)
 {
+
+	dgBigVector normal (convexMesh.FaceNormal(convexFace, &convexMesh.m_points[0].m_x, sizeof(dgBigVector)));
+	if ((normal % normal) < dgFloat64 (1.0e-30)) {
+		dgAssert (0);
+		return true;
+	}  
+	dgBigPlane plane (normal, - (convexMesh.m_points[convexFace->m_incidentVertex] % normal));
+	plane = plane.Scale (dgFloat64(1.0f)/ sqrt (plane % plane));
+
+	dgFloat64 capAttribute = convexMesh.m_attrib[convexFace->m_userData].m_material;
+	
 	dgInt32 neutral = 0;
 	dgInt32 positive = 0;
 	dgInt32 negative = 0;
 	dgInt32 pointCount = GetVertexCount();
-
-	dgBigVector normal (convexMesh.FaceNormal(convexFace, &convexMesh.m_points[0].m_x, sizeof(dgBigVector)));
-	dgBigPlane plane (normal, - (convexMesh.m_points[convexFace->m_incidentVertex] % normal));
-	plane = plane.Scale (dgFloat64(1.0f)/ sqrt (plane % plane));
-
 	const dgInt32 extraVertex = 256;
 	dgStack <dgFloat64> test (pointCount + extraVertex);
 
@@ -3075,9 +3081,19 @@ bool dgMeshEffect::PlaneClip (const dgMeshEffect& convexMesh, const dgEdge* cons
 
 		for (dgInt32 i = 0; i < capCount; i ++) {
 			dgEdge* const edge = capEdges[i];
-			edge->m_incidentFace = faceIdEnumeration;
+			dgVertexAtribute attibute;
+			attibute.m_vertex = m_points[edge->m_incidentVertex];
+			attibute.m_normal_x = normal.m_x;
+			attibute.m_normal_y = normal.m_y;
+			attibute.m_normal_z = normal.m_z;
+			attibute.m_material = capAttribute;
+			attibute.m_u0 = 0.0f;
+			attibute.m_v0 = 0.0f;
+			attibute.m_u1 = 0.0f;
+			attibute.m_v1 = 0.0f;
+			AddAtribute (attibute);
+			edge->m_userData = m_atribCount - 1;
 		}
-		
 	}
 
 	return true;
@@ -3093,12 +3109,9 @@ dgMeshEffect* dgMeshEffect::ConvexMeshIntersection (const dgMeshEffect* const co
 	dgMeshEffect* const convexIntersection = new (GetAllocator()) dgMeshEffect (*this);
 	convexIntersection->RemoveUnusedVertices(NULL);
 
-	const dgInt32 enunBase = 10000000;
-	dgInt32 faceIdEnumeration = enunBase;
 	dgInt32 mark = convexMesh->IncLRU();
 	dgPolyhedra::Iterator iter (*convexMesh);
 
-	dgTree<dgEdge*,dgInt32> faceMap(GetAllocator());
 	for (iter.Begin(); iter; iter ++){
 		 dgEdge* const convexFace = &(*iter);
 		if (convexFace->m_mark != mark) {
@@ -3107,12 +3120,10 @@ dgMeshEffect* dgMeshEffect::ConvexMeshIntersection (const dgMeshEffect* const co
 				ptr->m_mark = mark;
 				ptr = ptr->m_next;
 			} while (ptr != convexFace);
-			faceMap.Insert(convexFace, faceIdEnumeration);
-			if (!convexIntersection->PlaneClip(*convexMesh, convexFace, faceIdEnumeration)) {
+			if (!convexIntersection->PlaneClip(*convexMesh, convexFace)) {
 				delete convexIntersection;
 				return NULL;
 			}
-			faceIdEnumeration ++;
 		}
 	}
 
@@ -3122,28 +3133,6 @@ dgMeshEffect* dgMeshEffect::ConvexMeshIntersection (const dgMeshEffect* const co
 		return NULL;
 	}
 
-/*
-	mark = convexIntersection->IncLRU();
-	dgPolyhedra::Iterator convexIntersectionIter (*convexIntersection);
-	for (convexIntersectionIter.Begin(); convexIntersectionIter; convexIntersectionIter ++){
-		 dgEdge* const face = &(*convexIntersectionIter);
-		 if ((face->m_incidentFace >= enunBase) && (face->m_mark != mark)) {
-			 dgEdge* ptr = face;
-			 dgAssert (faceMap.Find(face->m_incidentFace));
-			 dgEdge* const convexFace = faceMap.Find(face->m_incidentFace)->GetInfo();
-			 do {
-				 dgAssert (face->m_incidentFace == ptr->m_incidentFace);
-				 const dgBigVector& point = convexIntersection->m_points[ptr->m_incidentVertex];
-				 dgVertexAtribute attibute (convexMesh->InterpolateVertex (point, convexFace));
-				 convexIntersection->AddAtribute (attibute);
-				 ptr->m_userData = convexIntersection->m_atribCount - 1;
-
-				 ptr->m_mark = mark;
-				 ptr = ptr->m_next;
-			 } while (ptr != face);
-		 }
-	}
-*/
 	convexIntersection->RemoveUnusedVertices(NULL);
 	
 	return convexIntersection;
