@@ -412,7 +412,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (dgIsland* const island, dgInt32 
 					row->m_deltaAccel = extenalAcceleration * forceOrImpulseScale;
 					row->m_coordenateAccel += extenalAcceleration * forceOrImpulseScale;
 					dgAssert (row->m_jointFeebackForce);
-					row->m_force = row->m_jointFeebackForce[0] * forceOrImpulseScale;
+					row->m_force = row->m_jointFeebackForce[0].m_force * forceOrImpulseScale;
 
 					//force[index] = 0.0f;
 					dgAssert (row->m_diagDamp >= dgFloat32(0.1f));
@@ -470,7 +470,7 @@ void dgWorldDynamicUpdate::ApplyExternalForcesAndAcceleration(const dgIsland* co
 			dgFloat32 val = row->m_force; 
 
 			dgAssert (dgCheckFloat(val));
-			row->m_jointFeebackForce[0] = val;
+			row->m_jointFeebackForce[0].m_force = val;
 
 			dgVector force (val);
 			y0.m_linear += row->m_Jt.m_jacobianM0.m_linear.CompProduct4 (force);
@@ -1060,7 +1060,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 					dgJacobianMatrixElement* const row = &matrixRow[j + first];
 					dgFloat32 val = row->m_force; 
 					dgAssert (dgCheckFloat(val));
-					row->m_jointFeebackForce[0] = val;
+					row->m_jointFeebackForce[0].m_force = val;
 				}
 				hasJointFeeback |= (constraint->m_updaFeedbackCallback ? 1 : 0);
 			}

@@ -70,16 +70,22 @@ class dgJointCallbackParam
 };
 
 
+class dgForceImpactPair
+{
+	public:
+	dgFloat32 m_force;
+	dgFloat32 m_impact;
+};
+
 class dgBilateralBounds
 {
 	public:
 	dgFloat32 m_low;
 	dgFloat32 m_upper;
 	dgInt32 m_normalIndex;
-	dgFloat32 *m_jointForce;
+	dgForceImpactPair* m_jointForce;
 };
 
-//DG_MSC_VECTOR_ALIGMENT
 DG_MSC_VECTOR_ALIGMENT
 class dgJacobian
 {

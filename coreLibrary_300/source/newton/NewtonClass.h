@@ -108,7 +108,7 @@ class NewtonUserJoint: public dgUserConstraint
 	NewtonUserBilateralGetInfoCallback m_getInfoCallback;
 
 	dgInt32 m_rows;
-	dgFloat32* m_forceArray;
+	dgForceImpactPair* m_forceArray;
 	dgContraintDescritor* m_param;
 
 	dgFloat32 m_lastJointAngle;

@@ -132,11 +132,11 @@ dgVector dgSlidingConstraint::GetJointForce () const
 	dgMatrix matrix1;
 
 	CalculateGlobalMatrixAndAngle (matrix0, matrix1);
-	return dgVector (matrix0.m_up.Scale3 (m_jointForce[0]) + 
-		             matrix0.m_right.Scale3 (m_jointForce[1]) + 
-					 matrix0.m_up.Scale3 (m_jointForce[2]) +
-					 matrix0.m_right.Scale3 (m_jointForce[3]) +
-					 matrix0.m_right.Scale3 (m_jointForce[4]));
+	return dgVector (matrix0.m_up.Scale3 (m_jointForce[0].m_force) + 
+		             matrix0.m_right.Scale3 (m_jointForce[1].m_force) + 
+					 matrix0.m_up.Scale3 (m_jointForce[2].m_force) +
+					 matrix0.m_right.Scale3 (m_jointForce[3].m_force) +
+					 matrix0.m_right.Scale3 (m_jointForce[4].m_force));
 }
 
 

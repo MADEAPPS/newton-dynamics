@@ -164,9 +164,9 @@ class dgContactMaterial: public dgContactPoint
 
 	dgVector m_dir0;
 	dgVector m_dir1;
-	dgFloat32 m_normal_Force;
-	dgFloat32 m_dir0_Force;
-	dgFloat32 m_dir1_Force;
+	dgForceImpactPair m_normal_Force;
+	dgForceImpactPair m_dir0_Force;
+	dgForceImpactPair m_dir1_Force;
 	dgFloat32 m_softness;
 	dgFloat32 m_restitution;
 	dgFloat32 m_staticFriction0;

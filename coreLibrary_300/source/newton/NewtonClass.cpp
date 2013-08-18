@@ -167,9 +167,9 @@ NewtonUserJoint::NewtonUserJoint (
 
 	dgAssert (world);
 	m_forceArray = m_jointForce;
-	if (m_maxDOF > 32) {
+	if (m_maxDOF > DG_BILATERAL_CONTRAINT_DOF) {
 		dgAssert (0);
-		m_forceArray = (dgFloat32*) world->GetAllocator()->Malloc (dgInt32 (m_maxDOF * sizeof (dgFloat32)));
+		m_forceArray = (dgForceImpactPair*) world->GetAllocator()->Malloc (dgInt32 (m_maxDOF * sizeof (dgForceImpactPair)));
 	}
 	memset (m_forceArray, 0, m_maxDOF * sizeof (dgFloat32));
 }
@@ -292,7 +292,7 @@ dgFloat32 NewtonUserJoint::GetRowForce (dgInt32 row) const
 
 	force = 0.0f;
 	if ((row >= 0) && (row < dgInt32 (m_maxDOF))) {
-		force = m_forceArray[row]; 
+		force = m_forceArray[row].m_force; 
 	}
 	return force;
 }

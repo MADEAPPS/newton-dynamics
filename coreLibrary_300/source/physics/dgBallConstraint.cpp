@@ -120,7 +120,7 @@ dgVector dgBallConstraint::GetJointForce () const
 	dgMatrix matrix1;
 
 	CalculateGlobalMatrixAndAngle (matrix0, matrix1);
-	return dgVector (matrix0.m_front.Scale3 (m_jointForce[0]) + matrix0.m_up.Scale3 (m_jointForce[1]) + matrix0.m_right.Scale3 (m_jointForce[2]));
+	return dgVector (matrix0.m_front.Scale3 (m_jointForce[0].m_force) + matrix0.m_up.Scale3 (m_jointForce[1].m_force) + matrix0.m_right.Scale3 (m_jointForce[2].m_force));
 }
 
 bool dgBallConstraint::GetTwistLimitState () const
@@ -279,7 +279,6 @@ dgUnsigned32 dgBallConstraint::JacobianDerivative (dgContraintDescritor& params)
 			params.m_forceBounds[ret].m_low = dgFloat32 (0.0f);
 			params.m_forceBounds[ret].m_normalIndex = DG_NORMAL_CONSTRAINT;
 			params.m_forceBounds[ret].m_jointForce = &m_jointForce[ret];
-//			params.m_jointAccel[ret] = (relVelocErr + penetrationErr) * params.m_invTimestep;
 			SetMotorAcceleration (ret, (relVelocErr + penetrationErr) * params.m_invTimestep, params);
 			ret ++;
 		} else if (angle.m_x < - m_twistAngle) {

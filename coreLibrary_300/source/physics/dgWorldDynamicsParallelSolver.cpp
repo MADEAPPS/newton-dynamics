@@ -213,7 +213,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrixParallelKernel (void* const contex
 			//row->m_extAccel = extenalAcceleration;
 			row->m_deltaAccel = extenalAcceleration;
 			row->m_coordenateAccel += extenalAcceleration;
-			row->m_force = row->m_jointFeebackForce[0];
+			row->m_force = row->m_jointFeebackForce[0].m_force;
 
 			dgAssert (row->m_diagDamp >= dgFloat32(0.1f));
 			dgAssert (row->m_diagDamp <= dgFloat32(100.0f));
@@ -602,7 +602,7 @@ void dgWorldDynamicUpdate::UpdateFeedbackForcesParallelKernel (void* const conte
 			dgJacobianMatrixElement* const row = &matrixRow[j + first];
 			dgFloat32 val = row->m_force; 
 			dgAssert (dgCheckFloat(val));
-			row->m_jointFeebackForce[0] = val;
+			row->m_jointFeebackForce[0].m_force = val;
 		}
 		hasJointFeeback |= (constraintArray[i].m_joint->m_updaFeedbackCallback ? 1 : 0);
 	}

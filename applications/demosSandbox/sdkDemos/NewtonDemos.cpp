@@ -45,7 +45,7 @@
 //#define DEFAULT_SCENE	19			// simple convex decomposition
 //#define DEFAULT_SCENE	20			// scene Collision
 //#define DEFAULT_SCENE	21          // simple boolean operators 
-//#define DEFAULT_SCENE	22			// simple convex fracturing 
+#define DEFAULT_SCENE	22			// simple convex fracturing 
 //#define DEFAULT_SCENE	23			// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	24			// continue collision
 //#define DEFAULT_SCENE	25			// puck slide continue collision
@@ -54,7 +54,7 @@
 //#define DEFAULT_SCENE	28			// basic car
 //#define DEFAULT_SCENE	29			// high performance super car
 //#define DEFAULT_SCENE	30			// basic player controller
-#define DEFAULT_SCENE	31			// advanced player controller
+//#define DEFAULT_SCENE	31			// advanced player controller
 //#define DEFAULT_SCENE	32			// cloth patch			
 //#define DEFAULT_SCENE	33			// soft bodies			
 

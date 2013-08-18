@@ -188,7 +188,7 @@ void dgBilateralConstraint::SetJacobianDerivative (
 	dgContraintDescritor& desc, 
 	const dgFloat32* jacobianA, 
 	const dgFloat32* jacobianB, 
-	dgFloat32* const jointForce)
+	dgForceImpactPair* const jointForce)
 {
 	dgJacobian &jacobian0 = desc.m_jacobian[index].m_jacobianM0; 
 	dgJacobian &jacobian1 = desc.m_jacobian[index].m_jacobianM1; 
@@ -267,7 +267,7 @@ void dgBilateralConstraint::CalculateAngularDerivative (
 	const dgVector& dir,	
 	dgFloat32 stiffness,
 	dgFloat32 jointAngle,
-	dgFloat32* const jointForce)
+	dgForceImpactPair* const jointForce)
 {
 	dgAssert (jointForce);
 	dgAssert (m_body0);
@@ -332,7 +332,7 @@ void dgBilateralConstraint::CalculatePointDerivative (
 	dgContraintDescritor& desc, 
 	const dgVector& dir,	
 	const dgPointParam& param,
-	dgFloat32* const jointForce)
+	dgForceImpactPair* const jointForce)
 {
 	dgAssert (jointForce);
 	dgAssert (m_body0);

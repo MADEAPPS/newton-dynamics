@@ -9,8 +9,6 @@
 * freely
 */
 
-
-
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
 #include "TargaToOpenGl.h"
@@ -25,94 +23,6 @@
 
 #define BREAK_FORCE_IN_GRAVITIES	6
 //#define BREAK_FORCE_IN_GRAVITIES	1
-
-#if 0
-static void CreateSimpleVoronoiFracture (DemoEntityManager* const scene)
-{
-	// create a collision primitive
-//	dVector size (2.0f, 2.0f, 2.0f);
-//	dVector size = dVector (10.0f, 0.5f, 10.0f, 0.0f);
-	dVector size = dVector (5.0f, 5.0f, 5.0f, 0.0f);
-	NewtonWorld* const world = scene->GetNewton();
-
-//	NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
-	NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), size, _CAPSULE_PRIMITIVE, 0);
-//	NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), size, _SPHERE_PRIMITIVE, 0);
-//	NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), size, _REGULAR_CONVEX_HULL_PRIMITIVE, 0);
-//	NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), size, _RANDOM_CONVEX_HULL_PRIMITIVE, 0);
-	
-	
-
-	// create a newton mesh from the collision primitive
-	NewtonMesh* const mesh = NewtonMeshCreateFromCollision(collision);
-
-	// apply a simple Box Mapping
-	int tex0 = LoadTexture("reljef.tga");
-	NewtonMeshApplyBoxMapping(mesh, tex0, tex0, tex0);
-
-	// pepper the bing box of the mesh with random points
-	dVector points[NUMBER_OF_INTERNAL_PARTS + 100];
-	int count = 0;
-
-	while (count < NUMBER_OF_INTERNAL_PARTS) {
-		dFloat x = RandomVariable(size.m_x);
-		dFloat y = RandomVariable(size.m_y);
-		dFloat z = RandomVariable(size.m_z);
-		if ((x <= size.m_x) && (x >= -size.m_x) && (y <= size.m_y) && (y >= -size.m_y) && (z <= size.m_z) && (z >= -size.m_z)){
-			points[count] = dVector (x, y, z);
-			count ++;
-		}
-	} 
-
-count = 4;
-
-	// Create the array of convex pieces from the mesh
-	int interior = LoadTexture("KAMEN-stup.tga");
-//	int interior = LoadTexture("camo.tga");
-	dMatrix textureMatrix (GetIdentityMatrix());
-	textureMatrix[0][0] = 1.0f / size.m_x;
-	textureMatrix[1][1] = 1.0f / size.m_y;
-	NewtonMesh* const convexParts = NewtonMeshVoronoiDecomposition (mesh, count, sizeof (dVector), &points[0].m_x, interior, &textureMatrix[0][0]);
-//	NewtonMesh* const convexParts = NewtonMeshConvexDecomposition (mesh, 1000000);
-
-#if 1
-dScene xxxx(world);
-dScene::dTreeNode* const modelNode = xxxx.CreateSceneNode(xxxx.GetRootNode());
-dScene::dTreeNode* const meshNode = xxxx.CreateMeshNode(modelNode);
-dMeshNodeInfo* const modelMesh = (dMeshNodeInfo*)xxxx.GetInfoFromNode(meshNode);
-modelMesh->ReplaceMesh (convexParts);
-xxxx.Serialize("../../../media/xxx.ngd");
-#endif
-
-	DemoEntity* const entity = new DemoEntity(NULL);
-	entity->SetMatrix(*scene, dQuaternion(), dVector (0, 10, 0, 0));
-	entity->InterpolateMatrix (*scene, 1.0f);
-	
-	
-	scene->Append (entity);
-	DemoMesh* const mesh1 = new DemoMesh(convexParts);
-	entity->SetMesh(mesh1);
-	mesh1->Release();
-
-/*
-DemoEntity* const entity2 = new DemoEntity(NULL);
-entity2->SetMatrix(*scene, dQuaternion(), dVector (0, 10, 0, 0));
-entity2->InterpolateMatrix (*scene, 1.0f);
-
-scene->Append (entity2);
-DemoMesh* const mesh2 = new DemoMesh(mesh);
-entity2->SetMesh(mesh2);
-mesh2->Release();
-*/
-
-	// make sure the assets are released before leaving the function
-	if (convexParts) {
-		NewtonMeshDestroy (convexParts);
-	}
-	NewtonMeshDestroy (mesh);
-	NewtonDestroyCollision (collision);
-}
-#endif
 
 
 class FractureAtom
@@ -491,11 +401,11 @@ void SimpleConvexFracturing (DemoEntityManager* const scene)
 	dVector size (0.75f, 0.75f, 0.75f, 0.0f);
 	dMatrix shapeOffsetMatrix (GetIdentityMatrix());
 
-	int count = 5;
+	int count = 1;
 	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);

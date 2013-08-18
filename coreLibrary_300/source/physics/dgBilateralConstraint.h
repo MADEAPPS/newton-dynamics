@@ -24,10 +24,10 @@
 
 #include "dgConstraint.h"
 
+#define DG_BILATERAL_CONTRAINT_DOF	8 
 
 class dgBilateralConstraint: public dgConstraint  
 {
-
 	public:
 	virtual void SetDestructorCallback (OnConstraintDestroy destructor);
 
@@ -52,9 +52,9 @@ class dgBilateralConstraint: public dgConstraint
 	virtual void JointVelocityCorrection(dgJointAccelerationDecriptor* const params); 
 
 	void SetMotorAcceleration (dgInt32 index, dgFloat32 accelration, dgContraintDescritor& desc);
-	void SetJacobianDerivative (dgInt32 index, dgContraintDescritor& desc, const dgFloat32* jacobianA, const dgFloat32* jacobianB, dgFloat32* const jointForce);
-	void CalculatePointDerivative (dgInt32 index, dgContraintDescritor& desc, const dgVector& normalGlobal, const dgPointParam& param, dgFloat32* const jointForce);
-	void CalculateAngularDerivative (dgInt32 index, dgContraintDescritor& desc, const dgVector& normalGlobal, dgFloat32 stiffness, dgFloat32 jointAngle, dgFloat32* const jointForce);
+	void SetJacobianDerivative (dgInt32 index, dgContraintDescritor& desc, const dgFloat32* jacobianA, const dgFloat32* jacobianB, dgForceImpactPair* const jointForce);
+	void CalculatePointDerivative (dgInt32 index, dgContraintDescritor& desc, const dgVector& normalGlobal, const dgPointParam& param, dgForceImpactPair* const jointForce);
+	void CalculateAngularDerivative (dgInt32 index, dgContraintDescritor& desc, const dgVector& normalGlobal, dgFloat32 stiffness, dgFloat32 jointAngle, dgForceImpactPair* const jointForce);
 	dgFloat32 CalculateSpringDamperAcceleration (dgInt32 index, const dgContraintDescritor& desc, dgFloat32 jointAngle, const dgVector& p0Global, const dgVector& p1Global, dgFloat32 springK, dgFloat32 springD);
 
 	void SetMaxContactsForExactSolver (bool mode, dgInt32 MaxCount);
@@ -62,9 +62,9 @@ class dgBilateralConstraint: public dgConstraint
 	dgMatrix m_localMatrix0;
 	dgMatrix m_localMatrix1;
 	dgFloat32 m_stiffness;
-	dgFloat32 m_jointForce[32];
-	dgInt32	  m_rowIsMotor[32];
-	dgFloat32 m_motorAcceleration[32];
+	dgForceImpactPair m_jointForce[DG_BILATERAL_CONTRAINT_DOF];
+	dgInt32	  m_rowIsMotor[DG_BILATERAL_CONTRAINT_DOF];
+	dgFloat32 m_motorAcceleration[DG_BILATERAL_CONTRAINT_DOF];
 	dgInt32 m_useExactSolverContactLimit;
 	
 	OnConstraintDestroy m_destructor;
