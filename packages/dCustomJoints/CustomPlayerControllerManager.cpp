@@ -243,18 +243,16 @@ dVector CustomPlayerController::CalculateDesiredVelocity (dFloat forwardSpeed, d
 			NewtonBodyGetVelocity(m_body, &bodyVeloc[0]);
 			veloc = updir.Scale(bodyVeloc % updir) + gravity.Scale (timestep) + frontDir.Scale (forwardSpeed) + rightDir.Scale (lateralSpeed) + updir.Scale(verticalSpeed);
 			veloc += (m_groundVelocity - updir.Scale (updir % m_groundVelocity));
+
+			dFloat speedLimitMag2 = forwardSpeed * forwardSpeed + lateralSpeed * lateralSpeed + verticalSpeed * verticalSpeed + 0.1f;
+			dFloat speedMag2 = veloc % veloc;
+			if (speedMag2 > speedLimitMag2) {
+				veloc = veloc.Scale (dSqrt (speedLimitMag2 / speedMag2));
+			}
+
 			dFloat normalVeloc = m_groundPlane % (veloc - m_groundVelocity);
 			if (normalVeloc < 0.0f) {
 				veloc -= m_groundPlane.Scale (normalVeloc);
-			}
-			dFloat speedLimitMag2 = forwardSpeed * forwardSpeed + lateralSpeed * lateralSpeed + verticalSpeed * verticalSpeed;
-			dFloat speedMag2 = veloc % veloc;
-			if (speedMag2 > speedLimitMag2) {
-				if (speedLimitMag2 < dFloat (1.0e-6f)) {
-					veloc = dVector (0.0f, 0.0f, 0.0f, 0.0f);
-				} else {
-					veloc = veloc.Scale (dSqrt (speedLimitMag2 / speedMag2));
-				}
 			}
 		} else {
 			// player is in an illegal ramp, he slides down hill an loses control of his movement 
@@ -312,6 +310,8 @@ void CustomPlayerController::UpdateGroundPlane (dMatrix& matrix, const dMatrix& 
 
 	m_groundPlane = dVector (0.0f, 0.0f, 0.0f, 0.0f);
 	m_groundVelocity = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+
+
 
 	if (filter.m_hitBody) {
 		m_isJumping = false;
@@ -457,20 +457,16 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 	NewtonCollisionSetScale (m_upperBodyShape, scale.m_x, scale.m_y, scale.m_z);
 
 	// determine if player is standing on some plane
-	if (step > 1.0e-6f) {
-		dMatrix supportMatrix (matrix);
-
-		supportMatrix.m_posit += updir.Scale (m_sphereCastOrigin);
-
-		if (m_isJumping) {
-			dVector dst (matrix.m_posit);
-			UpdateGroundPlane (matrix, supportMatrix, dst, threadIndex);
-		} else {
-			step = dAbs (updir % veloc.Scale (timestep));
-			dFloat castDist = ((m_groundPlane % m_groundPlane) > 0.0f) ? m_stairStep : step;
-			dVector dst (matrix.m_posit - updir.Scale (castDist * 2.0f));
-			UpdateGroundPlane (matrix, supportMatrix, dst, threadIndex);
-		}
+	dMatrix supportMatrix (matrix);
+	supportMatrix.m_posit += updir.Scale (m_sphereCastOrigin);
+	if (m_isJumping) {
+		dVector dst (matrix.m_posit);
+		UpdateGroundPlane (matrix, supportMatrix, dst, threadIndex);
+	} else {
+		step = dAbs (updir % veloc.Scale (timestep));
+		dFloat castDist = ((m_groundPlane % m_groundPlane) > 0.0f) ? m_stairStep : step;
+		dVector dst (matrix.m_posit - updir.Scale (castDist * 2.0f));
+		UpdateGroundPlane (matrix, supportMatrix, dst, threadIndex);
 	}
 
 	// set player velocity, position and orientation
