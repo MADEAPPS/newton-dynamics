@@ -2012,9 +2012,10 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 		dgInt32 key = nodeNode->GetKey();
 
 		if (key < guadVertexKey) {
-
-			dgInt32 count = 0;
 			dgBigVector pointArray[512];
+			dgInt32 indexArray[512];
+			
+			dgInt32 count = 0;
 			for (dgList<dgInt32>::dgListNode* ptr = list.GetFirst(); ptr; ptr = ptr->GetNext()) {
 				dgInt32 i = ptr->GetInfo();
 				pointArray[count] = voronoiPoints[i];
@@ -2022,20 +2023,23 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 				dgAssert (count < dgInt32 (sizeof (pointArray) / sizeof (pointArray[0])));
 			}
 
-			dgMeshEffect convexMesh (allocator, &pointArray[0].m_x, count, sizeof (dgBigVector), dgFloat64 (0.0f));
-			if (convexMesh.GetCount()) {
-				convexMesh.CalculateNormals(normalAngleInRadians);
-				convexMesh.UniformBoxMapping (materialId, textureProjectionMatrix);
+			count = dgVertexListToIndexList(&pointArray[0].m_x, sizeof (dgBigVector), 3, count, &indexArray[0], dgFloat64 (1.0e-3f));	
+			if (count >= 4) {
+				dgMeshEffect convexMesh (allocator, &pointArray[0].m_x, count, sizeof (dgBigVector), dgFloat64 (0.0f));
+				if (convexMesh.GetCount()) {
+					convexMesh.CalculateNormals(normalAngleInRadians);
+					convexMesh.UniformBoxMapping (materialId, textureProjectionMatrix);
 
-				for (dgInt32 i = 0; i < convexMesh.m_pointCount; i ++) {
-					convexMesh.m_points[i].m_w = layer;
-				}
-				for (dgInt32 i = 0; i < convexMesh.m_atribCount; i ++) {
-					convexMesh.m_attrib[i].m_vertex.m_w = layer;
-				}
+					for (dgInt32 i = 0; i < convexMesh.m_pointCount; i ++) {
+						convexMesh.m_points[i].m_w = layer;
+					}
+					for (dgInt32 i = 0; i < convexMesh.m_atribCount; i ++) {
+						convexMesh.m_attrib[i].m_vertex.m_w = layer;
+					}
 
-				voronoiPartition->MergeFaces(&convexMesh);
-				layer += dgFloat64 (1.0f);
+					voronoiPartition->MergeFaces(&convexMesh);
+					layer += dgFloat64 (1.0f);
+				}
 			}
 		}
 	}
