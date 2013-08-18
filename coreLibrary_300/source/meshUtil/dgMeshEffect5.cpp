@@ -2955,14 +2955,45 @@ bool dgMeshEffect::PlaneClip (const dgMeshEffect& convexMesh, const dgEdge* cons
 {
 
 	dgBigVector normal (convexMesh.FaceNormal(convexFace, &convexMesh.m_points[0].m_x, sizeof(dgBigVector)));
-	if ((normal % normal) < dgFloat64 (1.0e-30)) {
+	dgFloat64 mag2 = normal % normal;
+	if (mag2 < dgFloat64 (1.0e-30)) {
 		dgAssert (0);
 		return true;
 	}  
-	dgBigPlane plane (normal, - (convexMesh.m_points[convexFace->m_incidentVertex] % normal));
-	plane = plane.Scale (dgFloat64(1.0f)/ sqrt (plane % plane));
+
+	normal = normal.Scale3(dgFloat64 (1.0f) / sqrt (mag2));
+	dgBigVector origin (convexMesh.m_points[convexFace->m_incidentVertex]);
+	dgBigPlane plane (normal, - (origin % normal));
 
 	dgFloat64 capAttribute = convexMesh.m_attrib[convexFace->m_userData].m_material;
+
+	dgMatrix matrix;
+	
+	dgBigVector p1 (convexMesh.m_points[convexFace->m_next->m_incidentVertex]);
+
+	dgBigVector xDir (p1 - origin);
+	matrix[2] = dgVector (normal);
+	matrix[0] = dgVector(xDir.Scale3(dgFloat64 (1.0f) / sqrt (xDir% xDir)));
+	matrix[1] = matrix[2] * matrix[0];
+	matrix[3] = dgVector (origin);
+	matrix[3][3] = dgFloat32 (1.0f);
+
+
+	dgVector q0 (matrix.UntransformVector(dgVector(origin)));
+	dgVector q1 (matrix.UntransformVector(dgVector(p1)));
+	dgVector q2 (matrix.UntransformVector(dgVector(convexMesh.m_points[convexFace->m_next->m_next->m_incidentVertex])));
+
+	dgVector p10 (q1 - q0);
+	dgVector p20 (q2 - q0);
+
+	dgVector uv0_0 (dgFloat32 (convexMesh.m_attrib[convexFace->m_userData].m_u0), dgFloat32 (convexMesh.m_attrib[convexFace->m_userData].m_v0), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	dgVector uv0_1 (dgFloat32 (convexMesh.m_attrib[convexFace->m_next->m_userData].m_u0), dgFloat32 (convexMesh.m_attrib[convexFace->m_next->m_userData].m_v0), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	dgVector uv0_2 (dgFloat32 (convexMesh.m_attrib[convexFace->m_next->m_next->m_userData].m_u0), dgFloat32 (convexMesh.m_attrib[convexFace->m_next->m_next->m_userData].m_v0), dgFloat32 (0.0f), dgFloat32 (0.0f));
+
+	dgVector uv1_0 (dgFloat32 (convexMesh.m_attrib[convexFace->m_userData].m_u1), dgFloat32 (convexMesh.m_attrib[convexFace->m_userData].m_v1), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	dgVector uv1_1 (dgFloat32 (convexMesh.m_attrib[convexFace->m_next->m_userData].m_u1), dgFloat32 (convexMesh.m_attrib[convexFace->m_next->m_userData].m_v1), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	dgVector uv1_2 (dgFloat32 (convexMesh.m_attrib[convexFace->m_next->m_next->m_userData].m_u1), dgFloat32 (convexMesh.m_attrib[convexFace->m_next->m_next->m_userData].m_v1), dgFloat32 (0.0f), dgFloat32 (0.0f));
+
 	
 	dgInt32 neutral = 0;
 	dgInt32 positive = 0;
@@ -3079,6 +3110,9 @@ bool dgMeshEffect::PlaneClip (const dgMeshEffect& convexMesh, const dgEdge* cons
 			DeleteEdge(edge);
 		}
 
+
+
+
 		for (dgInt32 i = 0; i < capCount; i ++) {
 			dgEdge* const edge = capEdges[i];
 			dgVertexAtribute attibute;
@@ -3087,10 +3121,33 @@ bool dgMeshEffect::PlaneClip (const dgMeshEffect& convexMesh, const dgEdge* cons
 			attibute.m_normal_y = normal.m_y;
 			attibute.m_normal_z = normal.m_z;
 			attibute.m_material = capAttribute;
-			attibute.m_u0 = 0.0f;
-			attibute.m_v0 = 0.0f;
-			attibute.m_u1 = 0.0f;
-			attibute.m_v1 = 0.0f;
+
+			dgVector p (matrix.UntransformVector (attibute.m_vertex));
+
+			dgVector p_p0 (p - q0);
+			dgVector p_p1 (p - q1);
+			dgVector p_p2 (p - q2);
+			dgFloat32 alpha1 = p10 % p_p0;
+			dgFloat32 alpha2 = p20 % p_p0;
+			dgFloat32 alpha3 = p10 % p_p1;
+			dgFloat32 alpha4 = p20 % p_p1;
+			dgFloat32 alpha5 = p10 % p_p2;
+			dgFloat32 alpha6 = p20 % p_p2;
+			dgFloat32 vc = alpha1 * alpha4 - alpha3 * alpha2;
+			dgFloat32 vb = alpha5 * alpha2 - alpha1 * alpha6;
+			dgFloat32 va = alpha3 * alpha6 - alpha5 * alpha4;
+			dgFloat32 den = va + vb + vc;
+			dgAssert (den > 0.0f);
+
+			den = dgFloat32 (1.0f) / (va + vb + vc);
+			dgFloat32 alpha0 = dgFloat32 (va * den);
+			alpha1 = dgFloat32 (vb * den);
+			alpha2 = dgFloat32 (vc * den);
+
+			attibute.m_u0 = uv0_0.m_x * alpha0 + uv0_1.m_x * alpha1 + uv0_2.m_x * alpha2; 
+			attibute.m_v0 = uv0_0.m_y * alpha0 + uv0_1.m_y * alpha1 + uv0_2.m_y * alpha2; 
+			attibute.m_u1 = uv1_0.m_x * alpha0 + uv1_1.m_x * alpha1 + uv1_2.m_x * alpha2; 
+			attibute.m_v1 = uv1_0.m_y * alpha0 + uv1_1.m_y * alpha1 + uv1_2.m_y * alpha2; 
 			AddAtribute (attibute);
 			edge->m_userData = m_atribCount - 1;
 		}
