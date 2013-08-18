@@ -290,8 +290,10 @@ void CustomPlayerController::SetPlayerVelocity (dFloat forwardSpeed, dFloat late
 
 dFloat CustomPlayerController::CalculateContactKinematics(const dVector& veloc, const NewtonWorldConvexCastReturnInfo* const contactInfo) const
 {
-	dVector contactVeloc;
-	NewtonBodyGetPointVelocity (contactInfo->m_hitBody, contactInfo->m_point, &contactVeloc[0]);
+	dVector contactVeloc(0.0f, 0.0f, 0.0f, 0.0f) ;
+	if (contactInfo->m_hitBody) {
+		NewtonBodyGetPointVelocity (contactInfo->m_hitBody, contactInfo->m_point, &contactVeloc[0]);
+	}
 
 	const dFloat restitution = 0.0f;
 	dVector normal (contactInfo->m_normal);
@@ -310,8 +312,6 @@ void CustomPlayerController::UpdateGroundPlane (dMatrix& matrix, const dMatrix& 
 
 	m_groundPlane = dVector (0.0f, 0.0f, 0.0f, 0.0f);
 	m_groundVelocity = dVector (0.0f, 0.0f, 0.0f, 0.0f);
-
-
 
 	if (filter.m_hitBody) {
 		m_isJumping = false;
@@ -363,6 +363,15 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 	//const dFloat radio = m_outerRadio * 4.0f;
 	const dFloat radio = (m_outerRadio + m_restrainingDistance) * 4.0f;
 	NewtonCollisionSetScale (m_upperBodyShape, m_height - m_stairStep, radio, radio);
+
+
+	NewtonWorldConvexCastReturnInfo upConstratint;
+	memset (&upConstratint, 0, sizeof (upConstratint));
+	upConstratint.m_normal[0] = m_upVector.m_x;
+	upConstratint.m_normal[1] = m_upVector.m_y;
+	upConstratint.m_normal[2] = m_upVector.m_z;
+	upConstratint.m_normal[3] = m_upVector.m_w;
+
 	for (int j = 0; (j < D_PLAYER_MAX_INTERGRATION_STEPS) && (normalizedTimeLeft > 1.0e-5f); j ++ ) {
 		if ((veloc % veloc) < 1.0e-6f) {
 			break;
@@ -388,16 +397,35 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 			dFloat bounceSpeed[PLAYER_CONTROLLER_MAX_CONTACTS * 2];
 			dVector bounceNormal[PLAYER_CONTROLLER_MAX_CONTACTS * 2];
 
+			for (int i = 1; i < contactCount; i ++) {
+				dVector n0 (info[i-1].m_normal);
+				for (int j = 0; j < i; j ++) {
+					dVector n1 (info[j].m_normal);
+					if ((n0 % n1) > 0.9999f) {
+						info[i] = info[contactCount - 1];
+						i --;
+						contactCount --;
+						break;
+					}
+				}
+			}
+
 			int count = 0;
+			if (!m_isJumping) {
+				upConstratint.m_point[0] = matrix.m_posit.m_x;
+				upConstratint.m_point[1] = matrix.m_posit.m_y;
+				upConstratint.m_point[2] = matrix.m_posit.m_z;
+				upConstratint.m_point[3] = matrix.m_posit.m_w;
+
+				speed[count] = 0.0f;
+				bounceNormal[count] = dVector (upConstratint.m_normal);
+				bounceSpeed[count] = CalculateContactKinematics(veloc, &upConstratint);
+				count ++;
+			}
+
 			for (int i = 0; i < contactCount; i ++) {
 				speed[count] = 0.0f;
-				dVector normal (info[i].m_normal);
-				normal -= updir.Scale(updir % normal);
-				normal = normal.Scale (1.0f / dSqrt (normal % normal));
-				bounceNormal[count] = normal;
-				info[i].m_normal[0] = normal.m_x;
-				info[i].m_normal[1] = normal.m_y;
-				info[i].m_normal[2] = normal.m_z;
+				bounceNormal[count] = dVector (info[i].m_normal);
 				bounceSpeed[count] = CalculateContactKinematics(veloc, &info[i]);
 				count ++;
 			}
