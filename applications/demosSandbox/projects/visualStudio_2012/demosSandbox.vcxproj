@@ -542,12 +542,6 @@ xcopy  "../../../../packages/projects/visualStudio_2012/$(PlatformName)/dJointLi
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\coreLibrary_300\projects\windows\project_vs2012\ai.vcxproj">
-      <Project>{7d48cee3-5263-46ca-bd69-924881f0ea2f}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\coreLibrary_300\projects\windows\project_vs2012\core.vcxproj">
-      <Project>{57ac4f2d-b115-4931-8f6e-af8ad616b6aa}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\..\coreLibrary_300\projects\windows\project_vs2012\newton.vcxproj">
       <Project>{68d9962c-0ec7-445a-b0fd-f87b16d43901}</Project>
     </ProjectReference>
@@ -556,15 +550,6 @@ xcopy  "../../../../packages/projects/visualStudio_2012/$(PlatformName)/dJointLi
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\coreLibrary_300\source\pthreads.2\VS_2012\pthread.vcxproj">
       <Project>{03bca23c-02a5-415b-a37b-26600bc2ce96}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2012\dAILibrary.vcxproj">
-      <Project>{2f95c24f-6935-4288-a71c-dab402e4eabc}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2012\dAnimation.vcxproj">
-      <Project>{e3c14351-bad1-4add-ab9a-31054d6e7cdb}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2012\dContainers.vcxproj">
-      <Project>{f67c4593-a914-4ddf-8cb5-c59a3ef3ece0}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2012\dJointLibrary.vcxproj">
       <Project>{721c99ce-4716-4146-9817-59bc2671b844}</Project>
@@ -595,12 +580,6 @@ xcopy  "../../../../packages/projects/visualStudio_2012/$(PlatformName)/dJointLi
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\thirdParty\tinyxml\vs2012\tinyxml.vcxproj">
       <Project>{18e509cf-46d2-4749-b3bb-160937cf2481}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2012\wx_vc9_base.vcxproj">
-      <Project>{3fcc50c2-81e9-5db2-b8d8-2129427568b1}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2012\wx_vc9_core.vcxproj">
-      <Project>{6744dad8-9c70-574a-bff2-9f8dddb24a75}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2012\wx_vc9_gl.vcxproj">
       <Project>{da8b15ef-6750-5928-bc0e-c748213cf9b2}</Project>
