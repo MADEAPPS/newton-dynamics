@@ -33,7 +33,6 @@
 		FF084AB1173F1B090059C41D /* SkyBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60FB61556DBB400E7B112 /* SkyBox.cpp */; };
 		FF084AB3173F1B090059C41D /* TargaToOpenGl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60FB81556DBB400E7B112 /* TargaToOpenGl.cpp */; };
 		FF084AB5173F1B090059C41D /* toolbox_stdafx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60FBA1556DBB400E7B112 /* toolbox_stdafx.cpp */; };
-		FF084AB7173F1B310059C41D /* PostCompoundCreateBuildTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF3B297817300D39007E6FEC /* PostCompoundCreateBuildTest.cpp */; };
 		FF084AB8173F1B310059C41D /* PuckSlide.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF3B297917300D39007E6FEC /* PuckSlide.cpp */; };
 		FF084AB9173F1B310059C41D /* SimpleBooleans.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF3B297A17300D39007E6FEC /* SimpleBooleans.cpp */; };
 		FF084ABA173F1B310059C41D /* UserStaticCollision.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF3B297017300C79007E6FEC /* UserStaticCollision.cpp */; };
@@ -57,7 +56,6 @@
 		FF084ACC173F1B310059C41D /* PrimitiveCollision.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F6B1556DA2300E7B112 /* PrimitiveCollision.cpp */; };
 		FF084ACD173F1B310059C41D /* ScaledCollision.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F6E1556DA2300E7B112 /* ScaledCollision.cpp */; };
 		FF084ACE173F1B310059C41D /* SceneCollision.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F6F1556DA2300E7B112 /* SceneCollision.cpp */; };
-		FF084ACF173F1B310059C41D /* SimpleConvexShatter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F701556DA2300E7B112 /* SimpleConvexShatter.cpp */; };
 		FF084AD0173F1B310059C41D /* SoftBodies.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F711556DA2300E7B112 /* SoftBodies.cpp */; };
 		FF084AD1173F1B310059C41D /* SuperCar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F731556DA2300E7B112 /* SuperCar.cpp */; };
 		FF084AD2173F1B310059C41D /* UsingNewtonMeshTool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F771556DA2300E7B112 /* UsingNewtonMeshTool.cpp */; };
@@ -237,6 +235,24 @@
 		FF5067F9173F3EAD00D01FDF /* env1.tga in Resources */ = {isa = PBXBuildFile; fileRef = FF50669D173F3D8800D01FDF /* env1.tga */; };
 		FF5067FA173F3EAD00D01FDF /* f1.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF50669E173F3D8800D01FDF /* f1.ngd */; };
 		FF6FCF70175156940088B4D3 /* CocoaOpenglGlue.mm in Sources */ = {isa = PBXBuildFile; fileRef = FF6FCF6F175156940088B4D3 /* CocoaOpenglGlue.mm */; };
+		FF82375D17C26DE6004C80D4 /* ArchimedesBuoyancy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF82375A17C26DE6004C80D4 /* ArchimedesBuoyancy.cpp */; };
+		FF82375E17C26DE6004C80D4 /* ArticulatedJoints.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF82375B17C26DE6004C80D4 /* ArticulatedJoints.cpp */; };
+		FF82375F17C26DE6004C80D4 /* SimpleConvexFracturing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF82375C17C26DE6004C80D4 /* SimpleConvexFracturing.cpp */; };
+		FF82377017C26F8C004C80D4 /* aventador.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF82376017C26F8B004C80D4 /* aventador.ngd */; };
+		FF82377117C26F8C004C80D4 /* forklift_d.tga in Resources */ = {isa = PBXBuildFile; fileRef = FF82376117C26F8B004C80D4 /* forklift_d.tga */; };
+		FF82377217C26F8C004C80D4 /* forklift_underside_d.tga in Resources */ = {isa = PBXBuildFile; fileRef = FF82376217C26F8B004C80D4 /* forklift_underside_d.tga */; };
+		FF82377317C26F8C004C80D4 /* forklift_wheels_d.tga in Resources */ = {isa = PBXBuildFile; fileRef = FF82376317C26F8B004C80D4 /* forklift_wheels_d.tga */; };
+		FF82377417C26F8C004C80D4 /* forklift.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF82376417C26F8B004C80D4 /* forklift.ngd */; };
+		FF82377517C26F8C004C80D4 /* DirectionalDiffuse.ps in Resources */ = {isa = PBXBuildFile; fileRef = FF82376617C26F8B004C80D4 /* DirectionalDiffuse.ps */; };
+		FF82377617C26F8C004C80D4 /* DirectionalDiffuse.vs in Sources */ = {isa = PBXBuildFile; fileRef = FF82376717C26F8B004C80D4 /* DirectionalDiffuse.vs */; };
+		FF82377717C26F8C004C80D4 /* SkinningDirectionalDiffuse.ps in Resources */ = {isa = PBXBuildFile; fileRef = FF82376817C26F8B004C80D4 /* SkinningDirectionalDiffuse.ps */; };
+		FF82377817C26F8C004C80D4 /* SkinningDirectionalDiffuse.vs in Sources */ = {isa = PBXBuildFile; fileRef = FF82376917C26F8B004C80D4 /* SkinningDirectionalDiffuse.vs */; };
+		FF82377917C26F8C004C80D4 /* SolidColor.ps in Resources */ = {isa = PBXBuildFile; fileRef = FF82376A17C26F8C004C80D4 /* SolidColor.ps */; };
+		FF82377A17C26F8C004C80D4 /* SolidColor.vs in Sources */ = {isa = PBXBuildFile; fileRef = FF82376B17C26F8C004C80D4 /* SolidColor.vs */; };
+		FF82377B17C26F8C004C80D4 /* TextureDecal.ps in Resources */ = {isa = PBXBuildFile; fileRef = FF82376C17C26F8C004C80D4 /* TextureDecal.ps */; };
+		FF82377C17C26F8C004C80D4 /* TextureDecal.vs in Sources */ = {isa = PBXBuildFile; fileRef = FF82376D17C26F8C004C80D4 /* TextureDecal.vs */; };
+		FF82377D17C26F8C004C80D4 /* swimmingPool.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF82376E17C26F8C004C80D4 /* swimmingPool.ngd */; };
+		FF82377E17C26F8C004C80D4 /* tractor.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF82376F17C26F8C004C80D4 /* tractor.ngd */; };
 		FF85000C1740605300BEE80B /* libdContainers.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF85FFE317405FDE00BEE80B /* libdContainers.a */; };
 		FF85000D1740605400BEE80B /* libdCustomJoints.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF85FFF217405FDE00BEE80B /* libdCustomJoints.a */; };
 		FF85000E1740605400BEE80B /* libdMath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF85000117405FDE00BEE80B /* libdMath.a */; };
@@ -366,7 +382,6 @@
 		FF3B297017300C79007E6FEC /* UserStaticCollision.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UserStaticCollision.cpp; path = ../../../sdkDemos/demos/UserStaticCollision.cpp; sourceTree = "<group>"; };
 		FF3B297217300CF0007E6FEC /* UserHeightFieldCollision.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UserHeightFieldCollision.cpp; path = ../../../sdkDemos/toolBox/UserHeightFieldCollision.cpp; sourceTree = "<group>"; };
 		FF3B297417300CF0007E6FEC /* UserPlaneCollision.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UserPlaneCollision.cpp; path = ../../../sdkDemos/toolBox/UserPlaneCollision.cpp; sourceTree = "<group>"; };
-		FF3B297817300D39007E6FEC /* PostCompoundCreateBuildTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PostCompoundCreateBuildTest.cpp; path = ../../../sdkDemos/demos/PostCompoundCreateBuildTest.cpp; sourceTree = "<group>"; };
 		FF3B297917300D39007E6FEC /* PuckSlide.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PuckSlide.cpp; path = ../../../sdkDemos/demos/PuckSlide.cpp; sourceTree = "<group>"; };
 		FF3B297A17300D39007E6FEC /* SimpleBooleans.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SimpleBooleans.cpp; path = ../../../sdkDemos/demos/SimpleBooleans.cpp; sourceTree = "<group>"; };
 		FF506608173F33DA00D01FDF /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = /System/Library/Frameworks/CoreGraphics.framework; sourceTree = "<absolute>"; };
@@ -548,6 +563,24 @@
 		FF506720173F3D8A00D01FDF /* yellow_p.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = yellow_p.tga; path = ../../../../media/yellow_p.tga; sourceTree = "<group>"; };
 		FF6FCF6F175156940088B4D3 /* CocoaOpenglGlue.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CocoaOpenglGlue.mm; path = ../../../sdkDemos/toolBox/CocoaOpenglGlue.mm; sourceTree = "<group>"; };
 		FF7F20861730187900AC6E4B /* enet_osx.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = enet_osx.xcodeproj; path = "../../../../../packages/thirdParty/enet-1.2/enet_osx/enet_osx.xcodeproj"; sourceTree = "<group>"; };
+		FF82375A17C26DE6004C80D4 /* ArchimedesBuoyancy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ArchimedesBuoyancy.cpp; path = ../../../sdkDemos/demos/ArchimedesBuoyancy.cpp; sourceTree = "<group>"; };
+		FF82375B17C26DE6004C80D4 /* ArticulatedJoints.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ArticulatedJoints.cpp; path = ../../../sdkDemos/demos/ArticulatedJoints.cpp; sourceTree = "<group>"; };
+		FF82375C17C26DE6004C80D4 /* SimpleConvexFracturing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SimpleConvexFracturing.cpp; path = ../../../sdkDemos/demos/SimpleConvexFracturing.cpp; sourceTree = "<group>"; };
+		FF82376017C26F8B004C80D4 /* aventador.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = aventador.ngd; path = ../../../../media/aventador.ngd; sourceTree = "<group>"; };
+		FF82376117C26F8B004C80D4 /* forklift_d.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = forklift_d.tga; path = ../../../../media/forklift_d.tga; sourceTree = "<group>"; };
+		FF82376217C26F8B004C80D4 /* forklift_underside_d.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = forklift_underside_d.tga; path = ../../../../media/forklift_underside_d.tga; sourceTree = "<group>"; };
+		FF82376317C26F8B004C80D4 /* forklift_wheels_d.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = forklift_wheels_d.tga; path = ../../../../media/forklift_wheels_d.tga; sourceTree = "<group>"; };
+		FF82376417C26F8B004C80D4 /* forklift.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = forklift.ngd; path = ../../../../media/forklift.ngd; sourceTree = "<group>"; };
+		FF82376617C26F8B004C80D4 /* DirectionalDiffuse.ps */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = DirectionalDiffuse.ps; sourceTree = "<group>"; };
+		FF82376717C26F8B004C80D4 /* DirectionalDiffuse.vs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = DirectionalDiffuse.vs; sourceTree = "<group>"; };
+		FF82376817C26F8B004C80D4 /* SkinningDirectionalDiffuse.ps */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SkinningDirectionalDiffuse.ps; sourceTree = "<group>"; };
+		FF82376917C26F8B004C80D4 /* SkinningDirectionalDiffuse.vs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = SkinningDirectionalDiffuse.vs; sourceTree = "<group>"; };
+		FF82376A17C26F8C004C80D4 /* SolidColor.ps */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SolidColor.ps; sourceTree = "<group>"; };
+		FF82376B17C26F8C004C80D4 /* SolidColor.vs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = SolidColor.vs; sourceTree = "<group>"; };
+		FF82376C17C26F8C004C80D4 /* TextureDecal.ps */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TextureDecal.ps; sourceTree = "<group>"; };
+		FF82376D17C26F8C004C80D4 /* TextureDecal.vs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = TextureDecal.vs; sourceTree = "<group>"; };
+		FF82376E17C26F8C004C80D4 /* swimmingPool.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = swimmingPool.ngd; path = ../../../../media/swimmingPool.ngd; sourceTree = "<group>"; };
+		FF82376F17C26F8C004C80D4 /* tractor.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = tractor.ngd; path = ../../../../media/tractor.ngd; sourceTree = "<group>"; };
 		FF8402EB17353606008E038A /* wxcocoaStatic.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = wxcocoaStatic.xcodeproj; path = "../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/build/osx/wxcocoaStatic.xcodeproj"; sourceTree = "<group>"; };
 		FF850081174525BC00BEE80B /* persianRug.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = persianRug.tga; path = ../../../../media/persianRug.tga; sourceTree = "<group>"; };
 		FF856BC31752E07700324FDC /* skeleton.ngd */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = skeleton.ngd; path = ../../../../media/skeleton.ngd; sourceTree = "<group>"; };
@@ -596,7 +629,6 @@
 		FFF60F6B1556DA2300E7B112 /* PrimitiveCollision.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PrimitiveCollision.cpp; path = ../../../sdkDemos/demos/PrimitiveCollision.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60F6E1556DA2300E7B112 /* ScaledCollision.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScaledCollision.cpp; path = ../../../sdkDemos/demos/ScaledCollision.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60F6F1556DA2300E7B112 /* SceneCollision.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SceneCollision.cpp; path = ../../../sdkDemos/demos/SceneCollision.cpp; sourceTree = SOURCE_ROOT; };
-		FFF60F701556DA2300E7B112 /* SimpleConvexShatter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SimpleConvexShatter.cpp; path = ../../../sdkDemos/demos/SimpleConvexShatter.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60F711556DA2300E7B112 /* SoftBodies.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SoftBodies.cpp; path = ../../../sdkDemos/demos/SoftBodies.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60F731556DA2300E7B112 /* SuperCar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SuperCar.cpp; path = ../../../sdkDemos/demos/SuperCar.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60F771556DA2300E7B112 /* UsingNewtonMeshTool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UsingNewtonMeshTool.cpp; path = ../../../sdkDemos/demos/UsingNewtonMeshTool.cpp; sourceTree = SOURCE_ROOT; };
@@ -680,6 +712,14 @@
 		FF506721173F3DDC00D01FDF /* assets */ = {
 			isa = PBXGroup;
 			children = (
+				FF82376517C26F8B004C80D4 /* shaders */,
+				FF82376017C26F8B004C80D4 /* aventador.ngd */,
+				FF82376117C26F8B004C80D4 /* forklift_d.tga */,
+				FF82376217C26F8B004C80D4 /* forklift_underside_d.tga */,
+				FF82376317C26F8B004C80D4 /* forklift_wheels_d.tga */,
+				FF82376417C26F8B004C80D4 /* forklift.ngd */,
+				FF82376E17C26F8C004C80D4 /* swimmingPool.ngd */,
+				FF82376F17C26F8C004C80D4 /* tractor.ngd */,
 				FF856BC31752E07700324FDC /* skeleton.ngd */,
 				FF8B5E161750F1B80076BE6C /* calibri.ttf */,
 				FF8B5E171750F1B80076BE6C /* courbd.ttf */,
@@ -854,6 +894,22 @@
 			name = assets;
 			sourceTree = "<group>";
 		};
+		FF82376517C26F8B004C80D4 /* shaders */ = {
+			isa = PBXGroup;
+			children = (
+				FF82376617C26F8B004C80D4 /* DirectionalDiffuse.ps */,
+				FF82376717C26F8B004C80D4 /* DirectionalDiffuse.vs */,
+				FF82376817C26F8B004C80D4 /* SkinningDirectionalDiffuse.ps */,
+				FF82376917C26F8B004C80D4 /* SkinningDirectionalDiffuse.vs */,
+				FF82376A17C26F8C004C80D4 /* SolidColor.ps */,
+				FF82376B17C26F8C004C80D4 /* SolidColor.vs */,
+				FF82376C17C26F8C004C80D4 /* TextureDecal.ps */,
+				FF82376D17C26F8C004C80D4 /* TextureDecal.vs */,
+			);
+			name = shaders;
+			path = ../../../../media/shaders;
+			sourceTree = "<group>";
+		};
 		FF85000217405FDE00BEE80B /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -969,8 +1025,10 @@
 		FF8F28D4131368B90019E923 /* demos */ = {
 			isa = PBXGroup;
 			children = (
+				FF82375A17C26DE6004C80D4 /* ArchimedesBuoyancy.cpp */,
+				FF82375B17C26DE6004C80D4 /* ArticulatedJoints.cpp */,
+				FF82375C17C26DE6004C80D4 /* SimpleConvexFracturing.cpp */,
 				FF8B5E1B1750F4670076BE6C /* BasicRagDoll.cpp */,
-				FF3B297817300D39007E6FEC /* PostCompoundCreateBuildTest.cpp */,
 				FF3B297917300D39007E6FEC /* PuckSlide.cpp */,
 				FF3B297A17300D39007E6FEC /* SimpleBooleans.cpp */,
 				FF3B297017300C79007E6FEC /* UserStaticCollision.cpp */,
@@ -994,7 +1052,6 @@
 				FFF60F6B1556DA2300E7B112 /* PrimitiveCollision.cpp */,
 				FFF60F6E1556DA2300E7B112 /* ScaledCollision.cpp */,
 				FFF60F6F1556DA2300E7B112 /* SceneCollision.cpp */,
-				FFF60F701556DA2300E7B112 /* SimpleConvexShatter.cpp */,
 				FFF60F711556DA2300E7B112 /* SoftBodies.cpp */,
 				FFF60F731556DA2300E7B112 /* SuperCar.cpp */,
 				FFF60F771556DA2300E7B112 /* UsingNewtonMeshTool.cpp */,
@@ -1420,6 +1477,17 @@
 				FF5067FA173F3EAD00D01FDF /* f1.ngd in Resources */,
 				FF50674F173F3E9E00D01FDF /* sponza.ngd in Resources */,
 				FF084A3F173F188B0059C41D /* MainMenu.xib in Resources */,
+				FF82377017C26F8C004C80D4 /* aventador.ngd in Resources */,
+				FF82377117C26F8C004C80D4 /* forklift_d.tga in Resources */,
+				FF82377217C26F8C004C80D4 /* forklift_underside_d.tga in Resources */,
+				FF82377317C26F8C004C80D4 /* forklift_wheels_d.tga in Resources */,
+				FF82377417C26F8C004C80D4 /* forklift.ngd in Resources */,
+				FF82377517C26F8C004C80D4 /* DirectionalDiffuse.ps in Resources */,
+				FF82377717C26F8C004C80D4 /* SkinningDirectionalDiffuse.ps in Resources */,
+				FF82377917C26F8C004C80D4 /* SolidColor.ps in Resources */,
+				FF82377B17C26F8C004C80D4 /* TextureDecal.ps in Resources */,
+				FF82377D17C26F8C004C80D4 /* swimmingPool.ngd in Resources */,
+				FF82377E17C26F8C004C80D4 /* tractor.ngd in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1430,7 +1498,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FF084AB7173F1B310059C41D /* PostCompoundCreateBuildTest.cpp in Sources */,
 				FF084AB8173F1B310059C41D /* PuckSlide.cpp in Sources */,
 				FF084AB9173F1B310059C41D /* SimpleBooleans.cpp in Sources */,
 				FF084ABA173F1B310059C41D /* UserStaticCollision.cpp in Sources */,
@@ -1454,7 +1521,6 @@
 				FF084ACC173F1B310059C41D /* PrimitiveCollision.cpp in Sources */,
 				FF084ACD173F1B310059C41D /* ScaledCollision.cpp in Sources */,
 				FF084ACE173F1B310059C41D /* SceneCollision.cpp in Sources */,
-				FF084ACF173F1B310059C41D /* SimpleConvexShatter.cpp in Sources */,
 				FF084AD0173F1B310059C41D /* SoftBodies.cpp in Sources */,
 				FF084AD1173F1B310059C41D /* SuperCar.cpp in Sources */,
 				FF084AD2173F1B310059C41D /* UsingNewtonMeshTool.cpp in Sources */,
@@ -1485,6 +1551,13 @@
 				FF084A9B173F1AD30059C41D /* NewtonDemos.cpp in Sources */,
 				FF8B5E1C1750F4670076BE6C /* BasicRagDoll.cpp in Sources */,
 				FF6FCF70175156940088B4D3 /* CocoaOpenglGlue.mm in Sources */,
+				FF82375D17C26DE6004C80D4 /* ArchimedesBuoyancy.cpp in Sources */,
+				FF82375E17C26DE6004C80D4 /* ArticulatedJoints.cpp in Sources */,
+				FF82375F17C26DE6004C80D4 /* SimpleConvexFracturing.cpp in Sources */,
+				FF82377617C26F8C004C80D4 /* DirectionalDiffuse.vs in Sources */,
+				FF82377817C26F8C004C80D4 /* SkinningDirectionalDiffuse.vs in Sources */,
+				FF82377A17C26F8C004C80D4 /* SolidColor.vs in Sources */,
+				FF82377C17C26F8C004C80D4 /* TextureDecal.vs in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -152,7 +152,7 @@ void CustomLimitBallAndSocket::SubmitConstraints (dFloat timestep, int threadInd
 	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_right[0]);
 
 	dMatrix localMatrix (matrix0 * (m_rotationOffset * matrix1).Inverse());
-	dVector euler (localMatrix.GetEulerAngles());
+	//dVector euler (localMatrix.GetEulerAngles());
 	dFloat pitchAngle = -dAtan2(localMatrix[1][2], localMatrix[2][2]);
 
 	if ((m_maxTwistAngle - m_minTwistAngle) < 1.0e-4f) {

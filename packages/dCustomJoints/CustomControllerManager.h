@@ -290,9 +290,9 @@ CONTROLLER_BASE* CustomControllerManager<CONTROLLER_BASE>::CreateController ()
 template<class CONTROLLER_BASE>
 void CustomControllerManager<CONTROLLER_BASE>::DestroyController (CONTROLLER_BASE* const controller)
 {
-	dAssert (FindNodeFromInfo (*controller));
+	dAssert (CustomControllerManager<CONTROLLER_BASE>::FindNodeFromInfo (*controller));
 	typename CustomControllerManager<CONTROLLER_BASE>::CustomListNode* const node = CustomControllerManager<CONTROLLER_BASE>::GetNodeFromInfo (*controller);
-	Remove (node);
+	CustomControllerManager<CONTROLLER_BASE>::Remove (node);
 }
 
 #endif 

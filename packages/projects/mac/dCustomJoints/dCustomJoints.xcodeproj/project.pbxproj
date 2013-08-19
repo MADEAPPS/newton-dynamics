@@ -27,7 +27,14 @@
 		FF32E226172E13BF0052D273 /* CustomUpVector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF32E1FA172E13BF0052D273 /* CustomUpVector.cpp */; };
 		FF32E228172E13BF0052D273 /* CustomUserBlank.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF32E1FC172E13BF0052D273 /* CustomUserBlank.cpp */; };
 		FF32E22A172E13BF0052D273 /* CustomVehicleControllerManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF32E1FE172E13BF0052D273 /* CustomVehicleControllerManager.cpp */; };
-		FF856C021753A00100324FDC /* CustomSkeletonTransformManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF856C011753A00100324FDC /* CustomSkeletonTransformManager.cpp */; };
+		FF82375217C269BC004C80D4 /* CustomArcticulatedTransformManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF82374A17C269BC004C80D4 /* CustomArcticulatedTransformManager.cpp */; };
+		FF82375317C269BC004C80D4 /* CustomArcticulatedTransformManager.h in Headers */ = {isa = PBXBuildFile; fileRef = FF82374B17C269BC004C80D4 /* CustomArcticulatedTransformManager.h */; };
+		FF82375417C269BC004C80D4 /* CustomHingeActuator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF82374C17C269BC004C80D4 /* CustomHingeActuator.cpp */; };
+		FF82375517C269BC004C80D4 /* CustomHingeActuator.h in Headers */ = {isa = PBXBuildFile; fileRef = FF82374D17C269BC004C80D4 /* CustomHingeActuator.h */; };
+		FF82375617C269BC004C80D4 /* CustomSliderActuator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF82374E17C269BC004C80D4 /* CustomSliderActuator.cpp */; };
+		FF82375717C269BC004C80D4 /* CustomSliderActuator.h in Headers */ = {isa = PBXBuildFile; fileRef = FF82374F17C269BC004C80D4 /* CustomSliderActuator.h */; };
+		FF82375817C269BC004C80D4 /* CustomUniversalActuator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF82375017C269BC004C80D4 /* CustomUniversalActuator.cpp */; };
+		FF82375917C269BC004C80D4 /* CustomUniversalActuator.h in Headers */ = {isa = PBXBuildFile; fileRef = FF82375117C269BC004C80D4 /* CustomUniversalActuator.h */; };
 		FF856C041753A0DC00324FDC /* CustomJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = FF856C031753A0DC00324FDC /* CustomJoint.h */; };
 		FF856C061753BDC300324FDC /* CustomRackAndPinion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF856C051753BDC300324FDC /* CustomRackAndPinion.cpp */; };
 		FFA78DB11789A8670056DE1C /* Custom6DOF.h in Headers */ = {isa = PBXBuildFile; fileRef = FFA78D9B1789A8670056DE1C /* Custom6DOF.h */; };
@@ -44,7 +51,6 @@
 		FFA78DBC1789A8670056DE1C /* CustomPlayerControllerManager.h in Headers */ = {isa = PBXBuildFile; fileRef = FFA78DA61789A8670056DE1C /* CustomPlayerControllerManager.h */; };
 		FFA78DBD1789A8670056DE1C /* CustomPulley.h in Headers */ = {isa = PBXBuildFile; fileRef = FFA78DA71789A8670056DE1C /* CustomPulley.h */; };
 		FFA78DBE1789A8670056DE1C /* CustomRackAndPinion.h in Headers */ = {isa = PBXBuildFile; fileRef = FFA78DA81789A8670056DE1C /* CustomRackAndPinion.h */; };
-		FFA78DBF1789A8670056DE1C /* CustomSkeletonTransformManager.h in Headers */ = {isa = PBXBuildFile; fileRef = FFA78DA91789A8670056DE1C /* CustomSkeletonTransformManager.h */; };
 		FFA78DC01789A8670056DE1C /* CustomSlider.h in Headers */ = {isa = PBXBuildFile; fileRef = FFA78DAA1789A8670056DE1C /* CustomSlider.h */; };
 		FFA78DC11789A8670056DE1C /* CustomSlidingContact.h in Headers */ = {isa = PBXBuildFile; fileRef = FFA78DAB1789A8670056DE1C /* CustomSlidingContact.h */; };
 		FFA78DC21789A8670056DE1C /* CustomTriggerManager.h in Headers */ = {isa = PBXBuildFile; fileRef = FFA78DAC1789A8670056DE1C /* CustomTriggerManager.h */; };
@@ -77,7 +83,14 @@
 		FF32E1FA172E13BF0052D273 /* CustomUpVector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomUpVector.cpp; path = ../../../dCustomJoints/CustomUpVector.cpp; sourceTree = "<group>"; };
 		FF32E1FC172E13BF0052D273 /* CustomUserBlank.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomUserBlank.cpp; path = ../../../dCustomJoints/CustomUserBlank.cpp; sourceTree = "<group>"; };
 		FF32E1FE172E13BF0052D273 /* CustomVehicleControllerManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomVehicleControllerManager.cpp; path = ../../../dCustomJoints/CustomVehicleControllerManager.cpp; sourceTree = "<group>"; };
-		FF856C011753A00100324FDC /* CustomSkeletonTransformManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomSkeletonTransformManager.cpp; path = ../../../dCustomJoints/CustomSkeletonTransformManager.cpp; sourceTree = "<group>"; };
+		FF82374A17C269BC004C80D4 /* CustomArcticulatedTransformManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomArcticulatedTransformManager.cpp; path = ../../../dCustomJoints/CustomArcticulatedTransformManager.cpp; sourceTree = "<group>"; };
+		FF82374B17C269BC004C80D4 /* CustomArcticulatedTransformManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomArcticulatedTransformManager.h; path = ../../../dCustomJoints/CustomArcticulatedTransformManager.h; sourceTree = "<group>"; };
+		FF82374C17C269BC004C80D4 /* CustomHingeActuator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomHingeActuator.cpp; path = ../../../dCustomJoints/CustomHingeActuator.cpp; sourceTree = "<group>"; };
+		FF82374D17C269BC004C80D4 /* CustomHingeActuator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomHingeActuator.h; path = ../../../dCustomJoints/CustomHingeActuator.h; sourceTree = "<group>"; };
+		FF82374E17C269BC004C80D4 /* CustomSliderActuator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomSliderActuator.cpp; path = ../../../dCustomJoints/CustomSliderActuator.cpp; sourceTree = "<group>"; };
+		FF82374F17C269BC004C80D4 /* CustomSliderActuator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomSliderActuator.h; path = ../../../dCustomJoints/CustomSliderActuator.h; sourceTree = "<group>"; };
+		FF82375017C269BC004C80D4 /* CustomUniversalActuator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomUniversalActuator.cpp; path = ../../../dCustomJoints/CustomUniversalActuator.cpp; sourceTree = "<group>"; };
+		FF82375117C269BC004C80D4 /* CustomUniversalActuator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomUniversalActuator.h; path = ../../../dCustomJoints/CustomUniversalActuator.h; sourceTree = "<group>"; };
 		FF856C031753A0DC00324FDC /* CustomJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomJoint.h; path = ../../../dCustomJoints/CustomJoint.h; sourceTree = "<group>"; };
 		FF856C051753BDC300324FDC /* CustomRackAndPinion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomRackAndPinion.cpp; path = ../../../dCustomJoints/CustomRackAndPinion.cpp; sourceTree = "<group>"; };
 		FFA78D9B1789A8670056DE1C /* Custom6DOF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Custom6DOF.h; path = ../../../dCustomJoints/Custom6DOF.h; sourceTree = "<group>"; };
@@ -94,7 +107,6 @@
 		FFA78DA61789A8670056DE1C /* CustomPlayerControllerManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomPlayerControllerManager.h; path = ../../../dCustomJoints/CustomPlayerControllerManager.h; sourceTree = "<group>"; };
 		FFA78DA71789A8670056DE1C /* CustomPulley.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomPulley.h; path = ../../../dCustomJoints/CustomPulley.h; sourceTree = "<group>"; };
 		FFA78DA81789A8670056DE1C /* CustomRackAndPinion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomRackAndPinion.h; path = ../../../dCustomJoints/CustomRackAndPinion.h; sourceTree = "<group>"; };
-		FFA78DA91789A8670056DE1C /* CustomSkeletonTransformManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomSkeletonTransformManager.h; path = ../../../dCustomJoints/CustomSkeletonTransformManager.h; sourceTree = "<group>"; };
 		FFA78DAA1789A8670056DE1C /* CustomSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomSlider.h; path = ../../../dCustomJoints/CustomSlider.h; sourceTree = "<group>"; };
 		FFA78DAB1789A8670056DE1C /* CustomSlidingContact.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomSlidingContact.h; path = ../../../dCustomJoints/CustomSlidingContact.h; sourceTree = "<group>"; };
 		FFA78DAC1789A8670056DE1C /* CustomTriggerManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomTriggerManager.h; path = ../../../dCustomJoints/CustomTriggerManager.h; sourceTree = "<group>"; };
@@ -137,6 +149,14 @@
 		FFD2A7A2172E128200114513 /* source */ = {
 			isa = PBXGroup;
 			children = (
+				FF82374A17C269BC004C80D4 /* CustomArcticulatedTransformManager.cpp */,
+				FF82374B17C269BC004C80D4 /* CustomArcticulatedTransformManager.h */,
+				FF82374C17C269BC004C80D4 /* CustomHingeActuator.cpp */,
+				FF82374D17C269BC004C80D4 /* CustomHingeActuator.h */,
+				FF82374E17C269BC004C80D4 /* CustomSliderActuator.cpp */,
+				FF82374F17C269BC004C80D4 /* CustomSliderActuator.h */,
+				FF82375017C269BC004C80D4 /* CustomUniversalActuator.cpp */,
+				FF82375117C269BC004C80D4 /* CustomUniversalActuator.h */,
 				FFA78DC71789A8A60056DE1C /* CustomAlloc.cpp */,
 				FFA78DC81789A8A60056DE1C /* CustomAlloc.h */,
 				FFA78D9B1789A8670056DE1C /* Custom6DOF.h */,
@@ -153,7 +173,6 @@
 				FFA78DA61789A8670056DE1C /* CustomPlayerControllerManager.h */,
 				FFA78DA71789A8670056DE1C /* CustomPulley.h */,
 				FFA78DA81789A8670056DE1C /* CustomRackAndPinion.h */,
-				FFA78DA91789A8670056DE1C /* CustomSkeletonTransformManager.h */,
 				FFA78DAA1789A8670056DE1C /* CustomSlider.h */,
 				FFA78DAB1789A8670056DE1C /* CustomSlidingContact.h */,
 				FFA78DAC1789A8670056DE1C /* CustomTriggerManager.h */,
@@ -180,7 +199,6 @@
 				FF32E1FA172E13BF0052D273 /* CustomUpVector.cpp */,
 				FF32E1FC172E13BF0052D273 /* CustomUserBlank.cpp */,
 				FF32E1F6172E13BF0052D273 /* CustomTriggerManager.cpp */,
-				FF856C011753A00100324FDC /* CustomSkeletonTransformManager.cpp */,
 				FF32E1DA172E13BF0052D273 /* CustomControllerManager.cpp */,
 				FF32E1FE172E13BF0052D273 /* CustomVehicleControllerManager.cpp */,
 				FF32E1EC172E13BF0052D273 /* CustomPlayerControllerManager.cpp */,
@@ -210,7 +228,6 @@
 				FFA78DBC1789A8670056DE1C /* CustomPlayerControllerManager.h in Headers */,
 				FFA78DBD1789A8670056DE1C /* CustomPulley.h in Headers */,
 				FFA78DBE1789A8670056DE1C /* CustomRackAndPinion.h in Headers */,
-				FFA78DBF1789A8670056DE1C /* CustomSkeletonTransformManager.h in Headers */,
 				FFA78DC01789A8670056DE1C /* CustomSlider.h in Headers */,
 				FFA78DC11789A8670056DE1C /* CustomSlidingContact.h in Headers */,
 				FFA78DC21789A8670056DE1C /* CustomTriggerManager.h in Headers */,
@@ -219,6 +236,10 @@
 				FFA78DC51789A8670056DE1C /* CustomUserBlank.h in Headers */,
 				FFA78DC61789A8670056DE1C /* CustomVehicleControllerManager.h in Headers */,
 				FFA78DCA1789A8A60056DE1C /* CustomAlloc.h in Headers */,
+				FF82375317C269BC004C80D4 /* CustomArcticulatedTransformManager.h in Headers */,
+				FF82375517C269BC004C80D4 /* CustomHingeActuator.h in Headers */,
+				FF82375717C269BC004C80D4 /* CustomSliderActuator.h in Headers */,
+				FF82375917C269BC004C80D4 /* CustomUniversalActuator.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -293,9 +314,12 @@
 				FF32E226172E13BF0052D273 /* CustomUpVector.cpp in Sources */,
 				FF32E228172E13BF0052D273 /* CustomUserBlank.cpp in Sources */,
 				FF32E22A172E13BF0052D273 /* CustomVehicleControllerManager.cpp in Sources */,
-				FF856C021753A00100324FDC /* CustomSkeletonTransformManager.cpp in Sources */,
 				FF856C061753BDC300324FDC /* CustomRackAndPinion.cpp in Sources */,
 				FFA78DC91789A8A60056DE1C /* CustomAlloc.cpp in Sources */,
+				FF82375217C269BC004C80D4 /* CustomArcticulatedTransformManager.cpp in Sources */,
+				FF82375417C269BC004C80D4 /* CustomHingeActuator.cpp in Sources */,
+				FF82375617C269BC004C80D4 /* CustomSliderActuator.cpp in Sources */,
+				FF82375817C269BC004C80D4 /* CustomUniversalActuator.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
