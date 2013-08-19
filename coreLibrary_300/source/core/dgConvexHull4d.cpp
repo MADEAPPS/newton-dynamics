@@ -630,6 +630,7 @@ dgInt32 dgConvexHull4d::InitVertexArray(dgHullVector* const points, const dgBigV
 	dgAABBPointTree4d* tree = BuildTree (NULL, points, count, 0, (dgInt8**) &memoryPool, maxMemSize);
 
 	dgBigVector boxSize (tree->m_box[1] - tree->m_box[0]);	
+	boxSize.m_w = dgFloat64 (0.0f);
 	m_diag = dgFloat32 (sqrt (boxSize.DotProduct4(boxSize).m_x));
 
 	m_points[4].m_x = dgFloat64 (0.0f);
