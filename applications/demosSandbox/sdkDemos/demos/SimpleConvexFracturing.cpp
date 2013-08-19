@@ -81,16 +81,15 @@ class FractureEffect: public dList<FractureAtom>
 		textureMatrix[0][0] = 1.0f / size.m_x;
 		textureMatrix[1][1] = 1.0f / size.m_y;
 
-		// now we call create we decompose the mesh into several convex pieces 
-		NewtonMesh* const debriMeshPieces = NewtonMeshCreateVoronoiConvexDecomposition (m_world, count, &points[0].m_x, sizeof (dVector), interiorMaterial, &textureMatrix[0][0]);
-		dAssert (debriMeshPieces);
-		
-
 		// Get the volume of the original mesh
 		NewtonCollision* const collision = NewtonCreateConvexHullFromMesh (m_world, mesh, 0.0f, 0);
 		dFloat volume = NewtonConvexCollisionCalculateVolume (collision);
 		NewtonDestroyCollision(collision);
 
+		// now we call create we decompose the mesh into several convex pieces 
+		NewtonMesh* const debriMeshPieces = NewtonMeshCreateVoronoiConvexDecomposition (m_world, count, &points[0].m_x, sizeof (dVector), interiorMaterial, &textureMatrix[0][0]);
+		dAssert (debriMeshPieces);
+		
 		// now we iterate over each pieces and for each one we create a visual entity and a rigid body
 		NewtonMesh* nextDebri;
 		for (NewtonMesh* debri = NewtonMeshCreateFirstLayer (debriMeshPieces); debri; debri = nextDebri) {
