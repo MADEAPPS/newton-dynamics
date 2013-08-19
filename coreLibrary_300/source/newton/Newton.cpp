@@ -7826,7 +7826,8 @@ void NewtonMeshCalculateOOBB(const NewtonMesh* const mesh, dFloat* const matrix,
 	dgBigVector size;
 	dgMatrix alignMatrix (meshEffect->CalculateOOBB (size));
 
-	*((dgMatrix *)matrix) = alignMatrix; 
+//	*((dgMatrix *)matrix) = alignMatrix; 
+	memcpy (matrix, &alignMatrix[0][0], sizeof (dgMatrix));
 	*x = dgFloat32 (size.m_x);
 	*y = dgFloat32 (size.m_y);
 	*z = dgFloat32 (size.m_z);
