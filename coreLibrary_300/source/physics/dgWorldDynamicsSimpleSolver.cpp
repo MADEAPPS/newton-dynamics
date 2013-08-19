@@ -414,6 +414,8 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (dgIsland* const island, dgInt32 
 					dgAssert (row->m_jointFeebackForce);
 					row->m_force = row->m_jointFeebackForce[0].m_force * forceOrImpulseScale;
 
+					row->m_maxImpact = dgFloat32 (0.0f);
+
 					//force[index] = 0.0f;
 					dgAssert (row->m_diagDamp >= dgFloat32(0.1f));
 					dgAssert (row->m_diagDamp <= dgFloat32(100.0f));
@@ -797,7 +799,7 @@ dgAssert (0);
 }
 
 
-void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island, dgInt32 threadIndex, dgFloat32 timestepSrc, dgFloat32 maxAccNorm) const
+void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island, dgInt32 threadIndex, dgFloat32 timestep, dgFloat32 maxAccNorm) const
 {
 	dgJacobian* const internalForces = &m_solverMemory.m_internalForces[island->m_bodyStart];
 	dgVector zero(dgFloat32 (0.0f));
@@ -859,10 +861,10 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 
 	dgInt32 maxPasses = dgInt32 (world->m_solverMode + LINEAR_SOLVER_SUB_STEPS);
 
-	dgFloat32 invTimestepSrc = (timestepSrc > dgFloat32 (0.0f)) ? dgFloat32 (1.0f) / timestepSrc : dgFloat32 (0.0f);
-	dgFloat32 invStep = (dgFloat32 (1.0f) / dgFloat32 (maxPasses));
-	dgFloat32 timestep =  timestepSrc * invStep;
-	dgFloat32 invTimestep = invTimestepSrc * dgFloat32 (maxPasses);
+	dgFloat32 invTimestep = (timestep > dgFloat32 (0.0f)) ? dgFloat32 (1.0f) / timestep : dgFloat32 (0.0f);
+	dgFloat32 invStepRK = (dgFloat32 (1.0f) / dgFloat32 (maxPasses));
+	dgFloat32 timestepRK =  timestep * invStepRK;
+	dgFloat32 invTimestepRK = invTimestep * dgFloat32 (maxPasses);
 	dgAssert (bodyArray[0].m_body == world->m_sentinelBody);
 
 	dgFloat32 cacheForce[DG_CONSTRAINT_MAX_ROWS + 4];
@@ -878,8 +880,8 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 	dgFloat32 firstPassCoef = dgFloat32 (0.0f);
 	for (dgInt32 step = 0; step < maxPasses; step ++) {
 		dgJointAccelerationDecriptor joindDesc;
-		joindDesc.m_timeStep = timestep;
-		joindDesc.m_invTimeStep = invTimestep;
+		joindDesc.m_timeStep = timestepRK;
+		joindDesc.m_invTimeStep = invTimestepRK;
 		joindDesc.m_firstPassCoefFlag = firstPassCoef;
 		if (firstPassCoef == dgFloat32 (0.0f)) {
 			for (dgInt32 curJoint = 0; curJoint < jointCount; curJoint ++) {
@@ -991,6 +993,8 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 							row->m_force = f.m_x;
 							normalForce[k] = f.m_x;
 
+							row->m_maxImpact = f.Abs().GetMax (row->m_maxImpact).m_x;
+
 							linearM0 += row->m_Jt.m_jacobianM0.m_linear.CompProduct4 (prevValue);
 							angularM0 += row->m_Jt.m_jacobianM0.m_angular.CompProduct4 (prevValue);
 							linearM1 += row->m_Jt.m_jacobianM1.m_linear.CompProduct4 (prevValue);
@@ -1006,8 +1010,8 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 			}
 		}
 
-		if (timestep != dgFloat32 (0.0f)) {
-			dgVector timestep4 (timestep);
+		if (timestepRK != dgFloat32 (0.0f)) {
+			dgVector timestep4 (timestepRK);
 			for (dgInt32 i = 1; i < bodyCount; i ++) {
 				dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
 				if (body->m_active) {
@@ -1048,7 +1052,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 	}
 
 	dgInt32 hasJointFeeback = 0;
-	if (timestep != dgFloat32 (0.0f)) {
+	if (timestepRK != dgFloat32 (0.0f)) {
 		for (dgInt32 i = 0; i < jointCount; i ++) {
 			dgJointInfo* const jointInfo = &constraintArray[i];
 			dgConstraint* const constraint = jointInfo->m_joint;
@@ -1061,13 +1065,14 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 					dgFloat32 val = row->m_force; 
 					dgAssert (dgCheckFloat(val));
 					row->m_jointFeebackForce[0].m_force = val;
+					row->m_jointFeebackForce[0].m_impact = row->m_maxImpact * timestepRK;
 				}
 				hasJointFeeback |= (constraint->m_updaFeedbackCallback ? 1 : 0);
 			}
 		}
 
 
-		dgVector invTime (invTimestepSrc);
+		dgVector invTime (invTimestep);
 		dgFloat32 maxAccNorm2 = maxAccNorm * maxAccNorm;
 		for (dgInt32 i = 1; i < bodyCount; i ++) {
 			dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
@@ -1097,7 +1102,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 		if (hasJointFeeback) {
 			for (dgInt32 i = 0; i < jointCount; i ++) {
 				if (constraintArray[i].m_joint->m_updaFeedbackCallback) {
-					constraintArray[i].m_joint->m_updaFeedbackCallback (*constraintArray[i].m_joint, timestepSrc, threadIndex);
+					constraintArray[i].m_joint->m_updaFeedbackCallback (*constraintArray[i].m_joint, timestep, threadIndex);
 				}
 			}
 		}

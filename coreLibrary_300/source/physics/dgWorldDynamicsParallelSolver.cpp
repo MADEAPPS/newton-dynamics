@@ -50,6 +50,7 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel (const dgIsland* cons
 
 	dgInt32 maxPasses = dgInt32 (world->m_solverMode + LINEAR_SOLVER_SUB_STEPS);
 
+
 	syncData.m_timestep = timestep;
 	syncData.m_invTimestep = (timestep > dgFloat32 (0.0f)) ? dgFloat32 (1.0f) / timestep : dgFloat32 (0.0f);
 	syncData.m_invStepRK = (dgFloat32 (1.0f) / dgFloat32 (maxPasses));
@@ -214,6 +215,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrixParallelKernel (void* const contex
 			row->m_deltaAccel = extenalAcceleration;
 			row->m_coordenateAccel += extenalAcceleration;
 			row->m_force = row->m_jointFeebackForce[0].m_force;
+			row->m_maxImpact = dgFloat32 (0.0f);
 
 			dgAssert (row->m_diagDamp >= dgFloat32(0.1f));
 			dgAssert (row->m_diagDamp <= dgFloat32(100.0f));
@@ -472,6 +474,7 @@ void dgWorldDynamicUpdate::CalculateJointsForceParallelKernel (void* const conte
 
 				row->m_force = f.m_x;
 				normalForce[k] = f.m_x;
+				row->m_maxImpact = f.Abs().GetMax (row->m_maxImpact).m_x;
 
 				linearM0 += row->m_Jt.m_jacobianM0.m_linear.CompProduct4 (prevValue);
 				angularM0 += row->m_Jt.m_jacobianM0.m_angular.CompProduct4 (prevValue);
@@ -603,6 +606,7 @@ void dgWorldDynamicUpdate::UpdateFeedbackForcesParallelKernel (void* const conte
 			dgFloat32 val = row->m_force; 
 			dgAssert (dgCheckFloat(val));
 			row->m_jointFeebackForce[0].m_force = val;
+			row->m_jointFeebackForce[0].m_impact = row->m_maxImpact * syncData->m_timestepRK;
 		}
 		hasJointFeeback |= (constraintArray[i].m_joint->m_updaFeedbackCallback ? 1 : 0);
 	}

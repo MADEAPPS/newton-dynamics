@@ -1881,11 +1881,8 @@ dFloat NewtonMaterialGetContactNormalSpeed(const NewtonMaterial* const materialH
 // See also: NewtonMaterialSetCollisionCallback
 dFloat NewtonMaterialGetContactTangentSpeed(const NewtonMaterial* const materialHandle, int index)
 {
-//	dgAssert (0);
-
 	TRACE_FUNCTION(__FUNCTION__);
 	dgContactMaterial* const material = (dgContactMaterial*) materialHandle;
-//	contact = (dgContact*) contactlHandle;
 
 	const dgBody* const body0 = material->m_body0;
 	const dgBody* const body1 = material->m_body1;
@@ -1897,15 +1894,25 @@ dFloat NewtonMaterialGetContactTangentSpeed(const NewtonMaterial* const material
 	dgVector v1 (body1->GetVelocity() + body1->GetOmega() * p1);
 
 	dgVector dv (v1 - v0);
-
-	dgVector dir;
-	if (index) {
-		dir = material->m_dir1;
-	} else {
-		dir = material->m_dir0;
-	}
+	dgVector dir (index ? material->m_dir1 : material->m_dir0);
 	dFloat speed = dv % dir;
 	return - speed;
+}
+
+
+dFloat NewtonMaterialGetContactMaxNormalImpact(const NewtonMaterial* const materialHandle)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgContactMaterial* const material = (dgContactMaterial*) materialHandle;
+	return material->m_normal_Force.m_impact;
+}
+
+dFloat NewtonMaterialGetContactMaxTangentImpact(const NewtonMaterial* const materialHandle, int index)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+
+	dgContactMaterial* const material = (dgContactMaterial*) materialHandle;
+	return index ? material->m_dir1_Force.m_impact: material->m_dir0_Force.m_impact;
 }
 
 

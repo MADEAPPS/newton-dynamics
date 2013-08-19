@@ -17,12 +17,11 @@
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
 
-#define INITIAL_DELAY					1000
-#define NUMBER_OF_INTERNAL_PARTS		8
-//#define NUMBER_OF_INTERNAL_PARTS		0
+#define INITIAL_DELAY							1000
+#define NUMBER_OF_INTERNAL_PARTS				8
 
-#define BREAK_FORCE_IN_GRAVITIES	6
-//#define BREAK_FORCE_IN_GRAVITIES	1
+#define BREAK_IMPACT_IN_METERS_PER_SECONDS		10.0f
+
 
 
 class FractureAtom
@@ -161,36 +160,34 @@ class SimpleFracturedEffectEntity: public DemoEntity
 
 	void SimulationPostListener(DemoEntityManager* const scene, DemoEntityManager::dListNode* const mynode, dFloat timeStep)
 	{
-		m_delay --;
-		if (m_delay > 0) {
-			return;
-		}
+//		m_delay --;
+//		if (m_delay > 0) {
+//			return;
+//		}
 
 		// see if the net force on the body comes fr a high impact collision
-		dFloat maxInternalForceMag2 = 0.0f;
+		dFloat breakImpact = 0.0f;
 		for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint(m_myBody); joint; joint = NewtonBodyGetNextContactJoint(m_myBody, joint)) {
 			for (void* contact = NewtonContactJointGetFirstContact (joint); contact; contact = NewtonContactJointGetNextContact (joint, contact)) {
 				//dVector point;
 				//dVector normal;	
 				dVector contactForce;
 				NewtonMaterial* const material = NewtonContactGetMaterial (contact);
-				//NewtonMaterialGetContactPositionAndNormal (material, &point.m_x, &normal.m_x);
-				NewtonMaterialGetContactForce(material, m_myBody, &contactForce[0]);
-				dFloat forceMag = contactForce % contactForce;
-				if (forceMag > maxInternalForceMag2) {
-					maxInternalForceMag2 = forceMag;
+				
+//				NewtonMaterialGetContactForce(material, m_myBody, &contactForce[0]);
+				dFloat impulseImpact = NewtonMaterialGetContactMaxNormalImpact(material);
+				if (impulseImpact > breakImpact) {
+					breakImpact = impulseImpact;
 				}
 			}
 		}
 
 
 		// if the force is bigger than N time Gravities, It is considered a collision force
-		//		dFloat maxForce = BREAK_FORCE_IN_GRAVITIES * m_myweight;
-		dFloat maxForce = 0;
+		breakImpact *= m_myMassInverse;
+		dTrace (("%f\n", breakImpact));
 
-		//dTrace (("%f %f\n", sqrtf (maxInternalForceMag2), maxForce));
-
-		if (maxInternalForceMag2 > (maxForce * maxForce)) {
+		if (breakImpact > BREAK_IMPACT_IN_METERS_PER_SECONDS) {
 			NewtonWorld* const world = NewtonBodyGetWorld(m_myBody);
 
 			dFloat Ixx; 
@@ -277,7 +274,7 @@ class SimpleFracturedEffectEntity: public DemoEntity
 	int m_delay;
 	FractureEffect m_effect;
 	NewtonBody* m_myBody;
-	dFloat m_myweight; 
+	dFloat m_myMassInverse; 
 
 	static unsigned m_lock;
 };
@@ -308,7 +305,7 @@ static void AddFracturedEntity (DemoEntityManager* const scene, DemoMesh* const 
 	NewtonBody* const rigidBody = NewtonCreateDynamicBody (world, collision, &matrix[0][0]);
 
 	entity->m_myBody = rigidBody;
-	entity->m_myweight = dAbs (mass * DEMO_GRAVITY);
+	entity->m_myMassInverse = 1.0f / mass;
 
 	// set the correct center of gravity for this body
 	//NewtonBodySetCentreOfMass (rigidBody, &origin[0]);
@@ -401,11 +398,11 @@ void SimpleConvexFracturing (DemoEntityManager* const scene)
 	dVector size (0.75f, 0.75f, 0.75f, 0.0f);
 	dMatrix shapeOffsetMatrix (GetIdentityMatrix());
 
-	int count = 1;
+	int count = 5;
 	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
