@@ -42,7 +42,7 @@ class NewtonDeadBodies: public dgTree<dgBody*, void* >
 };
 
 
-class NewtonDeadJoints: public dgTree<dgConstraint*, void *>
+class NewtonDeadJoints: public dgTree<dgConstraint*, void* >
 {
 	public: 
 	NewtonDeadJoints(dgMemoryAllocator* const allocator);
@@ -61,13 +61,13 @@ class Newton:
 	Newton (dgFloat32 scale, dgMemoryAllocator* const allocator);
 	~Newton ();
 
-	void DestroyBody(dgBody* body);
+	void DestroyBody(dgBody* const body);
 	void DestroyJoint(dgConstraint* const joint);
 
 	void UpdatePhysics (dgFloat32 timestep);
 	void UpdatePhysicsAsync (dgFloat32 timestep);
 	static void* DefaultAllocMemory (dgInt32 size);
-	static void DefaultFreeMemory (void *ptr, dgInt32 size);
+	static void DefaultFreeMemory (void* const ptr, dgInt32 size);
 
 	dgFloat32 m_maxTimeStep;
 
@@ -80,15 +80,13 @@ class Newton:
 class NewtonUserJoint: public dgUserConstraint  
 {	
 	public:
-	NewtonUserJoint (dgWorld* world, dgInt32 maxDof, 
-					 NewtonUserBilateralCallback callback, NewtonUserBilateralGetInfoCallback getInfo,
-					 dgBody *dyn0, dgBody *dyn1);
+	NewtonUserJoint (dgWorld* const world, dgInt32 maxDof, NewtonUserBilateralCallback callback, NewtonUserBilateralGetInfoCallback getInfo, dgBody* const dyn0, dgBody* const dyn1);
 	~NewtonUserJoint ();
 
 	dgUnsigned32 JacobianDerivative (dgContraintDescritor& params); 
 
 	void AddAngularRowJacobian (const dgVector& dir, dgFloat32 relAngle);
-	void AddGeneralRowJacobian (const dgFloat32* jacobian0, const dgFloat32* jacobian1);
+	void AddGeneralRowJacobian (const dgFloat32* const jacobian0, const dgFloat32* const jacobian1);
 	void AddLinearRowJacobian (const dgVector& pivot0, const dgVector& pivot1, const dgVector& dir);
 
 	dgFloat32 GetRowForce (dgInt32 row) const;

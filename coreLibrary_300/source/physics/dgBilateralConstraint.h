@@ -19,12 +19,12 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#if !defined(AFX_DGBILATERALCONSTRAINT_H__7C9E1F9A_5EC6_48BE_8C9F_FB90132C6619_H)
-#define AFX_DGBILATERALCONSTRAINT_H__7C9E1F9A_5EC6_48BE_8C9F_FB90132C6619_H
+#ifndef _DGBILATERALCONSTRAINT_H__
+#define _DGBILATERALCONSTRAINT_H__
 
 #include "dgConstraint.h"
 
-#define DG_BILATERAL_CONTRAINT_DOF	8 
+#define DG_BILATERAL_CONTRAINT_DOF	8
 
 class dgBilateralConstraint: public dgConstraint  
 {
@@ -52,7 +52,7 @@ class dgBilateralConstraint: public dgConstraint
 	virtual void JointVelocityCorrection(dgJointAccelerationDecriptor* const params); 
 
 	void SetMotorAcceleration (dgInt32 index, dgFloat32 accelration, dgContraintDescritor& desc);
-	void SetJacobianDerivative (dgInt32 index, dgContraintDescritor& desc, const dgFloat32* jacobianA, const dgFloat32* jacobianB, dgForceImpactPair* const jointForce);
+	void SetJacobianDerivative (dgInt32 index, dgContraintDescritor& desc, const dgFloat32* const jacobianA, const dgFloat32* const jacobianB, dgForceImpactPair* const jointForce);
 	void CalculatePointDerivative (dgInt32 index, dgContraintDescritor& desc, const dgVector& normalGlobal, const dgPointParam& param, dgForceImpactPair* const jointForce);
 	void CalculateAngularDerivative (dgInt32 index, dgContraintDescritor& desc, const dgVector& normalGlobal, dgFloat32 stiffness, dgFloat32 jointAngle, dgForceImpactPair* const jointForce);
 	dgFloat32 CalculateSpringDamperAcceleration (dgInt32 index, const dgContraintDescritor& desc, dgFloat32 jointAngle, const dgVector& p0Global, const dgVector& p1Global, dgFloat32 springK, dgFloat32 springD);
@@ -72,5 +72,5 @@ class dgBilateralConstraint: public dgConstraint
 	friend class dgWorldDynamicUpdate;
 };
 
-#endif // !defined(AFX_DGBILATERALCONSTRAINT_H__7C9E1F9A_5EC6_48BE_8C9F_FB90132C6619_H)
+#endif
 

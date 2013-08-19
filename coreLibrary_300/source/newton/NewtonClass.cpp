@@ -81,7 +81,7 @@ void* Newton::DefaultAllocMemory (dgInt32 size)
 }
 
 
-void Newton::DefaultFreeMemory (void *ptr, dgInt32 size)
+void Newton::DefaultFreeMemory (void* const ptr, dgInt32 size)
 {
 	free (ptr);
 }
@@ -131,7 +131,7 @@ void Newton::UpdatePhysicsAsync (dgFloat32 timestep)
 void Newton::DestroyJoint(dgConstraint* const joint)
 {
 	if (IsBusy()) {		
-		// the engine is busy in the previus update, deferred the deletion
+		// the engine is busy in the previous update, deferred the deletion
 		NewtonDeadJoints& jointList = *this;
 		jointList.Insert (joint, joint);
 	} else {
@@ -139,7 +139,7 @@ void Newton::DestroyJoint(dgConstraint* const joint)
 	}
 }
 
-void Newton::DestroyBody(dgBody* body)
+void Newton::DestroyBody(dgBody* const body)
 {
 	if (IsBusy()) {		
 		// the engine is busy in the previous update, deferred the deletion
@@ -151,13 +151,7 @@ void Newton::DestroyBody(dgBody* body)
 }
 
 
-NewtonUserJoint::NewtonUserJoint (
-	dgWorld* world, 
-	dgInt32 maxDof, 
-	NewtonUserBilateralCallback callback, 
-	NewtonUserBilateralGetInfoCallback getInfo,
-	dgBody *dyn0, 
-	dgBody *dyn1)
+NewtonUserJoint::NewtonUserJoint (dgWorld* const world, dgInt32 maxDof, NewtonUserBilateralCallback callback, NewtonUserBilateralGetInfoCallback getInfo, dgBody* const dyn0, dgBody* const dyn1)
 	:dgUserConstraint (world, dyn0, dyn1, 1)
 {
 	m_rows = 0;
@@ -168,7 +162,6 @@ NewtonUserJoint::NewtonUserJoint (
 	dgAssert (world);
 	m_forceArray = m_jointForce;
 	if (m_maxDOF > DG_BILATERAL_CONTRAINT_DOF) {
-		dgAssert (0);
 		m_forceArray = (dgForceImpactPair*) world->GetAllocator()->Malloc (dgInt32 (m_maxDOF * sizeof (dgForceImpactPair)));
 	}
 	memset (m_forceArray, 0, m_maxDOF * sizeof (dgFloat32));
@@ -215,7 +208,7 @@ void NewtonUserJoint::AddAngularRowJacobian (const dgVector& dir, dgFloat32 relA
 	dgAssert (m_rows <= dgInt32 (m_maxDOF));
 }
 
-void NewtonUserJoint::AddGeneralRowJacobian (const dgFloat32* jacobian0, const dgFloat32* jacobian1)
+void NewtonUserJoint::AddGeneralRowJacobian (const dgFloat32* const jacobian0, const dgFloat32* const jacobian1)
 {
 	m_lastPosit0 = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	m_lastPosit1 = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
