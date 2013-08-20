@@ -32,10 +32,12 @@ class DemoCameraListener: public DemoListenerBase
 		return m_camera;
 	}
 
-	void SetCameraMatrix (DemoEntityManager* const scene, const dQuaternion& rotation, const dVector& position) const
+	void SetCameraMatrix (DemoEntityManager* const scene, const dQuaternion& rotation, const dVector& position)
 	{
 		m_camera->SetMatrix(*scene, rotation, position);
 		m_camera->SetMatrix(*scene, rotation, position);
+		m_yaw = m_camera->GetYawAngle();
+		m_pitch = m_camera->GetPichAngle();
 	}
 
 	void RenderPickedTarget () const;

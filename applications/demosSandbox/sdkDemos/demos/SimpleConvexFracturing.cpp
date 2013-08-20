@@ -159,21 +159,12 @@ class SimpleFracturedEffectEntity: public DemoEntity
 
 	void SimulationPostListener(DemoEntityManager* const scene, DemoEntityManager::dListNode* const mynode, dFloat timeStep)
 	{
-//		m_delay --;
-//		if (m_delay > 0) {
-//			return;
-//		}
-
 		// see if the net force on the body comes fr a high impact collision
 		dFloat breakImpact = 0.0f;
 		for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint(m_myBody); joint; joint = NewtonBodyGetNextContactJoint(m_myBody, joint)) {
 			for (void* contact = NewtonContactJointGetFirstContact (joint); contact; contact = NewtonContactJointGetNextContact (joint, contact)) {
-				//dVector point;
-				//dVector normal;	
 				dVector contactForce;
 				NewtonMaterial* const material = NewtonContactGetMaterial (contact);
-				
-//				NewtonMaterialGetContactForce(material, m_myBody, &contactForce[0]);
 				dFloat impulseImpact = NewtonMaterialGetContactMaxNormalImpact(material);
 				if (impulseImpact > breakImpact) {
 					breakImpact = impulseImpact;
@@ -184,8 +175,6 @@ class SimpleFracturedEffectEntity: public DemoEntity
 
 		// if the force is bigger than N time Gravities, It is considered a collision force
 		breakImpact *= m_myMassInverse;
-		dTrace (("%f\n", breakImpact));
-
 		if (breakImpact > BREAK_IMPACT_IN_METERS_PER_SECONDS) {
 			NewtonWorld* const world = NewtonBodyGetWorld(m_myBody);
 
@@ -217,16 +206,11 @@ class SimpleFracturedEffectEntity: public DemoEntity
 
 				DemoEntity* const entity = new DemoEntity (dMatrix (rotation, matrix.m_posit), NULL);
 				entity->SetMesh (atom.m_mesh);
-				//entity->SetMatrix(*scene, rotation, matrix.m_posit);
-				//entity->InterpolateMatrix (*scene, 1.0f);
 				scene->Append(entity);
 
 				int materialId = 0;
 
 				dFloat debriMass = mass * atom.m_massFraction;
-				//dFloat Ixx = debriMass * atom.m_momentOfInirtia.m_x;
-				//dFloat Iyy = debriMass * atom.m_momentOfInirtia.m_y;
-				//dFloat Izz = debriMass * atom.m_momentOfInirtia.m_z;
 
 				//create the rigid body
 				NewtonBody* const rigidBody = NewtonCreateDynamicBody (world, atom.m_collision, &matrix[0][0]);
@@ -406,12 +390,8 @@ void SimpleConvexFracturing (DemoEntityManager* const scene)
 //	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 
-//for (int i = 0; i < 1; i ++)
-//AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 1.7f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-
 	// place camera into position
 	dQuaternion rot;
-//	dVector origin (-40.0f, 10.0f, 0.0f, 0.0f);
 	dVector origin (-15.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 

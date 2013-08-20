@@ -49,8 +49,6 @@ DemoCameraListener::DemoCameraListener(DemoEntityManager* const scene)
 	,m_pickedBodyParam(0.0f)
 	,m_prevMouseState(false)
 {
-//	m_Yaw = m_camera->GetYawAngle();
-//	m_Pitch = m_camera->GetPichAngle();
 }
 
 DemoCameraListener::~DemoCameraListener()

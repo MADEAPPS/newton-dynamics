@@ -13,35 +13,14 @@
 
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
-#include "dList.h"
-#include "dTree.h"
-#include "dHeap.h"
 #include "TargaToOpenGl.h"
-#include "RenderPrimitive.h"
-#include "../OGLMesh.h"
-#include "../SceneManager.h"
-#include "../PhysicsUtils.h"
-#include "../toolBox/MousePick.h"
-#include "../toolBox/OpenGlUtil.h"
-#include "../toolBox/DebugDisplay.h"
-#include "../toolBox/LevelPrimitive.h"
-
-// comment out this line to regenerate the breakable mesh in every run
-#define USE_SERILIZED_MESH
+#include "DemoMesh.h"
+#include "DemoEntityManager.h"
+#include "DemoCamera.h"
+#include "PhysicsUtils.h"
 
 
-static void SerializeFile (void* serializeHandle, const void* buffer, int size)
-{
-	fwrite (buffer, size, 1, (FILE*) serializeHandle);
-}
-
-static void DeSerializeFile (void* serializeHandle, void* buffer, int size)
-{
-	fread (buffer, size, 1, (FILE*) serializeHandle);
-}
-
-
-
+#if 0
 class ShareVertexMesh: public OGLMesh
 {
 	public: 
@@ -1001,9 +980,36 @@ void BuildingDestruction(SceneManager& system)
 //	BreakableStruture (system, dVector ( 15.0f, 0.0f,  10.0f, 0.0f), 3);
 }
 
+#endif
 
 
 
+void StructuredConvexFracturing (DemoEntityManager* const scene)
+{
+	// load the skybox
+	scene->CreateSkyBox();
+
+	// load the scene from a ngd file format
+	CreateLevelMesh (scene, "ruinsFloor.ngd", false);
+	//CreateLevelMesh (scene, "flatPlane.ngd", false);
+	//CreateLevelMesh (scene, "sponza.ngd", false);
+	//CreateLevelMesh (scene, "sponza.ngd", true);
+
+CreateLevelMesh (scene, "ruins.ngd", false);
+
+	// create a shattered mesh array
+	//CreateSimpleVoronoiFracture (scene);
+
+	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
+	dVector location (0.0f, 0.0f, 0.0f, 0.0f);
+	dVector size (0.75f, 0.75f, 0.75f, 0.0f);
+	dMatrix shapeOffsetMatrix (GetIdentityMatrix());
+
+	// place camera into position
+	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -30.0f * 3.141592f / 180.0f); 
+	dVector origin (-45.0f, 20.0f, -15.0f, 0.0f);
+	scene->SetCameraMatrix(rot, origin);
+}
 
 
 

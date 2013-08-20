@@ -1009,6 +1009,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\sdkDemos\demos\StructuredConvexFracturing.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\sdkDemos\demos\SuperCar.cpp"
 				>
 			</File>
