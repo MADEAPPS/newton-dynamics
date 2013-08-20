@@ -1407,6 +1407,7 @@ void dgBroadPhase::RayCast (const dgVector& l0, const dgVector& l1, OnRayCastAct
 			line.m_boxL0 = (line.m_l0 & test) | line.m_l1.AndNot(test);
 			line.m_boxL1 = (line.m_l1 & test) | line.m_l0.AndNot(test);
 
+			const dgBody* const sentinel = m_world->GetSentinelBody();
 			while (stack) {
 				stack --;
 				dgFloat32 dist = distance[stack];
@@ -1415,7 +1416,7 @@ void dgBroadPhase::RayCast (const dgVector& l0, const dgVector& l1, OnRayCastAct
 				} else {
 					const dgNode* const me = stackPool[stack];
 					dgAssert (me);
-					if (me->m_body) {
+					if (me->m_body && (me->m_body != sentinel)) {
 						dgAssert (!me->m_left);
 						dgAssert (!me->m_right);
 						dgFloat32 param = me->m_body->RayCast (line, filter, prefilter, userData, maxParam);
@@ -1484,6 +1485,7 @@ void dgBroadPhase::ConvexRayCast (dgCollisionInstance* const shape, const dgMatr
 		stackPool[0] = m_rootNode;
 		distance[0] = ray.BoxIntersect(minBox, maxBox);
 
+		const dgBody* const sentinel = m_world->GetSentinelBody();
 		while (stack) {
 			stack --;
 			dgFloat32 dist = distance[stack];
@@ -1492,7 +1494,7 @@ void dgBroadPhase::ConvexRayCast (dgCollisionInstance* const shape, const dgMatr
 			} else {
 				const dgNode* const me = stackPool[stack];
 				dgAssert (me);
-				if (me->m_body) {
+				if (me->m_body && (me->m_body != sentinel)) {
 					dgAssert (!me->m_left);
 					dgAssert (!me->m_right);
 					dgBody* const body = me->m_body;
@@ -1574,6 +1576,7 @@ dgInt32 dgBroadPhase::ConvexCast (dgCollisionInstance* const shape, const dgMatr
 		stackPool[0] = m_rootNode;
 		distance[0] = ray.BoxIntersect(minBox, maxBox);
 
+		const dgBody* const sentinel = m_world->GetSentinelBody();
 		while (stack) {
 			stack --;
 
@@ -1583,7 +1586,7 @@ dgInt32 dgBroadPhase::ConvexCast (dgCollisionInstance* const shape, const dgMatr
 				break;
 			} else {
 				const dgNode* const me = stackPool[stack];
-				if (me->m_body) {
+				if (me->m_body && (me->m_body != sentinel)) {
 					dgAssert (!me->m_left);
 					dgAssert (!me->m_right);
 					dgBody* const body = me->m_body;
