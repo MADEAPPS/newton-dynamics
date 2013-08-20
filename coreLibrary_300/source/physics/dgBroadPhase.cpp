@@ -1416,12 +1416,14 @@ void dgBroadPhase::RayCast (const dgVector& l0, const dgVector& l1, OnRayCastAct
 				} else {
 					const dgNode* const me = stackPool[stack];
 					dgAssert (me);
-					if (me->m_body && (me->m_body != sentinel)) {
-						dgAssert (!me->m_left);
-						dgAssert (!me->m_right);
-						dgFloat32 param = me->m_body->RayCast (line, filter, prefilter, userData, maxParam);
-						if (param < maxParam) {
-							maxParam = param;
+					if (me->m_body) {
+						if (me->m_body != sentinel) {
+							dgAssert (!me->m_left);
+							dgAssert (!me->m_right);
+							dgFloat32 param = me->m_body->RayCast (line, filter, prefilter, userData, maxParam);
+							if (param < maxParam) {
+								maxParam = param;
+							}
 						}
 					} else {
 						const dgNode* const left = me->m_left;
@@ -1494,15 +1496,17 @@ void dgBroadPhase::ConvexRayCast (dgCollisionInstance* const shape, const dgMatr
 			} else {
 				const dgNode* const me = stackPool[stack];
 				dgAssert (me);
-				if (me->m_body && (me->m_body != sentinel)) {
-					dgAssert (!me->m_left);
-					dgAssert (!me->m_right);
-					dgBody* const body = me->m_body;
-					if (!PREFILTER_RAYCAST (prefilter, body, shape, userData)) {
-						dgFloat32 param = body->ConvexRayCast (ray, shape,boxP0, boxP1, matrix, velocA, filter, prefilter, userData, maxParam, threadId);
-						if (param < maxParam) {
-							param = dgMin (param + quantizeStep, dgFloat32 (1.0f));
-							maxParam = param;
+				if (me->m_body) {
+					if (me->m_body != sentinel) {
+						dgAssert (!me->m_left);
+						dgAssert (!me->m_right);
+						dgBody* const body = me->m_body;
+						if (!PREFILTER_RAYCAST (prefilter, body, shape, userData)) {
+							dgFloat32 param = body->ConvexRayCast (ray, shape,boxP0, boxP1, matrix, velocA, filter, prefilter, userData, maxParam, threadId);
+							if (param < maxParam) {
+								param = dgMin (param + quantizeStep, dgFloat32 (1.0f));
+								maxParam = param;
+							}
 						}
 					}
 				} else {
@@ -1586,34 +1590,36 @@ dgInt32 dgBroadPhase::ConvexCast (dgCollisionInstance* const shape, const dgMatr
 				break;
 			} else {
 				const dgNode* const me = stackPool[stack];
-				if (me->m_body && (me->m_body != sentinel)) {
-					dgAssert (!me->m_left);
-					dgAssert (!me->m_right);
-					dgBody* const body = me->m_body;
-					if (!PREFILTER_RAYCAST (prefilter, body, shape, userData)) {
-						dgInt32 count = m_world->CollideContinue(shape, matrix, velocA, velocB, body->m_collision, body->m_matrix, velocB, velocB, time, points, normals, penetration, attributeA, attributeB, DG_CONVEX_CAST_POOLSIZE, threadIndex);
+				if (me->m_body) {
+					if (me->m_body != sentinel) {
+						dgAssert (!me->m_left);
+						dgAssert (!me->m_right);
+						dgBody* const body = me->m_body;
+						if (!PREFILTER_RAYCAST (prefilter, body, shape, userData)) {
+							dgInt32 count = m_world->CollideContinue(shape, matrix, velocA, velocB, body->m_collision, body->m_matrix, velocB, velocB, time, points, normals, penetration, attributeA, attributeB, DG_CONVEX_CAST_POOLSIZE, threadIndex);
 
-						if (count) {
-							if (time < maxParam) {
-								if ((time - maxParam) < dgFloat32(-1.0e-3f)) {
-									totalCount = 0;
-								}
-								maxParam = time;
-								if (count >= (maxContacts - totalCount)) {
-									count = maxContacts - totalCount;
-								}
+							if (count) {
+								if (time < maxParam) {
+									if ((time - maxParam) < dgFloat32(-1.0e-3f)) {
+										totalCount = 0;
+									}
+									maxParam = time;
+									if (count >= (maxContacts - totalCount)) {
+										count = maxContacts - totalCount;
+									}
 
-								for (dgInt32 i = 0; i < count; i++) {
-									info[totalCount].m_hitBody = body;
-									info[totalCount].m_point[0] = points[i].m_x;
-									info[totalCount].m_point[1] = points[i].m_y;
-									info[totalCount].m_point[2] = points[i].m_z;
-									info[totalCount].m_normal[0] = normals[i].m_x;
-									info[totalCount].m_normal[1] = normals[i].m_y;
-									info[totalCount].m_normal[2] = normals[i].m_z;
-									info[totalCount].m_penetration = penetration[i];
-									info[totalCount].m_contaID = attributeB[i];
-									totalCount++;
+									for (dgInt32 i = 0; i < count; i++) {
+										info[totalCount].m_hitBody = body;
+										info[totalCount].m_point[0] = points[i].m_x;
+										info[totalCount].m_point[1] = points[i].m_y;
+										info[totalCount].m_point[2] = points[i].m_z;
+										info[totalCount].m_normal[0] = normals[i].m_x;
+										info[totalCount].m_normal[1] = normals[i].m_y;
+										info[totalCount].m_normal[2] = normals[i].m_z;
+										info[totalCount].m_penetration = penetration[i];
+										info[totalCount].m_contaID = attributeB[i];
+										totalCount++;
+									}
 								}
 							}
 						}
