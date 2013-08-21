@@ -61,6 +61,17 @@ static ARTICULATED_VEHICLE_DEFINITION forkliftDefinition[] =
 class ArticulatedEntityModel: public DemoEntity
 {
 	public:
+	class InputRecord
+	{
+		public:
+		InputRecord()
+		{
+			memset (this, 0, sizeof (InputRecord));
+		}
+
+		int m_steerValue;
+	};
+
 	ArticulatedEntityModel (DemoEntityManager* const scene, const char* const name)
 		:DemoEntity(GetIdentityMatrix(), NULL)
 		,m_rearTiresCount(0)
@@ -70,6 +81,8 @@ class ArticulatedEntityModel: public DemoEntity
 	{
 		// load the vehicle model
 		LoadNGD_mesh (name, scene->GetNewton());
+
+		
 	}
 
 	ArticulatedEntityModel (const ArticulatedEntityModel& copy)
@@ -86,6 +99,11 @@ class ArticulatedEntityModel: public DemoEntity
 		return new ArticulatedEntityModel(*this);
 	}
 
+
+	void SetInput (const InputRecord& inputs)
+	{
+		m_inputs = inputs;
+	}
 
 	void LinkFrontTire (NewtonBody* const chassis, NewtonBody* const tire)
 	{
@@ -118,10 +136,8 @@ class ArticulatedEntityModel: public DemoEntity
 
 		dFloat angleLimit = 30.0f * 3.141592f / 180.0f;
 		dFloat angularRate = 60.0f * 3.141592f / 180.0f;
-		m_rearTireJoints[m_frontTiresCount] = new CustomUniversalActuator (&chassisMatrix[0][0], angularRate, -angleLimit, angleLimit, angularRate, -angleLimit, angleLimit, tire, chassis);
-		m_rearTireJoints[m_frontTiresCount]->SetEnableFlag0 (false);
-		//m_rearTireJoints[m_frontTiresCount]->SetTargetAngle1(angleLimit);
-
+		m_rearTireJoints[m_rearTiresCount] = new CustomUniversalActuator (&chassisMatrix[0][0], angularRate, -angleLimit, angleLimit, angularRate, -angleLimit, angleLimit, tire, chassis);
+		m_rearTireJoints[m_rearTiresCount]->SetEnableFlag0 (false);
 		m_rearTiresCount ++;
 	}
 
@@ -163,7 +179,6 @@ class ArticulatedEntityModel: public DemoEntity
 		m_paletteActuatorsCount ++;
 	}
 
-
 	int m_rearTiresCount;
 	int m_frontTiresCount;
 	int m_liftActuatorsCount;
@@ -174,8 +189,9 @@ class ArticulatedEntityModel: public DemoEntity
 	CustomSliderActuator* m_liftJoints[3];
 	CustomSliderActuator* m_paletteJoints[3];
 	CustomUniversalActuator* m_rearTireJoints[2];
-	
 	CustomHingeActuator* m_angularActuator;
+
+	InputRecord m_inputs;
 };
 
 class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
@@ -191,6 +207,18 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 	virtual void OnPreUpdate (CustomArticulatedTransformController* const controller, dFloat timestep, int threadIndex) const
 	{
+		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)controller->GetUserData();
+
+		dFloat steeringAngle = vehicleModel->m_rearTireJoints[0]->GetActuatorAngle1();
+		if (vehicleModel->m_inputs.m_steerValue > 0) {
+			steeringAngle = vehicleModel->m_rearTireJoints[0]->GetMinAngularLimit0(); 
+		} else if (vehicleModel->m_inputs.m_steerValue < 0) {
+			steeringAngle = vehicleModel->m_rearTireJoints[0]->GetMaxAngularLimit0(); 
+		}
+		vehicleModel->m_rearTireJoints[0]->SetTargetAngle1(steeringAngle);
+		vehicleModel->m_rearTireJoints[1]->SetTargetAngle1(steeringAngle);
+
+
 	}
 
 	static int OnBoneAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
@@ -408,6 +436,25 @@ class AriculatedJointInputManager: public CustomInputManager
 
 	void OnBeginUpdate (dFloat timestepInSecunds)
 	{
+		ArticulatedEntityModel::InputRecord inputs;
+
+		NewtonDemos* const mainWindow = m_scene->GetRootWindow();
+		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*) m_player->GetUserData();
+
+		inputs.m_steerValue = (int (mainWindow->GetKeyState ('D')) - int (mainWindow->GetKeyState ('A')));
+
+		// check if we must activate the player
+		if (mainWindow->GetKeyState ('A') || 
+			mainWindow->GetKeyState ('D') ||
+			mainWindow->GetKeyState ('W') ||
+			mainWindow->GetKeyState ('S')) 
+		{
+			NewtonBody* const body = m_player->GetBoneBody(0);
+			NewtonBodySetSleepState(body, false);
+		}
+
+
+		vehicleModel->SetInput (inputs);
 	}
 
 	void OnEndUpdate (dFloat timestepInSecunds)

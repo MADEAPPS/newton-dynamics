@@ -140,6 +140,22 @@ CustomArticulatedTransformController::dSkeletonBone* CustomArticulatedTransformC
 	return &m_bones[m_boneCount - 1];
 }
 
+int CustomArticulatedTransformController::GetBoneCount() const
+{
+	return m_boneCount;
+}
+
+const CustomArticulatedTransformController::dSkeletonBone* CustomArticulatedTransformController::GetBone(int index) const
+{
+	return &m_bones[index];
+}
+
+NewtonBody* CustomArticulatedTransformController::GetBoneBody (int index) const
+{
+	return GetBone(index)->m_body;
+}
+
+
 void CustomArticulatedTransformController::SetDefaultSelfCollisionMask ()
 {
 	for (int i = 0; i < m_boneCount; i ++) {

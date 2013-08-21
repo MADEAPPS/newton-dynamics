@@ -94,6 +94,10 @@ class CustomArticulatedTransformController: public CustomControllerBase
 
 	NEWTON_API bool SelfCollisionTest (const dSkeletonBone* const bone0, const dSkeletonBone* const bone1) const;
 	NEWTON_API dSkeletonBone* AddBone (NewtonBody* const bone, const dMatrix& bindMatrix, dSkeletonBone* const parentBodne = NULL);
+
+	NEWTON_API int GetBoneCount() const;
+	NEWTON_API const dSkeletonBone* GetBone(int index) const;
+	NEWTON_API NewtonBody* GetBoneBody (int index) const;
 	
 	protected:
 	NEWTON_API void Init (void* const userData, bool errorCorrectionMode);
