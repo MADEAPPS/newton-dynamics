@@ -99,6 +99,7 @@ class ArticulatedEntityModel: public DemoEntity
 		,m_omegaResistance(0.0f)
 		,m_tiltAngle(0.0f)
 		,m_liftPosit(0.0f)
+		,m_openPosit(0.0f)
 	{
 	}
 
@@ -157,7 +158,6 @@ class ArticulatedEntityModel: public DemoEntity
 		dFloat angleLimit = 20.0f * 3.141592f / 180.0f;
 		dFloat angularRate = 30.0f * 3.141592f / 180.0f;
 		m_angularActuator = new CustomHingeActuator (&baseMatrix[0][0], angularRate, -angleLimit, angleLimit, child, parent);
-		//m_angularActuator->SetTargetAngle(angleLimit);
 	}
 
 	void LinkLiftActuator (NewtonBody* const parent, NewtonBody* const child)
@@ -169,8 +169,6 @@ class ArticulatedEntityModel: public DemoEntity
 		dFloat maxLimit = 1.5f;
 		dFloat linearRate = 0.3f;
 		m_liftJoints[m_liftActuatorsCount] = new CustomSliderActuator (&baseMatrix[0][0], linearRate, minLimit, maxLimit, child, parent);
-
-		//m_liftJoints[m_liftActuatorsCount]->SetTargetPosit(maxLimit);
 		m_liftActuatorsCount ++;
 	}
 
@@ -183,7 +181,6 @@ class ArticulatedEntityModel: public DemoEntity
 		dFloat maxLimit = 0.2f;
 		dFloat linearRate = 0.25f;
 		m_paletteJoints[m_paletteActuatorsCount] = new CustomSliderActuator (&baseMatrix[0][0], linearRate, minLimit, maxLimit, child, parent);
-		//m_paletteJoints[m_paletteActuatorsCount]->SetTargetPosit(minLimit);
 		m_paletteActuatorsCount ++;
 	}
 
@@ -195,12 +192,12 @@ class ArticulatedEntityModel: public DemoEntity
 	dFloat m_omegaResistance;
 	dFloat m_tiltAngle;
 	dFloat m_liftPosit;
-
+	dFloat m_openPosit;
 		
 	NewtonBody* m_fronTires[2];
 	CustomHinge* m_frontTireJoints[2];
 	CustomSliderActuator* m_liftJoints[3];
-	CustomSliderActuator* m_paletteJoints[3];
+	CustomSliderActuator* m_paletteJoints[2];
 	CustomUniversalActuator* m_rearTireJoints[2];
 	CustomHingeActuator* m_angularActuator;
 
@@ -277,7 +274,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		vehicleModel->m_angularActuator->SetTargetAngle (tiltAngle);
 
 
-		// set the list position
+		// set the lift position
 		dFloat liftPosit = vehicleModel->m_liftPosit;
 		if (vehicleModel->m_inputs.m_liftValue > 0) {
 			liftPosit = vehicleModel->m_liftJoints[0]->GetMinPositLimit();
@@ -286,11 +283,23 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			liftPosit = vehicleModel->m_liftJoints[0]->GetMaxPositLimit();
 			vehicleModel->m_liftPosit = vehicleModel->m_liftJoints[0]->GetActuatorPosit();
 		}
-		for (int i =- 0; i < 3; i ++) {
+		for (int i = 0; i < sizeof (vehicleModel->m_liftJoints) / sizeof (vehicleModel->m_liftJoints[0]); i ++) {
 			vehicleModel->m_liftJoints[i]->SetTargetPosit(liftPosit);
 		}
 
 
+		// open Close palette position
+		dFloat openPosit = vehicleModel->m_openPosit;
+		if (vehicleModel->m_inputs.m_openValue > 0) {
+			openPosit = vehicleModel->m_paletteJoints[0]->GetMinPositLimit();
+			vehicleModel->m_openPosit = vehicleModel->m_paletteJoints[0]->GetActuatorPosit();
+		} else if (vehicleModel->m_inputs.m_openValue < 0) {
+			openPosit = vehicleModel->m_paletteJoints[0]->GetMaxPositLimit();
+			vehicleModel->m_openPosit = vehicleModel->m_paletteJoints[0]->GetActuatorPosit();
+		}
+		for (int i = 0; i < sizeof (vehicleModel->m_paletteJoints) / sizeof (vehicleModel->m_paletteJoints[0]); i ++) {
+			vehicleModel->m_paletteJoints[i]->SetTargetPosit(openPosit);
+		}
 	}
 
 	static int OnBoneAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
@@ -581,38 +590,6 @@ class AriculatedJointInputManager: public CustomInputManager
 		camOrigin -= frontDir.Scale(ARTICULATED_VEHICLE_CAMERA_DISTANCE);
 
 		camera->SetNextMatrix (*m_scene, camMatrix, camOrigin);
-
-
-/*
-		NewtonDemos* const mainWindow = scene->GetRootWindow();
-		NewtonBody* const body = controller->GetBody();
-		BasicPlayerEntity* const player = (BasicPlayerEntity*) NewtonBodyGetUserData(body);
-
-		player->m_headinAngle = camera->GetYawAngle();
-		dFloat forwarSpeed = (int (mainWindow->GetKeyState ('W')) - int (mainWindow->GetKeyState ('S'))) * PLAYER_WALK_SPEED;
-		dFloat strafeSpeed = (int (mainWindow->GetKeyState ('D')) - int (mainWindow->GetKeyState ('A'))) * PLAYER_WALK_SPEED;
-
-		// normalize player speed
-		dFloat mag2 = forwarSpeed * forwarSpeed + strafeSpeed * strafeSpeed;
-		if (mag2 > 0.0f) {
-			dFloat invMag = PLAYER_WALK_SPEED / dSqrt (mag2);
-			forwarSpeed *= invMag;
-			strafeSpeed *= invMag;
-		}
-		m_player->m_forwarSpeed = forwarSpeed;
-		m_player->m_strafeSpeed = strafeSpeed;
-
-		// set player is jumping speed
-		const dFloat jumpSpeed = 8.0f;
-		m_player->m_jumpSpeed = (m_player->m_jumpKey.UpdateTriggerButton(mainWindow, ' ')) ? jumpSpeed : 0.0f;
-
-		// see if we are shooting
-		m_player->m_shootProp = m_shotProp.UpdateTriggerButton(mainWindow, 0x0d) ? 1 : 0;
-
-		// set the help key
-		m_player->m_helpKey.UpdatePushButton (mainWindow, 'H');
-*/		
-
 	}
 
 	void AddPlayer(CustomArticulatedTransformController* const player)
@@ -630,6 +607,8 @@ class AriculatedJointInputManager: public CustomInputManager
 		lineNumber = scene->Print (color, 10, lineNumber + 20, "drive backward:          S");
 		lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right:              D");
 		lineNumber = scene->Print (color, 10, lineNumber + 20, "turn left:               A");
+		lineNumber = scene->Print (color, 10, lineNumber + 20, "open palette:            F");
+		lineNumber = scene->Print (color, 10, lineNumber + 20, "close palette            G");
 		lineNumber = scene->Print (color, 10, lineNumber + 20, "lift palette:            E");
 		lineNumber = scene->Print (color, 10, lineNumber + 20, "lower palette            Q");
 		lineNumber = scene->Print (color, 10, lineNumber + 20, "tilt forward:            Z");
