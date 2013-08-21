@@ -19,13 +19,18 @@
 #include "DemoEntityManager.h"
 #include "CustomBallAndSocket.h"
 #include "DebugDisplay.h"
+
 #include "CustomHinge.h"
+#include "CustomInputManager.h"
 #include "CustomHingeActuator.h"
 #include "CustomSliderActuator.h"
 #include "HeightFieldPrimitive.h"
 #include "CustomUniversalActuator.h"
 #include "CustomArcticulatedTransformManager.h"
 
+
+#define ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD	2.0f
+#define ARTICULATED_VEHICLE_CAMERA_DISTANCE			7.0f
 
 struct ARTICULATED_VEHICLE_DEFINITION
 {
@@ -51,10 +56,12 @@ static ARTICULATED_VEHICLE_DEFINITION forkliftDefinition[] =
 	{"right_teeth", "convexHullAggregate",	 50.0f, "paletteActuator"},
 };
 
+
+
 class ArticulatedEntityModel: public DemoEntity
 {
 	public:
-	ArticulatedEntityModel(DemoEntityManager* const scene, const char* const name)
+	ArticulatedEntityModel (DemoEntityManager* const scene, const char* const name)
 		:DemoEntity(GetIdentityMatrix(), NULL)
 		,m_rearTiresCount(0)
 		,m_frontTiresCount(0)
@@ -63,9 +70,6 @@ class ArticulatedEntityModel: public DemoEntity
 	{
 		// load the vehicle model
 		LoadNGD_mesh (name, scene->GetNewton());
-
-		// plug a callback for 2d help display
-		scene->Set2DDisplayRenderFunction (RenderPlayerHelp, this);
 	}
 
 	ArticulatedEntityModel (const ArticulatedEntityModel& copy)
@@ -80,29 +84,6 @@ class ArticulatedEntityModel: public DemoEntity
 	DemoEntity* CreateClone() const
 	{
 		return new ArticulatedEntityModel(*this);
-	}
-
-
-	void RenderPlayerHelp (DemoEntityManager* const scene, int lineNumber) const
-	{
-//		if (m_player->m_helpKey.GetPushButtonState()) {
-			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "Navigation               Key");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "drive forward:           W");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "drive backward:          S");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right:              D");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn left:               A");
-//			lineNumber = scene->Print (color, 10, lineNumber + 20, "toggle camera mode:      C");
-//			lineNumber = scene->Print (color, 10, lineNumber + 20, "jump:                    Space");
-//			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help:               H");
-//			lineNumber = scene->Print (color, 10, lineNumber + 20, "change player direction: Left mouse button");
-//		}
-	}
-
-	static void RenderPlayerHelp (DemoEntityManager* const scene, void* const context, int lineNumber)
-	{
-		ArticulatedEntityModel* const me = (ArticulatedEntityModel*) context;
-		me->RenderPlayerHelp (scene, lineNumber);
 	}
 
 
@@ -139,7 +120,7 @@ class ArticulatedEntityModel: public DemoEntity
 		dFloat angularRate = 60.0f * 3.141592f / 180.0f;
 		m_rearTireJoints[m_frontTiresCount] = new CustomUniversalActuator (&chassisMatrix[0][0], angularRate, -angleLimit, angleLimit, angularRate, -angleLimit, angleLimit, tire, chassis);
 		m_rearTireJoints[m_frontTiresCount]->SetEnableFlag0 (false);
-//m_rearTireJoints[m_frontTiresCount]->SetTargetAngle1(angleLimit);
+		//m_rearTireJoints[m_frontTiresCount]->SetTargetAngle1(angleLimit);
 
 		m_rearTiresCount ++;
 	}
@@ -152,7 +133,7 @@ class ArticulatedEntityModel: public DemoEntity
 		dFloat angleLimit = 20.0f * 3.141592f / 180.0f;
 		dFloat angularRate = 30.0f * 3.141592f / 180.0f;
 		m_angularActuator = new CustomHingeActuator (&baseMatrix[0][0], angularRate, -angleLimit, angleLimit, child, parent);
-//m_angularActuator->SetTargetAngle(angleLimit);
+		//m_angularActuator->SetTargetAngle(angleLimit);
 	}
 
 	void LinkLiftActuator (NewtonBody* const parent, NewtonBody* const child)
@@ -165,7 +146,7 @@ class ArticulatedEntityModel: public DemoEntity
 		dFloat linearRate = 0.3f;
 		m_liftJoints[m_liftActuatorsCount] = new CustomSliderActuator (&baseMatrix[0][0], linearRate, minLimit, maxLimit, child, parent);
 
-//m_liftJoints[m_liftActuatorsCount]->SetTargetPosit(maxLimit);
+		//m_liftJoints[m_liftActuatorsCount]->SetTargetPosit(maxLimit);
 		m_liftActuatorsCount ++;
 	}
 
@@ -178,7 +159,7 @@ class ArticulatedEntityModel: public DemoEntity
 		dFloat maxLimit = 0.2f;
 		dFloat linearRate = 0.25f;
 		m_paletteJoints[m_paletteActuatorsCount] = new CustomSliderActuator (&baseMatrix[0][0], linearRate, minLimit, maxLimit, child, parent);
-//m_paletteJoints[m_paletteActuatorsCount]->SetTargetPosit(minLimit);
+		//m_paletteJoints[m_paletteActuatorsCount]->SetTargetPosit(minLimit);
 		m_paletteActuatorsCount ++;
 	}
 
@@ -344,7 +325,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 	}
 
 
-	void CreateForklift (const dMatrix& location, const DemoEntity* const model, int bodyPartsCount, ARTICULATED_VEHICLE_DEFINITION* const definition)
+	CustomArticulatedTransformController* CreateForklift (const dMatrix& location, const DemoEntity* const model, int bodyPartsCount, ARTICULATED_VEHICLE_DEFINITION* const definition)
 	{
 		NewtonWorld* const world = GetWorld(); 
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
@@ -404,9 +385,109 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 		// disable self collision between all body parts
 		controller->DisableAllSelfCollision();
+
+		return controller;
 	}
 
 	int m_material;
+};
+
+
+// we recommend using and input manage to control input for all games
+class AriculatedJointInputManager: public CustomInputManager
+{
+	public:
+	AriculatedJointInputManager (DemoEntityManager* const scene)
+		:CustomInputManager(scene->GetNewton())
+		,m_scene(scene)
+		,m_player(NULL)
+	{
+		// plug a callback for 2d help display
+		scene->Set2DDisplayRenderFunction (RenderPlayerHelp, this);
+	}
+
+	void OnBeginUpdate (dFloat timestepInSecunds)
+	{
+	}
+
+	void OnEndUpdate (dFloat timestepInSecunds)
+	{
+		DemoCamera* const camera = m_scene->GetCamera();
+		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*) m_player->GetUserData();
+		
+		dMatrix camMatrix(camera->GetNextMatrix());
+		dMatrix playerMatrix (vehicleModel->GetNextMatrix());
+
+		dVector frontDir (camMatrix[0]);
+		dVector camOrigin (playerMatrix.TransformVector(dVector(0.0f, ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD, 0.0f, 0.0f)));
+		camOrigin -= frontDir.Scale(ARTICULATED_VEHICLE_CAMERA_DISTANCE);
+
+		camera->SetNextMatrix (*m_scene, camMatrix, camOrigin);
+
+
+/*
+		NewtonDemos* const mainWindow = scene->GetRootWindow();
+		NewtonBody* const body = controller->GetBody();
+		BasicPlayerEntity* const player = (BasicPlayerEntity*) NewtonBodyGetUserData(body);
+
+		player->m_headinAngle = camera->GetYawAngle();
+		dFloat forwarSpeed = (int (mainWindow->GetKeyState ('W')) - int (mainWindow->GetKeyState ('S'))) * PLAYER_WALK_SPEED;
+		dFloat strafeSpeed = (int (mainWindow->GetKeyState ('D')) - int (mainWindow->GetKeyState ('A'))) * PLAYER_WALK_SPEED;
+
+		// normalize player speed
+		dFloat mag2 = forwarSpeed * forwarSpeed + strafeSpeed * strafeSpeed;
+		if (mag2 > 0.0f) {
+			dFloat invMag = PLAYER_WALK_SPEED / dSqrt (mag2);
+			forwarSpeed *= invMag;
+			strafeSpeed *= invMag;
+		}
+		m_player->m_forwarSpeed = forwarSpeed;
+		m_player->m_strafeSpeed = strafeSpeed;
+
+		// set player is jumping speed
+		const dFloat jumpSpeed = 8.0f;
+		m_player->m_jumpSpeed = (m_player->m_jumpKey.UpdateTriggerButton(mainWindow, ' ')) ? jumpSpeed : 0.0f;
+
+		// see if we are shooting
+		m_player->m_shootProp = m_shotProp.UpdateTriggerButton(mainWindow, 0x0d) ? 1 : 0;
+
+		// set the help key
+		m_player->m_helpKey.UpdatePushButton (mainWindow, 'H');
+*/		
+
+	}
+
+	void AddPlayer(CustomArticulatedTransformController* const player)
+	{
+		m_player = player;
+	}
+
+
+	void RenderPlayerHelp (DemoEntityManager* const scene, int lineNumber) const
+	{
+		//		if (m_player->m_helpKey.GetPushButtonState()) {
+		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
+		lineNumber = scene->Print (color, 10, lineNumber + 20, "Navigation               Key");
+		lineNumber = scene->Print (color, 10, lineNumber + 20, "drive forward:           W");
+		lineNumber = scene->Print (color, 10, lineNumber + 20, "drive backward:          S");
+		lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right:              D");
+		lineNumber = scene->Print (color, 10, lineNumber + 20, "turn left:               A");
+		//lineNumber = scene->Print (color, 10, lineNumber + 20, "toggle camera mode:      C");
+		//lineNumber = scene->Print (color, 10, lineNumber + 20, "jump:                    Space");
+		//lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help:               H");
+		//lineNumber = scene->Print (color, 10, lineNumber + 20, "change player direction: Left mouse button");
+	}
+
+
+	static void RenderPlayerHelp (DemoEntityManager* const scene, void* const context, int lineNumber)
+	{
+		AriculatedJointInputManager* const me = (AriculatedJointInputManager*) context;
+		me->RenderPlayerHelp (scene, lineNumber);
+	}
+
+
+	DemoEntityManager* m_scene;
+	CustomArticulatedTransformController* m_player;
 };
 
 
@@ -420,23 +501,19 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	// load a the mesh of the articulate vehicle
 	ArticulatedEntityModel forkliffModel(scene, "forklift.ngd");
 
+	// add an input Manage to manage the inputs and user interaction 
+	AriculatedJointInputManager* const inputManager = new AriculatedJointInputManager (scene);
+
 	//  create a skeletal transform controller for controlling rag doll
-	ArticulatedVehicleManagerManager* const manager = new ArticulatedVehicleManagerManager (scene);
+	ArticulatedVehicleManagerManager* const vehicleManager = new ArticulatedVehicleManagerManager (scene);
 
 	NewtonWorld* const world = scene->GetNewton();
-	dMatrix matrix (GetIdentityMatrix());
-
 	dVector origin (FindFloor (world, dVector (-10.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
 
-	int count = 1;
-	for (int x = 0; x < count; x ++) {
-		for (int z = 0; z < count; z ++) {
-			dVector p (origin + dVector ((x - count / 2) * 3.0f - count / 2, 0.0f, (z - count / 2) * 3.0f, 0.0f));
-			matrix.m_posit = FindFloor (world, p, 100.0f);
-			matrix.m_posit.m_y += 3.0f;
-			manager->CreateForklift (matrix, &forkliffModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition);
-		}
-	}
+	dMatrix matrix (GetIdentityMatrix());
+	matrix.m_posit = FindFloor (world, origin, 100.0f);
+	matrix.m_posit.m_y += 3.0f;
+	inputManager->AddPlayer (vehicleManager->CreateForklift (matrix, &forkliffModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition));
 	
 	origin.m_x -= 5.0f;
 	origin.m_y += 5.0f;
