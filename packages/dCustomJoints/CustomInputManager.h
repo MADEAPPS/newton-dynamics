@@ -20,19 +20,43 @@
 */
 
 
-#ifndef _D_NEWTON_IMPUT_MANAGER_H_
-#define _D_NEWTON_IMPUT_MANAGER_H_
+#ifndef D_CUSTOM_IMPUT_MANAGER_H_
+#define D_CUSTOM_IMPUT_MANAGER_H_
 
-class dNewton;
+#include "CustomJointLibraryStdAfx.h"
+#include "CustomControllerManager.h"
 
-class dNewtonInputManager: public CustomInputManager
+#define INPUT_PLUGIN_NAME				"__inputManager__"
+
+
+class CustomInputController: public CustomControllerBase
 {
 	public:
-	CNEWTON_API dNewtonInputManager (dNewton* const world);
-	CNEWTON_API virtual ~dNewtonInputManager();
+	NEWTON_API virtual void PreUpdate(dFloat timestep, int threadIndex)
+	{
+		//do nothing;
+	}
+
+	NEWTON_API virtual void PostUpdate(dFloat timestep, int threadIndex)
+	{
+		//do nothing;
+	}
+};
+
+
+class CustomInputManager: public CustomControllerManager<CustomInputController> 
+{
+	public:
+	NEWTON_API CustomInputManager (NewtonWorld* const world);
+	NEWTON_API virtual ~CustomInputManager();
 
 	virtual void OnBeginUpdate (dFloat timestepInSecunds) = 0;
 	virtual void OnEndUpdate (dFloat timestepInSecunds) = 0;
+
+	protected:
+	NEWTON_API virtual void PreUpdate(dFloat timestep);
+	NEWTON_API virtual void PostUpdate (dFloat timestep);
+	NEWTON_API virtual void Debug () const {};
 };
 
 #endif

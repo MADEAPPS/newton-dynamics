@@ -22,7 +22,7 @@
 
 
 
-#define TRIGGER_PLUGIN_NAME				"triggerManager"
+#define TRIGGER_PLUGIN_NAME				"__triggerManager__"
 
 // a trigger is volume of space that is there to send a message to other objects when and object enter of leave the trigger region  
 // they are not visible and do not collide with bodies, but the generate contacts
@@ -75,7 +75,7 @@ class CustomTriggerManager: public CustomControllerManager<CustomTriggerControll
 		m_exitTrigger,
 	};
 
-	NEWTON_API CustomTriggerManager(NewtonWorld* const world);
+	NEWTON_API CustomTriggerManager (NewtonWorld* const world);
 	NEWTON_API virtual ~CustomTriggerManager();
 
 	NEWTON_API virtual void PreUpdate(dFloat timestep);

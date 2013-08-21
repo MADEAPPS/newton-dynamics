@@ -22,7 +22,7 @@
 #include "CustomControllerManager.h"
 
 
-#define VEHICLE_PLUGIN_NAME			"vehicleManager"
+#define VEHICLE_PLUGIN_NAME			"__vehicleManager__"
 
 
 class CustomVehicleController: public CustomControllerBase

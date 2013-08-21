@@ -21,7 +21,7 @@
 #include "CustomControllerManager.h"
 
 
-#define PLAYER_PLUGIN_NAME				"playerManager"
+#define PLAYER_PLUGIN_NAME				"__playerManager__"
 #define PLAYER_CONTROLLER_MAX_CONTACTS	32
 #define PLAYER_MIN_RESTRAINING_DISTANCE	1.0e-2f
 

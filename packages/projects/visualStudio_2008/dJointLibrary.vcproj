@@ -1119,6 +1119,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\dCustomJoints\CustomInputManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dCustomJoints\CustomInputManager.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\dCustomJoints\CustomPlayerControllerManager.cpp"
 				>
 			</File>

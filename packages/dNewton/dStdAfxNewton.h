@@ -68,6 +68,7 @@
 #include <CustomSlider.h>
 #include <CustomUniversal.h>
 #include <CustomBallAndSocket.h>
+#include <CustomInputManager.h>
 #include <CustomTriggerManager.h>
 #include <CustomControllerManager.h>
 #include <CustomPlayerControllerManager.h>
