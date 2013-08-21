@@ -70,6 +70,7 @@ class ArticulatedEntityModel: public DemoEntity
 		}
 
 		int m_steerValue;
+		int m_throttleValue;
 	};
 
 	ArticulatedEntityModel (DemoEntityManager* const scene, const char* const name)
@@ -91,6 +92,8 @@ class ArticulatedEntityModel: public DemoEntity
 		,m_frontTiresCount(0)
 		,m_liftActuatorsCount(0)
 		,m_paletteActuatorsCount(0)
+		,m_maxEngineTorque(0.0f)
+		,m_omegaResistance(0.0f)
 	{
 	}
 
@@ -183,6 +186,9 @@ class ArticulatedEntityModel: public DemoEntity
 	int m_frontTiresCount;
 	int m_liftActuatorsCount;
 	int m_paletteActuatorsCount;
+	dFloat m_maxEngineTorque;
+	dFloat m_omegaResistance;
+
 		
 	NewtonBody* m_fronTires[2];
 	CustomHinge* m_frontTireJoints[2];
@@ -218,6 +224,39 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		vehicleModel->m_rearTireJoints[0]->SetTargetAngle1(steeringAngle);
 		vehicleModel->m_rearTireJoints[1]->SetTargetAngle1(steeringAngle);
 
+
+		// apply engine torque
+		dFloat brakeTorque = 0.0f;
+		dFloat engineTorque = 0.0f;
+		if (vehicleModel->m_inputs.m_throttleValue > 0) {
+			engineTorque = -vehicleModel->m_maxEngineTorque; 
+		} else if (vehicleModel->m_inputs.m_throttleValue < 0) {
+			engineTorque = vehicleModel->m_maxEngineTorque; 
+		} else {
+			brakeTorque = 1000.0f;
+		}
+		vehicleModel->m_frontTireJoints[0]->SetFriction(brakeTorque);
+		vehicleModel->m_frontTireJoints[1]->SetFriction(brakeTorque);
+
+		dMatrix matrix;
+		NewtonBody* const rootBody = controller->GetBoneBody(0);
+		NewtonBodyGetMatrix(rootBody, &matrix[0][0]);
+		
+		dVector tirePing (matrix.RotateVector(dVector (0.0, 0.0, 1.0, 0.0)));
+		if (engineTorque != 0.0f) {
+			dVector torque (tirePing.Scale(engineTorque));
+			NewtonBodyAddTorque (vehicleModel->m_fronTires[0], &torque[0]);
+			NewtonBodyAddTorque (vehicleModel->m_fronTires[1], &torque[0]);
+		}
+
+		for (int i = 0; i < 2; i ++) {
+			dVector omega;
+			NewtonBodyGetOmega(vehicleModel->m_fronTires[i], &omega[0]);
+			dFloat omegaMag = omega % tirePing;
+			dFloat sign = (omegaMag >= 0.0f) ? 1.0 : -1.0f;
+			omega -= tirePing.Scale(sign * omegaMag * omegaMag * vehicleModel->m_omegaResistance);
+			NewtonBodySetOmega(vehicleModel->m_fronTires[i], &omega[0]);
+		}
 
 	}
 
@@ -353,6 +392,32 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 	}
 
 
+	void CalculateEngine (ArticulatedEntityModel* const vehicleModel, NewtonBody* const chassiBody, NewtonBody* const tireBody)
+	{
+		// calculate the maximum torque that the engine will produce
+		NewtonCollision* const tireShape = NewtonBodyGetCollision(tireBody);
+		dAssert (NewtonCollisionGetType() == SERIALIZE_ID_CHAMFERCYLINDER);
+
+		dVector p0;
+		dVector p1;
+		CalculateAABB (tireShape, GetIdentityMatrix(), p0, p1);
+
+		dFloat Ixx;
+		dFloat Iyy;
+		dFloat Izz;
+		dFloat mass;
+		NewtonBodyGetMassMatrix(chassiBody, &mass, &Ixx, &Iyy, &Izz);
+		dFloat radius = (p1.m_y - p0.m_y) * 0.5f;
+
+		// calculate a torque the will produce a 0.5f of the force of gravity
+		vehicleModel->m_maxEngineTorque = 0.25f * mass * radius * dAbs(DEMO_GRAVITY);
+
+		// calculate the coefficient of drag for top speed of 20 m/s
+		dFloat maxOmega = 200.0f / radius;
+		vehicleModel->m_omegaResistance = 1.0f / maxOmega;
+	}
+
+
 	CustomArticulatedTransformController* CreateForklift (const dMatrix& location, const DemoEntity* const model, int bodyPartsCount, ARTICULATED_VEHICLE_DEFINITION* const definition)
 	{
 		NewtonWorld* const world = GetWorld(); 
@@ -411,6 +476,9 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			}
 		}
 
+		// calculate the engine parameters
+		CalculateEngine (vehicleModel, rootBody, vehicleModel->m_fronTires[0]);
+
 		// disable self collision between all body parts
 		controller->DisableAllSelfCollision();
 
@@ -442,6 +510,7 @@ class AriculatedJointInputManager: public CustomInputManager
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*) m_player->GetUserData();
 
 		inputs.m_steerValue = (int (mainWindow->GetKeyState ('D')) - int (mainWindow->GetKeyState ('A')));
+		inputs.m_throttleValue = (int (mainWindow->GetKeyState ('W')) - int (mainWindow->GetKeyState ('S')));
 
 		// check if we must activate the player
 		if (mainWindow->GetKeyState ('A') || 
