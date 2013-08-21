@@ -71,6 +71,9 @@ class ArticulatedEntityModel: public DemoEntity
 
 		int m_steerValue;
 		int m_throttleValue;
+		int m_tiltValue;
+		int m_liftValue;
+		int m_openValue;
 	};
 
 	ArticulatedEntityModel (DemoEntityManager* const scene, const char* const name)
@@ -94,6 +97,8 @@ class ArticulatedEntityModel: public DemoEntity
 		,m_paletteActuatorsCount(0)
 		,m_maxEngineTorque(0.0f)
 		,m_omegaResistance(0.0f)
+		,m_tiltAngle(0.0f)
+		,m_liftPosit(0.0f)
 	{
 	}
 
@@ -188,6 +193,8 @@ class ArticulatedEntityModel: public DemoEntity
 	int m_paletteActuatorsCount;
 	dFloat m_maxEngineTorque;
 	dFloat m_omegaResistance;
+	dFloat m_tiltAngle;
+	dFloat m_liftPosit;
 
 		
 	NewtonBody* m_fronTires[2];
@@ -257,6 +264,32 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			omega -= tirePing.Scale(sign * omegaMag * omegaMag * vehicleModel->m_omegaResistance);
 			NewtonBodySetOmega(vehicleModel->m_fronTires[i], &omega[0]);
 		}
+
+		// set the tilt angle
+		dFloat tiltAngle = vehicleModel->m_tiltAngle;
+		if (vehicleModel->m_inputs.m_tiltValue > 0) {
+			tiltAngle = vehicleModel->m_angularActuator->GetMinAngularLimit();
+			vehicleModel->m_tiltAngle = vehicleModel->m_angularActuator->GetActuatorAngle();
+		} else if (vehicleModel->m_inputs.m_tiltValue < 0) {
+			tiltAngle = vehicleModel->m_angularActuator->GetMaxAngularLimit();
+			vehicleModel->m_tiltAngle = vehicleModel->m_angularActuator->GetActuatorAngle();
+		}
+		vehicleModel->m_angularActuator->SetTargetAngle (tiltAngle);
+
+
+		// set the list position
+		dFloat liftPosit = vehicleModel->m_liftPosit;
+		if (vehicleModel->m_inputs.m_liftValue > 0) {
+			liftPosit = vehicleModel->m_liftJoints[0]->GetMinPositLimit();
+			vehicleModel->m_liftPosit = vehicleModel->m_liftJoints[0]->GetActuatorPosit();
+		} else if (vehicleModel->m_inputs.m_liftValue < 0) {
+			liftPosit = vehicleModel->m_liftJoints[0]->GetMaxPositLimit();
+			vehicleModel->m_liftPosit = vehicleModel->m_liftJoints[0]->GetActuatorPosit();
+		}
+		for (int i =- 0; i < 3; i ++) {
+			vehicleModel->m_liftJoints[i]->SetTargetPosit(liftPosit);
+		}
+
 
 	}
 
@@ -396,7 +429,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 	{
 		// calculate the maximum torque that the engine will produce
 		NewtonCollision* const tireShape = NewtonBodyGetCollision(tireBody);
-		dAssert (NewtonCollisionGetType() == SERIALIZE_ID_CHAMFERCYLINDER);
+		dAssert (NewtonCollisionGetType(tireShape) == SERIALIZE_ID_CHAMFERCYLINDER);
 
 		dVector p0;
 		dVector p1;
@@ -509,14 +542,23 @@ class AriculatedJointInputManager: public CustomInputManager
 		NewtonDemos* const mainWindow = m_scene->GetRootWindow();
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*) m_player->GetUserData();
 
-		inputs.m_steerValue = (int (mainWindow->GetKeyState ('D')) - int (mainWindow->GetKeyState ('A')));
-		inputs.m_throttleValue = (int (mainWindow->GetKeyState ('W')) - int (mainWindow->GetKeyState ('S')));
+		inputs.m_steerValue = int (mainWindow->GetKeyState ('D')) - int (mainWindow->GetKeyState ('A'));
+		inputs.m_throttleValue = int (mainWindow->GetKeyState ('W')) - int (mainWindow->GetKeyState ('S'));
+		inputs.m_tiltValue = int (mainWindow->GetKeyState ('Z')) - int (mainWindow->GetKeyState ('C'));
+		inputs.m_liftValue = int (mainWindow->GetKeyState ('Q')) - int (mainWindow->GetKeyState ('E'));
+		inputs.m_openValue = int (mainWindow->GetKeyState ('F')) - int (mainWindow->GetKeyState ('G'));
 
 		// check if we must activate the player
 		if (mainWindow->GetKeyState ('A') || 
 			mainWindow->GetKeyState ('D') ||
 			mainWindow->GetKeyState ('W') ||
-			mainWindow->GetKeyState ('S')) 
+			mainWindow->GetKeyState ('S') ||
+			mainWindow->GetKeyState ('F') ||
+			mainWindow->GetKeyState ('G') ||
+			mainWindow->GetKeyState ('Q') ||
+			mainWindow->GetKeyState ('E') ||
+			mainWindow->GetKeyState ('Z') ||
+			mainWindow->GetKeyState ('C')) 
 		{
 			NewtonBody* const body = m_player->GetBoneBody(0);
 			NewtonBodySetSleepState(body, false);
@@ -583,15 +625,16 @@ class AriculatedJointInputManager: public CustomInputManager
 	{
 		//		if (m_player->m_helpKey.GetPushButtonState()) {
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-		lineNumber = scene->Print (color, 10, lineNumber + 20, "Navigation               Key");
+		lineNumber = scene->Print (color, 10, lineNumber + 20, "Navigation Keys");
 		lineNumber = scene->Print (color, 10, lineNumber + 20, "drive forward:           W");
 		lineNumber = scene->Print (color, 10, lineNumber + 20, "drive backward:          S");
 		lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right:              D");
 		lineNumber = scene->Print (color, 10, lineNumber + 20, "turn left:               A");
+		lineNumber = scene->Print (color, 10, lineNumber + 20, "lift palette:            E");
+		lineNumber = scene->Print (color, 10, lineNumber + 20, "lower palette            Q");
+		lineNumber = scene->Print (color, 10, lineNumber + 20, "tilt forward:            Z");
+		lineNumber = scene->Print (color, 10, lineNumber + 20, "tilt backward:           C");
 		//lineNumber = scene->Print (color, 10, lineNumber + 20, "toggle camera mode:      C");
-		//lineNumber = scene->Print (color, 10, lineNumber + 20, "jump:                    Space");
-		//lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help:               H");
-		//lineNumber = scene->Print (color, 10, lineNumber + 20, "change player direction: Left mouse button");
 	}
 
 
