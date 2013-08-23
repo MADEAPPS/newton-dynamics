@@ -20,8 +20,8 @@
 */
 
 
-#ifndef __STDAFXNEWTON_H__
-#define __STDAFXNEWTON_H__
+#ifndef _D_NEWTON_H__
+#define _D_NEWTON_H__
 
 
 #ifdef _CNEWTON_STATIC_LIB

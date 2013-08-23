@@ -36,14 +36,14 @@ class dNewtonArticulationManager: public CustomArticulaledTransformManager
 		CNEWTON_API dNewtonArticulationController (dNewtonArticulationManager* const manager, bool projectError);
 		CNEWTON_API ~dNewtonArticulationController ();
 
-		NEWTON_API virtual void OnPreUpdate (dFloat timestep) = 0;
-		NEWTON_API virtual void OnUpdateBoneTransform (dNewtonBody* const bone, const dFloat* const localMatrix) = 0;
-		NEWTON_API virtual void* AddBone (dNewtonBody* const bone, const dFloat* const bindMatrix, void* const parentBodne = NULL);
+		CNEWTON_API virtual void OnPreUpdate (dFloat timestep) = 0;
+		CNEWTON_API virtual void OnUpdateBoneTransform (dNewtonBody* const bone, const dFloat* const localMatrix) = 0;
+		CNEWTON_API virtual void* AddBone (dNewtonBody* const bone, const dFloat* const bindMatrix, void* const parentBodne = NULL);
 
-		NEWTON_API void DisableAllSelfCollision ();
-		NEWTON_API void SetDefaultSelfCollisionMask ();
-		NEWTON_API void SetSelfCollisionMask (void* const boneNode0, void* const boneNode1, bool mode);
-		NEWTON_API bool SelfCollisionTest (const void* const boneNode0, const void* const boneNode1) const;
+		CNEWTON_API void DisableAllSelfCollision ();
+		CNEWTON_API void SetDefaultSelfCollisionMask ();
+		CNEWTON_API void SetSelfCollisionMask (void* const boneNode0, void* const boneNode1, bool mode);
+		CNEWTON_API bool SelfCollisionTest (const void* const boneNode0, const void* const boneNode1) const;
 
 		private:
 		CustomArticulatedTransformController* m_controller;
@@ -53,14 +53,14 @@ class dNewtonArticulationManager: public CustomArticulaledTransformManager
 	CNEWTON_API dNewtonArticulationManager (dNewton* const world);
 	CNEWTON_API virtual ~dNewtonArticulationManager ();
 
-	NEWTON_API void DisableAllSelfCollision (CustomArticulatedTransformController* const controller);
-	NEWTON_API void SetDefaultSelfCollisionMask (CustomArticulatedTransformController* const controller);
-	NEWTON_API void SetSelfCollisionMask (void* const boneNode0, void* const boneNode1, bool mode);
-	NEWTON_API bool SelfCollisionTest (const void* const boneNode0, const void* const boneNode1) const;
+	CNEWTON_API void DisableAllSelfCollision (CustomArticulatedTransformController* const controller);
+	CNEWTON_API void SetDefaultSelfCollisionMask (CustomArticulatedTransformController* const controller);
+	CNEWTON_API void SetSelfCollisionMask (void* const boneNode0, void* const boneNode1, bool mode);
+	CNEWTON_API bool SelfCollisionTest (const void* const boneNode0, const void* const boneNode1) const;
 
-	NEWTON_API virtual void OnPreUpdate (CustomArticulatedTransformController* const constroller, dFloat timestep, int threadIndex) const;
-	NEWTON_API virtual void OnUpdateTransform (const CustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const;
-	NEWTON_API void DestroyController (CustomArticulatedTransformController* const controller);
+	CNEWTON_API virtual void OnPreUpdate (CustomArticulatedTransformController* const constroller, dFloat timestep, int threadIndex) const;
+	CNEWTON_API virtual void OnUpdateTransform (const CustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const;
+	CNEWTON_API void DestroyController (CustomArticulatedTransformController* const controller);
 
 	CNEWTON_API dNewtonArticulationController* GetFirstController() const;
 	CNEWTON_API dNewtonArticulationController* GetNextController(const dNewtonArticulationController* const controller) const;

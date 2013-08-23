@@ -61,7 +61,7 @@ class dNewtonMesh: public dNewtonAlloc
 	CNEWTON_API void AddFace (int vertexCount, const dFloat* const vertex, int strideInBytes, int materialIndex);
 	CNEWTON_API void EndPolygon();
 
-	NEWTON_API void ApplyTransform (const dFloat* const matrix);
+	CNEWTON_API void ApplyTransform (const dFloat* const matrix);
 
 	CNEWTON_API void CreateVoronoiConvexDecomposition (const dNewtonMesh& convexMesh);
 	CNEWTON_API int GetPointCount() const;

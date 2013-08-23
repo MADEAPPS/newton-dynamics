@@ -57,7 +57,7 @@ class dNewtonContactMaterial
 	CNEWTON_API void* GetFirstContact() const;
 	CNEWTON_API void* GetNextContact(void* const contact) const;
 
-	NEWTON_API void RotateTangentDirections (const void* contact, const dFloat* const directionVector);
+	CNEWTON_API void RotateTangentDirections (const void* contact, const dFloat* const directionVector);
 
 	private:
 	void* m_materialHandle; 

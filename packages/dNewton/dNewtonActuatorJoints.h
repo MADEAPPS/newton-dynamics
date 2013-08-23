@@ -40,7 +40,7 @@ class dNewtonHingeActuator: public dNewtonHingeJoint
 		m_type = m_hingeActuator;
 	}
 
-	bool GetEnableFlag (bool flag) const
+	CNEWTON_API bool GetEnableFlag (bool flag) const
 	{
 		return m_flag;
 	}
@@ -127,7 +127,7 @@ class dNewtonSliderActuator: public dNewtonSliderJoint
 		m_type = m_sliderActuator;
 	}
 
-	bool GetEnableFlag (bool flag) const
+	CNEWTON_API bool GetEnableFlag (bool flag) const
 	{
 		return m_flag;
 	}
@@ -215,7 +215,7 @@ class dNewtonUniversalActuator: public dNewtonUniversalJoint
 		EnableLimit_1(false);
 	}
 
-	bool GetEnableFlag0 (bool flag) const
+	CNEWTON_API bool GetEnableFlag0 (bool flag) const
 	{
 		return m_flag0;
 	}
@@ -266,7 +266,7 @@ class dNewtonUniversalActuator: public dNewtonUniversalJoint
 	}
 
 
-	void SetEnableFlag0 (bool flag)
+	CNEWTON_API void SetEnableFlag0 (bool flag)
 	{
 		m_flag0 = flag;
 	}
@@ -291,7 +291,7 @@ class dNewtonUniversalActuator: public dNewtonUniversalJoint
 		m_angularRate0 = rate;
 	}
 
-	void SetEnableFlag1 (bool flag)
+	CNEWTON_API void SetEnableFlag1 (bool flag)
 	{
 		m_flag1 = flag;
 	}

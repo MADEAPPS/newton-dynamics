@@ -57,7 +57,7 @@ dNewtonArticulationManager::dNewtonArticulationController* dNewtonArticulationMa
 	return NULL;
 }
 
-NEWTON_API void dNewtonArticulationManager::DestroyController (CustomArticulatedTransformController* const controller)
+void dNewtonArticulationManager::DestroyController (CustomArticulatedTransformController* const controller)
 {
 	dNewtonArticulationController* const myController = (dNewtonArticulationController*) controller->GetUserData();
 	controller->SetUserData(NULL);

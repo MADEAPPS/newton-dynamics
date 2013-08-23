@@ -23,17 +23,16 @@ class dNewton;
 // a Skeleton Transform controller is use to calculate local transform on contractions of rigid bodies and joint that form part of a hierarchical Skeleton
 class dNewtonTransformController: public CustomControllerBase
 {
-	public:
 	private:
 	CNEWTON_API virtual void PreUpdate(dFloat timestep, int threadIndex){}
-	NEWTON_API virtual void PostUpdate(dFloat timestep, int threadIndex){}
+	CNEWTON_API virtual void PostUpdate(dFloat timestep, int threadIndex){}
 };
 
 class dNewtonTransformManager: public CustomControllerManager<dNewtonTransformController> 
 {
 	public:
-	NEWTON_API dNewtonTransformManager (dNewton* const world);
-	NEWTON_API virtual ~dNewtonTransformManager();
+	CNEWTON_API dNewtonTransformManager (dNewton* const world);
+	CNEWTON_API virtual ~dNewtonTransformManager();
 
 	private:
 	CNEWTON_API virtual void Debug () const {};

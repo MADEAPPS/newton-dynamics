@@ -53,9 +53,6 @@
 #include <Newton.h>
 #include <CustomJoint.h>
 
-#if (defined (_POSIX_VER) || defined (_POSIX_VER_64))
-#endif
-
 #endif
 
 
