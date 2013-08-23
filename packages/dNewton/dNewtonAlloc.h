@@ -35,11 +35,11 @@ class dNewtonAlloc
 	CNEWTON_API void *operator new (size_t size);
 	CNEWTON_API void operator delete (void* ptr);
 
-	dNewtonAlloc()
+	CNEWTON_API dNewtonAlloc()
 	{
 	}
 
-	virtual ~dNewtonAlloc() 
+	CNEWTON_API virtual ~dNewtonAlloc() 
 	{
 	}
 

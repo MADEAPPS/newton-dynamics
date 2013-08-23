@@ -53,7 +53,7 @@ class dNewtonBody: public dNewtonAlloc, public dNewtonTransformLerp
 	CNEWTON_API void SetMatrix (const dFloat* const matrix);
 	CNEWTON_API void GetMatrix (dFloat* const matrix) const;
 
-	void GetVisualMatrix (dFloat param, dFloat* const matrix) const;
+	CNEWTON_API void GetVisualMatrix (dFloat param, dFloat* const matrix) const;
 
 	CNEWTON_API void SetVeloc (const dFloat* const veloc);
 	CNEWTON_API void GetVeloc (dFloat* const veloc) const;
@@ -103,7 +103,7 @@ class dNewtonBody: public dNewtonAlloc, public dNewtonTransformLerp
 
 	protected:
 	CNEWTON_API dNewtonBody(dBodyType type, dNewtonBody* const parent);
-	virtual void SetBody (NewtonBody* const body);
+	CNEWTON_API virtual void SetBody (NewtonBody* const body);
 
 	private: 
 	CNEWTON_API static void OnBodyDestroy (const NewtonBody* const body);
