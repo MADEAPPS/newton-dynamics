@@ -43,7 +43,7 @@ class dNewtonDynamicBody: public dNewtonBody
 
 	protected:
 	CNEWTON_API dNewtonDynamicBody(dNewtonBody* const parent);
-	virtual void SetBody (NewtonBody* const body);
+	CNEWTON_API virtual void SetBody (NewtonBody* const body);
 
 	private: 
 	CNEWTON_API static void OnForceAndTorque (const NewtonBody* body, dFloat timestep, int threadIndex);

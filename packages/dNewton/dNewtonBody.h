@@ -103,7 +103,7 @@ class dNewtonBody: public dNewtonAlloc, public dNewtonTransformLerp
 
 	protected:
 	CNEWTON_API dNewtonBody(dBodyType type, dNewtonBody* const parent);
-	CNEWTON_API virtual void SetBody (NewtonBody* const body);
+	CNEWTON_API virtual void SetBody  (NewtonBody* const body);
 
 	private: 
 	CNEWTON_API static void OnBodyDestroy (const NewtonBody* const body);
