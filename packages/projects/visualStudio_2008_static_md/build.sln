@@ -77,6 +77,12 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "core", "..\..\..\coreLibrary_300\projects\windows\project_vs2008_static_md\core.vcproj", "{57AC4F2D-B115-4931-8F6E-AF8AD616B6AA}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "newton", "..\..\..\coreLibrary_300\projects\windows\project_vs2008_static_md\newton.vcproj", "{68D9962C-0EC7-445A-B0FD-F87B16D43901}"
+	ProjectSection(ProjectDependencies) = postProject
+		{57AC4F2D-B115-4931-8F6E-AF8AD616B6AA} = {57AC4F2D-B115-4931-8F6E-AF8AD616B6AA}
+		{03BCA23C-02A5-415B-A37B-26600BC2CE96} = {03BCA23C-02A5-415B-A37B-26600BC2CE96}
+		{39737A8F-6151-4259-8E39-25530345D4B4} = {39737A8F-6151-4259-8E39-25530345D4B4}
+		{7D48CEE3-5263-46CA-BD69-924881F0EA2F} = {7D48CEE3-5263-46CA-BD69-924881F0EA2F}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "physics", "..\..\..\coreLibrary_300\projects\windows\project_vs2008_static_md\physics.vcproj", "{39737A8F-6151-4259-8E39-25530345D4B4}"
 EndProject
