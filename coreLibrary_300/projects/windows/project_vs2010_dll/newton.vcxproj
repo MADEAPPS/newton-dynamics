@@ -73,6 +73,8 @@
     <OutDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release|x64'">false</LinkIncremental>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)_d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -100,7 +102,7 @@
       <ProgramDataBaseFileName>$(IntDir)vc90.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>false</TreatWarningAsError>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
@@ -108,7 +110,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <OutputFile>$(OutDir)$(ProjectName)_d.dll</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(ProjectName)_d.pdb</ProgramDatabaseFile>
@@ -119,6 +121,7 @@
       </DataExecutionPrevention>
       <ImportLibrary>$(OutDir)$(ProjectName)_d.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </Link>
     <PostBuildEvent>
       <Command>rem xcopy  "$(OutDir)$(TargetName).lib" "C:\Users\Julio\Downloads\NewtonTestApp\lib/*.*"  /F /Y /R
@@ -156,7 +159,7 @@ rem xcopy  "$(OutDir)$(TargetName).dll" "C:\Users\Julio\Downloads\NewtonTestApp\
       <ProgramDataBaseFileName>$(IntDir)vc90.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>false</TreatWarningAsError>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
@@ -164,7 +167,7 @@ rem xcopy  "$(OutDir)$(TargetName).dll" "C:\Users\Julio\Downloads\NewtonTestApp\
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <OutputFile>$(OutDir)$(ProjectName)_d.dll</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(ProjectName)_d.pdb</ProgramDatabaseFile>
@@ -175,6 +178,7 @@ rem xcopy  "$(OutDir)$(TargetName).dll" "C:\Users\Julio\Downloads\NewtonTestApp\
       </DataExecutionPrevention>
       <ImportLibrary>$(OutDir)$(ProjectName)_d.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </Link>
     <PostBuildEvent>
       <Command>rem xcopy  "$(OutDir)$(TargetName).dll" "C:\Users\Julio\Downloads\testcore300/*.*"  /F /Y /R
@@ -212,7 +216,7 @@ rem xcopy  "$(OutDir)$(TargetName).dll" "C:\dev\pengII\pengII\Debug\*.*"  /F /Y 
       <ProgramDataBaseFileName>$(IntDir)vc90.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>false</TreatWarningAsError>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
@@ -220,7 +224,7 @@ rem xcopy  "$(OutDir)$(TargetName).dll" "C:\dev\pengII\pengII\Debug\*.*"  /F /Y 
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>
@@ -234,6 +238,7 @@ rem xcopy  "$(OutDir)$(TargetName).dll" "C:\dev\pengII\pengII\Debug\*.*"  /F /Y 
       </DataExecutionPrevention>
       <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </Link>
     <PostBuildEvent>
       <Command>rem xcopy  "$(OutDir)$(TargetName).lib" "C:\Users\Julio\Downloads\NewtonTestApp\lib/*.*"  /F /Y /R
@@ -273,7 +278,7 @@ rem xcopy  "$(OutDir)$(TargetName).dll" "C:\Users\Julio\Downloads\NewtonTestApp\
       <ProgramDataBaseFileName>$(IntDir)vc90.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>false</TreatWarningAsError>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
@@ -281,7 +286,7 @@ rem xcopy  "$(OutDir)$(TargetName).dll" "C:\Users\Julio\Downloads\NewtonTestApp\
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>
@@ -295,6 +300,7 @@ rem xcopy  "$(OutDir)$(TargetName).dll" "C:\Users\Julio\Downloads\NewtonTestApp\
       </DataExecutionPrevention>
       <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </Link>
     <PostBuildEvent>
       <Command>rem xcopy  "$(OutDir)$(TargetName).dll" "C:\Users\Julio\Downloads\testcore300/*.*"  /F /Y /R
