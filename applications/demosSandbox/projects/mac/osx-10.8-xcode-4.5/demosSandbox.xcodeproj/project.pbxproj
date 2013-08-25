@@ -253,6 +253,7 @@
 		FF82377C17C26F8C004C80D4 /* TextureDecal.vs in Sources */ = {isa = PBXBuildFile; fileRef = FF82376D17C26F8C004C80D4 /* TextureDecal.vs */; };
 		FF82377D17C26F8C004C80D4 /* swimmingPool.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF82376E17C26F8C004C80D4 /* swimmingPool.ngd */; };
 		FF82377E17C26F8C004C80D4 /* tractor.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF82376F17C26F8C004C80D4 /* tractor.ngd */; };
+		FF8237C717CA218A004C80D4 /* StructuredConvexFracturing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8237C617CA218A004C80D4 /* StructuredConvexFracturing.cpp */; };
 		FF85000C1740605300BEE80B /* libdContainers.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF85FFE317405FDE00BEE80B /* libdContainers.a */; };
 		FF85000D1740605400BEE80B /* libdCustomJoints.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF85FFF217405FDE00BEE80B /* libdCustomJoints.a */; };
 		FF85000E1740605400BEE80B /* libdMath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF85000117405FDE00BEE80B /* libdMath.a */; };
@@ -581,6 +582,19 @@
 		FF82376D17C26F8C004C80D4 /* TextureDecal.vs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = TextureDecal.vs; sourceTree = "<group>"; };
 		FF82376E17C26F8C004C80D4 /* swimmingPool.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = swimmingPool.ngd; path = ../../../../media/swimmingPool.ngd; sourceTree = "<group>"; };
 		FF82376F17C26F8C004C80D4 /* tractor.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = tractor.ngd; path = ../../../../media/tractor.ngd; sourceTree = "<group>"; };
+		FF8237BA17CA212E004C80D4 /* DemoAIAgent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DemoAIAgent.h; path = ../../../sdkDemos/DemoAIAgent.h; sourceTree = "<group>"; };
+		FF8237BB17CA212E004C80D4 /* DemoAIListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DemoAIListener.h; path = ../../../sdkDemos/DemoAIListener.h; sourceTree = "<group>"; };
+		FF8237BC17CA212E004C80D4 /* DemoCamera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DemoCamera.h; path = ../../../sdkDemos/DemoCamera.h; sourceTree = "<group>"; };
+		FF8237BD17CA212E004C80D4 /* DemoCameraListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DemoCameraListener.h; path = ../../../sdkDemos/DemoCameraListener.h; sourceTree = "<group>"; };
+		FF8237BE17CA212E004C80D4 /* DemoEntity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DemoEntity.h; path = ../../../sdkDemos/DemoEntity.h; sourceTree = "<group>"; };
+		FF8237BF17CA212E004C80D4 /* DemoEntityListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DemoEntityListener.h; path = ../../../sdkDemos/DemoEntityListener.h; sourceTree = "<group>"; };
+		FF8237C017CA212E004C80D4 /* DemoEntityManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DemoEntityManager.h; path = ../../../sdkDemos/DemoEntityManager.h; sourceTree = "<group>"; };
+		FF8237C117CA212E004C80D4 /* DemoListenerBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DemoListenerBase.h; path = ../../../sdkDemos/DemoListenerBase.h; sourceTree = "<group>"; };
+		FF8237C217CA212E004C80D4 /* DemoMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DemoMesh.h; path = ../../../sdkDemos/DemoMesh.h; sourceTree = "<group>"; };
+		FF8237C317CA212E004C80D4 /* DemoSoundListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DemoSoundListener.h; path = ../../../sdkDemos/DemoSoundListener.h; sourceTree = "<group>"; };
+		FF8237C417CA212E004C80D4 /* DemoVisualDebugerListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DemoVisualDebugerListener.h; path = ../../../sdkDemos/DemoVisualDebugerListener.h; sourceTree = "<group>"; };
+		FF8237C517CA212E004C80D4 /* NewtonDemos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NewtonDemos.h; path = ../../../sdkDemos/NewtonDemos.h; sourceTree = "<group>"; };
+		FF8237C617CA218A004C80D4 /* StructuredConvexFracturing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = StructuredConvexFracturing.cpp; path = ../../../sdkDemos/demos/StructuredConvexFracturing.cpp; sourceTree = "<group>"; };
 		FF8402EB17353606008E038A /* wxcocoaStatic.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = wxcocoaStatic.xcodeproj; path = "../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/build/osx/wxcocoaStatic.xcodeproj"; sourceTree = "<group>"; };
 		FF850081174525BC00BEE80B /* persianRug.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = persianRug.tga; path = ../../../../media/persianRug.tga; sourceTree = "<group>"; };
 		FF856BC31752E07700324FDC /* skeleton.ngd */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = skeleton.ngd; path = ../../../../media/skeleton.ngd; sourceTree = "<group>"; };
@@ -1025,6 +1039,7 @@
 		FF8F28D4131368B90019E923 /* demos */ = {
 			isa = PBXGroup;
 			children = (
+				FF8237C617CA218A004C80D4 /* StructuredConvexFracturing.cpp */,
 				FF82375A17C26DE6004C80D4 /* ArchimedesBuoyancy.cpp */,
 				FF82375B17C26DE6004C80D4 /* ArticulatedJoints.cpp */,
 				FF82375C17C26DE6004C80D4 /* SimpleConvexFracturing.cpp */,
@@ -1062,6 +1077,18 @@
 		FF9931B51316828C00D1C65B /* main */ = {
 			isa = PBXGroup;
 			children = (
+				FF8237BA17CA212E004C80D4 /* DemoAIAgent.h */,
+				FF8237BB17CA212E004C80D4 /* DemoAIListener.h */,
+				FF8237BC17CA212E004C80D4 /* DemoCamera.h */,
+				FF8237BD17CA212E004C80D4 /* DemoCameraListener.h */,
+				FF8237BE17CA212E004C80D4 /* DemoEntity.h */,
+				FF8237BF17CA212E004C80D4 /* DemoEntityListener.h */,
+				FF8237C017CA212E004C80D4 /* DemoEntityManager.h */,
+				FF8237C117CA212E004C80D4 /* DemoListenerBase.h */,
+				FF8237C217CA212E004C80D4 /* DemoMesh.h */,
+				FF8237C317CA212E004C80D4 /* DemoSoundListener.h */,
+				FF8237C417CA212E004C80D4 /* DemoVisualDebugerListener.h */,
+				FF8237C517CA212E004C80D4 /* NewtonDemos.h */,
 				FF6FCF6F175156940088B4D3 /* CocoaOpenglGlue.mm */,
 				FFD27435172DA06D00114513 /* DemoCameraListener.cpp */,
 				FFD2742E172DA02000114513 /* DemoListenerBase.cpp */,
@@ -1558,6 +1585,7 @@
 				FF82377817C26F8C004C80D4 /* SkinningDirectionalDiffuse.vs in Sources */,
 				FF82377A17C26F8C004C80D4 /* SolidColor.vs in Sources */,
 				FF82377C17C26F8C004C80D4 /* TextureDecal.vs in Sources */,
+				FF8237C717CA218A004C80D4 /* StructuredConvexFracturing.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

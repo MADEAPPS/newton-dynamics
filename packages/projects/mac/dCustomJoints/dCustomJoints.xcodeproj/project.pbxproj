@@ -35,6 +35,8 @@
 		FF82375717C269BC004C80D4 /* CustomSliderActuator.h in Headers */ = {isa = PBXBuildFile; fileRef = FF82374F17C269BC004C80D4 /* CustomSliderActuator.h */; };
 		FF82375817C269BC004C80D4 /* CustomUniversalActuator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF82375017C269BC004C80D4 /* CustomUniversalActuator.cpp */; };
 		FF82375917C269BC004C80D4 /* CustomUniversalActuator.h in Headers */ = {isa = PBXBuildFile; fileRef = FF82375117C269BC004C80D4 /* CustomUniversalActuator.h */; };
+		FF8237CA17CA2209004C80D4 /* CustomInputManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8237C817CA2209004C80D4 /* CustomInputManager.cpp */; };
+		FF8237CB17CA2209004C80D4 /* CustomInputManager.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8237C917CA2209004C80D4 /* CustomInputManager.h */; };
 		FF856C041753A0DC00324FDC /* CustomJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = FF856C031753A0DC00324FDC /* CustomJoint.h */; };
 		FF856C061753BDC300324FDC /* CustomRackAndPinion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF856C051753BDC300324FDC /* CustomRackAndPinion.cpp */; };
 		FFA78DB11789A8670056DE1C /* Custom6DOF.h in Headers */ = {isa = PBXBuildFile; fileRef = FFA78D9B1789A8670056DE1C /* Custom6DOF.h */; };
@@ -91,6 +93,8 @@
 		FF82374F17C269BC004C80D4 /* CustomSliderActuator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomSliderActuator.h; path = ../../../dCustomJoints/CustomSliderActuator.h; sourceTree = "<group>"; };
 		FF82375017C269BC004C80D4 /* CustomUniversalActuator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomUniversalActuator.cpp; path = ../../../dCustomJoints/CustomUniversalActuator.cpp; sourceTree = "<group>"; };
 		FF82375117C269BC004C80D4 /* CustomUniversalActuator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomUniversalActuator.h; path = ../../../dCustomJoints/CustomUniversalActuator.h; sourceTree = "<group>"; };
+		FF8237C817CA2209004C80D4 /* CustomInputManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomInputManager.cpp; path = ../../../dCustomJoints/CustomInputManager.cpp; sourceTree = "<group>"; };
+		FF8237C917CA2209004C80D4 /* CustomInputManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomInputManager.h; path = ../../../dCustomJoints/CustomInputManager.h; sourceTree = "<group>"; };
 		FF856C031753A0DC00324FDC /* CustomJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomJoint.h; path = ../../../dCustomJoints/CustomJoint.h; sourceTree = "<group>"; };
 		FF856C051753BDC300324FDC /* CustomRackAndPinion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomRackAndPinion.cpp; path = ../../../dCustomJoints/CustomRackAndPinion.cpp; sourceTree = "<group>"; };
 		FFA78D9B1789A8670056DE1C /* Custom6DOF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Custom6DOF.h; path = ../../../dCustomJoints/Custom6DOF.h; sourceTree = "<group>"; };
@@ -149,6 +153,8 @@
 		FFD2A7A2172E128200114513 /* source */ = {
 			isa = PBXGroup;
 			children = (
+				FF8237C817CA2209004C80D4 /* CustomInputManager.cpp */,
+				FF8237C917CA2209004C80D4 /* CustomInputManager.h */,
 				FF82374A17C269BC004C80D4 /* CustomArcticulatedTransformManager.cpp */,
 				FF82374B17C269BC004C80D4 /* CustomArcticulatedTransformManager.h */,
 				FF82374C17C269BC004C80D4 /* CustomHingeActuator.cpp */,
@@ -240,6 +246,7 @@
 				FF82375517C269BC004C80D4 /* CustomHingeActuator.h in Headers */,
 				FF82375717C269BC004C80D4 /* CustomSliderActuator.h in Headers */,
 				FF82375917C269BC004C80D4 /* CustomUniversalActuator.h in Headers */,
+				FF8237CB17CA2209004C80D4 /* CustomInputManager.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -320,6 +327,7 @@
 				FF82375417C269BC004C80D4 /* CustomHingeActuator.cpp in Sources */,
 				FF82375617C269BC004C80D4 /* CustomSliderActuator.cpp in Sources */,
 				FF82375817C269BC004C80D4 /* CustomUniversalActuator.cpp in Sources */,
+				FF8237CA17CA2209004C80D4 /* CustomInputManager.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
