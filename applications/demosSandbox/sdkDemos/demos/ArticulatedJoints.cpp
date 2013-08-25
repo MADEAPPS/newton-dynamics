@@ -45,17 +45,17 @@ struct ARTICULATED_VEHICLE_DEFINITION
 
 static ARTICULATED_VEHICLE_DEFINITION forkliftDefinition[] =
 {
-	{"body",		"convexHull",			600.0f},
-	{"fr_tire",		"tireShape",			 40.0f, "frontTire"},
-	{"fl_tire",		"tireShape",			 40.0f, "frontTire"},
-	{"rr_tire",		"tireShape",			 40.0f, "rearTire"},
-	{"rl_tire",		"tireShape",			 40.0f, "rearTire"},
-	{"lift_1",		"convexHull",			 50.0f, "hingeActuator"},
-	{"lift_2",		"convexHull",			 50.0f, "liftActuator"},
-	{"lift_3",		"convexHull",			 50.0f, "liftActuator"},
-	{"lift_4",		"convexHull",			 50.0f, "liftActuator"},
-	{"left_teeth",  "convexHullAggregate",	 50.0f, "paletteActuator"},
-	{"right_teeth", "convexHullAggregate",	 50.0f, "paletteActuator"},
+	{"body",		"convexHull",			1000.0f},
+	{"fr_tire",		"tireShape",			 50.0f, "frontTire"},
+	{"fl_tire",		"tireShape",			 50.0f, "frontTire"},
+	{"rr_tire",		"tireShape",			 50.0f, "rearTire"},
+	{"rl_tire",		"tireShape",			 50.0f, "rearTire"},
+	{"lift_1",		"convexHull",			 30.0f, "hingeActuator"},
+	{"lift_2",		"convexHull",			 30.0f, "liftActuator"},
+	{"lift_3",		"convexHull",			 30.0f, "liftActuator"},
+	{"lift_4",		"convexHull",			 30.0f, "liftActuator"},
+	{"left_teeth",  "convexHullAggregate",	 30.0f, "paletteActuator"},
+	{"right_teeth", "convexHullAggregate",	 30.0f, "paletteActuator"},
 };
 
 
