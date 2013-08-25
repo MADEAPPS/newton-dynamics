@@ -71,7 +71,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "physics", "..\..\..\..\core
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tinyxml", "..\..\..\..\packages\thirdParty\tinyxml\vs2008\tinyxml.vcproj", "{18E509CF-46D2-4749-B3BB-160937CF2481}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread", "..\..\..\..\packages\thirdParty\pthreads.2\VS_2008\pthread.vcproj", "{03BCA23C-02A5-415B-A37B-26600BC2CE96}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread", "..\..\..\..\coreLibrary_300\source\pthreads.2\VS_2008\pthread.vcproj", "{03BCA23C-02A5-415B-A37B-26600BC2CE96}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -252,6 +252,5 @@ Global
 		{68D9962C-0EC7-445A-B0FD-F87B16D43901} = {2685588F-EC3B-4BEB-B408-83109A7BAC7E}
 		{39737A8F-6151-4259-8E39-25530345D4B4} = {2685588F-EC3B-4BEB-B408-83109A7BAC7E}
 		{18E509CF-46D2-4749-B3BB-160937CF2481} = {2685588F-EC3B-4BEB-B408-83109A7BAC7E}
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96} = {2685588F-EC3B-4BEB-B408-83109A7BAC7E}
 	EndGlobalSection
 EndGlobal

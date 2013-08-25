@@ -495,19 +495,6 @@ dScene::dTreeNode* Export::LoadObject(INode* const node, ObjectState* const os, 
 	sprintf (name, "%s_mesh", parent->GetName());
 	instance->SetName(name);
 
-	dMatrix objectMatrix (GetMatrixFromMaxMatrix (node->GetObjectTM(0)));
-	dMatrix nodeMatrix (GetMatrixFromMaxMatrix (node->GetNodeTM (0)));
-	dMatrix scaleTransform2 (objectMatrix * nodeMatrix.Inverse4x4());
-
-	dVector scale;
-	dMatrix matrix;
-	dMatrix stretchAxis;
-	scaleTransform2.PolarDecomposition (matrix, scale, stretchAxis);
-	dMatrix scaleTransform (dMatrix (GetIdentityMatrix(), scale, stretchAxis));
-
-	instance->SetPivotMatrix(matrix);
-
-
 	int* const faceIndexCount = new int [facesCount];
 	int* const materialIndex = new int [facesCount];
 
@@ -651,13 +638,25 @@ dScene::dTreeNode* Export::LoadObject(INode* const node, ObjectState* const os, 
 		}
 	}
 
-
 	int indexCount = 0;
 	for (int i = 0; i < facesCount; i ++) {
 		MNFace* const face = maxMesh.F(i);
 		faceIndexCount[i] = face->deg;
 		indexCount += face->deg;
 	}
+
+
+	dMatrix objectMatrix (GetMatrixFromMaxMatrix (node->GetObjectTM(0)));
+	dMatrix nodeMatrix (GetMatrixFromMaxMatrix (node->GetNodeTM (0)));
+	dMatrix scaleTransform2 (objectMatrix * nodeMatrix.Inverse4x4());
+
+	dVector scale;
+	dMatrix matrix;
+	dMatrix axisMatrix;
+	scaleTransform2.PolarDecomposition (matrix, scale, axisMatrix);
+	dMatrix scaleTransform (dMatrix (GetIdentityMatrix(), scale, axisMatrix));
+
+	instance->SetPivotMatrix(matrix);
 
 	int* const vertexIndex = new int[vertexCount];
 	dVector* const vertex = new dVector[vertexCount];

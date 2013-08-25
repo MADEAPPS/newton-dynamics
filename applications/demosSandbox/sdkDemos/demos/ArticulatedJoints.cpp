@@ -28,8 +28,10 @@
 #include "CustomUniversalActuator.h"
 #include "CustomArcticulatedTransformManager.h"
 
-
+#define ARTICULATED_VEHICLE_CAMERA_EYEPOINT			1.5f
 #define ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD	2.0f
+
+
 #define ARTICULATED_VEHICLE_CAMERA_DISTANCE			7.0f
 
 struct ARTICULATED_VEHICLE_DEFINITION
@@ -85,8 +87,6 @@ class ArticulatedEntityModel: public DemoEntity
 	{
 		// load the vehicle model
 		LoadNGD_mesh (name, scene->GetNewton());
-
-		
 	}
 
 	ArticulatedEntityModel (const ArticulatedEntityModel& copy)
@@ -539,6 +539,7 @@ class AriculatedJointInputManager: public CustomInputManager
 		:CustomInputManager(scene->GetNewton())
 		,m_scene(scene)
 		,m_player(NULL)
+		,m_cameraMode(true)
 	{
 		// plug a callback for 2d help display
 		scene->Set2DDisplayRenderFunction (RenderPlayerHelp, this);
@@ -551,9 +552,9 @@ class AriculatedJointInputManager: public CustomInputManager
 		NewtonDemos* const mainWindow = m_scene->GetRootWindow();
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*) m_player->GetUserData();
 
-		inputs.m_steerValue = int (mainWindow->GetKeyState ('D')) - int (mainWindow->GetKeyState ('A'));
+		inputs.m_steerValue = int (mainWindow->GetKeyState ('A')) - int (mainWindow->GetKeyState ('D'));
 		inputs.m_throttleValue = int (mainWindow->GetKeyState ('W')) - int (mainWindow->GetKeyState ('S'));
-		inputs.m_tiltValue = int (mainWindow->GetKeyState ('Z')) - int (mainWindow->GetKeyState ('C'));
+		inputs.m_tiltValue = int (mainWindow->GetKeyState ('Z')) - int (mainWindow->GetKeyState ('X'));
 		inputs.m_liftValue = int (mainWindow->GetKeyState ('Q')) - int (mainWindow->GetKeyState ('E'));
 		inputs.m_openValue = int (mainWindow->GetKeyState ('F')) - int (mainWindow->GetKeyState ('G'));
 
@@ -586,8 +587,16 @@ class AriculatedJointInputManager: public CustomInputManager
 		dMatrix playerMatrix (vehicleModel->GetNextMatrix());
 
 		dVector frontDir (camMatrix[0]);
-		dVector camOrigin (playerMatrix.TransformVector(dVector(0.0f, ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD, 0.0f, 0.0f)));
-		camOrigin -= frontDir.Scale(ARTICULATED_VEHICLE_CAMERA_DISTANCE);
+
+		dVector camOrigin; 
+		m_cameraMode.UpdatePushButton(m_scene->GetRootWindow(), 'C');
+		if (m_cameraMode.GetPushButtonState()) {
+			camOrigin = playerMatrix.TransformVector( dVector(0.0f, ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD, 0.0f, 0.0f));
+			camOrigin -= frontDir.Scale(ARTICULATED_VEHICLE_CAMERA_DISTANCE);
+		} else {
+			camMatrix = camMatrix * playerMatrix;
+			camOrigin = playerMatrix.TransformVector(dVector(-0.8f, ARTICULATED_VEHICLE_CAMERA_EYEPOINT, 0.0f, 0.0f));
+		}
 
 		camera->SetNextMatrix (*m_scene, camMatrix, camOrigin);
 	}
@@ -612,8 +621,8 @@ class AriculatedJointInputManager: public CustomInputManager
 		lineNumber = scene->Print (color, 10, lineNumber + 20, "lift palette:            E");
 		lineNumber = scene->Print (color, 10, lineNumber + 20, "lower palette            Q");
 		lineNumber = scene->Print (color, 10, lineNumber + 20, "tilt forward:            Z");
-		lineNumber = scene->Print (color, 10, lineNumber + 20, "tilt backward:           C");
-		//lineNumber = scene->Print (color, 10, lineNumber + 20, "toggle camera mode:      C");
+		lineNumber = scene->Print (color, 10, lineNumber + 20, "tilt backward:           X");
+		lineNumber = scene->Print (color, 10, lineNumber + 20, "toggle camera mode:      C");
 	}
 
 
@@ -626,7 +635,17 @@ class AriculatedJointInputManager: public CustomInputManager
 
 	DemoEntityManager* m_scene;
 	CustomArticulatedTransformController* m_player;
+	DemoEntityManager::ButtonKey m_cameraMode;
 };
+
+
+
+static void LoadLumberYardMesh (DemoEntityManager* const scene, const DemoEntity& entity, const dVector& location)
+{
+	DemoEntity* const ent = (DemoEntity*) entity.CreateClone();
+	scene->Append(ent);
+}
+
 
 
 void ArticulatedJoints (DemoEntityManager* const scene)
@@ -652,10 +671,17 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	matrix.m_posit = FindFloor (world, origin, 100.0f);
 	matrix.m_posit.m_y += 3.0f;
 	inputManager->AddPlayer (vehicleManager->CreateForklift (matrix, &forkliffModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition));
+
+
+	// add some object to play with
+	DemoEntity entity (GetIdentityMatrix(), NULL);
+	entity.LoadNGD_mesh ("lumber.ngd", scene->GetNewton());
+	LoadLumberYardMesh (scene, entity, dVector(0.0f, 0.0f, 0.0f, 0.0f));
+
 	
 	origin.m_x -= 5.0f;
 	origin.m_y += 5.0f;
-	dQuaternion rot;
+	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -30.0f * 3.141592f / 180.0f);  
 	scene->SetCameraMatrix(rot, origin);
 }
 
