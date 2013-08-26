@@ -96,8 +96,12 @@ class CustomArticulatedTransformController: public CustomControllerBase
 	NEWTON_API dSkeletonBone* AddBone (NewtonBody* const bone, const dMatrix& bindMatrix, dSkeletonBone* const parentBodne = NULL);
 
 	NEWTON_API int GetBoneCount() const;
-	NEWTON_API const dSkeletonBone* GetBone(int index) const;
+
 	NEWTON_API NewtonBody* GetBoneBody (int index) const;
+	NEWTON_API const dSkeletonBone* GetBone(int index) const;
+	
+	NEWTON_API NewtonBody* GetBoneBody (const dSkeletonBone* const bone) const;
+	NEWTON_API const dSkeletonBone* GetParent(const dSkeletonBone* const bone) const;
 	
 	protected:
 	NEWTON_API void Init (void* const userData, bool errorCorrectionMode);

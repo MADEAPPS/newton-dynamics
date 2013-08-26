@@ -150,6 +150,16 @@ const CustomArticulatedTransformController::dSkeletonBone* CustomArticulatedTran
 	return &m_bones[index];
 }
 
+const CustomArticulatedTransformController::dSkeletonBone* CustomArticulatedTransformController::GetParent(const dSkeletonBone* const bone) const
+{
+	return bone->m_parent;
+}
+
+NewtonBody* CustomArticulatedTransformController::GetBoneBody (const dSkeletonBone* const bone) const
+{
+	return bone->m_body;
+}
+
 NewtonBody* CustomArticulatedTransformController::GetBoneBody (int index) const
 {
 	return GetBone(index)->m_body;
