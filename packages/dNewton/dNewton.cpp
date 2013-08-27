@@ -270,6 +270,18 @@ void dNewton::WaitForUpdateToFinish ()
 	NewtonWaitForUpdateToFinish(m_world);
 }
 
+int dNewton::GetNumberOfThreads() const
+{
+	return NewtonGetThreadsCount(m_world);
+}
+
+void dNewton::SetNumberOfThreads(int threadCount)
+{
+	// by default runs on four micro threads
+	NewtonSetThreadsCount(m_world, threadCount);
+}
+
+
 void dNewton::Update (dFloat timestepInSecunds)
 {
 	dLong timestepMicrosecunds = dLong (double (timestepInSecunds) * 1000000.0f);

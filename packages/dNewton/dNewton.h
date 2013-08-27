@@ -49,6 +49,9 @@ class dNewton: public dNewtonAlloc
 	CNEWTON_API virtual void UpdateAsync (dFloat timestepInSecunds);
 	CNEWTON_API void WaitForUpdateToFinish ();
 
+	CNEWTON_API int GetNumberOfThreads() const;
+	CNEWTON_API void SetNumberOfThreads(int threadCount);
+
 	CNEWTON_API dFloat GetInterpolationParam(dFloat timestepInSecunds) const;
 
 	CNEWTON_API void SetMaxUpdatesPerIterations (int update);
