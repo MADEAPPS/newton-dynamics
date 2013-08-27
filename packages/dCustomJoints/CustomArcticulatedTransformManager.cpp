@@ -212,10 +212,11 @@ void CustomArticulatedTransformController::SetSelfCollisionMask (dSkeletonBone* 
 
 bool CustomArticulatedTransformController::SelfCollisionTest (const dSkeletonBone* const bone0, const dSkeletonBone* const bone1) const
 {
-	dAssert (bone0->m_myController == this);
-	dAssert (bone1->m_myController == this);
-	int id1 = int (bone1 - m_bones);
-	bool state = bone0->m_bitField.TestMask(id1);
+	bool state = false;
+	if (bone0->m_myController == bone1->m_myController) {
+		int id1 = int (bone1 - m_bones);
+		state = bone0->m_bitField.TestMask(id1);
+	}
 	return state;
 }
 
