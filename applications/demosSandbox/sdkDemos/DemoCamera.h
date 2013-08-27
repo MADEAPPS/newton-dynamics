@@ -27,16 +27,6 @@ class DemoCamera: public DemoEntity
 	DemoCamera();
 	~DemoCamera();
 
-	bool GetNavigationMode () const
-	{
-		return m_navigationMode;
-	}
-
-	void SetNavigationMode (bool navigationMode)
-	{
-		m_navigationMode = navigationMode;
-	}
-
 	dFloat GetYawAngle() const;
 	dFloat GetPichAngle() const;
 
@@ -54,8 +44,6 @@ class DemoCamera: public DemoEntity
 	dFloat m_frontPlane;
 	dFloat m_cameraYaw;
 	dFloat m_cameraPitch;
-	
-	bool m_navigationMode;
 
 	int m_viewport[4]; 
 	GLdouble m_modelViewMatrix[16];

@@ -336,7 +336,8 @@ class AdvancePlayerControllerManager: public CustomPlayerControllerManager
 	{
 		// update all characters physics
 		CustomPlayerControllerManager::PostUpdate(timestep);
-
+		dAssert (0);
+/*
 		// now overwrite the camera to match the player character location 
 		if (m_player) {
 			dMatrix playerMatrix (m_player->GetNextMatrix()); 
@@ -376,6 +377,7 @@ class AdvancePlayerControllerManager: public CustomPlayerControllerManager
 				SpawnRandomProp (camera->GetNextMatrix());
 			}
 		}
+*/
 	}
 
 

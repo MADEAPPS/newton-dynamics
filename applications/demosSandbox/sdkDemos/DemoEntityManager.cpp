@@ -76,11 +76,12 @@ bool DemoEntityManager::ButtonKey::UpdateTriggerJoystick (const NewtonDemos* con
 	return !m_memory0 & m_memory1;
 }
 
-void DemoEntityManager::ButtonKey::UpdatePushButton (const NewtonDemos* const mainWin, int keyCode)
+bool DemoEntityManager::ButtonKey::UpdatePushButton (const NewtonDemos* const mainWin, int keyCode)
 {
 	if (UpdateTriggerButton (mainWin, keyCode)) {
 		m_state = ! m_state;
 	}
+	return m_state;
 }
 
 

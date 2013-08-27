@@ -840,7 +840,8 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 	{
 		// do the base class post update
 		CustomVehicleControllerManager::PostUpdate(timestep);
-
+		dAssert (0);
+/*
 		// update the visual transformation matrices for all vehicle tires
 		for (CustomListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
 			CustomVehicleController* const controller = &ptr->GetInfo();
@@ -879,6 +880,7 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 		// smooth out the camera position 
 //		playerMatrix.m_posit = camMatrix.m_posit + (playerMatrix.m_posit - camMatrix.m_posit).Scale(0.5f);
 		camera->SetNextMatrix(*scene, m_camRotation, m_camPosit);
+*/
 	}
 
 	// use this to display debug information about vehicle 

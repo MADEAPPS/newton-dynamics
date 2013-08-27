@@ -82,29 +82,26 @@ void DemoCameraListener::PostUpdate (const NewtonWorld* const world, dFloat time
 //	}
 
 	// do camera translation
-	if (m_camera->GetNavigationMode()) {
-		if (mainWin->GetKeyState ('W')) {
-			targetMatrix.m_posit += targetMatrix.m_front.Scale(m_frontSpeed * timestep * slowDownFactor);
-		}
-		if (mainWin->GetKeyState ('S')) {
-			targetMatrix.m_posit -= targetMatrix.m_front.Scale(m_frontSpeed * timestep * slowDownFactor);
-		}
-		if (mainWin->GetKeyState ('A')) {
-			targetMatrix.m_posit -= targetMatrix.m_right.Scale(m_sidewaysSpeed * timestep * slowDownFactor);
-		}
-		if (mainWin->GetKeyState ('D')) {
-			targetMatrix.m_posit += targetMatrix.m_right.Scale(m_sidewaysSpeed * timestep * slowDownFactor);
-		}
-
-		if (mainWin->GetKeyState ('Q')) {
-			targetMatrix.m_posit -= targetMatrix.m_up.Scale(m_sidewaysSpeed * timestep * slowDownFactor);
-		}
-
-		if (mainWin->GetKeyState ('E')) {
-			targetMatrix.m_posit += targetMatrix.m_up.Scale(m_sidewaysSpeed * timestep * slowDownFactor);
-		}
+	if (mainWin->GetKeyState ('W')) {
+		targetMatrix.m_posit += targetMatrix.m_front.Scale(m_frontSpeed * timestep * slowDownFactor);
+	}
+	if (mainWin->GetKeyState ('S')) {
+		targetMatrix.m_posit -= targetMatrix.m_front.Scale(m_frontSpeed * timestep * slowDownFactor);
+	}
+	if (mainWin->GetKeyState ('A')) {
+		targetMatrix.m_posit -= targetMatrix.m_right.Scale(m_sidewaysSpeed * timestep * slowDownFactor);
+	}
+	if (mainWin->GetKeyState ('D')) {
+		targetMatrix.m_posit += targetMatrix.m_right.Scale(m_sidewaysSpeed * timestep * slowDownFactor);
 	}
 
+	if (mainWin->GetKeyState ('Q')) {
+		targetMatrix.m_posit -= targetMatrix.m_up.Scale(m_sidewaysSpeed * timestep * slowDownFactor);
+	}
+
+	if (mainWin->GetKeyState ('E')) {
+		targetMatrix.m_posit += targetMatrix.m_up.Scale(m_sidewaysSpeed * timestep * slowDownFactor);
+	}
 
 	// do camera rotation, only if we do not have anything picked
 	bool buttonState = mainWin->GetMouseKeyState(0);
@@ -133,9 +130,7 @@ void DemoCameraListener::PostUpdate (const NewtonWorld* const world, dFloat time
 	dQuaternion rot (matrix);
 	m_camera->SetMatrix (*scene, rot, targetMatrix.m_posit);
 
-	if (m_camera->GetNavigationMode()) {
-		UpdatePickBody(scene, timestep);
-	}
+	UpdatePickBody(scene, timestep);
 }
 
 void DemoCameraListener::OnPickedBodyDestroyedNotify (const NewtonBody* body)

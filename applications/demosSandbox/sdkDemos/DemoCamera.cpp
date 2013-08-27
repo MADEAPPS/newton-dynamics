@@ -35,7 +35,6 @@ DemoCamera::DemoCamera()
 	,m_frontPlane (0.1f)
 	,m_cameraYaw(0.0f)
 	,m_cameraPitch(0.0f)
-	,m_navigationMode(true)
 {
 }
 

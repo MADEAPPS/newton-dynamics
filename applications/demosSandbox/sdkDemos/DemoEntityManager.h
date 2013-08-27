@@ -39,7 +39,7 @@ class DemoEntityManager: public wxGLCanvas, public dList <DemoEntity*>
 		ButtonKey (bool initialState);
 
 		bool UpdateTriggerButton (const NewtonDemos* const mainWin, int keyCode);
-		void UpdatePushButton (const NewtonDemos* const mainWin, int keyCode);
+		bool UpdatePushButton (const NewtonDemos* const mainWin, int keyCode);
 		bool GetPushButtonState() const { return m_state;}
 
 
