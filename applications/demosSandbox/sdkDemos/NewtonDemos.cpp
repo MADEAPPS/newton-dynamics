@@ -54,8 +54,8 @@
 //#define DEFAULT_SCENE	28			// basic rag doll
 //#define DEFAULT_SCENE	29			// basic car
 //#define DEFAULT_SCENE	30			// high performance super car
-#define DEFAULT_SCENE	31			// basic player controller
-//#define DEFAULT_SCENE	32			// advanced player controller
+//#define DEFAULT_SCENE	31			// basic player controller
+#define DEFAULT_SCENE	32			// advanced player controller
 //#define DEFAULT_SCENE	33			// cloth patch			
 //#define DEFAULT_SCENE	34			// soft bodies			
 

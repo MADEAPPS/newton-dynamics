@@ -16,25 +16,29 @@
 #include "PhysicsUtils.h"
 #include "TargaToOpenGl.h"
 #include "CustomHinge.h"
+#include "DemoMesh.h"
+#include "DemoCamera.h"
+#include "DebugDisplay.h"
+#include "DemoEntityManager.h"
+#include "CustomInputManager.h"
 #include "CustomTriggerManager.h"
 #include "CustomKinematicController.h"
-#include "DemoMesh.h"
-#include "DemoEntityManager.h"
-#include "DemoCamera.h"
-#include "../toolBox/DebugDisplay.h"
 #include "CustomPlayerControllerManager.h"
 
 
+#define PLAYER_MASS						80.0f
 #define PLAYER_WALK_SPEED				4.0f
+#define PLAYER_JUMP_SPEED				6.0f
 #define PLAYER_THIRD_PERSON_VIEW_DIST	8.0f
 
-// define the massage we will use for this Game
-#define ENTER_TRIGGER				1
-#define EXIT_TRIGGER				2
-#define INSIDE_TRIGGER				3
 
-#define PLAYER_CALL_FERRY_DRIVER	4
-#define PLAYER_BOARDED_FERRY_DRIVER	5
+// define the massage we will use for this Game
+#define ENTER_TRIGGER					1
+#define EXIT_TRIGGER					2
+#define INSIDE_TRIGGER					3
+
+#define PLAYER_CALL_FERRY_DRIVER		4
+#define PLAYER_BOARDED_FERRY_DRIVER		5
 
 
 class PlaformEntityEntity;
@@ -83,17 +87,27 @@ class AdvancePlayerEntity: public DemoEntity
 {
 	public: 
 
+	class InputRecord
+	{
+		public:
+		InputRecord()
+		{
+			memset (this, 0, sizeof (InputRecord));
+		}
+
+		dFloat m_headinAngle;
+		dFloat m_forwarSpeed;
+		dFloat m_strafeSpeed;
+		dFloat m_jumpSpeed;
+		int m_cameraMode;
+	};
+
 	AdvancePlayerEntity (DemoEntityManager* const scene, CustomPlayerControllerManager* const manager, dFloat radius, dFloat height, const dMatrix& location)
 		:DemoEntity (GetIdentityMatrix(), NULL)
-		,m_isPlayer(false)
-		,m_skipRender(true)
-		,m_helpKey(true)
-		,m_jumpKey(false)
-		,m_headinAngle(0.0f)
-		,m_forwarSpeed(0.0f)
-		,m_strafeSpeed(0.0f)
-		,m_jumpSpeed(0.0f)
-		,m_shootProp(0)
+		,m_inputs()
+		,m_currentTrigger(NULL)
+		,m_controller(NULL) 
+		,m_currentPlatform(NULL)
 	{
 		// add this entity to the scene for rendering
 		scene->Append(this);
@@ -137,9 +151,14 @@ class AdvancePlayerEntity: public DemoEntity
 		((CustomPlayerControllerManager*)m_controller->GetManager())->DestroyController(m_controller);
 	}
 
+	void SetInput (const InputRecord& inputs)
+	{
+		m_inputs = inputs;
+	}
+
 	virtual void Render(dFloat timeStep) const
 	{
-		if (!(m_skipRender & m_isPlayer)) {
+		if (m_inputs.m_cameraMode) {
 			// render only when external view mode
 			DemoEntity::Render(timeStep);
 		}
@@ -174,20 +193,10 @@ class AdvancePlayerEntity: public DemoEntity
 		}
 	}
 
-	
-	bool m_isPlayer;
-	bool m_skipRender;
-	DemoEntityManager::ButtonKey m_helpKey;
-	DemoEntityManager::ButtonKey m_jumpKey;
-	dFloat m_headinAngle;
-	dFloat m_forwarSpeed;
-	dFloat m_strafeSpeed;
-	dFloat m_jumpSpeed;
-	int m_shootProp;
-	
+	InputRecord	m_inputs;
 	NewtonBody* m_currentTrigger;
-	PlaformEntityEntity* m_currentPlatform;
 	CustomPlayerController* m_controller; 
+	PlaformEntityEntity* m_currentPlatform;
 };
 
 class AdvancePlayerControllerManager: public CustomPlayerControllerManager
@@ -195,132 +204,24 @@ class AdvancePlayerControllerManager: public CustomPlayerControllerManager
 	public:
 	AdvancePlayerControllerManager (NewtonWorld* const world)
 		:CustomPlayerControllerManager (world)
-		,m_player (NULL) 
-		,m_shootProp(true)
-		,m_cameraMode(false)
 	{
-		// hook a callback for 2d help display
-		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-		scene->Set2DDisplayRenderFunction (RenderPlayerHelp, this);
 	}
 
 	~AdvancePlayerControllerManager ()
 	{
 	}
 
-	static void RenderPlayerHelp (DemoEntityManager* const scene, void* const context, int lineNumber)
-	{
-		AdvancePlayerControllerManager* const me = (AdvancePlayerControllerManager*) context;
-		me->RenderPlayerHelp (scene, lineNumber);
-	}
-
-
-	void SetAsPlayer (AdvancePlayerEntity* const player)
-	{
-		if (m_player) {
-			m_player->m_isPlayer = false;
-		}
-
-		m_player = player;
-		player->m_isPlayer = true;
-	}
-
-	void RenderPlayerHelp (DemoEntityManager* const scene, int lineNumber) const
-	{
-		if (m_player->m_helpKey.GetPushButtonState()) {
-			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "Navigation               Key");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "walk forward:            W");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "walk backward:           S");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "strafe right:            D");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "strafe left:             A");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "toggle camera mode:      C");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "jump:                    Space");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "shoot random prop:       Enter");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help:               H");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "change player direction: Left mouse button");
-		}
-	}
-
-
-	void PlayerInputs (const CustomPlayerController* const controller, dFloat timestep)
-	{
-		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
-
-		DemoCamera* const camera = scene->GetCamera();
-
-		NewtonDemos* const mainWindow = scene->GetRootWindow();
-		NewtonBody* const body = controller->GetBody();
-		AdvancePlayerEntity* const player = (AdvancePlayerEntity*) NewtonBodyGetUserData(body);
-
-		player->m_headinAngle = camera->GetYawAngle();
-		dFloat forwarSpeed = (int (mainWindow->GetKeyState ('W')) - int (mainWindow->GetKeyState ('S'))) * PLAYER_WALK_SPEED;
-		dFloat strafeSpeed = (int (mainWindow->GetKeyState ('D')) - int (mainWindow->GetKeyState ('A'))) * PLAYER_WALK_SPEED;
-
-		// normalize player speed
-		dFloat mag2 = forwarSpeed * forwarSpeed + strafeSpeed * strafeSpeed;
-		if (mag2 > 0.0f) {
-			dFloat invMag = PLAYER_WALK_SPEED / dSqrt (mag2);
-			forwarSpeed *= invMag;
-			strafeSpeed *= invMag;
-		}
-		m_player->m_forwarSpeed = forwarSpeed;
-		m_player->m_strafeSpeed = strafeSpeed;
-
-		// set player is jumping speed
-		const dFloat jumpSpeed = 8.0f;
-		m_player->m_jumpSpeed = (m_player->m_jumpKey.UpdateTriggerButton(mainWindow, ' ')) ? jumpSpeed : 0.0f;
-
-		// see if we are shoting
-		m_player->m_shootProp = m_shootProp.UpdateTriggerButton(mainWindow, 0x0d) ? 1 : 0;
-
-		// set the help key
-		m_player->m_helpKey.UpdatePushButton (mainWindow, 'H');
-	}
-
-
 	// apply gravity 
 	virtual void ApplyPlayerMove (CustomPlayerController* const controller, dFloat timestep)
 	{
 		NewtonBody* const body = controller->GetBody();
-
 		AdvancePlayerEntity* const player = (AdvancePlayerEntity*) NewtonBodyGetUserData(body);
-		if (player == m_player) {
-			// velocity set by human player, get input from player camera
-			PlayerInputs (controller, timestep);
-		} else {
-			// velocity is set by AI script
-		}
-
-#if 0
-	#if 0
-		static FILE* file = fopen ("log.bin", "wb");
-		if (file) {
-			fwrite (&player->m_headinAngle, sizeof (dFloat), 1, file);
-			fwrite (&player->m_forwarSpeed, sizeof (dFloat), 1, file);
-			fwrite (&player->m_strafeSpeed, sizeof (dFloat), 1, file);
-			fwrite (&player->m_jumpSpeed, sizeof (dFloat), 1, file);
-			fwrite (&player->m_shootProp, sizeof (m_shootProp), 1, file);
-			fflush(file);
-		}
-	#else 
-		static FILE* file = fopen ("log.bin", "rb");
-		if (file) {
-			fread (&player->m_headinAngle, sizeof (dFloat), 1, file);
-			fread (&player->m_forwarSpeed, sizeof (dFloat), 1, file);
-			fread (&player->m_strafeSpeed, sizeof (dFloat), 1, file);
-			fread (&player->m_jumpSpeed, sizeof (dFloat), 1, file);
-			fread (&player->m_shootProp, sizeof (m_shootProp), 1, file);
-		}
-	#endif
-#endif
-		
 		
 		// calculate desired linear and angular velocity form the input
 		dVector gravity (0.0f, DEMO_GRAVITY, 0.0f, 0.0f);
 
 		// set player linear and angular velocity
-		controller->SetPlayerVelocity (player->m_forwarSpeed, player->m_strafeSpeed, player->m_jumpSpeed, player->m_headinAngle, gravity, timestep);
+		controller->SetPlayerVelocity (player->m_inputs.m_forwarSpeed, player->m_inputs.m_strafeSpeed, player->m_inputs.m_jumpSpeed, player->m_inputs.m_headinAngle, gravity, timestep);
 	}
 
 
@@ -329,67 +230,36 @@ class AdvancePlayerControllerManager: public CustomPlayerControllerManager
 		count = CustomPlayerControllerManager::ProcessContacts (controller, contacts, count); 
 		return count;
 	}
+};
 
 
-
-	void PostUpdate (dFloat timestep)
+// we recommend using and input manage to control input for all games
+class AdvancedPlayerInputManager: public CustomInputManager
+{
+	public:
+	AdvancedPlayerInputManager (DemoEntityManager* const scene)
+		:CustomInputManager(scene->GetNewton())
+		,m_scene(scene)
+		,m_player(NULL)
+		,m_jumpKey(false)
+		,m_cameraMode(true)
+		,m_helpKey(true)
+		,m_shootProp(false)
+		,m_shootState(0)
 	{
-		// update all characters physics
-		CustomPlayerControllerManager::PostUpdate(timestep);
-		dAssert (0);
-/*
-		// now overwrite the camera to match the player character location 
-		if (m_player) {
-			dMatrix playerMatrix (m_player->GetNextMatrix()); 
-			dFloat height = m_player->m_controller->GetHigh();
-			dVector upDir (m_player->m_controller->GetUpDir());
-			playerMatrix.m_posit += upDir.Scale(height);
-
-			DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
-			DemoCamera* const camera = scene->GetCamera();
-			camera->SetNavigationMode(false);
-
-
-			// toggle between third and first person
-			NewtonDemos* const mainWindow = scene->GetRootWindow();
-			dMatrix camMatrix (camera->GetNextMatrix ());
-
-			m_cameraMode.UpdatePushButton(mainWindow, 'C');
-			if (m_cameraMode.GetPushButtonState()) {
-				// first person view, player skip rendering
-				m_player->m_skipRender = true;
-			} else {
-				m_player->m_skipRender = false;
-				// third person view, set camera at some distance from payer
-				dVector dist (camMatrix.m_front.Scale (PLAYER_THIRD_PERSON_VIEW_DIST));
-				playerMatrix.m_posit -= dist;
-				// raise a little more 
-				playerMatrix.m_posit += upDir.Scale(height);
-			}
-
-			// smooth out the camera position 
-			playerMatrix.m_posit = camMatrix.m_posit + (playerMatrix.m_posit - camMatrix.m_posit).Scale(0.5f);
-
-			camera->SetNextMatrix(*scene, dQuaternion (camMatrix), playerMatrix.m_posit);
-
-			// update the shot button
-			if (m_player->m_shootProp) {
-				SpawnRandomProp (camera->GetNextMatrix());
-			}
-		}
-*/
+		// plug a callback for 2d help display
+		scene->Set2DDisplayRenderFunction (RenderPlayerHelp, this);
 	}
-
 
 	void SpawnRandomProp(const dMatrix& location) const
 	{
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-		scene->SetCurrent();
+		//scene->SetCurrent();
 
 		static PrimitiveType proSelection[] = {_SPHERE_PRIMITIVE, _BOX_PRIMITIVE, _CAPSULE_PRIMITIVE, _CYLINDER_PRIMITIVE, _CONE_PRIMITIVE, 
-			                                   _TAPERED_CAPSULE_PRIMITIVE, _TAPERED_CYLINDER_PRIMITIVE, 
-			                                   _CHAMFER_CYLINDER_PRIMITIVE, _RANDOM_CONVEX_HULL_PRIMITIVE, _REGULAR_CONVEX_HULL_PRIMITIVE};
+			_TAPERED_CAPSULE_PRIMITIVE, _TAPERED_CYLINDER_PRIMITIVE, 
+			_CHAMFER_CYLINDER_PRIMITIVE, _RANDOM_CONVEX_HULL_PRIMITIVE, _REGULAR_CONVEX_HULL_PRIMITIVE};
 
 		PrimitiveType type = PrimitiveType (dRand() % (sizeof (proSelection) / sizeof (proSelection[0])));
 
@@ -398,7 +268,7 @@ class AdvancePlayerControllerManager: public CustomPlayerControllerManager
 		DemoMesh* const geometry = new DemoMesh("prop", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
 		dMatrix matrix (location);
-//		matrix.m_posit += matrix.RotateVector (controller->GetUpDir().Scale (controller->GetHight()));
+		matrix.m_posit.m_y += 0.5f;
 
 		NewtonBody* const prop = CreateSimpleSolid (scene, geometry, 30.0f, matrix, collision, 0);
 		NewtonDestroyCollision(collision);
@@ -408,16 +278,125 @@ class AdvancePlayerControllerManager: public CustomPlayerControllerManager
 		dVector veloc (matrix.m_front.Scale (initialSpeed));
 		NewtonBodySetVelocity(prop, &veloc[0]);
 		NewtonBodySetLinearDamping(prop, 0);
-
-		// for now off until joints CCD is implemented!!
-		//NewtonBodySetContinuousCollisionMode(prop, 1);
 	}
 
-	
+	void OnBeginUpdate (dFloat timestepInSecunds)
+	{
+		AdvancePlayerEntity::InputRecord inputs;
+
+		DemoCamera* const camera = m_scene->GetCamera();
+		NewtonDemos* const mainWindow = m_scene->GetRootWindow();
+
+		// set the help key
+		m_helpKey.UpdatePushButton (mainWindow, 'H');
+
+		// read the player inputs
+		inputs.m_headinAngle = camera->GetYawAngle();
+		inputs.m_cameraMode = m_cameraMode.UpdatePushButton(m_scene->GetRootWindow(), 'C') ? 1 : 0;
+		inputs.m_forwarSpeed = (int (mainWindow->GetKeyState ('W')) - int (mainWindow->GetKeyState ('S'))) * PLAYER_WALK_SPEED;
+		inputs.m_strafeSpeed = (int (mainWindow->GetKeyState ('D')) - int (mainWindow->GetKeyState ('A'))) * PLAYER_WALK_SPEED;
+		inputs.m_jumpSpeed = (m_jumpKey.UpdateTriggerButton(mainWindow, ' ')) ? PLAYER_JUMP_SPEED : 0.0f;
+
+		// normalize player speed
+		dFloat mag2 = inputs.m_forwarSpeed * inputs.m_forwarSpeed + inputs.m_strafeSpeed * inputs.m_strafeSpeed;
+		if (mag2 > 0.0f) {
+			dFloat invMag = PLAYER_WALK_SPEED / dSqrt (mag2);
+			inputs.m_forwarSpeed *= invMag;
+			inputs.m_strafeSpeed *= invMag;
+		}
+
+		// see if we are shotting some props
+		m_shootState = m_shootProp.UpdateTriggerButton(mainWindow, 0x0d) ? 1 : 0;
+
+
+#if 0
+	#if 0
+		static FILE* file = fopen ("log.bin", "wb");
+		if (file) {
+			fwrite (&inputs, sizeof (inputs), 1, file);
+			fflush(file);
+		}
+	#else 
+		static FILE* file = fopen ("log.bin", "rb");
+		if (file) {
+			fread (&inputs, sizeof (inputs), 1, file);
+		}
+	#endif
+#endif
+		m_player->SetInput(inputs);
+	}
+
+	void OnEndUpdate (dFloat timestepInSecunds)
+	{
+		DemoCamera* const camera = m_scene->GetCamera();
+
+		dMatrix camMatrix(camera->GetNextMatrix());
+		dMatrix playerMatrix (m_player->GetNextMatrix());
+
+		dVector frontDir (camMatrix[0]);
+
+		CustomPlayerController* const controller = m_player->m_controller; 
+		dFloat height = controller->GetHigh();
+		dVector upDir (controller->GetUpDir());
+
+		dVector camOrigin; 
+
+		if (m_player->m_inputs.m_cameraMode) {
+			// set third person view camera
+			camOrigin = playerMatrix.TransformVector (upDir.Scale(height));
+			camOrigin -= frontDir.Scale (PLAYER_THIRD_PERSON_VIEW_DIST);
+		} else {
+			// set first person view camera
+			camMatrix = camMatrix * playerMatrix;
+			camOrigin = playerMatrix.TransformVector (upDir.Scale(height));
+		}
+
+		camera->SetNextMatrix (*m_scene, camMatrix, camOrigin);
+
+		// update the shot button
+		if (m_shootState) {
+			SpawnRandomProp (camera->GetNextMatrix());
+		}
+	}
+
+	void AddPlayer (AdvancePlayerEntity* const player)
+	{
+		m_player = player;
+	}
+
+	void RenderPlayerHelp (DemoEntityManager* const scene, int lineNumber) const
+	{
+		if (m_helpKey.GetPushButtonState()) {
+			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "Navigation Keys");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "walk forward:            W");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "walk backward:           S");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "strafe right:            D");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "strafe left:             A");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "toggle camera mode:      C");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "jump:                    Space");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help:               H");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "change player direction: Left mouse button");
+		}
+	}
+
+	static void RenderPlayerHelp (DemoEntityManager* const scene, void* const context, int lineNumber)
+	{
+		AdvancedPlayerInputManager* const me = (AdvancedPlayerInputManager*) context;
+		me->RenderPlayerHelp (scene, lineNumber);
+	}
+
+
+	DemoEntityManager* m_scene;
 	AdvancePlayerEntity* m_player;
-	DemoEntityManager::ButtonKey m_shootProp;
+	DemoEntityManager::ButtonKey m_jumpKey;
 	DemoEntityManager::ButtonKey m_cameraMode;
+	DemoEntityManager::ButtonKey m_helpKey;
+	DemoEntityManager::ButtonKey m_shootProp;
+
+	int m_shootState;
 };
+
 
 
 class PlaformEntityEntity: public DemoEntity
@@ -939,8 +918,6 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 
 		new CustomHinge (pinMatrix0, body0, playGroundBody);
 	}
-
-
 }
 
 
@@ -1008,6 +985,10 @@ void AdvancedPlayerController (DemoEntityManager* const scene)
 
 	NewtonWorld* const world = scene->GetNewton();
 
+
+	// add an input Manage to manage the inputs and user interaction 
+	AdvancedPlayerInputManager* const inputManager = new AdvancedPlayerInputManager (scene);
+
 	// create a character controller manager
 	AdvancePlayerControllerManager* const playerManager = new AdvancePlayerControllerManager (world);
 
@@ -1026,7 +1007,11 @@ void AdvancedPlayerController (DemoEntityManager* const scene)
 	AdvancePlayerEntity* const player = new AdvancePlayerEntity (scene, playerManager, 0.5f, 1.9f, location);
 
 	// set as the player with the camera
-	playerManager->SetAsPlayer(player);
+	//playerManager->SetAsPlayer(player);
+
+	// set as the player with the camera
+	inputManager->AddPlayer(player);
+
 
 
 /*

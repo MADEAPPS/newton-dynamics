@@ -100,7 +100,6 @@ class BasicPlayerEntity: public DemoEntity
 		m_inputs = inputs;
 	}
 
-
 	virtual void Render(dFloat timeStep) const
 	{
 		if (m_inputs.m_cameraMode) {
@@ -118,8 +117,6 @@ class BasicPlayerControllerManager: public CustomPlayerControllerManager
 	public:
 	BasicPlayerControllerManager (NewtonWorld* const world)
 		:CustomPlayerControllerManager (world)
-		,m_player (NULL) 
-		,m_cameraMode(false)
 	{
 	}
 
@@ -146,10 +143,6 @@ class BasicPlayerControllerManager: public CustomPlayerControllerManager
 		count = CustomPlayerControllerManager::ProcessContacts (controller, contacts, count); 
 		return count;
 	}
-
-	BasicPlayerEntity* m_player;
-	
-	DemoEntityManager::ButtonKey m_cameraMode;
 };
 
 
@@ -233,16 +226,16 @@ class BasicPlayerInputManager: public CustomInputManager
 
 #if 0
 	#if 0
-			static FILE* file = fopen ("log.bin", "wb");
-			if (file) {
-				fwrite (&inputs, sizeof (inputs), 1, file);
-				fflush(file);
-			}
+		static FILE* file = fopen ("log.bin", "wb");
+		if (file) {
+			fwrite (&inputs, sizeof (inputs), 1, file);
+			fflush(file);
+		}
 	#else 
-			static FILE* file = fopen ("log.bin", "rb");
-			if (file) {
-				fread (&inputs, sizeof (inputs), 1, file);
-			}
+		static FILE* file = fopen ("log.bin", "rb");
+		if (file) {
+			fread (&inputs, sizeof (inputs), 1, file);
+		}
 	#endif
 #endif
 
@@ -327,21 +320,19 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	// load the sky box
 	scene->CreateSkyBox();
 
-	CreateLevelMesh (scene, "flatPlane.ngd", true);
+	//CreateLevelMesh (scene, "flatPlane.ngd", true);
 	//CreateLevelMesh (scene, "playground.ngd", true);
-	//CreateLevelMesh (scene, "castle.ngd", true);
+	CreateLevelMesh (scene, "castle.ngd", true);
 	//CreateLevelMesh (scene, "sponza.ngd", true);
 	//CreateLevelMesh (scene, "sibenik.ngd", true);
 
-
 	NewtonWorld* const world = scene->GetNewton();
-
 
 	// add an input Manage to manage the inputs and user interaction 
 	BasicPlayerInputManager* const inputManager = new BasicPlayerInputManager (scene);
 
 	// create a character controller manager
-	BasicPlayerControllerManager* const manager = new BasicPlayerControllerManager (world);
+	BasicPlayerControllerManager* const playerManager = new BasicPlayerControllerManager (world);
 
 	// add main player
 	dMatrix location (GetIdentityMatrix());
@@ -351,7 +342,7 @@ void BasicPlayerController (DemoEntityManager* const scene)
 
 
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 10.0f);
-	BasicPlayerEntity* const player = new BasicPlayerEntity (scene, manager, 0.5f, 1.9f, location);
+	BasicPlayerEntity* const player = new BasicPlayerEntity (scene, playerManager, 0.5f, 1.9f, location);
 
 	// set as the player with the camera
 	inputManager->AddPlayer(player);
@@ -361,7 +352,7 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	dVector size (2.0f, 2.0f, 2.0f, 0.0f);
 	int count = 1;
 	dMatrix shapeOffsetMatrix (GetIdentityMatrix());
-//	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix, 10.0f);
+	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix, 10.0f);
 
 	dVector origin (-10.0f, 2.0f, 0.0f, 0.0f);
 	dQuaternion rot;

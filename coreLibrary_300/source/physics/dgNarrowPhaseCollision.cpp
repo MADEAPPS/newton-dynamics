@@ -1726,8 +1726,6 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 
 	polyInstance.m_scaleIsUnit = true;
 	polyInstance.m_scaleIsUniform = true;
-//	polyInstance.m_scale = scale;
-//	polyInstance.m_invScale = invScale;
 
 	dgFloat32 closestDist = dgFloat32 (1.0e10f);
 	dgContactPoint* const contactOut = proxy.m_contacts;
@@ -1735,7 +1733,6 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 	dgInt32* const indexArray = (dgInt32*)data.m_faceVertexIndex;
 	data.SortFaceArray();
 
-//	for (dgInt32 i = 0; (i < data.m_faceCount) && (count < 16); i ++) {
 	for (dgInt32 i = data.m_faceCount - 1; (i >= 0) && (count < 16); i --) {
 		dgInt32 address = data.m_faceIndexStart[i];
 		const dgInt32* const localIndexArray = &indexArray[address];
@@ -1747,7 +1744,6 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 		polygon.m_faceClipSize = data.GetFaceSize (localIndexArray, polygon.m_count);
 		polygon.m_faceNormalIndex = data.GetNormalIndex (localIndexArray, polygon.m_count);
 		polygon.m_normal = dgVector (&vertex[polygon.m_faceNormalIndex * stride]);
-		//polygon.m_normal.m_w = dgFloat32 (0.0f);
 		dgAssert (polygon.m_normal.m_w == dgFloat32 (0.0f));
 		contactJoint->m_separtingVector = separatingVector;
 

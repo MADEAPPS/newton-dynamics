@@ -49,14 +49,14 @@ class dgCollisionConvex: public dgCollision
 		{
 			// set all entry to be no swap order
 			memset (m_swapPriority, false, sizeof (m_swapPriority));
-			for (dgInt32 i = m_sphereCollision; i < m_boxCollision; i ++) {
-				for (dgInt32 j = m_sphereCollision; j < i; j ++) {
-					m_swapPriority[i][j] = true;
-				}
+			for (dgInt32 i = 0; i < m_nullCollision; i ++) {
+				m_swapPriority[i][m_sphereCollision] = true;
+				m_swapPriority[i][m_capsuleCollision] = true;
+				m_swapPriority[i][m_chamferCylinderCollision] = true;
 			}
-			for (dgInt32 i = m_boxCollision; i < m_nullCollision; i ++) {
-				for (dgInt32 j = m_sphereCollision; j < m_boxCollision; j ++) {
-					m_swapPriority[i][j] = true;
+			for (dgInt32 i = m_sphereCollision; i <= m_chamferCylinderCollision; i ++) {
+				for (dgInt32 j = m_sphereCollision; j <= m_chamferCylinderCollision; j ++) {
+					m_swapPriority[i][j] = false;
 				}
 			}
 		}
