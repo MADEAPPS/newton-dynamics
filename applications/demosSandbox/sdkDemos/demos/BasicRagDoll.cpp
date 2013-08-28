@@ -111,7 +111,7 @@ class RagDollManager: public CustomArticulaledTransformManager
 
 		dAssert (bone0);
 		dAssert (bone1);
-		if (bone0->m_myController == bone1->m_myController) {
+		if (bone0->m_myController && bone1->m_myController) {
 			return bone0->m_myController->SelfCollisionTest (bone0, bone1) ? 1 : 0;
 		}
 
@@ -362,7 +362,7 @@ void DescreteRagDoll (DemoEntityManager* const scene)
 //	dVector origin (-10.0f, 1.0f, 0.0f, 1.0f);
 	dVector origin (FindFloor (world, dVector (-10.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
 
-	int count = 8;
+	int count = 6;
 	for (int x = 0; x < count; x ++) {
 		for (int z = 0; z < count; z ++) {
 			dVector p (origin + dVector ((x - count / 2) * 3.0f - count / 2, 0.0f, (z - count / 2) * 3.0f, 0.0f));
