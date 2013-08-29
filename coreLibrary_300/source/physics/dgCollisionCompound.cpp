@@ -1830,19 +1830,23 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingle (dgCollidingPairCollector
 						proxy.m_referenceCollision = &childInstance; 
 
 						proxy.m_maxContacts = DG_MAX_CONTATCS - contactCount;
-						proxy.m_contacts = &contacts[contactCount];
-
-						dgInt32 count = m_world->CalculateConvexToConvexContacts (proxy);
-						for (dgInt32 i = 0; i < count; i ++) {
-							dgAssert (contacts[contactCount + i].m_collision0 == &childInstance);
-							contacts[contactCount + i].m_collision0 = subShape;
-						}
-						contactCount += count;
+						proxy.m_contacts = contacts ? &contacts[contactCount] : contacts;
 
 						closestDist = dgMin(closestDist, constraint->m_closestDistance);
 
-						if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
-							contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
+						dgInt32 count = m_world->CalculateConvexToConvexContacts (proxy);
+						if (!proxy.m_intersectionTestOnly) {
+							for (dgInt32 i = 0; i < count; i ++) {
+								dgAssert (contacts[contactCount + i].m_collision0 == &childInstance);
+								contacts[contactCount + i].m_collision0 = subShape;
+							}
+							contactCount += count;
+							if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
+								contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
+							}
+						} else if (count == -1) {
+							contactCount = -1;
+							break;
 						}
 						//childInstance.SetUserData(NULL);
 					}
@@ -1927,7 +1931,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgCollidingPairCo
 						proxy.m_referenceCollision = &childInstance; 
 
 						proxy.m_maxContacts = DG_MAX_CONTATCS - contactCount;
-						proxy.m_contacts = &contacts[contactCount];
+						proxy.m_contacts = contacts ? &contacts[contactCount] : contacts;
 
 						dgInt32 count = m_world->CalculateConvexToConvexContacts (proxy);
 
@@ -1936,31 +1940,38 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgCollidingPairCo
 							dgFloat32 param = proxy.m_timestep;
 							dgAssert (param >= dgFloat32 (0.0f));
 							if (param < maxParam) {
-								if (contactCount && ((param - maxParam) * invMaxParam) < dgFloat32(-1.0e-3f)) {
-									for (dgInt32 i = 0; i < count; i ++) {
-										contacts[i] = contacts[contactCount + i];
+								if (proxy.m_intersectionTestOnly) {
+									maxParam = param;
+									if (count == -1) {
+										contactCount = -1;
+										break;
 									}
-									contactCount = 0;
-								}
-								maxParam = param;
 
-								
-								for (dgInt32 i = 0; i < count; i ++) {
-									dgAssert (contacts[contactCount + i].m_collision0 == &childInstance);
-									contacts[contactCount + i].m_collision0 = subShape;
-								}
-								contactCount += count;
+								} else {
+									if (contactCount && ((param - maxParam) * invMaxParam) < dgFloat32(-1.0e-3f)) {
+										for (dgInt32 i = 0; i < count; i ++) {
+											contacts[i] = contacts[contactCount + i];
+										}
+										contactCount = 0;
+									}
+									maxParam = param;
 
-								if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
-									contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
-								}
+									for (dgInt32 i = 0; i < count; i ++) {
+										dgAssert (contacts[contactCount + i].m_collision0 == &childInstance);
+										contacts[contactCount + i].m_collision0 = subShape;
+									}
+									contactCount += count;
 
-								if (maxParam == dgFloat32 (0.0f)) {
-									break;
+									if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
+										contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
+									}
+
+									if (maxParam == dgFloat32 (0.0f)) {
+										break;
+									}
 								}
 							}
 						}
-						//childInstance.SetUserData(NULL);
 					}
 				}
 			} else {
@@ -2041,20 +2052,25 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompound (dgCollidingPairCollect
 						proxy.m_floatingCollision = &otherChildInstance; 
 
 						proxy.m_maxContacts = DG_MAX_CONTATCS - contactCount;
-						proxy.m_contacts = &contacts[contactCount];
+						proxy.m_contacts = contacts ? &contacts[contactCount] : contacts;
 
 						dgInt32 count = m_world->CalculateConvexToConvexContacts (proxy);
 						closestDist = dgMin(closestDist, constraint->m_closestDistance);
 
-						for (dgInt32 i = 0; i < count; i ++) {
-							dgAssert (contacts[contactCount + i].m_collision0 == &childInstance);
-							dgAssert (contacts[contactCount + i].m_collision1 == &otherChildInstance);
-							contacts[contactCount + i].m_collision0 = subShape;
-							contacts[contactCount + i].m_collision1 = otherSubShape;
-						}
-						contactCount += count;
-						if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
-							contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
+						if (!proxy.m_intersectionTestOnly) {
+							for (dgInt32 i = 0; i < count; i ++) {
+								dgAssert (contacts[contactCount + i].m_collision0 == &childInstance);
+								dgAssert (contacts[contactCount + i].m_collision1 == &otherChildInstance);
+								contacts[contactCount + i].m_collision0 = subShape;
+								contacts[contactCount + i].m_collision1 = otherSubShape;
+							}
+							contactCount += count;
+							if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
+								contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
+							}
+						} else if (count == -1) {
+							contactCount = -1;
+							break;
 						}
 						//childInstance.SetUserData(NULL);
 						//otherChildInstance.SetUserData(NULL);
@@ -2201,20 +2217,23 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTree (dgCollidingPairCo
 						proxy.m_referenceCollision = &childInstance; 
 
 						proxy.m_maxContacts = DG_MAX_CONTATCS - contactCount;
-						proxy.m_contacts = &contacts[contactCount];
+						proxy.m_contacts = contacts ? &contacts[contactCount] : contacts;
 
 						dgInt32 count = m_world->CalculateConvexToNonConvexContacts (proxy);
 						closestDist = dgMin(closestDist, constraint->m_closestDistance);
 
-						for (dgInt32 i = 0; i < count; i ++) {
-							dgAssert (contacts[contactCount + i].m_collision0 == &childInstance);
-							contacts[contactCount + i].m_collision0 = subShape;
-						}
-						contactCount += count;
-
-
-						if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
-							contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
+						if (!proxy.m_intersectionTestOnly) {
+							for (dgInt32 i = 0; i < count; i ++) {
+								dgAssert (contacts[contactCount + i].m_collision0 == &childInstance);
+								contacts[contactCount + i].m_collision0 = subShape;
+							}
+							contactCount += count;
+							if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
+								contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
+							}
+						} else if (count == -1) {
+							contactCount = -1;
+							break;
 						}
 						//childInstance.SetUserData(NULL);
 					}
@@ -2479,20 +2498,25 @@ dgInt32 dgCollisionCompound::CalculateContactsToHeightField (dgCollidingPairColl
 						proxy.m_referenceCollision = &childInstance; 
 
 						proxy.m_maxContacts = DG_MAX_CONTATCS - contactCount;
-						proxy.m_contacts = &contacts[contactCount];
+						proxy.m_contacts = contacts ? &contacts[contactCount] : contacts;
 
 						dgInt32 count = 0;
 						count += m_world->CalculateConvexToNonConvexContacts (proxy);
 						closestDist = dgMin(closestDist, constraint->m_closestDistance);
 
-						for (dgInt32 i = 0; i < count; i ++) {
-							dgAssert (contacts[contactCount + i].m_collision0 == &childInstance);
-							contacts[contactCount + i].m_collision0 = subShape;
-						}
-						contactCount += count;
+						if (!proxy.m_intersectionTestOnly) {
+							for (dgInt32 i = 0; i < count; i ++) {
+								dgAssert (contacts[contactCount + i].m_collision0 == &childInstance);
+								contacts[contactCount + i].m_collision0 = subShape;
+							}
+							contactCount += count;
 
-						if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
-							contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
+							if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
+								contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
+							}
+						} else if (count == -1) {
+							contactCount = -1;
+							break;
 						}
 						//childInstance.SetUserData(NULL);
 					}
@@ -2573,20 +2597,25 @@ dgInt32 dgCollisionCompound::CalculateContactsUserDefinedCollision (dgCollidingP
 						proxy.m_referenceCollision = &childInstance; 
 
 						proxy.m_maxContacts = DG_MAX_CONTATCS - contactCount;
-						proxy.m_contacts = &contacts[contactCount];
+						proxy.m_contacts = contacts ? &contacts[contactCount] : contacts;
 
 						dgInt32 count = 0;
 						count += m_world->CalculateConvexToNonConvexContacts (proxy);
 						closestDist = dgMin(closestDist, constraint->m_closestDistance);
 
-						for (dgInt32 i = 0; i < count; i ++) {
-							dgAssert (contacts[contactCount + i].m_collision0 == &childInstance);
-							contacts[contactCount + i].m_collision0 = subShape;
-						}
-						contactCount += count;
+						if (!proxy.m_intersectionTestOnly) {
+							for (dgInt32 i = 0; i < count; i ++) {
+								dgAssert (contacts[contactCount + i].m_collision0 == &childInstance);
+								contacts[contactCount + i].m_collision0 = subShape;
+							}
+							contactCount += count;
 
-						if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
-							contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
+							if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
+								contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
+							}
+						} else if (count == -1) {
+							contactCount = -1;
+							break;
 						}
 						//childInstance.SetUserData(NULL);
 					}
