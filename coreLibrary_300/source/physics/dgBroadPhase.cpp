@@ -440,7 +440,7 @@ void dgBroadPhase::GetWorldSize (dgVector& p0, dgVector& p1) const
 }
 
 
-void dgBroadPhase::ForEachBodyInAABB (const dgVector& q0, const dgVector& q1, OnBodiesInAABB callback, void* const userData) const
+void dgBroadPhase::ForEachBodyInAABB (const dgVector& minBox, const dgVector& maxBox, OnBodiesInAABB callback, void* const userData) const
 {
 	if (m_rootNode) {
 		const dgNode* stackPool[DG_BROADPHASE_MAX_STACK_DEPTH];
@@ -451,13 +451,13 @@ void dgBroadPhase::ForEachBodyInAABB (const dgVector& q0, const dgVector& q1, On
 		while (stack) {
 			stack --;
 			const dgNode* const rootNode = stackPool[stack];
-			if (dgOverlapTest (rootNode->m_minBox, rootNode->m_maxBox, q0, q1)) {
+			if (dgOverlapTest (rootNode->m_minBox, rootNode->m_maxBox, minBox, maxBox)) {
 
 				if (rootNode->m_body) {
 					dgAssert (!rootNode->m_left);
 					dgAssert (!rootNode->m_right);
 					dgBody* const body = rootNode->m_body;
-					if (dgOverlapTest (body->m_minAABB, body->m_maxAABB, q0, q1)) {
+					if (dgOverlapTest (body->m_minAABB, body->m_maxAABB, minBox, maxBox)) {
 						if (body != sentinel) {
 							if (!callback (body, userData)) {
 								break;

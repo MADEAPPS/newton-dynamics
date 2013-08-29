@@ -229,6 +229,46 @@ void DemoCameraListener::InterpolateMatrices (DemoEntityManager* const scene, dF
 	}
 }
 
+
+
+/*
+// NewtonBodyIterator
+int xxx;
+static int BodyIterator (const NewtonBody * const body, void * const userData)
+{   
+
+	//	NewtonEntity* entity = (NewtonEntity*)(userData);
+	//	NewtonEntity* otherEntity = (NewtonEntity*) NewtonBodyGetUserData(body);
+	//	const NewtonBody * const otherBody = (NewtonBody*)entity->component->userData;
+	const NewtonBody * const otherBody = (NewtonBody*)userData;
+
+	// not interested in self collision
+	if( body == otherBody ){ 
+		return 1;
+	}
+
+	NewtonCollision* collisionA = NewtonBodyGetCollision(body);
+	NewtonCollision* collisionB = NewtonBodyGetCollision(otherBody);
+	NewtonWorld* const world = NewtonBodyGetWorld(body);
+
+	dMatrix poseA;
+	NewtonBodyGetMatrix(body, &poseA[0][0]);
+
+	dMatrix poseB;
+	NewtonBodyGetMatrix(otherBody,&poseB[0][0]);
+
+	if( NewtonCollisionIntersectionTest(world,collisionA, &poseA[0][0], collisionB, &poseB[0][0],0) )
+	{	
+		xxx ++;
+		//		++entity->bodyDesc.collisionInfo.numberOfCollisions;
+		//		entity->bodyDesc.collisionInfo.collisionList.push_back( (PhysicsBody*)(otherEntity) );
+	}
+
+	return 1;
+}
+*/
+
+
 void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, float timestep) 
 {
 	NewtonDemos* const mainWin = scene->GetRootWindow();
@@ -300,4 +340,9 @@ void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, float ti
 	}
 
 	m_prevMouseState = mousePickState;
+
+//dVector minBox( -100.0f, -100.0f, -100.0f, 0.0f);
+//dVector maxBox(  100.0f,  100.0f,  100.0f, 0.0f);
+//NewtonBody* body = NewtonWorldGetFirstBody(scene->GetNewton());
+//NewtonWorldForEachBodyInAABBDo(scene->GetNewton(), &minBox[0], &maxBox[0], BodyIterator, body);
 }

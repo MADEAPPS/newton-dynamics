@@ -597,7 +597,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete (dgCollis
 	}
 
 	const dgInt32 hullId = hull->GetUserDataID();
-	if (inside) {
+	if (inside & !proxy.m_intersectionTestOnly) {
 		dgVector pointsContacts[64];
 		dgVector point (pointInHull + normalInHull.Scale4(dgMax (penetration - DG_IMPULSIVE_CONTACT_PENETRATION, DG_IMPULSIVE_CONTACT_PENETRATION)));
 
@@ -606,6 +606,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete (dgCollis
 		penetration = dgMax(dgAbsf (penetration) - DG_IMPULSIVE_CONTACT_PENETRATION, dgFloat32 (0.0f));
 		const dgMatrix& worldMatrix = hull->m_globalMatrix;
 		dgContactPoint* const contactsOut = proxy.m_contacts;
+		dgAssert (contactsOut);
 		dgVector globalNormal (worldMatrix.RotateVector(normalInHull));
 		for (dgInt32 i = 0; i < count; i ++) {
 			contactsOut[i].m_point = worldMatrix.TransformVector (pointsContacts[i] + step);
