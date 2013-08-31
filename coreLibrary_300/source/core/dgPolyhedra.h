@@ -36,7 +36,7 @@ class dgPlane;
 class dgSphere;
 class dgMatrix;
 class dgPolyhedra;
-
+class dgVertexCollapseVertexMetric;
 
 typedef dgInt64 dgEdgeKey;
 
@@ -128,7 +128,15 @@ class dgPolyhedra: public dgTree <dgEdge, dgEdgeKey>
 	dgEdge* FindEarTip (dgEdge* const face, const dgFloat64* const pool, dgInt32 stride, dgDownHeap<dgEdge*, dgFloat64>& heap, const dgBigVector &normal) const;
 	dgEdge* TriangulateFace (dgEdge* const face, const dgFloat64* const pool, dgInt32 stride, dgDownHeap<dgEdge*, dgFloat64>& heap, dgBigVector* const faceNormalOut);
 	
+
+	void RemoveHalfEdge (dgEdge* const edge);
+	dgEdge* OptimizeCollapseEdge (dgEdge* const edge);
+	bool IsOkToCollapse (const dgBigVector* const pool, dgEdge* const edge) const;
 	dgFloat64 EdgePenalty (const dgBigVector* const pool, dgEdge* const edge) const;
+	dgBigPlane EdgePlane (dgInt32 i0, dgInt32 i1, dgInt32 i2, const dgBigVector* const pool) const;
+	void CalculateAllMetrics (dgVertexCollapseVertexMetric* const table, const dgBigVector* const pool) const;
+	void CalculateVertexMetrics (dgVertexCollapseVertexMetric* const table, const dgBigVector* const pool, dgEdge* const edge) const;
+	
 
 	mutable dgInt32 m_baseMark;
 	mutable dgInt32 m_edgeMark;

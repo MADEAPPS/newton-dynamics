@@ -328,7 +328,7 @@ typename dgList<T>::dgListNode *dgList<T>::Append (dgListNode* const node)
 		m_last->AddLast (node);
 		m_last = node;
 	}
-#ifdef __ENABLE_SANITY_CHECK 
+#ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
 	dgAssert (SanityCheck ());
 #endif
 	return m_last;
@@ -344,7 +344,7 @@ typename dgList<T>::dgListNode *dgList<T>::Append ()
 	} else {
 		m_last = new (m_allocator) dgListNode(m_last, NULL);
 	}
-#ifdef __ENABLE_SANITY_CHECK 
+#ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
 	dgAssert (SanityCheck ());
 #endif
 	return m_last;
@@ -360,7 +360,7 @@ typename dgList<T>::dgListNode *dgList<T>::Append (const T &element)
 	} else {
 		m_last = new (m_allocator) dgListNode(element, m_last, NULL);
 	}
-#ifdef __ENABLE_SANITY_CHECK 
+#ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
 	dgAssert (SanityCheck ());
 #endif
 
@@ -380,7 +380,7 @@ typename dgList<T>::dgListNode *dgList<T>::Addtop (dgListNode* const node)
 		m_first->AddFirst(node);
 		m_first = node;
 	}
-#ifdef __ENABLE_SANITY_CHECK 
+#ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
 	dgAssert (SanityCheck ());
 #endif
 	return m_first;
@@ -397,7 +397,7 @@ typename dgList<T>::dgListNode *dgList<T>::Addtop ()
 	} else {
 		m_first = new (m_allocator) dgListNode(NULL, m_first);
 	}
-#ifdef __ENABLE_SANITY_CHECK 
+#ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
 	dgAssert (SanityCheck ());
 #endif
 	return m_first;
@@ -414,7 +414,7 @@ typename dgList<T>::dgListNode *dgList<T>::Addtop (const T &element)
 	} else {
 		m_first = new (m_allocator) dgListNode(element, NULL, m_first);
 	}
-#ifdef __ENABLE_SANITY_CHECK 
+#ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
 	dgAssert (SanityCheck ());
 #endif
 	return m_first;
@@ -504,7 +504,7 @@ void dgList<T>::RotateToEnd (dgListNode* const node)
 		}
 	}
 
-#ifdef __ENABLE_SANITY_CHECK 
+#ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
 	dgAssert (SanityCheck ());
 #endif
 }
@@ -523,7 +523,7 @@ void dgList<T>::RotateToBegin (dgListNode* const node)
 		}
 	}
 
-#ifdef __ENABLE_SANITY_CHECK 
+#ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
 	dgAssert (SanityCheck ());
 #endif
 }
@@ -578,7 +578,7 @@ void dgList<T>::Unlink (dgListNode* const node)
 	}
 	node->Unlink();
 
-#ifdef __ENABLE_SANITY_CHECK 
+#ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
 	dgAssert (SanityCheck ());
 #endif
 }
@@ -601,7 +601,7 @@ void dgList<T>::Merge (dgList<T>& list)
 	list.m_count = 0;
 	list.m_last = NULL;
 	list.m_first = NULL;
-#ifdef __ENABLE_SANITY_CHECK 
+#ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
 	dgAssert (SanityCheck ());
 #endif
 }

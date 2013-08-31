@@ -454,7 +454,7 @@ typename dgTree<OBJECT, KEY>::dgTreeNode* dgTree<OBJECT, KEY>::FindGreater (KEY 
 		}
 	}
 
-#ifdef __ENABLE_SANITY_CHECK
+#ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK
 	if (prev) {
 		Iterator iter (*this);
 		for (iter.Begin(); iter.GetNode() != prev; iter ++) {
@@ -493,7 +493,7 @@ typename dgTree<OBJECT, KEY>::dgTreeNode* dgTree<OBJECT, KEY>::FindGreaterEqual 
 		}
 	}
 
-#ifdef __ENABLE_SANITY_CHECK
+#ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK
 	if (prev) {
 		Iterator iter (*this);
 		for (iter.Begin(); iter.GetNode() != prev; iter ++) {
@@ -534,7 +534,7 @@ typename dgTree<OBJECT, KEY>::dgTreeNode* dgTree<OBJECT, KEY>::FindLessEqual (KE
 
 	}
 
-#ifdef __ENABLE_SANITY_CHECK
+#ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK
 	if (prev) {
 		Iterator iter (*this);
 		for (iter.End(); iter.GetNode() != prev; iter --) {

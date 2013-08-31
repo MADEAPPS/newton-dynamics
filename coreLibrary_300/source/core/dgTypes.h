@@ -171,7 +171,7 @@
 #define	DG_MAX_THREADS_HIVE_COUNT		16
 
 #ifdef _DEBUG
-//#define __ENABLE_SANITY_CHECK 
+//#define __ENABLE_DG_CONTAINERS_SANITY_CHECK 
 #endif
 
 
