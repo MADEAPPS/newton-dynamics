@@ -61,7 +61,7 @@ dgCollisionInstance::dgCollisionInstance()
 	,m_childShape (NULL)
 	,m_scaleIsUnit(true)
 	,m_scaleIsUniform(true)
-	,m_collisionMode(true)
+	,m_collisionMode(1)
 {
 }
 
@@ -79,7 +79,7 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const world, const dgCol
 	,m_childShape (childCollision)
 	,m_scaleIsUnit (true)
 	,m_scaleIsUniform (true)
-	,m_collisionMode(true)
+	,m_collisionMode(1)
 {
 	m_childShape->AddRef();
 }
@@ -140,7 +140,7 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 	,m_childShape (NULL)
 	,m_scaleIsUnit (true)
 	,m_scaleIsUniform (true)
-	,m_collisionMode(true)
+	,m_collisionMode(1)
 {
 	dgInt32 saved;
 	dgInt32 signature;
@@ -153,6 +153,7 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 	deserialization (userData, &m_maxScale, sizeof (m_maxScale));
 	deserialization (userData, &m_userDataID, sizeof (m_userDataID));
 	deserialization (userData, &m_flags, sizeof (m_flags));
+	deserialization (userData, &m_collisionMode, sizeof (m_collisionMode));
 	deserialization (userData, &primitive, sizeof (primitive));
 	deserialization (userData, &signature, sizeof (signature));
 	deserialization (userData, &saved, sizeof (saved));
@@ -326,6 +327,7 @@ void dgCollisionInstance::Serialize(dgSerialize callback, void* const userData, 
 	callback (userData, &m_maxScale, sizeof (m_maxScale));
 	callback (userData, &m_userDataID, sizeof (m_userDataID));
 	callback (userData, &m_flags, sizeof (m_flags));
+	callback (userData, &m_collisionMode, sizeof (m_collisionMode));
 	callback (userData, &primitiveType, sizeof (primitiveType));
 	callback (userData, &signature, sizeof (signature));
 	callback (userData, &save, sizeof (save));

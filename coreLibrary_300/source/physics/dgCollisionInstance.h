@@ -128,9 +128,11 @@ class dgCollisionInstance
 		struct {
 			dgInt32 m_scaleIsUnit		:1;
 			dgInt32 m_scaleIsUniform	:1;
-			dgInt32 m_collisionMode		:1;
+			
 		};
 	};
+
+	dgInt32 m_collisionMode;
 
 	static dgVector m_padding;
 };
@@ -143,7 +145,6 @@ DG_INLINE dgCollisionInstance::dgCollisionInstance(const dgCollisionInstance& me
 	,m_maxScale(meshInstance.m_maxScale)
 	,m_userDataID(meshInstance.m_userDataID)
 	,m_refCount(1)
-//	,m_userData(meshInstance.m_userData)
 	,m_userData(NULL)
 	,m_world(meshInstance.m_world)
 	,m_childShape (shape)
@@ -259,10 +260,8 @@ DG_INLINE bool dgCollisionInstance::GetCollisionMode() const
 
 DG_INLINE void dgCollisionInstance::SetCollisionMode(bool mode)
 {
-	m_collisionMode = mode;
+	m_collisionMode = mode ? 1 : 0;
 }
-
-
 
 
 DG_INLINE void dgCollisionInstance::SetBreakImpulse(dgFloat32 force)
