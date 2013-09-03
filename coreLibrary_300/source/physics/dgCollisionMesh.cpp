@@ -296,8 +296,8 @@ dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const casti
 
 	dgMatrix matrix (hullMatrix * soupMatrix.Inverse());
 
-	const dgVector& scale = referenceCollision->m_scale;
-	const dgVector& invScale = referenceCollision->m_invScale;
+	const dgVector& scale = referenceCollision->GetScale();
+	const dgVector& invScale = referenceCollision->GetInvScale();
 
 	dgMatrix polySoupScaledMatrix (invScale.CompProduct4(matrix[0]), invScale.CompProduct4(matrix[1]), invScale.CompProduct4(matrix[2]), invScale.CompProduct4(matrix[3])); 
 	dgPolygonMeshDesc data;

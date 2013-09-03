@@ -380,7 +380,7 @@ void DebugRenderWorldCollision (const NewtonWorld* const world, DEBUG_DRAW_MODE 
 			//SERIALIZE_ID_COMPOUND:
 			//SERIALIZE_ID_CLOTH_PATCH:
 			//SERIALIZE_ID_DEFORMABLE_SOLID:
-			case SERIALIZE_ID_TREE:
+//			case SERIALIZE_ID_TREE:
 			case SERIALIZE_ID_SCENE:
 			case SERIALIZE_ID_USERMESH:
 			case SERIALIZE_ID_HEIGHTFIELD:
@@ -450,12 +450,9 @@ void ShowMeshCollidingFaces (const NewtonBody* const staticCollisionBody, const 
 				debugDisplayCount  += 2;
 				l0 = l1;
 			}
-	
-
 			// unlock the critical section
 			NewtonWorldCriticalSectionUnlock (NewtonBodyGetWorld (staticCollisionBody));
 		}
-
 	}
 #endif
 }

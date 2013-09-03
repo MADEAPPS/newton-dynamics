@@ -52,6 +52,9 @@ class dgCollisionInstance
 	const dgVector& GetScale () const;
 	const dgVector& GetInvScale () const;
 
+	dgScaleType GetScaleType() const;
+	dgScaleType GetCombinedScaleType(dgScaleType type) const;
+
 	const dgMatrix& GetLocalMatrix () const;
 	const dgMatrix& GetGlobalMatrix () const;
 	void SetLocalMatrix (const dgMatrix& matrix);
@@ -122,17 +125,8 @@ class dgCollisionInstance
 	void* m_userData;
 	const dgWorld* m_world;
 	const dgCollision* m_childShape;
-	union 
-	{
-		dgUnsigned32 m_flags;
-		struct {
-			dgInt32 m_scaleIsUnit		:1;
-			dgInt32 m_scaleIsUniform	:1;
-			
-		};
-	};
-
 	dgInt32 m_collisionMode;
+	dgScaleType m_scaleType;
 
 	static dgVector m_padding;
 };
@@ -148,9 +142,10 @@ DG_INLINE dgCollisionInstance::dgCollisionInstance(const dgCollisionInstance& me
 	,m_userData(NULL)
 	,m_world(meshInstance.m_world)
 	,m_childShape (shape)
-	,m_scaleIsUnit (meshInstance.m_scaleIsUnit)
-	,m_scaleIsUniform (meshInstance.m_scaleIsUniform)
+//	,m_scaleIsUnit (meshInstance.m_scaleIsUnit)
+//	,m_scaleIsUniform (meshInstance.m_scaleIsUniform)
 	,m_collisionMode(meshInstance.m_collisionMode)
+	,m_scaleType(meshInstance.m_scaleType)
 {
 	m_childShape->AddRef();
 }
@@ -249,7 +244,17 @@ DG_INLINE dgMemoryAllocator* dgCollisionInstance::GetAllocator() const
 
 DG_INLINE dgFloat32 dgCollisionInstance::GetVolume () const
 {
-	return m_childShape->GetVolume() * m_scale.m_x * m_scale.m_y * m_scale.m_z;
+	switch (m_scaleType)
+	{
+		case m_unit:
+		case m_uniform:
+		case m_nonUniform:
+			return m_childShape->GetVolume() * m_scale.m_x * m_scale.m_y * m_scale.m_z;
+
+		default:
+			dgAssert (0);
+			return m_childShape->GetVolume() * m_scale.m_x * m_scale.m_y * m_scale.m_z;
+	}
 }
 
 
@@ -327,14 +332,28 @@ DG_INLINE dgFloat32 dgCollisionInstance::GetBoxMaxRadius () const
 DG_INLINE dgVector dgCollisionInstance::SupportVertex(const dgVector& dir, dgInt32* const vertexIndex) const
 {
 	dgAssert (dgAbsf(dir % dir - dgFloat32 (1.0f)) < dgFloat32 (1.0e-2f));
+	dgAssert (dir.m_w == dgFloat32 (0.0f));
+	switch (m_scaleType)
+	{
+		case m_unit:
+		{
+			return m_childShape->SupportVertex (dir, vertexIndex);
+		}
+		case m_uniform:
+		{
+			return m_scale.CompProduct4 (m_childShape->SupportVertex (dir, vertexIndex));
+		}
+		case m_nonUniform:
+		{
+			// support((p * S), n) = S * support (p, n * transp(S)) 
+			dgVector dir1 (m_scale.CompProduct4(dir));
+			dir1 = dir1.CompProduct4(dir1.InvMagSqrt());
+			return m_scale.CompProduct4(m_childShape->SupportVertex (dir1, vertexIndex));
+		}
+		default:
+			dgAssert(0);
+			return dgVector(0.0f);
 
-	if (m_scaleIsUniform) {
-		return m_scale.CompProduct3 (m_childShape->SupportVertex (dir, vertexIndex));
-	} else {
-		// support((p * m), n) = m * support (p, n * trans(m)) 
-		dgVector dir1 (m_scale.CompProduct3(dir));
-		dir1 = dir1.Scale3 (dgRsqrt (dir1 % dir1));
-		return m_scale.CompProduct3(m_childShape->SupportVertex (dir1, vertexIndex));
 	}
 }
 
@@ -360,18 +379,50 @@ DG_INLINE dgInt32 dgCollisionInstance::GetConvexVertexCount() const
 
 DG_INLINE dgVector dgCollisionInstance::GetBoxSize() const
 {
-	return m_childShape->m_boxSize.CompProduct3(m_scale);
+	switch (m_scaleType)
+	{
+		case m_unit:
+		case m_uniform:
+		case m_nonUniform:
+			return m_childShape->m_boxSize.CompProduct4(m_scale);
+
+		default:
+			dgAssert (0);
+			return m_childShape->m_boxSize.CompProduct4(m_scale);
+	}
 }
 
 DG_INLINE dgVector dgCollisionInstance::GetBoxOrigin() const
 {
-	return m_childShape->m_boxOrigin.CompProduct3(m_scale);
+//	return m_childShape->m_boxOrigin.CompProduct3(m_scale);
+	switch (m_scaleType)
+	{
+		case m_unit:
+		case m_uniform:
+		case m_nonUniform:
+			return m_childShape->m_boxOrigin.CompProduct4(m_scale);
+
+		default:
+			dgAssert (0);
+			return m_childShape->m_boxOrigin.CompProduct4(m_scale);
+	}
 }
 
 DG_INLINE dgFloat32 dgCollisionInstance::GetUmbraClipSize () const
 {
 	return m_childShape->GetUmbraClipSize() * m_maxScale.m_x;
 }
+
+DG_INLINE dgCollisionInstance::dgScaleType dgCollisionInstance::GetScaleType() const
+{
+	return m_scaleType;
+}
+
+DG_INLINE dgCollisionInstance::dgScaleType dgCollisionInstance::GetCombinedScaleType(dgCollisionInstance::dgScaleType type) const
+{
+	return dgMax(m_scaleType, type);
+}
+
 
 #endif 
 

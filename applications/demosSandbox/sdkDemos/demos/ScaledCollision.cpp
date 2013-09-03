@@ -33,7 +33,6 @@ static void AddUniformScaledPrimitives (DemoEntityManager* const scene, dFloat m
 		for (int j = 0; j < zCount; j ++) {
 
 			dFloat scale = 0.5f + 2.0f * dFloat (dRand()) / dFloat(dRAND_MAX);
-			//scale = 1.0f;
 			NewtonCollisionSetScale (collision, scale, scale, scale);
 			DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
@@ -64,6 +63,7 @@ static void AddNonUniformScaledPrimitives (DemoEntityManager* const scene, dFloa
 
 	dFloat startElevation = 1000.0f;
 	dMatrix matrix (GetIdentityMatrix());
+	//matrix = dPitchMatrix(-10.0f * 3.141592f/180.0f) * dYawMatrix(-10.0f * 3.141592f/180.0f) * dRollMatrix(10.0f * 3.141592f/180.0f);
 	for (int i = 0; i < xCount; i ++) {
 		dFloat x = origin.m_x + (i - xCount / 2) * spacing;
 		for (int j = 0; j < zCount; j ++) {
@@ -72,9 +72,6 @@ static void AddNonUniformScaledPrimitives (DemoEntityManager* const scene, dFloa
 			dFloat scaley = 0.5f + 2.0f * dFloat (dRand()) / dFloat(dRAND_MAX);
 			dFloat scalez = 0.5f + 2.0f * dFloat (dRand()) / dFloat(dRAND_MAX);
 
-			//scalex = 0.5f;
-			//scaley = 0.75f;
-			//scalez = 1.5f;
 			NewtonCollisionSetScale(collision, scalex, scaley, scalez);
 			DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
@@ -104,7 +101,6 @@ static void AddNonUniformScaledPrimitives (DemoEntityManager* const scene, dFloa
 static void CreateScaleStaticMesh (NewtonBody* const body, DemoEntityManager* const scene, const dMatrix& location, const dVector& scaleIn)
 {
 	dVector scale(scaleIn);
-//	scale = dVector (1,1,1,0);
 
 	DemoEntity* const entity = (DemoEntity*) NewtonBodyGetUserData(body);
 
@@ -139,56 +135,6 @@ static void CreateScaleStaticMesh (NewtonBody* const body, DemoEntityManager* co
 //	// note: scaling a collision mesh does not updates the broadPhase, this function is a util that do update broadphase
 	NewtonBodySetCollisionScale (scaledBody, scale.m_x, scale.m_y, scale.m_z);
 }
-
-
-
-
-
-void NonUniformScaledCollision (DemoEntityManager* const scene)
-{
-	// load the skybox
-	scene->CreateSkyBox();
-
-	// load the scene from a ngd file format
-	CreateLevelMesh (scene, "flatPlane.ngd", 0);
-	//	CreateLevelMesh (scene, "sponza.ngd", 0);
-	//	CreateLevelMesh (scene, "cattle.ngd", fileName);
-	//	CreateLevelMesh (scene, "playground.ngd", 0);
-
-	// place camera into position
-	//	dQuaternion rot;
-	//	dVector posit (0.0f, 1.0f, 0.0f, 0.0f);
-	//	scene->SetCameraMatrix(rot, posit);
-
-	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
-	dQuaternion rot (camMatrix);
-	//	dVector origin (-30.0f, 40.0f, -15.0f, 0.0f);
-	dVector origin (-10.0f, 5.0f, -15.0f, 0.0f);
-	scene->SetCameraMatrix(rot, origin);
-
-	NewtonWorld* const world = scene->GetNewton();
-	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (world);
-	dVector location (0.0f, 0.0f, 0.0f, 0.0f);
-	dVector size (0.5f, 0.5f, 0.75f, 0.0f);
-	//dVector size (1.0f, 1.0f, 1.0f, 0.0f);
-
-	int count = 5;
-	dMatrix shapeOffsetMatrix (dRollMatrix(3.141592f/2.0f));
-	//shapeOffsetMatrix = GetIdentityMatrix();
-	shapeOffsetMatrix.m_posit.m_y = 0.0f;
-
-	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _TAPERED_CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _TAPERED_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-}
-
 
 
 
@@ -236,7 +182,52 @@ void UniformScaledCollision(DemoEntityManager* const scene)
 	AddUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _COMPOUND_CONVEX_CRUZ_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _COMPOUND_CONVEX_CRUZ_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+}
+
+
+void NonUniformScaledCollision (DemoEntityManager* const scene)
+{
+	// load the skybox
+	scene->CreateSkyBox();
+
+	// load the scene from a ngd file format
+	CreateLevelMesh (scene, "flatPlane.ngd", 0);
+	//	CreateLevelMesh (scene, "sponza.ngd", 0);
+	//	CreateLevelMesh (scene, "cattle.ngd", fileName);
+	//	CreateLevelMesh (scene, "playground.ngd", 0);
+
+	// place camera into position
+	//	dQuaternion rot;
+	//	dVector posit (0.0f, 1.0f, 0.0f, 0.0f);
+	//	scene->SetCameraMatrix(rot, posit);
+
+	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
+	dQuaternion rot (camMatrix);
+	//	dVector origin (-30.0f, 40.0f, -15.0f, 0.0f);
+	dVector origin (-10.0f, 5.0f, -15.0f, 0.0f);
+	scene->SetCameraMatrix(rot, origin);
+
+	NewtonWorld* const world = scene->GetNewton();
+	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (world);
+	dVector location (0.0f, 0.0f, 0.0f, 0.0f);
+	dVector size (0.5f, 0.5f, 0.75f, 0.0f);
+	//dVector size (1.0f, 1.0f, 1.0f, 0.0f);
+
+	int count = 5;
+	dMatrix shapeOffsetMatrix (dRollMatrix(3.141592f/2.0f));
+	shapeOffsetMatrix.m_posit.m_y = 0.0f;
+
+	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _TAPERED_CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _TAPERED_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 }
 
 
@@ -247,20 +238,16 @@ void ScaledMeshCollision (DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 	// load the scene from a ngd file format
-//	CreateLevelMesh (scene, "flatPlane.ngd", 1);
-//	CreateLevelMesh (scene, "flatPlaneDoubleFace.ngd", 1);
+	CreateLevelMesh (scene, "flatPlane.ngd", 1);
+	//CreateLevelMesh (scene, "flatPlaneDoubleFace.ngd", 1);
 	//CreateLevelMesh (scene, "sponza.ngd", 0);
-	//	CreateLevelMesh (scene, "cattle.ngd", fileName);
-	CreateLevelMesh (scene, "playground.ngd", 0);
-
-	// place camera into position
-	//	dQuaternion rot;
-	//	dVector posit (0.0f, 1.0f, 0.0f, 0.0f);
-	//	scene->SetCameraMatrix(rot, posit);
+	//CreateLevelMesh (scene, "cattle.ngd", fileName);
+	//CreateLevelMesh (scene, "playground.ngd", 0);
 
 	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
 	dQuaternion rot (camMatrix);
 	dVector origin (-15.0f, 10.0f, -20.0f, 0.0f);
+origin = origin.Scale (0.25f);
 	scene->SetCameraMatrix(rot, origin);
 
 
@@ -284,21 +271,21 @@ void ScaledMeshCollision (DemoEntityManager* const scene)
 	unitScaledEntity->ResetMatrix(*scene, matrix);
 
 	matrix.m_posit.m_z = -5.0f;
-	//CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (0.75f, 0.75f, 0.75f, 0.0f));
-	CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (1.0f, 1.0f, 1.0f, 0.0f));
+	CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (0.75f, 0.75f, 0.75f, 0.0f));
+	//CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (1.0f, 1.0f, 1.0f, 0.0f));
 
 	matrix.m_posit.m_z = 5.0f;
-	//CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (1.5f, 1.5f, 1.5f, 0.0f));
-	CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (1.0f, 1.0f, 1.0f, 0.0f));
+	CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (1.5f, 1.5f, 1.5f, 0.0f));
+	//CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (1.0f, 1.0f, 1.0f, 0.0f));
 
 	matrix.m_posit.m_z = 0.0f;
 	matrix.m_posit.m_x = -5.0f;
-	//	CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (1.0f, 1.0f, 2.0f, 0.0f));
-	CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (1.0f, 1.0f, 1.0f, 0.0f));
+	CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (1.0f, 1.0f, 2.0f, 0.0f));
+	//CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (1.0f, 1.0f, 1.0f, 0.0f));
 
 	matrix.m_posit.m_x = 5.0f;
-	//	CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (2.0f, 1.0f, 1.0f, 0.0f));
-	CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (1.0f, 1.0f, 1.0f, 0.0f));
+	CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (2.0f, 1.0f, 1.0f, 0.0f));
+	//CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (1.0f, 1.0f, 1.0f, 0.0f));
 
 
 	dVector size (0.5f, 0.5f, 0.75f, 0.0f);
@@ -314,10 +301,10 @@ void ScaledMeshCollision (DemoEntityManager* const scene)
 	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _TAPERED_CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _TAPERED_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _TAPERED_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 }

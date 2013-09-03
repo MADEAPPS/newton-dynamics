@@ -28,8 +28,8 @@
 #include "dgCollisionInstance.h"
 
 
-//#define DG_MAX_COLLIDING_FACES			256
-#define DG_MAX_COLLIDING_FACES				128
+#define DG_MAX_COLLIDING_FACES				256
+//#define DG_MAX_COLLIDING_FACES			128
 #define DG_MAX_COLLIDING_INDICES			(DG_MAX_COLLIDING_FACES * (4 * 2 + 3))
 
 

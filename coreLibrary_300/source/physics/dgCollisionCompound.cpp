@@ -885,9 +885,9 @@ void dgCollisionCompound::ApplyScale (const dgVector& scale)
 		dgCollisionInstance* const collision = node->GetShape();
 
 		dgMatrix localScale (dgGetIdentityMatrix());
-		localScale[0][0] = collision->m_scale.m_x;
-		localScale[1][1] = collision->m_scale.m_y;
-		localScale[2][2] = collision->m_scale.m_z;
+		localScale[0][0] = collision->GetScale().m_x;
+		localScale[1][1] = collision->GetScale().m_y;
+		localScale[2][2] = collision->GetScale().m_z;
 
 		const dgMatrix& localMatrix = collision->GetLocalMatrix();
 		dgMatrix matrix (localScale * localMatrix * scaleMatrix);

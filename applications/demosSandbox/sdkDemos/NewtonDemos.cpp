@@ -41,7 +41,7 @@
 //#define DEFAULT_SCENE	15			// simple Archimedes buoyancy
 //#define DEFAULT_SCENE	16			// uniform Scaled Collision
 //#define DEFAULT_SCENE	17			// non Uniform Scaled Collision
-//#define DEFAULT_SCENE	18			// scaled mesh collision
+#define DEFAULT_SCENE	18			// scaled mesh collision
 //#define DEFAULT_SCENE	19			// simple convex decomposition
 //#define DEFAULT_SCENE	20			// scene Collision
 //#define DEFAULT_SCENE	21          // simple boolean operators 
@@ -51,7 +51,7 @@
 //#define DEFAULT_SCENE	25			// continue collision
 //#define DEFAULT_SCENE	26			// puck slide continue collision
 //#define DEFAULT_SCENE	27			// articulated joints
-#define DEFAULT_SCENE	28			// basic rag doll
+//#define DEFAULT_SCENE	28			// basic rag doll
 //#define DEFAULT_SCENE	29			// basic car
 //#define DEFAULT_SCENE	30			// high performance super car
 //#define DEFAULT_SCENE	31			// basic player controller
@@ -313,6 +313,9 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 
 m_showStatistics = true;
 //m_debugDisplayMode = 2;
+//m_hideVisualMeshes = true;
+//SetDebugDisplayMode(2);
+
 //m_autoSleepState = false;
 //m_useParallelSolver = true;
 //m_scene->m_showProfiler[6] = 1;

@@ -59,9 +59,8 @@ dgCollisionInstance::dgCollisionInstance()
 	,m_userData(NULL)
 	,m_world(NULL)
 	,m_childShape (NULL)
-	,m_scaleIsUnit(true)
-	,m_scaleIsUniform(true)
 	,m_collisionMode(1)
+	,m_scaleType(m_unit)
 {
 }
 
@@ -77,9 +76,8 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const world, const dgCol
 	,m_userData(NULL)
 	,m_world(world)
 	,m_childShape (childCollision)
-	,m_scaleIsUnit (true)
-	,m_scaleIsUniform (true)
 	,m_collisionMode(1)
+	,m_scaleType(m_unit)
 {
 	m_childShape->AddRef();
 }
@@ -95,9 +93,8 @@ dgCollisionInstance::dgCollisionInstance(const dgCollisionInstance& instance)
 	,m_userData(instance.m_userData)
 	,m_world(instance.m_world)
 	,m_childShape (instance.m_childShape)
-	,m_scaleIsUnit (instance.m_scaleIsUnit)
-	,m_scaleIsUniform (instance.m_scaleIsUniform)
 	,m_collisionMode(instance.m_collisionMode)
+	,m_scaleType(instance.m_scaleType)
 {
 	if (m_childShape->IsType (dgCollision::dgCollisionCompound_RTTI)) {
 		if (m_childShape->IsType (dgCollision::dgCollisionCompoundBreakable_RTTI)) {
@@ -138,25 +135,27 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 	,m_userData(NULL)
 	,m_world(constWorld)
 	,m_childShape (NULL)
-	,m_scaleIsUnit (true)
-	,m_scaleIsUniform (true)
 	,m_collisionMode(1)
+	,m_scaleType(m_unit)
 {
 	dgInt32 saved;
 	dgInt32 signature;
 	dgInt32 primitive;
+	dgInt32 scaleType;
 	
 	deserialization (userData, &m_globalMatrix, sizeof (m_globalMatrix));
 	deserialization (userData, &m_localMatrix, sizeof (m_localMatrix));
 	deserialization (userData, &m_scale, sizeof (m_scale));
-	deserialization (userData, &m_invScale, sizeof (m_scale));
+	deserialization (userData, &m_invScale, sizeof (m_invScale));
 	deserialization (userData, &m_maxScale, sizeof (m_maxScale));
 	deserialization (userData, &m_userDataID, sizeof (m_userDataID));
-	deserialization (userData, &m_flags, sizeof (m_flags));
 	deserialization (userData, &m_collisionMode, sizeof (m_collisionMode));
+	deserialization (userData, &scaleType, sizeof (scaleType));
 	deserialization (userData, &primitive, sizeof (primitive));
 	deserialization (userData, &signature, sizeof (signature));
 	deserialization (userData, &saved, sizeof (saved));
+
+	m_scaleType = dgScaleType(scaleType);
 
 	dgWorld* const world = (dgWorld*) constWorld;
 	if (saved) {
@@ -319,6 +318,7 @@ void dgCollisionInstance::Serialize(dgSerialize callback, void* const userData, 
 	dgInt32 save = saveShape ? 1 : 0;
 	dgInt32 primitiveType = m_childShape->GetCollisionPrimityType();
 	dgInt32 signature = m_childShape->GetSignature();
+	dgInt32 scaleType = m_scaleType;
 
 	callback (userData, &m_globalMatrix, sizeof (m_globalMatrix));
 	callback (userData, &m_localMatrix, sizeof (m_localMatrix));
@@ -326,8 +326,8 @@ void dgCollisionInstance::Serialize(dgSerialize callback, void* const userData, 
 	callback (userData, &m_invScale, sizeof (m_invScale));
 	callback (userData, &m_maxScale, sizeof (m_maxScale));
 	callback (userData, &m_userDataID, sizeof (m_userDataID));
-	callback (userData, &m_flags, sizeof (m_flags));
 	callback (userData, &m_collisionMode, sizeof (m_collisionMode));
+	callback (userData, &scaleType, sizeof (scaleType));
 	callback (userData, &primitiveType, sizeof (primitiveType));
 	callback (userData, &signature, sizeof (signature));
 	callback (userData, &save, sizeof (save));
@@ -348,27 +348,27 @@ void dgCollisionInstance::SetScale (const dgVector& scale)
 	dgAssert (scaleZ > dgFloat32 (0.0f));
 
 	if ((dgAbsf (scaleX - scaleY) < dgFloat32 (1.0e-3f)) && (dgAbsf (scaleX - scaleZ) < dgFloat32 (1.0e-3f))) {
-		m_scaleIsUniform = 1;
 		if ((dgAbsf (scaleX - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f))) {
-			m_scaleIsUnit = 1;
+			m_scaleType = m_unit;
 			m_scale	= dgVector (dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f));	
 			m_maxScale = m_scale;	
 			m_invScale = m_scale;
 		} else {
-			m_scaleIsUnit = 0;
+			m_scaleType = m_uniform;
 			m_scale	= dgVector (scaleX, scaleX, scaleX, dgFloat32 (0.0f));	
 			m_maxScale = m_scale;	
 			m_invScale = dgVector (dgFloat32 (1.0f) / scaleX, dgFloat32 (1.0f) / scaleX, dgFloat32 (1.0f) / scaleX, dgFloat32 (0.0f));	
 		}
 	} else {
-		m_scaleIsUnit = 0;
-		m_scaleIsUniform = 0;
+		m_scaleType = m_nonUniform;
 		m_maxScale = dgMax(scaleX, scaleY, scaleZ);
 		m_scale	= dgVector (scaleX, scaleY, scaleZ, dgFloat32 (0.0f));	
 		m_invScale = dgVector (dgFloat32 (1.0f) / scaleX, dgFloat32 (1.0f) / scaleY, dgFloat32 (1.0f) / scaleZ, dgFloat32 (0.0f));	
 	}
 
 	if (GetCollisionPrimityType() == m_compoundCollision) {
+		dgAssert(0);
+/*
 		dgCollisionCompound* const compound = (dgCollisionCompound*) m_childShape;
 		compound->ApplyScale(m_scale);
 
@@ -377,6 +377,7 @@ void dgCollisionInstance::SetScale (const dgVector& scale)
 		m_scale	= dgVector (dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f));	
 		m_maxScale = m_scale;	
 		m_invScale = m_scale;
+*/
 	}
 }
 
@@ -399,11 +400,25 @@ void dgCollisionInstance::SetLocalMatrix (const dgMatrix& matrix)
 
 void dgCollisionInstance::DebugCollision (const dgMatrix& matrix, OnDebugCollisionMeshCallback callback, void* const userData) const
 {
-	dgMatrix scaledMatrix (m_localMatrix * matrix);
-	scaledMatrix[0] = scaledMatrix[0].Scale3 (m_scale[0]);
-	scaledMatrix[1] = scaledMatrix[1].Scale3 (m_scale[1]);
-	scaledMatrix[2] = scaledMatrix[2].Scale3 (m_scale[2]);
-	m_childShape->DebugCollision (scaledMatrix, callback, userData);
+	switch (m_scaleType)
+	{
+		case m_unit:
+		case m_uniform:
+		case m_nonUniform:
+		{
+			dgMatrix scaledMatrix (m_localMatrix * matrix);
+			scaledMatrix[0] = scaledMatrix[0].Scale3 (m_scale[0]);
+			scaledMatrix[1] = scaledMatrix[1].Scale3 (m_scale[1]);
+			scaledMatrix[2] = scaledMatrix[2].Scale3 (m_scale[2]);
+			m_childShape->DebugCollision (scaledMatrix, callback, userData);
+			break;
+		}
+
+		default:
+		{
+			dgAssert (0);
+		}
+	}
 }
 
 
@@ -412,7 +427,21 @@ dgMatrix dgCollisionInstance::CalculateInertia () const
 	if (IsType(dgCollision::dgCollisionMesh_RTTI)) {
 		return dgGetZeroMatrix();
 	} else {
-		return m_childShape->CalculateInertiaAndCenterOfMass (m_scale, m_localMatrix);
+		switch (m_scaleType)
+		{
+			case m_unit:
+			case m_uniform:
+			case m_nonUniform:
+			{
+				return m_childShape->CalculateInertiaAndCenterOfMass (m_scale, m_localMatrix);
+			}
+
+			default:
+			{
+				dgAssert (0);
+				return m_childShape->CalculateInertiaAndCenterOfMass (m_scale, m_localMatrix);
+			}
+		}
 	}
 }
 
@@ -420,16 +449,39 @@ dgMatrix dgCollisionInstance::CalculateInertia () const
 dgInt32 dgCollisionInstance::CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const
 {
 	dgInt32 count = 0;
-	dgVector normal1 (normal);
-	dgVector point1 (m_invScale.CompProduct4(point));
-	if (!m_scaleIsUniform) {
-		normal1 = m_scale.CompProduct3(normal1);
-		normal1 = normal1.Scale3 (dgRsqrt (normal1 % normal1));
-	}
+	dgAssert(normal.m_w == dgFloat32 (0.0f));
+	switch (m_scaleType)
+	{
+		case m_unit:
+		{
+			count = m_childShape->CalculatePlaneIntersection (normal, point, contactsOut);
+			break;
+		}
+		case m_uniform:
+		{
+			dgVector point1 (m_invScale.CompProduct4(point));
+			count = m_childShape->CalculatePlaneIntersection (normal, point1, contactsOut);
+			for (dgInt32 i = 0; i < count; i ++) {
+				contactsOut[i] = m_scale.CompProduct4(contactsOut[i]);
+			}
+			break;
+		}
 
-	count = m_childShape->CalculatePlaneIntersection (normal1, point1, contactsOut);
-	for (dgInt32 i = 0; i < count; i ++) {
-		contactsOut[i] = m_scale.CompProduct4(contactsOut[i]);
+		case m_nonUniform:
+		{
+			// support((p * S), n) = S * support (p, n * transp(S)) 
+			dgVector point1 (m_invScale.CompProduct4(point));
+			dgVector normal1 (m_scale.CompProduct4(normal));
+			normal1 = normal1.CompProduct4(normal1.InvMagSqrt());
+			count = m_childShape->CalculatePlaneIntersection (normal1, point1, contactsOut);
+			for (dgInt32 i = 0; i < count; i ++) {
+				contactsOut[i] = m_scale.CompProduct4(contactsOut[i]);
+			}
+			break;
+		}
+
+		default:
+			dgAssert(0);
 	}
 	return count;
 }
@@ -446,68 +498,129 @@ void dgCollisionInstance::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVect
 dgFloat32 dgCollisionInstance::RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, OnRayPrecastAction preFilter, const dgBody* const body, void* const userData) const
 {
 	if (!preFilter || preFilter(body, this, userData)) {
-		if (m_scaleIsUnit) {
-			dgFloat32 t = m_childShape->RayCast (localP0, localP1, maxT, contactOut, body, userData);
-			if (t <= maxT) {
-				if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
-					contactOut.m_shapeId0 = GetUserDataID();
-					contactOut.m_shapeId1 = GetUserDataID();
+		switch(m_scaleType)
+		{
+			case m_unit:
+			{
+				dgFloat32 t = m_childShape->RayCast (localP0, localP1, maxT, contactOut, body, userData);
+				if (t <= maxT) {
+					if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
+						contactOut.m_shapeId0 = GetUserDataID();
+						contactOut.m_shapeId1 = GetUserDataID();
+					}
+					contactOut.m_collision0 = this;
+					contactOut.m_collision1 = this;
 				}
-				contactOut.m_collision0 = this;
-				contactOut.m_collision1 = this;
+				return t;
 			}
-			return t;
-		} else {
-			dgVector p0 (localP0.CompProduct4(m_invScale));
-			dgVector p1 (localP1.CompProduct4(m_invScale));
-			dgFloat32 t = m_childShape->RayCast (p0, p1, maxT, contactOut, body, userData);
-			if (t <= maxT) {
-				if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
-//					contactOut.m_userId = GetUserDataID();
-					contactOut.m_shapeId0 = GetUserDataID();
-					contactOut.m_shapeId1 = GetUserDataID();
-					dgVector n (m_scale.CompProduct3 (contactOut.m_normal));
-					contactOut.m_normal = n.Scale3 (dgRsqrt (n % n));
+
+			case m_uniform:
+			{
+				dgVector p0 (localP0.CompProduct4(m_invScale));
+				dgVector p1 (localP1.CompProduct4(m_invScale));
+				dgFloat32 t = m_childShape->RayCast (p0, p1, maxT, contactOut, body, userData);
+				if (t <= maxT) {
+					if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
+						contactOut.m_shapeId0 = GetUserDataID();
+						contactOut.m_shapeId1 = GetUserDataID();
+					}
+					contactOut.m_collision0 = this;
+					contactOut.m_collision1 = this;
 				}
-				contactOut.m_collision0 = this;
-				contactOut.m_collision1 = this;
+				return t;
 			}
-			return t;
+
+			case m_nonUniform:
+			{
+				dgVector p0 (localP0.CompProduct4(m_invScale));
+				dgVector p1 (localP1.CompProduct4(m_invScale));
+				dgFloat32 t = m_childShape->RayCast (p0, p1, maxT, contactOut, body, userData);
+				if (t <= maxT) {
+					if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
+						contactOut.m_shapeId0 = GetUserDataID();
+						contactOut.m_shapeId1 = GetUserDataID();
+						dgVector n (m_invScale.CompProduct4 (contactOut.m_normal));
+						contactOut.m_normal = n.CompProduct4(n.InvMagSqrt());
+					}
+					contactOut.m_collision0 = this;
+					contactOut.m_collision1 = this;
+				}
+				return t;
+			}
+
+		
+			default:
+			{
+				dgAssert(0);
+/*
+				dgVector p0 (localP0.CompProduct4(m_invScale));
+				dgVector p1 (localP1.CompProduct4(m_invScale));
+				dgFloat32 t = m_childShape->RayCast (p0, p1, maxT, contactOut, body, userData);
+				if (t <= maxT) {
+					if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
+						contactOut.m_shapeId0 = GetUserDataID();
+						contactOut.m_shapeId1 = GetUserDataID();
+						dgVector n (m_invScale.CompProduct4 (contactOut.m_normal));
+						contactOut.m_normal = n.CompProduct4(n.InvMagSqrt());
+					}
+					contactOut.m_collision0 = this;
+					contactOut.m_collision1 = this;
+				}
+				return t;
+*/
+			}
 		}
 	}
-
 	return dgFloat32 (1.2f);
+
 }
 
 dgFloat32 dgCollisionInstance::ConvexRayCast (const dgCollisionInstance* const convexShape, const dgMatrix& convexShapeMatrix, const dgVector& localVeloc, dgFloat32 minT, dgContactPoint& contactOut, OnRayPrecastAction preFilter, const dgBody* const referenceBody, void* const userData, dgInt32 threadId) const
 {
+
 	if ((GetCollisionPrimityType() != m_nullCollision) && (!preFilter || preFilter(referenceBody, this, userData))) {
-		if (m_scaleIsUnit) {
-			dgFloat32 t = m_childShape->ConvexRayCast (convexShape, convexShapeMatrix, localVeloc, minT, contactOut, referenceBody, this, userData, threadId);
-			if (t <= minT) {
-				if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
-					contactOut.m_shapeId0 = GetUserDataID();
-					contactOut.m_shapeId1 = GetUserDataID();
+
+		switch(m_scaleType)
+		{
+			case m_unit:
+			{
+				dgFloat32 t = m_childShape->ConvexRayCast (convexShape, convexShapeMatrix, localVeloc, minT, contactOut, referenceBody, this, userData, threadId);
+				if (t <= minT) {
+					if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
+						contactOut.m_shapeId0 = GetUserDataID();
+						contactOut.m_shapeId1 = GetUserDataID();
+					}
+					contactOut.m_collision0 = this;
+					contactOut.m_collision1 = this;
 				}
-				contactOut.m_collision0 = this;
-				contactOut.m_collision1 = this;
+				return t;
 			}
-			return t;
-		} else {
-			dgAssert (0);
+			default:
+				dgAssert(0);
+
 		}
 	}
-
 	return dgFloat32 (1.2f);
+
 }
 
-//void dgBody::AddBuoyancyForce (dgFloat32 fluidDensity, dgFloat32 fluidLinearViscousity, dgFloat32 fluidAngularViscousity, const dgVector& gravityVector, GetBuoyancyPlane buoyancuPlane, void* const context)
 void dgCollisionInstance::CalculateBuoyancyAcceleration (const dgMatrix& matrix, const dgVector& origin, const dgVector& gravity, const dgVector& fluidPlane, dgFloat32 fluidDensity, dgFloat32 fluidViscosity, dgVector& accel, dgVector& alpha)
 {
 	dgMatrix scaledMatrix (m_localMatrix * matrix);
-	scaledMatrix[0] = scaledMatrix[0].Scale3 (m_scale[0]);
-	scaledMatrix[1] = scaledMatrix[1].Scale3 (m_scale[1]);
-	scaledMatrix[2] = scaledMatrix[2].Scale3 (m_scale[2]);
+
+	switch (m_scaleType)
+	{
+		case m_unit:
+		case m_uniform:
+		case m_nonUniform:
+		{
+			scaledMatrix[0] = scaledMatrix[0].Scale4 (m_scale[0]);
+			scaledMatrix[1] = scaledMatrix[1].Scale4 (m_scale[1]);
+			scaledMatrix[2] = scaledMatrix[2].Scale4 (m_scale[2]);
+		}
+		default:
+			dgAssert(0);
+	}
 
 	accel = dgVector (0.0f);
 	alpha = dgVector (0.0f);

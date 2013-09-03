@@ -674,7 +674,7 @@ void DemoEntityManager::UpdatePhysics(float timestep)
 	// read the controls 
 	// update the physics
 	if (m_world) {
-		//Sleep (10);
+//		Sleep (40);
 
 		dFloat timestepInSecunds = 1.0f / MAX_PHYSICS_FPS;
 		unsigned64 timestepMicrosecunds = unsigned64 (timestepInSecunds * 1000000.0f);
