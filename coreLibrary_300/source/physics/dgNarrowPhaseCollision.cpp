@@ -1469,7 +1469,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts (dgCollisionParamProxy& prox
 	const dgMatrix& soupMatrix = polySoupInstance->m_globalMatrix;
 
 	proxy.m_matrix = hullMatrix * soupMatrix.Inverse();
-	const dgVector& invScale = polySoupInstance->m_invScale;
+	const dgVector& invScale = polySoupInstance->GetInvScale();
 	dgMatrix polySoupScaledMatrix (invScale.CompProduct4(proxy.m_matrix[0]), invScale.CompProduct4(proxy.m_matrix[1]), invScale.CompProduct4(proxy.m_matrix[2]), invScale.CompProduct4(proxy.m_matrix[3])); 
 
 	dgPolygonMeshDesc data;

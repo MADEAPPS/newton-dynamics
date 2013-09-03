@@ -263,29 +263,26 @@ origin = origin.Scale (0.25f);
 	matrix.m_posit.m_w = 1.0f;
 
 
-	//NewtonBody* const unitScaledBody = CreateLevelMesh (scene, "mask.ngd", 0);
+//	DemoEntity teaPot (GetIdentityMatrix(), NULL);
+//	teaPot.LoadNGD_mesh("teapot.ngd", world);
 	NewtonBody* const unitScaledBody = CreateLevelMesh (scene, "teapot.ngd", 0);
-	//NewtonBody* const unitScaledBody = CreateLevelMesh (scene, "box.ngd", 1);
 	DemoEntity* const unitScaledEntity = (DemoEntity*) NewtonBodyGetUserData(unitScaledBody);
 	NewtonBodySetMatrix(unitScaledBody, &matrix[0][0]);
 	unitScaledEntity->ResetMatrix(*scene, matrix);
 
 	matrix.m_posit.m_z = -5.0f;
-	CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (0.75f, 0.75f, 0.75f, 0.0f));
-	//CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (1.0f, 1.0f, 1.0f, 0.0f));
+//	CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (0.75f, 0.75f, 0.75f, 0.0f));
 
 	matrix.m_posit.m_z = 5.0f;
-	CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (1.5f, 1.5f, 1.5f, 0.0f));
-	//CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (1.0f, 1.0f, 1.0f, 0.0f));
+//	CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (1.5f, 1.5f, 1.5f, 0.0f));
 
 	matrix.m_posit.m_z = 0.0f;
 	matrix.m_posit.m_x = -5.0f;
-	CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (1.0f, 1.0f, 2.0f, 0.0f));
-	//CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (1.0f, 1.0f, 1.0f, 0.0f));
+//	CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (1.0f, 1.0f, 2.0f, 0.0f));
 
 	matrix.m_posit.m_x = 5.0f;
-	CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (2.0f, 1.0f, 1.0f, 0.0f));
-	//CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (1.0f, 1.0f, 1.0f, 0.0f));
+//	CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (2.0f, 1.0f, 1.0f, 0.0f));
+
 
 
 	dVector size (0.5f, 0.5f, 0.75f, 0.0f);
@@ -296,10 +293,10 @@ origin = origin.Scale (0.25f);
 	//shapeOffsetMatrix.m_posit.m_y = 1.0f;
 
 	//	int count = 1;
-	int count = 5;
-	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	int count = 1;
+//	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _TAPERED_CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
