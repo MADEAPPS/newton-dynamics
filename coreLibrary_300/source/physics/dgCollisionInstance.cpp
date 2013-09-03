@@ -489,9 +489,51 @@ dgInt32 dgCollisionInstance::CalculatePlaneIntersection (const dgVector& normal,
 
 void dgCollisionInstance::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const
 {
+//	m_childShape->CalcAABB (matrix, p0, p1);
+//	p0 = (matrix.m_posit + (p0 - matrix.m_posit).CompProduct4(m_maxScale) - m_padding) & dgVector::m_triplexMask;
+//	p1 = (matrix.m_posit + (p1 - matrix.m_posit).CompProduct4(m_maxScale) + m_padding) & dgVector::m_triplexMask;
+
+static int xxx = 1;
+	switch (m_scaleType)
+	{
+		case m_unit:
+		{
+			m_childShape->CalcAABB (matrix, p0, p1);
+			p0 -= m_padding;
+			p1 += m_padding;
+			break;
+		}
+		case m_uniform:
+		{
+			m_childShape->CalcAABB (matrix, p0, p1);
+			dgVector size (((p1 - p0).CompProduct4(m_scale).Scale4(0.5f) + m_padding) & dgVector::m_triplexMask);
+			p0 = matrix.m_posit - size;
+			p1 = matrix.m_posit + size;
+			break;
+		}
+		case m_nonUniform:
+		{
+if (xxx){
+			dgMatrix matrix1 (matrix);
+			matrix1[0] = matrix1[0].Scale4(m_scale.m_x);
+			matrix1[1] = matrix1[1].Scale4(m_scale.m_y);
+			matrix1[2] = matrix1[2].Scale4(m_scale.m_z);
+			m_childShape->CalcAABB (matrix1, p0, p1);
+			p0 -= m_padding;
+			p1 += m_padding;
+
+} else {
 	m_childShape->CalcAABB (matrix, p0, p1);
 	p0 = (matrix.m_posit + (p0 - matrix.m_posit).CompProduct4(m_maxScale) - m_padding) & dgVector::m_triplexMask;
 	p1 = (matrix.m_posit + (p1 - matrix.m_posit).CompProduct4(m_maxScale) + m_padding) & dgVector::m_triplexMask;
+}
+
+			break;
+		}
+
+		default:
+			dgAssert(0);
+	}
 }
 
 
