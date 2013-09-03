@@ -1744,6 +1744,7 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 		polygon.m_faceClipSize = data.GetFaceSize (localIndexArray, polygon.m_count);
 		polygon.m_faceNormalIndex = data.GetNormalIndex (localIndexArray, polygon.m_count);
 		polygon.m_normal = dgVector (&vertex[polygon.m_faceNormalIndex * stride]);
+		dgAssert (dgAbsf(polygon.m_normal % polygon.m_normal - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
 		dgAssert (polygon.m_normal.m_w == dgFloat32 (0.0f));
 		contactJoint->m_separtingVector = separatingVector;
 

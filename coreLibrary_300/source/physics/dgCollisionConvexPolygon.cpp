@@ -538,6 +538,8 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete (dgCollis
 	polygonMatrix[1] = m_normal * polygonMatrix[0];
 	polygonMatrix[2] = m_normal;
 	polygonMatrix[3] = (hullOrigin - m_normal.CompProduct4(m_normal.DotProduct4(hullOrigin - m_localPoly[0]))) | dgVector::m_wOne;
+
+	dgAssert (polygonMatrix.TestOrthogonal());
 	
 	m_normal = polygonMatrix.UnrotateVector(m_normal);
 	for (dgInt32 i = 0; i < m_count; i ++) {
@@ -711,6 +713,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue (dgCollis
 	polygonMatrix[1] = m_normal * polygonMatrix[0];
 	polygonMatrix[2] = m_normal;
 	polygonMatrix[3] = hullOrigin;
+	dgAssert (polygonMatrix.TestOrthogonal());
 
 	dgVector polyBoxP0 (dgFloat32 ( 1.0e15f));
 	dgVector polyBoxP1 (dgFloat32 (-1.0e15f));

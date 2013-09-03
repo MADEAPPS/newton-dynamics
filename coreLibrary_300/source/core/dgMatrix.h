@@ -76,6 +76,8 @@ class dgMatrix
 	void TransformTriplex (dgFloat64* const dst, dgInt32 dstStrideInBytes,
 						   const dgFloat32* const src, dgInt32 srcStrideInBytes, dgInt32 count) const;
 
+	bool TestOrthogonal() const;
+
 
 	dgMatrix operator* (const dgMatrix &B) const;
 	
@@ -277,7 +279,19 @@ DG_INLINE dgMatrix dgMatrix::Inverse () const
 }
 
 
+DG_INLINE bool dgMatrix::TestOrthogonal() const
+{
+	dgVector n (m_front * m_up);
+	dgFloat32 a = m_right % m_right;
+	dgFloat32 b = m_up % m_up;
+	dgFloat32 c = m_front % m_front;
+	dgFloat32 d = n % m_right;
 
+	return  (dgAbsf(a - dgFloat32 (1.0f)) < dgFloat32 (1.0e-6f)) & 
+			(dgAbsf(b - dgFloat32 (1.0f)) < dgFloat32 (1.0e-6f)) &
+			(dgAbsf(c - dgFloat32 (1.0f)) < dgFloat32 (1.0e-6f)) &
+			(dgAbsf(d - dgFloat32 (1.0f)) < dgFloat32 (1.0e-6f)); 
+}
 
 #endif
 
