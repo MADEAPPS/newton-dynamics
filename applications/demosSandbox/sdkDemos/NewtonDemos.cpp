@@ -312,12 +312,13 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	m_mainMenu = CreateMainMenu();
 
 m_showStatistics = true;
+
 //m_debugDisplayMode = 2;
 //m_hideVisualMeshes = true;
 //SetDebugDisplayMode(2);
 
-m_showContactPoints = true;
-m_autoSleepState = false;
+//m_showContactPoints = true;
+//m_autoSleepState = false;
 
 //m_useParallelSolver = true;
 //m_scene->m_showProfiler[6] = 1;

@@ -205,9 +205,9 @@ dgInt32 dgCollisionSphere::CalculateSignature () const
 
 void dgCollisionSphere::CalcAABB (const dgMatrix& matrix, dgVector &p0, dgVector &p1) const
 {
-	dgVector radius (m_radius);
-	p0 = (matrix[3] - radius) & dgVector::m_triplexMask;
-	p1 = (matrix[3] + radius) & dgVector::m_triplexMask;
+	dgVector size (matrix.m_front.Abs().Scale4(m_radius) + matrix.m_up.Abs().Scale4(m_radius) + matrix.m_right.Abs().Scale4(m_radius));
+	p0 = (matrix[3] - size) & dgVector::m_triplexMask;
+	p1 = (matrix[3] + size) & dgVector::m_triplexMask;
 }
 
 

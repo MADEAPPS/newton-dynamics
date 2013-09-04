@@ -504,13 +504,14 @@ void dgCollisionInstance::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVect
 			break;
 		}
 		case m_uniform:
-		{
-			m_childShape->CalcAABB (matrix, p0, p1);
-			dgVector size (((p1 - p0).CompProduct4(m_scale).Scale4(0.5f) + m_padding));
-			p0 = (matrix.m_posit - size) & dgVector::m_triplexMask;
-			p1 = (matrix.m_posit + size) & dgVector::m_triplexMask;
-			break;
-		}
+//		{
+//			m_childShape->CalcAABB (matrix, p0, p1);
+//			dgVector origin ((p1 + p0).Scale4(0.5f));
+//			dgVector size (((p1 - p0).CompProduct4(m_scale).Scale4(0.5f) + m_padding));
+//			p0 = origin - size;
+//			p1 = origin + size;
+//			break;
+//		}
 		case m_nonUniform:
 		{
 			dgMatrix matrix1 (matrix);
