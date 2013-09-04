@@ -493,7 +493,7 @@ void dgCollisionInstance::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVect
 //	p0 = (matrix.m_posit + (p0 - matrix.m_posit).CompProduct4(m_maxScale) - m_padding) & dgVector::m_triplexMask;
 //	p1 = (matrix.m_posit + (p1 - matrix.m_posit).CompProduct4(m_maxScale) + m_padding) & dgVector::m_triplexMask;
 
-static int xxx = 1;
+
 	switch (m_scaleType)
 	{
 		case m_unit:
@@ -506,14 +506,13 @@ static int xxx = 1;
 		case m_uniform:
 		{
 			m_childShape->CalcAABB (matrix, p0, p1);
-			dgVector size (((p1 - p0).CompProduct4(m_scale).Scale4(0.5f) + m_padding) & dgVector::m_triplexMask);
-			p0 = matrix.m_posit - size;
-			p1 = matrix.m_posit + size;
+			dgVector size (((p1 - p0).CompProduct4(m_scale).Scale4(0.5f) + m_padding));
+			p0 = (matrix.m_posit - size) & dgVector::m_triplexMask;
+			p1 = (matrix.m_posit + size) & dgVector::m_triplexMask;
 			break;
 		}
 		case m_nonUniform:
 		{
-if (xxx){
 			dgMatrix matrix1 (matrix);
 			matrix1[0] = matrix1[0].Scale4(m_scale.m_x);
 			matrix1[1] = matrix1[1].Scale4(m_scale.m_y);
@@ -521,19 +520,15 @@ if (xxx){
 			m_childShape->CalcAABB (matrix1, p0, p1);
 			p0 -= m_padding;
 			p1 += m_padding;
-
-} else {
-	m_childShape->CalcAABB (matrix, p0, p1);
-	p0 = (matrix.m_posit + (p0 - matrix.m_posit).CompProduct4(m_maxScale) - m_padding) & dgVector::m_triplexMask;
-	p1 = (matrix.m_posit + (p1 - matrix.m_posit).CompProduct4(m_maxScale) + m_padding) & dgVector::m_triplexMask;
-}
-
 			break;
 		}
 
 		default:
 			dgAssert(0);
 	}
+
+	dgAssert (p0.m_w == dgFloat32 (0.0f));
+	dgAssert (p1.m_w == dgFloat32 (0.0f));
 }
 
 
