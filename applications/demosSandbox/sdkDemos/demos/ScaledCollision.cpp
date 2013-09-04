@@ -266,6 +266,10 @@ origin = origin.Scale (0.25f);
 	teaPot.LoadNGD_mesh("teapot.ngd", world);
 	NewtonCollision* const staticCollision = CreateCollisionTree (world, &teaPot, 0, true);
 
+dVector minP;
+dVector maxP;
+CalculateAABB (staticCollision, GetIdentityMatrix(), minP, maxP);
+
 	CreateScaleStaticMesh (&teaPot, staticCollision, scene, matrix, dVector (1.0f, 1.0f, 1.0f, 0.0f));
 
 	matrix.m_posit.m_z = -5.0f;

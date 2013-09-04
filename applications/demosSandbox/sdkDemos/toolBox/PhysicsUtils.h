@@ -38,7 +38,8 @@ enum PrimitiveType
 
 void ExportScene (NewtonWorld* const world, const char* const fileName);
 
-
+class DemoMesh;
+class DemoEntity;
 class DemoEntityManager;
 /*
 void InitEyePoint (const dVector& dir, const dVector& origin);

@@ -378,6 +378,11 @@ dgIntersectStatus dgCollisionBVH::ShowDebugPolygon (void* const context, const d
 	return t_ContinueSearh;
 }
 
+dgVector dgCollisionBVH::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
+{
+	return ForAllSectorsSupportVectex (dir);
+}
+
 
 void dgCollisionBVH::DebugCollision (const dgMatrix& matrixPtr, OnDebugCollisionMeshCallback callback, void* const userData) const
 {

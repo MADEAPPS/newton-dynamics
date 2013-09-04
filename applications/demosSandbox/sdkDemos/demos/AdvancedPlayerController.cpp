@@ -1007,12 +1007,7 @@ void AdvancedPlayerController (DemoEntityManager* const scene)
 	AdvancePlayerEntity* const player = new AdvancePlayerEntity (scene, playerManager, 0.5f, 1.9f, location);
 
 	// set as the player with the camera
-	//playerManager->SetAsPlayer(player);
-
-	// set as the player with the camera
 	inputManager->AddPlayer(player);
-
-
 
 /*
 	//dFloat x0 = location.m_posit.m_x;
