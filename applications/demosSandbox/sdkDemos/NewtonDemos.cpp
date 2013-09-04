@@ -316,7 +316,9 @@ m_showStatistics = true;
 //m_hideVisualMeshes = true;
 //SetDebugDisplayMode(2);
 
-//m_autoSleepState = false;
+m_showContactPoints = true;
+m_autoSleepState = false;
+
 //m_useParallelSolver = true;
 //m_scene->m_showProfiler[6] = 1;
 m_scene->m_showProfiler[0] = 1;

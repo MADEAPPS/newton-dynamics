@@ -284,8 +284,10 @@ DemoMesh::DemoMesh(const DemoMesh& mesh)
 		segment->m_diffuse = srcSegment.m_diffuse;
 		segment->m_specular = srcSegment.m_specular;
 		segment->m_textureHandle = srcSegment.m_textureHandle;
-		//strncpy (segment->m_textureName, srcSegment.m_textureName, sizeof (segment->m_textureName) - 1);
 		segment->m_textureName = srcSegment.m_textureName;
+		if (segment->m_textureHandle) {
+			AddTextureRef (srcSegment.m_textureHandle);
+		}
 	}
 
 	// see if this mesh can be optimized

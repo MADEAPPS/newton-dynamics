@@ -955,15 +955,13 @@ class CollsionTreeFaceMap
 };
 
 
-
-static NewtonBody* CreateLevelMeshBody (NewtonWorld* const world, DemoEntity* const ent, bool optimization)
+NewtonCollision* CreateCollisionTree (NewtonWorld* world, DemoEntity* const entity, int materialID, bool optimize)
 {
 	// measure the time to build a collision tree
 	unsigned64 timer0 = dGetTimeInMicrosenconds();
 
 	// create the collision tree geometry
-	NewtonCollision* const collision = NewtonCreateTreeCollision(world, 0);
-
+	NewtonCollision* const collision = NewtonCreateTreeCollision(world, materialID);
 
 	// set the application level callback
 #ifdef USE_STATIC_MESHES_DEBUG_COLLISION
@@ -974,9 +972,9 @@ static NewtonBody* CreateLevelMeshBody (NewtonWorld* const world, DemoEntity* co
 	NewtonTreeCollisionBeginBuild(collision);
 
 	// iterate the entire geometry an build the collision
-	for (DemoEntity* model = ent->GetFirst(); model; model = model->GetNext()) {
+	for (DemoEntity* model = entity->GetFirst(); model; model = model->GetNext()) {
 
-		dMatrix matrix (model->CalculateGlobalMatrix(ent));
+		dMatrix matrix (model->CalculateGlobalMatrix(entity));
 		DemoMesh* const mesh = model->GetMesh();
 		dFloat* const vertex = mesh->m_vertex;
 		for (DemoMesh::dListNode* nodes = mesh->GetFirst(); nodes; nodes = nodes->GetNext()) {
@@ -1002,10 +1000,19 @@ static NewtonBody* CreateLevelMeshBody (NewtonWorld* const world, DemoEntity* co
 			}
 		}
 	}
-	NewtonTreeCollisionEndBuild(collision, optimization ? 1 : 0);
+	NewtonTreeCollisionEndBuild(collision, optimize ? 1 : 0);
 
 	// measure the time to build a collision tree
 	timer0 = (dGetTimeInMicrosenconds() - timer0) / 1000;
+
+	return collision;
+}
+
+
+
+static NewtonBody* CreateLevelMeshBody (NewtonWorld* const world, DemoEntity* const ent, bool optimize)
+{
+	NewtonCollision* const collision = CreateCollisionTree (world, ent, 0, optimize);
 
 	// Get the root Matrix
 	dMatrix matrix (ent->CalculateGlobalMatrix(NULL));
@@ -1016,8 +1023,7 @@ static NewtonBody* CreateLevelMeshBody (NewtonWorld* const world, DemoEntity* co
 	// save the pointer to the graphic object with the body.
 	NewtonBodySetUserData (level, ent);
 
-
-#if 1
+#if 0
 	NewtonCollisionInfoRecord collisionInfo;
 	NewtonCollisionGetInfo (collision, &collisionInfo);
 	if (collisionInfo.m_collisionType == SERIALIZE_ID_TREE) {
@@ -1042,13 +1048,12 @@ static NewtonBody* CreateLevelMeshBody (NewtonWorld* const world, DemoEntity* co
 	// release the collision tree (this way the application does not have to do book keeping of Newton objects
 	NewtonDestroyCollision (collision);
 
-	// now we will make a loop table for quick material index lookup for face to index
+	// now we will make a lookup table for quick material index lookup for face to index
 	//CollsionTreeFaceMap faceMap (NewtonBodyGetCollision(level));
-
-	
-
 	return level;
 }
+
+
 
 
 NewtonBody* CreateLevelMesh (DemoEntityManager* const scene, const char* const name, bool optimized)
@@ -1064,9 +1069,6 @@ NewtonBody* CreateLevelMesh (DemoEntityManager* const scene, const char* const n
 		DemoEntity* const ent = node->GetInfo();
 		DemoMesh* const mesh = ent->GetMesh();
 		if (mesh) {
-			//char name[2048];
-			//mesh->GetName(name);
-			//if (!strcmp (name, "levelGeometry_mesh")) {
 			if (mesh->GetName() == "levelGeometry_mesh") {
 				levelBody = CreateLevelMeshBody (world, ent, optimized);
 				break;

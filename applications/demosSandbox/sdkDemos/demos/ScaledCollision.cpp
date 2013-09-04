@@ -63,7 +63,7 @@ static void AddNonUniformScaledPrimitives (DemoEntityManager* const scene, dFloa
 
 	dFloat startElevation = 1000.0f;
 	dMatrix matrix (GetIdentityMatrix());
-	//matrix = dPitchMatrix(-10.0f * 3.141592f/180.0f) * dYawMatrix(-10.0f * 3.141592f/180.0f) * dRollMatrix(10.0f * 3.141592f/180.0f);
+//matrix = dPitchMatrix(-10.0f * 3.141592f/180.0f) * dYawMatrix(-10.0f * 3.141592f/180.0f) * dRollMatrix(10.0f * 3.141592f/180.0f);
 	for (int i = 0; i < xCount; i ++) {
 		dFloat x = origin.m_x + (i - xCount / 2) * spacing;
 		for (int j = 0; j < zCount; j ++) {
@@ -98,12 +98,9 @@ static void AddNonUniformScaledPrimitives (DemoEntityManager* const scene, dFloa
 
 
 
-static void CreateScaleStaticMesh (NewtonBody* const body, DemoEntityManager* const scene, const dMatrix& location, const dVector& scaleIn)
+//static void CreateScaleStaticMesh (NewtonBody* const body, DemoEntityManager* const scene, const dMatrix& location, const dVector& scaleIn)
+static void CreateScaleStaticMesh (DemoEntity* const entity, NewtonCollision* const collision, DemoEntityManager* const scene, const dMatrix& location, const dVector& scale)
 {
-	dVector scale(scaleIn);
-
-	DemoEntity* const entity = (DemoEntity*) NewtonBodyGetUserData(body);
-
 	// now make a scale version of the same model
 	// first Get The mesh and make a scale copy
 	DemoMesh* const mesh = entity->GetMesh();
@@ -126,13 +123,12 @@ static void CreateScaleStaticMesh (NewtonBody* const body, DemoEntityManager* co
 
 	// now make a body with a scaled collision mesh
 	// note: the collision do not have to be destroyed because we did no create a new collision we are simple using an existing one 
-	NewtonBody* const scaledBody = NewtonCreateDynamicBody(scene->GetNewton(), NewtonBodyGetCollision(body), &location[0][0]);
-
+	NewtonBody* const scaledBody = NewtonCreateDynamicBody(scene->GetNewton(), collision, &location[0][0]);
 
 	NewtonBodySetUserData(scaledBody, scaledEntity);
 
 	// apply the scale to the new body collision; 
-//	// note: scaling a collision mesh does not updates the broadPhase, this function is a util that do update broadphase
+//	// note: scaling a collision mesh does not updates the broadPhase, this function is a until that do update broad phase
 	NewtonBodySetCollisionScale (scaledBody, scale.m_x, scale.m_y, scale.m_z);
 }
 
@@ -263,26 +259,29 @@ origin = origin.Scale (0.25f);
 	matrix.m_posit.m_w = 1.0f;
 
 
-//	DemoEntity teaPot (GetIdentityMatrix(), NULL);
-//	teaPot.LoadNGD_mesh("teapot.ngd", world);
-	NewtonBody* const unitScaledBody = CreateLevelMesh (scene, "teapot.ngd", 0);
-	DemoEntity* const unitScaledEntity = (DemoEntity*) NewtonBodyGetUserData(unitScaledBody);
-	NewtonBodySetMatrix(unitScaledBody, &matrix[0][0]);
-	unitScaledEntity->ResetMatrix(*scene, matrix);
+	DemoEntity teaPot (GetIdentityMatrix(), NULL);
+	teaPot.LoadNGD_mesh("teapot.ngd", world);
+	NewtonCollision* const staticCollision = CreateCollisionTree (world, &teaPot, 0, true);
+
+	CreateScaleStaticMesh (&teaPot, staticCollision, scene, matrix, dVector (1.0f, 1.0f, 1.0f, 0.0f));
+//	CreateScaleStaticMesh (&teaPot, staticCollision, scene, matrix, dVector (0.75f, 0.75f, 0.75f, 0.0f));
 
 	matrix.m_posit.m_z = -5.0f;
-//	CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (0.75f, 0.75f, 0.75f, 0.0f));
+//	CreateScaleStaticMesh (&teaPot, staticCollision, scene, matrix, dVector (0.75f, 0.75f, 0.75f, 0.0f));
 
 	matrix.m_posit.m_z = 5.0f;
-//	CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (1.5f, 1.5f, 1.5f, 0.0f));
+//	CreateScaleStaticMesh (&teaPot, staticCollision, scene, matrix, dVector (1.5f, 1.5f, 1.5f, 0.0f));
 
 	matrix.m_posit.m_z = 0.0f;
 	matrix.m_posit.m_x = -5.0f;
-//	CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (1.0f, 1.0f, 2.0f, 0.0f));
+//	CreateScaleStaticMesh (&teaPot, staticCollision, scene, matrix, dVector (1.0f, 1.0f, 2.0f, 0.0f));
 
 	matrix.m_posit.m_x = 5.0f;
-//	CreateScaleStaticMesh (unitScaledBody, scene, matrix, dVector (2.0f, 1.0f, 1.0f, 0.0f));
+//	CreateScaleStaticMesh (&teaPot, staticCollision, scene, matrix, dVector (2.0f, 1.0f, 1.0f, 0.0f));
 
+
+	// do not forget to destroy the collision mesh helper
+	NewtonDestroyCollision(staticCollision);
 
 
 	dVector size (0.5f, 0.5f, 0.75f, 0.0f);
@@ -296,8 +295,8 @@ origin = origin.Scale (0.25f);
 	int count = 1;
 //	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _TAPERED_CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _TAPERED_CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _TAPERED_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);

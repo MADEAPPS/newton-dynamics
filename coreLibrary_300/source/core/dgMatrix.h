@@ -287,10 +287,10 @@ DG_INLINE bool dgMatrix::TestOrthogonal() const
 	dgFloat32 c = m_front % m_front;
 	dgFloat32 d = n % m_right;
 
-	return  (dgAbsf(a - dgFloat32 (1.0f)) < dgFloat32 (1.0e-6f)) & 
-			(dgAbsf(b - dgFloat32 (1.0f)) < dgFloat32 (1.0e-6f)) &
-			(dgAbsf(c - dgFloat32 (1.0f)) < dgFloat32 (1.0e-6f)) &
-			(dgAbsf(d - dgFloat32 (1.0f)) < dgFloat32 (1.0e-6f)); 
+	return  (dgAbsf(a - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f)) & 
+			(dgAbsf(b - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f)) &
+			(dgAbsf(c - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f)) &
+			(dgAbsf(d - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f)); 
 }
 
 #endif
