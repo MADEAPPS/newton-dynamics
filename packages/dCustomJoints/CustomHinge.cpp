@@ -101,10 +101,9 @@ dFloat CustomHinge::GetFriction () const
 
 void CustomHinge::CalculatePitchAngle (const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const
 {
-	sinAngle = (matrix1.m_up * matrix0.m_up) % matrix0.m_front;
+	sinAngle = (matrix0.m_up * matrix1.m_up) % matrix1.m_front;
 	cosAngle = matrix0.m_up % matrix1.m_up;
 }
-
 
 
 void CustomHinge::ProjectError () const
