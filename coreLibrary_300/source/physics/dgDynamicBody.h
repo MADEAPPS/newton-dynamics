@@ -71,11 +71,6 @@ class dgDynamicBody : public dgBody
 	virtual OnApplyExtForceAndTorque GetExtForceAndTorqueCallback () const;
 	virtual void SetExtForceAndTorqueCallback (OnApplyExtForceAndTorque callback);
 
-	
-	virtual void AddImpulse (const dgVector& pointVeloc, const dgVector& pointPosit);
-	virtual void ApplyImpulsePair (const dgVector& linearImpulse, const dgVector& angularImpulse);
-	virtual void ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, const dgFloat32* const impulseArray, const dgFloat32* const pointArray);
-
 	virtual void Serialize (const dgTree<dgInt32, const dgCollision*>* const collisionNode, dgSerialize serializeCallback, void* const userData);
 
 	private:

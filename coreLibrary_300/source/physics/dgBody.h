@@ -161,9 +161,9 @@ class dgBody
 	virtual bool IsInEquilibrium () const = 0;
 	virtual void SetCollidable (bool state) = 0;
 
-	virtual void AddImpulse (const dgVector& pointVeloc, const dgVector& pointPosit) = 0;
-	virtual void ApplyImpulsePair (const dgVector& linearImpulse, const dgVector& angularImpulse) = 0;
-	virtual void ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, const dgFloat32* const impulseArray, const dgFloat32* const pointArray) = 0;
+	virtual void AddImpulse (const dgVector& pointVeloc, const dgVector& pointPosit);
+	virtual void ApplyImpulsePair (const dgVector& linearImpulse, const dgVector& angularImpulse);
+	virtual void ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, const dgFloat32* const impulseArray, const dgFloat32* const pointArray);
 	
 	virtual void InvalidateCache();
 	

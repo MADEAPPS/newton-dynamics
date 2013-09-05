@@ -575,3 +575,109 @@ void dgBody::InvalidateCache ()
 	dgMatrix matrix (m_matrix);
 	SetMatrixOriginAndRotation(matrix);
 }
+
+
+void dgBody::AddImpulse (const dgVector& pointDeltaVeloc, const dgVector& pointPosit)
+{
+	dgMatrix invInertia (CalculateInvInertiaMatrix());
+
+	// get contact matrix
+	dgMatrix tmp;
+	//	dgVector globalContact (pointPosit - m_matrix.m_posit);
+	dgVector globalContact (pointPosit - m_globalCentreOfMass);
+
+	//globalContact[0] = dgFloat32 (0.0f);
+	//globalContact[1] = dgFloat32 (0.0f);
+	//globalContact[2] = dgFloat32 (0.0f);
+
+	tmp[0][0] = dgFloat32 (0.0f);
+	tmp[0][1] = + globalContact[2];
+	tmp[0][2] = - globalContact[1];
+	tmp[0][3] = dgFloat32 (0.0f);
+
+	tmp[1][0] = -globalContact[2];
+	tmp[1][1] = dgFloat32 (0.0f);
+	tmp[1][2] = +globalContact[0];
+	tmp[1][3] = dgFloat32 (0.0f);
+
+	tmp[2][0] = +globalContact[1];
+	tmp[2][1] = -globalContact[0];
+	tmp[2][2] = dgFloat32 (0.0f);
+	tmp[2][3] = dgFloat32 (0.0f);
+
+	tmp[3][0] = dgFloat32 (0.0f);
+	tmp[3][1] = dgFloat32 (0.0f);
+	tmp[3][2] = dgFloat32 (0.0f);
+	tmp[3][3] = dgFloat32 (1.0f);
+
+	dgMatrix contactMatrix (tmp * invInertia * tmp);
+	for (dgInt32 i = 0; i < 3; i ++) {
+		for (dgInt32 j = 0; j < 3; j ++) {
+			contactMatrix[i][j] *= -dgFloat32 (1.0f);
+		}
+	}
+	contactMatrix[0][0] += m_invMass.m_w;	
+	contactMatrix[1][1] += m_invMass.m_w;	
+	contactMatrix[2][2] += m_invMass.m_w;	
+
+	contactMatrix = contactMatrix.Symetric3by3Inverse ();
+
+	// change of momentum
+	dgVector changeOfMomentum (contactMatrix.RotateVector (pointDeltaVeloc));
+
+
+	dgVector dv (changeOfMomentum.Scale3 (m_invMass.m_w));
+	dgVector dw (invInertia.RotateVector (globalContact * changeOfMomentum));
+
+	m_veloc += dv;
+	m_omega += dw;
+
+	m_sleeping	= false;
+	m_equilibrium = false;
+	Unfreeze ();
+}
+
+void dgBody::ApplyImpulsePair (const dgVector& linearImpulseIn, const dgVector& angularImpulseIn)
+{
+	dgMatrix inertia (CalculateInertiaMatrix());
+	dgMatrix invInertia (CalculateInvInertiaMatrix());
+
+	dgVector linearImpulse (m_veloc.Scale3 (m_mass.m_w) + linearImpulseIn);
+	dgVector angularImpulse (inertia.RotateVector (m_omega) + angularImpulseIn);
+
+	m_veloc = linearImpulse.Scale3(m_invMass.m_w);
+	m_omega = invInertia.RotateVector(angularImpulse);
+
+	m_sleeping	= false;
+	m_equilibrium = false;
+	Unfreeze ();
+}
+
+void dgBody::ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, const dgFloat32* const impulseArray, const dgFloat32* const pointArray)
+{
+	dgInt32 stride = strideInBytes / sizeof (dgFloat32);
+
+	dgMatrix inertia (CalculateInertiaMatrix());
+
+	dgVector impulse (m_veloc.Scale3 (m_mass.m_w));
+	dgVector angularImpulse (inertia.RotateVector (m_omega));
+
+	dgVector com (m_globalCentreOfMass);
+	for (dgInt32 i = 0; i < count; i ++) {
+		dgInt32 index = i * stride;
+		dgVector r (pointArray[index], pointArray[index + 1], pointArray[index + 2], dgFloat32 (0.0f));
+		dgVector L (impulseArray[index], impulseArray[index + 1], impulseArray[index + 2], dgFloat32 (0.0f));
+		dgVector Q ((r - com) * L);
+
+		impulse += L;
+		angularImpulse += Q;
+	}
+
+	dgMatrix invInertia (CalculateInvInertiaMatrix());
+	m_veloc = impulse.Scale3(m_invMass.m_w);
+	m_omega = invInertia.RotateVector(angularImpulse);
+
+	m_sleeping	= false;
+	m_equilibrium = false;
+	Unfreeze ();
+}
