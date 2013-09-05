@@ -682,6 +682,42 @@ struct dgCollisionHeightFieldShowPolyContext
 	OnDebugCollisionMeshCallback m_callback;
 };
 
+dgVector dgCollisionHeightField::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
+{
+	dgFloat32 maxProject (dgFloat32 (-1.e-20f));
+	dgVector support (dgFloat32 (0.0f));
+	if (m_elevationDataType == m_float32Bit)  {
+		const dgFloat32* const elevation = (dgFloat32*)m_elevationMap;
+		for (dgInt32 z = 0; z < m_height - 1; z ++) {
+			dgInt32 base = z * m_width;
+			dgFloat32 zVal = m_horizontalScale * z;
+			for (dgInt32 x = 0; x < m_width; x ++) {
+				dgVector p (m_horizontalScale * x, m_verticalScale * elevation[base + x], zVal, dgFloat32 (0.0f));
+				dgFloat32 project = dir.DotProduct4(p).m_x;
+				if (project > maxProject) {
+					maxProject = project;
+					support = p;
+				}
+			}
+		}
+
+	} else {
+		const dgUnsigned16* const elevation = (dgUnsigned16*)m_elevationMap;
+		for (dgInt32 z = 0; z < m_height - 1; z ++) {
+			dgInt32 base = z * m_width;
+			dgFloat32 zVal = m_horizontalScale * z;
+			for (dgInt32 x = 0; x < m_width; x ++) {
+				dgVector p (m_horizontalScale * x, m_verticalScale * elevation[base + x], zVal, dgFloat32 (0.0f));
+				dgFloat32 project = dir.DotProduct4(p).m_x;
+				if (project > maxProject) {
+					maxProject = project;
+					support = p;
+				}
+			}
+		}
+	}
+	return support;
+}
 
 void dgCollisionHeightField::DebugCollision (const dgMatrix& matrix, OnDebugCollisionMeshCallback callback, void* const userData) const
 {
@@ -909,8 +945,9 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 			{
 				const dgFloat32* const elevation = (dgFloat32*)m_elevationMap;
 				for (dgInt32 z = z0; z <= z1; z ++) {
+					dgFloat32 zVal = m_horizontalScale * z;
 					for (dgInt32 x = x0; x <= x1; x ++) {
-						vertex[vertexIndex] = dgVector(m_horizontalScale * x, m_verticalScale * elevation[base + x], m_horizontalScale * z, dgFloat32 (0.0f));
+						vertex[vertexIndex] = dgVector(m_horizontalScale * x, m_verticalScale * elevation[base + x], zVal, dgFloat32 (0.0f));
 						vertexIndex ++;
 						dgAssert (vertexIndex <= m_instanceData->m_vertexCount[data->m_threadNumber]); 
 					}
@@ -923,8 +960,9 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 			{
 				const dgUnsigned16* const elevation = (dgUnsigned16*)m_elevationMap;
 				for (dgInt32 z = z0; z <= z1; z ++) {
+					dgFloat32 zVal = m_horizontalScale * z;
 					for (dgInt32 x = x0; x <= x1; x ++) {
-						vertex[vertexIndex] = dgVector(m_horizontalScale * x, m_verticalScale * dgFloat32 (elevation[base + x]), m_horizontalScale * z, dgFloat32 (0.0f));
+						vertex[vertexIndex] = dgVector(m_horizontalScale * x, m_verticalScale * dgFloat32 (elevation[base + x]), zVal, dgFloat32 (0.0f));
 						vertexIndex ++;
 						dgAssert (vertexIndex <= m_instanceData->m_vertexCount[data->m_threadNumber]); 
 					}

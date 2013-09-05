@@ -3997,7 +3997,6 @@ void NewtonCollisionSupportVertex(const NewtonCollision* const collisionPtr, con
 	vertex[0] = vertexOut[0];
 	vertex[1] = vertexOut[1];
 	vertex[2] = vertexOut[2];
-	
 }
 
 

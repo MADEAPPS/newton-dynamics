@@ -1229,9 +1229,6 @@ dgCollisionInstance* dgCollisionCompound::GetCollisionFromNode (dgTree<dgCollisi
 
 dgVector dgCollisionCompound::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
-	dgAssert (0);
-	return dgVector (0,0,0,0);
-/*
 	dgFloat32 aabbProjection[DG_COMPOUND_STACK_DEPTH];
 	const dgNodeBase* stackPool[DG_COMPOUND_STACK_DEPTH];
 
@@ -1240,11 +1237,11 @@ dgVector dgCollisionCompound::SupportVertex (const dgVector& dir, dgInt32* const
 	aabbProjection[0] = dgFloat32 (1.0e10f);
 
 	dgFloat32 maxProj = dgFloat32 (-1.0e20f); 
-	dgVector searchDir (m_offset.UnrotateVector(dir));
+	//dgVector searchDir (m_offset.UnrotateVector(dir));
 
-	dgInt32 ix = (searchDir[0] > dgFloat32 (0.0f)) ? 1 : 0;
-	dgInt32 iy = (searchDir[1] > dgFloat32 (0.0f)) ? 1 : 0;
-	dgInt32 iz = (searchDir[2] > dgFloat32 (0.0f)) ? 1 : 0;
+	dgInt32 ix = (dir[0] > dgFloat32 (0.0f)) ? 1 : 0;
+	dgInt32 iy = (dir[1] > dgFloat32 (0.0f)) ? 1 : 0;
+	dgInt32 iz = (dir[2] > dgFloat32 (0.0f)) ? 1 : 0;
 	dgVector supportVertex (dgFloat32 (0.0f), dgFloat32 (0.0f),  dgFloat32 (0.0f),  dgFloat32 (0.0f));   
 
 	while (stack) {
@@ -1255,10 +1252,11 @@ dgVector dgCollisionCompound::SupportVertex (const dgVector& dir, dgInt32* const
 			const dgNodeBase* const me = stackPool[stack];
 
 			if (me->m_type == m_leaf) {
-				dgCollision* const shape = me->GetShape()->GetChildShape();
-
-				dgVector newDir (shape->m_offset.UnrotateVector(searchDir)); 
-				dgVector vertex (shape->m_offset.TransformVector (shape->SupportVertex(newDir)));		
+				dgInt32 index; 
+				dgCollisionInstance* const subShape = me->GetShape();
+				const dgMatrix& matrix = subShape->GetLocalMatrix(); 
+				dgVector newDir (matrix.UnrotateVector(dir)); 
+				dgVector vertex (matrix.TransformVector (subShape->SupportVertex(newDir, &index)));		
 				dgFloat32 dist = dir % vertex;
 				if (dist > maxProj) {
 					maxProj = dist;
@@ -1298,8 +1296,8 @@ dgVector dgCollisionCompound::SupportVertex (const dgVector& dir, dgInt32* const
 		}
 	}
 
-	return m_offset.TransformVector (supportVertex);
-*/
+//	return m_offset.TransformVector (supportVertex);
+	return supportVertex;
 }
 
 
