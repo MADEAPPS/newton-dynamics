@@ -113,8 +113,8 @@ void RenderAABB (NewtonWorld* const world)
 		dMatrix matrix;
 		NewtonCollision* const collision = NewtonBodyGetCollision(body);
 		NewtonBodyGetMatrix (body, &matrix[0][0]);
-//		NewtonCollisionCalculateAABB (collision, &matrix[0][0], &p0[0], &p1[0]);
-		CalculateAABB (collision, matrix, p0, p1);
+		NewtonCollisionCalculateAABB (collision, &matrix[0][0], &p0[0], &p1[0]);
+//		CalculateAABB (collision, matrix, p0, p1);
 
 		glVertex3f (p0.m_x, p0.m_y, p0.m_z);
 		glVertex3f (p1.m_x, p0.m_y, p0.m_z);

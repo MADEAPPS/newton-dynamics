@@ -175,8 +175,8 @@ void UniformScaledCollision(DemoEntityManager* const scene)
 	AddUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _TAPERED_CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _TAPERED_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _TAPERED_CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _TAPERED_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
@@ -221,10 +221,10 @@ void NonUniformScaledCollision (DemoEntityManager* const scene)
 	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _TAPERED_CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _TAPERED_CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _TAPERED_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _TAPERED_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
@@ -293,13 +293,13 @@ origin = origin.Scale (0.25f);
 
 	int count = 5;
 	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _TAPERED_CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _TAPERED_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 }
