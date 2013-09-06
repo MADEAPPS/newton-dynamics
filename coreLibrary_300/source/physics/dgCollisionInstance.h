@@ -35,6 +35,7 @@ class dgCollisionInstance
 		m_unit,
 		m_uniform,
 		m_nonUniform,
+		m_global,
 	};
 
 	DG_CLASS_ALLOCATOR(allocator)
@@ -118,6 +119,7 @@ class dgCollisionInstance
 
 	dgMatrix m_globalMatrix;
 	dgMatrix m_localMatrix;
+	dgMatrix m_aligmentMatrix;
 	dgVector m_scale;
 	dgVector m_invScale;
 	dgVector m_maxScale;
@@ -136,6 +138,7 @@ class dgCollisionInstance
 DG_INLINE dgCollisionInstance::dgCollisionInstance(const dgCollisionInstance& meshInstance, const dgCollision* const shape)
 	:m_globalMatrix(meshInstance.m_globalMatrix)
 	,m_localMatrix (meshInstance.m_localMatrix)
+	,m_aligmentMatrix (meshInstance.m_aligmentMatrix)
 	,m_scale(meshInstance.m_scale)
 	,m_invScale(meshInstance.m_invScale)
 	,m_maxScale(meshInstance.m_maxScale)
@@ -396,7 +399,6 @@ DG_INLINE dgVector dgCollisionInstance::GetBoxSize() const
 
 DG_INLINE dgVector dgCollisionInstance::GetBoxOrigin() const
 {
-//	return m_childShape->m_boxOrigin.CompProduct3(m_scale);
 	switch (m_scaleType)
 	{
 		case m_unit:

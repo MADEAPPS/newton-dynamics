@@ -51,6 +51,7 @@ dgVector dgCollisionInstance::m_padding (DG_MAX_COLLISION_AABB_PADDING, DG_MAX_C
 dgCollisionInstance::dgCollisionInstance()
 	:m_globalMatrix(dgGetIdentityMatrix())
 	,m_localMatrix (dgGetIdentityMatrix())
+	,m_aligmentMatrix (dgGetIdentityMatrix())
 	,m_scale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
 	,m_invScale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
 	,m_maxScale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
@@ -68,6 +69,7 @@ dgCollisionInstance::dgCollisionInstance()
 dgCollisionInstance::dgCollisionInstance(const dgWorld* const world, const dgCollision* const childCollision, dgInt32 shapeID, const dgMatrix& matrix)
 	:m_globalMatrix(matrix)
 	,m_localMatrix (matrix)
+	,m_aligmentMatrix (dgGetIdentityMatrix())
 	,m_scale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
 	,m_invScale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
 	,m_maxScale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
@@ -85,6 +87,7 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const world, const dgCol
 dgCollisionInstance::dgCollisionInstance(const dgCollisionInstance& instance)
 	:m_globalMatrix(instance.m_globalMatrix)
 	,m_localMatrix (instance.m_localMatrix)
+	,m_aligmentMatrix (instance.m_aligmentMatrix)
 	,m_scale(instance.m_scale)
 	,m_invScale(instance.m_invScale)
 	,m_maxScale(instance.m_maxScale)
@@ -127,6 +130,7 @@ dgCollisionInstance::dgCollisionInstance(const dgCollisionInstance& instance)
 dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDeserialize deserialization, void* const userData)
 	:m_globalMatrix(dgGetIdentityMatrix())
 	,m_localMatrix (dgGetIdentityMatrix())
+	,m_aligmentMatrix (dgGetIdentityMatrix())
 	,m_scale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
 	,m_invScale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
 	,m_maxScale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
@@ -145,6 +149,7 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 	
 	deserialization (userData, &m_globalMatrix, sizeof (m_globalMatrix));
 	deserialization (userData, &m_localMatrix, sizeof (m_localMatrix));
+	deserialization (userData, &m_aligmentMatrix, sizeof (m_localMatrix));
 	deserialization (userData, &m_scale, sizeof (m_scale));
 	deserialization (userData, &m_invScale, sizeof (m_invScale));
 	deserialization (userData, &m_maxScale, sizeof (m_maxScale));
@@ -322,6 +327,7 @@ void dgCollisionInstance::Serialize(dgSerialize callback, void* const userData, 
 
 	callback (userData, &m_globalMatrix, sizeof (m_globalMatrix));
 	callback (userData, &m_localMatrix, sizeof (m_localMatrix));
+	callback (userData, &m_aligmentMatrix, sizeof (m_localMatrix));
 	callback (userData, &m_scale, sizeof (m_scale));
 	callback (userData, &m_invScale, sizeof (m_invScale));
 	callback (userData, &m_maxScale, sizeof (m_maxScale));
@@ -377,7 +383,24 @@ void dgCollisionInstance::SetGlobalScale (const dgVector& scale)
 		m_localMatrix.m_posit =  m_localMatrix.m_posit.Scale3 (scale.m_x);
 		SetScale (scale);
 	} else {
-		dgAssert (0);
+		dgMatrix matrix (m_localMatrix);
+		matrix[0] = matrix[0].CompProduct4 (scale);
+		matrix[1] = matrix[1].CompProduct4 (scale);
+		matrix[2] = matrix[2].CompProduct4 (scale);
+		matrix[3] = matrix[3].CompProduct4 (scale);
+		matrix[3][3] = dgFloat32 (1.0f);
+		
+		matrix.PolarDecomposition (m_localMatrix, m_scale, m_aligmentMatrix);
+
+		bool isIdentity = true;
+		for (dgInt32 i = 0; i < 3; i ++) {
+			isIdentity &= dgAbsf (m_aligmentMatrix[i][i] - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f);
+			isIdentity &= dgAbsf (m_aligmentMatrix[3][i]) < dgFloat32 (1.0e-5f);
+		}
+		m_scaleType = isIdentity ? m_nonUniform : m_global;
+
+		m_maxScale = dgMax(m_scale[0], m_scale[1], m_scale[2]);
+		m_invScale = dgVector (dgFloat32 (1.0f) / m_scale[0], dgFloat32 (1.0f) / m_scale[1], dgFloat32 (1.0f) / m_scale[2], dgFloat32 (0.0f));	
 	}
 }
 
@@ -503,15 +526,7 @@ void dgCollisionInstance::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVect
 			p1 += m_padding;
 			break;
 		}
-		case m_uniform:
-//		{
-//			m_childShape->CalcAABB (matrix, p0, p1);
-//			dgVector origin ((p1 + p0).Scale4(0.5f));
-//			dgVector size (((p1 - p0).CompProduct4(m_scale).Scale4(0.5f) + m_padding));
-//			p0 = origin - size;
-//			p1 = origin + size;
-//			break;
-//		}
+
 		case m_nonUniform:
 		{
 			dgMatrix matrix1 (matrix);

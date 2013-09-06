@@ -83,6 +83,18 @@ dgMatrix::dgMatrix (const dgQuaternion &rotation, const dgVector &position)
 	m_posit.m_w = dgFloat32(1.0f);
 }
 
+
+dgMatrix::dgMatrix (const dgMatrix& transformMatrix, const dgVector& scale, const dgMatrix& stretchAxis)
+{
+	dgMatrix scaledAxis;
+	scaledAxis[0] = stretchAxis[0].Scale4 (scale[0]);
+	scaledAxis[1] = stretchAxis[1].Scale4 (scale[1]);
+	scaledAxis[2] = stretchAxis[2].Scale4 (scale[2]);
+	scaledAxis[3] = stretchAxis[3];
+
+	*this = stretchAxis.Transpose() * scaledAxis * transformMatrix;
+}
+
 dgMatrix dgMatrix::operator* (const dgMatrix &B) const
 {
 	return dgMatrix (dgVector (B.m_front.Scale4(m_front.m_x) + B.m_up.Scale4(m_front.m_y) + B.m_right.Scale4(m_front.m_z) + B.m_posit.Scale4 (m_front.m_w)), 
@@ -674,13 +686,6 @@ void dgMatrix::PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, d
 		//stretchAxis = LL.JacobiDiagonalization(scale, initialStretchAxis);
 		stretchAxis = LL;
 		stretchAxis.EigenVectors (scale);
-
-//dgMatrix xxx (dgGetIdentityMatrix());
-//xxx[0][0] = scale.m_x;
-//xxx[1][1] = scale.m_y;
-//xxx[2][2] = scale.m_z;
-//dgMatrix xxx2 (stretchAxis.Transpose() * xxx * stretchAxis);
-
 
 		// I need to deal with by seeing of some of the Scale are duplicated
 		// do this later (maybe by a given rotation around the non uniform axis but I do not know if it will work)

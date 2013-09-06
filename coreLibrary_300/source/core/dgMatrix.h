@@ -89,6 +89,10 @@ class dgMatrix
 	void EigenVectors (const dgMatrix& initialGuess = dgGetIdentityMatrix());
 	void PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, dgMatrix& stretchAxis, const dgMatrix& initialStretchAxis = dgGetIdentityMatrix()) const;
 
+	// constructor for polar composition
+	dgMatrix (const dgMatrix& transformMatrix, const dgVector& scale, const dgMatrix& stretchAxis);
+
+
 	dgVector m_front;
 	dgVector m_up;
 	dgVector m_right;
