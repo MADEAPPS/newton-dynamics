@@ -137,12 +137,6 @@ static void CreateScaleStaticMesh (DemoEntity* const entity, NewtonCollision* co
 }
 
 
-
-
-
-
-
-
 void ScaledMeshCollision (DemoEntityManager* const scene)
 {
 	// load the skybox
@@ -158,7 +152,7 @@ void ScaledMeshCollision (DemoEntityManager* const scene)
 	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
 	dQuaternion rot (camMatrix);
 	dVector origin (-15.0f, 10.0f, -20.0f, 0.0f);
-origin = origin.Scale (0.25f);
+	origin = origin.Scale (0.25f);
 	scene->SetCameraMatrix(rot, origin);
 
 
@@ -212,7 +206,7 @@ origin = origin.Scale (0.25f);
 	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 }
 
 
@@ -227,11 +221,6 @@ void UniformScaledCollision(DemoEntityManager* const scene)
 	//	CreateLevelMesh (scene, "sponza.ngd", 0);
 	//	CreateLevelMesh (scene, "cattle.ngd", fileName);
 	//	CreateLevelMesh (scene, "playground.ngd", 0);
-
-	// place camera into position
-	//	dQuaternion rot;
-	//	dVector posit (0.0f, 1.0f, 0.0f, 0.0f);
-	//	scene->SetCameraMatrix(rot, posit);
 
 	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
 	dQuaternion rot (camMatrix);
@@ -277,14 +266,9 @@ void NonUniformScaledCollision (DemoEntityManager* const scene)
 	//	CreateLevelMesh (scene, "cattle.ngd", fileName);
 	//	CreateLevelMesh (scene, "playground.ngd", 0);
 
-	// place camera into position
-	//	dQuaternion rot;
-	//	dVector posit (0.0f, 1.0f, 0.0f, 0.0f);
-	//	scene->SetCameraMatrix(rot, posit);
-
 	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
 	dQuaternion rot (camMatrix);
-	//	dVector origin (-30.0f, 40.0f, -15.0f, 0.0f);
+//	dVector origin (-30.0f, 40.0f, -15.0f, 0.0f);
 	dVector origin (-10.0f, 5.0f, -15.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 
