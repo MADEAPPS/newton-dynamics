@@ -9,17 +9,14 @@
 # freely
 
 set (projectName dMath)
-include_directories ("${corePath}/ai") 
-include_directories ("${corePath}/newton") 
 include_directories ("${packagesPath}/dMath") 
 
 file(GLOB_RECURSE headers *.h)
 file(GLOB_RECURSE sources *.cpp)
 add_library(${projectName} ${headers} ${sources})
-target_link_libraries (${projectName} ${corePath}/pthreads.2/dgThreads)
 
 if (MSVC)
-  set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudStdAfxMath.h")
-  set_source_files_properties(dStdAfxMath.cpp PROPERTIES COMPILE_FLAGS "/YcdStdAfxMath.h")
-  set_target_properties (${projectName} PROPERTIES COMPILE_DEFINITIONS "_WIN_32_VER;_CRT_SECURE_NO_WARNINGS")
+	set_target_properties (${projectName} PROPERTIES COMPILE_FLAGS "/YudStdAfxMath.h")
+	set_source_files_properties(dStdAfxMath.cpp PROPERTIES COMPILE_FLAGS "/YcdStdAfxMath.h")
+	set_target_properties (${projectName} PROPERTIES COMPILE_DEFINITIONS "_NEWTON_STATIC_LIB;_WIN_32_VER;PTW32_BUILD;PTW32_STATIC_LIB;_CRT_SECURE_NO_WARNINGS")
 endif(MSVC)

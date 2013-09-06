@@ -8,11 +8,10 @@
 # including commercial applications, and to alter it and redistribute it
 # freely
 
-set (packagesPath ${PROJECT_SOURCE_DIR}/packages)
-
+add_subdirectory ("${packagesPath}/dAILibrary")
+add_subdirectory ("${packagesPath}/dAnimation")
+add_subdirectory ("${packagesPath}/dContainers")
+add_subdirectory ("${packagesPath}/dCustomJoints")
 add_subdirectory ("${packagesPath}/dMath")
-#add_subdirectory ("${packagesPath}/core")
-#add_subdirectory ("${packagesPath}/newton")
-#add_subdirectory ("${packagesPath}/physics")
-#add_subdirectory ("${packagesPath}/pthreads.2")
-
+add_subdirectory ("${packagesPath}/dNewton")
+add_subdirectory ("${packagesPath}/dScene")

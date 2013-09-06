@@ -8,13 +8,14 @@
 # including commercial applications, and to alter it and redistribute it
 # freely
 
+set (projectName dgThreads)
 include_directories ("${corePath}/pthreads.2") 
 
 # add the thread core library library
 file(GLOB_RECURSE sources pthread.c)
 file(GLOB_RECURSE headers pthread.h implement.h semaphore.h sched.h)
-add_library (dgThreads ${headers} ${sources})
+add_library (${projectName} ${headers} ${sources})
 
 if (MSVC)
-  set_target_properties (dgThreads PROPERTIES COMPILE_DEFINITIONS "_WIN_32_VER;PTW32_BUILD;PTW32_STATIC_LIB;_CRT_SECURE_NO_WARNINGS")
+  set_target_properties (${projectName} PROPERTIES COMPILE_DEFINITIONS "_WIN_32_VER;PTW32_BUILD;PTW32_STATIC_LIB;_CRT_SECURE_NO_WARNINGS")
 endif(MSVC)
