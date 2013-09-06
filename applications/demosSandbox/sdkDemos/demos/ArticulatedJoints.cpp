@@ -51,10 +51,10 @@ struct ARTICULATED_VEHICLE_DEFINITION
 static ARTICULATED_VEHICLE_DEFINITION forkliftDefinition[] =
 {
 	{"body",		"convexHull",			900.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "mainBody"},
-	{"fr_tire",		"tireShape",			 50.0f, ARTICULATED_VEHICLE_DEFINITION::m_tireID, "frontTire"},
-	{"fl_tire",		"tireShape",			 50.0f, ARTICULATED_VEHICLE_DEFINITION::m_tireID, "frontTire"},
-	{"rr_tire",		"tireShape",			 50.0f, ARTICULATED_VEHICLE_DEFINITION::m_tireID, "rearTire"},
-	{"rl_tire",		"tireShape",			 50.0f, ARTICULATED_VEHICLE_DEFINITION::m_tireID, "rearTire"},
+//	{"fr_tire",		"tireShape",			 50.0f, ARTICULATED_VEHICLE_DEFINITION::m_tireID, "frontTire"},
+//	{"fl_tire",		"tireShape",			 50.0f, ARTICULATED_VEHICLE_DEFINITION::m_tireID, "frontTire"},
+//	{"rr_tire",		"tireShape",			 50.0f, ARTICULATED_VEHICLE_DEFINITION::m_tireID, "rearTire"},
+//	{"rl_tire",		"tireShape",			 50.0f, ARTICULATED_VEHICLE_DEFINITION::m_tireID, "rearTire"},
 	{"lift_1",		"convexHull",			 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "hingeActuator"},
 	{"lift_2",		"convexHull",			 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
 	{"lift_3",		"convexHull",			 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
@@ -160,10 +160,10 @@ class ArticulatedEntityModel: public DemoEntity
 		dMatrix baseMatrix;
 		NewtonBodyGetMatrix (child, &baseMatrix[0][0]);
 
-		dFloat minAngleLimit = -20.0f * 3.141592f / 180.0f;
-		dFloat maxAngleLimit =  30.0f * 3.141592f / 180.0f;
+		dFloat minAngleLimit = -30.0f * 3.141592f / 180.0f;
+		dFloat maxAngleLimit =  20.0f * 3.141592f / 180.0f;
 		dFloat angularRate = 10.0f * 3.141592f / 180.0f;
-		m_angularActuator = new CustomHingeActuator (&baseMatrix[0][0], angularRate, minAngleLimit, maxAngleLimit, child, parent);
+		m_angularActuator = new CustomHingeActuator (&baseMatrix[0][0], angularRate, minAngleLimit * 1000.0f, maxAngleLimit * 1000.0f, child, parent);
 	}
 
 	void LinkLiftActuator (NewtonBody* const parent, NewtonBody* const child)
@@ -224,7 +224,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 	virtual void OnPreUpdate (CustomArticulatedTransformController* const controller, dFloat timestep, int threadIndex) const
 	{
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)controller->GetUserData();
-
+/*
 		dFloat steeringAngle = vehicleModel->m_rearTireJoints[0]->GetActuatorAngle1();
 		if (vehicleModel->m_inputs.m_steerValue > 0) {
 			steeringAngle = vehicleModel->m_rearTireJoints[0]->GetMinAngularLimit0(); 
@@ -266,8 +266,13 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			omega -= tirePing.Scale(sign * omegaMag * omegaMag * vehicleModel->m_omegaResistance);
 			NewtonBodySetOmega(vehicleModel->m_fronTires[i], &omega[0]);
 		}
-
+*/
 		// set the tilt angle
+static int xxx;
+xxx ++;
+if (xxx > 500)
+vehicleModel->m_inputs.m_tiltValue = -1;
+
 		dFloat tiltAngle = vehicleModel->m_tiltAngle;
 		if (vehicleModel->m_inputs.m_tiltValue > 0) {
 			tiltAngle = vehicleModel->m_angularActuator->GetMinAngularLimit();
@@ -278,7 +283,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		}
 		vehicleModel->m_angularActuator->SetTargetAngle (tiltAngle);
 
-
+/*
 		// set the lift position
 		dFloat liftPosit = vehicleModel->m_liftPosit;
 		if (vehicleModel->m_inputs.m_liftValue > 0) {
@@ -304,6 +309,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		for (int i = 0; i < sizeof (vehicleModel->m_paletteJoints) / sizeof (vehicleModel->m_paletteJoints[0]); i ++) {
 			vehicleModel->m_paletteJoints[i]->SetTargetPosit(openPosit);
 		}
+*/
 	}
 
 	static int OnBoneAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
@@ -573,7 +579,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		}
 
 		// calculate the engine parameters
-		CalculateEngine (vehicleModel, rootBody, vehicleModel->m_fronTires[0]);
+//		CalculateEngine (vehicleModel, rootBody, vehicleModel->m_fronTires[0]);
 
 		// disable self collision between all body parts
 		controller->DisableAllSelfCollision();
@@ -620,11 +626,14 @@ class AriculatedJointInputManager: public CustomInputManager
 			mainWindow->GetKeyState ('Q') ||
 			mainWindow->GetKeyState ('E') ||
 			mainWindow->GetKeyState ('Z') ||
-			mainWindow->GetKeyState ('C')) 
+			mainWindow->GetKeyState ('X')) 
 		{
 			NewtonBody* const body = m_player->GetBoneBody(0);
 			NewtonBodySetSleepState(body, false);
 		}
+
+NewtonBody* const body = m_player->GetBoneBody(0);
+NewtonBodySetSleepState(body, false);
 
 
 #if 1

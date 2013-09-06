@@ -435,8 +435,8 @@ void dgAABBPolygonSoup::GetAABB (dgVector& p0, dgVector& p1) const
 	if (m_aabb) { 
 		GetNodeAABB (m_aabb, p0, p1);
 	} else {
-		p0 = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-		p1 = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+		p0 = dgVector (dgFloat32 (0.0f));
+		p1 = dgVector (dgFloat32 (0.0f));
 	}
 }
 
@@ -921,7 +921,7 @@ dgVector dgAABBPolygonSoup::ForAllSectorsSupportVectex (const dgVector& dir) con
 					backSupportDist = dgFloat32 (-1.0e20f);
 					dgInt32 index = dgInt32 (me->m_left.GetIndex());
 					dgInt32 vCount = me->m_left.GetCount();
-					dgVector vertex (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+					dgVector vertex (dgFloat32 (0.0f));
 					for (dgInt32 j = 0; j < vCount; j ++) {
 						dgInt32 i0 = m_indices[index + j] * dgInt32 (sizeof (dgTriplex) / sizeof (dgFloat32));
 						dgVector p (&boxArray[i0].m_x);
@@ -955,7 +955,7 @@ dgVector dgAABBPolygonSoup::ForAllSectorsSupportVectex (const dgVector& dir) con
 					frontSupportDist = dgFloat32 (-1.0e20f);
 					dgInt32 index = dgInt32 (me->m_right.GetIndex());
 					dgInt32 vCount = me->m_right.GetCount();
-					dgVector vertex (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+					dgVector vertex (dgFloat32 (0.0f));
 					for (dgInt32 j = 0; j < vCount; j ++) {
 						dgInt32 i0 = m_indices[index + j] * dgInt32 (sizeof (dgTriplex) / sizeof (dgFloat32));
 						dgVector p (&boxArray[i0].m_x);
@@ -980,7 +980,7 @@ dgVector dgAABBPolygonSoup::ForAllSectorsSupportVectex (const dgVector& dir) con
 					box[1].m_y = boxArray[node->m_indexBox1].m_y;
 					box[1].m_z = boxArray[node->m_indexBox1].m_z;
 
-					dgVector supportPoint (box[ix].m_x, box[iy].m_y, box[iz].m_z, dgFloat32 (0.0));
+					dgVector supportPoint (box[ix].m_x, box[iy].m_y, box[iz].m_z, dgFloat32 (0.0f));
 					frontSupportDist = supportPoint % dir;
 				}
 
@@ -1141,7 +1141,7 @@ void dgAABBPolygonSoup::ForAllSectors (const dgVector& minBox, const dgVector& m
 						dgFloat32 dist = node->BoxPenetration(vertexArray, minBox, maxBox);
 						if (dist > dgFloat32 (0.0f)) {
 							dgInt32 j = stack;
-							for ( ; j && (dist < distance[j - 1]); j --) {
+							for ( ; j && (dist > distance[j - 1]); j --) {
 								stackPool[j] = stackPool[j - 1];
 								distance[j] = distance[j - 1];
 							}
@@ -1173,7 +1173,7 @@ void dgAABBPolygonSoup::ForAllSectors (const dgVector& minBox, const dgVector& m
 						dgFloat32 dist = node->BoxPenetration(vertexArray, minBox, maxBox);
 						if (dist > dgFloat32 (0.0f)) {
 							dgInt32 j = stack;
-							for ( ; j && (dist < distance[j - 1]); j --) {
+							for ( ; j && (dist > distance[j - 1]); j --) {
 								stackPool[j] = stackPool[j - 1];
 								distance[j] = distance[j - 1];
 							}
