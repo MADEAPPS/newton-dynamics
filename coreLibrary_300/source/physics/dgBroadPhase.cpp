@@ -782,6 +782,11 @@ dgBroadPhase::dgNode* dgBroadPhase::BuildTopDown (dgNode** const leafArray, dgIn
 	}
 }
 
+void dgBroadPhase::ResetEntropy ()
+{
+	m_treeEntropy = dgFloat32 (0.0f);
+}
+
 void dgBroadPhase::ImproveFitness()
 {
 	dgFloat64 entropy = CalculateEmptropy();
@@ -795,12 +800,16 @@ void dgBroadPhase::ImproveFitness()
 			dgNode** const leafArray = (dgNode**)&world->m_pairMemoryBuffer[0];
 			for (dgFitnessList::dgListNode* nodePtr = m_fitness.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
 				dgNode* const node = nodePtr->GetInfo();
-				if (node->m_left->m_body) {
-					leafArray[leafNodesCount] = node->m_left;
+				dgNode* const leftNode = node->m_left;
+				if (leftNode->m_body) {
+					node->SetAABB(leftNode->m_body->m_minAABB, leftNode->m_body->m_maxAABB);
+					leafArray[leafNodesCount] = leftNode;
 					leafNodesCount ++;
 				}
-				if (node->m_right->m_body) {
-					leafArray[leafNodesCount] = node->m_right;
+				dgNode* const rightNode = node->m_right;
+				if (rightNode->m_body) {
+					rightNode->SetAABB (rightNode->m_body->m_minAABB, rightNode->m_body->m_maxAABB);
+					leafArray[leafNodesCount] = rightNode;
 					leafNodesCount ++;
 				}
 			}

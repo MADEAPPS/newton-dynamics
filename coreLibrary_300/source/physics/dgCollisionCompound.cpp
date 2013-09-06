@@ -516,10 +516,6 @@ void dgCollisionCompound::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVect
 {
 	if (m_root) {
 		dgVector origin (matrix.TransformVector(m_root->m_origin));
-		//dgVector size (m_root->m_size.m_x * dgAbsf(matrix[0][0]) + m_root->m_size.m_y * dgAbsf(matrix[1][0]) + m_root->m_size.m_z * dgAbsf(matrix[2][0]),  
-		//			     m_root->m_size.m_x * dgAbsf(matrix[0][1]) + m_root->m_size.m_y * dgAbsf(matrix[1][1]) + m_root->m_size.m_z * dgAbsf(matrix[2][1]),  
-		//			     m_root->m_size.m_x * dgAbsf(matrix[0][2]) + m_root->m_size.m_y * dgAbsf(matrix[1][2]) + m_root->m_size.m_z * dgAbsf(matrix[2][2]),
-		//			     dgFloat32 (0.0f));
 		dgVector size (matrix.m_front.Abs().Scale4(m_root->m_size.m_x) + matrix.m_up.Abs().Scale4(m_root->m_size.m_y) + matrix.m_right.Abs().Scale4(m_root->m_size.m_z));
 
 		p0 = (origin - size) & dgVector::m_triplexMask;
@@ -995,7 +991,6 @@ void dgCollisionCompound::EndAddRemove ()
 		if (m_root->m_type == m_node) {
 
 			dgWorld* const world = m_world;
-
 			dgThreadHiveScopeLock lock (world, &m_criticalSectionLock);
 
 			dgTree<dgNodeBase*, dgInt32>::Iterator iter (m_array);

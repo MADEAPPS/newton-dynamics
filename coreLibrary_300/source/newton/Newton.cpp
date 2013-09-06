@@ -5537,11 +5537,14 @@ void NewtonBodySetCollision(const NewtonBody* const bodyPtr, const NewtonCollisi
 void NewtonBodySetCollisionScale (const NewtonBody* const bodyPtr, dFloat scaleX, dFloat scaleY, dFloat scaleZ)
 {
 	TRACE_FUNCTION(__FUNCTION__);
+	dgBody* const body = (dgBody *)bodyPtr;
+	dgWorld* const world = body->GetWorld();
 	NewtonCollisionSetScale(NewtonBodyGetCollision(bodyPtr), scaleX, scaleY, scaleZ);
+	world->GetBroadPhase()->ResetEntropy ();
 
-	dgMatrix matrix;
-	NewtonBodyGetMatrix (bodyPtr, &matrix[0][0]);
-	NewtonBodySetMatrix (bodyPtr, &matrix[0][0]);
+//	dgMatrix matrix;
+//	NewtonBodyGetMatrix (bodyPtr, &matrix[0][0]);
+//	NewtonBodySetMatrix (bodyPtr, &matrix[0][0]);
 }
 
 

@@ -91,6 +91,8 @@ class dgBroadPhase
 	dgInt32 GetBroadPhaseType () const;
 	void SelectBroadPhaseType (dgInt32 algorthmType);
 
+	void ResetEntropy ();
+
 	protected:
 	class dgFitnessList: public dgList <dgNode*>
 	{
