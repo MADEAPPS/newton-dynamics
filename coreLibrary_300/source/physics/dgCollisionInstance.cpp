@@ -347,8 +347,12 @@ void dgCollisionInstance::SetScale (const dgVector& scale)
 	dgAssert (scaleY > dgFloat32 (0.0f));
 	dgAssert (scaleZ > dgFloat32 (0.0f));
 
-	if ((dgAbsf (scaleX - scaleY) < dgFloat32 (1.0e-3f)) && (dgAbsf (scaleX - scaleZ) < dgFloat32 (1.0e-3f))) {
-		if ((dgAbsf (scaleX - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f))) {
+	if (IsType(dgCollision::dgCollisionCompound_RTTI)) {
+		dgAssert (m_scaleType == m_unit);
+		dgCollisionCompound* const compound = (dgCollisionCompound*) m_childShape;
+		compound->ApplyScale(scale);
+	} else if ((dgAbsf (scaleX - scaleY) < dgFloat32 (1.0e-4f)) && (dgAbsf (scaleX - scaleZ) < dgFloat32 (1.0e-4f))) {
+		if ((dgAbsf (scaleX - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f))) {
 			m_scaleType = m_unit;
 			m_scale	= dgVector (dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f));	
 			m_maxScale = m_scale;	
@@ -365,19 +369,15 @@ void dgCollisionInstance::SetScale (const dgVector& scale)
 		m_scale	= dgVector (scaleX, scaleY, scaleZ, dgFloat32 (0.0f));	
 		m_invScale = dgVector (dgFloat32 (1.0f) / scaleX, dgFloat32 (1.0f) / scaleY, dgFloat32 (1.0f) / scaleZ, dgFloat32 (0.0f));	
 	}
+}
 
-	if (GetCollisionPrimityType() == m_compoundCollision) {
-		dgAssert(0);
-/*
-		dgCollisionCompound* const compound = (dgCollisionCompound*) m_childShape;
-		compound->ApplyScale(m_scale);
-
-		m_scaleIsUnit = 1;
-		m_scaleIsUniform = 1;
-		m_scale	= dgVector (dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f));	
-		m_maxScale = m_scale;	
-		m_invScale = m_scale;
-*/
+void dgCollisionInstance::SetGlobalScale (const dgVector& scale)
+{
+	if ((dgAbsf (scale[0] - scale[1]) < dgFloat32 (1.0e-4f)) && (dgAbsf (scale[0] - scale[2]) < dgFloat32 (1.0e-4f))) {
+		m_localMatrix.m_posit =  m_localMatrix.m_posit.Scale3 (scale.m_x);
+		SetScale (scale);
+	} else {
+		dgAssert (0);
 	}
 }
 

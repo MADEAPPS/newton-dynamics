@@ -121,6 +121,7 @@ dgCollisionCompound::dgNodeBase::dgNodeBase (const dgNodeBase& copyFrom)
 	,m_right(NULL)
 	,m_parent(NULL)
 	,m_shape(copyFrom.m_shape)
+	,m_myNode(NULL)
 {
 	dgAssert (!copyFrom.m_shape);
 }
@@ -134,10 +135,7 @@ dgCollisionCompound::dgNodeBase::dgNodeBase (dgCollisionInstance* const instance
 	,m_shape(new (instance->GetAllocator()) dgCollisionInstance (*instance))
 	,m_myNode(NULL)
 {	
-	dgVector p0;
-	dgVector p1;
-	m_shape->CalcAABB(m_shape->GetLocalMatrix (), p0, p1);
-	SetBox (p0, p1);
+	CalculateAABB();
 }
 
 
@@ -147,12 +145,11 @@ dgCollisionCompound::dgNodeBase::dgNodeBase (dgNodeBase* const left, dgNodeBase*
 	,m_right(right)
 	,m_parent(NULL)
 	,m_shape(NULL)
+	,m_myNode(NULL)
 {
 	m_left->m_parent = this;
 	m_right->m_parent = this;
 
-//	dgVector p0 (dgMin (left->m_p0.m_x, right->m_p0.m_x), dgMin (left->m_p0.m_y, right->m_p0.m_y), dgMin (left->m_p0.m_z, right->m_p0.m_z), dgFloat32 (0.0f));
-//	dgVector p1 (dgMax (left->m_p1.m_x, right->m_p1.m_x), dgMax (left->m_p1.m_y, right->m_p1.m_y), dgMax (left->m_p1.m_z, right->m_p1.m_z), dgFloat32 (0.0f));
 	dgVector p0 (left->m_p0.GetMin(right->m_p0));
 	dgVector p1 (left->m_p1.GetMax(right->m_p1));
 	SetBox(p0, p1);
@@ -181,6 +178,14 @@ void dgCollisionCompound::dgNodeBase::SetBox (const dgVector& p0, const dgVector
 	m_size = (m_p1 - m_p0).CompProduct4 (dgVector::m_half);
 	m_origin = (m_p1 + m_p0).CompProduct4 (dgVector::m_half);
 	m_area = m_size.DotProduct4(m_size.ShiftTripleRight()).m_x;
+}
+
+void dgCollisionCompound::dgNodeBase::CalculateAABB()
+{
+	dgVector p0;
+	dgVector p1;
+	m_shape->CalcAABB(m_shape->GetLocalMatrix (), p0, p1);
+	SetBox (p0, p1);
 }
 
 bool dgCollisionCompound::dgNodeBase::BoxTest (const dgOOBBTestData& data) const
@@ -859,7 +864,7 @@ void dgCollisionCompound::MassProperties ()
 
 	dgCollision::MassProperties ();
 }
-
+/*
 void dgCollisionCompound::ConvertChildToConvexHull (void* userData, int vertexCount, const dgFloat32* FaceArray, int faceId)
 {
 	dgConvertChildToConvexHullContext* const pool = (dgConvertChildToConvexHullContext*) userData;
@@ -867,12 +872,11 @@ void dgCollisionCompound::ConvertChildToConvexHull (void* userData, int vertexCo
 		pool->AddPoint(dgVector (&FaceArray[i * 3]));
 	}
 }
+*/
 
 void dgCollisionCompound::ApplyScale (const dgVector& scale)
 {
-	dgFloatExceptions exception (dgFloatExceptions::m_allExepctions);
-
-
+/*
 	dgMatrix scaleMatrix (dgGetIdentityMatrix());
 	scaleMatrix[0][0] = scale.m_x;
 	scaleMatrix[1][1] = scale.m_y;
@@ -923,7 +927,16 @@ void dgCollisionCompound::ApplyScale (const dgVector& scale)
 
 	m_treeEntropy = dgFloat32 (0.0f);
 	EndAddRemove ();
-	dgCollision::MassProperties ();
+*/
+
+	dgTree<dgNodeBase*, dgInt32>::Iterator iter (m_array);
+	for (iter.Begin(); iter; iter ++) {
+		dgNodeBase* const node = iter.GetNode()->GetInfo();
+		dgCollisionInstance* const collision = node->GetShape();
+		collision->SetGlobalScale (scale);
+	}
+	m_treeEntropy = dgFloat32 (0.0f);
+	EndAddRemove ();
 }
 
 
@@ -984,6 +997,13 @@ void dgCollisionCompound::EndAddRemove ()
 			dgWorld* const world = m_world;
 
 			dgThreadHiveScopeLock lock (world, &m_criticalSectionLock);
+
+			dgTree<dgNodeBase*, dgInt32>::Iterator iter (m_array);
+			for (iter.Begin(); iter; iter ++) {
+				dgNodeBase* const node = iter.GetNode()->GetInfo();
+				node->CalculateAABB();
+			}
+
 			dgList<dgNodeBase*> list (GetAllocator());
 			dgList<dgNodeBase*> stack (GetAllocator());
 			stack.Append(m_root);

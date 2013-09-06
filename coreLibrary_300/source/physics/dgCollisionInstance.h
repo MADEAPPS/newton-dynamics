@@ -52,6 +52,8 @@ class dgCollisionInstance
 	const dgVector& GetScale () const;
 	const dgVector& GetInvScale () const;
 
+	void SetGlobalScale (const dgVector& scale);
+
 	dgScaleType GetScaleType() const;
 	dgScaleType GetCombinedScaleType(dgScaleType type) const;
 

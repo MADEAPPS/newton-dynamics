@@ -75,9 +75,12 @@ class dgCollisionCompound: public dgCollision
 		dgNodeBase (dgNodeBase* const left, dgNodeBase* const right);
 		~dgNodeBase();
 
+		void CalculateAABB();
 		void SetBox (const dgVector& p0, const dgVector& p1);
 		bool BoxTest (const dgOOBBTestData& data) const;
 		bool BoxTest (const dgOOBBTestData& data, const dgNodeBase* const otherNode) const;
+
+		
 
 		DG_INLINE dgCollisionInstance* GetShape() const 
 		{
@@ -106,6 +109,7 @@ class dgCollisionCompound: public dgCollision
 
 	
 	protected:
+/*
 	class dgConvertChildToConvexHullContext
 	{
 		public: 
@@ -130,7 +134,7 @@ class dgCollisionCompound: public dgCollision
 		dgInt32 m_count;
 		dgVector* m_pool;
 	};
-
+*/
 
 	class dgNodePairs
 	{
@@ -222,7 +226,7 @@ class dgCollisionCompound: public dgCollision
 
 	dgFloat64 CalculateEntropy (dgList<dgNodeBase*>& list);
 
-	static void ConvertChildToConvexHull (void* userData, int vertexCount, const dgFloat32* FaceArray, int faceId);
+//	static void ConvertChildToConvexHull (void* userData, int vertexCount, const dgFloat32* FaceArray, int faceId);
 
 	void CalculateCollisionTreeArea(dgNodePairs& pairOut, const dgCollisionBVH* const collisionTree, const void* const treeNode) const;
 	void ImproveNodeFitness (dgNodeBase* const node) const;
