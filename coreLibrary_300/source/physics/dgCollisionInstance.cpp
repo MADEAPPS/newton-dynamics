@@ -527,6 +527,7 @@ void dgCollisionInstance::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVect
 			break;
 		}
 
+		case m_uniform:
 		case m_nonUniform:
 		{
 			dgMatrix matrix1 (matrix);
