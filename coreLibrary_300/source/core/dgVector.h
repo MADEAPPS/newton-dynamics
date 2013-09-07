@@ -806,10 +806,13 @@ class dgVector
 
 	DG_INLINE dgVector Floor () const
 	{
-		dgVector mask ((dgFloat32 (1.5f) * dgFloat32 (1<<23)));
-		dgVector ret (_mm_sub_ps(_mm_add_ps(m_type, mask.m_type), mask.m_type));
-		dgVector adjust (_mm_cmplt_ps (m_type, ret.m_type));
-		ret = _mm_sub_ps (ret.m_type, _mm_and_ps(_mm_set_ps1(1.0), adjust.m_type));
+//		dgVector mask ((dgFloat32 (1.5f) * dgFloat32 (1<<23)));
+//		dgVector ret (_mm_sub_ps(_mm_add_ps(m_type, mask.m_type), mask.m_type));
+//		dgVector adjust (_mm_cmplt_ps (m_type, ret.m_type));
+//		ret = _mm_sub_ps (ret.m_type, _mm_and_ps(_mm_set_ps1(1.0), adjust.m_type));
+
+		dgVector truncated (_mm_cvtepi32_ps (_mm_cvttps_epi32 (m_type)));
+		dgVector ret (truncated - (dgVector::m_one & (*this < truncated)));
 		dgAssert (ret.m_f[0] == dgFloor(m_f[0]));
 		dgAssert (ret.m_f[1] == dgFloor(m_f[1]));
 		dgAssert (ret.m_f[2] == dgFloor(m_f[2]));
