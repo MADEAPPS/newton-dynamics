@@ -383,14 +383,21 @@ void dgCollisionInstance::SetGlobalScale (const dgVector& scale)
 		m_localMatrix.m_posit =  m_localMatrix.m_posit.Scale3 (scale.m_x * m_invScale.m_x);
 		SetScale (scale);
 	} else {
-		dgMatrix matrix (m_localMatrix);
-		matrix[0] = matrix[0].CompProduct4 (scale);
-		matrix[1] = matrix[1].CompProduct4 (scale);
-		matrix[2] = matrix[2].CompProduct4 (scale);
-		matrix[3] = matrix[3].CompProduct4 (scale);
-		matrix[3][3] = dgFloat32 (1.0f);
+		// extract the original local matrix
+		dgMatrix localMatrix (m_aligmentMatrix * m_localMatrix);
 		
-		matrix.PolarDecomposition (m_localMatrix, m_scale, m_aligmentMatrix);
+		// create a new scale matrix 
+		localMatrix[0] = localMatrix[0].CompProduct4 (scale);
+		localMatrix[1] = localMatrix[1].CompProduct4 (scale);
+		localMatrix[2] = localMatrix[2].CompProduct4 (scale);
+		localMatrix[3] = localMatrix[3].CompProduct4 (scale);
+		localMatrix[3][3] = dgFloat32 (1.0f);
+
+		// decompose into to align * scale * local
+		localMatrix.PolarDecomposition (m_localMatrix, m_scale, m_aligmentMatrix);
+
+		m_localMatrix = m_aligmentMatrix * m_localMatrix;
+		m_aligmentMatrix = m_aligmentMatrix.Transpose();
 
 		bool isIdentity = true;
 		for (dgInt32 i = 0; i < 3; i ++) {
@@ -595,26 +602,23 @@ dgFloat32 dgCollisionInstance::RayCast (const dgVector& localP0, const dgVector&
 				return t;
 			}
 
-		
+			case m_global:
 			default:
 			{
-				dgAssert(0);
-/*
-				dgVector p0 (localP0.CompProduct4(m_invScale));
-				dgVector p1 (localP1.CompProduct4(m_invScale));
+				dgVector p0 (m_aligmentMatrix.UntransformVector (localP0.CompProduct4(m_invScale)));
+				dgVector p1 (m_aligmentMatrix.UntransformVector (localP1.CompProduct4(m_invScale)));
 				dgFloat32 t = m_childShape->RayCast (p0, p1, maxT, contactOut, body, userData);
 				if (t <= maxT) {
 					if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
 						contactOut.m_shapeId0 = GetUserDataID();
 						contactOut.m_shapeId1 = GetUserDataID();
-						dgVector n (m_invScale.CompProduct4 (contactOut.m_normal));
+						dgVector n (m_aligmentMatrix.RotateVector(m_invScale.CompProduct4 (contactOut.m_normal)));
 						contactOut.m_normal = n.CompProduct4(n.InvMagSqrt());
 					}
 					contactOut.m_collision0 = this;
 					contactOut.m_collision1 = this;
 				}
 				return t;
-*/
 			}
 		}
 	}
