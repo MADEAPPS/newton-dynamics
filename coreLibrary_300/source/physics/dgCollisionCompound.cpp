@@ -518,6 +518,7 @@ void dgCollisionCompound::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVect
 		dgVector origin (matrix.TransformVector(m_root->m_origin));
 		dgVector size (matrix.m_front.Abs().Scale4(m_root->m_size.m_x) + matrix.m_up.Abs().Scale4(m_root->m_size.m_y) + matrix.m_right.Abs().Scale4(m_root->m_size.m_z));
 
+		size -= dgCollisionInstance::m_padding;
 		p0 = (origin - size) & dgVector::m_triplexMask;
 		p1 = (origin + size) & dgVector::m_triplexMask;
 	} else {
@@ -860,71 +861,9 @@ void dgCollisionCompound::MassProperties ()
 
 	dgCollision::MassProperties ();
 }
-/*
-void dgCollisionCompound::ConvertChildToConvexHull (void* userData, int vertexCount, const dgFloat32* FaceArray, int faceId)
-{
-	dgConvertChildToConvexHullContext* const pool = (dgConvertChildToConvexHullContext*) userData;
-	for (dgInt32 i = 0; i < vertexCount; i ++) {
-		pool->AddPoint(dgVector (&FaceArray[i * 3]));
-	}
-}
-*/
 
 void dgCollisionCompound::ApplyScale (const dgVector& scale)
 {
-/*
-	dgMatrix scaleMatrix (dgGetIdentityMatrix());
-	scaleMatrix[0][0] = scale.m_x;
-	scaleMatrix[1][1] = scale.m_y;
-	scaleMatrix[2][2] = scale.m_z;
-	dgTree<dgNodeBase*, dgInt32>::Iterator iter (m_array);
-
-	dgConvertChildToConvexHullContext convexPool;
-	for (iter.Begin(); iter; iter ++) {
-		dgNodeBase* const node = iter.GetNode()->GetInfo();
-		dgCollisionInstance* const collision = node->GetShape();
-
-		dgMatrix localScale (dgGetIdentityMatrix());
-		localScale[0][0] = collision->GetScale().m_x;
-		localScale[1][1] = collision->GetScale().m_y;
-		localScale[2][2] = collision->GetScale().m_z;
-
-		const dgMatrix& localMatrix = collision->GetLocalMatrix();
-		dgMatrix matrix (localScale * localMatrix * scaleMatrix);
-
-		dgVector newScaleScale;
-		dgMatrix orthonormalMatrix;
-		dgMatrix axisMatrix;
-		matrix.PolarDecomposition (orthonormalMatrix, newScaleScale, axisMatrix);
-
-		dgMatrix localScale1 (dgGetIdentityMatrix());
-		localScale1[0][0] = newScaleScale.m_x;
-		localScale1[1][1] = newScaleScale.m_y;
-		localScale1[2][2] = newScaleScale.m_z;
-		dgMatrix bakeMatrix (axisMatrix.Transpose() * localScale1 * axisMatrix);
-
-		convexPool.m_count = 0;
-		collision->GetChildShape()->DebugCollision(bakeMatrix, ConvertChildToConvexHull, &convexPool);
-		dgCollisionInstance* const convexHull = m_world->CreateConvexHull (convexPool.m_count, &convexPool.m_pool[0].m_x, sizeof (convexPool.m_pool[0]), dgFloat32 (0.0f), 0, dgGetIdentityMatrix());
-
-		collision->SetScale(dgVector (dgFloat32(1.0f)));
-		collision->SetLocalMatrix(orthonormalMatrix);
-
-		const dgCollision* const childShape = collision->GetChildShape()->AddRef();
-		collision->SetChildShape((dgCollision*)convexHull->GetChildShape());
-		convexHull->Release();
-		m_world->ReleaseCollision(childShape);
-
-		dgVector p0;
-		dgVector p1;
-		collision->GetChildShape()->CalcAABB(orthonormalMatrix, p0, p1);
-		node->SetBox (p0, p1);
-	}
-
-	m_treeEntropy = dgFloat32 (0.0f);
-	EndAddRemove ();
-*/
-
 	dgTree<dgNodeBase*, dgInt32>::Iterator iter (m_array);
 	for (iter.Begin(); iter; iter ++) {
 		dgNodeBase* const node = iter.GetNode()->GetInfo();
