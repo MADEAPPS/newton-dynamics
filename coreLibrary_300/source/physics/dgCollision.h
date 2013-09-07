@@ -266,7 +266,7 @@ class dgCollision
 	
 	virtual void MassProperties ();
 	virtual dgFloat32 CalculateMassProperties (const dgMatrix& offset, dgVector& inertia, dgVector& crossInertia, dgVector& centerOfMass) const {dgAssert (0); return 0;}
-	virtual dgMatrix CalculateInertiaAndCenterOfMass (const dgVector& localScale, const dgMatrix& matrix) const {dgAssert (0); return dgGetZeroMatrix();}
+	virtual dgMatrix CalculateInertiaAndCenterOfMass (const dgMatrix& m_alignMatrix, const dgVector& localScale, const dgMatrix& matrix) const {dgAssert (0); return dgGetZeroMatrix();}
 
 	virtual dgFloat32 GetSkinThickness () const; 
 	virtual dgFloat32 GetBoxMinRadius () const = 0; 

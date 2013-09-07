@@ -1479,7 +1479,7 @@ void dgBroadPhase::ConvexRayCast (dgCollisionInstance* const shape, const dgMatr
 
 		dgVector boxP0;
 		dgVector boxP1;
-		shape->CalcAABB(shape->m_localMatrix * matrix, boxP0, boxP1);
+		shape->CalcAABB(shape->GetLocalMatrix() * matrix, boxP0, boxP1);
 
 		dgInt32 stack = 1;
 		dgFloat32 distance[DG_COMPOUND_STACK_DEPTH];

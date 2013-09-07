@@ -147,8 +147,6 @@ DG_INLINE dgCollisionInstance::dgCollisionInstance(const dgCollisionInstance& me
 	,m_userData(NULL)
 	,m_world(meshInstance.m_world)
 	,m_childShape (shape)
-//	,m_scaleIsUnit (meshInstance.m_scaleIsUnit)
-//	,m_scaleIsUniform (meshInstance.m_scaleIsUniform)
 	,m_collisionMode(meshInstance.m_collisionMode)
 	,m_scaleType(meshInstance.m_scaleType)
 {
@@ -249,17 +247,7 @@ DG_INLINE dgMemoryAllocator* dgCollisionInstance::GetAllocator() const
 
 DG_INLINE dgFloat32 dgCollisionInstance::GetVolume () const
 {
-	switch (m_scaleType)
-	{
-		case m_unit:
-		case m_uniform:
-		case m_nonUniform:
-			return m_childShape->GetVolume() * m_scale.m_x * m_scale.m_y * m_scale.m_z;
-
-		default:
-			dgAssert (0);
-			return m_childShape->GetVolume() * m_scale.m_x * m_scale.m_y * m_scale.m_z;
-	}
+	return m_childShape->GetVolume() * m_scale.m_x * m_scale.m_y * m_scale.m_z;
 }
 
 
@@ -355,10 +343,15 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertex(const dgVector& dir, dgInt
 			dir1 = dir1.CompProduct4(dir1.InvMagSqrt());
 			return m_scale.CompProduct4(m_childShape->SupportVertex (dir1, vertexIndex));
 		}
-		default:
-			dgAssert(0);
-			return dgVector(0.0f);
 
+		case m_global:
+		default:	
+		{
+//			dgAssert(0);
+			dgVector dir1 (m_scale.CompProduct4(dir));
+			dir1 = dir1.CompProduct4(dir1.InvMagSqrt());
+			return m_scale.CompProduct4(m_childShape->SupportVertex (dir1, vertexIndex));
+		}
 	}
 }
 

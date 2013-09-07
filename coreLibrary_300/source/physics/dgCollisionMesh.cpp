@@ -291,8 +291,8 @@ dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const casti
 
 	dgCollisionMesh* const polysoup = (dgCollisionMesh *) referenceCollision->GetChildShape();
 
-	dgMatrix hullMatrix (castingShape->m_localMatrix * shapeMatrix);
-	const dgMatrix& soupMatrix = referenceCollision->m_globalMatrix;
+	dgMatrix hullMatrix (castingShape->GetLocalMatrix() * shapeMatrix);
+	const dgMatrix& soupMatrix = referenceCollision->GetGlobalMatrix();
 
 	dgMatrix matrix (hullMatrix * soupMatrix.Inverse());
 
@@ -387,8 +387,8 @@ dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const casti
 			dgInt32 index = localIndexArray[i] * stride;
 			polygon.m_localPoly[i] = (scale.CompProduct4(dgVector (&vertex[index])) - origin) & dgVector::m_triplexMask;
 		}
-		polyInstance.m_localMatrix.m_posit = referenceCollision->m_localMatrix.TransformVector(origin);
-		polyInstance.m_globalMatrix.m_posit = referenceCollision->m_globalMatrix.TransformVector(origin);
+		polyInstance.m_localMatrix.m_posit = referenceCollision->GetLocalMatrix().TransformVector(origin);
+		polyInstance.m_globalMatrix.m_posit = referenceCollision->GetGlobalMatrix().TransformVector(origin);
 		dgFloat32 t = polygon.ConvexRayCast (castingShape, shapeMatrix, shapeVeloc, maxT, tmpContact, referenceBody, &polyInstance, userData, threadId);
 		if (t < maxT) {
 			maxT = t;

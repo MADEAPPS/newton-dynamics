@@ -188,7 +188,7 @@ class dgCollisionCompound: public dgCollision
 	static void CalculateInertia (void* userData, int vertexCount, const dgFloat32* const FaceArray, int faceId);
 
 	virtual void MassProperties ();
-	dgMatrix CalculateInertiaAndCenterOfMass (const dgVector& localScale, const dgMatrix& matrix) const;
+	dgMatrix CalculateInertiaAndCenterOfMass (const dgMatrix& m_alignMatrix, const dgVector& localScale, const dgMatrix& matrix) const;
 	dgFloat32 CalculateMassProperties (const dgMatrix& offset, dgVector& inertia, dgVector& crossInertia, dgVector& centerOfMass) const;
 
 	

@@ -109,7 +109,7 @@ class dgCollisionConvex: public dgCollision
 	virtual void DebugCollision  (const dgMatrix& matrix, OnDebugCollisionMeshCallback callback, void* const userData) const;
 
 	virtual void MassProperties ();
-	virtual dgMatrix CalculateInertiaAndCenterOfMass (const dgVector& localScale, const dgMatrix& matrix) const;
+	virtual dgMatrix CalculateInertiaAndCenterOfMass (const dgMatrix& m_alignMatrix, const dgVector& localScale, const dgMatrix& matrix) const;
 	virtual dgFloat32 CalculateMassProperties (const dgMatrix& offset, dgVector& inertia, dgVector& crossInertia, dgVector& centerOfMass) const;
 
 	bool SanityCheck(dgInt32 count, const dgVector& normal, dgVector* const contactsOut) const;

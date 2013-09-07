@@ -1671,10 +1671,12 @@ void dgCollisionConvex::MassProperties ()
 	dgCollision::MassProperties ();
 }
 
-dgMatrix dgCollisionConvex::CalculateInertiaAndCenterOfMass (const dgVector& localScale, const dgMatrix& matrix) const
+dgMatrix dgCollisionConvex::CalculateInertiaAndCenterOfMass (const dgMatrix& m_alignMatrix, const dgVector& localScale, const dgMatrix& matrix) const
 {
- 
 	if ((dgAbsf (localScale.m_x - localScale.m_y) < dgFloat32 (1.0e-5f)) && (dgAbsf (localScale.m_x - localScale.m_z) < dgFloat32 (1.0e-5f))) {
+		dgAssert (m_alignMatrix[0][0] == dgFloat32(1.0f));
+		dgAssert (m_alignMatrix[1][1] == dgFloat32(1.0f));
+		dgAssert (m_alignMatrix[2][2] == dgFloat32(1.0f));
 		#ifdef _DEBUG
 				// using divergence theorem
 				dgVector inertiaII_;
@@ -1747,6 +1749,8 @@ dgMatrix dgCollisionConvex::CalculateInertiaAndCenterOfMass (const dgVector& loc
 		scaledMatrix[0] = scaledMatrix[0].Scale3(localScale.m_x);
 		scaledMatrix[1] = scaledMatrix[1].Scale3(localScale.m_y);
 		scaledMatrix[2] = scaledMatrix[2].Scale3(localScale.m_z);
+		scaledMatrix = m_alignMatrix * scaledMatrix;
+
 		dgFloat32 volume = CalculateMassProperties (scaledMatrix, inertiaII, crossInertia, centerOfMass);
 		if (volume < DG_MAX_MIN_VOLUME) {
 			volume = DG_MAX_MIN_VOLUME;

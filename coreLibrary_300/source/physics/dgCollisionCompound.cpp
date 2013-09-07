@@ -185,6 +185,10 @@ void dgCollisionCompound::dgNodeBase::CalculateAABB()
 	dgVector p0;
 	dgVector p1;
 	m_shape->CalcAABB(m_shape->GetLocalMatrix (), p0, p1);
+
+static int xxxx;
+dgTrace (("%d %f %f %f\n", xxxx, p0[0], p0[1], p0[2]));
+xxxx ++;
 	SetBox (p0, p1);
 }
 
@@ -778,7 +782,7 @@ dgFloat32 dgCollisionCompound::CalculateMassProperties (const dgMatrix& offset, 
 }
 
 
-dgMatrix dgCollisionCompound::CalculateInertiaAndCenterOfMass (const dgVector& localScale, const dgMatrix& matrix) const
+dgMatrix dgCollisionCompound::CalculateInertiaAndCenterOfMass (const dgMatrix& m_alignMatrix, const dgVector& localScale, const dgMatrix& matrix) const
 {
 	dgVector inertiaII;
 	dgVector crossInertia;
@@ -787,6 +791,8 @@ dgMatrix dgCollisionCompound::CalculateInertiaAndCenterOfMass (const dgVector& l
 	scaledMatrix[0] = scaledMatrix[0].Scale3(localScale.m_x);
 	scaledMatrix[1] = scaledMatrix[1].Scale3(localScale.m_y);
 	scaledMatrix[2] = scaledMatrix[2].Scale3(localScale.m_z);
+	scaledMatrix = m_alignMatrix * scaledMatrix;
+
 	dgFloat32 volume = CalculateMassProperties (scaledMatrix, inertiaII, crossInertia, centerOfMass);
 	if (volume < DG_MAX_MIN_VOLUME) {
 		volume = DG_MAX_MIN_VOLUME;
