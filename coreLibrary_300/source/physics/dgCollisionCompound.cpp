@@ -185,10 +185,6 @@ void dgCollisionCompound::dgNodeBase::CalculateAABB()
 	dgVector p0;
 	dgVector p1;
 	m_shape->CalcAABB(m_shape->GetLocalMatrix (), p0, p1);
-
-static int xxxx;
-dgTrace (("%d %f %f %f\n", xxxx, p0[0], p0[1], p0[2]));
-xxxx ++;
 	SetBox (p0, p1);
 }
 
