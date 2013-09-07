@@ -546,7 +546,6 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete (dgCollis
 		m_localPoly[i] = polygonMatrix.UntransformVector(m_localPoly[i]);
 		dgAssert (m_localPoly[i].m_w == dgFloat32 (0.0f));
 	}
-
 	dgMatrix savedProxyMatrix (proxy.m_matrix);
 	proxy.m_matrix = polygonMatrix * proxy.m_matrix;
 

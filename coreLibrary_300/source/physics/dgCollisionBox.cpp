@@ -235,11 +235,9 @@ dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, cons
 	dgFloat32 test[8];
 	dgPlane plane (normal, - (normal % point));
 	for (dgInt32 i = 0; i < 8; i ++) {
-		//test[i] = plane.Evalue (m_vertex[i]);
-		//test[i] = plane.DotProduct4 (m_vertex[i]).m_x;
+		dgAssert (m_vertex[i].m_w == dgFloat32 (0.0f));
 		test[i] = plane.DotProduct4 (m_vertex[i] | dgVector::m_wOne).m_x;
 	}
-
 
 	dgConvexSimplexEdge* edge = NULL;
 	for (dgInt32 i = 0; i < dgInt32 (sizeof (m_vertexToEdgeMap)/sizeof (m_vertexToEdgeMap[0])); i ++) {
@@ -251,19 +249,6 @@ dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, cons
 			break;
 		}
 	}
-
-	if (!edge) {
-		for (dgInt32 i = 0; i < dgInt32 (sizeof (m_vertexToEdgeMap)/sizeof (m_vertexToEdgeMap[0])); i ++) {
-			dgConvexSimplexEdge* const ptr = m_vertexToEdgeMap[i];
-			dgFloat32 side0 = test[ptr->m_vertex];
-			dgFloat32 side1 = test[ptr->m_twin->m_vertex];
-			if ((side0 * side1) <= dgFloat32 (0.0f)) {
-				edge = ptr;
-				break;
-			}
-		}
-	}
-
 
 	dgInt32 count = 0;
 	if (edge) {
