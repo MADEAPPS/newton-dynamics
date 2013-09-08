@@ -267,6 +267,8 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 				m_hullSum[vertexIndex] = p + q;
 				break;
 			}
+
+			case dgCollisionInstance::m_global:
 			default:
 				dgAssert(0);
 		}

@@ -1000,7 +1000,7 @@ CreateLevelMesh (scene, "ruins.ngd", false);
 	// create a shattered mesh array
 	//CreateSimpleVoronoiFracture (scene);
 
-	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
+	//int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 	dVector location (0.0f, 0.0f, 0.0f, 0.0f);
 	dVector size (0.75f, 0.75f, 0.75f, 0.0f);
 	dMatrix shapeOffsetMatrix (GetIdentityMatrix());

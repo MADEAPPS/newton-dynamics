@@ -47,10 +47,7 @@
 #define	dAtan2(x,y) dFloat (atan2 (dFloat(x), dFloat(y)))
 
 
-//#define D_VECTOR_SIMD_SIZE		16
-//#define D_MSC_VECTOR_ALIGMENT		__declspec(align(D_VECTOR_SIMD_SIZE))
 #define	D_MSC_VECTOR_ALIGMENT
-
 
 enum dEulerAngleOrder
 {
