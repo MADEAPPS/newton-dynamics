@@ -779,13 +779,13 @@ inside = false;
 			dgVector p0 (proxy.m_matrix.UntransformVector (pointInHull));
 
 			dgFloat32 timetoImpact = dgFloat32 (0.0f);
-			dgFloat32 closestDistance = dgFloat32 (0.0f);
+			//dgFloat32 closestDistance = dgFloat32 (0.0f);
 			
 			dgFloat32 penetration = (m_localPoly[0] - p0) % m_normal + proxy.m_skinThickness + DG_IMPULSIVE_CONTACT_PENETRATION;
 			if (penetration < dgFloat32 (0.0f)) {
 				timetoImpact = penetration / (polyRelativeVeloc % m_normal);
 				dgAssert (timetoImpact >= dgFloat32 (0.0f));
-				closestDistance = -penetration;
+//				closestDistance = -penetration;
 			}
 
 			if (timetoImpact <= proxy.m_timestep) {

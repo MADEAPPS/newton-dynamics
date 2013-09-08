@@ -738,8 +738,8 @@ void dgWorld::PopulateContacts (dgCollidingPairCollector::dgPair* const pair, dg
 	}
 
 	dgFloat32 maxImpulse = dgFloat32 (-1.0f);
-	dgFloat32 breakImpulse0 = dgFloat32 (0.0f);
-	dgFloat32 breakImpulse1 = dgFloat32 (0.0f);
+//	dgFloat32 breakImpulse0 = dgFloat32 (0.0f);
+//	dgFloat32 breakImpulse1 = dgFloat32 (0.0f);
 	for (dgInt32 i = 0; i < contactCount; i ++) {
 
 		dgList<dgContactMaterial>::dgListNode* contactNode = NULL;
@@ -832,8 +832,8 @@ void dgWorld::PopulateContacts (dgCollidingPairCollector::dgPair* const pair, dg
 			dgFloat32 impulse = vRel % contactMaterial->m_normal;
 			if (dgAbsf (impulse) > maxImpulse) {
 				maxImpulse = dgAbsf (impulse); 
-				breakImpulse0 = contactMaterial->m_collision0->GetBreakImpulse();
-				breakImpulse1 = contactMaterial->m_collision1->GetBreakImpulse();
+//				breakImpulse0 = contactMaterial->m_collision0->GetBreakImpulse();
+//				breakImpulse1 = contactMaterial->m_collision1->GetBreakImpulse();
 			}
 
 			dgVector tangDir (vRel - contactMaterial->m_normal.Scale3 (impulse));

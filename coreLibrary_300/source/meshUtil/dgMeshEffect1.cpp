@@ -1080,7 +1080,7 @@ dgMeshEffect::dgMeshEffect(dgMemoryAllocator* const allocator, const char* const
 
 		dgInt32 vertexCount = 0;
 		dgInt32 faceCount = 0;
-		dgInt32 edgeCount = 0;
+//		dgInt32 edgeCount = 0;
 
 		char buffer[1024];
 		bool stillData = true;
@@ -1092,7 +1092,7 @@ dgMeshEffect::dgMeshEffect(dgMemoryAllocator* const allocator, const char* const
 				{
 					vertexCount = parcel.GetInteger();
 					faceCount = parcel.GetInteger();
-					edgeCount = parcel.GetInteger();
+//					edgeCount = parcel.GetInteger();
 					parcel.SkipLine();
 
 					dgVertexAtribute attribute;

@@ -1009,17 +1009,17 @@ dgEdge* dgPolyhedra::FindEarTip (dgEdge* const face, const dgFloat64* const pool
 dgEdge* dgPolyhedra::TriangulateFace (dgEdge* const faceIn, const dgFloat64* const pool, dgInt32 stride, dgDownHeap<dgEdge*, dgFloat64>& heap, dgBigVector* const faceNormalOut)
 {
 	dgEdge* face = faceIn;
-	dgEdge* perimeter [1024 * 16]; 
-	dgEdge* ptr = face;
-	dgInt32 perimeterCount = 0;
-	do {
-		perimeter[perimeterCount] = ptr;
-		perimeterCount ++;
-		dgAssert (perimeterCount < dgInt32 (sizeof (perimeter) / sizeof (perimeter[0])));
-		ptr = ptr->m_next;
-	} while (ptr != face);
-	perimeter[perimeterCount] = face;
-	dgAssert ((perimeterCount + 1) < dgInt32 (sizeof (perimeter) / sizeof (perimeter[0])));
+//	dgEdge* perimeter [1024 * 16]; 
+//	dgEdge* ptr = face;
+//	dgInt32 perimeterCount = 0;
+//	do {
+//		perimeter[perimeterCount] = ptr;
+//		perimeterCount ++;
+//		dgAssert (perimeterCount < dgInt32 (sizeof (perimeter) / sizeof (perimeter[0])));
+//		ptr = ptr->m_next;
+//	} while (ptr != face);
+//	perimeter[perimeterCount] = face;
+//	dgAssert ((perimeterCount + 1) < dgInt32 (sizeof (perimeter) / sizeof (perimeter[0])));
 
 	dgBigVector normal (FaceNormal (face, pool, dgInt32 (stride * sizeof (dgFloat64))));
 
@@ -1034,7 +1034,6 @@ dgEdge* dgPolyhedra::TriangulateFace (dgEdge* const faceIn, const dgFloat64* con
 	if (faceNormalOut) {
 		*faceNormalOut = normal;
 	}
-
 
 	while (face->m_next->m_next->m_next != face) {
 		dgEdge* const ear = FindEarTip (face, pool, stride, heap, normal); 
