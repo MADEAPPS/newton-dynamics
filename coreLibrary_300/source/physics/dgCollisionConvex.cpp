@@ -270,9 +270,31 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 
 			case dgCollisionInstance::m_global:
 			default:
-				dgAssert(0);
-		}
+			{
+				const dgCollisionInstance* const myCollisionInstance = m_proxy->m_referenceCollision;
+				const dgCollisionInstance* const otherCollsionInstance = m_proxy->m_floatingCollision;
 
+				dgAssert (myCollisionInstance->GetChildShape() == m_myShape);
+				dgAssert (otherCollsionInstance->GetChildShape() == m_otherShape);
+
+				const dgMatrix& myMatrix = myCollisionInstance->m_aligmentMatrix;
+				const dgMatrix& otherMatrix = otherCollsionInstance->m_aligmentMatrix;
+
+				dgVector alignedDir (myMatrix.RotateVector(dir));
+				dgVector dir1 (m_scale.CompProduct4(m_matrix.UnrotateVector (m_invScale.CompProduct4(alignedDir.CompProduct4(dgVector::m_negOne)))));
+				dir1 = otherMatrix.UnrotateVector(dir1.CompProduct4(dir1.InvMagSqrt()));
+				dgAssert (dir1.m_w == dgFloat32 (0.0f));
+				dgAssert (dgAbsf(dir1 % dir1 - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+
+				dgVector q1 (otherMatrix.TransformVector (m_otherShape->SupportVertex (dir1, &m_polygonFaceIndex[vertexIndex])));
+				dgVector q (myMatrix.UntransformVector(m_invScale.CompProduct4(m_matrix.TransformVector (m_scale.CompProduct4 (q1)))));
+				dgAssert (q.m_w == dgFloat32 (0.0f));
+
+				m_hullDiff[vertexIndex] = p - q;
+				m_hullSum[vertexIndex] = p + q;
+				break;
+			}
+		}
 	}
 
 	static dgVector ReduceLine (dgInt32& indexOut, dgVector* const lineDiff, dgVector* const lineSum, dgInt32* const shapeFaceIndex)
