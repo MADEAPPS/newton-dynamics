@@ -17,6 +17,9 @@
 # dg low level library
 #
 # ******************************************************
+
+DG_PTHREAD_PATH = ../../source/pthreads.2
+
 DG_INCLUDED_PATH = ../../source/core
 DG_PATH = $(DG_INCLUDED_PATH)/
 DG_SRCS = \
@@ -164,10 +167,11 @@ COMPILER = gcc
 #CPU_FLAGS = -m32 -O0 -fPIC -g -msse -msse2 -mfpmath=sse 
 #CPU_FLAGS = -m32 -O0 -fPIC -g -msse -msse4.1 -mfpmath=sse 
 #CPU_FLAGS = -m32 -O2 -fpic -g -msse -msse4.1 -mfpmath=sse -ffloat-store -ffast-math -freciprocal-math -funsafe-math-optimizations -fsingle-precision-constant
-CPU_FLAGS = -m32 -O2 -fpic -g -msse -msse3 -mfpmath=sse -ffloat-store -ffast-math -freciprocal-math -funsafe-math-optimizations -fsingle-precision-constant
+CPU_FLAGS = -m32 -O2 -g -msse -msse3 -mfpmath=sse -ffloat-store -ffast-math -freciprocal-math -funsafe-math-optimizations -fsingle-precision-constant
 
+FLAGS  = -c -Wall -Wno-strict-aliasing -D_MINGW_32_VER $(CPU_FLAGS) -I$(DG_PTHREAD_PATH) -I$(DG_INCLUDED_PATH) -I$(DG_INCLUDED_PHYSICS_PATH) -I$(DG_INCLUDED_MESH_PATH) -I$(DG_INCLUDED_OPENCL_PATH)
 
-FLAGS  = -c -Wall -Wno-strict-aliasing -D_POSIX_VER $(CPU_FLAGS) -I$(DG_INCLUDED_PATH) -I$(DG_INCLUDED_PHYSICS_PATH) -I$(DG_INCLUDED_MESH_PATH) -I$(DG_INCLUDED_OPENCL_PATH)
+INSTALL_PATH = wingwg32
 
 
 .SUFFIXES : .o .cpp
@@ -187,9 +191,9 @@ clean :
 libNewton.a : $(DG_OBJ_FILES)
 	ar r $@ $?
 #	strip -g -S -d -v libNewton.a -o libNewton.a
-	cp libNewton.a ../../../packages/posix32/libNewton.a
-	cp ../../source/newton/Newton.h ../../../packages/posix32/Newton.h
-	cp ../../source/ai/NewtonAI.h ../../../packages/posix32/NewtonAI.h
+	cp libNewton.a ../../../packages/$(INSTALL_PATH)/libNewton.a
+	cp ../../source/newton/Newton.h ../../../packages/$(INSTALL_PATH)/Newton.h
+	cp ../../source/ai/NewtonAI.h ../../../packages/$(INSTALL_PATH)/NewtonAI.h
 	$(COMPILER) -shared -Wl,-soname,libNewton.so $? -o libNewton.so 
-	cp libNewton.so ../../../packages/posix32/libNewton.so
+	cp libNewton.so ../../../packages/$(INSTALL_PATH)/libNewton.so
 	#sudo cp libNewton.so /usr/lib

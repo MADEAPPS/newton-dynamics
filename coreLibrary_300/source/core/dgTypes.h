@@ -124,7 +124,6 @@
 #endif
 
 
-
 #if (defined (_POSIX_VER) || defined (_POSIX_VER_64) || defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
 	#include <unistd.h>
 	#include <assert.h>
@@ -135,7 +134,6 @@
 		#include <emmintrin.h> 
 		#include <mmintrin.h> 
 	} 
-
 #endif
 
 #ifdef _MACOSX_VER
@@ -774,9 +772,14 @@ class dgSetPrecisionDouble
 DG_INLINE dgInt32 dgAtomicExchangeAndAdd (dgInt32* const addend, dgInt32 amount)
 {
 	// it is a pity that pthread does not supports cross platform atomics, it would be nice if it did
-	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER) || defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
+	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 		return _InterlockedExchangeAdd((long*) addend, long (amount));
 	#endif
+
+	#if (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
+		return InterlockedExchangeAdd((long*) addend, long (amount));
+	#endif
+
 
 	#if (defined (_POSIX_VER) || defined (_POSIX_VER_64) ||defined (_MACOSX_VER))
 		return __sync_fetch_and_add ((int32_t*)addend, amount );
@@ -786,9 +789,14 @@ DG_INLINE dgInt32 dgAtomicExchangeAndAdd (dgInt32* const addend, dgInt32 amount)
 DG_INLINE dgInt32 dgInterlockedExchange(dgInt32* const ptr, dgInt32 value)
 {
 	// it is a pity that pthread does not supports cross platform atomics, it would be nice if it did
-	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER) || defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
+	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 		return _InterlockedExchange((long*) ptr, value);
 	#endif
+
+	#if (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
+		return InterlockedExchange((long*) ptr, value);
+	#endif
+
 
 	#if (defined (_POSIX_VER) || defined (_POSIX_VER_64) ||defined (_MACOSX_VER))
 		//__sync_synchronize();

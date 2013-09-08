@@ -95,8 +95,8 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 		dgNode ()
 			:m_indexBox0(0)
 			,m_indexBox1(0)
-			,m_left(NULL)
-			,m_right(NULL)
+			,m_left(0)
+			,m_right(0)
 		{
 		}
 
