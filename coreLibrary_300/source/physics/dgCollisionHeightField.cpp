@@ -495,6 +495,7 @@ dgFloat32 dgCollisionHeightField::RayCastCell (const dgFastRayTest& ray, dgInt32
 		}
 
 		case m_unsigned16Bit:
+		default:
 		{
 			const dgUnsigned16* const elevation = (dgUnsigned16*)m_elevationMap;
 			points[0 * 2 + 0] = dgVector ((xIndex0 + 0) * m_horizontalScale,  m_verticalScale * dgFloat32 (elevation[base]),			   (zIndex0 + 0) * m_horizontalScale, dgFloat32 (0.0f));
@@ -771,7 +772,7 @@ void dgCollisionHeightField::DebugCollision (const dgMatrix& matrix, OnDebugColl
 			points[1 * 2 + 1] = matrix.TransformVector(points[1 * 2 + 1]);
 
 
-			const dgInt32* const indirectIndex = &m_cellIndices[m_diagonals[z * m_width + x]][0];
+			const dgInt32* const indirectIndex = &m_cellIndices[dgInt32 (m_diagonals[z * m_width + x])][0];
 
 			dgInt32 i0 = indirectIndex[0];
 			dgInt32 i1 = indirectIndex[1];
@@ -984,7 +985,7 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 		for (dgInt32 z = z0; z < z1; z ++) {
 			dgInt32 zStep = z * m_width;
 			for (dgInt32 x = x0; x < x1; x ++) {
-				const dgInt32* const indirectIndex = &m_cellIndices[m_diagonals[zStep + x]][0];
+				const dgInt32* const indirectIndex = &m_cellIndices[dgInt32 (m_diagonals[zStep + x])][0];
 
 				dgInt32 vIndex[4];
 				vIndex[0] = vertexIndex;
