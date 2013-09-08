@@ -193,7 +193,7 @@ libNewton.a : $(DG_OBJ_FILES)
 #	strip -g -S -d -v libNewton.a -o libNewton.a
 	cp libNewton.a ../../../packages/$(INSTALL_PATH)/libNewton.a
 	cp ../../source/newton/Newton.h ../../../packages/$(INSTALL_PATH)/Newton.h
-	cp ../../source/ai/NewtonAI.h ../../../packages/$(INSTALL_PATH)/NewtonAI.h
-	$(COMPILER) -shared -Wl,-soname,libNewton.so $? -o libNewton.so 
-	cp libNewton.so ../../../packages/$(INSTALL_PATH)/libNewton.so
-	#sudo cp libNewton.so /usr/lib
+#	cp ../../source/ai/NewtonAI.h ../../../packages/$(INSTALL_PATH)/NewtonAI.h
+#	$(COMPILER) -shared -Wl,-soname,libNewton.so $? -o libNewton.so 
+#	cp libNewton.so ../../../packages/$(INSTALL_PATH)/libNewton.so
+
