@@ -347,10 +347,9 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertex(const dgVector& dir, dgInt
 		case m_global:
 		default:	
 		{
-//			dgAssert(0);
-			dgVector dir1 (m_scale.CompProduct4(dir));
+			dgVector dir1 (m_aligmentMatrix.UnrotateVector(m_scale.CompProduct4(dir)));
 			dir1 = dir1.CompProduct4(dir1.InvMagSqrt());
-			return m_scale.CompProduct4(m_childShape->SupportVertex (dir1, vertexIndex));
+			return m_scale.CompProduct4(m_aligmentMatrix.TransformVector (m_childShape->SupportVertex (dir1, vertexIndex)));
 		}
 	}
 }
@@ -384,9 +383,9 @@ DG_INLINE dgVector dgCollisionInstance::GetBoxSize() const
 		case m_nonUniform:
 			return m_childShape->m_boxSize.CompProduct4(m_scale);
 
+		case m_global:
 		default:
-			dgAssert (0);
-			return m_childShape->m_boxSize.CompProduct4(m_scale);
+			return m_childShape->m_boxSize.CompProduct4(m_maxScale);
 	}
 }
 
@@ -399,9 +398,9 @@ DG_INLINE dgVector dgCollisionInstance::GetBoxOrigin() const
 		case m_nonUniform:
 			return m_childShape->m_boxOrigin.CompProduct4(m_scale);
 
+		case m_global:
 		default:
-			dgAssert (0);
-			return m_childShape->m_boxOrigin.CompProduct4(m_scale);
+			return m_aligmentMatrix.TransformVector(m_childShape->m_boxOrigin).CompProduct4(m_scale);
 	}
 }
 

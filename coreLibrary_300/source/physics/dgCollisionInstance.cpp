@@ -495,8 +495,17 @@ dgInt32 dgCollisionInstance::CalculatePlaneIntersection (const dgVector& normal,
 			break;
 		}
 
+		case m_global:
 		default:
-			dgAssert(0);
+		{
+			dgVector point1 (m_aligmentMatrix.UntransformVector (m_invScale.CompProduct4(point)));
+			dgVector normal1 (m_aligmentMatrix.UntransformVector (m_scale.CompProduct4(normal)));
+			normal1 = normal1.CompProduct4(normal1.InvMagSqrt());
+			count = m_childShape->CalculatePlaneIntersection (normal1, point1, contactsOut);
+			for (dgInt32 i = 0; i < count; i ++) {
+				contactsOut[i] = m_scale.CompProduct4(m_aligmentMatrix.TransformVector(contactsOut[i]));
+			}
+		}
 	}
 	return count;
 }

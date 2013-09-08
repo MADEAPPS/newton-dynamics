@@ -745,9 +745,11 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* world, const dMatrix& srcMa
 
 		case _COMPOUND_CONVEX_CRUZ_PRIMITIVE:
 		{
-			NewtonCollision* const collisionA = NewtonCreateBox (world, size.m_x, size.m_x * 0.25f, size.m_x * 0.25f, 0, NULL); 
-			NewtonCollision* const collisionB = NewtonCreateBox (world, size.m_x * 0.25f, size.m_x, size.m_x * 0.25f, 0, NULL); 
-			NewtonCollision* const collisionC = NewtonCreateBox (world, size.m_x * 0.25f, size.m_x * 0.25f, size.m_x, 0, NULL); 
+			//dMatrix matrix (GetIdentityMatrix());
+			dMatrix matrix (dPitchMatrix(15.0f * 3.1416f / 180.0f) * dYawMatrix(15.0f * 3.1416f / 180.0f) * dRollMatrix(15.0f * 3.1416f / 180.0f));
+			NewtonCollision* const collisionA = NewtonCreateBox (world, size.m_x, size.m_x * 0.25f, size.m_x * 0.25f, 0, &matrix[0][0]); 
+			NewtonCollision* const collisionB = NewtonCreateBox (world, size.m_x * 0.25f, size.m_x, size.m_x * 0.25f, 0, &matrix[0][0]); 
+			NewtonCollision* const collisionC = NewtonCreateBox (world, size.m_x * 0.25f, size.m_x * 0.25f, size.m_x, 0, &matrix[0][0]); 
 
 			collision = NewtonCreateCompoundCollision (world, 0);
 
