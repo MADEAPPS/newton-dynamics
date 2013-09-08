@@ -186,16 +186,8 @@ engine : libNewton.a
 # clean all objects target
 clean :
 	del /S ..\..\*.o
-#	del $(DG_OBJ_FILES)
-#	touch $(ALL_SRC_FILES)
 
 # libraries targets
 libNewton.a : $(DG_OBJ_FILES)
 	ar r $@ $?
-#	strip -g -S -d -v libNewton.a -o libNewton.a
-#	cp libNewton.a ../../../packages/$(INSTALL_PATH)/libNewton.a
-#	cp ../../source/newton/Newton.h ../../../packages/$(INSTALL_PATH)/Newton.h
-#	cp ../../source/ai/NewtonAI.h ../../../packages/$(INSTALL_PATH)/NewtonAI.h
-#	$(COMPILER) -shared -Wl,-soname,libNewton.so $? -o libNewton.so 
-#	cp libNewton.so ../../../packages/$(INSTALL_PATH)/libNewton.so
 
