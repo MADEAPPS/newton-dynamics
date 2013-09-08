@@ -72,9 +72,9 @@ static void AddNonUniformScaledPrimitives (DemoEntityManager* const scene, dFloa
 			dFloat scaley = 0.5f + 2.0f * dFloat (dRand()) / dFloat(dRAND_MAX);
 			dFloat scalez = 0.5f + 2.0f * dFloat (dRand()) / dFloat(dRAND_MAX);
 
-scalex = 2.0f;
-scaley = 1.0f;
-scalez = 1.0f;
+//scalex = 2.0f;
+//scaley = 1.0f;
+//scalez = 1.0f;
 
 			NewtonCollisionSetScale(collision, scalex, scaley, scalez);
 			DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "smilli.tga", "smilli.tga", "smilli.tga");
