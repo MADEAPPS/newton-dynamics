@@ -950,7 +950,6 @@ dgInt32 dgWorld::ValidateContactCache (dgContact* const contact, dgFloat32 times
 	dgVector mask ((positError2 < m_linearContactError2) & (rotatError2 < m_angularContactError2));
 
 	dgList<dgContactMaterial>& list = *contact;
-return 0;
 	return mask.GetSignMask() ? list.GetCount() : 0;
 }
 
@@ -1684,7 +1683,6 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) 
 		contactOut[i].m_shapeId1 = collision2->GetUserDataID();
 	}
 	return count;
-
 }
 
 
