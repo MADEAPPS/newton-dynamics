@@ -213,6 +213,7 @@
     <ClCompile Include="..\..\dCustomJoints\CustomGear.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomHinge.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomHingeActuator.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomInputManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomJoint.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomJointLibraryStdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -246,6 +247,7 @@
     <ClInclude Include="..\..\dCustomJoints\CustomGear.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomHinge.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomHingeActuator.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomInputManager.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomJoint.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomJointLibraryStdAfx.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomKinematicController.h" />
