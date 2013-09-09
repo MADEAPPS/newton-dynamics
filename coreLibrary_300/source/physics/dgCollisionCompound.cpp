@@ -1786,9 +1786,8 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingle (dgCollidingPairCollector
 						proxy.m_maxContacts = DG_MAX_CONTATCS - contactCount;
 						proxy.m_contacts = contacts ? &contacts[contactCount] : contacts;
 
-						closestDist = dgMin(closestDist, constraint->m_closestDistance);
-
 						dgInt32 count = m_world->CalculateConvexToConvexContacts (proxy);
+						closestDist = dgMin(closestDist, constraint->m_closestDistance);
 						if (!proxy.m_intersectionTestOnly) {
 							for (dgInt32 i = 0; i < count; i ++) {
 								dgAssert (contacts[contactCount + i].m_collision0 == &childInstance);
