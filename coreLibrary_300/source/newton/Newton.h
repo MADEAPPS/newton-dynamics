@@ -119,89 +119,86 @@ extern "C" {
 	typedef struct NewtonBreakableComponentMesh{} NewtonBreakableComponentMesh;
 
 
-	struct NewtonBoxParam
+	typedef struct NewtonBoxParam
 	{
 		dFloat m_x;
 		dFloat m_y;
 		dFloat m_z;
-	};
+	} NewtonBoxParam;
 
-	struct NewtonSphereParam
+	typedef struct NewtonSphereParam
 	{
 		dFloat m_radio;
-	};
+	} NewtonSphereParam;
 
-	struct NewtonCylinderParam
-	{
-		dFloat m_radio;
-		dFloat m_height;
-	};
-
-	struct NewtonCapsuleParam
+	typedef struct NewtonCylinderParam
 	{
 		dFloat m_radio;
 		dFloat m_height;
-	};
+	} NewtonCylinderParam;
 
-	struct NewtonConeParam
+	typedef struct NewtonCapsuleParam
 	{
 		dFloat m_radio;
 		dFloat m_height;
-	};
+	} NewtonCapsuleParam;
 
-	struct NewtonTaperedCapsuleParam
+	typedef struct NewtonConeParam
+	{
+		dFloat m_radio;
+		dFloat m_height;
+	} NewtonConeParam;
+
+	typedef struct NewtonTaperedCapsuleParam
 	{
 		dFloat m_radio0;
 		dFloat m_radio1;
 		dFloat m_height;
-	};
+	} NewtonTaperedCapsuleParam;
 
 
-	struct NewtonTaperedCylinderParam
+	typedef struct NewtonTaperedCylinderParam
 	{
 		dFloat m_radio0;
 		dFloat m_radio1;
 		dFloat m_height;
-	};
+	} NewtonTaperedCylinderParam;
 
-	struct NewtonChamferCylinderParam
+	typedef struct NewtonChamferCylinderParam
 	{
 		dFloat m_radio;
 		dFloat m_height;
-	};
+	} NewtonChamferCylinderParam;
 
-	struct NewtonConvexHullParam
+	typedef struct NewtonConvexHullParam
 	{
 		int m_vertexCount;
 		int m_vertexStrideInBytes;
 		int m_faceCount;
 		dFloat* m_vertex;
-	};
+	} NewtonConvexHullParam;
 
-
-	struct NewtonCompoundCollisionParam
+	typedef struct NewtonCompoundCollisionParam
 	{
 		int m_chidrenCount;
-	};
+	} NewtonCompoundCollisionParam;
 
-	
-	struct NewtonCollisionTreeParam
+	typedef struct NewtonCollisionTreeParam
 	{
 		int m_vertexCount;
 		int m_indexCount;
-	};
+	} NewtonCollisionTreeParam;
 
-	struct NewtonDeformableMeshParam
+	typedef struct NewtonDeformableMeshParam
 	{
 		int m_vertexCount;
 		int m_triangleCount;
 		int m_vrtexStrideInBytes;
 		unsigned short *m_indexList;
 		dFloat *m_vertexList;
-	};
+	} NewtonDeformableMeshParam;
 
-
-	struct NewtonHeightFieldCollisionParam
+	typedef struct NewtonHeightFieldCollisionParam
 	{
 		int m_width;
 		int m_height;
@@ -211,14 +208,14 @@ extern "C" {
 		dFloat m_verticalScale;
 		void* m_elevation;
 		char* m_atributes;
-	};
+	} NewtonHeightFieldCollisionParam;
 
-	struct NewtonSceneCollisionParam
+	typedef struct NewtonSceneCollisionParam
 	{
 		int m_childrenProxyCount;
-	};
+	} NewtonSceneCollisionParam;
 
-	struct NewtonCollisionInfoRecord
+	typedef struct NewtonCollisionInfoRecord
 	{
 		dFloat m_offsetMatrix[4][4];
 		int m_collisionType;				// tag id to identify the collision primitive
@@ -241,9 +238,9 @@ extern "C" {
 			NewtonSceneCollisionParam m_sceneCollision;
 			dFloat m_paramArray[64];		    // user define collision can use this to store information
 		};
-	};
+	} NewtonCollisionInfoRecord;
 
-	struct NewtonJointRecord
+	typedef struct NewtonJointRecord
 	{
 		dFloat m_attachmenMatrix_0[4][4];
 		dFloat m_attachmenMatrix_1[4][4];
@@ -256,10 +253,9 @@ extern "C" {
 		dFloat m_extraParameters[64];
 		int	m_bodiesCollisionOn;
 		char m_descriptionType[128];
-	};
+	} NewtonJointRecord;
 
-	
-	struct NewtonUserMeshCollisionCollideDesc
+	typedef struct NewtonUserMeshCollisionCollideDesc
 	{
 		dFloat m_boxP0[4];							// lower bounding box of intersection query in local space
 		dFloat m_boxP1[4];							// upper bounding box of intersection query in local space
@@ -284,9 +280,9 @@ extern "C" {
 													// N in the index to the vertex normal relative to m_vertex pointer
 													// E0, E1, E2, ... are the indices of the the face normal that is shared to that face edge, when the edge does not share a face normal then the edge index is set to index N, which the index to the face normal    
 													// A is and estimate of the largest diagonal of the face, this used internally as a hint to improve floating point accuracy and algorithm performance. 
-	};
+	} NewtonUserMeshCollisionCollideDesc;
 
-	struct NewtonWorldConvexCastReturnInfo
+	typedef struct NewtonWorldConvexCastReturnInfo
 	{
 		dFloat m_point[4];						// collision point in global space
 		dFloat m_normal[4];						// surface normal at collision point in global space
@@ -295,30 +291,30 @@ extern "C" {
 		dLong m_contactID;						// collision ID at contact point
 		const NewtonBody* m_hitBody;			// body hit at contact point
 		dFloat m_penetration;                   // contact penetration at collision point
-	};
+	} NewtonWorldConvexCastReturnInfo;
 	
-	struct NewtonUserMeshCollisionRayHitDesc
+	typedef struct NewtonUserMeshCollisionRayHitDesc
 	{
 		dFloat m_p0[4];							// ray origin in collision local space
 		dFloat m_p1[4];                         // ray destination in collision local space   
 		dFloat m_normalOut[4];					// copy here the normal at the ray intersection
 		dLong m_userIdOut;						// copy here a user defined id for further feedback  
 		void* m_userData;                       // user data passed to the collision geometry at creation time
-	};
+	} NewtonUserMeshCollisionRayHitDesc;
 
-	struct NewtonHingeSliderUpdateDesc
+	typedef struct NewtonHingeSliderUpdateDesc
 	{
 		dFloat m_accel;
 		dFloat m_minFriction;
 		dFloat m_maxFriction;
 		dFloat m_timestep;
-	};
+	} NewtonHingeSliderUpdateDesc;
 
-	struct NewtonClothPatchMaterial
+	typedef struct NewtonClothPatchMaterial
 	{
 		dFloat m_damper;
 		dFloat m_stiffness;
-	};
+	} NewtonClothPatchMaterial;
 
 
 	// Newton callback functions
