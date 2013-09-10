@@ -443,20 +443,21 @@ dgMatrix dgCollisionInstance::CalculateInertia () const
 	if (IsType(dgCollision::dgCollisionMesh_RTTI)) {
 		return dgGetZeroMatrix();
 	} else {
-		switch (m_scaleType)
-		{
-			case m_unit:
-			case m_uniform:
-			case m_nonUniform:
-			{
-				return m_childShape->CalculateInertiaAndCenterOfMass (m_aligmentMatrix, m_scale, m_localMatrix);
-			}
-
-			default:
-			{
-				return m_childShape->CalculateInertiaAndCenterOfMass (m_aligmentMatrix, m_scale, m_localMatrix);
-			}
-		}
+		return m_childShape->CalculateInertiaAndCenterOfMass (m_aligmentMatrix, m_scale, m_localMatrix);
+//		switch (m_scaleType)
+//		{
+//			case m_unit:
+//			case m_uniform:
+//			case m_nonUniform:
+//			{
+//				return m_childShape->CalculateInertiaAndCenterOfMass (m_aligmentMatrix____, m_scale, m_localMatrix);
+//			}
+//
+//			default:
+//			{
+//				return m_childShape->CalculateInertiaAndCenterOfMass (m_aligmentMatrix____, m_scale, m_localMatrix);
+//			}
+//		}
 	}
 }
 

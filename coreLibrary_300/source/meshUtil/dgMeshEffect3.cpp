@@ -576,7 +576,7 @@ class dgHACDClusterGraph
 		,m_proxyList(mesh.GetAllocator())
 		,m_concavityTreeArray(NULL)
 		,m_convexProximation(mesh.GetAllocator())
-		,m_priorityHeap (mesh.GetCount() + 2048, mesh.GetAllocator())
+		,m_priorityHeap (mesh.GetCount() * 2 + 2048, mesh.GetAllocator())
 		,m_reportProgressCallback (reportProgressCallback)
 	{
 		m_faceCount = mesh.GetTotalFaceCount();
@@ -586,8 +586,8 @@ class dgHACDClusterGraph
 
 		// init some auxiliary structures
 		dgInt32 vertexCount = mesh.GetVertexCount();
-		m_vertexMarks =  (dgInt32*) dgMallocStack(vertexCount * sizeof(dgInt32));
-		m_vertexPool =  (dgBigVector*) dgMallocStack(vertexCount * sizeof(dgBigVector));
+		m_vertexMarks = (dgInt32*) dgMallocStack(vertexCount * sizeof(dgInt32));
+		m_vertexPool = (dgBigVector*) dgMallocStack(vertexCount * sizeof(dgBigVector));
 		memset(m_vertexMarks, 0, vertexCount * sizeof(dgInt32));
 
 		m_cancavityTreeIndex = m_faceCount + 1;

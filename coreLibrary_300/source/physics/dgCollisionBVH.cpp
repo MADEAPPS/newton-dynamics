@@ -92,6 +92,7 @@ void dgCollisionBVH::EndBuild(dgInt32 optimize)
 
 	m_builder->End(state);
 	Create (*m_builder, state);
+	CalculateAdjacendy();
 	
 	GetAABB (p0, p1);
 	SetCollisionBBox (p0, p1);

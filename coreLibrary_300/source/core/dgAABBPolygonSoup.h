@@ -156,6 +156,7 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 	virtual ~dgAABBPolygonSoup ();
 
 	void Create (const dgPolygonSoupDatabaseBuilder& builder, bool optimizedBuild);
+	void CalculateAdjacendy ();
 	virtual void ForAllSectorsRayHit (const dgFastRayTest& ray, dgFloat32 maxT, dgRayIntersectCallback callback, void* const context) const;
 	virtual void ForAllSectors (const dgVector& minBox, const dgVector& maxBox, const dgVector& boxDistanceTravel, dgFloat32 m_maxT, dgAABBIntersectCallback callback, void* const context) const;
 
@@ -183,10 +184,10 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 		p1 = dgVector (&((dgTriplex*)m_localVertex)[node->m_indexBox1].m_x);
 	}
 	virtual dgVector ForAllSectorsSupportVectex (const dgVector& dir) const;
+
 	
 
 	private:
-	void CalculateAdjacendy ();
 	dgNodeBuilder* BuildTopDown (dgNodeBuilder* const leafArray, dgInt32 firstBox, dgInt32 lastBox, dgNodeBuilder** const allocator) const;
 	dgFloat32 CalculateFaceMaxSize (const dgVector* const vertex, dgInt32 indexCount, const dgInt32* const indexArray) const;
 //	static dgIntersectStatus CalculateManifoldFaceEdgeNormals (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount);

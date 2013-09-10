@@ -273,8 +273,8 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 				dgAssert (m_proxy->m_referenceCollision->GetChildShape() == m_myShape);
 				dgAssert (m_proxy->m_floatingCollision->GetChildShape() == m_otherShape);
 
-				const dgMatrix& myAlignMatrix = m_proxy->m_referenceCollision->m_aligmentMatrix;
-				const dgMatrix& otherAlignMatrix = m_proxy->m_floatingCollision->m_aligmentMatrix;
+				const dgMatrix& myAlignMatrix = m_proxy->m_referenceCollision->GetAlignMatrix ();
+				const dgMatrix& otherAlignMatrix = m_proxy->m_floatingCollision->GetAlignMatrix ();
 
 				dgVector alignedDir (myAlignMatrix.RotateVector(dir));
 				dgVector dir1 (m_otherScale.CompProduct4(m_matrix.UnrotateVector (m_myInvScale.CompProduct4(alignedDir.CompProduct4(dgVector::m_negOne)))));
@@ -2815,8 +2815,8 @@ dgInt32 dgCollisionConvex::CalculateContactsGeneric (const dgVector& point, cons
 		dgVector n;
 		dgVector p;
 		if (myInstance->GetCombinedScaleType(otherInstance->GetScaleType()) == dgCollisionInstance::m_global) {
-			const dgMatrix& myAlignMatrix = myInstance->m_aligmentMatrix;
-			const dgMatrix& otherAlignMatrix = otherInstance->m_aligmentMatrix;
+			const dgMatrix& myAlignMatrix = myInstance->GetAlignMatrix ();
+			const dgMatrix& otherAlignMatrix = otherInstance->GetAlignMatrix ();
 			n = otherAlignMatrix.UnrotateVector (otherScale.CompProduct4(matrix.UnrotateVector(myInvScale.CompProduct4 (myAlignMatrix.RotateVector(normal)))));
 			p = otherAlignMatrix.UntransformVector (otherInvScale.CompProduct4 (matrix.UntransformVector(myScale.CompProduct4(myAlignMatrix.TransformVector(point)))));
 		} else {
@@ -2978,7 +2978,7 @@ dgInt32 dgCollisionConvex::CalculateConvexToConvexContact (dgCollisionParamProxy
 			proxy.m_closestPointBody0 = matrix.TransformVector(scale.CompProduct4(minkHull.m_p));
 			proxy.m_closestPointBody1 = matrix.TransformVector(scale.CompProduct4(minkHull.m_q));
 		} else {
-			const dgMatrix& alignMatrix = collConicConvexInstance->m_aligmentMatrix;
+			const dgMatrix& alignMatrix = collConicConvexInstance->GetAlignMatrix ();
 			proxy.m_normal = matrix.RotateVector(invScale.CompProduct4(alignMatrix.RotateVector(minkHull.m_normal.Scale4 (dgFloat32(-1.0f)))));
 			proxy.m_normal = proxy.m_normal.CompProduct4(proxy.m_normal.InvMagSqrt());
 
@@ -3159,13 +3159,11 @@ dgInt32 dgCollisionConvex::CalculateConvexCastContacts(dgCollisionParamProxy& pr
 
 	dgVector floatingVeloc (floatingBody->m_veloc);
 	dgVector referenceVeloc (referenceBody->m_veloc);
-dgAssert (0);
+
 	dgCollisionInstance* const collConicConvexInstance = proxy.m_referenceCollision;
 	const dgVector& scale = collConicConvexInstance->GetScale();
 	const dgVector& invScale = collConicConvexInstance->GetInvScale();
 	const dgMatrix& matrix = collConicConvexInstance->GetGlobalMatrix();
-	//dgInt32 isNonUniformScale = !collConicConvexInstance->m_scaleIsUniform;
-
 	dgVector veloc (matrix.UnrotateVector(floatingVeloc - referenceVeloc));
 
 	dgInt32 iter = 0;
@@ -3175,6 +3173,7 @@ dgAssert (0);
 	proxy.m_contactJoint->m_closestDistance = dgFloat32 (1.0e10f);
 
 	dgMinkHull minkHull (proxy);
+	dgAssert (minkHull.m_scaleType == dgCollisionInstance::m_unit);
 	do {
 		minkHull.CalculateClosestPoints ();
 		dgVector normal (minkHull.m_normal);
@@ -3251,7 +3250,6 @@ dgAssert (0);
 			count = 0;
 			proxy.m_timestep = timestep;
 			proxy.m_normal = matrix.RotateVector(invScale.CompProduct4(minkHull.m_normal.Scale4 (-1.0f)));
-			//proxy.m_normal = proxy.m_normal.Scale3(dgRsqrt(proxy.m_normal % proxy.m_normal ));
 			proxy.m_normal = proxy.m_normal.CompProduct4(proxy.m_normal.InvMagSqrt());
 			proxy.m_closestPointBody0 = matrix.TransformVector(scale.CompProduct4(minkHull.m_p)) & dgVector::m_triplexMask;
 			proxy.m_closestPointBody1 = matrix.TransformVector(scale.CompProduct4(minkHull.m_q)) & dgVector::m_triplexMask;

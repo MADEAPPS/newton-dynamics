@@ -60,6 +60,7 @@ class dgCollisionInstance
 
 	const dgMatrix& GetLocalMatrix () const;
 	const dgMatrix& GetGlobalMatrix () const;
+	const dgMatrix& GetAlignMatrix () const;
 	void SetLocalMatrix (const dgMatrix& matrix);
 	void SetGlobalMatrix (const dgMatrix& matrix);
 
@@ -233,6 +234,10 @@ DG_INLINE const dgMatrix& dgCollisionInstance::GetGlobalMatrix () const
 	return m_globalMatrix;
 }
 
+DG_INLINE const dgMatrix& dgCollisionInstance::GetAlignMatrix () const
+{
+	return m_aligmentMatrix;
+}
 
 DG_INLINE void dgCollisionInstance::SetGlobalMatrix (const dgMatrix& matrix)
 {

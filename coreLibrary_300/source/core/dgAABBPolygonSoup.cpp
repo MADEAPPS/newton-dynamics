@@ -515,12 +515,13 @@ dgIntersectStatus dgAABBPolygonSoup::CalculateAllFaceEdgeNormals (void* const co
 		i0 = i1;
 	}
 
-	p0.m_x -= dgFloat32 (0.25f);
-	p0.m_y -= dgFloat32 (0.25f);
-	p0.m_z -= dgFloat32 (0.25f);
-	p1.m_x += dgFloat32 (0.25f);
-	p1.m_y += dgFloat32 (0.25f);
-	p1.m_z += dgFloat32 (0.25f);
+	dgFloat32 padding = dgFloat32 (1.0f/16.0f);
+	p0.m_x -= padding;
+	p0.m_y -= padding;
+	p0.m_z -= padding;
+	p1.m_x += padding;
+	p1.m_y += padding;
+	p1.m_z += padding;
 
 	me->ForAllSectors (p0, p1, dgVector (dgFloat32 (0.0f)), dgFloat32 (1.0f), CalculateDisjointedFaceEdgeNormals, &adjacentFaces);
 
@@ -850,7 +851,7 @@ void dgAABBPolygonSoup::Create (const dgPolygonSoupDatabaseBuilder& builder, boo
 	if (builder.m_faceCount == 1) {
 		m_aabb[0].m_right = dgNode::dgLeafNodePtr (0, 0);
 	}
-	CalculateAdjacendy();
+//	CalculateAdjacendy();
 }
 
 void dgAABBPolygonSoup::Serialize (dgSerialize callback, void* const userData) const
