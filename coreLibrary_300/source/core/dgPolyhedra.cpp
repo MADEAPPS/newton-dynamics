@@ -2302,7 +2302,6 @@ dgEdge* dgPolyhedra::OptimizeCollapseEdge (dgEdge* const edge)
 	return retEdge;
 }
 
-
 void dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes, dgFloat64 tol)
 {
 	dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat64));
