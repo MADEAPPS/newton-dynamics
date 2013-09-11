@@ -82,8 +82,6 @@ struct dgEdgeCollapseEdgeHandle
 class dgVertexCollapseVertexMetric
 {
 	public:
-	dgFloat64 elem[10];
-
 	dgVertexCollapseVertexMetric (const dgBigPlane &plane) 
 	{
 		elem[0] = plane.m_x * plane.m_x;  
@@ -134,13 +132,15 @@ class dgVertexCollapseVertexMetric
 	}
 
 
-	dgFloat64 Evalue (const dgVector &p) const 
+	dgFloat64 Evalue (const dgBigVector &p) const 
 	{
 		dgFloat64 acc = elem[0] * p.m_x * p.m_x + elem[1] * p.m_y * p.m_y + elem[2] * p.m_z * p.m_z + 
 						elem[4] * p.m_x * p.m_y + elem[5] * p.m_x * p.m_z + elem[7] * p.m_y * p.m_z + 
 						elem[6] * p.m_x + elem[8] * p.m_y + elem[9] * p.m_z + elem[3];  
 		return fabs (acc);
 	}
+
+	dgFloat64 elem[10];
 };
 
 
@@ -2305,8 +2305,6 @@ dgEdge* dgPolyhedra::OptimizeCollapseEdge (dgEdge* const edge)
 
 void dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes, dgFloat64 tol)
 {
-	dgList <dgEdgeCollapseEdgeHandle>::dgListNode *handleNodePtr;
-
 	dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat64));
 
 #ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
@@ -2343,21 +2341,21 @@ void dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes,
 		dgInt32 index1 = edge->m_twin->m_incidentVertex;
 
 		dgVertexCollapseVertexMetric &metric = vertexMetrics[index0];
-		dgVector p	(&vertexPool[index1].m_x);
+		const dgBigVector& p = vertexPool[index1];
 		dgFloat64 cost = metric.Evalue (p); 
 		if (cost < tol2) {
 			cost = EdgePenalty (&vertexPool[0], edge);
 
 			if (cost > dgFloat64 (0.0f)) {
 				dgEdgeCollapseEdgeHandle handle (edge);
-				handleNodePtr = edgeHandleList.Addtop (handle);
+				dgList <dgEdgeCollapseEdgeHandle>::dgListNode* handleNodePtr = edgeHandleList.Addtop (handle);
 				bigHeapArray.Push (handleNodePtr, cost);
 			}
 		}
 	}
 
 	while (bigHeapArray.GetCount()) {
-		handleNodePtr = bigHeapArray[0];
+		dgList <dgEdgeCollapseEdgeHandle>::dgListNode* const handleNodePtr = bigHeapArray[0];
 
 		dgEdge* edge = handleNodePtr->GetInfo().m_edge;
 		bigHeapArray.Pop();
@@ -2369,7 +2367,7 @@ void dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes,
 			dgInt32 index0 = edge->m_incidentVertex;
 			dgInt32 index1 = edge->m_twin->m_incidentVertex;
 			dgVertexCollapseVertexMetric &metric = vertexMetrics[index0];
-			dgBigVector p (vertexPool[index1]);
+			const dgBigVector& p = vertexPool[index1];
 
 			if ((metric.Evalue (p) < tol2) && IsOkToCollapse (&vertexPool[0], edge) && (EdgePenalty (&vertexPool[0], edge)  > dgFloat64 (0.0f))) {
 
@@ -2404,7 +2402,7 @@ void dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes,
 						index1 = ptr->m_twin->m_incidentVertex;
 
 						dgVertexCollapseVertexMetric &metric = vertexMetrics[index0];
-						dgBigVector p (vertexPool[index1]);
+						const dgBigVector& p = vertexPool[index1];
 
 						dgFloat64 cost = dgFloat32 (-1.0f);
 						if (metric.Evalue (p) < tol2) {
@@ -2413,7 +2411,7 @@ void dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes,
 
 						if (cost  > dgFloat64 (0.0f)) {
 							dgEdgeCollapseEdgeHandle handle (ptr);
-							handleNodePtr = edgeHandleList.Addtop (handle);
+							dgList <dgEdgeCollapseEdgeHandle>::dgListNode* handleNodePtr = edgeHandleList.Addtop (handle);
 							bigHeapArray.Push (handleNodePtr, cost);
 						} else {
 							dgEdgeCollapseEdgeHandle* const handle = (dgEdgeCollapseEdgeHandle*)IntToPointer (ptr->m_userData);
@@ -2441,7 +2439,7 @@ void dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes,
 							if (ptr1->m_mark != mark) {
 								ptr1->m_mark = mark;
 								dgVertexCollapseVertexMetric &metric = vertexMetrics[index0];
-								dgBigVector p (vertexPool[index1]);
+								const dgBigVector& p = vertexPool[index1];
 
 								dgFloat64 cost = dgFloat32 (-1.0f);
 								if (metric.Evalue (p) < tol2) {
@@ -2451,7 +2449,7 @@ void dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes,
 								if (cost  > dgFloat64 (0.0f)) {
 									dgAssert (cost > dgFloat64(0.0f));
 									dgEdgeCollapseEdgeHandle handle (ptr1);
-									handleNodePtr = edgeHandleList.Addtop (handle);
+									dgList <dgEdgeCollapseEdgeHandle>::dgListNode* handleNodePtr = edgeHandleList.Addtop (handle);
 									bigHeapArray.Push (handleNodePtr, cost);
 								} else {
 									dgEdgeCollapseEdgeHandle *handle;
@@ -2467,7 +2465,7 @@ void dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes,
 							if (ptr1->m_twin->m_mark != mark) {
 								ptr1->m_twin->m_mark = mark;
 								dgVertexCollapseVertexMetric &metric = vertexMetrics[index1];
-								dgBigVector p (vertexPool[index0]);
+								const dgBigVector& p = vertexPool[index0];
 
 								dgFloat64 cost = dgFloat32 (-1.0f);
 								if (metric.Evalue (p) < tol2) {
@@ -2477,7 +2475,7 @@ void dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes,
 								if (cost  > dgFloat64 (0.0f)) {
 									dgAssert (cost > dgFloat64(0.0f));
 									dgEdgeCollapseEdgeHandle handle (ptr1->m_twin);
-									handleNodePtr = edgeHandleList.Addtop (handle);
+									dgList <dgEdgeCollapseEdgeHandle>::dgListNode* handleNodePtr = edgeHandleList.Addtop (handle);
 									bigHeapArray.Push (handleNodePtr, cost);
 								} else {
 									dgEdgeCollapseEdgeHandle *handle;
