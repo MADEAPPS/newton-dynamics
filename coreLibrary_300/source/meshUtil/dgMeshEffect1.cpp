@@ -1606,7 +1606,7 @@ dgInt32 dgMeshEffect::EnumerateAttributeArray (dgVertexAtribute* const attib)
 
 void dgMeshEffect::ApplyAttributeArray (dgVertexAtribute* const attib, dgInt32 maxCount)
 {
-	dgStack<dgInt32>indexMap (GetCount());
+	dgStack<dgInt32>indexMap (dgMax (GetCount(), maxCount));
 
 	m_atribCount = dgVertexListToIndexList (&attib[0].m_vertex.m_x, sizeof (dgVertexAtribute), sizeof (dgVertexAtribute) / sizeof(dgFloat64), maxCount, &indexMap[0], DG_VERTEXLIST_INDEXLIST_TOL);
 	m_maxAtribCount = m_atribCount;

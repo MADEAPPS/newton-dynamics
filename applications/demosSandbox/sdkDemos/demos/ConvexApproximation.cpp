@@ -64,6 +64,7 @@ static void CreateConvexAproximation (const char* const name, DemoEntityManager*
 	// create a convex approximation form the original mesh, 32 convex max and no more than 100 vertex convex hulls
 	NewtonMesh* const convexApproximation = NewtonMeshApproximateConvexDecomposition (newtonMesh, 0.01f, 0.2f, 32, 100, NULL);
 
+
 	// create a compound collision by creation a convex hull of each segment of the source mesh 
 	NewtonCollision* const compound = NewtonCreateCompoundCollisionFromMesh (world, convexApproximation, 0.001f, 0, 0);
 	
@@ -100,6 +101,7 @@ void SimpleConvexApproximation (DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 	// load the scene from a ngd file format
+//	NewtonBody* const body = CreateLevelMesh (scene, "xxxx.ngd", true);
 	NewtonBody* const body = CreateLevelMesh (scene, "flatPlane.ngd", true);
 //	NewtonBody* const body = CreateLevelMesh (scene, "playground.ngd", true);
 //	NewtonBody* const body = CreateLevelMesh (scene, "sponza.ngd", true);
@@ -132,6 +134,7 @@ void SimpleConvexApproximation (DemoEntityManager* const scene)
 	CreateConvexAproximation ("chair.ngd", scene, location, 3, "checker.tga");
 	CreateConvexAproximation ("cow.ngd", scene, location + dVector (10, 0, 0, 0), 3, "cow.tga");
 	CreateConvexAproximation ("camel.ngd", scene, location + dVector (17, 0, 0, 0), 3, "jirafe.tga");
+//	CreateConvexAproximation ("armadello.ngd", scene, location, 1, "KAMEN.tga");
 
 
 	dVector size (0.5f, 0.5f, 0.75f, 0.0f);

@@ -1410,10 +1410,16 @@ dgMeshEffect* dgMeshEffect::CreateConvexApproximation(
 	// make a copy of the mesh
 	dgMeshEffect mesh(*this);
 	mesh.ClearAttributeArray();
-
-	// precondition the mesh for better approximation
+	mesh.Triangulate ();
+	mesh.Optimize (&mesh.m_points->m_x, sizeof (dgBigVector), dgFloat32 (1.0e-3f), 1500);
+	mesh.ClearAttributeArray();
+	mesh.DeleteDegenerateFaces (&mesh.m_points->m_x, sizeof (dgBigVector), dgFloat32 (1.0e-12f));
+	mesh.RepairTJoints();
 	mesh.ConvertToPolygons();
 
+	//mesh.SaveOFF ("xxxxxx.off");
+	// precondition the mesh for better approximation
+	
 
 	// create a general connectivity graph    
 	dgHACDClusterGraph graph (mesh, backFaceDistanceFactor, reportProgressCallback);

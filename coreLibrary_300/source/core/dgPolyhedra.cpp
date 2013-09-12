@@ -2044,125 +2044,6 @@ void dgPolyhedra::CalculateAllMetrics (dgVertexCollapseVertexMetric* const table
 	}
 }
 
-dgFloat64 dgPolyhedra::EdgePenalty (const dgBigVector* const pool, dgEdge* const edge) const
-{
-	dgInt32 i0 = edge->m_incidentVertex;
-	dgInt32 i1 = edge->m_next->m_incidentVertex;
-
-	const dgBigVector& p0 = pool[i0];
-	const dgBigVector& p1 = pool[i1];
-	dgBigVector dp (p1 - p0);
-
-	dgFloat64 dot = dp % dp;
-	if (dot < dgFloat64(1.0e-6f)) {
-		return dgFloat64 (-1.0f);
-	}
-
-	if ((edge->m_incidentFace > 0) && (edge->m_twin->m_incidentFace > 0)) {
-		dgBigVector edgeNormal (FaceNormal (edge, &pool[0].m_x, sizeof (dgBigVector)));
-		dgBigVector twinNormal (FaceNormal (edge->m_twin, &pool[0].m_x, sizeof (dgBigVector)));
-
-		dgFloat64 mag0 = edgeNormal % edgeNormal;
-		dgFloat64 mag1 = twinNormal % twinNormal;
-		if ((mag0 < dgFloat64 (1.0e-24f)) || (mag1 < dgFloat64 (1.0e-24f))) {
-			return dgFloat64 (-1.0f);
-		}
-
-		edgeNormal = edgeNormal.Scale3 (dgFloat64 (1.0f) / sqrt(mag0));
-		twinNormal = twinNormal.Scale3 (dgFloat64 (1.0f) / sqrt(mag1));
-
-		dot = edgeNormal % twinNormal;
-		if (dot < dgFloat64 (-0.9f)) {
-			return dgFloat32 (-1.0f);
-		}
-
-		dgEdge* ptr = edge;
-		do {
-			if ((ptr->m_incidentFace <= 0) || (ptr->m_twin->m_incidentFace <= 0)){
-				dgEdge* const adj = edge->m_twin;
-				ptr = edge;
-				do {
-					if ((ptr->m_incidentFace <= 0) || (ptr->m_twin->m_incidentFace <= 0)){
-						return dgFloat32 (-1.0);
-					}
-					ptr = ptr->m_twin->m_next;
-				} while (ptr != adj);
-			}
-			ptr = ptr->m_twin->m_next;
-		} while (ptr != edge);
-	}
-
-	dgInt32 faceA = edge->m_incidentFace;
-	dgInt32 faceB = edge->m_twin->m_incidentFace;
-
-	i0 = edge->m_twin->m_incidentVertex;
-	dgBigVector p (pool[i0].m_x, pool[i0].m_y, pool[i0].m_z, dgFloat32 (0.0f));
-
-	bool penalty = false;
-	dgEdge* ptr = edge;
-	do {
-		dgEdge* const adj = ptr->m_twin;
-
-		dgInt32 face = adj->m_incidentFace;
-		if ((face != faceB) && (face != faceA) && (face >= 0) && (adj->m_next->m_incidentFace == face) && (adj->m_prev->m_incidentFace == face)){
-
-			dgInt32 i0 = adj->m_next->m_incidentVertex;
-			const dgBigVector& p0 = pool[i0];
-
-			dgInt32 i1 = adj->m_incidentVertex;
-			const dgBigVector& p1 = pool[i1];
-
-			dgInt32 i2 = adj->m_prev->m_incidentVertex;
-			const dgBigVector& p2 = pool[i2];
-
-			dgBigVector n0 ((p1 - p0) * (p2 - p0));
-			dgBigVector n1 ((p1 - p) * (p2 - p));
-			dgFloat64 dot = n0 % n1;
-			if (dot < dgFloat64 (0.0f)) {
-				penalty = true;
-				break;
-			}
-		}
-
-		ptr = ptr->m_twin->m_next;
-	} while (ptr != edge);
-
-	dgFloat64 aspect = dgFloat32 (-1.0f);
-	if (!penalty) {
-		dgInt32 i0 = edge->m_twin->m_incidentVertex;
-		dgBigVector p0 (pool[i0]);
-
-		aspect = dgFloat32 (1.0f);
-		for (dgEdge* ptr = edge->m_twin->m_next->m_twin->m_next; ptr != edge; ptr = ptr->m_twin->m_next) {
-			if (ptr->m_incidentFace > 0) {
-				dgInt32 i0 = ptr->m_next->m_incidentVertex;
-				const dgBigVector& p1 = pool[i0];
-
-				dgInt32 i1 = ptr->m_prev->m_incidentVertex;
-				const dgBigVector& p2 = pool[i1];
-
-				dgBigVector e0 (p1 - p0);
-				dgBigVector e1 (p2 - p1);
-				dgBigVector e2 (p0 - p2);
-
-				dgFloat64 mag0 = e0 % e0;
-				dgFloat64 mag1 = e1 % e1;
-				dgFloat64 mag2 = e2 % e2;
-				dgFloat64 maxMag = dgMax (mag0, mag1, mag2);
-				dgFloat64 minMag = dgMin (mag0, mag1, mag2);
-				dgFloat64 ratio = minMag / maxMag;
-
-				if (ratio < aspect) {
-					aspect = ratio;
-				}
-			}
-		}
-		aspect = sqrt (aspect);
-		//aspect = 1.0f;
-	}
-
-	return aspect;
-}
 
 
 bool dgPolyhedra::IsOkToCollapse (const dgBigVector* const pool, dgEdge* const edge) const
@@ -2302,7 +2183,128 @@ dgEdge* dgPolyhedra::OptimizeCollapseEdge (dgEdge* const edge)
 	return retEdge;
 }
 
-void dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes, dgFloat64 tol)
+#if 0
+dgFloat64 dgPolyhedra::EdgePenalty (const dgBigVector* const pool, dgEdge* const edge, dgFloat64 dist___) const
+{
+	dgInt32 i0 = edge->m_incidentVertex;
+	dgInt32 i1 = edge->m_next->m_incidentVertex;
+
+	const dgBigVector& p0 = pool[i0];
+	const dgBigVector& p1 = pool[i1];
+	dgBigVector dp (p1 - p0);
+
+	dgFloat64 dot = dp % dp;
+	if (dot < dgFloat64(1.0e-6f)) {
+		return dgFloat64 (-1.0f);
+	}
+
+	if ((edge->m_incidentFace > 0) && (edge->m_twin->m_incidentFace > 0)) {
+		dgBigVector edgeNormal (FaceNormal (edge, &pool[0].m_x, sizeof (dgBigVector)));
+		dgBigVector twinNormal (FaceNormal (edge->m_twin, &pool[0].m_x, sizeof (dgBigVector)));
+
+		dgFloat64 mag0 = edgeNormal % edgeNormal;
+		dgFloat64 mag1 = twinNormal % twinNormal;
+		if ((mag0 < dgFloat64 (1.0e-24f)) || (mag1 < dgFloat64 (1.0e-24f))) {
+			return dgFloat64 (-1.0f);
+		}
+
+		edgeNormal = edgeNormal.Scale3 (dgFloat64 (1.0f) / sqrt(mag0));
+		twinNormal = twinNormal.Scale3 (dgFloat64 (1.0f) / sqrt(mag1));
+
+		dot = edgeNormal % twinNormal;
+		if (dot < dgFloat64 (-0.9f)) {
+			return dgFloat32 (-1.0f);
+		}
+
+		dgEdge* ptr = edge;
+		do {
+			if ((ptr->m_incidentFace <= 0) || (ptr->m_twin->m_incidentFace <= 0)){
+				dgEdge* const adj = edge->m_twin;
+				ptr = edge;
+				do {
+					if ((ptr->m_incidentFace <= 0) || (ptr->m_twin->m_incidentFace <= 0)){
+						return dgFloat32 (-1.0);
+					}
+					ptr = ptr->m_twin->m_next;
+				} while (ptr != adj);
+			}
+			ptr = ptr->m_twin->m_next;
+		} while (ptr != edge);
+	}
+
+	dgInt32 faceA = edge->m_incidentFace;
+	dgInt32 faceB = edge->m_twin->m_incidentFace;
+
+	i0 = edge->m_twin->m_incidentVertex;
+	dgBigVector p (pool[i0].m_x, pool[i0].m_y, pool[i0].m_z, dgFloat32 (0.0f));
+
+	bool penalty = false;
+	dgEdge* ptr = edge;
+	do {
+		dgEdge* const adj = ptr->m_twin;
+
+		dgInt32 face = adj->m_incidentFace;
+		if ((face != faceB) && (face != faceA) && (face >= 0) && (adj->m_next->m_incidentFace == face) && (adj->m_prev->m_incidentFace == face)){
+
+			dgInt32 i0 = adj->m_next->m_incidentVertex;
+			const dgBigVector& p0 = pool[i0];
+
+			dgInt32 i1 = adj->m_incidentVertex;
+			const dgBigVector& p1 = pool[i1];
+
+			dgInt32 i2 = adj->m_prev->m_incidentVertex;
+			const dgBigVector& p2 = pool[i2];
+
+			dgBigVector n0 ((p1 - p0) * (p2 - p0));
+			dgBigVector n1 ((p1 - p) * (p2 - p));
+			dgFloat64 dot = n0 % n1;
+			if (dot < dgFloat64 (0.0f)) {
+				penalty = true;
+				break;
+			}
+		}
+
+		ptr = ptr->m_twin->m_next;
+	} while (ptr != edge);
+
+	dgFloat64 aspect = dgFloat32 (-1.0f);
+	if (!penalty) {
+		dgInt32 i0 = edge->m_twin->m_incidentVertex;
+		dgBigVector p0 (pool[i0]);
+
+		aspect = dgFloat32 (1.0f);
+		for (dgEdge* ptr = edge->m_twin->m_next->m_twin->m_next; ptr != edge; ptr = ptr->m_twin->m_next) {
+			if (ptr->m_incidentFace > 0) {
+				dgInt32 i0 = ptr->m_next->m_incidentVertex;
+				const dgBigVector& p1 = pool[i0];
+
+				dgInt32 i1 = ptr->m_prev->m_incidentVertex;
+				const dgBigVector& p2 = pool[i1];
+
+				dgBigVector e0 (p1 - p0);
+				dgBigVector e1 (p2 - p1);
+				dgBigVector e2 (p0 - p2);
+
+				dgFloat64 mag0 = e0 % e0;
+				dgFloat64 mag1 = e1 % e1;
+				dgFloat64 mag2 = e2 % e2;
+				dgFloat64 maxMag = dgMax (mag0, mag1, mag2);
+				dgFloat64 minMag = dgMin (mag0, mag1, mag2);
+				dgFloat64 ratio = minMag / maxMag;
+
+				if (ratio < aspect) {
+					aspect = ratio;
+				}
+			}
+		}
+		aspect = sqrt (aspect);
+		//aspect = 1.0f;
+	}
+
+	return aspect;
+}
+
+void dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes, dgFloat64 tol, dgInt32 maxFaceCount___)
 {
 	dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat64));
 
@@ -2343,7 +2345,7 @@ void dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes,
 		const dgBigVector& p = vertexPool[index1];
 		dgFloat64 cost = metric.Evalue (p); 
 		if (cost < tol2) {
-			cost = EdgePenalty (&vertexPool[0], edge);
+			cost = EdgePenalty (&vertexPool[0], edge, 0);
 
 			if (cost > dgFloat64 (0.0f)) {
 				dgEdgeCollapseEdgeHandle handle (edge);
@@ -2368,7 +2370,7 @@ void dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes,
 			dgVertexCollapseVertexMetric &metric = vertexMetrics[index0];
 			const dgBigVector& p = vertexPool[index1];
 
-			if ((metric.Evalue (p) < tol2) && IsOkToCollapse (&vertexPool[0], edge) && (EdgePenalty (&vertexPool[0], edge)  > dgFloat64 (0.0f))) {
+			if ((metric.Evalue (p) < tol2) && IsOkToCollapse (&vertexPool[0], edge) && (EdgePenalty (&vertexPool[0], edge, 0)  > dgFloat64 (0.0f))) {
 
 #ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
 				dgAssert (SanityCheck ());
@@ -2405,7 +2407,7 @@ void dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes,
 
 						dgFloat64 cost = dgFloat32 (-1.0f);
 						if (metric.Evalue (p) < tol2) {
-							cost = EdgePenalty (&vertexPool[0], ptr);
+							cost = EdgePenalty (&vertexPool[0], ptr, 0);
 						}
 
 						if (cost  > dgFloat64 (0.0f)) {
@@ -2442,7 +2444,7 @@ void dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes,
 
 								dgFloat64 cost = dgFloat32 (-1.0f);
 								if (metric.Evalue (p) < tol2) {
-									cost = EdgePenalty (&vertexPool[0], ptr1);
+									cost = EdgePenalty (&vertexPool[0], ptr1, 0);
 								}
 
 								if (cost  > dgFloat64 (0.0f)) {
@@ -2468,7 +2470,7 @@ void dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes,
 
 								dgFloat64 cost = dgFloat32 (-1.0f);
 								if (metric.Evalue (p) < tol2) {
-									cost = EdgePenalty (&vertexPool[0], ptr1->m_twin);
+									cost = EdgePenalty (&vertexPool[0], ptr1->m_twin, 0);
 								}
 
 								if (cost  > dgFloat64 (0.0f)) {
@@ -2497,3 +2499,298 @@ void dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes,
 		}
 	}
 }
+
+#else
+
+
+
+dgFloat64 dgPolyhedra::EdgePenalty (const dgBigVector* const pool, dgEdge* const edge, dgFloat64 dist) const
+{
+	dgInt32 i0 = edge->m_incidentVertex;
+	dgInt32 i1 = edge->m_next->m_incidentVertex;
+
+	dgFloat32 maxPenalty = dgFloat32 (1.0e14f);
+
+	const dgBigVector& p0 = pool[i0];
+	const dgBigVector& p1 = pool[i1];
+	dgBigVector dp (p1 - p0);
+
+	dgFloat64 dot = dp % dp;
+	if (dot < dgFloat64(1.0e-6f)) {
+		return dist * maxPenalty;
+	}
+
+	if ((edge->m_incidentFace > 0) && (edge->m_twin->m_incidentFace > 0)) {
+		dgBigVector edgeNormal (FaceNormal (edge, &pool[0].m_x, sizeof (dgBigVector)));
+		dgBigVector twinNormal (FaceNormal (edge->m_twin, &pool[0].m_x, sizeof (dgBigVector)));
+
+		dgFloat64 mag0 = edgeNormal % edgeNormal;
+		dgFloat64 mag1 = twinNormal % twinNormal;
+		if ((mag0 < dgFloat64 (1.0e-24f)) || (mag1 < dgFloat64 (1.0e-24f))) {
+			return dist * maxPenalty;
+		}
+
+		edgeNormal = edgeNormal.Scale3 (dgFloat64 (1.0f) / sqrt(mag0));
+		twinNormal = twinNormal.Scale3 (dgFloat64 (1.0f) / sqrt(mag1));
+
+		dot = edgeNormal % twinNormal;
+		if (dot < dgFloat64 (-0.9f)) {
+			return dist * maxPenalty;
+		}
+
+		dgEdge* ptr = edge;
+		do {
+			if ((ptr->m_incidentFace <= 0) || (ptr->m_twin->m_incidentFace <= 0)){
+				dgEdge* const adj = edge->m_twin;
+				ptr = edge;
+				do {
+					if ((ptr->m_incidentFace <= 0) || (ptr->m_twin->m_incidentFace <= 0)){
+						return dist * maxPenalty;
+					}
+					ptr = ptr->m_twin->m_next;
+				} while (ptr != adj);
+			}
+			ptr = ptr->m_twin->m_next;
+		} while (ptr != edge);
+	}
+
+	dgInt32 faceA = edge->m_incidentFace;
+	dgInt32 faceB = edge->m_twin->m_incidentFace;
+
+	i0 = edge->m_twin->m_incidentVertex;
+	dgBigVector p (pool[i0].m_x, pool[i0].m_y, pool[i0].m_z, dgFloat32 (0.0f));
+
+	bool penalty = false;
+	dgEdge* ptr = edge;
+	do {
+		dgEdge* const adj = ptr->m_twin;
+
+		dgInt32 face = adj->m_incidentFace;
+		if ((face != faceB) && (face != faceA) && (face >= 0) && (adj->m_next->m_incidentFace == face) && (adj->m_prev->m_incidentFace == face)){
+
+			dgInt32 i0 = adj->m_next->m_incidentVertex;
+			const dgBigVector& p0 = pool[i0];
+
+			dgInt32 i1 = adj->m_incidentVertex;
+			const dgBigVector& p1 = pool[i1];
+
+			dgInt32 i2 = adj->m_prev->m_incidentVertex;
+			const dgBigVector& p2 = pool[i2];
+
+			dgBigVector n0 ((p1 - p0) * (p2 - p0));
+			dgBigVector n1 ((p1 - p) * (p2 - p));
+			dgFloat64 dot = n0 % n1;
+			if (dot < dgFloat64 (0.0f)) {
+				penalty = true;
+				break;
+			}
+		}
+
+		ptr = ptr->m_twin->m_next;
+	} while (ptr != edge);
+
+	dgFloat64 aspect = dgFloat32 (0.0f);
+	if (!penalty) {
+		dgInt32 i0 = edge->m_twin->m_incidentVertex;
+		dgBigVector p0 (pool[i0]);
+
+		aspect = dgFloat32 (1.0f);
+		for (dgEdge* ptr = edge->m_twin->m_next->m_twin->m_next; ptr != edge; ptr = ptr->m_twin->m_next) {
+			if (ptr->m_incidentFace > 0) {
+				dgInt32 i0 = ptr->m_next->m_incidentVertex;
+				const dgBigVector& p1 = pool[i0];
+
+				dgInt32 i1 = ptr->m_prev->m_incidentVertex;
+				const dgBigVector& p2 = pool[i1];
+
+				dgBigVector e0 (p1 - p0);
+				dgBigVector e1 (p2 - p1);
+				dgBigVector e2 (p0 - p2);
+
+				dgFloat64 mag0 = e0 % e0;
+				dgFloat64 mag1 = e1 % e1;
+				dgFloat64 mag2 = e2 % e2;
+				dgFloat64 maxMag = dgMax (mag0, mag1, mag2);
+				dgFloat64 minMag = dgMin (mag0, mag1, mag2);
+				dgFloat64 ratio = minMag / maxMag;
+
+				if (ratio < aspect) {
+					aspect = ratio;
+				}
+			}
+		}
+		aspect = dgFloat32 (1.0f) - aspect;
+	}
+	return aspect * aspect * dist;
+}
+
+
+void dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes, dgFloat64 tol, dgInt32 maxFaceCount)
+{
+	dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat64));
+
+#ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
+	dgAssert (SanityCheck ());
+#endif
+
+	dgInt32 edgeCount = GetEdgeCount() * 4 + 1024 * 16;
+	dgInt32 maxVertexIndex = GetLastVertexIndex();
+	
+
+	dgStack<dgBigVector> vertexPool (maxVertexIndex); 
+	dgStack<dgVertexCollapseVertexMetric> vertexMetrics (maxVertexIndex + 512); 
+
+	dgList <dgEdgeCollapseEdgeHandle> edgeHandleList(GetAllocator());
+	dgStack<char> heapPool (2 * edgeCount * dgInt32 (sizeof (dgFloat64) + sizeof (dgEdgeCollapseEdgeHandle*) + sizeof (dgInt32))); 
+	dgUpHeap<dgList <dgEdgeCollapseEdgeHandle>::dgListNode* , dgFloat64> bigHeapArray(&heapPool[0], heapPool.GetSizeInBytes());
+
+	for (dgInt32 i = 0; i < maxVertexIndex; i ++) {
+		vertexPool[i].m_x = array[i * stride + 0];
+		vertexPool[i].m_y = array[i * stride + 1];
+		vertexPool[i].m_z = array[i * stride + 2];
+		vertexPool[i].m_w= dgFloat64 (0.0f);
+	}
+
+	memset (&vertexMetrics[0], 0, maxVertexIndex * sizeof (dgVertexCollapseVertexMetric));
+	CalculateAllMetrics (&vertexMetrics[0], &vertexPool[0]);
+
+	dgFloat64 tol2 = tol * tol;
+	dgFloat64 distTol = dgMax (tol2, dgFloat64 (1.0e-12f));
+	Iterator iter (*this);
+	for (iter.Begin(); iter; iter ++) {
+		dgEdge* const edge = &(*iter);
+
+		edge->m_userData = 0;
+		dgInt32 index0 = edge->m_incidentVertex;
+		dgInt32 index1 = edge->m_twin->m_incidentVertex;
+
+		dgVertexCollapseVertexMetric &metric = vertexMetrics[index0];
+		const dgBigVector& p = vertexPool[index1];
+		dgFloat64 faceCost = metric.Evalue (p); 
+		dgFloat64 edgePenalty = EdgePenalty (&vertexPool[0], edge, distTol);
+		dgAssert (edgePenalty >= dgFloat32 (0.0f));
+		dgEdgeCollapseEdgeHandle handle (edge);
+		dgList <dgEdgeCollapseEdgeHandle>::dgListNode* handleNodePtr = edgeHandleList.Addtop (handle);
+		bigHeapArray.Push (handleNodePtr, faceCost + edgePenalty);
+	}
+
+	dgInt32 interPasses = 0;
+	dgInt32 faceCount = GetFaceCount();
+	while (bigHeapArray.GetCount() && (bigHeapArray.Value() < tol2) || (faceCount > maxFaceCount)) {
+
+		dgList <dgEdgeCollapseEdgeHandle>::dgListNode* const handleNodePtr = bigHeapArray[0];
+
+		dgEdge* edge = handleNodePtr->GetInfo().m_edge;
+		bigHeapArray.Pop();
+		edgeHandleList.Remove (handleNodePtr);
+
+		if (edge) {
+			if (IsOkToCollapse (&vertexPool[0], edge)) {
+
+				interPasses ++;
+				faceCount -= 2;
+				if (interPasses >= 400) {
+					interPasses = 0;
+					faceCount = GetFaceCount();
+				}
+
+				if (bigHeapArray.GetCount() > (bigHeapArray.GetMaxCount() - 100)) {
+					for(dgInt32 i = bigHeapArray.GetCount() - 1; i >= 0; i --) {
+						dgList <dgEdgeCollapseEdgeHandle>::dgListNode* const emptyHandle = bigHeapArray[i];
+						if (!emptyHandle->GetInfo().m_edge) {
+							bigHeapArray.Remove(i);
+							edgeHandleList.Remove (emptyHandle);
+						}
+					}
+				}
+
+#ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
+				dgAssert (SanityCheck ());
+#endif
+
+				edge = OptimizeCollapseEdge(edge);
+
+#ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
+				dgAssert (SanityCheck ());
+#endif
+				if (edge) {
+					// Update vertex metrics
+					CalculateVertexMetrics (&vertexMetrics[0], &vertexPool[0], edge);
+
+					// Update metrics for all surrounding vertex
+					dgEdge* ptr = edge;
+					do {
+						CalculateVertexMetrics (&vertexMetrics[0], &vertexPool[0], ptr->m_twin);
+						ptr = ptr->m_twin->m_next;
+					} while (ptr != edge);
+
+					// calculate edge cost of all incident edges
+					dgInt32 mark = IncLRU();
+					ptr = edge;
+					do {
+						dgAssert (ptr->m_mark != mark);
+						ptr->m_mark = mark;
+
+						dgInt32 index0 = ptr->m_incidentVertex;
+						dgInt32 index1 = ptr->m_twin->m_incidentVertex;
+
+						dgVertexCollapseVertexMetric &metric = vertexMetrics[index0];
+						const dgBigVector& p = vertexPool[index1];
+
+						dgFloat64 faceCost = metric.Evalue (p); 
+						dgFloat64 edgePenalty = EdgePenalty (&vertexPool[0], ptr, distTol);
+						dgAssert (edgePenalty >= dgFloat32 (0.0f));
+						dgEdgeCollapseEdgeHandle handle (ptr);
+						dgList <dgEdgeCollapseEdgeHandle>::dgListNode* handleNodePtr = edgeHandleList.Addtop (handle);
+						bigHeapArray.Push (handleNodePtr, faceCost + edgePenalty);
+
+						ptr = ptr->m_twin->m_next;
+					} while (ptr != edge);
+
+
+					// calculate edge cost of all incident edges to a surrounding vertex
+					ptr = edge;
+					do {
+						dgEdge* const incidentEdge = ptr->m_twin;		
+
+						dgEdge* ptr1 = incidentEdge;
+						do {
+							dgInt32 index0 = ptr1->m_incidentVertex;
+							dgInt32 index1 = ptr1->m_twin->m_incidentVertex;
+
+							if (ptr1->m_mark != mark) {
+								ptr1->m_mark = mark;
+								dgVertexCollapseVertexMetric &metric = vertexMetrics[index0];
+								const dgBigVector& p = vertexPool[index1];
+
+								dgFloat64 faceCost = metric.Evalue (p); 
+								dgFloat64 edgePenalty = EdgePenalty (&vertexPool[0], ptr1, distTol);
+								dgAssert (edgePenalty >= dgFloat32 (0.0f));
+								dgEdgeCollapseEdgeHandle handle (ptr1);
+								dgList <dgEdgeCollapseEdgeHandle>::dgListNode* handleNodePtr = edgeHandleList.Addtop (handle);
+								bigHeapArray.Push (handleNodePtr, faceCost + edgePenalty);
+							}
+
+							if (ptr1->m_twin->m_mark != mark) {
+								ptr1->m_twin->m_mark = mark;
+								dgVertexCollapseVertexMetric &metric = vertexMetrics[index1];
+								const dgBigVector& p = vertexPool[index0];
+								dgFloat64 faceCost = metric.Evalue (p); 
+								dgFloat64 edgePenalty = EdgePenalty (&vertexPool[0], ptr1->m_twin, distTol);
+								dgAssert (edgePenalty >= dgFloat32 (0.0f));
+								dgEdgeCollapseEdgeHandle handle (ptr1->m_twin);
+								dgList <dgEdgeCollapseEdgeHandle>::dgListNode* handleNodePtr = edgeHandleList.Addtop (handle);
+								bigHeapArray.Push (handleNodePtr, faceCost + edgePenalty);
+							}
+
+							ptr1 = ptr1->m_twin->m_next;
+						} while (ptr1 != incidentEdge);
+
+						ptr = ptr->m_twin->m_next;
+					} while (ptr != edge);
+				}
+			}
+		}
+	}
+}
+#endif

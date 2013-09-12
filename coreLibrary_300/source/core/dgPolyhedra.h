@@ -114,7 +114,7 @@ class dgPolyhedra: public dgTree <dgEdge, dgEdgeKey>
 	void ChangeEdgeIncidentVertex (dgEdge* const edge, dgInt32 newIndex);	
 	void DeleteDegenerateFaces (const dgFloat64* const pool, dgInt32 dstStrideInBytes, dgFloat64 minArea);
 
-	void Optimize (const dgFloat64* const pool, dgInt32 strideInBytes, dgFloat64 tol);
+	void Optimize (const dgFloat64* const pool, dgInt32 strideInBytes, dgFloat64 tol, dgInt32 maxFaceCount = 1<<28);
 	void Triangulate (const dgFloat64* const vertex, dgInt32 strideInBytes, dgPolyhedra* const leftOversOut);
 	void ConvexPartition (const dgFloat64* const vertex, dgInt32 strideInBytes, dgPolyhedra* const leftOversOut);
 	dgEdge* CollapseEdge(dgEdge* const edge);
@@ -132,7 +132,7 @@ class dgPolyhedra: public dgTree <dgEdge, dgEdgeKey>
 	void RemoveHalfEdge (dgEdge* const edge);
 	dgEdge* OptimizeCollapseEdge (dgEdge* const edge);
 	bool IsOkToCollapse (const dgBigVector* const pool, dgEdge* const edge) const;
-	dgFloat64 EdgePenalty (const dgBigVector* const pool, dgEdge* const edge) const;
+	dgFloat64 EdgePenalty (const dgBigVector* const pool, dgEdge* const edge, dgFloat64 dist) const;
 	dgBigPlane EdgePlane (dgInt32 i0, dgInt32 i1, dgInt32 i2, const dgBigVector* const pool) const;
 	void CalculateAllMetrics (dgVertexCollapseVertexMetric* const table, const dgBigVector* const pool) const;
 	void CalculateVertexMetrics (dgVertexCollapseVertexMetric* const table, const dgBigVector* const pool, dgEdge* const edge) const;
