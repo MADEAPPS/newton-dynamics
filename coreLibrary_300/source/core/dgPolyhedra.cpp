@@ -2654,6 +2654,7 @@ bool dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes,
 	memset (&vertexMetrics[0], 0, maxVertexIndex * sizeof (dgVertexCollapseVertexMetric));
 	CalculateAllMetrics (&vertexMetrics[0], &vertexPool[0]);
 
+	const dgFloat64 maxCost = dgFloat32 (1.0e-3f);
 	dgFloat64 tol2 = tol * tol;
 	dgFloat64 distTol = dgMax (tol2, dgFloat64 (1.0e-12f));
 	Iterator iter (*this);
@@ -2677,7 +2678,7 @@ bool dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes,
 	bool progress = true;
 	dgInt32 interPasses = 0;
 	dgInt32 faceCount = GetFaceCount();
-	while (bigHeapArray.GetCount() && (bigHeapArray.Value() < tol2) || (faceCount > maxFaceCount) && progress ) {
+	while (bigHeapArray.GetCount() && (bigHeapArray.Value() < maxCost) && ((bigHeapArray.Value() < tol2) || (faceCount > maxFaceCount)) && progress ) {
 		dgList <dgEdgeCollapseEdgeHandle>::dgListNode* const handleNodePtr = bigHeapArray[0];
 
 		dgEdge* edge = handleNodePtr->GetInfo().m_edge;

@@ -146,7 +146,7 @@ case IDNO:
 	return(0);
 }
 
-void ConvexApproximationClassDesc::ReportProgress(float progressNormalzedPercent)
+bool ConvexApproximationClassDesc::ReportProgress(float progressNormalzedPercent)
 {
 	ConvexApproximationClassDesc* const desc = (ConvexApproximationClassDesc*) ConvexApproximationClassDesc::GetDescriptor();
 
@@ -155,7 +155,9 @@ void ConvexApproximationClassDesc::ReportProgress(float progressNormalzedPercent
 		desc->m_progress = progress;
 		Interface* const inteface = desc->m_currentInterface;
 		inteface->ProgressUpdate(progress);
+		return inteface->GetCancel() ? true : false;
 	}
+	return true;
 }
 
 

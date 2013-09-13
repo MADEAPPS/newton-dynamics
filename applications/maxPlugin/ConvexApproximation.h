@@ -64,7 +64,7 @@ class ConvexApproximationClassDesc: public ClassDesc2
 	static ClassDesc* GetDescriptor();
 
 	static DWORD WINAPI ReportMaxProgress(LPVOID arg);
-	static void ReportProgress(float progressNormalzedPercent);
+	static bool ReportProgress(float progressNormalzedPercent);
 
 	int m_progress; 
 	ConvexApproximationMouseCallBack m_mouseCallback;
