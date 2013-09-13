@@ -7901,16 +7901,16 @@ void NewtonMeshClip (const NewtonMesh* const mesh, const NewtonMesh* const clipp
 }
 
 
-NewtonMesh* NewtonMeshSimplify (const NewtonMesh* const mesh, int maxVertexCount, NewtonReportProgress reportPrograssCallback)
+NewtonMesh* NewtonMeshSimplify (const NewtonMesh* const mesh, int maxVertexCount, NewtonReportProgress progressReportCallback)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	return (NewtonMesh*) ((dgMeshEffect*) mesh)->CreateSimplification (dgInt32 (maxVertexCount), (dgReportProgress) reportPrograssCallback);
+	return (NewtonMesh*) ((dgMeshEffect*) mesh)->CreateSimplification (dgInt32 (maxVertexCount), (dgReportProgress) progressReportCallback);
 }
 
-NewtonMesh* NewtonMeshApproximateConvexDecomposition (const NewtonMesh* const mesh, dFloat maxConcavity, dFloat backFaceDistanceFactor, int maxCount, int maxVertexPerHull, NewtonReportProgress reportPrograssCallback)
+NewtonMesh* NewtonMeshApproximateConvexDecomposition (const NewtonMesh* const mesh, dFloat maxConcavity, dFloat backFaceDistanceFactor, int maxCount, int maxVertexPerHull, NewtonReportProgress progressReportCallback)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	return (NewtonMesh*) ((dgMeshEffect*) mesh)->CreateConvexApproximation (maxConcavity, backFaceDistanceFactor, maxCount, maxVertexPerHull, (dgReportProgress) reportPrograssCallback);
+	return (NewtonMesh*) ((dgMeshEffect*) mesh)->CreateConvexApproximation (maxConcavity, backFaceDistanceFactor, maxCount, maxVertexPerHull, (dgReportProgress) progressReportCallback);
 }
 
 

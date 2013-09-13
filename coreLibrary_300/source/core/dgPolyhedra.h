@@ -114,7 +114,7 @@ class dgPolyhedra: public dgTree <dgEdge, dgEdgeKey>
 	void ChangeEdgeIncidentVertex (dgEdge* const edge, dgInt32 newIndex);	
 	void DeleteDegenerateFaces (const dgFloat64* const pool, dgInt32 dstStrideInBytes, dgFloat64 minArea);
 
-	void Optimize (const dgFloat64* const pool, dgInt32 strideInBytes, dgFloat64 tol, dgInt32 maxFaceCount = 1<<28);
+	bool Optimize (const dgFloat64* const pool, dgInt32 strideInBytes, dgReportProgress normalizedProgress, dgFloat64 tol, dgInt32 maxFaceCount = 1<<28);
 	void Triangulate (const dgFloat64* const vertex, dgInt32 strideInBytes, dgPolyhedra* const leftOversOut);
 	void ConvexPartition (const dgFloat64* const vertex, dgInt32 strideInBytes, dgPolyhedra* const leftOversOut);
 	dgEdge* CollapseEdge(dgEdge* const edge);

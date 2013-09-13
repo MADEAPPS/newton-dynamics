@@ -264,7 +264,7 @@ class dgBigVector;
 
 typedef void (dgApi *dgDeserialize) (void* const userData, void* buffer, size_t size);
 typedef void (dgApi *dgSerialize) (void* const userData, const void* const buffer, size_t size);
-typedef void (dgApi *dgReportProgress) (dgFloat32 progressNormalzedPercent);
+typedef bool (dgApi *dgReportProgress) (dgFloat32 progressNormalzedPercent);
 
 DG_INLINE dgInt32 dgExp2 (dgInt32 x)
 {

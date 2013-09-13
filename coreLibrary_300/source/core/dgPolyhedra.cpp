@@ -1694,7 +1694,7 @@ void dgPolyhedra::ConvexPartition (const dgFloat64* const vertex, dgInt32 stride
 	if (GetCount()) {
 		Triangulate (vertex, strideInBytes, leftOversOut);
 		DeleteDegenerateFaces (vertex, strideInBytes, dgFloat32 (1.0e-5f));
-		Optimize (vertex, strideInBytes, dgFloat32 (1.0e-4f));
+		Optimize (vertex, strideInBytes, NULL, dgFloat32 (1.0e-4f));
 		DeleteDegenerateFaces (vertex, strideInBytes, dgFloat32 (1.0e-5f));
 
 		if (GetCount()) {
@@ -2625,7 +2625,7 @@ dgFloat64 dgPolyhedra::EdgePenalty (const dgBigVector* const pool, dgEdge* const
 }
 
 
-void dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes, dgFloat64 tol, dgInt32 maxFaceCount)
+bool dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes, dgReportProgress normalizedProgress, dgFloat64 tol, dgInt32 maxFaceCount)
 {
 	dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat64));
 
@@ -2633,10 +2633,10 @@ void dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes,
 	dgAssert (SanityCheck ());
 #endif
 
+	dgFloat32 progressDen = dgFloat32 (1.0f / GetEdgeCount());
 	dgInt32 edgeCount = GetEdgeCount() * 4 + 1024 * 16;
 	dgInt32 maxVertexIndex = GetLastVertexIndex();
 	
-
 	dgStack<dgBigVector> vertexPool (maxVertexIndex); 
 	dgStack<dgVertexCollapseVertexMetric> vertexMetrics (maxVertexIndex + 512); 
 
@@ -2674,10 +2674,10 @@ void dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes,
 		bigHeapArray.Push (handleNodePtr, faceCost + edgePenalty);
 	}
 
+	bool progress = true;
 	dgInt32 interPasses = 0;
 	dgInt32 faceCount = GetFaceCount();
-	while (bigHeapArray.GetCount() && (bigHeapArray.Value() < tol2) || (faceCount > maxFaceCount)) {
-
+	while (bigHeapArray.GetCount() && (bigHeapArray.Value() < tol2) || (faceCount > maxFaceCount) && progress ) {
 		dgList <dgEdgeCollapseEdgeHandle>::dgListNode* const handleNodePtr = bigHeapArray[0];
 
 		dgEdge* edge = handleNodePtr->GetInfo().m_edge;
@@ -2692,6 +2692,7 @@ void dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes,
 				if (interPasses >= 400) {
 					interPasses = 0;
 					faceCount = GetFaceCount();
+					progress = normalizedProgress ? normalizedProgress(dgFloat32 (1.0f) - GetEdgeCount() * progressDen) : true;
 				}
 
 				if (bigHeapArray.GetCount() > (bigHeapArray.GetMaxCount() - 100)) {
@@ -2792,5 +2793,10 @@ void dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes,
 			}
 		}
 	}
+
+	if (normalizedProgress && progress) {
+		progress = normalizedProgress(dgFloat32 (1.0f));
+	}
+	return progress;
 }
 #endif

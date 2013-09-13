@@ -19,6 +19,11 @@
 #include "PhysicsUtils.h"
 #include "HeightFieldPrimitive.h"
 
+static bool ReportProgress (dFloat normalizedProgressPercent)
+{
+	return true; 
+}
+
 
 static void CreateConvexAproximation (const char* const name, DemoEntityManager* const scene, const dVector& origin, int instaceCount, const char* const texture)
 {
@@ -58,20 +63,18 @@ static void CreateConvexAproximation (const char* const name, DemoEntityManager*
 //	scale[2][2] = scaleMag;
 //	NewtonMesApplyTransform (mesh, &scale[0][0]);
 #endif
-
-	NewtonMesh* const newtonMesh = NewtonMeshSimplify(mesh, 500, NULL);
+	//NewtonMesh* const newtonMesh = NewtonMeshSimplify(mesh, 500, ReportProgress);
 
 	// create a convex approximation form the original mesh, 32 convex max and no more than 100 vertex convex hulls
-	NewtonMesh* const convexApproximation = NewtonMeshApproximateConvexDecomposition (newtonMesh, 0.01f, 0.2f, 32, 100, NULL);
-
+	NewtonMesh* const convexApproximation = NewtonMeshApproximateConvexDecomposition (mesh, 0.01f, 0.2f, 32, 100, ReportProgress);
 
 	// create a compound collision by creation a convex hull of each segment of the source mesh 
 	NewtonCollision* const compound = NewtonCreateCompoundCollisionFromMesh (world, convexApproximation, 0.001f, 0, 0);
 	
 	// make a visual Mesh
 	int tex = LoadTexture(texture);
-	NewtonMeshApplyBoxMapping(newtonMesh, tex, tex, tex);
-	DemoMesh* const visualMesh = new DemoMesh (newtonMesh);
+	NewtonMeshApplyBoxMapping(mesh, tex, tex, tex);
+	DemoMesh* const visualMesh = new DemoMesh (mesh);
 
 	dMatrix matrix (GetIdentityMatrix());
 	matrix.m_posit = origin;
@@ -90,7 +93,6 @@ static void CreateConvexAproximation (const char* const name, DemoEntityManager*
 
 	NewtonDestroyCollision(compound);
 	NewtonMeshDestroy (convexApproximation);
-	NewtonMeshDestroy (newtonMesh);
 }
 
 
