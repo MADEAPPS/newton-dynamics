@@ -37,10 +37,12 @@ class StupidComplexOfConvexShapes: public DemoEntity
 		int materialID = NewtonMaterialGetDefaultGroupID(world);
 
 		// create a pool of predefined convex mesh
-		PrimitiveType selection[] = {_SPHERE_PRIMITIVE,	_BOX_PRIMITIVE,	_CAPSULE_PRIMITIVE, _CYLINDER_PRIMITIVE, _CONE_PRIMITIVE, _TAPERED_CAPSULE_PRIMITIVE, _TAPERED_CYLINDER_PRIMITIVE, _CHAMFER_CYLINDER_PRIMITIVE, _RANDOM_CONVEX_HULL_PRIMITIVE, _REGULAR_CONVEX_HULL_PRIMITIVE};
+//		PrimitiveType selection[] = {_SPHERE_PRIMITIVE,	_BOX_PRIMITIVE,	_CAPSULE_PRIMITIVE, _CYLINDER_PRIMITIVE, _CONE_PRIMITIVE, _TAPERED_CAPSULE_PRIMITIVE, _TAPERED_CYLINDER_PRIMITIVE, _CHAMFER_CYLINDER_PRIMITIVE, _RANDOM_CONVEX_HULL_PRIMITIVE, _REGULAR_CONVEX_HULL_PRIMITIVE};
+PrimitiveType selection[] = {_SPHERE_PRIMITIVE};
 		for (int i = 0; i < int (sizeof (collisionArray) / sizeof (collisionArray[0])); i ++) {
 			int index = dRand() % (sizeof (selection) / sizeof (selection[0]));
 			dVector shapeSize (size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), 0.0f);
+shapeSize = dVector(size, size, size, 0.0f);
 			collisionArray[i] = CreateConvexCollision (world, GetIdentityMatrix(), shapeSize, selection[index], materialID);
 			gemetries[i] = new DemoMesh("geometry", collisionArray[i], "wood_4.tga", "wood_4.tga", "wood_1.tga");
 		}
@@ -58,6 +60,17 @@ class StupidComplexOfConvexShapes: public DemoEntity
 				float y = RandomVariable (size * 2.0f);
 				float z = size * (i - count / 2) + RandomVariable (size * 0.5f);
 
+pitch = 0;
+yaw = 0;
+roll = 0;
+x = size * (j - count / 2);
+y = 0;
+z = size * (i - count / 2);
+
+//x = 0;
+//z = 0;
+
+//if (j == 0){
 				dMatrix matrix (dPitchMatrix (pitch) * dYawMatrix (yaw) * dRollMatrix (roll));
 				matrix.m_posit = dVector (x, y, z, 1.0f);
 
@@ -67,6 +80,7 @@ class StupidComplexOfConvexShapes: public DemoEntity
 
 				NewtonCollisionSetMatrix (collisionArray[index], &matrix[0][0]);
 				NewtonCompoundCollisionAddSubCollision (compound, collisionArray[index]);
+//}
 			}
 		}
 		NewtonCompoundCollisionEndAddRemove(compound);	
@@ -144,6 +158,29 @@ class StupidComplexOfConvexShapes: public DemoEntity
 	{
 		m_castingEntity->ResetMatrix(*scene, matrix);
 	}
+
+/*
+void SimulationPreListener(DemoEntityManager* const scene, DemoEntityManager::dListNode* const mynode, dFloat timeStep)
+{
+	dVector p0 (-9.6479425f, 3.2714758f, -6.2146726f, 1.0f);
+	dVector p1 (1609.6510f, -560.38074f, 1025.2556f, 1.f);
+
+	// do the convex cast here 
+	dMatrix matrix (GetIdentityMatrix());
+	matrix.m_posit = p0;
+
+	dFloat hitParam;
+	NewtonWorldConvexCastReturnInfo info[16];
+	NewtonCollision* const shape = GetCurrentShape();
+	NewtonWorld* const world = scene->GetNewton();
+	int count = NewtonWorldConvexCast (world, &matrix[0][0], &p1[0], shape, &hitParam, NULL, NULL, &info[0], 4, 0);		
+	if (count) {
+		matrix.m_posit += (p1 - matrix.m_posit).Scale (hitParam);
+		SetCastEntityMatrix (scene, matrix);
+	}
+	SetCastingLine (p0, p1);
+}
+*/
 
 	virtual void Render(dFloat timeStep) const
 	{
@@ -257,7 +294,6 @@ class dConvexCastManager: public CustomControllerManager<dConvexCastRecord>
 				matrix.m_posit += (p1 - matrix.m_posit).Scale (hitParam);
 				m_stupidLevel->SetCastEntityMatrix (scene, matrix);
 			}
-
 			m_stupidLevel->SetCastingLine (p0, p1);
 		}
 	}

@@ -3068,7 +3068,6 @@ dgAssert (0);
 
 	dgFloat32 param = dgFloat32 (1.2f);
 	dgMinkHull minkHull (proxy);
-//	minkHull.m_scaleIsUnit = !isScaled;
 	minkHull.m_scaleType = convexConicShape->GetCombinedScaleType(otherConvexShapeInstance->GetScaleType());
 
 	dgInt32 makingProgressCount = 0;
@@ -3077,13 +3076,6 @@ dgAssert (0);
 		if (!disjoint) {
 			break;
 		}
-
-//		dgVector normal (minkHull.m_normal);
-//		if (isScaled) {
-//			normal = minkHull.m_normal.CompProduct4(invScale);
-//			dgAssert (normal.m_w == dgFloat32 (0.0f));
-//			normal = normal.CompProduct4(normal.DotProduct4(normal).InvSqrt());
-//		}
 
 		dgVector normal (minkHull.m_normal);
 		dgAssert (normal.m_w == dgFloat32 (0.0f));
@@ -3172,6 +3164,7 @@ dgInt32 dgCollisionConvex::CalculateConvexCastContacts(dgCollisionParamProxy& pr
 	dgFloat32 timestep = proxy.m_timestep;
 	proxy.m_contactJoint->m_closestDistance = dgFloat32 (1.0e10f);
 
+
 	dgMinkHull minkHull (proxy);
 	dgAssert (minkHull.m_scaleType == dgCollisionInstance::m_unit);
 	do {
@@ -3192,8 +3185,9 @@ dgInt32 dgCollisionConvex::CalculateConvexCastContacts(dgCollisionParamProxy& pr
 			default:
 				dgAssert(0);
 		}
+		minkHull.m_p = ConvexConicSupporVertex(minkHull.m_p, minkHull.m_normal);
+
 		dgFloat32 den = normal % veloc;
-		//if (den >= dgFloat32 (0.0f)) {
 		if (den >= dgFloat32 (-1.0e-6f)) {
 			// bodies are residing from each other, even if they are touching they are not considered to be colliding because the motion will move them apart 
 			// get the closet point and the normal at contact point
@@ -3201,14 +3195,12 @@ dgInt32 dgCollisionConvex::CalculateConvexCastContacts(dgCollisionParamProxy& pr
 			proxy.m_timestep = timestep;
 			proxy.m_normal = matrix.RotateVector(invScale.CompProduct4(minkHull.m_normal.Scale4 (-1.0f)));
 			dgAssert (proxy.m_normal.m_w == dgFloat32 (0.0f));
-			//proxy.m_normal = proxy.m_normal.Scale3(dgRsqrt(proxy.m_normal % proxy.m_normal ));
 			proxy.m_normal = proxy.m_normal.CompProduct4(proxy.m_normal.InvMagSqrt());
 			proxy.m_closestPointBody0 = matrix.TransformVector(scale.CompProduct4(minkHull.m_p)) & dgVector::m_triplexMask;
 			proxy.m_closestPointBody1 = matrix.TransformVector(scale.CompProduct4(minkHull.m_q)) & dgVector::m_triplexMask;
 			break;
 		}
-
-		minkHull.m_p = ConvexConicSupporVertex(minkHull.m_p, minkHull.m_normal);
+		
 		dgVector diff (scale.CompProduct4(minkHull.m_q - minkHull.m_p));
 		dgFloat32 num = minkHull.m_normal.DotProduct4(diff).m_x;
 		if (num <= dgFloat32 (0.0f)) {
@@ -3244,7 +3236,8 @@ dgInt32 dgCollisionConvex::CalculateConvexCastContacts(dgCollisionParamProxy& pr
 		}
 
 		num += DG_RESTING_CONTACT_PENETRATION; 
-		tacc -= (num / den); 
+		dgFloat32 dt = - (num / den);
+		tacc += dt; 
 		if (tacc >= timestep) {
 			// object do not collide on this timestep
 			count = 0;
@@ -3256,7 +3249,8 @@ dgInt32 dgCollisionConvex::CalculateConvexCastContacts(dgCollisionParamProxy& pr
 			break;
 		}
 
-		dgVector step (veloc.Scale4(tacc));
+		//dgVector step (veloc.Scale4(tacc));
+		dgVector step (veloc.Scale4(dt));
 		minkHull.TranslateSimplex(step);
 
 		iter ++;

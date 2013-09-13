@@ -447,10 +447,15 @@ void DemoEntityManager::BodyDeserialization (NewtonBody* const body, NewtonDeser
 	NewtonBodySetUserData (body, entity);
 	NewtonBodySetTransformCallback(body, DemoEntity::TransformCallback);
 	NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
+	NewtonCollision* const collision = NewtonBodyGetCollision(body);
 
+	#ifdef USE_STATIC_MESHES_DEBUG_COLLISION
+		if (NewtonCollisionGetType(collision) == SERIALIZE_ID_TREE) {
+			NewtonStaticCollisionSetDebugCallback (collision, ShowMeshCollidingFaces);
+		}
+	#endif
 
 	//for visual mesh we will collision mesh and convert it to a visual mesh using NewtonMesh 
-	NewtonCollision* const collision = NewtonBodyGetCollision(body);
 	DemoMesh* const mesh = new DemoMesh(bodyIndentification, collision, NULL, NULL, NULL);
 
 	entity->SetMesh(mesh);

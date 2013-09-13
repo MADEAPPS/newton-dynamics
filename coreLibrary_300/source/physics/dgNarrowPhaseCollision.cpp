@@ -1405,7 +1405,7 @@ dgInt32 dgWorld::ClosestPoint (dgCollisionParamProxy& proxy) const
 		tmp.m_timestep = proxy.m_timestep;
 		tmp.m_skinThickness = proxy.m_skinThickness;
 		tmp.m_maxContacts = proxy.m_maxContacts;
-		tmp.m_matrix = collision1->m_globalMatrix * collision2->m_globalMatrix.Inverse();
+		tmp.m_matrix = collision1->GetGlobalMatrix() * collision2->GetGlobalMatrix().Inverse();
 
 		dgCollisionConvex* const convexShape = (dgCollisionConvex*) collision2->m_childShape;
 
@@ -1425,7 +1425,7 @@ dgInt32 dgWorld::ClosestPoint (dgCollisionParamProxy& proxy) const
 			return 1;
 		}
 	} else {
-		proxy.m_matrix = collision2->m_globalMatrix * collision1->m_globalMatrix.Inverse();
+		proxy.m_matrix = collision2->GetGlobalMatrix() * collision1->GetGlobalMatrix().Inverse();
 		dgCollisionConvex* const convexShape = (dgCollisionConvex*) collision1->m_childShape;
 
 		dgVector v (proxy.m_matrix.m_posit & dgVector::m_triplexMask);
@@ -1465,8 +1465,8 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts (dgCollisionParamProxy& prox
 	dgAssert (proxy.m_referenceCollision->IsType (dgCollision::dgCollisionConvexShape_RTTI));
 	dgAssert (proxy.m_floatingCollision->IsType (dgCollision::dgCollisionMesh_RTTI));
 
-	const dgMatrix& hullMatrix = convexInstance->m_globalMatrix;
-	const dgMatrix& soupMatrix = polySoupInstance->m_globalMatrix;
+	const dgMatrix& hullMatrix = convexInstance->GetGlobalMatrix();
+	const dgMatrix& soupMatrix = polySoupInstance->GetGlobalMatrix();
 
 	proxy.m_matrix = hullMatrix * soupMatrix.Inverse();
 	const dgVector& invScale = polySoupInstance->GetInvScale();
@@ -1575,7 +1575,7 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) 
 			tmp.m_timestep = proxy.m_timestep;
 			tmp.m_skinThickness = proxy.m_skinThickness;
 			tmp.m_maxContacts = proxy.m_maxContacts;
-			tmp.m_matrix = collision1->m_globalMatrix * collision2->m_globalMatrix.Inverse();
+			tmp.m_matrix = collision1->GetGlobalMatrix() * collision2->GetGlobalMatrix().Inverse();
 
 			dgCollisionConvex* const convexShape = (dgCollisionConvex*) collision2->m_childShape;
 			if (contactJoint->m_isNewContact) {
@@ -1603,7 +1603,7 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) 
 			proxy.m_closestPointBody1 = tmp.m_closestPointBody0;
 
 		} else {
-			proxy.m_matrix = collision2->m_globalMatrix * collision1->m_globalMatrix.Inverse();
+			proxy.m_matrix = collision2->GetGlobalMatrix() * collision1->GetGlobalMatrix().Inverse();
 			dgCollisionConvex* const convexShape = (dgCollisionConvex*) collision1->m_childShape;
 
 			if (contactJoint->m_isNewContact) {
@@ -1628,7 +1628,7 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) 
 			tmp.m_timestep = proxy.m_timestep;
 			tmp.m_skinThickness = proxy.m_skinThickness;
 			tmp.m_maxContacts = proxy.m_maxContacts;
-			tmp.m_matrix = collision1->m_globalMatrix * collision2->m_globalMatrix.Inverse();
+			tmp.m_matrix = collision1->GetGlobalMatrix() * collision2->GetGlobalMatrix().Inverse();
 
 			dgCollisionConvex* const convexShape = (dgCollisionConvex*) collision2->m_childShape;
 
@@ -1656,7 +1656,7 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) 
 			proxy.m_closestPointBody1 = tmp.m_closestPointBody0;
 
 		} else {
-			proxy.m_matrix = collision2->m_globalMatrix * collision1->m_globalMatrix.Inverse();
+			proxy.m_matrix = collision2->GetGlobalMatrix() * collision1->GetGlobalMatrix().Inverse();
 			dgCollisionConvex* const convexShape = (dgCollisionConvex*) collision1->m_childShape;
 
 			if (contactJoint->m_isNewContact) {
@@ -1775,7 +1775,7 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 	// check for extreme obtuse contacts 
 	dgFloat32 penetrations[DG_MAX_CONTATCS];
 	const dgCollisionInstance* const convexInstance = proxy.m_referenceCollision;
-	const dgMatrix& matrix = convexInstance->m_globalMatrix;
+	const dgMatrix& matrix = convexInstance->GetGlobalMatrix();
 	for (dgInt32 i = 0; i < count; i ++) {
 		const dgVector& normal = contactOut[i].m_normal;
 		dgVector minPenetration (contactOut[i].m_point - matrix.TransformVector(convexInstance->SupportVertex (matrix.UnrotateVector(normal.Scale3 (dgFloat32 (-1.0f))), NULL)));
@@ -1922,7 +1922,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue (dgCollisionParamPro
 	// check for extreme obtuse contacts 
 //	dgFloat32 penetrations[DG_MAX_CONTATCS];
 //	const dgCollisionInstance* const convexInstance = proxy.m_referenceCollision;
-//	const dgMatrix& matrix = convexInstance->m_globalMatrix;
+//	const dgMatrix& matrix = convexInstance->GetGlobalMatrix();
 //	for (dgInt32 i = 0; i < count; i ++) {
 //		const dgVector& normal = contactOut[i].m_normal;
 //		dgVector minPenetration (contactOut[i].m_point - matrix.TransformVector(convexInstance->SupportVertex (matrix.UnrotateVector(normal.Scale3 (dgFloat32 (-1.0f))), NULL)));
