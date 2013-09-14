@@ -26,6 +26,7 @@
 
 #include "dgRef.h"
 #include "dgCRC.h"
+#include "dgObb.h"
 #include "dgRtti.h"
 #include "dgList.h"
 #include "dgTree.h"
@@ -39,7 +40,6 @@
 #include "dgGoogol.h"
 #include "dgVector.h"
 #include "dgMatrix.h"
-#include "dgSphere.h"
 #include "dgMemory.h"
 #include "dgRandom.h"
 #include "dgThread.h"

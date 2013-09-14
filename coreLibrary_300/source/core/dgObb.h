@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __dgSphere__
-#define __dgSphere__
+#ifndef __dgOOBB_H__
+#define __dgOOBB_H__
 
 #include "dgStdafx.h"
 #include "dgTypes.h"
@@ -29,28 +29,26 @@
 #include "dgQuaternion.h"
 
 
-//class dgFace; 
 class dgPlane;
-//class dgCamera;
 
 DG_MSC_VECTOR_ALIGMENT
-class dgSphere: public dgMatrix
+class dgObb: public dgMatrix
 {
 	public:
-	dgSphere ();
-	dgSphere (const dgQuaternion &quat, const dgVector &position, const dgVector& dim = dgVector(0, 0, 0, 0));
-	dgSphere (const dgMatrix& matrix, const dgVector& dim = dgVector(0, 0, 0, 0));
+	dgObb ();
+	dgObb (const dgQuaternion &quat, const dgVector &position, const dgVector& dim = dgVector(0, 0, 0, 0));
+	dgObb (const dgMatrix& matrix, const dgVector& dim = dgVector(0, 0, 0, 0));
 
-	dgSphere &operator= (const dgMatrix &arg);
+	dgObb &operator= (const dgMatrix &arg);
 	void Scale (dgFloat32 Ws, dgFloat32 Hs, dgFloat32 Bs) ;
 	void SetDimensions (dgFloat32 W, dgFloat32 H, dgFloat32 B);
 	void SetDimensions (const dgFloat32 vertex[], dgInt32 strideInBytes, dgInt32 vertexCount, const dgMatrix *basis = NULL);
 	void SetDimensions (const dgFloat32 vertex[], dgInt32 strideInBytes, const dgInt32 triangles[], dgInt32 indexCount, const dgMatrix *basis);
 //	void SetDimensions (const dgFloat32 vertex[], dgInt32 strideInBytes, const dgInt32 index[], dgInt32 indexCount, const dgMatrix *basis = NULL);
 
-	// return:  0 if the sphere is wholly inside the viewport
-	//          1 if the sphere is partially inside the viewport
-	//         -1 if the sphere is wholly outside the viewport
+	// return:  0 if the sphere is wholly inside the view port
+	//          1 if the sphere is partially inside the view port
+	//         -1 if the sphere is wholly outside the view port
 //	dgInt32 VisibilityTest (const dgCamera* camera) const;
 //	dgInt32 VisibilityTest (const dgCamera* camera, const dgMatrix &worldMatrix) const; 
 //	void Render (const dgCamera* camera, const dgMatrix &transform, unsigned rgb) const;
@@ -74,13 +72,35 @@ class dgSphere: public dgMatrix
 
 	public:
 	dgVector m_size;
-}DG_GCC_VECTOR_ALIGMENT; 
+} DG_GCC_VECTOR_ALIGMENT; 
 
 
-const dgSphere& GetIdentitySphere();
+//const dgSphere& GetIdentitySphere();
 
 
-inline dgSphere &dgSphere::operator= (const dgMatrix &arg)
+inline dgObb::dgObb ()
+	:dgMatrix(dgGetIdentityMatrix())
+	,m_size (dgFloat32 (0.0f))
+{
+}
+
+inline dgObb::dgObb (const dgQuaternion &quat, const dgVector &position, const dgVector& dim)
+	:dgMatrix(quat, position)
+{
+	SetDimensions (dim.m_x, dim.m_y, dim.m_z);
+	dgAssert (0);
+}
+
+inline dgObb::dgObb(const dgMatrix& matrix, const dgVector& dim)
+	:dgMatrix(matrix)
+{
+	SetDimensions (dim.m_x, dim.m_y, dim.m_z);
+}
+
+
+
+
+inline dgObb &dgObb::operator= (const dgMatrix &arg)
 {
 	m_front = arg.m_front;
 	m_up = arg.m_up;
@@ -89,12 +109,12 @@ inline dgSphere &dgSphere::operator= (const dgMatrix &arg)
 	return *this;
 }
 
-inline void dgSphere::SetDimensions (dgFloat32 W, dgFloat32 H, dgFloat32 B)
+inline void dgObb::SetDimensions (dgFloat32 W, dgFloat32 H, dgFloat32 B)
 {
 	m_size = dgVector (dgAbsf(W), dgAbsf(H), dgAbsf(B), dgSqrt (W * W + H * H + B * B));
 }
 
-inline void dgSphere::Scale (dgFloat32 Ws, dgFloat32 Hs, dgFloat32 Bs) 
+inline void dgObb::Scale (dgFloat32 Ws, dgFloat32 Hs, dgFloat32 Bs) 
 {
 	SetDimensions (m_size.m_x * Ws, m_size.m_y * Hs, m_size.m_z * Bs);
 }

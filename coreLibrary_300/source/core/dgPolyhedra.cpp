@@ -20,10 +20,10 @@
 */
 
 #include "dgStdafx.h"
+#include "dgObb.h"
 #include "dgHeap.h"
 #include "dgDebug.h"
 #include "dgStack.h"
-#include "dgSphere.h"
 #include "dgPolyhedra.h"
 #include "dgConvexHull3d.h"
 #include "dgSmallDeterminant.h"
@@ -1851,7 +1851,7 @@ void dgPolyhedra::ConvexPartition (const dgFloat64* const vertex, dgInt32 stride
 }
 
 
-dgSphere dgPolyhedra::CalculateSphere (const dgFloat64* const vertex, dgInt32 strideInBytes, const dgMatrix* const basis) const
+dgObb dgPolyhedra::CalculateSphere (const dgFloat64* const vertex, dgInt32 strideInBytes, const dgMatrix* const basis) const
 {
 	dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat64));	
 
@@ -1890,7 +1890,7 @@ dgSphere dgPolyhedra::CalculateSphere (const dgFloat64* const vertex, dgInt32 st
 	dgAssert (vertexCountIndex <= vertexCount);
 
 	dgMatrix axis (dgGetIdentityMatrix());
-	dgSphere sphere (axis);
+	dgObb sphere (axis);
 	dgConvexHull3d convexHull (GetAllocator(), &pool[0].m_x, sizeof (dgBigVector), vertexCountIndex, 0.0f);
 	if (convexHull.GetCount()) {
 		dgStack<dgInt32> triangleList (convexHull.GetCount() * 3); 				

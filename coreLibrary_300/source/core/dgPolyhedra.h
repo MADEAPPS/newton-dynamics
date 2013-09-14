@@ -33,7 +33,7 @@
 
 class dgEdge;
 class dgPlane;
-class dgSphere;
+class dgObb;
 class dgMatrix;
 class dgPolyhedra;
 class dgVertexCollapseVertexMetric;
@@ -110,7 +110,7 @@ class dgPolyhedra: public dgTree <dgEdge, dgEdgeKey>
 	bool GetConectedSurface (dgPolyhedra &polyhedra) const;
 	void EndConectedSurface() const;
 
-	dgSphere CalculateSphere (const dgFloat64* const vertex, dgInt32 strideInBytes, const dgMatrix* const basis = NULL) const;
+	dgObb CalculateSphere (const dgFloat64* const vertex, dgInt32 strideInBytes, const dgMatrix* const basis = NULL) const;
 	void ChangeEdgeIncidentVertex (dgEdge* const edge, dgInt32 newIndex);	
 	void DeleteDegenerateFaces (const dgFloat64* const pool, dgInt32 dstStrideInBytes, dgFloat64 minArea);
 
