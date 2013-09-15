@@ -112,10 +112,11 @@ void dgCollisionBVH::GetCollisionInfo(dgCollisionInfo* const info) const
 	data.m_userDataList = NULL;
 	data.m_maxIndexCount = 1000000000;
 	data.m_triangleCount = 0; 
-	dgVector p0 (-1.0e10f, -1.0e10f, -1.0e10f, 1.0f);
-	dgVector p1 ( 1.0e10f,  1.0e10f,  1.0e10f, 1.0f);
+//	dgVector p0 (-1.0e10f, -1.0e10f, -1.0e10f, 1.0f);
+//	dgVector p1 ( 1.0e10f,  1.0e10f,  1.0e10f, 1.0f);
 	dgVector zero (dgFloat32 (0.0f));
-	ForAllSectors (p0, p1, zero, dgFloat32 (1.0f), GetTriangleCount, &data);
+	dgFastAABBInfo box (dgGetIdentityMatrix(), dgVector (dgFloat32 (1.0e15f)));
+	ForAllSectors (box, zero, dgFloat32 (1.0f), GetTriangleCount, &data);
 
 	info->m_bvhCollision.m_vertexCount = GetVertexCount();
 	info->m_bvhCollision.m_indexCount = data.m_triangleCount * 3;
@@ -126,9 +127,10 @@ void dgCollisionBVH::ForEachFace (dgAABBIntersectCallback callback, void* const 
 	dgVector p0 (-1.0e10f, -1.0e10f, -1.0e10f, 1.0f);
 	dgVector p1 ( 1.0e10f,  1.0e10f,  1.0e10f, 1.0f);
 	dgVector zero (dgFloat32 (0.0f));
-	ForAllSectors (p0, p1, zero, dgFloat32 (1.0f), callback, context);
+	dgFastAABBInfo box (dgGetIdentityMatrix(), dgVector (dgFloat32 (1.0e15f)));
+	//ForAllSectors (p0, p1, zero, dgFloat32 (1.0f), callback, context);
+	ForAllSectors (box, zero, dgFloat32 (1.0f), callback, context);
 }
-
 
 
 dgIntersectStatus dgCollisionBVH::CollectVertexListIndexList (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount, dgFloat32 hitDistance)
@@ -180,7 +182,8 @@ dgIntersectStatus dgCollisionBVH::GetTriangleCount (void* const context, const d
 
 void dgCollisionBVH::GetVertexListIndexList (const dgVector& p0, const dgVector& p1, dgMeshVertexListIndexList &data) const
 {
-	ForAllSectors (p0, p1, dgVector (dgFloat32 (0.0f)), dgFloat32 (1.0f), CollectVertexListIndexList, &data);
+	dgFastAABBInfo box (p0, p1);
+	ForAllSectors (box, dgVector (dgFloat32 (0.0f)), dgFloat32 (1.0f), CollectVertexListIndexList, &data);
 
 	data.m_veterxArray = GetLocalVertexPool(); 
 	data.m_vertexCount = GetVertexCount(); 
@@ -313,7 +316,7 @@ dgIntersectStatus dgCollisionBVH::GetPolygon (void* const context, const dgFloat
 	data.m_faceCount ++;
 	dgInt32* const dst = &data.m_faceVertexIndex[data.m_globalIndexCount];
 
-	//the docks say memcpy is an intrinsic function but as usual this is another microsoft lie
+	//the docks say memcpy is an intrinsic function but as usual this is another Microsoft lied
 	//memcpy (dst, indexArray, sizeof (dgInt32) * count);
 	for (dgInt32 i = 0; i < count; i ++) {
 		dst[i] = indexArray[i];
@@ -338,7 +341,8 @@ void dgCollisionBVH::GetCollidingFaces (dgPolygonMeshDesc* const data) const
 	data->m_faceIndexStart = data->m_meshData.m_globalFaceIndexStart;
 	data->m_faceVertexIndex = data->m_globalFaceVertexIndex;
 	data->m_hitDistance = data->m_meshData.m_globalHitDistance;
-	ForAllSectors (data->m_boxP0, data->m_boxP1, data->m_boxDistanceTravelInMeshSpace, data->m_maxT, GetPolygon, data);
+//	ForAllSectors (data->m_boxP0, data->m_boxP1, data->m_boxDistanceTravelInMeshSpace, data->m_maxT, GetPolygon, data);
+	ForAllSectors (*data, data->m_boxDistanceTravelInMeshSpace, data->m_maxT, GetPolygon, data);
 }
 
 
@@ -393,7 +397,6 @@ void dgCollisionBVH::DebugCollision (const dgMatrix& matrixPtr, OnDebugCollision
 	context.m_userData = userData;;
 	context.m_callback = callback;
 
-	dgVector p0 (dgFloat32 (-1.0e20f), dgFloat32 (-1.0e20f), dgFloat32 (-1.0e20f), dgFloat32 (0.0f));
-	dgVector p1 (dgFloat32 ( 1.0e20f), dgFloat32 ( 1.0e20f), dgFloat32 ( 1.0e20f), dgFloat32 (0.0f));
-	ForAllSectors (p0, p1, dgVector(dgFloat32 (0.0f)), dgFloat32 (1.0f), ShowDebugPolygon, &context);
+	dgFastAABBInfo box (dgGetIdentityMatrix(), dgVector (1.0e15f));
+	ForAllSectors (box, dgVector(dgFloat32 (0.0f)), dgFloat32 (1.0f), ShowDebugPolygon, &context);
 }

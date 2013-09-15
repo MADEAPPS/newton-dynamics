@@ -794,9 +794,11 @@ class dgVector
 		return _mm_min_ps (m_type, data.m_type);
 	}
 
-	DG_INLINE dgInt32 GetInt () const
+	//DG_INLINE dgInt32 GetInt () const
+	DG_INLINE dgVector GetInt () const
 	{
-		return _mm_cvtss_si32(m_type);
+		//return _mm_cvtss_si32(m_type);
+		return dgVector(_mm_cvtps_epi32(Floor().m_type));
 	}
 
 	DG_INLINE dgVector TestZero() const
@@ -940,10 +942,10 @@ class dgVector
 			dgFloat32 m_w;
 		};
 		struct {
-			dgFloat32 m_ix;
-			dgFloat32 m_iy;
-			dgFloat32 m_iz;
-			dgFloat32 m_iw;
+			dgInt32 m_ix;
+			dgInt32 m_iy;
+			dgInt32 m_iz;
+			dgInt32 m_iw;
 		};
 	};
 

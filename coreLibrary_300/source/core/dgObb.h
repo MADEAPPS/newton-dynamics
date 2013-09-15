@@ -35,7 +35,7 @@ DG_MSC_VECTOR_ALIGMENT
 class dgObb: public dgMatrix
 {
 	public:
-	dgObb ();
+	DG_INLINE dgObb (){};
 	dgObb (const dgQuaternion &quat, const dgVector &position, const dgVector& dim = dgVector(0, 0, 0, 0));
 	dgObb (const dgMatrix& matrix, const dgVector& dim = dgVector(0, 0, 0, 0));
 
@@ -78,11 +78,11 @@ class dgObb: public dgMatrix
 //const dgSphere& GetIdentitySphere();
 
 
-inline dgObb::dgObb ()
-	:dgMatrix(dgGetIdentityMatrix())
-	,m_size (dgFloat32 (0.0f))
-{
-}
+//inline dgObb::dgObb ()
+//	:dgMatrix(dgGetIdentityMatrix())
+//	,m_size (dgFloat32 (0.0f))
+//{
+//}
 
 inline dgObb::dgObb (const dgQuaternion &quat, const dgVector &position, const dgVector& dim)
 	:dgMatrix(quat, position)

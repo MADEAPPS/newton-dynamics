@@ -1063,25 +1063,9 @@ void dgCollisionDeformableMesh::SetCollisionBBox (const dgVector& p0, const dgVe
 
 	m_boxSize = (p1 - p0).Scale3 (dgFloat32 (0.5f)); 
 	m_boxOrigin = (p1 + p0).Scale3 (dgFloat32 (0.5f)); 
-//	m_boxOrigin-= m_particles.m_com;
 
 	dgFloat32 padding = m_skinThickness + DG_DEFORMABLE_DEFAULT_SKIN_THICKNESS;
 	m_boxSize += dgVector (padding, padding, padding, dgFloat32 (0.0f));
-
-	m_size_x.m_x = m_boxSize.m_x;
-	m_size_x.m_y = m_boxSize.m_x;
-	m_size_x.m_z = m_boxSize.m_x;
-	m_size_x.m_w = dgFloat32 (0.0f); 
-
-	m_size_y.m_x = m_boxSize.m_y;
-	m_size_y.m_y = m_boxSize.m_y;
-	m_size_y.m_z = m_boxSize.m_y;
-	m_size_y.m_w = dgFloat32 (0.0f); 
-
-	m_size_z.m_x = m_boxSize.m_z;
-	m_size_z.m_y = m_boxSize.m_z;
-	m_size_z.m_z = m_boxSize.m_z;
-	m_size_z.m_w = dgFloat32 (0.0f); 
 }
 
 

@@ -1467,17 +1467,51 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts (dgCollisionParamProxy& prox
 
 	const dgMatrix& hullMatrix = convexInstance->GetGlobalMatrix();
 	const dgMatrix& soupMatrix = polySoupInstance->GetGlobalMatrix();
-
 	proxy.m_matrix = hullMatrix * soupMatrix.Inverse();
-	const dgVector& invScale = polySoupInstance->GetInvScale();
-	dgMatrix polySoupScaledMatrix (invScale.CompProduct4(proxy.m_matrix[0]), invScale.CompProduct4(proxy.m_matrix[1]), invScale.CompProduct4(proxy.m_matrix[2]), invScale.CompProduct4(proxy.m_matrix[3])); 
 
 	dgPolygonMeshDesc data;
-	convexInstance->CalcAABB (polySoupScaledMatrix, data.m_boxP0, data.m_boxP1);
+	switch (convexInstance->GetCombinedScaleType(polySoupInstance->GetScaleType()))
+	{
+		case dgCollisionInstance::m_unit:
+		{
+			data.InitUniScale (proxy.m_matrix, convexInstance);
+			break;
+		}
+
+		case dgCollisionInstance::m_uniform:
+		{
+			const dgVector& invScale = polySoupInstance->GetInvScale();
+			//	dgMatrix polySoupScaledMatrix (invScale.CompProduct4(proxy.m_matrix[0]), invScale.CompProduct4(proxy.m_matrix[1]), invScale.CompProduct4(proxy.m_matrix[2]), invScale.CompProduct4(proxy.m_matrix[3])); 
+			//	convexInstance->CalcAABB (polySoupScaledMatrix, data.m_boxP0, data.m_boxP1);
+			//	data.SetAABBAndOOBB (convexInstance, polySoupScaledMatrix);
+			data.InitUniformScale (proxy.m_matrix, invScale, convexInstance);
+			break;
+		}
+
+		case dgCollisionInstance::m_nonUniform:
+		{
+			dgAssert (0);
+			//	const dgVector& invScale = polySoupInstance->GetInvScale();
+			//	dgMatrix polySoupScaledMatrix (invScale.CompProduct4(proxy.m_matrix[0]), invScale.CompProduct4(proxy.m_matrix[1]), invScale.CompProduct4(proxy.m_matrix[2]), invScale.CompProduct4(proxy.m_matrix[3])); 
+			//	convexInstance->CalcAABB (polySoupScaledMatrix, data.m_boxP0, data.m_boxP1);
+			//	data.SetAABBAndOOBB (convexInstance, polySoupScaledMatrix);
+			break;
+		}
+
+		case dgCollisionInstance::m_global:
+		default:
+		{
+			dgAssert (0);
+			//	const dgVector& invScale = polySoupInstance->GetInvScale();
+			//	dgMatrix polySoupScaledMatrix (invScale.CompProduct4(proxy.m_matrix[0]), invScale.CompProduct4(proxy.m_matrix[1]), invScale.CompProduct4(proxy.m_matrix[2]), invScale.CompProduct4(proxy.m_matrix[3])); 
+			//	convexInstance->CalcAABB (polySoupScaledMatrix, data.m_boxP0, data.m_boxP1);
+			//	data.SetAABBAndOOBB (convexInstance, polySoupScaledMatrix);
+		}
+	}
+
 
 	dgAssert (proxy.m_timestep <= dgFloat32 (1.0f));
 	dgAssert (proxy.m_timestep >= dgFloat32 (0.0f));
-
 
 	data.m_vertex = NULL;
 	data.m_threadNumber = proxy.m_threadIndex;

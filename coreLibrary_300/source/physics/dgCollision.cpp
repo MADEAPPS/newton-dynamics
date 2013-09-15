@@ -148,23 +148,6 @@ void dgCollision::GetCollisionInfo(dgCollisionInfo* const info) const
 
 void dgCollision::SerializeLow (dgSerialize callback, void* const userData) const
 {
-//	dgInt32 signature[4];
-//	signature[0] = dgInt32 (GetSignature ());
-//	signature[1] = GetCollisionPrimityType ();
-//	signature[2] = 0;
-//	signature[3] = 0;
-//	callback (userData, &signature, sizeof (signature));
-//	:m_inertia(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))	
-//	,m_crossInertia(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))		
-//	,m_centerOfMass(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))		
-//	,m_boxSize (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)) 
-//	,m_boxOrigin (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
-//	,m_rtti(0)
-//	,m_refCount(1)
-//	,m_signature(0)
-//	,m_collisionId(dgCollisionID(0))
-//	,m_allocator(world->GetAllocator())
-
 	dgInt32 collisionId = m_collisionId;
 	callback (userData, &m_inertia, sizeof (m_inertia));
 	callback (userData, &m_crossInertia, sizeof (m_crossInertia));

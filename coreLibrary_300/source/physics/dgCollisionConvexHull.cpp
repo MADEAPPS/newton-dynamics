@@ -341,7 +341,7 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 			tmp[i][2] = dgFloat32 (0.0f);
 		}
 	
-		dgSphere sphere;
+		dgObb sphere;
 		sphere.SetDimensions (&tmp[0][0], sizeof (dgVector), count);
 
 		dgInt32 index = 0;

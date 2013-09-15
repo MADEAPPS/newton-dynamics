@@ -284,6 +284,10 @@ class dgCollision
 	dgInt32 GetRefCount() const;
 	virtual dgInt32 Release () const;
 
+
+	const dgVector& GetObbSize() const; 
+	const dgVector& GetObbOrigin() const; 
+
 	dgFloat32 GetUmbraClipSize () const;
 	dgMemoryAllocator* GetAllocator() const;
 
@@ -296,8 +300,6 @@ class dgCollision
 	void SetSignature (dgInt32 signature);
 	virtual dgInt32 CalculateSignature () const = 0;
 
-	
-	
 	dgVector m_inertia;	
 	dgVector m_crossInertia;	
 	dgVector m_centerOfMass;	
@@ -376,6 +378,16 @@ DG_INLINE dgInt32 dgCollision::GetConvexVertexCount() const
 DG_INLINE dgInt32 dgCollision::IsType (dgRTTI type) const 
 {
 	return type & m_rtti;
+}
+
+DG_INLINE const dgVector& dgCollision::GetObbSize() const
+{
+	return m_boxSize;
+}
+
+DG_INLINE const dgVector& dgCollision::GetObbOrigin() const
+{
+	return m_boxOrigin;
 }
 
 

@@ -148,11 +148,6 @@ class dgCollisionConvex: public dgCollision
 //	dgInt32 CalculateConicClosestSimplexLarge (const dgCollisionConvex* const convexShape, const dgVector& scale1, const dgMatrix& matrix, const dgVector& invScale0, const dgVector& separatingVectorHint, dgVector* const diff, dgVector* const sum, dgVector& normal) const;
 //	dgInt32 CalculateIntersectingPlane (const dgCollisionConvex* const convexShape, const dgVector& scale1, const dgMatrix& matrix, const dgVector& invScale0, const dgVector& separatingVectorHint, dgInt32 count, dgVector* const diff, dgVector* const sum, dgVector& normal) const;
 	
-
-	dgVector m_size_x;
-	dgVector m_size_y;
-	dgVector m_size_z;
-	
 	void* m_userData;
 	dgVector* m_vertex;
 	dgConvexSimplexEdge* m_simplex;

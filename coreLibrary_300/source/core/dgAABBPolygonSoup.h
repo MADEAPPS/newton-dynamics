@@ -23,6 +23,7 @@
 #define __DG_AABB_POLYGON_SOUP_H_
 
 #include "dgStdafx.h"
+#include "dgIntersections.h"
 #include "dgPolygonSoupDatabase.h"
 
 
@@ -100,13 +101,6 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 		{
 		}
 
-//		DG_INLINE dgInt32 RayTest (const dgFastRayTest& ray, const dgTriplex* const vertexArray) const
-//		{
-//			dgVector p0 (&vertexArray[m_indexBox0].m_x);
-//			dgVector p1 (&vertexArray[m_indexBox1].m_x);
-//			return ray.BoxTest (p0, p1);
-//		}
-
 		DG_INLINE dgFloat32 RayDistance (const dgFastRayTest& ray, const dgTriplex* const vertexArray) const
 		{
 			dgVector minBox (&vertexArray[m_indexBox0].m_x);
@@ -158,7 +152,9 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 	void Create (const dgPolygonSoupDatabaseBuilder& builder, bool optimizedBuild);
 	void CalculateAdjacendy ();
 	virtual void ForAllSectorsRayHit (const dgFastRayTest& ray, dgFloat32 maxT, dgRayIntersectCallback callback, void* const context) const;
-	virtual void ForAllSectors (const dgVector& minBox, const dgVector& maxBox, const dgVector& boxDistanceTravel, dgFloat32 m_maxT, dgAABBIntersectCallback callback, void* const context) const;
+	//virtual void ForAllSectors (const dgVector& minBox, const dgVector& maxBox, const dgVector& boxDistanceTravel, dgFloat32 m_maxT, dgAABBIntersectCallback callback, void* const context) const;
+	virtual void ForAllSectors (const dgFastAABBInfo& obbAabb, const dgVector& boxDistanceTravel, dgFloat32 m_maxT, dgAABBIntersectCallback callback, void* const context) const;
+	
 
 	DG_INLINE void* GetRootNode() const 
 	{

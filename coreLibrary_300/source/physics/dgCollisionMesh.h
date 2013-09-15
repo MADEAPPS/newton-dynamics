@@ -39,7 +39,7 @@ typedef void (*dgCollisionMeshCollisionCallback) (const dgBody* const bodyWithTr
 
 
 DG_MSC_VECTOR_ALIGMENT 
-class dgPolygonMeshDesc
+class dgPolygonMeshDesc: public dgFastAABBInfo
 {
 	public:
 	class dgMesh
@@ -51,35 +51,66 @@ class dgPolygonMeshDesc
 	};
 
 	// colliding box in polygonSoup local space
-	dgPolygonMeshDesc()
-		:m_boxDistanceTravelInMeshSpace(dgFloat32 (0.0f))
+	DG_INLINE dgPolygonMeshDesc()
+		:dgFastAABBInfo()
+		,m_boxDistanceTravelInMeshSpace(dgFloat32 (0.0f))
 		,m_maxT(dgFloat32 (1.0f))
 		,m_doContinuesCollisionTest(false)
 	{
 	}
 
-	inline dgInt32 GetFaceIndexCount(dgInt32 indexCount) const
+	DG_INLINE void InitUniScale(const dgMatrix& matrix, const dgCollisionInstance* const instance)
+	{
+		dgMatrix& me = *this;
+		const dgCollision* const collision = instance->GetChildShape();
+
+		me = matrix;
+		instance->CalcAABB (matrix, m_p0, m_p1);
+		m_posit += matrix.RotateVector (collision->GetObbOrigin());
+		m_size = collision->GetObbSize() + dgCollisionInstance::m_padding;
+//		m_localP0 = m_size.Scale4 (dgFloat32 (-1.0f));
+//		m_localP1 = m_size;
+	}
+
+	DG_INLINE void InitUniformScale(const dgMatrix& matrix, const dgVector& scale, const dgCollisionInstance* const instance)
+	{
+		dgMatrix& me = *this;
+		const dgCollision* const collision = instance->GetChildShape();
+
+		me = matrix;
+		instance->CalcAABB (matrix, m_p0, m_p1);
+
+		m_posit += matrix.RotateVector (collision->GetObbOrigin().CompProduct4(scale).CompProduct4(instance->GetScale()));
+		m_size = collision->GetObbSize().CompProduct4(scale).CompProduct4(instance->GetScale()) + dgCollisionInstance::m_padding;
+//		m_localP0 = m_size.Scale4 (dgFloat32 (-1.0f));
+//		m_localP1 = m_size;
+	}
+
+
+
+
+	DG_INLINE dgInt32 GetFaceIndexCount(dgInt32 indexCount) const
 	{
 		return indexCount * 2 + 3;
 	}
 
-	inline const dgInt32* GetAdjacentFaceEdgeNormalArray(const dgInt32* const faceIndexArray, dgInt32 indexCount) const
+	DG_INLINE const dgInt32* GetAdjacentFaceEdgeNormalArray(const dgInt32* const faceIndexArray, dgInt32 indexCount) const
 	{
 		return &faceIndexArray[indexCount + 2];
 	}
 
 
-	inline dgInt32 GetNormalIndex(const dgInt32* const faceIndexArray, dgInt32 indexCount) const
+	DG_INLINE dgInt32 GetNormalIndex(const dgInt32* const faceIndexArray, dgInt32 indexCount) const
 	{
 		return faceIndexArray[indexCount + 1];
 	}
 
-	inline dgInt32 GetFaceId(const dgInt32* const faceIndexArray, dgInt32 indexCount) const
+	DG_INLINE dgInt32 GetFaceId(const dgInt32* const faceIndexArray, dgInt32 indexCount) const
 	{
 		return faceIndexArray[indexCount];
 	}
 
-	inline dgFloat32 GetFaceSize(const dgInt32* const faceIndexArray, dgInt32 indexCount) const
+	DG_INLINE dgFloat32 GetFaceSize(const dgInt32* const faceIndexArray, dgInt32 indexCount) const
 	{
 		dgInt32 size = faceIndexArray[indexCount * 2 + 2];
 		return dgFloat32 ((size >= 1) ? size : dgFloat32 (1.0f));
@@ -87,9 +118,6 @@ class dgPolygonMeshDesc
 
 	void SortFaceArray ();
 
-
-	dgVector m_boxP0;                           
-	dgVector m_boxP1;
 	dgVector m_boxDistanceTravelInMeshSpace;
 	dgInt32 m_threadNumber;
 	dgInt32 m_faceCount;

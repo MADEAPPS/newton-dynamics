@@ -39,10 +39,10 @@
 //#define DEFAULT_SCENE	13			// user height field Collision
 //#define DEFAULT_SCENE	14			// compound Collision
 //#define DEFAULT_SCENE	15			// simple Archimedes buoyancy
-//#define DEFAULT_SCENE	16			// uniform Scaled Collision
+#define DEFAULT_SCENE	16			// uniform Scaled Collision
 //#define DEFAULT_SCENE	17			// non Uniform Scaled Collision
 //#define DEFAULT_SCENE	18			// scaled mesh collision
-#define DEFAULT_SCENE	19			// simple convex decomposition
+//#define DEFAULT_SCENE	19			// simple convex decomposition
 //#define DEFAULT_SCENE	20			// scene Collision
 //#define DEFAULT_SCENE	21          // simple boolean operators 
 //#define DEFAULT_SCENE	22			// simple convex fracturing 
@@ -175,7 +175,6 @@ class NewtonDemosApp: public wxApp
 		}
 
 		// load the default Scene		
-		//frame->LoadDemo (DEFAULT_SCENE);
 		wxMenuEvent loadDemo (wxEVT_COMMAND_MENU_SELECTED, NewtonDemos::ID_RUN_DEMO + DEFAULT_SCENE);
 		frame->GetEventHandler()->ProcessEvent(loadDemo);
 
@@ -312,13 +311,14 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	m_mainMenu = CreateMainMenu();
 
 m_showStatistics = true;
+#if 0
+m_debugDisplayMode = 2;
+m_hideVisualMeshes = true;
+SetDebugDisplayMode(2);
 
-//m_debugDisplayMode = 2;
-//m_hideVisualMeshes = true;
-//SetDebugDisplayMode(2);
-
-//m_showContactPoints = true;
-//m_autoSleepState = false;
+m_showContactPoints = true;
+m_autoSleepState = false;
+#endif
 
 //m_useParallelSolver = true;
 //m_scene->m_showProfiler[6] = 1;

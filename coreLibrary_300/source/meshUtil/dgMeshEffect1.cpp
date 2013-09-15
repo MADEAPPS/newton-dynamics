@@ -1519,7 +1519,7 @@ void dgMeshEffect::ApplyTransform (const dgMatrix& matrix)
 
 dgMatrix dgMeshEffect::CalculateOOBB (dgBigVector& size) const
 {
-	dgSphere sphere (CalculateSphere (&m_points[0].m_x, sizeof (dgBigVector), NULL));
+	dgObb sphere (CalculateSphere (&m_points[0].m_x, sizeof (dgBigVector), NULL));
 	size = sphere.m_size;
 
 	dgMatrix permuation (dgGetIdentityMatrix());

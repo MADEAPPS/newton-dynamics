@@ -31,7 +31,6 @@
 //////////////////////////////////////////////////////////////////////
 
 
-
 void dgPolygonMeshDesc::SortFaceArray ()
 {
 	dgInt32 stride = 8;
@@ -301,7 +300,10 @@ dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const casti
 
 	dgMatrix polySoupScaledMatrix (invScale.CompProduct4(matrix[0]), invScale.CompProduct4(matrix[1]), invScale.CompProduct4(matrix[2]), invScale.CompProduct4(matrix[3])); 
 	dgPolygonMeshDesc data;
-	castingShape->CalcAABB (polySoupScaledMatrix, data.m_boxP0, data.m_boxP1);
+dgAssert (0);
+//	castingShape->CalcAABB (polySoupScaledMatrix, data.m_boxP0, data.m_boxP1);
+
+
 	data.m_vertex = NULL;
 	data.m_threadNumber = threadId;
 	data.m_faceCount = 0;
@@ -311,8 +313,6 @@ dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const casti
 	data.m_faceVertexIndex = NULL;
 	data.m_hitDistance = NULL;
 	data.m_userData = referenceCollision->GetUserData();
-//	data.m_objBody = hullBody;
-//	data.m_polySoupBody = soupBody;
 	data.m_objBody = NULL;
 	data.m_polySoupBody = NULL;
 	data.m_objCollision = (dgCollisionInstance*)castingShape;

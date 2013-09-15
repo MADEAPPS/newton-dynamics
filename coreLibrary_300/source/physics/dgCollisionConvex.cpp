@@ -1448,9 +1448,6 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 
 dgCollisionConvex::dgCollisionConvex (dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgCollisionID id)
 	:dgCollision(allocator, signature, id) 
-	,m_size_x (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
-	,m_size_y (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
-	,m_size_z (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
 	,m_userData (NULL)
 	,m_vertex (NULL)
 	,m_simplex (NULL)
@@ -1466,9 +1463,6 @@ dgCollisionConvex::dgCollisionConvex (dgMemoryAllocator* const allocator, dgUnsi
 
 dgCollisionConvex::dgCollisionConvex (dgWorld* const world, dgDeserialize deserialization, void* const userData)
 	:dgCollision (world, deserialization, userData)
-	,m_size_x (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
-	,m_size_y (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
-	,m_size_z (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
 	,m_userData (userData)
 	,m_vertex (NULL)
 	,m_simplex (NULL)
@@ -1557,21 +1551,6 @@ void dgCollisionConvex::SetVolumeAndCG ()
 	m_boxOrigin = (p1 + p0).Scale3 (dgFloat32 (0.5f)); 
 	m_boxMinRadius = dgMin(m_boxSize.m_x, m_boxSize.m_y, m_boxSize.m_z);
 	m_boxMaxRadius = dgSqrt (m_boxSize % m_boxSize);
-
-	m_size_x.m_x = m_boxSize.m_x;
-	m_size_x.m_y = m_boxSize.m_x;
-	m_size_x.m_z = m_boxSize.m_x;
-	m_size_x.m_w = dgFloat32 (0.0f); 
-
-	m_size_y.m_x = m_boxSize.m_y;
-	m_size_y.m_y = m_boxSize.m_y;
-	m_size_y.m_z = m_boxSize.m_y;
-	m_size_y.m_w = dgFloat32 (0.0f); 
-
-	m_size_z.m_x = m_boxSize.m_z;
-	m_size_z.m_y = m_boxSize.m_z;
-	m_size_z.m_z = m_boxSize.m_z;
-	m_size_z.m_w = dgFloat32 (0.0f); 
 
 	MassProperties ();
 }
