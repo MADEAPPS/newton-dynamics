@@ -102,6 +102,7 @@ class dgAABBPolygonSoup::dgNodeBuilder: public dgAABBPolygonSoup::dgNode
 		m_p0 = p0;
 		m_p1 = p1;
 		m_size = m_p1 - m_p0;
+		m_origin = (m_p1 + m_p0).Scale4 (dgFloat32 (0.5f));
 		m_area = m_size.DotProduct4(m_size.ShiftTripleRight()).m_x;
 	}
 
