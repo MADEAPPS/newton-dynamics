@@ -776,11 +776,6 @@ void dgCollisionHeightField::GetLocalAABB (const dgVector& q0, const dgVector& q
 	// the user data is the pointer to the collision geometry
 	CalculateMinExtend3d (q0, q1, boxP0, boxP1);
 
-//	dgInt32 x0 = dgFastInt (boxP0.m_x * m_horizontalScaleInv);
-//	dgInt32 x1 = dgFastInt (boxP1.m_x * m_horizontalScaleInv);
-//	dgInt32 z0 = dgFastInt (boxP0.m_z * m_horizontalScaleInv);
-//	dgInt32 z1 = dgFastInt (boxP1.m_z * m_horizontalScaleInv);
-
 	dgVector p0 (boxP0.Scale4(m_horizontalScaleInv).GetInt());
 	dgVector p1 (boxP1.Scale4(m_horizontalScaleInv).GetInt());
 
@@ -858,11 +853,6 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 	dgAssert (p0.m_iz == dgFastInt (boxP0.m_z * m_horizontalScaleInv));
 	dgAssert (p1.m_ix == dgFastInt (boxP1.m_x * m_horizontalScaleInv));
 	dgAssert (p1.m_iz == dgFastInt (boxP1.m_z * m_horizontalScaleInv));
-
-//	dgInt32 x0 = dgFastInt (boxP0.m_x * m_horizontalScaleInv);
-//	dgInt32 x1 = dgFastInt (boxP1.m_x * m_horizontalScaleInv);
-//	dgInt32 z0 = dgFastInt (boxP0.m_z * m_horizontalScaleInv);
-//	dgInt32 z1 = dgFastInt (boxP1.m_z * m_horizontalScaleInv);
 
 	dgInt32 x0 = p0.m_ix;
 	dgInt32 x1 = p1.m_ix;

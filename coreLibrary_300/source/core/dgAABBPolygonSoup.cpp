@@ -28,7 +28,7 @@
 #include "dgPolygonSoupBuilder.h"
 
 
-#define DG_STACK_DEPTH 256
+#define DG_STACK_DEPTH 512
 
 
 DG_MSC_VECTOR_ALIGMENT

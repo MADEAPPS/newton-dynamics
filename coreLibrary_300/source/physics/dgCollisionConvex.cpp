@@ -229,7 +229,7 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 			{
 				dgVector dir1 (m_matrix.UnrotateVector (dir.CompProduct4(dgVector::m_negOne)));
 				dgAssert (dir1.m_w == dgFloat32 (0.0f));
-				dgAssert (dgAbsf(dir1 % dir1 - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+				dgAssert (dgAbsf(dir1 % dir1 - dgFloat32 (1.0f)) < dgFloat32 (1.0e-2f));
 				dgVector q (m_matrix.TransformVector (m_otherShape->SupportVertex (dir1, &m_polygonFaceIndex[vertexIndex])) & dgVector::m_triplexMask);
 				dgAssert (q.m_w == dgFloat32 (0.0f));
 
