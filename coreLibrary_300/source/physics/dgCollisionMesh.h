@@ -117,9 +117,9 @@ class dgPolygonMeshDesc: public dgFastAABBInfo
 				dgMatrix scaleMatrix (meshInvScale.CompProduct4(m_front), meshInvScale.CompProduct4(m_up), meshInvScale.CompProduct4(m_right), m_posit);
 				m_objCollision->CalcAABB (scaleMatrix, m_p0, m_p1);
 
-				m_posit += matrix.RotateVector (collision->GetObbOrigin());
 				//m_size = collision->GetObbSize() + dgCollisionInstance::m_padding;
-				m_size = collision->GetObbSize().CompProduct4(m_invScale) + dgCollisionInstance::m_padding;
+				m_posit += matrix.RotateVector (collision->GetObbOrigin().CompProduct4(m_objCollision->GetScale()));
+				m_size = collision->GetObbSize().CompProduct4(m_objCollision->GetScale()) + dgCollisionInstance::m_padding;
 				break;
 			}
 
