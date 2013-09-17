@@ -142,6 +142,7 @@ void dgCollisionUserMesh::GetCollidingFaces (dgPolygonMeshDesc* const data) cons
 	data->m_faceCount = 0;
 
 	if (m_collideCallback) {
+dgAssert (0);
 		data->m_me = this;
 		data->m_userData = m_userData;
 		m_collideCallback (*data);

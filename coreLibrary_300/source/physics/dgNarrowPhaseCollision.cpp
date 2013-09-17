@@ -1760,7 +1760,8 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts (dgCollisionParamProxy& prox
 	dgAssert (proxy.m_timestep <= dgFloat32 (1.0f));
 	dgAssert (proxy.m_timestep >= dgFloat32 (0.0f));
 
-	dgPolygonMeshDesc data(proxy);
+	//dgPolygonMeshDesc data(proxy, proxy.m_floatingCollision->GetUserData());
+	dgPolygonMeshDesc data(proxy, NULL);
 	if (proxy.m_continueCollision) {
 		data.m_doContinuesCollisionTest = true;
 
@@ -1776,8 +1777,9 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts (dgCollisionParamProxy& prox
 			dgFloat32 upperBoundSpeed = baseLinearSpeed + dgSqrt (angularSpeedBound);
 			dgVector upperBoundVeloc (hullVeloc.Scale3 (proxy.m_timestep * upperBoundSpeed / baseLinearSpeed));
 
-			const dgMatrix& soupMatrix = data.m_polySoupCollision->GetGlobalMatrix();
-			data.m_boxDistanceTravelInMeshSpace = data.m_polySoupCollision->GetInvScale().CompProduct4(soupMatrix.UnrotateVector(upperBoundVeloc.CompProduct4(data.m_objCollision->GetInvScale())));
+			//const dgMatrix& soupMatrix = data.m_polySoupCollision->GetGlobalMatrix();
+			//data.m_boxDistanceTravelInMeshSpace = data.m_polySoupCollision->GetInvScale().CompProduct4(soupMatrix.UnrotateVector(upperBoundVeloc.CompProduct4(data.m_objCollision->GetInvScale())));
+			data.SetDistanceTravel (upperBoundVeloc);
 		}
 	}
 

@@ -59,14 +59,14 @@ class dgPolygonMeshDesc: public dgFastAABBInfo
 	{
 	}
 
-	DG_INLINE dgPolygonMeshDesc(dgCollisionParamProxy& proxy)
+	DG_INLINE dgPolygonMeshDesc(dgCollisionParamProxy& proxy, void* const userData)
 		:dgFastAABBInfo()
 		,m_boxDistanceTravelInMeshSpace(dgFloat32 (0.0f))
 		,m_threadNumber(proxy.m_threadIndex)
 		,m_faceCount(0)
 		,m_vertexStrideInBytes(0)
-		,m_skinThickness(m_skinThickness)
-		,m_userData (proxy.m_floatingCollision->GetUserData())
+		,m_skinThickness(proxy.m_skinThickness)
+		,m_userData (userData)
 		,m_objBody (proxy.m_referenceBody)
 		,m_polySoupBody(proxy.m_floatingBody)
 		,m_objCollision(proxy.m_referenceCollision)
@@ -76,7 +76,7 @@ class dgPolygonMeshDesc: public dgFastAABBInfo
 		,m_faceVertexIndex(NULL)
 		,m_hitDistance(NULL)
 		,m_maxT(dgFloat32 (1.0f))
-		,m_doContinuesCollisionTest(false)
+		,m_doContinuesCollisionTest(proxy.m_continueCollision)
 	{
 		dgAssert (m_polySoupCollision->IsType (dgCollision::dgCollisionMesh_RTTI));
 		dgAssert (m_objCollision->IsType (dgCollision::dgCollisionConvexShape_RTTI));
@@ -131,24 +131,14 @@ class dgPolygonMeshDesc: public dgFastAABBInfo
 		}
 	}
 
-/*
-	DG_INLINE void InitUniScale(const dgMatrix& matrix, const dgCollisionInstance* const instance)
+	DG_INLINE void SetDistanceTravel (const dgVector& distanceInGlobalSpace)
 	{
+		//const dgMatrix& soupMatrix = data.m_polySoupCollision->GetGlobalMatrix();
+		const dgMatrix& soupMatrix = m_polySoupCollision->GetGlobalMatrix();
+		//data.m_boxDistanceTravelInMeshSpace = data.m_polySoupCollision->GetInvScale().CompProduct4(soupMatrix.UnrotateVector(upperBoundVeloc.CompProduct4(data.m_objCollision->GetInvScale())));
+		m_boxDistanceTravelInMeshSpace = m_polySoupCollision->GetInvScale().CompProduct4(soupMatrix.UnrotateVector(distanceInGlobalSpace.CompProduct4(m_objCollision->GetInvScale())));
+
 	}
-
-	DG_INLINE void InitUniformScale(const dgMatrix& matrix, const dgVector& scale, const dgCollisionInstance* const instance)
-	{
-		dgMatrix& me = *this;
-		const dgCollision* const collision = instance->GetChildShape();
-
-		me = matrix;
-		dgMatrix scaledMatrix (scale.CompProduct4(matrix[0]), scale.CompProduct4(matrix[1]), scale.CompProduct4(matrix[2]), scale.CompProduct4(matrix[3]) | dgVector::m_wOne); 
-		instance->CalcAABB (scaledMatrix, m_p0, m_p1);
-
-		m_posit += matrix.RotateVector (collision->GetObbOrigin().CompProduct4(scale).CompProduct4(instance->GetScale()));
-		m_size = collision->GetObbSize().CompProduct4(scale).CompProduct4(instance->GetScale()) + dgCollisionInstance::m_padding;
-	}
-*/
 
 
 

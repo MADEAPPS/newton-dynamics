@@ -289,41 +289,28 @@ dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const casti
 	dgAssert (referenceCollision->GetChildShape() == this);
 
 	dgCollisionMesh* const polysoup = (dgCollisionMesh *) referenceCollision->GetChildShape();
+	dgCollisionInstance tmpCastingInstance (*castingShape);
+	tmpCastingInstance.SetGlobalMatrix(castingShape->GetLocalMatrix() * shapeMatrix);
+	
+	dgCollisionParamProxy proxy (NULL, &contactOut, threadId, true, true);
 
-	dgMatrix hullMatrix (castingShape->GetLocalMatrix() * shapeMatrix);
-	const dgMatrix& soupMatrix = referenceCollision->GetGlobalMatrix();
+	proxy.m_continueCollision = true;
+	proxy.m_skinThickness = dgFloat32 (0.0f);
+	proxy.m_referenceBody = NULL;
+	proxy.m_referenceBody = NULL;
+	proxy.m_referenceCollision = &tmpCastingInstance;
+	proxy.m_floatingCollision = (dgCollisionInstance*)referenceCollision;
 
-	dgMatrix matrix (hullMatrix * soupMatrix.Inverse());
+//	dgPolygonMeshDesc data (proxy, referenceCollision->GetUserData());
+	dgPolygonMeshDesc data (proxy, NULL);
 
-	const dgVector& scale = referenceCollision->GetScale();
-	const dgVector& invScale = referenceCollision->GetInvScale();
-
-	dgMatrix polySoupScaledMatrix (invScale.CompProduct4(matrix[0]), invScale.CompProduct4(matrix[1]), invScale.CompProduct4(matrix[2]), invScale.CompProduct4(matrix[3])); 
-	dgPolygonMeshDesc data;
-dgAssert (0);
-//	castingShape->CalcAABB (polySoupScaledMatrix, data.m_boxP0, data.m_boxP1);
-
-
-	data.m_vertex = NULL;
-	data.m_threadNumber = threadId;
-	data.m_faceCount = 0;
-	data.m_vertexStrideInBytes = 0;
-	data.m_skinThickness = dgFloat32 (0.0f);
-	data.m_faceIndexCount = NULL;
-	data.m_faceVertexIndex = NULL;
-	data.m_hitDistance = NULL;
-	data.m_userData = referenceCollision->GetUserData();
-	data.m_objBody = NULL;
-	data.m_polySoupBody = NULL;
-	data.m_objCollision = (dgCollisionInstance*)castingShape;
-	data.m_polySoupCollision = (dgCollisionInstance*)referenceCollision;
-
-	data.m_doContinuesCollisionTest = true;
-	dgFloat32 maxTime = (maxT > dgFloat32 (1.0f)) ? dgFloat32 (1.0f) : maxT;
-	dgVector distanceTravel (shapeVeloc.Scale4 (maxTime));
+//	castingShape->CalcAABB (polySoupScaledMatrix, data.m_boxP0, data.m_b
 
 	data.m_maxT = dgMin (maxT, dgFloat32 (1.0f));
-	data.m_boxDistanceTravelInMeshSpace = referenceCollision->m_invScale.CompProduct4(soupMatrix.UnrotateVector(distanceTravel.CompProduct4(castingShape->m_invScale)));
+	dgFloat32 maxTime = (maxT > dgFloat32 (1.0f)) ? dgFloat32 (1.0f) : maxT;
+	dgVector distanceTravel (shapeVeloc.Scale4 (maxTime));
+//	data.m_boxDistanceTravelInMeshSpace = referenceCollision->m_invScale.CompProduct4(soupMatrix.UnrotateVector(distanceTravel.CompProduct4(castingShape->m_invScale)));
+	data.SetDistanceTravel (distanceTravel);
 
 	polysoup->GetCollidingFaces (&data);
 
@@ -339,34 +326,14 @@ dgAssert (0);
 
 	dgFloat32 maxPolyScale = referenceCollision->m_maxScale.m_x;
 
-
-	dgInt32* const indexArray = (dgInt32*)data.m_faceVertexIndex;
-//	dgInt32 indexCount = 0;
-//	dgInt32 faceAdresses[DG_MAX_COLLIDING_FACES];
-//	for (dgInt32 j = 0; j < data.m_faceCount; j ++) {
-//		dgInt32 count = data.GetFaceIndexCount (data.m_faceIndexCount[j]);
-//		faceAdresses[j] = indexCount;
-//		data.m_globalHitDistance[j] *= maxTime;
-//		indexCount += count;
-//	}
-//
-//	for (dgInt32 i = 1; i < data.m_faceCount; i ++) {
-//		dgInt32 j = i;
-//		dgInt32 ptr = faceAdresses[i];
-//		dgFloat32 dist = data.m_globalHitDistance[i];
-//		for (; j && (dist < data.m_globalHitDistance[j -1]); j --) {
-//			dgAssert (j > 0);
-//			faceAdresses[j] = faceAdresses[j - 1];
-//			data.m_globalHitDistance[j] = data.m_globalHitDistance[j - 1];
-//		}
-//		faceAdresses[j] = ptr;
-//		data.m_globalHitDistance[j] = dist;
-//	}
-//	indexCount = 0;
-
-	dgFloat32 paramScale = maxT;
+	const dgVector& scale = referenceCollision->GetScale();
+	const dgVector& invScale = referenceCollision->GetInvScale();
+	const dgMatrix& hullMatrix = tmpCastingInstance.GetGlobalMatrix();
+	
 	data.SortFaceArray();
 	dgContactPoint tmpContact;
+	dgFloat32 paramScale = maxT;
+	dgInt32* const indexArray = (dgInt32*)data.m_faceVertexIndex;
 	for (dgInt32 j = 0; (j < data.m_faceCount) && ((data.m_hitDistance[j] * paramScale) < maxT); j ++) {
 		dgInt32 address = data.m_faceIndexStart[j];
 		const dgInt32* const localIndexArray = &indexArray[address];

@@ -3041,7 +3041,6 @@ dgFloat32 dgCollisionConvex::ConvexConicConvexRayCast (const dgCollisionInstance
 	contactOut.m_point = dgVector (dgFloat32 (0.0f));
 	dgContactPoint lastContact(contactOut);
 
-dgAssert (0);
 	const dgVector& scale = convexConicShape->GetScale();
 	const dgVector& invScale = convexConicShape->GetInvScale();
 
@@ -3143,9 +3142,7 @@ dgInt32 dgCollisionConvex::CalculateConvexCastContacts(dgCollisionParamProxy& pr
 	dgFloat32 timestep = proxy.m_timestep;
 	proxy.m_contactJoint->m_closestDistance = dgFloat32 (1.0e10f);
 
-
 	dgMinkHull minkHull (proxy);
-	dgAssert (minkHull.m_scaleType == dgCollisionInstance::m_unit);
 	do {
 		minkHull.CalculateClosestPoints ();
 		dgVector normal (minkHull.m_normal);
