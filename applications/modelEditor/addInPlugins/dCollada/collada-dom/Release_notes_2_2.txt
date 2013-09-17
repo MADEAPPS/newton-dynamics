@@ -1,0 +1,52 @@
+----------------------------------------------------------------------
+COLLADA-DOM 2.2
+----------------------------------------------------------------------
+
+
+[New Features]
+
+- Added Linux, Mac COLLADA Viewer
+
+- Upgrade library Bullet to version 2.51
+
+
+
+[New Document]
+
+- Added samples.doc to describe features of sample COLLADA documents
+
+- Revised readme.txt for Linux, Mac support
+
+
+
+[Bug Fix]
+
+- Major memory leak fixes
+
+- Numerous minor bug fixes 
+
+
+
+[Known Bugs/Restrictions]
+
+- For PS3 debug build, when unloading COLLADA document with large number of nodes, such as demo.dae and dominos.dae,
+  a debug exception is raised due to stack overflow.
+  
+  The COLLADA Viewer uses Cell SDK framework, which sets the main PPU thread priority and stack size in its code base.
+  Currently there is no way to override this stack size setting without generating a linker warning on Windows host or 
+  an error on Linux host.  See below:
+
+  linker warning "L0019: symbol '__sys_process_param' multiply defined" is generated.
+  
+  To get around this problem, one can modify the Cell SDK framwork code in the following way:
+  
+  In <SDKROOT>\samples\fw\src\cell\FWCellMain.cpp, modify the line from 
+	SYS_PROCESS_PARAM( 1001, 0x10000 );		// priority = 1001, stack size = 64K	
+	
+  to
+  
+	SYS_PROCESS_PARAM( 1001, 0x18000 );		// priority = 1001, increase stack size to 96K, or other setting to suit your need
+
+
+- cgDestroyEffect() is not used for PS3 platform while unloading COLLADA document, a 'DATA_HTAB_MISS' error occurs if it is used.
+  This problem is not yet resolved, it is likely caused by PSGLFX not fully support CgFX features.
