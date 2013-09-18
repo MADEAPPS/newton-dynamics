@@ -102,7 +102,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy   &quot;..\..\..\..\coreLibrary_300\projects\windows\project_vs2008\$(PlatformName)\newton\$(ConfigurationName)dll\newton_d.dll&quot;   &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;&#x0D;&#x0A;xcopy   &quot;..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(PlatformName)\wxgl\$(ConfigurationName)\*.dll&quot; &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;xcopy   &quot;..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(PlatformName)\wxcore\$(ConfigurationName)\*.dll&quot; &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;xcopy   &quot;..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(PlatformName)\wxbase\$(ConfigurationName)\*.dll&quot; &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R"
+				CommandLine="xcopy   &quot;..\..\..\..\coreLibrary_300\projects\windows\project_vs2008\$(PlatformName)\newton\$(ConfigurationName)dll\newton_d.dll&quot;   &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;&#x0D;&#x0A;xcopy   &quot;..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(PlatformName)\wxgl\$(ConfigurationName)\*.dll&quot; &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;xcopy   &quot;..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(PlatformName)\wxcore\$(ConfigurationName)\*.dll&quot; &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;xcopy   &quot;..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(PlatformName)\wxbase\$(ConfigurationName)\*.dll&quot; &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -189,7 +189,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy   &quot;..\..\..\..\coreLibrary_300\projects\windows\project_vs2008\$(PlatformName)\newton\$(ConfigurationName)dll\newton_d.dll&quot;   &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;&#x0D;&#x0A;xcopy   &quot;..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(PlatformName)\wxgl\$(ConfigurationName)\*.dll&quot; &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;xcopy   &quot;..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(PlatformName)\wxcore\$(ConfigurationName)\*.dll&quot; &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;xcopy   &quot;..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(PlatformName)\wxbase\$(ConfigurationName)\*.dll&quot; &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R"
+				CommandLine="xcopy   &quot;..\..\..\..\coreLibrary_300\projects\windows\project_vs2008\$(PlatformName)\newton\$(ConfigurationName)dll\newton_d.dll&quot;   &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;&#x0D;&#x0A;xcopy   &quot;..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(PlatformName)\wxgl\$(ConfigurationName)\*.dll&quot; &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;xcopy   &quot;..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(PlatformName)\wxcore\$(ConfigurationName)\*.dll&quot; &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;xcopy   &quot;..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(PlatformName)\wxbase\$(ConfigurationName)\*.dll&quot; &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -273,7 +273,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy   &quot;..\..\..\..\coreLibrary_300\projects\windows\project_vs2008\$(PlatformName)\newton\$(ConfigurationName)dll\newton_d.dll&quot;   &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;&#x0D;&#x0A;xcopy   &quot;..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(PlatformName)\wxgl\$(ConfigurationName)\*.dll&quot; &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;xcopy   &quot;..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(PlatformName)\wxcore\$(ConfigurationName)\*.dll&quot; &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;xcopy   &quot;..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(PlatformName)\wxbase\$(ConfigurationName)\*.dll&quot; &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R"
+				CommandLine="xcopy   &quot;..\..\..\..\coreLibrary_300\projects\windows\project_vs2008\$(PlatformName)\newton\$(ConfigurationName)dll\*.dll&quot;   &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;&#x0D;&#x0A;xcopy   &quot;..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(PlatformName)\wxgl\$(ConfigurationName)\*.dll&quot; &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;xcopy   &quot;..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(PlatformName)\wxcore\$(ConfigurationName)\*.dll&quot; &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;xcopy   &quot;..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(PlatformName)\wxbase\$(ConfigurationName)\*.dll&quot; &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -358,7 +358,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy   &quot;..\..\..\..\coreLibrary_300\projects\windows\project_vs2008\$(PlatformName)\newton\$(ConfigurationName)dll\newton_d.dll&quot;   &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;&#x0D;&#x0A;xcopy   &quot;..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(PlatformName)\wxgl\$(ConfigurationName)\*.dll&quot; &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;xcopy   &quot;..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(PlatformName)\wxcore\$(ConfigurationName)\*.dll&quot; &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;xcopy   &quot;..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(PlatformName)\wxbase\$(ConfigurationName)\*.dll&quot; &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R"
+				CommandLine="xcopy   &quot;..\..\..\..\coreLibrary_300\projects\windows\project_vs2008\$(PlatformName)\newton\$(ConfigurationName)dll\newton_d.dll&quot;   &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;&#x0D;&#x0A;xcopy   &quot;..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(PlatformName)\wxgl\$(ConfigurationName)\*.dll&quot; &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;xcopy   &quot;..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(PlatformName)\wxcore\$(ConfigurationName)\*.dll&quot; &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;xcopy   &quot;..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(PlatformName)\wxbase\$(ConfigurationName)\*.dll&quot; &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>

@@ -11,6 +11,7 @@
 
 
 #include <toolbox_stdafx.h>
+#include "NewtonModelEditor.h"
 #include "NewtonModelEditorApp.h"
 
 
@@ -38,21 +39,20 @@ bool NewtonModelEditorApp::OnInit()
 	// make sure no Newton tool or utility leaves leaks behind.
 	_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF|_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF));
 #endif
-/*
+
 	// Set the memory allocation function before creation the newton world
 	// this is the only function that can be called before the creation of the newton world.
 	// it should be called once, and the the call is optional 
 	NewtonSetMemorySystem (PhysicsAlloc, PhysicsFree);
 
-	int version = NewtonWorldGetVersion();
-	wxString tittle;
-	tittle.Printf (wxT ("Newton %d.%02d SDK demos"), version / 100, version % 100);
-	NewtonDemos* const frame = new NewtonDemos(tittle, wxDefaultPosition, wxSize(1024, 768));
+//	int version = NewtonWorldGetVersion();
+//	wxString tittle;
+//	tittle.Printf (wxT ("Newton %d.%02d SDK demos"), version / 100, version % 100);
 
-
+	NewtonModelEditor* const frame = new NewtonModelEditor (APPLICATION_NAME, wxDefaultPosition, wxSize(1024, 768));
 	frame->Show(true);
 	SetTopWindow(frame);
-
+/*
 	// initialize open gl graphics
 	if (frame->m_scene) {
 		frame->m_scene->InitGraphicsSystem();

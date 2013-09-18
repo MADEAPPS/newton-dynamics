@@ -48,7 +48,7 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 
 	enum 
 	{
-		ID_CANVAS = FXMainWindow::ID_LAST,
+//		ID_CANVAS = FXMainWindow::ID_LAST,
 
 		ID_EDITOR_MODE,
 		ID_SET_VIEW_MODE,
@@ -110,13 +110,11 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 		ID_MAX_EXPORT_PLUGINS = ID_EXPORT_PLUGINS + D_MAX_PLUGINS_COUNT,
 	};
 
-/*
-	NewtonModelEditor();
-	NewtonModelEditor(FXApp& application);
+	NewtonModelEditor(const wxString& title, const wxPoint& pos, const wxSize& size);
 	~NewtonModelEditor();
 
+/*
 	void Initilialize();
-
 	void RefrehViewports();
 
 	// GUI interface functions

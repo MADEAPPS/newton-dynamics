@@ -14,6 +14,7 @@
 
 
 #include <toolbox_stdafx.h>
+#include "NewtonModelEditor.h"
 //#include "EditorMainMenu.h"
 //#include "DebugDisplay.h"
 //#include "EditorCanvas.h"
@@ -123,9 +124,6 @@ int main(int argc, char *argv[])
 	return application.run();
 }
 
-NewtonModelEditor::NewtonModelEditor()
-{
-}
 
 
 void NewtonModelEditor::create()
@@ -838,11 +836,10 @@ long NewtonModelEditor::onPaint(FXObject* sender, FXSelector id, void* eventPtr)
 
 
 
-/*
+
 NewtonModelEditor::~NewtonModelEditor()
 {
-	dAssert (0);
-
+/*
 	DestroyScene();
 	SaveConfig();
 
@@ -854,13 +851,14 @@ NewtonModelEditor::~NewtonModelEditor()
 	delete m_sharedVisual;
 
 	DeleteResources();
-
+*/
 }
 
 
 
-NewtonModelEditor::NewtonModelEditor(FXApp& application)
-	:FXMainWindow(&application, "Newton Model Editor", NULL, NULL, DECOR_ALL, 0, 0, 1024, 768)
+NewtonModelEditor::NewtonModelEditor(const wxString& title, const wxPoint& pos, const wxSize& size)
+	:wxFrame(NULL, -1, title, pos, size)
+	,dPluginInterface()
 //	,m_workshop(NULL)
 //	,m_mainMenu(NULL)
 //	,m_statusbar(NULL)
@@ -874,8 +872,8 @@ NewtonModelEditor::NewtonModelEditor(FXApp& application)
 //	,m_controlKey(false)
 //	,m_navigationKey(false)
 {
-	dAssert (0);
-
+//	dAssert (0);
+/*
 	// Load all static resources
 	LoadResources ();
 
@@ -926,6 +924,5 @@ NewtonModelEditor::NewtonModelEditor(FXApp& application)
 	for (int i = 0; i < 4; i ++) {
 		m_canvas[i] = new EditorCanvas(m_workshop, this, i ? m_canvas[0] : NULL);
 	}
-
-}
 */
+}
