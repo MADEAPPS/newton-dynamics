@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="gl"
+	Name="wxgl"
 	ProjectGUID="{DA8B15EF-6750-5928-BC0E-C748213CF9B2}"
 	TargetFrameworkVersion="0"
 	>
@@ -77,6 +77,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="winmm.lib rpcrt4.lib advapi32.lib wsock32.lib wininet.lib"
 				OutputFile="$(OutDir)\$(ProjectName)_d.dll"
 			/>
 			<Tool
@@ -164,6 +165,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="winmm.lib rpcrt4.lib advapi32.lib wsock32.lib wininet.lib"
 				OutputFile="$(OutDir)\$(ProjectName)_d.dll"
 			/>
 			<Tool
@@ -248,6 +250,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="winmm.lib rpcrt4.lib advapi32.lib wsock32.lib wininet.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -332,6 +335,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="winmm.lib rpcrt4.lib advapi32.lib wsock32.lib wininet.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"

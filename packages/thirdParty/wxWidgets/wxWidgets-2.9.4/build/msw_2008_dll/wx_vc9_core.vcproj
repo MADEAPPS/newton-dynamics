@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="core"
+	Name="wxcore"
 	ProjectGUID="{6744DAD8-9C70-574A-BFF2-9F8DDDB24A75}"
 	RootNamespace="core"
 	TargetFrameworkVersion="0"
@@ -78,6 +78,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="winmm.lib rpcrt4.lib advapi32.lib wsock32.lib wininet.lib comctl32.lib"
 				OutputFile="$(OutDir)\$(ProjectName)_d.dll"
 			/>
 			<Tool
@@ -165,6 +166,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="winmm.lib rpcrt4.lib advapi32.lib wsock32.lib wininet.lib comctl32.lib"
 				OutputFile="$(OutDir)\$(ProjectName)_d.dll"
 			/>
 			<Tool
@@ -249,6 +251,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="winmm.lib rpcrt4.lib advapi32.lib wsock32.lib wininet.lib comctl32.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -333,6 +336,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="winmm.lib rpcrt4.lib advapi32.lib wsock32.lib wininet.lib comctl32.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
