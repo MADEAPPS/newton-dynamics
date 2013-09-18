@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="newtonModelEditor"
+	Name="nme"
 	ProjectGUID="{E7F83F91-569D-4540-9F8B-9FD2DD20DE8A}"
 	RootNamespace="NewtonDemos"
 	Keyword="Win32Proj"
@@ -48,8 +48,8 @@
 				InlineFunctionExpansion="0"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="../../nme;../../nme/toolBox;../../standardPlugins/dPluginCommons;../../../../coreLibrary_300/source/ai;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAILibrary;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/thirdParty/tinyxml;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/glew/include;&quot;../../../../packages/thirdParty/fox/fox-1.6.44/include&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;FOXDLL;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;_CRT_SECURE_NO_WARNINGS"
+				AdditionalIncludeDirectories="../../nme;../../nme/toolBox;../../standardPlugins/dPluginCommons;../../../../coreLibrary_300/source/ai;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAILibrary;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/thirdParty/tinyxml;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/glew/include;&quot;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include&quot;;&quot;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)&quot;"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;NOPCH;__WXMSW__;WXUSINGDLL;GLEW_STATIC;AL_LIBTYPE_STATIC;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -77,7 +77,7 @@
 				AdditionalLibraryDirectories="../../../../packages/thirdParty/fmod/api/lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/NewtonDemos.pdb"
-				SubSystem="1"
+				SubSystem="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				TargetMachine="1"
@@ -102,7 +102,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy   &quot;..\..\..\..\coreLibrary_300\projects\windows\project_vs2008\$(PlatformName)\newton\$(ConfigurationName)dll\newton_d.dll&quot;   &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;xcopy   &quot;..\..\..\..\packages\thirdParty\fox\fox-1.6.44\windows\vcpp\foxVS_2009\$(PlatformName)\fox\$(ConfigurationName)dll\fox_d.dll&quot;   &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;"
+				CommandLine="rem xcopy   &quot;..\..\..\..\coreLibrary_300\projects\windows\project_vs2008\$(PlatformName)\newton\$(ConfigurationName)dll\newton_d.dll&quot;   &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;rem xcopy   &quot;..\..\..\..\packages\thirdParty\fox\fox-1.6.44\windows\vcpp\foxVS_2009\$(PlatformName)\fox\$(ConfigurationName)dll\fox_d.dll&quot;   &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -135,7 +135,7 @@
 				InlineFunctionExpansion="0"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="../../nme;../../nme/toolBox;../../standardPlugins/dPluginCommons;../../../../coreLibrary_300/source/ai;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAILibrary;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/thirdParty/tinyxml;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/glew/include;&quot;../../../../packages/thirdParty/fox/fox-1.6.44/include&quot;"
+				AdditionalIncludeDirectories="../../nme;../../nme/toolBox;../../standardPlugins/dPluginCommons;../../../../coreLibrary_300/source/ai;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAILibrary;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/thirdParty/tinyxml;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/glew/include;&quot;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include&quot;;&quot;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -164,7 +164,7 @@
 				AdditionalLibraryDirectories="../../../../packages/thirdParty/fmod/api/lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/NewtonDemos.pdb"
-				SubSystem="1"
+				SubSystem="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				TargetMachine="17"
@@ -220,8 +220,8 @@
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="../../nme;../../nme/toolBox;../../standardPlugins/dPluginCommons;../../../../coreLibrary_300/source/ai;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAILibrary;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/thirdParty/tinyxml;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/glew/include;&quot;../../../../packages/thirdParty/fox/fox-1.6.44/include&quot;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;FOXDLL;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;_CRT_SECURE_NO_WARNINGS"
+				AdditionalIncludeDirectories="../../nme;../../nme/toolBox;../../standardPlugins/dPluginCommons;../../../../coreLibrary_300/source/ai;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAILibrary;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/thirdParty/tinyxml;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/glew/include;&quot;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include&quot;;&quot;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)&quot;"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;NOPCH;__WXMSW__;WXUSINGDLL;GLEW_STATIC;AL_LIBTYPE_STATIC;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="toolbox_stdafx.h"
@@ -246,7 +246,7 @@
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="../../../../packages/thirdParty/fmod/api/lib"
 				GenerateDebugInformation="true"
-				SubSystem="1"
+				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				RandomizedBaseAddress="1"
@@ -273,7 +273,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy   &quot;..\..\..\..\coreLibrary_300\projects\windows\project_vs2008\$(PlatformName)\newton\$(ConfigurationName)dll\newton.dll&quot;   &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;xcopy   &quot;..\..\..\..\packages\thirdParty\fox\fox-1.6.44\windows\vcpp\foxVS_2009\$(PlatformName)\fox\$(ConfigurationName)dll\fox.dll&quot;   &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;"
+				CommandLine="rem xcopy   &quot;..\..\..\..\coreLibrary_300\projects\windows\project_vs2008\$(PlatformName)\newton\$(ConfigurationName)dll\newton.dll&quot;   &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;rem xcopy   &quot;..\..\..\..\packages\thirdParty\fox\fox-1.6.44\windows\vcpp\foxVS_2009\$(PlatformName)\fox\$(ConfigurationName)dll\fox.dll&quot;   &quot;../../$(PlatformName)/*.*&quot;  /F /Y /R&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -305,7 +305,7 @@
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="../../nme;../../nme/toolBox;../../standardPlugins/dPluginCommons;../../../../coreLibrary_300/source/ai;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAILibrary;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/thirdParty/tinyxml;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/glew/include;&quot;../../../../packages/thirdParty/fox/fox-1.6.44/include&quot;"
+				AdditionalIncludeDirectories="../../nme;../../nme/toolBox;../../standardPlugins/dPluginCommons;../../../../coreLibrary_300/source/ai;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAILibrary;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/thirdParty/tinyxml;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/glew/include;&quot;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include&quot;;&quot;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="2"
@@ -331,7 +331,7 @@
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="../../../../packages/thirdParty/fmod/api/lib"
 				GenerateDebugInformation="true"
-				SubSystem="1"
+				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				RandomizedBaseAddress="1"
@@ -453,83 +453,19 @@
 			Name="nme"
 			>
 			<File
-				RelativePath="..\..\nme\EditorAssetBrowser.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\nme\EditorAssetBrowser.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\nme\EditorAssetExplorer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\nme\EditorAssetExplorer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\nme\EditorCanvas.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\nme\EditorCanvas.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\nme\EditorCommandPanel.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\nme\EditorCommandPanel.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\nme\EditorExplorer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\nme\EditorExplorer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\nme\EditorMainMenu.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\nme\EditorMainMenu.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\nme\EditorPanel.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\nme\EditorPanel.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\nme\EditorRenderViewport.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\nme\EditorRenderViewport.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\nme\EditorToolBars.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\nme\EditorToolBars.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\nme\NewtonModelEditor.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\nme\NewtonModelEditor.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\nme\NewtonModelEditorApp.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\nme\NewtonModelEditorApp.h"
 				>
 			</File>
 		</Filter>

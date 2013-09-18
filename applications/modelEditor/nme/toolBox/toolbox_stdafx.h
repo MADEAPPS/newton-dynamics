@@ -95,19 +95,15 @@ typedef long long unsigned64;
 
 
 // gui library includes
-#include <fx.h>
-#include <fx3d.h>
-#include <fxkeys.h>
+//#include <fx.h>
+//#include <fx3d.h>
+//#include <fxkeys.h>
 
-
-// sound library
-//#include <fmod.h>
-//#include <fmod_errors.h>\
-
-// audio library support
-//#include <AL/al.h>
-//#include <AL/alc.h>
-
+// gui library includes
+#include <wx/wx.h>
+#include <wx/event.h>
+#include <wx/dcclient.h>
+#include <wx/glcanvas.h>
 
 // SDK includes
 #include <Newton.h>

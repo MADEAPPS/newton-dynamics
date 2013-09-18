@@ -15,8 +15,8 @@
 class NewtonModelEditor;
 class DemoEntityManager;
 
+/*
 
-//class EditorPanel: public FXHorizontalFrame 
 class EditorPanel: public FXVerticalFrame
 {
 	public:
@@ -27,6 +27,6 @@ class EditorPanel: public FXVerticalFrame
 	void Unhide();
 	NewtonModelEditor* const m_mainFrame;
 };
-
+*/
 
 #endif

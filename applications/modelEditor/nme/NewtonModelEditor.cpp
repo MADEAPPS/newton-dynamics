@@ -14,35 +14,26 @@
 
 
 #include <toolbox_stdafx.h>
-#include "EditorMainMenu.h"
-#include "DebugDisplay.h"
-#include "EditorCanvas.h"
-#include "EditorExplorer.h"
-#include "EditorToolBars.h"
-#include "NewtonModelEditor.h"
-#include "EditorCommandPanel.h"
-#include "EditorAssetExplorer.h"
-#include "EditorRenderViewport.h"
+//#include "EditorMainMenu.h"
+//#include "DebugDisplay.h"
+//#include "EditorCanvas.h"
+//#include "EditorExplorer.h"
+//#include "EditorToolBars.h"
+//#include "NewtonModelEditor.h"
+//#include "EditorCommandPanel.h"
+//#include "EditorAssetExplorer.h"
+//#include "EditorRenderViewport.h"
+
 
 
 
 typedef dPluginRecord** (CALLBACK* GetPluginArray)();
 
 
-int dPluginInterface::m_totalMemoryUsed = 0;
-
-void *operator new (size_t size) 
-{ 
-	void* const ptr = ::malloc (size);
-	return ptr; 
-}                                          
-
-void operator delete (void *ptr) 
-{ 
-	::free (ptr); 
-}
 
 
+
+/*
 // Message Map
 FXDEFMAP(NewtonModelEditor) MessageMap[]=
 {
@@ -96,8 +87,11 @@ FXDEFMAP(NewtonModelEditor) MessageMap[]=
 };
 FXIMPLEMENT(NewtonModelEditor,FXMainWindow,MessageMap,ARRAYNUMBER(MessageMap))
 
+*/
 
 
+
+#if 0
 int main(int argc, char *argv[])
 {
 	// Enable run-time memory check for debug builds.
@@ -133,88 +127,6 @@ NewtonModelEditor::NewtonModelEditor()
 {
 }
 
-NewtonModelEditor::NewtonModelEditor(FXApp& application)
-	:FXMainWindow(&application, "Newton Model Editor", NULL, NULL, DECOR_ALL, 0, 0, 1024, 768)
-	,m_workshop(NULL)
-	,m_mainMenu(NULL)
-	,m_statusbar(NULL)
-	,m_fileToolbar(NULL)
-	,m_explorer(NULL)
-	,m_commandPanel(NULL)
-	,m_sharedVisual(NULL)
-	,m_editMode(m_editAsset)
-	,m_altKey(false)
-	,m_shiftKey(false)
-	,m_controlKey(false)
-	,m_navigationKey(false)
-{
-	// Load all static resources
-	LoadResources ();
-
-	// create status bar for showing results 
-	m_statusbar = new FXStatusBar(this, LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|STATUSBAR_WITH_DRAGCORNER);
-
-	m_showNavigationMode = new FXTextField(m_statusbar,10, NULL,0,FRAME_SUNKEN|JUSTIFY_NORMAL|LAYOUT_RIGHT|LAYOUT_CENTER_Y|TEXTFIELD_READONLY,0,0,0,0,2,2,1,1);
-	m_showNavigationMode->setBackColor(m_statusbar->getBackColor());
-	ShowNavigationMode(m_selectNode);
-
-
-	// create the dock areas
-	m_docks[0] = new FXDockSite(this,DOCKSITE_NO_WRAP|LAYOUT_SIDE_TOP|LAYOUT_FILL_X);
-	m_docks[1] = new FXDockSite(this,LAYOUT_SIDE_LEFT|LAYOUT_FILL_Y);
-	m_docks[2] = new FXDockSite(this,LAYOUT_SIDE_RIGHT|LAYOUT_FILL_Y);
-	m_docks[3] = new FXDockSite(this,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
-
-	// create the main menu
-	m_mainMenuDragShell = new FXToolBarShell(this, FRAME_RAISED);
-	m_mainMenu = new EditorMainMenu (m_docks[0], m_mainMenuDragShell, this);
-
-	// add the tool bars 
-	m_fileToolbarShell = new FXToolBarShell(this, FRAME_RAISED);
-	m_fileToolbar = new EditorFileToolBar (m_docks[0], m_fileToolbarShell, this);
-
-	m_navigationToolbarShell = new FXToolBarShell(this, FRAME_RAISED); 
-	m_navigationToolbar = new EditorNavigationToolBar (m_docks[0], m_navigationToolbarShell, this);
-
-
-	// add the explorer window
-	m_explorerToolbarShell = new FXToolBarShell(this, FRAME_RAISED|FRAME_THICK|LAYOUT_FILL);
-	FXDockBar* const explorerDockbar = new FXDockBar(m_docks[1], m_explorerToolbarShell, LAYOUT_FILL_Y|LAYOUT_SIDE_RIGHT, 0,0,0,0, 2,2,2,2, 2,2);
-	explorerDockbar->allowedSides(FXDockBar::ALLOW_LEFT|FXDockBar::ALLOW_RIGHT);
-	m_explorer = new EditorExplorer (explorerDockbar, this);
-
-
-	// add the command panel window
-	m_commandPanelToolbarShell = new FXToolBarShell(this, FRAME_RAISED|FRAME_THICK|LAYOUT_FILL);
-	FXDockBar* const commandPanelToolDockbar = new FXDockBar(m_docks[2], m_commandPanelToolbarShell, LAYOUT_FILL_Y|LAYOUT_SIDE_RIGHT, 0,0,0,0, 2,2,2,2, 2,2);
-	commandPanelToolDockbar->allowedSides(FXDockBar::ALLOW_LEFT|FXDockBar::ALLOW_RIGHT);
-	m_commandPanel = new EditorCommandPanel (commandPanelToolDockbar, this);
-	
-
-	// create the working area of main frame
-//	FXPacker* const spliterFrame = new FXPacker (this, FRAME_SUNKEN|LAYOUT_FILL|FRAME_RAISED|FRAME_THICK);
-	m_workshop = new FX4Splitter(this, LAYOUT_SIDE_TOP|LAYOUT_FILL|FRAME_THICK|FOURSPLITTER_TRACKING);
-	m_sharedVisual = new GLVisual (&application);
-	for (int i = 0; i < 4; i ++) {
-		m_canvas[i] = new EditorCanvas(m_workshop, this, i ? m_canvas[0] : NULL);
-	}
-}
-
-
-NewtonModelEditor::~NewtonModelEditor()
-{
-	DestroyScene();
-	SaveConfig();
-
-	delete m_commandPanelToolbarShell;
-	delete m_explorerToolbarShell;
-	delete m_mainMenuDragShell;
-	delete m_fileToolbarShell;
-	delete m_navigationToolbarShell;
-	delete m_sharedVisual;
-	
-	DeleteResources();
-}
 
 void NewtonModelEditor::create()
 {
@@ -920,5 +832,100 @@ long NewtonModelEditor::onPaint(FXObject* sender, FXSelector id, void* eventPtr)
 
 	return 1;
 }
+#endif
 
 
+
+
+
+/*
+NewtonModelEditor::~NewtonModelEditor()
+{
+	dAssert (0);
+
+	DestroyScene();
+	SaveConfig();
+
+	delete m_commandPanelToolbarShell;
+	delete m_explorerToolbarShell;
+	delete m_mainMenuDragShell;
+	delete m_fileToolbarShell;
+	delete m_navigationToolbarShell;
+	delete m_sharedVisual;
+
+	DeleteResources();
+
+}
+
+
+
+NewtonModelEditor::NewtonModelEditor(FXApp& application)
+	:FXMainWindow(&application, "Newton Model Editor", NULL, NULL, DECOR_ALL, 0, 0, 1024, 768)
+//	,m_workshop(NULL)
+//	,m_mainMenu(NULL)
+//	,m_statusbar(NULL)
+//	,m_fileToolbar(NULL)
+//	,m_explorer(NULL)
+//	,m_commandPanel(NULL)
+//	,m_sharedVisual(NULL)
+//	,m_editMode(m_editAsset)
+//	,m_altKey(false)
+//	,m_shiftKey(false)
+//	,m_controlKey(false)
+//	,m_navigationKey(false)
+{
+	dAssert (0);
+
+	// Load all static resources
+	LoadResources ();
+
+	// create status bar for showing results 
+	m_statusbar = new FXStatusBar(this, LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|STATUSBAR_WITH_DRAGCORNER);
+
+	m_showNavigationMode = new FXTextField(m_statusbar,10, NULL,0,FRAME_SUNKEN|JUSTIFY_NORMAL|LAYOUT_RIGHT|LAYOUT_CENTER_Y|TEXTFIELD_READONLY,0,0,0,0,2,2,1,1);
+	m_showNavigationMode->setBackColor(m_statusbar->getBackColor());
+	ShowNavigationMode(m_selectNode);
+
+
+	// create the dock areas
+	m_docks[0] = new FXDockSite(this,DOCKSITE_NO_WRAP|LAYOUT_SIDE_TOP|LAYOUT_FILL_X);
+	m_docks[1] = new FXDockSite(this,LAYOUT_SIDE_LEFT|LAYOUT_FILL_Y);
+	m_docks[2] = new FXDockSite(this,LAYOUT_SIDE_RIGHT|LAYOUT_FILL_Y);
+	m_docks[3] = new FXDockSite(this,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
+
+	// create the main menu
+	m_mainMenuDragShell = new FXToolBarShell(this, FRAME_RAISED);
+	m_mainMenu = new EditorMainMenu (m_docks[0], m_mainMenuDragShell, this);
+
+	// add the tool bars 
+	m_fileToolbarShell = new FXToolBarShell(this, FRAME_RAISED);
+	m_fileToolbar = new EditorFileToolBar (m_docks[0], m_fileToolbarShell, this);
+
+	m_navigationToolbarShell = new FXToolBarShell(this, FRAME_RAISED); 
+	m_navigationToolbar = new EditorNavigationToolBar (m_docks[0], m_navigationToolbarShell, this);
+
+
+	// add the explorer window
+	m_explorerToolbarShell = new FXToolBarShell(this, FRAME_RAISED|FRAME_THICK|LAYOUT_FILL);
+	FXDockBar* const explorerDockbar = new FXDockBar(m_docks[1], m_explorerToolbarShell, LAYOUT_FILL_Y|LAYOUT_SIDE_RIGHT, 0,0,0,0, 2,2,2,2, 2,2);
+	explorerDockbar->allowedSides(FXDockBar::ALLOW_LEFT|FXDockBar::ALLOW_RIGHT);
+	m_explorer = new EditorExplorer (explorerDockbar, this);
+
+
+	// add the command panel window
+	m_commandPanelToolbarShell = new FXToolBarShell(this, FRAME_RAISED|FRAME_THICK|LAYOUT_FILL);
+	FXDockBar* const commandPanelToolDockbar = new FXDockBar(m_docks[2], m_commandPanelToolbarShell, LAYOUT_FILL_Y|LAYOUT_SIDE_RIGHT, 0,0,0,0, 2,2,2,2, 2,2);
+	commandPanelToolDockbar->allowedSides(FXDockBar::ALLOW_LEFT|FXDockBar::ALLOW_RIGHT);
+	m_commandPanel = new EditorCommandPanel (commandPanelToolDockbar, this);
+
+
+	// create the working area of main frame
+	//	FXPacker* const spliterFrame = new FXPacker (this, FRAME_SUNKEN|LAYOUT_FILL|FRAME_RAISED|FRAME_THICK);
+	m_workshop = new FX4Splitter(this, LAYOUT_SIDE_TOP|LAYOUT_FILL|FRAME_THICK|FOURSPLITTER_TRACKING);
+	m_sharedVisual = new GLVisual (&application);
+	for (int i = 0; i < 4; i ++) {
+		m_canvas[i] = new EditorCanvas(m_workshop, this, i ? m_canvas[0] : NULL);
+	}
+
+}
+*/

@@ -283,7 +283,6 @@ class dMousePickClass
 //		return NewtonCollisionIsTriggerVolume(collision) ? 0 : 1;
 	}
 
-	//static dFloat RayCastFilter (const NewtonBody* const body, const dFloat* const normal, int collisionID, void* userData, dFloat intersetParam)
 	static dFloat RayCastFilter (const NewtonBody* const body, const NewtonCollision* const shapeHit, const dFloat* const normal, int* const collisionID, void* const userData, dFloat intersectParam)
 	{
 		dFloat mass;
@@ -312,6 +311,9 @@ class dMousePickClass
 
 NewtonBody* MousePickByForce (NewtonWorld* nWorld, int mouseX, int mouseY, dFloat& paramter, dVector& position, dVector& normal, dFloat witdh, dFloat length)
 {
+	dAssert (0);
+	return NULL;
+/*
 	float x = dFloat (mouseX);
 	float y = dFloat (mouseY);
 	dVector p0 (ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
@@ -326,4 +328,5 @@ NewtonBody* MousePickByForce (NewtonWorld* nWorld, int mouseX, int mouseY, dFloa
 		paramter = rayCast.m_param;
 	}
 	return (NewtonBody*) rayCast.m_body;
+*/
 }

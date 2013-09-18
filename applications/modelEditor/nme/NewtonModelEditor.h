@@ -25,10 +25,8 @@ class EditorCommandPanel;
 #define D_EDIT_MODE_ASSET "asset"
 #define D_EDIT_MODE_SCENE "scene"
 
-class NewtonModelEditor: public FXMainWindow, public dPluginInterface
+class NewtonModelEditor: public wxFrame, public dPluginInterface
 {
-	FXDECLARE(NewtonModelEditor)
-
 	public:
 	enum EditMode 
 	{
@@ -112,7 +110,7 @@ class NewtonModelEditor: public FXMainWindow, public dPluginInterface
 		ID_MAX_EXPORT_PLUGINS = ID_EXPORT_PLUGINS + D_MAX_PLUGINS_COUNT,
 	};
 
-
+/*
 	NewtonModelEditor();
 	NewtonModelEditor(FXApp& application);
 	~NewtonModelEditor();
@@ -229,6 +227,7 @@ class NewtonModelEditor: public FXMainWindow, public dPluginInterface
 	friend class EditorAssetExplorer;
 	friend class EditorRenderViewport;
 	friend class EditorNavigationToolBar;
+*/
 };
 
 

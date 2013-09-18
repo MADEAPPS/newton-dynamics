@@ -34,8 +34,15 @@
 #include <dPluginStdafx.h>
 
 // gui library includes
-#include <fx.h>
-#include <fx3d.h>
+//#include <fx.h>
+//#include <fx3d.h>
+
+#include <wx/wx.h>
+#include <wx/event.h>
+#include <wx/dcclient.h>
+#include <wx/glcanvas.h>
+
+
 
 #include <dScene.h>
 #include <dSceneGraph.h>

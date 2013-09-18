@@ -13,7 +13,7 @@
 #include "EditorPanel.h"
 #include "NewtonModelEditor.h"
 
-
+/*
 EditorPanel::EditorPanel(FXComposite* const parent, NewtonModelEditor* const mainFrame, const char* const title)
 	:FXVerticalFrame(parent, LAYOUT_SIDE_TOP|LAYOUT_FILL, 0,0,0,0, 0,0,0,0, 0,0)
 	,m_mainFrame(mainFrame)
@@ -41,3 +41,4 @@ void EditorPanel::Unhide()
 	show();
 	recalc();
 }
+*/
