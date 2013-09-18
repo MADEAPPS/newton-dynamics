@@ -14,8 +14,9 @@
 
 
 #include <toolbox_stdafx.h>
+#include "EditorMainMenu.h"
 #include "NewtonModelEditor.h"
-//#include "EditorMainMenu.h"
+
 //#include "DebugDisplay.h"
 //#include "EditorCanvas.h"
 //#include "EditorExplorer.h"
@@ -873,13 +874,18 @@ NewtonModelEditor::NewtonModelEditor(const wxString& title, const wxPoint& pos, 
 //	,m_navigationKey(false)
 {
 //	dAssert (0);
-/*
+
 	// Load all static resources
-	LoadResources ();
+//	LoadResources ();
+
+	// add the main menu
+//	m_mainMenu = new EditorMainMenu(this);
+//	SetMenuBar (m_mainMenu);
 
 	// create status bar for showing results 
-	m_statusbar = new FXStatusBar(this, LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|STATUSBAR_WITH_DRAGCORNER);
+//	m_statusbar = new FXStatusBar(this, LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|STATUSBAR_WITH_DRAGCORNER);
 
+/*
 	m_showNavigationMode = new FXTextField(m_statusbar,10, NULL,0,FRAME_SUNKEN|JUSTIFY_NORMAL|LAYOUT_RIGHT|LAYOUT_CENTER_Y|TEXTFIELD_READONLY,0,0,0,0,2,2,1,1);
 	m_showNavigationMode->setBackColor(m_statusbar->getBackColor());
 	ShowNavigationMode(m_selectNode);

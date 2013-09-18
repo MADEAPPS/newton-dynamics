@@ -13,11 +13,13 @@
 #include "EditorMainMenu.h"
 #include "NewtonModelEditor.h"
 
-
-EditorMainMenu::EditorMainMenu(FXComposite* const parent, FXToolBarShell* const dragShell, NewtonModelEditor* const mainFrame)
-	:FXMenuBar(parent, dragShell, LAYOUT_DOCK_SAME|LAYOUT_SIDE_TOP|LAYOUT_FILL_X|FRAME_RAISED)
-	,m_mainFrame(mainFrame)
+EditorMainMenu::EditorMainMenu(NewtonModelEditor* const parent)
+//EditorMainMenu::EditorMainMenu(FXComposite* const parent, FXToolBarShell* const dragShell, NewtonModelEditor* const mainFrame)
+//	:FXMenuBar(parent, dragShell, LAYOUT_DOCK_SAME|LAYOUT_SIDE_TOP|LAYOUT_FILL_X|FRAME_RAISED)
+//	,m_mainFrame(mainFrame)
+	:wxMenuBar()
 {
+/*
 	new FXToolBarGrip(this, this, FXMenuBar::ID_TOOLBARGRIP,TOOLBARGRIP_DOUBLE);
 
 	// file menu
@@ -146,11 +148,14 @@ EditorMainMenu::EditorMainMenu(FXComposite* const parent, FXToolBarShell* const 
 		new FXMenuTitle(this, "Help", NULL, m_helpMenu);
 		new FXMenuCommand(m_helpMenu, "About", NULL, mainFrame, NewtonModelEditor::ID_ABOUT);
 	}
+*/
 
+	
 }
 
 EditorMainMenu::~EditorMainMenu(void)
 {
+/*
 	delete m_helpMenu;
 	delete m_fileMenu;
 	delete m_editMenu;
@@ -161,10 +166,11 @@ EditorMainMenu::~EditorMainMenu(void)
 	delete m_exportPlugins;
 	delete m_preferencesMenu;
 	delete m_recentFilesMenu;
+*/
 }
 
 
-
+/*
 FXString EditorMainMenu::GetRecentFile(int id)
 {
 	int i = 0; 
@@ -247,4 +253,4 @@ dPluginRecord* EditorMainMenu::GetPlugin (FXMenuPane* const paneMenu, int id)
 	FXMenuCommand* const item = (FXMenuCommand*) paneMenu->childAtIndex(id);
 	return (dPluginRecord*)item->getUserData();
 }
-
+*/

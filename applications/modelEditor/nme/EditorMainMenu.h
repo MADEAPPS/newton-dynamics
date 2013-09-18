@@ -16,15 +16,17 @@
 #include <dList.h>
 
 class NewtonModelEditor;
-class DemoEntityManager;
 
 
-class EditorMainMenu: public FXMenuBar 
+class EditorMainMenu: public wxMenuBar
 {
 	public:
-	EditorMainMenu(FXComposite* const parent, FXToolBarShell* const dragShell, NewtonModelEditor* const mainFrame);
-	~EditorMainMenu(void);
 
+//	EditorMainMenu(FXComposite* const parent, FXToolBarShell* const dragShell, NewtonModelEditor* const mainFrame);
+
+	EditorMainMenu(NewtonModelEditor* const parent);
+	~EditorMainMenu(void);
+/*
 	FXString GetRecentFile(int id);
 	void AddRecentFile(const FXString& filePathName);
 
@@ -43,6 +45,7 @@ class EditorMainMenu: public FXMenuBar
 	FXMenuPane* m_recentFilesMenu;
 	FXMenuPane* m_preferencesMenu;
 	dList<FXString> m_recentFilesList;
+*/
 };
 
 

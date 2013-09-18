@@ -13,21 +13,21 @@
 #define __NEWTON_MODEL_EDITOR_H_
 
 
-class GLVisual;
-class dPluginScene;
-class EditorCanvas;
+//class GLVisual;
+//class dPluginScene;
+//class EditorCanvas;
 class EditorMainMenu;
-class EditorExplorer;
-class EditorCommandPanel;
+//class EditorExplorer;
+//class EditorCommandPanel;
 
-#define D_MAX_PLUGINS_COUNT 128
-
-#define D_EDIT_MODE_ASSET "asset"
-#define D_EDIT_MODE_SCENE "scene"
+//#define D_MAX_PLUGINS_COUNT 128
+//#define D_EDIT_MODE_ASSET "asset"
+//#define D_EDIT_MODE_SCENE "scene"
 
 class NewtonModelEditor: public wxFrame, public dPluginInterface
 {
 	public:
+/*
 	enum EditMode 
 	{
 		m_editAsset,
@@ -109,7 +109,7 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 		ID_EXPORT_PLUGINS,
 		ID_MAX_EXPORT_PLUGINS = ID_EXPORT_PLUGINS + D_MAX_PLUGINS_COUNT,
 	};
-
+*/
 	NewtonModelEditor(const wxString& title, const wxPoint& pos, const wxSize& size);
 	~NewtonModelEditor();
 
@@ -225,6 +225,8 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	friend class EditorAssetExplorer;
 	friend class EditorRenderViewport;
 	friend class EditorNavigationToolBar;
+
+	wxMenuBar* m_mainMenu;
 */
 };
 
