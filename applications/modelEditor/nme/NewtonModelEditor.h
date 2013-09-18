@@ -228,6 +228,7 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 
 	wxMenuBar* m_mainMenu;
 */
+	wxAuiManager m_mgr;
 };
 
 

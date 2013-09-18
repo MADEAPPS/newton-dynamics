@@ -104,6 +104,8 @@ typedef long long unsigned64;
 #include <wx/event.h>
 #include <wx/dcclient.h>
 #include <wx/glcanvas.h>
+#include <wx/aui/aui.h>
+
 
 // SDK includes
 #include <Newton.h>

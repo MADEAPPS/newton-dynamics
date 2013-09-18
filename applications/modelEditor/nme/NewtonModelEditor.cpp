@@ -853,6 +853,9 @@ NewtonModelEditor::~NewtonModelEditor()
 
 	DeleteResources();
 */
+
+	// deinitialize the frame manager
+	m_mgr.UnInit();
 }
 
 
@@ -873,6 +876,9 @@ NewtonModelEditor::NewtonModelEditor(const wxString& title, const wxPoint& pos, 
 //	,m_controlKey(false)
 //	,m_navigationKey(false)
 {
+	// notify wxAUI which frame to use
+	m_mgr.SetManagedWindow(this);
+
 //	dAssert (0);
 
 	// Load all static resources
