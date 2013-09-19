@@ -241,12 +241,14 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	void LoadResources ();
 	void DeleteResources ();
 	void CreateMainToolBar();
+	void CreateNavigationToolBar();
 	void LoadIcon (const char* const iconName);
 	
 	wxAuiManager m_mgr;
 	wxMenuBar* m_mainMenu;
 	wxStatusBar* m_statusBar;
 	wxAuiToolBar* m_fileToolbar;
+	wxAuiToolBar* m_navigationToolbar;
 
 	wxString m_lastFilePath;
 	wxString m_currentFileName;

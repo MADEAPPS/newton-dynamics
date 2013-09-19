@@ -18,16 +18,8 @@
 #include "NewtonModelEditor.h"
 #include "NewtonModelEditorApp.h"
 
-//#include "DebugDisplay.h"
-//#include "EditorCanvas.h"
-//#include "EditorExplorer.h"
-//#include "EditorToolBars.h"
-//#include "NewtonModelEditor.h"
-//#include "EditorCommandPanel.h"
-//#include "EditorAssetExplorer.h"
-//#include "EditorRenderViewport.h"
 
-
+#define TOOLBAR_ICON_SIZE	32
 
 
 typedef dPluginRecord** (CALLBACK* GetPluginArray)();
@@ -799,7 +791,8 @@ NewtonModelEditor::NewtonModelEditor(const wxString& title, const wxPoint& pos, 
 //	,m_workshop(NULL)
 	,m_mainMenu(NULL)
 	,m_statusBar(NULL)
-//	,m_fileToolbar(NULL)
+	,m_fileToolbar(NULL)
+	,m_navigationToolbar(NULL)
 //	,m_explorer(NULL)
 //	,m_commandPanel(NULL)
 //	,m_sharedVisual(NULL)
@@ -824,9 +817,9 @@ NewtonModelEditor::NewtonModelEditor(const wxString& title, const wxPoint& pos, 
 	// create status bar for showing results 
 	m_statusBar = CreateStatusBar();
 
-
-	// create main Toolbar
+	// create main Toolbars
 	CreateMainToolBar();
+	CreateNavigationToolBar();
 
 /*
 	m_showNavigationMode = new FXTextField(m_statusbar,10, NULL,0,FRAME_SUNKEN|JUSTIFY_NORMAL|LAYOUT_RIGHT|LAYOUT_CENTER_Y|TEXTFIELD_READONLY,0,0,0,0,2,2,1,1);
@@ -910,18 +903,21 @@ void NewtonModelEditor::LoadIcon (const char* const iconName)
 	GetAplicationDirectory (appPath);
 
 	sprintf (fileName, "%sicons/%s", appPath, iconName);
-
-	
-
-
-//	FXFileStream stream;
-//	stream.open(fileName, FXStreamLoad);
-//	FXGIFIcon* const icon = new FXGIFIcon(getApp());
-//	icon->loadPixels(stream);
-//	stream.close();
-
 	wxBitmap* const bitmap = new wxBitmap(fileName, wxBITMAP_TYPE_GIF);
 
+
+	
+	wxImage image (bitmap->ConvertToImage());
+//	unsigned char GetRed( int x, int y ) const;
+//	unsigned char GetGreen( int x, int y ) const;
+//	unsigned char GetBlue( int x, int y ) const;
+
+	wxColour colour;
+	colour.Set(image.GetRed (0, 0), image.GetGreen (0, 0), image.GetBlue (0, 0));
+	wxMask* mask = new wxMask (*bitmap, colour);
+//	wxMask* const mask = bitmap->GetMask();
+//	wxMask xxx (*bitmap, int paletteIndex);
+	bitmap->SetMask(mask);
 /*
 	FXuint opts = icon->getOptions();
 	icon->setOptions(opts | IMAGE_ALPHACOLOR);
@@ -979,16 +975,38 @@ void NewtonModelEditor::DeleteResources ()
 
 void NewtonModelEditor::CreateMainToolBar()
 {
-	m_fileToolbar = new wxAuiToolBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_OVERFLOW);
+	wxAuiToolBar* const toolbar = new wxAuiToolBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_OVERFLOW);
+	toolbar->SetToolBitmapSize (wxSize(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE));
 
-	m_fileToolbar->SetToolBitmapSize (wxSize(48,48));
-	m_fileToolbar->AddTool (wxID_NEW, wxT("Create new scene"), *m_icons.Find(dCRC64("fileNew.gif"))->GetInfo());
+	toolbar->AddTool (wxID_NEW, wxT("Create new scene"), *m_icons.Find(dCRC64("fileNew.gif"))->GetInfo());
 
-	m_fileToolbar->AddSeparator();
-	m_fileToolbar->AddTool (wxID_OPEN, wxT("Open scene"), *m_icons.Find(dCRC64("fileOpen.gif"))->GetInfo());
-	m_fileToolbar->AddTool (wxID_SAVE, wxT("Save scene"), *m_icons.Find(dCRC64("fileSave.gif"))->GetInfo());
-	m_fileToolbar->AddTool (wxID_SAVEAS, wxT("Save scene as"), *m_icons.Find(dCRC64("fileSaveAs.gif"))->GetInfo());
+	toolbar->AddSeparator();
+	toolbar->AddTool (wxID_OPEN, wxT("Open scene"), *m_icons.Find(dCRC64("fileOpen.gif"))->GetInfo());
+	toolbar->AddTool (wxID_SAVE, wxT("Save scene"), *m_icons.Find(dCRC64("fileSave.gif"))->GetInfo());
+	toolbar->AddTool (wxID_SAVEAS, wxT("Save scene as"), *m_icons.Find(dCRC64("fileSaveAs.gif"))->GetInfo());
 
-	m_fileToolbar->Realize();
-	m_mgr.AddPane (m_fileToolbar, wxAuiPaneInfo(). Name(wxT("File Menu")).Caption(wxT("File menu")).ToolbarPane().Top());
+	toolbar->Realize();
+	m_mgr.AddPane (toolbar, wxAuiPaneInfo(). Name(wxT("File Menu")).Caption(wxT("File menu")).ToolbarPane().Top());
+
+	m_fileToolbar = toolbar;
+}
+
+
+void NewtonModelEditor::CreateNavigationToolBar()
+{
+	wxAuiToolBar* const toolbar = new wxAuiToolBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_OVERFLOW);
+	toolbar->SetToolBitmapSize (wxSize(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE));
+
+	toolbar->AddTool (wxID_UNDO, wxT("Undo previous action"), *m_icons.Find(dCRC64("undo.gif"))->GetInfo());
+	toolbar->AddTool (wxID_REDO, wxT("Redo previous action"), *m_icons.Find(dCRC64("redo.gif"))->GetInfo());
+
+	//	new FXButton(this,"\tCursor\tCursor mode.", mainFrame->FindIcon("cursor.gif"), mainFrame, NewtonModelEditor::ID_SELECT_COMMAND_MODE, BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+//	new FXButton(this,"\tSelect\tObject selection mode.", mainFrame->FindIcon("object_cursor.gif"), mainFrame, NewtonModelEditor::ID_SELECT_COMMAND_MODE, BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+//	new FXButton(this,"\tMove\tObject translation mode.", mainFrame->FindIcon("object_move.gif"), mainFrame, NewtonModelEditor::ID_TRANSLATE_COMMAND_MODE, BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+//	new FXButton(this,"\tRotate\tObject rotation mode.", mainFrame->FindIcon("object_turn.gif"), mainFrame, NewtonModelEditor::ID_ROTATE_COMMAND_MODE, BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+//	new FXButton(this,"\tScale\tObject scale mode.", mainFrame->FindIcon("object_scale.gif"), mainFrame, NewtonModelEditor::ID_SCALE_COMMAND_MODE, BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+
+	toolbar->Realize();
+	m_mgr.AddPane (toolbar, wxAuiPaneInfo(). Name(wxT("Navigation options")).Caption(wxT("Navigation options")).ToolbarPane().Top());
+	m_navigationToolbar = toolbar;
 }
