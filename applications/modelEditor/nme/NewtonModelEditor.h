@@ -50,6 +50,15 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	{
 		ID_CANVAS = wxID_HIGHEST,
 
+
+		// editor node modes
+		ID_CURSOR_COMMAND_MODE,
+		ID_SELECT_COMMAND_MODE,
+		ID_TRANSLATE_COMMAND_MODE,
+		ID_ROTATE_COMMAND_MODE,
+		ID_SCALE_COMMAND_MODE,
+
+
 		// file menu
 //		ID_NEW,
 /*
@@ -89,11 +98,6 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 		// help menu
 		ID_ABOUT,
 
-		// editor node modes
-		ID_SELECT_COMMAND_MODE,
-		ID_TRANSLATE_COMMAND_MODE,
-		ID_ROTATE_COMMAND_MODE,
-		ID_SCALE_COMMAND_MODE,
 
 
 		// editor state

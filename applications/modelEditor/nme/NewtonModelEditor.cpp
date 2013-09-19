@@ -929,7 +929,6 @@ void NewtonModelEditor::LoadResources ()
 	GetMediaDirectory (path);
 	m_lastFilePath = path;
 	m_currentFileName = "";
-LoadIcon ("undo.gif");
 
 	LoadIcon ("fileNew.gif");
 	LoadIcon ("fileOpen.gif");
@@ -984,7 +983,6 @@ void NewtonModelEditor::CreateMainToolBar()
 	m_fileToolbar = toolbar;
 }
 
-
 void NewtonModelEditor::CreateNavigationToolBar()
 {
 	wxAuiToolBar* const toolbar = new wxAuiToolBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_OVERFLOW);
@@ -994,11 +992,11 @@ void NewtonModelEditor::CreateNavigationToolBar()
 	toolbar->AddTool (wxID_REDO, wxT("Redo previous action"), *m_icons.Find(dCRC64("redo.gif"))->GetInfo());
 
 	toolbar->AddSeparator();
-//	new FXButton(this,"\tCursor\tCursor mode.", mainFrame->FindIcon("cursor.gif"), mainFrame, NewtonModelEditor::ID_SELECT_COMMAND_MODE, BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-//	new FXButton(this,"\tSelect\tObject selection mode.", mainFrame->FindIcon("object_cursor.gif"), mainFrame, NewtonModelEditor::ID_SELECT_COMMAND_MODE, BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-//	new FXButton(this,"\tMove\tObject translation mode.", mainFrame->FindIcon("object_move.gif"), mainFrame, NewtonModelEditor::ID_TRANSLATE_COMMAND_MODE, BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-//	new FXButton(this,"\tRotate\tObject rotation mode.", mainFrame->FindIcon("object_turn.gif"), mainFrame, NewtonModelEditor::ID_ROTATE_COMMAND_MODE, BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-//	new FXButton(this,"\tScale\tObject scale mode.", mainFrame->FindIcon("object_scale.gif"), mainFrame, NewtonModelEditor::ID_SCALE_COMMAND_MODE, BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+	toolbar->AddTool (ID_CURSOR_COMMAND_MODE, wxT("select object"), *m_icons.Find(dCRC64("cursor.gif"))->GetInfo());
+	toolbar->AddTool (ID_SELECT_COMMAND_MODE, wxT("Object selection mode"), *m_icons.Find(dCRC64("object_cursor.gif"))->GetInfo());
+	toolbar->AddTool (ID_TRANSLATE_COMMAND_MODE, wxT("Object translation mode"), *m_icons.Find(dCRC64("object_move.gif"))->GetInfo());
+	toolbar->AddTool (ID_ROTATE_COMMAND_MODE, wxT("Object rotation mode"), *m_icons.Find(dCRC64("object_turn.gif"))->GetInfo());
+	toolbar->AddTool (ID_SCALE_COMMAND_MODE, wxT("Object rotation mode"), *m_icons.Find(dCRC64("object_scale.gif"))->GetInfo());
 
 	toolbar->Realize();
 	m_mgr.AddPane (toolbar, wxAuiPaneInfo(). Name(wxT("Navigation options")).Caption(wxT("Navigation options")).ToolbarPane().Top());
