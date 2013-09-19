@@ -1452,7 +1452,7 @@
 #define wxUSE_TGA           0
 
 // Set to 1 for GIF format support
-#define wxUSE_GIF           0
+#define wxUSE_GIF           1
 
 // Set to 1 for PNM format support
 #define wxUSE_PNM           0
@@ -1467,7 +1467,7 @@
 #define wxUSE_XPM           0
 
 // Set to 1 for MS Icons and Cursors format support
-#define wxUSE_ICO_CUR       0
+#define wxUSE_ICO_CUR       1
 
 // Set to 1 to compile in wxPalette class
 #define wxUSE_PALETTE       1

@@ -79,6 +79,8 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="winmm.lib rpcrt4.lib advapi32.lib wsock32.lib wininet.lib"
 				OutputFile="$(OutDir)\$(ProjectName)_d.dll"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -167,6 +169,8 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="winmm.lib rpcrt4.lib advapi32.lib wsock32.lib wininet.lib"
 				OutputFile="$(OutDir)\$(ProjectName)_d.dll"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -251,6 +255,8 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="winmm.lib rpcrt4.lib advapi32.lib wsock32.lib wininet.lib"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -336,6 +342,8 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="winmm.lib rpcrt4.lib advapi32.lib wsock32.lib wininet.lib"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -460,10 +468,6 @@
 			UniqueIdentifier="{63537534-1833-5C1F-8DBD-359A84F294C8}"
 			>
 			<File
-				RelativePath="..\..\include\wx\univ\setup.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\include\wx\msw\setup.h"
 				>
 				<FileConfiguration
@@ -506,6 +510,10 @@
 						Outputs="..\..\lib\$(PlatformName)\wx\setup.h"
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\include\wx\univ\setup.h"
+				>
 			</File>
 		</Filter>
 		<Filter

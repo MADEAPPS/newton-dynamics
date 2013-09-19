@@ -214,27 +214,21 @@ void EditorMainMenu::CreateFileMenu()
 	menu->AppendSeparator();
 	menu->Append(wxID_PREFERENCES, wxT("Preferences"));
 
-
 	// new scene
-//	new FXMenuCommand(menu, "New", mainFrame->FindIcon("fileNew.gif"), mainFrame, NewtonModelEditor::ID_NEW);
 	menu->AppendSeparator();
 	menu->Append (wxID_NEW, wxT("New"), wxT("clean scene"));
 
+	menu->AppendSeparator();
+	menu->Append (wxID_OPEN, wxT("Open scene"), wxT("open an existing scene"));
+	menu->Append (wxID_SAVE, wxT("Save scene"), wxT("Save current scene"));
+	menu->Append (wxID_SAVEAS, wxT("Save scene as"), wxT("Save current scene to different file"));
 
 /*
-	// load save scene
-	{
-		//			new FXMenuSeparator(menu);
-		//			new FXMenuCommand(menu, "Load scene", mainFrame->FindIcon("fileOpen.gif"), mainFrame, NewtonModelEditor::ID_LOAD_SCENE);
-		//			new FXMenuCommand(menu, "Save scene ", mainFrame->FindIcon("fileSave.gif"), mainFrame, NewtonModelEditor::ID_SAVE_SCENE);
-		//			new FXMenuCommand(menu, "Save scene as ...", mainFrame->FindIcon("fileSaveAs.gif"), mainFrame, NewtonModelEditor::ID_SAVE_SCENE_AS);
-
 		new FXMenuSeparator(menu);
 		new FXMenuCommand(menu, "Load asset", mainFrame->FindIcon("fileOpen.gif"), mainFrame, NewtonModelEditor::ID_LOAD_ASSET);
 		new FXMenuCommand(menu, "Save asset", mainFrame->FindIcon("fileSave.gif"), mainFrame, NewtonModelEditor::ID_SAVE_ASSET);
 		new FXMenuCommand(menu, "Save asset as ...", mainFrame->FindIcon("fileSaveAs.gif"), mainFrame, NewtonModelEditor::ID_SAVE_ASSET_AS);
 	}
-
 
 	// load save assets
 	{

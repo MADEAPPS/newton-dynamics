@@ -2508,8 +2508,13 @@ bool wxImage::DoLoad(wxImageHandler& handler, wxInputStream& stream, int index)
 {
     // save the options values which can be clobbered by the handler (e.g. many
     // of them call Destroy() before trying to load the file)
-    const unsigned maxWidth = GetOptionInt(wxIMAGE_OPTION_MAX_WIDTH),
-                   maxHeight = GetOptionInt(wxIMAGE_OPTION_MAX_HEIGHT);
+
+	// Julio for some reason this crashes
+//    const unsigned maxWidth = GetOptionInt(wxIMAGE_OPTION_MAX_WIDTH),
+//                   maxHeight = GetOptionInt(wxIMAGE_OPTION_MAX_HEIGHT);
+
+	const unsigned maxWidth = 0;
+	const unsigned maxHeight = 0;
 
     // Preserve the original stream position if possible to rewind back to it
     // if we failed to load the file -- maybe the next handler that we try can

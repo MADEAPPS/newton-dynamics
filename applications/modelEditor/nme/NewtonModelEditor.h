@@ -178,8 +178,7 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 
 	void LoadScene (const FXString& fileName);
 
-	void LoadResources ();
-	void DeleteResources ();
+	
 
 	void PopNavigationMode();
 	void PushNavigationMode(NavigationMode mode);
@@ -210,10 +209,10 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 
 	GLVisual* m_sharedVisual;
 	FXDockSite* m_docks[4]; 
-	dTree<FXIcon*, dCRCTYPE> m_icons;
 	
-	FXString m_lastFilePath;
-	FXString m_currentFileName;
+	
+	
+	
 	
 	EditMode m_editMode;
 	bool m_altKey;
@@ -237,9 +236,21 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	void OnExit(wxCommandEvent& event);
 	void OnNew(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);
+
+
+	void LoadResources ();
+	void DeleteResources ();
+	void CreateMainToolBar();
+	void LoadIcon (const char* const iconName);
 	
 	wxAuiManager m_mgr;
 	wxMenuBar* m_mainMenu;
+	wxStatusBar* m_statusBar;
+	wxAuiToolBar* m_fileToolbar;
+
+	wxString m_lastFilePath;
+	wxString m_currentFileName;
+	dTree<wxBitmap*, dCRCTYPE> m_icons;
 };
 
 

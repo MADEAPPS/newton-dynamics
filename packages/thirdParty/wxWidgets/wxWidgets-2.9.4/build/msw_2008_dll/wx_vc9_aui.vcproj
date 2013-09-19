@@ -85,7 +85,7 @@
 				AdditionalLibraryDirectories="..\..\lib\vc_dll"
 				GenerateManifest="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="..\..\lib\vc_dll\wxmsw294ud_aui_vc_custom.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				ImportLibrary="..\..\lib\vc_dll\wxmsw29ud_aui.lib"
 				TargetMachine="1"
 			/>
@@ -182,7 +182,7 @@
 				AdditionalLibraryDirectories="..\..\lib\vc_dll"
 				GenerateManifest="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="..\..\lib\vc_dll\wxmsw294ud_aui_vc_custom.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				ImportLibrary="..\..\lib\vc_dll\wxmsw29ud_aui.lib"
 				TargetMachine="17"
 			/>
@@ -276,7 +276,7 @@
 				AdditionalLibraryDirectories="..\..\lib\vc_dll"
 				GenerateManifest="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="..\..\lib\vc_dll\wxmsw294u_aui_vc_custom.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				ImportLibrary="..\..\lib\vc_dll\wxmsw29u_aui.lib"
@@ -373,7 +373,7 @@
 				AdditionalLibraryDirectories="..\..\lib\vc_dll"
 				GenerateManifest="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="..\..\lib\vc_dll\wxmsw294u_aui_vc_custom.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				ImportLibrary="..\..\lib\vc_dll\wxmsw29u_aui.lib"
@@ -462,6 +462,10 @@
 			UniqueIdentifier="{63537534-1833-5C1F-8DBD-359A84F294C8}"
 			>
 			<File
+				RelativePath="..\..\include\wx\univ\setup.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\include\wx\msw\setup.h"
 				>
 				<FileConfiguration
@@ -504,10 +508,6 @@
 						Outputs="..\..\lib\vc_dll\mswu\wx\setup.h"
 					/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\..\include\wx\univ\setup.h"
-				>
 			</File>
 		</Filter>
 		<Filter
