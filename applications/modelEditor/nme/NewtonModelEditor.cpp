@@ -898,34 +898,26 @@ void NewtonModelEditor::OnNew (wxCommandEvent& event)
 
 void NewtonModelEditor::LoadIcon (const char* const iconName)
 {
-	char appPath [2048];
-	char fileName [2048];
-	GetAplicationDirectory (appPath);
+	if (!m_icons.Find (dCRC64 (iconName))) {
+		char appPath [2048];
+		char fileName [2048];
+		GetAplicationDirectory (appPath);
 
-	sprintf (fileName, "%sicons/%s", appPath, iconName);
-	wxBitmap* const bitmap = new wxBitmap(fileName, wxBITMAP_TYPE_GIF);
-
-
-	
-	wxImage image (bitmap->ConvertToImage());
-//	unsigned char GetRed( int x, int y ) const;
-//	unsigned char GetGreen( int x, int y ) const;
-//	unsigned char GetBlue( int x, int y ) const;
-
-	wxColour colour;
-	colour.Set(image.GetRed (0, 0), image.GetGreen (0, 0), image.GetBlue (0, 0));
-	wxMask* mask = new wxMask (*bitmap, colour);
-//	wxMask* const mask = bitmap->GetMask();
-//	wxMask xxx (*bitmap, int paletteIndex);
-	bitmap->SetMask(mask);
-/*
-	FXuint opts = icon->getOptions();
-	icon->setOptions(opts | IMAGE_ALPHACOLOR);
-
-	FXColor transparentColor (icon->getPixel(0, 0));
-	icon->setTransparentColor(transparentColor);
-*/
-	m_icons.Insert (bitmap, dCRC64 (iconName));
+		sprintf (fileName, "%sicons/%s", appPath, iconName);
+		wxBitmap* const bitmap = new wxBitmap(fileName, wxBITMAP_TYPE_GIF);
+		wxImage image (bitmap->ConvertToImage());
+		if (!image.IsTransparent (0, 0)) {
+			unsigned char red = image.GetRed (0, 0);
+			unsigned char green = image.GetGreen (0, 0);
+			unsigned char blue = image.GetBlue (0, 0);
+			unsigned char alpha = image.HasAlpha() ? image.GetAlpha (0, 0) : wxALPHA_TRANSPARENT;
+			wxColour colour;
+			colour.Set(red, green, blue, alpha);
+			wxMask* mask = new wxMask (*bitmap, colour);
+			bitmap->SetMask(mask);
+		}
+		m_icons.Insert (bitmap, dCRC64 (iconName));
+	}
 }
 
 
@@ -937,6 +929,7 @@ void NewtonModelEditor::LoadResources ()
 	GetMediaDirectory (path);
 	m_lastFilePath = path;
 	m_currentFileName = "";
+LoadIcon ("undo.gif");
 
 	LoadIcon ("fileNew.gif");
 	LoadIcon ("fileOpen.gif");
@@ -1000,7 +993,8 @@ void NewtonModelEditor::CreateNavigationToolBar()
 	toolbar->AddTool (wxID_UNDO, wxT("Undo previous action"), *m_icons.Find(dCRC64("undo.gif"))->GetInfo());
 	toolbar->AddTool (wxID_REDO, wxT("Redo previous action"), *m_icons.Find(dCRC64("redo.gif"))->GetInfo());
 
-	//	new FXButton(this,"\tCursor\tCursor mode.", mainFrame->FindIcon("cursor.gif"), mainFrame, NewtonModelEditor::ID_SELECT_COMMAND_MODE, BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+	toolbar->AddSeparator();
+//	new FXButton(this,"\tCursor\tCursor mode.", mainFrame->FindIcon("cursor.gif"), mainFrame, NewtonModelEditor::ID_SELECT_COMMAND_MODE, BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
 //	new FXButton(this,"\tSelect\tObject selection mode.", mainFrame->FindIcon("object_cursor.gif"), mainFrame, NewtonModelEditor::ID_SELECT_COMMAND_MODE, BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
 //	new FXButton(this,"\tMove\tObject translation mode.", mainFrame->FindIcon("object_move.gif"), mainFrame, NewtonModelEditor::ID_TRANSLATE_COMMAND_MODE, BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
 //	new FXButton(this,"\tRotate\tObject rotation mode.", mainFrame->FindIcon("object_turn.gif"), mainFrame, NewtonModelEditor::ID_ROTATE_COMMAND_MODE, BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
