@@ -45,11 +45,14 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 		m_zoomViewport,
 		m_rotateViewport,
 	};
-
+*/
 	enum 
 	{
-//		ID_CANVAS = FXMainWindow::ID_LAST,
+		ID_CANVAS = wxID_HIGHEST,
 
+		// file menu
+//		ID_NEW,
+/*
 		ID_EDITOR_MODE,
 		ID_SET_VIEW_MODE,
 		ID_SET_RENDER_MODE,
@@ -108,8 +111,9 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 
 		ID_EXPORT_PLUGINS,
 		ID_MAX_EXPORT_PLUGINS = ID_EXPORT_PLUGINS + D_MAX_PLUGINS_COUNT,
-	};
 */
+	};
+
 	NewtonModelEditor(const wxString& title, const wxPoint& pos, const wxSize& size);
 	~NewtonModelEditor();
 
@@ -225,10 +229,17 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	friend class EditorAssetExplorer;
 	friend class EditorRenderViewport;
 	friend class EditorNavigationToolBar;
-
-	wxMenuBar* m_mainMenu;
 */
+
+	private:	
+	DECLARE_EVENT_TABLE()
+
+	void OnExit(wxCommandEvent& event);
+	void OnNew(wxCommandEvent& event);
+	void OnAbout(wxCommandEvent& event);
+	
 	wxAuiManager m_mgr;
+	wxMenuBar* m_mainMenu;
 };
 
 

@@ -12,7 +12,8 @@
 #ifndef __NEWTON_MODEL_EDITOR_APP_H_
 #define __NEWTON_MODEL_EDITOR_APP_H_
 
-#define APPLICATION_NAME wxT("Newton Model Editor")
+#define APPLICATION_NAME		wxT("Newton Model Editor")
+#define APPLICATION_VERSION		100
 
 
 class NewtonModelEditorApp: public wxApp

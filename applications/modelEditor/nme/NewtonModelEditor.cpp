@@ -16,6 +16,7 @@
 #include <toolbox_stdafx.h>
 #include "EditorMainMenu.h"
 #include "NewtonModelEditor.h"
+#include "NewtonModelEditorApp.h"
 
 //#include "DebugDisplay.h"
 //#include "EditorCanvas.h"
@@ -91,6 +92,17 @@ FXIMPLEMENT(NewtonModelEditor,FXMainWindow,MessageMap,ARRAYNUMBER(MessageMap))
 
 */
 
+
+BEGIN_EVENT_TABLE (NewtonModelEditor, wxFrame)
+
+	EVT_MENU(wxID_EXIT, NewtonModelEditor::OnExit)
+	EVT_MENU(wxID_ABOUT, NewtonModelEditor::OnAbout)
+	EVT_MENU(wxID_HELP, NewtonModelEditor::OnAbout)
+	EVT_MENU(wxID_PREFERENCES, NewtonModelEditor::OnAbout)
+
+	EVT_MENU(wxID_NEW, NewtonModelEditor::OnNew)
+
+END_EVENT_TABLE()
 
 
 #if 0
@@ -606,13 +618,6 @@ EditorCanvas* NewtonModelEditor::GetCanvas(FXObject* const sender) const
 
 
 
-long NewtonModelEditor::onNew(FXObject* sender, FXSelector id, void* eventPtr)
-{
-	Clear();
-	DestroyScene();
-	CreateScene();
-	return 1;
-}
 
 
 long NewtonModelEditor::onLoadScene(FXObject* sender, FXSelector id, void* eventPtr)
@@ -854,7 +859,7 @@ NewtonModelEditor::~NewtonModelEditor()
 	DeleteResources();
 */
 
-	// deinitialize the frame manager
+	// de-initialize the frame manager
 	m_mgr.UnInit();
 }
 
@@ -864,7 +869,7 @@ NewtonModelEditor::NewtonModelEditor(const wxString& title, const wxPoint& pos, 
 	:wxFrame(NULL, -1, title, pos, size)
 	,dPluginInterface()
 //	,m_workshop(NULL)
-//	,m_mainMenu(NULL)
+	,m_mainMenu(NULL)
 //	,m_statusbar(NULL)
 //	,m_fileToolbar(NULL)
 //	,m_explorer(NULL)
@@ -885,8 +890,8 @@ NewtonModelEditor::NewtonModelEditor(const wxString& title, const wxPoint& pos, 
 //	LoadResources ();
 
 	// add the main menu
-//	m_mainMenu = new EditorMainMenu(this);
-//	SetMenuBar (m_mainMenu);
+	m_mainMenu = new EditorMainMenu(this);
+	SetMenuBar (m_mainMenu);
 
 	// create status bar for showing results 
 //	m_statusbar = new FXStatusBar(this, LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|STATUSBAR_WITH_DRAGCORNER);
@@ -938,3 +943,28 @@ NewtonModelEditor::NewtonModelEditor(const wxString& title, const wxPoint& pos, 
 	}
 */
 }
+
+
+void NewtonModelEditor::OnExit(wxCommandEvent& event)
+{
+	Close ();
+}
+
+
+void NewtonModelEditor::OnAbout(wxCommandEvent& event)
+{
+	wxString msg;
+	msg.Printf(wxT ("%s %d.%02d"), APPLICATION_NAME, APPLICATION_VERSION / 100, APPLICATION_VERSION % 100);
+	wxMessageBox(msg, wxT ("Newton Dynanics"), wxOK | wxICON_INFORMATION, this);
+}
+
+
+void NewtonModelEditor::OnNew (wxCommandEvent& event)
+{
+	dAssert (0);
+//	Clear();
+//	DestroyScene();
+//	CreateScene();
+}
+
+

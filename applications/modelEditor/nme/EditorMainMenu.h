@@ -26,6 +26,11 @@ class EditorMainMenu: public wxMenuBar
 
 	EditorMainMenu(NewtonModelEditor* const parent);
 	~EditorMainMenu(void);
+
+	private:
+	void CreateFileMenu();
+	void CreateHelpMenu();
+
 /*
 	FXString GetRecentFile(int id);
 	void AddRecentFile(const FXString& filePathName);
@@ -46,6 +51,9 @@ class EditorMainMenu: public wxMenuBar
 	FXMenuPane* m_preferencesMenu;
 	dList<FXString> m_recentFilesList;
 */
+
+	wxMenu* m_fileMenu;
+	wxMenu* m_helpMenu;
 };
 
 

@@ -18,74 +18,21 @@ EditorMainMenu::EditorMainMenu(NewtonModelEditor* const parent)
 //	:FXMenuBar(parent, dragShell, LAYOUT_DOCK_SAME|LAYOUT_SIDE_TOP|LAYOUT_FILL_X|FRAME_RAISED)
 //	,m_mainFrame(mainFrame)
 	:wxMenuBar()
+	,m_fileMenu(NULL)
+	,m_helpMenu(NULL)
 {
+//	new FXToolBarGrip(this, this, FXMenuBar::ID_TOOLBARGRIP,TOOLBARGRIP_DOUBLE);
+
+
+	CreateFileMenu();
+	CreateHelpMenu();
+
+	// add main menus to menu bar
+	Append (m_fileMenu, wxT("&File"));
+	Append (m_helpMenu, wxT("&Help"));
+
+
 /*
-	new FXToolBarGrip(this, this, FXMenuBar::ID_TOOLBARGRIP,TOOLBARGRIP_DOUBLE);
-
-	// file menu
-	{
-		m_fileMenu = new FXMenuPane(this);
-		new FXMenuTitle(this, "File", NULL, m_fileMenu);
-
-		// new scene
-		{
-			new FXMenuCommand(m_fileMenu, "New", mainFrame->FindIcon("fileNew.gif"), mainFrame, NewtonModelEditor::ID_NEW);
-		}
-
-		// load save scene
-		{
-//			new FXMenuSeparator(m_fileMenu);
-//			new FXMenuCommand(m_fileMenu, "Load scene", mainFrame->FindIcon("fileOpen.gif"), mainFrame, NewtonModelEditor::ID_LOAD_SCENE);
-//			new FXMenuCommand(m_fileMenu, "Save scene ", mainFrame->FindIcon("fileSave.gif"), mainFrame, NewtonModelEditor::ID_SAVE_SCENE);
-//			new FXMenuCommand(m_fileMenu, "Save scene as ...", mainFrame->FindIcon("fileSaveAs.gif"), mainFrame, NewtonModelEditor::ID_SAVE_SCENE_AS);
-
-			new FXMenuSeparator(m_fileMenu);
-			new FXMenuCommand(m_fileMenu, "Load asset", mainFrame->FindIcon("fileOpen.gif"), mainFrame, NewtonModelEditor::ID_LOAD_ASSET);
-			new FXMenuCommand(m_fileMenu, "Save asset", mainFrame->FindIcon("fileSave.gif"), mainFrame, NewtonModelEditor::ID_SAVE_ASSET);
-			new FXMenuCommand(m_fileMenu, "Save asset as ...", mainFrame->FindIcon("fileSaveAs.gif"), mainFrame, NewtonModelEditor::ID_SAVE_ASSET_AS);
-		}
-
-		// load save assets
-		{
-//			new FXMenuSeparator(m_fileMenu);
-//			new FXMenuCommand(m_fileMenu, "Load asset", NULL, mainFrame, NewtonModelEditor::ID_LOAD_ASSET);
-//			new FXMenuCommand(m_fileMenu, "Save asset", NULL, mainFrame, NewtonModelEditor::ID_SAVE_ASSET);
-//			new FXMenuCommand(m_fileMenu, "Save asset as ...", NULL, mainFrame, NewtonModelEditor::ID_SAVE_ASSET_AS);
-		}
-
-		
-		// add Recent file sub menu
-		{
-			new FXMenuSeparator(m_fileMenu);
-			m_recentFilesMenu = new FXMenuPane(this);
-			new FXMenuCascade(m_fileMenu, "Recent Files...", NULL, m_recentFilesMenu);
-			for (int i = NewtonModelEditor::ID_RECENT_FILES; i < NewtonModelEditor::ID_MAX_RECENT_FILES; i ++) {
-				new FXMenuCommand(m_recentFilesMenu, FXString::null, NULL, mainFrame, i);
-			}
-		}
-		
-
-		// add import export plugins file sub menu
-		{
-			new FXMenuSeparator(m_fileMenu);
-			m_importPlugins = new FXMenuPane(this);
-			new FXMenuCascade(m_fileMenu, "Import plugins...", NULL, m_importPlugins);
-			for (int i = NewtonModelEditor::ID_IMPORT_PLUGINS; i < NewtonModelEditor::ID_MAX_IMPORT_PLUGINS; i ++) {
-				new FXMenuCommand(m_importPlugins, FXString::null, NULL, mainFrame, i);
-			}
-
-			m_exportPlugins = new FXMenuPane(this);
-			new FXMenuCascade(m_fileMenu, "Export plugins...", NULL, m_exportPlugins);
-			for (int i = NewtonModelEditor::ID_EXPORT_PLUGINS; i < NewtonModelEditor::ID_MAX_EXPORT_PLUGINS; i ++) {
-				new FXMenuCommand(m_exportPlugins, FXString::null, NULL, mainFrame, i);
-			}
-		}
-
-		// quick editor
-		{
-			new FXMenuSeparator(m_fileMenu);
-			new FXMenuCommand(m_fileMenu, "Quit", NULL, getApp(), FXApp::ID_QUIT);
-		}
 	}
 
 	// edit menu
@@ -142,12 +89,6 @@ EditorMainMenu::EditorMainMenu(NewtonModelEditor* const parent)
 		
 	}
 
-	// add help menu
-	{
-		m_helpMenu = new FXMenuPane(this);
-		new FXMenuTitle(this, "Help", NULL, m_helpMenu);
-		new FXMenuCommand(m_helpMenu, "About", NULL, mainFrame, NewtonModelEditor::ID_ABOUT);
-	}
 */
 
 	
@@ -157,7 +98,7 @@ EditorMainMenu::~EditorMainMenu(void)
 {
 /*
 	delete m_helpMenu;
-	delete m_fileMenu;
+	delete menu;
 	delete m_editMenu;
 	delete m_meshMenu;
 	delete m_modelMenu;
@@ -254,3 +195,89 @@ dPluginRecord* EditorMainMenu::GetPlugin (FXMenuPane* const paneMenu, int id)
 	return (dPluginRecord*)item->getUserData();
 }
 */
+
+
+void EditorMainMenu::CreateHelpMenu()
+{
+	wxMenu* const menu = new wxMenu;
+	menu->Append(wxID_HELP, wxT("About"));
+	m_helpMenu = menu;
+}
+
+void EditorMainMenu::CreateFileMenu()
+{
+	wxMenu* const menu = new wxMenu;
+
+	// make the Mac Happy
+	menu->Append(wxID_ABOUT, wxT("About"));
+
+	menu->AppendSeparator();
+	menu->Append(wxID_PREFERENCES, wxT("Preferences"));
+
+
+	// new scene
+//	new FXMenuCommand(menu, "New", mainFrame->FindIcon("fileNew.gif"), mainFrame, NewtonModelEditor::ID_NEW);
+	menu->AppendSeparator();
+	menu->Append (wxID_NEW, wxT("New"), wxT("clean scene"));
+
+
+/*
+	// load save scene
+	{
+		//			new FXMenuSeparator(menu);
+		//			new FXMenuCommand(menu, "Load scene", mainFrame->FindIcon("fileOpen.gif"), mainFrame, NewtonModelEditor::ID_LOAD_SCENE);
+		//			new FXMenuCommand(menu, "Save scene ", mainFrame->FindIcon("fileSave.gif"), mainFrame, NewtonModelEditor::ID_SAVE_SCENE);
+		//			new FXMenuCommand(menu, "Save scene as ...", mainFrame->FindIcon("fileSaveAs.gif"), mainFrame, NewtonModelEditor::ID_SAVE_SCENE_AS);
+
+		new FXMenuSeparator(menu);
+		new FXMenuCommand(menu, "Load asset", mainFrame->FindIcon("fileOpen.gif"), mainFrame, NewtonModelEditor::ID_LOAD_ASSET);
+		new FXMenuCommand(menu, "Save asset", mainFrame->FindIcon("fileSave.gif"), mainFrame, NewtonModelEditor::ID_SAVE_ASSET);
+		new FXMenuCommand(menu, "Save asset as ...", mainFrame->FindIcon("fileSaveAs.gif"), mainFrame, NewtonModelEditor::ID_SAVE_ASSET_AS);
+	}
+
+
+	// load save assets
+	{
+		//			new FXMenuSeparator(menu);
+		//			new FXMenuCommand(menu, "Load asset", NULL, mainFrame, NewtonModelEditor::ID_LOAD_ASSET);
+		//			new FXMenuCommand(menu, "Save asset", NULL, mainFrame, NewtonModelEditor::ID_SAVE_ASSET);
+		//			new FXMenuCommand(menu, "Save asset as ...", NULL, mainFrame, NewtonModelEditor::ID_SAVE_ASSET_AS);
+	}
+
+
+	// add Recent file sub menu
+	{
+		new FXMenuSeparator(menu);
+		m_recentFilesMenu = new FXMenuPane(this);
+		new FXMenuCascade(menu, "Recent Files...", NULL, m_recentFilesMenu);
+		for (int i = NewtonModelEditor::ID_RECENT_FILES; i < NewtonModelEditor::ID_MAX_RECENT_FILES; i ++) {
+			new FXMenuCommand(m_recentFilesMenu, FXString::null, NULL, mainFrame, i);
+		}
+	}
+
+
+	// add import export plugins file sub menu
+	{
+		new FXMenuSeparator(menu);
+		m_importPlugins = new FXMenuPane(this);
+		new FXMenuCascade(menu, "Import plugins...", NULL, m_importPlugins);
+		for (int i = NewtonModelEditor::ID_IMPORT_PLUGINS; i < NewtonModelEditor::ID_MAX_IMPORT_PLUGINS; i ++) {
+			new FXMenuCommand(m_importPlugins, FXString::null, NULL, mainFrame, i);
+		}
+
+		m_exportPlugins = new FXMenuPane(this);
+		new FXMenuCascade(menu, "Export plugins...", NULL, m_exportPlugins);
+		for (int i = NewtonModelEditor::ID_EXPORT_PLUGINS; i < NewtonModelEditor::ID_MAX_EXPORT_PLUGINS; i ++) {
+			new FXMenuCommand(m_exportPlugins, FXString::null, NULL, mainFrame, i);
+		}
+	}
+
+*/
+
+	//quick editor
+	menu->AppendSeparator();
+	//new FXMenuCommand(menu, "Quit", NULL, getApp(), FXApp::ID_QUIT);
+	menu->Append(wxID_EXIT, wxT("E&xit\tAlt-X"), wxT("Quit SDK editor") );
+
+	m_fileMenu = menu;
+}
