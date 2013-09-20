@@ -237,13 +237,16 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	friend class EditorRenderViewport;
 	friend class EditorNavigationToolBar;
 */
+	
+	int GetViewMode() const;
 
 	protected:	
 	DECLARE_EVENT_TABLE()
-
+	
 	void OnExit(wxCommandEvent& event);
 	void OnNew(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);
+	void OnChangeView(wxCommandEvent& event);
 
 
 	void LoadResources ();

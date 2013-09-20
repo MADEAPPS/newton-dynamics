@@ -14,23 +14,16 @@
 #include "NewtonModelEditor.h"
 
 EditorMainMenu::EditorMainMenu(NewtonModelEditor* const parent)
-//EditorMainMenu::EditorMainMenu(FXComposite* const parent, FXToolBarShell* const dragShell, NewtonModelEditor* const mainFrame)
-//	:FXMenuBar(parent, dragShell, LAYOUT_DOCK_SAME|LAYOUT_SIDE_TOP|LAYOUT_FILL_X|FRAME_RAISED)
-//	,m_mainFrame(mainFrame)
 	:wxMenuBar()
 	,m_fileMenu(NULL)
 	,m_helpMenu(NULL)
 {
-//	new FXToolBarGrip(this, this, FXMenuBar::ID_TOOLBARGRIP,TOOLBARGRIP_DOUBLE);
-
-
 	CreateFileMenu();
 	CreateHelpMenu();
 
 	// add main menus to menu bar
 	Append (m_fileMenu, wxT("&File"));
 	Append (m_helpMenu, wxT("&Help"));
-
 
 /*
 	}

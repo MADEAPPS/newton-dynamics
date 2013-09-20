@@ -16,16 +16,6 @@
 //class EditorCanvas;
 class NewtonModelEditor;
 
-/*
-class GLVisual: public FXGLVisual
-{
-	public:
-	GLVisual (FXApp* const app)
-		:FXGLVisual (app, VISUAL_DOUBLEBUFFER)
-	{
-	}
-};
-*/
 
 class EditorRenderViewport: public wxGLCanvas, public dPluginCamera
 {

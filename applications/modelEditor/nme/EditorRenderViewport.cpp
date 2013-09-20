@@ -21,11 +21,10 @@ int EditorRenderViewport::m_attributes[] = {WX_GL_DOUBLEBUFFER, WX_GL_RGBA, WX_G
 
 
 BEGIN_EVENT_TABLE (EditorRenderViewport, wxGLCanvas)
-
-	EVT_SIZE(EditorRenderViewport::OnSize)
-	EVT_PAINT(EditorRenderViewport::OnPaint)
-	EVT_IDLE(EditorRenderViewport::OnIdle)
-	EVT_ERASE_BACKGROUND (EditorRenderViewport::OnEraseBackground)
+	EVT_SIZE (OnSize)
+	EVT_PAINT(OnPaint)
+	EVT_IDLE(OnIdle)
+	EVT_ERASE_BACKGROUND (OnEraseBackground)
 END_EVENT_TABLE()
 
 /*
@@ -453,7 +452,7 @@ void EditorRenderViewport::BeginRender ()
 	m_render->BeginRender();
 
 	// set the camera matrix for this view port		
-	SetCameraMatrix(m_perpective);
+	SetCameraMatrix(dViewPortModes (m_mainFrame->GetViewMode()));
 
 	// draw construction grid 
 	DrawConstructionGrid(m_render);

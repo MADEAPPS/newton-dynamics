@@ -88,12 +88,16 @@ FXIMPLEMENT(NewtonModelEditor,FXMainWindow,MessageMap,ARRAYNUMBER(MessageMap))
 
 BEGIN_EVENT_TABLE (NewtonModelEditor, wxFrame)
 
-	EVT_MENU(wxID_EXIT, NewtonModelEditor::OnExit)
-	EVT_MENU(wxID_ABOUT, NewtonModelEditor::OnAbout)
-	EVT_MENU(wxID_HELP, NewtonModelEditor::OnAbout)
-	EVT_MENU(wxID_PREFERENCES, NewtonModelEditor::OnAbout)
+	EVT_MENU(wxID_EXIT, OnExit)
+	EVT_MENU(wxID_ABOUT, OnAbout)
+	EVT_MENU(wxID_HELP, OnAbout)
+	EVT_MENU(wxID_PREFERENCES, OnAbout)
 
-	EVT_MENU(wxID_NEW, NewtonModelEditor::OnNew)
+	EVT_MENU(wxID_NEW, OnNew)
+
+
+	EVT_CHOICE(ID_VIEW_MODES, OnChangeView)  
+
 
 END_EVENT_TABLE()
 
@@ -904,6 +908,12 @@ void NewtonModelEditor::OnNew (wxCommandEvent& event)
 }
 
 
+void NewtonModelEditor::OnChangeView(wxCommandEvent& event)
+{
+	wxPaintEvent paint;
+	GetEventHandler()->ProcessEvent (paint);
+}
+
 void NewtonModelEditor::LoadIcon (const char* const iconName)
 {
 	if (!m_icons.Find (dCRC64 (iconName))) {
@@ -1057,4 +1067,10 @@ void NewtonModelEditor::CreateRenderViewPort()
 {
 	m_renderViewport = new EditorRenderViewport (this);
 	m_mgr.AddPane (m_renderViewport, wxAuiPaneInfo().Name(wxT("render window")).CenterPane().PaneBorder(false));
+}
+
+int NewtonModelEditor::GetViewMode() const
+{
+	int index = m_viewMode->GetCurrentSelection();
+	return m_viewModelMap[index];
 }
