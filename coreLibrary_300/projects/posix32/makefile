@@ -45,7 +45,7 @@ DG_SRCS = \
 	$(DG_PATH)dgRef.cpp \
 	$(DG_PATH)dgSmallDeterminant.cpp \
 	$(DG_PATH)dgSPDMatrix.cpp \
-	$(DG_PATH)dgSphere.cpp \
+	$(DG_PATH)dgObb.cpp \
 	$(DG_PATH)dgThread.cpp \
 	$(DG_PATH)dgThreadHive.cpp \
 	$(DG_PATH)dgTree.cpp \
