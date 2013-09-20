@@ -7904,7 +7904,7 @@ void NewtonMeshClip (const NewtonMesh* const mesh, const NewtonMesh* const clipp
 NewtonMesh* NewtonMeshSimplify (const NewtonMesh* const mesh, int maxVertexCount, NewtonReportProgress progressReportCallback)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	return (NewtonMesh*) ((dgMeshEffect*) mesh)->CreateSimplification (dgInt32 (maxVertexCount), (dgReportProgress) progressReportCallback);
+	return (NewtonMesh*) ((dgMeshEffect*) mesh)->CreateSimplification (maxVertexCount, (dgReportProgress) progressReportCallback);
 }
 
 NewtonMesh* NewtonMeshApproximateConvexDecomposition (const NewtonMesh* const mesh, dFloat maxConcavity, dFloat backFaceDistanceFactor, int maxCount, int maxVertexPerHull, NewtonReportProgress progressReportCallback)

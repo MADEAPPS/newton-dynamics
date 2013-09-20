@@ -102,81 +102,9 @@ void EditorRenderViewport::create()
 
 
 
-void EditorRenderViewport::BeginRender(dViewPortModes mode)
-{
-	makeCurrent();
-
-	// start rendering scene
-	m_render->BeginRender();
-
-	// set the camera matrix for this view port		
-	SetCameraMatrix(mode);
-
-	// draw construction grid 
-	DrawConstructionGrid(m_render);
-
-	// draw the gizmo
-	DrawGizmo(m_render, m_font);
-
-	//m_render->SetColor(dVector(1.0f, 1.0f, 1.0f, 1.0f));
-	//m_render->Print (m_font, 10, 10, "this is a test");
-}
 
 
 
-void EditorRenderViewport::EndRender()
-{
-	m_render->EndRender();
-	swapBuffers();
-	makeNonCurrent();
-}
-
-
-
-void EditorRenderViewport::SetCameraMatrix(dViewPortModes mode)
-{
-	switch (mode) 
-	{
-		case m_perpective:
-			SetPerspectiveMatrix(m_render, getWidth(), getHeight());
-			SetGridMatrix (dPitchMatrix(90.0f * 3.141592f /180.0f));
-			break;
-
-		case m_top:
-			SetOrtographicMatrix(m_render, getWidth(), getHeight(), dPitchMatrix(90.0f * 3.141592f /180.0f) * dRollMatrix(90.0f * 3.141592f /180.0f));
-			SetGridMatrix (dPitchMatrix(90.0f * 3.141592f /180.0f));
-			break;
-
-		case m_bottom:
-			SetOrtographicMatrix(m_render, getWidth(), getHeight(), dPitchMatrix(-90.0f * 3.141592f /180.0f) * dRollMatrix(90.0f * 3.141592f /180.0f));
-			SetGridMatrix (dPitchMatrix(-90.0f * 3.141592f /180.0f));
-			break;
-		
-		case m_front:
-			SetOrtographicMatrix(m_render, getWidth(), getHeight(), dYawMatrix(90.0f * 3.141592f /180.0f));
-			SetGridMatrix (dYawMatrix(90.0f * 3.141592f /180.0f));
-			break;
-
-		case m_back:
-			SetOrtographicMatrix(m_render, getWidth(), getHeight(), dYawMatrix(-90.0f * 3.141592f /180.0f));
-			SetGridMatrix (dYawMatrix(-90.0f * 3.141592f /180.0f));
-			break;
-
-
-		case m_left:
-			SetOrtographicMatrix(m_render, getWidth(), getHeight(), GetIdentityMatrix());
-			SetGridMatrix (GetIdentityMatrix());
-			break;
-
-		case m_right:
-			SetOrtographicMatrix(m_render, getWidth(), getHeight(), dYawMatrix(3.141592f));
-			SetGridMatrix (dYawMatrix(3.141592f));
-			break;
-
-		default:
-			_ASSERTE (0);
-	}
-}
 
 
 void EditorRenderViewport::UpdateScene (dViewPortModes mode)
@@ -388,22 +316,94 @@ EditorRenderViewport::EditorRenderViewport (NewtonModelEditor* const mainFrame)
 	:wxGLCanvas (mainFrame, wxID_ANY, wxDefaultPosition, wxSize (300, 300), wxSUNKEN_BORDER|wxFULL_REPAINT_ON_RESIZE, _("GLRenderCanvas"), m_attributes)
 	,dPluginCamera()
 	,m_mainFrame(mainFrame)
-//	,m_font(0)
+	,m_render(mainFrame->GetRender())
+	,m_init(false)
+	,m_font(0)
 //	,m_canvas(canvas)
-//	,m_render(mainFrame->GetRender())
 //	,m_mainFrame(mainFrame)
 //	,m_leftMouseKeyState(false)
 {
-//	m_render->AddRef();
+	m_render->AddRef();
+
 }
 
 
 EditorRenderViewport::~EditorRenderViewport(void)
 {
 	// delete GUI elements
-//	DestroyConstructionGrid(m_render);
-//	m_render->Release();
+	DestroyConstructionGrid(m_render);
+	m_render->Release();
 }
+
+void EditorRenderViewport::Init()
+{
+	m_init = true;
+	BuildConstructionGrid(m_render, 20, 1.0f);
+}
+
+
+int EditorRenderViewport::GetWidth() const 
+{ 
+	int width;
+	int height;
+	GetSize (&width, &height);
+	return width; 
+}
+
+int EditorRenderViewport::GetHeight() const 
+{ 
+	int width;
+	int height;
+	GetSize (&width, &height);
+	return height; 
+}
+
+
+void EditorRenderViewport::SetCameraMatrix(dViewPortModes mode)
+{
+	switch (mode) 
+	{
+		case m_perpective:
+			SetPerspectiveMatrix(m_render, GetWidth(), GetHeight());
+			SetGridMatrix (dPitchMatrix(90.0f * 3.141592f /180.0f));
+			break;
+
+		case m_top:
+			SetOrtographicMatrix(m_render, GetWidth(), GetHeight(), dPitchMatrix(90.0f * 3.141592f /180.0f) * dRollMatrix(90.0f * 3.141592f /180.0f));
+			SetGridMatrix (dPitchMatrix(90.0f * 3.141592f /180.0f));
+			break;
+
+		case m_bottom:
+			SetOrtographicMatrix(m_render, GetWidth(), GetHeight(), dPitchMatrix(-90.0f * 3.141592f /180.0f) * dRollMatrix(90.0f * 3.141592f /180.0f));
+			SetGridMatrix (dPitchMatrix(-90.0f * 3.141592f /180.0f));
+			break;
+
+		case m_front:
+			SetOrtographicMatrix(m_render, GetWidth(), GetHeight(), dYawMatrix(90.0f * 3.141592f /180.0f));
+			SetGridMatrix (dYawMatrix(90.0f * 3.141592f /180.0f));
+			break;
+
+		case m_back:
+			SetOrtographicMatrix(m_render, GetWidth(), GetHeight(), dYawMatrix(-90.0f * 3.141592f /180.0f));
+			SetGridMatrix (dYawMatrix(-90.0f * 3.141592f /180.0f));
+			break;
+
+
+		case m_left:
+			SetOrtographicMatrix(m_render, GetWidth(), GetHeight(), GetIdentityMatrix());
+			SetGridMatrix (GetIdentityMatrix());
+			break;
+
+		case m_right:
+			SetOrtographicMatrix(m_render, GetWidth(), GetHeight(), dYawMatrix(3.141592f));
+			SetGridMatrix (dYawMatrix(3.141592f));
+			break;
+
+		default:
+			_ASSERTE (0);
+	}
+}
+
 
 
 void EditorRenderViewport::OnSize(wxSizeEvent& event)
@@ -420,14 +420,63 @@ void EditorRenderViewport::OnEraseBackground(wxEraseEvent& WXUNUSED(event))
 
 void EditorRenderViewport::OnPaint (wxPaintEvent& WXUNUSED(event))
 {
-//	wxPaintDC dc(this);
-//	RenderFrame ();
+	wxPaintDC dc(this);
+	RenderFrame ();
 }
 
 
 void EditorRenderViewport::OnIdle(wxIdleEvent& event)
 {
-//	wxClientDC dc(this);
-//	RenderFrame ();
+	wxClientDC dc(this);
+	RenderFrame ();
 //	event.RequestMore(); // render continuously, not only once on idle
 }
+
+
+void EditorRenderViewport::RenderFrame ()
+{
+	SetCurrent();
+	if (GetContext()) {
+		if (!m_init) {
+			Init();
+		}
+		BeginRender ();
+		EndRender();
+	}
+}
+
+
+
+void EditorRenderViewport::BeginRender ()
+{
+	// start rendering scene
+	m_render->BeginRender();
+
+	// set the camera matrix for this view port		
+	SetCameraMatrix(m_perpective);
+
+	// draw construction grid 
+	DrawConstructionGrid(m_render);
+
+	// draw the gizmo
+	DrawGizmo(m_render, m_font);
+
+//m_render->SetColor(dVector(1.0f, 1.0f, 1.0f, 1.0f));
+//m_render->Print (m_font, 10, 10, "this is a test");
+}
+
+
+
+void EditorRenderViewport::EndRender()
+{
+	m_render->EndRender();
+
+	// draw everything and swap the display buffer
+	glFlush();
+
+	// Swap
+	SwapBuffers();
+}
+
+
+

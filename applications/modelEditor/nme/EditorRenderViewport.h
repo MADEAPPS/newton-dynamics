@@ -30,7 +30,7 @@ class GLVisual: public FXGLVisual
 class EditorRenderViewport: public wxGLCanvas, public dPluginCamera
 {
 	public:
-/*
+
 	enum dViewPortModes
 	{
 		m_perpective,
@@ -41,11 +41,13 @@ class EditorRenderViewport: public wxGLCanvas, public dPluginCamera
 		m_top, 
 		m_bottom
 	};
-*/
 
-//	EditorRenderViewport(FXComposite* const parent, NewtonModelEditor* const mainFrame, EditorCanvas* const canvas, EditorRenderViewport* const shareContext);
 	EditorRenderViewport (NewtonModelEditor* const parent);
 	~EditorRenderViewport();
+
+	int GetWidth() const;
+	int GetHeight() const;
+
 
 /*
 	void create();
@@ -59,7 +61,7 @@ class EditorRenderViewport: public wxGLCanvas, public dPluginCamera
 	
 
 	protected:
-	void SetCameraMatrix(dViewPortModes mode);
+	
 
 	void BeginRender(dViewPortModes mode);
 	void EndRender();
@@ -69,16 +71,16 @@ class EditorRenderViewport: public wxGLCanvas, public dPluginCamera
 
 	void RenderSelectedNodeGizmo () const;
 
-	int m_font;
+	
 	EditorCanvas* m_canvas;
-	dSceneRender* m_render;
+	
 	
 	bool m_leftMouseKeyState;
 
 	FXDECLARE(EditorRenderViewport)
 */
 
-	private:
+	protected:
 	DECLARE_EVENT_TABLE()
 
 	void OnSize(wxSizeEvent &event);
@@ -86,7 +88,18 @@ class EditorRenderViewport: public wxGLCanvas, public dPluginCamera
 	void OnPaint(wxPaintEvent& event);
 	void OnEraseBackground(wxEraseEvent& event);
 
+	void Init();
+	void RenderFrame ();
+	void BeginRender();
+	void EndRender();
+	void SetCameraMatrix(dViewPortModes mode);
+
+
 	NewtonModelEditor* m_mainFrame;
+	dSceneRender* m_render;
+
+	int m_font;
+	bool m_init;
 	static int m_attributes[];
 };
 

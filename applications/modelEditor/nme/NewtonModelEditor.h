@@ -51,7 +51,6 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	{
 		ID_CANVAS = wxID_HIGHEST,
 
-
 		// object selection modes
 		ID_CURSOR_COMMAND_MODE,
 		ID_SELECT_COMMAND_MODE,
@@ -241,7 +240,7 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	friend class EditorNavigationToolBar;
 */
 
-	private:	
+	protected:	
 	DECLARE_EVENT_TABLE()
 
 	void OnExit(wxCommandEvent& event);
