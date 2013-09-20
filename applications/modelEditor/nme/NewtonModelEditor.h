@@ -69,6 +69,10 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 		ID_VIEW_MODES,
 		ID_VIEW_MODES_LAST = ID_VIEW_MODES + 16,
 
+		ID_SHADE_MODES,
+		ID_SHADE_MODES_LAST = ID_SHADE_MODES + 16,
+
+
 
 /*
 		ID_EDITOR_MODE,
@@ -239,6 +243,7 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 */
 	
 	int GetViewMode() const;
+	int GetShadeMode() const;
 
 	protected:	
 	DECLARE_EVENT_TABLE()
@@ -246,7 +251,8 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	void OnExit(wxCommandEvent& event);
 	void OnNew(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);
-	void OnChangeView(wxCommandEvent& event);
+	void OnChangeViewMode(wxCommandEvent& event);
+	void OnChangeShadeMode(wxCommandEvent& event);
 
 
 	void LoadResources ();
@@ -266,11 +272,12 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	wxAuiToolBar* m_navigationToolbar;
 	wxAuiToolBar* m_objectSelectionToolbar;
 	wxChoice* m_viewMode;
+	wxChoice* m_shadeMode;
 
 	EditorRenderViewport* m_renderViewport;
 
-
-	int m_viewModelMap[ID_VIEW_MODES_LAST - ID_VIEW_MODES];
+	int m_viewModeMap[ID_VIEW_MODES_LAST - ID_VIEW_MODES];
+	int m_shapeModeMap[ID_SHADE_MODES_LAST - ID_SHADE_MODES];
 
 	wxString m_lastFilePath;
 	wxString m_currentFileName;

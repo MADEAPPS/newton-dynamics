@@ -96,7 +96,8 @@ BEGIN_EVENT_TABLE (NewtonModelEditor, wxFrame)
 	EVT_MENU(wxID_NEW, OnNew)
 
 
-	EVT_CHOICE(ID_VIEW_MODES, OnChangeView)  
+	EVT_CHOICE(ID_VIEW_MODES, OnChangeViewMode)  
+	EVT_CHOICE(ID_SHADE_MODES, OnChangeShadeMode)  
 
 
 END_EVENT_TABLE()
@@ -800,7 +801,8 @@ NewtonModelEditor::NewtonModelEditor(const wxString& title, const wxPoint& pos, 
 	,m_navigationToolbar(NULL)
 	,m_objectSelectionToolbar(NULL)
 	,m_renderViewport(NULL)
-	,m_viewMode()
+	,m_viewMode(NULL)
+	,m_shadeMode(NULL)
 //	,m_explorer(NULL)
 //	,m_commandPanel(NULL)
 //	,m_sharedVisual(NULL)
@@ -908,11 +910,18 @@ void NewtonModelEditor::OnNew (wxCommandEvent& event)
 }
 
 
-void NewtonModelEditor::OnChangeView(wxCommandEvent& event)
+void NewtonModelEditor::OnChangeViewMode(wxCommandEvent& event)
 {
 	wxPaintEvent paint;
 	GetEventHandler()->ProcessEvent (paint);
 }
+
+void NewtonModelEditor::OnChangeShadeMode(wxCommandEvent& event)
+{
+	wxPaintEvent paint;
+	GetEventHandler()->ProcessEvent (paint);
+}
+
 
 void NewtonModelEditor::LoadIcon (const char* const iconName)
 {
@@ -1027,35 +1036,43 @@ void NewtonModelEditor::CreateNavigationToolBar()
 	wxAuiToolBar* const toolbar = new wxAuiToolBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_OVERFLOW);
 	toolbar->SetToolBitmapSize (wxSize(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE));
 
-	toolbar->AddTool (ID_VIEWPORT_PANNING, wxT("pan veiwport"), *m_icons.Find(dCRC64("camera_move.gif"))->GetInfo());
+	toolbar->AddTool (ID_VIEWPORT_PANNING, wxT("pan veiwport"), *m_icons.Find(dCRC64("maximize.gif"))->GetInfo());
 	toolbar->AddTool (ID_VIEWPORT_MOVE, wxT("Translate Camera"), *m_icons.Find(dCRC64("camera_move.gif"))->GetInfo());
 	toolbar->AddTool (ID_VIEWPORT_ROTATE, wxT("Rotate Camera"), *m_icons.Find(dCRC64("camera_turn.gif"))->GetInfo());
 	toolbar->AddTool (ID_VIEWPORT_ZOOM, wxT("Rotate Camera"), *m_icons.Find(dCRC64("camera_zoom.gif"))->GetInfo());
 
 	m_viewMode = new wxChoice(toolbar, ID_VIEW_MODES);
 	m_viewMode->AppendString(wxT("top"));
-	m_viewModelMap[0] = EditorRenderViewport::m_top;
+	m_viewModeMap[0] = EditorRenderViewport::m_top;
 
 	m_viewMode->AppendString(wxT("front"));
-	m_viewModelMap[1] = EditorRenderViewport::m_front;
+	m_viewModeMap[1] = EditorRenderViewport::m_front;
 
 	m_viewMode->AppendString(wxT("left"));
-	m_viewModelMap[2] = EditorRenderViewport::m_left;
+	m_viewModeMap[2] = EditorRenderViewport::m_left;
 
 	m_viewMode->AppendString(wxT("perspective"));
-	m_viewModelMap[3] = EditorRenderViewport::m_perpective;
+	m_viewModeMap[3] = EditorRenderViewport::m_perpective;
 
 	m_viewMode->AppendString(wxT("right"));
-	m_viewModelMap[4] = EditorRenderViewport::m_right;
+	m_viewModeMap[4] = EditorRenderViewport::m_right;
 
 	m_viewMode->AppendString(wxT("bottom"));
-	m_viewModelMap[5] = EditorRenderViewport::m_bottom;
+	m_viewModeMap[5] = EditorRenderViewport::m_bottom;
 
 	m_viewMode->AppendString(wxT("back"));
-	m_viewModelMap[6] = EditorRenderViewport::m_back;
+	m_viewModeMap[6] = EditorRenderViewport::m_back;
 
 	m_viewMode->SetSelection (3);
 	toolbar->AddControl(m_viewMode);
+
+	m_shadeMode = new wxChoice(toolbar, ID_SHADE_MODES);
+	m_shadeMode->AppendString(wxT("xxxxxx"));
+	m_shapeModeMap[0] = EditorRenderViewport::m_top;
+
+	m_shadeMode->SetSelection (0);
+	toolbar->AddControl(m_shadeMode);
+
 
 	toolbar->Realize();
 	m_mgr.AddPane (toolbar, wxAuiPaneInfo(). Name(wxT("Navigation options")).Caption(wxT("Navigation options")).ToolbarPane().Top());
@@ -1072,5 +1089,12 @@ void NewtonModelEditor::CreateRenderViewPort()
 int NewtonModelEditor::GetViewMode() const
 {
 	int index = m_viewMode->GetCurrentSelection();
-	return m_viewModelMap[index];
+	return m_viewModeMap[index];
+}
+
+
+int NewtonModelEditor::GetShadeMode() const
+{
+	int index = m_shadeMode->GetCurrentSelection();
+	return m_shapeModeMap[index];
 }
