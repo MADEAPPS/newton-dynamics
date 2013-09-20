@@ -65,15 +65,15 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 		ID_VIEWPORT_ROTATE,
 		ID_VIEWPORT_ZOOM,
 
-		// file menu
-//		ID_NEW,
+		//view modes
+		ID_VIEW_MODES,
+		ID_VIEW_MODES_LAST = ID_VIEW_MODES + 16,
+
+
 /*
 		ID_EDITOR_MODE,
 		ID_SET_VIEW_MODE,
 		ID_SET_RENDER_MODE,
-
-		// file menu
-		ID_NEW,
 
 		// scene menu
 		ID_LOAD_SCENE,
@@ -103,8 +103,6 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 
 		// help menu
 		ID_ABOUT,
-
-
 
 		// editor state
 		ID_RECENT_FILES,
@@ -264,8 +262,12 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	wxAuiToolBar* m_fileToolbar;
 	wxAuiToolBar* m_navigationToolbar;
 	wxAuiToolBar* m_objectSelectionToolbar;
+	wxChoice* m_viewMode;
 
 	EditorRenderViewport* m_renderViewport;
+
+
+	int m_viewModelMap[ID_VIEW_MODES_LAST - ID_VIEW_MODES];
 
 	wxString m_lastFilePath;
 	wxString m_currentFileName;

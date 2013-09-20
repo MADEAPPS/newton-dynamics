@@ -796,6 +796,7 @@ NewtonModelEditor::NewtonModelEditor(const wxString& title, const wxPoint& pos, 
 	,m_navigationToolbar(NULL)
 	,m_objectSelectionToolbar(NULL)
 	,m_renderViewport(NULL)
+	,m_viewMode()
 //	,m_explorer(NULL)
 //	,m_commandPanel(NULL)
 //	,m_sharedVisual(NULL)
@@ -1020,6 +1021,31 @@ void NewtonModelEditor::CreateNavigationToolBar()
 	toolbar->AddTool (ID_VIEWPORT_MOVE, wxT("Translate Camera"), *m_icons.Find(dCRC64("camera_move.gif"))->GetInfo());
 	toolbar->AddTool (ID_VIEWPORT_ROTATE, wxT("Rotate Camera"), *m_icons.Find(dCRC64("camera_turn.gif"))->GetInfo());
 	toolbar->AddTool (ID_VIEWPORT_ZOOM, wxT("Rotate Camera"), *m_icons.Find(dCRC64("camera_zoom.gif"))->GetInfo());
+
+	m_viewMode = new wxChoice(toolbar, ID_VIEW_MODES);
+	m_viewMode->AppendString(wxT("top"));
+	m_viewModelMap[0] = EditorRenderViewport::m_top;
+
+	m_viewMode->AppendString(wxT("front"));
+	m_viewModelMap[1] = EditorRenderViewport::m_front;
+
+	m_viewMode->AppendString(wxT("left"));
+	m_viewModelMap[2] = EditorRenderViewport::m_left;
+
+	m_viewMode->AppendString(wxT("perspective"));
+	m_viewModelMap[3] = EditorRenderViewport::m_perpective;
+
+	m_viewMode->AppendString(wxT("right"));
+	m_viewModelMap[4] = EditorRenderViewport::m_right;
+
+	m_viewMode->AppendString(wxT("bottom"));
+	m_viewModelMap[5] = EditorRenderViewport::m_bottom;
+
+	m_viewMode->AppendString(wxT("back"));
+	m_viewModelMap[6] = EditorRenderViewport::m_back;
+
+	m_viewMode->SetSelection (3);
+	toolbar->AddControl(m_viewMode);
 
 	toolbar->Realize();
 	m_mgr.AddPane (toolbar, wxAuiPaneInfo(). Name(wxT("Navigation options")).Caption(wxT("Navigation options")).ToolbarPane().Top());
