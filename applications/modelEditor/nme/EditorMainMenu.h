@@ -24,7 +24,7 @@ class EditorMainMenu: public wxMenuBar
 
 //	EditorMainMenu(FXComposite* const parent, FXToolBarShell* const dragShell, NewtonModelEditor* const mainFrame);
 
-	EditorMainMenu(NewtonModelEditor* const parent);
+	EditorMainMenu (NewtonModelEditor* const parent);
 	~EditorMainMenu(void);
 
 	private:

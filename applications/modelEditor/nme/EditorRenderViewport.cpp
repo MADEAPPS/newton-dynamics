@@ -10,15 +10,25 @@
 */
 
 #include "toolbox_stdafx.h"
-#include "EditorCanvas.h"
-//#include "OpenGlUtil.h"
-#include "EditorExplorer.h"
+//#include "EditorCanvas.h"
+//#include "EditorExplorer.h"
 #include "NewtonModelEditor.h"
-#include "EditorAssetExplorer.h"
+//#include "EditorAssetExplorer.h"
 #include "EditorRenderViewport.h"
 
 
+int EditorRenderViewport::m_attributes[] = {WX_GL_DOUBLEBUFFER, WX_GL_RGBA, WX_GL_DEPTH_SIZE, 32, 0};
 
+
+BEGIN_EVENT_TABLE (EditorRenderViewport, wxGLCanvas)
+
+	EVT_SIZE(EditorRenderViewport::OnSize)
+	EVT_PAINT(EditorRenderViewport::OnPaint)
+	EVT_IDLE(EditorRenderViewport::OnIdle)
+	EVT_ERASE_BACKGROUND (EditorRenderViewport::OnEraseBackground)
+END_EVENT_TABLE()
+
+/*
 FXDEFMAP(EditorRenderViewport) MessageMap[]=
 {
 	FXMAPFUNC(SEL_LEFTBUTTONPRESS,		0,	EditorRenderViewport::onLeftMouseKeyDown),
@@ -37,25 +47,6 @@ EditorRenderViewport::EditorRenderViewport()
 {
 }
 
-EditorRenderViewport::EditorRenderViewport(FXComposite* const parent, NewtonModelEditor* const mainFrame, EditorCanvas* const canvas, EditorRenderViewport* const shareContext)
-	:FXGLCanvas (parent, mainFrame->m_sharedVisual, shareContext, mainFrame, NewtonModelEditor::ID_CANVAS, LAYOUT_FILL | LAYOUT_TOP | LAYOUT_LEFT)
-	,dPluginCamera()
-	,m_font(0)
-	,m_canvas(canvas)
-	,m_render(mainFrame->GetRender())
-	,m_mainFrame(mainFrame)
-	,m_leftMouseKeyState(false)
-{
-	m_render->AddRef();
-}
-
-
-EditorRenderViewport::~EditorRenderViewport(void)
-{
-	// delete GUI elements
-	DestroyConstructionGrid(m_render);
-	m_render->Release();
-}
 
 
 void EditorRenderViewport::create()
@@ -388,4 +379,55 @@ void EditorRenderViewport::RenderSelectedNodeGizmo () const
 		//DrawNodeSelectionGizmo(m_render, axis);
 		DrawNodeSelectAndMoveGizmo(m_render, axis);
 	}
+}
+
+*/
+
+
+EditorRenderViewport::EditorRenderViewport (NewtonModelEditor* const mainFrame)
+	:wxGLCanvas (mainFrame, wxID_ANY, wxDefaultPosition, wxSize (300, 300), wxSUNKEN_BORDER|wxFULL_REPAINT_ON_RESIZE, _("GLRenderCanvas"), m_attributes)
+	,dPluginCamera()
+	,m_mainFrame(mainFrame)
+//	,m_font(0)
+//	,m_canvas(canvas)
+//	,m_render(mainFrame->GetRender())
+//	,m_mainFrame(mainFrame)
+//	,m_leftMouseKeyState(false)
+{
+//	m_render->AddRef();
+}
+
+
+EditorRenderViewport::~EditorRenderViewport(void)
+{
+	// delete GUI elements
+//	DestroyConstructionGrid(m_render);
+//	m_render->Release();
+}
+
+
+void EditorRenderViewport::OnSize(wxSizeEvent& event)
+{
+	// this is also necessary to update the context on some platforms
+	wxGLCanvas::OnSize(event);
+}
+
+
+void EditorRenderViewport::OnEraseBackground(wxEraseEvent& WXUNUSED(event))
+{
+	// Do nothing, to avoid flashing on MSW
+}
+
+void EditorRenderViewport::OnPaint (wxPaintEvent& WXUNUSED(event))
+{
+//	wxPaintDC dc(this);
+//	RenderFrame ();
+}
+
+
+void EditorRenderViewport::OnIdle(wxIdleEvent& event)
+{
+//	wxClientDC dc(this);
+//	RenderFrame ();
+//	event.RequestMore(); // render continuously, not only once on idle
 }

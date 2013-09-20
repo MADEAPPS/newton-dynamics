@@ -12,9 +12,11 @@
 #ifndef __EDITOR_RENDER_VIEWPORT_H__
 #define __EDITOR_RENDER_VIEWPORT_H__
 
-class EditorCanvas;
+
+//class EditorCanvas;
 class NewtonModelEditor;
 
+/*
 class GLVisual: public FXGLVisual
 {
 	public:
@@ -23,13 +25,12 @@ class GLVisual: public FXGLVisual
 	{
 	}
 };
+*/
 
-
-class EditorRenderViewport: public FXGLCanvas, public dPluginCamera
+class EditorRenderViewport: public wxGLCanvas, public dPluginCamera
 {
 	public:
-
-
+/*
 	enum dViewPortModes
 	{
 		m_perpective,
@@ -40,10 +41,13 @@ class EditorRenderViewport: public FXGLCanvas, public dPluginCamera
 		m_top, 
 		m_bottom
 	};
+*/
 
-	EditorRenderViewport();
-	EditorRenderViewport(FXComposite* const parent, NewtonModelEditor* const mainFrame, EditorCanvas* const canvas, EditorRenderViewport* const shareContext);
-	~EditorRenderViewport(void);
+//	EditorRenderViewport(FXComposite* const parent, NewtonModelEditor* const mainFrame, EditorCanvas* const canvas, EditorRenderViewport* const shareContext);
+	EditorRenderViewport (NewtonModelEditor* const parent);
+	~EditorRenderViewport();
+
+/*
 	void create();
 
 	void UpdateScene (dViewPortModes mode);
@@ -68,10 +72,24 @@ class EditorRenderViewport: public FXGLCanvas, public dPluginCamera
 	int m_font;
 	EditorCanvas* m_canvas;
 	dSceneRender* m_render;
-	NewtonModelEditor* m_mainFrame;
+	
 	bool m_leftMouseKeyState;
 
 	FXDECLARE(EditorRenderViewport)
+*/
+
+	private:
+	DECLARE_EVENT_TABLE()
+
+	void OnSize(wxSizeEvent &event);
+	void OnIdle(wxIdleEvent &event);
+	void OnPaint(wxPaintEvent& event);
+	void OnEraseBackground(wxEraseEvent& event);
+
+	NewtonModelEditor* m_mainFrame;
+	static int m_attributes[];
 };
+
+
 
 #endif

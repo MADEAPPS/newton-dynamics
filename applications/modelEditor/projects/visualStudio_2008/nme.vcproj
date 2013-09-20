@@ -463,6 +463,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\nme\EditorRenderViewport.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\nme\EditorRenderViewport.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\nme\NewtonModelEditor.cpp"
 				>
 			</File>

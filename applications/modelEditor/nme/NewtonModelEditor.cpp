@@ -16,6 +16,7 @@
 #include <toolbox_stdafx.h>
 #include "EditorMainMenu.h"
 #include "NewtonModelEditor.h"
+#include "EditorRenderViewport.h"
 #include "NewtonModelEditorApp.h"
 
 
@@ -503,9 +504,9 @@ long NewtonModelEditor::onHideNavigationToolbar(FXObject* sender, FXSelector id,
 	FXuval val = FXuval (eventPtr);
 
 	if (val) {
-		((EditorFileToolBar*)m_navigationToolbar)->Hide();
+		((EditorFileToolBar*)m_objectSelectionToolbar)->Hide();
 	} else {
-		((EditorFileToolBar*)m_navigationToolbar)->Unhide();
+		((EditorFileToolBar*)m_objectSelectionToolbar)->Unhide();
 	}
 	return 1;
 }
@@ -793,6 +794,8 @@ NewtonModelEditor::NewtonModelEditor(const wxString& title, const wxPoint& pos, 
 	,m_statusBar(NULL)
 	,m_fileToolbar(NULL)
 	,m_navigationToolbar(NULL)
+	,m_objectSelectionToolbar(NULL)
+	,m_renderViewport(NULL)
 //	,m_explorer(NULL)
 //	,m_commandPanel(NULL)
 //	,m_sharedVisual(NULL)
@@ -817,9 +820,13 @@ NewtonModelEditor::NewtonModelEditor(const wxString& title, const wxPoint& pos, 
 	// create status bar for showing results 
 	m_statusBar = CreateStatusBar();
 
-	// create main Toolbars
-	CreateMainToolBar();
+	// create main Tool bars
+	CreateFileToolBar();
+	CreateObjectSelectionToolBar();
 	CreateNavigationToolBar();
+	CreateRenderViewPort();
+	
+
 
 /*
 	m_showNavigationMode = new FXTextField(m_statusbar,10, NULL,0,FRAME_SUNKEN|JUSTIFY_NORMAL|LAYOUT_RIGHT|LAYOUT_CENTER_Y|TEXTFIELD_READONLY,0,0,0,0,2,2,1,1);
@@ -965,7 +972,7 @@ void NewtonModelEditor::DeleteResources ()
 }
 
 
-void NewtonModelEditor::CreateMainToolBar()
+void NewtonModelEditor::CreateFileToolBar()
 {
 	wxAuiToolBar* const toolbar = new wxAuiToolBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_OVERFLOW);
 	toolbar->SetToolBitmapSize (wxSize(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE));
@@ -983,7 +990,7 @@ void NewtonModelEditor::CreateMainToolBar()
 	m_fileToolbar = toolbar;
 }
 
-void NewtonModelEditor::CreateNavigationToolBar()
+void NewtonModelEditor::CreateObjectSelectionToolBar()
 {
 	wxAuiToolBar* const toolbar = new wxAuiToolBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_OVERFLOW);
 	toolbar->SetToolBitmapSize (wxSize(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE));
@@ -996,9 +1003,32 @@ void NewtonModelEditor::CreateNavigationToolBar()
 	toolbar->AddTool (ID_SELECT_COMMAND_MODE, wxT("Object selection mode"), *m_icons.Find(dCRC64("object_cursor.gif"))->GetInfo());
 	toolbar->AddTool (ID_TRANSLATE_COMMAND_MODE, wxT("Object translation mode"), *m_icons.Find(dCRC64("object_move.gif"))->GetInfo());
 	toolbar->AddTool (ID_ROTATE_COMMAND_MODE, wxT("Object rotation mode"), *m_icons.Find(dCRC64("object_turn.gif"))->GetInfo());
-	toolbar->AddTool (ID_SCALE_COMMAND_MODE, wxT("Object rotation mode"), *m_icons.Find(dCRC64("object_scale.gif"))->GetInfo());
+	toolbar->AddTool (ID_SCALE_COMMAND_MODE, wxT("Object scale mode"), *m_icons.Find(dCRC64("object_scale.gif"))->GetInfo());
+
+	toolbar->Realize();
+	m_mgr.AddPane (toolbar, wxAuiPaneInfo(). Name(wxT("Object selection")).Caption(wxT("Object options")).ToolbarPane().Top());
+	m_objectSelectionToolbar = toolbar;
+}
+
+
+void NewtonModelEditor::CreateNavigationToolBar()
+{
+	wxAuiToolBar* const toolbar = new wxAuiToolBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_OVERFLOW);
+	toolbar->SetToolBitmapSize (wxSize(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE));
+
+	toolbar->AddTool (ID_VIEWPORT_PANNING, wxT("pan veiwport"), *m_icons.Find(dCRC64("camera_move.gif"))->GetInfo());
+	toolbar->AddTool (ID_VIEWPORT_MOVE, wxT("Translate Camera"), *m_icons.Find(dCRC64("camera_move.gif"))->GetInfo());
+	toolbar->AddTool (ID_VIEWPORT_ROTATE, wxT("Rotate Camera"), *m_icons.Find(dCRC64("camera_turn.gif"))->GetInfo());
+	toolbar->AddTool (ID_VIEWPORT_ZOOM, wxT("Rotate Camera"), *m_icons.Find(dCRC64("camera_zoom.gif"))->GetInfo());
 
 	toolbar->Realize();
 	m_mgr.AddPane (toolbar, wxAuiPaneInfo(). Name(wxT("Navigation options")).Caption(wxT("Navigation options")).ToolbarPane().Top());
 	m_navigationToolbar = toolbar;
+}
+
+
+void NewtonModelEditor::CreateRenderViewPort()
+{
+	m_renderViewport = new EditorRenderViewport (this);
+	m_mgr.AddPane (m_renderViewport, wxAuiPaneInfo().Name(wxT("render window")).CenterPane().PaneBorder(false));
 }

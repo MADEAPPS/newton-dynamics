@@ -17,6 +17,7 @@
 //class dPluginScene;
 //class EditorCanvas;
 class EditorMainMenu;
+class EditorRenderViewport;
 //class EditorExplorer;
 //class EditorCommandPanel;
 
@@ -51,13 +52,19 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 		ID_CANVAS = wxID_HIGHEST,
 
 
-		// editor node modes
+		// object selection modes
 		ID_CURSOR_COMMAND_MODE,
 		ID_SELECT_COMMAND_MODE,
 		ID_TRANSLATE_COMMAND_MODE,
 		ID_ROTATE_COMMAND_MODE,
 		ID_SCALE_COMMAND_MODE,
 
+		// editor navigation modes
+		//ID_VIEWPORT_MAXIMIZE,
+		ID_VIEWPORT_PANNING,
+		ID_VIEWPORT_MOVE,
+		ID_VIEWPORT_ROTATE,
+		ID_VIEWPORT_ZOOM,
 
 		// file menu
 //		ID_NEW,
@@ -244,8 +251,12 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 
 	void LoadResources ();
 	void DeleteResources ();
-	void CreateMainToolBar();
+	void CreateFileToolBar();
+	void CreateRenderViewPort();
 	void CreateNavigationToolBar();
+	void CreateObjectSelectionToolBar();
+	
+
 	void LoadIcon (const char* const iconName);
 	
 	wxAuiManager m_mgr;
@@ -253,6 +264,9 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	wxStatusBar* m_statusBar;
 	wxAuiToolBar* m_fileToolbar;
 	wxAuiToolBar* m_navigationToolbar;
+	wxAuiToolBar* m_objectSelectionToolbar;
+
+	EditorRenderViewport* m_renderViewport;
 
 	wxString m_lastFilePath;
 	wxString m_currentFileName;
