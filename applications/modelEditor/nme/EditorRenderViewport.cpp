@@ -132,25 +132,6 @@ void EditorRenderViewport::SelectAssetNode (const FXEvent* const event)
 
 
 
-void EditorRenderViewport::UpdateAsset (dViewPortModes mode)
-{
-	BeginRender(mode);
-
-	dPluginScene* const asset = m_mainFrame->GetAsset();		
-
-	if (asset) {
-		//asset->RenderWireframe(m_render);
-		//asset->RenderFlatShaded(m_render);
-		asset->RenderSolidWireframe(m_render);
-
-		asset->RenderWireframeSelection (m_render, m_mainFrame);
-
-		// draw the gizmo for the selections
-		RenderSelectedNodeGizmo();
-
-	}
-	EndRender();
-}
 
 void EditorRenderViewport::RenderSelectedNodeGizmo () const
 {
@@ -314,7 +295,49 @@ void EditorRenderViewport::RenderFrame ()
 			Init();
 		}
 		BeginRender ();
+		UpdateScene();
 		EndRender();
+	}
+}
+
+
+void EditorRenderViewport::UpdateScene ()
+{
+	dPluginScene* const scene = m_mainFrame->GetScene();		
+	if (scene) {
+
+		//asset->RenderWireframe(m_render);
+		//asset->RenderFlatShaded(m_render);
+
+		dShadingModes shadeMode (dShadingModes(m_mainFrame->GetShadeMode()));
+		switch (shadeMode)
+		{
+			case m_solid:
+			{
+				scene->RenderSolidWireframe(m_render);
+				//scene->RenderWireframeSelection (m_render, m_mainFrame);
+				// draw the gizmo for the selections
+				//		RenderSelectedNodeGizmo();
+				break;
+			}
+
+			case m_wireframe:
+			{
+				scene->RenderWireframe(m_render);
+				//scene->RenderWireframeSelection (m_render, m_mainFrame);
+				// draw the gizmo for the selections
+				//		RenderSelectedNodeGizmo();
+				break;
+			}
+
+			case m_textured:
+			{
+				scene->RenderFlatShaded(m_render);
+				break;
+			}
+			default:
+				dAssert(0);
+		}
 	}
 }
 
@@ -432,7 +455,7 @@ void EditorRenderViewport::OnMouse (wxMouseEvent &event)
 				dFloat yaw = GetYawAngle();
 				dFloat roll = GetRollAngle();
 
-				dFloat sensitivity = 0.5f * 3.141692f / 180.0f;
+				dFloat sensitivity = 1.5f * 3.141692f / 180.0f;
 
 				int stepX = mouseX - m_lastMouseX;
 				dFloat deltaYaw = stepX ? (stepX < 0 ? sensitivity : -sensitivity) : 0;

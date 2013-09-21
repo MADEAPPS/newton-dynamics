@@ -54,6 +54,8 @@ class EditorMainMenu: public wxMenuBar
 
 	wxMenu* m_fileMenu;
 	wxMenu* m_helpMenu;
+
+	wxMenu* m_recentFileSubMenu;
 };
 
 

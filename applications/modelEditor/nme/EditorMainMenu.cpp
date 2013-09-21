@@ -17,6 +17,7 @@ EditorMainMenu::EditorMainMenu(NewtonModelEditor* const parent)
 	:wxMenuBar()
 	,m_fileMenu(NULL)
 	,m_helpMenu(NULL)
+	,m_recentFileSubMenu(NULL)
 {
 	CreateFileMenu();
 	CreateHelpMenu();
@@ -215,6 +216,7 @@ void EditorMainMenu::CreateFileMenu()
 	menu->Append (wxID_OPEN, wxT("Open scene"), wxT("open an existing scene"));
 	menu->Append (wxID_SAVE, wxT("Save scene"), wxT("Save current scene"));
 	menu->Append (wxID_SAVEAS, wxT("Save scene as"), wxT("Save current scene to different file"));
+
 
 /*
 		new FXMenuSeparator(menu);

@@ -130,8 +130,8 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	~NewtonModelEditor();
 
 /*
-	void Initilialize();
-	void RefrehViewports();
+	
+	
 
 	// GUI interface functions
 	void create();
@@ -181,14 +181,14 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	static void PhysicsFree (void *ptr, int sizeInBytes);
 
 	private:
-	void CreateScene();
-	void DestroyScene();
+	
+	
 	
 	void SaveConfig();
 	void LoadConfig();
 	void LoadPlugins(const char* const path);
 
-	void LoadScene (const FXString& fileName);
+	
 
 	
 
@@ -254,9 +254,10 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	void OnAbout(wxCommandEvent& event);
 	void OnChangeViewMode(wxCommandEvent& event);
 	void OnChangeShadeMode(wxCommandEvent& event);
-
-
 	void OnChangeNavigationMode(wxCommandEvent& event);
+
+	void OnOpenScene(wxCommandEvent& event);
+	
 
 
 	void LoadResources ();
@@ -266,8 +267,14 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	void CreateNavigationToolBar();
 	void CreateObjectSelectionToolBar();
 	
+	void Initilialize();
+	void CreateScene();
+	void DestroyScene();
+	void RefrehViewports();
 
+	void LoadScene (const char* const fileName);
 	void LoadIcon (const char* const iconName);
+	
 	
 	wxAuiManager m_mgr;
 	wxMenuBar* m_mainMenu;

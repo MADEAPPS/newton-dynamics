@@ -50,17 +50,11 @@ class EditorRenderViewport: public wxGLCanvas, public dPluginCamera
 	void create();
 
 	void UpdateScene (dViewPortModes mode);
-	void UpdateAsset (dViewPortModes mode);
+	
 
 	
 
 	protected:
-	
-
-	void BeginRender(dViewPortModes mode);
-	void EndRender();
-
-
 	void SelectAssetNode (const FXEvent* const event);
 
 	void RenderSelectedNodeGizmo () const;
@@ -94,6 +88,7 @@ class EditorRenderViewport: public wxGLCanvas, public dPluginCamera
 	void RenderFrame ();
 	void BeginRender();
 	void EndRender();
+	void UpdateScene ();
 	void SetCameraMatrix(dViewPortModes mode);
 
 	void LeftMouseKeyDown ();

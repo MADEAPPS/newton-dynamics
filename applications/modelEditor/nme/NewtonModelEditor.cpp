@@ -93,6 +93,8 @@ BEGIN_EVENT_TABLE (NewtonModelEditor, wxFrame)
 	EVT_MENU(wxID_HELP, OnAbout)
 	EVT_MENU(wxID_PREFERENCES, OnAbout)
 
+	EVT_MENU(wxID_OPEN, OnOpenScene)
+
 	EVT_MENU(wxID_NEW, OnNew)
 	EVT_MENU (ID_VIEWPORT_PANNING, OnChangeNavigationMode)
 	EVT_MENU (ID_VIEWPORT_MOVE, OnChangeNavigationMode)
@@ -186,18 +188,6 @@ bool NewtonModelEditor::IsShiftDown() const
 }
 
 
-void NewtonModelEditor::Initilialize()
-{
-	// load configuration form last run
-	LoadConfig();
-
-	// load all plugins
-	LoadPlugins("stdPlugins");
-	LoadPlugins("plugins");
-
-	// create the scene
-	CreateScene();
-}
 
 
 
@@ -249,33 +239,6 @@ void NewtonModelEditor::LoadPlugins(const char* const path)
 
 
 
-void NewtonModelEditor::CreateScene()
-{
-	NewtonWorld* const world = NewtonCreate();
-
-	// link the work with this user data
-	NewtonWorldSetUserData(world, this);
-
-	m_scene = new dPluginScene (world);
-
-//	_ASSERTE (0);
-//	m_explorer->Populate (m_scene);
-}
-
-void NewtonModelEditor::DestroyScene()
-{
-	Clear();
-	NewtonWorld* const world = m_scene->GetNewtonWorld();
-
-	m_scene->Release();
-	RemoveAllAsset();
-//	m_explorer->ReleaseAllAssets ();
-	m_explorer->RefreshAllViewer();
-
-	NewtonWorldSetUserData(world, NULL);
-	NewtonDestroy(world);
-}
-
 
 
 void NewtonModelEditor::SaveConfig()
@@ -312,10 +275,6 @@ FXIcon* NewtonModelEditor::FindIcon (const char* const iconName) const
 }
 
 
-void NewtonModelEditor::RefrehViewports()
-{
-	getApp()->addChore(this, NewtonModelEditor::ID_CANVAS);
-}
 
 void NewtonModelEditor::ShowNavigationMode(NavigationMode mode) const
 { 
@@ -552,56 +511,8 @@ EditorCanvas* NewtonModelEditor::GetCanvas(FXObject* const sender) const
 
 
 
-long NewtonModelEditor::onLoadScene(FXObject* sender, FXSelector id, void* eventPtr)
-{
-	const FXchar patterns[]="Newton Dynamics Files (*.ngd)";
 
-	FXFileDialog open(this,"Load Newton Dynamics scene");
-	open.setPatternList(patterns);
-	open.setDirectory (m_lastFilePath);
-	if(open.execute()){
-		onNew (sender, id, eventPtr);
-		m_lastFilePath = open.getDirectory();
-		m_filePathFile = m_lastFilePath.text();
-		m_mainMenu->AddRecentFile(open.getFilename());
-		LoadScene (open.getFilename());
-	}
-	return 1;
-}
 
-long NewtonModelEditor::onLoadRecentScene(FXObject* sender, FXSelector id, void* eventPtr)
-{
-	FXString fileName (m_mainMenu->GetRecentFile(FXSELID(id)-ID_RECENT_FILES));
-	if (!fileName.empty()) {
-		onNew (sender, id, eventPtr);
-		m_mainMenu->AddRecentFile(fileName);
-		LoadScene (fileName);
-	}
-	return 1;
-}
-
-void NewtonModelEditor::LoadScene (const FXString& fileName)
-{
-	m_currentFileName = fileName;
-
-/*
-		m_scene->Cleanup();
-
-		// load the scene from and alchemedia file format
-		m_scene->makeCurrent();
-		m_scene->LoadScene (open.getFilename().text());
-		m_scene->makeNonCurrent();
-
-		// place camera into position
-		dMatrix camMatrix (GetIdentityMatrix());
-		//		camMatrix.m_posit = dVector (-40.0f, 10.0f, 0.0f, 0.0f);
-		camMatrix = dYawMatrix(-0.0f * 3.1416f / 180.0f);
-		camMatrix.m_posit = dVector (-5.0f, 1.0f, -0.0f, 0.0f);
-		m_scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
-
-		RestoreSettings ();
-*/
-}
 
 
 
@@ -709,26 +620,6 @@ long NewtonModelEditor::onModel (FXObject* sender, FXSelector id, void* eventPtr
 
 
 
-long NewtonModelEditor::onLoadAsset(FXObject* sender, FXSelector id, void* eventPtr)
-{
-	dPluginScene* const scene = GetScene();
-	NewtonWorld* const world = scene->GetNewtonWorld();
-	FXFileDialog open(this, "load NGD mesh asset");
-	open.setPatternList("*.ngd");
-	open.setDirectory (GetFilePath());
-	dPluginScene* asset = NULL;
-	if(open.execute()){
-		asset = new dPluginScene(world);
-		asset->Deserialize(open.getFilename().text());
-		m_explorer->AddAsset(asset, NULL);
-
-		ClearSelection();
-		asset->Release();
-		RefrehViewports();
-	}
-
-	return 1;
-}
 
 
 long NewtonModelEditor::onMesh (FXObject* sender, FXSelector id, void* eventPtr)
@@ -775,22 +666,6 @@ long NewtonModelEditor::onPaint(FXObject* sender, FXSelector id, void* eventPtr)
 
 
 
-NewtonModelEditor::~NewtonModelEditor()
-{
-//	DestroyScene();
-//	SaveConfig();
-//	delete m_commandPanelToolbarShell;
-//	delete m_explorerToolbarShell;
-//	delete m_mainMenuDragShell;
-//	delete m_fileToolbarShell;
-//	delete m_navigationToolbarShell;
-//	delete m_sharedVisual;
-
-	// Clean up the frame manager
-	m_mgr.UnInit();
-
-	DeleteResources();
-}
 
 
 
@@ -891,85 +766,72 @@ NewtonModelEditor::NewtonModelEditor(const wxString& title, const wxPoint& pos, 
 
 	// "commit" all changes made to wxAuiManager
 	m_mgr.Update();
+
+
+	// create the scene
+	Initilialize();
 }
 
 
-void NewtonModelEditor::OnExit(wxCommandEvent& event)
+
+NewtonModelEditor::~NewtonModelEditor()
 {
-	Close ();
+	DestroyScene();
+	//	SaveConfig();
+	//	delete m_commandPanelToolbarShell;
+	//	delete m_explorerToolbarShell;
+	//	delete m_mainMenuDragShell;
+	//	delete m_fileToolbarShell;
+	//	delete m_navigationToolbarShell;
+	//	delete m_sharedVisual;
+
+	// Clean up the frame manager
+	m_mgr.UnInit();
+
+	DeleteResources();
 }
 
-
-void NewtonModelEditor::OnAbout(wxCommandEvent& event)
+void NewtonModelEditor::Initilialize()
 {
-	wxString msg;
-	msg.Printf(wxT ("%s %d.%02d"), APPLICATION_NAME, APPLICATION_VERSION / 100, APPLICATION_VERSION % 100);
-	wxMessageBox(msg, wxT ("Newton Dynanics"), wxOK | wxICON_INFORMATION, this);
+	// load configuration form last run
+//	LoadConfig();
+
+	// load all plugins
+//	LoadPlugins("stdPlugins");
+//	LoadPlugins("plugins");
+
+	// create the scene
+	CreateScene();
 }
 
-
-void NewtonModelEditor::OnNew (wxCommandEvent& event)
+void NewtonModelEditor::CreateScene()
 {
-	dAssert (0);
-//	Clear();
-//	DestroyScene();
-//	CreateScene();
+	NewtonWorld* const world = NewtonCreate();
+
+	// link the work with this user data
+	NewtonWorldSetUserData(world, this);
+
+	m_scene = new dPluginScene (world);
+
+//	_ASSERTE (0);
+//	m_explorer->Populate (m_scene);
 }
 
 
-void NewtonModelEditor::OnChangeViewMode(wxCommandEvent& event)
+
+void NewtonModelEditor::DestroyScene()
 {
-	wxPaintEvent paint;
-	GetEventHandler()->ProcessEvent (paint);
+	Clear();
+	NewtonWorld* const world = m_scene->GetNewtonWorld();
+
+	m_scene->Release();
+	RemoveAllAsset();
+//	m_explorer->RefreshAllViewer();
+
+	NewtonWorldSetUserData(world, NULL);
+	NewtonDestroy(world);
 }
 
-void NewtonModelEditor::OnChangeShadeMode(wxCommandEvent& event)
-{
-	wxPaintEvent paint;
-	GetEventHandler()->ProcessEvent (paint);
-}
-
-
-void NewtonModelEditor::OnChangeNavigationMode(wxCommandEvent& event)
-{
-
-	switch (event.GetId())
-	{
-		case ID_VIEWPORT_PANNING:
-		{
-			m_navigationStack = 0;
-			m_navigationMode[0] = NewtonModelEditor::m_panViewport;
-			break;
-		}
-
-		case ID_VIEWPORT_MOVE:
-		{
-			m_navigationStack = 0;
-			m_navigationMode[0] = NewtonModelEditor::m_moveViewport;
-			break;
-		}
-
-		case ID_VIEWPORT_ROTATE:
-		{
-			m_navigationStack = 0;
-			m_navigationMode[0] = NewtonModelEditor::m_rotateViewport;
-			break;
-		}
-
-		case ID_VIEWPORT_ZOOM:
-		{
-			m_navigationStack = 0;
-			m_navigationMode[0] = NewtonModelEditor::m_zoomViewport;
-			break;
-		}
-
-
-		default:
-			dAssert(0);
-	}
-
-	//m_mainFrame->ShowNavigationMode(m_navigationMode[0]);
-}
 
 
 void NewtonModelEditor::LoadIcon (const char* const iconName)
@@ -1147,6 +1009,40 @@ int NewtonModelEditor::GetViewMode() const
 }
 
 
+void NewtonModelEditor::LoadScene (const char* const fileName)
+{
+//	m_currentFileName = fileName;
+
+	m_scene->Cleanup();
+
+		// load the scene from and alchemedia file format
+//	m_scene->makeCurrent();
+	m_scene->Deserialize (fileName);
+//	m_scene->makeNonCurrent();
+	ClearSelection();
+
+/*
+	// place camera into position
+	dMatrix camMatrix (GetIdentityMatrix());
+	camMatrix = dYawMatrix(-0.0f * 3.1416f / 180.0f);
+	camMatrix.m_posit = dVector (-5.0f, 1.0f, -0.0f, 0.0f);
+	m_scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
+
+	RestoreSettings ();
+*/
+
+	RefrehViewports();
+}
+
+
+void NewtonModelEditor::RefrehViewports()
+{
+	wxPaintEvent paint;
+	GetEventHandler()->ProcessEvent (paint);
+}
+
+
+
 int NewtonModelEditor::GetShadeMode() const
 {
 	int index = m_shadeMode->GetCurrentSelection();
@@ -1157,3 +1053,116 @@ int NewtonModelEditor::GetNavigationMode() const
 {
 	return m_navigationMode[m_navigationStack];
 };
+
+
+
+
+void NewtonModelEditor::OnExit(wxCommandEvent& event)
+{
+	Close ();
+}
+
+
+void NewtonModelEditor::OnAbout(wxCommandEvent& event)
+{
+	wxString msg;
+	msg.Printf(wxT ("%s %d.%02d"), APPLICATION_NAME, APPLICATION_VERSION / 100, APPLICATION_VERSION % 100);
+	wxMessageBox(msg, wxT ("Newton Dynanics"), wxOK | wxICON_INFORMATION, this);
+}
+
+
+void NewtonModelEditor::OnNew (wxCommandEvent& event)
+{
+	Clear();
+	DestroyScene();
+	CreateScene();
+	RefrehViewports();
+}
+
+
+void NewtonModelEditor::OnChangeViewMode(wxCommandEvent& event)
+{
+	RefrehViewports();
+}
+
+void NewtonModelEditor::OnChangeShadeMode(wxCommandEvent& event)
+{
+	RefrehViewports();
+}
+
+
+void NewtonModelEditor::OnChangeNavigationMode(wxCommandEvent& event)
+{
+
+	switch (event.GetId())
+	{
+		case ID_VIEWPORT_PANNING:
+		{
+			m_navigationStack = 0;
+			m_navigationMode[0] = NewtonModelEditor::m_panViewport;
+			break;
+		}
+
+		case ID_VIEWPORT_MOVE:
+		{
+			m_navigationStack = 0;
+			m_navigationMode[0] = NewtonModelEditor::m_moveViewport;
+			break;
+		}
+
+		case ID_VIEWPORT_ROTATE:
+		{
+			m_navigationStack = 0;
+			m_navigationMode[0] = NewtonModelEditor::m_rotateViewport;
+			break;
+		}
+
+		case ID_VIEWPORT_ZOOM:
+		{
+			m_navigationStack = 0;
+			m_navigationMode[0] = NewtonModelEditor::m_zoomViewport;
+			break;
+		}
+
+
+		default:
+		{
+			dAssert(0);
+		}
+	}
+
+	RefrehViewports();
+	//m_mainFrame->ShowNavigationMode(m_navigationMode[0]);
+}
+
+/*
+void NewtonModelEditor::OnOpenScene(wxCommandEvent& event)
+{
+	const FXchar patterns[]="Newton Dynamics Files (*.ngd)";
+
+	FXFileDialog open(this,"Load Newton Dynamics scene");
+	open.setPatternList(patterns);
+	open.setDirectory (m_lastFilePath);
+	if(open.execute()){
+		onNew (sender, id, eventPtr);
+		m_lastFilePath = open.getDirectory();
+		m_filePathFile = m_lastFilePath.text();
+		m_mainMenu->AddRecentFile(open.getFilename());
+		LoadScene (open.getFilename());
+	}
+}
+*/
+
+void NewtonModelEditor::OnOpenScene(wxCommandEvent& event)
+{
+	wxFileDialog open (this, wxT("Load Newton Dynamics Scene"), wxT("../../../media"), wxT(""), wxT("*.ngd"));
+	if (open.ShowModal() == wxID_OK) {
+//		dPluginScene* const scene = GetScene();
+//		NewtonWorld* const world = scene->GetNewtonWorld();
+		OnNew (event);
+		m_lastFilePath = open.GetPath();
+//		m_filePathFile = m_lastFilePath.text();
+		LoadScene (m_lastFilePath.mb_str());
+	}
+}
+
