@@ -34,7 +34,7 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 		m_editAsset,
 		m_editScene
 	};
-
+*/
 	enum NavigationMode
 	{
 		m_selectNode,
@@ -46,7 +46,7 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 		m_zoomViewport,
 		m_rotateViewport,
 	};
-*/
+
 	enum 
 	{
 		ID_CANVAS = wxID_HIGHEST,
@@ -244,6 +244,7 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	
 	int GetViewMode() const;
 	int GetShadeMode() const;
+	int GetNavigationMode() const;
 
 	protected:	
 	DECLARE_EVENT_TABLE()
@@ -253,6 +254,9 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	void OnAbout(wxCommandEvent& event);
 	void OnChangeViewMode(wxCommandEvent& event);
 	void OnChangeShadeMode(wxCommandEvent& event);
+
+
+	void OnChangeNavigationMode(wxCommandEvent& event);
 
 
 	void LoadResources ();
@@ -278,6 +282,10 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 
 	int m_viewModeMap[ID_VIEW_MODES_LAST - ID_VIEW_MODES];
 	int m_shapeModeMap[ID_SHADE_MODES_LAST - ID_SHADE_MODES];
+
+	
+	NavigationMode m_navigationMode[16];
+	int m_navigationStack;
 
 	wxString m_lastFilePath;
 	wxString m_currentFileName;

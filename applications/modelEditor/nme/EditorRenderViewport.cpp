@@ -21,6 +21,10 @@ int EditorRenderViewport::m_attributes[] = {WX_GL_DOUBLEBUFFER, WX_GL_RGBA, WX_G
 
 
 BEGIN_EVENT_TABLE (EditorRenderViewport, wxGLCanvas)
+//	EVT_KEY_UP (OnKeyUp)	
+//	EVT_KEY_DOWN (OnKeyDown)
+	EVT_MOUSE_EVENTS (OnMouse)
+
 	EVT_SIZE (OnSize)
 	EVT_PAINT(OnPaint)
 	EVT_IDLE(OnIdle)
@@ -38,14 +42,6 @@ FXDEFMAP(EditorRenderViewport) MessageMap[]=
 
 };
 FXIMPLEMENT(EditorRenderViewport,FXGLCanvas,MessageMap,ARRAYNUMBER(MessageMap))
-
-
-
-
-EditorRenderViewport::EditorRenderViewport()
-{
-}
-
 
 
 void EditorRenderViewport::create()
@@ -99,13 +95,6 @@ void EditorRenderViewport::create()
 	makeNonCurrent();
 }
 
-
-
-
-
-
-
-
 void EditorRenderViewport::UpdateScene (dViewPortModes mode)
 {
 	BeginRender(mode);
@@ -119,123 +108,9 @@ void EditorRenderViewport::UpdateScene (dViewPortModes mode)
 
 
 
-long EditorRenderViewport::onMouseMove(FXObject* sender, FXSelector id, void* eventPtr)
-{
-	m_mainFrame->ShowNavigationMode(m_canvas->m_navigationMode[m_canvas->m_navigationStack]);
-
-	if (m_leftMouseKeyState) {
-		FXEvent* const event = (FXEvent*)eventPtr;
-
-		switch (m_canvas->m_navigationMode[m_canvas->m_navigationStack]) 
-		{
-			case NewtonModelEditor::m_panViewport:
-			{
-				dFloat x;
-				dFloat y;
-				GetPanning(x, y);
-				x += (event->win_x - event->last_x);
-				y -= (event->win_y - event->last_y);
-				SetPanning(x, y);
-				//DTRACE (("%d %d\n", event->win_x - event->last_x, event->win_y - event->last_y));
-				break;
-			}
-
-			case NewtonModelEditor::m_moveViewport:
-			{
-				dFloat sensitivity = 0.05f;
-				int step = event->win_y - event->last_y;
-				dFloat factor = step ? (step < 0 ? 1.0f + sensitivity : 1.0f - sensitivity) : 1.0f;
-				SetMatrix(GetYawAngle(), GetRollAngle(), GetDistance() * factor);
-				break;
-			}
-
-			
-			case NewtonModelEditor::m_rotateViewport:
-			{
-				dFloat yaw = GetYawAngle();
-				dFloat roll = GetRollAngle();
-
-				dFloat sensitivity = 0.5f * 3.141692f / 180.0f;
-
-				int stepX = event->win_x - event->last_x;
-				dFloat deltaYaw = stepX ? (stepX < 0 ? sensitivity : -sensitivity) : 0;
-				
-				int stepY = event->win_y - event->last_y;
-				dFloat deltaRoll = stepY ? (stepY < 0 ? sensitivity: -sensitivity) : 0;
-
-				SetMatrix(yaw + deltaYaw, roll + deltaRoll, GetDistance());
-				break;
-			}
-
-
-			case NewtonModelEditor::m_zoomViewport:
-			{
-				if (event->win_y - event->last_y) {
-					dFloat zoomVal = GetZoom();
-					dFloat zoomFactor = 1.0 / 64.0f;
-					zoomVal *= ((event->win_y - event->last_y) > 0) ? (1.0f + zoomFactor): (1.0f - zoomFactor);
-					SetZoom(zoomVal);
-				}
-				break;
-			}
-
-			case NewtonModelEditor::m_selectNode:
-			case NewtonModelEditor::m_translateNode:
-			case NewtonModelEditor::m_rotateNode:
-			case NewtonModelEditor::m_scaleNode:
-			{
-				if (m_mainFrame->IsControlDown() && (m_mainFrame->IsShiftDown() || m_mainFrame->IsAltDown())) {
-					SelectAssetNode (event);
-				}
-			}
-		}
-
-		m_mainFrame->RefrehViewports();
-	}
-	return 1;
-}
 
 
 
-long EditorRenderViewport::onLeftMouseKeyUp(FXObject* sender, FXSelector id, void* eventPtr)
-{
-	m_leftMouseKeyState = false;
-	return 1;
-}
-
-
-long EditorRenderViewport::onLeftMouseKeyDown(FXObject* sender, FXSelector id, void* eventPtr)
-{
-	m_leftMouseKeyState = true;
-
-
-	switch (m_canvas->m_navigationMode[m_canvas->m_navigationStack])  
-	{
-		case NewtonModelEditor::m_scaleNode:
-		case NewtonModelEditor::m_selectNode:
-		case NewtonModelEditor::m_rotateNode:
-		case NewtonModelEditor::m_translateNode:
-		{
-			const FXEvent* const event = (FXEvent*)eventPtr;
-			switch (m_mainFrame->m_editMode) 
-			{
-				case NewtonModelEditor::m_editAsset:
-				{
-					SelectAssetNode (event);
-					break;
-				}
-
-				case NewtonModelEditor::m_editScene:
-				{
-					_ASSERTE (0);
-					break;
-				}
-			}
-			break;
-		}
-	}
-	return 1;
-}
 	
 void EditorRenderViewport::SelectAssetNode (const FXEvent* const event)
 {
@@ -316,14 +191,13 @@ EditorRenderViewport::EditorRenderViewport (NewtonModelEditor* const mainFrame)
 	,dPluginCamera()
 	,m_mainFrame(mainFrame)
 	,m_render(mainFrame->GetRender())
-	,m_init(false)
 	,m_font(0)
-//	,m_canvas(canvas)
-//	,m_mainFrame(mainFrame)
-//	,m_leftMouseKeyState(false)
+	,m_init(false)
+	,m_leftMouseKeyState(false)
+	,m_lastMouseX(0)
+	,m_lastMouseY(0)
 {
 	m_render->AddRef();
-
 }
 
 
@@ -477,5 +351,130 @@ void EditorRenderViewport::EndRender()
 	SwapBuffers();
 }
 
+void EditorRenderViewport::LeftMouseKeyUp()
+{
+	m_leftMouseKeyState = false;
+}
+
+
+void EditorRenderViewport::LeftMouseKeyDown ()
+{
+	m_leftMouseKeyState = true;
+
+/*
+	switch (m_mainFrame->GetNavigationMode())  
+	{
+		case NewtonModelEditor::m_scaleNode:
+		case NewtonModelEditor::m_selectNode:
+		case NewtonModelEditor::m_rotateNode:
+		case NewtonModelEditor::m_translateNode:
+		{
+			const FXEvent* const event = (FXEvent*)eventPtr;
+			switch (m_mainFrame->m_editMode) 
+			{
+				case NewtonModelEditor::m_editAsset:
+				{
+					SelectAssetNode (event);
+					break;
+				}
+
+				case NewtonModelEditor::m_editScene:
+				{
+					_ASSERTE (0);
+					break;
+				}
+			}
+			break;
+		}
+	}
+*/
+}
+
+void EditorRenderViewport::OnMouse (wxMouseEvent &event)
+{
+	if (event.LeftIsDown()) {
+		LeftMouseKeyDown ();
+	} else {
+		LeftMouseKeyUp();
+	}
+
+	int mouseX = event.GetX();
+	int mouseY = event.GetY();
+
+//	m_mainFrame->ShowNavigationMode(m_canvas->m_navigationMode[m_canvas->m_navigationStack]);
+	if (m_leftMouseKeyState) {
+		NewtonModelEditor::NavigationMode navigationMode = NewtonModelEditor::NavigationMode (m_mainFrame->GetNavigationMode());
+		switch (navigationMode) 
+		{
+			case NewtonModelEditor::m_panViewport:
+			{
+				dFloat x;
+				dFloat y;
+				GetPanning(x, y);
+				x += (mouseX - m_lastMouseX);
+				y -= (mouseY - m_lastMouseY);
+				SetPanning(x, y);
+				break;
+			}
+
+			case NewtonModelEditor::m_moveViewport:
+			{
+				dFloat sensitivity = 0.05f;
+				int step = (mouseY - m_lastMouseY);
+				dFloat factor = step ? (step < 0 ? 1.0f + sensitivity : 1.0f - sensitivity) : 1.0f;
+				SetMatrix(GetYawAngle(), GetRollAngle(), GetDistance() * factor);
+				break;
+			}
+
+	
+			case NewtonModelEditor::m_rotateViewport:
+			{
+				dFloat yaw = GetYawAngle();
+				dFloat roll = GetRollAngle();
+
+				dFloat sensitivity = 0.5f * 3.141692f / 180.0f;
+
+				int stepX = mouseX - m_lastMouseX;
+				dFloat deltaYaw = stepX ? (stepX < 0 ? sensitivity : -sensitivity) : 0;
+
+				int stepY = mouseY - m_lastMouseY;
+				dFloat deltaRoll = stepY ? (stepY < 0 ? sensitivity: -sensitivity) : 0;
+
+				SetMatrix(yaw + deltaYaw, roll + deltaRoll, GetDistance());
+				break;
+			}
+
+
+			case NewtonModelEditor::m_zoomViewport:
+			{
+				if (mouseY - m_lastMouseY) {
+					dFloat zoomVal = GetZoom();
+					dFloat zoomFactor = 1.0 / 64.0f;
+					zoomVal *= ((mouseY - m_lastMouseY) > 0) ? (1.0f + zoomFactor): (1.0f - zoomFactor);
+					SetZoom(zoomVal);
+				}
+				break;
+			}
+/*
+			case NewtonModelEditor::m_selectNode:
+			case NewtonModelEditor::m_translateNode:
+			case NewtonModelEditor::m_rotateNode:
+			case NewtonModelEditor::m_scaleNode:
+			{
+				if (m_mainFrame->IsControlDown() && (m_mainFrame->IsShiftDown() || m_mainFrame->IsAltDown())) {
+					SelectAssetNode (event);
+				}
+			}
+*/
+			default:
+				dAssert(0);
+		}
+
+//		m_mainFrame->RefrehViewports();
+	}
+
+	m_lastMouseX = mouseX;
+	m_lastMouseY = mouseY;
+}
 
 

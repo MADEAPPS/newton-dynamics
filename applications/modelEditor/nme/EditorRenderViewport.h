@@ -21,6 +21,13 @@ class EditorRenderViewport: public wxGLCanvas, public dPluginCamera
 {
 	public:
 
+	enum dShadingModes
+	{
+		m_textured,
+		m_solid,
+		m_wireframe,
+	};
+
 	enum dViewPortModes
 	{
 		m_perpective,
@@ -45,9 +52,6 @@ class EditorRenderViewport: public wxGLCanvas, public dPluginCamera
 	void UpdateScene (dViewPortModes mode);
 	void UpdateAsset (dViewPortModes mode);
 
-	long onLeftMouseKeyDown(FXObject* sender, FXSelector id, void* eventPtr);
-	long onLeftMouseKeyUp(FXObject* sender, FXSelector id, void* eventPtr);
-	long onMouseMove(FXObject* sender, FXSelector id, void* eventPtr);
 	
 
 	protected:
@@ -73,6 +77,14 @@ class EditorRenderViewport: public wxGLCanvas, public dPluginCamera
 	protected:
 	DECLARE_EVENT_TABLE()
 
+
+//	long onLeftMouseKeyUp(FXObject* sender, FXSelector id, void* eventPtr);
+//	long onMouseMove(FXObject* sender, FXSelector id, void* eventPtr);
+
+//	void OnKeyUp(wxKeyEvent &event);
+//	void OnKeyDown(wxKeyEvent &event);
+	void OnMouse(wxMouseEvent &event);
+
 	void OnSize(wxSizeEvent &event);
 	void OnIdle(wxIdleEvent &event);
 	void OnPaint(wxPaintEvent& event);
@@ -84,12 +96,18 @@ class EditorRenderViewport: public wxGLCanvas, public dPluginCamera
 	void EndRender();
 	void SetCameraMatrix(dViewPortModes mode);
 
+	void LeftMouseKeyDown ();
+	void LeftMouseKeyUp ();
 
 	NewtonModelEditor* m_mainFrame;
 	dSceneRender* m_render;
 
 	int m_font;
 	bool m_init;
+
+	int m_lastMouseX;
+	int m_lastMouseY;
+	bool m_leftMouseKeyState;
 	static int m_attributes[];
 };
 

@@ -94,7 +94,10 @@ BEGIN_EVENT_TABLE (NewtonModelEditor, wxFrame)
 	EVT_MENU(wxID_PREFERENCES, OnAbout)
 
 	EVT_MENU(wxID_NEW, OnNew)
-
+	EVT_MENU (ID_VIEWPORT_PANNING, OnChangeNavigationMode)
+	EVT_MENU (ID_VIEWPORT_MOVE, OnChangeNavigationMode)
+	EVT_MENU (ID_VIEWPORT_ROTATE, OnChangeNavigationMode)
+	EVT_MENU (ID_VIEWPORT_ZOOM, OnChangeNavigationMode)
 
 	EVT_CHOICE(ID_VIEW_MODES, OnChangeViewMode)  
 	EVT_CHOICE(ID_SHADE_MODES, OnChangeShadeMode)  
@@ -803,6 +806,7 @@ NewtonModelEditor::NewtonModelEditor(const wxString& title, const wxPoint& pos, 
 	,m_renderViewport(NULL)
 	,m_viewMode(NULL)
 	,m_shadeMode(NULL)
+	,m_navigationStack(0)
 //	,m_explorer(NULL)
 //	,m_commandPanel(NULL)
 //	,m_sharedVisual(NULL)
@@ -814,6 +818,9 @@ NewtonModelEditor::NewtonModelEditor(const wxString& title, const wxPoint& pos, 
 {
 	// notify wxAUI which frame to use
 	m_mgr.SetManagedWindow(this);
+
+
+	m_navigationMode[0] = m_panViewport;
 
 //	dAssert (0);
 
@@ -923,6 +930,48 @@ void NewtonModelEditor::OnChangeShadeMode(wxCommandEvent& event)
 }
 
 
+void NewtonModelEditor::OnChangeNavigationMode(wxCommandEvent& event)
+{
+
+	switch (event.GetId())
+	{
+		case ID_VIEWPORT_PANNING:
+		{
+			m_navigationStack = 0;
+			m_navigationMode[0] = NewtonModelEditor::m_panViewport;
+			break;
+		}
+
+		case ID_VIEWPORT_MOVE:
+		{
+			m_navigationStack = 0;
+			m_navigationMode[0] = NewtonModelEditor::m_moveViewport;
+			break;
+		}
+
+		case ID_VIEWPORT_ROTATE:
+		{
+			m_navigationStack = 0;
+			m_navigationMode[0] = NewtonModelEditor::m_rotateViewport;
+			break;
+		}
+
+		case ID_VIEWPORT_ZOOM:
+		{
+			m_navigationStack = 0;
+			m_navigationMode[0] = NewtonModelEditor::m_zoomViewport;
+			break;
+		}
+
+
+		default:
+			dAssert(0);
+	}
+
+	//m_mainFrame->ShowNavigationMode(m_navigationMode[0]);
+}
+
+
 void NewtonModelEditor::LoadIcon (const char* const iconName)
 {
 	if (!m_icons.Find (dCRC64 (iconName))) {
@@ -1019,7 +1068,7 @@ void NewtonModelEditor::CreateObjectSelectionToolBar()
 	toolbar->AddTool (wxID_REDO, wxT("Redo previous action"), *m_icons.Find(dCRC64("redo.gif"))->GetInfo());
 
 	toolbar->AddSeparator();
-	toolbar->AddTool (ID_CURSOR_COMMAND_MODE, wxT("select object"), *m_icons.Find(dCRC64("cursor.gif"))->GetInfo());
+	toolbar->AddTool (ID_CURSOR_COMMAND_MODE, wxT("Select cursor"), *m_icons.Find(dCRC64("cursor.gif"))->GetInfo());
 	toolbar->AddTool (ID_SELECT_COMMAND_MODE, wxT("Object selection mode"), *m_icons.Find(dCRC64("object_cursor.gif"))->GetInfo());
 	toolbar->AddTool (ID_TRANSLATE_COMMAND_MODE, wxT("Object translation mode"), *m_icons.Find(dCRC64("object_move.gif"))->GetInfo());
 	toolbar->AddTool (ID_ROTATE_COMMAND_MODE, wxT("Object rotation mode"), *m_icons.Find(dCRC64("object_turn.gif"))->GetInfo());
@@ -1067,12 +1116,17 @@ void NewtonModelEditor::CreateNavigationToolBar()
 	toolbar->AddControl(m_viewMode);
 
 	m_shadeMode = new wxChoice(toolbar, ID_SHADE_MODES);
-	m_shadeMode->AppendString(wxT("xxxxxx"));
-	m_shapeModeMap[0] = EditorRenderViewport::m_top;
+	m_shadeMode->AppendString(wxT("textured"));
+	m_shapeModeMap[0] = EditorRenderViewport::m_textured;
 
-	m_shadeMode->SetSelection (0);
+	m_shadeMode->AppendString(wxT("solid"));
+	m_shapeModeMap[1] = EditorRenderViewport::m_solid;
+
+	m_shadeMode->AppendString(wxT("wireframe"));
+	m_shapeModeMap[2] = EditorRenderViewport::m_wireframe;
+
+	m_shadeMode->SetSelection (1);
 	toolbar->AddControl(m_shadeMode);
-
 
 	toolbar->Realize();
 	m_mgr.AddPane (toolbar, wxAuiPaneInfo(). Name(wxT("Navigation options")).Caption(wxT("Navigation options")).ToolbarPane().Top());
@@ -1098,3 +1152,8 @@ int NewtonModelEditor::GetShadeMode() const
 	int index = m_shadeMode->GetCurrentSelection();
 	return m_shapeModeMap[index];
 }
+
+int NewtonModelEditor::GetNavigationMode() const
+{
+	return m_navigationMode[m_navigationStack];
+};
