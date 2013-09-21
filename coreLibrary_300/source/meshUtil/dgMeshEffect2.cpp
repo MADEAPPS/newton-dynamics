@@ -2039,6 +2039,7 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 
 					voronoiPartition->MergeFaces(&convexMesh);
 					layer += dgFloat64 (1.0f);
+break;
 				}
 			}
 		}

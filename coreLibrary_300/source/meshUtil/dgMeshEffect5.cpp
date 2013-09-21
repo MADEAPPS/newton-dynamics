@@ -2953,6 +2953,10 @@ dgMeshEffect* dgMeshEffect::Intersection (const dgMatrix& matrix, const dgMeshEf
 
 bool dgMeshEffect::PlaneClip (const dgMeshEffect& convexMesh, const dgEdge* const convexFace)
 {
+static int xxx;
+xxx ++;
+if (xxx >= 3)
+return true;;
 
 	dgBigVector normal (convexMesh.FaceNormal(convexFace, &convexMesh.m_points[0].m_x, sizeof(dgBigVector)));
 	dgFloat64 mag2 = normal % normal;
@@ -3110,9 +3114,6 @@ bool dgMeshEffect::PlaneClip (const dgMeshEffect& convexMesh, const dgEdge* cons
 			DeleteEdge(edge);
 		}
 
-
-
-
 		for (dgInt32 i = 0; i < capCount; i ++) {
 			dgEdge* const edge = capEdges[i];
 			dgVertexAtribute attibute;
@@ -3148,6 +3149,12 @@ bool dgMeshEffect::PlaneClip (const dgMeshEffect& convexMesh, const dgEdge* cons
 			attibute.m_v0 = uv0_0.m_y * alpha0 + uv0_1.m_y * alpha1 + uv0_2.m_y * alpha2; 
 			attibute.m_u1 = uv1_0.m_x * alpha0 + uv1_1.m_x * alpha1 + uv1_2.m_x * alpha2; 
 			attibute.m_v1 = uv1_0.m_y * alpha0 + uv1_1.m_y * alpha1 + uv1_2.m_y * alpha2; 
+
+attibute.m_u0 = 0; 
+attibute.m_v0 = 0; 
+attibute.m_u1 = 0;
+attibute.m_v1 = 0;
+
 			AddAtribute (attibute);
 			edge->m_userData = m_atribCount - 1;
 		}
