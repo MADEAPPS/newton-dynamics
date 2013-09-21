@@ -2953,11 +2953,6 @@ dgMeshEffect* dgMeshEffect::Intersection (const dgMatrix& matrix, const dgMeshEf
 
 bool dgMeshEffect::PlaneClip (const dgMeshEffect& convexMesh, const dgEdge* const convexFace)
 {
-static int xxx;
-xxx ++;
-if (xxx >= 3)
-return true;;
-
 	dgBigVector normal (convexMesh.FaceNormal(convexFace, &convexMesh.m_points[0].m_x, sizeof(dgBigVector)));
 	dgFloat64 mag2 = normal % normal;
 	if (mag2 < dgFloat64 (1.0e-30)) {
@@ -3082,13 +3077,22 @@ return true;;
 								} while (ptr != devideEdge);
 							}
 							dgAssert(found);
-
-
 							capEdges[capCount] = devideEdge;
-							dgAssert (capEdges[capCount]);
 							capCount ++;
 							dgAssert (capCount < sizeof (capEdges)/ sizeof (capEdges[0]));
-
+						} else if (edge0->m_next == edge1) {
+							bool outsize = false;
+							dgEdge* ptr = edge1->m_next;
+							do {
+								if (test[ptr->m_incidentVertex] > dgFloat32 (0.0f)) {
+									outsize = true;
+								}
+								ptr = ptr->m_next;
+							} while (ptr != edge1);
+							
+							capEdges[capCount] = outsize ? edge0 : edge0->m_twin;
+							capCount ++;
+							dgAssert (capCount < sizeof (capEdges)/ sizeof (capEdges[0]));
 						}
 						break;
 					}
@@ -3149,11 +3153,6 @@ return true;;
 			attibute.m_v0 = uv0_0.m_y * alpha0 + uv0_1.m_y * alpha1 + uv0_2.m_y * alpha2; 
 			attibute.m_u1 = uv1_0.m_x * alpha0 + uv1_1.m_x * alpha1 + uv1_2.m_x * alpha2; 
 			attibute.m_v1 = uv1_0.m_y * alpha0 + uv1_1.m_y * alpha1 + uv1_2.m_y * alpha2; 
-
-attibute.m_u0 = 0; 
-attibute.m_v0 = 0; 
-attibute.m_u1 = 0;
-attibute.m_v1 = 0;
 
 			AddAtribute (attibute);
 			edge->m_userData = m_atribCount - 1;
