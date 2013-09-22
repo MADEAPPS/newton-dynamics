@@ -30,9 +30,13 @@ class dBoxPrimitiveUI: public wxDialog
 	}
 
 	dBoxPrimitiveUI(wxWindow* const owner)
-		:wxDialog(owner, 0, "Box properties") 
+		:wxDialog(owner, 0, wxT("Box properties")) 
+		,m_sizeX (1.0f)
+		,m_sizeY (1.0f)
+		,m_sizeZ (1.0f)
+		,m_name (wxT ("box")) 
 	{
-		dAssert(0);
+		
 /*
 		new FXLabel(this, "name:");
 		m_name = new FXTextField(this, 10, NULL, 0, TEXTFIELD_NORMAL|JUSTIFY_LEFT|LAYOUT_FILL_X|FRAME_SUNKEN|FRAME_THICK);
@@ -65,19 +69,13 @@ class dBoxPrimitiveUI: public wxDialog
 
 	~dBoxPrimitiveUI()
 	{
-		dAssert(0);
 	}
 
-	
-//	FXTextField* m_x;
-//	FXTextField* m_y;
-//	FXTextField* m_z;
-//	FXTextField* m_name;
-//	FXDECLARE(dBoxPrimitiveUI)
+	float m_sizeX;
+	float m_sizeY;
+	float m_sizeZ;
+	wxString m_name;
 };
-
-//FXIMPLEMENT(dBoxPrimitiveUI,FXDialogBox,NULL,0)
-
 
 
 dMeshBoxPrimitive::dMeshBoxPrimitive()
@@ -99,28 +97,30 @@ dMeshBoxPrimitive* dMeshBoxPrimitive::GetPlugin()
 
 dPluginScene* dMeshBoxPrimitive::Create (dPluginInterface* const interface)
 {
-	dAssert(0);
-	return NULL;
-/*
 	dPluginScene* const scene = interface->GetScene();
 	NewtonWorld* const world = scene->GetNewtonWorld();
-	FXMainWindow* const mainWindow = (FXMainWindow*) NewtonWorldGetUserData(world);
+	wxFrame* const mainWindow = (wxFrame*) NewtonWorldGetUserData(world);
 	dBoxPrimitiveUI modaldialog(mainWindow);
 
 	dPluginScene* asset = NULL;
-	if (modaldialog.execute(PLACEMENT_OWNER)) {
+
+//	if (modaldialog.execute(PLACEMENT_OWNER)) {
+	if (1) {
 		// for now asset manage does not have undo/redo
 		//interface->Push (new dUndoCurrentAsset(scene));
 
 		asset = new dPluginScene(world);
-		double x = atof (modaldialog.m_x->getText().text());
-		double y = atof (modaldialog.m_y->getText().text());
-		double z = atof (modaldialog.m_z->getText().text());
+		//double x = atof (modaldialog.m_x->getText().text());
+		//double y = atof (modaldialog.m_y->getText().text());
+		//double z = atof (modaldialog.m_z->getText().text());
+
+		double x = modaldialog.m_sizeX;
+		double y = modaldialog.m_sizeY;
+		double z = modaldialog.m_sizeZ;
 
 		dPluginScene::dTreeNode* const root = asset->GetRoot();
 		dNodeInfo* const rootInfo = asset->GetInfoFromNode(root);
-		rootInfo->SetName(modaldialog.m_name->getText().text());		
-
+		rootInfo->SetName(modaldialog.m_name.c_str());		
 
 		dPluginScene::dTreeNode* const sceneNode = asset->CreateSceneNode(asset->GetRoot());
 		dPluginScene::dTreeNode* const boxMesh = asset->CreateMeshNode(sceneNode);
@@ -138,7 +138,6 @@ dPluginScene* dMeshBoxPrimitive::Create (dPluginInterface* const interface)
 	}
 
 	return asset;
-*/
 }
 
 

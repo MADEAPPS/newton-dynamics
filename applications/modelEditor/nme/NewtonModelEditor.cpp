@@ -66,7 +66,6 @@ FXDEFMAP(NewtonModelEditor) MessageMap[]=
 	FXMAPFUNC(SEL_COMMAND,		NewtonModelEditor::ID_HIDE_EXPLORER_PANEL,				NewtonModelEditor::onHideExplorerPanel),
 	FXMAPFUNC(SEL_COMMAND,		NewtonModelEditor::ID_HIDE_COMMAND_PANEL,				NewtonModelEditor::onHideCommandPanel),
 
-	FXMAPFUNCS(SEL_COMMAND,		NewtonModelEditor::ID_RECENT_FILES,	NewtonModelEditor::ID_MAX_RECENT_FILES, NewtonModelEditor::onLoadRecentScene),
 	FXMAPFUNCS(SEL_COMMAND,		NewtonModelEditor::ID_IMPORT_PLUGINS, NewtonModelEditor::ID_MAX_IMPORT_PLUGINS, NewtonModelEditor::onImport),
 	FXMAPFUNCS(SEL_COMMAND,		NewtonModelEditor::ID_EXPORT_PLUGINS, NewtonModelEditor::ID_MAX_EXPORT_PLUGINS, NewtonModelEditor::onExport),
 	FXMAPFUNCS(SEL_COMMAND,		NewtonModelEditor::ID_MODEL_PLUGINS, NewtonModelEditor::ID_MAX_MODELS_PLUGINS, NewtonModelEditor::onModel),
@@ -1071,14 +1070,16 @@ void NewtonModelEditor::OnMesh (wxCommandEvent& event)
 
 	dPluginMesh* const plugin = (dPluginMesh*) m_mainMenu->GetPlugin(m_mainMenu->m_meshMenu, id);
 	_ASSERTE (plugin);
-/*
+
 	dPluginScene* const asset = plugin->Create (this);
 	if (asset) {
+		dAssert(0);
+/*
 		m_explorer->AddAsset(asset, plugin);
 		asset->Release();
 		RefrehViewports();
-	}
 */
+	}
 }
 
 
