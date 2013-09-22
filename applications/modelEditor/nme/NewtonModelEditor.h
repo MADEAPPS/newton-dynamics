@@ -21,7 +21,7 @@ class EditorRenderViewport;
 //class EditorExplorer;
 //class EditorCommandPanel;
 
-//#define D_MAX_PLUGINS_COUNT 128
+#define D_MAX_PLUGINS_COUNT 128
 //#define D_EDIT_MODE_ASSET "asset"
 //#define D_EDIT_MODE_SCENE "scene"
 
@@ -76,6 +76,10 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 		ID_SHADE_MODES,
 		ID_SHADE_MODES_LAST = ID_SHADE_MODES + 16,
 
+		ID_MESH_PLUGINS,
+		ID_MAX_MESH_PLUGINS = ID_MESH_PLUGINS + D_MAX_PLUGINS_COUNT,
+
+
 
 
 /*
@@ -101,8 +105,6 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 		ID_KEYBOARD_SHORCUTS,
 
 
-		ID_MESH_PLUGINS,
-		ID_MAX_MESH_PLUGINS = ID_MESH_PLUGINS + D_MAX_PLUGINS_COUNT,
 
 		ID_MODEL_PLUGINS,
 		ID_MAX_MODELS_PLUGINS = ID_MODEL_PLUGINS + D_MAX_PLUGINS_COUNT,
@@ -153,7 +155,7 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	long onImport(FXObject* sender, FXSelector id, void* eventPtr); 
 	long onExport(FXObject* sender, FXSelector id, void* eventPtr); 
 
-	long onMesh (FXObject* sender, FXSelector id, void* eventPtr); 
+	
 	long onModel (FXObject* sender, FXSelector id, void* eventPtr); 
 
 
@@ -245,7 +247,7 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	void OnUndo(wxCommandEvent& event); 
 	void OnRedo(wxCommandEvent& event); 
 	void OnClearUndoHistory(wxCommandEvent& event); 
-
+	void OnMesh (wxCommandEvent& event); 
 	
 
 
@@ -267,7 +269,7 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	
 	
 	wxAuiManager m_mgr;
-	wxMenuBar* m_mainMenu;
+	EditorMainMenu* m_mainMenu;
 	wxStatusBar* m_statusBar;
 	wxAuiToolBar* m_fileToolbar;
 	wxAuiToolBar* m_navigationToolbar;

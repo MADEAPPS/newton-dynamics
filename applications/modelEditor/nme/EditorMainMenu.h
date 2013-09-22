@@ -21,40 +21,47 @@ class NewtonModelEditor;
 class EditorMainMenu: public wxMenuBar
 {
 	public:
+	class BasePluginBaseMenuId: public wxObjectRefData
+	{
+		public: 
+		BasePluginBaseMenuId (int baseID)
+			:wxObjectRefData()
+			,m_baseID(baseID)
+		{
+		}
+
+		int m_baseID;				
+	};
+
+	class EditorPlugin: public wxObjectRefData
+	{
+		public: 
+		EditorPlugin (dPluginRecord* const plugin)
+			:wxObjectRefData()
+			,m_plugin(plugin)
+		{
+		}
+
+		dPluginRecord* const m_plugin;
+	};
+
+
 	EditorMainMenu (NewtonModelEditor* const parent);
 	~EditorMainMenu(void);
 
-	
-
 	private:
 	void CreateFileMenu();
+	void CreateMeshMenu();
 	void CreateEditMenu();
 	void CreateHelpMenu();
 
 	void AddPlugin (wxMenu* const menu, dPluginRecord* const plugin);
-/*
-	FXString GetRecentFile(int id);
-	void AddRecentFile(const FXString& filePathName);
+	dPluginRecord* GetPlugin (wxMenu* const paneMenu, int id);
 
-	dPluginRecord* GetPlugin (FXMenuPane* const paneMenu, int id);
-	
-	
 	NewtonModelEditor* m_mainFrame;
-	FXMenuPane* m_fileMenu;
-	FXMenuPane* m_editMenu;
-	FXMenuPane* m_meshMenu;
-	FXMenuPane* m_modelMenu;
-	FXMenuPane* m_helpMenu;
-	FXMenuPane* m_optionsMenu;
-	FXMenuPane* m_importPlugins;
-	FXMenuPane* m_exportPlugins;
-	FXMenuPane* m_recentFilesMenu;
-	FXMenuPane* m_preferencesMenu;
-	dList<FXString> m_recentFilesList;
-*/
-
 	wxMenu* m_fileMenu;
 	wxMenu* m_editMenu;
+	wxMenu* m_meshMenu;
 	wxMenu* m_helpMenu;
 
 	wxMenu* m_importPlugins;

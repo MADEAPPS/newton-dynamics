@@ -87,7 +87,6 @@ dMeshBoxPrimitive::dMeshBoxPrimitive()
 
 dMeshBoxPrimitive::~dMeshBoxPrimitive()
 {
-	dAssert(0);
 }
 
 

@@ -15,45 +15,26 @@
 
 EditorMainMenu::EditorMainMenu(NewtonModelEditor* const parent)
 	:wxMenuBar()
+	,m_mainFrame(parent)
 	,m_fileMenu(NULL)
+	,m_meshMenu(NULL)
 	,m_editMenu(NULL)
 	,m_helpMenu(NULL)
 	,m_importPlugins(NULL)
 	,m_exportPlugins(NULL)
 {
 	CreateFileMenu();
+	CreateMeshMenu();
 	CreateEditMenu();
 	CreateHelpMenu();
 
 	// add main menus to menu bar
 	Append (m_fileMenu, wxT("&File"));
 	Append (m_editMenu, wxT("&Edit"));
+	Append (m_meshMenu, wxT("&Mesh"));
 	Append (m_helpMenu, wxT("&Help"));
 
 /*
-	}
-
-	// edit menu
-	{
-		m_editMenu = new FXMenuPane(this);
-		new FXMenuTitle(this, "Edit", NULL, m_editMenu);
-
-		new FXMenuCommand(m_editMenu, "Undo", mainFrame->FindIcon("undo.gif"), mainFrame, NewtonModelEditor::ID_UNDO);
-		new FXMenuCommand(m_editMenu, "Redo", mainFrame->FindIcon("redo.gif"), mainFrame, NewtonModelEditor::ID_REDO);
-		new FXMenuCommand(m_editMenu, "Clear Undo History", NULL, mainFrame, NewtonModelEditor::ID_CLEAR_UNDO);
-		new FXMenuSeparator(m_editMenu);
-	}
-
-
-	// mesh menu
-	{
-		// this many is going to be populate bu the plugin manager
-		m_meshMenu  = new FXMenuPane(this);
-		new FXMenuTitle(this, "Mesh", NULL, m_meshMenu);
-		for (int i = NewtonModelEditor::ID_MESH_PLUGINS; i < NewtonModelEditor::ID_MAX_MESH_PLUGINS; i ++) {
-			new FXMenuCommand(m_meshMenu, FXString::null, NULL, mainFrame, i);
-		}
-	}
 
 
 	// models menu
@@ -94,93 +75,27 @@ EditorMainMenu::EditorMainMenu(NewtonModelEditor* const parent)
 
 EditorMainMenu::~EditorMainMenu(void)
 {
-/*
-	delete m_helpMenu;
-	delete menu;
-	delete m_editMenu;
-	delete m_meshMenu;
-	delete m_modelMenu;
-	delete m_optionsMenu;
-	delete m_importPlugins;
-	delete m_exportPlugins;
-	delete m_preferencesMenu;
-	delete m_recentFilesMenu;
-*/
 }
 
 
-/*
-FXString EditorMainMenu::GetRecentFile(int id)
+
+
+dPluginRecord* EditorMainMenu::GetPlugin (wxMenu* const paneMenu, int id)
 {
-	int i = 0; 
-	for (dList<FXString>::dListNode* node = m_recentFilesList.GetFirst(); node; node = node->GetNext()) {
-		if (i == id) {
-			const char * const name = node->GetInfo().text();
-			FILE* const file = fopen (name, "rb");
-			if (file) {
-				fclose (file);
-				return name;
-			} else {
-				m_recentFilesList.Remove(node);
-				for (int i = 0; i < NewtonModelEditor::ID_MAX_RECENT_FILES - NewtonModelEditor::ID_RECENT_FILES; i ++) {
-					FXMenuCommand* const item = (FXMenuCommand*) m_recentFilesMenu->childAtIndex(i);
-					item->setText(FXString::null);
-				}
-
-				int index = 0;
-				for (dList<FXString>::dListNode* node = m_recentFilesList.GetFirst(); node; node = node->GetNext()) {
-					FXMenuCommand* const item = (FXMenuCommand*) m_recentFilesMenu->childAtIndex(index);
-					item->setText(node->GetInfo());
-					index ++;
-				}
-			}
-			break;
-		}
-		i ++;
-	}
-	return FXString::null;
+	wxMenuItem* const item = paneMenu->FindItemByPosition (id);
+	dAssert (item);
+	EditorPlugin* const plugin = (EditorPlugin*)item->GetRefData();
+	dAssert(plugin);
+	return plugin->m_plugin;
 }
 
-
-
-void EditorMainMenu::AddRecentFile(const FXString& filePathName)
+void EditorMainMenu::AddPlugin (wxMenu* const menu, dPluginRecord* const plugin)
 {
-	for (dList<FXString>::dListNode* node = m_recentFilesList.GetFirst(); node; node = node->GetNext()) {
-		if (node->GetInfo() == filePathName) {
-			m_recentFilesList.Remove(node);
-			break;
-		}
-	}
-	m_recentFilesList.Addtop(filePathName);
-
-	if (m_recentFilesList.GetCount() > (NewtonModelEditor::ID_MAX_RECENT_FILES - NewtonModelEditor::ID_RECENT_FILES)) {
-		m_recentFilesList.Remove(m_recentFilesList.GetLast());
-	}
-
-	for (int i = 0; i < NewtonModelEditor::ID_MAX_RECENT_FILES - NewtonModelEditor::ID_RECENT_FILES; i ++) {
-		FXMenuCommand* const item = (FXMenuCommand*) m_recentFilesMenu->childAtIndex(i);
-		item->setText(FXString::null);
-	}
-
-	int i = 0;
-	for (dList<FXString>::dListNode* node = m_recentFilesList.GetFirst(); node; node = node->GetNext()) {
-		FXMenuCommand* const item = (FXMenuCommand*) m_recentFilesMenu->childAtIndex(i);
-		item->setText(node->GetInfo());
-		i ++;
-	}
+	BasePluginBaseMenuId* const baseIdData = (BasePluginBaseMenuId*)menu->GetRefData();
+	dAssert(baseIdData);
+	wxMenuItem* const item = menu->Append (baseIdData->m_baseID + menu->GetMenuItemCount(), wxString (plugin->GetMenuName ()));
+	item->SetRefData (new EditorPlugin(plugin));
 }
-
-
-
-
-
-dPluginRecord* EditorMainMenu::GetPlugin (FXMenuPane* const paneMenu, int id)
-{
-	_ASSERTE (id < D_MAX_PLUGINS_COUNT);
-	FXMenuCommand* const item = (FXMenuCommand*) paneMenu->childAtIndex(id);
-	return (dPluginRecord*)item->getUserData();
-}
-*/
 
 
 void EditorMainMenu::CreateHelpMenu()
@@ -193,11 +108,6 @@ void EditorMainMenu::CreateHelpMenu()
 void EditorMainMenu::CreateEditMenu()
 {
 	wxMenu* const menu = new wxMenu;
-
-//	new FXMenuCommand(m_editMenu, "Undo", mainFrame->FindIcon("undo.gif"), mainFrame, NewtonModelEditor::ID_UNDO);
-//	new FXMenuCommand(m_editMenu, "Redo", mainFrame->FindIcon("redo.gif"), mainFrame, NewtonModelEditor::ID_REDO);
-//	new FXMenuCommand(m_editMenu, "Clear Undo History", NULL, mainFrame, NewtonModelEditor::ID_CLEAR_UNDO);
-//	new FXMenuSeparator(m_editMenu);
 
 	menu->Append(wxID_UNDO, wxT("Undo"), wxT("undo editor command"));
 	menu->Append(wxID_REDO, wxT("Redo"), wxT("redo editor command"));
@@ -278,15 +188,19 @@ void EditorMainMenu::CreateFileMenu()
 }
 
 
-void EditorMainMenu::AddPlugin (wxMenu* const menu, dPluginRecord* const plugin)
+void EditorMainMenu::CreateMeshMenu()
 {
-//	for (int i = 0; i < D_MAX_PLUGINS_COUNT; i ++) {
-//		FXMenuCommand* const item = (FXMenuCommand*) paneMenu->childAtIndex(i);
-//		if (item->getText().empty()) {
-//			item->setText(plugin->GetMenuName ());
-//			item->setUserData(plugin);
-//			return;
+	// mesh menu
+//	{
+//		// this many is going to be populate bu the plugin manager
+//		m_meshMenu  = new FXMenuPane(this);
+//		new FXMenuTitle(this, "Mesh", NULL, m_meshMenu);
+//		for (int i = NewtonModelEditor::ID_MESH_PLUGINS; i < NewtonModelEditor::ID_MAX_MESH_PLUGINS; i ++) {
+//			new FXMenuCommand(m_meshMenu, FXString::null, NULL, mainFrame, i);
 //		}
 //	}
 
+	wxMenu* const menu = new wxMenu;
+	menu->SetRefData(new BasePluginBaseMenuId(NewtonModelEditor::ID_MESH_PLUGINS));
+	m_meshMenu = menu;
 }

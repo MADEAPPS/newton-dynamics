@@ -70,7 +70,7 @@ FXDEFMAP(NewtonModelEditor) MessageMap[]=
 	FXMAPFUNCS(SEL_COMMAND,		NewtonModelEditor::ID_IMPORT_PLUGINS, NewtonModelEditor::ID_MAX_IMPORT_PLUGINS, NewtonModelEditor::onImport),
 	FXMAPFUNCS(SEL_COMMAND,		NewtonModelEditor::ID_EXPORT_PLUGINS, NewtonModelEditor::ID_MAX_EXPORT_PLUGINS, NewtonModelEditor::onExport),
 	FXMAPFUNCS(SEL_COMMAND,		NewtonModelEditor::ID_MODEL_PLUGINS, NewtonModelEditor::ID_MAX_MODELS_PLUGINS, NewtonModelEditor::onModel),
-	FXMAPFUNCS(SEL_COMMAND,		NewtonModelEditor::ID_MESH_PLUGINS, NewtonModelEditor::ID_MAX_MESH_PLUGINS, NewtonModelEditor::onMesh),
+	
 };
 */
 
@@ -97,6 +97,8 @@ BEGIN_EVENT_TABLE (NewtonModelEditor, wxFrame)
 	EVT_MENU (wxID_REDO, OnRedo)
 	EVT_MENU (ID_CLEAR_UNDO_HISTORY, OnClearUndoHistory)
 
+
+	EVT_MENU_RANGE (ID_MESH_PLUGINS, ID_MAX_MESH_PLUGINS, OnMesh)
 
 END_EVENT_TABLE()
 
@@ -453,17 +455,6 @@ EditorCanvas* NewtonModelEditor::GetCanvas(FXObject* const sender) const
 	return  (EditorCanvas*)(((FXWindow*) sender)->getParent()->getParent());
 }
 
-
-
-
-
-
-
-
-
-
-
-
 long NewtonModelEditor::onExport(FXObject* sender, FXSelector id, void* eventPtr)
 {
 //	dExportPlugin* const importer = (dExportPlugin*)m_mainMenu->GetPlugin(m_mainMenu->m_exportPlugins, FXSELID(id)-ID_EXPORT_PLUGINS);
@@ -546,19 +537,6 @@ long NewtonModelEditor::onModel (FXObject* sender, FXSelector id, void* eventPtr
 
 
 
-long NewtonModelEditor::onMesh (FXObject* sender, FXSelector id, void* eventPtr)
-{
-	dPluginMesh* const plugin = (dPluginMesh*)m_mainMenu->GetPlugin(m_mainMenu->m_meshMenu, FXSELID(id)-ID_MESH_PLUGINS);
-	_ASSERTE (plugin);
-
-	dPluginScene* const asset = plugin->Create (this);
-	if (asset) {
-		m_explorer->AddAsset(asset, plugin);
-		asset->Release();
-		RefrehViewports();
-	}
-	return 1;
-}
 
 long NewtonModelEditor::onAssetSelected (FXObject* sender, FXSelector id, void* eventPtr)
 {
@@ -721,8 +699,8 @@ void NewtonModelEditor::Initilialize()
 //	LoadConfig();
 
 	// load all plugins
-//	LoadPlugins("stdPlugins");
-//	LoadPlugins("plugins");
+	LoadPlugins("stdPlugins");
+	LoadPlugins("plugins");
 
 	// create the scene
 	CreateScene();
@@ -829,7 +807,6 @@ void NewtonModelEditor::LoadPlugins(const char* const path)
 		GetPluginArray GetPluginsTable = (GetPluginArray) GetProcAddress (module, "GetPluginArray"); 
 		dPluginRecord** const table = GetPluginsTable();
 
-		EditorMainMenu* const menu = (EditorMainMenu*)m_mainMenu;
 		for (int i = 0; table[i]; i ++) {
 			dPluginRecord* const plugin = table[i];
 
@@ -838,28 +815,27 @@ void NewtonModelEditor::LoadPlugins(const char* const path)
 				case dPluginRecord::m_import:
 				{
 					//m_mainMenu->AddImportPlugin(plugin);
-					menu->AddPlugin(menu->m_importPlugins, plugin);
+					m_mainMenu->AddPlugin(m_mainMenu->m_importPlugins, plugin);
 					break;
 				}
 
 				case dPluginRecord::m_export:
 				{
 					dAssert(0);
-					//menu->AddPlugin(menu->m_exportPlugins, plugin);
+					//m_mainMenu->AddPlugin(m_mainMenu->m_exportPlugins, plugin);
 					break;
 				}
 
 				case dPluginRecord::m_model:
 				{
 					dAssert(0);
-					//menu->AddPlugin(menu->m_modelMenu, plugin);
+					//m_mainMenu->AddPlugin(m_mainMenu->m_modelMenu, plugin);
 					break;
 				}
 
 				case dPluginRecord::m_mesh:
 				{
-					dAssert(0);
-					//menu->AddPlugin(menu->m_meshMenu, plugin);
+					m_mainMenu->AddPlugin(m_mainMenu->m_meshMenu, plugin);
 					break;
 				}
 			}
@@ -1088,6 +1064,23 @@ void NewtonModelEditor::OnClearUndoHistory(wxCommandEvent& event)
 //	m_explorer->RefreshAllViewer();
 	RefrehViewports();
 }
+
+void NewtonModelEditor::OnMesh (wxCommandEvent& event)
+{
+	int id = event.GetId() - ID_MESH_PLUGINS;
+
+	dPluginMesh* const plugin = (dPluginMesh*) m_mainMenu->GetPlugin(m_mainMenu->m_meshMenu, id);
+	_ASSERTE (plugin);
+/*
+	dPluginScene* const asset = plugin->Create (this);
+	if (asset) {
+		m_explorer->AddAsset(asset, plugin);
+		asset->Release();
+		RefrehViewports();
+	}
+*/
+}
+
 
 
 void NewtonModelEditor::OnChangeNavigationMode(wxCommandEvent& event)
