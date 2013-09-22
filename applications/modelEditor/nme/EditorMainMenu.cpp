@@ -16,14 +16,18 @@
 EditorMainMenu::EditorMainMenu(NewtonModelEditor* const parent)
 	:wxMenuBar()
 	,m_fileMenu(NULL)
+	,m_editMenu(NULL)
 	,m_helpMenu(NULL)
-	,m_recentFileSubMenu(NULL)
+	,m_importPlugins(NULL)
+	,m_exportPlugins(NULL)
 {
 	CreateFileMenu();
+	CreateEditMenu();
 	CreateHelpMenu();
 
 	// add main menus to menu bar
 	Append (m_fileMenu, wxT("&File"));
+	Append (m_editMenu, wxT("&Edit"));
 	Append (m_helpMenu, wxT("&Help"));
 
 /*
@@ -169,18 +173,6 @@ void EditorMainMenu::AddRecentFile(const FXString& filePathName)
 
 
 
-void EditorMainMenu::AddPlugin (FXMenuPane* const paneMenu, dPluginRecord* const plugin)
-{
-	for (int i = 0; i < D_MAX_PLUGINS_COUNT; i ++) {
-		FXMenuCommand* const item = (FXMenuCommand*) paneMenu->childAtIndex(i);
-		if (item->getText().empty()) {
-			item->setText(plugin->GetMenuName ());
-			item->setUserData(plugin);
-			return;
-		}
-	}
-	_ASSERTE (0);
-}
 
 dPluginRecord* EditorMainMenu::GetPlugin (FXMenuPane* const paneMenu, int id)
 {
@@ -196,6 +188,22 @@ void EditorMainMenu::CreateHelpMenu()
 	wxMenu* const menu = new wxMenu;
 	menu->Append(wxID_HELP, wxT("About"));
 	m_helpMenu = menu;
+}
+
+void EditorMainMenu::CreateEditMenu()
+{
+	wxMenu* const menu = new wxMenu;
+
+//	new FXMenuCommand(m_editMenu, "Undo", mainFrame->FindIcon("undo.gif"), mainFrame, NewtonModelEditor::ID_UNDO);
+//	new FXMenuCommand(m_editMenu, "Redo", mainFrame->FindIcon("redo.gif"), mainFrame, NewtonModelEditor::ID_REDO);
+//	new FXMenuCommand(m_editMenu, "Clear Undo History", NULL, mainFrame, NewtonModelEditor::ID_CLEAR_UNDO);
+//	new FXMenuSeparator(m_editMenu);
+
+	menu->Append(wxID_UNDO, wxT("Undo"), wxT("undo editor command"));
+	menu->Append(wxID_REDO, wxT("Redo"), wxT("redo editor command"));
+	menu->Append(NewtonModelEditor::ID_CLEAR_UNDO_HISTORY, wxT("Clear undo history"), wxT("clear the undo redo history"));
+
+	m_editMenu = menu;
 }
 
 void EditorMainMenu::CreateFileMenu()
@@ -243,30 +251,42 @@ void EditorMainMenu::CreateFileMenu()
 			new FXMenuCommand(m_recentFilesMenu, FXString::null, NULL, mainFrame, i);
 		}
 	}
-
+*/
 
 	// add import export plugins file sub menu
 	{
-		new FXMenuSeparator(menu);
-		m_importPlugins = new FXMenuPane(this);
-		new FXMenuCascade(menu, "Import plugins...", NULL, m_importPlugins);
-		for (int i = NewtonModelEditor::ID_IMPORT_PLUGINS; i < NewtonModelEditor::ID_MAX_IMPORT_PLUGINS; i ++) {
-			new FXMenuCommand(m_importPlugins, FXString::null, NULL, mainFrame, i);
-		}
+		menu->AppendSeparator();
+		m_importPlugins = new wxMenu;
+		menu->AppendSubMenu(m_importPlugins, wxT("Import plugins..."), wxT("execute and scen import plug in"));
+//		new FXMenuCascade(menu, "Import plugins...", NULL, m_importPlugins);
+//		for (int i = NewtonModelEditor::ID_IMPORT_PLUGINS; i < NewtonModelEditor::ID_MAX_IMPORT_PLUGINS; i ++) {
+//			new FXMenuCommand(m_importPlugins, FXString::null, NULL, mainFrame, i);
+//		}
 
-		m_exportPlugins = new FXMenuPane(this);
-		new FXMenuCascade(menu, "Export plugins...", NULL, m_exportPlugins);
-		for (int i = NewtonModelEditor::ID_EXPORT_PLUGINS; i < NewtonModelEditor::ID_MAX_EXPORT_PLUGINS; i ++) {
-			new FXMenuCommand(m_exportPlugins, FXString::null, NULL, mainFrame, i);
-		}
+		m_exportPlugins = new wxMenu;
+		menu->AppendSubMenu(m_exportPlugins, wxT("Export plugins..."), wxT("execute and scene iexport plug in"));
+//		for (int i = NewtonModelEditor::ID_EXPORT_PLUGINS; i < NewtonModelEditor::ID_MAX_EXPORT_PLUGINS; i ++) {
+//			new FXMenuCommand(m_exportPlugins, FXString::null, NULL, mainFrame, i);
+//		}
 	}
-
-*/
 
 	//quick editor
 	menu->AppendSeparator();
-	//new FXMenuCommand(menu, "Quit", NULL, getApp(), FXApp::ID_QUIT);
 	menu->Append(wxID_EXIT, wxT("E&xit\tAlt-X"), wxT("Quit SDK editor") );
 
 	m_fileMenu = menu;
+}
+
+
+void EditorMainMenu::AddPlugin (wxMenu* const menu, dPluginRecord* const plugin)
+{
+//	for (int i = 0; i < D_MAX_PLUGINS_COUNT; i ++) {
+//		FXMenuCommand* const item = (FXMenuCommand*) paneMenu->childAtIndex(i);
+//		if (item->getText().empty()) {
+//			item->setText(plugin->GetMenuName ());
+//			item->setUserData(plugin);
+//			return;
+//		}
+//	}
+
 }

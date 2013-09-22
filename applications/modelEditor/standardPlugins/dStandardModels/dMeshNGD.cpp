@@ -38,12 +38,16 @@ dMeshNGD* dMeshNGD::GetPlugin()
 
 void dMeshNGD::Destroy (dPluginInterface* const interface, dPluginScene* const asset)
 {
-	asset->Release();
+	dAssert(0);
+//	asset->Release();
 }
 
 
 dPluginScene* dMeshNGD::Create (dPluginInterface* const interface)
 {
+	dAssert(0);
+	return NULL;
+/*
 	dPluginScene* const scene = interface->GetScene();
 	NewtonWorld* const world = scene->GetNewtonWorld();
 	FXMainWindow* const mainWindow = (FXMainWindow*) NewtonWorldGetUserData(world);
@@ -57,5 +61,6 @@ dPluginScene* dMeshNGD::Create (dPluginInterface* const interface)
 	}
 
 	return asset;
+*/
 }
 

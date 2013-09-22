@@ -21,17 +21,19 @@
 #include "dBoxCollision.h"
 
 // implement the UI for this using a dialog box
-class dStandardModelUI : public FXDialogBox 
+class dStandardModelUI: public wxDialog
 {
 	public:
 	dStandardModelUI()
 	{
+		dAssert (0);
 	}
 
-	dStandardModelUI(FXWindow* const owner, dList<dCollisionPlugin*>& collisionsList)
-		:FXDialogBox(owner, "Model properties", DECOR_TITLE|DECOR_BORDER, 0, 0, 300, 0) 
+	dStandardModelUI(wxWindow* const owner, dList<dCollisionPlugin*>& collisionsList)
+		:wxDialog(owner, 0, "Model properties") 
 	{
-
+		dAssert (0);
+/*
 		// add the type of available collision shape 
 //		new FXHorizontalSeparator(this,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|SEPARATOR_NONE);
 //		new FXHorizontalSeparator(this,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|SEPARATOR_NONE);
@@ -64,16 +66,18 @@ class dStandardModelUI : public FXDialogBox
 		FXHorizontalFrame* const buttonContents = new FXHorizontalFrame(this,LAYOUT_SIDE_BOTTOM|FRAME_NONE|LAYOUT_FILL_X|PACK_UNIFORM_WIDTH);
 		new FXButton(buttonContents,"&Accept",NULL,this,ID_ACCEPT, BUTTON_DEFAULT|BUTTON_INITIAL|FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
 		new FXButton(buttonContents,"&Cancel",NULL,this,ID_CANCEL,BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
+*/
 	}
 
 	~dStandardModelUI()
 	{
+		dAssert (0);
 	}
 
-	FXDECLARE(dStandardModelUI)
+//	FXDECLARE(dStandardModelUI)
 };
 
-FXIMPLEMENT(dStandardModelUI,FXDialogBox,NULL,0)
+//FXIMPLEMENT(dStandardModelUI,FXDialogBox,NULL,0)
 
 
 dStandardModel::dStandardModel()
@@ -95,6 +99,8 @@ dStandardModel* dStandardModel::GetPlugin()
 
 bool dStandardModel::Create (dPluginInterface* const interface)
 {
+	dAssert (0);
+/*
 	// find all collision types
 	dList<dBodyPlugin*> rigidBodies;
 	dList<dCollisionPlugin*> collisionsList;
@@ -128,8 +134,7 @@ bool dStandardModel::Create (dPluginInterface* const interface)
 		//	_ASSERTE (collisionPlugin);
 
 	}
-
-
+*/
 	return true;
 }
 

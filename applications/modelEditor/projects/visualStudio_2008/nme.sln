@@ -8,7 +8,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "thirdParties", "thirdPartie
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "newtonCore", "newtonCore", "{8D5218D1-FC13-4112-9980-F257026406BD}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "stdPlugins", "stdPlugins", "{657BECAE-4DBA-4B8F-9E82-5BEB9CBF00FB}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "plugins", "plugins", "{657BECAE-4DBA-4B8F-9E82-5BEB9CBF00FB}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dPluginCommons", "..\..\standardPlugins\projects\visualStudio_2008\dPluginCommons.vcproj", "{82B461DE-8921-4DA4-B6B9-FC34DF831F0F}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -172,9 +172,13 @@ Global
 		{5580C08E-E865-4D9E-B4C9-5AC040130B92}.Release|Win32.ActiveCfg = Release|Win32
 		{5580C08E-E865-4D9E-B4C9-5AC040130B92}.Release|x64.ActiveCfg = Release|x64
 		{233684F4-37B1-45EC-835C-7EBB26743210}.Debug|Win32.ActiveCfg = Debug|Win32
+		{233684F4-37B1-45EC-835C-7EBB26743210}.Debug|Win32.Build.0 = Debug|Win32
 		{233684F4-37B1-45EC-835C-7EBB26743210}.Debug|x64.ActiveCfg = Debug|x64
+		{233684F4-37B1-45EC-835C-7EBB26743210}.Debug|x64.Build.0 = Debug|x64
 		{233684F4-37B1-45EC-835C-7EBB26743210}.Release|Win32.ActiveCfg = Release|Win32
+		{233684F4-37B1-45EC-835C-7EBB26743210}.Release|Win32.Build.0 = Release|Win32
 		{233684F4-37B1-45EC-835C-7EBB26743210}.Release|x64.ActiveCfg = Release|x64
+		{233684F4-37B1-45EC-835C-7EBB26743210}.Release|x64.Build.0 = Release|x64
 		{7D48CEE3-5263-46CA-BD69-924881F0EA2F}.Debug|Win32.ActiveCfg = debug|Win32
 		{7D48CEE3-5263-46CA-BD69-924881F0EA2F}.Debug|Win32.Build.0 = debug|Win32
 		{7D48CEE3-5263-46CA-BD69-924881F0EA2F}.Debug|x64.ActiveCfg = debug|x64

@@ -21,22 +21,23 @@ class NewtonModelEditor;
 class EditorMainMenu: public wxMenuBar
 {
 	public:
-
-//	EditorMainMenu(FXComposite* const parent, FXToolBarShell* const dragShell, NewtonModelEditor* const mainFrame);
-
 	EditorMainMenu (NewtonModelEditor* const parent);
 	~EditorMainMenu(void);
 
+	
+
 	private:
 	void CreateFileMenu();
+	void CreateEditMenu();
 	void CreateHelpMenu();
 
+	void AddPlugin (wxMenu* const menu, dPluginRecord* const plugin);
 /*
 	FXString GetRecentFile(int id);
 	void AddRecentFile(const FXString& filePathName);
 
 	dPluginRecord* GetPlugin (FXMenuPane* const paneMenu, int id);
-	void AddPlugin (FXMenuPane* const paneMenu, dPluginRecord* const plugin);
+	
 	
 	NewtonModelEditor* m_mainFrame;
 	FXMenuPane* m_fileMenu;
@@ -53,9 +54,13 @@ class EditorMainMenu: public wxMenuBar
 */
 
 	wxMenu* m_fileMenu;
+	wxMenu* m_editMenu;
 	wxMenu* m_helpMenu;
 
-	wxMenu* m_recentFileSubMenu;
+	wxMenu* m_importPlugins;
+	wxMenu* m_exportPlugins;
+
+	friend class NewtonModelEditor;
 };
 
 

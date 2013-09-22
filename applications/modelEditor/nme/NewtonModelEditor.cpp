@@ -30,13 +30,10 @@ typedef dPluginRecord** (CALLBACK* GetPluginArray)();
 
 
 /*
-// Message Map
 FXDEFMAP(NewtonModelEditor) MessageMap[]=
 {
-
 	FXMAPFUNC(SEL_KEYPRESS,		0,														NewtonModelEditor::onKeyboardHandle),
 	FXMAPFUNC(SEL_KEYRELEASE,	0,														NewtonModelEditor::onKeyboardHandle),
-
 
 	FXMAPFUNC(SEL_COMMAND,			NewtonModelEditor::ID_SELECT_ASSET,					NewtonModelEditor::onAssetSelected),
 //	FXMAPFUNC(SEL_RIGHTBUTTONPRESS,	NewtonModelEditor::ID_SELECT_ASSET,					NewtonModelEditor::onAssetSelected),
@@ -49,9 +46,6 @@ FXDEFMAP(NewtonModelEditor) MessageMap[]=
 	FXMAPFUNC(SEL_CHORE,		NewtonModelEditor::ID_EDITOR_MODE,						NewtonModelEditor::onEditorMode),
 	FXMAPFUNC(SEL_COMMAND,		NewtonModelEditor::ID_EDITOR_MODE,						NewtonModelEditor::onEditorMode),
 
-	FXMAPFUNC(SEL_COMMAND,		NewtonModelEditor::ID_NEW,								NewtonModelEditor::onNew),
-	
-	FXMAPFUNC(SEL_COMMAND,		NewtonModelEditor::ID_LOAD_SCENE,						NewtonModelEditor::onLoadScene),
 //	FXMAPFUNC(SEL_COMMAND,		NewtonModelEditor::ID_SAVE,								NewtonModelEditor::onSave),
 //	FXMAPFUNC(SEL_COMMAND,		NewtonModelEditor::ID_SAVE_AS,							NewtonModelEditor::onSave),
 
@@ -60,9 +54,6 @@ FXDEFMAP(NewtonModelEditor) MessageMap[]=
 //	FXMAPFUNC(SEL_COMMAND,		NewtonModelEditor::ID_SAVE_ASSET,						NewtonModelEditor::onSave),
 //	FXMAPFUNC(SEL_COMMAND,		NewtonModelEditor::ID_SAVE_ASSET_AS,					NewtonModelEditor::onSave),
 
-	FXMAPFUNC(SEL_COMMAND,		NewtonModelEditor::ID_UNDO,								NewtonModelEditor::onUndo),
-	FXMAPFUNC(SEL_COMMAND,		NewtonModelEditor::ID_REDO,								NewtonModelEditor::onRedo),
-	FXMAPFUNC(SEL_COMMAND,		NewtonModelEditor::ID_CLEAR_UNDO,						NewtonModelEditor::onClearUndoHistory),
 
 	FXMAPFUNC(SEL_COMMAND,		NewtonModelEditor::ID_SELECT_COMMAND_MODE,				NewtonModelEditor::onSelectionCommandMode),
 	FXMAPFUNC(SEL_COMMAND,		NewtonModelEditor::ID_TRANSLATE_COMMAND_MODE,			NewtonModelEditor::onSelectionCommandMode),
@@ -81,21 +72,19 @@ FXDEFMAP(NewtonModelEditor) MessageMap[]=
 	FXMAPFUNCS(SEL_COMMAND,		NewtonModelEditor::ID_MODEL_PLUGINS, NewtonModelEditor::ID_MAX_MODELS_PLUGINS, NewtonModelEditor::onModel),
 	FXMAPFUNCS(SEL_COMMAND,		NewtonModelEditor::ID_MESH_PLUGINS, NewtonModelEditor::ID_MAX_MESH_PLUGINS, NewtonModelEditor::onMesh),
 };
-FXIMPLEMENT(NewtonModelEditor,FXMainWindow,MessageMap,ARRAYNUMBER(MessageMap))
-
 */
 
 
 BEGIN_EVENT_TABLE (NewtonModelEditor, wxFrame)
 
-	EVT_MENU(wxID_EXIT, OnExit)
-	EVT_MENU(wxID_ABOUT, OnAbout)
-	EVT_MENU(wxID_HELP, OnAbout)
-	EVT_MENU(wxID_PREFERENCES, OnAbout)
+	EVT_MENU (wxID_EXIT, OnExit)
+	EVT_MENU (wxID_ABOUT, OnAbout)
+	EVT_MENU (wxID_HELP, OnAbout)
+	EVT_MENU (wxID_PREFERENCES, OnAbout)
 
-	EVT_MENU(wxID_OPEN, OnOpenScene)
+	EVT_MENU (wxID_OPEN, OnOpenScene)
 
-	EVT_MENU(wxID_NEW, OnNew)
+	EVT_MENU (wxID_NEW, OnNew)
 	EVT_MENU (ID_VIEWPORT_PANNING, OnChangeNavigationMode)
 	EVT_MENU (ID_VIEWPORT_MOVE, OnChangeNavigationMode)
 	EVT_MENU (ID_VIEWPORT_ROTATE, OnChangeNavigationMode)
@@ -103,6 +92,10 @@ BEGIN_EVENT_TABLE (NewtonModelEditor, wxFrame)
 
 	EVT_CHOICE(ID_VIEW_MODES, OnChangeViewMode)  
 	EVT_CHOICE(ID_SHADE_MODES, OnChangeShadeMode)  
+
+	EVT_MENU (wxID_UNDO, OnUndo)
+	EVT_MENU (wxID_REDO, OnRedo)
+	EVT_MENU (ID_CLEAR_UNDO_HISTORY, OnClearUndoHistory)
 
 
 END_EVENT_TABLE()
@@ -190,52 +183,6 @@ bool NewtonModelEditor::IsShiftDown() const
 
 
 
-
-void NewtonModelEditor::LoadPlugins(const char* const path)
-{
-	dPluginDll pluginList;
-	dPluginInterface::LoadPlugins(path, pluginList);
-
-	// dispatch plugins by type
-	for (dPluginDll::dListNode* dllNode = pluginList.GetFirst(); dllNode; dllNode = dllNode->GetNext()) {
-		HMODULE module = dllNode->GetInfo();
-
-		GetPluginArray GetPluginsTable = (GetPluginArray) GetProcAddress (module, "GetPluginArray"); 
-		dPluginRecord** const table = GetPluginsTable();
-
-		for (int i = 0; table[i]; i ++) {
-			dPluginRecord* const plugin = table[i];
-
-			switch (plugin->GetType())
-			{
-				case dPluginRecord::m_import:
-				{
-					//m_mainMenu->AddImportPlugin(plugin);
-					m_mainMenu->AddPlugin(m_mainMenu->m_importPlugins, plugin);
-					break;
-				}
-
-				case dPluginRecord::m_export:
-				{
-					m_mainMenu->AddPlugin(m_mainMenu->m_exportPlugins, plugin);
-					break;
-				}
-
-				case dPluginRecord::m_model:
-				{
-					m_mainMenu->AddPlugin(m_mainMenu->m_modelMenu, plugin);
-					break;
-				}
-
-				case dPluginRecord::m_mesh:
-				{
-					m_mainMenu->AddPlugin(m_mainMenu->m_meshMenu, plugin);
-					break;
-				}
-			}
-		}
-	}
-}
 
 
 
@@ -526,29 +473,6 @@ long NewtonModelEditor::onExport(FXObject* sender, FXSelector id, void* eventPtr
 
 
 
-long NewtonModelEditor::onUndo(FXObject* sender, FXSelector id, void* eventPtr)
-{
-	Undo();
-	m_explorer->RefreshAllViewer();
-	RefrehViewports();
-	return 1;
-}
-
-long NewtonModelEditor::onRedo(FXObject* sender, FXSelector id, void* eventPtr)
-{
-	Redo();
-	m_explorer->RefreshAllViewer();
-	RefrehViewports();
-	return 1;
-}
-
-long NewtonModelEditor::onClearUndoHistory(FXObject* sender, FXSelector id, void* eventPtr)
-{
-	Clear();
-	m_explorer->RefreshAllViewer();
-	RefrehViewports();
-	return 1;
-}
 
 
 
@@ -893,6 +817,58 @@ void NewtonModelEditor::LoadResources ()
 }
 
 
+void NewtonModelEditor::LoadPlugins(const char* const path)
+{
+	dPluginDll pluginList;
+	dPluginInterface::LoadPlugins(path, pluginList);
+
+	// dispatch plugins by type
+	for (dPluginDll::dListNode* dllNode = pluginList.GetFirst(); dllNode; dllNode = dllNode->GetNext()) {
+		HMODULE module = dllNode->GetInfo();
+
+		GetPluginArray GetPluginsTable = (GetPluginArray) GetProcAddress (module, "GetPluginArray"); 
+		dPluginRecord** const table = GetPluginsTable();
+
+		EditorMainMenu* const menu = (EditorMainMenu*)m_mainMenu;
+		for (int i = 0; table[i]; i ++) {
+			dPluginRecord* const plugin = table[i];
+
+			switch (plugin->GetType())
+			{
+				case dPluginRecord::m_import:
+				{
+					//m_mainMenu->AddImportPlugin(plugin);
+					menu->AddPlugin(menu->m_importPlugins, plugin);
+					break;
+				}
+
+				case dPluginRecord::m_export:
+				{
+					dAssert(0);
+					//menu->AddPlugin(menu->m_exportPlugins, plugin);
+					break;
+				}
+
+				case dPluginRecord::m_model:
+				{
+					dAssert(0);
+					//menu->AddPlugin(menu->m_modelMenu, plugin);
+					break;
+				}
+
+				case dPluginRecord::m_mesh:
+				{
+					dAssert(0);
+					//menu->AddPlugin(menu->m_meshMenu, plugin);
+					break;
+				}
+			}
+		}
+	}
+}
+
+
+
 void NewtonModelEditor::DeleteResources ()
 {
 	dTree<wxBitmap*, dCRCTYPE>::Iterator iter (m_icons);
@@ -1087,6 +1063,29 @@ void NewtonModelEditor::OnChangeViewMode(wxCommandEvent& event)
 
 void NewtonModelEditor::OnChangeShadeMode(wxCommandEvent& event)
 {
+	RefrehViewports();
+}
+
+
+void NewtonModelEditor::OnUndo(wxCommandEvent& event)
+{
+	dUndoRedoManager::Undo();
+//	m_explorer->RefreshAllViewer();
+	RefrehViewports();
+//	return 1;
+}
+
+void NewtonModelEditor::OnRedo(wxCommandEvent& event)
+{
+	dUndoRedoManager::Redo();
+//	m_explorer->RefreshAllViewer();
+	RefrehViewports();
+}
+
+void NewtonModelEditor::OnClearUndoHistory(wxCommandEvent& event)
+{
+	dUndoRedoManager::Clear();
+//	m_explorer->RefreshAllViewer();
 	RefrehViewports();
 }
 

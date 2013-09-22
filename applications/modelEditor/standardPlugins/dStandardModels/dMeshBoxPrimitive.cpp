@@ -21,17 +21,19 @@
 
 
 // implement the UI for this using a dialog box
-class dBoxPrimitiveUI : public FXDialogBox 
+class dBoxPrimitiveUI: public wxDialog
 {
 	public:
 	dBoxPrimitiveUI()
 	{
+		dAssert(0);
 	}
 
-	dBoxPrimitiveUI(FXWindow* const owner)
-		:FXDialogBox(owner, "Box properties", DECOR_TITLE|DECOR_BORDER, 0, 0, 150, 0) 
+	dBoxPrimitiveUI(wxWindow* const owner)
+		:wxDialog(owner, 0, "Box properties") 
 	{
-
+		dAssert(0);
+/*
 		new FXLabel(this, "name:");
 		m_name = new FXTextField(this, 10, NULL, 0, TEXTFIELD_NORMAL|JUSTIFY_LEFT|LAYOUT_FILL_X|FRAME_SUNKEN|FRAME_THICK);
 		m_name->setText("box primitive");
@@ -58,22 +60,24 @@ class dBoxPrimitiveUI : public FXDialogBox
 		FXHorizontalFrame* const buttonContents = new FXHorizontalFrame(this,LAYOUT_SIDE_BOTTOM|FRAME_NONE|LAYOUT_FILL_X|PACK_UNIFORM_WIDTH);
 		new FXButton(buttonContents,"&Accept",NULL,this,ID_ACCEPT, BUTTON_DEFAULT|BUTTON_INITIAL|FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
 		new FXButton(buttonContents,"&Cancel",NULL,this,ID_CANCEL,BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
+*/
 	}
 
 	~dBoxPrimitiveUI()
 	{
+		dAssert(0);
 	}
 
 	
-	FXTextField* m_x;
-	FXTextField* m_y;
-	FXTextField* m_z;
-	FXTextField* m_name;
-
-	FXDECLARE(dBoxPrimitiveUI)
+//	FXTextField* m_x;
+//	FXTextField* m_y;
+//	FXTextField* m_z;
+//	FXTextField* m_name;
+//	FXDECLARE(dBoxPrimitiveUI)
 };
 
-FXIMPLEMENT(dBoxPrimitiveUI,FXDialogBox,NULL,0)
+//FXIMPLEMENT(dBoxPrimitiveUI,FXDialogBox,NULL,0)
+
 
 
 dMeshBoxPrimitive::dMeshBoxPrimitive()
@@ -83,6 +87,7 @@ dMeshBoxPrimitive::dMeshBoxPrimitive()
 
 dMeshBoxPrimitive::~dMeshBoxPrimitive()
 {
+	dAssert(0);
 }
 
 
@@ -95,6 +100,9 @@ dMeshBoxPrimitive* dMeshBoxPrimitive::GetPlugin()
 
 dPluginScene* dMeshBoxPrimitive::Create (dPluginInterface* const interface)
 {
+	dAssert(0);
+	return NULL;
+/*
 	dPluginScene* const scene = interface->GetScene();
 	NewtonWorld* const world = scene->GetNewtonWorld();
 	FXMainWindow* const mainWindow = (FXMainWindow*) NewtonWorldGetUserData(world);
@@ -131,10 +139,11 @@ dPluginScene* dMeshBoxPrimitive::Create (dPluginInterface* const interface)
 	}
 
 	return asset;
+*/
 }
 
 
 void dMeshBoxPrimitive::Destroy (dPluginInterface* const interface, dPluginScene* const asset)
 {
-	asset->Release();
+//	asset->Release();
 }

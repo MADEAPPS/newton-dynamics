@@ -33,10 +33,10 @@ dPluginRecord** GetPluginArray()
 	{
 		// do not register this plug in since it is a native file format, but leave it for reference to write other loader type 
 		//dMeshNGD::GetPlugin(),
-		dRigidBody::GetPlugin(),
-		dBoxCollision::GetPlugin(),
-		dStandardModel::GetPlugin(),
-		dSphereCollision::GetPlugin(),
+		//dRigidBody::GetPlugin(),
+		//dBoxCollision::GetPlugin(),
+		//dStandardModel::GetPlugin(),
+		//dSphereCollision::GetPlugin(),
 		dMeshBoxPrimitive::GetPlugin(),
 		NULL
 	};

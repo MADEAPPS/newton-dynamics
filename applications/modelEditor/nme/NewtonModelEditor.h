@@ -65,6 +65,10 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 		ID_VIEWPORT_ROTATE,
 		ID_VIEWPORT_ZOOM,
 
+
+		// editor menu options
+		ID_CLEAR_UNDO_HISTORY,
+
 		//view modes
 		ID_VIEW_MODES,
 		ID_VIEW_MODES_LAST = ID_VIEW_MODES + 16,
@@ -75,10 +79,6 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 
 
 /*
-		ID_EDITOR_MODE,
-		ID_SET_VIEW_MODE,
-		ID_SET_RENDER_MODE,
-
 		// scene menu
 		ID_LOAD_SCENE,
 		ID_SAVE_SCENE,
@@ -100,17 +100,6 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 		ID_HIDE_COMMAND_PANEL,
 		ID_KEYBOARD_SHORCUTS,
 
-		// undo, redo
-		ID_UNDO,
-		ID_REDO,
-		ID_CLEAR_UNDO,
-
-		// help menu
-		ID_ABOUT,
-
-		// editor state
-		ID_RECENT_FILES,
-		ID_MAX_RECENT_FILES = ID_RECENT_FILES + 12,
 
 		ID_MESH_PLUGINS,
 		ID_MAX_MESH_PLUGINS = ID_MESH_PLUGINS + D_MAX_PLUGINS_COUNT,
@@ -158,9 +147,6 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 
 	long onLoadAsset(FXObject* sender, FXSelector id, void* eventPtr); 
 
-	long onUndo(FXObject* sender, FXSelector id, void* eventPtr); 
-	long onRedo(FXObject* sender, FXSelector id, void* eventPtr); 
-	long onClearUndoHistory(FXObject* sender, FXSelector id, void* eventPtr); 
 
 	long onSelectionCommandMode(FXObject* sender, FXSelector id, void* eventPtr); 
 
@@ -255,8 +241,11 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	void OnChangeViewMode(wxCommandEvent& event);
 	void OnChangeShadeMode(wxCommandEvent& event);
 	void OnChangeNavigationMode(wxCommandEvent& event);
-
 	void OnOpenScene(wxCommandEvent& event);
+	void OnUndo(wxCommandEvent& event); 
+	void OnRedo(wxCommandEvent& event); 
+	void OnClearUndoHistory(wxCommandEvent& event); 
+
 	
 
 
@@ -272,6 +261,7 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	void DestroyScene();
 	void RefrehViewports();
 
+	void LoadPlugins(const char* const path);
 	void LoadScene (const char* const fileName);
 	void LoadIcon (const char* const iconName);
 	
