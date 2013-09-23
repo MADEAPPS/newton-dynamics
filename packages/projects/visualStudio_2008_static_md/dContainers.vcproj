@@ -332,6 +332,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\dContainers\dContainersAlloc.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dContainers\dContainersAlloc.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\dContainers\dContainersStdAfx.cpp"
 			>
 			<FileConfiguration
