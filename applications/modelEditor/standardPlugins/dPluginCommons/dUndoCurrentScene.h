@@ -9,8 +9,8 @@
 * freely
 */
 
-#ifndef _D_UNDO_CURRENT_ASSET_H_
-#define _D_UNDO_CURRENT_ASSET_H_
+#ifndef _D_UNDO_CURRENT_SCENE_H_
+#define _D_UNDO_CURRENT_SCENE_H_
 
 #include "dPluginStdafx.h"
 #include "dPluginInterface.h"
@@ -34,7 +34,8 @@ class dUndoCurrentAsset: public dUndoRedo
 	dPluginInterface* m_interface;
 	dTree<int, void*> m_selection;
 	dTree<int, void*> m_exploreStatus;
-	dPluginInterface::AssetPluginAssociation m_backup;
+//	dPluginInterface::AssetPluginAssociation m_backup;
+	dPluginScene* m_backup;
 };
 
 #endif

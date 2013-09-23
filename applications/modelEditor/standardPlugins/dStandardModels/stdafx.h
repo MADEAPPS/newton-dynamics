@@ -34,15 +34,10 @@
 #include <dPluginStdafx.h>
 
 // gui library includes
-//#include <fx.h>
-//#include <fx3d.h>
-
 #include <wx/wx.h>
 #include <wx/event.h>
 #include <wx/dcclient.h>
 #include <wx/glcanvas.h>
-
-
 
 #include <dScene.h>
 #include <dSceneGraph.h>
@@ -58,8 +53,8 @@
 #include <dModelPlugin.h>
 #include <dPluginScene.h>
 #include <dExportPlugin.h>
-#include <dUndoCurrentAsset.h>
 #include <dCollisionPlugin.h>
 #include <dPluginInterface.h>
+#include <dUndoCurrentScene.h>
 
 #endif

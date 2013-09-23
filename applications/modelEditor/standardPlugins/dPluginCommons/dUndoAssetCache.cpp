@@ -11,7 +11,7 @@
 
 #include "dPluginStdafx.h"
 #include "dUndoAssetCache.h"
-
+/*
 dUndoAssetCache::dUndoAssetCache (dPluginInterface* const interface)
 	:dUndoCurrentAsset(interface)
 	,m_backupAssets()
@@ -21,7 +21,6 @@ dUndoAssetCache::dUndoAssetCache (dPluginInterface* const interface)
 	
 	dPluginInterface::dAssetList::dListNode* const currentAsset = interface->GetCurrentAssetNode();
 
-//DTRACE (("save: "));
 	for (dPluginInterface::dAssetList::dListNode* assetNode = interface->GetFirstAssetNode(); assetNode; assetNode = interface->GetNextAssetNode(assetNode)) {
 
 		const dPluginInterface::AssetPluginAssociation& assetPlugin = assetNode->GetInfo();
@@ -38,7 +37,6 @@ dUndoAssetCache::dUndoAssetCache (dPluginInterface* const interface)
 		dScene::dTreeNode* const rootNode = scene->GetRootNode();
 		backup.m_asset->DeleteRootNode ();
 		backup.m_asset->AddRootNode(scene->GetInfoFromNode(rootNode));
-//DTRACE (("%s ", backup.m_asset->GetInfoFromNode(backup.m_asset->GetRootNode())->GetName()));
 
 		for (dScene::dTreeNode* node = scene->GetFirstNode(); node; node = scene->GetNextNode(node)) {
 			if (node != rootNode) {
@@ -55,7 +53,6 @@ dUndoAssetCache::dUndoAssetCache (dPluginInterface* const interface)
 			}
 		}
 	}
-//DTRACE (("\n"));
 }
 
 dUndoAssetCache::~dUndoAssetCache()
@@ -92,7 +89,7 @@ dUndoRedo* dUndoAssetCache::CreateRedoState() const
 {
 	return new dUndoAssetCache (m_interface);
 }
-
+*/
 
 
 

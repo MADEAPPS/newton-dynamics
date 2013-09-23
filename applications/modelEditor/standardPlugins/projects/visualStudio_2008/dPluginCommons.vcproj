@@ -430,11 +430,11 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\dPluginCommons\dUndoCurrentAsset.cpp"
+			RelativePath="..\..\dPluginCommons\dUndoCurrentScene.cpp"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dPluginCommons\dUndoCurrentAsset.h"
+			RelativePath="..\..\dPluginCommons\dUndoCurrentScene.h"
 			>
 		</File>
 		<File

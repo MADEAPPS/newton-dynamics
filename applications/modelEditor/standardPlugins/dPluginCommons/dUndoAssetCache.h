@@ -14,10 +14,10 @@
 
 
 #include "dPluginStdafx.h"
-#include "dUndoCurrentAsset.h"
+#include "dUndoCurrentScene.h"
 
 
-
+/*
 class dUndoAssetCache: public dUndoCurrentAsset
 {
 	public:
@@ -31,7 +31,7 @@ class dUndoAssetCache: public dUndoCurrentAsset
 	dList<dPluginInterface::AssetPluginAssociation> m_backupAssets;
 	dList<dPluginInterface::AssetPluginAssociation>::dListNode* m_currentScene;
 };
-
+*/
 
 
 

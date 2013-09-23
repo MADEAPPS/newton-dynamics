@@ -46,8 +46,11 @@ class dPluginScene: public dScene
 	virtual void RenderFlatShaded (dSceneRender* const render);
 	virtual void RenderSolidWireframe (dSceneRender* const render);
 	virtual void RenderWireframeSelection (dSceneRender* const render, dPluginInterface* const interface);
-
 	virtual void UpdateAllOOBB ();
+
+
+	void MergeScene (dPluginInterface* const interface, dPluginScene* const asset) const;
+
 	private:
 	
 	virtual void RenderWireframeSceneNode (dSceneRender* const render, dScene::dTreeNode* const sceneNode);

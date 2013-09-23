@@ -726,7 +726,7 @@ void NewtonModelEditor::DestroyScene()
 	NewtonWorld* const world = m_scene->GetNewtonWorld();
 
 	m_scene->Release();
-	RemoveAllAsset();
+//	RemoveAllAsset();
 //	m_explorer->RefreshAllViewer();
 
 	NewtonWorldSetUserData(world, NULL);
@@ -1047,7 +1047,6 @@ void NewtonModelEditor::OnUndo(wxCommandEvent& event)
 	dUndoRedoManager::Undo();
 //	m_explorer->RefreshAllViewer();
 	RefrehViewports();
-//	return 1;
 }
 
 void NewtonModelEditor::OnRedo(wxCommandEvent& event)
@@ -1073,12 +1072,10 @@ void NewtonModelEditor::OnMesh (wxCommandEvent& event)
 
 	dPluginScene* const asset = plugin->Create (this);
 	if (asset) {
-		dAssert(0);
-/*
-		m_explorer->AddAsset(asset, plugin);
+		m_scene->MergeScene(this, asset);
+//		m_explorer->AddAsset(asset, plugin);
 		asset->Release();
 		RefrehViewports();
-*/
 	}
 }
 
@@ -1150,11 +1147,8 @@ void NewtonModelEditor::OnOpenScene(wxCommandEvent& event)
 {
 	wxFileDialog open (this, wxT("Load Newton Dynamics Scene"), wxT("../../../media"), wxT(""), wxT("*.ngd"));
 	if (open.ShowModal() == wxID_OK) {
-//		dPluginScene* const scene = GetScene();
-//		NewtonWorld* const world = scene->GetNewtonWorld();
 		OnNew (event);
 		m_lastFilePath = open.GetPath();
-//		m_filePathFile = m_lastFilePath.text();
 		LoadScene (m_lastFilePath.mb_str());
 	}
 }

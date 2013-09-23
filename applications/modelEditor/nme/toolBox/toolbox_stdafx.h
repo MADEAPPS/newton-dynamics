@@ -134,7 +134,7 @@ typedef long long unsigned64;
 #include <dRefCounter.h>
 #include <dBaseHierarchy.h>
 #include <dUndoAssetCache.h>
-#include <dUndoCurrentAsset.h>
+#include <dUndoCurrentScene.h>
 
 #include <dSceneStdafx.h>
 #include <dPluginStdafx.h>

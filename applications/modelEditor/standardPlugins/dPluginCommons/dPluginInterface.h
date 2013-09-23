@@ -18,7 +18,6 @@
 #include "dPluginScene.h"
 class dPluginMesh;
 class dSceneRender;
-//class dPluginScene;
 class dPluginCamera;
 class dPluginRecord;
 
@@ -29,7 +28,7 @@ class dPluginInterface: public dUndoRedoManager
 	class dPluginDll: public dList <HMODULE>
 	{
 	};
-
+/*
 	class AssetPluginAssociation
 	{
 		public:
@@ -63,17 +62,20 @@ class dPluginInterface: public dUndoRedoManager
 		dPluginScene* m_asset;
 		dPluginMesh* m_plugin;
 	};
+*/
 
 
-	class dAssetList: public dList <AssetPluginAssociation>
-	{
-	};
+//	class dAssetList: public dList <AssetPluginAssociation>
+//	{
+//	};
 
 	dPluginInterface(void);
 	virtual ~dPluginInterface(void);
 	
 	virtual dPluginScene* GetScene() const;
-	virtual dPluginScene* GetAsset() const;
+	virtual void SetScene(dPluginScene* const scene);
+
+//	virtual dPluginScene* GetAsset() const;
 	virtual dSceneRender* GetRender() const;
 
 	virtual dPluginCamera* GetCamera() const;
@@ -83,17 +85,15 @@ class dPluginInterface: public dUndoRedoManager
 	virtual void* GetNextPluginNode(void* const pluginNode) const;
 	virtual dPluginRecord* GetPluginFromNode(void* const pluginNode) const;
 
-	virtual dAssetList::dListNode* AddAsset(dPluginScene* const scene, dPluginMesh* plugin);
-	virtual void RemoveAsset(dAssetList::dListNode* const node);
-	virtual void RemoveAllAsset();
-	virtual dAssetList::dListNode* GetCurrentAssetNode() const;
-	virtual void SetCurrentAssetNode(dAssetList::dListNode* const node);
-
-
-	virtual dAssetList::dListNode* GetFirstAssetNode() const;
-	virtual dAssetList::dListNode* GetNextAssetNode(dAssetList::dListNode* const node) const;
-	virtual dPluginScene* GetAssetFromNode(dAssetList::dListNode* const node) const;
-	virtual dPluginMesh* GetAssetPluginFromNode(dAssetList::dListNode* const node) const;
+//	virtual dAssetList::dListNode* AddAsset(dPluginScene* const scene, dPluginMesh* plugin);
+//	virtual void RemoveAsset(dAssetList::dListNode* const node);
+//	virtual void RemoveAllAsset();
+//	virtual dAssetList::dListNode* GetCurrentAssetNode() const;
+//	virtual void SetCurrentAssetNode(dAssetList::dListNode* const node);
+//	virtual dAssetList::dListNode* GetFirstAssetNode() const;
+//	virtual dAssetList::dListNode* GetNextAssetNode(dAssetList::dListNode* const node) const;
+//	virtual dPluginScene* GetAssetFromNode(dAssetList::dListNode* const node) const;
+//	virtual dPluginMesh* GetAssetPluginFromNode(dAssetList::dListNode* const node) const;
 
 	virtual const char* GetFilePath() const;
 
@@ -120,8 +120,8 @@ class dPluginInterface: public dUndoRedoManager
 	dPluginCamera* m_currentCamera;
 	dPluginDll m_allPlugins;
 	const char* m_filePathFile;
-	dAssetList m_assetCache;
-	dAssetList::dListNode* m_currentAsset;
+//	dAssetList m_assetCache;
+//	dAssetList::dListNode* m_currentAsset;
 
 	dTree<int, void*> m_selection;
 	dTree<int, void*> m_ExplorerExpand;

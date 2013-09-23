@@ -20,6 +20,7 @@
 #include "dPluginStdafx.h"
 #include "dPluginScene.h"
 #include "dPluginInterface.h"
+#include "dUndoCurrentScene.h"
 
 dPluginScene::dPluginScene(NewtonWorld* const newton)
 	:dScene (newton)
@@ -234,3 +235,9 @@ void dPluginScene::UpdateAllOOBB ()
 	}
 }
 
+
+void dPluginScene::MergeScene (dPluginInterface* const interface, dPluginScene* const asset) const
+{
+	interface->Push(new dUndoCurrentAsset(interface));
+	interface->GetScene()->dScene::MergeScene(asset);
+}

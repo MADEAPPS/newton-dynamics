@@ -27,7 +27,7 @@ dPluginInterface::dPluginInterface(void)
 	,m_render(NULL)
 	,m_currentCamera(NULL)
 	,m_filePathFile(NULL)
-	,m_currentAsset(NULL)
+//	,m_currentAsset(NULL)
 {
 	m_render = new dPluginRender;
 	m_render->Init();
@@ -42,7 +42,7 @@ dPluginInterface::~dPluginInterface(void)
 
 	m_render->Release();
 
-	RemoveAllAsset();
+//	RemoveAllAsset();
 }
 
 
@@ -104,11 +104,15 @@ dPluginScene* dPluginInterface::GetScene() const
 	return m_scene;
 }
 
-dPluginScene* dPluginInterface::GetAsset() const
+void dPluginInterface::SetScene(dPluginScene* const scene)
 {
-//	return m_currentAsset ? m_currentAsset->GetInfo().m_asset : NULL;
-	return GetAssetFromNode(GetCurrentAssetNode());
+	m_scene = scene;
 }
+
+//dPluginScene* dPluginInterface::GetAsset() const
+//{
+//	return GetAssetFromNode(GetCurrentAssetNode());
+//}
 
 dSceneRender* dPluginInterface::GetRender() const
 {
@@ -154,68 +158,65 @@ dPluginRecord* dPluginInterface::GetPluginFromNode(void* const pluginNode) const
 }
 
 
-dPluginInterface::dAssetList::dListNode* dPluginInterface::GetCurrentAssetNode() const
-{
-	return m_currentAsset;
-}
+//dPluginInterface::dAssetList::dListNode* dPluginInterface::GetCurrentAssetNode() const
+//{
+//	return m_currentAsset;
+//}
 
-void dPluginInterface::SetCurrentAssetNode(dAssetList::dListNode* const node)
-{
-	m_currentAsset = (dAssetList::dListNode*) node;
-}
+//void dPluginInterface::SetCurrentAssetNode(dAssetList::dListNode* const node)
+//{
+//	m_currentAsset = (dAssetList::dListNode*) node;
+//}
 
+//dPluginInterface::dAssetList::dListNode* dPluginInterface::GetFirstAssetNode() const
+//{
+//	return m_assetCache.GetFirst(); 
+//}
 
-dPluginInterface::dAssetList::dListNode* dPluginInterface::GetFirstAssetNode() const
-{
-	return m_assetCache.GetFirst(); 
-}
+//dPluginInterface::dAssetList::dListNode* dPluginInterface::GetNextAssetNode(dPluginInterface::dAssetList::dListNode* const node) const
+//{
+//	return node ? ((dAssetList::dListNode*)node)->GetNext() : NULL;
+//}
 
-dPluginInterface::dAssetList::dListNode* dPluginInterface::GetNextAssetNode(dPluginInterface::dAssetList::dListNode* const node) const
-{
-	return node ? ((dAssetList::dListNode*)node)->GetNext() : NULL;
-}
+//dPluginScene* dPluginInterface::GetAssetFromNode(dPluginInterface::dAssetList::dListNode* const node) const
+//{
+//	return node ? node->GetInfo().m_asset : NULL;
+//}
 
-dPluginScene* dPluginInterface::GetAssetFromNode(dPluginInterface::dAssetList::dListNode* const node) const
-{
-	return node ? node->GetInfo().m_asset : NULL;
-}
+//dPluginMesh* dPluginInterface::GetAssetPluginFromNode(dPluginInterface::dAssetList::dListNode* const node) const
+//{
+//	return node ? node->GetInfo().m_plugin : NULL;
+//}
 
-dPluginMesh* dPluginInterface::GetAssetPluginFromNode(dPluginInterface::dAssetList::dListNode* const node) const
-{
-	return node ? node->GetInfo().m_plugin : NULL;
-}
+//dPluginInterface::dAssetList::dListNode* dPluginInterface::AddAsset(dPluginScene* const asset, dPluginMesh* const plugin)
+//{
+//	AssetPluginAssociation association (asset, plugin);
+//	m_currentAsset = m_assetCache.Append(association);
+//	return m_currentAsset;
+//}
 
+//void dPluginInterface::RemoveAllAsset()
+//{
+//	while (m_assetCache.GetCount()) {
+//		RemoveAsset(m_assetCache.GetFirst());
+//	}
+//}
 
-dPluginInterface::dAssetList::dListNode* dPluginInterface::AddAsset(dPluginScene* const asset, dPluginMesh* const plugin)
-{
-	AssetPluginAssociation association (asset, plugin);
-	m_currentAsset = m_assetCache.Append(association);
-	return m_currentAsset;
-}
-
-void dPluginInterface::RemoveAllAsset()
-{
-	while (m_assetCache.GetCount()) {
-		RemoveAsset(m_assetCache.GetFirst());
-	}
-}
-
-void dPluginInterface::RemoveAsset(dPluginInterface::dAssetList::dListNode* const assetNode)
-{
-	if (assetNode == m_currentAsset) {
-		_ASSERTE (m_currentAsset);
-		if (m_currentAsset->GetNext()) {
-			m_currentAsset = m_currentAsset->GetNext();
-		} else if (m_currentAsset->GetPrev()){
-			m_currentAsset = m_currentAsset->GetPrev();
-		} else {
-			m_currentAsset = NULL;
-		}
-	}
-
-	dPluginScene* const asset = assetNode->GetInfo().m_asset;
-	m_assetCache.Remove(assetNode);
-}
+//void dPluginInterface::RemoveAsset(dPluginInterface::dAssetList::dListNode* const assetNode)
+//{
+//	if (assetNode == m_currentAsset) {
+//		_ASSERTE (m_currentAsset);
+//		if (m_currentAsset->GetNext()) {
+//			m_currentAsset = m_currentAsset->GetNext();
+//		} else if (m_currentAsset->GetPrev()){
+//			m_currentAsset = m_currentAsset->GetPrev();
+//		} else {
+//			m_currentAsset = NULL;
+//		}
+//	}
+//	dPluginScene* const asset = assetNode->GetInfo().m_asset;
+//	m_assetCache.Remove(assetNode);
+//}
 
 
 
