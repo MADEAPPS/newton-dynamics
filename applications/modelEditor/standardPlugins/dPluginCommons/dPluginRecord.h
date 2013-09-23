@@ -19,12 +19,7 @@
 #ifndef __D_PLUGIN_RECORD__
 #define __D_PLUGIN_RECORD__
 
-#ifdef D_PLUGIN_EXPORT
-	#define D_PLUGIN_API __declspec(dllexport)
-#else
-	#define D_PLUGIN_API __declspec(dllimport)
-#endif
-
+#include "dPluginUtils.h"
 
 
 class dPluginRecord
@@ -40,17 +35,15 @@ class dPluginRecord
 		m_collision,
 	};
 
-	dPluginRecord(void);
-	virtual ~dPluginRecord(void);
+	DPLUGIN_API dPluginRecord(void);
+	virtual DPLUGIN_API ~dPluginRecord(void);
 
 	virtual const char* GetMenuName () {return NULL;}
 	virtual const char* GetFileExtension () {return NULL;}
 	virtual const char* GetFileDescription () {return NULL;}
 
-
 	virtual const char* GetSignature () = 0;
 	virtual dPluginType GetType () = 0;
-
 };
 
 #endif

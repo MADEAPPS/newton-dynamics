@@ -20,7 +20,9 @@
 #include "dPluginRender.h"
 
 dPluginRender::dPluginRender(void)
-	:m_wireFrameDisplayList()
+	:dSceneRender()
+	,dPluginAlloc()
+	,m_wireFrameDisplayList()
 	,m_flatShadedDisplayList()
 {
 }

@@ -46,7 +46,7 @@
 #include <dPluginScene.h>
 #include <dExportPlugin.h>
 #include <dImportPlugin.h>
-#include <dUndoCurrentAsset.h>
 #include <dPluginInterface.h>
+#include <dUndoCurrentScene.h>
 
 #endif

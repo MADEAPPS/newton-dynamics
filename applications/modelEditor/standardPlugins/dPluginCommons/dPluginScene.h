@@ -19,6 +19,7 @@
 #ifndef _D_PLUGIN_SCENE_H_
 #define _D_PLUGIN_SCENE_H_
 
+#include "dPluginUtils.h"
 
 class dPluginInterface;
 
@@ -36,28 +37,24 @@ class dPluginSceneRegisterClass
 	static dPluginSceneRegisterClass __##className(className::BaseClassName(), &className::GetSingleton())
 
 
-class dPluginScene: public dScene
+class dPluginScene: public dScene, public dPluginAlloc
 {
 	public:
-	dPluginScene(NewtonWorld* const newton);
-	virtual ~dPluginScene(void);
+	DPLUGIN_API dPluginScene(NewtonWorld* const newton);
+	virtual DPLUGIN_API ~dPluginScene(void);
 
-	virtual void RenderWireframe (dSceneRender* const render);
-	virtual void RenderFlatShaded (dSceneRender* const render);
-	virtual void RenderSolidWireframe (dSceneRender* const render);
-	virtual void RenderWireframeSelection (dSceneRender* const render, dPluginInterface* const interface);
-	virtual void UpdateAllOOBB ();
-
-
-	void MergeScene (dPluginInterface* const interface, dPluginScene* const asset) const;
+	virtual DPLUGIN_API void RenderWireframe (dSceneRender* const render);
+	virtual DPLUGIN_API void RenderFlatShaded (dSceneRender* const render);
+	virtual DPLUGIN_API void RenderSolidWireframe (dSceneRender* const render);
+	virtual DPLUGIN_API void RenderWireframeSelection (dSceneRender* const render, dPluginInterface* const interface);
+	virtual DPLUGIN_API void UpdateAllOOBB ();
+	virtual void DPLUGIN_API MergeScene (dPluginInterface* const interface, dPluginScene* const asset) const;
 
 	private:
-	
 	virtual void RenderWireframeSceneNode (dSceneRender* const render, dScene::dTreeNode* const sceneNode);
 	virtual void RenderFlatShadedSceneNode (dSceneRender* const render, dScene::dTreeNode* const sceneNode);
 	//virtual void RenderSelectedSceneNodes (dSceneRender* const render, dScene::dTreeNode* const sceneNode, dPluginInterface* const interface);
 	virtual void RenderSelectedSceneNodes (dSceneRender* const render, void* const incidentSceneNodeLink, dPluginInterface* const interface);
-	
 
 	int IncLRU();
 	int m_lru;

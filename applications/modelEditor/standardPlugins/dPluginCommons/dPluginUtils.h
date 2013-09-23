@@ -22,12 +22,44 @@
 #define __D_PLUGIN_UTILS_H__
 
 
+#ifdef _DPLUGIN_COMMON_BUILD_DLL
+	#ifdef _WIN32
+		#define DPLUGIN_API __declspec (dllexport)
+	#else
+		#define DPLUGIN_API __attribute__ ((visibility("default")))
+	#endif
+#else
+	#ifdef _WIN32
+		#define DPLUGIN_API __declspec (dllimport)
+	#else
+		#define NEWTON_API
+	#endif
+#endif
+
+
+class dPluginAlloc  
+{
+	public:
+	dPluginAlloc  ()
+	{
+	}
+
+	virtual ~dPluginAlloc  () 
+	{
+	}
+
+	DPLUGIN_API void *operator new (size_t size);
+	DPLUGIN_API void operator delete (void* ptr);
+};
+
+
+
 // for some reason specifying a relative does not seem to work in Linus
 // and i have to specify a absolute path
 // #define ASSETS_PATH "."
-void GetMediaDirectory (char* const mediaDirOut);
-void GetAplicationDirectory (char* const aplicationDirOut);
-void GetWorkingFileName (const char* const name, char* const outPathNameOut);
+DPLUGIN_API void GetMediaDirectory (char* const mediaDirOut);
+DPLUGIN_API void GetAplicationDirectory (char* const aplicationDirOut);
+DPLUGIN_API void GetWorkingFileName (const char* const name, char* const outPathNameOut);
 
 
 // TODO: reference additional headers your program requires here

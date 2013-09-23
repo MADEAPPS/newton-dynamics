@@ -19,7 +19,9 @@
 #ifndef _D_PLUGIN_RENDER_H_
 #define _D_PLUGIN_RENDER_H_
 
-class dPluginRender: public dSceneRender
+#include "dPluginUtils.h"
+
+class dPluginRender: public dSceneRender, public dPluginAlloc
 {
 	public:
 	dPluginRender(void);

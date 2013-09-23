@@ -16,13 +16,15 @@
 #define _D_PLUGIN_INTERFACE_H_
 
 #include "dPluginScene.h"
+#include "dPluginUtils.h"
+
 class dPluginMesh;
 class dSceneRender;
 class dPluginCamera;
 class dPluginRecord;
 
 
-class dPluginInterface: public dUndoRedoManager
+class dPluginInterface: public dUndoRedoManager, public dPluginAlloc
 {
 	public:
 	class dPluginDll: public dList <HMODULE>
@@ -69,21 +71,21 @@ class dPluginInterface: public dUndoRedoManager
 //	{
 //	};
 
-	dPluginInterface(void);
-	virtual ~dPluginInterface(void);
+	DPLUGIN_API dPluginInterface(void);
+	virtual DPLUGIN_API  ~dPluginInterface(void);
 	
-	virtual dPluginScene* GetScene() const;
-	virtual void SetScene(dPluginScene* const scene);
+	virtual DPLUGIN_API dPluginScene* GetScene() const;
+	virtual DPLUGIN_API void SetScene(dPluginScene* const scene);
 
 //	virtual dPluginScene* GetAsset() const;
-	virtual dSceneRender* GetRender() const;
+	virtual DPLUGIN_API dSceneRender* GetRender() const;
 
-	virtual dPluginCamera* GetCamera() const;
-	virtual dPluginRecord* GetPlugin(const char* const signature) const;
+	virtual DPLUGIN_API dPluginCamera* GetCamera() const;
+	virtual DPLUGIN_API dPluginRecord* GetPlugin(const char* const signature) const;
 
-	virtual void* GetFirstPluginNode() const;
-	virtual void* GetNextPluginNode(void* const pluginNode) const;
-	virtual dPluginRecord* GetPluginFromNode(void* const pluginNode) const;
+	virtual DPLUGIN_API void* GetFirstPluginNode() const;
+	virtual DPLUGIN_API void* GetNextPluginNode(void* const pluginNode) const;
+	virtual DPLUGIN_API dPluginRecord* GetPluginFromNode(void* const pluginNode) const;
 
 //	virtual dAssetList::dListNode* AddAsset(dPluginScene* const scene, dPluginMesh* plugin);
 //	virtual void RemoveAsset(dAssetList::dListNode* const node);
@@ -95,26 +97,26 @@ class dPluginInterface: public dUndoRedoManager
 //	virtual dPluginScene* GetAssetFromNode(dAssetList::dListNode* const node) const;
 //	virtual dPluginMesh* GetAssetPluginFromNode(dAssetList::dListNode* const node) const;
 
-	virtual const char* GetFilePath() const;
+	virtual DPLUGIN_API const char* GetFilePath() const;
+
+	virtual DPLUGIN_API void ClearSelection();
+	virtual DPLUGIN_API bool IsNodeSelected(void* const incidentLink) const;
+	virtual DPLUGIN_API void AddToSelection(void* const incidentLink);
+	virtual DPLUGIN_API void RemoveFromSelection(void* const incidentLink);
+	virtual DPLUGIN_API void* GetFirtSelectedNode() const;
+	virtual DPLUGIN_API void* GetNextSelectedNode(void* const incidentLink) const;
 
 
-	virtual void ClearSelection();
-	virtual bool IsNodeSelected(void* const incidentLink) const;
-	virtual void AddToSelection(void* const incidentLink);
-	virtual void RemoveFromSelection(void* const incidentLink);
-	virtual void* GetFirtSelectedNode() const;
-	virtual void* GetNextSelectedNode(void* const incidentLink) const;
-
-
-	virtual void ClearExplorerExpand();
-	virtual void AddExplorerExpandNode(void* const incidentLink, bool state);
-	virtual void SetExplorerExpandNodeState(void* const incidentLink, bool state);
-	virtual bool GetExplorerExpandNodeState(void* const incidentLink) const;
+	virtual DPLUGIN_API void ClearExplorerExpand();
+	virtual DPLUGIN_API void AddExplorerExpandNode(void* const incidentLink, bool state);
+	virtual DPLUGIN_API void SetExplorerExpandNodeState(void* const incidentLink, bool state);
+	virtual DPLUGIN_API bool GetExplorerExpandNodeState(void* const incidentLink) const;
 
 
 	protected:
-	void LoadPlugins(const char* const path, dPluginDll& plugins);
+	DPLUGIN_API void LoadPlugins(const char* const path, dPluginDll& plugins);
 
+	private:
 	dPluginScene* m_scene;
 	dSceneRender* m_render;
 	dPluginCamera* m_currentCamera;

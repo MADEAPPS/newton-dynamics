@@ -22,6 +22,24 @@
 #include "dPluginUtils.h"
 
 
+#ifdef _DPLUGIN_COMMON_BUILD_DLL
+	#if (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
+	int main(int argc, char* argv[])
+	{
+		return 0;
+	}
+	#endif
+
+	#ifdef _MSC_VER
+	BOOL APIENTRY DllMain (HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
+	{
+		return TRUE;
+	}
+	#endif
+#endif
+
+
+
 
 
 void GetAplicationDirectory (char* const aplicationDir)
@@ -99,3 +117,28 @@ void GetWorkingFileName (const char* const name, char* const outPathName)
 	ptr [0] = 0;
 	sprintf (outPathName, "%sapplications/media/%s", appPath, name);
 }
+
+
+
+
+void* operator new (size_t size) 
+{ 
+	return NewtonAlloc(int (size));
+}
+
+void operator delete (void* ptr) 
+{ 
+	NewtonFree(ptr);
+}
+
+
+void* dPluginAlloc::operator new (size_t size)
+{
+	return NewtonAlloc(int (size));
+}
+
+void dPluginAlloc::operator delete (void* ptr)
+{
+	NewtonFree(ptr);
+}
+

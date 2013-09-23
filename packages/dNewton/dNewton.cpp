@@ -26,6 +26,24 @@
 #include "dNewtonCollision.h"
 #include "dNewtonTransformManager.h"
 
+
+#ifdef _CNEWTON_BUILD_DLL
+	#if (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
+	int main(int argc, char* argv[])
+	{
+		return 0;
+	}
+	#endif
+
+	#ifdef _MSC_VER
+	BOOL APIENTRY DllMain (HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
+	{
+		return TRUE;
+	}
+	#endif
+#endif
+
+
 dNewton::ScopeLock::ScopeLock (unsigned* const lock)
 	:m_atomicLock(lock)
 {

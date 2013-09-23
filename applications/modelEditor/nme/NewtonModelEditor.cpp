@@ -712,7 +712,7 @@ void NewtonModelEditor::CreateScene()
 	// link the work with this user data
 	NewtonWorldSetUserData(world, this);
 
-	m_scene = new dPluginScene (world);
+	SetScene (new dPluginScene (world));
 
 //	_ASSERTE (0);
 //	m_explorer->Populate (m_scene);
@@ -723,9 +723,9 @@ void NewtonModelEditor::CreateScene()
 void NewtonModelEditor::DestroyScene()
 {
 	Clear();
-	NewtonWorld* const world = m_scene->GetNewtonWorld();
+	NewtonWorld* const world = GetScene()->GetNewtonWorld();
 
-	m_scene->Release();
+	GetScene()->Release();
 //	RemoveAllAsset();
 //	m_explorer->RefreshAllViewer();
 
@@ -964,12 +964,12 @@ void NewtonModelEditor::LoadScene (const char* const fileName)
 {
 //	m_currentFileName = fileName;
 
-	m_scene->Cleanup();
+	GetScene()->Cleanup();
 
 		// load the scene from and alchemedia file format
-//	m_scene->makeCurrent();
-	m_scene->Deserialize (fileName);
-//	m_scene->makeNonCurrent();
+//	GetScene()->makeCurrent();
+	GetScene()->Deserialize (fileName);
+//	GetScene()->makeNonCurrent();
 	ClearSelection();
 
 /*
@@ -977,7 +977,7 @@ void NewtonModelEditor::LoadScene (const char* const fileName)
 	dMatrix camMatrix (GetIdentityMatrix());
 	camMatrix = dYawMatrix(-0.0f * 3.1416f / 180.0f);
 	camMatrix.m_posit = dVector (-5.0f, 1.0f, -0.0f, 0.0f);
-	m_scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
+	GetScene()->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
 	RestoreSettings ();
 */
@@ -1072,7 +1072,7 @@ void NewtonModelEditor::OnMesh (wxCommandEvent& event)
 
 	dPluginScene* const asset = plugin->Create (this);
 	if (asset) {
-		m_scene->MergeScene(this, asset);
+		GetScene()->MergeScene(this, asset);
 //		m_explorer->AddAsset(asset, plugin);
 		asset->Release();
 		RefrehViewports();

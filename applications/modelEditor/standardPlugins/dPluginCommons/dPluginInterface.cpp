@@ -23,7 +23,9 @@
 typedef dPluginRecord** (CALLBACK* GetPluginArray)();
 
 dPluginInterface::dPluginInterface(void)
-	:m_scene(NULL)
+	:dUndoRedoManager()
+	,dPluginAlloc()
+	,m_scene(NULL)
 	,m_render(NULL)
 	,m_currentCamera(NULL)
 	,m_filePathFile(NULL)
