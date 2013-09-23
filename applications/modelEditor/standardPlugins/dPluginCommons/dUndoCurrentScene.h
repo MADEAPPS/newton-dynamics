@@ -13,6 +13,7 @@
 #define _D_UNDO_CURRENT_SCENE_H_
 
 #include "dPluginStdafx.h"
+#include "dUndoRedo.h"
 #include "dPluginInterface.h"
 
 class dPluginMesh;

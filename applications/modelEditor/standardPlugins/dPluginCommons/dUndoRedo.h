@@ -12,41 +12,41 @@
 #ifndef _UNDO_REDO_H_
 #define _UNDO_REDO_H_
 
-#include "dList.h"
+#include "dPluginUtils.h"
 
-class dUndoRedo
+class dUndoRedo: public dPluginAlloc 
 {
 	public:
-	dUndoRedo();
-	virtual ~dUndoRedo();
+	DPLUGIN_API dUndoRedo();
+	virtual DPLUGIN_API ~dUndoRedo();
 
 	virtual void RestoreState() = 0;
 	virtual dUndoRedo* CreateRedoState() const = 0;
 
 };
 
-class dUndoRedoManager 
+class dUndoRedoManager: public dPluginAlloc 
 {
 	public:
 	class dStack: public dList<dUndoRedo*>
 	{
 		public:
-		dStack ();
-		~dStack ();
-		void Clear();
+		DPLUGIN_API dStack ();
+		DPLUGIN_API ~dStack ();
 
-		void Push(dUndoRedo* const state);
-		dUndoRedo* Pop();
+		DPLUGIN_API void Clear();
+		DPLUGIN_API void Push(dUndoRedo* const state);
+		DPLUGIN_API dUndoRedo* Pop();
 	};
 
-	dUndoRedoManager();
-	~dUndoRedoManager();
+	DPLUGIN_API dUndoRedoManager();
+	DPLUGIN_API ~dUndoRedoManager();
 	
-	void Clear();
-	void Push(dUndoRedo* const state);
+	DPLUGIN_API void Clear();
+	DPLUGIN_API void Push(dUndoRedo* const state);
 
-	void Undo();
-	void Redo();
+	DPLUGIN_API void Undo();
+	DPLUGIN_API void Redo();
 
 	private:
 	dStack m_undodStack;

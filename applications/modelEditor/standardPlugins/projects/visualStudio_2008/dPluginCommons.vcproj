@@ -69,6 +69,7 @@
 				AdditionalDependencies="opengl32.lib glu32.lib winmm.lib wsock32.lib Ws2_32.lib"
 				OutputFile="$(OutDir)\$(ProjectName)_d.dll"
 				GenerateDebugInformation="true"
+				LinkTimeCodeGeneration="0"
 				ImportLibrary="$(OutDir)/$(ProjectName)_d.lib"
 				TargetMachine="1"
 			/>
@@ -145,6 +146,7 @@
 				AdditionalDependencies="opengl32.lib glu32.lib winmm.lib wsock32.lib Ws2_32.lib"
 				OutputFile="$(OutDir)\$(ProjectName)_d.dll"
 				GenerateDebugInformation="true"
+				LinkTimeCodeGeneration="0"
 				ImportLibrary="$(OutDir)/$(ProjectName)_d.lib"
 				TargetMachine="17"
 			/>
@@ -221,6 +223,7 @@
 				AdditionalDependencies="opengl32.lib glu32.lib winmm.lib wsock32.lib Ws2_32.lib"
 				OutputFile="$(OutDir)\$(ProjectName)_d.dll"
 				GenerateDebugInformation="true"
+				LinkTimeCodeGeneration="0"
 				ImportLibrary="$(OutDir)/$(ProjectName).lib"
 				TargetMachine="1"
 			/>
@@ -298,6 +301,7 @@
 				AdditionalDependencies="opengl32.lib glu32.lib winmm.lib wsock32.lib Ws2_32.lib"
 				OutputFile="$(OutDir)\$(ProjectName)_d.dll"
 				GenerateDebugInformation="true"
+				LinkTimeCodeGeneration="0"
 				ImportLibrary="$(OutDir)/$(ProjectName).lib"
 				TargetMachine="17"
 			/>
@@ -477,6 +481,14 @@
 		</File>
 		<File
 			RelativePath="..\..\dPluginCommons\dUndoCurrentScene.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dPluginCommons\dUndoRedo.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dPluginCommons\dUndoRedo.h"
 			>
 		</File>
 	</Files>

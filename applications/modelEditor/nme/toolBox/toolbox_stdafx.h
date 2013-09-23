@@ -156,6 +156,7 @@ typedef long long unsigned64;
 
 
 #include <dPluginUtils.h>
+#include <dUndoRedo.h>
 #include <dPluginScene.h>
 #include <dPluginMesh.h>
 #include <dModelPlugin.h>
