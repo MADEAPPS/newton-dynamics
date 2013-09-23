@@ -654,6 +654,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\source\core\dgObb.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\source\core\dgObb.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\source\core\dgPlane.h"
 				>
 			</File>
@@ -687,14 +695,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\source\core\dgSPDMatrix.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\source\core\dgSphere.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\source\core\dgSphere.h"
 				>
 			</File>
 			<File

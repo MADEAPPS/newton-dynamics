@@ -739,14 +739,6 @@
 			RelativePath="..\..\dContainers\dTree.h"
 			>
 		</File>
-		<File
-			RelativePath="..\..\dContainers\dUndoRedo.cpp"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dContainers\dUndoRedo.h"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>

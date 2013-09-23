@@ -438,10 +438,6 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\dScene\dllmain.cpp"
-			>
-		</File>
-		<File
 			RelativePath="..\..\dScene\dMaterialNodeInfo.cpp"
 			>
 		</File>

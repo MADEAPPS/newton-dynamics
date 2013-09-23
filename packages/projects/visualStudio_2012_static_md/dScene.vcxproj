@@ -34,7 +34,6 @@
     <ClCompile Include="..\..\dScene\dGeometryNodeInfo.cpp" />
     <ClCompile Include="..\..\dScene\dGeometryNodeModifierInfo.cpp" />
     <ClCompile Include="..\..\dScene\dGeometryNodeSkinModifierInfo.cpp" />
-    <ClCompile Include="..\..\dScene\dllmain.cpp" />
     <ClCompile Include="..\..\dScene\dMaterialNodeInfo.cpp" />
     <ClCompile Include="..\..\dScene\dMeshNodeInfo.cpp" />
     <ClCompile Include="..\..\dScene\dNodeInfo.cpp" />

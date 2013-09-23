@@ -202,7 +202,6 @@
     <ClCompile Include="..\..\dContainers\dRefCounter.cpp" />
     <ClCompile Include="..\..\dContainers\dString.cpp" />
     <ClCompile Include="..\..\dContainers\dTree.cpp" />
-    <ClCompile Include="..\..\dContainers\dUndoRedo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dContainers\dBaseHierarchy.h" />
@@ -215,7 +214,6 @@
     <ClInclude Include="..\..\dContainers\dRtti.h" />
     <ClInclude Include="..\..\dContainers\dString.h" />
     <ClInclude Include="..\..\dContainers\dTree.h" />
-    <ClInclude Include="..\..\dContainers\dUndoRedo.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\coreLibrary_300\projects\windows\project_vs2010_dll\ai.vcxproj">

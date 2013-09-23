@@ -64,9 +64,6 @@
     <ClCompile Include="..\..\..\source\core\dgSPDMatrix.cpp">
       <Filter>math</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\core\dgSphere.cpp">
-      <Filter>math</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\source\core\dg.cpp">
       <Filter>base</Filter>
     </ClCompile>
@@ -90,6 +87,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\source\core\dgAsyncThread.cpp">
       <Filter>threading</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\core\dgObb.cpp">
+      <Filter>math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -180,9 +180,6 @@
     <ClInclude Include="..\..\..\source\core\dgSPDMatrix.h">
       <Filter>math</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\source\core\dgSphere.h">
-      <Filter>math</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\source\core\dg.h">
       <Filter>base</Filter>
     </ClInclude>
@@ -218,6 +215,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\source\core\dgThreadProfiler.h">
       <Filter>threading</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\source\core\dgObb.h">
+      <Filter>math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
