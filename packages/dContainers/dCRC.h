@@ -12,12 +12,14 @@
 #ifndef __dCRC__
 #define __dCRC__
 
+#include "dContainersAlloc.h"
+
 #define dCRCTYPE long long
 
-dCRCTYPE dCRC64 (const char* const string, dCRCTYPE  crcAcc = 0);
-dCRCTYPE dCRC64 (const void* const buffer, int size, dCRCTYPE crcAcc);
+DCONTAINER_API dCRCTYPE dCRC64 (const char* const string, dCRCTYPE  crcAcc = 0);
+DCONTAINER_API dCRCTYPE dCRC64 (const void* const buffer, int size, dCRCTYPE crcAcc);
 
-dCRCTYPE dCombineCRC (dCRCTYPE a, dCRCTYPE b);
+DCONTAINER_API dCRCTYPE dCombineCRC (dCRCTYPE a, dCRCTYPE b);
 
 #endif
 

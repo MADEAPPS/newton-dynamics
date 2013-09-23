@@ -19,18 +19,14 @@
 class dClassInfo: public dRefCounter
 {
 	public:
-	dClassInfo(void);
-	virtual ~dClassInfo(void);
+	dClassInfo(void)
+	{
+	}
+	virtual DCONTAINER_API  ~dClassInfo()
+	{
+	}
+
 	dRttiRootClassSupportDeclare(dClassInfo);
 };
-
-
-inline dClassInfo::dClassInfo(void)
-{
-}
-
-inline dClassInfo::~dClassInfo(void)
-{
-}
 
 #endif

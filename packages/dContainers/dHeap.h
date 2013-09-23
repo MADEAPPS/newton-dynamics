@@ -8,11 +8,11 @@
 
 
 #include "dContainersStdAfx.h"
-
+#include "dContainersAlloc.h"
 
 
 template <class OBJECT, class KEY>
-class dHeapBase
+class dHeapBase: public dContainersAlloc
 {
 	protected:
 	struct dHeapRecord 

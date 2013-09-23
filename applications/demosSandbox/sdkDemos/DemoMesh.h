@@ -50,6 +50,9 @@ class DemoMesh: public dList<DemoSubMesh>, virtual public dClassInfo
 	DemoMesh(const char* const name, const NewtonCollision* const collision, const char* const texture0, const char* const texture1, const char* const texture2);
 	DemoMesh(const char* const name, dFloat* const elevation, int size, dFloat cellSize, dFloat texelsDensity, int tileSize);
 
+	using dClassInfo::operator new;
+	using dClassInfo::operator delete;
+
 	DemoSubMesh* AddSubMesh();
 	void AllocVertexData (int vertexCount);
 

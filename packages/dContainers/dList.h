@@ -14,6 +14,7 @@
 #define __dList__
 
 #include "dContainersStdAfx.h"
+#include "dContainersAlloc.h"
 
 #define D_MAX_ENTRIES_IN_FREELIST	32
 
@@ -47,7 +48,7 @@ class dListAllocator
 // it implements an iterators, and all the basics operation on list found on the STL class
 
 template<class T, class Allocator = dListAllocator<T> >
-class dList 
+class dList: public dContainersAlloc
 {
 	public:
 	class dListNode

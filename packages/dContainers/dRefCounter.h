@@ -13,17 +13,19 @@
 #ifndef __DREF_COUNTER_H__
 #define __DREF_COUNTER_H__
 
+#include "dContainersAlloc.h"
 
-class dRefCounter
+
+class dRefCounter: public dContainersAlloc
 {
 	public:
-	dRefCounter(void);
-	int GetRef() const;
-	int Release();
-	void AddRef() const;
+	DCONTAINER_API dRefCounter(void);
+	DCONTAINER_API int GetRef() const;
+	DCONTAINER_API int Release();
+	DCONTAINER_API void AddRef() const;
 
 	protected:
-	virtual ~dRefCounter(void);
+	DCONTAINER_API virtual ~dRefCounter(void);
 
 	private:
 	mutable int m_refCount;

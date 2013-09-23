@@ -13,6 +13,7 @@
 #include "dRefCounter.h"
 
 dRefCounter::dRefCounter(void)
+	:dContainersAlloc()
 {
 	m_refCount = 1;
 }

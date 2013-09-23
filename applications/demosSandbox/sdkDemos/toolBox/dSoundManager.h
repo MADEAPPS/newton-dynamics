@@ -50,11 +50,14 @@ class dSoundManager
 	{
 	};
 
-	class dSoundAsset: public dSoundChannelList, public dRefCounter
+	class dSoundAsset: public dSoundChannelList, virtual public dRefCounter
 	{
 		public:
 		dSoundAsset();
 		virtual ~dSoundAsset();
+
+		using dRefCounter::operator new;
+		using dRefCounter::operator delete;
 
 
 		int m_buffer;

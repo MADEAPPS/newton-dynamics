@@ -15,42 +15,40 @@
 
 #include "dCRC.h"
 #include "dString.h"
-
-#if (_MSC_VER >= 1400)
-	#pragma warning (disable: 4996) // for 2005 users declared deprecated
-#endif
+#include "dContainersAlloc.h"
 
 
-class dBaseHierarchy
+
+class dBaseHierarchy: public dContainersAlloc
 {
 	public:
-	dBaseHierarchy* GetChild () const;
-	dBaseHierarchy* GetParent () const;
-	dBaseHierarchy* GetSibling () const;
+	DCONTAINER_API dBaseHierarchy* GetChild () const;
+	DCONTAINER_API dBaseHierarchy* GetParent () const;
+	DCONTAINER_API dBaseHierarchy* GetSibling () const;
 
-	void Detach ();
-	void Attach (dBaseHierarchy* const parent, bool addFirst = false);
+	DCONTAINER_API void Detach ();
+	DCONTAINER_API void Attach (dBaseHierarchy* const parent, bool addFirst = false);
 	
-	dBaseHierarchy* GetRoot () const;
-	dBaseHierarchy* GetFirst() const;
-	dBaseHierarchy* GetLast() const;
-	dBaseHierarchy* GetNext() const;
-	dBaseHierarchy* GetPrev() const;
+	DCONTAINER_API dBaseHierarchy* GetRoot () const;
+	DCONTAINER_API dBaseHierarchy* GetFirst() const;
+	DCONTAINER_API dBaseHierarchy* GetLast() const;
+	DCONTAINER_API dBaseHierarchy* GetNext() const;
+	DCONTAINER_API dBaseHierarchy* GetPrev() const;
 
-	dBaseHierarchy* Find (dCRCTYPE nameCRC) const; 
-	dBaseHierarchy* Find (const char* const name) const;
+	DCONTAINER_API dBaseHierarchy* Find (dCRCTYPE nameCRC) const; 
+	DCONTAINER_API dBaseHierarchy* Find (const char* const name) const;
 
-	long long GetNameID() const;
-	const dString& GetName() const;
-	void SetNameID(const char* const name);
-
+	DCONTAINER_API long long GetNameID() const;
+	DCONTAINER_API const dString& GetName() const;
+	DCONTAINER_API void SetNameID(const char* const name);
+	
 	protected:
-	dBaseHierarchy ();
-	dBaseHierarchy (const char* const name);
-	dBaseHierarchy (const dBaseHierarchy &clone);
-	virtual ~dBaseHierarchy ();
+	DCONTAINER_API dBaseHierarchy ();
+	DCONTAINER_API dBaseHierarchy (const char* const name);
+	DCONTAINER_API dBaseHierarchy (const dBaseHierarchy &clone);
+	virtual DCONTAINER_API ~dBaseHierarchy ();
 
-	virtual dBaseHierarchy* CreateClone () const = 0;
+	virtual DCONTAINER_API dBaseHierarchy* CreateClone () const = 0;
 
 	private:
 	inline void Clear();

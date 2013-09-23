@@ -14,21 +14,21 @@
 #define __DSTRING_H_
 
 #include "dContainersStdAfx.h"
+#include "dContainersAlloc.h"
 
 
-
-class dString
+class dString: public dContainersAlloc
 {
 	class dStringAllocator;
 	public:
-	dString ();
-	dString (char chr);
-	dString (const dString& src);
-	dString (const char* const data);
-	dString (const char* const data, int maxSize);
-	dString (int val);
-	dString (long long val);
-	~dString ();
+	DCONTAINER_API dString ();
+	DCONTAINER_API dString (char chr);
+	DCONTAINER_API dString (const dString& src);
+	DCONTAINER_API dString (const char* const data);
+	DCONTAINER_API dString (const char* const data, int maxSize);
+	DCONTAINER_API dString (int val);
+	DCONTAINER_API dString (long long val);
+	DCONTAINER_API ~dString ();
 
 	char& operator[] (int index);
 	char operator[] (int index) const;
