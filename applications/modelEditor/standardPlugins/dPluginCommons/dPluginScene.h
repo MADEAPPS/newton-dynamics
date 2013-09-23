@@ -37,7 +37,7 @@ class dPluginSceneRegisterClass
 	static dPluginSceneRegisterClass __##className(className::BaseClassName(), &className::GetSingleton())
 
 
-class dPluginScene: public dScene, public dPluginAlloc
+class dPluginScene: public dScene//, public dPluginAlloc
 {
 	public:
 	DPLUGIN_API dPluginScene(NewtonWorld* const newton);

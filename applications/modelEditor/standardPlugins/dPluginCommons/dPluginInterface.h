@@ -24,7 +24,7 @@ class dPluginCamera;
 class dPluginRecord;
 
 
-class dPluginInterface: public dUndoRedoManager, public dPluginAlloc
+class dPluginInterface: public dUndoRedoManager
 {
 	public:
 	class dPluginDll: public dList <HMODULE>

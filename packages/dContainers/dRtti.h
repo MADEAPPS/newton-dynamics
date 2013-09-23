@@ -13,17 +13,18 @@
 #define __DRTTI_H__
 
 #include "dCRC.h"
+#include "dContainersAlloc.h"
 
 #define dRttiCommon(className)				\
 	private:								\
 	static dCRCTYPE m_rtti; 				\
 	public:									\
 	public:									\
-	static dCRCTYPE GetRttiType()			\
+	static DCONTAINER_API dCRCTYPE GetRttiType()			\
 	{										\
 		return m_rtti;						\
 	}										\
-	virtual dCRCTYPE GetTypeId () const		\
+	virtual DCONTAINER_API dCRCTYPE GetTypeId () const		\
 	{										\
 		return m_rtti;						\
 	}										\
@@ -33,7 +34,7 @@
 // add these macros only to the root base class that you want to have rtti 
 #define dRttiRootClassSupportDeclare(className)		\
 	dRttiCommon(className)							\
-	virtual bool IsType (dCRCTYPE typeId) const		\
+	virtual DCONTAINER_API bool IsType (dCRCTYPE typeId) const		\
 	{												\
 		return typeId == m_rtti;					\
 	}												
@@ -46,7 +47,7 @@
 // add these macros to every derived class  
 #define dAddRtti(baseClass)								\
 	dRttiCommon(baseClass)								\
-	virtual bool IsType (dCRCTYPE typeId) const			\
+	virtual DCONTAINER_API bool IsType (dCRCTYPE typeId) const			\
 	{													\
 		if (typeId == m_rtti) {							\
 			return true;								\

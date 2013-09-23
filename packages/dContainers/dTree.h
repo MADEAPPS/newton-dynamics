@@ -14,6 +14,7 @@
 #define __dTree__
 
 #include "dContainersStdAfx.h"
+#include "dContainersAlloc.h"
 #include <stdlib.h>
 
 // Note: this is a low level class for dTree use only
@@ -88,7 +89,7 @@ class dTreeAllocator
 
 
 template<class OBJECT, class KEY, class Allocator = dTreeAllocator<OBJECT, KEY> >
-class dTree 
+class dTree: public dContainersAlloc 
 {
 	public:
 	class dTreeNode: public dRedBackNode
