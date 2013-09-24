@@ -22,7 +22,7 @@
 #include "dPluginUtils.h"
 
 
-#ifdef _DPLUGIN_COMMON_BUILD_DLL
+#ifdef _DPLUGIN_COMMON_DLL_EXPORT
 	#if (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
 	int main(int argc, char* argv[])
 	{

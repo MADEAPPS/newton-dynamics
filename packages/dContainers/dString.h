@@ -76,10 +76,10 @@ class dString: public dContainersAlloc
 
 	int Find (const char* const subString, int stringSize, int from, int lenght) const;
 
-	char* AllocMem(int size);
-	void FreeMem (char* const ptr);
 
 	protected:
+	char* AllocMem(int size);
+	void FreeMem (char* const ptr);
 	dString (const dString& src, const char* const concatenate, int maxSize);
 	
 	char* m_string;

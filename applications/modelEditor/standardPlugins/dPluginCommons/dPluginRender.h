@@ -21,7 +21,7 @@
 
 #include "dPluginUtils.h"
 
-class dPluginRender: public dSceneRender, public dPluginAlloc
+class dPluginRender: public dSceneRender
 {
 	public:
 	dPluginRender(void);

@@ -21,7 +21,6 @@
 
 dPluginRender::dPluginRender(void)
 	:dSceneRender()
-	,dPluginAlloc()
 	,m_wireFrameDisplayList()
 	,m_flatShadedDisplayList()
 {

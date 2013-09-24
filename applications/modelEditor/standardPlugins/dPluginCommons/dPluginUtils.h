@@ -22,7 +22,7 @@
 #define __D_PLUGIN_UTILS_H__
 
 
-#ifdef _DPLUGIN_COMMON_BUILD_DLL
+#ifdef _DPLUGIN_COMMON_DLL_EXPORT
 	#ifdef _WIN32
 		#define DPLUGIN_API __declspec (dllexport)
 	#else

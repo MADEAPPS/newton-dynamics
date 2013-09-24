@@ -24,8 +24,8 @@ class dScene;
 class dSceneRender: public dRefCounter
 {
 	public:
-	dSceneRender(void);
-	virtual ~dSceneRender(void);
+	DSCENE_API dSceneRender(void);
+	virtual DSCENE_API ~dSceneRender(void);
 
 	virtual bool Init() = 0;
 	virtual int GetViewPortWidth() const = 0;
@@ -89,19 +89,15 @@ class dSceneRender: public dRefCounter
 	virtual void End() = 0;
 
 
-	virtual dVector GlobalToScreen (const dVector& global) const;
-	virtual dVector ScreenToGlobal (const dVector& screen) const;
+	virtual DSCENE_API dVector GlobalToScreen (const dVector& global) const;
+	virtual DSCENE_API dVector ScreenToGlobal (const dVector& screen) const;
 
-	virtual void DrawLine(const dVector& p0, const dVector& p1);
-	virtual void DrawTriangle(const dVector& p0, const dVector& p1, const dVector& p2);
+	virtual DSCENE_API void DrawLine(const dVector& p0, const dVector& p1);
+	virtual DSCENE_API void DrawTriangle(const dVector& p0, const dVector& p1, const dVector& p2);
 
-	virtual void DrawCone(int segments, dFloat radius, dFloat heigh);
-	virtual void DrawCylinder(int segments, dFloat radius, dFloat heigh);
-	virtual void DrawArrow (int segments, dFloat radius, dFloat heigh, const dVector& stemColor, const dVector& tipColor);
-
-
-	
-	
+	virtual DSCENE_API void DrawCone(int segments, dFloat radius, dFloat heigh);
+	virtual DSCENE_API void DrawCylinder(int segments, dFloat radius, dFloat heigh);
+	virtual DSCENE_API void DrawArrow (int segments, dFloat radius, dFloat heigh, const dVector& stemColor, const dVector& tipColor);
 };
 
 

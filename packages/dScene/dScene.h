@@ -63,107 +63,106 @@ class dScene: public dSceneGraph, public dRefCounter
 
 
 
-	dScene(NewtonWorld* const newton);
-	dScene(const dScene& me);
-	virtual ~dScene(void);
+	DSCENE_API dScene(NewtonWorld* const newton);
+	DSCENE_API dScene(const dScene& me);
+	virtual DSCENE_API ~dScene(void);
+	virtual DSCENE_API void CleanUp();
+	virtual DSCENE_API dTreeNode* GetRootNode() const;
 
-	virtual void CleanUp();
+	virtual DSCENE_API dTreeNode* CreateModelNode(dTreeNode* const parent);
+	virtual DSCENE_API dTreeNode* CreateSceneNode(dTreeNode* const parent);
+	virtual DSCENE_API dTreeNode* CreateGeometryTransformNode(dTreeNode* const parent);
+	virtual DSCENE_API dTreeNode* CreateBoneNode(dTreeNode* const parent);
+	virtual DSCENE_API dTreeNode* CreateRigidbodyNode(dTreeNode* const parent);
+	virtual DSCENE_API dTreeNode* CreateCollisionBoxNode(dTreeNode* const parent);
+	virtual DSCENE_API dTreeNode* CreateCollisionConeNode(dTreeNode* const parent);
+	virtual DSCENE_API dTreeNode* CreateCollisionSphereNode(dTreeNode* const parent);
+	virtual DSCENE_API dTreeNode* CreateCollisionCapsuleNode(dTreeNode* const parent);
+	virtual DSCENE_API dTreeNode* CreateCollisionCylinderNode(dTreeNode* const parent);
+	virtual DSCENE_API dTreeNode* CreateCollisionCompoundNode(dTreeNode* const parent);
+	virtual DSCENE_API dTreeNode* CreateCollisionConvexHullNode(dTreeNode* const parent);
+	virtual DSCENE_API dTreeNode* CreateCollisionChamferCylinderNode(dTreeNode* const parent);
+	//virtual DSCENE_API dScene::dTreeNode* CreateCollisioTreeNode(dTreeNode* const parent);
+	virtual DSCENE_API dTreeNode* CreateCollisioTreeNode(dTreeNode* const parent);
+	virtual DSCENE_API dTreeNode* CreateMeshNode(dTreeNode* const parent);
+	virtual DSCENE_API dTreeNode* CreateSkinModifierNode(dTreeNode* const parent);
+
+	virtual DSCENE_API dTreeNode* CreateMaterialNode (int id);
+	virtual DSCENE_API dTreeNode* CreateTextureNode (const char* const pathName);
+
+	virtual DSCENE_API dTreeNode* GetTextureCacheNode ();
+	virtual DSCENE_API dTreeNode* GetMaterialCacheNode ();
+	virtual DSCENE_API dTreeNode* GetGeometryCacheNode ();
+
+	virtual DSCENE_API dTreeNode* AddNode(dNodeInfo* const sceneInfo, dTreeNode* const parent);
+	virtual DSCENE_API dTreeNode* CreateNode (const char* const className, dTreeNode* const parent);
+	virtual DSCENE_API dTreeNode* CreateCollisionFromNewtonCollision(dTreeNode* const parent, NewtonCollision* const collision);
 	
-	virtual dTreeNode* GetRootNode() const;
+	virtual DSCENE_API void AddReference(dTreeNode* const parent, dTreeNode* const child);
+	virtual DSCENE_API void RemoveReference(dTreeNode* const node1, dTreeNode* const node2);
 
-	virtual dTreeNode* CreateModelNode(dTreeNode* const parent);
-	virtual dTreeNode* CreateSceneNode(dTreeNode* const parent);
-	virtual dTreeNode* CreateGeometryTransformNode(dTreeNode* const parent);
-	virtual dTreeNode* CreateBoneNode(dTreeNode* const parent);
-	virtual dTreeNode* CreateRigidbodyNode(dTreeNode* const parent);
-	virtual dTreeNode* CreateCollisionBoxNode(dTreeNode* const parent);
-	virtual dTreeNode* CreateCollisionConeNode(dTreeNode* const parent);
-	virtual dTreeNode* CreateCollisionSphereNode(dTreeNode* const parent);
-	virtual dTreeNode* CreateCollisionCapsuleNode(dTreeNode* const parent);
-	virtual dTreeNode* CreateCollisionCylinderNode(dTreeNode* const parent);
-	virtual dTreeNode* CreateCollisionCompoundNode(dTreeNode* const parent);
-	virtual dTreeNode* CreateCollisionConvexHullNode(dTreeNode* const parent);
-	virtual dTreeNode* CreateCollisionChamferCylinderNode(dTreeNode* const parent);
-	dScene::dTreeNode* CreateCollisioTreeNode(dTreeNode* const parent);
-	virtual dTreeNode* CreateMeshNode(dTreeNode* const parent);
-	virtual dTreeNode* CreateSkinModifierNode(dTreeNode* const parent);
-
-	virtual dTreeNode* CreateMaterialNode (int id);
-	virtual dTreeNode* CreateTextureNode (const char* const pathName);
-
-	virtual dTreeNode* GetTextureCacheNode ();
-	virtual dTreeNode* GetMaterialCacheNode ();
-	virtual dTreeNode* GetGeometryCacheNode ();
-
-	virtual dTreeNode* AddNode(dNodeInfo* const sceneInfo, dTreeNode* const parent);
-	virtual dTreeNode* CreateNode (const char* const className, dTreeNode* const parent);
-	virtual dTreeNode* CreateCollisionFromNewtonCollision(dTreeNode* const parent, NewtonCollision* const collision);
-	
-	virtual void AddReference(dTreeNode* const parent, dTreeNode* const child);
-	virtual void RemoveReference(dTreeNode* const node1, dTreeNode* const node2);
-
-	virtual dTreeNode* GetFirstNode () const;
-	virtual dTreeNode* GetNextNode (dTreeNode* const node) const;
-	virtual dTreeNode* FindNode (dNodeInfo* const info) const;
+	virtual DSCENE_API dTreeNode* GetFirstNode () const;
+	virtual DSCENE_API dTreeNode* GetNextNode (dTreeNode* const node) const;
+	virtual DSCENE_API dTreeNode* FindNode (dNodeInfo* const info) const;
 	 
 	
-	virtual void* GetFirstChild(dTreeNode* const parentNode) const;
-	virtual void* GetNextChild(dTreeNode* const parentNode, void* const link) const;
+	virtual DSCENE_API void* GetFirstChild(dTreeNode* const parentNode) const;
+	virtual DSCENE_API void* GetNextChild(dTreeNode* const parentNode, void* const link) const;
 
-	virtual void* GetFirstParent(dTreeNode* const childNode) const;
-	virtual void* GetNextParent(dTreeNode* const childNode, void* const link) const;
+	virtual DSCENE_API void* GetFirstParent(dTreeNode* const childNode) const;
+	virtual DSCENE_API void* GetNextParent(dTreeNode* const childNode, void* const link) const;
 
-	//virtual bool IsParentLink (void* const link) const;
-	virtual dTreeNode* GetNodeFromLink (void* const child) const;
+	//virtual DSCENE_API bool IsParentLink (void* const link) const;
+	virtual DSCENE_API dTreeNode* GetNodeFromLink (void* const child) const;
 
-	//virtual void CloneInfoFromNode(dTreeNode* const node);
-	virtual dNodeInfo* CloneNodeInfo(dTreeNode* const node) const;
-	virtual dNodeInfo* GetInfoFromNode(dTreeNode* const node) const;
+	//virtual DSCENE_API void CloneInfoFromNode(dTreeNode* const node);
+	virtual DSCENE_API dNodeInfo* CloneNodeInfo(dTreeNode* const node) const;
+	virtual DSCENE_API dNodeInfo* GetInfoFromNode(dTreeNode* const node) const;
 	
-	virtual dTreeNode* FindMaterialById(int materialId);
-	virtual dTreeNode* FindMaterialBySignature(dCRCTYPE signature);
+	virtual DSCENE_API dTreeNode* FindMaterialById(int materialId);
+	virtual DSCENE_API dTreeNode* FindMaterialBySignature(dCRCTYPE signature);
 
-	virtual dTreeNode* FindTextureByTextId(dCRCTYPE textId);
-	virtual dTreeNode* FindMaterialById(dTreeNode* const parentNode, int materialId) const;
-	virtual dTreeNode* FindTextureByTextId(dTreeNode* const parentNode, dCRCTYPE textId) const;
-	
-
-	virtual dTreeNode* FindChildByType(dTreeNode* const parentNode, dCRCTYPE type) const;
-	virtual dTreeNode* FindParentByType(dTreeNode* const child, dCRCTYPE type) const;
-
-	virtual NewtonWorld* GetNewtonWorld() const {return m_newton;}
-
-	virtual void DeleteNode (dTreeNode* const node);
-	virtual void MergeScene (dScene* const scene);
-
-	virtual void Serialize (const char* const fileName);
-	virtual bool Deserialize (const char* const fileName);
-
-	virtual dFloat RayCast (const dVector& p0, const dVector& p1, dList<dTreeNode*>& traceRoot) const;
-
-	virtual void FreezeScale () const;
-	virtual void FreezePivot () const;
-	virtual void BakeTransform (dMatrix& matrix) const;
-	
-	virtual int GetRevision() const;
-
-	virtual void RemoveUnusedVertex();
+	virtual DSCENE_API dTreeNode* FindTextureByTextId(dCRCTYPE textId);
+	virtual DSCENE_API dTreeNode* FindMaterialById(dTreeNode* const parentNode, int materialId) const;
+	virtual DSCENE_API dTreeNode* FindTextureByTextId(dTreeNode* const parentNode, dCRCTYPE textId) const;
 	
 
-	virtual void SetNodeLRU (dTreeNode* const node, int lru);
-	virtual int GetNodeLRU (dTreeNode* const node) const;
+	virtual DSCENE_API dTreeNode* FindChildByType(dTreeNode* const parentNode, dCRCTYPE type) const;
+	virtual DSCENE_API dTreeNode* FindParentByType(dTreeNode* const child, dCRCTYPE type) const;
 
-	virtual void NewtonWorldToScene (const NewtonWorld* const world, dSceneExportCallback* const visualContext);
-	virtual void SceneToNewtonWorld (NewtonWorld* world, dList<NewtonBody*>& loadedBodies);
+	virtual DSCENE_API NewtonWorld* GetNewtonWorld() const {return m_newton;}
+
+	virtual DSCENE_API void DeleteNode (dTreeNode* const node);
+	virtual DSCENE_API void MergeScene (dScene* const scene);
+
+	virtual DSCENE_API void Serialize (const char* const fileName);
+	virtual DSCENE_API bool Deserialize (const char* const fileName);
+
+	virtual DSCENE_API dFloat RayCast (const dVector& p0, const dVector& p1, dList<dTreeNode*>& traceRoot) const;
+
+	virtual DSCENE_API void FreezeScale () const;
+	virtual DSCENE_API void FreezePivot () const;
+	virtual DSCENE_API void BakeTransform (dMatrix& matrix) const;
+	
+	virtual DSCENE_API int GetRevision() const;
+
+	virtual DSCENE_API void RemoveUnusedVertex();
+	
+
+	virtual DSCENE_API void SetNodeLRU (dTreeNode* const node, int lru);
+	virtual DSCENE_API int GetNodeLRU (dTreeNode* const node) const;
+
+	virtual DSCENE_API void NewtonWorldToScene (const NewtonWorld* const world, dSceneExportCallback* const visualContext);
+	virtual DSCENE_API void SceneToNewtonWorld (NewtonWorld* world, dList<NewtonBody*>& loadedBodies);
 
 
-	virtual void DeleteDuplicateTextures();
-	virtual void DeleteDuplicateMaterials();
-	virtual void DeleteDuplicateGeometries();
+	virtual DSCENE_API void DeleteDuplicateTextures();
+	virtual DSCENE_API void DeleteDuplicateMaterials();
+	virtual DSCENE_API void DeleteDuplicateGeometries();
 
 	
 	protected:
-	virtual dTreeNode* GetCacheNode (const char* const cacheName);
+	virtual DSCENE_API dTreeNode* GetCacheNode (const char* const cacheName);
 
 	int m_revision;
 
