@@ -23,15 +23,13 @@
 #ifdef _DSCENE_DLL
 	void* operator new (size_t size) 
 	{ 
-		//	return NewtonAlloc(int (size));
-		dAssert (0);
+		//return NewtonAlloc(int (size));
 		return malloc (size);
 	}
 
 	void operator delete (void* ptr) 
 	{ 
-		//	NewtonFree(ptr);
-		dAssert (0);
+		//NewtonFree(ptr);
 		free (ptr);
 	}
 
@@ -39,11 +37,11 @@
 	{
 		switch (ul_reason_for_call)
 		{
-		case DLL_PROCESS_ATTACH:
-		case DLL_THREAD_ATTACH:
-		case DLL_THREAD_DETACH:
-		case DLL_PROCESS_DETACH:
-			break;
+			case DLL_PROCESS_ATTACH:
+			case DLL_THREAD_ATTACH:
+			case DLL_THREAD_DETACH:
+			case DLL_PROCESS_DETACH:
+				break;
 		}
 		return TRUE;
 	}

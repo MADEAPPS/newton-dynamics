@@ -592,6 +592,7 @@ NewtonModelEditor::NewtonModelEditor(const wxString& title, const wxPoint& pos, 
 //	,m_controlKey(false)
 //	,m_navigationKey(false)
 {
+#if 0
 	// notify wxAUI which frame to use
 	m_mgr.SetManagedWindow(this);
 
@@ -671,25 +672,20 @@ NewtonModelEditor::NewtonModelEditor(const wxString& title, const wxPoint& pos, 
 
 	// create the scene
 	Initilialize();
+#endif
 }
 
 
 
 NewtonModelEditor::~NewtonModelEditor()
 {
+#if 0
 	DestroyScene();
-	//	SaveConfig();
-	//	delete m_commandPanelToolbarShell;
-	//	delete m_explorerToolbarShell;
-	//	delete m_mainMenuDragShell;
-	//	delete m_fileToolbarShell;
-	//	delete m_navigationToolbarShell;
-	//	delete m_sharedVisual;
-
 	// Clean up the frame manager
 	m_mgr.UnInit();
 
 	DeleteResources();
+#endif
 }
 
 void NewtonModelEditor::Initilialize()
@@ -796,6 +792,7 @@ void NewtonModelEditor::LoadResources ()
 
 void NewtonModelEditor::LoadPlugins(const char* const path)
 {
+	dAssert (0);
 	dPluginDll pluginList;
 	dPluginInterface::LoadPlugins(path, pluginList);
 

@@ -28,13 +28,6 @@ class EditorRenderViewport;
 class NewtonModelEditor: public wxFrame, public dPluginInterface
 {
 	public:
-/*
-	enum EditMode 
-	{
-		m_editAsset,
-		m_editScene
-	};
-*/
 	enum NavigationMode
 	{
 		m_selectNode,
@@ -121,9 +114,6 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	~NewtonModelEditor();
 
 /*
-	
-	
-
 	// GUI interface functions
 	void create();
 

@@ -31,10 +31,19 @@
 	#endif
 
 	#ifdef _MSC_VER
-	BOOL APIENTRY DllMain (HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
+	BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
 	{
+		switch (ul_reason_for_call)
+		{
+			case DLL_PROCESS_ATTACH:
+			case DLL_THREAD_ATTACH:
+			case DLL_THREAD_DETACH:
+			case DLL_PROCESS_DETACH:
+				break;
+		}
 		return TRUE;
 	}
+
 	#endif
 #endif
 
@@ -123,22 +132,26 @@ void GetWorkingFileName (const char* const name, char* const outPathName)
 
 void* operator new (size_t size) 
 { 
-	return NewtonAlloc(int (size));
+	//return NewtonAlloc(int (size));
+	return malloc (size);
 }
 
 void operator delete (void* ptr) 
 { 
-	NewtonFree(ptr);
+	//NewtonFree(ptr);
+	free (ptr);
 }
 
 
 void* dPluginAlloc::operator new (size_t size)
 {
-	return NewtonAlloc(int (size));
+	//return NewtonAlloc(int (size));
+	return ::new char[size];
 }
 
 void dPluginAlloc::operator delete (void* ptr)
 {
-	NewtonFree(ptr);
+//	NewtonFree(ptr);
+	::delete[] (char*) ptr;
 }
 
