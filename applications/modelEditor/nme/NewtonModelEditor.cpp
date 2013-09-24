@@ -25,55 +25,6 @@
 
 typedef dPluginRecord** (CALLBACK* GetPluginArray)();
 
-
-
-
-
-/*
-FXDEFMAP(NewtonModelEditor) MessageMap[]=
-{
-	FXMAPFUNC(SEL_KEYPRESS,		0,														NewtonModelEditor::onKeyboardHandle),
-	FXMAPFUNC(SEL_KEYRELEASE,	0,														NewtonModelEditor::onKeyboardHandle),
-
-	FXMAPFUNC(SEL_COMMAND,			NewtonModelEditor::ID_SELECT_ASSET,					NewtonModelEditor::onAssetSelected),
-//	FXMAPFUNC(SEL_RIGHTBUTTONPRESS,	NewtonModelEditor::ID_SELECT_ASSET,					NewtonModelEditor::onAssetSelected),
-
-	
-	FXMAPFUNC(SEL_PAINT,		NewtonModelEditor::ID_CANVAS,							NewtonModelEditor::onPaint),
-	FXMAPFUNC(SEL_CHORE,		NewtonModelEditor::ID_CANVAS,							NewtonModelEditor::onPaint),
-	FXMAPFUNC(SEL_COMMAND,		NewtonModelEditor::ID_SET_VIEW_MODE,					NewtonModelEditor::onPaint),
-	
-	FXMAPFUNC(SEL_CHORE,		NewtonModelEditor::ID_EDITOR_MODE,						NewtonModelEditor::onEditorMode),
-	FXMAPFUNC(SEL_COMMAND,		NewtonModelEditor::ID_EDITOR_MODE,						NewtonModelEditor::onEditorMode),
-
-//	FXMAPFUNC(SEL_COMMAND,		NewtonModelEditor::ID_SAVE,								NewtonModelEditor::onSave),
-//	FXMAPFUNC(SEL_COMMAND,		NewtonModelEditor::ID_SAVE_AS,							NewtonModelEditor::onSave),
-
-
-	FXMAPFUNC(SEL_COMMAND,		NewtonModelEditor::ID_LOAD_ASSET,						NewtonModelEditor::onLoadAsset),
-//	FXMAPFUNC(SEL_COMMAND,		NewtonModelEditor::ID_SAVE_ASSET,						NewtonModelEditor::onSave),
-//	FXMAPFUNC(SEL_COMMAND,		NewtonModelEditor::ID_SAVE_ASSET_AS,					NewtonModelEditor::onSave),
-
-
-	FXMAPFUNC(SEL_COMMAND,		NewtonModelEditor::ID_SELECT_COMMAND_MODE,				NewtonModelEditor::onSelectionCommandMode),
-	FXMAPFUNC(SEL_COMMAND,		NewtonModelEditor::ID_TRANSLATE_COMMAND_MODE,			NewtonModelEditor::onSelectionCommandMode),
-	FXMAPFUNC(SEL_COMMAND,		NewtonModelEditor::ID_ROTATE_COMMAND_MODE,				NewtonModelEditor::onSelectionCommandMode),
-	FXMAPFUNC(SEL_COMMAND,		NewtonModelEditor::ID_SCALE_COMMAND_MODE,				NewtonModelEditor::onSelectionCommandMode),
-
-
-	FXMAPFUNC(SEL_COMMAND,		NewtonModelEditor::ID_HIDE_FILE_TOOLBAR,				NewtonModelEditor::onHideFileToolbar),
-	FXMAPFUNC(SEL_COMMAND,		NewtonModelEditor::ID_HIDE_NAVIGATION_TOOLBAR,			NewtonModelEditor::onHideNavigationToolbar),
-	FXMAPFUNC(SEL_COMMAND,		NewtonModelEditor::ID_HIDE_EXPLORER_PANEL,				NewtonModelEditor::onHideExplorerPanel),
-	FXMAPFUNC(SEL_COMMAND,		NewtonModelEditor::ID_HIDE_COMMAND_PANEL,				NewtonModelEditor::onHideCommandPanel),
-
-	FXMAPFUNCS(SEL_COMMAND,		NewtonModelEditor::ID_IMPORT_PLUGINS, NewtonModelEditor::ID_MAX_IMPORT_PLUGINS, NewtonModelEditor::onImport),
-	FXMAPFUNCS(SEL_COMMAND,		NewtonModelEditor::ID_EXPORT_PLUGINS, NewtonModelEditor::ID_MAX_EXPORT_PLUGINS, NewtonModelEditor::onExport),
-	FXMAPFUNCS(SEL_COMMAND,		NewtonModelEditor::ID_MODEL_PLUGINS, NewtonModelEditor::ID_MAX_MODELS_PLUGINS, NewtonModelEditor::onModel),
-	
-};
-*/
-
-
 BEGIN_EVENT_TABLE (NewtonModelEditor, wxFrame)
 
 	EVT_MENU (wxID_EXIT, OnExit)
@@ -181,22 +132,12 @@ bool NewtonModelEditor::IsShiftDown() const
 	return m_shiftKey;
 }
 
-
-
-
-
-
-
-
-
 void NewtonModelEditor::SaveConfig()
 {
-	
 }
 
 void NewtonModelEditor::LoadConfig()
 {
-
 }
 
 // memory allocation for Newton
@@ -592,7 +533,6 @@ NewtonModelEditor::NewtonModelEditor(const wxString& title, const wxPoint& pos, 
 //	,m_controlKey(false)
 //	,m_navigationKey(false)
 {
-#if 0
 	// notify wxAUI which frame to use
 	m_mgr.SetManagedWindow(this);
 
@@ -672,20 +612,17 @@ NewtonModelEditor::NewtonModelEditor(const wxString& title, const wxPoint& pos, 
 
 	// create the scene
 	Initilialize();
-#endif
 }
 
 
 
 NewtonModelEditor::~NewtonModelEditor()
 {
-#if 0
 	DestroyScene();
 	// Clean up the frame manager
 	m_mgr.UnInit();
 
 	DeleteResources();
-#endif
 }
 
 void NewtonModelEditor::Initilialize()
@@ -792,7 +729,7 @@ void NewtonModelEditor::LoadResources ()
 
 void NewtonModelEditor::LoadPlugins(const char* const path)
 {
-	dAssert (0);
+return;
 	dPluginDll pluginList;
 	dPluginInterface::LoadPlugins(path, pluginList);
 
