@@ -68,16 +68,6 @@
 	#pragma warning (disable: 4100) // unreferenced formal parameter
 	#pragma warning (disable: 4505) // unreferenced local function has been removed
 
-	#ifdef DSCENE_USE_DLL
-		#ifdef DSCENE_EXPORTS
-			#define DSCENE_API __declspec(dllexport)
-		#else
-			#define DSCENE_API __declspec(dllimport)
-		#endif
-	#else 
-		#define DSCENE_API 
-	#endif
-
 #endif
 
 #ifndef _MSC_VER
@@ -125,7 +115,7 @@
 
 
 #ifdef _DSCENE_DLL
-	#ifdef _DSCENE_EXPORT
+	#ifdef _DSCENE_EXPORTS
 		#ifdef _WIN32
 			#define DSCENE_API __declspec (dllexport)
 		#else

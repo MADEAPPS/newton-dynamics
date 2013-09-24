@@ -60,7 +60,7 @@ class dSceneGraph: public dTree<dGraphNode, unsigned>
 };
 
 
-class dGraphNode
+class dGraphNode: public dContainersAlloc
 {
 	class dLink: public dList<dSceneGraph::dTreeNode*>
 	{
