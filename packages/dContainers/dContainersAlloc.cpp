@@ -22,6 +22,9 @@
 #include "dContainersStdAfx.h"
 #include "dContainersAlloc.h"
 
+
+#pragma warning (disable: 4100) //warning C4100: 'lpReserved' : unreferenced formal parameter
+
 #ifdef _DCONTAINERS_DLL
 	void* operator new (size_t size) 
 	{ 
@@ -53,12 +56,25 @@
 void* dContainersAlloc::operator new (size_t size)
 {
 	//return NewtonAlloc(int (size));
-	return ::new char[size];
+	return Alloc(size);
 }
 
 void dContainersAlloc::operator delete (void* ptr)
 {
 //	NewtonFree(ptr);
+	free(ptr);
+}
+
+void* dContainersAlloc::Alloc (size_t size)
+{
+	//return NewtonAlloc(int (size));
+	return ::new char[size];
+}
+
+void dContainersAlloc::Free(void* const ptr)
+{
+	//	NewtonFree(ptr);
 	delete[] (char*) ptr;
 }
+
 

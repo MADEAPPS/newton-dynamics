@@ -26,8 +26,8 @@ class dListAllocator
 	~dListAllocator();
 	void* Alloc();
 	void Free(void* const ptr);
-	void Flush ();
 	bool IsAlive() const;
+	void Flush ();
 
 	private:
 	class dFreeListNode
@@ -38,6 +38,7 @@ class dListAllocator
 	};
 	
 	void Prefetch ();
+
 	dFreeListNode* m_freeListNode;
 	bool m_alive;
 };
@@ -223,9 +224,6 @@ class dList: public dContainersAlloc
 	dList ();
 	virtual ~dList ();
 
-	void* operator new (size_t size);
-	void operator delete (void* ptr);
-
 	operator int() const;
 	int GetCount() const;
 	dListNode* GetLast() const;
@@ -290,19 +288,6 @@ dList<T, Allocator>::~dList ()
 	if (!GetAllocator().IsAlive()) {
 		GetAllocator().Flush();
 	}
-}
-
-
-template<class T, class Allocator>
-void* dList<T, Allocator>::operator new (size_t size)
-{
-	return new char[size];
-}
-
-template<class T, class Allocator>
-void dList<T, Allocator>::operator delete (void *ptr)
-{
-	delete[] (char*)ptr;
 }
 
 
@@ -533,7 +518,8 @@ void dListAllocator<T>::Prefetch ()
 {
 	int sizeInBytes = sizeof (typename dList<T, dListAllocator<T> >::dListNode);
 	for (int i = 0; i < D_MAX_ENTRIES_IN_FREELIST; i ++) {
-		dFreeListNode* const data = (dFreeListNode*) new char[sizeInBytes];
+		//dFreeListNode* const data = (dFreeListNode*) new char[sizeInBytes];
+		dFreeListNode* const data = (dFreeListNode*) dContainersAlloc::Alloc (sizeInBytes);
 		data->m_count = i + 1; 
 		data->m_next = m_freeListNode; 
 		m_freeListNode = data;
@@ -546,7 +532,8 @@ void dListAllocator<T>::Flush ()
 	for (int i = 0; m_freeListNode && (i < D_MAX_ENTRIES_IN_FREELIST); i ++) {
 		dFreeListNode* const ptr = m_freeListNode;
 		m_freeListNode = m_freeListNode->m_next;
-		delete[] (char*) ptr;
+		//delete[] (char*) ptr;
+		dContainersAlloc::Free (ptr);
 	}
 }
 

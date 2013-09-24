@@ -19,13 +19,13 @@
 class dRefCounter: public dContainersAlloc
 {
 	public:
-	DCONTAINER_API dRefCounter(void);
-	DCONTAINER_API int GetRef() const;
-	DCONTAINER_API int Release();
-	DCONTAINER_API void AddRef() const;
+	DCONTAINERS_API dRefCounter(void);
+	DCONTAINERS_API int GetRef() const;
+	DCONTAINERS_API int Release();
+	DCONTAINERS_API void AddRef() const;
 
 	protected:
-	DCONTAINER_API virtual ~dRefCounter(void);
+	DCONTAINERS_API virtual ~dRefCounter(void);
 
 	private:
 	mutable int m_refCount;

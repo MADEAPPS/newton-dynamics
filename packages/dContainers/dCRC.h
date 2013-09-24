@@ -16,10 +16,10 @@
 
 #define dCRCTYPE long long
 
-DCONTAINER_API dCRCTYPE dCRC64 (const char* const string, dCRCTYPE  crcAcc = 0);
-DCONTAINER_API dCRCTYPE dCRC64 (const void* const buffer, int size, dCRCTYPE crcAcc);
+DCONTAINERS_API dCRCTYPE dCRC64 (const char* const string, dCRCTYPE  crcAcc = 0);
+DCONTAINERS_API dCRCTYPE dCRC64 (const void* const buffer, int size, dCRCTYPE crcAcc);
 
-DCONTAINER_API dCRCTYPE dCombineCRC (dCRCTYPE a, dCRCTYPE b);
+DCONTAINERS_API dCRCTYPE dCombineCRC (dCRCTYPE a, dCRCTYPE b);
 
 #endif
 

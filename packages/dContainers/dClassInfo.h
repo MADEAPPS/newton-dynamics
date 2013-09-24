@@ -22,11 +22,11 @@ class dClassInfo: public dRefCounter
 	dClassInfo(void)
 	{
 	}
-	virtual DCONTAINER_API  ~dClassInfo()
+	virtual DCONTAINERS_API  ~dClassInfo()
 	{
 	}
 
-	dRttiRootClassSupportDeclare(dClassInfo,DCONTAINER_API);
+	dRttiRootClassSupportDeclare(dClassInfo,DCONTAINERS_API);
 };
 
 #endif

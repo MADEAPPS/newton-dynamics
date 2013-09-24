@@ -89,9 +89,9 @@ dHeapBase<OBJECT,KEY>::dHeapBase (int maxElements)
 	:m_curCount(0)
 	,m_maxCount(maxElements)
 	,m_allocated(true)
-//	,m_pool((RECORD*) malloc (maxElements * sizeof (RECORD)))
 	,m_pool(new dHeapRecord[maxElements])
 {
+dAssert (0);
 	Flush();
 }
 
@@ -100,6 +100,7 @@ template <class OBJECT, class KEY>
 dHeapBase<OBJECT,KEY>::~dHeapBase ()
 {   
 	if (m_allocated == true) {
+dAssert (0);
 		delete[] m_pool;
 	}
 }

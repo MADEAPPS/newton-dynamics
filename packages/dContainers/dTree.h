@@ -34,10 +34,10 @@ class dRedBackNode
 	dRedBackNode* GetRight() const;
 	dRedBackNode* GetParent() const;
 	dRedBackNode (dRedBackNode* const parent);
-	DCONTAINER_API dRedBackNode* Prev() const;
-	DCONTAINER_API dRedBackNode* Next() const;
-	DCONTAINER_API dRedBackNode* Minimum() const;
-	DCONTAINER_API dRedBackNode* Maximum() const;
+	DCONTAINERS_API dRedBackNode* Prev() const;
+	DCONTAINERS_API dRedBackNode* Next() const;
+	DCONTAINERS_API dRedBackNode* Minimum() const;
+	DCONTAINERS_API dRedBackNode* Maximum() const;
 
 	protected:
 	virtual ~dRedBackNode () 
@@ -49,11 +49,11 @@ class dRedBackNode
 	bool GetColor () const;
 	bool IsInTree () const;
 	void SetInTreeFlag (bool flag);
-	DCONTAINER_API void RotateLeft(dRedBackNode** const head); 
-	DCONTAINER_API void RotateRight(dRedBackNode** const head); 
-	DCONTAINER_API void RemoveFixup (dRedBackNode* const node, dRedBackNode** const head); 
-	DCONTAINER_API void Unlink (dRedBackNode** const head);
-	DCONTAINER_API void InsertFixup(dRedBackNode** const head); 
+	DCONTAINERS_API void RotateLeft(dRedBackNode** const head); 
+	DCONTAINERS_API void RotateRight(dRedBackNode** const head); 
+	DCONTAINERS_API void RemoveFixup (dRedBackNode* const node, dRedBackNode** const head); 
+	DCONTAINERS_API void Unlink (dRedBackNode** const head);
+	DCONTAINERS_API void InsertFixup(dRedBackNode** const head); 
 	
 	bool m_color;
 	bool m_inTree;
@@ -834,7 +834,8 @@ template<class OBJECT, class KEY>
 void dTreeAllocator<OBJECT, KEY>::Prefetch ()
 {
 	for (int i = 0; i < D_MAX_ENTRIES_IN_FREETREENODE; i ++) {
-		dFreeTreeNode* const data = (dFreeTreeNode*) new char[sizeof (typename dTree<OBJECT, KEY, dTreeAllocator<OBJECT, KEY> >::dTreeNode)];
+		//dFreeTreeNode* const data = (dFreeTreeNode*) new char[sizeof (typename dTree<OBJECT, KEY, dTreeAllocator<OBJECT, KEY> >::dTreeNode)];
+		dFreeTreeNode* const data = (dFreeTreeNode*) dContainersAlloc::Alloc (sizeof (typename dTree<OBJECT, KEY, dTreeAllocator<OBJECT, KEY> >::dTreeNode));
 		data->m_count = i + 1; 
 		data->m_next = m_freeTreeNode; 
 		m_freeTreeNode = data;
@@ -848,7 +849,8 @@ void dTreeAllocator<OBJECT, KEY>::Flush ()
 		dAssert (m_freeTreeNode);
 		dFreeTreeNode* const ptr = m_freeTreeNode;
 		m_freeTreeNode = m_freeTreeNode->m_next;
-		delete[] (char*) ptr;
+		//delete[] (char*) ptr;
+		dContainersAlloc::Free (ptr);
 	}
 }
 

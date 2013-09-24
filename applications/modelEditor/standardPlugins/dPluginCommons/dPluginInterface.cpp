@@ -61,6 +61,7 @@ void dPluginInterface::LoadPlugins(const char* const path, dPluginDll& plugins)
 	strcat (plugInPath, path);
 	sprintf (rootPathInPath, "%s/*.dll", plugInPath);
 
+
 	// scan for all plugins in this folder
 	_finddata_t data;
 	intptr_t handle = _findfirst (rootPathInPath, &data);
@@ -82,7 +83,6 @@ void dPluginInterface::LoadPlugins(const char* const path, dPluginDll& plugins)
 		} while (_findnext (handle, &data) == 0);
 		_findclose (handle);
 	}
-
 
 	for (dPluginDll::dListNode* dllNode = plugins.GetFirst(); dllNode; dllNode = dllNode->GetNext()) {
 		HMODULE module = dllNode->GetInfo();

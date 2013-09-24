@@ -729,7 +729,6 @@ void NewtonModelEditor::LoadResources ()
 
 void NewtonModelEditor::LoadPlugins(const char* const path)
 {
-return;
 	dPluginDll pluginList;
 	dPluginInterface::LoadPlugins(path, pluginList);
 

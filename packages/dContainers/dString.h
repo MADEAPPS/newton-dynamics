@@ -21,19 +21,19 @@ class dString: public dContainersAlloc
 {
 	class dStringAllocator;
 	public:
-	DCONTAINER_API dString ();
-	DCONTAINER_API dString (char chr);
-	DCONTAINER_API dString (const dString& src);
-	DCONTAINER_API dString (const char* const data);
-	DCONTAINER_API dString (const char* const data, int maxSize);
-	DCONTAINER_API dString (int val);
-	DCONTAINER_API dString (long long val);
-	DCONTAINER_API ~dString ();
+	DCONTAINERS_API dString ();
+	DCONTAINERS_API dString (char chr);
+	DCONTAINERS_API dString (const dString& src);
+	DCONTAINERS_API dString (const char* const data);
+	DCONTAINERS_API dString (const char* const data, int maxSize);
+	DCONTAINERS_API dString (int val);
+	DCONTAINERS_API dString (long long val);
+	DCONTAINERS_API ~dString ();
 
 	char& operator[] (int index);
 	char operator[] (int index) const;
 	
-	DCONTAINER_API dString& operator= (const dString& src);
+	DCONTAINERS_API dString& operator= (const dString& src);
 	bool operator== (const dString& src) const;
 	bool operator!= (const dString& src) const;
 	bool operator< (const dString& src) const;
@@ -41,30 +41,30 @@ class dString: public dContainersAlloc
 	bool operator<= (const dString& src) const;
 	bool operator>= (const dString& src) const;
 
-	DCONTAINER_API void operator+= (const char* const src);
+	DCONTAINERS_API void operator+= (const char* const src);
 	void operator+= (const dString& src);
 
 	dString operator+ (const char* const src) const;
 	dString operator+ (const dString& src) const;
 
-	DCONTAINER_API int Find (char ch, int from = 0) const;
+	DCONTAINERS_API int Find (char ch, int from = 0) const;
 	int Find (const dString& subString, int from = 0) const;
-	DCONTAINER_API int Find (const char* const subString, int from = 0, int lenght = 0x7ffffff) const;
+	DCONTAINERS_API int Find (const char* const subString, int from = 0, int lenght = 0x7ffffff) const;
 
-	DCONTAINER_API void Replace (int start, int size, const char* const str, int strSize);
+	DCONTAINERS_API void Replace (int start, int size, const char* const str, int strSize);
 	void Replace (int start, int size, const dString& str);
 	void Empty();
 
-	DCONTAINER_API void ToUpper();
-	DCONTAINER_API void ToLower();
-	DCONTAINER_API int ToInteger() const;
-	DCONTAINER_API long long ToInteger64() const;
+	DCONTAINERS_API void ToUpper();
+	DCONTAINERS_API void ToLower();
+	DCONTAINERS_API int ToInteger() const;
+	DCONTAINERS_API long long ToInteger64() const;
 
 	int Size() const;
 	int Capacity() const;
-	DCONTAINER_API void Expand (int size);
+	DCONTAINERS_API void Expand (int size);
 
-	DCONTAINER_API void LoadFile (FILE* const file);
+	DCONTAINERS_API void LoadFile (FILE* const file);
 	dString SubString(int start = 0, int size = 0x7fffffff) const;
 
 	const char* GetStr () const;

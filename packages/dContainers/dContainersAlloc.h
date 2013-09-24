@@ -21,32 +21,13 @@
 
 #ifndef _D_CONTAINERS_ALLOC_H_
 #define _D_CONTAINERS_ALLOC_H_
-
-#ifdef _DCONTAINERS_DLL
-	#ifdef _DCONTAINERS_EXPORT
-		#ifdef _WIN32
-			#define DCONTAINER_API __declspec (dllexport)
-		#else
-			#define DCONTAINER_API __attribute__ ((visibility("default")))
-		#endif
-	#else
-		#ifdef _WIN32
-			#define DCONTAINER_API __declspec (dllimport)
-		#else
-			#define DCONTAINER_API
-		#endif
-	#endif
-#else
-	#define DCONTAINER_API
-#endif
-
-
+#include "dContainersStdAfx.h"
 
 class dContainersAlloc  
 {
 	public:
-	DCONTAINER_API void *operator new (size_t size);
-	DCONTAINER_API void operator delete (void* ptr);
+	DCONTAINERS_API void *operator new (size_t size);
+	DCONTAINERS_API void operator delete (void* ptr);
 
 	dContainersAlloc()
 	{
@@ -55,6 +36,9 @@ class dContainersAlloc
 	virtual ~dContainersAlloc() 
 	{
 	}
+
+	static DCONTAINERS_API void* Alloc (size_t size);
+	static DCONTAINERS_API void Free (void* const ptr);
 };
 
 #endif

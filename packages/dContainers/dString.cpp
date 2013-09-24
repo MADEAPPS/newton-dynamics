@@ -50,7 +50,8 @@ class dString::dStringAllocator
 			void Prefetch (int chunckSize)
 			{
 				for (int i = 0; i < D_DSTRING_ENTRIES_IN_FREELIST; i ++) {
-					dDataChunk* const data = (dDataChunk*) new char[chunckSize + sizeof (int)];
+					//dDataChunk* const data = (dDataChunk*) new char[chunckSize + sizeof (int)];
+					dDataChunk* const data = (dDataChunk*) dContainersAlloc::Alloc (chunckSize + sizeof (int));
 					data->m_count = i + 1; 
 					data->m_size = chunckSize;
 					data->m_next = m_freeListDataChunk; 
@@ -63,7 +64,8 @@ class dString::dStringAllocator
 				for (int i = 0; m_freeListDataChunk && (i < D_DSTRING_ENTRIES_IN_FREELIST); i ++) {
 					dDataChunk* const ptr = m_freeListDataChunk;
 					m_freeListDataChunk = m_freeListDataChunk->m_next;
-					delete[] (char*) ptr;
+					//delete[] (char*) ptr;
+					dContainersAlloc::Free (ptr);
 				}
 			}
 
@@ -116,7 +118,8 @@ class dString::dStringAllocator
 				int buckectSize = (buckectEntry + 1) * D_STRING_MEM_GRANULARITY;
 				return m_buckects[buckectEntry].Alloc(buckectSize);
 			}
-			dMemBucket::dDataChunk* const ptr = (dMemBucket::dDataChunk*) new char[size + sizeof (int)];
+			//dMemBucket::dDataChunk* const ptr = (dMemBucket::dDataChunk*) new char[size + sizeof (int)];
+			dMemBucket::dDataChunk* const ptr = (dMemBucket::dDataChunk*) dContainersAlloc::Alloc (size + sizeof (int));
 			ptr->m_size = size;
 			return ((char*)ptr) + sizeof (int);
 		}
@@ -129,7 +132,8 @@ class dString::dStringAllocator
 				int buckectEntry = dataChunck->m_size / D_STRING_MEM_GRANULARITY - 1;
 				m_buckects[buckectEntry].Free(ptr);
 			} else {
-				delete[] realPtr;
+				//delete[] realPtr;
+				dContainersAlloc::Free (ptr);
 			}
 		}
 
@@ -138,12 +142,14 @@ class dString::dStringAllocator
 	#else 
 		char* Alloc(int size)
 		{
-			return new char[size];
+			//return new char[size];
+			return (char*) dContainersAlloc::Alloc (size);
 		}
 
 		void Free(char* const ptr)
 		{
-			delete[] ptr;
+			//delete[] ptr;
+			dContainersAlloc::Free (ptr);
 		}
 	#endif
 };
