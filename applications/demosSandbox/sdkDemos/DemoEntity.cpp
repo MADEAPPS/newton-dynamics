@@ -15,7 +15,6 @@
 
 dInitRtti(DemoEntity);
 
-//#define DEMO_GRAVITY	10.0f
 
 DemoEntity::DemoEntity(const dMatrix& matrix, DemoEntity* parent)
 	:dClassInfo()
