@@ -82,11 +82,11 @@
 				OutputFile="$(OutDir)\$(ProjectName)_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\..\lib\vc_dll"
+				AdditionalLibraryDirectories=""
 				GenerateManifest="true"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
-				ImportLibrary="..\..\lib\vc_dll\wxmsw29ud_aui.lib"
+				ImportLibrary="$(OutDir)/$(ProjectName)_d.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -179,11 +179,11 @@
 				OutputFile="$(OutDir)\$(ProjectName)_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\..\lib\vc_dll"
+				AdditionalLibraryDirectories=""
 				GenerateManifest="true"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
-				ImportLibrary="..\..\lib\vc_dll\wxmsw29ud_aui.lib"
+				ImportLibrary="$(OutDir)/$(ProjectName)_d.lib"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -279,7 +279,7 @@
 				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				ImportLibrary="..\..\lib\vc_dll\wxmsw29u_aui.lib"
+				ImportLibrary="$(OutDir)/$(ProjectName).lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -376,7 +376,7 @@
 				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				ImportLibrary="..\..\lib\vc_dll\wxmsw29u_aui.lib"
+				ImportLibrary="$(OutDir)/$(ProjectName).lib"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -462,6 +462,10 @@
 			UniqueIdentifier="{63537534-1833-5C1F-8DBD-359A84F294C8}"
 			>
 			<File
+				RelativePath="..\..\include\wx\univ\setup.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\include\wx\msw\setup.h"
 				>
 				<FileConfiguration
@@ -504,10 +508,6 @@
 						Outputs="..\..\lib\vc_dll\mswu\wx\setup.h"
 					/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\..\include\wx\univ\setup.h"
-				>
 			</File>
 		</Filter>
 		<Filter

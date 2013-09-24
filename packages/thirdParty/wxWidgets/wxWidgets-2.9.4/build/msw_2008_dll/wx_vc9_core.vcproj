@@ -82,6 +82,8 @@
 				OutputFile="$(OutDir)\$(ProjectName)_d.dll"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
+				ImportLibrary="$(OutDir)/$(ProjectName)_d.lib"
+				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -172,6 +174,8 @@
 				OutputFile="$(OutDir)\$(ProjectName)_d.dll"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
+				ImportLibrary="$(OutDir)/$(ProjectName)_d.lib"
+				TargetMachine="17"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -258,6 +262,8 @@
 				AdditionalDependencies="winmm.lib rpcrt4.lib advapi32.lib wsock32.lib wininet.lib comctl32.lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
+				ImportLibrary="$(OutDir)/$(ProjectName).lib"
+				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -345,6 +351,8 @@
 				AdditionalDependencies="winmm.lib rpcrt4.lib advapi32.lib wsock32.lib wininet.lib comctl32.lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
+				ImportLibrary="$(OutDir)/$(ProjectName).lib"
+				TargetMachine="17"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -6795,6 +6803,10 @@
 			UniqueIdentifier="{63537534-1833-5C1F-8DBD-359A84F294C8}"
 			>
 			<File
+				RelativePath="..\..\include\wx\univ\setup.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\include\wx\msw\setup.h"
 				>
 				<FileConfiguration
@@ -6837,10 +6849,6 @@
 						Outputs="..\..\lib\$(PlatformName)\wx\setup.h"
 					/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\..\include\wx\univ\setup.h"
-				>
 			</File>
 		</Filter>
 		<Filter
@@ -8512,11 +8520,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\wx\panel.h"
+				RelativePath="..\..\include\wx\ribbon\panel.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\wx\ribbon\panel.h"
+				RelativePath="..\..\include\wx\panel.h"
 				>
 			</File>
 			<File
@@ -8864,11 +8872,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\wx\persist\toplevel.h"
+				RelativePath="..\..\include\wx\toplevel.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\wx\toplevel.h"
+				RelativePath="..\..\include\wx\persist\toplevel.h"
 				>
 			</File>
 			<File
@@ -8876,11 +8884,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\wx\persist\treebook.h"
+				RelativePath="..\..\include\wx\treebook.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\wx\treebook.h"
+				RelativePath="..\..\include\wx\persist\treebook.h"
 				>
 			</File>
 			<File

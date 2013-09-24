@@ -221,7 +221,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="opengl32.lib glu32.lib winmm.lib wsock32.lib Ws2_32.lib"
-				OutputFile="$(OutDir)\$(ProjectName)_d.dll"
+				OutputFile="$(OutDir)\$(ProjectName).dll"
 				GenerateDebugInformation="true"
 				LinkTimeCodeGeneration="0"
 				ImportLibrary="$(OutDir)/$(ProjectName).lib"
@@ -299,7 +299,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="opengl32.lib glu32.lib winmm.lib wsock32.lib Ws2_32.lib"
-				OutputFile="$(OutDir)\$(ProjectName)_d.dll"
+				OutputFile="$(OutDir)\$(ProjectName).dll"
 				GenerateDebugInformation="true"
 				LinkTimeCodeGeneration="0"
 				ImportLibrary="$(OutDir)/$(ProjectName).lib"
