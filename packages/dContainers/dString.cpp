@@ -295,9 +295,6 @@ dString::~dString ()
 	Empty();
 }
 
-
-
-
 void dString::Empty()
 {
 	if (m_capacity && m_string) {
@@ -322,11 +319,6 @@ void dString::LoadFile (FILE* const file)
 }
 
 
-dString dString::SubString(int start, int size) const
-{
-	dAssert (m_string);
-	return dString (&m_string[start], size);
-}
 
 void dString::operator+= (const char* const src)
 {
@@ -340,73 +332,6 @@ void dString::operator+= (const char* const src)
 	m_capacity = m_size + 1;
 	FreeMem(oldData);
 }
-
-
-
-
-const char* dString::GetStr () const
-{
-	return m_string;
-}
-
-int dString::Size() const
-{
-	return m_size;
-}
-
-int dString::Capacity() const
-{
-	return m_capacity;
-}
-
-void dString::CopyData (char* const dst, const char* const src, int size) const
-{
-	dAssert (dst);
-	dAssert (src);
-	memcpy (dst, src, size);
-}
-
-
-int dString::Compare (const char* const str0, const char* const str1) const
-{
-	dAssert (str0);
-	dAssert (str1);
-	return strcmp (str0, str1);
-}
-
-
-bool dString::operator== (const dString& src) const
-{
-	return Compare (m_string, src.m_string) == 0;
-}
-
-bool dString::operator!= (const dString& src) const
-{
-	return Compare (m_string, src.m_string) != 0;
-}
-
-
-bool dString::operator< (const dString& src) const
-{
-	return Compare (m_string, src.m_string) < 0;
-}
-
-bool dString::operator> (const dString& src) const
-{
-	return Compare (m_string, src.m_string) > 0;
-}
-
-bool dString::operator<= (const dString& src) const
-{
-	return Compare (m_string, src.m_string) <= 0;
-}
-
-bool dString::operator>= (const dString& src) const
-{
-	return Compare (m_string, src.m_string) >= 0;
-}
-
-
 
 
 int dString::ToInteger() const

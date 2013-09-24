@@ -25,7 +25,7 @@
 class dCollisionCylinderNodeInfo: public dCollisionNodeInfo
 {
 	public:
-	D_DEFINE_CLASS_NODE(dCollisionCylinderNodeInfo,dCollisionNodeInfo)
+	D_DEFINE_CLASS_NODE(dCollisionCylinderNodeInfo,dCollisionNodeInfo,DSCENE_API)
 
 	dCollisionCylinderNodeInfo();
 	dCollisionCylinderNodeInfo(dScene* const world);

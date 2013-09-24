@@ -15,48 +15,48 @@
 #include "dCRC.h"
 #include "dContainersAlloc.h"
 
-#define dRttiCommon(className)				\
-	private:								\
-	static dCRCTYPE m_rtti; 				\
-	public:									\
-	public:									\
-	static DCONTAINER_API dCRCTYPE GetRttiType()			\
-	{										\
-		return m_rtti;						\
-	}										\
-	virtual DCONTAINER_API dCRCTYPE GetTypeId () const		\
-	{										\
-		return m_rtti;						\
-	}										\
+#define dRttiCommon(className,exportType)					\
+	private:												\
+	static dCRCTYPE m_rtti; 								\
+	public:													\
+	public:													\
+	static exportType dCRCTYPE GetRttiType()				\
+	{														\
+		return m_rtti;										\
+	}														\
+	virtual exportType dCRCTYPE GetTypeId () const			\
+	{														\
+		return m_rtti;										\
+	}														\
 
 
 
 // add these macros only to the root base class that you want to have rtti 
-#define dRttiRootClassSupportDeclare(className)		\
-	dRttiCommon(className)							\
-	virtual DCONTAINER_API bool IsType (dCRCTYPE typeId) const		\
-	{												\
-		return typeId == m_rtti;					\
+#define dRttiRootClassSupportDeclare(className,exportType)			\
+	dRttiCommon(className,exportType)								\
+	virtual exportType bool IsType (dCRCTYPE typeId) const			\
+	{																\
+		return typeId == m_rtti;									\
 	}												
 
-#define dRttiRootClassSupportImplement(className)	\
+#define dRttiRootClassSupportImplement(className)					\
 	dCRCTYPE className::m_rtti = dCRC64 (#className);
 
 
 
 // add these macros to every derived class  
-#define dAddRtti(baseClass)								\
-	dRttiCommon(baseClass)								\
-	virtual DCONTAINER_API bool IsType (dCRCTYPE typeId) const			\
-	{													\
-		if (typeId == m_rtti) {							\
-			return true;								\
-		}												\
-		return baseClass::IsType (typeId);				\
+#define dAddRtti(baseClass,exportType)									\
+	dRttiCommon(baseClass,exportType)									\
+	virtual exportType bool IsType (dCRCTYPE typeId) const				\
+	{																	\
+		if (typeId == m_rtti) {											\
+			return true;												\
+		}																\
+		return baseClass::IsType (typeId);								\
 	}													
 
 
-#define dInitRtti(className)							\
+#define dInitRtti(className)											\
 	dRttiRootClassSupportImplement(className)
 
 

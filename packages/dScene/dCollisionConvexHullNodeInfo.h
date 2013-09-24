@@ -25,7 +25,7 @@
 class dCollisionConvexHullNodeInfo: public dCollisionNodeInfo
 {
 	public:
-	D_DEFINE_CLASS_NODE(dCollisionConvexHullNodeInfo,dCollisionNodeInfo)
+	D_DEFINE_CLASS_NODE(dCollisionConvexHullNodeInfo,dCollisionNodeInfo,DSCENE_API)
 
 	dCollisionConvexHullNodeInfo();
 	dCollisionConvexHullNodeInfo(const dCollisionConvexHullNodeInfo& info);

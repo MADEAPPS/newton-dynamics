@@ -34,7 +34,7 @@ class dMeshNodeInfo: public dGeometryNodeInfo
 	};
 
 
-	D_DEFINE_CLASS_NODE(dMeshNodeInfo,dGeometryNodeInfo)
+	D_DEFINE_CLASS_NODE(dMeshNodeInfo,dGeometryNodeInfo,DSCENE_API)
 
 	dMeshNodeInfo();
 	dMeshNodeInfo(dScene* const world);

@@ -27,7 +27,7 @@
 class dRigidbodyNodeInfo: public dNodeInfo
 {
 	public:
-	D_DEFINE_CLASS_NODE(dRigidbodyNodeInfo,dNodeInfo)
+	D_DEFINE_CLASS_NODE(dRigidbodyNodeInfo,dNodeInfo,DSCENE_API)
 
 	dRigidbodyNodeInfo();
 	dRigidbodyNodeInfo(dScene* const world);

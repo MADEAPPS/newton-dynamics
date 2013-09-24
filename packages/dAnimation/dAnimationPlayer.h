@@ -13,7 +13,7 @@
 #define __dAnimationPlayer_h__
 #include "dAnimationNode.h"
 
-
+/*
 class dAnimationPlayer: public dAnimationNode
 {
 	public:
@@ -25,7 +25,7 @@ class dAnimationPlayer: public dAnimationNode
 
 
 };
-
+*/
 
 
 

@@ -25,7 +25,7 @@
 class dCollisionBoxNodeInfo: public dCollisionNodeInfo
 {
 	public:
-	D_DEFINE_CLASS_NODE(dCollisionBoxNodeInfo,dCollisionNodeInfo)
+	D_DEFINE_CLASS_NODE(dCollisionBoxNodeInfo,dCollisionNodeInfo,DSCENE_API)
 
 	dCollisionBoxNodeInfo();
 	dCollisionBoxNodeInfo(dScene* const world);

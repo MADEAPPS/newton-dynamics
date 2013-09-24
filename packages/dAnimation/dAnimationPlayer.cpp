@@ -12,6 +12,7 @@
 #include "dAnimationStdAfx.h"
 #include "dAnimationPlayer.h"
 
+/*
 D_DEFINE_ANIMATION_NODE_DECLARE(dAnimationPlayer)	
 
 dAnimationPlayer::dAnimationPlayer(void)
@@ -21,3 +22,4 @@ dAnimationPlayer::dAnimationPlayer(void)
 dAnimationPlayer::~dAnimationPlayer(void)
 {
 }
+*/

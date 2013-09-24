@@ -33,7 +33,7 @@ class dString: public dContainersAlloc
 	char& operator[] (int index);
 	char operator[] (int index) const;
 	
-	dString& operator= (const dString& src);
+	DCONTAINER_API dString& operator= (const dString& src);
 	bool operator== (const dString& src) const;
 	bool operator!= (const dString& src) const;
 	bool operator< (const dString& src) const;
@@ -41,30 +41,30 @@ class dString: public dContainersAlloc
 	bool operator<= (const dString& src) const;
 	bool operator>= (const dString& src) const;
 
-	void operator+= (const char* const src);
+	DCONTAINER_API void operator+= (const char* const src);
 	void operator+= (const dString& src);
 
 	dString operator+ (const char* const src) const;
 	dString operator+ (const dString& src) const;
 
-	int Find (char ch, int from = 0) const;
+	DCONTAINER_API int Find (char ch, int from = 0) const;
 	int Find (const dString& subString, int from = 0) const;
-	int Find (const char* const subString, int from = 0, int lenght = 0x7ffffff) const;
+	DCONTAINER_API int Find (const char* const subString, int from = 0, int lenght = 0x7ffffff) const;
 
-	void Replace (int start, int size, const char* const str, int strSize);
+	DCONTAINER_API void Replace (int start, int size, const char* const str, int strSize);
 	void Replace (int start, int size, const dString& str);
 	void Empty();
 
-	void ToUpper();
-	void ToLower();
-	int ToInteger() const;
-	long long ToInteger64() const;
+	DCONTAINER_API void ToUpper();
+	DCONTAINER_API void ToLower();
+	DCONTAINER_API int ToInteger() const;
+	DCONTAINER_API long long ToInteger64() const;
 
 	int Size() const;
 	int Capacity() const;
-	void Expand (int size);
+	DCONTAINER_API void Expand (int size);
 
-	void LoadFile (FILE* const file);
+	DCONTAINER_API void LoadFile (FILE* const file);
 	dString SubString(int start = 0, int size = 0x7fffffff) const;
 
 	const char* GetStr () const;
@@ -107,6 +107,16 @@ inline char dString::operator[] (int index) const
 	return m_string[index];
 }
 
+inline const char* dString::GetStr () const
+{
+	return m_string;
+}
+
+inline int dString::Size() const
+{
+	return m_size;
+}
+
 
 inline int dString::Find (const char* const subString, int from, int lenght) const
 {
@@ -137,6 +147,64 @@ inline dString dString::operator+ (const dString& src) const
 inline dString dString::operator+ (const char* const copy) const
 {
 	return dString (*this, copy, CalculateSize (copy));
+}
+
+
+inline int dString::Capacity() const
+{
+	return m_capacity;
+}
+
+inline void dString::CopyData (char* const dst, const char* const src, int size) const
+{
+	dAssert (dst);
+	dAssert (src);
+	memcpy (dst, src, size);
+}
+
+inline int dString::Compare (const char* const str0, const char* const str1) const
+{
+	dAssert (str0);
+	dAssert (str1);
+	return strcmp (str0, str1);
+}
+
+
+inline bool dString::operator== (const dString& src) const
+{
+	return Compare (m_string, src.m_string) == 0;
+}
+
+inline bool dString::operator!= (const dString& src) const
+{
+	return Compare (m_string, src.m_string) != 0;
+}
+
+
+inline bool dString::operator< (const dString& src) const
+{
+	return Compare (m_string, src.m_string) < 0;
+}
+
+inline bool dString::operator> (const dString& src) const
+{
+	return Compare (m_string, src.m_string) > 0;
+}
+
+inline bool dString::operator<= (const dString& src) const
+{
+	return Compare (m_string, src.m_string) <= 0;
+}
+
+inline bool dString::operator>= (const dString& src) const
+{
+	return Compare (m_string, src.m_string) >= 0;
+}
+
+inline dString dString::SubString(int start, int size) const
+{
+	dAssert (m_string);
+	return dString (&m_string[start], size);
 }
 
 

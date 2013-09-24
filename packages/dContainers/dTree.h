@@ -34,10 +34,10 @@ class dRedBackNode
 	dRedBackNode* GetRight() const;
 	dRedBackNode* GetParent() const;
 	dRedBackNode (dRedBackNode* const parent);
-	dRedBackNode* Prev() const;
-	dRedBackNode* Next() const;
-	dRedBackNode* Minimum() const;
-	dRedBackNode* Maximum() const;
+	DCONTAINER_API dRedBackNode* Prev() const;
+	DCONTAINER_API dRedBackNode* Next() const;
+	DCONTAINER_API dRedBackNode* Minimum() const;
+	DCONTAINER_API dRedBackNode* Maximum() const;
 
 	protected:
 	virtual ~dRedBackNode () 
@@ -49,11 +49,11 @@ class dRedBackNode
 	bool GetColor () const;
 	bool IsInTree () const;
 	void SetInTreeFlag (bool flag);
-	void RotateLeft(dRedBackNode** const head); 
-	void RotateRight(dRedBackNode** const head); 
-	void RemoveFixup (dRedBackNode* const node, dRedBackNode** const head); 
-	void Unlink (dRedBackNode** const head);
-	void InsertFixup(dRedBackNode** const head); 
+	DCONTAINER_API void RotateLeft(dRedBackNode** const head); 
+	DCONTAINER_API void RotateRight(dRedBackNode** const head); 
+	DCONTAINER_API void RemoveFixup (dRedBackNode* const node, dRedBackNode** const head); 
+	DCONTAINER_API void Unlink (dRedBackNode** const head);
+	DCONTAINER_API void InsertFixup(dRedBackNode** const head); 
 	
 	bool m_color;
 	bool m_inTree;

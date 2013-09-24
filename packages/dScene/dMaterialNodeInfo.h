@@ -25,7 +25,7 @@
 class dMaterialNodeInfo: public dNodeInfo
 {
 	public:
-	D_DEFINE_CLASS_NODE(dMaterialNodeInfo,dNodeInfo)
+	D_DEFINE_CLASS_NODE(dMaterialNodeInfo,dNodeInfo,DSCENE_API)
 
 	dMaterialNodeInfo();
 	dMaterialNodeInfo(dScene* const world);

@@ -22,8 +22,8 @@
 #ifndef _D_CONTAINERS_ALLOC_H_
 #define _D_CONTAINERS_ALLOC_H_
 
-#ifdef _DCONTAINERS_BUILD_DLL
-	#ifdef _DCONTAINERS_BUILD_EXPORT
+#ifdef _DCONTAINERS_DLL
+	#ifdef _DCONTAINERS_EXPORT
 		#ifdef _WIN32
 			#define DCONTAINER_API __declspec (dllexport)
 		#else

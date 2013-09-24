@@ -26,7 +26,7 @@
 class dTextureNodeInfo: public dNodeInfo
 {
 	public:
-	D_DEFINE_CLASS_NODE(dTextureNodeInfo,dNodeInfo)
+	D_DEFINE_CLASS_NODE(dTextureNodeInfo,dNodeInfo,DSCENE_API)
 
 	dTextureNodeInfo(); 
 	dTextureNodeInfo(dScene* const world); 

@@ -23,6 +23,25 @@
 #include <string.h>
 #include <assert.h>
 
+#ifdef _DCONTAINERS_DLL
+	#ifdef _DCONTAINERS_EXPORT
+		#ifdef _WIN32
+			#define DCONTAINERS_API __declspec (dllexport)
+		#else
+			#define DCONTAINERS_API __attribute__ ((visibility("default")))
+		#endif
+	#else
+		#ifdef _WIN32
+			#define DCONTAINERS_API __declspec (dllimport)
+		#else
+			#define DCONTAINERS_API
+		#endif
+	#endif
+#else
+	#define DCONTAINERS_API
+#endif
+
+
 #ifdef _MSC_VER
 	#include <windows.h>
 	#include <crtdbg.h>

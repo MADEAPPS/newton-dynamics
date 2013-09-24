@@ -67,7 +67,7 @@ class DemoMesh: public dList<DemoSubMesh>, virtual public dClassInfo
 	protected:
 	virtual ~DemoMesh();
 
-	dAddRtti(dClassInfo);
+	dAddRtti(dClassInfo,DOMMY_API);
 	void  OptimizeForRender();
 	void  ResetOptimization();
 	void  SpliteSegment(dListNode* const node, int maxIndexCount);

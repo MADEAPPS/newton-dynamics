@@ -83,7 +83,7 @@ class DemoEntity: public dHierarchy<DemoEntity>, virtual public dClassInfo
 	DemoMesh* m_mesh;
 	UserData* m_userData;
 
-	dAddRtti(dClassInfo);
+	dAddRtti(dClassInfo,DOMMY_API);
 
 	friend class DemoEntityManager;
 };

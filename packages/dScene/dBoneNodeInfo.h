@@ -26,7 +26,7 @@
 class dBoneNodeInfo: public dSceneNodeInfo
 {
 	public:
-	D_DEFINE_CLASS_NODE(dBoneNodeInfo,dSceneNodeInfo)
+	D_DEFINE_CLASS_NODE(dBoneNodeInfo,dSceneNodeInfo,DSCENE_API)
 
 	dBoneNodeInfo();
 	dBoneNodeInfo(dScene* const world) {}

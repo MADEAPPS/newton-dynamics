@@ -28,33 +28,33 @@ class dNodeInfo;
 class dSceneRender;
 
 
-#define D_DEFINE_CLASS_NODE_ESSENCIALS(className,baseClass)		\
-	dAddRtti(baseClass);										\
-	virtual dNodeInfo* MakeCopy () const						\
-	{															\
-		return new className(*this);							\
-	}															\
-	virtual dNodeInfo* MetaFunction(dScene* const world) const	\
-	{															\
-		return new className(world);							\
-	}															\
-	static const char* BaseClassName ()							\
-	{															\
-		return #baseClass;										\
-	}															\
-	static const className& GetSingleton()						\
-	{															\
-		return m_singletonClass;								\
-	}															\
+#define D_DEFINE_CLASS_NODE_ESSENCIALS(className,baseClass,exportType)		\
+	dAddRtti(baseClass,exportType);											\
+	virtual exportType dNodeInfo* MakeCopy () const							\
+	{																		\
+		return new className(*this);										\
+	}																		\
+	virtual exportType dNodeInfo* MetaFunction(dScene* const world) const	\
+	{																		\
+		return new className(world);										\
+	}																		\
+	static exportType const char* BaseClassName ()							\
+	{																		\
+		return #baseClass;													\
+	}																		\
+	static exportType const className& GetSingleton()						\
+	{																		\
+		return m_singletonClass;											\
+	}																		\
 	static className m_singletonClass;
 
 
-#define D_DEFINE_CLASS_NODE(className,baseClass)				\
-	virtual const char* GetClassName () const					\
-	{															\
-		return #className;										\
-	}															\
-	D_DEFINE_CLASS_NODE_ESSENCIALS(className,baseClass)		
+#define D_DEFINE_CLASS_NODE(className,baseClass,exportType)			\
+	virtual exportType const char* GetClassName () const			\
+	{																\
+		return #className;											\
+	}																\
+	D_DEFINE_CLASS_NODE_ESSENCIALS(className,baseClass,exportType)		
 
 
 
@@ -111,7 +111,7 @@ class dNodeInfo: public dClassInfo, public dVariableList
 	static dTree<const dNodeInfo*, dCRCTYPE>& GetSingletonDictionary();
 	static void ReplaceSingletonClass (const char* const className, const dNodeInfo* const singleton);
 
-	dAddRtti(dClassInfo);
+	dAddRtti(dClassInfo,);
 
 	private:
 	dString m_name;

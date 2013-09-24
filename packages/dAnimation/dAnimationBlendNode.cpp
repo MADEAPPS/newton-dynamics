@@ -12,6 +12,7 @@
 #include "dAnimationStdAfx.h"
 #include "dAnimationBlendNode.h"
 
+/*
 D_DEFINE_ANIMATION_NODE_DECLARE(dAnimationBlendNode)
 
 dAnimationBlendNode::dAnimationBlendNode(void)
@@ -29,10 +30,6 @@ void dAnimationBlendNode::Update (dAnimationTransform* const palette, int transf
 	if (m_children.GetCount() == 1) {
 		m_children.GetFirst()->GetInfo()->Update(palette, transformCount);
 	} else {
-
-		
-
 	}
-			
-
 }
+*/

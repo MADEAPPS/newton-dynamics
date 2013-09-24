@@ -13,7 +13,7 @@
 #define __dAnimationNode_h__
 
 class dAnimationTransform;
-
+/*
 class dAnimationNode: public dClassInfo
 {
 	public:
@@ -27,6 +27,6 @@ class dAnimationNode: public dClassInfo
 	virtual void  SerializeXml (TiXmlElement* const rootNode) const = 0;
 	virtual void  DeSerializeXml (TiXmlElement* const rootNode) const = 0;
 };
-
+*/
 
 #endif

@@ -13,7 +13,7 @@
 #define __dAnimationClip_h__
 
 class dAnimationTransform;
-
+/*
 class dAnimationClip: public dClassInfo
 {
 	public:
@@ -25,6 +25,6 @@ class dAnimationClip: public dClassInfo
 	virtual void Update (dAnimationTransform* const palette, int transformCount);
 
 };
-
+*/
 
 #endif

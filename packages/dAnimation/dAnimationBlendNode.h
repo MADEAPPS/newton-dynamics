@@ -13,6 +13,7 @@
 #define __dAnimationBlendNode_h__
 #include "dAnimationNode.h"
 
+/*
 class dAnimationBlendNode: public dAnimationNode
 {
 	public:
@@ -30,6 +31,6 @@ class dAnimationBlendNode: public dAnimationNode
 	dList<dAnimationNode*> m_children;
 
 };
-
+*/
 
 #endif

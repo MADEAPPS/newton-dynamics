@@ -26,7 +26,7 @@
 class dSceneModelInfo: public dNodeInfo
 {
 	public:
-	D_DEFINE_CLASS_NODE(dSceneModelInfo,dNodeInfo)
+	D_DEFINE_CLASS_NODE(dSceneModelInfo,dNodeInfo,DSCENE_API)
 
 	dSceneModelInfo();
 	dSceneModelInfo(dScene* const world);

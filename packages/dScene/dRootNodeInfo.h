@@ -25,7 +25,7 @@
 class dRootNodeInfo: public dNodeInfo
 {
 	public:
-	D_DEFINE_CLASS_NODE(dRootNodeInfo,dNodeInfo)
+	D_DEFINE_CLASS_NODE(dRootNodeInfo,dNodeInfo,DSCENE_API)
 
 	dRootNodeInfo();
 	dRootNodeInfo(dScene* const world);

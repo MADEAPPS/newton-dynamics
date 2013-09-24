@@ -26,7 +26,7 @@ class dClassInfo: public dRefCounter
 	{
 	}
 
-	dRttiRootClassSupportDeclare(dClassInfo);
+	dRttiRootClassSupportDeclare(dClassInfo,DCONTAINER_API);
 };
 
 #endif

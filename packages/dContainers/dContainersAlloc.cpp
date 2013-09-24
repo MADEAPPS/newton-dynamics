@@ -22,17 +22,32 @@
 #include "dContainersStdAfx.h"
 #include "dContainersAlloc.h"
 
-#ifdef _DCONTAINERS_BUILD_DLL
+#ifdef _DCONTAINERS_DLL
 	void* operator new (size_t size) 
 	{ 
 	//	return NewtonAlloc(int (size));
+		dAssert (0);
 		return malloc (size);
 	}
 
 	void operator delete (void* ptr) 
 	{ 
 	//	NewtonFree(ptr);
+		dAssert (0);
 		free (ptr);
+	}
+
+	BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
+	{
+		switch (ul_reason_for_call)
+		{
+		case DLL_PROCESS_ATTACH:
+		case DLL_THREAD_ATTACH:
+		case DLL_THREAD_DETACH:
+		case DLL_PROCESS_DETACH:
+			break;
+		}
+		return TRUE;
 	}
 #endif
 

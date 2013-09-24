@@ -26,7 +26,7 @@
 class dSceneCacheInfo: public dNodeInfo
 {
 	public:
-	D_DEFINE_CLASS_NODE(dSceneCacheInfo,dNodeInfo)
+	D_DEFINE_CLASS_NODE(dSceneCacheInfo,dNodeInfo,DSCENE_API)
 
 	dSceneCacheInfo();
 	dSceneCacheInfo(dScene* const world);

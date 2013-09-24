@@ -24,7 +24,7 @@
 class dGeometryNodeInfo: public dNodeInfo
 {
 	public:
-	D_DEFINE_CLASS_NODE(dGeometryNodeInfo,dNodeInfo)
+	D_DEFINE_CLASS_NODE(dGeometryNodeInfo,dNodeInfo,DSCENE_API)
 
 	dGeometryNodeInfo();
 	dGeometryNodeInfo(dScene* const world);

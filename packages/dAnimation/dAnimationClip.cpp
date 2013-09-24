@@ -11,7 +11,7 @@
 
 #include "dAnimationStdAfx.h"
 #include "dAnimationClip.h"
-
+/*
 D_DEFINE_ANIMATION_NODE_DECLARE(dAnimationClip)	
 
 dAnimationClip::dAnimationClip(void)
@@ -21,3 +21,4 @@ dAnimationClip::dAnimationClip(void)
 dAnimationClip::~dAnimationClip(void)
 {
 }
+*/

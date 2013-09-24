@@ -124,6 +124,26 @@
 #include <Newton.h>
 
 
+#ifdef _DSCENE_DLL
+	#ifdef _DSCENE_EXPORT
+		#ifdef _WIN32
+			#define DSCENE_API __declspec (dllexport)
+		#else
+			#define DSCENE_API __attribute__ ((visibility("default")))
+		#endif
+	#else
+		#ifdef _WIN32
+			#define DSCENE_API __declspec (dllimport)
+		#else
+			#define DSCENE_API
+		#endif
+	#endif
+#else
+	#define DSCENE_API
+#endif
+
+
+
 
 
 #ifdef __USE_DOUBLE_PRECISION__
