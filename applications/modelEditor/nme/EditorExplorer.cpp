@@ -12,14 +12,15 @@
 #include "toolbox_stdafx.h"
 #include "EditorExplorer.h"
 #include "NewtonModelEditor.h"
-#include "EditorAssetBrowser.h"
-#include "EditorAssetExplorer.h"
+//#include "EditorAssetBrowser.h"
+//#include "EditorAssetExplorer.h"
 
 
-EditorExplorer::EditorExplorer(FXComposite* const parent, NewtonModelEditor* const mainFrame)
-	:EditorPanel(parent, mainFrame, "              explorer             ")
+EditorExplorer::EditorExplorer(NewtonModelEditor* const mainFrame)
+	:wxTreeCtrl (mainFrame)
 	,m_mainFrame(mainFrame)
 {
+/*
 	FXVerticalFrame* const contents = new FXVerticalFrame(this, LAYOUT_SIDE_LEFT|FRAME_NONE|LAYOUT_FILL, 0,0,0,0, 0,0,0,0);
 	m_tabBook = new FXTabBook(contents, mainFrame, NewtonModelEditor::ID_EDITOR_MODE, TABBOOK_BOTTOMTABS|FRAME_NONE|LAYOUT_FILL, 0,0,0,0, 0,0,0,0);
 
@@ -36,9 +37,9 @@ EditorExplorer::EditorExplorer(FXComposite* const parent, NewtonModelEditor* con
 	// add a scene explorer viewer
 	FXTabItem* const sceneExplorerTab = new FXTabItem(m_tabBook, D_EDIT_MODE_SCENE, NULL, FRAME_NONE|LAYOUT_FILL);
 	sceneExplorerTab;
-int ID_OPEN_TREE = 1000;
+	int ID_OPEN_TREE = 1000;
 	m_sceneExplorer = new FXTreeList(m_tabBook, mainFrame, ID_OPEN_TREE, TREELIST_BROWSESELECT|TREELIST_SHOWS_LINES|TREELIST_SHOWS_BOXES|LAYOUT_FILL_X|LAYOUT_FILL_Y);
-
+*/
 }
 
 EditorExplorer::~EditorExplorer(void)
@@ -93,7 +94,7 @@ void EditorExplorer::PopulateModel(const dPluginScene* const scene, FXTreeItem* 
 }
 */
 
-
+/*
 void EditorExplorer::PopulateCurrentAsset ()
 {
 	dPluginInterface::dAssetList::dListNode* const assetPluginNode = m_mainFrame->GetCurrentAssetNode();
@@ -173,3 +174,4 @@ void EditorExplorer::HandleSelectionEvent (const dList<dScene::dTreeNode*>& trac
 {
 	m_assetExplorer->HandleSelectionEvent (traceToRoot);
 }
+*/

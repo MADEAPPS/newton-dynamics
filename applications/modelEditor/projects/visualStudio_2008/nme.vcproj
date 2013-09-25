@@ -455,6 +455,14 @@
 			Name="nme"
 			>
 			<File
+				RelativePath="..\..\nme\EditorExplorer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\nme\EditorExplorer.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\nme\EditorMainMenu.cpp"
 				>
 			</File>

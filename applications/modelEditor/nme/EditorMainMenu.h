@@ -51,8 +51,9 @@ class EditorMainMenu: public wxMenuBar
 
 	private:
 	void CreateFileMenu();
-	void CreateMeshMenu();
 	void CreateEditMenu();
+	void CreateViewMenu();
+	void CreateMeshMenu();
 	void CreateHelpMenu();
 
 	void AddPlugin (wxMenu* const menu, dPluginRecord* const plugin);
@@ -61,6 +62,7 @@ class EditorMainMenu: public wxMenuBar
 	NewtonModelEditor* m_mainFrame;
 	wxMenu* m_fileMenu;
 	wxMenu* m_editMenu;
+	wxMenu* m_viewMenu;
 	wxMenu* m_meshMenu;
 	wxMenu* m_helpMenu;
 

@@ -13,7 +13,8 @@
 //
 
 
-#include <toolbox_stdafx.h>
+#include "toolbox_stdafx.h"
+#include "EditorExplorer.h"
 #include "EditorMainMenu.h"
 #include "NewtonModelEditor.h"
 #include "EditorRenderViewport.h"
@@ -46,6 +47,9 @@ BEGIN_EVENT_TABLE (NewtonModelEditor, wxFrame)
 	EVT_MENU (wxID_UNDO, OnUndo)
 	EVT_MENU (wxID_REDO, OnRedo)
 	EVT_MENU (ID_CLEAR_UNDO_HISTORY, OnClearUndoHistory)
+
+	EVT_MENU (ID_HIDE_EXPLORER_PANE, OnHideExplorerPane)
+	EVT_AUI_PANE_CLOSE(OnPaneClose)
 
 
 	EVT_MENU_RANGE (ID_MESH_PLUGINS, ID_MAX_MESH_PLUGINS, OnMesh)
@@ -521,10 +525,10 @@ NewtonModelEditor::NewtonModelEditor(const wxString& title, const wxPoint& pos, 
 	,m_navigationToolbar(NULL)
 	,m_objectSelectionToolbar(NULL)
 	,m_renderViewport(NULL)
+	,m_explorer(NULL)
 	,m_viewMode(NULL)
 	,m_shadeMode(NULL)
 	,m_navigationStack(0)
-//	,m_explorer(NULL)
 //	,m_commandPanel(NULL)
 //	,m_sharedVisual(NULL)
 //	,m_editMode(m_editAsset)
@@ -535,7 +539,6 @@ NewtonModelEditor::NewtonModelEditor(const wxString& title, const wxPoint& pos, 
 {
 	// notify wxAUI which frame to use
 	m_mgr.SetManagedWindow(this);
-
 
 	m_navigationMode[0] = m_panViewport;
 
@@ -556,7 +559,7 @@ NewtonModelEditor::NewtonModelEditor(const wxString& title, const wxPoint& pos, 
 	CreateObjectSelectionToolBar();
 	CreateNavigationToolBar();
 	CreateRenderViewPort();
-	
+	CreateExploser();
 
 
 /*
@@ -886,6 +889,12 @@ void NewtonModelEditor::CreateRenderViewPort()
 	m_mgr.AddPane (m_renderViewport, wxAuiPaneInfo().Name(wxT("render window")).CenterPane().PaneBorder(false));
 }
 
+void NewtonModelEditor::CreateExploser()
+{
+	m_explorer = new EditorExplorer (this);
+	m_mgr.AddPane (m_explorer, wxAuiPaneInfo().Name(wxT("scene explorer")).Caption(wxT("scene explorer")).Left().Layer(1).Position(1).CloseButton(true).MaximizeButton(false));
+}
+
 int NewtonModelEditor::GetViewMode() const
 {
 	int index = m_viewMode->GetCurrentSelection();
@@ -1012,6 +1021,27 @@ void NewtonModelEditor::OnMesh (wxCommandEvent& event)
 	}
 }
 
+
+void NewtonModelEditor::OnHideExplorerPane (wxCommandEvent& event) 
+{
+	wxAuiPaneInfo& pane = m_mgr.GetPane(m_explorer);
+	if (event.GetInt()) {
+		pane.Show(true);
+	} else {
+		pane.Show(false);
+	}
+	m_mgr.Update();
+}
+
+void NewtonModelEditor::OnPaneClose (wxAuiManagerEvent& event)
+{
+//	wxCommandEvent notify(wxEVT_COMMAND_MENU_SELECTED, ID_HIDE_EXPLORER_PANE);
+//	notify.SetEventObject(this);
+//	notify.SetInt (0);
+//	GetEventHandler()->ProcessEvent (notify);
+	wxMenuItem* const item = m_mainMenu->m_viewMenu->FindItem (m_mainMenu->m_viewMenu->FindItem (event.pane->name));
+	item->Check(false);
+}
 
 
 void NewtonModelEditor::OnChangeNavigationMode(wxCommandEvent& event)

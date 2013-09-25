@@ -105,6 +105,7 @@ typedef long long unsigned64;
 #include <wx/dcclient.h>
 #include <wx/glcanvas.h>
 #include <wx/aui/aui.h>
+#include <wx/treectrl.h>
 
 
 // SDK includes

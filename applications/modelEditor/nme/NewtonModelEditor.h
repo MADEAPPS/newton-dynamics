@@ -13,17 +13,13 @@
 #define __NEWTON_MODEL_EDITOR_H_
 
 
-//class GLVisual;
 //class dPluginScene;
-//class EditorCanvas;
 class EditorMainMenu;
+class EditorExplorer;
 class EditorRenderViewport;
-//class EditorExplorer;
 //class EditorCommandPanel;
 
 #define D_MAX_PLUGINS_COUNT 128
-//#define D_EDIT_MODE_ASSET "asset"
-//#define D_EDIT_MODE_SCENE "scene"
 
 class NewtonModelEditor: public wxFrame, public dPluginInterface
 {
@@ -62,6 +58,9 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 		// editor menu options
 		ID_CLEAR_UNDO_HISTORY,
 
+		// view menu options
+		ID_HIDE_EXPLORER_PANE,
+
 		//view modes
 		ID_VIEW_MODES,
 		ID_VIEW_MODES_LAST = ID_VIEW_MODES + 16,
@@ -93,7 +92,7 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 		// options menu
 		ID_HIDE_FILE_TOOLBAR,
 		ID_HIDE_NAVIGATION_TOOLBAR,
-		ID_HIDE_EXPLORER_PANEL,
+		
 		ID_HIDE_COMMAND_PANEL,
 		ID_KEYBOARD_SHORCUTS,
 
@@ -159,31 +158,13 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	static void PhysicsFree (void *ptr, int sizeInBytes);
 
 	private:
-	
-	
-	
 	void SaveConfig();
 	void LoadConfig();
 	void LoadPlugins(const char* const path);
-
-	
-
-	
-
 	void PopNavigationMode();
 	void PushNavigationMode(NavigationMode mode);
 	void ShowNavigationMode(NavigationMode mode) const;
-
-
 	EditorCanvas* GetCanvas(FXObject* const sender) const;
-
-	FX4Splitter* m_workshop;
-	EditorCanvas* m_canvas[4];
-
-	FXStatusBar* m_statusbar;
-
-	FXToolBarShell* m_mainMenuDragShell;
-	EditorMainMenu* m_mainMenu;
 
 	FXToolBarShell* m_fileToolbarShell;
 	FXToolBar* m_fileToolbar;
@@ -191,8 +172,6 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	FXToolBarShell* m_navigationToolbarShell;
 	FXToolBar* m_navigationToolbar;
 
-	FXToolBarShell* m_explorerToolbarShell;
-	EditorExplorer* m_explorer;
 
 	FXToolBarShell* m_commandPanelToolbarShell;
 	EditorCommandPanel* m_commandPanel;
@@ -238,11 +217,14 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	void OnRedo(wxCommandEvent& event); 
 	void OnClearUndoHistory(wxCommandEvent& event); 
 	void OnMesh (wxCommandEvent& event); 
+
+	void OnHideExplorerPane (wxCommandEvent& event); 
+	void OnPaneClose (wxAuiManagerEvent& event); 
 	
-
-
 	void LoadResources ();
 	void DeleteResources ();
+
+	void CreateExploser();
 	void CreateFileToolBar();
 	void CreateRenderViewPort();
 	void CreateNavigationToolBar();
@@ -268,6 +250,8 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	wxChoice* m_shadeMode;
 
 	EditorRenderViewport* m_renderViewport;
+	EditorExplorer* m_explorer;
+
 
 	int m_viewModeMap[ID_VIEW_MODES_LAST - ID_VIEW_MODES];
 	int m_shapeModeMap[ID_SHADE_MODES_LAST - ID_SHADE_MODES];

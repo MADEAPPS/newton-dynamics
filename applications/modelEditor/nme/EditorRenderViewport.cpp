@@ -94,23 +94,6 @@ void EditorRenderViewport::create()
 
 	makeNonCurrent();
 }
-
-void EditorRenderViewport::UpdateScene (dViewPortModes mode)
-{
-	BeginRender(mode);
-
-	_ASSERTE (0);
-
-
-	EndRender();
-}
-
-
-
-
-
-
-
 	
 void EditorRenderViewport::SelectAssetNode (const FXEvent* const event)
 {
@@ -129,9 +112,6 @@ void EditorRenderViewport::SelectAssetNode (const FXEvent* const event)
 		}
 	}
 }
-
-
-
 
 void EditorRenderViewport::RenderSelectedNodeGizmo () const
 {
@@ -163,7 +143,6 @@ void EditorRenderViewport::RenderSelectedNodeGizmo () const
 		DrawNodeSelectAndMoveGizmo(m_render, axis);
 	}
 }
-
 */
 
 

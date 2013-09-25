@@ -13,14 +13,11 @@
 #define __EDITOR_RENDER_VIEWPORT_H__
 
 
-//class EditorCanvas;
 class NewtonModelEditor;
-
 
 class EditorRenderViewport: public wxGLCanvas, public dPluginCamera
 {
 	public:
-
 	enum dShadingModes
 	{
 		m_textured,
@@ -48,37 +45,22 @@ class EditorRenderViewport: public wxGLCanvas, public dPluginCamera
 
 /*
 	void create();
-
 	void UpdateScene (dViewPortModes mode);
-	
-
-	
-
 	protected:
 	void SelectAssetNode (const FXEvent* const event);
-
 	void RenderSelectedNodeGizmo () const;
-
-	
 	EditorCanvas* m_canvas;
-	
-	
 	bool m_leftMouseKeyState;
-
-	FXDECLARE(EditorRenderViewport)
+	long onLeftMouseKeyUp(FXObject* sender, FXSelector id, void* eventPtr);
+	long onMouseMove(FXObject* sender, FXSelector id, void* eventPtr);
+	void OnKeyUp(wxKeyEvent &event);
+	void OnKeyDown(wxKeyEvent &event);
 */
 
 	protected:
 	DECLARE_EVENT_TABLE()
 
-
-//	long onLeftMouseKeyUp(FXObject* sender, FXSelector id, void* eventPtr);
-//	long onMouseMove(FXObject* sender, FXSelector id, void* eventPtr);
-
-//	void OnKeyUp(wxKeyEvent &event);
-//	void OnKeyDown(wxKeyEvent &event);
 	void OnMouse(wxMouseEvent &event);
-
 	void OnSize(wxSizeEvent &event);
 	void OnIdle(wxIdleEvent &event);
 	void OnPaint(wxPaintEvent& event);

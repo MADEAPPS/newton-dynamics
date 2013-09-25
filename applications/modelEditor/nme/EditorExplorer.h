@@ -12,17 +12,16 @@
 #ifndef _EDITOR_EXPLORER_H_
 #define _EDITOR_EXPLORER_H_
 
-#include "EditorPanel.h"
 
 class dPluginScene;
 class NewtonModelEditor;
-class EditorAssetBrowser;
-class EditorAssetExplorer;
+//class EditorAssetBrowser;
+//class EditorAssetExplorer;
 
-class EditorExplorer: public EditorPanel
+class EditorExplorer: public wxTreeCtrl
 {
 	public:
-	EditorExplorer(FXComposite* const parent, NewtonModelEditor* const mainFrame);
+	EditorExplorer (NewtonModelEditor* const mainFrame);
 	~EditorExplorer(void);
 
 //	void Populate (const dPluginScene* const scene);
@@ -40,11 +39,11 @@ class EditorExplorer: public EditorPanel
 
 	void HandleSelectionEvent (const dList<dScene::dTreeNode*>& traceToRoot) const;
 
-	FXTabBook* m_tabBook;
-	FXTreeList* m_sceneExplorer;
+//	FXTabBook* m_tabBook;
+//	FXTreeList* m_sceneExplorer;
 	NewtonModelEditor* m_mainFrame;
-	EditorAssetBrowser* m_assetBrowser;
-	EditorAssetExplorer* m_assetExplorer;
+//	EditorAssetBrowser* m_assetBrowser;
+//	EditorAssetExplorer* m_assetExplorer;
 };
 
 

@@ -17,20 +17,23 @@ EditorMainMenu::EditorMainMenu(NewtonModelEditor* const parent)
 	:wxMenuBar()
 	,m_mainFrame(parent)
 	,m_fileMenu(NULL)
-	,m_meshMenu(NULL)
 	,m_editMenu(NULL)
+	,m_viewMenu(NULL)
+	,m_meshMenu(NULL)
 	,m_helpMenu(NULL)
 	,m_importPlugins(NULL)
 	,m_exportPlugins(NULL)
 {
 	CreateFileMenu();
-	CreateMeshMenu();
 	CreateEditMenu();
+	CreateViewMenu();
+	CreateMeshMenu();
 	CreateHelpMenu();
 
 	// add main menus to menu bar
 	Append (m_fileMenu, wxT("&File"));
 	Append (m_editMenu, wxT("&Edit"));
+	Append (m_viewMenu, wxT("&View"));
 	Append (m_meshMenu, wxT("&Mesh"));
 	Append (m_helpMenu, wxT("&Help"));
 
@@ -115,6 +118,17 @@ void EditorMainMenu::CreateEditMenu()
 
 	m_editMenu = menu;
 }
+
+void EditorMainMenu::CreateViewMenu()
+{
+	wxMenu* const menu = new wxMenu;
+
+	wxMenuItem* const item = menu->AppendCheckItem(NewtonModelEditor::ID_HIDE_EXPLORER_PANE, wxT("scene explorer"), wxT("hide/unhide scene explore pane"));
+	item->Check();
+
+	m_viewMenu = menu;
+}
+
 
 void EditorMainMenu::CreateFileMenu()
 {
