@@ -19,12 +19,11 @@
 	private:												\
 	static dCRCTYPE m_rtti; 								\
 	public:													\
-	public:													\
-	static exportType dCRCTYPE GetRttiType()				\
+	exportType static dCRCTYPE GetRttiType()				\
 	{														\
 		return m_rtti;										\
 	}														\
-	virtual exportType dCRCTYPE GetTypeId () const			\
+	exportType virtual dCRCTYPE GetTypeId () const			\
 	{														\
 		return m_rtti;										\
 	}														\
@@ -34,7 +33,7 @@
 // add these macros only to the root base class that you want to have rtti 
 #define dRttiRootClassSupportDeclare(className,exportType)			\
 	dRttiCommon(className,exportType)								\
-	virtual exportType bool IsType (dCRCTYPE typeId) const			\
+	exportType virtual bool IsType (dCRCTYPE typeId) const			\
 	{																\
 		return typeId == m_rtti;									\
 	}												
@@ -47,7 +46,7 @@
 // add these macros to every derived class  
 #define dAddRtti(baseClass,exportType)									\
 	dRttiCommon(baseClass,exportType)									\
-	virtual exportType bool IsType (dCRCTYPE typeId) const				\
+	exportType virtual bool IsType (dCRCTYPE typeId) const				\
 	{																	\
 		if (typeId == m_rtti) {											\
 			return true;												\

@@ -89,38 +89,6 @@ int main(int argc, char *argv[])
 	return application.run();
 }
 
-
-
-void NewtonModelEditor::create()
-{
-	// create all icon images
-	dTree<FXIcon*, dCRCTYPE>::Iterator iter (m_icons);
-	for (iter.Begin(); iter; iter ++) {
-		FXIcon* const icon = iter.GetNode()->GetInfo();
-		icon->create();
-	}
-
-	FXMainWindow::create();
-	m_explorerToolbarShell->create();
-	m_commandPanelToolbarShell->create();
-	m_fileToolbarShell->create();
-	m_mainMenuDragShell->create();
-	m_navigationToolbarShell->create();
-
-	// set default view modes
-	m_canvas[0]->m_viewmodes->setCurrentItem(0, TRUE);
-	m_canvas[1]->m_viewmodes->setCurrentItem(1, TRUE);
-	m_canvas[2]->m_viewmodes->setCurrentItem(2, TRUE);
-	m_canvas[3]->m_viewmodes->setCurrentItem(3, TRUE);
-
-	//m_canvas[0]->m_viewmodes->setCurrentItem(3, TRUE);
-	//m_canvas[1]->m_viewmodes->setCurrentItem(3, TRUE);
-	//m_canvas[2]->m_viewmodes->setCurrentItem(3, TRUE);
-	//m_canvas[3]->m_viewmodes->setCurrentItem(3, TRUE);
-
-	show(PLACEMENT_SCREEN);
-}
-
 bool NewtonModelEditor::IsControlDown() const
 {
 	return m_controlKey;
@@ -371,17 +339,6 @@ long NewtonModelEditor::onHideNavigationToolbar(FXObject* sender, FXSelector id,
 	return 1;
 }
 
-long NewtonModelEditor::onHideExplorerPanel(FXObject* sender, FXSelector id, void* eventPtr)
-{
-	FXuval val = FXuval (eventPtr);
-
-	if (val) {
-		m_explorer->Hide();
-	} else {
-		m_explorer->Unhide();
-	}
-	return 1;
-}
 
 long NewtonModelEditor::onHideCommandPanel(FXObject* sender, FXSelector id, void* eventPtr)
 {
@@ -561,63 +518,12 @@ NewtonModelEditor::NewtonModelEditor(const wxString& title, const wxPoint& pos, 
 	CreateRenderViewPort();
 	CreateExploser();
 
-
-/*
-	m_showNavigationMode = new FXTextField(m_statusbar,10, NULL,0,FRAME_SUNKEN|JUSTIFY_NORMAL|LAYOUT_RIGHT|LAYOUT_CENTER_Y|TEXTFIELD_READONLY,0,0,0,0,2,2,1,1);
-	m_showNavigationMode->setBackColor(m_statusbar->getBackColor());
-	ShowNavigationMode(m_selectNode);
-
-
-	// create the dock areas
-	m_docks[0] = new FXDockSite(this,DOCKSITE_NO_WRAP|LAYOUT_SIDE_TOP|LAYOUT_FILL_X);
-	m_docks[1] = new FXDockSite(this,LAYOUT_SIDE_LEFT|LAYOUT_FILL_Y);
-	m_docks[2] = new FXDockSite(this,LAYOUT_SIDE_RIGHT|LAYOUT_FILL_Y);
-	m_docks[3] = new FXDockSite(this,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
-
-	// create the main menu
-	m_mainMenuDragShell = new FXToolBarShell(this, FRAME_RAISED);
-	m_mainMenu = new EditorMainMenu (m_docks[0], m_mainMenuDragShell, this);
-
-	// add the tool bars 
-	m_fileToolbarShell = new FXToolBarShell(this, FRAME_RAISED);
-	m_fileToolbar = new EditorFileToolBar (m_docks[0], m_fileToolbarShell, this);
-
-	m_navigationToolbarShell = new FXToolBarShell(this, FRAME_RAISED); 
-	m_navigationToolbar = new EditorNavigationToolBar (m_docks[0], m_navigationToolbarShell, this);
-
-
-	// add the explorer window
-	m_explorerToolbarShell = new FXToolBarShell(this, FRAME_RAISED|FRAME_THICK|LAYOUT_FILL);
-	FXDockBar* const explorerDockbar = new FXDockBar(m_docks[1], m_explorerToolbarShell, LAYOUT_FILL_Y|LAYOUT_SIDE_RIGHT, 0,0,0,0, 2,2,2,2, 2,2);
-	explorerDockbar->allowedSides(FXDockBar::ALLOW_LEFT|FXDockBar::ALLOW_RIGHT);
-	m_explorer = new EditorExplorer (explorerDockbar, this);
-
-
-	// add the command panel window
-	m_commandPanelToolbarShell = new FXToolBarShell(this, FRAME_RAISED|FRAME_THICK|LAYOUT_FILL);
-	FXDockBar* const commandPanelToolDockbar = new FXDockBar(m_docks[2], m_commandPanelToolbarShell, LAYOUT_FILL_Y|LAYOUT_SIDE_RIGHT, 0,0,0,0, 2,2,2,2, 2,2);
-	commandPanelToolDockbar->allowedSides(FXDockBar::ALLOW_LEFT|FXDockBar::ALLOW_RIGHT);
-	m_commandPanel = new EditorCommandPanel (commandPanelToolDockbar, this);
-
-
-	// create the working area of main frame
-	//	FXPacker* const spliterFrame = new FXPacker (this, FRAME_SUNKEN|LAYOUT_FILL|FRAME_RAISED|FRAME_THICK);
-	m_workshop = new FX4Splitter(this, LAYOUT_SIDE_TOP|LAYOUT_FILL|FRAME_THICK|FOURSPLITTER_TRACKING);
-	m_sharedVisual = new GLVisual (&application);
-	for (int i = 0; i < 4; i ++) {
-		m_canvas[i] = new EditorCanvas(m_workshop, this, i ? m_canvas[0] : NULL);
-	}
-*/
-
 	// "commit" all changes made to wxAuiManager
 	m_mgr.Update();
-
 
 	// create the scene
 	Initilialize();
 }
-
-
 
 NewtonModelEditor::~NewtonModelEditor()
 {
@@ -650,8 +556,7 @@ void NewtonModelEditor::CreateScene()
 
 	SetScene (new dPluginScene (world));
 
-//	_ASSERTE (0);
-//	m_explorer->Populate (m_scene);
+	m_explorer->Populate (GetScene());
 }
 
 
@@ -987,22 +892,22 @@ void NewtonModelEditor::OnChangeShadeMode(wxCommandEvent& event)
 void NewtonModelEditor::OnUndo(wxCommandEvent& event)
 {
 	dUndoRedoManager::Undo();
-//	m_explorer->RefreshAllViewer();
 	RefrehViewports();
+	m_explorer->Populate(GetScene());
 }
 
 void NewtonModelEditor::OnRedo(wxCommandEvent& event)
 {
 	dUndoRedoManager::Redo();
-//	m_explorer->RefreshAllViewer();
 	RefrehViewports();
+	m_explorer->Populate(GetScene());
 }
 
 void NewtonModelEditor::OnClearUndoHistory(wxCommandEvent& event)
 {
 	dUndoRedoManager::Clear();
-//	m_explorer->RefreshAllViewer();
 	RefrehViewports();
+	m_explorer->Populate(GetScene());
 }
 
 void NewtonModelEditor::OnMesh (wxCommandEvent& event)
@@ -1015,9 +920,9 @@ void NewtonModelEditor::OnMesh (wxCommandEvent& event)
 	dPluginScene* const asset = plugin->Create (this);
 	if (asset) {
 		GetScene()->MergeScene(this, asset);
-//		m_explorer->AddAsset(asset, plugin);
 		asset->Release();
 		RefrehViewports();
+		m_explorer->Populate(GetScene());
 	}
 }
 
@@ -1046,7 +951,6 @@ void NewtonModelEditor::OnPaneClose (wxAuiManagerEvent& event)
 
 void NewtonModelEditor::OnChangeNavigationMode(wxCommandEvent& event)
 {
-
 	switch (event.GetId())
 	{
 		case ID_VIEWPORT_PANNING:

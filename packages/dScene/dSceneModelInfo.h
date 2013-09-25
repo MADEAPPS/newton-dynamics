@@ -28,13 +28,13 @@ class dSceneModelInfo: public dNodeInfo
 	public:
 	D_DEFINE_CLASS_NODE(dSceneModelInfo,dNodeInfo,DSCENE_API)
 
-	dSceneModelInfo();
-	dSceneModelInfo(dScene* const world);
-	virtual ~dSceneModelInfo(void);
+	DSCENE_API dSceneModelInfo();
+	DSCENE_API dSceneModelInfo(dScene* const world);
+	virtual DSCENE_API ~dSceneModelInfo(void);
 
 	protected:
-	virtual void Serialize (TiXmlElement* const rootNode) const; 
-	virtual bool Deserialize (const dScene* const scene, TiXmlElement* const rootNode);
+	virtual DSCENE_API void Serialize (TiXmlElement* const rootNode) const; 
+	virtual DSCENE_API bool Deserialize (const dScene* const scene, TiXmlElement* const rootNode);
 };
 
 

@@ -30,19 +30,19 @@ class dSceneRender;
 
 #define D_DEFINE_CLASS_NODE_ESSENCIALS(className,baseClass,exportType)		\
 	dAddRtti(baseClass,exportType);											\
-	virtual exportType dNodeInfo* MakeCopy () const							\
+	exportType virtual dNodeInfo* MakeCopy () const							\
 	{																		\
 		return new className(*this);										\
 	}																		\
-	virtual exportType dNodeInfo* MetaFunction(dScene* const world) const	\
+	exportType virtual dNodeInfo* MetaFunction(dScene* const world) const	\
 	{																		\
 		return new className(world);										\
 	}																		\
-	static exportType const char* BaseClassName ()							\
+	exportType static const char* BaseClassName ()							\
 	{																		\
 		return #baseClass;													\
 	}																		\
-	static exportType const className& GetSingleton()						\
+	exportType static const className& GetSingleton()						\
 	{																		\
 		return m_singletonClass;											\
 	}																		\
@@ -50,7 +50,7 @@ class dSceneRender;
 
 
 #define D_DEFINE_CLASS_NODE(className,baseClass,exportType)			\
-	virtual exportType const char* GetClassName () const			\
+	exportType virtual const char* GetClassName () const			\
 	{																\
 		return #className;											\
 	}																\
@@ -111,7 +111,7 @@ class dNodeInfo: public dClassInfo, public dVariableList
 	static dTree<const dNodeInfo*, dCRCTYPE>& GetSingletonDictionary();
 	static void ReplaceSingletonClass (const char* const className, const dNodeInfo* const singleton);
 
-	dAddRtti(dClassInfo,);
+	dAddRtti(dClassInfo,DSCENE_API);
 
 	private:
 	dString m_name;

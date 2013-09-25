@@ -54,44 +54,8 @@ void EditorExplorer::ReleaseAllAssets ()
 }
 
 
-void EditorExplorer::Populate (const dPluginScene* const scene)
-{
-	m_sceneExplorer->clearItems(TRUE);
-
-	dScene::dTreeNode* const rootNode = scene->GetRootNode();
-	dNodeInfo* const rootInfo = scene->GetInfoFromNode(rootNode);
-	FXTreeItem* const rootItem = m_sceneExplorer->appendItem(NULL, rootInfo->GetName(), NULL, NULL, NULL, TRUE);
-	rootItem->setData (rootNode);
-
-	// add all models
-//	for (dScene::dTreeNode* node = scene->GetFirstNode(); node; node = scene->GetNextNode(node)) {
-	for (void* link = scene->GetFirstChild(rootNode); link; link = scene->GetNextChild(rootNode, link)) {
-		dScene::dTreeNode* const node = scene->GetNodeFromLink (link);
-		dNodeInfo* const info = scene->GetInfoFromNode(node);
-		if (info->IsType(dSceneModelInfo::GetRttiType())) {
-			FXTreeItem* const modelItem = (FXTreeItem*) m_sceneExplorer->appendItem(rootItem , info->GetName(), NULL, NULL, NULL, TRUE);
-			modelItem->setData (node);
-//			if (m_assetBrowser->IsExpanded())
-			PopulateModel(scene, modelItem);
-		}
-	}
-
-	m_sceneExplorer->expandTree(rootItem, true);
-}
 
 
-void EditorExplorer::PopulateModel(const dPluginScene* const scene, FXTreeItem* const modelItem)
-{
-	dScene::dTreeNode* const modelNode = (dScene::dTreeNode*) modelItem->getData();
-	for (void* link = scene->GetFirstChild(modelNode); link; link = scene->GetNextChild(modelNode, link)) {
-		dScene::dTreeNode* const node = scene->GetNodeFromLink (link);
-		dNodeInfo* const info = scene->GetInfoFromNode(node);
-
-		FXTreeItem* const childItem = (FXTreeItem*) m_sceneExplorer->appendItem(modelItem, info->GetName(), NULL, NULL, NULL, TRUE);
-		childItem->setData (node);
-		PopulateModel(scene, childItem);
-	}
-}
 */
 
 /*
@@ -175,3 +139,47 @@ void EditorExplorer::HandleSelectionEvent (const dList<dScene::dTreeNode*>& trac
 	m_assetExplorer->HandleSelectionEvent (traceToRoot);
 }
 */
+
+/*
+void EditorExplorer::PopulateModel(const dPluginScene* const scene, wxTreeItemId modelItem)
+{
+	dScene::dTreeNode* const modelNode = (dScene::dTreeNode*) modelItem->getData();
+	for (void* link = scene->GetFirstChild(modelNode); link; link = scene->GetNextChild(modelNode, link)) {
+		dScene::dTreeNode* const node = scene->GetNodeFromLink (link);
+		dNodeInfo* const info = scene->GetInfoFromNode(node);
+
+//		FXTreeItem* const childItem = (FXTreeItem*) m_sceneExplorer->appendItem(modelItem, info->GetName(), NULL, NULL, NULL, TRUE);
+		wxTreeItemId childItem = AppendItem(modelItem, wxT(info->GetName())));
+//		childItem->setData (node);
+		PopulateModel(scene, childItem);
+	}
+}
+*/
+
+void EditorExplorer::Populate (const dPluginScene* const scene)
+{
+	DeleteAllItems();
+
+	dScene::dTreeNode* const rootNode = scene->GetRootNode();
+	dNodeInfo* const rootInfo = scene->GetInfoFromNode(rootNode);
+	wxTreeItemId rootItem = AddRoot(wxT (rootInfo->GetName()) , -1, -1, new ExplorerData(rootNode));
+
+	// add all models
+	//	for (dScene::dTreeNode* node = scene->GetFirstNode(); node; node = scene->GetNextNode(node)) {
+	for (void* link = scene->GetFirstChild(rootNode); link; link = scene->GetNextChild(rootNode, link)) {
+		dScene::dTreeNode* const node = scene->GetNodeFromLink (link);
+		dNodeInfo* const info = scene->GetInfoFromNode(node);
+dCRCTYPE xxx = info->GetTypeId();
+//dNodeInfo::GetRttiType();
+//dSceneModelInfo::GetRttiType();
+//		if (info->IsType(dSceneModelInfo::GetRttiType())) {
+			//FXTreeItem* const modelItem = (FXTreeItem*) m_sceneExplorer->appendItem(rootItem , info->GetName(), NULL, NULL, NULL, TRUE);
+			wxTreeItemId modelItem = AppendItem(rootItem, wxT(info->GetName()), -1, -1, new ExplorerData(node));
+			//modelItem->setData (node);
+//			PopulateModel(scene, modelItem);
+//		}
+	}
+/*
+	m_sceneExplorer->expandTree(rootItem, true);
+*/
+}

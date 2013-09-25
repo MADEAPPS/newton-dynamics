@@ -21,12 +21,27 @@ class NewtonModelEditor;
 class EditorExplorer: public wxTreeCtrl
 {
 	public:
+
+	class ExplorerData: public wxTreeItemData
+	{
+		public:
+		ExplorerData (dScene::dTreeNode* const node)
+			:wxTreeItemData()
+			,m_node(node)
+		{
+		}
+		~ExplorerData ()
+		{
+		}
+
+		dScene::dTreeNode* m_node;
+	};
+
 	EditorExplorer (NewtonModelEditor* const mainFrame);
 	~EditorExplorer(void);
 
-//	void Populate (const dPluginScene* const scene);
-//	void PopulateModel(const dPluginScene* const scene, FXTreeItem* const modelItem);
-
+	void Populate (const dPluginScene* const scene);
+	void PopulateModel(const dPluginScene* const scene, wxTreeItemId modelItem);
 
 	void SetBrowserSelection ();
 	void RefreshAllViewer ();
