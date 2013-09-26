@@ -22,7 +22,7 @@
 #include "dUndoCurrentScene.h"
 
 
-dUndoCurrentAsset::dUndoCurrentAsset(dPluginInterface* const interface) 
+dUndoCurrentScene::dUndoCurrentScene(dPluginInterface* const interface) 
 	:dUndoRedo()
 	,nodeIndex (0)
 	,m_interface(interface)
@@ -30,8 +30,6 @@ dUndoCurrentAsset::dUndoCurrentAsset(dPluginInterface* const interface)
 {
 
 	dPluginScene* const scene = interface->GetScene();
-//		m_backup.m_asset = new dPluginScene(scene->GetNewtonWorld());
-//		m_backup.m_plugin = assetPlugin.m_plugin;
 
 	m_backup = new dPluginScene(scene->GetNewtonWorld());
 
@@ -41,13 +39,10 @@ dUndoCurrentAsset::dUndoCurrentAsset(dPluginInterface* const interface)
 	}
 
 	dScene::dTreeNode* const rootNode = scene->GetRootNode();
-//	m_backup.m_asset->DeleteRootNode ();
 	m_backup->DeleteRootNode ();
-//	m_backup.m_asset->AddRootNode(scene->GetInfoFromNode(rootNode));
 	m_backup->AddRootNode(scene->GetInfoFromNode(rootNode));
 	for (dScene::dTreeNode* node = scene->GetFirstNode(); node; node = scene->GetNextNode(node)) {
 		if (node != rootNode) {
-//			m_backup.m_asset->AddNode(scene->GetInfoFromNode(node), NULL);
 			m_backup->AddNode(scene->GetInfoFromNode(node), NULL);
 		}
 	}
@@ -76,19 +71,19 @@ dUndoCurrentAsset::dUndoCurrentAsset(dPluginInterface* const interface)
 }
 
 
-dUndoCurrentAsset::~dUndoCurrentAsset() 
+dUndoCurrentScene::~dUndoCurrentScene() 
 {
 	dAssert(m_backup);
 	m_backup->Release();
 }
 
 
-dUndoRedo* dUndoCurrentAsset::CreateRedoState() const
+dUndoRedo* dUndoCurrentScene::CreateRedoState() const
 {
-	return new dUndoCurrentAsset (m_interface);
+	return new dUndoCurrentScene (m_interface);
 }
 
-void dUndoCurrentAsset::RestoreState()
+void dUndoCurrentScene::RestoreState()
 {
 //	if (m_backup.m_asset) {
 //		dScene::dTreeNode* const rootNode = m_backup.m_asset->GetRootNode();

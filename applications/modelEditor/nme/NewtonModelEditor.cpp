@@ -553,10 +553,10 @@ void NewtonModelEditor::CreateScene()
 
 	// link the work with this user data
 	NewtonWorldSetUserData(world, this);
-
 	SetScene (new dPluginScene (world));
 
-	m_explorer->Populate (GetScene());
+	m_explorer->Clear();
+	m_explorer->ReconstructScene (GetScene());
 }
 
 
@@ -893,21 +893,24 @@ void NewtonModelEditor::OnUndo(wxCommandEvent& event)
 {
 	dUndoRedoManager::Undo();
 	RefrehViewports();
-	m_explorer->Populate(GetScene());
+	dAssert (0);
+//	m_explorer->Populate(GetScene());
 }
 
 void NewtonModelEditor::OnRedo(wxCommandEvent& event)
 {
 	dUndoRedoManager::Redo();
 	RefrehViewports();
-	m_explorer->Populate(GetScene());
+	dAssert (0);
+//	m_explorer->Populate(GetScene());
 }
 
 void NewtonModelEditor::OnClearUndoHistory(wxCommandEvent& event)
 {
 	dUndoRedoManager::Clear();
 	RefrehViewports();
-	m_explorer->Populate(GetScene());
+	dAssert (0);
+//	m_explorer->Populate(GetScene());
 }
 
 void NewtonModelEditor::OnMesh (wxCommandEvent& event)
@@ -922,7 +925,7 @@ void NewtonModelEditor::OnMesh (wxCommandEvent& event)
 		GetScene()->MergeScene(this, asset);
 		asset->Release();
 		RefrehViewports();
-		m_explorer->Populate(GetScene());
+		m_explorer->ReconstructScene(GetScene());
 	}
 }
 
@@ -1017,6 +1020,7 @@ void NewtonModelEditor::OnOpenScene(wxCommandEvent& event)
 		OnNew (event);
 		m_lastFilePath = open.GetPath();
 		LoadScene (m_lastFilePath.mb_str());
+		m_explorer->ReconstructScene(GetScene());
 	}
 }
 

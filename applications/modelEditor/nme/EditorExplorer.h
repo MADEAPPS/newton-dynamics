@@ -40,25 +40,20 @@ class EditorExplorer: public wxTreeCtrl
 	EditorExplorer (NewtonModelEditor* const mainFrame);
 	~EditorExplorer(void);
 
-	void Populate (const dPluginScene* const scene);
-	void PopulateModel(const dPluginScene* const scene, wxTreeItemId modelItem);
+	void Clear();
+	void ReconstructScene(const dPluginScene* const scene);
 
-	void SetBrowserSelection ();
-	void RefreshAllViewer ();
-	
-	void AddAsset (dPluginScene* const asset, dPluginMesh* const plugin);
-	void PopulateCurrentAsset ();
+	private:
+//	void Populate (const dPluginScene* const scene, wxTreeItemId rootNode);
+//	void PopulateModel(const dPluginScene* const scene, wxTreeItemId modelItem);
+//	void SetBrowserSelection ();
+//	void RefreshAllViewer ();
+//	void AddAsset (dPluginScene* const asset, dPluginMesh* const plugin);
+//	void PopulateCurrentAsset ();
+//	dPluginScene* GetCurrentAsset() const; 
+//	void HandleSelectionEvent (const dList<dScene::dTreeNode*>& traceToRoot) const;
 
-	dPluginScene* GetCurrentAsset() const; 
-
-
-	void HandleSelectionEvent (const dList<dScene::dTreeNode*>& traceToRoot) const;
-
-//	FXTabBook* m_tabBook;
-//	FXTreeList* m_sceneExplorer;
 	NewtonModelEditor* m_mainFrame;
-//	EditorAssetBrowser* m_assetBrowser;
-//	EditorAssetExplorer* m_assetExplorer;
 };
 
 

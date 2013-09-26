@@ -46,7 +46,7 @@ return true;
 	FILE* const file = fopen (fileName, "rb");
 	if (file) {
 		// save the state of the scene 
-		interface->Push (new dUndoCurrentAsset(interface));
+		interface->Push (new dUndoCurrentScene(interface));
 
 		NewtonWorld* const world = NewtonCreate();
 		NewtonWorldSetUserData(world, interface);

@@ -20,11 +20,11 @@ class dPluginMesh;
 class dPluginScene;
 
 
-class dUndoCurrentAsset: public dUndoRedo
+class dUndoCurrentScene: public dUndoRedo
 {
 	public:
-	dUndoCurrentAsset(dPluginInterface* const interface);
-	virtual ~dUndoCurrentAsset();
+	dUndoCurrentScene(dPluginInterface* const interface);
+	virtual ~dUndoCurrentScene();
 
 	protected:
 	virtual void RestoreState();
@@ -35,7 +35,6 @@ class dUndoCurrentAsset: public dUndoRedo
 	dPluginInterface* m_interface;
 	dTree<int, void*> m_selection;
 	dTree<int, void*> m_exploreStatus;
-//	dPluginInterface::AssetPluginAssociation m_backup;
 	dPluginScene* m_backup;
 };
 
