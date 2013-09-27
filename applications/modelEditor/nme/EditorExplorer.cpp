@@ -20,26 +20,19 @@ EditorExplorer::EditorExplorer(NewtonModelEditor* const mainFrame)
 	:wxTreeCtrl (mainFrame)
 	,m_mainFrame(mainFrame)
 {
-/*
-	FXVerticalFrame* const contents = new FXVerticalFrame(this, LAYOUT_SIDE_LEFT|FRAME_NONE|LAYOUT_FILL, 0,0,0,0, 0,0,0,0);
-	m_tabBook = new FXTabBook(contents, mainFrame, NewtonModelEditor::ID_EDITOR_MODE, TABBOOK_BOTTOMTABS|FRAME_NONE|LAYOUT_FILL, 0,0,0,0, 0,0,0,0);
 
-	// add asset database viewer
-	new FXTabItem(m_tabBook, D_EDIT_MODE_ASSET, NULL, FRAME_NONE|LAYOUT_FILL);
-	FXVerticalFrame* const assetContainer = new FXVerticalFrame(m_tabBook, LAYOUT_SIDE_LEFT|FRAME_NONE|LAYOUT_FILL, 0,0,0,0, 0,0,0,0);
-	new FXLabel(assetContainer, "Assets database:");	
-	m_assetBrowser = new EditorAssetBrowser(assetContainer, mainFrame);
-	// add the current asset
-	new FXLabel(assetContainer, "Current Asset:");	
-	m_assetExplorer = new EditorAssetExplorer(assetContainer, mainFrame);
+	wxBitmap* const bitmap = m_mainFrame->FindIcon ("explorer.gif");
+	int w = bitmap->GetWidth();
+	int h = bitmap->GetHeight();
 
-		
-	// add a scene explorer viewer
-	FXTabItem* const sceneExplorerTab = new FXTabItem(m_tabBook, D_EDIT_MODE_SCENE, NULL, FRAME_NONE|LAYOUT_FILL);
-	sceneExplorerTab;
-	int ID_OPEN_TREE = 1000;
-	m_sceneExplorer = new FXTreeList(m_tabBook, mainFrame, ID_OPEN_TREE, TREELIST_BROWSESELECT|TREELIST_SHOWS_LINES|TREELIST_SHOWS_BOXES|LAYOUT_FILL_X|LAYOUT_FILL_Y);
-*/
+	wxImageList* const imageList = new wxImageList (w, h, true, 16);
+
+	imageList->Add (*m_mainFrame->FindIcon ("explorer.gif"));
+	imageList->Add (*m_mainFrame->FindIcon ("cache.gif"));
+	imageList->Add (*m_mainFrame->FindIcon ("sceneNode.gif"));
+
+	AssignImageList(imageList);
+	
 }
 
 EditorExplorer::~EditorExplorer(void)
@@ -194,7 +187,7 @@ void EditorExplorer::ReconstructScene(const dPluginScene* const scene)
 	if (GetRootItem() == NULL) {
 		dScene::dTreeNode* const rootNode = scene->GetRootNode();
 		dNodeInfo* const rootInfo = scene->GetInfoFromNode(rootNode);
-		AddRoot(wxT (rootInfo->GetName()) , -1, -1, new ExplorerData(rootNode));
+		AddRoot(wxT (rootInfo->GetName()) , 0, -1, new ExplorerData(rootNode));
 	}
 		
 	dList<wxTreeItemId> stack;
@@ -220,20 +213,16 @@ void EditorExplorer::ReconstructScene(const dPluginScene* const scene)
 			
 			if (!found) {
 				dNodeInfo* const info = scene->GetInfoFromNode(childNode);
-				wxTreeItemId item = AppendItem(rootItem, wxT(info->GetName()), -1, -1, new ExplorerData(childNode));
 
-dClassInfo::GetRttiType();
-dSceneNodeInfo::GetRttiType();
-
-//				dSceneNodeInfo* model = (dSceneNodeInfo*)info;
-//				model->GetTypeId();
-//				model->dSceneNodeInfo::GetTypeId();
-//				dSceneNodeInfo::GetRttiType();
-//				dSceneNodeInfo::BaseClassName();
-
+				//wxTreeItemId item;
+				if (info->IsType(dSceneCacheInfo::GetRttiType())) {
+					PrependItem(rootItem, wxT(info->GetName()), 1, -1, new ExplorerData(childNode));
+				} else {
+					AppendItem(rootItem, wxT(info->GetName()), 2, -1, new ExplorerData(childNode));
+				}
 			}
 		}
-		
+	
 	
 		for (wxTreeItemId childItem = GetLastChild(rootItem); childItem; childItem = GetPrevSibling(childItem)) {
 			stack.Append(childItem);

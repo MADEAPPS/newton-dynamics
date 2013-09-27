@@ -586,6 +586,7 @@ void NewtonModelEditor::LoadIcon (const char* const iconName)
 		sprintf (fileName, "%sicons/%s", appPath, iconName);
 		wxBitmap* const bitmap = new wxBitmap(fileName, wxBITMAP_TYPE_GIF);
 		wxImage image (bitmap->ConvertToImage());
+
 		if (!image.IsTransparent (0, 0)) {
 			unsigned char red = image.GetRed (0, 0);
 			unsigned char green = image.GetGreen (0, 0);
@@ -598,6 +599,13 @@ void NewtonModelEditor::LoadIcon (const char* const iconName)
 		}
 		m_icons.Insert (bitmap, dCRC64 (iconName));
 	}
+}
+
+wxBitmap* NewtonModelEditor::FindIcon (const char* const iconName) const
+{
+	dAssert (m_icons.Find(dCRC64(iconName)));
+	return m_icons.Find(dCRC64(iconName))->GetInfo();
+
 }
 
 
@@ -630,6 +638,7 @@ void NewtonModelEditor::LoadResources ()
 
 	LoadIcon ("explorer.gif");
 	LoadIcon ("sceneNode.gif");
+	LoadIcon ("cache.gif");
 	//	LoadIcon ("meshNode.gif");
 	//	LoadIcon ("imageNode.gif");
 }
@@ -700,12 +709,12 @@ void NewtonModelEditor::CreateFileToolBar()
 	wxAuiToolBar* const toolbar = new wxAuiToolBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_OVERFLOW);
 	toolbar->SetToolBitmapSize (wxSize(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE));
 
-	toolbar->AddTool (wxID_NEW, wxT("Create new scene"), *m_icons.Find(dCRC64("fileNew.gif"))->GetInfo());
+	toolbar->AddTool (wxID_NEW, wxT("Create new scene"), *FindIcon("fileNew.gif"));
 
 	toolbar->AddSeparator();
-	toolbar->AddTool (wxID_OPEN, wxT("Open scene"), *m_icons.Find(dCRC64("fileOpen.gif"))->GetInfo());
-	toolbar->AddTool (wxID_SAVE, wxT("Save scene"), *m_icons.Find(dCRC64("fileSave.gif"))->GetInfo());
-	toolbar->AddTool (wxID_SAVEAS, wxT("Save scene as"), *m_icons.Find(dCRC64("fileSaveAs.gif"))->GetInfo());
+	toolbar->AddTool (wxID_OPEN, wxT("Open scene"), *FindIcon("fileOpen.gif"));
+	toolbar->AddTool (wxID_SAVE, wxT("Save scene"), *FindIcon("fileSave.gif"));
+	toolbar->AddTool (wxID_SAVEAS, wxT("Save scene as"), *FindIcon("fileSaveAs.gif"));
 
 	toolbar->Realize();
 	m_mgr.AddPane (toolbar, wxAuiPaneInfo(). Name(wxT("File Menu")).Caption(wxT("File menu")).ToolbarPane().Top());
@@ -718,15 +727,15 @@ void NewtonModelEditor::CreateObjectSelectionToolBar()
 	wxAuiToolBar* const toolbar = new wxAuiToolBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_OVERFLOW);
 	toolbar->SetToolBitmapSize (wxSize(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE));
 
-	toolbar->AddTool (wxID_UNDO, wxT("Undo previous action"), *m_icons.Find(dCRC64("undo.gif"))->GetInfo());
-	toolbar->AddTool (wxID_REDO, wxT("Redo previous action"), *m_icons.Find(dCRC64("redo.gif"))->GetInfo());
+	toolbar->AddTool (wxID_UNDO, wxT("Undo previous action"), *FindIcon("undo.gif"));
+	toolbar->AddTool (wxID_REDO, wxT("Redo previous action"), *FindIcon("redo.gif"));
 
 	toolbar->AddSeparator();
-	toolbar->AddTool (ID_CURSOR_COMMAND_MODE, wxT("Select cursor"), *m_icons.Find(dCRC64("cursor.gif"))->GetInfo());
-	toolbar->AddTool (ID_SELECT_COMMAND_MODE, wxT("Object selection mode"), *m_icons.Find(dCRC64("object_cursor.gif"))->GetInfo());
-	toolbar->AddTool (ID_TRANSLATE_COMMAND_MODE, wxT("Object translation mode"), *m_icons.Find(dCRC64("object_move.gif"))->GetInfo());
-	toolbar->AddTool (ID_ROTATE_COMMAND_MODE, wxT("Object rotation mode"), *m_icons.Find(dCRC64("object_turn.gif"))->GetInfo());
-	toolbar->AddTool (ID_SCALE_COMMAND_MODE, wxT("Object scale mode"), *m_icons.Find(dCRC64("object_scale.gif"))->GetInfo());
+	toolbar->AddTool (ID_CURSOR_COMMAND_MODE, wxT("Select cursor"), *FindIcon("cursor.gif"));
+	toolbar->AddTool (ID_SELECT_COMMAND_MODE, wxT("Object selection mode"), *FindIcon("object_cursor.gif"));
+	toolbar->AddTool (ID_TRANSLATE_COMMAND_MODE, wxT("Object translation mode"), *FindIcon("object_move.gif"));
+	toolbar->AddTool (ID_ROTATE_COMMAND_MODE, wxT("Object rotation mode"), *FindIcon("object_turn.gif"));
+	toolbar->AddTool (ID_SCALE_COMMAND_MODE, wxT("Object scale mode"), *FindIcon("object_scale.gif"));
 
 	toolbar->Realize();
 	m_mgr.AddPane (toolbar, wxAuiPaneInfo(). Name(wxT("Object selection")).Caption(wxT("Object options")).ToolbarPane().Top());
@@ -739,10 +748,10 @@ void NewtonModelEditor::CreateNavigationToolBar()
 	wxAuiToolBar* const toolbar = new wxAuiToolBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_OVERFLOW);
 	toolbar->SetToolBitmapSize (wxSize(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE));
 
-	toolbar->AddTool (ID_VIEWPORT_PANNING, wxT("pan veiwport"), *m_icons.Find(dCRC64("maximize.gif"))->GetInfo());
-	toolbar->AddTool (ID_VIEWPORT_MOVE, wxT("Translate Camera"), *m_icons.Find(dCRC64("camera_move.gif"))->GetInfo());
-	toolbar->AddTool (ID_VIEWPORT_ROTATE, wxT("Rotate Camera"), *m_icons.Find(dCRC64("camera_turn.gif"))->GetInfo());
-	toolbar->AddTool (ID_VIEWPORT_ZOOM, wxT("Rotate Camera"), *m_icons.Find(dCRC64("camera_zoom.gif"))->GetInfo());
+	toolbar->AddTool (ID_VIEWPORT_PANNING, wxT("pan veiwport"), *FindIcon("maximize.gif"));
+	toolbar->AddTool (ID_VIEWPORT_MOVE, wxT("Translate Camera"), *FindIcon("camera_move.gif"));
+	toolbar->AddTool (ID_VIEWPORT_ROTATE, wxT("Rotate Camera"), *FindIcon("camera_turn.gif"));
+	toolbar->AddTool (ID_VIEWPORT_ZOOM, wxT("Rotate Camera"), *FindIcon("camera_zoom.gif"));
 
 	m_viewMode = new wxChoice(toolbar, ID_VIEW_MODES);
 	m_viewMode->AppendString(wxT("top"));

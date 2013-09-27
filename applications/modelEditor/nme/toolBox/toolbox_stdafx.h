@@ -143,6 +143,7 @@ typedef long long unsigned64;
 #include <dBoneNodeInfo.h>
 #include <dSceneNodeInfo.h>
 #include <dSceneModelInfo.h>
+#include <dSceneCacheInfo.h>
 #include <dTextureNodeInfo.h>
 #include <dMaterialNodeInfo.h>
 #include <dRigidbodyNodeInfo.h>

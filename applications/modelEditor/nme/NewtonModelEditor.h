@@ -153,7 +153,7 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 
 
 	void LoadIcon (const char* const iconName);
-	FXIcon* FindIcon (const char* const iconName) const;
+	
 	static void* PhysicsAlloc (int sizeInBytes);
 	static void PhysicsFree (void *ptr, int sizeInBytes);
 
@@ -202,6 +202,7 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	int GetViewMode() const;
 	int GetShadeMode() const;
 	int GetNavigationMode() const;
+	wxBitmap* FindIcon (const char* const iconName) const;
 
 	protected:	
 	DECLARE_EVENT_TABLE()
@@ -238,6 +239,8 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	void LoadPlugins(const char* const path);
 	void LoadScene (const char* const fileName);
 	void LoadIcon (const char* const iconName);
+
+	
 	
 	
 	wxAuiManager m_mgr;
