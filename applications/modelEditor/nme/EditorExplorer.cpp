@@ -217,9 +217,20 @@ void EditorExplorer::ReconstructScene(const dPluginScene* const scene)
 					break;
 				}
 			}
+			
 			if (!found) {
 				dNodeInfo* const info = scene->GetInfoFromNode(childNode);
-				AppendItem(rootItem, wxT(info->GetName()), -1, -1, new ExplorerData(childNode));
+				wxTreeItemId item = AppendItem(rootItem, wxT(info->GetName()), -1, -1, new ExplorerData(childNode));
+
+dClassInfo::GetRttiType();
+dSceneNodeInfo::GetRttiType();
+
+//				dSceneNodeInfo* model = (dSceneNodeInfo*)info;
+//				model->GetTypeId();
+//				model->dSceneNodeInfo::GetTypeId();
+//				dSceneNodeInfo::GetRttiType();
+//				dSceneNodeInfo::BaseClassName();
+
 			}
 		}
 		

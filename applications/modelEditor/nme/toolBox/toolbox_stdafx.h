@@ -123,9 +123,6 @@ typedef long long unsigned64;
 #include <dAIAgentVehicleController.h>
 #include <dAIAgentCharacterController.h>
 
-
-//#include <CustomJointLibraryStdAfx.h>
-
 #include <dCRC.h>
 #include <dHeap.h>
 #include <dList.h>

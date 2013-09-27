@@ -26,8 +26,8 @@ dPluginScene::dPluginScene(NewtonWorld* const newton)
 	:dScene (newton)
 	,m_lru (100)
 {
-	dSceneModelInfo::GetRttiType();
-	dRigidbodyNodeInfo::GetRttiType();
+	dAssert (dSceneModelInfo::GetRttiType());
+	dAssert (dRigidbodyNodeInfo::GetRttiType());
 }
 
 

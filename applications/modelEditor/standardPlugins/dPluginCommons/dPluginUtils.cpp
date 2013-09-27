@@ -22,15 +22,14 @@
 #include "dPluginUtils.h"
 
 
-#ifdef _DPLUGIN_COMMON_DLL_EXPORT
-	#if (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
+#if (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
 	int main(int argc, char* argv[])
 	{
 		return 0;
 	}
-	#endif
+#endif
 
-	#ifdef _MSC_VER
+#ifdef _MSC_VER
 	BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
 	{
 		switch (ul_reason_for_call)
@@ -43,12 +42,7 @@
 		}
 		return TRUE;
 	}
-
-	#endif
 #endif
-
-
-
 
 
 void GetAplicationDirectory (char* const aplicationDir)
