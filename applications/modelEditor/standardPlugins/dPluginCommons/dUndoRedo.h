@@ -22,7 +22,6 @@ class dUndoRedo: public dPluginAlloc
 
 	virtual void RestoreState() = 0;
 	virtual dUndoRedo* CreateRedoState() const = 0;
-
 };
 
 class dUndoRedoManager: public dPluginAlloc 

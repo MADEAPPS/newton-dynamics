@@ -19,28 +19,11 @@ class NewtonModelEditor;
 class EditorExplorer: public wxTreeCtrl
 {
 	public:
-	class TraverseExplorer
-	{
-		public:
-		TraverseExplorer (){}
-		virtual bool TraverseCallback (wxTreeItemId rootItem) const = 0;
-		void Traverse(const EditorExplorer* const me) const;
-	};
+	class TraverseExplorer;
+	class ExplorerData;
+	class ChangeNames;
+	class UndoRedoChangeName;
 
-	class ExplorerData: public wxTreeItemData
-	{
-		public:
-		ExplorerData (dScene::dTreeNode* const node)
-			:wxTreeItemData()
-			,m_node(node)
-		{
-		}
-		~ExplorerData ()
-		{
-		}
-
-		dScene::dTreeNode* m_node;
-	};
 
 	EditorExplorer (NewtonModelEditor* const mainFrame);
 	~EditorExplorer(void);

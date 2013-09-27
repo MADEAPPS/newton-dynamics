@@ -19,30 +19,113 @@ BEGIN_EVENT_TABLE (EditorExplorer, wxTreeCtrl)
 	EVT_TREE_BEGIN_LABEL_EDIT (NewtonModelEditor::ID_EDIT_NODE_NAME, OnBeginEdit)
 	EVT_TREE_END_LABEL_EDIT (NewtonModelEditor::ID_EDIT_NODE_NAME, OnEndEdit)
 
-
 END_EVENT_TABLE()
 
 
-
-void EditorExplorer::TraverseExplorer::Traverse(const EditorExplorer* const me) const
+class EditorExplorer::ExplorerData: public wxTreeItemData
 {
-	dList<wxTreeItemId> itemList;
+	public:
+	ExplorerData (dScene::dTreeNode* const node)
+		:wxTreeItemData()
+		,m_node(node)
+	{
+	}
+	~ExplorerData ()
+	{
+	}
 
-	itemList.Append(me->GetRootItem()); 
-	while (itemList.GetCount()) {
-		wxTreeItemId item = itemList.GetLast()->GetInfo();
-		itemList.Remove(itemList.GetLast());
+	dScene::dTreeNode* m_node;
+};
 
-		bool state = TraverseCallback (item);
-		if (!state) {
-			break;
-		}
 
-		for (wxTreeItemId childItem = me->GetLastChild(item); childItem; childItem = me->GetPrevSibling(childItem)) {
-			itemList.Append(childItem); 
+
+class EditorExplorer::TraverseExplorer
+{
+	public:
+	TraverseExplorer (){}
+	virtual bool TraverseCallback (wxTreeItemId rootItem) const = 0;
+	void TraverseExplorer::Traverse(const EditorExplorer* const me) const
+	{
+		dList<wxTreeItemId> itemList;
+
+		itemList.Append(me->GetRootItem()); 
+		while (itemList.GetCount()) {
+			wxTreeItemId item = itemList.GetLast()->GetInfo();
+			itemList.Remove(itemList.GetLast());
+
+			bool state = TraverseCallback (item);
+			if (!state) {
+				break;
+			}
+
+			for (wxTreeItemId childItem = me->GetLastChild(item); childItem; childItem = me->GetPrevSibling(childItem)) {
+				itemList.Append(childItem); 
+			}
 		}
 	}
-}
+};
+
+class EditorExplorer::ChangeNames: public TraverseExplorer
+{
+	public:
+	ChangeNames(EditorExplorer* const me, const wxString& name, dScene::dTreeNode* const node)
+		:m_me(me) 
+		,m_name(name)
+		,m_node(node)
+	{
+		Traverse(me);
+	}
+
+	bool TraverseCallback (wxTreeItemId item) const
+	{
+		ExplorerData* const data = (ExplorerData*) m_me->GetItemData(item);
+		if (m_node == data->m_node) {
+			m_me->SetItemText(item, m_name);
+		}
+		return true;
+	}
+
+	EditorExplorer* m_me;
+	const wxString& m_name;
+	dScene::dTreeNode* m_node;
+};
+
+
+class EditorExplorer::UndoRedoChangeName: public dUndoRedo
+{
+	public:
+	UndoRedoChangeName(EditorExplorer* const me, const wxString& name, dScene::dTreeNode* const node)
+		:dUndoRedo()
+		,m_me(me) 
+		,m_name(name) 
+		,m_node(node)
+	{
+	}
+
+	~UndoRedoChangeName()
+	{
+	}
+
+	protected:
+	virtual void RestoreState()
+	{
+		dPluginScene* const scene = m_me->m_mainFrame->GetScene(); 
+		dNodeInfo* const info = scene->GetInfoFromNode(m_node);
+		info->SetName(m_name.c_str());
+		ChangeNames chamgeNames(m_me, m_name, m_node);
+	}
+
+	virtual dUndoRedo* CreateRedoState() const
+	{
+		dPluginScene* const scene = m_me->m_mainFrame->GetScene(); 
+		dNodeInfo* const info = scene->GetInfoFromNode(m_node);
+		return new UndoRedoChangeName (m_me, wxString(info->GetName()), m_node);
+	}
+
+	EditorExplorer* m_me;
+	wxString m_name;
+	dScene::dTreeNode* m_node;
+};
 
 
 
@@ -256,50 +339,24 @@ void EditorExplorer::ReconstructScene(const dPluginScene* const scene)
 
 void EditorExplorer::OnBeginEdit (wxTreeEvent& event)
 {
-
 }
 
 void EditorExplorer::OnEndEdit (wxTreeEvent& event)
 {
-	
 	wxString name (event.GetLabel());
 	if (!name.IsEmpty()) {
-
-		class ChangeNames: public TraverseExplorer
-		{
-			public:
-			ChangeNames(EditorExplorer* const me, const wxString& name, dScene::dTreeNode* const node)
-				:m_me(me) 
-				,m_name(name)
-				,m_node(node)
-			{
-				Traverse(me);
-			}
-
-			bool TraverseCallback (wxTreeItemId item) const
-			{
-				ExplorerData* const data = (ExplorerData*) m_me->GetItemData(item);
-				if (m_node == data->m_node) {
-					m_me->SetItemText(item, m_name);
-				}
-				return true;
-			}
-
-			EditorExplorer* m_me;
-			const wxString& m_name;
-			dScene::dTreeNode* m_node;
-		};
 
 		wxTreeItemId item (event.GetItem());
 		ExplorerData* const data = (ExplorerData*) GetItemData(item);
 		dScene::dTreeNode* const node = data->m_node;
-
 		dPluginScene* const scene = m_mainFrame->GetScene(); 
 		dNodeInfo* const info = scene->GetInfoFromNode(node);
+
+		m_mainFrame->Push (new UndoRedoChangeName(this, wxString(info->GetName()), node));
+
 		info->SetName(name.c_str());
 
 		ChangeNames changeName (this, name, node);
-
 	}
 }
 
