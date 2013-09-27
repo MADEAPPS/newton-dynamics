@@ -24,6 +24,28 @@ END_EVENT_TABLE()
 
 
 
+void EditorExplorer::TraverseExplorer::Traverse(const EditorExplorer* const me) const
+{
+	dList<wxTreeItemId> itemList;
+
+	itemList.Append(me->GetRootItem()); 
+	while (itemList.GetCount()) {
+		wxTreeItemId item = itemList.GetLast()->GetInfo();
+		itemList.Remove(itemList.GetLast());
+
+		bool state = TraverseCallback (item);
+		if (!state) {
+			break;
+		}
+
+		for (wxTreeItemId childItem = me->GetLastChild(item); childItem; childItem = me->GetPrevSibling(childItem)) {
+			itemList.Append(childItem); 
+		}
+	}
+}
+
+
+
 EditorExplorer::EditorExplorer(NewtonModelEditor* const mainFrame)
 	:wxTreeCtrl (mainFrame, NewtonModelEditor::ID_EDIT_NODE_NAME, wxDefaultPosition, wxSize (200, 160), wxTR_EDIT_LABELS | wxTR_MULTIPLE | wxTR_EXTENDED | wxTR_HAS_BUTTONS | wxTR_LINES_AT_ROOT)
 	,m_mainFrame(mainFrame)
@@ -239,15 +261,45 @@ void EditorExplorer::OnBeginEdit (wxTreeEvent& event)
 
 void EditorExplorer::OnEndEdit (wxTreeEvent& event)
 {
-	dPluginScene* const scene = m_mainFrame->GetScene(); 
+	
 	wxString name (event.GetLabel());
 	if (!name.IsEmpty()) {
+
+		class ChangeNames: public TraverseExplorer
+		{
+			public:
+			ChangeNames(EditorExplorer* const me, const wxString& name, dScene::dTreeNode* const node)
+				:m_me(me) 
+				,m_name(name)
+				,m_node(node)
+			{
+				Traverse(me);
+			}
+
+			bool TraverseCallback (wxTreeItemId item) const
+			{
+				ExplorerData* const data = (ExplorerData*) m_me->GetItemData(item);
+				if (m_node == data->m_node) {
+					m_me->SetItemText(item, m_name);
+				}
+				return true;
+			}
+
+			EditorExplorer* m_me;
+			const wxString& m_name;
+			dScene::dTreeNode* m_node;
+		};
+
 		wxTreeItemId item (event.GetItem());
 		ExplorerData* const data = (ExplorerData*) GetItemData(item);
 		dScene::dTreeNode* const node = data->m_node;
 
+		dPluginScene* const scene = m_mainFrame->GetScene(); 
 		dNodeInfo* const info = scene->GetInfoFromNode(node);
 		info->SetName(name.c_str());
+
+		ChangeNames changeName (this, name, node);
+
 	}
 }
 

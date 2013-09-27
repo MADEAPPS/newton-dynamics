@@ -19,6 +19,13 @@ class NewtonModelEditor;
 class EditorExplorer: public wxTreeCtrl
 {
 	public:
+	class TraverseExplorer
+	{
+		public:
+		TraverseExplorer (){}
+		virtual bool TraverseCallback (wxTreeItemId rootItem) const = 0;
+		void Traverse(const EditorExplorer* const me) const;
+	};
 
 	class ExplorerData: public wxTreeItemData
 	{
