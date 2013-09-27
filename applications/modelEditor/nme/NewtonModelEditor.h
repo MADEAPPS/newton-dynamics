@@ -56,6 +56,8 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 
 
 		// editor menu options
+		ID_EDIT_NODE_NAME,
+		
 		ID_CLEAR_UNDO_HISTORY,
 
 		// view menu options
@@ -70,7 +72,6 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 
 		ID_MESH_PLUGINS,
 		ID_MAX_MESH_PLUGINS = ID_MESH_PLUGINS + D_MAX_PLUGINS_COUNT,
-
 
 
 
@@ -221,6 +222,7 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 
 	void OnHideExplorerPane (wxCommandEvent& event); 
 	void OnPaneClose (wxAuiManagerEvent& event); 
+
 	
 	void LoadResources ();
 	void DeleteResources ();

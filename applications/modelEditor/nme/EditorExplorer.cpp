@@ -12,12 +12,20 @@
 #include "toolbox_stdafx.h"
 #include "EditorExplorer.h"
 #include "NewtonModelEditor.h"
-//#include "EditorAssetBrowser.h"
-//#include "EditorAssetExplorer.h"
+
+BEGIN_EVENT_TABLE (EditorExplorer, wxTreeCtrl)
+
+
+	EVT_TREE_BEGIN_LABEL_EDIT (NewtonModelEditor::ID_EDIT_NODE_NAME, OnBeginEdit)
+	EVT_TREE_END_LABEL_EDIT (NewtonModelEditor::ID_EDIT_NODE_NAME, OnEndEdit)
+
+
+END_EVENT_TABLE()
+
 
 
 EditorExplorer::EditorExplorer(NewtonModelEditor* const mainFrame)
-	:wxTreeCtrl (mainFrame)
+	:wxTreeCtrl (mainFrame, NewtonModelEditor::ID_EDIT_NODE_NAME, wxDefaultPosition, wxSize (200, 160), wxTR_EDIT_LABELS | wxTR_MULTIPLE | wxTR_EXTENDED | wxTR_HAS_BUTTONS | wxTR_LINES_AT_ROOT)
 	,m_mainFrame(mainFrame)
 {
 
@@ -39,17 +47,6 @@ EditorExplorer::~EditorExplorer(void)
 {
 }
 
-/*
-void EditorExplorer::ReleaseAllAssets ()
-{
-	m_assetBrowser->ReleaseAllAssets ();
-	m_mainFrame->RemoveAllAsset();
-}
-
-
-
-
-*/
 
 /*
 void EditorExplorer::PopulateCurrentAsset ()
@@ -214,11 +211,14 @@ void EditorExplorer::ReconstructScene(const dPluginScene* const scene)
 			if (!found) {
 				dNodeInfo* const info = scene->GetInfoFromNode(childNode);
 
-				//wxTreeItemId item;
 				if (info->IsType(dSceneCacheInfo::GetRttiType())) {
 					PrependItem(rootItem, wxT(info->GetName()), 1, -1, new ExplorerData(childNode));
 				} else {
-					AppendItem(rootItem, wxT(info->GetName()), 2, -1, new ExplorerData(childNode));
+					int imageId = -1;
+					if (info->IsType(dSceneModelInfo::GetRttiType())) {
+						imageId = 2;
+					}
+					AppendItem(rootItem, wxT(info->GetName()), imageId, -1, new ExplorerData(childNode));
 				}
 			}
 		}
@@ -228,4 +228,26 @@ void EditorExplorer::ReconstructScene(const dPluginScene* const scene)
 			stack.Append(childItem);
 		}
 	}
+
+//	virtual void Expand(const wxTreeItemId& item) = 0;
 }
+
+void EditorExplorer::OnBeginEdit (wxTreeEvent& event)
+{
+
+}
+
+void EditorExplorer::OnEndEdit (wxTreeEvent& event)
+{
+	dPluginScene* const scene = m_mainFrame->GetScene(); 
+	wxString name (event.GetLabel());
+	if (!name.IsEmpty()) {
+		wxTreeItemId item (event.GetItem());
+		ExplorerData* const data = (ExplorerData*) GetItemData(item);
+		dScene::dTreeNode* const node = data->m_node;
+
+		dNodeInfo* const info = scene->GetInfoFromNode(node);
+		info->SetName(name.c_str());
+	}
+}
+

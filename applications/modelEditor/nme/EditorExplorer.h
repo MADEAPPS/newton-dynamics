@@ -15,8 +15,6 @@
 
 class dPluginScene;
 class NewtonModelEditor;
-//class EditorAssetBrowser;
-//class EditorAssetExplorer;
 
 class EditorExplorer: public wxTreeCtrl
 {
@@ -44,6 +42,13 @@ class EditorExplorer: public wxTreeCtrl
 	void ReconstructScene(const dPluginScene* const scene);
 
 	private:
+	DECLARE_EVENT_TABLE()
+
+	void OnEndEdit (wxTreeEvent& event);
+	void OnBeginEdit (wxTreeEvent& event);
+	
+
+
 //	void Populate (const dPluginScene* const scene, wxTreeItemId rootNode);
 //	void PopulateModel(const dPluginScene* const scene, wxTreeItemId modelItem);
 //	void SetBrowserSelection ();
@@ -54,6 +59,8 @@ class EditorExplorer: public wxTreeCtrl
 //	void HandleSelectionEvent (const dList<dScene::dTreeNode*>& traceToRoot) const;
 
 	NewtonModelEditor* m_mainFrame;
+
+	
 };
 
 

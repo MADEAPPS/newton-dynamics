@@ -127,6 +127,7 @@ class dScene: public dSceneGraph, public dRefCounter
 	virtual DSCENE_API dTreeNode* FindTextureByTextId(dTreeNode* const parentNode, dCRCTYPE textId) const;
 	
 
+	virtual DSCENE_API dTreeNode* FindChildByName(dTreeNode* const parentNode, const char* const name) const;
 	virtual DSCENE_API dTreeNode* FindChildByType(dTreeNode* const parentNode, dCRCTYPE type) const;
 	virtual DSCENE_API dTreeNode* FindParentByType(dTreeNode* const child, dCRCTYPE type) const;
 

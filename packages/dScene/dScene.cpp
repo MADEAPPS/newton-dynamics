@@ -436,7 +436,16 @@ dScene::dTreeNode* dScene::GetCacheNode (const char* const cacheName)
 {
 	dTreeNode* const root = GetRootNode();
 
-	dCRCTYPE id = dCRC64 (cacheName);
+	dTreeNode* node = FindChildByName (root, cacheName);
+	if (!node) {
+		dCRCTYPE id = dCRC64 (cacheName);
+		node = CreateNode ("dSceneCacheInfo", root);
+		dSceneCacheInfo* const info = (dSceneCacheInfo*) GetInfoFromNode(node);
+		info->SetName(cacheName);
+		info->SetID(id);
+	}
+/*
+	
 	for (void* ptr = GetFirstChild(root); ptr; ptr = GetNextChild(root, ptr)) {
 		dTreeNode* const node = GetNodeFromLink (ptr);
 		dSceneCacheInfo* const info = (dSceneCacheInfo*) GetInfoFromNode(node);
@@ -446,10 +455,8 @@ dScene::dTreeNode* dScene::GetCacheNode (const char* const cacheName)
 			}
 		}
 	}
-	dTreeNode* const node = CreateNode ("dSceneCacheInfo", root);
-	dSceneCacheInfo* const info = (dSceneCacheInfo*) GetInfoFromNode(node);
-	info->SetName(cacheName);
-	info->SetID(id);
+*/
+
 	return node;
 
 }
@@ -595,6 +602,20 @@ dScene::dTreeNode* dScene::FindMaterialById(int materialId)
 	return FindMaterialById (GetMaterialCacheNode(), materialId);
 }
 
+dScene::dTreeNode* dScene::FindChildByName(dTreeNode* const root, const char* const name) const
+{
+	dCRCTYPE id = dCRC64 (name);
+	for (void* ptr = GetFirstChild(root); ptr; ptr = GetNextChild(root, ptr)) {
+		dTreeNode* const node = GetNodeFromLink (ptr);
+		dSceneCacheInfo* const info = (dSceneCacheInfo*) GetInfoFromNode(node);
+		if (info->IsType(dSceneCacheInfo::GetRttiType())) {
+			if (info->GetID() == id) {
+				return node;
+			}
+		}
+	}
+	return NULL;
+}
 
 dScene::dTreeNode* dScene::FindChildByType(dTreeNode* const parentNode, dCRCTYPE type) const
 {
@@ -754,20 +775,29 @@ void dScene::MergeScene (dScene* const scene)
 		dNodeInfo* const info = scene->GetInfoFromNode(node);
 		if (!(info->IsType(dRootNodeInfo::GetRttiType()))) {
 			dAssert (!Find (info->GetUniqueID()));
-			dTreeNode* newNode = AddNode (info, NULL);
-			map.Insert(newNode, node);
-		}
+
+			if (info->IsType(dSceneCacheInfo::GetRttiType())) {
+				dTreeNode* newNode = FindChildByName(GetRootNode(), info->GetName());
+				if (!newNode) {
+					newNode = AddNode (info, NULL);
+				}
+				map.Insert(newNode, node);
+			} else {
+				dTreeNode* const newNode = AddNode (info, NULL);
+				map.Insert(newNode, node);
+			}
+		} 
 	}
 
 	//now connect all edges
 	dTree<dTreeNode*,dTreeNode*>::Iterator mapIter (map);
 	for (mapIter.Begin(); mapIter; mapIter ++) {
-		dTreeNode* srcNode = mapIter.GetKey();
+		dTreeNode* const srcNode = mapIter.GetKey();
 		dGraphNode& srcInfoHeader = mapIter.GetNode()->GetInfo()->GetInfo();
 		for (void* ptr = scene->GetFirstChild (srcNode); ptr; ptr = scene->GetNextChild(srcNode, ptr)) {
-			dTreeNode* srcLinkNode = scene->GetNodeFromLink(ptr);
+			dTreeNode* const srcLinkNode = scene->GetNodeFromLink(ptr);
 
-			dTree<dTreeNode*,dTreeNode*>::dTreeNode* mapSaved = map.Find(srcLinkNode);
+			dTree<dTreeNode*,dTreeNode*>::dTreeNode* const mapSaved = map.Find(srcLinkNode);
 			if (mapSaved) {
 				dTreeNode* const node = mapSaved->GetInfo();
 				srcInfoHeader.m_children.Append(node);
@@ -775,15 +805,14 @@ void dScene::MergeScene (dScene* const scene)
 		}
 
 		for (void* ptr = scene->GetFirstParent (srcNode); ptr; ptr = scene->GetNextParent(srcNode, ptr)) {
-			dTreeNode* srcLinkNode = scene->GetNodeFromLink(ptr);
+			dTreeNode* const srcLinkNode = scene->GetNodeFromLink(ptr);
 
-			dTree<dTreeNode*,dTreeNode*>::dTreeNode* mapSaved = map.Find(srcLinkNode);
+			dTree<dTreeNode*,dTreeNode*>::dTreeNode* const mapSaved = map.Find(srcLinkNode);
 			if (mapSaved) {
 				dTreeNode* const node = mapSaved->GetInfo();
 				srcInfoHeader.m_parents.Append(node);
 			}
 		}
-
 	}
 }
 
