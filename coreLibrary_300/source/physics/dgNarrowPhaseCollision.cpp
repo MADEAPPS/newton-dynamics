@@ -84,15 +84,17 @@ dgCollisionInstance* dgWorld::CreateBox(dgFloat32 dx, dgFloat32 dy, dgFloat32 dz
 	dgUnsigned32 crc = dgCollisionBox::CalculateSignature(dx, dy, dz);
 	dgUnsigned32 pinNumber = dgCollisionBox::CalculateSignature(dy, dz, dx);
 	dgBodyCollisionList::dgTreeNode* node = dgBodyCollisionList::Find (crc);
-	if (!node) {
-		dgCollision* const collision = new  (m_allocator) dgCollisionBox (m_allocator, crc, dx, dy, dz);
-		node = dgBodyCollisionList::Insert (CollisionKeyPair(collision, pinNumber), crc);
-	}
-	if (node->GetInfo().m_pinNumber != pinNumber) {
+
+	if (node && (node->GetInfo().m_pinNumber != pinNumber)) {
 		// shape was found but it is a CRC collision simple single out this shape as a unique entry in the cache
 		dgTrace (("we have a CRC collision simple single out this shape as a unique entry in the cache\n"));
 		dgCollision* const collision = new  (m_allocator) dgCollisionBox (m_allocator, pinNumber, dx, dy, dz);
 		node = dgBodyCollisionList::Insert (CollisionKeyPair(collision, pinNumber), pinNumber);
+	}
+
+	if (!node) {
+		dgCollision* const collision = new  (m_allocator) dgCollisionBox (m_allocator, crc, dx, dy, dz);
+		node = dgBodyCollisionList::Insert (CollisionKeyPair(collision, pinNumber), crc);
 	}
 	return CreateInstance (node->GetInfo().m_collision, shapeID, offsetMatrix);
 }
@@ -103,15 +105,17 @@ dgCollisionInstance* dgWorld::CreateCapsule (dgFloat32 radius, dgFloat32 height,
 	dgUnsigned32 crc = dgCollisionCapsule::CalculateSignature(dgAbsf (radius), dgMax (dgFloat32(0.01f), dgAbsf (height * dgFloat32 (0.5f)) - dgAbsf (radius)));  
 	dgUnsigned32 pinNumber = dgCollisionCapsule::CalculateSignature(dgMax (dgFloat32(0.01f), dgAbsf (height * dgFloat32 (0.5f)) - dgAbsf (radius)), dgAbsf (radius));  
 	dgBodyCollisionList::dgTreeNode* node = dgBodyCollisionList::Find (crc);
-	if (!node) {
-		dgCollision* const collision = new  (m_allocator) dgCollisionCapsule (m_allocator, crc, radius, height);
-		node = dgBodyCollisionList::Insert (CollisionKeyPair(collision, pinNumber), crc);
-	}
-	if (node->GetInfo().m_pinNumber != pinNumber) {
+
+	if (node && (node->GetInfo().m_pinNumber != pinNumber)) {
 		// shape was found but it is a CRC collision simple single out this shape as a unique entry in the cache
 		dgTrace (("we have a CRC collision simple single out this shape as a unique entry in the cache\n"));
 		dgCollision* const collision = new  (m_allocator) dgCollisionCapsule (m_allocator, pinNumber, radius, height);
 		node = dgBodyCollisionList::Insert (CollisionKeyPair(collision, pinNumber), pinNumber);
+	}
+
+	if (!node) {
+		dgCollision* const collision = new  (m_allocator) dgCollisionCapsule (m_allocator, crc, radius, height);
+		node = dgBodyCollisionList::Insert (CollisionKeyPair(collision, pinNumber), crc);
 	}
 
 	return CreateInstance (node->GetInfo().m_collision, shapeID, offsetMatrix);
@@ -185,6 +189,23 @@ dgCollisionInstance* dgWorld::CreateConvexHull (dgInt32 count, const dgFloat32* 
 	dgUnsigned32 crc = dgCollisionConvexHull::CalculateSignature (count, vertexArray, strideInBytes);
 
 	dgBodyCollisionList::dgTreeNode* node = dgBodyCollisionList::Find (crc);
+
+	if (node && (node->GetInfo().m_pinNumber != pinNumber)) {
+		// shape was found but it is a CRC collision simple single out this shape as a unique entry in the cache
+		dgTrace (("we have a CRC collision simple single out this shape as a unique entry in the cache\n"));
+		dgCollisionConvexHull* const collision = new (m_allocator) dgCollisionConvexHull (m_allocator, pinNumber, count, strideInBytes, tolerance, vertexArray);
+		if (collision->GetConvexVertexCount()) {
+			node = dgBodyCollisionList::Insert (CollisionKeyPair(collision, pinNumber), pinNumber);
+		} else {
+			//most likely the point cloud is a plane or a line
+			//could not make the shape destroy the shell and return NULL 
+			//note this is the only newton shape that can return NULL;
+			collision->Release();
+			return NULL;
+		}
+	}
+
+
 	if (!node) {
 		// shape not found create a new one and add to the cache
 		dgCollisionConvexHull* const collision = new (m_allocator) dgCollisionConvexHull (m_allocator, crc, count, strideInBytes, tolerance, vertexArray);
@@ -199,20 +220,6 @@ dgCollisionInstance* dgWorld::CreateConvexHull (dgInt32 count, const dgFloat32* 
 		}
 	}
 
-	if (node->GetInfo().m_pinNumber != pinNumber) {
-		// shape was found but it is a CRC collision simple single out this shape as a unique entry in the cache
-		dgTrace (("we have a CRC collision simple single out this shape as a unique entry in the cache\n"));
-		dgCollisionConvexHull* const collision = new (m_allocator) dgCollisionConvexHull (m_allocator, pinNumber, count, strideInBytes, tolerance, vertexArray);
-		if (collision->GetConvexVertexCount()) {
-			node = dgBodyCollisionList::Insert (CollisionKeyPair(collision, pinNumber), pinNumber);
-		} else {
-			//most likely the point cloud is a plane or a line
-			//could not make the shape destroy the shell and return NULL 
-			//note this is the only newton shape that can return NULL;
-			collision->Release();
-			return NULL;
-		}
-	}
 
 	// add reference to the shape and return the collision pointer
 	return CreateInstance (node->GetInfo().m_collision, shapeID, offsetMatrix);
