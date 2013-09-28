@@ -114,7 +114,7 @@ class dPluginInterface: public dUndoRedoManager
 
 
 	protected:
-	DPLUGIN_API void LoadPlugins(const char* const path, dPluginDll& plugins);
+	DPLUGIN_API dPluginDll::dListNode* LoadPlugins(const char* const path);
 
 	private:
 	dPluginScene* m_scene;
@@ -122,8 +122,6 @@ class dPluginInterface: public dUndoRedoManager
 	dPluginCamera* m_currentCamera;
 	dPluginDll m_allPlugins;
 	const char* m_filePathFile;
-//	dAssetList m_assetCache;
-//	dAssetList::dListNode* m_currentAsset;
 
 	dTree<int, void*> m_selection;
 	dTree<int, void*> m_ExplorerExpand;

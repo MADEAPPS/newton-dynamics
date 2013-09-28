@@ -468,14 +468,6 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\dPluginCommons\dUndoAssetCache.cpp"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dPluginCommons\dUndoAssetCache.h"
-			>
-		</File>
-		<File
 			RelativePath="..\..\dPluginCommons\dUndoCurrentScene.cpp"
 			>
 		</File>

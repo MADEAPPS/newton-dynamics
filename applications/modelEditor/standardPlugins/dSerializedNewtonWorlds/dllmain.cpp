@@ -8,6 +8,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 {
 	switch (ul_reason_for_call)
 	{
+		case DLL_THREAD_ATTACH:
 		case DLL_PROCESS_ATTACH:
 			// check for memory leaks
 			#if defined(_DEBUG) && defined(_MSC_VER)
@@ -16,7 +17,6 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 			_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF|_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF));
 			#endif
 
-		case DLL_THREAD_ATTACH:
 		case DLL_THREAD_DETACH:
 		case DLL_PROCESS_DETACH:
 		break;

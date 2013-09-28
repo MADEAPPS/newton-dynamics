@@ -62,11 +62,6 @@ END_EVENT_TABLE()
 int main(int argc, char *argv[])
 {
 	// Enable run-time memory check for debug builds.
-#ifdef _MSC_VER
-	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
-#endif
-
-
 	FXApp application("Newton Dynamics demos", "Newton Model Editor");
 
 	// Set the memory allocation function before creation the newton world
@@ -647,11 +642,11 @@ void NewtonModelEditor::LoadResources ()
 
 void NewtonModelEditor::LoadPlugins(const char* const path)
 {
-	dPluginDll pluginList;
-	dPluginInterface::LoadPlugins(path, pluginList);
+	
+	dPluginDll::dListNode* const firstNode = dPluginInterface::LoadPlugins(path);
 
 	// dispatch plugins by type
-	for (dPluginDll::dListNode* dllNode = pluginList.GetFirst(); dllNode; dllNode = dllNode->GetNext()) {
+	for (dPluginDll::dListNode* dllNode = firstNode; dllNode; dllNode = dllNode->GetNext()) {
 		HMODULE module = dllNode->GetInfo();
 
 		GetPluginArray GetPluginsTable = (GetPluginArray) GetProcAddress (module, "GetPluginArray"); 

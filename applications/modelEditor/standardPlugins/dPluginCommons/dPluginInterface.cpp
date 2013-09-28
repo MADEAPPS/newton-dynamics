@@ -28,7 +28,6 @@ dPluginInterface::dPluginInterface(void)
 	,m_render(NULL)
 	,m_currentCamera(NULL)
 	,m_filePathFile(NULL)
-//	,m_currentAsset(NULL)
 {
 	m_render = new dPluginRender;
 	m_render->Init();
@@ -42,8 +41,6 @@ dPluginInterface::~dPluginInterface(void)
 	}
 
 	m_render->Release();
-
-//	RemoveAllAsset();
 }
 
 
@@ -53,7 +50,7 @@ const char* dPluginInterface::GetFilePath() const
 }
 
 
-void dPluginInterface::LoadPlugins(const char* const path, dPluginDll& plugins)
+dPluginInterface::dPluginDll::dListNode* dPluginInterface::LoadPlugins(const char* const path)
 {
 	char plugInPath[2048];
 	char rootPathInPath [2048];
@@ -61,6 +58,7 @@ void dPluginInterface::LoadPlugins(const char* const path, dPluginDll& plugins)
 	strcat (plugInPath, path);
 	sprintf (rootPathInPath, "%s/*.dll", plugInPath);
 
+	dPluginDll::dListNode* const firstNode = m_allPlugins.GetLast();
 
 	// scan for all plugins in this folder
 	_finddata_t data;
@@ -74,7 +72,7 @@ void dPluginInterface::LoadPlugins(const char* const path, dPluginDll& plugins)
 				// get the interface function pointer to the Plug in classes
 				GetPluginArray GetPluginsTable = (GetPluginArray) GetProcAddress (module, "GetPluginArray"); 
 				if (GetPluginsTable) {
-					plugins.Append(module);
+//					plugins.Append(module);
 					m_allPlugins.Append(module);
 				} else {
 					FreeLibrary(module);
@@ -84,7 +82,7 @@ void dPluginInterface::LoadPlugins(const char* const path, dPluginDll& plugins)
 		_findclose (handle);
 	}
 
-	for (dPluginDll::dListNode* dllNode = plugins.GetFirst(); dllNode; dllNode = dllNode->GetNext()) {
+	for (dPluginDll::dListNode* dllNode = firstNode ? firstNode->GetNext() : m_allPlugins.GetFirst(); dllNode; dllNode = dllNode->GetNext()) {
 		HMODULE module = dllNode->GetInfo();
 
 		GetPluginArray GetPluginsTable = (GetPluginArray) GetProcAddress (module, "GetPluginArray"); 
@@ -97,6 +95,8 @@ void dPluginInterface::LoadPlugins(const char* const path, dPluginDll& plugins)
 			m_pluginDictionary.Insert(plugin, key);
 		}
 	}
+
+	return firstNode ? firstNode->GetNext() : m_allPlugins.GetFirst();
 }
 
 

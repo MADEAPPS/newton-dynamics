@@ -763,8 +763,6 @@ void dScene::Serialize (const char* const fileName)
 }
 
 
-
-
 void dScene::MergeScene (dScene* const scene)
 {
 	dTree<dTreeNode*,dTreeNode*> map;
@@ -814,6 +812,11 @@ void dScene::MergeScene (dScene* const scene)
 			}
 		}
 	}
+}
+
+void dScene::UnmergeScene (dScene* const scene)
+{
+
 }
 
 void dScene::DeleteNode (dTreeNode* const node)

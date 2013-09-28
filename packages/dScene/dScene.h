@@ -135,6 +135,7 @@ class dScene: public dSceneGraph, public dRefCounter
 
 	virtual DSCENE_API void DeleteNode (dTreeNode* const node);
 	virtual DSCENE_API void MergeScene (dScene* const scene);
+	virtual DSCENE_API void UnmergeScene (dScene* const scene);
 
 	virtual DSCENE_API void Serialize (const char* const fileName);
 	virtual DSCENE_API bool Deserialize (const char* const fileName);

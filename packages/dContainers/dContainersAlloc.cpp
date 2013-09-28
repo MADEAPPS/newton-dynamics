@@ -28,13 +28,13 @@
 #ifdef _DCONTAINERS_DLL
 	void* operator new (size_t size) 
 	{ 
-	//	return NewtonAlloc(int (size));
-		return malloc (size);
+		void* const ptr = malloc (size);
+//		dAssert ((unsigned(ptr) & 0xffff) != 0x0968);
+		return ptr;
 	}
 
 	void operator delete (void* ptr) 
 	{ 
-	//	NewtonFree(ptr);
 		free (ptr);
 	}
 
@@ -44,6 +44,13 @@
 		{
 			case DLL_PROCESS_ATTACH:
 			case DLL_THREAD_ATTACH:
+				// check for memory leaks
+				#if defined(_DEBUG) && defined(_MSC_VER)
+					// Track all memory leaks at the operating system level.
+					// make sure no Newton tool or utility leaves leaks behind.
+					_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF|_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF));
+				#endif
+
 			case DLL_THREAD_DETACH:
 			case DLL_PROCESS_DETACH:
 				break;
@@ -55,25 +62,21 @@
 
 void* dContainersAlloc::operator new (size_t size)
 {
-	//return NewtonAlloc(int (size));
-	return Alloc(size);
+	return ::new char[size];
 }
 
 void dContainersAlloc::operator delete (void* ptr)
 {
-//	NewtonFree(ptr);
-	free(ptr);
+	delete[] (char*) ptr;
 }
 
 void* dContainersAlloc::Alloc (size_t size)
 {
-	//return NewtonAlloc(int (size));
 	return ::new char[size];
 }
 
 void dContainersAlloc::Free(void* const ptr)
 {
-	//	NewtonFree(ptr);
 	delete[] (char*) ptr;
 }
 
