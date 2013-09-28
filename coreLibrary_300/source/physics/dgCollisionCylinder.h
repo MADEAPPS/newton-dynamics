@@ -30,7 +30,7 @@
 class dgCollisionCylinder: public dgCollisionConvex  
 {
 	public:
-	dgCollisionCylinder(dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgFloat32 radius, dgFloat32 height);
+	dgCollisionCylinder(dgMemoryAllocator* const allocator, dgUnsigned64 signature, dgFloat32 radius, dgFloat32 height);
 	dgCollisionCylinder(dgWorld* const world, dgDeserialize deserialization, void* const userData);
 	virtual ~dgCollisionCylinder();
 
@@ -46,7 +46,7 @@ class dgCollisionCylinder: public dgCollisionConvex
 	
 	virtual dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const;
 	
-	virtual dgInt32 CalculateSignature () const;
+	virtual dgUnsigned64 CalculateSignature () const;
 	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1);
 
 	virtual dgFloat32 GetSkinThickness () const; 
@@ -54,7 +54,7 @@ class dgCollisionCylinder: public dgCollisionConvex
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
 
-	static dgInt32 CalculateSignature (dgFloat32 radius, dgFloat32 height);
+	static dgUnsigned64 CalculateSignature (dgFloat32 radius, dgFloat32 height);
 
 
 	// special feature based contact calculation for conics convex (ex spheres, capsules, tapered capsules, and chamfered cylinders)

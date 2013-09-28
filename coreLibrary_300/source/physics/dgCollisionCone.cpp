@@ -32,7 +32,7 @@
 dgInt32 dgCollisionCone::m_shapeRefCount = 0;
 dgConvexSimplexEdge dgCollisionCone::m_edgeArray[DG_CONE_SEGMENTS * 4];
 
-dgCollisionCone::dgCollisionCone(dgMemoryAllocator* allocator, dgUnsigned32 signature, dgFloat32 radius, dgFloat32 height)
+dgCollisionCone::dgCollisionCone(dgMemoryAllocator* allocator, dgUnsigned64 signature, dgFloat32 radius, dgFloat32 height)
 	:dgCollisionConvex(allocator, signature, m_coneCollision)
 {
 	Init (radius, height);
@@ -129,18 +129,18 @@ void dgCollisionCone::Init (dgFloat32 radius, dgFloat32 height)
 	SetVolumeAndCG ();
 }
 
-dgInt32 dgCollisionCone::CalculateSignature (dgFloat32 radius, dgFloat32 height)
+dgUnsigned64 dgCollisionCone::CalculateSignature (dgFloat32 radius, dgFloat32 height)
 {
-	dgUnsigned32 buffer[3];
+	dgUnsigned64 buffer[3];
 
 	memset (buffer, 0, sizeof (buffer));
 	buffer[0] = m_coneCollision;
 	buffer[1] = dgCollision::Quantize (radius);
 	buffer[2] = dgCollision::Quantize (height);
-	return dgInt32 (dgCollision::Quantize(buffer, sizeof (buffer)));
+	return dgCollision::Quantize(buffer, sizeof (buffer));
 }
 
-dgInt32 dgCollisionCone::CalculateSignature () const
+dgUnsigned64 dgCollisionCone::CalculateSignature () const
 {
 	return CalculateSignature (m_radius, m_height);
 }

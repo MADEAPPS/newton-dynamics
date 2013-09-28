@@ -57,7 +57,7 @@ dgVector dgWorld::m_linearContactError2 (DG_CONTACT_TRANSLATION_ERROR * DG_CONTA
 
 dgCollisionInstance* dgWorld::CreateNull ()
 {
-	dgUnsigned32 crc = dgCollision::dgCollisionNull_RTTI;
+	dgUnsigned64 crc = dgCollision::dgCollisionNull_RTTI;
 	dgBodyCollisionList::dgTreeNode* node = dgBodyCollisionList::Find (crc);
 	if (!node) {
 		dgCollision* const collision = new  (m_allocator) dgCollisionNull (m_allocator, crc);
@@ -69,7 +69,7 @@ dgCollisionInstance* dgWorld::CreateNull ()
 
 dgCollisionInstance* dgWorld::CreateSphere(dgFloat32 radii, dgInt32 shapeID, const dgMatrix& offsetMatrix)
 {
-	dgUnsigned32 crc = dgCollisionSphere::CalculateSignature (radii);
+	dgUnsigned64 crc = dgCollisionSphere::CalculateSignature (radii);
 	dgBodyCollisionList::dgTreeNode* node = dgBodyCollisionList::Find (crc);
 	if (!node) {
 		dgCollision* const collision = new  (m_allocator) dgCollisionSphere (m_allocator, crc, dgAbsf(radii));
@@ -81,7 +81,7 @@ dgCollisionInstance* dgWorld::CreateSphere(dgFloat32 radii, dgInt32 shapeID, con
 
 dgCollisionInstance* dgWorld::CreateBox(dgFloat32 dx, dgFloat32 dy, dgFloat32 dz, dgInt32 shapeID, const dgMatrix& offsetMatrix)
 {
-	dgUnsigned32 crc = dgCollisionBox::CalculateSignature(dx, dy, dz);
+	dgUnsigned64 crc = dgCollisionBox::CalculateSignature(dx, dy, dz);
 	dgBodyCollisionList::dgTreeNode* node = dgBodyCollisionList::Find (crc);
 	if (!node) {
 		dgCollision* const collision = new  (m_allocator) dgCollisionBox (m_allocator, crc, dx, dy, dz);
@@ -93,7 +93,7 @@ dgCollisionInstance* dgWorld::CreateBox(dgFloat32 dx, dgFloat32 dy, dgFloat32 dz
 
 dgCollisionInstance* dgWorld::CreateCapsule (dgFloat32 radius, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix)
 {
-	dgUnsigned32 crc = dgCollisionCapsule::CalculateSignature(dgAbsf (radius), dgMax (dgFloat32(0.01f), dgAbsf (height * dgFloat32 (0.5f)) - dgAbsf (radius)));  
+	dgUnsigned64 crc = dgCollisionCapsule::CalculateSignature(dgAbsf (radius), dgMax (dgFloat32(0.01f), dgAbsf (height * dgFloat32 (0.5f)) - dgAbsf (radius)));  
 	dgBodyCollisionList::dgTreeNode* node = dgBodyCollisionList::Find (crc);
 	if (!node) {
 		dgCollision* const collision = new  (m_allocator) dgCollisionCapsule (m_allocator, crc, radius, height);
@@ -104,7 +104,7 @@ dgCollisionInstance* dgWorld::CreateCapsule (dgFloat32 radius, dgFloat32 height,
 
 dgCollisionInstance* dgWorld::CreateCylinder (dgFloat32 radius, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix)
 {
-	dgUnsigned32 crc = dgCollisionCylinder::CalculateSignature(dgAbsf (radius), dgAbsf (height) * dgFloat32 (0.5f));
+	dgUnsigned64 crc = dgCollisionCylinder::CalculateSignature(dgAbsf (radius), dgAbsf (height) * dgFloat32 (0.5f));
 	dgBodyCollisionList::dgTreeNode* node = dgBodyCollisionList::Find (crc);
 	if (!node) {
 		dgCollision* const collision = new (m_allocator) dgCollisionCylinder (m_allocator, crc, radius, height);
@@ -116,7 +116,7 @@ dgCollisionInstance* dgWorld::CreateCylinder (dgFloat32 radius, dgFloat32 height
 
 dgCollisionInstance* dgWorld::CreateTaperedCapsule (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix)
 {
-	dgUnsigned32 crc = dgCollisionTaperedCapsule::CalculateSignature(dgAbsf (radio0), dgAbsf (radio1), dgAbsf (height) * dgFloat32 (0.5f));
+	dgUnsigned64 crc = dgCollisionTaperedCapsule::CalculateSignature(dgAbsf (radio0), dgAbsf (radio1), dgAbsf (height) * dgFloat32 (0.5f));
 
 	dgBodyCollisionList::dgTreeNode* node = dgBodyCollisionList::Find (crc);
 	if (!node) {
@@ -129,7 +129,7 @@ dgCollisionInstance* dgWorld::CreateTaperedCapsule (dgFloat32 radio0, dgFloat32 
 
 dgCollisionInstance* dgWorld::CreateTaperedCylinder (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix)
 {
-	dgUnsigned32 crc = dgCollisionTaperedCylinder::CalculateSignature(dgAbsf (radio0), dgAbsf (radio1), dgAbsf (height) * dgFloat32 (0.5f));
+	dgUnsigned64 crc = dgCollisionTaperedCylinder::CalculateSignature(dgAbsf (radio0), dgAbsf (radio1), dgAbsf (height) * dgFloat32 (0.5f));
 
 	dgBodyCollisionList::dgTreeNode* node = dgBodyCollisionList::Find (crc);
 	if (!node) {
@@ -142,7 +142,7 @@ dgCollisionInstance* dgWorld::CreateTaperedCylinder (dgFloat32 radio0, dgFloat32
 
 dgCollisionInstance* dgWorld::CreateChamferCylinder (dgFloat32 radius, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix)
 {
-	dgUnsigned32 crc = dgCollisionChamferCylinder::CalculateSignature(dgAbsf (radius), dgAbsf (height) * dgFloat32 (0.5f));
+	dgUnsigned64 crc = dgCollisionChamferCylinder::CalculateSignature(dgAbsf (radius), dgAbsf (height) * dgFloat32 (0.5f));
 
 	dgBodyCollisionList::dgTreeNode* node = dgBodyCollisionList::Find (crc);
 	if (!node) {
@@ -154,7 +154,7 @@ dgCollisionInstance* dgWorld::CreateChamferCylinder (dgFloat32 radius, dgFloat32
 
 dgCollisionInstance* dgWorld::CreateCone (dgFloat32 radius, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix)
 {
-	dgUnsigned32 crc = dgCollisionCone::CalculateSignature (dgAbsf (radius), dgAbsf (height) * dgFloat32 (0.5f));
+	dgUnsigned64 crc = dgCollisionCone::CalculateSignature (dgAbsf (radius), dgAbsf (height) * dgFloat32 (0.5f));
 	dgBodyCollisionList::dgTreeNode* node = dgBodyCollisionList::Find (crc);
 	if (!node) {
 		dgCollision* const collision = new (m_allocator) dgCollisionCone (m_allocator, crc, radius, height);
@@ -166,7 +166,7 @@ dgCollisionInstance* dgWorld::CreateCone (dgFloat32 radius, dgFloat32 height, dg
 
 dgCollisionInstance* dgWorld::CreateConvexHull (dgInt32 count, const dgFloat32* const vertexArray, dgInt32 strideInBytes, dgFloat32 tolerance, dgInt32 shapeID, const dgMatrix& offsetMatrix)
 {
-	dgUnsigned32 crc = dgCollisionConvexHull::CalculateSignature (count, vertexArray, strideInBytes);
+	dgUnsigned64 crc = dgCollisionConvexHull::CalculateSignature (count, vertexArray, strideInBytes);
 	dgBodyCollisionList::dgTreeNode* node = dgBodyCollisionList::Find (crc);
 	if (!node) {
 		// shape not found crate a new one and add to the cache

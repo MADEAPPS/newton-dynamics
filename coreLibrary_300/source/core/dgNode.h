@@ -48,7 +48,7 @@ class dgBaseNode: public dgRef
 	dgBaseNode *GetNext() const;
 	dgBaseNode *GetPrev() const;
 
-	dgBaseNode *Find (dgUnsigned32 nameCRC) const; 
+	dgBaseNode *Find (dgUnsigned64 nameCRC) const; 
 	dgBaseNode *Find (const char* const name) const;
 	void DebugPrint (const char* const fileName); 
 	bool SanityCheck();

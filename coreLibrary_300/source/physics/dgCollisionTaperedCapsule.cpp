@@ -34,7 +34,7 @@
 dgInt32 dgCollisionTaperedCapsule::m_shapeRefCount = 0;
 dgConvexSimplexEdge dgCollisionTaperedCapsule::m_edgeArray[DG_CAPSULE_SEGMENTS * (6 + 8 * (DG_CAP_SEGMENTS - 1))];
 
-dgCollisionTaperedCapsule::dgCollisionTaperedCapsule(dgMemoryAllocator* allocator, dgUnsigned32 signature, dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height)
+dgCollisionTaperedCapsule::dgCollisionTaperedCapsule(dgMemoryAllocator* allocator, dgUnsigned64 signature, dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height)
 	:dgCollisionConvex(allocator, signature, m_taperedCapsuleCollision)
 {
 	Init (radio0, radio1, height);
@@ -186,9 +186,9 @@ void dgCollisionTaperedCapsule::Init (dgFloat32 radio0, dgFloat32 radio1, dgFloa
 }
 
 
-dgInt32 dgCollisionTaperedCapsule::CalculateSignature (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height)
+dgUnsigned64 dgCollisionTaperedCapsule::CalculateSignature (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height)
 {
-	dgUnsigned32 buffer[4];
+	dgUnsigned64 buffer[4];
 
 	buffer[0] = m_taperedCapsuleCollision;
 	buffer[1] = Quantize (radio0);
@@ -197,7 +197,7 @@ dgInt32 dgCollisionTaperedCapsule::CalculateSignature (dgFloat32 radio0, dgFloat
 	return Quantize(buffer, sizeof (buffer));
 }
 
-dgInt32 dgCollisionTaperedCapsule::CalculateSignature () const
+dgUnsigned64 dgCollisionTaperedCapsule::CalculateSignature () const
 {
 	return CalculateSignature (m_radio0, m_radio1, m_height);
 }

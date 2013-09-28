@@ -177,7 +177,7 @@ class dgCollisionCompoundBreakable: public dgCollisionCompound
 		virtual dgVector CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& plane) const;
 
 		private:
-		virtual dgInt32 CalculateSignature () const;
+		virtual dgUnsigned64 CalculateSignature () const;
 		virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1);
 		virtual dgFloat32 GetBoxMinRadius () const;
 		virtual dgFloat32 GetBoxMaxRadius () const;

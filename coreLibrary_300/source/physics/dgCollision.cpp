@@ -29,8 +29,8 @@
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-//dgCollision::dgCollision(dgMemoryAllocator* const allocator, dgUnsigned32 signature, const dgMatrix& matrix, dgCollisionID id)
-dgCollision::dgCollision(dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgCollisionID id)
+//dgCollision::dgCollision(dgMemoryAllocator* const allocator, dgUnsigned64 signature, const dgMatrix& matrix, dgCollisionID id)
+dgCollision::dgCollision(dgMemoryAllocator* const allocator, dgUnsigned64 signature, dgCollisionID id)
 	:m_inertia(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))	
 	,m_crossInertia(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))		
 	,m_centerOfMass(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))		
@@ -87,14 +87,14 @@ dgCollision::~dgCollision()
 {
 }
 
-dgUnsigned32 dgCollision::Quantize(dgFloat32 value)
+dgUnsigned64 dgCollision::Quantize(dgFloat32 value)
 {
-	return dgUnsigned32 (value * 1024.0f);
+	return dgUnsigned64 (value * 1024.0f);
 }
 
-dgUnsigned32 dgCollision::Quantize(void *buffer, int size)
+dgUnsigned64 dgCollision::Quantize(void* const buffer, int size)
 {
-	dgUnsigned32 crc = dgCRC (buffer, size);
+	dgUnsigned64 crc = dgCRC (buffer, size);
 	return crc;
 }
 

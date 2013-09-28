@@ -143,7 +143,7 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 	,m_scaleType(m_unit)
 {
 	dgInt32 saved;
-	dgInt32 signature;
+	dgInt64 signature;
 	dgInt32 primitive;
 	dgInt32 scaleType;
 	
@@ -165,7 +165,7 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 	dgWorld* const world = (dgWorld*) constWorld;
 	if (saved) {
 		const dgCollision* collision = NULL;
-		dgBodyCollisionList::dgTreeNode* node = world->dgBodyCollisionList::Find (dgUnsigned32 (signature));
+		dgBodyCollisionList::dgTreeNode* node = world->dgBodyCollisionList::Find (signature);
 
 		if (node) {
 			collision = node->GetInfo();
@@ -322,7 +322,7 @@ void dgCollisionInstance::Serialize(dgSerialize callback, void* const userData, 
 {
 	dgInt32 save = saveShape ? 1 : 0;
 	dgInt32 primitiveType = m_childShape->GetCollisionPrimityType();
-	dgInt32 signature = m_childShape->GetSignature();
+	dgInt64 signature = m_childShape->GetSignature();
 	dgInt32 scaleType = m_scaleType;
 
 	callback (userData, &m_globalMatrix, sizeof (m_globalMatrix));

@@ -95,7 +95,7 @@ class dgCollisionDeformableSolidMesh: public dgCollisionDeformableMesh
 */
 
 	void Serialize(dgSerialize callback, void* const userData) const;
-	virtual dgInt32 CalculateSignature () const;
+	virtual dgUnsigned64 CalculateSignature () const;
 
 /*
 	dgParticle m_particles;

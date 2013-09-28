@@ -145,7 +145,7 @@ void dgCollisionMesh::SetCollisionBBox (const dgVector& p0, const dgVector& p1)
 	m_boxOrigin = (p1 + p0).Scale4 (dgFloat32 (0.5f)) & dgVector::m_triplexMask; 
 }
 
-dgInt32 dgCollisionMesh::CalculateSignature () const
+dgUnsigned64 dgCollisionMesh::CalculateSignature () const
 {
 	dgAssert (0);
 	return 0;

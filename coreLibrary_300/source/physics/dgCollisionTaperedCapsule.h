@@ -32,7 +32,7 @@
 class dgCollisionTaperedCapsule: public dgCollisionConvex  
 {
 	public:
-	dgCollisionTaperedCapsule (dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height);
+	dgCollisionTaperedCapsule (dgMemoryAllocator* const allocator, dgUnsigned64 signature, dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height);
 	dgCollisionTaperedCapsule(dgWorld* const world, dgDeserialize deserialization, void* const userData);
 	virtual ~dgCollisionTaperedCapsule();
 
@@ -48,7 +48,7 @@ class dgCollisionTaperedCapsule: public dgCollisionConvex
 
 	virtual void DebugCollision  (const dgMatrix& matrix, OnDebugCollisionMeshCallback callback, void* const userData) const;
 
-	virtual dgInt32 CalculateSignature () const;
+	virtual dgUnsigned64 CalculateSignature () const;
 	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1);
 	virtual dgFloat32 CalculateMassProperties (const dgMatrix& offset, dgVector& inertia, dgVector& crossInertia, dgVector& centerOfMass) const;
 
@@ -65,7 +65,7 @@ class dgCollisionTaperedCapsule: public dgCollisionConvex
 	virtual dgInt32 CalculateContacts (const dgVector& point, const dgVector& normal, dgCollisionParamProxy& proxy, dgVector* const contactsOut) const;
 
 
-	static dgInt32 CalculateSignature (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height);
+	static dgUnsigned64 CalculateSignature (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height);
 
 	dgVector m_sideNormal;
 	dgFloat32 m_height;

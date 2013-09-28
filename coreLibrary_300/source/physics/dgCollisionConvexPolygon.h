@@ -44,7 +44,7 @@ class dgCollisionConvexPolygon: public dgCollisionConvex
 	dgCollisionConvexPolygon (dgMemoryAllocator* const allocator);
 	~dgCollisionConvexPolygon ();
 
-	virtual dgInt32 CalculateSignature () const;
+	virtual dgUnsigned64 CalculateSignature () const;
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
 	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1);
 	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;

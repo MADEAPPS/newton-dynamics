@@ -30,7 +30,7 @@
 class dgCollisionSphere: public dgCollisionConvex
 {
 	public:
-	dgCollisionSphere(dgMemoryAllocator* allocator, dgUnsigned32 signature, dgFloat32 radius);
+	dgCollisionSphere(dgMemoryAllocator* allocator, dgUnsigned64 signature, dgFloat32 radius);
 	dgCollisionSphere(dgWorld* const world, dgDeserialize deserialization, void* const userData);
 	virtual ~dgCollisionSphere();
 
@@ -46,9 +46,9 @@ class dgCollisionSphere: public dgCollisionConvex
 	void TesselateTriangle (dgInt32 level, const dgVector& p0, const dgVector& p1, const dgVector& p2, dgInt32& count, dgVector* ouput) const;
 	
 //	private:
-	static dgInt32 CalculateSignature (dgFloat32 radius);
+	static dgUnsigned64 CalculateSignature (dgFloat32 radius);
 
-	virtual dgInt32 CalculateSignature () const;
+	virtual dgUnsigned64 CalculateSignature () const;
 	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1);
 
 	virtual void MassProperties ();

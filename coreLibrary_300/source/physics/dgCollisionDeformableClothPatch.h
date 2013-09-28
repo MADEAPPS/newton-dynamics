@@ -58,7 +58,7 @@ class dgCollisionDeformableClothPatch: public dgCollisionDeformableMesh
 //	virtual void DebugCollision (const dgMatrix& matrixPtr, OnDebugCollisionMeshCallback callback, void* const userData) const;
 
 	void Serialize(dgSerialize callback, void* const userData) const;
-	virtual dgInt32 CalculateSignature () const;
+	virtual dgUnsigned64 CalculateSignature () const;
 
 	virtual void IntegrateParticles (dgFloat32 timestep);
 	virtual void ResolvePositionsConstraints (dgFloat32 timestep);

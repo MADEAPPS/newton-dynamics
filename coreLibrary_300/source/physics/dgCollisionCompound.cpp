@@ -504,7 +504,7 @@ void dgCollisionCompound::GetAABB (dgVector& boxMin, dgVector& boxMax) const
 }
 
 
-dgInt32 dgCollisionCompound::CalculateSignature () const
+dgUnsigned64 dgCollisionCompound::CalculateSignature () const
 {
 	dgAssert (0);
 	return 0;

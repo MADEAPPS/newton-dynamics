@@ -39,7 +39,7 @@ dgVector dgCollisionSphere::m_unitSphere[DG_SPHERE_VERTEX_COUNT];
 dgConvexSimplexEdge dgCollisionSphere::m_edgeArray[DG_SPHERE_EDGE_COUNT];
 
 
-dgCollisionSphere::dgCollisionSphere(dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgFloat32 radii)
+dgCollisionSphere::dgCollisionSphere(dgMemoryAllocator* const allocator, dgUnsigned64 signature, dgFloat32 radii)
 	:dgCollisionConvex(allocator, signature, m_sphereCollision) 
 {
 	Init (radii, allocator);
@@ -188,9 +188,9 @@ void dgCollisionSphere::SetCollisionBBox (const dgVector& p0__, const dgVector& 
 	dgAssert (0);
 }
 
-dgInt32 dgCollisionSphere::CalculateSignature (dgFloat32 radius)
+dgUnsigned64 dgCollisionSphere::CalculateSignature (dgFloat32 radius)
 {
-	dgUnsigned32 buffer[2];
+	dgUnsigned64 buffer[2];
 	radius = dgAbsf (radius);
 
 	buffer[0] = m_sphereCollision;
@@ -198,7 +198,7 @@ dgInt32 dgCollisionSphere::CalculateSignature (dgFloat32 radius)
 	return Quantize(buffer, sizeof (buffer));
 }
 
-dgInt32 dgCollisionSphere::CalculateSignature () const
+dgUnsigned64 dgCollisionSphere::CalculateSignature () const
 {
 	return CalculateSignature(m_radius);
 }

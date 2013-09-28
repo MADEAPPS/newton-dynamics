@@ -55,11 +55,11 @@ class dgCorkscrewConstraint;
 class dgCollisionDeformableMesh;
 
 
-class dgBodyCollisionList: public dgTree<const dgCollision*, dgUnsigned32>
+class dgBodyCollisionList: public dgTree<const dgCollision*, dgUnsigned64>
 {
 	public:
 	dgBodyCollisionList (dgMemoryAllocator* const allocator)
-		:dgTree<const dgCollision*, dgUnsigned32>(allocator)
+		:dgTree<const dgCollision*, dgUnsigned64>(allocator)
 	{
 	}
 };

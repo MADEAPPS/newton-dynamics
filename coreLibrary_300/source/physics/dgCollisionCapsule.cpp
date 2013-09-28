@@ -36,7 +36,7 @@
 dgInt32 dgCollisionCapsule::m_shapeRefCount = 0;
 dgConvexSimplexEdge dgCollisionCapsule::m_edgeArray[DG_CAPSULE_SEGMENTS * (6 + 8 * (DG_CAP_SEGMENTS - 1))];
 
-dgCollisionCapsule::dgCollisionCapsule(dgMemoryAllocator* allocator, dgUnsigned32 signature, dgFloat32 radius, dgFloat32 height)
+dgCollisionCapsule::dgCollisionCapsule(dgMemoryAllocator* allocator, dgUnsigned64 signature, dgFloat32 radius, dgFloat32 height)
 	:dgCollisionConvex(allocator, signature, m_capsuleCollision)
 {
 	Init (radius, height);
@@ -166,9 +166,9 @@ void dgCollisionCapsule::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVecto
 }
 
 
-dgInt32 dgCollisionCapsule::CalculateSignature (dgFloat32 radius, dgFloat32 height)
+dgUnsigned64 dgCollisionCapsule::CalculateSignature (dgFloat32 radius, dgFloat32 height)
 {
-	dgUnsigned32 buffer[3];
+	dgUnsigned64 buffer[3];
 
 	buffer[0] = m_capsuleCollision;
 	buffer[1] = Quantize (radius);
@@ -176,7 +176,7 @@ dgInt32 dgCollisionCapsule::CalculateSignature (dgFloat32 radius, dgFloat32 heig
 	return Quantize(buffer, sizeof (buffer));
 }
 
-dgInt32 dgCollisionCapsule::CalculateSignature () const
+dgUnsigned64 dgCollisionCapsule::CalculateSignature () const
 {
 	return CalculateSignature (m_radius, m_height);
 }

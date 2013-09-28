@@ -36,7 +36,7 @@
 dgInt32 dgCollisionTaperedCylinder::m_shapeRefCount = 0;
 dgConvexSimplexEdge dgCollisionTaperedCylinder::m_edgeArray[DG_CYLINDER_SEGMENTS * 2 * 3];
 
-dgCollisionTaperedCylinder::dgCollisionTaperedCylinder(dgMemoryAllocator* allocator, dgUnsigned32 signature, dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height)
+dgCollisionTaperedCylinder::dgCollisionTaperedCylinder(dgMemoryAllocator* allocator, dgUnsigned64 signature, dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height)
 	:dgCollisionConvex(allocator, signature, m_taperedCylinderCollision)
 {
 	Init (radio0, radio1, height);
@@ -139,9 +139,9 @@ dgCollisionTaperedCylinder::~dgCollisionTaperedCylinder()
 	dgCollisionConvex::m_vertex = NULL;
 }
 
-dgInt32 dgCollisionTaperedCylinder::CalculateSignature (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height)
+dgUnsigned64 dgCollisionTaperedCylinder::CalculateSignature (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height)
 {
-	dgUnsigned32 buffer[4];
+	dgUnsigned64 buffer[4];
 
 	buffer[0] = m_taperedCylinderCollision;
 	buffer[1] = Quantize (radio0);
@@ -150,7 +150,7 @@ dgInt32 dgCollisionTaperedCylinder::CalculateSignature (dgFloat32 radio0, dgFloa
 	return Quantize(buffer, sizeof (buffer));
 }
 
-dgInt32 dgCollisionTaperedCylinder::CalculateSignature () const
+dgUnsigned64 dgCollisionTaperedCylinder::CalculateSignature () const
 {
 	return CalculateSignature (m_radio0, m_radio1, m_height);
 }

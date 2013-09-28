@@ -121,7 +121,7 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
 	virtual void GetCollidingFaces (dgPolygonMeshDesc* const data) const;
 
-	virtual dgInt32 CalculateSignature () const;
+	virtual dgUnsigned64 CalculateSignature () const;
 	virtual void UpdateCollision ();
 
 	void CalculateContactsToCollisionTree (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy);

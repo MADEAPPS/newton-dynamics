@@ -66,7 +66,7 @@ void dgCollisionDeformableClothPatch::Serialize(dgSerialize callback, void* cons
 */
 }
 
-dgInt32 dgCollisionDeformableClothPatch::CalculateSignature () const
+dgUnsigned64 dgCollisionDeformableClothPatch::CalculateSignature () const
 {
 	dgAssert (0);
 	return 0;

@@ -245,12 +245,12 @@ class dgCollision
 	};													 
 	
 	DG_CLASS_ALLOCATOR(allocator)
-	static dgUnsigned32 Quantize (dgFloat32 value);
-	static dgUnsigned32 Quantize( void* buffer, int size);
+	static dgUnsigned64 Quantize (dgFloat32 value);
+	static dgUnsigned64 Quantize (void* const buffer, int size);
 
 	// these function should be be virtual
 	dgInt32 IsType (dgRTTI type) const; 
-	dgUnsigned32 GetSignature () const;
+	dgUnsigned64 GetSignature () const;
 	dgCollisionID GetCollisionPrimityType () const;
 	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const = 0;
 	virtual dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const = 0;
@@ -293,12 +293,12 @@ class dgCollision
 
 	protected:
 	dgCollision (const dgCollision& source);
-	dgCollision (dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgCollisionID id);
+	dgCollision (dgMemoryAllocator* const allocator, dgUnsigned64 signature, dgCollisionID id);
 	dgCollision (dgWorld* const world, dgDeserialize deserialization, void* const userData);
 	virtual ~dgCollision();
 	
-	void SetSignature (dgInt32 signature);
-	virtual dgInt32 CalculateSignature () const = 0;
+	void SetSignature (dgUnsigned64 signature);
+	virtual dgUnsigned64 CalculateSignature () const = 0;
 
 	dgVector m_inertia;	
 	dgVector m_crossInertia;	
@@ -307,7 +307,7 @@ class dgCollision
 	dgVector m_boxOrigin;
 	dgInt32 m_rtti;
 	mutable dgInt32 m_refCount;
-	dgUnsigned32 m_signature;
+	dgUnsigned64 m_signature;
 	dgCollisionID m_collisionId;
 	dgMemoryAllocator* m_allocator;
 
@@ -324,14 +324,14 @@ DG_INLINE dgCollisionID dgCollision::GetCollisionPrimityType () const
 	return m_collisionId;
 }
 
-DG_INLINE dgUnsigned32 dgCollision::GetSignature () const
+DG_INLINE dgUnsigned64 dgCollision::GetSignature () const
 {
 	return m_signature;
 }
 
-DG_INLINE void dgCollision::SetSignature (dgInt32 signature)
+DG_INLINE void dgCollision::SetSignature (dgUnsigned64 signature)
 {
-	m_signature = dgUnsigned32 (signature);
+	m_signature = signature;
 }
 
 

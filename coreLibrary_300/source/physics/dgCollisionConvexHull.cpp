@@ -44,7 +44,7 @@ class dgCollisionConvexHull::dgConvexBox
 	dgInt32 m_rightBox;
 }DG_GCC_VECTOR_ALIGMENT;
 
-dgCollisionConvexHull::dgCollisionConvexHull(dgMemoryAllocator* const allocator, dgUnsigned32 signature)
+dgCollisionConvexHull::dgCollisionConvexHull(dgMemoryAllocator* const allocator, dgUnsigned64 signature)
 	:dgCollisionConvex(allocator, signature, m_convexHullCollision)
 	,m_faceCount (0)
 	,m_supportTreeCount (0)
@@ -58,7 +58,7 @@ dgCollisionConvexHull::dgCollisionConvexHull(dgMemoryAllocator* const allocator,
 	m_rtti |= dgCollisionConvexHull_RTTI;
 }
 
-dgCollisionConvexHull::dgCollisionConvexHull(dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgInt32 count, dgInt32 strideInBytes, dgFloat32 tolerance, const dgFloat32* const vertexArray)
+dgCollisionConvexHull::dgCollisionConvexHull(dgMemoryAllocator* const allocator, dgUnsigned64 signature, dgInt32 count, dgInt32 strideInBytes, dgFloat32 tolerance, const dgFloat32* const vertexArray)
 	:dgCollisionConvex(allocator, signature, m_convexHullCollision)
 	,m_faceCount (0)
 	,m_supportTreeCount (0)
@@ -707,9 +707,9 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 
 
 
-dgInt32 dgCollisionConvexHull::CalculateSignature (dgInt32 vertexCount, const dgFloat32* const vertexArray, dgInt32 strideInBytes)
+dgUnsigned64 dgCollisionConvexHull::CalculateSignature (dgInt32 vertexCount, const dgFloat32* const vertexArray, dgInt32 strideInBytes)
 {
-	dgStack<dgUnsigned32> buffer(1 + 3 * vertexCount);  
+	dgStack<dgUnsigned64> buffer(1 + 3 * vertexCount);  
 
 	dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat32));
 
@@ -724,7 +724,7 @@ dgInt32 dgCollisionConvexHull::CalculateSignature (dgInt32 vertexCount, const dg
 	return Quantize(&buffer[0], buffer.GetSizeInBytes());
 }
 
-dgInt32 dgCollisionConvexHull::CalculateSignature () const
+dgUnsigned64 dgCollisionConvexHull::CalculateSignature () const
 {
 	return dgInt32 (GetSignature());
 //	return CalculateSignature (m_vertexCount, &m_vertex[0].m_x, sizeof (dgVector));
