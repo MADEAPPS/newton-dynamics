@@ -932,10 +932,14 @@ void NewtonModelEditor::OnMesh (wxCommandEvent& event)
 
 	dPluginScene* const asset = plugin->Create (this);
 	if (asset) {
-		GetScene()->MergeScene(this, asset);
+		dPluginScene* const oldScene = GetScene();
+		oldScene->AddRef();
+		oldScene ->MergeScene(this, asset);
+		dPluginScene* const newScene = GetScene();
 		asset->Release();
 		RefrehViewports();
-		m_explorer->ReconstructScene(GetScene());
+		m_explorer->ReconstructScene(newScene);
+		oldScene->Release();
 	}
 }
 
