@@ -143,7 +143,7 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 	,m_scaleType(m_unit)
 {
 	dgInt32 saved;
-	dgInt64 signature;
+	dgInt32 signature;
 	dgInt32 primitive;
 	dgInt32 scaleType;
 	
@@ -162,13 +162,14 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 
 	m_scaleType = dgScaleType(scaleType);
 
+
 	dgWorld* const world = (dgWorld*) constWorld;
 	if (saved) {
 		const dgCollision* collision = NULL;
-		dgBodyCollisionList::dgTreeNode* node = world->dgBodyCollisionList::Find (signature);
+		dgBodyCollisionList::dgTreeNode* node = world->dgBodyCollisionList::Find (dgUnsigned32 (signature));
 
 		if (node) {
-			collision = node->GetInfo();
+			collision = node->GetInfo().m_collision;
 			collision->AddRef();
 
 		} else {
@@ -206,7 +207,7 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 				case m_sphereCollision:
 				{
 					collision = new (allocator) dgCollisionSphere (world, deserialization, userData);
-					node = world->dgBodyCollisionList::Insert (collision, collision->GetSignature());
+					node = world->dgBodyCollisionList::Insert (CollisionKeyPair(collision, collision->GetSignature()), collision->GetSignature());
 					collision->AddRef();
 					break;
 				}
@@ -214,7 +215,7 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 				case m_boxCollision:
 				{
 					collision = new (allocator) dgCollisionBox (world, deserialization, userData);
-					node = world->dgBodyCollisionList::Insert (collision, collision->GetSignature());
+					node = world->dgBodyCollisionList::Insert (CollisionKeyPair(collision, collision->GetSignature()), collision->GetSignature());
 					collision->AddRef();
 					break;
 				}
@@ -222,7 +223,7 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 				case m_coneCollision:
 				{
 					collision = new (allocator) dgCollisionCone (world, deserialization, userData);
-					node = world->dgBodyCollisionList::Insert (collision, collision->GetSignature());
+					node = world->dgBodyCollisionList::Insert (CollisionKeyPair(collision, collision->GetSignature()), collision->GetSignature());
 					collision->AddRef();
 					break;
 				}
@@ -230,7 +231,7 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 				case m_capsuleCollision:
 				{
 					collision = new (allocator) dgCollisionCapsule (world, deserialization, userData);
-					node = world->dgBodyCollisionList::Insert (collision, collision->GetSignature());
+					node = world->dgBodyCollisionList::Insert (CollisionKeyPair(collision, collision->GetSignature()), collision->GetSignature());
 					collision->AddRef();
 					break;
 				}
@@ -238,7 +239,7 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 				case m_taperedCapsuleCollision:
 				{
 					collision = new (allocator) dgCollisionTaperedCapsule (world, deserialization, userData);
-					node = world->dgBodyCollisionList::Insert (collision, collision->GetSignature());
+					node = world->dgBodyCollisionList::Insert (CollisionKeyPair(collision, collision->GetSignature()), collision->GetSignature());
 					collision->AddRef();
 					break;
 				}
@@ -246,7 +247,7 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 				case m_cylinderCollision:
 				{
 					collision = new (allocator) dgCollisionCylinder (world, deserialization, userData);
-					node = world->dgBodyCollisionList::Insert (collision, collision->GetSignature());
+					node = world->dgBodyCollisionList::Insert (CollisionKeyPair(collision, collision->GetSignature()), collision->GetSignature());
 					collision->AddRef();
 					break;
 				}
@@ -254,7 +255,7 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 				case m_chamferCylinderCollision:
 				{
 					collision = new (allocator) dgCollisionChamferCylinder (world, deserialization, userData);
-					node = world->dgBodyCollisionList::Insert (collision, collision->GetSignature());
+					node = world->dgBodyCollisionList::Insert (CollisionKeyPair(collision, collision->GetSignature()), collision->GetSignature());
 					collision->AddRef();
 					break;
 				}
@@ -262,7 +263,7 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 				case m_taperedCylinderCollision:
 				{
 					collision = new (allocator) dgCollisionTaperedCylinder (world, deserialization, userData);
-					node = world->dgBodyCollisionList::Insert (collision, collision->GetSignature());
+					node = world->dgBodyCollisionList::Insert (CollisionKeyPair(collision, collision->GetSignature()), collision->GetSignature());
 					collision->AddRef();
 					break;
 				}
@@ -270,7 +271,7 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 				case m_convexHullCollision:
 				{
 					collision = new (allocator) dgCollisionConvexHull (world, deserialization, userData);
-					node = world->dgBodyCollisionList::Insert (collision, collision->GetSignature());
+					node = world->dgBodyCollisionList::Insert (CollisionKeyPair(collision, collision->GetSignature()), collision->GetSignature());
 					collision->AddRef();
 					break;
 				}
@@ -278,27 +279,22 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 				case m_nullCollision:
 				{
 					collision = new (allocator) dgCollisionNull (world, deserialization, userData);
-					node = world->dgBodyCollisionList::Insert (collision, collision->GetSignature());
+					node = world->dgBodyCollisionList::Insert (CollisionKeyPair(collision, collision->GetSignature()), collision->GetSignature());
 					collision->AddRef();
 					break;
 				}
 
+//				case m_deformableMesh:
+//				{
+//					dgAssert (0);
+//					return NULL;
+//				}
+//				case m_compoundBreakable:
+//				{
+//					collision = new (allocator) dgCollisionCompoundBreakable (this, deserialization, userData);
+//					break;
+//				}
 
-	/*
-				case m_deformableMesh:
-				{
-					dgAssert (0);
-					return NULL;
-				}
-
-
-
-				case m_compoundBreakable:
-				{
-					collision = new (allocator) dgCollisionCompoundBreakable (this, deserialization, userData);
-					break;
-				}
-	*/
 
 				default:
 				dgAssert (0);
@@ -322,7 +318,7 @@ void dgCollisionInstance::Serialize(dgSerialize callback, void* const userData, 
 {
 	dgInt32 save = saveShape ? 1 : 0;
 	dgInt32 primitiveType = m_childShape->GetCollisionPrimityType();
-	dgInt64 signature = m_childShape->GetSignature();
+	dgInt32 signature = m_childShape->GetSignature();
 	dgInt32 scaleType = m_scaleType;
 
 	callback (userData, &m_globalMatrix, sizeof (m_globalMatrix));

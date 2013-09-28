@@ -3151,7 +3151,7 @@ dgCollisionInstance* dgMeshEffect::CreateConvexCollision(dgWorld* const world, d
 	matrix.m_posit += matrix.RotateVector(com);
 	matrix.m_posit.m_w = dgFloat32 (1.0f);
 
-	dgUnsigned64 crc = dgCollisionConvexHull::CalculateSignature (count, &pool[0].m_x, sizeof (dgVector));
+	dgUnsigned32 crc = dgCollisionConvexHull::CalculateSignature (count, &pool[0].m_x, sizeof (dgVector));
 	dgCollisionConvexHull* const collision = new (GetAllocator()) dgCollisionConvexHull (GetAllocator(), crc, count, sizeof (dgVector), dgFloat32 (tolerance), &pool[0].m_x);
 	if (!collision->GetConvexVertexCount()) {
 		collision->Release();

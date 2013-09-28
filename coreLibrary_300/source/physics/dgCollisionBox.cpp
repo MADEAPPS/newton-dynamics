@@ -63,7 +63,7 @@ dgConvexSimplexEdge* dgCollisionBox::m_vertexToEdgeMap[] = {&m_edgeArray[1], &m_
 															&m_edgeArray[11], &m_edgeArray[8], &m_edgeArray[5], &m_edgeArray[2],
 															&m_edgeArray[14], &m_edgeArray[16], &m_edgeArray[17], &m_edgeArray[20]};
 
-dgCollisionBox::dgCollisionBox(dgMemoryAllocator* allocator, dgUnsigned64 signature, dgFloat32 size_x, dgFloat32 size_y, dgFloat32 size_z)
+dgCollisionBox::dgCollisionBox(dgMemoryAllocator* allocator, dgUnsigned32 signature, dgFloat32 size_x, dgFloat32 size_y, dgFloat32 size_z)
 	:dgCollisionConvex(allocator, signature, m_boxCollision)
 {
 	Init (size_x, size_y, size_z);
@@ -120,9 +120,9 @@ void dgCollisionBox::SetCollisionBBox (const dgVector& p0__, const dgVector& p1_
 	dgAssert (0);
 }
 
-dgUnsigned64 dgCollisionBox::CalculateSignature (dgFloat32 dx, dgFloat32 dy, dgFloat32 dz)
+dgInt32 dgCollisionBox::CalculateSignature (dgFloat32 dx, dgFloat32 dy, dgFloat32 dz)
 {
-	dgUnsigned64 buffer[4];
+	dgUnsigned32 buffer[4];
 
 	dx = dgAbsf (dx);
 	dy = dgAbsf (dy);
@@ -135,7 +135,7 @@ dgUnsigned64 dgCollisionBox::CalculateSignature (dgFloat32 dx, dgFloat32 dy, dgF
 }
 
 
-dgUnsigned64 dgCollisionBox::CalculateSignature () const
+dgInt32 dgCollisionBox::CalculateSignature () const
 {
 	return CalculateSignature(m_size[0].m_x, m_size[0].m_y, m_size[0].m_z);
 }

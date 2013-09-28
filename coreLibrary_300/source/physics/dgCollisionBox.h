@@ -30,7 +30,7 @@ class dgCollisionBox: public dgCollisionConvex
 {
 	public:
 
-	dgCollisionBox(dgMemoryAllocator* const allocator, dgUnsigned64 signature, dgFloat32 size_x, dgFloat32 size_y, dgFloat32 size_z);
+	dgCollisionBox(dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgFloat32 size_x, dgFloat32 size_y, dgFloat32 size_z);
 	dgCollisionBox(dgWorld* const world, dgDeserialize deserialization, void* const userData);
 	virtual ~dgCollisionBox();
 
@@ -41,14 +41,14 @@ class dgCollisionBox: public dgCollisionConvex
 	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
 	virtual dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const;
 	
-	virtual dgUnsigned64 CalculateSignature () const;
+	virtual dgInt32 CalculateSignature () const;
 	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1);
 	virtual void MassProperties ();
 
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
 
-	static dgUnsigned64 CalculateSignature (dgFloat32 dx, dgFloat32 dy, dgFloat32 dz);
+	static dgInt32 CalculateSignature (dgFloat32 dx, dgFloat32 dy, dgFloat32 dz);
 
 	dgVector m_size[2];
 	dgVector m_vertex[8];

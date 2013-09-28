@@ -82,7 +82,7 @@ class dgCollisionConvex: public dgCollision
 	//dgInt32 ConvexCastContacts (const dgMatrix& matrix, const dgMatrix& invMatrix, const dgVector& veloc, dgFloat32& timeStep, const dgCollisionConvex* const convexShape, dgContactPoint* const contact) const;
 
 	protected:
-	dgCollisionConvex (dgMemoryAllocator* const allocator, dgUnsigned64 signature, dgCollisionID id);
+	dgCollisionConvex (dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgCollisionID id);
 	dgCollisionConvex (dgWorld* const world, dgDeserialize deserialization, void* const userData);
 	~dgCollisionConvex ();
 

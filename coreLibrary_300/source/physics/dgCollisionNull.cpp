@@ -31,7 +31,7 @@
 
 
 
-dgCollisionNull::dgCollisionNull(dgMemoryAllocator* const allocator, dgUnsigned64 signature)
+dgCollisionNull::dgCollisionNull(dgMemoryAllocator* const allocator, dgUnsigned32 signature)
 	:dgCollisionConvex(allocator, signature, m_nullCollision) 
 {
 	m_rtti |= dgCollisionNull_RTTI;
@@ -63,9 +63,9 @@ void dgCollisionNull::DebugCollision (const dgMatrix& matrixPtr, OnDebugCollisio
 }
 
 
-dgUnsigned64 dgCollisionNull::CalculateSignature () const
+dgInt32 dgCollisionNull::CalculateSignature () const
 {
-	return dgUnsigned64 (GetSignature());
+	return dgInt32 (GetSignature());
 }
 
 void dgCollisionNull::CalcAABB (const dgMatrix& matrix, dgVector &p0, dgVector &p1) const

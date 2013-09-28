@@ -30,14 +30,15 @@ class dgCollisionConvexHull: public dgCollisionConvex
 	public:
 	class dgConvexBox;
 
-	dgCollisionConvexHull(dgMemoryAllocator* const allocator, dgUnsigned64 signature);
-	dgCollisionConvexHull(dgMemoryAllocator* const allocator, dgUnsigned64 signature, dgInt32 count, dgInt32 strideInBytes, dgFloat32 tolerance, const dgFloat32* const vertexArray);
+	dgCollisionConvexHull(dgMemoryAllocator* const allocator, dgUnsigned32 signature);
+	dgCollisionConvexHull(dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgInt32 count, dgInt32 strideInBytes, dgFloat32 tolerance, const dgFloat32* const vertexArray);
 	dgCollisionConvexHull(dgWorld* const world, dgDeserialize deserialization, void* const userData);
 	virtual ~dgCollisionConvexHull();
 
 	dgInt32 GetFaceIndices (dgInt32 index, dgInt32* const indices) const;
 
-	static dgUnsigned64 CalculateSignature (dgInt32 vertexCount, const dgFloat32* const vertexArray, dgInt32 strideInBytes);
+	static dgInt32 CalculateSignature (dgInt32 vertexCount, const dgFloat32* const vertexArray, dgInt32 strideInBytes);
+	static dgInt32 CalculatePinNumber (dgInt32 vertexCount, const dgFloat32* const vertexArray, dgInt32 strideInBytes);
 
 	protected:
 	void BuildHull (dgInt32 count, dgInt32 strideInBytes, dgFloat32 tolerance, const dgFloat32* const vertexArray);
@@ -49,7 +50,7 @@ class dgCollisionConvexHull: public dgCollisionConvex
 
 	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
 
-	virtual dgUnsigned64 CalculateSignature () const;
+	virtual dgInt32 CalculateSignature () const;
 	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1);
 	virtual void DebugCollision  (const dgMatrix& matrix, OnDebugCollisionMeshCallback callback, void* const userData) const;
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;

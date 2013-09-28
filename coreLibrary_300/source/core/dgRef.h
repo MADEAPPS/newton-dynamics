@@ -61,8 +61,8 @@ class dgRef: public dgRefFlags
 	DG_CLASS_ALLOCATOR(allocator)
 
 	virtual dgRef *CreateClone ()	const;
-	virtual dgUnsigned64 GetTypeId () const;
-	virtual bool IsType (dgUnsigned64 typeId) const;
+	virtual dgUnsigned32 GetTypeId () const;
+	virtual bool IsType (dgUnsigned32 typeId) const;
 
 	bool GetUserFlag0 () const;
 	bool GetUserFlag1 () const;
@@ -74,21 +74,21 @@ class dgRef: public dgRefFlags
 	virtual void Unkill();
 
 	const char* GetName () const;
-	dgUnsigned64 GetNameID () const;
-	inline void SetNameID (dgUnsigned64 newID);
-	virtual inline void SetName (const char* const name);
+	dgUnsigned32 GetNameID () const;
+	inline void SetNameID (dgUnsigned32 newID);
+	virtual inline void SetName (const char *name);
 
-	void AttachRef (dgRef **oldRef, dgRef* newRef);
+	void AttachRef (dgRef **oldRef, dgRef *newRef);
 
 	
 	bool IsTypeByName (const char *typeName) const;
-	static dgUnsigned64 GetRttiType();
+	static dgUnsigned32 GetRttiType();
 
 	protected:
 	virtual ~dgRef (); 
 
 	private:
-	dgUnsigned64 m_id;
+	dgUnsigned32 m_id;
 	static dgRtti m_rtti;
 };
 
@@ -159,17 +159,17 @@ inline dgRef *dgRef::CreateClone () const
 }
 
 
-inline dgUnsigned64 dgRef::GetTypeId () const
+inline dgUnsigned32 dgRef::GetTypeId () const
 {
 	return m_rtti.GetTypeId ();
 }
 
-inline bool dgRef::IsType (dgUnsigned64 typeId) const
+inline bool dgRef::IsType (dgUnsigned32 typeId) const
 {
 	return m_rtti.IsTypeID (typeId);
 }
 
-inline dgUnsigned64 dgRef::GetRttiType()
+inline dgUnsigned32 dgRef::GetRttiType()
 {
 	return m_rtti.GetTypeId();
 }
@@ -217,17 +217,17 @@ inline void dgRef::Unkill()
 	m_alive = true;
 }
 
-inline void dgRef::SetNameID (dgUnsigned64 newID)
+inline void dgRef::SetNameID (dgUnsigned32 newID)
 {
 	m_id = newID;
 }
 
-inline dgUnsigned64 dgRef::GetNameID () const
+inline dgUnsigned32 dgRef::GetNameID () const
 {
 	return m_id;
 }
 
-inline void dgRef::SetName (const char* const name)
+inline void dgRef::SetName (const char *name)
 {
 	SetNameID (0);
 	if (name) {

@@ -30,7 +30,7 @@
 class dgCollisionCone: public dgCollisionConvex  
 {
 	public:
-	dgCollisionCone (dgMemoryAllocator* const allocator, dgUnsigned64 signature, dgFloat32 radius, dgFloat32 height);
+	dgCollisionCone (dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgFloat32 radius, dgFloat32 height);
 	dgCollisionCone(dgWorld* const world, dgDeserialize deserialization, void* const userData);
 	virtual ~dgCollisionCone();
 
@@ -43,12 +43,12 @@ class dgCollisionCone: public dgCollisionConvex
 	virtual void MassProperties ();
 	virtual void DebugCollision  (const dgMatrix& matrix, OnDebugCollisionMeshCallback callback, void* const userData) const;
 	
-	virtual dgUnsigned64 CalculateSignature () const;
+	virtual dgInt32 CalculateSignature () const;
 	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1);
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
 
-	static dgUnsigned64 CalculateSignature (dgFloat32 radius, dgFloat32 height);
+	static dgInt32 CalculateSignature (dgFloat32 radius, dgFloat32 height);
 
 	dgFloat32 m_height;
 	dgFloat32 m_radius;

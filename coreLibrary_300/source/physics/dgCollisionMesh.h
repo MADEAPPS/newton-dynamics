@@ -253,7 +253,7 @@ class dgCollisionMesh: public dgCollision
 	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1);
 
 	private:
-	virtual dgUnsigned64 CalculateSignature () const;
+	virtual dgInt32 CalculateSignature () const;
 	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
 
 	virtual void CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;

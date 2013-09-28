@@ -34,7 +34,7 @@ dgInt32 dgCollisionChamferCylinder::m_shapeRefCount = 0;
 dgVector dgCollisionChamferCylinder::m_shapesDirs[DG_MAX_CHAMFERCYLINDER_DIR_COUNT];
 dgConvexSimplexEdge dgCollisionChamferCylinder::m_edgeArray[(4 * DG_CHAMFERCYLINDER_SLICES + 2)* DG_CHAMFERCYLINDER_BRAKES];
 
-dgCollisionChamferCylinder::dgCollisionChamferCylinder(dgMemoryAllocator* allocator, dgUnsigned64 signature, dgFloat32 radius, dgFloat32 height)
+dgCollisionChamferCylinder::dgCollisionChamferCylinder(dgMemoryAllocator* allocator, dgUnsigned32 signature, dgFloat32 radius, dgFloat32 height)
 	:dgCollisionConvex(allocator, signature, m_chamferCylinderCollision)
 {
 	Init (radius, height);
@@ -204,18 +204,18 @@ void dgCollisionChamferCylinder::DebugCollision (const dgMatrix& matrix, OnDebug
 }
 
 
-dgUnsigned64 dgCollisionChamferCylinder::CalculateSignature (dgFloat32 radius, dgFloat32 height)
+dgInt32 dgCollisionChamferCylinder::CalculateSignature (dgFloat32 radius, dgFloat32 height)
 {
-	dgUnsigned64 buffer[3];
+	dgUnsigned32 buffer[3];
 
 	memset (buffer, 0, sizeof (buffer));
 	buffer[0] = m_chamferCylinderCollision;
 	buffer[1] = dgCollision::Quantize (radius);
 	buffer[2] = dgCollision::Quantize (height);
-	return dgCollision::Quantize(buffer, sizeof (buffer));
+	return dgInt32 (dgCollision::Quantize(buffer, sizeof (buffer)));
 }
 
-dgUnsigned64 dgCollisionChamferCylinder::CalculateSignature () const
+dgInt32 dgCollisionChamferCylinder::CalculateSignature () const
 {
 	return CalculateSignature (m_radius, m_height);
 }

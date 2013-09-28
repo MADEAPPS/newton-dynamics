@@ -51,7 +51,7 @@ dgCollisionConvexPolygon::~dgCollisionConvexPolygon ()
 }
 
 
-dgUnsigned64 dgCollisionConvexPolygon::CalculateSignature () const
+dgInt32 dgCollisionConvexPolygon::CalculateSignature () const
 {
 	return DG_CONVEX_POLYGON_CRC;
 }

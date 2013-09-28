@@ -1601,7 +1601,7 @@ void dgCollisionDeformableSolidMesh::Serialize(dgSerialize callback, void* const
 */
 }
 
-dgUnsigned64 dgCollisionDeformableSolidMesh::CalculateSignature () const
+dgInt32 dgCollisionDeformableSolidMesh::CalculateSignature () const
 {
 	dgAssert (0);
 	return 0;

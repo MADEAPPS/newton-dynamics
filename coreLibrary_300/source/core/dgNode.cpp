@@ -184,7 +184,7 @@ dgBaseNode* dgBaseNode::GetPrev() const
 
 
 
-dgBaseNode* dgBaseNode::Find (dgUnsigned64 nameCRC) const 
+dgBaseNode* dgBaseNode::Find (dgUnsigned32 nameCRC) const 
 {
 	dgBaseNode *ptr = GetFirst();
 	for (; ptr; ptr = ptr->GetNext()) {

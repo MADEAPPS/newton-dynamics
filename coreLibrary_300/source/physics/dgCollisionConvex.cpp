@@ -1446,7 +1446,7 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-dgCollisionConvex::dgCollisionConvex (dgMemoryAllocator* const allocator, dgUnsigned64 signature, dgCollisionID id)
+dgCollisionConvex::dgCollisionConvex (dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgCollisionID id)
 	:dgCollision(allocator, signature, id) 
 	,m_userData (NULL)
 	,m_vertex (NULL)

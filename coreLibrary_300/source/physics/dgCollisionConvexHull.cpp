@@ -44,7 +44,7 @@ class dgCollisionConvexHull::dgConvexBox
 	dgInt32 m_rightBox;
 }DG_GCC_VECTOR_ALIGMENT;
 
-dgCollisionConvexHull::dgCollisionConvexHull(dgMemoryAllocator* const allocator, dgUnsigned64 signature)
+dgCollisionConvexHull::dgCollisionConvexHull(dgMemoryAllocator* const allocator, dgUnsigned32 signature)
 	:dgCollisionConvex(allocator, signature, m_convexHullCollision)
 	,m_faceCount (0)
 	,m_supportTreeCount (0)
@@ -58,7 +58,7 @@ dgCollisionConvexHull::dgCollisionConvexHull(dgMemoryAllocator* const allocator,
 	m_rtti |= dgCollisionConvexHull_RTTI;
 }
 
-dgCollisionConvexHull::dgCollisionConvexHull(dgMemoryAllocator* const allocator, dgUnsigned64 signature, dgInt32 count, dgInt32 strideInBytes, dgFloat32 tolerance, const dgFloat32* const vertexArray)
+dgCollisionConvexHull::dgCollisionConvexHull(dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgInt32 count, dgInt32 strideInBytes, dgFloat32 tolerance, const dgFloat32* const vertexArray)
 	:dgCollisionConvex(allocator, signature, m_convexHullCollision)
 	,m_faceCount (0)
 	,m_supportTreeCount (0)
@@ -705,12 +705,9 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 }
 
 
-
-
-dgUnsigned64 dgCollisionConvexHull::CalculateSignature (dgInt32 vertexCount, const dgFloat32* const vertexArray, dgInt32 strideInBytes)
+dgInt32 dgCollisionConvexHull::CalculateSignature (dgInt32 vertexCount, const dgFloat32* const vertexArray, dgInt32 strideInBytes)
 {
-	dgStack<dgUnsigned64> buffer(1 + 3 * vertexCount);  
-
+	dgStack<dgUnsigned32> buffer(1 + 3 * vertexCount);  
 	dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat32));
 
 	memset (&buffer[0], 0, size_t (buffer.GetSizeInBytes()));
@@ -724,7 +721,24 @@ dgUnsigned64 dgCollisionConvexHull::CalculateSignature (dgInt32 vertexCount, con
 	return Quantize(&buffer[0], buffer.GetSizeInBytes());
 }
 
-dgUnsigned64 dgCollisionConvexHull::CalculateSignature () const
+dgInt32 dgCollisionConvexHull::CalculatePinNumber (dgInt32 vertexCount, const dgFloat32* const vertexArray, dgInt32 strideInBytes)
+{
+	dgStack<dgUnsigned32> buffer(1 + 3 * vertexCount);  
+	dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat32));
+
+	memset (&buffer[0], 0, size_t (buffer.GetSizeInBytes()));
+	buffer[0] = m_convexHullCollision;
+
+	for (dgInt32 i = 0; i < vertexCount; i ++) {
+		buffer[1 + i * 3 + 0] = dgCollision::Quantize (vertexArray[i * stride + 2]);
+		buffer[1 + i * 3 + 1] = dgCollision::Quantize (vertexArray[i * stride + 0]);
+		buffer[1 + i * 3 + 2] = dgCollision::Quantize (vertexArray[i * stride + 1]);
+	}
+
+	return Quantize(&buffer[0], buffer.GetSizeInBytes());
+}
+
+dgInt32 dgCollisionConvexHull::CalculateSignature () const
 {
 	return dgInt32 (GetSignature());
 //	return CalculateSignature (m_vertexCount, &m_vertex[0].m_x, sizeof (dgVector));

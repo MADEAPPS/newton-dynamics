@@ -25,10 +25,11 @@
 #include "dgStdafx.h"
 
 
-dgUnsigned64 dgApi dgCRC (const char* const string);
-dgUnsigned64 dgApi dgCRC (const void* const buffer, dgInt32 size, dgUnsigned64 crcAcc = 0);
-const char* dgApi dgInverseCRC (dgUnsigned64 CRC);
-dgUnsigned64 dgApi dgHash (const void* const string, dgInt32 size);
+dgUnsigned32 dgApi dgCRC (const char* const string);
+dgUnsigned32 dgApi dgCRC (const void* const buffer, dgInt32 size, dgUnsigned32 crcAcc = 0);
+const char* dgApi dgInverseCRC (dgUnsigned32 CRC);
+
+dgUnsigned32 dgApi dgHash (const void* const string, dgInt32 size);
 
 #endif
 

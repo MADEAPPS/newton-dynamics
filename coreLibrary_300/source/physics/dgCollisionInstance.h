@@ -93,7 +93,7 @@ class dgCollisionInstance
 	void SetBreakImpulse(dgFloat32 force);
 	dgFloat32 GetBreakImpulse() const;
 
-	dgUnsigned64 GetSignature () const;
+	dgUnsigned32 GetSignature () const;
 	dgCollisionID GetCollisionPrimityType () const;
 
 	void CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
@@ -109,7 +109,7 @@ class dgCollisionInstance
 	dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
 	dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const;
 
-	dgUnsigned64 CalculateSignature () const;
+	dgInt32 CalculateSignature () const;
 	void SetCollisionBBox (const dgVector& p0, const dgVector& p1);
 
 	dgInt32 GetConvexVertexCount() const; 
@@ -300,7 +300,7 @@ DG_INLINE void dgCollisionInstance::SetUserDataID (dgUnsigned32 userDataId)
 	m_userDataID = userDataId;
 }
 
-DG_INLINE dgUnsigned64 dgCollisionInstance::GetSignature () const
+DG_INLINE dgUnsigned32 dgCollisionInstance::GetSignature () const
 {
 	return m_childShape->GetSignature();
 }
@@ -366,7 +366,7 @@ DG_INLINE void dgCollisionInstance::SetCollisionBBox (const dgVector& p0, const 
 	dgAssert (0);
 }
 
-DG_INLINE dgUnsigned64 dgCollisionInstance::CalculateSignature () const
+DG_INLINE dgInt32 dgCollisionInstance::CalculateSignature () const
 {
 	dgAssert (0);
 	return 0;
