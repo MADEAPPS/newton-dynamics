@@ -28,7 +28,7 @@ dUndoCurrentScene::dUndoCurrentScene(dPluginInterface* const interface)
 	,m_interface(interface)
 	,m_backup()
 {
-
+/*
 	dPluginScene* const scene = interface->GetScene();
 
 	m_backup = new dPluginScene(scene->GetNewtonWorld());
@@ -68,6 +68,12 @@ dUndoCurrentScene::dUndoCurrentScene(dPluginInterface* const interface)
 			m_exploreStatus.Insert (interface->GetExplorerExpandNodeState(link) ? 1 : 0, childLink);
 		}
 	}
+*/
+	dPluginScene* const scene = interface->GetScene();
+	dPluginScene* const newScene = new dPluginScene(*scene);
+	m_backup = scene;
+	m_backup->AddRef();
+	interface->SetScene(newScene);
 }
 
 
@@ -85,6 +91,7 @@ dUndoRedo* dUndoCurrentScene::CreateRedoState() const
 
 void dUndoCurrentScene::RestoreState()
 {
+/*
 //	if (m_backup.m_asset) {
 //		dScene::dTreeNode* const rootNode = m_backup.m_asset->GetRootNode();
 
@@ -118,4 +125,9 @@ void dUndoCurrentScene::RestoreState()
 //			m_interface->AddExplorerExpandNode (link, expandNode->GetInfo() ? true : false);
 //		}
 //	}
+*/
+
+	dPluginScene* const scene = m_interface->GetScene();
+	scene->Release();
+	m_interface->SetScene(m_backup);
 }
