@@ -816,7 +816,11 @@ void dScene::MergeScene (dScene* const scene)
 
 void dScene::UnmergeScene (dScene* const scene)
 {
+	dTree<const dTreeNode*, const dNodeInfo*> map;
 
+	for (dTreeNode* node = GetFirstNode(); node; node = GetNextNode(node)) {
+		map.Insert(node, GetInfoFromNode(node));
+	}
 }
 
 void dScene::DeleteNode (dTreeNode* const node)
