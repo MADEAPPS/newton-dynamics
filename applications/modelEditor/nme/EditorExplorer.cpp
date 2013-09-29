@@ -139,6 +139,9 @@ EditorExplorer::EditorExplorer(NewtonModelEditor* const mainFrame)
 	imageList->Add (*m_mainFrame->FindIcon ("explorer.gif"));
 	imageList->Add (*m_mainFrame->FindIcon ("cache.gif"));
 	imageList->Add (*m_mainFrame->FindIcon ("sceneNode.gif"));
+	imageList->Add (*m_mainFrame->FindIcon ("texture.gif"));
+	imageList->Add (*m_mainFrame->FindIcon ("material.gif"));
+	imageList->Add (*m_mainFrame->FindIcon ("geometry.gif"));
 
 	AssignImageList(imageList);
 	
@@ -316,10 +319,21 @@ void EditorExplorer::ReconstructScene(const dPluginScene* const scene)
 					PrependItem(rootItem, wxT(info->GetName()), 1, -1, new ExplorerData(childNode));
 				} else {
 					int imageId = -1;
-					if (info->IsType(dSceneModelInfo::GetRttiType())) {
+					if (info->IsType(dSceneNodeInfo::GetRttiType())) {
 						imageId = 2;
+					} else if (info->IsType(dTextureNodeInfo::GetRttiType())) {
+						imageId = 3;
+					} else if (info->IsType(dMaterialNodeInfo::GetRttiType())) {
+						imageId = 4;
+					} else if (info->IsType(dGeometryNodeInfo::GetRttiType())) {
+						imageId = 5;
 					}
-					AppendItem(rootItem, wxT(info->GetName()), imageId, -1, new ExplorerData(childNode));
+
+					if (info->IsType(dGeometryNodeInfo::GetRttiType())) {
+						PrependItem(rootItem, wxT(info->GetName()), imageId, -1, new ExplorerData(childNode));
+					} else {
+						AppendItem(rootItem, wxT(info->GetName()), imageId, -1, new ExplorerData(childNode));
+					}
 				}
 			}
 		}

@@ -635,6 +635,9 @@ void NewtonModelEditor::LoadResources ()
 	LoadIcon ("explorer.gif");
 	LoadIcon ("sceneNode.gif");
 	LoadIcon ("cache.gif");
+	LoadIcon ("texture.gif");
+	LoadIcon ("material.gif");
+	LoadIcon ("geometry.gif");
 	//	LoadIcon ("meshNode.gif");
 	//	LoadIcon ("imageNode.gif");
 }
