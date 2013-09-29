@@ -18,6 +18,10 @@
 
 class NewtonModelEditorApp: public wxApp
 {
+	public:
+	NewtonModelEditorApp();
+	virtual ~NewtonModelEditorApp();
+
 	virtual bool OnInit();
 	static void* PhysicsAlloc (int sizeInBytes);
 	static void PhysicsFree (void* ptr, int sizeInBytes);

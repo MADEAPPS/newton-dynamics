@@ -29,7 +29,6 @@
 	void* operator new (size_t size) 
 	{ 
 		void* const ptr = malloc (size);
-//		dAssert ((unsigned(ptr) & 0xffff) != 0x0968);
 		return ptr;
 	}
 

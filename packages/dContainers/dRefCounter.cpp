@@ -31,6 +31,7 @@ int dRefCounter::GetRef() const
 int dRefCounter::Release()
 {
 	m_refCount --;
+	dAssert (m_refCount >= 0);
 	if (!m_refCount) {
 		delete this;
 		return 0;

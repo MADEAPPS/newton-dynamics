@@ -55,7 +55,7 @@ typedef long long unsigned64;
 	#include <windows.h>
 	#include <Commctrl.h>
 	#include <stdlib.h>
-	#include <malloc.h>
+//	#include <malloc.h>
 	#include <memory.h>
 	#include <time.h>
 	#include <tchar.h>

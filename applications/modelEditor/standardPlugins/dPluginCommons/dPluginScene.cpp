@@ -242,6 +242,6 @@ void dPluginScene::UpdateAllOOBB ()
 
 void dPluginScene::MergeScene (dPluginInterface* const interface, dPluginScene* const asset) const
 {
-	interface->Push(new dUndoCurrentScene(interface));
+	interface->Push(new dUndoCurrentScene(interface, asset));
 	interface->GetScene()->dScene::MergeScene(asset);
 }

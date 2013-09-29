@@ -222,7 +222,6 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 
 	void OnHideExplorerPane (wxCommandEvent& event); 
 	void OnPaneClose (wxAuiManagerEvent& event); 
-
 	void LoadResources ();
 	void DeleteResources ();
 

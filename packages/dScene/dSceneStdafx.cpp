@@ -23,14 +23,12 @@
 #ifdef _DSCENE_DLL
 	void* operator new (size_t size) 
 	{ 
-		//return NewtonAlloc(int (size));
-		return malloc (size);
+		return dContainersAlloc::Alloc(size);
 	}
 
 	void operator delete (void* ptr) 
 	{ 
-		//NewtonFree(ptr);
-		free (ptr);
+		dContainersAlloc::Free (ptr);
 	}
 
 	BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)

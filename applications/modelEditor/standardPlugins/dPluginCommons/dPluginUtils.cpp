@@ -133,26 +133,22 @@ void GetWorkingFileName (const char* const name, char* const outPathName)
 
 void* operator new (size_t size) 
 { 
-	//return NewtonAlloc(int (size));
-	return malloc (size);
+	return dContainersAlloc::Alloc (size);
 }
 
 void operator delete (void* ptr) 
 { 
-	//NewtonFree(ptr);
-	free (ptr);
+	dContainersAlloc::Free (ptr);
 }
 
 
 void* dPluginAlloc::operator new (size_t size)
 {
-	//return NewtonAlloc(int (size));
 	return ::new char[size];
 }
 
 void dPluginAlloc::operator delete (void* ptr)
 {
-//	NewtonFree(ptr);
 	::delete[] (char*) ptr;
 }
 

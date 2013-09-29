@@ -16,7 +16,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 			// make sure no Newton tool or utility leaves leaks behind.
 			_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF|_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF));
 			#endif
-
+		
 		case DLL_THREAD_DETACH:
 		case DLL_PROCESS_DETACH:
 		break;

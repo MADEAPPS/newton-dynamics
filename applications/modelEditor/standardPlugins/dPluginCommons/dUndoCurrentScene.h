@@ -23,19 +23,19 @@ class dPluginScene;
 class dUndoCurrentScene: public dUndoRedo
 {
 	public:
-	dUndoCurrentScene(dPluginInterface* const interface);
+	dUndoCurrentScene(dPluginInterface* const interface, dPluginScene* const deltaScene);
 	virtual ~dUndoCurrentScene();
 
 	protected:
 	virtual void RestoreState();
 	virtual dUndoRedo* CreateRedoState() const;
 	
-
-	int nodeIndex;
+//	int nodeIndex;
+	
+//	dTree<int, void*> m_selection;
+//	dTree<int, void*> m_exploreStatus;
+	dPluginScene* m_deltaScene;
 	dPluginInterface* m_interface;
-	dTree<int, void*> m_selection;
-	dTree<int, void*> m_exploreStatus;
-	dPluginScene* m_backup;
 };
 
 #endif

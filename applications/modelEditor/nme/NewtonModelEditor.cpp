@@ -898,7 +898,7 @@ void NewtonModelEditor::OnUndo(wxCommandEvent& event)
 {
 	dUndoRedoManager::Undo();
 	RefrehViewports();
-	dAssert (0);
+//	dAssert (0);
 //	m_explorer->Populate(GetScene());
 }
 
@@ -906,7 +906,7 @@ void NewtonModelEditor::OnRedo(wxCommandEvent& event)
 {
 	dUndoRedoManager::Redo();
 	RefrehViewports();
-	dAssert (0);
+//	dAssert (0);
 //	m_explorer->Populate(GetScene());
 }
 
@@ -927,14 +927,10 @@ void NewtonModelEditor::OnMesh (wxCommandEvent& event)
 
 	dPluginScene* const asset = plugin->Create (this);
 	if (asset) {
-		dPluginScene* const oldScene = GetScene();
-		oldScene->AddRef();
-		oldScene ->MergeScene(this, asset);
-		dPluginScene* const newScene = GetScene();
+		GetScene()->MergeScene(this, asset);
 		asset->Release();
 		RefrehViewports();
-		m_explorer->ReconstructScene(newScene);
-		oldScene->Release();
+		m_explorer->ReconstructScene(GetScene());
 	}
 }
 

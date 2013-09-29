@@ -14,22 +14,28 @@
 #include "NewtonModelEditor.h"
 #include "NewtonModelEditorApp.h"
 
-
 IMPLEMENT_APP(NewtonModelEditorApp)
 
 void *operator new (size_t size) 
 { 
-	void* const ptr = ::malloc (size);
-	return ptr; 
+	return dContainersAlloc::Alloc (size);
 }                                          
 
 void operator delete (void* ptr) 
 { 
-	::free (ptr); 
+	dContainersAlloc::Free (ptr);
 }
 
-
 int NewtonModelEditorApp::m_totalMemoryUsed;
+
+NewtonModelEditorApp::NewtonModelEditorApp()
+{
+}
+
+NewtonModelEditorApp::~NewtonModelEditorApp()
+{
+}
+
 
 bool NewtonModelEditorApp::OnInit()
 {
