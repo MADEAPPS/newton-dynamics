@@ -67,17 +67,12 @@ class dPluginInterface: public dUndoRedoManager
 */
 
 
-//	class dAssetList: public dList <AssetPluginAssociation>
-//	{
-//	};
-
 	DPLUGIN_API dPluginInterface(void);
 	virtual DPLUGIN_API  ~dPluginInterface(void);
 	
 	virtual DPLUGIN_API dPluginScene* GetScene() const;
 	virtual DPLUGIN_API void SetScene(dPluginScene* const scene);
 
-//	virtual dPluginScene* GetAsset() const;
 	virtual DPLUGIN_API dSceneRender* GetRender() const;
 
 	virtual DPLUGIN_API dPluginCamera* GetCamera() const;
@@ -112,6 +107,8 @@ class dPluginInterface: public dUndoRedoManager
 	virtual DPLUGIN_API void SetExplorerExpandNodeState(void* const incidentLink, bool state);
 	virtual DPLUGIN_API bool GetExplorerExpandNodeState(void* const incidentLink) const;
 
+
+	virtual DPLUGIN_API void RefreshExplorerEvent(bool clear) const;
 
 	protected:
 	DPLUGIN_API dPluginDll::dListNode* LoadPlugins(const char* const path);

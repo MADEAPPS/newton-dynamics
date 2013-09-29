@@ -240,6 +240,8 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	void LoadScene (const char* const fileName);
 	void LoadIcon (const char* const iconName);
 
+
+	virtual void RefreshExplorerEvent(bool clear) const;
 	
 	
 	

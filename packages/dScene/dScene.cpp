@@ -463,17 +463,17 @@ dScene::dTreeNode* dScene::GetCacheNode (const char* const cacheName)
 
 dScene::dTreeNode* dScene::GetTextureCacheNode ()
 {
-	return GetCacheNode ("dTextureCache");
+	return GetCacheNode (D_TEXTURE_CACHE_NODE_MAME);
 }
 
 dScene::dTreeNode* dScene::GetMaterialCacheNode ()
 {
-	return GetCacheNode ("dMaterialCache");
+	return GetCacheNode (D_MATERIAL_CACHE_NODE_MAME);
 }
 
 dScene::dTreeNode* dScene::GetGeometryCacheNode ()
 {
-	return GetCacheNode ("dGeometryCache");
+	return GetCacheNode (D_GEOMETRY_CACHE_NODE_MAME);
 }
 
 
@@ -816,10 +816,67 @@ void dScene::MergeScene (dScene* const scene)
 
 void dScene::UnmergeScene (dScene* const scene)
 {
-	dTree<const dTreeNode*, const dNodeInfo*> map;
+	dTree<dTreeNode*, const dNodeInfo*> map;
+
+	dTreeNode* const sceneRootName = scene->GetRootNode();
+	map.Insert(GetRootNode(), scene->GetInfoFromNode (sceneRootName));
+
+	if (scene->FindChildByName (sceneRootName, D_TEXTURE_CACHE_NODE_MAME)) {
+		map.Insert(GetTextureCacheNode(), scene->GetInfoFromNode (scene->GetTextureCacheNode()));
+	}
+	if (scene->FindChildByName (sceneRootName, D_MATERIAL_CACHE_NODE_MAME)) {
+		map.Insert(GetMaterialCacheNode(), scene->GetInfoFromNode (scene->GetMaterialCacheNode()));
+	}
+	if (scene->FindChildByName (sceneRootName, D_GEOMETRY_CACHE_NODE_MAME)) {
+		map.Insert(GetGeometryCacheNode(), scene->GetInfoFromNode (scene->GetGeometryCacheNode()));
+	}
 
 	for (dTreeNode* node = GetFirstNode(); node; node = GetNextNode(node)) {
 		map.Insert(node, GetInfoFromNode(node));
+	}
+
+	for (dTreeNode* parentNode = scene->GetFirstNode(); parentNode; parentNode = scene->GetNextNode(parentNode)) {
+		dNodeInfo* const parentInfo = GetInfoFromNode(parentNode);
+
+		dTree<dTreeNode*, const dNodeInfo*>::dTreeNode* const mapNode = map.Find(parentInfo);
+		if (mapNode) {
+			dTreeNode* const myParentNode = mapNode->GetInfo();
+			for (void* link = scene->GetFirstChildLink(parentNode); link; link = scene->GetNextChildLink(parentNode, link)) {
+				dTreeNode* const childNode = scene->GetNodeFromLink(link);
+				if (childNode != scene->GetRootNode()) {
+					dNodeInfo* const childInfo = GetInfoFromNode(childNode);
+					if (!childInfo->IsType(dSceneCacheInfo::GetRttiType())) {
+						dTree<dTreeNode*, const dNodeInfo*>::dTreeNode* const mapNode = map.Find(childInfo);
+						if (mapNode) {
+							dTreeNode* const myChildNode = mapNode->GetInfo();
+							RemoveReference(myParentNode, myChildNode);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	dTreeNode* const rootNode = GetRootNode();
+	dTreeNode* cacheNode = FindChildByName (rootNode, D_TEXTURE_CACHE_NODE_MAME);
+	if (cacheNode) { 
+		if (!GetFirstChildLink(cacheNode)) {
+			DeleteNode (cacheNode);
+		}
+	}
+
+	cacheNode = FindChildByName (rootNode, D_MATERIAL_CACHE_NODE_MAME);
+	if (cacheNode) { 
+		if (!GetFirstChildLink(cacheNode)) {
+			DeleteNode (cacheNode);
+		}
+	}
+
+	cacheNode = FindChildByName (rootNode, D_GEOMETRY_CACHE_NODE_MAME);
+	if (cacheNode) { 
+		if (!GetFirstChildLink(cacheNode)) {
+			DeleteNode (cacheNode);
+		}
 	}
 }
 

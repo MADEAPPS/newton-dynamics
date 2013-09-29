@@ -27,11 +27,10 @@ class dUndoCurrentScene: public dUndoRedo
 	virtual ~dUndoCurrentScene();
 
 	protected:
-	virtual void RestoreState();
+	virtual void RestoreState(dUndodeRedoMode mode);
 	virtual dUndoRedo* CreateRedoState() const;
 	
 //	int nodeIndex;
-	
 //	dTree<int, void*> m_selection;
 //	dTree<int, void*> m_exploreStatus;
 	dPluginScene* m_deltaScene;

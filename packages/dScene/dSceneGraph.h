@@ -74,7 +74,7 @@ class dGraphNode: public dContainersAlloc
 	virtual DSCENE_API ~dGraphNode ();
 
 	virtual DSCENE_API dNodeInfo* GetNode() const {return m_nodeInfo;}
-	virtual DSCENE_API void SetNode(dNodeInfo* newInfo);
+	virtual DSCENE_API void SetNode(dNodeInfo* const newInfo);
 
 	virtual DSCENE_API void SetLRU (int lru) {m_lru = lru;}
 	virtual DSCENE_API int GetLRU () const { return m_lru;}

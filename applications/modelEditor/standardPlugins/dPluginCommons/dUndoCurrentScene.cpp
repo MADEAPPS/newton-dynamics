@@ -40,8 +40,24 @@ dUndoRedo* dUndoCurrentScene::CreateRedoState() const
 	return new dUndoCurrentScene (m_interface, m_deltaScene);
 }
 
-void dUndoCurrentScene::RestoreState()
+void dUndoCurrentScene::RestoreState(dUndodeRedoMode mode)
 {
 	dPluginScene* const scene = m_interface->GetScene();
-	scene->UnmergeScene(m_deltaScene);
+	switch (mode)
+	{
+		case m_undo:
+		{
+			scene->dScene::UnmergeScene(m_deltaScene);
+			m_interface->RefreshExplorerEvent (true);
+			break;
+		}
+
+		default:
+		{
+			scene->dScene::MergeScene(m_deltaScene);
+			m_interface->RefreshExplorerEvent (false);
+			break;
+		}
+	}
+	
 }

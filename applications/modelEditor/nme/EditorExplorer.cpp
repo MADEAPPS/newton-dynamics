@@ -107,7 +107,7 @@ class EditorExplorer::UndoRedoChangeName: public dUndoRedo
 	}
 
 	protected:
-	virtual void RestoreState()
+	virtual void RestoreState(dUndodeRedoMode mode)
 	{
 		dPluginScene* const scene = m_me->m_mainFrame->GetScene(); 
 		dNodeInfo* const info = scene->GetInfoFromNode(m_node);

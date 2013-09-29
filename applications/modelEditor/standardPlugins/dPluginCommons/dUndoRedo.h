@@ -17,11 +17,16 @@
 class dUndoRedo: public dPluginAlloc 
 {
 	public:
+	enum dUndodeRedoMode
+	{
+		m_undo,
+		m_redo,
+	};
 	DPLUGIN_API dUndoRedo();
 	virtual DPLUGIN_API ~dUndoRedo();
 
-	virtual void RestoreState() = 0;
 	virtual dUndoRedo* CreateRedoState() const = 0;
+	virtual void RestoreState(dUndodeRedoMode mode) = 0;
 };
 
 class dUndoRedoManager: public dPluginAlloc 

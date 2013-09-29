@@ -44,6 +44,11 @@ dPluginInterface::~dPluginInterface(void)
 }
 
 
+void dPluginInterface::RefreshExplorerEvent(bool clear) const
+{
+
+}
+
 const char* dPluginInterface::GetFilePath() const
 {
 	return m_filePathFile;

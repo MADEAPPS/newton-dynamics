@@ -41,7 +41,7 @@ dGraphNode::~dGraphNode ()
 {
 }
 
-void dGraphNode::SetNode(dNodeInfo* newInfo)
+void dGraphNode::SetNode(dNodeInfo* const newInfo)
 {
 	m_nodeInfo->Release();
 	m_nodeInfo = newInfo;

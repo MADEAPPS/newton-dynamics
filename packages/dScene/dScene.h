@@ -44,6 +44,9 @@ class dTextureNodeInfo;
 #define D_SCENE_REVISION_NUMBER 103
 
 
+#define D_TEXTURE_CACHE_NODE_MAME	"dTextureCache"
+#define D_MATERIAL_CACHE_NODE_MAME	"dMaterialCache"
+#define D_GEOMETRY_CACHE_NODE_MAME	"dGeometryCache"
 
 class dScene: public dSceneGraph, public dRefCounter
 {

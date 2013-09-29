@@ -898,24 +898,17 @@ void NewtonModelEditor::OnUndo(wxCommandEvent& event)
 {
 	dUndoRedoManager::Undo();
 	RefrehViewports();
-//	dAssert (0);
-//	m_explorer->Populate(GetScene());
 }
 
 void NewtonModelEditor::OnRedo(wxCommandEvent& event)
 {
 	dUndoRedoManager::Redo();
 	RefrehViewports();
-//	dAssert (0);
-//	m_explorer->Populate(GetScene());
 }
 
 void NewtonModelEditor::OnClearUndoHistory(wxCommandEvent& event)
 {
 	dUndoRedoManager::Clear();
-	RefrehViewports();
-	dAssert (0);
-//	m_explorer->Populate(GetScene());
 }
 
 void NewtonModelEditor::OnMesh (wxCommandEvent& event)
@@ -1029,3 +1022,13 @@ void NewtonModelEditor::OnOpenScene(wxCommandEvent& event)
 	}
 }
 
+
+void NewtonModelEditor::RefreshExplorerEvent(bool clear) const
+{
+	dPluginInterface::RefreshExplorerEvent(clear);
+
+	if (clear) {
+		m_explorer->Clear();
+	}
+	m_explorer->ReconstructScene (GetScene());
+}

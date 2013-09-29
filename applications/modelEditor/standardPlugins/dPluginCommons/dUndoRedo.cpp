@@ -93,7 +93,7 @@ void dUndoRedoManager::Redo()
 	dUndoRedo* const state = m_redodStack.Pop();
 	if (state) {
 		m_undodStack.Push(state->CreateRedoState());
-		state->RestoreState();
+		state->RestoreState(dUndoRedo::m_redo);
 		delete state;
 	}
 }
@@ -103,7 +103,7 @@ void dUndoRedoManager::Undo()
 	dUndoRedo* const state = m_undodStack.Pop();
 	if (state) {
 		m_redodStack.Push(state->CreateRedoState());
-		state->RestoreState();
+		state->RestoreState(dUndoRedo::m_undo);
 		delete state;
 	}
 }
