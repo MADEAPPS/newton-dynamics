@@ -145,7 +145,7 @@ void dSceneNodeInfo::UpdateOOBB (dScene* const scene, dScene::dTreeNode* const m
 
 	m_editorMinOOBB = dVector (0.0f, 0.0f, 0.0f, 0.0f) ;	
 	m_editorMaxOOBB = dVector (0.0f, 0.0f, 0.0f, 0.0f) ;	
-	for (void* link = scene->GetFirstChild(myNode); link; link = scene->GetNextChild(myNode, link)) {
+	for (void* link = scene->GetFirstChildLink(myNode); link; link = scene->GetNextChildLink(myNode, link)) {
 		dScene::dTreeNode* const node = scene->GetNodeFromLink(link);
 		dGeometryNodeInfo* const geometryInfo = (dGeometryNodeInfo*)scene->GetInfoFromNode(node);
 		if (geometryInfo->IsType(dGeometryNodeInfo::GetRttiType())) {

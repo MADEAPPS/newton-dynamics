@@ -239,7 +239,7 @@ void EditorExplorer::HandleSelectionEvent (const dList<dScene::dTreeNode*>& trac
 void EditorExplorer::PopulateModel(const dPluginScene* const scene, wxTreeItemId modelItem)
 {
 	dScene::dTreeNode* const modelNode = (dScene::dTreeNode*) modelItem->getData();
-	for (void* link = scene->GetFirstChild(modelNode); link; link = scene->GetNextChild(modelNode, link)) {
+	for (void* link = scene->GetFirstChildLink(modelNode); link; link = scene->GetNextChild(modelNode, link)) {
 		dScene::dTreeNode* const node = scene->GetNodeFromLink (link);
 		dNodeInfo* const info = scene->GetInfoFromNode(node);
 
@@ -260,7 +260,7 @@ void EditorExplorer::Populate (const dPluginScene* const scene, wxTreeItemId roo
 
 	// add all models
 	//	for (dScene::dTreeNode* node = scene->GetFirstNode(); node; node = scene->GetNextNode(node)) {
-	for (void* link = scene->GetFirstChild(rootNode); link; link = scene->GetNextChild(rootNode, link)) {
+	for (void* link = scene->GetFirstChildLink(rootNode); link; link = scene->GetNextChild(rootNode, link)) {
 		dScene::dTreeNode* const node = scene->GetNodeFromLink (link);
 		dNodeInfo* const info = scene->GetInfoFromNode(node);
 //dCRCTYPE xxx = info->GetTypeId();
@@ -301,7 +301,7 @@ void EditorExplorer::ReconstructScene(const dPluginScene* const scene)
 		ExplorerData* const nodeData = ((ExplorerData*)GetItemData(rootItem));
 		dScene::dTreeNode* const rootNode = nodeData->m_node;
 
-		for (void* link = scene->GetFirstChild(rootNode); link; link = scene->GetNextChild(rootNode, link)) {
+		for (void* link = scene->GetFirstChildLink(rootNode); link; link = scene->GetNextChildLink(rootNode, link)) {
 			dScene::dTreeNode* const childNode = scene->GetNodeFromLink (link);
 			bool found = false;
 			for (wxTreeItemId childItem = GetLastChild(rootItem); childItem; childItem = GetPrevSibling(childItem)) {

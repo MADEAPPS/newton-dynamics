@@ -82,7 +82,7 @@ void dPluginScene::RenderFlatShaded (dSceneRender* const render)
 	render->DisableBlend();
 
 	dScene::dTreeNode* const rootNode = GetRootNode();
-	for (void* link = GetFirstChild(rootNode); link; link = GetNextChild(rootNode, link)) {
+	for (void* link = GetFirstChildLink(rootNode); link; link = GetNextChildLink(rootNode, link)) {
 		dScene::dTreeNode* const node = GetNodeFromLink (link);
 		dNodeInfo* const info = GetInfoFromNode(node);
 		if (info->IsType(dSceneNodeInfo::GetRttiType())) {
@@ -103,7 +103,7 @@ void dPluginScene::RenderWireframeSelection (dSceneRender* const render, dPlugin
 	render->SetColor(dVector (1.0f, 1.0f, 1.0f));
 
 	dScene::dTreeNode* const rootNode = GetRootNode();
-	for (void* link = GetFirstChild(rootNode); link; link = GetNextChild(rootNode, link)) {
+	for (void* link = GetFirstChildLink(rootNode); link; link = GetNextChildLink(rootNode, link)) {
 		dScene::dTreeNode* const sceneNode = GetNodeFromLink (link);
 		dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*)GetInfoFromNode(sceneNode);
 		if (sceneInfo->IsType(dSceneNodeInfo::GetRttiType())) {
@@ -123,7 +123,7 @@ void dPluginScene::RenderWireframe (dSceneRender* const render)
 	render->DisableBlend();
 
 	dScene::dTreeNode* const rootNode = GetRootNode();
-	for (void* link = GetFirstChild(rootNode); link; link = GetNextChild(rootNode, link)) {
+	for (void* link = GetFirstChildLink(rootNode); link; link = GetNextChildLink(rootNode, link)) {
 		dScene::dTreeNode* const sceneNode = GetNodeFromLink (link);
 		dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*)GetInfoFromNode(sceneNode);
 		if (sceneInfo->IsType(dSceneNodeInfo::GetRttiType())) {
@@ -151,7 +151,7 @@ void dPluginScene::RenderFlatShadedSceneNode (dSceneRender* const render, dScene
 
 	render->PushMatrix (sceneInfo->GetTransform());
 
-	for (void* link = GetFirstChild(sceneNode); link; link = GetNextChild(sceneNode, link)) {
+	for (void* link = GetFirstChildLink(sceneNode); link; link = GetNextChildLink(sceneNode, link)) {
 		dScene::dTreeNode* const node = GetNodeFromLink (link);
 		dGeometryNodeInfo* const geometryInfo = (dGeometryNodeInfo*)GetInfoFromNode(node);
 		if (geometryInfo->IsType(dGeometryNodeInfo::GetRttiType())) {
@@ -159,7 +159,7 @@ void dPluginScene::RenderFlatShadedSceneNode (dSceneRender* const render, dScene
 		}
 	}
 
-	for (void* link = GetFirstChild(sceneNode); link; link = GetNextChild(sceneNode, link)) {
+	for (void* link = GetFirstChildLink(sceneNode); link; link = GetNextChildLink(sceneNode, link)) {
 		dScene::dTreeNode* const node = GetNodeFromLink (link);
 		dSceneNodeInfo* const info = (dSceneNodeInfo*)GetInfoFromNode(node);
 		if (info->IsType(dSceneNodeInfo::GetRttiType())) {
@@ -177,7 +177,7 @@ void dPluginScene::RenderWireframeSceneNode (dSceneRender* const render, dScene:
 
 	render->PushMatrix (sceneInfo->GetTransform());
 
-	for (void* link = GetFirstChild(sceneNode); link; link = GetNextChild(sceneNode, link)) {
+	for (void* link = GetFirstChildLink(sceneNode); link; link = GetNextChildLink(sceneNode, link)) {
 		dScene::dTreeNode* const node = GetNodeFromLink (link);
 		dGeometryNodeInfo* const geometryInfo = (dGeometryNodeInfo*)GetInfoFromNode(node);
 		if (geometryInfo->IsType(dGeometryNodeInfo::GetRttiType())) {
@@ -185,7 +185,7 @@ void dPluginScene::RenderWireframeSceneNode (dSceneRender* const render, dScene:
 		}
 	}
 
-	for (void* link = GetFirstChild(sceneNode); link; link = GetNextChild(sceneNode, link)) {
+	for (void* link = GetFirstChildLink(sceneNode); link; link = GetNextChildLink(sceneNode, link)) {
 		dScene::dTreeNode* const node = GetNodeFromLink (link);
 		dSceneNodeInfo* const info = (dSceneNodeInfo*)GetInfoFromNode(node);
 		if (info->IsType(dSceneNodeInfo::GetRttiType())) {
@@ -205,7 +205,7 @@ void dPluginScene::RenderSelectedSceneNodes (dSceneRender* const render, void* c
 
 	render->PushMatrix (sceneInfo->GetTransform());
 	if (interface->IsNodeSelected (incidentSceneNodeLink)) {
-		for (void* link = GetFirstChild(sceneNode); link; link = GetNextChild(sceneNode, link)) {
+		for (void* link = GetFirstChildLink(sceneNode); link; link = GetNextChildLink(sceneNode, link)) {
 			dScene::dTreeNode* const node = GetNodeFromLink (link);
 			dGeometryNodeInfo* const geometryInfo = (dGeometryNodeInfo*)GetInfoFromNode(node);
 			if (geometryInfo->IsType(dGeometryNodeInfo::GetRttiType())) {
@@ -214,7 +214,7 @@ void dPluginScene::RenderSelectedSceneNodes (dSceneRender* const render, void* c
 		}
 	}
 
-	for (void* link = GetFirstChild(sceneNode); link; link = GetNextChild(sceneNode, link)) {
+	for (void* link = GetFirstChildLink(sceneNode); link; link = GetNextChildLink(sceneNode, link)) {
 		dScene::dTreeNode* const node = GetNodeFromLink (link);
 		dSceneNodeInfo* const info = (dSceneNodeInfo*)GetInfoFromNode(node);
 		if (info->IsType(dSceneNodeInfo::GetRttiType())) {

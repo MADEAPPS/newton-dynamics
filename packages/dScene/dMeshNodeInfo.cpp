@@ -140,7 +140,7 @@ void dMeshNodeInfo::RemoveUnusedVertices(dScene* const world, dScene::dTreeNode*
 
 	NewtonRemoveUnusedVertices(m_mesh, vertexRemapArray);
 
-	for (void* ptr0 = world->GetFirstChild (myNode); ptr0; ptr0 = world->GetNextChild(myNode, ptr0)) {
+	for (void* ptr0 = world->GetFirstChildLink (myNode); ptr0; ptr0 = world->GetNextChildLink(myNode, ptr0)) {
 		dScene::dTreeNode* node = world->GetNodeFromLink(ptr0);
 		dNodeInfo* info = world->GetInfoFromNode(node);
 		if (info->IsType(dGeometryNodeModifierInfo::GetRttiType())) {

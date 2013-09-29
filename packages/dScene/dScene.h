@@ -106,11 +106,11 @@ class dScene: public dSceneGraph, public dRefCounter
 	virtual DSCENE_API dTreeNode* FindNode (dNodeInfo* const info) const;
 	 
 	
-	virtual DSCENE_API void* GetFirstChild(dTreeNode* const parentNode) const;
-	virtual DSCENE_API void* GetNextChild(dTreeNode* const parentNode, void* const link) const;
+	virtual DSCENE_API void* GetFirstChildLink(dTreeNode* const parentNode) const;
+	virtual DSCENE_API void* GetNextChildLink(dTreeNode* const parentNode, void* const link) const;
 
-	virtual DSCENE_API void* GetFirstParent(dTreeNode* const childNode) const;
-	virtual DSCENE_API void* GetNextParent(dTreeNode* const childNode, void* const link) const;
+	virtual DSCENE_API void* GetFirstParentLink(dTreeNode* const childNode) const;
+	virtual DSCENE_API void* GetNextParentLink(dTreeNode* const childNode, void* const link) const;
 
 	//virtual DSCENE_API bool IsParentLink (void* const link) const;
 	virtual DSCENE_API dTreeNode* GetNodeFromLink (void* const child) const;

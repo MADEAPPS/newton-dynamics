@@ -121,8 +121,8 @@ void dGeometryNodeSkinModifierInfo::SkinMesh(dScene::dTreeNode* skinNode, dScene
 		delete[] m_boneBindingMatrix;
 	}
 
-	while (scene->GetFirstChild(skinNode)) {
-		dScene::dTreeNode* bone = scene->GetNodeFromLink(scene->GetFirstChild(skinNode));
+	while (scene->GetFirstChildLink(skinNode)) {
+		dScene::dTreeNode* bone = scene->GetNodeFromLink(scene->GetFirstChildLink(skinNode));
 		dAssert (bone);
 		scene->RemoveReference (skinNode, bone);
 	}
@@ -172,7 +172,7 @@ void dGeometryNodeSkinModifierInfo::SkinMesh(dScene::dTreeNode* skinNode, dScene
 	dSceneNodeInfo* sceneNode = (dSceneNodeInfo*) scene->GetInfoFromNode(parentBone);
 	m_shapeBindMatrix = meshInfo->m_matrix * sceneNode->GetTransform();
 	int index = 0;
-	for (void* boneLink = scene->GetFirstChild(skinNode); boneLink; boneLink = scene->GetNextChild(skinNode, boneLink)) {
+	for (void* boneLink = scene->GetFirstChildLink(skinNode); boneLink; boneLink = scene->GetNextChildLink(skinNode, boneLink)) {
 		dScene::dTreeNode* boneNode = scene->GetNodeFromLink(boneLink);
 		dSceneNodeInfo* sceneInfo = (dSceneNodeInfo*) scene->GetInfoFromNode(boneNode);
 		dMatrix matrix (sceneInfo->GetTransform());

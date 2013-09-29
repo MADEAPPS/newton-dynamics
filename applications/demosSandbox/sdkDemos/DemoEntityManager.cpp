@@ -547,7 +547,7 @@ void DemoEntityManager::LoadVisualScene(dScene* const scene, EntityDictionary& d
 	// create an entity for every root node in the mesh
 	// a root node or scene entity is a dSceneNodeInfo with a direct link to the root of the dScene node.
 	dScene::dTreeNode* const root = scene->GetRootNode();
-	for (void* child = scene->GetFirstChild(root); child; child = scene->GetNextChild (root, child)) {
+	for (void* child = scene->GetFirstChildLink(root); child; child = scene->GetNextChildLink (root, child)) {
 		dScene::dTreeNode* node = scene->GetNodeFromLink(child);
 		dNodeInfo* info = scene->GetInfoFromNode(node);
 		if (info->GetTypeId() == dSceneNodeInfo::GetRttiType()) {

@@ -146,7 +146,7 @@ DemoMesh::DemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode)
 	matrix.TransformTriplex(m_normal, 3 * sizeof (dFloat), m_normal, 3 * sizeof (dFloat), m_vertexCount);
 
 	dTree<dScene::dTreeNode*, dCRCTYPE> materialMap;
-	for (void* ptr = scene->GetFirstChild(meshNode); ptr; ptr = scene->GetNextChild (meshNode, ptr)) {
+	for (void* ptr = scene->GetFirstChildLink(meshNode); ptr; ptr = scene->GetNextChildLink (meshNode, ptr)) {
 		dScene::dTreeNode* node = scene->GetNodeFromLink(ptr);
 		dNodeInfo* info = scene->GetInfoFromNode(node);
 		if (info->GetTypeId() == dMaterialNodeInfo::GetRttiType()) {
@@ -208,7 +208,7 @@ DemoMesh::DemoMesh(NewtonMesh* const mesh)
 	NewtonMeshGetVertexStreams (mesh, 3 * sizeof (dFloat), (dFloat*) m_vertex, 3 * sizeof (dFloat), (dFloat*) m_normal,	2 * sizeof (dFloat), (dFloat*) m_uv, 2 * sizeof (dFloat), (dFloat*) m_uv);
 
 //	dTree<dScene::dTreeNode*, int> materialMap;
-//	for (void* ptr = scene->GetFirstChild(meshNode); ptr; ptr = scene->GetNextChild (meshNode, ptr)) {
+//	for (void* ptr = scene->GetFirstChildLink(meshNode); ptr; ptr = scene->GetNextChildLink (meshNode, ptr)) {
 //		dScene::dTreeNode* node = scene->GetNodeFromLink(ptr);
 //		dNodeInfo* info = scene->GetInfoFromNode(node);
 //		if (info->GetTypeId() == dMaterialNodeInfo::GetRttiType()) {

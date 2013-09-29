@@ -82,7 +82,7 @@ DemoEntity::DemoEntity(
 
 	// we now scan for all dSceneNodeInfo node with direct connection to this rootSceneNode, 
 	// and we load the as children of this entity
-	for (void* child = scene->GetFirstChild(rootSceneNode); child; child = scene->GetNextChild (rootSceneNode, child)) {
+	for (void* child = scene->GetFirstChildLink(rootSceneNode); child; child = scene->GetNextChildLink (rootSceneNode, child)) {
 		dScene::dTreeNode* const node = scene->GetNodeFromLink(child);
 		dNodeInfo* const info = scene->GetInfoFromNode(node);
 		if (info->IsType(dSceneNodeInfo::GetRttiType())) {
@@ -141,7 +141,7 @@ void DemoEntity::LoadNGD_mesh (const char* const fileName, NewtonWorld* const wo
 	dScene::dTreeNode* meshNode = NULL;
 
 	dScene::dTreeNode* const root = scene.GetRootNode();
-	for (void* child = scene.GetFirstChild(root); child; child = scene.GetNextChild (root, child)) {
+	for (void* child = scene.GetFirstChildLink(root); child; child = scene.GetNextChildLink (root, child)) {
 		dScene::dTreeNode* node = scene.GetNodeFromLink(child);
 		dNodeInfo* info = scene.GetInfoFromNode(node);
 		if (info->GetTypeId() == dSceneNodeInfo::GetRttiType()) {
@@ -186,7 +186,7 @@ void DemoEntity::LoadNGD_mesh (const char* const fileName, NewtonWorld* const wo
 			entity->m_matrix = matrix;
 			entity->SetNameID(info->GetName());
 
-			for (void* child = scene.GetFirstChild(rootSceneNode); child; child = scene.GetNextChild (rootSceneNode, child)) {
+			for (void* child = scene.GetFirstChildLink(rootSceneNode); child; child = scene.GetNextChildLink (rootSceneNode, child)) {
 				dScene::dTreeNode* const node = scene.GetNodeFromLink(child);
 
 				dNodeInfo* const info = scene.GetInfoFromNode(node);
@@ -201,7 +201,7 @@ void DemoEntity::LoadNGD_mesh (const char* const fileName, NewtonWorld* const wo
 				}
 			}
 
-			for (void* child = scene.GetFirstChild(rootSceneNode); child; child = scene.GetNextChild (rootSceneNode, child)) {
+			for (void* child = scene.GetFirstChildLink(rootSceneNode); child; child = scene.GetNextChildLink (rootSceneNode, child)) {
 				dScene::dTreeNode* const node = scene.GetNodeFromLink(child);
 				dNodeInfo* const info = scene.GetInfoFromNode(node);
 				if (info->IsType(dSceneNodeInfo::GetRttiType())) {

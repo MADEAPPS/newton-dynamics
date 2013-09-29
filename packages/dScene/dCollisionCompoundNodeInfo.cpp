@@ -102,7 +102,7 @@ NewtonCollision* dCollisionCompoundNodeInfo::CreateNewtonCollision (NewtonWorld*
 	NewtonCompoundCollisionBeginAddRemove(collision);
 
 	// create space to load all sub shapes
-	for (void* link = scene->GetFirstChild(myNode); link; link = scene->GetNextChild (myNode, link)) {
+	for (void* link = scene->GetFirstChildLink(myNode); link; link = scene->GetNextChildLink (myNode, link)) {
 		dScene::dTreeNode* childNode = scene->GetNodeFromLink(link);
 		dNodeInfo* info = scene->GetInfoFromNode(childNode);
 		if (info->IsType (dCollisionNodeInfo::GetRttiType())) {
