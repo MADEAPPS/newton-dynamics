@@ -68,37 +68,37 @@ class EditorExplorer::TraverseExplorer
 class EditorExplorer::ChangeNames: public TraverseExplorer
 {
 	public:
-	ChangeNames(EditorExplorer* const me, const wxString& name, dScene::dTreeNode* const node)
+	ChangeNames(EditorExplorer* const me, dNodeInfo* const nodeInfo)
 		:m_me(me) 
-		,m_name(name)
-		,m_node(node)
+		,m_nodeInfo(nodeInfo)
 	{
 		Traverse(me);
 	}
 
 	bool TraverseCallback (wxTreeItemId item) const
 	{
+		dPluginScene* const scene = m_me->m_mainFrame->GetScene(); 		
+
 		ExplorerData* const data = (ExplorerData*) m_me->GetItemData(item);
-		if (m_node == data->m_node) {
-			m_me->SetItemText(item, m_name);
+		if (m_nodeInfo == scene->GetInfoFromNode(data->m_node)) {
+			m_me->SetItemText(item, wxString (m_nodeInfo->GetName()));
 		}
 		return true;
 	}
 
 	EditorExplorer* m_me;
-	const wxString& m_name;
-	dScene::dTreeNode* m_node;
+	dNodeInfo* m_nodeInfo;
 };
 
 
 class EditorExplorer::UndoRedoChangeName: public dUndoRedo
 {
 	public:
-	UndoRedoChangeName(EditorExplorer* const me, const wxString& name, dScene::dTreeNode* const node)
+	UndoRedoChangeName(EditorExplorer* const me, const wxString& name, dNodeInfo* const nodeInfo)
 		:dUndoRedo()
 		,m_me(me) 
+		,m_nodeInfo(nodeInfo)
 		,m_name(name) 
-		,m_node(node)
 	{
 	}
 
@@ -109,22 +109,18 @@ class EditorExplorer::UndoRedoChangeName: public dUndoRedo
 	protected:
 	virtual void RestoreState(dUndodeRedoMode mode)
 	{
-		dPluginScene* const scene = m_me->m_mainFrame->GetScene(); 
-		dNodeInfo* const info = scene->GetInfoFromNode(m_node);
-		info->SetName(m_name.c_str());
-		ChangeNames chamgeNames(m_me, m_name, m_node);
+		m_nodeInfo->SetName(m_name.c_str());
+		ChangeNames chamgeNames(m_me, m_nodeInfo);
 	}
 
 	virtual dUndoRedo* CreateRedoState() const
 	{
-		dPluginScene* const scene = m_me->m_mainFrame->GetScene(); 
-		dNodeInfo* const info = scene->GetInfoFromNode(m_node);
-		return new UndoRedoChangeName (m_me, wxString(info->GetName()), m_node);
+		return new UndoRedoChangeName (m_me, wxString(m_nodeInfo->GetName()), m_nodeInfo);
 	}
 
-	EditorExplorer* m_me;
 	wxString m_name;
-	dScene::dTreeNode* m_node;
+	EditorExplorer* m_me;
+	dNodeInfo* m_nodeInfo;
 };
 
 
@@ -352,11 +348,10 @@ void EditorExplorer::OnEndEdit (wxTreeEvent& event)
 		dPluginScene* const scene = m_mainFrame->GetScene(); 
 		dNodeInfo* const info = scene->GetInfoFromNode(node);
 
-		m_mainFrame->Push (new UndoRedoChangeName(this, wxString(info->GetName()), node));
+		m_mainFrame->Push (new UndoRedoChangeName(this, wxString(info->GetName()), info));
 
 		info->SetName(name.c_str());
-
-		ChangeNames changeName (this, name, node);
+		ChangeNames changeName (this, info);
 	}
 }
 
