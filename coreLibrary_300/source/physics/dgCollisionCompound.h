@@ -107,35 +107,7 @@ class dgCollisionCompound: public dgCollision
 		dgTree<dgNodeBase*, dgInt32>::dgTreeNode* m_myNode; 
 	} DG_GCC_VECTOR_ALIGMENT;
 
-	
 	protected:
-/*
-	class dgConvertChildToConvexHullContext
-	{
-		public: 
-		dgConvertChildToConvexHullContext ()
-			:m_count(0)
-			,m_pool ((dgVector*)dgMallocStack (1024 * 4 * sizeof (dgVector)))
-		{
-
-		}
-		~dgConvertChildToConvexHullContext ()
-		{
-			dgFreeStack(m_pool);
-		}
-
-		void AddPoint (const dgVector& point)
-		{
-			dgAssert (m_count < (1024 * 4));
-			m_pool[m_count] = point;
-			m_count ++;
-		}
-
-		dgInt32 m_count;
-		dgVector* m_pool;
-	};
-*/
-
 	class dgNodePairs
 	{
 		public:
@@ -226,8 +198,6 @@ class dgCollisionCompound: public dgCollision
 
 	dgFloat64 CalculateEntropy (dgList<dgNodeBase*>& list);
 
-//	static void ConvertChildToConvexHull (void* userData, int vertexCount, const dgFloat32* FaceArray, int faceId);
-
 	void CalculateCollisionTreeArea(dgNodePairs& pairOut, const dgCollisionBVH* const collisionTree, const void* const treeNode) const;
 	void ImproveNodeFitness (dgNodeBase* const node) const;
 	dgFloat32 CalculateSurfaceArea (dgNodeBase* const node0, dgNodeBase* const node1, dgVector& minBox, dgVector& maxBox) const;
@@ -241,6 +211,7 @@ class dgCollisionCompound: public dgCollision
 	dgNodeBase* m_root;
 	dgThread::dgCriticalSection m_criticalSectionLock;
 	dgTree<dgNodeBase*, dgInt32> m_array;
+	dgInt32 m_idIndex;
 
 
 	friend class dgBody;

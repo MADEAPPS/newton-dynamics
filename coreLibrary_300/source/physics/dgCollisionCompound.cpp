@@ -371,6 +371,7 @@ dgCollisionCompound::dgCollisionCompound(dgWorld* const world)
 	,m_root(NULL)
 	,m_criticalSectionLock()
 	,m_array (world->GetAllocator())
+	,m_idIndex(0)
 {
 	m_rtti |= dgCollisionCompound_RTTI;
 }
@@ -384,7 +385,7 @@ dgCollisionCompound::dgCollisionCompound (const dgCollisionCompound& source)
 	,m_root(NULL)
 	,m_criticalSectionLock()
 	,m_array (source.GetAllocator())
-
+	,m_idIndex(source.m_idIndex)
 {
 	m_rtti |= dgCollisionCompound_RTTI;
 
@@ -464,6 +465,7 @@ dgCollisionCompound::dgCollisionCompound (dgWorld* const world, dgDeserialize de
 	,m_root(NULL)
 	,m_criticalSectionLock()
 	,m_array (world->GetAllocator())
+	,m_idIndex(0)
 {
 	dgAssert (m_rtti | dgCollisionCompound_RTTI);
 
@@ -995,7 +997,9 @@ void dgCollisionCompound::EndAddRemove ()
 dgTree<dgCollisionCompound::dgNodeBase*, dgInt32>::dgTreeNode* dgCollisionCompound::AddCollision (dgCollisionInstance* const shape)
 {
 	dgNodeBase* const newNode = new (m_allocator) dgNodeBase (shape);
-	newNode->m_myNode = m_array.Insert(newNode, m_array.GetCount());
+//	newNode->m_myNode = m_array.Insert(newNode, m_array.GetCount());
+	newNode->m_myNode = m_array.Insert(newNode, m_idIndex);
+	m_idIndex ++;
 
 	if (!m_root) {
 		m_root = newNode;

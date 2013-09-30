@@ -197,9 +197,24 @@ static void MakeFunnyCompound (DemoEntityManager* const scene, const dVector& or
 			node = nextNode;
 		}
 		// finish remove 
+
+		void* handle1 = NewtonCompoundCollisionGetNodeByIndex (compound, 30);
+		void* handle2 = NewtonCompoundCollisionGetNodeByIndex (compound, 100);
+		NewtonCollision* const shape1 = NewtonCompoundCollisionGetCollisionFromNode (compound, handle1);
+		NewtonCollision* const shape2 = NewtonCompoundCollisionGetCollisionFromNode (compound, handle2);
+
+		NewtonCollision* const copyShape1 = NewtonCollisionCreateInstance (shape1);
+		NewtonCollision* const copyShape2 = NewtonCollisionCreateInstance (shape2);
+
 		// you can also remove shape by their index
 		NewtonCompoundCollisionRemoveSubCollisionByIndex (compound, 30);	
 		NewtonCompoundCollisionRemoveSubCollisionByIndex (compound, 100);	
+
+		handle1 = NewtonCompoundCollisionAddSubCollision (compound, copyShape1);
+		handle2 = NewtonCompoundCollisionAddSubCollision (compound, copyShape2);
+		NewtonDestroyCollision(copyShape1);
+		NewtonDestroyCollision(copyShape2);
+
 		NewtonCompoundCollisionEndAddRemove(compound);	
 	}
 
