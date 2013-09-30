@@ -21,6 +21,8 @@
 
 #include "dPluginUtils.h"
 
+
+#define D_EXPLORER_INFO	"editorExplorerInfo"
 class dPluginInterface;
 
 class dPluginSceneRegisterClass
@@ -51,11 +53,14 @@ class dPluginScene: public dScene
 	virtual DPLUGIN_API void UpdateAllOOBB ();
 //	virtual void DPLUGIN_API MergeScene (dPluginInterface* const interface, dPluginScene* const asset) const;
 
+	virtual bool Deserialize (const char* const fileName);
 	private:
 	virtual void RenderWireframeSceneNode (dSceneRender* const render, dScene::dTreeNode* const sceneNode);
 	virtual void RenderFlatShadedSceneNode (dSceneRender* const render, dScene::dTreeNode* const sceneNode);
 	//virtual void RenderSelectedSceneNodes (dSceneRender* const render, dScene::dTreeNode* const sceneNode, dPluginInterface* const interface);
 	virtual void RenderSelectedSceneNodes (dSceneRender* const render, void* const incidentSceneNodeLink, dPluginInterface* const interface);
+
+	
 
 	int IncLRU();
 	int m_lru;

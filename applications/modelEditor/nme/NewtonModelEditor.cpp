@@ -810,10 +810,9 @@ void NewtonModelEditor::LoadScene (const char* const fileName)
 
 	GetScene()->Cleanup();
 
-		// load the scene from and alchemedia file format
-//	GetScene()->makeCurrent();
+	// load the scene from and alchemedia file format
 	GetScene()->Deserialize (fileName);
-//	GetScene()->makeNonCurrent();
+
 	ClearSelection();
 
 /*

@@ -26,12 +26,31 @@ dPluginScene::dPluginScene(NewtonWorld* const newton)
 	:dScene (newton)
 	,m_lru (100)
 {
+	Iterator iter (*this);
+	for (iter.Begin(); iter; iter ++) {
+		dTreeNode* const sceneNode = iter.GetNode();
+		dNodeInfo* const info = (dSceneNodeInfo*) GetInfoFromNode(sceneNode);
+
+		if (!info->FindVariable(D_EXPLORER_INFO)) {
+			dVariable* const variable= info->CreateVariable (D_EXPLORER_INFO);
+			variable->SetValue (0);
+		}
+	}
 }
 
 dPluginScene::dPluginScene(const dPluginScene& scene)
 	:dScene (scene)
 	,m_lru (scene.m_lru)
 {
+	Iterator iter (*this);
+	for (iter.Begin(); iter; iter ++) {
+		dTreeNode* const sceneNode = iter.GetNode();
+		dNodeInfo* const info = (dSceneNodeInfo*) GetInfoFromNode(sceneNode);
+
+		if (!info->FindVariable(D_EXPLORER_INFO)) {
+			dAssert (0);
+		}
+	}
 }
 
 
@@ -240,3 +259,20 @@ void dPluginScene::UpdateAllOOBB ()
 }
 
 
+bool dPluginScene::Deserialize (const char* const fileName)
+{
+	bool state = dScene::Deserialize (fileName);
+
+	if (state) {
+		Iterator iter (*this);
+		for (iter.Begin(); iter; iter ++) {
+			dTreeNode* const sceneNode = iter.GetNode();
+			dNodeInfo* const info = (dSceneNodeInfo*) GetInfoFromNode(sceneNode);
+			if (!info->FindVariable(D_EXPLORER_INFO)) {
+				dVariable* const variable= info->CreateVariable (D_EXPLORER_INFO);
+				variable->SetValue (0);
+			}
+		}
+	}
+	return state;
+}
