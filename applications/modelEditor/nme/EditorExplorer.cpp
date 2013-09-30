@@ -29,16 +29,16 @@ END_EVENT_TABLE()
 class EditorExplorer::ExplorerData: public wxTreeItemData
 {
 	public:
-	ExplorerData (dScene::dTreeNode* const node)
+	ExplorerData (dNodeInfo* const info)
 		:wxTreeItemData()
-		,m_node(node)
+		,m_info(info)
 	{
 	}
 	~ExplorerData ()
 	{
 	}
 
-	dScene::dTreeNode* m_node;
+	dNodeInfo* m_info;
 };
 
 
@@ -82,12 +82,15 @@ class EditorExplorer::ChangeNames: public TraverseExplorer
 
 	bool TraverseCallback (wxTreeItemId item) const
 	{
+		dAssert (0);
+/*
 		dPluginScene* const scene = m_me->m_mainFrame->GetScene(); 		
 
 		ExplorerData* const data = (ExplorerData*) m_me->GetItemData(item);
 		if (m_nodeInfo == scene->GetInfoFromNode(data->m_node)) {
 			m_me->SetItemText(item, wxString (m_nodeInfo->GetName()));
 		}
+*/
 		return true;
 	}
 
@@ -288,69 +291,6 @@ void EditorExplorer::Clear()
 }
 
 
-void EditorExplorer::ReconstructScene(const dPluginScene* const scene)
-{
-	if (GetRootItem() == NULL) {
-		dScene::dTreeNode* const rootNode = scene->GetRootNode();
-		dNodeInfo* const rootInfo = scene->GetInfoFromNode(rootNode);
-		AddRoot(wxT (rootInfo->GetName()) , 0, -1, new ExplorerData(rootNode));
-	}
-		
-	dList<wxTreeItemId> stack;
-	stack.Append(GetRootItem());
-	while (stack.GetCount()) {
-		wxTreeItemId rootItem (stack.GetLast()->GetInfo());
-		stack.Remove(stack.GetLast());
-
-		ExplorerData* const nodeData = ((ExplorerData*)GetItemData(rootItem));
-		dScene::dTreeNode* const rootNode = nodeData->m_node;
-
-		for (void* link = scene->GetFirstChildLink(rootNode); link; link = scene->GetNextChildLink(rootNode, link)) {
-			dScene::dTreeNode* const childNode = scene->GetNodeFromLink (link);
-			bool found = false;
-			for (wxTreeItemId childItem = GetLastChild(rootItem); childItem; childItem = GetPrevSibling(childItem)) {
-				ExplorerData* const data = ((ExplorerData*)GetItemData(childItem));
-				dScene::dTreeNode* const node = data->m_node;
-				if (node == childNode) {
-					found = true;
-					break;
-				}
-			}
-			
-			if (!found) {
-				dNodeInfo* const info = scene->GetInfoFromNode(childNode);
-
-				if (info->IsType(dSceneCacheInfo::GetRttiType())) {
-					PrependItem(rootItem, wxT(info->GetName()), 1, -1, new ExplorerData(childNode));
-				} else {
-					int imageId = -1;
-					if (info->IsType(dSceneNodeInfo::GetRttiType())) {
-						imageId = 2;
-					} else if (info->IsType(dTextureNodeInfo::GetRttiType())) {
-						imageId = 3;
-					} else if (info->IsType(dMaterialNodeInfo::GetRttiType())) {
-						imageId = 4;
-					} else if (info->IsType(dGeometryNodeInfo::GetRttiType())) {
-						imageId = 5;
-					}
-
-					if (info->IsType(dGeometryNodeInfo::GetRttiType())) {
-						PrependItem(rootItem, wxT(info->GetName()), imageId, -1, new ExplorerData(childNode));
-					} else {
-						AppendItem(rootItem, wxT(info->GetName()), imageId, -1, new ExplorerData(childNode));
-					}
-				}
-			}
-		}
-	
-	
-		for (wxTreeItemId childItem = GetLastChild(rootItem); childItem; childItem = GetPrevSibling(childItem)) {
-			stack.Append(childItem);
-		}
-	}
-
-//	virtual void Expand(const wxTreeItemId& item) = 0;
-}
 
 void EditorExplorer::OnKeyboardItem (wxKeyEvent& event)
 {
@@ -369,10 +309,9 @@ void EditorExplorer::OnKeyboardItem (wxKeyEvent& event)
 
 void EditorExplorer::OnDeleteItem (wxTreeEvent& event)
 {
-	wxArrayTreeItemIds items;
-	size_t count = GetSelections(items);
-
-	dAssert (0);
+//	wxArrayTreeItemIds items;
+//	size_t count = GetSelections(items);
+//	dAssert (0);
 }
 
 void EditorExplorer::OnSelectItem (wxTreeEvent& event)
@@ -391,6 +330,8 @@ void EditorExplorer::OnBeginEditItemName (wxTreeEvent& event)
 
 void EditorExplorer::OnEndEditItemName (wxTreeEvent& event)
 {
+	dAssert (0);
+/*
 	wxString name (event.GetLabel());
 	if (!name.IsEmpty()) {
 
@@ -405,4 +346,71 @@ void EditorExplorer::OnEndEditItemName (wxTreeEvent& event)
 		info->SetName(name.c_str());
 		ChangeNames changeName (this, info);
 	}
+*/
+}
+
+void EditorExplorer::ReconstructScene(const dPluginScene* const scene)
+{
+	if (GetRootItem() == NULL) {
+		dScene::dTreeNode* const rootNode = scene->GetRootNode();
+		dNodeInfo* const rootInfo = scene->GetInfoFromNode(rootNode);
+		AddRoot(wxT (rootInfo->GetName()) , 0, -1, new ExplorerData(rootInfo));
+	}
+		
+	dList<wxTreeItemId> stack;
+	stack.Append(GetRootItem());
+	while (stack.GetCount()) {
+		wxTreeItemId rootItem (stack.GetLast()->GetInfo());
+		stack.Remove(stack.GetLast());
+
+		ExplorerData* const nodeData = ((ExplorerData*)GetItemData(rootItem));
+		dScene::dTreeNode* const rootNode = scene->FindNode (nodeData->m_info);
+		dAssert (rootNode);
+
+		for (void* link = scene->GetFirstChildLink(rootNode); link; link = scene->GetNextChildLink(rootNode, link)) {
+			dScene::dTreeNode* const childNode = scene->GetNodeFromLink (link);
+			bool found = false;
+			for (wxTreeItemId childItem = GetLastChild(rootItem); childItem; childItem = GetPrevSibling(childItem)) {
+				ExplorerData* const data = ((ExplorerData*)GetItemData(childItem));
+				dScene::dTreeNode* const node = scene->FindNode (data->m_info);
+				dAssert (node);
+				if (node == childNode) {
+					found = true;
+					break;
+				}
+			}
+			
+			if (!found) {
+				dNodeInfo* const info = scene->GetInfoFromNode(childNode);
+				if (info->IsType(dSceneCacheInfo::GetRttiType())) {
+					PrependItem(rootItem, wxT(info->GetName()), 1, -1, new ExplorerData(info));
+				} else {
+					int imageId = -1;
+					if (info->IsType(dSceneNodeInfo::GetRttiType())) {
+						imageId = 2;
+					} else if (info->IsType(dTextureNodeInfo::GetRttiType())) {
+						imageId = 3;
+					} else if (info->IsType(dMaterialNodeInfo::GetRttiType())) {
+						imageId = 4;
+					} else if (info->IsType(dGeometryNodeInfo::GetRttiType())) {
+						imageId = 5;
+					}
+
+					if (info->IsType(dGeometryNodeInfo::GetRttiType())) {
+						PrependItem(rootItem, wxT(info->GetName()), imageId, -1, new ExplorerData(info));
+					} else {
+						AppendItem(rootItem, wxT(info->GetName()), imageId, -1, new ExplorerData(info));
+					}
+				}
+			}
+		}
+
+	
+		for (wxTreeItemId childItem = GetLastChild(rootItem); childItem; childItem = GetPrevSibling(childItem)) {
+			stack.Append(childItem);
+		}
+	}
+
+//	virtual void Expand(const wxTreeItemId& item) = 0;
+
 }
