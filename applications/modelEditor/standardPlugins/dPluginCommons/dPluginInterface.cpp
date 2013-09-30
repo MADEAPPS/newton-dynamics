@@ -27,7 +27,7 @@ dPluginInterface::dPluginInterface(void)
 	:dUndoRedoManager()
 	,m_scene(NULL)
 	,m_render(NULL)
-	,m_sceneExplorer(NULL)
+//	,m_sceneExplorer(NULL)
 	,m_currentCamera(NULL)
 	,m_filePathFile(NULL)
 {
@@ -51,12 +51,12 @@ dPluginInterface::~dPluginInterface(void)
 void dPluginInterface::DestroyScene ()
 {
 	if (m_scene) {
-		if (m_sceneExplorer) {
-			delete m_sceneExplorer;
-		}
+//		if (m_sceneExplorer) {
+//			delete m_sceneExplorer;
+//			m_sceneExplorer = NULL;
+//		}
 		m_scene->Release();
 		m_scene = NULL; 
-		m_sceneExplorer = NULL;
 	}
 }
 
@@ -127,15 +127,15 @@ dPluginScene* dPluginInterface::GetScene() const
 
 void dPluginInterface::SetScene(dPluginScene* const scene)
 {
-	if (scene != m_scene) {
-		if (m_sceneExplorer) {
-			m_explorerDictionary.RemoveAll();
-			delete m_sceneExplorer;
-		}
-		m_sceneExplorer = new dSceneExplorer(scene->GetInfoFromNode (scene->GetRootNode()));
-		dAssert (!scene->GetFirstChildLink(scene->GetRootNode()));
-		m_explorerDictionary.Insert(m_sceneExplorer, m_sceneExplorer->m_info);
-	}
+//	if (scene != m_scene) {
+//		if (m_sceneExplorer) {
+//			m_explorerDictionary.RemoveAll();
+//			delete m_sceneExplorer;
+//		}
+//		m_sceneExplorer = new dSceneExplorer(scene->GetInfoFromNode (scene->GetRootNode()));
+//		dAssert (!scene->GetFirstChildLink(scene->GetRootNode()));
+//		m_explorerDictionary.Insert(m_sceneExplorer, m_sceneExplorer->m_info);
+//	}
 
 	m_scene = scene;
 }
@@ -315,7 +315,7 @@ void* dPluginInterface::GetNextSelectedNode(void* const node) const
 	iter ++;
 	return iter.GetNode() ? iter.GetNode()->GetKey() : NULL;
 }
-
+/*
 void dPluginInterface::MergeExplorer()
 {
 	struct Pair
@@ -353,10 +353,11 @@ void dPluginInterface::MergeExplorer()
 		}
 	}
 }
+*/
 
 void dPluginInterface::MergeScene (dPluginScene* const scene)
 {
 	Push(new dUndoCurrentScene(this, scene));
 	m_scene->MergeScene(scene);
-	MergeExplorer();
+//	MergeExplorer();
 }

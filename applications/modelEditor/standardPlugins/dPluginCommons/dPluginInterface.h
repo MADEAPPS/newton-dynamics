@@ -30,7 +30,7 @@ class dPluginInterface: public dUndoRedoManager
 	class dPluginDll: public dList <HMODULE>
 	{
 	};
-
+/*
 	class dSceneExplorer: public dHierarchy<dSceneExplorer>
 	{
 		public:
@@ -59,7 +59,7 @@ class dPluginInterface: public dUndoRedoManager
 	{
 		public:
 	};
-
+*/
 /*
 	class AssetPluginAssociation
 	{
@@ -140,7 +140,7 @@ class dPluginInterface: public dUndoRedoManager
 
 	DPLUGIN_API virtual void DestroyScene ();
 	DPLUGIN_API virtual void MergeScene (dPluginScene* const asset);
-	DPLUGIN_API virtual void MergeExplorer();
+//	DPLUGIN_API virtual void MergeExplorer();
 	DPLUGIN_API virtual void RefreshExplorerEvent(bool clear) const;
 
 	protected:
@@ -151,14 +151,14 @@ class dPluginInterface: public dUndoRedoManager
 	private:
 	dPluginScene* m_scene;
 	dSceneRender* m_render;
-	dSceneExplorer* m_sceneExplorer;
+//	dSceneExplorer* m_sceneExplorer;
 
 	dPluginCamera* m_currentCamera;
 	dPluginDll m_allPlugins;
 	const char* m_filePathFile;
 
 	dTree<int, void*> m_selection;
-	ExplorerDictionary m_explorerDictionary;
+//	ExplorerDictionary m_explorerDictionary;
 	
 	dTree<dPluginRecord*, dCRCTYPE> m_pluginDictionary;
 	static int m_totalMemoryUsed;
