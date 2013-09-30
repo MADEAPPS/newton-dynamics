@@ -152,19 +152,13 @@ class dPluginInterface: public dUndoRedoManager
 	protected:
 	DPLUGIN_API dPluginDll::dListNode* LoadPlugins(const char* const path);
 
-	
-
 	private:
 	dPluginScene* m_scene;
 	dSceneRender* m_render;
-//	dSceneExplorer* m_sceneExplorer;
-
 	dPluginCamera* m_currentCamera;
 	dPluginDll m_allPlugins;
 	const char* m_filePathFile;
-
 	dTree<int, void*> m_selection;
-//	ExplorerDictionary m_explorerDictionary;
 	
 	dTree<dPluginRecord*, dCRCTYPE> m_pluginDictionary;
 	static int m_totalMemoryUsed;

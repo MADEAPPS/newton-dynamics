@@ -357,6 +357,13 @@ void dPluginInterface::MergeExplorer()
 
 void dPluginInterface::MergeScene (dPluginScene* const scene)
 {
+	dPluginScene::Iterator iter (*scene);
+	for (iter.Begin(); iter; iter ++) {
+		dPluginScene::dTreeNode* const sceneNode = iter.GetNode();
+		dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*) scene->GetInfoFromNode(sceneNode);
+		sceneInfo->SetEditorFlags(sceneInfo->GetEditorFlags() | m_expanded);
+	}
+
 	Push(new dUndoCurrentScene(this, scene));
 	m_scene->MergeScene(scene);
 //	MergeExplorer();

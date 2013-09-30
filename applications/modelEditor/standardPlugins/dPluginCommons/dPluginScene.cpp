@@ -26,21 +26,16 @@ dPluginScene::dPluginScene(NewtonWorld* const newton)
 	:dScene (newton)
 	,m_lru (100)
 {
+	dScene::dTreeNode* const rootNode = GetRootNode();
+	dNodeInfo* const rootInfo = GetInfoFromNode(rootNode);
+	rootInfo->SetEditorFlags (dPluginInterface::m_expanded);
+
 }
 
 dPluginScene::dPluginScene(const dPluginScene& scene)
 	:dScene (scene)
 	,m_lru (scene.m_lru)
 {
-	Iterator iter (*this);
-	for (iter.Begin(); iter; iter ++) {
-		dTreeNode* const sceneNode = iter.GetNode();
-		dNodeInfo* const info = (dSceneNodeInfo*) GetInfoFromNode(sceneNode);
-
-		if (!info->FindVariable(D_EXPLORER_INFO)) {
-			dAssert (0);
-		}
-	}
 }
 
 
