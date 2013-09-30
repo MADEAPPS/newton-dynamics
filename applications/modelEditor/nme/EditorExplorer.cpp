@@ -16,6 +16,8 @@
 BEGIN_EVENT_TABLE (EditorExplorer, wxTreeCtrl)
 
 	EVT_CHAR (OnKeyboardItem)
+	EVT_TREE_ITEM_EXPANDED(NewtonModelEditor::ID_EDIT_NODE_NAME, OnExpandItem) 
+	EVT_TREE_ITEM_COLLAPSED(NewtonModelEditor::ID_EDIT_NODE_NAME, OnCollapseItem) 
 	EVT_TREE_SEL_CHANGED(NewtonModelEditor::ID_EDIT_NODE_NAME, OnSelectItem)
 	EVT_TREE_DELETE_ITEM(NewtonModelEditor::ID_EDIT_NODE_NAME, OnDeleteItem)
 //	EVT_TREE_KEY_DOWN (NewtonModelEditor::ID_EDIT_NODE_NAME, OnKeyboardItem)
@@ -349,6 +351,21 @@ void EditorExplorer::OnEndEditItemName (wxTreeEvent& event)
 */
 }
 
+void EditorExplorer::OnExpandItem (wxTreeEvent& event)
+{
+	wxTreeItemId item (event.GetItem());
+	ExplorerData* const nodeData = ((ExplorerData*)GetItemData(item));
+	nodeData->m_info->SetEditorFlags(nodeData->m_info->GetEditorFlags() | dPluginInterface::m_expanded);
+}
+
+void EditorExplorer::OnCollapseItem (wxTreeEvent& event)
+{
+	wxTreeItemId item (event.GetItem());
+	ExplorerData* const nodeData = ((ExplorerData*)GetItemData(item));
+	nodeData->m_info->SetEditorFlags(nodeData->m_info->GetEditorFlags() & ~dPluginInterface::m_expanded);
+}
+
+
 void EditorExplorer::ReconstructScene(const dPluginScene* const scene)
 {
 	if (GetRootItem() == NULL) {
@@ -404,13 +421,26 @@ void EditorExplorer::ReconstructScene(const dPluginScene* const scene)
 				}
 			}
 		}
-
 	
 		for (wxTreeItemId childItem = GetLastChild(rootItem); childItem; childItem = GetPrevSibling(childItem)) {
 			stack.Append(childItem);
 		}
 	}
 
-//	virtual void Expand(const wxTreeItemId& item) = 0;
+	stack.Append(GetRootItem());
+	while (stack.GetCount()) {
+		wxTreeItemId rootItem (stack.GetLast()->GetInfo());
+		stack.Remove(stack.GetLast());
 
+		ExplorerData* const nodeData = ((ExplorerData*)GetItemData(rootItem));
+		const unsigned itemFlags = nodeData->m_info->GetEditorFlags();
+		if (itemFlags & dPluginInterface::m_expanded) {
+			Expand (rootItem);
+		} else {
+			Collapse (rootItem);
+		}
+		for (wxTreeItemId childItem = GetLastChild(rootItem); childItem; childItem = GetPrevSibling(childItem)) {
+			stack.Append(childItem);
+		}
+	}
 }

@@ -96,6 +96,9 @@ class dNodeInfo: public dClassInfo, public dVariableList
 
 	virtual const char* GetName () const;
 	virtual void SetName (const char* const name);
+
+	virtual unsigned GetEditorFlags() const;
+	virtual void SetEditorFlags(unsigned flags);
 	
 	virtual void Serialize (TiXmlElement* const rootNode) const; 
 	virtual bool Deserialize (const dScene* const scene, TiXmlElement* const rootNode);

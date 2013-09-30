@@ -143,6 +143,15 @@ dVariable* dNodeInfo::CreateVariable (const char* const name)
 */
 
 
+unsigned dNodeInfo::GetEditorFlags() const
+{
+	return m_editorFlags;
+}
+
+void dNodeInfo::SetEditorFlags(unsigned flags)
+{
+	m_editorFlags = flags;
+}
 
 
 

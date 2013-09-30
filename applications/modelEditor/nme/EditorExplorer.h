@@ -34,7 +34,11 @@ class EditorExplorer: public wxTreeCtrl
 	private:
 	DECLARE_EVENT_TABLE()
 
+
 	void OnKeyboardItem (wxKeyEvent& event);
+
+	void OnExpandItem (wxTreeEvent& event);
+	void OnCollapseItem (wxTreeEvent& event);
 	void OnDeleteItem (wxTreeEvent& event);
 	void OnSelectItem (wxTreeEvent& event);
 	void OnEndEditItemName (wxTreeEvent& event);
