@@ -84,15 +84,10 @@ class EditorExplorer::ChangeNames: public TraverseExplorer
 
 	bool TraverseCallback (wxTreeItemId item) const
 	{
-		dAssert (0);
-/*
-		dPluginScene* const scene = m_me->m_mainFrame->GetScene(); 		
-
 		ExplorerData* const data = (ExplorerData*) m_me->GetItemData(item);
-		if (m_nodeInfo == scene->GetInfoFromNode(data->m_node)) {
+		if (m_nodeInfo == data->m_info) {
 			m_me->SetItemText(item, wxString (m_nodeInfo->GetName()));
 		}
-*/
 		return true;
 	}
 
@@ -332,23 +327,15 @@ void EditorExplorer::OnBeginEditItemName (wxTreeEvent& event)
 
 void EditorExplorer::OnEndEditItemName (wxTreeEvent& event)
 {
-	dAssert (0);
-/*
 	wxString name (event.GetLabel());
 	if (!name.IsEmpty()) {
-
 		wxTreeItemId item (event.GetItem());
 		ExplorerData* const data = (ExplorerData*) GetItemData(item);
-		dScene::dTreeNode* const node = data->m_node;
-		dPluginScene* const scene = m_mainFrame->GetScene(); 
-		dNodeInfo* const info = scene->GetInfoFromNode(node);
-
+		dNodeInfo* const info = data->m_info;
 		m_mainFrame->Push (new UndoRedoChangeName(this, wxString(info->GetName()), info));
-
 		info->SetName(name.c_str());
 		ChangeNames changeName (this, info);
 	}
-*/
 }
 
 void EditorExplorer::OnExpandItem (wxTreeEvent& event)
