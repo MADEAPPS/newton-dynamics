@@ -23,6 +23,26 @@ class dPluginScene;
 class dUndoCurrentScene: public dUndoRedo
 {
 	public:
+/*
+	class dSelectionTree: public dHierarchy<dSelectionTree>
+	{
+		public:
+		dSelectionTree (dNodeInfo* const info)
+			:dHierarchy<dSelectionTree>(info->GetName())
+			,m_info(info)
+		{
+			m_info->AddRef();
+		}
+
+		~dSelectionTree ()
+		{
+			m_info->Release();
+		}
+
+		dNodeInfo* m_info;
+	};
+*/
+
 	dUndoCurrentScene(dPluginInterface* const interface, dPluginScene* const deltaScene);
 	virtual ~dUndoCurrentScene();
 
@@ -31,8 +51,8 @@ class dUndoCurrentScene: public dUndoRedo
 	virtual dUndoRedo* CreateRedoState() const;
 	
 //	int nodeIndex;
-//	dTree<int, void*> m_selection;
 //	dTree<int, void*> m_exploreStatus;
+//	dSelectionTree* m_selection;
 	dPluginScene* m_deltaScene;
 	dPluginInterface* m_interface;
 };

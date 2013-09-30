@@ -42,13 +42,14 @@ class EditorRenderViewport: public wxGLCanvas, public dPluginCamera
 	int GetWidth() const;
 	int GetHeight() const;
 
+	void RenderSelectedNodeGizmo () const;
 
 /*
 	void create();
 	void UpdateScene (dViewPortModes mode);
 	protected:
 	void SelectAssetNode (const FXEvent* const event);
-	void RenderSelectedNodeGizmo () const;
+	
 	EditorCanvas* m_canvas;
 	bool m_leftMouseKeyState;
 	long onLeftMouseKeyUp(FXObject* sender, FXSelector id, void* eventPtr);

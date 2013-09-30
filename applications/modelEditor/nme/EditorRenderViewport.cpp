@@ -112,13 +112,16 @@ void EditorRenderViewport::SelectAssetNode (const FXEvent* const event)
 		}
 	}
 }
+*/
 
 void EditorRenderViewport::RenderSelectedNodeGizmo () const
 {
-	dPluginScene* const scene = m_mainFrame->GetAsset();		
-	EditorAssetExplorer* const assetBrowser = m_mainFrame->m_explorer->m_assetExplorer;
+//	dPluginScene* const scene = m_mainFrame->GetScene();		
+//	EditorExplorer* const explorer = m_mainFrame->GetExplorer();
 
 	for (void* link = m_mainFrame->GetFirtSelectedNode(); link; link = m_mainFrame->GetNextSelectedNode(link)) {
+		dAssert (0);
+/*
 		FXTreeItem* item = assetBrowser->findItemByData(link);
 		_ASSERTE (item);
 		dMatrix globalMatrix (GetIdentityMatrix());
@@ -141,9 +144,10 @@ void EditorRenderViewport::RenderSelectedNodeGizmo () const
 		globalMatrix.PolarDecomposition (axis, scale, stretchAxis);
 		//DrawNodeSelectionGizmo(m_render, axis);
 		DrawNodeSelectAndMoveGizmo(m_render, axis);
+*/
 	}
 }
-*/
+
 
 
 EditorRenderViewport::EditorRenderViewport (NewtonModelEditor* const mainFrame)
@@ -295,8 +299,6 @@ void EditorRenderViewport::UpdateScene ()
 			{
 				scene->RenderSolidWireframe(m_render);
 				//scene->RenderWireframeSelection (m_render, m_mainFrame);
-				// draw the gizmo for the selections
-				//		RenderSelectedNodeGizmo();
 				break;
 			}
 
@@ -304,8 +306,6 @@ void EditorRenderViewport::UpdateScene ()
 			{
 				scene->RenderWireframe(m_render);
 				//scene->RenderWireframeSelection (m_render, m_mainFrame);
-				// draw the gizmo for the selections
-				//		RenderSelectedNodeGizmo();
 				break;
 			}
 
@@ -318,6 +318,9 @@ void EditorRenderViewport::UpdateScene ()
 				dAssert(0);
 		}
 	}
+
+	// draw the gizmo for the selections
+	RenderSelectedNodeGizmo();
 }
 
 

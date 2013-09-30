@@ -15,9 +15,12 @@
 
 BEGIN_EVENT_TABLE (EditorExplorer, wxTreeCtrl)
 
-
-	EVT_TREE_BEGIN_LABEL_EDIT (NewtonModelEditor::ID_EDIT_NODE_NAME, OnBeginEdit)
-	EVT_TREE_END_LABEL_EDIT (NewtonModelEditor::ID_EDIT_NODE_NAME, OnEndEdit)
+	EVT_CHAR (OnKeyboardItem)
+	EVT_TREE_SEL_CHANGED(NewtonModelEditor::ID_EDIT_NODE_NAME, OnSelectItem)
+	EVT_TREE_DELETE_ITEM(NewtonModelEditor::ID_EDIT_NODE_NAME, OnDeleteItem)
+//	EVT_TREE_KEY_DOWN (NewtonModelEditor::ID_EDIT_NODE_NAME, OnKeyboardItem)
+	EVT_TREE_BEGIN_LABEL_EDIT (NewtonModelEditor::ID_EDIT_NODE_NAME, OnBeginEditItemName)
+	EVT_TREE_END_LABEL_EDIT (NewtonModelEditor::ID_EDIT_NODE_NAME, OnEndEditItemName)
 
 END_EVENT_TABLE()
 
@@ -347,11 +350,44 @@ void EditorExplorer::ReconstructScene(const dPluginScene* const scene)
 //	virtual void Expand(const wxTreeItemId& item) = 0;
 }
 
-void EditorExplorer::OnBeginEdit (wxTreeEvent& event)
+void EditorExplorer::OnKeyboardItem (wxKeyEvent& event)
+{
+	switch ( event.GetKeyCode() )
+	{
+		case WXK_DELETE:
+		{
+			wxTreeEvent event(wxEVT_COMMAND_TREE_DELETE_ITEM, this, wxTreeItemId());
+			GetEventHandler()->ProcessEvent (event);
+			return;
+		}
+	}
+
+	event.Skip();
+}
+
+void EditorExplorer::OnDeleteItem (wxTreeEvent& event)
+{
+	wxArrayTreeItemIds items;
+	size_t count = GetSelections(items);
+
+	dAssert (0);
+}
+
+void EditorExplorer::OnSelectItem (wxTreeEvent& event)
+{
+//	wxTreeItemId item (event.GetItem());
+//	wxArrayTreeItemIds items;
+//	size_t count = GetSelections(items);
+//	bool selectMode = IsSelected(item);
+//	bool selectMode1 = IsSelected(item);
+}
+
+
+void EditorExplorer::OnBeginEditItemName (wxTreeEvent& event)
 {
 }
 
-void EditorExplorer::OnEndEdit (wxTreeEvent& event)
+void EditorExplorer::OnEndEditItemName (wxTreeEvent& event)
 {
 	wxString name (event.GetLabel());
 	if (!name.IsEmpty()) {

@@ -34,8 +34,12 @@ class EditorExplorer: public wxTreeCtrl
 	private:
 	DECLARE_EVENT_TABLE()
 
-	void OnEndEdit (wxTreeEvent& event);
-	void OnBeginEdit (wxTreeEvent& event);
+	void OnKeyboardItem (wxKeyEvent& event);
+	void OnDeleteItem (wxTreeEvent& event);
+	void OnSelectItem (wxTreeEvent& event);
+	void OnEndEditItemName (wxTreeEvent& event);
+	void OnBeginEditItemName (wxTreeEvent& event);
+
 	
 
 

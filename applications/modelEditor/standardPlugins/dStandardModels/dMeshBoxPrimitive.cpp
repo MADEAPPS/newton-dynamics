@@ -24,11 +24,6 @@
 class dBoxPrimitiveUI: public wxDialog
 {
 	public:
-	dBoxPrimitiveUI()
-	{
-		dAssert(0);
-	}
-
 	dBoxPrimitiveUI(wxWindow* const owner)
 		:wxDialog(owner, 0, wxT("Box properties")) 
 		,m_sizeX (1.0f)

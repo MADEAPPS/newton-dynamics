@@ -19,6 +19,7 @@
 #include "dPluginRecord.h"
 #include "dPluginCamera.h"
 #include "dPluginInterface.h"
+#include "dUndoCurrentScene.h"
 
 typedef dPluginRecord** (CALLBACK* GetPluginArray)();
 
@@ -26,6 +27,7 @@ dPluginInterface::dPluginInterface(void)
 	:dUndoRedoManager()
 	,m_scene(NULL)
 	,m_render(NULL)
+	,m_sceneExplorer(NULL)
 	,m_currentCamera(NULL)
 	,m_filePathFile(NULL)
 {
@@ -40,9 +42,23 @@ dPluginInterface::~dPluginInterface(void)
 		m_allPlugins.Remove(m_allPlugins.GetFirst());
 	}
 
+	DestroyScene ();
+
 	m_render->Release();
 }
 
+
+void dPluginInterface::DestroyScene ()
+{
+	if (m_scene) {
+		if (m_sceneExplorer) {
+			delete m_sceneExplorer;
+		}
+		m_scene->Release();
+		m_scene = NULL; 
+		m_sceneExplorer = NULL;
+	}
+}
 
 void dPluginInterface::RefreshExplorerEvent(bool clear) const
 {
@@ -77,7 +93,6 @@ dPluginInterface::dPluginDll::dListNode* dPluginInterface::LoadPlugins(const cha
 				// get the interface function pointer to the Plug in classes
 				GetPluginArray GetPluginsTable = (GetPluginArray) GetProcAddress (module, "GetPluginArray"); 
 				if (GetPluginsTable) {
-//					plugins.Append(module);
 					m_allPlugins.Append(module);
 				} else {
 					FreeLibrary(module);
@@ -112,13 +127,18 @@ dPluginScene* dPluginInterface::GetScene() const
 
 void dPluginInterface::SetScene(dPluginScene* const scene)
 {
+	if (scene != m_scene) {
+		if (m_sceneExplorer) {
+			m_explorerDictionary.RemoveAll();
+			delete m_sceneExplorer;
+		}
+		m_sceneExplorer = new dSceneExplorer(scene->GetInfoFromNode (scene->GetRootNode()));
+		dAssert (!scene->GetFirstChildLink(scene->GetRootNode()));
+		m_explorerDictionary.Insert(m_sceneExplorer, m_sceneExplorer->m_info);
+	}
+
 	m_scene = scene;
 }
-
-//dPluginScene* dPluginInterface::GetAsset() const
-//{
-//	return GetAssetFromNode(GetCurrentAssetNode());
-//}
 
 dSceneRender* dPluginInterface::GetRender() const
 {
@@ -227,31 +247,31 @@ dPluginRecord* dPluginInterface::GetPluginFromNode(void* const pluginNode) const
 
 
 
-void dPluginInterface::ClearExplorerExpand()
-{
-	m_ExplorerExpand.RemoveAll();
-}
+//void dPluginInterface::ClearExplorerExpand()
+//{
+//	m_ExplorerExpand.RemoveAll();
+//}
 
-void dPluginInterface::AddExplorerExpandNode(void* const incidentLink, bool state)
-{
-	m_ExplorerExpand.Insert(state ? 1 : 0, incidentLink);
-}
+//void dPluginInterface::AddExplorerExpandNode(void* const incidentLink, bool state)
+//{
+//	m_ExplorerExpand.Insert(state ? 1 : 0, incidentLink);
+//}
 
 
-void dPluginInterface::SetExplorerExpandNodeState(void* const incidentLink, bool state)
-{
-	dTree<int, void*>::dTreeNode* const ptr = m_ExplorerExpand.Find(incidentLink);
-	_ASSERTE (ptr);
-	if (ptr) {
-		ptr->GetInfo() = state ? 1 : 0;
-	}
-}
+//void dPluginInterface::SetExplorerExpandNodeState(void* const incidentLink, bool state)
+//{
+//	dTree<int, void*>::dTreeNode* const ptr = m_ExplorerExpand.Find(incidentLink);
+//	_ASSERTE (ptr);
+//	if (ptr) {
+//		ptr->GetInfo() = state ? 1 : 0;
+//	}
+//}
 
-bool dPluginInterface::GetExplorerExpandNodeState(void* const incidentLink) const
-{
-	dTree<int, void*>::dTreeNode* const ptr = m_ExplorerExpand.Find(incidentLink);
-	return ptr ? (ptr->GetInfo() ? true : false) : false;
-}
+//bool dPluginInterface::GetExplorerExpandNodeState(void* const incidentLink) const
+//{
+//	dTree<int, void*>::dTreeNode* const ptr = m_ExplorerExpand.Find(incidentLink);
+//	return ptr ? (ptr->GetInfo() ? true : false) : false;
+//}
 
 
 
@@ -296,3 +316,47 @@ void* dPluginInterface::GetNextSelectedNode(void* const node) const
 	return iter.GetNode() ? iter.GetNode()->GetKey() : NULL;
 }
 
+void dPluginInterface::MergeExplorer()
+{
+	struct Pair
+	{
+		Pair(dScene::dTreeNode* const sceneNode, dSceneExplorer* explorerNode)
+			:m_sceneNode(sceneNode)
+			,m_exploreNode (explorerNode)
+		{
+		}
+
+		dScene::dTreeNode* m_sceneNode;
+		dSceneExplorer* m_exploreNode;
+	};
+
+	dAssert (m_sceneExplorer);
+	dAssert (m_sceneExplorer->m_info == m_scene->GetInfoFromNode (m_scene->GetRootNode()));
+	dList <Pair> stack;
+	stack.Append(Pair(m_scene->GetRootNode(), m_sceneExplorer));
+
+	while (stack.GetCount()) {
+
+		Pair pair (stack.GetLast()->GetInfo());
+		stack.Remove(stack.GetLast());
+
+		for (void* link = m_scene->GetFirstChildLink(pair.m_sceneNode); link; link = m_scene->GetNextChildLink(pair.m_sceneNode, link)) {
+			dScene::dTreeNode* const childNode = m_scene->GetNodeFromLink (link);
+			dNodeInfo* const childInfo = m_scene->GetInfoFromNode(childNode);
+			ExplorerDictionary::dTreeNode* dictionaryNode = m_explorerDictionary.Find(childInfo);
+			if (!dictionaryNode) {
+				dSceneExplorer* const explorerNode = new dSceneExplorer(childInfo);
+				explorerNode->Attach(pair.m_exploreNode, true);
+				dictionaryNode = m_explorerDictionary.Insert(explorerNode, childInfo);
+			}
+			stack.Append(Pair(childNode, dictionaryNode->GetInfo()));
+		}
+	}
+}
+
+void dPluginInterface::MergeScene (dPluginScene* const scene)
+{
+	Push(new dUndoCurrentScene(this, scene));
+	m_scene->MergeScene(scene);
+	MergeExplorer();
+}

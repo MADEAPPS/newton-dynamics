@@ -30,6 +30,36 @@ class dPluginInterface: public dUndoRedoManager
 	class dPluginDll: public dList <HMODULE>
 	{
 	};
+
+	class dSceneExplorer: public dHierarchy<dSceneExplorer>
+	{
+		public:
+		dSceneExplorer (dNodeInfo* const info)
+			:dHierarchy<dSceneExplorer>(info->GetName())
+			,m_info(info)
+		{
+			m_info->AddRef();
+		}
+
+		virtual dBaseHierarchy* CreateClone () const
+		{
+			dAssert(0);
+			return NULL;
+		}
+
+		~dSceneExplorer ()
+		{
+			m_info->Release();
+		}
+
+		dNodeInfo* m_info;
+	};
+
+	class ExplorerDictionary: public dTree<dSceneExplorer*, dNodeInfo*>
+	{
+		public:
+	};
+
 /*
 	class AssetPluginAssociation
 	{
@@ -68,19 +98,19 @@ class dPluginInterface: public dUndoRedoManager
 
 
 	DPLUGIN_API dPluginInterface(void);
-	virtual DPLUGIN_API  ~dPluginInterface(void);
+	DPLUGIN_API virtual  ~dPluginInterface(void);
 	
-	virtual DPLUGIN_API dPluginScene* GetScene() const;
-	virtual DPLUGIN_API void SetScene(dPluginScene* const scene);
+	DPLUGIN_API virtual dPluginScene* GetScene() const;
+	DPLUGIN_API virtual void SetScene(dPluginScene* const scene);
 
-	virtual DPLUGIN_API dSceneRender* GetRender() const;
+	DPLUGIN_API virtual dSceneRender* GetRender() const;
 
-	virtual DPLUGIN_API dPluginCamera* GetCamera() const;
-	virtual DPLUGIN_API dPluginRecord* GetPlugin(const char* const signature) const;
+	DPLUGIN_API virtual dPluginCamera* GetCamera() const;
+	DPLUGIN_API virtual dPluginRecord* GetPlugin(const char* const signature) const;
 
-	virtual DPLUGIN_API void* GetFirstPluginNode() const;
-	virtual DPLUGIN_API void* GetNextPluginNode(void* const pluginNode) const;
-	virtual DPLUGIN_API dPluginRecord* GetPluginFromNode(void* const pluginNode) const;
+	DPLUGIN_API virtual void* GetFirstPluginNode() const;
+	DPLUGIN_API virtual void* GetNextPluginNode(void* const pluginNode) const;
+	DPLUGIN_API virtual dPluginRecord* GetPluginFromNode(void* const pluginNode) const;
 
 //	virtual dAssetList::dListNode* AddAsset(dPluginScene* const scene, dPluginMesh* plugin);
 //	virtual void RemoveAsset(dAssetList::dListNode* const node);
@@ -92,36 +122,44 @@ class dPluginInterface: public dUndoRedoManager
 //	virtual dPluginScene* GetAssetFromNode(dAssetList::dListNode* const node) const;
 //	virtual dPluginMesh* GetAssetPluginFromNode(dAssetList::dListNode* const node) const;
 
-	virtual DPLUGIN_API const char* GetFilePath() const;
+	DPLUGIN_API virtual const char* GetFilePath() const;
 
-	virtual DPLUGIN_API void ClearSelection();
-	virtual DPLUGIN_API bool IsNodeSelected(void* const incidentLink) const;
-	virtual DPLUGIN_API void AddToSelection(void* const incidentLink);
-	virtual DPLUGIN_API void RemoveFromSelection(void* const incidentLink);
-	virtual DPLUGIN_API void* GetFirtSelectedNode() const;
-	virtual DPLUGIN_API void* GetNextSelectedNode(void* const incidentLink) const;
-
-
-	virtual DPLUGIN_API void ClearExplorerExpand();
-	virtual DPLUGIN_API void AddExplorerExpandNode(void* const incidentLink, bool state);
-	virtual DPLUGIN_API void SetExplorerExpandNodeState(void* const incidentLink, bool state);
-	virtual DPLUGIN_API bool GetExplorerExpandNodeState(void* const incidentLink) const;
+	DPLUGIN_API virtual void ClearSelection();
+	DPLUGIN_API virtual bool IsNodeSelected(void* const incidentLink) const;
+	DPLUGIN_API virtual void AddToSelection(void* const incidentLink);
+	DPLUGIN_API virtual void RemoveFromSelection(void* const incidentLink);
+	DPLUGIN_API virtual void* GetFirtSelectedNode() const;
+	DPLUGIN_API virtual void* GetNextSelectedNode(void* const incidentLink) const;
 
 
-	virtual DPLUGIN_API void RefreshExplorerEvent(bool clear) const;
+//	DPLUGIN_API virtual void ClearExplorerExpand();
+//	DPLUGIN_API virtual void AddExplorerExpandNode(void* const incidentLink, bool state);
+//	DPLUGIN_API virtual void SetExplorerExpandNodeState(void* const incidentLink, bool state);
+//	DPLUGIN_API virtual bool GetExplorerExpandNodeState(void* const incidentLink) const;
+
+
+	DPLUGIN_API virtual void DestroyScene ();
+	DPLUGIN_API virtual void MergeScene (dPluginScene* const asset);
+	DPLUGIN_API virtual void MergeExplorer();
+	DPLUGIN_API virtual void RefreshExplorerEvent(bool clear) const;
 
 	protected:
 	DPLUGIN_API dPluginDll::dListNode* LoadPlugins(const char* const path);
 
+	
+
 	private:
 	dPluginScene* m_scene;
 	dSceneRender* m_render;
+	dSceneExplorer* m_sceneExplorer;
+
 	dPluginCamera* m_currentCamera;
 	dPluginDll m_allPlugins;
 	const char* m_filePathFile;
 
 	dTree<int, void*> m_selection;
-	dTree<int, void*> m_ExplorerExpand;
+	ExplorerDictionary m_explorerDictionary;
+	
 	dTree<dPluginRecord*, dCRCTYPE> m_pluginDictionary;
 	static int m_totalMemoryUsed;
 };

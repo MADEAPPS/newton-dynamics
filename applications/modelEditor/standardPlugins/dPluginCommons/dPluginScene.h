@@ -49,7 +49,7 @@ class dPluginScene: public dScene
 	virtual DPLUGIN_API void RenderSolidWireframe (dSceneRender* const render);
 	virtual DPLUGIN_API void RenderWireframeSelection (dSceneRender* const render, dPluginInterface* const interface);
 	virtual DPLUGIN_API void UpdateAllOOBB ();
-	virtual void DPLUGIN_API MergeScene (dPluginInterface* const interface, dPluginScene* const asset) const;
+//	virtual void DPLUGIN_API MergeScene (dPluginInterface* const interface, dPluginScene* const asset) const;
 
 	private:
 	virtual void RenderWireframeSceneNode (dSceneRender* const render, dScene::dTreeNode* const sceneNode);

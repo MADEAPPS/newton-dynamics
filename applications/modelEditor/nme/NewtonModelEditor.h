@@ -113,6 +113,8 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	NewtonModelEditor(const wxString& title, const wxPoint& pos, const wxSize& size);
 	~NewtonModelEditor();
 
+	EditorExplorer* GetExplorer() const;
+
 /*
 	// GUI interface functions
 	void create();
@@ -231,7 +233,7 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	void CreateNavigationToolBar();
 	void CreateObjectSelectionToolBar();
 	
-	void Initilialize();
+	
 	void CreateScene();
 	void DestroyScene();
 	void RefrehViewports();
@@ -241,6 +243,7 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	void LoadIcon (const char* const iconName);
 
 
+	
 	virtual void RefreshExplorerEvent(bool clear) const;
 	
 	
@@ -256,7 +259,6 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 
 	EditorRenderViewport* m_renderViewport;
 	EditorExplorer* m_explorer;
-
 
 	int m_viewModeMap[ID_VIEW_MODES_LAST - ID_VIEW_MODES];
 	int m_shapeModeMap[ID_SHADE_MODES_LAST - ID_SHADE_MODES];

@@ -767,7 +767,10 @@ void dScene::MergeScene (dScene* const scene)
 {
 	dTree<dTreeNode*,dTreeNode*> map;
 	Iterator iter (*scene);
-	map.Insert(GetRootNode(), scene->GetRootNode());
+
+	dTreeNode* const rootNode = GetRootNode();
+
+	map.Insert(rootNode, scene->GetRootNode());
 	for (iter.Begin(); iter; iter ++) {
 		dTreeNode* const node = iter.GetNode();
 		dNodeInfo* const info = scene->GetInfoFromNode(node);
@@ -775,7 +778,7 @@ void dScene::MergeScene (dScene* const scene)
 			dAssert (!Find (info->GetUniqueID()));
 
 			if (info->IsType(dSceneCacheInfo::GetRttiType())) {
-				dTreeNode* newNode = FindChildByName(GetRootNode(), info->GetName());
+				dTreeNode* newNode = FindChildByName(rootNode, info->GetName());
 				if (!newNode) {
 					newNode = AddNode (info, NULL);
 				}
@@ -790,25 +793,28 @@ void dScene::MergeScene (dScene* const scene)
 	//now connect all edges
 	dTree<dTreeNode*,dTreeNode*>::Iterator mapIter (map);
 	for (mapIter.Begin(); mapIter; mapIter ++) {
-		dTreeNode* const srcNode = mapIter.GetKey();
-		dGraphNode& srcInfoHeader = mapIter.GetNode()->GetInfo()->GetInfo();
-		for (void* ptr = scene->GetFirstChildLink (srcNode); ptr; ptr = scene->GetNextChildLink(srcNode, ptr)) {
+		dTreeNode* const keyNode = mapIter.GetKey();
+		dTreeNode* const curNode = mapIter.GetNode()->GetInfo();
+		//dGraphNode& srcInfoHeader = mapIter.GetNode()->GetInfo()->GetInfo();
+		for (void* ptr = scene->GetFirstChildLink (keyNode); ptr; ptr = scene->GetNextChildLink(keyNode, ptr)) {
 			dTreeNode* const srcLinkNode = scene->GetNodeFromLink(ptr);
 
 			dTree<dTreeNode*,dTreeNode*>::dTreeNode* const mapSaved = map.Find(srcLinkNode);
 			if (mapSaved) {
 				dTreeNode* const node = mapSaved->GetInfo();
-				srcInfoHeader.m_children.Append(node);
+				//srcInfoHeader.m_children.Append(node);
+				AddReference (curNode, node);
 			}
 		}
 
-		for (void* ptr = scene->GetFirstParentLink (srcNode); ptr; ptr = scene->GetNextParentLink(srcNode, ptr)) {
+		for (void* ptr = scene->GetFirstParentLink (keyNode); ptr; ptr = scene->GetNextParentLink(keyNode, ptr)) {
 			dTreeNode* const srcLinkNode = scene->GetNodeFromLink(ptr);
 
 			dTree<dTreeNode*,dTreeNode*>::dTreeNode* const mapSaved = map.Find(srcLinkNode);
 			if (mapSaved) {
 				dTreeNode* const node = mapSaved->GetInfo();
-				srcInfoHeader.m_parents.Append(node);
+				//srcInfoHeader.m_parents.Append(node);
+				AddReference (node, curNode);
 			}
 		}
 	}

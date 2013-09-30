@@ -513,12 +513,18 @@ NewtonModelEditor::NewtonModelEditor(const wxString& title, const wxPoint& pos, 
 	CreateNavigationToolBar();
 	CreateRenderViewPort();
 	CreateExploser();
+	CreateScene();
+
+	// load configuration form last run
+	//	LoadConfig();
+
+	// load all plugins
+	LoadPlugins("stdPlugins");
+	LoadPlugins("plugins");
 
 	// "commit" all changes made to wxAuiManager
 	m_mgr.Update();
 
-	// create the scene
-	Initilialize();
 }
 
 NewtonModelEditor::~NewtonModelEditor()
@@ -530,18 +536,6 @@ NewtonModelEditor::~NewtonModelEditor()
 	DeleteResources();
 }
 
-void NewtonModelEditor::Initilialize()
-{
-	// load configuration form last run
-//	LoadConfig();
-
-	// load all plugins
-	LoadPlugins("stdPlugins");
-	LoadPlugins("plugins");
-
-	// create the scene
-	CreateScene();
-}
 
 void NewtonModelEditor::CreateScene()
 {
@@ -555,17 +549,12 @@ void NewtonModelEditor::CreateScene()
 	m_explorer->ReconstructScene (GetScene());
 }
 
-
-
 void NewtonModelEditor::DestroyScene()
 {
 	Clear();
 	NewtonWorld* const world = GetScene()->GetNewtonWorld();
 
-	GetScene()->Release();
-//	RemoveAllAsset();
-//	m_explorer->RefreshAllViewer();
-
+	dPluginInterface::DestroyScene();
 	NewtonWorldSetUserData(world, NULL);
 	NewtonDestroy(world);
 }
@@ -923,7 +912,7 @@ void NewtonModelEditor::OnMesh (wxCommandEvent& event)
 
 	dPluginScene* const asset = plugin->Create (this);
 	if (asset) {
-		GetScene()->MergeScene(this, asset);
+		MergeScene (asset);
 		asset->Release();
 		RefrehViewports();
 		m_explorer->ReconstructScene(GetScene());
@@ -1034,4 +1023,10 @@ void NewtonModelEditor::RefreshExplorerEvent(bool clear) const
 		m_explorer->Clear();
 	}
 	m_explorer->ReconstructScene (GetScene());
+}
+
+
+EditorExplorer* NewtonModelEditor::GetExplorer() const
+{
+	return m_explorer;
 }
