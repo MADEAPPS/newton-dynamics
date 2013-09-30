@@ -115,8 +115,8 @@ class dNodeInfo: public dClassInfo, public dVariableList
 
 	private:
 	dString m_name;
-
 	unsigned m_uniqueID;
+	unsigned m_editorFlags;
 	static unsigned m_uniqueIDCounter;
 };
 

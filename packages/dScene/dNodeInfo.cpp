@@ -47,6 +47,7 @@ dNodeInfo::dNodeInfo()
 	,dVariableList() 
 	,m_name()
 	,m_uniqueID(m_uniqueIDCounter)
+	,m_editorFlags(0)
 {
 	m_uniqueIDCounter ++;
 }
@@ -57,6 +58,7 @@ dNodeInfo::dNodeInfo(const dNodeInfo& me)
 	,dVariableList(me) 
 	,m_name(me.m_name)
 	,m_uniqueID (m_uniqueIDCounter)
+	,m_editorFlags(me.m_editorFlags)
 {
 	m_uniqueIDCounter ++;
 }
@@ -147,6 +149,7 @@ dVariable* dNodeInfo::CreateVariable (const char* const name)
 void dNodeInfo::Serialize (TiXmlElement* const rootNode) const
 {
 	rootNode->SetAttribute("name", m_name.GetStr());
+	rootNode->SetAttribute("editorFlags", m_editorFlags);
 	dVariableList::Serialize(rootNode);
 }
 
@@ -154,6 +157,7 @@ void dNodeInfo::Serialize (TiXmlElement* const rootNode) const
 bool dNodeInfo::Deserialize (const dScene* const scene, TiXmlElement* const rootNode) 
 {
 	SetName (rootNode->Attribute("name"));
+	rootNode->Attribute("editorFlags", (int*)&m_editorFlags);
 
 	dVariableList::Deserialize(scene, rootNode);
 

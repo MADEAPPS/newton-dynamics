@@ -53,7 +53,8 @@ class dPluginScene: public dScene
 	virtual DPLUGIN_API void UpdateAllOOBB ();
 //	virtual void DPLUGIN_API MergeScene (dPluginInterface* const interface, dPluginScene* const asset) const;
 
-	virtual bool Deserialize (const char* const fileName);
+	virtual DPLUGIN_API bool Deserialize (const char* const fileName);
+	virtual DPLUGIN_API void Serialize (const char* const fileName);
 	private:
 	virtual void RenderWireframeSceneNode (dSceneRender* const render, dScene::dTreeNode* const sceneNode);
 	virtual void RenderFlatShadedSceneNode (dSceneRender* const render, dScene::dTreeNode* const sceneNode);
