@@ -29,8 +29,9 @@ class dPluginRecord
 	{
 		m_import = 0,
 		m_export,
-		m_model,
+		m_tool,
 		m_mesh,
+		m_model,
 		m_body,
 		m_collision,
 	};

@@ -53,6 +53,7 @@ class EditorMainMenu: public wxMenuBar
 	void CreateFileMenu();
 	void CreateEditMenu();
 	void CreateViewMenu();
+	void CreateToolMenu();
 	void CreateMeshMenu();
 	void CreateHelpMenu();
 
@@ -63,6 +64,7 @@ class EditorMainMenu: public wxMenuBar
 	wxMenu* m_fileMenu;
 	wxMenu* m_editMenu;
 	wxMenu* m_viewMenu;
+	wxMenu* m_toolMenu;
 	wxMenu* m_meshMenu;
 	wxMenu* m_helpMenu;
 

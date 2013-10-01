@@ -19,6 +19,7 @@ EditorMainMenu::EditorMainMenu(NewtonModelEditor* const parent)
 	,m_fileMenu(NULL)
 	,m_editMenu(NULL)
 	,m_viewMenu(NULL)
+	,m_toolMenu(NULL)
 	,m_meshMenu(NULL)
 	,m_helpMenu(NULL)
 	,m_importPlugins(NULL)
@@ -27,61 +28,22 @@ EditorMainMenu::EditorMainMenu(NewtonModelEditor* const parent)
 	CreateFileMenu();
 	CreateEditMenu();
 	CreateViewMenu();
+	CreateToolMenu();
 	CreateMeshMenu();
 	CreateHelpMenu();
 
 	// add main menus to menu bar
-	Append (m_fileMenu, wxT("&File"));
-	Append (m_editMenu, wxT("&Edit"));
-	Append (m_viewMenu, wxT("&View"));
-	Append (m_meshMenu, wxT("&Mesh"));
-	Append (m_helpMenu, wxT("&Help"));
-
-/*
-
-
-	// models menu
-	{
-		// this many is going to be populate bu the plugin manager
-		m_modelMenu  = new FXMenuPane(this);
-		new FXMenuTitle(this, "Models", NULL, m_modelMenu);
-		for (int i = NewtonModelEditor::ID_MODEL_PLUGINS; i < NewtonModelEditor::ID_MAX_MODELS_PLUGINS; i ++) {
-			new FXMenuCommand(m_modelMenu, FXString::null, NULL, mainFrame, i);
-		}
-	}
-
-
-	// option menu
-	{
-		m_optionsMenu = new FXMenuPane(this);
-		new FXMenuTitle(this, "Options", NULL, m_optionsMenu);
-
-		new FXMenuCheck(m_optionsMenu, "hide file toolBar", mainFrame, NewtonModelEditor::ID_HIDE_FILE_TOOLBAR);
-		new FXMenuCheck(m_optionsMenu, "hide navigation toolBar", mainFrame, NewtonModelEditor::ID_HIDE_NAVIGATION_TOOLBAR);
-		new FXMenuCheck(m_optionsMenu, "hide explorer panel", mainFrame, NewtonModelEditor::ID_HIDE_EXPLORER_PANEL);
-		new FXMenuCheck(m_optionsMenu, "hide command panel", mainFrame, NewtonModelEditor::ID_HIDE_COMMAND_PANEL);
-
-		{
-			new FXMenuSeparator(m_optionsMenu);
-			m_preferencesMenu = new FXMenuPane(this);
-			new FXMenuCascade(m_optionsMenu, "Preferences...", NULL, m_preferencesMenu);
-			new FXMenuCommand(m_preferencesMenu, "keyboard shortcuts", NULL, mainFrame, NewtonModelEditor::ID_KEYBOARD_SHORCUTS);
-
-		}
-		
-	}
-
-*/
-
-	
+	Append (m_fileMenu, wxT("File"));
+	Append (m_editMenu, wxT("Edit"));
+	Append (m_viewMenu, wxT("View"));
+	Append (m_toolMenu, wxT("Tools"));
+	Append (m_meshMenu, wxT("Mesh"));
+	Append (m_helpMenu, wxT("Help"));
 }
 
 EditorMainMenu::~EditorMainMenu(void)
 {
 }
-
-
-
 
 dPluginRecord* EditorMainMenu::GetPlugin (wxMenu* const paneMenu, int id)
 {
@@ -111,11 +73,9 @@ void EditorMainMenu::CreateHelpMenu()
 void EditorMainMenu::CreateEditMenu()
 {
 	wxMenu* const menu = new wxMenu;
-//("&Hello\tCtrl-H");
 	menu->Append(wxID_UNDO, wxT("&Undo\tCtrl-Z"), wxT("Undo previous action"));
 	menu->Append(wxID_REDO, wxT("&Redo\tCtrl-Y"), wxT("Redo previous action"));
 	menu->Append(NewtonModelEditor::ID_CLEAR_UNDO_HISTORY, wxT("Clear undo history"), wxT("clear the undo redo history"));
-
 	m_editMenu = menu;
 }
 
@@ -145,37 +105,9 @@ void EditorMainMenu::CreateFileMenu()
 	menu->Append (wxID_NEW, wxT("New"), wxT("clean scene"));
 
 	menu->AppendSeparator();
-	menu->Append (wxID_OPEN, wxT("&Open scene\tCtrl-O"), wxT("open an existing scene"));
+	menu->Append (wxID_OPEN, wxT("&Open scene\tCtrl-O"), wxT("Open an existing scene"));
 	menu->Append (wxID_SAVE, wxT("Save scene\tCtrl-S"), wxT("Save current scene"));
 	menu->Append (wxID_SAVEAS, wxT("Save scene as"), wxT("Save current scene to different file"));
-
-
-/*
-		new FXMenuSeparator(menu);
-		new FXMenuCommand(menu, "Load asset", mainFrame->FindIcon("fileOpen.gif"), mainFrame, NewtonModelEditor::ID_LOAD_ASSET);
-		new FXMenuCommand(menu, "Save asset", mainFrame->FindIcon("fileSave.gif"), mainFrame, NewtonModelEditor::ID_SAVE_ASSET);
-		new FXMenuCommand(menu, "Save asset as ...", mainFrame->FindIcon("fileSaveAs.gif"), mainFrame, NewtonModelEditor::ID_SAVE_ASSET_AS);
-	}
-
-	// load save assets
-	{
-		//			new FXMenuSeparator(menu);
-		//			new FXMenuCommand(menu, "Load asset", NULL, mainFrame, NewtonModelEditor::ID_LOAD_ASSET);
-		//			new FXMenuCommand(menu, "Save asset", NULL, mainFrame, NewtonModelEditor::ID_SAVE_ASSET);
-		//			new FXMenuCommand(menu, "Save asset as ...", NULL, mainFrame, NewtonModelEditor::ID_SAVE_ASSET_AS);
-	}
-
-
-	// add Recent file sub menu
-	{
-		new FXMenuSeparator(menu);
-		m_recentFilesMenu = new FXMenuPane(this);
-		new FXMenuCascade(menu, "Recent Files...", NULL, m_recentFilesMenu);
-		for (int i = NewtonModelEditor::ID_RECENT_FILES; i < NewtonModelEditor::ID_MAX_RECENT_FILES; i ++) {
-			new FXMenuCommand(m_recentFilesMenu, FXString::null, NULL, mainFrame, i);
-		}
-	}
-*/
 
 	// add import export plugins file sub menu
 	{
@@ -196,6 +128,13 @@ void EditorMainMenu::CreateFileMenu()
 	m_fileMenu = menu;
 }
 
+
+void EditorMainMenu::CreateToolMenu()
+{
+	wxMenu* const menu = new wxMenu;
+	menu->SetRefData(new BasePluginBaseMenuId(NewtonModelEditor::ID_TOOL_PLUGINS));
+	m_toolMenu = menu;
+}
 
 void EditorMainMenu::CreateMeshMenu()
 {

@@ -696,12 +696,12 @@ void NewtonModelEditor::CreateFileToolBar()
 	wxAuiToolBar* const toolbar = new wxAuiToolBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_OVERFLOW);
 	toolbar->SetToolBitmapSize (wxSize(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE));
 
-	toolbar->AddTool (wxID_NEW, wxT("Create new scene"), *FindIcon("fileNew.gif"));
+	toolbar->AddTool (wxID_NEW, wxT("Create new scene"), *FindIcon("fileNew.gif"), wxT("Clear and create an empty scene"));
 
 	toolbar->AddSeparator();
-	toolbar->AddTool (wxID_OPEN, wxT("Open scene"), *FindIcon("fileOpen.gif"));
-	toolbar->AddTool (wxID_SAVE, wxT("Save scene"), *FindIcon("fileSave.gif"));
-	toolbar->AddTool (wxID_SAVEAS, wxT("Save scene as"), *FindIcon("fileSaveAs.gif"));
+	toolbar->AddTool (wxID_OPEN, wxT("Open scene"), *FindIcon("fileOpen.gif"), wxT("Open an existing scene"));
+	toolbar->AddTool (wxID_SAVE, wxT("Save scene"), *FindIcon("fileSave.gif"), wxT("Save current scene"));
+	toolbar->AddTool (wxID_SAVEAS, wxT("Save scene as"), *FindIcon("fileSaveAs.gif"), wxT("Save current scene to different file"));
 
 	toolbar->Realize();
 	m_mgr.AddPane (toolbar, wxAuiPaneInfo(). Name(wxT("File Menu")).Caption(wxT("File menu")).ToolbarPane().Top());
