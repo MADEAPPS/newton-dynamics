@@ -968,13 +968,6 @@ void NewtonModelEditor::OnOpenScene(wxCommandEvent& event)
 {
 	wxFileDialog open (this, wxT("Load Newton Dynamics Scene"), wxT("../../../media"), wxT(""), wxT("*.ngd"));
 	if (open.ShowModal() == wxID_OK) {
-//		OnNew (event);
-//		m_lastFilePath = open.GetPath();
-//		LoadScene (m_lastFilePath.mb_str());
-//		m_explorer->Clear();
-//		m_explorer->ReconstructScene(GetScene());
-//		RefrehViewports();
-
 		// link the work with this user data
 		NewtonWorld* const world = GetScene()->GetNewtonWorld();
 		dPluginScene* const asset = new dPluginScene (world);

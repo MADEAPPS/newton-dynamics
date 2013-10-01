@@ -250,6 +250,7 @@ void dPluginScene::Serialize (const char* const fileName)
 bool dPluginScene::Deserialize (const char* const fileName)
 {
 	bool state = dScene::Deserialize (fileName);
+/*
 	if (state) {
 		dScene::dTreeNode* const rootNode = GetRootNode();
 		dNodeInfo* const rootInfo = (dSceneNodeInfo*) GetInfoFromNode(rootNode);
@@ -262,6 +263,6 @@ bool dPluginScene::Deserialize (const char* const fileName)
 			}
 		}
 	}
-
+*/
 	return state;
 }

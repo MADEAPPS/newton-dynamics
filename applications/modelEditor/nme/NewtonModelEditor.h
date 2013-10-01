@@ -233,18 +233,13 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	void CreateNavigationToolBar();
 	void CreateObjectSelectionToolBar();
 	
-	
 	void CreateScene();
 	void DestroyScene();
 	void RefrehViewports();
 
 	void LoadPlugins(const char* const path);
 	void LoadIcon (const char* const iconName);
-
-	
 	virtual void RefreshExplorerEvent(bool clear) const;
-	
-	
 	
 	wxAuiManager m_mgr;
 	EditorMainMenu* m_mainMenu;
