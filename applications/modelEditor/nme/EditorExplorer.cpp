@@ -50,8 +50,10 @@ class EditorExplorer::TraverseExplorer
 {
 	public:
 	TraverseExplorer (){}
-	virtual bool TraverseCallback (wxTreeItemId rootItem) const = 0;
-	void TraverseExplorer::Traverse(const EditorExplorer* const me) const
+
+	virtual bool TraverseCallback (wxTreeItemId rootItem) = 0;
+
+	void TraverseExplorer::Traverse(const EditorExplorer* const me)
 	{
 		dList<wxTreeItemId> itemList;
 
@@ -82,7 +84,7 @@ class EditorExplorer::ChangeNames: public TraverseExplorer
 		Traverse(me);
 	}
 
-	bool TraverseCallback (wxTreeItemId item) const
+	bool TraverseCallback (wxTreeItemId item)
 	{
 		ExplorerData* const data = (ExplorerData*) m_me->GetItemData(item);
 		if (m_nodeInfo == data->m_info) {
@@ -158,126 +160,9 @@ EditorExplorer::~EditorExplorer(void)
 
 
 /*
-void EditorExplorer::PopulateCurrentAsset ()
-{
-	dPluginInterface::dAssetList::dListNode* const assetPluginNode = m_mainFrame->GetCurrentAssetNode();
-	if (assetPluginNode) {
-		dPluginScene* const asset = m_mainFrame->GetAssetFromNode(assetPluginNode);
-		m_mainFrame->SetCurrentAssetNode(assetPluginNode);
-		m_assetExplorer->Populate (asset);
-	} else {
-		m_assetExplorer->Populate (NULL);
-	}
-}
-
-void EditorExplorer::SetBrowserSelection ()
-{
-	dPluginInterface::dAssetList::dListNode* const node = m_assetBrowser->GetCurrentAssetPluginNode();
-	if (node != m_mainFrame->GetCurrentAssetNode()) {
-		m_mainFrame->Push (new dUndoAssetCache(m_mainFrame));
-		m_mainFrame->SetCurrentAssetNode(node);
-		PopulateCurrentAsset ();
-	}
-}
-
-dPluginScene* EditorExplorer::GetCurrentAsset() const
-{
-	dPluginInterface::dAssetList::dListNode* const assetPluginNode = m_assetBrowser->GetCurrentAssetPluginNode();
-	if (assetPluginNode) {
-		return m_mainFrame->GetAssetFromNode(assetPluginNode);
-	} else {
-		return NULL;
-	}
-}
-
-void EditorExplorer::AddAsset (dPluginScene* const asset, dPluginMesh* const plugin)
-{
-	m_mainFrame->Push(new dUndoAssetCache(m_mainFrame));
-	
-	// add this asset to the dPluginInterface class
-	dPluginInterface::dAssetList::dListNode* const assetPluginNode = m_mainFrame->AddAsset(asset, plugin);
-
-	// update all bounding boxes
-	asset->UpdateAllOOBB();
-
-	// add this asset to the assetDatabase browser
-	m_assetBrowser->AddAssetAndPopulate (assetPluginNode);
-	m_assetExplorer->Populate (m_mainFrame->GetAssetFromNode (assetPluginNode));
-}
-
-
-void EditorExplorer::RefreshAllViewer ()
-{
-	m_assetBrowser->Clear();
-	int index = 0;
-	int currentIndex = 0;
-	dPluginInterface::dAssetList::dListNode* const currentAsset = m_mainFrame->GetCurrentAssetNode();	
-	for (dPluginInterface::dAssetList::dListNode* assetNode = m_mainFrame->GetFirstAssetNode(); assetNode; assetNode = m_mainFrame->GetNextAssetNode(assetNode)) {	
-		m_assetBrowser->AddAsset (assetNode);
-
-		if (assetNode == currentAsset) {
-			currentIndex = index;
-		}
-		index ++;
-	}
-
-	// populate the asset browser
-	PopulateCurrentAsset();
-	m_assetBrowser->setCurrentItem(-1, FALSE);
-	if (currentAsset) {
-		m_assetBrowser->setCurrentItem(currentIndex, FALSE);
-	}
-
-	// populate the current asset explorer
-	m_assetExplorer->Populate (GetCurrentAsset());
-}
-
-
 void EditorExplorer::HandleSelectionEvent (const dList<dScene::dTreeNode*>& traceToRoot) const
 {
 	m_assetExplorer->HandleSelectionEvent (traceToRoot);
-}
-*/
-
-/*
-void EditorExplorer::PopulateModel(const dPluginScene* const scene, wxTreeItemId modelItem)
-{
-	dScene::dTreeNode* const modelNode = (dScene::dTreeNode*) modelItem->getData();
-	for (void* link = scene->GetFirstChildLink(modelNode); link; link = scene->GetNextChild(modelNode, link)) {
-		dScene::dTreeNode* const node = scene->GetNodeFromLink (link);
-		dNodeInfo* const info = scene->GetInfoFromNode(node);
-
-//		FXTreeItem* const childItem = (FXTreeItem*) m_sceneExplorer->appendItem(modelItem, info->GetName(), NULL, NULL, NULL, TRUE);
-		wxTreeItemId childItem = AppendItem(modelItem, wxT(info->GetName())));
-//		childItem->setData (node);
-		PopulateModel(scene, childItem);
-	}
-}
-*/
-
-/*
-void EditorExplorer::Populate (const dPluginScene* const scene, wxTreeItemId rootItem)
-{
-
-	ExplorerData* const nodeData = ((ExplorerData*)GetItemData(rootItem));
-	dScene::dTreeNode* const rootNode = nodeData->m_node;
-
-	// add all models
-	//	for (dScene::dTreeNode* node = scene->GetFirstNode(); node; node = scene->GetNextNode(node)) {
-	for (void* link = scene->GetFirstChildLink(rootNode); link; link = scene->GetNextChild(rootNode, link)) {
-		dScene::dTreeNode* const node = scene->GetNodeFromLink (link);
-		dNodeInfo* const info = scene->GetInfoFromNode(node);
-//dCRCTYPE xxx = info->GetTypeId();
-//dNodeInfo::GetRttiType();
-//dSceneModelInfo::GetRttiType();
-//		if (info->IsType(dSceneModelInfo::GetRttiType())) {
-			//FXTreeItem* const modelItem = (FXTreeItem*) m_sceneExplorer->appendItem(rootItem , info->GetName(), NULL, NULL, NULL, TRUE);
-			wxTreeItemId modelItem = AppendItem(rootItem, wxT(info->GetName()), -1, -1, new ExplorerData(node));
-			//modelItem->setData (node);
-//			PopulateModel(scene, modelItem);
-//		}
-	}
-	m_sceneExplorer->expandTree(rootItem, true);
 }
 */
 
@@ -313,11 +198,40 @@ void EditorExplorer::OnDeleteItem (wxTreeEvent& event)
 
 void EditorExplorer::OnSelectItem (wxTreeEvent& event)
 {
-	wxTreeItemId item (event.GetItem());
+//	wxTreeItemId item (event.GetItem());
 //	wxArrayTreeItemIds items;
 //	size_t count = GetSelections(items);
 //	bool selectMode = IsSelected(item);
 //	bool selectMode1 = IsSelected(item);
+
+	class SelectionItems: public EditorExplorer::TraverseExplorer//, public dTree<const dNodeInfo*, const dNodeInfo*>
+	{
+		public:
+		SelectionItems (EditorExplorer* const me)
+			:EditorExplorer::TraverseExplorer()
+//			,dTree<const dNodeInfo*, const dNodeInfo*>()
+			,m_me(me)
+		{
+			Traverse(me);
+		}
+
+		virtual bool TraverseCallback (wxTreeItemId item)
+		{
+			ExplorerData* const nodeData = ((ExplorerData*)m_me->GetItemData(item));
+			if (m_me->IsSelected(item)) {
+				nodeData->m_info->SetEditorFlags (nodeData->m_info->GetEditorFlags() | dPluginInterface::m_selected);
+			} else {
+				nodeData->m_info->SetEditorFlags (nodeData->m_info->GetEditorFlags() & ~dPluginInterface::m_selected);
+			}
+
+//			dTree<const dNodeInfo*, const dNodeInfo*>::Insert(nodeData->m_info, nodeData->m_info); 
+			return true;
+		}
+		EditorExplorer* m_me;
+	};
+
+	SelectionItems itemsList(this);
+	
 }
 
 

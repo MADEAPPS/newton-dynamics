@@ -206,7 +206,7 @@ void dPluginScene::RenderSelectedSceneNodes (dSceneRender* const render, dScene:
 	dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*)GetInfoFromNode(sceneNode);	
 	render->PushMatrix (sceneInfo->GetTransform());
 
-	if (1 || sceneInfo->GetEditorFlags() & dPluginInterface::m_selected) {
+	if (sceneInfo->GetEditorFlags() & dPluginInterface::m_selected) {
 		for (void* link = GetFirstChildLink(sceneNode); link; link = GetNextChildLink(sceneNode, link)) {
 			dScene::dTreeNode* const node = GetNodeFromLink (link);
 			dGeometryNodeInfo* const geometryInfo = (dGeometryNodeInfo*)GetInfoFromNode(node);

@@ -418,7 +418,6 @@ int dPluginRender::GetCachedWireframeDisplayList(NewtonMesh* const mesh)
 	}
 
 	return node->GetInfo();
-
 }
 
 
