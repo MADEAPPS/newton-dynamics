@@ -350,10 +350,6 @@
 	</References>
 	<Files>
 		<File
-			RelativePath="..\..\dSerializedNewtonWorlds\dllmain.cpp"
-			>
-		</File>
-		<File
 			RelativePath="..\..\dSerializedNewtonWorlds\NetwonDllGlue.cpp"
 			>
 		</File>

@@ -182,16 +182,11 @@ void EditorMainMenu::CreateFileMenu()
 		menu->AppendSeparator();
 		m_importPlugins = new wxMenu;
 		menu->AppendSubMenu(m_importPlugins, wxT("Import plugins..."), wxT("execute and scen import plug in"));
-//		new FXMenuCascade(menu, "Import plugins...", NULL, m_importPlugins);
-//		for (int i = NewtonModelEditor::ID_IMPORT_PLUGINS; i < NewtonModelEditor::ID_MAX_IMPORT_PLUGINS; i ++) {
-//			new FXMenuCommand(m_importPlugins, FXString::null, NULL, mainFrame, i);
-//		}
+		m_importPlugins->SetRefData(new BasePluginBaseMenuId(NewtonModelEditor::ID_IMPORT_PLUGINS));
 
 		m_exportPlugins = new wxMenu;
 		menu->AppendSubMenu(m_exportPlugins, wxT("Export plugins..."), wxT("execute and scene iexport plug in"));
-//		for (int i = NewtonModelEditor::ID_EXPORT_PLUGINS; i < NewtonModelEditor::ID_MAX_EXPORT_PLUGINS; i ++) {
-//			new FXMenuCommand(m_exportPlugins, FXString::null, NULL, mainFrame, i);
-//		}
+		m_exportPlugins->SetRefData(new BasePluginBaseMenuId(NewtonModelEditor::ID_MAX_EXPORT_PLUGINS));
 	}
 
 	//quick editor
@@ -204,16 +199,6 @@ void EditorMainMenu::CreateFileMenu()
 
 void EditorMainMenu::CreateMeshMenu()
 {
-	// mesh menu
-//	{
-//		// this many is going to be populate bu the plugin manager
-//		m_meshMenu  = new FXMenuPane(this);
-//		new FXMenuTitle(this, "Mesh", NULL, m_meshMenu);
-//		for (int i = NewtonModelEditor::ID_MESH_PLUGINS; i < NewtonModelEditor::ID_MAX_MESH_PLUGINS; i ++) {
-//			new FXMenuCommand(m_meshMenu, FXString::null, NULL, mainFrame, i);
-//		}
-//	}
-
 	wxMenu* const menu = new wxMenu;
 	menu->SetRefData(new BasePluginBaseMenuId(NewtonModelEditor::ID_MESH_PLUGINS));
 	m_meshMenu = menu;

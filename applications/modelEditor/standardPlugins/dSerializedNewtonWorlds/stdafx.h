@@ -25,7 +25,6 @@
 #ifndef _D_SERIALIZED_STDAFX_H_
 #define _D_SERIALIZED_STDAFX_H_
 
-#include "targetver.h"
 
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 

@@ -43,6 +43,7 @@ bool NewtonImport::Import (const char* const fileName, dPluginInterface* const i
 {
 _ASSERTE (0);
 return true;
+/*
 	FILE* const file = fopen (fileName, "rb");
 	if (file) {
 		// save the state of the scene 
@@ -56,6 +57,7 @@ return true;
 		fclose (file);
 	}
 	return true;
+*/
 }
 
 void NewtonImport::DeserializeFile (void* const serializeHandle, void* const buffer, int size)

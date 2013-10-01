@@ -358,10 +358,6 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\dStandardModels\dllmain.cpp"
-			>
-		</File>
-		<File
 			RelativePath="..\..\dStandardModels\dMeshBoxPrimitive.cpp"
 			>
 		</File>

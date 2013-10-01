@@ -658,8 +658,7 @@ void NewtonModelEditor::LoadPlugins(const char* const path)
 
 				case dPluginRecord::m_export:
 				{
-					dAssert(0);
-					//m_mainMenu->AddPlugin(m_mainMenu->m_exportPlugins, plugin);
+					m_mainMenu->AddPlugin(m_mainMenu->m_exportPlugins, plugin);
 					break;
 				}
 
