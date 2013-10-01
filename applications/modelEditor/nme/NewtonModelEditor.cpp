@@ -804,29 +804,6 @@ int NewtonModelEditor::GetViewMode() const
 }
 
 
-void NewtonModelEditor::LoadScene (const char* const fileName)
-{
-//	m_currentFileName = fileName;
-
-	GetScene()->Cleanup();
-
-	// load the scene from and alchemedia file format
-	GetScene()->Deserialize (fileName);
-
-//	ClearSelection();
-
-/*
-	// place camera into position
-	dMatrix camMatrix (GetIdentityMatrix());
-	camMatrix = dYawMatrix(-0.0f * 3.1416f / 180.0f);
-	camMatrix.m_posit = dVector (-5.0f, 1.0f, -0.0f, 0.0f);
-	GetScene()->SetCameraMatrix(camMatrix, camMatrix.m_posit);
-
-	RestoreSettings ();
-*/
-
-	
-}
 
 
 void NewtonModelEditor::RefrehViewports()
@@ -991,13 +968,24 @@ void NewtonModelEditor::OnOpenScene(wxCommandEvent& event)
 {
 	wxFileDialog open (this, wxT("Load Newton Dynamics Scene"), wxT("../../../media"), wxT(""), wxT("*.ngd"));
 	if (open.ShowModal() == wxID_OK) {
-		OnNew (event);
-		m_lastFilePath = open.GetPath();
-		LoadScene (m_lastFilePath.mb_str());
+//		OnNew (event);
+//		m_lastFilePath = open.GetPath();
+//		LoadScene (m_lastFilePath.mb_str());
+//		m_explorer->Clear();
+//		m_explorer->ReconstructScene(GetScene());
+//		RefrehViewports();
 
-		m_explorer->Clear();
-		m_explorer->ReconstructScene(GetScene());
-		RefrehViewports();
+		// link the work with this user data
+		NewtonWorld* const world = GetScene()->GetNewtonWorld();
+		dPluginScene* const asset = new dPluginScene (world);
+		asset->Cleanup();
+		m_lastFilePath = open.GetPath();
+		if (asset->Deserialize (m_lastFilePath.mb_str())) {
+			MergeScene (asset);
+			m_explorer->ReconstructScene(GetScene());
+			RefrehViewports();
+		}
+		asset->Release();
 	}
 }
 

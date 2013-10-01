@@ -136,7 +136,7 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	long onHideCommandPanel(FXObject* sender, FXSelector id, void* eventPtr);
 
 	long onNew(FXObject* sender, FXSelector id, void* eventPtr); 
-	long onLoadScene(FXObject* sender, FXSelector id, void* eventPtr); 
+	
 	long onLoadRecentScene(FXObject* sender, FXSelector id, void* eventPtr); 
 
 	long onLoadAsset(FXObject* sender, FXSelector id, void* eventPtr); 
@@ -239,9 +239,7 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	void RefrehViewports();
 
 	void LoadPlugins(const char* const path);
-	void LoadScene (const char* const fileName);
 	void LoadIcon (const char* const iconName);
-
 
 	
 	virtual void RefreshExplorerEvent(bool clear) const;
