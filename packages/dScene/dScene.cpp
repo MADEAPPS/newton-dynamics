@@ -103,14 +103,26 @@ static void MakeSceneNodeMatricesLocalToNodeParent (dScene* const scene)
 // revision 102: add a texture cache node as child of root node
 static void PopupateTextureCacheNode (dScene* const scene)
 {
-	dScene::dTreeNode* const root = scene->GetRootNode();
 	dScene::dTreeNode* const cacheNode = scene->GetTextureCacheNode ();
 	dAssert (cacheNode);
-	for (void* link = scene->GetFirstChildLink(root); link; link = scene->GetNextChildLink(root, link)) {
-		dScene::dTreeNode* const node = scene->GetNodeFromLink(link);
+	for (dScene::dTreeNode* node = scene->GetFirstNode(); node; node = scene->GetNextNode(node)) {
 		dTextureNodeInfo* const nodeInfo = (dTextureNodeInfo*)scene->GetInfoFromNode(node);
 		if (nodeInfo->IsType(dTextureNodeInfo::GetRttiType())) {
 			scene->AddReference(cacheNode, node);
+		}
+	}
+
+
+	for (void* link = scene->GetFirstChildLink(cacheNode); link; link = scene->GetNextChildLink(cacheNode, link)) {
+		dScene::dTreeNode* const textNode = scene->GetNodeFromLink(link);
+		dAssert (scene->GetInfoFromNode(textNode)->IsType(dTextureNodeInfo::GetRttiType()));
+
+		for (void* link1 = scene->GetFirstParentLink(textNode); link1; link1 = scene->GetNextParentLink(textNode, link1)) {
+			dScene::dTreeNode* const node = scene->GetNodeFromLink(link1);
+			dNodeInfo* const info = scene->GetInfoFromNode(node);
+			if (!(info->IsType(dSceneCacheInfo::GetRttiType()) || info->IsType(dSceneCacheInfo::GetRttiType()))) {
+				scene->RemoveReference(node, textNode);
+			}
 		}
 	}
 }
