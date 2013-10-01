@@ -24,7 +24,6 @@ class EditorExplorer: public wxTreeCtrl
 	class ChangeNames;
 	class UndoRedoChangeName;
 
-
 	EditorExplorer (NewtonModelEditor* const mainFrame);
 	~EditorExplorer(void);
 
@@ -34,9 +33,7 @@ class EditorExplorer: public wxTreeCtrl
 	private:
 	DECLARE_EVENT_TABLE()
 
-
 	void OnKeyboardItem (wxKeyEvent& event);
-
 	void OnExpandItem (wxTreeEvent& event);
 	void OnCollapseItem (wxTreeEvent& event);
 	void OnDeleteItem (wxTreeEvent& event);
@@ -44,21 +41,8 @@ class EditorExplorer: public wxTreeCtrl
 	void OnEndEditItemName (wxTreeEvent& event);
 	void OnBeginEditItemName (wxTreeEvent& event);
 
-	
-
-
-//	void Populate (const dPluginScene* const scene, wxTreeItemId rootNode);
-//	void PopulateModel(const dPluginScene* const scene, wxTreeItemId modelItem);
-//	void SetBrowserSelection ();
-//	void RefreshAllViewer ();
-//	void AddAsset (dPluginScene* const asset, dPluginMesh* const plugin);
-//	void PopulateCurrentAsset ();
-//	dPluginScene* GetCurrentAsset() const; 
-//	void HandleSelectionEvent (const dList<dScene::dTreeNode*>& traceToRoot) const;
-
 	NewtonModelEditor* m_mainFrame;
 
-	
 };
 
 

@@ -158,21 +158,10 @@ EditorExplorer::~EditorExplorer(void)
 {
 }
 
-
-/*
-void EditorExplorer::HandleSelectionEvent (const dList<dScene::dTreeNode*>& traceToRoot) const
-{
-	m_assetExplorer->HandleSelectionEvent (traceToRoot);
-}
-*/
-
-
 void EditorExplorer::Clear()
 {
 	DeleteAllItems();
 }
-
-
 
 void EditorExplorer::OnKeyboardItem (wxKeyEvent& event)
 {
@@ -198,18 +187,33 @@ void EditorExplorer::OnDeleteItem (wxTreeEvent& event)
 
 void EditorExplorer::OnSelectItem (wxTreeEvent& event)
 {
-//	wxTreeItemId item (event.GetItem());
-//	wxArrayTreeItemIds items;
-//	size_t count = GetSelections(items);
-//	bool selectMode = IsSelected(item);
-//	bool selectMode1 = IsSelected(item);
-
-	class SelectionItems: public EditorExplorer::TraverseExplorer//, public dTree<const dNodeInfo*, const dNodeInfo*>
+	class SelectionList: public EditorExplorer::TraverseExplorer, public dList<dNodeInfo*>
 	{
 		public:
-		SelectionItems (EditorExplorer* const me)
+		SelectionList (EditorExplorer* const me)
 			:EditorExplorer::TraverseExplorer()
-//			,dTree<const dNodeInfo*, const dNodeInfo*>()
+			,dList<dNodeInfo*>()
+			,m_me(me)
+		{
+			Traverse(me);
+		}
+
+		virtual bool TraverseCallback (wxTreeItemId item)
+		{
+			if (m_me->IsSelected(item)) {
+				ExplorerData* const nodeData = ((ExplorerData*)m_me->GetItemData(item));
+				Append(nodeData->m_info);
+			}
+			return true;
+		}
+		EditorExplorer* m_me;
+	};
+
+	class SelectDuplicatesItems: public EditorExplorer::TraverseExplorer
+	{
+		public:
+		SelectDuplicatesItems (EditorExplorer* const me)
+			:EditorExplorer::TraverseExplorer()
 			,m_me(me)
 		{
 			Traverse(me);
@@ -218,19 +222,29 @@ void EditorExplorer::OnSelectItem (wxTreeEvent& event)
 		virtual bool TraverseCallback (wxTreeItemId item)
 		{
 			ExplorerData* const nodeData = ((ExplorerData*)m_me->GetItemData(item));
-			if (m_me->IsSelected(item)) {
-				nodeData->m_info->SetEditorFlags (nodeData->m_info->GetEditorFlags() | dPluginInterface::m_selected);
-			} else {
-				nodeData->m_info->SetEditorFlags (nodeData->m_info->GetEditorFlags() & ~dPluginInterface::m_selected);
+			if (m_me->IsSelected(item) && !(nodeData->m_info->GetEditorFlags() & dPluginInterface::m_selected)) {
+				m_me->SelectItem (item, false);
+			} else if (!m_me->IsSelected(item) && (nodeData->m_info->GetEditorFlags() & dPluginInterface::m_selected)) {
+				m_me->SelectItem (item, true);
 			}
-
-//			dTree<const dNodeInfo*, const dNodeInfo*>::Insert(nodeData->m_info, nodeData->m_info); 
 			return true;
 		}
 		EditorExplorer* m_me;
 	};
 
-	SelectionItems itemsList(this);
+	dPluginScene* const scene = m_mainFrame->GetScene();
+	for (dScene::dTreeNode* node = scene->GetFirstNode(); node; node = scene->GetNextNode(node)) {
+		dNodeInfo* const info = scene->GetInfoFromNode(node);
+		info->SetEditorFlags(info->GetEditorFlags() & ~dPluginInterface::m_selected);
+	}
+
+	SelectionList selectionList(this);
+	for (SelectionList::dListNode* node = selectionList.GetFirst(); node; node = node->GetNext()) {
+		dNodeInfo* const info = node->GetInfo();
+		info->SetEditorFlags(info->GetEditorFlags() | dPluginInterface::m_selected);
+	}
+
+	SelectDuplicatesItems selectedDuplicatedItems(this);
 	
 }
 
