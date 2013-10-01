@@ -88,8 +88,11 @@ static void MakeSceneNodeMatricesLocalToNodeParent (dScene* const scene)
 				// return any texture because the ids where change from 32 to 64 bit and the do no match anymore
 				for (void* link = scene->GetFirstChildLink(materialNode); link; link = scene->GetNextChildLink(materialNode, link)) {
 					dScene::dTreeNode* const node = scene->GetNodeFromLink(link);
-					const dTextureNodeInfo* const texture = (dTextureNodeInfo*) scene->GetInfoFromNode(node);
+					dTextureNodeInfo* const texture = (dTextureNodeInfo*) scene->GetInfoFromNode(node);
 					if (texture->IsType(dTextureNodeInfo::GetRttiType())) {
+						if (dString(texture->GetName()) == dString("texture")){
+							texture->SetName (texture->GetPathName());
+						}
 						materialInfo->SetDiffuseTextId(texture->GetId());
 						break;
 					}
@@ -97,7 +100,6 @@ static void MakeSceneNodeMatricesLocalToNodeParent (dScene* const scene)
 			}
 		}
 	}
-
 }
 
 // revision 102: add a texture cache node as child of root node
