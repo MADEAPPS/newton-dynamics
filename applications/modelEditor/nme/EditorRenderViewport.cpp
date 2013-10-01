@@ -10,10 +10,7 @@
 */
 
 #include "toolbox_stdafx.h"
-//#include "EditorCanvas.h"
-//#include "EditorExplorer.h"
 #include "NewtonModelEditor.h"
-//#include "EditorAssetExplorer.h"
 #include "EditorRenderViewport.h"
 
 
@@ -21,8 +18,6 @@ int EditorRenderViewport::m_attributes[] = {WX_GL_DOUBLEBUFFER, WX_GL_RGBA, WX_G
 
 
 BEGIN_EVENT_TABLE (EditorRenderViewport, wxGLCanvas)
-//	EVT_KEY_UP (OnKeyUp)	
-//	EVT_KEY_DOWN (OnKeyDown)
 	EVT_MOUSE_EVENTS (OnMouse)
 
 	EVT_SIZE (OnSize)
@@ -32,17 +27,6 @@ BEGIN_EVENT_TABLE (EditorRenderViewport, wxGLCanvas)
 END_EVENT_TABLE()
 
 /*
-FXDEFMAP(EditorRenderViewport) MessageMap[]=
-{
-	FXMAPFUNC(SEL_LEFTBUTTONPRESS,		0,	EditorRenderViewport::onLeftMouseKeyDown),
-	FXMAPFUNC(SEL_LEFTBUTTONRELEASE,	0,	EditorRenderViewport::onLeftMouseKeyUp),
-	FXMAPFUNC(SEL_LEAVE,                0,	EditorRenderViewport::onLeftMouseKeyUp),
-
-	FXMAPFUNC(SEL_MOTION,		0,			EditorRenderViewport::onMouseMove),
-
-};
-FXIMPLEMENT(EditorRenderViewport,FXGLCanvas,MessageMap,ARRAYNUMBER(MessageMap))
-
 
 void EditorRenderViewport::create()
 {
@@ -359,7 +343,6 @@ void EditorRenderViewport::LeftMouseKeyDown ()
 {
 	m_leftMouseKeyState = true;
 
-/*
 	switch (m_mainFrame->GetNavigationMode())  
 	{
 		case NewtonModelEditor::m_scaleNode:
@@ -367,6 +350,8 @@ void EditorRenderViewport::LeftMouseKeyDown ()
 		case NewtonModelEditor::m_rotateNode:
 		case NewtonModelEditor::m_translateNode:
 		{
+			dAssert (0);
+/*
 			const FXEvent* const event = (FXEvent*)eventPtr;
 			switch (m_mainFrame->m_editMode) 
 			{
@@ -382,10 +367,10 @@ void EditorRenderViewport::LeftMouseKeyDown ()
 					break;
 				}
 			}
+*/
 			break;
 		}
 	}
-*/
 }
 
 void EditorRenderViewport::OnMouse (wxMouseEvent &event)
@@ -467,8 +452,6 @@ void EditorRenderViewport::OnMouse (wxMouseEvent &event)
 			default:
 				dAssert(0);
 		}
-
-//		m_mainFrame->RefrehViewports();
 	}
 
 	m_lastMouseX = mouseX;
