@@ -313,7 +313,7 @@ void EditorExplorer::OnDeleteItem (wxTreeEvent& event)
 
 void EditorExplorer::OnSelectItem (wxTreeEvent& event)
 {
-//	wxTreeItemId item (event.GetItem());
+	wxTreeItemId item (event.GetItem());
 //	wxArrayTreeItemIds items;
 //	size_t count = GetSelections(items);
 //	bool selectMode = IsSelected(item);

@@ -130,12 +130,12 @@ class dPluginInterface: public dUndoRedoManager
 
 	DPLUGIN_API virtual const char* GetFilePath() const;
 
-	DPLUGIN_API virtual void ClearSelection();
-	DPLUGIN_API virtual bool IsNodeSelected(void* const incidentLink) const;
-	DPLUGIN_API virtual void AddToSelection(void* const incidentLink);
-	DPLUGIN_API virtual void RemoveFromSelection(void* const incidentLink);
-	DPLUGIN_API virtual void* GetFirtSelectedNode() const;
-	DPLUGIN_API virtual void* GetNextSelectedNode(void* const incidentLink) const;
+//	DPLUGIN_API virtual void ClearSelection();
+//	DPLUGIN_API virtual bool IsNodeSelected(void* const incidentLink) const;
+//	DPLUGIN_API virtual void AddToSelection(void* const incidentLink);
+//	DPLUGIN_API virtual void RemoveFromSelection(void* const incidentLink);
+//	DPLUGIN_API virtual void* GetFirtSelectedNode() const;
+//	DPLUGIN_API virtual void* GetNextSelectedNode(void* const incidentLink) const;
 
 
 //	DPLUGIN_API virtual void ClearExplorerExpand();
@@ -146,7 +146,6 @@ class dPluginInterface: public dUndoRedoManager
 
 	DPLUGIN_API virtual void DestroyScene ();
 	DPLUGIN_API virtual void MergeScene (dPluginScene* const asset);
-//	DPLUGIN_API virtual void MergeExplorer();
 	DPLUGIN_API virtual void RefreshExplorerEvent(bool clear) const;
 
 	protected:
@@ -158,7 +157,7 @@ class dPluginInterface: public dUndoRedoManager
 	dPluginCamera* m_currentCamera;
 	dPluginDll m_allPlugins;
 	const char* m_filePathFile;
-	dTree<int, void*> m_selection;
+	dTree<dNodeInfo*, dNodeInfo*> m_selection;
 	
 	dTree<dPluginRecord*, dCRCTYPE> m_pluginDictionary;
 	static int m_totalMemoryUsed;

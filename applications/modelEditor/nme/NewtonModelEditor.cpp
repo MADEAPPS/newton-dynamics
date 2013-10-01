@@ -813,7 +813,7 @@ void NewtonModelEditor::LoadScene (const char* const fileName)
 	// load the scene from and alchemedia file format
 	GetScene()->Deserialize (fileName);
 
-	ClearSelection();
+//	ClearSelection();
 
 /*
 	// place camera into position

@@ -273,48 +273,46 @@ dPluginRecord* dPluginInterface::GetPluginFromNode(void* const pluginNode) const
 //	return ptr ? (ptr->GetInfo() ? true : false) : false;
 //}
 
+//void dPluginInterface::ClearSelection()
+//{
+//	m_selection.RemoveAll();
+//}
 
 
-void dPluginInterface::ClearSelection()
-{
-	m_selection.RemoveAll();
-}
+//bool dPluginInterface::IsNodeSelected(void* const incidentLink) const
+//{
+//	return m_selection.Find(incidentLink) ? true : false;
+//}
 
 
-bool dPluginInterface::IsNodeSelected(void* const incidentLink) const
-{
-	return m_selection.Find(incidentLink) ? true : false;
-}
+//void dPluginInterface::AddToSelection(void* const incidentLink)
+//{
+//	m_selection.Insert(0, incidentLink);
+//}
 
 
-void dPluginInterface::AddToSelection(void* const incidentLink)
-{
-	m_selection.Insert(0, incidentLink);
-}
-
-
-void dPluginInterface::RemoveFromSelection(void* const incidentLink)
-{
-	m_selection.Remove (incidentLink);
-}
+//void dPluginInterface::RemoveFromSelection(void* const incidentLink)
+//{
+//	m_selection.Remove (incidentLink);
+//}
 
 
 
 
-void* dPluginInterface::GetFirtSelectedNode() const
-{
-	dTree<int, void*>::Iterator iter (m_selection);
-	iter.Begin();
-	return iter.GetNode() ? iter.GetNode()->GetKey() : NULL;
-}
+//void* dPluginInterface::GetFirtSelectedNode() const
+//{
+//	dTree<int, void*>::Iterator iter (m_selection);
+//	iter.Begin();
+//	return iter.GetNode() ? iter.GetNode()->GetKey() : NULL;
+//}
 
-void* dPluginInterface::GetNextSelectedNode(void* const node) const
-{
-	dTree<int, void*>::Iterator iter (m_selection);
-	iter.Set (m_selection.Find(node));
-	iter ++;
-	return iter.GetNode() ? iter.GetNode()->GetKey() : NULL;
-}
+//void* dPluginInterface::GetNextSelectedNode(void* const node) const
+//{
+//	dTree<int, void*>::Iterator iter (m_selection);
+//	iter.Set (m_selection.Find(node));
+//	iter ++;
+//	return iter.GetNode() ? iter.GetNode()->GetKey() : NULL;
+//}
 /*
 void dPluginInterface::MergeExplorer()
 {

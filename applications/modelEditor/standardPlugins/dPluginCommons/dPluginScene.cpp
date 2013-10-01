@@ -204,6 +204,8 @@ void dPluginScene::RenderWireframeSceneNode (dSceneRender* const render, dScene:
 //void dPluginScene::RenderSelectedSceneNodes (dSceneRender* const render, dScene::dTreeNode* const sceneNode, dPluginInterface* const interface)
 void dPluginScene::RenderSelectedSceneNodes (dSceneRender* const render, void* const incidentSceneNodeLink, dPluginInterface* const interface)
 {
+	dAssert (0);
+/*
 	dScene::dTreeNode* const sceneNode = GetNodeFromLink (incidentSceneNodeLink);
 	dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*)GetInfoFromNode(sceneNode);	
 
@@ -228,6 +230,7 @@ void dPluginScene::RenderSelectedSceneNodes (dSceneRender* const render, void* c
 	}
 
 	render->PopMatrix ();
+*/
 }
 
 
