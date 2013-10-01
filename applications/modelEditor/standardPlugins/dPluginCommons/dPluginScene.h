@@ -49,18 +49,18 @@ class dPluginScene: public dScene
 	virtual DPLUGIN_API void RenderWireframe (dSceneRender* const render);
 	virtual DPLUGIN_API void RenderFlatShaded (dSceneRender* const render);
 	virtual DPLUGIN_API void RenderSolidWireframe (dSceneRender* const render);
-	virtual DPLUGIN_API void RenderWireframeSelection (dSceneRender* const render, dPluginInterface* const interface);
+	virtual DPLUGIN_API void RenderWireframeSelection (dSceneRender* const render);
+
+
 	virtual DPLUGIN_API void UpdateAllOOBB ();
-//	virtual void DPLUGIN_API MergeScene (dPluginInterface* const interface, dPluginScene* const asset) const;
+
 
 	virtual DPLUGIN_API bool Deserialize (const char* const fileName);
 	virtual DPLUGIN_API void Serialize (const char* const fileName);
 	private:
 	virtual void RenderWireframeSceneNode (dSceneRender* const render, dScene::dTreeNode* const sceneNode);
 	virtual void RenderFlatShadedSceneNode (dSceneRender* const render, dScene::dTreeNode* const sceneNode);
-	//virtual void RenderSelectedSceneNodes (dSceneRender* const render, dScene::dTreeNode* const sceneNode, dPluginInterface* const interface);
-	virtual void RenderSelectedSceneNodes (dSceneRender* const render, void* const incidentSceneNodeLink, dPluginInterface* const interface);
-
+	virtual void RenderSelectedSceneNodes (dSceneRender* const render, dScene::dTreeNode* const sceneNode);
 	
 
 	int IncLRU();

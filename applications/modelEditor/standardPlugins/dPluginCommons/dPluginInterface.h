@@ -36,72 +36,6 @@ class dPluginInterface: public dUndoRedoManager
 	class dPluginDll: public dList <HMODULE>
 	{
 	};
-/*
-	class dSceneExplorer: public dHierarchy<dSceneExplorer>
-	{
-		public:
-		dSceneExplorer (dNodeInfo* const info)
-			:dHierarchy<dSceneExplorer>(info->GetName())
-			,m_info(info)
-		{
-			m_info->AddRef();
-		}
-
-		virtual dBaseHierarchy* CreateClone () const
-		{
-			dAssert(0);
-			return NULL;
-		}
-
-		~dSceneExplorer ()
-		{
-			m_info->Release();
-		}
-
-		dNodeInfo* m_info;
-	};
-
-	class ExplorerDictionary: public dTree<dSceneExplorer*, dNodeInfo*>
-	{
-		public:
-	};
-*/
-/*
-	class AssetPluginAssociation
-	{
-		public:
-		AssetPluginAssociation ()
-			:m_asset(NULL)
-			,m_plugin(NULL)
-		{
-		}
-
-		AssetPluginAssociation (dPluginScene* const asset, dPluginMesh* const plugin)
-			:m_asset(asset)
-			,m_plugin(plugin)
-		{
-			m_asset->AddRef();
-		}
-
-		AssetPluginAssociation (const AssetPluginAssociation& copy)
-			:m_asset(copy.m_asset)
-			,m_plugin(copy.m_plugin)
-		{
-			m_asset->AddRef();
-		}
-
-		~AssetPluginAssociation()
-		{
-			if (m_asset) {
-				m_asset->Release();
-			}
-		}
-
-		dPluginScene* m_asset;
-		dPluginMesh* m_plugin;
-	};
-*/
-
 
 	DPLUGIN_API dPluginInterface(void);
 	DPLUGIN_API virtual  ~dPluginInterface(void);
@@ -136,8 +70,6 @@ class dPluginInterface: public dUndoRedoManager
 //	DPLUGIN_API virtual void RemoveFromSelection(void* const incidentLink);
 //	DPLUGIN_API virtual void* GetFirtSelectedNode() const;
 //	DPLUGIN_API virtual void* GetNextSelectedNode(void* const incidentLink) const;
-
-
 //	DPLUGIN_API virtual void ClearExplorerExpand();
 //	DPLUGIN_API virtual void AddExplorerExpandNode(void* const incidentLink, bool state);
 //	DPLUGIN_API virtual void SetExplorerExpandNodeState(void* const incidentLink, bool state);

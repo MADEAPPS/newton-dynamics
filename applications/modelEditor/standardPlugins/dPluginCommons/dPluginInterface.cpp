@@ -27,7 +27,6 @@ dPluginInterface::dPluginInterface(void)
 	:dUndoRedoManager()
 	,m_scene(NULL)
 	,m_render(NULL)
-//	,m_sceneExplorer(NULL)
 	,m_currentCamera(NULL)
 	,m_filePathFile(NULL)
 {
@@ -51,10 +50,6 @@ dPluginInterface::~dPluginInterface(void)
 void dPluginInterface::DestroyScene ()
 {
 	if (m_scene) {
-//		if (m_sceneExplorer) {
-//			delete m_sceneExplorer;
-//			m_sceneExplorer = NULL;
-//		}
 		m_scene->Release();
 		m_scene = NULL; 
 	}

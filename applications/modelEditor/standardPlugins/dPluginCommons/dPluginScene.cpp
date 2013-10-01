@@ -96,7 +96,7 @@ void dPluginScene::RenderFlatShaded (dSceneRender* const render)
 	}
 }
 
-void dPluginScene::RenderWireframeSelection (dSceneRender* const render, dPluginInterface* const interface)
+void dPluginScene::RenderWireframeSelection (dSceneRender* const render)
 {
 	render->EnableZbuffer();
 	render->EnableBackFace();
@@ -111,10 +111,10 @@ void dPluginScene::RenderWireframeSelection (dSceneRender* const render, dPlugin
 		dScene::dTreeNode* const sceneNode = GetNodeFromLink (link);
 		dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*)GetInfoFromNode(sceneNode);
 		if (sceneInfo->IsType(dSceneNodeInfo::GetRttiType())) {
-			//RenderSelectedSceneNodes (render, sceneNode, interface);
-			RenderSelectedSceneNodes (render, link, interface);
+			RenderSelectedSceneNodes (render, sceneNode);
 		}
 	}
+
 }
 
 
@@ -201,20 +201,16 @@ void dPluginScene::RenderWireframeSceneNode (dSceneRender* const render, dScene:
 }
 
 
-//void dPluginScene::RenderSelectedSceneNodes (dSceneRender* const render, dScene::dTreeNode* const sceneNode, dPluginInterface* const interface)
-void dPluginScene::RenderSelectedSceneNodes (dSceneRender* const render, void* const incidentSceneNodeLink, dPluginInterface* const interface)
+void dPluginScene::RenderSelectedSceneNodes (dSceneRender* const render, dScene::dTreeNode* const sceneNode)
 {
-	dAssert (0);
-/*
-	dScene::dTreeNode* const sceneNode = GetNodeFromLink (incidentSceneNodeLink);
 	dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*)GetInfoFromNode(sceneNode);	
-
 	render->PushMatrix (sceneInfo->GetTransform());
-	if (interface->IsNodeSelected (incidentSceneNodeLink)) {
+
+	if (1 || sceneInfo->GetEditorFlags() & dPluginInterface::m_selected) {
 		for (void* link = GetFirstChildLink(sceneNode); link; link = GetNextChildLink(sceneNode, link)) {
 			dScene::dTreeNode* const node = GetNodeFromLink (link);
 			dGeometryNodeInfo* const geometryInfo = (dGeometryNodeInfo*)GetInfoFromNode(node);
-			if (geometryInfo->IsType(dGeometryNodeInfo::GetRttiType())) {
+			if ( geometryInfo->IsType(dGeometryNodeInfo::GetRttiType())) {
 				geometryInfo->DrawWireFrame(render, this, node);
 			}
 		}
@@ -224,13 +220,11 @@ void dPluginScene::RenderSelectedSceneNodes (dSceneRender* const render, void* c
 		dScene::dTreeNode* const node = GetNodeFromLink (link);
 		dSceneNodeInfo* const info = (dSceneNodeInfo*)GetInfoFromNode(node);
 		if (info->IsType(dSceneNodeInfo::GetRttiType())) {
-			//RenderSelectedSceneNodes (render, node, interface);
-			RenderSelectedSceneNodes (render, link, interface);
+			RenderSelectedSceneNodes (render, node);
 		}
 	}
 
 	render->PopMatrix ();
-*/
 }
 
 
@@ -256,5 +250,18 @@ void dPluginScene::Serialize (const char* const fileName)
 bool dPluginScene::Deserialize (const char* const fileName)
 {
 	bool state = dScene::Deserialize (fileName);
+	if (state) {
+		dScene::dTreeNode* const rootNode = GetRootNode();
+		dNodeInfo* const rootInfo = (dSceneNodeInfo*) GetInfoFromNode(rootNode);
+		rootInfo->SetEditorFlags(rootInfo->GetEditorFlags() | dPluginInterface::m_expanded);
+		for (void* link = GetFirstChildLink(rootNode); link; link = GetNextChildLink(rootNode, link)) {
+			dPluginScene::dTreeNode* const node = GetNodeFromLink(link);
+			dNodeInfo* const sceneInfo = (dSceneNodeInfo*) GetInfoFromNode(node);
+			if (sceneInfo->IsType(dSceneNodeInfo::GetRttiType())) {
+				sceneInfo->SetEditorFlags(sceneInfo->GetEditorFlags() | dPluginInterface::m_expanded);
+			}
+		}
+	}
+
 	return state;
 }

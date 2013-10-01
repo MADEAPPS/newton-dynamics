@@ -114,12 +114,13 @@ void EditorRenderViewport::SelectAssetNode (const FXEvent* const event)
 }
 */
 
+/*
 void EditorRenderViewport::RenderSelectedNodeGizmo () const
 {
-	dAssert (0);
+
 //	dPluginScene* const scene = m_mainFrame->GetScene();		
 //	EditorExplorer* const explorer = m_mainFrame->GetExplorer();
-/*
+
 	for (void* link = m_mainFrame->GetFirtSelectedNode(); link; link = m_mainFrame->GetNextSelectedNode(link)) {
 		FXTreeItem* item = assetBrowser->findItemByData(link);
 		_ASSERTE (item);
@@ -144,9 +145,8 @@ void EditorRenderViewport::RenderSelectedNodeGizmo () const
 		//DrawNodeSelectionGizmo(m_render, axis);
 		DrawNodeSelectAndMoveGizmo(m_render, axis);
 	}
-*/
 }
-
+*/
 
 
 EditorRenderViewport::EditorRenderViewport (NewtonModelEditor* const mainFrame)
@@ -287,24 +287,18 @@ void EditorRenderViewport::UpdateScene ()
 {
 	dPluginScene* const scene = m_mainFrame->GetScene();		
 	if (scene) {
-
-		//asset->RenderWireframe(m_render);
-		//asset->RenderFlatShaded(m_render);
-
 		dShadingModes shadeMode (dShadingModes(m_mainFrame->GetShadeMode()));
 		switch (shadeMode)
 		{
 			case m_solid:
 			{
 				scene->RenderSolidWireframe(m_render);
-				//scene->RenderWireframeSelection (m_render, m_mainFrame);
 				break;
 			}
 
 			case m_wireframe:
 			{
 				scene->RenderWireframe(m_render);
-				//scene->RenderWireframeSelection (m_render, m_mainFrame);
 				break;
 			}
 
@@ -319,7 +313,7 @@ void EditorRenderViewport::UpdateScene ()
 	}
 
 	// draw the gizmo for the selections
-	RenderSelectedNodeGizmo();
+	scene->RenderWireframeSelection(m_render);
 }
 
 

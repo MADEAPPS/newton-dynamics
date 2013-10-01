@@ -825,7 +825,7 @@ void NewtonModelEditor::LoadScene (const char* const fileName)
 	RestoreSettings ();
 */
 
-	RefrehViewports();
+	
 }
 
 
@@ -902,21 +902,6 @@ void NewtonModelEditor::OnClearUndoHistory(wxCommandEvent& event)
 	dUndoRedoManager::Clear();
 }
 
-void NewtonModelEditor::OnMesh (wxCommandEvent& event)
-{
-	int id = event.GetId() - ID_MESH_PLUGINS;
-
-	dPluginMesh* const plugin = (dPluginMesh*) m_mainMenu->GetPlugin(m_mainMenu->m_meshMenu, id);
-	_ASSERTE (plugin);
-
-	dPluginScene* const asset = plugin->Create (this);
-	if (asset) {
-		MergeScene (asset);
-		asset->Release();
-		RefrehViewports();
-		m_explorer->ReconstructScene(GetScene());
-	}
-}
 
 
 void NewtonModelEditor::OnHideExplorerPane (wxCommandEvent& event) 
@@ -984,23 +969,23 @@ void NewtonModelEditor::OnChangeNavigationMode(wxCommandEvent& event)
 	//m_mainFrame->ShowNavigationMode(m_navigationMode[0]);
 }
 
-/*
-void NewtonModelEditor::OnOpenScene(wxCommandEvent& event)
-{
-	const FXchar patterns[]="Newton Dynamics Files (*.ngd)";
 
-	FXFileDialog open(this,"Load Newton Dynamics scene");
-	open.setPatternList(patterns);
-	open.setDirectory (m_lastFilePath);
-	if(open.execute()){
-		onNew (sender, id, eventPtr);
-		m_lastFilePath = open.getDirectory();
-		m_filePathFile = m_lastFilePath.text();
-		m_mainMenu->AddRecentFile(open.getFilename());
-		LoadScene (open.getFilename());
+void NewtonModelEditor::OnMesh (wxCommandEvent& event)
+{
+	int id = event.GetId() - ID_MESH_PLUGINS;
+
+	dPluginMesh* const plugin = (dPluginMesh*) m_mainMenu->GetPlugin(m_mainMenu->m_meshMenu, id);
+	_ASSERTE (plugin);
+
+	dPluginScene* const asset = plugin->Create (this);
+	if (asset) {
+		MergeScene (asset);
+		asset->Release();
+		m_explorer->ReconstructScene(GetScene());
+		RefrehViewports();
 	}
 }
-*/
+
 
 void NewtonModelEditor::OnOpenScene(wxCommandEvent& event)
 {
@@ -1009,7 +994,10 @@ void NewtonModelEditor::OnOpenScene(wxCommandEvent& event)
 		OnNew (event);
 		m_lastFilePath = open.GetPath();
 		LoadScene (m_lastFilePath.mb_str());
+
+		m_explorer->Clear();
 		m_explorer->ReconstructScene(GetScene());
+		RefrehViewports();
 	}
 }
 

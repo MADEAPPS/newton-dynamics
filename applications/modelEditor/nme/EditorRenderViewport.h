@@ -42,8 +42,6 @@ class EditorRenderViewport: public wxGLCanvas, public dPluginCamera
 	int GetWidth() const;
 	int GetHeight() const;
 
-	void RenderSelectedNodeGizmo () const;
-
 /*
 	void create();
 	void UpdateScene (dViewPortModes mode);
