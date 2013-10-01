@@ -22,6 +22,7 @@ class EditorExplorer: public wxTreeCtrl
 	class TraverseExplorer;
 	class ExplorerData;
 	class ChangeNames;
+	class SelectDuplicatesItems;
 	class UndoRedoChangeName;
 
 	EditorExplorer (NewtonModelEditor* const mainFrame);
@@ -42,7 +43,7 @@ class EditorExplorer: public wxTreeCtrl
 	void OnBeginEditItemName (wxTreeEvent& event);
 
 	NewtonModelEditor* m_mainFrame;
-
+	int m_recursiveSelectionCall;
 };
 
 
