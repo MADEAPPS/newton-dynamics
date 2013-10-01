@@ -111,9 +111,9 @@ void EditorMainMenu::CreateHelpMenu()
 void EditorMainMenu::CreateEditMenu()
 {
 	wxMenu* const menu = new wxMenu;
-
-	menu->Append(wxID_UNDO, wxT("Undo"), wxT("undo editor command"));
-	menu->Append(wxID_REDO, wxT("Redo"), wxT("redo editor command"));
+//("&Hello\tCtrl-H");
+	menu->Append(wxID_UNDO, wxT("&Undo\tCtrl-Z"), wxT("Undo previous action"));
+	menu->Append(wxID_REDO, wxT("&Redo\tCtrl-Y"), wxT("Redo previous action"));
 	menu->Append(NewtonModelEditor::ID_CLEAR_UNDO_HISTORY, wxT("Clear undo history"), wxT("clear the undo redo history"));
 
 	m_editMenu = menu;
@@ -145,8 +145,8 @@ void EditorMainMenu::CreateFileMenu()
 	menu->Append (wxID_NEW, wxT("New"), wxT("clean scene"));
 
 	menu->AppendSeparator();
-	menu->Append (wxID_OPEN, wxT("Open scene"), wxT("open an existing scene"));
-	menu->Append (wxID_SAVE, wxT("Save scene"), wxT("Save current scene"));
+	menu->Append (wxID_OPEN, wxT("&Open scene\tCtrl-O"), wxT("open an existing scene"));
+	menu->Append (wxID_SAVE, wxT("Save scene\tCtrl-S"), wxT("Save current scene"));
 	menu->Append (wxID_SAVEAS, wxT("Save scene as"), wxT("Save current scene to different file"));
 
 

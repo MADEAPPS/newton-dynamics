@@ -715,8 +715,8 @@ void NewtonModelEditor::CreateObjectSelectionToolBar()
 	wxAuiToolBar* const toolbar = new wxAuiToolBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_OVERFLOW);
 	toolbar->SetToolBitmapSize (wxSize(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE));
 
-	toolbar->AddTool (wxID_UNDO, wxT("Undo previous action"), *FindIcon("undo.gif"));
-	toolbar->AddTool (wxID_REDO, wxT("Redo previous action"), *FindIcon("redo.gif"));
+	toolbar->AddTool (wxID_UNDO, wxT("Undo"), *FindIcon("undo.gif"), wxT("Undo previous action"));
+	toolbar->AddTool (wxID_REDO, wxT("Redo"), *FindIcon("redo.gif"), wxT("Redo previous action"));
 
 	toolbar->AddSeparator();
 	toolbar->AddTool (ID_CURSOR_COMMAND_MODE, wxT("Select cursor"), *FindIcon("cursor.gif"));
