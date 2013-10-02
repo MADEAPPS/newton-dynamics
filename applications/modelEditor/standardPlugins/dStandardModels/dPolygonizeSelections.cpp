@@ -17,28 +17,28 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "StdAfx.h"
-#include "dTriangulateSelections.h"
+#include "dPolygonizeSelections.h"
 #include "dUndoRedoSaveSelectedMesh.h"
 
-dMeshTriangulateMesh::dMeshTriangulateMesh()
+dPolygonizeSelections::dPolygonizeSelections()
 	:dPluginTool()
 {
 }
 
-dMeshTriangulateMesh::~dMeshTriangulateMesh()
+dPolygonizeSelections::~dPolygonizeSelections()
 {
 }
 
 
-dMeshTriangulateMesh* dMeshTriangulateMesh::GetPlugin()
+dPolygonizeSelections* dPolygonizeSelections::GetPlugin()
 {
-	static dMeshTriangulateMesh plugin;
+	static dPolygonizeSelections plugin;
 	return &plugin;
 }
 
 
 
-bool dMeshTriangulateMesh::Execute (dPluginInterface* const interface)
+bool dPolygonizeSelections::Execute (dPluginInterface* const interface)
 {
 	dScene* const scene = interface->GetScene();
 	dAssert (scene);
@@ -67,7 +67,7 @@ bool dMeshTriangulateMesh::Execute (dPluginInterface* const interface)
 					if (info->GetEditorFlags() & dPluginInterface::m_selected) {
 						dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*) info;
 						render->InvalidateCachedDisplayList (meshInfo->GetMesh());
-						NewtonMeshTriangulate(meshInfo->GetMesh());
+						NewtonMeshPolygonize(meshInfo->GetMesh());
 					}
 				}
 			}

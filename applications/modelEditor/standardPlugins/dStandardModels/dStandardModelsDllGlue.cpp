@@ -25,6 +25,7 @@
 #include "dStandardModel.h"
 #include "dSphereCollision.h"
 #include "dMeshBoxPrimitive.h"
+#include "dPolygonizeSelections.h"
 #include "dTriangulateSelections.h"
 #include "dStandardModelsDllGlue.h"
 
@@ -40,6 +41,7 @@ dPluginRecord** GetPluginArray()
 		//dSphereCollision::GetPlugin(),
 		dMeshBoxPrimitive::GetPlugin(),
 		dMeshTriangulateMesh::GetPlugin(),
+		dPolygonizeSelections::GetPlugin(),
 		NULL
 	};
 

@@ -16,20 +16,21 @@
 // freely
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef _D_TRIANGULATE_MESH_H_
-#define _D_TRIANGULATE_MESH_H_
+#ifndef _D_POLYGONIZE_MESH_H_
+#define _D_POLYGONIZE_MESH_H_
 
 
-class dMeshTriangulateMesh: public dPluginTool
+
+class dPolygonizeSelections: public dPluginTool
 {
 	public:
-	dMeshTriangulateMesh();
-	~dMeshTriangulateMesh();
-	static dMeshTriangulateMesh* GetPlugin();
+	dPolygonizeSelections();
+	~dPolygonizeSelections();
+	static dPolygonizeSelections* GetPlugin();
 
 	virtual const char* GetMenuName () { return GetSignature();}
-	virtual const char* GetDescription () {return "Triangulate selected meshes";}
-	virtual const char* GetSignature () {return "Triangulate Mesh";}
+	virtual const char* GetDescription () {return "convert selected meshes to patches of convex polygons";}
+	virtual const char* GetSignature () {return "Polygonize Mesh";}
 	virtual bool Execute (dPluginInterface* const interface);
 };
 

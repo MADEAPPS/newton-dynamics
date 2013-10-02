@@ -366,6 +366,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\dStandardModels\dPolygonizeSelections.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dStandardModels\dPolygonizeSelections.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\dStandardModels\dRigidBody.cpp"
 			>
 		</File>
@@ -403,6 +411,14 @@
 		</File>
 		<File
 			RelativePath="..\..\dStandardModels\dTriangulateSelections.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dStandardModels\dUndoRedoSaveSelectedMesh.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dStandardModels\dUndoRedoSaveSelectedMesh.h"
 			>
 		</File>
 		<File
