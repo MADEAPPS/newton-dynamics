@@ -1140,8 +1140,6 @@ dgMeshEffect::dgMeshEffect(dgMemoryAllocator* const allocator, const char* const
 dgMeshEffect::dgMeshEffect (dgMemoryAllocator* const allocator, dgDeserialize deserialization, void* const userData)
 	:dgPolyhedra (allocator) 
 {
-	dgAssert (0);
-
 	dgInt32 faceCount;
 	deserialization (userData, &faceCount, sizeof (dgInt32));
 	deserialization (userData, &m_pointCount, sizeof (dgInt32));

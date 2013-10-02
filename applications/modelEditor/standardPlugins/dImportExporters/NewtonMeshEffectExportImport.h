@@ -20,6 +20,26 @@
 #define _NEWTON_MESH_EFFECT_EXPORT_IMPORT_H_
 
 
+class NewtonMeshEffectImport: public dImportPlugin
+{
+	public:
+	NewtonMeshEffectImport();
+	~NewtonMeshEffectImport();
+
+	static NewtonMeshEffectImport* GetPlugin();
+
+	virtual const char* GetMenuName () { return GetSignature();}
+	virtual const char* GetFileExtension () { return "*.nme";}
+	virtual const char* GetFileDescription () {return "import NewtonMeshEffect file";}
+
+	virtual const char* GetSignature () {return "Netwon Mesh Effect import";}
+	virtual bool Import (const char* const fileName, dPluginInterface* const interface);
+
+	static void DeserializeCallback (void* const serializeHandle, void* const buffer, int size);
+};
+
+
+
 class NewtonMeshEffectExport: public dExportPlugin
 {
 	public:
@@ -29,7 +49,7 @@ class NewtonMeshEffectExport: public dExportPlugin
 	static NewtonMeshEffectExport* GetPlugin();
 
 	virtual const char* GetMenuName () { return GetSignature();}
-	virtual const char* GetFileExtension () { return ".nme";}
+	virtual const char* GetFileExtension () { return "*.nme";}
 	virtual const char* GetFileDescription () {return "save selected mesh as NewtonMeshEffect file";}
 
 	virtual const char* GetSignature () {return "Netwon Mesh Effect Export";}

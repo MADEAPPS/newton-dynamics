@@ -19,6 +19,54 @@
 #include "StdAfx.h"
 #include "NewtonMeshEffectExportImport.h"
 
+
+NewtonMeshEffectImport::NewtonMeshEffectImport()
+	:dImportPlugin()
+{
+}
+
+NewtonMeshEffectImport::~NewtonMeshEffectImport()
+{
+}
+
+
+NewtonMeshEffectImport* NewtonMeshEffectImport::GetPlugin()
+{
+	static NewtonMeshEffectImport plugin;
+	return &plugin;
+}
+
+
+void NewtonMeshEffectImport::DeserializeCallback (void* const serializeHandle, void* const buffer, int size)
+{
+	FILE* const file = (FILE*) serializeHandle;
+	fread (buffer, size, 1, file);
+}
+
+bool NewtonMeshEffectImport::Import (const char* const fileName, dPluginInterface* const interface)
+{
+	FILE* const file = fopen (fileName, "rb");
+	if (file) {
+		dScene* const scene = interface->GetScene();
+		dAssert (scene);
+		int count = 0;
+		fread ( &count, sizeof (int), 1, file);
+		dAssert (count >= 1);
+		NewtonWorld* const world = scene->GetNewtonWorld();
+		for (int i = 0; i < count; i ++) {
+			NewtonMesh* const newtonMesh = NewtonMeshCreateFromSerialization (world, DeserializeCallback, file);
+			dAssert (newtonMesh);
+		}
+
+		fclose (file);
+		return true;
+	}
+	return false;
+}
+
+
+
+
 NewtonMeshEffectExport::NewtonMeshEffectExport()
 	:dExportPlugin()
 {
@@ -49,9 +97,8 @@ void NewtonMeshEffectExport::Export (const char* const fileName, dPluginInterfac
 		dScene* const scene = interface->GetScene();
 		dAssert (scene);
 
-
-		dScene::dTreeNode* const geometryCache = scene->FindGetGeometryCacheNode ();
 		int count = 0;
+		dScene::dTreeNode* const geometryCache = scene->FindGetGeometryCacheNode ();
 		for (void* link = scene->GetFirstChildLink(geometryCache); link; link = scene->GetNextChildLink(geometryCache, link)) {
 			dScene::dTreeNode* const node = scene->GetNodeFromLink(link);
 			dNodeInfo* const info = scene->GetInfoFromNode(node);

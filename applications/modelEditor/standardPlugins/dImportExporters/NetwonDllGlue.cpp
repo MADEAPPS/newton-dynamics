@@ -26,6 +26,7 @@ dPluginRecord** GetPluginArray()
 {
 	static dPluginRecord* array[] = 
 	{
+		NewtonMeshEffectImport::GetPlugin(),
 		NewtonMeshEffectExport::GetPlugin(),
 		NewtonImport::GetPlugin(),
 		NewtonExport::GetPlugin(),
