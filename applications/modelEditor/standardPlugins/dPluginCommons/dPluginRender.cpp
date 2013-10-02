@@ -28,8 +28,8 @@ dPluginRender::dPluginRender(void)
 
 dPluginRender::~dPluginRender(void)
 {
-	CleanupDiaplayListCache(m_wireFrameDisplayList);
-	CleanupDiaplayListCache(m_flatShadedDisplayList);
+	CleanupDisplayListCache(m_wireFrameDisplayList);
+	CleanupDisplayListCache(m_flatShadedDisplayList);
 }
 
 
@@ -39,10 +39,10 @@ bool dPluginRender::Init()
 }
 
 
-void dPluginRender::CleanupDiaplayListCache(dTree<int, NewtonMesh*>& cache)
+void dPluginRender::CleanupDisplayListCache(dTree<int, const NewtonMesh*>& cache)
 {
 	while (cache.GetCount()) {
-		dTree<int, NewtonMesh*>::dTreeNode* const node = cache.GetRoot();
+		dTree<int, const NewtonMesh*>::dTreeNode* const node = cache.GetRoot();
 		DestroyDisplayList(node->GetInfo());
 		cache.Remove(node);
 	}
@@ -394,7 +394,7 @@ void dPluginRender::Print (int displayListFont, dFloat x, dFloat y, const char* 
 
 int dPluginRender::GetCachedWireframeDisplayList(NewtonMesh* const mesh)
 {
-	dTree<int, NewtonMesh*>::dTreeNode* node = m_wireFrameDisplayList.Find(mesh);
+	dTree<int, const NewtonMesh*>::dTreeNode* node = m_wireFrameDisplayList.Find(mesh);
 	if (!node) {
 		int displayList = CreateDisplayList();
 		BeginDisplayList(displayList);
@@ -423,7 +423,7 @@ int dPluginRender::GetCachedWireframeDisplayList(NewtonMesh* const mesh)
 
 int dPluginRender::GetCachedFlatShadedDisplayList(NewtonMesh* const mesh)
 {
-	dTree<int, NewtonMesh*>::dTreeNode* node = m_flatShadedDisplayList.Find(mesh);
+	dTree<int, const NewtonMesh*>::dTreeNode* node = m_flatShadedDisplayList.Find(mesh);
 	if (!node) {
 		int displayList = CreateDisplayList();
 		BeginDisplayList(displayList);
@@ -462,4 +462,21 @@ int dPluginRender::GetCachedFlatShadedDisplayList(NewtonMesh* const mesh)
 	}
 
 	return node->GetInfo();
+}
+
+
+void dPluginRender::InvalidateCachedDisplayList(const NewtonMesh* const mesh)
+{
+	dTree<int, const NewtonMesh*>::dTreeNode* const wireFrameNode = m_wireFrameDisplayList.Find(mesh);
+	if (wireFrameNode) {
+		DestroyDisplayList(wireFrameNode->GetInfo());
+		m_wireFrameDisplayList.Remove(wireFrameNode);
+	}
+
+	dTree<int, const NewtonMesh*>::dTreeNode* const flatShadedNode = m_flatShadedDisplayList.Find(mesh);
+	if (flatShadedNode) {
+		DestroyDisplayList(flatShadedNode->GetInfo());
+		m_flatShadedDisplayList.Remove(flatShadedNode);
+	}
+
 }

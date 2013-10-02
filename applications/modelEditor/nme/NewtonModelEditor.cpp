@@ -51,9 +51,8 @@ BEGIN_EVENT_TABLE (NewtonModelEditor, wxFrame)
 	EVT_MENU (ID_HIDE_EXPLORER_PANE, OnHideExplorerPane)
 	EVT_AUI_PANE_CLOSE(OnPaneClose)
 
+	EVT_MENU_RANGE (ID_TOOL_PLUGINS, ID_MAX_TOOL_PLUGINS, OnTool)
 	EVT_MENU_RANGE (ID_MESH_PLUGINS, ID_MAX_MESH_PLUGINS, OnMesh)
-
-
 
 END_EVENT_TABLE()
 
@@ -669,11 +668,21 @@ void NewtonModelEditor::LoadPlugins(const char* const path)
 					break;
 				}
 
+				case dPluginRecord::m_tool:
+				{
+					m_mainMenu->AddPlugin(m_mainMenu->m_toolMenu, plugin);
+					break;
+				}
+
+
 				case dPluginRecord::m_mesh:
 				{
 					m_mainMenu->AddPlugin(m_mainMenu->m_meshMenu, plugin);
 					break;
 				}
+
+				default:
+					dAssert (0);
 			}
 		}
 	}
@@ -960,6 +969,15 @@ void NewtonModelEditor::OnMesh (wxCommandEvent& event)
 		m_explorer->ReconstructScene(GetScene());
 		RefrehViewports();
 	}
+}
+
+void NewtonModelEditor::OnTool (wxCommandEvent& event)
+{
+	int id = event.GetId() - ID_TOOL_PLUGINS;
+
+	dPluginTool* const plugin = (dPluginTool*) m_mainMenu->GetPlugin(m_mainMenu->m_toolMenu, id);
+	_ASSERTE (plugin);
+	plugin->Execute(this);
 }
 
 

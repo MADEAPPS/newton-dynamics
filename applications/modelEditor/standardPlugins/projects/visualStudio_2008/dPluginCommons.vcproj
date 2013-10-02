@@ -460,6 +460,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\dPluginCommons\dPluginTool.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dPluginCommons\dPluginTool.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\dPluginCommons\dPluginUtils.cpp"
 			>
 		</File>

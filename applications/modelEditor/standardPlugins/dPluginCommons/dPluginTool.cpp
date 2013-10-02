@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        dPluginMesh.h
+// Name:        dPluginMesh.cpp
 // Purpose:     
 // Author:      Julio Jerez
 // Modified by: 
@@ -16,29 +16,8 @@
 // freely
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __D_PLUGIN_MESH_H__
-#define __D_PLUGIN_MESH_H__
 
-#include "dPluginRecord.h"
-
-class dPluginScene;
-class dPluginInterface;
-
-class dPluginMesh: public dPluginRecord
-{
-	public:
-	dPluginMesh(void) {};
-	virtual ~dPluginMesh(void) {};
-
-	virtual dPluginType GetType () { return m_mesh;}
-
-	virtual const char* GetMenuName () {return NULL;}
-	virtual const char* GetDescription () {return NULL;}
-
-	virtual dPluginScene* Create (dPluginInterface* const interface) = 0;
-	virtual void Destroy (dPluginInterface* const interface, dPluginScene* const asset) = 0;
-};
+#include "dPluginStdafx.h"
+#include "dPluginTool.h"
 
 
-
-#endif

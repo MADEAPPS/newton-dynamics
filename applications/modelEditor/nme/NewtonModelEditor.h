@@ -224,6 +224,7 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	void OnRedo(wxCommandEvent& event); 
 	void OnClearUndoHistory(wxCommandEvent& event); 
 	void OnMesh (wxCommandEvent& event); 
+	void OnTool (wxCommandEvent& event); 
 
 	void OnHideExplorerPane (wxCommandEvent& event); 
 	void OnPaneClose (wxAuiManagerEvent& event); 

@@ -55,7 +55,6 @@ typedef long long unsigned64;
 	#include <windows.h>
 	#include <Commctrl.h>
 	#include <stdlib.h>
-//	#include <malloc.h>
 	#include <memory.h>
 	#include <time.h>
 	#include <tchar.h>
@@ -93,11 +92,6 @@ typedef long long unsigned64;
 	#endif
 #endif
 
-
-// gui library includes
-//#include <fx.h>
-//#include <fx3d.h>
-//#include <fxkeys.h>
 
 // gui library includes
 #include <wx/wx.h>
@@ -155,8 +149,9 @@ typedef long long unsigned64;
 
 #include <dPluginUtils.h>
 #include <dUndoRedo.h>
-#include <dPluginScene.h>
 #include <dPluginMesh.h>
+#include <dPluginTool.h>
+#include <dPluginScene.h>
 #include <dModelPlugin.h>
 #include <dPluginCamera.h>
 #include <dImportPlugin.h>

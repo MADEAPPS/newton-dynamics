@@ -414,7 +414,6 @@ dScene::dTreeNode* dScene::CreateSkinModifierNode(dTreeNode* const parent)
 
 dScene::dTreeNode* dScene::CreateTextureNode (const char* const pathName)
 {
-	//dTreeNode* const root = GetRootNode();
 	dTreeNode* const root = GetTextureCacheNode();
 
 	// see if this texture is already exist
@@ -489,6 +488,22 @@ dScene::dTreeNode* dScene::GetGeometryCacheNode ()
 {
 	return GetCacheNode (D_GEOMETRY_CACHE_NODE_MAME);
 }
+
+dScene::dTreeNode* dScene::FindTextureCacheNode () const
+{
+	return FindChildByName(GetRootNode(), D_TEXTURE_CACHE_NODE_MAME);
+}
+
+dScene::dTreeNode* dScene::FindGetMaterialCacheNode () const
+{
+	return FindChildByName(GetRootNode(), D_MATERIAL_CACHE_NODE_MAME);
+}
+
+dScene::dTreeNode* dScene::FindGetGeometryCacheNode () const
+{
+	return FindChildByName(GetRootNode(), D_GEOMETRY_CACHE_NODE_MAME);
+}
+
 
 
 dScene::dTreeNode* dScene::GetFirstNode () const

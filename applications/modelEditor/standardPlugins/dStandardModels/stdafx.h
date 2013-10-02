@@ -47,6 +47,7 @@
 
 #include <dUndoRedo.h>
 #include <dPluginMesh.h>
+#include <dPluginTool.h>
 #include <dBodyPlugin.h>
 #include <dModelPlugin.h>
 #include <dPluginScene.h>

@@ -413,10 +413,6 @@
 			RelativePath="..\..\dSerializedNewtonWorlds\stdafx.h"
 			>
 		</File>
-		<File
-			RelativePath="..\..\dSerializedNewtonWorlds\targetver.h"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>

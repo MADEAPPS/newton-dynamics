@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        dPluginMesh.h
+// Name:        dPluginTool.h
 // Purpose:     
 // Author:      Julio Jerez
 // Modified by: 
@@ -16,27 +16,25 @@
 // freely
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __D_PLUGIN_MESH_H__
-#define __D_PLUGIN_MESH_H__
+#ifndef __D_PLUGIN_TOOL_H__
+#define __D_PLUGIN_TOOL_H__
 
 #include "dPluginRecord.h"
 
 class dPluginScene;
 class dPluginInterface;
 
-class dPluginMesh: public dPluginRecord
+class dPluginTool: public dPluginRecord
 {
 	public:
-	dPluginMesh(void) {};
-	virtual ~dPluginMesh(void) {};
+	dPluginTool(void) {};
+	virtual ~dPluginTool(void) {};
 
-	virtual dPluginType GetType () { return m_mesh;}
+	virtual dPluginType GetType () { return m_tool;}
 
 	virtual const char* GetMenuName () {return NULL;}
 	virtual const char* GetDescription () {return NULL;}
-
-	virtual dPluginScene* Create (dPluginInterface* const interface) = 0;
-	virtual void Destroy (dPluginInterface* const interface, dPluginScene* const asset) = 0;
+	virtual bool Execute (dPluginInterface* const interface) = 0;
 };
 
 

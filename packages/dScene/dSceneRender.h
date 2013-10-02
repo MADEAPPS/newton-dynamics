@@ -76,9 +76,9 @@ class dSceneRender: public dRefCounter
 	virtual void SetMaterialShininess(dFloat normalizedPower) = 0;
 	
 
-
 	virtual int GetCachedWireframeDisplayList(NewtonMesh* const mesh) = 0; 
 	virtual int GetCachedFlatShadedDisplayList(NewtonMesh* const mesh) = 0; 
+	virtual void InvalidateCachedDisplayList(const NewtonMesh* const mesh) = 0; 
 		
 
 	// primitive drawing functions

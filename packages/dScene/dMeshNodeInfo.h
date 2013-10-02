@@ -43,6 +43,7 @@ class dMeshNodeInfo: public dGeometryNodeInfo
 	virtual ~dMeshNodeInfo(void);
 
 	virtual NewtonMesh* GetMesh () const;
+	virtual void SetMesh (NewtonMesh* const mesh);
 	virtual void ReplaceMesh (NewtonMesh* const mesh);
 
 	virtual void BakeTransform (const dMatrix& matrix);

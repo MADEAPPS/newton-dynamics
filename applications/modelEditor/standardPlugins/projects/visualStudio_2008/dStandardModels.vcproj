@@ -366,14 +366,6 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\dStandardModels\dMeshNGD.cpp"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dStandardModels\dMeshNGD.h"
-			>
-		</File>
-		<File
 			RelativePath="..\..\dStandardModels\dRigidBody.cpp"
 			>
 		</File>
@@ -403,6 +395,14 @@
 		</File>
 		<File
 			RelativePath="..\..\dStandardModels\dStandardModelsDllGlue.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dStandardModels\dTriangulateSelections.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dStandardModels\dTriangulateSelections.h"
 			>
 		</File>
 		<File
@@ -443,10 +443,6 @@
 		</File>
 		<File
 			RelativePath="..\..\dStandardModels\stdafx.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dStandardModels\targetver.h"
 			>
 		</File>
 	</Files>

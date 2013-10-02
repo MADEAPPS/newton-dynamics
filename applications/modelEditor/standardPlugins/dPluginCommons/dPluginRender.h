@@ -60,6 +60,8 @@ class dPluginRender: public dSceneRender
 	virtual int GetCachedWireframeDisplayList(NewtonMesh* const mesh); 
 	virtual int GetCachedFlatShadedDisplayList(NewtonMesh* const mesh); 
 	
+	virtual void InvalidateCachedDisplayList(const NewtonMesh* const mesh); 
+
 
 	// material interface
 	virtual void EnableZbuffer();
@@ -87,13 +89,11 @@ class dPluginRender: public dSceneRender
 	virtual void SubmitNormal(const dVector& normal);
 	virtual void SubmitVertex(const dVector& posit);
 	virtual void End();
-
-
 	
 	private:
-	void CleanupDiaplayListCache(dTree<int, NewtonMesh*>& cache);
-	dTree<int, NewtonMesh*> m_wireFrameDisplayList;
-	dTree<int, NewtonMesh*> m_flatShadedDisplayList;
+	void CleanupDisplayListCache(dTree<int, const NewtonMesh*>& cache);
+	dTree<int, const NewtonMesh*> m_wireFrameDisplayList;
+	dTree<int, const NewtonMesh*> m_flatShadedDisplayList;
 };
 
 

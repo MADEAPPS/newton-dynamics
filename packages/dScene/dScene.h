@@ -97,6 +97,11 @@ class dScene: public dSceneGraph, public dRefCounter
 	virtual DSCENE_API dTreeNode* GetMaterialCacheNode ();
 	virtual DSCENE_API dTreeNode* GetGeometryCacheNode ();
 
+	virtual DSCENE_API dTreeNode* FindTextureCacheNode () const;
+	virtual DSCENE_API dTreeNode* FindGetMaterialCacheNode () const;
+	virtual DSCENE_API dTreeNode* FindGetGeometryCacheNode () const;
+
+
 	virtual DSCENE_API dTreeNode* AddNode(dNodeInfo* const sceneInfo, dTreeNode* const parent);
 	virtual DSCENE_API dTreeNode* CreateNode (const char* const className, dTreeNode* const parent);
 	virtual DSCENE_API dTreeNode* CreateCollisionFromNewtonCollision(dTreeNode* const parent, NewtonCollision* const collision);
@@ -108,17 +113,13 @@ class dScene: public dSceneGraph, public dRefCounter
 	virtual DSCENE_API dTreeNode* GetNextNode (dTreeNode* const node) const;
 	virtual DSCENE_API dTreeNode* FindNode (dNodeInfo* const info) const;
 	 
-	
 	virtual DSCENE_API void* GetFirstChildLink(dTreeNode* const parentNode) const;
 	virtual DSCENE_API void* GetNextChildLink(dTreeNode* const parentNode, void* const link) const;
 
 	virtual DSCENE_API void* GetFirstParentLink(dTreeNode* const childNode) const;
 	virtual DSCENE_API void* GetNextParentLink(dTreeNode* const childNode, void* const link) const;
 
-	//virtual DSCENE_API bool IsParentLink (void* const link) const;
 	virtual DSCENE_API dTreeNode* GetNodeFromLink (void* const child) const;
-
-	//virtual DSCENE_API void CloneInfoFromNode(dTreeNode* const node);
 	virtual DSCENE_API dNodeInfo* CloneNodeInfo(dTreeNode* const node) const;
 	virtual DSCENE_API dNodeInfo* GetInfoFromNode(dTreeNode* const node) const;
 	
@@ -128,7 +129,6 @@ class dScene: public dSceneGraph, public dRefCounter
 	virtual DSCENE_API dTreeNode* FindTextureByTextId(dCRCTYPE textId);
 	virtual DSCENE_API dTreeNode* FindMaterialById(dTreeNode* const parentNode, int materialId) const;
 	virtual DSCENE_API dTreeNode* FindTextureByTextId(dTreeNode* const parentNode, dCRCTYPE textId) const;
-	
 
 	virtual DSCENE_API dTreeNode* FindChildByName(dTreeNode* const parentNode, const char* const name) const;
 	virtual DSCENE_API dTreeNode* FindChildByType(dTreeNode* const parentNode, dCRCTYPE type) const;

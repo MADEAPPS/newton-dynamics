@@ -60,12 +60,17 @@ NewtonMesh* dMeshNodeInfo::GetMesh () const
 	return m_mesh;
 }
 
+void dMeshNodeInfo::SetMesh (NewtonMesh* const mesh)
+{
+	m_mesh = mesh;
+}
+
 void dMeshNodeInfo::ReplaceMesh (NewtonMesh* const mesh)
 {
 	if (m_mesh) {
 		NewtonMeshDestroy(m_mesh);
 	}
-	m_mesh = mesh;
+	SetMesh (mesh);
 }
 
 
