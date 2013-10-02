@@ -870,9 +870,11 @@ void dScene::UnmergeScene (dScene* const scene)
 		map.Insert(node, GetInfoFromNode(node));
 	}
 
+static int xxx;
+
 	for (dTreeNode* parentNode = scene->GetFirstNode(); parentNode; parentNode = scene->GetNextNode(parentNode)) {
 		dNodeInfo* const parentInfo = GetInfoFromNode(parentNode);
-
+xxx ++;
 		dTree<dTreeNode*, const dNodeInfo*>::dTreeNode* const mapNode = map.Find(parentInfo);
 		if (mapNode) {
 			dTreeNode* const myParentNode = mapNode->GetInfo();

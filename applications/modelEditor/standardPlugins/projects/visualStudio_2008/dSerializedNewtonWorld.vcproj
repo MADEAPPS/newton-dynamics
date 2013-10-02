@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="dSerializedNewtonWorld"
+	Name="dImportExporter"
 	ProjectGUID="{5580C08E-E865-4D9E-B4C9-5AC040130B92}"
 	RootNamespace="neValveMapLoader"
 	Keyword="Win32Proj"
@@ -350,31 +350,31 @@
 	</References>
 	<Files>
 		<File
-			RelativePath="..\..\dSerializedNewtonWorlds\NetwonDllGlue.cpp"
+			RelativePath="..\..\dImportExporters\NetwonDllGlue.cpp"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dSerializedNewtonWorlds\NetwonDllGlue.h"
+			RelativePath="..\..\dImportExporters\NetwonDllGlue.h"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dSerializedNewtonWorlds\NewtonExport.cpp"
+			RelativePath="..\..\dImportExporters\NewtonExport.cpp"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dSerializedNewtonWorlds\NewtonExport.h"
+			RelativePath="..\..\dImportExporters\NewtonExport.h"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dSerializedNewtonWorlds\NewtonImport.cpp"
+			RelativePath="..\..\dImportExporters\NewtonImport.cpp"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dSerializedNewtonWorlds\NewtonImport.h"
+			RelativePath="..\..\dImportExporters\NewtonImport.h"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dSerializedNewtonWorlds\stdafx.cpp"
+			RelativePath="..\..\dImportExporters\stdafx.cpp"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"
@@ -410,7 +410,7 @@
 			</FileConfiguration>
 		</File>
 		<File
-			RelativePath="..\..\dSerializedNewtonWorlds\stdafx.h"
+			RelativePath="..\..\dImportExporters\stdafx.h"
 			>
 		</File>
 	</Files>
