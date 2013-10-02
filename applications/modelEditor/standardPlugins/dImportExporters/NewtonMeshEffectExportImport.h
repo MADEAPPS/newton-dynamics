@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        dll glue .h
+// Name:        NewtonMeshEffectExport.h
 // Purpose:     
 // Author:      Julio Jerez
 // Modified by: 
@@ -16,23 +16,24 @@
 // freely
 /////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
-#include "NewtonImport.h"
-#include "NewtonExport.h"
-#include "NetwonDllGlue.h"
-#include "NewtonMeshEffectExportImport.h"
+#ifndef _NEWTON_MESH_EFFECT_EXPORT_IMPORT_H_
+#define _NEWTON_MESH_EFFECT_EXPORT_IMPORT_H_
 
-dPluginRecord** GetPluginArray()
+
+class NewtonMeshEffectExport: public dExportPlugin
 {
-	static dPluginRecord* array[] = 
-	{
-		NewtonMeshEffectExport::GetPlugin(),
-		NewtonImport::GetPlugin(),
-		NewtonExport::GetPlugin(),
-		NULL
-	};
+	public:
+	NewtonMeshEffectExport();
+	~NewtonMeshEffectExport();
 
-	return array;
-}
+	static NewtonMeshEffectExport* GetPlugin();
 
+	virtual const char* GetMenuName () { return GetSignature();}
+	virtual const char* GetFileExtension () { return ".nme";}
+	virtual const char* GetFileDescription () {return "save selected mesh as NewtonMeshEffect file";}
 
+	virtual const char* GetSignature () {return "Netwon Mesh Effect Export";}
+	virtual void Export (const char* const fileName, dPluginInterface* const interface);
+};
+
+#endif

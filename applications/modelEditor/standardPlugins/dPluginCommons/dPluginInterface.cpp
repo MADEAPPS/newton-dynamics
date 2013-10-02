@@ -105,7 +105,8 @@ dPluginInterface::dPluginDll::dListNode* dPluginInterface::LoadPlugins(const cha
 
 		for (int i = 0; table[i]; i ++) {
 			dPluginRecord* const plugin = table[i];
-			dCRCTYPE key = dCRC64 (plugin->GetSignature());
+			const char* const pluginName = plugin->GetSignature();
+			dCRCTYPE key = dCRC64 (pluginName);
 			_ASSERTE (!m_pluginDictionary.Find(key));
 			m_pluginDictionary.Insert(plugin, key);
 		}

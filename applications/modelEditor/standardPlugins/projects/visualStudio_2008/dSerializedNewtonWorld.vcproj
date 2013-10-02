@@ -374,6 +374,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\dImportExporters\NewtonMeshEffectExportImport.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dImportExporters\NewtonMeshEffectExportImport.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\dImportExporters\stdafx.cpp"
 			>
 			<FileConfiguration
