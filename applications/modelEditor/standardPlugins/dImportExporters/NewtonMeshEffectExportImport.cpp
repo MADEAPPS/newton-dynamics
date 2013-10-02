@@ -53,10 +53,25 @@ bool NewtonMeshEffectImport::Import (const char* const fileName, dPluginInterfac
 		fread ( &count, sizeof (int), 1, file);
 		dAssert (count >= 1);
 		NewtonWorld* const world = scene->GetNewtonWorld();
+
+		dPluginScene* const asset = new dPluginScene(world);
+		dPluginScene::dTreeNode* const root = asset->GetRoot();
+		dNodeInfo* const rootInfo = asset->GetInfoFromNode(root);
+		rootInfo->SetName("xxx");	
+
 		for (int i = 0; i < count; i ++) {
 			NewtonMesh* const newtonMesh = NewtonMeshCreateFromSerialization (world, DeserializeCallback, file);
 			dAssert (newtonMesh);
+
+			dPluginScene::dTreeNode* const sceneNode = asset->CreateSceneNode(asset->GetRoot());
+			dPluginScene::dTreeNode* const boxMesh = asset->CreateMeshNode(sceneNode);
+			dMeshNodeInfo* const instance = (dMeshNodeInfo*) asset->GetInfoFromNode(boxMesh);
+			instance->SetName("mesh_1");
+			instance->ReplaceMesh (newtonMesh);
 		}
+
+		interface->MergeScene (asset);
+		asset->Release();
 
 		fclose (file);
 		return true;

@@ -1008,7 +1008,10 @@ void NewtonModelEditor::OnImport (wxCommandEvent& event)
 	dAssert (plugin);
 	wxFileDialog open (this, wxT(plugin->GetFileDescription ()), wxT("../../../media"), wxT(""), wxT(plugin->GetFileExtension ()));
 	if (open.ShowModal() == wxID_OK) {
-		plugin->Import (open.GetPath().mb_str(), this);
+		if (plugin->Import (open.GetPath().mb_str(), this)) {
+			m_explorer->ReconstructScene(GetScene());
+			RefrehViewports();
+		}
 	}
 }
 
