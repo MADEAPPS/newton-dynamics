@@ -169,6 +169,23 @@ dPluginRecord* dPluginInterface::GetPluginFromNode(void* const pluginNode) const
 	return node ? node->GetInfo() : NULL;
 }
 
+bool dPluginInterface::HasMeshSelection (dCRCTYPE meshType)
+{
+	dScene::dTreeNode* const geometryCache = m_scene->FindGetGeometryCacheNode ();
+	if (geometryCache) {
+		for (void* link = m_scene->GetFirstChildLink(geometryCache); link; link = m_scene->GetNextChildLink(geometryCache, link)) {
+			dScene::dTreeNode* const node = m_scene->GetNodeFromLink(link);
+			dNodeInfo* const info = m_scene->GetInfoFromNode(node);
+			if (info->IsType(meshType)) {
+				if (info->GetEditorFlags() & dPluginInterface::m_selected) {
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
 
 //void dPluginInterface::ClearExplorerExpand()
 //{

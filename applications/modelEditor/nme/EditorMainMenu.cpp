@@ -58,7 +58,8 @@ void EditorMainMenu::AddPlugin (wxMenu* const menu, dPluginRecord* const plugin)
 {
 	BasePluginBaseMenuId* const baseIdData = (BasePluginBaseMenuId*)menu->GetRefData();
 	dAssert(baseIdData);
-	wxMenuItem* const item = menu->Append (baseIdData->m_baseID + menu->GetMenuItemCount(), wxString (plugin->GetMenuName ()));
+	int id = baseIdData->m_baseID + menu->GetMenuItemCount();
+	wxMenuItem* const item = menu->Append (id, wxString (plugin->GetMenuName ()));
 	item->SetRefData (new EditorPlugin(plugin));
 }
 
@@ -113,12 +114,12 @@ void EditorMainMenu::CreateFileMenu()
 	{
 		menu->AppendSeparator();
 		m_importPlugins = new wxMenu;
-		menu->AppendSubMenu(m_importPlugins, wxT("Import plugins..."), wxT("execute and scen import plug in"));
+		menu->AppendSubMenu(m_importPlugins, wxT("Import plugins ..."), wxT("import third party file to the scene"));
 		m_importPlugins->SetRefData(new BasePluginBaseMenuId(NewtonModelEditor::ID_IMPORT_PLUGINS));
 
 		m_exportPlugins = new wxMenu;
-		menu->AppendSubMenu(m_exportPlugins, wxT("Export plugins..."), wxT("execute and scene iexport plug in"));
-		m_exportPlugins->SetRefData(new BasePluginBaseMenuId(NewtonModelEditor::ID_MAX_EXPORT_PLUGINS));
+		menu->AppendSubMenu(m_exportPlugins, wxT("Export plugins ..."), wxT("export slect mesh to a third party file format"));
+		m_exportPlugins->SetRefData(new BasePluginBaseMenuId(NewtonModelEditor::ID_EXPORT_PLUGINS));
 	}
 
 	//quick editor

@@ -40,40 +40,26 @@ dMeshTriangulateMesh* dMeshTriangulateMesh::GetPlugin()
 
 bool dMeshTriangulateMesh::Execute (dPluginInterface* const interface)
 {
-	dScene* const scene = interface->GetScene();
-	dAssert (scene);
+	if (interface->HasMeshSelection (dMeshNodeInfo::GetRttiType())) {
+		dScene* const scene = interface->GetScene();
+		dAssert (scene);
+		dScene::dTreeNode* const geometryCache = scene->FindGetGeometryCacheNode ();
 
-	dScene::dTreeNode* const geometryCache = scene->FindGetGeometryCacheNode ();
-	if (geometryCache) {
-		bool hasSelections = false;
-		for (void* link = scene->GetFirstChildLink(geometryCache); link && !hasSelections; link = scene->GetNextChildLink(geometryCache, link)) {
+		interface->Push (new dUndoRedoSaveSelectedMesh(interface));
+
+		dSceneRender* const render = interface->GetRender();
+		for (void* link = scene->GetFirstChildLink(geometryCache); link; link = scene->GetNextChildLink(geometryCache, link)) {
 			dScene::dTreeNode* const node = scene->GetNodeFromLink(link);
 			dNodeInfo* const info = scene->GetInfoFromNode(node);
 			if (info->IsType(dMeshNodeInfo::GetRttiType())) {
 				if (info->GetEditorFlags() & dPluginInterface::m_selected) {
-					hasSelections = true;
-				}
-			}
-		}
-
-		if (hasSelections) {
-			interface->Push (new dUndoRedoSaveSelectedMesh(interface));
-
-			dSceneRender* const render = interface->GetRender();
-			for (void* link = scene->GetFirstChildLink(geometryCache); link; link = scene->GetNextChildLink(geometryCache, link)) {
-				dScene::dTreeNode* const node = scene->GetNodeFromLink(link);
-				dNodeInfo* const info = scene->GetInfoFromNode(node);
-				if (info->IsType(dMeshNodeInfo::GetRttiType())) {
-					if (info->GetEditorFlags() & dPluginInterface::m_selected) {
-						dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*) info;
-						render->InvalidateCachedDisplayList (meshInfo->GetMesh());
-						NewtonMeshTriangulate(meshInfo->GetMesh());
-					}
+					dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*) info;
+					render->InvalidateCachedDisplayList (meshInfo->GetMesh());
+					NewtonMeshTriangulate(meshInfo->GetMesh());
 				}
 			}
 		}
 	}
-
 	return true;
 }
 

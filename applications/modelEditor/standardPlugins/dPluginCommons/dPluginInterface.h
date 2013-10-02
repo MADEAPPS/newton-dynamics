@@ -80,7 +80,9 @@ class dPluginInterface: public dUndoRedoManager
 	DPLUGIN_API virtual void MergeScene (dPluginScene* const asset);
 	DPLUGIN_API virtual void RefreshExplorerEvent(bool clear) const;
 
+	DPLUGIN_API bool HasMeshSelection (dCRCTYPE meshType);
 	protected:
+	
 	DPLUGIN_API dPluginDll::dListNode* LoadPlugins(const char* const path);
 
 	private:

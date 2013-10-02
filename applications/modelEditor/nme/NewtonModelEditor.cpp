@@ -53,6 +53,8 @@ BEGIN_EVENT_TABLE (NewtonModelEditor, wxFrame)
 
 	EVT_MENU_RANGE (ID_TOOL_PLUGINS, ID_MAX_TOOL_PLUGINS, OnTool)
 	EVT_MENU_RANGE (ID_MESH_PLUGINS, ID_MAX_MESH_PLUGINS, OnMesh)
+//	EVT_MENU_RANGE (ID_IMPORT_PLUGINS, ID_MAX_IMPORT_PLUGINS, OnImport)
+	EVT_MENU_RANGE (ID_EXPORT_PLUGINS, ID_MAX_EXPORT_PLUGINS, OnExport)
 
 END_EVENT_TABLE()
 
@@ -996,6 +998,28 @@ void NewtonModelEditor::OnOpenScene(wxCommandEvent& event)
 			RefrehViewports();
 		}
 		asset->Release();
+	}
+}
+
+void NewtonModelEditor::OnImport (wxCommandEvent& event)
+{
+	int id = event.GetId() - ID_IMPORT_PLUGINS;
+	dImportPlugin* const plugin = (dImportPlugin*) m_mainMenu->GetPlugin(m_mainMenu->m_importPlugins, id);
+	dAssert (plugin);
+
+	dAssert (0);
+}
+
+void NewtonModelEditor::OnExport (wxCommandEvent& event)
+{
+	int id = event.GetId() - ID_EXPORT_PLUGINS;
+	dExportPlugin* const plugin = (dExportPlugin*) m_mainMenu->GetPlugin(m_mainMenu->m_exportPlugins, id);
+	dAssert (plugin);
+	if (HasMeshSelection (dMeshNodeInfo::GetRttiType())) {
+		wxFileDialog open (this, wxT(plugin->GetFileDescription ()), wxT("../../../media"), wxT(""), wxT(plugin->GetFileExtension ()));
+		if (open.ShowModal() == wxID_OK) {
+			plugin->Export (open.GetPath().mb_str(), this);
+		}
 	}
 }
 

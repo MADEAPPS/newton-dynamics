@@ -13,11 +13,9 @@
 #define __NEWTON_MODEL_EDITOR_H_
 
 
-//class dPluginScene;
 class EditorMainMenu;
 class EditorExplorer;
 class EditorRenderViewport;
-//class EditorCommandPanel;
 
 #define D_MAX_PLUGINS_COUNT 128
 
@@ -225,6 +223,8 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	void OnClearUndoHistory(wxCommandEvent& event); 
 	void OnMesh (wxCommandEvent& event); 
 	void OnTool (wxCommandEvent& event); 
+	void OnImport (wxCommandEvent& event); 
+	void OnExport (wxCommandEvent& event); 
 
 	void OnHideExplorerPane (wxCommandEvent& event); 
 	void OnPaneClose (wxAuiManagerEvent& event); 
