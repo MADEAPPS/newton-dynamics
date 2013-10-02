@@ -36,21 +36,46 @@ NewtonMeshEffectExport* NewtonMeshEffectExport::GetPlugin()
 }
 
 
+void NewtonMeshEffectExport::SerializeCallback (void* const serializeHandle, const void* const buffer, int size)
+{
+	FILE* const file = (FILE*) serializeHandle;
+	fwrite (buffer, size, 1, file);
+}
+
 void NewtonMeshEffectExport::Export (const char* const fileName, dPluginInterface* const interface)
 {
+	FILE* const file = fopen (fileName, "wb");
+	if (file) {
+		dScene* const scene = interface->GetScene();
+		dAssert (scene);
 
-	dScene* const scene = interface->GetScene();
-	dAssert (scene);
 
-	dScene::dTreeNode* const geometryCache = scene->FindGetGeometryCacheNode ();
-	for (void* link = scene->GetFirstChildLink(geometryCache); link; link = scene->GetNextChildLink(geometryCache, link)) {
-		dScene::dTreeNode* const node = scene->GetNodeFromLink(link);
-		dNodeInfo* const info = scene->GetInfoFromNode(node);
-		if (info->IsType(dMeshNodeInfo::GetRttiType())) {
-			if (info->GetEditorFlags() & dPluginInterface::m_selected) {
-				dAssert (0);
+		dScene::dTreeNode* const geometryCache = scene->FindGetGeometryCacheNode ();
+		int count = 0;
+		for (void* link = scene->GetFirstChildLink(geometryCache); link; link = scene->GetNextChildLink(geometryCache, link)) {
+			dScene::dTreeNode* const node = scene->GetNodeFromLink(link);
+			dNodeInfo* const info = scene->GetInfoFromNode(node);
+			if (info->IsType(dMeshNodeInfo::GetRttiType())) {
+				if (info->GetEditorFlags() & dPluginInterface::m_selected) {
+					count ++;
+				}
 			}
 		}
+		dAssert (count >= 1);
+		fwrite (& count, sizeof (int), 1, file);
+
+		for (void* link = scene->GetFirstChildLink(geometryCache); link; link = scene->GetNextChildLink(geometryCache, link)) {
+			dScene::dTreeNode* const node = scene->GetNodeFromLink(link);
+			dNodeInfo* const info = scene->GetInfoFromNode(node);
+			if (info->IsType(dMeshNodeInfo::GetRttiType())) {
+				if (info->GetEditorFlags() & dPluginInterface::m_selected) {
+					dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*) info;
+					NewtonMeshSerialize (meshInfo->GetMesh(), SerializeCallback, file);
+				}
+			}
+		}
+
+		fclose (file);
 	}
 }
 

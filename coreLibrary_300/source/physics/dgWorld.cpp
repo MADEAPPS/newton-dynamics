@@ -1017,21 +1017,22 @@ void dgWorld::UpdateAsync (dgFloat32 timestep)
 void dgWorld::SerializeToFile (const char* const fileName) const
 {
 	FILE* const file = fopen (fileName, "wb");
+	if (file) {
+		dgBody** const array = new dgBody*[GetBodiesCount()];
 
-	dgBody** const array = new dgBody*[GetBodiesCount()];
+		dgInt32 count = 0;
+		const dgBodyMasterList& me = *this;
+		for (dgBodyMasterList::dgListNode* node = me.GetFirst()->GetNext(); node; node = node->GetNext()) {
+			const dgBodyMasterListRow& graphNode = node->GetInfo();
+			array[count] = graphNode.GetBody();	
+			count ++;
+			dgAssert (count <= GetBodiesCount());
+		}
+		SerializeBodyArray (array, count, OnBodySerializeToFile, OnSerializeToFile, file);
 
-	dgInt32 count = 0;
-	const dgBodyMasterList& me = *this;
-	for (dgBodyMasterList::dgListNode* node = me.GetFirst()->GetNext(); node; node = node->GetNext()) {
-		const dgBodyMasterListRow& graphNode = node->GetInfo();
-		array[count] = graphNode.GetBody();	
-		count ++;
-		dgAssert (count <= GetBodiesCount());
+		delete[] array;
+		fclose (file);
 	}
-	SerializeBodyArray (array, count, OnBodySerializeToFile, OnSerializeToFile, file);
-
-	delete[] array;
-	fclose (file);
 }
 
 

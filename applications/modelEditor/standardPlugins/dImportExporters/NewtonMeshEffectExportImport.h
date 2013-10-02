@@ -34,6 +34,8 @@ class NewtonMeshEffectExport: public dExportPlugin
 
 	virtual const char* GetSignature () {return "Netwon Mesh Effect Export";}
 	virtual void Export (const char* const fileName, dPluginInterface* const interface);
+
+	static void SerializeCallback (void* const serializeHandle, const void* const buffer, int size);
 };
 
 #endif
