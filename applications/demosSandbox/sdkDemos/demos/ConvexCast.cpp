@@ -285,10 +285,10 @@ static void MakeSingleCompound(DemoEntityManager* const scene)
 	NewtonCompoundCollisionAddSubCollision(compoundCollision, boxCollision);
 	NewtonDestroyCollision(boxCollision);
 
-	NewtonCompoundCollisionEndAddRemove(compoundCollision);
+dMatrix matrix(GetIdentityMatrix());
+matrix.m_posit.m_y = 10.0f;
 
-	dMatrix matrix(GetIdentityMatrix());
-	matrix.m_posit.m_y = 10.0f;
+	NewtonCompoundCollisionEndAddRemove(compoundCollision);
 	NewtonBody* compoundBody = NewtonCreateDynamicBody(world, compoundCollision, &matrix[0][0]);
 	NewtonDestroyCollision(compoundCollision);
 
