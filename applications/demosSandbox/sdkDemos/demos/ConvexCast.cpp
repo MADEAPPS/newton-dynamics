@@ -297,6 +297,10 @@ matrix.m_posit.m_y = 10.0f;
 
 
 // adding some visualization
+NewtonBodySetMassProperties (compoundBody, 1.0f, NewtonBodyGetCollision(compoundBody));
+NewtonBodySetTransformCallback(compoundBody, DemoEntity::TransformCallback);
+NewtonBodySetForceAndTorqueCallback(compoundBody, PhysicsApplyGravityForce);
+
 DemoMesh* mesh = new DemoMesh("geometry", NewtonBodyGetCollision(compoundBody), "smilli.tga", "smilli.tga", "smilli.tga");
 DemoEntity* const entity = new DemoEntity(matrix, NULL);
 entity->SetMesh(mesh);
