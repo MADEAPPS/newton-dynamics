@@ -67,10 +67,6 @@ x = size * (j - count / 2);
 y = 0;
 z = size * (i - count / 2);
 
-//x = 0;
-//z = 0;
-
-//if (j == 0){
 				dMatrix matrix (dPitchMatrix (pitch) * dYawMatrix (yaw) * dRollMatrix (roll));
 				matrix.m_posit = dVector (x, y, z, 1.0f);
 
@@ -80,7 +76,7 @@ z = size * (i - count / 2);
 
 				NewtonCollisionSetMatrix (collisionArray[index], &matrix[0][0]);
 				NewtonCompoundCollisionAddSubCollision (compound, collisionArray[index]);
-//}
+
 			}
 		}
 		NewtonCompoundCollisionEndAddRemove(compound);	
@@ -159,28 +155,6 @@ z = size * (i - count / 2);
 		m_castingEntity->ResetMatrix(*scene, matrix);
 	}
 
-/*
-void SimulationPreListener(DemoEntityManager* const scene, DemoEntityManager::dListNode* const mynode, dFloat timeStep)
-{
-	dVector p0 (-9.6479425f, 3.2714758f, -6.2146726f, 1.0f);
-	dVector p1 (1609.6510f, -560.38074f, 1025.2556f, 1.f);
-
-	// do the convex cast here 
-	dMatrix matrix (GetIdentityMatrix());
-	matrix.m_posit = p0;
-
-	dFloat hitParam;
-	NewtonWorldConvexCastReturnInfo info[16];
-	NewtonCollision* const shape = GetCurrentShape();
-	NewtonWorld* const world = scene->GetNewton();
-	int count = NewtonWorldConvexCast (world, &matrix[0][0], &p1[0], shape, &hitParam, NULL, NULL, &info[0], 4, 0);		
-	if (count) {
-		matrix.m_posit += (p1 - matrix.m_posit).Scale (hitParam);
-		SetCastEntityMatrix (scene, matrix);
-	}
-	SetCastingLine (p0, p1);
-}
-*/
 
 	virtual void Render(dFloat timeStep) const
 	{
@@ -217,10 +191,6 @@ class dConvexCastRecord: public CustomControllerBase
 	void PostUpdate(dFloat timestep, int threadIndex)
 	{
 	}
-
-//	void Init (dFloat location_x, dFloat location_z, PrimitiveType shapeType, int materialID, PrimitiveType castingShapeType)
-//	{
-//	}
 };
 
 
@@ -304,6 +274,40 @@ class dConvexCastManager: public CustomControllerManager<dConvexCastRecord>
 };
 
 
+static void MakeSingleCompound(DemoEntityManager* const scene)
+{
+	NewtonWorld* const world = scene->GetNewton();
+
+	NewtonCollision* compoundCollision = NewtonCreateCompoundCollision(world, 0);
+	NewtonCompoundCollisionBeginAddRemove(compoundCollision);
+
+	NewtonCollision* boxCollision = NewtonCreateBox(world, 50, 50, 50, 0, NULL);
+	NewtonCompoundCollisionAddSubCollision(compoundCollision, boxCollision);
+	NewtonDestroyCollision(boxCollision);
+
+	NewtonCompoundCollisionEndAddRemove(compoundCollision);
+
+	dMatrix matrix(GetIdentityMatrix());
+	matrix.m_posit.m_y = 10.0f;
+	NewtonBody* compoundBody = NewtonCreateDynamicBody(world, compoundCollision, &matrix[0][0]);
+	NewtonDestroyCollision(compoundCollision);
+
+	// scale after creating body slows everything down. Without the scale it runs fine even though the body is huge
+	NewtonCollisionSetScale(NewtonBodyGetCollision(compoundBody), 0.05f, 0.05f, 0.05f);
+
+
+// adding some visualization
+DemoMesh* mesh = new DemoMesh("geometry", NewtonBodyGetCollision(compoundBody), "smilli.tga", "smilli.tga", "smilli.tga");
+DemoEntity* const entity = new DemoEntity(matrix, NULL);
+entity->SetMesh(mesh);
+mesh->Release();
+NewtonBodySetUserData(compoundBody, entity);
+scene->Append(entity);
+
+}
+
+
+
 // create physics scene
 void ConvexCast (DemoEntityManager* const scene)
 {
@@ -318,10 +322,11 @@ void ConvexCast (DemoEntityManager* const scene)
 //	CreateLevelMesh (scene, "flatPlane.ngd", 0);
 //	CreateLevelMesh (scene, "playground.ngd", 0);
 
-
 	StupidComplexOfConvexShapes* const stupidLevel = new StupidComplexOfConvexShapes (scene, 100);
-
 	new dConvexCastManager (scene, stupidLevel);
+
+// add a single compound Box test
+MakeSingleCompound(scene);
 
 
 	// place camera into position

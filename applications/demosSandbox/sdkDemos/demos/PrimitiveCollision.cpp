@@ -98,6 +98,7 @@ static void PhysicsSpinBody (const NewtonBody* body, dFloat timestep, int thread
 }
 
 
+
 static void AddSinglePrimitive (DemoEntityManager* const scene, dFloat x, PrimitiveType type, int materialID)
 {
 
@@ -164,7 +165,6 @@ void PrimitiveCollision (DemoEntityManager* const scene)
 		NewtonBodySetForceAndTorqueCallback(body, PhysicsSpinBody);
 		NewtonBodySetAutoSleep (body, 0);
 	}
-
 
 	// place camera into position
 	//dMatrix camMatrix (dYawMatrix(90.0f * 3.1416f /180.0f));
