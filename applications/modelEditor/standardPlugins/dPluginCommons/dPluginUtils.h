@@ -60,6 +60,8 @@ class dPluginAlloc
 DPLUGIN_API void GetMediaDirectory (char* const mediaDirOut);
 DPLUGIN_API void GetAplicationDirectory (char* const aplicationDirOut);
 DPLUGIN_API void GetWorkingFileName (const char* const name, char* const outPathNameOut);
+DPLUGIN_API const char* GetNameFromPath (const char* const fullName);
+DPLUGIN_API void ExtractPathFromFullName (const char* const fullName, char* const path);
 
 
 // TODO: reference additional headers your program requires here

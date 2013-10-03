@@ -19,17 +19,20 @@
 #include "stdafx.h"
 #include "NewtonImport.h"
 #include "NewtonExport.h"
-#include "NetwonDllGlue.h"
+#include "NewtonDllGlue.h"
+#include "OffExportImport.h"
 #include "NewtonMeshEffectExportImport.h"
 
 dPluginRecord** GetPluginArray()
 {
 	static dPluginRecord* array[] = 
 	{
+		OffImport::GetPlugin(),
+		OffExport::GetPlugin(),
 		NewtonMeshEffectImport::GetPlugin(),
 		NewtonMeshEffectExport::GetPlugin(),
-		NewtonImport::GetPlugin(),
-		NewtonExport::GetPlugin(),
+//		NewtonImport::GetPlugin(),
+//		NewtonExport::GetPlugin(),
 		NULL
 	};
 

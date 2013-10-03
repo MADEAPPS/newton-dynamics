@@ -20,17 +20,7 @@
 #include "NewtonMeshEffectExportImport.h"
 
 
-NewtonMeshEffectImport::NewtonMeshEffectImport()
-	:dImportPlugin()
-{
-}
-
-NewtonMeshEffectImport::~NewtonMeshEffectImport()
-{
-}
-
-
-NewtonMeshEffectImport* NewtonMeshEffectImport::GetPlugin()
+dImportPlugin* NewtonMeshEffectImport::GetPlugin()
 {
 	static NewtonMeshEffectImport plugin;
 	return &plugin;
@@ -81,18 +71,7 @@ bool NewtonMeshEffectImport::Import (const char* const fileName, dPluginInterfac
 
 
 
-
-NewtonMeshEffectExport::NewtonMeshEffectExport()
-	:dExportPlugin()
-{
-}
-
-NewtonMeshEffectExport::~NewtonMeshEffectExport()
-{
-}
-
-
-NewtonMeshEffectExport* NewtonMeshEffectExport::GetPlugin()
+dExportPlugin* NewtonMeshEffectExport::GetPlugin()
 {
 	static NewtonMeshEffectExport plugin;
 	return &plugin;

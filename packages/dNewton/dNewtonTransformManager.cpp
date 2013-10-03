@@ -18,7 +18,7 @@
 
 
 dNewtonTransformManager::dNewtonTransformManager (dNewton* const world)
-	:CustomControllerManager<dNewtonTransformController>(world->GetNewton(), "__dnetwon_transformManager__")
+	:CustomControllerManager<dNewtonTransformController>(world->GetNewton(), "__dNewton_transformManager__")
 {
 
 }

@@ -42,6 +42,7 @@
 #include <dMaterialNodeInfo.h>
 
 #include <dUndoRedo.h>
+#include <dPluginUtils.h>
 #include <dPluginScene.h>
 #include <dExportPlugin.h>
 #include <dImportPlugin.h>

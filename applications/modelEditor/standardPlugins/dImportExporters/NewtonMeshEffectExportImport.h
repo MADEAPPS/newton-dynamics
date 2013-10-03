@@ -23,18 +23,17 @@
 class NewtonMeshEffectImport: public dImportPlugin
 {
 	public:
-	NewtonMeshEffectImport();
-	~NewtonMeshEffectImport();
+	static dImportPlugin* GetPlugin();
 
-	static NewtonMeshEffectImport* GetPlugin();
-
+	private:
+	NewtonMeshEffectImport() :dImportPlugin() {}
+	~NewtonMeshEffectImport(){}
 	virtual const char* GetMenuName () { return GetSignature();}
 	virtual const char* GetFileExtension () { return "*.nme";}
 	virtual const char* GetFileDescription () {return "import NewtonMeshEffect file";}
-
-	virtual const char* GetSignature () {return "Netwon Mesh Effect import";}
+	virtual const char* GetSignature () {return "Newton Mesh Effect import";}
 	virtual bool Import (const char* const fileName, dPluginInterface* const interface);
-
+	
 	static void DeserializeCallback (void* const serializeHandle, void* const buffer, int size);
 };
 
@@ -43,16 +42,15 @@ class NewtonMeshEffectImport: public dImportPlugin
 class NewtonMeshEffectExport: public dExportPlugin
 {
 	public:
-	NewtonMeshEffectExport();
-	~NewtonMeshEffectExport();
+	static dExportPlugin* GetPlugin();
 
-	static NewtonMeshEffectExport* GetPlugin();
-
+	private:
+	NewtonMeshEffectExport() :dExportPlugin() {}
+	~NewtonMeshEffectExport(){}
 	virtual const char* GetMenuName () { return GetSignature();}
 	virtual const char* GetFileExtension () { return "*.nme";}
 	virtual const char* GetFileDescription () {return "save selected mesh as NewtonMeshEffect file";}
-
-	virtual const char* GetSignature () {return "Netwon Mesh Effect Export";}
+	virtual const char* GetSignature () {return "Newton Mesh Effect Export";}
 	virtual void Export (const char* const fileName, dPluginInterface* const interface);
 
 	static void SerializeCallback (void* const serializeHandle, const void* const buffer, int size);

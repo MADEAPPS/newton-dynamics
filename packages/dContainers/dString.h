@@ -70,7 +70,7 @@ class dString: public dContainersAlloc
 	const char* GetStr () const;
 
 	private:
-	int CalculateSize (const char* const data) const;
+	DCONTAINERS_API int CalculateSize (const char* const data) const;
 	int Compare (const char* const str0, const char* const str1) const;
 	void CopyData (char* const dst, const char* const src, int size) const;
 
@@ -80,7 +80,7 @@ class dString: public dContainersAlloc
 	protected:
 	char* AllocMem(int size);
 	void FreeMem (char* const ptr);
-	dString (const dString& src, const char* const concatenate, int maxSize);
+	DCONTAINERS_API dString (const dString& src, const char* const concatenate, int maxSize);
 	
 	char* m_string;
 	int m_size;

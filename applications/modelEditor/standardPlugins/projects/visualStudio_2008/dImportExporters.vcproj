@@ -350,11 +350,11 @@
 	</References>
 	<Files>
 		<File
-			RelativePath="..\..\dImportExporters\NetwonDllGlue.cpp"
+			RelativePath="..\..\dImportExporters\NewtonDllGlue.cpp"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dImportExporters\NetwonDllGlue.h"
+			RelativePath="..\..\dImportExporters\NewtonDllGlue.h"
 			>
 		</File>
 		<File
@@ -379,6 +379,14 @@
 		</File>
 		<File
 			RelativePath="..\..\dImportExporters\NewtonMeshEffectExportImport.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dImportExporters\OffExportImport.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dImportExporters\OffExportImport.h"
 			>
 		</File>
 		<File

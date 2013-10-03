@@ -3350,7 +3350,7 @@ void NewtonStaticCollisionSetDebugCallback(const NewtonCollision* const staticCo
 // Remarks: calling this function with *rayHitCallback* = NULL will rest the collision tree to it default raycast mode, which is return with the closest hit.
 //
 // Remarks: when *rayHitCallback* is not null then the callback is dalled with the follwing arguments 
-// *const NetwonCollisio* collision - pointer to the collision tree
+// *const NewtonCollisio* collision - pointer to the collision tree
 // *dFloat* interseption - inetstion parameters of the ray
 // *dFloat* *normal - unnormalized face mormal in the space fo eth parent of the collision.  
 // *int* faceId -  id of this face in the collision tree.

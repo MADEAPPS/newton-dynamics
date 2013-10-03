@@ -108,5 +108,28 @@ void GetWorkingFileName (const char* const name, char* const outPathName)
 }
 
 
+const char* GetNameFromPath (const char* const fullName)
+{
+	const char* ptr = strrchr ((char*) fullName, '\\');
+	if (!ptr) {
+		ptr = strrchr ((char*) fullName, '/');
+	}
+	if (ptr) {
+		ptr ++;
+	} else {
+		ptr = fullName;
+	}
+	return ptr;
+}
+
+void ExtractPathFromFullName (const char* const fullName, char* const path)
+{
+	strcpy (path, fullName);
+	char* ptr = (char*)GetNameFromPath(path);
+	if (ptr != path) {
+		ptr --;
+	}
+	ptr[0] = 0;
+}
 
 
