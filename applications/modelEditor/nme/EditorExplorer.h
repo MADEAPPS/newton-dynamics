@@ -19,11 +19,13 @@ class NewtonModelEditor;
 class EditorExplorer: public wxTreeCtrl
 {
 	public:
-	class TraverseExplorer;
-	class ExplorerData;
 	class ChangeNames;
-	class SelectDuplicatesItems;
+	class SelectionList;
+	class ExplorerData;
+	class TraverseExplorer;
+	class UndoRedoSelection;
 	class UndoRedoChangeName;
+	class SelectDuplicatesItems;
 
 	EditorExplorer (NewtonModelEditor* const mainFrame);
 	~EditorExplorer(void);

@@ -58,16 +58,7 @@ bool NewtonModelEditorApp::OnInit()
 	NewtonModelEditor* const frame = new NewtonModelEditor (APPLICATION_NAME, wxDefaultPosition, wxSize(1024, 768));
 	frame->Show(true);
 	SetTopWindow(frame);
-/*
-	// initialize open gl graphics
-	if (frame->m_scene) {
-		frame->m_scene->InitGraphicsSystem();
-	}
 
-	// load the default Scene		
-	wxMenuEvent loadDemo (wxEVT_COMMAND_MENU_SELECTED, NewtonDemos::ID_RUN_DEMO + DEFAULT_SCENE);
-	frame->GetEventHandler()->ProcessEvent(loadDemo);
-*/
 	return true;
 }
 

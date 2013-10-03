@@ -23,7 +23,6 @@
 
 dUndoCurrentScene::dUndoCurrentScene(dPluginInterface* const interface, dPluginScene* const deltaScene) 
 	:dUndoRedo()
-//	,m_selection(NULL)
 	,m_deltaScene(deltaScene)
 	,m_interface(interface)
 {
@@ -34,9 +33,6 @@ dUndoCurrentScene::~dUndoCurrentScene()
 {
 	dAssert(m_deltaScene);
 	m_deltaScene->Release();
-//	if (m_selection) {
-//		delete m_selection;
-//	}
 }
 
 dUndoRedo* dUndoCurrentScene::CreateRedoState() const

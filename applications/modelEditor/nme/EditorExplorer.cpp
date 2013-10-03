@@ -44,8 +44,6 @@ class EditorExplorer::ExplorerData: public wxTreeItemData
 };
 
 
-
-
 class EditorExplorer::TraverseExplorer
 {
 	public:
@@ -156,6 +154,80 @@ class EditorExplorer::UndoRedoChangeName: public dUndoRedo
 
 
 
+class EditorExplorer::UndoRedoSelection: public dUndoRedo, public dList<dNodeInfo*>
+{
+	public:
+	using dUndoRedo::operator new;
+	using dUndoRedo::operator delete;
+
+	UndoRedoSelection(EditorExplorer* const me)
+		:dUndoRedo()
+		,dList<dNodeInfo*>()
+		,m_me(me) 
+	{
+		dPluginScene* const scene = m_me->m_mainFrame->GetScene();
+		for (dScene::dTreeNode* node = scene->GetFirstNode(); node; node = scene->GetNextNode(node)) {
+			dNodeInfo* const info = scene->GetInfoFromNode(node);
+			if (info->GetEditorFlags() & dPluginInterface::m_selected) {
+				Append (info);
+			}
+		}
+	}
+
+	~UndoRedoSelection()
+	{
+	}
+
+	virtual void RestoreState(dUndodeRedoMode mode)
+	{
+		dPluginScene* const scene = m_me->m_mainFrame->GetScene();
+		for (dScene::dTreeNode* node = scene->GetFirstNode(); node; node = scene->GetNextNode(node)) {
+			dNodeInfo* const info = scene->GetInfoFromNode(node);
+			info->SetEditorFlags(info->GetEditorFlags() & ~dPluginInterface::m_selected);
+		}
+
+		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
+			dNodeInfo* const info = node->GetInfo();
+			info->SetEditorFlags(info->GetEditorFlags() | dPluginInterface::m_selected);
+		}
+
+		m_me->m_recursiveSelectionCall ++;
+		SelectDuplicatesItems selectedDuplicatedItems(m_me);
+		m_me->m_recursiveSelectionCall --;
+	}
+
+	virtual dUndoRedo* CreateRedoState() const
+	{
+		return new UndoRedoSelection (m_me);
+	}
+
+	EditorExplorer* m_me;
+};
+
+
+class EditorExplorer::SelectionList: public EditorExplorer::TraverseExplorer, public dList<dNodeInfo*>
+{
+	public:
+	SelectionList (EditorExplorer* const me)
+		:EditorExplorer::TraverseExplorer()
+		,dList<dNodeInfo*>()
+		,m_me(me)
+	{
+		Traverse(me);
+	}
+
+	virtual bool TraverseCallback (wxTreeItemId item)
+	{
+		if (m_me->IsSelected(item)) {
+			ExplorerData* const nodeData = ((ExplorerData*)m_me->GetItemData(item));
+			Append(nodeData->m_info);
+		}
+		return true;
+	}
+	EditorExplorer* m_me;
+};
+
+
 EditorExplorer::EditorExplorer(NewtonModelEditor* const mainFrame)
 	:wxTreeCtrl (mainFrame, NewtonModelEditor::ID_EDIT_NODE_NAME, wxDefaultPosition, wxSize (200, 160), wxTR_EDIT_LABELS | wxTR_MULTIPLE | wxTR_EXTENDED | wxTR_HAS_BUTTONS | wxTR_LINES_AT_ROOT)
 	,m_mainFrame(mainFrame)
@@ -212,81 +284,6 @@ void EditorExplorer::OnDeleteItem (wxTreeEvent& event)
 
 void EditorExplorer::OnSelectItem (wxTreeEvent& event)
 {
-
-	class UndoRedoSelection: public dUndoRedo, public dList<dNodeInfo*>
-	{
-		public:
-		using dUndoRedo::operator new;
-		using dUndoRedo::operator delete;
-
-		UndoRedoSelection(EditorExplorer* const me)
-			:dUndoRedo()
-			,dList<dNodeInfo*>()
-			,m_me(me) 
-		{
-			dPluginScene* const scene = m_me->m_mainFrame->GetScene();
-			for (dScene::dTreeNode* node = scene->GetFirstNode(); node; node = scene->GetNextNode(node)) {
-				dNodeInfo* const info = scene->GetInfoFromNode(node);
-				if (info->GetEditorFlags() & dPluginInterface::m_selected) {
-					Append (info);
-				}
-			}
-		}
-
-		~UndoRedoSelection()
-		{
-		}
-
-		virtual void RestoreState(dUndodeRedoMode mode)
-		{
-			dPluginScene* const scene = m_me->m_mainFrame->GetScene();
-			for (dScene::dTreeNode* node = scene->GetFirstNode(); node; node = scene->GetNextNode(node)) {
-				dNodeInfo* const info = scene->GetInfoFromNode(node);
-				info->SetEditorFlags(info->GetEditorFlags() & ~dPluginInterface::m_selected);
-			}
-
-			for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
-				dNodeInfo* const info = node->GetInfo();
-				info->SetEditorFlags(info->GetEditorFlags() | dPluginInterface::m_selected);
-			}
-
-			m_me->m_recursiveSelectionCall ++;
-			SelectDuplicatesItems selectedDuplicatedItems(m_me);
-			m_me->m_recursiveSelectionCall --;
-		}
-
-		virtual dUndoRedo* CreateRedoState() const
-		{
-			return new UndoRedoSelection (m_me);
-		}
-
-		EditorExplorer* m_me;
-	};
-
-
-	class SelectionList: public EditorExplorer::TraverseExplorer, public dList<dNodeInfo*>
-	{
-		public:
-		SelectionList (EditorExplorer* const me)
-			:EditorExplorer::TraverseExplorer()
-			,dList<dNodeInfo*>()
-			,m_me(me)
-		{
-			Traverse(me);
-		}
-
-		virtual bool TraverseCallback (wxTreeItemId item)
-		{
-			if (m_me->IsSelected(item)) {
-				ExplorerData* const nodeData = ((ExplorerData*)m_me->GetItemData(item));
-				Append(nodeData->m_info);
-			}
-			return true;
-		}
-		EditorExplorer* m_me;
-	};
-
-
 	m_recursiveSelectionCall ++;
 	if (m_recursiveSelectionCall == 1) {
 		m_mainFrame->Push (new UndoRedoSelection(this));
