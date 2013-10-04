@@ -132,6 +132,41 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 			return dist.m_x;
 		}
 
+
+		DG_INLINE dgFloat32 BoxPenetration (const dgFastAABBInfo& obb, const dgTriplex* const vertexArray) const
+		{
+			dgVector p0 (&vertexArray[m_indexBox0].m_x);
+			dgVector p1 (&vertexArray[m_indexBox1].m_x);
+			dgVector minBox (p0 - obb.m_p1);
+			dgVector maxBox (p1 - obb.m_p0);
+			dgVector mask ((minBox.CompProduct4(maxBox)) < dgVector (dgFloat32 (0.0f)));
+			mask = mask & mask.ShiftTripleRight();
+			mask = mask & mask.ShiftTripleRight();
+			dgVector dist (maxBox.GetMin (minBox.Abs()) & mask);
+			dist = dist.GetMin(dist.ShiftTripleRight());
+			dist = dist.GetMin(dist.ShiftTripleRight());
+
+			if (dist.m_x > dgFloat32 (0.0f)) {
+				dgVector origin ((p1 + p0).CompProduct4(dgVector::m_half));
+				dgVector size ((p1 - p0).CompProduct4(dgVector::m_half));
+
+				origin = obb.UntransformVector(origin);
+				size = obb.m_absDir.RotateVector(size);
+				dgVector q0 (origin - size);
+				dgVector q1 (origin + size);
+				dgVector minBox (q0 - obb.m_size);
+				dgVector maxBox (q1 + obb.m_size);
+				dgVector mask ((minBox.CompProduct4(maxBox)) < dgVector (dgFloat32 (0.0f)));
+				mask = mask & mask.ShiftTripleRight();
+				mask = mask & mask.ShiftTripleRight();
+				dgVector dist1 (maxBox.GetMin (minBox.Abs()) & mask);
+				dist1 = dist1.GetMin(dist1.ShiftTripleRight());
+				dist1 = dist1.GetMin(dist1.ShiftTripleRight());
+				dist = dist.GetMin(dist1);
+			}
+			return dist.m_x;
+		}
+
 		dgInt32 m_indexBox0;
 		dgInt32 m_indexBox1;
 		dgLeafNodePtr m_left;
@@ -152,7 +187,6 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 	void Create (const dgPolygonSoupDatabaseBuilder& builder, bool optimizedBuild);
 	void CalculateAdjacendy ();
 	virtual void ForAllSectorsRayHit (const dgFastRayTest& ray, dgFloat32 maxT, dgRayIntersectCallback callback, void* const context) const;
-	//virtual void ForAllSectors (const dgVector& minBox, const dgVector& maxBox, const dgVector& boxDistanceTravel, dgFloat32 m_maxT, dgAABBIntersectCallback callback, void* const context) const;
 	virtual void ForAllSectors (const dgFastAABBInfo& obbAabb, const dgVector& boxDistanceTravel, dgFloat32 m_maxT, dgAABBIntersectCallback callback, void* const context) const;
 	
 

@@ -247,6 +247,7 @@ class dgFastAABBInfo: public dgObb
 	public:
 	DG_INLINE dgFastAABBInfo()
 		:dgObb()
+		,m_absDir(dgGetIdentityMatrix())
 		,m_scale (dgFloat32 (1.0f))
 		,m_invScale (dgFloat32 (1.0f))
 	{
@@ -257,20 +258,30 @@ class dgFastAABBInfo: public dgObb
 		,m_scale (dgFloat32 (1.0f))
 		,m_invScale (dgFloat32 (1.0f))
 	{
+		SetInvMatrix (matrix);
 		dgVector size1 (matrix[0].Abs().CompProduct4(dgVector(size.m_x)) + matrix[1].Abs().CompProduct4(dgVector(size.m_y)) + matrix[2].Abs().CompProduct4(dgVector(size.m_z)));
 		m_p0 = (matrix[3] - size1) & dgVector::m_triplexMask;
 		m_p1 = (matrix[3] + size1) & dgVector::m_triplexMask;
 	}
 
-
 	DG_INLINE dgFastAABBInfo(const dgVector& p0, const dgVector& p1)
 		:dgObb(dgGetIdentityMatrix(), (p1 - p0).CompProduct4(dgVector::m_half))
+		,m_absDir(dgGetIdentityMatrix())
 		,m_p0(p0)
 		,m_p1(p1)
 		,m_scale (dgFloat32 (1.0f))
 		,m_invScale (dgFloat32 (1.0f))
 	{
 		m_posit = ((p1 + p0).CompProduct4(dgVector::m_half) & dgVector::m_triplexMask) | dgVector::m_wOne;
+	}
+
+	void SetInvMatrix (const dgMatrix& matrix)
+	{
+		m_absDir = matrix.Transpose();
+		m_absDir[0] = m_absDir[0].Abs();
+		m_absDir[1] = m_absDir[1].Abs();
+		m_absDir[2] = m_absDir[2].Abs();
+		m_absDir[3] = dgVector::m_wOne;
 	}
 
 	DG_INLINE dgFloat32 PolygonBoxRayDistance (const dgVector& faceNormal, dgInt32 indexCount, const dgInt32* const indexArray, dgInt32 stride, const dgFloat32* const vertexArray, const dgFastRayTest& ray) const
@@ -291,6 +302,7 @@ class dgFastAABBInfo: public dgObb
 		return dist0;
 	}
 
+
 	DG_INLINE dgFloat32 PolygonBoxDistance (const dgVector& faceNormal, dgInt32 indexCount, const dgInt32* const indexArray, dgInt32 stride, const dgFloat32* const vertexArray) const
 	{
 		dgVector minBox;
@@ -306,7 +318,7 @@ class dgFastAABBInfo: public dgObb
 		return dist0;
 	}
 
-private:
+	private:
 	DG_INLINE void MakeBox1 (dgInt32 indexCount, const dgInt32* const indexArray, dgInt32 stride, const dgFloat32* const vertexArray, dgVector& minBox, dgVector& maxBox) const
 	{
 		const dgMatrix& matrix = *this;
@@ -357,10 +369,12 @@ private:
 	}
 
 	protected:
+	dgMatrix m_absDir;
 	dgVector m_p0;
 	dgVector m_p1;
 	dgVector m_scale;
 	dgVector m_invScale;
+	
 
 	friend class dgAABBPolygonSoup;
 	friend class dgCollisionHeightField;

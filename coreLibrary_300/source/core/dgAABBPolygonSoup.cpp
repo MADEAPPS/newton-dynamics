@@ -1100,9 +1100,17 @@ void dgAABBPolygonSoup::ForAllSectorsRayHit (const dgFastRayTest& raySrc, dgFloa
 }
 
 
-//void dgAABBPolygonSoup::ForAllSectors (const dgVector& minBox, const dgVector& maxBox, const dgVector& boxDistanceTravel, dgFloat32 m_maxT, dgAABBIntersectCallback callback, void* const context) const
 void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const dgVector& boxDistanceTravel, dgFloat32 m_maxT, dgAABBIntersectCallback callback, void* const context) const
 {
+
+	dgAssert (dgAbsf(dgAbsf(obbAabbInfo[0][0]) - obbAabbInfo.m_absDir[0][0]) < dgFloat32 (1.0e-4f));
+	dgAssert (dgAbsf(dgAbsf(obbAabbInfo[1][1]) - obbAabbInfo.m_absDir[1][1]) < dgFloat32 (1.0e-4f));
+	dgAssert (dgAbsf(dgAbsf(obbAabbInfo[2][2]) - obbAabbInfo.m_absDir[2][2]) < dgFloat32 (1.0e-4f));
+
+	dgAssert (dgAbsf(dgAbsf(obbAabbInfo[0][1]) - obbAabbInfo.m_absDir[1][0]) < dgFloat32 (1.0e-4f));
+	dgAssert (dgAbsf(dgAbsf(obbAabbInfo[0][2]) - obbAabbInfo.m_absDir[2][0]) < dgFloat32 (1.0e-4f));
+	dgAssert (dgAbsf(dgAbsf(obbAabbInfo[1][2]) - obbAabbInfo.m_absDir[2][1]) < dgFloat32 (1.0e-4f));
+
 	if (m_aabb) {
 		dgFloat32 distance[DG_STACK_DEPTH];
 		const dgNode* stackPool[DG_STACK_DEPTH];
@@ -1111,10 +1119,10 @@ void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const 
 		const dgTriplex* const vertexArray = (dgTriplex*) m_localVertex;
 
 		if ((boxDistanceTravel % boxDistanceTravel) < dgFloat32 (1.0e-8f)) {
+
 			dgInt32 stack = 1;
 			stackPool[0] = m_aabb;
-			distance[0] = m_aabb->BoxPenetration(vertexArray, obbAabbInfo.m_p0, obbAabbInfo.m_p1);
-
+			distance[0] = m_aabb->BoxPenetration(obbAabbInfo, vertexArray);
 			while (stack) {
 				stack --;
 				dgFloat32 dist = distance[stack];
@@ -1138,7 +1146,7 @@ void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const 
 
 					} else {
 						const dgNode* const node = me->m_left.GetNode(m_aabb);
-						dgFloat32 dist = node->BoxPenetration(vertexArray, obbAabbInfo.m_p0, obbAabbInfo.m_p1);
+						dgFloat32 dist = node->BoxPenetration(obbAabbInfo, vertexArray);
 						if (dist > dgFloat32 (0.0f)) {
 							dgInt32 j = stack;
 							for ( ; j && (dist > distance[j - 1]); j --) {
@@ -1170,7 +1178,7 @@ void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const 
 
 					} else {
 						const dgNode* const node = me->m_right.GetNode(m_aabb);
-						dgFloat32 dist = node->BoxPenetration(vertexArray, obbAabbInfo.m_p0, obbAabbInfo.m_p1);
+						dgFloat32 dist = node->BoxPenetration(obbAabbInfo, vertexArray);
 						if (dist > dgFloat32 (0.0f)) {
 							dgInt32 j = stack;
 							for ( ; j && (dist > distance[j - 1]); j --) {

@@ -91,6 +91,7 @@ class dgPolygonMeshDesc: public dgFastAABBInfo
 			{
 				dgMatrix& matrix = *this;
 				matrix = proxy.m_matrix;
+				SetInvMatrix (matrix);
 
 				m_scale = dgVector (dgFloat32 (1.0f));
 				m_invScale = dgVector (dgFloat32 (1.0f));
@@ -107,6 +108,7 @@ class dgPolygonMeshDesc: public dgFastAABBInfo
 				dgMatrix& matrix = *this;
 				matrix = proxy.m_matrix;
 				matrix.m_posit = matrix.m_posit.CompProduct4(m_polySoupCollision->GetInvScale()) | dgVector::m_wOne;
+				SetInvMatrix (matrix);
 
 				const dgCollision* const collision = m_objCollision->GetChildShape();
 

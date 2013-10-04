@@ -281,11 +281,11 @@ dgIntersectStatus dgCollisionBVH::GetPolygon (void* const context, const dgFloat
 {
 	dgPolygonMeshDesc& data = (*(dgPolygonMeshDesc*) context);
 	if (data.m_faceCount >= DG_MAX_COLLIDING_FACES) {
-		dgTrace (("buffer Overfloat, try using a lower resolution mesh for collision\n"));
+		dgTrace (("buffer Over float, try using a lower resolution mesh for collision\n"));
 		return t_StopSearh;
 	}
 	if ((data.m_globalIndexCount + indexCount * 2 + 3) >= DG_MAX_COLLIDING_INDICES) {
-		dgTrace (("buffer Overfloat, try using a lower resolution mesh for collision\n"));
+		dgTrace (("buffer Over float, try using a lower resolution mesh for collision\n"));
 		return t_StopSearh;
 	}
 
@@ -341,7 +341,6 @@ void dgCollisionBVH::GetCollidingFaces (dgPolygonMeshDesc* const data) const
 	data->m_faceIndexStart = data->m_meshData.m_globalFaceIndexStart;
 	data->m_faceVertexIndex = data->m_globalFaceVertexIndex;
 	data->m_hitDistance = data->m_meshData.m_globalHitDistance;
-//	ForAllSectors (data->m_boxP0, data->m_boxP1, data->m_boxDistanceTravelInMeshSpace, data->m_maxT, GetPolygon, data);
 	ForAllSectors (*data, data->m_boxDistanceTravelInMeshSpace, data->m_maxT, GetPolygon, data);
 }
 
