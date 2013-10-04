@@ -1196,9 +1196,10 @@ void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const 
 
 		} else {
 			dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), boxDistanceTravel);
+			dgFastRayTest obbRay (dgVector (dgFloat32 (0.0f)), obbAabbInfo.UnrotateVector(boxDistanceTravel));
 			dgInt32 stack = 1;
 			stackPool[0] = m_aabb;
-			distance [0] = m_aabb->BoxIntersect (ray, vertexArray, obbAabbInfo.m_p0, obbAabbInfo.m_p1);
+			distance [0] = m_aabb->BoxIntersect (ray, obbRay, obbAabbInfo, vertexArray);
 
 			while (stack) {
 				stack --;
@@ -1224,7 +1225,7 @@ void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const 
 
 					} else {
 						const dgNode* const node = me->m_left.GetNode(m_aabb);
-						dgFloat32 dist = node->BoxIntersect (ray, vertexArray, obbAabbInfo.m_p0, obbAabbInfo.m_p1);
+						dgFloat32 dist = node->BoxIntersect (ray, obbRay, obbAabbInfo, vertexArray);
 						if (dist < dgFloat32 (1.0f)) {
 							dgInt32 j = stack;
 							for ( ; j && (dist > distance[j - 1]); j --) {
@@ -1256,7 +1257,7 @@ void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const 
 
 					} else {
 						const dgNode* const node = me->m_right.GetNode(m_aabb);
-						dgFloat32 dist = node->BoxIntersect (ray, vertexArray, obbAabbInfo.m_p0, obbAabbInfo.m_p1);
+						dgFloat32 dist = node->BoxIntersect (ray, obbRay, obbAabbInfo, vertexArray);
 						if (dist < dgFloat32 (1.0f)) {
 							dgInt32 j = stack;
 							for ( ; j && (dist > distance[j - 1]); j --) {

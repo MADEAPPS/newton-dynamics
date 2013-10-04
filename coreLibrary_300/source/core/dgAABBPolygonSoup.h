@@ -107,16 +107,7 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 			dgVector maxBox (&vertexArray[m_indexBox1].m_x);
 			return ray.BoxIntersect(minBox, maxBox);
 		}
-
-		DG_INLINE dgFloat32 BoxIntersect (const dgFastRayTest& ray, const dgTriplex* const vertexArray, const dgVector& boxP0, const dgVector& boxP1) const
-		{
-			dgVector p0 (&vertexArray[m_indexBox0].m_x);
-			dgVector p1 (&vertexArray[m_indexBox1].m_x);
-			dgVector minBox (p0 - boxP1);
-			dgVector maxBox (p1 - boxP0);
-			return ray.BoxIntersect(minBox, maxBox);
-		}
-
+/*
 		DG_INLINE dgFloat32 BoxPenetration (const dgTriplex* const vertexArray, const dgVector& boxP0, const dgVector& boxP1) const
 		{
 			dgVector p0 (&vertexArray[m_indexBox0].m_x);
@@ -131,7 +122,7 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 			dist = dist.GetMin(dist.ShiftTripleRight());
 			return dist.m_x;
 		}
-
+*/
 
 		DG_INLINE dgFloat32 BoxPenetration (const dgFastAABBInfo& obb, const dgTriplex* const vertexArray) const
 		{
@@ -166,6 +157,43 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 			}
 			return dist.m_x;
 		}
+/*
+		DG_INLINE dgFloat32 BoxIntersect (const dgFastRayTest& ray, const dgTriplex* const vertexArray, const dgVector& boxP0, const dgVector& boxP1) const
+		{
+			dgVector p0 (&vertexArray[m_indexBox0].m_x);
+			dgVector p1 (&vertexArray[m_indexBox1].m_x);
+			dgVector minBox (p0 - boxP1);
+			dgVector maxBox (p1 - boxP0);
+			return ray.BoxIntersect(minBox, maxBox);
+		}
+*/
+		DG_INLINE dgFloat32 BoxIntersect (const dgFastRayTest& ray, const dgFastRayTest& obbRay, const dgFastAABBInfo& obb, const dgTriplex* const vertexArray) const
+		{
+			dgVector p0 (&vertexArray[m_indexBox0].m_x);
+			dgVector p1 (&vertexArray[m_indexBox1].m_x);
+			dgVector minBox (p0 - obb.m_p1);
+			dgVector maxBox (p1 - obb.m_p0);
+			dgFloat32 dist = ray.BoxIntersect(minBox, maxBox);
+			if (dist < dgFloat32 (1.0f)) {
+				dgVector origin ((p1 + p0).CompProduct4(dgVector::m_half));
+				dgVector size ((p1 - p0).CompProduct4(dgVector::m_half));
+
+				origin = obb.UntransformVector(origin);
+				size = obb.m_absDir.RotateVector(size);
+				dgVector q0 (origin - size);
+				dgVector q1 (origin + size);
+
+				dgVector minBox1 (q0 - obb.m_size);
+				dgVector maxBox1 (q1 + obb.m_size);
+				dgFloat32 dist1 = obbRay.BoxIntersect(minBox1, maxBox1);
+				//dgAssert (dist1 <= 1.0f);
+				//dgAssert (dist == dist1);
+				dist = dist1;
+			}
+			return dist;
+		}
+
+
 
 		dgInt32 m_indexBox0;
 		dgInt32 m_indexBox1;
