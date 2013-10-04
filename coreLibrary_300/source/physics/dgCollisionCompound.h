@@ -213,7 +213,7 @@ class dgCollisionCompound: public dgCollision
 	dgTree<dgNodeBase*, dgInt32> m_array;
 	dgInt32 m_idIndex;
 
-
+	static dgVector m_padding;
 	friend class dgBody;
 	friend class dgWorld;
 	friend class dgCollisionScene;

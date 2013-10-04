@@ -113,14 +113,17 @@ dPluginScene* dMeshBoxPrimitive::Create (dPluginInterface* const interface)
 		double y = modaldialog.m_sizeY;
 		double z = modaldialog.m_sizeZ;
 
-		dPluginScene::dTreeNode* const root = asset->GetRoot();
-		dNodeInfo* const rootInfo = asset->GetInfoFromNode(root);
-		rootInfo->SetName(modaldialog.m_name.c_str());		
+//		dPluginScene::dTreeNode* const root = asset->GetRoot();
+//		dNodeInfo* const rootInfo = asset->GetInfoFromNode(root);
+//		rootInfo->SetName(modaldialog.m_name.c_str());		
 
 		dPluginScene::dTreeNode* const sceneNode = asset->CreateSceneNode(asset->GetRoot());
+		dSceneModelInfo* const sceneNodeInfo = (dSceneModelInfo*) asset->GetInfoFromNode(sceneNode);
+		sceneNodeInfo->SetName("box_node");
+
 		dPluginScene::dTreeNode* const boxMesh = asset->CreateMeshNode(sceneNode);
 		dMeshNodeInfo* const instance = (dMeshNodeInfo*) asset->GetInfoFromNode(boxMesh);
-		instance->SetName("mesh");
+		instance->SetName("box");
 
 		NewtonCollision* const boxCollision = NewtonCreateBox (world, float (x), float (y), float (z), 0, NULL); 
 		NewtonMesh* const mesh = NewtonMeshCreateFromCollision(boxCollision);

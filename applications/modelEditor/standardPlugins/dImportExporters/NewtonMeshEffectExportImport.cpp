@@ -45,18 +45,28 @@ bool NewtonMeshEffectImport::Import (const char* const fileName, dPluginInterfac
 		NewtonWorld* const world = scene->GetNewtonWorld();
 
 		dPluginScene* const asset = new dPluginScene(world);
-		dPluginScene::dTreeNode* const root = asset->GetRoot();
-		dNodeInfo* const rootInfo = asset->GetInfoFromNode(root);
-		rootInfo->SetName("xxx");	
 
+		dString ext ("_node");
 		for (int i = 0; i < count; i ++) {
+			int size;
+			char name [2048];
+			fread (&size, sizeof (int), 1, file);
+			dAssert (size < sizeof (name));
+			fread (name, size, 1, file);
+			name[size] = 0;
+
 			NewtonMesh* const newtonMesh = NewtonMeshCreateFromSerialization (world, DeserializeCallback, file);
 			dAssert (newtonMesh);
 
 			dPluginScene::dTreeNode* const sceneNode = asset->CreateSceneNode(asset->GetRoot());
+			dSceneModelInfo* const sceneNodeInfo = (dSceneModelInfo*) asset->GetInfoFromNode(sceneNode);
+			dString nodeName (name);
+			nodeName += ext;
+			sceneNodeInfo->SetName(nodeName.GetStr());
+
 			dPluginScene::dTreeNode* const boxMesh = asset->CreateMeshNode(sceneNode);
 			dMeshNodeInfo* const instance = (dMeshNodeInfo*) asset->GetInfoFromNode(boxMesh);
-			instance->SetName("mesh_1");
+			instance->SetName(name);
 			instance->ReplaceMesh (newtonMesh);
 		}
 
@@ -111,6 +121,10 @@ void NewtonMeshEffectExport::Export (const char* const fileName, dPluginInterfac
 			if (info->IsType(dMeshNodeInfo::GetRttiType())) {
 				if (info->GetEditorFlags() & dPluginInterface::m_selected) {
 					dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*) info;
+					dString name (meshInfo->GetName()); 
+					int size = name.Size();
+					fwrite (&size, sizeof (int), 1, file);
+					fwrite (name.GetStr(), size, 1, file);
 					NewtonMeshSerialize (meshInfo->GetMesh(), SerializeCallback, file);
 				}
 			}
