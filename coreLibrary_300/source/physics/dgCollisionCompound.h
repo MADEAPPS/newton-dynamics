@@ -61,6 +61,12 @@ class dgCollisionCompound: public dgCollision
 		dgVector m_crossAxisAbs[3][3];
 		dgVector m_crossAxisDotAbs[3][3];
 		dgVector m_extends[3][3];
+
+		dgVector m_crossAxis____[9];
+		dgVector m_crossAxisAbs____[9];
+		dgVector m_crossAxisDotAbs____[9];
+		dgVector m_extendsMinX____[3];
+		dgVector m_extendsMaxX____[3];
 	} DG_GCC_VECTOR_ALIGMENT;
 
 
@@ -79,8 +85,6 @@ class dgCollisionCompound: public dgCollision
 		void SetBox (const dgVector& p0, const dgVector& p1);
 		bool BoxTest (const dgOOBBTestData& data) const;
 		bool BoxTest (const dgOOBBTestData& data, const dgNodeBase* const otherNode) const;
-
-		
 
 		DG_INLINE dgCollisionInstance* GetShape() const 
 		{
@@ -214,6 +218,7 @@ class dgCollisionCompound: public dgCollision
 	dgInt32 m_idIndex;
 
 	static dgVector m_padding;
+	static dgVector m_padding___;
 	friend class dgBody;
 	friend class dgWorld;
 	friend class dgCollisionScene;

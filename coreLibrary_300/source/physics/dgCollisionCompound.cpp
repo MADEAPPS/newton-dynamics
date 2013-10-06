@@ -36,6 +36,7 @@
 #define DG_MAX_MIN_VOLUME				dgFloat32 (1.0e-3f)
 
 dgVector dgCollisionCompound::m_padding (dgFloat32 (1.0e-3f), dgFloat32 (1.0e-3f), dgFloat32 (1.0e-3f), dgFloat32 (0.0f)); 
+dgVector dgCollisionCompound::m_padding___ (dgFloat32 (1.0e-3f)); 
 
 class dgCollisionCompound::dgHeapNodePair
 {
@@ -48,19 +49,42 @@ class dgCollisionCompound::dgHeapNodePair
 dgCollisionCompound::dgOOBBTestData::dgOOBBTestData (const dgMatrix& matrix)
 	:m_matrix (matrix)
 {
+	m_absMatrix[0] = m_matrix[0].Abs();
+	m_absMatrix[1] = m_matrix[1].Abs();
+	m_absMatrix[2] = m_matrix[2].Abs();
+	m_absMatrix[3] = dgVector::m_wOne;
+
+	dgInt32 index = 0;
 	for (dgInt32 i = 0; i < 3; i ++) {
-		m_absMatrix[i][3] = dgFloat32 (0.0f);
-		dgVector dir(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+		dgVector dir(dgFloat32 (0.0f));
 		dir[i] = dgFloat32 (1.0f);
 		for (dgInt32 j = 0; j < 3; j ++) {
-			m_absMatrix[i][j] = dgAbsf (m_matrix[i][j]);
 			dgVector axis (dir * m_matrix[j]);
 			m_crossAxis[i][j] = axis;
-			m_crossAxisAbs[i][j] = dgVector (dgAbsf (axis.m_x), dgAbsf (axis.m_y), dgAbsf (axis.m_z), dgFloat32 (0.0f));
-			m_crossAxisDotAbs[i][j] = dgVector (dgAbsf (axis % matrix[0]), dgAbsf (axis % matrix[1]), dgAbsf (axis % matrix[2]), dgFloat32 (0.0f));
+			//m_crossAxisAbs[i][j] = dgVector (dgAbsf (axis.m_x), dgAbsf (axis.m_y), dgAbsf (axis.m_z), dgFloat32 (0.0f));
+			m_crossAxisAbs[i][j] = axis.Abs();
+			//m_crossAxisDotAbs[i][j] = dgVector (dgAbsf (axis % matrix[0]), dgAbsf (axis % matrix[1]), dgAbsf (axis % matrix[2]), dgFloat32 (0.0f));
+			m_crossAxisDotAbs[i][j] = matrix.UnrotateVector (axis).Abs();
+
+			m_crossAxis____[index] = axis;
+			m_crossAxisAbs____[index] = axis.Abs();
+			m_crossAxisDotAbs____[index] = matrix.UnrotateVector (axis).Abs();
+			index ++;
 		}
 	}
-	m_absMatrix[3][3] = dgFloat32 (1.0f);
+
+	dgVector tmp;
+	dgVector::Transpose4x4 (m_crossAxis____[0], m_crossAxis____[1], m_crossAxis____[2], m_crossAxis____[3], m_crossAxis____[0], m_crossAxis____[1], m_crossAxis____[2], m_crossAxis____[3]);
+	dgVector::Transpose4x4 (m_crossAxis____[3], m_crossAxis____[4], m_crossAxis____[5], m_crossAxis____[6], m_crossAxis____[4], m_crossAxis____[5], m_crossAxis____[6], m_crossAxis____[7]);
+	dgVector::Transpose4x4 (m_crossAxis____[6], m_crossAxis____[7], m_crossAxis____[8], tmp,				m_crossAxis____[8], m_crossAxis____[8], m_crossAxis____[8], m_crossAxis____[8]);
+
+	dgVector::Transpose4x4 (m_crossAxisAbs____[0], m_crossAxisAbs____[1], m_crossAxisAbs____[2], m_crossAxisAbs____[3], m_crossAxisAbs____[0], m_crossAxisAbs____[1], m_crossAxisAbs____[2], m_crossAxisAbs____[3]);
+	dgVector::Transpose4x4 (m_crossAxisAbs____[3], m_crossAxisAbs____[4], m_crossAxisAbs____[5], m_crossAxisAbs____[6], m_crossAxisAbs____[4], m_crossAxisAbs____[5], m_crossAxisAbs____[6], m_crossAxisAbs____[7]);
+	dgVector::Transpose4x4 (m_crossAxisAbs____[6], m_crossAxisAbs____[7], m_crossAxisAbs____[8], tmp,				    m_crossAxisAbs____[8], m_crossAxisAbs____[8], m_crossAxisAbs____[8], m_crossAxisAbs____[8]);
+
+	dgVector::Transpose4x4 (m_crossAxisDotAbs____[0], m_crossAxisDotAbs____[1], m_crossAxisDotAbs____[2], m_crossAxisDotAbs____[3], m_crossAxisDotAbs____[0], m_crossAxisDotAbs____[1], m_crossAxisDotAbs____[2], m_crossAxisDotAbs____[3]);
+	dgVector::Transpose4x4 (m_crossAxisDotAbs____[3], m_crossAxisDotAbs____[4], m_crossAxisDotAbs____[5], m_crossAxisDotAbs____[6], m_crossAxisDotAbs____[4], m_crossAxisDotAbs____[5], m_crossAxisDotAbs____[6], m_crossAxisDotAbs____[7]);
+	dgVector::Transpose4x4 (m_crossAxisDotAbs____[6], m_crossAxisDotAbs____[7], m_crossAxisDotAbs____[8], tmp,				     m_crossAxisDotAbs____[8], m_crossAxisDotAbs____[8], m_crossAxisDotAbs____[8], m_crossAxisDotAbs____[8]);
 }
 
 
@@ -70,22 +94,29 @@ dgCollisionCompound::dgOOBBTestData::dgOOBBTestData (const dgMatrix& matrix, con
 	m_size = (m_localP1 - m_localP0).CompProduct4 (dgVector::m_half);
 	m_origin = (m_localP1 + m_localP0).CompProduct4 (dgVector::m_half);
 
+	m_absMatrix[0] = m_matrix[0].Abs();
+	m_absMatrix[1] = m_matrix[1].Abs();
+	m_absMatrix[2] = m_matrix[2].Abs();
+	m_absMatrix[3] = dgVector::m_wOne;
+
+	dgInt32 index = 0;
 	for (dgInt32 i = 0; i < 3; i ++) {
-		m_absMatrix[i][3] = dgFloat32 (0.0f);
-		dgVector dir(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+		dgVector dir(dgFloat32 (0.0f));
 		dir[i] = dgFloat32 (1.0f);
 		for (dgInt32 j = 0; j < 3; j ++) {
-			m_absMatrix[i][j] = dgAbsf (m_matrix[i][j]);
 			m_crossAxis[i][j] = dir * m_matrix[j];
+			m_crossAxis____[index] = dir * m_matrix[j];
+			index ++;
 		}
 	}
-	m_absMatrix[3][3] = dgFloat32 (1.0f);
 
 	dgVector size (m_absMatrix.RotateVector(m_size));
 	dgVector origin (m_matrix.TransformVector (m_origin));
 	m_aabbP0 = origin - size;
 	m_aabbP1 = origin + size;
 
+	index = 0;
+	dgVector extends[9];
 	for (dgInt32 i = 0; i < 3; i ++) {
 		for (dgInt32 j = 0; j < 3; j ++) {
 			dgFloat32 d;
@@ -96,10 +127,30 @@ dgCollisionCompound::dgOOBBTestData::dgOOBBTestData (const dgMatrix& matrix, con
 
 			m_extends[i][j] = dgVector (c - d, c + d, dgFloat32 (0.0f), dgFloat32 (0.0f));
 
+			extends[index] = m_extends[i][j];
+
 			dgAssert (m_extends[i][j].m_x <= m_extends[i][j].m_y);
-			m_crossAxisAbs[i][j] = dgVector (dgAbsf (axis.m_x), dgAbsf (axis.m_y), dgAbsf (axis.m_z), dgFloat32 (0.0f));
+			//m_crossAxisAbs[i][j] = dgVector (dgAbsf (axis.m_x), dgAbsf (axis.m_y), dgAbsf (axis.m_z), dgFloat32 (0.0f));
+			m_crossAxisAbs[i][j] = axis.Abs();
+
+			m_crossAxisAbs____[index] = axis.Abs();
+			index ++;
 		}
 	}
+
+
+	dgVector tmp;
+	dgVector::Transpose4x4 (m_crossAxis____[0], m_crossAxis____[1], m_crossAxis____[2], m_crossAxis____[3], m_crossAxis____[0], m_crossAxis____[1], m_crossAxis____[2], m_crossAxis____[3]);
+	dgVector::Transpose4x4 (m_crossAxis____[3], m_crossAxis____[4], m_crossAxis____[5], m_crossAxis____[6], m_crossAxis____[4], m_crossAxis____[5], m_crossAxis____[6], m_crossAxis____[7]);
+	dgVector::Transpose4x4 (m_crossAxis____[6], m_crossAxis____[7], m_crossAxis____[8], tmp,				m_crossAxis____[8], m_crossAxis____[8], m_crossAxis____[8], m_crossAxis____[8]);
+
+	dgVector::Transpose4x4 (m_crossAxisAbs____[0], m_crossAxisAbs____[1], m_crossAxisAbs____[2], m_crossAxisAbs____[3], m_crossAxisAbs____[0], m_crossAxisAbs____[1], m_crossAxisAbs____[2], m_crossAxisAbs____[3]);
+	dgVector::Transpose4x4 (m_crossAxisAbs____[3], m_crossAxisAbs____[4], m_crossAxisAbs____[5], m_crossAxisAbs____[6], m_crossAxisAbs____[4], m_crossAxisAbs____[5], m_crossAxisAbs____[6], m_crossAxisAbs____[7]);
+	dgVector::Transpose4x4 (m_crossAxisAbs____[6], m_crossAxisAbs____[7], m_crossAxisAbs____[8], tmp,				    m_crossAxisAbs____[8], m_crossAxisAbs____[8], m_crossAxisAbs____[8], m_crossAxisAbs____[8]);
+
+	dgVector::Transpose4x4 (m_extendsMinX____[0], m_extendsMaxX____[0], tmp, tmp, extends[0], extends[1], extends[2], extends[3]);
+	dgVector::Transpose4x4 (m_extendsMinX____[1], m_extendsMaxX____[1], tmp, tmp, extends[4], extends[5], extends[6], extends[7]);
+	dgVector::Transpose4x4 (m_extendsMinX____[2], m_extendsMaxX____[2], tmp, tmp, extends[8], extends[8], extends[8], extends[8]);
 }
 
 
@@ -190,6 +241,7 @@ void dgCollisionCompound::dgNodeBase::CalculateAABB()
 	SetBox (p0, p1);
 }
 
+/*
 bool dgCollisionCompound::dgNodeBase::BoxTest (const dgOOBBTestData& data) const
 {
 	if (dgOverlapTest (data.m_aabbP0, data.m_aabbP1, m_p0, m_p1)) {
@@ -202,8 +254,6 @@ bool dgCollisionCompound::dgNodeBase::BoxTest (const dgOOBBTestData& data) const
 			for (dgInt32 i = 0; i < 3; i ++) {
 				for (dgInt32 j = 0; j < 3; j ++) {
 					const dgVector& axis = data.m_crossAxisAbs[i][j];
-
-#if 0
 					dgFloat32 d = m_size.m_x * axis.m_x + m_size.m_y * axis.m_y + m_size.m_z * axis.m_z + dgFloat32 (1.0e-3f); 
 					dgFloat32 c = m_origin % data.m_crossAxis[i][j];
 
@@ -215,26 +265,13 @@ bool dgCollisionCompound::dgNodeBase::BoxTest (const dgOOBBTestData& data) const
 					if (test) {
 						return false;
 					}
-#else 
-
-					dgVector d (m_size.DotProduct4(axis) + m_padding); 
-					dgVector c (m_origin.DotProduct4(data.m_crossAxis[i][j]));
-					dgVector x0 (c - d);
-					dgVector x1 (c + d);
-					const dgVector& extend = data.m_extends[i][j];
-					if ((x1.m_x < extend.m_x) | (x0.m_x > extend.m_y)) {
-						return false;
-					}
-#endif
 				}
 			}
 			return true;
 		}
 	}
-
 	return false;
 }
-
 
 bool dgCollisionCompound::dgNodeBase::BoxTest (const dgOOBBTestData& data, const dgNodeBase* const otherNode) const
 {
@@ -243,7 +280,6 @@ bool dgCollisionCompound::dgNodeBase::BoxTest (const dgOOBBTestData& data, const
 	dgVector otherP0 ((otherOrigin - otherSize) & dgVector::m_triplexMask);
 	dgVector otherP1 ((otherOrigin + otherSize) & dgVector::m_triplexMask);
 	if (dgOverlapTest (m_p0, m_p1, otherP0, otherP1)) {
-
 		dgVector origin (data.m_matrix.UntransformVector(m_origin));
 		dgVector size (data.m_absMatrix.UnrotateVector(m_size));
 		dgVector p0 (origin - size);
@@ -252,11 +288,9 @@ bool dgCollisionCompound::dgNodeBase::BoxTest (const dgOOBBTestData& data, const
 			for (dgInt32 i = 0; i < 3; i ++) {
 				for (dgInt32 j = 0; j < 3; j ++) {
 					const dgVector& axis = data.m_crossAxis[i][j];
-
 					const dgVector& axisAbs = data.m_crossAxisAbs[i][j];
 					const dgVector& axisDotAbs = data.m_crossAxisDotAbs[i][j]; 
 
-#if 0
 					dgFloat32 d = m_size.m_x * axisAbs.m_x + m_size.m_y * axisAbs.m_y + m_size.m_z * axisAbs.m_z + dgFloat32 (1.0e-3f); 
 					dgFloat32 c = m_origin % axis;
 					dgFloat32 x0 = c - d;
@@ -272,28 +306,98 @@ bool dgCollisionCompound::dgNodeBase::BoxTest (const dgOOBBTestData& data, const
 					if ((x1 < z0) || (x0 > z1)) {
 						return false;
 					}
-#else 
-
-					dgVector d (m_size.DotProduct4(axisAbs) + m_padding); 
-					dgVector c (m_origin.DotProduct4(axis));
-					dgVector x0 (c - d);
-					dgVector x1 (c + d);
-					
-					d = otherNode->m_size.DotProduct4(axisDotAbs) + m_padding; 
-					c = otherOrigin.DotProduct4(axis); 
-					dgVector z0 (c - d);
-					dgVector z1 (c + d);
-
-					dgVector mask ((x1 < z0) | (x0 > z1)); 
-					dgInt32 test = mask.GetSignMask();
-					if (test) {
-						return false;
-					}
-#endif
 				}
 			}
-
 			return true;
+		}
+	}
+	return false;
+}
+*/
+
+
+bool dgCollisionCompound::dgNodeBase::BoxTest (const dgOOBBTestData& data) const
+{
+	if (dgOverlapTest (data.m_aabbP0, data.m_aabbP1, m_p0, m_p1)) {
+		dgVector origin (data.m_matrix.UntransformVector(m_origin));
+		dgVector size (data.m_absMatrix.UnrotateVector(m_size));
+		dgVector p0 (origin - size);
+		dgVector p1 (origin + size);
+		if (dgOverlapTest (p0, p1, data.m_localP0, data.m_localP1)) {
+			dgVector size_x (m_size.m_x);
+			dgVector size_y (m_size.m_y);
+			dgVector size_z (m_size.m_z);
+
+			dgVector origin_x (m_origin.m_x);
+			dgVector origin_y (m_origin.m_y);
+			dgVector origin_z (m_origin.m_z);
+
+			bool ret = true;
+			for (dgInt32 i = 0; (i < 3) && ret; i ++) {
+				const dgInt32 j = i * 3;
+				dgVector c (origin_x.CompProduct4(data.m_crossAxis____[j + 0]) + origin_y.CompProduct4(data.m_crossAxis____[j + 1]) + origin_z.CompProduct4(data.m_crossAxis____[j + 2]));
+				dgVector d (size_x.CompProduct4(data.m_crossAxisAbs____[j + 0]) + size_y.CompProduct4(data.m_crossAxisAbs____[j + 1]) + size_z.CompProduct4(data.m_crossAxisAbs____[j + 2]) + m_padding___); 
+				dgVector x0 (c - d);
+				dgVector x1 (c + d);
+				dgVector box0 (x0 - data.m_extendsMaxX____[i]);
+				dgVector box1 (x1 - data.m_extendsMinX____[i]);
+				dgVector test (box0.CompProduct4((box1)));
+				ret = (test.GetSignMask() & 0x0f) == 0x0f;
+			}
+			return ret;
+		}
+	}
+	return false;
+}
+
+
+bool dgCollisionCompound::dgNodeBase::BoxTest (const dgOOBBTestData& data, const dgNodeBase* const otherNode) const
+{
+	dgVector otherOrigin (data.m_matrix.TransformVector(otherNode->m_origin));
+	dgVector otherSize (data.m_absMatrix.RotateVector(otherNode->m_size));
+	dgVector otherP0 ((otherOrigin - otherSize) & dgVector::m_triplexMask);
+	dgVector otherP1 ((otherOrigin + otherSize) & dgVector::m_triplexMask);
+	if (dgOverlapTest (m_p0, m_p1, otherP0, otherP1)) {
+		dgVector origin (data.m_matrix.UntransformVector(m_origin));
+		dgVector size (data.m_absMatrix.UnrotateVector(m_size));
+		dgVector p0 (origin - size);
+		dgVector p1 (origin + size);
+		if (dgOverlapTest (p0, p1, otherNode->m_p0, otherNode->m_p1)) {
+
+			dgVector size0_x (m_size.m_x);
+			dgVector size0_y (m_size.m_y);
+			dgVector size0_z (m_size.m_z);
+
+			dgVector origin0_x (m_origin.m_x);
+			dgVector origin0_y (m_origin.m_y);
+			dgVector origin0_z (m_origin.m_z);
+
+			dgVector size1_x (otherNode->m_size.m_x);
+			dgVector size1_y (otherNode->m_size.m_y);
+			dgVector size1_z (otherNode->m_size.m_z);
+
+			dgVector origin1_x (otherOrigin.m_x);
+			dgVector origin1_y (otherOrigin.m_y);
+			dgVector origin1_z (otherOrigin.m_z);
+
+			bool ret = true;
+			for (dgInt32 j = 0; (j < 9) && ret; j += 3) {
+				dgVector c0 (origin0_x.CompProduct4(data.m_crossAxis____[j + 0]) + origin0_y.CompProduct4(data.m_crossAxis____[j + 1]) + origin0_z.CompProduct4(data.m_crossAxis____[j + 2]));
+				dgVector d0 (size0_x.CompProduct4(data.m_crossAxisAbs____[j + 0]) + size0_y.CompProduct4(data.m_crossAxisAbs____[j + 1]) + size0_z.CompProduct4(data.m_crossAxisAbs____[j + 2]) + m_padding___); 
+				dgVector x0 (c0 - d0);
+				dgVector x1 (c0 + d0);
+
+				dgVector c1 (origin1_x.CompProduct4(data.m_crossAxis____[j + 0]) + origin1_y.CompProduct4(data.m_crossAxis____[j + 1]) + origin1_z.CompProduct4(data.m_crossAxis____[j + 2]));
+				dgVector d1 (size1_x.CompProduct4(data.m_crossAxisDotAbs____[j + 0]) + size1_y.CompProduct4(data.m_crossAxisDotAbs____[j + 1]) + size1_z.CompProduct4(data.m_crossAxisDotAbs____[j + 2]) + m_padding___); 
+				dgVector z0 (c1 - d1);
+				dgVector z1 (c1 + d1);
+
+				dgVector box0 (x0 - z1);
+				dgVector box1 (x1 - z0);
+				dgVector test (box0.CompProduct4((box1)));
+				ret = (test.GetSignMask() & 0x0f) == 0x0f;
+			}
+			return ret;
 		}
 	}
 	return false;
@@ -2477,6 +2581,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToHeightField (dgCollidingPairColl
 		terrainCollision->GetLocalAABB (p0, p1, nodeProxi.m_p0, nodeProxi.m_p1);
 		nodeProxi.m_size = (nodeProxi.m_p1 - nodeProxi.m_p0).Scale3 (dgFloat32 (0.5f));
 		nodeProxi.m_origin = (nodeProxi.m_p1 + nodeProxi.m_p0).Scale3 (dgFloat32 (0.5f));
+
 		if (me->BoxTest (data, &nodeProxi)) {
 			if (me->m_type == m_leaf) {
 				dgCollisionInstance* const subShape = me->GetShape();
