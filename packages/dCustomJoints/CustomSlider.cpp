@@ -103,10 +103,14 @@ void CustomSlider::SubmitConstraints (dFloat timestep, int threadIndex)
  	NewtonUserJointAddLinearRow (m_joint, &r0[0], &r1[0], &matrix1.m_right[0]);
 
 	// calculate position and speed	
-	dVector veloc0; 
-	dVector veloc1; 
-	NewtonBodyGetVelocity(m_body0, &veloc0[0]);
-	NewtonBodyGetVelocity(m_body1, &veloc1[0]);
+	dVector veloc0(0.0f, 0.0f, 0.0f, 0.0f); 
+	dVector veloc1(0.0f, 0.0f, 0.0f, 0.0f);  
+	if (m_body0) {
+		NewtonBodyGetVelocity(m_body0, &veloc0[0]);
+	}
+	if (m_body1) {
+		NewtonBodyGetVelocity(m_body1, &veloc1[0]);
+	}
 	m_posit = (matrix0.m_posit - matrix1.m_posit) % matrix1.m_front;
 	m_speed = (veloc0 - veloc1) % matrix1.m_front;
 
