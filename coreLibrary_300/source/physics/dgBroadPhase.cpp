@@ -1190,69 +1190,87 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 	bool tier6 = isKinematic1 & mass0; 
 	bool ret = tier0 & tier1 & tier2 & (tier3 | tier4 | tier5 | tier6);
 
-static int xxx = 1;
-//	if (ret) {
-	if (ret && xxx) {
-		dgVector size0;
-		dgVector size1;
-		dgVector origin0;
-		dgVector origin1;
-
+	if (ret) {
 		const dgCollisionInstance* const instance0 = body0->GetCollision();
 		const dgCollisionInstance* const instance1 = body1->GetCollision();
-		instance0->CalcObb (origin0, size0);
-		instance1->CalcObb (origin1, size1);
 
-		dgMatrix matrix (instance1->GetGlobalMatrix() * instance0->GetGlobalMatrix().Inverse());
-		dgMatrix matrixAbs;
-		matrixAbs[0] = matrix[0].Abs();
-		matrixAbs[1] = matrix[1].Abs();
-		matrixAbs[2] = matrix[2].Abs();
+		if (body0->m_continueCollisionMode | body1->m_continueCollisionMode) {
+			dgVector box0_p0;
+			dgVector box0_p1;
+			dgVector box1_p0;
+			dgVector box1_p1;
+			
+			instance0->CalcAABB(instance0->GetGlobalMatrix(), box0_p0, box0_p1);
+			instance1->CalcAABB(instance1->GetGlobalMatrix(), box1_p0, box1_p1);
+
+			dgVector boxp0 (box0_p0 - box1_p1);
+			dgVector boxp1 (box0_p1 - box1_p0);
+
+			dgVector velRelative (body1->GetVelocity() - body0->GetVelocity());
+			dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), velRelative);
+			dgFloat32 distance = ray.BoxIntersect(boxp0, boxp1);
+			ret = (distance < dgFloat32 (1.0f));
+
+		} else {
+			dgVector size0;
+			dgVector size1;
+			dgVector origin0;
+			dgVector origin1;
+
+			instance0->CalcObb (origin0, size0);
+			instance1->CalcObb (origin1, size1);
+
+			dgMatrix matrix (instance1->GetGlobalMatrix() * instance0->GetGlobalMatrix().Inverse());
+			dgMatrix matrixAbs;
+			matrixAbs[0] = matrix[0].Abs();
+			matrixAbs[1] = matrix[1].Abs();
+			matrixAbs[2] = matrix[2].Abs();
 
 
-		dgVector q0 (origin1 - size1);
-		dgVector q1 (origin1 + size1);
-		dgVector size (matrixAbs.UnrotateVector(size0));
-		dgVector origin = matrix.UntransformVector(origin0);
-		dgVector p0 (origin - size);
-		dgVector p1 (origin + size);
-		dgVector box0 (p0 - q1);
-		dgVector box1 (p1 - q0);
-		dgVector test (box0.CompProduct4((box1)));
-		ret = (test.GetSignMask() & 0x07) == 0x07;
-		if (ret) {
-			dgVector p0 (origin0 - size0);
-			dgVector p1 (origin0 + size0);
-			dgVector size (matrixAbs.RotateVector(size1));
-			origin1 = matrix.TransformVector(origin1);
-			dgVector q0 (origin1 - size);
-			dgVector q1 (origin1 + size);
+			dgVector q0 (origin1 - size1);
+			dgVector q1 (origin1 + size1);
+			dgVector size (matrixAbs.UnrotateVector(size0));
+			dgVector origin = matrix.UntransformVector(origin0);
+			dgVector p0 (origin - size);
+			dgVector p1 (origin + size);
 			dgVector box0 (p0 - q1);
 			dgVector box1 (p1 - q0);
 			dgVector test (box0.CompProduct4((box1)));
 			ret = (test.GetSignMask() & 0x07) == 0x07;
+			if (ret) {
+				dgVector p0 (origin0 - size0);
+				dgVector p1 (origin0 + size0);
+				dgVector size (matrixAbs.RotateVector(size1));
+				origin1 = matrix.TransformVector(origin1);
+				dgVector q0 (origin1 - size);
+				dgVector q1 (origin1 + size);
+				dgVector box0 (p0 - q1);
+				dgVector box1 (p1 - q0);
+				dgVector test (box0.CompProduct4((box1)));
+				ret = (test.GetSignMask() & 0x07) == 0x07;
 
-			for (dgInt32 i = 0; (i < 3) && ret; i ++) {
-				dgVector dir(dgFloat32 (0.0f));
-				dir[i] = dgFloat32 (1.0f);
-				for (dgInt32 j = 0; (j < 3) && ret; j ++) {
-					dgVector crossDir (dir * matrix[j]);
-					if (crossDir.DotProduct4(crossDir).m_x > dgFloat32 (1.0e-7f)) {
-						dgVector size2 (size0.DotProduct4(crossDir.Abs()));
-						dgVector origin2 (origin0.DotProduct4(crossDir));
-						dgVector p0 (origin2 - size2);
-						dgVector p1 (origin2 + size2);
-					
-						dgVector origin3 (origin1.DotProduct4(crossDir));
-						dgVector crossDir3 (matrix[0].DotProduct4(crossDir).m_x, matrix[1].DotProduct4(crossDir).m_x, matrix[2].DotProduct4(crossDir).m_x, dgFloat32 (0.0f));
-						dgVector size3 (size1.DotProduct4(crossDir3.Abs()));
-						dgVector q0 (origin3 - size3);
-						dgVector q1 (origin3 + size3);
+				for (dgInt32 i = 0; (i < 3) && ret; i ++) {
+					dgVector dir(dgFloat32 (0.0f));
+					dir[i] = dgFloat32 (1.0f);
+					for (dgInt32 j = 0; (j < 3) && ret; j ++) {
+						dgVector crossDir (dir * matrix[j]);
+						if (crossDir.DotProduct4(crossDir).m_x > dgFloat32 (1.0e-7f)) {
+							dgVector size2 (size0.DotProduct4(crossDir.Abs()));
+							dgVector origin2 (origin0.DotProduct4(crossDir));
+							dgVector p0 (origin2 - size2);
+							dgVector p1 (origin2 + size2);
+						
+							dgVector origin3 (origin1.DotProduct4(crossDir));
+							dgVector crossDir3 (matrix[0].DotProduct4(crossDir).m_x, matrix[1].DotProduct4(crossDir).m_x, matrix[2].DotProduct4(crossDir).m_x, dgFloat32 (0.0f));
+							dgVector size3 (size1.DotProduct4(crossDir3.Abs()));
+							dgVector q0 (origin3 - size3);
+							dgVector q1 (origin3 + size3);
 
-						dgVector box0 (p0 - q1);
-						dgVector box1 (p1 - q0);
-						dgVector test (box0.CompProduct4((box1)));
-						ret = (test.GetSignMask() & 0x01) == 0x01;
+							dgVector box0 (p0 - q1);
+							dgVector box1 (p1 - q0);
+							dgVector test (box0.CompProduct4((box1)));
+							ret = (test.GetSignMask() & 0x01) == 0x01;
+						}
 					}
 				}
 			}
