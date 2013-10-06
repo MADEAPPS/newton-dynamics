@@ -1064,8 +1064,6 @@ dgFloat64 dgCollisionCompound::CalculateEntropy (dgList<dgNodeBase*>& list)
 void dgCollisionCompound::EndAddRemove ()
 {
 	if (m_root) {
-//		if (m_root->m_type == m_node) {
-
 		dgWorld* const world = m_world;
 		dgThreadHiveScopeLock lock (world, &m_criticalSectionLock);
 
@@ -1118,11 +1116,12 @@ void dgCollisionCompound::EndAddRemove ()
 		while (m_root->m_parent) {
 			m_root = m_root->m_parent;
 		}
-//		}
 
 		m_boxMinRadius = dgMin(m_root->m_size.m_x, m_root->m_size.m_y, m_root->m_size.m_z);
 		m_boxMaxRadius = dgSqrt (m_root->m_size % m_root->m_size);
 
+		m_boxSize = m_root->m_size;
+		m_boxOrigin = m_root->m_origin;
 		MassProperties ();
 	}
 }

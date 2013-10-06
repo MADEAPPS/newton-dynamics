@@ -259,7 +259,8 @@ class dgFastAABBInfo: public dgObb
 		,m_invScale (dgFloat32 (1.0f))
 	{
 		SetInvMatrix (matrix);
-		dgVector size1 (matrix[0].Abs().CompProduct4(dgVector(size.m_x)) + matrix[1].Abs().CompProduct4(dgVector(size.m_y)) + matrix[2].Abs().CompProduct4(dgVector(size.m_z)));
+//		dgVector size1 (matrix[0].Abs().CompProduct4(dgVector(size.m_x)) + matrix[1].Abs().CompProduct4(dgVector(size.m_y)) + matrix[2].Abs().CompProduct4(dgVector(size.m_z)));
+		dgVector size1 (matrix[0].Abs().Scale4(size.m_x) + matrix[1].Abs().Scale4(size.m_y) + matrix[2].Abs().Scale4(size.m_z));
 		m_p0 = (matrix[3] - size1) & dgVector::m_triplexMask;
 		m_p1 = (matrix[3] + size1) & dgVector::m_triplexMask;
 	}

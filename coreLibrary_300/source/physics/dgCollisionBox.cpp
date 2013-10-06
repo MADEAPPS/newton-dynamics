@@ -156,7 +156,8 @@ void dgCollisionBox::CalcAABB (const dgMatrix& matrix, dgVector &p0, dgVector &p
 //	dgFloat32 x = m_size[0].m_x * dgAbsf(matrix[0][0]) + m_size[0].m_y * dgAbsf(matrix[1][0]) + m_size[0].m_z * dgAbsf(matrix[2][0]);  
 //	dgFloat32 y = m_size[0].m_x * dgAbsf(matrix[0][1]) + m_size[0].m_y * dgAbsf(matrix[1][1]) + m_size[0].m_z * dgAbsf(matrix[2][1]);  
 //	dgFloat32 z = m_size[0].m_x * dgAbsf(matrix[0][2]) + m_size[0].m_y * dgAbsf(matrix[1][2]) + m_size[0].m_z * dgAbsf(matrix[2][2]);  
-	dgVector size (matrix[0].Abs().CompProduct4(dgVector(m_size[0].m_x)) + matrix[1].Abs().CompProduct4(dgVector(m_size[0].m_y)) + matrix[2].Abs().CompProduct4(dgVector(m_size[0].m_z)));
+//	dgVector size (matrix[0].Abs().CompProduct4(dgVector(m_size[0].m_x)) + matrix[1].Abs().CompProduct4(dgVector(m_size[0].m_y)) + matrix[2].Abs().CompProduct4(dgVector(m_size[0].m_z)));
+	dgVector size (matrix[0].Abs().Scale4(m_size[0].m_x) + matrix[1].Abs().Scale4(m_size[0].m_y) + matrix[2].Abs().Scale4(m_size[0].m_z));
 	p0 = (matrix[3] - size) & dgVector::m_triplexMask;
 	p1 = (matrix[3] + size) & dgVector::m_triplexMask;
 }

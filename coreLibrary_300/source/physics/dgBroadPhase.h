@@ -37,9 +37,7 @@ typedef dgUnsigned32 (dgApi *OnRayPrecastAction) (const dgBody* const body, cons
 typedef dgFloat32 (dgApi *OnRayCastAction) (const dgBody* const body, const dgCollisionInstance* const collision, const dgVector& contact, const dgVector& normal, dgInt64 collisionID, void* const userData, dgFloat32 intersetParam);
 
 
-
 #define DG_CACHE_DIST_TOL			dgFloat32 (1.0e-3f)
-//#define DG_PRUNE_PADDING_BYTES		128
 
 DG_MSC_VECTOR_ALIGMENT
 struct dgLineBox
@@ -79,7 +77,7 @@ class dgBroadPhase
 	class dgSpliteInfo;
 
 	dgBroadPhase(dgWorld* const world);
-	~dgBroadPhase();
+	virtual ~dgBroadPhase();
 
 	void GetWorldSize (dgVector& p0, dgVector& p1) const;
 	void RayCast (const dgVector& p0, const dgVector& p1, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData) const;
