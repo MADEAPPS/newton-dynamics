@@ -1190,7 +1190,9 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 	bool tier6 = isKinematic1 & mass0; 
 	bool ret = tier0 & tier1 & tier2 & (tier3 | tier4 | tier5 | tier6);
 
-	if (ret) {
+static int xxx = 1;
+//	if (ret) {
+	if (ret && xxx) {
 		dgVector size0;
 		dgVector size1;
 		dgVector origin0;
@@ -1206,35 +1208,54 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 		matrixAbs[0] = matrix[0].Abs();
 		matrixAbs[1] = matrix[1].Abs();
 		matrixAbs[2] = matrix[2].Abs();
-		
-		dgVector p0 (origin0 - size0);
-		dgVector p1 (origin0 + size0);
-		dgVector size (matrixAbs.RotateVector(size1));
-		dgVector origin = matrix.TransformVector(origin1);
-		dgVector size__ (matrixAbs[0].Abs().Scale4(size1.m_x) + matrixAbs[1].Abs().Scale4(size1.m_y) + matrixAbs[2].Abs().Scale4(size1.m_z));
-		dgVector q0 (origin - size);
-		dgVector q1 (origin + size);
+
+
+		dgVector q0 (origin1 - size1);
+		dgVector q1 (origin1 + size1);
+		dgVector size (matrixAbs.UnrotateVector(size0));
+		dgVector origin = matrix.UntransformVector(origin0);
+		dgVector p0 (origin - size);
+		dgVector p1 (origin + size);
 		dgVector box0 (p0 - q1);
 		dgVector box1 (p1 - q0);
 		dgVector test (box0.CompProduct4((box1)));
 		ret = (test.GetSignMask() & 0x07) == 0x07;
 		if (ret) {
-			dgVector q0 (origin1 - size1);
-			dgVector q1 (origin1 + size1);
-			dgVector size (matrixAbs.UnrotateVector(size0));
-			dgVector origin = matrix.UntransformVector(origin0);
-			dgVector p0 (origin - size);
-			dgVector p1 (origin + size);
+			dgVector p0 (origin0 - size0);
+			dgVector p1 (origin0 + size0);
+			dgVector size (matrixAbs.RotateVector(size1));
+			origin1 = matrix.TransformVector(origin1);
+			dgVector q0 (origin1 - size);
+			dgVector q1 (origin1 + size);
 			dgVector box0 (p0 - q1);
 			dgVector box1 (p1 - q0);
 			dgVector test (box0.CompProduct4((box1)));
 			ret = (test.GetSignMask() & 0x07) == 0x07;
-			if (ret) {
-//				dgAssert(0);
 
-			//			dgAssert (ret);
+			for (dgInt32 i = 0; (i < 3) && ret; i ++) {
+				dgVector dir(dgFloat32 (0.0f));
+				dir[i] = dgFloat32 (1.0f);
+				for (dgInt32 j = 0; (j < 3) && ret; j ++) {
+					dgVector crossDir (dir * matrix[j]);
+					if (crossDir.DotProduct4(crossDir).m_x > dgFloat32 (1.0e-7f)) {
+						dgVector size2 (size0.DotProduct4(crossDir.Abs()));
+						dgVector origin2 (origin0.DotProduct4(crossDir));
+						dgVector p0 (origin2 - size2);
+						dgVector p1 (origin2 + size2);
+					
+						dgVector origin3 (origin1.DotProduct4(crossDir));
+						dgVector crossDir3 (matrix[0].DotProduct4(crossDir).m_x, matrix[1].DotProduct4(crossDir).m_x, matrix[2].DotProduct4(crossDir).m_x, dgFloat32 (0.0f));
+						dgVector size3 (size1.DotProduct4(crossDir3.Abs()));
+						dgVector q0 (origin3 - size3);
+						dgVector q1 (origin3 + size3);
+
+						dgVector box0 (p0 - q1);
+						dgVector box1 (p1 - q0);
+						dgVector test (box0.CompProduct4((box1)));
+						ret = (test.GetSignMask() & 0x01) == 0x01;
+					}
+				}
 			}
-
 		}
 	}
 	return ret;
