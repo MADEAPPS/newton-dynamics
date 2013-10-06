@@ -514,7 +514,6 @@ void dgCollisionInstance::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVect
 //	p0 = (matrix.m_posit + (p0 - matrix.m_posit).CompProduct4(m_maxScale) - m_padding) & dgVector::m_triplexMask;
 //	p1 = (matrix.m_posit + (p1 - matrix.m_posit).CompProduct4(m_maxScale) + m_padding) & dgVector::m_triplexMask;
 
-
 	switch (m_scaleType)
 	{
 		case m_unit:
@@ -537,7 +536,9 @@ void dgCollisionInstance::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVect
 			p1 += m_padding;
 			break;
 		}
+
 		case m_global:
+		default:
 		{
 			dgMatrix matrix1 (matrix);
 			matrix1[0] = matrix1[0].Scale4(m_scale.m_x);

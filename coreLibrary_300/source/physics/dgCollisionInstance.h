@@ -96,6 +96,7 @@ class dgCollisionInstance
 	dgUnsigned32 GetSignature () const;
 	dgCollisionID GetCollisionPrimityType () const;
 
+	void CalcObb (dgVector& origin, dgVector& size) const;
 	void CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
 	dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, OnRayPrecastAction preFilter, const dgBody* const body, void* const userData) const;
 	dgFloat32 ConvexRayCast (const dgCollisionInstance* const convexShape, const dgMatrix& localMatrix, const dgVector& localVeloc, dgFloat32 maxT, dgContactPoint& contactOut, OnRayPrecastAction preFilter, const dgBody* const referenceBody, void* const userData, dgInt32 threadId) const; 
@@ -424,6 +425,43 @@ DG_INLINE dgCollisionInstance::dgScaleType dgCollisionInstance::GetCombinedScale
 	return dgMax(m_scaleType, type);
 }
 
+DG_INLINE void dgCollisionInstance::CalcObb (dgVector& origin, dgVector& size) const
+{
+	size = m_childShape->GetObbSize(); 
+	origin = m_childShape->GetObbOrigin(); 
+
+	switch (m_scaleType)
+	{
+		case m_unit:
+		{
+			size += m_padding;
+			break;
+		}
+
+		case m_uniform:
+		case m_nonUniform:
+		{
+			size = size.CompProduct4(m_scale) + m_padding;
+			origin = origin.CompProduct4(m_scale);
+			break;
+		}
+		case m_global:
+		{
+			dgAssert (0);
+//			dgMatrix matrix1 (matrix);
+//			matrix1[0] = matrix1[0].Scale4(m_scale.m_x);
+//			matrix1[1] = matrix1[1].Scale4(m_scale.m_y);
+//			matrix1[2] = matrix1[2].Scale4(m_scale.m_z);
+//			m_childShape->CalcAABB (m_aligmentMatrix * matrix1, p0, p1);
+//			p0 -= m_padding;
+//			p1 += m_padding;
+			break;
+		}
+	}
+
+	dgAssert (size.m_w == dgFloat32 (0.0f));
+	dgAssert (origin.m_w == dgFloat32 (0.0f));
+}
 
 #endif 
 

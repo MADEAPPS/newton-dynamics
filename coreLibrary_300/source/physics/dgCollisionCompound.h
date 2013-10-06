@@ -47,7 +47,7 @@ class dgCollisionCompound: public dgCollision
 	{
 		public:
 		dgOOBBTestData (const dgMatrix& matrix);
-		dgOOBBTestData (const dgMatrix& matrix, const dgVector& p0, const dgVector& p1);
+		dgOOBBTestData (const dgMatrix& matrix, const dgVector& origin, const dgVector& size);
 
 		dgMatrix m_matrix;
 		dgMatrix m_absMatrix;
@@ -213,7 +213,6 @@ class dgCollisionCompound: public dgCollision
 	dgTree<dgNodeBase*, dgInt32> m_array;
 	dgInt32 m_idIndex;
 
-//	static dgVector m_padding;
 	static dgVector m_padding;
 	friend class dgBody;
 	friend class dgWorld;

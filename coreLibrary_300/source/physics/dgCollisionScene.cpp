@@ -71,8 +71,6 @@ void dgCollisionScene::MassProperties ()
 
 void dgCollisionScene::CollidePair (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
-	dgVector p0;
-	dgVector p1;
 	const dgNodeBase* stackPool[DG_COMPOUND_STACK_DEPTH];
 
 	dgAssert (proxy.m_contactJoint == pair->m_contact);
@@ -100,6 +98,8 @@ void dgCollisionScene::CollidePair (dgCollidingPairCollector::dgPair* const pair
 
 	dgFloat32 closestDist = dgFloat32 (1.0e10f);
 	if (proxy.m_continueCollision && (baseLinearSpeed > dgFloat32 (1.0e-6f))) {
+		dgVector p0;
+		dgVector p1;
 		otherInstance->CalcAABB (matrix, p0, p1);
 
 		const dgVector& hullOmega = otherBody->m_omega;
@@ -162,9 +162,12 @@ void dgCollisionScene::CollidePair (dgCollidingPairCollector::dgPair* const pair
 		}
 
 	} else {
-		otherInstance->CalcAABB(dgGetIdentityMatrix(), p0, p1);
+		dgVector origin;
+		dgVector size;
 
-		dgOOBBTestData data (matrix, p0, p1);
+//		otherInstance->CalcAABB(dgGetIdentityMatrix(), p0, p1);
+		otherInstance->CalcObb(origin, size);
+		dgOOBBTestData data (matrix, origin, size);
 		dgInt32 stack = 1;
 		stackPool[0] = m_root;
 		while (stack) {

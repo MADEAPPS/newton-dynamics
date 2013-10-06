@@ -82,11 +82,16 @@ dgCollisionCompound::dgOOBBTestData::dgOOBBTestData (const dgMatrix& matrix)
 }
 
 
-dgCollisionCompound::dgOOBBTestData::dgOOBBTestData (const dgMatrix& matrix, const dgVector& p0, const dgVector& p1)
-	:m_matrix (matrix), m_localP0(p0), m_localP1(p1)
+dgCollisionCompound::dgOOBBTestData::dgOOBBTestData (const dgMatrix& matrix, const dgVector& localOrigin, const dgVector& localSize)
+//	:m_matrix (matrix), m_localP0(p0), m_localP1(p1)
+	:m_matrix (matrix)
+	,m_origin(localOrigin)
+	,m_size(localSize)
+	,m_localP0 (localOrigin - localSize)
+	,m_localP1 (localOrigin + localSize)
 {
-	m_size = (m_localP1 - m_localP0).CompProduct4 (dgVector::m_half);
-	m_origin = (m_localP1 + m_localP0).CompProduct4 (dgVector::m_half);
+//	m_size = (m_localP1 - m_localP0).CompProduct4 (dgVector::m_half);
+//	m_origin = (m_localP1 + m_localP0).CompProduct4 (dgVector::m_half);
 
 	m_absMatrix[0] = m_matrix[0].Abs();
 	m_absMatrix[1] = m_matrix[1].Abs();
@@ -1864,8 +1869,6 @@ dgInt32 dgCollisionCompound::ClosestDitanceToCompound (dgBody* const compoundBod
 
 dgInt32 dgCollisionCompound::CalculateContactsToSingle (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
-	dgVector p0;
-	dgVector p1;
 	dgContactPoint* const contacts = proxy.m_contacts;
 	const dgNodeBase* stackPool[DG_COMPOUND_STACK_DEPTH];
 
@@ -1888,8 +1891,12 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingle (dgCollidingPairCollector
 	dgInt32 contactCount = 0;
 	dgMatrix myMatrix (compoundInstance->GetLocalMatrix() * compoundBody->m_matrix);
 	dgMatrix matrix (otherBody->m_collision->GetGlobalMatrix() * myMatrix.Inverse());
-	otherInstance->CalcAABB(dgGetIdentityMatrix(), p0, p1);
-	dgOOBBTestData data (matrix, p0, p1);
+
+//	otherInstance->CalcAABB(dgGetIdentityMatrix(), p0, p1);
+	dgVector size;
+	dgVector origin;
+	otherInstance->CalcObb (origin, size);
+	dgOOBBTestData data (matrix, origin, size);
 
 	dgInt32 stack = 1;
 	stackPool[0] = m_root;
