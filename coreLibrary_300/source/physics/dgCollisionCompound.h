@@ -57,16 +57,12 @@ class dgCollisionCompound: public dgCollision
 		dgVector m_localP1;
 		dgVector m_aabbP0;
 		dgVector m_aabbP1;
-		dgVector m_crossAxis[3][3];
-		dgVector m_crossAxisAbs[3][3];
-		dgVector m_crossAxisDotAbs[3][3];
-		dgVector m_extends[3][3];
 
-		dgVector m_crossAxis____[9];
-		dgVector m_crossAxisAbs____[9];
-		dgVector m_crossAxisDotAbs____[9];
-		dgVector m_extendsMinX____[3];
-		dgVector m_extendsMaxX____[3];
+		dgVector m_crossAxis[9];
+		dgVector m_crossAxisAbs[9];
+		dgVector m_crossAxisDotAbs[9];
+		dgVector m_extendsMinX[3];
+		dgVector m_extendsMaxX[3];
 	} DG_GCC_VECTOR_ALIGMENT;
 
 

@@ -60,31 +60,25 @@ dgCollisionCompound::dgOOBBTestData::dgOOBBTestData (const dgMatrix& matrix)
 		dir[i] = dgFloat32 (1.0f);
 		for (dgInt32 j = 0; j < 3; j ++) {
 			dgVector axis (dir * m_matrix[j]);
-			m_crossAxis[i][j] = axis;
-			//m_crossAxisAbs[i][j] = dgVector (dgAbsf (axis.m_x), dgAbsf (axis.m_y), dgAbsf (axis.m_z), dgFloat32 (0.0f));
-			m_crossAxisAbs[i][j] = axis.Abs();
-			//m_crossAxisDotAbs[i][j] = dgVector (dgAbsf (axis % matrix[0]), dgAbsf (axis % matrix[1]), dgAbsf (axis % matrix[2]), dgFloat32 (0.0f));
-			m_crossAxisDotAbs[i][j] = matrix.UnrotateVector (axis).Abs();
-
-			m_crossAxis____[index] = axis;
-			m_crossAxisAbs____[index] = axis.Abs();
-			m_crossAxisDotAbs____[index] = matrix.UnrotateVector (axis).Abs();
+			m_crossAxis[index] = axis;
+			m_crossAxisAbs[index] = axis.Abs();
+			m_crossAxisDotAbs[index] = matrix.UnrotateVector (axis).Abs();
 			index ++;
 		}
 	}
 
 	dgVector tmp;
-	dgVector::Transpose4x4 (m_crossAxis____[0], m_crossAxis____[1], m_crossAxis____[2], m_crossAxis____[3], m_crossAxis____[0], m_crossAxis____[1], m_crossAxis____[2], m_crossAxis____[3]);
-	dgVector::Transpose4x4 (m_crossAxis____[3], m_crossAxis____[4], m_crossAxis____[5], m_crossAxis____[6], m_crossAxis____[4], m_crossAxis____[5], m_crossAxis____[6], m_crossAxis____[7]);
-	dgVector::Transpose4x4 (m_crossAxis____[6], m_crossAxis____[7], m_crossAxis____[8], tmp,				m_crossAxis____[8], m_crossAxis____[8], m_crossAxis____[8], m_crossAxis____[8]);
+	dgVector::Transpose4x4 (m_crossAxis[0], m_crossAxis[1], m_crossAxis[2], m_crossAxis[3], m_crossAxis[0], m_crossAxis[1], m_crossAxis[2], m_crossAxis[3]);
+	dgVector::Transpose4x4 (m_crossAxis[3], m_crossAxis[4], m_crossAxis[5], m_crossAxis[6], m_crossAxis[4], m_crossAxis[5], m_crossAxis[6], m_crossAxis[7]);
+	dgVector::Transpose4x4 (m_crossAxis[6], m_crossAxis[7], m_crossAxis[8], tmp,				m_crossAxis[8], m_crossAxis[8], m_crossAxis[8], m_crossAxis[8]);
 
-	dgVector::Transpose4x4 (m_crossAxisAbs____[0], m_crossAxisAbs____[1], m_crossAxisAbs____[2], m_crossAxisAbs____[3], m_crossAxisAbs____[0], m_crossAxisAbs____[1], m_crossAxisAbs____[2], m_crossAxisAbs____[3]);
-	dgVector::Transpose4x4 (m_crossAxisAbs____[3], m_crossAxisAbs____[4], m_crossAxisAbs____[5], m_crossAxisAbs____[6], m_crossAxisAbs____[4], m_crossAxisAbs____[5], m_crossAxisAbs____[6], m_crossAxisAbs____[7]);
-	dgVector::Transpose4x4 (m_crossAxisAbs____[6], m_crossAxisAbs____[7], m_crossAxisAbs____[8], tmp,				    m_crossAxisAbs____[8], m_crossAxisAbs____[8], m_crossAxisAbs____[8], m_crossAxisAbs____[8]);
+	dgVector::Transpose4x4 (m_crossAxisAbs[0], m_crossAxisAbs[1], m_crossAxisAbs[2], m_crossAxisAbs[3], m_crossAxisAbs[0], m_crossAxisAbs[1], m_crossAxisAbs[2], m_crossAxisAbs[3]);
+	dgVector::Transpose4x4 (m_crossAxisAbs[3], m_crossAxisAbs[4], m_crossAxisAbs[5], m_crossAxisAbs[6], m_crossAxisAbs[4], m_crossAxisAbs[5], m_crossAxisAbs[6], m_crossAxisAbs[7]);
+	dgVector::Transpose4x4 (m_crossAxisAbs[6], m_crossAxisAbs[7], m_crossAxisAbs[8], tmp,				    m_crossAxisAbs[8], m_crossAxisAbs[8], m_crossAxisAbs[8], m_crossAxisAbs[8]);
 
-	dgVector::Transpose4x4 (m_crossAxisDotAbs____[0], m_crossAxisDotAbs____[1], m_crossAxisDotAbs____[2], m_crossAxisDotAbs____[3], m_crossAxisDotAbs____[0], m_crossAxisDotAbs____[1], m_crossAxisDotAbs____[2], m_crossAxisDotAbs____[3]);
-	dgVector::Transpose4x4 (m_crossAxisDotAbs____[3], m_crossAxisDotAbs____[4], m_crossAxisDotAbs____[5], m_crossAxisDotAbs____[6], m_crossAxisDotAbs____[4], m_crossAxisDotAbs____[5], m_crossAxisDotAbs____[6], m_crossAxisDotAbs____[7]);
-	dgVector::Transpose4x4 (m_crossAxisDotAbs____[6], m_crossAxisDotAbs____[7], m_crossAxisDotAbs____[8], tmp,				     m_crossAxisDotAbs____[8], m_crossAxisDotAbs____[8], m_crossAxisDotAbs____[8], m_crossAxisDotAbs____[8]);
+	dgVector::Transpose4x4 (m_crossAxisDotAbs[0], m_crossAxisDotAbs[1], m_crossAxisDotAbs[2], m_crossAxisDotAbs[3], m_crossAxisDotAbs[0], m_crossAxisDotAbs[1], m_crossAxisDotAbs[2], m_crossAxisDotAbs[3]);
+	dgVector::Transpose4x4 (m_crossAxisDotAbs[3], m_crossAxisDotAbs[4], m_crossAxisDotAbs[5], m_crossAxisDotAbs[6], m_crossAxisDotAbs[4], m_crossAxisDotAbs[5], m_crossAxisDotAbs[6], m_crossAxisDotAbs[7]);
+	dgVector::Transpose4x4 (m_crossAxisDotAbs[6], m_crossAxisDotAbs[7], m_crossAxisDotAbs[8], tmp,				     m_crossAxisDotAbs[8], m_crossAxisDotAbs[8], m_crossAxisDotAbs[8], m_crossAxisDotAbs[8]);
 }
 
 
@@ -104,8 +98,7 @@ dgCollisionCompound::dgOOBBTestData::dgOOBBTestData (const dgMatrix& matrix, con
 		dgVector dir(dgFloat32 (0.0f));
 		dir[i] = dgFloat32 (1.0f);
 		for (dgInt32 j = 0; j < 3; j ++) {
-			m_crossAxis[i][j] = dir * m_matrix[j];
-			m_crossAxis____[index] = dir * m_matrix[j];
+			m_crossAxis[index] = dir * m_matrix[j];
 			index ++;
 		}
 	}
@@ -121,36 +114,28 @@ dgCollisionCompound::dgOOBBTestData::dgOOBBTestData (const dgMatrix& matrix, con
 		for (dgInt32 j = 0; j < 3; j ++) {
 			dgFloat32 d;
 			dgFloat32 c;
-			dgVector& axis = m_crossAxis[i][j];
+			dgVector& axis = m_crossAxis[index];
 			d = m_size.m_x * dgAbsf (axis % m_matrix[0]) + m_size.m_y * dgAbsf (axis % m_matrix[1]) + m_size.m_z * dgAbsf (axis % m_matrix[2]) + dgFloat32 (1.0e-3f); 
 			c = origin % axis;
-
-			m_extends[i][j] = dgVector (c - d, c + d, dgFloat32 (0.0f), dgFloat32 (0.0f));
-
-			extends[index] = m_extends[i][j];
-
-			dgAssert (m_extends[i][j].m_x <= m_extends[i][j].m_y);
-			//m_crossAxisAbs[i][j] = dgVector (dgAbsf (axis.m_x), dgAbsf (axis.m_y), dgAbsf (axis.m_z), dgFloat32 (0.0f));
-			m_crossAxisAbs[i][j] = axis.Abs();
-
-			m_crossAxisAbs____[index] = axis.Abs();
+			extends[index] = dgVector (c - d, c + d, dgFloat32 (0.0f), dgFloat32 (0.0f));
+			m_crossAxisAbs[index] = axis.Abs();
 			index ++;
 		}
 	}
 
 
 	dgVector tmp;
-	dgVector::Transpose4x4 (m_crossAxis____[0], m_crossAxis____[1], m_crossAxis____[2], m_crossAxis____[3], m_crossAxis____[0], m_crossAxis____[1], m_crossAxis____[2], m_crossAxis____[3]);
-	dgVector::Transpose4x4 (m_crossAxis____[3], m_crossAxis____[4], m_crossAxis____[5], m_crossAxis____[6], m_crossAxis____[4], m_crossAxis____[5], m_crossAxis____[6], m_crossAxis____[7]);
-	dgVector::Transpose4x4 (m_crossAxis____[6], m_crossAxis____[7], m_crossAxis____[8], tmp,				m_crossAxis____[8], m_crossAxis____[8], m_crossAxis____[8], m_crossAxis____[8]);
+	dgVector::Transpose4x4 (m_crossAxis[0], m_crossAxis[1], m_crossAxis[2], m_crossAxis[3], m_crossAxis[0], m_crossAxis[1], m_crossAxis[2], m_crossAxis[3]);
+	dgVector::Transpose4x4 (m_crossAxis[3], m_crossAxis[4], m_crossAxis[5], m_crossAxis[6], m_crossAxis[4], m_crossAxis[5], m_crossAxis[6], m_crossAxis[7]);
+	dgVector::Transpose4x4 (m_crossAxis[6], m_crossAxis[7], m_crossAxis[8], tmp,				m_crossAxis[8], m_crossAxis[8], m_crossAxis[8], m_crossAxis[8]);
 
-	dgVector::Transpose4x4 (m_crossAxisAbs____[0], m_crossAxisAbs____[1], m_crossAxisAbs____[2], m_crossAxisAbs____[3], m_crossAxisAbs____[0], m_crossAxisAbs____[1], m_crossAxisAbs____[2], m_crossAxisAbs____[3]);
-	dgVector::Transpose4x4 (m_crossAxisAbs____[3], m_crossAxisAbs____[4], m_crossAxisAbs____[5], m_crossAxisAbs____[6], m_crossAxisAbs____[4], m_crossAxisAbs____[5], m_crossAxisAbs____[6], m_crossAxisAbs____[7]);
-	dgVector::Transpose4x4 (m_crossAxisAbs____[6], m_crossAxisAbs____[7], m_crossAxisAbs____[8], tmp,				    m_crossAxisAbs____[8], m_crossAxisAbs____[8], m_crossAxisAbs____[8], m_crossAxisAbs____[8]);
+	dgVector::Transpose4x4 (m_crossAxisAbs[0], m_crossAxisAbs[1], m_crossAxisAbs[2], m_crossAxisAbs[3], m_crossAxisAbs[0], m_crossAxisAbs[1], m_crossAxisAbs[2], m_crossAxisAbs[3]);
+	dgVector::Transpose4x4 (m_crossAxisAbs[3], m_crossAxisAbs[4], m_crossAxisAbs[5], m_crossAxisAbs[6], m_crossAxisAbs[4], m_crossAxisAbs[5], m_crossAxisAbs[6], m_crossAxisAbs[7]);
+	dgVector::Transpose4x4 (m_crossAxisAbs[6], m_crossAxisAbs[7], m_crossAxisAbs[8], tmp,				    m_crossAxisAbs[8], m_crossAxisAbs[8], m_crossAxisAbs[8], m_crossAxisAbs[8]);
 
-	dgVector::Transpose4x4 (m_extendsMinX____[0], m_extendsMaxX____[0], tmp, tmp, extends[0], extends[1], extends[2], extends[3]);
-	dgVector::Transpose4x4 (m_extendsMinX____[1], m_extendsMaxX____[1], tmp, tmp, extends[4], extends[5], extends[6], extends[7]);
-	dgVector::Transpose4x4 (m_extendsMinX____[2], m_extendsMaxX____[2], tmp, tmp, extends[8], extends[8], extends[8], extends[8]);
+	dgVector::Transpose4x4 (m_extendsMinX[0], m_extendsMaxX[0], tmp, tmp, extends[0], extends[1], extends[2], extends[3]);
+	dgVector::Transpose4x4 (m_extendsMinX[1], m_extendsMaxX[1], tmp, tmp, extends[4], extends[5], extends[6], extends[7]);
+	dgVector::Transpose4x4 (m_extendsMinX[2], m_extendsMaxX[2], tmp, tmp, extends[8], extends[8], extends[8], extends[8]);
 }
 
 
@@ -335,12 +320,12 @@ bool dgCollisionCompound::dgNodeBase::BoxTest (const dgOOBBTestData& data) const
 			bool ret = true;
 			for (dgInt32 i = 0; (i < 3) && ret; i ++) {
 				const dgInt32 j = i * 3;
-				dgVector c (origin_x.CompProduct4(data.m_crossAxis____[j + 0]) + origin_y.CompProduct4(data.m_crossAxis____[j + 1]) + origin_z.CompProduct4(data.m_crossAxis____[j + 2]));
-				dgVector d (size_x.CompProduct4(data.m_crossAxisAbs____[j + 0]) + size_y.CompProduct4(data.m_crossAxisAbs____[j + 1]) + size_z.CompProduct4(data.m_crossAxisAbs____[j + 2]) + m_padding___); 
+				dgVector c (origin_x.CompProduct4(data.m_crossAxis[j + 0]) + origin_y.CompProduct4(data.m_crossAxis[j + 1]) + origin_z.CompProduct4(data.m_crossAxis[j + 2]));
+				dgVector d (size_x.CompProduct4(data.m_crossAxisAbs[j + 0]) + size_y.CompProduct4(data.m_crossAxisAbs[j + 1]) + size_z.CompProduct4(data.m_crossAxisAbs[j + 2]) + m_padding___); 
 				dgVector x0 (c - d);
 				dgVector x1 (c + d);
-				dgVector box0 (x0 - data.m_extendsMaxX____[i]);
-				dgVector box1 (x1 - data.m_extendsMinX____[i]);
+				dgVector box0 (x0 - data.m_extendsMaxX[i]);
+				dgVector box1 (x1 - data.m_extendsMinX[i]);
 				dgVector test (box0.CompProduct4((box1)));
 				ret = (test.GetSignMask() & 0x0f) == 0x0f;
 			}
@@ -382,13 +367,13 @@ bool dgCollisionCompound::dgNodeBase::BoxTest (const dgOOBBTestData& data, const
 
 			bool ret = true;
 			for (dgInt32 j = 0; (j < 9) && ret; j += 3) {
-				dgVector c0 (origin0_x.CompProduct4(data.m_crossAxis____[j + 0]) + origin0_y.CompProduct4(data.m_crossAxis____[j + 1]) + origin0_z.CompProduct4(data.m_crossAxis____[j + 2]));
-				dgVector d0 (size0_x.CompProduct4(data.m_crossAxisAbs____[j + 0]) + size0_y.CompProduct4(data.m_crossAxisAbs____[j + 1]) + size0_z.CompProduct4(data.m_crossAxisAbs____[j + 2]) + m_padding___); 
+				dgVector c0 (origin0_x.CompProduct4(data.m_crossAxis[j + 0]) + origin0_y.CompProduct4(data.m_crossAxis[j + 1]) + origin0_z.CompProduct4(data.m_crossAxis[j + 2]));
+				dgVector d0 (size0_x.CompProduct4(data.m_crossAxisAbs[j + 0]) + size0_y.CompProduct4(data.m_crossAxisAbs[j + 1]) + size0_z.CompProduct4(data.m_crossAxisAbs[j + 2]) + m_padding___); 
 				dgVector x0 (c0 - d0);
 				dgVector x1 (c0 + d0);
 
-				dgVector c1 (origin1_x.CompProduct4(data.m_crossAxis____[j + 0]) + origin1_y.CompProduct4(data.m_crossAxis____[j + 1]) + origin1_z.CompProduct4(data.m_crossAxis____[j + 2]));
-				dgVector d1 (size1_x.CompProduct4(data.m_crossAxisDotAbs____[j + 0]) + size1_y.CompProduct4(data.m_crossAxisDotAbs____[j + 1]) + size1_z.CompProduct4(data.m_crossAxisDotAbs____[j + 2]) + m_padding___); 
+				dgVector c1 (origin1_x.CompProduct4(data.m_crossAxis[j + 0]) + origin1_y.CompProduct4(data.m_crossAxis[j + 1]) + origin1_z.CompProduct4(data.m_crossAxis[j + 2]));
+				dgVector d1 (size1_x.CompProduct4(data.m_crossAxisDotAbs[j + 0]) + size1_y.CompProduct4(data.m_crossAxisDotAbs[j + 1]) + size1_z.CompProduct4(data.m_crossAxisDotAbs[j + 2]) + m_padding___); 
 				dgVector z0 (c1 - d1);
 				dgVector z1 (c1 + d1);
 
