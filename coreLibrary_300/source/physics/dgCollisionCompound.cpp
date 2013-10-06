@@ -35,8 +35,8 @@
 
 #define DG_MAX_MIN_VOLUME				dgFloat32 (1.0e-3f)
 
-dgVector dgCollisionCompound::m_padding (dgFloat32 (1.0e-3f), dgFloat32 (1.0e-3f), dgFloat32 (1.0e-3f), dgFloat32 (0.0f)); 
-dgVector dgCollisionCompound::m_padding___ (dgFloat32 (1.0e-3f)); 
+//dgVector dgCollisionCompound::m_padding (dgFloat32 (1.0e-3f), dgFloat32 (1.0e-3f), dgFloat32 (1.0e-3f), dgFloat32 (0.0f)); 
+dgVector dgCollisionCompound::m_padding (dgFloat32 (1.0e-3f)); 
 
 class dgCollisionCompound::dgHeapNodePair
 {
@@ -112,17 +112,20 @@ dgCollisionCompound::dgOOBBTestData::dgOOBBTestData (const dgMatrix& matrix, con
 	dgVector extends[9];
 	for (dgInt32 i = 0; i < 3; i ++) {
 		for (dgInt32 j = 0; j < 3; j ++) {
-			dgFloat32 d;
-			dgFloat32 c;
-			dgVector& axis = m_crossAxis[index];
-			d = m_size.m_x * dgAbsf (axis % m_matrix[0]) + m_size.m_y * dgAbsf (axis % m_matrix[1]) + m_size.m_z * dgAbsf (axis % m_matrix[2]) + dgFloat32 (1.0e-3f); 
-			c = origin % axis;
-			extends[index] = dgVector (c - d, c + d, dgFloat32 (0.0f), dgFloat32 (0.0f));
+			const dgVector& axis = m_crossAxis[index];
+			dgAssert (axis.m_w == dgFloat32 (0.0f));
+
+//			dgFloat32 d = m_size.m_x * dgAbsf (axis % m_matrix[0]) + m_size.m_y * dgAbsf (axis % m_matrix[1]) + m_size.m_z * dgAbsf (axis % m_matrix[2]) + dgFloat32 (1.0e-3f); 
+//			dgFloat32 c = origin % axis;
+//			extends[index] = dgVector (c - d, c + d, dgFloat32 (0.0f), dgFloat32 (0.0f));
+			dgVector tmp (m_matrix.UnrotateVector(axis));
+			dgVector d (m_size.DotProduct4(tmp.Abs()) + m_padding);
+			dgVector c (origin.DotProduct4(axis));
+			extends[index] = ((c - d).PackLow (c + d));
 			m_crossAxisAbs[index] = axis.Abs();
 			index ++;
 		}
 	}
-
 
 	dgVector tmp;
 	dgVector::Transpose4x4 (m_crossAxis[0], m_crossAxis[1], m_crossAxis[2], m_crossAxis[3], m_crossAxis[0], m_crossAxis[1], m_crossAxis[2], m_crossAxis[3]);
@@ -321,7 +324,7 @@ bool dgCollisionCompound::dgNodeBase::BoxTest (const dgOOBBTestData& data) const
 			for (dgInt32 i = 0; (i < 3) && ret; i ++) {
 				const dgInt32 j = i * 3;
 				dgVector c (origin_x.CompProduct4(data.m_crossAxis[j + 0]) + origin_y.CompProduct4(data.m_crossAxis[j + 1]) + origin_z.CompProduct4(data.m_crossAxis[j + 2]));
-				dgVector d (size_x.CompProduct4(data.m_crossAxisAbs[j + 0]) + size_y.CompProduct4(data.m_crossAxisAbs[j + 1]) + size_z.CompProduct4(data.m_crossAxisAbs[j + 2]) + m_padding___); 
+				dgVector d (size_x.CompProduct4(data.m_crossAxisAbs[j + 0]) + size_y.CompProduct4(data.m_crossAxisAbs[j + 1]) + size_z.CompProduct4(data.m_crossAxisAbs[j + 2]) + m_padding); 
 				dgVector x0 (c - d);
 				dgVector x1 (c + d);
 				dgVector box0 (x0 - data.m_extendsMaxX[i]);
@@ -368,12 +371,12 @@ bool dgCollisionCompound::dgNodeBase::BoxTest (const dgOOBBTestData& data, const
 			bool ret = true;
 			for (dgInt32 j = 0; (j < 9) && ret; j += 3) {
 				dgVector c0 (origin0_x.CompProduct4(data.m_crossAxis[j + 0]) + origin0_y.CompProduct4(data.m_crossAxis[j + 1]) + origin0_z.CompProduct4(data.m_crossAxis[j + 2]));
-				dgVector d0 (size0_x.CompProduct4(data.m_crossAxisAbs[j + 0]) + size0_y.CompProduct4(data.m_crossAxisAbs[j + 1]) + size0_z.CompProduct4(data.m_crossAxisAbs[j + 2]) + m_padding___); 
+				dgVector d0 (size0_x.CompProduct4(data.m_crossAxisAbs[j + 0]) + size0_y.CompProduct4(data.m_crossAxisAbs[j + 1]) + size0_z.CompProduct4(data.m_crossAxisAbs[j + 2]) + m_padding); 
 				dgVector x0 (c0 - d0);
 				dgVector x1 (c0 + d0);
 
 				dgVector c1 (origin1_x.CompProduct4(data.m_crossAxis[j + 0]) + origin1_y.CompProduct4(data.m_crossAxis[j + 1]) + origin1_z.CompProduct4(data.m_crossAxis[j + 2]));
-				dgVector d1 (size1_x.CompProduct4(data.m_crossAxisDotAbs[j + 0]) + size1_y.CompProduct4(data.m_crossAxisDotAbs[j + 1]) + size1_z.CompProduct4(data.m_crossAxisDotAbs[j + 2]) + m_padding___); 
+				dgVector d1 (size1_x.CompProduct4(data.m_crossAxisDotAbs[j + 0]) + size1_y.CompProduct4(data.m_crossAxisDotAbs[j + 1]) + size1_z.CompProduct4(data.m_crossAxisDotAbs[j + 2]) + m_padding); 
 				dgVector z0 (c1 - d1);
 				dgVector z1 (c1 + d1);
 
