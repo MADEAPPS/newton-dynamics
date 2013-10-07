@@ -317,11 +317,13 @@ class dgFastAABBInfo: public dgObb
 	private:
 	DG_INLINE void MakeBox1 (dgInt32 indexCount, const dgInt32* const indexArray, dgInt32 stride, const dgFloat32* const vertexArray, dgVector& minBox, dgVector& maxBox) const
 	{
-		const dgMatrix& matrix = *this;
-		dgVector faceBoxP0 (m_scale.CompProduct4(matrix.UntransformVector(dgVector(&vertexArray[indexArray[0] * stride]))));
+		//const dgMatrix& matrix = *this;
+		//dgVector faceBoxP0 (m_scale.CompProduct4(matrix.UntransformVector(dgVector(&vertexArray[indexArray[0] * stride]))));
+		dgVector faceBoxP0 (m_scale.CompProduct4(dgVector(&vertexArray[indexArray[0] * stride])));
 		dgVector faceBoxP1 (faceBoxP0);
 		for (dgInt32 i = 1; i < indexCount; i ++) {
-			dgVector p (m_scale.CompProduct4 (matrix.UntransformVector(dgVector(&vertexArray[indexArray[i] * stride]))));
+			//dgVector p (m_scale.CompProduct4 (matrix.UntransformVector(dgVector(&vertexArray[indexArray[i] * stride]))));
+			dgVector p (m_scale.CompProduct4 (dgVector(&vertexArray[indexArray[i] * stride])));
 			faceBoxP0 = faceBoxP0.GetMin(p); 
 			faceBoxP1 = faceBoxP1.GetMax(p); 
 		}
