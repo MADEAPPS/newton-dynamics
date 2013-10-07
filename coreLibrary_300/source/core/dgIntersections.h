@@ -327,8 +327,10 @@ class dgFastAABBInfo: public dgObb
 			faceBoxP0 = faceBoxP0.GetMin(p); 
 			faceBoxP1 = faceBoxP1.GetMax(p); 
 		}
-		minBox = faceBoxP0 - m_size;
-		maxBox = faceBoxP1 + m_size;
+		//minBox = faceBoxP0 - m_size;
+		//maxBox = faceBoxP1 + m_size;
+		minBox = faceBoxP0;
+		maxBox = faceBoxP1;
 	}
 
 	DG_INLINE void MakeBox2 (const dgMatrix& faceMatrix, dgInt32 indexCount, const dgInt32* const indexArray, dgInt32 stride, const dgFloat32* const vertexArray, dgVector& minBox, dgVector& maxBox) const
