@@ -188,7 +188,8 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 				dgFloat32 dist1 = obbRay.BoxIntersect(minBox1, maxBox1);
 				//dgAssert (dist1 <= 1.0f);
 				//dgAssert (dist == dist1);
-				dist = dist1;
+				//dist = dist1;
+				dist = (dist1  > dgFloat32 (1.0f)) ? dist1 : dgMax (dist1, dist);
 			}
 			return dist;
 		}
