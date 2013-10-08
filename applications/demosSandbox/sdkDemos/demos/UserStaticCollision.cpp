@@ -21,6 +21,42 @@
 #include "HeightFieldPrimitive.h"
 
 
+static void AddUniformScaledPrimitives (DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat spacing, PrimitiveType type, int materialID, const dMatrix& shapeOffsetMatrix)
+{
+	// create the shape and visual mesh as a common data to be re used
+	NewtonWorld* const world = scene->GetNewton();
+	NewtonCollision* const collision = CreateConvexCollision (world, &shapeOffsetMatrix[0][0], size, type, materialID);
+
+	dFloat startElevation = 1000.0f;
+	dMatrix matrix (dRollMatrix(-3.141592f/2.0f));
+	for (int i = 0; i < xCount; i ++) {
+		dFloat x = origin.m_x + (i - xCount / 2) * spacing;
+		for (int j = 0; j < zCount; j ++) {
+
+			dFloat scale = 0.5f + 2.0f * dFloat (dRand()) / dFloat(dRAND_MAX);
+
+			NewtonCollisionSetScale (collision, scale, scale, scale);
+			DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+
+			dFloat z = origin.m_z + (j - zCount / 2) * spacing;
+			matrix.m_posit.m_x = x;
+			matrix.m_posit.m_z = z;
+			dVector floor (FindFloor (world, dVector (matrix.m_posit.m_x, startElevation, matrix.m_posit.m_z, 0.0f), 2.0f * startElevation));
+			matrix.m_posit.m_y = floor.m_y + 4.f;
+
+			// create a solid
+			CreateSimpleSolid (scene, geometry, mass, matrix, collision, materialID);
+
+			// release the mesh
+			geometry->Release(); 
+		}
+	}
+
+	// do not forget to delete the collision
+	NewtonDestroyCollision (collision);
+}
+
+
 void UserHeightFieldCollision (DemoEntityManager* const scene)
 {
 	// load the sky box
@@ -86,11 +122,12 @@ void UserPlaneCollision (DemoEntityManager* const scene)
 	dVector location (origin);
 	location.m_x += 20.0f;
 	location.m_z += 20.0f;
-	dVector size (0.5f, 0.5f, 0.75f, 0.0f);
+//	dVector size (0.5f, 0.5f, 0.75f, 0.0f);
+	dVector size (1.0f, 1.0f, 1.0f, 0.0f);
 
 	int count = 5;
-	//	int count = 1;
 	dMatrix shapeOffsetMatrix (GetIdentityMatrix());
+	AddUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
