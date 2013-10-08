@@ -1093,7 +1093,6 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 		dgInt32 faceIndexCount0 = 0; 
 		dgInt32 faceIndexCount1 = 0; 
 
-		//dgFastAABBInfo aabb (data->m_boxP0, data->m_boxP1);
 		dgInt32* const address = data->m_meshData.m_globalFaceIndexStart;
 		dgFloat32* const hitDistance = data->m_meshData.m_globalHitDistance;
 		

@@ -28,7 +28,7 @@
 
 typedef void (dgApi *OnUserMeshDestroyCallback) (void* const userData);
 
-typedef void (dgApi *OnUserMeshCollideCallback) (dgPolygonMeshDesc& collideData);
+typedef void (dgApi *OnUserMeshCollideCallback) (void* const collideData);
 typedef dgFloat32 (dgApi *OnUserMeshRayHitCallback) (dgCollisionMeshRayHitDesc& rayHitdata);
 typedef void (dgApi *OnUserMeshCollisionInfo) (void* userData, dgCollisionInfo* infoRecord);
 typedef dgInt32 (dgApi *OnUserMeshAABBOverlapTest) (void* const userData, const dgVector& boxP0, const dgVector& boxP1);

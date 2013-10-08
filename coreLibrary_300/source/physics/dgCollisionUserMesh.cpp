@@ -103,14 +103,12 @@ bool dgCollisionUserMesh::AABBOvelapTest (const dgVector& boxP0, const dgVector&
 
 dgFloat32 dgCollisionUserMesh::RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body,	void* const userData) const
 {
-	dgAssert (0);
-	return 0;
-/*
 	dgFloat32 param = dgFloat32 (1.2f);
 	if (m_rayHitCallback) {
 		dgCollisionMeshRayHitDesc data;
 		data.m_localP0 = localP0;
 		data.m_localP1 = localP1;
+		data.m_userId = body->m_collision->GetUserDataID();
 		data.m_userData = m_userData;
 		data.m_altenateUserData = userData;
 		if (body) {
@@ -126,7 +124,6 @@ dgFloat32 dgCollisionUserMesh::RayCast (const dgVector& localP0, const dgVector&
 		} 
 	}
 	return param;
-*/
 }
 
 
@@ -142,10 +139,45 @@ void dgCollisionUserMesh::GetCollidingFaces (dgPolygonMeshDesc* const data) cons
 	data->m_faceCount = 0;
 
 	if (m_collideCallback) {
-dgAssert (0);
 		data->m_me = this;
 		data->m_userData = m_userData;
-		m_collideCallback (*data);
+		m_collideCallback (&data->m_p0);
+
+		dgInt32 faceCount0 = 0; 
+		dgInt32 faceIndexCount0 = 0; 
+		dgInt32 faceIndexCount1 = 0; 
+		dgInt32 stride = data->m_vertexStrideInBytes / sizeof (dgFloat32);
+		dgFloat32* const vertex = data->m_vertex;
+		dgInt32* const address = data->m_meshData.m_globalFaceIndexStart;
+		dgFloat32* const hitDistance = data->m_meshData.m_globalHitDistance;
+		dgInt32* const indices = data->m_faceVertexIndex;
+		dgInt32* const faceIndexCount = data->m_faceIndexCount; 
+
+		for (dgInt32 i = 0; i < data->m_faceCount; i ++) {
+			dgInt32 indexCount = faceIndexCount[i];
+			const dgInt32* const indexArray = &indices[faceIndexCount1]; 
+
+			dgInt32 normalIndex = data->GetNormalIndex (indexArray, indexCount);
+			const dgVector& faceNormal = vertex[normalIndex * stride];
+			dgFloat32 dist = data->PolygonBoxDistance (faceNormal, indexCount, indexArray, stride, vertex);
+
+			const dgInt32 faceIndexCount = data->GetFaceIndexCount(indexCount); 
+			if (dist > dgFloat32 (0.0f)) {
+				hitDistance[faceCount0] = dist;
+				address[faceCount0] = faceIndexCount0;
+				memcpy (&indices[faceIndexCount0], indexArray, faceIndexCount * sizeof (dgInt32));
+				faceCount0 ++;
+				faceIndexCount0 += faceIndexCount;
+			}
+			faceIndexCount1 += faceIndexCount;
+		}
+
+		data->m_faceCount = 0;
+		if (faceCount0) {
+			data->m_faceCount = faceCount0;
+			data->m_faceIndexStart = address;
+			data->m_hitDistance = hitDistance;
+		}
 	}
 }
 

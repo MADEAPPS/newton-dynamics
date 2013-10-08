@@ -74,6 +74,7 @@ class dgPolygonMeshDesc: public dgFastAABBInfo
 		,m_vertex(NULL)
 		,m_faceIndexCount(NULL)
 		,m_faceVertexIndex(NULL)
+		,m_faceIndexStart(NULL)
 		,m_hitDistance(NULL)
 		,m_maxT(dgFloat32 (1.0f))
 		,m_doContinuesCollisionTest(proxy.m_continueCollision)
@@ -185,11 +186,11 @@ class dgPolygonMeshDesc: public dgFastAABBInfo
 	dgCollisionInstance* m_polySoupCollision;
 	dgFloat32* m_vertex;
 	dgInt32* m_faceIndexCount;
-	dgInt32* m_faceIndexStart;
 	dgInt32* m_faceVertexIndex;
-	dgFloat32* m_hitDistance;
 
 	// private data;
+	dgInt32* m_faceIndexStart;
+	dgFloat32* m_hitDistance;
 	const dgCollisionMesh* m_me;
 	dgInt32 m_globalIndexCount;
 	dgFloat32 m_maxT;
@@ -210,7 +211,7 @@ class dgCollisionMeshRayHitDesc
 	dgVector m_localP0; 
 	dgVector m_localP1; 
 	dgVector m_normal;
-	dgInt32* m_userId;
+	dgUnsigned64 m_userId;
 	void*  m_userData;
 	void*  m_altenateUserData;
 	dgMatrix m_matrix;

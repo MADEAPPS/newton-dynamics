@@ -254,7 +254,6 @@ class dgFastAABBInfo: public dgObb
 		,m_invScale (dgFloat32 (1.0f))
 	{
 		SetInvMatrix (matrix);
-//		dgVector size1 (matrix[0].Abs().CompProduct4(dgVector(size.m_x)) + matrix[1].Abs().CompProduct4(dgVector(size.m_y)) + matrix[2].Abs().CompProduct4(dgVector(size.m_z)));
 		dgVector size1 (matrix[0].Abs().Scale4(size.m_x) + matrix[1].Abs().Scale4(size.m_y) + matrix[2].Abs().Scale4(size.m_z));
 		m_p0 = (matrix[3] - size1) & dgVector::m_triplexMask;
 		m_p1 = (matrix[3] + size1) & dgVector::m_triplexMask;
@@ -263,10 +262,10 @@ class dgFastAABBInfo: public dgObb
 	DG_INLINE dgFastAABBInfo(const dgVector& p0, const dgVector& p1)
 		:dgObb(dgGetIdentityMatrix(), (p1 - p0).CompProduct4(dgVector::m_half))
 		,m_absDir(dgGetIdentityMatrix())
-		,m_p0(p0)
-		,m_p1(p1)
 		,m_scale (dgFloat32 (1.0f))
 		,m_invScale (dgFloat32 (1.0f))
+		,m_p0(p0)
+		,m_p1(p1)
 	{
 		m_posit = ((p1 + p0).CompProduct4(dgVector::m_half) & dgVector::m_triplexMask) | dgVector::m_wOne;
 	}
@@ -370,13 +369,13 @@ class dgFastAABBInfo: public dgObb
 
 	protected:
 	dgMatrix m_absDir;
-	dgVector m_p0;
-	dgVector m_p1;
 	dgVector m_scale;
 	dgVector m_invScale;
-	
+	dgVector m_p0;
+	dgVector m_p1;
 
 	friend class dgAABBPolygonSoup;
+	friend class dgCollisionUserMesh;
 	friend class dgCollisionHeightField;
 } DG_GCC_VECTOR_ALIGMENT;
 
