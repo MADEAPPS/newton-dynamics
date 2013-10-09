@@ -241,7 +241,7 @@ class dgCollisionMesh: public dgCollision
 	dgCollisionMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData);
 	virtual ~dgCollisionMesh();
 
-	void SetCollisionCallback (dgCollisionMeshCollisionCallback debugCallback);
+	
 
 
 	virtual dgFloat32 GetVolume () const;
@@ -250,6 +250,8 @@ class dgCollisionMesh: public dgCollision
 	virtual void GetVertexListIndexList (const dgVector& p0, const dgVector& p1, dgMeshVertexListIndexList &data) const = 0;
 
 	virtual void GetCollidingFaces (dgPolygonMeshDesc* const data) const = 0;
+
+	void SetDebugCollisionCallback (dgCollisionMeshCollisionCallback debugCallback);
 	dgCollisionMeshCollisionCallback GetDebugCollisionCallback() const { return m_debugCallback;} 
 
 	protected:

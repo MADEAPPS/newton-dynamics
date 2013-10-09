@@ -25,8 +25,6 @@
 #include "dgCollisionUserMesh.h"
 
 
-//dgCollisionUserMesh::dgCollisionUserMesh(dgMemoryAllocator* allocator, const dgVector& boxP0, const dgVector& boxP1, const dgUserMeshCreation& data)
-//	:dgCollisionMesh (allocator, m_userMesh)
 dgCollisionUserMesh::dgCollisionUserMesh(dgWorld* const world, const dgVector& boxP0, const dgVector& boxP1, const dgUserMeshCreation& data)
 	:dgCollisionMesh (world, m_userMesh)
 {
@@ -151,10 +149,10 @@ void dgCollisionUserMesh::GetCollidingFaces (dgPolygonMeshDesc* const data) cons
 		dgInt32* const address = data->m_meshData.m_globalFaceIndexStart;
 		dgFloat32* const hitDistance = data->m_meshData.m_globalHitDistance;
 		dgInt32* const indices = data->m_faceVertexIndex;
-		dgInt32* const faceIndexCount = data->m_faceIndexCount; 
+		dgInt32* const faceIndexCountArray = data->m_faceIndexCount; 
 
 		for (dgInt32 i = 0; i < data->m_faceCount; i ++) {
-			dgInt32 indexCount = faceIndexCount[i];
+			dgInt32 indexCount = faceIndexCountArray[i];
 			const dgInt32* const indexArray = &indices[faceIndexCount1]; 
 
 			dgInt32 normalIndex = data->GetNormalIndex (indexArray, indexCount);
@@ -165,6 +163,7 @@ void dgCollisionUserMesh::GetCollidingFaces (dgPolygonMeshDesc* const data) cons
 			if (dist > dgFloat32 (0.0f)) {
 				hitDistance[faceCount0] = dist;
 				address[faceCount0] = faceIndexCount0;
+				faceIndexCountArray[faceCount0] = indexCount;
 				memcpy (&indices[faceIndexCount0], indexArray, faceIndexCount * sizeof (dgInt32));
 				faceCount0 ++;
 				faceIndexCount0 += faceIndexCount;
@@ -177,6 +176,27 @@ void dgCollisionUserMesh::GetCollidingFaces (dgPolygonMeshDesc* const data) cons
 			data->m_faceCount = faceCount0;
 			data->m_faceIndexStart = address;
 			data->m_hitDistance = hitDistance;
+
+			if (GetDebugCollisionCallback()) { 
+				dgTriplex triplex[32];
+				const dgMatrix& matrix = data->m_polySoupCollision->GetGlobalMatrix();
+				for (dgInt32 i = 0; i < data->m_faceCount; i ++) {
+					dgInt32 base = address[i];
+					dgInt32 indexCount = faceIndexCountArray[i];
+					const dgInt32* const vertexFaceIndex = &data->m_faceVertexIndex[base];
+					for (dgInt32 j = 0; j < indexCount; j ++) {
+						dgInt32 index = vertexFaceIndex[j];
+						dgVector q (&vertex[index * stride]);
+						dgVector p (matrix.TransformVector(q));
+						triplex[j].m_x = p.m_x;
+						triplex[j].m_y = p.m_y;
+						triplex[j].m_z = p.m_z;
+					}
+					dgInt32 faceId = data->GetFaceId(vertexFaceIndex, indexCount);
+					GetDebugCollisionCallback() (data->m_polySoupBody, data->m_objBody, faceId, indexCount, &triplex[0].m_x, sizeof (dgTriplex));
+				}
+			}
+
 		}
 	}
 }

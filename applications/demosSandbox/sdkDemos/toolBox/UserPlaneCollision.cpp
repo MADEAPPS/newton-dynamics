@@ -67,6 +67,9 @@ class dInfinitePlane
 													 PlaneCollisionAABBOverlapTest, PlaneCollisionGetFacesInAABB, 
 													 UserCollisionSerializationCallback, 0);
 
+		// set a debug display call back
+		NewtonStaticCollisionSetDebugCallback (m_collision, ShowMeshCollidingFaces);
+
 		// set the collisoin offset Matrix;
 		NewtonCollisionSetMatrix(m_collision, &m_rotation[0][0]);
 		

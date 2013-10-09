@@ -3327,7 +3327,7 @@ void NewtonStaticCollisionSetDebugCallback(const NewtonCollision* const staticCo
 	dgCollisionInstance* const collision = (dgCollisionInstance*)staticCollision;
 	if (collision->IsType (dgCollision::dgCollisionMesh_RTTI)) {
 		dgCollisionMesh* const mesh = (dgCollisionMesh*) collision->GetChildShape();
-		mesh->SetCollisionCallback ((dgCollisionMeshCollisionCallback) userCallback);
+		mesh->SetDebugCollisionCallback ((dgCollisionMeshCollisionCallback) userCallback);
 	}
 
 }

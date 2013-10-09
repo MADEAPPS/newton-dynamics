@@ -158,7 +158,7 @@ dgInt32 dgCollisionMesh::CalculatePlaneIntersection (const dgVector& normal, con
 	return 0;
 }
 
-void dgCollisionMesh::SetCollisionCallback (dgCollisionMeshCollisionCallback debugCallback)
+void dgCollisionMesh::SetDebugCollisionCallback (dgCollisionMeshCollisionCallback debugCallback)
 {
 	m_debugCallback = debugCallback;
 }
