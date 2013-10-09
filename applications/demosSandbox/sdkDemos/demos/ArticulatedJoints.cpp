@@ -59,8 +59,8 @@ static ARTICULATED_VEHICLE_DEFINITION forkliftDefinition[] =
 	{"lift_2",		"convexHull",			 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
 	{"lift_3",		"convexHull",			 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
 	{"lift_4",		"convexHull",			 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
-	{"left_teeth",  "convexHullAggregate",	 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
-	{"right_teeth", "convexHullAggregate",	 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
+//	{"left_teeth",  "convexHullAggregate",	 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
+//	{"right_teeth", "convexHullAggregate",	 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
 };
 
 
@@ -274,6 +274,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 //vehicleModel->m_inputs.m_tiltValue = -1;
 
 		dFloat tiltAngle = vehicleModel->m_tiltAngle;
+tiltAngle = -0.3f;
 		if (vehicleModel->m_inputs.m_tiltValue > 0) {
 			tiltAngle = vehicleModel->m_angularActuator->GetMinAngularLimit();
 			vehicleModel->m_tiltAngle = vehicleModel->m_angularActuator->GetActuatorAngle();
@@ -802,7 +803,8 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	
 	origin.m_x -= 5.0f;
 	origin.m_y += 5.0f;
-	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -30.0f * 3.141592f / 180.0f);  
+//	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -30.0f * 3.141592f / 180.0f);  
+	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -90.0f * 3.141592f / 180.0f);  
 	scene->SetCameraMatrix(rot, origin);
 
 }

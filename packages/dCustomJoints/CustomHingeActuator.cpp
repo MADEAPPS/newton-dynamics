@@ -116,9 +116,14 @@ void CustomHingeActuator::SubmitConstraints (dFloat timestep, int threadIndex)
 
 		dFloat step = m_angularRate * timestep;
 		if (dAbs (relAngle) > 2.0f * dAbs (step)) {
+			dAssert (0);
+/*
 			dFloat speed = GetJointOmega ();
-			dFloat accel = (relAngle >= 0.0f) ? (m_angularRate - speed) / timestep : -(m_angularRate + speed) / timestep;
+			dFloat rate = dSign(relAngle) * m_angularRate;
+//			dFloat accel = (relAngle >= 0.0f) ? (m_angularRate - speed) / timestep : -(m_angularRate + speed) / timestep;
+			dFloat accel = (rate - speed) / timestep;
 			NewtonUserJointSetRowAcceleration (m_joint, accel);
+*/
 		}
 		NewtonUserJointSetRowStiffness (m_joint, 1.0f);
 	}
