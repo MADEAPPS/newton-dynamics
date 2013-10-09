@@ -119,10 +119,17 @@ void CustomSliderActuator::SubmitConstraints (dFloat timestep, int threadIndex)
 		dFloat relPosit = m_posit - GetJointPosit();
 		dFloat step = m_linearRate * timestep;
 		if (dAbs (relPosit) > 2.0f * dAbs (step)) {
-			dFloat speed = GetJointSpeed ();
-			dFloat accel = (relPosit >= 0.0f) ? (m_linearRate - speed) / timestep : -(m_linearRate + speed) / timestep;
+//			dFloat speed = GetJointSpeed ();
+//			dFloat accel = (relPosit >= 0.0f) ? (m_linearRate - speed) / timestep : -(m_linearRate + speed) / timestep;
+			dFloat speed0 = dClamp (relPosit / timestep, -m_linearRate, m_linearRate);
+			dFloat speed1 = GetJointSpeed ();;
+			dFloat accel = (speed0 - speed1) / timestep;
 			NewtonUserJointSetRowAcceleration (m_joint, accel);
 		}
+
+dVector xxx (matrix0.m_posit - matrix1.m_posit);
+dTrace (("%f %f %f\n", xxx.m_x, xxx.m_y, xxx.m_z))
+
 		NewtonUserJointSetRowStiffness (m_joint, 1.0f);
 	}
 }

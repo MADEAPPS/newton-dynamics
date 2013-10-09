@@ -59,8 +59,8 @@ static ARTICULATED_VEHICLE_DEFINITION forkliftDefinition[] =
 	{"lift_2",		"convexHull",			 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
 	{"lift_3",		"convexHull",			 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
 	{"lift_4",		"convexHull",			 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
-//	{"left_teeth",  "convexHullAggregate",	 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
-//	{"right_teeth", "convexHullAggregate",	 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
+	{"left_teeth",  "convexHullAggregate",	 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
+	{"right_teeth", "convexHullAggregate",	 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
 };
 
 
