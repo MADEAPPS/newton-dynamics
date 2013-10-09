@@ -59,8 +59,8 @@ static ARTICULATED_VEHICLE_DEFINITION forkliftDefinition[] =
 	{"lift_2",		"convexHull",			 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
 	{"lift_3",		"convexHull",			 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
 	{"lift_4",		"convexHull",			 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
-	{"left_teeth",  "convexHullAggregate",	 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
-	{"right_teeth", "convexHullAggregate",	 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
+//	{"left_teeth",  "convexHullAggregate",	 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
+//	{"right_teeth", "convexHullAggregate",	 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
 };
 
 
@@ -160,10 +160,10 @@ class ArticulatedEntityModel: public DemoEntity
 		dMatrix baseMatrix;
 		NewtonBodyGetMatrix (child, &baseMatrix[0][0]);
 
-		dFloat minAngleLimit = -30.0f * 3.141592f / 180.0f;
+		dFloat minAngleLimit = -20.0f * 3.141592f / 180.0f;
 		dFloat maxAngleLimit =  20.0f * 3.141592f / 180.0f;
 		dFloat angularRate = 10.0f * 3.141592f / 180.0f;
-		m_angularActuator = new CustomHingeActuator (&baseMatrix[0][0], angularRate, minAngleLimit * 1000.0f, maxAngleLimit * 1000.0f, child, parent);
+		m_angularActuator = new CustomHingeActuator (&baseMatrix[0][0], angularRate, minAngleLimit, maxAngleLimit, child, parent);
 	}
 
 	void LinkLiftActuator (NewtonBody* const parent, NewtonBody* const child)
@@ -268,10 +268,10 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		}
 */
 		// set the tilt angle
-static int xxx;
-xxx ++;
-if (xxx > 500)
-vehicleModel->m_inputs.m_tiltValue = -1;
+//static int xxx;
+//xxx ++;
+//if (xxx > 500)
+//vehicleModel->m_inputs.m_tiltValue = -1;
 
 		dFloat tiltAngle = vehicleModel->m_tiltAngle;
 		if (vehicleModel->m_inputs.m_tiltValue > 0) {
@@ -534,6 +534,8 @@ vehicleModel->m_inputs.m_tiltValue = -1;
 		com.m_y -= 0.25f;
 		NewtonBodySetCentreOfMass(rootBody, &com[0]);
 
+NewtonBodySetMassMatrix(rootBody, 0,0,0,0);
+
 		// add the root bone to the articulation manager
 		CustomArticulatedTransformController::dSkeletonBone* const bone = controller->AddBone (rootBody, GetIdentityMatrix());
 		// save the bone as the shape use data for self collision test
@@ -767,7 +769,6 @@ static void LoadLumberYardMesh (DemoEntityManager* const scene, const DemoEntity
 
 void ArticulatedJoints (DemoEntityManager* const scene)
 {
-/*
 	// load the sky box
 	scene->CreateSkyBox();
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
@@ -800,7 +801,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	origin.m_y += 5.0f;
 	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -30.0f * 3.141592f / 180.0f);  
 	scene->SetCameraMatrix(rot, origin);
-*/
+
 }
 
 

@@ -110,7 +110,8 @@ void CustomHingeActuator::SubmitConstraints (dFloat timestep, int threadIndex)
 		dMatrix matrix1;
 
 		CalculateGlobalMatrix (matrix0, matrix1);
-		dFloat relAngle = m_angle - GetJointAngle();
+		dFloat jointangle = GetJointAngle();
+		dFloat relAngle = m_angle - jointangle;
 		NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix0.m_front[0]);
 
 		dFloat step = m_angularRate * timestep;
