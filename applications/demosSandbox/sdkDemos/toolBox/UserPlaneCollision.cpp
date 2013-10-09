@@ -22,6 +22,8 @@
 
 #define MAX_THREAD_FACES	32
 
+//#define PASS_A_QUAD
+
 class dInfinitePlane
 {
 	dInfinitePlane (NewtonWorld* const world, const dVector& plane)
@@ -38,6 +40,9 @@ class dInfinitePlane
 
 		// save the plane in local space
 		m_plane = m_rotation.UntransformPlane (plane);
+
+#ifdef PASS_A_QUAD
+		// passing a single quad	
 		for (int i = 0; i < MAX_THREAD_FACES; i ++) {
 			m_faceIndices[i] = 4;
 			// face attribute
@@ -54,8 +59,60 @@ class dInfinitePlane
 				m_indexArray[i][j + 4 + 2] = 4;
 			}
 		}
+#else
+		// passing two trinagle	
+		for (int i = 0; i < MAX_THREAD_FACES; i ++) {
+			// first triangle
+			{
+				// index count
+				m_faceIndices[i][0] = 3;
+				
+				// face indices
+				m_indexArray[i][0] = 0;
+				m_indexArray[i][1] = 1;
+				m_indexArray[i][2] = 2;
 
+				// face attribute
+				m_indexArray[i][3] = 0;
 
+				// face normal
+				m_indexArray[i][4] = 4;
+
+				// face adjacent index (infinite plane does not have shared edge with other faces)
+				m_indexArray[i][5] = 4;
+				m_indexArray[i][6] = 4;
+				m_indexArray[i][7] = 4;
+
+				// face area (the plane is clipped around the box, the face size is always optimal)
+				m_indexArray[i][8] = 0;
+			}
+
+			// secund triangle
+			{
+				// index count
+				m_faceIndices[i][1] = 3;
+				
+				// face indices
+				m_indexArray[i][0 + 9] = 0;
+				m_indexArray[i][1 + 9] = 2;
+				m_indexArray[i][2 + 9] = 3;
+
+				// face attribute
+				m_indexArray[i][3 + 9] = 0;
+
+				// face normal
+				m_indexArray[i][4 + 9] = 4;
+
+				// face adjacent index (infinite plane does not have shared edge with other faces)
+				m_indexArray[i][5 + 9] = 4;
+				m_indexArray[i][6 + 9] = 4;
+				m_indexArray[i][7 + 9] = 4;
+
+				// face area (the plane is clipped around the box, the face size is always optimal)
+				m_indexArray[i][8 + 9] = 0;
+			}
+		}
+#endif
 		// the box is define in local space 
 		dVector minBox (-0.1f, -2000.0f, -2000.0f);
 		dVector maxBox ( 0.1f,  2000.0f,  2000.0f);
@@ -173,9 +230,13 @@ class dInfinitePlane
 			dInt32 threadNumber = collideDesc->m_threadNumber;
 
 			// initialize the callback data structure
+#ifdef PASS_A_QUAD
 			collideDesc->m_faceCount = 1;
+#else
+			collideDesc->m_faceCount = 2;
+#endif
 			collideDesc->m_vertexStrideInBytes = sizeof (dVector);
-			collideDesc->m_faceIndexCount = &me->m_faceIndices[threadNumber];
+			collideDesc->m_faceIndexCount = &me->m_faceIndices[threadNumber][0];
 			collideDesc->m_faceVertexIndex = &me->m_indexArray[threadNumber][0];
 			collideDesc->m_vertex = &me->m_collisionVertex[threadNumber][0][0];
 			dVector* const polygon = &me->m_collisionVertex[threadNumber][0];
@@ -286,8 +347,9 @@ class dInfinitePlane
 	dVector m_unitSphape[4];
 
 	// this is local per thread data 
-	dInt32 m_faceIndices[MAX_THREAD_FACES];
-	dInt32 m_indexArray[MAX_THREAD_FACES][4 + 4 + 3]; // 4 indices + 1 attribute + 1 index normal + 4 adjacent edge normals + 1 face diagonal size = 11 indices
+	dInt32 m_faceIndices[MAX_THREAD_FACES][2];
+//	dInt32 m_indexArray[MAX_THREAD_FACES][4 + 4 + 3]; // 4 indices + 1 attribute + 1 index normal + 4 adjacent edge normals + 1 face diagonal size = 11 indices
+	dInt32 m_indexArray[MAX_THREAD_FACES][2 * 9]; // 2 trinagles of (3 indices + 1 attribute + 1 index normal + 3 adjacent edge normals + 1 face diagonal size) = 9 * 2indices
 	dVector m_collisionVertex[MAX_THREAD_FACES][5];   // 4 vertex + 1 face normal
 };
 
