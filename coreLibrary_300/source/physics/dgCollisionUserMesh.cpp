@@ -158,7 +158,7 @@ void dgCollisionUserMesh::GetCollidingFaces (dgPolygonMeshDesc* const data) cons
 			const dgInt32* const indexArray = &indices[faceIndexCount1]; 
 
 			dgInt32 normalIndex = data->GetNormalIndex (indexArray, indexCount);
-			const dgVector& faceNormal = vertex[normalIndex * stride];
+			dgVector faceNormal (&vertex[normalIndex * stride]);
 			dgFloat32 dist = data->PolygonBoxDistance (faceNormal, indexCount, indexArray, stride, vertex);
 
 			const dgInt32 faceIndexCount = data->GetFaceIndexCount(indexCount); 
