@@ -130,9 +130,9 @@ void CustomHinge::ProjectError () const
 	const dMatrix& identity = GetIdentityMatrix();
 	dMatrix angleMatrix (identity);
 	angleMatrix[1][1] = cosAngle;
-	angleMatrix[1][2] = sinAngle;
+	angleMatrix[1][2] = -sinAngle;
 	angleMatrix[2][2] = cosAngle;
-	angleMatrix[2][1] = -sinAngle;
+	angleMatrix[2][1] = sinAngle;
 
 	dMatrix expectedMatrix0 (angleMatrix * matrix1);
 	dMatrix errorMatrix (matrix0 * expectedMatrix0.Inverse());
