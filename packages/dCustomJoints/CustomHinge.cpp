@@ -101,8 +101,8 @@ dFloat CustomHinge::GetFriction () const
 
 void CustomHinge::CalculatePitchAngle (const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const
 {
-	sinAngle = (matrix1.m_up * matrix0.m_up) % matrix1.m_front;
-	cosAngle = matrix1.m_up % matrix0.m_up;
+	sinAngle = (matrix0.m_up * matrix1.m_up) % matrix1.m_front;
+	cosAngle = matrix0.m_up % matrix1.m_up;
 }
 
 
@@ -217,6 +217,7 @@ void CustomHinge::SubmitConstraints (dFloat timestep, int threadIndex)
 	if (m_limitsOn) {
 		// the joint angle can be determine by getting the angle between any two non parallel vectors
 		if (m_curJointAngle.m_angle < m_minAngle) {
+
 			dFloat relAngle = m_curJointAngle.m_angle - m_minAngle;
 			// the angle was clipped save the new clip limit
 			m_curJointAngle.m_angle = m_minAngle;
@@ -232,6 +233,7 @@ void CustomHinge::SubmitConstraints (dFloat timestep, int threadIndex)
 
 
 		} else if (m_curJointAngle.m_angle  > m_maxAngle) {
+
 			dFloat relAngle = m_curJointAngle.m_angle - m_maxAngle;
 
 			// the angle was clipped save the new clip limit
