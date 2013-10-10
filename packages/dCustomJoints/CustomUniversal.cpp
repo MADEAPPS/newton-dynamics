@@ -145,14 +145,18 @@ dVector CustomUniversal::GetPinAxis_1 () const
 
 void CustomUniversal::CalculatePitchAngle (const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const
 {
-	sinAngle = (matrix1.m_up * matrix0.m_up) % matrix0.m_front;
-	cosAngle = matrix1.m_up % matrix0.m_up;
+//	sinAngle = (matrix1.m_up * matrix0.m_up) % matrix0.m_front;
+//	cosAngle = matrix1.m_up % matrix0.m_up;
+	sinAngle = (matrix0.m_up * matrix1.m_up) % matrix1.m_front;
+	cosAngle = matrix0.m_up % matrix1.m_up;
 }
 
 void CustomUniversal::CalculateYawAngle (const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const
 {
-	sinAngle = (matrix1.m_front * matrix0.m_front) % matrix1.m_up;
-	cosAngle = matrix1.m_front % matrix0.m_front;
+//	sinAngle = (matrix1.m_front * matrix0.m_front) % matrix1.m_up;
+//	cosAngle = matrix1.m_front % matrix0.m_front;
+	sinAngle = (matrix0.m_front * matrix1.m_front) % matrix1.m_up;
+	cosAngle = matrix0.m_front % matrix1.m_front;
 }
 
 
@@ -178,9 +182,9 @@ void CustomUniversal::ProjectError () const
 	
 	dMatrix angleMatrix0 (identity);
 	angleMatrix0[1][1] = cosAngle_0;
-	angleMatrix0[1][2] = sinAngle_0;
+	angleMatrix0[1][2] = -sinAngle_0;
 	angleMatrix0[2][2] = cosAngle_0;
-	angleMatrix0[2][1] = -sinAngle_0;
+	angleMatrix0[2][1] = sinAngle_0;
 
 	dFloat sinAngle_1;
 	dFloat cosAngle_1;
@@ -191,9 +195,9 @@ void CustomUniversal::ProjectError () const
 
 	dMatrix angleMatrix1 (identity);
 	angleMatrix1[0][0] = cosAngle_1;
-	angleMatrix1[0][2] = -sinAngle_1;
+	angleMatrix1[0][2] = sinAngle_1;
 	angleMatrix1[2][2] = cosAngle_1;
-	angleMatrix1[2][0] = sinAngle_1;
+	angleMatrix1[2][0] = -sinAngle_1;
 
 	dMatrix offsetMatrix (angleMatrix0 * angleMatrix1);
 	dMatrix expectedMatrix0 (offsetMatrix * matrix1);
@@ -290,7 +294,7 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 	// check is the joint limit are enable
 	if (m_limit_0_On) {
 		if (m_curJointAngle_0.m_angle < m_minAngle_0) {
-			dFloat relAngle = m_minAngle_0 - m_curJointAngle_0.m_angle;
+			dFloat relAngle = m_curJointAngle_0.m_angle - m_minAngle_0;
 
 			// tell joint error will minimize the exceeded angle error
 			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix0.m_front[0]);
@@ -302,7 +306,7 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 			NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
 
 		} else if (m_curJointAngle_0.m_angle > m_maxAngle_0) {
-			dFloat relAngle = m_maxAngle_0 - m_curJointAngle_0.m_angle;
+			dFloat relAngle = m_curJointAngle_0.m_angle - m_maxAngle_0;
 
 			// tell joint error will minimize the exceeded angle error
 			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix0.m_front[0]);
@@ -330,7 +334,7 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 	// if limit are enable ...
 	if (m_limit_1_On) {
 		if (m_curJointAngle_1.m_angle < m_minAngle_1) {
-			dFloat relAngle = m_minAngle_1 - m_curJointAngle_1.m_angle;
+			dFloat relAngle = m_curJointAngle_1.m_angle - m_minAngle_1;
 
 			// tell joint error will minimize the exceeded angle error
 			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix1.m_up[0]);
@@ -342,7 +346,7 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 			NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
 
 		} else if (m_curJointAngle_1.m_angle > m_maxAngle_1) {
-			dFloat relAngle = m_maxAngle_1 - m_curJointAngle_1.m_angle;
+			dFloat relAngle = m_curJointAngle_1.m_angle - m_maxAngle_1;
 			
 			// tell joint error will minimize the exceeded angle error
 			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix1.m_up[0]);
