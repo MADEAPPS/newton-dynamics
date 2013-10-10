@@ -145,18 +145,14 @@ dVector CustomUniversal::GetPinAxis_1 () const
 
 void CustomUniversal::CalculatePitchAngle (const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const
 {
-//	dFloat sinAngle_0 = (matrix0.m_up * matrix1.m_up) % matrix0.m_front;
-//	dFloat cosAngle_0 = matrix0.m_up % matrix1.m_up;
-	sinAngle = (matrix0.m_up * matrix1.m_up) % matrix0.m_front;
-	cosAngle = matrix0.m_up % matrix1.m_up;
+	sinAngle = (matrix1.m_up * matrix0.m_up) % matrix0.m_front;
+	cosAngle = matrix1.m_up % matrix0.m_up;
 }
 
 void CustomUniversal::CalculateYawAngle (const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const
 {
-//	dFloat sinAngle_1 = (matrix0.m_front * matrix1.m_front) % matrix1.m_up;
-//	dFloat cosAngle_1 = matrix0.m_front % matrix1.m_front;
-	sinAngle = (matrix0.m_front * matrix1.m_front) % matrix0.m_up;
-	cosAngle = matrix0.m_front % matrix1.m_front;
+	sinAngle = (matrix1.m_front * matrix0.m_front) % matrix1.m_up;
+	cosAngle = matrix1.m_front % matrix0.m_front;
 }
 
 

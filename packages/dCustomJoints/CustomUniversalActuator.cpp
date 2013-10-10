@@ -159,6 +159,7 @@ void CustomUniversalActuator::GetInfo (NewtonJointRecord* const info) const
 
 void CustomUniversalActuator::SubmitConstraints (dFloat timestep, int threadIndex)
 {
+
 	CustomUniversal::SubmitConstraints (timestep, threadIndex);
 
 	if (m_flag0 | m_flag1){
@@ -167,26 +168,29 @@ void CustomUniversalActuator::SubmitConstraints (dFloat timestep, int threadInde
 
 		CalculateGlobalMatrix (matrix0, matrix1);
 		if (m_flag0) {
-			dFloat angle = GetJointAngle_0();
-			dFloat relAngle = m_angle0 - angle;
+			dFloat jointAngle = GetJointAngle_0();
+			dFloat relAngle = m_angle0 - jointAngle;
 			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix0.m_front[0]);
 			dFloat step = m_angularRate0 * timestep;
 			if (dAbs (relAngle) > 2.0f * dAbs (step)) {
-				dFloat speed = GetJointOmega_0 ();
-				dFloat accel = (relAngle >= 0.0f) ? (m_angularRate0 - speed) / timestep : -(m_angularRate0 + speed) / timestep;
+				dFloat desiredSpeed = dSign(relAngle) * m_angularRate0;
+				dFloat currentSpeed = GetJointOmega_0 ();
+				dFloat accel = (desiredSpeed - currentSpeed) / timestep;
 				NewtonUserJointSetRowAcceleration (m_joint, accel);
+
 			}
 			NewtonUserJointSetRowStiffness (m_joint, 1.0f);
 		}
 
 		if (m_flag1) {
-			dFloat angle = GetJointAngle_1();
-			dFloat relAngle = m_angle1 - angle;
+			dFloat jointAngle = GetJointAngle_1();
+			dFloat relAngle = m_angle1 - jointAngle;
 			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix1.m_up[0]);
 			dFloat step = m_angularRate1 * timestep;
 			if (dAbs (relAngle) > 2.0f * dAbs (step)) {
-				dFloat speed = GetJointOmega_1 ();
-				dFloat accel = (relAngle >= 0.0f) ? (m_angularRate1 - speed) / timestep : -(m_angularRate1 + speed) / timestep;
+				dFloat desiredSpeed = dSign(relAngle) * m_angularRate1;
+				dFloat currentSpeed = GetJointOmega_1 ();
+				dFloat accel = (desiredSpeed - currentSpeed) / timestep;
 				NewtonUserJointSetRowAcceleration (m_joint, accel);
 			}
 			NewtonUserJointSetRowStiffness (m_joint, 1.0f);

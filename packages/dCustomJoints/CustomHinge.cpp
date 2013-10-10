@@ -108,6 +108,7 @@ void CustomHinge::CalculatePitchAngle (const dMatrix& matrix0, const dMatrix& ma
 
 void CustomHinge::ProjectError () const
 {
+return ;
 	dMatrix body0Matrix;
 	dMatrix body1Matrix;
 
@@ -119,6 +120,7 @@ void CustomHinge::ProjectError () const
 
 	dFloat sinAngle;
 	dFloat cosAngle;
+
 	CalculatePitchAngle (matrix0, matrix1, sinAngle, cosAngle);
 	dFloat angleMag = 1.0f / dSqrt (sinAngle * sinAngle + cosAngle * cosAngle);
 	sinAngle *= angleMag;

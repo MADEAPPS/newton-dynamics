@@ -104,7 +104,7 @@ void CustomArticulatedTransformController::PostUpdate(dFloat timestep, int threa
 			for (NewtonJoint* joint = NewtonBodyGetFirstJoint(child); joint; joint = NewtonBodyGetNextJoint(child, joint)) {
 				if ((NewtonJointGetBody0(joint) == parent) || (NewtonJointGetBody1(joint) == parent)) {
 					CustomJoint* const cJoint = (CustomJoint*) NewtonJointGetUserData(joint);
-//					cJoint->ProjectError ();
+					cJoint->ProjectError ();
 					break;
 				}
 			}
