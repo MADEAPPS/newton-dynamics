@@ -55,12 +55,12 @@ static ARTICULATED_VEHICLE_DEFINITION forkliftDefinition[] =
 	{"fl_tire",		"tireShape",			 50.0f, ARTICULATED_VEHICLE_DEFINITION::m_tireID, "frontTire"},
 	{"rr_tire",		"tireShape",			 50.0f, ARTICULATED_VEHICLE_DEFINITION::m_tireID, "rearTire"},
 	{"rl_tire",		"tireShape",			 50.0f, ARTICULATED_VEHICLE_DEFINITION::m_tireID, "rearTire"},
-//	{"lift_1",		"convexHull",			 50.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "hingeActuator"},
-//	{"lift_2",		"convexHull",			 40.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
-//	{"lift_3",		"convexHull",			 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
-//	{"lift_4",		"convexHull",			 20.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
-//	{"left_teeth",  "convexHullAggregate",	 10.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
-//	{"right_teeth", "convexHullAggregate",	 10.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
+	{"lift_1",		"convexHull",			 50.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "hingeActuator"},
+	{"lift_2",		"convexHull",			 40.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
+	{"lift_3",		"convexHull",			 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
+	{"lift_4",		"convexHull",			 20.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
+	{"left_teeth",  "convexHullAggregate",	 10.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
+	{"right_teeth", "convexHullAggregate",	 10.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
 };
 
 
@@ -230,91 +230,100 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)controller->GetUserData();
 
 		// apply engine torque
-		dFloat brakeTorque = 0.0f;
-		dFloat engineTorque = 0.0f;
-		if (vehicleModel->m_inputs.m_throttleValue > 0) {
-			engineTorque = -vehicleModel->m_maxEngineTorque; 
-		} else if (vehicleModel->m_inputs.m_throttleValue < 0) {
-			engineTorque = vehicleModel->m_maxEngineTorque; 
-		} else {
-			brakeTorque = 1000.0f;
-		}
-		vehicleModel->m_frontTireJoints[0]->SetFriction(brakeTorque);
-		vehicleModel->m_frontTireJoints[1]->SetFriction(brakeTorque);
+		if (vehicleModel->m_frontTiresCount) {
+			dFloat brakeTorque = 0.0f;
+			dFloat engineTorque = 0.0f;
+			if (vehicleModel->m_inputs.m_throttleValue > 0) {
+				engineTorque = -vehicleModel->m_maxEngineTorque; 
+			} else if (vehicleModel->m_inputs.m_throttleValue < 0) {
+				engineTorque = vehicleModel->m_maxEngineTorque; 
+			} else {
+				brakeTorque = 1000.0f;
+			}
+			vehicleModel->m_frontTireJoints[0]->SetFriction(brakeTorque);
+			vehicleModel->m_frontTireJoints[1]->SetFriction(brakeTorque);
 
-		dMatrix matrix;
-		NewtonBody* const rootBody = controller->GetBoneBody(0);
-		NewtonBodyGetMatrix(rootBody, &matrix[0][0]);
-		
-		dVector tirePing (matrix.RotateVector(dVector (0.0, 0.0, 1.0, 0.0)));
-		if (engineTorque != 0.0f) {
-			dVector torque (tirePing.Scale(engineTorque));
-			NewtonBodyAddTorque (vehicleModel->m_fronTires[0], &torque[0]);
-			NewtonBodyAddTorque (vehicleModel->m_fronTires[1], &torque[0]);
-		}
+			dMatrix matrix;
+			NewtonBody* const rootBody = controller->GetBoneBody(0);
+			NewtonBodyGetMatrix(rootBody, &matrix[0][0]);
+			
+			dVector tirePing (matrix.RotateVector(dVector (0.0, 0.0, 1.0, 0.0)));
+			if (engineTorque != 0.0f) {
+				dVector torque (tirePing.Scale(engineTorque));
+				NewtonBodyAddTorque (vehicleModel->m_fronTires[0], &torque[0]);
+				NewtonBodyAddTorque (vehicleModel->m_fronTires[1], &torque[0]);
+			}
 
-		for (int i = 0; i < vehicleModel->m_frontTiresCount; i ++) {
-			dVector omega;
-			NewtonBodyGetOmega(vehicleModel->m_fronTires[i], &omega[0]);
-			dFloat omegaMag = omega % tirePing;
-			dFloat sign = (omegaMag >= 0.0f) ? 1.0 : -1.0f;
-			omega -= tirePing.Scale(sign * omegaMag * omegaMag * vehicleModel->m_omegaResistance);
-			NewtonBodySetOmega(vehicleModel->m_fronTires[i], &omega[0]);
-		}
-
-
-		dFloat steeringAngle = vehicleModel->m_rearTireJoints[0]->GetActuatorAngle1();
-		if (vehicleModel->m_inputs.m_steerValue > 0) {
-			steeringAngle = vehicleModel->m_rearTireJoints[0]->GetMinAngularLimit0(); 
-		} else if (vehicleModel->m_inputs.m_steerValue < 0) {
-			steeringAngle = vehicleModel->m_rearTireJoints[0]->GetMaxAngularLimit0(); 
-		}
-		for (int i = 0; i < vehicleModel->m_rearTiresCount; i ++) {
-			vehicleModel->m_rearTireJoints[i]->SetTargetAngle1(steeringAngle);
+			for (int i = 0; i < vehicleModel->m_frontTiresCount; i ++) {
+				dVector omega;
+				NewtonBodyGetOmega(vehicleModel->m_fronTires[i], &omega[0]);
+				dFloat omegaMag = omega % tirePing;
+				dFloat sign = (omegaMag >= 0.0f) ? 1.0 : -1.0f;
+				omega -= tirePing.Scale(sign * omegaMag * omegaMag * vehicleModel->m_omegaResistance);
+				NewtonBodySetOmega(vehicleModel->m_fronTires[i], &omega[0]);
+			}
 		}
 
-/*
+		// update steering wheels
+		if (vehicleModel->m_rearTiresCount) {
+			dFloat steeringAngle = vehicleModel->m_rearTireJoints[0]->GetActuatorAngle1();
+			if (vehicleModel->m_inputs.m_steerValue > 0) {
+				steeringAngle = vehicleModel->m_rearTireJoints[0]->GetMinAngularLimit0(); 
+			} else if (vehicleModel->m_inputs.m_steerValue < 0) {
+				steeringAngle = vehicleModel->m_rearTireJoints[0]->GetMaxAngularLimit0(); 
+			}
+			for (int i = 0; i < vehicleModel->m_rearTiresCount; i ++) {
+				vehicleModel->m_rearTireJoints[i]->SetTargetAngle1(steeringAngle);
+			}
+		}
+
+
 		// set the tilt angle
-		dFloat tiltAngle = vehicleModel->m_tiltAngle;
-		if (vehicleModel->m_inputs.m_tiltValue > 0) {
-			tiltAngle = vehicleModel->m_angularActuator->GetMinAngularLimit();
-			vehicleModel->m_tiltAngle = vehicleModel->m_angularActuator->GetActuatorAngle();
-		} else if (vehicleModel->m_inputs.m_tiltValue < 0) {
-			tiltAngle = vehicleModel->m_angularActuator->GetMaxAngularLimit();
-			vehicleModel->m_tiltAngle = vehicleModel->m_angularActuator->GetActuatorAngle();
-		}
+		if (vehicleModel->m_angularActuatorsCount) {
+			dFloat tiltAngle = vehicleModel->m_tiltAngle;
+			if (vehicleModel->m_inputs.m_tiltValue > 0) {
+				tiltAngle = vehicleModel->m_angularActuator[0]->GetMinAngularLimit();
+				vehicleModel->m_tiltAngle = vehicleModel->m_angularActuator[0]->GetActuatorAngle();
+			} else if (vehicleModel->m_inputs.m_tiltValue < 0) {
+				tiltAngle = vehicleModel->m_angularActuator[0]->GetMaxAngularLimit();
+				vehicleModel->m_tiltAngle = vehicleModel->m_angularActuator[0]->GetActuatorAngle();
+			}
 
-		for (int i = 0; i < vehicleModel->m_angularActuatorsCount; i ++) {
-			vehicleModel->m_angularActuator[i]->SetTargetAngle (tiltAngle);
+			for (int i = 0; i < vehicleModel->m_angularActuatorsCount; i ++) {
+				vehicleModel->m_angularActuator[i]->SetTargetAngle (tiltAngle);
+			}
 		}
 
 
 		// set the lift position
-		dFloat liftPosit = vehicleModel->m_liftPosit;
-		if (vehicleModel->m_inputs.m_liftValue > 0) {
-			liftPosit = vehicleModel->m_liftJoints[0]->GetMinPositLimit();
-			vehicleModel->m_liftPosit = vehicleModel->m_liftJoints[0]->GetActuatorPosit();
-		} else if (vehicleModel->m_inputs.m_liftValue < 0) {
-			liftPosit = vehicleModel->m_liftJoints[0]->GetMaxPositLimit();
-			vehicleModel->m_liftPosit = vehicleModel->m_liftJoints[0]->GetActuatorPosit();
-		}
-		for (int i = 0; i < sizeof (vehicleModel->m_liftJoints) / sizeof (vehicleModel->m_liftJoints[0]); i ++) {
-			vehicleModel->m_liftJoints[i]->SetTargetPosit(liftPosit);
+		if (vehicleModel->m_liftActuatorsCount) {
+			dFloat liftPosit = vehicleModel->m_liftPosit;
+			if (vehicleModel->m_inputs.m_liftValue > 0) {
+				liftPosit = vehicleModel->m_liftJoints[0]->GetMinPositLimit();
+				vehicleModel->m_liftPosit = vehicleModel->m_liftJoints[0]->GetActuatorPosit();
+			} else if (vehicleModel->m_inputs.m_liftValue < 0) {
+				liftPosit = vehicleModel->m_liftJoints[0]->GetMaxPositLimit();
+				vehicleModel->m_liftPosit = vehicleModel->m_liftJoints[0]->GetActuatorPosit();
+			}
+			for (int i = 0; i < vehicleModel->m_liftActuatorsCount; i ++) {
+				vehicleModel->m_liftJoints[i]->SetTargetPosit(liftPosit);
+			}
 		}
 
 		// open Close palette position
-		dFloat openPosit = vehicleModel->m_openPosit;
-		if (vehicleModel->m_inputs.m_openValue > 0) {
-			openPosit = vehicleModel->m_paletteJoints[0]->GetMinPositLimit();
-			vehicleModel->m_openPosit = vehicleModel->m_paletteJoints[0]->GetActuatorPosit();
-		} else if (vehicleModel->m_inputs.m_openValue < 0) {
-			openPosit = vehicleModel->m_paletteJoints[0]->GetMaxPositLimit();
-			vehicleModel->m_openPosit = vehicleModel->m_paletteJoints[0]->GetActuatorPosit();
+		if (vehicleModel->m_paletteActuatorsCount) {
+			dFloat openPosit = vehicleModel->m_openPosit;
+			if (vehicleModel->m_inputs.m_openValue > 0) {
+				openPosit = vehicleModel->m_paletteJoints[0]->GetMinPositLimit();
+				vehicleModel->m_openPosit = vehicleModel->m_paletteJoints[0]->GetActuatorPosit();
+			} else if (vehicleModel->m_inputs.m_openValue < 0) {
+				openPosit = vehicleModel->m_paletteJoints[0]->GetMaxPositLimit();
+				vehicleModel->m_openPosit = vehicleModel->m_paletteJoints[0]->GetActuatorPosit();
+			}
+			for (int i = 0; i < vehicleModel->m_paletteActuatorsCount; i ++) {
+				vehicleModel->m_paletteJoints[i]->SetTargetPosit(openPosit);
+			}
 		}
-		for (int i = 0; i < sizeof (vehicleModel->m_paletteJoints) / sizeof (vehicleModel->m_paletteJoints[0]); i ++) {
-			vehicleModel->m_paletteJoints[i]->SetTargetPosit(openPosit);
-		}
-*/
 	}
 
 	static int OnBoneAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
@@ -643,8 +652,8 @@ class AriculatedJointInputManager: public CustomInputManager
 			NewtonBodySetSleepState(body, false);
 		}
 
-NewtonBody* const body = m_player->GetBoneBody(0);
-NewtonBodySetSleepState(body, false);
+//NewtonBody* const body = m_player->GetBoneBody(0);
+//NewtonBodySetSleepState(body, false);
 
 #if 0
 	#if 0
@@ -783,7 +792,6 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 
 	// load a the mesh of the articulate vehicle
 	ArticulatedEntityModel forkliffModel(scene, "forklift.ngd");
-//	ArticulatedEntityModel forkliffModel(scene, "forklift__.ngd");
 
 	// add an input Manage to manage the inputs and user interaction 
 	AriculatedJointInputManager* const inputManager = new AriculatedJointInputManager (scene);
@@ -796,19 +804,18 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 
 	dMatrix matrix (GetIdentityMatrix());
 	matrix.m_posit = FindFloor (world, origin, 100.0f);
-	matrix.m_posit.m_y += 3.0f;
+	matrix.m_posit.m_y += 0.75f;
 	inputManager->AddPlayer (vehicleManager->CreateForklift (matrix, &forkliffModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition));
 
 
 	// add some object to play with
-//	DemoEntity entity (GetIdentityMatrix(), NULL);
-//	entity.LoadNGD_mesh ("lumber.ngd", scene->GetNewton());
-//	LoadLumberYardMesh (scene, entity, dVector(10.0f, 0.0f, 0.0f, 0.0f));
+	DemoEntity entity (GetIdentityMatrix(), NULL);
+	entity.LoadNGD_mesh ("lumber.ngd", scene->GetNewton());
+	LoadLumberYardMesh (scene, entity, dVector(10.0f, 0.0f, 0.0f, 0.0f));
 	
 	origin.m_x -= 5.0f;
 	origin.m_y += 5.0f;
-//	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -30.0f * 3.141592f / 180.0f);  
-	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -90.0f * 3.141592f / 180.0f);  
+	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -30.0f * 3.141592f / 180.0f);  
 	scene->SetCameraMatrix(rot, origin);
 
 }

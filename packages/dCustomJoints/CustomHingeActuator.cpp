@@ -103,7 +103,6 @@ void CustomHingeActuator::GetInfo (NewtonJointRecord* const info) const
 
 void CustomHingeActuator::SubmitConstraints (dFloat timestep, int threadIndex)
 {
-dAssert (0);
 	CustomHinge::SubmitConstraints (timestep, threadIndex);
 
 	if (m_flag) {

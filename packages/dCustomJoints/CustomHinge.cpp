@@ -108,7 +108,6 @@ void CustomHinge::CalculatePitchAngle (const dMatrix& matrix0, const dMatrix& ma
 
 void CustomHinge::ProjectError () const
 {
-return ;
 	dMatrix body0Matrix;
 	dMatrix body1Matrix;
 
