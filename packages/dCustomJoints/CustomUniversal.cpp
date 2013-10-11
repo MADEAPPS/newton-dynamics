@@ -281,10 +281,12 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 	CalculateYawAngle (matrix0, matrix1, sinAngle_1, cosAngle_1);
 	m_curJointAngle_1.CalculateJointAngle (cosAngle_1, sinAngle_1);
 
-	dVector omega0 (0.0f, 0.0f, 0.0f);
-	dVector omega1 (0.0f, 0.0f, 0.0f);
+	dVector omega0 (0.0f, 0.0f, 0.0f, 0.0f);
+	dVector omega1 (0.0f, 0.0f, 0.0f, 0.0f);
 	NewtonBodyGetOmega(m_body0, &omega0[0]);
-	NewtonBodyGetOmega(m_body1, &omega1[0]);
+	if (m_body1) {
+		NewtonBodyGetOmega(m_body1, &omega1[0]);
+	}
 
 	// calculate the desired acceleration
 	dVector relOmega (omega0 - omega1);
