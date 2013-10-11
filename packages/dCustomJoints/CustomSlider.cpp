@@ -52,9 +52,6 @@ void CustomSlider::EnableLimits(bool state)
 
 void CustomSlider::SetLimis(dFloat minDist, dFloat maxDist)
 {
-//	dAssert (minDist < 0.0f);
-//	dAssert (maxDist > 0.0f);
-
 	m_minDist = minDist;
 	m_maxDist = maxDist;
 }

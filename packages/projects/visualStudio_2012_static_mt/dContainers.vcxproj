@@ -189,6 +189,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\dContainers\dBaseHierarchy.cpp" />
     <ClCompile Include="..\..\dContainers\dClassInfo.cpp" />
+    <ClCompile Include="..\..\dContainers\dContainersAlloc.cpp" />
     <ClCompile Include="..\..\dContainers\dContainersStdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -203,6 +204,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\dContainers\dBaseHierarchy.h" />
     <ClInclude Include="..\..\dContainers\dClassInfo.h" />
+    <ClInclude Include="..\..\dContainers\dContainersAlloc.h" />
     <ClInclude Include="..\..\dContainers\dContainersStdAfx.h" />
     <ClInclude Include="..\..\dContainers\dCRC.h" />
     <ClInclude Include="..\..\dContainers\dHeap.h" />

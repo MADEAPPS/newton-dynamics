@@ -116,9 +116,6 @@ void CustomHingeActuator::SubmitConstraints (dFloat timestep, int threadIndex)
 
 		dFloat step = m_angularRate * timestep;
 		if (dAbs (relAngle) > 2.0f * dAbs (step)) {
-//			dFloat speed0 = dClamp (relAngle / timestep, -m_angularRate, m_angularRate);
-//			dFloat speed1 = GetJointOmega ();
-//			dFloat accel = (speed0 - speed1) / timestep;
 			dFloat desiredSpeed = dSign(relAngle) * m_angularRate;
 			dFloat currentSpeed = GetJointOmega ();
 			dFloat accel = (desiredSpeed - currentSpeed) / timestep;
