@@ -148,12 +148,13 @@ void dgCollisionUserMesh::GetCollidingFaces (dgPolygonMeshDesc* const data) cons
 		dgFloat32* const vertex = data->m_vertex;
 		dgInt32* const address = data->m_meshData.m_globalFaceIndexStart;
 		dgFloat32* const hitDistance = data->m_meshData.m_globalHitDistance;
-		dgInt32* const indices = data->m_faceVertexIndex;
+		const dgInt32* const srcIndices = data->m_faceVertexIndex;
+		dgInt32* const dstIndices = data->m_globalFaceVertexIndex;
 		dgInt32* const faceIndexCountArray = data->m_faceIndexCount; 
 
-		for (dgInt32 i = 0; i < data->m_faceCount; i ++) {
+		for (dgInt32 i = 0; (i < data->m_faceCount) && (faceIndexCount0 < (DG_MAX_COLLIDING_INDICES - 32)); i ++) {
 			dgInt32 indexCount = faceIndexCountArray[i];
-			const dgInt32* const indexArray = &indices[faceIndexCount1]; 
+			const dgInt32* const indexArray = &srcIndices[faceIndexCount1]; 
 
 			dgInt32 normalIndex = data->GetNormalIndex (indexArray, indexCount);
 			dgVector faceNormal (&vertex[normalIndex * stride]);
@@ -164,7 +165,8 @@ void dgCollisionUserMesh::GetCollidingFaces (dgPolygonMeshDesc* const data) cons
 				hitDistance[faceCount0] = dist;
 				address[faceCount0] = faceIndexCount0;
 				faceIndexCountArray[faceCount0] = indexCount;
-				memcpy (&indices[faceIndexCount0], indexArray, faceIndexCount * sizeof (dgInt32));
+				//memcpy (&srcIndices[faceIndexCount0], indexArray, faceIndexCount * sizeof (dgInt32));
+				memcpy (&dstIndices[faceIndexCount0], indexArray, faceIndexCount * sizeof (dgInt32));
 				faceCount0 ++;
 				faceIndexCount0 += faceIndexCount;
 			}
@@ -176,6 +178,7 @@ void dgCollisionUserMesh::GetCollidingFaces (dgPolygonMeshDesc* const data) cons
 			data->m_faceCount = faceCount0;
 			data->m_faceIndexStart = address;
 			data->m_hitDistance = hitDistance;
+			data->m_faceVertexIndex = dstIndices;
 
 			if (GetDebugCollisionCallback()) { 
 				dgTriplex triplex[32];
