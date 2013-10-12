@@ -27,7 +27,7 @@ class CustomSliderActuator: public CustomSlider
 	NEWTON_API CustomSliderActuator (const dMatrix& pinAndPivotFrame, dFloat speed, dFloat minPosit, dFloat maxPosit, NewtonBody* const child, NewtonBody* const parent = NULL);
 	NEWTON_API virtual ~CustomSliderActuator();
 
-	NEWTON_API bool GetEnableFlag (bool flag) const;
+	NEWTON_API bool GetEnableFlag () const;
 	NEWTON_API void SetEnableFlag (bool flag);
 
 	NEWTON_API dFloat GetActuatorPosit() const;

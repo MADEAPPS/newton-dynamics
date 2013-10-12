@@ -38,7 +38,7 @@ CustomHingeActuator::~CustomHingeActuator()
 {
 }
 
-bool CustomHingeActuator::GetEnableFlag (bool flag) const
+bool CustomHingeActuator::GetEnableFlag () const
 {
 	return m_flag;
 }

@@ -67,9 +67,12 @@
 #include <CustomHinge.h>
 #include <CustomSlider.h>
 #include <CustomUniversal.h>
-#include <CustomBallAndSocket.h>
 #include <CustomInputManager.h>
+#include <CustomBallAndSocket.h>
+#include <CustomHingeActuator.h>
+#include <CustomSliderActuator.h>
 #include <CustomTriggerManager.h>
+#include <CustomUniversalActuator.h>
 #include <CustomControllerManager.h>
 #include <CustomPlayerControllerManager.h>
 #include <CustomVehicleControllerManager.h>

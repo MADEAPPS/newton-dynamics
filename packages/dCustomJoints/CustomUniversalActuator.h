@@ -25,7 +25,7 @@ class CustomUniversalActuator: public CustomUniversal
 	NEWTON_API CustomUniversalActuator (const dMatrix& pinAndPivotFrame, dFloat angularRate0, dFloat minAngle0, dFloat maxAngle0, dFloat angularRate1, dFloat minAngle1, dFloat maxAngle1, NewtonBody* const child, NewtonBody* const parent = NULL);
 	NEWTON_API virtual ~CustomUniversalActuator();
 
-	NEWTON_API bool GetEnableFlag0 (bool flag) const;
+	NEWTON_API bool GetEnableFlag0 () const;
 	NEWTON_API void SetEnableFlag0 (bool flag);
 
 	NEWTON_API dFloat GetActuatorAngle0() const;
@@ -42,7 +42,7 @@ class CustomUniversalActuator: public CustomUniversal
 	NEWTON_API void SetMaxAngularLimit0(dFloat limit);
 
 
-	NEWTON_API bool GetEnableFlag1 (bool flag) const;
+	NEWTON_API bool GetEnableFlag1 () const;
 	NEWTON_API void SetEnableFlag1 (bool flag);
 
 	NEWTON_API dFloat GetActuatorAngle1() const;

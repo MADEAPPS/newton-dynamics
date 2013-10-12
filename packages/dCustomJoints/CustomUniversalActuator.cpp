@@ -40,7 +40,7 @@ CustomUniversalActuator::~CustomUniversalActuator()
 {
 }
 
-bool CustomUniversalActuator::GetEnableFlag0 (bool flag) const
+bool CustomUniversalActuator::GetEnableFlag0 () const
 {
 	return m_flag0;
 }
@@ -65,7 +65,7 @@ dFloat CustomUniversalActuator::GetMaxAngularLimit0() const
 	return m_maxAngle0;
 }
 
-bool CustomUniversalActuator::GetEnableFlag1 (bool flag) const
+bool CustomUniversalActuator::GetEnableFlag1 () const
 {
 	return m_flag1;
 }

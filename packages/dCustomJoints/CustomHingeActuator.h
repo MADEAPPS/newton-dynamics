@@ -33,7 +33,7 @@ class CustomHingeActuator: public CustomHinge
 	NEWTON_API virtual ~CustomHingeActuator();
 
 	NEWTON_API dFloat GetActuatorAngle() const;
-	NEWTON_API bool GetEnableFlag (bool flag) const;
+	NEWTON_API bool GetEnableFlag () const;
 	NEWTON_API void SetEnableFlag (bool flag);
 
 	NEWTON_API dFloat GetTargetAngle() const;

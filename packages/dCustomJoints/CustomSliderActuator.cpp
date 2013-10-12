@@ -37,7 +37,7 @@ CustomSliderActuator::~CustomSliderActuator()
 }
 
 
-bool CustomSliderActuator::GetEnableFlag (bool flag) const
+bool CustomSliderActuator::GetEnableFlag () const
 {
 	return m_flag;
 }

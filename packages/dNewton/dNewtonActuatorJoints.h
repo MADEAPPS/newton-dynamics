@@ -26,314 +26,267 @@
 #include "dNewtonJoint.h"
 
 
-class dNewtonHingeActuator: public dNewtonHingeJoint
+class dNewtonHingeActuator: public dNewtonJoint
 {
 	public:
 	CNEWTON_API dNewtonHingeActuator(const dFloat* const pinAndPivotFrame, dFloat angularRate, dFloat minAngle, dFloat maxAngle, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
-		:dNewtonHingeJoint(pinAndPivotFrame, body0, body1)
-		,m_angle(0.0f)
-		,m_minAngle(minAngle)
-		,m_maxAngle(maxAngle)
-		,m_angularRate(angularRate)
-		,m_flag(true)
+		:dNewtonJoint(m_hingeActuator)
 	{
-		m_type = m_hingeActuator;
+		SetJoint (new CustomHingeActuator (pinAndPivotFrame, angularRate, minAngle, maxAngle, body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
 	}
 
-	CNEWTON_API bool GetEnableFlag (bool flag) const
+	CNEWTON_API bool GetEnableFlag () const
 	{
-		return m_flag;
+		return ((CustomHingeActuator*)m_joint)->GetEnableFlag();
 	}
 
 	CNEWTON_API dFloat GetTargetAngle() const
 	{
-		return m_angle;
+		return ((CustomHingeActuator*)m_joint)->GetTargetAngle();
 	}
 
 	CNEWTON_API dFloat GetMinAngularLimit() const
 	{
-		return m_minAngle;
+		return ((CustomHingeActuator*)m_joint)->GetMinAngularLimit();
 	}
 
 	CNEWTON_API dFloat GetMaxAngularLimit() const
 	{
-		return m_maxAngle;
+		return ((CustomHingeActuator*)m_joint)->GetMaxAngularLimit();
 	}
 
 	CNEWTON_API dFloat GetAngularRate() const
 	{
-		return m_angularRate;
+		return ((CustomHingeActuator*)m_joint)->GetAngularRate();
 	}
 
 
 	CNEWTON_API void SetMinAngularLimit(dFloat limit)
 	{
-		m_minAngle = limit;
+		((CustomHingeActuator*)m_joint)->SetMinAngularLimit(limit);
 	}
 
 	CNEWTON_API void SetMaxAngularLimit(dFloat limit)
 	{
-		m_maxAngle = limit;
+		((CustomHingeActuator*)m_joint)->SetMaxAngularLimit(limit);
 	}
 
 
 	CNEWTON_API void SetAngularRate(dFloat rate)
 	{
-		m_angularRate = rate;
+		((CustomHingeActuator*)m_joint)->SetAngularRate(rate);
 	}
 
 	CNEWTON_API void SetTargetAngle(dFloat angle)
 	{
-		m_angle = dClamp (angle, m_minAngle, m_maxAngle);
+		((CustomHingeActuator*)m_joint)->SetTargetAngle(angle);
 	}
 
 	CNEWTON_API void SetEnableFlag (bool flag)
 	{
-		m_flag = flag;
+		((CustomHingeActuator*)m_joint)->SetEnableFlag (flag);
 	}
 	
 	CNEWTON_API dFloat GetActuatorAngle() const
 	{
-		CustomHinge* const hinge = (CustomHinge*) m_joint;
-		return hinge->GetJointAngle();
+		return ((CustomHingeActuator*)m_joint)->GetActuatorAngle();
 	}
-
-
-	CNEWTON_API virtual void OnSubmitConstraint (dFloat timestep, int threadIndex);
-
-	private:
-	dFloat m_angle;
-	dFloat m_minAngle;
-	dFloat m_maxAngle;
-	dFloat m_angularRate;
-	bool m_flag;
 };
 
 
 
-
-
-class dNewtonSliderActuator: public dNewtonSliderJoint
+class dNewtonSliderActuator: public dNewtonJoint
 {
 	public:
 	CNEWTON_API dNewtonSliderActuator(const dFloat* const pinAndPivotFrame, dFloat speed, dFloat minPosit, dFloat maxPosit, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
-		:dNewtonSliderJoint(pinAndPivotFrame, body0, body1)
-		,m_linearRate(speed)
-		,m_posit(0.0f)
-		,m_minPosit(minPosit)
-		,m_maxPosit(maxPosit)
-		,m_flag(true)
+		:dNewtonJoint(m_sliderActuator)
 	{
-		m_type = m_sliderActuator;
+		SetJoint (new CustomSliderActuator (pinAndPivotFrame, speed, minPosit, maxPosit, body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL)); 
 	}
 
-	CNEWTON_API bool GetEnableFlag (bool flag) const
+	CNEWTON_API bool GetEnableFlag () const
 	{
-		return m_flag;
+		return ((CustomSliderActuator*)m_joint)->GetEnableFlag ();
 	}
 
 	CNEWTON_API dFloat GetTargetPosit() const
 	{
-		return m_posit;
+		return ((CustomSliderActuator*)m_joint)->GetTargetPosit();
 	}
 
 	CNEWTON_API dFloat GetLinearRate() const
 	{
-		return m_linearRate;
+		return ((CustomSliderActuator*)m_joint)->GetLinearRate();
 	}
 
 
 	CNEWTON_API dFloat GetMinPositLimit() const
 	{
-		return m_minPosit;
+		return ((CustomSliderActuator*)m_joint)->GetMinPositLimit();
 	}
 
 	CNEWTON_API dFloat GetMaxPositLimit() const
 	{
-		return m_maxPosit;
+		return ((CustomSliderActuator*)m_joint)->GetMaxPositLimit();
 	}
 
 
 	CNEWTON_API void SetTargetPosit(dFloat posit)
 	{
-		m_posit = dClamp (posit, m_minPosit, m_maxPosit);
+		((CustomSliderActuator*)m_joint)->SetTargetPosit(posit);
 	}
 
 
 	CNEWTON_API void SetMinPositLimit(dFloat limit)
 	{
-		m_minPosit = limit;
+		((CustomSliderActuator*)m_joint)->SetMinPositLimit(limit);
 	}
 
 	CNEWTON_API void SetMaxPositLimit(dFloat limit)
 	{
-		m_maxPosit = limit;
+		((CustomSliderActuator*)m_joint)->SetMaxPositLimit(limit);
 	}
 
 	CNEWTON_API void SetLinearRate(dFloat rate)
 	{
-		m_linearRate = rate;
+		((CustomSliderActuator*)m_joint)->SetLinearRate (rate);
 	}
 
 	void SetEnableFlag (bool flag)
 	{
-		m_flag = flag;
+		((CustomSliderActuator*)m_joint)->SetEnableFlag (flag);
 	}
 
-
-	CNEWTON_API dFloat GetActuatorPosit() const;
-	CNEWTON_API virtual void OnSubmitConstraint (dFloat timestep, int threadIndex);
-
-	private:
-	dFloat m_linearRate;
-	dFloat m_posit;
-	dFloat m_minPosit;
-	dFloat m_maxPosit;
-	bool m_flag;
+	CNEWTON_API dFloat GetActuatorPosit() const
+	{
+		return ((CustomSliderActuator*)m_joint)->GetActuatorPosit();
+	}
 };
 
 
-class dNewtonUniversalActuator: public dNewtonUniversalJoint
+class dNewtonUniversalActuator: public dNewtonJoint 
 {
 	public:
 	CNEWTON_API dNewtonUniversalActuator(const dFloat* const pinAndPivotFrame, dFloat angularRate0, dFloat minAngle0, dFloat maxAngle0, dFloat angularRate1, dFloat minAngle1, dFloat maxAngle1, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
-		:dNewtonUniversalJoint(pinAndPivotFrame, body0, body1)
-		,m_angle0(0.0f)
-		,m_minAngle0(minAngle0)
-		,m_maxAngle0(maxAngle0)
-		,m_angularRate0(angularRate0)
-		,m_angle1(0.0f)
-		,m_minAngle1(minAngle1)
-		,m_maxAngle1(maxAngle1)
-		,m_angularRate1(angularRate1)
-		,m_flag0(true)
-		,m_flag1(true)
+		:dNewtonJoint(m_universalActuator)
 	{
-		m_type = m_universalActuator;
-		// disable limit on both axis
-		EnableLimit_0(false);
-		EnableLimit_1(false);
+		SetJoint (new CustomUniversalActuator (pinAndPivotFrame, angularRate0, minAngle0, maxAngle0, angularRate1, minAngle1, maxAngle1, body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
 	}
-
-	CNEWTON_API bool GetEnableFlag0 (bool flag) const
-	{
-		return m_flag0;
-	}
-
-	CNEWTON_API dFloat GetTargetAngle0() const
-	{
-		return m_angle0;
-	}
-
-	CNEWTON_API dFloat GetAngularRate0() const
-	{
-		return m_angularRate0;
-	}
-
-	CNEWTON_API dFloat GetMinAngularLimit0() const
-	{
-		return m_minAngle0;
-	}
-
-	CNEWTON_API dFloat GetMaxAngularLimit0() const
-	{
-		return m_maxAngle0;
-	}
-
-	bool GetEnableFlag1 (bool flag) const
-	{
-		return m_flag1;
-	}
-
-	CNEWTON_API dFloat GetTargetAngle1() const
-	{
-		return m_angle1;
-	}
-
-	CNEWTON_API dFloat GetAngularRate1() const
-	{
-		return m_angularRate1;
-	}
-
-	CNEWTON_API dFloat GetMinAngularLimit1() const
-	{
-		return m_minAngle1;
-	}
-
-	CNEWTON_API dFloat GetMaxAngularLimit1() const
-	{
-		return m_maxAngle1;
-	}
-
 
 	CNEWTON_API void SetEnableFlag0 (bool flag)
 	{
-		m_flag0 = flag;
+		((CustomUniversalActuator*)m_joint)->SetEnableFlag0 (flag);
 	}
 
 	CNEWTON_API void SetTargetAngle0(dFloat angle)
 	{
-		m_angle0 = dClamp (angle, m_minAngle0, m_maxAngle0);
+		((CustomUniversalActuator*)m_joint)->SetTargetAngle0 (angle);
 	}
 
 	CNEWTON_API void SetMinAngularLimit0(dFloat limit)
 	{
-		m_minAngle0 = limit;
+		((CustomUniversalActuator*)m_joint)->SetMinAngularLimit0 (limit);
 	}
 
 	CNEWTON_API void SetMaxAngularLimit0(dFloat limit)
 	{
-		m_maxAngle0 = limit;
+		((CustomUniversalActuator*)m_joint)->SetMaxAngularLimit0(limit);
 	}
 
 	CNEWTON_API void SetAngularRate0(dFloat rate)
 	{
-		m_angularRate0 = rate;
+		((CustomUniversalActuator*)m_joint)->SetAngularRate0(rate);
 	}
+
 
 	CNEWTON_API void SetEnableFlag1 (bool flag)
 	{
-		m_flag1 = flag;
+		((CustomUniversalActuator*)m_joint)->SetEnableFlag1 (flag);
 	}
 
 	CNEWTON_API void SetTargetAngle1(dFloat angle)
 	{
-		m_angle1 = dClamp (angle, m_minAngle1, m_maxAngle1);
-	}
-
-
-	CNEWTON_API void SetAngularRate1(dFloat rate)
-	{
-		m_angularRate1 = rate;
+		((CustomUniversalActuator*)m_joint)->SetTargetAngle1 (angle);
 	}
 
 	CNEWTON_API void SetMinAngularLimit1(dFloat limit)
 	{
-		m_minAngle1 = limit;
+		((CustomUniversalActuator*)m_joint)->SetMinAngularLimit1 (limit);
 	}
 
 	CNEWTON_API void SetMaxAngularLimit1(dFloat limit)
 	{
-		m_maxAngle1 = limit;
+		((CustomUniversalActuator*)m_joint)->SetMaxAngularLimit1(limit);
 	}
 
-	CNEWTON_API dFloat GetActuatorAngle0() const;
-	CNEWTON_API dFloat GetActuatorAngle1() const;
-	CNEWTON_API virtual void OnSubmitConstraint (dFloat timestep, int threadIndex);
+	CNEWTON_API void SetAngularRate1(dFloat rate)
+	{
+		((CustomUniversalActuator*)m_joint)->SetAngularRate1(rate);
+	}
 
-	private:
-	dFloat m_angle0;
-	dFloat m_minAngle0;
-	dFloat m_maxAngle0;
-	dFloat m_angularRate0;
 
-	dFloat m_angle1;
-	dFloat m_minAngle1;
-	dFloat m_maxAngle1;
-	dFloat m_angularRate1;
 
-	bool m_flag0;
-	bool m_flag1;
+	CNEWTON_API bool GetEnableFlag0 () const
+	{
+		return ((CustomUniversalActuator*)m_joint)->GetEnableFlag0();
+	}
+
+	CNEWTON_API dFloat GetTargetAngle0() const
+	{
+		return ((CustomUniversalActuator*)m_joint)->GetTargetAngle0();
+	}
+
+	CNEWTON_API dFloat GetAngularRate0() const
+	{
+		return ((CustomUniversalActuator*)m_joint)->GetAngularRate0();
+	}
+
+	CNEWTON_API dFloat GetMinAngularLimit0() const
+	{
+		return ((CustomUniversalActuator*)m_joint)->GetMinAngularLimit0();
+	}
+
+	CNEWTON_API dFloat GetMaxAngularLimit0() const
+	{
+		return ((CustomUniversalActuator*)m_joint)->GetMaxAngularLimit0();
+	}
+
+
+
+	CNEWTON_API bool GetEnableFlag1 () const
+	{
+		return ((CustomUniversalActuator*)m_joint)->GetEnableFlag1();
+	}
+
+	CNEWTON_API dFloat GetTargetAngle1() const
+	{
+		return ((CustomUniversalActuator*)m_joint)->GetTargetAngle1();
+	}
+
+	CNEWTON_API dFloat GetAngularRate1() const
+	{
+		return ((CustomUniversalActuator*)m_joint)->GetAngularRate1();
+	}
+
+	CNEWTON_API dFloat GetMinAngularLimit1() const
+	{
+		return ((CustomUniversalActuator*)m_joint)->GetMinAngularLimit1();
+	}
+
+	CNEWTON_API dFloat GetMaxAngularLimit1() const
+	{
+		return ((CustomUniversalActuator*)m_joint)->GetMaxAngularLimit1();
+	}
+
+	CNEWTON_API dFloat GetActuatorAngle0() const
+	{
+		return ((CustomUniversalActuator*)m_joint)->GetActuatorAngle0();
+	}
+
+	CNEWTON_API dFloat GetActuatorAngle1() const
+	{
+		return ((CustomUniversalActuator*)m_joint)->GetActuatorAngle1();
+	}
 };
 
 
