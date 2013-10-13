@@ -41,16 +41,23 @@
 #include "pthread.h"
 #include "implement.h"
 
+static void on_process_exit(void)
+{
+	pthread_win32_thread_detach_np  ();
+	pthread_win32_process_detach_np ();
+}
+
+
 static void on_process_init(void)
 {
     pthread_win32_process_attach_np ();
+
+	#if defined(_MSC_VER)
+		// pthread on window do no call on_process_exit leaving memory leaks
+		atexit(on_process_exit);
+	#endif
 }
 
-static void on_process_exit(void)
-{
-    pthread_win32_thread_detach_np  ();
-    pthread_win32_process_detach_np ();
-}
 
 #if defined(__MINGW64__) || defined(__MINGW32__)
 # define attribute_section(a) __attribute__((section(a)))
