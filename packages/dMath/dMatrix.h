@@ -29,6 +29,7 @@ class dMatrix
 	public:
 	dMatrix ();
 	dMatrix (const dFloat* const array);
+	dMatrix (const dFloat64* const array);
 	dMatrix (const dVector &front, const dVector &up, const dVector &right, const dVector &posit);
 	dMatrix (const dQuaternion &rotation, const dVector &position);
 	dMatrix (dFloat pitch, dFloat yaw, dFloat roll, const dVector& location);
@@ -105,6 +106,14 @@ inline dMatrix::dMatrix (
 inline dMatrix::dMatrix (const dFloat* const array)
 {
 	memcpy (&(*this)[0][0], array, sizeof (dMatrix));
+}
+
+inline dMatrix::dMatrix (const dFloat64* const array)
+{
+	dFloat* const ptr = &(*this)[0][0];
+	for (int i = 0; i < 16; i ++) {
+		ptr[i] = dFloat (array[i]);
+	}
 }
 
 inline dVector& dMatrix::operator[] (int  i)
