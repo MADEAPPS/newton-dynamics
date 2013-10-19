@@ -1825,7 +1825,7 @@ dgVector dgCollisionConvex::CalculateVolumeIntegral (const dgPlane& plane) const
 	}
 
 	if (positive == m_vertexCount) {
-		return dgVector (0.0f);
+		return dgVector (dgFloat32 (0.0f));
 	}
 
 	if (negative == m_vertexCount) {

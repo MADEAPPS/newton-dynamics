@@ -33,12 +33,12 @@ dgVector dgDynamicBody::m_equilibriumError2 (DG_ErrTolerance2);
 
 dgDynamicBody::dgDynamicBody()
 	:dgBody()
-	,m_accel(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
-	,m_alpha(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
-	,m_prevExternalForce(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
-	,m_prevExternalTorque(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
-	,m_dampCoef(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
-	,m_aparentMass(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
+	,m_accel(dgFloat32 (0.0))
+	,m_alpha(dgFloat32 (0.0))
+	,m_prevExternalForce(dgFloat32 (0.0))
+	,m_prevExternalTorque(dgFloat32 (0.0))
+	,m_dampCoef(dgFloat32 (0.0))
+	,m_aparentMass(dgFloat32 (0.0))
 	,m_sleepingCounter(0)
 	,m_isInDestructionArrayLRU(0)
 	,m_applyExtForces(NULL)
@@ -50,12 +50,12 @@ dgDynamicBody::dgDynamicBody()
 
 dgDynamicBody::dgDynamicBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionCashe, dgDeserialize serializeCallback, void* const userData)
 	:dgBody(world, collisionCashe, serializeCallback, userData)
-	,m_accel(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
-	,m_alpha(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
-	,m_prevExternalForce(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
-	,m_prevExternalTorque(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
-	,m_dampCoef(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
-	,m_aparentMass(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
+	,m_accel(dgFloat32 (0.0))
+	,m_alpha(dgFloat32 (0.0))
+	,m_prevExternalForce(dgFloat32 (0.0))
+	,m_prevExternalTorque(dgFloat32 (0.0))
+	,m_dampCoef(dgFloat32 (0.0))
+	,m_aparentMass(dgFloat32 (0.0))
 	,m_sleepingCounter(0)
 	,m_isInDestructionArrayLRU(0)
 	,m_applyExtForces(NULL)
@@ -92,8 +92,8 @@ void dgDynamicBody::Serialize (const dgTree<dgInt32, const dgCollision*>* const 
 void dgDynamicBody::SetMatrixIgnoreSleep(const dgMatrix& matrix)
 {
 	dgBody::SetMatrixIgnoreSleep(matrix);
-	m_prevExternalForce = dgVector (0.0f, 0.0f, 0.0f, 0.0f);
-	m_prevExternalTorque = dgVector (0.0f, 0.0f, 0.0f, 0.0f);
+	m_prevExternalForce = dgVector (dgFloat32 (0.0f));
+	m_prevExternalTorque = dgVector (dgFloat32 (0.0f));
 	CalcInvInertiaMatrix();
 }
 
@@ -131,18 +131,21 @@ bool dgDynamicBody::IsInEquilibrium () const
 
 void dgDynamicBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex)
 {
-	m_accel = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	m_alpha = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	m_accel = dgVector (dgFloat32 (0.0f));
+	m_alpha = dgVector (dgFloat32 (0.0f));
 	if (m_applyExtForces) {
 		m_applyExtForces(*this, timestep, threadIndex);
 	}
 
+
 #if 0
-	#if 0
+	#if 1
 		static FILE* file = fopen ("replay.bin", "wb");
 		if (file) {
 			fwrite (&m_accel, sizeof (dgVector), 1, file);
 			fwrite (&m_alpha, sizeof (dgVector), 1, file);
+			fwrite (&m_veloc, sizeof (dgVector), 1, file);
+			fwrite (&m_omega, sizeof (dgVector), 1, file);
 			fflush(file);
 		}
 	#else 
@@ -150,6 +153,8 @@ void dgDynamicBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex)
 		if (file) {
 			fread (&m_accel, sizeof (dgVector), 1, file);
 			fread (&m_alpha, sizeof (dgVector), 1, file);
+			fread (&m_veloc, sizeof (dgVector), 1, file);
+			fread (&m_omega, sizeof (dgVector), 1, file);
 		}
 	#endif
 #endif
@@ -162,7 +167,7 @@ void dgDynamicBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex)
 void dgDynamicBody::InvalidateCache ()
 {
 	m_sleepingCounter = 0;
-	m_prevExternalForce = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	m_prevExternalTorque = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	m_prevExternalForce = dgVector (dgFloat32 (0.0f));
+	m_prevExternalTorque = dgVector (dgFloat32 (0.0f));
 	dgBody::InvalidateCache ();
 }

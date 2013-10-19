@@ -680,8 +680,8 @@ void dgCollisionInstance::CalculateBuoyancyAcceleration (const dgMatrix& matrix,
 			dgAssert(0);
 	}
 
-	accel = dgVector (0.0f);
-	alpha = dgVector (0.0f);
+	accel = dgVector (dgFloat32 (0.0f));
+	alpha = dgVector (dgFloat32 (0.0f));
 	dgVector volumeIntegral (m_childShape->CalculateVolumeIntegral (scaledMatrix, fluidPlane));
 	if (volumeIntegral.m_w > dgFloat32 (0.0f)) {
 		dgVector buoyanceCenter (volumeIntegral - origin);

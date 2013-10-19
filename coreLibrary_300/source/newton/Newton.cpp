@@ -6082,7 +6082,6 @@ void NewtonBodyAddImpulse(const NewtonBody* const bodyPtr, const dFloat* const p
 	if (body->GetInvMass().m_w > dgFloat32 (0.0f)) {
 		dgVector p (pointPosit[0], pointPosit[1], pointPosit[2], dgFloat32 (0.0f));
 		dgVector v (pointDeltaVeloc[0], pointDeltaVeloc[1], pointDeltaVeloc[2], dgFloat32 (0.0f));
-//		UnfreezeBody (body);
 		body->AddImpulse (v, p);
 	}
 }

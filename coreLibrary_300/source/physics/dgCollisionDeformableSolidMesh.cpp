@@ -1320,7 +1320,7 @@ xxx ++;
 //					dgVector tangentVeloc (veloc - bounceVeloc);
 //					float restitution = dgFloat32 (0.0f);
 //					veloc = veloc - bounceVeloc.Scale (dgFloat32 (1.0f) + restitution) ;
-					velocity[index] = dgVector (0.0f, 0.0f, 0.0f, 0.0f);
+					velocity[index] = dgVector (dgFloat32 (0.0f));
 					//float keneticFriction = dgFloat32 (0.5f);
 				}
 			}

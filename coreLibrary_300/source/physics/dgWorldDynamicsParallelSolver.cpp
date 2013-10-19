@@ -702,7 +702,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameModeParallel (dgParallelSolverSync
 		//for (dgInt32 passes = 0; passes < maxPasses; passes ++) {
 		for (dgInt32 passes = 0; (passes < DG_BASE_ITERATION_COUNT) && (accNorm > DG_SOLVER_MAX_ERROR); passes ++) {
 			for (dgInt32 i = 0; i < threadCounts; i ++) {
-				syncData->m_accelNorm[i] = dgVector (0.0f);
+				syncData->m_accelNorm[i] = dgVector (dgFloat32 (0.0f));
 			}
 			for (int i = 0; i < syncData->m_batchesCount; i ++) {
 				syncData->m_atomicIndex = syncData->m_jointBatches[i].m_start;

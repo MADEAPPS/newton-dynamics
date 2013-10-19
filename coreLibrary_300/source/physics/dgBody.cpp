@@ -45,15 +45,15 @@ dgBody::dgBody()
 	,m_matrix (dgGetIdentityMatrix())
 	,m_rotation(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
 	,m_mass(dgFloat32 (DG_INFINITE_MASS * 2.0f), dgFloat32 (DG_INFINITE_MASS * 2.0f), dgFloat32 (DG_INFINITE_MASS * 2.0f), dgFloat32 (DG_INFINITE_MASS * 2.0f))
-	,m_invMass(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
-	,m_veloc(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
-	,m_omega(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
-	,m_minAABB(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
-	,m_maxAABB(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
-	,m_netForce(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
-	,m_netTorque(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
-	,m_localCentreOfMass(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))	
-	,m_globalCentreOfMass(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))	
+	,m_invMass(dgFloat32 (0.0))
+	,m_veloc(dgFloat32 (0.0))
+	,m_omega(dgFloat32 (0.0))
+	,m_minAABB(dgFloat32 (0.0))
+	,m_maxAABB(dgFloat32 (0.0))
+	,m_netForce(dgFloat32 (0.0))
+	,m_netTorque(dgFloat32 (0.0))
+	,m_localCentreOfMass(dgFloat32 (0.0))	
+	,m_globalCentreOfMass(dgFloat32 (0.0))	
 	,m_aparentMass(dgFloat32 (DG_INFINITE_MASS), dgFloat32 (DG_INFINITE_MASS), dgFloat32 (DG_INFINITE_MASS), dgFloat32 (DG_INFINITE_MASS))
 	,m_index(0)
 	,m_uniqueID(0)
@@ -84,15 +84,15 @@ dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>*
 	,m_matrix (dgGetIdentityMatrix())
 	,m_rotation(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
 	,m_mass(dgFloat32 (DG_INFINITE_MASS * 2.0f), dgFloat32 (DG_INFINITE_MASS * 2.0f), dgFloat32 (DG_INFINITE_MASS * 2.0f), dgFloat32 (DG_INFINITE_MASS * 2.0f))
-	,m_invMass(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
-	,m_veloc(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
-	,m_omega(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
-	,m_minAABB(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
-	,m_maxAABB(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
-	,m_netForce(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
-	,m_netTorque(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))
-	,m_localCentreOfMass(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))	
-	,m_globalCentreOfMass(dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0), dgFloat32 (0.0))	
+	,m_invMass(dgFloat32 (0.0))
+	,m_veloc(dgFloat32 (0.0))
+	,m_omega(dgFloat32 (0.0))
+	,m_minAABB(dgFloat32 (0.0))
+	,m_maxAABB(dgFloat32 (0.0))
+	,m_netForce(dgFloat32 (0.0))
+	,m_netTorque(dgFloat32 (0.0))
+	,m_localCentreOfMass(dgFloat32 (0.0))	
+	,m_globalCentreOfMass(dgFloat32 (0.0))	
 	,m_aparentMass(dgFloat32 (DG_INFINITE_MASS), dgFloat32 (DG_INFINITE_MASS), dgFloat32 (DG_INFINITE_MASS), dgFloat32 (DG_INFINITE_MASS))
 	,m_index(0)
 	,m_uniqueID(0)
@@ -583,12 +583,7 @@ void dgBody::AddImpulse (const dgVector& pointDeltaVeloc, const dgVector& pointP
 
 	// get contact matrix
 	dgMatrix tmp;
-	//	dgVector globalContact (pointPosit - m_matrix.m_posit);
 	dgVector globalContact (pointPosit - m_globalCentreOfMass);
-
-	//globalContact[0] = dgFloat32 (0.0f);
-	//globalContact[1] = dgFloat32 (0.0f);
-	//globalContact[2] = dgFloat32 (0.0f);
 
 	tmp[0][0] = dgFloat32 (0.0f);
 	tmp[0][1] = + globalContact[2];
