@@ -76,8 +76,9 @@ class dNewtonMesh: public dNewtonAlloc
 	CNEWTON_API void ApplySphericalMapping (int matId); 
 	CNEWTON_API void ApplyCylindricalMapping (int cylinderMatId, int capMatId); 
 	CNEWTON_API void ApplyBoxMapping (int topMatId, int sideMatId, int frontMatId); 
-	
 
+	CNEWTON_API void CalculateVertexNormals (dFloat angleInRadians); 
+	
 	CNEWTON_API int GetMaterialIndex (void* const materialHandle) const; 
 	CNEWTON_API int GetNextMaterialIndex (void* const materialHandle, int materialIndex) const; 
 

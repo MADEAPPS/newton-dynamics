@@ -172,6 +172,12 @@ void dNewtonMesh::ApplyCylindricalMapping (int cylinderMatId, int capMatId)
 	NewtonMeshApplyCylindricalMapping(m_mesh, cylinderMatId, capMatId);
 }
 
+void dNewtonMesh::CalculateVertexNormals (dFloat angleInRadians)
+{
+	NewtonMeshCalculateVertexNormals (m_mesh, angleInRadians);
+}
+
+
 void dNewtonMesh::ApplyTransform (const dFloat* const matrix)
 {
 	NewtonMeshApplyTransform (m_mesh, matrix);

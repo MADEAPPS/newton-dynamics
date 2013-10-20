@@ -1636,45 +1636,45 @@ dgBigVector dgMeshEffect::GetOrigin ()const
 }
 
 
-void dgMeshEffect::FixCylindricalMapping (dgVertexAtribute* attribArray) const
+void dgMeshEffect::FixCylindricalMapping (dgVertexAtribute* const attribArray) const
 {
-/*
+	dgInt32 mark = IncLRU ();
 	dgPolyhedra::Iterator iter (*this);	
-	for(iter.Begin(); iter; iter ++){
-		dgEdge* const edge = &(*iter);
-		dgVertexAtribute& attrib0 = attribArray[dgInt32 (edge->m_userData)];
-		dgVertexAtribute& attrib1 = attribArray[dgInt32 (edge->m_next->m_userData)];
-
-		dgFloat64 error = fabs (attrib0.m_u0 - attrib1.m_u0);
-		if (error > dgFloat32 (0.6f)) {
-			if (attrib0.m_u0 < attrib1.m_u0) {
-				attrib0.m_u0 += dgFloat32 (1.0f);
-				attrib0.m_u1 = attrib0.m_u0;
-			} else {
-				attrib1.m_u0 += dgFloat32 (1.0f);
-				attrib1.m_u1 = attrib1.m_u0;
-			}
-			
-		}
-	}
 
 	for(iter.Begin(); iter; iter ++){
 		dgEdge* const edge = &(*iter);
-		dgVertexAtribute& attrib0 = attribArray[dgInt32 (edge->m_userData)];
-		dgVertexAtribute& attrib1 = attribArray[dgInt32 (edge->m_next->m_userData)];
+		if ((edge->m_incidentFace > 0) && (edge->m_mark != mark)) {
+			dgBigVector normal(0.0f); 
+			edge->m_mark = mark;
+			edge->m_next->m_mark = mark;
+			dgVertexAtribute& attrib0 = attribArray[dgInt32 (edge->m_userData)];
+			dgVertexAtribute& attrib1 = attribArray[dgInt32 (edge->m_next->m_userData)];
+			dgBigVector p0 (attrib0.m_u0, attrib0.m_v0, dgFloat64 (0.0f), dgFloat64 (0.0f));
+			dgBigVector p1 (attrib1.m_u0, attrib1.m_v0, dgFloat64 (0.0f), dgFloat64 (0.0f));
+			dgBigVector e0 (p1 - p0);
+			dgEdge* ptr = edge->m_next->m_next;
+			do {
+				ptr->m_mark = mark;
+				dgVertexAtribute& attrib2 = attribArray[dgInt32 (ptr->m_userData)];
+				dgBigVector p2 (attrib2.m_u0, attrib2.m_v0, dgFloat64 (0.0f), dgFloat64 (0.0f));
+				dgBigVector e1 (p2 - p0);
+				normal += e0 * e1;
+				ptr = ptr->m_next;
+			} while (ptr != edge);
 
-		dgFloat64 error = fabs (attrib0.m_u0 - attrib1.m_u0);
-		if (error > dgFloat32 (0.6f)) {
-			if (attrib0.m_u0 < attrib1.m_u0) {
-				attrib0.m_u0 += dgFloat32 (1.0f);
-				attrib0.m_u1 = attrib0.m_u0;
-			} else {
-				attrib1.m_u0 += dgFloat32 (1.0f);
-				attrib1.m_u1 = attrib1.m_u0;
+			if (normal.m_z < dgFloat32 (0.0f)) {
+				dgEdge* ptr = edge;
+				do {
+					dgVertexAtribute& attrib = attribArray[dgInt32 (ptr->m_userData)];
+					if (attrib.m_v0 < dgFloat32(0.5f)) {
+						attrib.m_v0 += dgFloat32(1.0f);
+						attrib.m_v1 = attrib.m_v0;
+					}
+					ptr = ptr->m_next;
+				} while (ptr != edge);
 			}
 		}
 	}
-*/
 }
 
 
@@ -1742,9 +1742,9 @@ void dgMeshEffect::CylindricalMapping (dgInt32 cylinderMaterial, dgInt32 capMate
 		point = point.Scale3 (dgFloat64 (1.0f) / sqrt (point % point));
 		dgFloat64 v = dgAtan2 (point.m_y, point.m_z);
 
-		v = (dgFloat64 (3.141592f) - v) / dgFloat64 (2.0f * 3.141592f);
+		v = (v - dgFloat64 (3.141592f)) / dgFloat64 (2.0f * 3.141592f) + dgFloat64 (1.0f);
 		cylinder[i].m_x = u;
-		cylinder[i].m_y = -v;
+		cylinder[i].m_y = v;
 	}
 
 
@@ -1789,6 +1789,7 @@ void dgMeshEffect::CylindricalMapping (dgInt32 cylinderMaterial, dgInt32 capMate
 					dgVector p (m_points[ptr->m_incidentVertex] - origin);
 					dgFloat64 u = (p.m_y - pMin.m_y) * scale.m_y;
 					dgFloat64 v = (p.m_z - pMin.m_z) * scale.m_z;
+
 					attrib.m_u0 = u;
 					attrib.m_v0 = v;
 					attrib.m_u1 = u;
