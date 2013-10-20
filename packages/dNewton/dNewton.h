@@ -75,8 +75,6 @@ class dNewton: public dNewtonAlloc
 
 	CNEWTON_API virtual void OnContactProcess (dNewtonContactMaterial* const contactMaterial, dFloat timestep, int threadIndex) const;
 
-
-	protected:
 	CNEWTON_API void ResetTimer();
 	CNEWTON_API dLong GetTimeInMicrosenconds() const; 
 
