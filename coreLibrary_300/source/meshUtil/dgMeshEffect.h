@@ -304,8 +304,6 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	dgInt32 EnumerateAttributeArray (dgVertexAtribute* const attib);
 	void ApplyAttributeArray (dgVertexAtribute* const attib, dgInt32 maxCount);
 	
-	void FixCylindricalMapping (dgVertexAtribute* const attib) const;
-
 	void MergeFaces (const dgMeshEffect* const source);
 //	void ReverseMergeFaces (dgMeshEffect* const source);
 	dgVertexAtribute InterpolateEdge (dgEdge* const edge, dgFloat64 param) const;
