@@ -1339,15 +1339,12 @@ void dgMeshEffect::ConvertToPolygons ()
 {
 	dgPolyhedra polygon(GetAllocator());
 
-
-static dgEdge* xxxx0;
-
 	dgInt32 mark = IncLRU();
 	polygon.BeginFace();
 	dgPolyhedra::Iterator iter (*this);
 	for (iter.Begin(); iter; iter ++){
 		dgEdge* const face = &(*iter);
-xxxx0 = face;
+
 		if ((face->m_mark != mark) && (face->m_incidentFace > 0)) {
 			dgInt32	index[DG_MESH_EFFECT_POINT_SPLITED];
 
@@ -2241,8 +2238,7 @@ void dgMeshEffect::AddPolygon (dgInt32 count, const dgFloat32* const vertexList,
 			points[i].m_u0 = dgFloat64(0.0f);
 			points[i].m_v0 = dgFloat64(0.0f);
 			points[i].m_u1 = dgFloat64(0.0f);
-			points[i].m_v1 = dgFloat64(0.0f);
-			points[i].m_material = dgFloat64(material);
+			points[i].m_u1 = dgFloat64(0.0f);
 		}
 	} else {
 		for (dgInt32 i = 0; i < count; i ++) {
@@ -2256,8 +2252,7 @@ void dgMeshEffect::AddPolygon (dgInt32 count, const dgFloat32* const vertexList,
 			points[i].m_u0 = vertexList[i * stride + 7];
 			points[i].m_v0 = vertexList[i * stride + 8];
 			points[i].m_u1 = vertexList[i * stride + 9];
-			points[i].m_v1 = vertexList[i * stride + 10];
-			points[i].m_material = dgFloat64(material);
+			points[i].m_u1 = vertexList[i * stride + 10];
 		}
 	}
 
