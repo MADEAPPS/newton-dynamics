@@ -2238,7 +2238,8 @@ void dgMeshEffect::AddPolygon (dgInt32 count, const dgFloat32* const vertexList,
 			points[i].m_u0 = dgFloat64(0.0f);
 			points[i].m_v0 = dgFloat64(0.0f);
 			points[i].m_u1 = dgFloat64(0.0f);
-			points[i].m_u1 = dgFloat64(0.0f);
+			points[i].m_v1 = dgFloat64(0.0f);
+			points[i].m_material = dgFloat64(material);
 		}
 	} else {
 		for (dgInt32 i = 0; i < count; i ++) {
@@ -2252,7 +2253,8 @@ void dgMeshEffect::AddPolygon (dgInt32 count, const dgFloat32* const vertexList,
 			points[i].m_u0 = vertexList[i * stride + 7];
 			points[i].m_v0 = vertexList[i * stride + 8];
 			points[i].m_u1 = vertexList[i * stride + 9];
-			points[i].m_u1 = vertexList[i * stride + 10];
+			points[i].m_v1 = vertexList[i * stride + 10];
+			points[i].m_material = dgFloat64(material);
 		}
 	}
 
@@ -2273,7 +2275,6 @@ void dgMeshEffect::EndPolygon (dgFloat64 tol, bool fixTjoint)
 		dgBigVector e2 (p2 - p0);
 		dgBigVector n (e1 * e2);
 		dgFloat64 mag2 = n % n;
-//		dgAssert (mag2 > DG_MESH_EFFECT_TRIANGLE_MIN_AREA);
 		dgAssert (mag2 > dgFloat32 (0.0f));
 	}
 #endif
