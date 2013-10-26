@@ -797,7 +797,8 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete (dgCollis
 	if (inside & !proxy.m_intersectionTestOnly) {
 		dgAssert (penetration >= dgFloat32 (0.0f));
 		dgVector pointsContacts[64];
-		penetration = dgMin (penetration, DG_IMPULSIVE_CONTACT_PENETRATION);
+		//penetration = dgMin (penetration, DG_IMPULSIVE_CONTACT_PENETRATION);
+		penetration = dgMax (penetration, DG_IMPULSIVE_CONTACT_PENETRATION);
 		dgVector point (pointInHull + normalInHull.Scale4(penetration));
 
 		count = hull->CalculatePlaneIntersection (normalInHull.Scale4 (dgFloat32 (-1.0f)), point, pointsContacts);
