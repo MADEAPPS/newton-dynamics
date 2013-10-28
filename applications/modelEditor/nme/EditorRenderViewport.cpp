@@ -18,7 +18,6 @@ int EditorRenderViewport::m_attributes[] = {WX_GL_DOUBLEBUFFER, WX_GL_RGBA, WX_G
 
 
 BEGIN_EVENT_TABLE (EditorRenderViewport, wxGLCanvas)
-
 	EVT_KEY_UP(OnKeyUp)	
 	EVT_KEY_DOWN(OnKeyDown)
 	EVT_MOUSE_EVENTS (OnMouse)
