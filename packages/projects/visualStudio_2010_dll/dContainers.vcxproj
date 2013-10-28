@@ -236,10 +236,6 @@
       <Project>{03bca23c-02a5-415b-a37b-26600bc2ce96}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="dMath.vcxproj">
-      <Project>{cbe9e751-e58b-46c1-b6b0-873670d0f981}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

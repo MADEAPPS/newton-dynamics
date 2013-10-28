@@ -287,10 +287,6 @@
       <Project>{cbe9e751-e58b-46c1-b6b0-873670d0f981}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="dScene.vcxproj">
-      <Project>{b5eec82d-938f-44c9-89bb-4a058581750b}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
