@@ -44,13 +44,17 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxregex", "..\..\..\..\pack
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxzlib", "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010_dll\wx_vc9_wxzlib.vcxproj", "{8B867186-A0B5-5479-B824-E176EDD27C40}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxtinyxml", "..\..\..\..\packages\thirdParty\tinyxml\vs2010_static_mt\tinyxml.vcxproj", "{18E509CF-46D2-4749-B3BB-160937CF2481}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tinyxml", "..\..\..\..\packages\thirdParty\tinyxml\vs2010_static_mt\tinyxml.vcxproj", "{18E509CF-46D2-4749-B3BB-160937CF2481}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dPluginCommons", "..\..\standardPlugins\projects\visualStudio_2010\dPluginCommons.vcxproj", "{82B461DE-8921-4DA4-B6B9-FC34DF831F0F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dContainers", "..\..\..\..\packages\projects\visualStudio_2010_dll\dContainers.vcxproj", "{F67C4593-A914-4DDF-8CB5-C59A3EF3ECE0}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dScene", "..\..\..\..\packages\projects\visualStudio_2010_dll\dScene.vcxproj", "{B5EEC82D-938F-44C9-89BB-4A058581750B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dStandardPlugins", "..\..\standardPlugins\projects\visualStudio_2010\dStandardModels.vcxproj", "{233684F4-37B1-45EC-835C-7EBB26743210}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dImportExporter", "..\..\standardPlugins\projects\visualStudio_2010\dImportExporters.vcxproj", "{5580C08E-E865-4D9E-B4C9-5AC040130B92}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -228,6 +232,22 @@ Global
 		{B5EEC82D-938F-44C9-89BB-4A058581750B}.Release|Win32.Build.0 = release|Win32
 		{B5EEC82D-938F-44C9-89BB-4A058581750B}.Release|x64.ActiveCfg = release|x64
 		{B5EEC82D-938F-44C9-89BB-4A058581750B}.Release|x64.Build.0 = release|x64
+		{233684F4-37B1-45EC-835C-7EBB26743210}.Debug|Win32.ActiveCfg = Debug|Win32
+		{233684F4-37B1-45EC-835C-7EBB26743210}.Debug|Win32.Build.0 = Debug|Win32
+		{233684F4-37B1-45EC-835C-7EBB26743210}.Debug|x64.ActiveCfg = Debug|x64
+		{233684F4-37B1-45EC-835C-7EBB26743210}.Debug|x64.Build.0 = Debug|x64
+		{233684F4-37B1-45EC-835C-7EBB26743210}.Release|Win32.ActiveCfg = Release|Win32
+		{233684F4-37B1-45EC-835C-7EBB26743210}.Release|Win32.Build.0 = Release|Win32
+		{233684F4-37B1-45EC-835C-7EBB26743210}.Release|x64.ActiveCfg = Release|x64
+		{233684F4-37B1-45EC-835C-7EBB26743210}.Release|x64.Build.0 = Release|x64
+		{5580C08E-E865-4D9E-B4C9-5AC040130B92}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5580C08E-E865-4D9E-B4C9-5AC040130B92}.Debug|Win32.Build.0 = Debug|Win32
+		{5580C08E-E865-4D9E-B4C9-5AC040130B92}.Debug|x64.ActiveCfg = Debug|x64
+		{5580C08E-E865-4D9E-B4C9-5AC040130B92}.Debug|x64.Build.0 = Debug|x64
+		{5580C08E-E865-4D9E-B4C9-5AC040130B92}.Release|Win32.ActiveCfg = Release|Win32
+		{5580C08E-E865-4D9E-B4C9-5AC040130B92}.Release|Win32.Build.0 = Release|Win32
+		{5580C08E-E865-4D9E-B4C9-5AC040130B92}.Release|x64.ActiveCfg = Release|x64
+		{5580C08E-E865-4D9E-B4C9-5AC040130B92}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -256,5 +276,7 @@ Global
 		{68D9962C-0EC7-445A-B0FD-F87B16D43901} = {8D5218D1-FC13-4112-9980-F257026406BD}
 		{39737A8F-6151-4259-8E39-25530345D4B4} = {8D5218D1-FC13-4112-9980-F257026406BD}
 		{82B461DE-8921-4DA4-B6B9-FC34DF831F0F} = {657BECAE-4DBA-4B8F-9E82-5BEB9CBF00FB}
+		{233684F4-37B1-45EC-835C-7EBB26743210} = {657BECAE-4DBA-4B8F-9E82-5BEB9CBF00FB}
+		{5580C08E-E865-4D9E-B4C9-5AC040130B92} = {657BECAE-4DBA-4B8F-9E82-5BEB9CBF00FB}
 	EndGlobalSection
 EndGlobal
