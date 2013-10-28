@@ -182,11 +182,6 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 
 	GLVisual* m_sharedVisual;
 	FXDockSite* m_docks[4]; 
-	
-	
-	
-	
-	
 	EditMode m_editMode;
 	bool m_altKey;
 	bool m_shiftKey;
@@ -210,7 +205,9 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 
 	protected:	
 	DECLARE_EVENT_TABLE()
-	
+
+	void OnKeyUp(wxKeyEvent &event);
+	void OnKeyDown(wxKeyEvent &event);
 	void OnExit(wxCommandEvent& event);
 	void OnNew(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);

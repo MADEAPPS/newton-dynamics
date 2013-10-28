@@ -18,8 +18,10 @@ int EditorRenderViewport::m_attributes[] = {WX_GL_DOUBLEBUFFER, WX_GL_RGBA, WX_G
 
 
 BEGIN_EVENT_TABLE (EditorRenderViewport, wxGLCanvas)
-	EVT_MOUSE_EVENTS (OnMouse)
 
+	EVT_KEY_UP(OnKeyUp)	
+	EVT_KEY_DOWN(OnKeyDown)
+	EVT_MOUSE_EVENTS (OnMouse)
 	EVT_SIZE (OnSize)
 	EVT_PAINT(OnPaint)
 	EVT_IDLE(OnIdle)
@@ -332,6 +334,32 @@ void EditorRenderViewport::EndRender()
 	// Swap
 	SwapBuffers();
 }
+
+void EditorRenderViewport::OnKeyUp(wxKeyEvent &event)
+{
+	dAssert (0);
+}
+
+
+void EditorRenderViewport::OnKeyDown(wxKeyEvent &event)
+{
+	int keyCode = event.GetKeyCode();
+	if (keyCode == WXK_ESCAPE)  {
+		// send a display refresh event in case the runtime update is stopped bu the user.
+		wxMenuEvent exitEvent (wxEVT_COMMAND_MENU_SELECTED, wxID_EXIT);
+		GetEventHandler()->ProcessEvent(exitEvent);
+	}
+
+	dAssert (0);
+
+/*
+	if (!event.GetModifiers()) {
+		int code = keyCode & 0xff; 
+		m_key[m_keyMap[code]] = true;
+	}
+*/
+}
+
 
 void EditorRenderViewport::LeftMouseKeyUp()
 {

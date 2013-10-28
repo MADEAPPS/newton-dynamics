@@ -59,6 +59,8 @@ class EditorRenderViewport: public wxGLCanvas, public dPluginCamera
 	protected:
 	DECLARE_EVENT_TABLE()
 
+	void OnKeyUp(wxKeyEvent &event);
+	void OnKeyDown(wxKeyEvent &event);
 	void OnMouse(wxMouseEvent &event);
 	void OnSize(wxSizeEvent &event);
 	void OnIdle(wxIdleEvent &event);
