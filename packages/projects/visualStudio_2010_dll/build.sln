@@ -23,6 +23,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "newton", "..\..\..\coreLibr
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "physics", "..\..\..\coreLibrary_300\projects\windows\project_vs2010_dll\physics.vcxproj", "{39737A8F-6151-4259-8E39-25530345D4B4}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dAILibrary", "dAILibrary.vcxproj", "{2F95C24F-6935-4288-A71C-DAB402E4EABC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug|Win32 = debug|Win32
@@ -119,6 +121,14 @@ Global
 		{39737A8F-6151-4259-8E39-25530345D4B4}.release|Win32.Build.0 = release|Win32
 		{39737A8F-6151-4259-8E39-25530345D4B4}.release|x64.ActiveCfg = release|x64
 		{39737A8F-6151-4259-8E39-25530345D4B4}.release|x64.Build.0 = release|x64
+		{2F95C24F-6935-4288-A71C-DAB402E4EABC}.debug|Win32.ActiveCfg = Debug|Win32
+		{2F95C24F-6935-4288-A71C-DAB402E4EABC}.debug|Win32.Build.0 = Debug|Win32
+		{2F95C24F-6935-4288-A71C-DAB402E4EABC}.debug|x64.ActiveCfg = Debug|x64
+		{2F95C24F-6935-4288-A71C-DAB402E4EABC}.debug|x64.Build.0 = Debug|x64
+		{2F95C24F-6935-4288-A71C-DAB402E4EABC}.release|Win32.ActiveCfg = Release|Win32
+		{2F95C24F-6935-4288-A71C-DAB402E4EABC}.release|Win32.Build.0 = Release|Win32
+		{2F95C24F-6935-4288-A71C-DAB402E4EABC}.release|x64.ActiveCfg = Release|x64
+		{2F95C24F-6935-4288-A71C-DAB402E4EABC}.release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
