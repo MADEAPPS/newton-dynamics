@@ -62,16 +62,16 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../$(Platform)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug|x64'">../../$(Platform)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release|Win32'">../../$(Platform)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release|Win32'">false</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">../../$(Platform)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release|x64'">false</LinkIncremental>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">$(ProjectName)_d</TargetName>
@@ -106,16 +106,16 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy   "..\..\..\..\coreLibrary_300\projects\windows\project_vs2008_dll\$(Platform)\newton\$(Configuration)\*.dll"   "../../$(Platform)/*.*"  /F /Y /R
-xcopy   "..\..\..\..\packages\projects\visualStudio_2008_dll\$(Platform)\dScene\$(Configuration)\*.dll"   "../../$(Platform)/*.*"  /F /Y /R
-xcopy   "..\..\..\..\packages\projects\visualStudio_2008_dll\$(Platform)\dContainers\$(Configuration)\*.dll"   "../../$(Platform)/*.*"  /F /Y /R
+      <Command>xcopy   "..\..\..\..\coreLibrary_300\projects\windows\project_vs2010_dll\$(Platform)\newton\$(Configuration)\*.dll"   "../../$(Platform)/*.*"  /F /Y /R
+xcopy   "..\..\..\..\packages\projects\visualStudio_2010_dll\$(Platform)\dScene\$(Configuration)\*.dll"   "../../$(Platform)/*.*"  /F /Y /R
+xcopy   "..\..\..\..\packages\projects\visualStudio_2010_dll\$(Platform)\dContainers\$(Configuration)\*.dll"   "../../$(Platform)/*.*"  /F /Y /R
 
-xcopy  "..\..\standardPlugins\projects\visualStudio_2008\$(Platform)\dPluginCommons\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
+xcopy  "..\..\standardPlugins\projects\visualStudio_2010\$(Platform)\dPluginCommons\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
 
-xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(Platform)\wxgl\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
-xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(Platform)\wxaui\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
-xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(Platform)\wxcore\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
-xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(Platform)\wxbase\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
+xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010_dll\$(Platform)\wxgl\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
+xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010_dll\$(Platform)\wxaui\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
+xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010_dll\$(Platform)\wxcore\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
+xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010_dll\$(Platform)\wxbase\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -152,16 +152,16 @@ xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_200
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy   "..\..\..\..\coreLibrary_300\projects\windows\project_vs2008_dll\$(Platform)\newton\$(Configuration)\*.dll"   "../../$(Platform)/*.*"  /F /Y /R
-xcopy   "..\..\..\..\packages\projects\visualStudio_2008_dll\$(Platform)\dScene\$(Configuration)\*.dll"   "../../$(Platform)/*.*"  /F /Y /R
-xcopy   "..\..\..\..\packages\projects\visualStudio_2008_dll\$(Platform)\dContainers\$(Configuration)\*.dll"   "../../$(Platform)/*.*"  /F /Y /R
+      <Command>xcopy   "..\..\..\..\coreLibrary_300\projects\windows\project_vs2010_dll\$(Platform)\newton\$(Configuration)\*.dll"   "../../$(Platform)/*.*"  /F /Y /R
+xcopy   "..\..\..\..\packages\projects\visualStudio_2010_dll\$(Platform)\dScene\$(Configuration)\*.dll"   "../../$(Platform)/*.*"  /F /Y /R
+xcopy   "..\..\..\..\packages\projects\visualStudio_2010_dll\$(Platform)\dContainers\$(Configuration)\*.dll"   "../../$(Platform)/*.*"  /F /Y /R
 
-xcopy  "..\..\standardPlugins\projects\visualStudio_2008\$(Platform)\dPluginCommons\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
+xcopy  "..\..\standardPlugins\projects\visualStudio_2010\$(Platform)\dPluginCommons\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
 
-xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(Platform)\wxgl\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
-xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(Platform)\wxaui\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
-xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(Platform)\wxcore\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
-xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(Platform)\wxbase\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
+xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010_dll\$(Platform)\wxgl\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
+xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010_dll\$(Platform)\wxaui\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
+xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010_dll\$(Platform)\wxcore\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
+xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010_dll\$(Platform)\wxbase\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -194,16 +194,16 @@ xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_200
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy   "..\..\..\..\coreLibrary_300\projects\windows\project_vs2008_dll\$(Platform)\newton\$(Configuration)\*.dll"   "../../$(Platform)/*.*"  /F /Y /R
-xcopy   "..\..\..\..\packages\projects\visualStudio_2008_dll\$(Platform)\dScene\$(Configuration)\*.dll"   "../../$(Platform)/*.*"  /F /Y /R
-xcopy   "..\..\..\..\packages\projects\visualStudio_2008_dll\$(Platform)\dContainers\$(Configuration)\*.dll"   "../../$(Platform)/*.*"  /F /Y /R
+      <Command>xcopy   "..\..\..\..\coreLibrary_300\projects\windows\project_vs2010_dll\$(Platform)\newton\$(Configuration)\*.dll"   "../../$(Platform)/*.*"  /F /Y /R
+xcopy   "..\..\..\..\packages\projects\visualStudio_2010_dll\$(Platform)\dScene\$(Configuration)\*.dll"   "../../$(Platform)/*.*"  /F /Y /R
+xcopy   "..\..\..\..\packages\projects\visualStudio_2010_dll\$(Platform)\dContainers\$(Configuration)\*.dll"   "../../$(Platform)/*.*"  /F /Y /R
 
-xcopy  "..\..\standardPlugins\projects\visualStudio_2008\$(Platform)\dPluginCommons\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
+xcopy  "..\..\standardPlugins\projects\visualStudio_2010\$(Platform)\dPluginCommons\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
 
-xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(Platform)\wxgl\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
-xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(Platform)\wxaui\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
-xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(Platform)\wxcore\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
-xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(Platform)\wxbase\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
+xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010_dll\$(Platform)\wxgl\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
+xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010_dll\$(Platform)\wxaui\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
+xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010_dll\$(Platform)\wxcore\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
+xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010_dll\$(Platform)\wxbase\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -239,16 +239,16 @@ xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_200
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy   "..\..\..\..\coreLibrary_300\projects\windows\project_vs2008_dll\$(Platform)\newton\$(Configuration)\*.dll"   "../../$(Platform)/*.*"  /F /Y /R
-xcopy   "..\..\..\..\packages\projects\visualStudio_2008_dll\$(Platform)\dScene\$(Configuration)\*.dll"   "../../$(Platform)/*.*"  /F /Y /R
-xcopy   "..\..\..\..\packages\projects\visualStudio_2008_dll\$(Platform)\dContainers\$(Configuration)\*.dll"   "../../$(Platform)/*.*"  /F /Y /R
+      <Command>xcopy   "..\..\..\..\coreLibrary_300\projects\windows\project_vs2010_dll\$(Platform)\newton\$(Configuration)\*.dll"   "../../$(Platform)/*.*"  /F /Y /R
+xcopy   "..\..\..\..\packages\projects\visualStudio_2010_dll\$(Platform)\dScene\$(Configuration)\*.dll"   "../../$(Platform)/*.*"  /F /Y /R
+xcopy   "..\..\..\..\packages\projects\visualStudio_2010_dll\$(Platform)\dContainers\$(Configuration)\*.dll"   "../../$(Platform)/*.*"  /F /Y /R
 
-xcopy  "..\..\standardPlugins\projects\visualStudio_2008\$(Platform)\dPluginCommons\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
+xcopy  "..\..\standardPlugins\projects\visualStudio_2010\$(Platform)\dPluginCommons\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
 
-xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(Platform)\wxgl\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
-xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(Platform)\wxaui\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
-xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(Platform)\wxcore\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
-xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008_dll\$(Platform)\wxbase\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
+xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010_dll\$(Platform)\wxgl\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
+xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010_dll\$(Platform)\wxaui\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
+xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010_dll\$(Platform)\wxcore\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
+xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010_dll\$(Platform)\wxbase\$(Configuration)\*.dll" "../../$(Platform)/*.*"  /F /Y /R
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
