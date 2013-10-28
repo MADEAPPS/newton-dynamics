@@ -25,22 +25,22 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
   </PropertyGroup>
@@ -70,7 +70,7 @@
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)_d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">$(ProjectName)_d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -81,7 +81,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton;../../thirdParty/tinyxml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;DSCENE_EXPORTS;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_DSCENE_DLL;_DSCENE_EXPORTS;_DCONTAINERS_DLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -90,17 +90,15 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>dSceneStdafx.h</PrecompiledHeaderFile>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
     </ClCompile>
-    <ProjectReference>
-      <LinkLibraryDependencies>false</LinkLibraryDependencies>
-    </ProjectReference>
-    <Lib>
+    <Link>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
-    </Lib>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ImportLibrary>$(OutDir)$(ProjectName)_d.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
     <PostBuildEvent>
       <Command>
       </Command>
@@ -117,7 +115,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton;../../thirdParty/tinyxml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;DSCENE_EXPORTS;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_DSCENE_DLL;_DSCENE_EXPORTS;_DCONTAINERS_DLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -126,17 +124,15 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>dSceneStdafx.h</PrecompiledHeaderFile>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
     </ClCompile>
-    <ProjectReference>
-      <LinkLibraryDependencies>false</LinkLibraryDependencies>
-    </ProjectReference>
-    <Lib>
+    <Link>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
-    </Lib>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ImportLibrary>$(OutDir)$(ProjectName)_d.lib</ImportLibrary>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
     <PostBuildEvent>
       <Command>
       </Command>
@@ -150,7 +146,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton;../../thirdParty/tinyxml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;DSCENE_EXPORTS;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_DSCENE_DLL;_DSCENE_EXPORTS;_DCONTAINERS_DLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
@@ -158,21 +154,19 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>dSceneStdafx.h</PrecompiledHeaderFile>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
     </ClCompile>
-    <ProjectReference>
-      <LinkLibraryDependencies>false</LinkLibraryDependencies>
-    </ProjectReference>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Link>
     <PostBuildEvent>
       <Command>
       </Command>
     </PostBuildEvent>
-    <Lib>
-      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
-    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
     <Midl>
@@ -185,7 +179,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton;../../thirdParty/tinyxml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;DSCENE_EXPORTS;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_DSCENE_DLL;_DSCENE_EXPORTS;_DCONTAINERS_DLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
@@ -193,21 +187,19 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>dSceneStdafx.h</PrecompiledHeaderFile>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
     </ClCompile>
-    <ProjectReference>
-      <LinkLibraryDependencies>false</LinkLibraryDependencies>
-    </ProjectReference>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
+      <TargetMachine>MachineX64</TargetMachine>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Link>
     <PostBuildEvent>
       <Command>
       </Command>
     </PostBuildEvent>
-    <Lib>
-      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
-    </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\dScene\dBoneNodeInfo.cpp" />
@@ -277,41 +269,23 @@
     <ClInclude Include="..\..\dScene\dVariable.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\coreLibrary_300\projects\windows\project_vs2010_dll\ai.vcxproj">
-      <Project>{7d48cee3-5263-46ca-bd69-924881f0ea2f}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\coreLibrary_300\projects\windows\project_vs2010_dll\core.vcxproj">
-      <Project>{57ac4f2d-b115-4931-8f6e-af8ad616b6aa}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\coreLibrary_300\projects\windows\project_vs2010_dll\newton.vcxproj">
       <Project>{68d9962c-0ec7-445a-b0fd-f87b16d43901}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\coreLibrary_300\projects\windows\project_vs2010_dll\physics.vcxproj">
-      <Project>{39737a8f-6151-4259-8e39-25530345d4b4}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\coreLibrary_300\source\pthreads.2\VS_2010_static_mt\pthread.vcxproj">
-      <Project>{03bca23c-02a5-415b-a37b-26600bc2ce96}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    <ProjectReference Include="..\..\thirdParty\tinyxml\vs2010_static_mt\tinyxml.vcxproj">
+      <Project>{18e509cf-46d2-4749-b3bb-160937cf2481}</Project>
     </ProjectReference>
     <ProjectReference Include="dAnimation.vcxproj">
       <Project>{e3c14351-bad1-4add-ab9a-31054d6e7cdb}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="dContainers.vcxproj">
       <Project>{f67c4593-a914-4ddf-8cb5-c59a3ef3ece0}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="dJointLibrary.vcxproj">
       <Project>{721c99ce-4716-4146-9817-59bc2671b844}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="dMath.vcxproj">
       <Project>{cbe9e751-e58b-46c1-b6b0-873670d0f981}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

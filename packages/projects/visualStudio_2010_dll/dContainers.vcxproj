@@ -25,19 +25,19 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -70,7 +70,7 @@
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)_d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">$(ProjectName)_d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -80,7 +80,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <AdditionalIncludeDirectories>../../;../../dMath;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;_DCONTAINERS_DLL;_DCONTAINERS_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -90,13 +90,15 @@
       <PrecompiledHeaderFile>dContainersStdAfx.h</PrecompiledHeaderFile>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <WarningLevel>Level4</WarningLevel>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
-    <Lib>
+    <Link>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
-    </Lib>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ImportLibrary>$(TargetDir)$(TargetName)_d.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
     <PostBuildEvent>
       <Command>
       </Command>
@@ -112,7 +114,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <AdditionalIncludeDirectories>../../;../../dMath;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;_DCONTAINERS_DLL;_DCONTAINERS_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -122,13 +124,15 @@
       <PrecompiledHeaderFile>dContainersStdAfx.h</PrecompiledHeaderFile>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <WarningLevel>Level4</WarningLevel>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
-    <Lib>
+    <Link>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
-    </Lib>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ImportLibrary>$(TargetDir)$(TargetName)_d.lib</ImportLibrary>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
     <PostBuildEvent>
       <Command>
       </Command>
@@ -140,7 +144,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <AdditionalIncludeDirectories>../../;../../dMath;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;_DCONTAINERS_DLL;_DCONTAINERS_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Precise</FloatingPointModel>
@@ -148,13 +152,14 @@
       <PrecompiledHeaderFile>dContainersStdAfx.h</PrecompiledHeaderFile>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <WarningLevel>Level4</WarningLevel>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
-    <Lib>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <TargetMachine>MachineX86</TargetMachine>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
-    </Lib>
+    </Link>
     <PostBuildEvent>
       <Command>
       </Command>
@@ -169,7 +174,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <AdditionalIncludeDirectories>../../;../../dMath;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;_DCONTAINERS_DLL;_DCONTAINERS_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
@@ -177,13 +182,14 @@
       <PrecompiledHeaderFile>dContainersStdAfx.h</PrecompiledHeaderFile>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <WarningLevel>Level4</WarningLevel>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
-    <Lib>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <TargetMachine>MachineX64</TargetMachine>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
-    </Lib>
+    </Link>
     <PostBuildEvent>
       <Command>
       </Command>
@@ -192,6 +198,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\dContainers\dBaseHierarchy.cpp" />
     <ClCompile Include="..\..\dContainers\dClassInfo.cpp" />
+    <ClCompile Include="..\..\dContainers\dContainersAlloc.cpp" />
     <ClCompile Include="..\..\dContainers\dContainersStdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">Create</PrecompiledHeader>
@@ -206,6 +213,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\dContainers\dBaseHierarchy.h" />
     <ClInclude Include="..\..\dContainers\dClassInfo.h" />
+    <ClInclude Include="..\..\dContainers\dContainersAlloc.h" />
     <ClInclude Include="..\..\dContainers\dContainersStdAfx.h" />
     <ClInclude Include="..\..\dContainers\dCRC.h" />
     <ClInclude Include="..\..\dContainers\dHeap.h" />
@@ -214,28 +222,6 @@
     <ClInclude Include="..\..\dContainers\dRtti.h" />
     <ClInclude Include="..\..\dContainers\dString.h" />
     <ClInclude Include="..\..\dContainers\dTree.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\coreLibrary_300\projects\windows\project_vs2010_dll\ai.vcxproj">
-      <Project>{7d48cee3-5263-46ca-bd69-924881f0ea2f}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\coreLibrary_300\projects\windows\project_vs2010_dll\core.vcxproj">
-      <Project>{57ac4f2d-b115-4931-8f6e-af8ad616b6aa}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\coreLibrary_300\projects\windows\project_vs2010_dll\newton.vcxproj">
-      <Project>{68d9962c-0ec7-445a-b0fd-f87b16d43901}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\coreLibrary_300\projects\windows\project_vs2010_dll\physics.vcxproj">
-      <Project>{39737a8f-6151-4259-8e39-25530345d4b4}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\coreLibrary_300\source\pthreads.2\VS_2010_static_mt\pthread.vcxproj">
-      <Project>{03bca23c-02a5-415b-a37b-26600bc2ce96}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -74,6 +74,7 @@
     <OutDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release|x64'">false</LinkIncremental>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -94,7 +95,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;glu32.lib;winmm.lib;wsock32.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>../../$(Platform)/$(ProjectName)_d.exe</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
@@ -140,7 +141,7 @@ xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_200
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;glu32.lib;winmm.lib;wsock32.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>../../$(Platform)/$(ProjectName)_d.exe</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
@@ -180,7 +181,7 @@ xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_200
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;glu32.lib;winmm.lib;wsock32.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>../../$(Platform)/$(ProjectName).exe</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
@@ -225,7 +226,7 @@ xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_200
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;glu32.lib;winmm.lib;wsock32.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>../../$(Platform)/$(ProjectName).exe</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
@@ -283,9 +284,56 @@ xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_200
     <ClInclude Include="..\..\nme\NewtonModelEditorApp.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\standardPlugins\projects\visualStudio_2008\dPluginCommons.vcxproj">
+    <ProjectReference Include="..\..\..\..\coreLibrary_300\projects\windows\project_vs2010_dll\ai.vcxproj">
+      <Project>{7d48cee3-5263-46ca-bd69-924881f0ea2f}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\coreLibrary_300\projects\windows\project_vs2010_dll\core.vcxproj">
+      <Project>{57ac4f2d-b115-4931-8f6e-af8ad616b6aa}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\coreLibrary_300\projects\windows\project_vs2010_dll\newton.vcxproj">
+      <Project>{68d9962c-0ec7-445a-b0fd-f87b16d43901}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\coreLibrary_300\projects\windows\project_vs2010_dll\physics.vcxproj">
+      <Project>{39737a8f-6151-4259-8e39-25530345d4b4}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\coreLibrary_300\source\pthreads.2\VS_2010_static_mt\pthread.vcxproj">
+      <Project>{03bca23c-02a5-415b-a37b-26600bc2ce96}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010_dll\dAILibrary.vcxproj">
+      <Project>{2f95c24f-6935-4288-a71c-dab402e4eabc}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010_dll\dAnimation.vcxproj">
+      <Project>{e3c14351-bad1-4add-ab9a-31054d6e7cdb}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010_dll\dContainers.vcxproj">
+      <Project>{f67c4593-a914-4ddf-8cb5-c59a3ef3ece0}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010_dll\dJointLibrary.vcxproj">
+      <Project>{721c99ce-4716-4146-9817-59bc2671b844}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010_dll\dMath.vcxproj">
+      <Project>{cbe9e751-e58b-46c1-b6b0-873670d0f981}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010_dll\dNewton.vcxproj">
+      <Project>{8a04a234-b1ca-464d-a2dd-34ceb583ba6a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010_dll\dScene.vcxproj">
+      <Project>{b5eec82d-938f-44c9-89bb-4a058581750b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010_dll\wx_vc9_aui.vcxproj">
+      <Project>{a16d3832-0f42-57ce-8f48-50e06649ade8}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010_dll\wx_vc9_base.vcxproj">
+      <Project>{3fcc50c2-81e9-5db2-b8d8-2129427568b1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010_dll\wx_vc9_core.vcxproj">
+      <Project>{6744dad8-9c70-574a-bff2-9f8dddb24a75}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010_dll\wx_vc9_gl.vcxproj">
+      <Project>{da8b15ef-6750-5928-bc0e-c748213cf9b2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\standardPlugins\projects\visualStudio_2010\dPluginCommons.vcxproj">
       <Project>{82b461de-8921-4da4-b6b9-fc34df831f0f}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
