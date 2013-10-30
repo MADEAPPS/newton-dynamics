@@ -129,7 +129,7 @@ z = size * (i - count / 2);
 
 		m_currentCastingShape = 0;
 		m_castingEntity = new DemoEntity (matrix, NULL);
-		m_castingEntity->SetMesh(m_castingGeometries[0]);
+		m_castingEntity->SetMesh(m_castingGeometries[m_currentCastingShape]);
 	}
 
 	NewtonCollision* GetCurrentShape() const 
@@ -251,6 +251,11 @@ class dConvexCastManager: public CustomControllerManager<dConvexCastRecord>
 			float y = dFloat (mouseY);
 			dVector p0 (camera->ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
 			dVector p1 (camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
+
+
+//p0 = dVector (-2.6353559f, 6.3114533f, -8.6758823f, 1.0f);
+//p1 = dVector (883.85059f, -1115.0381f, 1510.1704f, 1.0f); 
+
 
 			// do the convex cast here 
 			dMatrix matrix (GetIdentityMatrix());

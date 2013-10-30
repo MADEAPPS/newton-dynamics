@@ -3135,6 +3135,7 @@ dgInt32 dgCollisionConvex::CalculateConvexCastContacts(dgCollisionParamProxy& pr
 	const dgVector& invScale = collConicConvexInstance->GetInvScale();
 	const dgMatrix& matrix = collConicConvexInstance->GetGlobalMatrix();
 	dgVector veloc (matrix.UnrotateVector(floatingVeloc - referenceVeloc));
+	dgAssert (veloc.m_w == dgFloat32 (0.0f));
 
 	dgInt32 iter = 0;
 	dgInt32 count = 0;
@@ -3190,6 +3191,8 @@ dgInt32 dgCollisionConvex::CalculateConvexCastContacts(dgCollisionParamProxy& pr
 			dgFloat32 penetration = dgMax(num * dgFloat32 (-1.0f) - DG_IMPULSIVE_CONTACT_PENETRATION, dgFloat32 (0.0f));
 			if (proxy.m_contacts) {
 				dgVector contactPoint ((minkHull.m_p + minkHull.m_q).Scale3 (dgFloat32 (0.5f)));
+				// note: not sure if I need to restore the proxy.m_matrix, provable so, but for now I will not
+				proxy.m_matrix = minkHull.m_matrix;
 				count = CalculateContacts (contactPoint, minkHull.m_normal.Scale4 (-1.0f), proxy, minkHull.m_hullDiff);
 				if (count) {
 					
