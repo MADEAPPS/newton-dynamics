@@ -1798,6 +1798,7 @@ void dgMeshEffect::CylindricalMapping (dgInt32 cylinderMaterial, dgInt32 capMate
 
 
 	// apply cap mapping
+	mark = IncLRU ();
 	for(iter.Begin(); iter; iter ++){
 		dgEdge* const edge = &(*iter);
 		//if (edge->m_mark < mark){
