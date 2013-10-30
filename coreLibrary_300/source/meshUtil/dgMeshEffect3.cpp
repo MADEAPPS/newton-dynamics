@@ -477,9 +477,11 @@ class dgHACDClusterGraph
 			approximation.Push(tmp, m_concavity);
 			while ((approximation.GetCount() < count) && (approximation.Value() >= dgFloat32 (0.0f))) {
 				dgHACDConvacityLookAheadTree* worseCluster = approximation[0];
-				if (!worseCluster->m_left && approximation.Value() >= dgFloat32 (0.0f)) {
+				dgFloat64 concavity = approximation.Value();
+				if (!worseCluster->m_left && (concavity >= dgFloat32 (0.0f))) {
+					dgAssert (!worseCluster->m_right);
 					approximation.Pop();
-					approximation.Push(worseCluster, dgFloat32 (-1.0f));
+					approximation.Push(worseCluster, concavity - dgFloat64 (1.0e10f));
 				} else {
 					dgAssert (worseCluster->m_left);
 					dgAssert (worseCluster->m_right);
