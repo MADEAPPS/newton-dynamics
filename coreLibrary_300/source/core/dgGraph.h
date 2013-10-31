@@ -47,6 +47,8 @@ class dgGraph: public dgList<dgGraphNode<dgNodeData, dgEdgeData> >
 	typename dgGraph<dgNodeData, dgEdgeData>::dgListNode* AddNode ();
 	void DeleteNode (typename dgGraph<dgNodeData, dgEdgeData>::dgListNode* const node);
 
+	typename dgGraph<dgNodeData, dgEdgeData>::dgListNode* GetNodeFromNodeData(dgNodeData* const nodeData);
+
 	//void Trace () const;
 };
 
@@ -114,6 +116,16 @@ void dgGraph<dgNodeData, dgEdgeData>::DeleteNode (typename dgGraph<dgNodeData, d
 		}
 	}
 	dgList<dgGraphNode<dgNodeData, dgEdgeData> >::Remove (node);
+}
+
+template<class dgNodeData, class dgEdgeData>
+typename dgGraph<dgNodeData, dgEdgeData>::dgListNode* dgGraph<dgNodeData, dgEdgeData>::GetNodeFromNodeData(dgNodeData* const nodeData)
+{
+	dgInt32 size1 = sizeof (*nodeData);
+	dgInt32 size0 = sizeof (dgGraphNode<dgNodeData, dgEdgeData>);
+	void* const ptr = ((char*)nodeData) - (size0 - size1);
+	typename dgGraphNode<dgNodeData, dgEdgeData>* const nodeInfo =  (typename dgGraphNode<dgNodeData, dgEdgeData>*) ptr;
+	return GetNodeFromInfo(*nodeInfo);
 }
 
 /*
