@@ -42,20 +42,6 @@ class EditorRenderViewport: public wxGLCanvas, public dPluginCamera
 	int GetWidth() const;
 	int GetHeight() const;
 
-/*
-	void create();
-	void UpdateScene (dViewPortModes mode);
-	protected:
-	void SelectAssetNode (const FXEvent* const event);
-	
-	EditorCanvas* m_canvas;
-	bool m_leftMouseKeyState;
-	long onLeftMouseKeyUp(FXObject* sender, FXSelector id, void* eventPtr);
-	long onMouseMove(FXObject* sender, FXSelector id, void* eventPtr);
-	void OnKeyUp(wxKeyEvent &event);
-	void OnKeyDown(wxKeyEvent &event);
-*/
-
 	protected:
 	DECLARE_EVENT_TABLE()
 

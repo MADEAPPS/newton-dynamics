@@ -647,8 +647,8 @@ inside = false;
 		} else {
 			dgFloat32 convexSphapeUmbra = hull->GetUmbraClipSize ();
 			if (m_faceClipSize > convexSphapeUmbra) {
-				BeamClipping (convexSphapeUmbra);
-				m_faceClipSize = hull->m_childShape->GetBoxMaxRadius();
+//				BeamClipping (convexSphapeUmbra);
+//				m_faceClipSize = hull->m_childShape->GetBoxMaxRadius();
 			}
 
 			dgCollisionConvex* const convexShape = (dgCollisionConvex*) hull->m_childShape;

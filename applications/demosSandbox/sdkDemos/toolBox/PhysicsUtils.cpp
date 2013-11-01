@@ -1020,7 +1020,7 @@ NewtonCollision* CreateCollisionTree (NewtonWorld* world, DemoEntity* const enti
 
 
 
-static NewtonBody* CreateLevelMeshBody (NewtonWorld* const world, DemoEntity* const ent, bool optimize)
+NewtonBody* CreateLevelMeshBody (NewtonWorld* const world, DemoEntity* const ent, bool optimize)
 {
 	NewtonCollision* const collision = CreateCollisionTree (world, ent, 0, optimize);
 
