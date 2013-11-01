@@ -2488,7 +2488,7 @@ clipperMeshBVH->m_mesh->Trace();
 					stack --;
 					dgEdge* const face = stackPool[stack];
 					if (face->m_mark != mark) {
-						dgMeshBVHNode* const newNode = meshBVH->AddNode (face);
+						dgMeshBVHNode* const newNode = meshBVH->AddFaceNode (face, NULL);
 						dgPolyhedra::dgPairKey key(newNode->m_face->m_incidentVertex, newNode->m_face->m_twin->m_incidentVertex);
 						meshBVH->m_nodeEdgeMap.Insert(newNode, key.GetVal());
 					}

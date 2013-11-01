@@ -80,7 +80,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		class dgMeshBVHNode
 		{
 			public:
-			dgMeshBVHNode (const dgMeshEffect* const mesh, dgEdge* const face);
+			dgMeshBVHNode (const dgMeshEffect* const mesh, dgEdge* const face, void* const userData);
 			dgMeshBVHNode (dgMeshBVHNode* const left, dgMeshBVHNode* const right);
 			~dgMeshBVHNode ();
 			void SetBox (const dgVector& p0, const dgVector& p1);
@@ -91,6 +91,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 			dgFloat32 m_area;
 			dgEdge* m_face;
+			void* m_userData;
 			dgMeshBVHNode* m_left;
 			dgMeshBVHNode* m_right;
 			dgMeshBVHNode* m_parent;
@@ -111,10 +112,10 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		virtual void Cleanup ();
 
 		void GetOverlapNodes (dgList<dgMeshBVHNode*>& overlapNodes, const dgBigVector& p0, const dgBigVector& p1) const;
-		dgMeshBVHNode* FaceRayCast (const dgBigVector& l0, const dgBigVector& l1, dgFloat64& paramOut) const;
+		dgMeshBVHNode* FaceRayCast (const dgBigVector& l0, const dgBigVector& l1, dgFloat64& paramOut, bool doubleSidedFaces) const;
 
 		protected:
-		dgMeshBVHNode* AddNode (dgEdge* const face);
+		dgMeshBVHNode* AddFaceNode (dgEdge* const face, void* const userData);
 		void RemoveNode (dgMeshBVHNode* const treeNode);
 		void ImproveNodeFitness ();
 		void ImproveNodeFitness (dgMeshBVHNode* const node);
@@ -122,7 +123,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		virtual bool SanityCheck() const;
 
 		virtual dgFloat64 VertexRayCast (const dgBigVector& l0, const dgBigVector& l1) const;
-		virtual dgFloat64 RayFaceIntersect (const dgMeshBVHNode* const face, const dgBigVector& p0, const dgBigVector& p1) const;
+		virtual dgFloat64 RayFaceIntersect (const dgMeshBVHNode* const face, const dgBigVector& p0, const dgBigVector& p1, bool dobleSidedFaces) const;
 		virtual bool RayRayIntersect (dgEdge* const edge, const dgMeshEffect* const otherMesh, dgEdge* const otherEdge, dgFloat64& param, dgFloat64& otherParam) const;
 		
 		dgMeshEffect* m_mesh;
