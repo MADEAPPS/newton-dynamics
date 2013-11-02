@@ -92,11 +92,13 @@ class dgMatrix
 	// constructor for polar composition
 	dgMatrix (const dgMatrix& transformMatrix, const dgVector& scale, const dgMatrix& stretchAxis);
 
-
 	dgVector m_front;
 	dgVector m_up;
 	dgVector m_right;
 	dgVector m_posit;
+
+	static dgMatrix m_zeroMatrix;
+	static dgMatrix m_identityMatrix;
 } DG_GCC_VECTOR_ALIGMENT;
 
 

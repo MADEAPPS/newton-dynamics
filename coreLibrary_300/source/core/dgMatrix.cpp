@@ -33,24 +33,24 @@ dgVector dgVector::m_half (dgFloat32 (0.5f));
 dgVector dgVector::m_three (dgFloat32 (3.0f));
 dgVector dgVector::m_negOne (dgFloat32 (-1.0f));
 
-static dgMatrix zeroMatrix (dgVector (dgFloat32(0.0f)),
-							dgVector (dgFloat32(0.0f)),
-							dgVector (dgFloat32(0.0f)),
-							dgVector (dgFloat32(0.0f)));
+dgMatrix dgMatrix::m_zeroMatrix (dgVector (dgFloat32(0.0f)),
+								 dgVector (dgFloat32(0.0f)),
+								 dgVector (dgFloat32(0.0f)),
+								 dgVector (dgFloat32(0.0f)));
 
-static dgMatrix identityMatrix (dgVector (dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f)),
-								dgVector (dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f)),
-								dgVector (dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f)),
-								dgVector (dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f)));
+dgMatrix dgMatrix::m_identityMatrix (dgVector (dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f)),
+									 dgVector (dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f)),
+									 dgVector (dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f)),
+									 dgVector (dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f)));
 
 const dgMatrix& dgGetIdentityMatrix()
 {
-	return identityMatrix;
+	return dgMatrix::m_identityMatrix;
 }
 
 const dgMatrix& dgGetZeroMatrix ()
 {
-	return zeroMatrix;
+	return dgMatrix::m_zeroMatrix;
 }
 
 

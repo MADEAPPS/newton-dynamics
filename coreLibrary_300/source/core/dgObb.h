@@ -75,15 +75,6 @@ class dgObb: public dgMatrix
 } DG_GCC_VECTOR_ALIGMENT; 
 
 
-//const dgSphere& GetIdentitySphere();
-
-
-//inline dgObb::dgObb ()
-//	:dgMatrix(dgGetIdentityMatrix())
-//	,m_size (dgFloat32 (0.0f))
-//{
-//}
-
 inline dgObb::dgObb (const dgQuaternion &quat, const dgVector &position, const dgVector& dim)
 	:dgMatrix(quat, position)
 {

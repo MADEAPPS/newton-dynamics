@@ -24,13 +24,6 @@
 #include "dgDebug.h"
 #include "dgPlane.h"
 #include "dgMatrix.h"
-/*
-static dgObb identitySphere;
-const dgObb& GetIdentitySphere()
-{
-	return identitySphere;
-}
-*/
 
 
 namespace InternalSphere
