@@ -50,6 +50,7 @@ shapeSize = dVector(size, size, size, 0.0f);
 		// make a large complex of plane by adding lost of these shapes at a random location and oriention; 
 		NewtonCollision* const compound = NewtonCreateCompoundCollision (world, materialID);
 		NewtonCompoundCollisionBeginAddRemove(compound);	
+
 		for (int i = 0 ; i < count; i ++) {
 			for (int j = 0 ; j < count; j ++) {
 				float pitch = RandomVariable (1.0f) * 2.0f * 3.1416f;
@@ -253,9 +254,10 @@ class dConvexCastManager: public CustomControllerManager<dConvexCastRecord>
 			dVector p1 (camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
 
 
-//p0 = dVector (-2.6353559f, 6.3114533f, -8.6758823f, 1.0f);
-//p1 = dVector (883.85059f, -1115.0381f, 1510.1704f, 1.0f); 
-
+//p0 = dVector (-9.048349, 11.493608, -16.226702, 1.0f);
+//p1 = dVector (149.520401, -1381.376099, 1543.290405, 1.0f); 
+//dTrace (("%f, %f, %f,\n", p0[0], p0[1], p0[2]));
+//dTrace (("%f, %f, %f,\n", p1[0], p1[1], p1[2]));
 
 			// do the convex cast here 
 			dMatrix matrix (GetIdentityMatrix());
@@ -279,10 +281,10 @@ class dConvexCastManager: public CustomControllerManager<dConvexCastRecord>
 };
 
 
-static void MakeSingleCompound(DemoEntityManager* const scene)
+static void AddSingleCompound(DemoEntityManager* const scene)
 {
 	NewtonWorld* const world = scene->GetNewton();
-
+	
 	NewtonCollision* compoundCollision = NewtonCreateCompoundCollision(world, 0);
 	NewtonCompoundCollisionBeginAddRemove(compoundCollision);
 
@@ -316,6 +318,28 @@ scene->Append(entity);
 }
 
 
+static void AddStaticMesh(DemoEntityManager* const scene)
+{
+	char fileName[2048];
+
+	NewtonWorld* const world = scene->GetNewton();
+	GetWorkingFileName ("ramp.off", fileName);
+	NewtonMesh* const ntMesh = NewtonMeshLoadOFF(world, fileName);
+
+	dMatrix matrix (GetIdentityMatrix());
+	DemoMesh* mesh = new DemoMesh(ntMesh);
+	DemoEntity* const entity = new DemoEntity(matrix, NULL);
+	entity->SetMesh(mesh);
+	mesh->Release();
+
+	scene->Append(entity);
+
+	CreateLevelMeshBody (world, entity, true);
+
+	NewtonMeshDestroy (ntMesh);
+}
+
+
 
 // create physics scene
 void ConvexCast (DemoEntityManager* const scene)
@@ -335,8 +359,8 @@ void ConvexCast (DemoEntityManager* const scene)
 	new dConvexCastManager (scene, stupidLevel);
 
 // add a single compound Box test
-MakeSingleCompound(scene);
-
+AddSingleCompound(scene);
+AddStaticMesh(scene);
 
 	// place camera into position
 	dMatrix camMatrix (GetIdentityMatrix());

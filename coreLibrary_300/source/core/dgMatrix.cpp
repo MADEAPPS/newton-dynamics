@@ -166,64 +166,6 @@ void dgMatrix::TransformTriplex (dgFloat64* const dst, dgInt32 dstStrideInBytes,
 
 void dgMatrix::TransformBBox (const dgVector& p0local, const dgVector& p1local, dgVector& p0, dgVector& p1) const
 {
-/*
-	dgVector box[8];
-
-	box[0][0] = p0local[0];
-	box[0][1] = p0local[1];
-	box[0][2] = p0local[2];
-	box[0][3] = dgFloat32(1.0f);
-
-	box[1][0] = p0local[0];
-	box[1][1] = p0local[1];
-	box[1][2] = p1local[2];
-	box[1][3] = dgFloat32(1.0f);
-
-	box[2][0] = p0local[0];
-	box[2][1] = p1local[1];
-	box[2][2] = p0local[2];
-	box[2][3] = dgFloat32(1.0f);
-
-	box[3][0] = p0local[0];
-	box[3][1] = p1local[1];
-	box[3][2] = p1local[2];
-	box[3][3] = dgFloat32(1.0f);
-
-	box[4][0] = p1local[0];
-	box[4][1] = p0local[1];
-	box[4][2] = p0local[2];
-	box[4][3] = dgFloat32(1.0f);
-
-	box[5][0] = p1local[0];
-	box[5][1] = p0local[1];
-	box[5][2] = p1local[2];
-	box[1][3] = dgFloat32(1.0f);
-
-	box[6][0] = p1local[0];
-	box[6][1] = p1local[1];
-	box[6][2] = p0local[2];
-	box[6][3] = dgFloat32(1.0f);
-
-	box[7][0] = p1local[0];
-	box[7][1] = p1local[1];
-	box[7][2] = p1local[2];
-	box[7][3] = dgFloat32(1.0f);
-
-	TransformTriplex (&box[0].m_x, sizeof (dgVector), &box[0].m_x, sizeof (dgVector), 8);
-
-	p0 = box[0];
-	p1 = box[0];
-	for (dgInt32 i = 1; i < 8; i ++) {
-		p0.m_x = GetMin (p0.m_x, box[i].m_x);
-		p0.m_y = GetMin (p0.m_y, box[i].m_y);
-		p0.m_z = GetMin (p0.m_z, box[i].m_z);
-
-		p1.m_x = GetMax (p1.m_x, box[i].m_x);
-		p1.m_y = GetMax (p1.m_y, box[i].m_y);
-		p1.m_z = GetMax (p1.m_z, box[i].m_z);
-	}
-*/
-
 	const dgMatrix& matrix = *this;
 	dgVector size ((p1local - p0local).Scale3 (dgFloat32 (0.5f)));
 	dgVector center (TransformVector ((p1local + p0local).Scale3 (dgFloat32 (0.5f))));

@@ -57,7 +57,7 @@ class dgCollisionConvexPolygon: public dgCollisionConvex
 	virtual dgFloat32 GetBoxMinRadius () const; 
 	virtual dgFloat32 GetBoxMaxRadius () const;
 
-	void BeamClipping (dgFloat32 size);
+	void BeamClipping (const dgVector& origin, dgFloat32 size);
 	void SetFeatureHit (dgInt32 featureCount, const dgInt32* const index);
     dgInt32 CalculateContactToConvexHullDescrete (dgCollisionParamProxy& proxy, const dgVector& polyInstanceScale, const dgVector& polyInstanceInvScale);
 	dgInt32 CalculateContactToConvexHullContinue (dgCollisionParamProxy& proxy, const dgVector& polyInstanceScale, const dgVector& polyInstanceInvScale);
