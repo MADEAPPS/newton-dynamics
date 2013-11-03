@@ -1,0 +1,31 @@
+
+[Visualizer]
+; autoexpad type for for dgVetore type, in th enewtyon engine
+dgVector{
+	children
+	(
+	    #array
+	    (
+			expr :	($c.m_f)[$i],  
+			size :	4
+		)
+	)
+	
+    preview
+    ( 
+        #( 
+			" x=", ($c.m_f)[0],
+			" y=", ($c.m_f)[1],
+			" z=", ($c.m_f)[2],
+			" w=", ($c.m_f)[3],
+			""
+		)
+	)
+}
+
+
+;dgQuaternion= <m_q0,f> <m_q1,f> <m_q2,f> <m_q3,f>
+;dgTemplateVector<*>= <m_x,f> <m_y,f> <m_z,f> <m_w,f>
+
+
+
