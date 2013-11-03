@@ -120,7 +120,7 @@ z = size * (i - count / 2);
 
 		for (int i = 0; i < m_count; i ++) {
 			dVector shapeSize (size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), 0.0f);
-#if 0
+#if 1
 			m_castingShapeArray[i] = CreateConvexCollision (world, GetIdentityMatrix(), shapeSize, castSelection[i], materialID);
 #else 
 			m_castingShapeArray[i] = NewtonCreateCompoundCollision (world, materialID);
@@ -137,7 +137,7 @@ z = size * (i - count / 2);
 		dMatrix matrix (GetIdentityMatrix());
 		matrix.m_posit.m_y = 2.0f;
 
-		m_currentCastingShape = 0;
+		m_currentCastingShape = 3;
 		m_castingEntity = new DemoEntity (matrix, NULL);
 		m_castingEntity->SetMesh(m_castingGeometries[m_currentCastingShape]);
 	}
