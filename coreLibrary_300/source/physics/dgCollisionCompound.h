@@ -25,9 +25,9 @@
 
 #include "dgCollision.h"
 
+class dgFastRayTest;
 class dgCollisionBVH;
 class dgCollisionInstance;
-
 
 
 #define DG_COMPOUND_STACK_DEPTH	256
@@ -81,6 +81,7 @@ class dgCollisionCompound: public dgCollision
 		void SetBox (const dgVector& p0, const dgVector& p1);
 		bool BoxTest (const dgOOBBTestData& data) const;
 		bool BoxTest (const dgOOBBTestData& data, const dgNodeBase* const otherNode) const;
+		dgFloat32 RayBoxDistance (const dgOOBBTestData& data, const dgFastRayTest& myRay, const dgFastRayTest& otherRay, const dgNodeBase* const otherNode) const;
 
 		DG_INLINE dgCollisionInstance* GetShape() const 
 		{
@@ -180,7 +181,9 @@ class dgCollisionCompound: public dgCollision
 	dgInt32 CalculateContactsToSingle (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 	dgInt32 CalculateContactsToSingleContinue (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 	dgInt32 CalculateContactsToCompound (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
+	dgInt32 CalculateContactsToCompoundContinue (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 	dgInt32 CalculateContactsToCollisionTree (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
+	dgInt32 CalculateContactsToCollisionTreeContinue (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 	dgInt32 CalculateContactsToHeightField (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 	dgInt32 CalculateContactsUserDefinedCollision (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 
