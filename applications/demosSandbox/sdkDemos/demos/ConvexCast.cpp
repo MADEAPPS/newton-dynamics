@@ -51,6 +51,7 @@ shapeSize = dVector(size, size, size, 0.0f);
 		NewtonCollision* const compound = NewtonCreateCompoundCollision (world, materialID);
 		NewtonCompoundCollisionBeginAddRemove(compound);	
 
+//count = 0;
 		for (int i = 0 ; i < count; i ++) {
 			for (int j = 0 ; j < count; j ++) {
 				float pitch = RandomVariable (1.0f) * 2.0f * 3.1416f;
@@ -77,7 +78,6 @@ z = size * (i - count / 2);
 
 				NewtonCollisionSetMatrix (collisionArray[index], &matrix[0][0]);
 				NewtonCompoundCollisionAddSubCollision (compound, collisionArray[index]);
-
 			}
 		}
 		NewtonCompoundCollisionEndAddRemove(compound);	
@@ -120,7 +120,16 @@ z = size * (i - count / 2);
 
 		for (int i = 0; i < m_count; i ++) {
 			dVector shapeSize (size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), 0.0f);
+#if 0
 			m_castingShapeArray[i] = CreateConvexCollision (world, GetIdentityMatrix(), shapeSize, castSelection[i], materialID);
+#else 
+			m_castingShapeArray[i] = NewtonCreateCompoundCollision (world, materialID);
+			NewtonCompoundCollisionBeginAddRemove(m_castingShapeArray[i]);	
+			NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), shapeSize, castSelection[i], materialID);
+			NewtonCompoundCollisionAddSubCollision (m_castingShapeArray[i], collision);
+			NewtonDestroyCollision(collision);
+			NewtonCompoundCollisionEndAddRemove(m_castingShapeArray[i]);	
+#endif
 			m_castingGeometries[i] = new DemoMesh("geometry", m_castingShapeArray[i], "smilli.tga", "smilli.tga", "smilli.tga");
 		}
 
@@ -253,11 +262,10 @@ class dConvexCastManager: public CustomControllerManager<dConvexCastRecord>
 			dVector p0 (camera->ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
 			dVector p1 (camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
 
-
-//p0 = dVector (-9.048349, 11.493608, -16.226702, 1.0f);
-//p1 = dVector (149.520401, -1381.376099, 1543.290405, 1.0f); 
-//dTrace (("%f, %f, %f,\n", p0[0], p0[1], p0[2]));
-//dTrace (("%f, %f, %f,\n", p1[0], p1[1], p1[2]));
+//p0 = dVector (-29.900000, 9.967503, 0.004149, 1.0f);
+//p1 = dVector (1969.768188, -639.875854, 82.962875, 1.0f); 
+//dTrace (("%f, %f, %f\n", p0[0], p0[1], p0[2]));
+//dTrace (("%f, %f, %f\n", p1[0], p1[1], p1[2]));
 
 			// do the convex cast here 
 			dMatrix matrix (GetIdentityMatrix());

@@ -1533,7 +1533,6 @@ dgInt32 dgCollisionCompound::CalculateContacts (dgCollidingPairCollector::dgPair
 			} else if (body1->m_collision->IsType (dgCollision::dgCollisionCompound_RTTI)) {
 				contactCount = CalculateContactsToCompoundContinue (pair, proxy);
 			} else if (body1->m_collision->IsType (dgCollision::dgCollisionBVH_RTTI)) {
-				dgAssert (0);
 				contactCount = CalculateContactsToCollisionTreeContinue (pair, proxy);
 			} else if (body1->m_collision->IsType (dgCollision::dgCollisionHeightField_RTTI)) {
 				dgAssert (0);
@@ -2287,10 +2286,11 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTree (dgCollidingPairCo
 
 	proxy.m_referenceBody = myBody;
 	proxy.m_floatingBody = treeBody;
-
 	proxy.m_floatingCollision = treeCollisionInstance;
-	dgMatrix myMatrix (compoundInstance->GetLocalMatrix() * myBody->m_matrix);
-	dgOOBBTestData data (proxy.m_floatingCollision->m_globalMatrix * myMatrix.Inverse());
+
+//	dgMatrix myMatrix (compoundInstance->GetLocalMatrix() * myBody->m_matrix);
+	const dgMatrix& myMatrix (compoundInstance->GetGlobalMatrix());
+	dgOOBBTestData data (treeCollisionInstance->GetGlobalMatrix() * myMatrix.Inverse());
 
 	dgInt32 stack = 1;
 	stackPool[0].m_myNode = m_root;
@@ -2568,309 +2568,6 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTree (dgCollidingPairCo
 
 
 
-
-dgInt32 dgCollisionCompound::CalculateContactsToCollisionTreeContinue (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const
-{
-	dgAssert (0);
-	return 0;
-/*
-	dgContactPoint* const contacts = proxy.m_contacts;
-
-	dgNodePairs stackPool[4 * DG_COMPOUND_STACK_DEPTH];
-
-	dgInt32 contactCount = 0;
-
-	dgContact* const constraint = pair->m_contact;
-	dgBody* const myBody = constraint->GetBody0();
-	dgBody* const treeBody = constraint->GetBody1();
-
-	dgCollisionInstance* const compoundInstance = myBody->m_collision;
-	dgCollisionInstance* const treeCollisionInstance = treeBody->m_collision;
-
-	dgAssert (compoundInstance->GetChildShape() == this);
-	dgAssert (treeCollisionInstance->IsType (dgCollision::dgCollisionBVH_RTTI));
-	dgCollisionBVH* const treeCollision = (dgCollisionBVH*)treeCollisionInstance->GetChildShape();
-
-	proxy.m_referenceBody = myBody;
-	proxy.m_floatingBody = treeBody;
-
-	proxy.m_floatingCollision = treeCollisionInstance;
-	dgMatrix myMatrix (compoundInstance->GetLocalMatrix() * myBody->m_matrix);
-	dgOOBBTestData data (proxy.m_floatingCollision->m_globalMatrix * myMatrix.Inverse());
-
-	dgInt32 stack = 1;
-	stackPool[0].m_myNode = m_root;
-	stackPool[0].m_treeNode = treeCollision->GetRootNode();
-	stackPool[0].m_treeNodeIsLeaf = 0;
-
-	dgNodeBase nodeProxi;
-	nodeProxi.m_left = NULL;
-	nodeProxi.m_right = NULL;
-
-	const dgContactMaterial* const material = constraint->GetMaterial();
-
-	CalculateCollisionTreeArea(stackPool[0], treeCollision, stackPool[0].m_treeNode);
-
-	dgFloat32 closestDist = dgFloat32 (1.0e10f);
-	while (stack) {
-
-		stack --;
-		const dgNodePairs* const stackEntry = &stackPool[stack];
-
-		dgNodeBase* const me = stackEntry->m_myNode;
-		const void* const other = stackEntry->m_treeNode;
-		dgInt32 treeNodeIsLeaf = stackEntry->m_treeNodeIsLeaf;
-
-		dgAssert (me && other);
-#ifdef _DEBUG
-		dgVector p0;
-		dgVector p1;
-		treeCollision->GetNodeAABB(other, p0, p1);
-		dgVector size = (p1 - p0).Scale3 (dgFloat32 (0.5f));
-		dgVector origin = (p1 + p0).Scale3 (dgFloat32 (0.5f));
-		dgVector size1 (size.m_y, size.m_z, size.m_x, dgFloat32 (0.0f));
-		dgFloat32 area = size  % size1;
-		dgAssert (dgAbsf(area - stackEntry->m_treeNodeArea) < dgFloat32 (1.0e-1f));
-#endif
-
-		nodeProxi.m_p0 = stackEntry->m_treeNodeP0;
-		nodeProxi.m_p1 = stackEntry->m_treeNodeP1;
-		nodeProxi.m_area = stackEntry->m_treeNodeArea;
-		nodeProxi.m_size = stackEntry->m_treeNodeSize;
-		nodeProxi.m_origin = stackEntry->m_treeNodeOrigin;
-		if (me->BoxTest (data, &nodeProxi)) {
-			if ((me->m_type == m_leaf) && treeNodeIsLeaf) {
-				dgCollisionInstance* const subShape = me->GetShape();
-				if (subShape->GetCollisionMode()) {
-					bool processContacts = true;
-					if (material->m_compoundAABBOverlap) {
-						processContacts = material->m_compoundAABBOverlap (*material, myBody, me->m_myNode, treeBody, NULL, proxy.m_threadIndex);
-					}
-					if (processContacts) {
-						dgCollisionInstance childInstance (*subShape, subShape->GetChildShape());
-						childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * myMatrix;
-						proxy.m_referenceCollision = &childInstance; 
-
-						proxy.m_maxContacts = DG_MAX_CONTATCS - contactCount;
-						proxy.m_contacts = contacts ? &contacts[contactCount] : contacts;
-
-						dgInt32 count = m_world->CalculateConvexToNonConvexContacts (proxy);
-						closestDist = dgMin(closestDist, constraint->m_closestDistance);
-
-						if (!proxy.m_intersectionTestOnly) {
-							for (dgInt32 i = 0; i < count; i ++) {
-								dgAssert (contacts[contactCount + i].m_collision0 == &childInstance);
-								contacts[contactCount + i].m_collision0 = subShape;
-							}
-							contactCount += count;
-							if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
-								contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
-							}
-						} else if (count == -1) {
-							contactCount = -1;
-							break;
-						}
-						//childInstance.SetUserData(NULL);
-					}
-				}
-
-			} else if (me->m_type == m_leaf) {
-				void* const frontNode = treeCollision->GetFrontNode(other);
-				void* const backNode = treeCollision->GetBackNode(other);
-				if (backNode && frontNode) {
-					stackPool[stack].m_myNode = me;
-					stackPool[stack].m_treeNode = backNode;
-					stackPool[stack].m_treeNodeIsLeaf = 0;
-					CalculateCollisionTreeArea(stackPool[stack], treeCollision, backNode);
-					stack++;
-
-					stackPool[stack].m_myNode = me;
-					stackPool[stack].m_treeNode = frontNode;
-					stackPool[stack].m_treeNodeIsLeaf = 0;
-					CalculateCollisionTreeArea(stackPool[stack], treeCollision, frontNode);
-					stack++;
-
-				} else if (backNode && !frontNode) {
-					stackPool[stack].m_myNode = me;
-					stackPool[stack].m_treeNode = backNode;
-					stackPool[stack].m_treeNodeIsLeaf = 0;
-					CalculateCollisionTreeArea(stackPool[stack], treeCollision, backNode);
-					stack++;
-
-					stackPool[stack].m_myNode = me;
-					stackPool[stack].m_treeNode = other;
-					stackPool[stack].m_treeNodeIsLeaf = 1;
-					stackPool[stack].m_treeNodeP0 = nodeProxi.m_p0;
-					stackPool[stack].m_treeNodeP1 = nodeProxi.m_p1;
-					stackPool[stack].m_treeNodeArea = nodeProxi.m_area;
-					stackPool[stack].m_treeNodeSize = nodeProxi.m_size;
-					stackPool[stack].m_treeNodeOrigin = nodeProxi.m_origin;
-					stack++;
-
-				} else if (!backNode && frontNode) {
-					stackPool[stack].m_myNode = me;
-					stackPool[stack].m_treeNode = frontNode;
-					stackPool[stack].m_treeNodeIsLeaf = 0;
-					CalculateCollisionTreeArea(stackPool[stack], treeCollision, frontNode);
-					stack++;
-
-					stackPool[stack].m_myNode = me;
-					stackPool[stack].m_treeNode = other;
-					stackPool[stack].m_treeNodeIsLeaf = 1;
-					stackPool[stack].m_treeNodeP0 = nodeProxi.m_p0;
-					stackPool[stack].m_treeNodeP1 = nodeProxi.m_p1;
-					stackPool[stack].m_treeNodeArea = nodeProxi.m_area;
-					stackPool[stack].m_treeNodeSize = nodeProxi.m_size;
-					stackPool[stack].m_treeNodeOrigin = nodeProxi.m_origin;
-					stack++;
-
-				} else {
-					stackPool[stack].m_myNode = me;
-					stackPool[stack].m_treeNode = other;
-					stackPool[stack].m_treeNodeIsLeaf = 1;
-					stackPool[stack].m_treeNodeP0 = nodeProxi.m_p0;
-					stackPool[stack].m_treeNodeP1 = nodeProxi.m_p1;
-					stackPool[stack].m_treeNodeArea = nodeProxi.m_area;
-					stackPool[stack].m_treeNodeSize = nodeProxi.m_size;
-					stackPool[stack].m_treeNodeOrigin = nodeProxi.m_origin;
-					stack++;
-				}
-
-			} else if (treeNodeIsLeaf) {
-				stackPool[stack].m_myNode = me->m_left;
-				stackPool[stack].m_treeNode = other;
-				stackPool[stack].m_treeNodeIsLeaf = 1;
-				stackPool[stack].m_treeNodeP0 = nodeProxi.m_p0;
-				stackPool[stack].m_treeNodeP1 = nodeProxi.m_p1;
-				stackPool[stack].m_treeNodeArea = nodeProxi.m_area;
-				stackPool[stack].m_treeNodeSize = nodeProxi.m_size;
-				stackPool[stack].m_treeNodeOrigin = nodeProxi.m_origin;
-				stack++;
-				dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNodeBase*)));
-
-				stackPool[stack].m_myNode = me->m_right;
-				stackPool[stack].m_treeNode = other;
-				stackPool[stack].m_treeNodeIsLeaf = 1;
-				stackPool[stack].m_treeNodeP0 = nodeProxi.m_p0;
-				stackPool[stack].m_treeNodeP1 = nodeProxi.m_p1;
-				stackPool[stack].m_treeNodeArea = nodeProxi.m_area;
-				stackPool[stack].m_treeNodeSize = nodeProxi.m_size;
-				stackPool[stack].m_treeNodeOrigin = nodeProxi.m_origin;
-				stack++;
-				dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNodeBase*)));
-
-			} else if (nodeProxi.m_area > me->m_area) {
-				dgAssert (me->m_type == m_node);
-				void* const frontNode = treeCollision->GetFrontNode(other);
-				void* const backNode = treeCollision->GetBackNode(other);
-				if (backNode && frontNode) {
-					stackPool[stack].m_myNode = (dgNodeBase*) me;
-					stackPool[stack].m_treeNode = backNode;
-					stackPool[stack].m_treeNodeIsLeaf = 0;
-					CalculateCollisionTreeArea(stackPool[stack], treeCollision, backNode);
-					stack++;
-
-					stackPool[stack].m_myNode = (dgNodeBase*) me;
-					stackPool[stack].m_treeNode = frontNode;
-					stackPool[stack].m_treeNodeIsLeaf = 0;
-					CalculateCollisionTreeArea(stackPool[stack], treeCollision, frontNode);
-					stack++;
-				} else if (backNode && !frontNode) {
-					stackPool[stack].m_myNode = (dgNodeBase*) me;
-					stackPool[stack].m_treeNode = backNode;
-					stackPool[stack].m_treeNodeIsLeaf = 0;
-					CalculateCollisionTreeArea(stackPool[stack], treeCollision, backNode);
-					stack++;
-
-					stackPool[stack].m_myNode = me->m_left;
-					stackPool[stack].m_treeNode = other;
-					stackPool[stack].m_treeNodeIsLeaf = 1;
-					stackPool[stack].m_treeNodeP0 = nodeProxi.m_p0;
-					stackPool[stack].m_treeNodeP1 = nodeProxi.m_p1;
-					stackPool[stack].m_treeNodeArea = nodeProxi.m_area;
-					stackPool[stack].m_treeNodeSize = nodeProxi.m_size;
-					stackPool[stack].m_treeNodeOrigin = nodeProxi.m_origin;
-					stack++;
-
-					stackPool[stack].m_myNode = me->m_right;
-					stackPool[stack].m_treeNode = other;
-					stackPool[stack].m_treeNodeIsLeaf = 1;
-					stackPool[stack].m_treeNodeP0 = nodeProxi.m_p0;
-					stackPool[stack].m_treeNodeP1 = nodeProxi.m_p1;
-					stackPool[stack].m_treeNodeArea = nodeProxi.m_area;
-					stackPool[stack].m_treeNodeSize = nodeProxi.m_size;
-					stackPool[stack].m_treeNodeOrigin = nodeProxi.m_origin;
-					stack++;
-
-				} else if (!backNode && frontNode) {
-					stackPool[stack].m_myNode = me;
-					stackPool[stack].m_treeNode = frontNode;
-					stackPool[stack].m_treeNodeIsLeaf = 0;
-					CalculateCollisionTreeArea(stackPool[stack], treeCollision, frontNode);
-					stack++;
-
-					stackPool[stack].m_myNode = me->m_left;
-					stackPool[stack].m_treeNode = other;
-					stackPool[stack].m_treeNodeIsLeaf = 1;
-					stackPool[stack].m_treeNodeP0 = nodeProxi.m_p0;
-					stackPool[stack].m_treeNodeP1 = nodeProxi.m_p1;
-					stackPool[stack].m_treeNodeArea = nodeProxi.m_area;
-					stackPool[stack].m_treeNodeSize = nodeProxi.m_size;
-					stackPool[stack].m_treeNodeOrigin = nodeProxi.m_origin;
-					stack++;
-
-					stackPool[stack].m_myNode = me->m_right;
-					stackPool[stack].m_treeNode = other;
-					stackPool[stack].m_treeNodeIsLeaf = 1;
-					stackPool[stack].m_treeNodeP0 = nodeProxi.m_p0;
-					stackPool[stack].m_treeNodeP1 = nodeProxi.m_p1;
-					stackPool[stack].m_treeNodeArea = nodeProxi.m_area;
-					stackPool[stack].m_treeNodeSize = nodeProxi.m_size;
-					stackPool[stack].m_treeNodeOrigin = nodeProxi.m_origin;
-					stack++;
-
-				} else {
-					stackPool[stack].m_myNode = me;
-					stackPool[stack].m_treeNode = other;
-					stackPool[stack].m_treeNodeIsLeaf = 1;
-					stackPool[stack].m_treeNodeP0 = nodeProxi.m_p0;
-					stackPool[stack].m_treeNodeP1 = nodeProxi.m_p1;
-					stackPool[stack].m_treeNodeArea = nodeProxi.m_area;
-					stackPool[stack].m_treeNodeSize = nodeProxi.m_size;
-					stackPool[stack].m_treeNodeOrigin = nodeProxi.m_origin;
-					stack++;
-				}
-
-			} else {
-				dgAssert (me->m_type == m_node);
-				stackPool[stack].m_myNode = me->m_left;
-				stackPool[stack].m_treeNode = other;
-				stackPool[stack].m_treeNodeIsLeaf = treeNodeIsLeaf;
-				stackPool[stack].m_treeNodeP0 = nodeProxi.m_p0;
-				stackPool[stack].m_treeNodeP1 = nodeProxi.m_p1;
-				stackPool[stack].m_treeNodeArea = nodeProxi.m_area;
-				stackPool[stack].m_treeNodeSize = nodeProxi.m_size;
-				stackPool[stack].m_treeNodeOrigin = nodeProxi.m_origin;
-				stack++;
-
-				stackPool[stack].m_myNode = me->m_right;
-				stackPool[stack].m_treeNode = other;
-				stackPool[stack].m_treeNodeIsLeaf = treeNodeIsLeaf;
-				stackPool[stack].m_treeNodeP0 = nodeProxi.m_p0;
-				stackPool[stack].m_treeNodeP1 = nodeProxi.m_p1;
-				stackPool[stack].m_treeNodeArea = nodeProxi.m_area;
-				stackPool[stack].m_treeNodeSize = nodeProxi.m_size;
-				stackPool[stack].m_treeNodeOrigin = nodeProxi.m_origin;
-				stack++;
-			}
-		}
-	}
-
-	constraint->m_closestDistance = closestDist;
-	proxy.m_contacts = contacts;	
-	return contactCount;
-*/
-}
 
 
 
@@ -3021,9 +2718,9 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompoundContinue(dgCollidingPair
 
 //	dgMatrix myMatrix (compoundInstance->GetLocalMatrix() * compoundBody->m_matrix);
 //	dgMatrix otherMatrix (otherCompoundInstance->GetLocalMatrix() * otherCompoundBody->m_matrix);
+//	dgMatrix matrix (otherCompoundInstance->GetGlobalMatrix() * myMatrix.Inverse());
 	const dgMatrix& myMatrix = compoundInstance->GetGlobalMatrix();
 	const dgMatrix& otherMatrix = otherCompoundInstance->GetGlobalMatrix();
-//	dgMatrix matrix (otherCompoundInstance->GetGlobalMatrix() * myMatrix.Inverse());
 	dgOOBBTestData data (otherMatrix * myMatrix.Inverse());
 
 //	dgVector boxP0;
@@ -3032,7 +2729,6 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompoundContinue(dgCollidingPair
 	dgVector relVeloc (myMatrix.UnrotateVector (otherCompoundBody->GetVelocity() - compoundBody->GetVelocity()));
 	dgFastRayTest myCompoundRay (dgVector (dgFloat32 (0.0f)), relVeloc);
 	dgFastRayTest otherCompoundRay (dgVector (dgFloat32 (0.0f)), data.m_matrix.UnrotateVector(relVeloc));
-
 
 	dgInt32 stack = 1;
 	stackPool[0][0] = m_root;
@@ -3176,3 +2872,363 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompoundContinue(dgCollidingPair
 	proxy.m_contacts = contacts;
 	return contactCount;
 }
+
+
+
+dgInt32 dgCollisionCompound::CalculateContactsToCollisionTreeContinue (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const
+{
+	dgContactPoint* const contacts = proxy.m_contacts;
+
+	dgNodePairs stackPool[4 * DG_COMPOUND_STACK_DEPTH];
+
+	dgInt32 contactCount = 0;
+
+	dgContact* const constraint = pair->m_contact;
+	dgBody* const myBody = constraint->GetBody0();
+	dgBody* const treeBody = constraint->GetBody1();
+
+	dgCollisionInstance* const compoundInstance = myBody->m_collision;
+	dgCollisionInstance* const treeCollisionInstance = treeBody->m_collision;
+
+	dgAssert (compoundInstance->GetChildShape() == this);
+	dgAssert (treeCollisionInstance->IsType (dgCollision::dgCollisionBVH_RTTI));
+	dgCollisionBVH* const treeCollision = (dgCollisionBVH*)treeCollisionInstance->GetChildShape();
+
+	proxy.m_referenceBody = myBody;
+	proxy.m_floatingBody = treeBody;
+	proxy.m_floatingCollision = treeCollisionInstance;
+
+//	dgMatrix myMatrix (compoundInstance->GetLocalMatrix() * myBody->m_matrix);
+	const dgMatrix& myMatrix = compoundInstance->GetGlobalMatrix();
+	const dgMatrix& otherMatrix = treeCollisionInstance->GetGlobalMatrix();
+	dgOOBBTestData data (otherMatrix * myMatrix.Inverse());
+
+	dgVector relVeloc (myMatrix.UnrotateVector (treeBody->GetVelocity() - myBody->GetVelocity()));
+	dgFastRayTest myCompoundRay (dgVector (dgFloat32 (0.0f)), relVeloc);
+	dgFastRayTest otherTreedRay (dgVector (dgFloat32 (0.0f)), data.m_matrix.UnrotateVector(relVeloc));
+
+	dgInt32 stack = 1;
+	stackPool[0].m_myNode = m_root;
+	stackPool[0].m_treeNode = treeCollision->GetRootNode();
+	stackPool[0].m_treeNodeIsLeaf = 0;
+
+	dgNodeBase nodeProxi;
+	nodeProxi.m_left = NULL;
+	nodeProxi.m_right = NULL;
+
+	const dgContactMaterial* const material = constraint->GetMaterial();
+	CalculateCollisionTreeArea(stackPool[0], treeCollision, stackPool[0].m_treeNode);
+
+	dgFloat32 maxParam = proxy.m_timestep;
+	dgFloat32 invMaxParam = dgFloat32 (1.0f) / maxParam; 
+
+	dgFloat32 upperBound = dgFloat32 (1.0f);
+	dgFloat32 closestDist = dgFloat32 (1.0e10f);
+	while (stack) {
+
+		stack --;
+		const dgNodePairs* const stackEntry = &stackPool[stack];
+
+		dgNodeBase* const me = stackEntry->m_myNode;
+		const void* const other = stackEntry->m_treeNode;
+		dgInt32 treeNodeIsLeaf = stackEntry->m_treeNodeIsLeaf;
+
+		dgAssert (me && other);
+#ifdef _DEBUG
+		dgVector p0;
+		dgVector p1;
+		treeCollision->GetNodeAABB(other, p0, p1);
+		dgVector size = (p1 - p0).Scale3 (dgFloat32 (0.5f));
+		dgVector origin = (p1 + p0).Scale3 (dgFloat32 (0.5f));
+		dgVector size1 (size.m_y, size.m_z, size.m_x, dgFloat32 (0.0f));
+		dgFloat32 area = size  % size1;
+		dgAssert (dgAbsf(area - stackEntry->m_treeNodeArea) < dgFloat32 (1.0e-1f));
+#endif
+
+		nodeProxi.m_p0 = stackEntry->m_treeNodeP0;
+		nodeProxi.m_p1 = stackEntry->m_treeNodeP1;
+		nodeProxi.m_area = stackEntry->m_treeNodeArea;
+		nodeProxi.m_size = stackEntry->m_treeNodeSize;
+		nodeProxi.m_origin = stackEntry->m_treeNodeOrigin;
+
+		dgFloat32 dist = me->RayBoxDistance (data, myCompoundRay, otherTreedRay, &nodeProxi);
+//		if (me->BoxTest (data, &nodeProxi)) {
+		if (dist <= upperBound) {
+			if ((me->m_type == m_leaf) && treeNodeIsLeaf) {
+				dgCollisionInstance* const subShape = me->GetShape();
+				if (subShape->GetCollisionMode()) {
+					bool processContacts = true;
+					if (material->m_compoundAABBOverlap) {
+						processContacts = material->m_compoundAABBOverlap (*material, myBody, me->m_myNode, treeBody, NULL, proxy.m_threadIndex);
+					}
+					if (processContacts) {
+
+						dgCollisionInstance childInstance (*subShape, subShape->GetChildShape());
+						childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * myMatrix;
+						proxy.m_referenceCollision = &childInstance; 
+
+						//dgCollisionInstance otherChildInstance (*otherSubShape, otherSubShape->GetChildShape());
+						//otherChildInstance.m_globalMatrix = otherChildInstance.GetLocalMatrix() * otherMatrix;
+						//proxy.m_floatingCollision = &otherChildInstance; 
+
+						proxy.m_maxContacts = DG_MAX_CONTATCS - contactCount;
+						proxy.m_contacts = contacts ? &contacts[contactCount] : contacts;
+
+						dgInt32 count = m_world->CalculateConvexToNonConvexContacts (proxy);
+						closestDist = dgMin(closestDist, constraint->m_closestDistance);
+
+						//if (!proxy.m_intersectionTestOnly) {
+						//	for (dgInt32 i = 0; i < count; i ++) {
+						//		dgAssert (contacts[contactCount + i].m_collision0 == &childInstance);
+						//		contacts[contactCount + i].m_collision0 = subShape;
+						//	}
+						//	contactCount += count;
+						//	if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
+						//		contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
+						//	}
+						//} else if (count == -1) {
+						//	contactCount = -1;
+						//	break;
+						//}
+
+						if (count) {
+							dgFloat32 param = proxy.m_timestep;
+							dgAssert (param >= dgFloat32 (0.0f));
+							if (param < maxParam) {
+
+								upperBound = param * invMaxParam;
+								if (proxy.m_intersectionTestOnly) {
+									maxParam = param;
+									if (count == -1) {
+										contactCount = -1;
+										break;
+									}
+
+								} else {
+									if (contactCount && ((param - maxParam) * invMaxParam) < dgFloat32(-1.0e-3f)) {
+										for (dgInt32 i = 0; i < count; i ++) {
+											contacts[i] = contacts[contactCount + i];
+										}
+										contactCount = 0;
+									}
+									maxParam = param;
+
+									for (dgInt32 i = 0; i < count; i ++) {
+										dgAssert (contacts[contactCount + i].m_collision0 == &childInstance);
+										contacts[contactCount + i].m_collision0 = subShape;
+									}
+									contactCount += count;
+
+									if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
+										contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
+									}
+
+									if (maxParam == dgFloat32 (0.0f)) {
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+
+			} else if (me->m_type == m_leaf) {
+				void* const frontNode = treeCollision->GetFrontNode(other);
+				void* const backNode = treeCollision->GetBackNode(other);
+
+				if (backNode && frontNode) {
+					stackPool[stack].m_myNode = me;
+					stackPool[stack].m_treeNode = backNode;
+					stackPool[stack].m_treeNodeIsLeaf = 0;
+					CalculateCollisionTreeArea(stackPool[stack], treeCollision, backNode);
+					stack++;
+
+					stackPool[stack].m_myNode = me;
+					stackPool[stack].m_treeNode = frontNode;
+					stackPool[stack].m_treeNodeIsLeaf = 0;
+					CalculateCollisionTreeArea(stackPool[stack], treeCollision, frontNode);
+					stack++;
+
+				} else if (backNode && !frontNode) {
+					stackPool[stack].m_myNode = me;
+					stackPool[stack].m_treeNode = backNode;
+					stackPool[stack].m_treeNodeIsLeaf = 0;
+					CalculateCollisionTreeArea(stackPool[stack], treeCollision, backNode);
+					stack++;
+
+					stackPool[stack].m_myNode = me;
+					stackPool[stack].m_treeNode = other;
+					stackPool[stack].m_treeNodeIsLeaf = 1;
+					stackPool[stack].m_treeNodeP0 = nodeProxi.m_p0;
+					stackPool[stack].m_treeNodeP1 = nodeProxi.m_p1;
+					stackPool[stack].m_treeNodeArea = nodeProxi.m_area;
+					stackPool[stack].m_treeNodeSize = nodeProxi.m_size;
+					stackPool[stack].m_treeNodeOrigin = nodeProxi.m_origin;
+					stack++;
+				} else if (!backNode && frontNode) {
+					stackPool[stack].m_myNode = me;
+					stackPool[stack].m_treeNode = frontNode;
+					stackPool[stack].m_treeNodeIsLeaf = 0;
+					CalculateCollisionTreeArea(stackPool[stack], treeCollision, frontNode);
+					stack++;
+
+					stackPool[stack].m_myNode = me;
+					stackPool[stack].m_treeNode = other;
+					stackPool[stack].m_treeNodeIsLeaf = 1;
+					stackPool[stack].m_treeNodeP0 = nodeProxi.m_p0;
+					stackPool[stack].m_treeNodeP1 = nodeProxi.m_p1;
+					stackPool[stack].m_treeNodeArea = nodeProxi.m_area;
+					stackPool[stack].m_treeNodeSize = nodeProxi.m_size;
+					stackPool[stack].m_treeNodeOrigin = nodeProxi.m_origin;
+					stack++;
+				} else {
+					stackPool[stack].m_myNode = me;
+					stackPool[stack].m_treeNode = other;
+					stackPool[stack].m_treeNodeIsLeaf = 1;
+					stackPool[stack].m_treeNodeP0 = nodeProxi.m_p0;
+					stackPool[stack].m_treeNodeP1 = nodeProxi.m_p1;
+					stackPool[stack].m_treeNodeArea = nodeProxi.m_area;
+					stackPool[stack].m_treeNodeSize = nodeProxi.m_size;
+					stackPool[stack].m_treeNodeOrigin = nodeProxi.m_origin;
+					stack++;
+				}
+
+			} else if (treeNodeIsLeaf) {
+
+				stackPool[stack].m_myNode = me->m_left;
+				stackPool[stack].m_treeNode = other;
+				stackPool[stack].m_treeNodeIsLeaf = 1;
+				stackPool[stack].m_treeNodeP0 = nodeProxi.m_p0;
+				stackPool[stack].m_treeNodeP1 = nodeProxi.m_p1;
+				stackPool[stack].m_treeNodeArea = nodeProxi.m_area;
+				stackPool[stack].m_treeNodeSize = nodeProxi.m_size;
+				stackPool[stack].m_treeNodeOrigin = nodeProxi.m_origin;
+				stack++;
+				dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNodeBase*)));
+
+				stackPool[stack].m_myNode = me->m_right;
+				stackPool[stack].m_treeNode = other;
+				stackPool[stack].m_treeNodeIsLeaf = 1;
+				stackPool[stack].m_treeNodeP0 = nodeProxi.m_p0;
+				stackPool[stack].m_treeNodeP1 = nodeProxi.m_p1;
+				stackPool[stack].m_treeNodeArea = nodeProxi.m_area;
+				stackPool[stack].m_treeNodeSize = nodeProxi.m_size;
+				stackPool[stack].m_treeNodeOrigin = nodeProxi.m_origin;
+				stack++;
+				dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNodeBase*)));
+
+			} else if (nodeProxi.m_area > me->m_area) {
+
+				dgAssert (me->m_type == m_node);
+				void* const frontNode = treeCollision->GetFrontNode(other);
+				void* const backNode = treeCollision->GetBackNode(other);
+				if (backNode && frontNode) {
+					stackPool[stack].m_myNode = (dgNodeBase*) me;
+					stackPool[stack].m_treeNode = backNode;
+					stackPool[stack].m_treeNodeIsLeaf = 0;
+					CalculateCollisionTreeArea(stackPool[stack], treeCollision, backNode);
+					stack++;
+
+					stackPool[stack].m_myNode = (dgNodeBase*) me;
+					stackPool[stack].m_treeNode = frontNode;
+					stackPool[stack].m_treeNodeIsLeaf = 0;
+					CalculateCollisionTreeArea(stackPool[stack], treeCollision, frontNode);
+					stack++;
+				} else if (backNode && !frontNode) {
+					stackPool[stack].m_myNode = (dgNodeBase*) me;
+					stackPool[stack].m_treeNode = backNode;
+					stackPool[stack].m_treeNodeIsLeaf = 0;
+					CalculateCollisionTreeArea(stackPool[stack], treeCollision, backNode);
+					stack++;
+
+					stackPool[stack].m_myNode = me->m_left;
+					stackPool[stack].m_treeNode = other;
+					stackPool[stack].m_treeNodeIsLeaf = 1;
+					stackPool[stack].m_treeNodeP0 = nodeProxi.m_p0;
+					stackPool[stack].m_treeNodeP1 = nodeProxi.m_p1;
+					stackPool[stack].m_treeNodeArea = nodeProxi.m_area;
+					stackPool[stack].m_treeNodeSize = nodeProxi.m_size;
+					stackPool[stack].m_treeNodeOrigin = nodeProxi.m_origin;
+					stack++;
+
+					stackPool[stack].m_myNode = me->m_right;
+					stackPool[stack].m_treeNode = other;
+					stackPool[stack].m_treeNodeIsLeaf = 1;
+					stackPool[stack].m_treeNodeP0 = nodeProxi.m_p0;
+					stackPool[stack].m_treeNodeP1 = nodeProxi.m_p1;
+					stackPool[stack].m_treeNodeArea = nodeProxi.m_area;
+					stackPool[stack].m_treeNodeSize = nodeProxi.m_size;
+					stackPool[stack].m_treeNodeOrigin = nodeProxi.m_origin;
+					stack++;
+
+				} else if (!backNode && frontNode) {
+
+					stackPool[stack].m_myNode = me;
+					stackPool[stack].m_treeNode = frontNode;
+					stackPool[stack].m_treeNodeIsLeaf = 0;
+					CalculateCollisionTreeArea(stackPool[stack], treeCollision, frontNode);
+					stack++;
+
+					stackPool[stack].m_myNode = me->m_left;
+					stackPool[stack].m_treeNode = other;
+					stackPool[stack].m_treeNodeIsLeaf = 1;
+					stackPool[stack].m_treeNodeP0 = nodeProxi.m_p0;
+					stackPool[stack].m_treeNodeP1 = nodeProxi.m_p1;
+					stackPool[stack].m_treeNodeArea = nodeProxi.m_area;
+					stackPool[stack].m_treeNodeSize = nodeProxi.m_size;
+					stackPool[stack].m_treeNodeOrigin = nodeProxi.m_origin;
+					stack++;
+
+					stackPool[stack].m_myNode = me->m_right;
+					stackPool[stack].m_treeNode = other;
+					stackPool[stack].m_treeNodeIsLeaf = 1;
+					stackPool[stack].m_treeNodeP0 = nodeProxi.m_p0;
+					stackPool[stack].m_treeNodeP1 = nodeProxi.m_p1;
+					stackPool[stack].m_treeNodeArea = nodeProxi.m_area;
+					stackPool[stack].m_treeNodeSize = nodeProxi.m_size;
+					stackPool[stack].m_treeNodeOrigin = nodeProxi.m_origin;
+					stack++;
+
+				} else {
+					stackPool[stack].m_myNode = me;
+					stackPool[stack].m_treeNode = other;
+					stackPool[stack].m_treeNodeIsLeaf = 1;
+					stackPool[stack].m_treeNodeP0 = nodeProxi.m_p0;
+					stackPool[stack].m_treeNodeP1 = nodeProxi.m_p1;
+					stackPool[stack].m_treeNodeArea = nodeProxi.m_area;
+					stackPool[stack].m_treeNodeSize = nodeProxi.m_size;
+					stackPool[stack].m_treeNodeOrigin = nodeProxi.m_origin;
+					stack++;
+				}
+
+			} else {
+				dgAssert (me->m_type == m_node);
+				stackPool[stack].m_myNode = me->m_left;
+				stackPool[stack].m_treeNode = other;
+				stackPool[stack].m_treeNodeIsLeaf = treeNodeIsLeaf;
+				stackPool[stack].m_treeNodeP0 = nodeProxi.m_p0;
+				stackPool[stack].m_treeNodeP1 = nodeProxi.m_p1;
+				stackPool[stack].m_treeNodeArea = nodeProxi.m_area;
+				stackPool[stack].m_treeNodeSize = nodeProxi.m_size;
+				stackPool[stack].m_treeNodeOrigin = nodeProxi.m_origin;
+				stack++;
+
+				stackPool[stack].m_myNode = me->m_right;
+				stackPool[stack].m_treeNode = other;
+				stackPool[stack].m_treeNodeIsLeaf = treeNodeIsLeaf;
+				stackPool[stack].m_treeNodeP0 = nodeProxi.m_p0;
+				stackPool[stack].m_treeNodeP1 = nodeProxi.m_p1;
+				stackPool[stack].m_treeNodeArea = nodeProxi.m_area;
+				stackPool[stack].m_treeNodeSize = nodeProxi.m_size;
+				stackPool[stack].m_treeNodeOrigin = nodeProxi.m_origin;
+				stack++;
+			}
+		}
+	}
+
+	constraint->m_closestDistance = closestDist;
+	proxy.m_contacts = contacts;	
+	return contactCount;
+
+}
+
