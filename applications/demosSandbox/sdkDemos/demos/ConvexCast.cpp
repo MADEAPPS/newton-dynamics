@@ -262,8 +262,8 @@ class dConvexCastManager: public CustomControllerManager<dConvexCastRecord>
 			dVector p0 (camera->ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
 			dVector p1 (camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
 
-//p0 = dVector (-29.900000, 9.967503, 0.004149, 1.0f);
-//p1 = dVector (1969.768188, -639.875854, 82.962875, 1.0f); 
+p0 = dVector (-15.894950, 8.041811, -1.959232, 1.0f);
+p1 = dVector (1888.718384, -691.545227, 101.955811, 1.0f); 
 //dTrace (("%f, %f, %f\n", p0[0], p0[1], p0[2]));
 //dTrace (("%f, %f, %f\n", p1[0], p1[1], p1[2]));
 
