@@ -1707,15 +1707,17 @@ dgInt32 dgBroadPhase::ConvexCast (dgCollisionInstance* const shape, const dgMatr
 									}
 
 									for (dgInt32 i = 0; i < count; i++) {
-										info[totalCount].m_hitBody = body;
 										info[totalCount].m_point[0] = points[i].m_x;
 										info[totalCount].m_point[1] = points[i].m_y;
 										info[totalCount].m_point[2] = points[i].m_z;
+                                        info[totalCount].m_point[3] = dgFloat32 (0.0f);
 										info[totalCount].m_normal[0] = normals[i].m_x;
 										info[totalCount].m_normal[1] = normals[i].m_y;
 										info[totalCount].m_normal[2] = normals[i].m_z;
+                                        info[totalCount].m_normal[3] = dgFloat32 (0.0f);
 										info[totalCount].m_penetration = penetration[i];
 										info[totalCount].m_contaID = attributeB[i];
+                                        info[totalCount].m_hitBody = body;
 										totalCount++;
 									}
 								}

@@ -54,7 +54,7 @@ class dgConvexCastReturnInfo
 	public:
 	dgFloat32 m_point[4];					// collision point in global space
 	dgFloat32 m_normal[4];					// surface normal at collision point in global space
-	dgFloat32 m_normalOnHitPoint[4];		// surface normal at the surface of the hit body, 
+	//dgFloat32 m_normalOnHitPoint[4];		// surface normal at the surface of the hit body, 
 											// is the same as the normal calculate by a raycast passing by the hit point in the direction of the cast
 	dgInt64  m_contaID;	                // collision ID at contact point
 	const dgBody* m_hitBody;				// body hit at contact point
