@@ -2783,8 +2783,8 @@ dgInt32 dgCollisionConvex::CalculateContactsGeneric (const dgVector& point, cons
 			count1 = CalculatePlaneIntersection (normal, center, shape1);
 		}
 	}
-	if (count1) {
 
+	if (count1) {
 		const dgVector& myScale = myInstance->GetScale();
 		const dgVector& myInvScale = myInstance->GetInvScale();
 		const dgVector& otherScale = otherInstance->GetScale();
@@ -2882,6 +2882,12 @@ dgInt32 dgCollisionConvex::CalculateContactsGeneric (const dgVector& point, cons
 			}
 		}
 	}
+
+	if (!count & proxy.m_continueCollision) {
+		count = 1;
+		contactsOut[0] = point;
+	}
+
 	return count;
 }
 

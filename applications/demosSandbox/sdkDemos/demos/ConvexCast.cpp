@@ -112,6 +112,8 @@ z = size * (i - count / 2);
 		NewtonWorld* const world = scene->GetNewton();
 		int materialID = NewtonMaterialGetDefaultGroupID(world);
 
+		dSetRandSeed (0);
+
 		dVector shapeSize (size, size, size, 0.0f);
 		PrimitiveType castSelection[] = {_SPHERE_PRIMITIVE,	_CAPSULE_PRIMITIVE, _BOX_PRIMITIVE, _CYLINDER_PRIMITIVE, _REGULAR_CONVEX_HULL_PRIMITIVE, _CHAMFER_CYLINDER_PRIMITIVE};
 		m_count =  sizeof (castSelection) / sizeof (castSelection[0]);
@@ -262,8 +264,8 @@ class dConvexCastManager: public CustomControllerManager<dConvexCastRecord>
 			dVector p0 (camera->ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
 			dVector p1 (camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
 
-p0 = dVector (-15.894950, 8.041811, -1.959232, 1.0f);
-p1 = dVector (1888.718384, -691.545227, 101.955811, 1.0f); 
+//p0 = dVector (-11.984048, 5.142051, -0.066473, 1.0f);
+//p1 = dVector (1964.122803, -367.930450, -23.802830, 1.0f); 
 //dTrace (("%f, %f, %f\n", p0[0], p0[1], p0[2]));
 //dTrace (("%f, %f, %f\n", p1[0], p1[1], p1[2]));
 
