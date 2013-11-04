@@ -1844,8 +1844,10 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompound (dgCollidingPairCollect
 	proxy.m_referenceBody = myBody;
 	proxy.m_floatingBody = otherBody;
 
-	dgMatrix myMatrix (myCompoundInstance->GetLocalMatrix() * myBody->m_matrix);
-	dgMatrix otherMatrix (otherCompoundInstance->GetLocalMatrix() * otherBody->m_matrix);
+//	dgMatrix myMatrix (myCompoundInstance->GetLocalMatrix() * myBody->m_matrix);
+//	dgMatrix otherMatrix (otherCompoundInstance->GetLocalMatrix() * otherBody->m_matrix);
+	const dgMatrix& myMatrix = myCompoundInstance->GetGlobalMatrix();
+	const dgMatrix& otherMatrix = otherCompoundInstance->GetGlobalMatrix();
 	dgOOBBTestData data (otherMatrix * myMatrix.Inverse());
 
 	dgInt32 stack = 1;
@@ -1991,7 +1993,8 @@ dgInt32 dgCollisionCompound::CalculateContactsToHeightField (dgCollidingPairColl
 	proxy.m_floatingBody = terrainBody;
 
 	proxy.m_floatingCollision = terrainInstance;
-	dgMatrix myMatrix (compoundInstance->GetLocalMatrix() * myBody->m_matrix);
+//	dgMatrix myMatrix (compoundInstance->GetLocalMatrix() * myBody->m_matrix);
+	const dgMatrix& myMatrix = compoundInstance->GetGlobalMatrix();
 	dgOOBBTestData data (terrainInstance->GetGlobalMatrix() * myMatrix.Inverse());
 
 	dgInt32 stack = 1;
@@ -2093,7 +2096,8 @@ dgInt32 dgCollisionCompound::CalculateContactsUserDefinedCollision (dgCollidingP
 	proxy.m_floatingBody = userBody;
 
 	proxy.m_floatingCollision = userMeshInstance;
-	dgMatrix myMatrix (compoundInstance->GetLocalMatrix() * myBody->m_matrix);
+//	dgMatrix myMatrix (compoundInstance->GetLocalMatrix() * myBody->m_matrix);
+	const dgMatrix& myMatrix = compoundInstance->GetGlobalMatrix();
 	dgOOBBTestData data (userMeshInstance->GetGlobalMatrix() * myMatrix.Inverse());
 
 	dgInt32 stack = 1;
@@ -2191,7 +2195,8 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingle (dgCollidingPairCollector
 	proxy.m_floatingCollision = otherBody->m_collision;
 
 	dgInt32 contactCount = 0;
-	dgMatrix myMatrix (compoundInstance->GetLocalMatrix() * compoundBody->m_matrix);
+//	dgMatrix myMatrix (compoundInstance->GetLocalMatrix() * compoundBody->m_matrix);
+	const dgMatrix& myMatrix = compoundInstance->GetGlobalMatrix();
 	dgMatrix matrix (otherBody->m_collision->GetGlobalMatrix() * myMatrix.Inverse());
 
 	dgVector size;
@@ -2593,7 +2598,8 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgCollidingPairCo
 
 	dgInt32 contactCount = 0;
 
-	dgMatrix myMatrix (compoundInstance->GetLocalMatrix() * compoundBody->m_matrix);
+//	dgMatrix myMatrix (compoundInstance->GetLocalMatrix() * compoundBody->m_matrix);
+	const dgMatrix myMatrix = compoundInstance->GetGlobalMatrix();
 	dgMatrix matrix (otherBody->m_collision->GetGlobalMatrix() * myMatrix.Inverse());
 
 	dgVector boxP0;

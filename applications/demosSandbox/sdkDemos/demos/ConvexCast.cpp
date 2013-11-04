@@ -120,14 +120,16 @@ z = size * (i - count / 2);
 		m_castingGeometries = new DemoMesh*[m_count];
 		m_castingShapeArray = new NewtonCollision*[m_count];
 
+
+		dMatrix alignMatrix (dRollMatrix(3.141592f * 90.0f / 180.0f));
 		for (int i = 0; i < m_count; i ++) {
 			dVector shapeSize (size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), 0.0f);
 #if 1
-			m_castingShapeArray[i] = CreateConvexCollision (world, GetIdentityMatrix(), shapeSize, castSelection[i], materialID);
+			m_castingShapeArray[i] = CreateConvexCollision (world, &alignMatrix[0][0], shapeSize, castSelection[i], materialID);
 #else 
 			m_castingShapeArray[i] = NewtonCreateCompoundCollision (world, materialID);
 			NewtonCompoundCollisionBeginAddRemove(m_castingShapeArray[i]);	
-			NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), shapeSize, castSelection[i], materialID);
+			NewtonCollision* const collision = CreateConvexCollision (world, &alignMatrix[0][0], shapeSize, castSelection[i], materialID);
 			NewtonCompoundCollisionAddSubCollision (m_castingShapeArray[i], collision);
 			NewtonDestroyCollision(collision);
 			NewtonCompoundCollisionEndAddRemove(m_castingShapeArray[i]);	
