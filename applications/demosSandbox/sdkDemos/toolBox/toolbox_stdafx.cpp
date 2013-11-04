@@ -45,14 +45,18 @@ FT_BEGIN_HEADER
     }
 FT_END_HEADER
 
+static unsigned ___dRandSeed___ = 0;
 
+void dSetRandSeed (unsigned seed)
+{
+	___dRandSeed___	= seed; 
+}
 
 unsigned dRand ()
 {
 	#define RAND_MUL 31415821u
-	static unsigned randSeed = 0;
-	randSeed = RAND_MUL * randSeed + 1; 
-	return randSeed & dRAND_MAX;
+	___dRandSeed___ = RAND_MUL * ___dRandSeed___ + 1; 
+	return ___dRandSeed___ & dRAND_MAX;
 }
 
 dFloat RandomVariable(dFloat amp)

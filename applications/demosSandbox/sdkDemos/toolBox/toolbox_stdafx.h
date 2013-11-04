@@ -206,6 +206,7 @@ typedef long long unsigned64;
 #define dRAND_MAX		0x0fffffff
 
 unsigned dRand ();
+void dSetRandSeed (unsigned seed);
 dFloat RandomVariable(dFloat amp);
 
 inline int TwosPower (int x)
