@@ -51,16 +51,9 @@ class dNewtonJoint: public dNewtonAlloc
 
 
 	protected:
-	CNEWTON_API dNewtonJoint(dJointType type)
-		:m_type(type) 
-		,m_joint(NULL)
-	{
-	}
-
+	CNEWTON_API dNewtonJoint(dJointType type);
 	CNEWTON_API void SetJoint(CustomJoint* const joint);
-	CNEWTON_API virtual void OnSubmitConstraint (dFloat timestep, int threadIndex)
-	{
-	}
+	CNEWTON_API virtual void OnSubmitConstraint (dFloat timestep, int threadIndex);
 
 	private:
 	CNEWTON_API static void OnJointDestroyCallback (const NewtonUserJoint* const me);
@@ -84,62 +77,26 @@ class dNewtonBallAndSocketJoint: public dNewtonJoint
 class dNewtonHingeJoint: public dNewtonJoint 
 {
 	public:
-	CNEWTON_API dNewtonHingeJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1 = NULL)
-		:dNewtonJoint(m_hinge)
-	{
-		SetJoint (new CustomHinge (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
-	}
-
-	CNEWTON_API dFloat GetFriction () const
-	{
-		return ((CustomHinge*)m_joint)->GetFriction();
-	}
-
-	CNEWTON_API void SetFriction (dFloat friction)
-	{
-		((CustomHinge*)m_joint)->SetFriction(friction);
-	}
+	CNEWTON_API dNewtonHingeJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1 = NULL);
+	CNEWTON_API dFloat GetFriction () const;
+	CNEWTON_API void SetFriction (dFloat friction);
 };
 
 class dNewtonSliderJoint: public dNewtonJoint 
 {
 	public:
-	CNEWTON_API dNewtonSliderJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1 = NULL)
-		:dNewtonJoint(m_slider)
-	{
-		SetJoint (new CustomSlider (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
-	}
+	CNEWTON_API dNewtonSliderJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1 = NULL);
 };
 
 
 class dNewtonUniversalJoint: public dNewtonJoint 
 {
 	public:
-	CNEWTON_API dNewtonUniversalJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1 = NULL)
-		:dNewtonJoint(m_universal)
-	{
-		SetJoint (new CustomUniversal (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
-	}
-
-	CNEWTON_API void EnableLimit_0(bool state)
-	{
-		((CustomUniversal*) m_joint)->EnableLimit_0(state);
-	}
-
-	CNEWTON_API void EnableLimit_1(bool state)
-	{
-		((CustomUniversal*) m_joint)->EnableLimit_1(state);
-	}
-
-	CNEWTON_API void SetLimis_0(dFloat minAngle, dFloat maxAngle)
-	{
-		((CustomUniversal*) m_joint)->SetLimis_0 (minAngle, maxAngle);
-	}
-
-	CNEWTON_API void SetLimis_1(dFloat minAngle, dFloat maxAngle)
-	{
-		((CustomUniversal*) m_joint)->SetLimis_1 (minAngle, maxAngle);
-	}
+	CNEWTON_API dNewtonUniversalJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1 = NULL);
+	CNEWTON_API void EnableLimit_0(bool state);
+	CNEWTON_API void EnableLimit_1(bool state);
+	CNEWTON_API void SetLimis_0(dFloat minAngle, dFloat maxAngle);
+	CNEWTON_API void SetLimis_1(dFloat minAngle, dFloat maxAngle);
 };
 
 

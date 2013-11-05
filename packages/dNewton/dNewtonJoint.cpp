@@ -25,6 +25,18 @@
 #include "dNewtonJoint.h"
 #include "dNewtonDynamicBody.h"
 
+
+dNewtonJoint::dNewtonJoint(dJointType type)
+	:m_type(type) 
+	,m_joint(NULL)
+{
+}
+
+void dNewtonJoint::OnSubmitConstraint (dFloat timestep, int threadIndex)
+{
+}
+
+
 void dNewtonJoint::SetJoint(CustomJoint* const joint)
 {
 	m_joint = joint;
@@ -71,3 +83,54 @@ void dNewtonJoint::OnSubmitConstraintCallback (const NewtonUserJoint* const me, 
 	joint->OnSubmitConstraint (timestep, threadIndex);
 }
 
+
+
+dNewtonHingeJoint::dNewtonHingeJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
+	:dNewtonJoint(m_hinge)
+{
+	SetJoint (new CustomHinge (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
+}
+
+dFloat dNewtonHingeJoint::GetFriction () const
+{
+	return ((CustomHinge*)m_joint)->GetFriction();
+}
+
+void dNewtonHingeJoint::SetFriction (dFloat friction)
+{
+	((CustomHinge*)m_joint)->SetFriction(friction);
+}
+
+
+dNewtonSliderJoint::dNewtonSliderJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
+	:dNewtonJoint(m_slider)
+{
+	SetJoint (new CustomSlider (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
+}
+
+
+dNewtonUniversalJoint::dNewtonUniversalJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
+	:dNewtonJoint(m_universal)
+{
+	SetJoint (new CustomUniversal (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
+}
+
+void dNewtonUniversalJoint::EnableLimit_0(bool state)
+{
+	((CustomUniversal*) m_joint)->EnableLimit_0(state);
+}
+
+void dNewtonUniversalJoint::EnableLimit_1(bool state)
+{
+	((CustomUniversal*) m_joint)->EnableLimit_1(state);
+}
+
+void dNewtonUniversalJoint::SetLimis_0(dFloat minAngle, dFloat maxAngle)
+{
+	((CustomUniversal*) m_joint)->SetLimis_0 (minAngle, maxAngle);
+}
+
+void dNewtonUniversalJoint::SetLimis_1(dFloat minAngle, dFloat maxAngle)
+{
+	((CustomUniversal*) m_joint)->SetLimis_1 (minAngle, maxAngle);
+}
