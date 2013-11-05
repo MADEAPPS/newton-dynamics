@@ -29,12 +29,12 @@
 class CustomPulley: public CustomJoint  
 {
 	public:
-	NEWTON_API CustomPulley(dFloat pulleyRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const parenPin, NewtonBody* const parent);
-	NEWTON_API virtual ~CustomPulley();
+	CUSTOM_JOINTS_API CustomPulley(dFloat pulleyRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const parenPin, NewtonBody* const parent);
+	CUSTOM_JOINTS_API virtual ~CustomPulley();
 
 	protected:
-	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
+	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;
@@ -46,12 +46,12 @@ class CustomPulley: public CustomJoint
 class CustomPulleyAndTwist: public CustomPulley
 {
 	public:
-	NEWTON_API CustomPulleyAndTwist(dFloat pulleyRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const parenPin, NewtonBody* const parent);
-	NEWTON_API virtual ~CustomPulley();
+	CUSTOM_JOINTS_API CustomPulleyAndTwist(dFloat pulleyRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const parenPin, NewtonBody* const parent);
+	CUSTOM_JOINTS_API virtual ~CustomPulley();
 
 	protected:
-	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
+	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;

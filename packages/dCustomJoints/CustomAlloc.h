@@ -29,8 +29,8 @@
 class CustomAlloc  
 {
 	public:
-	NEWTON_API void *operator new (size_t size);
-	NEWTON_API void operator delete (void* ptr);
+	CUSTOM_JOINTS_API void *operator new (size_t size);
+	CUSTOM_JOINTS_API void operator delete (void* ptr);
 
 	CustomAlloc()
 	{

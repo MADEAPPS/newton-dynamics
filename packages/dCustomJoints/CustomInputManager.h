@@ -32,12 +32,12 @@
 class CustomInputController: public CustomControllerBase
 {
 	public:
-	NEWTON_API virtual void PreUpdate(dFloat timestep, int threadIndex)
+	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex)
 	{
 		//do nothing;
 	}
 
-	NEWTON_API virtual void PostUpdate(dFloat timestep, int threadIndex)
+	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex)
 	{
 		//do nothing;
 	}
@@ -47,16 +47,16 @@ class CustomInputController: public CustomControllerBase
 class CustomInputManager: public CustomControllerManager<CustomInputController> 
 {
 	public:
-	NEWTON_API CustomInputManager (NewtonWorld* const world);
-	NEWTON_API virtual ~CustomInputManager();
+	CUSTOM_JOINTS_API CustomInputManager (NewtonWorld* const world);
+	CUSTOM_JOINTS_API virtual ~CustomInputManager();
 
 	virtual void OnBeginUpdate (dFloat timestepInSecunds) = 0;
 	virtual void OnEndUpdate (dFloat timestepInSecunds) = 0;
 
 	protected:
-	NEWTON_API virtual void PreUpdate(dFloat timestep);
-	NEWTON_API virtual void PostUpdate (dFloat timestep);
-	NEWTON_API virtual void Debug () const {};
+	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep);
+	CUSTOM_JOINTS_API virtual void PostUpdate (dFloat timestep);
+	CUSTOM_JOINTS_API virtual void Debug () const {};
 };
 
 #endif

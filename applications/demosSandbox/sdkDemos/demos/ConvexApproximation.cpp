@@ -67,7 +67,8 @@ static void CreateConvexAproximation (const char* const name, DemoEntityManager*
 
 	// create a convex approximation form the original mesh, 32 convex max and no more than 100 vertex convex hulls
 //	NewtonMesh* const convexApproximation = NewtonMeshApproximateConvexDecomposition (mesh, 0.01f, 0.2f, 32, 100, ReportProgress);
-	NewtonMesh* const convexApproximation = NewtonMeshApproximateConvexDecomposition (mesh, 0.01f, 0.2f, 256, 100, ReportProgress);
+//	NewtonMesh* const convexApproximation = NewtonMeshApproximateConvexDecomposition (mesh, 0.01f, 0.2f, 256, 100, ReportProgress);
+	NewtonMesh* const convexApproximation = NewtonMeshApproximateConvexDecomposition (mesh, 0.00001f, 0.0f, 256, 100, ReportProgress);
 
 	// create a compound collision by creation a convex hull of each segment of the source mesh 
 	NewtonCollision* const compound = NewtonCreateCompoundCollisionFromMesh (world, convexApproximation, 0.001f, 0, 0);
@@ -131,12 +132,12 @@ void SimpleConvexApproximation (DemoEntityManager* const scene)
 	// convex approximate some file meshes 
 //	CreateConvexAproximation ("xxx.ngd", scene, location, 1, "camo.tga");
 
-	CreateConvexAproximation ("lshape.ngd", scene, location, 3, "camo.tga");
-	CreateConvexAproximation ("hollowBox.ngd", scene, location, 3, "KAMEN.tga");
-	CreateConvexAproximation ("hollowCylinder.ngd", scene, location, 3, "frowny.tga");
+//	CreateConvexAproximation ("lshape.ngd", scene, location, 3, "camo.tga");
+//	CreateConvexAproximation ("hollowBox.ngd", scene, location, 3, "KAMEN.tga");
+//	CreateConvexAproximation ("hollowCylinder.ngd", scene, location, 3, "frowny.tga");
 	CreateConvexAproximation ("chair.ngd", scene, location, 3, "checker.tga");
-	CreateConvexAproximation ("cow.ngd", scene, location + dVector (10, 0, 0, 0), 3, "cow.tga");
-	CreateConvexAproximation ("camel.ngd", scene, location + dVector (17, 0, 0, 0), 3, "jirafe.tga");
+//	CreateConvexAproximation ("cow.ngd", scene, location + dVector (10, 0, 0, 0), 3, "cow.tga");
+//	CreateConvexAproximation ("camel.ngd", scene, location + dVector (17, 0, 0, 0), 3, "jirafe.tga");
 
 //	CreateConvexAproximation ("tree.ngd", scene, location, 1, "KAMEN.tga");
 //	CreateConvexAproximation ("beetle.ngd", scene, location, 1, "KAMEN.tga");
@@ -148,10 +149,10 @@ void SimpleConvexApproximation (DemoEntityManager* const scene)
 	
 
 	int count = 5;
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 
 //	ExportScene (scene->GetNewton(), "../../../media/test1.ngd");
 

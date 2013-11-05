@@ -23,15 +23,15 @@
 class CustomSlider: public CustomJoint  
 {
 	public:
-	NEWTON_API CustomSlider (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
-	NEWTON_API virtual ~CustomSlider();
+	CUSTOM_JOINTS_API CustomSlider (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
+	CUSTOM_JOINTS_API virtual ~CustomSlider();
 
-	NEWTON_API void EnableLimits(bool state);
-	NEWTON_API void SetLimis(dFloat mindist, dFloat maxdist);
-	NEWTON_API bool JoinHitLimit () const ;
+	CUSTOM_JOINTS_API void EnableLimits(bool state);
+	CUSTOM_JOINTS_API void SetLimis(dFloat mindist, dFloat maxdist);
+	CUSTOM_JOINTS_API bool JoinHitLimit () const ;
 
-	NEWTON_API dFloat GetJointPosit () const;
-	NEWTON_API dFloat GetJointSpeed () const;
+	CUSTOM_JOINTS_API dFloat GetJointPosit () const;
+	CUSTOM_JOINTS_API dFloat GetJointSpeed () const;
 	void CalculateGlobalMatrix(dMatrix& matrix0, dMatrix& matrix1) const
 	{
 		CustomJoint::CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
@@ -39,8 +39,8 @@ class CustomSlider: public CustomJoint
 
 	
 	protected:
-	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
+	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;

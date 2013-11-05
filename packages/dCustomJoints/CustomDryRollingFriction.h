@@ -29,12 +29,12 @@
 class CustomDryRollingFriction: public CustomJoint  
 {
 	public:
-	NEWTON_API CustomDryRollingFriction(NewtonBody* const child, dFloat radius, dFloat coefficient);
-	NEWTON_API virtual ~CustomDryRollingFriction();
+	CUSTOM_JOINTS_API CustomDryRollingFriction(NewtonBody* const child, dFloat radius, dFloat coefficient);
+	CUSTOM_JOINTS_API virtual ~CustomDryRollingFriction();
 
 	protected:
-	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
+	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dFloat m_frictionCoef;
 	dFloat m_frictionTorque;

@@ -29,28 +29,28 @@
 class CustomHingeActuator: public CustomHinge
 {
 	public:
-	NEWTON_API CustomHingeActuator(const dMatrix& pinAndPivotFrame, dFloat angularRate, dFloat minAngle, dFloat maxAngle, NewtonBody* const child, NewtonBody* const parent = NULL);
-	NEWTON_API virtual ~CustomHingeActuator();
+	CUSTOM_JOINTS_API CustomHingeActuator(const dMatrix& pinAndPivotFrame, dFloat angularRate, dFloat minAngle, dFloat maxAngle, NewtonBody* const child, NewtonBody* const parent = NULL);
+	CUSTOM_JOINTS_API virtual ~CustomHingeActuator();
 
-	NEWTON_API dFloat GetActuatorAngle() const;
-	NEWTON_API bool GetEnableFlag () const;
-	NEWTON_API void SetEnableFlag (bool flag);
+	CUSTOM_JOINTS_API dFloat GetActuatorAngle() const;
+	CUSTOM_JOINTS_API bool GetEnableFlag () const;
+	CUSTOM_JOINTS_API void SetEnableFlag (bool flag);
 
-	NEWTON_API dFloat GetTargetAngle() const;
-	NEWTON_API void SetTargetAngle(dFloat angle);
+	CUSTOM_JOINTS_API dFloat GetTargetAngle() const;
+	CUSTOM_JOINTS_API void SetTargetAngle(dFloat angle);
 
-	NEWTON_API dFloat GetMinAngularLimit() const;
-	NEWTON_API void SetMinAngularLimit(dFloat limit);
+	CUSTOM_JOINTS_API dFloat GetMinAngularLimit() const;
+	CUSTOM_JOINTS_API void SetMinAngularLimit(dFloat limit);
 
-	NEWTON_API dFloat GetMaxAngularLimit() const;
-	NEWTON_API void SetMaxAngularLimit(dFloat limit);
+	CUSTOM_JOINTS_API dFloat GetMaxAngularLimit() const;
+	CUSTOM_JOINTS_API void SetMaxAngularLimit(dFloat limit);
 
-	NEWTON_API dFloat GetAngularRate() const;
-	NEWTON_API void SetAngularRate(dFloat rate);
+	CUSTOM_JOINTS_API dFloat GetAngularRate() const;
+	CUSTOM_JOINTS_API void SetAngularRate(dFloat rate);
 
 	protected:
-	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
-	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
+	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 
 	dFloat m_angle;
 	dFloat m_minAngle;

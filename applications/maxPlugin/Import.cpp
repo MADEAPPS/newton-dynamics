@@ -196,7 +196,7 @@ void Import::SetSmoothingGroups (Mesh& maxMesh)
 void Import::LoadMaterials (dScene& scene, MaterialCache& materialCache)
 {
 	dScene::dTreeNode* const cacheNode = scene.GetMaterialCacheNode ();
-	for (void* link = scene.GetFirstChild(cacheNode); link; link = scene.GetNextChild(cacheNode, link)) {
+	for (void* link = scene.GetFirstChildLink(cacheNode); link; link = scene.GetNextChildLink(cacheNode, link)) {
 		dScene::dTreeNode* const materialNode = scene.GetNodeFromLink(link);
 		dNodeInfo* const info = scene.GetInfoFromNode(materialNode);
 		if (info->IsType(dMaterialNodeInfo::GetRttiType())) {
@@ -273,7 +273,7 @@ void Import::LoadMaterials (dScene& scene, MaterialCache& materialCache)
 void Import::LoadGeometries (dScene& scene, GeometryCache& meshCache, const MaterialCache& materialCache)
 {
 	dScene::dTreeNode* const geometryCache = scene.GetGeometryCacheNode ();
-	for (void* link = scene.GetFirstChild(geometryCache); link; link = scene.GetNextChild(geometryCache, link)) {
+	for (void* link = scene.GetFirstChildLink(geometryCache); link; link = scene.GetNextChildLink(geometryCache, link)) {
 		dScene::dTreeNode* const geometryNode = scene.GetNodeFromLink(link);
 		dNodeInfo* const info = scene.GetInfoFromNode(geometryNode);
 		if (info->IsType(dGeometryNodeInfo::GetRttiType())) {
@@ -427,7 +427,7 @@ INode* Import::CreateMaxMeshNode (dScene& scene, Mtl *mtl, dScene::dTreeNode* me
 void Import::LoadNode (dScene& scene, INode* maxParent, dScene::dTreeNode* node, const dMatrix& parentMatrix, const GeometryCache& meshCache, Mtl *mtl, MaxNodeChache& maxNodeCache)
 {
 	dScene::dTreeNode* geometryNode = NULL;
-	for (void* ptr = scene.GetFirstChild(node); ptr; ptr = scene.GetNextChild(node, ptr) ) {
+	for (void* ptr = scene.GetFirstChildLink(node); ptr; ptr = scene.GetNextChildLink(node, ptr) ) {
 		dScene::dTreeNode* const node = scene.GetNodeFromLink(ptr);
 		dNodeInfo* info = scene.GetInfoFromNode(node);
 		if (info->IsType(dGeometryNodeInfo::GetRttiType())) {
@@ -481,7 +481,7 @@ void Import::LoadNode (dScene& scene, INode* maxParent, dScene::dTreeNode* node,
 	Matrix3 maxMatrix (GetMatrixFromdMatrix (transform));
 	maxNode->SetNodeTM(0, maxMatrix);
 
-	for (void* ptr = scene.GetFirstChild(node); ptr; ptr = scene.GetNextChild(node, ptr) ) {
+	for (void* ptr = scene.GetFirstChildLink(node); ptr; ptr = scene.GetNextChildLink(node, ptr) ) {
 		dScene::dTreeNode* node = scene.GetNodeFromLink(ptr);
 		dNodeInfo* info = scene.GetInfoFromNode(node);
 		if (info->IsType(dSceneNodeInfo::GetRttiType())) {
@@ -494,7 +494,7 @@ void Import::LoadNodes (dScene& scene, const GeometryCache& meshCache, Mtl *mtl,
 {
 	dScene::dTreeNode* const root = scene.GetRootNode();
 
-	for (void* ptr = scene.GetFirstChild(root); ptr; ptr = scene.GetNextChild(root, ptr) ) {
+	for (void* ptr = scene.GetFirstChildLink(root); ptr; ptr = scene.GetNextChildLink(root, ptr) ) {
 		dScene::dTreeNode* node = scene.GetNodeFromLink(ptr);
 		dNodeInfo* info = scene.GetInfoFromNode(node);
 		if (info->IsType(dSceneNodeInfo::GetRttiType())) {
@@ -512,7 +512,7 @@ void Import::ApplyModifiers (dScene& scene, const MaxNodeChache& maxNodeCache)
 		dNodeInfo* info = scene.GetInfoFromNode(meshNode);
 		if (info->IsType(dGeometryNodeInfo::GetRttiType())) {
 			dScene::dTreeNode* skinModifierNode = NULL;	
-			for (void* ptr = scene.GetFirstChild(meshNode); ptr; ptr = scene.GetNextChild(meshNode, ptr)) {
+			for (void* ptr = scene.GetFirstChildLink(meshNode); ptr; ptr = scene.GetNextChildLink(meshNode, ptr)) {
 				dScene::dTreeNode* node = scene.GetNodeFromLink(ptr);
 				dNodeInfo* info = scene.GetInfoFromNode(node);
 				if (info->GetTypeId() == dGeometryNodeSkinModifierInfo::GetRttiType()) {
@@ -552,7 +552,7 @@ void Import::ApplyModifiers (dScene& scene, const MaxNodeChache& maxNodeCache)
 				int maxNodeCount = 0;
 				INode* maxNodes[1024];
 			
-				for (void* ptr = scene.GetFirstChild(skinModifierNode); ptr; ptr = scene.GetNextChild(skinModifierNode, ptr)) {
+				for (void* ptr = scene.GetFirstChildLink(skinModifierNode); ptr; ptr = scene.GetNextChildLink(skinModifierNode, ptr)) {
 					dScene::dTreeNode* boneNode = scene.GetNodeFromLink(ptr);
 					INode* skelBone = maxNodeCache.Find(boneNode)->GetInfo(); 
 					maxNodes[maxNodeCount] = skelBone;

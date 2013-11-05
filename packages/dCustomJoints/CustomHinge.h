@@ -22,21 +22,21 @@
 class CustomHinge: public CustomJoint  
 {
 	public:
-	NEWTON_API CustomHinge (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
+	CUSTOM_JOINTS_API CustomHinge (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
 
 	// this is a special contributor that create a hinge with an error between the two matrices, the error is reduce to zero after few iterations 
 	// the error can not be too great, this is more for hinges with wiggle room
-	NEWTON_API CustomHinge (const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent = NULL);
-	NEWTON_API virtual ~CustomHinge();
+	CUSTOM_JOINTS_API CustomHinge (const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent = NULL);
+	CUSTOM_JOINTS_API virtual ~CustomHinge();
 
-	NEWTON_API void EnableLimits(bool state);
-	NEWTON_API void SetLimis(dFloat minAngle, dFloat maxAngle);
-	NEWTON_API dFloat GetJointAngle () const;
-	NEWTON_API dVector GetPinAxis () const;
-	NEWTON_API dFloat GetJointOmega () const;
+	CUSTOM_JOINTS_API void EnableLimits(bool state);
+	CUSTOM_JOINTS_API void SetLimis(dFloat minAngle, dFloat maxAngle);
+	CUSTOM_JOINTS_API dFloat GetJointAngle () const;
+	CUSTOM_JOINTS_API dVector GetPinAxis () const;
+	CUSTOM_JOINTS_API dFloat GetJointOmega () const;
 
-	NEWTON_API void SetFriction (dFloat frictionTorque);
-	NEWTON_API dFloat GetFriction () const;
+	CUSTOM_JOINTS_API void SetFriction (dFloat frictionTorque);
+	CUSTOM_JOINTS_API dFloat GetFriction () const;
 
 	void CalculateGlobalMatrix(dMatrix& matrix0, dMatrix& matrix1) const
 	{
@@ -45,9 +45,9 @@ class CustomHinge: public CustomJoint
 
 	protected:
 	void CalculatePitchAngle (const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const;
-	NEWTON_API virtual void ProjectError () const;
-	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
-	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void ProjectError () const;
+	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
+	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;

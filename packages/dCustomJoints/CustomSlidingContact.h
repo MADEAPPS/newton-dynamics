@@ -23,17 +23,17 @@
 class CustomSlidingContact: public CustomJoint  
 {
 	public:
-	NEWTON_API CustomSlidingContact (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
-	NEWTON_API virtual ~CustomSlidingContact();
+	CUSTOM_JOINTS_API CustomSlidingContact (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
+	CUSTOM_JOINTS_API virtual ~CustomSlidingContact();
 
-	NEWTON_API void EnableLinearLimits(bool state);
-	NEWTON_API void EnableAngularLimits(bool state);
-	NEWTON_API void SetLinearLimis(dFloat minAngle, dFloat maxAngle);
-	NEWTON_API void SetAngularLimis(dFloat minAngle, dFloat maxAngle);
+	CUSTOM_JOINTS_API void EnableLinearLimits(bool state);
+	CUSTOM_JOINTS_API void EnableAngularLimits(bool state);
+	CUSTOM_JOINTS_API void SetLinearLimis(dFloat minAngle, dFloat maxAngle);
+	CUSTOM_JOINTS_API void SetAngularLimis(dFloat minAngle, dFloat maxAngle);
 
 	protected:
-	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
+	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;

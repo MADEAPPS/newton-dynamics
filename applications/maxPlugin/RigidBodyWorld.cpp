@@ -70,14 +70,14 @@ void RigidBodyData::LoadCollision (void* const serializeHandle, void* buffer, in
 {
 	ULONG nwrit;
 	ILoad* const iload = (ILoad*)serializeHandle;
-	iload->Read(buffer, size, &nwrit);
+	iload->Read((const char*)buffer, size, &nwrit);
 }
 
 void RigidBodyData::SaveCollision (void* const serializeHandle, const void* buffer, int size)
 {
 	ULONG nwrit;
 	ISave* const isave = (ISave*)serializeHandle;
-	isave->Write(buffer, size, &nwrit);
+	isave->Write((const char*)buffer, size, &nwrit);
 }
 
 
@@ -90,17 +90,17 @@ void RigidBodyData::Load(ILoad* const iload)
 	dMatrix matrix;
 	RigidBodyWorldDesc& me = *(RigidBodyWorldDesc*) RigidBodyWorldDesc::GetDescriptor();
 
-	iload->Read(&revision, sizeof (revision), &nwrit);
-	iload->Read(&m_oldControlerID, sizeof (m_oldControlerID), &nwrit);
-	iload->Read(&m_collisionShape, sizeof (m_collisionShape), &nwrit);
-	iload->Read(&m_hideGizmos, sizeof (m_hideGizmos), &nwrit);
-	iload->Read(&m_mass, sizeof (m_mass), &nwrit);
-	iload->Read(&m_inertia, sizeof (m_inertia), &nwrit);
-	iload->Read(&m_origin, sizeof (m_origin), &nwrit);
+	iload->Read((const char*)&revision, sizeof (revision), &nwrit);
+	iload->Read((const char*)&m_oldControlerID, sizeof (m_oldControlerID), &nwrit);
+	iload->Read((const char*)&m_collisionShape, sizeof (m_collisionShape), &nwrit);
+	iload->Read((const char*)&m_hideGizmos, sizeof (m_hideGizmos), &nwrit);
+	iload->Read((const char*)&m_mass, sizeof (m_mass), &nwrit);
+	iload->Read((const char*)&m_inertia, sizeof (m_inertia), &nwrit);
+	iload->Read((const char*)&m_origin, sizeof (m_origin), &nwrit);
 
-	iload->Read(&matrix, sizeof (matrix), &nwrit);
-	iload->Read(&veloc, sizeof (veloc), &nwrit);
-	iload->Read(&omega, sizeof (omega), &nwrit);
+	iload->Read((const char*)&matrix, sizeof (matrix), &nwrit);
+	iload->Read((const char*)&veloc, sizeof (veloc), &nwrit);
+	iload->Read((const char*)&omega, sizeof (omega), &nwrit);
 	NewtonCollision* const collision = NewtonCreateCollisionFromSerialization (me.m_newton, LoadCollision, iload);
 
 
@@ -128,17 +128,17 @@ void RigidBodyData::Save(ISave* const isave)
 
 	NewtonCollision* const collision = NewtonBodyGetCollision(m_body);
 
-	isave->Write(&revision, sizeof (revision), &nwrit);
-	isave->Write(&m_oldControlerID, sizeof (m_oldControlerID), &nwrit);
-	isave->Write(&m_collisionShape, sizeof (m_collisionShape), &nwrit);
-	isave->Write(&m_hideGizmos, sizeof (m_hideGizmos), &nwrit);
-	isave->Write(&m_mass, sizeof (m_mass), &nwrit);
-	isave->Write(&m_inertia, sizeof (m_inertia), &nwrit);
-	isave->Write(&m_origin, sizeof (m_origin), &nwrit);
+	isave->Write((const char*)&revision, sizeof (revision), &nwrit);
+	isave->Write((const char*)&m_oldControlerID, sizeof (m_oldControlerID), &nwrit);
+	isave->Write((const char*)&m_collisionShape, sizeof (m_collisionShape), &nwrit);
+	isave->Write((const char*)&m_hideGizmos, sizeof (m_hideGizmos), &nwrit);
+	isave->Write((const char*)&m_mass, sizeof (m_mass), &nwrit);
+	isave->Write((const char*)&m_inertia, sizeof (m_inertia), &nwrit);
+	isave->Write((const char*)&m_origin, sizeof (m_origin), &nwrit);
 
-	isave->Write(&matrix, sizeof (matrix), &nwrit);
-	isave->Write(&veloc, sizeof (veloc), &nwrit);
-	isave->Write(&omega, sizeof (omega), &nwrit);
+	isave->Write((const char*)&matrix, sizeof (matrix), &nwrit);
+	isave->Write((const char*)&veloc, sizeof (veloc), &nwrit);
+	isave->Write((const char*)&omega, sizeof (omega), &nwrit);
 	NewtonCollisionSerialize (me.m_newton, collision, SaveCollision, isave);
 }
 
@@ -246,8 +246,8 @@ IOResult RigidBodyWorldDesc::Load(ILoad* iload)
 
 	ULONG retVal;
 	iload->OpenChunk();
-	iload->Read(&m_gravity, sizeof (m_gravity), &retVal);
-	iload->Read(&m_minFps, sizeof (m_minFps), &retVal);
+	iload->Read((const char*)&m_gravity, sizeof (m_gravity), &retVal);
+	iload->Read((const char*)&m_minFps, sizeof (m_minFps), &retVal);
 	iload->CloseChunk();
 
 	return ret;
@@ -259,8 +259,8 @@ IOResult RigidBodyWorldDesc::Save(ISave* isave)
 
 	ULONG retVal;
 	isave->BeginChunk(USHORT (ClassID().PartB()));
-	isave->Write(&m_gravity, sizeof (m_gravity), &retVal);
-	isave->Write(&m_minFps, sizeof (m_minFps), &retVal);
+	isave->Write((const char*)&m_gravity, sizeof (m_gravity), &retVal);
+	isave->Write((const char*)&m_minFps, sizeof (m_minFps), &retVal);
 	isave->EndChunk();
 
 	return ret;

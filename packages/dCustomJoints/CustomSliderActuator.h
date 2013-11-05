@@ -24,28 +24,28 @@
 class CustomSliderActuator: public CustomSlider
 {
 	public:
-	NEWTON_API CustomSliderActuator (const dMatrix& pinAndPivotFrame, dFloat speed, dFloat minPosit, dFloat maxPosit, NewtonBody* const child, NewtonBody* const parent = NULL);
-	NEWTON_API virtual ~CustomSliderActuator();
+	CUSTOM_JOINTS_API CustomSliderActuator (const dMatrix& pinAndPivotFrame, dFloat speed, dFloat minPosit, dFloat maxPosit, NewtonBody* const child, NewtonBody* const parent = NULL);
+	CUSTOM_JOINTS_API virtual ~CustomSliderActuator();
 
-	NEWTON_API bool GetEnableFlag () const;
-	NEWTON_API void SetEnableFlag (bool flag);
+	CUSTOM_JOINTS_API bool GetEnableFlag () const;
+	CUSTOM_JOINTS_API void SetEnableFlag (bool flag);
 
-	NEWTON_API dFloat GetActuatorPosit() const;
-	NEWTON_API dFloat GetTargetPosit() const;
-	NEWTON_API void SetTargetPosit(dFloat posit);
+	CUSTOM_JOINTS_API dFloat GetActuatorPosit() const;
+	CUSTOM_JOINTS_API dFloat GetTargetPosit() const;
+	CUSTOM_JOINTS_API void SetTargetPosit(dFloat posit);
 
-	NEWTON_API dFloat GetLinearRate() const;
-	NEWTON_API void SetLinearRate(dFloat rate);
+	CUSTOM_JOINTS_API dFloat GetLinearRate() const;
+	CUSTOM_JOINTS_API void SetLinearRate(dFloat rate);
 
-	NEWTON_API dFloat GetMinPositLimit() const;
-	NEWTON_API void SetMinPositLimit(dFloat limit);
+	CUSTOM_JOINTS_API dFloat GetMinPositLimit() const;
+	CUSTOM_JOINTS_API void SetMinPositLimit(dFloat limit);
 
-	NEWTON_API dFloat GetMaxPositLimit() const;
-	NEWTON_API void SetMaxPositLimit(dFloat limit);
+	CUSTOM_JOINTS_API dFloat GetMaxPositLimit() const;
+	CUSTOM_JOINTS_API void SetMaxPositLimit(dFloat limit);
 
 	protected:
-	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
+	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dFloat m_linearRate;
 	dFloat m_posit;

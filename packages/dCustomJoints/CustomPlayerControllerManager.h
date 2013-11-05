@@ -28,10 +28,10 @@
 class CustomPlayerController: public CustomControllerBase
 {
 	public:
-	NEWTON_API CustomPlayerController();
-	NEWTON_API ~CustomPlayerController();
+	CUSTOM_JOINTS_API CustomPlayerController();
+	CUSTOM_JOINTS_API ~CustomPlayerController();
 
-	NEWTON_API void Init(dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stepHigh, const dMatrix& localAxis);
+	CUSTOM_JOINTS_API void Init(dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stepHigh, const dMatrix& localAxis);
 
 	dFloat GetHigh() const 
 	{
@@ -61,13 +61,13 @@ class CustomPlayerController: public CustomControllerBase
 	{
 	}
 
-	NEWTON_API void SetPlayerOrigin (dFloat originHigh);
+	CUSTOM_JOINTS_API void SetPlayerOrigin (dFloat originHigh);
 
-	NEWTON_API dVector CalculateDesiredOmega (dFloat headingAngle, dFloat timestep) const;
-	NEWTON_API dVector CalculateDesiredVelocity (dFloat forwardSpeed, dFloat lateralSpeed, dFloat verticalSpeed, const dVector& gravity, dFloat timestep) const;
+	CUSTOM_JOINTS_API dVector CalculateDesiredOmega (dFloat headingAngle, dFloat timestep) const;
+	CUSTOM_JOINTS_API dVector CalculateDesiredVelocity (dFloat forwardSpeed, dFloat lateralSpeed, dFloat verticalSpeed, const dVector& gravity, dFloat timestep) const;
 	
-	NEWTON_API virtual void PostUpdate(dFloat timestep, int threadIndex);
-	NEWTON_API void SetPlayerVelocity (dFloat forwardSpeed, dFloat lateralSpeed, dFloat verticalSpeed, dFloat headingAngle, const dVector& gravity, dFloat timestep);
+	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API void SetPlayerVelocity (dFloat forwardSpeed, dFloat lateralSpeed, dFloat verticalSpeed, dFloat headingAngle, const dVector& gravity, dFloat timestep);
 
 	private:
 	void UpdateGroundPlane (dMatrix& matrix, const dMatrix& castMatrix, const dVector& target, int threadIndex);
@@ -94,17 +94,17 @@ class CustomPlayerController: public CustomControllerBase
 class CustomPlayerControllerManager: public CustomControllerManager<CustomPlayerController>
 {
 	public:
-	NEWTON_API CustomPlayerControllerManager(NewtonWorld* const world);
-	NEWTON_API ~CustomPlayerControllerManager();
+	CUSTOM_JOINTS_API CustomPlayerControllerManager(NewtonWorld* const world);
+	CUSTOM_JOINTS_API ~CustomPlayerControllerManager();
 
 	virtual void PreUpdate(dFloat timestep)
 	{
 	}
 
-	NEWTON_API virtual void ApplyPlayerMove (CustomPlayerController* const controller, dFloat timestep) = 0; 
+	CUSTOM_JOINTS_API virtual void ApplyPlayerMove (CustomPlayerController* const controller, dFloat timestep) = 0; 
 
-	NEWTON_API virtual CustomPlayerController* CreatePlayer (dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dMatrix& localAxis);
-	NEWTON_API virtual int ProcessContacts (const CustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const; 
+	CUSTOM_JOINTS_API virtual CustomPlayerController* CreatePlayer (dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dMatrix& localAxis);
+	CUSTOM_JOINTS_API virtual int ProcessContacts (const CustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const; 
 };
 
 #endif 

@@ -56,29 +56,29 @@ class CustomJoint: public CustomAlloc
 		dFloat m_angle;
 	};
 
-	NEWTON_API CustomJoint();
-	NEWTON_API CustomJoint(int maxDOF, NewtonBody* const body0, NewtonBody* const body1);
-	NEWTON_API virtual ~CustomJoint();
+	CUSTOM_JOINTS_API CustomJoint();
+	CUSTOM_JOINTS_API CustomJoint(int maxDOF, NewtonBody* const body0, NewtonBody* const body1);
+	CUSTOM_JOINTS_API virtual ~CustomJoint();
 
-	NEWTON_API void SetBodiesCollisionState (int state);
-	NEWTON_API int GetBodiesCollisionState () const;
+	CUSTOM_JOINTS_API void SetBodiesCollisionState (int state);
+	CUSTOM_JOINTS_API int GetBodiesCollisionState () const;
 
-	NEWTON_API NewtonBody* GetBody0 () const;
-	NEWTON_API NewtonBody* GetBody1 () const;
-	NEWTON_API NewtonJoint* GetJoint () const;
+	CUSTOM_JOINTS_API NewtonBody* GetBody0 () const;
+	CUSTOM_JOINTS_API NewtonBody* GetBody1 () const;
+	CUSTOM_JOINTS_API NewtonJoint* GetJoint () const;
 
 
 	// the application needs to implement this function for serialization
-	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
-	NEWTON_API virtual void ProjectError () const;
+	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
+	CUSTOM_JOINTS_API virtual void ProjectError () const;
 
 	// these member function are only used by the C interface or for hooking callback to customize a particular 
 	// joint without deriving a new one
 	// note: this is not a extension of a virtual function, DO NOT CALL the base class SubmitConstraints!! 
-	NEWTON_API void SetUserData (void* userData) {m_userData = userData;}
-	NEWTON_API void* GetUserData () const {return m_userData;}
-	NEWTON_API void SetUserDestructorCallback (JointUserDestructorCallback callback) {m_userDestructor = callback;}
-	NEWTON_API void SetUserSubmintConstraintCallback (JointUserSubmitConstraintCallback callback) {m_userConstrationCallback = callback;}
+	CUSTOM_JOINTS_API void SetUserData (void* userData) {m_userData = userData;}
+	CUSTOM_JOINTS_API void* GetUserData () const {return m_userData;}
+	CUSTOM_JOINTS_API void SetUserDestructorCallback (JointUserDestructorCallback callback) {m_userDestructor = callback;}
+	CUSTOM_JOINTS_API void SetUserSubmintConstraintCallback (JointUserSubmitConstraintCallback callback) {m_userConstrationCallback = callback;}
 
 	private:
 	// this are the callback needed to have transparent c++ method interfaces 
@@ -102,12 +102,12 @@ class CustomJoint: public CustomAlloc
 		return isIdentity;
 	}
 
-	NEWTON_API void Init (int maxDOF, NewtonBody* const body0, NewtonBody* const body1);
+	CUSTOM_JOINTS_API void Init (int maxDOF, NewtonBody* const body0, NewtonBody* const body1);
 
 	// the application needs to implement this function for each derived joint. See examples for more detail
-	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	NEWTON_API void CalculateGlobalMatrix (const dMatrix& localMatrix0, const dMatrix& localMatrix1, dMatrix& matrix0, dMatrix& matrix1) const;
-	NEWTON_API void CalculateLocalMatrix (const dMatrix& pinsAndPivotFrame, dMatrix& localMatrix0, dMatrix& localMatrix1) const;
+	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API void CalculateGlobalMatrix (const dMatrix& localMatrix0, const dMatrix& localMatrix1, dMatrix& matrix0, dMatrix& matrix1) const;
+	CUSTOM_JOINTS_API void CalculateLocalMatrix (const dMatrix& pinsAndPivotFrame, dMatrix& localMatrix0, dMatrix& localMatrix1) const;
 
 
 	void* m_userData;

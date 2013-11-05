@@ -40,12 +40,12 @@ class CustomTriggerController: public CustomControllerBase
 	class PassangerManifest: public CustomList<Passenger>
 	{
 		public:
-		NEWTON_API PassangerManifest ();
-		NEWTON_API ~PassangerManifest ();
+		CUSTOM_JOINTS_API PassangerManifest ();
+		CUSTOM_JOINTS_API ~PassangerManifest ();
 
-		NEWTON_API Passenger* Find (NewtonBody* const m_body);
-		NEWTON_API Passenger* Insert (NewtonBody* const m_body, CustomTriggerController* const controller);
-		NEWTON_API void Pack();
+		CUSTOM_JOINTS_API Passenger* Find (NewtonBody* const m_body);
+		CUSTOM_JOINTS_API Passenger* Insert (NewtonBody* const m_body, CustomTriggerController* const controller);
+		CUSTOM_JOINTS_API void Pack();
 
 		int m_count;
 		int m_capacity;
@@ -53,12 +53,12 @@ class CustomTriggerController: public CustomControllerBase
 	};
 
 	public:
-	NEWTON_API CustomTriggerController();
-	NEWTON_API ~CustomTriggerController();
+	CUSTOM_JOINTS_API CustomTriggerController();
+	CUSTOM_JOINTS_API ~CustomTriggerController();
 
-	NEWTON_API void Init (NewtonCollision* const convexShape, const dMatrix& matrix, void* const userData);
-	NEWTON_API virtual void PreUpdate(dFloat timestep, int threadIndex);
-	NEWTON_API virtual void PostUpdate(dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API void Init (NewtonCollision* const convexShape, const dMatrix& matrix, void* const userData);
+	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 	
 	private:
 	PassangerManifest m_manifest;
@@ -75,19 +75,19 @@ class CustomTriggerManager: public CustomControllerManager<CustomTriggerControll
 		m_exitTrigger,
 	};
 
-	NEWTON_API CustomTriggerManager (NewtonWorld* const world);
-	NEWTON_API virtual ~CustomTriggerManager();
+	CUSTOM_JOINTS_API CustomTriggerManager (NewtonWorld* const world);
+	CUSTOM_JOINTS_API virtual ~CustomTriggerManager();
 
-	NEWTON_API virtual void PreUpdate(dFloat timestep);
+	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep);
 	virtual void PostUpdate(dFloat timestep)
 	{
 		// bypass the entire Post Update call by not calling the base class
 	}
 
 	virtual void Debug () const {};
-	NEWTON_API virtual CustomTriggerController* CreateTrigger (const dMatrix& matrix, NewtonCollision* const convexShape, void* const userData);
+	CUSTOM_JOINTS_API virtual CustomTriggerController* CreateTrigger (const dMatrix& matrix, NewtonCollision* const convexShape, void* const userData);
 
-	NEWTON_API virtual void EventCallback (const CustomTriggerController* const me, TriggerEventType eventType, NewtonBody* const guess) const = 0;
+	CUSTOM_JOINTS_API virtual void EventCallback (const CustomTriggerController* const me, TriggerEventType eventType, NewtonBody* const guess) const = 0;
 
 	private:
 	void UpdateTrigger (CustomTriggerController* const controller);

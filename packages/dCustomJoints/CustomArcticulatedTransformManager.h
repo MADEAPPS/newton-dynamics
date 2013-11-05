@@ -82,32 +82,32 @@ class CustomArticulatedTransformController: public CustomControllerBase
 		dSelfCollisionBitmask m_bitField;
 	};
 
-	NEWTON_API CustomArticulatedTransformController();
-	NEWTON_API ~CustomArticulatedTransformController();
+	CUSTOM_JOINTS_API CustomArticulatedTransformController();
+	CUSTOM_JOINTS_API ~CustomArticulatedTransformController();
 
-	NEWTON_API void SetErrorProjectionMode (bool mode);
-	NEWTON_API bool GetErrorProjectionMode () const;
+	CUSTOM_JOINTS_API void SetErrorProjectionMode (bool mode);
+	CUSTOM_JOINTS_API bool GetErrorProjectionMode () const;
 
-	NEWTON_API void DisableAllSelfCollision ();
-	NEWTON_API void SetDefaultSelfCollisionMask ();
-	NEWTON_API void SetSelfCollisionMask (dSkeletonBone* const bone0, dSkeletonBone* const bone1, bool mode);
+	CUSTOM_JOINTS_API void DisableAllSelfCollision ();
+	CUSTOM_JOINTS_API void SetDefaultSelfCollisionMask ();
+	CUSTOM_JOINTS_API void SetSelfCollisionMask (dSkeletonBone* const bone0, dSkeletonBone* const bone1, bool mode);
 
-	NEWTON_API bool SelfCollisionTest (const dSkeletonBone* const bone0, const dSkeletonBone* const bone1) const;
-	NEWTON_API dSkeletonBone* AddBone (NewtonBody* const bone, const dMatrix& bindMatrix, dSkeletonBone* const parentBodne = NULL);
+	CUSTOM_JOINTS_API bool SelfCollisionTest (const dSkeletonBone* const bone0, const dSkeletonBone* const bone1) const;
+	CUSTOM_JOINTS_API dSkeletonBone* AddBone (NewtonBody* const bone, const dMatrix& bindMatrix, dSkeletonBone* const parentBodne = NULL);
 
-	NEWTON_API int GetBoneCount() const;
+	CUSTOM_JOINTS_API int GetBoneCount() const;
 
-	NEWTON_API NewtonBody* GetBoneBody (int index) const;
-	NEWTON_API const dSkeletonBone* GetBone(int index) const;
+	CUSTOM_JOINTS_API NewtonBody* GetBoneBody (int index) const;
+	CUSTOM_JOINTS_API const dSkeletonBone* GetBone(int index) const;
 	
-	NEWTON_API NewtonBody* GetBoneBody (const dSkeletonBone* const bone) const;
-	NEWTON_API const dSkeletonBone* GetParent(const dSkeletonBone* const bone) const;
+	CUSTOM_JOINTS_API NewtonBody* GetBoneBody (const dSkeletonBone* const bone) const;
+	CUSTOM_JOINTS_API const dSkeletonBone* GetParent(const dSkeletonBone* const bone) const;
 	
 	protected:
-	NEWTON_API void Init (void* const userData, bool errorCorrectionMode);
+	CUSTOM_JOINTS_API void Init (void* const userData, bool errorCorrectionMode);
 
-	NEWTON_API virtual void PreUpdate(dFloat timestep, int threadIndex);
-	NEWTON_API virtual void PostUpdate(dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 	
 	private:
 	dSkeletonBone m_bones[D_HIERACHICAL_CONTROLLER_MAX_BONES];
@@ -119,21 +119,21 @@ class CustomArticulatedTransformController: public CustomControllerBase
 class CustomArticulaledTransformManager: public CustomControllerManager<CustomArticulatedTransformController> 
 {
 	public:
-	NEWTON_API CustomArticulaledTransformManager(NewtonWorld* const world, bool applyLocalTransform);
-	NEWTON_API virtual ~CustomArticulaledTransformManager();
+	CUSTOM_JOINTS_API CustomArticulaledTransformManager(NewtonWorld* const world, bool applyLocalTransform);
+	CUSTOM_JOINTS_API virtual ~CustomArticulaledTransformManager();
 
-	NEWTON_API virtual void Debug () const {}
+	CUSTOM_JOINTS_API virtual void Debug () const {}
 
-	NEWTON_API virtual CustomArticulatedTransformController* CreateTransformController (void* const userData, bool errorCorrectionMode);
+	CUSTOM_JOINTS_API virtual CustomArticulatedTransformController* CreateTransformController (void* const userData, bool errorCorrectionMode);
 	
-	NEWTON_API virtual void DisableAllSelfCollision (CustomArticulatedTransformController* const controller);
-	NEWTON_API virtual void SetDefaultSelfCollisionMask (CustomArticulatedTransformController* const controller);
+	CUSTOM_JOINTS_API virtual void DisableAllSelfCollision (CustomArticulatedTransformController* const controller);
+	CUSTOM_JOINTS_API virtual void SetDefaultSelfCollisionMask (CustomArticulatedTransformController* const controller);
 	
-	NEWTON_API virtual void SetCollisionMask (CustomArticulatedTransformController::dSkeletonBone* const bone0, CustomArticulatedTransformController::dSkeletonBone* const bone1, bool mode);
-	NEWTON_API virtual bool SelfCollisionTest (const CustomArticulatedTransformController::dSkeletonBone* const bone0, const CustomArticulatedTransformController::dSkeletonBone* const bone1) const;
+	CUSTOM_JOINTS_API virtual void SetCollisionMask (CustomArticulatedTransformController::dSkeletonBone* const bone0, CustomArticulatedTransformController::dSkeletonBone* const bone1, bool mode);
+	CUSTOM_JOINTS_API virtual bool SelfCollisionTest (const CustomArticulatedTransformController::dSkeletonBone* const bone0, const CustomArticulatedTransformController::dSkeletonBone* const bone1) const;
 
-	NEWTON_API virtual void OnPreUpdate (CustomArticulatedTransformController* const constroller, dFloat timestep, int threadIndex) const = 0;
-	NEWTON_API virtual void OnUpdateTransform (const CustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const = 0;
+	CUSTOM_JOINTS_API virtual void OnPreUpdate (CustomArticulatedTransformController* const constroller, dFloat timestep, int threadIndex) const = 0;
+	CUSTOM_JOINTS_API virtual void OnUpdateTransform (const CustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const = 0;
 
 	private: 
 	bool m_applyLocalTransform;

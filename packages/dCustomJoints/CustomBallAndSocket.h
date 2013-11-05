@@ -21,12 +21,12 @@
 class CustomBallAndSocket: public CustomJoint  
 {
 	public:
-	NEWTON_API CustomBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
-	NEWTON_API virtual ~CustomBallAndSocket();
+	CUSTOM_JOINTS_API CustomBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
+	CUSTOM_JOINTS_API virtual ~CustomBallAndSocket();
 
 	protected:
-	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
+	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;
@@ -38,15 +38,15 @@ class CustomBallAndSocket: public CustomJoint
 class CustomLimitBallAndSocket: public CustomBallAndSocket  
 {
 	public:
-	NEWTON_API CustomLimitBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
-	NEWTON_API CustomLimitBallAndSocket(const dMatrix& childPinAndPivotFrame, NewtonBody* const child, const dMatrix& parentPinAndPivotFrame, NewtonBody* const parent);
-	NEWTON_API virtual ~CustomLimitBallAndSocket();
+	CUSTOM_JOINTS_API CustomLimitBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
+	CUSTOM_JOINTS_API CustomLimitBallAndSocket(const dMatrix& childPinAndPivotFrame, NewtonBody* const child, const dMatrix& parentPinAndPivotFrame, NewtonBody* const parent);
+	CUSTOM_JOINTS_API virtual ~CustomLimitBallAndSocket();
 
-	NEWTON_API void SetConeAngle (dFloat angle);
-	NEWTON_API void SetTwistAngle (dFloat minAngle, dFloat maxAngle);
+	CUSTOM_JOINTS_API void SetConeAngle (dFloat angle);
+	CUSTOM_JOINTS_API void SetTwistAngle (dFloat minAngle, dFloat maxAngle);
 	protected:
-	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
+	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 
 	dMatrix m_rotationOffset;

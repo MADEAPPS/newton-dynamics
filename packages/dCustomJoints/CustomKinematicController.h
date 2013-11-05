@@ -24,22 +24,22 @@
 class CustomKinematicController: public CustomJoint
 {
 	public:
-	NEWTON_API CustomKinematicController (NewtonBody* const body, const dVector& attachmentPointInGlobalSpace);
-	NEWTON_API virtual ~CustomKinematicController();
+	CUSTOM_JOINTS_API CustomKinematicController (NewtonBody* const body, const dVector& attachmentPointInGlobalSpace);
+	CUSTOM_JOINTS_API virtual ~CustomKinematicController();
 
-	NEWTON_API void SetPickMode (int mode);
-	NEWTON_API void SetMaxLinearFriction(dFloat accel); 
-	NEWTON_API void SetMaxAngularFriction(dFloat alpha); 
+	CUSTOM_JOINTS_API void SetPickMode (int mode);
+	CUSTOM_JOINTS_API void SetMaxLinearFriction(dFloat accel); 
+	CUSTOM_JOINTS_API void SetMaxAngularFriction(dFloat alpha); 
 	
-	NEWTON_API void SetTargetRotation (const dQuaternion& rotation); 
-	NEWTON_API void SetTargetPosit (const dVector& posit); 
-	NEWTON_API void SetTargetMatrix (const dMatrix& matrix); 
+	CUSTOM_JOINTS_API void SetTargetRotation (const dQuaternion& rotation); 
+	CUSTOM_JOINTS_API void SetTargetPosit (const dVector& posit); 
+	CUSTOM_JOINTS_API void SetTargetMatrix (const dMatrix& matrix); 
 
-	NEWTON_API dMatrix GetTargetMatrix () const;
+	CUSTOM_JOINTS_API dMatrix GetTargetMatrix () const;
 
 	protected:
-	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
+	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dVector m_localHandle;
 	dVector m_targetPosit;

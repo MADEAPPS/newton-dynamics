@@ -28,14 +28,14 @@
 class CustomGear: public CustomJoint  
 {
 	public:
-	NEWTON_API CustomGear(dFloat gearRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const child, NewtonBody* const parent);
-	NEWTON_API CustomGear(int dof, NewtonBody* const child, NewtonBody* const parent);
-	NEWTON_API virtual ~CustomGear();
+	CUSTOM_JOINTS_API CustomGear(dFloat gearRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const child, NewtonBody* const parent);
+	CUSTOM_JOINTS_API CustomGear(int dof, NewtonBody* const child, NewtonBody* const parent);
+	CUSTOM_JOINTS_API virtual ~CustomGear();
 
 
 	protected:
-	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
+	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;
@@ -46,11 +46,11 @@ class CustomGear: public CustomJoint
 class CustomGearAndSlide: public CustomGear
 {
 	public:
-	NEWTON_API CustomGearAndSlide (dFloat gearRatio, dFloat slideRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const parenPin, NewtonBody* const parent);
-	NEWTON_API virtual ~CustomGearAndSlide();
+	CUSTOM_JOINTS_API CustomGearAndSlide (dFloat gearRatio, dFloat slideRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const parenPin, NewtonBody* const parent);
+	CUSTOM_JOINTS_API virtual ~CustomGearAndSlide();
 
-	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
+	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	protected:
 	dFloat m_slideRatio;

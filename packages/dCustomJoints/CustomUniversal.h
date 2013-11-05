@@ -22,25 +22,25 @@
 class CustomUniversal: public CustomJoint  
 {
 	public:
-	NEWTON_API CustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* child, NewtonBody* parent = NULL);
-	NEWTON_API virtual ~CustomUniversal();
+	CUSTOM_JOINTS_API CustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* child, NewtonBody* parent = NULL);
+	CUSTOM_JOINTS_API virtual ~CustomUniversal();
 
-	NEWTON_API void EnableLimit_0(bool state);
-	NEWTON_API void EnableLimit_1(bool state);
-	NEWTON_API void SetLimis_0(dFloat minAngle, dFloat maxAngle);
-	NEWTON_API void SetLimis_1(dFloat minAngle, dFloat maxAngle);
+	CUSTOM_JOINTS_API void EnableLimit_0(bool state);
+	CUSTOM_JOINTS_API void EnableLimit_1(bool state);
+	CUSTOM_JOINTS_API void SetLimis_0(dFloat minAngle, dFloat maxAngle);
+	CUSTOM_JOINTS_API void SetLimis_1(dFloat minAngle, dFloat maxAngle);
 
-	NEWTON_API dFloat GetJointAngle_0 () const;
-	NEWTON_API dFloat GetJointAngle_1 () const;
+	CUSTOM_JOINTS_API dFloat GetJointAngle_0 () const;
+	CUSTOM_JOINTS_API dFloat GetJointAngle_1 () const;
 
-	NEWTON_API dVector GetPinAxis_0 () const;
-	NEWTON_API dVector GetPinAxis_1 () const;
+	CUSTOM_JOINTS_API dVector GetPinAxis_0 () const;
+	CUSTOM_JOINTS_API dVector GetPinAxis_1 () const;
 
-	NEWTON_API dFloat GetJointOmega_0 () const;
-	NEWTON_API dFloat GetJointOmega_1 () const;
+	CUSTOM_JOINTS_API dFloat GetJointOmega_0 () const;
+	CUSTOM_JOINTS_API dFloat GetJointOmega_1 () const;
 
-	NEWTON_API void EnableMotor_0(bool state);
-	NEWTON_API void EnableMotor_1(bool state);
+	CUSTOM_JOINTS_API void EnableMotor_0(bool state);
+	CUSTOM_JOINTS_API void EnableMotor_1(bool state);
 	void CalculateGlobalMatrix(dMatrix& matrix0, dMatrix& matrix1) const
 	{
 		CustomJoint::CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
@@ -50,9 +50,9 @@ class CustomUniversal: public CustomJoint
 	void CalculatePitchAngle (const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const;
 	void CalculateYawAngle (const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const;
 
-	NEWTON_API virtual void ProjectError () const;
-	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
+	CUSTOM_JOINTS_API virtual void ProjectError () const;
+	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;

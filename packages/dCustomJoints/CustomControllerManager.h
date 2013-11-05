@@ -29,13 +29,13 @@
 class CustomControllerConvexCastPreFilter
 {	
 	public:
-	NEWTON_API CustomControllerConvexCastPreFilter (const NewtonBody* const me)
+	CUSTOM_JOINTS_API CustomControllerConvexCastPreFilter (const NewtonBody* const me)
 		:m_bodiesToSkipCount(1)
 	{
 		m_bodiesToSkip[0] = me;
 	}
 
-	NEWTON_API static unsigned Prefilter(const NewtonBody* const body, const NewtonCollision* const myCollision, void* const userData)
+	CUSTOM_JOINTS_API static unsigned Prefilter(const NewtonBody* const body, const NewtonCollision* const myCollision, void* const userData)
 	{
 		CustomControllerConvexCastPreFilter* const filter = (CustomControllerConvexCastPreFilter*) userData;
 		const NewtonCollision* const collision = NewtonBodyGetCollision(body);
@@ -58,7 +58,7 @@ class CustomControllerConvexCastPreFilter
 class CustomControllerConvexRayFilter: public CustomControllerConvexCastPreFilter
 {	
 	public:
-	NEWTON_API CustomControllerConvexRayFilter (const NewtonBody* const me)
+	CUSTOM_JOINTS_API CustomControllerConvexRayFilter (const NewtonBody* const me)
 		:CustomControllerConvexCastPreFilter(me)
 		,m_hitBody(NULL)
 		,m_shapeHit(NULL)
@@ -67,7 +67,7 @@ class CustomControllerConvexRayFilter: public CustomControllerConvexCastPreFilte
 	{
 	}
 
-	NEWTON_API static dFloat Filter (const NewtonBody* const body, const NewtonCollision* const shapeHit, const dFloat* const hitContact, const dFloat* const hitNormal, dLong collisionID, void* const userData, dFloat intersectParam)
+	CUSTOM_JOINTS_API static dFloat Filter (const NewtonBody* const body, const NewtonCollision* const shapeHit, const dFloat* const hitContact, const dFloat* const hitNormal, dLong collisionID, void* const userData, dFloat intersectParam)
 	{
 		CustomControllerConvexRayFilter* const filter = (CustomControllerConvexRayFilter*) userData;
 		dAssert (body != filter->m_bodiesToSkip[0]);

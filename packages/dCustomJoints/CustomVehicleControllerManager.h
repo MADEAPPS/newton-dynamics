@@ -68,8 +68,8 @@ class CustomVehicleController: public CustomControllerBase
 		{
 		}
 
-		NEWTON_API void InitalizeCurve (int points, const dFloat* const steps, const dFloat* const values);
-		NEWTON_API dFloat GetValue (dFloat param) const;
+		CUSTOM_JOINTS_API void InitalizeCurve (int points, const dFloat* const steps, const dFloat* const values);
+		CUSTOM_JOINTS_API dFloat GetValue (dFloat param) const;
 
 		dNot m_nodes[6];
 		int m_count;
@@ -100,7 +100,7 @@ class CustomVehicleController: public CustomControllerBase
 		{
 		}
 		
-		NEWTON_API virtual void Update (dFloat timestep) = 0;
+		CUSTOM_JOINTS_API virtual void Update (dFloat timestep) = 0;
 		
 		CustomVehicleController* m_controller; 
 		dFloat m_param;
@@ -120,12 +120,12 @@ class CustomVehicleController: public CustomControllerBase
 				m_maxGears = 16
 			};
 
-			NEWTON_API GearBox(CustomVehicleController* const controller, dFloat reverseGearRatio, int gearCount, const dFloat* const gearBoxRatios);
+			CUSTOM_JOINTS_API GearBox(CustomVehicleController* const controller, dFloat reverseGearRatio, int gearCount, const dFloat* const gearBoxRatios);
 
-			NEWTON_API int GetGear() const {return m_currentGear;}
-			NEWTON_API void SetGear(int gear) {m_currentGear = dClamp (gear, int (m_reverseGear), m_gearsCount - 1);}
-			NEWTON_API int GetGearCount() const {return m_gearsCount;}
-			NEWTON_API dFloat GetGearRatio(int gear) const {return (gear != m_reverseGear) ? gears[gear] : -gears[gear];}
+			CUSTOM_JOINTS_API int GetGear() const {return m_currentGear;}
+			CUSTOM_JOINTS_API void SetGear(int gear) {m_currentGear = dClamp (gear, int (m_reverseGear), m_gearsCount - 1);}
+			CUSTOM_JOINTS_API int GetGearCount() const {return m_gearsCount;}
+			CUSTOM_JOINTS_API dFloat GetGearRatio(int gear) const {return (gear != m_reverseGear) ? gears[gear] : -gears[gear];}
 
 			int m_gearsCount;
 			int m_currentGear;
@@ -133,28 +133,28 @@ class CustomVehicleController: public CustomControllerBase
 		};
 
 
-		NEWTON_API EngineComponent (CustomVehicleController* const controller, GearBox* const gearBox, TireBodyState* const leftTire, TireBodyState* const righTire);
-		NEWTON_API ~EngineComponent();
+		CUSTOM_JOINTS_API EngineComponent (CustomVehicleController* const controller, GearBox* const gearBox, TireBodyState* const leftTire, TireBodyState* const righTire);
+		CUSTOM_JOINTS_API ~EngineComponent();
 
-		NEWTON_API virtual void Update (dFloat timestep);
+		CUSTOM_JOINTS_API virtual void Update (dFloat timestep);
 		
-		NEWTON_API void InitEngineTorqueCurve (dFloat vehicleSpeedKPH,
+		CUSTOM_JOINTS_API void InitEngineTorqueCurve (dFloat vehicleSpeedKPH,
 									dFloat poundFootIdleTorque, dFloat idleTorqueRPM, 
 									dFloat poundFootPeakTorque, dFloat peakTorqueRPM, 
 									dFloat poundFootPeackHorsePower, dFloat peakHorsePowerRPM, 
 									dFloat poundFootRedLineTorque, dFloat redLineTorqueRPM);
 
-		NEWTON_API int GetGear () const;
-		NEWTON_API void SetGear (int gear);
-		NEWTON_API dFloat GetRPM () const;
-		NEWTON_API dFloat GetSpeed () const;
-		NEWTON_API dFloat GetTopSpeed () const;
-		NEWTON_API dFloat GetIdleFakeInertia() const;
+		CUSTOM_JOINTS_API int GetGear () const;
+		CUSTOM_JOINTS_API void SetGear (int gear);
+		CUSTOM_JOINTS_API dFloat GetRPM () const;
+		CUSTOM_JOINTS_API dFloat GetSpeed () const;
+		CUSTOM_JOINTS_API dFloat GetTopSpeed () const;
+		CUSTOM_JOINTS_API dFloat GetIdleFakeInertia() const;
 
 		protected:
-		NEWTON_API void SetIdleFakeInertia(dFloat inertia);
-		NEWTON_API void SetTopSpeed (dFloat topSpeedMeterPerSecunds);
-		NEWTON_API dFloat CaculateEngineRPS (const TireBodyState* const tire, dFloat gearGain) const;
+		CUSTOM_JOINTS_API void SetIdleFakeInertia(dFloat inertia);
+		CUSTOM_JOINTS_API void SetTopSpeed (dFloat topSpeedMeterPerSecunds);
+		CUSTOM_JOINTS_API dFloat CaculateEngineRPS (const TireBodyState* const tire, dFloat gearGain) const;
 
 		GearBox* m_gearBox;
 		TireList::CustomListNode* m_leftTire;
@@ -173,9 +173,9 @@ class CustomVehicleController: public CustomControllerBase
 	class BrakeComponent: public Component
 	{
 		public:
-		NEWTON_API BrakeComponent (CustomVehicleController* const controller, dFloat maxBrakeTorque);
-		NEWTON_API void AddBrakeTire (TireBodyState* const tire);
-		NEWTON_API virtual void Update (dFloat timestep);
+		CUSTOM_JOINTS_API BrakeComponent (CustomVehicleController* const controller, dFloat maxBrakeTorque);
+		CUSTOM_JOINTS_API void AddBrakeTire (TireBodyState* const tire);
+		CUSTOM_JOINTS_API virtual void Update (dFloat timestep);
 
 		dFloat m_maxBrakeTorque;
 		CustomList<TireList::CustomListNode*> m_brakeTires;
@@ -191,9 +191,9 @@ class CustomVehicleController: public CustomControllerBase
 			TireList::CustomListNode* m_tireNode;
 		};
 
-		NEWTON_API SteeringComponent (CustomVehicleController* const controller, dFloat maxAngleInRadians);
-		NEWTON_API void AddSteeringTire (TireBodyState* const tire, dFloat sign);
-		NEWTON_API virtual void Update (dFloat timestep);
+		CUSTOM_JOINTS_API SteeringComponent (CustomVehicleController* const controller, dFloat maxAngleInRadians);
+		CUSTOM_JOINTS_API void AddSteeringTire (TireBodyState* const tire, dFloat sign);
+		CUSTOM_JOINTS_API virtual void Update (dFloat timestep);
 
 		CustomList<TireSignPair> m_steeringTires;
 		dFloat m_maxAngle;
@@ -270,16 +270,16 @@ class CustomVehicleController: public CustomControllerBase
 		VehicleJoint(){}
 		virtual ~VehicleJoint(){}
 
-		NEWTON_API virtual void Init(CustomVehicleController* const controller, BodyState* const state0, BodyState* const state1);
+		CUSTOM_JOINTS_API virtual void Init(CustomVehicleController* const controller, BodyState* const state0, BodyState* const state1);
 
-		NEWTON_API virtual void UpdateSolverForces (const JacobianPair* const jacobians) const = 0; 
-		NEWTON_API virtual void JacobianDerivative (ParamInfo* const constraintParams) = 0; 
-		NEWTON_API virtual void JointAccelerations (JointAccelerationDecriptor* const accelParam);
+		CUSTOM_JOINTS_API virtual void UpdateSolverForces (const JacobianPair* const jacobians) const = 0; 
+		CUSTOM_JOINTS_API virtual void JacobianDerivative (ParamInfo* const constraintParams) = 0; 
+		CUSTOM_JOINTS_API virtual void JointAccelerations (JointAccelerationDecriptor* const accelParam);
 
-		NEWTON_API void InitPointParam (PointDerivativeParam& param, const dVector& pivot) const;
-		NEWTON_API void CalculateAngularDerivative (ParamInfo* const constraintParams, const dVector& dir,	dFloat jointAngle);
-		NEWTON_API void CalculatePointDerivative (ParamInfo* const constraintParams, const dVector& dir, const PointDerivativeParam& param);
-		NEWTON_API void AddLinearRowJacobian (ParamInfo* const constraintParams, const dVector& pivot, const dVector& dir);
+		CUSTOM_JOINTS_API void InitPointParam (PointDerivativeParam& param, const dVector& pivot) const;
+		CUSTOM_JOINTS_API void CalculateAngularDerivative (ParamInfo* const constraintParams, const dVector& dir,	dFloat jointAngle);
+		CUSTOM_JOINTS_API void CalculatePointDerivative (ParamInfo* const constraintParams, const dVector& dir, const PointDerivativeParam& param);
+		CUSTOM_JOINTS_API void AddLinearRowJacobian (ParamInfo* const constraintParams, const dVector& pivot, const dVector& dir);
 
 		int m_rowIsMotor[8];
 		dFloat m_motorAcceleration[8];
@@ -294,8 +294,8 @@ class CustomVehicleController: public CustomControllerBase
 	class TireJoint: public VehicleJoint
 	{
 		public:
-		NEWTON_API virtual void UpdateSolverForces (const JacobianPair* const jacobians) const; 
-		NEWTON_API virtual void JacobianDerivative (ParamInfo* const constraintParams); 
+		CUSTOM_JOINTS_API virtual void UpdateSolverForces (const JacobianPair* const jacobians) const; 
+		CUSTOM_JOINTS_API virtual void JacobianDerivative (ParamInfo* const constraintParams); 
 	};
 
 	class ContactJoint: public VehicleJoint
@@ -305,9 +305,9 @@ class CustomVehicleController: public CustomControllerBase
 			:m_contactCount(0)
 		{
 		}
-		NEWTON_API virtual void UpdateSolverForces (const JacobianPair* const jacobians) const; 
-		NEWTON_API virtual void JacobianDerivative (ParamInfo* const constraintParams); 
-		NEWTON_API virtual void JointAccelerations (JointAccelerationDecriptor* const accelParam);
+		CUSTOM_JOINTS_API virtual void UpdateSolverForces (const JacobianPair* const jacobians) const; 
+		CUSTOM_JOINTS_API virtual void JacobianDerivative (ParamInfo* const constraintParams); 
+		CUSTOM_JOINTS_API virtual void JointAccelerations (JointAccelerationDecriptor* const accelParam);
 
 		int m_contactCount;
 		NewtonWorldConvexCastReturnInfo m_contacts[4];
@@ -317,12 +317,12 @@ class CustomVehicleController: public CustomControllerBase
 	class BodyState
 	{
 		public:
-		NEWTON_API BodyState();
-		NEWTON_API virtual ~BodyState() {}
+		CUSTOM_JOINTS_API BodyState();
+		CUSTOM_JOINTS_API virtual ~BodyState() {}
 		
-		NEWTON_API void Init(CustomVehicleController* const controller);
-		NEWTON_API void UpdateInertia();
-		NEWTON_API virtual void IntegrateForce (dFloat timestep, const dVector& force, const dVector& torque);
+		CUSTOM_JOINTS_API void Init(CustomVehicleController* const controller);
+		CUSTOM_JOINTS_API void UpdateInertia();
+		CUSTOM_JOINTS_API virtual void IntegrateForce (dFloat timestep, const dVector& force, const dVector& torque);
 		
 		dMatrix m_matrix;
 		dMatrix m_localFrame;
@@ -348,8 +348,8 @@ class CustomVehicleController: public CustomControllerBase
 	class ChassisBodyState: public BodyState
 	{
 		public:
-		NEWTON_API void Init (CustomVehicleController* const controller, const dMatrix& localframe);
-		NEWTON_API void UpdateDynamicInputs();
+		CUSTOM_JOINTS_API void Init (CustomVehicleController* const controller, const dMatrix& localframe);
+		CUSTOM_JOINTS_API void UpdateDynamicInputs();
 
 		dVector m_com;
 		dVector m_comOffset;
@@ -359,20 +359,20 @@ class CustomVehicleController: public CustomControllerBase
 	class TireBodyState: public BodyState
 	{
 		public:
-		NEWTON_API void Init (CustomVehicleController* const controller, const TireCreationInfo& tireInfo);
+		CUSTOM_JOINTS_API void Init (CustomVehicleController* const controller, const TireCreationInfo& tireInfo);
 
-		NEWTON_API dFloat GetAdhesionCoefficient() const;
-		NEWTON_API void SetAdhesionCoefficient(dFloat Coefficient);
+		CUSTOM_JOINTS_API dFloat GetAdhesionCoefficient() const;
+		CUSTOM_JOINTS_API void SetAdhesionCoefficient(dFloat Coefficient);
 
-		NEWTON_API dMatrix CalculateMatrix () const;
-		NEWTON_API dMatrix CalculateSteeringMatrix () const;
-		NEWTON_API dMatrix CalculateSuspensionMatrix () const;
+		CUSTOM_JOINTS_API dMatrix CalculateMatrix () const;
+		CUSTOM_JOINTS_API dMatrix CalculateSteeringMatrix () const;
+		CUSTOM_JOINTS_API dMatrix CalculateSuspensionMatrix () const;
 		
-		NEWTON_API void Collide (CustomControllerConvexCastPreFilter& filter, dFloat timestepInv);
-		NEWTON_API void UpdateDynamicInputs(dFloat timestep);
+		CUSTOM_JOINTS_API void Collide (CustomControllerConvexCastPreFilter& filter, dFloat timestepInv);
+		CUSTOM_JOINTS_API void UpdateDynamicInputs(dFloat timestep);
 
-		NEWTON_API void UpdateTransform ();
-		NEWTON_API virtual void IntegrateForce (dFloat timestep, const dVector& force, const dVector& torque);
+		CUSTOM_JOINTS_API void UpdateTransform ();
+		CUSTOM_JOINTS_API virtual void IntegrateForce (dFloat timestep, const dVector& force, const dVector& torque);
 
 		dVector m_tireLoad;
 		dVector m_lateralForce;
@@ -402,43 +402,43 @@ class CustomVehicleController: public CustomControllerBase
 	public:
 
 	// public functions
-	NEWTON_API TireBodyState* AddTire (const TireCreationInfo& tireInfo);
-	NEWTON_API TireBodyState* GetFirstTire () const ;
-	NEWTON_API TireBodyState* GetNextTire (TireBodyState* const tire) const;
+	CUSTOM_JOINTS_API TireBodyState* AddTire (const TireCreationInfo& tireInfo);
+	CUSTOM_JOINTS_API TireBodyState* GetFirstTire () const ;
+	CUSTOM_JOINTS_API TireBodyState* GetNextTire (TireBodyState* const tire) const;
 
-	NEWTON_API void* GetUserData (TireBodyState* const tireNode) const;
-	NEWTON_API dMatrix GetTireLocalMatrix (TireBodyState* const tireNode) const;
-	NEWTON_API dMatrix GetTireGlobalMatrix (TireBodyState* const tireNode) const;
+	CUSTOM_JOINTS_API void* GetUserData (TireBodyState* const tireNode) const;
+	CUSTOM_JOINTS_API dMatrix GetTireLocalMatrix (TireBodyState* const tireNode) const;
+	CUSTOM_JOINTS_API dMatrix GetTireGlobalMatrix (TireBodyState* const tireNode) const;
 
-	NEWTON_API const ChassisBodyState& GetChassisState () const;
+	CUSTOM_JOINTS_API const ChassisBodyState& GetChassisState () const;
 
-	NEWTON_API void SetLongitudinalSlipRatio(dFloat maxLongitudinalSlipRatio);
-	NEWTON_API void SetLateralSlipAngle(dFloat maxLongitudinalSlipAngleIndDegrees);
+	CUSTOM_JOINTS_API void SetLongitudinalSlipRatio(dFloat maxLongitudinalSlipRatio);
+	CUSTOM_JOINTS_API void SetLateralSlipAngle(dFloat maxLongitudinalSlipAngleIndDegrees);
 
-	NEWTON_API void SetCenterOfGravity(const dVector& comRelativeToGeomtriCenter);
+	CUSTOM_JOINTS_API void SetCenterOfGravity(const dVector& comRelativeToGeomtriCenter);
 
-	NEWTON_API BrakeComponent* GetBrakes() const;
-	NEWTON_API EngineComponent* GetEngine() const;
-	NEWTON_API BrakeComponent* GetHandBrakes() const;
-	NEWTON_API SteeringComponent* GetSteering() const;
+	CUSTOM_JOINTS_API BrakeComponent* GetBrakes() const;
+	CUSTOM_JOINTS_API EngineComponent* GetEngine() const;
+	CUSTOM_JOINTS_API BrakeComponent* GetHandBrakes() const;
+	CUSTOM_JOINTS_API SteeringComponent* GetSteering() const;
 
-	NEWTON_API void SetBrakes(BrakeComponent* const brakes);
-	NEWTON_API void SetEngine(EngineComponent* const engine);
-	NEWTON_API void SetHandBrakes(BrakeComponent* const brakes);
-	NEWTON_API void SetSteering(SteeringComponent* const steering);
+	CUSTOM_JOINTS_API void SetBrakes(BrakeComponent* const brakes);
+	CUSTOM_JOINTS_API void SetEngine(EngineComponent* const engine);
+	CUSTOM_JOINTS_API void SetHandBrakes(BrakeComponent* const brakes);
+	CUSTOM_JOINTS_API void SetSteering(SteeringComponent* const steering);
 
 	protected:
-	NEWTON_API void Init (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, const dVector& gravityVector);
-	NEWTON_API void Cleanup();
+	CUSTOM_JOINTS_API void Init (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, const dVector& gravityVector);
+	CUSTOM_JOINTS_API void Cleanup();
 
-	NEWTON_API virtual void PreUpdate(dFloat timestep, int threadIndex);
-	NEWTON_API virtual void PostUpdate(dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 
-	NEWTON_API int GetActiveJoints(VehicleJoint** const jointArray);
-	NEWTON_API int BuildJacobianMatrix (int jointCount, VehicleJoint** const jointArray, dFloat timestep, VehicleJoint::JacobianPair* const jacobianArray, VehicleJoint::JacobianColum* const jacobianColumnArray);
-	NEWTON_API void CalculateReactionsForces(int jointCount, VehicleJoint** const jointArray, dFloat timestep, VehicleJoint::JacobianPair* const jacobianArray, VehicleJoint::JacobianColum* const jacobianColumnArray);
+	CUSTOM_JOINTS_API int GetActiveJoints(VehicleJoint** const jointArray);
+	CUSTOM_JOINTS_API int BuildJacobianMatrix (int jointCount, VehicleJoint** const jointArray, dFloat timestep, VehicleJoint::JacobianPair* const jacobianArray, VehicleJoint::JacobianColum* const jacobianColumnArray);
+	CUSTOM_JOINTS_API void CalculateReactionsForces(int jointCount, VehicleJoint** const jointArray, dFloat timestep, VehicleJoint::JacobianPair* const jacobianArray, VehicleJoint::JacobianColum* const jacobianColumnArray);
 	
-	NEWTON_API void UpdateTireTransforms ();
+	CUSTOM_JOINTS_API void UpdateTireTransforms ();
 
 	BodyState m_staticWorld;
 	ChassisBodyState m_chassisState;
@@ -460,11 +460,11 @@ class CustomVehicleController: public CustomControllerBase
 class CustomVehicleControllerManager: public CustomControllerManager<CustomVehicleController> 
 {
 	public:
-	NEWTON_API CustomVehicleControllerManager(NewtonWorld* const world);
-	NEWTON_API virtual ~CustomVehicleControllerManager();
+	CUSTOM_JOINTS_API CustomVehicleControllerManager(NewtonWorld* const world);
+	CUSTOM_JOINTS_API virtual ~CustomVehicleControllerManager();
 
-	NEWTON_API virtual CustomVehicleController* CreateVehicle (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, const dVector& gravityVector);
-	NEWTON_API virtual void DestroyController (CustomVehicleController* const controller);
+	CUSTOM_JOINTS_API virtual CustomVehicleController* CreateVehicle (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, const dVector& gravityVector);
+	CUSTOM_JOINTS_API virtual void DestroyController (CustomVehicleController* const controller);
 };
 
 

@@ -23,14 +23,14 @@
 class CustomUpVector: public CustomJoint
 {
 	public:
-	NEWTON_API CustomUpVector(const dVector& pin, NewtonBody* child);
-	NEWTON_API virtual ~CustomUpVector();
+	CUSTOM_JOINTS_API CustomUpVector(const dVector& pin, NewtonBody* child);
+	CUSTOM_JOINTS_API virtual ~CustomUpVector();
 
-	NEWTON_API void SetPinDir (const dVector& pin);
+	CUSTOM_JOINTS_API void SetPinDir (const dVector& pin);
 
 	protected:
-	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
+	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;

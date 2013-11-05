@@ -28,6 +28,10 @@
 #pragma warning (disable: 4996) // for 2005 users declared deprecated
 
 
+#ifndef nullptr
+#define nullptr NULL
+#endif
+
 #include <Max.h>
 #include <io.h>
 #include <stdio.h>

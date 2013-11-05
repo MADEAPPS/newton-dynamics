@@ -23,27 +23,27 @@
 class Custom6DOF: public CustomJoint  
 {
 	public:
-	NEWTON_API Custom6DOF (const dMatrix& pinsAndPivotChildFrame, const dMatrix& pinsAndPivotParentFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
-	NEWTON_API virtual ~Custom6DOF();
+	CUSTOM_JOINTS_API Custom6DOF (const dMatrix& pinsAndPivotChildFrame, const dMatrix& pinsAndPivotParentFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
+	CUSTOM_JOINTS_API virtual ~Custom6DOF();
 
-	NEWTON_API void SetLinearLimits (const dVector& minLinearLimits, const dVector& maxLinearLimits);
-	NEWTON_API void SetAngularLimits (const dVector& minAngularLimits, const dVector& maxAngularLimits);
-	NEWTON_API void GetLinearLimits (dVector& minLinearLimits, dVector& maxLinearLimits);
-	NEWTON_API void GetAngularLimits (dVector& minAngularLimits, dVector& maxAngularLimits);
+	CUSTOM_JOINTS_API void SetLinearLimits (const dVector& minLinearLimits, const dVector& maxLinearLimits);
+	CUSTOM_JOINTS_API void SetAngularLimits (const dVector& minAngularLimits, const dVector& maxAngularLimits);
+	CUSTOM_JOINTS_API void GetLinearLimits (dVector& minLinearLimits, dVector& maxLinearLimits);
+	CUSTOM_JOINTS_API void GetAngularLimits (dVector& minAngularLimits, dVector& maxAngularLimits);
 
 
-	NEWTON_API void SetReverserUniversal (int order);
-
-	protected:
-	NEWTON_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	NEWTON_API virtual void GetInfo (NewtonJointRecord* const info) const;
-
-	NEWTON_API void SubmitConstraints (const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
+	CUSTOM_JOINTS_API void SetReverserUniversal (int order);
 
 	protected:
-	NEWTON_API dMatrix CalculateBasisAndJointAngle (const dMatrix& matrix0, const dMatrix& matrix1) const;
-	NEWTON_API dMatrix CalculateHinge_Angles (const dMatrix& matrix0, const dMatrix& matrix1, int x, int y, int z) const;
-	NEWTON_API dMatrix CalculateUniversal_Angles (const dMatrix& matrix0, const dMatrix& matrix1, int x, int y, int z) const;
+	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
+
+	CUSTOM_JOINTS_API void SubmitConstraints (const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
+
+	protected:
+	CUSTOM_JOINTS_API dMatrix CalculateBasisAndJointAngle (const dMatrix& matrix0, const dMatrix& matrix1) const;
+	CUSTOM_JOINTS_API dMatrix CalculateHinge_Angles (const dMatrix& matrix0, const dMatrix& matrix1, int x, int y, int z) const;
+	CUSTOM_JOINTS_API dMatrix CalculateUniversal_Angles (const dMatrix& matrix0, const dMatrix& matrix1, int x, int y, int z) const;
 
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;
