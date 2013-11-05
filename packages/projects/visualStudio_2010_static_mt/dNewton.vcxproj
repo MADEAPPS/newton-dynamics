@@ -186,6 +186,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\dNewton\dMaterialPairManager.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonActuatorJoints.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonJoint.cpp" />
     <ClCompile Include="..\..\dNewton\dNewton.cpp" />
@@ -214,6 +215,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\dNewton\dMaterialPairManager.h" />
     <ClInclude Include="..\..\dNewton\dNewtonActuatorJoints.h" />
     <ClInclude Include="..\..\dNewton\dNewtonJoint.h" />
     <ClInclude Include="..\..\dNewton\dNewton.h" />

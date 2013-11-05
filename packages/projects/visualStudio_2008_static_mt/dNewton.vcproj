@@ -336,6 +336,14 @@
 			</File>
 		</Filter>
 		<File
+			RelativePath="..\..\dNewton\dMaterialPairManager.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dNewton\dMaterialPairManager.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\dNewton\dNewton.cpp"
 			>
 		</File>

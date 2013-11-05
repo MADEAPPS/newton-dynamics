@@ -31,6 +31,7 @@
     <ClCompile Include="..\..\dNewton\dNewtonTriggerManager.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonVehicleManager.cpp" />
     <ClCompile Include="..\..\dNewton\dStdAfxNewton.cpp" />
+    <ClCompile Include="..\..\dNewton\dMaterialPairManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dNewton\dNewtonActuatorJoints.h">
@@ -58,5 +59,6 @@
     <ClInclude Include="..\..\dNewton\dNewtonTriggerManager.h" />
     <ClInclude Include="..\..\dNewton\dNewtonVehicleManager.h" />
     <ClInclude Include="..\..\dNewton\dStdAfxNewton.h" />
+    <ClInclude Include="..\..\dNewton\dMaterialPairManager.h" />
   </ItemGroup>
 </Project>

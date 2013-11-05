@@ -286,7 +286,7 @@ extern "C" {
 	{
 		dFloat m_point[4];						// collision point in global space
 		dFloat m_normal[4];						// surface normal at collision point in global space
-		dFloat m_normalOnHitPoint[4];           // surface normal at the surface of the hit body, 
+		//dFloat m_normalOnHitPoint[4];           // surface normal at the surface of the hit body, 
 												// is the same as the normal calculated by a ray cast hitting the body at the hit point
 		dLong m_contactID;						// collision ID at contact point
 		const NewtonBody* m_hitBody;			// body hit at contact point
