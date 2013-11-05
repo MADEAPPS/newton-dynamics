@@ -23,7 +23,25 @@
 #define _D_CUSTOM_ALLOC_H_
 
 
-#include "CustomJointLibraryStdAfx.h"
+
+#ifdef _CUSTOM_JOINTS_STATIC_LIB
+	#define CUSTOM_JOINTS_API
+#else 
+	#ifdef _CUSTOM_JOINTS_BUILD_DLL
+		#ifdef _WIN32
+			#define CUSTOM_JOINTS_API __declspec (dllexport)
+		#else
+			#define CUSTOM_JOINTS_API __attribute__ ((visibility("default")))
+		#endif
+	#else
+		#ifdef _WIN32
+			#define CUSTOM_JOINTS_API __declspec (dllimport)
+		#else
+			#define CUSTOM_JOINTS_API
+		#endif
+	#endif
+#endif
+
 
 
 class CustomAlloc  

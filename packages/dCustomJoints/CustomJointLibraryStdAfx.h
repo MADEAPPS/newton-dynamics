@@ -49,30 +49,13 @@
 
 
 
-#ifdef _CUSTOM_JOINTS_STATIC_LIB
-	#define CUSTOM_JOINTS_API
-#else 
-	#ifdef _CUSTOM_JOINTS_BUILD_DLL
-		#ifdef _WIN32
-			#define CUSTOM_JOINTS_API __declspec (dllexport)
-		#else
-			#define CUSTOM_JOINTS_API __attribute__ ((visibility("default")))
-		#endif
-	#else
-		#ifdef _WIN32
-			#define CUSTOM_JOINTS_API __declspec (dllimport)
-		#else
-			#define CUSTOM_JOINTS_API
-		#endif
-	#endif
-#endif
-
-
 #include <new>
 #include <stdio.h>
 #include <stdlib.h>
 #include <Newton.h>
-#include <CustomJoint.h>
+#include <dMathDefines.h>
+#include <CustomAlloc.h>
+
 
 #endif
 

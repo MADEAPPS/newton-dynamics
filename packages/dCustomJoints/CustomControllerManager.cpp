@@ -16,6 +16,7 @@
 
 
 #include "CustomJointLibraryStdAfx.h"
+#include "CustomJoint.h"
 #include "CustomControllerManager.h"
 
 

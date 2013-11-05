@@ -12,6 +12,7 @@
 
 #ifndef _CUSTOM_LIST_H_
 #define _CUSTOM_LIST_H_
+
 #include "CustomAlloc.h"
 
 // this is a small double link list container similar to STL, 
