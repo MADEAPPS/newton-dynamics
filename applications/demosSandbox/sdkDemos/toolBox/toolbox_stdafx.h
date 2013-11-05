@@ -129,6 +129,7 @@ typedef long long unsigned64;
 #include <dMatrix.h>
 #include <dQuaternion.h>
 #include <dMathDefines.h>
+#include <CustomJoint.h>
 #include <NewtonDebuggerServer.h>
 #include <CustomControllerManager.h>
 
