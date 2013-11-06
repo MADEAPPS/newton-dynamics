@@ -43,6 +43,10 @@ class dMaterialPairManager: public dNewtonAlloc
 	CNEWTON_API dMaterialPairManager ();
 	CNEWTON_API ~dMaterialPairManager ();
 	
+	dMaterialPair* GetDefualtPair ()
+	{
+		return &m_default;
+	}
 	CNEWTON_API dMaterialPair* GetPair (int materialId_0, int materialId_1, int threadIndex = 0);
 	CNEWTON_API void AddPair (int materialId_0, int materialId_1, const dMaterialPair& pair);
 

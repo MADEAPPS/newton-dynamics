@@ -33,6 +33,7 @@ class dNewtonMaterial: virtual public dNewtonAlloc
 	dNewtonMaterial(dLong mask = -1)
 		:dNewtonAlloc()
 		,m_collisionMask (mask)
+		,m_materailID(0)
 	{
 	}
 
@@ -41,6 +42,7 @@ class dNewtonMaterial: virtual public dNewtonAlloc
 	}
 
 	dLong m_collisionMask;
+	char m_materailID;
 };
 
 class dNewtonContactMaterial

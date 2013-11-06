@@ -19,7 +19,6 @@ dMaterialPairManager::dMaterialPairManager ()
 	,m_maxCount(8)
 	,m_entryCount(0)
 {
-	dAssert (0);
 	memset (m_cachedKeys, -1, sizeof(m_cachedKeys));
 	memset (m_cachedMaterial, 0, sizeof(m_cachedMaterial));
 	m_keys = new unsigned[m_maxCount];
