@@ -60,10 +60,13 @@ class dNewtonContactMaterial
 	CNEWTON_API void* GetFirstContact() const;
 	CNEWTON_API void* GetNextContact(void* const contact) const;
 
-	CNEWTON_API dNewtonCollision* GetShape0 (const void* contact);
-	CNEWTON_API dNewtonCollision* GetShape1 (const void* contact);
+	CNEWTON_API dNewtonCollision* GetShape0 (const void* const contact);
+	CNEWTON_API dNewtonCollision* GetShape1 (const void* const contact);
 
-	CNEWTON_API void RotateTangentDirections (const void* contact, const dFloat* const directionVector);
+	CNEWTON_API void SetContactRestitution (const void* const contact, dFloat restitution);
+	CNEWTON_API void SetContactFrictionCoef (const void* const contact, dFloat staticFrictionCoef, dFloat kineticFrictionCoef, int index);
+
+	CNEWTON_API void RotateTangentDirections (const void* const contact, const dFloat* const directionVector);
 
 	private:
 	void* m_materialHandle; 

@@ -45,7 +45,7 @@ void* dNewtonContactMaterial::GetNextContact(void* const contact) const
 	return NewtonContactJointGetNextContact ((NewtonJoint*)m_materialHandle, contact);
 }
 
-dNewtonCollision* dNewtonContactMaterial::GetShape0 (const void* contact)
+dNewtonCollision* dNewtonContactMaterial::GetShape0 (const void* const contact)
 {
 	NewtonBody* const body = NewtonJointGetBody0 ((NewtonJoint*)m_materialHandle);
 	NewtonMaterial* const material = NewtonContactGetMaterial (contact);
@@ -53,7 +53,7 @@ dNewtonCollision* dNewtonContactMaterial::GetShape0 (const void* contact)
 	return (dNewtonCollision*)NewtonCollisionGetUserData(collision);
 }
 
-dNewtonCollision* dNewtonContactMaterial::GetShape1 (const void* contact)
+dNewtonCollision* dNewtonContactMaterial::GetShape1 (const void* const contact)
 {
 	NewtonBody* const body = NewtonJointGetBody1 ((NewtonJoint*)m_materialHandle);
 	NewtonMaterial* const material = NewtonContactGetMaterial (contact);
@@ -61,8 +61,19 @@ dNewtonCollision* dNewtonContactMaterial::GetShape1 (const void* contact)
 	return (dNewtonCollision*)NewtonCollisionGetUserData(collision);
 }
 
+void dNewtonContactMaterial::SetContactRestitution (const void* const contact, dFloat restitution)
+{
+	NewtonMaterial* const material = NewtonContactGetMaterial (contact);
+	NewtonMaterialSetContactElasticity(material, restitution);
+}
 
-void dNewtonContactMaterial::RotateTangentDirections (const void* contact, const dFloat* const directionVector)
+void dNewtonContactMaterial::SetContactFrictionCoef (const void* const contact, dFloat staticFrictionCoef, dFloat kineticFrictionCoef, int index)
+{
+	NewtonMaterial* const material = NewtonContactGetMaterial (contact);
+	NewtonMaterialSetContactFrictionCoef (material, staticFrictionCoef, kineticFrictionCoef, index);
+}
+
+void dNewtonContactMaterial::RotateTangentDirections (const void* const contact, const dFloat* const directionVector)
 {
 	NewtonMaterial* const material = NewtonContactGetMaterial (contact);
 	NewtonMaterialContactRotateTangentDirections (material, directionVector);
