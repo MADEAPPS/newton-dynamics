@@ -45,6 +45,23 @@ void* dNewtonContactMaterial::GetNextContact(void* const contact) const
 	return NewtonContactJointGetNextContact ((NewtonJoint*)m_materialHandle, contact);
 }
 
+dNewtonCollision* dNewtonContactMaterial::GetShape0 (const void* contact)
+{
+	NewtonBody* const body = NewtonJointGetBody0 ((NewtonJoint*)m_materialHandle);
+	NewtonMaterial* const material = NewtonContactGetMaterial (contact);
+	NewtonCollision* const collision = NewtonMaterialGetBodyCollidingShape (material, body);
+	return (dNewtonCollision*)NewtonCollisionGetUserData(collision);
+}
+
+dNewtonCollision* dNewtonContactMaterial::GetShape1 (const void* contact)
+{
+	NewtonBody* const body = NewtonJointGetBody1 ((NewtonJoint*)m_materialHandle);
+	NewtonMaterial* const material = NewtonContactGetMaterial (contact);
+	NewtonCollision* const collision = NewtonMaterialGetBodyCollidingShape (material, body);
+	return (dNewtonCollision*)NewtonCollisionGetUserData(collision);
+}
+
+
 void dNewtonContactMaterial::RotateTangentDirections (const void* contact, const dFloat* const directionVector)
 {
 	NewtonMaterial* const material = NewtonContactGetMaterial (contact);

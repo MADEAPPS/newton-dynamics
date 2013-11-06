@@ -64,7 +64,7 @@ void dMaterialPairManager::AddPair (int materialId_0, int materialId_1, const dM
 }
 
 
-dMaterialPairManager::dMaterialPair* dMaterialPairManager::GetPair (int materialId_0, int materialId_1, int threadIndex)
+const dMaterialPairManager::dMaterialPair* dMaterialPairManager::GetPair (int materialId_0, int materialId_1, int threadIndex) const
 {
 	unsigned key = MakeKey (materialId_0, materialId_0);
 

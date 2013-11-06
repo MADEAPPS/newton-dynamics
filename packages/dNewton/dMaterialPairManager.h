@@ -47,8 +47,9 @@ class dMaterialPairManager: public dNewtonAlloc
 	{
 		return &m_default;
 	}
-	CNEWTON_API dMaterialPair* GetPair (int materialId_0, int materialId_1, int threadIndex = 0);
+	
 	CNEWTON_API void AddPair (int materialId_0, int materialId_1, const dMaterialPair& pair);
+	CNEWTON_API const dMaterialPair* GetPair (int materialId_0, int materialId_1, int threadIndex = 0) const;
 
 	private:
 	unsigned MakeKey (int id0, int id1) const
@@ -59,9 +60,9 @@ class dMaterialPairManager: public dNewtonAlloc
 	}
 	
 
-	dMaterialPair m_default;
-	unsigned m_cachedKeys[16];
-	dMaterialPair* m_cachedMaterial[16];
+	mutable dMaterialPair m_default;
+	mutable unsigned m_cachedKeys[16];
+	mutable dMaterialPair* m_cachedMaterial[16];
 	int m_maxCount;
 	int m_entryCount;
 	unsigned* m_keys;
