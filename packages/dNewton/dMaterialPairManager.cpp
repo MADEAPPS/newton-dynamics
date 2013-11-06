@@ -97,8 +97,6 @@ const dMaterialPairManager::dMaterialPair* dMaterialPairManager::GetPair (int ma
 		}
 		m_cachedMaterial[threadIndex] = &m_default;
 	}
-
 	return m_cachedMaterial[threadIndex];
-
 }
 
