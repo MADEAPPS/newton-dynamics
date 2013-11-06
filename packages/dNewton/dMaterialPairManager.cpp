@@ -27,7 +27,6 @@ dMaterialPairManager::dMaterialPairManager ()
 
 dMaterialPairManager::~dMaterialPairManager ()
 {
-	dAssert (0);
 	delete[] m_keys;
 	delete[] m_pool;
 }
