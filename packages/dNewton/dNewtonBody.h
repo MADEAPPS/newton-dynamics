@@ -69,6 +69,15 @@ class dNewtonBody: public dNewtonAlloc, public dNewtonTransformLerp
 	CNEWTON_API void AddTorque (const dFloat* const torque);
 	//CNEWTON_API void GetTorque (dFloat* const torque) const;
 
+	CNEWTON_API dFloat GetLinearDrag () const;
+	CNEWTON_API void SetLinearDrag (const dFloat drag);
+
+	CNEWTON_API void GetAngularDrag (dFloat* const drag) const;
+	CNEWTON_API void SetAngularDrag (const dFloat* const drag);
+	
+//	NEWTON_API void  NewtonBodySetLinearDamping (const NewtonBody* const body, dFloat linearDamp);
+//	NEWTON_API void  NewtonBodySetAngularDamping (const NewtonBody* const body, const dFloat* const angularDamp);
+
 	
 
 	CNEWTON_API void GetCenterOfMass (dFloat* const com) const;

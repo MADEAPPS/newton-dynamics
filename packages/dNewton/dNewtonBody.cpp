@@ -162,6 +162,27 @@ void dNewtonBody::SetCenterOfMass (const dFloat* const com)
 	NewtonBodySetCentreOfMass (m_body, com);
 }
 
+dFloat dNewtonBody::GetLinearDrag () const
+{
+	return NewtonBodyGetLinearDamping (m_body);
+}
+
+void dNewtonBody::SetLinearDrag (const dFloat drag)
+{
+	NewtonBodySetLinearDamping (m_body, drag);
+}
+
+void dNewtonBody::GetAngularDrag (dFloat* const drag) const
+{
+	NewtonBodyGetAngularDamping (m_body, drag);
+}
+
+void dNewtonBody::SetAngularDrag (const dFloat* const drag)
+{
+	NewtonBodySetAngularDamping (m_body, drag);
+}
+
+
 void dNewtonBody::SetCCDMode (bool mode)
 {
 	NewtonBodySetContinuousCollisionMode(m_body, mode ? 1 : 0);
