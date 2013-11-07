@@ -34,7 +34,6 @@ dMaterialPairManager::~dMaterialPairManager ()
 
 void dMaterialPairManager::AddPair (int materialId_0, int materialId_1, const dMaterialPair& pair)
 {
-	dAssert (0);
 	if (m_entryCount >= m_maxCount) {
 		// the interaction pool is full we need to reallocate a larger Pool 
 		unsigned* const newKeys = new unsigned[m_maxCount * 2];
@@ -51,7 +50,7 @@ void dMaterialPairManager::AddPair (int materialId_0, int materialId_1, const dM
 		m_maxCount *= 2;
 	}
 
-	unsigned key = MakeKey (materialId_0, materialId_0);
+	unsigned key = MakeKey (materialId_0, materialId_1);
 	int index = m_entryCount;
 	for ( ; (index > 0) && m_keys[index-1] > key; index --) {
 		m_keys[index] = m_keys[index - 1];
@@ -65,7 +64,7 @@ void dMaterialPairManager::AddPair (int materialId_0, int materialId_1, const dM
 
 const dMaterialPairManager::dMaterialPair* dMaterialPairManager::GetPair (int materialId_0, int materialId_1, int threadIndex) const
 {
-	unsigned key = MakeKey (materialId_0, materialId_0);
+	unsigned key = MakeKey (materialId_0, materialId_1);
 
 	if (m_cachedKeys[threadIndex] != key) {
 		m_cachedKeys[threadIndex] = key;
@@ -88,7 +87,7 @@ const dMaterialPairManager::dMaterialPair* dMaterialPairManager::GetPair (int ma
 		}
 
 		index2 = dMin (m_entryCount, index2 + 4);
-		for (int i = index0; (i < index2) && (m_keys[i] < key); i ++) {
+		for (int i = index0; (i <= index2) && (m_keys[i] <= key); i ++) {
 			if (m_keys[i] == key) {
 				m_cachedMaterial[threadIndex] = &m_pool[i];
 				return m_cachedMaterial[threadIndex];

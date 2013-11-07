@@ -38,10 +38,38 @@ class dNewtonMaterial: virtual public dNewtonAlloc
 	{
 	}
 
+	dNewtonMaterial(const dNewtonMaterial& copy)
+		:dNewtonAlloc()
+		,m_collisionMask (copy.m_collisionMask)
+		,m_materailID(copy.m_materailID)
+	{
+	}
+
 	virtual ~dNewtonMaterial() 
 	{
 	}
 
+	void SetMaterialId(char id)
+	{
+		m_materailID = id;
+	}
+
+	int GetMaterialId() const 
+	{
+		return m_materailID;
+	}
+
+	void SetCollisionMask(dLong mask) 
+	{
+		m_collisionMask = mask;
+	}
+
+	dLong GetCollisionMask() const
+	{
+		return m_collisionMask;
+	}
+	
+	protected:
 	dLong m_collisionMask;
 	char m_materailID;
 };

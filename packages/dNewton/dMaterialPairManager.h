@@ -60,7 +60,7 @@ class dMaterialPairManager: public dNewtonAlloc
 	{
 		id0 &= 0xff;
 		id1 &= 0xff;
-		return (id1 >= id0) ? (id1 << 8) + id0 : (id0 << 8) + id1;
+		return (id0 >= id1) ? (id1 << 8) + id0 : (id0 << 8) + id1;
 	}
 	
 

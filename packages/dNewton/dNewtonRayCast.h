@@ -43,7 +43,7 @@ class dNewtonRayCast: virtual public dNewtonAlloc, public dNewtonMaterial
 	protected:
 	virtual bool OnPrefilter (const dNewtonBody* const body, const dNewtonCollision* const shape) const 
 	{
-		return (shape->m_collisionMask & m_collisionMask) ? true : false;
+		return (shape->GetCollisionMask() & m_collisionMask) ? true : false;
 	}
 	CNEWTON_API virtual dFloat OnRayHit (const dNewtonBody* const body, const dNewtonCollision* const shape, const dFloat* const contact, const dFloat* const normal, dLong collisionID, dFloat intersectParam) = 0;
 	
