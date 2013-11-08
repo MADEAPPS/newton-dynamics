@@ -169,6 +169,7 @@ void dgCollisionScene::CollidePair (dgCollidingPairCollector::dgPair* const pair
 		dgVector origin;
 		dgVector size;
 
+
 		otherInstance->CalcObb(origin, size);
 		dgOOBBTestData data (matrix, origin, size);
 		dgInt32 stack = 1;

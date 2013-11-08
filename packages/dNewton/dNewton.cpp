@@ -159,32 +159,11 @@ void dNewton::OnContactProcess (const NewtonJoint* const contactJoint, dFloat ti
 {
 	NewtonBody* const body = NewtonJointGetBody0 (contactJoint);
 	dNewton* const world = (dNewton*) NewtonWorldGetUserData(NewtonBodyGetWorld (body));
-
-//	NewtonBody* const body = NewtonJointGetBody0(contactJoint);
-	for (void* contact = NewtonContactJointGetFirstContact (contactJoint); contact; contact = NewtonContactJointGetNextContact (contactJoint, contact)) {
-
-//		dFloat speed;
-//		dVector point;
-//		dVector normal;	
-//		dVector dir0;	
-//		dVector dir1;	
-//		dVector force;
-		NewtonMaterial* const material = NewtonContactGetMaterial (contact);
-		NewtonMaterialSetContactFrictionCoef (material, 1.0f, 1.0f, 0);
-		NewtonMaterialSetContactFrictionCoef (material, 1.0f, 1.0f, 1);
-/*
-		NewtonMaterialGetContactForce (material, body, &force.m_x);
-		NewtonMaterialGetContactPositionAndNormal (material, body, &point.m_x, &normal.m_x);
-		NewtonMaterialGetContactTangentDirections (material, body, &dir0.m_x, &dir1.m_x);
-		speed = NewtonMaterialGetContactNormalSpeed(material);
-
-
-		//speed = NewtonMaterialGetContactNormalSpeed(material);
-		// play sound base of the contact speed.
-		//
-*/
-	}
-
+//	for (void* contact = NewtonContactJointGetFirstContact (contactJoint); contact; contact = NewtonContactJointGetNextContact (contactJoint, contact)) {
+//		NewtonMaterial* const material = NewtonContactGetMaterial (contact);
+//		NewtonMaterialSetContactFrictionCoef (material, 1.0f, 1.0f, 0);
+//		NewtonMaterialSetContactFrictionCoef (material, 1.0f, 1.0f, 1);
+//	}
 	dNewtonContactMaterial contactMaterial ((void*)contactJoint);
 	world->OnContactProcess (&contactMaterial, timestep, threadIndex);
 }
