@@ -64,6 +64,7 @@
 #include <stdlib.h>
 #include <Newton.h>
 #include <CustomJoint.h>
+#include <CustomGear.h>
 #include <CustomHinge.h>
 #include <CustomSlider.h>
 #include <CustomCorkScrew.h>

@@ -33,15 +33,32 @@ class dNewtonJoint: public dNewtonAlloc
 	public:
 	enum dJointType
 	{
+        // general 6dof joint
+        //m_3dof,
+
+        // basics joints
 		m_ballAndSocket,
 		m_hinge,
 		m_slider,
 		m_universal,
         m_cylindrical,
 
-		m_hingeActuator,
-		m_sliderActuator,
-		m_universalActuator,
+        // relational joints
+        m_gear,
+        //m_pulley,
+        //m_rackAndGear,
+
+        // robotic joints
+        m_hingeActuator,
+        m_sliderActuator,
+        m_universalActuator,
+       
+        // special joints
+        //m_uprighVector,
+        //m_dryRollingFriction,
+        //m_kinematicContoller,
+
+        // this is the end
 		m_unknown,
 	};
 	
@@ -112,6 +129,12 @@ class dNewtonCylindricalJoint: public dNewtonJoint
     CNEWTON_API void SetLimis_1(dFloat minAngle, dFloat maxAngle);
 };
 
+
+class dNewtonGearJoint: public dNewtonJoint 
+{
+    public:
+    CNEWTON_API dNewtonGearJoint(dFloat ratio, const dFloat* const body0Pin, dNewtonDynamicBody* const body0, const dFloat* const body1Pin, dNewtonDynamicBody* const body1);
+};
 
 
 

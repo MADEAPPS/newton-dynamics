@@ -185,3 +185,10 @@ void dNewtonCylindricalJoint::SetLimis_1(dFloat minAngle, dFloat maxAngle)
 {
     ((CustomCorkScrew*) m_joint)->SetAngularLimis(minAngle, maxAngle);
 }
+
+
+dNewtonGearJoint::dNewtonGearJoint(dFloat ratio, const dFloat* const body0Pin, dNewtonDynamicBody* const body0, const dFloat* const body1Pin, dNewtonDynamicBody* const body1)
+    :dNewtonJoint(m_gear)
+{
+    SetJoint (new CustomGear (ratio, body0Pin, body1Pin, body0->GetNewtonBody(), body1->GetNewtonBody()));
+}
