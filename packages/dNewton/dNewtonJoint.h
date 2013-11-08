@@ -37,6 +37,7 @@ class dNewtonJoint: public dNewtonAlloc
 		m_hinge,
 		m_slider,
 		m_universal,
+        m_cylindrical,
 
 		m_hingeActuator,
 		m_sliderActuator,
@@ -100,6 +101,17 @@ class dNewtonUniversalJoint: public dNewtonJoint
 	CNEWTON_API void SetLimis_0(dFloat minAngle, dFloat maxAngle);
 	CNEWTON_API void SetLimis_1(dFloat minAngle, dFloat maxAngle);
 };
+
+class dNewtonCylindricalJoint: public dNewtonJoint 
+{
+    public:
+    CNEWTON_API dNewtonCylindricalJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1 = NULL);
+    CNEWTON_API void EnableLimit_0(bool state);
+    CNEWTON_API void EnableLimit_1(bool state);
+    CNEWTON_API void SetLimis_0(dFloat minDist, dFloat maxDist);
+    CNEWTON_API void SetLimis_1(dFloat minAngle, dFloat maxAngle);
+};
+
 
 
 

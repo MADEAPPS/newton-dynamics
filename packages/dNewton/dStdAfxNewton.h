@@ -66,6 +66,7 @@
 #include <CustomJoint.h>
 #include <CustomHinge.h>
 #include <CustomSlider.h>
+#include <CustomCorkScrew.h>
 #include <CustomUniversal.h>
 #include <CustomInputManager.h>
 #include <CustomBallAndSocket.h>

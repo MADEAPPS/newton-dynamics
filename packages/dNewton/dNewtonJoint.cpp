@@ -158,3 +158,30 @@ void dNewtonUniversalJoint::SetLimis_1(dFloat minAngle, dFloat maxAngle)
 {
 	((CustomUniversal*) m_joint)->SetLimis_1 (minAngle, maxAngle);
 }
+
+
+dNewtonCylindricalJoint::dNewtonCylindricalJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
+    :dNewtonJoint(m_cylindrical)
+{
+    SetJoint (new CustomCorkScrew (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
+}
+
+void dNewtonCylindricalJoint::EnableLimit_0(bool state)
+{
+    ((CustomCorkScrew*) m_joint)->EnableLinearLimits(state);
+}
+
+void dNewtonCylindricalJoint::EnableLimit_1(bool state)
+{
+    ((CustomCorkScrew*) m_joint)->EnableAngularLimits(state);
+}
+
+void dNewtonCylindricalJoint::SetLimis_0(dFloat minDist, dFloat maxDist)
+{
+    ((CustomCorkScrew*) m_joint)->SetLinearLimis (minDist, maxDist);
+}
+
+void dNewtonCylindricalJoint::SetLimis_1(dFloat minAngle, dFloat maxAngle)
+{
+    ((CustomCorkScrew*) m_joint)->SetAngularLimis(minAngle, maxAngle);
+}
