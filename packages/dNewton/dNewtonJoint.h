@@ -67,11 +67,7 @@ class dNewtonJoint: public dNewtonAlloc
 class dNewtonBallAndSocketJoint: public dNewtonJoint 
 {
 	public:
-	CNEWTON_API dNewtonBallAndSocketJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1 = NULL)
-		:dNewtonJoint(m_ballAndSocket)
-	{
-		SetJoint (new CustomBallAndSocket (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
-	}
+	CNEWTON_API dNewtonBallAndSocketJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1 = NULL);
 };
 
 class dNewtonHingeJoint: public dNewtonJoint 
@@ -80,6 +76,9 @@ class dNewtonHingeJoint: public dNewtonJoint
 	CNEWTON_API dNewtonHingeJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1 = NULL);
 	CNEWTON_API dFloat GetFriction () const;
 	CNEWTON_API void SetFriction (dFloat friction);
+
+    CNEWTON_API void EnableLimits(bool state);
+   	CNEWTON_API void SetLimis(dFloat minAngle, dFloat maxAngle);
 };
 
 class dNewtonSliderJoint: public dNewtonJoint 

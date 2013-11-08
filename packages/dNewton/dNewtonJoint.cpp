@@ -84,6 +84,12 @@ void dNewtonJoint::OnSubmitConstraintCallback (const NewtonUserJoint* const me, 
 }
 
 
+dNewtonBallAndSocketJoint::dNewtonBallAndSocketJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
+    :dNewtonJoint(m_ballAndSocket)
+{
+    SetJoint (new CustomBallAndSocket (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
+}
+
 
 dNewtonHingeJoint::dNewtonHingeJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
 	:dNewtonJoint(m_hinge)
@@ -101,6 +107,15 @@ void dNewtonHingeJoint::SetFriction (dFloat friction)
 	((CustomHinge*)m_joint)->SetFriction(friction);
 }
 
+void dNewtonHingeJoint::EnableLimits(bool state)
+{
+    ((CustomHinge*)m_joint)->EnableLimits(state);
+}
+
+void dNewtonHingeJoint::SetLimis(dFloat minAngle, dFloat maxAngle)
+{
+    ((CustomHinge*)m_joint)->SetLimis(minAngle, maxAngle);
+}
 
 dNewtonSliderJoint::dNewtonSliderJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
 	:dNewtonJoint(m_slider)
