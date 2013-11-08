@@ -64,9 +64,9 @@ dgFloat32 dgCollisionScene::GetBoxMaxRadius () const
 
 void dgCollisionScene::MassProperties ()
 {
-	m_inertia = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	m_centerOfMass = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	m_crossInertia = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	m_inertia = dgVector (dgFloat32 (0.0f));
+	m_centerOfMass = dgVector (dgFloat32 (0.0f));
+	m_crossInertia = dgVector (dgFloat32 (0.0f));
 }
 
 void dgCollisionScene::CollidePair (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const
@@ -115,7 +115,7 @@ void dgCollisionScene::CollidePair (dgCollidingPairCollector::dgPair* const pair
 
 		dgInt32 stack = 1;
 		stackPool[0] = m_root;
-		dgFastRayTest ray (dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)), boxDistanceTravelInMeshSpace);
+		dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), boxDistanceTravelInMeshSpace);
 
 		while (stack) {
 			stack--;
@@ -131,17 +131,21 @@ void dgCollisionScene::CollidePair (dgCollidingPairCollector::dgPair* const pair
 					}
 
 					if (processContacts) {
-						dgCollisionInstance childInstance (*me->GetShape(), me->GetShape()->GetChildShape());
+						const dgCollisionInstance* const myInstance =  me->GetShape();
+						dgCollisionInstance childInstance (*myInstance, myInstance->GetChildShape());
 						childInstance.SetGlobalMatrix(childInstance.GetLocalMatrix() * myMatrix);
 						proxy.m_floatingCollision = &childInstance;
 						dgInt32 count = pair->m_contactCount;
 						m_world->SceneChildContacts (pair, proxy);
 						if (pair->m_contactCount > count) {
 							dgContactPoint* const buffer = proxy.m_contacts;
-							for (dgInt32 i = 0; i < pair->m_contactCount; i ++) {
+							for (dgInt32 i = count; i < pair->m_contactCount; i ++) {
 								dgAssert (buffer[i].m_collision0 == proxy.m_referenceCollision);
-								if (buffer[i].m_collision1 == proxy.m_floatingCollision) {
-									buffer[i].m_collision1 = me->GetShape();
+								//if (buffer[i].m_collision1 == proxy.m_floatingCollision) {
+								//	buffer[i].m_collision1 = myInstance;
+								//}
+								if (buffer[i].m_collision1->GetChildShape() == myInstance->GetChildShape()) {
+									buffer[i].m_collision1 = myInstance;
 								}
 							}
 						}
@@ -165,7 +169,6 @@ void dgCollisionScene::CollidePair (dgCollidingPairCollector::dgPair* const pair
 		dgVector origin;
 		dgVector size;
 
-//		otherInstance->CalcAABB(dgGetIdentityMatrix(), p0, p1);
 		otherInstance->CalcObb(origin, size);
 		dgOOBBTestData data (matrix, origin, size);
 		dgInt32 stack = 1;
@@ -185,17 +188,21 @@ void dgCollisionScene::CollidePair (dgCollidingPairCollector::dgPair* const pair
 					}
 
 					if (processContacts) {
-						dgCollisionInstance childInstance (*me->GetShape(), me->GetShape()->GetChildShape());
+						const dgCollisionInstance* const myInstance =  me->GetShape();
+						dgCollisionInstance childInstance (*myInstance, myInstance->GetChildShape());
 						childInstance.SetGlobalMatrix(childInstance.GetLocalMatrix() * myMatrix);
 						proxy.m_floatingCollision = &childInstance;
 						dgInt32 count = pair->m_contactCount;
 						m_world->SceneChildContacts (pair, proxy);
 						if (pair->m_contactCount > count) {
 							dgContactPoint* const buffer = proxy.m_contacts;
-							for (dgInt32 i = 0; i < pair->m_contactCount; i ++) {
+							for (dgInt32 i = count; i < pair->m_contactCount; i ++) {
 								dgAssert (buffer[i].m_collision0 == proxy.m_referenceCollision);
-								if (buffer[i].m_collision1 == proxy.m_floatingCollision) {
-									buffer[i].m_collision1 = me->GetShape();
+								//if (buffer[i].m_collision1 == proxy.m_floatingCollision) {
+								//	buffer[i].m_collision1 = myInstance;
+								//}
+								if (buffer[i].m_collision1->GetChildShape() == myInstance->GetChildShape()) {
+									buffer[i].m_collision1 = myInstance;
 								}
 							}
 						} else if (pair->m_contactCount == -1) {
@@ -274,6 +281,10 @@ void dgCollisionScene::CollideCompoundPair (dgCollidingPairCollector::dgPair* co
 					}
 
 					if (processContacts) {
+						const dgCollisionInstance* const mySrcInstance =  me->GetShape();
+						const dgCollisionInstance* const otherSrcInstance =  other->GetShape();
+						//dgCollisionInstance childInstance (*mySrcInstance, mySrcInstance->GetChildShape());
+						//dgCollisionInstance otherInstance (*otherSrcInstance, otherSrcInstance->GetChildShape());
 						dgCollisionInstance childInstance (*me->GetShape(), me->GetShape()->GetChildShape());
 						dgCollisionInstance otherInstance (*other->GetShape(), other->GetShape()->GetChildShape());
 
@@ -286,12 +297,21 @@ void dgCollisionScene::CollideCompoundPair (dgCollidingPairCollector::dgPair* co
 						m_world->SceneChildContacts (pair, proxy);
 						if (pair->m_contactCount > count) {
 							dgContactPoint* const buffer = proxy.m_contacts;
-							for (dgInt32 i = 0; i < pair->m_contactCount; i ++) {
-								if (buffer[i].m_collision0 == proxy.m_floatingCollision) {
-									buffer[i].m_collision0 = me->GetShape();
-								}
-								if (buffer[i].m_collision1 == proxy.m_referenceCollision) {
-									buffer[i].m_collision1 = other->GetShape();
+							for (dgInt32 i = count; i < pair->m_contactCount; i ++) {
+								//if (buffer[i].m_collision0 == proxy.m_floatingCollision) {
+								//	buffer[i].m_collision0 = mySrcInstance;
+								//}
+								//if (buffer[i].m_collision1 == proxy.m_referenceCollision) {
+								//	buffer[i].m_collision1 = otherSrcInstance;
+								//}
+								if (buffer[i].m_collision1->GetChildShape() == otherSrcInstance->GetChildShape()) {
+									dgAssert(buffer[i].m_collision0->GetChildShape() == mySrcInstance->GetChildShape());
+									buffer[i].m_collision0 = mySrcInstance;
+									buffer[i].m_collision1 = otherSrcInstance;
+								} else {
+									dgAssert(buffer[i].m_collision1->GetChildShape() == mySrcInstance->GetChildShape());
+									buffer[i].m_collision1 = mySrcInstance;
+									buffer[i].m_collision0 = otherSrcInstance;
 								}
 							}
 						}

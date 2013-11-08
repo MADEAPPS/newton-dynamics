@@ -116,8 +116,8 @@ class dgCollisionDeformableMesh::dgDeformationRegion
 
 	void Update(const dgCollisionDeformableMesh::dgParticle& particles)
 	{
-		m_com = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-		m_com0 = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+		m_com = dgVector (dgFloat32 (0.0f));
+		m_com0 = dgVector (dgFloat32 (0.0f));
 		m_AqqInv = dgGetIdentityMatrix();
 		m_rotSeed = dgGetIdentityMatrix();
 
@@ -155,7 +155,7 @@ class dgCollisionDeformableMesh::dgDeformationRegion
 		const dgVector* const posit0 = particles.m_shapePosition;
 		const dgVector* const posit1 = particles.m_position;
 
-		dgVector com = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+		dgVector com = dgVector (dgFloat32 (0.0f));
 		for (dgInt32 i = 0; i < m_count; i ++) {
 			dgInt32 index = m_indices[i];
 			com += posit1[index].Scale3 (mass[index]);
@@ -946,7 +946,7 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMes
 //		m_particles.m_edge[i] = NULL;
 		m_particles.m_unitMass[i] = dgFloat32 (1.0f);
 		m_particles.m_posit[i] = dgVector (dgFloat32 (vertex[i * stride + 0]), dgFloat32 (vertex[i * stride + 1]), dgFloat32 (vertex[i * stride + 2]), dgFloat32 (0.0f));
-		m_particles.m_veloc[i] = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+		m_particles.m_veloc[i] = dgVector (dgFloat32 (0.0f));
 	}
 //	com = com.Scale3(dgFloat32 (1.0f / m_particles.m_count));
 //	m_particles.m_com = com;

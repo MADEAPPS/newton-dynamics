@@ -43,7 +43,7 @@ dgBallConstraint::dgBallConstraint ()
 	m_jointUserCallback = NULL;
 	m_constId = m_ballConstraint;
 	m_ballLimits = 0;
-	m_angles = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	m_angles = dgVector (dgFloat32 (0.0f));
 }
 
 dgBallConstraint::~dgBallConstraint ()
@@ -67,7 +67,7 @@ dgBallConstraint* dgBallConstraint::Create(dgWorld* world)
 	constraint->m_jointUserCallback = NULL;
 	constraint->m_constId = dgBallConstraintId;
 	constraint->m_ballLimits = 0;
-	constraint->m_angles = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	constraint->m_angles = dgVector (dgFloat32 (0.0f));
 	return constraint;
 }
 

@@ -207,7 +207,7 @@ dgFloat32 dgCollisionBox::RayCast (const dgVector& localP0, const dgVector& loca
 
 	if (tmin > dgFloat32 (0.0f)) {
 		dgAssert (tmin < 1.0f);
-		contactOut.m_normal = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+		contactOut.m_normal = dgVector (dgFloat32 (0.0f));
 		contactOut.m_normal[index] = signDir;
 		//contactOut.m_userId = SetUserDataID();
 	} else {
@@ -220,8 +220,8 @@ dgFloat32 dgCollisionBox::RayCast (const dgVector& localP0, const dgVector& loca
 
 void dgCollisionBox::MassProperties ()
 {
-	m_centerOfMass = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	m_crossInertia = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	m_centerOfMass = dgVector (dgFloat32 (0.0f));
+	m_crossInertia = dgVector (dgFloat32 (0.0f));
 	dgFloat32 volume = dgFloat32 (8.0f) * m_size[0].m_x * m_size[0].m_y * m_size[0].m_z; 
 	m_inertia = dgVector (dgFloat32 (1.0f / 3.0f) * (m_size[0].m_y * m_size[0].m_y + m_size[0].m_z * m_size[0].m_z),
 						  dgFloat32 (1.0f / 3.0f) * (m_size[0].m_x * m_size[0].m_x + m_size[0].m_z * m_size[0].m_z),

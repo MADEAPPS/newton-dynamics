@@ -262,13 +262,13 @@ dgFloat32 dgCollisionPoint::GetVolume () const
 
 dgVector dgCollisionPoint::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
-	return dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)); 
+	return dgVector (dgFloat32 (0.0f)); 
 }
 
 
 dgFloat32 dgCollisionSphere::RayCast (const dgVector& p0, const dgVector& p1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
 {
-	dgFloat32 t = dgRayCastSphere (p0, p1, dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)), m_radius);
+	dgFloat32 t = dgRayCastSphere (p0, p1, dgVector (dgFloat32 (0.0f)), m_radius);
 	if (t < maxT) {
 		dgVector contact (p0 + (p1 - p0).Scale3 (t));
 		contactOut.m_normal = contact.Scale3 (dgRsqrt (contact % contact));
@@ -280,8 +280,8 @@ dgFloat32 dgCollisionSphere::RayCast (const dgVector& p0, const dgVector& p1, dg
 
 void dgCollisionSphere::MassProperties () 
 {
-	m_centerOfMass = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	m_crossInertia = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	m_centerOfMass = dgVector (dgFloat32 (0.0f));
+	m_crossInertia = dgVector (dgFloat32 (0.0f));
 	dgFloat32 volume = dgFloat32 (4.0f * 3.141592f / 3.0f) * m_radius *  m_radius * m_radius; 
 	dgFloat32 II = dgFloat32 (2.0f / 5.0f) * m_radius *  m_radius;
 

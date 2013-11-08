@@ -802,8 +802,8 @@ void dgWorld::BodySetMatrix (dgBody* const body, const dgMatrix& matrix)
 		m_broadPhase->Add (body);
 
 		dgMatrix matrix (body->GetMatrix() * relMatrix);
-		body->SetVelocity (dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)));    
-		body->SetOmega (dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)));    
+		body->SetVelocity (dgVector (dgFloat32 (0.0f)));    
+		body->SetOmega (dgVector (dgFloat32 (0.0f)));    
 		body->SetMatrix (matrix);
 
 		for (dgBodyMasterListRow::dgListNode* jointNode = body->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {

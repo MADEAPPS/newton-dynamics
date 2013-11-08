@@ -78,7 +78,7 @@ void dgCollisionNull::CalcAABB (const dgMatrix& matrix, dgVector &p0, dgVector &
 dgVector dgCollisionNull::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
 	dgAssert (0);
-	return dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	return dgVector (dgFloat32 (0.0f));
 }
 
 dgFloat32 dgCollisionNull::GetVolume () const

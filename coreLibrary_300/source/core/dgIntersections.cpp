@@ -998,7 +998,7 @@ dgFloat32 dgRayCastBox (const dgVector& p0, const dgVector& p1, const dgVector& 
 
 	if (tmin > dgFloat32 (0.0f)) {
 		dgAssert (tmin < 1.0f);
-		normalOut = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+		normalOut = dgVector (dgFloat32 (0.0f));
 		normalOut[index] = signDir;
 	} else {
 		tmin = dgFloat32 (1.2f);

@@ -416,8 +416,8 @@ void dgCollisionCapsule::Serialize(dgSerialize callback, void* const userData) c
 void dgCollisionCapsule::MassProperties ()
 {
 /*
-	m_centerOfMass = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	m_crossInertia = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	m_centerOfMass = dgVector (dgFloat32 (0.0f));
+	m_crossInertia = dgVector (dgFloat32 (0.0f));
 
 	dgFloat32 cylVolume = dgFloat32 (3.14159f * 2.0f) * m_radius * m_radius * m_height;
 	dgFloat32 sphVolume = dgFloat32 (3.14159f * 4.0f / 3.0f) * m_radius * m_radius * m_radius; 
@@ -439,7 +439,7 @@ void dgCollisionCapsule::MassProperties ()
 */
 	dgCollisionConvex::MassProperties ();
 	m_centerOfMass = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), m_centerOfMass.m_w);
-	m_crossInertia = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	m_crossInertia = dgVector (dgFloat32 (0.0f));
 }
 
 

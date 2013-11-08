@@ -213,7 +213,7 @@ dgVector dgCollisionCone::SupportVertex (const dgVector& dir, dgInt32* const ver
 void dgCollisionCone::MassProperties ()
 {
 	m_centerOfMass = dgVector (-dgFloat32 (1.0f/2.0f) * m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	m_crossInertia = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	m_crossInertia = dgVector (dgFloat32 (0.0f));
 
 	dgFloat32 volume = dgFloat32 (3.14159f * 2.0f / 3.0f) * m_radius * m_radius * m_height; 
 	dgFloat32 inertiaxx = dgFloat32 (3.0f / 10.0f) * m_radius * m_radius;

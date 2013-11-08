@@ -200,8 +200,8 @@ void NewtonUserJoint::AddLinearRowJacobian (const dgVector& pivot0, const dgVect
 
 void NewtonUserJoint::AddAngularRowJacobian (const dgVector& dir, dgFloat32 relAngle)
 {
-	m_lastPosit0 = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	m_lastPosit1 = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	m_lastPosit0 = dgVector (dgFloat32 (0.0f));
+	m_lastPosit1 = dgVector (dgFloat32 (0.0f));
 	m_lastJointAngle = relAngle;
 	CalculateAngularDerivative (m_rows, *m_param, dir, m_stiffness, relAngle, &m_forceArray[m_rows]); 
 	m_rows ++;
@@ -210,8 +210,8 @@ void NewtonUserJoint::AddAngularRowJacobian (const dgVector& dir, dgFloat32 relA
 
 void NewtonUserJoint::AddGeneralRowJacobian (const dgFloat32* const jacobian0, const dgFloat32* const jacobian1)
 {
-	m_lastPosit0 = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	m_lastPosit1 = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	m_lastPosit0 = dgVector (dgFloat32 (0.0f));
+	m_lastPosit1 = dgVector (dgFloat32 (0.0f));
 	m_lastJointAngle = 0.0f;
 
 	SetJacobianDerivative (m_rows, *m_param, jacobian0, jacobian1, &m_forceArray[m_rows]);

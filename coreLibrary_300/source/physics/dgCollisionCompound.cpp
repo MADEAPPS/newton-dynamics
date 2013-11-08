@@ -579,8 +579,8 @@ void dgCollisionCompound::GetAABB (dgVector& boxMin, dgVector& boxMax) const
 		boxMin = m_root->m_p0;
 		boxMax = m_root->m_p1;
 	} else {
-		boxMin = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-		boxMax = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+		boxMin = dgVector (dgFloat32 (0.0f));
+		boxMax = dgVector (dgFloat32 (0.0f));
 	}
 }
 

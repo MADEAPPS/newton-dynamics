@@ -117,8 +117,7 @@ dgCollisionMesh::dgCollisionMesh(dgWorld* const world, dgCollisionID type)
 {
 	m_rtti |= dgCollisionMesh_RTTI;
 	m_debugCallback = NULL;
-	SetCollisionBBox (dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)),
-					  dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)));
+	SetCollisionBBox (dgVector (dgFloat32 (0.0f)), dgVector (dgFloat32 (0.0f)));
 }
 
 dgCollisionMesh::dgCollisionMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData)
@@ -127,8 +126,7 @@ dgCollisionMesh::dgCollisionMesh (dgWorld* const world, dgDeserialize deserializ
 	dgAssert (m_rtti | dgCollisionMesh_RTTI);
 
 	m_debugCallback = NULL;
-	SetCollisionBBox (dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)),
-					  dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)));
+	SetCollisionBBox (dgVector (dgFloat32 (0.0f)), dgVector (dgFloat32 (0.0f)));
 }
 
 dgCollisionMesh::~dgCollisionMesh()
@@ -180,7 +178,7 @@ dgVector dgCollisionMesh::BoxSupportMapping  (const dgVector& dir) const
 
 dgVector dgCollisionMesh::CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& plane) const
 {
-	return dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	return dgVector (dgFloat32 (0.0f));
 }
 
 
