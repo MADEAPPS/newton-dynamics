@@ -85,6 +85,9 @@ class dNewtonSliderJoint: public dNewtonJoint
 {
 	public:
 	CNEWTON_API dNewtonSliderJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1 = NULL);
+
+    CNEWTON_API void EnableLimits(bool state);
+    CNEWTON_API void SetLimis(dFloat minDist, dFloat maxDist);
 };
 
 

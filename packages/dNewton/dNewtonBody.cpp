@@ -193,6 +193,10 @@ bool dNewtonBody::GetCCDMode () const
 	return NewtonBodyGetContinuousCollisionMode(m_body) ? true : false;
 }
 
+void dNewtonBody::SetMassAndInertia (dFloat mass, dFloat Ixx, dFloat Iyy, dFloat Izz)
+{
+    NewtonBodySetMassMatrix(m_body, mass, Ixx, Iyy, Izz);
+}
 
 void dNewtonBody::GetMassAndInertia (dFloat& mass, dFloat& Ixx, dFloat& Iyy, dFloat& Izz) const
 {

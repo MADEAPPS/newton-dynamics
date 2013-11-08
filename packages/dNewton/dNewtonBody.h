@@ -78,10 +78,10 @@ class dNewtonBody: public dNewtonAlloc, public dNewtonTransformLerp
 //	NEWTON_API void  NewtonBodySetLinearDamping (const NewtonBody* const body, dFloat linearDamp);
 //	NEWTON_API void  NewtonBodySetAngularDamping (const NewtonBody* const body, const dFloat* const angularDamp);
 
-	
-
 	CNEWTON_API void GetCenterOfMass (dFloat* const com) const;
 	CNEWTON_API void SetCenterOfMass (const dFloat* const com);
+
+    CNEWTON_API void SetMassAndInertia (dFloat mass, dFloat Ixx, dFloat Iyy, dFloat Izz);
 	CNEWTON_API void GetMassAndInertia (dFloat& mass, dFloat& Ixx, dFloat& Iyy, dFloat& Izz) const;
 
 	CNEWTON_API void SetCCDMode (bool mode);

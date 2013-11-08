@@ -123,6 +123,15 @@ dNewtonSliderJoint::dNewtonSliderJoint(const dFloat* const pinAndPivotFrame, dNe
 	SetJoint (new CustomSlider (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
 }
 
+void dNewtonSliderJoint::EnableLimits(bool state)
+{
+    ((CustomSlider*) m_joint)->EnableLimits(state);
+}
+
+void dNewtonSliderJoint::SetLimis(dFloat minDist, dFloat maxDist)
+{
+    ((CustomSlider*) m_joint)->SetLimis(minDist, maxDist);
+}
 
 dNewtonUniversalJoint::dNewtonUniversalJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
 	:dNewtonJoint(m_universal)
