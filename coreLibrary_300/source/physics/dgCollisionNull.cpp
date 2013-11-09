@@ -35,6 +35,7 @@ dgCollisionNull::dgCollisionNull(dgMemoryAllocator* const allocator, dgUnsigned3
 	:dgCollisionConvex(allocator, signature, m_nullCollision) 
 {
 	m_rtti |= dgCollisionNull_RTTI;
+	m_inertia = dgVector (dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f));
 }
 
 dgCollisionNull::dgCollisionNull(dgWorld* const world, dgDeserialize deserialization, void* const userData)

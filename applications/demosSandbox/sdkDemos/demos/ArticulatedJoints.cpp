@@ -463,7 +463,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		// destroy the collision helper shape 
 		NewtonDestroyCollision (shape);
 
-		// get the collsion from body
+		// get the collision from body
 		NewtonCollision* const collision = NewtonBodyGetCollision(body);
 
 		// calculate the moment of inertia and the relative center of mass of the solid

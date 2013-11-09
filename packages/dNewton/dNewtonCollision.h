@@ -175,7 +175,7 @@ class dNewtonCollisionHeightField: public dNewtonCollision
 class dNewtonCollisionNull: public dNewtonCollision
 {
 	public: 
-	dNewtonCollisionNull (dNewton* const world)
+	CNEWTON_API dNewtonCollisionNull (dNewton* const world)
 		:dNewtonCollision(m_null, 0)
 	{
 		SetShape (NewtonCreateNull(world->GetNewton()));
