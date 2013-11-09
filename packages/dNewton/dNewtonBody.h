@@ -81,7 +81,9 @@ class dNewtonBody: public dNewtonAlloc, public dNewtonTransformLerp
 	CNEWTON_API void GetCenterOfMass (dFloat* const com) const;
 	CNEWTON_API void SetCenterOfMass (const dFloat* const com);
 
+	 
     CNEWTON_API void SetMassAndInertia (dFloat mass, dFloat Ixx, dFloat Iyy, dFloat Izz);
+	CNEWTON_API void SetMassAndInertia (dFloat mass, const dNewtonCollision* const collision);
 	CNEWTON_API void GetMassAndInertia (dFloat& mass, dFloat& Ixx, dFloat& Iyy, dFloat& Izz) const;
 
 	CNEWTON_API void SetCCDMode (bool mode);
