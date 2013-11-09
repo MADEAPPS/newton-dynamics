@@ -109,6 +109,7 @@ class dNewtonBody: public dNewtonAlloc, public dNewtonTransformLerp
 
 	CNEWTON_API NewtonBody* GetNewtonBody () const;
 	CNEWTON_API dNewtonCollision* GetCollision() const;
+	CNEWTON_API void SetCollision(const dNewtonCollision* const collision) const;
 
 	protected:
 	CNEWTON_API dNewtonBody(dBodyType type, dNewtonBody* const parent);

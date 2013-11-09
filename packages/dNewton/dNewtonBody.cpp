@@ -254,9 +254,13 @@ void dNewtonBody::OnBodyTransform (const NewtonBody* const body, const dFloat* c
 
 dNewtonCollision* dNewtonBody::GetCollision() const
 {
-	return (dNewtonCollisionScene*) NewtonCollisionGetUserData(NewtonBodyGetCollision (m_body));
+	return (dNewtonCollision*) NewtonCollisionGetUserData(NewtonBodyGetCollision (m_body));
 }
 
+void dNewtonBody::SetCollision(const dNewtonCollision* const collision) const
+{
+	NewtonBodySetCollision (m_body, collision->GetShape());
+}
 
 dNewtonBody* dNewtonBody::GetParent() const 
 {	
