@@ -45,8 +45,8 @@ class dNewtonJoint: public dNewtonAlloc
 
         // relational joints
         m_gear,
-        //m_pulley,
-        //m_rackAndGear,
+        m_pulley,
+        m_gearAndRack,
 
         // robotic joints
         m_hingeActuator,
@@ -136,6 +136,17 @@ class dNewtonGearJoint: public dNewtonJoint
     CNEWTON_API dNewtonGearJoint(dFloat ratio, const dFloat* const body0Pin, dNewtonDynamicBody* const body0, const dFloat* const body1Pin, dNewtonDynamicBody* const body1);
 };
 
+class dNewtonPulleyJoint: public dNewtonJoint 
+{
+    public:
+    CNEWTON_API dNewtonPulleyJoint(dFloat ratio, const dFloat* const body0Pin, dNewtonDynamicBody* const body0, const dFloat* const body1Pin, dNewtonDynamicBody* const body1);
+};
 
+
+class dNewtonGearAndRackJoint: public dNewtonJoint 
+{
+    public:
+    CNEWTON_API dNewtonGearAndRackJoint(dFloat ratio, const dFloat* const body0Pin, dNewtonDynamicBody* const body0, const dFloat* const body1Pin, dNewtonDynamicBody* const body1);
+};
 
 #endif

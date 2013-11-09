@@ -67,11 +67,13 @@
 #include <CustomGear.h>
 #include <CustomHinge.h>
 #include <CustomSlider.h>
+#include <CustomPulley.h>
 #include <CustomCorkScrew.h>
 #include <CustomUniversal.h>
 #include <CustomInputManager.h>
 #include <CustomBallAndSocket.h>
 #include <CustomHingeActuator.h>
+#include <CustomRackAndPinion.h>
 #include <CustomSliderActuator.h>
 #include <CustomTriggerManager.h>
 #include <CustomUniversalActuator.h>

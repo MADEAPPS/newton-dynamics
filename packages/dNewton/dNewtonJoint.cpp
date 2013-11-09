@@ -192,3 +192,16 @@ dNewtonGearJoint::dNewtonGearJoint(dFloat ratio, const dFloat* const body0Pin, d
 {
     SetJoint (new CustomGear (ratio, body0Pin, body1Pin, body0->GetNewtonBody(), body1->GetNewtonBody()));
 }
+
+dNewtonPulleyJoint::dNewtonPulleyJoint(dFloat ratio, const dFloat* const body0Pin, dNewtonDynamicBody* const body0, const dFloat* const body1Pin, dNewtonDynamicBody* const body1)
+    :dNewtonJoint(m_pulley)
+{
+    SetJoint (new CustomPulley (ratio, body0Pin, body1Pin, body0->GetNewtonBody(), body1->GetNewtonBody()));
+}
+
+dNewtonGearAndRackJoint::dNewtonGearAndRackJoint(dFloat ratio, const dFloat* const body0Pin, dNewtonDynamicBody* const body0, const dFloat* const body1Pin, dNewtonDynamicBody* const body1)
+    :dNewtonJoint(m_gearAndRack)
+{
+    SetJoint (new CustomRackAndPinion (ratio, body0Pin, body1Pin, body0->GetNewtonBody(), body1->GetNewtonBody()));
+}
+
