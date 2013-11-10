@@ -96,11 +96,11 @@ class CustomArticulatedTransformController: public CustomControllerBase
 	CUSTOM_JOINTS_API dSkeletonBone* AddBone (NewtonBody* const bone, const dMatrix& bindMatrix, dSkeletonBone* const parentBodne = NULL);
 
 	CUSTOM_JOINTS_API int GetBoneCount() const;
+	CUSTOM_JOINTS_API const dSkeletonBone* GetBone(int index) const;
 
 	CUSTOM_JOINTS_API NewtonBody* GetBoneBody (int index) const;
-	CUSTOM_JOINTS_API const dSkeletonBone* GetBone(int index) const;
-	
 	CUSTOM_JOINTS_API NewtonBody* GetBoneBody (const dSkeletonBone* const bone) const;
+
 	CUSTOM_JOINTS_API const dSkeletonBone* GetParent(const dSkeletonBone* const bone) const;
 	
 	protected:

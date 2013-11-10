@@ -40,10 +40,17 @@ class dNewtonArticulationManager: public CustomArticulaledTransformManager
 		CNEWTON_API virtual void OnUpdateBoneTransform (dNewtonBody* const bone, const dFloat* const localMatrix) = 0;
 		CNEWTON_API virtual void* AddBone (dNewtonBody* const bone, const dFloat* const bindMatrix, void* const parentBodne = NULL);
 
+		CNEWTON_API int GetBoneCount() const;
+		CNEWTON_API void* GetBone(int bonexIndex) const;
+		CNEWTON_API dNewtonBody* GetBoneBody (int index) const;
+		CNEWTON_API dNewtonBody* GetBoneBody (void* const bone) const;
+		CNEWTON_API void* GetBoneParent (const void* const bone) const;
+
 		CNEWTON_API void DisableAllSelfCollision ();
 		CNEWTON_API void SetDefaultSelfCollisionMask ();
 		CNEWTON_API void SetSelfCollisionMask (void* const boneNode0, void* const boneNode1, bool mode);
 		CNEWTON_API bool SelfCollisionTest (const void* const boneNode0, const void* const boneNode1) const;
+		
 
 		private:
 		CustomArticulatedTransformController* m_controller;
