@@ -118,13 +118,12 @@ void CustomArticulatedTransformController::PostUpdate(dFloat timestep, int threa
 			const dSkeletonBone& bone = m_bones[i];
 			dMatrix matrix;
 			NewtonBodyGetMatrix(bone.m_body, &matrix[0][0]);
-			if (!bone.m_parent) {
-				manager->OnUpdateTransform (&bone, matrix);
-			} else {
+			if (bone.m_parent) {
 				dMatrix parentMatrix;
 				NewtonBodyGetMatrix(bone.m_parent->m_body, &parentMatrix[0][0]);
-				manager->OnUpdateTransform (&bone, matrix * parentMatrix.Inverse() * bone.m_bindMatrix);
+				matrix = matrix * parentMatrix.Inverse() * bone.m_bindMatrix;
 			}
+			manager->OnUpdateTransform (&bone, matrix);
 		}
 	}
 }

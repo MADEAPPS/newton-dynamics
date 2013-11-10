@@ -62,7 +62,14 @@ void dNewtonTransformLerp::SetTargetMatrixLow (const dFloat* const matrix)
 void dNewtonTransformLerp::GetTargetMatrix (dFloat* const matrix) const
 {
 	dNewton::ScopeLock scopelock (&m_lock);
-	dMatrix mat (m_rotat1, m_posit0);
+	dMatrix mat (m_rotat1, m_posit1);
+	memcpy (matrix, &mat[0][0], sizeof (dMatrix));
+}
+
+void dNewtonTransformLerp::GetBaseMatrix (dFloat* const matrix) const
+{
+	dNewton::ScopeLock scopelock (&m_lock);
+	dMatrix mat (m_rotat0, m_posit0);
 	memcpy (matrix, &mat[0][0], sizeof (dMatrix));
 }
 

@@ -36,6 +36,7 @@ class dNewtonTransformLerp
 
 	CNEWTON_API void GetTargetMatrix (dFloat* const matrix) const;
 	CNEWTON_API void SetTargetMatrix (const dFloat* const matrix);
+	CNEWTON_API void GetBaseMatrix (dFloat* const matrix) const;
 
 	CNEWTON_API void InterplateMatrix (dFloat param, dFloat* const matrix) const;
 
