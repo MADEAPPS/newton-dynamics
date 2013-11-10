@@ -26,8 +26,8 @@
 #include "dNewtonArticulationManager.h"
 
 
-dNewtonArticulationManager::dNewtonArticulationManager (dNewton* const world)
-	:CustomArticulaledTransformManager (world->GetNewton(), false)
+dNewtonArticulationManager::dNewtonArticulationManager (dNewton* const world, bool applyLocalTransform)
+	:CustomArticulaledTransformManager (world->GetNewton(), applyLocalTransform)
 {
 }
 
@@ -116,6 +116,10 @@ void* dNewtonArticulationManager::dNewtonArticulationController::AddBone (dNewto
 		dNewtonBody* const parentBody = (dNewtonBody*) NewtonBodyGetUserData(parent->m_body);
 		parentBody->AttachChild (boneBody);
 	}
+
+	// save the bone articulation in the body
+	boneBody->SetBoneArticulation(bone);
+
 	return bone;
 }
 

@@ -50,7 +50,7 @@ class dNewtonArticulationManager: public CustomArticulaledTransformManager
 		friend class dNewtonArticulationManager;
 	};
 
-	CNEWTON_API dNewtonArticulationManager (dNewton* const world);
+	CNEWTON_API dNewtonArticulationManager (dNewton* const world, bool applyLocalTransform = false);
 	CNEWTON_API virtual ~dNewtonArticulationManager ();
 
 	CNEWTON_API void DisableAllSelfCollision (CustomArticulatedTransformController* const controller);

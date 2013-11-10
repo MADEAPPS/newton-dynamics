@@ -105,7 +105,9 @@ class dNewtonBody: public dNewtonAlloc, public dNewtonTransformLerp
 	CNEWTON_API dNewtonBody* GetChild() const;
 	CNEWTON_API dNewtonBody* GetSibling() const;
 	CNEWTON_API void AttachChild (dNewtonBody* const child);
-	
+
+	CNEWTON_API void* GetBoneArticulation() const;
+	CNEWTON_API void SetBoneArticulation(void* const boneArticulation);
 	
 	CNEWTON_API dNewton* GetNewton () const;
 
@@ -126,6 +128,7 @@ class dNewtonBody: public dNewtonAlloc, public dNewtonTransformLerp
 	dNewtonBody* m_child;
 	dNewtonBody* m_sibling;
 	dNewtonBody* m_parent;
+	void* m_boneArticulation; 
 	void* m_userData;
 	dBodyType m_bodyType;
 };

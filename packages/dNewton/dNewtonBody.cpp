@@ -32,6 +32,7 @@ dNewtonBody::dNewtonBody(dBodyType type, dNewtonBody* const parent)
 	,m_child(NULL) 
 	,m_sibling(NULL) 
 	,m_parent(parent) 
+	,m_boneArticulation(NULL)
 	,m_userData(NULL)
 	,m_bodyType(type)
 {
@@ -44,6 +45,7 @@ dNewtonBody::dNewtonBody (dNewton* const dWorld, dFloat mass, const dNewtonColli
 	,m_child(NULL) 
 	,m_sibling(NULL) 
 	,m_parent(parent) 
+	,m_boneArticulation(NULL)
 	,m_userData(userData)
 	,m_bodyType(type)
 {
@@ -282,6 +284,17 @@ dNewtonBody* dNewtonBody::GetSibling() const
 {
 	return m_sibling;
 }
+
+void* dNewtonBody::GetBoneArticulation() const
+{
+	return m_boneArticulation;
+}
+
+void dNewtonBody::SetBoneArticulation(void* const boneArticulation)
+{
+	m_boneArticulation = boneArticulation;
+}
+
 
 void dNewtonBody::AttachChild(dNewtonBody* const child)
 {
