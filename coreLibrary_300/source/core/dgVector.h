@@ -382,11 +382,10 @@ class dgVector
 						 m_x * B.m_y - m_y * B.m_x, m_w);
 	}
 
-
-
-	DG_INLINE dgInt32 GetInt () const
+	
+	DG_INLINE dgVector GetInt () const
 	{
-		return int (m_x);
+		return dgVector (int (dgFloor (m_x)), int(dgFloor (m_y)), int(dgFloor (m_z)), int (dgFloor (m_w)));
 	}
 
 	DG_INLINE dgVector TestZero() const
@@ -569,10 +568,21 @@ class dgVector
 
 	DG_CLASS_ALLOCATOR(allocator)
 
-	dgFloat32 m_x;
-	dgFloat32 m_y;
-	dgFloat32 m_z;
-	dgFloat32 m_w;
+	union {
+		struct {
+			dgFloat32 m_x;
+			dgFloat32 m_y;
+			dgFloat32 m_z;
+			dgFloat32 m_w;
+		};
+		struct {
+			dgInt32 m_ix;
+			dgInt32 m_iy;
+			dgInt32 m_iz;
+			dgInt32 m_iw;
+		};
+	};
+
 
 	static dgVector m_one;
 	static dgVector m_wOne;
