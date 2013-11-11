@@ -125,7 +125,7 @@ typename dgGraph<dgNodeData, dgEdgeData>::dgListNode* dgGraph<dgNodeData, dgEdge
 	dgInt32 size0 = sizeof (dgGraphNode<dgNodeData, dgEdgeData>);
 	void* const ptr = ((char*)nodeData) - (size0 - size1);
 	dgGraphNode<dgNodeData, dgEdgeData>* const nodeInfo = (dgGraphNode<dgNodeData, dgEdgeData>*) ptr;
-	return GetNodeFromInfo(*nodeInfo);
+	return this->GetNodeFromInfo(*nodeInfo);
 }
 
 /*
