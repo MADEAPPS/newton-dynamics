@@ -352,15 +352,12 @@ extern "C" {
 	typedef dFloat (*NewtonCollisionTreeRayCastCallback) (const NewtonBody* const body, const NewtonCollision* const treeCollision, dFloat intersection, dFloat* const normal, int faceId, void* const usedData);
 	typedef dFloat (*NewtonHeightFieldRayCastCallback) (const NewtonBody* const body, const NewtonCollision* const heightFieldCollision, dFloat intersection, int row, int col, dFloat* const normal, int faceId, void* const usedData);
 
-
 	typedef void (*NewtonCollisionCopyConstructionCallback) (const NewtonWorld* const newtonWorld, NewtonCollision* const collision, const NewtonCollision* const sourceCollision);
 	typedef void (*NewtonCollisionDestructorCallback) (const NewtonWorld* const newtonWorld, const NewtonCollision* const collision);
 
 	// collision tree call back (obsoleted no recommended)
 	typedef void (*NewtonTreeCollisionCallback) (const NewtonBody* const bodyWithTreeCollision, const NewtonBody* const body, int faceID, 
 												 int vertexCount, const dFloat* const vertex, int vertexStrideInBytes); 
-
-	
 
 	typedef void (*NewtonBodyDestructor) (const NewtonBody* const body);
 	typedef void (*NewtonApplyForceAndTorque) (const NewtonBody* const body, dFloat timestep, int threadIndex);
@@ -808,6 +805,9 @@ extern "C" {
 	NEWTON_API NewtonBody* NewtonCreateDeformableBody (const NewtonWorld* const newtonWorld, const NewtonCollision* const deformableMesh, const dFloat* const matrix);
 
 	NEWTON_API void  NewtonDestroyBody(const NewtonBody* const body);
+
+	NEWTON_API void  NewtonBodyEnableSimulation(const NewtonBody* const body);
+	NEWTON_API void  NewtonBodyDisableSimulation(const NewtonBody* const body);
 
 	NEWTON_API int NewtonBodyGetType (const NewtonBody* const body);
 	NEWTON_API void NewtonSetBodyCollidable (const NewtonBody* const body, int collidableState);

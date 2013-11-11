@@ -4562,6 +4562,20 @@ void NewtonDestroyBody (const NewtonBody* const bodyPtr)
 	world->DestroyBody(body);
 }
 
+void NewtonBodyEnableSimulation(const NewtonBody* const bodyPtr)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgBody* const body = (dgBody *)bodyPtr;
+	dgWorld* const world = body->GetWorld();
+}
+
+void NewtonBodyDisableSimulation(const NewtonBody* const bodyPtr)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgBody* const body = (dgBody *)bodyPtr;
+	dgWorld* const world = body->GetWorld();
+}
+
 void NewtonSetBodyCollidable (const NewtonBody* const bodyPtr, int collidable)
 {
 	TRACE_FUNCTION(__FUNCTION__);
