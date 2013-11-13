@@ -69,13 +69,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Autodesk\3ds Max 2010\plugins\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Program Files (x86)\Autodesk\3ds Max 2013\plugins</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Autodesk\3ds Max 2010\plugins\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Autodesk\3ds Max 2010\plugins\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Program Files (x86)\Autodesk\3ds Max 2013\plugins</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Autodesk\3ds Max 2010\plugins\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
@@ -85,7 +85,7 @@
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Newton</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.dli</TargetExt>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.dli</TargetExt>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">C:\Autodesk\3ds Max 2010\plugins\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">C:\Program Files (x86)\Autodesk\3ds Max 2013\plugins</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Template|x64'">C:\Autodesk\3ds Max 2010\plugins\</OutDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Newton</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Newton</TargetName>
@@ -110,7 +110,7 @@
       <AdditionalOptions>/LD  %(AdditionalOptions)</AdditionalOptions>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>C:\Development\maxsdk\include;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dContainers;../../../../packages/thirdParty/tinyxml;../../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Development\maxsdk\max2013\maxsdk\include;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dContainers;../../../../packages/thirdParty/tinyxml;../../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_NEWTON_STATIC_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -134,7 +134,7 @@
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;comctl32.lib;core.lib;geom.lib;gfx.lib;mesh.lib;biped.lib;maxutil.lib;maxscrpt.lib;paramblk2.lib;mnmath.lib;poly.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>C:\Development\maxsdk\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Development\maxsdk\max2013\maxsdk\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>..\..\maxPlugin.def</ModuleDefinitionFile>
       <ProgramDatabaseFile>.\Release\maxPlugin.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
@@ -157,7 +157,7 @@
       <AdditionalOptions>/LD  %(AdditionalOptions)</AdditionalOptions>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>C:\Development\maxsdk\include;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dContainers;../../../../packages/thirdParty/tinyxml;../../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Development\maxsdk\max2013\maxsdk\include;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dContainers;../../../../packages/thirdParty/tinyxml;../../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_NEWTON_STATIC_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -179,7 +179,7 @@
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;comctl32.lib;core.lib;geom.lib;gfx.lib;mesh.lib;biped.lib;maxutil.lib;maxscrpt.lib;paramblk2.lib;mnmath.lib;poly.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>C:\Development\maxsdk\x64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Development\maxsdk\max2012\3ds Max 2012\maxsdk\x64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>..\..\maxPlugin.def</ModuleDefinitionFile>
       <ProgramDatabaseFile>.\Release\maxPlugin.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
@@ -202,7 +202,7 @@
     <ClCompile>
       <AdditionalOptions>/LD  %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>C:\Development\maxsdk\include;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dContainers;../../../../packages/thirdParty/tinyxml;../../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Development\maxsdk\max2013\maxsdk\include;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dContainers;../../../../packages/thirdParty/tinyxml;../../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_NEWTON_STATIC_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>
@@ -226,7 +226,7 @@
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;comctl32.lib;core.lib;geom.lib;gfx.lib;mesh.lib;maxutil.lib;biped.lib;maxscrpt.lib;paramblk2.lib;mnmath.lib;poly.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>C:\Development\maxsdk\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Development\maxsdk\max2013\maxsdk\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>../../maxPlugin.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\Debug\maxPlugin.pdb</ProgramDatabaseFile>
@@ -249,7 +249,7 @@
     <ClCompile>
       <AdditionalOptions>/LD  %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>C:\Development\maxsdk\include;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dContainers;../../../../packages/thirdParty/tinyxml;../../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Development\maxsdk\max2013\maxsdk\include;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dContainers;../../../../packages/thirdParty/tinyxml;../../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_NEWTON_STATIC_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>
@@ -271,7 +271,7 @@
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;comctl32.lib;core.lib;geom.lib;gfx.lib;mesh.lib;maxutil.lib;biped.lib;maxscrpt.lib;paramblk2.lib;mnmath.lib;poly.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>C:\Development\maxsdk\x64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Development\maxsdk\max2012\3ds Max 2012\maxsdk\x64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>../../maxPlugin.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\Debug\maxPlugin.pdb</ProgramDatabaseFile>
@@ -287,20 +287,20 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
     <Link>
       <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
-      <AdditionalLibraryDirectories>C:\Autodesk\3ds Max 2012\maxsdk\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Development\maxsdk\max2013\maxsdk\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Development\maxsdk\include;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dContainers;../../../../packages/thirdParty/tinyxml;../../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Development\maxsdk\max2013\maxsdk\include;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dContainers;../../../../packages/thirdParty/tinyxml;../../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Template|x64'">
     <Link>
       <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
-      <AdditionalLibraryDirectories>C:\Autodesk\3ds Max 2012\maxsdk\x64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Development\maxsdk\max2012\3ds Max 2012\maxsdk\x64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>C:\Development\maxsdk\include;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dContainers;../../../../packages/thirdParty/tinyxml;../../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Development\maxsdk\max2013\maxsdk\include;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dContainers;../../../../packages/thirdParty/tinyxml;../../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
