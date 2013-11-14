@@ -272,6 +272,10 @@
 		FF8B5E191750F1B80076BE6C /* courbd.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FF8B5E171750F1B80076BE6C /* courbd.ttf */; };
 		FF8B5E1A1750F3E70076BE6C /* libfreeType.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF8B5E101750EFC00076BE6C /* libfreeType.a */; };
 		FF8B5E1C1750F4670076BE6C /* BasicRagDoll.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8B5E1B1750F4670076BE6C /* BasicRagDoll.cpp */; };
+		FF9BBC5018351FB90060F147 /* lumber.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF9BBC4C18351FB90060F147 /* lumber.ngd */; };
+		FF9BBC5118351FB90060F147 /* ramp.off in Resources */ = {isa = PBXBuildFile; fileRef = FF9BBC4D18351FB90060F147 /* ramp.off */; };
+		FF9BBC5218351FB90060F147 /* ruins.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF9BBC4E18351FB90060F147 /* ruins.ngd */; };
+		FF9BBC5318351FB90060F147 /* ruinsFloor.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF9BBC4F18351FB90060F147 /* ruinsFloor.ngd */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -610,6 +614,10 @@
 		FF8C2CFF1313DC7F00646B90 /* dScene.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = dScene.xcodeproj; path = ../../../../../packages/projects/mac/dScene/dScene.xcodeproj; sourceTree = "<group>"; };
 		FF8C2D0A1313DC9500646B90 /* tinyxml.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = tinyxml.xcodeproj; path = ../../../../../packages/projects/mac/tinyxml/tinyxml.xcodeproj; sourceTree = "<group>"; };
 		FF9936141735F69D000533B7 /* newton.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = newton.xcodeproj; path = "../../../../../coreLibrary_300/projects/mac/os10.6-xcode-3.2.5/newton.xcodeproj"; sourceTree = "<group>"; };
+		FF9BBC4C18351FB90060F147 /* lumber.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = lumber.ngd; path = ../../../../media/lumber.ngd; sourceTree = "<group>"; };
+		FF9BBC4D18351FB90060F147 /* ramp.off */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ramp.off; path = ../../../../media/ramp.off; sourceTree = "<group>"; };
+		FF9BBC4E18351FB90060F147 /* ruins.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = ruins.ngd; path = ../../../../media/ruins.ngd; sourceTree = "<group>"; };
+		FF9BBC4F18351FB90060F147 /* ruinsFloor.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = ruinsFloor.ngd; path = ../../../../media/ruinsFloor.ngd; sourceTree = "<group>"; };
 		FFD2742E172DA02000114513 /* DemoListenerBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DemoListenerBase.cpp; path = ../../../sdkDemos/DemoListenerBase.cpp; sourceTree = "<group>"; };
 		FFD27431172DA05A00114513 /* AdvancedPlayerController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AdvancedPlayerController.cpp; path = ../../../sdkDemos/demos/AdvancedPlayerController.cpp; sourceTree = "<group>"; };
 		FFD27432172DA05A00114513 /* BasicPlayerController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BasicPlayerController.cpp; path = ../../../sdkDemos/demos/BasicPlayerController.cpp; sourceTree = "<group>"; };
@@ -727,6 +735,10 @@
 			isa = PBXGroup;
 			children = (
 				FF82376517C26F8B004C80D4 /* shaders */,
+				FF9BBC4C18351FB90060F147 /* lumber.ngd */,
+				FF9BBC4D18351FB90060F147 /* ramp.off */,
+				FF9BBC4E18351FB90060F147 /* ruins.ngd */,
+				FF9BBC4F18351FB90060F147 /* ruinsFloor.ngd */,
 				FF82376017C26F8B004C80D4 /* aventador.ngd */,
 				FF82376117C26F8B004C80D4 /* forklift_d.tga */,
 				FF82376217C26F8B004C80D4 /* forklift_underside_d.tga */,
@@ -1515,6 +1527,10 @@
 				FF82377B17C26F8C004C80D4 /* TextureDecal.ps in Resources */,
 				FF82377D17C26F8C004C80D4 /* swimmingPool.ngd in Resources */,
 				FF82377E17C26F8C004C80D4 /* tractor.ngd in Resources */,
+				FF9BBC5018351FB90060F147 /* lumber.ngd in Resources */,
+				FF9BBC5118351FB90060F147 /* ramp.off in Resources */,
+				FF9BBC5218351FB90060F147 /* ruins.ngd in Resources */,
+				FF9BBC5318351FB90060F147 /* ruinsFloor.ngd in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

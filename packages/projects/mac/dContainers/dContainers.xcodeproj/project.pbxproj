@@ -13,8 +13,8 @@
 		FF8C26801313D31E00646B90 /* dCRC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C266F1313D31E00646B90 /* dCRC.cpp */; };
 		FF8C26841313D31E00646B90 /* dRefCounter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C26731313D31E00646B90 /* dRefCounter.cpp */; };
 		FF8C26891313D31E00646B90 /* dTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C26781313D31E00646B90 /* dTree.cpp */; };
+		FF9BBC4B18351EA70060F147 /* dContainersAlloc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF9BBC4A18351EA70060F147 /* dContainersAlloc.cpp */; };
 		FFD2742B172D9F9000114513 /* dString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFD27429172D9F9000114513 /* dString.cpp */; };
-		FFDE47C9166BF801006CFDE9 /* dUndoRedo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFDE47C5166BF801006CFDE9 /* dUndoRedo.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,8 +26,8 @@
 		FF8C266F1313D31E00646B90 /* dCRC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dCRC.cpp; path = ../../../dContainers/dCRC.cpp; sourceTree = SOURCE_ROOT; };
 		FF8C26731313D31E00646B90 /* dRefCounter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dRefCounter.cpp; path = ../../../dContainers/dRefCounter.cpp; sourceTree = SOURCE_ROOT; };
 		FF8C26781313D31E00646B90 /* dTree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dTree.cpp; path = ../../../dContainers/dTree.cpp; sourceTree = SOURCE_ROOT; };
+		FF9BBC4A18351EA70060F147 /* dContainersAlloc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dContainersAlloc.cpp; path = ../../../dContainers/dContainersAlloc.cpp; sourceTree = "<group>"; };
 		FFD27429172D9F9000114513 /* dString.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dString.cpp; path = ../../../dContainers/dString.cpp; sourceTree = "<group>"; };
-		FFDE47C5166BF801006CFDE9 /* dUndoRedo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dUndoRedo.cpp; path = ../../../dContainers/dUndoRedo.cpp; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,8 +61,8 @@
 		08FB77ACFE841707C02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				FF9BBC4A18351EA70060F147 /* dContainersAlloc.cpp */,
 				FFD27429172D9F9000114513 /* dString.cpp */,
-				FFDE47C5166BF801006CFDE9 /* dUndoRedo.cpp */,
 				FF8C26691313D31E00646B90 /* dBaseHierarchy.cpp */,
 				FF8C266B1313D31E00646B90 /* dClassInfo.cpp */,
 				FF8C266D1313D31E00646B90 /* dContainersStdAfx.cpp */,
@@ -143,8 +143,8 @@
 				FF8C26801313D31E00646B90 /* dCRC.cpp in Sources */,
 				FF8C26841313D31E00646B90 /* dRefCounter.cpp in Sources */,
 				FF8C26891313D31E00646B90 /* dTree.cpp in Sources */,
-				FFDE47C9166BF801006CFDE9 /* dUndoRedo.cpp in Sources */,
 				FFD2742B172D9F9000114513 /* dString.cpp in Sources */,
+				FF9BBC4B18351EA70060F147 /* dContainersAlloc.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
