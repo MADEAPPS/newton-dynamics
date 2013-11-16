@@ -14,7 +14,6 @@
 
 #include "dPluginStdafx.h"
 #include "dUndoRedo.h"
-//#include "dPluginInterface.h"
 
 class dPluginMesh;
 class dPluginScene;
