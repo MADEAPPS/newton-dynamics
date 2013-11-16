@@ -132,12 +132,6 @@
     <ClCompile Include="..\dCollada\pcre-8.01\pcre_stringpiece.cc" />
     <ClCompile Include="..\dCollada\pcre-8.01\pcrecpp.cc" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="pcre.vcxproj">
-      <Project>{9a5197f3-4592-4349-9846-426d88a632aa}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

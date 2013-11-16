@@ -507,10 +507,6 @@
     <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domVisual_scene.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="pcre.vcxproj">
-      <Project>{9a5197f3-4592-4349-9846-426d88a632aa}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
     <ProjectReference Include="pcrecpp.vcxproj">
       <Project>{99434ac8-de5a-4af3-a5cb-bb2efabd6ff3}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

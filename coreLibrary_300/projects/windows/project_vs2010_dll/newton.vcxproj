@@ -119,7 +119,7 @@
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
-      <ImportLibrary>$(OutDir)$(ProjectName)_d.lib</ImportLibrary>
+      <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <SuppressStartupBanner>false</SuppressStartupBanner>
     </Link>
@@ -176,7 +176,7 @@ rem xcopy  "$(OutDir)$(TargetName).dll" "C:\Users\Julio\Downloads\NewtonTestApp\
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
-      <ImportLibrary>$(OutDir)$(ProjectName)_d.lib</ImportLibrary>
+      <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
       <SuppressStartupBanner>false</SuppressStartupBanner>
     </Link>
