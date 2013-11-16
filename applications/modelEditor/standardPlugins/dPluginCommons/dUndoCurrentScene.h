@@ -14,21 +14,20 @@
 
 #include "dPluginStdafx.h"
 #include "dUndoRedo.h"
-#include "dPluginInterface.h"
+//#include "dPluginInterface.h"
 
 class dPluginMesh;
 class dPluginScene;
-
+class dPluginInterface;
 
 class dUndoCurrentScene: public dUndoRedo
 {
 	public:
-
 	dUndoCurrentScene(dPluginInterface* const interface, dPluginScene* const deltaScene);
 	virtual ~dUndoCurrentScene();
 
 	protected:
-	virtual void RestoreState(dUndodeRedoMode mode);
+	virtual void RestoreState (dUndodeRedoMode mode);
 	virtual dUndoRedo* CreateRedoState() const;
 	
 	dPluginScene* m_deltaScene;

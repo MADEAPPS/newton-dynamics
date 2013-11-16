@@ -44,19 +44,19 @@ class dPluginScene: public dScene
 	public:
 	DPLUGIN_API dPluginScene(NewtonWorld* const newton);
 	DPLUGIN_API dPluginScene(const dPluginScene& scene);
-	virtual DPLUGIN_API ~dPluginScene(void);
+	DPLUGIN_API virtual ~dPluginScene(void);
 
-	virtual DPLUGIN_API void RenderWireframe (dSceneRender* const render);
-	virtual DPLUGIN_API void RenderFlatShaded (dSceneRender* const render);
-	virtual DPLUGIN_API void RenderSolidWireframe (dSceneRender* const render);
-	virtual DPLUGIN_API void RenderWireframeSelection (dSceneRender* const render);
-
-
-	virtual DPLUGIN_API void UpdateAllOOBB ();
+	DPLUGIN_API virtual void RenderWireframe (dSceneRender* const render);
+	DPLUGIN_API virtual void RenderFlatShaded (dSceneRender* const render);
+	DPLUGIN_API virtual void RenderSolidWireframe (dSceneRender* const render);
+	DPLUGIN_API virtual void RenderWireframeSelection (dSceneRender* const render);
 
 
-	virtual DPLUGIN_API bool Deserialize (const char* const fileName);
-	virtual DPLUGIN_API void Serialize (const char* const fileName);
+	DPLUGIN_API virtual void UpdateAllOOBB ();
+
+
+	DPLUGIN_API virtual bool Deserialize (const char* const fileName);
+	DPLUGIN_API virtual void Serialize (const char* const fileName);
 	private:
 	virtual void RenderWireframeSceneNode (dSceneRender* const render, dScene::dTreeNode* const sceneNode);
 	virtual void RenderFlatShadedSceneNode (dSceneRender* const render, dScene::dTreeNode* const sceneNode);

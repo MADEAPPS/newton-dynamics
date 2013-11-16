@@ -21,36 +21,36 @@ class dPluginCamera
 {
 	public:
 	DPLUGIN_API dPluginCamera ();
-	virtual DPLUGIN_API ~dPluginCamera ();
+	DPLUGIN_API virtual ~dPluginCamera ();
 
-	virtual DPLUGIN_API void SetPerspectiveMatrix(dSceneRender* const render, int width, int height);
-	virtual DPLUGIN_API void SetOrtographicMatrix(dSceneRender* const render, int width, int height, const dMatrix& aligment);
+	DPLUGIN_API virtual void SetPerspectiveMatrix(dSceneRender* const render, int width, int height);
+	DPLUGIN_API virtual void SetOrtographicMatrix(dSceneRender* const render, int width, int height, const dMatrix& aligment);
 
-	virtual DPLUGIN_API void DrawConstructionGrid(dSceneRender* const render) const;
-	virtual DPLUGIN_API void BuildConstructionGrid(dSceneRender* const render, int count, dFloat spacing);
-	virtual DPLUGIN_API void DestroyConstructionGrid(dSceneRender* const render);
+	DPLUGIN_API virtual void DrawConstructionGrid(dSceneRender* const render) const;
+	DPLUGIN_API virtual void BuildConstructionGrid(dSceneRender* const render, int count, dFloat spacing);
+	DPLUGIN_API virtual void DestroyConstructionGrid(dSceneRender* const render);
 
-	virtual DPLUGIN_API void DrawGizmo(dSceneRender* const render, int font) const;
-	virtual DPLUGIN_API void DrawNodeSelectionGizmo(dSceneRender* const render, const dMatrix& matrix) const;
-	virtual DPLUGIN_API void DrawNodeSelectAndMoveGizmo(dSceneRender* const render, const dMatrix& matrix) const;
+	DPLUGIN_API virtual void DrawGizmo(dSceneRender* const render, int font) const;
+	DPLUGIN_API virtual void DrawNodeSelectionGizmo(dSceneRender* const render, const dMatrix& matrix) const;
+	DPLUGIN_API virtual void DrawNodeSelectAndMoveGizmo(dSceneRender* const render, const dMatrix& matrix) const;
 
-	virtual DPLUGIN_API void SetZoom(dFloat zoom);
-	virtual DPLUGIN_API dFloat GetZoom() const;
+	DPLUGIN_API virtual void SetZoom(dFloat zoom);
+	DPLUGIN_API virtual dFloat GetZoom() const;
 
-	virtual DPLUGIN_API void SetPanning(dFloat x, dFloat y);
-	virtual DPLUGIN_API void GetPanning(dFloat & x, dFloat & y) const;
+	DPLUGIN_API virtual void SetPanning(dFloat x, dFloat y);
+	DPLUGIN_API virtual void GetPanning(dFloat & x, dFloat & y) const;
 
-	virtual DPLUGIN_API void SetGridMatrix (const dMatrix& matrix);
+	DPLUGIN_API virtual void SetGridMatrix (const dMatrix& matrix);
 
-	virtual DPLUGIN_API dFloat GetDistance() const;
-	virtual DPLUGIN_API dFloat GetYawAngle() const;
-	virtual DPLUGIN_API dFloat GetRollAngle() const;
+	DPLUGIN_API virtual dFloat GetDistance() const;
+	DPLUGIN_API virtual dFloat GetYawAngle() const;
+	DPLUGIN_API virtual dFloat GetRollAngle() const;
 
-	virtual DPLUGIN_API dVector GetPointOfInterest() const;
-	virtual DPLUGIN_API void SetPointOfInterest(const dVector& pointOfInterst);
+	DPLUGIN_API virtual dVector GetPointOfInterest() const;
+	DPLUGIN_API virtual void SetPointOfInterest(const dVector& pointOfInterst);
 
-	virtual DPLUGIN_API dMatrix GetMatrix () const;
-	virtual DPLUGIN_API void SetMatrix (dFloat yaw, dFloat roll, dFloat distance);
+	DPLUGIN_API virtual dMatrix GetMatrix () const;
+	DPLUGIN_API virtual void SetMatrix (dFloat yaw, dFloat roll, dFloat distance);
 
 	private:
 	dMatrix m_matrix;

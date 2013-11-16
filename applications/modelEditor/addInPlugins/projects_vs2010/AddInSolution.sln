@@ -41,6 +41,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxregex", "..\..\..\..\pack
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxzlib", "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010_dll\wx_vc9_wxzlib.vcxproj", "{8B867186-A0B5-5479-B824-E176EDD27C40}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dFBX", "dFBX.vcxproj", "{5580C08E-E865-4D9E-B4C9-5AC040130B92}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -177,6 +179,14 @@ Global
 		{8B867186-A0B5-5479-B824-E176EDD27C40}.Release|Win32.Build.0 = Release|Win32
 		{8B867186-A0B5-5479-B824-E176EDD27C40}.Release|x64.ActiveCfg = Release|x64
 		{8B867186-A0B5-5479-B824-E176EDD27C40}.Release|x64.Build.0 = Release|x64
+		{5580C08E-E865-4D9E-B4C9-5AC040130B92}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5580C08E-E865-4D9E-B4C9-5AC040130B92}.Debug|Win32.Build.0 = Debug|Win32
+		{5580C08E-E865-4D9E-B4C9-5AC040130B92}.Debug|x64.ActiveCfg = Debug|x64
+		{5580C08E-E865-4D9E-B4C9-5AC040130B92}.Debug|x64.Build.0 = Debug|x64
+		{5580C08E-E865-4D9E-B4C9-5AC040130B92}.Release|Win32.ActiveCfg = Release|Win32
+		{5580C08E-E865-4D9E-B4C9-5AC040130B92}.Release|Win32.Build.0 = Release|Win32
+		{5580C08E-E865-4D9E-B4C9-5AC040130B92}.Release|x64.ActiveCfg = Release|x64
+		{5580C08E-E865-4D9E-B4C9-5AC040130B92}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -22,8 +22,9 @@ class dUndoRedo: public dPluginAlloc
 		m_undo,
 		m_redo,
 	};
+
 	DPLUGIN_API dUndoRedo();
-	virtual DPLUGIN_API ~dUndoRedo();
+	DPLUGIN_API virtual ~dUndoRedo();
 
 	virtual dUndoRedo* CreateRedoState() const = 0;
 	virtual void RestoreState(dUndodeRedoMode mode) = 0;
@@ -56,5 +57,6 @@ class dUndoRedoManager: public dPluginAlloc
 	dStack m_undodStack;
 	dStack m_redodStack;
 };
+
 
 #endif

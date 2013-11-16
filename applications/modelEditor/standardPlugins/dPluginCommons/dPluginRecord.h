@@ -37,7 +37,7 @@ class dPluginRecord
 	};
 
 	DPLUGIN_API dPluginRecord(void);
-	virtual DPLUGIN_API ~dPluginRecord(void);
+	DPLUGIN_API virtual ~dPluginRecord(void);
 
 	virtual const char* GetMenuName () {return NULL;}
 	virtual const char* GetFileExtension () {return NULL;}
