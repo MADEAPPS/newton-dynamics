@@ -1,0 +1,1292 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="1.4">
+      <UniqueIdentifier>{f51cdf4f-99e8-4d75-94b7-be6f823655a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="1.4\Header Files">
+      <UniqueIdentifier>{0d7983ab-f085-4fe3-983a-55a9356642df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="1.4\Source Files">
+      <UniqueIdentifier>{f3b6f626-5e52-4186-8177-804715a067d7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\dae.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeArray.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeAtomicType.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeDatabase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeDocument.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeDom.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeElement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeError.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeErrorHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeIDRef.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeIOPluginCommon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\modules\LIBXMLPlugin\daeLIBXMLPlugin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeMemorySystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeMetaAny.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeMetaAttribute.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeMetaChoice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeMetaCMPolicy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeMetaElement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeMetaElementAttribute.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeMetaGroup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeMetaSequence.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeRawResolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeRefCountedObj.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeSIDResolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeStandardURIResolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\modules\STLDatabase\daeSTLDatabase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeStringRef.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeStringTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeTinyXMLPlugin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeURI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeZAEUncompressHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\domAny.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\modules\stdErrPlugin\stdErrPlugin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domAccessor.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domAnimation.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domAnimation_clip.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domAsset.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domBind_material.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domBool_array.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domBox.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCamera.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCapsule.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCg_connect_param.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCg_newarray_type.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCg_newparam.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCg_param_type.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCg_sampler1D.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCg_sampler2D.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCg_sampler3D.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCg_samplerCUBE.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCg_samplerDEPTH.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCg_samplerRECT.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCg_setarray_type.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCg_setparam.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCg_setparam_simple.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCg_setuser_type.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCg_surface_type.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domChannel.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCOLLADA.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCommon_color_or_texture_type.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCommon_float_or_param_type.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCommon_newparam_type.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCommon_transparent_type.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domConstants.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domController.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domConvex_mesh.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCylinder.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domEffect.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domEllipsoid.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domExtra.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFloat_array.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domForce_field.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_annotate_common.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_annotate_type_common.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_basic_type_common.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_clearcolor_common.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_cleardepth_common.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_clearstencil_common.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_code_profile.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_colortarget_common.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_depthtarget_common.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_include_common.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_newparam_common.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_profile_abstract.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_sampler1D_common.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_sampler2D_common.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_sampler3D_common.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_samplerCUBE_common.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_samplerDEPTH_common.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_samplerRECT_common.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_stenciltarget_common.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_surface_common.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_surface_format_hint_common.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_surface_init_common.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_surface_init_cube_common.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_surface_init_from_common.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_surface_init_planar_common.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_surface_init_volume_common.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGeometry.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGl_hook_abstract.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGl_pipeline_settings.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGl_sampler1D.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGl_sampler2D.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGl_sampler3D.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGl_samplerCUBE.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGl_samplerDEPTH.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGl_samplerRECT.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGles_basic_type_common.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGles_newparam.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGles_pipeline_settings.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGles_sampler_state.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGles_texcombiner_argumentAlpha_type.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGles_texcombiner_argumentRGB_type.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGles_texcombiner_command_type.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGles_texcombiner_commandAlpha_type.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGles_texcombiner_commandRGB_type.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGles_texenv_command_type.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGles_texture_constant_type.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGles_texture_pipeline.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGles_texture_unit.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGlsl_newarray_type.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGlsl_newparam.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGlsl_param_type.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGlsl_setarray_type.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGlsl_setparam.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGlsl_setparam_simple.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGlsl_surface_type.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domIDREF_array.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domImage.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInputGlobal.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInputLocal.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInputLocalOffset.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInstance_camera.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInstance_controller.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInstance_effect.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInstance_force_field.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInstance_geometry.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInstance_light.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInstance_material.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInstance_node.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInstance_physics_material.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInstance_physics_model.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInstance_rigid_body.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInstance_rigid_constraint.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInstanceWithExtra.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInt_array.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLibrary_animation_clips.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLibrary_animations.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLibrary_cameras.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLibrary_controllers.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLibrary_effects.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLibrary_force_fields.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLibrary_geometries.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLibrary_images.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLibrary_lights.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLibrary_materials.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLibrary_nodes.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLibrary_physics_materials.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLibrary_physics_models.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLibrary_physics_scenes.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLibrary_visual_scenes.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLight.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLines.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLinestrips.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLookat.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domMaterial.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domMatrix.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domMesh.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domMorph.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domName_array.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domNode.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domP.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domParam.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domPhysics_material.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domPhysics_model.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domPhysics_scene.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domPlane.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domPolygons.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domPolylist.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domProfile_CG.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domProfile_COMMON.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domProfile_GLES.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domProfile_GLSL.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domRigid_body.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domRigid_constraint.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domRotate.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domSampler.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domScale.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domSkew.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domSkin.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domSource.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domSphere.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domSpline.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domTapered_capsule.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domTapered_cylinder.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domTargetableFloat.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domTargetableFloat3.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domTechnique.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domTranslate.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domTriangles.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domTrifans.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domTristrips.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domTypes.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domVertices.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domVisual_scene.cpp">
+      <Filter>1.4\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeArray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeArrayTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeAtomicType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeDatabase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeDocument.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeDom.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeDomTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeElement.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeError.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeErrorHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeGCCPlatform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeIDRef.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeIOPlugin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeIOPluginCommon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\modules\daeLIBXMLPlugin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeMemorySystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeMetaAny.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeMetaAttribute.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeMetaChoice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeMetaCMPolicy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeMetaElement.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeMetaElementAttribute.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeMetaGroup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeMetaSequence.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daePlatform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeRawResolver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeRefCountedObj.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeSIDResolver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeSmartRef.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeStandardURIResolver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\modules\daeSTLDatabase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeStringRef.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeStringTable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeTinyXMLPlugin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeURI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeWin32Platform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeZAEUncompressHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dom.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\domAny.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\modules\stdErrPlugin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domAccessor.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domAnimation.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domAnimation_clip.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domAsset.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domBind_material.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domBool_array.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domBox.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCamera.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCapsule.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCg_connect_param.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCg_newarray_type.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCg_newparam.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCg_param_type.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCg_sampler1D.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCg_sampler2D.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCg_sampler3D.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCg_samplerCUBE.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCg_samplerDEPTH.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCg_samplerRECT.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCg_setarray_type.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCg_setparam.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCg_setparam_simple.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCg_setuser_type.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCg_surface_type.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domChannel.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCOLLADA.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCommon_color_or_texture_type.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCommon_float_or_param_type.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCommon_newparam_type.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCommon_transparent_type.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domConstants.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domController.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domConvex_mesh.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCylinder.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domEffect.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domElements.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domEllipsoid.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domExtra.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFloat_array.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domForce_field.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_annotate_common.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_annotate_type_common.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_basic_type_common.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_clearcolor_common.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_cleardepth_common.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_clearstencil_common.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_code_profile.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_colortarget_common.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_depthtarget_common.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_include_common.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_newparam_common.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_profile_abstract.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_sampler1D_common.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_sampler2D_common.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_sampler3D_common.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_samplerCUBE_common.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_samplerDEPTH_common.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_samplerRECT_common.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_stenciltarget_common.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_surface_common.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_surface_format_hint_common.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_surface_init_common.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_surface_init_cube_common.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_surface_init_from_common.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_surface_init_planar_common.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_surface_init_volume_common.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGeometry.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGl_hook_abstract.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGl_pipeline_settings.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGl_sampler1D.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGl_sampler2D.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGl_sampler3D.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGl_samplerCUBE.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGl_samplerDEPTH.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGl_samplerRECT.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGles_basic_type_common.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGles_newparam.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGles_pipeline_settings.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGles_sampler_state.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGles_texcombiner_argumentAlpha_type.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGles_texcombiner_argumentRGB_type.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGles_texcombiner_command_type.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGles_texcombiner_commandAlpha_type.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGles_texcombiner_commandRGB_type.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGles_texenv_command_type.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGles_texture_constant_type.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGles_texture_pipeline.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGles_texture_unit.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGlsl_newarray_type.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGlsl_newparam.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGlsl_param_type.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGlsl_setarray_type.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGlsl_setparam.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGlsl_setparam_simple.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGlsl_surface_type.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domIDREF_array.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domImage.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInputGlobal.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInputLocal.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInputLocalOffset.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInstance_camera.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInstance_controller.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInstance_effect.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInstance_force_field.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInstance_geometry.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInstance_light.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInstance_material.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInstance_node.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInstance_physics_material.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInstance_physics_model.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInstance_rigid_body.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInstance_rigid_constraint.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInstanceWithExtra.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInt_array.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLibrary_animation_clips.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLibrary_animations.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLibrary_cameras.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLibrary_controllers.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLibrary_effects.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLibrary_force_fields.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLibrary_geometries.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLibrary_images.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLibrary_lights.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLibrary_materials.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLibrary_nodes.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLibrary_physics_materials.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLibrary_physics_models.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLibrary_physics_scenes.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLibrary_visual_scenes.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLight.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLines.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLinestrips.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLookat.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domMaterial.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domMatrix.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domMesh.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domMorph.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domName_array.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domNode.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domP.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domParam.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domPhysics_material.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domPhysics_model.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domPhysics_scene.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domPlane.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domPolygons.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domPolylist.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domProfile_CG.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domProfile_COMMON.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domProfile_GLES.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domProfile_GLSL.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domRigid_body.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domRigid_constraint.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domRotate.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domSampler.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domScale.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domSkew.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domSkin.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domSource.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domSphere.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domSpline.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domTapered_capsule.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domTapered_cylinder.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domTargetableFloat.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domTargetableFloat3.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domTechnique.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domTranslate.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domTriangles.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domTrifans.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domTristrips.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domTypes.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domVertices.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domVisual_scene.h">
+      <Filter>1.4\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

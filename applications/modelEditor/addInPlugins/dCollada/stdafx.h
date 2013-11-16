@@ -11,8 +11,8 @@
 // Windows Header Files:
 #include <windows.h>
 
-#include <fx.h>
-#include <fx3d.h>
+//#include <fx.h>
+//#include <fx3d.h>
 
 #include <dSceneStdafx.h>
 #include <dScene.h>
@@ -36,13 +36,13 @@
 
 
 #include <dUndoRedo.h>
-#include <dMeshPlugin.h>
+//#include <dMeshPlugin.h>
 #include <dBodyPlugin.h>
 #include <dModelPlugin.h>
 #include <dPluginScene.h>
 #include <dExportPlugin.h>
 #include <dImportPlugin.h>
-#include <dUndoSceneGraph.h>
+//#include <dUndoSceneGraph.h>
 #include <dCollisionPlugin.h>
 #include <dPluginInterface.h>
 

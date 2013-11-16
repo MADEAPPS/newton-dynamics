@@ -1,0 +1,522 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{2BAD5C91-F2B8-4E96-94DA-F6D6822DF29F}</ProjectGuid>
+    <RootNamespace>domstatic</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)_d</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../dCollada/collada-dom/dom/include;../dCollada/collada-dom/dom/include/1.4;../dCollada/pcre-8.01;../../../../packages/thirdParty/tinyxml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CRT_SECURE_NO_DEPRECATE;DOM_INCLUDE_TINYXML;PCRE_STATIC;BOOST_ALL_NO_LIB;NO_BOOST;NO_ZAE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <DisableLanguageExtensions>true</DisableLanguageExtensions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>dae.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>../dCollada/collada-dom/dom/include;../dCollada/collada-dom/dom/include/1.4;../dCollada/pcre-8.01;../../../../packages/thirdParty/tinyxml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CRT_SECURE_NO_DEPRECATE;DOM_INCLUDE_TINYXML;PCRE_STATIC;BOOST_ALL_NO_LIB;NO_BOOST;NO_ZAE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <DisableLanguageExtensions>true</DisableLanguageExtensions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>dae.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\dae.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeArray.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeAtomicType.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeDatabase.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeDocument.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeDom.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeElement.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeError.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeErrorHandler.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeIDRef.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeIOPluginCommon.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\modules\LIBXMLPlugin\daeLIBXMLPlugin.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeMemorySystem.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeMetaAny.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeMetaAttribute.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeMetaChoice.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeMetaCMPolicy.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeMetaElement.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeMetaElementAttribute.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeMetaGroup.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeMetaSequence.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeRawResolver.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeRefCountedObj.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeSIDResolver.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeStandardURIResolver.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\modules\STLDatabase\daeSTLDatabase.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeStringRef.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeStringTable.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeTinyXMLPlugin.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeURI.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeUtils.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\daeZAEUncompressHandler.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\dae\domAny.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\modules\stdErrPlugin\stdErrPlugin.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domAccessor.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domAnimation.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domAnimation_clip.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domAsset.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domBind_material.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domBool_array.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domBox.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCamera.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCapsule.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCg_connect_param.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCg_newarray_type.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCg_newparam.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCg_param_type.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCg_sampler1D.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCg_sampler2D.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCg_sampler3D.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCg_samplerCUBE.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCg_samplerDEPTH.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCg_samplerRECT.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCg_setarray_type.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCg_setparam.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCg_setparam_simple.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCg_setuser_type.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCg_surface_type.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domChannel.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCOLLADA.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCommon_color_or_texture_type.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCommon_float_or_param_type.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCommon_newparam_type.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCommon_transparent_type.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domConstants.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domController.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domConvex_mesh.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domCylinder.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domEffect.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domEllipsoid.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domExtra.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFloat_array.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domForce_field.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_annotate_common.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_annotate_type_common.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_basic_type_common.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_clearcolor_common.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_cleardepth_common.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_clearstencil_common.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_code_profile.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_colortarget_common.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_depthtarget_common.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_include_common.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_newparam_common.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_profile_abstract.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_sampler1D_common.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_sampler2D_common.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_sampler3D_common.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_samplerCUBE_common.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_samplerDEPTH_common.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_samplerRECT_common.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_stenciltarget_common.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_surface_common.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_surface_format_hint_common.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_surface_init_common.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_surface_init_cube_common.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_surface_init_from_common.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_surface_init_planar_common.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domFx_surface_init_volume_common.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGeometry.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGl_hook_abstract.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGl_pipeline_settings.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGl_sampler1D.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGl_sampler2D.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGl_sampler3D.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGl_samplerCUBE.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGl_samplerDEPTH.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGl_samplerRECT.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGles_basic_type_common.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGles_newparam.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGles_pipeline_settings.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGles_sampler_state.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGles_texcombiner_argumentAlpha_type.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGles_texcombiner_argumentRGB_type.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGles_texcombiner_command_type.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGles_texcombiner_commandAlpha_type.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGles_texcombiner_commandRGB_type.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGles_texenv_command_type.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGles_texture_constant_type.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGles_texture_pipeline.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGles_texture_unit.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGlsl_newarray_type.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGlsl_newparam.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGlsl_param_type.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGlsl_setarray_type.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGlsl_setparam.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGlsl_setparam_simple.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domGlsl_surface_type.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domIDREF_array.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domImage.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInputGlobal.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInputLocal.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInputLocalOffset.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInstance_camera.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInstance_controller.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInstance_effect.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInstance_force_field.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInstance_geometry.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInstance_light.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInstance_material.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInstance_node.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInstance_physics_material.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInstance_physics_model.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInstance_rigid_body.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInstance_rigid_constraint.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInstanceWithExtra.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domInt_array.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLibrary_animation_clips.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLibrary_animations.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLibrary_cameras.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLibrary_controllers.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLibrary_effects.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLibrary_force_fields.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLibrary_geometries.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLibrary_images.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLibrary_lights.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLibrary_materials.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLibrary_nodes.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLibrary_physics_materials.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLibrary_physics_models.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLibrary_physics_scenes.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLibrary_visual_scenes.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLight.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLines.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLinestrips.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domLookat.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domMaterial.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domMatrix.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domMesh.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domMorph.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domName_array.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domNode.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domP.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domParam.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domPhysics_material.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domPhysics_model.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domPhysics_scene.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domPlane.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domPolygons.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domPolylist.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domProfile_CG.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domProfile_COMMON.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domProfile_GLES.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domProfile_GLSL.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domRigid_body.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domRigid_constraint.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domRotate.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domSampler.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domScale.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domSkew.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domSkin.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domSource.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domSphere.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domSpline.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domTapered_capsule.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domTapered_cylinder.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domTargetableFloat.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domTargetableFloat3.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domTechnique.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domTranslate.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domTriangles.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domTrifans.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domTristrips.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domTypes.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domVertices.cpp" />
+    <ClCompile Include="..\dCollada\collada-dom\dom\src\1.4\dom\domVisual_scene.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeArray.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeArrayTypes.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeAtomicType.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeDatabase.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeDocument.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeDom.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeDomTypes.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeElement.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeError.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeErrorHandler.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeGCCPlatform.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeIDRef.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeIOPlugin.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeIOPluginCommon.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\modules\daeLIBXMLPlugin.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeMemorySystem.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeMetaAny.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeMetaAttribute.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeMetaChoice.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeMetaCMPolicy.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeMetaElement.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeMetaElementAttribute.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeMetaGroup.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeMetaSequence.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daePlatform.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeRawResolver.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeRefCountedObj.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeSIDResolver.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeSmartRef.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeStandardURIResolver.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\modules\daeSTLDatabase.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeStringRef.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeStringTable.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeTinyXMLPlugin.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeTypes.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeURI.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeUtils.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeWin32Platform.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\daeZAEUncompressHandler.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dom.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\dae\domAny.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\modules\stdErrPlugin.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domAccessor.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domAnimation.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domAnimation_clip.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domAsset.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domBind_material.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domBool_array.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domBox.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCamera.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCapsule.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCg_connect_param.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCg_newarray_type.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCg_newparam.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCg_param_type.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCg_sampler1D.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCg_sampler2D.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCg_sampler3D.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCg_samplerCUBE.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCg_samplerDEPTH.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCg_samplerRECT.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCg_setarray_type.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCg_setparam.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCg_setparam_simple.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCg_setuser_type.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCg_surface_type.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domChannel.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCOLLADA.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCommon_color_or_texture_type.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCommon_float_or_param_type.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCommon_newparam_type.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCommon_transparent_type.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domConstants.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domController.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domConvex_mesh.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domCylinder.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domEffect.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domElements.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domEllipsoid.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domExtra.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFloat_array.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domForce_field.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_annotate_common.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_annotate_type_common.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_basic_type_common.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_clearcolor_common.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_cleardepth_common.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_clearstencil_common.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_code_profile.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_colortarget_common.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_depthtarget_common.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_include_common.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_newparam_common.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_profile_abstract.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_sampler1D_common.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_sampler2D_common.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_sampler3D_common.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_samplerCUBE_common.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_samplerDEPTH_common.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_samplerRECT_common.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_stenciltarget_common.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_surface_common.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_surface_format_hint_common.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_surface_init_common.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_surface_init_cube_common.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_surface_init_from_common.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_surface_init_planar_common.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domFx_surface_init_volume_common.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGeometry.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGl_hook_abstract.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGl_pipeline_settings.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGl_sampler1D.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGl_sampler2D.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGl_sampler3D.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGl_samplerCUBE.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGl_samplerDEPTH.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGl_samplerRECT.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGles_basic_type_common.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGles_newparam.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGles_pipeline_settings.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGles_sampler_state.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGles_texcombiner_argumentAlpha_type.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGles_texcombiner_argumentRGB_type.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGles_texcombiner_command_type.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGles_texcombiner_commandAlpha_type.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGles_texcombiner_commandRGB_type.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGles_texenv_command_type.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGles_texture_constant_type.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGles_texture_pipeline.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGles_texture_unit.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGlsl_newarray_type.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGlsl_newparam.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGlsl_param_type.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGlsl_setarray_type.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGlsl_setparam.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGlsl_setparam_simple.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domGlsl_surface_type.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domIDREF_array.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domImage.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInputGlobal.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInputLocal.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInputLocalOffset.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInstance_camera.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInstance_controller.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInstance_effect.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInstance_force_field.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInstance_geometry.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInstance_light.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInstance_material.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInstance_node.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInstance_physics_material.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInstance_physics_model.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInstance_rigid_body.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInstance_rigid_constraint.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInstanceWithExtra.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domInt_array.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLibrary_animation_clips.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLibrary_animations.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLibrary_cameras.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLibrary_controllers.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLibrary_effects.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLibrary_force_fields.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLibrary_geometries.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLibrary_images.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLibrary_lights.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLibrary_materials.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLibrary_nodes.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLibrary_physics_materials.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLibrary_physics_models.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLibrary_physics_scenes.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLibrary_visual_scenes.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLight.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLines.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLinestrips.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domLookat.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domMaterial.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domMatrix.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domMesh.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domMorph.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domName_array.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domNode.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domP.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domParam.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domPhysics_material.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domPhysics_model.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domPhysics_scene.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domPlane.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domPolygons.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domPolylist.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domProfile_CG.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domProfile_COMMON.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domProfile_GLES.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domProfile_GLSL.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domRigid_body.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domRigid_constraint.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domRotate.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domSampler.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domScale.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domSkew.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domSkin.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domSource.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domSphere.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domSpline.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domTapered_capsule.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domTapered_cylinder.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domTargetableFloat.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domTargetableFloat3.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domTechnique.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domTranslate.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domTriangles.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domTrifans.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domTristrips.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domTypes.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domVertices.h" />
+    <ClInclude Include="..\dCollada\collada-dom\dom\include\1.4\dom\domVisual_scene.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="pcre.vcxproj">
+      <Project>{9a5197f3-4592-4349-9846-426d88a632aa}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="pcrecpp.vcxproj">
+      <Project>{99434ac8-de5a-4af3-a5cb-bb2efabd6ff3}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

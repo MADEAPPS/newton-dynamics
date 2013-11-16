@@ -733,7 +733,7 @@ void ColladaExport::AddControllerLibrary (daeDocument *document, const dScene* s
 		dNodeInfo* info = scene->GetInfoFromNode(meshNode);
 		if (info->IsType(dGeometryNodeInfo::GetRttiType())) {
 			dScene::dTreeNode* skinModifierNode = NULL;	
-			for (void* ptr = scene->GetFirstChild(meshNode); ptr; ptr = scene->GetNextChild(meshNode, ptr)) {
+			for (void* ptr = scene->GetFirstChildLink(meshNode); ptr; ptr = scene->GetNextChildLink(meshNode, ptr)) {
 				dScene::dTreeNode* node = scene->GetNodeFromLink(ptr);
 				dNodeInfo* info = scene->GetInfoFromNode(node);
 				if (info->GetTypeId() == dGeometryNodeSkinModifierInfo::GetRttiType()) {
@@ -850,7 +850,7 @@ void ColladaExport::AddControllerLibrary (daeDocument *document, const dScene* s
 					boneNames->setCount (skinModifier->m_boneCount);
 					domListOfNames &boneSrcArray = boneNames->getValue();
 
-					for (void* ptr = scene->GetFirstChild(skinModifierNode); ptr; ptr = scene->GetNextChild(skinModifierNode, ptr)) {
+					for (void* ptr = scene->GetFirstChildLink(skinModifierNode); ptr; ptr = scene->GetNextChildLink(skinModifierNode, ptr)) {
 						dScene::dTreeNode* node = scene->GetNodeFromLink(ptr);
 						dNodeInfo* info = scene->GetInfoFromNode(node);
 						if (info->IsType(dSceneNodeInfo::GetRttiType())) {
@@ -1054,7 +1054,7 @@ void ColladaExport::AddVisualSceneLibrary (daeDocument *document, const dScene* 
 //	dScene::Iterator iter (*scene);
 //	for (iter.Begin(); iter; iter ++) {
 	dScene::dTreeNode* rootBone = scene->GetRootNode();
-	for (void* ptr = scene->GetFirstChild(rootBone); ptr; ptr = scene->GetNextChild(rootBone, ptr)) {
+	for (void* ptr = scene->GetFirstChildLink(rootBone); ptr; ptr = scene->GetNextChildLink(rootBone, ptr)) {
 		dScene::dTreeNode* node = scene->GetNodeFromLink(ptr);
 		dNodeInfo* info = scene->GetInfoFromNode(node);
 		if (info->IsType(dSceneNodeInfo::GetRttiType())) {
@@ -1136,12 +1136,12 @@ void ColladaExport::AddVisualSceneLibrary (daeDocument *document, const dScene* 
 			}
 		}
 		
-		for (void* ptr = scene->GetFirstChild(item.m_node); ptr; ptr = scene->GetNextChild(item.m_node, ptr)) {
+		for (void* ptr = scene->GetFirstChildLink(item.m_node); ptr; ptr = scene->GetNextChildLink(item.m_node, ptr)) {
 			dScene::dTreeNode* meshNode = scene->GetNodeFromLink(ptr);
 			dNodeInfo* info = scene->GetInfoFromNode(meshNode);
 			if (info->IsType(dGeometryNodeInfo::GetRttiType())) {
 				dScene::dTreeNode* skinModifierNode = NULL;	
-				for (void* ptr = scene->GetFirstChild(meshNode); ptr; ptr = scene->GetNextChild(meshNode, ptr)) {
+				for (void* ptr = scene->GetFirstChildLink(meshNode); ptr; ptr = scene->GetNextChildLink(meshNode, ptr)) {
 					dScene::dTreeNode* skinNode = scene->GetNodeFromLink(ptr);
 					dNodeInfo* info = scene->GetInfoFromNode(skinNode);
 					if (info->GetTypeId() == dGeometryNodeSkinModifierInfo::GetRttiType()) {
@@ -1159,7 +1159,7 @@ void ColladaExport::AddVisualSceneLibrary (daeDocument *document, const dScene* 
 			}
 		}
 
-		for (void* ptr = scene->GetFirstChild(item.m_node); ptr; ptr = scene->GetNextChild(item.m_node, ptr)) {
+		for (void* ptr = scene->GetFirstChildLink(item.m_node); ptr; ptr = scene->GetNextChildLink(item.m_node, ptr)) {
 			dScene::dTreeNode* node = scene->GetNodeFromLink(ptr);
 			dNodeInfo* info = scene->GetInfoFromNode(node);
 			if (info->IsType(dSceneNodeInfo::GetRttiType())) {
