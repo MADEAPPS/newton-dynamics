@@ -18,6 +18,7 @@
 class dPluginMesh;
 class dPluginScene;
 class dPluginInterface;
+enum dUndodeRedoMode;
 
 class dUndoCurrentScene: public dUndoRedo
 {
