@@ -20,14 +20,14 @@
 #define _D_FBX_EXPORT_H_
 
 
-class fbxExport: public dExportPlugin
+class dfbxExport: public dExportPlugin
 {
 	public:
 	static dExportPlugin* GetPlugin();
 
 	public:
-	fbxExport():dExportPlugin(){}
-	~fbxExport(){}
+	dfbxExport():dExportPlugin(){}
+	~dfbxExport(){}
 
 	virtual const char* GetMenuName () { return GetSignature();}
 	virtual const char* GetFileExtension () { return "*.fbx";}

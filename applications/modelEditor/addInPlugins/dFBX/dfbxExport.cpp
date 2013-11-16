@@ -20,16 +20,19 @@
 #include "dfbxExport.h"
 
 
-dExportPlugin* fbxExport::GetPlugin()
+dExportPlugin* dfbxExport::GetPlugin()
 {
-	static fbxExport plugin;
+	static dfbxExport plugin;
 	return &plugin;
 }
 
 
-void fbxExport::Export (const char* const fileName, dPluginInterface* const interface)
+void dfbxExport::Export (const char* const fileName, dPluginInterface* const interface)
 {
-	dAssert (0);
+	// Initialize the SDK manager. This object handles memory management.
+	FbxManager* const lSdkManager = FbxManager::Create();
+	dAssert (lSdkManager);
+
 /*
 	dScene* const scene = interface->GetScene();
 	dAssert (scene);
@@ -53,5 +56,8 @@ void fbxExport::Export (const char* const fileName, dPluginInterface* const inte
 		NewtonMeshSaveOFF (mesh, fileName);
 	}
 */
+
+	// Destroy the SDK manager and all the other objects it was handling.
+	lSdkManager->Destroy();
 }
 

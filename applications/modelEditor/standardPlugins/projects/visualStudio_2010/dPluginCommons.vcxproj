@@ -96,6 +96,10 @@
       <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy  "$(OutDir)$(TargetName).dll" "../../../$(PlatformName)/stdPlugins/*.*"  /F /Y /R
+xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/stdPlugins/*.*"  /F /Y /R</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Midl>
@@ -123,6 +127,10 @@
       <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy  "$(OutDir)$(TargetName).dll" "../../../$(PlatformName)/stdPlugins/*.*"  /F /Y /R
+xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/stdPlugins/*.*"  /F /Y /R</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -147,6 +155,10 @@
       <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy  "$(OutDir)$(TargetName).dll" "../../../$(PlatformName)/stdPlugins/*.*"  /F /Y /R
+xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/stdPlugins/*.*"  /F /Y /R</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Midl>
@@ -174,6 +186,10 @@
       <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy  "$(OutDir)$(TargetName).dll" "../../../$(PlatformName)/stdPlugins/*.*"  /F /Y /R
+xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/stdPlugins/*.*"  /F /Y /R</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\dPluginCommons\dBodyPlugin.cpp" />

@@ -87,7 +87,7 @@
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dContainers;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../coreLibrary_300/source/newton;../../standardPlugins/dPluginCommons;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(FBX_SDK)/include;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dContainers;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../coreLibrary_300/source/newton;../../standardPlugins/dPluginCommons;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;NOPCH;__WXMSW__;WXUSINGDLL;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;_DSCENE_DLL;_DCONTAINERS_DLL;_FBX_PLUGIN_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -98,9 +98,9 @@
       <PrecompiledHeaderFile>dfbxStdafx.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>glu32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glu32.lib;opengl32.lib;libfbxsdk-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(FBX_SDK)/lib/vs2010/x86/debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -121,7 +121,7 @@ xcopy  "$(OutDir)$(TargetName).pdb" "../../$(PlatformName)/stdPlugins/*.*"  /F /
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dContainers;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../coreLibrary_300/source/newton;../../standardPlugins/dPluginCommons;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(FBX_SDK)/include;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dContainers;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../coreLibrary_300/source/newton;../../standardPlugins/dPluginCommons;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;NOPCH;__WXMSW__;WXUSINGDLL;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;_DSCENE_DLL;_DCONTAINERS_DLL;_FBX_PLUGIN_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -132,9 +132,9 @@ xcopy  "$(OutDir)$(TargetName).pdb" "../../$(PlatformName)/stdPlugins/*.*"  /F /
       <PrecompiledHeaderFile>dfbxStdafx.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>glu32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glu32.lib;opengl32.lib;libfbxsdk-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(FBX_SDK)/lib/vs2010/x64/debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -152,7 +152,7 @@ xcopy  "$(OutDir)$(TargetName).pdb" "../../$(PlatformName)/stdPlugins/*.*"  /F /
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dContainers;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../coreLibrary_300/source/newton;../../standardPlugins/dPluginCommons;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(FBX_SDK)/include;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dContainers;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../coreLibrary_300/source/newton;../../standardPlugins/dPluginCommons;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;NOPCH;__WXMSW__;WXUSINGDLL;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;_DSCENE_DLL;_DCONTAINERS_DLL;_FBX_PLUGIN_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -162,9 +162,9 @@ xcopy  "$(OutDir)$(TargetName).pdb" "../../$(PlatformName)/stdPlugins/*.*"  /F /
       <PrecompiledHeaderFile>dfbxStdafx.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>glu32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glu32.lib;opengl32.lib;libfbxsdk-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(FBX_SDK)/lib/vs2010/x86/release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -186,7 +186,7 @@ xcopy  "$(OutDir)$(TargetName).pdb" "../../$(PlatformName)/stdPlugins/*.*"  /F /
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dContainers;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../coreLibrary_300/source/newton;../../standardPlugins/dPluginCommons;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(FBX_SDK)/include;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dContainers;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../coreLibrary_300/source/newton;../../standardPlugins/dPluginCommons;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;NOPCH;__WXMSW__;WXUSINGDLL;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;_DSCENE_DLL;_DCONTAINERS_DLL;_FBX_PLUGIN_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -196,9 +196,9 @@ xcopy  "$(OutDir)$(TargetName).pdb" "../../$(PlatformName)/stdPlugins/*.*"  /F /
       <PrecompiledHeaderFile>dfbxStdafx.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>glu32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glu32.lib;opengl32.lib;libfbxsdk-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(FBX_SDK)/lib/vs2010/x64/release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>

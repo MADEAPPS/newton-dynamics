@@ -30,6 +30,7 @@
 
 #include <windows.h>
 #include <crtdbg.h>
+#include <fbxsdk.h>
 
 #include <dTree.h>
 #include <dList.h>

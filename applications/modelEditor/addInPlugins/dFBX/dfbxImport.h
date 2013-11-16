@@ -20,14 +20,28 @@
 #define _D_FBX_IMPORT_H_
 
 
-class fbxImport: public dImportPlugin
+class dfbxImport: public dImportPlugin
 {
 	public:
 	static dImportPlugin* GetPlugin();
 
+	class ImportStackData
+	{
+		public:
+		ImportStackData (const dMatrix& parentMatrix, FbxNode* const fbxNode, dPluginScene::dTreeNode* parentNode)
+			:m_parentMatrix(parentMatrix)
+			,m_fbxNode(fbxNode)
+			,m_parentNode(parentNode)
+		{
+		}
+		dMatrix m_parentMatrix;
+		FbxNode* m_fbxNode;
+		dPluginScene::dTreeNode* m_parentNode;
+	};
+
 	public:
-	fbxImport():dImportPlugin() {}
-	~fbxImport() {}
+	dfbxImport():dImportPlugin() {}
+	~dfbxImport() {}
 
 	virtual const char* GetMenuName () { return GetSignature();}
 	virtual const char* GetFileExtension () { return "*.fbx";}
@@ -35,6 +49,13 @@ class fbxImport: public dImportPlugin
 
 	virtual const char* GetSignature () {return "fbx mesh import";}
 	virtual bool Import (const char* const fileName, dPluginInterface* const interface);
+
+	private:
+	
+	void PopulateScene (const FbxScene* const fbxScene, dPluginScene* const ngdScene);
+
+	void LoadHiearchy (const FbxScene* const fbxScene, dPluginScene* const ngdScene);
+	dPluginScene::dTreeNode* ImportMeshNode (const FbxNode* const fbxMeshNode, dPluginScene* const ngdScene, dPluginScene::dTreeNode* const rootNode);
 };
 
 #endif

@@ -25,10 +25,8 @@ dPluginRecord** GetPluginArray()
 {
 	static dPluginRecord* array[] = 
 	{
-		fbxImport::GetPlugin(),
-		fbxExport::GetPlugin(),
-//		NewtonMeshEffectImport::GetPlugin(),
-//		NewtonMeshEffectExport::GetPlugin(),
+		dfbxImport::GetPlugin(),
+		dfbxExport::GetPlugin(),
 		NULL
 	};
 
