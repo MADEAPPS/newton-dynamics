@@ -30,8 +30,8 @@ class NewtonMeshEffectImport: public dImportPlugin
 	~NewtonMeshEffectImport(){}
 	virtual const char* GetMenuName () { return GetSignature();}
 	virtual const char* GetFileExtension () { return "*.nme";}
-	virtual const char* GetFileDescription () {return "import NewtonMeshEffect file";}
-	virtual const char* GetSignature () {return "Newton Mesh Effect import";}
+	virtual const char* GetFileDescription () {return "nme import";}
+	virtual const char* GetSignature () {return "Import Newton Mesh Effect file";}
 	virtual bool Import (const char* const fileName, dPluginInterface* const interface);
 	
 	static void DeserializeCallback (void* const serializeHandle, void* const buffer, int size);

@@ -20,11 +20,24 @@
 #include "dfbxImport.h"
 
 
-dImportPlugin* dfbxImport::GetPlugin()
+dImportPlugin* dfbxImport::GetPluginFBX()
 {
-	static dfbxImport plugin;
+	static dfbxImport plugin("*.fbx", "Import Autodesk fbx file", "fbx mesh import");
 	return &plugin;
 }
+
+dImportPlugin* dfbxImport::GetPluginOBJ()
+{
+	static dfbxImport plugin("*.obj", "Import Wavefront obj file", "obj mesh import");
+	return &plugin;
+}
+
+dImportPlugin* dfbxImport::GetPluginDAE()
+{
+	static dfbxImport plugin("*.dae", "Import Autodesk Collada file", "dae mesh import");
+	return &plugin;
+}
+
 
 bool dfbxImport::Import (const char* const fileName, dPluginInterface* const interface)
 {
@@ -89,8 +102,8 @@ bool dfbxImport::Import (const char* const fileName, dPluginInterface* const int
 
 void dfbxImport::PopulateScene (const FbxScene* const fbxScene, dPluginScene* const ngdScene)
 {
-
-	LoadHiearchy (fbxScene, ngdScene);
+	NodeMap nodeMap;
+	LoadHierarchy  (fbxScene, ngdScene, nodeMap);
 /*
 	dList <ImportStackData> nodeStack; 
 	
@@ -179,7 +192,7 @@ dPluginScene::dTreeNode* dfbxImport::ImportMeshNode (const FbxNode* const fbxMes
 }
 
 
-void dfbxImport::LoadHiearchy (const FbxScene* const fbxScene, dPluginScene* const ngdScene)
+void dfbxImport::LoadHierarchy  (const FbxScene* const fbxScene, dPluginScene* const ngdScene, NodeMap& nodeMap)
 {
 	dList <ImportStackData> nodeStack; 
 
@@ -205,6 +218,8 @@ void dfbxImport::LoadHiearchy (const FbxScene* const fbxScene, dPluginScene* con
 
 		info->SetName(data.m_fbxNode->GetName());
 		info->SetTransform(matrix);
+
+		nodeMap.Insert (node, data.m_fbxNode);
 
 		int count = data.m_fbxNode->GetChildCount();
 		for(int i = 0; i < count; i++) {

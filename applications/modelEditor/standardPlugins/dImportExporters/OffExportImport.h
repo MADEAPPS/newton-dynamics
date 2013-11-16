@@ -31,9 +31,9 @@ class OffImport: public dImportPlugin
 
 	virtual const char* GetMenuName () { return GetSignature();}
 	virtual const char* GetFileExtension () { return "*.off";}
-	virtual const char* GetFileDescription () {return "Import OFF file";}
+	virtual const char* GetFileDescription () {return "off mesh import";}
 
-	virtual const char* GetSignature () {return "Off mesh import";}
+	virtual const char* GetSignature () {return "Import Object File Format file";}
 	virtual bool Import (const char* const fileName, dPluginInterface* const interface);
 };
 
