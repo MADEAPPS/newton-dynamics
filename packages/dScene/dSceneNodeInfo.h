@@ -73,8 +73,4 @@ class dSceneNodeInfo: public dNodeInfo
 	dVector m_editorMaxOOBB;    // bounding Box of the body this bod cover in the scene
 };
 
-
-
-
-
 #endif
