@@ -49,6 +49,7 @@ bool dfbxImport::Import (const char* const fileName, dPluginInterface* const int
 
 	// Use the first argument as the filename for the importer.
 	if(fbxImporter->Initialize(fileName, -1, fbxSdk->GetIOSettings())) { 
+		ret = true;
 		// Create a new scene so that it can be populated by the imported file.
 		FbxScene* const fbxScene = FbxScene::Create(fbxSdk,"myScene");
 
@@ -76,7 +77,6 @@ bool dfbxImport::Import (const char* const fileName, dPluginInterface* const int
 		// destroy the scene
 		fbxScene->Destroy();
 	}
-
 
 	// The file is imported, so get rid of the importer.
 	fbxImporter->Destroy();
