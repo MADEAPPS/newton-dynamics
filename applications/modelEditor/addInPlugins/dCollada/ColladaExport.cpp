@@ -725,6 +725,8 @@ _ASSERTE (0);
 
 void ColladaExport::AddControllerLibrary (daeDocument *document, const dScene* scene, UniqueNameFilter& uniqueNames)
 {
+_ASSERTE (0);
+/*
 	domCOLLADA *domRoot = daeSafeCast<domCOLLADA>(document->getDomRoot());
 
 	dScene::Iterator iter (*scene);
@@ -982,6 +984,7 @@ void ColladaExport::AddControllerLibrary (daeDocument *document, const dScene* s
 			}
 		}
 	}
+*/
 }
 
 

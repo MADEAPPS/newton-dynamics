@@ -30,11 +30,11 @@ class dSceneModelInfo: public dNodeInfo
 
 	DSCENE_API dSceneModelInfo();
 	DSCENE_API dSceneModelInfo(dScene* const world);
-	virtual DSCENE_API ~dSceneModelInfo(void);
+	DSCENE_API virtual ~dSceneModelInfo(void);
 
 	protected:
-	virtual DSCENE_API void Serialize (TiXmlElement* const rootNode) const; 
-	virtual DSCENE_API bool Deserialize (const dScene* const scene, TiXmlElement* const rootNode);
+	DSCENE_API virtual void Serialize (TiXmlElement* const rootNode) const; 
+	DSCENE_API virtual bool Deserialize (const dScene* const scene, TiXmlElement* const rootNode);
 };
 
 

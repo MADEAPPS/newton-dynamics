@@ -31,27 +31,27 @@ class dSceneGraph: public dTree<dGraphNode, unsigned>
 	DSCENE_API dSceneGraph(dNodeInfo* const rootInfo);
 	DSCENE_API dSceneGraph(const dSceneGraph& me);
 
-	virtual DSCENE_API ~dSceneGraph(void);
+	DSCENE_API virtual ~dSceneGraph(void);
 
-	virtual DSCENE_API dTreeNode* GetRootNode() const;
-	virtual DSCENE_API void AddRootNode(dNodeInfo* const info);
-	virtual DSCENE_API void DeleteRootNode ();
+	DSCENE_API virtual dTreeNode* GetRootNode() const;
+	DSCENE_API virtual void AddRootNode(dNodeInfo* const info);
+	DSCENE_API virtual void DeleteRootNode ();
 
-	virtual DSCENE_API void SetNodeInfo (dNodeInfo* const newInfo, dTreeNode* const node);
-	virtual DSCENE_API dTreeNode* AddNode (dNodeInfo* const info, dTreeNode* const parent);
-	virtual DSCENE_API void DeleteNode (dTreeNode* const node);
+	DSCENE_API virtual void SetNodeInfo (dNodeInfo* const newInfo, dTreeNode* const node);
+	DSCENE_API virtual dTreeNode* AddNode (dNodeInfo* const info, dTreeNode* const parent);
+	DSCENE_API virtual void DeleteNode (dTreeNode* const node);
 
-	virtual DSCENE_API void AddEdge (dTreeNode* const node1, dTreeNode* const node2);
-	virtual DSCENE_API void DeleteEdge (dTreeNode* const node1, dTreeNode* const node2);
+	DSCENE_API virtual void AddEdge (dTreeNode* const node1, dTreeNode* const node2);
+	DSCENE_API virtual void DeleteEdge (dTreeNode* const node1, dTreeNode* const node2);
 
-	virtual DSCENE_API void UnlinkEdge (dTreeNode* const node1, dTreeNode* const node2);
-	virtual DSCENE_API bool HasLinkToRoot (dTreeNode* const node); 
+	DSCENE_API virtual void UnlinkEdge (dTreeNode* const node1, dTreeNode* const node2);
+	DSCENE_API virtual bool HasLinkToRoot (dTreeNode* const node); 
 
-	virtual DSCENE_API void Serialize (TiXmlElement* const parentNode) const;
-	virtual DSCENE_API bool Deserialize (TiXmlElement* const parentNode);
+	DSCENE_API virtual void Serialize (TiXmlElement* const parentNode) const;
+	DSCENE_API virtual bool Deserialize (TiXmlElement* const parentNode);
 
-	virtual DSCENE_API int GetLRU();
-	virtual DSCENE_API void Cleanup();
+	DSCENE_API virtual int GetLRU();
+	DSCENE_API virtual void Cleanup();
 
 	protected:
 	int m_lru;
@@ -71,13 +71,13 @@ class dGraphNode: public dContainersAlloc
 	public:
 	DSCENE_API dGraphNode ();
 	DSCENE_API dGraphNode (const dGraphNode& node);
-	virtual DSCENE_API ~dGraphNode ();
+	DSCENE_API virtual ~dGraphNode ();
 
-	virtual DSCENE_API dNodeInfo* GetNode() const {return m_nodeInfo;}
-	virtual DSCENE_API void SetNode(dNodeInfo* const newInfo);
+	DSCENE_API virtual dNodeInfo* GetNode() const {return m_nodeInfo;}
+	DSCENE_API virtual void SetNode(dNodeInfo* const newInfo);
 
-	virtual DSCENE_API void SetLRU (int lru) {m_lru = lru;}
-	virtual DSCENE_API int GetLRU () const { return m_lru;}
+	DSCENE_API virtual void SetLRU (int lru) {m_lru = lru;}
+	DSCENE_API virtual int GetLRU () const { return m_lru;}
 
 	private:
 	int m_lru;
