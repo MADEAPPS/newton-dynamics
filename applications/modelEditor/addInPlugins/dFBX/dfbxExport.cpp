@@ -43,35 +43,95 @@ dExportPlugin* dfbxExport::GetPluginDAE()
 
 void dfbxExport::Export (const char* const fileName, dPluginInterface* const interface)
 {
-	// Initialize the SDK manager. This object handles memory management.
-	FbxManager* const lSdkManager = FbxManager::Create();
-	dAssert (lSdkManager);
-
-/*
 	dScene* const scene = interface->GetScene();
 	dAssert (scene);
 
-	int count = 0;
-	NewtonMesh* mesh = NULL;
-	dScene::dTreeNode* const geometryCache = scene->FindGetGeometryCacheNode ();
-	for (void* link = scene->GetFirstChildLink(geometryCache); link; link = scene->GetNextChildLink(geometryCache, link)) {
-		dScene::dTreeNode* const node = scene->GetNodeFromLink(link);
-		dNodeInfo* const info = scene->GetInfoFromNode(node);
-		if (info->IsType(dMeshNodeInfo::GetRttiType())) {
-			if (info->GetEditorFlags() & dPluginInterface::m_selected) {
-				dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*) info;
-				mesh = meshInfo->GetMesh();
-				count ++;
+	NewtonWorld* const world = scene->GetNewtonWorld();
+	dAssert (world);
+
+	// Initialize the SDK manager. This object handles memory management.
+	FbxManager* const fbxSdk = FbxManager::Create();
+	dAssert (fbxSdk);
+
+	// for FBX formats, try sitting ascii format
+	int fileFormat = -1;
+	int formatsCount = fbxSdk->GetIOPluginRegistry()->GetWriterFormatCount();
+	for (int i = 0; i < formatsCount; i++)
+	{
+		if (fbxSdk->GetIOPluginRegistry()->WriterIsFBX(i)) {
+			const FbxString& lDesc = fbxSdk->GetIOPluginRegistry()->GetWriterFormatDescription(i);
+			if (lDesc.Find("ascii") >= 0)
+			{
+				fileFormat = i;
+				break;
 			}
 		}
 	}
 
-	if (count == 1) {
-		NewtonMeshSaveOFF (mesh, fileName);
-	}
+
+	// Create the IO settings object.
+	FbxIOSettings* const ios = FbxIOSettings::Create(fbxSdk, IOSROOT);
+	fbxSdk->SetIOSettings(ios);
+
+	// create an exporter
+	FbxExporter* const fbxExporter = FbxExporter::Create(fbxSdk, "");
+
+	// Use the first argument as the filename for the importer.
+	if (fbxExporter->Initialize(fileName, fileFormat, fbxSdk->GetIOSettings())) { 
+
+/*
+		dScene* const scene = interface->GetScene();
+		dAssert (scene);
+
+		int count = 0;
+		NewtonMesh* mesh = NULL;
+		dScene::dTreeNode* const geometryCache = scene->FindGetGeometryCacheNode ();
+		for (void* link = scene->GetFirstChildLink(geometryCache); link; link = scene->GetNextChildLink(geometryCache, link)) {
+			dScene::dTreeNode* const node = scene->GetNodeFromLink(link);
+			dNodeInfo* const info = scene->GetInfoFromNode(node);
+			if (info->IsType(dMeshNodeInfo::GetRttiType())) {
+				if (info->GetEditorFlags() & dPluginInterface::m_selected) {
+					dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*) info;
+					mesh = meshInfo->GetMesh();
+					count ++;
+				}
+			}
+		}
+
+		if (count == 1) {
+			NewtonMeshSaveOFF (mesh, fileName);
+		}
 */
 
+		// Create a new scene so that it can be populated by the imported file.
+		FbxScene* const fbxScene = FbxScene::Create(fbxSdk,"myScene");
+
+
+
+		// set the scene information
+		FbxDocumentInfo* sceneInfo = FbxDocumentInfo::Create(fbxSdk, "SceneInfo");
+		sceneInfo->mTitle = "Example scene";
+		sceneInfo->mSubject = "";
+		sceneInfo->mAuthor = "Newton Game Dynamic, model editor";
+		sceneInfo->mRevision = "revision 1.0";
+		sceneInfo->mKeywords = "";
+		sceneInfo->mComment = "converted from NGD format, for more info go to: http://newtondynamics.com";
+		fbxScene->SetSceneInfo(sceneInfo);
+
+		// Import the contents of the file into the scene.
+		fbxExporter->Export(fbxScene);
+
+	}
+
+	fbxSdk->SetIOSettings(NULL);
+
+	// The file is imported, so get rid of the importer.
+	fbxExporter->Destroy();
+
+	// destroy the IO settings object.
+	ios->Destroy();
+
 	// Destroy the SDK manager and all the other objects it was handling.
-	lSdkManager->Destroy();
+	fbxSdk->Destroy();
 }
 

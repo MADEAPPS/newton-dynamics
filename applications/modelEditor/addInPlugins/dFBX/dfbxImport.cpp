@@ -96,8 +96,13 @@ bool dfbxImport::Import (const char* const fileName, dPluginInterface* const int
 		fbxScene->Destroy();
 	}
 
+	fbxSdk->SetIOSettings(NULL);
+
 	// The file is imported, so get rid of the importer.
 	fbxImporter->Destroy();
+
+	// destroy the IO settings object.
+	ios->Destroy();
 
 	// Destroy the SDK manager and all the other objects it was handling.
 	fbxSdk->Destroy();

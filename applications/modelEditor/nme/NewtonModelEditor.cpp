@@ -637,12 +637,12 @@ void NewtonModelEditor::OnExport (wxCommandEvent& event)
 	int id = event.GetId() - ID_EXPORT_PLUGINS;
 	dExportPlugin* const plugin = (dExportPlugin*) m_mainMenu->GetPlugin(m_mainMenu->m_exportPlugins, id);
 	dAssert (plugin);
-	if (HasMeshSelection (dMeshNodeInfo::GetRttiType())) {
-		wxFileDialog open (this, wxT(plugin->GetFileDescription ()), wxT("../../../media"), wxT(""), wxT(plugin->GetFileExtension ()));
-		if (open.ShowModal() == wxID_OK) {
-			plugin->Export (open.GetPath().mb_str(), this);
-		}
+//	if (HasMeshSelection (dMeshNodeInfo::GetRttiType())) {
+	wxFileDialog open (this, wxT(plugin->GetFileDescription ()), wxT("../../../media"), wxT(""), wxT(plugin->GetFileExtension ()));
+	if (open.ShowModal() == wxID_OK) {
+		plugin->Export (open.GetPath().mb_str(), this);
 	}
+//	}
 }
 
 
