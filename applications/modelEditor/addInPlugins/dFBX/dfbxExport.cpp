@@ -96,10 +96,12 @@ void dfbxExport::Export (const char* const fileName, dPluginInterface* const int
 		BuildMeshes (scene, fbxScene, meshMap);
 		LoadNodes (scene, fbxScene, meshMap);
 
+//		const  FbxSystemUnit::ConversionOptions lConversionOptions = {true, true, true, true, true, true};
+//		FbxSystemUnit::Inch.ConvertScene(fbxScene, lConversionOptions);
+//		FbxAxisSystem::Max.ConvertScene(fbxScene);
 
 		// Import the contents of the file into the scene.
 		fbxExporter->Export(fbxScene);
-
 	}
 
 	fbxSdk->SetIOSettings(NULL);
@@ -133,6 +135,25 @@ void dfbxExport::LoadNode (dPluginScene* const scene, FbxScene* const fbxScene, 
 	dSceneNodeInfo* const nodeInfo = (dSceneNodeInfo*)scene->GetInfoFromNode(node);
 	FbxNode* const fpxNode = FbxNode::Create(fbxScene, nodeInfo->GetName());
 	fbxRoot->AddChild(fpxNode);
+
+	dMatrix matrix (nodeInfo->GetTransform());
+	FbxMatrix fbxMatrix;
+	double* const data = fbxMatrix;
+	for (int i = 0; i < 4; i ++) {
+		for (int j = 0; j < 4; j ++) {
+			data[i * 4 + j] = matrix[i][j];
+		}
+	}
+	FbxVector4 translation;
+	FbxQuaternion rotation;
+	FbxVector4 shearing;
+	FbxVector4 scaling;
+	double sign;
+	fbxMatrix.GetElements(translation, rotation, shearing, scaling, sign);
+
+	fpxNode->LclTranslation.Set(translation);
+	fpxNode->LclRotation.Set(rotation.DecomposeSphericalXYZ());
+	fpxNode->LclScaling.Set(scaling);
 
 	for (void* ptr = scene->GetFirstChildLink(node); ptr; ptr = scene->GetNextChildLink(node, ptr) ) {
 		dScene::dTreeNode* const childNode = scene->GetNodeFromLink(ptr);
@@ -171,6 +192,16 @@ void dfbxExport::BuildMeshes (dPluginScene* const ngdScene, FbxScene* const fbxS
 			}
 			FbxMesh* const fbxMesh = FbxMesh::Create(fbxScene, name);
 			meshMap.Insert(fbxMesh, node);
+
+			dMatrix matrix (meshInfo->GetPivotMatrix());
+			FbxAMatrix fbxMatrix;
+			double* const data = fbxMatrix;
+			for (int i = 0; i < 4; i ++) {
+				for (int j = 0; j < 4; j ++) {
+					data[i * 4 + j] = matrix[i][j];
+				}
+			}
+			fbxMesh->SetPivot(fbxMatrix);
 
 			NewtonMesh* const mesh = meshInfo->GetMesh();
 		}
