@@ -100,99 +100,61 @@ bool dfbxImport::Import (const char* const fileName, dPluginInterface* const int
 }
 
 
-void dfbxImport::PopulateScene (const FbxScene* const fbxScene, dPluginScene* const ngdScene)
+void dfbxImport::PopulateScene (FbxScene* const fbxScene, dPluginScene* const ngdScene)
 {
 	NodeMap nodeMap;
+	dTree<dPluginScene::dTreeNode*, FbxMesh*> meshCache;
+
 	LoadHierarchy  (fbxScene, ngdScene, nodeMap);
-/*
-	dList <ImportStackData> nodeStack; 
-	
-	// Print the nodes of the scene and their attributes recursively.
-	FbxNode* const rootNode = fbxScene->GetRootNode();
-	if(rootNode) {
-		int count = rootNode->GetChildCount();
-		for(int i = 0; i < count; i++) {
-			nodeStack.Append(ImportStackData (GetIdentityMatrix(), rootNode->GetChild(count - i - 1), ngdScene->GetRoot()));
-		}
-	}
 
-	while (nodeStack.GetCount()) {
+	NodeMap::Iterator iter (nodeMap);
+	for (iter.Begin(); iter; iter ++) {
+		FbxNode* const fbxNode = iter.GetKey(); 
+		dScene::dTreeNode* const node = iter.GetNode()->GetInfo(); 
 
-		ImportStackData data (nodeStack.GetLast()->GetInfo());
-		nodeStack.Remove(nodeStack.GetLast());
+		FbxNodeAttribute* const attribute = fbxNode->GetNodeAttribute();
+		dAssert (attribute);
 
-		FbxAMatrix fpxNoceMatrix (data.m_fbxNode->EvaluateLocalTransform());
+		FbxNodeAttribute::EType attributeType = attribute->GetAttributeType();
 
-		dMatrix matrix (fpxNoceMatrix);
-//		FbxDouble3 translation = data.m_fbxNode->LclTranslation.Get();
-//		FbxDouble3 rotation = data.m_fbxNode->LclRotation.Get();
-//		FbxDouble3 scaling = data.m_fbxNode->LclScaling.Get();
-
-		FbxNodeAttribute* const attribute = data.m_fbxNode->GetNodeAttribute();
-		dPluginScene::dTreeNode* parentNode = data.m_parentNode;
-		if (attribute) {
-			FbxNodeAttribute::EType attributeType = attribute->GetAttributeType();
-
-			switch (attributeType)
+		switch (attributeType)
+		{
+			case FbxNodeAttribute::eMesh: 
 			{
-				case FbxNodeAttribute::eMesh: 
-				{
-					parentNode = ImportMeshNode (data.m_fbxNode, ngdScene, parentNode);
-					break;
-				}
+				ImportMeshNode (fbxNode, ngdScene, node, meshCache);
+				break;
+			}
 
-				case FbxNodeAttribute::eNull:
-				case FbxNodeAttribute::eMarker:
-				case FbxNodeAttribute::eSkeleton: 
-				case FbxNodeAttribute::eNurbs: 
-				case FbxNodeAttribute::ePatch:
-				case FbxNodeAttribute::eCamera: 
-				case FbxNodeAttribute::eCameraStereo:
-				case FbxNodeAttribute::eCameraSwitcher:
-				case FbxNodeAttribute::eLight:
-				case FbxNodeAttribute::eOpticalReference:
-				case FbxNodeAttribute::eOpticalMarker:
-				case FbxNodeAttribute::eNurbsCurve:
-				case FbxNodeAttribute::eTrimNurbsSurface:
-				case FbxNodeAttribute::eBoundary:
-				case FbxNodeAttribute::eNurbsSurface:
-				case FbxNodeAttribute::eShape:
-				case FbxNodeAttribute::eLODGroup:
-				case FbxNodeAttribute::eSubDiv:
-				case FbxNodeAttribute::eCachedEffect:
-				case FbxNodeAttribute::eLine:
-				case FbxNodeAttribute::eUnknown:
-				default:
-					dAssert(0);
-					break;
-
-			}   
-		} else {
-			dAssert(0);
-		}
-		
-		int count = rootNode->GetChildCount();
-		for(int i = 0; i < count; i++) {
-			dAssert (0);
-//			parentNode.Append(parent);
-//			nodeStack.Append(rootNode->GetChild(count - i - 1));
+			case FbxNodeAttribute::eNull:
+			case FbxNodeAttribute::eMarker:
+			case FbxNodeAttribute::eSkeleton: 
+			case FbxNodeAttribute::eNurbs: 
+			case FbxNodeAttribute::ePatch:
+			case FbxNodeAttribute::eCamera: 
+			case FbxNodeAttribute::eCameraStereo:
+			case FbxNodeAttribute::eCameraSwitcher:
+			case FbxNodeAttribute::eLight:
+			case FbxNodeAttribute::eOpticalReference:
+			case FbxNodeAttribute::eOpticalMarker:
+			case FbxNodeAttribute::eNurbsCurve:
+			case FbxNodeAttribute::eTrimNurbsSurface:
+			case FbxNodeAttribute::eBoundary:
+			case FbxNodeAttribute::eNurbsSurface:
+			case FbxNodeAttribute::eShape:
+			case FbxNodeAttribute::eLODGroup:
+			case FbxNodeAttribute::eSubDiv:
+			case FbxNodeAttribute::eCachedEffect:
+			case FbxNodeAttribute::eLine:
+			case FbxNodeAttribute::eUnknown:
+			default:
+				dAssert(0);
+				break;
 		}
 	}
-*/
 }
 
 
-
-
-
-dPluginScene::dTreeNode* dfbxImport::ImportMeshNode (const FbxNode* const fbxMeshNode, dPluginScene* const ngdScene, dPluginScene::dTreeNode* const rootNode)
-{
-
-	return NULL;
-}
-
-
-void dfbxImport::LoadHierarchy  (const FbxScene* const fbxScene, dPluginScene* const ngdScene, NodeMap& nodeMap)
+void dfbxImport::LoadHierarchy  (FbxScene* const fbxScene, dPluginScene* const ngdScene, NodeMap& nodeMap)
 {
 	dList <ImportStackData> nodeStack; 
 
@@ -225,5 +187,26 @@ void dfbxImport::LoadHierarchy  (const FbxScene* const fbxScene, dPluginScene* c
 		for(int i = 0; i < count; i++) {
 			nodeStack.Append(ImportStackData (matrix, data.m_fbxNode->GetChild(count - i - 1), node));	
 		}
+	}
+}
+
+
+void dfbxImport::ImportMeshNode (FbxNode* const fbxMeshNode, dPluginScene* const ngdScene, dPluginScene::dTreeNode* const node, dTree<dPluginScene::dTreeNode*, FbxMesh*>& meshCache)
+{
+	dTree<dPluginScene::dTreeNode*, FbxMesh*>::dTreeNode* instanceNode = meshCache.Find(fbxMeshNode->GetMesh());
+	if (instanceNode) {
+		dScene::dTreeNode* const meshInstance = instanceNode->GetInfo();
+		ngdScene->AddReference (node, meshInstance);
+	} else {
+		FbxMesh* const fbxMesh = fbxMeshNode->GetMesh();
+		dScene::dTreeNode* const meshNode = ngdScene->CreateMeshNode(node);
+		meshCache.Insert (meshNode, fbxMesh);
+
+		dMeshNodeInfo* const instance = (dMeshNodeInfo*) ngdScene->GetInfoFromNode(meshNode);
+		char name[256];
+		sprintf (name, "%s_mesh", fbxMeshNode->GetName());
+		instance->SetName(name);
+
+
 	}
 }

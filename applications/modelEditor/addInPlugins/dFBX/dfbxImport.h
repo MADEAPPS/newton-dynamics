@@ -65,57 +65,13 @@ class dfbxImport: public dImportPlugin
 	virtual bool Import (const char* const fileName, dPluginInterface* const interface);
 
 	private:
-	void PopulateScene (const FbxScene* const fbxScene, dPluginScene* const ngdScene);
-	void LoadHierarchy  (const FbxScene* const fbxScene, dPluginScene* const ngdScene, NodeMap& nodeMap);
-	dPluginScene::dTreeNode* ImportMeshNode (const FbxNode* const fbxMeshNode, dPluginScene* const ngdScene, dPluginScene::dTreeNode* const rootNode);
+	void PopulateScene (FbxScene* const fbxScene, dPluginScene* const ngdScene);
+	void LoadHierarchy  (FbxScene* const fbxScene, dPluginScene* const ngdScene, NodeMap& nodeMap);
+	void ImportMeshNode (FbxNode* const fbxMeshNode, dPluginScene* const ngdScene, dPluginScene::dTreeNode* const node, dTree<dPluginScene::dTreeNode*, FbxMesh*>& meshCache);
 
 	char m_ext[32];
 	char m_signature[32];
 	char m_description[32];
 };
 
-/*
-
-class dfbxImport: public dImportPlugin
-{
-	public:
-	static dImportPlugin* GetPlugin();
-
-	class NodeMap: public dTree<dScene::dTreeNode*, FbxNode*>
-	{
-	};
-
-	class ImportStackData
-	{
-		public:
-		ImportStackData (const dMatrix& parentMatrix, FbxNode* const fbxNode, dPluginScene::dTreeNode* parentNode)
-			:m_parentMatrix(parentMatrix)
-			,m_fbxNode(fbxNode)
-			,m_parentNode(parentNode)
-		{
-		}
-		dMatrix m_parentMatrix;
-		FbxNode* m_fbxNode;
-		dPluginScene::dTreeNode* m_parentNode;
-	};
-
-	public:
-	dfbxImport():dImportPlugin() {}
-	~dfbxImport() {}
-
-	virtual const char* GetMenuName () { return GetSignature();}
-	virtual const char* GetFileExtension () { return "*.fbx";}
-	virtual const char* GetFileDescription () {return "Import autodesk fbx file";}
-
-	virtual const char* GetSignature () {return "fbx mesh import";}
-	virtual bool Import (const char* const fileName, dPluginInterface* const interface);
-
-	private:
-	
-	void PopulateScene (const FbxScene* const fbxScene, dPluginScene* const ngdScene);
-
-	void LoadHierarchy  (const FbxScene* const fbxScene, dPluginScene* const ngdScene, NodeMap& nodeMap);
-	dPluginScene::dTreeNode* ImportMeshNode (const FbxNode* const fbxMeshNode, dPluginScene* const ngdScene, dPluginScene::dTreeNode* const rootNode);
-};
-*/
 #endif
