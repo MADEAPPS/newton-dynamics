@@ -207,6 +207,74 @@ void dfbxImport::ImportMeshNode (FbxNode* const fbxMeshNode, dPluginScene* const
 		sprintf (name, "%s_mesh", fbxMeshNode->GetName());
 		instance->SetName(name);
 
+		int faceCount = fbxMesh->GetPolygonCount();
+		
+		int indexCount = 0;
+		for (int i = 0; i < faceCount; i ++) {
+			indexCount += fbxMesh->GetPolygonSize(i);
+		}
 
+		int* const faceIndexList = new int [faceCount];
+		int* const materialIndex = new int [faceCount];
+		int* const vertexIndex = new int [indexCount];
+		int* const normalIndex = new int [indexCount];
+		int* const uv0Index = new int [indexCount];
+
+		FbxVector4* const normals = new FbxVector4[indexCount];
+		FbxVector2* const uv0 = new FbxVector2[indexCount];
+		FbxVector4* const vertexArray = fbxMesh->GetControlPoints();
+
+		FbxGeometryElementUV* const uvArray = fbxMesh->GetElementUV ();
+		FbxLayerElement::EMappingMode mapingMode = uvArray->GetMappingMode();
+		FbxLayerElement::EReferenceMode refMode = uvArray->GetReferenceMode();
+
+		bool faceMapping = (refMode == FbxGeometryElement::eDirect) || (refMode == FbxGeometryElement::eIndexToDirect) || (mapingMode == FbxGeometryElement::eByPolygonVertex);
+
+		int index = 0;
+		for (int i = 0; i < faceCount; i ++) {
+			int polygonIndexCount = fbxMesh->GetPolygonSize(i);
+
+			materialIndex[i] = 0;
+			faceIndexList[i] = polygonIndexCount;
+			for (int j = 0; j < polygonIndexCount; j ++) {
+				vertexIndex[index] = fbxMesh->GetPolygonVertex (i, j);
+				FbxVector4 n(0, 1, 0, 0);
+				fbxMesh->GetPolygonVertexNormal (i, j, n);
+				normals[index] = n;
+				normalIndex[index] = index;
+
+				FbxVector2 uv(0, 0);
+				if (faceMapping) {
+					int textIndex = fbxMesh->GetTextureUVIndex(i, j);
+					uv = uvArray->GetDirectArray().GetAt(textIndex);
+				}
+				uv0[index] = uv;
+
+				int uvIndex = fbxMesh->GetTextureUVIndex(i, j, FbxLayerElement::eTextureDiffuse);
+				if (uvIndex < 0) {
+					uvIndex = 0;
+				}
+				uv0Index[index] = uvIndex;
+
+				index ++;
+				dAssert (index <= indexCount);
+			}
+		}
+
+/*
+		instance->BuildFromVertexListIndexList(faceCount, indexCount, materialIndex, 
+			&vertex[0].m_x, sizeof (dVector), vertexList,
+			&normal[0].m_x, sizeof (dVector), normalList,
+			&UV0[0].m_x, sizeof (dVector), uv0List,
+			&UV1.m_x, sizeof (dVector), uv1List);
+*/
+
+		delete[] uv0;
+		delete[] normals;
+		delete[] vertexIndex;
+		delete[] normalIndex;
+		delete[] uv0Index;
+		delete[] materialIndex;
+		delete[] faceIndexList;
 	}
 }
