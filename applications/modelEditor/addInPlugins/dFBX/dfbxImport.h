@@ -47,7 +47,7 @@ class dfbxImport: public dImportPlugin
 	};
 
 	public:
-	dfbxImport(const char* const ext, const char* const signature, const char* const description)
+	dfbxImport (const char* const ext, const char* const signature, const char* const description)
 		:dImportPlugin() 
 	{
 		strcpy (m_ext, ext);

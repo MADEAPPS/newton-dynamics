@@ -49,8 +49,8 @@ class NewtonMeshEffectExport: public dExportPlugin
 	~NewtonMeshEffectExport(){}
 	virtual const char* GetMenuName () { return GetSignature();}
 	virtual const char* GetFileExtension () { return "*.nme";}
-	virtual const char* GetFileDescription () {return "save selected mesh as NewtonMeshEffect file";}
-	virtual const char* GetSignature () {return "Newton Mesh Effect Export";}
+	virtual const char* GetFileDescription () {return "nme export";}
+	virtual const char* GetSignature () {return "Export Newton Mesh Effect file";}
 	virtual void Export (const char* const fileName, dPluginInterface* const interface);
 
 	static void SerializeCallback (void* const serializeHandle, const void* const buffer, int size);

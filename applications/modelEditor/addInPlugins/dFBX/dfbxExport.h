@@ -23,18 +23,32 @@
 class dfbxExport: public dExportPlugin
 {
 	public:
-	static dExportPlugin* GetPlugin();
+	static dExportPlugin* GetPluginFBX();
+	static dExportPlugin* GetPluginOBJ();
+	static dExportPlugin* GetPluginDAE();
 
 	public:
-	dfbxExport():dExportPlugin(){}
+	dfbxExport(const char* const ext, const char* const signature, const char* const description)
+		:dExportPlugin()
+	{
+		strcpy (m_ext, ext);
+		strcpy (m_signature, signature);
+		strcpy (m_description, description);
+	}
 	~dfbxExport(){}
 
 	virtual const char* GetMenuName () { return GetSignature();}
-	virtual const char* GetFileExtension () { return "*.fbx";}
-	virtual const char* GetFileDescription () {return "save selected mesh as autodesk fbx file";}
 
-	virtual const char* GetSignature () {return "fbx mesh export";}
+	virtual const char* GetFileExtension () { return m_ext;}
+	virtual const char* GetSignature () {return m_signature;}
+	virtual const char* GetFileDescription () {return m_description;}
+
 	virtual void Export (const char* const fileName, dPluginInterface* const interface);
+
+	char m_ext[32];
+	char m_signature[32];
+	char m_description[32];
+
 };
 
 #endif

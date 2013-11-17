@@ -26,9 +26,14 @@ dPluginRecord** GetPluginArray()
 	static dPluginRecord* array[] = 
 	{
 		dfbxImport::GetPluginFBX(),
+		dfbxExport::GetPluginFBX(),
+
 		dfbxImport::GetPluginOBJ(),
+		dfbxExport::GetPluginOBJ(),
+
 		dfbxImport::GetPluginDAE(),
-		dfbxExport::GetPlugin(),
+		dfbxExport::GetPluginDAE(),
+
 		NULL
 	};
 

@@ -20,11 +20,25 @@
 #include "dfbxExport.h"
 
 
-dExportPlugin* dfbxExport::GetPlugin()
+
+dExportPlugin* dfbxExport::GetPluginFBX()
 {
-	static dfbxExport plugin;
+	static dfbxExport plugin("*.fbx", "Export Autodesk fbx file", "fbx mesh export");
 	return &plugin;
 }
+
+dExportPlugin* dfbxExport::GetPluginOBJ()
+{
+	static dfbxExport plugin("*.obj", "Export Wavefront obj file", "obj mesh export");
+	return &plugin;
+}
+
+dExportPlugin* dfbxExport::GetPluginDAE()
+{
+	static dfbxExport plugin("*.dae", "Export Autodesk Collada file", "dae mesh export");
+	return &plugin;
+}
+
 
 
 void dfbxExport::Export (const char* const fileName, dPluginInterface* const interface)
