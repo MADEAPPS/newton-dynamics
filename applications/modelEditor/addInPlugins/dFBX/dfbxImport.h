@@ -54,10 +54,9 @@ class dfbxImport: public dImportPlugin
 		strcpy (m_signature, signature);
 		strcpy (m_description, description);
 	}
+	
 	~dfbxImport() {}
-
 	virtual const char* GetMenuName () { return GetSignature();}
-
 	virtual const char* GetFileExtension () { return m_ext;}
 	virtual const char* GetSignature () {return m_signature;}
 	virtual const char* GetFileDescription () {return m_description;}

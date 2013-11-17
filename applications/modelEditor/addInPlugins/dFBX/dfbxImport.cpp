@@ -43,7 +43,7 @@ bool dfbxImport::Import (const char* const fileName, dPluginInterface* const int
 {
 	bool ret = false;
 
-	dScene* const scene = interface->GetScene();
+	dPluginScene* const scene = interface->GetScene();
 	dAssert (scene);
 
 	NewtonWorld* const world = scene->GetNewtonWorld();
@@ -76,17 +76,6 @@ bool dfbxImport::Import (const char* const fileName, dPluginInterface* const int
 
 //		NewtonMeshFixTJoints (mesh);
 		dPluginScene* const asset = new dPluginScene(world);
-/*
-		dString name (GetNameFromPath(fileName));
-		name = name.SubString (0, name.Find ('.'));
-		dPluginScene::dTreeNode* const sceneNode = asset->CreateSceneNode (asset->GetRoot());
-		dSceneModelInfo* const sceneNodeInfo = (dSceneModelInfo*) asset->GetInfoFromNode(sceneNode);
-		sceneNodeInfo->SetName(name.GetStr());	
-		dPluginScene::dTreeNode* const meshNode = asset->CreateMeshNode(sceneNode);
-		dMeshNodeInfo* const instance = (dMeshNodeInfo*) asset->GetInfoFromNode(meshNode);
-		instance->SetName ((name + "_mesh").GetStr());
-		instance->ReplaceMesh (mesh);
-*/
 		PopulateScene (fbxScene, asset);
 
 		interface->MergeScene (asset);
@@ -332,11 +321,13 @@ void dfbxImport::ImportMeshNode (FbxNode* const fbxMeshNode, dPluginScene* const
 			vertexArray[i] = dVector (dFloat(p[0]), dFloat(p[1]), dFloat(p[2]), 0.0f);
 		}
 
+		bool faceMapping = false;
 		FbxGeometryElementUV* const uvArray = fbxMesh->GetElementUV ();
-		FbxLayerElement::EMappingMode mapingMode = uvArray->GetMappingMode();
-		FbxLayerElement::EReferenceMode refMode = uvArray->GetReferenceMode();
-
-		bool faceMapping = (refMode == FbxGeometryElement::eDirect) || (refMode == FbxGeometryElement::eIndexToDirect) || (mapingMode == FbxGeometryElement::eByPolygonVertex);
+		if (uvArray) {
+			FbxLayerElement::EMappingMode mapingMode = uvArray->GetMappingMode();
+			FbxLayerElement::EReferenceMode refMode = uvArray->GetReferenceMode();
+			faceMapping = (refMode == FbxGeometryElement::eDirect) || (refMode == FbxGeometryElement::eIndexToDirect) || (mapingMode == FbxGeometryElement::eByPolygonVertex);
+		}
 
 		int index = 0;
 		for (int i = 0; i < faceCount; i ++) {

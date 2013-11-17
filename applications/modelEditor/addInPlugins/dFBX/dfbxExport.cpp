@@ -43,7 +43,7 @@ dExportPlugin* dfbxExport::GetPluginDAE()
 
 void dfbxExport::Export (const char* const fileName, dPluginInterface* const interface)
 {
-	dScene* const scene = interface->GetScene();
+	dPluginScene* const scene = interface->GetScene();
 	dAssert (scene);
 
 	NewtonWorld* const world = scene->GetNewtonWorld();
@@ -79,37 +79,11 @@ void dfbxExport::Export (const char* const fileName, dPluginInterface* const int
 	// Use the first argument as the filename for the importer.
 	if (fbxExporter->Initialize(fileName, fileFormat, fbxSdk->GetIOSettings())) { 
 
-/*
-		dScene* const scene = interface->GetScene();
-		dAssert (scene);
-
-		int count = 0;
-		NewtonMesh* mesh = NULL;
-		dScene::dTreeNode* const geometryCache = scene->FindGetGeometryCacheNode ();
-		for (void* link = scene->GetFirstChildLink(geometryCache); link; link = scene->GetNextChildLink(geometryCache, link)) {
-			dScene::dTreeNode* const node = scene->GetNodeFromLink(link);
-			dNodeInfo* const info = scene->GetInfoFromNode(node);
-			if (info->IsType(dMeshNodeInfo::GetRttiType())) {
-				if (info->GetEditorFlags() & dPluginInterface::m_selected) {
-					dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*) info;
-					mesh = meshInfo->GetMesh();
-					count ++;
-				}
-			}
-		}
-
-		if (count == 1) {
-			NewtonMeshSaveOFF (mesh, fileName);
-		}
-*/
-
 		// Create a new scene so that it can be populated by the imported file.
 		FbxScene* const fbxScene = FbxScene::Create(fbxSdk,"myScene");
 
-
-
 		// set the scene information
-		FbxDocumentInfo* sceneInfo = FbxDocumentInfo::Create(fbxSdk, "SceneInfo");
+		FbxDocumentInfo* const sceneInfo = FbxDocumentInfo::Create(fbxSdk, "SceneInfo");
 		sceneInfo->mTitle = "Example scene";
 		sceneInfo->mSubject = "";
 		sceneInfo->mAuthor = "Newton Game Dynamic, model editor";
@@ -117,6 +91,11 @@ void dfbxExport::Export (const char* const fileName, dPluginInterface* const int
 		sceneInfo->mKeywords = "";
 		sceneInfo->mComment = "converted from NGD format, for more info go to: http://newtondynamics.com";
 		fbxScene->SetSceneInfo(sceneInfo);
+
+		dTree<FbxMesh*, dPluginScene::dTreeNode*> meshMap;
+		BuildMeshes (scene, fbxScene, meshMap);
+		LoadNodes (scene, fbxScene, meshMap);
+
 
 		// Import the contents of the file into the scene.
 		fbxExporter->Export(fbxScene);
@@ -135,3 +114,65 @@ void dfbxExport::Export (const char* const fileName, dPluginInterface* const int
 	fbxSdk->Destroy();
 }
 
+
+void dfbxExport::LoadNodes (dPluginScene* const scene, FbxScene* const fbxScene, dTree<FbxMesh*, dPluginScene::dTreeNode*>& meshMap)
+{
+	dScene::dTreeNode* const root = scene->GetRootNode();
+
+	for (void* ptr = scene->GetFirstChildLink(root); ptr; ptr = scene->GetNextChildLink(root, ptr) ) {
+		dScene::dTreeNode* const node = scene->GetNodeFromLink(ptr);
+		dNodeInfo* const info = scene->GetInfoFromNode(node);
+		if (info->IsType(dSceneNodeInfo::GetRttiType())) {
+			LoadNode (scene, fbxScene, fbxScene->GetRootNode(), node, meshMap);
+		}
+	}
+}
+
+void dfbxExport::LoadNode (dPluginScene* const scene, FbxScene* const fbxScene, FbxNode* const fbxRoot, dPluginScene::dTreeNode* const node, dTree<FbxMesh*, dPluginScene::dTreeNode*>& meshMap)
+{
+	dSceneNodeInfo* const nodeInfo = (dSceneNodeInfo*)scene->GetInfoFromNode(node);
+	FbxNode* const fpxNode = FbxNode::Create(fbxScene, nodeInfo->GetName());
+	fbxRoot->AddChild(fpxNode);
+
+	for (void* ptr = scene->GetFirstChildLink(node); ptr; ptr = scene->GetNextChildLink(node, ptr) ) {
+		dScene::dTreeNode* const childNode = scene->GetNodeFromLink(ptr);
+		dNodeInfo* const childInfo = scene->GetInfoFromNode(childNode);
+		if (childInfo->IsType(dGeometryNodeInfo::GetRttiType())) {
+			dAssert(meshMap.Find(childNode));
+			FbxMesh* const fbxMesh = meshMap.Find(childNode)->GetInfo();
+			fpxNode->SetNodeAttribute(fbxMesh);
+			break;
+		}
+	}
+	
+	for (void* ptr = scene->GetFirstChildLink(node); ptr; ptr = scene->GetNextChildLink(node, ptr) ) {
+		dScene::dTreeNode* const childNode = scene->GetNodeFromLink(ptr);
+		dNodeInfo* const childInfo = scene->GetInfoFromNode(childNode);
+		if (childInfo->IsType(dSceneNodeInfo::GetRttiType())) {
+			LoadNode (scene, fbxScene, fpxNode, childNode, meshMap);
+		}
+	}
+}
+
+
+void dfbxExport::BuildMeshes (dPluginScene* const ngdScene, FbxScene* const fbxScene, dTree<FbxMesh*, dPluginScene::dTreeNode*>& meshMap)
+{
+	dScene::dTreeNode* const geometryCache = ngdScene->FindGetGeometryCacheNode ();
+	for (void* link = ngdScene->GetFirstChildLink(geometryCache); link; link = ngdScene->GetNextChildLink(geometryCache, link)) {
+		dScene::dTreeNode* const node = ngdScene->GetNodeFromLink(link);
+		dNodeInfo* const info = ngdScene->GetInfoFromNode(node);
+		if (info->IsType(dMeshNodeInfo::GetRttiType())) {
+			dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*) info;
+			char name[256];
+			strcpy (name, meshInfo->GetName());
+			char* const ptr = strstr (name, "_mesh");
+			if (ptr) {
+				ptr[0] = 0;
+			}
+			FbxMesh* const fbxMesh = FbxMesh::Create(fbxScene, name);
+			meshMap.Insert(fbxMesh, node);
+
+			NewtonMesh* const mesh = meshInfo->GetMesh();
+		}
+	}
+}

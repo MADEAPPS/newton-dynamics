@@ -36,14 +36,18 @@ class dfbxExport: public dExportPlugin
 		strcpy (m_description, description);
 	}
 	~dfbxExport(){}
-
+	
 	virtual const char* GetMenuName () { return GetSignature();}
-
 	virtual const char* GetFileExtension () { return m_ext;}
 	virtual const char* GetSignature () {return m_signature;}
 	virtual const char* GetFileDescription () {return m_description;}
-
 	virtual void Export (const char* const fileName, dPluginInterface* const interface);
+
+	private:
+	void BuildMeshes (dPluginScene* const ngdScene, FbxScene* const fbxScene, dTree<FbxMesh*, dPluginScene::dTreeNode*>& meshMap);
+	void LoadNodes (dPluginScene* const scene, FbxScene* const fbxScene, dTree<FbxMesh*, dPluginScene::dTreeNode*>& meshMap);
+	void LoadNode (dPluginScene* const scene, FbxScene* const fbxScene, FbxNode* const fpxRoot, dPluginScene::dTreeNode* const node, dTree<FbxMesh*, dPluginScene::dTreeNode*>& meshMap);
+	
 
 	char m_ext[32];
 	char m_signature[32];
