@@ -69,6 +69,11 @@ bool dfbxImport::Import (const char* const fileName, dPluginInterface* const int
 		// Import the contents of the file into the scene.
 		fbxImporter->Import(fbxScene);
 
+		// Convert the scene to meters using the defined options.
+		const  FbxSystemUnit::ConversionOptions lConversionOptions = {true, true, true, true, true, true};
+		FbxSystemUnit::m.ConvertScene(fbxScene, lConversionOptions);
+		FbxAxisSystem::OpenGL.ConvertScene(fbxScene);
+
 //		NewtonMeshFixTJoints (mesh);
 		dPluginScene* const asset = new dPluginScene(world);
 /*
@@ -111,44 +116,42 @@ void dfbxImport::PopulateScene (FbxScene* const fbxScene, dPluginScene* const ng
 	for (iter.Begin(); iter; iter ++) {
 		FbxNode* const fbxNode = iter.GetKey(); 
 		dScene::dTreeNode* const node = iter.GetNode()->GetInfo(); 
-
 		FbxNodeAttribute* const attribute = fbxNode->GetNodeAttribute();
-		dAssert (attribute);
-
-		FbxNodeAttribute::EType attributeType = attribute->GetAttributeType();
-
-		switch (attributeType)
-		{
-			case FbxNodeAttribute::eMesh: 
+		if (attribute) {
+			FbxNodeAttribute::EType attributeType = attribute->GetAttributeType();
+			switch (attributeType)
 			{
-				ImportMeshNode (fbxNode, ngdScene, node, meshCache);
-				break;
-			}
+				case FbxNodeAttribute::eMesh: 
+				{
+					ImportMeshNode (fbxNode, ngdScene, node, meshCache);
+					break;
+				}
 
-			case FbxNodeAttribute::eNull:
-			case FbxNodeAttribute::eMarker:
-			case FbxNodeAttribute::eSkeleton: 
-			case FbxNodeAttribute::eNurbs: 
-			case FbxNodeAttribute::ePatch:
-			case FbxNodeAttribute::eCamera: 
-			case FbxNodeAttribute::eCameraStereo:
-			case FbxNodeAttribute::eCameraSwitcher:
-			case FbxNodeAttribute::eLight:
-			case FbxNodeAttribute::eOpticalReference:
-			case FbxNodeAttribute::eOpticalMarker:
-			case FbxNodeAttribute::eNurbsCurve:
-			case FbxNodeAttribute::eTrimNurbsSurface:
-			case FbxNodeAttribute::eBoundary:
-			case FbxNodeAttribute::eNurbsSurface:
-			case FbxNodeAttribute::eShape:
-			case FbxNodeAttribute::eLODGroup:
-			case FbxNodeAttribute::eSubDiv:
-			case FbxNodeAttribute::eCachedEffect:
-			case FbxNodeAttribute::eLine:
-			case FbxNodeAttribute::eUnknown:
-			default:
-				dAssert(0);
-				break;
+				case FbxNodeAttribute::eNull:
+				case FbxNodeAttribute::eMarker:
+				case FbxNodeAttribute::eSkeleton: 
+				case FbxNodeAttribute::eNurbs: 
+				case FbxNodeAttribute::ePatch:
+				case FbxNodeAttribute::eCamera: 
+				case FbxNodeAttribute::eCameraStereo:
+				case FbxNodeAttribute::eCameraSwitcher:
+				case FbxNodeAttribute::eLight:
+				case FbxNodeAttribute::eOpticalReference:
+				case FbxNodeAttribute::eOpticalMarker:
+				case FbxNodeAttribute::eNurbsCurve:
+				case FbxNodeAttribute::eTrimNurbsSurface:
+				case FbxNodeAttribute::eBoundary:
+				case FbxNodeAttribute::eNurbsSurface:
+				case FbxNodeAttribute::eShape:
+				case FbxNodeAttribute::eLODGroup:
+				case FbxNodeAttribute::eSubDiv:
+				case FbxNodeAttribute::eCachedEffect:
+				case FbxNodeAttribute::eLine:
+				case FbxNodeAttribute::eUnknown:
+				default:
+					dAssert(0);
+					break;
+			}
 		}
 	}
 }
@@ -207,8 +210,100 @@ void dfbxImport::ImportMeshNode (FbxNode* const fbxMeshNode, dPluginScene* const
 		sprintf (name, "%s_mesh", fbxMeshNode->GetName());
 		instance->SetName(name);
 
+		FbxAMatrix pivotMatrix;
+		fbxMesh->GetPivot(pivotMatrix);
+		instance->SetPivotMatrix(dMatrix (pivotMatrix));
+
+/*
+		dMaterialNodeInfo* const material = new dMaterialNodeInfo ();
+		char name[256];
+		if (mtl->NumSubMtls()) {
+			sprintf (name, "%s", maxMaterial->GetName());
+		} else {
+			sprintf (name, "%s", mtl->GetName());
+		}
+		material->SetName(name);
+
+		Color ambient (maxMaterial->GetAmbient());
+		Color difusse (maxMaterial->GetDiffuse());
+		Color specular (maxMaterial->GetSpecular());
+		float shininess (maxMaterial->GetShininess());
+		float shininessStr (maxMaterial->GetShinStr());      
+		float tranparency (maxMaterial->GetXParency());
+
+		material->SetAmbientColor (dVector (ambient.r, ambient.g, ambient.b, 1.0f));
+		material->SetDiffuseColor (dVector (difusse.r, difusse.g, difusse.b, 1.0f));
+		material->SetSpecularColor(dVector (specular.r * shininess, specular.g * shininess, specular.b * shininess, 1.0f));
+		material->SetShininess(shininessStr * 100.0f);
+		material->SetOpacity (1.0f - tranparency);
+
+		dScene::dTreeNode* textNode = NULL;
+		Texmap* const tex = maxMaterial->GetSubTexmap(1);
+		if (tex) {
+			Class_ID texId (tex->ClassID());
+			if (texId != Class_ID(BMTEX_CLASS_ID, 0x00)) {
+				_ASSERTE (0);
+				//					continue;
+			}
+			BitmapTex* const bitmapTex = (BitmapTex *)tex;
+			const char* const texPathName = bitmapTex->GetMapName();
+
+			const char* texName = strrchr (texPathName, '\\');
+			if (texName) {
+				texName ++;
+			} else {
+				texName = strrchr (texPathName, '/');
+				if (texName) {
+					texName ++;
+				} else {
+					texName = texPathName;
+				}
+			}
+
+			dCRCTYPE crc = dCRC64(texName);
+			dTree<dScene::dTreeNode*, dCRCTYPE>::dTreeNode* cacheNode = imageCache.Find(crc);
+			if (!cacheNode) {
+				dScene::dTreeNode* const textNode = scene.CreateTextureNode(texName);
+				cacheNode = imageCache.Insert(textNode, crc);
+			}
+			textNode = cacheNode->GetInfo();
+			//scene.AddReference(matNode, textNode);
+			dTextureNodeInfo* const texture = (dTextureNodeInfo*) scene.GetInfoFromNode(textNode);
+			texture->SetName(texName);
+			material->SetDiffuseTextId(texture->GetId());
+			material->SetAmbientTextId(texture->GetId());
+			material->SetSpecularTextId(texture->GetId());
+		}
+		dCRCTYPE signature = material->CalculateSignature();
+		dScene::dTreeNode* matNode = scene.FindMaterialBySignature(signature);
+		if (!matNode) {
+			matNode = scene.AddNode(material, scene.GetMaterialCacheNode());
+			material->SetId(materialID);
+			materialID ++;
+			if (textNode) {
+				scene.AddReference(matNode, textNode);
+			}
+		}
+		scene.AddReference(meshNode, matNode);
+		material->Release();
+
+		dMaterialNodeInfo* const cachedMaterialInfo = (dMaterialNodeInfo*)scene.GetInfoFromNode(matNode);
+		int id = cachedMaterialInfo->GetId();
+		for (int j = 0; j < facesCount; j ++) {
+			MNFace* const maxFace = maxMesh.F(j);
+			if (maxFace->material == i) {
+				materialIndex[j] = id;
+			}
+		}
+*/
+
+		int materialID = 0;
+		dScene::dTreeNode* const matNode = ngdScene->CreateMaterialNode(materialID);
+		dMaterialNodeInfo* const material = (dMaterialNodeInfo*) ngdScene->GetInfoFromNode(matNode);
+		material->SetName("default material");
+//		materialID ++;
+
 		int faceCount = fbxMesh->GetPolygonCount();
-		
 		int indexCount = 0;
 		for (int i = 0; i < faceCount; i ++) {
 			indexCount += fbxMesh->GetPolygonSize(i);
@@ -219,10 +314,18 @@ void dfbxImport::ImportMeshNode (FbxNode* const fbxMeshNode, dPluginScene* const
 		int* const vertexIndex = new int [indexCount];
 		int* const normalIndex = new int [indexCount];
 		int* const uv0Index = new int [indexCount];
+		int* const uv1Index = new int [indexCount];
 
-		FbxVector4* const normals = new FbxVector4[indexCount];
-		FbxVector2* const uv0 = new FbxVector2[indexCount];
-		FbxVector4* const vertexArray = fbxMesh->GetControlPoints();
+		dVector* const vertexArray = new dVector[fbxMesh->GetControlPointsCount()]; 
+		dVector* const normalArray = new dVector[indexCount];
+		dVector* const uv0Array = new dVector[indexCount];
+		dVector* const uv1Array = new dVector[indexCount];
+		
+		const FbxVector4* const controlPoints = fbxMesh->GetControlPoints();
+		for (int i = 0; i < fbxMesh->GetControlPointsCount(); i ++) {
+			const FbxVector4& p = controlPoints[i];
+			vertexArray[i] = dVector (dFloat(p[0]), dFloat(p[1]), dFloat(p[2]), 0.0f);
+		}
 
 		FbxGeometryElementUV* const uvArray = fbxMesh->GetElementUV ();
 		FbxLayerElement::EMappingMode mapingMode = uvArray->GetMappingMode();
@@ -234,13 +337,13 @@ void dfbxImport::ImportMeshNode (FbxNode* const fbxMeshNode, dPluginScene* const
 		for (int i = 0; i < faceCount; i ++) {
 			int polygonIndexCount = fbxMesh->GetPolygonSize(i);
 
-			materialIndex[i] = 0;
+			materialIndex[i] = materialID;
 			faceIndexList[i] = polygonIndexCount;
 			for (int j = 0; j < polygonIndexCount; j ++) {
 				vertexIndex[index] = fbxMesh->GetPolygonVertex (i, j);
 				FbxVector4 n(0, 1, 0, 0);
 				fbxMesh->GetPolygonVertexNormal (i, j, n);
-				normals[index] = n;
+				normalArray[index] = dVector (dFloat(n[0]), dFloat(n[1]), dFloat(n[2]), 0.0f);
 				normalIndex[index] = index;
 
 				FbxVector2 uv(0, 0);
@@ -248,7 +351,7 @@ void dfbxImport::ImportMeshNode (FbxNode* const fbxMeshNode, dPluginScene* const
 					int textIndex = fbxMesh->GetTextureUVIndex(i, j);
 					uv = uvArray->GetDirectArray().GetAt(textIndex);
 				}
-				uv0[index] = uv;
+				uv0Array[index] = dVector (dFloat(uv[0]), dFloat(uv[1]), 0.0f, 0.0f);
 
 				int uvIndex = fbxMesh->GetTextureUVIndex(i, j, FbxLayerElement::eTextureDiffuse);
 				if (uvIndex < 0) {
@@ -256,24 +359,28 @@ void dfbxImport::ImportMeshNode (FbxNode* const fbxMeshNode, dPluginScene* const
 				}
 				uv0Index[index] = uvIndex;
 
+				uv1Array[index] = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+				uv1Index[index] = 0;
+
 				index ++;
 				dAssert (index <= indexCount);
 			}
 		}
 
-/*
-		instance->BuildFromVertexListIndexList(faceCount, indexCount, materialIndex, 
-			&vertex[0].m_x, sizeof (dVector), vertexList,
-			&normal[0].m_x, sizeof (dVector), normalList,
-			&UV0[0].m_x, sizeof (dVector), uv0List,
-			&UV1.m_x, sizeof (dVector), uv1List);
-*/
+		instance->BuildFromVertexListIndexList(faceCount, faceIndexList, materialIndex, 
+											   &vertexArray[0].m_x, sizeof (dVector), vertexIndex, 
+											   &normalArray[0].m_x, sizeof (dVector), normalIndex,
+											   &uv0Array[0].m_x, sizeof (dVector), uv0Index,
+											   &uv1Array[0].m_x, sizeof (dVector), uv1Index);
 
-		delete[] uv0;
-		delete[] normals;
-		delete[] vertexIndex;
-		delete[] normalIndex;
+		delete[] uv1Array;
+		delete[] uv0Array;
+		delete[] normalArray;
+		delete[] vertexArray;
+		delete[] uv1Index;
 		delete[] uv0Index;
+		delete[] normalIndex;
+		delete[] vertexIndex;
 		delete[] materialIndex;
 		delete[] faceIndexList;
 	}

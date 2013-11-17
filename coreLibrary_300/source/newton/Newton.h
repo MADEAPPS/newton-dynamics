@@ -1141,24 +1141,24 @@ extern "C" {
 	NEWTON_API void NewtonMeshEndFace(const NewtonMesh* const mesh);
 
 	NEWTON_API void NewtonMeshBuildFromVertexListIndexList(const NewtonMesh* const mesh,
-		int faceCount, const int* const faceIndexCount, const int* const faceMaterialIndex, 
-		const dFloat* const vertex, int vertexStrideInBytes, const int* const vertexIndex,
-		const dFloat* const normal, int normalStrideInBytes, const int* const normalIndex,
-		const dFloat* const uv0, int uv0StrideInBytes, const int* const uv0Index,
-		const dFloat* const uv1, int uv1StrideInBytes, const int* const uv1Index);
-
-
+														   int faceCount, const int* const faceIndexCount, const int* const faceMaterialIndex, 
+														   const dFloat* const vertex, int vertexStrideInBytes, const int* const vertexIndex,
+														   const dFloat* const normal, int normalStrideInBytes, const int* const normalIndex,
+														   const dFloat* const uv0, int uv0StrideInBytes, const int* const uv0Index,
+														   const dFloat* const uv1, int uv1StrideInBytes, const int* const uv1Index);
 
 	NEWTON_API void NewtonMeshGetVertexStreams (const NewtonMesh* const mesh, 
 												int vertexStrideInByte, dFloat* const vertex,
 												int normalStrideInByte, dFloat* const normal,
 												int uvStrideInByte0, dFloat* const uv0,
 												int uvStrideInByte1, dFloat* const uv1);
+
 	NEWTON_API void NewtonMeshGetIndirectVertexStreams(const NewtonMesh* const mesh, 
 													   int vertexStrideInByte, dFloat* const vertex, int* const vertexIndices, int* const vertexCount,
 													   int normalStrideInByte, dFloat* const normal, int* const normalIndices, int* const normalCount,
 													   int uvStrideInByte0, dFloat* const uv0, int* const uvIndices0, int* const uvCount0,
 													   int uvStrideInByte1, dFloat* const uv1, int* const uvIndices1, int* const uvCount1);
+
 	NEWTON_API void* NewtonMeshBeginHandle (const NewtonMesh* const mesh); 
 	NEWTON_API void NewtonMeshEndHandle (const NewtonMesh* const mesh, void* const handle); 
 	NEWTON_API int NewtonMeshFirstMaterial (const NewtonMesh* const mesh, void* const handle); 
