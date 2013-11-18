@@ -46,8 +46,8 @@ void dfbxExport::Export (const char* const fileName, dPluginInterface* const int
 	dPluginScene* const scene = interface->GetScene();
 	dAssert (scene);
 
-	NewtonWorld* const world = scene->GetNewtonWorld();
-	dAssert (world);
+	//NewtonWorld* const world = scene->GetNewtonWorld();
+	//dAssert (world);
 
 	// Initialize the SDK manager. This object handles memory management.
 	FbxManager* const fbxSdk = FbxManager::Create();
@@ -204,6 +204,51 @@ void dfbxExport::BuildMeshes (dPluginScene* const ngdScene, FbxScene* const fbxS
 			fbxMesh->SetPivot(fbxMatrix);
 
 			NewtonMesh* const mesh = meshInfo->GetMesh();
+			int vertexCount = NewtonMeshGetVertexCount(mesh);
+			int vertexStride = NewtonMeshGetVertexStrideInByte(mesh) / sizeof (dFloat64);
+			dFloat64* const vertex = NewtonMeshGetVertexArray (mesh); 
+
+			fbxMesh->InitControlPoints (vertexCount);
+			FbxVector4* const points = fbxMesh->GetControlPoints();
+			for (int i = 0; i < vertexCount; i ++) {
+				points[i] = FbxVector4(vertex[vertexStride * i + 0], vertex[vertexStride * i + 1], vertex[vertexStride * i + 2], 0.0f);
+			}
+
+			// We want to have one normal for each vertex (or control point),
+			FbxGeometryElementNormal* const geometryElementNormal = fbxMesh->CreateElementNormal();
+			geometryElementNormal->SetMappingMode(FbxGeometryElement::eByPolygonVertex);
+			geometryElementNormal->SetReferenceMode(FbxGeometryElement::eIndexToDirect);
+
+			int attibuteCount = NewtonMeshGetPointCount(mesh); 
+			int attibuteStride = NewtonMeshGetPointStrideInByte(mesh) / sizeof (dFloat64);
+			dFloat64* const normal = NewtonMeshGetNormalArray (mesh); 
+
+			for (int i = 0; i < attibuteCount; i ++) {
+				geometryElementNormal->GetDirectArray().Add(FbxVector4(normal[attibuteStride * i + 0], normal[attibuteStride * i + 1], normal[attibuteStride * i + 2], 0.0));
+			}
+
+			for (void* face = NewtonMeshGetFirstFace(mesh); face; face = NewtonMeshGetNextFace(mesh, face)) {
+				if (!NewtonMeshIsFaceOpen(mesh, face)) {
+					int faceIndices[256];
+					int indexCount = NewtonMeshGetFaceIndexCount (mesh, face);
+					NewtonMeshGetFaceIndices (mesh, face, faceIndices);
+
+					//int matId = NewtonMeshGetFaceMaterial (mesh, face);
+					//MaterialProxi material;
+					//material.m_mtl = 0;
+					//material.m_matID = 0;
+					//MaterialCache::dTreeNode* const materialNode = materialCache.Find(matId);
+					//if (materialNode) {
+					//	material = materialNode->GetInfo();
+					//}
+
+					fbxMesh->BeginPolygon(-1, -1, false);
+					for (int j = 0; j < indexCount; j ++) {
+						fbxMesh->AddPolygon (faceIndices[j], -1);
+					}
+					fbxMesh->EndPolygon();
+				}
+			}
 		}
 	}
 }
