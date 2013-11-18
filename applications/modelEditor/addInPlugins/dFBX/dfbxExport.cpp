@@ -149,24 +149,30 @@ void dfbxExport::LoadNode (dPluginScene* const scene, FbxScene* const fbxScene, 
 	fbxRoot->AddChild(fpxNode);
 
 	dMatrix matrix (nodeInfo->GetTransform());
-	FbxMatrix fbxMatrix;
-	double* const data = fbxMatrix;
-	for (int i = 0; i < 4; i ++) {
-		for (int j = 0; j < 4; j ++) {
-			data[i * 4 + j] = matrix[i][j];
-		}
-	}
-	FbxVector4 translation;
-	FbxQuaternion rotation;
-	FbxVector4 shearing;
-	FbxVector4 scaling;
-	double sign;
-	fbxMatrix.GetElements(translation, rotation, shearing, scaling, sign);
-	FbxVector4 eulers (rotation.DecomposeSphericalXYZ() * (180.0 / 3.14159265359));
+//	FbxMatrix fbxMatrix;
+//	double* const data = fbxMatrix;
+//	for (int i = 0; i < 4; i ++) {
+//		for (int j = 0; j < 4; j ++) {
+//			data[i * 4 + j] = matrix[i][j];
+//		}
+//	}
+//	FbxVector4 translation;
+//	FbxQuaternion rotation;
+//	FbxVector4 shearing;
+//	FbxVector4 scaling;
+//	double sign;
+//	fbxMatrix.GetElements(translation, rotation, shearing, scaling, sign);
+//	FbxVector4 eulers (rotation.DecomposeSphericalXYZ() * (180.0 / 3.14159265359));
 
-	fpxNode->LclTranslation.Set(translation);
-	fpxNode->LclRotation.Set(eulers);
-	fpxNode->LclScaling.Set(scaling);
+	dVector scale;
+	dMatrix stretchAxis;
+	dMatrix transformMatrix; 
+	matrix.PolarDecomposition (transformMatrix, scale, stretchAxis);
+	dVector eulers (transformMatrix.GetEulerAngles().Scale (180.0f / 3.14159265359f));
+
+	fpxNode->LclTranslation.Set(FbxVector4 (transformMatrix.m_posit.m_x, transformMatrix.m_posit.m_y, transformMatrix.m_posit.m_z, 1.0));
+	fpxNode->LclRotation.Set(FbxVector4 (eulers.m_x, eulers.m_y, eulers.m_z, 0.0));
+	fpxNode->LclScaling.Set(FbxVector4 (scale.m_x, scale.m_y, scale.m_z, 0.0));
 
 	for (void* ptr = scene->GetFirstChildLink(node); ptr; ptr = scene->GetNextChildLink(node, ptr) ) {
 		dScene::dTreeNode* const childNode = scene->GetNodeFromLink(ptr);
