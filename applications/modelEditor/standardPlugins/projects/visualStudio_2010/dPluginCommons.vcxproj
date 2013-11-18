@@ -97,8 +97,8 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy  "$(OutDir)$(TargetName).dll" "../../../$(PlatformName)/stdPlugins/*.*"  /F /Y /R
-xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/stdPlugins/*.*"  /F /Y /R</Command>
+      <Command>xcopy  "$(OutDir)$(TargetName).dll" "../../../$(PlatformName)/*.*"  /F /Y /R
+xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/*.*"  /F /Y /R</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -128,8 +128,8 @@ xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/stdPlugins/*.*"  /
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy  "$(OutDir)$(TargetName).dll" "../../../$(PlatformName)/stdPlugins/*.*"  /F /Y /R
-xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/stdPlugins/*.*"  /F /Y /R</Command>
+      <Command>xcopy  "$(OutDir)$(TargetName).dll" "../../../$(PlatformName)/*.*"  /F /Y /R
+xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/*.*"  /F /Y /R</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -156,8 +156,8 @@ xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/stdPlugins/*.*"  /
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy  "$(OutDir)$(TargetName).dll" "../../../$(PlatformName)/stdPlugins/*.*"  /F /Y /R
-xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/stdPlugins/*.*"  /F /Y /R</Command>
+      <Command>xcopy  "$(OutDir)$(TargetName).dll" "../../../$(PlatformName)/*.*"  /F /Y /R
+xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/*.*"  /F /Y /R</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -187,8 +187,8 @@ xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/stdPlugins/*.*"  /
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy  "$(OutDir)$(TargetName).dll" "../../../$(PlatformName)/stdPlugins/*.*"  /F /Y /R
-xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/stdPlugins/*.*"  /F /Y /R</Command>
+      <Command>xcopy  "$(OutDir)$(TargetName).dll" "../../../$(PlatformName)/*.*"  /F /Y /R
+xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/*.*"  /F /Y /R</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

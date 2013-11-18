@@ -70,13 +70,39 @@ bool dfbxImport::Import (const char* const fileName, dPluginInterface* const int
 		fbxImporter->Import(fbxScene);
 
 		// Convert the scene to meters using the defined options.
-		const  FbxSystemUnit::ConversionOptions lConversionOptions = {true, true, true, true, true, true};
-		FbxSystemUnit::m.ConvertScene(fbxScene, lConversionOptions);
-		FbxAxisSystem::OpenGL.ConvertScene(fbxScene);
+		FbxGlobalSettings& settings = fbxScene->GetGlobalSettings();
+
+		dMatrix convertMatrix (GetIdentityMatrix());
+
+		const FbxSystemUnit& systemUnit = settings.GetSystemUnit();
+		convertMatrix[0][0] = dFloat (systemUnit.GetScaleFactor() / 100.0f);
+		convertMatrix[1][1] = dFloat (systemUnit.GetScaleFactor() / 100.0f);
+		convertMatrix[2][2] = dFloat (systemUnit.GetScaleFactor() / 100.0f);
+
+		int sign;
+		FbxAxisSystem axisSystem = settings.GetAxisSystem();
+		if (axisSystem.GetUpVector(sign) == FbxAxisSystem::eXAxis) {
+			dAssert (0);
+		} else if (axisSystem.GetUpVector(sign) == FbxAxisSystem::eYAxis) {
+			dMatrix tmp (GetZeroMatrix());
+			tmp[0][2] = 1.0f;
+			tmp[1][1] = 1.0f;
+			tmp[2][0] = -1.0f;
+			tmp[3][3] = 1.0f;
+			convertMatrix = tmp * convertMatrix;
+		} else if (axisSystem.GetUpVector(sign) == FbxAxisSystem::eZAxis) {
+			dMatrix tmp (GetZeroMatrix());
+			tmp[0][2] = -1.0f;
+			tmp[1][0] = 1.0f;
+			tmp[2][1] = 1.0f;
+			tmp[3][3] = 1.0f;
+			convertMatrix = tmp * convertMatrix;
+		}
 
 //		NewtonMeshFixTJoints (mesh);
 		dPluginScene* const asset = new dPluginScene(world);
 		PopulateScene (fbxScene, asset);
+		asset->BakeTransform (convertMatrix);
 
 		interface->MergeScene (asset);
 		asset->Release();

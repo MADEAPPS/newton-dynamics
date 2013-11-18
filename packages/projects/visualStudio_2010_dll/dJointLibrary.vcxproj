@@ -164,6 +164,7 @@
       <TargetMachine>MachineX86</TargetMachine>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>false</SuppressStartupBanner>
+      <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
     </Link>
     <PostBuildEvent>
       <Command>
