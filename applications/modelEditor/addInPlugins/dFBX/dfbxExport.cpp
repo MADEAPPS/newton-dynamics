@@ -236,21 +236,27 @@ void dfbxExport::BuildMeshes (dPluginScene* const ngdScene, FbxScene* const fbxS
 			// We want to have one normal for each vertex (or control point),
 			FbxGeometryElementNormal* const geometryElementNormal = fbxMesh->CreateElementNormal();
 			geometryElementNormal->SetMappingMode(FbxGeometryElement::eByPolygonVertex);
-			geometryElementNormal->SetReferenceMode(FbxGeometryElement::eIndexToDirect);
+			//geometryElementNormal->SetReferenceMode(FbxGeometryElement::eIndexToDirect);
+			geometryElementNormal->SetReferenceMode(FbxGeometryElement::eDirect);
 
 			int attibuteCount = NewtonMeshGetPointCount(mesh); 
 			int attibuteStride = NewtonMeshGetPointStrideInByte(mesh) / sizeof (dFloat64);
 			dFloat64* const normal = NewtonMeshGetNormalArray (mesh); 
 
-			for (int i = 0; i < attibuteCount; i ++) {
-				geometryElementNormal->GetDirectArray().Add(FbxVector4(normal[attibuteStride * i + 0], normal[attibuteStride * i + 1], normal[attibuteStride * i + 2], 0.0));
-			}
+//			for (int i = 0; i < attibuteCount; i ++) {
+//				geometryElementNormal->GetDirectArray().Add(FbxVector4(normal[attibuteStride * i + 0], normal[attibuteStride * i + 1], normal[attibuteStride * i + 2], 0.0));
+//			}
 
+			geometryElementNormal->GetIndexArray().SetCount(attibuteCount);
+
+//			int index = 0;
 			for (void* face = NewtonMeshGetFirstFace(mesh); face; face = NewtonMeshGetNextFace(mesh, face)) {
 				if (!NewtonMeshIsFaceOpen(mesh, face)) {
-					int faceIndices[256];
+					int faceVertexIndices[256];
+					int facePointIndices[256];
 					int indexCount = NewtonMeshGetFaceIndexCount (mesh, face);
-					NewtonMeshGetFaceIndices (mesh, face, faceIndices);
+					NewtonMeshGetFaceIndices (mesh, face, faceVertexIndices);
+					NewtonMeshGetFacePointIndices (mesh, face, facePointIndices);
 
 					//int matId = NewtonMeshGetFaceMaterial (mesh, face);
 					//MaterialProxi material;
@@ -263,7 +269,13 @@ void dfbxExport::BuildMeshes (dPluginScene* const ngdScene, FbxScene* const fbxS
 
 					fbxMesh->BeginPolygon(-1, -1, false);
 					for (int j = 0; j < indexCount; j ++) {
-						fbxMesh->AddPolygon (faceIndices[j], -1);
+						dAssert (faceVertexIndices[j] < vertexCount);
+						dAssert (facePointIndices[j] < attibuteCount);
+						fbxMesh->AddPolygon (faceVertexIndices[j], -1);
+						//geometryElementNormal->GetIndexArray().SetAt(index, facePointIndices[j]);
+						int k = facePointIndices[j];
+						geometryElementNormal->GetDirectArray().Add(FbxVector4(normal[attibuteStride * k + 0], normal[attibuteStride * k + 1], normal[attibuteStride * k + 2], 0.0));
+//						index ++;
 					}
 					fbxMesh->EndPolygon();
 				}
