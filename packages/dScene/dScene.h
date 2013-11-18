@@ -147,7 +147,7 @@ class dScene: public dSceneGraph, public dRefCounter
 
 	DSCENE_API virtual void FreezeScale () const;
 	DSCENE_API virtual void FreezePivot () const;
-	DSCENE_API virtual void BakeTransform (dMatrix& matrix) const;
+	DSCENE_API virtual void BakeTransform (const dMatrix& matrix) const;
 	
 	DSCENE_API virtual int GetRevision() const;
 

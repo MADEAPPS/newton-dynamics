@@ -80,24 +80,33 @@ bool dfbxImport::Import (const char* const fileName, dPluginInterface* const int
 		convertMatrix[2][2] = dFloat (systemUnit.GetScaleFactor() / 100.0f);
 
 		int sign;
+		dVector upVector (0.0f, 1.0f, 0.0f, 0.0f);
+		dVector frontVector (1.0f, 0.0f, 0.0f, 0.0f);
 		FbxAxisSystem axisSystem = settings.GetAxisSystem();
 		if (axisSystem.GetUpVector(sign) == FbxAxisSystem::eXAxis) {
 			dAssert (0);
 		} else if (axisSystem.GetUpVector(sign) == FbxAxisSystem::eYAxis) {
-			dMatrix tmp (GetZeroMatrix());
-			tmp[0][2] = 1.0f;
-			tmp[1][1] = 1.0f;
-			tmp[2][0] = -1.0f;
-			tmp[3][3] = 1.0f;
-			convertMatrix = tmp * convertMatrix;
-		} else if (axisSystem.GetUpVector(sign) == FbxAxisSystem::eZAxis) {
-			dMatrix tmp (GetZeroMatrix());
-			tmp[0][2] = -1.0f;
-			tmp[1][0] = 1.0f;
-			tmp[2][1] = 1.0f;
-			tmp[3][3] = 1.0f;
-			convertMatrix = tmp * convertMatrix;
+			upVector = dVector (0.0f, 1.0f * sign, 0.0f, 0.0f);
+			if (axisSystem.GetFrontVector(sign) == FbxAxisSystem::eParityEven) {
+				frontVector = dVector (1.0f * sign, 0.0f, 0.0f, 0.0f);
+			} else {
+				frontVector = dVector (0.0f, 0.0f, 1.0f * sign, 0.0f);
+			}
+		} else {
+			upVector = dVector (1.0f * sign, 0.0f, 0.0f, 0.0f);
+			if (axisSystem.GetFrontVector(sign) == FbxAxisSystem::eParityEven) {
+				dAssert (0);
+				frontVector = dVector (1.0f * sign, 0.0f, 0.0f, 0.0f);
+			} else {
+				frontVector = dVector (0.0f, 0.0f, -1.0f * sign, 0.0f);
+			}
 		}
+
+		dMatrix axisMatrix (GetIdentityMatrix());
+		axisMatrix.m_front = frontVector;
+		axisMatrix.m_up = upVector;
+		axisMatrix.m_right = frontVector * upVector;
+		convertMatrix = axisMatrix * convertMatrix;
 
 //		NewtonMeshFixTJoints (mesh);
 		dPluginScene* const asset = new dPluginScene(world);

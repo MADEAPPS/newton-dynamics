@@ -746,7 +746,7 @@ void dScene::FreezePivot () const
 
 }
 
-void dScene::BakeTransform (dMatrix& matrix) const
+void dScene::BakeTransform (const dMatrix& matrix) const
 {
 	Iterator iter (*this);
 	for (iter.Begin(); iter; iter ++) {

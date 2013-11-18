@@ -43,8 +43,6 @@ dExportPlugin* dfbxExport::GetPluginDAE()
 
 void dfbxExport::Export (const char* const fileName, dPluginInterface* const interface)
 {
-	dPluginScene* const scene = interface->GetScene();
-	dAssert (scene);
 
 	//NewtonWorld* const world = scene->GetNewtonWorld();
 	//dAssert (world);
@@ -78,6 +76,16 @@ void dfbxExport::Export (const char* const fileName, dPluginInterface* const int
 
 	// Use the first argument as the filename for the importer.
 	if (fbxExporter->Initialize(fileName, fileFormat, fbxSdk->GetIOSettings())) { 
+		dPluginScene* const scene = interface->GetScene();
+		dAssert (scene);
+
+		// rotat scene 90 degree aroun teh y axis
+		dMatrix rotateScene (GetZeroMatrix());
+		rotateScene[0][2] = -1.0f;
+		rotateScene[1][1] = 1.0f;
+		rotateScene[2][0] = 1.0f;
+		rotateScene[3][3] = 1.0f;
+		scene->BakeTransform (rotateScene);
 
 		// Create a new scene so that it can be populated by the imported file.
 		FbxScene* const fbxScene = FbxScene::Create(fbxSdk,"myScene");
@@ -96,12 +104,16 @@ void dfbxExport::Export (const char* const fileName, dPluginInterface* const int
 		BuildMeshes (scene, fbxScene, meshMap);
 		LoadNodes (scene, fbxScene, meshMap);
 
-//		const  FbxSystemUnit::ConversionOptions lConversionOptions = {true, true, true, true, true, true};
-//		FbxSystemUnit::Inch.ConvertScene(fbxScene, lConversionOptions);
-//		FbxAxisSystem::Max.ConvertScene(fbxScene);
+
+		FbxGlobalSettings& settings = fbxScene->GetGlobalSettings();
+		settings.SetSystemUnit(FbxSystemUnit(100.0));
+		settings.SetAxisSystem(FbxAxisSystem::eMayaYUp);
 
 		// Import the contents of the file into the scene.
 		fbxExporter->Export(fbxScene);
+
+		// undo the rotation
+		scene->BakeTransform (rotateScene.Transpose());
 	}
 
 	fbxSdk->SetIOSettings(NULL);
@@ -150,9 +162,10 @@ void dfbxExport::LoadNode (dPluginScene* const scene, FbxScene* const fbxScene, 
 	FbxVector4 scaling;
 	double sign;
 	fbxMatrix.GetElements(translation, rotation, shearing, scaling, sign);
+	FbxVector4 eulers (rotation.DecomposeSphericalXYZ() * (180.0 / 3.14159265359));
 
 	fpxNode->LclTranslation.Set(translation);
-	fpxNode->LclRotation.Set(rotation.DecomposeSphericalXYZ());
+	fpxNode->LclRotation.Set(eulers);
 	fpxNode->LclScaling.Set(scaling);
 
 	for (void* ptr = scene->GetFirstChildLink(node); ptr; ptr = scene->GetNextChildLink(node, ptr) ) {
