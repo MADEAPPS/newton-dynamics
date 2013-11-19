@@ -1189,7 +1189,7 @@ void dgCollisionCompound::RemoveCollision (dgNodeBase* const treeNode)
 			m_root = treeNode->m_parent->m_right;
 			treeNode->m_parent->m_right = NULL;
 		} else {
-			dgAssert (treeNode->m_parent->m_left == treeNode);
+			dgAssert (treeNode->m_parent->m_right == treeNode);
 			m_root = treeNode->m_parent->m_left;
 			treeNode->m_parent->m_left= NULL;
 		}
