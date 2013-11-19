@@ -318,8 +318,41 @@ class dInfinitePlane
 	}
 
 	public:
+    static void TestAddingUserMeshToSceneCollsion (NewtonWorld* const world)
+    {
+        NewtonCollision* const sceneCollision = NewtonCreateSceneCollision (world, 0);
+        dMatrix matrix (GetIdentityMatrix());
+        NewtonBody* const body = NewtonCreateDynamicBody(world, sceneCollision, &matrix[0][0]);
+        NewtonDestroyCollision(sceneCollision);
+
+        // make a use mesh collision for testing
+        dVector minBox(-100.0f, -100.0f, -100.0f, 0.0f);
+        dVector maxBox(100.0f, 100.0f, 100.0f, 0.0f);
+        NewtonCollision* const collision = NewtonCreateUserMeshCollision (world, &minBox[0], &maxBox[0], NULL, 
+            NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0);
+
+        // add some use mesh collision
+        NewtonCollision* const rootScene = NewtonBodyGetCollision(body);
+        NewtonSceneCollisionBeginAddRemove(rootScene);
+        void* const node = NewtonSceneCollisionAddSubCollision(rootScene, collision);
+        NewtonSceneCollisionEndAddRemove(rootScene);
+        NewtonDestroyCollision(sceneCollision);
+
+        // test empty the sub collision shapes
+        NewtonCollision* const rootScene1 = NewtonBodyGetCollision(body);
+        NewtonSceneCollisionBeginAddRemove(rootScene1);
+        NewtonSceneCollisionRemoveSubCollision(rootScene1, node);
+        NewtonSceneCollisionEndAddRemove(rootScene1);
+
+        // delete the body
+        NewtonDestroyBody(body);
+    }
+
+
 	static NewtonBody* CreateInfinitePlane (DemoEntityManager* const scene, const dVector& plane)
 	{
+//        TestAddingUserMeshToSceneCollsion (scene->GetNewton());
+
 		// create the Plane collision
 		dInfinitePlane* const planeCollision = new dInfinitePlane (scene->GetNewton(), plane);
 
