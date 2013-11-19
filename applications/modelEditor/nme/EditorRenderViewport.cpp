@@ -346,7 +346,7 @@ void EditorRenderViewport::OnKeyDown(wxKeyEvent &event)
 	if (keyCode == WXK_ESCAPE)  {
 		// send a display refresh event in case the runtime update is stopped bu the user.
 		wxMenuEvent exitEvent (wxEVT_COMMAND_MENU_SELECTED, wxID_EXIT);
-		GetEventHandler()->ProcessEvent(exitEvent);
+        m_mainFrame->GetEventHandler()->ProcessEvent(exitEvent);
 	}
 
 	dAssert (0);
@@ -368,6 +368,8 @@ void EditorRenderViewport::LeftMouseKeyUp()
 
 void EditorRenderViewport::LeftMouseKeyDown ()
 {
+    SetFocus();
+
 	m_leftMouseKeyState = true;
 
 	switch (m_mainFrame->GetNavigationMode())  

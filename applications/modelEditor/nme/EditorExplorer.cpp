@@ -262,8 +262,17 @@ void EditorExplorer::Clear()
 
 void EditorExplorer::OnKeyboardItem (wxKeyEvent& event)
 {
-	switch ( event.GetKeyCode() )
+    int keyCode = event.GetKeyCode();
+	switch (keyCode)
 	{
+        case WXK_ESCAPE:
+        {
+            // send a display refresh event in case the runtime update is stopped bu the user.
+            wxMenuEvent exitEvent (wxEVT_COMMAND_MENU_SELECTED, wxID_EXIT);
+            m_mainFrame->GetEventHandler()->ProcessEvent(exitEvent);
+            return;
+        }
+
 		case WXK_DELETE:
 		{
 			wxTreeEvent event(wxEVT_COMMAND_TREE_DELETE_ITEM, this, wxTreeItemId());

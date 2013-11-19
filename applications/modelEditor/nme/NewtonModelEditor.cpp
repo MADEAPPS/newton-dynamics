@@ -28,9 +28,6 @@ typedef dPluginRecord** (CALLBACK* GetPluginArray)();
 
 BEGIN_EVENT_TABLE (NewtonModelEditor, wxFrame)
 
-	EVT_KEY_UP(OnKeyUp)	
-	EVT_KEY_DOWN(OnKeyDown)
-
 	EVT_MENU (wxID_EXIT, OnExit)
 	EVT_MENU (wxID_ABOUT, OnAbout)
 	EVT_MENU (wxID_HELP, OnAbout)
@@ -432,31 +429,6 @@ int NewtonModelEditor::GetNavigationMode() const
 void NewtonModelEditor::OnExit(wxCommandEvent& event)
 {
 	Close ();
-}
-
-void NewtonModelEditor::OnKeyUp(wxKeyEvent &event)
-{
-	dAssert (0);
-}
-
-
-void NewtonModelEditor::OnKeyDown(wxKeyEvent &event)
-{
-	int keyCode = event.GetKeyCode();
-	if (keyCode == WXK_ESCAPE)  {
-		// send a display refresh event in case the runtime update is stopped bu the user.
-		wxMenuEvent exitEvent (wxEVT_COMMAND_MENU_SELECTED, wxID_EXIT);
-		GetEventHandler()->ProcessEvent(exitEvent);
-	}
-
-	dAssert (0);
-
-/*
-	if (!event.GetModifiers()) {
-		int code = keyCode & 0xff; 
-		m_key[m_keyMap[code]] = true;
-	}
-*/
 }
 
 
