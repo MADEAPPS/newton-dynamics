@@ -1505,7 +1505,7 @@ void dgCollisionConvex::SetUserData (void* const userData)
 
 void dgCollisionConvex::SetVolumeAndCG ()
 {
-	dgVector faceVertex[64];
+	dgVector faceVertex[DG_MAX_EDGE_COUNT];
 	dgStack<dgInt8> edgeMarks (m_edgeCount);
 	memset (&edgeMarks[0], 0, sizeof (dgInt8) * m_edgeCount);
 
@@ -1523,7 +1523,6 @@ void dgCollisionConvex::SetVolumeAndCG ()
 				dgAssert (count < dgInt32 (sizeof (faceVertex) / sizeof (faceVertex[0])));
 				edge = edge->m_next;
 			} while (edge != face);
-
 			localData.AddCGFace (count, faceVertex);
 		}
 	}
@@ -1809,7 +1808,7 @@ dgVector dgCollisionConvex::CalculateVolumeIntegral (const dgPlane& plane) const
 {
 	dgInt8 mark[DG_MAX_EDGE_COUNT];
 	dgFloat32 test[DG_MAX_EDGE_COUNT];
-	dgVector faceVertex[256];
+	dgVector faceVertex[DG_MAX_EDGE_COUNT];
 
 	dgInt32 positive = 0;
 	dgInt32 negative = 0;
@@ -2165,7 +2164,7 @@ dgInt32 dgCollisionConvex::RectifyConvexSlice (dgInt32 count, const dgVector& no
 
 dgCollisionConvex::dgPerimenterEdge* dgCollisionConvex::ReduceContacts (dgPerimenterEdge* poly, dgInt32 maxCount) const
 {
-	dgInt32 buffer [256];
+	dgInt32 buffer [DG_MAX_EDGE_COUNT];
 	dgUpHeap<dgPerimenterEdge*, dgFloat32> heap (buffer, sizeof (buffer));	
 
 	dgInt32 restart = 1;
