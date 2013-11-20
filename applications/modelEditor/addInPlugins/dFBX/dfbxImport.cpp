@@ -368,6 +368,56 @@ void dfbxImport::ImportMaterials (FbxScene* const fbxScene, dPluginScene* const 
 				dMaterialNodeInfo* const material = (dMaterialNodeInfo*) ngdScene->GetInfoFromNode(node);
 				material->SetName(fbxMaterial->GetName());
 
+				dVector ambient(material->GetAmbientColor());
+				dVector difusse(material->GetDiffuseColor());
+				dVector specular(material->GetSpecularColor());
+				dFloat opacity = material->GetOpacity();
+				dFloat shininess = material->GetShininess();
+				if (fbxMaterial->GetClassId().Is(FbxSurfacePhong::ClassId))	{
+					FbxSurfacePhong* const phongMaterial = (FbxSurfacePhong *) fbxMaterial;
+				
+					// Get the ambient Color
+					ambient[0] = dFloat(phongMaterial->Ambient.Get()[0]);
+					ambient[1] = dFloat(phongMaterial->Ambient.Get()[0]);
+					ambient[2] = dFloat(phongMaterial->Ambient.Get()[0]);
+					ambient[3] = 1.0f;
+			
+					// get the Diffuse Color
+					difusse[0] = dFloat(phongMaterial->Diffuse.Get()[0]);
+					difusse[1] = dFloat(phongMaterial->Diffuse.Get()[0]);
+					difusse[2] = dFloat(phongMaterial->Diffuse.Get()[0]);
+					difusse[3] = 1.0f;
+
+					// Get specular Color (unique to Phong materials)
+					specular[0] = dFloat(phongMaterial->Specular.Get()[0]);
+					specular[1] = dFloat(phongMaterial->Specular.Get()[0]);
+					specular[2] = dFloat(phongMaterial->Specular.Get()[0]);
+					specular[3] = 1.0f;
+
+					// Display the Shininess
+					shininess = dFloat(phongMaterial->Shininess.Get() * 100.0f);
+
+					// Display the Emissive Color
+					//lKFbxDouble3 =((FbxSurfacePhong *) lMaterial)->Emissive;
+					//theColor.Set(lKFbxDouble3.Get()[0], lKFbxDouble3.Get()[1], lKFbxDouble3.Get()[2]);
+					//DisplayColor("            Emissive: ", theColor);
+
+					//Opacity is Transparency factor now
+					opacity = dFloat(1.0 - phongMaterial->TransparencyFactor.Get());
+
+					// Display the Reflectivity
+					//lKFbxDouble1 =((FbxSurfacePhong *) lMaterial)->ReflectionFactor;
+					//DisplayDouble("            Reflectivity: ", lKFbxDouble1.Get());
+				} else {
+					dAssert (0);
+				}
+
+				material->SetAmbientColor (ambient);
+				material->SetDiffuseColor (difusse);
+				material->SetSpecularColor(specular);
+				material->SetShininess(shininess);
+				material->SetOpacity (opacity);
+
 				m_materialId ++;
 			}
 			dScene::dTreeNode* const materialNode = matNode->GetInfo();

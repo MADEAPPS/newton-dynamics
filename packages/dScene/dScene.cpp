@@ -1167,7 +1167,6 @@ void dScene::RemoveUnusedMaterials()
 
 void dScene::RemoveUnusedVertex()
 {
-//	dScene::dTreeNode* const geometryCacheNode = GetGeometryCacheNode();
 	dScene::dTreeNode* const geometryCacheNode = FindGetGeometryCacheNode();
 	if (geometryCacheNode) {
 		for (void* link = GetFirstChildLink(geometryCacheNode); link; link = GetNextChildLink(geometryCacheNode, link)) {
