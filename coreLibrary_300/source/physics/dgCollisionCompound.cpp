@@ -1037,30 +1037,33 @@ void dgCollisionCompound::EndAddRemove ()
 			} 
 		}
 
-		dgFloat64 cost = CalculateEntropy (list);
-		if ((cost > m_treeEntropy * dgFloat32 (2.0f)) || (cost < m_treeEntropy * dgFloat32 (0.5f))) {
-			dgInt32 count = list.GetCount() * 2 + 12;
-			dgInt32 leafNodesCount = 0;
-			dgStack<dgNodeBase*> leafArray(count);
-			for (dgList<dgNodeBase*>::dgListNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) {
-				dgNodeBase* const node = listNode->GetInfo();
-				if (node->m_left->m_type == m_leaf) {
-					leafArray[leafNodesCount] = node->m_left;
-					leafNodesCount ++;
+		if (list.GetCount()) {
+			dgFloat64 cost = CalculateEntropy (list);
+			if ((cost > m_treeEntropy * dgFloat32 (2.0f)) || (cost < m_treeEntropy * dgFloat32 (0.5f))) {
+				dgInt32 count = list.GetCount() * 2 + 12;
+				dgInt32 leafNodesCount = 0;
+				dgStack<dgNodeBase*> leafArray(count);
+				for (dgList<dgNodeBase*>::dgListNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) {
+					dgNodeBase* const node = listNode->GetInfo();
+					if (node->m_left->m_type == m_leaf) {
+						leafArray[leafNodesCount] = node->m_left;
+						leafNodesCount ++;
+					}
+					if (node->m_right->m_type == m_leaf) {
+						leafArray[leafNodesCount] = node->m_right;
+						leafNodesCount ++;
+					}
 				}
-				if (node->m_right->m_type == m_leaf) {
-					leafArray[leafNodesCount] = node->m_right;
-					leafNodesCount ++;
-				}
+
+				dgList<dgNodeBase*>::dgListNode* nodePtr = list.GetFirst();
+				m_root = BuildTopDown (&leafArray[0], 0, leafNodesCount - 1, &nodePtr);
+				m_treeEntropy = CalculateEntropy (list);
 			}
-
-			dgList<dgNodeBase*>::dgListNode* nodePtr = list.GetFirst();
-			m_root = BuildTopDown (&leafArray[0], 0, leafNodesCount - 1, &nodePtr);
-			m_treeEntropy = CalculateEntropy (list);
-		}
-
-		while (m_root->m_parent) {
-			m_root = m_root->m_parent;
+			while (m_root->m_parent) {
+				m_root = m_root->m_parent;
+			}
+		} else {
+			m_treeEntropy = dgFloat32 (2.0f);
 		}
 
 		m_boxMinRadius = dgMin(m_root->m_size.m_x, m_root->m_size.m_y, m_root->m_size.m_z);
