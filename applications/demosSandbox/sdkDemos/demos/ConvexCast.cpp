@@ -358,6 +358,14 @@ void ConvexCast (DemoEntityManager* const scene)
 {
 	scene->CreateSkyBox();
 
+//char fileName[2048];
+//NewtonWorld* const world = scene->GetNewton();
+//GetWorkingFileName ("low_rez_rim.OFF", fileName);
+//NewtonMesh* const mesh = NewtonMeshLoadOFF(world, fileName);
+//NewtonCollision* coll = NewtonCreateConvexHullFromMesh (world, mesh, 0.0f, 0);
+//NewtonDestroyCollision(coll);
+
+
 	// customize the scene after loading
 	// set a user friction variable in the body for variable friction demos
 	// later this will be done using LUA script

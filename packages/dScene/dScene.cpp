@@ -441,7 +441,8 @@ dScene::dTreeNode* dScene::CreateMaterialNode (int id)
 {
 	dTreeNode* const root = GetMaterialCacheNode();
 	dScene::dTreeNode* const node = CreateNode ("dMaterialNodeInfo", root);
-	((dMaterialNodeInfo*) GetInfoFromNode(node))->m_id = id;
+	dMaterialNodeInfo* const info = (dMaterialNodeInfo*) GetInfoFromNode(node);
+	info->m_id = id;
 	return node;
 }
 
@@ -1149,17 +1150,33 @@ void dScene::DeleteDuplicateGeometries()
 	}
 }
 
-
+void dScene::RemoveUnusedMaterials()
+{
+	dScene::dTreeNode* const materialCacheNode = FindGetMaterialCacheNode();
+	if (materialCacheNode) {
+		void* nextMaterialLink;
+		for (void* materialLink = GetFirstChildLink(materialCacheNode); materialLink; materialLink = nextMaterialLink) {
+			nextMaterialLink = GetNextChildLink(materialCacheNode, materialLink);
+			dTreeNode* const materialNode = GetNodeFromLink(materialLink);
+			if (!GetNextParentLink(materialCacheNode, GetFirstParentLink(materialNode))) {
+				RemoveReference (materialNode, materialCacheNode);
+			}
+		}
+	}
+}
 
 void dScene::RemoveUnusedVertex()
 {
-	dScene::dTreeNode* const geometryCacheNode = GetGeometryCacheNode();
-	for (void* link = GetFirstChildLink(geometryCacheNode); link; link = GetNextChildLink(geometryCacheNode, link)) {
-		dTreeNode* const node = GetNodeFromLink(link);
-		dNodeInfo* const info = node->GetInfo().GetNode();
-		if (info->IsType(dMeshNodeInfo::GetRttiType())) {
-			dMeshNodeInfo* const mesh = (dMeshNodeInfo*) info;
-			mesh->RemoveUnusedVertices(this, node);
+//	dScene::dTreeNode* const geometryCacheNode = GetGeometryCacheNode();
+	dScene::dTreeNode* const geometryCacheNode = FindGetGeometryCacheNode();
+	if (geometryCacheNode) {
+		for (void* link = GetFirstChildLink(geometryCacheNode); link; link = GetNextChildLink(geometryCacheNode, link)) {
+			dTreeNode* const node = GetNodeFromLink(link);
+			dNodeInfo* const info = node->GetInfo().GetNode();
+			if (info->IsType(dMeshNodeInfo::GetRttiType())) {
+				dMeshNodeInfo* const mesh = (dMeshNodeInfo*) info;
+				mesh->RemoveUnusedVertices(this, node);
+			}
 		}
 	}
 }

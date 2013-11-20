@@ -32,6 +32,19 @@ class dfbxImport: public dImportPlugin
 	{
 	};
 
+	class MeshMap: public dTree<dPluginScene::dTreeNode*, FbxMesh*>
+	{
+	};
+
+	class MaterialGlobalMap: public dTree<dPluginScene::dTreeNode*, FbxSurfaceMaterial*>
+	{
+	};
+
+	class MaterialLocalMap: public dTree<dPluginScene::dTreeNode*, int>
+	{
+	};
+
+
 	class ImportStackData
 	{
 		public:
@@ -49,6 +62,7 @@ class dfbxImport: public dImportPlugin
 	public:
 	dfbxImport (const char* const ext, const char* const signature, const char* const description)
 		:dImportPlugin() 
+		, m_materialId (0)
 	{
 		strcpy (m_ext, ext);
 		strcpy (m_signature, signature);
@@ -66,8 +80,10 @@ class dfbxImport: public dImportPlugin
 	private:
 	void PopulateScene (FbxScene* const fbxScene, dPluginScene* const ngdScene);
 	void LoadHierarchy  (FbxScene* const fbxScene, dPluginScene* const ngdScene, NodeMap& nodeMap);
-	void ImportMeshNode (FbxNode* const fbxMeshNode, dPluginScene* const ngdScene, dPluginScene::dTreeNode* const node, dTree<dPluginScene::dTreeNode*, FbxMesh*>& meshCache);
-
+	void ImportMeshNode (FbxScene* const fbxScene, dPluginScene* const ngdScene, FbxNode* const fbxMeshNode, dPluginScene::dTreeNode* const node, MeshMap& meshCache, MaterialGlobalMap& materialCache);
+	void ImportMaterials (FbxScene* const fbxScene, dPluginScene* const ngdScene, FbxNode* const fbxMeshNode, dPluginScene::dTreeNode* const meshNode, MaterialGlobalMap& materialCache, MaterialLocalMap& localMaterilIndex);
+	
+	int m_materialId;
 	char m_ext[32];
 	char m_signature[32];
 	char m_description[32];

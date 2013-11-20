@@ -152,7 +152,7 @@ class dScene: public dSceneGraph, public dRefCounter
 	DSCENE_API virtual int GetRevision() const;
 
 	DSCENE_API virtual void RemoveUnusedVertex();
-	
+	DSCENE_API virtual void RemoveUnusedMaterials();
 
 	DSCENE_API virtual void SetNodeLRU (dTreeNode* const node, int lru);
 	DSCENE_API virtual int GetNodeLRU (dTreeNode* const node) const;

@@ -233,23 +233,26 @@ void dfbxExport::BuildMeshes (dPluginScene* const ngdScene, FbxScene* const fbxS
 				points[i] = FbxVector4(vertex[vertexStride * i + 0], vertex[vertexStride * i + 1], vertex[vertexStride * i + 2], 0.0f);
 			}
 
-			// We want to have one normal for each vertex (or control point),
-			FbxGeometryElementNormal* const geometryElementNormal = fbxMesh->CreateElementNormal();
-			geometryElementNormal->SetMappingMode(FbxGeometryElement::eByPolygonVertex);
-			//geometryElementNormal->SetReferenceMode(FbxGeometryElement::eIndexToDirect);
-			geometryElementNormal->SetReferenceMode(FbxGeometryElement::eDirect);
-
 			int attibuteCount = NewtonMeshGetPointCount(mesh); 
 			int attibuteStride = NewtonMeshGetPointStrideInByte(mesh) / sizeof (dFloat64);
 			dFloat64* const normal = NewtonMeshGetNormalArray (mesh); 
+			dFloat64* const uv0 = NewtonMeshGetUV0Array (mesh); 
+
+			// We want to have one normal for each vertex (or control point),
+			FbxGeometryElementNormal* const geometryElementNormal = fbxMesh->CreateElementNormal();
+			geometryElementNormal->SetMappingMode(FbxGeometryElement::eByPolygonVertex);
+			geometryElementNormal->SetReferenceMode(FbxGeometryElement::eDirect);
+			geometryElementNormal->GetIndexArray().SetCount(attibuteCount);
+
+			FbxLayerElementUV* const geometryElementUV = fbxMesh->CreateElementUV("UVChannel_1");
+			geometryElementUV->SetMappingMode(FbxGeometryElement::eByPolygonVertex);
+			geometryElementUV->SetReferenceMode(FbxGeometryElement::eDirect);
+			geometryElementUV->GetIndexArray().SetCount(attibuteCount);
 
 //			for (int i = 0; i < attibuteCount; i ++) {
 //				geometryElementNormal->GetDirectArray().Add(FbxVector4(normal[attibuteStride * i + 0], normal[attibuteStride * i + 1], normal[attibuteStride * i + 2], 0.0));
 //			}
 
-			geometryElementNormal->GetIndexArray().SetCount(attibuteCount);
-
-//			int index = 0;
 			for (void* face = NewtonMeshGetFirstFace(mesh); face; face = NewtonMeshGetNextFace(mesh, face)) {
 				if (!NewtonMeshIsFaceOpen(mesh, face)) {
 					int faceVertexIndices[256];
@@ -272,10 +275,10 @@ void dfbxExport::BuildMeshes (dPluginScene* const ngdScene, FbxScene* const fbxS
 						dAssert (faceVertexIndices[j] < vertexCount);
 						dAssert (facePointIndices[j] < attibuteCount);
 						fbxMesh->AddPolygon (faceVertexIndices[j], -1);
-						//geometryElementNormal->GetIndexArray().SetAt(index, facePointIndices[j]);
+						
 						int k = facePointIndices[j];
+						geometryElementUV->GetDirectArray().Add(FbxVector2(uv0[attibuteStride * k + 0], uv0[attibuteStride * k + 1]));
 						geometryElementNormal->GetDirectArray().Add(FbxVector4(normal[attibuteStride * k + 0], normal[attibuteStride * k + 1], normal[attibuteStride * k + 2], 0.0));
-//						index ++;
 					}
 					fbxMesh->EndPolygon();
 				}
