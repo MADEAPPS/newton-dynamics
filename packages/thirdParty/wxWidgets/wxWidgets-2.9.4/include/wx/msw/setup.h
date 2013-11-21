@@ -1464,7 +1464,7 @@
 #define wxUSE_IFF           0
 
 // Set to 1 for XPM format support
-#define wxUSE_XPM           0
+#define wxUSE_XPM           1
 
 // Set to 1 for MS Icons and Cursors format support
 #define wxUSE_ICO_CUR       1

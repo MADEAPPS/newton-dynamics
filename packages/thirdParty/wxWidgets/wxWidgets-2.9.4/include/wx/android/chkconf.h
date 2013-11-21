@@ -160,7 +160,7 @@
 // ----------------------------------------------------------------------------
 
 #undef wxUSE_IMAGE
-#define wxUSE_IMAGE         0
+#define wxUSE_IMAGE         1
 
 #undef wxUSE_LIBPNG
 #define wxUSE_LIBPNG        0
@@ -187,7 +187,7 @@
 #define wxUSE_IFF           0
 
 #undef wxUSE_XPM
-#define wxUSE_XPM           0
+#define wxUSE_XPM           1
 
 #undef wxUSE_ICO_CUR
 #define wxUSE_ICO_CUR       0
