@@ -2036,9 +2036,9 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 					for (dgInt32 i = 0; i < convexMesh.m_atribCount; i ++) {
 						convexMesh.m_attrib[i].m_vertex.m_w = layer;
 					}
-
 					voronoiPartition->MergeFaces(&convexMesh);
 					layer += dgFloat64 (1.0f);
+
 				}
 			}
 		}

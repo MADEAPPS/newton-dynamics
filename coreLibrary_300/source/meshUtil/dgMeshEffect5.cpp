@@ -3163,17 +3163,17 @@ bool dgMeshEffect::PlaneClip (const dgMeshEffect& convexMesh, const dgEdge* cons
 }
 
 
-
-
-dgMeshEffect* dgMeshEffect::ConvexMeshIntersection (const dgMeshEffect* const convexMesh) const
+dgMeshEffect* dgMeshEffect::ConvexMeshIntersection (const dgMeshEffect* const convexMeshSrc) const
 {
-//return new (GetAllocator()) dgMeshEffect (*convexMesh);
+	dgMeshEffect convexMesh (*convexMeshSrc);
+	convexMesh.ConvertToPolygons();
+	//return new (GetAllocator()) dgMeshEffect (*convexMesh);
 
 	dgMeshEffect* const convexIntersection = new (GetAllocator()) dgMeshEffect (*this);
 	convexIntersection->RemoveUnusedVertices(NULL);
 
-	dgInt32 mark = convexMesh->IncLRU();
-	dgPolyhedra::Iterator iter (*convexMesh);
+	dgInt32 mark = convexMesh.IncLRU();
+	dgPolyhedra::Iterator iter (convexMesh);
 
 	for (iter.Begin(); iter; iter ++){
 		 dgEdge* const convexFace = &(*iter);
@@ -3183,7 +3183,7 @@ dgMeshEffect* dgMeshEffect::ConvexMeshIntersection (const dgMeshEffect* const co
 				ptr->m_mark = mark;
 				ptr = ptr->m_next;
 			} while (ptr != convexFace);
-			if (!convexIntersection->PlaneClip(*convexMesh, convexFace)) {
+			if (!convexIntersection->PlaneClip(convexMesh, convexFace)) {
 				delete convexIntersection;
 				return NULL;
 			}
