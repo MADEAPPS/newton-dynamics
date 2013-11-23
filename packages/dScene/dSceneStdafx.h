@@ -147,23 +147,22 @@
 #endif
 
 
-void dStringToIntArray (const char* const string, int* const array, int maxCount);
-void dStringToFloatArray (const char* const string, dFloat* const array, int maxCount);
-//void dStringToFloat64Array (const char* const string, dFloat64* const array, int maxCount);
-void dIntArrayToString (const int* const array, int count, char* const string, int maxSixeInBytes);
-void dFloatArrayToString (const dFloat* const array, int count, char* const string, int maxSixeInBytes);
+DSCENE_API void dStringToIntArray (const char* const string, int* const array, int maxCount);
+DSCENE_API void dStringToFloatArray (const char* const string, dFloat* const array, int maxCount);
+//DSCENE_API void dStringToFloat64Array (const char* const string, dFloat64* const array, int maxCount);
+DSCENE_API void dIntArrayToString (const int* const array, int count, char* const string, int maxSixeInBytes);
+DSCENE_API void dFloatArrayToString (const dFloat* const array, int count, char* const string, int maxSixeInBytes);
 
-const char* dGetNameFromPath (const char* const fullName);
-void dExtractPathFromFullName (const char* const fullName, char* const path);
+DSCENE_API const char* dGetNameFromPath (const char* const fullName);
+DSCENE_API void dExtractPathFromFullName (const char* const fullName, char* const path);
 
-int dPackVertexArray (dFloat* const vertexList, int compareElements, int strideInBytes, int vertexCount, int* const indexListOut);
+DSCENE_API int dPackVertexArray (dFloat* const vertexList, int compareElements, int strideInBytes, int vertexCount, int* const indexListOut);
 
-dFloat dBoxRayCast (const dVector& line0, const dVector& line1, const dVector& boxP0, const dVector& boxP1);
-void dRayToRayCast (const dVector& ray_p0, const dVector& ray_p1, const dVector& ray_q0, const dVector& ray_q1, dVector& pOut, dVector& qOut);
+DSCENE_API dFloat dBoxRayCast (const dVector& line0, const dVector& line1, const dVector& boxP0, const dVector& boxP1);
+DSCENE_API void dRayToRayCast (const dVector& ray_p0, const dVector& ray_p1, const dVector& ray_q0, const dVector& ray_q1, dVector& pOut, dVector& qOut);
 
-dBigVector dPolygonNormal (int indexCount, const dFloat64* const vertex, int strideInBytes, const int* const indices);
-dFloat dPolygonRayCast (const dVector& line0, const dVector& line1, int indexCount, const dFloat64* const vertex, int strideInBytes, const int* const indices);
-
+DSCENE_API dBigVector dPolygonNormal (int indexCount, const dFloat64* const vertex, int strideInBytes, const int* const indices);
+DSCENE_API dFloat dPolygonRayCast (const dVector& line0, const dVector& line1, int indexCount, const dFloat64* const vertex, int strideInBytes, const int* const indices);
 
 void SerializeMesh (const NewtonMesh* const mesh, TiXmlElement* const rootNode);
 bool DeserializeMesh (const NewtonMesh* const mesh, TiXmlElement* const rootNode); 

@@ -27,6 +27,27 @@ class dfbxExport: public dExportPlugin
 	static dExportPlugin* GetPluginOBJ();
 	static dExportPlugin* GetPluginDAE();
 
+	class MeshMap: public dTree<FbxMesh*, dPluginScene::dTreeNode*>
+	{
+	};
+
+	class MaterialMap: public dTree<FbxSurfaceMaterial*, dPluginScene::dTreeNode*>
+	{
+	};
+
+	class TextureMap: public dTree<FbxTexture*, dPluginScene::dTreeNode*>
+	{
+	};
+
+	class MaterialIndex: public dTree<int, int>
+	{
+	};
+
+	class TextureIndex: public dTree<int, dCRCTYPE>
+	{
+	};
+
+
 	public:
 	dfbxExport(const char* const ext, const char* const signature, const char* const description)
 		:dExportPlugin()
@@ -44,10 +65,11 @@ class dfbxExport: public dExportPlugin
 	virtual void Export (const char* const fileName, dPluginInterface* const interface);
 
 	private:
-	void BuildMeshes (dPluginScene* const ngdScene, FbxScene* const fbxScene, dTree<FbxMesh*, dPluginScene::dTreeNode*>& meshMap);
-	void LoadNodes (dPluginScene* const scene, FbxScene* const fbxScene, dTree<FbxMesh*, dPluginScene::dTreeNode*>& meshMap);
-	void LoadNode (dPluginScene* const scene, FbxScene* const fbxScene, FbxNode* const fpxRoot, dPluginScene::dTreeNode* const node, dTree<FbxMesh*, dPluginScene::dTreeNode*>& meshMap);
-	
+	void CreateTexture (dPluginScene* const scene, FbxScene* const fbxScene, TextureMap& textureMap, TextureIndex& textureIndex);
+	void CreateMaterials (dPluginScene* const scene, FbxScene* const fbxScene, const TextureMap& textureMap, MaterialMap& materialMap, MaterialIndex& materialIndex);
+	void BuildMeshes (dPluginScene* const ngdScene, FbxScene* const fbxScene, MeshMap& meshMap, const TextureMap& textureMap, const MaterialMap& materialMap, const MaterialIndex& materialIndex, const TextureIndex& textureIndex);
+	void LoadNodes (dPluginScene* const scene, FbxScene* const fbxScene, MeshMap& meshMap, MaterialMap& materialMap);
+	void LoadNode (dPluginScene* const scene, FbxScene* const fbxScene, FbxNode* const fpxRoot, dPluginScene::dTreeNode* const node, MeshMap& meshMap, MaterialMap& materialMap);
 
 	char m_ext[32];
 	char m_signature[32];

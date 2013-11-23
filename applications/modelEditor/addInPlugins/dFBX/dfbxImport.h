@@ -28,19 +28,28 @@ class dfbxImport: public dImportPlugin
 	static dImportPlugin* GetPluginOBJ();
 	static dImportPlugin* GetPluginDAE();
 
-	class NodeMap: public dTree<dScene::dTreeNode*, FbxNode*>
+	class GlobalNoceMap: public dTree<dScene::dTreeNode*, FbxNode*>
 	{
 	};
 
-	class MeshMap: public dTree<dPluginScene::dTreeNode*, FbxMesh*>
+	class GlobalMeshMap: public dTree<dPluginScene::dTreeNode*, FbxMesh*>
 	{
 	};
 
-	class MaterialGlobalMap: public dTree<dPluginScene::dTreeNode*, FbxSurfaceMaterial*>
+	class GlobalMaterialMap: public dTree<dPluginScene::dTreeNode*, FbxSurfaceMaterial*>
 	{
 	};
 
-	class MaterialLocalMap: public dTree<dPluginScene::dTreeNode*, int>
+	class GlobalTextureMap: public dTree<dPluginScene::dTreeNode*, FbxTexture*>
+	{
+	};
+
+	class LocalMaterialMap: public dTree<dPluginScene::dTreeNode*, int>
+	{
+	};
+
+
+	class UsedMaterials: public dTree<int, dPluginScene::dTreeNode*>
 	{
 	};
 
@@ -79,9 +88,10 @@ class dfbxImport: public dImportPlugin
 
 	private:
 	void PopulateScene (FbxScene* const fbxScene, dPluginScene* const ngdScene);
-	void LoadHierarchy  (FbxScene* const fbxScene, dPluginScene* const ngdScene, NodeMap& nodeMap);
-	void ImportMeshNode (FbxScene* const fbxScene, dPluginScene* const ngdScene, FbxNode* const fbxMeshNode, dPluginScene::dTreeNode* const node, MeshMap& meshCache, MaterialGlobalMap& materialCache);
-	void ImportMaterials (FbxScene* const fbxScene, dPluginScene* const ngdScene, FbxNode* const fbxMeshNode, dPluginScene::dTreeNode* const meshNode, MaterialGlobalMap& materialCache, MaterialLocalMap& localMaterilIndex);
+	void LoadHierarchy  (FbxScene* const fbxScene, dPluginScene* const ngdScene, GlobalNoceMap& nodeMap);
+	void ImportMeshNode (FbxScene* const fbxScene, dPluginScene* const ngdScene, FbxNode* const fbxMeshNode, dPluginScene::dTreeNode* const node, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials);
+	void ImportMaterials (FbxScene* const fbxScene, dPluginScene* const ngdScene, FbxNode* const fbxMeshNode, dPluginScene::dTreeNode* const meshNode, GlobalMaterialMap& materialCache, LocalMaterialMap& localMaterilIndex, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials);
+	void ImportTexture (dPluginScene* const ngdScene, FbxProperty pProperty, dPluginScene::dTreeNode* const materialNode, GlobalTextureMap& textureCache);
 	
 	int m_materialId;
 	char m_ext[32];

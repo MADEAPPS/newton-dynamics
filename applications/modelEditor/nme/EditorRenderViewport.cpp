@@ -336,7 +336,7 @@ void EditorRenderViewport::EndRender()
 
 void EditorRenderViewport::OnKeyUp(wxKeyEvent &event)
 {
-	dAssert (0);
+//	dAssert (0);
 }
 
 
@@ -349,7 +349,7 @@ void EditorRenderViewport::OnKeyDown(wxKeyEvent &event)
         m_mainFrame->GetEventHandler()->ProcessEvent(exitEvent);
 	}
 
-	dAssert (0);
+//	dAssert (0);
 
 /*
 	if (!event.GetModifiers()) {

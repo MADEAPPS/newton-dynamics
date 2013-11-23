@@ -139,18 +139,21 @@ bool dfbxImport::Import (const char* const fileName, dPluginInterface* const int
 
 void dfbxImport::PopulateScene (FbxScene* const fbxScene, dPluginScene* const ngdScene)
 {
-	NodeMap nodeMap;
-	MeshMap meshCache;
-	MaterialGlobalMap materialCache;
+	GlobalNoceMap nodeMap;
+	GlobalMeshMap meshCache;
+	GlobalTextureMap textureCache;
+	GlobalMaterialMap materialCache;
+	UsedMaterials usedMaterials;
 
 	dScene::dTreeNode* const defaulMaterialNode = ngdScene->CreateMaterialNode(DEFUALT_MATERIAL_ID);
 	dMaterialNodeInfo* const defaulMaterial = (dMaterialNodeInfo*) ngdScene->GetInfoFromNode(defaulMaterialNode);
 	defaulMaterial->SetName("default_material");
+	usedMaterials.Insert(0, defaulMaterialNode);
 
 	m_materialId = 0;
 	LoadHierarchy  (fbxScene, ngdScene, nodeMap);
 
-	NodeMap::Iterator iter (nodeMap);
+	GlobalNoceMap::Iterator iter (nodeMap);
 	for (iter.Begin(); iter; iter ++) {
 		FbxNode* const fbxNode = iter.GetKey(); 
 		dScene::dTreeNode* const node = iter.GetNode()->GetInfo(); 
@@ -161,7 +164,7 @@ void dfbxImport::PopulateScene (FbxScene* const fbxScene, dPluginScene* const ng
 			{
 				case FbxNodeAttribute::eMesh: 
 				{
-					ImportMeshNode (fbxScene, ngdScene, fbxNode, node, meshCache, materialCache);
+					ImportMeshNode (fbxScene, ngdScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials);
 					break;
 				}
 
@@ -192,10 +195,28 @@ void dfbxImport::PopulateScene (FbxScene* const fbxScene, dPluginScene* const ng
 			}
 		}
 	}
+
+	
+	UsedMaterials::Iterator iter1 (usedMaterials);
+	for (iter1.Begin(); iter1; iter1 ++) {
+		int count = iter1.GetNode()->GetInfo();
+		if (!count) {
+			dScene::dTreeNode* const materiaCacheNode = ngdScene->FindGetMaterialCacheNode();
+			dScene::dTreeNode* const materialNode = iter1.GetKey();
+			void* nextLink;
+			for (void* link = ngdScene->GetFirstParentLink(materialNode); link; link = nextLink) {
+				nextLink = ngdScene->GetNextParentLink(materialNode, link);
+				dScene::dTreeNode* const parentNode = ngdScene->GetNodeFromLink(link);
+				if (parentNode != materiaCacheNode) {
+					ngdScene->RemoveReference (parentNode, materialNode);
+				}
+			}
+		}
+	}
 }
 
 
-void dfbxImport::LoadHierarchy  (FbxScene* const fbxScene, dPluginScene* const ngdScene, NodeMap& nodeMap)
+void dfbxImport::LoadHierarchy  (FbxScene* const fbxScene, dPluginScene* const ngdScene, GlobalNoceMap& nodeMap)
 {
 	dList <ImportStackData> nodeStack; 
 
@@ -232,7 +253,7 @@ void dfbxImport::LoadHierarchy  (FbxScene* const fbxScene, dPluginScene* const n
 }
 
 
-void dfbxImport::ImportMeshNode (FbxScene* const fbxScene, dPluginScene* const ngdScene, FbxNode* const fbxMeshNode, dPluginScene::dTreeNode* const node, MeshMap& meshCache, MaterialGlobalMap& materialCache)
+void dfbxImport::ImportMeshNode (FbxScene* const fbxScene, dPluginScene* const ngdScene, FbxNode* const fbxMeshNode, dPluginScene::dTreeNode* const node, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials)
 {
 	dTree<dPluginScene::dTreeNode*, FbxMesh*>::dTreeNode* instanceNode = meshCache.Find(fbxMeshNode->GetMesh());
 	if (instanceNode) {
@@ -252,8 +273,8 @@ void dfbxImport::ImportMeshNode (FbxScene* const fbxScene, dPluginScene* const n
 		fbxMesh->GetPivot(pivotMatrix);
 		instance->SetPivotMatrix(dMatrix (pivotMatrix));
 
-		MaterialLocalMap localMaterialIndex;
-		ImportMaterials (fbxScene, ngdScene, fbxMeshNode, meshNode, materialCache, localMaterialIndex);
+		LocalMaterialMap localMaterialIndex;
+		ImportMaterials (fbxScene, ngdScene, fbxMeshNode, meshNode, materialCache, localMaterialIndex, textureCache, usedMaterials);
 
 //		int materialID = 0;		
 //		dScene::dTreeNode* const matNode = ngdScene->CreateMaterialNode(materialID);
@@ -305,10 +326,13 @@ void dfbxImport::ImportMeshNode (FbxScene* const fbxScene, dPluginScene* const n
 					materialID = (materialRefMode == FbxGeometryElement::eDirect) ? 0 : materialArray->GetIndexArray().GetAt(0);
 				}
 			}
-			MaterialLocalMap::dTreeNode* const matNode =  localMaterialIndex.Find(materialID);
+			LocalMaterialMap::dTreeNode* const matNode = localMaterialIndex.Find(materialID);
 			dAssert (matNode);
 			dMaterialNodeInfo* const material = (dMaterialNodeInfo*) ngdScene->GetInfoFromNode(matNode->GetInfo());
 			materialIndex[i] = material->GetId();
+
+			dAssert (usedMaterials.Find(matNode->GetInfo()));
+			usedMaterials.Find(matNode->GetInfo())->GetInfo() += 1;
 
 			faceIndexList[i] = polygonIndexCount;
 			for (int j = 0; j < polygonIndexCount; j ++) {
@@ -340,6 +364,31 @@ void dfbxImport::ImportMeshNode (FbxScene* const fbxScene, dPluginScene* const n
 											   &uv0Array[0].m_x, sizeof (dVector), uv0Index,
 											   &uv1Array[0].m_x, sizeof (dVector), uv1Index);
 
+/*
+NewtonWorld* const world = ngdScene->GetNewtonWorld();
+NewtonMesh* xxx = instance->GetMesh ();
+NewtonCollision* collision =  NewtonCreateConvexHullFromMesh (world, xxx, 0, 0);
+NewtonMesh* xxx1 = NewtonMeshCreateFromCollision(collision);
+instance->SetMesh (xxx1);
+instance->ConvertToTriangles();
+
+NewtonMesh* newtonMesh = instance->GetMesh ();
+int vertexCount = NewtonMeshGetVertexCount(newtonMesh);
+int stride = NewtonMeshGetVertexStrideInByte(newtonMesh) / sizeof(dFloat64);
+dFloat64* const vertexList = NewtonMeshGetVertexArray(newtonMesh);
+
+int actualCount = 0;
+for (void* vertex = NewtonMeshGetFirstVertex(newtonMesh); vertex; vertex = NewtonMeshGetNextVertex(newtonMesh, vertex)) 
+{
+	int index = NewtonMeshGetVertexIndex(newtonMesh, vertex) * stride;
+	dFloat x = dFloat(vertexList[index + 0]);
+	dFloat y = dFloat(vertexList[index + 1]);
+	dFloat z = dFloat(vertexList[index + 2]);
+	++actualCount;
+}
+dAssert(actualCount == vertexCount );
+*/
+
 		delete[] uv1Array;
 		delete[] uv0Array;
 		delete[] normalArray;
@@ -354,44 +403,50 @@ void dfbxImport::ImportMeshNode (FbxScene* const fbxScene, dPluginScene* const n
 }
 
 
-void dfbxImport::ImportMaterials (FbxScene* const fbxScene, dPluginScene* const ngdScene, FbxNode* const fbxMeshNode, dPluginScene::dTreeNode* const meshNode, MaterialGlobalMap& materialCache, MaterialLocalMap& localMaterilIndex)
+void dfbxImport::ImportMaterials (FbxScene* const fbxScene, dPluginScene* const ngdScene, FbxNode* const fbxMeshNode, dPluginScene::dTreeNode* const meshNode, 
+								  GlobalMaterialMap& materialCache, LocalMaterialMap& localMaterilIndex, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials)
 {
+	dPluginScene::dTreeNode* const materialNode = ngdScene->FindMaterialById(DEFUALT_MATERIAL_ID);
+	localMaterilIndex.Insert(materialNode, DEFUALT_MATERIAL_ID);
+	ngdScene->AddReference(meshNode, materialNode);
+
 	int materialCount = fbxMeshNode->GetMaterialCount();
 	if (materialCount) { 
 		for (int i = 0; i < materialCount; i ++) {
 			FbxSurfaceMaterial* const fbxMaterial = fbxMeshNode->GetMaterial(i);
-			MaterialGlobalMap::dTreeNode* matNode = materialCache.Find(fbxMaterial);
-			if (!matNode) {
-				dScene::dTreeNode* const node = ngdScene->CreateMaterialNode(m_materialId);
-				matNode = materialCache.Insert (node, fbxMaterial);
+			GlobalMaterialMap::dTreeNode* globalMaterialCacheNode = materialCache.Find(fbxMaterial);
+			if (!globalMaterialCacheNode) {
+				dScene::dTreeNode* const materialNode = ngdScene->CreateMaterialNode(m_materialId);
+				globalMaterialCacheNode = materialCache.Insert (materialNode, fbxMaterial);
+				usedMaterials.Insert(0, materialNode);
 
-				dMaterialNodeInfo* const material = (dMaterialNodeInfo*) ngdScene->GetInfoFromNode(node);
-				material->SetName(fbxMaterial->GetName());
+				dMaterialNodeInfo* const materialInfo = (dMaterialNodeInfo*) ngdScene->GetInfoFromNode(materialNode);
+				materialInfo->SetName(fbxMaterial->GetName());
 
-				dVector ambient(material->GetAmbientColor());
-				dVector difusse(material->GetDiffuseColor());
-				dVector specular(material->GetSpecularColor());
-				dFloat opacity = material->GetOpacity();
-				dFloat shininess = material->GetShininess();
+				dVector ambient(materialInfo->GetAmbientColor());
+				dVector difusse(materialInfo->GetDiffuseColor());
+				dVector specular(materialInfo->GetSpecularColor());
+				dFloat opacity = materialInfo->GetOpacity();
+				dFloat shininess = materialInfo->GetShininess();
 				if (fbxMaterial->GetClassId().Is(FbxSurfacePhong::ClassId))	{
 					FbxSurfacePhong* const phongMaterial = (FbxSurfacePhong *) fbxMaterial;
 				
 					// Get the ambient Color
 					ambient[0] = dFloat(phongMaterial->Ambient.Get()[0]);
-					ambient[1] = dFloat(phongMaterial->Ambient.Get()[0]);
-					ambient[2] = dFloat(phongMaterial->Ambient.Get()[0]);
+					ambient[1] = dFloat(phongMaterial->Ambient.Get()[1]);
+					ambient[2] = dFloat(phongMaterial->Ambient.Get()[2]);
 					ambient[3] = 1.0f;
 			
 					// get the Diffuse Color
 					difusse[0] = dFloat(phongMaterial->Diffuse.Get()[0]);
-					difusse[1] = dFloat(phongMaterial->Diffuse.Get()[0]);
-					difusse[2] = dFloat(phongMaterial->Diffuse.Get()[0]);
+					difusse[1] = dFloat(phongMaterial->Diffuse.Get()[1]);
+					difusse[2] = dFloat(phongMaterial->Diffuse.Get()[2]);
 					difusse[3] = 1.0f;
 
 					// Get specular Color (unique to Phong materials)
 					specular[0] = dFloat(phongMaterial->Specular.Get()[0]);
-					specular[1] = dFloat(phongMaterial->Specular.Get()[0]);
-					specular[2] = dFloat(phongMaterial->Specular.Get()[0]);
+					specular[1] = dFloat(phongMaterial->Specular.Get()[1]);
+					specular[2] = dFloat(phongMaterial->Specular.Get()[2]);
 					specular[3] = 1.0f;
 
 					// Display the Shininess
@@ -412,106 +467,140 @@ void dfbxImport::ImportMaterials (FbxScene* const fbxScene, dPluginScene* const 
 					dAssert (0);
 				}
 
-				material->SetAmbientColor (ambient);
-				material->SetDiffuseColor (difusse);
-				material->SetSpecularColor(specular);
-				material->SetShininess(shininess);
-				material->SetOpacity (opacity);
+				materialInfo->SetAmbientColor (ambient);
+				materialInfo->SetDiffuseColor (difusse);
+				materialInfo->SetSpecularColor(specular);
+				materialInfo->SetShininess(shininess);
+				materialInfo->SetOpacity (opacity);
 
 				m_materialId ++;
 			}
-			dScene::dTreeNode* const materialNode = matNode->GetInfo();
+			dScene::dTreeNode* const materialNode = globalMaterialCacheNode->GetInfo();
 			localMaterilIndex.Insert(materialNode, i);
 			ngdScene->AddReference(meshNode, materialNode);
-		}
-	} else {
-		dPluginScene::dTreeNode* const materialNode = ngdScene->FindMaterialById(DEFUALT_MATERIAL_ID);
-		localMaterilIndex.Insert(materialNode, DEFUALT_MATERIAL_ID);
-		ngdScene->AddReference(meshNode, materialNode);
-	}
 
-
-	
-/*
-	dMaterialNodeInfo* const material = new dMaterialNodeInfo ();
-	char name[256];
-	if (mtl->NumSubMtls()) {
-		sprintf (name, "%s", maxMaterial->GetName());
-	} else {
-		sprintf (name, "%s", mtl->GetName());
-	}
-	material->SetName(name);
-
-	Color ambient (maxMaterial->GetAmbient());
-	Color difusse (maxMaterial->GetDiffuse());
-	Color specular (maxMaterial->GetSpecular());
-	float shininess (maxMaterial->GetShininess());
-	float shininessStr (maxMaterial->GetShinStr());      
-	float tranparency (maxMaterial->GetXParency());
-
-	material->SetAmbientColor (dVector (ambient.r, ambient.g, ambient.b, 1.0f));
-	material->SetDiffuseColor (dVector (difusse.r, difusse.g, difusse.b, 1.0f));
-	material->SetSpecularColor(dVector (specular.r * shininess, specular.g * shininess, specular.b * shininess, 1.0f));
-	material->SetShininess(shininessStr * 100.0f);
-	material->SetOpacity (1.0f - tranparency);
-
-	dScene::dTreeNode* textNode = NULL;
-	Texmap* const tex = maxMaterial->GetSubTexmap(1);
-	if (tex) {
-		Class_ID texId (tex->ClassID());
-		if (texId != Class_ID(BMTEX_CLASS_ID, 0x00)) {
-			_ASSERTE (0);
-			//					continue;
-		}
-		BitmapTex* const bitmapTex = (BitmapTex *)tex;
-		const char* const texPathName = bitmapTex->GetMapName();
-
-		const char* texName = strrchr (texPathName, '\\');
-		if (texName) {
-			texName ++;
-		} else {
-			texName = strrchr (texPathName, '/');
-			if (texName) {
-				texName ++;
-			} else {
-				texName = texPathName;
+			// assume layer 0 for now
+			FbxProperty textureProperty (fbxMaterial->FindProperty(FbxLayerElement::sTextureChannelNames[0]));
+			if (textureProperty.IsValid()) {
+				ImportTexture (ngdScene, textureProperty, materialNode, textureCache);
 			}
 		}
+	}
+}
 
-		dCRCTYPE crc = dCRC64(texName);
-		dTree<dScene::dTreeNode*, dCRCTYPE>::dTreeNode* cacheNode = imageCache.Find(crc);
-		if (!cacheNode) {
-			dScene::dTreeNode* const textNode = scene.CreateTextureNode(texName);
-			cacheNode = imageCache.Insert(textNode, crc);
-		}
-		textNode = cacheNode->GetInfo();
-		//scene.AddReference(matNode, textNode);
-		dTextureNodeInfo* const texture = (dTextureNodeInfo*) scene.GetInfoFromNode(textNode);
-		texture->SetName(texName);
-		material->SetDiffuseTextId(texture->GetId());
-		material->SetAmbientTextId(texture->GetId());
-		material->SetSpecularTextId(texture->GetId());
-	}
-	dCRCTYPE signature = material->CalculateSignature();
-	dScene::dTreeNode* matNode = scene.FindMaterialBySignature(signature);
-	if (!matNode) {
-		matNode = scene.AddNode(material, scene.GetMaterialCacheNode());
-		material->SetId(materialID);
-		materialID ++;
-		if (textNode) {
-			scene.AddReference(matNode, textNode);
-		}
-	}
-	scene.AddReference(meshNode, matNode);
-	material->Release();
 
-	dMaterialNodeInfo* const cachedMaterialInfo = (dMaterialNodeInfo*)scene.GetInfoFromNode(matNode);
-	int id = cachedMaterialInfo->GetId();
-	for (int j = 0; j < facesCount; j ++) {
-		MNFace* const maxFace = maxMesh.F(j);
-		if (maxFace->material == i) {
-			materialIndex[j] = id;
-		}
-	}
+void dfbxImport::ImportTexture (dPluginScene* const ngdScene, FbxProperty pProperty, dPluginScene::dTreeNode* const materialNode, GlobalTextureMap& textureCache)
+{
+	int lTextureCount = pProperty.GetSrcObjectCount<FbxTexture>();
+	for (int j = 0; j < lTextureCount; ++j) {
+		//Here we have to check if it's layered textures, or just textures:
+		FbxLayeredTexture *lLayeredTexture = pProperty.GetSrcObject<FbxLayeredTexture>(j);
+		if (lLayeredTexture)
+		{
+			dAssert (0);
+/*
+			DisplayInt("    Layered Texture: ", j);
+			FbxLayeredTexture *lLayeredTexture = pProperty.GetSrcObject<FbxLayeredTexture>(j);
+			int lNbTextures = lLayeredTexture->GetSrcObjectCount<FbxTexture>();
+			for(int k =0; k<lNbTextures; ++k)
+			{
+				FbxTexture* lTexture = lLayeredTexture->GetSrcObject<FbxTexture>(k);
+				if(lTexture)
+				{
+
+					if(pDisplayHeader){                    
+						DisplayInt("    Textures connected to Material ", pMaterialIndex);
+						pDisplayHeader = false;
+					}
+
+					//NOTE the blend mode is ALWAYS on the LayeredTexture and NOT the one on the texture.
+					//Why is that?  because one texture can be shared on different layered textures and might
+					//have different blend modes.
+
+					FbxLayeredTexture::EBlendMode lBlendMode;
+					lLayeredTexture->GetTextureBlendMode(k, lBlendMode);
+					DisplayString("    Textures for ", pProperty.GetName());
+					DisplayInt("        Texture ", k);  
+					DisplayTextureInfo(lTexture, (int) lBlendMode);   
+				}
+			}
 */
+		} else {
+			//no layered texture simply get on the property
+			FbxTexture* const texture = pProperty.GetSrcObject<FbxTexture>(j);
+			if(texture) {
+				GlobalTextureMap::dTreeNode* textCacheNode = textureCache.Find(texture);
+				if (!textCacheNode) {
+
+					//const FbxString& name = pProperty.GetName();
+					//const char* const texPathName = name.Buffer();
+					dAssert (pProperty.GetName() == "DiffuseColor");
+
+					FbxFileTexture* const fileTexture = FbxCast<FbxFileTexture>(texture);
+					//FbxProceduralTexture* const proceduralTexture = FbxCast<FbxProceduralTexture>(texture);
+					dAssert (!FbxCast<FbxProceduralTexture>(texture));
+
+					const char* const texPathName = fileTexture->GetFileName();
+
+/*
+					DisplayDouble("            Scale U: ", pTexture->GetScaleU());
+					DisplayDouble("            Scale V: ", pTexture->GetScaleV());
+					DisplayDouble("            Translation U: ", pTexture->GetTranslationU());
+					DisplayDouble("            Translation V: ", pTexture->GetTranslationV());
+					DisplayBool("            Swap UV: ", pTexture->GetSwapUV());
+					DisplayDouble("            Rotation U: ", pTexture->GetRotationU());
+					DisplayDouble("            Rotation V: ", pTexture->GetRotationV());
+					DisplayDouble("            Rotation W: ", pTexture->GetRotationW());
+					const char* lAlphaSources[] = { "None", "RGB Intensity", "Black" };
+					DisplayString("            Alpha Source: ", lAlphaSources[pTexture->GetAlphaSource()]);
+					DisplayDouble("            Cropping Left: ", pTexture->GetCroppingLeft());
+					DisplayDouble("            Cropping Top: ", pTexture->GetCroppingTop());
+					DisplayDouble("            Cropping Right: ", pTexture->GetCroppingRight());
+					DisplayDouble("            Cropping Bottom: ", pTexture->GetCroppingBottom());
+					const char* lMappingTypes[] = { "Null", "Planar", "Spherical", "Cylindrical", "Box", "Face", "UV", "Environment" };
+					DisplayString("            Mapping Type: ", lMappingTypes[pTexture->GetMappingType()]);
+					if (pTexture->GetMappingType() == FbxTexture::ePlanar) {
+						const char* lPlanarMappingNormals[] = { "X", "Y", "Z" };
+
+						DisplayString("            Planar Mapping Normal: ", lPlanarMappingNormals[pTexture->GetPlanarMappingNormal()]);
+					}
+
+					const char* lBlendModes[]   = { "Translucent", "Add", "Modulate", "Modulate2" };   
+					if(pBlendMode >= 0)
+						DisplayString("            Blend Mode: ", lBlendModes[pBlendMode]);
+					DisplayDouble("            Alpha: ", pTexture->GetDefaultAlpha());
+
+					if (lFileTexture) {
+						const char* lMaterialUses[] = { "Model Material", "Default Material" };
+						DisplayString("            Material Use: ", lMaterialUses[lFileTexture->GetMaterialUse()]);
+					}
+
+					const char* pTextureUses[] = { "Standard", "Shadow Map", "Light Map", "Spherical Reflexion Map", "Sphere Reflexion Map", "Bump Normal Map" };
+					DisplayString("            Texture Use: ", pTextureUses[pTexture->GetTextureUse()]);
+					DisplayString("");                
+
+*/
+					char path[2048];
+					const char* const texName = dGetNameFromPath(texPathName);
+					dExtractPathFromFullName (texPathName, path);
+
+					dScene::dTreeNode* const textNode = ngdScene->CreateTextureNode(texName);
+					dTextureNodeInfo* const textureInfo = (dTextureNodeInfo*) ngdScene->GetInfoFromNode(textNode);
+					textureInfo->SetName(texName);
+					textureInfo->SetPathName(texName);
+					textCacheNode = textureCache.Insert (textNode, texture);
+				}
+
+				// for now only set the Diffuse texture
+				dScene::dTreeNode* const textNode = textCacheNode->GetInfo();
+				dTextureNodeInfo* const textureInfo = (dTextureNodeInfo*) ngdScene->GetInfoFromNode(textNode);
+				dMaterialNodeInfo* const materialInfo = (dMaterialNodeInfo*) ngdScene->GetInfoFromNode(materialNode);
+				ngdScene->AddReference (materialNode, textNode);
+
+				materialInfo->SetDiffuseTextId(textureInfo->GetId());
+				materialInfo->SetAmbientTextId(textureInfo->GetId());
+				materialInfo->SetSpecularTextId(textureInfo->GetId());
+			}
+		}
+	}
 }
