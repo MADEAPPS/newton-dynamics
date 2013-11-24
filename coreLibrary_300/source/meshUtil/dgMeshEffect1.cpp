@@ -1334,6 +1334,8 @@ void dgMeshEffect::Triangulate  ()
 		}
 	}
 
+	RepairTJoints ();
+	dgAssert (Sanity ());
 }
 
 void dgMeshEffect::ConvertToPolygons ()
