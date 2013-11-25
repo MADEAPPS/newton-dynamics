@@ -32,7 +32,7 @@ class OffImport: public dImportPlugin
 	virtual const char* GetMenuName () { return GetSignature();}
 	virtual const char* GetFileExtension () { return "*.off";}
 	virtual const char* GetFileDescription () {return "off mesh import";}
-	virtual const char* GetSignature () {return "Import Object File Format file";}
+	virtual const char* GetSignature () {return "Import Object File Format file (.off)";}
 	virtual bool Import (const char* const fileName, dPluginInterface* const interface);
 };
 
@@ -50,7 +50,7 @@ class OffExport: public dExportPlugin
 	virtual const char* GetMenuName () { return GetSignature();}
 	virtual const char* GetFileExtension () { return "*.off";}
 	virtual const char* GetFileDescription () {return "off mesh export";}
-	virtual const char* GetSignature () {return "Export Object File Format file";}
+	virtual const char* GetSignature () {return "Export Object File Format file (.off)";}
 	virtual void Export (const char* const fileName, dPluginInterface* const interface);
 };
 

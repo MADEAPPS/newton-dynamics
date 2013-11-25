@@ -311,10 +311,12 @@ class dInfinitePlane
 
 		DemoEntity* const entity = new DemoEntity(matrix, NULL);
 		scene->Append (entity);
-		entity->SetMesh(mesh);
+dAssert (0);
+//		entity->SetMesh(mesh);
 		mesh->Release();
 
 		return entity;
+
 	}
 
 	public:

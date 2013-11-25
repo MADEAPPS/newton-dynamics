@@ -457,8 +457,8 @@ void DemoEntityManager::BodyDeserialization (NewtonBody* const body, NewtonDeser
 
 	//for visual mesh we will collision mesh and convert it to a visual mesh using NewtonMesh 
 	DemoMesh* const mesh = new DemoMesh(bodyIndentification, collision, NULL, NULL, NULL);
-
-	entity->SetMesh(mesh);
+dAssert (0);
+//	entity->SetMesh(mesh);
 	mesh->Release();
 }
 
@@ -575,7 +575,7 @@ void DemoEntityManager::LoadScene (const char* const fileName)
 	// this will apply all global the scale to the mesh
 	database.FreezeScale();
 	// this will apply all local scale and transform to the mesh
-	database.FreezePivot();
+	//database.FreezePivot();
 
 	// Load the Visual Scene
 	EntityDictionary entDictionary;

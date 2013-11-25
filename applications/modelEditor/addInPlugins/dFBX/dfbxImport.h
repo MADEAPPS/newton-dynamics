@@ -93,6 +93,7 @@ class dfbxImport: public dImportPlugin
 	void ImportMaterials (FbxScene* const fbxScene, dPluginScene* const ngdScene, FbxNode* const fbxMeshNode, dPluginScene::dTreeNode* const meshNode, GlobalMaterialMap& materialCache, LocalMaterialMap& localMaterilIndex, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials);
 	void ImportTexture (dPluginScene* const ngdScene, FbxProperty pProperty, dPluginScene::dTreeNode* const materialNode, GlobalTextureMap& textureCache);
 	
+	
 	int m_materialId;
 	char m_ext[32];
 	char m_signature[32];

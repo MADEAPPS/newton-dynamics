@@ -36,20 +36,21 @@ class DemoEntity: public dHierarchy<DemoEntity>, virtual public dClassInfo
 	};
 
 	DemoEntity(const DemoEntity& copyFrom);
-	DemoEntity(const dMatrix& matrix, DemoEntity* parent);
-	DemoEntity(DemoEntityManager& world, const dScene* scene, dScene::dTreeNode* rootSceneNode, dTree<DemoMesh*, dScene::dTreeNode*>& meshCache, 
-			   DemoEntityManager::EntityDictionary& entityDictionary, DemoEntity* parent = NULL);
+	DemoEntity(const dMatrix& matrix, DemoEntity* const parent);
+	DemoEntity(DemoEntityManager& world, const dScene* const scene, dScene::dTreeNode* const rootSceneNode, dTree<DemoMesh*, dScene::dTreeNode*>& meshCache, DemoEntityManager::EntityDictionary& entityDictionary, DemoEntity* const parent = NULL);
 	virtual ~DemoEntity(void);
 
 	DemoMesh* GetMesh() const;
-	void SetMesh(DemoMesh* m_mesh);
+	void SetMesh(DemoMesh* const m_mesh, const dMatrix& meshMatrix);
+
+	const dMatrix& GetMeshMatrix() const;  
+	void SetMeshMatrix(const dMatrix& matrix);  
 
 	UserData* GetUserData ();
 	void SetUserData (UserData* const data);
 
 	dBaseHierarchy* CreateClone () const;
 	void LoadNGD_mesh (const char* const fileName, NewtonWorld* const world);
-
 
 	const dMatrix& GetRenderMatrix () const;
 	dMatrix CalculateGlobalMatrix (const DemoEntity* const root = NULL) const;
@@ -78,11 +79,12 @@ class DemoEntity: public dHierarchy<DemoEntity>, virtual public dClassInfo
 	dVector m_nextPosition;             // position at the current physics simulation step
 	dQuaternion m_curRotation;          // rotation one physics simulation step in the future  
 	dQuaternion m_nextRotation;         // rotation at the current physics simulation step  
-	unsigned m_lock;
 
+	dMatrix m_meshMatrix;
 	DemoMesh* m_mesh;
 	UserData* m_userData;
 
+	unsigned m_lock;
 	dAddRtti(dClassInfo,DOMMY_API);
 
 	friend class DemoEntityManager;

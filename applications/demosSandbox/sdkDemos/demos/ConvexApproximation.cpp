@@ -34,10 +34,10 @@ static void CreateConvexAproximation (const char* const name, DemoEntityManager*
 	dScene compoundTestMesh (world);
 	compoundTestMesh.Deserialize(fileName);
 
+dAssert (0);
 	// freeze the scale and pivot on the model 
 	compoundTestMesh.FreezeScale();
-	compoundTestMesh.FreezePivot ();
-
+//	compoundTestMesh.FreezeGeometryPivot ();
 
 	dMeshNodeInfo* meshInfo = NULL;
 	for (dScene::dTreeNode* node = compoundTestMesh.GetFirstNode (); node; node = compoundTestMesh.GetNextNode (node)) {

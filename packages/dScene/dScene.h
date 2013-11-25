@@ -36,12 +36,14 @@ class dTextureNodeInfo;
 // change SceneNodeMatrix Matrix from global to local
 //#define D_SCENE_REVISION_NUMBER 101
 
-
 // added a texture cache, material cache, and mesh cache as children of root node.
 //#define D_SCENE_REVISION_NUMBER 102
 
-// adding the geometry transform node info, 
-#define D_SCENE_REVISION_NUMBER 103
+// skip this revision number
+//#define D_SCENE_REVISION_NUMBER 103
+
+// adding the geometry transform node info 
+#define D_SCENE_REVISION_NUMBER 104
 
 
 #define D_TEXTURE_CACHE_NODE_MAME	"dTextureCache"
@@ -146,7 +148,7 @@ class dScene: public dSceneGraph, public dRefCounter
 	DSCENE_API virtual dFloat RayCast (const dVector& p0, const dVector& p1, dList<dTreeNode*>& traceRoot) const;
 
 	DSCENE_API virtual void FreezeScale () const;
-	DSCENE_API virtual void FreezePivot () const;
+//	DSCENE_API virtual void FreezePivot () const;
 	DSCENE_API virtual void BakeTransform (const dMatrix& matrix) const;
 	
 	DSCENE_API virtual int GetRevision() const;

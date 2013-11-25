@@ -156,18 +156,20 @@ void dPluginScene::RenderFlatShadedSceneNode (dSceneRender* const render, dScene
 	render->PushMatrix (sceneInfo->GetTransform());
 
 	for (void* link = GetFirstChildLink(sceneNode); link; link = GetNextChildLink(sceneNode, link)) {
-		dScene::dTreeNode* const node = GetNodeFromLink (link);
-		dGeometryNodeInfo* const geometryInfo = (dGeometryNodeInfo*)GetInfoFromNode(node);
+		dScene::dTreeNode* const geometryNode = GetNodeFromLink (link);
+		dGeometryNodeInfo* const geometryInfo = (dGeometryNodeInfo*)GetInfoFromNode(geometryNode);
 		if (geometryInfo->IsType(dGeometryNodeInfo::GetRttiType())) {
-			geometryInfo->DrawFlatShaded(render, this, node);
+			render->PushMatrix(sceneInfo->GetGeometryTransform());
+			geometryInfo->DrawFlatShaded(render, this, geometryNode);
+			render->PopMatrix ();
 		}
 	}
 
 	for (void* link = GetFirstChildLink(sceneNode); link; link = GetNextChildLink(sceneNode, link)) {
-		dScene::dTreeNode* const node = GetNodeFromLink (link);
-		dSceneNodeInfo* const info = (dSceneNodeInfo*)GetInfoFromNode(node);
-		if (info->IsType(dSceneNodeInfo::GetRttiType())) {
-			RenderFlatShadedSceneNode (render, node);
+		dScene::dTreeNode* const sceneNode = GetNodeFromLink (link);
+		dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*)GetInfoFromNode(sceneNode);
+		if (sceneInfo->IsType(dSceneNodeInfo::GetRttiType())) {
+			RenderFlatShadedSceneNode (render, sceneNode);
 		}
 	}
 
@@ -182,18 +184,20 @@ void dPluginScene::RenderWireframeSceneNode (dSceneRender* const render, dScene:
 	render->PushMatrix (sceneInfo->GetTransform());
 
 	for (void* link = GetFirstChildLink(sceneNode); link; link = GetNextChildLink(sceneNode, link)) {
-		dScene::dTreeNode* const node = GetNodeFromLink (link);
-		dGeometryNodeInfo* const geometryInfo = (dGeometryNodeInfo*)GetInfoFromNode(node);
+		dScene::dTreeNode* const geometryNode = GetNodeFromLink (link);
+		dGeometryNodeInfo* const geometryInfo = (dGeometryNodeInfo*)GetInfoFromNode(geometryNode);
 		if (geometryInfo->IsType(dGeometryNodeInfo::GetRttiType())) {
-			geometryInfo->DrawWireFrame(render, this, node);
+			render->PushMatrix(sceneInfo->GetGeometryTransform());
+			geometryInfo->DrawWireFrame(render, this, geometryNode);
+			render->PopMatrix ();
 		}
 	}
 
 	for (void* link = GetFirstChildLink(sceneNode); link; link = GetNextChildLink(sceneNode, link)) {
-		dScene::dTreeNode* const node = GetNodeFromLink (link);
-		dSceneNodeInfo* const info = (dSceneNodeInfo*)GetInfoFromNode(node);
-		if (info->IsType(dSceneNodeInfo::GetRttiType())) {
-			RenderWireframeSceneNode (render, node);
+		dScene::dTreeNode* const sceneNode = GetNodeFromLink (link);
+		dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*)GetInfoFromNode(sceneNode);
+		if (sceneInfo->IsType(dSceneNodeInfo::GetRttiType())) {
+			RenderWireframeSceneNode (render, sceneNode);
 		}
 	}
 
@@ -208,19 +212,21 @@ void dPluginScene::RenderSelectedSceneNodes (dSceneRender* const render, dScene:
 
 	if (sceneInfo->GetEditorFlags() & dPluginInterface::m_selected) {
 		for (void* link = GetFirstChildLink(sceneNode); link; link = GetNextChildLink(sceneNode, link)) {
-			dScene::dTreeNode* const node = GetNodeFromLink (link);
-			dGeometryNodeInfo* const geometryInfo = (dGeometryNodeInfo*)GetInfoFromNode(node);
+			dScene::dTreeNode* const geometryNode = GetNodeFromLink (link);
+			dGeometryNodeInfo* const geometryInfo = (dGeometryNodeInfo*)GetInfoFromNode(geometryNode);
 			if ( geometryInfo->IsType(dGeometryNodeInfo::GetRttiType())) {
-				geometryInfo->DrawWireFrame(render, this, node);
+				render->PushMatrix(sceneInfo->GetGeometryTransform());
+				geometryInfo->DrawWireFrame(render, this, geometryNode);
+				render->PopMatrix ();
 			}
 		}
 	}
 
 	for (void* link = GetFirstChildLink(sceneNode); link; link = GetNextChildLink(sceneNode, link)) {
-		dScene::dTreeNode* const node = GetNodeFromLink (link);
-		dSceneNodeInfo* const info = (dSceneNodeInfo*)GetInfoFromNode(node);
-		if (info->IsType(dSceneNodeInfo::GetRttiType())) {
-			RenderSelectedSceneNodes (render, node);
+		dScene::dTreeNode* const sceneNode = GetNodeFromLink (link);
+		dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*)GetInfoFromNode(sceneNode);
+		if (sceneInfo->IsType(dSceneNodeInfo::GetRttiType())) {
+			RenderSelectedSceneNodes (render, sceneNode);
 		}
 	}
 

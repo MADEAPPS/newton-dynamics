@@ -141,7 +141,8 @@ class AdvancePlayerEntity: public DemoEntity
 		// create the visual mesh from the player collision shape
 		NewtonCollision* const collision = NewtonBodyGetCollision(body);
 		DemoMesh* const geometry = new DemoMesh("player", collision, "smilli.tga", "smilli.tga", "smilli.tga");
-		SetMesh(geometry);
+dAssert (0);
+//		SetMesh(geometry);
 		geometry->Release(); 
 	}
 
@@ -513,7 +514,8 @@ class PlaformEntityEntity: public DemoEntity
 		scene->Append(this);
 
 		DemoMesh* const mesh = source->GetMesh();
-		SetMesh(mesh);
+dAssert (0);
+//		SetMesh(mesh);
 
 		const dFloat mass = 100.9f;
 		dMatrix matrix (source->GetNextMatrix()) ;

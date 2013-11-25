@@ -399,8 +399,8 @@ int dPluginRender::GetCachedWireframeDisplayList(NewtonMesh* const mesh)
 		int displayList = CreateDisplayList();
 		BeginDisplayList(displayList);
 
-		int stride = NewtonMeshGetVertexStrideInByte(mesh) / sizeof (double);
-		const double* const vertexList = NewtonMeshGetVertexArray(mesh);
+		int stride = NewtonMeshGetVertexStrideInByte(mesh) / sizeof (dFloat64);
+		const dFloat64* const vertexList = NewtonMeshGetVertexArray(mesh);
 
 		BeginLine();
 		for (void* edge = NewtonMeshGetFirstEdge (mesh); edge; edge = NewtonMeshGetNextEdge (mesh, edge)) {
@@ -428,8 +428,8 @@ int dPluginRender::GetCachedFlatShadedDisplayList(NewtonMesh* const mesh)
 		int displayList = CreateDisplayList();
 		BeginDisplayList(displayList);
 
-		int stride = NewtonMeshGetVertexStrideInByte(mesh) / sizeof (double);
-		const double* const vertexList = NewtonMeshGetVertexArray(mesh);
+		int stride = NewtonMeshGetVertexStrideInByte(mesh) / sizeof (dFloat64);
+		const dFloat64* const vertexList = NewtonMeshGetVertexArray(mesh);
 
 		BeginTriangle();
 		for (void* face = NewtonMeshGetFirstFace(mesh); face; face = NewtonMeshGetNextFace(mesh, face)) {

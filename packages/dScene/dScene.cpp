@@ -168,6 +168,25 @@ static void AddTextureCacheMaterianCacheMeshCache (dScene* const scene)
 	scene->DeleteDuplicateGeometries();
 }
 
+static void RemoveLocalTransformFromGeometries (dScene* const scene)
+{
+	dScene::dTreeNode* const cacheNode = scene->FindGetGeometryCacheNode();
+	for (void* link = scene->GetFirstChildLink(cacheNode); link; link = scene->GetNextChildLink(cacheNode, link)) {
+		dScene::dTreeNode* const geometryNode = scene->GetNodeFromLink(link);
+		dGeometryNodeInfo* const geometryInfo = (dGeometryNodeInfo*)scene->GetInfoFromNode(geometryNode);
+		dMatrix matrix (geometryInfo->GetPivotMatrix());
+		for (void* link1 = scene->GetFirstParentLink(geometryNode); link1; link1 = scene->GetNextParentLink(geometryNode, link1)) {
+			dScene::dTreeNode* const sceneNode = scene->GetNodeFromLink(link1);
+			if (sceneNode != cacheNode) {
+				dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*)scene->GetInfoFromNode(sceneNode);
+				sceneInfo->SetGeometryTransform(matrix * sceneInfo->GetGeometryTransform());
+			}
+		}
+		geometryInfo->SetPivotMatrix(GetIdentityMatrix());
+	}
+	scene->FreezeScale();
+}
+
 
 // this constructor is for the editor only
 dScene::dScene(NewtonWorld* const newton)
@@ -674,7 +693,6 @@ dScene::dTreeNode* dScene::FindParentByType(dTreeNode* const childNode, dCRCTYPE
 
 void dScene::FreezeScale () const
 {
-	// revision 101 and up, nodes are now relative to parent node
 	dList<dTreeNode*> nodeStack;
 	dList<dMatrix> parentMatrixStack;
 
@@ -696,45 +714,46 @@ void dScene::FreezeScale () const
 		nodeStack.Remove(nodeStack.GetLast());
 		parentMatrixStack.Remove(parentMatrixStack.GetLast());
 
-		dSceneNodeInfo* const sceneNode = (dSceneNodeInfo*)GetInfoFromNode(rootNode);
-		dAssert (sceneNode->IsType(dSceneNodeInfo::GetRttiType()));
-		dMatrix transform (sceneNode->GetTransform() * parentMatrix);
+		dSceneNodeInfo* const sceneNodeInfo = (dSceneNodeInfo*)GetInfoFromNode(rootNode);
+		dAssert (sceneNodeInfo->IsType(dSceneNodeInfo::GetRttiType()));
+		dMatrix transform (sceneNodeInfo->GetTransform() * parentMatrix);
 
 		dVector scale;
 		dMatrix matrix;
 		dMatrix stretchAxis;
 		transform.PolarDecomposition (matrix, scale, stretchAxis);
+		sceneNodeInfo->SetTransform (matrix);
 
-		sceneNode->SetTransform (matrix);
 		dMatrix scaleMatrix (GetIdentityMatrix(), scale, stretchAxis);
-
-		for (void* ptr = GetFirstChildLink(rootNode); ptr; ptr = GetNextChildLink(rootNode, ptr)) {
-			dTreeNode* const geomNode = GetNodeFromLink(ptr);
-			if (GetInfoFromNode(geomNode)->IsType(dGeometryNodeInfo::GetRttiType())) {
-				dGeometryNodeInfo* const geom = (dGeometryNodeInfo*)GetInfoFromNode(geomNode);
-				if (!geoFilter.Find(geom)) {
-					geom->BakeTransform (scaleMatrix);
-					geoFilter.Insert(geom, geom);
-				}
-			}
-		}
-
+//		for (void* ptr = GetFirstChildLink(rootNode); ptr; ptr = GetNextChildLink(rootNode, ptr)) {
+//			dTreeNode* const geomNode = GetNodeFromLink(ptr);
+//			if (GetInfoFromNode(geomNode)->IsType(dGeometryNodeInfo::GetRttiType())) {
+//				dGeometryNodeInfo* const geom = (dGeometryNodeInfo*)GetInfoFromNode(geomNode);
+//				if (!geoFilter.Find(geom)) {
+//					geom->BakeTransform (scaleMatrix);
+//					geoFilter.Insert(geom, geom);
+//				}
+//			}
+//		}
+		sceneNodeInfo->SetGeometryTransform (sceneNodeInfo->GetGeometryTransform() * scaleMatrix);
 
 		for (void* link = GetFirstChildLink(rootNode); link; link = GetNextChildLink(rootNode, link)) {
 			dTreeNode* const node = GetNodeFromLink(link);
 			dNodeInfo* const nodeInfo = GetInfoFromNode(node);
 			if (nodeInfo->IsType(dSceneNodeInfo::GetRttiType())) {
 				nodeStack.Append(node);
-				parentMatrixStack.Append(transform);
+				parentMatrixStack.Append(scaleMatrix);
 			}
 		}
 	}
 }
 
+/*
 void dScene::FreezePivot () const
 {
 	Iterator iter (*this);
 	for (iter.Begin(); iter; iter ++) {
+		dAssert (0);
 		dTreeNode* const node = iter.GetNode();
 		dNodeInfo* const nodeInfo = GetInfoFromNode(node);
 		if (nodeInfo->IsType(dGeometryNodeInfo::GetRttiType())) {
@@ -744,8 +763,22 @@ void dScene::FreezePivot () const
 			geom->BakeTransform (matrix);
 		}
 	}
-
 }
+*/
+
+/*
+void dScene::FreezeGeometryPivot () const
+{
+	dTreeNode* const meshCache = FindGetGeometryCacheNode();
+	for (void* link = GetFirstChildLink(meshCache); link; link = GetNextChildLink(meshCache, link)) {
+		dTreeNode* const meshNode = GetNodeFromLink(link);
+		dGeometryNodeInfo* const geom = (dGeometryNodeInfo*)GetInfoFromNode(meshNode);
+		dMatrix matrix (geom->GetPivotMatrix());
+		geom->SetPivotMatrix (GetIdentityMatrix());
+		geom->BakeTransform (matrix);
+	}
+}
+*/
 
 void dScene::BakeTransform (const dMatrix& matrix) const
 {
@@ -1425,7 +1458,11 @@ bool dScene::Deserialize (const char* const fileName)
 		}
 
 		// update the revision to latest 
-		m_revision = D_SCENE_REVISION_NUMBER;
+		if (GetRevision() < 104) {
+			m_revision = 104;
+			RemoveLocalTransformFromGeometries (this);
+		}
+		
 	}
 
 	// restore locale settings

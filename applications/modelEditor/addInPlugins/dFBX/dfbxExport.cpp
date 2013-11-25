@@ -153,17 +153,39 @@ void dfbxExport::LoadNode (dPluginScene* const ngdScene, FbxScene* const fbxScen
 	FbxNode* const fpxNode = FbxNode::Create(fbxScene, nodeInfo->GetName());
 	fbxRoot->AddChild(fpxNode);
 
-	dMatrix matrix (nodeInfo->GetTransform());
+	{
+		dMatrix matrix (nodeInfo->GetTransform());
+		dVector scale;
+		dMatrix stretchAxis;
+		dMatrix transformMatrix; 
+		matrix.PolarDecomposition (transformMatrix, scale, stretchAxis);
+		dVector eulers (transformMatrix.GetEulerAngles().Scale (180.0f / 3.14159265359f));
 
-	dVector scale;
-	dMatrix stretchAxis;
-	dMatrix transformMatrix; 
-	matrix.PolarDecomposition (transformMatrix, scale, stretchAxis);
-	dVector eulers (transformMatrix.GetEulerAngles().Scale (180.0f / 3.14159265359f));
+		dAssert (dAbs (stretchAxis[0][0] - 1.0f)  < 1.0e-6f);
+		dAssert (dAbs (stretchAxis[1][1] - 1.0f)  < 1.0e-6f);
+		dAssert (dAbs (stretchAxis[2][2] - 1.0f)  < 1.0e-6f);
+		fpxNode->LclTranslation.Set(FbxVector4 (transformMatrix.m_posit.m_x, transformMatrix.m_posit.m_y, transformMatrix.m_posit.m_z, 1.0));
+		fpxNode->LclRotation.Set(FbxVector4 (eulers.m_x, eulers.m_y, eulers.m_z, 0.0));
+		fpxNode->LclScaling.Set(FbxVector4 (scale.m_x, scale.m_y, scale.m_z, 0.0));
+	}
 
-	fpxNode->LclTranslation.Set(FbxVector4 (transformMatrix.m_posit.m_x, transformMatrix.m_posit.m_y, transformMatrix.m_posit.m_z, 1.0));
-	fpxNode->LclRotation.Set(FbxVector4 (eulers.m_x, eulers.m_y, eulers.m_z, 0.0));
-	fpxNode->LclScaling.Set(FbxVector4 (scale.m_x, scale.m_y, scale.m_z, 0.0));
+	{
+		dMatrix matrix (nodeInfo->GetGeometryTransform());
+		dVector scale;
+		dMatrix stretchAxis;
+		dMatrix transformMatrix; 
+		matrix.PolarDecomposition (transformMatrix, scale, stretchAxis);
+		dVector eulers (transformMatrix.GetEulerAngles().Scale (180.0f / 3.14159265359f));
+
+		dAssert (dAbs (stretchAxis[0][0] - 1.0f)  < 1.0e-6f);
+		dAssert (dAbs (stretchAxis[1][1] - 1.0f)  < 1.0e-6f);
+		dAssert (dAbs (stretchAxis[2][2] - 1.0f)  < 1.0e-6f);
+
+		fpxNode->SetGeometricTranslation (FbxNode::eSourcePivot, FbxVector4 (transformMatrix.m_posit.m_x, transformMatrix.m_posit.m_y, transformMatrix.m_posit.m_z, 1.0));
+		fpxNode->SetGeometricRotation (FbxNode::eSourcePivot, FbxVector4 (eulers.m_x, eulers.m_y, eulers.m_z, 0.0));
+		fpxNode->SetGeometricScaling (FbxNode::eSourcePivot, FbxVector4 (scale.m_x, scale.m_y, scale.m_z, 0.0));
+	}
+
 
 	for (void* ptr = ngdScene->GetFirstChildLink(node); ptr; ptr = ngdScene->GetNextChildLink(node, ptr) ) {
 		dScene::dTreeNode* const childMeshNode = ngdScene->GetNodeFromLink(ptr);
@@ -252,7 +274,7 @@ void dfbxExport::CreateMaterials (dPluginScene* const ngdScene, FbxScene* const 
 		fbxMaterial->Specular.Set (FbxDouble3(specular[0], specular[1], specular[2]));
 
 		fbxMaterial->TransparencyFactor.Set (1.0 - materialInfo->GetOpacity());
-/*
+
 		if (materialInfo->GetDiffuseTextId() != -1) {
 			dScene::dTreeNode* const textNode = ngdScene->FindTextureByTextId(materialNode, materialInfo->GetDiffuseTextId());
 			if (textNode) {
@@ -262,7 +284,7 @@ void dfbxExport::CreateMaterials (dPluginScene* const ngdScene, FbxScene* const 
 				fbxMaterial->Diffuse.ConnectSrcObject(fbxTexture);
 			}
 		}
-
+/*
 		if (materialInfo->GetAmbientTextId() != -1) {
 			dScene::dTreeNode* const textNode = ngdScene->FindTextureByTextId(materialNode, materialInfo->GetAmbientTextId());
 			if (textNode) {
@@ -273,6 +295,7 @@ void dfbxExport::CreateMaterials (dPluginScene* const ngdScene, FbxScene* const 
 			}
 		}
 */
+
 		materialMap.Insert(fbxMaterial, materialNode);
 		materialIndex.Insert(enumerator, materialInfo->GetId());
 		enumerator ++;
@@ -351,19 +374,19 @@ void dfbxExport::BuildMeshes (dPluginScene* const ngdScene, FbxScene* const fbxS
 					int faceId = NewtonMeshGetFaceMaterial (mesh, face);
 					dAssert (materialIndex.Find(faceId));
 					int matId = materialIndex.Find(faceId)->GetInfo();
-matId = -1;
+
 
 					dScene::dTreeNode* const materialNode = ngdScene->FindMaterialById(faceId);
 					dMaterialNodeInfo* const materialInfo = (dMaterialNodeInfo*) ngdScene->GetInfoFromNode(materialNode);
 					dCRCTYPE difusseTexture = materialInfo->GetDiffuseTextId();
+
 					int texId = -1;
 					if (difusseTexture != -1) {
-						//dScene::dTreeNode* const textureNode = ngdScene->FindTextureByTextId(difusseTexture);
-						//dTextureNodeInfo* const textureInfo = (dTextureNodeInfo*) ngdScene->GetInfoFromNode(textureNode);
 						dAssert (textureIndex.Find(difusseTexture));
 						texId = textureIndex.Find(difusseTexture)->GetInfo();
 					}
-
+//matId = -1;
+texId = -1;
 
 					fbxMesh->BeginPolygon(matId, texId, false);
 					for (int j = 0; j < indexCount; j ++) {

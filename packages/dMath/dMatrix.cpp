@@ -601,6 +601,7 @@ void dMatrix::PolarDecomposition (dMatrix& transformMatrix, dVector& scale, dMat
 		scale[0] = det;
 		scale[1] = det;
 		scale[2] = det;
+		scale[3] = 1.0f;
 		det = 1.0f/ det;
 		transformMatrix.m_front = m_front.Scale (det);
 		transformMatrix.m_up = m_up.Scale (det);

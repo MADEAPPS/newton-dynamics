@@ -240,8 +240,9 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			} else {
 				brakeTorque = 1000.0f;
 			}
-			vehicleModel->m_frontTireJoints[0]->SetFriction(brakeTorque);
-			vehicleModel->m_frontTireJoints[1]->SetFriction(brakeTorque);
+			for (int i = 0; i < vehicleModel->m_frontTiresCount; i ++) {
+				vehicleModel->m_frontTireJoints[i]->SetFriction(brakeTorque);
+			}
 
 			dMatrix matrix;
 			NewtonBody* const rootBody = controller->GetBoneBody(0);
@@ -250,8 +251,9 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			dVector tirePing (matrix.RotateVector(dVector (0.0, 0.0, 1.0, 0.0)));
 			if (engineTorque != 0.0f) {
 				dVector torque (tirePing.Scale(engineTorque));
-				NewtonBodyAddTorque (vehicleModel->m_fronTires[0], &torque[0]);
-				NewtonBodyAddTorque (vehicleModel->m_fronTires[1], &torque[0]);
+				for (int i = 0; i < vehicleModel->m_frontTiresCount; i ++) {
+					NewtonBodyAddTorque (vehicleModel->m_fronTires[i], &torque[0]);
+				}
 			}
 
 			for (int i = 0; i < vehicleModel->m_frontTiresCount; i ++) {
@@ -398,11 +400,13 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		dFloat minWidth = 0.0f;
 
 		DemoMesh* const mesh = bodyPart->GetMesh();
+		const dMatrix& matrix = bodyPart->GetMeshMatrix();
 		dFloat* const array = mesh->m_vertex;
 		for (int i = 0; i < mesh->m_vertexCount; i ++) {
-			maxWidth = dMax (array[i * 3 + 0], maxWidth);
-			minWidth = dMin (array[i * 3 + 0], minWidth);
-			radius = dMax (array[i * 3 + 1], radius);
+			dVector p (matrix.TransformVector(dVector(array[i * 3 + 0], array[i * 3 + 1], array[i * 3 + 2], 1.0f)));
+			maxWidth = dMax (p.m_x, maxWidth);
+			minWidth = dMin (p.m_x, minWidth);
+			radius = dMax (p.m_y, radius);
 		}
 		dFloat width = maxWidth - minWidth;
 		radius -= width * 0.5f;
@@ -424,12 +428,14 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			points[i].m_y = array[i * 3 + 1];
 			points[i].m_z = array[i * 3 + 2];
 		}
+		bodyPart->GetMeshMatrix().TransformTriplex(&points[0].m_x, sizeof (dVector), &points[0].m_x, sizeof (dVector), mesh->m_vertexCount) ;
+
 		return NewtonCreateConvexHull (GetWorld(), mesh->m_vertexCount, &points[0].m_x, sizeof (dVector), 1.0e-3f, 0, NULL);
 	}
 
 	NewtonCollision* MakeConvexHullAggregate(DemoEntity* const bodyPart) const
 	{
-		NewtonMesh* const mesh = bodyPart->GetMesh()->CreateNewtonMesh (GetWorld());
+		NewtonMesh* const mesh = bodyPart->GetMesh()->CreateNewtonMesh (GetWorld(), bodyPart->GetMeshMatrix());
 		NewtonMesh* const convexApproximation = NewtonMeshApproximateConvexDecomposition (mesh, 0.01f, 0.2f, 32, 100, NULL);
 		
 		NewtonCollision* const compound = NewtonCreateCompoundCollisionFromMesh (GetWorld(), convexApproximation, 0.001f, 0, 0);
@@ -599,7 +605,9 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		}
 
 		// calculate the engine parameters
-		CalculateEngine (vehicleModel, rootBody, vehicleModel->m_fronTires[0]);
+		if (vehicleModel->m_frontTiresCount) {
+			CalculateEngine (vehicleModel, rootBody, vehicleModel->m_fronTires[0]);
+		}
 
 		// disable self collision between all body parts
 		controller->DisableAllSelfCollision();
@@ -739,7 +747,8 @@ static void LoadLumberYardMesh (DemoEntityManager* const scene, const DemoEntity
 	dTree<NewtonCollision*, DemoMesh*> filter;
 	NewtonWorld* const world = scene->GetNewton();
 
-	dFloat mass = 5.0f; 
+	dFloat density = 15.0f; 
+
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());	
 	for (DemoEntity* child = entity.GetFirst(); child; child = child->GetNext()) {
 		DemoMesh* const mesh = child->GetMesh();
@@ -748,27 +757,33 @@ static void LoadLumberYardMesh (DemoEntityManager* const scene, const DemoEntity
 			if (!node) {
 				// make a collision shape only for and instance
 				dFloat* const array = mesh->m_vertex;
-				dVector minBox(1.0e10f, 1.0e10f, 1.0e10f, 0.0f);
-				dVector maxBox(-1.0e10f, -1.0e10f, -1.0e10f, 0.0f);
+				dVector minBox(1.0e10f, 1.0e10f, 1.0e10f, 1.0f);
+				dVector maxBox(-1.0e10f, -1.0e10f, -1.0e10f, 1.0f);
+				
 				for (int i = 0; i < mesh->m_vertexCount; i ++) {
-					minBox.m_x = dMin (array[i * 3 + 0], minBox.m_x);
-					minBox.m_y = dMin (array[i * 3 + 1], minBox.m_y);
-					minBox.m_z = dMin (array[i * 3 + 2], minBox.m_z);
+					dVector p (array[i * 3 + 0], array[i * 3 + 1], array[i * 3 + 2], 1.0f);
+					minBox.m_x = dMin (p.m_x, minBox.m_x);
+					minBox.m_y = dMin (p.m_y, minBox.m_y);
+					minBox.m_z = dMin (p.m_z, minBox.m_z);
 
-					maxBox.m_x = dMax (array[i * 3 + 0], maxBox.m_x);
-					maxBox.m_y = dMax (array[i * 3 + 1], maxBox.m_y);
-					maxBox.m_z = dMax (array[i * 3 + 2], maxBox.m_z);
+					maxBox.m_x = dMax (p.m_x, maxBox.m_x);
+					maxBox.m_y = dMax (p.m_y, maxBox.m_y);
+					maxBox.m_z = dMax (p.m_z, maxBox.m_z);
 				}
 
 				dVector size (maxBox - minBox);
-				NewtonCollision* const shape = NewtonCreateBox(world, size.m_x, size.m_y, size.m_z, 0, NULL);
+				dMatrix offset (GetIdentityMatrix());
+				offset.m_posit = (maxBox + minBox).Scale (0.5f);
+				//NewtonCollision* const shape = NewtonCreateBox(world, size.m_x, size.m_y, size.m_z, 0, NULL);
+				NewtonCollision* const shape = NewtonCreateBox(world, size.m_x, size.m_y, size.m_z, 0, &offset[0][0]);
 				node = filter.Insert (shape, mesh);
 			}
 
 			// create a body and add to the world
 			NewtonCollision* const shape = node->GetInfo();
-			dMatrix matrix (child->CalculateGlobalMatrix());
+			dMatrix matrix (child->GetMeshMatrix() * child->CalculateGlobalMatrix());
 			matrix.m_posit += location;
+			float mass = density * NewtonConvexCollisionCalculateVolume(shape);
 			CreateSimpleSolid (scene, mesh, mass, matrix, shape, defaultMaterialID);
 		}
 	}

@@ -149,7 +149,8 @@ class SimpleFracturedEffectEntity: public DemoEntity
 	SimpleFracturedEffectEntity (DemoMesh* const mesh, const FractureEffect& columnDebris)
 		:DemoEntity (GetIdentityMatrix(), NULL), m_delay (INITIAL_DELAY), m_effect(columnDebris), m_myBody(NULL)
 	{
-		SetMesh(mesh);
+		dAssert (0);
+//		SetMesh(mesh);
 	}
 
 	~SimpleFracturedEffectEntity ()
@@ -205,7 +206,8 @@ class SimpleFracturedEffectEntity: public DemoEntity
 				FractureAtom& atom = node->GetInfo();
 
 				DemoEntity* const entity = new DemoEntity (dMatrix (rotation, matrix.m_posit), NULL);
-				entity->SetMesh (atom.m_mesh);
+dAssert (0);
+//				entity->SetMesh (atom.m_mesh);
 				scene->Append(entity);
 
 				int materialId = 0;

@@ -62,7 +62,7 @@ class DemoMesh: public dList<DemoSubMesh>, virtual public dClassInfo
 	virtual void Render ();
 	virtual void RenderNormals ();
 
-	NewtonMesh* CreateNewtonMesh(NewtonWorld* const workd);
+	NewtonMesh* CreateNewtonMesh(NewtonWorld* const workd, const dMatrix& meshMatrix);
 
 	protected:
 	virtual ~DemoMesh();

@@ -308,7 +308,8 @@ freq *= 0.5f;
 
 		DemoEntity* const entity = new DemoEntity(GetIdentityMatrix(), NULL);
 		scene->Append (entity);
-		entity->SetMesh(mesh);
+dAssert (0);
+//		entity->SetMesh(mesh);
 		mesh->Release();
 
 		// create the height field collision and rigid body

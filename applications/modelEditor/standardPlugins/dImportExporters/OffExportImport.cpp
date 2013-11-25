@@ -34,6 +34,20 @@ bool OffImport::Import (const char* const fileName, dPluginInterface* const inte
 	NewtonMesh* const mesh = NewtonMeshLoadOFF (world, fileName);
 	if (mesh) {
 		// some OFF files are vert dirty, make sure we do not have any degenerated faces
+/*
+NewtonMesh* xxx = mesh;
+NewtonCollision* collision = NewtonCreateConvexHullFromMesh (world, xxx, 0, 0);
+NewtonMesh* xxx1 = NewtonMeshCreateFromCollision(collision);
+NewtonMeshTriangulate (xxx1);
+int vertexCount = NewtonMeshGetVertexCount(xxx1);
+int actualCount = 0;
+for (void* vertex = NewtonMeshGetFirstVertex(xxx1); vertex; vertex = NewtonMeshGetNextVertex(xxx1, vertex)) 
+{
+	++actualCount;
+}
+dAssert(actualCount == vertexCount );
+*/
+
 		NewtonMeshFixTJoints (mesh);
 
 		dPluginScene* const asset = new dPluginScene(world);

@@ -126,10 +126,10 @@ DemoMesh::DemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode)
 	,m_optilizedDiplayList(0)
 	,m_name()
 {
-	dMeshNodeInfo* const info = (dMeshNodeInfo*)scene->GetInfoFromNode(meshNode);
-	m_name = info->GetName();
+	dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*)scene->GetInfoFromNode(meshNode);
+	m_name = meshInfo->GetName();
 	
-	NewtonMesh* const mesh = info->GetMesh();
+	NewtonMesh* const mesh = meshInfo->GetMesh();
 
 	// extract vertex data  from the newton mesh		
 	AllocVertexData(NewtonMeshGetPointCount (mesh));
@@ -139,10 +139,10 @@ DemoMesh::DemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode)
 								      2 * sizeof (dFloat), (dFloat*) m_uv);
 
 	// bake the matrix into the vertex array
-	dMatrix matrix (info->GetPivotMatrix());
+	dMatrix matrix (meshInfo->GetPivotMatrix());
 	matrix.TransformTriplex(m_vertex, 3 * sizeof (dFloat), m_vertex, 3 * sizeof (dFloat), m_vertexCount);
 	matrix.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
-	matrix = matrix.Inverse4x4() * matrix.Transpose() * matrix;
+	matrix = (matrix.Inverse4x4()).Transpose();
 	matrix.TransformTriplex(m_normal, 3 * sizeof (dFloat), m_normal, 3 * sizeof (dFloat), m_vertexCount);
 
 	dTree<dScene::dTreeNode*, dCRCTYPE> materialMap;
@@ -498,12 +498,13 @@ DemoMesh::~DemoMesh()
 }
 
 
-NewtonMesh* DemoMesh::CreateNewtonMesh(NewtonWorld* const world)
+NewtonMesh* DemoMesh::CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix)
 {
 	NewtonMesh* const mesh = NewtonMeshCreate(world);
 
 	NewtonMeshBeginFace (mesh);
 
+	dMatrix rotation ((meshMatrix.Inverse4x4()).Transpose4X4());
 
 	int id = 0;
 	dFloat point[3][12];
@@ -512,21 +513,27 @@ NewtonMesh* DemoMesh::CreateNewtonMesh(NewtonWorld* const world)
 		for (int i = 0; i < segment.m_indexCount; i += 3) {
 			for (int j = 0; j < 3; j ++) {
 				int index = segment.m_indexes[i + j];
-				point[j][0] = m_vertex[index * 3 + 0];
-				point[j][1] = m_vertex[index * 3 + 1];
-				point[j][2] = m_vertex[index * 3 + 2];
+
+				dVector p (meshMatrix.TransformVector(dVector (m_vertex[index * 3 + 0], m_vertex[index * 3 + 1], m_vertex[index * 3 + 2], 1.0f)));
+				point[j][0] = p.m_x;
+				point[j][1] = p.m_y;
+				point[j][2] = p.m_z;
 				point[j][3] = 0.0f;
 
-				point[j][4] = m_normal[index * 3 + 0];
-				point[j][5] = m_normal[index * 3 + 1];
-				point[j][6] = m_normal[index * 3 + 2];
+				//dgVector (m_normal[index * 3 + 0], m_normal[index * 3 + 1], m_normal[index * 3 + 2], dgFloat32 (0.0f));
+				dVector n (rotation.RotateVector(dVector (m_normal[index * 3 + 0], m_normal[index * 3 + 1], m_normal[index * 3 + 2], 0.0f)));
+				dAssert ((n % n) > 0.0f);
+				n = n.Scale (1.0f / dSqrt (n % n));
+
+				point[j][4] = n.m_x;
+				point[j][5] = n.m_y;
+				point[j][6] = n.m_z;
 
 				point[j][7] = m_uv[index * 2 + 0];
 				point[j][8] = m_uv[index * 2 + 1];
 
 				point[j][9] = 0.0f;
 				point[j][10] = 0.0f;
-
 			}
 			NewtonMeshAddFace(mesh, 3, &point[0][0], sizeof (point) / 3, id);
 		}

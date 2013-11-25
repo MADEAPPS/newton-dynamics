@@ -74,7 +74,8 @@ z = size * (i - count / 2);
 
 				int index = dRand() % (sizeof (selection) / sizeof (selection[0]));
 				DemoEntity* const entity = new DemoEntity(matrix, this);
-				entity->SetMesh(gemetries[index]);
+dAssert (0);
+//				entity->SetMesh(gemetries[index]);
 
 				NewtonCollisionSetMatrix (collisionArray[index], &matrix[0][0]);
 				NewtonCompoundCollisionAddSubCollision (compound, collisionArray[index]);
@@ -143,7 +144,8 @@ z = size * (i - count / 2);
 
 		m_currentCastingShape = 3;
 		m_castingEntity = new DemoEntity (matrix, NULL);
-		m_castingEntity->SetMesh(m_castingGeometries[m_currentCastingShape]);
+dAssert (0);
+//		m_castingEntity->SetMesh(m_castingGeometries[m_currentCastingShape]);
 	}
 
 	NewtonCollision* GetCurrentShape() const 
@@ -161,7 +163,8 @@ z = size * (i - count / 2);
 	void ChangeCastingShape()
 	{
 		m_currentCastingShape = (m_currentCastingShape + 1) % m_count;
-		m_castingEntity->SetMesh(m_castingGeometries[m_currentCastingShape]);
+dAssert (0);
+//		m_castingEntity->SetMesh(m_castingGeometries[m_currentCastingShape]);
 	}
 
 	void SetCastEntityMatrix (DemoEntityManager* const scene, const dMatrix& matrix) const
@@ -322,7 +325,8 @@ NewtonBodySetForceAndTorqueCallback(compoundBody, PhysicsApplyGravityForce);
 
 DemoMesh* mesh = new DemoMesh("geometry", NewtonBodyGetCollision(compoundBody), "smilli.tga", "smilli.tga", "smilli.tga");
 DemoEntity* const entity = new DemoEntity(matrix, NULL);
-entity->SetMesh(mesh);
+dAssert (0);
+//entity->SetMesh(mesh);
 mesh->Release();
 NewtonBodySetUserData(compoundBody, entity);
 scene->Append(entity);
@@ -341,7 +345,8 @@ static void AddStaticMesh(DemoEntityManager* const scene)
 	dMatrix matrix (GetIdentityMatrix());
 	DemoMesh* mesh = new DemoMesh(ntMesh);
 	DemoEntity* const entity = new DemoEntity(matrix, NULL);
-	entity->SetMesh(mesh);
+dAssert (0);
+//	entity->SetMesh(mesh);
 	mesh->Release();
 
 	scene->Append(entity);

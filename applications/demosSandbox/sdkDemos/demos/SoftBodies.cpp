@@ -33,7 +33,8 @@ class SimpleSoftBodyEntity: public DemoEntity
 
 		// create the render mesh
 		DemoMesh* const mesh = new DemoMesh ("softMesh");
-		SetMesh(mesh);
+dAssert (0);
+//		SetMesh(mesh);
 		mesh->Release();
 
 		NewtonWorld* const world = scene->GetNewton();

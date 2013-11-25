@@ -216,41 +216,8 @@ void dfbxImport::PopulateScene (FbxScene* const fbxScene, dPluginScene* const ng
 }
 
 
-void dfbxImport::LoadHierarchy  (FbxScene* const fbxScene, dPluginScene* const ngdScene, GlobalNoceMap& nodeMap)
-{
-	dList <ImportStackData> nodeStack; 
 
-	// Print the nodes of the scene and their attributes recursively.
-	FbxNode* const rootNode = fbxScene->GetRootNode();
-	if(rootNode) {
-		int count = rootNode->GetChildCount();
-		for(int i = 0; i < count; i++) {
-			nodeStack.Append(ImportStackData (GetIdentityMatrix(), rootNode->GetChild(count - i - 1), ngdScene->GetRootNode()));
-		}
-	}
 
-	while (nodeStack.GetCount()) {
-		ImportStackData data (nodeStack.GetLast()->GetInfo());
-		nodeStack.Remove(nodeStack.GetLast());
-
-		FbxAMatrix fpxNoceMatrix (data.m_fbxNode->EvaluateLocalTransform());
-		
-		dPluginScene::dTreeNode* const node = ngdScene->CreateSceneNode (data.m_parentNode);
-
-		dMatrix matrix (fpxNoceMatrix);
-		dSceneNodeInfo* const info = (dSceneNodeInfo*) ngdScene->GetInfoFromNode (node);
-
-		info->SetName(data.m_fbxNode->GetName());
-		info->SetTransform(matrix);
-
-		nodeMap.Insert (node, data.m_fbxNode);
-
-		int count = data.m_fbxNode->GetChildCount();
-		for(int i = 0; i < count; i++) {
-			nodeStack.Append(ImportStackData (matrix, data.m_fbxNode->GetChild(count - i - 1), node));	
-		}
-	}
-}
 
 
 void dfbxImport::ImportMeshNode (FbxScene* const fbxScene, dPluginScene* const ngdScene, FbxNode* const fbxMeshNode, dPluginScene::dTreeNode* const node, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials)
@@ -271,7 +238,10 @@ void dfbxImport::ImportMeshNode (FbxScene* const fbxScene, dPluginScene* const n
 
 		FbxAMatrix pivotMatrix;
 		fbxMesh->GetPivot(pivotMatrix);
-		instance->SetPivotMatrix(dMatrix (pivotMatrix));
+
+		dMatrix matrix (pivotMatrix);
+		instance->SetPivotMatrix(matrix);
+		dAssert (matrix[1][1] == 1.0f);
 
 		LocalMaterialMap localMaterialIndex;
 		ImportMaterials (fbxScene, ngdScene, fbxMeshNode, meshNode, materialCache, localMaterialIndex, textureCache, usedMaterials);
@@ -364,30 +334,6 @@ void dfbxImport::ImportMeshNode (FbxScene* const fbxScene, dPluginScene* const n
 											   &uv0Array[0].m_x, sizeof (dVector), uv0Index,
 											   &uv1Array[0].m_x, sizeof (dVector), uv1Index);
 
-/*
-NewtonWorld* const world = ngdScene->GetNewtonWorld();
-NewtonMesh* xxx = instance->GetMesh ();
-NewtonCollision* collision =  NewtonCreateConvexHullFromMesh (world, xxx, 0, 0);
-NewtonMesh* xxx1 = NewtonMeshCreateFromCollision(collision);
-instance->SetMesh (xxx1);
-instance->ConvertToTriangles();
-
-NewtonMesh* newtonMesh = instance->GetMesh ();
-int vertexCount = NewtonMeshGetVertexCount(newtonMesh);
-int stride = NewtonMeshGetVertexStrideInByte(newtonMesh) / sizeof(dFloat64);
-dFloat64* const vertexList = NewtonMeshGetVertexArray(newtonMesh);
-
-int actualCount = 0;
-for (void* vertex = NewtonMeshGetFirstVertex(newtonMesh); vertex; vertex = NewtonMeshGetNextVertex(newtonMesh, vertex)) 
-{
-	int index = NewtonMeshGetVertexIndex(newtonMesh, vertex) * stride;
-	dFloat x = dFloat(vertexList[index + 0]);
-	dFloat y = dFloat(vertexList[index + 1]);
-	dFloat z = dFloat(vertexList[index + 2]);
-	++actualCount;
-}
-dAssert(actualCount == vertexCount );
-*/
 
 		delete[] uv1Array;
 		delete[] uv0Array;
@@ -604,3 +550,56 @@ void dfbxImport::ImportTexture (dPluginScene* const ngdScene, FbxProperty pPrope
 		}
 	}
 }
+
+
+void dfbxImport::LoadHierarchy  (FbxScene* const fbxScene, dPluginScene* const ngdScene, GlobalNoceMap& nodeMap)
+{
+	dList <ImportStackData> nodeStack; 
+
+	FbxAnimEvaluator* const evaluator = fbxScene->GetEvaluator();
+
+	// Print the nodes of the scene and their attributes recursively.
+	FbxNode* const rootNode = fbxScene->GetRootNode();
+	if(rootNode) {
+		int count = rootNode->GetChildCount();
+		for(int i = 0; i < count; i++) {
+			nodeStack.Append(ImportStackData (GetIdentityMatrix(), rootNode->GetChild(count - i - 1), ngdScene->GetRootNode()));
+		}
+	}
+
+	while (nodeStack.GetCount()) {
+
+		ImportStackData data (nodeStack.GetLast()->GetInfo());
+		nodeStack.Remove(nodeStack.GetLast());
+
+		dPluginScene::dTreeNode* const node = ngdScene->CreateSceneNode (data.m_parentNode);
+		dSceneNodeInfo* const info = (dSceneNodeInfo*) ngdScene->GetInfoFromNode (node);
+
+		dMatrix localMatrix (evaluator->GetNodeLocalTransform(data.m_fbxNode));
+
+		info->SetName(data.m_fbxNode->GetName());
+		info->SetTransform (localMatrix);
+
+		FbxVector4 fbxPivotScaling (data.m_fbxNode->GetGeometricScaling(FbxNode::eSourcePivot));
+		FbxVector4 fbxPivotRotation (data.m_fbxNode->GetGeometricRotation(FbxNode::eSourcePivot));
+		FbxVector4 fbxPivotTranslation (data.m_fbxNode->GetGeometricTranslation(FbxNode::eSourcePivot));
+
+		dVector pivotTranslation (dFloat(fbxPivotTranslation[0]), dFloat(fbxPivotTranslation[1]), dFloat(fbxPivotTranslation[2]), 1.0f);
+		dVector pivotRotation (dFloat(fbxPivotRotation[0] * 3.14159265359 / 180.0), dFloat(fbxPivotRotation[1] * 3.14159265359 / 180.0), dFloat(fbxPivotRotation[2] * 3.14159265359 / 180.0), 0.0f);
+
+		dMatrix pivotScale (GetIdentityMatrix());
+		pivotScale[0][0] = dFloat(fbxPivotScaling[0]);
+		pivotScale[1][1] = dFloat(fbxPivotScaling[1]);
+		pivotScale[2][2] = dFloat(fbxPivotScaling[2]);
+		dMatrix pivotMatrix (pivotScale * dMatrix(pivotRotation[0], pivotRotation[1], pivotRotation[2], pivotTranslation));
+		info->SetGeometryTransform(pivotMatrix);
+
+		nodeMap.Insert (node, data.m_fbxNode);
+
+		int count = data.m_fbxNode->GetChildCount();
+		for(int i = 0; i < count; i++) {
+			nodeStack.Append(ImportStackData (GetIdentityMatrix(), data.m_fbxNode->GetChild(count - i - 1), node));	
+		}
+	}
+}
+

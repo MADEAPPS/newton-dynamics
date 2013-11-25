@@ -35,6 +35,7 @@ dSceneNodeInfo::dSceneNodeInfo(dScene* const world)
 	,m_euler (0.0f, 0.0f, 0.0f, 1.0f)     // node orientation matrix R: x = pitch, y = yaw, z = roll, 
 	,m_scale (1.0f, 1.0f, 1.0f, 1.0f)	// local scale: x = scale_x, y = scale_y, z = scale_z, 
 	,m_eigenScaleAxis (GetIdentityMatrix())
+	,m_geometryTransform(GetIdentityMatrix())
 	,m_solidColor (0.75f, 0.75f, 0.0f, 0.0f)
 	,m_editorMinOOBB (0.0f, 0.0f, 0.0f, 0.0f) 
 	,m_editorMaxOOBB (0.0f, 0.0f, 0.0f, 0.0f)
@@ -48,6 +49,7 @@ dSceneNodeInfo::dSceneNodeInfo()
 	,m_euler (0.0f, 0.0f, 0.0f, 1.0f)     // node orientation matrix R: x = pitch, y = yaw, z = roll, 
 	,m_scale (1.0f, 1.0f, 1.0f, 1.0f)	// local scale: x = scale_x, y = scale_y, z = scale_z, 
 	,m_eigenScaleAxis (GetIdentityMatrix())
+	,m_geometryTransform(GetIdentityMatrix())
 	,m_solidColor (0.75f, 0.75f, 0.0f, 0.0f)
 	,m_editorMinOOBB (0.0f, 0.0f, 0.0f, 0.0f) 
 	,m_editorMaxOOBB (0.0f, 0.0f, 0.0f, 0.0f)
@@ -59,6 +61,15 @@ dSceneNodeInfo::~dSceneNodeInfo(void)
 {
 }
 
+dMatrix dSceneNodeInfo::GetGeometryTransform () const
+{
+	return m_geometryTransform;
+}
+
+void dSceneNodeInfo::SetGeometryTransform (const dMatrix& matrix)
+{
+	m_geometryTransform = matrix;
+}
 
 
 dMatrix dSceneNodeInfo::GetTransform () const
@@ -136,7 +147,9 @@ void dSceneNodeInfo::SetColor (const dVector& color)
 
 void dSceneNodeInfo::BakeTransform (const dMatrix& transform)
 {
-	SetTransform (transform.Inverse4x4() * GetTransform() * transform);
+	dMatrix invert (transform.Inverse4x4());
+	SetTransform (invert * GetTransform() * transform);
+	SetGeometryTransform(invert * GetGeometryTransform() * transform);
 }
 
 void dSceneNodeInfo::UpdateOOBB (dScene* const scene, dScene::dTreeNode* const myNode)
@@ -151,6 +164,7 @@ void dSceneNodeInfo::UpdateOOBB (dScene* const scene, dScene::dTreeNode* const m
 		if (geometryInfo->IsType(dGeometryNodeInfo::GetRttiType())) {
 			dVector p0; 
 			dVector p1;
+dAssert (0);
 			geometryInfo->CalcutateAABB (p0, p1);
 			m_editorMinOOBB[0] = dMin(p0[0], m_editorMinOOBB[0]);
 			m_editorMinOOBB[1] = dMin(p0[1], m_editorMinOOBB[1]);
@@ -194,6 +208,11 @@ void dSceneNodeInfo::Serialize (TiXmlElement* const rootNode) const
 
 	dFloatArrayToString (&m_eigenScaleAxis[0][0], 16, tmp, sizeof (tmp));
 	matrix->SetAttribute("stretchAxis", tmp);
+
+	TiXmlElement* const geometryTransform = new TiXmlElement ("geometryTransform");
+	rootNode->LinkEndChild(geometryTransform);
+	dFloatArrayToString (&m_geometryTransform[0][0], 16, tmp, sizeof (tmp));
+	geometryTransform->SetAttribute("matrix", tmp);
 }
 
 bool dSceneNodeInfo::Deserialize (const dScene* const scene, TiXmlElement* const rootNode) 
@@ -208,6 +227,11 @@ bool dSceneNodeInfo::Deserialize (const dScene* const scene, TiXmlElement* const
 	dStringToFloatArray (transformNode->Attribute("eulerAngles"), &m_euler[0], 4);
 	dStringToFloatArray (transformNode->Attribute("localScale"), &m_scale[0], 4);
 	dStringToFloatArray (transformNode->Attribute("stretchAxis"), &m_eigenScaleAxis[0][0], 16);
+
+	TiXmlElement* const geometryTransform = (TiXmlElement*) rootNode->FirstChild ("geometryTransform");
+	if (geometryTransform ) {
+		dStringToFloatArray (geometryTransform ->Attribute("matrix"), &m_geometryTransform[0][0], 16);
+	}
 
 	return true;
 }
