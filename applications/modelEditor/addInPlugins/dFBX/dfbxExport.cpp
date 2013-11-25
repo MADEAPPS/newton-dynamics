@@ -22,19 +22,19 @@
 
 dExportPlugin* dfbxExport::GetPluginFBX()
 {
-	static dfbxExport plugin("*.fbx", "Export Autodesk fbx file", "fbx mesh export");
+	static dfbxExport plugin("*.fbx", "Export Autodesk fbx file (.fbx)", "fbx mesh export");
 	return &plugin;
 }
 
 dExportPlugin* dfbxExport::GetPluginOBJ()
 {
-	static dfbxExport plugin("*.obj", "Export Wavefront obj file", "obj mesh export");
+	static dfbxExport plugin("*.obj", "Export Wavefront obj file (.obj)", "obj mesh export");
 	return &plugin;
 }
 
 dExportPlugin* dfbxExport::GetPluginDAE()
 {
-	static dfbxExport plugin("*.dae", "Export Autodesk Collada file", "dae mesh export");
+	static dfbxExport plugin("*.dae", "Export Autodesk Collada file (.dae)", "dae mesh export");
 	return &plugin;
 }
 

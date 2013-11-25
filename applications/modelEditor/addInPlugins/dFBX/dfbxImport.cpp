@@ -23,19 +23,19 @@
 
 dImportPlugin* dfbxImport::GetPluginFBX()
 {
-	static dfbxImport plugin("*.fbx", "Import Autodesk fbx file", "fbx mesh import");
+	static dfbxImport plugin("*.fbx", "Import Autodesk fbx file (.fbx)", "fbx mesh import");
 	return &plugin;
 }
 
 dImportPlugin* dfbxImport::GetPluginOBJ()
 {
-	static dfbxImport plugin("*.obj", "Import Wavefront obj file", "obj mesh import");
+	static dfbxImport plugin("*.obj", "Import Wavefront obj file (.obj)", "obj mesh import");
 	return &plugin;
 }
 
 dImportPlugin* dfbxImport::GetPluginDAE()
 {
-	static dfbxImport plugin("*.dae", "Import Autodesk Collada file", "dae mesh import");
+	static dfbxImport plugin("*.dae", "Import Autodesk Collada file (.dae)", "dae mesh import");
 	return &plugin;
 }
 
