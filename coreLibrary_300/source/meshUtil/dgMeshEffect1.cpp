@@ -3646,7 +3646,6 @@ void dgMeshEffect::RepairTJoints ()
 	DeleteDegenerateFaces(&m_points[0].m_x, sizeof (m_points[0]), dgFloat64 (1.0e-7f));
 	dgAssert (Sanity ());
 
-/*
 	// delete straight line edges
 	dirty = true;
 	while (dirty) {
@@ -3718,6 +3717,7 @@ void dgMeshEffect::RepairTJoints ()
 
 								DeleteEdge(edge);
 								DeleteEdge(nextEdge);
+								//dgAssert (Sanity ());
 
 							} else if (edge->m_next->m_next->m_next == edge) {
 								dirty = true;
@@ -3813,6 +3813,7 @@ void dgMeshEffect::RepairTJoints ()
 											dirty |= newFace ? true : false;
 										}
 									}
+									//dgAssert (Sanity ());
 								} else if (openEdge->m_prev->m_twin->m_incidentFace > 0) {
 									dirty = true;
 
@@ -3853,6 +3854,7 @@ void dgMeshEffect::RepairTJoints ()
 									deletedEdge->m_next = deletedEdge->m_twin;
 									deletedEdge->m_prev = deletedEdge->m_twin;
 									DeleteEdge(deletedEdge);
+									//dgAssert (Sanity ());
 								}
 							}
 						}
@@ -3861,7 +3863,7 @@ void dgMeshEffect::RepairTJoints ()
 			}
 		}
 	}
-*/
+
 
 	DeleteDegenerateFaces(&m_points[0].m_x, sizeof (m_points[0]), dgFloat64 (1.0e-7f));
 	for (iter.Begin(); iter; iter ++) {
@@ -3873,8 +3875,6 @@ void dgMeshEffect::RepairTJoints ()
 			m_attrib[edge->m_userData].m_vertex.m_z = p0.m_z;
 		}
 	}
-
-
 	dgAssert (Sanity ());
 }
 
