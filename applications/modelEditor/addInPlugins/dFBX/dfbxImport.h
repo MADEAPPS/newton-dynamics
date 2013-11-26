@@ -96,8 +96,8 @@ class dfbxImport: public dImportPlugin
 	
 	int m_materialId;
 	char m_ext[32];
-	char m_signature[32];
-	char m_description[32];
+	char m_signature[64];
+	char m_description[64];
 };
 
 #endif

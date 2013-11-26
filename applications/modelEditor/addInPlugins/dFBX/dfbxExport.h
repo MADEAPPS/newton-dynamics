@@ -72,8 +72,8 @@ class dfbxExport: public dExportPlugin
 	void LoadNode (dPluginScene* const scene, FbxScene* const fbxScene, FbxNode* const fpxRoot, dPluginScene::dTreeNode* const node, MeshMap& meshMap, MaterialMap& materialMap);
 
 	char m_ext[32];
-	char m_signature[32];
-	char m_description[32];
+	char m_signature[64];
+	char m_description[64];
 
 };
 
