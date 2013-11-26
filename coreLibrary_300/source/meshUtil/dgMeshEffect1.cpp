@@ -3646,6 +3646,7 @@ void dgMeshEffect::RepairTJoints ()
 	DeleteDegenerateFaces(&m_points[0].m_x, sizeof (m_points[0]), dgFloat64 (1.0e-7f));
 	dgAssert (Sanity ());
 
+/*
 	// delete straight line edges
 	dirty = true;
 	while (dirty) {
@@ -3860,6 +3861,7 @@ void dgMeshEffect::RepairTJoints ()
 			}
 		}
 	}
+*/
 
 	DeleteDegenerateFaces(&m_points[0].m_x, sizeof (m_points[0]), dgFloat64 (1.0e-7f));
 	for (iter.Begin(); iter; iter ++) {
