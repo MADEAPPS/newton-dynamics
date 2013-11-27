@@ -206,8 +206,7 @@ class SimpleFracturedEffectEntity: public DemoEntity
 				FractureAtom& atom = node->GetInfo();
 
 				DemoEntity* const entity = new DemoEntity (dMatrix (rotation, matrix.m_posit), NULL);
-dAssert (0);
-//				entity->SetMesh (atom.m_mesh);
+				entity->SetMesh (atom.m_mesh, GetIdentityMatrix());
 				scene->Append(entity);
 
 				int materialId = 0;

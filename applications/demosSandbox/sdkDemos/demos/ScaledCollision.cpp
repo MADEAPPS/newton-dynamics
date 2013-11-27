@@ -124,8 +124,7 @@ static void CreateScaleStaticMesh (DemoEntity* const entity, NewtonCollision* co
 
 	DemoEntity* const scaledEntity = new DemoEntity(location, NULL);
 	scene->Append (scaledEntity);
-dAssert (0);
-//	scaledEntity->SetMesh(scaledMesh);
+	scaledEntity->SetMesh(scaledMesh, GetIdentityMatrix());
 	scaledMesh->Release();
 
 	// now make a body with a scaled collision mesh

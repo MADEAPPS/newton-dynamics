@@ -433,7 +433,6 @@ void DemoEntityManager::BodyDeserialization (NewtonBody* const body, NewtonDeser
 	deserializecallback (serializeHandle, &size, sizeof (size));
 	deserializecallback (serializeHandle, bodyIndentification, size);
 
-
 	// get the world and the scene form the world user data
 	NewtonWorld* const world = NewtonBodyGetWorld(body);
 	DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
@@ -457,8 +456,7 @@ void DemoEntityManager::BodyDeserialization (NewtonBody* const body, NewtonDeser
 
 	//for visual mesh we will collision mesh and convert it to a visual mesh using NewtonMesh 
 	DemoMesh* const mesh = new DemoMesh(bodyIndentification, collision, NULL, NULL, NULL);
-dAssert (0);
-//	entity->SetMesh(mesh);
+	entity->SetMesh(mesh, GetIdentityMatrix());
 	mesh->Release();
 }
 
