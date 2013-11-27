@@ -126,6 +126,11 @@ void CustomSliderActuator::SubmitConstraints (dFloat timestep, int threadIndex)
 			NewtonUserJointSetRowAcceleration (m_joint, accel);
 		}
 
+// hack to test max force
+NewtonUserJointSetRowMinimumFriction (m_joint, -1000.0f);
+NewtonUserJointSetRowMaximumFriction (m_joint,  1000.0f);
+
+
 		NewtonUserJointSetRowStiffness (m_joint, 1.0f);
 	}
 }
