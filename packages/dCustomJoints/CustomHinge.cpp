@@ -206,49 +206,52 @@ void CustomHinge::SubmitConstraints (dFloat timestep, int threadIndex)
 	}
 	m_jointOmega = (omega0 - omega1) % matrix1.m_front;
 
+    // four possibilities
 	if (m_friction != 0.0f) {
-		dFloat alpha = m_jointOmega / timestep;
-		NewtonUserJointAddAngularRow (m_joint, 0, &matrix1.m_front[0]);		
-		NewtonUserJointSetRowAcceleration (m_joint, -alpha);
-		NewtonUserJointSetRowMinimumFriction (m_joint, -m_friction);
-		NewtonUserJointSetRowMaximumFriction (m_joint,  m_friction);
-		NewtonUserJointSetRowStiffness (m_joint, 1.0f);
-	}
+        if (m_limitsOn) {
+            // friction and limits at the same time
+            dAssert (0);
+        } else {
+            // friction but not limits
+		    dFloat alpha = m_jointOmega / timestep;
+		    NewtonUserJointAddAngularRow (m_joint, 0, &matrix1.m_front[0]);		
+		    NewtonUserJointSetRowAcceleration (m_joint, -alpha);
+		    NewtonUserJointSetRowMinimumFriction (m_joint, -m_friction);
+		    NewtonUserJointSetRowMaximumFriction (m_joint,  m_friction);
+		    NewtonUserJointSetRowStiffness (m_joint, 1.0f);
+        }
+	} else if (m_limitsOn) {
+        // only limit are on 
+        // the joint angle can be determine by getting the angle between any two non parallel vectors
+        if (m_curJointAngle.m_angle < m_minAngle) {
+            dFloat relAngle = m_curJointAngle.m_angle - m_minAngle;
+            // the angle was clipped save the new clip limit
+            m_curJointAngle.m_angle = m_minAngle;
 
-	// if limit are enable ...
-	if (m_limitsOn) {
-		// the joint angle can be determine by getting the angle between any two non parallel vectors
-		if (m_curJointAngle.m_angle < m_minAngle) {
-			dFloat relAngle = m_curJointAngle.m_angle - m_minAngle;
-			// the angle was clipped save the new clip limit
-			m_curJointAngle.m_angle = m_minAngle;
+            // tell joint error will minimize the exceeded angle error
+            NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix1.m_front[0]);
 
-			// tell joint error will minimize the exceeded angle error
-			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix1.m_front[0]);
+            // need high stiffness here
+            NewtonUserJointSetRowStiffness (m_joint, 1.0f);
 
-			// need high stiffness here
-			NewtonUserJointSetRowStiffness (m_joint, 1.0f);
+            // allow the joint to move back freely 
+            NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
+        } else if (m_curJointAngle.m_angle  > m_maxAngle) {
+            dFloat relAngle = m_curJointAngle.m_angle - m_maxAngle;
 
-			// allow the joint to move back freely 
-			NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
+            // the angle was clipped save the new clip limit
+            m_curJointAngle.m_angle = m_maxAngle;
 
+            // tell joint error will minimize the exceeded angle error
+            NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix1.m_front[0]);
 
-		} else if (m_curJointAngle.m_angle  > m_maxAngle) {
-			dFloat relAngle = m_curJointAngle.m_angle - m_maxAngle;
+            // need high stiffness here
+            NewtonUserJointSetRowStiffness (m_joint, 1.0f);
 
-			// the angle was clipped save the new clip limit
-			m_curJointAngle.m_angle = m_maxAngle;
-			
-			// tell joint error will minimize the exceeded angle error
-			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix1.m_front[0]);
-
-			// need high stiffness here
-			NewtonUserJointSetRowStiffness (m_joint, 1.0f);
-
-			// allow the joint to move back freely
-			NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
-		}
-	}
+            // allow the joint to move back freely
+            NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
+        }
+    }
 }
 
 
