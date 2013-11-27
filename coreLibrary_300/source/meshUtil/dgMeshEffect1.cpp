@@ -3640,7 +3640,7 @@ void dgMeshEffect::RepairTJoints ()
 	dgAssert (Sanity ());
 	DeleteDegenerateFaces(&m_points[0].m_x, sizeof (m_points[0]), dgFloat64 (1.0e-7f));
 	dgAssert (Sanity ());
-/*
+
 	// delete straight line edges
 	dirty = true;
 	while (dirty) {
@@ -3678,6 +3678,9 @@ void dgMeshEffect::RepairTJoints ()
 
 								newEdge->m_twin = newTwin;
 								newTwin->m_twin = newEdge;
+
+								newEdge->m_userData = edge->m_userData;
+								newTwin->m_userData = edge->m_twin->m_prev->m_userData;
 
 								newEdge->m_incidentFace = edge->m_incidentFace;
 								newTwin->m_incidentFace = edge->m_twin->m_incidentFace;
@@ -3722,6 +3725,15 @@ void dgMeshEffect::RepairTJoints ()
 								while ((&(*iter) == deletedEdge) || (&(*iter) == deletedEdge->m_twin)) {
 									iter ++;
 								}
+
+								openEdge->m_userData = deletedEdge->m_twin->m_userData;
+
+								dgBigVector p2p0 (p2 - p0);
+								dgFloat64 den = p2p0 % p2p0;
+								dgFloat64 param1 = ((p1 - p0) % p2p0) / den;
+								dgVertexAtribute attib1 = InterpolateEdge (deletedEdge->m_twin, param1);
+								AddAtribute(attib1);
+								openEdge->m_next->m_userData = m_atribCount  - 1;
 
 								openEdge->m_incidentFace = deletedEdge->m_twin->m_incidentFace;
 								openEdge->m_next->m_incidentFace = deletedEdge->m_twin->m_incidentFace;
@@ -3859,7 +3871,7 @@ void dgMeshEffect::RepairTJoints ()
 		}
 	}
 	dgAssert (Sanity ());
-*/
+
 	DeleteDegenerateFaces(&m_points[0].m_x, sizeof (m_points[0]), dgFloat64 (1.0e-7f));
 	for (iter.Begin(); iter; iter ++) {
 		dgEdge* const edge = &iter.GetNode()->GetInfo();
