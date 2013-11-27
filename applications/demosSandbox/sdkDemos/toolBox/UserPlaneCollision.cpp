@@ -26,6 +26,7 @@
 
 class dInfinitePlane
 {
+	public:
 	dInfinitePlane (NewtonWorld* const world, const dVector& plane)
 	{
 
@@ -136,7 +137,7 @@ class dInfinitePlane
 	{
 	}
 
-
+	private:
 	static void PlaneCollisionDestroyCallback(void* userData)
 	{
 		dInfinitePlane* const me = (dInfinitePlane*) userData;
@@ -264,7 +265,7 @@ class dInfinitePlane
 		}
 	}
 
-
+	public:
 	static DemoEntity* CreateVisualMesh (DemoEntityManager* const scene, const dVector& plane)
 	{
 		// make a visual entity
@@ -303,7 +304,6 @@ class dInfinitePlane
 
 		mesh->OptimizeForRender();
 
-
 		// get the transformation matrix that takes the plane to the world local space
 		dMatrix matrix (dgGrammSchmidt(plane));
 		matrix.m_posit = plane.Scale (-plane.m_w / (plane % plane));
@@ -315,10 +315,8 @@ class dInfinitePlane
 		mesh->Release();
 
 		return entity;
-
 	}
-
-	public:
+	
 /*
     static void TestAddingUserMeshToSceneCollsion (NewtonWorld* const world)
     {
@@ -359,7 +357,7 @@ class dInfinitePlane
         // delete the body
         NewtonDestroyBody(body);
     }
-*/
+
 
 	static NewtonBody* CreateInfinitePlane (DemoEntityManager* const scene, const dVector& plane)
 	{
@@ -376,7 +374,6 @@ class dInfinitePlane
 		NewtonDestroyCollision (planeCollision->m_collision);
 		planeCollision->m_collision = NewtonBodyGetCollision(body);
 
-
 		// create a visual mesh
 		DemoEntity* const entity = CreateVisualMesh (scene, plane);
 
@@ -385,6 +382,7 @@ class dInfinitePlane
 
 		return body;
 	}
+*/
 
 	dVector m_plane;
 	dMatrix m_rotation;
@@ -398,7 +396,14 @@ class dInfinitePlane
 	dVector m_collisionVertex[MAX_THREAD_FACES][5];   // 4 vertex + 1 face normal
 };
 
-NewtonBody* CreatePlaneCollision (DemoEntityManager* const scene, const dVector& plane)
+
+NewtonCollision* CreateInfinitePlane (NewtonWorld* const world, const dVector& planeEquation)
 {
-	return dInfinitePlane::CreateInfinitePlane (scene, plane);
+	dInfinitePlane* const planeCollision = new dInfinitePlane (world, planeEquation);
+	return planeCollision->m_collision;
+}
+
+DemoEntity* CreateVisualPlaneEntity (DemoEntityManager* const scene, const dVector& plane)
+{
+	return dInfinitePlane::CreateVisualMesh (scene, plane);
 }

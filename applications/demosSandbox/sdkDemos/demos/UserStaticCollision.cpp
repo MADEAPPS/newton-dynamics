@@ -21,6 +21,26 @@
 #include "HeightFieldPrimitive.h"
 
 
+static NewtonBody* CreatePlaneCollision (DemoEntityManager* const scene, const dVector& planeEquation)
+{
+//	return dInfinitePlane::CreateInfinitePlane (scene, plane);
+
+	NewtonCollision* const planeCollision = CreateInfinitePlane (scene->GetNewton(), planeEquation);
+
+	// create the the rigid body for
+	dMatrix matrix (GetIdentityMatrix());
+	NewtonBody* const body = NewtonCreateDynamicBody(scene->GetNewton(), planeCollision, &matrix[0][0]);
+	NewtonDestroyCollision (planeCollision);
+
+	// create a visual mesh
+	DemoEntity* const entity = CreateVisualPlaneEntity (scene, planeEquation);
+
+	// save the pointer to the graphic object with the body.
+	NewtonBodySetUserData (body, entity);
+
+	return body;
+}
+
 static void AddUniformScaledPrimitives (DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat spacing, PrimitiveType type, int materialID, const dMatrix& shapeOffsetMatrix)
 {
 	// create the shape and visual mesh as a common data to be re used

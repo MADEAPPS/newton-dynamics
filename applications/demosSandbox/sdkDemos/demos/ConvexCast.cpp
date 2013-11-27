@@ -352,6 +352,10 @@ static void AddStaticMesh(DemoEntityManager* const scene)
 	NewtonMeshDestroy (ntMesh);
 }
 
+static void AddUserDefineStaticMesh(DemoEntityManager* const scene)
+{
+
+}
 
 
 // create physics scene
@@ -382,6 +386,7 @@ void ConvexCast (DemoEntityManager* const scene)
 // add a single compound Box test
 AddSingleCompound(scene);
 AddStaticMesh(scene);
+AddUserDefineStaticMesh(scene);
 
 	// place camera into position
 	dMatrix camMatrix (GetIdentityMatrix());
