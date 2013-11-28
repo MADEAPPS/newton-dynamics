@@ -43,6 +43,9 @@ class CustomSliderActuator: public CustomSlider
 	CUSTOM_JOINTS_API dFloat GetMaxPositLimit() const;
 	CUSTOM_JOINTS_API void SetMaxPositLimit(dFloat limit);
 
+    CUSTOM_JOINTS_API dFloat GetMaxForcePower() const;
+    CUSTOM_JOINTS_API void SetMaxForcePower(dFloat force);
+
 	protected:
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
@@ -51,6 +54,7 @@ class CustomSliderActuator: public CustomSlider
 	dFloat m_posit;
 	dFloat m_minPosit;
 	dFloat m_maxPosit;
+    dFloat m_maxForce;
 	bool m_flag;
 };
 

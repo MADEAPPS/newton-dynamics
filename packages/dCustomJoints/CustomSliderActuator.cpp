@@ -28,6 +28,7 @@ CustomSliderActuator::CustomSliderActuator (const dMatrix& pinAndPivotFrame, dFl
 	,m_posit(0.0f)
 	,m_minPosit(minPosit)
 	,m_maxPosit(maxPosit)
+    ,m_maxForce(1.0e10f)
 	,m_flag(true)
 {
 }
@@ -96,6 +97,16 @@ dFloat CustomSliderActuator::GetActuatorPosit() const
 	return GetJointPosit();
 }
 
+dFloat CustomSliderActuator::GetMaxForcePower() const
+{
+    return m_maxForce;
+}
+
+void CustomSliderActuator::SetMaxForcePower(dFloat force)
+{
+    m_maxForce = dAbs (force);
+}
+
 
 void CustomSliderActuator::GetInfo (NewtonJointRecord* const info) const
 {
@@ -126,11 +137,8 @@ void CustomSliderActuator::SubmitConstraints (dFloat timestep, int threadIndex)
 			NewtonUserJointSetRowAcceleration (m_joint, accel);
 		}
 
-// hack to test max force
-NewtonUserJointSetRowMinimumFriction (m_joint, -1000.0f);
-NewtonUserJointSetRowMaximumFriction (m_joint,  1000.0f);
-
-
+        NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxForce);
+        NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxForce);
 		NewtonUserJointSetRowStiffness (m_joint, 1.0f);
 	}
 }

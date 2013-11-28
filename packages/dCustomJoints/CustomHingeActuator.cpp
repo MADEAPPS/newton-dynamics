@@ -29,6 +29,7 @@ CustomHingeActuator::CustomHingeActuator(const dMatrix& pinAndPivotFrame, dFloat
 	,m_minAngle(minAngle)
 	,m_maxAngle(maxAngle)
 	,m_angularRate(angularRate)
+    ,m_maxForce(1.0e10f)
 	,m_flag(true)
 {
 	EnableLimits(false);
@@ -95,6 +96,17 @@ dFloat CustomHingeActuator::GetActuatorAngle() const
 	return GetJointAngle();
 }
 
+dFloat CustomHingeActuator::GetMaxForcePower() const
+{
+    return m_maxForce;
+}
+
+void CustomHingeActuator::SetMaxForcePower(dFloat force)
+{
+    m_maxForce = dAbs (force);
+}
+
+
 void CustomHingeActuator::GetInfo (NewtonJointRecord* const info) const
 {
 	dAssert (0);
@@ -121,6 +133,8 @@ void CustomHingeActuator::SubmitConstraints (dFloat timestep, int threadIndex)
 			dFloat accel = (desiredSpeed - currentSpeed) / timestep;
 			NewtonUserJointSetRowAcceleration (m_joint, accel);
 		}
+        NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxForce);
+        NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxForce);
 		NewtonUserJointSetRowStiffness (m_joint, 1.0f);
 	}
 }

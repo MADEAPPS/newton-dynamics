@@ -48,6 +48,9 @@ class CustomHingeActuator: public CustomHinge
 	CUSTOM_JOINTS_API dFloat GetAngularRate() const;
 	CUSTOM_JOINTS_API void SetAngularRate(dFloat rate);
 
+    CUSTOM_JOINTS_API dFloat GetMaxForcePower() const;
+    CUSTOM_JOINTS_API void SetMaxForcePower(dFloat force);
+
 	protected:
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
@@ -56,6 +59,7 @@ class CustomHingeActuator: public CustomHinge
 	dFloat m_minAngle;
 	dFloat m_maxAngle;
 	dFloat m_angularRate;
+    dFloat m_maxForce;
 	bool m_flag;
 };
 
