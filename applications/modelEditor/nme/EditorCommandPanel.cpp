@@ -10,16 +10,15 @@
 */
 
 #include "toolbox_stdafx.h"
-#include "EditorCommandPanel.h"
 #include "NewtonModelEditor.h"
+#include "EditorCommandPanel.h"
 
 
 
-
-EditorCommandPanel::EditorCommandPanel(FXComposite* const parent, NewtonModelEditor* const mainFrame)
-	:EditorPanel(parent, mainFrame, "           command panel           ")
+EditorCommandPanel::EditorCommandPanel (NewtonModelEditor* const mainFrame)
+	:wxFoldPanelBar (mainFrame, NewtonModelEditor::ID_EDIT_NODE_NAME)
 {
-
+/*
 	FXVerticalFrame* const contents = new FXVerticalFrame(this, LAYOUT_SIDE_LEFT|FRAME_NONE|LAYOUT_FILL, 0,0,0,0, 0,0,0,0);
 	//	FXTabItem* effectItem = new FXTabItem(m_tabBook, "&Simple List", NULL, FRAME_NONE|LAYOUT_FILL);
 	//	FXHorizontalFrame* dirframe=new FXHorizontalFrame(m_tabBook,FRAME_THICK|FRAME_RAISED|LAYOUT_FILL);
@@ -32,10 +31,10 @@ EditorCommandPanel::EditorCommandPanel(FXComposite* const parent, NewtonModelEdi
 	FXHorizontalFrame* const treeframe = new FXHorizontalFrame(contents,FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0);
 	//	FXDirList* dirlist=new FXDirList(treeframe,this,ID_OPEN_TREE,DIRLIST_SHOWFILES|DIRLIST_NO_OWN_ASSOC|TREELIST_BROWSESELECT|TREELIST_SHOWS_LINES|TREELIST_SHOWS_BOXES|LAYOUT_FILL_X|LAYOUT_FILL_Y);
 	new FXTreeList(treeframe, mainFrame, ID_OPEN_TREE, TREELIST_BROWSESELECT|TREELIST_SHOWS_LINES|TREELIST_SHOWS_BOXES|LAYOUT_FILL_X|LAYOUT_FILL_Y);
-
+*/
 }
 
-EditorCommandPanel::~EditorCommandPanel(void)
+EditorCommandPanel::~EditorCommandPanel()
 {
 }
 

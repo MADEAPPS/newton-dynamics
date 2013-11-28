@@ -13,18 +13,17 @@
 #define _EDITOR_COMMAND_PANEL_H_
 
 
-#include "EditorPanel.h"
+#include "foldpanelbar.h"
 
 class NewtonModelEditor;
 class DemoEntityManager;
 
 
-class EditorCommandPanel: public EditorPanel
+class EditorCommandPanel: public wxFoldPanelBar
 {
 	public:
-	EditorCommandPanel(FXComposite* const parent, NewtonModelEditor* const mainFrame);
+	EditorCommandPanel(NewtonModelEditor* const mainFrame);
 	~EditorCommandPanel(void);
-
 };
 
 

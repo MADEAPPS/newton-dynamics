@@ -80,13 +80,17 @@ void EditorMainMenu::CreateEditMenu()
 	m_editMenu = menu;
 }
 
+void EditorMainMenu::AddViewControl (int controlId, const char* const title)
+{
+	char help[1024];
+	sprintf (help, "hide/unhide %s pane", title);
+	wxMenuItem* const item = m_viewMenu->AppendCheckItem (controlId, wxT(title), wxT(help));
+	item->Check();
+}
+
 void EditorMainMenu::CreateViewMenu()
 {
 	wxMenu* const menu = new wxMenu;
-
-	wxMenuItem* const item = menu->AppendCheckItem(NewtonModelEditor::ID_HIDE_EXPLORER_PANE, wxT("scene explorer"), wxT("hide/unhide scene explore pane"));
-	item->Check();
-
 	m_viewMenu = menu;
 }
 

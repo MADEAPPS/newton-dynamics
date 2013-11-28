@@ -17,6 +17,7 @@
 #include "EditorExplorer.h"
 #include "EditorMainMenu.h"
 #include "NewtonModelEditor.h"
+#include "EditorCommandPanel.h"
 #include "EditorRenderViewport.h"
 #include "NewtonModelEditorApp.h"
 
@@ -69,8 +70,9 @@ NewtonModelEditor::NewtonModelEditor(const wxString& title, const wxPoint& pos, 
 	,m_fileToolbar(NULL)
 	,m_navigationToolbar(NULL)
 	,m_objectSelectionToolbar(NULL)
-	,m_renderViewport(NULL)
 	,m_explorer(NULL)
+	,m_commandPanel(NULL)
+	,m_renderViewport(NULL)
 	,m_viewMode(NULL)
 	,m_shadeMode(NULL)
 	,m_navigationStack(0)
@@ -96,8 +98,13 @@ NewtonModelEditor::NewtonModelEditor(const wxString& title, const wxPoint& pos, 
 	CreateFileToolBar();
 	CreateObjectSelectionToolBar();
 	CreateNavigationToolBar();
+	
+	// create controllers
+	CreateExplorer();
+	CreateCommandPanel();
 	CreateRenderViewPort();
-	CreateExploser();
+	
+	// create and empty scene
 	CreateScene();
 
 	// load configuration form last run
@@ -382,16 +389,24 @@ void NewtonModelEditor::CreateNavigationToolBar()
 	m_navigationToolbar = toolbar;
 }
 
-
 void NewtonModelEditor::CreateRenderViewPort()
 {
 	m_renderViewport = new EditorRenderViewport (this);
 	m_mgr.AddPane (m_renderViewport, wxAuiPaneInfo().Name(wxT("render window")).CenterPane().PaneBorder(false));
 }
 
-void NewtonModelEditor::CreateExploser()
+
+void NewtonModelEditor::CreateCommandPanel()
+{
+	m_commandPanel = new EditorCommandPanel(this);
+	m_mainMenu->AddViewControl (NewtonModelEditor::ID_HIDE_COMMAND_PANE, "inspector");
+	m_mgr.AddPane (m_commandPanel, wxAuiPaneInfo().Name(wxT("inspector")).Caption(wxT("inspector")).Right().Layer(1).Position(1).CloseButton(true).MaximizeButton(false));
+}
+
+void NewtonModelEditor::CreateExplorer()
 {
 	m_explorer = new EditorExplorer (this);
+	m_mainMenu->AddViewControl (NewtonModelEditor::ID_HIDE_EXPLORER_PANE, "scene explorer");
 	m_mgr.AddPane (m_explorer, wxAuiPaneInfo().Name(wxT("scene explorer")).Caption(wxT("scene explorer")).Left().Layer(1).Position(1).CloseButton(true).MaximizeButton(false));
 }
 

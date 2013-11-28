@@ -60,6 +60,8 @@ class EditorMainMenu: public wxMenuBar
 	void AddPlugin (wxMenu* const menu, dPluginRecord* const plugin);
 	dPluginRecord* GetPlugin (wxMenu* const paneMenu, int id);
 
+	void AddViewControl (int controlId, const char* const title);
+
 	NewtonModelEditor* m_mainFrame;
 	wxMenu* m_fileMenu;
 	wxMenu* m_editMenu;

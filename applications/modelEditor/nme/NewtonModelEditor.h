@@ -15,6 +15,7 @@
 
 class EditorMainMenu;
 class EditorExplorer;
+class EditorCommandPanel;
 class EditorRenderViewport;
 
 #define D_MAX_PLUGINS_COUNT 128
@@ -34,7 +35,7 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 		m_rotateViewport,
 	};
 
-	enum 
+	enum EditorIds
 	{
 		ID_CANVAS = wxID_HIGHEST,
 
@@ -59,6 +60,7 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 		ID_CLEAR_UNDO_HISTORY,
 
 		// view menu options
+		ID_HIDE_COMMAND_PANE,
 		ID_HIDE_EXPLORER_PANE,
 
 		//view modes
@@ -226,8 +228,9 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	void LoadResources ();
 	void DeleteResources ();
 
-	void CreateExploser();
+	void CreateExplorer();
 	void CreateFileToolBar();
+	void CreateCommandPanel();
 	void CreateRenderViewPort();
 	void CreateNavigationToolBar();
 	void CreateObjectSelectionToolBar();
@@ -249,9 +252,11 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	wxChoice* m_viewMode;
 	wxChoice* m_shadeMode;
 
-	EditorRenderViewport* m_renderViewport;
+	
 	EditorExplorer* m_explorer;
-
+	EditorCommandPanel* m_commandPanel;
+	EditorRenderViewport* m_renderViewport;
+	
 	int m_viewModeMap[ID_VIEW_MODES_LAST - ID_VIEW_MODES];
 	int m_shapeModeMap[ID_SHADE_MODES_LAST - ID_SHADE_MODES];
 

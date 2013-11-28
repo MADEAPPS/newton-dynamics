@@ -7,6 +7,9 @@
     <Filter Include="nme">
       <UniqueIdentifier>{b8ae7acc-7601-4f72-8fbe-6973e91e939d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="foldBard">
+      <UniqueIdentifier>{8ee2bac2-5b9f-4e16-a243-c2ebb87b8303}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\nme\toolBox\DebugDisplay.cpp">
@@ -40,6 +43,18 @@
       <Filter>nme</Filter>
     </ClCompile>
     <ClCompile Include="..\..\nme\NewtonModelEditorApp.cpp">
+      <Filter>nme</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nme\foldbar\foldpanelbar.cpp">
+      <Filter>foldBard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nme\foldbar\captionbar.cpp">
+      <Filter>foldBard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nme\foldbar\foldpanelitem.cpp">
+      <Filter>foldBard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\nme\EditorCommandPanel.cpp">
       <Filter>nme</Filter>
     </ClCompile>
   </ItemGroup>
@@ -77,5 +92,34 @@
     <ClInclude Include="..\..\nme\NewtonModelEditorApp.h">
       <Filter>nme</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\nme\foldbar\foldpanelbar.h">
+      <Filter>foldBard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\nme\foldbar\captionbar.h">
+      <Filter>foldBard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\nme\foldbar\foldpanelitem.h">
+      <Filter>foldBard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\nme\EditorCommandPanel.h">
+      <Filter>nme</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\nme\foldbar\icon_collapsed.old.xpm">
+      <Filter>foldBard</Filter>
+    </None>
+    <None Include="..\..\nme\foldbar\icon_collapsed.xpm">
+      <Filter>foldBard</Filter>
+    </None>
+    <None Include="..\..\nme\foldbar\icon_expanded.old.xpm">
+      <Filter>foldBard</Filter>
+    </None>
+    <None Include="..\..\nme\foldbar\icon_expanded.xpm">
+      <Filter>foldBard</Filter>
+    </None>
+    <None Include="..\..\nme\foldbar\icon_theresmore.xpm">
+      <Filter>foldBard</Filter>
+    </None>
   </ItemGroup>
 </Project>
