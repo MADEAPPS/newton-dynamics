@@ -16,26 +16,22 @@
 
 
 EditorCommandPanel::EditorCommandPanel (NewtonModelEditor* const mainFrame)
-	:wxFoldPanelBar (mainFrame, NewtonModelEditor::ID_EDIT_NODE_NAME)
+	:wxFoldPanelBar (mainFrame, NewtonModelEditor::ID_EDIT_NODE_NAME, wxDefaultPosition, wxSize (200, 160))
 {
-/*
-	FXVerticalFrame* const contents = new FXVerticalFrame(this, LAYOUT_SIDE_LEFT|FRAME_NONE|LAYOUT_FILL, 0,0,0,0, 0,0,0,0);
-	//	FXTabItem* effectItem = new FXTabItem(m_tabBook, "&Simple List", NULL, FRAME_NONE|LAYOUT_FILL);
-	//	FXHorizontalFrame* dirframe=new FXHorizontalFrame(m_tabBook,FRAME_THICK|FRAME_RAISED|LAYOUT_FILL);
-	//	FXHorizontalFrame* boxframe=new FXHorizontalFrame(dirframe,FRAME_THICK|FRAME_SUNKEN|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0,0,0,0, 0,0,0,0);
-	//	FXTreeList* dirlist = new FXTreeList(m_tabBook, NULL,0,DIRLIST_SHOWFILES|TREELIST_SHOWS_LINES|TREELIST_SHOWS_BOXES|FRAME_NONE|LAYOUT_FILL);
+	wxFoldPanel item = AddFoldPanel(_T("Test me"), false);
+	AddFoldPanelWindow(item, new wxCheckBox(item.GetParent(), wxID_ANY, _T("I like this")));
 
-	int ID_OPEN_TREE = 1000;
-	//int ID_FILEFILTER = 1001;
+	item = AddFoldPanel(_T("Test me too!"), true);
+	AddFoldPanelWindow(item, new wxCheckBox(item.GetParent(), wxID_ANY, _T("I like this")));
 
-	FXHorizontalFrame* const treeframe = new FXHorizontalFrame(contents,FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0);
-	//	FXDirList* dirlist=new FXDirList(treeframe,this,ID_OPEN_TREE,DIRLIST_SHOWFILES|DIRLIST_NO_OWN_ASSOC|TREELIST_BROWSESELECT|TREELIST_SHOWS_LINES|TREELIST_SHOWS_BOXES|LAYOUT_FILL_X|LAYOUT_FILL_Y);
-	new FXTreeList(treeframe, mainFrame, ID_OPEN_TREE, TREELIST_BROWSESELECT|TREELIST_SHOWS_LINES|TREELIST_SHOWS_BOXES|LAYOUT_FILL_X|LAYOUT_FILL_Y);
-*/
+	item = AddFoldPanel(_T("Test me too 2!"), true);
+	AddFoldPanelWindow(item, new wxCheckBox(item.GetParent(), wxID_ANY, _T("I like this")));
+
 }
 
 EditorCommandPanel::~EditorCommandPanel()
 {
 }
+
 
 
