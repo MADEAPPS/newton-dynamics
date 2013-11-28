@@ -49,7 +49,7 @@ BEGIN_EVENT_TABLE (NewtonModelEditor, wxFrame)
 	EVT_MENU (wxID_REDO, OnRedo)
 	EVT_MENU (ID_CLEAR_UNDO_HISTORY, OnClearUndoHistory)
 
-	EVT_MENU (ID_HIDE_EXPLORER_PANE, OnHideExplorerPane)
+	EVT_MENU_RANGE (ID_HIDE_CONTROL_PANE, ID_HIDE_CONTROL_PANE_COUNT, OnHideExplorerPane)
 	EVT_AUI_PANE_CLOSE(OnPaneClose)
 
 	EVT_MENU_RANGE (ID_TOOL_PLUGINS, ID_MAX_TOOL_PLUGINS, OnTool)
@@ -399,14 +399,14 @@ void NewtonModelEditor::CreateRenderViewPort()
 void NewtonModelEditor::CreateCommandPanel()
 {
 	m_commandPanel = new EditorCommandPanel(this);
-	m_mainMenu->AddViewControl (NewtonModelEditor::ID_HIDE_COMMAND_PANE, "inspector");
+	m_mainMenu->AddViewControl (NewtonModelEditor::ID_HIDE_CONTROL_PANE + 0, "inspector", m_commandPanel);
 	m_mgr.AddPane (m_commandPanel, wxAuiPaneInfo().Name(wxT("inspector")).Caption(wxT("inspector")).Right().Layer(1).Position(1).CloseButton(true).MaximizeButton(false));
 }
 
 void NewtonModelEditor::CreateExplorer()
 {
 	m_explorer = new EditorExplorer (this);
-	m_mainMenu->AddViewControl (NewtonModelEditor::ID_HIDE_EXPLORER_PANE, "scene explorer");
+	m_mainMenu->AddViewControl (NewtonModelEditor::ID_HIDE_CONTROL_PANE + 1, "scene explorer", m_explorer);
 	m_mgr.AddPane (m_explorer, wxAuiPaneInfo().Name(wxT("scene explorer")).Caption(wxT("scene explorer")).Left().Layer(1).Position(1).CloseButton(true).MaximizeButton(false));
 }
 
@@ -497,7 +497,9 @@ void NewtonModelEditor::OnClearUndoHistory(wxCommandEvent& event)
 
 void NewtonModelEditor::OnHideExplorerPane (wxCommandEvent& event) 
 {
-	wxAuiPaneInfo& pane = m_mgr.GetPane(m_explorer);
+	int controlId = event.GetId();
+	wxWindow* const controlPane = m_mainMenu->GetViewControl (controlId);
+	wxAuiPaneInfo& pane = m_mgr.GetPane(controlPane);
 	if (event.GetInt()) {
 		pane.Show(true);
 	} else {

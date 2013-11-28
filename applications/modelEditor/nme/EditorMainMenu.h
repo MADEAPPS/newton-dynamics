@@ -45,6 +45,16 @@ class EditorMainMenu: public wxMenuBar
 		dPluginRecord* const m_plugin;
 	};
 
+	class EditorViewControl: public wxObjectRefData
+	{
+		public: 
+		EditorViewControl (wxWindow* const control)
+			:wxObjectRefData()
+			,m_control(control)
+		{
+		}
+		wxWindow* m_control;
+	};
 
 	EditorMainMenu (NewtonModelEditor* const parent);
 	~EditorMainMenu(void);
@@ -60,7 +70,8 @@ class EditorMainMenu: public wxMenuBar
 	void AddPlugin (wxMenu* const menu, dPluginRecord* const plugin);
 	dPluginRecord* GetPlugin (wxMenu* const paneMenu, int id);
 
-	void AddViewControl (int controlId, const char* const title);
+	wxWindow* GetViewControl (int controlId) const;
+	void AddViewControl (int controlId, const char* const title, wxWindow* const control);
 
 	NewtonModelEditor* m_mainFrame;
 	wxMenu* m_fileMenu;

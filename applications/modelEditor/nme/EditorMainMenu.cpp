@@ -80,11 +80,22 @@ void EditorMainMenu::CreateEditMenu()
 	m_editMenu = menu;
 }
 
-void EditorMainMenu::AddViewControl (int controlId, const char* const title)
+wxWindow* EditorMainMenu::GetViewControl (int controlId) const
+{
+	wxMenuItem* const item = m_viewMenu->FindItem (controlId);
+	dAssert (item);
+	EditorViewControl* const control = (EditorViewControl*)item->GetRefData();
+	dAssert(control);
+	return control->m_control;
+}
+
+void EditorMainMenu::AddViewControl (int controlId, const char* const title, wxWindow* const control)
 {
 	char help[1024];
 	sprintf (help, "hide/unhide %s pane", title);
+
 	wxMenuItem* const item = m_viewMenu->AppendCheckItem (controlId, wxT(title), wxT(help));
+	item->SetRefData (new EditorViewControl(control));
 	item->Check();
 }
 

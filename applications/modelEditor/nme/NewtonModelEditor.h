@@ -60,8 +60,8 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 		ID_CLEAR_UNDO_HISTORY,
 
 		// view menu options
-		ID_HIDE_COMMAND_PANE,
-		ID_HIDE_EXPLORER_PANE,
+		ID_HIDE_CONTROL_PANE,
+		ID_HIDE_CONTROL_PANE_COUNT = ID_HIDE_CONTROL_PANE + 16,
 
 		//view modes
 		ID_VIEW_MODES,
