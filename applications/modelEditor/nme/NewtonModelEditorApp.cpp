@@ -55,7 +55,7 @@ bool NewtonModelEditorApp::OnInit()
 //	wxString tittle;
 //	tittle.Printf (wxT ("Newton %d.%02d SDK demos"), version / 100, version % 100);
 
-	NewtonModelEditor* const frame = new NewtonModelEditor (APPLICATION_NAME, wxDefaultPosition, wxSize(1024, 768));
+	NewtonModelEditor* const frame = new NewtonModelEditor (APPLICATION_NAME, wxDefaultPosition, wxSize(1280, 960));
 	frame->Show(true);
 	SetTopWindow(frame);
 

@@ -19,8 +19,12 @@ class NewtonModelEditor;
 class DemoEntityManager;
 
 
-class EditorCommandPanel: public wxFoldPanelBar
+//class EditorCommandPanel: public wxFoldPanelBar
+//class EditorCommandPanel: public  wxScrollBar
+class EditorCommandPanel: public wxScrolledWindow
 {
+	class FoldBarCommandPanel;
+
 	public:
 	EditorCommandPanel(NewtonModelEditor* const mainFrame);
 	~EditorCommandPanel(void);

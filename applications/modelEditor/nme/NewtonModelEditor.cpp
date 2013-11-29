@@ -389,6 +389,9 @@ void NewtonModelEditor::CreateNavigationToolBar()
 	m_navigationToolbar = toolbar;
 }
 
+
+
+
 void NewtonModelEditor::CreateRenderViewPort()
 {
 	m_renderViewport = new EditorRenderViewport (this);

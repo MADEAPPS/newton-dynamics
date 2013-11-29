@@ -13,21 +13,58 @@
 #include "NewtonModelEditor.h"
 #include "EditorCommandPanel.h"
 
+#define CMD_PANEL_DEFFAULT_WITH		256
+#define CMD_PANEL_DEFFAULT_HEIGHT	160
+
+class EditorCommandPanel::FoldBarCommandPanel: public wxFoldPanelBar
+{
+	public:
+	FoldBarCommandPanel (wxWindow* const mainFrame)
+		:wxFoldPanelBar (mainFrame, NewtonModelEditor::ID_EDIT_NODE_NAME, wxDefaultPosition, wxSize (CMD_PANEL_DEFFAULT_WITH, CMD_PANEL_DEFFAULT_HEIGHT))
+		,m_mainFrame ((NewtonModelEditor*)mainFrame->GetParent())
+	{
+		wxFoldPanel item = AddFoldPanel(_T("Test me"), false);
+		AddFoldPanelWindow(item, new wxCheckBox(item.GetParent(), wxID_ANY, _T("I like this")));
+
+		item = AddFoldPanel(_T("Test me too!"), false);
+		AddFoldPanelWindow(item, new wxCheckBox(item.GetParent(), wxID_ANY, _T("I like this")));
+
+		item = AddFoldPanel(_T("Test me too 2!"), false);
+		AddFoldPanelWindow(item, new wxCheckBox(item.GetParent(), wxID_ANY, _T("I like this")));
+	}
+
+	~FoldBarCommandPanel()
+	{
+	}
+
+	NewtonModelEditor* const m_mainFrame;
+};
+
 
 
 EditorCommandPanel::EditorCommandPanel (NewtonModelEditor* const mainFrame)
-	:wxFoldPanelBar (mainFrame, NewtonModelEditor::ID_EDIT_NODE_NAME, wxDefaultPosition, wxSize (200, 160))
+	:wxScrolledWindow (mainFrame, wxID_ANY, wxDefaultPosition, wxSize (CMD_PANEL_DEFFAULT_WITH, CMD_PANEL_DEFFAULT_HEIGHT))
 {
-	wxFoldPanel item = AddFoldPanel(_T("Test me"), false);
-	AddFoldPanelWindow(item, new wxCheckBox(item.GetParent(), wxID_ANY, _T("I like this")));
+	// the sizer will take care of determining the needed scroll size
+	// (if you don't use sizers you will need to manually set the viewport size)
+	wxBoxSizer* const sizer = new wxBoxSizer(wxVERTICAL);
 
-	item = AddFoldPanel(_T("Test me too!"), true);
-	AddFoldPanelWindow(item, new wxCheckBox(item.GetParent(), wxID_ANY, _T("I like this")));
+	// add a series of widgets
+//	for (int w=1; w<=10; w++)
+//	{
+//		wxButton* b = new wxButton(this, wxID_ANY, wxString::Format(wxT("Button %i"), w));
+//		sizer->Add(b, 0, wxALL, 3);
+//	}
+	FoldBarCommandPanel* const commandPanel = new FoldBarCommandPanel(this);
+	sizer->Add(commandPanel, 0, wxALL, 0);
 
-	item = AddFoldPanel(_T("Test me too 2!"), true);
-	AddFoldPanelWindow(item, new wxCheckBox(item.GetParent(), wxID_ANY, _T("I like this")));
+	SetSizer(sizer);
 
+	// this part makes the scrollbars show up
+	FitInside(); // ask the sizer about the needed size
+	SetScrollRate(5, 5);
 }
+
 
 EditorCommandPanel::~EditorCommandPanel()
 {

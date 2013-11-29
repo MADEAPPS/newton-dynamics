@@ -13,6 +13,10 @@
 #include "EditorExplorer.h"
 #include "NewtonModelEditor.h"
 
+#define EXPLORER_PANEL_DEFAULT_WITH		256
+#define EXPLORER_PANEL_DEFAULT_HEIGHT	160
+
+
 BEGIN_EVENT_TABLE (EditorExplorer, wxTreeCtrl)
 
 	EVT_CHAR (OnKeyboardItem)
@@ -229,11 +233,10 @@ class EditorExplorer::SelectionList: public EditorExplorer::TraverseExplorer, pu
 
 
 EditorExplorer::EditorExplorer(NewtonModelEditor* const mainFrame)
-	:wxTreeCtrl (mainFrame, NewtonModelEditor::ID_EDIT_NODE_NAME, wxDefaultPosition, wxSize (200, 160), wxTR_EDIT_LABELS | wxTR_MULTIPLE | wxTR_EXTENDED | wxTR_HAS_BUTTONS | wxTR_LINES_AT_ROOT)
+	:wxTreeCtrl (mainFrame, NewtonModelEditor::ID_EDIT_NODE_NAME, wxDefaultPosition, wxSize (EXPLORER_PANEL_DEFAULT_WITH, EXPLORER_PANEL_DEFAULT_HEIGHT), wxTR_EDIT_LABELS | wxTR_MULTIPLE | wxTR_EXTENDED | wxTR_HAS_BUTTONS | wxTR_LINES_AT_ROOT)
 	,m_mainFrame(mainFrame)
 	,m_recursiveSelectionCall(0)
 {
-
 	wxBitmap* const bitmap = m_mainFrame->FindIcon ("explorer.gif");
 	int w = bitmap->GetWidth();
 	int h = bitmap->GetHeight();
