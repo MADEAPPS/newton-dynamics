@@ -3846,7 +3846,7 @@ void dgMeshEffect::RepairTJoints ()
 
 									dgFloat64 param2 = ((p2 - p0) % p3p0) / den;
 									dgVertexAtribute attib2 = InterpolateEdge (deletedEdge->m_twin, param2);
-									attib1.m_vertex = m_points[openEdge->m_next->m_next->m_incidentVertex];
+									attib2.m_vertex = m_points[openEdge->m_next->m_next->m_incidentVertex];
 									AddAtribute(attib2);
 									openEdge->m_next->m_next->m_userData = m_atribCount  - 1;
 
