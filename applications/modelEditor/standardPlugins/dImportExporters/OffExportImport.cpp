@@ -31,22 +31,23 @@ bool OffImport::Import (const char* const fileName, dPluginInterface* const inte
 	dScene* const scene = interface->GetScene();
 	dAssert (scene);
 	NewtonWorld* const world = scene->GetNewtonWorld();
-	NewtonMesh* const mesh = NewtonMeshLoadOFF (world, fileName);
+	NewtonMesh* mesh = NewtonMeshLoadOFF (world, fileName);
 	if (mesh) {
 		// some OFF files are vert dirty, make sure we do not have any degenerated faces
-/*
-NewtonMesh* xxx = mesh;
-NewtonCollision* collision = NewtonCreateConvexHullFromMesh (world, xxx, 0, 0);
-NewtonMesh* xxx1 = NewtonMeshCreateFromCollision(collision);
-NewtonMeshTriangulate (xxx1);
-int vertexCount = NewtonMeshGetVertexCount(xxx1);
-int actualCount = 0;
-for (void* vertex = NewtonMeshGetFirstVertex(xxx1); vertex; vertex = NewtonMeshGetNextVertex(xxx1, vertex)) 
-{
-	++actualCount;
-}
-dAssert(actualCount == vertexCount );
-*/
+
+NewtonCollision* collision = NewtonCreateConvexHullFromMesh (world, mesh, 0, 0);
+NewtonMesh* mesh1 = NewtonMeshCreateFromCollision(collision);
+NewtonMeshDestroy(mesh);
+NewtonDestroyCollision(collision);
+mesh = mesh1;
+//NewtonMeshTriangulate (xxx1);
+//int vertexCount = NewtonMeshGetVertexCount(xxx1);
+//int actualCount = 0;
+//for (void* vertex = NewtonMeshGetFirstVertex(xxx1); vertex; vertex = NewtonMeshGetNextVertex(xxx1, vertex)) 
+//{
+//	++actualCount;
+//}
+//dAssert(actualCount == vertexCount );
 
 		NewtonMeshFixTJoints (mesh);
 
