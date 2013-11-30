@@ -503,8 +503,9 @@ void dgWorld::BodyEnableSimulation (dgBody* const body)
 {
 	if (!body->m_masterNode) {
 		m_disableBodies.Remove(body);
-		m_broadPhase->Add (body);
 		dgBodyMasterList::AddBody(body);
+		body->SetMassMatrix(body->m_mass.m_w, body->m_mass.m_x, body->m_mass.m_y, body->m_mass.m_z);
+		m_broadPhase->Add (body);
 	}
 }
 
