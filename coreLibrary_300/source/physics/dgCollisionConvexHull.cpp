@@ -755,19 +755,24 @@ void dgCollisionConvexHull::SetCollisionBBox (const dgVector& p0__, const dgVect
 
 void dgCollisionConvexHull::DebugCollision (const dgMatrix& matrix, OnDebugCollisionMeshCallback callback, void* const userData) const
 {
-	dgTriplex tmp[1024 * 4];
-	matrix.TransformTriplex (&tmp[0].m_x, sizeof (dgTriplex), &m_vertex[0].m_x, sizeof (dgVector), m_vertexCount);
+//	dgTriplex tmp[1024 * 4];
+//	matrix.TransformTriplex (&tmp[0].m_x, sizeof (dgTriplex), &m_vertex[0].m_x, sizeof (dgVector), m_vertexCount);
 
+	dgTriplex vertex[256];
 	for (dgInt32 i = 0; i < m_faceCount; i ++) {
 		dgConvexSimplexEdge* const face = m_faceArray[i];
 		dgConvexSimplexEdge* ptr = face;
 		dgInt32 count = 0;
-		dgTriplex vertex[256];
 		do {
-			vertex[count] = tmp[ptr->m_vertex];
+			//vertex[count] = tmp[ptr->m_vertex];
+			vertex[count].m_x = m_vertex[ptr->m_vertex].m_x;
+			vertex[count].m_y = m_vertex[ptr->m_vertex].m_y;
+			vertex[count].m_z = m_vertex[ptr->m_vertex].m_z;
 			count ++;
+			dgAssert (count < sizeof (vertex)/ sizeof (vertex[0]));
 			ptr = ptr->m_next;
 		} while (ptr != face);
+		matrix.TransformTriplex (&vertex[0].m_x, sizeof (dgTriplex), &vertex[0].m_x, sizeof (dgTriplex), count);
 		callback (userData, count, &vertex[0].m_x, 0);
 	}
 }

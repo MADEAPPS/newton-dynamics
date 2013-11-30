@@ -23,21 +23,27 @@
 
 static NewtonBody* CreatePlaneCollision (DemoEntityManager* const scene, const dVector& planeEquation)
 {
-//	return dInfinitePlane::CreateInfinitePlane (scene, plane);
-
 	NewtonCollision* const planeCollision = CreateInfinitePlane (scene->GetNewton(), planeEquation);
 
 	// create the the rigid body for
 	dMatrix matrix (GetIdentityMatrix());
 	NewtonBody* const body = NewtonCreateDynamicBody(scene->GetNewton(), planeCollision, &matrix[0][0]);
-	NewtonDestroyCollision (planeCollision);
 
 	// create a visual mesh
-	DemoEntity* const entity = CreateVisualPlaneEntity (scene, planeEquation);
+	DemoMesh* const mesh = CreateVisualPlaneMesh (planeEquation);
+	DemoEntity* const entity = new DemoEntity(matrix, NULL);
+
+	NewtonCollisionGetMatrix(planeCollision, &matrix[0][0]);
+
+	scene->Append (entity);
+	entity->SetMesh(mesh, matrix);
+	mesh->Release();
 
 	// save the pointer to the graphic object with the body.
 	NewtonBodySetUserData (body, entity);
 
+	// destroy the collision shape
+	NewtonDestroyCollision (planeCollision);
 	return body;
 }
 

@@ -61,7 +61,7 @@ class dInfinitePlane
 			}
 		}
 #else
-		// passing two trinagle	
+		// passing two triangle	
 		for (int i = 0; i < MAX_THREAD_FACES; i ++) {
 			// first triangle
 			{
@@ -88,7 +88,7 @@ class dInfinitePlane
 				m_indexArray[i][8] = 0;
 			}
 
-			// secund triangle
+			// second triangle
 			{
 				// index count
 				m_faceIndices[i][1] = 3;
@@ -266,7 +266,7 @@ class dInfinitePlane
 	}
 
 	public:
-	static DemoEntity* CreateVisualMesh (DemoEntityManager* const scene, const dVector& plane)
+	static DemoMesh* CreateVisualMesh (const dVector& plane)
 	{
 		// make a visual entity
 		DemoMesh* const mesh = new DemoMesh ("userInfinitePlane");
@@ -303,6 +303,14 @@ class dInfinitePlane
 		}
 
 		mesh->OptimizeForRender();
+		return mesh;
+	}
+
+/*
+	static DemoEntity* CreateVisualMesh (DemoEntityManager* const scene, const dVector& plane)
+	{
+		// make a visual entity
+		DemoMesh* const mesh = CreateVisualMesh (plane);
 
 		// get the transformation matrix that takes the plane to the world local space
 		dMatrix matrix (dgGrammSchmidt(plane));
@@ -316,8 +324,7 @@ class dInfinitePlane
 
 		return entity;
 	}
-	
-/*
+
     static void TestAddingUserMeshToSceneCollsion (NewtonWorld* const world)
     {
         NewtonCollision* const sceneCollision = NewtonCreateSceneCollision (world, 0);
@@ -391,7 +398,6 @@ class dInfinitePlane
 
 	// this is local per thread data 
 	dInt32 m_faceIndices[MAX_THREAD_FACES][2];
-//	dInt32 m_indexArray[MAX_THREAD_FACES][4 + 4 + 3]; // 4 indices + 1 attribute + 1 index normal + 4 adjacent edge normals + 1 face diagonal size = 11 indices
 	dInt32 m_indexArray[MAX_THREAD_FACES][2 * 9]; // 2 trinagles of (3 indices + 1 attribute + 1 index normal + 3 adjacent edge normals + 1 face diagonal size) = 9 * 2indices
 	dVector m_collisionVertex[MAX_THREAD_FACES][5];   // 4 vertex + 1 face normal
 };
@@ -403,7 +409,7 @@ NewtonCollision* CreateInfinitePlane (NewtonWorld* const world, const dVector& p
 	return planeCollision->m_collision;
 }
 
-DemoEntity* CreateVisualPlaneEntity (DemoEntityManager* const scene, const dVector& plane)
+DemoMesh* CreateVisualPlaneMesh (const dVector& plane)
 {
-	return dInfinitePlane::CreateVisualMesh (scene, plane);
+	return dInfinitePlane::CreateVisualMesh (plane);
 }
