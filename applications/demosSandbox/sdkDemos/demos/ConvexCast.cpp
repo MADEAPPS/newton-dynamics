@@ -17,7 +17,7 @@
 #include "DemoCamera.h"
 #include "OpenGlUtil.h"
 #include "DemoEntityManager.h"
-
+#include "UserPlaneCollision.h"
 
 class StupidComplexOfConvexShapes: public DemoEntity
 {
@@ -29,6 +29,7 @@ class StupidComplexOfConvexShapes: public DemoEntity
 	{
 		scene->Append(this);
 
+count = 40;
 		const dFloat size = 0.5f;
 
 		DemoMesh* gemetries[32];
@@ -121,7 +122,6 @@ z = size * (i - count / 2);
 		m_castingGeometries = new DemoMesh*[m_count];
 		m_castingShapeArray = new NewtonCollision*[m_count];
 
-
 		dMatrix alignMatrix (dRollMatrix(3.141592f * 90.0f / 180.0f));
 		for (int i = 0; i < m_count; i ++) {
 			dVector shapeSize (size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), 0.0f);
@@ -142,7 +142,7 @@ z = size * (i - count / 2);
 		dMatrix matrix (GetIdentityMatrix());
 		matrix.m_posit.m_y = 2.0f;
 
-		m_currentCastingShape = 3;
+		m_currentCastingShape = 0;
 		m_castingEntity = new DemoEntity (matrix, NULL);
 		m_castingEntity->SetMesh(m_castingGeometries[m_currentCastingShape], GetIdentityMatrix());
 	}
@@ -267,8 +267,8 @@ class dConvexCastManager: public CustomControllerManager<dConvexCastRecord>
 			dVector p0 (camera->ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
 			dVector p1 (camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
 
-//p0 = dVector (-11.984048, 5.142051, -0.066473, 1.0f);
-//p1 = dVector (1964.122803, -367.930450, -23.802830, 1.0f); 
+//p0 = dVector (-29.900000f, 9.972861f, 0.013483f, 1.0f);
+//p1 = dVector (1969.768188f, -532.715515f, 269.629333f, 1.0f); 
 //dTrace (("%f, %f, %f\n", p0[0], p0[1], p0[2]));
 //dTrace (("%f, %f, %f\n", p1[0], p1[1], p1[2]));
 
@@ -354,7 +354,28 @@ static void AddStaticMesh(DemoEntityManager* const scene)
 
 static void AddUserDefineStaticMesh(DemoEntityManager* const scene)
 {
+	dVector planeEquation (0.0f, 1.0f, 0.0f, 0.0f);
+	NewtonCollision* const planeCollision = CreateInfinitePlane (scene->GetNewton(), planeEquation);
 
+	// create the the rigid body for
+	dMatrix matrix (GetIdentityMatrix());
+	NewtonBody* const body = NewtonCreateDynamicBody(scene->GetNewton(), planeCollision, &matrix[0][0]);
+
+	// create a visual mesh
+	DemoMesh* const mesh = CreateVisualPlaneMesh (planeEquation);
+	DemoEntity* const entity = new DemoEntity(matrix, NULL);
+
+	NewtonCollisionGetMatrix(planeCollision, &matrix[0][0]);
+
+	scene->Append (entity);
+	entity->SetMesh(mesh, matrix);
+	mesh->Release();
+
+	// save the pointer to the graphic object with the body.
+	NewtonBodySetUserData (body, entity);
+
+	// destroy the collision shape
+	NewtonDestroyCollision (planeCollision);
 }
 
 

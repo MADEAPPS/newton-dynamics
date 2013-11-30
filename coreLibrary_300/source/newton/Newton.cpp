@@ -3270,6 +3270,23 @@ NewtonCollision* NewtonCreateUserMeshCollision(
 
 
 
+int NewtonUserMeshCollisionContinueOveralapText (const NewtonUserMeshCollisionCollideDesc* const collideDescData, const void* const rayHandle, const dFloat* const minAabb, const dFloat* const maxAabb)
+{
+	const dgFastRayTest* const ray = (dgFastRayTest*) rayHandle;
+
+	dgVector p0 (minAabb);
+	dgVector p1 (maxAabb);
+
+	dgVector q0 (collideDescData->m_boxP0);
+	dgVector q1 (collideDescData->m_boxP1);
+
+	dgVector box0 (p0 - q1);
+	dgVector box1 (p1 - q0);
+
+	dgFloat32 dist = ray->BoxIntersect(box0, box1);
+	return (dist < dgFloat32 (1.0f)) ? 1 : 0;
+}
+
 
 
 // Name: NewtonCreateTreeCollision 

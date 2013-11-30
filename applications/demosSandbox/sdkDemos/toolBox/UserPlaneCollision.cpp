@@ -19,17 +19,18 @@
 #include "DebugDisplay.h"
 #include "UserPlaneCollision.h"
 
-
+#define PASS_A_QUAD
 #define MAX_THREAD_FACES	32
 
-//#define PASS_A_QUAD
 
 class dInfinitePlane
 {
 	public:
 	dInfinitePlane (NewtonWorld* const world, const dVector& plane)
-	{
+		:m_minBox (-0.1f, -2000.0f, -2000.0f, 0.0f)
+		,m_maxBox ( 0.1f,  2000.0f,  2000.0f, 0.0f)
 
+	{
 		// get the transformation matrix that takes the plane to the world local space
 		m_rotation = dgGrammSchmidt(plane);
 
@@ -45,7 +46,7 @@ class dInfinitePlane
 #ifdef PASS_A_QUAD
 		// passing a single quad	
 		for (int i = 0; i < MAX_THREAD_FACES; i ++) {
-			m_faceIndices[i] = 4;
+			m_faceIndices[i][0] = 4;
 			// face attribute
 			m_indexArray[i][4] = 0;
 			// face normal
@@ -114,12 +115,9 @@ class dInfinitePlane
 			}
 		}
 #endif
-		// the box is define in local space 
-		dVector minBox (-0.1f, -2000.0f, -2000.0f);
-		dVector maxBox ( 0.1f,  2000.0f,  2000.0f);
 
 		// create a Newton user collision 
-		m_collision = NewtonCreateUserMeshCollision (world, &minBox[0], &maxBox[0], this, 
+		m_collision = NewtonCreateUserMeshCollision (world, &m_minBox[0], &m_maxBox[0], this, 
 													 PlaneCollisionCollideCallback, PlaneMeshCollisionRayHitCallback, 
 													 PlaneCollisionDestroyCallback, PlaneCollisionGetCollisionInfo, 
 													 PlaneCollisionAABBOverlapTest, PlaneCollisionGetFacesInAABB, 
@@ -207,7 +205,63 @@ class dInfinitePlane
 	}
 
 
-	static void PlaneCollisionCollideCallback (NewtonUserMeshCollisionCollideDesc* const collideDesc)
+	static void PlaneCollisionCollideCallbackConstinue (NewtonUserMeshCollisionCollideDesc* const collideDesc, const void* const continueCollisionHandle)
+	{
+		dInfinitePlane* const me = (dInfinitePlane*) collideDesc->m_userData;
+
+		// build that aabb of each face and submit only the one that pass the test.
+		if (NewtonUserMeshCollisionContinueOveralapText (collideDesc, continueCollisionHandle, &me->m_minBox[0], &me->m_maxBox[0])) {
+			const dVector& p0 = me->m_minBox;
+			const dVector& p1 = me->m_maxBox;
+			dVector centre ((p1 + p0).Scale (0.5f));
+
+			//find the projection of center point over the plane
+			dFloat t = - (me->m_plane % centre + me->m_plane.m_w);
+			centre += me->m_plane.Scale (t);
+
+			//know calculate the scale factor
+			dVector size (p1 - p0);
+			dFloat s = dMax(size.m_x, dMax (size.m_y, size.m_z)) * 0.5f;
+
+			dInt32 threadNumber = collideDesc->m_threadNumber;
+
+			// initialize the callback data structure
+#ifdef PASS_A_QUAD
+			collideDesc->m_faceCount = 1;
+#else
+			collideDesc->m_faceCount = 2;
+#endif
+			collideDesc->m_vertexStrideInBytes = sizeof (dVector);
+			collideDesc->m_faceIndexCount = &me->m_faceIndices[threadNumber][0];
+			collideDesc->m_faceVertexIndex = &me->m_indexArray[threadNumber][0];
+			collideDesc->m_vertex = &me->m_collisionVertex[threadNumber][0][0];
+			dVector* const polygon = &me->m_collisionVertex[threadNumber][0];
+			for (int i = 0; i < 4; i ++) {
+				polygon[i] = centre + me->m_unitSphape[i].Scale (s);
+			}
+			// save face normal
+			polygon[4] =  me->m_plane;
+
+			// show debug display info
+			if (DebugDisplayOn()) {
+				dMatrix matrix;
+				dVector face[64];
+
+				NewtonBodyGetMatrix (collideDesc->m_polySoupBody, &matrix[0][0]);
+				matrix.TransformTriplex (&face[0].m_x, sizeof (dVector), &polygon[0].m_x, sizeof (dVector), 4);
+
+				NewtonWorld* const world = NewtonBodyGetWorld (collideDesc->m_polySoupBody);
+				// critical section lock
+				NewtonWorldCriticalSectionLock (world, threadNumber);
+				//DebugDrawPolygon (4, &face[0]);
+				// unlock the critical section
+				NewtonWorldCriticalSectionUnlock (world);
+			}
+		}
+	}
+
+
+	static void PlaneCollisionCollideCallbackDescrete (NewtonUserMeshCollisionCollideDesc* const collideDesc)
 	{
 		dInfinitePlane* const me = (dInfinitePlane*) collideDesc->m_userData;
 
@@ -262,6 +316,15 @@ class dInfinitePlane
 				// unlock the critical section
 				NewtonWorldCriticalSectionUnlock (world);
 			}
+		}
+	}
+
+	static void PlaneCollisionCollideCallback (NewtonUserMeshCollisionCollideDesc* const collideDesc, const void* const continueCollisionHandle)
+	{
+		if (continueCollisionHandle) {
+			PlaneCollisionCollideCallbackConstinue (collideDesc, continueCollisionHandle);
+		} else {
+			PlaneCollisionCollideCallbackDescrete (collideDesc);
 		}
 	}
 
@@ -391,6 +454,9 @@ class dInfinitePlane
 	}
 */
 
+	// the box is define in local space 
+	dVector m_minBox;
+	dVector m_maxBox;
 	dVector m_plane;
 	dMatrix m_rotation;
 	NewtonCollision* m_collision;

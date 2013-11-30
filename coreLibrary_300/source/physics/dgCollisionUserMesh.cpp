@@ -139,7 +139,9 @@ void dgCollisionUserMesh::GetCollidingFaces (dgPolygonMeshDesc* const data) cons
 	if (m_collideCallback) {
 		data->m_me = this;
 		data->m_userData = m_userData;
-		m_collideCallback (&data->m_p0);
+
+		dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), data->m_boxDistanceTravelInMeshSpace);
+		m_collideCallback (&data->m_p0, data->m_doContinuesCollisionTest ?  &ray : NULL);
 
 		dgInt32 faceCount0 = 0; 
 		dgInt32 faceIndexCount0 = 0; 
@@ -152,26 +154,48 @@ void dgCollisionUserMesh::GetCollidingFaces (dgPolygonMeshDesc* const data) cons
 		dgInt32* const dstIndices = data->m_globalFaceVertexIndex;
 		dgInt32* const faceIndexCountArray = data->m_faceIndexCount; 
 
-		for (dgInt32 i = 0; (i < data->m_faceCount) && (faceIndexCount0 < (DG_MAX_COLLIDING_INDICES - 32)); i ++) {
-			dgInt32 indexCount = faceIndexCountArray[i];
-			const dgInt32* const indexArray = &srcIndices[faceIndexCount1]; 
+		if (data->m_doContinuesCollisionTest) {
+			for (dgInt32 i = 0; (i < data->m_faceCount) && (faceIndexCount0 < (DG_MAX_COLLIDING_INDICES - 32)); i ++) {
+				dgInt32 indexCount = faceIndexCountArray[i];
+				const dgInt32* const indexArray = &srcIndices[faceIndexCount1]; 
 
-			dgInt32 normalIndex = data->GetNormalIndex (indexArray, indexCount);
-			dgVector faceNormal (&vertex[normalIndex * stride]);
-			dgFloat32 dist = data->PolygonBoxDistance (faceNormal, indexCount, indexArray, stride, vertex);
+				dgInt32 normalIndex = data->GetNormalIndex (indexArray, indexCount);
+				dgVector faceNormal (&vertex[normalIndex * stride]);
+				dgFloat32 dist = data->PolygonBoxRayDistance (faceNormal, indexCount, indexArray, stride, vertex, ray);
 
-			const dgInt32 faceIndexCount = data->GetFaceIndexCount(indexCount); 
-			if (dist > dgFloat32 (0.0f)) {
-				hitDistance[faceCount0] = dist;
-				address[faceCount0] = faceIndexCount0;
-				faceIndexCountArray[faceCount0] = indexCount;
-				//memcpy (&srcIndices[faceIndexCount0], indexArray, faceIndexCount * sizeof (dgInt32));
-				memcpy (&dstIndices[faceIndexCount0], indexArray, faceIndexCount * sizeof (dgInt32));
-				faceCount0 ++;
-				faceIndexCount0 += faceIndexCount;
+				const dgInt32 faceIndexCount = data->GetFaceIndexCount(indexCount); 
+				if (dist < dgFloat32 (1.0f)) {
+					hitDistance[faceCount0] = dist;
+					address[faceCount0] = faceIndexCount0;
+					faceIndexCountArray[faceCount0] = indexCount;
+					memcpy (&dstIndices[faceIndexCount0], indexArray, faceIndexCount * sizeof (dgInt32));
+					faceCount0 ++;
+					faceIndexCount0 += faceIndexCount;
+				}
+				faceIndexCount1 += faceIndexCount;
 			}
-			faceIndexCount1 += faceIndexCount;
+		} else {
+			for (dgInt32 i = 0; (i < data->m_faceCount) && (faceIndexCount0 < (DG_MAX_COLLIDING_INDICES - 32)); i ++) {
+				dgInt32 indexCount = faceIndexCountArray[i];
+				const dgInt32* const indexArray = &srcIndices[faceIndexCount1]; 
+
+				dgInt32 normalIndex = data->GetNormalIndex (indexArray, indexCount);
+				dgVector faceNormal (&vertex[normalIndex * stride]);
+				dgFloat32 dist = data->PolygonBoxDistance (faceNormal, indexCount, indexArray, stride, vertex);
+
+				const dgInt32 faceIndexCount = data->GetFaceIndexCount(indexCount); 
+				if (dist > dgFloat32 (0.0f)) {
+					hitDistance[faceCount0] = dist;
+					address[faceCount0] = faceIndexCount0;
+					faceIndexCountArray[faceCount0] = indexCount;
+					memcpy (&dstIndices[faceIndexCount0], indexArray, faceIndexCount * sizeof (dgInt32));
+					faceCount0 ++;
+					faceIndexCount0 += faceIndexCount;
+				}
+				faceIndexCount1 += faceIndexCount;
+			}
 		}
+
 
 		data->m_faceCount = 0;
 		if (faceCount0) {

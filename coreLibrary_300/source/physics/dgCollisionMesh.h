@@ -139,9 +139,7 @@ class dgPolygonMeshDesc: public dgFastAABBInfo
 		const dgMatrix& soupMatrix = m_polySoupCollision->GetGlobalMatrix();
 		//data.m_boxDistanceTravelInMeshSpace = data.m_polySoupCollision->GetInvScale().CompProduct4(soupMatrix.UnrotateVector(upperBoundVeloc.CompProduct4(data.m_objCollision->GetInvScale())));
 		m_boxDistanceTravelInMeshSpace = m_polySoupCollision->GetInvScale().CompProduct4(soupMatrix.UnrotateVector(distanceInGlobalSpace.CompProduct4(m_objCollision->GetInvScale())));
-
 	}
-
 
 
 	DG_INLINE dgInt32 GetFaceIndexCount(dgInt32 indexCount) const

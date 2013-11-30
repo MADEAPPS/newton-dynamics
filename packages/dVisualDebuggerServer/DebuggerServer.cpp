@@ -70,11 +70,12 @@ bool DebuggerServer::ServerStatus() const
 
 void DebuggerServer::Serve(dFloat timestep)
 {
-return;
 timestep = 0;
-	if (m_connected) {
-		AddNewBodies ();
-	}
+return;
+
+//	if (m_connected) {
+//		AddNewBodies ();
+//	}
 /*
 	int code = NEWTON_DEBUGGER_BEGIN_UPDATE;
 	SerializeData (&code, sizeof (code));
@@ -88,9 +89,8 @@ timestep = 0;
 */
 
 
-	int connected = NEWTON_CHECK_CONNECTED;
-	SendData (&connected, sizeof (connected));
-
+//	int connected = NEWTON_CHECK_CONNECTED;
+//	SendData (&connected, sizeof (connected));
 }
 
 bool DebuggerServer::SendData (const void* const buffer, int size)

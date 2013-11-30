@@ -35,8 +35,7 @@ class dClosestDistanceRecord: public CustomControllerBase
 			m_castingShape = CreateConvexCollision (world, GetIdentityMatrix(), size, castingShapeType, 0);
 
 			DemoMesh* const geometry = new DemoMesh("convexShape", m_castingShape, "smilli.tga", "smilli.tga", "smilli.tga");
-dAssert (0);
-//			SetMesh(geometry);
+			SetMesh(geometry, GetIdentityMatrix());
 			geometry->Release();
 
 			scene->Append(this);

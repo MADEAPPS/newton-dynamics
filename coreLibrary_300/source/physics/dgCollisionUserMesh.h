@@ -28,14 +28,14 @@
 
 typedef void (dgApi *OnUserMeshDestroyCallback) (void* const userData);
 
-typedef void (dgApi *OnUserMeshCollideCallback) (void* const collideData);
+typedef void (dgApi *OnUserMeshCollideCallback) (void* const collideData, const void* const continueHandle);
 typedef dgFloat32 (dgApi *OnUserMeshRayHitCallback) (dgCollisionMeshRayHitDesc& rayHitdata);
 typedef void (dgApi *OnUserMeshCollisionInfo) (void* userData, dgCollisionInfo* infoRecord);
 typedef dgInt32 (dgApi *OnUserMeshAABBOverlapTest) (void* const userData, const dgVector& boxP0, const dgVector& boxP1);
 typedef void (dgApi *OnUserMeshFacesInAABB) (void* userData, const dgFloat32* p0, const dgFloat32* p1,
 										   const dgFloat32** vertexArray, dgInt32* vertexCount, dgInt32* vertexStrideInBytes, 
 										   const dgInt32* indexList, dgInt32 maxIndexCount, const dgInt32* faceAttribute);
-typedef void (dgApi *OnUserMeshSerialize) (void* const userCollisionData, dgSerialize function, void* const serilalizeObject);
+typedef void (dgApi *OnUserMeshSerialize) (void* const userSerializeData, dgSerialize function, void* const serilalizeObject);
 
 
 class dgUserMeshCreation
