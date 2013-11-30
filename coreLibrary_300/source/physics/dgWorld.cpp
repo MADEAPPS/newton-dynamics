@@ -455,6 +455,14 @@ void dgWorld::DestroyAllBodies ()
 	dgBodyMasterList& me = *this;
 
 	Sync ();
+
+	dgTree<int, dgBody*>::Iterator iter (m_disableBodies);
+	for (iter.Begin(); iter; iter ++) {
+		dgBody* body = iter.GetKey();
+		DestroyBody (body);
+	}
+	dgAssert(!m_disableBodies.GetCount());
+
 	dgAssert (dgBodyMasterList::GetFirst()->GetInfo().GetBody() == m_sentinelBody);
 	for (dgBodyMasterList::dgListNode* node = me.GetFirst()->GetNext(); node; ) {
 		dgBody* const body = node->GetInfo().GetBody();
@@ -489,6 +497,24 @@ void dgWorld::InitBody (dgBody* const body, dgCollisionInstance* const collision
 	body->SetMassMatrix (DG_INFINITE_MASS * dgFloat32 (2.0f), DG_INFINITE_MASS, DG_INFINITE_MASS, DG_INFINITE_MASS);
 	body->SetMatrix (matrix);
 	m_broadPhase->Add (body);
+}
+
+void dgWorld::BodyEnableSimulation (dgBody* const body)
+{
+	if (!body->m_masterNode) {
+		m_disableBodies.Remove(body);
+		m_broadPhase->Add (body);
+		dgBodyMasterList::AddBody(body);
+	}
+}
+
+void dgWorld::BodyDisableSimulation(dgBody* const body)
+{
+	if (body->m_masterNode) {
+		m_broadPhase->Remove(body);
+		dgBodyMasterList::RemoveBody(body);
+		m_disableBodies.Insert(0, body);
+	}
 }
 
 dgDynamicBody* dgWorld::CreateDynamicBody(dgCollisionInstance* const collision, const dgMatrix& matrix)
@@ -528,9 +554,13 @@ void dgWorld::DestroyBody(dgBody* const body)
 	if (body->m_destructor) {
 		body->m_destructor (*body);
 	}
-
-	m_broadPhase->Remove (body);
-	dgBodyMasterList::RemoveBody (body);
+	
+	if (m_disableBodies.Find(body)) {
+		m_disableBodies.Remove(body);
+	} else {
+		m_broadPhase->Remove (body);
+		dgBodyMasterList::RemoveBody (body);
+	}
 
 	dgAssert (body->m_collision);
 	body->m_collision->Release();

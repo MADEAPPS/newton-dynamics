@@ -328,6 +328,9 @@ mesh->Release();
 NewtonBodySetUserData(compoundBody, entity);
 scene->Append(entity);
 
+
+//NewtonBodyDisableSimulation (compoundBody);
+
 }
 
 

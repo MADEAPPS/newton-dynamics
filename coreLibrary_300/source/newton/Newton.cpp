@@ -3270,7 +3270,7 @@ NewtonCollision* NewtonCreateUserMeshCollision(
 
 
 
-int NewtonUserMeshCollisionContinueOveralapText (const NewtonUserMeshCollisionCollideDesc* const collideDescData, const void* const rayHandle, const dFloat* const minAabb, const dFloat* const maxAabb)
+int NewtonUserMeshCollisionContinueOveralapTest (const NewtonUserMeshCollisionCollideDesc* const collideDescData, const void* const rayHandle, const dFloat* const minAabb, const dFloat* const maxAabb)
 {
 	const dgFastRayTest* const ray = (dgFastRayTest*) rayHandle;
 
@@ -4584,6 +4584,7 @@ void NewtonBodyEnableSimulation(const NewtonBody* const bodyPtr)
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)bodyPtr;
 	dgWorld* const world = body->GetWorld();
+	world->BodyEnableSimulation (body);
 }
 
 void NewtonBodyDisableSimulation(const NewtonBody* const bodyPtr)
@@ -4591,6 +4592,7 @@ void NewtonBodyDisableSimulation(const NewtonBody* const bodyPtr)
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)bodyPtr;
 	dgWorld* const world = body->GetWorld();
+	world->BodyDisableSimulation (body);
 }
 
 void NewtonSetBodyCollidable (const NewtonBody* const bodyPtr, int collidable)

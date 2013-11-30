@@ -381,7 +381,6 @@ class dgWorld:
 
 	OnGetPerformanceCountCallback GetPerformaceFuntion()const ;
 	void SetPerfomanceCounter(OnGetPerformanceCountCallback callback);
-	
 
 	void SetThreadsCount (dgInt32 count);
 	dgUnsigned32 GetPerfomanceTicks (dgUnsigned32 entry) const;
@@ -389,6 +388,9 @@ class dgWorld:
 
 	//Parallel Job dispatcher for user related stuff
 	void ExecuteUserJob (dgWorkerThreadTaskCallback userJobKernel, void* const userJobKernelContext);
+
+	void BodyEnableSimulation (dgBody* const body);
+	void BodyDisableSimulation (dgBody* const body);
 
 	dgBody* GetSentinelBody() const;
 	dgMemoryAllocator* GetAllocator() const;

@@ -22,6 +22,388 @@
 #define PASS_A_QUAD
 #define MAX_THREAD_FACES	32
 
+#if 0
+class Vector3i
+{
+	public: 
+	Vector3i ()
+	{
+	}
+
+	Vector3i (int x, int y, int z)
+		:m_x(x), m_y(y),  m_z(z)   
+	{
+
+	}
+	int m_x, m_y, m_z;
+};
+
+class MapDefinition
+{
+	public:
+
+	dVector GetSize() const 
+	{
+		return dVector (100, 100, 100);
+	}
+
+	int GetBlockType(const Vector3i& posit) const
+	{
+		return 0;
+	}
+
+	int GetAdjacentBlockType (const Vector3i& posit, int face) const 
+	{
+		return 0;
+	}
+
+	bool IsBlockTypeSolid(int type) const
+	{
+		return false;
+	}
+};
+
+class UserGridCollision
+{
+	UserGridCollision(NewtonWorld* const world, const MapDefinition& mapDefinition) 
+		:m_mapDefinition(mapDefinition)
+	{
+		// I use a pool of 1024 faces and hope a collision wont need that many faces
+		for (int j = 0; j < 1024; j++) 
+		{
+			m_faceIndices[j] = 4;
+
+			int indexArrayIndex = 11 * j;
+
+			// face attribute
+			m_indexArray[indexArrayIndex + 4] = 0;
+			// face normal
+			m_indexArray[indexArrayIndex + 4 + 1] = 4 + (j * 5);
+			// face area (the plane is clipped around the box, the face size is always optimal)
+			m_indexArray[indexArrayIndex + 4 + 2 + 4] = 0;
+
+			for (int k = 0; k < 4; k ++)
+			{
+				// face vertex index
+				m_indexArray[indexArrayIndex + k] = (j * 5) + k;
+				// face adjacent index (infinite plane does not have shared edge with other faces)
+				m_indexArray[indexArrayIndex + k + 4 + 2] = 4;
+			}
+		}
+
+		// use the map bounds
+		dVector minBox = dVector(0, 0, 0);
+		dVector maxBox = mapDefinition.GetSize();
+
+		// create a Newton user collision 
+		m_collision = NewtonCreateUserMeshCollision(world, &minBox[0], &maxBox[0], this, CollideCallback, RayHitCallback, DestroyCallback, GetCollisionInfo, AABBOverlapTest, GetFacesInAABB, SerializationCallback, 0);
+
+		// identity matrix
+		dMatrix matrix;
+		NewtonCollisionSetMatrix(m_collision, &matrix[0][0]);
+	}
+
+	UserGridCollision::~UserGridCollision()
+	{
+
+	}
+
+	static void UserGridCollision::DestroyCallback(void* userData)
+	{
+		UserGridCollision* const me = (UserGridCollision*)userData;
+		delete me;
+	}
+
+	static int UserGridCollision::GetFacesInAABB(void* me, const dFloat* p0, const dFloat* p1, const dFloat** vertexArray, int* vertexCount, int* vertexStrideInBytes, const int* indexList, int maxIndexCount, const int* userDataList)
+	{
+		return 0;
+	}
+
+	static int UserGridCollision::AABBOverlapTest(void* userData, const dFloat* const box0, const dFloat* const box1)
+	{
+		return 1;
+	}
+
+	static void UserGridCollision::SerializationCallback(void* const userData, NewtonSerializeCallback function, void* const serializeHandle)
+	{
+
+	}
+
+	static void UserGridCollision::GetCollisionInfo(void* const userData, NewtonCollisionInfoRecord* const infoRecord)
+	{
+
+	}
+
+	static dFloat UserGridCollision::RayHitCallback(NewtonUserMeshCollisionRayHitDesc* const rayDesc)
+	{
+		return 0;
+	}
+
+	void UserGridCollision::CollideCallbackDescrete(NewtonUserMeshCollisionCollideDesc* const collideDesc)
+	{
+		dVector p0(collideDesc->m_boxP0[0], collideDesc->m_boxP0[1], collideDesc->m_boxP0[2]);
+		dVector p1(collideDesc->m_boxP1[0], collideDesc->m_boxP1[1], collideDesc->m_boxP1[2]);
+
+		collideDesc->m_faceCount = 0;
+		collideDesc->m_vertexStrideInBytes = sizeof(dVector);
+		collideDesc->m_faceIndexCount = &m_faceIndices[0];
+		collideDesc->m_faceVertexIndex = &m_indexArray[0];
+		collideDesc->m_vertex = &m_collisionVertex[0][0];
+
+		int collisionVertexIndex = 0;
+		dVector* polygon;
+
+		// min voxel position
+		Vector3i minBlock((int)p0.m_x, (int)p0.m_y, (int)p0.m_z);
+
+		// max voxel position
+		Vector3i maxBlock((int)ceil(p1.m_x), (int)ceil(p1.m_y), (int)ceil(p1.m_z));
+
+		// loop through every voxel in the collision bounds,
+		// if there's a solid block, add faces of it to collide against
+		for (int x = minBlock.m_x; x <= maxBlock.m_x; ++x)
+		{
+			for (int y = minBlock.m_y; y <= maxBlock.m_y; ++y)
+			{
+				for (int z = minBlock.m_z; z <= maxBlock.m_z; ++z)
+				{
+					// if a voxel is solid (air block)
+					if (m_mapDefinition.IsBlockTypeSolid(m_mapDefinition.GetBlockType(Vector3i(x, y, z))))
+					{
+						// check each side
+						for (size_t face = 0; face < 6; ++face)
+						{
+							// adjacent block is solid, no need to add this face
+							if (m_mapDefinition.IsBlockTypeSolid(m_mapDefinition.GetAdjacentBlockType(Vector3i(x, y, z), face)))
+							{
+								continue;
+							}
+
+							polygon = &m_collisionVertex[collisionVertexIndex];
+
+							for (int i = 0; i < 4; i++)
+							{
+								// CHUNK_VERTEX_OFFSETS is just a lookup to create the face
+								//polygon[i] = Vector3i(x, y, z) + Map::CHUNK_VERTEX_OFFSETS[face * 4 + i];
+							}
+
+							// save face normal
+							//polygon[4] = MapDefinition::NORMALS[face];
+
+							collideDesc->m_faceCount += 1;
+							collisionVertexIndex += 5;
+
+							if (collideDesc->m_faceCount == 1024)
+							{
+								return;
+							}
+						}
+					}
+				}
+			}
+		}	
+	}
+
+	void UserGridCollision::CollideCallbackContinue(NewtonUserMeshCollisionCollideDesc* const collideDesc, const void* const continueHandle)
+	{
+		// get the aabb
+		dVector p0(collideDesc->m_boxP0[0], collideDesc->m_boxP0[1], collideDesc->m_boxP0[2]);
+		dVector p1(collideDesc->m_boxP1[0], collideDesc->m_boxP1[1], collideDesc->m_boxP1[2]);
+
+		// translate the box to target 
+		dVector transtionDist (collideDesc->m_boxDistanceTravel[0], collideDesc->m_boxDistanceTravel[1], collideDesc->m_boxDistanceTravel[2]);
+		dVector q0(p0 + transtionDist);
+		dVector q1(p1 + transtionDist);
+
+		p0.m_x = dMin (p0.m_x, q0.m_x); 
+		p0.m_y = dMin (p0.m_y, q0.m_y); 
+		p0.m_z = dMin (p0.m_z, q0.m_z); 
+
+		p1.m_x = dMax (p1.m_x, q1.m_x); 
+		p1.m_y = dMax (p1.m_y, q1.m_y); 
+		p1.m_z = dMax (p1.m_z, q1.m_z); 
+
+		collideDesc->m_faceCount = 0;
+		collideDesc->m_vertexStrideInBytes = sizeof(dVector);
+		collideDesc->m_faceIndexCount = &m_faceIndices[0];
+		collideDesc->m_faceVertexIndex = &m_indexArray[0];
+		collideDesc->m_vertex = &m_collisionVertex[0][0];
+
+//		int collisionVertexIndex = 0;
+//		dVector* polygon;
+
+		// min voxel position
+		Vector3i minBlock((int)p0.m_x, (int)p0.m_y, (int)p0.m_z);
+
+		// max voxel position
+		Vector3i maxBlock((int)ceil(p1.m_x), (int)ceil(p1.m_y), (int)ceil(p1.m_z));
+
+
+		int stack;
+		Vector3i stackPool[64][2];
+
+		stackPool[0][0] = minBlock;
+		stackPool[0][1] = maxBlock;
+		stack = 1;
+
+		while (stack)
+		{
+			stack --;
+			Vector3i minBlock (stackPool[stack][0]);
+			Vector3i maxBlock (stackPool[stack][1]);
+
+			//see this cell is visible to the collision path
+			dVector p0 (minBlock.m_x, minBlock.m_y, minBlock.m_z, 0.0f);
+			dVector p1 (maxBlock.m_x, maxBlock.m_y, maxBlock.m_z, 0.0f);
+			if (NewtonUserMeshCollisionContinueOveralapTest (collideDesc, continueHandle, &p0[0], &p1[0])) {
+
+				if (minBlock.m_x == maxBlock.m_x) {
+					if (minBlock.m_y == maxBlock.m_y) {
+						if (minBlock.m_z == maxBlock.m_z) {
+							//here we found a visible cell, submit this face
+
+
+						} else {
+							// split alone z axis 
+							int z = (minBlock.m_z + maxBlock.m_z) / 2;
+							stackPool[stack][0] = minBlock;
+							stackPool[stack][1] = Vector3i(minBlock.m_x, minBlock.m_y, z);
+							stack ++;
+							dAssert (stack < 64);
+
+							stackPool[stack][0] = Vector3i(minBlock.m_x, minBlock.m_y, z + 1);
+							stackPool[stack][1] = maxBlock;
+							stack ++;
+							dAssert (stack < 64);
+						}
+					} else {
+						if (minBlock.m_z == maxBlock.m_z) {
+							// split alone y only
+							int y = (minBlock.m_y + maxBlock.m_y) / 2;
+							stackPool[stack][0] = minBlock;
+							stackPool[stack][1] = Vector3i(minBlock.m_x, y, minBlock.m_z);
+							stack ++;
+							dAssert (stack < 64);
+
+							stackPool[stack][0] = Vector3i(minBlock.m_x, y + 1, minBlock.m_z);
+							stackPool[stack][1] = maxBlock;
+							stack ++;
+							dAssert (stack < 64);
+
+						} else {
+							// slit alone y and z
+							int y = (minBlock.m_y + maxBlock.m_y) / 2;
+							int z = (minBlock.m_z + maxBlock.m_z) / 2;
+
+							stackPool[stack][0] = minBlock;
+							stackPool[stack][1] = Vector3i(minBlock.m_x, y, z);
+							stack ++;
+							dAssert (stack < 64);
+
+							stackPool[stack][0] = Vector3i(minBlock.m_x, y + 1, z);
+							stackPool[stack][1] = Vector3i(minBlock.m_x, maxBlock.m_y, z);
+							stack ++;
+							dAssert (stack < 64);
+
+
+							stackPool[stack][0] = Vector3i(minBlock.m_x, minBlock.m_y, z);
+							stackPool[stack][1] = Vector3i(minBlock.m_x, y, maxBlock.m_z);
+							stack ++;
+							dAssert (stack < 64);
+
+							stackPool[stack][0] = Vector3i(minBlock.m_x, y + 1, z + 1);
+							stackPool[stack][1] = maxBlock;
+							stack ++;
+							dAssert (stack < 64);
+						}
+					}
+				} else {
+					// x's are different 
+					if (minBlock.m_y == maxBlock.m_y) {
+						if (minBlock.m_z == maxBlock.m_z) {
+							// split alone x axis 
+							int x = (minBlock.m_x + maxBlock.m_x) / 2;
+							stackPool[stack][0] = minBlock;
+							stackPool[stack][1] = Vector3i(x, minBlock.m_y, minBlock.m_z);
+							stack ++;
+							dAssert (stack < 64);
+
+							stackPool[stack][0] = Vector3i(x + 1, minBlock.m_y, minBlock.m_z);
+							stackPool[stack][1] = maxBlock;
+							stack ++;
+							dAssert (stack < 64);
+						} else {
+							// split alone x and z axis 
+							int x = (minBlock.m_y + maxBlock.m_y) / 2;
+							int z = (minBlock.m_z + maxBlock.m_z) / 2;
+
+							stackPool[stack][0] = minBlock;
+							stackPool[stack][1] = Vector3i(x, minBlock.m_y, z);
+							stack ++;
+							dAssert (stack < 64);
+
+							stackPool[stack][0] = Vector3i(x + 1, minBlock.m_y, z);
+							stackPool[stack][1] = Vector3i(minBlock.m_x, maxBlock.m_y, z);
+							stack ++;
+							dAssert (stack < 64);
+
+							stackPool[stack][0] = Vector3i(minBlock.m_x, minBlock.m_y, z);
+							stackPool[stack][1] = Vector3i(x, minBlock.m_y, maxBlock.m_z);
+							stack ++;
+							dAssert (stack < 64);
+
+							stackPool[stack][0] = Vector3i(x + 1, minBlock.m_y, z + 1);
+							stackPool[stack][1] = maxBlock;
+							stack ++;
+							dAssert (stack < 64);
+						}
+					} else {
+						if (minBlock.m_z == maxBlock.m_z) {
+							// split alone x, and y
+							int x = (minBlock.m_x + maxBlock.m_x) / 2;
+							int y = (minBlock.m_y + maxBlock.m_y) / 2;
+							//....
+
+
+						} else {
+							// slit alone x, y and z
+							int x = (minBlock.m_x + maxBlock.m_x) / 2;
+							int y = (minBlock.m_y + maxBlock.m_y) / 2;
+							int z = (minBlock.m_z + maxBlock.m_z) / 2;
+							//...
+
+						}
+					}
+
+				}
+			}
+		}
+	}
+
+	static void UserGridCollision::CollideCallback(NewtonUserMeshCollisionCollideDesc* const collideDesc, const void* const continueHandle)
+	{
+		UserGridCollision* const me = (UserGridCollision*)collideDesc->m_userData;
+		if (continueHandle) {
+			me->CollideCallbackContinue(collideDesc, continueHandle);
+		} else {
+			me->CollideCallbackDescrete(collideDesc);
+		}
+	}
+
+	int m_faceIndices[1024];
+	int m_indexArray[1024 * 11];
+	dVector m_collisionVertex[1000];
+
+	const MapDefinition& m_mapDefinition;
+	NewtonCollision* m_collision;
+};
+
+#endif
+
+
+
+
+
 
 class dInfinitePlane
 {
@@ -210,7 +592,7 @@ class dInfinitePlane
 		dInfinitePlane* const me = (dInfinitePlane*) collideDesc->m_userData;
 
 		// build that aabb of each face and submit only the one that pass the test.
-		if (NewtonUserMeshCollisionContinueOveralapText (collideDesc, continueCollisionHandle, &me->m_minBox[0], &me->m_maxBox[0])) {
+		if (NewtonUserMeshCollisionContinueOveralapTest (collideDesc, continueCollisionHandle, &me->m_minBox[0], &me->m_maxBox[0])) {
 			const dVector& p0 = me->m_minBox;
 			const dVector& p1 = me->m_maxBox;
 			dVector centre ((p1 + p0).Scale (0.5f));

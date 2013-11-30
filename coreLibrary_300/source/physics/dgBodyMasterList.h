@@ -71,6 +71,7 @@ class dgBodyMasterList: public dgList<dgBodyMasterListRow>
 	void SortMasterList();
 
 	public:
+	dgTree<int, dgBody*> m_disableBodies;
 	dgInt32 m_deformableCount;
 	dgUnsigned32 m_constraintCount;
 

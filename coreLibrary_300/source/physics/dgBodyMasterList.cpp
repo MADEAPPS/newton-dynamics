@@ -91,6 +91,7 @@ void dgBodyMasterListRow::SortList()
 
 dgBodyMasterList::dgBodyMasterList (dgMemoryAllocator* const allocator)
 	:dgList<dgBodyMasterListRow>(allocator)
+	,m_disableBodies(allocator)
 	,m_deformableCount(0)
 	,m_constraintCount (0)
 {
