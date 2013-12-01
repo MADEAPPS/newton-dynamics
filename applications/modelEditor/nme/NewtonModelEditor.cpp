@@ -35,6 +35,8 @@ BEGIN_EVENT_TABLE (NewtonModelEditor, wxFrame)
 	EVT_MENU (wxID_PREFERENCES, OnAbout)
 
 	EVT_MENU (wxID_OPEN, OnOpenScene)
+	EVT_MENU (wxID_SAVE, OnSaveScene)
+	EVT_MENU (wxID_SAVEAS, OnSaveSceneAs)
 
 	EVT_MENU (wxID_NEW, OnNew)
 	EVT_MENU (ID_VIEWPORT_PANNING, OnChangeNavigationMode)
@@ -600,13 +602,34 @@ void NewtonModelEditor::OnOpenScene(wxCommandEvent& event)
 		NewtonWorld* const world = GetScene()->GetNewtonWorld();
 		dPluginScene* const asset = new dPluginScene (world);
 		asset->Cleanup();
-		m_lastFilePath = open.GetPath();
-		if (asset->Deserialize (m_lastFilePath.mb_str())) {
+		wxString path (open.GetPath());
+		if (asset->Deserialize (path.mb_str())) {
+			m_lastFilePath = path;
+			m_currentFileName = open.GetFilename();
 			MergeScene (asset);
 			m_explorer->ReconstructScene(GetScene());
 			RefrehViewports();
 		}
 		asset->Release();
+	}
+}
+
+void NewtonModelEditor::OnSaveSceneAs(wxCommandEvent& event)
+{
+	wxFileDialog open (this, wxT("Save Newton Dynamics Scene"), wxT("../../../media"), wxT(""), wxT("*.ngd"));
+	if (open.ShowModal() == wxID_OK) {
+		m_lastFilePath = open.GetPath();
+		m_currentFileName = open.GetFilename();
+		GetScene()->Serialize (m_lastFilePath.mb_str());
+	}
+}
+
+void NewtonModelEditor::OnSaveScene(wxCommandEvent& event)
+{
+	if (m_currentFileName.IsEmpty()) {
+		OnSaveSceneAs(event);
+	} else {
+		GetScene()->Serialize (m_lastFilePath.mb_str());
 	}
 }
 

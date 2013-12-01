@@ -249,7 +249,6 @@ void dPluginScene::UpdateAllOOBB ()
 
 void dPluginScene::Serialize (const char* const fileName)
 {
-	dAssert (0);
 	dScene::Serialize (fileName);
 }
 

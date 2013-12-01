@@ -652,13 +652,10 @@ extern "C" {
 	// complex breakable collision primitives interface
 	//
 	// **********************************************************************************************
+	NEWTON_API NewtonCollision* NewtonCreateCompoundBreakable (const NewtonWorld* const newtonWorld, const NewtonMesh* const solidMesh, int fracturePhysicsMaterialID, int pointcloudCount, const dFloat* const vertexCloud, int strideInBytes, int materialID, const dFloat* const textureMatrix);
+	
+	
 /*
-	NEWTON_API NewtonCollision* NewtonCreateCompoundBreakable (const NewtonWorld* const newtonWorld, int meshCount, 
-															   const NewtonMesh** const solids, const int* const shapeIDArray, 
-															   const dFloat* const densities, const int* const internalFaceMaterial, 
-															   int shapeID, int debriID, dFloat debriSeparationGap);
-
-
 	NEWTON_API void NewtonCompoundBreakableResetAnchoredPieces (const NewtonCollision* const compoundBreakable);
 	NEWTON_API void NewtonCompoundBreakableSetAnchoredPieces (const NewtonCollision* const compoundBreakable, int fixShapesCount, dFloat* const matrixPallete, NewtonCollision** const fixedShapesArray);
 

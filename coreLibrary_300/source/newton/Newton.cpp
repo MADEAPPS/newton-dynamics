@@ -2774,25 +2774,21 @@ NewtonCollision* NewtonCreateCompoundCollisionFromMesh (const NewtonWorld* const
 }
 
 
-
-
-
-/*
-
-NewtonCollision* NewtonCreateCompoundBreakable (const NewtonWorld* const newtonWorld, int meshCount, 
-														   const NewtonMesh** const solids, const int* const shapeIDArray, 
-														   const dFloat* const densities, const int* const internalFaceMaterial,
-														   int shapeID, int debriID, dFloat debriSeparationGap)
+NewtonCollision* NewtonCreateCompoundBreakable (const NewtonWorld* const newtonWorld, const NewtonMesh* const solidMesh, int fracturePhysicsMaterialID, int pointcloudCount, const dFloat* const vertexCloud, int strideInBytes, int materialID, const dFloat* const textureMatrix)
 {
-	Newton* const world = (Newton *)newtonWorld;
 	TRACE_FUNCTION(__FUNCTION__);
 
-	dgCollisionInstance* const collision = world->CreateCollisionCompoundBreakable (meshCount, (dgMeshEffect**) solids, shapeIDArray, densities, internalFaceMaterial, debriID, debriSeparationGap);
+	Newton* const world = (Newton *)newtonWorld;
+	dgMeshEffect* const mesh = (dgMeshEffect*) solidMesh;
 
-	collision->SetUserDataID(dgUnsigned32 (shapeID));
+	dgMatrix textMatrix (textureMatrix);
+	dgCollisionInstance* const collision = world->CreateCollisionCompoundBreakable (mesh, fracturePhysicsMaterialID, pointcloudCount, vertexCloud, strideInBytes, materialID, textMatrix);
+
+	//collision->SetUserDataID(dgUnsigned32 (shapeID));
 	return (NewtonCollision*) collision;
 }
 
+/*
 void NewtonCompoundBreakableResetAnchoredPieces (const NewtonCollision* const compoundBreakable)
 {
 	TRACE_FUNCTION(__FUNCTION__);

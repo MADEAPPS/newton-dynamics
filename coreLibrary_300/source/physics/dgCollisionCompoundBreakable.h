@@ -24,11 +24,12 @@
 
 #include "dgCollisionCompound.h"
 
-#if 0
+
 class dgMeshEffect;
 
 class dgCollisionCompoundBreakable: public dgCollisionCompound
 {
+/*
 	public:
 	class dgFlatVertex
 	{
@@ -217,7 +218,8 @@ class dgCollisionCompoundBreakable: public dgCollisionCompound
 //		dgSegmenList(dgMeshEffect* const source);
 //		~dgSegmenList();
 //	};
-
+#endif
+*/
 
 	dgCollisionCompoundBreakable (const dgCollisionCompoundBreakable& source);
 //	dgCollisionCompoundBreakable (dgInt32 count, dgMeshEffect* const solidArray[], dgMeshEffect* const clipperArray[],
@@ -231,7 +233,7 @@ class dgCollisionCompoundBreakable: public dgCollisionCompound
 	dgCollisionCompoundBreakable (dgWorld* const world, dgDeserialize deserialization, void* const userData);
 	virtual ~dgCollisionCompoundBreakable(void);
 
-	
+/*
 	void DeleteComponentBegin ();
 	dgBody* CreateComponentBody (dgDebriGraph::dgListNode* node) const;
 	void DeleteComponent (dgDebriGraph::dgListNode* node);
@@ -275,7 +277,7 @@ class dgCollisionCompoundBreakable: public dgCollisionCompound
 	dgVertexBuffer* m_vertexBuffer;
 	dgDebriGraph m_conectivity;
 	dgIsland m_detachedIslands;
-	
+*/	
 };
-#endif
+
 #endif

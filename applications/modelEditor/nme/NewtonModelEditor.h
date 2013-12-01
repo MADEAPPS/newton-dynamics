@@ -83,34 +83,13 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 		ID_MAX_EXPORT_PLUGINS = ID_EXPORT_PLUGINS + D_MAX_PLUGINS_COUNT,
 
 
-/*
-		// scene menu
-		ID_LOAD_SCENE,
-		ID_SAVE_SCENE,
-		ID_SAVE_SCENE_AS,
-
-		// asset menu
-		ID_LOAD_ASSET,
-		ID_SAVE_ASSET,
-		ID_SAVE_ASSET_AS,
-
-		ID_ASSET_MANAGER,
-		ID_SELECT_ASSET,
-		
-
 		// options menu
-		ID_HIDE_FILE_TOOLBAR,
-		ID_HIDE_NAVIGATION_TOOLBAR,
-		
-		ID_HIDE_COMMAND_PANEL,
-		ID_KEYBOARD_SHORCUTS,
-
-
-
-		ID_MODEL_PLUGINS,
-		ID_MAX_MODELS_PLUGINS = ID_MODEL_PLUGINS + D_MAX_PLUGINS_COUNT,
-
-*/
+//		ID_HIDE_FILE_TOOLBAR,
+//		ID_HIDE_NAVIGATION_TOOLBAR,
+//		ID_HIDE_COMMAND_PANEL,
+//		ID_KEYBOARD_SHORCUTS,
+//		ID_MODEL_PLUGINS,
+//		ID_MAX_MODELS_PLUGINS = ID_MODEL_PLUGINS + D_MAX_PLUGINS_COUNT,
 	};
 
 	NewtonModelEditor(const wxString& title, const wxPoint& pos, const wxSize& size);
@@ -215,6 +194,8 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	void OnChangeShadeMode(wxCommandEvent& event);
 	void OnChangeNavigationMode(wxCommandEvent& event);
 	void OnOpenScene(wxCommandEvent& event);
+	void OnSaveScene(wxCommandEvent& event);
+	void OnSaveSceneAs(wxCommandEvent& event);
 	void OnUndo(wxCommandEvent& event); 
 	void OnRedo(wxCommandEvent& event); 
 	void OnClearUndoHistory(wxCommandEvent& event); 

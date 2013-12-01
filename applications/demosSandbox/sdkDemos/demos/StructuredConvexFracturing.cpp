@@ -983,6 +983,67 @@ void BuildingDestruction(SceneManager& system)
 #endif
 
 
+#define POINT_CLOUD_SIZE	10
+
+static void MakeRandomPointCloud(NewtonMesh* const mesh, dVector* const points)
+{
+	dVector size;
+	dMatrix matrix(GetIdentityMatrix()); 
+	NewtonMeshCalculateOOBB(mesh, &matrix[0][0], &size.m_x, &size.m_y, &size.m_z);
+
+	int count = 0;		
+	while (count < POINT_CLOUD_SIZE) {			
+		dFloat x = RandomVariable(size.m_x);
+		dFloat y = RandomVariable(size.m_y);
+		dFloat z = RandomVariable(size.m_z);
+		if ((x <= size.m_x) && (x >= -size.m_x) && (y <= size.m_y) && (y >= -size.m_y) && (z <= size.m_z) && (z >= -size.m_z)){
+			points[count] = dVector (x, y, z);
+			count ++;
+		}
+	}
+}
+
+
+
+static void AddStructuredFractured (DemoEntityManager* const scene, const dVector& origin, int materialID, const char* const assetName)
+{
+	// create the shape and visual mesh as a common data to be re used
+	NewtonWorld* const world = scene->GetNewton();
+
+	// load the mesh asset
+	DemoEntity entity(GetIdentityMatrix(), NULL);	
+	entity.LoadNGD_mesh (assetName, world);
+	DemoMesh* const mesh = entity.GetMesh();
+	dAssert (mesh);
+
+	// convert the mesh to a newtonMesh
+	NewtonMesh* const solidMesh = mesh->CreateNewtonMesh (world, GetIdentityMatrix());
+
+	// create a random point cloud
+	dVector points[POINT_CLOUD_SIZE];
+	MakeRandomPointCloud (solidMesh, points);
+
+	// create and interiors material for texturing the fractured pieces
+	int internalMaterial = LoadTexture("KAMEN-stup.tga");
+
+	// crate a texture matrix for uv mapping of fractured pieces
+	dMatrix textureMatrix (GetIdentityMatrix());
+	textureMatrix[0][0] = 1.0f / 2.0f;
+	textureMatrix[1][1] = 1.0f / 2.0f;
+
+	/// create the fractured collision and mesh
+	int debreePhysMaterial = NewtonMaterialGetDefaultGroupID(world);
+	NewtonCollision* const structuredFracturedCollision = NewtonCreateCompoundBreakable (world, solidMesh, debreePhysMaterial, POINT_CLOUD_SIZE, &points[0][0], sizeof (dVector), internalMaterial, &textureMatrix[0][0]);
+
+	// delete the solid mesh since it no longed needed
+	NewtonMeshDestroy (solidMesh);
+
+
+	// destroy the fracture collision
+	NewtonDestroyCollision (structuredFracturedCollision);
+}
+
+
 
 void StructuredConvexFracturing (DemoEntityManager* const scene)
 {
@@ -990,12 +1051,12 @@ void StructuredConvexFracturing (DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 	// load the scene from a ngd file format
-	CreateLevelMesh (scene, "ruinsFloor.ngd", false);
-	//CreateLevelMesh (scene, "flatPlane.ngd", false);
+	//CreateLevelMesh (scene, "ruinsFloor.ngd", true);
+	CreateLevelMesh (scene, "flatPlane.ngd", false);
 	//CreateLevelMesh (scene, "sponza.ngd", false);
 	//CreateLevelMesh (scene, "sponza.ngd", true);
 
-CreateLevelMesh (scene, "ruins.ngd", false);
+//	AddStructuredFractured (scene, dVector (0.0f, 0.0f, 0.0f, 0.0f), 0, "colum.ngd");
 
 	// create a shattered mesh array
 	//CreateSimpleVoronoiFracture (scene);

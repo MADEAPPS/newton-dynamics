@@ -252,16 +252,15 @@ dgAssert (0);
 return NULL;
 }
 
-/*
-dgCollision* dgWorld::CreateCollisionCompoundBreakable (
-	dgInt32 count, const dgMeshEffect* const solidArray[], const dgInt32* const idArray, 
-	const dgFloat32* const densities, const dgInt32* const internalFaceMaterial, dgInt32 debriID, dgFloat32 gap)
+
+dgCollisionInstance* dgWorld::CreateCollisionCompoundBreakable (dgMeshEffect* const solidMesh, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& offsetMatrix)
 {
+//	dgInt32 count, const dgMeshEffect* const solidArray[], const dgInt32* const idArray, 
+	//	const dgFloat32* const densities, const dgInt32* const internalFaceMaterial, dgInt32 debriID, dgFloat32 gap)
 	dgAssert (0);
 	return NULL;
-//	return new  (m_allocator) dgCollisionCompoundBreakable (count, solidArray, idArray, densities, internalFaceMaterial, debriID, gap, this);
 }
-*/
+
 
 dgCollisionInstance* dgWorld::CreateBVH ()	
 {
