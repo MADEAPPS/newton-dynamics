@@ -1376,9 +1376,17 @@ dgCollisionCompoundBreakable::~dgCollisionCompoundBreakable(void)
 }
 
 
-class dgCollisionCompoundBreakable::dgFractureBuilder//: public dgDelaunayTetrahedralization
+class dgCollisionCompoundBreakable::dgFractureBuilder: public dgTree<dgMeshEffect*, dgInt32>
 {
 	public:
+    class dgPerimenterEdge
+    {
+        public:
+        dgPerimenterEdge* m_next;
+        dgPerimenterEdge* m_prev;
+        const dgBigVector* m_vertex;
+    };
+
 	class dgFractureConectivity: public dgGraph<int, int>
 	{
 		public:
@@ -1443,216 +1451,28 @@ class dgCollisionCompoundBreakable::dgFractureBuilder//: public dgDelaunayTetrah
 	};
 */
 
+#if 0
 	class ConvexSegments: public dgTree<dgMeshEffect*, dgInt32>
 	{
 		public:
-		class dgPerimenterEdge
-		{
-			public:
-			const dgBigVector* m_vertex;
-			dgPerimenterEdge* m_next;
-			dgPerimenterEdge* m_prev;
-		};
 
 		ConvexSegments (dgMemoryAllocator* const allocator)
 			:dgTree<dgMeshEffect*, dgInt32>(allocator)
 		{
 		}
 
-		~ConvexSegments()
-		{
-			Iterator iter (*this);
-			for (iter.Begin(); iter; iter ++) {
-				dgMeshEffect* const mesh = iter.GetNode()->GetInfo();
-				mesh->Release();
-			}
-		}
 
-		bool ArePlaneCoplanar (dgMeshEffect* const meshA, void* faceA, const dgBigVector& planeA, dgMeshEffect* const meshB, void* faceB, const dgBigVector& planeB) const
-		{
-			if (((planeA % planeB) < dgFloat64 (-1.0 + 1.0e-6f)) && ((fabs(planeA.m_w + planeB.m_w) < dgFloat64(1.0e-6f)))) {
-				const dgBigVector* const pointsA = (dgBigVector*) meshA->GetVertexPool();
-				const dgBigVector* const pointsB = (dgBigVector*) meshB->GetVertexPool();
-
-				dgInt32 indexA[128];
-				dgInt32 indexB[128];
-
-				dgInt32 indexCountA = meshA->GetFaceIndexCount(faceA);
-				dgInt32 indexCountB = meshB->GetFaceIndexCount(faceB);
-				dgAssert (indexCountA < sizeof (indexA)/ sizeof(indexA[0]));
-				dgAssert (indexCountB < sizeof (indexB)/ sizeof(indexB[0]));
-
-				meshA->GetFaceIndex(faceA, indexA);
-				meshA->GetFaceIndex(faceB, indexB);
-
-				dgPerimenterEdge subdivision[256];
-				dgAssert ((2 * (indexCountA + indexCountB)) < dgInt32 (sizeof (subdivision) / sizeof (subdivision[0])));
-				for (dgInt32 i = 0; i < indexCountB; i ++) {
-					subdivision[i].m_vertex = &pointsB[indexB[indexCountB - i - 1]];
-					subdivision[i].m_prev = &subdivision[i - 1];
-					subdivision[i].m_next = &subdivision[i + 1];
-				}
-				subdivision[0].m_prev = &subdivision[indexCountB - 1];
-				subdivision[indexCountB - 1].m_next = &subdivision[0];
-
-
-				dgBigVector contactOut[256];
-				dgPerimenterEdge* edgeClipped[2];
-				//dgVector* output = &contactOut[indexCountA + indexCountB + maxContacts];
-				//dgBigVector* output = &contactOut[indexCountA + indexCountB + maxContacts];
-				edgeClipped[0] = NULL;
-				edgeClipped[1] = NULL;
-				
-				//dgInt32 edgeIndex = indexCountB;
-				//dgPerimenterEdge* poly = &subdivision[0];
-				dgInt32 i0 = indexCountA - 1;
-				for (dgInt32 i1 = 0; i1 < indexCountA; i1 ++) {
-
-//					dgVector n (normal * (shape1[i1] - shape1[i0]));
-//					dgPlane plane (n, - (n % shape1[i0]));
-//					i0 = i1;
-/*
-					count = 0;
-					dgPerimenterEdge* tmp = poly;
-					dgInt32 isInside = 0;
-					dgFloat32 test0 = plane.Evalue (*tmp->m_vertex);
-					do {
-						dgFloat32 test1 = plane.Evalue (*tmp->m_next->m_vertex);
-
-						if (test0 >= dgFloat32 (0.0f)) {
-							isInside |= 1;
-							if (test1 < dgFloat32 (0.0f)) {
-								const dgVector& p0 = *tmp->m_vertex;
-								const dgVector& p1 = *tmp->m_next->m_vertex;
-								dgVector dp (p1 - p0); 
-								dgFloat32 den = plane % dp;
-								if (dgAbsf(den) < dgFloat32 (1.0e-24f)) {
-									den = (den >= dgFloat32 (0.0f)) ?  dgFloat32 (1.0e-24f) :  dgFloat32 (-1.0e-24f);
-								}
-
-								den = test0 / den;
-								if (den >= dgFloat32 (0.0f)) {
-									den = dgFloat32 (0.0f);
-								} else if (den <= -1.0f) {
-									den = dgFloat32 (-1.0f);
-								}
-								output[0] = p0 - dp.Scale3 (den);
-								edgeClipped[0] = tmp;
-								count ++;
-							}
-						} else if (test1 >= dgFloat32 (0.0f)) {
-							const dgVector& p0 = *tmp->m_vertex;
-							const dgVector& p1 = *tmp->m_next->m_vertex;
-							isInside |= 1;
-							dgVector dp (p1 - p0); 
-							dgFloat32 den = plane % dp;
-							if (dgAbsf(den) < dgFloat32 (1.0e-24f)) {
-								den = (den >= dgFloat32 (0.0f)) ?  dgFloat32 (1.0e-24f) :  dgFloat32 (-1.0e-24f);
-							}
-							den = test0 / den;
-							if (den >= dgFloat32 (0.0f)) {
-								den = dgFloat32 (0.0f);
-							} else if (den <= -1.0f) {
-								den = dgFloat32 (-1.0f);
-							}
-							output[1] = p0 - dp.Scale3 (den);
-							edgeClipped[1] = tmp;
-							count ++;
-						}
-
-						test0 = test1;
-						tmp = tmp->m_next;
-					} while (tmp != poly && (count < 2));
-
-					if (!isInside) {
-						return 0;
-					}
-
-					if (count == 2) {
-						dgPerimenterEdge* const newEdge = &subdivision[edgeIndex];
-						newEdge->m_next = edgeClipped[1];
-						newEdge->m_prev = edgeClipped[0];
-						edgeClipped[0]->m_next = newEdge;
-						edgeClipped[1]->m_prev = newEdge;
-
-						newEdge->m_vertex = &output[0];
-						edgeClipped[1]->m_vertex = &output[1];
-						poly = newEdge;
-
-						output += 2;
-						edgeIndex ++;
-						//dgAssert (output < &pool[sizeof (pool)/sizeof (pool[0])]);
-						dgAssert (edgeIndex < dgInt32 (sizeof (subdivision) / sizeof (subdivision[0])));
-					}
-*/
-				}
-/*
-						dgAssert (poly);
-						poly = ReduceContacts (poly, maxContacts);
-						count = 0;
-						dgPerimenterEdge* intersection = poly;
-						do {
-							contactOut[count] = *intersection->m_vertex;
-							count ++;
-							intersection = intersection->m_next;
-						} while (intersection != poly);
-					}
-					return count;
-
-				}
-*/
-
-
-
-				return true;
-			}
-			return false;
-		}
+#if 0
 
 		
 
-		bool AreSolidNeigborg (int indexA, int indexB) const
-		{
-			dgMeshEffect* const meshA = Find(indexA)->GetInfo();
-			dgMeshEffect* const meshB = Find(indexB)->GetInfo();
-
-			const dgBigVector* const pointsA = (dgBigVector*) meshA->GetVertexPool();
-			const dgBigVector* const pointsB = (dgBigVector*) meshB->GetVertexPool();
-
-			dgBigVector planeB_array[512];
-
-			dgInt32 planeB_Count = 0;
-			for (void* faceB = meshB->GetFirstFace(); faceB; faceB = meshB->GetNextFace(faceB)) {
-				dgAssert (!meshB->IsFaceOpen (faceB));
-				dgInt32 vertexIndexB = meshB->GetVertexIndex (faceB);
-				dgBigVector planeB (meshB->CalculateFaceNormal (faceB));
-				planeB.m_w = -(planeB % pointsB[vertexIndexB]);
-				planeB_array[planeB_Count] = planeB;
-				planeB_Count ++;
-				dgAssert (planeB_Count < sizeof (planeB_array) / sizeof (planeB_array[0]));
-			}
-
-			for (void* faceA = meshA->GetFirstFace(); faceA; faceA = meshA->GetNextFace(faceA)) {
-				dgAssert (!meshA->IsFaceOpen (faceA));
-				dgInt32 vertexIndexA = meshA->GetVertexIndex (faceA);
-				dgBigVector planeA (meshA->CalculateFaceNormal (faceA));
-				planeA.m_w = -(planeA % pointsA[vertexIndexA]);
-
-				dgInt32 indexB = 0;
-				for (void* faceB = meshB->GetFirstFace(); faceB; faceB = meshB->GetNextFace(faceB)) {
-					if (ArePlaneCoplanar (meshA, faceA, planeA, meshB, faceB, planeB_array[indexB])) {
-						return true;
-					}
-					indexB ++;
-				}
-			}
-
-			return false;
-		}
+#endif
 	};
 
+#endif
+
 	dgFractureBuilder (dgMemoryAllocator* const allocator, dgMeshEffect* const solidMesh, dgInt32 pointcloudCount, const dgFloat32* const vertexCloud, dgInt32 strideInBytes, int materialId, const dgMatrix& textureProjectionMatrix)
-		:m_fractureMeshes(allocator)
+		:dgTree<dgMeshEffect*, dgInt32>(allocator)
 		,m_conectivity(allocator)
 	{
 		dgStack<dgBigVector> buffer(pointcloudCount + 16);
@@ -1732,11 +1552,9 @@ class dgCollisionCompoundBreakable::dgFractureBuilder//: public dgDelaunayTetrah
 			index ++;
 		}
 
-		m_fractureMeshes.BeginPolygon();
 		dgConvexSolidArray::Iterator iter (delanayNodes);
 		dgFloat32 normalAngleInRadians = 30.0f * 3.1416f / 180.0f;
 
-		ConvexSegments convexSolids (allocator);
 		dgTree<dgFractureConectivity::dgListNode*, int> graphMap(allocator);
 		for (iter.Begin(); iter; iter ++) {
 
@@ -1760,7 +1578,7 @@ class dgCollisionCompoundBreakable::dgFractureBuilder//: public dgDelaunayTetrah
 					dgMeshEffect* const convexMesh =  new (allocator) dgMeshEffect (allocator, &pointArray[0].m_x, count, sizeof (dgBigVector), dgFloat64 (0.0f));
 					if (convexMesh->GetCount()) {
 						convexMesh->AddRef();
-						convexSolids.Insert (convexMesh, key);
+						Insert (convexMesh, key);
 
 						convexMesh->ConvertToPolygons();
 						convexMesh->CalculateNormals(normalAngleInRadians);
@@ -1776,7 +1594,6 @@ class dgCollisionCompoundBreakable::dgFractureBuilder//: public dgDelaunayTetrah
 							dgMeshEffect::dgVertexAtribute& attib = convexMesh->GetAttribute (i);
 							attib.m_vertex.m_w = key;
 						}
-						m_fractureMeshes.MergeFaces(convexMesh);
 
 						dgFractureConectivity::dgListNode* const node = m_conectivity.AddNode ();
 						node->GetInfo().m_nodeData = key;
@@ -1786,7 +1603,7 @@ class dgCollisionCompoundBreakable::dgFractureBuilder//: public dgDelaunayTetrah
 				}
 			}
 		}
-		m_fractureMeshes.EndPolygon(dgFloat64 (1.0e-8f), false);
+
 		delanayNodes.RemoveAll();
 
 //		for (dgInt32 i = 0; i < m_fractureMeshes.GetVertexCount(); i ++) {
@@ -1843,8 +1660,7 @@ class dgCollisionCompoundBreakable::dgFractureBuilder//: public dgDelaunayTetrah
 							dgFractureConectivity::dgListNode* const node0 = graphMap.Find(nodeindex0)->GetInfo();
 							dgFractureConectivity::dgListNode* const node1 = graphMap.Find(nodeindex1)->GetInfo();
 							if (!IsPairConnected (node0, node1)) {
-								//if (planesArray.SharePlane (nodeindex0, nodeindex1)) {
-								if (convexSolids.AreSolidNeigborg (nodeindex0, nodeindex1)) {
+								if (AreSolidNeigborg (nodeindex0, nodeindex1)) {
 									node0->GetInfo().AddEdge(node1);
 									node1->GetInfo().AddEdge(node0);
 								}
@@ -1871,6 +1687,16 @@ for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; n
 
 	}
 
+    ~dgFractureBuilder()
+    {
+        Iterator iter (*this);
+        for (iter.Begin(); iter; iter ++) {
+            dgMeshEffect* const mesh = iter.GetNode()->GetInfo();
+            mesh->Release();
+        }
+    }
+
+
 	bool IsPairConnected (dgFractureConectivity::dgListNode* const nodeA, dgFractureConectivity::dgListNode* const nodeB) const
 	{
 		for (dgGraphNode<int, int>::dgListNode* edgeNodeAB = nodeA->GetInfo().GetFirst(); edgeNodeAB; edgeNodeAB = edgeNodeAB->GetNext()) {
@@ -1881,9 +1707,168 @@ for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; n
 		return false;
 	}
 
-	dgMeshEffect m_fractureMeshes;
+	bool ArePlaneCoplanar (dgMeshEffect* const meshA, void* faceA, const dgBigVector& planeA, dgMeshEffect* const meshB, void* faceB, const dgBigVector& planeB) const
+	{
+		if (((planeA % planeB) < dgFloat64 (-1.0 + 1.0e-6f)) && ((fabs(planeA.m_w + planeB.m_w) < dgFloat64(1.0e-6f)))) {
+			const dgBigVector* const pointsA = (dgBigVector*) meshA->GetVertexPool();
+			const dgBigVector* const pointsB = (dgBigVector*) meshB->GetVertexPool();
+
+			dgInt32 indexA[128];
+			dgInt32 indexB[128];
+
+			dgInt32 indexCountA = meshA->GetFaceIndexCount(faceA);
+			dgInt32 indexCountB = meshB->GetFaceIndexCount(faceB);
+			dgAssert (indexCountA < sizeof (indexA)/ sizeof(indexA[0]));
+			dgAssert (indexCountB < sizeof (indexB)/ sizeof(indexB[0]));
+
+			meshA->GetFaceIndex(faceA, indexA);
+			meshA->GetFaceIndex(faceB, indexB);
+
+			dgPerimenterEdge subdivision[256];
+			dgAssert ((2 * (indexCountA + indexCountB)) < dgInt32 (sizeof (subdivision) / sizeof (subdivision[0])));
+			for (dgInt32 i = 0; i < indexCountB; i ++) {
+				subdivision[i].m_vertex = &pointsB[indexB[i]];
+				subdivision[i].m_prev = &subdivision[i - 1];
+				subdivision[i].m_next = &subdivision[i + 1];
+			}
+			subdivision[0].m_prev = &subdivision[indexCountB - 1];
+			subdivision[indexCountB - 1].m_next = &subdivision[0];
+
+            dgInt32 edgeIndex = indexCountB;
+
+			dgBigVector outputPool[128];
+			dgPerimenterEdge* edgeClipped[2];
+			dgBigVector* output = &outputPool[0];
+			edgeClipped[0] = NULL;
+			edgeClipped[1] = NULL;
+				
+			
+			dgPerimenterEdge* poly = &subdivision[0];
+			dgInt32 i0 = indexCountA - 1;
+			for (dgInt32 i1 = 0; i1 < indexCountA; i1 ++) {
+                const dgBigVector& q0 = pointsA[indexA[i0]];
+                const dgBigVector& q1 = pointsA[indexA[i1]];
+				dgBigVector n (planeA * (q1 - q0));
+				dgBigPlane plane (n, - (n % q0));
+				i0 = i1;
+
+				dgInt32 count = 0;
+				dgPerimenterEdge* tmp = poly;
+				dgInt32 isInside = 0;
+				dgFloat64 test0 = plane.Evalue (*tmp->m_vertex);
+				do {
+					dgFloat64 test1 = plane.Evalue (*tmp->m_next->m_vertex);
+					if (test0 >= dgFloat32 (0.0f)) {
+						isInside |= 1;
+						if (test1 < dgFloat32 (0.0f)) {
+							const dgBigVector& p0 = *tmp->m_vertex;
+							const dgBigVector& p1 = *tmp->m_next->m_vertex;
+
+							dgBigVector dp (p1 - p0); 
+							dgFloat64 den = plane % dp;
+							if (fabs(den) < dgFloat32 (1.0e-24f)) {
+								den = (den >= dgFloat32 (0.0f)) ?  dgFloat32 (1.0e-24f) :  dgFloat32 (-1.0e-24f);
+							}
+
+							den = test0 / den;
+							if (den >= dgFloat32 (0.0f)) {
+								den = dgFloat32 (0.0f);
+							} else if (den <= -1.0f) {
+								den = dgFloat32 (-1.0f);
+							}
+							output[0] = p0 - dp.Scale3 (den);
+							edgeClipped[0] = tmp;
+							count ++;
+						}
+					} else if (test1 >= dgFloat32 (0.0f)) {
+						const dgBigVector& p0 = *tmp->m_vertex;
+						const dgBigVector& p1 = *tmp->m_next->m_vertex;
+						isInside |= 1;
+						dgBigVector dp (p1 - p0); 
+						dgFloat64 den = plane % dp;
+						if (fabs(den) < dgFloat32 (1.0e-24f)) {
+							den = (den >= dgFloat32 (0.0f)) ?  dgFloat32 (1.0e-24f) :  dgFloat32 (-1.0e-24f);
+						}
+						den = test0 / den;
+						if (den >= dgFloat32 (0.0f)) {
+							den = dgFloat32 (0.0f);
+						} else if (den <= -1.0f) {
+							den = dgFloat32 (-1.0f);
+						}
+						output[1] = p0 - dp.Scale3 (den);
+						edgeClipped[1] = tmp;
+						count ++;
+					}
+					test0 = test1;
+					tmp = tmp->m_next;
+				} while ((tmp != poly) && count < 2);
+
+				if (!isInside) {
+					return false;
+				}
+
+				if (count == 2) {
+					dgPerimenterEdge* const newEdge = &subdivision[edgeIndex];
+					newEdge->m_next = edgeClipped[1];
+					newEdge->m_prev = edgeClipped[0];
+					edgeClipped[0]->m_next = newEdge;
+					edgeClipped[1]->m_prev = newEdge;
+
+					newEdge->m_vertex = &output[0];
+					edgeClipped[1]->m_vertex = &output[1];
+					poly = newEdge;
+
+					output += 2;
+					edgeIndex ++;
+					dgAssert (edgeIndex < dgInt32 (sizeof (subdivision) / sizeof (subdivision[0])));
+				}
+			}
+			dgAssert (poly);
+            return true;
+		}
+		return false;
+	}
+
+
+    bool AreSolidNeigborg (int indexA, int indexB) const
+    {
+        dgMeshEffect* const meshA = Find(indexA)->GetInfo();
+        dgMeshEffect* const meshB = Find(indexB)->GetInfo();
+
+        const dgBigVector* const pointsA = (dgBigVector*) meshA->GetVertexPool();
+        const dgBigVector* const pointsB = (dgBigVector*) meshB->GetVertexPool();
+
+        dgBigVector planeB_array[512];
+
+        dgInt32 planeB_Count = 0;
+        for (void* faceB = meshB->GetFirstFace(); faceB; faceB = meshB->GetNextFace(faceB)) {
+            dgAssert (!meshB->IsFaceOpen (faceB));
+            dgInt32 vertexIndexB = meshB->GetVertexIndex (faceB);
+            dgBigVector planeB (meshB->CalculateFaceNormal (faceB));
+            planeB.m_w = -(planeB % pointsB[vertexIndexB]);
+            planeB_array[planeB_Count] = planeB;
+            planeB_Count ++;
+            dgAssert (planeB_Count < sizeof (planeB_array) / sizeof (planeB_array[0]));
+        }
+
+        for (void* faceA = meshA->GetFirstFace(); faceA; faceA = meshA->GetNextFace(faceA)) {
+            dgAssert (!meshA->IsFaceOpen (faceA));
+            dgInt32 vertexIndexA = meshA->GetVertexIndex (faceA);
+            dgBigVector planeA (meshA->CalculateFaceNormal (faceA));
+            planeA.m_w = -(planeA % pointsA[vertexIndexA]);
+
+            dgInt32 indexB = 0;
+            for (void* faceB = meshB->GetFirstFace(); faceB; faceB = meshB->GetNextFace(faceB)) {
+                if (ArePlaneCoplanar (meshA, faceA, planeA, meshB, faceB, planeB_array[indexB])) {
+                    return true;
+                }
+                indexB ++;
+            }
+        }
+        return false;
+    }
+
 	dgFractureConectivity m_conectivity;
-	
 };
 
 
