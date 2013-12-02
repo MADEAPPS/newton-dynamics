@@ -1626,7 +1626,7 @@ for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; n
 			meshA->GetFaceIndex(faceA, indexA);
 			meshA->GetFaceIndex(faceB, indexB);
 
-dgTrace (("faceA:\n"));
+//dgTrace (("faceA:\n"));
 			dgPerimenterEdge subdivision[256];
 			dgAssert ((2 * (indexCountA + indexCountB)) < dgInt32 (sizeof (subdivision) / sizeof (subdivision[0])));
 			for (dgInt32 i = 0; i < indexCountB; i ++) {
@@ -1634,7 +1634,7 @@ dgTrace (("faceA:\n"));
 				subdivision[i].m_prev = &subdivision[i - 1];
 				subdivision[i].m_next = &subdivision[i + 1];
 
-dgTrace (("%f %f %f\n", pointsB[indexB[i]].m_x, pointsB[indexB[i]].m_y, pointsB[indexB[i]].m_z));
+//dgTrace (("%f %f %f\n", pointsB[indexB[i]].m_x, pointsB[indexB[i]].m_y, pointsB[indexB[i]].m_z));
 			}
 			subdivision[0].m_prev = &subdivision[indexCountB - 1];
 			subdivision[indexCountB - 1].m_next = &subdivision[0];
@@ -1647,8 +1647,7 @@ dgTrace (("%f %f %f\n", pointsB[indexB[i]].m_x, pointsB[indexB[i]].m_y, pointsB[
 			edgeClipped[0] = NULL;
 			edgeClipped[1] = NULL;
 
-
-dgTrace (("faceB:\n"));
+//dgTrace (("faceB:\n"));
 			dgPerimenterEdge* poly = &subdivision[0];
 			dgInt32 i0 = indexCountA - 1;
 			for (dgInt32 i1 = 0; i1 < indexCountA; i1 ++) {
@@ -1657,7 +1656,7 @@ dgTrace (("faceB:\n"));
 				dgBigVector n (planeA * (q1 - q0));
 				dgBigPlane plane (n, - (n % q0));
 				i0 = i1;
-dgTrace (("%f %f %f\n", q0.m_x, q0.m_y, q0.m_z));
+//dgTrace (("%f %f %f\n", q0.m_x, q0.m_y, q0.m_z));
 
 				dgInt32 count = 0;
 				dgPerimenterEdge* tmp = poly;
@@ -1730,9 +1729,21 @@ dgTrace (("%f %f %f\n", q0.m_x, q0.m_y, q0.m_z));
 					dgAssert (edgeIndex < dgInt32 (sizeof (subdivision) / sizeof (subdivision[0])));
 				}
 			}
-dgTrace (("\n"));
+//dgTrace (("\n"));
 			dgAssert (poly);
-            return true;
+            dgBigVector area(dgFloat32 (0.0f));
+            dgBigVector r0 (*poly->m_vertex);
+            dgBigVector r1 (*poly->m_next->m_vertex);
+            dgBigVector r1r0 (r1 - r0);
+            dgPerimenterEdge* polyPtr = poly->m_next->m_next;
+            do {
+                dgBigVector r2 (*polyPtr->m_vertex);
+                dgBigVector r2r0 (r2 - r0);
+                area += r2r0 * r1r0;
+                r1r0 = r2r0;
+                polyPtr = polyPtr->m_next;
+            } while (polyPtr != poly);
+            return fabs (area % planeA) > dgFloat32 (1.0e-5f);
 		}
 
 		return false;
