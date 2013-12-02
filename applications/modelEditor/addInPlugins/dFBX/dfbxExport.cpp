@@ -222,26 +222,28 @@ void dfbxExport::CreateTexture (dPluginScene* const ngdScene, FbxScene* const fb
 {
 	int enumerator = 0;
 	dScene::dTreeNode* const cacheNode = ngdScene->FindTextureCacheNode ();
-	for (void* link = ngdScene->GetFirstChildLink(cacheNode); link; link = ngdScene->GetNextChildLink(cacheNode, link)) {
-		dScene::dTreeNode* const textureNode = ngdScene->GetNodeFromLink(link);
-		dTextureNodeInfo* const textureInfo = (dTextureNodeInfo*) ngdScene->GetInfoFromNode(textureNode);
-		dAssert (textureInfo->IsType(dTextureNodeInfo::GetRttiType()));
+	if (cacheNode) {
+		for (void* link = ngdScene->GetFirstChildLink(cacheNode); link; link = ngdScene->GetNextChildLink(cacheNode, link)) {
+			dScene::dTreeNode* const textureNode = ngdScene->GetNodeFromLink(link);
+			dTextureNodeInfo* const textureInfo = (dTextureNodeInfo*) ngdScene->GetInfoFromNode(textureNode);
+			dAssert (textureInfo->IsType(dTextureNodeInfo::GetRttiType()));
 
-		FbxFileTexture* const fbxTexture = FbxFileTexture::Create(fbxScene, "Diffuse Texture");
+			FbxFileTexture* const fbxTexture = FbxFileTexture::Create(fbxScene, "Diffuse Texture");
 
-		fbxTexture->SetFileName(textureInfo->GetPathName()); // Resource file is in current directory.
-		fbxTexture->SetTextureUse(FbxTexture::eStandard);
-		fbxTexture->SetMappingType(FbxTexture::eUV);
-		fbxTexture->SetMaterialUse(FbxFileTexture::eModelMaterial);
-		fbxTexture->SetSwapUV(false);
-		fbxTexture->SetTranslation(0.0, 0.0);
-		fbxTexture->SetScale(1.0, 1.0);
-		fbxTexture->SetRotation(0.0, 0.0);
-		fbxTexture->UVSet.Set(FbxString("DiffuseUV")); // Connect texture to the proper UV
+			fbxTexture->SetFileName(textureInfo->GetPathName()); // Resource file is in current directory.
+			fbxTexture->SetTextureUse(FbxTexture::eStandard);
+			fbxTexture->SetMappingType(FbxTexture::eUV);
+			fbxTexture->SetMaterialUse(FbxFileTexture::eModelMaterial);
+			fbxTexture->SetSwapUV(false);
+			fbxTexture->SetTranslation(0.0, 0.0);
+			fbxTexture->SetScale(1.0, 1.0);
+			fbxTexture->SetRotation(0.0, 0.0);
+			fbxTexture->UVSet.Set(FbxString("DiffuseUV")); // Connect texture to the proper UV
 
-		textureMap.Insert (fbxTexture, textureNode);
-		textureIndex.Insert(enumerator, textureInfo->GetId());
-		enumerator ++;
+			textureMap.Insert (fbxTexture, textureNode);
+			textureIndex.Insert(enumerator, textureInfo->GetId());
+			enumerator ++;
+		}
 	}
 }
 
@@ -250,55 +252,57 @@ void dfbxExport::CreateMaterials (dPluginScene* const ngdScene, FbxScene* const 
 {
 	int enumerator = 0;
 	dScene::dTreeNode* const materilCacheNode = ngdScene->FindGetMaterialCacheNode ();
-	for (void* link = ngdScene->GetFirstChildLink(materilCacheNode); link; link = ngdScene->GetNextChildLink(materilCacheNode, link)) {
-		dScene::dTreeNode* const materialNode = ngdScene->GetNodeFromLink(link);
+	if (materilCacheNode) {
+		for (void* link = ngdScene->GetFirstChildLink(materilCacheNode); link; link = ngdScene->GetNextChildLink(materilCacheNode, link)) {
+			dScene::dTreeNode* const materialNode = ngdScene->GetNodeFromLink(link);
 
-		dMaterialNodeInfo* const materialInfo = (dMaterialNodeInfo*) ngdScene->GetInfoFromNode(materialNode);
-		dAssert (materialInfo ->IsType(dMaterialNodeInfo::GetRttiType()));
+			dMaterialNodeInfo* const materialInfo = (dMaterialNodeInfo*) ngdScene->GetInfoFromNode(materialNode);
+			dAssert (materialInfo ->IsType(dMaterialNodeInfo::GetRttiType()));
 
-		FbxSurfacePhong* const fbxMaterial = FbxSurfacePhong::Create(fbxScene, materialInfo->GetName());
+			FbxSurfacePhong* const fbxMaterial = FbxSurfacePhong::Create(fbxScene, materialInfo->GetName());
 			
-		// Generate primary and secondary colors.
-		fbxMaterial->Emissive.Set(FbxDouble3 (0.0, 0.0, 0.0));
+			// Generate primary and secondary colors.
+			fbxMaterial->Emissive.Set(FbxDouble3 (0.0, 0.0, 0.0));
 
-		dVector ambient (materialInfo->GetAmbientColor());
-		fbxMaterial->Ambient.Set(FbxDouble3(ambient[0], ambient[1], ambient[2]));
+			dVector ambient (materialInfo->GetAmbientColor());
+			fbxMaterial->Ambient.Set(FbxDouble3(ambient[0], ambient[1], ambient[2]));
 
-		dVector difusse (materialInfo->GetDiffuseColor());
-		fbxMaterial->Diffuse.Set(FbxDouble3(difusse[0], difusse[1], difusse[2]));
+			dVector difusse (materialInfo->GetDiffuseColor());
+			fbxMaterial->Diffuse.Set(FbxDouble3(difusse[0], difusse[1], difusse[2]));
 
-		fbxMaterial->ShadingModel.Set(FbxString("Phong"));
+			fbxMaterial->ShadingModel.Set(FbxString("Phong"));
 
-		fbxMaterial->Shininess.Set (materialInfo->GetShininess() / 100.0);
-		dVector specular (materialInfo->GetSpecularColor());
-		fbxMaterial->Specular.Set (FbxDouble3(specular[0], specular[1], specular[2]));
+			fbxMaterial->Shininess.Set (materialInfo->GetShininess() / 100.0);
+			dVector specular (materialInfo->GetSpecularColor());
+			fbxMaterial->Specular.Set (FbxDouble3(specular[0], specular[1], specular[2]));
 
-		fbxMaterial->TransparencyFactor.Set (1.0 - materialInfo->GetOpacity());
+			fbxMaterial->TransparencyFactor.Set (1.0 - materialInfo->GetOpacity());
 
-		if (materialInfo->GetDiffuseTextId() != -1) {
-			dScene::dTreeNode* const textNode = ngdScene->FindTextureByTextId(materialNode, materialInfo->GetDiffuseTextId());
-			if (textNode) {
-				_ASSERTE (textNode);
-				dAssert (textureMap.Find((textNode)));
-				FbxTexture* const fbxTexture = textureMap.Find((textNode))->GetInfo();
-				fbxMaterial->Diffuse.ConnectSrcObject(fbxTexture);
+			if (materialInfo->GetDiffuseTextId() != -1) {
+				dScene::dTreeNode* const textNode = ngdScene->FindTextureByTextId(materialNode, materialInfo->GetDiffuseTextId());
+				if (textNode) {
+					_ASSERTE (textNode);
+					dAssert (textureMap.Find((textNode)));
+					FbxTexture* const fbxTexture = textureMap.Find((textNode))->GetInfo();
+					fbxMaterial->Diffuse.ConnectSrcObject(fbxTexture);
+				}
 			}
-		}
-/*
-		if (materialInfo->GetAmbientTextId() != -1) {
-			dScene::dTreeNode* const textNode = ngdScene->FindTextureByTextId(materialNode, materialInfo->GetAmbientTextId());
-			if (textNode) {
-				_ASSERTE (textNode);
-				dAssert (textureMap.Find((textNode)));
-				FbxTexture* const fbxTexture = textureMap.Find((textNode))->GetInfo();
-				fbxMaterial->Ambient.ConnectSrcObject(fbxTexture);
+	/*
+			if (materialInfo->GetAmbientTextId() != -1) {
+				dScene::dTreeNode* const textNode = ngdScene->FindTextureByTextId(materialNode, materialInfo->GetAmbientTextId());
+				if (textNode) {
+					_ASSERTE (textNode);
+					dAssert (textureMap.Find((textNode)));
+					FbxTexture* const fbxTexture = textureMap.Find((textNode))->GetInfo();
+					fbxMaterial->Ambient.ConnectSrcObject(fbxTexture);
+				}
 			}
-		}
-*/
+	*/
 
-		materialMap.Insert(fbxMaterial, materialNode);
-		materialIndex.Insert(enumerator, materialInfo->GetId());
-		enumerator ++;
+			materialMap.Insert(fbxMaterial, materialNode);
+			materialIndex.Insert(enumerator, materialInfo->GetId());
+			enumerator ++;
+		}
 	}
 }
 
@@ -307,98 +311,101 @@ void dfbxExport::CreateMaterials (dPluginScene* const ngdScene, FbxScene* const 
 void dfbxExport::BuildMeshes (dPluginScene* const ngdScene, FbxScene* const fbxScene, MeshMap& meshMap, const TextureMap& textureMap, const MaterialMap& materialMap, const MaterialIndex& materialIndex, const TextureIndex& textureIndex)
 {
 	dScene::dTreeNode* const geometryCache = ngdScene->FindGetGeometryCacheNode ();
-	for (void* link = ngdScene->GetFirstChildLink(geometryCache); link; link = ngdScene->GetNextChildLink(geometryCache, link)) {
-		dScene::dTreeNode* const ngdMeshNode = ngdScene->GetNodeFromLink(link);
-		dNodeInfo* const info = ngdScene->GetInfoFromNode(ngdMeshNode);
-		if (info->IsType(dMeshNodeInfo::GetRttiType())) {
-			dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*) info;
-			char name[256];
-			strcpy (name, meshInfo->GetName());
-			char* const ptr = strstr (name, "_mesh");
-			if (ptr) {
-				ptr[0] = 0;
-			}
-			FbxMesh* const fbxMesh = FbxMesh::Create(fbxScene, name);
-			meshMap.Insert(fbxMesh, ngdMeshNode);
-
-			dMatrix matrix (meshInfo->GetPivotMatrix());
-			FbxAMatrix fbxMatrix;
-			double* const data = fbxMatrix;
-			for (int i = 0; i < 4; i ++) {
-				for (int j = 0; j < 4; j ++) {
-					data[i * 4 + j] = matrix[i][j];
+	if (geometryCache) {
+		for (void* link = ngdScene->GetFirstChildLink(geometryCache); link; link = ngdScene->GetNextChildLink(geometryCache, link)) {
+			dScene::dTreeNode* const ngdMeshNode = ngdScene->GetNodeFromLink(link);
+			dNodeInfo* const info = ngdScene->GetInfoFromNode(ngdMeshNode);
+			if (info->IsType(dMeshNodeInfo::GetRttiType())) {
+				dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*) info;
+				char name[256];
+				strcpy (name, meshInfo->GetName());
+				char* const ptr = strstr (name, "_mesh");
+				if (ptr) {
+					ptr[0] = 0;
 				}
-			}
-			fbxMesh->SetPivot(fbxMatrix);
+				FbxMesh* const fbxMesh = FbxMesh::Create(fbxScene, name);
+				meshMap.Insert(fbxMesh, ngdMeshNode);
 
-			NewtonMesh* const mesh = meshInfo->GetMesh();
-			int vertexCount = NewtonMeshGetVertexCount(mesh);
-			int vertexStride = NewtonMeshGetVertexStrideInByte(mesh) / sizeof (dFloat64);
-			dFloat64* const vertex = NewtonMeshGetVertexArray (mesh); 
-
-			fbxMesh->InitControlPoints (vertexCount);
-			FbxVector4* const points = fbxMesh->GetControlPoints();
-			for (int i = 0; i < vertexCount; i ++) {
-				points[i] = FbxVector4(vertex[vertexStride * i + 0], vertex[vertexStride * i + 1], vertex[vertexStride * i + 2], 0.0f);
-			}
-
-			int attibuteCount = NewtonMeshGetPointCount(mesh); 
-			int attibuteStride = NewtonMeshGetPointStrideInByte(mesh) / sizeof (dFloat64);
-			dFloat64* const normal = NewtonMeshGetNormalArray (mesh); 
-			dFloat64* const uv0 = NewtonMeshGetUV0Array (mesh); 
-
-			// We want to have one normal for each vertex (or control point),
-			FbxGeometryElementNormal* const geometryElementNormal = fbxMesh->CreateElementNormal();
-			geometryElementNormal->SetMappingMode(FbxGeometryElement::eByPolygonVertex);
-			geometryElementNormal->SetReferenceMode(FbxGeometryElement::eDirect);
-			geometryElementNormal->GetIndexArray().SetCount(attibuteCount);
-
-			FbxLayerElementUV* const geometryElementUV = fbxMesh->CreateElementUV("UVChannel_1");
-			geometryElementUV->SetMappingMode(FbxGeometryElement::eByPolygonVertex);
-			geometryElementUV->SetReferenceMode(FbxGeometryElement::eDirect);
-			geometryElementUV->GetIndexArray().SetCount(attibuteCount);
-
-			// Set material mapping.
-			FbxGeometryElementMaterial* const materialElement = fbxMesh->CreateElementMaterial();
-			materialElement->SetMappingMode(FbxGeometryElement::eByPolygon);
-			materialElement->SetReferenceMode(FbxGeometryElement::eIndexToDirect);
-
-			for (void* face = NewtonMeshGetFirstFace(mesh); face; face = NewtonMeshGetNextFace(mesh, face)) {
-				if (!NewtonMeshIsFaceOpen(mesh, face)) {
-					int faceVertexIndices[256];
-					int facePointIndices[256];
-					int indexCount = NewtonMeshGetFaceIndexCount (mesh, face);
-					NewtonMeshGetFaceIndices (mesh, face, faceVertexIndices);
-					NewtonMeshGetFacePointIndices (mesh, face, facePointIndices);
-
-					int faceId = NewtonMeshGetFaceMaterial (mesh, face);
-					dAssert (materialIndex.Find(faceId));
-					int matId = materialIndex.Find(faceId)->GetInfo();
-
-
-					dScene::dTreeNode* const materialNode = ngdScene->FindMaterialById(faceId);
-					dMaterialNodeInfo* const materialInfo = (dMaterialNodeInfo*) ngdScene->GetInfoFromNode(materialNode);
-					dCRCTYPE difusseTexture = materialInfo->GetDiffuseTextId();
-
-					int texId = -1;
-					if (difusseTexture != -1) {
-						dAssert (textureIndex.Find(difusseTexture));
-						texId = textureIndex.Find(difusseTexture)->GetInfo();
+				dMatrix matrix (meshInfo->GetPivotMatrix());
+				FbxAMatrix fbxMatrix;
+				double* const data = fbxMatrix;
+				for (int i = 0; i < 4; i ++) {
+					for (int j = 0; j < 4; j ++) {
+						data[i * 4 + j] = matrix[i][j];
 					}
-//matId = -1;
-texId = -1;
+				}
+				fbxMesh->SetPivot(fbxMatrix);
 
-					fbxMesh->BeginPolygon(matId, texId, false);
-					for (int j = 0; j < indexCount; j ++) {
-						dAssert (faceVertexIndices[j] < vertexCount);
-						dAssert (facePointIndices[j] < attibuteCount);
-						fbxMesh->AddPolygon (faceVertexIndices[j], -1);
+				NewtonMesh* const mesh = meshInfo->GetMesh();
+				int vertexCount = NewtonMeshGetVertexCount(mesh);
+				int vertexStride = NewtonMeshGetVertexStrideInByte(mesh) / sizeof (dFloat64);
+				dFloat64* const vertex = NewtonMeshGetVertexArray (mesh); 
 
-						int k = facePointIndices[j];
-						geometryElementUV->GetDirectArray().Add(FbxVector2(uv0[attibuteStride * k + 0], uv0[attibuteStride * k + 1]));
-						geometryElementNormal->GetDirectArray().Add(FbxVector4(normal[attibuteStride * k + 0], normal[attibuteStride * k + 1], normal[attibuteStride * k + 2], 0.0));
+				fbxMesh->InitControlPoints (vertexCount);
+				FbxVector4* const points = fbxMesh->GetControlPoints();
+				for (int i = 0; i < vertexCount; i ++) {
+					points[i] = FbxVector4(vertex[vertexStride * i + 0], vertex[vertexStride * i + 1], vertex[vertexStride * i + 2], 0.0f);
+				}
+
+				int attibuteCount = NewtonMeshGetPointCount(mesh); 
+				int attibuteStride = NewtonMeshGetPointStrideInByte(mesh) / sizeof (dFloat64);
+				dFloat64* const normal = NewtonMeshGetNormalArray (mesh); 
+				dFloat64* const uv0 = NewtonMeshGetUV0Array (mesh); 
+
+				// We want to have one normal for each vertex (or control point),
+				FbxGeometryElementNormal* const geometryElementNormal = fbxMesh->CreateElementNormal();
+				geometryElementNormal->SetMappingMode(FbxGeometryElement::eByPolygonVertex);
+				geometryElementNormal->SetReferenceMode(FbxGeometryElement::eDirect);
+				geometryElementNormal->GetIndexArray().SetCount(attibuteCount);
+
+				FbxLayerElementUV* const geometryElementUV = fbxMesh->CreateElementUV("UVChannel_1");
+				geometryElementUV->SetMappingMode(FbxGeometryElement::eByPolygonVertex);
+				geometryElementUV->SetReferenceMode(FbxGeometryElement::eDirect);
+				geometryElementUV->GetIndexArray().SetCount(attibuteCount);
+
+				// Set material mapping.
+				FbxGeometryElementMaterial* const materialElement = fbxMesh->CreateElementMaterial();
+				materialElement->SetMappingMode(FbxGeometryElement::eByPolygon);
+				materialElement->SetReferenceMode(FbxGeometryElement::eIndexToDirect);
+
+				for (void* face = NewtonMeshGetFirstFace(mesh); face; face = NewtonMeshGetNextFace(mesh, face)) {
+					if (!NewtonMeshIsFaceOpen(mesh, face)) {
+						int faceVertexIndices[256];
+						int facePointIndices[256];
+						int indexCount = NewtonMeshGetFaceIndexCount (mesh, face);
+						NewtonMeshGetFaceIndices (mesh, face, faceVertexIndices);
+						NewtonMeshGetFacePointIndices (mesh, face, facePointIndices);
+
+						int texId = -1;
+						int matId = -1;
+						int faceId = NewtonMeshGetFaceMaterial (mesh, face);
+						MaterialIndex::dTreeNode* const matIndeNode = materialIndex.Find(faceId);
+						if (matIndeNode) {
+								matId = materialIndex.Find(faceId)->GetInfo();
+							dScene::dTreeNode* const materialNode = ngdScene->FindMaterialById(faceId);
+							dMaterialNodeInfo* const materialInfo = (dMaterialNodeInfo*) ngdScene->GetInfoFromNode(materialNode);
+							dCRCTYPE difusseTexture = materialInfo->GetDiffuseTextId();
+					
+							if (difusseTexture != -1) {
+								dAssert (textureIndex.Find(difusseTexture));
+								texId = textureIndex.Find(difusseTexture)->GetInfo();
+							}
+						}
+		//matId = -1;
+	texId = -1;
+
+						fbxMesh->BeginPolygon(matId, texId, false);
+						for (int j = 0; j < indexCount; j ++) {
+							dAssert (faceVertexIndices[j] < vertexCount);
+							dAssert (facePointIndices[j] < attibuteCount);
+							fbxMesh->AddPolygon (faceVertexIndices[j], -1);
+
+							int k = facePointIndices[j];
+							geometryElementUV->GetDirectArray().Add(FbxVector2(uv0[attibuteStride * k + 0], uv0[attibuteStride * k + 1]));
+							geometryElementNormal->GetDirectArray().Add(FbxVector4(normal[attibuteStride * k + 0], normal[attibuteStride * k + 1], normal[attibuteStride * k + 2], 0.0));
+						}
+						fbxMesh->EndPolygon();
 					}
-					fbxMesh->EndPolygon();
 				}
 			}
 		}

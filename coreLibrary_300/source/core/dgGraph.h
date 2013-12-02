@@ -43,7 +43,6 @@ class dgGraph: public dgList<dgGraphNode<dgNodeData, dgEdgeData> >
 	dgGraph (dgMemoryAllocator* const allocator);
 	~dgGraph ();
 
-
 	typename dgGraph<dgNodeData, dgEdgeData>::dgListNode* AddNode ();
 	void DeleteNode (typename dgGraph<dgNodeData, dgEdgeData>::dgListNode* const node);
 
@@ -135,9 +134,8 @@ void dgGraph<dgNodeData, dgEdgeData>::Trace () const
 	for (typename dgGraphNode<dgNodeData, dgEdgeData>::dgListNode* link = dgGraphNode<dgNodeData, dgEdgeData>::GetFirst(); link; link = link->GetNext()) {	
 		link->GetInfo().Trace ();
 		dgTrace (("%d: ", link->GetInfo().m_index));
-		for (dgGraphNode<dgNodeData, dgEdgeData>::dgListNode* edge = link->GetInfo().GetFirst(); edge; edge = edge->GetNext()) {	
-			dgListNode* node;
-			node = edge->GetInfo().m_node;
+		for (typename dgGraphNode<dgNodeData, dgEdgeData>::dgListNode* edge = link->GetInfo().GetFirst(); edge; edge = edge->GetNext()) {	
+			dgListNode* const node = edge->GetInfo().m_node;
 			dgTrace (("%d ", node->GetInfo().m_index));
 		}
 		dgTrace (("\n"));

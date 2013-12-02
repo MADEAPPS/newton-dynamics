@@ -29,6 +29,8 @@ class dgMeshEffect;
 
 class dgCollisionCompoundBreakable: public dgCollisionCompound
 {
+
+	class dgFractureBuilder;
 /*
 	public:
 	class dgFlatVertex
@@ -221,14 +223,13 @@ class dgCollisionCompoundBreakable: public dgCollisionCompound
 #endif
 */
 
+	public:
 	dgCollisionCompoundBreakable (const dgCollisionCompoundBreakable& source);
 //	dgCollisionCompoundBreakable (dgInt32 count, dgMeshEffect* const solidArray[], dgMeshEffect* const clipperArray[],
 //								  dgMatrix* const matrixArray, dgInt32* const idArray, dgFloat32* const densities, dgInt32 debriiId, 
 //								  dgCollisionCompoundBreakableCallback callback, void* buildUsedData, dgWorld* world);
 
-	dgCollisionCompoundBreakable (dgInt32 count, const dgMeshEffect* const solidArray[], const dgInt32* const idArray, 
-								  const dgFloat32* const densities, const dgInt32* const internalFaceMaterial, 
-								  dgInt32 debriiId, dgFloat32 gaps, dgWorld* world);
+	dgCollisionCompoundBreakable (dgWorld* const world, dgMeshEffect* const solidMesh, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& offsetMatrix);
 
 	dgCollisionCompoundBreakable (dgWorld* const world, dgDeserialize deserialization, void* const userData);
 	virtual ~dgCollisionCompoundBreakable(void);
@@ -279,5 +280,4 @@ class dgCollisionCompoundBreakable: public dgCollisionCompound
 	dgIsland m_detachedIslands;
 */	
 };
-
 #endif

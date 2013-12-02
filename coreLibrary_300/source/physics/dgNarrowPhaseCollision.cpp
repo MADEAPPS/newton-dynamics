@@ -253,12 +253,14 @@ return NULL;
 }
 
 
-dgCollisionInstance* dgWorld::CreateCollisionCompoundBreakable (dgMeshEffect* const solidMesh, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& offsetMatrix)
+dgCollisionInstance* dgWorld::CreateCollisionCompoundBreakable (dgMeshEffect* const solidMesh, int shapeID, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& textureMatrix)
 {
-//	dgInt32 count, const dgMeshEffect* const solidArray[], const dgInt32* const idArray, 
-	//	const dgFloat32* const densities, const dgInt32* const internalFaceMaterial, dgInt32 debriID, dgFloat32 gap)
-	dgAssert (0);
-	return NULL;
+	dgAssert (m_allocator == solidMesh->GetAllocator());
+
+	dgCollision* const collision = new (m_allocator) dgCollisionCompoundBreakable (this, solidMesh, fracturePhysicsMaterialID, pointcloudCount, vertexCloud, strideInBytes, materialID, textureMatrix);
+	dgCollisionInstance* const instance = CreateInstance (collision, shapeID, dgGetIdentityMatrix()); 
+	collision->Release();
+	return instance;
 }
 
 

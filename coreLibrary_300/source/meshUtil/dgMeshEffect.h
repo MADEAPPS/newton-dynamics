@@ -28,7 +28,6 @@ class dgWorld;
 class dgMeshEffect;
 class dgCollisionInstance;
 
-
 #define DG_MESH_EFFECT_PRECISION_BITS		48
 #define DG_MESH_EFFECT_PRECISION_SCALE		dgFloat64(dgInt64(1)<<DG_MESH_EFFECT_PRECISION_BITS)
 #define DG_MESH_EFFECT_PRECISION_SCALE_INV	(dgFloat64 (1.0f) / DG_MESH_EFFECT_PRECISION_SCALE)
@@ -253,6 +252,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 	void Serialize (dgSerialize callback, void* const userData) const;
 
+	dgBigVector& GetVertex (dgInt32 index) const;
 	dgVertexAtribute& GetAttribute (dgInt32 index) const;
 	void TransformMesh (const dgMatrix& matrix);
 
@@ -277,8 +277,8 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	int IsFaceOpen (const void* const face) const;
 	int GetFaceMaterial (const void* const face) const;
 	int GetFaceIndexCount (const void* const face) const;
-	void GetFaceIndex (const void* const face, int* const indices) const;
-	void GetFaceAttributeIndex (const void* const face, int* const indices) const;
+	void GetFaceIndex (const void* const face, dgInt32* const indices) const;
+	void GetFaceAttributeIndex (const void* const face, dgInt32* const indices) const;
 	dgBigVector CalculateFaceNormal (const void* const face) const;
 
 	void SetFaceMaterial (const void* const face, int materialID) const;
@@ -327,6 +327,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	friend class dgConvexHull3d;
 	friend class dgConvexHull4d;
 	friend class dgBooleanMeshBVH;
+	friend class dgCollisionCompoundBreakable;
 };
 
 
@@ -354,6 +355,11 @@ inline dgInt32 dgMeshEffect::GetMaterialIndexCount (dgIndexArray* const handle, 
 inline dgMeshEffect::dgVertexAtribute& dgMeshEffect::GetAttribute (dgInt32 index) const 
 {
 	return m_attrib[index];
+}
+
+inline dgBigVector& dgMeshEffect::GetVertex (dgInt32 index) const
+{
+	return m_points[index];
 }
 
 inline dgInt32 dgMeshEffect::GetPropertiesStrideInByte() const 

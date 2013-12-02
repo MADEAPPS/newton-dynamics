@@ -1523,19 +1523,19 @@ dgMatrix dgMeshEffect::CalculateOOBB (dgBigVector& size) const
 {
 	dgObb sphere (CalculateSphere (&m_points[0].m_x, sizeof (dgBigVector), NULL));
 	size = sphere.m_size;
+	size.m_w = 0.0f;
 
-	dgMatrix permuation (dgGetIdentityMatrix());
-	permuation[0][0] = dgFloat32 (0.0f);
-	permuation[0][1] = dgFloat32 (1.0f);
-	permuation[1][1] = dgFloat32 (0.0f);
-	permuation[1][2] = dgFloat32 (1.0f);
-	permuation[2][2] = dgFloat32 (0.0f);
-	permuation[2][0] = dgFloat32 (1.0f);
-
-	while ((size.m_x < size.m_y) || (size.m_x < size.m_z)) {
-		sphere = permuation * sphere;
-		size = permuation.UnrotateVector(size);
-	}
+//	dgMatrix permuation (dgGetIdentityMatrix());
+//	permuation[0][0] = dgFloat32 (0.0f);
+//	permuation[0][1] = dgFloat32 (1.0f);
+//	permuation[1][1] = dgFloat32 (0.0f);
+//	permuation[1][2] = dgFloat32 (1.0f);
+//	permuation[2][2] = dgFloat32 (0.0f);
+//	permuation[2][0] = dgFloat32 (1.0f);
+//	while ((size.m_x < size.m_y) || (size.m_x < size.m_z)) {
+//		sphere = permuation * sphere;
+//		size = permuation.UnrotateVector(size);
+//	}
 
 	return sphere;
 }
@@ -2837,7 +2837,7 @@ dgInt32 dgMeshEffect::GetFaceIndexCount (const void* const face) const
 	return count; 
 }
 
-void dgMeshEffect::GetFaceIndex (const void* const face, int* const indices) const
+void dgMeshEffect::GetFaceIndex (const void* const face, dgInt32* const indices) const
 {
 	int count = 0;
 	dgTreeNode* node = (dgTreeNode*) face;
@@ -2850,7 +2850,7 @@ void dgMeshEffect::GetFaceIndex (const void* const face, int* const indices) con
 	} while (ptr != edge);
 }
 
-void dgMeshEffect::GetFaceAttributeIndex (const void* const face, int* const indices) const
+void dgMeshEffect::GetFaceAttributeIndex (const void* const face, dgInt32* const indices) const
 {
 	int count = 0;
 	dgTreeNode* node = (dgTreeNode*) face;

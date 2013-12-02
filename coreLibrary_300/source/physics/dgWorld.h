@@ -340,8 +340,7 @@ class dgWorld:
 	void SetCollisionInstanceConstructorDestructor (OnCollisionInstanceDuplicate constructor, OnCollisionInstanceDestroy destructor);
 
 //	dgCollision* CreateCollisionCompoundBreakable (dgInt32 count, const dgMeshEffect* const solidArray[], const dgInt32* const idArray,  const dgFloat32* const densities, const dgInt32* const internalFaceMaterial, dgInt32 debriID, dgFloat32 gap);
-	dgCollisionInstance* CreateCollisionCompoundBreakable (dgMeshEffect* const solidMesh, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& offsetMatrix = dgGetIdentityMatrix());
-
+	dgCollisionInstance* CreateCollisionCompoundBreakable (dgMeshEffect* const solidMesh, int shapeID, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& textureMatrix);
 
 
 	dgCollisionInstance* CreateBVH ();	

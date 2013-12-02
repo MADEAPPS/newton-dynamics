@@ -991,15 +991,25 @@ static void MakeRandomPointCloud(NewtonMesh* const mesh, dVector* const points)
 	dMatrix matrix(GetIdentityMatrix()); 
 	NewtonMeshCalculateOOBB(mesh, &matrix[0][0], &size.m_x, &size.m_y, &size.m_z);
 
+	dVector minBox (matrix.m_posit - matrix[0].Scale (size.m_x) - matrix[1].Scale (size.m_y) - matrix[2].Scale (size.m_z));
+	dVector maxBox (matrix.m_posit + matrix[0].Scale (size.m_x) + matrix[1].Scale (size.m_y) + matrix[2].Scale (size.m_z));
+
 	int count = 0;		
+	size = (maxBox - minBox).Scale (0.5f);
+	dVector center ((maxBox + minBox).Scale (0.5f));
+
 	while (count < POINT_CLOUD_SIZE) {			
 		dFloat x = RandomVariable(size.m_x);
 		dFloat y = RandomVariable(size.m_y);
 		dFloat z = RandomVariable(size.m_z);
-		if ((x <= size.m_x) && (x >= -size.m_x) && (y <= size.m_y) && (y >= -size.m_y) && (z <= size.m_z) && (z >= -size.m_z)){
-			points[count] = dVector (x, y, z);
+x = 0;
+y = 0;
+z = 0;
+
+//		if ((x < maxBox.m_x) && (x > minBox.m_x) && (y < maxBox.m_y) && (y > minBox.m_y) && (z < maxBox.m_z) && (z > minBox.m_z)){
+			points[count] = center + dVector (x, y, z);
 			count ++;
-		}
+//		}
 	}
 }
 
@@ -1017,7 +1027,7 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
 	dAssert (mesh);
 
 	// convert the mesh to a newtonMesh
-	NewtonMesh* const solidMesh = mesh->CreateNewtonMesh (world, GetIdentityMatrix());
+	NewtonMesh* const solidMesh = mesh->CreateNewtonMesh (world, entity.GetMeshMatrix() * entity.GetCurrentMatrix());
 
 	// create a random point cloud
 	dVector points[POINT_CLOUD_SIZE];
@@ -1033,7 +1043,7 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
 
 	/// create the fractured collision and mesh
 	int debreePhysMaterial = NewtonMaterialGetDefaultGroupID(world);
-	NewtonCollision* const structuredFracturedCollision = NewtonCreateCompoundBreakable (world, solidMesh, debreePhysMaterial, POINT_CLOUD_SIZE, &points[0][0], sizeof (dVector), internalMaterial, &textureMatrix[0][0]);
+	NewtonCollision* const structuredFracturedCollision = NewtonCreateCompoundBreakable (world, solidMesh, 0, debreePhysMaterial, POINT_CLOUD_SIZE, &points[0][0], sizeof (dVector), internalMaterial, &textureMatrix[0][0]);
 
 	// delete the solid mesh since it no longed needed
 	NewtonMeshDestroy (solidMesh);
@@ -1052,11 +1062,11 @@ void StructuredConvexFracturing (DemoEntityManager* const scene)
 
 	// load the scene from a ngd file format
 	//CreateLevelMesh (scene, "ruinsFloor.ngd", true);
-	CreateLevelMesh (scene, "flatPlane.ngd", false);
-	//CreateLevelMesh (scene, "sponza.ngd", false);
+	CreateLevelMesh (scene, "flatPlane.ngd", true);
+	//CreateLevelMesh (scene, "sponza.ngd", true);
 	//CreateLevelMesh (scene, "sponza.ngd", true);
 
-//	AddStructuredFractured (scene, dVector (0.0f, 0.0f, 0.0f, 0.0f), 0, "colum.ngd");
+	AddStructuredFractured (scene, dVector (0.0f, 0.0f, 0.0f, 0.0f), 0, "colum.ngd");
 
 	// create a shattered mesh array
 	//CreateSimpleVoronoiFracture (scene);

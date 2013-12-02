@@ -2774,7 +2774,7 @@ NewtonCollision* NewtonCreateCompoundCollisionFromMesh (const NewtonWorld* const
 }
 
 
-NewtonCollision* NewtonCreateCompoundBreakable (const NewtonWorld* const newtonWorld, const NewtonMesh* const solidMesh, int fracturePhysicsMaterialID, int pointcloudCount, const dFloat* const vertexCloud, int strideInBytes, int materialID, const dFloat* const textureMatrix)
+NewtonCollision* NewtonCreateCompoundBreakable (const NewtonWorld* const newtonWorld, const NewtonMesh* const solidMesh, int shapeID, int fracturePhysicsMaterialID, int pointcloudCount, const dFloat* const vertexCloud, int strideInBytes, int materialID, const dFloat* const textureMatrix)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 
@@ -2782,9 +2782,7 @@ NewtonCollision* NewtonCreateCompoundBreakable (const NewtonWorld* const newtonW
 	dgMeshEffect* const mesh = (dgMeshEffect*) solidMesh;
 
 	dgMatrix textMatrix (textureMatrix);
-	dgCollisionInstance* const collision = world->CreateCollisionCompoundBreakable (mesh, fracturePhysicsMaterialID, pointcloudCount, vertexCloud, strideInBytes, materialID, textMatrix);
-
-	//collision->SetUserDataID(dgUnsigned32 (shapeID));
+	dgCollisionInstance* const collision = world->CreateCollisionCompoundBreakable (mesh, shapeID, fracturePhysicsMaterialID, pointcloudCount, vertexCloud, strideInBytes, materialID, textMatrix);
 	return (NewtonCollision*) collision;
 }
 
