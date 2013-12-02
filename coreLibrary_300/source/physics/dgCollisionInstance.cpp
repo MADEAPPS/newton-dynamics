@@ -38,6 +38,7 @@
 #include "dgCollisionTaperedCapsule.h"
 #include "dgCollisionTaperedCylinder.h"
 #include "dgCollisionChamferCylinder.h"
+#include "dgCollisionCompoundBreakable.h"
 #include "dgCollisionDeformableSolidMesh.h"
 #include "dgCollisionDeformableClothPatch.h"
 
@@ -101,9 +102,8 @@ dgCollisionInstance::dgCollisionInstance(const dgCollisionInstance& instance)
 {
 	if (m_childShape->IsType (dgCollision::dgCollisionCompound_RTTI)) {
 		if (m_childShape->IsType (dgCollision::dgCollisionCompoundBreakable_RTTI)) {
-			dgAssert (0);
-//			dgCollisionCompoundBreakable* const compound = (dgCollisionCompoundBreakable*) collision;
-//			collision = new (m_world->GetAllocator()) dgCollisionCompoundBreakable (*compound);
+			dgCollisionCompoundBreakable* const compound = (dgCollisionCompoundBreakable*) m_childShape;
+			m_childShape = new (m_world->GetAllocator()) dgCollisionCompoundBreakable (*compound);
 		} else if (m_childShape->IsType (dgCollision::dgCollisionScene_RTTI)) {
 			dgCollisionScene* const scene = (dgCollisionScene*) m_childShape;
 			m_childShape = new (m_world->GetAllocator()) dgCollisionScene (*scene);

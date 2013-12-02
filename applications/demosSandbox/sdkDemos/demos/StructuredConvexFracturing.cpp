@@ -1045,9 +1045,54 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
 	int debreePhysMaterial = NewtonMaterialGetDefaultGroupID(world);
 	NewtonCollision* const structuredFracturedCollision = NewtonCreateCompoundBreakable (world, solidMesh, 0, debreePhysMaterial, POINT_CLOUD_SIZE, &points[0][0], sizeof (dVector), internalMaterial, &textureMatrix[0][0]);
 
+//    dQuaternion rotation;
+//   SimpleFracturedEffectEntity* const entity = new SimpleFracturedEffectEntity (visualMesh, fractureEffect);
+    dMatrix matrix (GetIdentityMatrix());
+    matrix.m_posit = origin;
+    DemoEntity* const visualEntity= new DemoEntity(matrix, NULL);
+    scene->Append(visualEntity);
+
+    dVector com;
+    dVector inertia;
+    NewtonConvexCollisionCalculateInertialMatrix (structuredFracturedCollision, &inertia[0], &com[0]);	
+
+    float mass = 10.0f;
+    int materialId = 0;
+    //create the rigid body
+    NewtonBody* const rigidBody = NewtonCreateDynamicBody (world, structuredFracturedCollision, &matrix[0][0]);
+/*
+    entity->m_myBody = rigidBody;
+    entity->m_myMassInverse = 1.0f / mass;
+
+    // set the correct center of gravity for this body
+    //NewtonBodySetCentreOfMass (rigidBody, &origin[0]);
+
+    // set the mass matrix
+    NewtonBodySetMassProperties (rigidBody, mass, collision);
+
+    // save the pointer to the graphic object with the body.
+    NewtonBodySetUserData (rigidBody, entity);
+
+    // assign the wood id
+    NewtonBodySetMaterialGroupID (rigidBody, materialId);
+
+    //  set continue collision mode
+    //	NewtonBodySetContinuousCollisionMode (rigidBody, continueCollisionMode);
+
+    // set a destructor for this rigid body
+    NewtonBodySetDestructorCallback (rigidBody, PhysicsBodyDestructor);
+
+    // set the transform call back function
+    NewtonBodySetTransformCallback (rigidBody, DemoEntity::TransformCallback);
+
+    // set the force and torque call back function
+    NewtonBodySetForceAndTorqueCallback (rigidBody, PhysicsApplyGravityForce);
+*/
+
+
+
 	// delete the solid mesh since it no longed needed
 	NewtonMeshDestroy (solidMesh);
-
 
 	// destroy the fracture collision
 	NewtonDestroyCollision (structuredFracturedCollision);
