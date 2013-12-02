@@ -1446,6 +1446,14 @@ class dgCollisionCompoundBreakable::dgFractureBuilder//: public dgDelaunayTetrah
 	class ConvexSegments: public dgTree<dgMeshEffect*, dgInt32>
 	{
 		public:
+		class dgPerimenterEdge
+		{
+			public:
+			const dgBigVector* m_vertex;
+			dgPerimenterEdge* m_next;
+			dgPerimenterEdge* m_prev;
+		};
+
 		ConvexSegments (dgMemoryAllocator* const allocator)
 			:dgTree<dgMeshEffect*, dgInt32>(allocator)
 		{
@@ -1466,8 +1474,8 @@ class dgCollisionCompoundBreakable::dgFractureBuilder//: public dgDelaunayTetrah
 				const dgBigVector* const pointsA = (dgBigVector*) meshA->GetVertexPool();
 				const dgBigVector* const pointsB = (dgBigVector*) meshB->GetVertexPool();
 
-				dgInt32 indexA[256];
-				dgInt32 indexB[256];
+				dgInt32 indexA[128];
+				dgInt32 indexB[128];
 
 				dgInt32 indexCountA = meshA->GetFaceIndexCount(faceA);
 				dgInt32 indexCountB = meshB->GetFaceIndexCount(faceB);
@@ -1476,6 +1484,123 @@ class dgCollisionCompoundBreakable::dgFractureBuilder//: public dgDelaunayTetrah
 
 				meshA->GetFaceIndex(faceA, indexA);
 				meshA->GetFaceIndex(faceB, indexB);
+
+				dgPerimenterEdge subdivision[256];
+				dgAssert ((2 * (indexCountA + indexCountB)) < dgInt32 (sizeof (subdivision) / sizeof (subdivision[0])));
+				for (dgInt32 i = 0; i < indexCountB; i ++) {
+					subdivision[i].m_vertex = &pointsB[indexB[indexCountB - i - 1]];
+					subdivision[i].m_prev = &subdivision[i - 1];
+					subdivision[i].m_next = &subdivision[i + 1];
+				}
+				subdivision[0].m_prev = &subdivision[indexCountB - 1];
+				subdivision[indexCountB - 1].m_next = &subdivision[0];
+
+
+				dgBigVector contactOut[256];
+				dgPerimenterEdge* edgeClipped[2];
+				//dgVector* output = &contactOut[indexCountA + indexCountB + maxContacts];
+				//dgBigVector* output = &contactOut[indexCountA + indexCountB + maxContacts];
+				edgeClipped[0] = NULL;
+				edgeClipped[1] = NULL;
+				
+				//dgInt32 edgeIndex = indexCountB;
+				//dgPerimenterEdge* poly = &subdivision[0];
+				dgInt32 i0 = indexCountA - 1;
+				for (dgInt32 i1 = 0; i1 < indexCountA; i1 ++) {
+
+//					dgVector n (normal * (shape1[i1] - shape1[i0]));
+//					dgPlane plane (n, - (n % shape1[i0]));
+//					i0 = i1;
+/*
+					count = 0;
+					dgPerimenterEdge* tmp = poly;
+					dgInt32 isInside = 0;
+					dgFloat32 test0 = plane.Evalue (*tmp->m_vertex);
+					do {
+						dgFloat32 test1 = plane.Evalue (*tmp->m_next->m_vertex);
+
+						if (test0 >= dgFloat32 (0.0f)) {
+							isInside |= 1;
+							if (test1 < dgFloat32 (0.0f)) {
+								const dgVector& p0 = *tmp->m_vertex;
+								const dgVector& p1 = *tmp->m_next->m_vertex;
+								dgVector dp (p1 - p0); 
+								dgFloat32 den = plane % dp;
+								if (dgAbsf(den) < dgFloat32 (1.0e-24f)) {
+									den = (den >= dgFloat32 (0.0f)) ?  dgFloat32 (1.0e-24f) :  dgFloat32 (-1.0e-24f);
+								}
+
+								den = test0 / den;
+								if (den >= dgFloat32 (0.0f)) {
+									den = dgFloat32 (0.0f);
+								} else if (den <= -1.0f) {
+									den = dgFloat32 (-1.0f);
+								}
+								output[0] = p0 - dp.Scale3 (den);
+								edgeClipped[0] = tmp;
+								count ++;
+							}
+						} else if (test1 >= dgFloat32 (0.0f)) {
+							const dgVector& p0 = *tmp->m_vertex;
+							const dgVector& p1 = *tmp->m_next->m_vertex;
+							isInside |= 1;
+							dgVector dp (p1 - p0); 
+							dgFloat32 den = plane % dp;
+							if (dgAbsf(den) < dgFloat32 (1.0e-24f)) {
+								den = (den >= dgFloat32 (0.0f)) ?  dgFloat32 (1.0e-24f) :  dgFloat32 (-1.0e-24f);
+							}
+							den = test0 / den;
+							if (den >= dgFloat32 (0.0f)) {
+								den = dgFloat32 (0.0f);
+							} else if (den <= -1.0f) {
+								den = dgFloat32 (-1.0f);
+							}
+							output[1] = p0 - dp.Scale3 (den);
+							edgeClipped[1] = tmp;
+							count ++;
+						}
+
+						test0 = test1;
+						tmp = tmp->m_next;
+					} while (tmp != poly && (count < 2));
+
+					if (!isInside) {
+						return 0;
+					}
+
+					if (count == 2) {
+						dgPerimenterEdge* const newEdge = &subdivision[edgeIndex];
+						newEdge->m_next = edgeClipped[1];
+						newEdge->m_prev = edgeClipped[0];
+						edgeClipped[0]->m_next = newEdge;
+						edgeClipped[1]->m_prev = newEdge;
+
+						newEdge->m_vertex = &output[0];
+						edgeClipped[1]->m_vertex = &output[1];
+						poly = newEdge;
+
+						output += 2;
+						edgeIndex ++;
+						//dgAssert (output < &pool[sizeof (pool)/sizeof (pool[0])]);
+						dgAssert (edgeIndex < dgInt32 (sizeof (subdivision) / sizeof (subdivision[0])));
+					}
+*/
+				}
+/*
+						dgAssert (poly);
+						poly = ReduceContacts (poly, maxContacts);
+						count = 0;
+						dgPerimenterEdge* intersection = poly;
+						do {
+							contactOut[count] = *intersection->m_vertex;
+							count ++;
+							intersection = intersection->m_next;
+						} while (intersection != poly);
+					}
+					return count;
+
+				}
+*/
 
 
 
