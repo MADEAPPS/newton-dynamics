@@ -1414,62 +1414,6 @@ class dgCollisionCompoundBreakable::dgFractureBuilder: public dgTree<dgMeshEffec
 		}
 	};
 
-/*
-	class dgConvexPlanes: public dgList<dgBigVector>  
-	{
-		public:
-		dgConvexPlanes(dgMemoryAllocator* const allocator)
-			:dgList<dgBigVector> (allocator)
-		{
-		}
-	};
-
-	class dgConvexPlanesArray: public dgTree<dgConvexPlanes, dgInt32>  
-	{
-		public:
-		dgConvexPlanesArray(dgMemoryAllocator* const allocator)
-			:dgTree<dgConvexPlanes, dgInt32> (allocator) 
-		{
-		}
-
-		bool SharePlane (dgInt32 nodeindexA, dgInt32 nodeindexB) const
-		{
-			const dgConvexPlanes& planeListA = Find(nodeindexA)->GetInfo();
-			const dgConvexPlanes& planeListB = Find(nodeindexB)->GetInfo();
-
-			for (dgConvexPlanes::dgListNode* planeListNodeA = planeListA.GetFirst(); planeListNodeA; planeListNodeA = planeListNodeA->GetNext()) {
-				dgBigVector planeA (planeListNodeA->GetInfo().Scale4 (dgFloat32 (-1.0f)));
-				for (dgConvexPlanes::dgListNode* planeListNodeB = planeListB.GetFirst(); planeListNodeB; planeListNodeB = planeListNodeB->GetNext()) {
-					const dgBigVector& planeB = planeListNodeB->GetInfo();
-					if (((planeA % planeB) > dgFloat64 (1.0 - 1.0e-6f)) && ((fabs(planeA.m_w - planeB.m_w) < dgFloat64(1.0e-6f)))) {
-						return true;
-					}
-				}
-			}
-			return false;
-		}
-	};
-*/
-
-#if 0
-	class ConvexSegments: public dgTree<dgMeshEffect*, dgInt32>
-	{
-		public:
-
-		ConvexSegments (dgMemoryAllocator* const allocator)
-			:dgTree<dgMeshEffect*, dgInt32>(allocator)
-		{
-		}
-
-
-#if 0
-
-		
-
-#endif
-	};
-
-#endif
 
 	dgFractureBuilder (dgMemoryAllocator* const allocator, dgMeshEffect* const solidMesh, dgInt32 pointcloudCount, const dgFloat32* const vertexCloud, dgInt32 strideInBytes, int materialId, const dgMatrix& textureProjectionMatrix)
 		:dgTree<dgMeshEffect*, dgInt32>(allocator)
@@ -1603,50 +1547,8 @@ class dgCollisionCompoundBreakable::dgFractureBuilder: public dgTree<dgMeshEffec
 				}
 			}
 		}
-
 		delanayNodes.RemoveAll();
 
-//		for (dgInt32 i = 0; i < m_fractureMeshes.GetVertexCount(); i ++) {
-//			dgBigVector& point = m_fractureMeshes.GetVertex(i);
-//			dgInt32 nodeIndex = dgInt32 (point.m_w);
-//			dgConvexSolidArray::dgTreeNode* header = delanayNodes.Find(nodeIndex);
-//			if (!header) {
-//				dgConvexSolidVertices list (allocator);
-//				header = delanayNodes.Insert(list, nodeIndex);
-//			}
-//			header->GetInfo().Append (i);
-//			if (!graphMap.Find(nodeIndex)) {
-//				dgFractureConectivity::dgListNode* const node = m_conectivity.AddNode ();
-//				node->GetInfo().m_nodeData = nodeIndex;
-//				graphMap.Insert(node, nodeIndex);
-//			}
-//		}
-
-//		dgConvexPlanesArray planesArray(allocator);
-//		const dgBigVector* const points = (dgBigVector*) m_fractureMeshes.GetVertexPool();
-/*
-		for (void* face = m_fractureMeshes.GetFirstFace(); face; face = m_fractureMeshes.GetNextFace(face)) {
-			dgAssert (!m_fractureMeshes.IsFaceOpen (face));
-
-			dgInt32 vertexIndex = m_fractureMeshes.GetVertexIndex (face);
-			dgInt32 nodeIndex = dgInt32 (points[vertexIndex].m_w);
-			dgConvexPlanesArray::dgTreeNode* header = planesArray.Find(nodeIndex);
-			if (!header) {
-				dgConvexPlanes list (allocator);
-				header = planesArray.Insert(list, nodeIndex);
-			}
-			dgConvexPlanes& planeList = header->GetInfo();
-			dgBigVector plane (m_fractureMeshes.CalculateFaceNormal (face));
-			plane.m_w = -(plane % points[vertexIndex]);
-			planeList.Append(plane);
-
-			if (!graphMap.Find(nodeIndex)) {
-				dgFractureConectivity::dgListNode* const node = m_conectivity.AddNode ();
-				node->GetInfo().m_nodeData = nodeIndex;
-				graphMap.Insert(node, nodeIndex);
-			}
-		}
-*/
 		for (dgDelaunayTetrahedralization::dgListNode* node = delaunayTetrahedras.GetFirst(); node; node = node->GetNext()) {
 			dgConvexHull4dTetraherum& tetra = node->GetInfo();
 			for (dgInt32 i = 0; i < 3; i ++) {
@@ -1724,12 +1626,15 @@ for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; n
 			meshA->GetFaceIndex(faceA, indexA);
 			meshA->GetFaceIndex(faceB, indexB);
 
+dgTrace (("faceA:\n"));
 			dgPerimenterEdge subdivision[256];
 			dgAssert ((2 * (indexCountA + indexCountB)) < dgInt32 (sizeof (subdivision) / sizeof (subdivision[0])));
 			for (dgInt32 i = 0; i < indexCountB; i ++) {
 				subdivision[i].m_vertex = &pointsB[indexB[i]];
 				subdivision[i].m_prev = &subdivision[i - 1];
 				subdivision[i].m_next = &subdivision[i + 1];
+
+dgTrace (("%f %f %f\n", pointsB[indexB[i]].m_x, pointsB[indexB[i]].m_y, pointsB[indexB[i]].m_z));
 			}
 			subdivision[0].m_prev = &subdivision[indexCountB - 1];
 			subdivision[indexCountB - 1].m_next = &subdivision[0];
@@ -1741,8 +1646,9 @@ for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; n
 			dgBigVector* output = &outputPool[0];
 			edgeClipped[0] = NULL;
 			edgeClipped[1] = NULL;
-				
-			
+
+
+dgTrace (("faceB:\n"));
 			dgPerimenterEdge* poly = &subdivision[0];
 			dgInt32 i0 = indexCountA - 1;
 			for (dgInt32 i1 = 0; i1 < indexCountA; i1 ++) {
@@ -1751,6 +1657,7 @@ for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; n
 				dgBigVector n (planeA * (q1 - q0));
 				dgBigPlane plane (n, - (n % q0));
 				i0 = i1;
+dgTrace (("%f %f %f\n", q0.m_x, q0.m_y, q0.m_z));
 
 				dgInt32 count = 0;
 				dgPerimenterEdge* tmp = poly;
@@ -1823,9 +1730,11 @@ for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; n
 					dgAssert (edgeIndex < dgInt32 (sizeof (subdivision) / sizeof (subdivision[0])));
 				}
 			}
+dgTrace (("\n"));
 			dgAssert (poly);
             return true;
 		}
+
 		return false;
 	}
 
