@@ -983,7 +983,7 @@ void BuildingDestruction(SceneManager& system)
 #endif
 
 
-#define POINT_CLOUD_SIZE	10
+#define POINT_CLOUD_SIZE	20
 
 static void MakeRandomPointCloud(NewtonMesh* const mesh, dVector* const points)
 {
@@ -1002,10 +1002,9 @@ static void MakeRandomPointCloud(NewtonMesh* const mesh, dVector* const points)
 		dFloat x = RandomVariable(size.m_x);
 		dFloat y = RandomVariable(size.m_y);
 		dFloat z = RandomVariable(size.m_z);
-x = 0;
-y = 0;
-z = 0;
-
+//x = 0;
+//y = 0;
+//z = 0;
 //		if ((x < maxBox.m_x) && (x > minBox.m_x) && (y < maxBox.m_y) && (y > minBox.m_y) && (z < maxBox.m_z) && (z > minBox.m_z)){
 			points[count] = center + dVector (x, y, z);
 			count ++;

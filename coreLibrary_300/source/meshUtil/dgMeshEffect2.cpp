@@ -72,6 +72,8 @@ dgMeshEffect::dgMeshEffect (dgMemoryAllocator* const allocator, const dgFloat64*
 				&normal.m_x, sizeof (dgVector), &normalIndexListPool[0],
 				&uv.m_x, sizeof (dgVector), &normalIndexListPool[0],
 				&uv.m_x, sizeof (dgVector), &normalIndexListPool[0]);
+
+            RepairTJoints ();
 		}
 	}
 }

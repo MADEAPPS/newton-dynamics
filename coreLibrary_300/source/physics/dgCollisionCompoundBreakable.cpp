@@ -1439,12 +1439,15 @@ class dgCollisionCompoundBreakable::dgFractureBuilder: public dgTree<dgMeshEffec
 
 				count = dgVertexListToIndexList(&pointArray[0].m_x, sizeof (dgBigVector), 3, count, &indexArray[0], dgFloat64 (1.0e-3f));	
 				if (count >= 4) {
-					dgMeshEffect* const convexMesh =  new (allocator) dgMeshEffect (allocator, &pointArray[0].m_x, count, sizeof (dgBigVector), dgFloat64 (0.0f));
+					dgMeshEffect* const convexMesh = new (allocator) dgMeshEffect (allocator, &pointArray[0].m_x, count, sizeof (dgBigVector), dgFloat64 (0.0f));
 					if (convexMesh->GetCount()) {
+                        dgAssert (!convexMesh->HasOpenEdges());
 						convexMesh->AddRef();
 						Insert (convexMesh, key);
 
 						convexMesh->ConvertToPolygons();
+                        dgAssert (!convexMesh->HasOpenEdges());
+
 						convexMesh->CalculateNormals(normalAngleInRadians);
 						convexMesh->UniformBoxMapping (materialId, textureProjectionMatrix);
 
@@ -1850,7 +1853,7 @@ dgCollisionCompoundBreakable::dgCollisionCompoundBreakable (dgWorld* const world
 //	dAssert (debriMeshPieces);
 //	dgFloat32 normalAngleInRadians = 30.0f * 3.1416f / 180.0f;
 
-pointcloudCount = 0;
+//pointcloudCount = 0;
 	dgFractureBuilder fractureBuilder (GetAllocator(), solidMesh, pointcloudCount, vertexCloud, strideInBytes, materialID, offsetMatrix);
 
 //	dgStack<dgCollisionConvex*> shapeArrayPool (fractureBuilder.GetCount());
