@@ -1441,12 +1441,8 @@ class dgCollisionCompoundBreakable::dgFractureBuilder: public dgTree<dgMeshEffec
 				if (count >= 4) {
 					dgMeshEffect* const convexMesh = new (allocator) dgMeshEffect (allocator, &pointArray[0].m_x, count, sizeof (dgBigVector), dgFloat64 (0.0f));
 					if (convexMesh->GetCount()) {
-                        dgAssert (!convexMesh->HasOpenEdges());
 						convexMesh->AddRef();
 						Insert (convexMesh, key);
-
-						convexMesh->ConvertToPolygons();
-                        dgAssert (!convexMesh->HasOpenEdges());
 
 						convexMesh->CalculateNormals(normalAngleInRadians);
 						convexMesh->UniformBoxMapping (materialId, textureProjectionMatrix);
@@ -1687,28 +1683,32 @@ for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; n
 
         dgInt32 planeB_Count = 0;
         for (void* faceB = meshB->GetFirstFace(); faceB; faceB = meshB->GetNextFace(faceB)) {
-            dgAssert (!meshB->IsFaceOpen (faceB));
-            dgInt32 vertexIndexB = meshB->GetVertexIndex (faceB);
-            dgBigVector planeB (meshB->CalculateFaceNormal (faceB));
-            planeB.m_w = -(planeB % pointsB[vertexIndexB]);
-            planeB_array[planeB_Count] = planeB;
-            planeB_Count ++;
-            dgAssert (planeB_Count < sizeof (planeB_array) / sizeof (planeB_array[0]));
+            if (!meshB->IsFaceOpen (faceB)) {
+				dgInt32 vertexIndexB = meshB->GetVertexIndex (faceB);
+				dgBigVector planeB (meshB->CalculateFaceNormal (faceB));
+				planeB.m_w = -(planeB % pointsB[vertexIndexB]);
+				planeB_array[planeB_Count] = planeB;
+				planeB_Count ++;
+				dgAssert (planeB_Count < sizeof (planeB_array) / sizeof (planeB_array[0]));
+			}
         }
 
         for (void* faceA = meshA->GetFirstFace(); faceA; faceA = meshA->GetNextFace(faceA)) {
-            dgAssert (!meshA->IsFaceOpen (faceA));
-            dgInt32 vertexIndexA = meshA->GetVertexIndex (faceA);
-            dgBigVector planeA (meshA->CalculateFaceNormal (faceA));
-            planeA.m_w = -(planeA % pointsA[vertexIndexA]);
+            if (!meshA->IsFaceOpen (faceA)) {
+				dgInt32 vertexIndexA = meshA->GetVertexIndex (faceA);
+				dgBigVector planeA (meshA->CalculateFaceNormal (faceA));
+				planeA.m_w = -(planeA % pointsA[vertexIndexA]);
 
-            dgInt32 indexB = 0;
-            for (void* faceB = meshB->GetFirstFace(); faceB; faceB = meshB->GetNextFace(faceB)) {
-                if (ArePlaneCoplanar (meshA, faceA, planeA, meshB, faceB, planeB_array[indexB])) {
-                    return true;
-                }
-                indexB ++;
-            }
+				dgInt32 indexB = 0;
+				for (void* faceB = meshB->GetFirstFace(); faceB; faceB = meshB->GetNextFace(faceB)) {
+					if (!meshB->IsFaceOpen (faceB)) {
+						if (ArePlaneCoplanar (meshA, faceA, planeA, meshB, faceB, planeB_array[indexB])) {
+							return true;
+						}
+						indexB ++;
+					}
+				}
+			}
         }
         return false;
     }

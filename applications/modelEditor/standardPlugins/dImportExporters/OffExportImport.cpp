@@ -48,8 +48,7 @@ bool OffImport::Import (const char* const fileName, dPluginInterface* const inte
 //	++actualCount;
 //}
 //dAssert(actualCount == vertexCount );
-
-		NewtonMeshFixTJoints (mesh);
+//		NewtonMeshFixTJoints (mesh);
 
 		dPluginScene* const asset = new dPluginScene(world);
 
