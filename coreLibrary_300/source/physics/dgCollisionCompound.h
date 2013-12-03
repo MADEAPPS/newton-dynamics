@@ -42,6 +42,17 @@ class dgCollisionCompound: public dgCollision
 	};
 
 	public:
+
+	class dgNodeBase;
+	class dgTreeArray: public dgTree<dgNodeBase*, dgInt32>
+	{
+		public:
+		dgTreeArray (dgMemoryAllocator* const allocator)
+			:dgTree<dgNodeBase*, dgInt32>(allocator)
+		{
+		}
+	};
+
 	DG_MSC_VECTOR_ALIGMENT
 	class dgOOBBTestData
 	{
@@ -105,7 +116,7 @@ class dgCollisionCompound: public dgCollision
 		dgNodeBase* m_right;
 		dgNodeBase* m_parent;
 		dgCollisionInstance* m_shape;
-		dgTree<dgNodeBase*, dgInt32>::dgTreeNode* m_myNode; 
+		dgTreeArray::dgTreeNode* m_myNode; 
 	} DG_GCC_VECTOR_ALIGMENT;
 
 	protected:
@@ -122,32 +133,32 @@ class dgCollisionCompound: public dgCollision
 		dgNodeBase* m_myNode;
 	};
 
+
 	class dgSpliteInfo;
 	class dgHeapNodePair;
 
 	public:
-	
 	dgCollisionCompound (dgWorld* const world);
 	dgCollisionCompound (const dgCollisionCompound& source);
 	dgCollisionCompound (dgWorld* const world, dgDeserialize deserialization, void* const userData);
 	virtual ~dgCollisionCompound();
 
 	void BeginAddRemove ();
-	dgTree<dgNodeBase*, dgInt32>::dgTreeNode* AddCollision (dgCollisionInstance* const part);
-	void RemoveCollision (dgTree<dgNodeBase*, dgInt32>::dgTreeNode* const node);
-	void SetCollisionMatrix (dgTree<dgNodeBase*, dgInt32>::dgTreeNode* const node, const dgMatrix& matrix);
+	dgTreeArray::dgTreeNode* AddCollision (dgCollisionInstance* const part);
+	void RemoveCollision (dgTreeArray::dgTreeNode* const node);
+	void SetCollisionMatrix (dgTreeArray::dgTreeNode* const node, const dgMatrix& matrix);
 	void EndAddRemove ();
 
 	void ApplyScale (const dgVector& scale);
 	void GetAABB (dgVector& p0, dgVector& p1) const;
 
-	dgInt32 GetNodeIndex(dgTree<dgNodeBase*, dgInt32>::dgTreeNode* const node) const;
-	dgTree<dgNodeBase*, dgInt32>::dgTreeNode* FindNodeByIndex (dgInt32 index) const;
+	dgInt32 GetNodeIndex(dgTreeArray::dgTreeNode* const node) const;
+	dgTreeArray::dgTreeNode* FindNodeByIndex (dgInt32 index) const;
 
 
-	dgTree<dgNodeBase*, dgInt32>::dgTreeNode* GetFirstNode () const;
-	dgTree<dgNodeBase*, dgInt32>::dgTreeNode* GetNextNode (dgTree<dgNodeBase*, dgInt32>::dgTreeNode* const node) const;
-	dgCollisionInstance* GetCollisionFromNode (dgTree<dgNodeBase*, dgInt32>::dgTreeNode* const node) const;
+	dgTreeArray::dgTreeNode* GetFirstNode () const;
+	dgTreeArray::dgTreeNode* GetNextNode (dgTreeArray::dgTreeNode* const node) const;
+	dgCollisionInstance* GetCollisionFromNode (dgTreeArray::dgTreeNode* const node) const;
 
 	protected:
 	void RemoveCollision (dgNodeBase* const node);
@@ -213,7 +224,7 @@ class dgCollisionCompound: public dgCollision
 	dgWorld* m_world;	
 	dgNodeBase* m_root;
 	dgThread::dgCriticalSection m_criticalSectionLock;
-	dgTree<dgNodeBase*, dgInt32> m_array;
+	dgTreeArray m_array;
 	dgInt32 m_idIndex;
 
 	static dgVector m_padding;

@@ -468,7 +468,7 @@ dgCollisionCompound::dgCollisionCompound (const dgCollisionCompound& source)
 {
 	m_rtti |= dgCollisionCompound_RTTI;
 
-	dgTree<dgNodeBase*, dgInt32>::Iterator iter (source.m_array);
+	dgTreeArray::Iterator iter (source.m_array);
 	for (iter.Begin(); iter; iter ++) {
 		dgNodeBase* const node = iter.GetNode()->GetInfo();
 		dgNodeBase* const newNode = new (m_allocator) dgNodeBase (node->GetShape());
@@ -618,7 +618,7 @@ dgInt32 dgCollisionCompound::CalculatePlaneIntersection (const dgVector& normal,
 
 void dgCollisionCompound::DebugCollision (const dgMatrix& matrix, OnDebugCollisionMeshCallback callback, void* const userData) const
 {
-	dgTree<dgNodeBase*, dgInt32>::Iterator iter (m_array);
+	dgTreeArray::Iterator iter (m_array);
 	for (iter.Begin(); iter; iter ++) {
 		dgCollisionInstance* const collision = iter.GetNode()->GetInfo()->GetShape();
 		collision->DebugCollision (matrix, callback, userData);
@@ -806,7 +806,7 @@ dgFloat32 dgCollisionCompound::ConvexRayCast (const dgCollisionInstance* const c
 dgFloat32 dgCollisionCompound::GetVolume () const
 {
 	dgFloat32 volume = dgFloat32 (0.0f);
-	dgTree<dgNodeBase*, dgInt32>::Iterator iter (m_array);
+	dgTreeArray::Iterator iter (m_array);
 	for (iter.Begin(); iter; iter ++) {
 		dgCollisionConvex* const collision = (dgCollisionConvex*)iter.GetNode()->GetInfo()->GetShape()->GetChildShape();
 		volume += collision->GetVolume();
@@ -829,7 +829,7 @@ dgFloat32 dgCollisionCompound::GetBoxMaxRadius () const
 dgVector dgCollisionCompound::CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& plane) const
 {
 	dgVector totalVolume (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	dgTree<dgNodeBase*, dgInt32>::Iterator iter (m_array);
+	dgTreeArray::Iterator iter (m_array);
 	for (iter.Begin(); iter; iter ++) {
 		dgCollisionConvex* const collision = (dgCollisionConvex*)iter.GetNode()->GetInfo()->GetShape()->GetChildShape();
 		dgMatrix matrix (iter.GetNode()->GetInfo()->GetShape()->m_localMatrix * globalMatrix);
@@ -923,7 +923,7 @@ void dgCollisionCompound::MassProperties ()
 	dgVector origin (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	dgVector inertiaII (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	dgVector inertiaIJ (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	dgTree<dgNodeBase*, dgInt32>::Iterator iter (m_array);
+	dgTreeArray::Iterator iter (m_array);
 	for (iter.Begin(); iter; iter ++) {
 		dgCollisionInstance* const collision = iter.GetNode()->GetInfo()->GetShape();
 		dgMatrix shapeInertia (collision->CalculateInertia());
@@ -947,7 +947,7 @@ void dgCollisionCompound::MassProperties ()
 
 void dgCollisionCompound::ApplyScale (const dgVector& scale)
 {
-	dgTree<dgNodeBase*, dgInt32>::Iterator iter (m_array);
+	dgTreeArray::Iterator iter (m_array);
 	for (iter.Begin(); iter; iter ++) {
 		dgNodeBase* const node = iter.GetNode()->GetInfo();
 		dgCollisionInstance* const collision = node->GetShape();
@@ -1013,7 +1013,7 @@ void dgCollisionCompound::EndAddRemove ()
 		dgWorld* const world = m_world;
 		dgThreadHiveScopeLock lock (world, &m_criticalSectionLock);
 
-		dgTree<dgNodeBase*, dgInt32>::Iterator iter (m_array);
+		dgTreeArray::Iterator iter (m_array);
 		for (iter.Begin(); iter; iter ++) {
 			dgNodeBase* const node = iter.GetNode()->GetInfo();
 			node->CalculateAABB();
@@ -1139,7 +1139,7 @@ dgTree<dgCollisionCompound::dgNodeBase*, dgInt32>::dgTreeNode* dgCollisionCompou
 }
 
 
-void dgCollisionCompound::RemoveCollision (dgTree<dgNodeBase*, dgInt32>::dgTreeNode* const node)
+void dgCollisionCompound::RemoveCollision (dgTreeArray::dgTreeNode* const node)
 {
 	if (node) {
 		dgCollisionInstance* const instance = node->GetInfo()->GetShape();
@@ -1150,7 +1150,7 @@ void dgCollisionCompound::RemoveCollision (dgTree<dgNodeBase*, dgInt32>::dgTreeN
 	}
 }
 
-void dgCollisionCompound::SetCollisionMatrix (dgTree<dgNodeBase*, dgInt32>::dgTreeNode* const node, const dgMatrix& matrix)
+void dgCollisionCompound::SetCollisionMatrix (dgTreeArray::dgTreeNode* const node, const dgMatrix& matrix)
 {
 	if (node) {
 		dgWorld* const world = m_world;
@@ -1226,7 +1226,7 @@ void dgCollisionCompound::RemoveCollision (dgNodeBase* const treeNode)
 	}
 }
 
-dgInt32 dgCollisionCompound::GetNodeIndex(dgTree<dgNodeBase*, dgInt32>::dgTreeNode* const node) const
+dgInt32 dgCollisionCompound::GetNodeIndex(dgTreeArray::dgTreeNode* const node) const
 {
 	return node->GetKey();
 }
@@ -1238,10 +1238,10 @@ dgTree<dgCollisionCompound::dgNodeBase*, dgInt32>::dgTreeNode* dgCollisionCompou
 
 dgTree<dgCollisionCompound::dgNodeBase*, dgInt32>::dgTreeNode* dgCollisionCompound::GetFirstNode () const
 {
-	dgTree<dgNodeBase*, dgInt32>::Iterator iter (m_array);
+	dgTreeArray::Iterator iter (m_array);
 	iter.Begin();
 
-	dgTree<dgNodeBase*, dgInt32>::dgTreeNode* node = NULL;
+	dgTreeArray::dgTreeNode* node = NULL;
 	if (iter) {
 		node = iter.GetNode();
 	}
@@ -1250,10 +1250,10 @@ dgTree<dgCollisionCompound::dgNodeBase*, dgInt32>::dgTreeNode* dgCollisionCompou
 
 dgTree<dgCollisionCompound::dgNodeBase*, dgInt32>::dgTreeNode* dgCollisionCompound::GetNextNode (dgTree<dgCollisionCompound::dgNodeBase*, dgInt32>::dgTreeNode* const node) const
 {
-	dgTree<dgNodeBase*, dgInt32>::Iterator iter (m_array);
+	dgTreeArray::Iterator iter (m_array);
 	iter.Set (node);
 	iter ++;
-	dgTree<dgNodeBase*, dgInt32>::dgTreeNode* nextNode = NULL;
+	dgTreeArray::dgTreeNode* nextNode = NULL;
 	if (iter) {
 		nextNode = iter.GetNode();
 	}
@@ -1356,7 +1356,7 @@ void dgCollisionCompound::Serialize(dgSerialize callback, void* const userData) 
 	
 	dgInt32 count = m_array.GetCount();
 	callback (userData, &count, sizeof (count));
-	dgTree<dgNodeBase*, dgInt32>::Iterator iter (m_array);
+	dgTreeArray::Iterator iter (m_array);
 	for (iter.Begin(); iter; iter ++) {
 		dgCollisionInstance* const collision = iter.GetNode()->GetInfo()->GetShape();
 		collision->Serialize(callback, userData);

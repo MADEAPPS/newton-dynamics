@@ -191,189 +191,10 @@ dgFloat32 dgCollisionCompoundBreakable::dgCollisionConvexIntance::GetBreakImpuls
 }
 
 
-dgCollisionCompoundBreakable::dgVertexBuffer::dgVertexBuffer(dgInt32 vertsCount, dgMemoryAllocator* allocator)
-{
-	m_allocator = allocator;
-	m_vertexCount = vertsCount;
-	m_uv = (dgFloat32 *) m_allocator->Malloc (2 * vertsCount * dgInt32 (sizeof (dgFloat32))); 
-	m_vertex = (dgFloat32 *) m_allocator->Malloc (3 * vertsCount * dgInt32 (sizeof (dgFloat32))); 
-	m_normal = (dgFloat32 *) m_allocator->Malloc (3 * vertsCount * dgInt32 (sizeof (dgFloat32))); 
-}
-
-dgCollisionCompoundBreakable::dgVertexBuffer::~dgVertexBuffer ()
-{
-	m_allocator->Free (m_normal);
-	m_allocator->Free (m_vertex);
-	m_allocator->Free (m_uv);
-}
-
-dgCollisionCompoundBreakable::dgVertexBuffer::dgVertexBuffer (dgMemoryAllocator* const allocator, dgDeserialize callback, void* const userData)
-{
-	m_allocator = allocator;
-	callback (userData, &m_vertexCount, dgInt32 (sizeof (dgInt32)));
-
-	m_uv = (dgFloat32 *) m_allocator->Malloc (2 * m_vertexCount * dgInt32 (sizeof (dgFloat32))); 
-	m_vertex = (dgFloat32 *) m_allocator->Malloc (3 * m_vertexCount * dgInt32 (sizeof (dgFloat32))); 
-	m_normal = (dgFloat32 *) m_allocator->Malloc (3 * m_vertexCount * dgInt32 (sizeof (dgFloat32))); 
-
-	callback (userData, m_vertex, size_t (3 * m_vertexCount * dgInt32 (sizeof (dgFloat32))));
-	callback (userData, m_normal, size_t (3 * m_vertexCount * dgInt32 (sizeof (dgFloat32))));
-	callback (userData, m_uv, size_t (2 * m_vertexCount * dgInt32 (sizeof (dgFloat32))));
-}
-
-void dgCollisionCompoundBreakable::dgVertexBuffer::Serialize(dgSerialize callback, void* const userData) const
-{
-	callback (userData, &m_vertexCount, dgInt32 (sizeof (dgInt32)));
-	callback (userData, m_vertex, size_t (3 * m_vertexCount * dgInt32 (sizeof (dgFloat32))));
-	callback (userData, m_normal, size_t (3 * m_vertexCount * dgInt32 (sizeof (dgFloat32))));
-	callback (userData, m_uv, size_t (2 * m_vertexCount * dgInt32 (sizeof (dgFloat32))));
-}
 
 
-void dgCollisionCompoundBreakable::dgVertexBuffer::GetVertexStreams (dgInt32 vertexStrideInByte, dgFloat32* vertex, dgInt32 normalStrideInByte, dgFloat32* normal,
-	dgInt32 uvStrideInByte, dgFloat32* uv) const
-{
-	uvStrideInByte /= dgInt32 (sizeof (dgFloat32));
-	vertexStrideInByte /= dgInt32 (sizeof (dgFloat32));
-	normalStrideInByte /= dgInt32 (sizeof (dgFloat32));
-	for (dgInt32 i = 0; i < m_vertexCount; i ++)	{
-		dgInt32 j = i * vertexStrideInByte;
-		vertex[j + 0] = m_vertex[i * 3 + 0];
-		vertex[j + 1] = m_vertex[i * 3 + 1];
-		vertex[j + 2] = m_vertex[i * 3 + 2];
+#endif
 
-		j = i * normalStrideInByte;
-		normal[j + 0] = m_normal[i * 3 + 0];
-		normal[j + 1] = m_normal[i * 3 + 1];
-		normal[j + 2] = m_normal[i * 3 + 2];
-
-		j = i * uvStrideInByte;
-		uv[j + 0] = m_uv[i * 2 + 0];
-		uv[j + 1] = m_uv[i * 2 + 1];
-	}
-}
-
-
-
-dgCollisionCompoundBreakable::dgSubMesh::dgSubMesh (dgMemoryAllocator* const allocator)
-{
-	m_material = 0;
-	m_faceCount = 0;
-	m_indexes = NULL;
-	m_faceOffset = 0;
-	m_visibleFaces = 1;
-	m_allocator = allocator;
-}
-
-dgCollisionCompoundBreakable::dgSubMesh::~dgSubMesh ()
-{
-	if (m_indexes) {
-//		m_allocator->Free (m_visibilityMap);
-		m_allocator->Free (m_indexes);
-	}
-}
-
-void dgCollisionCompoundBreakable::dgSubMesh::Serialize(dgSerialize callback, void* const userData) const
-{
-	callback (userData, &m_material, dgInt32 (sizeof (dgInt32)));
-	callback (userData, &m_faceCount, dgInt32 (sizeof (dgInt32)));
-	callback (userData, &m_faceOffset, dgInt32 (sizeof (dgInt32)));
-	callback (userData, &m_visibleFaces, dgInt32 (sizeof (dgInt32)));
-	callback (userData, m_indexes, size_t (3 * m_faceCount * dgInt32 (sizeof (dgInt32))));
-}
-
-dgCollisionCompoundBreakable::dgMesh::dgMesh(dgMemoryAllocator* const allocator)
-	:dgList<dgSubMesh>(allocator)
-{
-	m_IsVisible = 1;
-}
-
-dgCollisionCompoundBreakable::dgMesh::~dgMesh()
-{
-}
-
-dgCollisionCompoundBreakable::dgMesh::dgMesh (dgMemoryAllocator* const allocator, dgDeserialize callback, void* const userData)
-	:dgList<dgSubMesh>(allocator), dgRefCounter ()
-{
-	dgInt32 count;
-
-	callback (userData, &m_IsVisible, dgInt32 (sizeof (dgInt32)));
-	callback (userData, &count, dgInt32 (sizeof (dgInt32)));
-	for (dgInt32 i = 0; i < count; i ++) {
-		dgInt32 material;
-		dgInt32 faceCount;
-		dgInt32 faceOffset;
-		dgInt32 exteriorFaces;
-
-		callback (userData, &material, dgInt32 (sizeof (dgInt32)));
-		callback (userData, &faceCount, dgInt32 (sizeof (dgInt32)));
-		callback (userData, &faceOffset, dgInt32 (sizeof (dgInt32)));
-		callback (userData, &exteriorFaces, dgInt32 (sizeof (dgInt32)));
-		dgSubMesh* const subMesh = AddgSubMesh (faceCount * 3, material);
-
-		subMesh->m_faceOffset = faceOffset;
-		subMesh->m_visibleFaces = exteriorFaces;
-
-//		callback (userData, subMesh->m_visibilityMap, faceCount * dgInt32 (sizeof (dgInt32)));
-		callback (userData, subMesh->m_indexes, size_t (3 * faceCount * sizeof (dgInt32)));
-	}
-}
-
-void dgCollisionCompoundBreakable::dgMesh::Serialize(dgSerialize callback, void* const userData) const
-{
-	dgInt32 count;
-	count = GetCount();
-	
-	callback (userData, &m_IsVisible, dgInt32 (sizeof (dgInt32)));
-	callback (userData, &count, dgInt32 (sizeof (dgInt32)));
-	for (dgListNode* node = GetFirst(); node; node = node->GetNext()) {
-		dgSubMesh& subMesh = node->GetInfo();
-		subMesh.Serialize(callback, userData);
-	}
-}
-
-dgCollisionCompoundBreakable::dgSubMesh* dgCollisionCompoundBreakable::dgMesh::AddgSubMesh(dgInt32 indexCount, dgInt32 material)
-{
-	dgSubMesh tmp (GetAllocator());
-	dgSubMesh& subMesh = Append(tmp)->GetInfo();
-
-	subMesh.m_faceOffset = 0;
-	subMesh.m_visibleFaces = 1;
-
-	subMesh.m_material = material;
-	subMesh.m_faceCount = indexCount / 3;
-
-	subMesh.m_indexes = (dgInt32 *) subMesh.m_allocator->Malloc (indexCount * dgInt32 (sizeof (dgInt32))); 
-	return &subMesh;
-}
-
-
-
-dgCollisionCompoundBreakable::dgDebriNodeInfo::dgDebriNodeInfo ()
-{
-	m_mesh = NULL;
-	m_shape = NULL;
-	memset (&m_commonData, 0, sizeof (m_commonData));
-}
-
-dgCollisionCompoundBreakable::dgDebriNodeInfo::~dgDebriNodeInfo ()
-{
-	if (m_shape) {
-		m_shape->Release();
-	}
-	
-	if (m_mesh) {
-		m_mesh->Release();
-	}
-}
-
-dgCollisionCompoundBreakable::dgSharedNodeMesh::dgSharedNodeMesh ()
-{
-}
-
-dgCollisionCompoundBreakable::dgSharedNodeMesh::~dgSharedNodeMesh ()
-{
-}
 
 
 dgCollisionCompoundBreakable::dgDebriGraph::dgDebriGraph (dgMemoryAllocator* const allocator)
@@ -385,6 +206,8 @@ dgCollisionCompoundBreakable::dgDebriGraph::dgDebriGraph (dgMemoryAllocator* con
 dgCollisionCompoundBreakable::dgDebriGraph::dgDebriGraph (dgMemoryAllocator* const allocator, dgDeserialize callback, void* const userData)
 	:dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>(allocator)
 {
+	dgAssert (0);
+/*
 	dgInt32 count;
 	dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* node;
 
@@ -415,6 +238,7 @@ dgCollisionCompoundBreakable::dgDebriGraph::dgDebriGraph (dgMemoryAllocator* con
 			nodesMap[i]->GetInfo().AddEdge (nodesMap[pool[j]]);
 		}
 	}
+*/
 }
 
 
@@ -422,6 +246,8 @@ dgCollisionCompoundBreakable::dgDebriGraph::dgDebriGraph (dgMemoryAllocator* con
 dgCollisionCompoundBreakable::dgDebriGraph::dgDebriGraph (const dgDebriGraph& source)
 	:dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>(source.GetAllocator())
 {
+	dgAssert (0);
+/*
 	dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* newNode;
 	dgTree<dgListNode*,dgListNode*> filter(GetAllocator());   
 
@@ -453,20 +279,19 @@ dgCollisionCompoundBreakable::dgDebriGraph::dgDebriGraph (const dgDebriGraph& so
 			myNode->GetInfo().AddEdge (otherNode);
 		}
 	}
+*/
 }
-
-
-
 
 
 dgCollisionCompoundBreakable::dgDebriGraph::~dgDebriGraph ()
 {
+	dgAssert (0);
 }
-
-
 
 void dgCollisionCompoundBreakable::dgDebriGraph::Serialize(dgSerialize callback, void* const userData) const
 {
+	dgAssert (0);
+/*
 	dgInt32 lru;
 	dgInt32 index;
 	dgInt32 count;
@@ -508,136 +333,16 @@ void dgCollisionCompoundBreakable::dgDebriGraph::Serialize(dgSerialize callback,
 		}
 		callback (userData, &pool[0], size_t (count * sizeof (dgInt32)));
 	}
-}
-
-
-void dgCollisionCompoundBreakable::dgDebriGraph::AddNode (
-	dgFlatVertexArray& flatArray, 
-	dgMeshEffect* solid, 
-	dgInt32 clipperMaterial, 
-	dgInt32 id,
-	dgFloat32 density,
-	dgFloat32 padding)
-{
-	dgAssert (0);
-/*
-	dgCollision* collision;
-
-	collision =  solid->CreateConvexCollision(dgFloat32 (0.005f), id, padding, dgGetIdentityMatrix());
-	dgAssert (collision);
-	if (collision) {
-		dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* node;
-		dgInt32 vertexCount;
-		dgInt32 baseVertexCount;
-		dgCollision* collisionInstance;
-		dgMeshEffect::dgIndexArray* geometryHandle;
-
-		node =  dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>::AddNode ();
-		dgDebriNodeInfo& data = node->GetInfo().m_nodeData;
-		
-		collisionInstance = new (GetAllocator()) dgCollisionConvexIntance ((dgCollisionConvex*) collision, node, density);
-		collision->Release();
-
-		data.m_mesh = new (GetAllocator()) dgMesh(GetAllocator());
-		data.m_shape = (dgCollisionConvex*)collisionInstance;
-
-		vertexCount = solid->GetPropertiesCount() * 6;
-		dgStack<dgVector>vertex (vertexCount);
-		dgStack<dgVector>normal (vertexCount);
-		dgStack<dgVector>uv0 (vertexCount);
-		dgStack<dgVector>uv1 (vertexCount);
-
-		solid->GetVertexStreams (sizeof (dgVector), &vertex[0].m_x, sizeof (dgVector), &normal[0].m_x, sizeof (dgVector), &uv0[0].m_x, sizeof (dgVector), &uv1[0].m_x);
-		
-		// extract the materials index array for mesh
-		geometryHandle = solid->MaterialGeomteryBegin();
-
-		data.m_mesh->m_IsVisible = 0;
-		vertexCount = flatArray.m_count;
-		baseVertexCount = flatArray.m_count;
-		for (dgInt32 handle = solid->GetFirstMaterial (geometryHandle); handle != -1; handle = solid->GetNextMaterial (geometryHandle, handle)) {
-			dgInt32 isVisible;
-			dgInt32 material; 
-			dgInt32 indexCount; 
-			dgSubMesh* segment;
-
-//			isVisible = 1;
-			material = solid->GetMaterialID (geometryHandle, handle);
-//			if (material == clipperMaterial) {
-//				isVisible = 0;
-//			}
-			isVisible = (material != clipperMaterial) ? 1 : 0;
-			data.m_mesh->m_IsVisible |= isVisible;
-
-			indexCount = solid->GetMaterialIndexCount (geometryHandle, handle);
-			segment = data.m_mesh->AddgSubMesh(indexCount, material);
-			segment->m_visibleFaces = isVisible;
-
-			solid->GetMaterialGetIndexStream (geometryHandle, handle, segment->m_indexes);
-			for (dgInt32 i = 0; i < indexCount; i ++) {
-				dgInt32 j;
-				j = segment->m_indexes[i];
-				flatArray[vertexCount].m_point[0] = vertex[j].m_x;
-				flatArray[vertexCount].m_point[1] = vertex[j].m_y;
-				flatArray[vertexCount].m_point[2] = vertex[j].m_z;
-				flatArray[vertexCount].m_point[3] = normal[j].m_x;
-				flatArray[vertexCount].m_point[4] = normal[j].m_y;
-				flatArray[vertexCount].m_point[5] = normal[j].m_z;
-				flatArray[vertexCount].m_point[6] = uv0[j].m_x;
-				flatArray[vertexCount].m_point[7] = uv0[j].m_y;
-				flatArray[vertexCount].m_point[8] = uv1[j].m_x;
-				flatArray[vertexCount].m_point[9] = uv1[j].m_y;
-				segment->m_indexes[i] = vertexCount - baseVertexCount; 
-				vertexCount ++;
-		//		dgAssert ((vertexCount - baseVertexCount) < dgInt32 (indexBuffer.GetElementsCount()));
-			}
-		}
-		solid->MaterialGeomteryEnd(geometryHandle);
-
-		dgStack<dgInt32> indexBuffer (vertexCount - baseVertexCount);
-		flatArray.m_count += dgVertexListToIndexList (&flatArray[baseVertexCount].m_point[0], sizeof (dgFlatVertex), sizeof (dgFlatVertex), 0, vertexCount - baseVertexCount, &indexBuffer[0], dgFloat32 (1.0e-6f));
-
-		for (dgMesh::dgListNode* meshSgement = data.m_mesh->GetFirst(); meshSgement; meshSgement = meshSgement->GetNext()) {
-			dgSubMesh* const subMesh = &meshSgement->GetInfo();
-			for (dgInt32 i = 0; i < subMesh->m_faceCount * 3; i ++) {
-				dgInt32 j;
-				j = subMesh->m_indexes[i];  
-				subMesh->m_indexes[i] = baseVertexCount + indexBuffer[j];
-			}
-		}
-	}
 */
 }
-
-
-void dgCollisionCompoundBreakable::dgDebriGraph::AddMeshes (
-	dgFlatVertexArray& vertexArray, 
-	dgInt32 count, 
-	const dgMeshEffect* const solidArray[], 
-	const dgInt32* const idArray,
-	const dgFloat32* const densities,
-	const dgInt32* const internalFaceMaterial,
-	dgFloat32 padding)
-{
-//padding = 0.0f;
-
-	dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* fixNode;
-
-	fixNode =  dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>::AddNode ();
-	for (dgInt32 i = 0; i < count; i ++) {
-		AddNode(vertexArray, (dgMeshEffect*) solidArray[i], internalFaceMaterial[i], idArray[i], densities[i], padding);
-	}
-}
-
-
-
 
 
 
 
 dgCollisionCompoundBreakable::dgCollisionCompoundBreakable (dgWorld* const world, dgDeserialize deserialization, void* const userData)
-	:dgCollisionCompound (world, deserialization, userData), m_conectivity(world->GetAllocator(), deserialization, userData),
-	 m_detachedIslands(world->GetAllocator())
+	:dgCollisionCompound (world, deserialization, userData)
+	,m_conectivity(world->GetAllocator(), deserialization, userData)
+//	,m_detachedIslands(world->GetAllocator())
 {
 	dgAssert (0);
 /*
@@ -671,11 +376,11 @@ dgCollisionCompoundBreakable::dgCollisionCompoundBreakable (dgWorld* const world
 */
 }
 
-
+/*
 void dgCollisionCompoundBreakable::LinkNodes ()
 {
 	dgAssert (0);
-/*
+
 	dgInt32 stack;
 	dgNodeBase* pool[DG_COMPOUND_STACK_DEPTH];
 
@@ -709,7 +414,6 @@ void dgCollisionCompoundBreakable::LinkNodes ()
 			stack ++;
 		} 
 	}
-*/
 }
 
 
@@ -728,16 +432,16 @@ void dgCollisionCompoundBreakable::Serialize(dgSerialize callback, void* const u
 	callback (userData, m_visibilityInderectMap, size_t (m_visibilityMapIndexCount * dgInt32 (sizeof (dgInt32))));
 
 	m_vertexBuffer->Serialize(callback, userData);
+
 }
+
 
 void dgCollisionCompoundBreakable::GetCollisionInfo(dgCollisionInfo* const info) const
 {
-	dgCollisionCompound::GetCollisionInfo (info);
-	info->m_collisionType = m_compoundBreakable;
+	dgAssert(0);
+//	dgCollisionCompound::GetCollisionInfo (info);
+//	info->m_collisionType = m_compoundBreakable;
 }
-
-
-
 
 
 dgInt32 dgCollisionCompoundBreakable::GetSegmentIndexStreamShort (dgDebriGraph::dgListNode* const node, dgMesh::dgListNode* subMeshNode, dgInt16* const index) const
@@ -810,17 +514,8 @@ dgInt32 dgCollisionCompoundBreakable::GetSegmentIndexStream (dgDebriGraph::dgLis
 }
 
 
-
-
-
-
-
-
 dgInt32 dgCollisionCompoundBreakable::GetSegmentsInRadius (const dgVector& origin, dgFloat32 radius, dgDebriGraph::dgListNode** segments, dgInt32 maxCount)
 {
-	dgAssert (0);
-	return 0;
-/*
 	dgInt32 count;
 	dgInt32 stack;
 	dgNodeBase* stackPool[DG_COMPOUND_STACK_DEPTH];
@@ -880,16 +575,14 @@ dgInt32 dgCollisionCompoundBreakable::GetSegmentsInRadius (const dgVector& origi
 //count = 1;
 
 	return count;
-*/
 }
 
 
-/*
 dgInt32 dgCollisionCompoundBreakable::GetDetachedPieces (dgCollision** shapes, dgInt32 maxCount)
 {
 
 }
-*/
+
 
 void dgCollisionCompoundBreakable::EnumerateIslands ()
 {
@@ -950,8 +643,6 @@ void dgCollisionCompoundBreakable::ResetAnchor ()
 
 void dgCollisionCompoundBreakable::SetAnchoredParts (dgInt32 count, const dgMatrix* const matrixArray, const dgCollision** collisionArray)
 {
-	dgAssert(0);
-/*
 	dgDebriGraph::dgListNode* fixNode;
 	dgMatrix matrix (dgGetIdentityMatrix());
 
@@ -1021,14 +712,11 @@ void dgCollisionCompoundBreakable::SetAnchoredParts (dgInt32 count, const dgMatr
 			}
 		}
 	}
-*/
 }
 
 
 void dgCollisionCompoundBreakable::DeleteComponent (dgDebriGraph::dgListNode* node)
 {
-	dgAssert (0);
-/*
 	dgMesh* mesh;
 	dgNodeBase* treeNode;
 	dgCollisionConvexIntance* shape;
@@ -1081,15 +769,11 @@ void dgCollisionCompoundBreakable::DeleteComponent (dgDebriGraph::dgListNode* no
 	treeNode = shape->m_treeNode;
 	((dgCollisionConvexIntance*) m_array[m_count - 1])->m_treeNode->m_id = treeNode->m_id;
 	RemoveCollision (treeNode);
-*/
 }
 
 
 dgBody* dgCollisionCompoundBreakable::CreateComponentBody (dgDebriGraph::dgListNode* node) const
 {
-	dgAssert (0);
-	return NULL;
-/*
 	dgFloat32 Ixx;
 	dgFloat32 Iyy;
 	dgFloat32 Izz;
@@ -1130,9 +814,7 @@ Izz = shape->m_inertia.m_z/shape->m_inertia.m_w;
 	body->SetAparentMassMatrix (dgVector (Ixx, Iyy, Izz, mass));
 
 	return body;
-*/
 }
-
 
 
 void dgCollisionCompoundBreakable::DeleteComponentBegin ()
@@ -1241,7 +923,7 @@ xxxx ++;
 	}
 
 
-/*
+#if 0
 m_conectivity.GetFirst()->GetInfo().Trace();
 dgInt32 count;	
 dgDebriGraph::dgListNode* stack[1024 * 4];
@@ -1270,29 +952,22 @@ while (count) {
 for (dgDebriGraph::dgListNode* node = m_conectivity.GetFirst(); node != m_conectivity.GetLast(); node = node->GetNext()) {
 //	dgAssert (node->GetInfo().m_nodeData.m_commonData.m_lru == m_lru);
 }
+#endif
+}
 */
 
-	
-
-}
-
-
-#endif
 
 
 dgCollisionCompoundBreakable::~dgCollisionCompoundBreakable(void)
 {
-	dgAssert (0);
-/*
 	if (m_visibilityMap) {
 		m_allocator->Free (m_visibilityMap);
-		m_allocator->Free (m_visibilityInderectMap);
+		m_allocator->Free (m_visibilityIndirectMap);
 	}
 
 	if (m_vertexBuffer) {
 		m_vertexBuffer->Release();
 	}
-*/
 }
 
 
@@ -1733,11 +1408,279 @@ for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; n
 };
 
 
+
+dgCollisionCompoundBreakable::dgDebriNodeInfo::dgDebriNodeInfo ()
+	:m_mesh(NULL)
+	,m_shapeNode(NULL)
+{
+//	memset (&m_commonData, 0, sizeof (m_commonData));
+}
+
+dgCollisionCompoundBreakable::dgDebriNodeInfo::~dgDebriNodeInfo ()
+{
+//	if (m_shape) {
+//		m_shape->Release();
+//	}
+
+	if (m_mesh) {
+		m_mesh->Release();
+	}
+}
+
+
+dgCollisionCompoundBreakable::dgVertexBuffer::dgVertexBuffer(dgInt32 vertsCount, dgMemoryAllocator* allocator)
+	:m_allocator(allocator)
+	,m_vertexCount(vertsCount)
+{
+	m_uv = (dgFloat32 *) m_allocator->Malloc (2 * vertsCount * dgInt32 (sizeof (dgFloat32))); 
+	m_vertex = (dgFloat32 *) m_allocator->Malloc (3 * vertsCount * dgInt32 (sizeof (dgFloat32))); 
+	m_normal = (dgFloat32 *) m_allocator->Malloc (3 * vertsCount * dgInt32 (sizeof (dgFloat32))); 
+}
+
+dgCollisionCompoundBreakable::dgVertexBuffer::~dgVertexBuffer ()
+{
+	dgAssert(0);
+	m_allocator->Free (m_normal);
+	m_allocator->Free (m_vertex);
+	m_allocator->Free (m_uv);
+}
+
+dgCollisionCompoundBreakable::dgVertexBuffer::dgVertexBuffer (dgMemoryAllocator* const allocator, dgDeserialize callback, void* const userData)
+{
+	dgAssert(0);
+	m_allocator = allocator;
+	callback (userData, &m_vertexCount, dgInt32 (sizeof (dgInt32)));
+
+	m_uv = (dgFloat32 *) m_allocator->Malloc (2 * m_vertexCount * dgInt32 (sizeof (dgFloat32))); 
+	m_vertex = (dgFloat32 *) m_allocator->Malloc (3 * m_vertexCount * dgInt32 (sizeof (dgFloat32))); 
+	m_normal = (dgFloat32 *) m_allocator->Malloc (3 * m_vertexCount * dgInt32 (sizeof (dgFloat32))); 
+
+	callback (userData, m_vertex, size_t (3 * m_vertexCount * dgInt32 (sizeof (dgFloat32))));
+	callback (userData, m_normal, size_t (3 * m_vertexCount * dgInt32 (sizeof (dgFloat32))));
+	callback (userData, m_uv, size_t (2 * m_vertexCount * dgInt32 (sizeof (dgFloat32))));
+}
+
+void dgCollisionCompoundBreakable::dgVertexBuffer::Serialize(dgSerialize callback, void* const userData) const
+{
+	callback (userData, &m_vertexCount, dgInt32 (sizeof (dgInt32)));
+	callback (userData, m_vertex, size_t (3 * m_vertexCount * dgInt32 (sizeof (dgFloat32))));
+	callback (userData, m_normal, size_t (3 * m_vertexCount * dgInt32 (sizeof (dgFloat32))));
+	callback (userData, m_uv, size_t (2 * m_vertexCount * dgInt32 (sizeof (dgFloat32))));
+}
+
+
+void dgCollisionCompoundBreakable::dgVertexBuffer::GetVertexStreams (dgInt32 vertexStrideInByte, dgFloat32* vertex, dgInt32 normalStrideInByte, dgFloat32* normal,
+	dgInt32 uvStrideInByte, dgFloat32* uv) const
+{
+	uvStrideInByte /= dgInt32 (sizeof (dgFloat32));
+	vertexStrideInByte /= dgInt32 (sizeof (dgFloat32));
+	normalStrideInByte /= dgInt32 (sizeof (dgFloat32));
+	for (dgInt32 i = 0; i < m_vertexCount; i ++)	{
+		dgInt32 j = i * vertexStrideInByte;
+		vertex[j + 0] = m_vertex[i * 3 + 0];
+		vertex[j + 1] = m_vertex[i * 3 + 1];
+		vertex[j + 2] = m_vertex[i * 3 + 2];
+
+		j = i * normalStrideInByte;
+		normal[j + 0] = m_normal[i * 3 + 0];
+		normal[j + 1] = m_normal[i * 3 + 1];
+		normal[j + 2] = m_normal[i * 3 + 2];
+
+		j = i * uvStrideInByte;
+		uv[j + 0] = m_uv[i * 2 + 0];
+		uv[j + 1] = m_uv[i * 2 + 1];
+	}
+}
+
+
+dgCollisionCompoundBreakable::dgSubMesh::dgSubMesh (dgMemoryAllocator* const allocator)
+	:m_indexes(NULL)
+	,m_allocator(allocator)
+	,m_faceOffset(0)
+	,m_material(0)
+	,m_faceCount(0)
+	,m_visibleFaces(true)
+{
+}
+
+dgCollisionCompoundBreakable::dgSubMesh::~dgSubMesh ()
+{
+	if (m_indexes) {
+		m_allocator->Free (m_indexes);
+	}
+}
+
+void dgCollisionCompoundBreakable::dgSubMesh::Serialize(dgSerialize callback, void* const userData) const
+{
+	dgAssert(0);
+/*
+	callback (userData, &m_material, dgInt32 (sizeof (dgInt32)));
+	callback (userData, &m_faceCount, dgInt32 (sizeof (dgInt32)));
+	callback (userData, &m_faceOffset, dgInt32 (sizeof (dgInt32)));
+	callback (userData, &m_visibleFaces, dgInt32 (sizeof (dgInt32)));
+	callback (userData, m_indexes, size_t (3 * m_faceCount * dgInt32 (sizeof (dgInt32))));
+*/
+}
+
+dgCollisionCompoundBreakable::dgSharedNodeMesh::dgSharedNodeMesh ()
+{
+}
+
+dgCollisionCompoundBreakable::dgSharedNodeMesh::~dgSharedNodeMesh ()
+{
+}
+
+
+dgCollisionCompoundBreakable::dgMesh::dgMesh(dgMemoryAllocator* const allocator)
+	:dgList<dgSubMesh>(allocator)
+	,m_IsVisible(false)
+{
+}
+
+dgCollisionCompoundBreakable::dgMesh::~dgMesh()
+{
+}
+
+dgCollisionCompoundBreakable::dgMesh::dgMesh (dgMemoryAllocator* const allocator, dgDeserialize callback, void* const userData)
+	:dgList<dgSubMesh>(allocator), dgRefCounter ()
+{
+	dgAssert(0);
+	/*
+
+	dgInt32 count;
+
+	callback (userData, &m_IsVisible, dgInt32 (sizeof (dgInt32)));
+	callback (userData, &count, dgInt32 (sizeof (dgInt32)));
+	for (dgInt32 i = 0; i < count; i ++) {
+		dgInt32 material;
+		dgInt32 faceCount;
+		dgInt32 faceOffset;
+		dgInt32 exteriorFaces;
+
+		callback (userData, &material, dgInt32 (sizeof (dgInt32)));
+		callback (userData, &faceCount, dgInt32 (sizeof (dgInt32)));
+		callback (userData, &faceOffset, dgInt32 (sizeof (dgInt32)));
+		callback (userData, &exteriorFaces, dgInt32 (sizeof (dgInt32)));
+		dgSubMesh* const subMesh = AddgSubMesh (faceCount * 3, material);
+
+		subMesh->m_faceOffset = faceOffset;
+		subMesh->m_visibleFaces = exteriorFaces;
+
+		//		callback (userData, subMesh->m_visibilityMap, faceCount * dgInt32 (sizeof (dgInt32)));
+		callback (userData, subMesh->m_indexes, size_t (3 * faceCount * sizeof (dgInt32)));
+	}
+*/
+}
+
+void dgCollisionCompoundBreakable::dgMesh::Serialize(dgSerialize callback, void* const userData) const
+{
+	dgAssert(0);
+/*
+	dgInt32 count;
+	count = GetCount();
+
+	callback (userData, &m_IsVisible, dgInt32 (sizeof (dgInt32)));
+	callback (userData, &count, dgInt32 (sizeof (dgInt32)));
+	for (dgListNode* node = GetFirst(); node; node = node->GetNext()) {
+		dgSubMesh& subMesh = node->GetInfo();
+		subMesh.Serialize(callback, userData);
+	}
+*/
+}
+
+dgCollisionCompoundBreakable::dgSubMesh* dgCollisionCompoundBreakable::dgMesh::AddgSubMesh(dgInt32 indexCount, dgInt32 material)
+{
+	dgSubMesh tmp (GetAllocator());
+	dgSubMesh& subMesh = Append(tmp)->GetInfo();
+
+	subMesh.m_faceOffset = 0;
+	subMesh.m_visibleFaces = true;
+
+	subMesh.m_material = material;
+	subMesh.m_faceCount = indexCount / 3;
+
+	subMesh.m_indexes = (dgInt32 *) subMesh.m_allocator->Malloc (indexCount * dgInt32 (sizeof (dgInt32))); 
+	return &subMesh;
+}
+
+
+ dgCollisionCompoundBreakable::dgDebriGraph::dgListNode* dgCollisionCompoundBreakable::dgDebriGraph::AddNode (dgFlatVertexArray& vertexArray, dgMeshEffect* const factureVisualMesh, dgTreeArray::dgTreeNode* const collisionNode, dgInt32 interiorMaterialBase)
+{
+	dgListNode* const node = dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>::AddNode ();
+	dgDebriNodeInfo& data = node->GetInfo().m_nodeData;
+
+	data.m_mesh = new (GetAllocator()) dgMesh(GetAllocator());
+	data.m_shapeNode = collisionNode;
+
+	dgInt32 vertexCount = factureVisualMesh->GetPropertiesCount();
+
+	dgStack<dgVector>vertex (vertexCount);
+	dgStack<dgVector>normal (vertexCount);
+	dgStack<dgVector>uv0 (vertexCount);
+	dgStack<dgVector>uv1 (vertexCount);
+	factureVisualMesh->GetVertexStreams (sizeof (dgVector), &vertex[0].m_x, sizeof (dgVector), &normal[0].m_x, sizeof (dgVector), &uv0[0].m_x, sizeof (dgVector), &uv1[0].m_x);
+		
+	// extract the materials index array for mesh
+	dgMeshEffect::dgIndexArray* const geometryHandle = factureVisualMesh->MaterialGeometryBegin();
+
+	vertexCount = vertexArray.m_count;
+	dgInt32 baseVertexCount = vertexArray.m_count;
+	for (dgInt32 handle = factureVisualMesh->GetFirstMaterial (geometryHandle); handle != -1; handle = factureVisualMesh->GetNextMaterial (geometryHandle, handle)) {
+		dgInt32 material = factureVisualMesh->GetMaterialID (geometryHandle, handle);
+
+		bool isVisible = (material < interiorMaterialBase) ? true : false;
+		data.m_mesh->m_IsVisible |= isVisible;
+
+		dgInt32 indexCount = factureVisualMesh->GetMaterialIndexCount (geometryHandle, handle);
+		dgSubMesh* const segment = data.m_mesh->AddgSubMesh(indexCount, isVisible ? material : material - interiorMaterialBase);
+		segment->m_visibleFaces = isVisible;
+
+		factureVisualMesh->GetMaterialGetIndexStream (geometryHandle, handle, segment->m_indexes);
+		for (dgInt32 i = 0; i < indexCount; i ++) {
+			dgInt32 j = segment->m_indexes[i];
+			vertexArray[vertexCount].m_point[0] = vertex[j].m_x;
+			vertexArray[vertexCount].m_point[1] = vertex[j].m_y;
+			vertexArray[vertexCount].m_point[2] = vertex[j].m_z;
+			vertexArray[vertexCount].m_point[3] = normal[j].m_x;
+			vertexArray[vertexCount].m_point[4] = normal[j].m_y;
+			vertexArray[vertexCount].m_point[5] = normal[j].m_z;
+			vertexArray[vertexCount].m_point[6] = uv0[j].m_x;
+			vertexArray[vertexCount].m_point[7] = uv0[j].m_y;
+			vertexArray[vertexCount].m_point[8] = uv1[j].m_x;
+			vertexArray[vertexCount].m_point[9] = uv1[j].m_y;
+			segment->m_indexes[i] = vertexCount - baseVertexCount; 
+			vertexCount ++;
+		}
+	}
+	factureVisualMesh->MaterialGeomteryEnd(geometryHandle);
+
+	dgStack<dgInt32> indexBuffer (vertexCount - baseVertexCount);
+	vertexArray.m_count += dgVertexListToIndexList (&vertexArray[baseVertexCount].m_point[0], sizeof (dgFlatVertex), sizeof (dgFlatVertex), 0, vertexCount - baseVertexCount, &indexBuffer[0], dgFloat32 (1.0e-6f));
+
+	for (dgMesh::dgListNode* meshSgement = data.m_mesh->GetFirst(); meshSgement; meshSgement = meshSgement->GetNext()) {
+		dgSubMesh* const subMesh = &meshSgement->GetInfo();
+		for (dgInt32 i = 0; i < subMesh->m_faceCount * 3; i ++) {
+			dgInt32 j = subMesh->m_indexes[i];  
+			subMesh->m_indexes[i] = baseVertexCount + indexBuffer[j];
+		}
+	}
+
+	return node;
+}
+
+
+
+
 dgCollisionCompoundBreakable::dgCollisionCompoundBreakable (const dgCollisionCompoundBreakable& source)
 //	:dgCollisionCompound(source), m_conectivity(source.m_conectivity), m_detachedIslands(source.m_conectivity.GetAllocator())
     :dgCollisionCompound(source)
+	,m_conectivity(source.m_conectivity)
+	,m_vertexBuffer(source.m_vertexBuffer)
+	,m_visibilityMapIndexCount(source.m_visibilityMapIndexCount)
 {
 	dgAssert (0);
+
+	m_vertexBuffer->AddRef();
 /*
 	dgInt32 stack;
 	dgNodeBase* stackPool[DG_COMPOUND_STACK_DEPTH];
@@ -1755,7 +1698,7 @@ dgCollisionCompoundBreakable::dgCollisionCompoundBreakable (const dgCollisionCom
 	 
 
 	m_vertexBuffer = source.m_vertexBuffer;
-	m_vertexBuffer->AddRef();
+	
 	m_collisionId = m_compoundBreakable;
 	m_rtti |= dgCollisionCompoundBreakable_RTTI;
 
@@ -1819,49 +1762,19 @@ dgCollisionCompoundBreakable::dgCollisionCompoundBreakable (const dgCollisionCom
 
 dgCollisionCompoundBreakable::dgCollisionCompoundBreakable (dgWorld* const world, dgMeshEffect* const solidMesh, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& offsetMatrix)
 	:dgCollisionCompound (world)
-//	dgInt32 count, const dgMeshEffect* const solidArray[],
-//	const dgInt32* const idArray, const dgFloat32* const densities, const dgInt32* const internalFaceMaterial,
-//	dgInt32 debriiId, dgFloat32 collisionPadding,
-//	dgWorld* world)
-//	:dgCollisionCompound(world), m_conectivity (world->GetAllocator()), m_detachedIslands(world->GetAllocator())
+	,m_conectivity(world->GetAllocator())
+	,m_vertexBuffer(NULL)
 {
 	m_rtti |= dgCollisionCompoundBreakable_RTTI;
 
-//	dgInt32 acc;
-//	dgInt32 indexCount;
-//	dgInt32 vertsCount;
-//	dgInt32 materialHitogram[256];
-//	dgInt32 faceOffsetHitogram[256];
-//	dgSubMesh* mainSegmenst[256];
-//	dgMesh* mainMesh;
-//	dgFlatVertexArray vertexArray(m_world->GetAllocator());
- 
-//	m_lru = 0;
-//	m_lastIslandColor = 0;
-//	m_visibilityMapIndexCount = 0;
-//	m_vertexBuffer = NULL;
-//	m_visibilityMap = NULL;
-//	m_visibilityInderectMap = NULL;
-//	m_collisionId = m_compoundBreakable;
-//	m_rtti |= dgCollisionCompoundBreakable_RTTI;
-//	if (collisionPadding < dgFloat32 (0.01f)) {
-//		collisionPadding = dgFloat32 (0.01f);
-//	}
-//	m_conectivity.AddMeshes (vertexArray, count, solidArray, idArray, densities, internalFaceMaterial, collisionPadding);
+	dgInt32 interiorMaterialBase = 1000;
+	dgFractureBuilder fractureBuilder (GetAllocator(), solidMesh, pointcloudCount, vertexCloud, strideInBytes, materialID + interiorMaterialBase, offsetMatrix);
 
-//	NewtonMesh* const debriMeshPieces = NewtonMeshCreateVoronoiConvexDecomposition (m_world, count, &points[0].m_x, sizeof (dVector), interiorMaterial, &textureMatrix[0][0]);
-//	dAssert (debriMeshPieces);
-//	dgFloat32 normalAngleInRadians = 30.0f * 3.1416f / 180.0f;
+	dgFlatVertexArray vertexArray(m_world->GetAllocator());
+	dgTree<dgDebriGraph::dgListNode*, dgInt32> conectinyMap(GetAllocator());
 
-//pointcloudCount = 0;
-	dgFractureBuilder fractureBuilder (GetAllocator(), solidMesh, pointcloudCount, vertexCloud, strideInBytes, materialID, offsetMatrix);
-
-//	dgStack<dgCollisionConvex*> shapeArrayPool (fractureBuilder.GetCount());
-//	dgCollisionConvex** const shapeArray = &shapeArrayPool[0];
+	m_conectivity.dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>::AddNode ();
 	
-//	indexCount = 0;
-//	for (dgDebriGraph::dgListNode* node = m_conectivity.GetFirst()->GetNext(); node; node = node->GetNext()) {
-//    dgStack<dgCollisionConvex*> shapeArrayPool (fractureBuilder.GetCount());
     BeginAddRemove ();
     for (dgFractureBuilder::dgFractureConectivity::dgListNode* node = fractureBuilder.m_conectivity.GetFirst(); node; node = node->GetNext()) {
         dgInt32 index = node->GetInfo().m_nodeData;
@@ -1869,23 +1782,27 @@ dgCollisionCompoundBreakable::dgCollisionCompoundBreakable (dgWorld* const world
         dgAssert (fractureNode);
         dgMeshEffect* const fractureSubMesh = fractureNode->GetInfo();
         dgCollisionInstance* const collisionInstance = fractureSubMesh->CreateConvexCollision(world, dgFloat32 (1.0e-5f), fracturePhysicsMaterialID);
-        dgTree<dgNodeBase*, dgInt32>::dgTreeNode* const shapeNode = AddCollision (collisionInstance);
-        collisionInstance->Release();
-
-//		dgDebriNodeInfo& data = node->GetInfo().m_nodeData;
-//		shapeArray[indexCount] = data.m_shape;
-//		indexCount ++;
+		dgTreeArray::dgTreeNode* const shapeNode = AddCollision (collisionInstance);
+		dgDebriGraph::dgListNode* const conectivityNode = m_conectivity.AddNode(vertexArray, fractureSubMesh, shapeNode, interiorMaterialBase);
+		conectinyMap.Insert(conectivityNode, index);
+		collisionInstance->Release();
 	}
     EndAddRemove ();
 
-/*
-	if (indexCount) {
-		m_root = BuildTree(indexCount, &shapeArray[0]);
+	for (dgFractureBuilder::dgFractureConectivity::dgListNode* node = fractureBuilder.m_conectivity.GetFirst(); node; node = node->GetNext()) {
+		dgInt32 index0 = node->GetInfo().m_nodeData;
+		dgDebriGraph::dgListNode* const conectivityNode0 = conectinyMap.Find(index0)->GetInfo();
+		for (dgGraphNode<int, int>::dgListNode* edge = node->GetInfo().GetFirst(); edge; edge = edge->GetNext()) {
+			dgFractureBuilder::dgFractureConectivity::dgListNode* const otherNode = edge->GetInfo().m_node;
+			dgInt32 index1 = otherNode->GetInfo().m_nodeData;
+			dgDebriGraph::dgListNode* const conectivityNode1 = conectinyMap.Find(index1)->GetInfo();
+			conectivityNode0->GetInfo().AddEdge(conectivityNode1);
+			conectivityNode1->GetInfo().AddEdge(conectivityNode0);
+		}
 	}
-	Init (indexCount, &shapeArray[0]);
 
 	dgStack<dgInt32> indexBuffer (vertexArray.m_count);
-	vertsCount = dgVertexListToIndexList (&vertexArray[0].m_point[0], sizeof (dgFlatVertex), sizeof (dgFlatVertex), 0, vertexArray.m_count, &indexBuffer[0], dgFloat32 (1.0e-6f));
+	dgInt32 vertsCount = dgVertexListToIndexList (&vertexArray[0].m_point[0], sizeof (dgFlatVertex), sizeof (dgFlatVertex), 0, vertexArray.m_count, &indexBuffer[0], dgFloat32 (1.0e-6f));
 
 	m_vertexBuffer = new (m_world->GetAllocator()) dgVertexBuffer(vertsCount, m_world->GetAllocator());
 	for (dgInt32 i = 0; i < vertsCount; i ++) {
@@ -1899,28 +1816,31 @@ dgCollisionCompoundBreakable::dgCollisionCompoundBreakable (dgWorld* const world
 		m_vertexBuffer->m_uv[i * 2 + 1] = vertexArray[i].m_point[7];
 	}
 
+	dgSubMesh* mainSegmenst[256];
+	dgInt32 materialHitogram[256];
+	dgInt32 faceOffsetHitogram[256];
+
 	memset (materialHitogram, 0, sizeof (materialHitogram));
 	memset (faceOffsetHitogram, 0, sizeof (faceOffsetHitogram));
 	memset (mainSegmenst, 0, sizeof (mainSegmenst));
+
 	for (dgDebriGraph::dgListNode* node = m_conectivity.GetFirst()->GetNext(); node; node = node->GetNext()) {
 		dgDebriNodeInfo& data = node->GetInfo().m_nodeData;
 		for (dgMesh::dgListNode* meshSgement = data.m_mesh->GetFirst(); meshSgement; meshSgement = meshSgement->GetNext()) {
-			dgInt32 material;
 			dgSubMesh* const subMesh = &meshSgement->GetInfo();
-			material = subMesh->m_material;
+			dgInt32 material = subMesh->m_material;
 			materialHitogram[material] += subMesh->m_faceCount;
 		}
 	}
-
 	dgDebriNodeInfo& mainNodeData = m_conectivity.dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>::AddNode()->GetInfo().m_nodeData;
 
-	acc = 0;
-	mainMesh = new (m_world->GetAllocator()) dgMesh(m_world->GetAllocator());
+	dgInt32 acc = 0;
+	dgMesh* const mainMesh = new (m_world->GetAllocator()) dgMesh(m_world->GetAllocator());
 	mainNodeData.m_mesh = mainMesh;
+
 	for (dgInt32 i = 0; i < 256; i ++) {
 		if (materialHitogram[i]) {
-			dgSubMesh* segment;
-			segment = mainMesh->AddgSubMesh(materialHitogram[i] * 3, i);
+			dgSubMesh* const segment = mainMesh->AddgSubMesh(materialHitogram[i] * 3, i);
 			segment->m_faceOffset = acc;
 			segment->m_faceCount = 0;
 			mainSegmenst[i] = segment;
@@ -1929,35 +1849,27 @@ dgCollisionCompoundBreakable::dgCollisionCompoundBreakable (dgWorld* const world
 		acc += materialHitogram[i];
 	}
 
-
 	m_visibilityMapIndexCount = acc;
-	m_visibilityMap = (dgInt8*) m_allocator->Malloc (dgInt32 (acc * sizeof (dgInt8)));
-	m_visibilityInderectMap = (dgInt32*) m_allocator->Malloc (acc * dgInt32 (sizeof (dgInt32)));
-	acc = 0;
 
+	m_visibilityMap = (dgInt8*) m_allocator->Malloc (dgInt32 (acc * sizeof (dgInt8)));
+	m_visibilityIndirectMap = (dgInt32*) m_allocator->Malloc (acc * dgInt32 (sizeof (dgInt32)));
+	acc = 0;
 	for (dgDebriGraph::dgListNode* node = m_conectivity.GetFirst()->GetNext(); node != m_conectivity.GetLast(); node = node->GetNext() ) {
 		dgDebriNodeInfo& data = node->GetInfo().m_nodeData;
-
 		for (dgMesh::dgListNode* node = data.m_mesh->GetFirst(); node; node = node->GetNext()) {
-			dgInt8 visbility;
-			dgInt32 rootIndexCount;
-
 			dgSubMesh& segment = node->GetInfo();
 			dgSubMesh& rootSegment = *mainSegmenst[segment.m_material];
-
-			visbility = dgInt8 (segment.m_visibleFaces);
+			bool visbility = segment.m_visibleFaces;
 
 			memset (&m_visibilityMap[acc], visbility, size_t (segment.m_faceCount));
 			for (dgInt32 i = 0; i < segment.m_faceCount; i ++) {
-				m_visibilityInderectMap[faceOffsetHitogram[segment.m_material] + i] = acc + i;
+				m_visibilityIndirectMap[faceOffsetHitogram[segment.m_material] + i] = acc + i;
 			}
 			faceOffsetHitogram[segment.m_material] += segment.m_faceCount;
 
-			rootIndexCount = rootSegment.m_faceCount * 3;
+			dgInt32 rootIndexCount = rootSegment.m_faceCount * 3;
 			for (dgInt32 i = 0; i < segment.m_faceCount * 3; i ++) {
-				dgInt32 j;
-
-				j = segment.m_indexes[i];
+				dgInt32 j = segment.m_indexes[i];
 				segment.m_indexes[i] = indexBuffer[j];
 				rootSegment.m_indexes[rootIndexCount] = indexBuffer[j];
 				rootIndexCount ++;
@@ -1969,77 +1881,11 @@ dgCollisionCompoundBreakable::dgCollisionCompoundBreakable (dgWorld* const world
 			acc += segment.m_faceCount;
 		}
 	}
-	LinkNodes ();	
 
-	dgMatrix matrix (dgGetIdentityMatrix());
-	for (dgDebriGraph::dgListNode* node = m_conectivity.GetFirst()->GetNext(); node != m_conectivity.GetLast(); node = node->GetNext()) {
-		dgInt32 stack;
-		dgCollisionConvexIntance* myShape;
-		dgNodeBase* pool[DG_COMPOUND_STACK_DEPTH];
+//	LinkNodes ();	
+//	ResetAnchor ();
+//  m_conectivity.Trace();
 
-		myShape = (dgCollisionConvexIntance*) node->GetInfo().m_nodeData.m_shape;
-		pool[0] = m_root;
-		stack = 1;
-
-		dgVector p0 (myShape->m_treeNode->m_p0);
-		dgVector p1 (myShape->m_treeNode->m_p1);
-
-		p0 -= dgVector (dgFloat32 (1.0e-2f), dgFloat32 (1.0e-2f), dgFloat32 (1.0e-2f), dgFloat32 (0.0f));
-		p1 += dgVector (dgFloat32 (1.0e-2f), dgFloat32 (1.0e-2f), dgFloat32 (1.0e-2f), dgFloat32 (0.0f));
-
-		while (stack) {
-			dgNodeBase* treeNode;
-			stack --;
-			treeNode = pool[stack];
-			if (dgOverlapTest (p0, p1, treeNode->m_p0, treeNode->m_p1)) {
-				if (treeNode->m_type == m_leaf) {
-					dgCollisionConvexIntance* otherShape;
-					otherShape = (dgCollisionConvexIntance*) treeNode->m_shape;
-					if (otherShape->m_graphNode != node) {
-						dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* adjacentEdge;
-	//					dgAssert (otherShape->m_graphNode != node) 
-						for (adjacentEdge = node->GetInfo().GetFirst(); adjacentEdge; adjacentEdge = adjacentEdge->GetNext()) {
-							if (adjacentEdge->GetInfo().m_node == otherShape->m_graphNode) {
-								break;
-							}
-						}
-						if (!adjacentEdge) {
-							dgInt32 disjoint;
-							dgTriplex normal;
-							dgTriplex contactA; 
-							dgTriplex contactB; 
-							const dgFloat32 minSeparation = dgFloat32 (2.0f) * collisionPadding + dgFloat32 (0.05f);
-							const dgFloat32 minSeparation2 = minSeparation * minSeparation;
-
-							disjoint = world->ClosestPoint (myShape, matrix, otherShape, matrix, contactA, contactB, normal, 0);
-							if (disjoint) {
-								dgVector qA (contactA.m_x, contactA.m_y, contactA.m_z, dgFloat32 (0.0f));
-								dgVector qB (contactB.m_x, contactB.m_y, contactB.m_z, dgFloat32 (0.0f));
-								dgVector dist (qB - qA);
-								disjoint = (dist % dist) > minSeparation2;
-							}
-
-							if (!disjoint) {
-								otherShape->m_graphNode->GetInfo().AddEdge(node);
-								node->GetInfo().AddEdge(otherShape->m_graphNode);
-							}
-						}
-					}
-	
-				} else {
-					dgAssert (treeNode->m_type == m_node);
-					pool[stack] = treeNode->m_right;
-					stack ++;
-					pool[stack] = treeNode->m_left;
-					stack ++;
-				}
-			}
-		}
-	}
-	
-	ResetAnchor ();
-//m_conectivity.Trace();
-*/
 }
 
 

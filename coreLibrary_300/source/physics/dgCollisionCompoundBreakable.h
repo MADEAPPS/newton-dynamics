@@ -31,7 +31,7 @@ class dgCollisionCompoundBreakable: public dgCollisionCompound
 {
 
 	class dgFractureBuilder;
-/*
+
 	public:
 	class dgFlatVertex
 	{
@@ -54,7 +54,6 @@ class dgCollisionCompoundBreakable: public dgCollisionCompound
 	class dgVertexBuffer: public dgRefCounter  
 	{
 		public: 
-
 		DG_CLASS_ALLOCATOR(allocator)
 		dgVertexBuffer (dgInt32 count, dgMemoryAllocator* allocator);
 		dgVertexBuffer (dgMemoryAllocator* const allocator, dgDeserialize deserialization, void* const userData);
@@ -64,13 +63,11 @@ class dgCollisionCompoundBreakable: public dgCollisionCompound
 		void GetVertexStreams (dgInt32 vertexStrideInByte, dgFloat32* vertex, dgInt32 normalStrideInByte, dgFloat32* normal,
 							   dgInt32 uvStrideInByte, dgFloat32* uv) const;
 
-
-
-		dgInt32 m_vertexCount;
 		dgFloat32 *m_uv;
 		dgFloat32 *m_vertex;
 		dgFloat32 *m_normal;
 		dgMemoryAllocator* m_allocator;
+		dgInt32 m_vertexCount;
 	};
 
 	class dgSubMesh
@@ -80,26 +77,24 @@ class dgCollisionCompoundBreakable: public dgCollisionCompound
 		~dgSubMesh ();
 		void Serialize(dgSerialize callback, void* const userData) const;
 
-		dgInt32 m_faceOffset;
-		dgInt32 m_visibleFaces;
-		dgInt32 m_material;
-		dgInt32 m_faceCount;
 		dgInt32 *m_indexes;
 		dgMemoryAllocator* m_allocator;
+		dgInt32 m_faceOffset;
+		dgInt32 m_material;
+		dgInt32 m_faceCount;
+		bool m_visibleFaces;
 	};
-
 
 	class dgMesh: public dgList<dgSubMesh>, public dgRefCounter 
 	{
 		public:
-
 		dgMesh(dgMemoryAllocator* const allocator);
 		dgMesh (dgMemoryAllocator* const allocator, dgDeserialize deserialization, void* const userData);
 		~dgMesh();
 		void Serialize(dgSerialize callback, void* const userData) const;
 		dgSubMesh* AddgSubMesh(dgInt32 indexCount, dgInt32 material);
 
-		dgInt32 m_IsVisible;
+		bool m_IsVisible;
 	};
 
 	class dgDebriNodeInfo
@@ -108,18 +103,18 @@ class dgCollisionCompoundBreakable: public dgCollisionCompound
 		dgDebriNodeInfo ();
 		~dgDebriNodeInfo ();
 
-		struct PackedSaveData {
-			union {
-				dgInt32 m_lru;
-				dgInt32 m_shapeID;
-			};
-			dgInt32 m_distanceToFixNode;
-			dgInt32 m_islandIndex; 
-		} m_commonData;
-
+//		struct PackedSaveData {
+//			union {
+//				dgInt32 m_lru;
+//				dgInt32 m_shapeID;
+//			};
+//			dgInt32 m_distanceToFixNode;
+//			dgInt32 m_islandIndex; 
+//		} m_commonData;
 
 		dgMesh* m_mesh;
-		dgCollisionConvex* m_shape;
+		//dgCollisionConvex* m_shape;
+		dgTreeArray::dgTreeNode* m_shapeNode;
 	};
 
 
@@ -139,19 +134,17 @@ class dgCollisionCompoundBreakable: public dgCollisionCompound
 		~dgDebriGraph ();
 
 //		void AddToHeap (dgDownHeap<dgMeshEffect*, dgFloat32>& heap, dgMeshEffect* front);
-		void AddNode (dgFlatVertexArray& vertexArray, dgMeshEffect* solid, dgInt32 clipperMaterial, dgInt32 id, dgFloat32 density, dgFloat32 padding);
+		dgListNode* AddNode (dgFlatVertexArray& vertexArray, dgMeshEffect* const factureVisualMesh, dgTreeArray::dgTreeNode* const collisionNode, dgInt32 interiorMaterialBase);
 //		void SplitAndAddNodes (dgFlatVertexArray& vertexArray, dgMeshEffect* solid, dgMeshEffect* const clipper, 
 //							   dgInt32 clipperMaterial, dgInt32 id, dgFloat32 density, dgCollisionCompoundBreakableCallback callback, void* buildUsedData);
 
 //		void AddMeshes (dgFlatVertexArray& vertexArray, dgInt32 count, dgMeshEffect* const solidArray[], dgMeshEffect* const clipperArray[], 
 //						dgMatrix* const matrixArray, dgInt32* const idArray, dgFloat32* const densities, dgCollisionCompoundBreakableCallback callback, void* buildUsedData);
-		void AddMeshes (dgFlatVertexArray& vertexArray, dgInt32 count, const dgMeshEffect* const solidArray[], 
-						const dgInt32* const idArray, const dgFloat32* const densities, const dgInt32* const internalFaceMaterial, dgFloat32 gaps);
-
 
 		void Serialize(dgSerialize callback, void* const userData) const;
 	};
 
+/*
 	class dgIsland: public dgList<dgDebriGraph::dgListNode*> 
 	{
 		public:
@@ -272,12 +265,17 @@ class dgCollisionCompoundBreakable: public dgCollisionCompound
 	
 	dgInt32 m_lru;
 	dgInt32 m_lastIslandColor;
-	dgInt32 m_visibilityMapIndexCount;
-	dgInt8* m_visibilityMap;
-	dgInt32* m_visibilityInderectMap;
+	
+	
+	
 	dgVertexBuffer* m_vertexBuffer;
-	dgDebriGraph m_conectivity;
+	
 	dgIsland m_detachedIslands;
 */	
+	dgDebriGraph m_conectivity;
+	dgVertexBuffer* m_vertexBuffer;
+	dgInt8* m_visibilityMap;
+	dgInt32* m_visibilityIndirectMap;
+	dgInt32 m_visibilityMapIndexCount;
 };
 #endif
