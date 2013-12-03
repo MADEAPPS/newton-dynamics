@@ -1340,7 +1340,7 @@ void dgMeshEffect::Triangulate  ()
 
 void dgMeshEffect::ConvertToPolygons ()
 {
-SaveOFF("xxx___0.off");
+//SaveOFF("xxx___0.off");
 	dgPolyhedra polygon(GetAllocator());
 
 	dgInt32 mark = IncLRU();
@@ -1395,20 +1395,20 @@ xxx *=1;
 			do {
 				ptr->m_mark = mark;
 				index[indexCount] = dgInt32 (m_attrib[ptr->m_incidentVertex].m_vertex.m_w);
-dgTrace (("%d ", index[indexCount]));
+//dgTrace (("%d ", index[indexCount]));
 
 				userData[indexCount] = ptr->m_incidentVertex;
 				indexCount ++;
 				ptr = ptr->m_next;
 			} while (ptr != face);
 			AddFace(indexCount, index, userData);
-dgTrace (("\n", index[indexCount]));
+//dgTrace (("\n", index[indexCount]));
 		}
 	}
 	EndFace();
 
-SaveOFF("xxx___1.off");
-dgAssert (!HasOpenEdges());
+//SaveOFF("xxx___1.off");
+//dgAssert (!HasOpenEdges());
 
 	for (iter.Begin(); iter; iter ++){
 		dgEdge* const face = &(*iter);
