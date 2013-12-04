@@ -125,6 +125,8 @@ class dgCollisionCompoundBreakable: public dgCollisionCompound
 		~dgSharedNodeMesh ();
 	};
 
+
+
 	class dgDebriGraph: public dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>
 	{
 		public:
@@ -145,6 +147,13 @@ class dgCollisionCompoundBreakable: public dgCollisionCompound
 	};
 
 /*
+	class dgCompoundBreakableFilterData
+	{
+		public:
+		dgInt32 m_index;
+		dgDebriGraph::dgListNode* m_node;
+	};
+	
 	class dgIsland: public dgList<dgDebriGraph::dgListNode*> 
 	{
 		public:
@@ -199,12 +208,6 @@ class dgCollisionCompoundBreakable: public dgCollisionCompound
 		friend class dgCollisionCompoundBreakable;
 	};
 
-	class dgCompoundBreakableFilterData
-	{
-		public:
-		dgInt32 m_index;
-		dgDebriGraph::dgListNode* m_node;
-	};
 
 
 //	class dgSegmenList: public dgList<dgMeshEffect*>

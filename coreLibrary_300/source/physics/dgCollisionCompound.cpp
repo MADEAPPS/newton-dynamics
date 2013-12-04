@@ -1078,7 +1078,6 @@ void dgCollisionCompound::EndAddRemove ()
 dgTree<dgCollisionCompound::dgNodeBase*, dgInt32>::dgTreeNode* dgCollisionCompound::AddCollision (dgCollisionInstance* const shape)
 {
 	dgNodeBase* const newNode = new (m_allocator) dgNodeBase (shape);
-//	newNode->m_myNode = m_array.Insert(newNode, m_array.GetCount());
 	newNode->m_myNode = m_array.Insert(newNode, m_idIndex);
 	m_idIndex ++;
 
