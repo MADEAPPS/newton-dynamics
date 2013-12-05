@@ -3158,8 +3158,8 @@ bool dgMeshEffect::PlaneClip (const dgMeshEffect& convexMesh, const dgEdge* cons
 			edge->m_userData = m_atribCount - 1;
 		}
 
-        Triangulate();
-//      ConvertToPolygons();
+//      Triangulate();
+        ConvertToPolygons();
 //SaveOFF("xxxxxxxxx_0.off");
 	}
 
@@ -3174,6 +3174,7 @@ dgMeshEffect* dgMeshEffect::ConvexMeshIntersection (const dgMeshEffect* const co
 	//return new (GetAllocator()) dgMeshEffect (*convexMesh);
 
 	dgMeshEffect* const convexIntersection = new (GetAllocator()) dgMeshEffect (*this);
+    convexIntersection->ConvertToPolygons();
 	convexIntersection->RemoveUnusedVertices(NULL);
 
 	dgInt32 mark = convexMesh.IncLRU();
