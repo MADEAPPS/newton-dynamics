@@ -1088,9 +1088,8 @@ class dgCollisionCompoundBreakable::dgFractureBuilder: public dgTree<dgMeshEffec
 				}
 			}
 		}
-
         ClipFractureParts (solidMesh);
-
+/*
 for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; node = node->GetNext()) {
 	dgInt32 index = node->GetInfo().m_nodeData;
 	dgTrace (("node %d: ", index));
@@ -1101,9 +1100,8 @@ for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; n
 	}
 	dgTrace (("\n"));
 }
-
-
-//solidMesh->SaveOFF("xxx0.off");
+solidMesh->SaveOFF("xxx0.off");
+*/
 
 	}
 
@@ -1670,7 +1668,7 @@ pointcloudCount = 0;
 	}
 
 	dgStack<dgInt32> indexBuffer (vertexArray.m_count);
-	dgInt32 vertsCount = dgVertexListToIndexList (&vertexArray[0].m_point[0], sizeof (dgFlatVertex), sizeof (dgFlatVertex), 0, vertexArray.m_count, &indexBuffer[0], dgFloat32 (1.0e-6f));
+	dgInt32 vertsCount = dgVertexListToIndexList (&vertexArray[0].m_point[0], sizeof (dgFlatVertex), sizeof (dgFlatVertex), 0, vertexArray.m_count, &indexBuffer[0], dgFloat32 (1.0e-4f));
 
 	m_vertexBuffer = new (m_world->GetAllocator()) dgVertexBuffer(vertsCount, m_world->GetAllocator());
 	for (dgInt32 i = 0; i < vertsCount; i ++) {
@@ -1682,6 +1680,12 @@ pointcloudCount = 0;
 		m_vertexBuffer->m_normal[i * 3 + 2] = vertexArray[i].m_point[5];
 		m_vertexBuffer->m_uv[i * 2 + 0] = vertexArray[i].m_point[6];
 		m_vertexBuffer->m_uv[i * 2 + 1] = vertexArray[i].m_point[7];
+
+
+for (int xxx = 0; xxx < 10; xxx ++)
+dgTrace (("%f ", vertexArray[i].m_point[xxx]));
+dgTrace (("\n"));
+
 	}
 
 	dgSubMesh* mainSegmenst[256];
@@ -1746,7 +1750,7 @@ pointcloudCount = 0;
 //			dgAssert (acc == segment.m_faceOffset);
 			acc += segment.m_faceCount;
 		}
-break;
+//break;
 	}
 
 	dgDebriGraph::dgListNode* const mainNode = m_conectivity.dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>::AddNode ();

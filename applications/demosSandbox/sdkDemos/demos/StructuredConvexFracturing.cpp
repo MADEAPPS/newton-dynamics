@@ -1061,13 +1061,13 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
 	dAssert (mesh);
 
 	// convert the mesh to a newtonMesh
-	NewtonMesh* const solidMesh = mesh->CreateNewtonMesh (world, entity.GetMeshMatrix() * entity.GetCurrentMatrix());
+//	NewtonMesh* const solidMesh = mesh->CreateNewtonMesh (world, entity.GetMeshMatrix() * entity.GetCurrentMatrix());
 
-//int externalMaterial = LoadTexture("wood_0.tga");
-//NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), dVector (3.0f, 3.0f, 3.0f, 0.0), _BOX_PRIMITIVE, 0);
-//NewtonMesh* const solidMesh = NewtonMeshCreateFromCollision(collision);
-//NewtonDestroyCollision(collision);
-//NewtonMeshApplyBoxMapping (solidMesh, externalMaterial, externalMaterial, externalMaterial);
+int externalMaterial = LoadTexture("wood_0.tga");
+NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), dVector (3.0f, 3.0f, 3.0f, 0.0), _BOX_PRIMITIVE, 0);
+NewtonMesh* const solidMesh = NewtonMeshCreateFromCollision(collision);
+NewtonDestroyCollision(collision);
+NewtonMeshApplyBoxMapping (solidMesh, externalMaterial, externalMaterial, externalMaterial);
 
 
 	// create a random point cloud
