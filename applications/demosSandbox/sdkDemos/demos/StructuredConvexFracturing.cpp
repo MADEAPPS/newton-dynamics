@@ -1061,7 +1061,15 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
 	dAssert (mesh);
 
 	// convert the mesh to a newtonMesh
-	NewtonMesh* const solidMesh = mesh->CreateNewtonMesh (world, entity.GetMeshMatrix() * entity.GetCurrentMatrix());
+//	NewtonMesh* const solidMesh = mesh->CreateNewtonMesh (world, entity.GetMeshMatrix() * entity.GetCurrentMatrix());
+
+int externalMaterial = LoadTexture("wood_0.tga");
+NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), dVector (3.0f, 3.0f, 3.0f, 0.0), _BOX_PRIMITIVE, 0);
+NewtonMesh* const solidMesh = NewtonMeshCreateFromCollision(collision);
+NewtonDestroyCollision(collision);
+NewtonMeshApplyBoxMapping (solidMesh, externalMaterial, externalMaterial, externalMaterial);
+
+
 
 	// create a random point cloud
 	dVector points[POINT_CLOUD_SIZE];
@@ -1082,6 +1090,7 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
 	// create a visual entity for display the main mesh
     dMatrix matrix (GetIdentityMatrix());
     matrix.m_posit = origin;
+matrix.m_posit.m_y = 5.0;
 	matrix.m_posit.m_w = 1.0f;
     DemoEntity* const visualEntity = new DemoEntity(matrix, NULL);
     scene->Append(visualEntity);

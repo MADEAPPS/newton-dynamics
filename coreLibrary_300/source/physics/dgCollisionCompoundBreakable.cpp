@@ -1640,6 +1640,8 @@ dgCollisionCompoundBreakable::dgCollisionCompoundBreakable (dgWorld* const world
 	,m_conectivity(world->GetAllocator())
 	,m_vertexBuffer(NULL)
 {
+pointcloudCount = 0;
+
 	m_collisionId = m_compoundBreakable;
 	m_rtti |= dgCollisionCompoundBreakable_RTTI;
 
@@ -1709,7 +1711,6 @@ dgCollisionCompoundBreakable::dgCollisionCompoundBreakable (dgWorld* const world
 		}
 	}
 
-//	dgDebriGraph::dgListNode* const mainNode = m_conectivity.dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>::AddNode();
 	dgDebriNodeInfo& mainNodeData = mainNode->GetInfo().m_nodeData;
 
 	dgInt32 acc = 0;
