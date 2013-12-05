@@ -654,17 +654,27 @@ extern "C" {
 	// **********************************************************************************************
 	NEWTON_API NewtonCollision* NewtonCreateCompoundBreakable (const NewtonWorld* const newtonWorld, const NewtonMesh* const solidMesh, int shapeID, int fracturePhysicsMaterialID, int pointcloudCount, const dFloat* const vertexCloud, int strideInBytes, int materialID, const dFloat* const textureMatrix);
 	
+	NEWTON_API int NewtonCompoundBreakableGetVertexCount (const NewtonCollision* const compoundBreakable); 
+	NEWTON_API const dFloat* NewtonCompoundBreakableGetVertexPositions (const NewtonCollision* const compoundBreakable);
+	NEWTON_API const dFloat* NewtonCompoundBreakableGetVertexNormals (const NewtonCollision* const compoundBreakable);
+	NEWTON_API const dFloat* NewtonCompoundBreakableGetVertexUVs (const NewtonCollision* const compoundBreakable);
+
+	NEWTON_API NewtonBreakableComponentMesh* NewtonBreakableGetMainMesh (const NewtonCollision* const compoundBreakable);
+	NEWTON_API void* NewtonBreakableGetFirstSegment (const NewtonBreakableComponentMesh* const breakableComponent); 
+	NEWTON_API void* NewtonBreakableGetNextSegment (const void* const breakableComponentSegment); 
+	NEWTON_API int NewtonBreakableSegmentGetMaterial (const void* const breakableComponentSegment); 
+	NEWTON_API int NewtonBreakableSegmentGetIndexCount (const void* const breakableComponentSegment); 
+
+	NEWTON_API int NewtonBreakableSegmentGetIndexStream (const NewtonCollision* const compoundBreakable, const NewtonBreakableComponentMesh* const meshOwner, const void* const segment, int* const index); 
+	NEWTON_API int NewtonBreakableSegmentGetIndexStreamShort (const NewtonCollision* const compoundBreakable, const NewtonBreakableComponentMesh* const meshOwner, const void* const segment, short int* const index); 
+
+
+//	NEWTON_API void NewtonCompoundBreakableResetAnchoredPieces (const NewtonCollision* const compoundBreakable);
+//	NEWTON_API void NewtonCompoundBreakableSetAnchoredPieces (const NewtonCollision* const compoundBreakable, int fixShapesCount, dFloat* const matrixPallete, NewtonCollision** const fixedShapesArray);
+//	
+
 	
 /*
-	NEWTON_API void NewtonCompoundBreakableResetAnchoredPieces (const NewtonCollision* const compoundBreakable);
-	NEWTON_API void NewtonCompoundBreakableSetAnchoredPieces (const NewtonCollision* const compoundBreakable, int fixShapesCount, dFloat* const matrixPallete, NewtonCollision** const fixedShapesArray);
-
-	NEWTON_API int NewtonCompoundBreakableGetVertexCount (const NewtonCollision* const compoundBreakable); 
-	NEWTON_API void NewtonCompoundBreakableGetVertexStreams (const NewtonCollision* const compoundBreakable, int vertexStrideInByte, dFloat* const vertex,
-															int normalStrideInByte, dFloat* const normal,	int uvStrideInByte, dFloat* const uv);
-
-	
-	NEWTON_API NewtonBreakableComponentMesh* NewtonBreakableGetMainMesh (const NewtonCollision* const compoundBreakable);
 	NEWTON_API NewtonBreakableComponentMesh* NewtonBreakableGetFirstComponent (const NewtonCollision* const compoundBreakable);
 	NEWTON_API NewtonBreakableComponentMesh* NewtonBreakableGetNextComponent (const NewtonBreakableComponentMesh* const component);
 
@@ -676,13 +686,9 @@ extern "C" {
 
 	NEWTON_API int NewtonBreakableGetComponentsInRadius (const NewtonCollision* const compoundBreakable, const dFloat* position, dFloat radius, NewtonBreakableComponentMesh** const segments, int maxCount);
 
-	NEWTON_API void* NewtonBreakableGetFirstSegment (const NewtonBreakableComponentMesh* const breakableComponent); 
-	NEWTON_API void* NewtonBreakableGetNextSegment (const void* const segment); 
 
-	NEWTON_API int NewtonBreakableSegmentGetMaterial (const void* const segment); 
-	NEWTON_API int NewtonBreakableSegmentGetIndexCount (const void* const segment); 
-	NEWTON_API int NewtonBreakableSegmentGetIndexStream (const NewtonCollision* const compoundBreakable, const NewtonBreakableComponentMesh* const meshOwner, const void* const segment, int* const index); 
-	NEWTON_API int NewtonBreakableSegmentGetIndexStreamShort (const NewtonCollision* const compoundBreakable, const NewtonBreakableComponentMesh* const meshOwner, const void* const segment, short int* const index); 
+
+	
 */
 
 	NEWTON_API NewtonCollision* NewtonCreateUserMeshCollision (const NewtonWorld* const newtonWorld, const dFloat* const minBox, 

@@ -60,8 +60,11 @@ class dgCollisionCompoundBreakable: public dgCollisionCompound
 		~dgVertexBuffer ();
 
 		void Serialize(dgSerialize callback, void* const userData) const;
-		void GetVertexStreams (dgInt32 vertexStrideInByte, dgFloat32* vertex, dgInt32 normalStrideInByte, dgFloat32* normal,
-							   dgInt32 uvStrideInByte, dgFloat32* uv) const;
+//		void GetVertexStreams (dgInt32 vertexStrideInByte, dgFloat32* const vertex, dgInt32 normalStrideInByte, dgFloat32* const normal, dgInt32 uvStrideInByte, dgFloat32* const uv) const;
+		const dgFloat32* GetVertexPositions() const {return m_vertex;};
+		const dgFloat32* GetVertexNormals() const {return m_normal;};
+		const dgFloat32* GetVertexUVs() const {return m_uv;};
+		
 
 		dgFloat32 *m_uv;
 		dgFloat32 *m_vertex;
@@ -221,14 +224,21 @@ class dgCollisionCompoundBreakable: public dgCollisionCompound
 
 	public:
 	dgCollisionCompoundBreakable (const dgCollisionCompoundBreakable& source);
-//	dgCollisionCompoundBreakable (dgInt32 count, dgMeshEffect* const solidArray[], dgMeshEffect* const clipperArray[],
-//								  dgMatrix* const matrixArray, dgInt32* const idArray, dgFloat32* const densities, dgInt32 debriiId, 
-//								  dgCollisionCompoundBreakableCallback callback, void* buildUsedData, dgWorld* world);
-
 	dgCollisionCompoundBreakable (dgWorld* const world, dgMeshEffect* const solidMesh, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& offsetMatrix);
 
 	dgCollisionCompoundBreakable (dgWorld* const world, dgDeserialize deserialization, void* const userData);
 	virtual ~dgCollisionCompoundBreakable(void);
+
+	dgDebriGraph::dgListNode* GetMainMesh() const {return m_conectivity.GetFirst();}
+
+	dgInt32 GetVertecCount() const {return m_vertexBuffer->m_vertexCount;}
+
+	const dgFloat32* GetVertexPositions () const {return m_vertexBuffer->GetVertexPositions();}
+	const dgFloat32* GetVertexNormal () const {return m_vertexBuffer->GetVertexNormals();}
+	const dgFloat32* GetVertexUVs () const {return m_vertexBuffer->GetVertexUVs();}
+	
+	dgInt32 GetSegmentIndexStream (dgDebriGraph::dgListNode* const node, dgMesh::dgListNode* const segment, dgInt32* const index) const;
+	dgInt32 GetSegmentIndexStreamShort (dgDebriGraph::dgListNode* const node, dgMesh::dgListNode* segment, dgInt16* const index) const;
 
 /*
 	void DeleteComponentBegin ();
@@ -237,7 +247,7 @@ class dgCollisionCompoundBreakable: public dgCollisionCompound
 	void DeleteComponentEnd ();
 
 
-	dgDebriGraph::dgListNode* GetMainMesh() const {return m_conectivity.GetLast();}
+	
 	dgDebriGraph::dgListNode* GetFirstComponentMesh () const {return (m_conectivity.GetCount() > 2) ? m_conectivity.GetFirst()->GetNext() : NULL;}
 	dgInt32 GetSegmentsInRadius (const dgVector& origin, dgFloat32 radius, dgDebriGraph::dgListNode** segments, dgInt32 maxCount);
 
@@ -247,16 +257,9 @@ class dgCollisionCompoundBreakable: public dgCollisionCompound
 //	dgInt32 GetSegmentsInRadius (const dgVector& origin, dgFloat32 radius, dgDebriGraph::dgListNode** segments, dgInt32 maxCount);
 //	dgInt32 GetDetachedPieces (dgCollision** shapes, dgInt32 maxCount);
 
-	dgInt32 GetSegmentIndexStream (dgDebriGraph::dgListNode* const node, dgMesh::dgListNode* segment, dgInt32* const index) const;
-	dgInt32 GetSegmentIndexStreamShort (dgDebriGraph::dgListNode* const node, dgMesh::dgListNode* segment, dgInt16* const index) const;
+	
+	
 
-	dgInt32 GetVertecCount() const {return m_vertexBuffer->m_vertexCount;}
-	void GetVertexStreams (dgInt32 vertexStrideInByte, dgFloat32* vertex, 
-						   dgInt32 normalStrideInByte, dgFloat32* normal,
-						   dgInt32 uvStrideInByte, dgFloat32* uv) const
-	{
-		m_vertexBuffer->GetVertexStreams (vertexStrideInByte, vertex, normalStrideInByte, normal, uvStrideInByte, uv);
-	}
 
 
 	private:

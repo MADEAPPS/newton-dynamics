@@ -385,7 +385,7 @@ void DebugRenderWorldCollision (const NewtonWorld* const world, DEBUG_DRAW_MODE 
 			case SERIALIZE_ID_SCENE:
 //			case SERIALIZE_ID_USERMESH:
 			case SERIALIZE_ID_HEIGHTFIELD:
-			case SERIALIZE_ID_COMPOUND_BREAKABLE:
+//			case SERIALIZE_ID_COMPOUND_BREAKABLE:
 				break;
 			default: 
 				DebugShowBodyCollision (body, mode);

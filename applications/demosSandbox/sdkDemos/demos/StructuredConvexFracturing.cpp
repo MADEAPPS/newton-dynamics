@@ -1014,6 +1014,41 @@ z = 0;
 
 
 
+static DemoMesh* CreateVisualMesh (NewtonCollision* const fracturedCompoundCollision)
+{
+	int vertexCount = NewtonCompoundBreakableGetVertexCount (fracturedCompoundCollision); 
+
+	const dFloat* const vertex = NewtonCompoundBreakableGetVertexPositions (fracturedCompoundCollision);
+	const dFloat* const normal = NewtonCompoundBreakableGetVertexNormals(fracturedCompoundCollision);
+	const dFloat* const uv = NewtonCompoundBreakableGetVertexUVs (fracturedCompoundCollision);
+
+	DemoMesh* const mesh = new DemoMesh ("fraturedMainMesh");
+	mesh->AllocVertexData (vertexCount);
+
+	dAssert (vertexCount == mesh->m_vertexCount);
+	memcpy (mesh->m_vertex, vertex, 3 * vertexCount * sizeof (dFloat));
+	memcpy (mesh->m_normal, normal, 3 * vertexCount * sizeof (dFloat));
+	memcpy (mesh->m_uv, uv, 2 * vertexCount * sizeof (dFloat));
+
+	NewtonBreakableComponentMesh* const meshData = NewtonBreakableGetMainMesh (fracturedCompoundCollision);
+	for (void* segment = NewtonBreakableGetFirstSegment(meshData); segment; segment = NewtonBreakableGetNextSegment (segment)) {
+		DemoSubMesh* const subMesh = mesh->AddSubMesh();
+
+		int material = NewtonBreakableSegmentGetMaterial (segment); 
+		int indexCount = NewtonBreakableSegmentGetIndexCount (segment); 
+
+		subMesh->m_textureHandle = (GLuint)material;
+
+		subMesh->AllocIndexData (indexCount);
+		//subMesh->m_indexCount = NewtonBreakableSegmentGetIndexStreamShort (compound, meshData, segment, (short int*)subMesh->m_indexes); 
+		subMesh->m_indexCount = NewtonBreakableSegmentGetIndexStream (fracturedCompoundCollision, meshData, segment, (int*)subMesh->m_indexes); 
+	}
+
+	return mesh;
+}
+
+
+
 static void AddStructuredFractured (DemoEntityManager* const scene, const dVector& origin, int materialID, const char* const assetName)
 {
 	// create the shape and visual mesh as a common data to be re used
@@ -1044,12 +1079,17 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
 	int debreePhysMaterial = NewtonMaterialGetDefaultGroupID(world);
 	NewtonCollision* const structuredFracturedCollision = NewtonCreateCompoundBreakable (world, solidMesh, 0, debreePhysMaterial, POINT_CLOUD_SIZE, &points[0][0], sizeof (dVector), internalMaterial, &textureMatrix[0][0]);
 
-//    dQuaternion rotation;
-//   SimpleFracturedEffectEntity* const entity = new SimpleFracturedEffectEntity (visualMesh, fractureEffect);
+	// create a visual entity for display the main mesh
     dMatrix matrix (GetIdentityMatrix());
     matrix.m_posit = origin;
-    DemoEntity* const visualEntity= new DemoEntity(matrix, NULL);
+	matrix.m_posit.m_w = 1.0f;
+    DemoEntity* const visualEntity = new DemoEntity(matrix, NULL);
     scene->Append(visualEntity);
+
+	// crate a visual main mesh and attach it to the entity
+	DemoMesh* const visualMesh = CreateVisualMesh (structuredFracturedCollision);
+	visualEntity->SetMesh (visualMesh, GetIdentityMatrix());
+	visualMesh->Release();
 
     dVector com;
     dVector inertia;
