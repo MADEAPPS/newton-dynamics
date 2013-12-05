@@ -3159,6 +3159,8 @@ bool dgMeshEffect::PlaneClip (const dgMeshEffect& convexMesh, const dgEdge* cons
 		}
 
         Triangulate();
+//      ConvertToPolygons();
+//SaveOFF("xxxxxxxxx_0.off");
 	}
 
 	return true;
