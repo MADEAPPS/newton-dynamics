@@ -3157,6 +3157,8 @@ bool dgMeshEffect::PlaneClip (const dgMeshEffect& convexMesh, const dgEdge* cons
 			AddAtribute (attibute);
 			edge->m_userData = m_atribCount - 1;
 		}
+
+        Triangulate();
 	}
 
 	return true;
