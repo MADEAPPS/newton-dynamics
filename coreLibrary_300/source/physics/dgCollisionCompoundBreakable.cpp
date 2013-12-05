@@ -1680,12 +1680,6 @@ pointcloudCount = 0;
 		m_vertexBuffer->m_normal[i * 3 + 2] = vertexArray[i].m_point[5];
 		m_vertexBuffer->m_uv[i * 2 + 0] = vertexArray[i].m_point[6];
 		m_vertexBuffer->m_uv[i * 2 + 1] = vertexArray[i].m_point[7];
-
-
-for (int xxx = 0; xxx < 10; xxx ++)
-dgTrace (("%f ", vertexArray[i].m_point[xxx]));
-dgTrace (("\n"));
-
 	}
 
 	dgSubMesh* mainSegmenst[256];
