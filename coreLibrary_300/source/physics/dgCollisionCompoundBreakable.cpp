@@ -251,13 +251,7 @@ dgCollisionCompoundBreakable::dgDebriGraph::dgDebriGraph (const dgDebriGraph& so
 {
 	dgTree<dgListNode*, dgListNode*> filter(GetAllocator());   
 
-	dgListNode* const newNode = dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>::AddNode();
-
-	//dgDebriNodeInfo& srcData = node->GetInfo().m_nodeData;
-	//dgDebriNodeInfo& data = newNode->GetInfo().m_nodeData;
-	filter.Insert(newNode, source.GetFirst());
-
-	for (dgDebriGraph::dgListNode* node = source.GetFirst()->GetNext(); node; node = node->GetNext() ) {
+	for (dgDebriGraph::dgListNode* node = source.GetFirst(); node; node = node->GetNext() ) {
 		dgListNode* const newNode = dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>::AddNode();
 
 		dgDebriNodeInfo& srcData = node->GetInfo().m_nodeData;
@@ -269,7 +263,7 @@ dgCollisionCompoundBreakable::dgDebriGraph::dgDebriGraph (const dgDebriGraph& so
 		filter.Insert(newNode, node);
 	}
 
-	for (dgListNode* node = source.GetFirst(); node; node = node->GetNext()) {
+	for (dgListNode* node = source.GetFirst(); node != source.GetLast(); node = node->GetNext()) {
 		dgListNode* const myNode = filter.Find(node)->GetInfo();
 		for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = node->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
 			dgListNode* const otherNode = filter.Find(edgeNode->GetInfo().m_node)->GetInfo();
@@ -1590,9 +1584,7 @@ dgCollisionCompoundBreakable::dgSubMesh* dgCollisionCompoundBreakable::dgMesh::A
 
 	return node;
 }
-
-
-
+ 
 
 dgCollisionCompoundBreakable::dgCollisionCompoundBreakable (const dgCollisionCompoundBreakable& source)
 //	:dgCollisionCompound(source), m_conectivity(source.m_conectivity), m_detachedIslands(source.m_conectivity.GetAllocator())
@@ -1650,8 +1642,6 @@ pointcloudCount = 0;
 
 	dgFlatVertexArray vertexArray(m_world->GetAllocator());
 	dgTree<dgDebriGraph::dgListNode*, dgInt32> conectinyMap(GetAllocator());
-
-	dgDebriGraph::dgListNode* const mainNode = m_conectivity.dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>::AddNode ();
 	
     BeginAddRemove ();
     for (dgFractureBuilder::dgFractureConectivity::dgListNode* node = fractureBuilder.m_conectivity.GetFirst(); node; node = node->GetNext()) {
@@ -1702,7 +1692,7 @@ pointcloudCount = 0;
 	memset (faceOffsetHitogram, 0, sizeof (faceOffsetHitogram));
 	memset (mainSegmenst, 0, sizeof (mainSegmenst));
 
-	for (dgDebriGraph::dgListNode* node = m_conectivity.GetFirst()->GetNext(); node; node = node->GetNext()) {
+	for (dgDebriGraph::dgListNode* node = m_conectivity.GetFirst(); node; node = node->GetNext()) {
 		dgDebriNodeInfo& data = node->GetInfo().m_nodeData;
 		for (dgMesh::dgListNode* meshSgement = data.m_mesh->GetFirst(); meshSgement; meshSgement = meshSgement->GetNext()) {
 			dgSubMesh* const subMesh = &meshSgement->GetInfo();
@@ -1711,11 +1701,8 @@ pointcloudCount = 0;
 		}
 	}
 
-	dgDebriNodeInfo& mainNodeData = mainNode->GetInfo().m_nodeData;
-
 	dgInt32 acc = 0;
 	dgMesh* const mainMesh = new (m_world->GetAllocator()) dgMesh(m_world->GetAllocator());
-	mainNodeData.m_mesh = mainMesh;
 
 	for (dgInt32 i = 0; i < 256; i ++) {
 		if (materialHitogram[i]) {
@@ -1733,7 +1720,7 @@ pointcloudCount = 0;
 	m_visibilityMap = (dgInt8*) m_allocator->Malloc (dgInt32 (acc * sizeof (dgInt8)));
 	m_visibilityIndirectMap = (dgInt32*) m_allocator->Malloc (acc * dgInt32 (sizeof (dgInt32)));
 	acc = 0;
-	for (dgDebriGraph::dgListNode* node = m_conectivity.GetFirst()->GetNext(); node != m_conectivity.GetLast(); node = node->GetNext() ) {
+	for (dgDebriGraph::dgListNode* node = m_conectivity.GetFirst(); node; node = node->GetNext() ) {
 		dgDebriNodeInfo& data = node->GetInfo().m_nodeData;
 		for (dgMesh::dgListNode* node = data.m_mesh->GetFirst(); node; node = node->GetNext()) {
 			dgSubMesh& segment = node->GetInfo();
@@ -1759,7 +1746,12 @@ pointcloudCount = 0;
 //			dgAssert (acc == segment.m_faceOffset);
 			acc += segment.m_faceCount;
 		}
+break;
 	}
+
+	dgDebriGraph::dgListNode* const mainNode = m_conectivity.dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>::AddNode ();
+	dgDebriNodeInfo& mainNodeData = mainNode->GetInfo().m_nodeData;
+	mainNodeData.m_mesh = mainMesh;
 
 //	LinkNodes ();	
 //	ResetAnchor ();

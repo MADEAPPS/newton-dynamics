@@ -1037,7 +1037,7 @@ static DemoMesh* CreateVisualMesh (NewtonCollision* const fracturedCompoundColli
 		int material = NewtonBreakableSegmentGetMaterial (segment); 
 		int indexCount = NewtonBreakableSegmentGetIndexCount (segment); 
 
-		subMesh->m_textureHandle = (GLuint)material;
+		subMesh->m_textureHandle = AddTextureRef ((GLuint)material);
 
 		subMesh->AllocIndexData (indexCount);
 		//subMesh->m_indexCount = NewtonBreakableSegmentGetIndexStreamShort (compound, meshData, segment, (short int*)subMesh->m_indexes); 
@@ -1061,14 +1061,13 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
 	dAssert (mesh);
 
 	// convert the mesh to a newtonMesh
-//	NewtonMesh* const solidMesh = mesh->CreateNewtonMesh (world, entity.GetMeshMatrix() * entity.GetCurrentMatrix());
+	NewtonMesh* const solidMesh = mesh->CreateNewtonMesh (world, entity.GetMeshMatrix() * entity.GetCurrentMatrix());
 
-int externalMaterial = LoadTexture("wood_0.tga");
-NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), dVector (3.0f, 3.0f, 3.0f, 0.0), _BOX_PRIMITIVE, 0);
-NewtonMesh* const solidMesh = NewtonMeshCreateFromCollision(collision);
-NewtonDestroyCollision(collision);
-NewtonMeshApplyBoxMapping (solidMesh, externalMaterial, externalMaterial, externalMaterial);
-
+//int externalMaterial = LoadTexture("wood_0.tga");
+//NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), dVector (3.0f, 3.0f, 3.0f, 0.0), _BOX_PRIMITIVE, 0);
+//NewtonMesh* const solidMesh = NewtonMeshCreateFromCollision(collision);
+//NewtonDestroyCollision(collision);
+//NewtonMeshApplyBoxMapping (solidMesh, externalMaterial, externalMaterial, externalMaterial);
 
 
 	// create a random point cloud
@@ -1076,7 +1075,8 @@ NewtonMeshApplyBoxMapping (solidMesh, externalMaterial, externalMaterial, extern
 	MakeRandomPointCloud (solidMesh, points);
 
 	// create and interiors material for texturing the fractured pieces
-	int internalMaterial = LoadTexture("KAMEN-stup.tga");
+	//int internalMaterial = LoadTexture("KAMEN-stup.tga");
+	int internalMaterial = LoadTexture("metal_30.tga");
 
 	// crate a texture matrix for uv mapping of fractured pieces
 	dMatrix textureMatrix (GetIdentityMatrix());
@@ -1104,8 +1104,8 @@ matrix.m_posit.m_y = 5.0;
     dVector inertia;
     NewtonConvexCollisionCalculateInertialMatrix (structuredFracturedCollision, &inertia[0], &com[0]);	
 
-    float mass = 10.0f;
-    int materialId = 0;
+    //float mass = 10.0f;
+    //int materialId = 0;
     //create the rigid body
     NewtonBody* const rigidBody = NewtonCreateDynamicBody (world, structuredFracturedCollision, &matrix[0][0]);
 /*
@@ -1138,6 +1138,9 @@ matrix.m_posit.m_y = 5.0;
 */
 
 
+
+	// release the interior texture
+	ReleaseTexture (internalMaterial);
 
 	// delete the solid mesh since it no longed needed
 	NewtonMeshDestroy (solidMesh);

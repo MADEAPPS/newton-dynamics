@@ -229,7 +229,7 @@ class dgCollisionCompoundBreakable: public dgCollisionCompound
 	dgCollisionCompoundBreakable (dgWorld* const world, dgDeserialize deserialization, void* const userData);
 	virtual ~dgCollisionCompoundBreakable(void);
 
-	dgDebriGraph::dgListNode* GetMainMesh() const {return m_conectivity.GetFirst();}
+	dgDebriGraph::dgListNode* GetMainMesh() const {return m_conectivity.GetLast();}
 
 	dgInt32 GetVertecCount() const {return m_vertexBuffer->m_vertexCount;}
 

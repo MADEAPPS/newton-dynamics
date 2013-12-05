@@ -506,7 +506,6 @@ NewtonMesh* DemoMesh::CreateNewtonMesh(NewtonWorld* const world, const dMatrix& 
 
 	dMatrix rotation ((meshMatrix.Inverse4x4()).Transpose4X4());
 
-	int id = 0;
 	dFloat point[3][12];
 	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
 		DemoSubMesh& segment = node->GetInfo();
@@ -535,9 +534,8 @@ NewtonMesh* DemoMesh::CreateNewtonMesh(NewtonWorld* const world, const dMatrix& 
 				point[j][9] = 0.0f;
 				point[j][10] = 0.0f;
 			}
-			NewtonMeshAddFace(mesh, 3, &point[0][0], sizeof (point) / 3, id);
+			NewtonMeshAddFace(mesh, 3, &point[0][0], sizeof (point) / 3, segment.m_textureHandle);
 		}
-		id ++;
 	}
 
 	NewtonMeshEndFace(mesh);
