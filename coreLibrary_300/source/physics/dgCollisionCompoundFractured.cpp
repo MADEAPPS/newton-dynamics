@@ -27,7 +27,7 @@
 #include "dgCollisionCompoundFractured.h"
 
 
-
+#define DG_FRACTURE_AABB_GUARD_DISTANCE 1.0f
 
 #if 0
 
@@ -110,11 +110,6 @@ dgVector dgCollisionCompoundBreakable::dgCollisionConvexIntance::SupportVertex (
 }
 
 
-
-void dgCollisionCompoundBreakable::dgCollisionConvexIntance::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const
-{
-	m_myShape->CalcAABB (matrix, p0, p1);
-}
 
 
 void dgCollisionCompoundBreakable::dgCollisionConvexIntance::DebugCollision (const dgMatrix& matrix, OnDebugCollisionMeshCallback callback, void* const userData) const
@@ -878,19 +873,6 @@ for (dgDebriGraph::dgListNode* node = m_conectivity.GetFirst(); node != m_conect
 }
 */
 
-
-
-dgCollisionCompoundFractured::~dgCollisionCompoundFractured(void)
-{
-	if (m_visibilityMap) {
-		m_allocator->Free (m_visibilityMap);
-		m_allocator->Free (m_visibilityIndirectMap);
-	}
-
-	if (m_vertexBuffer) {
-		m_vertexBuffer->Release();
-	}
-}
 
 
 class dgCollisionCompoundFractured::dgFractureBuilder: public dgTree<dgMeshEffect*, dgInt32>
@@ -1757,9 +1739,26 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (dgWorld* const world
 //	LinkNodes ();	
 //	ResetAnchor ();
 //  m_conectivity.Trace();
-
 }
 
+dgCollisionCompoundFractured::~dgCollisionCompoundFractured(void)
+{
+    if (m_visibilityMap) {
+        m_allocator->Free (m_visibilityMap);
+        m_allocator->Free (m_visibilityIndirectMap);
+    }
+
+    if (m_vertexBuffer) {
+        m_vertexBuffer->Release();
+    }
+}
+
+void dgCollisionCompoundFractured::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const
+{
+    dgCollisionCompound::CalcAABB (matrix, p0, p1);
+    p0 -= dgVector (DG_FRACTURE_AABB_GUARD_DISTANCE) & dgVector::m_triplexMask;
+    p1 += dgVector (DG_FRACTURE_AABB_GUARD_DISTANCE) & dgVector::m_triplexMask;
+}
 
 dgInt32 dgCollisionCompoundFractured::GetSegmentIndexStreamShort (dgDebriGraph::dgListNode* const node, dgMesh::dgListNode* subMeshNode, dgInt16* const index) const
 {

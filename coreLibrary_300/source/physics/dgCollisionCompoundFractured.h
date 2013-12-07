@@ -206,6 +206,8 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 	dgIsland m_detachedIslands;
 */	
 	private:
+    virtual void CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
+
 	dgDebriGraph m_conectivity;
 	dgVertexBuffer* m_vertexBuffer;
 	dgInt8* m_visibilityMap;
