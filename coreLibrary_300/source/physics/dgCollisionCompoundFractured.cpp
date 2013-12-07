@@ -24,7 +24,7 @@
 #include "dgMeshEffect.h"
 #include "dgCollisionInstance.h"
 #include "dgCollisionConvexHull.h"
-#include "dgCollisionCompoundBreakable.h"
+#include "dgCollisionCompoundFractured.h"
 
 
 
@@ -200,13 +200,13 @@ dgFloat32 dgCollisionCompoundBreakable::dgCollisionConvexIntance::GetBreakImpuls
 
 
 
-dgCollisionCompoundBreakable::dgDebriGraph::dgDebriGraph (dgMemoryAllocator* const allocator)
+dgCollisionCompoundFractured::dgDebriGraph::dgDebriGraph (dgMemoryAllocator* const allocator)
 	:dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>(allocator)
 {
 }
 
 
-dgCollisionCompoundBreakable::dgDebriGraph::dgDebriGraph (dgMemoryAllocator* const allocator, dgDeserialize callback, void* const userData)
+dgCollisionCompoundFractured::dgDebriGraph::dgDebriGraph (dgMemoryAllocator* const allocator, dgDeserialize callback, void* const userData)
 	:dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>(allocator)
 {
 	dgAssert (0);
@@ -246,7 +246,7 @@ dgCollisionCompoundBreakable::dgDebriGraph::dgDebriGraph (dgMemoryAllocator* con
 
 
 
-dgCollisionCompoundBreakable::dgDebriGraph::dgDebriGraph (const dgDebriGraph& source)
+dgCollisionCompoundFractured::dgDebriGraph::dgDebriGraph (const dgDebriGraph& source)
 	:dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>(source.GetAllocator())
 {
 	dgTree<dgListNode*, dgListNode*> filter(GetAllocator());   
@@ -273,11 +273,11 @@ dgCollisionCompoundBreakable::dgDebriGraph::dgDebriGraph (const dgDebriGraph& so
 }
 
 
-dgCollisionCompoundBreakable::dgDebriGraph::~dgDebriGraph ()
+dgCollisionCompoundFractured::dgDebriGraph::~dgDebriGraph ()
 {
 }
 
-void dgCollisionCompoundBreakable::dgDebriGraph::Serialize(dgSerialize callback, void* const userData) const
+void dgCollisionCompoundFractured::dgDebriGraph::Serialize(dgSerialize callback, void* const userData) const
 {
 	dgAssert (0);
 /*
@@ -328,7 +328,7 @@ void dgCollisionCompoundBreakable::dgDebriGraph::Serialize(dgSerialize callback,
 
 
 
-dgCollisionCompoundBreakable::dgCollisionCompoundBreakable (dgWorld* const world, dgDeserialize deserialization, void* const userData)
+dgCollisionCompoundFractured::dgCollisionCompoundFractured (dgWorld* const world, dgDeserialize deserialization, void* const userData)
 	:dgCollisionCompound (world, deserialization, userData)
 	,m_conectivity(world->GetAllocator(), deserialization, userData)
 //	,m_detachedIslands(world->GetAllocator())
@@ -880,7 +880,7 @@ for (dgDebriGraph::dgListNode* node = m_conectivity.GetFirst(); node != m_conect
 
 
 
-dgCollisionCompoundBreakable::~dgCollisionCompoundBreakable(void)
+dgCollisionCompoundFractured::~dgCollisionCompoundFractured(void)
 {
 	if (m_visibilityMap) {
 		m_allocator->Free (m_visibilityMap);
@@ -893,7 +893,7 @@ dgCollisionCompoundBreakable::~dgCollisionCompoundBreakable(void)
 }
 
 
-class dgCollisionCompoundBreakable::dgFractureBuilder: public dgTree<dgMeshEffect*, dgInt32>
+class dgCollisionCompoundFractured::dgFractureBuilder: public dgTree<dgMeshEffect*, dgInt32>
 {
 	public:
     class dgPerimenterEdge
@@ -1332,14 +1332,14 @@ for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; n
 
 
 
-dgCollisionCompoundBreakable::dgDebriNodeInfo::dgDebriNodeInfo ()
+dgCollisionCompoundFractured::dgDebriNodeInfo::dgDebriNodeInfo ()
 	:m_mesh(NULL)
 	,m_shapeNode(NULL)
 {
 //	memset (&m_commonData, 0, sizeof (m_commonData));
 }
 
-dgCollisionCompoundBreakable::dgDebriNodeInfo::~dgDebriNodeInfo ()
+dgCollisionCompoundFractured::dgDebriNodeInfo::~dgDebriNodeInfo ()
 {
 
 	if (m_mesh) {
@@ -1348,7 +1348,7 @@ dgCollisionCompoundBreakable::dgDebriNodeInfo::~dgDebriNodeInfo ()
 }
 
 
-dgCollisionCompoundBreakable::dgVertexBuffer::dgVertexBuffer(dgInt32 vertsCount, dgMemoryAllocator* allocator)
+dgCollisionCompoundFractured::dgVertexBuffer::dgVertexBuffer(dgInt32 vertsCount, dgMemoryAllocator* allocator)
 	:m_allocator(allocator)
 	,m_vertexCount(vertsCount)
 {
@@ -1357,14 +1357,14 @@ dgCollisionCompoundBreakable::dgVertexBuffer::dgVertexBuffer(dgInt32 vertsCount,
 	m_normal = (dgFloat32 *) m_allocator->Malloc (3 * vertsCount * dgInt32 (sizeof (dgFloat32))); 
 }
 
-dgCollisionCompoundBreakable::dgVertexBuffer::~dgVertexBuffer ()
+dgCollisionCompoundFractured::dgVertexBuffer::~dgVertexBuffer ()
 {
 	m_allocator->Free (m_normal);
 	m_allocator->Free (m_vertex);
 	m_allocator->Free (m_uv);
 }
 
-dgCollisionCompoundBreakable::dgVertexBuffer::dgVertexBuffer (dgMemoryAllocator* const allocator, dgDeserialize callback, void* const userData)
+dgCollisionCompoundFractured::dgVertexBuffer::dgVertexBuffer (dgMemoryAllocator* const allocator, dgDeserialize callback, void* const userData)
 {
 	dgAssert(0);
 	m_allocator = allocator;
@@ -1379,7 +1379,7 @@ dgCollisionCompoundBreakable::dgVertexBuffer::dgVertexBuffer (dgMemoryAllocator*
 	callback (userData, m_uv, size_t (2 * m_vertexCount * dgInt32 (sizeof (dgFloat32))));
 }
 
-void dgCollisionCompoundBreakable::dgVertexBuffer::Serialize(dgSerialize callback, void* const userData) const
+void dgCollisionCompoundFractured::dgVertexBuffer::Serialize(dgSerialize callback, void* const userData) const
 {
 	callback (userData, &m_vertexCount, dgInt32 (sizeof (dgInt32)));
 	callback (userData, m_vertex, size_t (3 * m_vertexCount * dgInt32 (sizeof (dgFloat32))));
@@ -1411,7 +1411,7 @@ void dgCollisionCompoundBreakable::dgVertexBuffer::GetVertexStreams (dgInt32 ver
 }
 */
 
-dgCollisionCompoundBreakable::dgSubMesh::dgSubMesh (dgMemoryAllocator* const allocator)
+dgCollisionCompoundFractured::dgSubMesh::dgSubMesh (dgMemoryAllocator* const allocator)
 	:m_indexes(NULL)
 	,m_allocator(allocator)
 	,m_faceOffset(0)
@@ -1421,14 +1421,14 @@ dgCollisionCompoundBreakable::dgSubMesh::dgSubMesh (dgMemoryAllocator* const all
 {
 }
 
-dgCollisionCompoundBreakable::dgSubMesh::~dgSubMesh ()
+dgCollisionCompoundFractured::dgSubMesh::~dgSubMesh ()
 {
 	if (m_indexes) {
 		m_allocator->Free (m_indexes);
 	}
 }
 
-void dgCollisionCompoundBreakable::dgSubMesh::Serialize(dgSerialize callback, void* const userData) const
+void dgCollisionCompoundFractured::dgSubMesh::Serialize(dgSerialize callback, void* const userData) const
 {
 	dgAssert(0);
 /*
@@ -1440,26 +1440,26 @@ void dgCollisionCompoundBreakable::dgSubMesh::Serialize(dgSerialize callback, vo
 */
 }
 
-dgCollisionCompoundBreakable::dgSharedNodeMesh::dgSharedNodeMesh ()
+dgCollisionCompoundFractured::dgSharedNodeMesh::dgSharedNodeMesh ()
 {
 }
 
-dgCollisionCompoundBreakable::dgSharedNodeMesh::~dgSharedNodeMesh ()
+dgCollisionCompoundFractured::dgSharedNodeMesh::~dgSharedNodeMesh ()
 {
 }
 
 
-dgCollisionCompoundBreakable::dgMesh::dgMesh(dgMemoryAllocator* const allocator)
+dgCollisionCompoundFractured::dgMesh::dgMesh(dgMemoryAllocator* const allocator)
 	:dgList<dgSubMesh>(allocator)
 	,m_IsVisible(false)
 {
 }
 
-dgCollisionCompoundBreakable::dgMesh::~dgMesh()
+dgCollisionCompoundFractured::dgMesh::~dgMesh()
 {
 }
 
-dgCollisionCompoundBreakable::dgMesh::dgMesh (dgMemoryAllocator* const allocator, dgDeserialize callback, void* const userData)
+dgCollisionCompoundFractured::dgMesh::dgMesh (dgMemoryAllocator* const allocator, dgDeserialize callback, void* const userData)
 	:dgList<dgSubMesh>(allocator), dgRefCounter ()
 {
 	dgAssert(0);
@@ -1490,7 +1490,7 @@ dgCollisionCompoundBreakable::dgMesh::dgMesh (dgMemoryAllocator* const allocator
 */
 }
 
-void dgCollisionCompoundBreakable::dgMesh::Serialize(dgSerialize callback, void* const userData) const
+void dgCollisionCompoundFractured::dgMesh::Serialize(dgSerialize callback, void* const userData) const
 {
 	dgAssert(0);
 /*
@@ -1506,7 +1506,7 @@ void dgCollisionCompoundBreakable::dgMesh::Serialize(dgSerialize callback, void*
 */
 }
 
-dgCollisionCompoundBreakable::dgSubMesh* dgCollisionCompoundBreakable::dgMesh::AddgSubMesh(dgInt32 indexCount, dgInt32 material)
+dgCollisionCompoundFractured::dgSubMesh* dgCollisionCompoundFractured::dgMesh::AddgSubMesh(dgInt32 indexCount, dgInt32 material)
 {
 	dgSubMesh tmp (GetAllocator());
 	dgSubMesh& subMesh = Append(tmp)->GetInfo();
@@ -1522,7 +1522,7 @@ dgCollisionCompoundBreakable::dgSubMesh* dgCollisionCompoundBreakable::dgMesh::A
 }
 
 
- dgCollisionCompoundBreakable::dgDebriGraph::dgListNode* dgCollisionCompoundBreakable::dgDebriGraph::AddNode (dgFlatVertexArray& vertexArray, dgMeshEffect* const factureVisualMesh, dgTreeArray::dgTreeNode* const collisionNode, dgInt32 interiorMaterialBase)
+ dgCollisionCompoundFractured::dgDebriGraph::dgListNode* dgCollisionCompoundFractured::dgDebriGraph::AddNode (dgFlatVertexArray& vertexArray, dgMeshEffect* const factureVisualMesh, dgTreeArray::dgTreeNode* const collisionNode, dgInt32 interiorMaterialBase)
 {
 	dgListNode* const node = dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>::AddNode ();
 	dgDebriNodeInfo& data = node->GetInfo().m_nodeData;
@@ -1587,7 +1587,7 @@ dgCollisionCompoundBreakable::dgSubMesh* dgCollisionCompoundBreakable::dgMesh::A
 }
  
 
-dgCollisionCompoundBreakable::dgCollisionCompoundBreakable (const dgCollisionCompoundBreakable& source)
+dgCollisionCompoundFractured::dgCollisionCompoundFractured (const dgCollisionCompoundFractured& source)
 //	:dgCollisionCompound(source), m_conectivity(source.m_conectivity), m_detachedIslands(source.m_conectivity.GetAllocator())
     :dgCollisionCompound(source)
 	,m_conectivity(source.m_conectivity)
@@ -1628,7 +1628,7 @@ dgCollisionCompoundBreakable::dgCollisionCompoundBreakable (const dgCollisionCom
 }
 
 
-dgCollisionCompoundBreakable::dgCollisionCompoundBreakable (dgWorld* const world, dgMeshEffect* const solidMesh, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& offsetMatrix)
+dgCollisionCompoundFractured::dgCollisionCompoundFractured (dgWorld* const world, dgMeshEffect* const solidMesh, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& offsetMatrix)
 	:dgCollisionCompound (world)
 	,m_conectivity(world->GetAllocator())
 	,m_vertexBuffer(NULL)
@@ -1761,7 +1761,7 @@ dgCollisionCompoundBreakable::dgCollisionCompoundBreakable (dgWorld* const world
 }
 
 
-dgInt32 dgCollisionCompoundBreakable::GetSegmentIndexStreamShort (dgDebriGraph::dgListNode* const node, dgMesh::dgListNode* subMeshNode, dgInt16* const index) const
+dgInt32 dgCollisionCompoundFractured::GetSegmentIndexStreamShort (dgDebriGraph::dgListNode* const node, dgMesh::dgListNode* subMeshNode, dgInt16* const index) const
 {
 	dgSubMesh* const subMesh = &subMeshNode->GetInfo();
 	const dgInt32* const indexes = subMesh->m_indexes;	
@@ -1795,7 +1795,7 @@ dgInt32 dgCollisionCompoundBreakable::GetSegmentIndexStreamShort (dgDebriGraph::
 }
 
 
-dgInt32 dgCollisionCompoundBreakable::GetSegmentIndexStream (dgDebriGraph::dgListNode* const node, dgMesh::dgListNode* const subMeshNode, dgInt32* const index) const
+dgInt32 dgCollisionCompoundFractured::GetSegmentIndexStream (dgDebriGraph::dgListNode* const node, dgMesh::dgListNode* const subMeshNode, dgInt32* const index) const
 {
 	dgSubMesh* const subMesh = &subMeshNode->GetInfo();
 	const dgInt32* const indexes = subMesh->m_indexes;

@@ -2794,7 +2794,7 @@ int NewtonCompoundBreakableGetVertexCount (const NewtonCollision* const compound
 
 	dgInt32 count = 0;
 	if (collision->IsType (dgCollision::dgCollisionCompoundBreakable_RTTI)) {
-		dgCollisionCompoundBreakable* const compound = (dgCollisionCompoundBreakable*) collision->GetChildShape();
+		dgCollisionCompoundFractured* const compound = (dgCollisionCompoundFractured*) collision->GetChildShape();
 		count = compound->GetVertecCount();
 	}
 	return count;
@@ -2808,7 +2808,7 @@ const dFloat* NewtonCompoundBreakableGetVertexPositions (const NewtonCollision* 
 
 	const dgFloat32* points = NULL;
 	if (collision->IsType (dgCollision::dgCollisionCompoundBreakable_RTTI)) {
-		dgCollisionCompoundBreakable* const compound = (dgCollisionCompoundBreakable*) collision->GetChildShape();
+		dgCollisionCompoundFractured* const compound = (dgCollisionCompoundFractured*) collision->GetChildShape();
 		points = compound->GetVertexPositions();
 	}
 	return points;
@@ -2822,7 +2822,7 @@ const dFloat* NewtonCompoundBreakableGetVertexNormals (const NewtonCollision* co
 
 	const dgFloat32* points = NULL;
 	if (collision->IsType (dgCollision::dgCollisionCompoundBreakable_RTTI)) {
-		dgCollisionCompoundBreakable* const compound = (dgCollisionCompoundBreakable*) collision->GetChildShape();
+		dgCollisionCompoundFractured* const compound = (dgCollisionCompoundFractured*) collision->GetChildShape();
 		points = compound->GetVertexNormal();
 	}
 	return points;
@@ -2835,7 +2835,7 @@ const dFloat* NewtonCompoundBreakableGetVertexUVs (const NewtonCollision* const 
 
 	const dgFloat32* points = NULL;
 	if (collision->IsType (dgCollision::dgCollisionCompoundBreakable_RTTI)) {
-		dgCollisionCompoundBreakable* const compound = (dgCollisionCompoundBreakable*) collision->GetChildShape();
+		dgCollisionCompoundFractured* const compound = (dgCollisionCompoundFractured*) collision->GetChildShape();
 		points = compound->GetVertexUVs();
 	}
 	return points;
@@ -2849,7 +2849,7 @@ NewtonBreakableComponentMesh* NewtonBreakableGetMainMesh (const NewtonCollision*
 
 	NewtonBreakableComponentMesh* mesh = NULL;
 	if (collision->IsType (dgCollision::dgCollisionCompoundBreakable_RTTI)) {
-		dgCollisionCompoundBreakable* const compound = (dgCollisionCompoundBreakable*) collision->GetChildShape();
+		dgCollisionCompoundFractured* const compound = (dgCollisionCompoundFractured*) collision->GetChildShape();
 		mesh = (NewtonBreakableComponentMesh*) compound->GetMainMesh();
 	}
 	return mesh;
@@ -2859,14 +2859,14 @@ NewtonBreakableComponentMesh* NewtonBreakableGetMainMesh (const NewtonCollision*
 void* NewtonBreakableGetFirstSegment (const NewtonBreakableComponentMesh* const breakableComponentMesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	dgCollisionCompoundBreakable::dgDebriGraph::dgListNode* const node = (dgCollisionCompoundBreakable::dgDebriGraph::dgListNode*) breakableComponentMesh;
+	dgCollisionCompoundFractured::dgDebriGraph::dgListNode* const node = (dgCollisionCompoundFractured::dgDebriGraph::dgListNode*) breakableComponentMesh;
 	return node->GetInfo().m_nodeData.m_mesh->GetFirst();
 }
 
 void* NewtonBreakableGetNextSegment (const void* const breakableComponentSegment)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	dgCollisionCompoundBreakable::dgMesh::dgListNode* const node = (dgCollisionCompoundBreakable::dgMesh::dgListNode*) breakableComponentSegment;
+	dgCollisionCompoundFractured::dgMesh::dgListNode* const node = (dgCollisionCompoundFractured::dgMesh::dgListNode*) breakableComponentSegment;
 	return node->GetNext();
 }
 
@@ -2874,7 +2874,7 @@ int NewtonBreakableSegmentGetMaterial (const void* const segment)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 
-	dgCollisionCompoundBreakable::dgMesh::dgListNode* const node = (dgCollisionCompoundBreakable::dgMesh::dgListNode*) segment;
+	dgCollisionCompoundFractured::dgMesh::dgListNode* const node = (dgCollisionCompoundFractured::dgMesh::dgListNode*) segment;
 	return node->GetInfo().m_material;
 }
 
@@ -2883,7 +2883,7 @@ int NewtonBreakableSegmentGetIndexCount (const void* const segment)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 
-	dgCollisionCompoundBreakable::dgMesh::dgListNode* const node = (dgCollisionCompoundBreakable::dgMesh::dgListNode*) segment;
+	dgCollisionCompoundFractured::dgMesh::dgListNode* const node = (dgCollisionCompoundFractured::dgMesh::dgListNode*) segment;
 	return node->GetInfo().m_faceCount * 3;
 }
 
@@ -2894,8 +2894,8 @@ int NewtonBreakableSegmentGetIndexStream (const NewtonCollision* const compoundB
 	dgInt32 count = 0;
 	dgCollisionInstance* const collision = (dgCollisionInstance*) compoundBreakable;
 	if (collision->IsType (dgCollision::dgCollisionCompoundBreakable_RTTI)) {
-		dgCollisionCompoundBreakable* const compound = (dgCollisionCompoundBreakable*) collision;
-		count = compound->GetSegmentIndexStream ((dgCollisionCompoundBreakable::dgDebriGraph::dgListNode*) meshOwner, (dgCollisionCompoundBreakable::dgMesh::dgListNode*) segment, index);
+		dgCollisionCompoundFractured* const compound = (dgCollisionCompoundFractured*) collision;
+		count = compound->GetSegmentIndexStream ((dgCollisionCompoundFractured::dgDebriGraph::dgListNode*) meshOwner, (dgCollisionCompoundFractured::dgMesh::dgListNode*) segment, index);
 	}
 	return count;
 }
@@ -2907,8 +2907,8 @@ int NewtonBreakableSegmentGetIndexStreamShort (const NewtonCollision* const comp
 	dgInt32 count = 0;
 	dgCollisionInstance* const collision = (dgCollisionInstance*) compoundBreakable;
 	if (collision->IsType (dgCollision::dgCollisionCompoundBreakable_RTTI)) {
-		dgCollisionCompoundBreakable* const compound = (dgCollisionCompoundBreakable*) collision;
-		count = compound->GetSegmentIndexStreamShort ((dgCollisionCompoundBreakable::dgDebriGraph::dgListNode*) meshOwner, (dgCollisionCompoundBreakable::dgMesh::dgListNode*) segment, index);
+		dgCollisionCompoundFractured* const compound = (dgCollisionCompoundFractured*) collision;
+		count = compound->GetSegmentIndexStreamShort ((dgCollisionCompoundFractured::dgDebriGraph::dgListNode*) meshOwner, (dgCollisionCompoundFractured::dgMesh::dgListNode*) segment, index);
 	}
 	return count;
 }

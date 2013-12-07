@@ -30,7 +30,7 @@ class dgFracturedBodiesUpdate: public dgList<dgCollisionDeformableMesh*>
 	dgFracturedBodiesUpdate (dgMemoryAllocator* const allocator);
 
 	void AddShape(dgCollisionDeformableMesh* const shape);
-	void RemoveShape(dgCollisionDeformableMesh*  const shape);
+	void RemoveShape(dgCollisionDeformableMesh* const shape);
 
 	private:
 	dgTree <dgListNode*, const dgCollisionDeformableMesh*> m_dictionary;

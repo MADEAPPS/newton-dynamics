@@ -47,7 +47,7 @@
 #include "dgCollisionTaperedCapsule.h"
 #include "dgCollisionTaperedCylinder.h"
 #include "dgCollisionChamferCylinder.h"
-#include "dgCollisionCompoundBreakable.h"
+#include "dgCollisionCompoundFractured.h"
 #include "dgCollisionDeformableClothPatch.h"
 
 #define DG_CONTACT_TRANSLATION_ERROR (dgFloat32 (1.0e-3f))
@@ -257,7 +257,7 @@ dgCollisionInstance* dgWorld::CreateCollisionCompoundBreakable (dgMeshEffect* co
 {
 	dgAssert (m_allocator == solidMesh->GetAllocator());
 
-	dgCollision* const collision = new (m_allocator) dgCollisionCompoundBreakable (this, solidMesh, fracturePhysicsMaterialID, pointcloudCount, vertexCloud, strideInBytes, materialID, textureMatrix);
+	dgCollision* const collision = new (m_allocator) dgCollisionCompoundFractured (this, solidMesh, fracturePhysicsMaterialID, pointcloudCount, vertexCloud, strideInBytes, materialID, textureMatrix);
 	dgCollisionInstance* const instance = CreateInstance (collision, shapeID, dgGetIdentityMatrix()); 
 	collision->Release();
 	return instance;

@@ -49,7 +49,7 @@
 #include "dgCollisionHeightField.h"
 #include "dgCollisionConvexPolygon.h"
 #include "dgCollisionDeformableMesh.h"
-#include "dgCollisionCompoundBreakable.h"
+#include "dgCollisionCompoundFractured.h"
 
 #endif 
 

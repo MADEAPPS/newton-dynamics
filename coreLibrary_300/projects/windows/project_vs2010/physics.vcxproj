@@ -475,7 +475,7 @@
     <ClCompile Include="..\..\..\source\physics\dgCollisionCapsule.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCollisionChamferCylinder.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCollisionCompound.cpp" />
-    <ClCompile Include="..\..\..\source\physics\dgCollisionCompoundBreakable.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgCollisionCompoundFractured.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCollisionCone.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCollisionConvex.cpp">
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='release|Win32'">NoListing</AssemblerOutput>
@@ -543,7 +543,7 @@
     <ClInclude Include="..\..\..\source\physics\dgCollisionCapsule.h" />
     <ClInclude Include="..\..\..\source\physics\dgCollisionChamferCylinder.h" />
     <ClInclude Include="..\..\..\source\physics\dgCollisionCompound.h" />
-    <ClInclude Include="..\..\..\source\physics\dgCollisionCompoundBreakable.h" />
+    <ClInclude Include="..\..\..\source\physics\dgCollisionCompoundFractured.h" />
     <ClInclude Include="..\..\..\source\physics\dgCollisionCone.h" />
     <ClInclude Include="..\..\..\source\physics\dgCollisionConvex.h" />
     <ClInclude Include="..\..\..\source\physics\dgCollisionConvexHull.h" />

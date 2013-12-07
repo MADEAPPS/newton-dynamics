@@ -28,7 +28,7 @@
 #include "dgCollisionCompound.h"
 #include "dgWorldDynamicUpdate.h"
 #include "dgCollisionDeformableMesh.h"
-#include "dgCollisionCompoundBreakable.h"
+#include "dgCollisionCompoundFractured.h"
 
 
 //////////////////////////////////////////////////////////////////////

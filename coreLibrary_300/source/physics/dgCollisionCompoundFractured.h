@@ -19,17 +19,16 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef AFX_DGCOLLISIONCOMPOUND_BREAKABLE_H_H
-#define AFX_DGCOLLISIONCOMPOUND_BREAKABLE_H_H
+#ifndef DG_COLLISION_COMPOUND_FRACTURED_H
+#define DG_COLLISION_COMPOUND_FRACTURED_H
 
 #include "dgCollisionCompound.h"
 
 
 class dgMeshEffect;
 
-class dgCollisionCompoundBreakable: public dgCollisionCompound
+class dgCollisionCompoundFractured: public dgCollisionCompound
 {
-
 	class dgFractureBuilder;
 
 	public:
@@ -128,8 +127,6 @@ class dgCollisionCompoundBreakable: public dgCollisionCompound
 		~dgSharedNodeMesh ();
 	};
 
-
-
 	class dgDebriGraph: public dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>
 	{
 		public:
@@ -165,69 +162,15 @@ class dgCollisionCompoundBreakable: public dgCollisionCompound
 		{
 		}
 	};
-
-
-	class dgCollisionConvexIntance: public dgCollisionConvex
-	{
-		public:
-		dgCollisionConvexIntance (dgWorld* const world, dgDeserialize deserialization, void* const userData);
-		dgCollisionConvexIntance (const dgCollisionConvexIntance& source, dgDebriGraph::dgListNode* node);
-		dgCollisionConvexIntance (dgCollisionConvex* convexChild, dgDebriGraph::dgListNode* node, dgFloat32 density);
-		virtual ~dgCollisionConvexIntance();
-
-		protected:
-		virtual dgFloat32 GetVolume () const;
-		virtual dgVector SupportVertex (const dgVector& dir) const;
-
-		virtual void CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
-		virtual void DebugCollision  (const dgMatrix& matrix, OnDebugCollisionMeshCallback callback, void* const userData) const;
-		virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
-		virtual dgVector CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& plane) const;
-
-		private:
-		virtual dgInt32 CalculateSignature () const;
-		virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1);
-		virtual dgFloat32 GetBoxMinRadius () const;
-		virtual dgFloat32 GetBoxMaxRadius () const;
-		virtual dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut)  const;
-
-		virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
-		virtual void Serialize(dgSerialize callback, void* const userData) const;
-
-		virtual void SetBreakImpulse(dgFloat32 force);
-		virtual dgFloat32 GetBreakImpulse() const;
-
-
-		
-		dgNodeBase* m_treeNode;
-		dgCollisionConvex* m_myShape;
-		dgDebriGraph::dgListNode* m_graphNode;
-		dgVector m_inertia;
-		dgFloat32 m_destructionImpulse;
-
-#ifdef _DEBUG
-		dgInt32 m_ordinal;
-#endif
-		friend class dgCollisionCompoundBreakable;
-	};
-
-
-
-//	class dgSegmenList: public dgList<dgMeshEffect*>
-//	{	
-//		public:
-//		dgSegmenList(dgMeshEffect* const source);
-//		~dgSegmenList();
-//	};
 #endif
 */
 
 	public:
-	dgCollisionCompoundBreakable (const dgCollisionCompoundBreakable& source);
-	dgCollisionCompoundBreakable (dgWorld* const world, dgMeshEffect* const solidMesh, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& offsetMatrix);
+	dgCollisionCompoundFractured (const dgCollisionCompoundFractured& source);
+	dgCollisionCompoundFractured (dgWorld* const world, dgMeshEffect* const solidMesh, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& offsetMatrix);
 
-	dgCollisionCompoundBreakable (dgWorld* const world, dgDeserialize deserialization, void* const userData);
-	virtual ~dgCollisionCompoundBreakable(void);
+	dgCollisionCompoundFractured (dgWorld* const world, dgDeserialize deserialization, void* const userData);
+	virtual ~dgCollisionCompoundFractured(void);
 
 	dgDebriGraph::dgListNode* GetMainMesh() const {return m_conectivity.GetLast();}
 
@@ -245,9 +188,6 @@ class dgCollisionCompoundBreakable: public dgCollisionCompound
 	dgBody* CreateComponentBody (dgDebriGraph::dgListNode* node) const;
 	void DeleteComponent (dgDebriGraph::dgListNode* node);
 	void DeleteComponentEnd ();
-
-
-	
 	dgDebriGraph::dgListNode* GetFirstComponentMesh () const {return (m_conectivity.GetCount() > 2) ? m_conectivity.GetFirst()->GetNext() : NULL;}
 	dgInt32 GetSegmentsInRadius (const dgVector& origin, dgFloat32 radius, dgDebriGraph::dgListNode** segments, dgInt32 maxCount);
 
@@ -256,28 +196,16 @@ class dgCollisionCompoundBreakable: public dgCollisionCompound
 	void EnumerateIslands ();
 //	dgInt32 GetSegmentsInRadius (const dgVector& origin, dgFloat32 radius, dgDebriGraph::dgListNode** segments, dgInt32 maxCount);
 //	dgInt32 GetDetachedPieces (dgCollision** shapes, dgInt32 maxCount);
-
-	
-	
-
-
-
 	private:
-
 	void LinkNodes ();	
-
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
 	
 	dgInt32 m_lru;
 	dgInt32 m_lastIslandColor;
-	
-	
-	
-	dgVertexBuffer* m_vertexBuffer;
-	
 	dgIsland m_detachedIslands;
 */	
+	private:
 	dgDebriGraph m_conectivity;
 	dgVertexBuffer* m_vertexBuffer;
 	dgInt8* m_visibilityMap;

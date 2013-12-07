@@ -327,7 +327,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	friend class dgConvexHull3d;
 	friend class dgConvexHull4d;
 	friend class dgBooleanMeshBVH;
-	friend class dgCollisionCompoundBreakable;
+	friend class dgCollisionCompoundFractured;
 };
 
 
