@@ -27,12 +27,6 @@ class dPluginRecord;
 class dPluginInterface: public dUndoRedoManager
 {
 	public:
-	enum dNodeEditorFlags
-	{
-		m_selected = 1<<0,
-		m_expanded = 1<<1,
-	};
-
 	class dPluginDll: public dList <HMODULE>
 	{
 	};

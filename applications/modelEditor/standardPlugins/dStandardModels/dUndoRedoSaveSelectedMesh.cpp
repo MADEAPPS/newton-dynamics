@@ -34,7 +34,7 @@ dUndoRedoSaveSelectedMesh::dUndoRedoSaveSelectedMesh (dPluginInterface* const in
 		dScene::dTreeNode* const node = scene->GetNodeFromLink(link);
 		dNodeInfo* const info = scene->GetInfoFromNode(node);
 		if (info->IsType(dMeshNodeInfo::GetRttiType())) {
-			if (info->GetEditorFlags() & dPluginInterface::m_selected) {
+			if (info->GetEditorFlags() & dNodeInfo::m_selected) {
 				Append((dMeshNodeInfo*) info);
 			}
 		}

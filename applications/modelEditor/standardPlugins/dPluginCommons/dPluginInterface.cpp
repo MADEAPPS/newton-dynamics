@@ -177,7 +177,7 @@ bool dPluginInterface::HasMeshSelection (dCRCTYPE meshType)
 			dScene::dTreeNode* const node = m_scene->GetNodeFromLink(link);
 			dNodeInfo* const info = m_scene->GetInfoFromNode(node);
 			if (info->IsType(meshType)) {
-				if (info->GetEditorFlags() & dPluginInterface::m_selected) {
+				if (info->GetEditorFlags() & dNodeInfo::m_selected) {
 					return true;
 				}
 			}

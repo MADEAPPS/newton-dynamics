@@ -68,6 +68,7 @@ class dSceneRender: public dRefCounter
 	virtual void DisableTexture() = 0;
 	virtual void EnableZBias(dFloat val) = 0;
 	virtual void DisableZBias() = 0;
+	virtual const dVector& GetColor() const = 0;
 	virtual void SetColor(const dVector& color) = 0;
 
 	virtual void SetMaterialDiffuse(const dVector& color) = 0;
@@ -87,7 +88,6 @@ class dSceneRender: public dRefCounter
 	virtual void SubmitNormal(const dVector& normal) = 0;
 	virtual void SubmitVertex(const dVector& posit) = 0;
 	virtual void End() = 0;
-
 
 	DSCENE_API virtual dVector GlobalToScreen (const dVector& global) const;
 	DSCENE_API virtual dVector ScreenToGlobal (const dVector& screen) const;

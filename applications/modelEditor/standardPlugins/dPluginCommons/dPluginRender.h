@@ -76,7 +76,10 @@ class dPluginRender: public dSceneRender
 	virtual void DisableTexture();
 	virtual void EnableZBias(dFloat val);
 	virtual void DisableZBias();
+
+	virtual const dVector& GetColor() const;
 	virtual void SetColor(const dVector& color);
+
 	virtual void SetMaterialDiffuse(const dVector& color);
 	virtual void SetMaterialAmbient(const dVector& color);
 	virtual void SetMaterialSpecular(const dVector& color);
@@ -94,6 +97,8 @@ class dPluginRender: public dSceneRender
 	void CleanupDisplayListCache(dTree<int, const NewtonMesh*>& cache);
 	dTree<int, const NewtonMesh*> m_wireFrameDisplayList;
 	dTree<int, const NewtonMesh*> m_flatShadedDisplayList;
+
+	dVector m_color;
 };
 
 

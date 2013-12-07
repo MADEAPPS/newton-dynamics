@@ -1,14 +1,8 @@
-// xxxxxxxxxxxxx.cpp : Defines the entry point for the console application.
-//
-
 #include "stdafx.h"
-
 #include <iostream>
 #include <dVector.h>
 #include <dMatrix.h>
 #include <newton.h>
-
-
 
 NewtonBody* CreateBackgroundBody(NewtonWorld* const world)
 {

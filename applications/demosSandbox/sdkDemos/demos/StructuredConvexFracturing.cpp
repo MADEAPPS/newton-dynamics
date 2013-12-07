@@ -983,9 +983,12 @@ void BuildingDestruction(SceneManager& system)
 #endif
 
 
-#define POINT_CLOUD_SIZE	50
+#define MAX_POINT_CLOUD_SIZE		500
+#define POINT_DENSITY_PER_METERS	0.5f  
+#define POISON_VARIANCE				(0.75f * POINT_DENSITY_PER_METERS)
 
-static void MakeRandomPointCloud(NewtonMesh* const mesh, dVector* const points)
+
+static int MakeRandomPoisonPointCloud(NewtonMesh* const mesh, dVector* const points)
 {
 	dVector size;
 	dMatrix matrix(GetIdentityMatrix()); 
@@ -994,22 +997,36 @@ static void MakeRandomPointCloud(NewtonMesh* const mesh, dVector* const points)
 	dVector minBox (matrix.m_posit - matrix[0].Scale (size.m_x) - matrix[1].Scale (size.m_y) - matrix[2].Scale (size.m_z));
 	dVector maxBox (matrix.m_posit + matrix[0].Scale (size.m_x) + matrix[1].Scale (size.m_y) + matrix[2].Scale (size.m_z));
 
-	int count = 0;		
-	size = (maxBox - minBox).Scale (0.5f);
-	dVector center ((maxBox + minBox).Scale (0.5f));
+	size = maxBox - minBox;
+	int xCount = int (size.m_x / POINT_DENSITY_PER_METERS) + 1;
+	int yCount = int (size.m_y / POINT_DENSITY_PER_METERS) + 1;
+	int zCount = int (size.m_z / POINT_DENSITY_PER_METERS) + 1;
 
-	while (count < POINT_CLOUD_SIZE) {			
-		dFloat x = RandomVariable(size.m_x);
-		dFloat y = RandomVariable(size.m_y);
-		dFloat z = RandomVariable(size.m_z);
-x = 0;
-y = 0;
-z = 0;
-//		if ((x < maxBox.m_x) && (x > minBox.m_x) && (y < maxBox.m_y) && (y > minBox.m_y) && (z < maxBox.m_z) && (z > minBox.m_z)){
-			points[count] = center + dVector (x, y, z);
-			count ++;
-//		}
+	int count = 0;
+	dFloat z0 = minBox.m_z;
+	for (int iz = 0; (iz < zCount) && (count < MAX_POINT_CLOUD_SIZE); iz ++) {
+		dFloat y0 = minBox.m_y;
+		for (int iy = 0; (iy < yCount) && (count < MAX_POINT_CLOUD_SIZE); iy ++) {
+			dFloat x0 = minBox.m_x;
+			for (int ix = 0; (ix < xCount) && (count < MAX_POINT_CLOUD_SIZE); ix ++) {
+
+				dFloat x = x0;
+				dFloat y = y0;
+				dFloat z = z0;
+				x += RandomVariable(POISON_VARIANCE);
+				y += RandomVariable(POISON_VARIANCE);
+				z += RandomVariable(POISON_VARIANCE);
+				points[count] = dVector (x, y, z);
+				count ++;
+				x0 += POINT_DENSITY_PER_METERS;
+			}
+			y0 += POINT_DENSITY_PER_METERS;
+		}
+		z0 += POINT_DENSITY_PER_METERS;
 	}
+	
+
+	return count;
 }
 
 
@@ -1040,7 +1057,6 @@ static DemoMesh* CreateVisualMesh (NewtonCollision* const fracturedCompoundColli
 		subMesh->m_textureHandle = AddTextureRef ((GLuint)material);
 
 		subMesh->AllocIndexData (indexCount);
-		//subMesh->m_indexCount = NewtonBreakableSegmentGetIndexStreamShort (compound, meshData, segment, (short int*)subMesh->m_indexes); 
 		subMesh->m_indexCount = NewtonBreakableSegmentGetIndexStream (fracturedCompoundCollision, meshData, segment, (int*)subMesh->m_indexes); 
 	}
 
@@ -1068,14 +1084,14 @@ int externalMaterial = LoadTexture("wood_0.tga");
 NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), dVector (3.0f, 3.0f, 3.0f, 0.0), _BOX_PRIMITIVE, 0);
 NewtonMesh* const solidMesh = NewtonMeshCreateFromCollision(collision);
 NewtonDestroyCollision(collision);
-NewtonMeshTriangulate(solidMesh);
+//NewtonMeshTriangulate(solidMesh);
 NewtonMeshApplyBoxMapping (solidMesh, externalMaterial, externalMaterial, externalMaterial);
 #endif
 
 
 	// create a random point cloud
-	dVector points[POINT_CLOUD_SIZE];
-	MakeRandomPointCloud (solidMesh, points);
+	dVector points[MAX_POINT_CLOUD_SIZE];
+	int pointCount = MakeRandomPoisonPointCloud (solidMesh, points);
 
 	// create and interiors material for texturing the fractured pieces
 	//int internalMaterial = LoadTexture("KAMEN-stup.tga");
@@ -1088,7 +1104,7 @@ NewtonMeshApplyBoxMapping (solidMesh, externalMaterial, externalMaterial, extern
 
 	/// create the fractured collision and mesh
 	int debreePhysMaterial = NewtonMaterialGetDefaultGroupID(world);
-	NewtonCollision* const structuredFracturedCollision = NewtonCreateCompoundBreakable (world, solidMesh, 0, debreePhysMaterial, POINT_CLOUD_SIZE, &points[0][0], sizeof (dVector), internalMaterial, &textureMatrix[0][0]);
+	NewtonCollision* const structuredFracturedCollision = NewtonCreateCompoundBreakable (world, solidMesh, 0, debreePhysMaterial, pointCount, &points[0][0], sizeof (dVector), internalMaterial, &textureMatrix[0][0]);
 
 	// create a visual entity for display the main mesh
     dMatrix matrix (GetIdentityMatrix());

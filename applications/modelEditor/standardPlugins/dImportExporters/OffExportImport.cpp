@@ -94,7 +94,7 @@ void OffExport::Export (const char* const fileName, dPluginInterface* const inte
 		dScene::dTreeNode* const node = scene->GetNodeFromLink(link);
 		dNodeInfo* const info = scene->GetInfoFromNode(node);
 		if (info->IsType(dMeshNodeInfo::GetRttiType())) {
-			if (info->GetEditorFlags() & dPluginInterface::m_selected) {
+			if (info->GetEditorFlags() & dNodeInfo::m_selected) {
 				dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*) info;
 				mesh = meshInfo->GetMesh();
 				count ++;

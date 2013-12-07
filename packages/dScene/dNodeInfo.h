@@ -79,6 +79,12 @@ class dSceneRender;
 class dNodeInfo: public dClassInfo, public dVariableList
 {
 	public:
+	enum dNodeEditorFlags
+	{
+		m_selected = 1<<0,
+		m_expanded = 1<<1,
+	};
+
 	class dRegisterSingleton
 	{	
 		public:

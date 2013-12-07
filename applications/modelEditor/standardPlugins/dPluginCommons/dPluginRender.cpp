@@ -23,6 +23,7 @@ dPluginRender::dPluginRender(void)
 	:dSceneRender()
 	,m_wireFrameDisplayList()
 	,m_flatShadedDisplayList()
+	,m_color(0.0f, 0.0f, 0.0f, 0.0f)
 {
 }
 
@@ -305,8 +306,14 @@ void dPluginRender::DisableZBias()
 }
 
 
+const dVector& dPluginRender::GetColor() const
+{
+	return m_color;		
+}
+
 void dPluginRender::SetColor(const dVector& color)
 {
+	m_color = color;
 	glColor3f (color.m_x, color.m_y, color.m_z);
 }
 

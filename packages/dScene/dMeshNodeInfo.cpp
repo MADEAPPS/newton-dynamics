@@ -311,12 +311,19 @@ void dMeshNodeInfo::DrawWireFrame(dSceneRender* const render, dScene* const scen
 	dAssert (myNode == scene->Find(GetUniqueID()));
 	dAssert (scene->GetInfoFromNode(myNode) == this);
 
+
 	int displayList = render->GetCachedWireframeDisplayList(m_mesh);
 	dAssert (displayList > 0);
 	
 	render->PushMatrix(&m_matrix[0][0]);
-//	render->SetColor(color);
-	render->DrawDisplayList(displayList);
+	if (GetEditorFlags() & m_selected) {
+		dVector color (render->GetColor());
+		render->SetColor(dVector (1.0f, 1.0f, 0.0f, 0.0f));
+		render->DrawDisplayList(displayList);
+		render->SetColor(color);
+	} else {
+		render->DrawDisplayList(displayList);
+	}
 	render->PopMatrix();
 }
 

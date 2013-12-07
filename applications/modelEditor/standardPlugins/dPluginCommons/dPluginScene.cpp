@@ -28,7 +28,7 @@ dPluginScene::dPluginScene(NewtonWorld* const newton)
 {
 	dScene::dTreeNode* const rootNode = GetRootNode();
 	dNodeInfo* const rootInfo = GetInfoFromNode(rootNode);
-	rootInfo->SetEditorFlags (dPluginInterface::m_expanded);
+	rootInfo->SetEditorFlags (dNodeInfo::m_expanded);
 
 }
 
@@ -210,7 +210,7 @@ void dPluginScene::RenderSelectedSceneNodes (dSceneRender* const render, dScene:
 	dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*)GetInfoFromNode(sceneNode);	
 	render->PushMatrix (sceneInfo->GetTransform());
 
-	if (sceneInfo->GetEditorFlags() & dPluginInterface::m_selected) {
+	if (sceneInfo->GetEditorFlags() & dNodeInfo::m_selected) {
 		for (void* link = GetFirstChildLink(sceneNode); link; link = GetNextChildLink(sceneNode, link)) {
 			dScene::dTreeNode* const geometryNode = GetNodeFromLink (link);
 			dGeometryNodeInfo* const geometryInfo = (dGeometryNodeInfo*)GetInfoFromNode(geometryNode);

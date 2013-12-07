@@ -2953,6 +2953,8 @@ dgMeshEffect* dgMeshEffect::Intersection (const dgMatrix& matrix, const dgMeshEf
 
 bool dgMeshEffect::PlaneClip (const dgMeshEffect& convexMesh, const dgEdge* const convexFace)
 {
+	dgAssert (convexFace->m_incidentFace > 0);
+	const dgFloat64 capAttribute = convexMesh.m_attrib[convexFace->m_userData].m_material;
 	dgBigVector normal (convexMesh.FaceNormal(convexFace, &convexMesh.m_points[0].m_x, sizeof(dgBigVector)));
 	dgFloat64 mag2 = normal % normal;
 	if (mag2 < dgFloat64 (1.0e-30)) {
@@ -2963,9 +2965,6 @@ bool dgMeshEffect::PlaneClip (const dgMeshEffect& convexMesh, const dgEdge* cons
 	normal = normal.Scale3(dgFloat64 (1.0f) / sqrt (mag2));
 	dgBigVector origin (convexMesh.m_points[convexFace->m_incidentVertex]);
 	dgBigPlane plane (normal, - (origin % normal));
-
-	dgFloat64 capAttribute = convexMesh.m_attrib[convexFace->m_userData].m_material;
-
 	dgMatrix matrix;
 	
 	dgBigVector p1 (convexMesh.m_points[convexFace->m_next->m_incidentVertex]);
@@ -2976,7 +2975,6 @@ bool dgMeshEffect::PlaneClip (const dgMeshEffect& convexMesh, const dgEdge* cons
 	matrix[1] = matrix[2] * matrix[0];
 	matrix[3] = dgVector (origin);
 	matrix[3][3] = dgFloat32 (1.0f);
-
 
 	dgVector q0 (matrix.UntransformVector(dgVector(origin)));
 	dgVector q1 (matrix.UntransformVector(dgVector(p1)));
@@ -2993,33 +2991,57 @@ bool dgMeshEffect::PlaneClip (const dgMeshEffect& convexMesh, const dgEdge* cons
 	dgVector uv1_1 (dgFloat32 (convexMesh.m_attrib[convexFace->m_next->m_userData].m_u1), dgFloat32 (convexMesh.m_attrib[convexFace->m_next->m_userData].m_v1), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	dgVector uv1_2 (dgFloat32 (convexMesh.m_attrib[convexFace->m_next->m_next->m_userData].m_u1), dgFloat32 (convexMesh.m_attrib[convexFace->m_next->m_next->m_userData].m_v1), dgFloat32 (0.0f), dgFloat32 (0.0f));
 
-	
-	dgInt32 neutral = 0;
-	dgInt32 positive = 0;
-	dgInt32 negative = 0;
-	dgInt32 pointCount = GetVertexCount();
-	const dgInt32 extraVertex = 256;
-	dgStack <dgFloat64> test (pointCount + extraVertex);
+/*
+static int xxx;
+xxx ++;
+int xxxxxxxxxx = 281;
+if (xxx == xxxxxxxxxx){
+char xxxx[128];
+sprintf (xxxx, "xxx__%d.off", xxx) ;
+SaveOFF(xxxx);
 
+dgInt32 xxxxx = IncLRU();
+dgPolyhedra::Iterator iter (*this);
+for (iter.Begin(); iter; iter ++) {
+	dgEdge* const edge = &(*iter);
+
+	if (edge->m_mark != xxxxx) {
+		dgEdge* end = edge;
+		do {
+			end->m_mark = xxxxx;
+			dgTrace (("%d ", end->m_incidentVertex));
+			end = end->m_next;
+		} while (end != edge);
+		dgTrace (("\n"));
+	}
+}
+}
+*/
+	dgAssert (!HasOpenEdges());
+	
+	dgInt32 pointCount = GetVertexCount();
+	dgStack <dgFloat64> testPool (2 * pointCount + 1024);
+	dgFloat64* const test = &testPool[0];
 	for (dgInt32 i = 0; i < pointCount; i ++) {
 		test[i] = plane.Evalue (m_points[i]);
-		if (test[i] > dgFloat32 (1.0e-5f)) {
-			positive ++;
-		} else if (test[i] < -dgFloat32 (1.0e-5f)) {
-			negative ++;
-		} else {
-			neutral ++;
-			test[i] = dgFloat64 (0.0f);
+		if (fabs (test[i]) < dgFloat32 (1.0e-5f)) {
+			test[i] = dgFloat32 (0.0f);
 		}
 	}
 
-	if ((positive + neutral) == pointCount) {
+	dgInt32 positive = 0;
+	dgInt32 negative = 0;
+	dgPolyhedra::Iterator iter (*this); 
+	for (iter.Begin(); iter && !(positive && negative); iter ++){
+		dgEdge* const edge = &(*iter);
+		positive += test[edge->m_incidentVertex] > dgFloat32 (0.0f);
+		negative += test[edge->m_incidentVertex] < dgFloat32 (0.0f);
+	}
+	if (positive  && !negative) {
 		return false;
 	}
-
-	if ((negative + neutral) < pointCount) {
-		dgPolyhedra::Iterator iter (*this);
-
+	
+	if (positive && negative) {
 		for (iter.Begin(); iter; iter ++){
 			dgEdge* const edge = &(*iter);
 			
@@ -3034,133 +3056,175 @@ bool dgMeshEffect::PlaneClip (const dgMeshEffect& convexMesh, const dgEdge* cons
 				test[splitEdge->m_next->m_incidentVertex] = dgFloat64 (0.0f);
 			} 
 		}
-		
-		dgInt32 capCount = 0;
-		dgEdge* capEdges[extraVertex];
 
-		for (iter.Begin(); iter; iter ++){
-			dgEdge* const edge0 = &(*iter);
-			dgFloat64 side = test[edge0->m_incidentVertex];
-			if (side == dgFloat32 (0.0f)) {
-				dgEdge* edge1 = edge0->m_next;
+/*
+if (xxx == xxxxxxxxxx){
+dgInt32 xxxxx = IncLRU();
+dgPolyhedra::Iterator iter (*this);
+for (iter.Begin(); iter; iter ++) {
+	dgEdge* const edge = &(*iter);
+
+	if (edge->m_mark != xxxxx) {
+		dgEdge* end = edge;
+		do {
+			end->m_mark = xxxxx;
+			dgTrace (("%d ", end->m_incidentVertex));
+			end = end->m_next;
+		} while (end != edge);
+		dgTrace (("\n"));
+	}
+}
+}
+*/
+
+		dgInt32 colorMark = IncLRU();
+		for (iter.Begin(); iter; iter ++) {
+			dgEdge* const edge = &(*iter);
+			dgFloat64 side0 = test[edge->m_incidentVertex];
+			dgFloat64 side1 = test[edge->m_next->m_incidentVertex];
+
+			if ((side0 > dgFloat32 (0.0f)) || (side1 > dgFloat64 (0.0f))) {
+				edge->m_mark = colorMark;
+			}
+		}
+
+		for (iter.Begin(); iter; iter ++) {
+			dgEdge* const edge = &(*iter);
+			dgFloat64 side0 = test[edge->m_incidentVertex];
+			dgFloat64 side1 = test[edge->m_next->m_incidentVertex];
+			if ((side0 == dgFloat32 (0.0f)) && (side1 == dgFloat64 (0.0f))) {
+				dgEdge* ptr = edge->m_next;
 				do {
-					dgFloat64 side = test[edge1->m_incidentVertex];
-					if (side == dgFloat32 (0.0f)) {
-						if ((edge1->m_next != edge0) && (edge1->m_prev != edge0) && !FindEdge(edge0->m_incidentVertex, edge1->m_incidentVertex)) {
-							dgEdge* devideEdge = ConnectVertex (edge1, edge0);
-
-							bool found = false;
-							dgEdge* ptr = devideEdge->m_next->m_next;
-							do {
-								if (test[ptr->m_incidentVertex] != dgFloat32 (0.0f)) {
-									if (test[ptr->m_incidentVertex] < dgFloat32 (0.0f)) {
-										devideEdge = devideEdge->m_twin;
-									}
-									found = true;
-									break;
-								}
-								ptr = ptr->m_next;
-							} while (ptr != devideEdge);
-
-							if (!found) {
-								dgAssert (0);
-								dgEdge* ptr = devideEdge->m_next->m_next;
-								do {
-									if (test[ptr->m_incidentVertex] != dgFloat32 (0.0f)) {
-										if (test[ptr->m_incidentVertex] < dgFloat32 (0.0f)) {
-											devideEdge = devideEdge->m_twin;
-										}
-										found = true;
-										break;
-									}
-									ptr = ptr->m_next;
-								} while (ptr != devideEdge);
-							}
-							dgAssert(found);
-							capEdges[capCount] = devideEdge;
-							capCount ++;
-							dgAssert (capCount < sizeof (capEdges)/ sizeof (capEdges[0]));
-						} else if (edge0->m_next == edge1) {
-							bool outsize = false;
-							dgEdge* ptr = edge1->m_next;
-							do {
-								if (test[ptr->m_incidentVertex] > dgFloat32 (0.0f)) {
-									outsize = true;
-								}
-								ptr = ptr->m_next;
-							} while (ptr != edge1);
-							
-							capEdges[capCount] = outsize ? edge0 : edge0->m_twin;
-							capCount ++;
-							dgAssert (capCount < sizeof (capEdges)/ sizeof (capEdges[0]));
-						}
+					if (ptr->m_mark == colorMark) {
+						edge->m_mark = colorMark;
 						break;
 					}
-					edge1 = edge1->m_next;
-				} while (edge1 != edge0);
+					ptr = ptr->m_next;
+				} while (ptr != edge);
 			}
 		}
 
-		dgList<dgEdge*> edgeEdge (GetAllocator());
-		dgInt32 mark = IncLRU();
-		for (iter.Begin(); iter; iter ++){
+
+		for (iter.Begin(); iter; iter ++) {
 			dgEdge* const edge = &(*iter);
-			dgFloat64 side = test[edge->m_incidentVertex];
-			if ((edge->m_mark != mark) && (side > dgFloat32 (0.0f))) {
-				edgeEdge.Append(edge);
-				edge->m_twin->m_mark = mark;
+			if ((edge->m_mark == colorMark) && (edge->m_next->m_mark < colorMark)) {
+				dgEdge* const startEdge = edge->m_next;
+				dgEdge* end = startEdge;
+				do {
+					if (end->m_mark == colorMark) {
+						break;
+					}
+
+					end = end->m_next;
+				} while (end != startEdge);
+				dgAssert (end != startEdge);
+				dgEdge* const devideEdge = ConnectVertex (startEdge, end);
+				dgAssert (devideEdge);
+				dgAssert (devideEdge->m_next->m_mark != colorMark);
+				dgAssert (devideEdge->m_prev->m_mark != colorMark);
+				dgAssert (devideEdge->m_twin->m_next->m_mark == colorMark);
+				dgAssert (devideEdge->m_twin->m_prev->m_mark == colorMark);
+				devideEdge->m_mark = colorMark - 1;
+				devideEdge->m_twin->m_mark = colorMark;
 			}
 		}
 
-
-		for (dgList<dgEdge*>::dgListNode* ptr = edgeEdge.GetFirst(); ptr; ptr = ptr->GetNext()) {
-			dgEdge* const edge = ptr->GetInfo();
-			DeleteEdge(edge);
+		dgInt32 mark = IncLRU();
+		dgList<dgEdge*> faceList (GetAllocator());
+		for (iter.Begin(); iter; iter ++){
+			dgEdge* const face = &(*iter);
+			if ((face->m_mark >= colorMark) && (face->m_mark != mark)) {
+				faceList.Append(face);
+				dgEdge* edge = face;
+				do {
+					edge->m_mark = mark;
+					edge = edge->m_next;
+				} while (edge != face);
+			}
 		}
 
-		for (dgInt32 i = 0; i < capCount; i ++) {
-			dgEdge* const edge = capEdges[i];
-			dgVertexAtribute attibute;
-			attibute.m_vertex = m_points[edge->m_incidentVertex];
-			attibute.m_normal_x = normal.m_x;
-			attibute.m_normal_y = normal.m_y;
-			attibute.m_normal_z = normal.m_z;
-			attibute.m_material = capAttribute;
-
-			dgVector p (matrix.UntransformVector (attibute.m_vertex));
-
-			dgVector p_p0 (p - q0);
-			dgVector p_p1 (p - q1);
-			dgVector p_p2 (p - q2);
-			dgFloat32 alpha1 = p10 % p_p0;
-			dgFloat32 alpha2 = p20 % p_p0;
-			dgFloat32 alpha3 = p10 % p_p1;
-			dgFloat32 alpha4 = p20 % p_p1;
-			dgFloat32 alpha5 = p10 % p_p2;
-			dgFloat32 alpha6 = p20 % p_p2;
-			dgFloat32 vc = alpha1 * alpha4 - alpha3 * alpha2;
-			dgFloat32 vb = alpha5 * alpha2 - alpha1 * alpha6;
-			dgFloat32 va = alpha3 * alpha6 - alpha5 * alpha4;
-			dgFloat32 den = va + vb + vc;
-			dgAssert (den > 0.0f);
-
-			den = dgFloat32 (1.0f) / (va + vb + vc);
-			dgFloat32 alpha0 = dgFloat32 (va * den);
-			alpha1 = dgFloat32 (vb * den);
-			alpha2 = dgFloat32 (vc * den);
-
-			attibute.m_u0 = uv0_0.m_x * alpha0 + uv0_1.m_x * alpha1 + uv0_2.m_x * alpha2; 
-			attibute.m_v0 = uv0_0.m_y * alpha0 + uv0_1.m_y * alpha1 + uv0_2.m_y * alpha2; 
-			attibute.m_u1 = uv1_0.m_x * alpha0 + uv1_1.m_x * alpha1 + uv1_2.m_x * alpha2; 
-			attibute.m_v1 = uv1_0.m_y * alpha0 + uv1_1.m_y * alpha1 + uv1_2.m_y * alpha2; 
-
-			AddAtribute (attibute);
-			edge->m_userData = m_atribCount - 1;
+		for (dgList<dgEdge*>::dgListNode* node = faceList.GetFirst(); node; node = node->GetNext()) {
+			dgEdge* const face = node->GetInfo();
+			DeleteFace(face);
 		}
 
-//      Triangulate();
-        ConvertToPolygons();
-//SaveOFF("xxxxxxxxx_0.off");
+		mark = IncLRU();
+		faceList.RemoveAll();
+		for (iter.Begin(); iter; iter ++){
+			dgEdge* const face = &(*iter);
+			if ((face->m_mark != mark) && (face->m_incidentFace < 0)) {
+				faceList.Append(face);
+				dgEdge* edge = face;
+				do {
+					edge->m_mark = mark;
+					edge = edge->m_next;
+				} while (edge != face);
+			}
+		}
+
+		for (dgList<dgEdge*>::dgListNode* node = faceList.GetFirst(); node; node = node->GetNext()) {
+			//dgInt32 faceIndices[1024];
+			dgEdge* const face = node->GetInfo();
+			dgEdge* edge = face;
+			//dgPolyhedra facePolygedra (GetAllocator());
+			//facePolygedra.BeginFace();
+			//int indexCount = 0;
+			do {
+				dgVertexAtribute attibute;
+				attibute.m_vertex = m_points[edge->m_incidentVertex];
+				attibute.m_normal_x = normal.m_x;
+				attibute.m_normal_y = normal.m_y;
+				attibute.m_normal_z = normal.m_z;
+				attibute.m_material = capAttribute;
+
+				dgVector p (matrix.UntransformVector (attibute.m_vertex));
+
+				dgVector p_p0 (p - q0);
+				dgVector p_p1 (p - q1);
+				dgVector p_p2 (p - q2);
+				dgFloat32 alpha1 = p10 % p_p0;
+				dgFloat32 alpha2 = p20 % p_p0;
+				dgFloat32 alpha3 = p10 % p_p1;
+				dgFloat32 alpha4 = p20 % p_p1;
+				dgFloat32 alpha5 = p10 % p_p2;
+				dgFloat32 alpha6 = p20 % p_p2;
+				dgFloat32 vc = alpha1 * alpha4 - alpha3 * alpha2;
+				dgFloat32 vb = alpha5 * alpha2 - alpha1 * alpha6;
+				dgFloat32 va = alpha3 * alpha6 - alpha5 * alpha4;
+				dgFloat32 den = va + vb + vc;
+				dgAssert (den > 0.0f);
+
+				den = dgFloat32 (1.0f) / (va + vb + vc);
+				dgFloat32 alpha0 = dgFloat32 (va * den);
+				alpha1 = dgFloat32 (vb * den);
+				alpha2 = dgFloat32 (vc * den);
+
+				attibute.m_u0 = uv0_0.m_x * alpha0 + uv0_1.m_x * alpha1 + uv0_2.m_x * alpha2; 
+				attibute.m_v0 = uv0_0.m_y * alpha0 + uv0_1.m_y * alpha1 + uv0_2.m_y * alpha2; 
+				attibute.m_u1 = uv1_0.m_x * alpha0 + uv1_1.m_x * alpha1 + uv1_2.m_x * alpha2; 
+				attibute.m_v1 = uv1_0.m_y * alpha0 + uv1_1.m_y * alpha1 + uv1_2.m_y * alpha2; 
+
+				AddAtribute (attibute);
+				edge->m_incidentFace = 1;
+				edge->m_userData = m_atribCount - 1;
+
+				//faceIndices[indexCount] = edge->m_incidentVertex;
+				//indexCount ++;
+				//dgAssert (indexCount < sizeof (faceIndices) / sizeof (faceIndices[0]));
+
+				edge = edge->m_next;
+			} while (edge != face);
+
+			//facePolygedra.AddFace(indexCount, faceIndices);
+			//facePolygedra.EndFace();
+
+			//dgPolyhedra leftOversOut(GetAllocator());
+			//facePolygedra.ConvexPartition (&m_points[0].m_x, sizeof (dgBigVector), &leftOversOut);
+			//dgAssert (leftOversOut.GetCount() == 0);
+		}
+//		Triangulate();
+		//SaveOFF("xxx__0.off");
+		//dgAssert (!HasOpenEdges());
 	}
 
 	return true;
@@ -3174,7 +3238,8 @@ dgMeshEffect* dgMeshEffect::ConvexMeshIntersection (const dgMeshEffect* const co
 	//return new (GetAllocator()) dgMeshEffect (*convexMesh);
 
 	dgMeshEffect* const convexIntersection = new (GetAllocator()) dgMeshEffect (*this);
-    convexIntersection->ConvertToPolygons();
+	//convexIntersection->ConvertToPolygons();
+	//convexIntersection->Triangulate();
 	convexIntersection->RemoveUnusedVertices(NULL);
 
 	dgInt32 mark = convexMesh.IncLRU();
@@ -3182,7 +3247,7 @@ dgMeshEffect* dgMeshEffect::ConvexMeshIntersection (const dgMeshEffect* const co
 
 	for (iter.Begin(); iter; iter ++){
 		 dgEdge* const convexFace = &(*iter);
-		if (convexFace->m_mark != mark) {
+		if ((convexFace->m_incidentFace > 0) && (convexFace->m_mark != mark)) {
 			dgEdge* ptr = convexFace;
 			do {
 				ptr->m_mark = mark;

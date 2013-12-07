@@ -1089,7 +1089,8 @@ class dgCollisionCompoundBreakable::dgFractureBuilder: public dgTree<dgMeshEffec
 			}
 		}
         ClipFractureParts (solidMesh);
-/*
+
+#if 0
 for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; node = node->GetNext()) {
 	dgInt32 index = node->GetInfo().m_nodeData;
 	dgTrace (("node %d: ", index));
@@ -1100,8 +1101,7 @@ for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; n
 	}
 	dgTrace (("\n"));
 }
-solidMesh->SaveOFF("xxx0.off");
-*/
+#endif
 
 	}
 
@@ -1310,17 +1310,20 @@ solidMesh->SaveOFF("xxx0.off");
 
     void ClipFractureParts (dgMeshEffect* const solidMesh)
     {
-        for (dgFractureBuilder::dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; node = node->GetNext()) {
+		dgFractureBuilder::dgFractureConectivity::dgListNode* nextNode;
+        for (dgFractureBuilder::dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; node = nextNode) {
+			nextNode = node->GetNext();
             dgInt32 index = node->GetInfo().m_nodeData;
             dgTreeNode* const fractureNode = Find(index);
             dgAssert (fractureNode);
             dgMeshEffect* const voronoiConvex = fractureNode->GetInfo();
             dgMeshEffect* const fracturePiece = solidMesh->ConvexMeshIntersection (voronoiConvex);
-            dgAssert (fracturePiece);
             if (fracturePiece) {
                 voronoiConvex->Release();    
                 fractureNode->GetInfo() = fracturePiece;
-            }
+            } else {
+				m_conectivity.DeleteNode(node);
+			}
         }
     }
 
@@ -1630,7 +1633,7 @@ dgCollisionCompoundBreakable::dgCollisionCompoundBreakable (dgWorld* const world
 	,m_conectivity(world->GetAllocator())
 	,m_vertexBuffer(NULL)
 {
-pointcloudCount = 0;
+//pointcloudCount = 0;
 
 	m_collisionId = m_compoundBreakable;
 	m_rtti |= dgCollisionCompoundBreakable_RTTI;

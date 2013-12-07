@@ -112,9 +112,9 @@ class EditorExplorer::SelectDuplicatesItems: public EditorExplorer::TraverseExpl
 	virtual bool TraverseCallback (wxTreeItemId item)
 	{
 		ExplorerData* const nodeData = ((ExplorerData*)m_me->GetItemData(item));
-		if (m_me->IsSelected(item) && !(nodeData->m_info->GetEditorFlags() & dPluginInterface::m_selected)) {
+		if (m_me->IsSelected(item) && !(nodeData->m_info->GetEditorFlags() & dNodeInfo::m_selected)) {
 			m_me->SelectItem (item, false);
-		} else if (!m_me->IsSelected(item) && (nodeData->m_info->GetEditorFlags() & dPluginInterface::m_selected)) {
+		} else if (!m_me->IsSelected(item) && (nodeData->m_info->GetEditorFlags() & dNodeInfo::m_selected)) {
 			m_me->SelectItem (item, true);
 		}
 		return true;
@@ -172,7 +172,7 @@ class EditorExplorer::UndoRedoSelection: public dUndoRedo, public dList<dNodeInf
 		dPluginScene* const scene = m_me->m_mainFrame->GetScene();
 		for (dScene::dTreeNode* node = scene->GetFirstNode(); node; node = scene->GetNextNode(node)) {
 			dNodeInfo* const info = scene->GetInfoFromNode(node);
-			if (info->GetEditorFlags() & dPluginInterface::m_selected) {
+			if (info->GetEditorFlags() & dNodeInfo::m_selected) {
 				Append (info);
 			}
 		}
@@ -187,12 +187,12 @@ class EditorExplorer::UndoRedoSelection: public dUndoRedo, public dList<dNodeInf
 		dPluginScene* const scene = m_me->m_mainFrame->GetScene();
 		for (dScene::dTreeNode* node = scene->GetFirstNode(); node; node = scene->GetNextNode(node)) {
 			dNodeInfo* const info = scene->GetInfoFromNode(node);
-			info->SetEditorFlags(info->GetEditorFlags() & ~dPluginInterface::m_selected);
+			info->SetEditorFlags(info->GetEditorFlags() & ~dNodeInfo::m_selected);
 		}
 
 		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
 			dNodeInfo* const info = node->GetInfo();
-			info->SetEditorFlags(info->GetEditorFlags() | dPluginInterface::m_selected);
+			info->SetEditorFlags(info->GetEditorFlags() | dNodeInfo::m_selected);
 		}
 
 		m_me->m_recursiveSelectionCall ++;
@@ -309,13 +309,13 @@ void EditorExplorer::OnSelectItem (wxTreeEvent& event)
 		dPluginScene* const scene = m_mainFrame->GetScene();
 		for (dScene::dTreeNode* node = scene->GetFirstNode(); node; node = scene->GetNextNode(node)) {
 			dNodeInfo* const info = scene->GetInfoFromNode(node);
-			info->SetEditorFlags(info->GetEditorFlags() & ~dPluginInterface::m_selected);
+			info->SetEditorFlags(info->GetEditorFlags() & ~dNodeInfo::m_selected);
 		}
 
 		SelectionList selectionList(this);
 		for (SelectionList::dListNode* node = selectionList.GetFirst(); node; node = node->GetNext()) {
 			dNodeInfo* const info = node->GetInfo();
-			info->SetEditorFlags(info->GetEditorFlags() | dPluginInterface::m_selected);
+			info->SetEditorFlags(info->GetEditorFlags() | dNodeInfo::m_selected);
 		}
 
 		SelectDuplicatesItems selectedDuplicatedItems(this);
@@ -347,14 +347,14 @@ void EditorExplorer::OnExpandItem (wxTreeEvent& event)
 {
 	wxTreeItemId item (event.GetItem());
 	ExplorerData* const nodeData = ((ExplorerData*)GetItemData(item));
-	nodeData->m_info->SetEditorFlags(nodeData->m_info->GetEditorFlags() | dPluginInterface::m_expanded);
+	nodeData->m_info->SetEditorFlags(nodeData->m_info->GetEditorFlags() | dNodeInfo::m_expanded);
 }
 
 void EditorExplorer::OnCollapseItem (wxTreeEvent& event)
 {
 	wxTreeItemId item (event.GetItem());
 	ExplorerData* const nodeData = ((ExplorerData*)GetItemData(item));
-	nodeData->m_info->SetEditorFlags(nodeData->m_info->GetEditorFlags() & ~dPluginInterface::m_expanded);
+	nodeData->m_info->SetEditorFlags(nodeData->m_info->GetEditorFlags() & ~dNodeInfo::m_expanded);
 }
 
 
@@ -426,7 +426,7 @@ void EditorExplorer::ReconstructScene(const dPluginScene* const scene)
 
 		ExplorerData* const nodeData = ((ExplorerData*)GetItemData(rootItem));
 		const unsigned itemFlags = nodeData->m_info->GetEditorFlags();
-		if (itemFlags & dPluginInterface::m_expanded) {
+		if (itemFlags & dNodeInfo::m_expanded) {
 			Expand (rootItem);
 		} else {
 			Collapse (rootItem);
