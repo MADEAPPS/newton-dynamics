@@ -52,7 +52,7 @@ class dgWorldDynamicUpdateSyncDescriptor
 	dgInt32 m_islandCount;
 	dgInt32 m_firstIsland;
 	dgThread::dgCriticalSection* m_lock;
-	dgCollisionDeformableMeshList::dgListNode* m_sofBodyNode;
+	dgDeformableBodiesUpdate::dgListNode* m_sofBodyNode;
 };
 
 
@@ -187,7 +187,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	world->m_perfomanceCounters[m_dynamicsTicks] = ticks - updateTime;
 
 	// integrate soft body dynamics phase 2
-	const dgCollisionDeformableMeshList* const softBodyList = world;
+	const dgDeformableBodiesUpdate* const softBodyList = world;
 	descriptor.m_sofBodyNode = softBodyList->GetFirst();
 	descriptor.m_lock = &m_softBodyCriticalSectionLock;
 	for (dgInt32 i = 0; i < threadCount; i ++) {
@@ -710,7 +710,7 @@ void dgWorldDynamicUpdate::IntegrateSoftBody (dgWorldDynamicUpdateSyncDescriptor
 	dgFloat32 timestep = descriptor->m_timestep; 
 	dgWorld* const world = (dgWorld*) this;
 
-	dgCollisionDeformableMeshList::dgListNode* node = NULL;
+	dgDeformableBodiesUpdate::dgListNode* node = NULL;
 	{
 		dgThreadHiveScopeLock lock (world, descriptor->m_lock);
 		node = descriptor->m_sofBodyNode;

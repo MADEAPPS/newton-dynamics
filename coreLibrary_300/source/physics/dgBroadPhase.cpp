@@ -276,7 +276,7 @@ class dgBroadphaseSyncDescriptor
 	dgFloat32 m_timestep;
 	dgBodyMasterList::dgListNode* m_collindPairBodyNode;
 	dgBodyMasterList::dgListNode* m_forceAndTorqueBodyNode;
-	dgCollisionDeformableMeshList::dgListNode* m_sofBodyNode;
+	dgDeformableBodiesUpdate::dgListNode* m_sofBodyNode;
 	dgBroadPhase::dgType m_broadPhaseType;
 	dgBroadPhase::dgNode* m_pairs[1024 * 4];	
 };
@@ -990,7 +990,7 @@ void dgBroadPhase::UpdateSoftBodyForcesKernel (dgBroadphaseSyncDescriptor* const
 //	dgCollisionDeformableMeshList& softBodyList = *m_world;
 
 	dgFloat32 timestep = descriptor->m_timestep; 
-	dgCollisionDeformableMeshList::dgListNode* node = NULL;
+	dgDeformableBodiesUpdate::dgListNode* node = NULL;
 	{
 		dgThreadHiveScopeLock lock (m_world, descriptor->m_lock);
 		node = descriptor->m_sofBodyNode;
@@ -1794,7 +1794,7 @@ void dgBroadPhase::UpdateContacts( dgFloat32 timestep)
 	syncPoints.m_timestep = timestep;
 	
 	const dgBodyMasterList* const masterList = m_world;
-	const dgCollisionDeformableMeshList* const softBodyList = m_world;
+	const dgDeformableBodiesUpdate* const softBodyList = m_world;
 
 	dgBodyMasterList::dgListNode* const firstBodyNode = masterList->GetFirst()->GetNext();
 	syncPoints.m_collindPairBodyNode = firstBodyNode;

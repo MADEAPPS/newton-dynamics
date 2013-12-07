@@ -30,7 +30,8 @@
 #include "dgCollisionScene.h"
 #include "dgBodyMasterList.h"
 #include "dgWorldDynamicUpdate.h"
-
+#include "dgFracturedBodiesUpdate.h"
+#include "dgDeformableBodiesUpdate.h"
 
 #define DG_REDUCE_CONTACT_TOLERANCE			dgFloat32 (1.0e-2f)
 #define DG_PRUNE_CONTACT_TOLERANCE			dgFloat32 (1.0e-2f)
@@ -84,32 +85,6 @@ class dgBodyMaterialList: public dgTree<dgContactMaterial, dgUnsigned32>
 	}
 };
 
-class dgCollisionDeformableMeshList: public dgList<dgCollisionDeformableMesh*>
-{
-	public:
-	dgCollisionDeformableMeshList (dgMemoryAllocator* const allocator)
-		:dgList<dgCollisionDeformableMesh*>(allocator)
-		,m_dictionary(allocator)
-	{
-	}
-
-	void AddShape(dgCollisionDeformableMesh* const shape)
-	{
-		dgListNode* const node = Append (shape);
-		m_dictionary.Insert (node, shape);
-	}
-
-	void RemoveShape(dgCollisionDeformableMesh*  const shape)
-	{
-		dgTree <dgListNode*, const dgCollisionDeformableMesh*>::dgTreeNode* const node = m_dictionary.Find (shape);
-		dgAssert (node);
-		Remove (node->GetInfo());
-		m_dictionary.Remove (node);
-	}
-
-	private:
-	dgTree <dgListNode*, const dgCollisionDeformableMesh*> m_dictionary;
-};
 
 class dgCollisionParamProxy;
 
@@ -176,17 +151,18 @@ class dgWorldThreadPool: public dgThreadHive
 };
 
 DG_MSC_VECTOR_ALIGMENT
-class dgWorld:
-	public dgBodyMasterList,
-	public dgBodyMaterialList,
-	public dgBodyCollisionList,
-	public dgCollisionDeformableMeshList,
-	public dgActiveContacts, 
-	public dgCollidingPairCollector,
-	public dgWorldDynamicUpdate,
-	public dgMutexThread,
-	public dgAsyncThread,
-	public dgWorldThreadPool
+class dgWorld
+	:public dgBodyMasterList
+	,public dgBodyMaterialList
+	,public dgBodyCollisionList
+	,public dgFracturedBodiesUpdate
+	,public dgDeformableBodiesUpdate
+	,public dgActiveContacts 
+	,public dgCollidingPairCollector
+	,public dgWorldDynamicUpdate
+	,public dgMutexThread
+	,public dgAsyncThread
+	,public dgWorldThreadPool
 {
 	public:
 	class dgDetroyBodyByForce

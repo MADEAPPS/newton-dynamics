@@ -830,7 +830,7 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh (const dgCollisionDeformabl
 {
 	m_rtti = source.m_rtti;
 
-	dgCollisionDeformableMeshList& softBodyList = *m_world;
+	dgDeformableBodiesUpdate& softBodyList = *m_world;
 	softBodyList.AddShape (this);
 
 	m_indexList = (dgInt16*) dgMallocStack (3 * m_trianglesCount * sizeof (dgInt16));
@@ -926,7 +926,7 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMes
 {
 	m_rtti |= dgCollisionDeformableMesh_RTTI;
 
-	dgCollisionDeformableMeshList& softBodyList = *m_world;
+	dgDeformableBodiesUpdate& softBodyList = *m_world;
 	softBodyList.AddShape (this);
 
 	dgMeshEffect meshCopy (*mesh);
@@ -1050,7 +1050,7 @@ dgCollisionDeformableMesh::~dgCollisionDeformableMesh(void)
 		dgFree (m_visualVertexData);
 	}
 
-	dgCollisionDeformableMeshList& softBodyList = *m_world;
+	dgDeformableBodiesUpdate& softBodyList = *m_world;
 	softBodyList.RemoveShape (this);
 }
 
