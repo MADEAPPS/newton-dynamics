@@ -621,36 +621,26 @@ matrix.m_posit.m_y = 5.0;
     //int materialId = 0;
     //create the rigid body
     NewtonBody* const rigidBody = NewtonCreateDynamicBody (world, structuredFracturedCollision, &matrix[0][0]);
-/*
-    entity->m_myBody = rigidBody;
-    entity->m_myMassInverse = 1.0f / mass;
 
-    // set the correct center of gravity for this body
-    //NewtonBodySetCentreOfMass (rigidBody, &origin[0]);
+	// set the mass and center of mass
+	dFloat density = 1.0f;
+	dFloat mass = density * NewtonConvexCollisionCalculateVolume (structuredFracturedCollision);
+	NewtonBodySetMassProperties (rigidBody, mass, structuredFracturedCollision);
 
-    // set the mass matrix
-    NewtonBodySetMassProperties (rigidBody, mass, collision);
+	// save the pointer to the graphic object with the body.
+	NewtonBodySetUserData (rigidBody, visualEntity);
 
-    // save the pointer to the graphic object with the body.
-    NewtonBodySetUserData (rigidBody, entity);
+	// set the transform call back function
+	NewtonBodySetTransformCallback (rigidBody, DemoEntity::TransformCallback);
+
+	// set the force and torque call back function
+	NewtonBodySetForceAndTorqueCallback (rigidBody, PhysicsApplyGravityForce);
 
     // assign the wood id
-    NewtonBodySetMaterialGroupID (rigidBody, materialId);
-
-    //  set continue collision mode
-    //	NewtonBodySetContinuousCollisionMode (rigidBody, continueCollisionMode);
+//    NewtonBodySetMaterialGroupID (rigidBody, materialId);
 
     // set a destructor for this rigid body
-    NewtonBodySetDestructorCallback (rigidBody, PhysicsBodyDestructor);
-
-    // set the transform call back function
-    NewtonBodySetTransformCallback (rigidBody, DemoEntity::TransformCallback);
-
-    // set the force and torque call back function
-    NewtonBodySetForceAndTorqueCallback (rigidBody, PhysicsApplyGravityForce);
-*/
-
-
+//    NewtonBodySetDestructorCallback (rigidBody, PhysicsBodyDestructor);
 
 	// release the interior texture
 	ReleaseTexture (internalMaterial);
