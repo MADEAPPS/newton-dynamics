@@ -1827,6 +1827,14 @@ dgInt32 dgCollisionCompoundFractured::GetSegmentIndexStream (dgDebriGraph::dgLis
 }
 
 
+dgInt32 dgCollisionCompoundFractured::CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const
+{
+	dgInt32 count = dgCollisionCompound::CalculateContacts (pair, proxy);
+
+
+	return count;
+}
+
 
 
 

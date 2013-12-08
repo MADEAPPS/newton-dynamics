@@ -187,8 +187,8 @@ class dgCollisionCompound: public dgCollision
 	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1);
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
+	virtual dgInt32 CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 
-	dgInt32 CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 	dgInt32 CalculateContactsToSingle (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 	dgInt32 CalculateContactsToSingleContinue (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 	dgInt32 CalculateContactsToCompound (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
@@ -202,12 +202,10 @@ class dgCollisionCompound: public dgCollision
 	dgInt32 ClosestDitanceToConvex (dgBody* const bodyA, dgTriplex& contactA, dgBody* const ConvetvBodyB, dgTriplex& contactB, dgTriplex& normalAB) const;
 	dgInt32 ClosestDitanceToCompound (dgBody* const compoundBodyA, dgTriplex& contactA, dgBody* const compoundBodyB, dgTriplex& contactB, dgTriplex& normalAB) const;
 	
-
 #ifdef _DEBUG
 	dgVector InternalSupportVertex (const dgVector& dir) const;
 #endif
 	
-	protected:
 	dgNodeBase* BuildTopDown (dgNodeBase** const leafArray, dgInt32 firstBox, dgInt32 lastBox, dgList<dgNodeBase*>::dgListNode** const nextNode);
 
 	dgFloat64 CalculateEntropy (dgList<dgNodeBase*>& list);

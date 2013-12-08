@@ -207,6 +207,7 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 */	
 	private:
     virtual void CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
+	dgInt32 CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 
 	dgDebriGraph m_conectivity;
 	dgVertexBuffer* m_vertexBuffer;
