@@ -50,7 +50,7 @@ static void ApplyGravity (const NewtonBody* const body, dFloat timestep, int thr
 
 NewtonBody* CreateFreeFallBall(NewtonWorld* const world)
 {
-	// crate a collision tree
+	// crate a collision sphere
 	NewtonCollision* const collision = NewtonCreateSphere(world, 1.0f, 0, NULL);
 
 	// create a dynamic body with a sphere shape, and 

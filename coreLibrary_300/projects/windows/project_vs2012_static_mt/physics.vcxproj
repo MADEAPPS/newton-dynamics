@@ -271,6 +271,7 @@
     <ClCompile Include="..\..\..\source\physics\dgBallConstraint.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgBilateralConstraint.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgBroadPhase.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgCollisionCompoundFractured.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCollisionDeformableClothPatch.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCollisionDeformableSolidMesh.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCollisionInstance.cpp" />
@@ -279,8 +280,10 @@
     <ClCompile Include="..\..\..\source\physics\dgConstraint.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgContact.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCorkscrewConstraint.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgDeformableBodiesUpdate.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgDeformableContact.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgDynamicBody.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgFractureBodiesUpdate.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgHingeConstraint.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgKinematicBody.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgSlidingConstraint.cpp" />
@@ -293,7 +296,6 @@
     <ClCompile Include="..\..\..\source\physics\dgCollisionCapsule.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCollisionChamferCylinder.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCollisionCompound.cpp" />
-    <ClCompile Include="..\..\..\source\physics\dgCollisionCompoundBreakable.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCollisionCone.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCollisionConvex.cpp">
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='release|Win32'">NoListing</AssemblerOutput>
@@ -331,6 +333,7 @@
     <ClInclude Include="..\..\..\source\physics\dgBallConstraint.h" />
     <ClInclude Include="..\..\..\source\physics\dgBilateralConstraint.h" />
     <ClInclude Include="..\..\..\source\physics\dgBroadPhase.h" />
+    <ClInclude Include="..\..\..\source\physics\dgCollisionCompoundFractured.h" />
     <ClInclude Include="..\..\..\source\physics\dgCollisionDeformableClothPatch.h" />
     <ClInclude Include="..\..\..\source\physics\dgCollisionDeformableSolidMesh.h" />
     <ClInclude Include="..\..\..\source\physics\dgCollisionInstance.h" />
@@ -339,8 +342,10 @@
     <ClInclude Include="..\..\..\source\physics\dgConstraint.h" />
     <ClInclude Include="..\..\..\source\physics\dgContact.h" />
     <ClInclude Include="..\..\..\source\physics\dgCorkscrewConstraint.h" />
+    <ClInclude Include="..\..\..\source\physics\dgDeformableBodiesUpdate.h" />
     <ClInclude Include="..\..\..\source\physics\dgDeformableContact.h" />
     <ClInclude Include="..\..\..\source\physics\dgDynamicBody.h" />
+    <ClInclude Include="..\..\..\source\physics\dgFracturedBodiesUpdate.h" />
     <ClInclude Include="..\..\..\source\physics\dgHingeConstraint.h" />
     <ClInclude Include="..\..\..\source\physics\dgKinematicBody.h" />
     <ClInclude Include="..\..\..\source\physics\dgSlidingConstraint.h" />
@@ -353,7 +358,6 @@
     <ClInclude Include="..\..\..\source\physics\dgCollisionCapsule.h" />
     <ClInclude Include="..\..\..\source\physics\dgCollisionChamferCylinder.h" />
     <ClInclude Include="..\..\..\source\physics\dgCollisionCompound.h" />
-    <ClInclude Include="..\..\..\source\physics\dgCollisionCompoundBreakable.h" />
     <ClInclude Include="..\..\..\source\physics\dgCollisionCone.h" />
     <ClInclude Include="..\..\..\source\physics\dgCollisionConvex.h" />
     <ClInclude Include="..\..\..\source\physics\dgCollisionConvexHull.h" />

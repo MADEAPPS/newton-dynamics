@@ -352,7 +352,6 @@
     <ClCompile Include="..\..\dNewton\dNewtonMesh.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonPlayerManager.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonRayCast.cpp" />
-    <ClCompile Include="..\..\dNewton\dNewtonSceneBody.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonScopeBuffer.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonTransformLerp.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonTriggerManager.cpp" />
@@ -383,7 +382,6 @@
     <ClInclude Include="..\..\dNewton\dNewtonMesh.h" />
     <ClInclude Include="..\..\dNewton\dNewtonPlayerManager.h" />
     <ClInclude Include="..\..\dNewton\dNewtonRayCast.h" />
-    <ClInclude Include="..\..\dNewton\dNewtonSceneBody.h" />
     <ClInclude Include="..\..\dNewton\dNewtonScopeBuffer.h" />
     <ClInclude Include="..\..\dNewton\dNewtonTransformLerp.h" />
     <ClInclude Include="..\..\dNewton\dNewtonTriggerManager.h" />

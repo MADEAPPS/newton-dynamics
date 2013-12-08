@@ -1831,6 +1831,21 @@ dgInt32 dgCollisionCompoundFractured::CalculateContacts (dgCollidingPairCollecto
 {
 	dgInt32 count = dgCollisionCompound::CalculateContacts (pair, proxy);
 
+	if (!count) {
+		dgContact* const constraint = pair->m_contact;
+		dgBody* const otherBody = constraint->GetBody1();
+		dgBody* const compoundBody = constraint->GetBody0();
+
+		dgCollisionInstance* const otherInstance = otherBody->GetCollision();
+		dgCollisionInstance* const compoundInstance = compoundBody->GetCollision();
+		dgAssert (compoundInstance->GetChildShape() == this);
+	}
+
+
+//	
+//	dgAssert ()
+
+
 
 	return count;
 }

@@ -69,9 +69,6 @@
     <ClCompile Include="..\..\..\source\physics\dgCollisionCompound.cpp">
       <Filter>collision</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\physics\dgCollisionCompoundBreakable.cpp">
-      <Filter>collision</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\source\physics\dgCollisionCone.cpp">
       <Filter>collision</Filter>
     </ClCompile>
@@ -171,6 +168,15 @@
     <ClCompile Include="..\..\..\source\physics\dgKinematicBody.cpp">
       <Filter>bodies</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\source\physics\dgFractureBodiesUpdate.cpp">
+      <Filter>systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\physics\dgDeformableBodiesUpdate.cpp">
+      <Filter>systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\physics\dgCollisionCompoundFractured.cpp">
+      <Filter>collision</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\source\physics\dgBallConstraint.h">
@@ -222,9 +228,6 @@
       <Filter>collision</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgCollisionCompound.h">
-      <Filter>collision</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\source\physics\dgCollisionCompoundBreakable.h">
       <Filter>collision</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgCollisionCone.h">
@@ -310,6 +313,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgKinematicBody.h">
       <Filter>bodies</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\source\physics\dgFracturedBodiesUpdate.h">
+      <Filter>systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\source\physics\dgDeformableBodiesUpdate.h">
+      <Filter>systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\source\physics\dgCollisionCompoundFractured.h">
+      <Filter>collision</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

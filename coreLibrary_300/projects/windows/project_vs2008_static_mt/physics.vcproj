@@ -532,11 +532,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\source\physics\dgCollisionCompoundBreakable.cpp"
+				RelativePath="..\..\..\source\physics\dgCollisionCompoundFractured.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\source\physics\dgCollisionCompoundBreakable.h"
+				RelativePath="..\..\..\source\physics\dgCollisionCompoundFractured.h"
 				>
 			</File>
 			<File
@@ -693,6 +693,22 @@
 			</File>
 			<File
 				RelativePath="..\..\..\source\physics\dgBroadPhase.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\source\physics\dgDeformableBodiesUpdate.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\source\physics\dgDeformableBodiesUpdate.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\source\physics\dgFractureBodiesUpdate.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\source\physics\dgFracturedBodiesUpdate.h"
 				>
 			</File>
 			<File
