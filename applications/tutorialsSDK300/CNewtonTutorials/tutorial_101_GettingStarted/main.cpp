@@ -6,6 +6,7 @@
 #include <dNewtonCollision.h>
 #include <dNewtonDynamicBody.h>
 
+// make a custom rigid body for the application to use as the base class of all it dynamics bodies
 class MyDynamicBody: public dNewtonDynamicBody
 {
 	public:
@@ -14,12 +15,13 @@ class MyDynamicBody: public dNewtonDynamicBody
 	{
 	}
 
+	// the end application need to overload this function from dNetwonBody
 	void OnBodyTransform (const dFloat* const matrix, int threadIndex)
 	{
-		dMatrix xxx (matrix);
 		Update (matrix);
 	}
 
+	// the end application need to overload this function from dNetwonDynamicBody
 	void OnForceAndTorque (dFloat timestep, int threadIndex)
 	{
 		// apply gravity force to the body
@@ -36,6 +38,7 @@ class MyDynamicBody: public dNewtonDynamicBody
 
 dNewtonDynamicBody* CreateBackgroundBody(dNewton* const world)
 {
+	// make a flat quad 
 	dFloat points[4][3] = 
 	{
 		{-100.0f, 0.0f,  100.0f}, 
@@ -91,7 +94,11 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	// run the simulation loop
 	for (int i = 0; i < 300; i ++) {
-		world.Update (1.0f/60.f);
+		// this function advance the simulation by the timestep, if another call is made before the time step of the previews call is exhausted, the call is ignored
+		//world.Update (1.0f/60.f);
+
+		// this function will advance the simulation by the timestep, on each call
+		world.UpdateOffLine (1.0f/60.f);
 
 		dMatrix matrix;
 		freeFallBall->InterplateMatrix (1.0f, &matrix[0][0]);

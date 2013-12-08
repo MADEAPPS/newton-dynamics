@@ -295,6 +295,12 @@ void dNewton::SetNumberOfThreads(int threadCount)
 }
 
 
+void dNewton::UpdateOffLine (dFloat timestepInSecunds)
+{
+	NewtonUpdate (m_world, timestepInSecunds);
+	m_microseconds += GetTimeInMicrosenconds ();
+}
+
 void dNewton::Update (dFloat timestepInSecunds)
 {
 	dLong timestepMicrosecunds = dLong (double (timestepInSecunds) * 1000000.0f);
