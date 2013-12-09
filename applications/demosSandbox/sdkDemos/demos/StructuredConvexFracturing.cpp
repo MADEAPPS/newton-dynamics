@@ -603,7 +603,7 @@ NewtonMeshApplyBoxMapping (solidMesh, externalMaterial, externalMaterial, extern
 	// create a visual entity for display the main mesh
     dMatrix matrix (GetIdentityMatrix());
     matrix.m_posit = origin;
-matrix.m_posit.m_y = 5.0;
+matrix.m_posit.m_y = 20.0;
 	matrix.m_posit.m_w = 1.0f;
     DemoEntity* const visualEntity = new DemoEntity(matrix, NULL);
     scene->Append(visualEntity);
@@ -664,8 +664,12 @@ void StructuredConvexFracturing (DemoEntityManager* const scene)
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
 	//CreateLevelMesh (scene, "sponza.ngd", true);
 	//CreateLevelMesh (scene, "sponza.ngd", true);
+	AddPrimitiveArray (scene, 0.0f, dVector (0.0f, 0.0f, 0.0f, 0.0f), dVector (100.0f, 1.0f, 100.0f, 0.0f), 1, 1, 0, _BOX_PRIMITIVE, 0, GetIdentityMatrix());
+
+
 
 	AddStructuredFractured (scene, dVector (0.0f, 0.0f, 0.0f, 0.0f), 0, "colum.ngd");
+
 
 	// create a shattered mesh array
 	//CreateSimpleVoronoiFracture (scene);

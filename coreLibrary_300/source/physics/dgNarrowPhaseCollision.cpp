@@ -539,7 +539,7 @@ dgInt32 dgWorld::ClosestCompoundPoint (dgBody* const compoundConvexA, dgBody* co
 	dgCollisionInstance* const instance = compoundConvexA->m_collision;
 	dgAssert (instance->IsType(dgCollision::dgCollisionCompound_RTTI));
 	dgCollisionCompound* const collision = (dgCollisionCompound*) instance->GetChildShape();
-	return collision->ClosestDitance(compoundConvexA, contactA, collisionB, contactB, normalAB);
+	return collision->ClosestDistance(compoundConvexA, contactA, collisionB, contactB, normalAB);
 }
 
 

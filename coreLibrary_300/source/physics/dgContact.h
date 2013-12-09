@@ -58,8 +58,9 @@ class dgActiveContacts: public dgList<dgContact*>
 class dgCollidingPairCollector
 {
 	public: 
-	struct dgPair 
+	class dgPair 
 	{
+		public:
 		dgContact* m_contact;
 		dgContactPoint* m_contactBuffer;
 		dgFloat32 m_timeOfImpact;

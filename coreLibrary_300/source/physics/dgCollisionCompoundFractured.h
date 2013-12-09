@@ -115,7 +115,6 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 //		} m_commonData;
 
 		dgMesh* m_mesh;
-		//dgCollisionConvex* m_shape;
 		dgTreeArray::dgTreeNode* m_shapeNode;
 	};
 
@@ -127,13 +126,13 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 		~dgSharedNodeMesh ();
 	};
 
-	class dgDebriGraph: public dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>
+	class dgConectivityGraph: public dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>
 	{
 		public:
-		dgDebriGraph (dgMemoryAllocator* const allocator);
-		dgDebriGraph (const dgDebriGraph& source);
-		dgDebriGraph (dgMemoryAllocator* const allocator, dgDeserialize deserialization, void* const userData);
-		~dgDebriGraph ();
+		dgConectivityGraph (dgMemoryAllocator* const allocator);
+		dgConectivityGraph (const dgConectivityGraph& source);
+		dgConectivityGraph (dgMemoryAllocator* const allocator, dgDeserialize deserialization, void* const userData);
+		~dgConectivityGraph ();
 
 //		void AddToHeap (dgDownHeap<dgMeshEffect*, dgFloat32>& heap, dgMeshEffect* front);
 		dgListNode* AddNode (dgFlatVertexArray& vertexArray, dgMeshEffect* const factureVisualMesh, dgTreeArray::dgTreeNode* const collisionNode, dgInt32 interiorMaterialBase);
@@ -144,6 +143,28 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 //						dgMatrix* const matrixArray, dgInt32* const idArray, dgFloat32* const densities, dgCollisionCompoundBreakableCallback callback, void* buildUsedData);
 
 		void Serialize(dgSerialize callback, void* const userData) const;
+	};
+
+	class dgConectivityGraphMap: public dgTree<dgConectivityGraph::dgListNode*, const dgCollisionInstance*>
+	{
+		public:
+		dgConectivityGraphMap (const dgConectivityGraphMap& source)
+			:dgTree<dgConectivityGraph::dgListNode*, const dgCollisionInstance*>(source.GetAllocator())
+		{
+		}
+
+		dgConectivityGraphMap (dgMemoryAllocator* const allocator)
+			:dgTree<dgConectivityGraph::dgListNode*, const dgCollisionInstance*>(allocator)
+		{
+		}
+
+		void Pupolate(const dgConectivityGraph& graph)
+		{
+			for (dgConectivityGraph::dgListNode* node = graph.GetFirst(); node != graph.GetLast(); node = node->GetNext() ) {
+				dgDebriNodeInfo& nodeInfo = node->GetInfo().m_nodeData;
+				Insert(node, nodeInfo.m_shapeNode->GetInfo()->GetShape());
+			}
+		}
 	};
 
 /*
@@ -172,7 +193,7 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 	dgCollisionCompoundFractured (dgWorld* const world, dgDeserialize deserialization, void* const userData);
 	virtual ~dgCollisionCompoundFractured(void);
 
-	dgDebriGraph::dgListNode* GetMainMesh() const {return m_conectivity.GetLast();}
+	dgConectivityGraph::dgListNode* GetMainMesh() const {return m_conectivity.GetLast();}
 
 	dgInt32 GetVertecCount() const {return m_vertexBuffer->m_vertexCount;}
 
@@ -180,8 +201,15 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 	const dgFloat32* GetVertexNormal () const {return m_vertexBuffer->GetVertexNormals();}
 	const dgFloat32* GetVertexUVs () const {return m_vertexBuffer->GetVertexUVs();}
 	
-	dgInt32 GetSegmentIndexStream (dgDebriGraph::dgListNode* const node, dgMesh::dgListNode* const segment, dgInt32* const index) const;
-	dgInt32 GetSegmentIndexStreamShort (dgDebriGraph::dgListNode* const node, dgMesh::dgListNode* segment, dgInt16* const index) const;
+	dgInt32 GetSegmentIndexStream (dgConectivityGraph::dgListNode* const node, dgMesh::dgListNode* const segment, dgInt32* const index) const;
+	dgInt32 GetSegmentIndexStreamShort (dgConectivityGraph::dgListNode* const node, dgMesh::dgListNode* segment, dgInt16* const index) const;
+
+	void SetImpulseStrength(dgFloat32 impulseStrength);
+	dgFloat32 GetImpulseStrength() const;
+
+	void SetImpulsePropgationFactor(dgFloat32 factor);
+	dgFloat32 GetSetImpulsePropgationFactor() const;
+
 
 /*
 	void DeleteComponentBegin ();
@@ -206,13 +234,17 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 	dgIsland m_detachedIslands;
 */	
 	private:
+	dgVector GetObbSize() const;
     virtual void CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
 	dgInt32 CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 
-	dgDebriGraph m_conectivity;
+	dgConectivityGraph m_conectivity;
+	dgConectivityGraphMap m_conectivityMap;
 	dgVertexBuffer* m_vertexBuffer;
 	dgInt8* m_visibilityMap;
 	dgInt32* m_visibilityIndirectMap;
 	dgInt32 m_visibilityMapIndexCount;
+	dgFloat32 m_impulseStrengthPerUnitMass;
+	dgFloat32 m_impulseAbsortionFactor;
 };
 #endif

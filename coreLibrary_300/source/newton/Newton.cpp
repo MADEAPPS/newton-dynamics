@@ -2859,7 +2859,7 @@ NewtonBreakableComponentMesh* NewtonBreakableGetMainMesh (const NewtonCollision*
 void* NewtonBreakableGetFirstSegment (const NewtonBreakableComponentMesh* const breakableComponentMesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	dgCollisionCompoundFractured::dgDebriGraph::dgListNode* const node = (dgCollisionCompoundFractured::dgDebriGraph::dgListNode*) breakableComponentMesh;
+	dgCollisionCompoundFractured::dgConectivityGraph::dgListNode* const node = (dgCollisionCompoundFractured::dgConectivityGraph::dgListNode*) breakableComponentMesh;
 	return node->GetInfo().m_nodeData.m_mesh->GetFirst();
 }
 
@@ -2895,7 +2895,7 @@ int NewtonBreakableSegmentGetIndexStream (const NewtonCollision* const compoundB
 	dgCollisionInstance* const collision = (dgCollisionInstance*) compoundBreakable;
 	if (collision->IsType (dgCollision::dgCollisionCompoundBreakable_RTTI)) {
 		dgCollisionCompoundFractured* const compound = (dgCollisionCompoundFractured*) collision;
-		count = compound->GetSegmentIndexStream ((dgCollisionCompoundFractured::dgDebriGraph::dgListNode*) meshOwner, (dgCollisionCompoundFractured::dgMesh::dgListNode*) segment, index);
+		count = compound->GetSegmentIndexStream ((dgCollisionCompoundFractured::dgConectivityGraph::dgListNode*) meshOwner, (dgCollisionCompoundFractured::dgMesh::dgListNode*) segment, index);
 	}
 	return count;
 }
@@ -2908,7 +2908,7 @@ int NewtonBreakableSegmentGetIndexStreamShort (const NewtonCollision* const comp
 	dgCollisionInstance* const collision = (dgCollisionInstance*) compoundBreakable;
 	if (collision->IsType (dgCollision::dgCollisionCompoundBreakable_RTTI)) {
 		dgCollisionCompoundFractured* const compound = (dgCollisionCompoundFractured*) collision;
-		count = compound->GetSegmentIndexStreamShort ((dgCollisionCompoundFractured::dgDebriGraph::dgListNode*) meshOwner, (dgCollisionCompoundFractured::dgMesh::dgListNode*) segment, index);
+		count = compound->GetSegmentIndexStreamShort ((dgCollisionCompoundFractured::dgConectivityGraph::dgListNode*) meshOwner, (dgCollisionCompoundFractured::dgMesh::dgListNode*) segment, index);
 	}
 	return count;
 }

@@ -874,8 +874,7 @@ void AddPrimitiveArray (DemoEntityManager* const scene, dFloat mass, const dVect
 			matrix.m_posit.m_x = x;
 			matrix.m_posit.m_z = z;
 			dVector floor (FindFloor (world, dVector (matrix.m_posit.m_x, startElevation, matrix.m_posit.m_z, 0.0f), 2.0f * startElevation));
-			matrix.m_posit.m_y = floor.m_y + 2.0f;
-//if ((i == 1) && (j == 1))
+			matrix.m_posit.m_y = floor.m_y + size.m_y * 0.5f;
 			CreateSimpleSolid (scene, geometry, mass, matrix, collision, materialID);
 		}
 	}

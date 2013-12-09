@@ -700,107 +700,6 @@ dgFloat32 dgCollisionCompound::RayCast (const dgVector& localP0, const dgVector&
 	return maxT;
 }
 
-dgFloat32 dgCollisionCompound::ConvexRayCast (const dgCollisionInstance* const convexShape, const dgMatrix& shapeMatrix, const dgVector& shapeVeloc, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const referenceBody, const dgCollisionInstance* const referenceShape, void* const userData, dgInt32 threadId) const
-{
-	dgAssert (referenceShape->GetChildShape() == this);
-
-	if (!m_root) {
-		return dgFloat32 (1.2f);
-	}
-
-	dgFloat32 distance[DG_COMPOUND_STACK_DEPTH];
-	const dgNodeBase* stackPool[DG_COMPOUND_STACK_DEPTH];
-
-	dgAssert (referenceShape->IsType(dgCollision::dgCollisionCompound_RTTI));
-	const dgMatrix& compoundMatrix = referenceShape->m_globalMatrix;
-	dgMatrix shapeGlobalMatrix (convexShape->m_localMatrix * shapeMatrix);
-
-	dgMatrix localMatrix (shapeGlobalMatrix * compoundMatrix.Inverse());
-	dgVector localVeloc (compoundMatrix.UnrotateVector(shapeVeloc));
-
-	dgVector shapeLocalP0; 
-	dgVector shapeLocalP1; 
-	convexShape->CalcAABB (localMatrix, shapeLocalP0, shapeLocalP1);
-
-	dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), localVeloc);
-
-	dgInt32 stack = 1;
-	stackPool[0] = m_root;
-	dgVector minBox (m_root->m_p0 - shapeLocalP1);
-	dgVector maxBox (m_root->m_p1 - shapeLocalP0);
-	distance[0] = ray.BoxIntersect(minBox, maxBox);
-	dgContactPoint tmpContact;
-	while (stack) {
-		stack --;
-		dgFloat32 dist = distance[stack];
-		if (dist > maxT) {
-			break;
-//		dgVector minBox (me->m_p0 - shapeLocalP1);
-//		dgVector maxBox (me->m_p1 - shapeLocalP0);
-//		if (ray.BoxTest (minBox, maxBox)) {
-		} else {
-			const dgNodeBase* const me = stackPool[stack];
-			dgAssert (me);
-			if (me->m_type == m_leaf) {
-				dgCollisionInstance* const subShape = me->GetShape();
-				dgCollisionInstance childInstance (*subShape, subShape->GetChildShape());
-				childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * compoundMatrix;
-				dgFloat32 t = childInstance.ConvexRayCast (convexShape, shapeMatrix, shapeVeloc, maxT, tmpContact, NULL, referenceBody, userData, threadId);
-				if (t < maxT) {
-					contactOut = tmpContact;
-					maxT = t;
-				}
-
-			} else {
-//				dgAssert (me->m_type == m_node);
-//				stackPool[stack] = me->m_left;
-//				stack++;
-//				dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNodeBase*)));
-//				stackPool[stack] = me->m_right;
-//				stack++;
-//				dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNodeBase*)));
-
-				dgAssert (me->m_type == m_node);
-				const dgNodeBase* const left = me->m_left;
-				dgAssert (left);
-				dgVector minBox (left->m_p0 - shapeLocalP1);
-				dgVector maxBox (left->m_p1 - shapeLocalP0);
-				dgFloat32 dist = ray.BoxIntersect(minBox, maxBox);
-				if (dist < maxT) {
-					dgInt32 j = stack;
-					for ( ; j && (dist > distance[j - 1]); j --) {
-						stackPool[j] = stackPool[j - 1];
-						distance[j] = distance[j - 1];
-					}
-					stackPool[j] = left;
-					distance[j] = dist;
-					stack++;
-					dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (stackPool[0])));
-				}
-
-				const dgNodeBase* const right = me->m_right;
-				dgAssert (right);
-				minBox = right->m_p0 - shapeLocalP1;
-				maxBox = right->m_p1 - shapeLocalP0;
-				dist = ray.BoxIntersect(minBox, maxBox);
-				if (dist < maxT) {
-					dgInt32 j = stack;
-					for ( ; j && (dist > distance[j - 1]); j --) {
-						stackPool[j] = stackPool[j - 1];
-						distance[j] = distance[j - 1];
-					}
-					stackPool[j] = right;
-					distance[j] = dist;
-					stack++;
-					dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (stackPool[0])));
-				}
-
-			}
-		}
-	}
-
-	return maxT;
-}
 
 
 dgFloat32 dgCollisionCompound::GetVolume () const
@@ -1576,24 +1475,32 @@ void dgCollisionCompound::CalculateCollisionTreeArea(dgNodePairs& pairOut, const
 }
 
 
-dgInt32 dgCollisionCompound::ClosestDitance (dgBody* const compoundBody, dgTriplex& contactA, dgBody* const bodyB, dgTriplex& contactB, dgTriplex& normalAB) const
+dgInt32 dgCollisionCompound::ClosestDistance (dgBody* const compoundBody, dgTriplex& contactA, dgBody* const bodyB, dgTriplex& contactB, dgTriplex& normalAB) const
 {
+	dgInt32 count = 0;
+	dgAssert(0);
+/*
 	if (m_root) {
 		if (bodyB->m_collision->IsType (dgCollision::dgCollisionConvexShape_RTTI)) {
-			return ClosestDitanceToConvex (compoundBody, contactA, bodyB, contactB, normalAB);
+			count = ClosestDitanceToConvex (compoundBody, contactA, bodyB, contactB, normalAB);
+		} else if (bodyB->m_collision->IsType (dgCollision::dgCollisionBVH_RTTI)) {
+			dgAssert(0);
 		} else {
-			return ClosestDitanceToCompound (compoundBody, contactA, bodyB, contactB, normalAB);
+			dgAssert(0);
+//			return ClosestDitanceToCompound (compoundBody, contactA, bodyB, contactB, normalAB);
 		}
 	}
-	return 0;
+*/
+	return count;
 }
 
 
+/*
 dgInt32 dgCollisionCompound::ClosestDitanceToConvex (dgBody* const compoundBody, dgTriplex& contactA, dgBody* const convexBodyB, dgTriplex& contactB, dgTriplex& normalAB) const
 {
 	dgAssert (0);
 	return 0;
-/*
+
 	dgVector p0;
 	dgVector p1;
 	dgContactPoint contact0;
@@ -1670,7 +1577,6 @@ dgInt32 dgCollisionCompound::ClosestDitanceToConvex (dgBody* const compoundBody,
 		normalAB.m_z = contact0.m_normal.m_z;
 	}
 	return retFlag;
-*/
 }
 
 dgInt32 dgCollisionCompound::ClosestDitanceToCompound (dgBody* const compoundBodyA, dgTriplex& contactA, dgBody* const compoundBodyB, dgTriplex& contactB, dgTriplex& normalAB) const
@@ -1822,8 +1728,9 @@ dgInt32 dgCollisionCompound::ClosestDitanceToCompound (dgBody* const compoundBod
 		normalAB.m_z = contact0.m_normal.m_z;
 	}
 	return retFlag;
-*/
 }
+*/
+
 
 
 dgInt32 dgCollisionCompound::CalculateContactsToCompound (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const
@@ -3240,3 +3147,121 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTreeContinue (dgCollidi
 
 }
 
+dgFloat32 dgCollisionCompound::ConvexRayCast (const dgCollisionInstance* const convexInstance, const dgMatrix& instanceMatrix, const dgVector& instanceVeloc, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const referenceBody, const dgCollisionInstance* const referenceInstance, void* const userData, dgInt32 threadId) const
+{
+	dgFloat32 dist = dgFloat32 (1.0e10f);
+	if (m_root) {
+		dgAssert (IsType (dgCollision::dgCollisionCompound_RTTI));
+//		dgContact* const constraint = pair->m_contact;
+//		dgBody* const body1 = constraint->GetBody1();
+		if (convexInstance->IsType (dgCollision::dgCollisionConvexShape_RTTI)) {
+			dist = ConvexRayCastSingleConvex (convexInstance, instanceMatrix, instanceVeloc, maxT, contactOut, referenceBody, referenceInstance, userData, threadId);
+		} else if (convexInstance->IsType (dgCollision::dgCollisionCompound_RTTI)) {
+			dgAssert (0);
+//			contactCount = CalculateContactsToCompoundContinue (pair, proxy);
+		} else if (convexInstance->IsType (dgCollision::dgCollisionBVH_RTTI)) {
+//			contactCount = CalculateContactsToCollisionTreeContinue (pair, proxy);
+		} else if (convexInstance->IsType (dgCollision::dgCollisionHeightField_RTTI)) {
+			dgAssert (0);
+			//				contactCount = CalculateContactsToHeightField (pair, proxy);
+		} else {
+			dgAssert (0);
+//			dgAssert (body1->m_collision->IsType (dgCollision::dgCollisionUserMesh_RTTI));
+			//				contactCount = CalculateContactsUserDefinedCollision (pair, proxy);
+		}
+	}
+	return dist;
+}
+
+dgFloat32 dgCollisionCompound::ConvexRayCastSingleConvex (const dgCollisionInstance* const convexShape, const dgMatrix& shapeMatrix, const dgVector& shapeVeloc, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const referenceBody, const dgCollisionInstance* const referenceInstance, void* const userData, dgInt32 threadId) const
+{
+	dgAssert (referenceInstance->GetChildShape() == this);
+
+	if (!m_root) {
+		return dgFloat32 (1.2f);
+	}
+
+	dgFloat32 distance[DG_COMPOUND_STACK_DEPTH];
+	const dgNodeBase* stackPool[DG_COMPOUND_STACK_DEPTH];
+
+	dgAssert (referenceInstance->IsType(dgCollision::dgCollisionCompound_RTTI));
+	const dgMatrix& compoundMatrix = referenceInstance->m_globalMatrix;
+	dgMatrix shapeGlobalMatrix (convexShape->m_localMatrix * shapeMatrix);
+
+	dgMatrix localMatrix (shapeGlobalMatrix * compoundMatrix.Inverse());
+	dgVector localVeloc (compoundMatrix.UnrotateVector(shapeVeloc));
+
+	dgVector shapeLocalP0; 
+	dgVector shapeLocalP1; 
+	convexShape->CalcAABB (localMatrix, shapeLocalP0, shapeLocalP1);
+
+	dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), localVeloc);
+
+	dgInt32 stack = 1;
+	stackPool[0] = m_root;
+	dgVector minBox (m_root->m_p0 - shapeLocalP1);
+	dgVector maxBox (m_root->m_p1 - shapeLocalP0);
+	distance[0] = ray.BoxIntersect(minBox, maxBox);
+	dgContactPoint tmpContact;
+	while (stack) {
+		stack --;
+		dgFloat32 dist = distance[stack];
+		if (dist > maxT) {
+			break;
+		} else {
+			const dgNodeBase* const me = stackPool[stack];
+			dgAssert (me);
+			if (me->m_type == m_leaf) {
+				dgCollisionInstance* const subShape = me->GetShape();
+				dgCollisionInstance childInstance (*subShape, subShape->GetChildShape());
+				childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * compoundMatrix;
+				dgFloat32 t = childInstance.ConvexRayCast (convexShape, shapeMatrix, shapeVeloc, maxT, tmpContact, NULL, referenceBody, userData, threadId);
+				if (t < maxT) {
+					contactOut = tmpContact;
+					contactOut.m_collision0 = subShape;
+					maxT = t;
+				}
+
+			} else {
+
+				dgAssert (me->m_type == m_node);
+				const dgNodeBase* const left = me->m_left;
+				dgAssert (left);
+				dgVector minBox (left->m_p0 - shapeLocalP1);
+				dgVector maxBox (left->m_p1 - shapeLocalP0);
+				dgFloat32 dist = ray.BoxIntersect(minBox, maxBox);
+				if (dist < maxT) {
+					dgInt32 j = stack;
+					for ( ; j && (dist > distance[j - 1]); j --) {
+						stackPool[j] = stackPool[j - 1];
+						distance[j] = distance[j - 1];
+					}
+					stackPool[j] = left;
+					distance[j] = dist;
+					stack++;
+					dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (stackPool[0])));
+				}
+
+				const dgNodeBase* const right = me->m_right;
+				dgAssert (right);
+				minBox = right->m_p0 - shapeLocalP1;
+				maxBox = right->m_p1 - shapeLocalP0;
+				dist = ray.BoxIntersect(minBox, maxBox);
+				if (dist < maxT) {
+					dgInt32 j = stack;
+					for ( ; j && (dist > distance[j - 1]); j --) {
+						stackPool[j] = stackPool[j - 1];
+						distance[j] = distance[j - 1];
+					}
+					stackPool[j] = right;
+					distance[j] = dist;
+					stack++;
+					dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (stackPool[0])));
+				}
+
+			}
+		}
+	}
+
+	return maxT;
+}

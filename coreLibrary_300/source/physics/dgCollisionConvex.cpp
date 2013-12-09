@@ -2899,7 +2899,7 @@ bool dgCollisionConvex::CalculateClosestPoints (dgCollisionParamProxy& proxy) co
 	dgContactPoint* const contactOut = proxy.m_contacts;
 	dgCollisionInstance* const collConicConvexInstance = proxy.m_referenceCollision;
 	dgVector p (ConvexConicSupporVertex(minkHull.m_p, minkHull.m_normal));
-dgAssert (0);
+
 	const dgVector& scale = collConicConvexInstance->GetScale();
 	const dgVector& invScale = collConicConvexInstance->GetInvScale();
 	const dgMatrix& matrix = collConicConvexInstance->GetGlobalMatrix();
