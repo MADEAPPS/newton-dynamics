@@ -116,6 +116,7 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 
 		dgMesh* m_mesh;
 		dgTreeArray::dgTreeNode* m_shapeNode;
+		dgInt32 m_lru;
 	};
 
 
@@ -238,11 +239,14 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
     virtual void CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
 	dgInt32 CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 
+	void SpawnSingleDrebree (dgBody* const myBody, dgConectivityGraph::dgListNode* const rootNode, dgFloat32 impulseStimate2, dgFloat32 impulseStimateCut2) const;
+
 	dgConectivityGraph m_conectivity;
 	dgConectivityGraphMap m_conectivityMap;
 	dgVertexBuffer* m_vertexBuffer;
 	dgInt8* m_visibilityMap;
 	dgInt32* m_visibilityIndirectMap;
+	mutable dgInt32 m_lru;
 	dgInt32 m_visibilityMapIndexCount;
 	dgFloat32 m_impulseStrengthPerUnitMass;
 	dgFloat32 m_impulseAbsortionFactor;

@@ -1318,6 +1318,7 @@ for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; n
 dgCollisionCompoundFractured::dgDebriNodeInfo::dgDebriNodeInfo ()
 	:m_mesh(NULL)
 	,m_shapeNode(NULL)
+	,m_lru(0)
 {
 //	memset (&m_commonData, 0, sizeof (m_commonData));
 }
@@ -1575,6 +1576,7 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (const dgCollisionCom
 	,m_conectivity(source.m_conectivity)
 	,m_conectivityMap (source.m_conectivityMap)
 	,m_vertexBuffer(source.m_vertexBuffer)
+	,m_lru(0)
 	,m_visibilityMapIndexCount(source.m_visibilityMapIndexCount)
 	,m_impulseStrengthPerUnitMass(source.m_impulseStrengthPerUnitMass)
 	,m_impulseAbsortionFactor(source.m_impulseAbsortionFactor)
@@ -1619,8 +1621,9 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (dgWorld* const world
 	,m_conectivity(world->GetAllocator())
 	,m_conectivityMap (world->GetAllocator())
 	,m_vertexBuffer(NULL)
+	,m_lru(0)
 	,m_impulseStrengthPerUnitMass(10.0f)
-	,m_impulseAbsortionFactor(0.25f)
+	,m_impulseAbsortionFactor(0.5f)
 {
 //pointcloudCount = 0;
 
@@ -1875,8 +1878,9 @@ dgInt32 dgCollisionCompoundFractured::CalculateContacts (dgCollidingPairCollecto
 		dgVector relVeloc (otherBody->GetVelocity() - myBody->GetVelocity());
 		dgAssert (relVeloc.m_w == dgFloat32 (0.0f));
 		dgVector impulseStimate (relVeloc.Scale4 (dgFloat32 (1.0f) / (myBody->GetInvMass().m_w + otherBody->GetInvMass().m_w))); 
+		dgFloat32 impulseStimate2 = impulseStimate.DotProduct4(impulseStimate).m_w;
 		dgFloat32 impulseStrength = m_impulseStrengthPerUnitMass * myBody->GetMass().m_w;
-		if (impulseStimate.DotProduct4(impulseStimate).m_w > (impulseStrength * impulseStrength)) {
+		if (impulseStimate2 > (impulseStrength * impulseStrength)) {
 
 			dgCollisionInstance* const myInstance = myBody->GetCollision();
 			dgCollisionInstance* const otherInstance = otherBody->GetCollision();
@@ -1887,6 +1891,11 @@ dgInt32 dgCollisionCompoundFractured::CalculateContacts (dgCollidingPairCollecto
 			dgFloat32 dist = ConvexRayCast (otherInstance, otherInstance->GetGlobalMatrix(), relVeloc, proxy.m_timestep, contactOut, myBody, myInstance, NULL, proxy.m_threadIndex);
 			if (dist < proxy.m_timestep) {
 				dgAssert (m_conectivityMap.Find(contactOut.m_collision0));
+				dgConectivityGraph::dgListNode* const rootNode = m_conectivityMap.Find(contactOut.m_collision0)->GetInfo();
+				dgDebriNodeInfo& nodeInfo = rootNode->GetInfo().m_nodeData;
+				nodeInfo.m_lru = 1;
+				SpawnSingleDrebree (myBody, rootNode, impulseStimate2, impulseStrength * impulseStrength);
+
 //				Insert(node, nodeInfo.m_shapeNode->GetInfo()->GetShape());
 //				dgAssert (0);
 			}
@@ -1897,5 +1906,36 @@ dgInt32 dgCollisionCompoundFractured::CalculateContacts (dgCollidingPairCollecto
 }
 
 
+void dgCollisionCompoundFractured::SpawnSingleDrebree (dgBody* const myBody, dgConectivityGraph::dgListNode* const rootNode, dgFloat32 impulseStimate2, dgFloat32 impulseStimateCut2) const
+{
+	dgFloat32 strengthPool[256];
+	dgConectivityGraph::dgListNode* pool[256];
 
+	dgFloat32 attenuation = m_impulseAbsortionFactor;
+	m_lru ++;
+	dgInt32 stack = 1;
+	pool[0] = rootNode;
+	strengthPool[0] = impulseStimate2;
+	while (stack) {
+		stack --;
+		dgFloat32 strenght = strengthPool[stack] * attenuation;
+		dgConectivityGraph::dgListNode* const rootNode = pool[stack];
+
+		if (strenght > impulseStimateCut2) {
+			for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = rootNode->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
+				dgConectivityGraph::dgListNode* const node = edgeNode->GetInfo().m_node;
+				dgDebriNodeInfo& childNodeInfo = node->GetInfo().m_nodeData;
+				if (childNodeInfo.m_lru != m_lru) {
+					childNodeInfo.m_lru = m_lru;
+					strengthPool[stack] = strenght;
+					pool[stack] = node;
+					stack ++;
+					dgAssert (stack < sizeof (pool)/sizeof (pool[0]));
+				}
+			}
+		}
+		dgDebriNodeInfo& nodeInfo = rootNode->GetInfo().m_nodeData;
+
+	}
+}
 
