@@ -59,7 +59,6 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 		~dgVertexBuffer ();
 
 		void Serialize(dgSerialize callback, void* const userData) const;
-//		void GetVertexStreams (dgInt32 vertexStrideInByte, dgFloat32* const vertex, dgInt32 normalStrideInByte, dgFloat32* const normal, dgInt32 uvStrideInByte, dgFloat32* const uv) const;
 		const dgFloat32* GetVertexPositions() const {return m_vertex;};
 		const dgFloat32* GetVertexNormals() const {return m_normal;};
 		const dgFloat32* GetVertexUVs() const {return m_uv;};
@@ -105,15 +104,6 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 		dgDebriNodeInfo ();
 		~dgDebriNodeInfo ();
 
-//		struct PackedSaveData {
-//			union {
-//				dgInt32 m_lru;
-//				dgInt32 m_shapeID;
-//			};
-//			dgInt32 m_distanceToFixNode;
-//			dgInt32 m_islandIndex; 
-//		} m_commonData;
-
 		dgMesh* m_mesh;
 		dgTreeArray::dgTreeNode* m_shapeNode;
 		dgInt32 m_lru;
@@ -135,14 +125,7 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 		dgConectivityGraph (dgMemoryAllocator* const allocator, dgDeserialize deserialization, void* const userData);
 		~dgConectivityGraph ();
 
-//		void AddToHeap (dgDownHeap<dgMeshEffect*, dgFloat32>& heap, dgMeshEffect* front);
 		dgListNode* AddNode (dgFlatVertexArray& vertexArray, dgMeshEffect* const factureVisualMesh, dgTreeArray::dgTreeNode* const collisionNode, dgInt32 interiorMaterialBase);
-//		void SplitAndAddNodes (dgFlatVertexArray& vertexArray, dgMeshEffect* solid, dgMeshEffect* const clipper, 
-//							   dgInt32 clipperMaterial, dgInt32 id, dgFloat32 density, dgCollisionCompoundBreakableCallback callback, void* buildUsedData);
-
-//		void AddMeshes (dgFlatVertexArray& vertexArray, dgInt32 count, dgMeshEffect* const solidArray[], dgMeshEffect* const clipperArray[], 
-//						dgMatrix* const matrixArray, dgInt32* const idArray, dgFloat32* const densities, dgCollisionCompoundBreakableCallback callback, void* buildUsedData);
-
 		void Serialize(dgSerialize callback, void* const userData) const;
 	};
 
@@ -168,25 +151,6 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 		}
 	};
 
-/*
-	class dgCompoundBreakableFilterData
-	{
-		public:
-		dgInt32 m_index;
-		dgDebriGraph::dgListNode* m_node;
-	};
-	
-	class dgIsland: public dgList<dgDebriGraph::dgListNode*> 
-	{
-		public:
-		dgIsland(dgMemoryAllocator* const allocator)
-			:dgList<dgDebriGraph::dgListNode*> (allocator)
-		{
-		}
-	};
-#endif
-*/
-
 	public:
 	dgCollisionCompoundFractured (const dgCollisionCompoundFractured& source);
 	dgCollisionCompoundFractured (dgWorld* const world, dgMeshEffect* const solidMesh, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& offsetMatrix);
@@ -211,35 +175,13 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 	void SetImpulsePropgationFactor(dgFloat32 factor);
 	dgFloat32 GetSetImpulsePropgationFactor() const;
 
-
-/*
-	void DeleteComponentBegin ();
-	dgBody* CreateComponentBody (dgDebriGraph::dgListNode* node) const;
-	void DeleteComponent (dgDebriGraph::dgListNode* node);
-	void DeleteComponentEnd ();
-	dgDebriGraph::dgListNode* GetFirstComponentMesh () const {return (m_conectivity.GetCount() > 2) ? m_conectivity.GetFirst()->GetNext() : NULL;}
-	dgInt32 GetSegmentsInRadius (const dgVector& origin, dgFloat32 radius, dgDebriGraph::dgListNode** segments, dgInt32 maxCount);
-
-	void ResetAnchor ();
-	void SetAnchoredParts (dgInt32 count, const dgMatrix* const matrixArray, const dgCollision** collisionArray);
-	void EnumerateIslands ();
-//	dgInt32 GetSegmentsInRadius (const dgVector& origin, dgFloat32 radius, dgDebriGraph::dgListNode** segments, dgInt32 maxCount);
-//	dgInt32 GetDetachedPieces (dgCollision** shapes, dgInt32 maxCount);
-	private:
-	void LinkNodes ();	
-	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
-	virtual void Serialize(dgSerialize callback, void* const userData) const;
-	
-	dgInt32 m_lru;
-	dgInt32 m_lastIslandColor;
-	dgIsland m_detachedIslands;
-*/	
 	private:
 	dgVector GetObbSize() const;
     virtual void CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
 	dgInt32 CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
-
 	void SpawnSingleDrebree (dgBody* const myBody, dgConectivityGraph::dgListNode* const rootNode, dgFloat32 impulseStimate2, dgFloat32 impulseStimateCut2) const;
+
+	bool SanityCheck() const;
 
 	dgConectivityGraph m_conectivity;
 	dgConectivityGraphMap m_conectivityMap;
