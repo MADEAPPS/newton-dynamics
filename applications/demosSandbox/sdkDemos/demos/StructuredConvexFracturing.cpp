@@ -527,11 +527,11 @@ static int MakeRandomPoisonPointCloud(NewtonMesh* const mesh, dVector* const poi
 
 static DemoMesh* CreateVisualMesh (NewtonCollision* const fracturedCompoundCollision)
 {
-	int vertexCount = NewtonCompoundBreakableGetVertexCount (fracturedCompoundCollision); 
+	int vertexCount = NewtonCreateFracturedCompoundGetVertexCount (fracturedCompoundCollision); 
 
-	const dFloat* const vertex = NewtonCompoundBreakableGetVertexPositions (fracturedCompoundCollision);
-	const dFloat* const normal = NewtonCompoundBreakableGetVertexNormals(fracturedCompoundCollision);
-	const dFloat* const uv = NewtonCompoundBreakableGetVertexUVs (fracturedCompoundCollision);
+	const dFloat* const vertex = NewtonCreateFracturedCompoundGetVertexPositions (fracturedCompoundCollision);
+	const dFloat* const normal = NewtonCreateFracturedCompoundGetVertexNormals(fracturedCompoundCollision);
+	const dFloat* const uv = NewtonCreateFracturedCompoundGetVertexUVs (fracturedCompoundCollision);
 
 	DemoMesh* const mesh = new DemoMesh ("fraturedMainMesh");
 	mesh->AllocVertexData (vertexCount);
@@ -541,17 +541,17 @@ static DemoMesh* CreateVisualMesh (NewtonCollision* const fracturedCompoundColli
 	memcpy (mesh->m_normal, normal, 3 * vertexCount * sizeof (dFloat));
 	memcpy (mesh->m_uv, uv, 2 * vertexCount * sizeof (dFloat));
 
-	NewtonBreakableComponentMesh* const meshData = NewtonBreakableGetMainMesh (fracturedCompoundCollision);
-	for (void* segment = NewtonBreakableGetFirstSegment(meshData); segment; segment = NewtonBreakableGetNextSegment (segment)) {
+	NewtonFracturedCompoundMeshPart* const meshData = NewtonFracturedCompoundGetMainMesh (fracturedCompoundCollision);
+	for (void* segment = NewtonFracturedCompoundMeshPartGetFirstSegment(meshData); segment; segment = NewtonFracturedCompoundMeshPartGetNextSegment (segment)) {
 		DemoSubMesh* const subMesh = mesh->AddSubMesh();
 
-		int material = NewtonBreakableSegmentGetMaterial (segment); 
-		int indexCount = NewtonBreakableSegmentGetIndexCount (segment); 
+		int material = NewtonFracturedCompoundMeshPartGetMaterial (segment); 
+		int indexCount = NewtonFracturedCompoundMeshPartGetIndexCount (segment); 
 
 		subMesh->m_textureHandle = AddTextureRef ((GLuint)material);
 
 		subMesh->AllocIndexData (indexCount);
-		subMesh->m_indexCount = NewtonBreakableSegmentGetIndexStream (fracturedCompoundCollision, meshData, segment, (int*)subMesh->m_indexes); 
+		subMesh->m_indexCount = NewtonFracturedCompoundMeshPartGetIndexStream (fracturedCompoundCollision, meshData, segment, (int*)subMesh->m_indexes); 
 	}
 
 	return mesh;
@@ -598,7 +598,7 @@ NewtonMeshApplyBoxMapping (solidMesh, externalMaterial, externalMaterial, extern
 
 	/// create the fractured collision and mesh
 	int debreePhysMaterial = NewtonMaterialGetDefaultGroupID(world);
-	NewtonCollision* const structuredFracturedCollision = NewtonCreateCompoundBreakable (world, solidMesh, 0, debreePhysMaterial, pointCount, &points[0][0], sizeof (dVector), internalMaterial, &textureMatrix[0][0]);
+	NewtonCollision* const structuredFracturedCollision = NewtonCreateFracturedCompound (world, solidMesh, 0, debreePhysMaterial, pointCount, &points[0][0], sizeof (dVector), internalMaterial, &textureMatrix[0][0]);
 
 	// create a visual entity for display the main mesh
     dMatrix matrix (GetIdentityMatrix());

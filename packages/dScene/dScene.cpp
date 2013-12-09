@@ -319,7 +319,7 @@ dScene::dTreeNode* dScene::CreateCollisionFromNewtonCollision(dTreeNode* const p
 		case SERIALIZE_ID_HEIGHTFIELD:
 		case SERIALIZE_ID_USERMESH:
 		case SERIALIZE_ID_SCENE:
-		case SERIALIZE_ID_COMPOUND_BREAKABLE:
+		case SERIALIZE_ID_FRACTURED_COMPOUND:
 		default:
 		{
 			dAssert(0);
