@@ -1228,7 +1228,7 @@ dgInt32 dgCollisionCompoundFractured::CalculateContacts (dgCollidingPairCollecto
 				dgConectivityGraph::dgListNode* const rootNode = m_conectivityMap.Find(contactOut.m_collision0)->GetInfo();
 				dgDebriNodeInfo& nodeInfo = rootNode->GetInfo().m_nodeData;
 				nodeInfo.m_lru = 1;
-				SpawnSingleDrebree (myBody, rootNode, impulseStimate2, impulseStrength * impulseStrength);
+                ((dgCollisionCompoundFractured*)this)->SpawnSingleDrebree (myBody, rootNode, impulseStimate2, impulseStrength * impulseStrength);
 
 				BuildMainMeshSubMehes();
 				m_reconstructMainMesh (myBody, m_conectivity.GetLast());
@@ -1243,7 +1243,7 @@ dgInt32 dgCollisionCompoundFractured::CalculateContacts (dgCollidingPairCollecto
 }
 
 
-void dgCollisionCompoundFractured::SpawnSingleDrebree (dgBody* const myBody, dgConectivityGraph::dgListNode* const rootNode, dgFloat32 impulseStimate2, dgFloat32 impulseStimateCut2) const
+void dgCollisionCompoundFractured::SpawnSingleDrebree (dgBody* const myBody, dgConectivityGraph::dgListNode* const rootNode, dgFloat32 impulseStimate2, dgFloat32 impulseStimateCut2)
 {
 	dgFloat32 strengthPool[256];
 	dgConectivityGraph::dgListNode* pool[256];
@@ -1271,7 +1271,12 @@ void dgCollisionCompoundFractured::SpawnSingleDrebree (dgBody* const myBody, dgC
 				}
 			}
 		}
+        
 		dgDebriNodeInfo& nodeInfo = rootNode->GetInfo().m_nodeData;
+
+        m_conectivityMap.Remove(nodeInfo.m_shapeNode->GetInfo()->GetShape());
+        RemoveCollision (nodeInfo.m_shapeNode);
+        m_conectivity.DeleteNode(rootNode);
 	}
 }
 
