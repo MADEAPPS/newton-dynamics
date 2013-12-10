@@ -32,6 +32,7 @@
 #include "dgWorldDynamicUpdate.h"
 #include "dgFracturedBodiesUpdate.h"
 #include "dgDeformableBodiesUpdate.h"
+#include "dgCollisionCompoundFractured.h"
 
 #define DG_REDUCE_CONTACT_TOLERANCE			dgFloat32 (1.0e-2f)
 #define DG_PRUNE_CONTACT_TOLERANCE			dgFloat32 (1.0e-2f)
@@ -316,7 +317,8 @@ class dgWorld
 	void SetCollisionInstanceConstructorDestructor (OnCollisionInstanceDuplicate constructor, OnCollisionInstanceDestroy destructor);
 
 //	dgCollision* CreateCollisionCompoundBreakable (dgInt32 count, const dgMeshEffect* const solidArray[], const dgInt32* const idArray,  const dgFloat32* const densities, const dgInt32* const internalFaceMaterial, dgInt32 debriID, dgFloat32 gap);
-	dgCollisionInstance* CreateCollisionCompoundBreakable (dgMeshEffect* const solidMesh, int shapeID, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& textureMatrix);
+	dgCollisionInstance* CreateCollisionFracturedCompound (dgMeshEffect* const solidMesh, int shapeID, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& textureMatrix,
+														   dgCollisionCompoundFractured::OnReconstructFractureMainMeshCallBack reconstructMainMesh);
 
 
 	dgCollisionInstance* CreateBVH ();	

@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#if !defined(AFX_STDAFX_H__7B02FF2D_C0C3_4291_9676_333105355F57_H)
-#define AFX_STDAFX_H__7B02FF2D_C0C3_4291_9676_333105355F57_H
+#ifndef __NEWTON_STDAFX_H__
+#define __NEWTON_STDAFX_H__
 
 
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers

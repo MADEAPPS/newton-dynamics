@@ -27,6 +27,8 @@
 
 class dgMeshEffect;
 
+
+
 class dgCollisionCompoundFractured: public dgCollisionCompound
 {
 	class dgFractureBuilder;
@@ -152,8 +154,11 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 	};
 
 	public:
+	typedef void (*OnReconstructFractureMainMeshCallBack) (dgBody* const body, dgConectivityGraph::dgListNode* const mainMeshNode);
+
 	dgCollisionCompoundFractured (const dgCollisionCompoundFractured& source);
-	dgCollisionCompoundFractured (dgWorld* const world, dgMeshEffect* const solidMesh, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& offsetMatrix);
+	dgCollisionCompoundFractured (dgWorld* const world, dgMeshEffect* const solidMesh, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& offsetMatrix,
+								 OnReconstructFractureMainMeshCallBack reconstructMainMesh);
 
 	dgCollisionCompoundFractured (dgWorld* const world, dgDeserialize deserialization, void* const userData);
 	virtual ~dgCollisionCompoundFractured(void);
@@ -193,5 +198,6 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 	dgFloat32 m_impulseAbsortionFactor;
 	mutable dgInt32 m_lru;
 	dgInt32 m_materialCount;
+	OnReconstructFractureMainMeshCallBack m_reconstructMainMesh;
 };
 #endif

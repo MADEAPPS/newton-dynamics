@@ -2774,7 +2774,8 @@ NewtonCollision* NewtonCreateCompoundCollisionFromMesh (const NewtonWorld* const
 }
 
 
-NewtonCollision* NewtonCreateFracturedCompound (const NewtonWorld* const newtonWorld, const NewtonMesh* const solidMesh, int shapeID, int fracturePhysicsMaterialID, int pointcloudCount, const dFloat* const vertexCloud, int strideInBytes, int materialID, const dFloat* const textureMatrix)
+NewtonCollision* NewtonCreateFracturedCompoundCollision (const NewtonWorld* const newtonWorld, const NewtonMesh* const solidMesh, int shapeID, int fracturePhysicsMaterialID, int pointcloudCount, const dFloat* const vertexCloud, int strideInBytes, int materialID, const dFloat* const textureMatrix,
+														NewtonFractureCompoundCollisionReconstructMainMeshCallBack regenerateMainMeshCallback)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 
@@ -2782,12 +2783,13 @@ NewtonCollision* NewtonCreateFracturedCompound (const NewtonWorld* const newtonW
 	dgMeshEffect* const mesh = (dgMeshEffect*) solidMesh;
 
 	dgMatrix textMatrix (textureMatrix);
-	dgCollisionInstance* const collision = world->CreateCollisionCompoundBreakable (mesh, shapeID, fracturePhysicsMaterialID, pointcloudCount, vertexCloud, strideInBytes, materialID, textMatrix);
+	dgCollisionInstance* const collision = world->CreateCollisionFracturedCompound (mesh, shapeID, fracturePhysicsMaterialID, pointcloudCount, vertexCloud, strideInBytes, materialID, textMatrix, 
+																					(dgCollisionCompoundFractured::OnReconstructFractureMainMeshCallBack) regenerateMainMeshCallback);
 	return (NewtonCollision*) collision;
 }
 
 
-int NewtonCreateFracturedCompoundGetVertexCount (const NewtonCollision* const fracturedCompound)
+int NewtonFracturedCompoundCollisionGetVertexCount (const NewtonCollision* const fracturedCompound)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const collision = (dgCollisionInstance*) fracturedCompound;
@@ -2801,7 +2803,7 @@ int NewtonCreateFracturedCompoundGetVertexCount (const NewtonCollision* const fr
 }
 
 
-const dFloat* NewtonCreateFracturedCompoundGetVertexPositions (const NewtonCollision* const fracturedCompound)
+const dFloat* NewtonFracturedCompoundCollisionGetVertexPositions (const NewtonCollision* const fracturedCompound)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const collision = (dgCollisionInstance*) fracturedCompound;
@@ -2815,7 +2817,7 @@ const dFloat* NewtonCreateFracturedCompoundGetVertexPositions (const NewtonColli
 }
 
 
-const dFloat* NewtonCreateFracturedCompoundGetVertexNormals (const NewtonCollision* const fracturedCompound)
+const dFloat* NewtonFracturedCompoundCollisionGetVertexNormals (const NewtonCollision* const fracturedCompound)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const collision = (dgCollisionInstance*) fracturedCompound;
@@ -2828,7 +2830,7 @@ const dFloat* NewtonCreateFracturedCompoundGetVertexNormals (const NewtonCollisi
 	return points;
 }
 
-const dFloat* NewtonCreateFracturedCompoundGetVertexUVs (const NewtonCollision* const fracturedCompound)
+const dFloat* NewtonFracturedCompoundCollisionGetVertexUVs (const NewtonCollision* const fracturedCompound)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const collision = (dgCollisionInstance*) fracturedCompound;

@@ -913,6 +913,7 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (const dgCollisionCom
 	,m_impulseAbsortionFactor(source.m_impulseAbsortionFactor)
 	,m_lru(0)
 	,m_materialCount(source.m_materialCount)
+	,m_reconstructMainMesh(source.m_reconstructMainMesh)
 {
 	m_rtti |= dgCollisionCompoundBreakable_RTTI;
 
@@ -949,7 +950,7 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (const dgCollisionCom
 }
 
 
-dgCollisionCompoundFractured::dgCollisionCompoundFractured (dgWorld* const world, dgMeshEffect* const solidMesh, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& offsetMatrix)
+dgCollisionCompoundFractured::dgCollisionCompoundFractured (dgWorld* const world, dgMeshEffect* const solidMesh, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& offsetMatrix, OnReconstructFractureMainMeshCallBack reconstructMainMesh)
 	:dgCollisionCompound (world)
 	,m_conectivity(world->GetAllocator())
 	,m_conectivityMap (world->GetAllocator())
@@ -958,6 +959,7 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (dgWorld* const world
 	,m_impulseAbsortionFactor(0.5f)
 	,m_lru(0)
 	,m_materialCount(0)
+	,m_reconstructMainMesh(reconstructMainMesh)
 {
 //pointcloudCount = 0;
 
@@ -1227,6 +1229,9 @@ dgInt32 dgCollisionCompoundFractured::CalculateContacts (dgCollidingPairCollecto
 				dgDebriNodeInfo& nodeInfo = rootNode->GetInfo().m_nodeData;
 				nodeInfo.m_lru = 1;
 				SpawnSingleDrebree (myBody, rootNode, impulseStimate2, impulseStrength * impulseStrength);
+
+				BuildMainMeshSubMehes();
+				m_reconstructMainMesh (myBody, m_conectivity.GetLast());
 
 //				Insert(node, nodeInfo.m_shapeNode->GetInfo()->GetShape());
 //				dgAssert (0);
