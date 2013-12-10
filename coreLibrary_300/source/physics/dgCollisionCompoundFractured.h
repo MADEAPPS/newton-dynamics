@@ -80,9 +80,9 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 
 		dgInt32 *m_indexes;
 		dgMemoryAllocator* m_allocator;
-		dgInt32 m_faceOffset;
 		dgInt32 m_material;
 		dgInt32 m_faceCount;
+		dgInt32 m_materialOrdinal;
 		bool m_visibleFaces;
 	};
 
@@ -176,21 +176,22 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 	dgFloat32 GetSetImpulsePropgationFactor() const;
 
 	private:
+	void BuildMainMeshSubMehes() const;
 	dgVector GetObbSize() const;
+	
     virtual void CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
 	dgInt32 CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 	void SpawnSingleDrebree (dgBody* const myBody, dgConectivityGraph::dgListNode* const rootNode, dgFloat32 impulseStimate2, dgFloat32 impulseStimateCut2) const;
 
+	
 	bool SanityCheck() const;
 
 	dgConectivityGraph m_conectivity;
 	dgConectivityGraphMap m_conectivityMap;
 	dgVertexBuffer* m_vertexBuffer;
-	dgInt8* m_visibilityMap;
-	dgInt32* m_visibilityIndirectMap;
-	mutable dgInt32 m_lru;
-	dgInt32 m_visibilityMapIndexCount;
 	dgFloat32 m_impulseStrengthPerUnitMass;
 	dgFloat32 m_impulseAbsortionFactor;
+	mutable dgInt32 m_lru;
+	dgInt32 m_materialCount;
 };
 #endif
