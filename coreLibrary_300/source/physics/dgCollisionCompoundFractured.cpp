@@ -1258,6 +1258,17 @@ void dgCollisionCompoundFractured::SpawnSingleDrebree (dgBody* const myBody, dgC
 		dgFloat32 strenght = strengthPool[stack] * attenuation;
 		dgConectivityGraph::dgListNode* const rootNode = pool[stack];
 
+        for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = rootNode->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
+            dgConectivityGraph::dgListNode* const node = edgeNode->GetInfo().m_node;
+            dgDebriNodeInfo& childNodeInfo = node->GetInfo().m_nodeData;
+            childNodeInfo.m_mesh->m_IsVisible = true;
+            for (dgMesh::dgListNode* meshSegment = childNodeInfo.m_mesh->GetFirst(); meshSegment; meshSegment = meshSegment->GetNext()) {
+                dgSubMesh* const subMesh = &meshSegment->GetInfo();
+                subMesh->m_visibleFaces = true;
+            }
+        }
+
+
 		if (strenght > impulseStimateCut2) {
 			for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = rootNode->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
 				dgConectivityGraph::dgListNode* const node = edgeNode->GetInfo().m_node;

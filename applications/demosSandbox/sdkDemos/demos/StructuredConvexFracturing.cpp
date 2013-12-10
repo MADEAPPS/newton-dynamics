@@ -636,7 +636,7 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
 
 	// create and interiors material for texturing the fractured pieces
 	//int internalMaterial = LoadTexture("KAMEN-stup.tga");
-	int internalMaterial = LoadTexture("metal_30.tga");
+	int internalMaterial = LoadTexture("concreteBrick.tga");
 
 	// crate a texture matrix for uv mapping of fractured pieces
 	dMatrix textureMatrix (GetIdentityMatrix());
@@ -682,7 +682,7 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
 //    NewtonBodySetDestructorCallback (rigidBody, PhysicsBodyDestructor);
 
 	// release the interior texture
-	ReleaseTexture (internalMaterial);
+//	ReleaseTexture (internalMaterial);
 
 	// delete the solid mesh since it no longed needed
 	NewtonMeshDestroy (solidMesh);
