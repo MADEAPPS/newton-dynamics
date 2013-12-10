@@ -564,6 +564,8 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
 	// create the shape and visual mesh as a common data to be re used
 	NewtonWorld* const world = scene->GetNewton();
 
+
+#if 0
 	// load the mesh asset
 	DemoEntity entity(GetIdentityMatrix(), NULL);	
 	entity.LoadNGD_mesh (assetName, world);
@@ -571,15 +573,14 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
 	dAssert (mesh);
 
 	// convert the mesh to a newtonMesh
-#if 0
 	NewtonMesh* const solidMesh = mesh->CreateNewtonMesh (world, entity.GetMeshMatrix() * entity.GetCurrentMatrix());
 #else
-int externalMaterial = LoadTexture("wood_0.tga");
-NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), dVector (3.0f, 3.0f, 3.0f, 0.0), _BOX_PRIMITIVE, 0);
-NewtonMesh* const solidMesh = NewtonMeshCreateFromCollision(collision);
-NewtonDestroyCollision(collision);
-//NewtonMeshTriangulate(solidMesh);
-NewtonMeshApplyBoxMapping (solidMesh, externalMaterial, externalMaterial, externalMaterial);
+	int externalMaterial = LoadTexture("wood_0.tga");
+	NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), dVector (3.0f, 3.0f, 3.0f, 0.0), _BOX_PRIMITIVE, 0);
+	NewtonMesh* const solidMesh = NewtonMeshCreateFromCollision(collision);
+	NewtonDestroyCollision(collision);
+	//NewtonMeshTriangulate(solidMesh);
+	NewtonMeshApplyBoxMapping (solidMesh, externalMaterial, externalMaterial, externalMaterial);
 #endif
 
 

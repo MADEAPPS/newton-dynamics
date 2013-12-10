@@ -366,7 +366,8 @@ extern "C" {
 	typedef int (*NewtonIslandUpdate) (const NewtonWorld* const newtonWorld, const void* islandHandle, int bodyCount);
 	typedef void (*NewtonDestroyBodyByExeciveForce) (const NewtonBody* const body, const NewtonJoint* const contact);
 	
-	typedef int (*NewtonCollisionCompoundBreakableCallback) (NewtonMesh* const mesh, void* const userData, dFloat* const planeMatrixOut);
+//	typedef int (*NewtonCollisionCompoundBreakableCallback) (NewtonMesh* const mesh, void* const userData, dFloat* const planeMatrixOut);
+
 	typedef unsigned (*NewtonWorldRayPrefilterCallback)(const NewtonBody* const body, const NewtonCollision* const collision, void* const userData);
 	typedef dFloat (*NewtonWorldRayFilterCallback)(const NewtonBody* const body, const NewtonCollision* const shapeHit, const dFloat* const hitContact, const dFloat* const hitNormal, dLong collisionID, void* const userData, dFloat intersectParam);
 	
@@ -649,7 +650,7 @@ extern "C" {
 
 	// **********************************************************************************************
 	//
-	// complex breakable collision primitives interface
+	// Fractured compound collision primitives interface
 	//
 	// **********************************************************************************************
 	NEWTON_API NewtonCollision* NewtonCreateFracturedCompound (const NewtonWorld* const newtonWorld, const NewtonMesh* const solidMesh, int shapeID, int fracturePhysicsMaterialID, int pointcloudCount, const dFloat* const vertexCloud, int strideInBytes, int materialID, const dFloat* const textureMatrix);
@@ -660,10 +661,10 @@ extern "C" {
 	NEWTON_API const dFloat* NewtonCreateFracturedCompoundGetVertexUVs (const NewtonCollision* const fracturedCompound);
 
 	NEWTON_API NewtonFracturedCompoundMeshPart* NewtonFracturedCompoundGetMainMesh (const NewtonCollision* const fracturedCompound);
-	NEWTON_API void* NewtonFracturedCompoundMeshPartGetFirstSegment (const NewtonFracturedCompoundMeshPart* const breakableComponent); 
-	NEWTON_API void* NewtonFracturedCompoundMeshPartGetNextSegment (const void* const breakableComponentSegment); 
-	NEWTON_API int NewtonFracturedCompoundMeshPartGetMaterial (const void* const breakableComponentSegment); 
-	NEWTON_API int NewtonFracturedCompoundMeshPartGetIndexCount (const void* const breakableComponentSegment); 
+	NEWTON_API void* NewtonFracturedCompoundMeshPartGetFirstSegment (const NewtonFracturedCompoundMeshPart* const fractureCompoundMeshPart); 
+	NEWTON_API void* NewtonFracturedCompoundMeshPartGetNextSegment (const void* const fractureCompoundMeshSegment); 
+	NEWTON_API int NewtonFracturedCompoundMeshPartGetMaterial (const void* const fractureCompoundMeshSegment); 
+	NEWTON_API int NewtonFracturedCompoundMeshPartGetIndexCount (const void* const fractureCompoundMeshSegment); 
 
 	NEWTON_API int NewtonFracturedCompoundMeshPartGetIndexStream (const NewtonCollision* const fracturedCompound, const NewtonFracturedCompoundMeshPart* const meshOwner, const void* const segment, int* const index); 
 	NEWTON_API int NewtonFracturedCompoundMeshPartGetIndexStreamShort (const NewtonCollision* const fracturedCompound, const NewtonFracturedCompoundMeshPart* const meshOwner, const void* const segment, short int* const index); 
@@ -671,26 +672,19 @@ extern "C" {
 
 //	NEWTON_API void NewtonCompoundBreakableResetAnchoredPieces (const NewtonCollision* const fracturedCompound);
 //	NEWTON_API void NewtonCompoundBreakableSetAnchoredPieces (const NewtonCollision* const fracturedCompound, int fixShapesCount, dFloat* const matrixPallete, NewtonCollision** const fixedShapesArray);
-//	
+//	NEWTON_API NewtonBreakableComponentMesh* NewtonBreakableGetFirstComponent (const NewtonCollision* const fracturedCompound);
+//	NEWTON_API NewtonBreakableComponentMesh* NewtonBreakableGetNextComponent (const NewtonBreakableComponentMesh* const component);
+//	NEWTON_API void NewtonBreakableBeginDelete (const NewtonCollision* const fracturedCompound);
+//	NEWTON_API NewtonBody* NewtonBreakableCreateDebrieBody (const NewtonCollision* const fracturedCompound, const NewtonBreakableComponentMesh* const component);
+//	NEWTON_API void NewtonBreakableDeleteComponent (const NewtonCollision* const fracturedCompound, const NewtonBreakableComponentMesh* const component);
+//	NEWTON_API void NewtonBreakableEndDelete (const NewtonCollision* const fracturedCompound);
+//	NEWTON_API int NewtonBreakableGetComponentsInRadius (const NewtonCollision* const fracturedCompound, const dFloat* position, dFloat radius, NewtonBreakableComponentMesh** const segments, int maxCount);
 
-	
-/*
-	NEWTON_API NewtonBreakableComponentMesh* NewtonBreakableGetFirstComponent (const NewtonCollision* const fracturedCompound);
-	NEWTON_API NewtonBreakableComponentMesh* NewtonBreakableGetNextComponent (const NewtonBreakableComponentMesh* const component);
-
-	NEWTON_API void NewtonBreakableBeginDelete (const NewtonCollision* const fracturedCompound);
-	NEWTON_API NewtonBody* NewtonBreakableCreateDebrieBody (const NewtonCollision* const fracturedCompound, const NewtonBreakableComponentMesh* const component);
-	NEWTON_API void NewtonBreakableDeleteComponent (const NewtonCollision* const fracturedCompound, const NewtonBreakableComponentMesh* const component);
-	NEWTON_API void NewtonBreakableEndDelete (const NewtonCollision* const fracturedCompound);
-
-
-	NEWTON_API int NewtonBreakableGetComponentsInRadius (const NewtonCollision* const fracturedCompound, const dFloat* position, dFloat radius, NewtonBreakableComponentMesh** const segments, int maxCount);
-
-
-
-	
-*/
-
+	//  ***********************************************************************************************************
+	//
+	//	User Static mesh collision interface
+	//
+	// ***********************************************************************************************************
 	NEWTON_API NewtonCollision* NewtonCreateUserMeshCollision (const NewtonWorld* const newtonWorld, const dFloat* const minBox, 
 		const dFloat* const maxBox, void* const userData, NewtonUserMeshCollisionCollideCallback collideCallback, 
 		NewtonUserMeshCollisionRayHitCallback rayHitCallback, NewtonUserMeshCollisionDestroyCallback destroyCallback,
