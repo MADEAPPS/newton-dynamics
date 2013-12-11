@@ -546,28 +546,11 @@ static void OnReconstructMainMeshCallBack (NewtonBody* const body, NewtonFractur
 	}
 }
 
-/*
-static DemoMesh* CreateVisualMesh (NewtonCollision* const fracturedCompoundCollision)
+static void OnEmitFracturedChunkChunk (NewtonBody* const body)
 {
-	int vertexCount = NewtonFracturedCompoundCollisionGetVertexCount (fracturedCompoundCollision); 
 
-	const dFloat* const vertex = NewtonFracturedCompoundCollisionGetVertexPositions (fracturedCompoundCollision);
-	const dFloat* const normal = NewtonFracturedCompoundCollisionGetVertexNormals(fracturedCompoundCollision);
-	const dFloat* const uv = NewtonFracturedCompoundCollisionGetVertexUVs (fracturedCompoundCollision);
-
-	DemoMesh* const mesh = new DemoMesh ("fraturedMainMesh");
-	mesh->AllocVertexData (vertexCount);
-
-	dAssert (vertexCount == mesh->m_vertexCount);
-	memcpy (mesh->m_vertex, vertex, 3 * vertexCount * sizeof (dFloat));
-	memcpy (mesh->m_normal, normal, 3 * vertexCount * sizeof (dFloat));
-	memcpy (mesh->m_uv, uv, 2 * vertexCount * sizeof (dFloat));
-
-	NewtonFracturedCompoundMeshPart* const mainMesh = NewtonFracturedCompoundGetMainMesh (fracturedCompoundCollision);
-	OnReconstructMainMeshCallBack (fracturedCompoundCollision, mainMesh);
-	return mesh;
 }
-*/
+
 static void CreateVisualEntity (DemoEntityManager* const scene, NewtonBody* const body)
 {
 	dMatrix matrix;
@@ -646,7 +629,7 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
 	/// create the fractured collision and mesh
 	int debreePhysMaterial = NewtonMaterialGetDefaultGroupID(world);
 	NewtonCollision* const structuredFracturedCollision = NewtonCreateFracturedCompoundCollision (world, solidMesh, 0, debreePhysMaterial, pointCount, &points[0][0], sizeof (dVector), internalMaterial, &textureMatrix[0][0],
-																								  OnReconstructMainMeshCallBack);
+																								  OnReconstructMainMeshCallBack, OnEmitFracturedChunkChunk);
     dVector com;
     dVector inertia;
     NewtonConvexCollisionCalculateInertialMatrix (structuredFracturedCollision, &inertia[0], &com[0]);	

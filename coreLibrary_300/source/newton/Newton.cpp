@@ -2774,8 +2774,10 @@ NewtonCollision* NewtonCreateCompoundCollisionFromMesh (const NewtonWorld* const
 }
 
 
-NewtonCollision* NewtonCreateFracturedCompoundCollision (const NewtonWorld* const newtonWorld, const NewtonMesh* const solidMesh, int shapeID, int fracturePhysicsMaterialID, int pointcloudCount, const dFloat* const vertexCloud, int strideInBytes, int materialID, const dFloat* const textureMatrix,
-														NewtonFractureCompoundCollisionReconstructMainMeshCallBack regenerateMainMeshCallback)
+NewtonCollision* NewtonCreateFracturedCompoundCollision (
+    const NewtonWorld* const newtonWorld, const NewtonMesh* const solidMesh, int shapeID, int fracturePhysicsMaterialID, int pointcloudCount, const dFloat* const vertexCloud, int strideInBytes, int materialID, const dFloat* const textureMatrix,
+	NewtonFractureCompoundCollisionReconstructMainMeshCallBack regenerateMainMeshCallback,
+    NewtonFractureCompoundCollisionOnEmitChunk emitFrafuredChunk)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 
