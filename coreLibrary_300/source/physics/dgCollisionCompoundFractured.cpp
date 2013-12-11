@@ -913,6 +913,7 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (const dgCollisionCom
 	,m_impulseAbsortionFactor(source.m_impulseAbsortionFactor)
 	,m_lru(0)
 	,m_materialCount(source.m_materialCount)
+	,m_emitFracturedChunk(source.m_emitFracturedChunk)
 	,m_reconstructMainMesh(source.m_reconstructMainMesh)
 {
 	m_rtti |= dgCollisionCompoundBreakable_RTTI;
@@ -950,7 +951,9 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (const dgCollisionCom
 }
 
 
-dgCollisionCompoundFractured::dgCollisionCompoundFractured (dgWorld* const world, dgMeshEffect* const solidMesh, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& offsetMatrix, OnReconstructFractureMainMeshCallBack reconstructMainMesh)
+dgCollisionCompoundFractured::dgCollisionCompoundFractured (
+	dgWorld* const world, dgMeshEffect* const solidMesh, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& offsetMatrix, 
+	OnEmitFractureChunkCallBack emitFracturedChunk, OnReconstructFractureMainMeshCallBack reconstructMainMesh)
 	:dgCollisionCompound (world)
 	,m_conectivity(world->GetAllocator())
 	,m_conectivityMap (world->GetAllocator())
@@ -959,6 +962,7 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (dgWorld* const world
 	,m_impulseAbsortionFactor(0.5f)
 	,m_lru(0)
 	,m_materialCount(0)
+	,m_emitFracturedChunk(emitFracturedChunk) 
 	,m_reconstructMainMesh(reconstructMainMesh)
 {
 //pointcloudCount = 0;

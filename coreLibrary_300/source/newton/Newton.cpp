@@ -2595,7 +2595,7 @@ NewtonCollision* NewtonCreateCompoundCollision(const NewtonWorld* const newtonWo
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-	dgCollisionInstance* const collision = world->CreateCollisionCompound ();
+	dgCollisionInstance* const collision = world->CreateCompound ();
 	collision->SetUserDataID(dgUnsigned32 (shapeID));
 	return (NewtonCollision*) collision;
 }
@@ -2776,8 +2776,7 @@ NewtonCollision* NewtonCreateCompoundCollisionFromMesh (const NewtonWorld* const
 
 NewtonCollision* NewtonCreateFracturedCompoundCollision (
     const NewtonWorld* const newtonWorld, const NewtonMesh* const solidMesh, int shapeID, int fracturePhysicsMaterialID, int pointcloudCount, const dFloat* const vertexCloud, int strideInBytes, int materialID, const dFloat* const textureMatrix,
-	NewtonFractureCompoundCollisionReconstructMainMeshCallBack regenerateMainMeshCallback,
-    NewtonFractureCompoundCollisionOnEmitChunk emitFrafuredChunk)
+	NewtonFractureCompoundCollisionReconstructMainMeshCallBack regenerateMainMeshCallback, NewtonFractureCompoundCollisionOnEmitChunk emitFrafuredChunk)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 
@@ -2785,7 +2784,8 @@ NewtonCollision* NewtonCreateFracturedCompoundCollision (
 	dgMeshEffect* const mesh = (dgMeshEffect*) solidMesh;
 
 	dgMatrix textMatrix (textureMatrix);
-	dgCollisionInstance* const collision = world->CreateCollisionFracturedCompound (mesh, shapeID, fracturePhysicsMaterialID, pointcloudCount, vertexCloud, strideInBytes, materialID, textMatrix, 
+	dgCollisionInstance* const collision = world->CreateFracturedCompound (mesh, shapeID, fracturePhysicsMaterialID, pointcloudCount, vertexCloud, strideInBytes, materialID, textMatrix, 
+																					(dgCollisionCompoundFractured::OnEmitFractureChunkCallBack) emitFrafuredChunk,
 																					(dgCollisionCompoundFractured::OnReconstructFractureMainMeshCallBack) regenerateMainMeshCallback);
 	return (NewtonCollision*) collision;
 }
@@ -3629,7 +3629,7 @@ int NewtonTreeCollisionGetVertexListTriangleListInAABB(const NewtonCollision* co
 	Newton* const world = (Newton *)newtonWorld;
 
 	TRACE_FUNCTION(__FUNCTION__);
-	dgCollisionInstance* const collision = world->CreateHeightFieldCollision(width, height, gridsDiagonals, elevationdatType, elevationMap, attributeMap, verticalScale, horizontalScale);
+	dgCollisionInstance* const collision = world->CreateHeightField(width, height, gridsDiagonals, elevationdatType, elevationMap, attributeMap, verticalScale, horizontalScale);
 	collision->SetUserDataID(dgUnsigned32 (shapeID));
 	return (NewtonCollision*) collision;
 }

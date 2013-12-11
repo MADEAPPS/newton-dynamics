@@ -227,7 +227,7 @@ dgCollisionInstance* dgWorld::CreateConvexHull (dgInt32 count, const dgFloat32* 
 
 
 
-dgCollisionInstance* dgWorld::CreateCollisionCompound ()
+dgCollisionInstance* dgWorld::CreateCompound ()
 {
 	// compound collision are not cached
 	dgCollision* const collision = new  (m_allocator) dgCollisionCompound (this);
@@ -253,12 +253,12 @@ return NULL;
 }
 
 
-dgCollisionInstance* dgWorld::CreateCollisionFracturedCompound (dgMeshEffect* const solidMesh, int shapeID, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& textureMatrix,
-																dgCollisionCompoundFractured::OnReconstructFractureMainMeshCallBack reconstructMainMesh)
+dgCollisionInstance* dgWorld::CreateFracturedCompound (dgMeshEffect* const solidMesh, int shapeID, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& textureMatrix,
+																dgCollisionCompoundFractured::OnEmitFractureChunkCallBack emitFrafuredChunk, dgCollisionCompoundFractured::OnReconstructFractureMainMeshCallBack reconstructMainMesh)
 {
 	dgAssert (m_allocator == solidMesh->GetAllocator());
 
-	dgCollision* const collision = new (m_allocator) dgCollisionCompoundFractured (this, solidMesh, fracturePhysicsMaterialID, pointcloudCount, vertexCloud, strideInBytes, materialID, textureMatrix, reconstructMainMesh);
+	dgCollision* const collision = new (m_allocator) dgCollisionCompoundFractured (this, solidMesh, fracturePhysicsMaterialID, pointcloudCount, vertexCloud, strideInBytes, materialID, textureMatrix, emitFrafuredChunk, reconstructMainMesh);
 	dgCollisionInstance* const instance = CreateInstance (collision, shapeID, dgGetIdentityMatrix()); 
 	collision->Release();
 	return instance;
@@ -284,7 +284,7 @@ dgCollisionInstance* dgWorld::CreateStaticUserMesh (const dgVector& boxP0, const
 
 }
 
-dgCollisionInstance* dgWorld::CreateHeightFieldCollision(
+dgCollisionInstance* dgWorld::CreateHeightField(
 	dgInt32 width, dgInt32 height, dgInt32 contructionMode, dgInt32 elevationDataType, 
 	const void* const elevationMap, const dgInt8* const atributeMap, dgFloat32 verticalScale, dgFloat32 horizontalScale)
 {
