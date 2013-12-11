@@ -51,7 +51,7 @@ class dgWorldDynamicUpdateSyncDescriptor
 	
 	dgInt32 m_islandCount;
 	dgInt32 m_firstIsland;
-	dgThread::dgCriticalSection* m_lock;
+	dgThread::dgCriticalSection* m_criticalSection;
 	dgDeformableBodiesUpdate::dgListNode* m_sofBodyNode;
 };
 
@@ -189,7 +189,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	// integrate soft body dynamics phase 2
 	const dgDeformableBodiesUpdate* const softBodyList = world;
 	descriptor.m_sofBodyNode = softBodyList->GetFirst();
-	descriptor.m_lock = &m_softBodyCriticalSectionLock;
+	descriptor.m_criticalSection = &m_softBodyCriticalSectionLock;
 	for (dgInt32 i = 0; i < threadCount; i ++) {
 		world->QueueJob (IntegrateSoftBodyForcesKernel, &descriptor, world);
 	}
@@ -712,7 +712,7 @@ void dgWorldDynamicUpdate::IntegrateSoftBody (dgWorldDynamicUpdateSyncDescriptor
 
 	dgDeformableBodiesUpdate::dgListNode* node = NULL;
 	{
-		dgThreadHiveScopeLock lock (world, descriptor->m_lock);
+		dgThreadHiveScopeLock lock (world, descriptor->m_criticalSection);
 		node = descriptor->m_sofBodyNode;
 		if (node) {
 			descriptor->m_sofBodyNode = node->GetNext();
@@ -724,7 +724,7 @@ void dgWorldDynamicUpdate::IntegrateSoftBody (dgWorldDynamicUpdateSyncDescriptor
 
 		softShape->ResolvePositionsConstraints (timestep);
 
-		dgThreadHiveScopeLock lock (world, descriptor->m_lock);
+		dgThreadHiveScopeLock lock (world, descriptor->m_criticalSection);
 		node = descriptor->m_sofBodyNode;
 		if (node) {
 			descriptor->m_sofBodyNode = node->GetNext();

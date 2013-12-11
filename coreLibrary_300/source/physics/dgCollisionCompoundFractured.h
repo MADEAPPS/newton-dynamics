@@ -195,9 +195,10 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 	dgConectivityGraph m_conectivity;
 	dgConectivityGraphMap m_conectivityMap;
 	dgVertexBuffer* m_vertexBuffer;
+	mutable dgThread::dgCriticalSection m_criticalSectionLock;
 	dgFloat32 m_impulseStrengthPerUnitMass;
 	dgFloat32 m_impulseAbsortionFactor;
-	mutable dgInt32 m_lru;
+	dgInt32 m_lru;
 	dgInt32 m_materialCount;
 	OnEmitFractureChunkCallBack m_emitFracturedChunk;
 	OnReconstructFractureMainMeshCallBack m_reconstructMainMesh;

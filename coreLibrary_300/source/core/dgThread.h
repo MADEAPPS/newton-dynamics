@@ -31,7 +31,7 @@
 
 class dgThread
 {
-	public:
+public:
 	class dgCriticalSection
 	{
 		public:
