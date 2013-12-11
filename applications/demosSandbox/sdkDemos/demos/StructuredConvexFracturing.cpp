@@ -546,8 +546,33 @@ static void OnReconstructMainMeshCallBack (NewtonBody* const body, NewtonFractur
 	}
 }
 
-static void OnEmitFracturedChunkChunk (NewtonBody* const body)
+static void OnEmitFracturedChunkChunk (NewtonBody* const chunkBody, NewtonFracturedCompoundMeshPart* const fractureChunkMesh)
 {
+	NewtonWorld* const world = NewtonBodyGetWorld(chunkBody);
+	DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+
+	// set the force an torque call back
+	NewtonBodySetForceAndTorqueCallback (chunkBody, PhysicsApplyGravityForce);
+
+	// set the transform callback 
+	NewtonBodySetTransformCallback (chunkBody, DemoEntity::TransformCallback);
+
+	// create the visual entity and mesh, and set the use data
+	dMatrix matrix;
+	NewtonBodyGetMatrix (chunkBody, &matrix[0][0]);
+
+	DemoEntity* const visualChunkEntity = new DemoEntity(matrix, NULL);
+	scene->Append(visualChunkEntity);
+
+	NewtonBodySetUserData (chunkBody, visualChunkEntity);
+
+	// create the mesh geometry and attach it to the entity
+	DemoMesh* const visualChunkMesh = new DemoMesh ("fracturedChuckMesh");
+	visualChunkEntity->SetMesh (visualChunkMesh, GetIdentityMatrix());
+	visualChunkMesh->Release();
+
+
+
 
 }
 
@@ -562,7 +587,7 @@ static void CreateVisualEntity (DemoEntityManager* const scene, NewtonBody* cons
 	// set the entiry as teh use data;
 	NewtonBodySetUserData (body, visualEntity);
 
-	// create the mesh geometry and attach ot to the entity
+	// create the mesh geometry and attach it to the entity
 	DemoMesh* const visualMesh = new DemoMesh ("fraturedMainMesh");
 	visualEntity->SetMesh (visualMesh, GetIdentityMatrix());
 	visualMesh->Release();

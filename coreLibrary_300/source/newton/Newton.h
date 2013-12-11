@@ -366,7 +366,7 @@ extern "C" {
 	typedef int (*NewtonIslandUpdate) (const NewtonWorld* const newtonWorld, const void* islandHandle, int bodyCount);
 	typedef void (*NewtonDestroyBodyByExeciveForce) (const NewtonBody* const body, const NewtonJoint* const contact);
 	
-    typedef void (*NewtonFractureCompoundCollisionOnEmitChunk) (NewtonBody* const body);
+    typedef void (*NewtonFractureCompoundCollisionOnEmitChunk) (NewtonBody* const chunkBody, NewtonFracturedCompoundMeshPart* const fracturexChunkMesh);
 	typedef void (*NewtonFractureCompoundCollisionReconstructMainMeshCallBack) (NewtonBody* const body, NewtonFracturedCompoundMeshPart* const mainMesh);
     
 

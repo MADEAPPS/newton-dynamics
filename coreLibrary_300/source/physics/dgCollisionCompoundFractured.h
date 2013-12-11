@@ -154,11 +154,11 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 	};
 
 	public:
-	typedef void (*OnEmitFractureChunkCallBack) (dgBody* const body);
+	typedef void (*OnEmitFractureChunkCallBack) (dgBody* const body, dgConectivityGraph::dgListNode* const chunkMeshNode);
 	typedef void (*OnReconstructFractureMainMeshCallBack) (dgBody* const body, dgConectivityGraph::dgListNode* const mainMeshNode);
 
 	dgCollisionCompoundFractured (const dgCollisionCompoundFractured& source);
-	dgCollisionCompoundFractured (dgWorld* const world, dgMeshEffect* const solidMesh, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& offsetMatrix,
+	dgCollisionCompoundFractured (dgWorld* const world, dgMeshEffect* const solidMesh, dgInt32 fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& offsetMatrix,
 								 OnEmitFractureChunkCallBack emitFracturedChunk, OnReconstructFractureMainMeshCallBack reconstructMainMesh);
 
 	dgCollisionCompoundFractured (dgWorld* const world, dgDeserialize deserialization, void* const userData);
@@ -198,6 +198,7 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 	mutable dgThread::dgCriticalSection m_criticalSectionLock;
 	dgFloat32 m_impulseStrengthPerUnitMass;
 	dgFloat32 m_impulseAbsortionFactor;
+	dgFloat32 m_density;
 	dgInt32 m_lru;
 	dgInt32 m_materialCount;
 	OnEmitFractureChunkCallBack m_emitFracturedChunk;
