@@ -329,7 +329,8 @@ static void AddFracturedPrimitive (DemoEntityManager* const scene, dFloat mass, 
 
 	// apply a material map
 	int externalMaterial = LoadTexture("reljef.tga");
-	int internalMaterial = LoadTexture("KAMEN-stup.tga");
+	//int internalMaterial = LoadTexture("KAMEN-stup.tga");
+    int internalMaterial = LoadTexture("concreteBrick.tga");
 	NewtonMeshApplyBoxMapping(mesh, externalMaterial, externalMaterial, externalMaterial);
 
 	// create a newton mesh from the collision primitive
