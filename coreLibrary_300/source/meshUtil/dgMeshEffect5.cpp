@@ -3042,26 +3042,23 @@ for (iter.Begin(); iter; iter ++) {
         dgVector p20 (q2 - q0);
         dgVector faceNormal (matrix.UnrotateVector (dgVector(normal)));
         dgFloat32 areaInv = (p10 * p20) % faceNormal;
-        if (convexFace->m_next->m_next->m_next != convexFace) {
-
+        if (e2->m_next != e0) {
             const dgEdge* edge = e2;
-            dgVector _q1 (q1);
-            dgVector _p10 (_q1 - q0);
+            dgVector r1 (q1);
+            dgVector p10 (p20);
             do {
-                dgVector _q2 (matrix.UntransformVector(dgVector(convexMesh.m_points[edge->m_next->m_incidentVertex])));
-                dgVector _p20 (_q2 - q0);
-                dgFloat32 areaInv1 = (_p10 * _p20) % faceNormal;
+                dgVector r2 (matrix.UntransformVector(dgVector(convexMesh.m_points[edge->m_next->m_incidentVertex])));
+                dgVector p20 (r2 - q0);
+                dgFloat32 areaInv1 = (p10 * p20) % faceNormal;
                 if (areaInv1 > areaInv) {
                     //areaInv = areaInv1;
                     //e1 = edge;
                     //e2 = edge->m_next;
                     //q1 = _q1;
                     //q2 = _q2;
-                    //p10 = _p10;
-                    //p20 = _p20;
                 }
-                _q1 = _q2;
-                _p10 = _p20;
+                r1 = r2;
+                p10 = p20;
                 edge = edge->m_next;
             } while (edge->m_next != e0);
         }
