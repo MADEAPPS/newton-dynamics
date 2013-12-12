@@ -30,7 +30,6 @@
 #include "dgCollisionScene.h"
 #include "dgBodyMasterList.h"
 #include "dgWorldDynamicUpdate.h"
-#include "dgFracturedBodiesUpdate.h"
 #include "dgDeformableBodiesUpdate.h"
 #include "dgCollisionCompoundFractured.h"
 
@@ -156,7 +155,6 @@ class dgWorld
 	:public dgBodyMasterList
 	,public dgBodyMaterialList
 	,public dgBodyCollisionList
-	,public dgFracturedBodiesUpdate
 	,public dgDeformableBodiesUpdate
 	,public dgActiveContacts 
 	,public dgCollidingPairCollector

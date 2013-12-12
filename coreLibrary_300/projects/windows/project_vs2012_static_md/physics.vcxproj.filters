@@ -151,9 +151,6 @@
     <ClCompile Include="..\..\..\source\physics\dgCollisionDeformableSolidMesh.cpp">
       <Filter>collision</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\physics\dgFractureBodiesUpdate.cpp">
-      <Filter>systems</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\source\physics\dgDeformableBodiesUpdate.cpp">
       <Filter>systems</Filter>
     </ClCompile>
@@ -296,9 +293,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgCollisionDeformableSolidMesh.h">
       <Filter>collision</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\source\physics\dgFracturedBodiesUpdate.h">
-      <Filter>systems</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgDeformableBodiesUpdate.h">
       <Filter>systems</Filter>

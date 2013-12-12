@@ -168,9 +168,6 @@
     <ClCompile Include="..\..\..\source\physics\dgKinematicBody.cpp">
       <Filter>bodies</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\physics\dgFractureBodiesUpdate.cpp">
-      <Filter>systems</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\source\physics\dgDeformableBodiesUpdate.cpp">
       <Filter>systems</Filter>
     </ClCompile>
@@ -313,9 +310,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgKinematicBody.h">
       <Filter>bodies</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\source\physics\dgFracturedBodiesUpdate.h">
-      <Filter>systems</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgDeformableBodiesUpdate.h">
       <Filter>systems</Filter>

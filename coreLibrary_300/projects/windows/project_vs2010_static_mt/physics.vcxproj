@@ -269,7 +269,6 @@
     <ClCompile Include="..\..\..\source\physics\dgCorkscrewConstraint.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgDeformableBodiesUpdate.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgDeformableContact.cpp" />
-    <ClCompile Include="..\..\..\source\physics\dgFractureBodiesUpdate.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgHingeConstraint.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgSlidingConstraint.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgUniversalConstraint.cpp" />
@@ -331,7 +330,6 @@
     <ClInclude Include="..\..\..\source\physics\dgCorkscrewConstraint.h" />
     <ClInclude Include="..\..\..\source\physics\dgDeformableBodiesUpdate.h" />
     <ClInclude Include="..\..\..\source\physics\dgDeformableContact.h" />
-    <ClInclude Include="..\..\..\source\physics\dgFracturedBodiesUpdate.h" />
     <ClInclude Include="..\..\..\source\physics\dgHingeConstraint.h" />
     <ClInclude Include="..\..\..\source\physics\dgSlidingConstraint.h" />
     <ClInclude Include="..\..\..\source\physics\dgUniversalConstraint.h" />

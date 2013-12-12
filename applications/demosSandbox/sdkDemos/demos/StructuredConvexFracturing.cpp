@@ -524,12 +524,10 @@ static int MakeRandomPoisonPointCloud(NewtonMesh* const mesh, dVector* const poi
 }
 
 
-static void OnReconstructMainMeshCallBack (NewtonBody* const body, NewtonFracturedCompoundMeshPart* const mainMesh)
+static void OnReconstructMainMeshCallBack (NewtonBody* const body, NewtonFracturedCompoundMeshPart* const mainMesh, const NewtonCollision* const fracturedCompoundCollision)
 {
 	DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(body);
 	DemoMesh* const visualMesh = entity->GetMesh();
-	NewtonCollision* const fracturedCompoundCollision = NewtonBodyGetCollision(body);
-
 	dAssert (NewtonCollisionGetType(fracturedCompoundCollision) == SERIALIZE_ID_FRACTURED_COMPOUND);
 
 	visualMesh->RemoveAll();
@@ -546,7 +544,22 @@ static void OnReconstructMainMeshCallBack (NewtonBody* const body, NewtonFractur
 	}
 }
 
-static void OnEmitFracturedChunkChunk (NewtonBody* const chunkBody, NewtonFracturedCompoundMeshPart* const fractureChunkMesh)
+
+static void AddMeshVertexwData (DemoMesh* const visualMesh, NewtonFracturedCompoundMeshPart* const fractureMesh, const NewtonCollision* const fracturedCompoundCollision)
+{
+	int vertexCount = NewtonFracturedCompoundCollisionGetVertexCount (fracturedCompoundCollision, fractureMesh); 
+	const dFloat* const vertex = NewtonFracturedCompoundCollisionGetVertexPositions (fracturedCompoundCollision, fractureMesh);
+	const dFloat* const normal = NewtonFracturedCompoundCollisionGetVertexNormals(fracturedCompoundCollision, fractureMesh);
+	const dFloat* const uv = NewtonFracturedCompoundCollisionGetVertexUVs (fracturedCompoundCollision, fractureMesh);
+
+	visualMesh->AllocVertexData (vertexCount);
+	dAssert (vertexCount == visualMesh->m_vertexCount);
+	memcpy (visualMesh->m_vertex, vertex, 3 * vertexCount * sizeof (dFloat));
+	memcpy (visualMesh->m_normal, normal, 3 * vertexCount * sizeof (dFloat));
+	memcpy (visualMesh->m_uv, uv, 2 * vertexCount * sizeof (dFloat));
+}
+
+static void OnEmitFracturedChunk (NewtonBody* const chunkBody, NewtonFracturedCompoundMeshPart* const fractureChunkMesh, const NewtonCollision* const fracturedCompoundCollision)
 {
 	NewtonWorld* const world = NewtonBodyGetWorld(chunkBody);
 	DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
@@ -571,9 +584,11 @@ static void OnEmitFracturedChunkChunk (NewtonBody* const chunkBody, NewtonFractu
 	visualChunkEntity->SetMesh (visualChunkMesh, GetIdentityMatrix());
 	visualChunkMesh->Release();
 
+	// add the vertex data
+	AddMeshVertexwData (visualChunkMesh, fractureChunkMesh, fracturedCompoundCollision);
 
-
-
+	// add the mesh indices
+	OnReconstructMainMeshCallBack (chunkBody, fractureChunkMesh, fracturedCompoundCollision);
 }
 
 static void CreateVisualEntity (DemoEntityManager* const scene, NewtonBody* const body)
@@ -584,7 +599,7 @@ static void CreateVisualEntity (DemoEntityManager* const scene, NewtonBody* cons
 	DemoEntity* const visualEntity = new DemoEntity(matrix, NULL);
 	scene->Append(visualEntity);
 
-	// set the entiry as teh use data;
+	// set the entiry as the user data;
 	NewtonBodySetUserData (body, visualEntity);
 
 	// create the mesh geometry and attach it to the entity
@@ -596,20 +611,12 @@ static void CreateVisualEntity (DemoEntityManager* const scene, NewtonBody* cons
 	NewtonCollision* const fracturedCompoundCollision = NewtonBodyGetCollision(body);
 	dAssert (NewtonCollisionGetType(fracturedCompoundCollision) == SERIALIZE_ID_FRACTURED_COMPOUND);
 
-	int vertexCount = NewtonFracturedCompoundCollisionGetVertexCount (fracturedCompoundCollision); 
-	const dFloat* const vertex = NewtonFracturedCompoundCollisionGetVertexPositions (fracturedCompoundCollision);
-	const dFloat* const normal = NewtonFracturedCompoundCollisionGetVertexNormals(fracturedCompoundCollision);
-	const dFloat* const uv = NewtonFracturedCompoundCollisionGetVertexUVs (fracturedCompoundCollision);
-
-	visualMesh->AllocVertexData (vertexCount);
-	dAssert (vertexCount == visualMesh->m_vertexCount);
-	memcpy (visualMesh->m_vertex, vertex, 3 * vertexCount * sizeof (dFloat));
-	memcpy (visualMesh->m_normal, normal, 3 * vertexCount * sizeof (dFloat));
-	memcpy (visualMesh->m_uv, uv, 2 * vertexCount * sizeof (dFloat));
+	// add the vertex data
+	NewtonFracturedCompoundMeshPart* const mainMesh = NewtonFracturedCompoundGetMainMesh (fracturedCompoundCollision);
+	AddMeshVertexwData (visualMesh, mainMesh, fracturedCompoundCollision);
 
 	// now add the sub mesh by calling the call back
-	NewtonFracturedCompoundMeshPart* const mainMesh = NewtonFracturedCompoundGetMainMesh (fracturedCompoundCollision);
-	OnReconstructMainMeshCallBack (body, mainMesh);
+	OnReconstructMainMeshCallBack (body, mainMesh, fracturedCompoundCollision);
 }
 
 
@@ -654,7 +661,15 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
 	/// create the fractured collision and mesh
 	int debreePhysMaterial = NewtonMaterialGetDefaultGroupID(world);
 	NewtonCollision* const structuredFracturedCollision = NewtonCreateFracturedCompoundCollision (world, solidMesh, 0, debreePhysMaterial, pointCount, &points[0][0], sizeof (dVector), internalMaterial, &textureMatrix[0][0],
-																								  OnReconstructMainMeshCallBack, OnEmitFracturedChunkChunk);
+																								  OnReconstructMainMeshCallBack, OnEmitFracturedChunk);
+
+//	int xxx1 = 0;
+//	for (NewtonFracturedCompoundMeshPart* xxx = NewtonFracturedCompoundGetFirstSubMesh(structuredFracturedCollision); xxx; xxx = NewtonFracturedCompoundGetNextSubMesh(structuredFracturedCollision, xxx)) {
+//		xxx1 ++; 
+//		int xxxx = NewtonFracturedCompoundCollisionGetVertexCount (structuredFracturedCollision, xxx); 
+//		xxxx = NewtonFracturedCompoundCollisionGetVertexCount (structuredFracturedCollision, xxx); 
+//	}
+
     dVector com;
     dVector inertia;
     NewtonConvexCollisionCalculateInertialMatrix (structuredFracturedCollision, &inertia[0], &com[0]);	

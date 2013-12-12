@@ -97,6 +97,8 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 		void Serialize(dgSerialize callback, void* const userData) const;
 		dgSubMesh* AddgSubMesh(dgInt32 indexCount, dgInt32 material);
 
+		dgInt32 m_vertexOffsetStart;
+		dgInt32 m_vertexCount;
 		bool m_IsVisible;
 	};
 
@@ -154,8 +156,8 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 	};
 
 	public:
-	typedef void (*OnEmitFractureChunkCallBack) (dgBody* const body, dgConectivityGraph::dgListNode* const chunkMeshNode);
-	typedef void (*OnReconstructFractureMainMeshCallBack) (dgBody* const body, dgConectivityGraph::dgListNode* const mainMeshNode);
+	typedef void (*OnEmitFractureChunkCallBack) (dgBody* const body, dgConectivityGraph::dgListNode* const chunkMeshNode, const dgCollisionInstance* const myInstance);
+	typedef void (*OnReconstructFractureMainMeshCallBack) (dgBody* const body, dgConectivityGraph::dgListNode* const mainMeshNode, const dgCollisionInstance* const myInstance);
 
 	dgCollisionCompoundFractured (const dgCollisionCompoundFractured& source);
 	dgCollisionCompoundFractured (dgWorld* const world, dgMeshEffect* const solidMesh, dgInt32 fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& offsetMatrix,
@@ -164,16 +166,15 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 	dgCollisionCompoundFractured (dgWorld* const world, dgDeserialize deserialization, void* const userData);
 	virtual ~dgCollisionCompoundFractured(void);
 
-	dgConectivityGraph::dgListNode* GetMainMesh() const {return m_conectivity.GetLast();}
+	dgConectivityGraph::dgListNode* GetMainMesh() const;
+	dgConectivityGraph::dgListNode* GetFirstMesh() const;
+	dgConectivityGraph::dgListNode* GetNextMesh(dgConectivityGraph::dgListNode* const mesh) const;
 
-	dgInt32 GetVertecCount() const {return m_vertexBuffer->m_vertexCount;}
-
-	const dgFloat32* GetVertexPositions () const {return m_vertexBuffer->GetVertexPositions();}
-	const dgFloat32* GetVertexNormal () const {return m_vertexBuffer->GetVertexNormals();}
-	const dgFloat32* GetVertexUVs () const {return m_vertexBuffer->GetVertexUVs();}
-	
+	dgInt32 GetVertecCount(dgConectivityGraph::dgListNode* const node) const;
+	const dgFloat32* GetVertexPositions (dgConectivityGraph::dgListNode* const node) const;
+	const dgFloat32* GetVertexNormal (dgConectivityGraph::dgListNode* const node) const;
+	const dgFloat32* GetVertexUVs (dgConectivityGraph::dgListNode* const node) const;
 	dgInt32 GetSegmentIndexStream (dgConectivityGraph::dgListNode* const node, dgMesh::dgListNode* const segment, dgInt32* const index) const;
-	dgInt32 GetSegmentIndexStreamShort (dgConectivityGraph::dgListNode* const node, dgMesh::dgListNode* segment, dgInt16* const index) const;
 
 	void SetImpulseStrength(dgFloat32 impulseStrength);
 	dgFloat32 GetImpulseStrength() const;
@@ -187,7 +188,7 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 	
     virtual void CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
 	dgInt32 CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
-	void SpawnSingleDrebree (dgBody* const myBody, dgConectivityGraph::dgListNode* const rootNode, dgFloat32 impulseStimate2, dgFloat32 impulseStimateCut2);
+	void SpawnChunks (dgBody* const myBody, const dgCollisionInstance* const myInstance, dgConectivityGraph::dgListNode* const rootNode, dgFloat32 impulseStimate2, dgFloat32 impulseStimateCut2);
 
 	
 	bool SanityCheck() const;

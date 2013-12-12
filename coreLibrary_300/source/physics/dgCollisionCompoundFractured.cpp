@@ -29,7 +29,7 @@
 
 
 #define DG_FRACTURE_AABB_GUARD_DISTANCE 1.0f
-
+#define DG_FRACTURE_MAX_METERIAL_COUNT	256
 
 dgCollisionCompoundFractured::dgConectivityGraph::dgConectivityGraph (dgMemoryAllocator* const allocator)
 	:dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>(allocator)
@@ -699,6 +699,8 @@ dgCollisionCompoundFractured::dgSharedNodeMesh::~dgSharedNodeMesh ()
 
 dgCollisionCompoundFractured::dgMesh::dgMesh(dgMemoryAllocator* const allocator)
 	:dgList<dgSubMesh>(allocator)
+	,m_vertexOffsetStart(0)
+	,m_vertexCount(0)
 	,m_IsVisible(false)
 {
 }
@@ -786,10 +788,30 @@ dgCollisionCompoundFractured::dgSubMesh* dgCollisionCompoundFractured::dgMesh::A
 	factureVisualMesh->GetVertexStreams (sizeof (dgVector), &vertex[0].m_x, sizeof (dgVector), &normal[0].m_x, sizeof (dgVector), &uv0[0].m_x, sizeof (dgVector), &uv1[0].m_x);
 		
 	// extract the materials index array for mesh
-	dgMeshEffect::dgIndexArray* const geometryHandle = factureVisualMesh->MaterialGeometryBegin();
-
-	vertexCount = vertexArray.m_count;
 	dgInt32 baseVertexCount = vertexArray.m_count;
+	data.m_mesh->m_vertexOffsetStart = baseVertexCount;
+
+	vertexArray[baseVertexCount + vertexCount].m_point[0] = 0.0f;
+	for (dgInt32 i = 0; i < vertexCount; i ++) {
+		dgInt32 j = baseVertexCount + i;
+		vertexArray[j].m_point[0] = vertex[i].m_x;
+		vertexArray[j].m_point[1] = vertex[i].m_y;
+		vertexArray[j].m_point[2] = vertex[i].m_z;
+		vertexArray[j].m_point[3] = normal[i].m_x;
+		vertexArray[j].m_point[4] = normal[i].m_y;
+		vertexArray[j].m_point[5] = normal[i].m_z;
+		vertexArray[j].m_point[6] = uv0[i].m_x;
+		vertexArray[j].m_point[7] = uv0[i].m_y;
+		vertexArray[j].m_point[8] = uv1[i].m_x;
+		vertexArray[j].m_point[9] = uv1[i].m_y;
+	}
+
+
+	dgStack<dgInt32> indexBuffer (vertexCount);
+	data.m_mesh->m_vertexCount = dgVertexListToIndexList (&vertexArray[baseVertexCount].m_point[0], sizeof (dgFlatVertex), sizeof (dgFlatVertex), 0, vertexCount, &indexBuffer[0], dgFloat32 (1.0e-6f));
+	vertexArray.m_count += data.m_mesh->m_vertexCount;
+
+	dgMeshEffect::dgIndexArray* const geometryHandle = factureVisualMesh->MaterialGeometryBegin();
 	for (dgInt32 handle = factureVisualMesh->GetFirstMaterial (geometryHandle); handle != -1; handle = factureVisualMesh->GetNextMaterial (geometryHandle, handle)) {
 		dgInt32 material = factureVisualMesh->GetMaterialID (geometryHandle, handle);
 
@@ -802,34 +824,13 @@ dgCollisionCompoundFractured::dgSubMesh* dgCollisionCompoundFractured::dgMesh::A
 		segment->m_visibleFaces = isVisible;
 
 		factureVisualMesh->GetMaterialGetIndexStream (geometryHandle, handle, segment->m_indexes);
-		for (dgInt32 i = 0; i < indexCount; i ++) {
+
+		for (dgInt32 i = 0; i < indexCount; i++) {
 			dgInt32 j = segment->m_indexes[i];
-			vertexArray[vertexCount].m_point[0] = vertex[j].m_x;
-			vertexArray[vertexCount].m_point[1] = vertex[j].m_y;
-			vertexArray[vertexCount].m_point[2] = vertex[j].m_z;
-			vertexArray[vertexCount].m_point[3] = normal[j].m_x;
-			vertexArray[vertexCount].m_point[4] = normal[j].m_y;
-			vertexArray[vertexCount].m_point[5] = normal[j].m_z;
-			vertexArray[vertexCount].m_point[6] = uv0[j].m_x;
-			vertexArray[vertexCount].m_point[7] = uv0[j].m_y;
-			vertexArray[vertexCount].m_point[8] = uv1[j].m_x;
-			vertexArray[vertexCount].m_point[9] = uv1[j].m_y;
-			segment->m_indexes[i] = vertexCount - baseVertexCount; 
-			vertexCount ++;
+			segment->m_indexes[i] = indexBuffer[j];
 		}
 	}
 	factureVisualMesh->MaterialGeomteryEnd(geometryHandle);
-
-	dgStack<dgInt32> indexBuffer (vertexCount - baseVertexCount);
-	vertexArray.m_count += dgVertexListToIndexList (&vertexArray[baseVertexCount].m_point[0], sizeof (dgFlatVertex), sizeof (dgFlatVertex), 0, vertexCount - baseVertexCount, &indexBuffer[0], dgFloat32 (1.0e-6f));
-
-	for (dgMesh::dgListNode* meshSgement = data.m_mesh->GetFirst(); meshSgement; meshSgement = meshSgement->GetNext()) {
-		dgSubMesh* const subMesh = &meshSgement->GetInfo();
-		for (dgInt32 i = 0; i < subMesh->m_faceCount * 3; i ++) {
-			dgInt32 j = subMesh->m_indexes[i];  
-			subMesh->m_indexes[i] = baseVertexCount + indexBuffer[j];
-		}
-	}
 	return node;
 }
  
@@ -936,11 +937,8 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (
 		}
 	}
 
-	dgStack<dgInt32> indexBuffer (vertexArray.m_count);
-	dgInt32 vertsCount = dgVertexListToIndexList (&vertexArray[0].m_point[0], sizeof (dgFlatVertex), sizeof (dgFlatVertex), 0, vertexArray.m_count, &indexBuffer[0], dgFloat32 (1.0e-4f));
-
-	m_vertexBuffer = new (m_world->GetAllocator()) dgVertexBuffer(vertsCount, m_world->GetAllocator());
-	for (dgInt32 i = 0; i < vertsCount; i ++) {
+	m_vertexBuffer = new (m_world->GetAllocator()) dgVertexBuffer(vertexArray.m_count, m_world->GetAllocator());
+	for (dgInt32 i = 0; i < vertexArray.m_count; i ++) {
 		m_vertexBuffer->m_vertex[i * 3 + 0] = vertexArray[i].m_point[0];
 		m_vertexBuffer->m_vertex[i * 3 + 1] = vertexArray[i].m_point[1];
 		m_vertexBuffer->m_vertex[i * 3 + 2] = vertexArray[i].m_point[2];
@@ -960,16 +958,11 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (
 			if (!node) {
 				node = materailOrdinalMap.Insert(m_materialCount, subMesh->m_material);
 				m_materialCount ++;
-				dgAssert (m_materialCount < 256);
+				dgAssert (m_materialCount < DG_FRACTURE_MAX_METERIAL_COUNT);
 			}
 
 			dgInt32 materialIndex = node->GetInfo();
 			subMesh->m_materialOrdinal = materialIndex;
-
-			for (dgInt32 i = 0; i < subMesh->m_faceCount * 3; i ++) {
-				dgInt32 j = subMesh->m_indexes[i];
-				subMesh->m_indexes[i] = indexBuffer[j];
-			}
 		}
 	}
 
@@ -996,10 +989,15 @@ void dgCollisionCompoundFractured::BuildMainMeshSubMehes() const
 {
 	dgConectivityGraph::dgListNode* const mainNode = m_conectivity.GetLast();
 	dgMesh* const mainMesh = mainNode->GetInfo().m_nodeData.m_mesh;
+	m_world->GlobalLock();
 	mainMesh->RemoveAll();
+	m_world->GlobalUnlock();
 
-	dgInt32 histogram[256];
-	dgInt32 materials[256];
+	dgAssert (mainMesh->m_vertexOffsetStart == 0);
+	mainMesh->m_vertexCount = m_vertexBuffer->m_vertexCount;
+
+	dgInt32 histogram[DG_FRACTURE_MAX_METERIAL_COUNT];
+	dgInt32 materials[DG_FRACTURE_MAX_METERIAL_COUNT];
 	memset (histogram, 0, m_materialCount * sizeof (dgInt32));
 
 	for (dgConectivityGraph::dgListNode* node = m_conectivity.GetFirst(); node != mainNode; node = node->GetNext() ) {
@@ -1014,26 +1012,32 @@ void dgCollisionCompoundFractured::BuildMainMeshSubMehes() const
 		}
 	}
 
-	dgSubMesh* mainSubMeshes[256];
+	dgSubMesh* mainSubMeshes[DG_FRACTURE_MAX_METERIAL_COUNT];
 	for (dgInt32 i = 0; i < m_materialCount; i ++) {
 		if (histogram[i]) {
+			m_world->GlobalLock();
 			mainSubMeshes[i] = mainMesh->AddgSubMesh (histogram[i] * 3, materials[i]);
+			m_world->GlobalUnlock();
 		}
 	}
 
-	dgInt32 faceIndexIndexOffset[256];
+	dgInt32 faceIndexIndexOffset[DG_FRACTURE_MAX_METERIAL_COUNT];
 	memset (faceIndexIndexOffset, 0, m_materialCount * sizeof (dgInt32));
 
 	for (dgConectivityGraph::dgListNode* node = m_conectivity.GetFirst(); node != mainNode; node = node->GetNext() ) {
 		dgDebriNodeInfo& data = node->GetInfo().m_nodeData;
+		const dgInt32 vertexOffsetStart = data.m_mesh->m_vertexOffsetStart;
 		for (dgMesh::dgListNode* meshSegment = data.m_mesh->GetFirst(); meshSegment; meshSegment = meshSegment->GetNext()) {
 			dgSubMesh* const subMesh = &meshSegment->GetInfo();
 			if (subMesh->m_visibleFaces) {
 				dgInt32 index = subMesh->m_materialOrdinal;
 				dgInt32 base = faceIndexIndexOffset[index];
 				dgSubMesh* const mainSubMesh = mainSubMeshes[index];
-				memcpy (&mainSubMesh->m_indexes[base], subMesh->m_indexes, 3 * subMesh->m_faceCount * sizeof (dgInt32));
-				faceIndexIndexOffset[index] += subMesh->m_faceCount * 3;
+				const dgInt32 count = 3 * subMesh->m_faceCount;
+				for (dgInt32 i = 0; i < count; i ++) {
+					mainSubMesh->m_indexes[base + i] = subMesh->m_indexes[i] + vertexOffsetStart;
+				}
+				faceIndexIndexOffset[index] += count;
 				dgAssert (faceIndexIndexOffset[index] <= histogram[index] * 3);
 			}
 		}
@@ -1055,45 +1059,48 @@ bool dgCollisionCompoundFractured::SanityCheck() const
 }
 
 
-dgInt32 dgCollisionCompoundFractured::GetSegmentIndexStreamShort (dgConectivityGraph::dgListNode* const node, dgMesh::dgListNode* subMeshNode, dgInt16* const index) const
+dgCollisionCompoundFractured::dgConectivityGraph::dgListNode* dgCollisionCompoundFractured::GetMainMesh() const 
 {
-dgAssert(0);
-return 0;
-/*
-	dgSubMesh* const subMesh = &subMeshNode->GetInfo();
-	const dgInt32* const indexes = subMesh->m_indexes;	
+	return m_conectivity.GetLast();
+}
 
-	dgInt32 currentIndex = 0;
-	if (node == m_conectivity.GetLast()) {
-		dgInt32 faceCount;
+dgCollisionCompoundFractured::dgConectivityGraph::dgListNode* dgCollisionCompoundFractured::GetFirstMesh() const 
+{
+	return m_conectivity.GetFirst();
+}
 
-		const dgInt8* const visbilityMap = m_visibilityMap;
-		const dgInt32* const visibilityInderectMap = &m_visibilityIndirectMap[subMesh->m_faceOffset];
+dgCollisionCompoundFractured::dgConectivityGraph::dgListNode* dgCollisionCompoundFractured::GetNextMesh (dgConectivityGraph::dgListNode* const mesNodeh) const
+{
+	return (mesNodeh->GetNext() != m_conectivity.GetLast()) ? mesNodeh->GetNext() : NULL;
+}
 
-		faceCount = subMesh->m_faceCount;
-		for (dgInt32 i = 0; i < faceCount; i ++) {
-			if (visbilityMap[visibilityInderectMap[i]]) {
-				index[currentIndex + 0] = dgInt16 (indexes[i * 3 + 0]);
-				index[currentIndex + 1] = dgInt16 (indexes[i * 3 + 1]);
-				index[currentIndex + 2] = dgInt16 (indexes[i * 3 + 2]);
-				currentIndex += 3;
-			}
-		}
+dgInt32 dgCollisionCompoundFractured::GetVertecCount(dgConectivityGraph::dgListNode* const node) const 
+{
+	dgMesh* const mesh = node->GetInfo().m_nodeData.m_mesh;
+	return mesh->m_vertexCount;
+}
 
-	} else {
-		dgInt32 indexCount = subMesh->m_faceCount * 3;
-		for (dgInt32 i = 0; i < indexCount; i ++) {
-			index[i] = dgInt16 (indexes[i]);
-		}
-		currentIndex = indexCount;
-	}
-
-	return currentIndex;
-*/
+const dgFloat32* dgCollisionCompoundFractured::GetVertexPositions (dgConectivityGraph::dgListNode* const node) const 
+{
+	dgMesh* const mesh = node->GetInfo().m_nodeData.m_mesh;
+	return m_vertexBuffer->GetVertexPositions() + mesh->m_vertexOffsetStart * 3;
 }
 
 
-dgInt32 dgCollisionCompoundFractured::GetSegmentIndexStream (dgConectivityGraph::dgListNode* const node, dgMesh::dgListNode* const subMeshNode, dgInt32* const index) const
+const dgFloat32* dgCollisionCompoundFractured::GetVertexNormal (dgConectivityGraph::dgListNode* const node) const 
+{
+	dgMesh* const mesh = node->GetInfo().m_nodeData.m_mesh;
+	return m_vertexBuffer->GetVertexNormals() + mesh->m_vertexOffsetStart * 3;
+}
+
+
+const dgFloat32* dgCollisionCompoundFractured::GetVertexUVs (dgConectivityGraph::dgListNode* const node) const 
+{
+	dgMesh* const mesh = node->GetInfo().m_nodeData.m_mesh;
+	return m_vertexBuffer->GetVertexUVs() + mesh->m_vertexOffsetStart * 2;
+}
+
+dgInt32 dgCollisionCompoundFractured::GetSegmentIndexStream (dgConectivityGraph::dgListNode* const node___, dgMesh::dgListNode* const subMeshNode, dgInt32* const index) const
 {
 	dgSubMesh* const subMesh = &subMeshNode->GetInfo();
 	const dgInt32* const indexes = subMesh->m_indexes;
@@ -1165,7 +1172,7 @@ dgInt32 dgCollisionCompoundFractured::CalculateContacts (dgCollidingPairCollecto
 				dgConectivityGraph::dgListNode* const rootNode = m_conectivityMap.Find(contactOut.m_collision0)->GetInfo();
 				dgDebriNodeInfo& nodeInfo = rootNode->GetInfo().m_nodeData;
 				nodeInfo.m_lru = 1;
-                ((dgCollisionCompoundFractured*)this)->SpawnSingleDrebree (myBody, rootNode, impulseStimate2, impulseStrength * impulseStrength);
+                ((dgCollisionCompoundFractured*)this)->SpawnChunks (myBody, myInstance, rootNode, impulseStimate2, impulseStrength * impulseStrength);
 
 			}
 		}
@@ -1175,7 +1182,7 @@ dgInt32 dgCollisionCompoundFractured::CalculateContacts (dgCollidingPairCollecto
 }
 
 
-void dgCollisionCompoundFractured::SpawnSingleDrebree (dgBody* const myBody, dgConectivityGraph::dgListNode* const rootNode, dgFloat32 impulseStimate2, dgFloat32 impulseStimateCut2)
+void dgCollisionCompoundFractured::SpawnChunks (dgBody* const myBody, const dgCollisionInstance* const myInstance, dgConectivityGraph::dgListNode* const rootNode, dgFloat32 impulseStimate2, dgFloat32 impulseStimateCut2)
 {
 	dgFloat32 strengthPool[256];
 	dgConectivityGraph::dgListNode* pool[256];
@@ -1189,7 +1196,6 @@ void dgCollisionCompoundFractured::SpawnSingleDrebree (dgBody* const myBody, dgC
 	if (m_density < dgFloat32 (0.0f)) {
 		m_density = dgAbsf (massMatrix.m_w * m_density);
 	}
-//	NewtonBodyGetMassMatrix(m_myBody, &mass, &Ixx, &Iyy, &Izz);
 
 	dgFloat32 attenuation = m_impulseAbsortionFactor;
 	m_lru ++;
@@ -1199,8 +1205,8 @@ void dgCollisionCompoundFractured::SpawnSingleDrebree (dgBody* const myBody, dgC
 	while (stack) {
 		stack --;
 		dgFloat32 strenght = strengthPool[stack] * attenuation;
-		dgConectivityGraph::dgListNode* const rootNode = pool[stack];
-		dgDebriNodeInfo& nodeInfo = rootNode->GetInfo().m_nodeData;
+		dgConectivityGraph::dgListNode* const chunkNode = pool[stack];
+		dgDebriNodeInfo& nodeInfo = chunkNode->GetInfo().m_nodeData;
 
 		nodeInfo.m_mesh->m_IsVisible = true;
 		for (dgMesh::dgListNode* meshSegment = nodeInfo.m_mesh->GetFirst(); meshSegment; meshSegment = meshSegment->GetNext()) {
@@ -1208,7 +1214,7 @@ void dgCollisionCompoundFractured::SpawnSingleDrebree (dgBody* const myBody, dgC
 			subMesh->m_visibleFaces = true;
 		}
 
-        for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = rootNode->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
+        for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = chunkNode->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
             dgConectivityGraph::dgListNode* const node = edgeNode->GetInfo().m_node;
             dgDebriNodeInfo& childNodeInfo = node->GetInfo().m_nodeData;
             childNodeInfo.m_mesh->m_IsVisible = true;
@@ -1219,7 +1225,7 @@ void dgCollisionCompoundFractured::SpawnSingleDrebree (dgBody* const myBody, dgC
         }
 		
 		if (strenght > impulseStimateCut2) {
-			for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = rootNode->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
+			for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = chunkNode->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
 				dgConectivityGraph::dgListNode* const node = edgeNode->GetInfo().m_node;
 				dgDebriNodeInfo& childNodeInfo = node->GetInfo().m_nodeData;
 				if (childNodeInfo.m_lru != m_lru) {
@@ -1246,17 +1252,20 @@ void dgCollisionCompoundFractured::SpawnSingleDrebree (dgBody* const myBody, dgC
 		chunkBody->SetVelocity(chunkVeloc);
 		chunkBody->SetGroupID(chunkCollision->GetUserDataID());
 
-		m_emitFracturedChunk(chunkBody, rootNode);
+		m_emitFracturedChunk(chunkBody, chunkNode, myInstance);
 
         m_conectivityMap.Remove (chunkCollision);
         RemoveCollision (nodeInfo.m_shapeNode);
-        m_conectivity.DeleteNode(rootNode);
-
-
-		BuildMainMeshSubMehes();
-		m_reconstructMainMesh (myBody, m_conectivity.GetLast());
+        m_conectivity.DeleteNode(chunkNode);
 
 		m_world->GlobalUnlock();
 	}
+
+	BuildMainMeshSubMehes();
+	m_reconstructMainMesh (myBody, m_conectivity.GetLast(), myInstance);
+
+	MassProperties ();
+	dgFloat32 mass = m_centerOfMass.m_w * m_density;
+	myBody->SetMassProperties(mass, myInstance);
 }
 

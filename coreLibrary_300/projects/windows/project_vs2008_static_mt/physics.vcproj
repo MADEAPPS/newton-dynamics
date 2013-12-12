@@ -704,14 +704,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\source\physics\dgFractureBodiesUpdate.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\source\physics\dgFracturedBodiesUpdate.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\source\physics\dgNarrowPhaseCollision.cpp"
 				>
 			</File>
