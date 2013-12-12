@@ -3044,18 +3044,18 @@ for (iter.Begin(); iter; iter ++) {
         dgFloat32 areaInv = (p10 * p20) % faceNormal;
         if (e2->m_next != e0) {
             const dgEdge* edge = e2;
-            dgVector r1 (q1);
+            dgVector r1 (q2);
             dgVector p10 (p20);
             do {
                 dgVector r2 (matrix.UntransformVector(dgVector(convexMesh.m_points[edge->m_next->m_incidentVertex])));
                 dgVector p20 (r2 - q0);
                 dgFloat32 areaInv1 = (p10 * p20) % faceNormal;
                 if (areaInv1 > areaInv) {
-                    //areaInv = areaInv1;
-                    //e1 = edge;
-                    //e2 = edge->m_next;
-                    //q1 = _q1;
-                    //q2 = _q2;
+                    e1 = edge;
+                    e2 = edge->m_next;
+                    q1 = r1;
+                    q2 = r2;
+                    areaInv = areaInv1;
                 }
                 r1 = r2;
                 p10 = p20;
