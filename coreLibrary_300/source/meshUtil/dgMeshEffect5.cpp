@@ -2953,9 +2953,7 @@ dgMeshEffect* dgMeshEffect::Intersection (const dgMatrix& matrix, const dgMeshEf
 
 bool dgMeshEffect::PlaneClip (const dgMeshEffect& convexMesh, const dgEdge* const convexFace)
 {
-	
 	dgAssert (convexFace->m_incidentFace > 0);
-
 	
 	dgBigVector normal (convexMesh.FaceNormal(convexFace, &convexMesh.m_points[0].m_x, sizeof(dgBigVector)));
 	dgFloat64 mag2 = normal % normal;
@@ -2967,11 +2965,10 @@ bool dgMeshEffect::PlaneClip (const dgMeshEffect& convexMesh, const dgEdge* cons
 	normal = normal.Scale3(dgFloat64 (1.0f) / sqrt (mag2));
 	dgBigVector origin (convexMesh.m_points[convexFace->m_incidentVertex]);
 	dgBigPlane plane (normal, - (origin % normal));
-
+/*
 static int xxxx;
 static int xxx;
 xxx ++;
-
 int xxxxxxxxxx = 2028;
 if (xxx == xxxxxxxxxx){
 
@@ -2994,9 +2991,8 @@ for (iter.Begin(); iter; iter ++) {
 		dgTrace (("\n"));
 	}
 }
-
 }
-
+*/
 	dgAssert (!HasOpenEdges());
 	
 	dgInt32 pointCount = GetVertexCount();
@@ -3023,37 +3019,64 @@ for (iter.Begin(); iter; iter ++) {
 	
 	if (positive && negative) {
 
+        const dgEdge* e0 = convexFace;
+        const dgEdge* e1 = e0->m_next;
+        const dgEdge* e2 = e1->m_next;
+
 		dgMatrix matrix;
-		dgBigVector p1 (convexMesh.m_points[convexFace->m_next->m_incidentVertex]);
+		dgBigVector p1 (convexMesh.m_points[e1->m_incidentVertex]);
 
 		dgBigVector xDir (p1 - origin);
+        dgAssert ((xDir % xDir) > dgFloat32 (0.0f));
 		matrix[2] = dgVector (normal);
 		matrix[0] = dgVector(xDir.Scale3(dgFloat64 (1.0f) / sqrt (xDir% xDir)));
 		matrix[1] = matrix[2] * matrix[0];
 		matrix[3] = dgVector (origin);
 		matrix[3][3] = dgFloat32 (1.0f);
 
-		dgVector q0 (matrix.UntransformVector(dgVector(origin)));
-		dgVector q1 (matrix.UntransformVector(dgVector(p1)));
-		dgVector q2 (matrix.UntransformVector(dgVector(convexMesh.m_points[convexFace->m_next->m_next->m_incidentVertex])));
+		dgVector q0 (matrix.UntransformVector(dgVector(convexMesh.m_points[e0->m_incidentVertex])));
+        dgVector q1 (matrix.UntransformVector(dgVector(convexMesh.m_points[e1->m_incidentVertex])));
+        dgVector q2 (matrix.UntransformVector(dgVector(convexMesh.m_points[e2->m_incidentVertex])));
 
-		dgVector p10 (q1 - q0);
-		dgVector p20 (q2 - q0);
+        dgVector p10 (q1 - q0);
+        dgVector p20 (q2 - q0);
+        dgVector faceNormal (matrix.UnrotateVector (dgVector(normal)));
+        dgFloat32 areaInv = (p10 * p20) % faceNormal;
+        if (convexFace->m_next->m_next->m_next != convexFace) {
 
-		dgVector uv0_0 (dgFloat32 (convexMesh.m_attrib[convexFace->m_userData].m_u0), dgFloat32 (convexMesh.m_attrib[convexFace->m_userData].m_v0), dgFloat32 (0.0f), dgFloat32 (0.0f));
-		dgVector uv0_1 (dgFloat32 (convexMesh.m_attrib[convexFace->m_next->m_userData].m_u0), dgFloat32 (convexMesh.m_attrib[convexFace->m_next->m_userData].m_v0), dgFloat32 (0.0f), dgFloat32 (0.0f));
-		dgVector uv0_2 (dgFloat32 (convexMesh.m_attrib[convexFace->m_next->m_next->m_userData].m_u0), dgFloat32 (convexMesh.m_attrib[convexFace->m_next->m_next->m_userData].m_v0), dgFloat32 (0.0f), dgFloat32 (0.0f));
-
-		dgVector uv1_0 (dgFloat32 (convexMesh.m_attrib[convexFace->m_userData].m_u1), dgFloat32 (convexMesh.m_attrib[convexFace->m_userData].m_v1), dgFloat32 (0.0f), dgFloat32 (0.0f));
-		dgVector uv1_1 (dgFloat32 (convexMesh.m_attrib[convexFace->m_next->m_userData].m_u1), dgFloat32 (convexMesh.m_attrib[convexFace->m_next->m_userData].m_v1), dgFloat32 (0.0f), dgFloat32 (0.0f));
-		dgVector uv1_2 (dgFloat32 (convexMesh.m_attrib[convexFace->m_next->m_next->m_userData].m_u1), dgFloat32 (convexMesh.m_attrib[convexFace->m_next->m_next->m_userData].m_v1), dgFloat32 (0.0f), dgFloat32 (0.0f));
-
-
-		dgVector faceNormal (normal);
-		dgFloat32 areaInv = (p10 * p20) % faceNormal;
-		dgAssert (areaInv > dgFloat32 (0.0f));
-		areaInv = dgFloat32 (1.0f) / areaInv;
+            const dgEdge* edge = e2;
+            dgVector _q1 (q1);
+            dgVector _p10 (_q1 - q0);
+            do {
+                dgVector _q2 (matrix.UntransformVector(dgVector(convexMesh.m_points[edge->m_next->m_incidentVertex])));
+                dgVector _p20 (_q2 - q0);
+                dgFloat32 areaInv1 = (_p10 * _p20) % faceNormal;
+                if (areaInv1 > areaInv) {
+                    //areaInv = areaInv1;
+                    //e1 = edge;
+                    //e2 = edge->m_next;
+                    //q1 = _q1;
+                    //q2 = _q2;
+                    //p10 = _p10;
+                    //p20 = _p20;
+                }
+                _q1 = _q2;
+                _p10 = _p20;
+                edge = edge->m_next;
+            } while (edge->m_next != e0);
+        }
 		
+        dgAssert (areaInv > dgFloat32 (0.0f));
+        areaInv = dgFloat32 (1.0f) / areaInv;
+
+		dgVector uv0_0 (dgFloat32 (convexMesh.m_attrib[e0->m_userData].m_u0), dgFloat32 (convexMesh.m_attrib[e0->m_userData].m_v0), dgFloat32 (0.0f), dgFloat32 (0.0f));
+		dgVector uv0_1 (dgFloat32 (convexMesh.m_attrib[e1->m_userData].m_u0), dgFloat32 (convexMesh.m_attrib[e1->m_userData].m_v0), dgFloat32 (0.0f), dgFloat32 (0.0f));
+		dgVector uv0_2 (dgFloat32 (convexMesh.m_attrib[e2->m_userData].m_u0), dgFloat32 (convexMesh.m_attrib[e2->m_userData].m_v0), dgFloat32 (0.0f), dgFloat32 (0.0f));
+
+		dgVector uv1_0 (dgFloat32 (convexMesh.m_attrib[e0->m_userData].m_u1), dgFloat32 (convexMesh.m_attrib[e0->m_userData].m_v1), dgFloat32 (0.0f), dgFloat32 (0.0f));
+		dgVector uv1_1 (dgFloat32 (convexMesh.m_attrib[e1->m_userData].m_u1), dgFloat32 (convexMesh.m_attrib[e1->m_userData].m_v1), dgFloat32 (0.0f), dgFloat32 (0.0f));
+		dgVector uv1_2 (dgFloat32 (convexMesh.m_attrib[e2->m_userData].m_u1), dgFloat32 (convexMesh.m_attrib[e2->m_userData].m_v1), dgFloat32 (0.0f), dgFloat32 (0.0f));
+
 		for (iter.Begin(); iter; iter ++){
 			dgEdge* const edge = &(*iter);
 			
@@ -3177,9 +3200,6 @@ for (iter.Begin(); iter; iter ++) {
 		const dgFloat64 capAttribute = convexMesh.m_attrib[convexFace->m_userData].m_material;
 		for (dgList<dgEdge*>::dgListNode* node = faceList.GetFirst(); node; node = node->GetNext()) {
 			dgEdge* const face = node->GetInfo();
-xxxx ++;
-if (xxxx == 1765)
-xxxx *=1;
 
 			dgEdge* edge = face;
 			do {
@@ -3195,27 +3215,25 @@ xxxx *=1;
 				dgVector p_p0 (p - q0);
 				dgVector p_p1 (p - q1);
 				dgVector p_p2 (p - q2);
-				dgFloat32 alpha1 = p10 % p_p0;
-				dgFloat32 alpha2 = p20 % p_p0;
-				dgFloat32 alpha3 = p10 % p_p1;
-				dgFloat32 alpha4 = p20 % p_p1;
-				dgFloat32 alpha5 = p10 % p_p2;
-				dgFloat32 alpha6 = p20 % p_p2;
-				dgFloat32 vc = alpha1 * alpha4 - alpha3 * alpha2;
-				dgFloat32 vb = alpha5 * alpha2 - alpha1 * alpha6;
-				dgFloat32 va = alpha3 * alpha6 - alpha5 * alpha4;
-				dgFloat32 den = va + vb + vc;
-				dgAssert (den > 0.0f);
+				//dgFloat32 alpha1 = p10 % p_p0;
+				//dgFloat32 alpha2 = p20 % p_p0;
+				//dgFloat32 alpha3 = p10 % p_p1;
+				//dgFloat32 alpha4 = p20 % p_p1;
+				//dgFloat32 alpha5 = p10 % p_p2;
+				//dgFloat32 alpha6 = p20 % p_p2;
+				//dgFloat32 vc = alpha1 * alpha4 - alpha3 * alpha2;
+				//dgFloat32 vb = alpha5 * alpha2 - alpha1 * alpha6;
+				//dgFloat32 va = alpha3 * alpha6 - alpha5 * alpha4;
+				//dgFloat32 den = va + vb + vc;
+				//dgAssert (den > 0.0f);
+                //den = dgFloat32 (1.0f) / (va + vb + vc);
+                //dgFloat32 alpha0 = dgFloat32 (va * den);
+                //alpha1 = dgFloat32 (vb * den);
+                //alpha2 = dgFloat32 (vc * den);
 
-				dgFloat32 area0 = ((p_p1 * p_p2) % faceNormal) * areaInv;
-				dgFloat32 area1 = ((p_p2 * p_p0) % faceNormal) * areaInv;
-				dgFloat32 area2 = ((p_p0 * p_p1) % faceNormal) * areaInv;
-
-
-				den = dgFloat32 (1.0f) / (va + vb + vc);
-				dgFloat32 alpha0 = dgFloat32 (va * den);
-				alpha1 = dgFloat32 (vb * den);
-				alpha2 = dgFloat32 (vc * den);
+				dgFloat32 alpha0 = ((p_p1 * p_p2) % faceNormal) * areaInv;
+				dgFloat32 alpha1 = ((p_p2 * p_p0) % faceNormal) * areaInv;
+				dgFloat32 alpha2 = ((p_p0 * p_p1) % faceNormal) * areaInv;
 
 				attibute.m_u0 = uv0_0.m_x * alpha0 + uv0_1.m_x * alpha1 + uv0_2.m_x * alpha2; 
 				attibute.m_v0 = uv0_0.m_y * alpha0 + uv0_1.m_y * alpha1 + uv0_2.m_y * alpha2; 
