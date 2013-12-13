@@ -45,6 +45,11 @@ void* dNewtonContactMaterial::GetNextContact(void* const contact) const
 	return NewtonContactJointGetNextContact ((NewtonJoint*)m_materialHandle, contact);
 }
 
+void dNewtonContactMaterial::RemoveContact(void* const contact) const
+{
+	NewtonContactJointRemoveContact((NewtonJoint*)m_materialHandle, contact);
+}
+
 dNewtonCollision* dNewtonContactMaterial::GetShape0 (const void* const contact)
 {
 	NewtonBody* const body = NewtonJointGetBody0 ((NewtonJoint*)m_materialHandle);

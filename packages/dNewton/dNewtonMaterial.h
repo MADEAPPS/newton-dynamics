@@ -87,6 +87,7 @@ class dNewtonContactMaterial
 
 	CNEWTON_API void* GetFirstContact() const;
 	CNEWTON_API void* GetNextContact(void* const contact) const;
+	CNEWTON_API void RemoveContact(void* const contact) const; 
 
 	CNEWTON_API dNewtonCollision* GetShape0 (const void* const contact);
 	CNEWTON_API dNewtonCollision* GetShape1 (const void* const contact);
