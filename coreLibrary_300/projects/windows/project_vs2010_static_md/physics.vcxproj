@@ -261,6 +261,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\source\meshUtil\dgMeshEffect6.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgBallConstraint.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgBilateralConstraint.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCollisionCompoundFractured.cpp" />

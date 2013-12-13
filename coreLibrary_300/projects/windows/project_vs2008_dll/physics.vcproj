@@ -799,6 +799,10 @@
 				RelativePath="..\..\..\source\meshUtil\dgMeshEffect5.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\..\..\source\meshUtil\dgMeshEffect6.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="bodies"
