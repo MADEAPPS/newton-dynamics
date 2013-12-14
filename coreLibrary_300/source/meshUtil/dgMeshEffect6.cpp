@@ -209,9 +209,13 @@ class dgAngleBasedFlatteningMapping
 
 				nextFaceEdge.m_u = e0length;
 				nextFaceEdge.m_v = dgFloat64 (0.0f);
+
+				dgFloat64 du (nextFaceEdge.m_u - face.m_u);
+				dgFloat64 dv (nextFaceEdge.m_v - face.m_v);
+				dgFloat64 refAngle = atan2 (dv, du);
 				
-				prevFaceEdge.m_u = face.m_u + e2length * cos (nextFaceEdge.m_alpha);
-				prevFaceEdge.m_v = face.m_v + e2length * sin (nextFaceEdge.m_alpha);
+				prevFaceEdge.m_u = face.m_u + e2length * cos (nextFaceEdge.m_alpha + refAngle);
+				prevFaceEdge.m_v = face.m_v + e2length * sin (nextFaceEdge.m_alpha + refAngle);
 
 				while (stack.GetCount()) {
 					dgEdge* const edge = stack.GetLast()->GetInfo();
@@ -242,8 +246,12 @@ class dgAngleBasedFlatteningMapping
 						dgFloat64 e0length = sqrt (p10 % p10);
 						dgFloat64 e2length = e0length  * sin (prevFaceEdge.m_alpha) / sin (face.m_alpha);
 
-						prevFaceEdge.m_u = faceEdge.m_u + e2length * cos (nextFaceEdge.m_alpha);
-						prevFaceEdge.m_v = faceEdge.m_v + e2length * sin (nextFaceEdge.m_alpha);
+						dgFloat64 du (nextFaceEdge.m_u - faceEdge.m_u);
+						dgFloat64 dv (nextFaceEdge.m_v - faceEdge.m_v);
+						dgFloat64 refAngle = atan2 (dv, du);
+
+						prevFaceEdge.m_u = faceEdge.m_u + e2length * cos (nextFaceEdge.m_alpha + refAngle);
+						prevFaceEdge.m_v = faceEdge.m_v + e2length * sin (nextFaceEdge.m_alpha + refAngle);
 
 						if (next->m_twin->m_incidentFace > 0) {
 							stack.Append(next->m_twin);
