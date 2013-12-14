@@ -24,6 +24,222 @@
 #include "dgMeshEffect.h"
 
 
+#define dgABF_PI dgFloat64 (3.1415926535)
+
+
+
+class dgAngleBasedFlatteningMapping
+{
+	enum dgABF_Type
+	{
+		m_interiorVertex = 0,
+		m_exteriorVertex,
+	};
+
+	class dgVertex
+	{
+		public:
+		dgEdge* m_incidentEdge;
+		dgABF_Type m_type;
+	};
+
+	class dgFace
+	{
+		public:
+		void Init (const dgMeshEffect* const mesh, dgEdge* const edge, dgInt32 enumerationID)
+		{
+			m_incidenEdge = edge;
+			m_incidenEdge->m_incidentFace = enumerationID + 1;
+
+			const dgBigVector& p0 = mesh->GetVertex(edge->m_prev->m_incidentVertex);
+			const dgBigVector& p1 = mesh->GetVertex(edge->m_incidentVertex);
+			const dgBigVector& p2 = mesh->GetVertex(edge->m_next->m_incidentVertex);
+
+			dgBigVector e10 (p1 - p0);
+			dgBigVector e20 (p2 - p0);
+
+			e10 = e10.Scale3 (dgFloat64 (1.0) / sqrt (e10 % e10));
+			e20 = e20.Scale3 (dgFloat64 (1.0) / sqrt (e20 % e20));
+			m_beta = acos (dgClamp(e10 % e20, dgFloat64 (0.0), dgABF_PI));
+			m_alpha = m_beta;
+		}
+
+		dgEdge* m_incidenEdge;
+		dgFloat64 m_alpha;
+		dgFloat64 m_beta;
+		dgFloat64 m_u;
+		dgFloat64 m_v;
+	};
+
+	public: 
+	dgAngleBasedFlatteningMapping (dgMeshEffect* const mesh, dgInt32 material)
+		:m_faceArray(1024, mesh->GetAllocator())
+		,m_vertexArray(1024, mesh->GetAllocator())
+		,m_mesh(mesh)
+		,m_material(material)
+	{
+		m_mesh->Triangulate();
+		m_vertexCount = m_mesh->GetVertexCount();
+		m_edgeCount = m_mesh->GetFaceCount() * 3;
+		m_interiorVertexCount = 0;
+
+		InitializeVertexTypeVector ();
+		InitializeFaceVector ();
+		if (m_interiorVertexCount) {
+			OptimizePlanrAngles();
+		}
+		CalculateUV ();
+	}
+
+	~dgAngleBasedFlatteningMapping()
+	{
+	}
+
+	void InitializeVertexTypeVector ()
+	{
+		dgInt32 count = 0;
+
+		dgInt32 mark = m_mesh->IncLRU();
+		dgMeshEffect::Iterator iter (*m_mesh);
+		for (iter.Begin(); iter; iter ++) {
+			dgEdge* const edge = &iter.GetNode()->GetInfo();
+
+			dgABF_Type vertexType = m_interiorVertex;
+			if (edge->m_mark != mark) {
+				dgEdge* ptr = edge; 
+				do {
+					if (ptr->m_incidentFace < 0) {
+						vertexType = m_exteriorVertex;
+					}
+
+					ptr->m_mark = mark;
+					ptr = ptr->m_twin->m_next;
+				} while (ptr != edge);
+				m_interiorVertexCount += (vertexType == m_interiorVertex) ? 1 : 0;
+
+				m_vertexArray[count].m_type = vertexType;
+				m_vertexArray[count].m_incidentEdge = edge;
+				count ++;
+				dgAssert (count <= m_vertexCount);
+			}
+		}
+		dgAssert (count == m_vertexCount);
+	}
+
+	void InitializeFaceVector  ()
+	{
+		dgInt32 count = 0;
+		dgInt32 mark = m_mesh->IncLRU();
+
+		// calculate initial angles;
+		dgMeshEffect::Iterator iter (*m_mesh);
+		for (iter.Begin(); iter; iter ++) {
+			dgEdge* const face = &iter.GetNode()->GetInfo();
+			if ((face->m_incidentFace > 0) && (face->m_mark != mark)) {
+				dgAssert (face->m_next->m_next->m_next == face);
+
+				dgEdge* ptr = face; 
+				do {
+					// save the vertex index plus one in the face 
+					m_faceArray[count].Init(m_mesh, ptr, count);
+					count ++;
+					ptr->m_mark = mark;
+					ptr = ptr->m_next;
+				} while (ptr != face);
+				dgAssert (count <= m_edgeCount);
+			}
+		}
+		dgAssert (count == m_edgeCount);
+
+		// calculate weight factor
+		for (dgInt32 i = 0; i < m_vertexCount; i ++) {
+			if (m_vertexArray[i].m_type == m_interiorVertex) {
+				dgAssert (0);
+				dgVertex& vertex = m_vertexArray[i];
+				dgFloat64 sum = dgFloat64 (0.0f);
+
+				dgEdge* ptr = vertex.m_incidentEdge; 
+				do {
+					dgInt32 faceIndex = ptr->m_incidentFace - 1;
+					sum += m_faceArray[faceIndex].m_beta;
+					ptr->m_mark = mark;
+					ptr = ptr->m_twin->m_next;
+				} while (ptr != vertex.m_incidentEdge);
+			}
+		}
+	}
+
+	void OptimizePlanrAngles()
+	{
+		dgAssert (0);
+	}
+
+	void CalculateUV ()
+	{
+		
+		dgInt32 mark = m_mesh->IncLRU();
+		for (dgInt32 i = 0; i < m_edgeCount; i ++) {
+			dgFace& face = m_faceArray[i];
+			if (face.m_incidenEdge->m_mark != mark) {
+				dgList<dgEdge*> stack(m_mesh->GetAllocator());
+				stack.Append(face.m_incidenEdge);
+
+ 				dgEdge* const next = face.m_incidenEdge->m_next;
+				dgEdge* const prev = face.m_incidenEdge->m_prev;
+				dgFace& nextFaceEdge = m_faceArray[next->m_incidentFace - 1];
+				dgFace& prevFaceEdge = m_faceArray[prev->m_incidentFace - 1];
+				dgAssert (nextFaceEdge.m_incidenEdge == next);
+				dgAssert (prevFaceEdge.m_incidenEdge == prev);
+
+				const dgBigVector& p0 = m_mesh->GetVertex(face.m_incidenEdge->m_incidentVertex);
+				const dgBigVector& p1 = m_mesh->GetVertex(next->m_incidentVertex);
+				dgBigVector p10 (p1 - p0);
+
+				face.m_u = dgFloat64 (0.0f);
+				face.m_v = dgFloat64 (0.0f);
+				nextFaceEdge.m_u = sqrt (p10 % p10);
+				nextFaceEdge.m_v = dgFloat64 (0.0f);
+
+				dgFloat64 e2length = nextFaceEdge.m_u * sin (prevFaceEdge.m_alpha) / sin (face.m_alpha);
+				prevFaceEdge.m_u = face.m_u + e2length * cos (nextFaceEdge.m_alpha);
+				prevFaceEdge.m_v = face.m_v + e2length * sin (nextFaceEdge.m_alpha);
+
+
+				while (stack.GetCount()) {
+					dgEdge* const edge = stack.GetLast()->GetInfo();
+					stack.Remove (stack.GetLast());
+					if (edge->m_mark != mark) {
+						dgEdge* const next = edge->m_next;
+						dgEdge* const prev = edge->m_prev;
+
+						edge->m_mark = mark;
+						next->m_mark = mark;
+						prev->m_mark = mark;
+
+						if (next->m_twin->m_incidentFace > 0) {
+							stack.Append(next->m_twin);
+						}
+						if (prev->m_twin->m_incidentFace > 0) {
+							stack.Append(prev->m_twin);
+						}
+					}
+				} 
+			}
+		}
+		
+	}
+	
+	dgArray<dgFace> m_faceArray; 
+	dgArray<dgVertex> m_vertexArray; 
+
+	dgMeshEffect* m_mesh;
+	dgInt32 m_material;
+	dgInt32 m_edgeCount;
+	dgInt32 m_vertexCount;
+	dgInt32 m_interiorVertexCount;
+	
+};	
+
 dgBigVector dgMeshEffect::GetOrigin ()const
 {
     dgBigVector origin (dgFloat64 (0.0f), dgFloat64 (0.0f), dgFloat64 (0.0f), dgFloat64 (0.0f));	
@@ -511,7 +727,7 @@ void dgMeshEffect::UniformBoxMapping (dgInt32 material, const dgMatrix& textureM
 
 
 
-void dgMeshEffect::AngleBaseFlatteningMapping (dgInt32 cylinderMaterial)
+void dgMeshEffect::AngleBaseFlatteningMapping (dgInt32 material)
 {
-
+	dgAngleBasedFlatteningMapping angleBadedFlattening (this, material);
 }
