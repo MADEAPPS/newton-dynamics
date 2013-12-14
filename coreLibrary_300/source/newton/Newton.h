@@ -1118,8 +1118,10 @@ extern "C" {
 
 	NEWTON_API void NewtonMeshCalculateVertexNormals(const NewtonMesh* const mesh, dFloat angleInRadians);
 	NEWTON_API void NewtonMeshApplySphericalMapping(const NewtonMesh* const mesh, int material);
-	NEWTON_API void NewtonMeshApplyBoxMapping(const NewtonMesh* const mesh, int front, int side, int top);
 	NEWTON_API void NewtonMeshApplyCylindricalMapping(const NewtonMesh* const mesh, int cylinderMaterial, int capMaterial);
+	NEWTON_API void NewtonMeshApplyBoxMapping(const NewtonMesh* const mesh, int frontMaterial, int sideMaterial, int topMaterial);
+	NEWTON_API void NewtonMeshApplyAngleBasedMapping(const NewtonMesh* const mesh, int material);
+	
 	
 	NEWTON_API int NewtonMeshIsOpenMesh (const NewtonMesh* const mesh);
 	NEWTON_API void NewtonMeshFixTJoints (const NewtonMesh* const mesh);

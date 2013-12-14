@@ -161,6 +161,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	void BoxMapping (dgInt32 front, dgInt32 side, dgInt32 top);
 	void UniformBoxMapping (dgInt32 material, const dgMatrix& textruMatrix);
 	void CylindricalMapping (dgInt32 cylinderMaterial, dgInt32 capMaterial);
+	void AngleBaseFlatteningMapping (dgInt32 cylinderMaterial);
 
 	dgEdge* InsertEdgeVertex (dgEdge* const edge, dgFloat64 param);
 

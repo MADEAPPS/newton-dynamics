@@ -7927,6 +7927,13 @@ void NewtonMeshCalculateVertexNormals(const NewtonMesh* const mesh, dFloat angle
 	meshEffect->CalculateNormals (angleInRadians);
 }
 
+void NewtonMeshApplyAngleBasedMapping(const NewtonMesh* const mesh, int material)
+{
+	TRACE_FUNCTION(__FUNCTION__);	
+	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
+	meshEffect->AngleBaseFlatteningMapping(material);
+}
+
 void NewtonMeshApplySphericalMapping(const NewtonMesh* const mesh, int material)
 {
 	TRACE_FUNCTION(__FUNCTION__);	

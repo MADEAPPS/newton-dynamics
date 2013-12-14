@@ -511,4 +511,7 @@ void dgMeshEffect::UniformBoxMapping (dgInt32 material, const dgMatrix& textureM
 
 
 
+void dgMeshEffect::AngleBaseFlatteningMapping (dgInt32 cylinderMaterial)
+{
 
+}
