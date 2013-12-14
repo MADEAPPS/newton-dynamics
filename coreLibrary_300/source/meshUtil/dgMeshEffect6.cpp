@@ -19,14 +19,21 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+
+// algorithm from paper: Non-Distorted Texture Mapping Using Angle Based Flattening
+// by A. Sheffer and E. de Sturler
+// http://www.math.vt.edu/people/sturler/Publications/UIUCDCS-R-2001-2257.pdf
+// 
+// also improvement from paper: ABF++: Fast and Robust Angle Based Flattening
+// http://hal.archives-ouvertes.fr/docs/00/10/56/89/PDF/abf_plus_plus_temp.pdf
+// by: Alla Sheffer, Bruno Lévy, Inria Lorraine, Maxim Mogilnitsky and Alexander Bogomyakov
+
 #include "dgPhysicsStdafx.h"
 #include "dgWorld.h"
 #include "dgMeshEffect.h"
 
 
 #define dgABF_PI dgFloat64 (3.1415926535)
-
-
 
 class dgAngleBasedFlatteningMapping
 {
@@ -176,13 +183,12 @@ class dgAngleBasedFlatteningMapping
 
 	void CalculateUV ()
 	{
-		
 		dgInt32 mark = m_mesh->IncLRU();
 		for (dgInt32 i = 0; i < m_edgeCount; i ++) {
 			dgFace& face = m_faceArray[i];
-			if (face.m_incidenEdge->m_mark != mark) {
+			if ((face.m_incidenEdge->m_twin->m_incidentFace > 0) && face.m_incidenEdge->m_mark != mark) {
 				dgList<dgEdge*> stack(m_mesh->GetAllocator());
-				stack.Append(face.m_incidenEdge);
+				stack.Append(face.m_incidenEdge->m_twin);
 
  				dgEdge* const next = face.m_incidenEdge->m_next;
 				dgEdge* const prev = face.m_incidenEdge->m_prev;
@@ -197,13 +203,15 @@ class dgAngleBasedFlatteningMapping
 
 				face.m_u = dgFloat64 (0.0f);
 				face.m_v = dgFloat64 (0.0f);
-				nextFaceEdge.m_u = sqrt (p10 % p10);
-				nextFaceEdge.m_v = dgFloat64 (0.0f);
 
-				dgFloat64 e2length = nextFaceEdge.m_u * sin (prevFaceEdge.m_alpha) / sin (face.m_alpha);
+				dgFloat64 e0length = sqrt (p10 % p10);
+				dgFloat64 e2length = e0length  * sin (prevFaceEdge.m_alpha) / sin (face.m_alpha);
+
+				nextFaceEdge.m_u = e0length;
+				nextFaceEdge.m_v = dgFloat64 (0.0f);
+				
 				prevFaceEdge.m_u = face.m_u + e2length * cos (nextFaceEdge.m_alpha);
 				prevFaceEdge.m_v = face.m_v + e2length * sin (nextFaceEdge.m_alpha);
-
 
 				while (stack.GetCount()) {
 					dgEdge* const edge = stack.GetLast()->GetInfo();
@@ -215,6 +223,27 @@ class dgAngleBasedFlatteningMapping
 						edge->m_mark = mark;
 						next->m_mark = mark;
 						prev->m_mark = mark;
+
+						dgFace& faceEdge = m_faceArray[edge->m_incidentFace - 1];
+						dgFace& nextFaceEdge = m_faceArray[next->m_incidentFace - 1];
+						dgFace& prevFaceEdge = m_faceArray[prev->m_incidentFace - 1];
+						dgAssert (faceEdge.m_incidenEdge == edge);
+						dgAssert (nextFaceEdge.m_incidenEdge == next);
+						dgAssert (prevFaceEdge.m_incidenEdge == prev);
+
+						nextFaceEdge.m_u = m_faceArray[edge->m_twin->m_incidentFace - 1].m_u;
+						nextFaceEdge.m_v = m_faceArray[edge->m_twin->m_incidentFace - 1].m_v;
+						faceEdge.m_u = m_faceArray[edge->m_twin->m_next->m_incidentFace - 1].m_u;
+						faceEdge.m_v = m_faceArray[edge->m_twin->m_next->m_incidentFace - 1].m_v;
+
+						const dgBigVector& p0 = m_mesh->GetVertex(edge->m_incidentVertex);
+						const dgBigVector& p1 = m_mesh->GetVertex(next->m_incidentVertex);
+						dgBigVector p10 (p1 - p0);
+						dgFloat64 e0length = sqrt (p10 % p10);
+						dgFloat64 e2length = e0length  * sin (prevFaceEdge.m_alpha) / sin (face.m_alpha);
+
+						prevFaceEdge.m_u = faceEdge.m_u + e2length * cos (nextFaceEdge.m_alpha);
+						prevFaceEdge.m_v = faceEdge.m_v + e2length * sin (nextFaceEdge.m_alpha);
 
 						if (next->m_twin->m_incidentFace > 0) {
 							stack.Append(next->m_twin);
