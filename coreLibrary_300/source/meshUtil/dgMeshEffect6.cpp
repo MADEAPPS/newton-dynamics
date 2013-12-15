@@ -19,9 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
 // algorithm from paper: Non-Distorted Texture Mapping Using Angle Based Flattening
-// by A. Sheffer and E. de Sturler
+// by: A. Sheffer and E. de Sturler
 // http://www.math.vt.edu/people/sturler/Publications/UIUCDCS-R-2001-2257.pdf
 // 
 // also improvement from paper: ABF++: Fast and Robust Angle Based Flattening
@@ -32,195 +31,301 @@
 #include "dgWorld.h"
 #include "dgMeshEffect.h"
 
-
-#define dgABF_PI dgFloat64 (3.1415926535)
+#define dgABF_MAX_ITERATIONS	100
+#define dgABF_TOL				dgFloat64 (1.0e-3f)
+#define dgABF_TOL2				dgABF_TOL * dgABF_TOL
+#define dgABF_PI				dgFloat64 (3.1415926535)
 
 class dgAngleBasedFlatteningMapping
 {
-	enum dgABF_Type
-	{
-		m_interiorVertex = 0,
-		m_exteriorVertex,
-	};
-
-	class dgVertex
-	{
-		public:
-		dgEdge* m_incidentEdge;
-		dgABF_Type m_type;
-	};
-
-	class dgFace
-	{
-		public:
-		void Init (const dgMeshEffect* const mesh, dgEdge* const edge, dgInt32 enumerationID)
-		{
-			m_incidenEdge = edge;
-			m_incidenEdge->m_incidentFace = enumerationID + 1;
-
-			const dgBigVector& p0 = mesh->GetVertex(edge->m_prev->m_incidentVertex);
-			const dgBigVector& p1 = mesh->GetVertex(edge->m_incidentVertex);
-			const dgBigVector& p2 = mesh->GetVertex(edge->m_next->m_incidentVertex);
-
-			dgBigVector e10 (p1 - p0);
-			dgBigVector e20 (p2 - p0);
-
-			e10 = e10.Scale3 (dgFloat64 (1.0) / sqrt (e10 % e10));
-			e20 = e20.Scale3 (dgFloat64 (1.0) / sqrt (e20 % e20));
-			m_beta = acos (dgClamp(e10 % e20, dgFloat64 (0.0), dgABF_PI));
-			m_alpha = m_beta;
-		}
-
-		dgEdge* m_incidenEdge;
-		dgFloat64 m_alpha;
-		dgFloat64 m_beta;
-		dgFloat64 m_u;
-		dgFloat64 m_v;
-	};
-
 	public: 
 	dgAngleBasedFlatteningMapping (dgMeshEffect* const mesh, dgInt32 material)
-		:m_faceArray(1024, mesh->GetAllocator())
-		,m_vertexArray(1024, mesh->GetAllocator())
-		,m_mesh(mesh)
+		:m_mesh(mesh)
 		,m_material(material)
 	{
 		m_mesh->Triangulate();
-		m_vertexCount = m_mesh->GetVertexCount();
-		m_edgeCount = m_mesh->GetFaceCount() * 3;
-		m_interiorVertexCount = 0;
 
-		InitializeVertexTypeVector ();
-		InitializeFaceVector ();
+		dgInt32 vertexCount = m_mesh->GetVertexCount();
+
+		m_interiorVertexCount = 0;
+		m_anglesCount = m_mesh->GetFaceCount() * 3;
+
+		m_betaEdge = (dgEdge**) m_mesh->GetAllocator()->MallocLow(m_anglesCount * sizeof (dgEdge*));
+		m_interiorAngle = (bool*) m_mesh->GetAllocator()->MallocLow(m_anglesCount * sizeof (bool));
+		m_alpha = (dgFloat64*) m_mesh->GetAllocator()->MallocLow(m_anglesCount * sizeof (dgFloat64));
+		m_beta = (dgFloat64*) m_mesh->GetAllocator()->MallocLow(m_anglesCount * sizeof (dgFloat64));
+		m_weight= (dgFloat64*) m_mesh->GetAllocator()->MallocLow(m_anglesCount * sizeof (dgFloat64));
+		m_sinTable = (dgFloat64*) m_mesh->GetAllocator()->MallocLow(m_anglesCount * sizeof (dgFloat64));
+		m_cosTable = (dgFloat64*) m_mesh->GetAllocator()->MallocLow(m_anglesCount * sizeof (dgFloat64));
+		
+		m_alphaLamda = (dgFloat64*) m_mesh->GetAllocator()->MallocLow(m_anglesCount * sizeof (dgFloat64));
+		m_triangleLamda = (dgFloat64*) m_mesh->GetAllocator()->MallocLow(m_anglesCount * sizeof (dgFloat64));
+		m_interiorVertexWheelLamda = (dgFloat64*) m_mesh->GetAllocator()->MallocLow (vertexCount * sizeof (dgFloat64));
+		m_interiorVertexPlanarityLamda = (dgFloat64*) m_mesh->GetAllocator()->MallocLow (vertexCount * sizeof (dgFloat64));
+
+		m_alphaGradients = (dgFloat64*) m_mesh->GetAllocator()->MallocLow(m_anglesCount * sizeof (dgFloat64));
+		
+		m_uv = (dgTriplex*) m_mesh->GetAllocator()->MallocLow(m_anglesCount * sizeof (dgTriplex));
+
+		InitEdgeVector();
+		CalculateInitialAngles ();
 		if (m_interiorVertexCount) {
-			OptimizePlanrAngles();
+			memset (m_alphaLamda, 0, m_anglesCount * sizeof (dgFloat64));	
+			memset (m_triangleLamda, 0, m_anglesCount * sizeof (dgFloat64));	
+			memset (m_interiorVertexWheelLamda, 0, vertexCount * sizeof (dgFloat64));	
+			memset (m_interiorVertexPlanarityLamda, 0, vertexCount * sizeof (dgFloat64));	
+
+			LagrangeOptimization();
 		}
 		CalculateUV ();
 	}
 
 	~dgAngleBasedFlatteningMapping()
 	{
+		m_mesh->GetAllocator()->FreeLow (m_uv);
+		m_mesh->GetAllocator()->FreeLow (m_alphaLamda);
+		m_mesh->GetAllocator()->FreeLow (m_triangleLamda);
+		m_mesh->GetAllocator()->FreeLow (m_interiorVertexPlanarityLamda);
+		m_mesh->GetAllocator()->FreeLow (m_interiorVertexWheelLamda);
+		m_mesh->GetAllocator()->FreeLow (m_alphaGradients);
+	
+		m_mesh->GetAllocator()->FreeLow (m_cosTable);
+		m_mesh->GetAllocator()->FreeLow (m_sinTable);
+		m_mesh->GetAllocator()->FreeLow (m_weight);
+		m_mesh->GetAllocator()->FreeLow (m_beta);
+		m_mesh->GetAllocator()->FreeLow (m_alpha);
+		m_mesh->GetAllocator()->FreeLow (m_interiorAngle);
+		m_mesh->GetAllocator()->FreeLow (m_betaEdge);
 	}
 
-	void InitializeVertexTypeVector ()
+	void InitEdgeVector()
 	{
 		dgInt32 count = 0;
-
-		dgInt32 mark = m_mesh->IncLRU();
 		dgMeshEffect::Iterator iter (*m_mesh);
 		for (iter.Begin(); iter; iter ++) {
 			dgEdge* const edge = &iter.GetNode()->GetInfo();
+			if (edge->m_incidentFace > 0) {
+				m_betaEdge[count] = edge;
+				edge->m_incidentFace = count + 1;
+				count ++;
+				dgAssert (count <= m_anglesCount);
+				dgAssert (edge->m_next->m_next->m_next == edge);
+				
+			}
+		}
 
-			dgABF_Type vertexType = m_interiorVertex;
+		m_interiorVertexCount = 0;
+		memset (m_interiorAngle, false, m_anglesCount * sizeof (bool));
+		dgInt32 mark = m_mesh->IncLRU();		
+		for (dgInt32 i = 0; i < m_anglesCount; i ++) {
+			dgEdge* const edge = m_betaEdge[i];
 			if (edge->m_mark != mark) {
-				dgEdge* ptr = edge; 
+				bool isInterior = true;
+				dgEdge* ptr = edge;
 				do {
-					if (ptr->m_incidentFace < 0) {
-						vertexType = m_exteriorVertex;
-					}
-
+					isInterior &= (ptr->m_incidentFace > 0);
 					ptr->m_mark = mark;
 					ptr = ptr->m_twin->m_next;
 				} while (ptr != edge);
-				m_interiorVertexCount += (vertexType == m_interiorVertex) ? 1 : 0;
 
-				m_vertexArray[count].m_type = vertexType;
-				m_vertexArray[count].m_incidentEdge = edge;
-				count ++;
-				dgAssert (count <= m_vertexCount);
+				if (isInterior) {
+					m_interiorVertexCount ++;
+					ptr = edge;
+					do {
+						dgInt32 index = ptr->m_incidentFace - 1;
+						m_interiorAngle[index] = isInterior;
+						ptr = ptr->m_twin->m_next;
+					} while (ptr != edge);
+				}
 			}
 		}
-		dgAssert (count == m_vertexCount);
 	}
 
-	void InitializeFaceVector  ()
+
+	void CalculateInitialAngles ()
 	{
-		dgInt32 count = 0;
-		dgInt32 mark = m_mesh->IncLRU();
+		dgStack<dgFloat64> scale(m_anglesCount);
 
-		// calculate initial angles;
-		dgMeshEffect::Iterator iter (*m_mesh);
-		for (iter.Begin(); iter; iter ++) {
-			dgEdge* const face = &iter.GetNode()->GetInfo();
-			if ((face->m_incidentFace > 0) && (face->m_mark != mark)) {
-				dgAssert (face->m_next->m_next->m_next == face);
+		for (dgInt32 i = 0; i < m_anglesCount; i ++) {
+			dgEdge* const edge = m_betaEdge[i];
 
-				dgEdge* ptr = face; 
-				do {
-					// save the vertex index plus one in the face 
-					m_faceArray[count].Init(m_mesh, ptr, count);
-					count ++;
-					ptr->m_mark = mark;
-					ptr = ptr->m_next;
-				} while (ptr != face);
-				dgAssert (count <= m_edgeCount);
-			}
+			const dgBigVector& p0 = m_mesh->GetVertex(edge->m_incidentVertex);
+			const dgBigVector& p1 = m_mesh->GetVertex(edge->m_next->m_incidentVertex);
+			const dgBigVector& p2 = m_mesh->GetVertex(edge->m_prev->m_incidentVertex);
+
+			dgBigVector e10 (p1 - p0);
+			dgBigVector e20 (p2 - p0);
+
+			e10 = e10.Scale3 (dgFloat64 (1.0) / sqrt (e10 % e10));
+			e20 = e20.Scale3 (dgFloat64 (1.0) / sqrt (e20 % e20));
+
+			dgFloat64 angle = acos (dgClamp(e10 % e20, dgFloat64 (0.0), dgABF_PI));
+			m_beta[i] = angle;
+			m_alpha[i] = angle;
+			m_weight[i] = dgFloat64 (2.0f) / (angle * angle);
+			scale[i] = dgFloat64 (1.0f);
 		}
-		dgAssert (count == m_edgeCount);
 
-		// calculate weight factor
-		for (dgInt32 i = 0; i < m_vertexCount; i ++) {
-			if (m_vertexArray[i].m_type == m_interiorVertex) {
-				dgAssert (0);
-				dgVertex& vertex = m_vertexArray[i];
-				dgFloat64 sum = dgFloat64 (0.0f);
-
-				dgEdge* ptr = vertex.m_incidentEdge; 
+		dgInt32 mark = m_mesh->IncLRU();
+		for (dgInt32 i = 0; i < m_anglesCount; i ++) {
+			dgEdge* const edge = m_betaEdge[i];
+			if ((edge->m_mark != mark) && m_interiorAngle[i]) {
+				dgFloat64 scale = dgFloat64 (0.0f);
+				dgEdge* ptr = edge; 
 				do {
-					dgInt32 faceIndex = ptr->m_incidentFace - 1;
-					sum += m_faceArray[faceIndex].m_beta;
+					dgInt32 index = ptr->m_incidentFace - 1;
+					scale += m_beta[index];
 					ptr->m_mark = mark;
 					ptr = ptr->m_twin->m_next;
-				} while (ptr != vertex.m_incidentEdge);
+				} while (ptr != edge);
+				dgAssert (scale > dgFloat32 (0.0f));
+
+				scale = dgFloat64 (2.0f) * dgABF_PI / scale;
+				ptr = edge;
+				do {
+					dgInt32 index = ptr->m_incidentFace - 1;
+					m_beta[index] *= scale;
+					m_alpha[index] *= scale;
+					ptr = ptr->m_twin->m_next;
+				} while (ptr != edge);
 			}
 		}
 	}
 
-	void OptimizePlanrAngles()
+
+	void LagrangeOptimization()
 	{
-		dgAssert (0);
+		dgFloat64 error2 = CalculateGradientVector ();
+		for (dgInt32 i = 0; (i < dgABF_MAX_ITERATIONS) && (error2 > dgABF_TOL2); i++) {
+//			dgAssert (0);
+		}
 	}
+
+
+	dgFloat64 CalculateAlphaGradient (dgInt32 alphaIndex) const
+	{
+		dgEdge* const edge = m_betaEdge[alphaIndex];
+		dgInt32 index0 = edge->m_incidentFace - 1;
+		dgInt32 index1 = edge->m_next->m_incidentFace - 1;
+		dgInt32 index2 = edge->m_prev->m_incidentFace - 1;
+
+		dgAssert (index0 == alphaIndex);
+		return (m_alpha[index0] - m_beta[index1]) * m_weight[index2] + m_alphaLamda[alphaIndex];
+	}
+
+	dgFloat64 CalculateInteriorVertexGradient (dgInt32 alphaIndex) const
+	{
+		dgEdge* const edge = m_betaEdge[alphaIndex];
+		return m_interiorVertexPlanarityLamda[edge->m_incidentVertex] * dgFloat64 (m_interiorAngle[alphaIndex]);
+	}
+
+	dgFloat64 CalculatePlanarityGradient (dgInt32 alphaIndex) const
+	{
+		dgFloat64 gradient = dgFloat64 (0.0f);
+		dgEdge* const incidentEdge = m_betaEdge[alphaIndex];
+
+		dgInt32 index1 = incidentEdge->m_next->m_incidentFace - 1;
+		if (m_interiorAngle[index1]) {
+			dgEdge* const edge = m_betaEdge[index1];
+			dgEdge* const alphaEdge = edge->m_prev;
+			dgFloat64 product = m_cosTable[alphaEdge->m_incidentFace - 1];
+			dgEdge* ptr = edge->m_twin->m_next;
+			do {
+				dgEdge* const alphaEdge = edge->m_prev;
+				product *= m_sinTable[alphaEdge->m_incidentFace - 1];
+				ptr = ptr->m_twin->m_next;
+			} while (ptr != edge);
+			gradient += product;
+		}
+
+		dgInt32 index2 = incidentEdge->m_prev->m_incidentFace - 1;
+		if (m_interiorAngle[index2]) {
+			dgEdge* const edge = m_betaEdge[index2];
+			dgEdge* const alphaEdge = edge->m_next;
+			dgFloat64 product = m_cosTable[alphaEdge->m_incidentFace - 1];
+			dgEdge* ptr = edge->m_twin->m_next;
+			do {
+				dgEdge* const alphaEdge = edge->m_next;
+				product *= m_sinTable[alphaEdge->m_incidentFace - 1];
+				ptr = ptr->m_twin->m_next;
+			} while (ptr != edge);
+			gradient -= product;
+		}
+		return gradient;
+	}
+
+	dgFloat64 CalculateGradientVector ()
+	{
+		dgFloat64 error2 = dgFloat64 (0.0f);
+
+		for (dgInt32 i = 0; i < m_anglesCount; i ++) {
+			m_sinTable[i] = sin (m_alpha[i]);
+			m_cosTable[i] = cos (m_alpha[i]);
+		}
+
+		// calculate the new face angular gradients
+		for (dgInt32 i = 0; i < m_anglesCount; i ++) {
+			dgFloat64 gradient = CalculateAlphaGradient (i) + CalculateInteriorVertexGradient(i) + CalculatePlanarityGradient (i);
+			m_alphaGradients[i] = -gradient;
+			error2 += gradient * gradient;
+		}
+
+		return error2;
+	}
+
 
 	void CalculateUV ()
 	{
+		memset (m_uv, 0, m_anglesCount * sizeof (m_uv[0]));
 		dgInt32 mark = m_mesh->IncLRU();
-		for (dgInt32 i = 0; i < m_edgeCount; i ++) {
-			dgFace& face = m_faceArray[i];
-			if ((face.m_incidenEdge->m_twin->m_incidentFace > 0) && face.m_incidenEdge->m_mark != mark) {
-				dgList<dgEdge*> stack(m_mesh->GetAllocator());
-				stack.Append(face.m_incidenEdge->m_twin);
+		for (dgInt32 i = 0; i < m_anglesCount; i ++) {
+			dgEdge* const face = m_betaEdge[i];
+			if ((face->m_twin->m_incidentFace > 0) && face->m_mark != mark) {
+				face->m_mark = mark;
+				face->m_next->m_mark = mark;
+				face->m_prev->m_mark = mark;
 
- 				dgEdge* const next = face.m_incidenEdge->m_next;
-				dgEdge* const prev = face.m_incidenEdge->m_prev;
-				dgFace& nextFaceEdge = m_faceArray[next->m_incidentFace - 1];
-				dgFace& prevFaceEdge = m_faceArray[prev->m_incidentFace - 1];
-				dgAssert (nextFaceEdge.m_incidenEdge == next);
-				dgAssert (prevFaceEdge.m_incidenEdge == prev);
+				dgInt32 edgeIndex0 = face->m_incidentFace - 1;
+				dgInt32 edgeIndex1 = face->m_next->m_incidentFace - 1;
+				dgInt32 edgeIndex2 = face->m_prev->m_incidentFace - 1;
 
-				const dgBigVector& p0 = m_mesh->GetVertex(face.m_incidenEdge->m_incidentVertex);
-				const dgBigVector& p1 = m_mesh->GetVertex(next->m_incidentVertex);
+				const dgBigVector& p0 = m_mesh->GetVertex(face->m_incidentVertex);
+				const dgBigVector& p1 = m_mesh->GetVertex(face->m_next->m_incidentVertex);
 				dgBigVector p10 (p1 - p0);
-
-				face.m_u = dgFloat64 (0.0f);
-				face.m_v = dgFloat64 (0.0f);
-
 				dgFloat64 e0length = sqrt (p10 % p10);
-				dgFloat64 e2length = e0length  * sin (prevFaceEdge.m_alpha) / sin (face.m_alpha);
+				
+				m_uv[edgeIndex0].m_x = dgFloat32 (0.0f);
+				m_uv[edgeIndex0].m_y = dgFloat32 (0.0f);
+				
+				m_uv[edgeIndex1].m_x = dgFloat32 (e0length);
+				m_uv[edgeIndex1].m_y = dgFloat32 (0.0f);
 
-				nextFaceEdge.m_u = e0length;
-				nextFaceEdge.m_v = dgFloat64 (0.0f);
-
-				dgFloat64 du (nextFaceEdge.m_u - face.m_u);
-				dgFloat64 dv (nextFaceEdge.m_v - face.m_v);
+				dgFloat64 e2length = e0length * sin (m_alpha[edgeIndex1]) / sin (m_alpha[edgeIndex2]);
+				dgFloat64 du (m_uv[edgeIndex1].m_x - m_uv[edgeIndex0].m_x);
+				dgFloat64 dv (m_uv[edgeIndex1].m_y - m_uv[edgeIndex0].m_y);
 				dgFloat64 refAngle = atan2 (dv, du);
 				
-				prevFaceEdge.m_u = face.m_u + e2length * cos (nextFaceEdge.m_alpha + refAngle);
-				prevFaceEdge.m_v = face.m_v + e2length * sin (nextFaceEdge.m_alpha + refAngle);
+				m_uv[edgeIndex2].m_x = m_uv[edgeIndex0].m_x + dgFloat32 (e2length * cos (m_alpha[edgeIndex0] + refAngle));
+				m_uv[edgeIndex2].m_y = m_uv[edgeIndex0].m_y + dgFloat32 (e2length * sin (m_alpha[edgeIndex0] + refAngle));
+
+				dgList<dgEdge*> stack(m_mesh->GetAllocator());
+				if (face->m_twin->m_incidentFace > 0) {
+					stack.Append(face->m_twin);
+				}
+				if (face->m_next->m_twin->m_incidentFace > 0) {
+					stack.Append(face->m_next->m_twin);
+				}
+
+				if (face->m_prev->m_twin->m_incidentFace > 0) {
+					stack.Append(face->m_prev->m_twin);
+				}
 
 				while (stack.GetCount()) {
 					dgEdge* const edge = stack.GetLast()->GetInfo();
 					stack.Remove (stack.GetLast());
 					if (edge->m_mark != mark) {
+						dgAssert (edge->m_incidentFace > 0);
+
 						dgEdge* const next = edge->m_next;
 						dgEdge* const prev = edge->m_prev;
 
@@ -228,30 +333,29 @@ class dgAngleBasedFlatteningMapping
 						next->m_mark = mark;
 						prev->m_mark = mark;
 
-						dgFace& faceEdge = m_faceArray[edge->m_incidentFace - 1];
-						dgFace& nextFaceEdge = m_faceArray[next->m_incidentFace - 1];
-						dgFace& prevFaceEdge = m_faceArray[prev->m_incidentFace - 1];
-						dgAssert (faceEdge.m_incidenEdge == edge);
-						dgAssert (nextFaceEdge.m_incidenEdge == next);
-						dgAssert (prevFaceEdge.m_incidenEdge == prev);
+						dgInt32 edgeIndex0 = edge->m_incidentFace - 1;
+						dgInt32 edgeIndex1 = next->m_incidentFace - 1;
+						dgInt32 edgeIndex2 = prev->m_incidentFace - 1;
 
-						nextFaceEdge.m_u = m_faceArray[edge->m_twin->m_incidentFace - 1].m_u;
-						nextFaceEdge.m_v = m_faceArray[edge->m_twin->m_incidentFace - 1].m_v;
-						faceEdge.m_u = m_faceArray[edge->m_twin->m_next->m_incidentFace - 1].m_u;
-						faceEdge.m_v = m_faceArray[edge->m_twin->m_next->m_incidentFace - 1].m_v;
+						m_uv[edgeIndex0].m_x = m_uv[edge->m_twin->m_next->m_incidentFace - 1].m_x;
+						m_uv[edgeIndex0].m_y = m_uv[edge->m_twin->m_next->m_incidentFace - 1].m_y;
+
+						m_uv[edgeIndex1].m_x = m_uv[edge->m_twin->m_incidentFace - 1].m_x;
+						m_uv[edgeIndex1].m_y = m_uv[edge->m_twin->m_incidentFace - 1].m_y;
 
 						const dgBigVector& p0 = m_mesh->GetVertex(edge->m_incidentVertex);
 						const dgBigVector& p1 = m_mesh->GetVertex(next->m_incidentVertex);
 						dgBigVector p10 (p1 - p0);
-						dgFloat64 e0length = sqrt (p10 % p10);
-						dgFloat64 e2length = e0length  * sin (prevFaceEdge.m_alpha) / sin (face.m_alpha);
 
-						dgFloat64 du (nextFaceEdge.m_u - faceEdge.m_u);
-						dgFloat64 dv (nextFaceEdge.m_v - faceEdge.m_v);
+						dgFloat64 e0length = sqrt (p10 % p10);
+						dgFloat64 e2length = e0length * sin (m_alpha[edgeIndex1]) / sin (m_alpha[edgeIndex2]);
+
+						dgFloat64 du (m_uv[edgeIndex1].m_x - m_uv[edgeIndex0].m_x);
+						dgFloat64 dv (m_uv[edgeIndex1].m_y - m_uv[edgeIndex0].m_y);
 						dgFloat64 refAngle = atan2 (dv, du);
 
-						prevFaceEdge.m_u = faceEdge.m_u + e2length * cos (nextFaceEdge.m_alpha + refAngle);
-						prevFaceEdge.m_v = faceEdge.m_v + e2length * sin (nextFaceEdge.m_alpha + refAngle);
+						m_uv[edgeIndex2].m_x = m_uv[edgeIndex0].m_x + dgFloat32 (e2length * cos (m_alpha[edgeIndex0] + refAngle));
+						m_uv[edgeIndex2].m_y = m_uv[edgeIndex0].m_y + dgFloat32 (e2length * sin (m_alpha[edgeIndex0] + refAngle));
 
 						if (next->m_twin->m_incidentFace > 0) {
 							stack.Append(next->m_twin);
@@ -263,18 +367,32 @@ class dgAngleBasedFlatteningMapping
 				} 
 			}
 		}
-		
 	}
-	
-	dgArray<dgFace> m_faceArray; 
-	dgArray<dgVertex> m_vertexArray; 
+
 
 	dgMeshEffect* m_mesh;
 	dgInt32 m_material;
-	dgInt32 m_edgeCount;
-	dgInt32 m_vertexCount;
+
+	dgEdge** m_betaEdge;
+	bool* m_interiorAngle;
+
+	dgFloat64* m_alpha;
+	dgFloat64* m_beta;
+	dgFloat64* m_weight;
+	dgFloat64* m_sinTable;
+	dgFloat64* m_cosTable;
+	dgFloat64* m_alphaLamda;
+	dgFloat64* m_triangleLamda;
+	dgFloat64* m_interiorVertexWheelLamda;
+	dgFloat64* m_interiorVertexPlanarityLamda;
+
+	dgFloat64* m_alphaGradients;
+
+	dgTriplex* m_uv;
+
+
+	dgInt32 m_anglesCount;
 	dgInt32 m_interiorVertexCount;
-	
 };	
 
 dgBigVector dgMeshEffect::GetOrigin ()const
