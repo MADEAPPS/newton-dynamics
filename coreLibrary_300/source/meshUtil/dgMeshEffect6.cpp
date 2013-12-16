@@ -101,22 +101,27 @@ class dgAngleBasedFlatteningMapping
 	void InitEdgeVector()
 	{
 		dgInt32 count = 0;
+		dgInt32 mark = m_mesh->IncLRU();
 		dgMeshEffect::Iterator iter (*m_mesh);
 		for (iter.Begin(); iter; iter ++) {
 			dgEdge* const edge = &iter.GetNode()->GetInfo();
-			if (edge->m_incidentFace > 0) {
-				m_betaEdge[count] = edge;
-				edge->m_incidentFace = count + 1;
-				count ++;
-				dgAssert (count <= m_anglesCount);
+			if ((edge->m_incidentFace > 0) && (edge->m_mark != mark)) {
+				dgEdge *ptr = edge;
+				do {
+					ptr->m_mark = mark;
+					m_betaEdge[count] = ptr;
+					ptr->m_incidentFace = count + 1;
+					count ++;
+					dgAssert (count <= m_anglesCount);
+					ptr = ptr->m_next;
+				} while (ptr != edge);
 				dgAssert (edge->m_next->m_next->m_next == edge);
-				
 			}
 		}
 
 		m_interiorVertexCount = 0;
 		memset (m_interiorAngle, false, m_anglesCount * sizeof (bool));
-		dgInt32 mark = m_mesh->IncLRU();		
+		mark = m_mesh->IncLRU();		
 		for (dgInt32 i = 0; i < m_anglesCount; i ++) {
 			dgEdge* const edge = m_betaEdge[i];
 			if (edge->m_mark != mark) {
@@ -141,6 +146,100 @@ class dgAngleBasedFlatteningMapping
 		}
 	}
 
+	void CalculateUV ()
+	{
+		memset (m_uv, 0, m_anglesCount * sizeof (m_uv[0]));
+		dgInt32 mark = m_mesh->IncLRU();
+		for (dgInt32 i = 0; i < m_anglesCount; i ++) {
+			dgEdge* const face = m_betaEdge[i];
+			if ((face->m_twin->m_incidentFace > 0) && face->m_mark != mark) {
+				face->m_mark = mark;
+				face->m_next->m_mark = mark;
+				face->m_prev->m_mark = mark;
+
+				dgInt32 edgeIndex0 = face->m_incidentFace - 1;
+				dgInt32 edgeIndex1 = face->m_next->m_incidentFace - 1;
+				dgInt32 edgeIndex2 = face->m_prev->m_incidentFace - 1;
+
+				const dgBigVector& p0 = m_mesh->GetVertex(face->m_incidentVertex);
+				const dgBigVector& p1 = m_mesh->GetVertex(face->m_next->m_incidentVertex);
+				dgBigVector p10 (p1 - p0);
+				dgFloat64 e0length = sqrt (p10 % p10);
+
+				m_uv[edgeIndex0].m_x = dgFloat32 (0.0f);
+				m_uv[edgeIndex0].m_y = dgFloat32 (0.0f);
+
+				m_uv[edgeIndex1].m_x = dgFloat32 (e0length);
+				m_uv[edgeIndex1].m_y = dgFloat32 (0.0f);
+
+				dgFloat64 e2length = e0length * sin (m_alpha[edgeIndex1]) / sin (m_alpha[edgeIndex2]);
+				dgFloat64 du (m_uv[edgeIndex1].m_x - m_uv[edgeIndex0].m_x);
+				dgFloat64 dv (m_uv[edgeIndex1].m_y - m_uv[edgeIndex0].m_y);
+				dgFloat64 refAngle = atan2 (dv, du);
+
+				m_uv[edgeIndex2].m_x = m_uv[edgeIndex0].m_x + dgFloat32 (e2length * cos (m_alpha[edgeIndex0] + refAngle));
+				m_uv[edgeIndex2].m_y = m_uv[edgeIndex0].m_y + dgFloat32 (e2length * sin (m_alpha[edgeIndex0] + refAngle));
+
+				dgList<dgEdge*> stack(m_mesh->GetAllocator());
+				if (face->m_twin->m_incidentFace > 0) {
+					stack.Append(face->m_twin);
+				}
+				if (face->m_next->m_twin->m_incidentFace > 0) {
+					stack.Append(face->m_next->m_twin);
+				}
+
+				if (face->m_prev->m_twin->m_incidentFace > 0) {
+					stack.Append(face->m_prev->m_twin);
+				}
+
+				while (stack.GetCount()) {
+					dgEdge* const edge = stack.GetLast()->GetInfo();
+					stack.Remove (stack.GetLast());
+					if (edge->m_mark != mark) {
+						dgAssert (edge->m_incidentFace > 0);
+
+						dgEdge* const next = edge->m_next;
+						dgEdge* const prev = edge->m_prev;
+
+						edge->m_mark = mark;
+						next->m_mark = mark;
+						prev->m_mark = mark;
+
+						dgInt32 edgeIndex0 = edge->m_incidentFace - 1;
+						dgInt32 edgeIndex1 = next->m_incidentFace - 1;
+						dgInt32 edgeIndex2 = prev->m_incidentFace - 1;
+
+						m_uv[edgeIndex0].m_x = m_uv[edge->m_twin->m_next->m_incidentFace - 1].m_x;
+						m_uv[edgeIndex0].m_y = m_uv[edge->m_twin->m_next->m_incidentFace - 1].m_y;
+
+						m_uv[edgeIndex1].m_x = m_uv[edge->m_twin->m_incidentFace - 1].m_x;
+						m_uv[edgeIndex1].m_y = m_uv[edge->m_twin->m_incidentFace - 1].m_y;
+
+						const dgBigVector& p0 = m_mesh->GetVertex(edge->m_incidentVertex);
+						const dgBigVector& p1 = m_mesh->GetVertex(next->m_incidentVertex);
+						dgBigVector p10 (p1 - p0);
+
+						dgFloat64 e0length = sqrt (p10 % p10);
+						dgFloat64 e2length = e0length * sin (m_alpha[edgeIndex1]) / sin (m_alpha[edgeIndex2]);
+
+						dgFloat64 du (m_uv[edgeIndex1].m_x - m_uv[edgeIndex0].m_x);
+						dgFloat64 dv (m_uv[edgeIndex1].m_y - m_uv[edgeIndex0].m_y);
+						dgFloat64 refAngle = atan2 (dv, du);
+
+						m_uv[edgeIndex2].m_x = m_uv[edgeIndex0].m_x + dgFloat32 (e2length * cos (m_alpha[edgeIndex0] + refAngle));
+						m_uv[edgeIndex2].m_y = m_uv[edgeIndex0].m_y + dgFloat32 (e2length * sin (m_alpha[edgeIndex0] + refAngle));
+
+						if (next->m_twin->m_incidentFace > 0) {
+							stack.Append(next->m_twin);
+						}
+						if (prev->m_twin->m_incidentFace > 0) {
+							stack.Append(prev->m_twin);
+						}
+					}
+				} 
+			}
+		}
+	}
 
 	void CalculateInitialAngles ()
 	{
@@ -270,104 +369,14 @@ class dgAngleBasedFlatteningMapping
 			error2 += gradient * gradient;
 		}
 
+		for (dgInt32 i = 0; i < m_anglesCount; i ++) {
+			dgAssert(0);
+		}
+
 		return error2;
 	}
 
 
-	void CalculateUV ()
-	{
-		memset (m_uv, 0, m_anglesCount * sizeof (m_uv[0]));
-		dgInt32 mark = m_mesh->IncLRU();
-		for (dgInt32 i = 0; i < m_anglesCount; i ++) {
-			dgEdge* const face = m_betaEdge[i];
-			if ((face->m_twin->m_incidentFace > 0) && face->m_mark != mark) {
-				face->m_mark = mark;
-				face->m_next->m_mark = mark;
-				face->m_prev->m_mark = mark;
-
-				dgInt32 edgeIndex0 = face->m_incidentFace - 1;
-				dgInt32 edgeIndex1 = face->m_next->m_incidentFace - 1;
-				dgInt32 edgeIndex2 = face->m_prev->m_incidentFace - 1;
-
-				const dgBigVector& p0 = m_mesh->GetVertex(face->m_incidentVertex);
-				const dgBigVector& p1 = m_mesh->GetVertex(face->m_next->m_incidentVertex);
-				dgBigVector p10 (p1 - p0);
-				dgFloat64 e0length = sqrt (p10 % p10);
-				
-				m_uv[edgeIndex0].m_x = dgFloat32 (0.0f);
-				m_uv[edgeIndex0].m_y = dgFloat32 (0.0f);
-				
-				m_uv[edgeIndex1].m_x = dgFloat32 (e0length);
-				m_uv[edgeIndex1].m_y = dgFloat32 (0.0f);
-
-				dgFloat64 e2length = e0length * sin (m_alpha[edgeIndex1]) / sin (m_alpha[edgeIndex2]);
-				dgFloat64 du (m_uv[edgeIndex1].m_x - m_uv[edgeIndex0].m_x);
-				dgFloat64 dv (m_uv[edgeIndex1].m_y - m_uv[edgeIndex0].m_y);
-				dgFloat64 refAngle = atan2 (dv, du);
-				
-				m_uv[edgeIndex2].m_x = m_uv[edgeIndex0].m_x + dgFloat32 (e2length * cos (m_alpha[edgeIndex0] + refAngle));
-				m_uv[edgeIndex2].m_y = m_uv[edgeIndex0].m_y + dgFloat32 (e2length * sin (m_alpha[edgeIndex0] + refAngle));
-
-				dgList<dgEdge*> stack(m_mesh->GetAllocator());
-				if (face->m_twin->m_incidentFace > 0) {
-					stack.Append(face->m_twin);
-				}
-				if (face->m_next->m_twin->m_incidentFace > 0) {
-					stack.Append(face->m_next->m_twin);
-				}
-
-				if (face->m_prev->m_twin->m_incidentFace > 0) {
-					stack.Append(face->m_prev->m_twin);
-				}
-
-				while (stack.GetCount()) {
-					dgEdge* const edge = stack.GetLast()->GetInfo();
-					stack.Remove (stack.GetLast());
-					if (edge->m_mark != mark) {
-						dgAssert (edge->m_incidentFace > 0);
-
-						dgEdge* const next = edge->m_next;
-						dgEdge* const prev = edge->m_prev;
-
-						edge->m_mark = mark;
-						next->m_mark = mark;
-						prev->m_mark = mark;
-
-						dgInt32 edgeIndex0 = edge->m_incidentFace - 1;
-						dgInt32 edgeIndex1 = next->m_incidentFace - 1;
-						dgInt32 edgeIndex2 = prev->m_incidentFace - 1;
-
-						m_uv[edgeIndex0].m_x = m_uv[edge->m_twin->m_next->m_incidentFace - 1].m_x;
-						m_uv[edgeIndex0].m_y = m_uv[edge->m_twin->m_next->m_incidentFace - 1].m_y;
-
-						m_uv[edgeIndex1].m_x = m_uv[edge->m_twin->m_incidentFace - 1].m_x;
-						m_uv[edgeIndex1].m_y = m_uv[edge->m_twin->m_incidentFace - 1].m_y;
-
-						const dgBigVector& p0 = m_mesh->GetVertex(edge->m_incidentVertex);
-						const dgBigVector& p1 = m_mesh->GetVertex(next->m_incidentVertex);
-						dgBigVector p10 (p1 - p0);
-
-						dgFloat64 e0length = sqrt (p10 % p10);
-						dgFloat64 e2length = e0length * sin (m_alpha[edgeIndex1]) / sin (m_alpha[edgeIndex2]);
-
-						dgFloat64 du (m_uv[edgeIndex1].m_x - m_uv[edgeIndex0].m_x);
-						dgFloat64 dv (m_uv[edgeIndex1].m_y - m_uv[edgeIndex0].m_y);
-						dgFloat64 refAngle = atan2 (dv, du);
-
-						m_uv[edgeIndex2].m_x = m_uv[edgeIndex0].m_x + dgFloat32 (e2length * cos (m_alpha[edgeIndex0] + refAngle));
-						m_uv[edgeIndex2].m_y = m_uv[edgeIndex0].m_y + dgFloat32 (e2length * sin (m_alpha[edgeIndex0] + refAngle));
-
-						if (next->m_twin->m_incidentFace > 0) {
-							stack.Append(next->m_twin);
-						}
-						if (prev->m_twin->m_incidentFace > 0) {
-							stack.Append(prev->m_twin);
-						}
-					}
-				} 
-			}
-		}
-	}
 
 
 	dgMeshEffect* m_mesh;
@@ -881,8 +890,58 @@ void dgMeshEffect::UniformBoxMapping (dgInt32 material, const dgMatrix& textureM
 }
 
 
+class xxxxxxx: public SymmetricBiconjugateGradientSolve
+{
+	public:
+	dgFloat64 a[3][3];
+
+	xxxxxxx()
+		:SymmetricBiconjugateGradientSolve(3)
+	{
+		dgFloat64 b[] = {1, 2, 3};
+		dgFloat64 x[] = {0, 0, 0};
+		dgFloat64 c[3];
+
+		dgMatrix aaa (dgPitchMatrix(30.0f * 3.141592f / 180.0f) * dgYawMatrix(30.0f * 3.141592f / 180.0f));
+		dgMatrix bbb = aaa.Transpose();
+		bbb[1] = bbb[1].Scale3 (2.0f);
+		bbb[2] = bbb[2].Scale3 (2.0f);
+		aaa = aaa * bbb;
+
+		for (int i = 0; i < 3; i ++) {
+			for (int j = 0; j < 3; j ++) {
+				a[i][j] = aaa[i][j];
+			}
+		}
+
+		Solve (dgFloat64  (1.0e-10f), x, b);
+
+		MatrixTimeVector (c, x);
+		MatrixTimeVector (c, x);
+	}
+
+	void MatrixTimeVector (dgFloat64* const out, const dgFloat64* const v) const
+	{
+		out[0] = a[0][0] * v[0] +  a[0][1] * v[1] +  a[0][2] * v[2];
+		out[1] = a[1][0] * v[0] +  a[1][1] * v[1] +  a[1][2] * v[2];
+		out[2] = a[2][0] * v[0] +  a[2][1] * v[1] +  a[2][2] * v[2];
+	}
+
+	void InversePrecoditionerTimeVector (dgFloat64* const out, const dgFloat64* const v) const
+	{
+		out[0] = v[0] / a[0][0];
+		out[1] = v[1] / a[1][1];
+		out[2] = v[2] / a[2][2];
+	}
+
+};
+
 
 void dgMeshEffect::AngleBaseFlatteningMapping (dgInt32 material)
 {
+
+xxxxxxx xx;
+
+
 	dgAngleBasedFlatteningMapping angleBadedFlattening (this, material);
 }
