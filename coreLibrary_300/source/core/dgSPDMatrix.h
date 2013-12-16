@@ -239,20 +239,20 @@ void dgSPDMatrix<T>::DownDateCholeskyDecomposition (dgInt32 column)
 class SymmetricBiconjugateGradientSolve
 {
 	public:
-	SymmetricBiconjugateGradientSolve (dgInt32 size);
+	SymmetricBiconjugateGradientSolve ();
 	~SymmetricBiconjugateGradientSolve ();	
 
-	void Solve (dgFloat64 tolerance, dgFloat64* const x, const dgFloat64* const b) const;
+	void Solve (dgInt32 size, dgFloat64 tolerance, dgFloat64* const x, const dgFloat64* const b) const;
 
 	protected:
-	dgFloat64 DotProduct (const dgFloat64* const b, const dgFloat64* const c) const;
-	void ScaleAdd (dgFloat64* const a, const dgFloat64* const b, dgFloat64 scale, const dgFloat64* const c) const;
-	void Sub (dgFloat64* const a, const dgFloat64* const b, const dgFloat64* const c) const;
-
 	virtual void MatrixTimeVector (dgFloat64* const out, const dgFloat64* const v) const = 0;
 	virtual void InversePrecoditionerTimeVector (dgFloat64* const out, const dgFloat64* const v) const = 0;
 
-	dgInt32 m_size;
+	private:
+	dgFloat64 DotProduct (dgInt32 size, const dgFloat64* const b, const dgFloat64* const c) const;
+	void ScaleAdd (dgInt32 size, dgFloat64* const a, const dgFloat64* const b, dgFloat64 scale, const dgFloat64* const c) const;
+	void Sub (dgInt32 size, dgFloat64* const a, const dgFloat64* const b, const dgFloat64* const c) const;
+
 };
 
 

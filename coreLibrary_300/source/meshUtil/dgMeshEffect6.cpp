@@ -36,7 +36,7 @@
 #define dgABF_TOL2				dgABF_TOL * dgABF_TOL
 #define dgABF_PI				dgFloat64 (3.1415926535)
 
-class dgAngleBasedFlatteningMapping
+class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 {
 	public: 
 	dgAngleBasedFlatteningMapping (dgMeshEffect* const mesh, dgInt32 material)
@@ -292,14 +292,6 @@ class dgAngleBasedFlatteningMapping
 	}
 
 
-	void LagrangeOptimization()
-	{
-		dgFloat64 error2 = CalculateGradientVector ();
-		for (dgInt32 i = 0; (i < dgABF_MAX_ITERATIONS) && (error2 > dgABF_TOL2); i++) {
-//			dgAssert (0);
-		}
-	}
-
 
 	dgFloat64 CalculateAlphaGradient (dgInt32 alphaIndex) const
 	{
@@ -376,6 +368,26 @@ class dgAngleBasedFlatteningMapping
 		return error2;
 	}
 
+
+	void MatrixTimeVector (dgFloat64* const out, const dgFloat64* const v) const
+	{
+		dgAssert (0);
+	}
+
+	void InversePrecoditionerTimeVector (dgFloat64* const out, const dgFloat64* const v) const
+	{
+		dgAssert (0);
+	}
+
+
+	void LagrangeOptimization()
+	{
+		dgFloat64 error2 = CalculateGradientVector ();
+		for (dgInt32 i = 0; (i < dgABF_MAX_ITERATIONS) && (error2 > dgABF_TOL2); i++) {
+			//	dgAssert (0);
+			//Solve();
+		}
+	}
 
 
 
@@ -896,7 +908,7 @@ class xxxxxxx: public SymmetricBiconjugateGradientSolve
 	dgFloat64 a[3][3];
 
 	xxxxxxx()
-		:SymmetricBiconjugateGradientSolve(3)
+		:SymmetricBiconjugateGradientSolve()
 	{
 		dgFloat64 b[] = {1, 2, 3};
 		dgFloat64 x[] = {0, 0, 0};
@@ -914,7 +926,7 @@ class xxxxxxx: public SymmetricBiconjugateGradientSolve
 			}
 		}
 
-		Solve (dgFloat64  (1.0e-10f), x, b);
+		Solve (3, dgFloat64  (1.0e-10f), x, b);
 
 		MatrixTimeVector (c, x);
 		MatrixTimeVector (c, x);

@@ -253,8 +253,7 @@ bool CholeskyDecomposition (dgFloat32 **rows, dgInt32 size)
 */
 
 
-SymmetricBiconjugateGradientSolve::SymmetricBiconjugateGradientSolve (dgInt32 size)
-	:m_size (size)
+SymmetricBiconjugateGradientSolve::SymmetricBiconjugateGradientSolve ()
 {
 }
 
@@ -263,36 +262,36 @@ SymmetricBiconjugateGradientSolve::~SymmetricBiconjugateGradientSolve ()
 }
 
 
-void SymmetricBiconjugateGradientSolve::ScaleAdd (dgFloat64* const a, const dgFloat64* const b, dgFloat64 scale, const dgFloat64* const c) const
+void SymmetricBiconjugateGradientSolve::ScaleAdd (dgInt32 size, dgFloat64* const a, const dgFloat64* const b, dgFloat64 scale, const dgFloat64* const c) const
 {
-	for (dgInt32 i = 0; i < m_size; i ++) {
+	for (dgInt32 i = 0; i < size; i ++) {
 		a[i] = b[i] + scale * c[i];
 	}
 }
 
-void SymmetricBiconjugateGradientSolve::Sub (dgFloat64* const a, const dgFloat64* const b, const dgFloat64* const c) const
+void SymmetricBiconjugateGradientSolve::Sub (dgInt32 size, dgFloat64* const a, const dgFloat64* const b, const dgFloat64* const c) const
 {
-	for (dgInt32 i = 0; i < m_size; i ++) {
+	for (dgInt32 i = 0; i < size; i ++) {
 		a[i] = b[i] - c[i];
 	}
 }
 
-dgFloat64 SymmetricBiconjugateGradientSolve::DotProduct (const dgFloat64* const b, const dgFloat64* const c) const
+dgFloat64 SymmetricBiconjugateGradientSolve::DotProduct (dgInt32 size, const dgFloat64* const b, const dgFloat64* const c) const
 {
 	dgFloat64 product = dgFloat64 (0.0f);
-	for (dgInt32 i = 0; i < m_size; i ++) {
+	for (dgInt32 i = 0; i < size; i ++) {
 		product += b[i] * c[i];
 	}
 	return product;
 }
 
-void SymmetricBiconjugateGradientSolve::Solve (dgFloat64 tolerance, dgFloat64* const x, const dgFloat64* const b) const
+void SymmetricBiconjugateGradientSolve::Solve (dgInt32 size, dgFloat64 tolerance, dgFloat64* const x, const dgFloat64* const b) const
 {
-	dgStack<dgFloat64> r0_(m_size);
-	dgStack<dgFloat64> p0_(m_size);
-	dgStack<dgFloat64> MinvR0_(m_size);
-	dgStack<dgFloat64> MinvR1_(m_size);
-	dgStack<dgFloat64> matrixP0_(m_size);
+	dgStack<dgFloat64> r0_(size);
+	dgStack<dgFloat64> p0_(size);
+	dgStack<dgFloat64> MinvR0_(size);
+	dgStack<dgFloat64> MinvR1_(size);
+	dgStack<dgFloat64> matrixP0_(size);
 
 	dgFloat64* const r0 = &r0_[0];
 	dgFloat64* const p0 = &p0_[0];
@@ -301,27 +300,27 @@ void SymmetricBiconjugateGradientSolve::Solve (dgFloat64 tolerance, dgFloat64* c
 	dgFloat64* const matrixP0 = &matrixP0_[0];
 
 	MatrixTimeVector (matrixP0, x);
-	Sub(r0, b, matrixP0);
+	Sub(size, r0, b, matrixP0);
 	InversePrecoditionerTimeVector (p0, r0);
 
 	dgFloat64 residualMag2 = dgFloat32 (1.0e10f);
-	for (dgInt32 i = 0; (i < m_size) && (residualMag2 > tolerance); i ++) {
+	for (dgInt32 i = 0; (i < size) && (residualMag2 > tolerance); i ++) {
 		InversePrecoditionerTimeVector (MinvR0, r0);
-		dgFloat64 num = DotProduct (r0, MinvR0);
+		dgFloat64 num = DotProduct (size, r0, MinvR0);
 		dgAssert (num > dgFloat64 (1.0e-16f));
 
 		MatrixTimeVector (matrixP0, p0);
-		dgFloat64 den = DotProduct (p0, matrixP0);
+		dgFloat64 den = DotProduct (size, p0, matrixP0);
 
 		dgAssert (den > dgFloat64 (1.0e-16f));
 		dgFloat64 alpha = num / den;
 
-		ScaleAdd (x, x, alpha, p0);
-		ScaleAdd (r0, r0, -alpha, matrixP0);
+		ScaleAdd (size, x, x, alpha, p0);
+		ScaleAdd (size, r0, r0, -alpha, matrixP0);
 
 		InversePrecoditionerTimeVector (MinvR1, r0);
-		dgFloat64 num1 = DotProduct (r0, MinvR1);
+		dgFloat64 num1 = DotProduct (size, r0, MinvR1);
 		dgFloat64 beta = num1 / num;
-		ScaleAdd (p0, MinvR1, beta, p0);
+		ScaleAdd (size, p0, MinvR1, beta, p0);
 	}
 }
