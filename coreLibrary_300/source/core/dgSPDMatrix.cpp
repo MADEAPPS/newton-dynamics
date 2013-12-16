@@ -290,21 +290,16 @@ dgFloat64 SymmetricBiconjugateGradientSolve::Solve (dgInt32 size, dgFloat64 tole
 	dgStack<dgFloat64> r0_(size);
 	dgStack<dgFloat64> p0_(size);
 	dgStack<dgFloat64> MinvR0_(size);
-	dgStack<dgFloat64> MinvR1_(size);
 	dgStack<dgFloat64> matrixP0_(size);
 
 	dgFloat64* const r0 = &r0_[0];
 	dgFloat64* const p0 = &p0_[0];
 	dgFloat64* const MinvR0 = &MinvR0_[0];
-	dgFloat64* const MinvR1 = &MinvR1_[0];
 	dgFloat64* const matrixP0 = &matrixP0_[0];
 
 	MatrixTimeVector (matrixP0, x);
 	Sub(size, r0, b, matrixP0);
 	InversePrecoditionerTimeVector (p0, r0);
-
-	//InversePrecoditionerTimeVector (MinvR0, r0);
-	//dgFloat64 num1 = DotProduct (size, r0, MinvR0);
 
 	dgFloat64 num = DotProduct (size, r0, p0);
 	dgAssert (num > dgFloat64 (1.0e-16f));
@@ -318,11 +313,10 @@ dgFloat64 SymmetricBiconjugateGradientSolve::Solve (dgInt32 size, dgFloat64 tole
 		ScaleAdd (size, x, x, alpha, p0);
 		ScaleAdd (size, r0, r0, -alpha, matrixP0);
 
-		InversePrecoditionerTimeVector (MinvR1, r0);
-		dgFloat64 num1 = DotProduct (size, r0, MinvR1);
-		dgFloat64 beta = num1 / num;
-		ScaleAdd (size, p0, MinvR1, beta, p0);
 		InversePrecoditionerTimeVector (MinvR0, r0);
+		dgFloat64 num1 = DotProduct (size, r0, MinvR0);
+		dgFloat64 beta = num1 / num;
+		ScaleAdd (size, p0, MinvR0, beta, p0);
 		num = DotProduct (size, r0, MinvR0);
 	}
 
