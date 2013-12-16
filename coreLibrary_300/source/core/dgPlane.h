@@ -51,7 +51,7 @@ class dgBigPlane: public dgBigVector
 	dgBigPlane (const dgBigVector &P0, const dgBigVector &P1, const dgBigVector &P2);
 	dgBigPlane Scale (dgFloat64 s) const;
 	dgFloat64 Evalue (const dgFloat32* const point) const;
-#ifndef __USE_DOUBLE_PRECISION__
+#ifndef _NEWTON_USE_DOUBLE
 	dgFloat64 Evalue (const dgFloat64* const point) const;
 #endif
 	dgFloat64 Evalue (const dgVector &point) const;
@@ -142,7 +142,7 @@ DG_INLINE dgFloat64 dgBigPlane::Evalue (const dgFloat32* const point) const
 	return m_x * point[0] + m_y * point[1] + m_z * point[2] + m_w;
 }
 
-#ifndef __USE_DOUBLE_PRECISION__
+#ifndef _NEWTON_USE_DOUBLE
 DG_INLINE dgFloat64 dgBigPlane::Evalue (const dgFloat64* const point) const
 {
 	return m_x * point[0] + m_y * point[1] + m_z * point[2] + m_w;

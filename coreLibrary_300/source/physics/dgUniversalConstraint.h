@@ -56,7 +56,7 @@ class dgUniversalConstraint: public dgBilateralConstraint
 	dgFloat32 m_angle1;
 	dgUniversalJointAcceleration m_jointAccelFnt;
 
-//#ifdef __USE_DOUBLE_PRECISION__
+//#ifdef _NEWTON_USE_DOUBLE
 //	dgUnsigned32 m_reserve[3];
 //#else
 //	dgUnsigned32 m_reserve[1];

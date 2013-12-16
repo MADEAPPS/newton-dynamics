@@ -32,7 +32,7 @@
 #endif
 
 
-#if defined (__USE_DOUBLE_PRECISION__) || defined (__ppc__) || defined (ANDROID) || defined (IOS)
+#if defined (_NEWTON_USE_DOUBLE) || defined (__ppc__) || defined (ANDROID) || defined (IOS)
 	#undef DG_SSE4_INSTRUCTIONS_SET
 	#ifndef DG_SCALAR_VECTOR_CLASS
 		#define DG_SCALAR_VECTOR_CLASS
@@ -213,7 +213,7 @@ typedef unsigned long long dgUnsigned64;
 
 typedef double dgFloat64;
 
-#ifdef __USE_DOUBLE_PRECISION__
+#ifdef _NEWTON_USE_DOUBLE
 	typedef double dgFloat32;
 #else
 	typedef float dgFloat32;
@@ -561,7 +561,7 @@ void dgSortIndirect (T** const array, dgInt32 elements, dgInt32 (*compare) (cons
 
 
 
-#ifdef __USE_DOUBLE_PRECISION__
+#ifdef _NEWTON_USE_DOUBLE
 	union dgFloatSign
 	{
 		struct {

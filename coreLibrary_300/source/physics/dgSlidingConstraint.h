@@ -49,7 +49,7 @@ class dgSlidingConstraint: public dgBilateralConstraint
 	dgFloat32 m_posit;
 	dgSlidingJointAcceleration m_jointAccelFnt;
 
-//#ifdef __USE_DOUBLE_PRECISION__
+//#ifdef _NEWTON_USE_DOUBLE
 //	dgUnsigned32 m_reserve[1];
 //#else
 //	dgUnsigned32 m_reserve[2];

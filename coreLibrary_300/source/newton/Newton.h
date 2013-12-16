@@ -52,7 +52,7 @@
 #endif
 
 #ifndef dFloat
-	#ifdef __USE_DOUBLE_PRECISION__
+	#ifdef _NEWTON_USE_DOUBLE
 		#define dFloat double
 	#else
 		#define dFloat float

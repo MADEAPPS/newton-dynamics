@@ -21,7 +21,7 @@
 #include <assert.h>
 
 #ifndef dFloat
-	#ifdef __USE_DOUBLE_PRECISION__
+	#ifdef _NEWTON_USE_DOUBLE
 		typedef double dFloat;
 	#else 
 		typedef float dFloat;

@@ -57,7 +57,7 @@ class dgCorkscrewConstraint: public dgBilateralConstraint
 	dgCorkscrewJointAcceleration m_jointAccelFnt;
 //	dgUnsigned32 m_reserve[1];
 
-//#ifdef __USE_DOUBLE_PRECISION__
+//#ifdef _NEWTON_USE_DOUBLE
 //	dgUnsigned32 m_reserve[3];
 //#else
 //	dgUnsigned32 m_reserve[1];

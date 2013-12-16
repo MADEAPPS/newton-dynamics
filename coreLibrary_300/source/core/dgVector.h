@@ -237,7 +237,7 @@ class dgBigVector: public dgTemplateVector<dgFloat64>
 		dgAssert (dgCheckVector ((*this)));
 	}
 
-#ifndef __USE_DOUBLE_PRECISION__
+#ifndef _NEWTON_USE_DOUBLE
 	DG_INLINE dgBigVector (const dgFloat64* const ptr)
 		:dgTemplateVector<dgFloat64>(ptr)
 	{
