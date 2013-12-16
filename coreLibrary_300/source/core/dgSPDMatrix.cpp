@@ -285,7 +285,7 @@ dgFloat64 SymmetricBiconjugateGradientSolve::DotProduct (dgInt32 size, const dgF
 	return product;
 }
 
-void SymmetricBiconjugateGradientSolve::Solve (dgInt32 size, dgFloat64 tolerance, dgFloat64* const x, const dgFloat64* const b) const
+dgFloat64 SymmetricBiconjugateGradientSolve::Solve (dgInt32 size, dgFloat64 tolerance, dgFloat64* const x, const dgFloat64* const b) const
 {
 	dgStack<dgFloat64> r0_(size);
 	dgStack<dgFloat64> p0_(size);
@@ -323,4 +323,6 @@ void SymmetricBiconjugateGradientSolve::Solve (dgInt32 size, dgFloat64 tolerance
 		dgFloat64 beta = num1 / num;
 		ScaleAdd (size, p0, MinvR1, beta, p0);
 	}
+
+	return residualMag2;
 }

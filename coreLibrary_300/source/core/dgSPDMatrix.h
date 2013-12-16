@@ -242,7 +242,7 @@ class SymmetricBiconjugateGradientSolve
 	SymmetricBiconjugateGradientSolve ();
 	~SymmetricBiconjugateGradientSolve ();	
 
-	void Solve (dgInt32 size, dgFloat64 tolerance, dgFloat64* const x, const dgFloat64* const b) const;
+	dgFloat64 Solve (dgInt32 size, dgFloat64 tolerance, dgFloat64* const x, const dgFloat64* const b) const;
 
 	protected:
 	virtual void MatrixTimeVector (dgFloat64* const out, const dgFloat64* const v) const = 0;
