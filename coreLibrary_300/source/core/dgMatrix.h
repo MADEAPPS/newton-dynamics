@@ -70,11 +70,13 @@ class dgMatrix
 	void TransformTriplex (dgFloat32* const dst, dgInt32 dstStrideInBytes,
 						   const dgFloat32* const src, dgInt32 srcStrideInBytes, dgInt32 count) const;
 
+#ifndef _NEWTON_USE_DOUBLE
 	void TransformTriplex (dgFloat64* const dst, dgInt32 dstStrideInBytes,
 						   const dgFloat64* const src, dgInt32 srcStrideInBytes, dgInt32 count) const;
 
 	void TransformTriplex (dgFloat64* const dst, dgInt32 dstStrideInBytes,
 						   const dgFloat32* const src, dgInt32 srcStrideInBytes, dgInt32 count) const;
+#endif
 
 	bool TestOrthogonal() const;
 

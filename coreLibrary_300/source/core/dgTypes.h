@@ -623,7 +623,7 @@ DG_INLINE dgFloat32 dgAbsf(dgFloat32 x)
 #endif
 }
 
-
+#ifndef _NEWTON_USE_DOUBLE
 DG_INLINE dgInt32 dgFastInt (dgFloat64 x)
 {
 	dgInt32 i = dgInt32 (x);
@@ -632,26 +632,15 @@ DG_INLINE dgInt32 dgFastInt (dgFloat64 x)
 	}
 	return i;
 }
+#endif
 
 DG_INLINE dgInt32 dgFastInt (dgFloat32 x)
 {
-#if 0
-	volatile dgDoubleInt val;
-	volatile dgDoubleInt round;
-	const dgFloat64 conversionMagicConst = ((dgFloat64 (dgInt64(1)<<52)) * dgFloat64 (1.5f));
-	val.m_float = dgFloat64 (x) + conversionMagicConst; 
-	round.m_float = x - dgFloat64 (val.m_intL);
-	dgInt32 ret = val.m_intL + (round.m_intH >> 31);
-	dgAssert (ret == dgInt32 (floor (x)));
-	return ret;
-
-#else
 	dgInt32 i = dgInt32 (x);
 	if (dgFloat32 (i) > x) {
 		i --;
 	}
 	return i;
-#endif
 }
 
 DG_INLINE dgFloat32 dgFloor(dgFloat32 x)
