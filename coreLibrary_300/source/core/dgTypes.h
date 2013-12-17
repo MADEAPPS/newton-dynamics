@@ -22,10 +22,6 @@
 #ifndef __DGTYPES_H__
 #define __DGTYPES_H__
 
-#ifndef DG_SCALAR_VECTOR_CLASS
-	//#define DG_SCALAR_VECTOR_CLASS
-#endif
-
 
 #ifdef DG_SSE4_INSTRUCTIONS_SET
 	#undef DG_SCALAR_VECTOR_CLASS
@@ -38,7 +34,6 @@
 		#define DG_SCALAR_VECTOR_CLASS
 	#endif		
 #endif
-
 
 
 
