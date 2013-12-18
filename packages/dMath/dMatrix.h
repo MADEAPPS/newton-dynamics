@@ -29,7 +29,9 @@ class dMatrix
 	public:
 	dMatrix ();
 	dMatrix (const dFloat* const array);
+#ifndef _NEWTON_USE_DOUBLE
 	dMatrix (const dFloat64* const array);
+#endif
 	dMatrix (const dVector &front, const dVector &up, const dVector &right, const dVector &posit);
 	dMatrix (const dQuaternion &rotation, const dVector &position);
 	dMatrix (dFloat pitch, dFloat yaw, dFloat roll, const dVector& location);
@@ -60,7 +62,9 @@ class dMatrix
 	dMatrix (const dMatrix& transformMatrix, const dVector& scale, const dMatrix& stretchAxis);
 
 	void TransformTriplex (dFloat* const dst, int dstStrideInBytes, const dFloat* const src, int srcStrideInBytes, int count) const;
+#ifndef _NEWTON_USE_DOUBLE
 	void TransformTriplex (dFloat64* const dst, int dstStrideInBytes, const dFloat64* const src, int srcStrideInBytes, int count) const;
+#endif
 
 	dMatrix operator* (const dMatrix & B) const;
 
@@ -108,6 +112,7 @@ inline dMatrix::dMatrix (const dFloat* const array)
 	memcpy (&(*this)[0][0], array, sizeof (dMatrix));
 }
 
+#ifndef _NEWTON_USE_DOUBLE
 inline dMatrix::dMatrix (const dFloat64* const array)
 {
 	dFloat* const ptr = &(*this)[0][0];
@@ -115,6 +120,7 @@ inline dMatrix::dMatrix (const dFloat64* const array)
 		ptr[i] = dFloat (array[i]);
 	}
 }
+#endif
 
 inline dVector& dMatrix::operator[] (int  i)
 {

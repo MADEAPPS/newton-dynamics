@@ -385,7 +385,7 @@ class dgVector
 	
 	DG_INLINE dgVector GetInt () const
 	{
-		return dgVector (int (dgFloor (m_x)), int(dgFloor (m_y)), int(dgFloor (m_z)), int (dgFloor (m_w)));
+		return dgVector (dgInt32 (dgFloor (m_x)), dgInt32(dgFloor (m_y)), dgInt32(dgFloor (m_z)), dgInt32 (dgFloor (m_w)));
 	}
 
 	DG_INLINE dgVector TestZero() const

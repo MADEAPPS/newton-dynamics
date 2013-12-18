@@ -275,7 +275,7 @@ dFloat dNewton::GetInterpolationParam(dFloat timestepInSecunds) const
 {
 	dLong timeStep = GetTimeInMicrosenconds () - m_microseconds;
 	dFloat param = (dFloat (timeStep) * 1.0e-6f) / timestepInSecunds;
-	return dClamp (param, 0.0f, 1.0f);
+	return dClamp (param, dFloat(0.0f), dFloat(1.0f));
 }
 
 void dNewton::WaitForUpdateToFinish ()

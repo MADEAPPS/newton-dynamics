@@ -1725,7 +1725,7 @@ void dgMeshEffect::AddPolygon (dgInt32 count, const dgFloat64* const vertexList,
 	}
 }
 
-
+#ifndef _NEWTON_USE_DOUBLE
 void dgMeshEffect::AddPolygon (dgInt32 count, const dgFloat32* const vertexList, dgInt32 strideIndBytes, dgInt32 material)
 {
 	dgVertexAtribute points[256];
@@ -1763,9 +1763,9 @@ void dgMeshEffect::AddPolygon (dgInt32 count, const dgFloat32* const vertexList,
 			points[i].m_material = dgFloat64(material);
 		}
 	}
-
 	AddPolygon (count, &points[0].m_vertex.m_x, sizeof (dgVertexAtribute), material);
 }
+#endif
 
 void dgMeshEffect::EndPolygon (dgFloat64 tol, bool fixTjoint)
 {

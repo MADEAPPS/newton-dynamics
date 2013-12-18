@@ -70,10 +70,12 @@ class dBigVector: public TemplateVector<double>
 	{
 	}
 
-	dBigVector (const TemplateVector<double>& v)
+#ifndef _NEWTON_USE_DOUBLE
+	dBigVector (const TemplateVector<dFloat64>& v)
 		:TemplateVector<dFloat64> (v.m_x, v.m_y, v.m_z, v.m_w)
 	{
 	}
+#endif
 
 	//	dBigVector (const dFloat *ptr);
 	dBigVector (dFloat x, dFloat y, dFloat z, dFloat w = 1.0)
@@ -81,10 +83,12 @@ class dBigVector: public TemplateVector<double>
 	{
 	}
 
+#ifndef _NEWTON_USE_DOUBLE
 	dBigVector (dFloat64 x, dFloat64 y, dFloat64 z, dFloat64 w = 1.0)
 		:TemplateVector<dFloat64> (x, y, z, w)
 	{
 	}
+#endif
 };
 
 

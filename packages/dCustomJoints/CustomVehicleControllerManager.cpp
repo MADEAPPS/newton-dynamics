@@ -658,14 +658,14 @@ void CustomVehicleController::ContactJoint::JacobianDerivative (ParamInfo* const
 
 
 			// the SlipRatio must be between -1.0 and 1.0 
-			longitudinalSlipRatio = dClamp(longitudinalSlipRatio, -1.0f, 1.0f);
+			longitudinalSlipRatio = dClamp(longitudinalSlipRatio, dFloat(-1.0f), dFloat(1.0f));
 
 			// calculate lateral slip angle
 			dFloat sideSlipAngle = 1.0f;
 			if (dAbs (u) > 1.0f) {
 				dFloat mag2 = headingVeloc % headingVeloc;
 				dFloat vx = dAbs (headingVeloc % longitudinalPin);
-				dFloat vy = dSqrt (dMax (mag2 - vx * vx, 0.1f));
+				dFloat vy = dSqrt (dMax (mag2 - vx * vx, dFloat(0.1f)));
 				sideSlipAngle = dAtan2 (vy, vx);
 				dAssert (sideSlipAngle >= 0.0f);
 				dAssert (sideSlipAngle <= 3.141592);
@@ -951,7 +951,7 @@ dFloat CustomVehicleController::TireBodyState::GetAdhesionCoefficient() const
 }
 void CustomVehicleController::TireBodyState::SetAdhesionCoefficient(dFloat Coefficient)
 {
-	m_adhesionCoefficient = 2.0f * dClamp (Coefficient, 0.0f, 1.0f);
+	m_adhesionCoefficient = 2.0f * dClamp (Coefficient, dFloat(0.0f), dFloat(1.0f));
 }
 
 
@@ -1189,7 +1189,7 @@ void CustomVehicleController::Cleanup()
 
 void CustomVehicleController::SetLateralSlipAngle(dFloat maxLongitudinalSlipAngleIndDegrees)
 {
-	dClamp (maxLongitudinalSlipAngleIndDegrees, 1.0f, 30.0f);
+	dClamp (maxLongitudinalSlipAngleIndDegrees, dFloat(1.0f), dFloat(30.0f));
 	dFloat slips[] = {0.0f, maxLongitudinalSlipAngleIndDegrees * 3.141592f / 180.0f, 90.0f * 3.141592f / 180.0f};
 	dFloat force[] = {0.0f, 1.0f, dSqrt (1.0f - VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SLIP_ANGLE * VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SLIP_ANGLE)};
 	m_tireLateralSlipAngle.InitalizeCurve(sizeof (slips) / sizeof (slips[0]), slips, force);
@@ -1197,7 +1197,7 @@ void CustomVehicleController::SetLateralSlipAngle(dFloat maxLongitudinalSlipAngl
                                   
 void CustomVehicleController::SetLongitudinalSlipRatio(dFloat maxLongitudinalSlipRatio)
 {
-	dClamp(maxLongitudinalSlipRatio, 0.01f, 0.9f);
+	dClamp(maxLongitudinalSlipRatio, dFloat(0.01f), dFloat(0.9f));
 
 	dFloat slips[] = {0.0f, maxLongitudinalSlipRatio, 1.0f};
 	dFloat force[] = {0.0f, 1.0f, dSqrt (1.0f - VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SLIP_ANGLE * VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SLIP_ANGLE)};

@@ -49,7 +49,7 @@ class CustomPlayerController: public CustomControllerBase
 
 	void SetRestrainingDistance (dFloat distance)
 	{
-		m_restrainingDistance = dMax (dAbs (distance), PLAYER_MIN_RESTRAINING_DISTANCE);
+		m_restrainingDistance = dMax (dAbs (distance), dFloat(PLAYER_MIN_RESTRAINING_DISTANCE));
 	}
 
 	void SetClimbSlope (dFloat slopeInRadians)

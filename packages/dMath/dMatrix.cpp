@@ -244,6 +244,7 @@ void dMatrix::TransformTriplex (dFloat* const dst, int dstStrideInBytes, const d
 	}
 }
 
+#ifndef _NEWTON_USE_DOUBLE
 void dMatrix::TransformTriplex (dFloat64* const dst, int dstStrideInBytes, const dFloat64* const src, int srcStrideInBytes, int count) const
 {
 	dstStrideInBytes /= sizeof (dFloat64);
@@ -257,7 +258,7 @@ void dMatrix::TransformTriplex (dFloat64* const dst, int dstStrideInBytes, const
 		dst[dstStrideInBytes * i + 2] = x * m_front.m_z + y * m_up.m_z + z * m_right.m_z + m_posit.m_z;
 	}
 }
-
+#endif
 
 dMatrix dMatrix::operator* (const dMatrix &B) const
 {
