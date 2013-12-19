@@ -451,6 +451,41 @@ class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 	}
 */
 
+	// sample of the Gradient Vector according to Mathematic to a generic mesh, this can be generalize for and arbitrary mesh topology
+	// x0 - x14 are the planar angles in 2d
+	// b0 - b14 are the mesh angles in 3d.
+	// T0 - T4 are the triangle lambdas
+	// V0 - V1 interior vertex lambdas
+	// W0 - W1 interior vertex wheel lambdas 
+	//
+    // Gradient derivatives: 
+	// (2 (-b0 + x0))/b0^2 + T0 + W2 Cos[x0] Sin[x5] Sin[x9] 
+	// (2 (-b1 + x1))/b1^2 + T0 - W2 Cos[x1] Sin[x10] Sin[x3] 
+	// (2 (-b2 + x2))/b2^2 + T0 + V2  
+	// (2 (-b3 + x3))/b3^2 + T1 - W2 Cos[x3] Sin[x1] Sin[x10] + W3 Cos[x3] Sin[x11] Sin[x12] Sin[x8] 
+	// (2 (-b4 + x4))/b4^2 + T1 + V2 - W3 Cos[x4] Sin[x13] Sin[x6] Sin[x9] 
+	// (2 (-b5 + x5))/b5^2 + T1 + V3 + W2 Cos[x5] Sin[x0] Sin[x9] 
+	// (2 (-b6 + x6))/b6^2 + T2 - W3 Cos[x6] Sin[x13] Sin[x4] Sin[x9] 
+	// (2 (-b7 + x7))/b7^2 + T2 + V3 
+	// (2 (-b8 + x8))/b8^2 + T2 + W3 Cos[x8] Sin[x11] Sin[x12] Sin[x3] 
+	// (2 (-b09 + x09))/b09^2 + T3 + W2 Cos[x9] Sin[x0] Sin[x5] - W3 Cos[x9] Sin[x13] Sin[x4] Sin[x6] 
+	// (2 (-b10 + x10))/b10^2 + T3 - W2 Cos[x10] Sin[x1] Sin[x3] 
+	// (2 (-b11 + x11))/b11^2 + T3 + V2 + W3 Cos[x11] Sin[x12] Sin[x3] Sin[x8] 
+	// (2 (-b12 + x12))/b12^2 + T4 + W3 Cos[x12] Sin[x11] Sin[x3] Sin[x8] 
+	// (2 (-b13 + x13))/b13^2 + T4 - W3 Cos[x13] Sin[x4] Sin[x6] Sin[x9] 
+	// (2 (-b14 + x14))/b14^2 + T4 + V3 
+	//
+	// x0 + x1 + x2 - pi
+	// x3 + x4 + x5 - pi 
+	// x6 + x7 + x8 - pi  
+	// x10 + x11 + x9 - pi 
+	// x12 + x13 + x14 - pi 
+	//
+	// x11 + x2 + x4 - 2 pi 
+	// x14 + x5 + x7 - 2 pi 
+	//
+	// -Sin[x1] Sin[x10] Sin[x3] + Sin[x0] Sin[x5] Sin[x9], 
+	//  Sin[x11] Sin[x12] Sin[x3] Sin[x8] - Sin[x13] Sin[x4] Sin[x6] Sin[x9]
 	dgFloat64 CalculateGradientVector ()
 	{
 		for (dgInt32 i = 0; i < m_anglesCount; i ++) {
