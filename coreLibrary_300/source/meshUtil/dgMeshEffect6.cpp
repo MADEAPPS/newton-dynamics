@@ -107,7 +107,7 @@ class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 		m_cosTable = (dgFloat64*) m_mesh->GetAllocator()->MallocLow (m_anglesCount * sizeof (dgFloat64));
 		m_variables = (dgFloat64*) m_mesh->GetAllocator()->MallocLow (m_totalVariablesCount * sizeof (dgFloat64));
 		m_gradients = (dgFloat64*) m_mesh->GetAllocator()->MallocLow (m_totalVariablesCount * sizeof (dgFloat64));
-		m_deltaVariable = (dgFloat64*) m_mesh->GetAllocator()->MallocLow (m_totalVariablesCount * sizeof (dgFloat64));
+		m_deltaVariables = (dgFloat64*) m_mesh->GetAllocator()->MallocLow (m_totalVariablesCount * sizeof (dgFloat64));
 		m_uv = (dgTriplex*) m_mesh->GetAllocator()->MallocLow (m_anglesCount * sizeof (dgTriplex));
 
 		InitEdgeVector();
@@ -129,7 +129,7 @@ class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 		m_mesh->GetAllocator()->FreeLow (m_weight);
 		m_mesh->GetAllocator()->FreeLow (m_variables);
 		m_mesh->GetAllocator()->FreeLow (m_gradients);
-		m_mesh->GetAllocator()->FreeLow (m_deltaVariable);
+		m_mesh->GetAllocator()->FreeLow (m_deltaVariables);
 		m_mesh->GetAllocator()->FreeLow (m_uv);
 	}
 	
@@ -170,7 +170,36 @@ class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 
 	void MatrixTimeVector (dgFloat64* const out, const dgFloat64* const v) const
 	{
-		dgAssert (0);
+		dgInt32 mark = m_mesh->IncLRU();
+		for (dgInt32 i = 0; i < m_anglesCount; i ++) {
+			out[i] = m_weight[i] * v[i];
+
+			dgEdge* const edge = m_betaEdge[i];
+			dgInt32 vertexIndex = GetInteriorVertex(edge);
+			if (vertexIndex >= 0) {
+				out[i] += v[vertexIndex];
+
+				if (edge->m_mark != mark) {
+					out[vertexIndex] = dgFloat64 (0.0f);
+					dgEdge* ptr = edge; 
+					do {
+						dgInt32 index = GetAlphaLandaIndex(ptr);
+						out[vertexIndex] += v[index];
+						ptr->m_mark = mark;
+						ptr = ptr->m_twin->m_next;
+					} while (ptr != edge);
+				}
+			}
+		}
+
+		for (dgInt32 i = 0; i < m_triangleCount; i ++) {
+			dgInt32 j = i * 3;
+			out[j + 0] += v[i + m_anglesCount];
+			out[j + 1] += v[i + m_anglesCount];
+			out[j + 2] += v[i + m_anglesCount];
+			out[i + m_anglesCount] = v[j + 0] + v[j + 1] +  v[j + 2];
+		}
+
 	}
 
 	void InversePrecoditionerTimeVector (dgFloat64* const out, const dgFloat64* const v) const
@@ -546,8 +575,8 @@ class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 
 		// calculate gradient due to the equality that the sum on the internal angle of a triangle must add to 180 degree. (Xt0 + Xt1 + Xt2 - pi) = 0
 		for (dgInt32 i = 0; i < m_triangleCount; i ++) {
-			dgFloat64 gradient = m_gradients[i * 3 + 0] + m_gradients[i * 3 + 1] + m_gradients[i * 3 + 2] - dgABF_PI;
-			m_gradients[i] = -gradient;
+			dgFloat64 gradient = m_variables[i * 3 + 0] + m_variables[i * 3 + 1] + m_variables[i * 3 + 2] - dgABF_PI;
+			m_gradients[m_anglesCount + i] = -gradient;
 			error2 += gradient * gradient;
 		}
 
@@ -604,15 +633,16 @@ class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 	void LagrangeOptimization()
 	{
 		memset (&m_variables[m_anglesCount], 0, (m_totalVariablesCount - m_anglesCount) * sizeof (dgFloat64));	
+		memset (m_deltaVariables, 0, m_totalVariablesCount * sizeof (dgFloat64));
 		dgFloat64 error2 = CalculateGradientVector ();
 
 		const dgInt32 solverIter = dgMax (dgInt32 (sqrt (dgFloat64(m_totalVariablesCount))), 10);
 		const dgFloat64 solverTolerance = dgABF_TOL2;
 
 		for (dgInt32 iter = 0; (iter < dgABF_MAX_ITERATIONS) && (error2 > dgABF_TOL2); iter++) {
-			Solve(m_totalVariablesCount, solverIter, solverTolerance, m_deltaVariable, m_gradients);
+			Solve(m_totalVariablesCount, solverIter, solverTolerance, m_deltaVariables, m_gradients);
 			for (dgInt32 i = 0; i < m_totalVariablesCount; i ++) {
-				m_variables[i] += m_deltaVariable[i];
+				m_variables[i] += m_deltaVariables[i];
 			}
 		}
 
@@ -629,7 +659,7 @@ class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 	dgFloat64* m_cosTable;
 	dgFloat64* m_variables;
 	dgFloat64* m_gradients;
-	dgFloat64* m_deltaVariable;
+	dgFloat64* m_deltaVariables;
 
 	dgTriplex* m_uv;
 
