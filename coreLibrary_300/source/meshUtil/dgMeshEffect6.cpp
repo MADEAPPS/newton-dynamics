@@ -31,7 +31,7 @@
 #include "dgWorld.h"
 #include "dgMeshEffect.h"
 
-#define dgABF_MAX_ITERATIONS	100
+#define dgABF_MAX_ITERATIONS	10
 #define dgABF_TOL				dgFloat64 (1.0e-3f)
 #define dgABF_TOL2				dgABF_TOL * dgABF_TOL
 #define dgABF_PI				dgFloat64 (3.1415926535)
@@ -107,6 +107,7 @@ class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 		m_cosTable = (dgFloat64*) m_mesh->GetAllocator()->MallocLow (m_anglesCount * sizeof (dgFloat64));
 		m_variables = (dgFloat64*) m_mesh->GetAllocator()->MallocLow (m_totalVariablesCount * sizeof (dgFloat64));
 		m_gradients = (dgFloat64*) m_mesh->GetAllocator()->MallocLow (m_totalVariablesCount * sizeof (dgFloat64));
+		m_deltaVariable = (dgFloat64*) m_mesh->GetAllocator()->MallocLow (m_totalVariablesCount * sizeof (dgFloat64));
 		m_uv = (dgTriplex*) m_mesh->GetAllocator()->MallocLow (m_anglesCount * sizeof (dgTriplex));
 
 		InitEdgeVector();
@@ -128,8 +129,44 @@ class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 		m_mesh->GetAllocator()->FreeLow (m_weight);
 		m_mesh->GetAllocator()->FreeLow (m_variables);
 		m_mesh->GetAllocator()->FreeLow (m_gradients);
+		m_mesh->GetAllocator()->FreeLow (m_deltaVariable);
 		m_mesh->GetAllocator()->FreeLow (m_uv);
 	}
+	
+	// the Hessian matrix is compose of these second partial derivatives
+	// these derivatives are too complex and make the solver to spend too much time, 
+	// [0][0]  2/b0^2 - W2 Sin[x0] Sin[x5] Sin[x9], 0, 0, 0, 0, W2 Cos[x0] Cos[x5] Sin[x9], 0, 0, 0, W2 Cos[x0] Cos[x9] Sin[x5], 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, Cos[x0] Sin[x5] Sin[x9], 0, 
+	// [0][[1] {0, 2/b1^2 + W2 Sin[x1] Sin[x10] Sin[x3], 0, -W2 Cos[x1] Cos[x3] Sin[x10], 0, 0, 0, 0, 0, 0, -W2 Cos[x1] Cos[x10] Sin[x3], 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, -Cos[x1] Sin[x10] Sin[x3], 0}, 
+	// ...
+
+	// the optimize version of the algorithms assume that the second derivatives are linear, therefore all sine terms are neglected, I will do the same
+	// [ 0][0-n]  2/b0^2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,  Cos[x0] Sin[x5] Sin[x9], 0 
+	// [ 1][0-n]  0, 2/b1^2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, -Cos[x1] Sin[x10] Sin[x3], 0 
+	// [ 2][0-n]  0, 0, 2/b2^2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0 
+	// [ 3][0-n]  0, 0, 0, 2/b3^2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, -Cos[x3] Sin[x1] Sin[x10], Cos[x3] Sin[x11] Sin[x12] Sin[x8] 
+	// [ 4][0-n]  0, 0, 0, 0, 2/b4^2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -Cos[x4] Sin[x13] Sin[x6] Sin[x9]}	
+	// [ 5][0-n]  0, 0, 0, 0, 0, 2/b5^2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, Cos[x5] Sin[x0] Sin[x9], 0 
+	// [ 6][0-n]  0, 0, 0, 0, 0, 0, 2/b6^2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, -Cos[x6] Sin[x13] Sin[x4] Sin[x9] 
+	// [ 7][0-n]  0, 0, 0, 0, 0, 0, 0, 2/b7^2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0
+	// [ 8][0-n]  0, 0, 0, 0, 0, 0, 0, 0, 2/b8^2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, Cos[x8] Sin[x11] Sin[x12] Sin[x3] 
+	// [ 9][0-n]  0, 0, 0, 0, 0, 0, 0, 0, 0, 2/b9^2,  0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, Cos[x9] Sin[x0] Sin[x5], -Cos[x9] Sin[x13] Sin[x4] Sin[x6]
+	// [10][0-n]  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2/b10^2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, -Cos[x10] Sin[x1] Sin[x3], 0}, 
+	// [11][0-n]  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2/b11^2, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, Cos[x11] Sin[x12] Sin[x3] Sin[x8]
+	// [12][0-n]  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2/b12^2, 0, 0, 0, 0, 0, 0, 1,	0, 0, 0, Cos[x12] Sin[x11] Sin[x3] Sin[x8]
+	// [13][0-n]  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2/b13^2, 0, 0, 0, 0, 0, 1, 0, 0, 0, -Cos[x13] Sin[x4] Sin[x6] Sin[x9]
+	// [14][0-n]  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2/b14^2, 0, 0, 0, 0, 1, 0, 1, 0, 0
+
+	// [15][0-n]  1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	// [16][0-n]  0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	// [17][0-n]  0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	// [18][0-n]  0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	// [19][0-n]  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0
+
+	// [20][0-n]  0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	// [21][0-n]  0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0
+
+	// [22][0-n]  Cos[x0] Sin[x5] Sin[x9], -Cos[x1] Sin[x10] Sin[x3], 0, -Cos[x3] Sin[x1] Sin[x10], 0, Cos[x5] Sin[x0] Sin[x9], 0, 0, 0, Cos[x9] Sin[x0] Sin[x5], -Cos[x10] Sin[x1] Sin[x3], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	// [23][0-n]  0, 0, 0, Cos[x3] Sin[x11] Sin[x12] Sin[x8], -Cos[x4] Sin[x13] Sin[x6] Sin[x9], 0, -Cos[x6] Sin[x13] Sin[x4] Sin[x9], 0, Cos[x8] Sin[x11] Sin[x12] Sin[x3], -Cos[x9] Sin[x13] Sin[x4] Sin[x6], 0, Cos[x11] Sin[x12] Sin[x3] Sin[x8], Cos[x12] Sin[x11] Sin[x3] Sin[x8], -Cos[x13] Sin[x4] Sin[x6] Sin[x9], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 	void MatrixTimeVector (dgFloat64* const out, const dgFloat64* const v) const
 	{
@@ -477,22 +514,22 @@ class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 	//11  (2 (-b11 + x11))/b11^2 + T3 + V2 + W3 Cos[x11] Sin[x12] Sin[x3] Sin[x8] 
 	//12  (2 (-b12 + x12))/b12^2 + T4 + W3 Cos[x12] Sin[x11] Sin[x3] Sin[x8] 
 	//13  (2 (-b13 + x13))/b13^2 + T4 - W3 Cos[x13] Sin[x4] Sin[x6] Sin[x9] 
-	//15  (2 (-b14 + x14))/b14^2 + T4 + V3 
+	//14  (2 (-b14 + x14))/b14^2 + T4 + V3 
 	//
-	// x0 + x1 + x2 - pi
-	// x3 + x4 + x5 - pi 
-	// x6 + x7 + x8 - pi  
-	// x10 + x11 + x9 - pi 
-	// x12 + x13 + x14 - pi 
+	//15  x0 + x1 + x2 - pi
+	//16  x3 + x4 + x5 - pi 
+	//17  x6 + x7 + x8 - pi  
+	//18  x10 + x11 + x9 - pi 
+	//19  x12 + x13 + x14 - pi 
 	//
-	// x11 + x2 + x4 - 2 pi 
-	// x10 + x14 + x5 + x7 - 2 pi 
+	//20  x11 + x2 + x4 - 2 pi 
+	//21  x10 + x14 + x5 + x7 - 2 pi 
 	//
-	// -Sin[x1] Sin[x10] Sin[x3] + Sin[x0] Sin[x5] Sin[x9], 
-	//  Sin[x11] Sin[x12] Sin[x3] Sin[x8] - Sin[x13] Sin[x4] Sin[x6] Sin[x9]
+	//22  Sin[x0] Sin[x5] Sin[x9] - Sin[x1] Sin[x10] Sin[x3] 
+	//23  Sin[x11] Sin[x12] Sin[x3] Sin[x8] - Sin[x13] Sin[x4] Sin[x6] Sin[x9]
 	dgFloat64 CalculateGradientVector ()
 	{
-		// pre compute sin cos tables
+		// pre-compute sin cos tables
 		for (dgInt32 i = 0; i < m_anglesCount; i ++) {
 			m_sinTable[i] = sin (m_variables[i]);
 			m_cosTable[i] = cos (m_variables[i]);
@@ -500,50 +537,67 @@ class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 
 		dgFloat64 error2 = dgFloat64 (0.0f);
 
-		// calculate the new face angular gradients
+		// calculate gradients due to the difference between a matching edge angle and it projected angle msu be mminimal Wei * (Xei - Bei) ^ e = minimal
 		for (dgInt32 i = 0; i < m_anglesCount; i ++) {
 			dgFloat64 gradient = CalculateAngularGradientDerivative (i) + CalculateInteriorVertexGradient (i) + CalculatePlanarityGradient (i);
 			m_gradients[i] = -gradient;
 			error2 += gradient * gradient;
 		}
 
-		dgAssert (0);
+		// calculate gradient due to the equality that the sum on the internal angle of a triangle must add to 180 degree. (Xt0 + Xt1 + Xt2 - pi) = 0
 		for (dgInt32 i = 0; i < m_triangleCount; i ++) {
-//			dgFloat64 gradient = m_alphaLambdaGradients[i * 3 + 0] + m_alphaLambdaGradients[i * 3 + 1] + m_alphaLambdaGradients[i * 3 + 2] - dgABF_PI;
-//			m_triangleLambdaGradients[i] = gradient;
-//			error2 += gradient * gradient;
+			dgFloat64 gradient = m_gradients[i * 3 + 0] + m_gradients[i * 3 + 1] + m_gradients[i * 3 + 2] - dgABF_PI;
+			m_gradients[i] = -gradient;
+			error2 += gradient * gradient;
 		}
-/*
+
+		// calculate the gradient due to the equality that the sum of all the angle incident to and interior vertex must be 3060 degree sum (Xvi) - 2 * pi = 0 
 		dgInt32 mark = m_mesh->IncLRU();
 		for (dgInt32 i = 0; i < m_anglesCount; i ++) {
 			dgEdge* const edge = m_betaEdge[i];
-			if ((edge->m_mark != mark) && GetInteriorVertex(edge) != -1) {
 
+			if ((edge->m_mark != mark) && GetInteriorVertex(edge) != -1) {
 				dgInt32 vertexIndex = GetInteriorVertex(edge);
 				dgFloat64 gradient = - dgFloat64 (2.0f) * dgABF_PI;
+
 				dgEdge* ptr = edge; 
 				do {
 					dgInt32 index = GetAlphaLandaIndex(ptr);
-					gradient += m_alphaLambda[index];
+					gradient += m_variables[index];
 					ptr->m_mark = mark;
 					ptr = ptr->m_twin->m_next;
 				} while (ptr != edge);
-				m_planarLambdaGradients[vertexIndex] = - gradient;
-				error2 += gradient * gradient;
-
-				gradient =  dgFloat64 (1.0f);
-				ptr = edge; 
-				do {
-					dgInt32 index = GetAlphaLandaIndex(ptr);
-					gradient *= m_sinTable[index];
-					ptr->m_mark = mark;
-					ptr = ptr->m_twin->m_next;
-				} while (ptr != edge);
-				m_lenghthLambdaGradients[vertexIndex] = -gradient;
+				m_gradients[vertexIndex] = - gradient;
 				error2 += gradient * gradient;
 			}
 		}
-*/
+
+		// calculate the gradient due to the equality that the difference of the product of the sin of the angle to the
+		// incident to an interior vertex must be zero product (sin (Xvi + 1) - product (sin (Xvi - 1)  = 0 
+		mark = m_mesh->IncLRU();
+		for (dgInt32 i = 0; i < m_anglesCount; i ++) {
+			dgEdge* const edge = m_betaEdge[i];
+
+			dgInt32 vertexIndex = GetInteriorVertex(edge);
+			if ((edge->m_mark != mark) && (vertexIndex != -1)) {
+				vertexIndex += m_interiorVertexCount;
+				dgFloat64 partialProdut0 =  dgFloat64 (1.0f);
+				dgFloat64 partialProdut1 =  dgFloat64 (1.0f);
+				dgEdge* ptr = edge; 
+				do {
+					dgInt32 index0 = GetAlphaLandaIndex(ptr->m_next);
+					dgInt32 index1 = GetAlphaLandaIndex(ptr->m_prev);
+					partialProdut0 *= m_sinTable[index0];
+					partialProdut1 *= m_sinTable[index1];
+					ptr->m_mark = mark;
+					ptr = ptr->m_twin->m_next;
+				} while (ptr != edge);
+				dgFloat64 gradient = partialProdut0 - partialProdut1;
+				m_gradients[vertexIndex] = - gradient;
+				error2 += gradient * gradient;
+			}
+		}
+
 		return error2;
 	}
 
@@ -551,10 +605,16 @@ class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 	{
 		memset (&m_variables[m_anglesCount], 0, (m_totalVariablesCount - m_anglesCount) * sizeof (dgFloat64));	
 		dgFloat64 error2 = CalculateGradientVector ();
-//		for (dgInt32 i = 0; (i < dgABF_MAX_ITERATIONS) && (error2 > dgABF_TOL2); i++) {
-			//	dgAssert (0);
-			//Solve();
-//		}
+
+		const dgInt32 solverIter = dgMax (dgInt32 (sqrt (dgFloat64(m_totalVariablesCount))), 10);
+		const dgFloat64 solverTolerance = dgABF_TOL2;
+
+		for (dgInt32 iter = 0; (iter < dgABF_MAX_ITERATIONS) && (error2 > dgABF_TOL2); iter++) {
+			Solve(m_totalVariablesCount, solverIter, solverTolerance, m_deltaVariable, m_gradients);
+			for (dgInt32 i = 0; i < m_totalVariablesCount; i ++) {
+				m_variables[i] += m_deltaVariable[i];
+			}
+		}
 
 	}
 
@@ -569,6 +629,7 @@ class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 	dgFloat64* m_cosTable;
 	dgFloat64* m_variables;
 	dgFloat64* m_gradients;
+	dgFloat64* m_deltaVariable;
 
 	dgTriplex* m_uv;
 
