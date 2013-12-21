@@ -133,118 +133,6 @@ class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 		m_mesh->GetAllocator()->FreeLow (m_uv);
 	}
 	
-	// the Hessian matrix is compose of these second partial derivatives
-	// these derivatives are too complex and make the solver to spend too much time, 
-	// [0][0]  2/b0^2 - W2 Sin[x0] Sin[x5] Sin[x9], 0, 0, 0, 0, W2 Cos[x0] Cos[x5] Sin[x9], 0, 0, 0, W2 Cos[x0] Cos[x9] Sin[x5], 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, Cos[x0] Sin[x5] Sin[x9], 0, 
-	// [0][[1] {0, 2/b1^2 + W2 Sin[x1] Sin[x10] Sin[x3], 0, -W2 Cos[x1] Cos[x3] Sin[x10], 0, 0, 0, 0, 0, 0, -W2 Cos[x1] Cos[x10] Sin[x3], 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, -Cos[x1] Sin[x10] Sin[x3], 0}, 
-	// ...
-
-	// the optimize version of the algorithms assume that the second derivatives are linear, therefore all sine terms are neglected, I will do the same
-	// [ 0][0-n]  2/b0^2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,  Cos[x0] Sin[x5] Sin[x9], 0 
-	// [ 1][0-n]  0, 2/b1^2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, -Cos[x1] Sin[x10] Sin[x3], 0 
-	// [ 2][0-n]  0, 0, 2/b2^2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0 
-	// [ 3][0-n]  0, 0, 0, 2/b3^2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, -Cos[x3] Sin[x1] Sin[x10], Cos[x3] Sin[x11] Sin[x12] Sin[x8] 
-	// [ 4][0-n]  0, 0, 0, 0, 2/b4^2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -Cos[x4] Sin[x13] Sin[x6] Sin[x9]}	
-	// [ 5][0-n]  0, 0, 0, 0, 0, 2/b5^2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, Cos[x5] Sin[x0] Sin[x9], 0 
-	// [ 6][0-n]  0, 0, 0, 0, 0, 0, 2/b6^2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, -Cos[x6] Sin[x13] Sin[x4] Sin[x9] 
-	// [ 7][0-n]  0, 0, 0, 0, 0, 0, 0, 2/b7^2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0
-	// [ 8][0-n]  0, 0, 0, 0, 0, 0, 0, 0, 2/b8^2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, Cos[x8] Sin[x11] Sin[x12] Sin[x3] 
-	// [ 9][0-n]  0, 0, 0, 0, 0, 0, 0, 0, 0, 2/b9^2,  0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, Cos[x9] Sin[x0] Sin[x5], -Cos[x9] Sin[x13] Sin[x4] Sin[x6]
-	// [10][0-n]  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2/b10^2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, -Cos[x10] Sin[x1] Sin[x3], 0}, 
-	// [11][0-n]  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2/b11^2, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, Cos[x11] Sin[x12] Sin[x3] Sin[x8]
-	// [12][0-n]  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2/b12^2, 0, 0, 0, 0, 0, 0, 1,	0, 0, 0, Cos[x12] Sin[x11] Sin[x3] Sin[x8]
-	// [13][0-n]  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2/b13^2, 0, 0, 0, 0, 0, 1, 0, 0, 0, -Cos[x13] Sin[x4] Sin[x6] Sin[x9]
-	// [14][0-n]  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2/b14^2, 0, 0, 0, 0, 1, 0, 1, 0, 0
-
-	// [15][0-n]  1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-	// [16][0-n]  0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-	// [17][0-n]  0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-	// [18][0-n]  0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-	// [19][0-n]  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0
-
-	// [20][0-n]  0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-	// [21][0-n]  0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0
-
-	// [22][0-n]  Cos[x0] Sin[x5] Sin[x9], -Cos[x1] Sin[x10] Sin[x3], 0, -Cos[x3] Sin[x1] Sin[x10], 0, Cos[x5] Sin[x0] Sin[x9], 0, 0, 0, Cos[x9] Sin[x0] Sin[x5], -Cos[x10] Sin[x1] Sin[x3], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-	// [23][0-n]  0, 0, 0, Cos[x3] Sin[x11] Sin[x12] Sin[x8], -Cos[x4] Sin[x13] Sin[x6] Sin[x9], 0, -Cos[x6] Sin[x13] Sin[x4] Sin[x9], 0, Cos[x8] Sin[x11] Sin[x12] Sin[x3], -Cos[x9] Sin[x13] Sin[x4] Sin[x6], 0, Cos[x11] Sin[x12] Sin[x3] Sin[x8], Cos[x12] Sin[x11] Sin[x3] Sin[x8], -Cos[x13] Sin[x4] Sin[x6] Sin[x9], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-
-	void MatrixTimeVector (dgFloat64* const out, const dgFloat64* const v) const
-	{
-		for (dgInt32 i = 0; i < m_interiorVertexCount; i ++) {
-			out[i + m_anglesCount + m_triangleCount] = dgFloat64 (0.0f);
-			out[i + m_anglesCount + m_triangleCount + m_interiorVertexCount] = dgFloat64 (0.0f);
-		}
-
-		for (dgInt32 i = 0; i < m_anglesCount; i ++) {
-			out[i] = m_weight[i] * v[i];
-
-			dgEdge* const edge = m_betaEdge[i];
-			dgInt32 vertexIndex = GetInteriorVertex(edge);
-			if (vertexIndex >= 0) {
-				out[i] += v[vertexIndex];
-				out[vertexIndex] += v[i];
-			}
-		}
-
-		for (dgInt32 i = 0; i < m_triangleCount; i ++) {
-			dgInt32 j = i * 3;
-			out[j + 0] += v[i + m_anglesCount];
-			out[j + 1] += v[i + m_anglesCount];
-			out[j + 2] += v[i + m_anglesCount];
-			out[i + m_anglesCount] = v[j + 0] + v[j + 1] +  v[j + 2];
-		}
-
-		for (dgInt32 i = 0; i < m_anglesCount; i ++) {
-			{
-				dgEdge* const edge = m_betaEdge[i]->m_prev;
-				dgInt32 vertexIndex = GetInteriorVertex(edge);
-				if (vertexIndex >= 0) {
-					dgInt32 index = GetAlphaLandaIndex(edge->m_next);
-					dgFloat64 product = m_cosTable[index];
-					dgEdge* ptr = edge->m_twin->m_next; 
-					do {
-						dgInt32 index = GetAlphaLandaIndex(ptr->m_next);
-						product *= m_sinTable[index];
-						ptr = ptr->m_twin->m_next;
-					} while (ptr != edge);
-					out[i] += m_variables[vertexIndex + m_interiorVertexCount] * product;
-					out[vertexIndex + m_interiorVertexCount] += product * m_variables[i];
-				}
-			}
-
-			{
-				dgEdge* const edge = m_betaEdge[i]->m_next;
-				dgInt32 vertexIndex = GetInteriorVertex(edge);
-				if (vertexIndex >= 0) {
-					dgInt32 index = GetAlphaLandaIndex(edge->m_prev);
-					dgFloat64 product = m_cosTable[index];
-					dgEdge* ptr = edge->m_twin->m_next; 
-					do {
-						dgInt32 index = GetAlphaLandaIndex(ptr->m_prev);
-						product *= m_sinTable[index];
-						ptr = ptr->m_twin->m_next;
-					} while (ptr != edge);
-					out[i] -= m_variables[vertexIndex + m_interiorVertexCount] * product;
-					out[vertexIndex + m_interiorVertexCount] -= product * m_variables[i];
-				}
-			}
-		}
-	}
-
-	void InversePrecoditionerTimeVector (dgFloat64* const out, const dgFloat64* const v) const
-	{
-		for (dgInt32 i = 0; i < m_anglesCount; i ++) {
-			out[i] = v[i] / m_weight[i];
-		}
-		for (dgInt32 i = 0; i < m_triangleCount; i ++) {
-			out[i + m_anglesCount] = v[i + m_anglesCount];
-		}
-
-		for (dgInt32 i = 0; i < m_interiorVertexCount; i ++) {
-			out[i + m_anglesCount + m_triangleCount] = v[i + m_anglesCount + m_triangleCount];
-			out[i + m_anglesCount + m_triangleCount + m_interiorVertexCount] = v[i + m_anglesCount + m_triangleCount + m_interiorVertexCount];
-		}
-	}
 
 	void GenerateUVCoordinates ()
 	{
@@ -667,6 +555,118 @@ class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 		}
 
 		return error2;
+	}
+
+	// the Hessian matrix is compose of these second partial derivatives
+	// these derivatives are too complex and make the solver to spend too much time, 
+	// [0][0]  2/b0^2 - W2 Sin[x0] Sin[x5] Sin[x9], 0, 0, 0, 0, W2 Cos[x0] Cos[x5] Sin[x9], 0, 0, 0, W2 Cos[x0] Cos[x9] Sin[x5], 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, Cos[x0] Sin[x5] Sin[x9], 0, 
+	// [0][[1] {0, 2/b1^2 + W2 Sin[x1] Sin[x10] Sin[x3], 0, -W2 Cos[x1] Cos[x3] Sin[x10], 0, 0, 0, 0, 0, 0, -W2 Cos[x1] Cos[x10] Sin[x3], 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, -Cos[x1] Sin[x10] Sin[x3], 0}, 
+	// ...
+
+	// the optimize version of the algorithms assume that the second derivatives are linear, therefore all sine terms are neglected, I will do the same
+	// [ 0][0-n]  2/b0^2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,  Cos[x0] Sin[x5] Sin[x9], 0 
+	// [ 1][0-n]  0, 2/b1^2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, -Cos[x1] Sin[x10] Sin[x3], 0 
+	// [ 2][0-n]  0, 0, 2/b2^2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0 
+	// [ 3][0-n]  0, 0, 0, 2/b3^2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, -Cos[x3] Sin[x1] Sin[x10], Cos[x3] Sin[x11] Sin[x12] Sin[x8] 
+	// [ 4][0-n]  0, 0, 0, 0, 2/b4^2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -Cos[x4] Sin[x13] Sin[x6] Sin[x9]}	
+	// [ 5][0-n]  0, 0, 0, 0, 0, 2/b5^2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, Cos[x5] Sin[x0] Sin[x9], 0 
+	// [ 6][0-n]  0, 0, 0, 0, 0, 0, 2/b6^2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, -Cos[x6] Sin[x13] Sin[x4] Sin[x9] 
+	// [ 7][0-n]  0, 0, 0, 0, 0, 0, 0, 2/b7^2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0
+	// [ 8][0-n]  0, 0, 0, 0, 0, 0, 0, 0, 2/b8^2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, Cos[x8] Sin[x11] Sin[x12] Sin[x3] 
+	// [ 9][0-n]  0, 0, 0, 0, 0, 0, 0, 0, 0, 2/b9^2,  0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, Cos[x9] Sin[x0] Sin[x5], -Cos[x9] Sin[x13] Sin[x4] Sin[x6]
+	// [10][0-n]  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2/b10^2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, -Cos[x10] Sin[x1] Sin[x3], 0}, 
+	// [11][0-n]  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2/b11^2, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, Cos[x11] Sin[x12] Sin[x3] Sin[x8]
+	// [12][0-n]  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2/b12^2, 0, 0, 0, 0, 0, 0, 1,	0, 0, 0, Cos[x12] Sin[x11] Sin[x3] Sin[x8]
+	// [13][0-n]  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2/b13^2, 0, 0, 0, 0, 0, 1, 0, 0, 0, -Cos[x13] Sin[x4] Sin[x6] Sin[x9]
+	// [14][0-n]  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2/b14^2, 0, 0, 0, 0, 1, 0, 1, 0, 0
+
+	// [15][0-n]  1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	// [16][0-n]  0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	// [17][0-n]  0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	// [18][0-n]  0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	// [19][0-n]  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0
+
+	// [20][0-n]  0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	// [21][0-n]  0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0
+
+	// [22][0-n]  Cos[x0] Sin[x5] Sin[x9], -Cos[x1] Sin[x10] Sin[x3], 0, -Cos[x3] Sin[x1] Sin[x10], 0, Cos[x5] Sin[x0] Sin[x9], 0, 0, 0, Cos[x9] Sin[x0] Sin[x5], -Cos[x10] Sin[x1] Sin[x3], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	// [23][0-n]  0, 0, 0, Cos[x3] Sin[x11] Sin[x12] Sin[x8], -Cos[x4] Sin[x13] Sin[x6] Sin[x9], 0, -Cos[x6] Sin[x13] Sin[x4] Sin[x9], 0, Cos[x8] Sin[x11] Sin[x12] Sin[x3], -Cos[x9] Sin[x13] Sin[x4] Sin[x6], 0, Cos[x11] Sin[x12] Sin[x3] Sin[x8], Cos[x12] Sin[x11] Sin[x3] Sin[x8], -Cos[x13] Sin[x4] Sin[x6] Sin[x9], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	void MatrixTimeVector (dgFloat64* const out, const dgFloat64* const v) const
+	{
+		for (dgInt32 i = 0; i < m_interiorVertexCount; i ++) {
+			out[i + m_anglesCount + m_triangleCount] = dgFloat64 (0.0f);
+			out[i + m_anglesCount + m_triangleCount + m_interiorVertexCount] = dgFloat64 (0.0f);
+		}
+
+		for (dgInt32 i = 0; i < m_anglesCount; i ++) {
+			out[i] = m_weight[i] * v[i];
+
+			dgEdge* const edge = m_betaEdge[i];
+			dgInt32 vertexIndex = GetInteriorVertex(edge);
+			if (vertexIndex >= 0) {
+				out[i] += v[vertexIndex];
+				out[vertexIndex] += v[i];
+			}
+		}
+
+		for (dgInt32 i = 0; i < m_triangleCount; i ++) {
+			dgInt32 j = i * 3;
+			out[j + 0] += v[i + m_anglesCount];
+			out[j + 1] += v[i + m_anglesCount];
+			out[j + 2] += v[i + m_anglesCount];
+			out[i + m_anglesCount] = v[j + 0] + v[j + 1] +  v[j + 2];
+		}
+
+		for (dgInt32 i = 0; i < m_anglesCount; i ++) {
+			{
+				dgEdge* const edge = m_betaEdge[i]->m_prev;
+				dgInt32 vertexIndex = GetInteriorVertex(edge);
+				if (vertexIndex >= 0) {
+					dgInt32 index = GetAlphaLandaIndex(edge->m_next);
+					dgFloat64 product = m_cosTable[index];
+					dgEdge* ptr = edge->m_twin->m_next; 
+					do {
+						dgInt32 index = GetAlphaLandaIndex(ptr->m_next);
+						product *= m_sinTable[index];
+						ptr = ptr->m_twin->m_next;
+					} while (ptr != edge);
+					out[i] += m_variables[vertexIndex + m_interiorVertexCount] * product;
+					out[vertexIndex + m_interiorVertexCount] += product * v[i];
+				}
+			}
+
+			{
+				dgEdge* const edge = m_betaEdge[i]->m_next;
+				dgInt32 vertexIndex = GetInteriorVertex(edge);
+				if (vertexIndex >= 0) {
+					dgInt32 index = GetAlphaLandaIndex(edge->m_prev);
+					dgFloat64 product = m_cosTable[index];
+					dgEdge* ptr = edge->m_twin->m_next; 
+					do {
+						dgInt32 index = GetAlphaLandaIndex(ptr->m_prev);
+						product *= m_sinTable[index];
+						ptr = ptr->m_twin->m_next;
+					} while (ptr != edge);
+					out[i] -= m_variables[vertexIndex + m_interiorVertexCount] * product;
+					out[vertexIndex + m_interiorVertexCount] -= product * v[i];
+				}
+			}
+		}
+	}
+
+	void InversePrecoditionerTimeVector (dgFloat64* const out, const dgFloat64* const v) const
+	{
+		for (dgInt32 i = 0; i < m_anglesCount; i ++) {
+			out[i] = v[i] / m_weight[i];
+		}
+		for (dgInt32 i = 0; i < m_triangleCount; i ++) {
+			out[i + m_anglesCount] = v[i + m_anglesCount];
+		}
+
+		for (dgInt32 i = 0; i < m_interiorVertexCount; i ++) {
+			out[i + m_anglesCount + m_triangleCount] = v[i + m_anglesCount + m_triangleCount];
+			out[i + m_anglesCount + m_triangleCount + m_interiorVertexCount] = v[i + m_anglesCount + m_triangleCount + m_interiorVertexCount];
+		}
 	}
 
 	void LagrangeOptimization()
