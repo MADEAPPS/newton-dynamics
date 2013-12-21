@@ -254,6 +254,7 @@ xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_201
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\nme\EditorCommandPanel.cpp" />
+    <ClCompile Include="..\..\nme\EditorUVMappingTool.cpp" />
     <ClCompile Include="..\..\nme\foldbar\captionbar.cpp" />
     <ClCompile Include="..\..\nme\foldbar\foldpanelbar.cpp" />
     <ClCompile Include="..\..\nme\foldbar\foldpanelitem.cpp" />
@@ -276,6 +277,7 @@ xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_201
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\nme\EditorCommandPanel.h" />
+    <ClInclude Include="..\..\nme\EditorUVMappingTool.h" />
     <ClInclude Include="..\..\nme\foldbar\captionbar.h" />
     <ClInclude Include="..\..\nme\foldbar\foldpanelbar.h" />
     <ClInclude Include="..\..\nme\foldbar\foldpanelitem.h" />

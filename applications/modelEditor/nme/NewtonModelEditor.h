@@ -16,6 +16,7 @@
 class EditorMainMenu;
 class EditorExplorer;
 class EditorCommandPanel;
+class EditorUVMappingTool;
 class EditorRenderViewport;
 
 #define D_MAX_PLUGINS_COUNT 128
@@ -217,6 +218,7 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	void CreateRenderViewPort();
 	void CreateNavigationToolBar();
 	void CreateObjectSelectionToolBar();
+	void CreateUVMappingDialog();
 	
 	void CreateScene();
 	void DestroyScene();
@@ -238,7 +240,9 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	
 	EditorExplorer* m_explorer;
 	EditorCommandPanel* m_commandPanel;
+	EditorUVMappingTool* m_uvMappingTool;
 	EditorRenderViewport* m_renderViewport;
+	
 	
 	int m_viewModeMap[ID_VIEW_MODES_LAST - ID_VIEW_MODES];
 	int m_shapeModeMap[ID_SHADE_MODES_LAST - ID_SHADE_MODES];

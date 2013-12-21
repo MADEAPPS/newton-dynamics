@@ -57,6 +57,9 @@
     <ClCompile Include="..\..\nme\EditorCommandPanel.cpp">
       <Filter>nme</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\nme\EditorUVMappingTool.cpp">
+      <Filter>nme</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\nme\toolBox\DebugDisplay.h">
@@ -102,6 +105,9 @@
       <Filter>foldBard</Filter>
     </ClInclude>
     <ClInclude Include="..\..\nme\EditorCommandPanel.h">
+      <Filter>nme</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\nme\EditorUVMappingTool.h">
       <Filter>nme</Filter>
     </ClInclude>
   </ItemGroup>

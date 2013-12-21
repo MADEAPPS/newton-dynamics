@@ -18,6 +18,7 @@
 #include "EditorMainMenu.h"
 #include "NewtonModelEditor.h"
 #include "EditorCommandPanel.h"
+#include "EditorUVMappingTool.h"
 #include "EditorRenderViewport.h"
 #include "NewtonModelEditorApp.h"
 
@@ -70,6 +71,7 @@ NewtonModelEditor::NewtonModelEditor(const wxString& title, const wxPoint& pos, 
 	,m_mainMenu(NULL)
 	,m_statusBar(NULL)
 	,m_fileToolbar(NULL)
+	,m_uvMappingTool(NULL)
 	,m_navigationToolbar(NULL)
 	,m_objectSelectionToolbar(NULL)
 	,m_explorer(NULL)
@@ -106,6 +108,7 @@ NewtonModelEditor::NewtonModelEditor(const wxString& title, const wxPoint& pos, 
 	CreateExplorer();
 	CreateCommandPanel();
 	CreateRenderViewPort();
+	CreateUVMappingDialog();
 	
 	// create and empty scene
 	CreateScene();
@@ -404,17 +407,29 @@ void NewtonModelEditor::CreateRenderViewPort()
 
 void NewtonModelEditor::CreateCommandPanel()
 {
+	const char* name = "inspector";
 	m_commandPanel = new EditorCommandPanel(this);
-	m_mainMenu->AddViewControl (NewtonModelEditor::ID_HIDE_CONTROL_PANE + 0, "inspector", m_commandPanel);
-	m_mgr.AddPane (m_commandPanel, wxAuiPaneInfo().Name(wxT("inspector")).Caption(wxT("inspector")).Right().Layer(1).Position(1).CloseButton(true).MaximizeButton(false));
+	m_mainMenu->AddViewControl (NewtonModelEditor::ID_HIDE_CONTROL_PANE + 0, name, m_commandPanel);
+	m_mgr.AddPane (m_commandPanel, wxAuiPaneInfo().Name(wxT(name)).Caption(wxT(name)).Right().Layer(1).Position(1).CloseButton(true).MaximizeButton(false));
 }
 
 void NewtonModelEditor::CreateExplorer()
 {
+	const char* name = "scene explorer";
 	m_explorer = new EditorExplorer (this);
-	m_mainMenu->AddViewControl (NewtonModelEditor::ID_HIDE_CONTROL_PANE + 1, "scene explorer", m_explorer);
-	m_mgr.AddPane (m_explorer, wxAuiPaneInfo().Name(wxT("scene explorer")).Caption(wxT("scene explorer")).Left().Layer(1).Position(1).CloseButton(true).MaximizeButton(false));
+	m_mainMenu->AddViewControl (NewtonModelEditor::ID_HIDE_CONTROL_PANE + 1, name, m_explorer);
+	m_mgr.AddPane (m_explorer, wxAuiPaneInfo().Name(wxT(name)).Caption(wxT(name)).Left().Layer(1).Position(1).CloseButton(true).MaximizeButton(false));
 }
+
+void NewtonModelEditor::CreateUVMappingDialog()
+{
+	const char* name = "uv editor";
+	m_uvMappingTool = new EditorUVMappingTool (this);
+	
+	m_mainMenu->AddViewControl (NewtonModelEditor::ID_HIDE_CONTROL_PANE + 3, name, m_uvMappingTool);
+	m_mgr.AddPane (m_uvMappingTool, wxAuiPaneInfo().Name(wxT(name)).Caption(wxT(name)).Right().Layer(1).Position(1).CloseButton(true).MaximizeButton(false));
+}
+
 
 int NewtonModelEditor::GetViewMode() const
 {
