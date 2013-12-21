@@ -31,10 +31,11 @@
 #include "dgWorld.h"
 #include "dgMeshEffect.h"
 
-#define dgABF_MAX_ITERATIONS	10
-#define dgABF_TOL				dgFloat64 (1.0e-3f)
-#define dgABF_TOL2				dgABF_TOL * dgABF_TOL
-#define dgABF_PI				dgFloat64 (3.1415926535)
+#define dgABF_MAX_ITERATIONS		10
+#define dgABF_MIN_SOLVER_ITERATIONS	100
+#define dgABF_TOL					dgFloat64 (1.0e-3f)
+#define dgABF_TOL2					dgABF_TOL * dgABF_TOL
+#define dgABF_PI					dgFloat64 (3.1415926535)
 
 
 class TestSolver_xxxxxxx: public SymmetricBiconjugateGradientSolve
@@ -630,7 +631,7 @@ class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 						product *= m_sinTable[index];
 						ptr = ptr->m_twin->m_next;
 					} while (ptr != edge);
-					out[i] += m_variables[vertexIndex + m_interiorVertexCount] * product;
+					out[i] += v[vertexIndex + m_interiorVertexCount] * product;
 					out[vertexIndex + m_interiorVertexCount] += product * v[i];
 				}
 			}
@@ -647,7 +648,7 @@ class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 						product *= m_sinTable[index];
 						ptr = ptr->m_twin->m_next;
 					} while (ptr != edge);
-					out[i] -= m_variables[vertexIndex + m_interiorVertexCount] * product;
+					out[i] -= v[vertexIndex + m_interiorVertexCount] * product;
 					out[vertexIndex + m_interiorVertexCount] -= product * v[i];
 				}
 			}
@@ -676,7 +677,8 @@ class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 		for (dgInt32 i = 0; i < m_interiorVertexCount; i ++) {
 			m_variables[m_anglesCount + m_triangleCount + m_interiorVertexCount] = dgFloat32 (1.0f);
 		}
-		const dgInt32 solverIter = dgMax (dgInt32 (sqrt (dgFloat64(m_totalVariablesCount))), 10);
+
+		dgInt32 solverIter = (m_totalVariablesCount <= dgABF_MIN_SOLVER_ITERATIONS) ? m_totalVariablesCount : (dgABF_MIN_SOLVER_ITERATIONS + dgInt32 (sqrt (dgFloat64(m_totalVariablesCount - dgABF_MIN_SOLVER_ITERATIONS))));
 		const dgFloat64 solverTolerance = dgABF_TOL2;
 
 		dgFloat64 error2 = CalculateGradientVector ();

@@ -304,6 +304,8 @@ dgFloat64 SymmetricBiconjugateGradientSolve::Solve (dgInt32 size, dgInt32 maxInt
 	maxInterations = dgMin(size, maxInterations);
 	dgAssert (maxInterations > 0);
 	dgFloat64 num = DotProduct (size, r0, p0);
+
+	dgInt32 iter = 0;
 	for (dgInt32 i = 0; (i < maxInterations) && (num > tolerance); i ++) {
 		MatrixTimeVector (matrixP0, p0);
 		dgFloat64 den = DotProduct (size, p0, matrixP0);
@@ -319,7 +321,9 @@ dgFloat64 SymmetricBiconjugateGradientSolve::Solve (dgInt32 size, dgInt32 maxInt
 		dgFloat64 beta = num1 / num;
 		ScaleAdd (size, p0, MinvR0, beta, p0);
 		num = DotProduct (size, r0, MinvR0);
+		iter ++;
 	}
 
+	dgAssert (iter < maxInterations);
 	return num;
 }
