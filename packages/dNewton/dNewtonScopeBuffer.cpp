@@ -22,12 +22,19 @@
 #include "dStdAfxNewton.h"
 #include "dNewtonScopeBuffer.h"
 
-dNewtonScopeBufferBase::dNewtonScopeBufferBase (int sizeInBytes)
-	:m_ptr (NewtonAlloc (sizeInBytes))
+dNewtonScopeBufferBase::dNewtonScopeBufferBase ()
+	:m_ptr (NULL)
 {
 }
 
 dNewtonScopeBufferBase::~dNewtonScopeBufferBase ()
 {
-	NewtonFree(m_ptr);
+	if (m_ptr) {
+		NewtonFree(m_ptr);
+	}
+}
+
+void dNewtonScopeBufferBase::SetBuffer (int sizeInBytes)
+{
+	m_ptr = NewtonAlloc (sizeInBytes);
 }
