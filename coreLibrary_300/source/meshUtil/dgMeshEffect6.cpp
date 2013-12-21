@@ -116,8 +116,7 @@ class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 
 		// if there are no interior vertex then the mesh can be projected to a flat plane
 		LagrangeOptimization();
-//		GenerateUVCoordinates ();
-
+		GenerateUVCoordinates ();
 	}
 
 	~dgAngleBasedFlatteningMapping()
@@ -137,8 +136,6 @@ class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 
 	void GenerateUVCoordinates ()
 	{
-		dgAssert(0);
-/*
 		memset (m_uv, 0, m_anglesCount * sizeof (m_uv[0]));
 		dgInt32 mark = m_mesh->IncLRU();
 		for (dgInt32 i = 0; i < m_anglesCount; i ++) {
@@ -164,13 +161,13 @@ class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 				m_uv[edgeIndex1].m_x = dgFloat32 (e0length);
 				m_uv[edgeIndex1].m_y = dgFloat32 (0.0f);
 
-				dgFloat64 e2length = e0length * sin (m_alphaLambda[edgeIndex1]) / sin (m_alphaLambda[edgeIndex2]);
+				dgFloat64 e2length = e0length * sin (m_variables[edgeIndex1]) / sin (m_variables[edgeIndex2]);
 				dgFloat64 du (m_uv[edgeIndex1].m_x - m_uv[edgeIndex0].m_x);
 				dgFloat64 dv (m_uv[edgeIndex1].m_y - m_uv[edgeIndex0].m_y);
 				dgFloat64 refAngle = atan2 (dv, du);
 
-				m_uv[edgeIndex2].m_x = m_uv[edgeIndex0].m_x + dgFloat32 (e2length * cos (m_alphaLambda[edgeIndex0] + refAngle));
-				m_uv[edgeIndex2].m_y = m_uv[edgeIndex0].m_y + dgFloat32 (e2length * sin (m_alphaLambda[edgeIndex0] + refAngle));
+				m_uv[edgeIndex2].m_x = m_uv[edgeIndex0].m_x + dgFloat32 (e2length * cos (m_variables[edgeIndex0] + refAngle));
+				m_uv[edgeIndex2].m_y = m_uv[edgeIndex0].m_y + dgFloat32 (e2length * sin (m_variables[edgeIndex0] + refAngle));
 
 				dgList<dgEdge*> stack(m_mesh->GetAllocator());
 				if (face->m_twin->m_incidentFace > 0) {
@@ -212,14 +209,14 @@ class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 						dgBigVector p10 (p1 - p0);
 
 						dgFloat64 e0length = sqrt (p10 % p10);
-						dgFloat64 e2length = e0length * sin (m_alphaLambda[edgeIndex1]) / sin (m_alphaLambda[edgeIndex2]);
+						dgFloat64 e2length = e0length * sin (m_variables[edgeIndex1]) / sin (m_variables[edgeIndex2]);
 
 						dgFloat64 du (m_uv[edgeIndex1].m_x - m_uv[edgeIndex0].m_x);
 						dgFloat64 dv (m_uv[edgeIndex1].m_y - m_uv[edgeIndex0].m_y);
 						dgFloat64 refAngle = atan2 (dv, du);
 
-						m_uv[edgeIndex2].m_x = m_uv[edgeIndex0].m_x + dgFloat32 (e2length * cos (m_alphaLambda[edgeIndex0] + refAngle));
-						m_uv[edgeIndex2].m_y = m_uv[edgeIndex0].m_y + dgFloat32 (e2length * sin (m_alphaLambda[edgeIndex0] + refAngle));
+						m_uv[edgeIndex2].m_x = m_uv[edgeIndex0].m_x + dgFloat32 (e2length * cos (m_variables[edgeIndex0] + refAngle));
+						m_uv[edgeIndex2].m_y = m_uv[edgeIndex0].m_y + dgFloat32 (e2length * sin (m_variables[edgeIndex0] + refAngle));
 
 						if (next->m_twin->m_incidentFace > 0) {
 							stack.Append(next->m_twin);
@@ -231,7 +228,7 @@ class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 				} 
 			}
 		}
-*/
+
 	}
 
 	void CalculateNumberOfVariables()
@@ -672,12 +669,13 @@ class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 
 	void LagrangeOptimization()
 	{
-		memset (&m_variables[m_anglesCount], 0, (m_totalVariablesCount - m_anglesCount) * sizeof (dgFloat64));	
 		memset (m_deltaVariables, 0, m_totalVariablesCount * sizeof (dgFloat64));
+		memset (&m_variables[m_anglesCount], 0, (m_totalVariablesCount - 2 * m_interiorVertexCount) * sizeof (dgFloat64));	
 		for (dgInt32 i = 0; i < m_interiorVertexCount; i ++) {
-			m_variables[m_anglesCount + m_triangleCount + m_interiorVertexCount] = dgFloat32 (1.0f);
+			m_variables[i + m_anglesCount + m_triangleCount] = dgFloat32 (1.0f);
+			m_variables[i + m_anglesCount + m_triangleCount + m_interiorVertexCount] = dgFloat32 (1.0f);
 		}
-
+		
 		dgInt32 solverIter = (m_totalVariablesCount <= dgABF_MIN_SOLVER_ITERATIONS) ? m_totalVariablesCount : (dgABF_MIN_SOLVER_ITERATIONS + dgInt32 (sqrt (dgFloat64(m_totalVariablesCount - dgABF_MIN_SOLVER_ITERATIONS))));
 		const dgFloat64 solverTolerance = dgABF_TOL2;
 
