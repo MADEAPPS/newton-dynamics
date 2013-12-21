@@ -47,6 +47,11 @@ dPluginInterface::~dPluginInterface(void)
 }
 
 
+bool dPluginInterface::UpdateProgress(dFloat progress) const
+{
+	return true;
+}
+
 void dPluginInterface::DestroyScene ()
 {
 	if (m_scene) {
@@ -57,7 +62,6 @@ void dPluginInterface::DestroyScene ()
 
 void dPluginInterface::RefreshExplorerEvent(bool clear) const
 {
-
 }
 
 const char* dPluginInterface::GetFilePath() const

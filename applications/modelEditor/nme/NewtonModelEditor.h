@@ -184,6 +184,8 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	int GetNavigationMode() const;
 	wxBitmap* FindIcon (const char* const iconName) const;
 
+	bool UpdateProgress(dFloat progress) const; 
+
 	protected:	
 	DECLARE_EVENT_TABLE()
 
@@ -248,6 +250,8 @@ class NewtonModelEditor: public wxFrame, public dPluginInterface
 	wxString m_lastFilePath;
 	wxString m_currentFileName;
 	dTree<wxBitmap*, dCRCTYPE> m_icons;
+
+	wxProgressDialog* m_currentProgress; 
 };
 
 

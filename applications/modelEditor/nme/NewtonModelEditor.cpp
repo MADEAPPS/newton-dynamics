@@ -78,6 +78,7 @@ NewtonModelEditor::NewtonModelEditor(const wxString& title, const wxPoint& pos, 
 	,m_viewMode(NULL)
 	,m_shadeMode(NULL)
 	,m_navigationStack(0)
+	,m_currentProgress(NULL)
 {
 	// notify wxAUI which frame to use
 	m_mgr.SetManagedWindow(this);
@@ -640,10 +641,13 @@ void NewtonModelEditor::OnImport (wxCommandEvent& event)
 	dAssert (plugin);
 	wxFileDialog open (this, wxT(plugin->GetFileDescription ()), wxT("../../../media"), wxT(""), wxT(plugin->GetFileExtension ()));
 	if (open.ShowModal() == wxID_OK) {
+		wxProgressDialog progressDlg (wxT("Please wait"), wxT(plugin->GetFileDescription ()), 1000, NULL, wxPD_APP_MODAL | wxPD_AUTO_HIDE | wxPD_CAN_ABORT);
+		m_currentProgress = &progressDlg;
 		if (plugin->Import (open.GetPath().mb_str(), this)) {
 			m_explorer->ReconstructScene(GetScene());
 			RefrehViewports();
 		}
+		m_currentProgress = NULL;
 	}
 }
 
@@ -675,4 +679,12 @@ void NewtonModelEditor::RefreshExplorerEvent(bool clear) const
 EditorExplorer* NewtonModelEditor::GetExplorer() const
 {
 	return m_explorer;
+}
+
+bool NewtonModelEditor::UpdateProgress(dFloat progress) const
+{
+	if (m_currentProgress) {
+		return m_currentProgress->Update(int (progress * 1000));
+	}
+	return true;
 }

@@ -46,6 +46,8 @@ class dPluginInterface: public dUndoRedoManager
 	DPLUGIN_API virtual void* GetNextPluginNode(void* const pluginNode) const;
 	DPLUGIN_API virtual dPluginRecord* GetPluginFromNode(void* const pluginNode) const;
 
+	DPLUGIN_API virtual bool UpdateProgress(dFloat progress) const; 
+
 //	virtual dAssetList::dListNode* AddAsset(dPluginScene* const scene, dPluginMesh* plugin);
 //	virtual void RemoveAsset(dAssetList::dListNode* const node);
 //	virtual void RemoveAllAsset();

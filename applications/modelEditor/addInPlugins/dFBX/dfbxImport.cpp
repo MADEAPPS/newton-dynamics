@@ -21,6 +21,8 @@
 
 #define DEFUALT_MATERIAL_ID -1
 
+dPluginInterface* dfbxImport::m_interface;
+
 dImportPlugin* dfbxImport::GetPluginFBX()
 {
 	static dfbxImport plugin("*.fbx", "Import Autodesk fbx file (.fbx)", "fbx mesh import");
@@ -40,9 +42,21 @@ dImportPlugin* dfbxImport::GetPluginDAE()
 }
 
 
+dfbxImport::dfbxImport (const char* const ext, const char* const signature, const char* const description)
+	:dImportPlugin() 
+	, m_materialId (0)
+{
+	strcpy (m_ext, ext);
+	strcpy (m_signature, signature);
+	strcpy (m_description, description);
+}
+
+
 bool dfbxImport::Import (const char* const fileName, dPluginInterface* const interface)
 {
 	bool ret = false;
+
+	m_interface = interface;
 
 	dPluginScene* const scene = interface->GetScene();
 	dAssert (scene);
@@ -60,6 +74,9 @@ bool dfbxImport::Import (const char* const fileName, dPluginInterface* const int
 
 	// Create an importer using the SDK manager.
 	FbxImporter* const fbxImporter = FbxImporter::Create(fbxSdk, "");
+
+	// set the progress callback
+	fbxImporter->SetProgressCallback (ProgressCallback);
 
 	// Use the first argument as the filename for the importer.
 	if(fbxImporter->Initialize(fileName, -1, fbxSdk->GetIOSettings())) { 
@@ -214,10 +231,6 @@ void dfbxImport::PopulateScene (FbxScene* const fbxScene, dPluginScene* const ng
 		}
 	}
 }
-
-
-
-
 
 
 void dfbxImport::ImportMeshNode (FbxScene* const fbxScene, dPluginScene* const ngdScene, FbxNode* const fbxMeshNode, dPluginScene::dTreeNode* const node, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials)
@@ -603,3 +616,7 @@ void dfbxImport::LoadHierarchy  (FbxScene* const fbxScene, dPluginScene* const n
 	}
 }
 
+bool dfbxImport::ProgressCallback (float pPercentage, FbxString pStatus)
+{
+	return  m_interface->UpdateProgress(pPercentage * 0.01f);
+}

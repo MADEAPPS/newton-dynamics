@@ -21,13 +21,21 @@
 #include <ctype.h>
 #include <io.h>
 #include <windows.h>
+
 #include <GL/glew.h>
 #include <GL/wglew.h>
 #include <gl/gl.h>
 #include <gl/glu.h>
 
+#include <wx/wx.h>
+#include <wx/event.h>
+#include <wx/dcclient.h>
+#include <wx/glcanvas.h>
+#include <wx/aui/aui.h>
+#include <wx/treectrl.h>
+#include <wx/progdlg.h>
 
-#include "dContainersStdAfx.h"
+#include <dContainersStdAfx.h>
 #include <dSceneStdafx.h>
 
 #include <dCRC.h>

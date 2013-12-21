@@ -77,7 +77,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../dPluginCommons;../../../../../packages;../../../../../packages/dMath;../../../../../packages/dScene;../../../../../packages/dContainers;../../../../../packages/thirdParty/tinyxml;../../../../../packages/thirdParty/glew/include;../../../../../coreLibrary_300/source/newton;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../dPluginCommons;../../../../../coreLibrary_300/source/newton;../../../../../packages;../../../../../packages/dMath;../../../../../packages/dScene;../../../../../packages/dContainers;../../../../../packages/thirdParty/tinyxml;../../../../../packages/thirdParty/glew/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;_DSCENE_DLL;_DCONTAINERS_DLL;_DPLUGIN_COMMON_DLL_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -108,7 +108,7 @@ xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/*.*"  /F /Y /R</Co
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../dPluginCommons;../../../../../packages;../../../../../packages/dMath;../../../../../packages/dScene;../../../../../packages/dContainers;../../../../../packages/thirdParty/tinyxml;../../../../../packages/thirdParty/glew/include;../../../../../coreLibrary_300/source/newton;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../dPluginCommons;../../../../../coreLibrary_300/source/newton;../../../../../packages;../../../../../packages/dMath;../../../../../packages/dScene;../../../../../packages/dContainers;../../../../../packages/thirdParty/tinyxml;../../../../../packages/thirdParty/glew/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;_DSCENE_DLL;_DCONTAINERS_DLL;_DPLUGIN_COMMON_DLL_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -137,7 +137,7 @@ xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/*.*"  /F /Y /R</Co
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../dPluginCommons;../../../../../packages;../../../../../packages/dMath;../../../../../packages/dScene;../../../../../packages/dContainers;../../../../../packages/thirdParty/tinyxml;../../../../../packages/thirdParty/glew/include;../../../../../coreLibrary_300/source/newton;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../dPluginCommons;../../../../../coreLibrary_300/source/newton;../../../../../packages;../../../../../packages/dMath;../../../../../packages/dScene;../../../../../packages/dContainers;../../../../../packages/thirdParty/tinyxml;../../../../../packages/thirdParty/glew/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;_DSCENE_DLL;_DCONTAINERS_DLL;_DPLUGIN_COMMON_DLL_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -168,7 +168,7 @@ xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/*.*"  /F /Y /R</Co
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../dPluginCommons;../../../../../packages;../../../../../packages/dMath;../../../../../packages/dScene;../../../../../packages/dContainers;../../../../../packages/thirdParty/tinyxml;../../../../../packages/thirdParty/glew/include;../../../../../coreLibrary_300/source/newton;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../dPluginCommons;../../../../../coreLibrary_300/source/newton;../../../../../packages;../../../../../packages/dMath;../../../../../packages/dScene;../../../../../packages/dContainers;../../../../../packages/thirdParty/tinyxml;../../../../../packages/thirdParty/glew/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;_DSCENE_DLL;_DCONTAINERS_DLL;_DPLUGIN_COMMON_DLL_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>

@@ -69,16 +69,8 @@ class dfbxImport: public dImportPlugin
 	};
 
 	public:
-	dfbxImport (const char* const ext, const char* const signature, const char* const description)
-		:dImportPlugin() 
-		, m_materialId (0)
-	{
-		strcpy (m_ext, ext);
-		strcpy (m_signature, signature);
-		strcpy (m_description, description);
-	}
-	
-	~dfbxImport() {}
+	dfbxImport (const char* const ext, const char* const signature, const char* const description);
+	virtual ~dfbxImport() {}
 	virtual const char* GetMenuName () { return GetSignature();}
 	virtual const char* GetFileExtension () { return m_ext;}
 	virtual const char* GetSignature () {return m_signature;}
@@ -93,6 +85,9 @@ class dfbxImport: public dImportPlugin
 	void ImportMaterials (FbxScene* const fbxScene, dPluginScene* const ngdScene, FbxNode* const fbxMeshNode, dPluginScene::dTreeNode* const meshNode, GlobalMaterialMap& materialCache, LocalMaterialMap& localMaterilIndex, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials);
 	void ImportTexture (dPluginScene* const ngdScene, FbxProperty pProperty, dPluginScene::dTreeNode* const materialNode, GlobalTextureMap& textureCache);
 	
+	static bool ProgressCallback (float pPercentage, FbxString pStatus);
+
+	static dPluginInterface* m_interface;
 	
 	int m_materialId;
 	char m_ext[32];
