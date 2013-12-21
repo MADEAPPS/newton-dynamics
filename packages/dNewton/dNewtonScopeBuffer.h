@@ -31,7 +31,7 @@ class dNewtonScopeBufferBase: public dNewtonAlloc
 	protected:
 	CNEWTON_API dNewtonScopeBufferBase ();
 	CNEWTON_API ~dNewtonScopeBufferBase ();
-	CNEWTON_API void SetBuffer (int newInBytes);
+	CNEWTON_API void SetBuffer (int sizeInBytes);
 	void* m_ptr;
 };
 
@@ -48,10 +48,10 @@ class dNewtonScopeBuffer: public dNewtonScopeBufferBase
 	}
 
 	dNewtonScopeBuffer (int size)
-		:dNewtonScopeBufferBase (0)
+		:dNewtonScopeBufferBase()
 		,m_size(0)
 	{
-		Init (size)
+		Init (size);
 	}
 
 	~dNewtonScopeBuffer ()
@@ -61,7 +61,7 @@ class dNewtonScopeBuffer: public dNewtonScopeBufferBase
 	void Init (int size)
 	{
 		m_size = size;
-		SetBuffer (sizeInBytes * sizeof (T))
+		SetBuffer (size * sizeof (T));
 	}
 
 
