@@ -436,7 +436,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 	NewtonCollision* MakeConvexHullAggregate(DemoEntity* const bodyPart) const
 	{
 		NewtonMesh* const mesh = bodyPart->GetMesh()->CreateNewtonMesh (GetWorld(), bodyPart->GetMeshMatrix());
-		NewtonMesh* const convexApproximation = NewtonMeshApproximateConvexDecomposition (mesh, 0.01f, 0.2f, 32, 100, NULL);
+		NewtonMesh* const convexApproximation = NewtonMeshApproximateConvexDecomposition (mesh, 0.01f, 0.2f, 32, 100, NULL, NULL);
 		
 		NewtonCollision* const compound = NewtonCreateCompoundCollisionFromMesh (GetWorld(), convexApproximation, 0.001f, 0, 0);
 

@@ -7927,11 +7927,11 @@ void NewtonMeshCalculateVertexNormals(const NewtonMesh* const mesh, dFloat angle
 	meshEffect->CalculateNormals (angleInRadians);
 }
 
-void NewtonMeshApplyAngleBasedMapping(const NewtonMesh* const mesh, int material)
+void NewtonMeshApplyAngleBasedMapping(const NewtonMesh* const mesh, int material, NewtonReportProgress reportPrograssCallback, void* const reportPrgressUserData)
 {
 	TRACE_FUNCTION(__FUNCTION__);	
 	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
-	meshEffect->AngleBaseFlatteningMapping(material);
+	meshEffect->AngleBaseFlatteningMapping(material, (dgReportProgress) reportPrograssCallback, reportPrgressUserData);
 }
 
 void NewtonMeshApplySphericalMapping(const NewtonMesh* const mesh, int material)
@@ -7993,16 +7993,16 @@ void NewtonMeshClip (const NewtonMesh* const mesh, const NewtonMesh* const clipp
 }
 
 
-NewtonMesh* NewtonMeshSimplify (const NewtonMesh* const mesh, int maxVertexCount, NewtonReportProgress progressReportCallback)
+NewtonMesh* NewtonMeshSimplify (const NewtonMesh* const mesh, int maxVertexCount, NewtonReportProgress progressReportCallback, void* const reportPrgressUserData)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	return (NewtonMesh*) ((dgMeshEffect*) mesh)->CreateSimplification (maxVertexCount, (dgReportProgress) progressReportCallback);
+	return (NewtonMesh*) ((dgMeshEffect*) mesh)->CreateSimplification (maxVertexCount, (dgReportProgress) progressReportCallback, reportPrgressUserData);
 }
 
-NewtonMesh* NewtonMeshApproximateConvexDecomposition (const NewtonMesh* const mesh, dFloat maxConcavity, dFloat backFaceDistanceFactor, int maxCount, int maxVertexPerHull, NewtonReportProgress progressReportCallback)
+NewtonMesh* NewtonMeshApproximateConvexDecomposition (const NewtonMesh* const mesh, dFloat maxConcavity, dFloat backFaceDistanceFactor, int maxCount, int maxVertexPerHull, NewtonReportProgress progressReportCallback, void* const reportPrgressUserData)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	return (NewtonMesh*) ((dgMeshEffect*) mesh)->CreateConvexApproximation (maxConcavity, backFaceDistanceFactor, maxCount, maxVertexPerHull, (dgReportProgress) progressReportCallback);
+	return (NewtonMesh*) ((dgMeshEffect*) mesh)->CreateConvexApproximation (maxConcavity, backFaceDistanceFactor, maxCount, maxVertexPerHull, (dgReportProgress) progressReportCallback, reportPrgressUserData);
 }
 
 

@@ -263,8 +263,8 @@ dgEdge* dgPolyhedra::AddFace ( dgInt32 count, const dgInt32* const index, const 
 	dgInt32 i0 = index[count-1];
 	for (dgInt32 i = 0; i < count; i ++) {
 		dgInt32 i1 = index[i];
-		dgPairKey code0 (i0, i1);
 
+		dgPairKey code0 (i0, i1);
 		if (!selfIntersectingFaceFilter.Insert (code0.GetVal())) {
 			return NULL;
 		}
@@ -1694,7 +1694,7 @@ void dgPolyhedra::ConvexPartition (const dgFloat64* const vertex, dgInt32 stride
 	if (GetCount()) {
 		Triangulate (vertex, strideInBytes, leftOversOut);
 		DeleteDegenerateFaces (vertex, strideInBytes, dgFloat32 (1.0e-5f));
-		Optimize (vertex, strideInBytes, NULL, dgFloat32 (1.0e-4f));
+		Optimize (vertex, strideInBytes, NULL, NULL, dgFloat32 (1.0e-4f));
 		DeleteDegenerateFaces (vertex, strideInBytes, dgFloat32 (1.0e-5f));
 
 		if (GetCount()) {
@@ -2625,7 +2625,7 @@ dgFloat64 dgPolyhedra::EdgePenalty (const dgBigVector* const pool, dgEdge* const
 }
 
 
-bool dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes, dgReportProgress normalizedProgress, dgFloat64 tol, dgInt32 maxFaceCount)
+bool dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes, dgReportProgress normalizedProgress, void* const reportProgressUserData, dgFloat64 tol, dgInt32 maxFaceCount)
 {
 	dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat64));
 
@@ -2693,7 +2693,7 @@ bool dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes,
 				if (interPasses >= 400) {
 					interPasses = 0;
 					faceCount = GetFaceCount();
-					progress = normalizedProgress ? normalizedProgress(dgFloat32 (1.0f) - GetEdgeCount() * progressDen) : true;
+					progress = normalizedProgress ? normalizedProgress(dgFloat32 (1.0f) - GetEdgeCount() * progressDen, reportProgressUserData) : true;
 				}
 
 				if (bigHeapArray.GetCount() > (bigHeapArray.GetMaxCount() - 100)) {
@@ -2796,7 +2796,7 @@ bool dgPolyhedra::Optimize (const dgFloat64* const array, dgInt32 strideInBytes,
 	}
 
 	if (normalizedProgress && progress) {
-		progress = normalizedProgress(dgFloat32 (1.0f));
+		progress = normalizedProgress(dgFloat32 (1.0f), reportProgressUserData);
 	}
 	return progress;
 }

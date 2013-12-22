@@ -253,6 +253,56 @@ bool CholeskyDecomposition (dgFloat32 **rows, dgInt32 size)
 */
 
 
+/*
+class TestSolver_xxxxxxx: public SymmetricBiconjugateGradientSolve
+{
+	public:
+	dgFloat64 a[4][4];
+
+	TestSolver_xxxxxxx()
+		:SymmetricBiconjugateGradientSolve()
+	{
+		dgFloat64 b[] = {1, 2, 3, 4};
+		dgFloat64 x[] = {0, 0, 0, 0};
+		dgFloat64 c[4];
+
+		memset (a, 0, sizeof (a));
+		a[0][0] = 2;
+		a[1][1] = 3;
+		a[2][2] = 4;
+		a[0][3] = 1;
+		a[1][3] = 1;
+		a[2][3] = 1;
+		a[3][0] = 1;
+		a[3][1] = 1;
+		a[3][2] = 1;
+
+
+		Solve (4, dgFloat64  (1.0e-10f), x, b);
+
+		MatrixTimeVector (c, x);
+		MatrixTimeVector (c, x);
+	}
+
+	void MatrixTimeVector (dgFloat64* const out, const dgFloat64* const v) const
+	{
+		out[0] = a[0][0] * v[0] + a[0][1] * v[1] + a[0][2] * v[2] + a[0][3] * v[3];
+		out[1] = a[1][0] * v[0] + a[1][1] * v[1] + a[1][2] * v[2] + a[1][3] * v[3];
+		out[2] = a[2][0] * v[0] + a[2][1] * v[1] + a[2][2] * v[2] + a[2][3] * v[3];
+		out[3] = a[3][0] * v[0] + a[3][1] * v[1] + a[3][2] * v[2] + a[3][3] * v[3];
+	}
+
+	void InversePrecoditionerTimeVector (dgFloat64* const out, const dgFloat64* const v) const
+	{
+		out[0] = v[0]/a[0][0];
+		out[1] = v[1]/a[1][1];
+		out[2] = v[2]/a[2][2];
+		out[3] = v[3];
+	}
+};
+*/
+
+
 SymmetricBiconjugateGradientSolve::SymmetricBiconjugateGradientSolve ()
 {
 }
@@ -285,7 +335,7 @@ dgFloat64 SymmetricBiconjugateGradientSolve::DotProduct (dgInt32 size, const dgF
 	return product;
 }
 
-dgFloat64 SymmetricBiconjugateGradientSolve::Solve (dgInt32 size, dgInt32 maxInterations, dgFloat64 tolerance, dgFloat64* const x, const dgFloat64* const b) const
+dgFloat64 SymmetricBiconjugateGradientSolve::Solve (dgInt32 size, dgFloat64 tolerance, dgFloat64* const x, const dgFloat64* const b) const
 {
 	dgStack<dgFloat64> r0_(size);
 	dgStack<dgFloat64> p0_(size);
@@ -301,12 +351,13 @@ dgFloat64 SymmetricBiconjugateGradientSolve::Solve (dgInt32 size, dgInt32 maxInt
 	Sub(size, r0, b, matrixP0);
 	InversePrecoditionerTimeVector (p0, r0);
 
-	maxInterations = dgMin(size, maxInterations);
-	dgAssert (maxInterations > 0);
 	dgFloat64 num = DotProduct (size, r0, p0);
-
 	dgInt32 iter = 0;
-	for (dgInt32 i = 0; (i < maxInterations) && (num > tolerance); i ++) {
+
+	
+	dgFloat64 error2 = num;
+	bool continueExecution = true;
+	for (dgInt32 j = 0; (j < size) && (error2 > tolerance) && continueExecution; j ++) {
 		MatrixTimeVector (matrixP0, p0);
 		dgFloat64 den = DotProduct (size, p0, matrixP0);
 
@@ -316,14 +367,21 @@ dgFloat64 SymmetricBiconjugateGradientSolve::Solve (dgInt32 size, dgInt32 maxInt
 		ScaleAdd (size, x, x, alpha, p0);
 		ScaleAdd (size, r0, r0, -alpha, matrixP0);
 
-		InversePrecoditionerTimeVector (MinvR0, r0);
+		continueExecution = InversePrecoditionerTimeVector (MinvR0, r0);
 		dgFloat64 num1 = DotProduct (size, r0, MinvR0);
 		dgFloat64 beta = num1 / num;
 		ScaleAdd (size, p0, MinvR0, beta, p0);
 		num = DotProduct (size, r0, MinvR0);
 		iter ++;
+		error2 = num;
+		if (j > 10) {
+			error2 = dgFloat64 (0.0f);
+			for (dgInt32 i = 0; i < size; i ++) {
+				error2 = dgMax (error2, r0[i] * r0[i]);
+			}
+		}
 	}
 
-	dgAssert (iter < maxInterations);
+	dgAssert (iter < size);
 	return num;
 }

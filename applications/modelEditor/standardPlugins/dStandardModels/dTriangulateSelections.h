@@ -31,6 +31,8 @@ class dMeshTriangulateMesh: public dPluginTool
 	virtual const char* GetDescription () {return "Triangulate selected meshes";}
 	virtual const char* GetSignature () {return "Triangulate Mesh";}
 	virtual bool Execute (dPluginInterface* const interface);
+
+	static bool ReportProgress(dFloat propgress, void* const handle);
 };
 
 #endif

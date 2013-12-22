@@ -829,8 +829,8 @@ class dgHACDClusterGraph
 #endif
 	}
 
-
-	// you can insert cal callback here  to print the progress as it collapse clusters
+/*
+	// you can insert callback here to print the progress as it collapse clusters
 	bool ReportProgress ()
 	{
 		bool state = true;
@@ -850,6 +850,7 @@ class dgHACDClusterGraph
 		}
 		return state;
 	};
+*/
 
 	dgMeshEffect* CreatePartitionMesh (dgMeshEffect& mesh, dgInt32 maxVertexPerHull)
 	{
@@ -904,7 +905,8 @@ class dgHACDClusterGraph
 		convexPartionMesh->EndPolygon(1.0e-5f);
 
 		m_progress = m_faceCount - 1;
-		ReportProgress();
+		dgAssert (0);
+//		ReportProgress();
 
 		return convexPartionMesh;
 	}
@@ -1128,7 +1130,9 @@ class dgHACDClusterGraph
 		dgAssert((pair.m_nodeA && pair.m_nodeB) || (!pair.m_nodeA && !pair.m_nodeB));
 		if (pair.m_nodeA && pair.m_nodeB && continueColapsing) {
 			// call the progress callback
-			continueColapsing = ReportProgress();
+//			continueColapsing = ReportProgress();
+			continueColapsing = true;
+			dgAssert (0);
 
 			dgListNode* const clusterNodeA = pair.m_nodeA;
 			dgListNode* const clusterNodeB = pair.m_nodeB;
@@ -1345,8 +1349,11 @@ class dgHACDClusterGraph
 dgReportProgress dgHACDClusterGraph::m_reportProgressCallback;
 
 
-dgMeshEffect* dgMeshEffect::CreateConvexApproximation(dgFloat32 maxConcavity, dgFloat32 backFaceDistanceFactor, dgInt32 maxHullsCount, dgInt32 maxVertexPerHull, dgReportProgress reportProgressCallback) const
+dgMeshEffect* dgMeshEffect::CreateConvexApproximation(dgFloat32 maxConcavity, dgFloat32 backFaceDistanceFactor, dgInt32 maxHullsCount, dgInt32 maxVertexPerHull, dgReportProgress reportProgressCallback, void* const userData) const
 {
+	dgAssert (0);
+	return 0;
+/*
 	//	dgMeshEffect triangleMesh(*this);
 	if (maxHullsCount <= 1) {
 		maxHullsCount = 1;
@@ -1388,4 +1395,5 @@ dgMeshEffect* dgMeshEffect::CreateConvexApproximation(dgFloat32 maxConcavity, dg
 	}
 
 	return partition;
+*/
 }

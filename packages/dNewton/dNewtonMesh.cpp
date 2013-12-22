@@ -86,7 +86,7 @@ void dNewtonMesh::CreateVoronoiConvexDecomposition (const dNewtonMesh& contexMes
 void dNewtonMesh::CreateApproximateConvexDecomposition (const dNewtonMesh& mesh, dFloat maxConcavity, dFloat backFaceDistanceFactor, int maxCount, int maxVertexPerHull)
 {
 	NewtonMeshDestroy (m_mesh);
-	m_mesh = NewtonMeshApproximateConvexDecomposition (mesh.m_mesh, maxConcavity, backFaceDistanceFactor, maxCount, maxVertexPerHull, NULL);
+	m_mesh = NewtonMeshApproximateConvexDecomposition (mesh.m_mesh, maxConcavity, backFaceDistanceFactor, maxCount, maxVertexPerHull, NULL, NULL);
 }
 
 

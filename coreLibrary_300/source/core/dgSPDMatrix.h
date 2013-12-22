@@ -242,11 +242,11 @@ class SymmetricBiconjugateGradientSolve
 	SymmetricBiconjugateGradientSolve ();
 	~SymmetricBiconjugateGradientSolve ();	
 
-	dgFloat64 Solve (dgInt32 size, dgInt32 maxInterations, dgFloat64 tolerance, dgFloat64* const x, const dgFloat64* const b) const;
+	dgFloat64 Solve (dgInt32 size, dgFloat64 tolerance, dgFloat64* const x, const dgFloat64* const b) const;
 
 	protected:
 	virtual void MatrixTimeVector (dgFloat64* const out, const dgFloat64* const v) const = 0;
-	virtual void InversePrecoditionerTimeVector (dgFloat64* const out, const dgFloat64* const v) const = 0;
+	virtual bool InversePrecoditionerTimeVector (dgFloat64* const out, const dgFloat64* const v) const = 0;
 
 	private:
 	dgFloat64 DotProduct (dgInt32 size, const dgFloat64* const b, const dgFloat64* const c) const;

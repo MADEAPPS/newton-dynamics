@@ -19,7 +19,7 @@
 #include "PhysicsUtils.h"
 #include "HeightFieldPrimitive.h"
 
-static bool ReportProgress (dFloat normalizedProgressPercent)
+static bool ReportProgress (dFloat normalizedProgressPercent, void* const userData)
 {
 	return true; 
 }
@@ -68,7 +68,7 @@ dAssert (0);
 	// create a convex approximation form the original mesh, 32 convex max and no more than 100 vertex convex hulls
 //	NewtonMesh* const convexApproximation = NewtonMeshApproximateConvexDecomposition (mesh, 0.01f, 0.2f, 32, 100, ReportProgress);
 //	NewtonMesh* const convexApproximation = NewtonMeshApproximateConvexDecomposition (mesh, 0.01f, 0.2f, 256, 100, ReportProgress);
-	NewtonMesh* const convexApproximation = NewtonMeshApproximateConvexDecomposition (mesh, 0.00001f, 0.0f, 256, 100, ReportProgress);
+	NewtonMesh* const convexApproximation = NewtonMeshApproximateConvexDecomposition (mesh, 0.00001f, 0.0f, 256, 100, ReportProgress, scene);
 
 	// create a compound collision by creation a convex hull of each segment of the source mesh 
 	NewtonCollision* const compound = NewtonCreateCompoundCollisionFromMesh (world, convexApproximation, 0.001f, 0, 0);

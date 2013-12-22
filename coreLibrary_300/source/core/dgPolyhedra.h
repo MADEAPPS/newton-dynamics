@@ -61,9 +61,9 @@ class dgEdge
 class dgPolyhedra: public dgTree <dgEdge, dgEdgeKey>
 {
 	public:
-
-	struct dgPairKey
+	class dgPairKey
 	{
+		public:
 		dgPairKey ();
 		dgPairKey (dgInt64 val);
 		dgPairKey (dgInt32 v0, dgInt32 v1);
@@ -79,12 +79,12 @@ class dgPolyhedra: public dgTree <dgEdge, dgEdgeKey>
 	dgPolyhedra (const dgPolyhedra &polyhedra);
 	virtual ~dgPolyhedra();
 
-	void BeginFace();
+	virtual void BeginFace();
 	dgEdge* AddFace (dgInt32 v0, dgInt32 v1, dgInt32 v2);
 	dgEdge* AddFace (dgInt32 count, const dgInt32* const index);
 	dgEdge* AddFace (dgInt32 count, const dgInt32* const index, const dgInt64* const userdata);
-	void EndFace ();
-	void DeleteFace(dgEdge* const edge);
+	virtual void EndFace ();
+	virtual void DeleteFace(dgEdge* const edge);
 
 	dgInt32 GetFaceCount() const;
 	dgInt32 GetEdgeCount() const;
@@ -114,7 +114,7 @@ class dgPolyhedra: public dgTree <dgEdge, dgEdgeKey>
 	void ChangeEdgeIncidentVertex (dgEdge* const edge, dgInt32 newIndex);	
 	void DeleteDegenerateFaces (const dgFloat64* const pool, dgInt32 dstStrideInBytes, dgFloat64 minArea);
 
-	bool Optimize (const dgFloat64* const pool, dgInt32 strideInBytes, dgReportProgress normalizedProgress, dgFloat64 tol, dgInt32 maxFaceCount = 1<<28);
+	bool Optimize (const dgFloat64* const pool, dgInt32 strideInBytes, dgReportProgress normalizedProgress, void* const reportProgressUserData, dgFloat64 tol, dgInt32 maxFaceCount = 1<<28);
 	void Triangulate (const dgFloat64* const vertex, dgInt32 strideInBytes, dgPolyhedra* const leftOversOut);
 	void ConvexPartition (const dgFloat64* const vertex, dgInt32 strideInBytes, dgPolyhedra* const leftOversOut);
 	dgEdge* CollapseEdge(dgEdge* const edge);
@@ -148,11 +148,11 @@ class dgPolyhedra: public dgTree <dgEdge, dgEdgeKey>
 
 
 
-inline dgEdge::dgEdge ()
+DG_INLINE dgEdge::dgEdge ()
 {
 }
 
-inline dgEdge::dgEdge (dgInt32 vertex, dgInt32 face, dgUnsigned64 userdata)
+DG_INLINE dgEdge::dgEdge (dgInt32 vertex, dgInt32 face, dgUnsigned64 userdata)
 	:m_incidentVertex(vertex)
 	,m_incidentFace(face)
 	,m_userData(userdata)
@@ -164,45 +164,45 @@ inline dgEdge::dgEdge (dgInt32 vertex, dgInt32 face, dgUnsigned64 userdata)
 }
 
 
-inline dgPolyhedra::dgPairKey::dgPairKey ()
+DG_INLINE dgPolyhedra::dgPairKey::dgPairKey ()
 {
 }
 
-inline dgPolyhedra::dgPairKey::dgPairKey (dgInt64 val)
+DG_INLINE dgPolyhedra::dgPairKey::dgPairKey (dgInt64 val)
 	:m_key(dgUnsigned64 (val))
 {
 }
 
-inline dgPolyhedra::dgPairKey::dgPairKey (dgInt32 v0, dgInt32 v1)
+DG_INLINE dgPolyhedra::dgPairKey::dgPairKey (dgInt32 v0, dgInt32 v1)
 	:m_key (dgUnsigned64 ((dgInt64 (v0) << 32) | v1))
 {
 }
 
-inline dgInt64 dgPolyhedra::dgPairKey::GetVal () const 
+DG_INLINE dgInt64 dgPolyhedra::dgPairKey::GetVal () const 
 {
 	return dgInt64 (m_key);
 }
 
-inline dgInt32 dgPolyhedra::dgPairKey::GetLowKey () const 
+DG_INLINE dgInt32 dgPolyhedra::dgPairKey::GetLowKey () const 
 {
 	return dgInt32 (m_key>>32);
 }
 
-inline dgInt32 dgPolyhedra::dgPairKey::GetHighKey () const 
+DG_INLINE dgInt32 dgPolyhedra::dgPairKey::GetHighKey () const 
 {
 	return dgInt32 (m_key & 0xffffffff);
 }
 
-inline void dgPolyhedra::BeginFace ()
+DG_INLINE void dgPolyhedra::BeginFace ()
 {
 }
 
-inline dgEdge* dgPolyhedra::AddFace (dgInt32 count, const dgInt32* const index) 
+DG_INLINE dgEdge* dgPolyhedra::AddFace (dgInt32 count, const dgInt32* const index) 
 {
 	return AddFace (count, index, NULL);
 }
 
-inline dgEdge* dgPolyhedra::AddFace (dgInt32 v0, dgInt32 v1, dgInt32 v2)
+DG_INLINE dgEdge* dgPolyhedra::AddFace (dgInt32 v0, dgInt32 v1, dgInt32 v2)
 {
 	dgInt32 vertex[3];
 
@@ -212,7 +212,7 @@ inline dgEdge* dgPolyhedra::AddFace (dgInt32 v0, dgInt32 v1, dgInt32 v2)
 	return AddFace (3, vertex, NULL);
 }
 
-inline dgInt32 dgPolyhedra::GetEdgeCount() const
+DG_INLINE dgInt32 dgPolyhedra::GetEdgeCount() const
 {
 #ifdef _DEBUG
 	dgInt32 edgeCount = 0;
@@ -225,7 +225,7 @@ inline dgInt32 dgPolyhedra::GetEdgeCount() const
 	return GetCount();
 }
 
-inline dgInt32 dgPolyhedra::GetLastVertexIndex() const
+DG_INLINE dgInt32 dgPolyhedra::GetLastVertexIndex() const
 {
 	dgInt32 maxVertexIndex = -1;
 	Iterator iter(*this);
@@ -239,38 +239,38 @@ inline dgInt32 dgPolyhedra::GetLastVertexIndex() const
 }
 
 
-inline dgInt32 dgPolyhedra::IncLRU() const
+DG_INLINE dgInt32 dgPolyhedra::IncLRU() const
 {	
 	m_edgeMark ++;
 	dgAssert (m_edgeMark < 0x7fffffff);
 	return m_edgeMark;
 }
 
-inline void dgPolyhedra::SetLRU(dgInt32 lru) const
+DG_INLINE void dgPolyhedra::SetLRU(dgInt32 lru) const
 {
 	if (lru > m_edgeMark) {
 		m_edgeMark = lru;
 	}
 }
 
-inline void dgPolyhedra::BeginConectedSurface() const
+DG_INLINE void dgPolyhedra::BeginConectedSurface() const
 {
 	m_baseMark = IncLRU();
 }
 
-inline void dgPolyhedra::EndConectedSurface() const
+DG_INLINE void dgPolyhedra::EndConectedSurface() const
 {
 }
 
 
-inline dgPolyhedra::dgTreeNode* dgPolyhedra::FindEdgeNode (dgInt32 i0, dgInt32 i1) const
+DG_INLINE dgPolyhedra::dgTreeNode* dgPolyhedra::FindEdgeNode (dgInt32 i0, dgInt32 i1) const
 {
 	dgPairKey key (i0, i1);
 	return Find (key.GetVal());
 }
 
 
-inline dgEdge *dgPolyhedra::FindEdge (dgInt32 i0, dgInt32 i1) const
+DG_INLINE dgEdge *dgPolyhedra::FindEdge (dgInt32 i0, dgInt32 i1) const
 {
 	//	dgTreeNode *node;
 	//	dgPairKey key (i0, i1);
@@ -280,7 +280,7 @@ inline dgEdge *dgPolyhedra::FindEdge (dgInt32 i0, dgInt32 i1) const
 	return node ? &node->GetInfo() : NULL;
 }
 
-inline void dgPolyhedra::DeleteEdge (dgInt32 v0, dgInt32 v1)
+DG_INLINE void dgPolyhedra::DeleteEdge (dgInt32 v0, dgInt32 v1)
 {
 	dgPairKey pairKey (v0, v1);
 	dgTreeNode* const node = Find(pairKey.GetVal());

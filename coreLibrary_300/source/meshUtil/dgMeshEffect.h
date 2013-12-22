@@ -161,7 +161,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	void BoxMapping (dgInt32 front, dgInt32 side, dgInt32 top);
 	void UniformBoxMapping (dgInt32 material, const dgMatrix& textruMatrix);
 	void CylindricalMapping (dgInt32 cylinderMaterial, dgInt32 capMaterial);
-	void AngleBaseFlatteningMapping (dgInt32 cylinderMaterial);
+	void AngleBaseFlatteningMapping (dgInt32 cylinderMaterial, dgReportProgress progressReportCallback, void* const userData);
 
 	dgEdge* InsertEdgeVertex (dgEdge* const edge, dgFloat64 param);
 
@@ -209,7 +209,6 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	dgFloat64* GetUV1Pool() const;
 
 	dgEdge* SpliteFace (dgInt32 v0, dgInt32 v1);
-	
 
 	dgInt32 GetTotalFaceCount() const;
 	dgInt32 GetTotalIndexCount() const;
@@ -246,8 +245,8 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	dgCollisionInstance* CreateCollisionTree(dgWorld* const world, dgInt32 shapeID) const;
 	dgCollisionInstance* CreateConvexCollision(dgWorld* const world, dgFloat64 tolerance, dgInt32 shapeID, const dgMatrix& matrix = dgGetIdentityMatrix()) const;
 
-	dgMeshEffect* CreateSimplification (dgInt32 maxVertexCount, dgReportProgress reportProgressCallback) const;
-	dgMeshEffect* CreateConvexApproximation (dgFloat32 maxConcavity, dgFloat32 backFaceDistanceFactor, dgInt32 maxHullOuputCount, dgInt32 maxVertexPerHull, dgReportProgress reportProgressCallback) const;
+	dgMeshEffect* CreateSimplification (dgInt32 maxVertexCount, dgReportProgress reportProgressCallback, void* const userData) const;
+	dgMeshEffect* CreateConvexApproximation (dgFloat32 maxConcavity, dgFloat32 backFaceDistanceFactor, dgInt32 maxHullOuputCount, dgInt32 maxVertexPerHull, dgReportProgress reportProgressCallback, void* const userData) const;
 
 	static dgMeshEffect* CreateDelaunayTetrahedralization (dgMemoryAllocator* const allocator, dgInt32 pointCount, dgInt32 pointStrideInBytes, const dgFloat32* const pointCloud, dgInt32 materialId, const dgMatrix& textureProjectionMatrix);
 	static dgMeshEffect* CreateVoronoiConvexDecomposition (dgMemoryAllocator* const allocator, dgInt32 pointCount, dgInt32 pointStrideInBytes, const dgFloat32* const pointCloud, dgInt32 materialId, const dgMatrix& textureProjectionMatrix);
@@ -290,15 +289,14 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	dgVertexAtribute InterpolateVertex (const dgBigVector& point, const dgEdge* const face) const;
 
 	bool Sanity () const;
-
-
 	void AddVertex(const dgBigVector& vertex);
 	void AddAtribute (const dgVertexAtribute& attib);
 	void AddPoint(const dgFloat64* vertexList, dgInt32 material);
 
-	
-
 	protected:
+	virtual void BeginFace();
+	virtual void EndFace ();
+
 	void Init ();
 	dgBigVector GetOrigin ()const;
 	dgInt32 CalculateMaxAttributes () const;
@@ -335,78 +333,78 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 
 
-inline dgInt32 dgMeshEffect::GetVertexCount() const
+DG_INLINE dgInt32 dgMeshEffect::GetVertexCount() const
 {
 	return m_pointCount;
 }
 
-inline dgInt32 dgMeshEffect::GetPropertiesCount() const
+DG_INLINE dgInt32 dgMeshEffect::GetPropertiesCount() const
 {
 	return m_atribCount;
 }
 
-inline dgInt32 dgMeshEffect::GetMaterialID (dgIndexArray* const handle, dgInt32 materialHandle) const
+DG_INLINE dgInt32 dgMeshEffect::GetMaterialID (dgIndexArray* const handle, dgInt32 materialHandle) const
 {
 	return handle->m_materials[materialHandle];
 }
 
-inline dgInt32 dgMeshEffect::GetMaterialIndexCount (dgIndexArray* const handle, dgInt32 materialHandle) const
+DG_INLINE dgInt32 dgMeshEffect::GetMaterialIndexCount (dgIndexArray* const handle, dgInt32 materialHandle) const
 {
 	return handle->m_materialsIndexCount[materialHandle];
 }
 
-inline dgMeshEffect::dgVertexAtribute& dgMeshEffect::GetAttribute (dgInt32 index) const 
+DG_INLINE dgMeshEffect::dgVertexAtribute& dgMeshEffect::GetAttribute (dgInt32 index) const 
 {
 	return m_attrib[index];
 }
 
-inline dgBigVector& dgMeshEffect::GetVertex (dgInt32 index) const
+DG_INLINE dgBigVector& dgMeshEffect::GetVertex (dgInt32 index) const
 {
 	return m_points[index];
 }
 
-inline dgInt32 dgMeshEffect::GetPropertiesStrideInByte() const 
+DG_INLINE dgInt32 dgMeshEffect::GetPropertiesStrideInByte() const 
 {
 	return sizeof (dgVertexAtribute);
 }
 
-inline dgFloat64* dgMeshEffect::GetAttributePool() const 
+DG_INLINE dgFloat64* dgMeshEffect::GetAttributePool() const 
 {
 	return &m_attrib->m_vertex.m_x;
 }
 
-inline dgFloat64* dgMeshEffect::GetNormalPool() const 
+DG_INLINE dgFloat64* dgMeshEffect::GetNormalPool() const 
 {
 	return &m_attrib->m_normal_x;
 }
 
-inline dgFloat64* dgMeshEffect::GetUV0Pool() const 
+DG_INLINE dgFloat64* dgMeshEffect::GetUV0Pool() const 
 {
 	return &m_attrib->m_u0;
 }
 
-inline dgFloat64* dgMeshEffect::GetUV1Pool() const 
+DG_INLINE dgFloat64* dgMeshEffect::GetUV1Pool() const 
 {
 	return &m_attrib->m_u1;
 }
 
-inline dgInt32 dgMeshEffect::GetVertexStrideInByte() const 
+DG_INLINE dgInt32 dgMeshEffect::GetVertexStrideInByte() const 
 {
 	return sizeof (dgBigVector);
 }
 
-inline dgFloat64* dgMeshEffect::GetVertexPool () const 
+DG_INLINE dgFloat64* dgMeshEffect::GetVertexPool () const 
 {
 	return &m_points[0].m_x;
 }
 
 
-inline dgMeshEffect* dgMeshEffect::GetFirstLayer ()
+DG_INLINE dgMeshEffect* dgMeshEffect::GetFirstLayer ()
 {
 	return GetNextLayer (IncLRU());
 }
 
-inline dgMeshEffect* dgMeshEffect::GetNextLayer (dgMeshEffect* const layerSegment)
+DG_INLINE dgMeshEffect* dgMeshEffect::GetNextLayer (dgMeshEffect* const layerSegment)
 {
 	if (!layerSegment) {
 		return NULL;
@@ -415,7 +413,7 @@ inline dgMeshEffect* dgMeshEffect::GetNextLayer (dgMeshEffect* const layerSegmen
 }
 
 
-inline dgFloat64 dgMeshEffect::QuantizeCordinade(dgFloat64 x) const
+DG_INLINE dgFloat64 dgMeshEffect::QuantizeCordinade(dgFloat64 x) const
 {
 	dgInt32 exp;
 	dgFloat64 mantissa = frexp(x, &exp);

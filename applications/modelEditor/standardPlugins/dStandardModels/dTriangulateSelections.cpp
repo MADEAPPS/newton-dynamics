@@ -37,6 +37,11 @@ dMeshTriangulateMesh* dMeshTriangulateMesh::GetPlugin()
 }
 
 
+bool dMeshTriangulateMesh::ReportProgress(dFloat progress, void* const handle)
+{
+	dPluginInterface* const interface = (dPluginInterface*) handle;
+	return interface->UpdateProgress(progress);
+}
 
 bool dMeshTriangulateMesh::Execute (dPluginInterface* const interface)
 {
@@ -55,7 +60,11 @@ bool dMeshTriangulateMesh::Execute (dPluginInterface* const interface)
 				if (info->GetEditorFlags() & dNodeInfo::m_selected) {
 					dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*) info;
 					render->InvalidateCachedDisplayList (meshInfo->GetMesh());
-					NewtonMeshTriangulate(meshInfo->GetMesh());
+
+NewtonMeshApplyAngleBasedMapping (meshInfo->GetMesh(), 0, ReportProgress, interface);
+//					NewtonMeshTriangulate(meshInfo->GetMesh());
+
+
 				}
 			}
 		}

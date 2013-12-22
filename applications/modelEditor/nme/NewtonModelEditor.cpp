@@ -606,7 +606,11 @@ void NewtonModelEditor::OnTool (wxCommandEvent& event)
 
 	dPluginTool* const plugin = (dPluginTool*) m_mainMenu->GetPlugin(m_mainMenu->m_toolMenu, id);
 	_ASSERTE (plugin);
+
+	wxProgressDialog progressDlg (wxT("Please wait"), wxT(plugin->GetFileDescription ()), 1000, NULL, wxPD_APP_MODAL | wxPD_AUTO_HIDE | wxPD_CAN_ABORT);
+	m_currentProgress = &progressDlg;
 	plugin->Execute(this);
+	m_currentProgress = NULL;
 }
 
 

@@ -1524,7 +1524,7 @@ class dgHACDClusterGraph
 
 #endif
 
-dgMeshEffect* dgMeshEffect::CreateSimplification(dgInt32 maxVertexCount, dgReportProgress reportProgressCallback) const
+dgMeshEffect* dgMeshEffect::CreateSimplification(dgInt32 maxVertexCount, dgReportProgress reportProgressCallback, void* const reportPrgressUserData) const
 {
 	if (GetVertexCount() <= maxVertexCount) {
 		return new (GetAllocator()) dgMeshEffect(*this); 
