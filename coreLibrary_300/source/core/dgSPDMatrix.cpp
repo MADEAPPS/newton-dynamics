@@ -349,14 +349,11 @@ dgFloat64 SymmetricBiconjugateGradientSolve::Solve (dgInt32 size, dgFloat64 tole
 
 	MatrixTimeVector (matrixP0, x);
 	Sub(size, r0, b, matrixP0);
-	InversePrecoditionerTimeVector (p0, r0);
+	bool continueExecution = InversePrecoditionerTimeVector (p0, r0);
 
 	dgFloat64 num = DotProduct (size, r0, p0);
 	dgInt32 iter = 0;
-
-	
 	dgFloat64 error2 = num;
-	bool continueExecution = true;
 	for (dgInt32 j = 0; (j < size) && (error2 > tolerance) && continueExecution; j ++) {
 		MatrixTimeVector (matrixP0, p0);
 		dgFloat64 den = DotProduct (size, p0, matrixP0);
@@ -365,8 +362,13 @@ dgFloat64 SymmetricBiconjugateGradientSolve::Solve (dgInt32 size, dgFloat64 tole
 		dgFloat64 alpha = num / den;
 
 		ScaleAdd (size, x, x, alpha, p0);
-		ScaleAdd (size, r0, r0, -alpha, matrixP0);
-
+        if ((j % 50) != 49) {
+		    ScaleAdd (size, r0, r0, -alpha, matrixP0);
+        } else {
+            dgAssert (0);
+            MatrixTimeVector (matrixP0, x);
+            Sub(size, r0, b, matrixP0);
+        }
 		continueExecution = InversePrecoditionerTimeVector (MinvR0, r0);
 		dgFloat64 num1 = DotProduct (size, r0, MinvR0);
 		dgFloat64 beta = num1 / num;
