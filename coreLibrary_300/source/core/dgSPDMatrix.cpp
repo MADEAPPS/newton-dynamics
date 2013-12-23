@@ -361,7 +361,7 @@ dgFloat64 SymmetricBiconjugateGradientSolve::Solve (dgInt32 size, dgFloat64 tole
 		MatrixTimeVector (matrixP0, p0);
 		dgFloat64 den = DotProduct (size, p0, matrixP0);
 
-		dgAssert (fabs(den) > dgFloat64 (1.0e-16f));
+		dgAssert (fabs(den) > dgFloat64 (0.0f));
 		dgFloat64 alpha = num / den;
 
 		ScaleAdd (size, x, x, alpha, p0);

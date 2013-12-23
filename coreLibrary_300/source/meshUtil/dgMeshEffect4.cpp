@@ -1529,7 +1529,7 @@ dgMeshEffect* dgMeshEffect::CreateSimplification(dgInt32 maxVertexCount, dgRepor
 	if (GetVertexCount() <= maxVertexCount) {
 		return new (GetAllocator()) dgMeshEffect(*this); 
 	}
-
+dgAssert (0);
 return new (GetAllocator()) dgMeshEffect(*this); 
 /*
 	//	dgMeshEffect triangleMesh(*this);
