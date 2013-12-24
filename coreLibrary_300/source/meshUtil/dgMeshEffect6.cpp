@@ -96,7 +96,7 @@ class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 
 	void GenerateUVCoordinates ()
 	{
-//m_mesh->SaveOFF("xxx.off");
+m_mesh->SaveOFF("xxx.off");
 //int xxx = 0;
 		dgStack<dgInt8> attibuteUsed (m_attibuteCount);
 		memset (&attibuteUsed[0], 0, attibuteUsed.GetSizeInBytes());
@@ -141,28 +141,22 @@ class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 					if (face->m_mark != mark) {
 						dgInt32 uvIndex2 = dgInt32 (face->m_prev->m_userData);
 						if (!attibuteUsed[uvIndex2]) {
+
 							dgInt32 uvIndex0 = dgInt32 (face->m_userData);
 							dgInt32 uvIndex1 = dgInt32 (face->m_next->m_userData);
-
-							dgFloat64 du (m_uvArray[uvIndex1].m_u0 - m_uvArray[uvIndex0].m_u0);
-							dgFloat64 dv (m_uvArray[uvIndex1].m_v0 - m_uvArray[uvIndex0].m_v0);
 
 							dgInt32 edgeIndex0 = GetAlphaLandaIndex (face);
 							dgInt32 edgeIndex1 = GetAlphaLandaIndex (face->m_next);
 							dgInt32 edgeIndex2 = GetAlphaLandaIndex (face->m_prev);
 
-							dgFloat64 e0length = sqrt (du * du + dv * dv);
-							dgFloat64 e2length = e0length * sin (m_variables[edgeIndex1]) / sin (m_variables[edgeIndex2]);
+							dgFloat64 refAngleCos = cos (m_variables[edgeIndex0]);
+							dgFloat64 refAngleSin = sin (m_variables[edgeIndex0]);
+							dgFloat64 scale = sin (m_variables[edgeIndex1]) / sin (m_variables[edgeIndex2]);
 
-							dgFloat64 ut = e2length * cos (m_variables[edgeIndex0]);
-							dgFloat64 vt = e2length * sin (m_variables[edgeIndex0]);
-
-							dgFloat64 refAngle = atan2 (dv, du);
-							dgFloat64 refAngleCos = cos (refAngle);
-							dgFloat64 refAngleSin = sin (refAngle);
-
-							dgFloat64 u = m_uvArray[uvIndex0].m_u0 + ut * refAngleCos - vt * refAngleSin; 
-							dgFloat64 v = m_uvArray[uvIndex0].m_v0 + ut * refAngleSin + vt * refAngleCos; 
+							dgFloat64 du = (m_uvArray[uvIndex1].m_u0 - m_uvArray[uvIndex0].m_u0) * scale;
+							dgFloat64 dv = (m_uvArray[uvIndex1].m_v0 - m_uvArray[uvIndex0].m_v0) * scale;
+							dgFloat64 u = m_uvArray[uvIndex0].m_u0 + du * refAngleCos - dv * refAngleSin; 
+							dgFloat64 v = m_uvArray[uvIndex0].m_v0 + du * refAngleSin + dv * refAngleCos; 
 
 							dgEdge* ptr = face->m_prev;
 							do {
@@ -187,46 +181,10 @@ class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 						if (face->m_prev->m_twin->m_incidentFace > 0) {
 							stack.Append(face->m_prev->m_twin);
 						}
-
-/*
-dgEdge* xxxx = face;
-dgTrace (("%d:\n", xxx));
-do {
-	const dgBigVector& p0 = m_mesh->GetVertex(xxxx->m_incidentVertex);
-	dgInt32 index = dgInt32 (xxxx->m_userData);
-	dgTrace (("(%5.3f %5.3f %5.3f) (%5.3f %5.3ff) \n", p0.m_x, p0.m_z, p0.m_y, m_uvArray[index].m_u0, m_uvArray[index].m_v0));
-	xxxx = xxxx->m_next;
-} while (xxxx != face);
-//dgInt32 edgeIndex0 = GetAlphaLandaIndex (face);
-//dgInt32 edgeIndex1 = GetAlphaLandaIndex (face->m_next);
-//dgInt32 edgeIndex2 = GetAlphaLandaIndex (face->m_prev);
-//dgTrace (("%d %4.2f %4.2f %4.2f\n", xxx, dgFloat32 (m_variables[edgeIndex0] * 180.0 / dgABF_PI), dgFloat32 (m_variables[edgeIndex1] * 180.0 / dgABF_PI), dgFloat32 (m_variables[edgeIndex2] * 180.0 / dgABF_PI)));
-xxx ++;
-//if (xxx > (128 + 4 + 2 + 2))
-if (xxx > (128 + 32 + 16))
-break;
-*/
 					}
 				}
 			}
-//break;
 		}
-
-/*
-for (dgInt32 i = 0; i < m_triangleCount; i ++) {
-	dgEdge* const face = m_betaEdge[i * 3];
-	if (face->m_mark != mark) {
-		dgEdge* ptr = face;
-		do {
-			dgInt32 index = dgInt32 (ptr->m_userData);
-			attibuteUsed[index] = 1;
-			m_uvArray[index].m_u0 = dgFloat32 (0.0f);
-			m_uvArray[index].m_v0 = dgFloat32 (0.0f);
-			ptr = ptr->m_next;
-		} while (ptr != face);
-	}
-}
-*/
 	}
 
 	void CalculateNumberOfVariables()
