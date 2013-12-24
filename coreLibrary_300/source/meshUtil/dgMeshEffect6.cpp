@@ -96,7 +96,7 @@ class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 
 	void GenerateUVCoordinates ()
 	{
-m_mesh->SaveOFF("xxx.off");
+//m_mesh->SaveOFF("xxx.off");
 //int xxx = 0;
 		dgStack<dgInt8> attibuteUsed (m_attibuteCount);
 		memset (&attibuteUsed[0], 0, attibuteUsed.GetSizeInBytes());
@@ -649,7 +649,7 @@ m_mesh->SaveOFF("xxx.off");
 		m_progressNum = 0;
 		m_continueExecution = true;
 
-
+/*
 		dgFloat64 gradientNorm = CalculateGradientVector ();
 		for (dgInt32 iter = 0; (iter < dgABF_MAX_ITERATIONS) && (gradientNorm > dgABF_TOL2) && m_continueExecution; iter++) {
 			m_progressDen = m_progressNum + m_totalVariablesCount;
@@ -659,14 +659,14 @@ m_mesh->SaveOFF("xxx.off");
 			}
 			gradientNorm = CalculateGradientVector ();
 		}
-
+*/
 
 #ifdef _DEBUG
 		// calculate gradient due to the equality that the sum on the internal angle of a triangle must add to 180 degree. (Xt0 + Xt1 + Xt2 - pi) = 0
-		for (dgInt32 i = 0; i < m_triangleCount; i ++) {
-			dgFloat64 gradient = m_variables[i * 3 + 0] + m_variables[i * 3 + 1] + m_variables[i * 3 + 2] - dgABF_PI;
-			dgAssert (fabs (gradient) < dgFloat64 (1.0e-2f));
-		}
+//		for (dgInt32 i = 0; i < m_triangleCount; i ++) {
+//			dgFloat64 gradient = m_variables[i * 3 + 0] + m_variables[i * 3 + 1] + m_variables[i * 3 + 2] - dgABF_PI;
+//			dgAssert (fabs (gradient) < dgFloat64 (1.0e-2f));
+//		}
 #endif
 	}
 
