@@ -27,6 +27,55 @@
 #include "dgStack.h"
 
 
+
+
+dgUnsigned64 dgGetTimeInMicrosenconds()
+{
+
+#ifdef _MSC_VER
+	static LARGE_INTEGER frequency;
+	static LARGE_INTEGER baseCount;
+	if (!frequency.QuadPart) {
+		QueryPerformanceFrequency(&frequency);
+		QueryPerformanceCounter (&baseCount);
+	}
+
+
+	LARGE_INTEGER count;
+	QueryPerformanceCounter (&count);
+	count.QuadPart -= baseCount.QuadPart;
+	dgUnsigned64 ticks = dgUnsigned64 (count.QuadPart * LONGLONG (1000000) / frequency.QuadPart);
+	return ticks;
+#endif
+
+#if (defined (_POSIX_VER) || defined (_POSIX_VER_64))
+	timespec ts;
+	static unsigned64 baseCount = 0;
+	if (!baseCount) {
+		clock_gettime(CLOCK_REALTIME, &ts);
+		baseCount = unsigned64 (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000;
+	}
+	clock_gettime(CLOCK_REALTIME, &ts); // Works on Linux
+	return unsigned64 (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000 - baseCount;
+#endif
+
+
+#ifdef _MACOSX_VER
+	timeval tp;
+	static unsigned64 baseCount = 0;
+	if (!baseCount) {
+		gettimeofday(&tp, NULL);
+		baseCount = unsigned64 (tp.tv_sec) * 1000000 + tp.tv_usec;
+	}
+
+	gettimeofday(&tp, NULL);
+	unsigned64 microsecunds = unsigned64 (tp.tv_sec) * 1000000 + tp.tv_usec;
+	return microsecunds - baseCount;
+#endif
+}
+
+
+
 void GetMinMax (dgVector &minOut, dgVector &maxOut, const dgFloat32* const vertexArray, dgInt32 vCount, dgInt32 strideInBytes)
 {
 	dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat32));

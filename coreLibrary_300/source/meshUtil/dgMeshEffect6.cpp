@@ -37,11 +37,9 @@
 #include "dgWorld.h"
 #include "dgMeshEffect.h"
 
-#define dgABF_MAX_ITERATIONS		20
-//#define dgABF_TOL2					dgFloat64 (1.0e-5f)
-//#define dgABF_LINEAR_SOLVER_TOL		dgFloat64 (1.0e-7f)
-#define dgABF_TOL2					dgFloat64 (1.0e-16)
-#define dgABF_LINEAR_SOLVER_TOL		dgFloat64 (1.0e-16)
+#define dgABF_MAX_ITERATIONS		5
+#define dgABF_TOL2					dgFloat64 (1.0e-12)
+#define dgABF_LINEAR_SOLVER_TOL		dgFloat64 (1.0e-14)
 #define dgABF_PI					dgFloat64 (3.1415926535)
 
 
@@ -674,7 +672,9 @@ for (dgInt32 i = 0; i < m_triangleCount; i ++) {
 
 		m_progressNum ++;
 		if (m_progressReportCallback) {
-			m_continueExecution = m_progressReportCallback (dgMin (dgFloat32 (m_progressNum) / m_progressDen, dgFloat32 (1.0f)), m_progressReportUserData);
+			if ((m_progressNum & 127) == 127) {
+				m_continueExecution = m_progressReportCallback (dgMin (dgFloat32 (m_progressNum) / m_progressDen, dgFloat32 (1.0f)), m_progressReportUserData);
+			}
 		}
 		return m_continueExecution;
 	}
@@ -691,16 +691,15 @@ for (dgInt32 i = 0; i < m_triangleCount; i ++) {
 		m_progressNum = 0;
 		m_continueExecution = true;
 
-		dgFloat64 solverTol = dgABF_LINEAR_SOLVER_TOL * dgFloat64 (10.0f);
+
 		dgFloat64 gradientNorm = CalculateGradientVector ();
 		for (dgInt32 iter = 0; (iter < dgABF_MAX_ITERATIONS) && (gradientNorm > dgABF_TOL2) && m_continueExecution; iter++) {
-			m_progressDen = m_progressNum + (m_totalVariablesCount >> 2);
-			Solve(m_totalVariablesCount, solverTol, m_deltaVariables, m_gradients);
+			m_progressDen = m_progressNum + m_totalVariablesCount;
+			Solve(m_totalVariablesCount, dgABF_LINEAR_SOLVER_TOL, m_deltaVariables, m_gradients);
 			for (dgInt32 i = 0; i < m_totalVariablesCount; i ++) {
 				m_variables[i] += m_deltaVariables[i];
 			}
 			gradientNorm = CalculateGradientVector ();
-			solverTol = dgABF_LINEAR_SOLVER_TOL;
 		}
 
 
@@ -1230,13 +1229,8 @@ void dgMeshEffect::UniformBoxMapping (dgInt32 material, const dgMatrix& textureM
 
 void dgMeshEffect::AngleBaseFlatteningMapping (dgInt32 material, dgReportProgress progressReportCallback, void* const userData)
 {
-/*
-dgMatrix matrix1 (dgGetIdentityMatrix());
-matrix1[0][0] = 100.0f;
-matrix1[1][1] = 100.0f;
-matrix1[2][2] = 100.0f;
-ApplyTransform(matrix1);
-*/
+	dgSetPrecisionDouble presicion;
+	dgFloatExceptions exceptions;
 
 	dgStack<dgVertexAtribute>attribArray (GetCount());
 	dgInt32 count = EnumerateAttributeArray (&attribArray[0]);

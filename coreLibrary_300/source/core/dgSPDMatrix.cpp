@@ -337,24 +337,25 @@ dgFloat64 SymmetricBiconjugateGradientSolve::DotProduct (dgInt32 size, const dgF
 
 dgFloat64 SymmetricBiconjugateGradientSolve::Solve (dgInt32 size, dgFloat64 tolerance, dgFloat64* const x, const dgFloat64* const b) const
 {
-	dgStack<dgFloat64> r0_(size);
-	dgStack<dgFloat64> p0_(size);
-	dgStack<dgFloat64> MinvR0_(size);
-	dgStack<dgFloat64> matrixP0_(size);
+	dgStack<dgFloat64> bufferR0(size);
+	dgStack<dgFloat64> bufferP0(size);
+	dgStack<dgFloat64> matrixTimesP0(size);
+	dgStack<dgFloat64> bufferConditionerInverseTimesR0(size);
 
-	dgFloat64* const r0 = &r0_[0];
-	dgFloat64* const p0 = &p0_[0];
-	dgFloat64* const MinvR0 = &MinvR0_[0];
-	dgFloat64* const matrixP0 = &matrixP0_[0];
+	dgFloat64* const r0 = &bufferR0[0];
+	dgFloat64* const p0 = &bufferP0[0];
+	dgFloat64* const MinvR0 = &bufferConditionerInverseTimesR0[0];
+	dgFloat64* const matrixP0 = &matrixTimesP0[0];
 
 	MatrixTimeVector (matrixP0, x);
 	Sub(size, r0, b, matrixP0);
 	bool continueExecution = InversePrecoditionerTimeVector (p0, r0);
 
-	dgFloat64 num = DotProduct (size, r0, p0);
 	dgInt32 iter = 0;
+	dgFloat64 num = DotProduct (size, r0, p0);
 	dgFloat64 error2 = num;
 	for (dgInt32 j = 0; (j < size) && (error2 > tolerance) && continueExecution; j ++) {
+
 		MatrixTimeVector (matrixP0, p0);
 		dgFloat64 den = DotProduct (size, p0, matrixP0);
 
@@ -365,11 +366,16 @@ dgFloat64 SymmetricBiconjugateGradientSolve::Solve (dgInt32 size, dgFloat64 tole
         if ((j % 50) != 49) {
 		    ScaleAdd (size, r0, r0, -alpha, matrixP0);
         } else {
-            dgAssert (0);
             MatrixTimeVector (matrixP0, x);
             Sub(size, r0, b, matrixP0);
         }
+
+//dgUnsigned64 xxx0 = dgGetTimeInMicrosenconds();
 		continueExecution = InversePrecoditionerTimeVector (MinvR0, r0);
+//xxx0 = dgGetTimeInMicrosenconds() - xxx0;
+//dgTrace (("%d\n", dgUnsigned64 (xxx0)));
+
+
 		dgFloat64 num1 = DotProduct (size, r0, MinvR0);
 		dgFloat64 beta = num1 / num;
 		ScaleAdd (size, p0, MinvR0, beta, p0);

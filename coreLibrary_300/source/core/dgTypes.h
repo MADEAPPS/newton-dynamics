@@ -688,6 +688,9 @@ void dgDeserializeMarker(dgDeserialize serializeCallback, void* const userData);
 typedef dgUnsigned32 (dgApi *OnGetPerformanceCountCallback) ();
 
 
+dgUnsigned64 dgGetTimeInMicrosenconds();
+
+
 class dgFloatExceptions
 {
 	public:
