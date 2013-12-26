@@ -51,10 +51,10 @@
 #endif
 
 
-class dgTraingleAngleToUV: public SymmetricBiconjugateGradientSolve
+class dgTriangleAnglesToUV: public SymmetricBiconjugateGradientSolve
 {
 	public:
-	dgTraingleAngleToUV (dgMeshEffect* const mesh, dgInt32 material, dgReportProgress progressReportCallback, void* const userData, const dgFloat64* const pinnedPoint, dgFloat64* const triangleAnglesVector = NULL)
+	dgTriangleAnglesToUV (dgMeshEffect* const mesh, dgInt32 material, dgReportProgress progressReportCallback, void* const userData, const dgFloat64* const pinnedPoint, dgFloat64* const triangleAnglesVector = NULL)
 		:m_mesh(mesh)
 		,m_triangleAngles(triangleAnglesVector)
 		,m_pinnedPoints(pinnedPoint)
@@ -150,9 +150,35 @@ class dgTraingleAngleToUV: public SymmetricBiconjugateGradientSolve
 		m_diagonal = (dgFloat64*) m_mesh->GetAllocator()->MallocLow (2 * m_mesh->GetVertexCount() * sizeof (dgFloat64));
 
 		LagrangeOptimization();
+
+		dgStack<dgMeshEffect::dgVertexAtribute>attribArray (m_mesh->GetCount());
+		dgInt32 attribCount = m_mesh->EnumerateAttributeArray (&attribArray[0]);
+		mark = m_mesh->IncLRU();
+		for (iter.Begin(); iter; iter ++) {
+			dgEdge* const edge = &iter.GetNode()->GetInfo();
+			if (edge->m_mark != mark) {
+				dgInt32 vertexIndex = edge->m_incidentVertex;
+				dgEdge* const vertexEdge = m_vertexEdge[vertexIndex];
+				dgFloat64 u = m_uvArray[vertexIndex * 2 + 0];
+				dgFloat64 v = m_uvArray[vertexIndex * 2 + 1];
+				dgEdge* ptr = vertexEdge;
+				do {
+					if (ptr->m_incidentFace > 0) {
+						dgInt32 index = dgInt32 (ptr->m_userData);
+						dgMeshEffect::dgVertexAtribute& attribute = m_mesh->GetAttribute (index);
+						attribute.m_u0 = u;
+						attribute.m_v0 = v;
+						attribute.m_material = material;
+					}
+					ptr->m_mark = mark;
+					ptr = ptr->m_twin->m_next;
+				} while (ptr != vertexEdge);
+			}
+		}
+		m_mesh->ApplyAttributeArray(&attribArray[0], attribCount);
 	}
 
-	~dgTraingleAngleToUV()
+	~dgTriangleAnglesToUV()
 	{
 		m_mesh->GetAllocator()->FreeLow (m_diagonal);
 		m_mesh->GetAllocator()->FreeLow (m_gradients);
@@ -795,7 +821,7 @@ class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 		for (dgInt32 i = 2; i < m_totalVariablesCount; i ++) {
 			m_deltaVariables[i] = 1.0f;
 		}
-		dgTraingleAngleToUV anglesToUV (mesh, material, progressReportCallback, userData, m_deltaVariables, m_variables);
+		dgTriangleAnglesToUV anglesToUV (mesh, material, progressReportCallback, userData, m_deltaVariables, m_variables);
 	}
 
 	~dgAngleBasedFlatteningMapping()
@@ -1844,9 +1870,6 @@ void dgMeshEffect::AngleBaseFlatteningMapping (dgInt32 material, dgReportProgres
 {
 	dgSetPrecisionDouble presicion;
 
-//	dgStack<dgVertexAtribute>attribArray (GetCount());
-//	dgInt32 count = EnumerateAttributeArray (&attribArray[0]);
-
 	dgMeshEffect tmp (*this);
 
 	dgBigVector minBox;
@@ -1861,14 +1884,6 @@ void dgMeshEffect::AngleBaseFlatteningMapping (dgInt32 material, dgReportProgres
 	matrix[1][1] = scale;
 	matrix[2][2] = scale;
 	tmp.ApplyTransform(matrix);
-/*
-	for (dgInt32 i =- 0; i < count; i ++) {
-		attribArray[i].m_u0= dgFloat64 (0.0f);
-		attribArray[i].m_v1= dgFloat64 (0.0f);
-		attribArray[i].m_u0= dgFloat64 (0.0f);
-		attribArray[i].m_v0= dgFloat64 (0.0f);
-	}
-	dgAngleBasedFlatteningMapping angleBadedFlattening (&tmp, count, &attribArray[0], material, progressReportCallback, userData);
-*/
+
 	dgAngleBasedFlatteningMapping angleBadedFlattening (&tmp, material, progressReportCallback, userData);
 }
