@@ -296,14 +296,22 @@ class dgTraingleAngleToUV: public SymmetricBiconjugateGradientSolve
 
 	void MatrixTimeVector (dgFloat64* const out, const dgFloat64* const v) const
 	{
-		out[0] = 2 * v[0] + 1 * v[1];
-		out[1] = 1 * v[0] + 3 * v[1];
+		const dgInt32 count = m_mesh->GetVertexCount();
+		for (dgInt32 i = 0; i < count; i ++) {
+			dgEdge* const vertex = m_vertexEdge[i];
+			dgAssert (vertex->m_incidentVertex == i);
+			out[i * 2 + 0] = m_diagonal[2 * i + 0] * v[2 * i + 0];
+			out[i * 2 + 1] = m_diagonal[2 * i + 1] * v[2 * i + 1];
+		}
 	}
 
 	bool InversePrecoditionerTimeVector (dgFloat64* const out, const dgFloat64* const v) const
 	{
-		out[0] = (1.0 / 2.0) * v[0] * 1.0f;
-		out[1] = (1.0 / 3.0) * v[1] * 0.0f;
+		const dgInt32 count = m_mesh->GetVertexCount();
+		for (dgInt32 i = 0; i < count; i ++) {
+			out[2 * i + 0] = m_pinnedPoints[i] * v[i * 2 + 0] / m_diagonal[2 * i + 0];
+			out[2 * i + 1] = m_pinnedPoints[i] * v[i * 2 + 1] / m_diagonal[2 * i + 1];
+		}
 		return true;
 	}
 /*
@@ -712,13 +720,13 @@ class dgTraingleAngleToUV: public SymmetricBiconjugateGradientSolve
 	void LagrangeOptimization()
 	{
 		CalculateGradientVector ();
-//		Solve(2 * m_mesh->GetVertexCount(), dgABF_UV_TOL2, m_uvArray, m_gradients);
+		Solve(2 * m_mesh->GetVertexCount(), dgABF_UV_TOL2, m_uvArray, m_gradients);
 
-m_gradients[0] = 7; 
-m_gradients[1] = 11; 
-m_uvArray[0] = 0; 
-m_uvArray[1] = 2; 
-Solve(2, dgABF_UV_TOL2, m_uvArray, m_gradients);
+//m_gradients[0] = 7; 
+//m_gradients[1] = 11; 
+//m_uvArray[0] = 0; 
+//m_uvArray[1] = 2; 
+//Solve(2, dgABF_UV_TOL2, m_uvArray, m_gradients);
 
 	}
 
@@ -785,7 +793,7 @@ class dgAngleBasedFlatteningMapping: public SymmetricBiconjugateGradientSolve
 		m_deltaVariables[0] = 0.0f;
 		m_deltaVariables[1] = 0.0f;
 		for (dgInt32 i = 2; i < m_totalVariablesCount; i ++) {
-			m_deltaVariables[0] = 1.0f;
+			m_deltaVariables[i] = 1.0f;
 		}
 		dgTraingleAngleToUV anglesToUV (mesh, material, progressReportCallback, userData, m_deltaVariables, m_variables);
 	}
