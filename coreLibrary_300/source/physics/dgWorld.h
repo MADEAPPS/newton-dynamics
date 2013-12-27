@@ -33,8 +33,8 @@
 #include "dgDeformableBodiesUpdate.h"
 #include "dgCollisionCompoundFractured.h"
 
-#define DG_REDUCE_CONTACT_TOLERANCE			dgFloat32 (1.0e-2f)
-#define DG_PRUNE_CONTACT_TOLERANCE			dgFloat32 (1.0e-2f)
+#define DG_REDUCE_CONTACT_TOLERANCE			dgFloat32 (5.0e-2f)
+#define DG_PRUNE_CONTACT_TOLERANCE			dgFloat32 (5.0e-2f)
 
 #define DG_SLEEP_ENTRIES					8
 #define DG_MAX_DESTROYED_BODIES_BY_FORCE	8

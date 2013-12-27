@@ -991,7 +991,7 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 		}
 	}
 
-	if (isAutoSleep) {
+	if (isAutoSleep && (island->m_jointCount > DG_SMALL_ISLAND_COUNT)) {
 		if (stackSleeping) {
 			for (dgInt32 i = 0; i < count; i ++) {
 				dgBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
