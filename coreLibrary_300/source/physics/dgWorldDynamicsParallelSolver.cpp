@@ -510,6 +510,7 @@ void dgWorldDynamicUpdate::CalculateJointsVelocParallelKernel (void* const conte
 
 	dgVector speedFreeze2 (world->m_freezeSpeed2 * dgFloat32 (0.1f));
 	dgVector freezeOmega2 (world->m_freezeOmega2 * dgFloat32 (0.1f));
+	//dgVector forceActiveMask ((jointCount <= DG_SMALL_ISLAND_COUNT) ?  dgFloat32 (-1.0f): dgFloat32 (0.0f));
 
 	dgVector timestep4 (syncData->m_timestepRK);
 

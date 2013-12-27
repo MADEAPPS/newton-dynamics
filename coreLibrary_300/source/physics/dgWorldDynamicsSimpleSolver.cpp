@@ -876,6 +876,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 
 	dgVector speedFreeze2 (world->m_freezeSpeed2 * dgFloat32 (0.1f));
 	dgVector freezeOmega2 (world->m_freezeOmega2 * dgFloat32 (0.1f));
+	dgVector forceActiveMask ((jointCount <= DG_SMALL_ISLAND_COUNT) ?  dgVector (-1, -1, -1, -1): dgFloat32 (0.0f));
 
 	dgFloat32 firstPassCoef = dgFloat32 (0.0f);
 	for (dgInt32 step = 0; step < maxPasses; step ++) {
@@ -1030,7 +1031,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 					} else {
 						dgVector velocStep2 (velocStep.DotProduct4(velocStep));
 						dgVector omegaStep2 (omegaStep.DotProduct4(omegaStep));
-						dgVector test ((velocStep2 > speedFreeze2) | (omegaStep2 > omegaStep2));
+						dgVector test ((velocStep2 > speedFreeze2) | (omegaStep2 > omegaStep2) | forceActiveMask);
 						if (test.GetSignMask()) {
 							body->m_resting = false;
 						}
@@ -1073,21 +1074,23 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 
 
 		dgVector invTime (invTimestep);
-		dgFloat32 maxAccNorm2 = maxAccNorm * maxAccNorm;
+		//dgFloat32 maxAccNorm2 = maxAccNorm * maxAccNorm;
+		dgVector maxAccNorm2 (maxAccNorm * maxAccNorm);
 		for (dgInt32 i = 1; i < bodyCount; i ++) {
 			dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
 			if (body->m_active) {
 				// the initial velocity and angular velocity were stored in net force and net torque, for memory saving
 				dgVector accel = (body->m_veloc - body->m_netForce).CompProduct4 (invTime);
 				dgVector alpha = (body->m_omega - body->m_netTorque).CompProduct4 (invTime);
-
-				if ((accel % accel) < maxAccNorm2) {
-					accel = zero;
-				}
-
-				if ((alpha % alpha) < maxAccNorm2) {
-					alpha = zero;
-				}
+				dgVector accelTest ((accel.DotProduct4(accel) > maxAccNorm2) | (alpha.DotProduct4(alpha) > maxAccNorm2) | forceActiveMask);
+//				if ((accel % accel) < maxAccNorm2) {
+//					accel = zero;
+//				}
+//				if ((alpha % alpha) < maxAccNorm2) {
+//					alpha = zero;
+//				}
+				accel = accel & accelTest;
+				alpha = alpha & accelTest;
 
 				if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
 					body->m_accel = accel;

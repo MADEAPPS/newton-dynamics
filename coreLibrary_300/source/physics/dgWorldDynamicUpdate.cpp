@@ -659,7 +659,7 @@ void dgWorldDynamicUpdate::FindActiveJointAndBodies (dgIsland* const island)
 //	if (jointCount > 100000000) {
 	if (0) {
 
-	} else if (jointCount) {
+	} else if (jointCount > DG_SMALL_ISLAND_COUNT) {
 		for (dgInt32 i = 0; i < jointCount; i ++) {
 			dgJointInfo* const jointInfo = &constraintArray[i];
 			dgConstraint* const joint = jointInfo->m_joint;
@@ -680,11 +680,31 @@ void dgWorldDynamicUpdate::FindActiveJointAndBodies (dgIsland* const island)
 			body1->m_active |= !(!m1);
 			joint->m_active = true;
 		}
+	} else if (jointCount){
+		for (dgInt32 i = 0; i < jointCount; i ++) {
+			dgJointInfo* const jointInfo = &constraintArray[i];
+			dgConstraint* const joint = jointInfo->m_joint;
+			dgInt32 m0 = (joint->m_body0->GetInvMass().m_w != dgFloat32(0.0f)) ? joint->m_body0->m_index: 0;
+			dgInt32 m1 = (joint->m_body1->GetInvMass().m_w != dgFloat32(0.0f)) ? joint->m_body1->m_index: 0;
+			jointInfo->m_m0 = m0;
+			jointInfo->m_m1 = m1;
+			joint->m_active = true;
+		}
+
+		dgInt32 bodyCount = island->m_bodyCount;
+		for (dgInt32 i = 1; i < bodyCount; i ++) {
+			dgBody* const body = bodyArray[i].m_body;
+			body->m_active = true;
+			//body->m_resting = body->m_equilibrium;
+			body->m_resting = false;
+		}
+
 	} else {
 		dgAssert (island->m_bodyCount == 2);
 		dgBody* const body = bodyArray[1].m_body;
 		body->m_active = true;
-		body->m_resting = body->m_equilibrium;
+		//body->m_resting = body->m_equilibrium;
+		body->m_resting = false;
 	}
 }
 
@@ -932,7 +952,7 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 	dgFloat32 maxOmega = dgFloat32 (0.0f);
 
 	dgFloat32 speedFreeze = world->m_freezeSpeed2;
-	dgFloat32 accelFreeze = world->m_freezeAccel2;
+	dgFloat32 accelFreeze = world->m_freezeAccel2 * ((island->m_jointCount <= DG_SMALL_ISLAND_COUNT) ? dgFloat32 (0.05f) : dgFloat32 (1.0f));
 	dgVector forceDampVect (forceDamp, forceDamp, forceDamp, dgFloat32 (0.0f));
 	for (dgInt32 i = 0; i < count; i ++) {
 		dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
