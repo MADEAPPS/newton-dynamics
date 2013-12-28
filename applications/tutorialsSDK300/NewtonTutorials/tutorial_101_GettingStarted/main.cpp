@@ -83,6 +83,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	NewtonBody* const background = CreateBackgroundBody (world);
 	NewtonBody* const freeFallBall = CreateFreeFallBall (world);
 
+	// for deterministic behavior call this function each time you change the world
+	NewtonInvalidateCache (world);
+
 	// run the simulation loop
 	for (int i = 0; i < 300; i ++) {
 		NewtonUpdate (world, 1.0f/60.f);
