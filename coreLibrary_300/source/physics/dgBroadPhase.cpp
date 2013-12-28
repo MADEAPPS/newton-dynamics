@@ -431,7 +431,8 @@ dgFloat64 dgBroadPhase::CalculateEmptropy ()
 
 void dgBroadPhase::InvalidateCache ()
 {
-	dgTrace (("Invalidate cache\n"));
+	ResetEntropy ();
+	ImproveFitness();
 }
 
 void dgBroadPhase::GetWorldSize (dgVector& p0, dgVector& p1) const

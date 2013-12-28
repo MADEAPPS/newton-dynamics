@@ -236,16 +236,21 @@ void dgBodyMasterList::SortMasterList()
 		dgAssert (GetFirst() != node);
 
 		body1->InvalidateCache ();
-		
 
-		//dgInt32 key1 = body1->m_uniqueID | ((body1->m_invMass.m_w > 0.0f) << 30);
-		dgInt32 key1 = body1->m_uniqueID | ((body1->GetInvMass().m_w > 0.0f) << 30);
+		dgInt32 val0 = (body1->GetInvMass().m_w > 0.0f) << 28;
+		dgInt32 val1 = body1->IsRTTIType(dgBody::m_kinematicBodyRTTI) ?  1<<29 : 0;
+		dgInt32 val2 = body1->IsRTTIType(dgBody::m_deformableBodyRTTI) ? 1<<30 : 0;
+		dgInt32 key1 = body1->m_uniqueID | val0 | val1 | val2;
 		dgListNode* const entry = node;
 		node = node->GetNext();
 		dgListNode* prev = entry->GetPrev();
 		for (; prev != GetFirst(); prev = prev->GetPrev()) {
 			dgBody* const body0 = prev->GetInfo().GetBody();
-			dgInt32 key0 = body0->m_uniqueID | ((body0->GetInvMass().m_w > 0.0f) << 30);
+
+			val0 = (body0->GetInvMass().m_w > 0.0f) << 28;
+			val1 = body0->IsRTTIType(dgBody::m_kinematicBodyRTTI) ?  1<<29 : 0;
+			val2 = body0->IsRTTIType(dgBody::m_deformableBodyRTTI) ? 1<<30 : 0;
+			dgInt32 key0 = body0->m_uniqueID | val0 | val1 | val2;
 			if (key0 < key1) {
 				break;
 			}

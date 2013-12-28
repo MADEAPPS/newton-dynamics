@@ -30,7 +30,7 @@ dgKinematicBody::dgKinematicBody()
 	:dgBody()
 {
 	m_collidable = false;
-	m_type = m_kinamticBody;
+	m_type = m_kinematicBody;
 	m_rtti |= m_kinematicBodyRTTI;
 }
 
@@ -38,7 +38,7 @@ dgKinematicBody::dgKinematicBody (dgWorld* const world, const dgTree<const dgCol
 	:dgBody (world, collisionNode, serializeCallback, userData)
 {
 	m_collidable = false;
-	m_type = m_kinamticBody;
+	m_type = m_kinematicBody;
 	m_rtti |= m_kinematicBodyRTTI;
 }
 

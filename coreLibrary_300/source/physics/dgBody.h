@@ -60,7 +60,7 @@ class dgBody
 	enum dgType
 	{
 		m_dynamicBody = 0,
-		m_kinamticBody,
+		m_kinematicBody,
 		m_deformableBody,
 	};
 

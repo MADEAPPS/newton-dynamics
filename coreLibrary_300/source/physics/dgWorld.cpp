@@ -1173,7 +1173,7 @@ void dgWorld::DeserializeBodyArray (OnBodyDeserialize bodyCallback, dgDeserializ
 				body = new (m_allocator) dgDynamicBody(this, &shapeMap, deserialization, userData);
 				break;
 			}
-			case dgBody::m_kinamticBody:
+			case dgBody::m_kinematicBody:
 			{
 				body = new (m_allocator) dgKinematicBody(this, &shapeMap, deserialization, userData);
 				break;
