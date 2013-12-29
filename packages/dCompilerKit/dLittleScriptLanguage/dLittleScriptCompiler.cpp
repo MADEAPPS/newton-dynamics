@@ -45,7 +45,6 @@
 #include "dDAGExpressionNodePrefixPostfix.h"
 #include "dDAGExpressionNodeLogicOperator.h"
 #include "dDAGExpressionNodeBinaryOperator.h"
-#include "dDAGFunctionStatementFunctionCall.h"
 
 
 #include "dScriptPackage.h"
@@ -767,8 +766,6 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewReturnStatement(const dUserVa
 	return returnNode;
 }
 
-
-
 dScriptCompiler::dUserVariable dScriptCompiler::NewExpressionFunctionCall (const dString& name, const dUserVariable& argumnetList)
 {
 	dUserVariable returnNode;
@@ -777,16 +774,9 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewExpressionFunctionCall (const
 	_ASSERTE (!argumentListNode || argumentListNode->IsType(dDAGExpressionNode::GetRttiType()));
 	dDAGExpressionNodeFunctionCall* const fntCall = new dDAGExpressionNodeFunctionCall(m_allNodes, name.GetStr(), argumentListNode);
 
-	_ASSERTE (0);
-//	for (dDAGExpressionNode* param = argumentListNode; param; param = param->m_nextExpresionNode) {
-//		_ASSERTE (param->IsType(dDAGExpressionNode::GetRttiType()));
-//		param->Release(); 
-//	}
-
 	returnNode.m_node = fntCall;
 	return returnNode;
 }
-
 
 
 dScriptCompiler::dUserVariable dScriptCompiler::NewIFStatement(const dUserVariable& expression, const dUserVariable& thenExpression, const dUserVariable& elseExpression)
@@ -855,18 +845,6 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewWhileStatement(const dUserVar
 	dUserVariable whileNode;
 	whileNode.m_node = new dDAGFunctionStatementWHILE(m_allNodes, conditionalNode, bodyStmt);
 	return whileNode;
-}
-
-dScriptCompiler::dUserVariable dScriptCompiler::NewProcedureCall (const dString& name, const dUserVariable& argumnetList)
-{
-	dUserVariable returnNode;
-	dDAGExpressionNode* const argumentListNode = (dDAGExpressionNode*) argumnetList.m_node;
-	_ASSERTE (!argumentListNode || argumentListNode->IsType(dDAGExpressionNode::GetRttiType()));
-	dDAGExpressionNodeFunctionCall* const fntCall = new dDAGExpressionNodeFunctionCall(m_allNodes, name.GetStr(), argumentListNode);
-	dDAGFunctionStatementFunctionCall* const procedureCall = new dDAGFunctionStatementFunctionCall(m_allNodes, fntCall);
-
-	returnNode.m_node = procedureCall;
-	return returnNode;
 }
 
 

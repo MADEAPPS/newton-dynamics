@@ -105,14 +105,11 @@ class dScriptCompiler: public dLittleScriptParser
 	dUserVariable NewEmptyStatement();
 	dUserVariable NewBreakStatement();
 	dUserVariable NewContinueStatement();
-	dUserVariable NewProcedureCall (const dString& name, const dUserVariable& argumnetList);
 	dUserVariable NewDoStatement(const dUserVariable& expression, const dUserVariable& statement);
 	dUserVariable NewWhileStatement(const dUserVariable& expression, const dUserVariable& statement);
 	dUserVariable NewSwitchStatement(const dUserVariable& expression, const dUserVariable& caseStatementList);
 	dUserVariable NewForStatement(const dUserVariable& init_exp, const dUserVariable& conditional, const dUserVariable& step_Exp, const dUserVariable& statement);
 
-
-	
 
 	dString m_packageFileName;
 	dString m_packageRootDirectory;
