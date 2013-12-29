@@ -118,7 +118,6 @@ class dString::dStringAllocator
 				int buckectSize = (buckectEntry + 1) * D_STRING_MEM_GRANULARITY;
 				return m_buckects[buckectEntry].Alloc(buckectSize);
 			}
-			//dMemBucket::dDataChunk* const ptr = (dMemBucket::dDataChunk*) new char[size + sizeof (int)];
 			dMemBucket::dDataChunk* const ptr = (dMemBucket::dDataChunk*) dContainersAlloc::Alloc (size + sizeof (int));
 			ptr->m_size = size;
 			return ((char*)ptr) + sizeof (int);
@@ -132,8 +131,8 @@ class dString::dStringAllocator
 				int buckectEntry = dataChunck->m_size / D_STRING_MEM_GRANULARITY - 1;
 				m_buckects[buckectEntry].Free(ptr);
 			} else {
-				//delete[] realPtr;
-				dContainersAlloc::Free (ptr);
+				void* const ptr1 = ((char*)ptr) - sizeof (int);
+				dContainersAlloc::Free (ptr1);
 			}
 		}
 

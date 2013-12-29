@@ -165,17 +165,8 @@ void dLexScannerGenerator::LoadTemplateFile(const char* const templateName, dStr
 	FILE* const templateFile = fopen (path, "rb");
 	_ASSERTE (templateFile);
 
-//	fseek (templateFile, 0, SEEK_END);
-//	int size = ftell (templateFile) + 1;
-//	fseek (templateFile, 0, SEEK_SET);
-//	templateOuput = ("") ;
-//	templateOuput.resize(size);
-//	fread ((void*)templateOuput.c_str(), 1, size, templateFile);
 	templateOuput.LoadFile(templateFile);
 	fclose (templateFile);	
-
-//	templateOuput.erase(strlen (templateOuput.c_str()));
-
 }
 
 
@@ -195,9 +186,6 @@ void dLexScannerGenerator::SaveFile(const char* const fileName, const char* cons
 	fclose (headerFile);
 
 }
-
-
-
 
 
 
