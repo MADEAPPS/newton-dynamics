@@ -280,15 +280,15 @@
 	</References>
 	<Files>
 		<File
-			RelativePath=".\dCIL.cpp"
+			RelativePath="..\dIntermediateLanguage\dCIL.cpp"
 			>
 		</File>
 		<File
-			RelativePath=".\dCIL.h"
+			RelativePath="..\dIntermediateLanguage\dCIL.h"
 			>
 		</File>
 		<File
-			RelativePath=".\dCILstdafx.cpp"
+			RelativePath="..\dIntermediateLanguage\dCILstdafx.cpp"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"
@@ -324,23 +324,23 @@
 			</FileConfiguration>
 		</File>
 		<File
-			RelativePath=".\dCILstdafx.h"
+			RelativePath="..\dIntermediateLanguage\dCILstdafx.h"
 			>
 		</File>
 		<File
-			RelativePath=".\dDataFlowGraph.cpp"
+			RelativePath="..\dIntermediateLanguage\dDataFlowGraph.cpp"
 			>
 		</File>
 		<File
-			RelativePath=".\dDataFlowGraph.h"
+			RelativePath="..\dIntermediateLanguage\dDataFlowGraph.h"
 			>
 		</File>
 		<File
-			RelativePath=".\dTreeAdressStmt.cpp"
+			RelativePath="..\dIntermediateLanguage\dTreeAdressStmt.cpp"
 			>
 		</File>
 		<File
-			RelativePath=".\dTreeAdressStmt.h"
+			RelativePath="..\dIntermediateLanguage\dTreeAdressStmt.h"
 			>
 		</File>
 	</Files>
