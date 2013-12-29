@@ -149,34 +149,34 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\dVirtualAssembler\dAssemblerLexical.lex">
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">dLexicalGenerator.exe %(Filename)%(Extension) -&gt; %(Filename).h %(Filename).cpp </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">dLexicalGenerator.exe %(RelativeDir)%%(Filename)%(Extension) -&gt; %(RelativeDir)%%(Filename).h %(Filename).cpp </Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\dLexicalGenerator.exe %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)%(Filename).cpp</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(RootDir)%(Directory)dAssemblerParser.grm;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">dLexicalGenerator.exe %(Filename)%(Extension) -&gt; %(Filename).h %(Filename).cpp </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">dLexicalGenerator.exe %(RelativeDir)%%(Filename)%(Extension) -&gt; %(RelativeDir)%%(Filename).h %(Filename).cpp </Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">bin\dLexicalGenerator.exe %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)%(Filename).cpp</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RootDir)%(Directory)dAssemblerParser.grm;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).cpp;%(Outputs)</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">dLexicalGenerator.exe %(Filename)%(Extension) -&gt; %(Filename).h %(Filename).cpp </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">dLexicalGenerator.exe %(RelativeDir)%%(Filename)%(Extension) -&gt; %(RelativeDir)%%(Filename).h %(Filename).cpp </Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\dLexicalGenerator.exe %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)%(Filename).cpp</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(RootDir)%(Directory)dAssemblerParser.grm;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">dLexicalGenerator.exe %(Filename)%(Extension) -&gt; %(Filename).h %(Filename).cpp </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">dLexicalGenerator.exe %(RelativeDir)%%(Filename)%(Extension) -&gt; %(RelativeDir)%%(Filename).h %(Filename).cpp </Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">bin\dLexicalGenerator.exe %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)%(Filename).cpp</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RootDir)%(Directory)dAssemblerParser.grm;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).cpp;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="..\dVirtualAssembler\dAssemblerParser.grm">
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">dParserGenerator.exe %(Filename)%(Extension) -&gt; %(Filename).h %(Filename).cpp </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">dParserGenerator.exe %(RelativeDir)%(Filename)%(Extension) -&gt; %(RelativeDir)%(Filename).h %(Filename).cpp </Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\dParserGenerator.exe %(RelativeDir)%(Filename)%(Extension) dAssemblerLexical %(RelativeDir)%(Filename).cpp</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">dParserGenerator.exe %(Filename)%(Extension) -&gt; %(Filename).h %(Filename).cpp </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">dParserGenerator.exe %(RelativeDir)%(Filename)%(Extension) -&gt; %(RelativeDir)%(Filename).h %(Filename).cpp </Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">bin\dParserGenerator.exe %(RelativeDir)%(Filename)%(Extension) dAssemblerLexical %(RelativeDir)%(Filename).cpp</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).cpp;%(Outputs)</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">dParserGenerator.exe %(Filename)%(Extension) -&gt; %(Filename).h %(Filename).cpp </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">dParserGenerator.exe %(RelativeDir)%(Filename)%(Extension) -&gt; %(RelativeDir)%(Filename).h %(Filename).cpp </Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\dParserGenerator.exe %(RelativeDir)%(Filename)%(Extension) dAssemblerLexical %(RelativeDir)%(Filename).cpp</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">dParserGenerator.exe %(Filename)%(Extension) -&gt; %(Filename).h %(Filename).cpp </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">dParserGenerator.exe %(RelativeDir)%(Filename)%(Extension) -&gt; %(RelativeDir)%(Filename).h %(Filename).cpp </Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">bin\dParserGenerator.exe %(RelativeDir)%(Filename)%(Extension) dAssemblerLexical %(RelativeDir)%(Filename).cpp</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).cpp;%(Outputs)</Outputs>
     </CustomBuild>
