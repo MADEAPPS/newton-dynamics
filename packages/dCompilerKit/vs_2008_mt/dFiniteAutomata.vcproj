@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="dVirtualAssembler"
-	ProjectGUID="{E77610C5-A79B-4BBD-B5D8-76FBA50B1ADB}"
+	Name="dFiniteAutomata"
+	ProjectGUID="{A84E1056-FD95-416B-BADD-E180E8BE7AEC}"
 	RootNamespace="dCompilerKit"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
@@ -44,13 +44,77 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../dMath;../../dContainers;../dVirtualMachine"
+				AdditionalIncludeDirectories="../../dMath;../../dContainers"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="dAssemblerCompiler.h"
+				PrecompiledHeaderThrough="dFiniteAutomata.h"
+				WarningLevel="4"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Debug|x64"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="4"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories="../../dMath;../../dContainers"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="1"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="dFiniteAutomata.h"
 				WarningLevel="4"
 				DebugInformationFormat="3"
 			/>
@@ -109,76 +173,12 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../../dMath;../../dContainers;../dVirtualMachine"
+				AdditionalIncludeDirectories="../../dMath;../../dContainers"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="dAssemblerCompiler.h"
-				WarningLevel="4"
-				DebugInformationFormat="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLibrarianTool"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Debug|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="4"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				TargetEnvironment="3"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				AdditionalIncludeDirectories="../../dMath;../../dContainers;../dVirtualMachine"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS"
-				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="dAssemblerCompiler.h"
+				PrecompiledHeaderThrough="dFiniteAutomata.h"
 				WarningLevel="4"
 				DebugInformationFormat="3"
 			/>
@@ -238,12 +238,12 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../../dMath;../../dContainers;../dVirtualMachine"
+				AdditionalIncludeDirectories="../../dMath;../../dContainers"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="dAssemblerCompiler.h"
+				PrecompiledHeaderThrough="dFiniteAutomata.h"
 				WarningLevel="4"
 				DebugInformationFormat="3"
 			/>
@@ -280,7 +280,31 @@
 	</References>
 	<Files>
 		<File
-			RelativePath=".\dAssemblerCompiler.cpp"
+			RelativePath="..\dFiniteAutomata\dAutomataState.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\dFiniteAutomata\dAutomataState.h"
+			>
+		</File>
+		<File
+			RelativePath="..\dFiniteAutomata\dChatertSetMap.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\dFiniteAutomata\dChatertSetMap.h"
+			>
+		</File>
+		<File
+			RelativePath="..\dFiniteAutomata\dDeterministicFiniteAutonata.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\dFiniteAutomata\dDeterministicFiniteAutonata.h"
+			>
+		</File>
+		<File
+			RelativePath="..\dFiniteAutomata\dFiniteAutomata.cpp"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"
@@ -291,7 +315,7 @@
 				/>
 			</FileConfiguration>
 			<FileConfiguration
-				Name="Release|Win32"
+				Name="Debug|x64"
 				>
 				<Tool
 					Name="VCCLCompilerTool"
@@ -299,7 +323,7 @@
 				/>
 			</FileConfiguration>
 			<FileConfiguration
-				Name="Debug|x64"
+				Name="Release|Win32"
 				>
 				<Tool
 					Name="VCCLCompilerTool"
@@ -316,111 +340,15 @@
 			</FileConfiguration>
 		</File>
 		<File
-			RelativePath=".\dAssemblerCompiler.h"
+			RelativePath="..\dFiniteAutomata\dFiniteAutomata.h"
 			>
 		</File>
 		<File
-			RelativePath=".\dAssemblerLexical.cpp"
+			RelativePath="..\dFiniteAutomata\dNonDeterministicFiniteAutonata.cpp"
 			>
 		</File>
 		<File
-			RelativePath=".\dAssemblerLexical.h"
-			>
-		</File>
-		<File
-			RelativePath=".\dAssemblerLexical.lex"
-			>
-			<FileConfiguration
-				Name="Debug|Win32"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="dLexicalGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp "
-					CommandLine="..\dLexicalGenerator\bin\dLexicalGenerator.exe $(InputFileName) $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
-					Outputs="$(InputName).cpp"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|Win32"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="dLexicalGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp "
-					CommandLine="..\dLexicalGenerator\bin\dLexicalGenerator.exe $(InputFileName) $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
-					Outputs="$(InputName).cpp"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Debug|x64"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="dLexicalGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp "
-					CommandLine="..\dLexicalGenerator\bin\dLexicalGenerator.exe $(InputFileName) $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
-					Outputs="$(InputName).cpp"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|x64"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="dLexicalGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp "
-					CommandLine="..\dLexicalGenerator\bin\dLexicalGenerator.exe $(InputFileName) $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
-					Outputs="$(InputName).cpp"
-				/>
-			</FileConfiguration>
-		</File>
-		<File
-			RelativePath=".\dAssemblerParser.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\dAssemblerParser.grm"
-			>
-			<FileConfiguration
-				Name="Debug|Win32"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="dParserGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp "
-					CommandLine="..\dParserGenerator\bin\dParserGenerator.exe $(InputFileName) dAssemblerLexical $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
-					Outputs="$(InputName).cpp"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|Win32"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="dParserGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp "
-					CommandLine="..\dParserGenerator\bin\dParserGenerator.exe $(InputFileName) dAssemblerLexical $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
-					Outputs="$(InputName).cpp"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Debug|x64"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="dParserGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp "
-					CommandLine="..\dParserGenerator\bin\dParserGenerator.exe $(InputFileName) dAssemblerLexical $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
-					Outputs="$(InputName).cpp"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|x64"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="dParserGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp "
-					CommandLine="..\dParserGenerator\bin\dParserGenerator.exe $(InputFileName) dAssemblerLexical $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
-					Outputs="$(InputName).cpp"
-				/>
-			</FileConfiguration>
-		</File>
-		<File
-			RelativePath=".\dAssemblerParser.h"
+			RelativePath="..\dFiniteAutomata\dNonDeterministicFiniteAutonata.h"
 			>
 		</File>
 	</Files>

@@ -137,6 +137,24 @@ class dDataFlowGraph
 		dCIL::dListNode* m_end;
 	};
 
+	class dBasicBlocks: public dList<dBasicBlock> 
+	{
+		public:
+		dBasicBlocks()
+			:dList<dBasicBlock> ()
+		{
+		}
+
+		void Trace() const
+		{
+			#ifdef _DEBUG
+			for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
+				node->GetInfo().Trace();
+			}
+			#endif
+		}
+	};
+
 	class dRegisterInterferenceNode;
 	class dRegisterInterferenceNodeEdge
 	{
@@ -273,6 +291,7 @@ class dDataFlowGraph
 	};
 
 
+
 	dDataFlowGraph(dCIL* const cil, dCIL::dListNode* const function, dCIL::dReturnType returnType);
 	virtual ~dDataFlowGraph(void);
 
@@ -318,7 +337,7 @@ class dDataFlowGraph
 	dCIL::dReturnType m_returnType;
 	dString m_returnVariableName;
 	dCIL::dListNode* m_function;
-	dList<dBasicBlock> m_basicBlocks; 
+	dBasicBlocks m_basicBlocks; 
 	dList<dBasicBlock*> m_traversalBlocksOrder; 
 	dTree<dDataFlowPoint, dCIL::dListNode*> m_dataFlowGraph;
 	dTree<dList<dCIL::dListNode*>, dString> m_variableDefinitions;

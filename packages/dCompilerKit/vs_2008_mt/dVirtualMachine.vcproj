@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="dFiniteAutomata"
-	ProjectGUID="{A84E1056-FD95-416B-BADD-E180E8BE7AEC}"
+	Name="dVirtualMachine"
+	ProjectGUID="{61D6A343-3A8F-440E-8FA6-2C342ABB6896}"
 	RootNamespace="dCompilerKit"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
@@ -50,71 +50,7 @@
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="dFiniteAutomata.h"
-				WarningLevel="4"
-				DebugInformationFormat="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLibrarianTool"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Release|Win32"
-			OutputDirectory="$(PlatformName)/$(ProjectName)/$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)/$(ProjectName)/$(ConfigurationName)"
-			ConfigurationType="4"
-			CharacterSet="2"
-			WholeProgramOptimization="1"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="2"
-				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../../dMath;../../dContainers"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS"
-				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="dFiniteAutomata.h"
+				PrecompiledHeaderThrough="dVirtualMachine.h"
 				WarningLevel="4"
 				DebugInformationFormat="3"
 			/>
@@ -178,7 +114,71 @@
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="dFiniteAutomata.h"
+				PrecompiledHeaderThrough="dVirtualMachine.h"
+				WarningLevel="4"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			OutputDirectory="$(PlatformName)/$(ProjectName)/$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)/$(ProjectName)/$(ConfigurationName)"
+			ConfigurationType="4"
+			CharacterSet="2"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="2"
+				EnableIntrinsicFunctions="true"
+				AdditionalIncludeDirectories="../../dMath;../../dContainers"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS"
+				RuntimeLibrary="0"
+				EnableFunctionLevelLinking="true"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="dVirtualMachine.h"
 				WarningLevel="4"
 				DebugInformationFormat="3"
 			/>
@@ -243,7 +243,7 @@
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="dFiniteAutomata.h"
+				PrecompiledHeaderThrough="dVirtualMachine.h"
 				WarningLevel="4"
 				DebugInformationFormat="3"
 			/>
@@ -280,31 +280,7 @@
 	</References>
 	<Files>
 		<File
-			RelativePath=".\dAutomataState.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\dAutomataState.h"
-			>
-		</File>
-		<File
-			RelativePath=".\dChatertSetMap.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\dChatertSetMap.h"
-			>
-		</File>
-		<File
-			RelativePath=".\dDeterministicFiniteAutonata.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\dDeterministicFiniteAutonata.h"
-			>
-		</File>
-		<File
-			RelativePath=".\dFiniteAutomata.cpp"
+			RelativePath="..\dVirtualMachine\dVirtualMachine.cpp"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"
@@ -315,7 +291,7 @@
 				/>
 			</FileConfiguration>
 			<FileConfiguration
-				Name="Release|Win32"
+				Name="Debug|x64"
 				>
 				<Tool
 					Name="VCCLCompilerTool"
@@ -323,7 +299,7 @@
 				/>
 			</FileConfiguration>
 			<FileConfiguration
-				Name="Debug|x64"
+				Name="Release|Win32"
 				>
 				<Tool
 					Name="VCCLCompilerTool"
@@ -340,15 +316,7 @@
 			</FileConfiguration>
 		</File>
 		<File
-			RelativePath=".\dFiniteAutomata.h"
-			>
-		</File>
-		<File
-			RelativePath=".\dNonDeterministicFiniteAutonata.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\dNonDeterministicFiniteAutonata.h"
+			RelativePath="..\dVirtualMachine\dVirtualMachine.h"
 			>
 		</File>
 	</Files>

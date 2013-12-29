@@ -174,13 +174,6 @@ void dDataFlowGraph::BuildBasicBlockGraph()
 			}
 		}
 	}
-
-#ifdef _DEBUG
-	for (dList<dBasicBlock>::dListNode* node = m_basicBlocks.GetFirst(); node; node = node->GetNext()) {
-//		_ASSERTE (node->GetInfo().m_mark == m_mark);
-		node->GetInfo().Trace();
-	}
-#endif
 }
 
 
@@ -1783,15 +1776,18 @@ m_cil->Trace();
 
 	m_mark += 2;
 	BuildBasicBlockGraph();
+m_basicBlocks.Trace();
 
 	CalculateReachingDefinitions();
 	for (bool optimized = true; optimized;) {
 		optimized = false;
 		optimized |= ApplySubExpresionToCopyPropagation();
-m_cil->Trace();
+//m_cil->Trace();
+m_basicBlocks.Trace();
 		if (optimized) {
 			ApplyRemoveDeadCode();
-m_cil->Trace();
+//m_cil->Trace();
+m_basicBlocks.Trace();
 		}
 	}
 
@@ -1801,15 +1797,20 @@ m_cil->Trace();
 		UpdateReachingDefinitions();
 
 		optimized |= ApplyConstantPropagation();
-m_cil->Trace();
+//m_cil->Trace();
+m_basicBlocks.Trace();
 		optimized |= ApplyCopyPropagation();
-m_cil->Trace();
+//m_cil->Trace();
+m_basicBlocks.Trace();
 		optimized |= ApplyConstantFolding();
-m_cil->Trace();
+//m_cil->Trace();
+m_basicBlocks.Trace();
 		optimized |= ApplyInstructionSematicOrdering();
-m_cil->Trace();
+//m_cil->Trace();
+m_basicBlocks.Trace();
 		optimized |= ApplyRemoveDeadCode();
-m_cil->Trace();
+//m_cil->Trace();
+m_basicBlocks.Trace();
 	}
 
 	// apply peephole optimizations

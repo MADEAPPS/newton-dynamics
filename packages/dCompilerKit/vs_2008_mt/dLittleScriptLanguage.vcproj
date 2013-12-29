@@ -283,15 +283,15 @@
 			Name="Lexical"
 			>
 			<File
-				RelativePath=".\dLittleScriptLexical.cpp"
+				RelativePath="..\dLittleScriptLanguage\dLittleScriptLexical.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dLittleScriptLexical.h"
+				RelativePath="..\dLittleScriptLanguage\dLittleScriptLexical.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dLittleScriptLexical.lex"
+				RelativePath="..\dLittleScriptLanguage\dLittleScriptLexical.lex"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -299,7 +299,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="dLexicalGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp "
-						CommandLine="..\dLexicalGenerator\bin\dLexicalGenerator.exe $(InputFileName) $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
+						CommandLine="..\dLexicalGenerator\bin\dLexicalGenerator.exe $(InputDir)$(InputFileName) $(InputDir)$(InputName).cpp"
 						AdditionalDependencies="$(InputDir)dNewtonScriptParser.grm"
 						Outputs="$(InputName).cpp"
 					/>
@@ -310,7 +310,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="dLexicalGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp "
-						CommandLine="..\dLexicalGenerator\bin\dLexicalGenerator.exe $(InputFileName) $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
+						CommandLine="..\dLexicalGenerator\bin\dLexicalGenerator.exe $(InputDir)$(InputFileName) $(InputDir)$(InputName).cpp"
 						AdditionalDependencies="$(InputDir)dNewtonScriptParser.grm"
 						Outputs="$(InputName).cpp"
 					/>
@@ -321,7 +321,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="dLexicalGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp "
-						CommandLine="..\dLexicalGenerator\bin\dLexicalGenerator.exe $(InputFileName) $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
+						CommandLine="..\dLexicalGenerator\bin\dLexicalGenerator.exe $(InputDir)$(InputFileName) $(InputDir)$(InputName).cpp"
 						AdditionalDependencies="$(InputDir)dNewtonScriptParser.grm"
 						Outputs="$(InputName).cpp"
 					/>
@@ -332,7 +332,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="dLexicalGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp "
-						CommandLine="..\dLexicalGenerator\bin\dLexicalGenerator.exe $(InputFileName) $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
+						CommandLine="..\dLexicalGenerator\bin\dLexicalGenerator.exe $(InputDir)$(InputFileName) $(InputDir)$(InputName).cpp"
 						AdditionalDependencies="$(InputDir)dNewtonScriptParser.grm"
 						Outputs="$(InputName).cpp"
 					/>
@@ -343,11 +343,11 @@
 			Name="Grammar"
 			>
 			<File
-				RelativePath=".\dLittleScriptParser.cpp"
+				RelativePath="..\dLittleScriptLanguage\dLittleScriptParser.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dLittleScriptParser.grm"
+				RelativePath="..\dLittleScriptLanguage\dLittleScriptParser.grm"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -355,7 +355,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="dParserGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp "
-						CommandLine="..\dParserGenerator\bin\dParserGenerator.exe $(InputFileName) dLittleScriptLexical $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
+						CommandLine="..\dParserGenerator\bin\dParserGenerator.exe $(InputDir)$(InputFileName) dLittleScriptLexical $(InputDir)$(InputName).cpp"
 						Outputs="$(InputName).cpp"
 					/>
 				</FileConfiguration>
@@ -365,7 +365,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="dParserGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp "
-						CommandLine="..\dParserGenerator\bin\dParserGenerator.exe $(InputFileName) dLittleScriptLexical $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
+						CommandLine="..\dParserGenerator\bin\dParserGenerator.exe $(InputDir)$(InputFileName) dLittleScriptLexical $(InputDir)$(InputName).cpp"
 						Outputs="$(InputName).cpp"
 					/>
 				</FileConfiguration>
@@ -375,7 +375,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="dParserGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp "
-						CommandLine="..\dParserGenerator\bin\dParserGenerator.exe $(InputFileName) dLittleScriptLexical $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
+						CommandLine="..\dParserGenerator\bin\dParserGenerator.exe $(InputDir)$(InputFileName) dLittleScriptLexical $(InputDir)$(InputName).cpp"
 						Outputs="$(InputName).cpp"
 					/>
 				</FileConfiguration>
@@ -385,13 +385,13 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="dParserGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp "
-						CommandLine="..\dParserGenerator\bin\dParserGenerator.exe $(InputFileName) dLittleScriptLexical $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
+						CommandLine="..\dParserGenerator\bin\dParserGenerator.exe $(InputDir)$(InputFileName) dLittleScriptLexical $(InputDir)$(InputName).cpp"
 						Outputs="$(InputName).cpp"
 					/>
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\dLittleScriptParser.h"
+				RelativePath="..\dLittleScriptLanguage\dLittleScriptParser.h"
 				>
 			</File>
 		</Filter>
@@ -399,293 +399,240 @@
 			Name="SyntaxTree"
 			>
 			<File
-				RelativePath=".\dDAG.cpp"
+				RelativePath="..\dLittleScriptLanguage\dDAG.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAG.h"
+				RelativePath="..\dLittleScriptLanguage\dDAG.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGClassNode.cpp"
+				RelativePath="..\dLittleScriptLanguage\dDAGClassNode.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGClassNode.h"
+				RelativePath="..\dLittleScriptLanguage\dDAGClassNode.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGDimensionNode.cpp"
+				RelativePath="..\dLittleScriptLanguage\dDAGDimensionNode.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGDimensionNode.h"
+				RelativePath="..\dLittleScriptLanguage\dDAGDimensionNode.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGExpressionNode.cpp"
+				RelativePath="..\dLittleScriptLanguage\dDAGExpressionNode.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGExpressionNode.h"
+				RelativePath="..\dLittleScriptLanguage\dDAGExpressionNode.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGExpressionNodeAssigment.cpp"
+				RelativePath="..\dLittleScriptLanguage\dDAGExpressionNodeAssigment.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGExpressionNodeAssigment.h"
+				RelativePath="..\dLittleScriptLanguage\dDAGExpressionNodeAssigment.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGExpressionNodeBinaryOperator.cpp"
+				RelativePath="..\dLittleScriptLanguage\dDAGExpressionNodeBinaryOperator.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGExpressionNodeBinaryOperator.h"
+				RelativePath="..\dLittleScriptLanguage\dDAGExpressionNodeBinaryOperator.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGExpressionNodeConstant.cpp"
+				RelativePath="..\dLittleScriptLanguage\dDAGExpressionNodeConstant.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGExpressionNodeConstant.h"
+				RelativePath="..\dLittleScriptLanguage\dDAGExpressionNodeConstant.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGExpressionNodeFunctionCall.cpp"
+				RelativePath="..\dLittleScriptLanguage\dDAGExpressionNodeFunctionCall.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGExpressionNodeFunctionCall.h"
+				RelativePath="..\dLittleScriptLanguage\dDAGExpressionNodeFunctionCall.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGExpressionNodeLogicOperator.cpp"
+				RelativePath="..\dLittleScriptLanguage\dDAGExpressionNodeLogicOperator.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGExpressionNodeLogicOperator.h"
+				RelativePath="..\dLittleScriptLanguage\dDAGExpressionNodeLogicOperator.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGExpressionNodeNew.cpp"
+				RelativePath="..\dLittleScriptLanguage\dDAGExpressionNodeNew.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGExpressionNodeNew.h"
+				RelativePath="..\dLittleScriptLanguage\dDAGExpressionNodeNew.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGExpressionNodePrefixPostfix.cpp"
+				RelativePath="..\dLittleScriptLanguage\dDAGExpressionNodePrefixPostfix.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGExpressionNodePrefixPostfix.h"
+				RelativePath="..\dLittleScriptLanguage\dDAGExpressionNodePrefixPostfix.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGExpressionNodeVariable.cpp"
+				RelativePath="..\dLittleScriptLanguage\dDAGExpressionNodeVariable.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGExpressionNodeVariable.h"
+				RelativePath="..\dLittleScriptLanguage\dDAGExpressionNodeVariable.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGFunctionModifier.cpp"
+				RelativePath="..\dLittleScriptLanguage\dDAGFunctionModifier.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGFunctionModifier.h"
+				RelativePath="..\dLittleScriptLanguage\dDAGFunctionModifier.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGFunctionNode.cpp"
+				RelativePath="..\dLittleScriptLanguage\dDAGFunctionNode.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGFunctionNode.h"
+				RelativePath="..\dLittleScriptLanguage\dDAGFunctionNode.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGFunctionStatement.cpp"
+				RelativePath="..\dLittleScriptLanguage\dDAGFunctionStatement.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGFunctionStatement.h"
+				RelativePath="..\dLittleScriptLanguage\dDAGFunctionStatement.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGFunctionStatementBREAK.cpp"
+				RelativePath="..\dLittleScriptLanguage\dDAGFunctionStatementBREAK.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGFunctionStatementBREAK.h"
+				RelativePath="..\dLittleScriptLanguage\dDAGFunctionStatementBREAK.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGFunctionStatementCASE.cpp"
+				RelativePath="..\dLittleScriptLanguage\dDAGFunctionStatementCASE.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGFunctionStatementCASE.h"
+				RelativePath="..\dLittleScriptLanguage\dDAGFunctionStatementCASE.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGFunctionStatementCONTINUE.cpp"
+				RelativePath="..\dLittleScriptLanguage\dDAGFunctionStatementCONTINUE.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGFunctionStatementCONTINUE.h"
+				RelativePath="..\dLittleScriptLanguage\dDAGFunctionStatementCONTINUE.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGFunctionStatementDO.cpp"
+				RelativePath="..\dLittleScriptLanguage\dDAGFunctionStatementDO.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGFunctionStatementDO.h"
+				RelativePath="..\dLittleScriptLanguage\dDAGFunctionStatementDO.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGFunctionStatementFlow.cpp"
+				RelativePath="..\dLittleScriptLanguage\dDAGFunctionStatementFlow.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGFunctionStatementFlow.h"
+				RelativePath="..\dLittleScriptLanguage\dDAGFunctionStatementFlow.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGFunctionStatementFOR.cpp"
+				RelativePath="..\dLittleScriptLanguage\dDAGFunctionStatementFOR.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGFunctionStatementFOR.h"
+				RelativePath="..\dLittleScriptLanguage\dDAGFunctionStatementFOR.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGFunctionStatementIF.cpp"
+				RelativePath="..\dLittleScriptLanguage\dDAGFunctionStatementIF.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGFunctionStatementIF.h"
+				RelativePath="..\dLittleScriptLanguage\dDAGFunctionStatementIF.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGFunctionStatementReturn.cpp"
+				RelativePath="..\dLittleScriptLanguage\dDAGFunctionStatementReturn.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGFunctionStatementReturn.h"
+				RelativePath="..\dLittleScriptLanguage\dDAGFunctionStatementReturn.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGFunctionStatementSWITCH.cpp"
+				RelativePath="..\dLittleScriptLanguage\dDAGFunctionStatementSWITCH.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGFunctionStatementSWITCH.h"
+				RelativePath="..\dLittleScriptLanguage\dDAGFunctionStatementSWITCH.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGFunctionStatementWHILE.cpp"
+				RelativePath="..\dLittleScriptLanguage\dDAGFunctionStatementWHILE.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGFunctionStatementWHILE.h"
+				RelativePath="..\dLittleScriptLanguage\dDAGFunctionStatementWHILE.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGParamerNode.cpp"
+				RelativePath="..\dLittleScriptLanguage\dDAGParamerNode.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGParameterNode.h"
+				RelativePath="..\dLittleScriptLanguage\dDAGParameterNode.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGScopeBlockNode.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AssemblerOutput="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AssemblerOutput="0"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\dDAGScopeBlockNode.h"
+				RelativePath="..\dLittleScriptLanguage\dDAGScopeBlockNode.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGTypeNode.cpp"
+				RelativePath="..\dLittleScriptLanguage\dDAGScopeBlockNode.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dDAGTypeNode.h"
+				RelativePath="..\dLittleScriptLanguage\dDAGTypeNode.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\dLittleScriptLanguage\dDAGTypeNode.h"
 				>
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\dLittleScriptCompiler.cpp"
-			>
-			<FileConfiguration
-				Name="Debug|Win32"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-					UsePrecompiledHeader="2"
-					PrecompiledHeaderThrough="dLSCstdafx.h"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Debug|x64"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-					UsePrecompiledHeader="2"
-					PrecompiledHeaderThrough="dLSCstdafx.h"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|Win32"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-					UsePrecompiledHeader="2"
-					PrecompiledHeaderThrough="dLSCstdafx.h"
-					AssemblerOutput="0"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|x64"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-					UsePrecompiledHeader="2"
-					PrecompiledHeaderThrough="dLSCstdafx.h"
-				/>
-			</FileConfiguration>
-		</File>
-		<File
-			RelativePath=".\dLittleScriptCompiler.h"
+			RelativePath="..\dLittleScriptLanguage\dLittleScriptCompiler.cpp"
 			>
 		</File>
 		<File
-			RelativePath=".\dLSCstdafx.cpp"
+			RelativePath="..\dLittleScriptLanguage\dLittleScriptCompiler.h"
+			>
+		</File>
+		<File
+			RelativePath="..\dLittleScriptLanguage\dLSCstdafx.cpp"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"
@@ -721,23 +668,23 @@
 			</FileConfiguration>
 		</File>
 		<File
-			RelativePath=".\dLSCstdafx.h"
+			RelativePath="..\dLittleScriptLanguage\dLSCstdafx.h"
 			>
 		</File>
 		<File
-			RelativePath=".\dScriptClass.cpp"
+			RelativePath="..\dLittleScriptLanguage\dScriptClass.cpp"
 			>
 		</File>
 		<File
-			RelativePath=".\dScriptClass.h"
+			RelativePath="..\dLittleScriptLanguage\dScriptClass.h"
 			>
 		</File>
 		<File
-			RelativePath=".\dScriptPackage.cpp"
+			RelativePath="..\dLittleScriptLanguage\dScriptPackage.cpp"
 			>
 		</File>
 		<File
-			RelativePath=".\dScriptPackage.h"
+			RelativePath="..\dLittleScriptLanguage\dScriptPackage.h"
 			>
 		</File>
 	</Files>
