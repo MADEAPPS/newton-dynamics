@@ -23,10 +23,9 @@ int _tmain(int argc, _TCHAR* argv[])
 
 
 	if (argc < 2) {
-		fprintf (stdout, "usage: dTestAssembly filename\n");
+		fprintf (stdout, "usage: dNewtonScriptCompiler filename\n");
 		exit (0);
 	}
-
 
 	const char* const sourceFileName = argv[1];
 	FILE* const sourceFile = fopen (sourceFileName, "r");
@@ -35,22 +34,13 @@ int _tmain(int argc, _TCHAR* argv[])
 		exit (0);
 	}
 
-
-	fseek (sourceFile, 0, SEEK_END);
-	int size = ftell (sourceFile);
-	fseek (sourceFile, 0, SEEK_SET);
-
-	char* const source = new char [size + 1];
-	memset (source, 0, size + 1);
-	fread (source, 1, size, sourceFile);
+	dString source;
+	source.LoadFile(sourceFile);
 	fclose (sourceFile);
 
 	const char* packacgeName = "demos";
 	dScriptCompiler compiler(packacgeName);
-
-	compiler.CompileSource (source);
-
-	delete source;
+	compiler.CompileSource (source.GetStr());
 	return 0;
 }
 

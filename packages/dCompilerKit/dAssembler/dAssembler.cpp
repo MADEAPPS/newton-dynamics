@@ -21,7 +21,7 @@ int _tmain(int argc, _TCHAR* argv[])
 #endif
 
 	if (argc < 2) {
-		fprintf (stdout, "usage: dTestAssembly filename\n");
+		fprintf (stdout, "usage: dAssembly filename\n");
 		exit (0);
 	}
 

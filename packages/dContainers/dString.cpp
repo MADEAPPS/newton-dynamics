@@ -312,8 +312,13 @@ void dString::Empty()
 void dString::LoadFile (FILE* const file)
 {
 	Empty();
-	fseek (file, 0, SEEK_END);
-	int size = ftell (file);
+//	fseek (file, 0, SEEK_END);
+//	int size = ftell (file);
+	int size = 0;
+	fseek (file, 0, SEEK_SET);
+	for (;!feof(file); size ++) {
+		fgetc (file);
+	}
 	fseek (file, 0, SEEK_SET);
 	Expand (size);
 	fread (m_string, 1, size, file);
