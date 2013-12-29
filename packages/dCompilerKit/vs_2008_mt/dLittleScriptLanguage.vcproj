@@ -298,8 +298,8 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						Description="dLexicalGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp "
-						CommandLine="..\dLexicalGenerator\bin\dLexicalGenerator.exe $(InputDir)$(InputFileName) $(InputDir)$(InputName).cpp"
+						Description="dLexicalGenerator.exe $(InputDir)$(InputFileName) -&gt; $(InputDir)$(InputName).h $(InputDir)$(InputName).cpp "
+						CommandLine="bin\dLexicalGenerator.exe $(InputDir)$(InputFileName) $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
 						AdditionalDependencies="$(InputDir)dNewtonScriptParser.grm"
 						Outputs="$(InputName).cpp"
 					/>
@@ -309,8 +309,8 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						Description="dLexicalGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp "
-						CommandLine="..\dLexicalGenerator\bin\dLexicalGenerator.exe $(InputDir)$(InputFileName) $(InputDir)$(InputName).cpp"
+						Description="dLexicalGenerator.exe $(InputDir)$(InputFileName) -&gt; $(InputDir)$(InputName).h $(InputDir)$(InputName).cpp "
+						CommandLine="bin\dLexicalGenerator.exe $(InputDir)$(InputFileName) $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
 						AdditionalDependencies="$(InputDir)dNewtonScriptParser.grm"
 						Outputs="$(InputName).cpp"
 					/>
@@ -320,8 +320,8 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						Description="dLexicalGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp "
-						CommandLine="..\dLexicalGenerator\bin\dLexicalGenerator.exe $(InputDir)$(InputFileName) $(InputDir)$(InputName).cpp"
+						Description="dLexicalGenerator.exe $(InputDir)$(InputFileName) -&gt; $(InputDir)$(InputName).h $(InputDir)$(InputName).cpp "
+						CommandLine="bin\dLexicalGenerator.exe $(InputDir)$(InputFileName) $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
 						AdditionalDependencies="$(InputDir)dNewtonScriptParser.grm"
 						Outputs="$(InputName).cpp"
 					/>
@@ -331,8 +331,8 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						Description="dLexicalGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp "
-						CommandLine="..\dLexicalGenerator\bin\dLexicalGenerator.exe $(InputDir)$(InputFileName) $(InputDir)$(InputName).cpp"
+						Description="dLexicalGenerator.exe $(InputDir)$(InputFileName) -&gt; $(InputDir)$(InputName).h $(InputDir)$(InputName).cpp "
+						CommandLine="bin\dLexicalGenerator.exe $(InputDir)$(InputFileName) $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
 						AdditionalDependencies="$(InputDir)dNewtonScriptParser.grm"
 						Outputs="$(InputName).cpp"
 					/>
@@ -354,8 +354,8 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						Description="dParserGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp "
-						CommandLine="..\dParserGenerator\bin\dParserGenerator.exe $(InputDir)$(InputFileName) dLittleScriptLexical $(InputDir)$(InputName).cpp"
+						Description="dParserGenerator.exe $(InputDir)$(InputFileName) -&gt; $(InputDir)$(InputName).h $(InputDir)$(InputName).cpp "
+						CommandLine="bin\dParserGenerator.exe $(InputDir)$(InputFileName) dLittleScriptLexical $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
 						Outputs="$(InputName).cpp"
 					/>
 				</FileConfiguration>
@@ -364,8 +364,8 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						Description="dParserGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp "
-						CommandLine="..\dParserGenerator\bin\dParserGenerator.exe $(InputDir)$(InputFileName) dLittleScriptLexical $(InputDir)$(InputName).cpp"
+						Description="dParserGenerator.exe $(InputDir)$(InputFileName) -&gt; $(InputDir)$(InputName).h $(InputDir)$(InputName).cpp "
+						CommandLine="bin\dParserGenerator.exe $(InputDir)$(InputFileName) dLittleScriptLexical $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
 						Outputs="$(InputName).cpp"
 					/>
 				</FileConfiguration>
@@ -374,8 +374,8 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						Description="dParserGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp "
-						CommandLine="..\dParserGenerator\bin\dParserGenerator.exe $(InputDir)$(InputFileName) dLittleScriptLexical $(InputDir)$(InputName).cpp"
+						Description="dParserGenerator.exe $(InputDir)$(InputFileName) -&gt; $(InputDir)$(InputName).h $(InputDir)$(InputName).cpp "
+						CommandLine="bin\dParserGenerator.exe $(InputDir)$(InputFileName) dLittleScriptLexical $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
 						Outputs="$(InputName).cpp"
 					/>
 				</FileConfiguration>
@@ -384,8 +384,8 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						Description="dParserGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp "
-						CommandLine="..\dParserGenerator\bin\dParserGenerator.exe $(InputDir)$(InputFileName) dLittleScriptLexical $(InputDir)$(InputName).cpp"
+						Description="dParserGenerator.exe $(InputDir)$(InputFileName) -&gt; $(InputDir)$(InputName).h $(InputDir)$(InputName).cpp "
+						CommandLine="bin\dParserGenerator.exe $(InputDir)$(InputFileName) dLittleScriptLexical $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
 						Outputs="$(InputName).cpp"
 					/>
 				</FileConfiguration>

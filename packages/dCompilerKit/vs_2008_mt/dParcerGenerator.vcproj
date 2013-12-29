@@ -387,8 +387,8 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					Description="dLexicalGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp "
-					CommandLine="..\dLexicalGenerator\bin\dLexicalGenerator.exe $(InputFileName) $(InputDir)$(InputName).cpp"
+					Description="dLexicalGenerator.exe $(InputDir)$(InputFileName) -&gt; $(InputDir)$(InputName).h $(InputDir)$(InputName).cpp "
+					CommandLine="bin\dLexicalGenerator.exe $(InputFileName) $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
 					Outputs="$(InputName).cpp"
 				/>
 			</FileConfiguration>
@@ -397,8 +397,8 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					Description="dLexicalGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp "
-					CommandLine="..\dLexicalGenerator\bin\dLexicalGenerator.exe $(InputFileName) $(InputDir)$(InputName).cpp"
+					Description="dLexicalGenerator.exe $(InputDir)$(InputFileName) -&gt; $(InputDir)$(InputName).h $(InputDir)$(InputName).cpp "
+					CommandLine="bin\dLexicalGenerator.exe $(InputFileName) $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
 					Outputs="$(InputName).cpp"
 				/>
 			</FileConfiguration>
@@ -407,8 +407,8 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					Description="dLexicalGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp "
-					CommandLine="..\dLexicalGenerator\bin\dLexicalGenerator.exe $(InputFileName) $(InputDir)$(InputName).cpp"
+					Description="dLexicalGenerator.exe $(InputDir)$(InputFileName) -&gt; $(InputDir)$(InputName).h $(InputDir)$(InputName).cpp "
+					CommandLine="bin\dLexicalGenerator.exe $(InputFileName) $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
 					Outputs="$(InputName).cpp"
 				/>
 			</FileConfiguration>
@@ -417,8 +417,8 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					Description="dLexicalGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp "
-					CommandLine="..\dLexicalGenerator\bin\dLexicalGenerator.exe $(InputFileName) $(InputDir)$(InputName).cpp"
+					Description="dLexicalGenerator.exe $(InputDir)$(InputFileName) -&gt; $(InputDir)$(InputName).h $(InputDir)$(InputName).cpp "
+					CommandLine="bin\dLexicalGenerator.exe $(InputFileName) $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
 					Outputs="$(InputName).cpp"
 				/>
 			</FileConfiguration>
