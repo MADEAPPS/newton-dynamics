@@ -20,20 +20,11 @@ dDAGFunctionStatementFunctionCall::dDAGFunctionStatementFunctionCall(dList<dDAG*
 	:dDAGFunctionStatement(allNodes)
 	,m_function(function)
 {
-	_ASSERTE (m_function);
-	_ASSERTE (0);
-//	if (m_function) {
-//		m_function->AddRef();
-//	}
 }
 
 
 dDAGFunctionStatementFunctionCall::~dDAGFunctionStatementFunctionCall()
 {
-	_ASSERTE (0);
-//	if (m_function) {
-//		m_function->Release();
-//	}
 }
 
 

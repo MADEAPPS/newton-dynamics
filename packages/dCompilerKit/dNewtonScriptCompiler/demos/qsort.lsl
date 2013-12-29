@@ -20,13 +20,13 @@ public class qsort
       int pivot = a[(left + right) / 2];
       while (i <= j) {
          while (a[i] < pivot) i ++;
-         while (a[j] > pivot) j--;
+         while (a[j] > pivot) j --;
 
-//			i--;
-//			do {} while (a[++i] < pivot);
+			i--;
+			do {} while (a[++i] < pivot);
 			
-//			j++;
-//			do {} while (a[--j] < pivot);
+			j++;
+			do {} while (a[--j] < pivot);
 
             if (i <= j) {
                   tmp = a[i];

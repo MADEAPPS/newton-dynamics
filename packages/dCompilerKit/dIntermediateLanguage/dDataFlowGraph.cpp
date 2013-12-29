@@ -1778,7 +1778,7 @@ bool dDataFlowGraph::ApplyLoopOptimization(dLoop& loop)
 
 void dDataFlowGraph::ApplyLocalOptimizations()
 {
-#if 0
+
 m_cil->Trace();
 
 	m_mark += 2;
@@ -1853,7 +1853,7 @@ m_cil->Trace();
 		}
 	}
 */
-#endif
+
 }
 
 
@@ -1861,9 +1861,8 @@ m_cil->Trace();
 
 void dDataFlowGraph::RegistersAllocation (int classRegisterIndex, int returnRegisterIndex, int registerCount)
 {
-/*
 	BuildBasicBlockGraph();
-//	CalculateLiveInputLiveOutput ();
+	CalculateLiveInputLiveOutput ();
 
 	while (ApplyRemoveDeadCode());
 //m_cil->Trace();
@@ -1878,5 +1877,5 @@ void dDataFlowGraph::RegistersAllocation (int classRegisterIndex, int returnRegi
 
 //	ApplyRemoveDeadCode();
 m_cil->Trace();
-*/
+
 }

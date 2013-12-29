@@ -31,21 +31,16 @@ dDAGExpressionNodeFunctionCall::dDAGExpressionNodeFunctionCall(dList<dDAG*>& all
 		next = (dDAGExpressionNode*) param->m_next;
 		_ASSERTE (param->IsType(dDAGExpressionNode::GetRttiType()));
 		m_argumentList.Append(param);
-
-_ASSERTE (0);
-//		param->AddRef(); 
 	}
 }
 
 
 dDAGExpressionNodeFunctionCall::~dDAGExpressionNodeFunctionCall(void)
 {
-	for (dList<dDAGExpressionNode*>::dListNode* node = m_argumentList.GetFirst(); node; node = node->GetNext()) {
+//	for (dList<dDAGExpressionNode*>::dListNode* node = m_argumentList.GetFirst(); node; node = node->GetNext()) {
 //		dDAGExpressionNode* const parameter = node->GetInfo();
-
-_ASSERTE (0);
 //		parameter->Release();
-	}
+//	}
 }
 
 void dDAGExpressionNodeFunctionCall::ConnectParent(dDAG* const parent)

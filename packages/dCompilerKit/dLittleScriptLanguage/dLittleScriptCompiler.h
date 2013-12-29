@@ -45,14 +45,6 @@ class dScriptCompiler: public dLittleScriptParser
 	protected:
 	virtual bool Parse(dLittleScriptLexical& scanner);
 
-
-//	void DisplayError (const char* format, ...) const;
-//	void SyntaxError (const dLittleScriptLexical& scanner, const dUserVariable& errorToken, const dUserVariable& errorTokenMarker);
-//	dUserVariable NewConstructorPrototype (const dUserVariable& functionName, const dUserVariable& parameterList, const dUserVariable& initBaseClass);
-//	dUserVariable NewFunctionPrototype (const dUserVariable& returnType, const dUserVariable& functionName, const dUserVariable& parameterList, const dUserVariable& isConst);
-//	dUserVariable NewFunctionModifier (const dUserVariable& modifirer, const dUserVariable& appendModifirer);
-//	dUserVariable TypeAddDimension(const dUserVariable& type, const dUserVariable& dimension);
-
 	// called from parcel
 	void ImportClass (const dString& className);
 	void ImportAllClasses (const dString& className);
@@ -113,10 +105,12 @@ class dScriptCompiler: public dLittleScriptParser
 	dUserVariable NewEmptyStatement();
 	dUserVariable NewBreakStatement();
 	dUserVariable NewContinueStatement();
+	dUserVariable NewProcedureCall (const dString& name, const dUserVariable& argumnetList);
 	dUserVariable NewDoStatement(const dUserVariable& expression, const dUserVariable& statement);
 	dUserVariable NewWhileStatement(const dUserVariable& expression, const dUserVariable& statement);
 	dUserVariable NewSwitchStatement(const dUserVariable& expression, const dUserVariable& caseStatementList);
 	dUserVariable NewForStatement(const dUserVariable& init_exp, const dUserVariable& conditional, const dUserVariable& step_Exp, const dUserVariable& statement);
+
 
 	
 

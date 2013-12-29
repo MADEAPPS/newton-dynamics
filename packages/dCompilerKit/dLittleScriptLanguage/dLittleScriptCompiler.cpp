@@ -844,7 +844,6 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewForStatement(const dUserVaria
 }
 
 
-
 dScriptCompiler::dUserVariable dScriptCompiler::NewWhileStatement(const dUserVariable& expression, const dUserVariable& statement)
 {
 	dDAGExpressionNode* const conditionalNode = (dDAGExpressionNode*) expression.m_node;
@@ -856,6 +855,18 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewWhileStatement(const dUserVar
 	dUserVariable whileNode;
 	whileNode.m_node = new dDAGFunctionStatementWHILE(m_allNodes, conditionalNode, bodyStmt);
 	return whileNode;
+}
+
+dScriptCompiler::dUserVariable dScriptCompiler::NewProcedureCall (const dString& name, const dUserVariable& argumnetList)
+{
+	dUserVariable returnNode;
+	dDAGExpressionNode* const argumentListNode = (dDAGExpressionNode*) argumnetList.m_node;
+	_ASSERTE (!argumentListNode || argumentListNode->IsType(dDAGExpressionNode::GetRttiType()));
+	dDAGExpressionNodeFunctionCall* const fntCall = new dDAGExpressionNodeFunctionCall(m_allNodes, name.GetStr(), argumentListNode);
+	dDAGFunctionStatementFunctionCall* const procedureCall = new dDAGFunctionStatementFunctionCall(m_allNodes, fntCall);
+
+	returnNode.m_node = procedureCall;
+	return returnNode;
 }
 
 
