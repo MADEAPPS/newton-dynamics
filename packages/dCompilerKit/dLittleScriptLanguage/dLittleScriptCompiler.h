@@ -70,8 +70,8 @@ class dScriptCompiler: public dLittleScriptParser
 	dUserVariable NewVariableToCurrentBlock (const dString& modifiers, const dUserVariable& type, const dString& name);
 	dUserVariable EndScopeBlock ();
 	
-//	dUserVariable AddClassVariable (const dString& modifiers, const dUserVariable& type, const dUserVariable& variableList);
-//	dUserVariable ConcatenateVariables(const dUserVariable& variableA, const dUserVariable& variableB);
+	dUserVariable AddClassVariable (const dString& modifiers, const dUserVariable& type, const dUserVariable& variableList);
+	dUserVariable ConcatenateVariables(const dUserVariable& variableA, const dUserVariable& variableB);
 	dUserVariable ConcatenateExpressions(const dUserVariable& expressionA, const dUserVariable& expressionB);
 
 	dUserVariable NewVariableStatement(const dString& name);

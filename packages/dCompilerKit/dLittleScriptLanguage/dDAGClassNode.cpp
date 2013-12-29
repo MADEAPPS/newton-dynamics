@@ -128,7 +128,7 @@ void dDAGClassNode::ConnectParent(dDAG* const parent)
 
 void dDAGClassNode::CompileCIL(dCIL& cil)  
 {
-	dTrace (("emit the class variables here\n"));
+	dTrace (("do not forget to emit the class variables here !!\n"));
 	for (dList<dDAGFunctionNode*>::dListNode* node = m_functionList.GetFirst(); node; node = node->GetNext()) {
 		m_cilCodeList.Append (cil.NewStatement());
 		dDAGFunctionNode* const function = node->GetInfo();

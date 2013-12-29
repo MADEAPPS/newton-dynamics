@@ -519,10 +519,11 @@ dScriptCompiler::dUserVariable dScriptCompiler::SetLocalVariablesType (const dUs
 	returnNode.m_node = node;
 	return returnNode;
 }
-
+*/
 
 dScriptCompiler::dUserVariable dScriptCompiler::ConcatenateVariables(const dUserVariable& variableA, const dUserVariable& variableB)
 {
+	dAssert (0);
 	dUserVariable returnNode;
 
 	dDAGFunctionStatement* const node = (dDAGFunctionStatement*)variableA.m_node;
@@ -537,8 +538,11 @@ dScriptCompiler::dUserVariable dScriptCompiler::ConcatenateVariables(const dUser
 	return returnNode;
 }
 
+
 dScriptCompiler::dUserVariable dScriptCompiler::AddClassVariable (const dString& modifiers, const dUserVariable& type, const dUserVariable& variableList)
 {
+	dAssert (0);
+
 	dUserVariable returnNode;
 
 	dDAGParameterNode* const node = (dDAGParameterNode*)variableList.m_node;
@@ -559,7 +563,7 @@ dScriptCompiler::dUserVariable dScriptCompiler::AddClassVariable (const dString&
 	}
 	return returnNode;
 }
-*/
+
 
 
 dScriptCompiler::dUserVariable dScriptCompiler::NewVariableToCurrentBlock (const dString& modifiers, const dUserVariable& type, const dString& name)
