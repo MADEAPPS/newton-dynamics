@@ -26,7 +26,7 @@ class dDAGFunctionStatementCONTINUE: public dDAGFunctionStatement
 	virtual void CompileCIL(dCIL& cil);
 	virtual void ConnectParent(dDAG* const parent);
 
-	dAddRtti(dDAGFunctionStatement);
+	dDAGRtti(dDAGFunctionStatement);
 };
 
 

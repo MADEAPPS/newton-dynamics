@@ -27,7 +27,7 @@ class dDAGFunctionStatementSWITCH: public dDAGFunctionStatementFlow
 	virtual void CompileCIL(dCIL& cil);
 	virtual void ConnectParent(dDAG* const parent);
 
-	dAddRtti(dDAGFunctionStatementFlow);
+	dDAGRtti(dDAGFunctionStatementFlow);
 
 	dDAGExpressionNode* m_expression;
 	dList<dDAGFunctionStatementCase*> m_caseList;

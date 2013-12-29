@@ -34,7 +34,7 @@ class dDAGExpressionNodeVariable: public dDAGExpressionNode
 
 	dDAGTypeNode* m_type;
 	dList<dDAGDimensionNode*> m_dimExpressions;
-	dAddRtti(dDAGExpressionNode);
+	dDAGRtti(dDAGExpressionNode);
 };
 
 

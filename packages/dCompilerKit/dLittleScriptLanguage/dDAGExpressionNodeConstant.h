@@ -33,7 +33,7 @@ class dDAGExpressionNodeConstant: public dDAGExpressionNode
 	virtual void ConnectParent(dDAG* const parent);
 
 	dType m_type;
-	dAddRtti(dDAGExpressionNode);
+	dDAGRtti(dDAGExpressionNode);
 };
 
 

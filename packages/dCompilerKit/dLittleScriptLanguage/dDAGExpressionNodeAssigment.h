@@ -29,7 +29,7 @@ class dDAGExpressionNodeAssigment: public dDAGExpressionNode
 
 	dDAGExpressionNode* m_expression;
 	dDAGExpressionNodeVariable* m_leftVariable;
-	dAddRtti(dDAGExpressionNode);
+	dDAGRtti(dDAGExpressionNode);
 };
 
 

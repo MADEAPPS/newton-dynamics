@@ -28,6 +28,11 @@ class dDAGClassNode;
 class dDAGFunctionNode;
 class dDAGScopeBlockNode;
 
+#define DGDAG_API	
+
+#define dDAGRtti(x)							dAddRtti(x,DGDAG_API)
+#define dDAGRttiRootClassSupportDeclare(x)	dRttiRootClassSupportDeclare(x,DGDAG_API)
+
 class dDAG
 {
 	public:
@@ -49,7 +54,7 @@ class dDAG
 	dDAG* m_parent;
 	dList<dDAG*>::dListNode* m_myListNode;
 
-	dRttiRootClassSupportDeclare(dDAG);
+	dDAGRttiRootClassSupportDeclare(dDAG);
 	
 };
 

@@ -28,7 +28,7 @@ class dDAGExpressionNodeFunctionCall: public dDAGExpressionNode
 	virtual void ConnectParent(dDAG* const parent);
 
 	dList<dDAGExpressionNode*> m_argumentList;
-	dAddRtti(dDAGExpressionNode);
+	dDAGRtti(dDAGExpressionNode);
 };
 
 

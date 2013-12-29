@@ -30,7 +30,7 @@ class dDAGFunctionStatementCase: public dDAGFunctionStatement
 	dString m_entryLabel;
 	dList<dDAGFunctionStatement*> m_statementList;
 	
-	dAddRtti(dDAGFunctionStatement);
+	dDAGRtti(dDAGFunctionStatement);
 };
 
 

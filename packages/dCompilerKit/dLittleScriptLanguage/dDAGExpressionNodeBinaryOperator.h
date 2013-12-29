@@ -47,7 +47,7 @@ class dDAGExpressionNodeBinaryOperator: public dDAGExpressionNode
 	dDAGExpressionNode* m_expressionA;
 	dDAGExpressionNode* m_expressionB;
 
-	dAddRtti(dDAGExpressionNode);
+	dDAGRtti(dDAGExpressionNode);
 };
 
 

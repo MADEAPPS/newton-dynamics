@@ -32,7 +32,7 @@ class dDAGDimensionNode: public dDAG
 	dString m_arraySize;
 	dDAGExpressionNode* m_dimExp;
 	dDAGDimensionNode* m_next;
-	dAddRtti(dDAG);
+	dDAGRtti(dDAG);
 };
 
 

@@ -36,7 +36,7 @@ class dDAGParameterNode: public dDAGFunctionStatement
 	dDAGTypeNode* m_type;
 //	dDAGExpressionNode* m_initializationExp;
 	
-	dAddRtti(dDAGFunctionStatement);
+	dDAGRtti(dDAGFunctionStatement);
 };
 
 

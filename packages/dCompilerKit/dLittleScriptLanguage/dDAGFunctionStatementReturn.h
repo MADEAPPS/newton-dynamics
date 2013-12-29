@@ -28,7 +28,7 @@ class dDAGFunctionStatementReturn: public dDAGFunctionStatement
 	virtual void ConnectParent(dDAG* const parent);
 
 	dDAGExpressionNode* m_expression;
-	dAddRtti(dDAGFunctionStatement);
+	dDAGRtti(dDAGFunctionStatement);
 };
 
 

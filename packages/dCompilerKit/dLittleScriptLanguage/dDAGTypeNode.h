@@ -33,7 +33,7 @@ class dDAGTypeNode: public dDAG
 
 	dList<dDAGDimensionNode*> m_dimensions;
 
-	dAddRtti(dDAG);
+	dDAGRtti(dDAG);
 };
 
 

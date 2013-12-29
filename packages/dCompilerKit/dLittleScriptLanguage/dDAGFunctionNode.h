@@ -44,7 +44,7 @@ class dDAGFunctionNode: public dDAG
 	dDAGScopeBlockNode* m_body;
 	dDAGFunctionModifier* m_modifier;
 	dList<dDAGParameterNode*> m_parameters; 
-	dAddRtti(dDAG);
+	dDAGRtti(dDAG);
 };
 
 

@@ -33,7 +33,7 @@ class dDAGFunctionStatementFlow: public dDAGFunctionStatement
 
 	dCIL::dListNode* CompileCILLoopBody(dCIL& cil, dDAGFunctionStatement* const posFixStmt);
 
-	dAddRtti(dDAGFunctionStatement);
+	dDAGRtti(dDAGFunctionStatement);
 
 	dString m_currentBreakLabel;
 	dString m_currentContinueLabel;

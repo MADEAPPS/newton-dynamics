@@ -58,7 +58,7 @@ class dDAGScopeBlockNode: public dDAGFunctionStatement
 
 	void AddSize(int size) ;
 
-	dAddRtti(dDAGFunctionStatement);
+	dDAGRtti(dDAGFunctionStatement);
 
 	int m_scopeLayer;
 

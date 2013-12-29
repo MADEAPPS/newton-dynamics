@@ -27,7 +27,7 @@ class dDAGFunctionStatement: public dDAG
 	virtual void ConnectParent(dDAG* const parent);
 
 	
-	dAddRtti(dDAG);
+	dDAGRtti(dDAG);
 };
 
 

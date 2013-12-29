@@ -27,7 +27,7 @@ class dDAGExpressionNodeNew: public dDAGExpressionNode
 	virtual void ConnectParent(dDAG* const parent);
 
 	dDAGDimensionNode* m_dimension;
-	dAddRtti(dDAGExpressionNode);
+	dDAGRtti(dDAGExpressionNode);
 };
 
 

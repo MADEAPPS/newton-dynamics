@@ -28,7 +28,7 @@ class dDAGFunctionStatementFOR: public dDAGFunctionStatementFlow
 	virtual void ConnectParent(dDAG* const parent);
 
 
-	dAddRtti(dDAGFunctionStatementFlow);
+	dDAGRtti(dDAGFunctionStatementFlow);
 
 	dDAGFunctionStatement* m_initialStmt;
 	

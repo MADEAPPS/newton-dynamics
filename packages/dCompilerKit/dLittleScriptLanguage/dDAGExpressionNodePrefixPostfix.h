@@ -29,7 +29,7 @@ class dDAGExpressionNodePrefixPostfix: public dDAGExpressionNode
 	bool m_isPrefix;
 	bool m_isIncrement;
 	dDAGExpressionNode* m_expression;
-	dAddRtti(dDAGExpressionNode);
+	dDAGRtti(dDAGExpressionNode);
 };
 
 

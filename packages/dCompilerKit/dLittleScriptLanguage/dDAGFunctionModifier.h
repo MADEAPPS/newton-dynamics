@@ -31,7 +31,7 @@ class dDAGFunctionModifier: public dDAG
 
 	bool m_private;
 	bool m_native;
-	dAddRtti(dDAG);
+	dDAGRtti(dDAG);
 };
 
 

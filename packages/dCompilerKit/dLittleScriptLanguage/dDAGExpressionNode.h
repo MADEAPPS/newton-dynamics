@@ -27,7 +27,7 @@ class dDAGExpressionNode: public dDAG
 	virtual void CompileCIL(dCIL& cil)  {_ASSERTE (0);}
 	virtual void ConnectParent(dDAG* const parent)  {_ASSERTE (0);}
 	virtual dDAGExpressionNodeVariable* FindLeftVariable() {_ASSERTE (0); return NULL; }
-	dAddRtti(dDAG);
+	dDAGRtti(dDAG);
 };
 
 

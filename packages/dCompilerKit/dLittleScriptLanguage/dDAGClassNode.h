@@ -47,7 +47,7 @@ class dDAGClassNode: public dDAG
 	dList<dDAGFunctionNode*> m_functionList;
 	dList<dDAGFunctionNode*> m_constructors;
 	dList<dCIL::dListNode*> m_cilCodeList;
-	dAddRtti(dDAG);
+	dDAGRtti(dDAG);
 };
 
 
