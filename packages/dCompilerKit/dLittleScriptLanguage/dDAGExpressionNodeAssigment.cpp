@@ -41,7 +41,7 @@ void dDAGExpressionNodeAssigment::CompileCIL(dCIL& cil)
 	m_expression->CompileCIL(cil); 
 	if (m_leftVariable->m_dimExpressions.GetCount()) {
 		dString& variable (m_leftVariable->m_name);
-		size_t pos = variable.Find (D_SCOPE_PREFIX, 0, strlen (D_SCOPE_PREFIX));
+		int pos = variable.Find (D_SCOPE_PREFIX, 0, int (strlen (D_SCOPE_PREFIX)));
 		if (pos != 0) {
 			bool state = RenameLocalVariable(cil, variable);
 			if (!state) {

@@ -181,16 +181,16 @@
   <ItemGroup>
     <CustomBuild Include="..\dParserGenerator\dParserLexical.lex">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">dLexicalGenerator.exe %(Filename)%(Extension) -&gt; %(Filename).h %(Filename).cpp </Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\dLexicalGenerator\bin\dLexicalGenerator.exe %(Filename)%(Extension) %(RootDir)%(Directory)%(Filename).cpp</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\dLexicalGenerator.exe %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)%(Filename).cpp</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">dLexicalGenerator.exe %(Filename)%(Extension) -&gt; %(Filename).h %(Filename).cpp </Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\dLexicalGenerator\bin\dLexicalGenerator.exe %(Filename)%(Extension) %(RootDir)%(Directory)%(Filename).cpp</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">bin\dLexicalGenerator.exe %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)%(Filename).cpp</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).cpp;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">dLexicalGenerator.exe %(Filename)%(Extension) -&gt; %(Filename).h %(Filename).cpp </Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\dLexicalGenerator\bin\dLexicalGenerator.exe %(Filename)%(Extension) %(RootDir)%(Directory)%(Filename).cpp</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\dLexicalGenerator.exe %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)%(Filename).cpp</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">dLexicalGenerator.exe %(Filename)%(Extension) -&gt; %(Filename).h %(Filename).cpp </Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\dLexicalGenerator\bin\dLexicalGenerator.exe %(Filename)%(Extension) %(RootDir)%(Directory)%(Filename).cpp</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">bin\dLexicalGenerator.exe %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)%(Filename).cpp</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).cpp;%(Outputs)</Outputs>
     </CustomBuild>
   </ItemGroup>

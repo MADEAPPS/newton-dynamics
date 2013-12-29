@@ -130,7 +130,7 @@ dAutomataState* dLexScannerGenerator::CreateTargetState (dTree<dAutomataState*,d
 
 void dLexScannerGenerator::ReplaceMacro (dString& data, const dString& newName, const char* const macro) const
 {
-	int size = strlen(macro);
+	int size = int (strlen(macro));
 	int position = data.Find (macro);
 	data.Replace(position, size, newName);
 }
@@ -138,7 +138,7 @@ void dLexScannerGenerator::ReplaceMacro (dString& data, const dString& newName, 
 
 void dLexScannerGenerator::ReplaceAllMacros (dString& data, const dString& newName, const char* const macro) const
 {
-	int size = strlen (macro);
+	int size = int (strlen (macro));
 	for (int i = data.Find(macro); i != -1; i = data.Find(macro, i)) {
 		data.Replace(i, size, newName);
 	}

@@ -1133,7 +1133,7 @@ void dParserCompiler::ReplaceMacro (dString& data, const dString& newName, const
 void dParserCompiler::ReplaceAllMacros (dString& data, const dString& newName, const dString& macro) const
 {
 	int size = int (macro.Size());
-	for (size_t i = data.Find (macro); i != -1; i = data.Find (macro)) {
+	for (int i = data.Find (macro); i != -1; i = data.Find (macro)) {
 		data.Replace(i, size, newName);
 	}
 }
@@ -1209,7 +1209,7 @@ void dParserCompiler::GenerateParserCode (
 	dString templateHeader ("");
 	LoadTemplateFile("/dParserTemplate.cpp", templateHeader);
 
-	size_t position = templateHeader.Find ("$(userCode)");
+	int position = templateHeader.Find ("$(userCode)");
 	templateHeader.Replace(position, 11, userCode);
 
 	ReplaceAllMacros (templateHeader, className, "$(className)");
