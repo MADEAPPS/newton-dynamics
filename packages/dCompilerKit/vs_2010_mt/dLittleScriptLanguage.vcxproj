@@ -210,22 +210,22 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\dLittleScriptLanguage\dLittleScriptLexical.lex">
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">dLexicalGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">dLexicalGenerator.exe %(Filename)%(Extension) -&gt; %(Filename).h %(Filename).cpp </Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\dLexicalGenerator.exe %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)%(Filename).cpp</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">dLexicalGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">dLexicalGenerator.exe %(Filename)%(Extension) -&gt; %(Filename).h %(Filename).cpp </Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">bin\dLexicalGenerator.exe %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)%(Filename).cpp</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).cpp;%(Outputs)</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">dLexicalGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">dLexicalGenerator.exe %(Filename)%(Extension) -&gt; %(Filename).h %(Filename).cpp </Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\dLexicalGenerator.exe %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)%(Filename).cpp</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">dLexicalGenerator.exe $(InputFileName) -&gt; $(InputName).h $(InputName).cpp </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">dLexicalGenerator.exe %(Filename)%(Extension) -&gt; %(Filename).h %(Filename).cpp </Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">bin\dLexicalGenerator.exe %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)%(Filename).cpp</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </AdditionalInputs>
