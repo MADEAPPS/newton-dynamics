@@ -1,0 +1,214 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Lexical">
+      <UniqueIdentifier>{26fbc202-0367-4e96-9db3-317f527a547b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Grammar">
+      <UniqueIdentifier>{e89b6143-5460-4b61-9810-36cd0ce9fd15}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SyntaxTree">
+      <UniqueIdentifier>{39a11282-6cf2-4760-a404-9a2db0184db4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\dLittleScriptLanguage\dLittleScriptLexical.cpp">
+      <Filter>Lexical</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dLittleScriptParser.cpp">
+      <Filter>Grammar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dDAG.cpp">
+      <Filter>SyntaxTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGClassNode.cpp">
+      <Filter>SyntaxTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGDimensionNode.cpp">
+      <Filter>SyntaxTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionNode.cpp">
+      <Filter>SyntaxTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionNodeAssigment.cpp">
+      <Filter>SyntaxTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionNodeBinaryOperator.cpp">
+      <Filter>SyntaxTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionNodeConstant.cpp">
+      <Filter>SyntaxTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionNodeFunctionCall.cpp">
+      <Filter>SyntaxTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionNodeLogicOperator.cpp">
+      <Filter>SyntaxTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionNodeNew.cpp">
+      <Filter>SyntaxTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionNodePrefixPostfix.cpp">
+      <Filter>SyntaxTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionNodeVariable.cpp">
+      <Filter>SyntaxTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionModifier.cpp">
+      <Filter>SyntaxTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionNode.cpp">
+      <Filter>SyntaxTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatement.cpp">
+      <Filter>SyntaxTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatementBREAK.cpp">
+      <Filter>SyntaxTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatementCASE.cpp">
+      <Filter>SyntaxTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatementCONTINUE.cpp">
+      <Filter>SyntaxTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatementDO.cpp">
+      <Filter>SyntaxTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatementFlow.cpp">
+      <Filter>SyntaxTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatementFOR.cpp">
+      <Filter>SyntaxTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatementIF.cpp">
+      <Filter>SyntaxTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatementReturn.cpp">
+      <Filter>SyntaxTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatementSWITCH.cpp">
+      <Filter>SyntaxTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatementWHILE.cpp">
+      <Filter>SyntaxTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGParamerNode.cpp">
+      <Filter>SyntaxTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGScopeBlockNode.cpp">
+      <Filter>SyntaxTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGTypeNode.cpp">
+      <Filter>SyntaxTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dLittleScriptCompiler.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dLSCstdafx.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dScriptClass.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dScriptPackage.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\dLittleScriptLanguage\dLittleScriptLexical.h">
+      <Filter>Lexical</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dLittleScriptLanguage\dLittleScriptParser.h">
+      <Filter>Grammar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dLittleScriptLanguage\dDAG.h">
+      <Filter>SyntaxTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGClassNode.h">
+      <Filter>SyntaxTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGDimensionNode.h">
+      <Filter>SyntaxTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionNode.h">
+      <Filter>SyntaxTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionNodeAssigment.h">
+      <Filter>SyntaxTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionNodeBinaryOperator.h">
+      <Filter>SyntaxTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionNodeConstant.h">
+      <Filter>SyntaxTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionNodeFunctionCall.h">
+      <Filter>SyntaxTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionNodeLogicOperator.h">
+      <Filter>SyntaxTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionNodeNew.h">
+      <Filter>SyntaxTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionNodePrefixPostfix.h">
+      <Filter>SyntaxTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionNodeVariable.h">
+      <Filter>SyntaxTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionModifier.h">
+      <Filter>SyntaxTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionNode.h">
+      <Filter>SyntaxTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatement.h">
+      <Filter>SyntaxTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatementBREAK.h">
+      <Filter>SyntaxTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatementCASE.h">
+      <Filter>SyntaxTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatementCONTINUE.h">
+      <Filter>SyntaxTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatementDO.h">
+      <Filter>SyntaxTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatementFlow.h">
+      <Filter>SyntaxTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatementFOR.h">
+      <Filter>SyntaxTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatementIF.h">
+      <Filter>SyntaxTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatementReturn.h">
+      <Filter>SyntaxTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatementSWITCH.h">
+      <Filter>SyntaxTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatementWHILE.h">
+      <Filter>SyntaxTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGParameterNode.h">
+      <Filter>SyntaxTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGScopeBlockNode.h">
+      <Filter>SyntaxTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGTypeNode.h">
+      <Filter>SyntaxTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dLittleScriptLanguage\dLittleScriptCompiler.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dLSCstdafx.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dScriptClass.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dScriptPackage.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\dLittleScriptLanguage\dLittleScriptLexical.lex">
+      <Filter>Lexical</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\dLittleScriptLanguage\dLittleScriptParser.grm">
+      <Filter>Grammar</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>
