@@ -12,9 +12,15 @@
 #ifndef  __dTreeAdressStmt_H_
 #define  __dTreeAdressStmt_H_
 
+#ifdef _DEBUG
+	#define TRACE_INTERMEDIATE_CODE
+#endif
 
-
-#define DTRACE_INTRUCTION(x) (x)->Trace();
+#ifdef TRACE_INTERMEDIATE_CODE
+	#define DTRACE_INTRUCTION(x) (x)->Trace();
+#else
+	#define DTRACE_INTRUCTION(x)
+#endif
 
 class dTreeAdressStmt
 {

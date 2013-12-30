@@ -179,13 +179,15 @@ void dDataFlowGraph::BuildBasicBlockGraph()
 
 void dDataFlowGraph::dBasicBlock::Trace() const
 {
-	int test = 1;
-	for (dCIL::dListNode* stmtNode = m_begin; test; stmtNode = stmtNode->GetNext()) {
-		test = (stmtNode != m_end);
-		const dTreeAdressStmt& stmt = stmtNode->GetInfo();
-		DTRACE_INTRUCTION(&stmt);
-	}
-	dTrace(("\n"));
+	#ifdef TRACE_INTERMEDIATE_CODE
+		int test = 1;
+		for (dCIL::dListNode* stmtNode = m_begin; test; stmtNode = stmtNode->GetNext()) {
+			test = (stmtNode != m_end);
+			const dTreeAdressStmt& stmt = stmtNode->GetInfo();
+			DTRACE_INTRUCTION(&stmt);
+		}
+		dTrace(("\n"));
+	#endif
 }
 
 
@@ -890,17 +892,20 @@ bool dDataFlowGraph::ApplyIfStatementsSimplification()
 
 	for (dCIL::dListNode* stmtNode = m_function; stmtNode; stmtNode = stmtNode->GetNext()) {
 		dTreeAdressStmt& stmt = stmtNode->GetInfo();
-		if (stmt.m_instruction == dTreeAdressStmt::m_if) {
+		if ((stmt.m_instruction == dTreeAdressStmt::m_if) && (stmt.m_operator == dTreeAdressStmt::m_identical) || (stmt.m_operator == dTreeAdressStmt::m_different)) {
 			dCIL::dListNode* const prevStmtNode = stmtNode->GetPrev();
 			dTreeAdressStmt& stmtA = prevStmtNode->GetInfo();
 			if ((stmt.m_arg1.m_label == stmtA.m_arg0.m_label) && (stmtA.m_instruction == dTreeAdressStmt::m_assigment)  &&  (stmtA.m_operator == dTreeAdressStmt::m_nothing) && (stmtA.m_arg1.m_type == dTreeAdressStmt::m_intConst)) {
 				dCIL::dListNode* const prevPrevStmtNode = prevStmtNode->GetPrev();
 				dTreeAdressStmt& stmtB = prevPrevStmtNode->GetInfo();
-				if ((stmt.m_arg0.m_label == stmtB.m_arg0.m_label) && (stmtB.m_instruction == dTreeAdressStmt::m_assigment)  &&  (m_cil->m_conditionals[stmtB.m_operator]) && (stmtB.m_arg2.m_type != dTreeAdressStmt::m_intConst)) {
-					dAssert (stmt.m_operator == stmtB.m_operator);
+				if ((stmt.m_arg0.m_label == stmtB.m_arg0.m_label) && (stmtB.m_instruction == dTreeAdressStmt::m_assigment)  && (m_cil->m_conditionals[stmtB.m_operator]) && (stmtB.m_arg2.m_type != dTreeAdressStmt::m_intConst)) {
 					stmt.m_arg0 = stmtB.m_arg1;
 					stmt.m_arg1 = stmtB.m_arg2;
-					stmt.m_operator = m_cil->m_operatorComplement[stmt.m_operator];
+					if (stmt.m_operator == dTreeAdressStmt::m_identical) {
+						stmt.m_operator = m_cil->m_operatorComplement[stmtB.m_operator];
+					} else {
+						stmt.m_operator = stmtB.m_operator;
+					}
 					ret = true;
 				}
 			}

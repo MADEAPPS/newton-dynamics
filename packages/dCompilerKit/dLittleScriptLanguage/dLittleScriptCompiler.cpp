@@ -602,8 +602,8 @@ dScriptCompiler::dUserVariable dScriptCompiler::AddStatementToCurrentBlock(const
 	dDAGFunctionStatement* const statementNode = (dDAGFunctionStatement*)statement.m_node;
 	if (statementNode) {
 		if (statementNode->IsType(dDAGExpressionNode::GetRttiType())) {
-			for (dDAGParameterNode* nextNode = (dDAGParameterNode*) statementNode; nextNode; nextNode = (dDAGParameterNode*) nextNode->m_next) {
-				block->AddStatement(statementNode);
+			for (dDAGParameterNode* node = (dDAGParameterNode*) statementNode; node; node = (dDAGParameterNode*) node->m_next) {
+				block->AddStatement(node);
 			}
 		} else {
 			_ASSERTE (statementNode->IsType(dDAGFunctionStatement::GetRttiType()));

@@ -86,11 +86,13 @@ class dDataFlowGraph
 
 			void Trace() const
 			{
-				Iterator iter (*this);
-				for (iter.Begin(); iter; iter ++) {
-					dTrace (("%s ", iter.GetKey().GetStr()));
-				}
-				dTrace (("\n"));
+				#ifdef TRACE_INTERMEDIATE_CODE
+					Iterator iter (*this);
+					for (iter.Begin(); iter; iter ++) {
+						dTrace (("%s ", iter.GetKey().GetStr()));
+					}
+					dTrace (("\n"));
+				#endif
 			}
 		};
 
@@ -147,10 +149,10 @@ class dDataFlowGraph
 
 		void Trace() const
 		{
-			#ifdef _DEBUG
-			for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
-				node->GetInfo().Trace();
-			}
+			#ifdef TRACE_INTERMEDIATE_CODE
+				for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
+					node->GetInfo().Trace();
+				}
 			#endif
 		}
 	};
