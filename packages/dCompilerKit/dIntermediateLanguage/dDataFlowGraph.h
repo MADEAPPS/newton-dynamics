@@ -314,7 +314,9 @@ class dDataFlowGraph
 	bool ApplyCommonSubExpresion();
 	bool ApplyConstantPropagation();
 	bool ApplyInstructionSematicOrdering();
+	bool ApplyIfStatementsSimplification();
 	bool ApplySubExpresionToCopyPropagation();
+	
 	bool ApplyLoopOptimization(dLoop& loop);
 	
 	void AllocateRegisters (dTree<dRegisterInterferenceNode, dString>& interferenceGraph);
