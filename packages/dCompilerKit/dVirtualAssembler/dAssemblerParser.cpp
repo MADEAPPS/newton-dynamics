@@ -13,7 +13,7 @@
 // Auto generated Parser Generator class: dAssemblerParser.cpp
 //
 
-#include <dAssemblerCompiler.h>
+#include "dAssemblerCompiler.h"
 #include "dAssemblerLexical.h"
 
 // Newton virtual machine assembler grammar

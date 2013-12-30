@@ -388,8 +388,8 @@
 				<Tool
 					Name="VCCustomBuildTool"
 					Description="dLexicalGenerator.exe $(InputDir)$(InputFileName) -&gt; $(InputDir)$(InputName).h $(InputDir)$(InputName).cpp "
-					CommandLine="bin\dLexicalGenerator.exe $(InputFileName) $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
-					Outputs="$(InputName).cpp"
+					CommandLine="bin\dLexicalGenerator.exe $(InputDir)$(InputFileName) $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
+					Outputs="$(InputName).cpp;$(InputName).h"
 				/>
 			</FileConfiguration>
 			<FileConfiguration
@@ -398,8 +398,8 @@
 				<Tool
 					Name="VCCustomBuildTool"
 					Description="dLexicalGenerator.exe $(InputDir)$(InputFileName) -&gt; $(InputDir)$(InputName).h $(InputDir)$(InputName).cpp "
-					CommandLine="bin\dLexicalGenerator.exe $(InputFileName) $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
-					Outputs="$(InputName).cpp"
+					CommandLine="bin\dLexicalGenerator.exe $(InputDir)$(InputFileName) $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
+					Outputs="$(InputName).cpp;$(InputName).h"
 				/>
 			</FileConfiguration>
 			<FileConfiguration
@@ -408,8 +408,8 @@
 				<Tool
 					Name="VCCustomBuildTool"
 					Description="dLexicalGenerator.exe $(InputDir)$(InputFileName) -&gt; $(InputDir)$(InputName).h $(InputDir)$(InputName).cpp "
-					CommandLine="bin\dLexicalGenerator.exe $(InputFileName) $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
-					Outputs="$(InputName).cpp"
+					CommandLine="bin\dLexicalGenerator.exe $(InputDir)$(InputFileName) $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
+					Outputs="$(InputName).cpp;$(InputName).h"
 				/>
 			</FileConfiguration>
 			<FileConfiguration
@@ -418,8 +418,8 @@
 				<Tool
 					Name="VCCustomBuildTool"
 					Description="dLexicalGenerator.exe $(InputDir)$(InputFileName) -&gt; $(InputDir)$(InputName).h $(InputDir)$(InputName).cpp "
-					CommandLine="bin\dLexicalGenerator.exe $(InputFileName) $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
-					Outputs="$(InputName).cpp"
+					CommandLine="bin\dLexicalGenerator.exe $(InputDir)$(InputFileName) $(InputDir)$(InputName).cpp&#x0D;&#x0A;"
+					Outputs="$(InputName).cpp;$(InputName).h"
 				/>
 			</FileConfiguration>
 		</File>

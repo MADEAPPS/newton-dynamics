@@ -250,29 +250,29 @@ ExpressionNew
 
 Expression
 	: Expression '=' Expression										{$$ = MyModule->NewExpresionNodeAssigment ($1, $3);} 
-//	| Expression _ASS_ADD Expression								{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
-//	| Expression _ASS_SUB Expression								{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
-//	| Expression _ASS_MUL Expression								{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
-//	| Expression _ASS_DIV Expression								{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
-//	| Expression _ASS_MOD Expression								{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
-//	| Expression _ASS_SHL Expression								{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
-//	| Expression _ASS_SHR Expression								{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
-//	| Expression _ASS_AND Expression								{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
-//	| Expression _ASS_XOR Expression								{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
-//	| Expression _ASS_OR Expression									{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
+	| Expression _ASS_ADD Expression								{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
+	| Expression _ASS_SUB Expression								{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
+	| Expression _ASS_MUL Expression								{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
+	| Expression _ASS_DIV Expression								{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
+	| Expression _ASS_MOD Expression								{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
+	| Expression _ASS_SHL Expression								{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
+	| Expression _ASS_SHR Expression								{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
+	| Expression _ASS_AND Expression								{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
+	| Expression _ASS_XOR Expression								{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
+	| Expression _ASS_OR Expression									{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
 	| Expression '+' Expression										{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);} 
 	| Expression '-' Expression										{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);} 
-//	| Expression '*' Expression										{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);} 
-//	| Expression '/' Expression										{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);} 
-//	| Expression '%' Expression										{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);}
-//	| Expression '>' Expression										{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);} 
-//	| Expression '<' Expression										{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);} 
+	| Expression '*' Expression										{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);} 
+	| Expression '/' Expression										{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);} 
+	| Expression '%' Expression										{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);}
+	| Expression '>' Expression										{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);} 
+	| Expression '<' Expression										{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);} 
 	| Expression _IDENTICAL Expression								{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);}
-//	| Expression _DIFFERENT Expression								{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);}
-//	| Expression _LESS_EQUAL Expression								{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);}
-//	| Expression _GREATHER_EQUAL Expression							{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);}
-//	| Expression _LOGIC_OR Expression								{$$ = MyModule->NewExpressionNodeLogiOperator ($1, $2, $3);}
-//	| Expression _LOGIC_AND Expression								{$$ = MyModule->NewExpressionNodeLogiOperator ($1, $2, $3);}
+	| Expression _DIFFERENT Expression								{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);}
+	| Expression _LESS_EQUAL Expression								{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);}
+	| Expression _GREATHER_EQUAL Expression							{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);}
+	| Expression _LOGIC_OR Expression								{$$ = MyModule->NewExpressionNodeLogiOperator ($1, $2, $3);}
+	| Expression _LOGIC_AND Expression								{$$ = MyModule->NewExpressionNodeLogiOperator ($1, $2, $3);}
 	| '+' Expression %prec '~'										{$$ = $2;}
 	| '-' Expression %prec '~'										{dUserVariable tmp; tmp.m_token = _INTEGER_CONST; tmp.m_data = "0"; tmp = MyModule->NewExpressionNodeConstant (tmp); $$ = MyModule->NewExpressionNodeBinaryOperator (tmp, $1, $2);}
 	| Expression _OP_INC											{$$ = MyModule->NewExpresionNodePrefixPostfixOperator ($1, false, true);}

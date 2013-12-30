@@ -10,7 +10,7 @@
 */
 
 %{
-#include <dAssemblerCompiler.h>
+#include "dAssemblerCompiler.h"
 #include "dAssemblerLexical.h"
 
 // Newton virtual machine assembler grammar
@@ -61,9 +61,7 @@
 %token LOCALLABEL		  
 	
 
-
 %start module
-
 
 %%
 module		: segmentList

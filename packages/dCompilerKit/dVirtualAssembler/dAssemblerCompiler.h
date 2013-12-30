@@ -22,7 +22,7 @@
 #include <dContainersStdAfx.h>
 #include <dVirtualMachine.h>
 #include "dAssemblerParser.h"
-
+#include "dAssemblerLexical.h"
 
 class dAssemblerCompiler: public dAssemblerParser
 {

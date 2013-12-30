@@ -9,9 +9,26 @@
 * freely
 */
 
-
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "dLexCompiler.h"
 
+
+bool CheckDependency(const char* const target, const char* const source)
+{
+	struct _stat sourceStat;
+	struct _stat targetStat;
+
+	int result = _stat (target, &targetStat);
+	if( result == 0 ) {
+		result = _stat (source, &sourceStat);
+		if( result == 0 ) {
+			return targetStat.st_mtime > sourceStat.st_mtime;
+		}
+	}
+
+	return false;
+}
 
 int main(int argc, char* argv[])
 {
@@ -27,6 +44,7 @@ int main(int argc, char* argv[])
 	}
 
 
+
 	const char* const inputRulesFileName = argv[1];
 	const char* const outputFileName = argv[2];
 
@@ -36,10 +54,12 @@ int main(int argc, char* argv[])
 		exit (0);
 	}
 
-	dString buffer;
-	buffer.LoadFile(rules);
-	fclose (rules);
-	dLexCompiler lexical (buffer, outputFileName);
+	if (!CheckDependency (outputFileName, inputRulesFileName)) {
+		dString buffer;
+		buffer.LoadFile(rules);
+		fclose (rules);
+		dLexCompiler lexical (buffer, outputFileName);
+	}
 
 	return 0;
 }

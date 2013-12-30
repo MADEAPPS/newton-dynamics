@@ -14,7 +14,7 @@
 //Auto generated Lexical Analyzer class: dAssemblerLexical.cpp
 //
 
-#include <dAssemblerCompiler.h>
+#include "dAssemblerCompiler.h"
 #include "dAssemblerParser.h"
 
 //

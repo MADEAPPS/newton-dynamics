@@ -17,6 +17,9 @@
 #include <ctype.h>
 #include <tchar.h>
 #include <crtdbg.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
 
 #include <dTree.h>
 #include <dList.h>
