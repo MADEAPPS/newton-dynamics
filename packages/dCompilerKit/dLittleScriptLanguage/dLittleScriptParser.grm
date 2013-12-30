@@ -15,8 +15,8 @@
  *------------------------------------------------------------------
  *
  * This grammar only have one shift reduce conflict, 
- * which the standerd dangling else in if-then-else
- * and is is resolved in favor of shift as it is is the custon tradition for languages like C, C++, java and c#
+ * which is the standard dangling else in if-then-else is almost all high level programming languages
+ * we resolved it in favor of shift, as it is is the custon tradition for languages like C, C++, java and c#
  *
  *------------------------------------------------------------------
  */
