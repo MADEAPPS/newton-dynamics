@@ -75,7 +75,7 @@ void dDAGExpressionNodeVariable::ConnectParent(dDAG* const parent)
 void dDAGExpressionNodeVariable::CompileCIL(dCIL& cil)
 {
 	dString variable (m_name);
-	size_t pos = variable.Find (D_SCOPE_PREFIX, 0, strlen (D_SCOPE_PREFIX));
+	int pos = variable.Find (D_SCOPE_PREFIX, 0, int (strlen (D_SCOPE_PREFIX)));
 	if (pos != 0) {
 		bool state = RenameLocalVariable(cil, variable);
 		if (!state) {
