@@ -29,8 +29,7 @@ dScriptClass::~dScriptClass(void)
 
 int dScriptClass::GetRegisterIndex (const dString& registerName) const
 {
-	dString tmp (registerName.GetStr() + strlen (D_REGISTER_SYMBOL));
-	return tmp.ToInteger();
+	return GetRegisterIndex (registerName);
 }
 
 void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)

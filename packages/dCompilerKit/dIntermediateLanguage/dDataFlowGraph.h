@@ -16,6 +16,20 @@
 #include "dCILstdafx.h"
 #include "dTreeAdressStmt.h"
 
+inline dString MakeRegister(int index)
+{
+	char regName[256];
+	sprintf (regName, "%s%d", D_REGISTER_SYMBOL, index);
+	return regName;			
+}
+
+
+inline int GetRegisterIndex (const dString& reg)
+{
+	static int base = int (strlen (D_REGISTER_SYMBOL));
+	return dString(reg.GetStr() + base).ToInteger();
+}
+
 
 class dDataFlowGraph 
 {
@@ -198,78 +212,24 @@ class dDataFlowGraph
 		dRegisterInterferenceGraph (dDataFlowGraph* const flowGraph, int registerCount);
 
 		private:
-		void ColorGraph (int registerCount);
+		int ColorGraph (int registerCount);
+		void SortRegistersByFrequency (int totalRegisters, int registerCount);
+		void AllocatedSpillsRegister(int totalRegisters, int registerCount);
+
+		void RemapRegister(dTreeAdressStmt::dArg& arg, int totalRegisters);
+		void SortRegisters(int totalRegisters);
+		int FindRegister (int regIndex, int totalRegisters) const;
+
+
+		void SaveSpillRegister(dCIL::dListNode* const node, const dString& reg, const dString& local);
+		static int Compare (const void* p1, const void* p2);
+
 
 		dTreeNode* GetBestNode();
 		dDataFlowGraph* m_flowGraph;
 		int m_registerCount;
+		int m_registenFrequency[1024][2];
 	};
-/*
-	class dRegisterInterferenceWorkingSet: public dList<dTree<dRegisterInterferenceNode, dString>::dTreeNode*>
-	{
-		public:
-		dRegisterInterferenceWorkingSet(dTree<dRegisterInterferenceNode, dString>* const interferenceGraph, int registerCount)
-			:dList<dTree<dRegisterInterferenceNode, dString>::dTreeNode*>()
-			,m_registerCount(registerCount)
-			,m_graph(interferenceGraph)
-		{
-		}
-
-		void GetSet ()
-		{
-			RemoveAll();
-			dTree<dRegisterInterferenceNode, dString>::Iterator iter (*m_graph);
-			for (iter.Begin(); iter; iter ++) {
-				dTree<dRegisterInterferenceNode, dString>::dTreeNode* const node = iter.GetNode();
-				dRegisterInterferenceNode& info = node->GetInfo();
-				if (!info.m_inSet) {
-					int count = 0;
-					for (dList<dRegisterInterferenceNodeEdge>::dListNode* edgeNode = info.m_interferanceEdge.GetFirst(); edgeNode && (count < m_registerCount); edgeNode = edgeNode->GetNext()) {
-						dRegisterInterferenceNodeEdge& edge = edgeNode->GetInfo();
-						if (!edge.m_mark) {
-							count += (edge.m_isMov) ? 0 : 1;
-						}
-					}
-
-					if (count < m_registerCount) {
-						info.m_inSet = true;
-						Append(node);
-					}
-				}
-			}
-
-			if (!GetCount()) {
-				// the function cannot be generate with m_registerCount, select a node candidate for spill here
-				int maxCount = 0;
-				dTree<dRegisterInterferenceNode, dString>::dTreeNode* bestSpillNode = NULL;
-				for (iter.Begin(); iter; iter ++) {
-					dTree<dRegisterInterferenceNode, dString>::dTreeNode* const node = iter.GetNode();
-					dRegisterInterferenceNode& info = node->GetInfo();
-					if (!info.m_inSet) {
-						int count = 0;
-						for (dList<dRegisterInterferenceNodeEdge>::dListNode* edgeNode = info.m_interferanceEdge.GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
-							dRegisterInterferenceNodeEdge& edge = edgeNode->GetInfo();
-							if (!edge.m_mark) {
-								count ++;
-							}
-						}
-
-						if (count > maxCount) {
-							maxCount = count;
-							bestSpillNode = node;
-						}
-					}
-				}
-				dRegisterInterferenceNode& info = bestSpillNode->GetInfo();
-				info.m_inSet = true;
-				Append(bestSpillNode);
-			}
-		}
-
-		int m_registerCount;
-		dTree<dRegisterInterferenceNode, dString>* m_graph;
-	};
-*/
 
 	class dLoop 
 	{
@@ -332,7 +292,7 @@ class dDataFlowGraph
 	virtual ~dDataFlowGraph(void);
 
 	void ApplyLocalOptimizations();
-	void RegistersAllocation (int classRegisterIndex, int returnRegisterIndex, int registerCount);
+	void RegistersAllocation (int registerCount);
 
 	private:
 	void CalculateReachingDefinitions();
@@ -367,7 +327,7 @@ class dDataFlowGraph
 	bool IsStatementInReachList(dCIL::dListNode* const node, dList<dCIL::dListNode*>& definitionList, dCIL::dListNode* const me) const;
 
 	mutable int m_mark;
-	int m_registersUsed;
+	int m_registersUsedMask;
 	dCIL* m_cil;
 	dCIL::dReturnType m_returnType;
 	dString m_returnVariableName;

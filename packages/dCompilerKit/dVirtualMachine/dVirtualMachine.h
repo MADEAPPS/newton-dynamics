@@ -15,22 +15,21 @@
 #define D_OPCODE_FIELD					6
 
 #define D_REGISTER_SYMBOL				"reg"	
-#define D_SPILL_REGISTER_SYMBOL			"localMem"	
 
 //#define D_INTEGER_REGISTER_COUNT		(1<<D_REGISTER_SET_FIELD)
 #define D_INTEGER_REGISTER_COUNT		(8)
+
+#define D_RETURN_REGISTER_INDEX			(D_INTEGER_REGISTER_COUNT - 2)
 #define D_STACK_REGISTER_INDEX			(D_INTEGER_REGISTER_COUNT - 1)
 
 #define D_FLOAT_REGISTER_COUNT			D_INTEGER_REGISTER_COUNT		
 
 
-#define D_CLASS_REGISTER_INDEX			0
-#define D_FUNCTION_RETURN_REGISTER		1
-
 #define D_VECTOR_REGISTES_SIZE			4
 
 typedef unsigned dMachineIntRegister;
 typedef double dMachineFloatRegister;
+
 
 
 class dVirtualMachine

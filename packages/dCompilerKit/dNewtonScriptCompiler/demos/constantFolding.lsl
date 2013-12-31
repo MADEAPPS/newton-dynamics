@@ -12,16 +12,30 @@
 //package demosPackage;
 
 
-// naive method to calculate a fibonacci number
-public class Fibonacci
+// naive method to calculate a ConstantFolding number
+public class ConstantFolding
 {
-	public static int Fibonacci (int n)
+
+	public static int ConstantFolding (int a, int b, int c)
 	{
-		if (n == 0)
-			return 0;
-		if (n == 1)
-			return 1;
-		return Fibonacci (n - 1) + Fibonacci (n - 2);
+		if (8 > 9) return 8; else if (5 >= 4) return 5; else return 9;
+	}
+
+
+	public static int ConstantFolding (int[] a, int b, int c)
+	{
+		int x = 1;
+		int k;
+		for (int i = 0; i < c; i++) {
+//			x = 3;
+			if (i < 10) {
+				x = 2;
+				i ++;
+			}
+			k = i;	
+			a[i] = x;
+		}
+		return x + k;
 	}
 }
 
