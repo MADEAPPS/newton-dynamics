@@ -191,6 +191,20 @@ class dDataFlowGraph
 		dList<dRegisterInterferenceNodeEdge> m_interferanceEdge;
 	};
 
+
+	class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dString>
+	{
+		public: 
+		dRegisterInterferenceGraph (dDataFlowGraph* const flowGraph, int registerCount);
+
+		private:
+		void ColorGraph (int registerCount);
+
+		dTreeNode* GetBestNode();
+		dDataFlowGraph* m_flowGraph;
+		int m_registerCount;
+	};
+/*
 	class dRegisterInterferenceWorkingSet: public dList<dTree<dRegisterInterferenceNode, dString>::dTreeNode*>
 	{
 		public:
@@ -209,7 +223,6 @@ class dDataFlowGraph
 				dTree<dRegisterInterferenceNode, dString>::dTreeNode* const node = iter.GetNode();
 				dRegisterInterferenceNode& info = node->GetInfo();
 				if (!info.m_inSet) {
-
 					int count = 0;
 					for (dList<dRegisterInterferenceNodeEdge>::dListNode* edgeNode = info.m_interferanceEdge.GetFirst(); edgeNode && (count < m_registerCount); edgeNode = edgeNode->GetNext()) {
 						dRegisterInterferenceNodeEdge& edge = edgeNode->GetInfo();
@@ -226,16 +239,37 @@ class dDataFlowGraph
 			}
 
 			if (!GetCount()) {
-				_ASSERTE (GetCount());
 				// the function cannot be generate with m_registerCount, select a node candidate for spill here
+				int maxCount = 0;
+				dTree<dRegisterInterferenceNode, dString>::dTreeNode* bestSpillNode = NULL;
+				for (iter.Begin(); iter; iter ++) {
+					dTree<dRegisterInterferenceNode, dString>::dTreeNode* const node = iter.GetNode();
+					dRegisterInterferenceNode& info = node->GetInfo();
+					if (!info.m_inSet) {
+						int count = 0;
+						for (dList<dRegisterInterferenceNodeEdge>::dListNode* edgeNode = info.m_interferanceEdge.GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
+							dRegisterInterferenceNodeEdge& edge = edgeNode->GetInfo();
+							if (!edge.m_mark) {
+								count ++;
+							}
+						}
+
+						if (count > maxCount) {
+							maxCount = count;
+							bestSpillNode = node;
+						}
+					}
+				}
+				dRegisterInterferenceNode& info = bestSpillNode->GetInfo();
+				info.m_inSet = true;
+				Append(bestSpillNode);
 			}
 		}
-
-		
 
 		int m_registerCount;
 		dTree<dRegisterInterferenceNode, dString>* m_graph;
 	};
+*/
 
 	class dLoop 
 	{
@@ -320,12 +354,9 @@ class dDataFlowGraph
 	bool ApplySubExpresionToCopyPropagation();
 	
 	bool ApplyLoopOptimization(dLoop& loop);
+	void AllocateRegisters (dRegisterInterferenceGraph& interferenceGraph);
 	
-	void AllocateRegisters (dTree<dRegisterInterferenceNode, dString>& interferenceGraph);
-	void BuildInterferenceGraph (dTree<dRegisterInterferenceNode, dString>& interference);
-	void ColorInterferenceGraph (dTree<dRegisterInterferenceNode, dString>& interference, int registerCount);
-	
-	dString GetRegisterName (dTree<dRegisterInterferenceNode, dString>& interferenceGraph, const dString& varName) const;
+	dString GetRegisterName (dRegisterInterferenceGraph& interferenceGraph, const dString& varName) const;
 	void FindNodesInPathway(dCIL::dListNode* const source, dCIL::dListNode* const destination, dTree<int, dCIL::dListNode*>& pathOut) const;
 
 	bool DoStatementAreachesStatementB(dCIL::dListNode* const stmtNodeB, dCIL::dListNode* const stmtNodeA) const;
