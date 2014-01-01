@@ -221,11 +221,23 @@ class dDataFlowGraph
 		int FindRegister (int regIndex, int totalRegisters) const;
 
 
+		void SaveSpillRegister(dCIL::dListNode* const node, dTreeAdressStmt::dArg& argument);
 		void SaveSpillRegister(dCIL::dListNode* const node, const dString& reg, const dString& local);
+
+		void LoadSpillRegister(dCIL::dListNode* const node, dTreeAdressStmt::dArg& argument);
+		void LoadSpillRegister(dCIL::dListNode* const node, const dString& reg, const dString& local);
 		static int Compare (const void* p1, const void* p2);
 
 
 		dTreeNode* GetBestNode();
+
+		dString m_reg0;
+		dString m_reg1;
+		dString m_reg2;
+		dString m_local0;
+		dString m_local1;
+		dString m_local2;
+
 		dDataFlowGraph* m_flowGraph;
 		int m_registerCount;
 		int m_registenFrequency[1024][2];

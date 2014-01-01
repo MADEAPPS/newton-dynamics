@@ -1273,6 +1273,10 @@ dDataFlowGraph::dRegisterInterferenceGraph::dRegisterInterferenceGraph (dDataFlo
 	,m_flowGraph(flowGraph)
 	,m_registerCount(registerCount)
 {
+	m_flowGraph->BuildBasicBlockGraph();
+	m_flowGraph->CalculateLiveInputLiveOutput ();
+	while (m_flowGraph->ApplyRemoveDeadCode());
+
 	dTree<dDataFlowPoint, dCIL::dListNode*>::Iterator iter (m_flowGraph->m_dataFlowGraph);
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowPoint& point = iter.GetNode()->GetInfo();
@@ -1359,9 +1363,19 @@ dDataFlowGraph::dRegisterInterferenceGraph::dRegisterInterferenceGraph (dDataFlo
 	if (registersUsed > registerCount) {
 		// we have some spill fix the program.
 		SortRegistersByFrequency(registersUsed, registerCount);
+		AllocatedSpillsRegister(registersUsed, registerCount);
 	}
 
-	AllocatedSpillsRegister(registersUsed, registerCount);
+	m_flowGraph->BuildBasicBlockGraph();
+	m_flowGraph->CalculateLiveInputLiveOutput ();
+	for (bool optimized = true; optimized;) {
+		optimized = false;
+		m_flowGraph->UpdateReachingDefinitions();
+		optimized |= m_flowGraph->ApplyCopyPropagation();
+		m_flowGraph->m_cil->Trace();
+		optimized |= m_flowGraph->ApplyRemoveDeadCode();
+		m_flowGraph->m_cil->Trace();
+	}
 }
 
 void dDataFlowGraph::dRegisterInterferenceGraph::SortRegistersByFrequency(int totalRegisters, int registerCount)
@@ -1552,92 +1566,74 @@ void dDataFlowGraph::dRegisterInterferenceGraph::AllocatedSpillsRegister(int tot
 	if (m_flowGraph->m_returnType != dCIL::m_void) {
 		index1 = (index1 == D_RETURN_REGISTER_INDEX) ? 1 : 0;
 	}
+	int index2 = index1 - 1;
+	if (m_flowGraph->m_returnType != dCIL::m_void) {
+		index2 = (index2 == D_RETURN_REGISTER_INDEX) ? 1 : 0;
+	}
 
-	dString reg0 (MakeRegister(index0));
-	dString reg1 (MakeRegister(index1));
+	m_reg0 = dString(MakeRegister(index0));
+	m_reg1 = dString (MakeRegister(index1));
+	m_reg2 = dString (MakeRegister(index2));
 
-	dString local0 (dString("_local") + dString(index0));
-	dString local1 (dString("_local") + dString(index1));
+	m_local0 = dString (dString("_local") + dString(index0));
+	m_local1 = dString (dString("_local") + dString(index1));
+	m_local2 = dString (dString("_local") + dString(index2));
 
-	for (dCIL::dListNode* node = m_flowGraph->m_function; node; node = node->GetNext()) {
+	dCIL::dListNode* nextNode;
+	for (dCIL::dListNode* node = m_flowGraph->m_function; node; node = nextNode) {
+		nextNode = node->GetNext();
 		dTreeAdressStmt& stmt = node->GetInfo();
-stmt.Trace();
+//stmt.Trace();
 		switch (stmt.m_instruction)
 		{
 			case dTreeAdressStmt::m_pop:
 			case dTreeAdressStmt::m_paramLoad:
 			{
-				if (stmt.m_arg0.m_label == reg0) {
-					SaveSpillRegister(node, reg0, local0);
-				} else if (stmt.m_arg0.m_label == reg1) {
-					SaveSpillRegister(node, reg1, local1);
-				}
+				SaveSpillRegister (node, stmt.m_arg0);
 				break;
 			}
 
 			case dTreeAdressStmt::m_assigment:
 			{
-				if (stmt.m_arg0.m_label == reg0) {
-					SaveSpillRegister(node, reg0, local0);
-				} else if (stmt.m_arg0.m_label == reg1) {
-					SaveSpillRegister(node, reg1, local1);
+				SaveSpillRegister (node, stmt.m_arg0);
+				LoadSpillRegister (node, stmt.m_arg1);
+
+				if (stmt.m_operator != dTreeAdressStmt::m_nothing) {
+					LoadSpillRegister (node, stmt.m_arg2);
 				}
-
-//				if (stmt.m_arg1.m_type == dTreeAdressStmt::m_intVar) {
-//					RemapRegister(stmt.m_arg1, totalRegisters);
-//				} else if (stmt.m_arg1.m_type == dTreeAdressStmt::m_floatVar) {
-//					dAssert (0);
-//				}
-
-//				if (stmt.m_operator != dTreeAdressStmt::m_nothing) {
-//					if (stmt.m_arg2.m_type == dTreeAdressStmt::m_intVar) {
-//						RemapRegister(stmt.m_arg2, totalRegisters);
-//					} else if (stmt.m_arg2.m_type == dTreeAdressStmt::m_floatVar) {
-//						dAssert (0);
-//					}
-//				}
-//				break;
+				break;
 			}
-
 
 			case dTreeAdressStmt::m_store:
 			{
-				if (stmt.m_arg0.m_label == reg0) {
-					SaveSpillRegister(node, reg0, local0);
-				} else if (stmt.m_arg0.m_label == reg1) {
-					SaveSpillRegister(node, reg1, local1);
-				}
-			
-//				RemapRegister(stmt.m_arg1, totalRegisters);
-//				RemapRegister(stmt.m_arg2, totalRegisters);
+				LoadSpillRegister (node, stmt.m_arg0);
+				LoadSpillRegister (node, stmt.m_arg1);
+				LoadSpillRegister (node, stmt.m_arg2);
+				break;
+			}
+
+			case dTreeAdressStmt::m_load:
+			{
+				SaveSpillRegister (node, stmt.m_arg0);
+				LoadSpillRegister (node, stmt.m_arg1);
+				LoadSpillRegister (node, stmt.m_arg2);
 				break;
 			}
 
 			case dTreeAdressStmt::m_push:
-			case dTreeAdressStmt::m_load:
+			{
+				LoadSpillRegister (node, stmt.m_arg0);
+				break;
+			}
+
 			case dTreeAdressStmt::m_if:
+			{
+				LoadSpillRegister (node, stmt.m_arg0);
+				LoadSpillRegister (node, stmt.m_arg1);
+				break;
+			}
 
 /*
-			
-			case dTreeAdressStmt::m_push:
-			case dTreeAdressStmt::m_paramLoad:
-			{
-				RemapRegister(stmt.m_arg0, totalRegisters);
-				break;
-			}
-
-			case dTreeAdressStmt::m_if:
-			{
-				if (stmt.m_arg0.m_type == dTreeAdressStmt::m_intVar) {
-					RemapRegister(stmt.m_arg0, totalRegisters);
-				}
-
-				if (stmt.m_arg1.m_type == dTreeAdressStmt::m_intVar) {
-					RemapRegister(stmt.m_arg1, totalRegisters);
-				}
-				break;
-			}
-
 			case dTreeAdressStmt::m_alloc:
 			{
 				point.m_killVariable = stmt.m_arg0.m_label;
@@ -1665,6 +1661,8 @@ stmt.Trace();
 				dAssert (0);
 		}
 	}
+
+	m_flowGraph->m_cil->Trace();
 }
 
 void dDataFlowGraph::dRegisterInterferenceGraph::SaveSpillRegister(dCIL::dListNode* const node, const dString& reg, const dString& local)
@@ -1672,14 +1670,51 @@ void dDataFlowGraph::dRegisterInterferenceGraph::SaveSpillRegister(dCIL::dListNo
 	dCIL::dListNode* const newNode = m_flowGraph->m_cil->NewStatement();
 	m_flowGraph->m_cil->InsertAfter (node, newNode);
 
-	dTreeAdressStmt& storeStmt = newNode->GetInfo();
-	storeStmt.m_instruction = dTreeAdressStmt::m_assigment;
-	storeStmt.m_operator = dTreeAdressStmt::m_nothing;
-	storeStmt.m_arg0.m_label = local;
-	storeStmt.m_arg0.m_type = dTreeAdressStmt::m_intVar;
+	dTreeAdressStmt& stmt = newNode->GetInfo();
+	stmt.m_instruction = dTreeAdressStmt::m_assigment;
+	stmt.m_operator = dTreeAdressStmt::m_nothing;
+	stmt.m_arg0.m_label = local;
+	stmt.m_arg0.m_type = dTreeAdressStmt::m_intVar;
 
-	storeStmt.m_arg1.m_label = reg;
-	storeStmt.m_arg1.m_type = dTreeAdressStmt::m_intVar;
+	stmt.m_arg1.m_label = reg;
+	stmt.m_arg1.m_type = dTreeAdressStmt::m_intVar;
+}
+
+void dDataFlowGraph::dRegisterInterferenceGraph::SaveSpillRegister(dCIL::dListNode* const node, dTreeAdressStmt::dArg& argument)
+{
+	if (argument.m_label == m_reg0) {
+		SaveSpillRegister(node, m_reg0, m_local0);
+	} else if (argument.m_label == m_reg1) {
+		SaveSpillRegister(node, m_reg1, m_local1);
+	} else if (argument.m_label == m_reg2) {
+		SaveSpillRegister(node, m_reg2, m_local2);
+	}
+}
+
+void dDataFlowGraph::dRegisterInterferenceGraph::LoadSpillRegister(dCIL::dListNode* const node, const dString& reg, const dString& local)
+{
+	dCIL::dListNode* const newNode = m_flowGraph->m_cil->NewStatement();
+	m_flowGraph->m_cil->InsertAfter (node->GetPrev(), newNode);
+
+	dTreeAdressStmt& stmt = newNode->GetInfo();
+	stmt.m_instruction = dTreeAdressStmt::m_assigment;
+	stmt.m_operator = dTreeAdressStmt::m_nothing;
+	stmt.m_arg0.m_label = reg;
+	stmt.m_arg0.m_type = dTreeAdressStmt::m_intVar;
+
+	stmt.m_arg1.m_label = local;
+	stmt.m_arg1.m_type = dTreeAdressStmt::m_intVar;
+}
+
+void dDataFlowGraph::dRegisterInterferenceGraph::LoadSpillRegister(dCIL::dListNode* const node, dTreeAdressStmt::dArg& argument)
+{
+	if (argument.m_label == m_reg0) {
+		LoadSpillRegister(node, m_reg0, m_local0);
+	} else if (argument.m_label == m_reg1) {
+		LoadSpillRegister(node, m_reg1, m_local1);
+	} else if (argument.m_label == m_reg2) {
+		LoadSpillRegister(node, m_reg2, m_local2);
+	}
 }
 
 int dDataFlowGraph::dRegisterInterferenceGraph::Compare (const void* p1, const void* p2)
@@ -2318,24 +2353,8 @@ m_cil->Trace();
 }
 
 
-
-
 void dDataFlowGraph::RegistersAllocation (int registerCount)
 {
-	BuildBasicBlockGraph();
-	CalculateLiveInputLiveOutput ();
-
-	while (ApplyRemoveDeadCode());
-m_cil->Trace();
-
 	dRegisterInterferenceGraph interferenceGraph(this, registerCount);
-m_cil->Trace();
-
-	BuildBasicBlockGraph();
-	CalculateLiveInputLiveOutput ();
-	while (ApplyRemoveDeadCode());
-
-//	ApplyRemoveDeadCode();
-m_cil->Trace();
-
 }
+
