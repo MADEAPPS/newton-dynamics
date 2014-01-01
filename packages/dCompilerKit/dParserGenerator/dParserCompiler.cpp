@@ -529,8 +529,7 @@ void dParserCompiler::LoadTemplateFile(const char* const templateName, dString& 
 	// in windows
 	GetModuleFileName(NULL, path, sizeof(path)); 
 
-
-	char* const ptr = strrchr (path, '\\');
+	char* const ptr = strrchr (path, '\\') + 1;
 	sprintf (ptr, templateName);
 
 	FILE* const templateFile = fopen (path, "rb");
@@ -573,7 +572,7 @@ void dParserCompiler::ScanGrammarFile(
 	int operatorPrecedencePriority = 0;
 
 	dParserLexical lexical (inputRules.GetStr());
-	LoadTemplateFile("/dParserUserVariableTemplate.cpp", userVariableClass);
+	LoadTemplateFile("dParserUserVariableTemplate_cpp.txt", userVariableClass);
 
 	// scan the definition segment
 	for (dToken token = dToken(lexical.NextToken()); token != GRAMMAR_SEGMENT; ) {
@@ -1146,8 +1145,8 @@ void dParserCompiler::GenerateHeaderFile (
 	const dTree<dTokenInfo, dCRCTYPE>& symbolList, 
 	const dString& userVariableClass) 
 {
-	dString templateHeader ("");
-	LoadTemplateFile("/dParserTemplate.h", templateHeader);
+	dString templateHeader;
+	LoadTemplateFile("dParserTemplate_h.txt", templateHeader);
 
 	ReplaceAllMacros (templateHeader, className, "$(className)");
 	ReplaceAllMacros (templateHeader, scannerClassName, "$(scannerClass)");
@@ -1207,7 +1206,7 @@ void dParserCompiler::GenerateParserCode (
 	int lastTerminalTokenEnum)
 {
 	dString templateHeader ("");
-	LoadTemplateFile("/dParserTemplate.cpp", templateHeader);
+	LoadTemplateFile("dParserTemplate _cpp.txt", templateHeader);
 
 	int position = templateHeader.Find ("$(userCode)");
 	templateHeader.Replace(position, 11, userCode);

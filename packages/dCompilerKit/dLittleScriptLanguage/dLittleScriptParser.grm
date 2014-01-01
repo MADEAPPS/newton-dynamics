@@ -9,16 +9,15 @@
 * freely
 */
 
-
 /*
  *------------------------------------------------------------------
  *
- * This grammar only have one shift reduce conflict, 
- * which is the standard dangling else in if-then-else is almost all high level programming languages
- * we resolved it in favor of shift, as it is is the custon tradition for languages like C, C++, java and c#
+ * This grammar only have one shift reduce conflict, which is the standard dangling else in if-then-else of almost all high level programming languages.
+ * I resolve it in favor of shift as it is is the custom tradition for languages like C, C++, java and c#
  *
  *------------------------------------------------------------------
  */
+
 
 %{
 // Newton Little Scripting Language specification 1.0.0

@@ -159,7 +159,7 @@ void dLexScannerGenerator::LoadTemplateFile(const char* const templateName, dStr
 	//	if(bytes >= 0)
 	//		pBuf[bytes] = '\0'; 
 
-	char* const ptr = strrchr (path, '\\');
+	char* const ptr = strrchr (path, '\\') + 1;
 	sprintf (ptr, templateName);
 
 	FILE* const templateFile = fopen (path, "rb");
@@ -191,8 +191,8 @@ void dLexScannerGenerator::SaveFile(const char* const fileName, const char* cons
 
 void dLexScannerGenerator::CreateHeaderFile (const char* const fileName, const dString& className) const
 {
-	dString templateHeader ("");
-	LoadTemplateFile("/dLexicalTemplate.h", templateHeader);
+	dString templateHeader;
+	LoadTemplateFile("dLexicalTemplate_h.txt", templateHeader);
 
 	ReplaceAllMacros (templateHeader, className, "$(className)");
 
@@ -235,8 +235,8 @@ void dLexScannerGenerator::AddText (dString& output, const char* const fmt, ...)
 
 void dLexScannerGenerator::CreateCodeFile (const char* const fileName, const dString& className, const dString& userPreHeaderCode, const dString& userPostHeaderCode) const
 {
-	dString templateCode ("");
-	LoadTemplateFile("/dLexicalTemplate.cpp", templateCode);
+	dString templateCode;
+	LoadTemplateFile("dLexicalTemplate_cpp.txt", templateCode);
 
 	ReplaceMacro (templateCode, userPreHeaderCode, "$(userIncludeCode)");
 	ReplaceAllMacros (templateCode, className, "$(className)");

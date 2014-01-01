@@ -21,7 +21,6 @@
 %}
 
 
-
 WhiteSpace			[ \t\n\r]+
 AnyButAstr			[^\*]
 AnyButSlash			[^\/]
