@@ -22,8 +22,6 @@ class dScriptClass
 
 	void AddCode (dDAGClassNode* const classSymbols, dCIL& classCode);
 
-	int GetRegisterIndex (const dString& registerName) const;
-
 	int m_codeSgementSize;
 	dVirtualMachine::dOpCode* m_codeSegment;
 

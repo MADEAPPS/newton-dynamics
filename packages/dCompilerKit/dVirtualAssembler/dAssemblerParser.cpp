@@ -140,7 +140,7 @@ const dAssemblerParser::dGotoEntry* dAssemblerParser::FindGoto (const dGotoEntry
 		}
 	}
 
-	_ASSERT (0);
+	dAssert (0);
 	return NULL;
 }
 
@@ -436,7 +436,7 @@ const dAssemblerParser::dActionEntry* dAssemblerParser::GetNextAction (dList<dSt
 	while (!action && (stack.GetCount() > 1)) {
 		errorMode = true; 
 
-		// we found a syntax error in go into error recovering mode, and find the token mark by a ". error" rule
+		// we found a syntax error, go into error recovering mode and find the token mark by a ". error" rule
 		stack.Remove (stack.GetLast());
 
 		const dStackPair& stackTop = stack.GetLast()->GetInfo();
@@ -560,7 +560,7 @@ bool dAssemblerParser::Parse(dAssemblerLexical& scanner)
 					dStackPair parameter[MAX_USER_PARAM];
 
 					int reduceCount = action->m_ruleSymbols;
-					_ASSERTE (reduceCount < sizeof (parameter) / sizeof (parameter[0]));
+					dAssert (reduceCount < sizeof (parameter) / sizeof (parameter[0]));
 
 					for (int i = 0; i < reduceCount; i ++) {
 						parameter[reduceCount - i - 1] = stack.GetLast()->GetInfo();
@@ -839,7 +839,7 @@ break;
 				
 				default:  
 				{
-					_ASSERTE (0);
+					dAssert (0);
 					// syntax error parsing program
 					//if (!ErrorHandler ("error")) {
 					//}

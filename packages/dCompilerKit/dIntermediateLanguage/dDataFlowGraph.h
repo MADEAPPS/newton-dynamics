@@ -16,7 +16,7 @@
 #include "dCILstdafx.h"
 #include "dTreeAdressStmt.h"
 
-inline dString MakeRegister(int index)
+inline dString IndexToRegister(int index)
 {
 	char regName[256];
 	sprintf (regName, "%s%d", D_REGISTER_SYMBOL, index);
@@ -24,7 +24,7 @@ inline dString MakeRegister(int index)
 }
 
 
-inline int GetRegisterIndex (const dString& reg)
+inline int RegisterToIndex (const dString& reg)
 {
 	static int base = int (strlen (D_REGISTER_SYMBOL));
 	return dString(reg.GetStr() + base).ToInteger();

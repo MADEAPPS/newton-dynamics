@@ -260,7 +260,7 @@ bool $(className)::Parse($(scannerClass)& scanner)
 					dStackPair parameter[MAX_USER_PARAM];
 
 					int reduceCount = action->m_ruleSymbols;
-					dAssertE (reduceCount < sizeof (parameter) / sizeof (parameter[0]));
+					dAssert (reduceCount < sizeof (parameter) / sizeof (parameter[0]));
 
 					for (int i = 0; i < reduceCount; i ++) {
 						parameter[reduceCount - i - 1] = stack.GetLast()->GetInfo();
@@ -297,7 +297,7 @@ $(semanticActionsCode)
 				
 				default:  
 				{
-					dAssertE (0);
+					dAssert (0);
 					// syntax error parsing program
 					//if (!ErrorHandler ("error")) {
 					//}

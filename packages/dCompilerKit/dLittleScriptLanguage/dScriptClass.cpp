@@ -13,6 +13,7 @@
 #include "dLSCstdafx.h"
 #include "dScriptClass.h"
 
+
 dScriptClass::dScriptClass(void)
 	:m_codeSgementSize(0)
 	,m_codeSegment(NULL)
@@ -25,11 +26,6 @@ dScriptClass::~dScriptClass(void)
 	if (m_codeSegment) {
 		delete[] m_codeSegment;
 	}
-}
-
-int dScriptClass::GetRegisterIndex (const dString& registerName) const
-{
-	return GetRegisterIndex (registerName);
 }
 
 void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
@@ -88,7 +84,7 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 			case dTreeAdressStmt::m_paramLoad:	
 			{
 				tmp[count].m_opcode = dVirtualMachine::loadBase;
-				tmp[count].m_reg0 = GetRegisterIndex (stmt.m_arg0.m_label.GetStr());
+				tmp[count].m_reg0 = RegisterToIndex (stmt.m_arg0.m_label.GetStr());
 				tmp[count].m_reg1 = D_STACK_REGISTER_INDEX;
 				tmp[count].m_imm3 = parameters.Find(stmt.m_arg2.m_label.GetStr())->GetInfo();
 				count ++;
@@ -113,9 +109,9 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 			case dTreeAdressStmt::m_load:	
 			{
 				tmp[count].m_opcode = dVirtualMachine::loadw;
-				tmp[count].m_reg0 = GetRegisterIndex (stmt.m_arg0.m_label.GetStr());
-				tmp[count].m_reg1 = GetRegisterIndex (stmt.m_arg1.m_label.GetStr());
-				tmp[count].m_reg2 = GetRegisterIndex (stmt.m_arg2.m_label.GetStr());
+				tmp[count].m_reg0 = RegisterToIndex (stmt.m_arg0.m_label.GetStr());
+				tmp[count].m_reg1 = RegisterToIndex (stmt.m_arg1.m_label.GetStr());
+				tmp[count].m_reg2 = RegisterToIndex (stmt.m_arg2.m_label.GetStr());
 				tmp[count].m_imm4 = 0;
 				count ++;
 				break;
@@ -124,9 +120,9 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 			case dTreeAdressStmt::m_store:	
 			{
 				tmp[count].m_opcode = dVirtualMachine::storew;
-				tmp[count].m_reg0 = GetRegisterIndex (stmt.m_arg0.m_label.GetStr());
-				tmp[count].m_reg1 = GetRegisterIndex (stmt.m_arg1.m_label.GetStr());
-				tmp[count].m_reg2 = GetRegisterIndex (stmt.m_arg2.m_label.GetStr());
+				tmp[count].m_reg0 = RegisterToIndex (stmt.m_arg0.m_label.GetStr());
+				tmp[count].m_reg1 = RegisterToIndex (stmt.m_arg1.m_label.GetStr());
+				tmp[count].m_reg2 = RegisterToIndex (stmt.m_arg2.m_label.GetStr());
 				tmp[count].m_imm4 = 0;
 				count ++;
 				break;
@@ -137,8 +133,8 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 			case dTreeAdressStmt::m_if:	
 			{
 				jumpsOrigin.Insert(stmt.m_arg2.m_label.GetStr(), count);
-				tmp[count].m_reg0 = GetRegisterIndex (stmt.m_arg0.m_label.GetStr());
-				tmp[count].m_reg1 = GetRegisterIndex (stmt.m_arg1.m_label.GetStr());
+				tmp[count].m_reg0 = RegisterToIndex (stmt.m_arg0.m_label.GetStr());
+				tmp[count].m_reg1 = RegisterToIndex (stmt.m_arg1.m_label.GetStr());
 				tmp[count].m_imm3 = 0;
 				switch (stmt.m_operator)
 				{
@@ -176,7 +172,7 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 
 			case dTreeAdressStmt::m_assigment:	
 			{
-				tmp[count].m_reg0 = GetRegisterIndex (stmt.m_arg0.m_label.GetStr());
+				tmp[count].m_reg0 = RegisterToIndex (stmt.m_arg0.m_label.GetStr());
 				if (stmt.m_operator == dTreeAdressStmt::m_nothing) {
 					if (stmt.m_arg1.m_type == dTreeAdressStmt::m_intConst) {
 						tmp[count].m_opcode = dVirtualMachine::movi;
@@ -184,10 +180,10 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 						tmp[count].m_imm3 = value.ToInteger();
 					} else {
 						tmp[count].m_opcode = dVirtualMachine::mov;
-						tmp[count].m_reg1 = GetRegisterIndex (stmt.m_arg1.m_label.GetStr());;
+						tmp[count].m_reg1 = RegisterToIndex (stmt.m_arg1.m_label.GetStr());;
 					}
 				} else {
-					tmp[count].m_reg1 = GetRegisterIndex (stmt.m_arg1.m_label.GetStr());
+					tmp[count].m_reg1 = RegisterToIndex (stmt.m_arg1.m_label.GetStr());
 					if (stmt.m_arg2.m_type == dTreeAdressStmt::m_intConst) {
 						dString value (stmt.m_arg2.m_label.GetStr());
 						switch (stmt.m_operator) 
@@ -224,7 +220,7 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 								_ASSERTE (0);
 						}
 					} else {
-						tmp[count].m_reg2 = GetRegisterIndex (stmt.m_arg2.m_label.GetStr());
+						tmp[count].m_reg2 = RegisterToIndex (stmt.m_arg2.m_label.GetStr());
 						switch (stmt.m_operator) 
 						{
 							case dTreeAdressStmt::m_identical:
@@ -310,7 +306,7 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 			case dTreeAdressStmt::m_push:	
 			{
 				tmp[count].m_opcode = dVirtualMachine::push;
-				tmp[count].m_reg0 = GetRegisterIndex (stmt.m_arg0.m_label.GetStr());
+				tmp[count].m_reg0 = RegisterToIndex (stmt.m_arg0.m_label.GetStr());
 				tmp[count].m_reg1 = D_STACK_REGISTER_INDEX;
 				count ++;
 				break;
@@ -319,7 +315,7 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 			case dTreeAdressStmt::m_pop:	
 			{
 				tmp[count].m_opcode = dVirtualMachine::pop;
-				tmp[count].m_reg0 = GetRegisterIndex (stmt.m_arg0.m_label.GetStr());
+				tmp[count].m_reg0 = RegisterToIndex (stmt.m_arg0.m_label.GetStr());
 				tmp[count].m_reg1 = D_STACK_REGISTER_INDEX;
 				count ++;
 				break;

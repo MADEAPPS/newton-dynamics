@@ -26,6 +26,7 @@
 #include <dString.h>
 #include <dCILstdafx.h>
 #include <dRefCounter.h>
+#include <dDataFlowGraph.h>
 #include <dVirtualMachine.h>
 #include <dTreeAdressStmt.h>
 #include <dContainersStdAfx.h>

@@ -1394,17 +1394,17 @@ void dDataFlowGraph::dRegisterInterferenceGraph::SortRegistersByFrequency(int to
 		{
 			case dTreeAdressStmt::m_assigment:
 			{
-				m_registenFrequency[GetRegisterIndex (stmt.m_arg0.m_label)][0] += 1;
+				m_registenFrequency[RegisterToIndex (stmt.m_arg0.m_label)][0] += 1;
 
 				if (stmt.m_arg1.m_type == dTreeAdressStmt::m_intVar) {
-					m_registenFrequency[GetRegisterIndex (stmt.m_arg1.m_label)][0] += 1;
+					m_registenFrequency[RegisterToIndex (stmt.m_arg1.m_label)][0] += 1;
 				} else if (stmt.m_arg1.m_type == dTreeAdressStmt::m_floatVar) {
 					dAssert (0);
 				}
 
 				if (stmt.m_operator != dTreeAdressStmt::m_nothing) {
 					if (stmt.m_arg2.m_type == dTreeAdressStmt::m_intVar) {
-						m_registenFrequency[GetRegisterIndex (stmt.m_arg2.m_label)][0] += 1;
+						m_registenFrequency[RegisterToIndex (stmt.m_arg2.m_label)][0] += 1;
 					} else if (stmt.m_arg2.m_type == dTreeAdressStmt::m_floatVar) {
 						dAssert (0);
 					}
@@ -1415,9 +1415,9 @@ void dDataFlowGraph::dRegisterInterferenceGraph::SortRegistersByFrequency(int to
 			case dTreeAdressStmt::m_load:
 			case dTreeAdressStmt::m_store:
 			{
-				m_registenFrequency[GetRegisterIndex (stmt.m_arg0.m_label)][0] += 1;
-				m_registenFrequency[GetRegisterIndex (stmt.m_arg1.m_label)][0] += 1;
-				m_registenFrequency[GetRegisterIndex (stmt.m_arg2.m_label)][0] += 1;
+				m_registenFrequency[RegisterToIndex (stmt.m_arg0.m_label)][0] += 1;
+				m_registenFrequency[RegisterToIndex (stmt.m_arg1.m_label)][0] += 1;
+				m_registenFrequency[RegisterToIndex (stmt.m_arg2.m_label)][0] += 1;
 				break;
 			}
 
@@ -1425,18 +1425,18 @@ void dDataFlowGraph::dRegisterInterferenceGraph::SortRegistersByFrequency(int to
 			case dTreeAdressStmt::m_push:
 			case dTreeAdressStmt::m_paramLoad:
 			{
-				m_registenFrequency[GetRegisterIndex (stmt.m_arg0.m_label)][0] += 1;
+				m_registenFrequency[RegisterToIndex (stmt.m_arg0.m_label)][0] += 1;
 				break;
 			}
 
 			case dTreeAdressStmt::m_if:
 			{
 				if (stmt.m_arg0.m_type == dTreeAdressStmt::m_intVar) {
-					m_registenFrequency[GetRegisterIndex (stmt.m_arg0.m_label)][0] += 1;
+					m_registenFrequency[RegisterToIndex (stmt.m_arg0.m_label)][0] += 1;
 				}
 
 				if (stmt.m_arg1.m_type == dTreeAdressStmt::m_intVar) {
-					m_registenFrequency[GetRegisterIndex (stmt.m_arg1.m_label)][0] += 1;
+					m_registenFrequency[RegisterToIndex (stmt.m_arg1.m_label)][0] += 1;
 				}
 				break;
 			}
@@ -1571,9 +1571,9 @@ void dDataFlowGraph::dRegisterInterferenceGraph::AllocatedSpillsRegister(int tot
 		index2 = (index2 == D_RETURN_REGISTER_INDEX) ? 1 : 0;
 	}
 
-	m_reg0 = dString(MakeRegister(index0));
-	m_reg1 = dString (MakeRegister(index1));
-	m_reg2 = dString (MakeRegister(index2));
+	m_reg0 = dString(IndexToRegister(index0));
+	m_reg1 = dString (IndexToRegister(index1));
+	m_reg2 = dString (IndexToRegister(index2));
 
 	m_local0 = dString (dString("_local") + dString(index0));
 	m_local1 = dString (dString("_local") + dString(index1));
@@ -1745,9 +1745,9 @@ int dDataFlowGraph::dRegisterInterferenceGraph::FindRegister(int regIndex, int t
 
 void dDataFlowGraph::dRegisterInterferenceGraph::RemapRegister(dTreeAdressStmt::dArg& arg, int totalRegisters)
 {
-	int index = GetRegisterIndex (arg.m_label);
+	int index = RegisterToIndex (arg.m_label);
 	int remapIndex = FindRegister (index, totalRegisters);
-	arg.m_label = MakeRegister(remapIndex);
+	arg.m_label = IndexToRegister(remapIndex);
 }
 
 
@@ -1884,13 +1884,9 @@ dString dDataFlowGraph::GetRegisterName (dRegisterInterferenceGraph& interferenc
 	if (varName[0] == '_') {
 		return varName;
 	} else {
-		//dTree<dRegisterInterferenceNode, dString>::dTreeNode* const node = interferenceGraph.Find (varName);
 		dRegisterInterferenceGraph::dTreeNode* const node = interferenceGraph.Find (varName);
 		dRegisterInterferenceNode& var = node->GetInfo();
-//		char regName[256];
-//		sprintf (regName, "%s%d", D_REGISTER_SYMBOL, var.m_registerIndex);
-//		return regName;			
-		return MakeRegister(var.m_registerIndex);
+		return IndexToRegister(var.m_registerIndex);
 	}
 }
 
