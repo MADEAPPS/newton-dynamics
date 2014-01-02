@@ -65,10 +65,14 @@ class dRegisterInterferenceNode
 		void EmitSpillStatements(int totalRegisters);
 		void SortRegisters(int totalRegisters);
 		void SortRegistersByFrequency (int totalRegisters);
+        void MakeWorkingRegisters(int totalRegisters);
 		void RemapRegister(dTreeAdressStmt::dArg& arg, int totalRegisters);
 
 		void SaveRegisterToTemp(dCIL::dListNode* const node, dTreeAdressStmt::dArg& argument);
 		void LoadRegisterFromTemp(dCIL::dListNode* const node, dTreeAdressStmt::dArg& argument);
+
+        void SaveRegisterToTemp(dCIL::dListNode* const node, const dString& reg, const dString& local);
+        void LoadRegisterFromTemp(dCIL::dListNode* const node, const dString& reg, const dString& local);
 		
 		int GetRegisterIndex (const dString& varName) const;
 		dString GetRegisterName (const dString& varName) const;
@@ -80,29 +84,20 @@ class dRegisterInterferenceNode
 		static int Compare (const void* p1, const void* p2);
 /*
 		void AllocatedSpilledRegister(int totalRegisters, int registerCount);
-
 		
 		
-		
-
-		
-		void SaveRegisterToTemp(dCIL::dListNode* const node, const dString& reg, const dString& local);
-
-		
-		void LoadRegisterFromTemp(dCIL::dListNode* const node, const dString& reg, const dString& local);
 
 		void LoadSpillRegister(dCIL::dListNode* const node, const dString& alliasRegister, dTreeAdressStmt::dArg& argument, int registerBase);
 		void SaveSpillRegister(dCIL::dListNode* const node, const dString& alliasRegister, dTreeAdressStmt::dArg& argument, int registerBase);
-		
-		
-
-		dString m_reg0;
-		dString m_reg1;
-		dString m_reg2;
-		dString m_local0;
-		dString m_local1;
-		dString m_local2;
 */
+
+    dString m_reg0;
+    dString m_reg1;
+//  dString m_reg2;
+    dString m_local0;
+    dString m_local1;
+//  dString m_local2;
+
 	dDataFlowGraph* m_flowGraph;
 	int m_spillCount;
 	int m_localLayer;
