@@ -936,6 +936,7 @@ bool dDataFlowGraph::ApplyCopyPropagation()
 
 	for (dCIL::dListNode* stmtNode = m_function; stmtNode; stmtNode = stmtNode->GetNext()) {
 		dTreeAdressStmt& stmt = stmtNode->GetInfo();
+//stmt.Trace();
 		switch (stmt.m_instruction)
 		{
 			case dTreeAdressStmt::m_assigment:
@@ -969,6 +970,16 @@ bool dDataFlowGraph::ApplyCopyPropagation()
 								} else if ((stmt1.m_arg1.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
 									ret = true;		
 									stmt1.m_arg1 = stmt.m_arg1;
+									UpdateReachingDefinitions();
+								}
+								break;
+							}
+
+							case dTreeAdressStmt::m_storeBase:
+							{
+								if ((stmt1.m_arg0.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
+									ret = true;
+									stmt1.m_arg0 = stmt.m_arg1;
 									UpdateReachingDefinitions();
 								}
 								break;
@@ -1246,7 +1257,7 @@ bool dDataFlowGraph::ApplyRemoveDeadCode()
 	dCIL::dListNode* nextStmtNode;
 	for (dCIL::dListNode* stmtNode = m_function; stmtNode; stmtNode = nextStmtNode) {
 		dTreeAdressStmt& stmt = stmtNode->GetInfo();
-stmt.Trace();
+//stmt.Trace();
 		nextStmtNode = stmtNode->GetNext();
 		switch (stmt.m_instruction) 
 		{
