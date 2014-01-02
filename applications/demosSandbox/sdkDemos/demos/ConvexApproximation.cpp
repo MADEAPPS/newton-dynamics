@@ -132,12 +132,12 @@ void SimpleConvexApproximation (DemoEntityManager* const scene)
 	// convex approximate some file meshes 
 //	CreateConvexAproximation ("xxx.ngd", scene, location, 1, "camo.tga");
 
-//	CreateConvexAproximation ("lshape.ngd", scene, location, 3, "camo.tga");
-//	CreateConvexAproximation ("hollowBox.ngd", scene, location, 3, "KAMEN.tga");
-//	CreateConvexAproximation ("hollowCylinder.ngd", scene, location, 3, "frowny.tga");
+	CreateConvexAproximation ("lshape.ngd", scene, location, 3, "camo.tga");
+	CreateConvexAproximation ("hollowBox.ngd", scene, location, 3, "KAMEN.tga");
+	CreateConvexAproximation ("hollowCylinder.ngd", scene, location, 3, "frowny.tga");
 	CreateConvexAproximation ("chair.ngd", scene, location, 3, "checker.tga");
-//	CreateConvexAproximation ("cow.ngd", scene, location + dVector (10, 0, 0, 0), 3, "cow.tga");
-//	CreateConvexAproximation ("camel.ngd", scene, location + dVector (17, 0, 0, 0), 3, "jirafe.tga");
+	CreateConvexAproximation ("cow.ngd", scene, location + dVector (10, 0, 0, 0), 3, "cow.tga");
+	CreateConvexAproximation ("camel.ngd", scene, location + dVector (17, 0, 0, 0), 3, "jirafe.tga");
 
 //	CreateConvexAproximation ("tree.ngd", scene, location, 1, "KAMEN.tga");
 //	CreateConvexAproximation ("beetle.ngd", scene, location, 1, "KAMEN.tga");
@@ -149,10 +149,10 @@ void SimpleConvexApproximation (DemoEntityManager* const scene)
 	
 
 	int count = 5;
-//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 
 //	ExportScene (scene->GetNewton(), "../../../media/test1.ngd");
 
