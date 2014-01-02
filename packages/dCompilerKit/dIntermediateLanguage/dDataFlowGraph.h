@@ -287,6 +287,7 @@ class dDataFlowGraph
 	dList<dBasicBlock*> m_traversalBlocksOrder; 
 	dTree<dDataFlowPoint, dCIL::dListNode*> m_dataFlowGraph;
 	dTree<dList<dCIL::dListNode*>, dString> m_variableDefinitions;
+	friend dRegisterInterferenceGraph;
 };
 
 

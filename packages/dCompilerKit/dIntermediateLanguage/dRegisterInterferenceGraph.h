@@ -17,8 +17,6 @@
 #include "dTreeAdressStmt.h"
 
 
-
-
 class dDataFlowGraph;
 class dRegisterInterferenceNode;
 class dRegisterInterferenceNodeEdge
@@ -60,8 +58,25 @@ class dRegisterInterferenceNode
 		dRegisterInterferenceGraph (dDataFlowGraph* const flowGraph, int registerCount);
 
 		private:
-/*
+		void Build();
+		dTreeNode* GetBestNode();
+		void EmitSpillStatements();
+		void AllocateRegisters ();
 		int ColorGraph (int registerCount);
+		
+
+		void SaveRegisterToTemp(dCIL::dListNode* const node, dTreeAdressStmt::dArg& argument);
+		void LoadRegisterFromTemp(dCIL::dListNode* const node, dTreeAdressStmt::dArg& argument);
+
+		
+
+		int GetRegisterIndex (const dString& varName) const;
+		dString GetRegisterName (const dString& varName) const;
+
+		dString MakeSpilledTemporary ();
+		dString MakeLocalVariable (int index);
+		
+/*
 		void SortRegistersByFrequency (int totalRegisters, int registerCount);
 		void AllocatedSpilledRegister(int totalRegisters, int registerCount);
 
@@ -69,16 +84,16 @@ class dRegisterInterferenceNode
 		void SortRegisters(int totalRegisters);
 		int FindRegister (int regIndex, int totalRegisters) const;
 
-		void SaveRegisterToTemp(dCIL::dListNode* const node, dTreeAdressStmt::dArg& argument);
+		
 		void SaveRegisterToTemp(dCIL::dListNode* const node, const dString& reg, const dString& local);
 
-		void LoadRegisterFromTemp(dCIL::dListNode* const node, dTreeAdressStmt::dArg& argument);
+		
 		void LoadRegisterFromTemp(dCIL::dListNode* const node, const dString& reg, const dString& local);
 
 		void LoadSpillRegister(dCIL::dListNode* const node, const dString& alliasRegister, dTreeAdressStmt::dArg& argument, int registerBase);
 		void SaveSpillRegister(dCIL::dListNode* const node, const dString& alliasRegister, dTreeAdressStmt::dArg& argument, int registerBase);
 		static int Compare (const void* p1, const void* p2);
-		dTreeNode* GetBestNode();
+		
 
 		dString m_reg0;
 		dString m_reg1;
@@ -88,6 +103,8 @@ class dRegisterInterferenceNode
 		dString m_local2;
 */
 	dDataFlowGraph* m_flowGraph;
+	int m_spillCount;
+	int m_localLayer;
 	int m_registerCount;
 //		int m_registenFrequency[1024][2];
 };

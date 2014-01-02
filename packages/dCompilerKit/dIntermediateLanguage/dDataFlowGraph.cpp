@@ -1246,6 +1246,7 @@ bool dDataFlowGraph::ApplyRemoveDeadCode()
 	dCIL::dListNode* nextStmtNode;
 	for (dCIL::dListNode* stmtNode = m_function; stmtNode; stmtNode = nextStmtNode) {
 		dTreeAdressStmt& stmt = stmtNode->GetInfo();
+stmt.Trace();
 		nextStmtNode = stmtNode->GetNext();
 		switch (stmt.m_instruction) 
 		{
@@ -1266,7 +1267,6 @@ bool dDataFlowGraph::ApplyRemoveDeadCode()
 			}
 
 			case dTreeAdressStmt::m_load:
-			case dTreeAdressStmt::m_storeBase:
 			case dTreeAdressStmt::m_loadBase:
 			{
 				dDataFlowPoint& info = m_dataFlowGraph.Find(stmtNode)->GetInfo();
@@ -1286,13 +1286,13 @@ bool dDataFlowGraph::ApplyRemoveDeadCode()
 /*
 dString dDataFlowGraph::GetRegisterName (dRegisterInterferenceGraph& interferenceGraph, const dString& varName) const
 {
-	if (varName[0] == '_') {
-		return varName;
-	} else {
-		dRegisterInterferenceGraph::dTreeNode* const node = interferenceGraph.Find (varName);
-		dRegisterInterferenceNode& var = node->GetInfo();
-		return IndexToRegister(var.m_registerIndex);
-	}
+if (varName[0] == '_') {
+return varName;
+} else {
+dRegisterInterferenceGraph::dTreeNode* const node = interferenceGraph.Find (varName);
+dRegisterInterferenceNode& var = node->GetInfo();
+return IndexToRegister(var.m_registerIndex);
+}
 }
 
 void dDataFlowGraph::AllocateRegisters (dRegisterInterferenceGraph& interferenceGraph)
@@ -1755,7 +1755,6 @@ m_cil->Trace();
 
 void dDataFlowGraph::RegistersAllocation (int registerCount)
 {
-	dAssert (0);
-//	dRegisterInterferenceGraph interferenceGraph(this, registerCount);
+	dRegisterInterferenceGraph interferenceGraph(this, registerCount);
 }
 
