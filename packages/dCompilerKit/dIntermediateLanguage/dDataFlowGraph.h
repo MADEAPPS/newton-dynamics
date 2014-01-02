@@ -16,6 +16,7 @@
 #include "dCILstdafx.h"
 #include "dTreeAdressStmt.h"
 
+
 inline dString IndexToRegister(int index)
 {
 	char regName[256];
@@ -31,13 +32,14 @@ inline dString IndexToLocal(int index)
 }
 
 
-
 inline int RegisterToIndex (const dString& reg)
 {
 	static int base = int (strlen (D_REGISTER_SYMBOL));
 	return dString(reg.GetStr() + base).ToInteger();
 }
 
+
+class dRegisterInterferenceGraph;
 
 class dDataFlowGraph 
 {
@@ -179,81 +181,6 @@ class dDataFlowGraph
 		}
 	};
 
-	class dRegisterInterferenceNode;
-	class dRegisterInterferenceNodeEdge
-	{
-		public:
-		dRegisterInterferenceNodeEdge (dTree<dRegisterInterferenceNode, dString>::dTreeNode* const targetNode)
-			:m_isMov(false)
-			,m_mark (0)
-			,m_twin(NULL)
-			,m_targetNode(targetNode)
-		{
-		}
-
-		bool m_isMov;
-		int m_mark;
-		dRegisterInterferenceNodeEdge* m_twin;
-		dTree<dRegisterInterferenceNode, dString>::dTreeNode* m_targetNode;
-	};
-
-
-	class dRegisterInterferenceNode
-	{
-		public: 
-		dRegisterInterferenceNode()
-			:m_inSet (false)
-			,m_registerIndex (-1)
-		{
-		}
-
-		bool m_inSet;
-		int m_registerIndex;
-		dString m_name;
-		dList<dRegisterInterferenceNodeEdge> m_interferanceEdge;
-	};
-
-
-	class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dString>
-	{
-		public: 
-		dRegisterInterferenceGraph (dDataFlowGraph* const flowGraph, int registerCount);
-
-		private:
-		int ColorGraph (int registerCount);
-		void SortRegistersByFrequency (int totalRegisters, int registerCount);
-		void AllocatedSpilledRegister(int totalRegisters, int registerCount);
-
-		void RemapRegister(dTreeAdressStmt::dArg& arg, int totalRegisters);
-		void SortRegisters(int totalRegisters);
-		int FindRegister (int regIndex, int totalRegisters) const;
-
-		void SaveRegisterToTemp(dCIL::dListNode* const node, dTreeAdressStmt::dArg& argument);
-		void SaveRegisterToTemp(dCIL::dListNode* const node, const dString& reg, const dString& local);
-
-		void LoadRegisterFromTemp(dCIL::dListNode* const node, dTreeAdressStmt::dArg& argument);
-		void LoadRegisterFromTemp(dCIL::dListNode* const node, const dString& reg, const dString& local);
-
-		void LoadSpillRegister(dCIL::dListNode* const node, const dString& alliasRegister, dTreeAdressStmt::dArg& argument, int registerBase);
-		void SaveSpillRegister(dCIL::dListNode* const node, const dString& alliasRegister, dTreeAdressStmt::dArg& argument, int registerBase);
-
-
-		static int Compare (const void* p1, const void* p2);
-
-
-		dTreeNode* GetBestNode();
-
-		dString m_reg0;
-		dString m_reg1;
-		dString m_reg2;
-		dString m_local0;
-		dString m_local1;
-		dString m_local2;
-
-		dDataFlowGraph* m_flowGraph;
-		int m_registerCount;
-		int m_registenFrequency[1024][2];
-	};
 
 	class dLoop 
 	{
@@ -338,9 +265,9 @@ class dDataFlowGraph
 	bool ApplySubExpresionToCopyPropagation();
 	
 	bool ApplyLoopOptimization(dLoop& loop);
-	void AllocateRegisters (dRegisterInterferenceGraph& interferenceGraph);
-	
-	dString GetRegisterName (dRegisterInterferenceGraph& interferenceGraph, const dString& varName) const;
+//	void AllocateRegisters (dRegisterInterferenceGraph& interferenceGraph);
+//	dString GetRegisterName (dRegisterInterferenceGraph& interferenceGraph, const dString& varName) const;
+
 	void FindNodesInPathway(dCIL::dListNode* const source, dCIL::dListNode* const destination, dTree<int, dCIL::dListNode*>& pathOut) const;
 
 	bool DoStatementAreachesStatementB(dCIL::dListNode* const stmtNodeB, dCIL::dListNode* const stmtNodeA) const;

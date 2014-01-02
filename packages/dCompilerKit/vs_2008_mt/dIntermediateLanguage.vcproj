@@ -336,6 +336,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\dIntermediateLanguage\dRegisterInterferenceGraph.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\dIntermediateLanguage\dRegisterInterferenceGraph.h"
+			>
+		</File>
+		<File
 			RelativePath="..\dIntermediateLanguage\dTreeAdressStmt.cpp"
 			>
 		</File>

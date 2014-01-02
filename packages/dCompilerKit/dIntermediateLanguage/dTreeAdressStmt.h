@@ -80,7 +80,8 @@ class dTreeAdressStmt
 		m_assigment,
 		m_goto,
 		m_label,
-		m_loadLocal,
+		m_loadBase,
+		m_storeBase,
 		m_push,
 		m_pop,
 	};

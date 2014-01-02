@@ -81,7 +81,7 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 				break;
 			}
 
-			case dTreeAdressStmt::m_loadLocal:	
+			case dTreeAdressStmt::m_loadBase:	
 			{
 				tmp[count].m_opcode = dVirtualMachine::loadBase;
 				tmp[count].m_reg0 = RegisterToIndex (stmt.m_arg0.m_label.GetStr());
@@ -90,6 +90,17 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 				count ++;
 				break;
 			}
+
+			case dTreeAdressStmt::m_storeBase:	
+			{
+				tmp[count].m_opcode = dVirtualMachine::storeBase;
+				tmp[count].m_reg0 = RegisterToIndex (stmt.m_arg0.m_label.GetStr());
+				tmp[count].m_reg1 = D_STACK_REGISTER_INDEX;
+				tmp[count].m_imm3 = parameters.Find(stmt.m_arg2.m_label.GetStr())->GetInfo();
+				count ++;
+				break;
+			}
+
 
 			case dTreeAdressStmt::m_label:	
 			{
@@ -127,8 +138,6 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 				count ++;
 				break;
 			}
-
-
 
 			case dTreeAdressStmt::m_if:	
 			{

@@ -227,11 +227,18 @@ void dTreeAdressStmt::Trace (char* const textOut) const
 			break;
 		}
 
-		case m_loadLocal:
+		case m_loadBase:
 		{
 			sprintf (textOut, "\t%s = [%s]\n", m_arg0.m_label.GetStr(), m_arg2.m_label.GetStr());
 			break;
 		}
+
+		case m_storeBase:
+		{
+			sprintf (textOut, "\t[%s] = %s\n", m_arg0.m_label.GetStr(), m_arg2.m_label.GetStr());
+			break;
+		}
+
 
 		case m_argument:
 		{
