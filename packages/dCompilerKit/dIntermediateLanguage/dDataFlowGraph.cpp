@@ -193,6 +193,7 @@ void dDataFlowGraph::dBasicBlock::Trace() const
 
 void dDataFlowGraph::BuildGeneratedAndKillStatementSets()
 {
+xxxxxxxxxxxxxxx
 	dTree<dDataFlowPoint, dCIL::dListNode*>::Iterator iter (m_dataFlowGraph);
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowPoint& point = iter.GetNode()->GetInfo();
@@ -936,7 +937,7 @@ bool dDataFlowGraph::ApplyCopyPropagation()
 
 	for (dCIL::dListNode* stmtNode = m_function; stmtNode; stmtNode = stmtNode->GetNext()) {
 		dTreeAdressStmt& stmt = stmtNode->GetInfo();
-//stmt.Trace();
+stmt.Trace();
 		switch (stmt.m_instruction)
 		{
 			case dTreeAdressStmt::m_assigment:
@@ -1022,6 +1023,100 @@ bool dDataFlowGraph::ApplyCopyPropagation()
 				}
 				break;
 			}
+
+            case dTreeAdressStmt::m_storeBase:
+            {
+                for (dCIL::dListNode* stmtNode1 = stmtNode->GetNext(); stmtNode1; stmtNode1 = stmtNode1->GetNext()) {
+                    dTreeAdressStmt& stmt1 = stmtNode1->GetInfo();
+stmt1.Trace();
+                    switch (stmt1.m_instruction)
+                    {
+                        case dTreeAdressStmt::m_assigment:
+                        {
+                            if ((stmt1.m_arg1.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)){
+                                ret = true;
+                                stmt1.m_arg1 = stmt.m_arg1;
+                                UpdateReachingDefinitions();
+                            }
+                            if ((stmt1.m_operator != dTreeAdressStmt::m_nothing) && (stmt1.m_arg2.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
+                                ret = true;
+                                stmt1.m_arg2 = stmt.m_arg1;
+                                UpdateReachingDefinitions();
+                            }
+                            break;
+                        }
+
+                        case dTreeAdressStmt::m_load:
+                        {
+                            if ((stmt1.m_arg2.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
+                                ret = true;		
+                                stmt1.m_arg2 = stmt.m_arg1;
+                                UpdateReachingDefinitions();
+                            } else if ((stmt1.m_arg1.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
+                                ret = true;		
+                                stmt1.m_arg1 = stmt.m_arg1;
+                                UpdateReachingDefinitions();
+                            }
+                            break;
+                        }
+
+                        case dTreeAdressStmt::m_loadBase:
+                        {
+                            if ((stmt1.m_arg2.m_label == stmt.m_arg2.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
+                                ret = true;
+                                stmt1.m_arg0 = stmt.m_arg1;
+                                UpdateReachingDefinitions();
+                            }
+                            break;
+                        }
+
+                        case dTreeAdressStmt::m_storeBase:
+                        {
+                            if ((stmt1.m_arg0.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
+                                ret = true;
+                                stmt1.m_arg0 = stmt.m_arg1;
+                                UpdateReachingDefinitions();
+                            }
+                            break;
+                        }
+
+                        case dTreeAdressStmt::m_store:
+                        {
+                            if ((stmt1.m_arg0.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
+                                ret = true;
+                                stmt1.m_arg0 = stmt.m_arg1;
+                                UpdateReachingDefinitions();
+                            } else if ((stmt1.m_arg2.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
+                                ret = true;		
+                                stmt1.m_arg2 = stmt.m_arg1;
+                                UpdateReachingDefinitions();
+                            } else if ((stmt1.m_arg1.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
+                                ret = true;		
+                                stmt1.m_arg1 = stmt.m_arg1;
+                                UpdateReachingDefinitions();
+                            }
+                            break;
+                        }
+
+                        case dTreeAdressStmt::m_if:
+                        {
+                            if ((stmt1.m_arg0.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)){
+                                ret = true;
+                                stmt1.m_arg0 = stmt.m_arg1;
+                                UpdateReachingDefinitions();
+                            }
+                            if ((stmt1.m_arg1.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
+                                ret = true;
+                                stmt1.m_arg1 = stmt.m_arg1;
+                                UpdateReachingDefinitions();
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                break;
+            }
 
 			case dTreeAdressStmt::m_load:
 			{
