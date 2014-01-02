@@ -1766,8 +1766,8 @@ void dDataFlowGraph::dRegisterInterferenceGraph::SaveSpillRegister(dCIL::dListNo
 {
 	int index = RegisterToIndex (argument.m_label);
 	if (index >= registerCount) {
-//		argument.m_label = alliasRegister;
-//		SaveRegisterToTemp (node, alliasRegister, IndexToLocal(index));
+		argument.m_label = alliasRegister;
+		SaveRegisterToTemp (node, alliasRegister, IndexToLocal(index));
 	}
 }
 
@@ -1775,8 +1775,8 @@ void dDataFlowGraph::dRegisterInterferenceGraph::LoadSpillRegister(dCIL::dListNo
 {
 	int index = RegisterToIndex (argument.m_label);
 	if (index >= registerCount) {
-		//		LoadRegisterFromTemp (node, alliasRegister, IndexToLocal(index));
-		//		argument.m_label = alliasRegister;
+		LoadRegisterFromTemp (node, alliasRegister, IndexToLocal(index));
+		argument.m_label = alliasRegister;
 	}
 }
 
