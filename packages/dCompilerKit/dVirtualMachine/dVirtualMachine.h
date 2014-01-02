@@ -17,7 +17,7 @@
 #define D_REGISTER_SYMBOL				"reg"	
 
 //#define D_INTEGER_REGISTER_COUNT		(1<<D_REGISTER_SET_FIELD)
-#define D_INTEGER_REGISTER_COUNT		(8)
+#define D_INTEGER_REGISTER_COUNT		(6)
 
 #define D_RETURN_REGISTER_INDEX			(D_INTEGER_REGISTER_COUNT - 2)
 #define D_STACK_REGISTER_INDEX			(D_INTEGER_REGISTER_COUNT - 1)
@@ -62,6 +62,7 @@ class dVirtualMachine
 		call,			//call		Ri, m_imm2					R(i) -= 4; [R(i)] = pc + 4; pc == imm2 
 		ret,			//ret		R1,	m_imm2					pc = [R(i)]; R(i) += 4 + imm2  
 		loadBase,		//loadbase	Ri, Rj, imm1				R(i) = dword at memory [R(j) + imm1]	
+		storeBase,		//storebase	Ri, Rj, imm1				dword at memory [R(j) + imm1] = R(i)
 		loadw,			//loadw		Ri, [Rj + Rk * 4 + imm4]	R(i) = dword at memory [R(j) + R(k) * 4 + imm4]	
 		storew,			//storew	Ri, [Rj + Rk * 4 + imm4]	dword at memory [R(j) + R(k) * 4 + imm4] = Ri 	
 		

@@ -23,6 +23,14 @@ inline dString IndexToRegister(int index)
 	return regName;			
 }
 
+inline dString IndexToLocal(int index)
+{
+	char regName[256];
+	sprintf (regName, "_local%d", index);
+	return regName;			
+}
+
+
 
 inline int RegisterToIndex (const dString& reg)
 {
@@ -214,18 +222,22 @@ class dDataFlowGraph
 		private:
 		int ColorGraph (int registerCount);
 		void SortRegistersByFrequency (int totalRegisters, int registerCount);
-		void AllocatedSpillsRegister(int totalRegisters, int registerCount);
+		void AllocatedSpilledRegister(int totalRegisters, int registerCount);
 
 		void RemapRegister(dTreeAdressStmt::dArg& arg, int totalRegisters);
 		void SortRegisters(int totalRegisters);
 		int FindRegister (int regIndex, int totalRegisters) const;
 
+		void SaveRegisterToTemp(dCIL::dListNode* const node, dTreeAdressStmt::dArg& argument);
+		void SaveRegisterToTemp(dCIL::dListNode* const node, const dString& reg, const dString& local);
 
-		void SaveSpillRegister(dCIL::dListNode* const node, dTreeAdressStmt::dArg& argument);
-		void SaveSpillRegister(dCIL::dListNode* const node, const dString& reg, const dString& local);
+		void LoadRegisterFromTemp(dCIL::dListNode* const node, dTreeAdressStmt::dArg& argument);
+		void LoadRegisterFromTemp(dCIL::dListNode* const node, const dString& reg, const dString& local);
 
-		void LoadSpillRegister(dCIL::dListNode* const node, dTreeAdressStmt::dArg& argument);
-		void LoadSpillRegister(dCIL::dListNode* const node, const dString& reg, const dString& local);
+		void LoadSpillRegister(dCIL::dListNode* const node, const dString& alliasRegister, dTreeAdressStmt::dArg& argument, int registerBase);
+		void SaveSpillRegister(dCIL::dListNode* const node, const dString& alliasRegister, dTreeAdressStmt::dArg& argument, int registerBase);
+
+
 		static int Compare (const void* p1, const void* p2);
 
 

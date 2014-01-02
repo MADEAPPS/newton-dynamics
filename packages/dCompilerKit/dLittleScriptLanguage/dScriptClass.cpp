@@ -391,6 +391,7 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 			case dVirtualMachine::loadw:
 			case dVirtualMachine::storew:
 			case dVirtualMachine::loadBase:
+			case dVirtualMachine::storeBase:
 				break;
 
 			default:
