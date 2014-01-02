@@ -114,8 +114,7 @@ class dgHACDCluster: public dgList<dgHACDClusterFace>
 };
 
 
-class dgHACDClusterGraph
-	:public dgGraph<dgHACDCluster, dgHACDEdge> 
+class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge> 
 //	,public dgAABBPolygonSoup 
 //	,public dgMeshEffect::dgMeshBVH
 {
@@ -647,7 +646,7 @@ class dgHACDClusterGraph
 		dgHACDClusterGraph* m_graph;
 	};
 
-	dgHACDClusterGraph(dgMeshEffect& mesh, dgFloat32 backFaceDistanceFactor)
+    dgHACDClusterGraph(dgMeshEffect& mesh, dgFloat32 backFaceDistanceFactor, dgReportProgress reportProgressCallback, void* const reportProgressUserData)
 		:dgGraph<dgHACDCluster, dgHACDEdge> (mesh.GetAllocator())
 		,m_mark(0)
 		,m_faceCount(0)
@@ -662,6 +661,8 @@ class dgHACDClusterGraph
 		,m_concavityTreeArray(NULL)
 		,m_convexProximation(mesh.GetAllocator())
 		,m_priorityHeap (mesh.GetCount() * 2 + 2048, mesh.GetAllocator())
+        ,m_reportProgressCallback(reportProgressCallback)
+        ,m_reportProgressUserData(reportProgressUserData)
 	{
 		m_faceCount = mesh.GetTotalFaceCount();
 
@@ -829,7 +830,7 @@ class dgHACDClusterGraph
 #endif
 	}
 
-/*
+
 	// you can insert callback here to print the progress as it collapse clusters
 	bool ReportProgress ()
 	{
@@ -837,11 +838,11 @@ class dgHACDClusterGraph
 		m_progress ++;
 		if (m_reportProgressCallback) {
 			dgFloat32 progress = dgFloat32(m_progress) * m_invFaceCount;
-			state = m_reportProgressCallback (progress * dgFloat32 (0.5f) + 0.5f);
+			state = m_reportProgressCallback (progress * dgFloat32 (0.5f) + 0.5f, m_reportProgressUserData);
 		}
 		return state;
 	}
-
+/*
 	static bool ReportProgress (dgFloat32 progressNormalzedPercent)
 	{
 		bool state = true;
@@ -905,8 +906,7 @@ class dgHACDClusterGraph
 		convexPartionMesh->EndPolygon(1.0e-5f);
 
 		m_progress = m_faceCount - 1;
-		dgAssert (0);
-//		ReportProgress();
+		ReportProgress();
 
 		return convexPartionMesh;
 	}
@@ -1130,9 +1130,7 @@ class dgHACDClusterGraph
 		dgAssert((pair.m_nodeA && pair.m_nodeB) || (!pair.m_nodeA && !pair.m_nodeB));
 		if (pair.m_nodeA && pair.m_nodeB && continueColapsing) {
 			// call the progress callback
-//			continueColapsing = ReportProgress();
-			continueColapsing = true;
-			dgAssert (0);
+			continueColapsing = ReportProgress();
 
 			dgListNode* const clusterNodeA = pair.m_nodeA;
 			dgListNode* const clusterNodeB = pair.m_nodeB;
@@ -1343,17 +1341,18 @@ class dgHACDClusterGraph
 	dgHACDConvacityLookAheadTree** m_concavityTreeArray;	
 	dgList<dgHACDConvacityLookAheadTree*> m_convexProximation;
 	dgUpHeap<dgList<dgPairProxy>::dgListNode*, dgFloat64> m_priorityHeap;
-	static dgReportProgress m_reportProgressCallback;
+	dgReportProgress m_reportProgressCallback;
+    void* m_reportProgressUserData;
 };
 
-dgReportProgress dgHACDClusterGraph::m_reportProgressCallback;
+//dgReportProgress dgHACDClusterGraph::m_reportProgressCallback;
 
 
 dgMeshEffect* dgMeshEffect::CreateConvexApproximation(dgFloat32 maxConcavity, dgFloat32 backFaceDistanceFactor, dgInt32 maxHullsCount, dgInt32 maxVertexPerHull, dgReportProgress reportProgressCallback, void* const userData) const
 {
-	dgAssert (0);
-	return 0;
-/*
+//	dgAssert (0);
+//	return 0;
+
 	//	dgMeshEffect triangleMesh(*this);
 	if (maxHullsCount <= 1) {
 		maxHullsCount = 1;
@@ -1368,13 +1367,13 @@ dgMeshEffect* dgMeshEffect::CreateConvexApproximation(dgFloat32 maxConcavity, dg
 	backFaceDistanceFactor = dgClamp(backFaceDistanceFactor, dgFloat32 (1.0e-6f), dgFloat32 (1.0f));
 
 	dgMeshEffect* partition = NULL;
-	dgHACDClusterGraph::m_reportProgressCallback = reportProgressCallback;
+//	dgHACDClusterGraph::m_reportProgressCallback = reportProgressCallback;
 
 	// make a copy of the mesh
 	dgMeshEffect mesh(*this);
 	mesh.ClearAttributeArray();
 	mesh.Triangulate ();
-	if (mesh.Optimize (&mesh.m_points->m_x, sizeof (dgBigVector), dgHACDClusterGraph::ReportProgress, dgFloat32 (1.0e-3f), 1500)) {
+	if (mesh.Optimize (&mesh.m_points->m_x, sizeof (dgBigVector), reportProgressCallback, userData, dgFloat32 (1.0e-3f), 1500)) {
 		mesh.ClearAttributeArray();
 		mesh.DeleteDegenerateFaces (&mesh.m_points->m_x, sizeof (dgBigVector), dgFloat32 (1.0e-12f));
 		mesh.RepairTJoints();
@@ -1382,7 +1381,7 @@ dgMeshEffect* dgMeshEffect::CreateConvexApproximation(dgFloat32 maxConcavity, dg
 		//mesh.SaveOFF ("xxxxxx.off");
 
 		// create a general connectivity graph    
-		dgHACDClusterGraph graph (mesh, backFaceDistanceFactor);
+		dgHACDClusterGraph graph (mesh, backFaceDistanceFactor, reportProgressCallback, userData);
 
 		// calculate initial edge costs
 		graph.SubmitInitialEdgeCosts (mesh);
@@ -1395,5 +1394,5 @@ dgMeshEffect* dgMeshEffect::CreateConvexApproximation(dgFloat32 maxConcavity, dg
 	}
 
 	return partition;
-*/
+
 }
