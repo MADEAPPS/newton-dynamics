@@ -15,7 +15,6 @@
 #include "dRegisterInterferenceGraph.h"
 
 
-
 dRegisterInterferenceGraph::dRegisterInterferenceGraph (dDataFlowGraph* const flowGraph, int registerCount)
 	:dTree<dRegisterInterferenceNode, dString>()
 	,m_flowGraph(flowGraph)
@@ -26,7 +25,7 @@ dRegisterInterferenceGraph::dRegisterInterferenceGraph (dDataFlowGraph* const fl
 	m_flowGraph->BuildBasicBlockGraph();
 	m_flowGraph->CalculateLiveInputLiveOutput ();
 	while (m_flowGraph->ApplyRemoveDeadCode());
-
+/*
 	for (int registersUsed = 100000; registersUsed > registerCount; ) {
 		Build();
 		registersUsed = ColorGraph (registerCount);
@@ -46,6 +45,30 @@ m_flowGraph->m_cil->Trace();
 	m_flowGraph->BuildBasicBlockGraph();
 	m_flowGraph->CalculateLiveInputLiveOutput ();
 m_flowGraph->m_cil->Trace();
+*/
+
+	Build();
+	int registersUsed = ColorGraph (registerCount);
+	AllocateRegisters();
+	if (registersUsed > registerCount) {
+		// we have some spill fix the program.
+//		AllocatedSpilledRegister(registersUsed, registerCount);
+		EmitSpillStatements(registersUsed);
+	}
+
+	m_flowGraph->BuildBasicBlockGraph();
+	m_flowGraph->CalculateLiveInputLiveOutput ();
+m_flowGraph->m_cil->Trace();
+
+	for (bool optimized = true; optimized;) {
+		optimized = false;
+		m_flowGraph->UpdateReachingDefinitions();
+		optimized |= m_flowGraph->ApplyCopyPropagation();
+		m_flowGraph->m_cil->Trace();
+		optimized |= m_flowGraph->ApplyRemoveDeadCode();
+		m_flowGraph->m_cil->Trace();
+	}
+
 
 	for (bool optimized = true; optimized;) {
 		optimized = false;
@@ -343,9 +366,48 @@ void dRegisterInterferenceGraph::AllocateRegisters ()
 	}
 }
 
-
-void dRegisterInterferenceGraph::EmitSpillStatements()
+int dRegisterInterferenceGraph::Compare (const void* p1, const void* p2)
 {
+	int* const reg0 = (int*) p1;
+	int* const reg1 = (int*) p2;
+
+	if (reg0[0] > reg1[0]) {
+		return -1;
+	} else if (reg0[0] < reg1[0]) {
+		return 1; 
+	} 
+	return 0;
+}
+
+
+int dRegisterInterferenceGraph::FindRegister(int regIndex, int totalRegisters) const
+{
+	for (int i = 0; i < totalRegisters; i ++) {
+		if (m_registenFrequency[i][1] == regIndex) {
+			return i;
+		}
+	}
+	dAssert (0);
+	return -1;
+}
+
+
+void dRegisterInterferenceGraph::SortRegisters(int totalRegisters)
+{
+	qsort (m_registenFrequency, totalRegisters, 2 * sizeof (int), Compare);
+	if (m_flowGraph->m_returnType != dCIL::m_void) {
+		dAssert (0);
+		int index = FindRegister (D_RETURN_REGISTER_INDEX, totalRegisters);
+	}
+}
+
+
+void dRegisterInterferenceGraph::EmitSpillStatements(int totalRegisters)
+{
+	SortRegistersByFrequency(totalRegisters);
+m_flowGraph->m_cil->Trace();
+
+/*
 	dCIL::dListNode* nextNode;
 	for (dCIL::dListNode* node = m_flowGraph->m_function; node; node = nextNode) {
 		nextNode = node->GetNext();
@@ -433,6 +495,7 @@ stmt.Trace();
 	}
 
 	m_localLayer ++;
+*/
 }
 
 dString dRegisterInterferenceGraph::MakeLocalVariable (int index)
@@ -501,9 +564,16 @@ node->GetInfo().Trace();
 	}
 }
 
+void dRegisterInterferenceGraph::RemapRegister(dTreeAdressStmt::dArg& arg, int totalRegisters)
+{
+	int index = RegisterToIndex (arg.m_label);
+	int remapIndex = FindRegister (index, totalRegisters);
+	arg.m_label = IndexToRegister(remapIndex);
+}
 
-/*
-void dRegisterInterferenceGraph::SortRegistersByFrequency(int totalRegisters, int registerCount)
+
+
+void dRegisterInterferenceGraph::SortRegistersByFrequency(int totalRegisters)
 {
 	memset (m_registenFrequency, 0, sizeof (m_registenFrequency)) ;
 
@@ -688,6 +758,7 @@ void dRegisterInterferenceGraph::SortRegistersByFrequency(int totalRegisters, in
 	}
 }
 
+/*
 void dRegisterInterferenceGraph::AllocatedSpilledRegister(int totalRegisters, int registerCount)
 {
 	SortRegistersByFrequency(totalRegisters, registerCount);
@@ -961,48 +1032,11 @@ void dRegisterInterferenceGraph::LoadRegisterFromTemp(dCIL::dListNode* const nod
 }
 
 
-int dRegisterInterferenceGraph::Compare (const void* p1, const void* p2)
-{
-	int* const reg0 = (int*) p1;
-	int* const reg1 = (int*) p2;
-
-	if (reg0[0] > reg1[0]) {
-		return -1;
-	} else if (reg0[0] < reg1[0]) {
-		return 1; 
-	} 
-	return 0;
-}
 
 
-int dRegisterInterferenceGraph::FindRegister(int regIndex, int totalRegisters) const
-{
-	for (int i = 0; i < totalRegisters; i ++) {
-		if (m_registenFrequency[i][1] == regIndex) {
-			return i;
-		}
-	}
-	dAssert (0);
-	return -1;
-}
 
 
-void dRegisterInterferenceGraph::RemapRegister(dTreeAdressStmt::dArg& arg, int totalRegisters)
-{
-	int index = RegisterToIndex (arg.m_label);
-	int remapIndex = FindRegister (index, totalRegisters);
-	arg.m_label = IndexToRegister(remapIndex);
-}
 
-
-void dRegisterInterferenceGraph::SortRegisters(int totalRegisters)
-{
-	qsort (m_registenFrequency, totalRegisters, 2 * sizeof (int), Compare);
-	if (m_flowGraph->m_returnType != dCIL::m_void) {
-		dAssert (0);
-		int index = FindRegister (D_RETURN_REGISTER_INDEX, totalRegisters);
-	}
-}
 
 
 
