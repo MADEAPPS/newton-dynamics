@@ -81,7 +81,7 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 				break;
 			}
 
-			case dTreeAdressStmt::m_paramLoad:	
+			case dTreeAdressStmt::m_loadLocal:	
 			{
 				tmp[count].m_opcode = dVirtualMachine::loadBase;
 				tmp[count].m_reg0 = RegisterToIndex (stmt.m_arg0.m_label.GetStr());

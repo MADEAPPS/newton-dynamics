@@ -257,7 +257,7 @@ void dDataFlowGraph::BuildGeneratedAndKillStatementSets()
 			}
 
 			case dTreeAdressStmt::m_pop:
-			case dTreeAdressStmt::m_paramLoad:
+			case dTreeAdressStmt::m_loadLocal:
 			{
 				dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const node = m_variableDefinitions.Insert(stmt.m_arg0.m_label);
 				node->GetInfo().Append(ptr);
@@ -326,7 +326,7 @@ void dDataFlowGraph::BuildGeneratedAndKillStatementSets()
 		{
 			case dTreeAdressStmt::m_pop:
 			case dTreeAdressStmt::m_load:
-			case dTreeAdressStmt::m_paramLoad:
+			case dTreeAdressStmt::m_loadLocal:
 			case dTreeAdressStmt::m_assigment:
 			{
 				point.m_generateStmt = true;
@@ -566,7 +566,7 @@ void dDataFlowGraph::BuildGeneratedAndKillVariableSets()
 
 		switch (stmt.m_instruction)
 		{
-			case dTreeAdressStmt::m_paramLoad:
+			case dTreeAdressStmt::m_loadLocal:
 			{
 				point.m_killVariable = stmt.m_arg0.m_label;
 				break;
@@ -1251,7 +1251,7 @@ bool dDataFlowGraph::ApplyRemoveDeadCode()
 			}
 
 			case dTreeAdressStmt::m_load:
-			case dTreeAdressStmt::m_paramLoad:
+			case dTreeAdressStmt::m_loadLocal:
 			{
 				dDataFlowPoint& info = m_dataFlowGraph.Find(stmtNode)->GetInfo();
 				dDataFlowPoint::dVariableSet<dString>& liveOut = info.m_liveOutputSet;
@@ -1425,7 +1425,7 @@ void dDataFlowGraph::dRegisterInterferenceGraph::SortRegistersByFrequency(int to
 
 			case dTreeAdressStmt::m_pop:
 			case dTreeAdressStmt::m_push:
-			case dTreeAdressStmt::m_paramLoad:
+			case dTreeAdressStmt::m_loadLocal:
 			{
 				m_registenFrequency[RegisterToIndex (stmt.m_arg0.m_label)][0] += 1;
 				break;
@@ -1482,7 +1482,7 @@ void dDataFlowGraph::dRegisterInterferenceGraph::SortRegistersByFrequency(int to
 
 			case dTreeAdressStmt::m_pop:
 			case dTreeAdressStmt::m_push:
-			case dTreeAdressStmt::m_paramLoad:
+			case dTreeAdressStmt::m_loadLocal:
 			{
 				RemapRegister(stmt.m_arg0, totalRegisters);
 				break;
@@ -1592,7 +1592,7 @@ m_flowGraph->m_cil->Trace();
 		switch (stmt.m_instruction)
 		{
 			case dTreeAdressStmt::m_pop:
-			case dTreeAdressStmt::m_paramLoad:
+			case dTreeAdressStmt::m_loadLocal:
 			{
 				SaveRegisterToTemp (node, stmt.m_arg0);
 				break;
@@ -1677,7 +1677,7 @@ m_flowGraph->m_cil->Trace();
 		switch (stmt.m_instruction)
 		{
 			case dTreeAdressStmt::m_pop:
-			case dTreeAdressStmt::m_paramLoad:
+			case dTreeAdressStmt::m_loadLocal:
 			{
 				SaveSpillRegister (node, m_reg0, stmt.m_arg0, registerCount);
 				break;
@@ -2053,7 +2053,7 @@ void dDataFlowGraph::AllocateRegisters (dRegisterInterferenceGraph& interference
 			case dTreeAdressStmt::m_pop:
 			case dTreeAdressStmt::m_push:
 			case dTreeAdressStmt::m_free:
-			case dTreeAdressStmt::m_paramLoad:
+			case dTreeAdressStmt::m_loadLocal:
 			{
 				stmt.m_arg0.m_label = GetRegisterName (interferenceGraph, stmt.m_arg0.m_label);
 				break;

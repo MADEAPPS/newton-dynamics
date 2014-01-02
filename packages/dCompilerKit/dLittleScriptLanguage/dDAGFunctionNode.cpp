@@ -145,7 +145,7 @@ void dDAGFunctionNode::CompileCIL(dCIL& cil)
 		dDAGParameterNode* const arg = argNode->GetInfo();
 		//arg->m_result.m_label = cil.NewTemp();
 		dTreeAdressStmt& fntArg = cil.NewStatement()->GetInfo();
-		fntArg.m_instruction = dTreeAdressStmt::m_paramLoad;
+		fntArg.m_instruction = dTreeAdressStmt::m_loadLocal;
 		fntArg.m_arg0 = arg->m_result;
 		fntArg.m_arg2.m_label = arg->m_name;
 		DTRACE_INTRUCTION (&fntArg);

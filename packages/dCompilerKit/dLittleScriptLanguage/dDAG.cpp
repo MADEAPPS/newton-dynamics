@@ -84,7 +84,7 @@ bool dDAG::RenameLocalVariable(dCIL& cil, dString& variable) const
 	if (functionVariable) {
 		if (functionVariable->m_result.m_label == "") {
 			dTreeAdressStmt& fntArg = cil.NewStatement()->GetInfo();
-			fntArg.m_instruction = dTreeAdressStmt::m_paramLoad;
+			fntArg.m_instruction = dTreeAdressStmt::m_loadLocal;
 			fntArg.m_arg0.m_label = cil.NewTemp();
 			fntArg.m_arg2.m_label = functionVariable->m_name;
 			DTRACE_INTRUCTION (&fntArg);
