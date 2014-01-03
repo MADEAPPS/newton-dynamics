@@ -121,9 +121,6 @@ class dgBody
 	bool GetAutoSleep () const;
 	void SetAutoSleep (bool state);
 
-	bool IsCollidable() const;
-	
-
 	dgCollisionInstance* GetCollision () const;
 	dgBodyMasterList::dgListNode* GetMasterList() const;
 
@@ -138,7 +135,11 @@ class dgBody
 
 	virtual dgMatrix CalculateInertiaMatrix () const;
 	virtual dgMatrix CalculateInvInertiaMatrix () const;
-	
+
+	bool IsCollidable() const;
+	virtual void SetCollidable (bool state) = 0;
+	virtual bool IsInEquilibrium () const = 0;
+
 	virtual const dgVector& GetForce() const = 0;
 	virtual const dgVector& GetTorque() const = 0;
 	virtual void AddForce (const dgVector& force) = 0;
@@ -157,9 +158,7 @@ class dgBody
 
 	virtual dgVector PredictLinearVelocity(dgFloat32 timestep) const = 0;
 	virtual dgVector PredictAngularVelocity(dgFloat32 timestep) const = 0;
-	
-	virtual bool IsInEquilibrium () const = 0;
-	virtual void SetCollidable (bool state) = 0;
+
 
 	virtual void AddImpulse (const dgVector& pointVeloc, const dgVector& pointPosit);
 	virtual void ApplyImpulsePair (const dgVector& linearImpulse, const dgVector& angularImpulse);

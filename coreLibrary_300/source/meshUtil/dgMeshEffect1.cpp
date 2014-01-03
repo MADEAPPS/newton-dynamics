@@ -1169,15 +1169,15 @@ void dgMeshEffect::EndFace ()
 {
 	dgPolyhedra::EndFace();
 
-	for (bool hascollision = true; hascollision;) {
-		hascollision = false;
+	for (bool hasVertexCollision = true; hasVertexCollision;) {
+		hasVertexCollision = false;
 
 		const dgInt32 currentCount = m_pointCount;
 		dgStack<dgInt8> verterCollision (currentCount);
 		memset (&verterCollision[0], 0, verterCollision.GetSizeInBytes());
 
-		dgInt32 mark = IncLRU();
 		Iterator iter (*this);
+		dgInt32 mark = IncLRU();
 		dgList<dgTreeNode*> collisionFound(GetAllocator());
 		for (iter.Begin(); iter; iter ++) {
 			dgEdge* const edge = &iter.GetNode()->GetInfo();
@@ -1185,7 +1185,7 @@ void dgMeshEffect::EndFace ()
 				if ((edge->m_incidentVertex < currentCount) && (verterCollision[edge->m_incidentVertex] == 0)) {
 					verterCollision[edge->m_incidentVertex] = 1;
 				} else {
-					hascollision = true;
+					hasVertexCollision = true;
 					collisionFound.Append(iter.GetNode());
 				}
 				dgEdge* ptr = edge;
@@ -1196,26 +1196,34 @@ void dgMeshEffect::EndFace ()
 			}
 		}
 
-		for (dgList<dgTreeNode*>::dgListNode* node = collisionFound.GetFirst(); node; node = node->GetNext()) {
-			dgEdge* const edge = &node->GetInfo()->GetInfo();
+		if (hasVertexCollision) {
+			dgAssert (Sanity());
+			for (dgList<dgTreeNode*>::dgListNode* node = collisionFound.GetFirst(); node; node = node->GetNext()) {
+				dgEdge* const edge = &node->GetInfo()->GetInfo();
 
-			// this is a vertex collision
-			dgBigVector point (m_points[edge->m_incidentVertex]);
-			point.m_w += dgFloat64 (1.0f);
-			AddVertex (point);
+				// this is a vertex collision
+				dgBigVector point (m_points[edge->m_incidentVertex]);
+				point.m_w += dgFloat64 (1.0f);
+				AddVertex (point);
 
-			dgEdge* ptr = edge;
-			do {
-				ptr->m_incidentVertex = m_pointCount - 1;
+				dgEdge* ptr = edge;
+				do {
+					ptr->m_incidentVertex = m_pointCount - 1;
 
-				dgTreeNode* const node = GetNodeFromInfo (*ptr);
-				dgPairKey key (ptr->m_incidentVertex, ptr->m_twin->m_incidentVertex);
-				ReplaceKey (node, key.GetVal());
-				ptr = ptr->m_twin->m_next;
-			} while (ptr != edge);
+					dgTreeNode* const edgeNode = GetNodeFromInfo (*ptr);
+					dgPairKey edgeKey (ptr->m_incidentVertex, ptr->m_twin->m_incidentVertex);
+					ReplaceKey (edgeNode, edgeKey.GetVal());
+
+					dgTreeNode* const twinNode = GetNodeFromInfo (*(ptr->m_twin));
+					dgPairKey twinKey (ptr->m_twin->m_incidentVertex, ptr->m_incidentVertex);
+					ReplaceKey (twinNode, twinKey.GetVal());
+
+					ptr = ptr->m_twin->m_next;
+				} while (ptr != edge);
+			}
+			dgAssert (Sanity());
 		}
 	}
-
 }
 
 
@@ -2080,7 +2088,6 @@ void dgMeshEffect::BuildFromVertexListIndexList(
 
 	EndFace();
 	PackVertexArrays ();
-//	RepairTJoints (true);
 }
 
 

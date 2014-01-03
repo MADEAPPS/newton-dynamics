@@ -47,6 +47,7 @@ class dgEdge
 	public:
 	dgEdge ();
 	dgEdge (dgInt32 vertex, dgInt32 face, dgUnsigned64 userdata = 0);
+	~dgEdge ();
 
 	dgInt32 m_incidentVertex;
 	dgInt32 m_incidentFace;
@@ -163,6 +164,9 @@ DG_INLINE dgEdge::dgEdge (dgInt32 vertex, dgInt32 face, dgUnsigned64 userdata)
 {
 }
 
+DG_INLINE dgEdge::~dgEdge ()
+{
+}
 
 DG_INLINE dgPolyhedra::dgPairKey::dgPairKey ()
 {
