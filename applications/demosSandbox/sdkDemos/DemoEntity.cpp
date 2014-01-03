@@ -56,10 +56,10 @@ DemoEntity::DemoEntity(DemoEntityManager& world, const dScene* const scene, dSce
 //	dMatrix parentMatrix (GetIdentityMatrix());
 	if (parent) {
 		Attach (parent);
-		dScene::dTreeNode* const parentNode = scene->FindParentByType(rootSceneNode, dSceneNodeInfo::GetRttiType());
-		dAssert (parentNode);
-		dSceneNodeInfo* const parentInfo = (dSceneNodeInfo*)scene->GetInfoFromNode (parentNode);
-		dAssert (parentInfo->IsType(dSceneNodeInfo::GetRttiType()));
+		dAssert (scene->FindParentByType(rootSceneNode, dSceneNodeInfo::GetRttiType()));
+//		dScene::dTreeNode* const parentNode = scene->FindParentByType(rootSceneNode, dSceneNodeInfo::GetRttiType());
+//		dSceneNodeInfo* const parentInfo = (dSceneNodeInfo*)scene->GetInfoFromNode (parentNode);
+//		dAssert (parentInfo->IsType(dSceneNodeInfo::GetRttiType()));
 //		parentMatrix = parentInfo->GetTransform();
 	}
 

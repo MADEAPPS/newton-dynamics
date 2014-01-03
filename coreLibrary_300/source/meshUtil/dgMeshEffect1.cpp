@@ -1169,7 +1169,6 @@ void dgMeshEffect::EndFace ()
 {
 	dgPolyhedra::EndFace();
 
-	
 	for (bool hascollision = true; hascollision;) {
 		hascollision = false;
 

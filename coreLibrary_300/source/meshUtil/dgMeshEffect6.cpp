@@ -55,10 +55,13 @@ class dgTriangleAnglesToUV: public SymmetricBiconjugateGradientSolve
 {
 	public:
 	dgTriangleAnglesToUV (dgMeshEffect* const mesh, dgInt32 material, dgReportProgress progressReportCallback, void* const userData, const dgFloat64* const pinnedPoint, dgFloat64* const triangleAnglesVector = NULL)
-		:m_mesh(mesh)
+		:m_hessianCoLumnIndex (4 * mesh->GetVertexCount(), mesh->GetAllocator())
+		,m_hessianCoLumnValue(4 * mesh->GetVertexCount(), mesh->GetAllocator())
+		,m_mesh(mesh)
 		,m_triangleAngles(triangleAnglesVector)
 		,m_pinnedPoints(pinnedPoint)
 		,m_trianglesCount(0)
+		,m_matrixElementCount(0)
 		,m_allocated(false)
 	{
 		dgInt32 mark = m_mesh->IncLRU();
@@ -320,26 +323,6 @@ class dgTriangleAnglesToUV: public SymmetricBiconjugateGradientSolve
 		}
 	}
 
-	void MatrixTimeVector (dgFloat64* const out, const dgFloat64* const v) const
-	{
-		const dgInt32 count = m_mesh->GetVertexCount();
-		for (dgInt32 i = 0; i < count; i ++) {
-			dgEdge* const vertex = m_vertexEdge[i];
-			dgAssert (vertex->m_incidentVertex == i);
-			out[i * 2 + 0] = m_diagonal[2 * i + 0] * v[2 * i + 0];
-			out[i * 2 + 1] = m_diagonal[2 * i + 1] * v[2 * i + 1];
-		}
-	}
-
-	bool InversePrecoditionerTimeVector (dgFloat64* const out, const dgFloat64* const v) const
-	{
-		const dgInt32 count = m_mesh->GetVertexCount();
-		for (dgInt32 i = 0; i < count; i ++) {
-			out[2 * i + 0] = m_pinnedPoints[i] * v[i * 2 + 0] / m_diagonal[2 * i + 0];
-			out[2 * i + 1] = m_pinnedPoints[i] * v[i * 2 + 1] / m_diagonal[2 * i + 1];
-		}
-		return true;
-	}
 /*
 	// objective function
 	f[u2_,v2_,u3_,v3_,u4_,v4_,u5_,v5_,u6_,v6_] := 
@@ -389,229 +372,7 @@ class dgTriangleAnglesToUV: public SymmetricBiconjugateGradientSolve
 		}
 	}
 
-/*
-	// Gradients
-	du0 =
-		2 * ( - cos(a0) * sin(b0) - sin(c0)) * (cos(a0) * sin(b0) * (u1 - v0) + sin(a0) * sin(b0) * (v1 - v0) + sin(c0) * (u6 - u0)) +
-		2 * ( - sin(a0) * sin(b0) - sin(c0)) * (cos(a0) * sin(b0) * (v1 - v0) + sin(a0) * sin(b0) * (u1 - u0) + sin(c0) * (v6 - v0)) +
-		2 * ( - cos(a1) * sin(b1) - sin(c1)) * (cos(a1) * sin(b1) * (u2 - v0) + sin(a1) * sin(b1) * (v2 - v0) + sin(c1) * (u1 - u0)) +
-		2 * ( - sin(a1) * sin(b1) - sin(c1)) * (cos(a1) * sin(b1) * (v2 - v0) + sin(a1) * sin(b1) * (u2 - u0) + sin(c1) * (v1 - v0)) +
-		2 * ( - cos(a2) * sin(b2) - sin(c2)) * (cos(a2) * sin(b2) * (u5 - v0) + sin(a2) * sin(b2) * (v5 - v0) + sin(c2) * (u2 - u0)) +
-		2 * ( - sin(a2) * sin(b2) - sin(c2)) * (cos(a2) * sin(b2) * (v5 - v0) + sin(a2) * sin(b2) * (u5 - u0) + sin(c2) * (v2 - v0)) +
-
-		dv0 =
-		2 * ( - sin(a0) * sin(b0) - sin(c0)) * (cos(a0) * sin(b0) * (u1 - v0) + sin(a0) * sin(b0) * (v1 - v0) + sin(c0) * (u6 - u0)) +
-		2 * ( - cos(a0) * sin(b0) - sin(c0)) * (cos(a0) * sin(b0) * (v1 - v0) + sin(a0) * sin(b0) * (u1 - u0) + sin(c0) * (v6 - v0)) +
-		2 * ( - sin(a1) * sin(b1) - sin(c1)) * (cos(a1) * sin(b1) * (u2 - v0) + sin(a1) * sin(b1) * (v2 - v0) + sin(c1) * (u1 - u0)) +
-		2 * ( - cos(a1) * sin(b1) - sin(c1)) * (cos(a1) * sin(b1) * (v2 - v0) + sin(a1) * sin(b1) * (u2 - u0) + sin(c1) * (v1 - v0)) +
-		2 * ( - sin(a2) * sin(b2) - sin(c2)) * (cos(a2) * sin(b2) * (u5 - v0) + sin(a2) * sin(b2) * (v5 - v0) + sin(c2) * (u2 - u0)) +
-		2 * ( - cos(a2) * sin(b2) - sin(c2)) * (cos(a2) * sin(b2) * (v5 - v0) + sin(a2) * sin(b2) * (u5 - u0) + sin(c2) * (v2 - v0)) +
-
-		du1 =
-		2 * (cos(a0) * sin(b0)) * (cos(a0) * sin(b0) * (u1 - v0) + sin(a0) * sin(b0) * (v1 - v0) + sin(c0) * (u6 - u0)) +
-		2 * (sin(a0) * sin(b0)) * (cos(a0) * sin(b0) * (v1 - v0) + sin(a0) * sin(b0) * (u1 - u0) + sin(c0) * (v6 - v0)) +
-		2 * ( - cos(a5) * sin(b5) - sin(c5)) * (cos(a5) * sin(b5) * (u4 - v1) + sin(a5) * sin(b5) * (v4 - v1) + sin(c5) * (u6 - u1)) +
-		2 * ( - sin(a5) * sin(b5) - sin(c5)) * (cos(a5) * sin(b5) * (v4 - v1) + sin(a5) * sin(b5) * (u4 - u1) + sin(c5) * (v6 - v1)) +
-		2 * ( - cos(a4) * sin(b4) - sin(c4)) * (cos(a4) * sin(b4) * (u3 - v1) + sin(a4) * sin(b4) * (v3 - v1) + sin(c4) * (u4 - u1)) +
-		2 * ( - sin(a4) * sin(b4) - sin(c4)) * (cos(a4) * sin(b4) * (v3 - v1) + sin(a4) * sin(b4) * (u3 - u1) + sin(c4) * (v4 - v1)) +
-		2 * ( - cos(a3) * sin(b3) - sin(c3)) * (cos(a3) * sin(b3) * (u2 - v1) + sin(a3) * sin(b3) * (v2 - v1) + sin(c3) * (u3 - u1)) +
-		2 * ( - sin(a3) * sin(b3) - sin(c3)) * (cos(a3) * sin(b3) * (v2 - v1) + sin(a3) * sin(b3) * (u2 - u1) + sin(c3) * (v3 - v1)) +
-		2 * ( - sin(c1)) * (cos(a1) * sin(b1) * (u2 - v0) + sin(a1) * sin(b1) * (v2 - v0) + sin(c1) * (u1 - u0)) +
-		2 * (0) * (cos(a1) * sin(b1) * (v2 - v0) + sin(a1) * sin(b1) * (u2 - u0) + sin(c1) * (v1 - v0))
-
-		dv1 =
-		2 * (sin(a0) * sin(b0)) * (cos(a0) * sin(b0) * (u1 - v0) + sin(a0) * sin(b0) * (v1 - v0) + sin(c0) * (u6 - u0)) +
-		2 * (cos(a0) * sin(b0)) * (cos(a0) * sin(b0) * (v1 - v0) + sin(a0) * sin(b0) * (u1 - u0) + sin(c0) * (v6 - v0)) +
-		2 * ( - sin(a5) * sin(b5) - sin(c5)) * (cos(a5) * sin(b5) * (u4 - v1) + sin(a5) * sin(b5) * (v4 - v1) + sin(c5) * (u6 - u1)) +
-		2 * ( - cos(a5) * sin(b5) - sin(c5)) * (cos(a5) * sin(b5) * (v4 - v1) + sin(a5) * sin(b5) * (u4 - u1) + sin(c5) * (v6 - v1)) +
-		2 * ( - sin(a4) * sin(b4) - sin(c4)) * (cos(a4) * sin(b4) * (u3 - v1) + sin(a4) * sin(b4) * (v3 - v1) + sin(c4) * (u4 - u1)) +
-		2 * ( - cos(a4) * sin(b4) - sin(c4)) * (cos(a4) * sin(b4) * (v3 - v1) + sin(a4) * sin(b4) * (u3 - u1) + sin(c4) * (v4 - v1)) +
-		2 * ( - sin(a3) * sin(b3) - sin(c3)) * (cos(a3) * sin(b3) * (u2 - v1) + sin(a3) * sin(b3) * (v2 - v1) + sin(c3) * (u3 - u1)) +
-		2 * ( - cos(a3) * sin(b3) - sin(c3)) * (cos(a3) * sin(b3) * (v2 - v1) + sin(a3) * sin(b3) * (u2 - u1) + sin(c3) * (v3 - v1)) +
-		2 * (0) * (cos(a1) * sin(b1) * (u2 - v0) + sin(a1) * sin(b1) * (v2 - v0) + sin(c1) * (u1 - u0)) +
-		2 * ( - sin(c1)) * (cos(a1) * sin(b1) * (v2 - v0) + sin(a1) * sin(b1) * (u2 - u0) + sin(c1) * (v1 - v0))
-
-		du2 =
-		2 * (cos(a1) * sin(b1)) * (cos(a1) * sin(b1) * (u2 - v0) + sin(a1) * sin(b1) * (v2 - v0) + sin(c1) * (u1 - u0)) +
-		2 * (sin(a1) * sin(b1)) * (cos(a1) * sin(b1) * (v2 - v0) + sin(a1) * sin(b1) * (u2 - u0) + sin(c1) * (v1 - v0)) +
-		2 * (cos(a3) * sin(b3)) * (cos(a3) * sin(b3) * (u2 - v1) + sin(a3) * sin(b3) * (v2 - v1) + sin(c3) * (u3 - u1)) +
-		2 * (sin(a3) * sin(b3)) * (cos(a3) * sin(b3) * (v2 - v1) + sin(a3) * sin(b3) * (u2 - u1) + sin(c3) * (v3 - v1)) +
-		2 * ( - cos(a6) * sin(b6) - sin(c6)) * (cos(a6) * sin(b6) * (u4 - v2) + sin(a6) * sin(b6) * (v4 - v2) + sin(c6) * (u3 - u2)) +
-		2 * ( - sin(a6) * sin(b6) - sin(c6)) * (cos(a6) * sin(b6) * (v4 - v2) + sin(a6) * sin(b6) * (u4 - u2) + sin(c6) * (v3 - v2)) +
-		2 * ( - cos(a7) * sin(b7) - sin(c7)) * (cos(a7) * sin(b7) * (u5 - v2) + sin(a7) * sin(b7) * (v5 - v2) + sin(c7) * (u4 - u2)) +
-		2 * ( - sin(a7) * sin(b7) - sin(c7)) * (cos(a7) * sin(b7) * (v5 - v2) + sin(a7) * sin(b7) * (u5 - u2) + sin(c7) * (v4 - v2)) +
-		2 * ( - sin(c2)) * (cos(a2) * sin(b2) * (u5 - v0) + sin(a2) * sin(b2) * (v5 - v0) + sin(c2) * (u2 - u0)) +
-		2 * (0) * (cos(a2) * sin(b2) * (v5 - v0) + sin(a2) * sin(b2) * (u5 - u0) + sin(c2) * (v2 - v0))
-
-		dv2 =
-		2 * (sin(a1) * sin(b1)) * (cos(a1) * sin(b1) * (u2 - v0) + sin(a1) * sin(b1) * (v2 - v0) + sin(c1) * (u1 - u0)) +
-		2 * (cos(a1) * sin(b1)) * (cos(a1) * sin(b1) * (v2 - v0) + sin(a1) * sin(b1) * (u2 - u0) + sin(c1) * (v1 - v0)) +
-		2 * (sin(a3) * sin(b3)) * (cos(a3) * sin(b3) * (u2 - v1) + sin(a3) * sin(b3) * (v2 - v1) + sin(c3) * (u3 - u1)) +
-		2 * (cos(a3) * sin(b3)) * (cos(a3) * sin(b3) * (v2 - v1) + sin(a3) * sin(b3) * (u2 - u1) + sin(c3) * (v3 - v1)) +
-		2 * ( - sin(a6) * sin(b6) - sin(c6)) * (cos(a6) * sin(b6) * (u4 - v2) + sin(a6) * sin(b6) * (v4 - v2) + sin(c6) * (u3 - u2)) +
-		2 * ( - cos(a6) * sin(b6) - sin(c6)) * (cos(a6) * sin(b6) * (v4 - v2) + sin(a6) * sin(b6) * (u4 - u2) + sin(c6) * (v3 - v2)) +
-		2 * ( - sin(a7) * sin(b7) - sin(c7)) * (cos(a7) * sin(b7) * (u5 - v2) + sin(a7) * sin(b7) * (v5 - v2) + sin(c7) * (u4 - u2)) +
-		2 * ( - cos(a7) * sin(b7) - sin(c7)) * (cos(a7) * sin(b7) * (v5 - v2) + sin(a7) * sin(b7) * (u5 - u2) + sin(c7) * (v4 - v2)) +
-		2 * (0) * (cos(a2) * sin(b2) * (u5 - v0) + sin(a2) * sin(b2) * (v5 - v0) + sin(c2) * (u2 - u0)) +
-		2 * ( - sin(c2)) * (cos(a2) * sin(b2) * (v5 - v0) + sin(a2) * sin(b2) * (u5 - u0) + sin(c2) * (v2 - v0))
-
-		du3 =
-		2 * ( - sin(c3)) * (cos(a3) * sin(b3) * (u2 - v1) + sin(a3) * sin(b3) * (v2 - v1) + sin(c3) * (u3 - u1)) +
-		2 * (0) * (cos(a3) * sin(b3) * (v2 - v1) + sin(a3) * sin(b3) * (u2 - u1) + sin(c3) * (v3 - v1)) +
-		2 * (cos(a4) * sin(b4)) * (cos(a4) * sin(b4) * (u3 - v1) + sin(a4) * sin(b4) * (v3 - v1) + sin(c4) * (u4 - u1)) +
-		2 * (sin(a4) * sin(b4)) * (cos(a4) * sin(b4) * (v3 - v1) + sin(a4) * sin(b4) * (u3 - u1) + sin(c4) * (v4 - v1)) +
-		2 * ( - sin(c6)) * (cos(a6) * sin(b6) * (u4 - v2) + sin(a6) * sin(b6) * (v4 - v2) + sin(c6) * (u3 - u2)) +
-		2 * (0) * (cos(a6) * sin(b6) * (v4 - v2) + sin(a6) * sin(b6) * (u4 - u2) + sin(c6) * (v3 - v2))
-
-		dv3 =
-		2 * (0) * (cos(a3) * sin(b3) * (u2 - v1) + sin(a3) * sin(b3) * (v2 - v1) + sin(c3) * (u3 - u1)) +
-		2 * ( - sin(c3)) * (cos(a3) * sin(b3) * (v2 - v1) + sin(a3) * sin(b3) * (u2 - u1) + sin(c3) * (v3 - v1)) +
-		2 * (sin(a4) * sin(b4)) * (cos(a4) * sin(b4) * (u3 - v1) + sin(a4) * sin(b4) * (v3 - v1) + sin(c4) * (u4 - u1)) +
-		2 * (cos(a4) * sin(b4)) * (cos(a4) * sin(b4) * (v3 - v1) + sin(a4) * sin(b4) * (u3 - u1) + sin(c4) * (v4 - v1)) +
-		2 * (0) * (cos(a6) * sin(b6) * (u4 - v2) + sin(a6) * sin(b6) * (v4 - v2) + sin(c6) * (u3 - u2)) +
-		2 * ( - sin(c6)) * (cos(a6) * sin(b6) * (v4 - v2) + sin(a6) * sin(b6) * (u4 - u2) + sin(c6) * (v3 - v2))
-
-		du4 =
-		2 * ( - sin(c4)) * (cos(a4) * sin(b4) * (u3 - v1) + sin(a4) * sin(b4) * (v3 - v1) + sin(c4) * (u4 - u1)) +
-		2 * (0) * (cos(a4) * sin(b4) * (v3 - v1) + sin(a4) * sin(b4) * (u3 - u1) + sin(c4) * (v4 - v1)) +
-		2 * (cos(a5) * sin(b5)) * (cos(a5) * sin(b5) * (u4 - v1) + sin(a5) * sin(b5) * (v4 - v1) + sin(c5) * (u6 - u1)) +
-		2 * (sin(a5) * sin(b5)) * (cos(a5) * sin(b5) * (v4 - v1) + sin(a5) * sin(b5) * (u4 - u1) + sin(c5) * (v6 - v1)) +
-		2 * ( - cos(a8) * sin(b8) - sin(c8)) * (cos(a8) * sin(b8) * (u5 - v4) + sin(a8) * sin(b8) * (v5 - v4) + sin(c8) * (u6 - u4)) +
-		2 * ( - sin(a8) * sin(b8) - sin(c8)) * (cos(a8) * sin(b8) * (v5 - v4) + sin(a8) * sin(b8) * (u5 - u4) + sin(c8) * (v6 - v4)) +
-		2 * ( - sin(c7)) * (cos(a7) * sin(b7) * (u5 - v2) + sin(a7) * sin(b7) * (v5 - v2) + sin(c7) * (u4 - u2)) +
-		2 * (0) * (cos(a7) * sin(b7) * (v5 - v2) + sin(a7) * sin(b7) * (u5 - u2) + sin(c7) * (v4 - v2)) +
-		2 * (cos(a6) * sin(b6)) * (cos(a6) * sin(b6) * (u4 - v2) + sin(a6) * sin(b6) * (v4 - v2) + sin(c6) * (u3 - u2)) +
-		2 * (sin(a6) * sin(b6)) * (cos(a6) * sin(b6) * (v4 - v2) + sin(a6) * sin(b6) * (u4 - u2) + sin(c6) * (v3 - v2))
-
-		dv4 =
-		2 * (0) * (cos(a4) * sin(b4) * (u3 - v1) + sin(a4) * sin(b4) * (v3 - v1) + sin(c4) * (u4 - u1)) +
-		2 * ( - sin(c4)) * (cos(a4) * sin(b4) * (v3 - v1) + sin(a4) * sin(b4) * (u3 - u1) + sin(c4) * (v4 - v1)) +
-		2 * (sin(a5) * sin(b5)) * (cos(a5) * sin(b5) * (u4 - v1) + sin(a5) * sin(b5) * (v4 - v1) + sin(c5) * (u6 - u1)) +
-		2 * (cos(a5) * sin(b5)) * (cos(a5) * sin(b5) * (v4 - v1) + sin(a5) * sin(b5) * (u4 - u1) + sin(c5) * (v6 - v1)) +
-		2 * ( - sin(a8) * sin(b8) - sin(c8)) * (cos(a8) * sin(b8) * (u5 - v4) + sin(a8) * sin(b8) * (v5 - v4) + sin(c8) * (u6 - u4)) +
-		2 * ( - cos(a8) * sin(b8) - sin(c8)) * (cos(a8) * sin(b8) * (v5 - v4) + sin(a8) * sin(b8) * (u5 - u4) + sin(c8) * (v6 - v4)) +
-		2 * (0) * (cos(a7) * sin(b7) * (u5 - v2) + sin(a7) * sin(b7) * (v5 - v2) + sin(c7) * (u4 - u2)) +
-		2 * ( - sin(c7)) * (cos(a7) * sin(b7) * (v5 - v2) + sin(a7) * sin(b7) * (u5 - u2) + sin(c7) * (v4 - v2)) +
-		2 * (sin(a6) * sin(b6)) * (cos(a6) * sin(b6) * (u4 - v2) + sin(a6) * sin(b6) * (v4 - v2) + sin(c6) * (u3 - u2)) +
-		2 * (cos(a6) * sin(b6)) * (cos(a6) * sin(b6) * (v4 - v2) + sin(a6) * sin(b6) * (u4 - u2) + sin(c6) * (v3 - v2))
-
-		du5 =
-		2 * (cos(a2) * sin(b2)) * (cos(a2) * sin(b2) * (u5 - v0) + sin(a2) * sin(b2) * (v5 - v0) + sin(c2) * (u2 - u0)) +
-		2 * (sin(a2) * sin(b2)) * (cos(a2) * sin(b2) * (v5 - v0) + sin(a2) * sin(b2) * (u5 - u0) + sin(c2) * (v2 - v0)) +
-		2 * (cos(a7) * sin(b7)) * (cos(a7) * sin(b7) * (u5 - v2) + sin(a7) * sin(b7) * (v5 - v2) + sin(c7) * (u4 - u2)) +
-		2 * (sin(a7) * sin(b7)) * (cos(a7) * sin(b7) * (v5 - v2) + sin(a7) * sin(b7) * (u5 - u2) + sin(c7) * (v4 - v2)) +
-		2 * (cos(a8) * sin(b8)) * (cos(a8) * sin(b8) * (u5 - v4) + sin(a8) * sin(b8) * (v5 - v4) + sin(c8) * (u6 - u4)) +
-		2 * (sin(a8) * sin(b8)) * (cos(a8) * sin(b8) * (v5 - v4) + sin(a8) * sin(b8) * (u5 - u4) + sin(c8) * (v6 - v4)) +
-
-		dv5 =
-		2 * (sin(a2) * sin(b2)) * (cos(a2) * sin(b2) * (u5 - v0) + sin(a2) * sin(b2) * (v5 - v0) + sin(c2) * (u2 - u0)) +
-		2 * (cos(a2) * sin(b2)) * (cos(a2) * sin(b2) * (v5 - v0) + sin(a2) * sin(b2) * (u5 - u0) + sin(c2) * (v2 - v0)) +
-		2 * (sin(a7) * sin(b7)) * (cos(a7) * sin(b7) * (u5 - v2) + sin(a7) * sin(b7) * (v5 - v2) + sin(c7) * (u4 - u2)) +
-		2 * (cos(a7) * sin(b7)) * (cos(a7) * sin(b7) * (v5 - v2) + sin(a7) * sin(b7) * (u5 - u2) + sin(c7) * (v4 - v2)) +
-		2 * (sin(a8) * sin(b8)) * (cos(a8) * sin(b8) * (u5 - v4) + sin(a8) * sin(b8) * (v5 - v4) + sin(c8) * (u6 - u4)) +
-		2 * (cos(a8) * sin(b8)) * (cos(a8) * sin(b8) * (v5 - v4) + sin(a8) * sin(b8) * (u5 - u4) + sin(c8) * (v6 - v4)) +
-
-		du6 =
-		2 * ( - sin(c0)) * (cos(a0) * sin(b0) * (u1 - v0) + sin(a0) * sin(b0) * (v1 - v0) + sin(c0) * (u6 - u0)) +
-		2 * (0) * (cos(a0) * sin(b0) * (v1 - v0) + sin(a0) * sin(b0) * (u1 - u0) + sin(c0) * (v6 - v0)) +
-		2 * ( - sin(c8)) * (cos(a8) * sin(b8) * (u5 - v4) + sin(a8) * sin(b8) * (v5 - v4) + sin(c8) * (u6 - u4)) +
-		2 * (0) * (cos(a8) * sin(b8) * (v5 - v4) + sin(a8) * sin(b8) * (u5 - u4) + sin(c8) * (v6 - v4)) +
-		2 * ( - sin(c5)) * (cos(a5) * sin(b5) * (u4 - v1) + sin(a5) * sin(b5) * (v4 - v1) + sin(c5) * (u6 - u1)) +
-		2 * (0) * (cos(a5) * sin(b5) * (v4 - v1) + sin(a5) * sin(b5) * (u4 - u1) + sin(c5) * (v6 - v1))
-
-		dv6 =
-		2 * (0) * (cos(a0) * sin(b0) * (u1 - v0) + sin(a0) * sin(b0) * (v1 - v0) + sin(c0) * (u6 - u0)) +
-		2 * ( - sin(c0)) * (cos(a0) * sin(b0) * (v1 - v0) + sin(a0) * sin(b0) * (u1 - u0) + sin(c0) * (v6 - v0)) +
-		2 * (0) * (cos(a8) * sin(b8) * (u5 - v4) + sin(a8) * sin(b8) * (v5 - v4) + sin(c8) * (u6 - u4)) +
-		2 * ( - sin(c8)) * (cos(a8) * sin(b8) * (v5 - v4) + sin(a8) * sin(b8) * (u5 - u4) + sin(c8) * (v6 - v4)) +
-		2 * (0) * (cos(a5) * sin(b5) * (u4 - v1) + sin(a5) * sin(b5) * (v4 - v1) + sin(c5) * (u6 - u1)) +
-		2 * ( - sin(c5)) * (cos(a5) * sin(b5) * (v4 - v1) + sin(a5) * sin(b5) * (u4 - u1) + sin(c5) * (v6 - v1))
-*/
-	void CalculateGradientVector ()
-	{
-		// trace objective function
-		TraceObjectiveFunction();
-
-		// trace gradients
-		DG_DEBUG_UV (("\n"));
-		for (dgInt32 i = 0; i < m_mesh->GetVertexCount(); i ++) {
-			CalculateGradientU (i);
-			CalculateGradientV (i);
-		}
-		DG_DEBUG_UV (("\n"));
-	}
-
-	void CalculateGradientU (dgInt32 vertexIndex) const
-	{
-		const dgEdge* const vertex = m_vertexEdge[vertexIndex];
-		DG_DEBUG_UV (("du%d =\n", vertexIndex));
-
-		dgFloat64 diagonal = dgFloat64 (0.0f);
-		dgFloat64 gradient = dgFloat64 (0.0f);
-		const dgEdge* ptr = vertex;
-		do {
-			if (ptr->m_incidentFace > 0) {
-				DG_DEBUG_UV (("2 * "));
-				dgAssert (ptr->m_incidentVertex == vertexIndex);
-				dgFloat64 diag = TraceGradient_U_Coefficent (ptr, true);
-				gradient += diag * TraceExpresion_U_face (ptr);
-				diagonal += diag * diag;
-				DG_DEBUG_UV ((" +\n"));
-
-				DG_DEBUG_UV (("2 * "));
-				diag = TraceGradient_U_Coefficent (ptr, false);
-				gradient += diag * TraceExpresion_V_face (ptr);
-				diagonal += diag * diag;
-				if (ptr->m_twin->m_next != vertex) {
-					DG_DEBUG_UV ((" +\n"));
-				} else {
-					DG_DEBUG_UV (("\n"));
-				}
-			}
-			ptr = ptr->m_twin->m_next;
-		} while (ptr != vertex);
-		dgAssert (diagonal > dgFloat32 (0.0f));
-		m_diagonal[2 * vertexIndex] = diagonal;
-		m_gradients[2 * vertexIndex] = - gradient;
-		DG_DEBUG_UV (("\n"));
-	}
-
-	void CalculateGradientV (dgInt32 vertexIndex) const
-	{
-		const dgEdge* const vertex = m_vertexEdge[vertexIndex];
-		DG_DEBUG_UV (("dv%d =\n", vertexIndex));
-
-		dgFloat64 diagonal = dgFloat64 (0.0f);
-		dgFloat64 gradient = dgFloat64 (0.0f);
-		const dgEdge* ptr = vertex;
-		do {
-			if (ptr->m_incidentFace > 0) {
-				DG_DEBUG_UV (("2 * "));
-				dgAssert (ptr->m_incidentVertex == vertexIndex);
-				dgFloat64 diag = TraceGradient_V_Coefficent (ptr, true);
-				gradient += diag * TraceExpresion_U_face (ptr);
-				diagonal += diag * diag;
-				DG_DEBUG_UV ((" +\n"));
-
-				DG_DEBUG_UV (("2 * "));
-				diag = TraceGradient_V_Coefficent (ptr, false);
-				gradient += diag * TraceExpresion_V_face (ptr);
-				diagonal += diag * diag;
-				if (ptr->m_twin->m_next != vertex) {
-					DG_DEBUG_UV ((" +\n"));
-				} else {
-					DG_DEBUG_UV (("\n"));
-				}
-			}
-			ptr = ptr->m_twin->m_next;
-		} while (ptr != vertex);
-		dgAssert (diagonal > dgFloat32 (0.0f));
-		m_diagonal[2 * vertexIndex + 1] = diagonal;
-		m_gradients[2 * vertexIndex + 1] = - gradient;
-		DG_DEBUG_UV (("\n"));
-	}
-
-	dgFloat64 TraceExpresion_U_face (const dgEdge* const face) const
+	dgFloat64 CalculateExpression_U_face (const dgEdge* const face) const
 	{
 		dgInt32 faceIndex = GetAlphaLandaIndex (face);
 		dgEdge* const faceStartEdge = m_triangles[faceIndex];
@@ -636,7 +397,7 @@ class dgTriangleAnglesToUV: public SymmetricBiconjugateGradientSolve
 		return gradient;
 	}
 
-	dgFloat64 TraceExpresion_V_face (const dgEdge* const face) const
+	dgFloat64 CalculateExpression_V_face (const dgEdge* const face) const
 	{
 		dgInt32 faceIndex = GetAlphaLandaIndex (face);
 		dgEdge* const faceStartEdge = m_triangles[faceIndex];
@@ -662,7 +423,7 @@ class dgTriangleAnglesToUV: public SymmetricBiconjugateGradientSolve
 	}
 
 
-	dgFloat64 TraceGradient_U_Coefficent (const dgEdge* const edge, bool u) const
+	dgFloat64 CalculateGradient_U_Coefficent (const dgEdge* const edge, bool u) const
 	{
 		DG_DEBUG_UV (("("));
 		dgInt32 faceIndex = GetAlphaLandaIndex (edge);
@@ -698,11 +459,11 @@ class dgTriangleAnglesToUV: public SymmetricBiconjugateGradientSolve
 				DG_DEBUG_UV (("0"));
 			}
 		}
-		DG_DEBUG_UV ((") * "));
+		DG_DEBUG_UV ((")"));
 		return gradient;
 	}
 
-	dgFloat64 TraceGradient_V_Coefficent (const dgEdge* const edge, bool u) const
+	dgFloat64 CalculateGradient_V_Coefficent (const dgEdge* const edge, bool u) const
 	{
 		DG_DEBUG_UV (("("));
 		dgInt32 faceIndex = GetAlphaLandaIndex (edge);
@@ -738,25 +499,322 @@ class dgTriangleAnglesToUV: public SymmetricBiconjugateGradientSolve
 				DG_DEBUG_UV (("0"));
 			}
 		}
-		DG_DEBUG_UV ((") * "));
+		DG_DEBUG_UV ((")"));
 		return gradient;
 	}
 
+
+	dgFloat64 CalculateHessianExpression_U_V (const dgEdge* const face) const
+	{
+		dgInt32 faceIndex = GetAlphaLandaIndex (face);
+		//dgEdge* const faceStartEdge = m_triangles[faceIndex];
+		//dgInt32 uvIndex0 = dgInt32 (faceStartEdge->m_incidentVertex);
+		//dgInt32 uvIndex1 = dgInt32 (faceStartEdge->m_next->m_incidentVertex);
+		//dgInt32 uvIndex2 = dgInt32 (faceStartEdge->m_prev->m_incidentVertex);
+		dgInt32 alphaIndex0 = faceIndex * 3;
+		dgInt32 alphaIndex1 = faceIndex * 3 + 1;
+		//dgInt32 alphaIndex2 = faceIndex * 3 + 2;
+		DG_DEBUG_UV (("( - sin(a%d) * sin(b%d))", faceIndex, faceIndex));
+		return - m_sinTable[alphaIndex0] * m_sinTable[alphaIndex1];
+	}
+
+
+	dgFloat64 CalculateHessianExpression_V_V (const dgEdge* const face) const
+	{
+		dgInt32 faceIndex = GetAlphaLandaIndex (face);
+		//dgEdge* const faceStartEdge = m_triangles[faceIndex];
+		//dgInt32 uvIndex0 = dgInt32 (faceStartEdge->m_incidentVertex);
+		//dgInt32 uvIndex1 = dgInt32 (faceStartEdge->m_next->m_incidentVertex);
+		//dgInt32 uvIndex2 = dgInt32 (faceStartEdge->m_prev->m_incidentVertex);
+
+		dgInt32 alphaIndex0 = faceIndex * 3;
+		dgInt32 alphaIndex1 = faceIndex * 3 + 1;
+		dgInt32 alphaIndex2 = faceIndex * 3 + 2;
+		DG_DEBUG_UV (("(- cos(a%d) * sin(b%d) - sin(c%d))", faceIndex, faceIndex, faceIndex));
+		return - m_cosTable[alphaIndex0] * m_sinTable[alphaIndex1] - m_sinTable[alphaIndex2];
+	}
+
+
+	void CalculateGradientU (dgInt32 vertexIndex)
+	{
+		// calculate U Gradient derivative
+		const dgEdge* const vertex = m_vertexEdge[vertexIndex];
+		DG_DEBUG_UV (("du%d =\n", vertexIndex));
+		dgFloat64 gradient = dgFloat64 (0.0f);
+		const dgEdge* ptr = vertex;
+		do {
+			if (ptr->m_incidentFace > 0) {
+				DG_DEBUG_UV (("2 * "));
+				dgAssert (ptr->m_incidentVertex == vertexIndex);
+				dgFloat64 a = CalculateGradient_U_Coefficent (ptr, true) ;
+				DG_DEBUG_UV ((" * "));
+				gradient += a * CalculateExpression_U_face (ptr);
+				DG_DEBUG_UV ((" +\n"));
+
+				DG_DEBUG_UV (("2 * "));
+				a = CalculateGradient_U_Coefficent (ptr, false);
+				DG_DEBUG_UV ((" * "));
+				gradient += a * CalculateExpression_V_face (ptr);
+				DG_DEBUG_UV ((" +\n"));
+			}
+			ptr = ptr->m_twin->m_next;
+		} while (ptr != vertex);
+		m_gradients[2 * vertexIndex] = - gradient;
+		DG_DEBUG_UV (("\n"));
+
+		// calculate diagonal derivative
+		DG_DEBUG_UV (("H(u%d,u%d) =\n", vertexIndex, vertexIndex));
+		dgFloat64 diagonal = dgFloat64 (0.0f);
+		ptr = vertex;
+		do {
+			if (ptr->m_incidentFace > 0) {
+				DG_DEBUG_UV (("2 * "));
+				dgAssert (ptr->m_incidentVertex == vertexIndex);
+				dgFloat64 diag = CalculateGradient_U_Coefficent (ptr, true);
+				diagonal += diag * diag;
+				DG_DEBUG_UV (("^2 +\n"));
+
+				DG_DEBUG_UV (("2 * "));
+				diag = CalculateGradient_U_Coefficent (ptr, false);
+				diagonal += diag * diag;
+				DG_DEBUG_UV (("^2 +\n"));
+			}
+			ptr = ptr->m_twin->m_next;
+		} while (ptr != vertex);
+		dgAssert (diagonal > dgFloat32 (0.0f));
+
+		m_hessianCoLumnValue[m_matrixElementCount] = diagonal;
+		m_hessianCoLumnIndex[m_matrixElementCount] = vertexIndex * 2 + 0;
+		m_matrixElementCount ++;
+		m_diagonal[2 * vertexIndex] = diagonal;
+		DG_DEBUG_UV (("\n"));
+
+		// calculate of diagonal UiVi derivative
+		DG_DEBUG_UV (("H(u%d,v%d) =\n", vertexIndex, vertexIndex));
+		dgFloat64 hessianUV = dgFloat64 (0.0);
+		ptr = vertex;
+		do {
+			if (ptr->m_incidentFace > 0) {
+				DG_DEBUG_UV (("2 * "));
+				dgAssert (ptr->m_incidentVertex == vertexIndex);
+				dgFloat64 a = CalculateGradient_U_Coefficent (ptr, true);
+				DG_DEBUG_UV ((" * "));
+				hessianUV += a * CalculateHessianExpression_U_V (ptr);
+				DG_DEBUG_UV ((" +\n"));
+
+				DG_DEBUG_UV (("2 * "));
+				a = CalculateGradient_U_Coefficent (ptr, false);
+				DG_DEBUG_UV ((" * "));
+				hessianUV += a * CalculateHessianExpression_V_V (ptr);
+				DG_DEBUG_UV ((" +\n"));
+			}
+			ptr = ptr->m_twin->m_next;
+		} while (ptr != vertex);
+
+		m_hessianCoLumnValue[m_matrixElementCount] = hessianUV;
+		m_hessianCoLumnIndex[m_matrixElementCount] = vertexIndex * 2 + 1;
+		m_matrixElementCount ++;
+		DG_DEBUG_UV (("\n"));
+
+
+/*
+		// calculate off diagonal partial derivatives
+		ptr = vertex;
+		do {
+			// derivative respect to U(i, j)
+			dgInt32 vertexIndex2 = ptr->m_twin->m_incidentVertex;
+			DG_DEBUG_UV (("H(u%d,u%d) =\n", vertexIndex, vertexIndex2));
+			if (ptr->m_incidentFace > 0) {
+				DG_DEBUG_UV (("2 * "));
+				dgAssert (ptr->m_incidentVertex == vertexIndex);
+				dgFloat64 a = CalculateGradient_U_Coefficent (ptr, true);
+				DG_DEBUG_UV ((" * "));
+//				gradient += diag * TraceExpression_U_face (ptr);
+				DG_DEBUG_UV ((" +\n"));
+
+				DG_DEBUG_UV (("2 * "));
+				a = CalculateGradient_U_Coefficent (ptr, false);
+				DG_DEBUG_UV ((" * "));
+//				gradient += diag * TraceExpression_V_face (ptr);
+				DG_DEBUG_UV ((" +\n"));
+			}
+
+			if (ptr->m_twin->m_incidentFace > 0) {
+				DG_DEBUG_UV (("2 * "));
+				dgAssert (ptr->m_incidentVertex == vertexIndex);
+				dgFloat64 a = CalculateGradient_U_Coefficent (ptr->m_twin->m_next, true);
+				DG_DEBUG_UV ((" * "));
+				//				gradient += diag * TraceExpression_U_face (ptr);
+				DG_DEBUG_UV ((" +\n"));
+
+				DG_DEBUG_UV (("2 * "));
+				a = CalculateGradient_U_Coefficent (ptr->m_twin->m_next, false);
+				DG_DEBUG_UV ((" * "));
+				//				gradient += diag * TraceExpression_V_face (ptr);
+				DG_DEBUG_UV ((" +\n"));
+			}
+
+			// derivative respect to V(i, j)
+			DG_DEBUG_UV (("H(u%d,v%d) =\n", vertexIndex, vertexIndex2));
+			if (ptr->m_incidentFace > 0) {
+
+				DG_DEBUG_UV (("2 * "));
+				dgAssert (ptr->m_incidentVertex == vertexIndex);
+				dgFloat64 a = CalculateGradient_U_Coefficent (ptr, true);
+				DG_DEBUG_UV ((" * "));
+				//				gradient += diag * TraceExpression_U_face (ptr);
+				DG_DEBUG_UV ((" +\n"));
+
+				DG_DEBUG_UV (("2 * "));
+				a = CalculateGradient_U_Coefficent (ptr, false);
+				DG_DEBUG_UV ((" * "));
+				//				gradient += diag * TraceExpression_V_face (ptr);
+				DG_DEBUG_UV ((" +\n"));
+
+			}
+
+			if (ptr->m_twin->m_incidentFace > 0) {
+
+				DG_DEBUG_UV (("2 * "));
+				dgAssert (ptr->m_incidentVertex == vertexIndex);
+				dgFloat64 a = CalculateGradient_U_Coefficent (ptr->m_twin->m_next, true);
+				DG_DEBUG_UV ((" * "));
+				//				gradient += diag * TraceExpression_U_face (ptr);
+				DG_DEBUG_UV ((" +\n"));
+
+				DG_DEBUG_UV (("2 * "));
+				a = CalculateGradient_U_Coefficent (ptr->m_twin->m_next, false);
+				DG_DEBUG_UV ((" * "));
+				//				gradient += diag * TraceExpression_V_face (ptr);
+				DG_DEBUG_UV ((" +\n"));
+
+			}
+
+			DG_DEBUG_UV (("\n"));
+			ptr = ptr->m_twin->m_next;
+		} while (ptr != vertex);
+*/
+	}
+
+
+	void CalculateGradientV (dgInt32 vertexIndex)
+	{
+		// calculate U Gradient derivative
+		const dgEdge* const vertex = m_vertexEdge[vertexIndex];
+		DG_DEBUG_UV (("dv%d =\n", vertexIndex));
+			
+		dgFloat64 gradient = dgFloat64 (0.0f);
+		const dgEdge* ptr = vertex;
+		do {
+			if (ptr->m_incidentFace > 0) {
+				DG_DEBUG_UV (("2 * "));
+				dgAssert (ptr->m_incidentVertex == vertexIndex);
+				dgFloat64 a = CalculateGradient_V_Coefficent (ptr, true);
+				DG_DEBUG_UV ((" * "));
+				gradient += a * CalculateExpression_U_face (ptr);
+				DG_DEBUG_UV ((" +\n"));
+
+				DG_DEBUG_UV (("2 * "));
+				a = CalculateGradient_V_Coefficent (ptr, false);
+				DG_DEBUG_UV ((" * "));
+				gradient += a * CalculateExpression_V_face (ptr);
+				DG_DEBUG_UV ((" +\n"));
+			}
+			ptr = ptr->m_twin->m_next;
+		} while (ptr != vertex);
+		m_gradients[2 * vertexIndex + 1] = - gradient;
+		DG_DEBUG_UV (("\n"));
+
+
+		// calculate diagonal derivative
+		DG_DEBUG_UV (("H(v%d,v%d) =\n", vertexIndex, vertexIndex));
+		dgFloat64 diagonal = dgFloat64 (0.0f);
+		ptr = vertex;
+		do {
+			if (ptr->m_incidentFace > 0) {
+				DG_DEBUG_UV (("2 * "));
+				dgAssert (ptr->m_incidentVertex == vertexIndex);
+				dgFloat64 diag = CalculateGradient_V_Coefficent (ptr, true);
+				diagonal += diag * diag;
+				DG_DEBUG_UV (("^2 +\n"));
+
+				DG_DEBUG_UV (("2 * "));
+				diag = CalculateGradient_V_Coefficent (ptr, false);
+				diagonal += diag * diag;
+				DG_DEBUG_UV (("^2 +\n"));
+			}
+			ptr = ptr->m_twin->m_next;
+		} while (ptr != vertex);
+		dgAssert (diagonal > dgFloat32 (0.0f));
+
+		m_hessianCoLumnValue[m_matrixElementCount] = diagonal;
+		m_hessianCoLumnIndex[m_matrixElementCount] = vertexIndex * 2 + 1;
+		m_matrixElementCount ++;
+		m_diagonal[2 * vertexIndex + 1] = diagonal;
+		DG_DEBUG_UV (("\n"));
+
+
+
+
+
+	}
+
+
+
+	void CalculateGradientVectorAndHessianMatrix ()
+	{
+		// trace objective function
+//		TraceObjectiveFunction();
+
+		// trace gradients
+		DG_DEBUG_UV (("\n"));
+		dgInt32 count = m_mesh->GetVertexCount();
+		for (dgInt32 i = 0; i < count; i ++) {
+			CalculateGradientU (i);
+			CalculateGradientV (i);
+		}
+		DG_DEBUG_UV (("\n"));
+	}
+
+
+	bool InversePrecoditionerTimeVector (dgFloat64* const out, const dgFloat64* const v) const
+	{
+		const dgInt32 count = m_mesh->GetVertexCount();
+		for (dgInt32 i = 0; i < count; i ++) {
+			out[2 * i + 0] = m_pinnedPoints[i] * v[i * 2 + 0] / m_diagonal[2 * i + 0];
+			out[2 * i + 1] = m_pinnedPoints[i] * v[i * 2 + 1] / m_diagonal[2 * i + 1];
+		}
+		return true;
+	}
+
+
+	void MatrixTimeVector (dgFloat64* const out, const dgFloat64* const v) const
+	{
+/*
+		const dgInt32 count = m_mesh->GetVertexCount();
+		for (dgInt32 i = 0; i < count; i ++) {
+			dgEdge* const vertex = m_vertexEdge[i];
+			dgAssert (vertex->m_incidentVertex == i);
+			out[i * 2 + 0] = m_diagonal[2 * i + 0] * v[2 * i + 0];
+			out[i * 2 + 1] = m_diagonal[2 * i + 1] * v[2 * i + 1];
+		}
+		DG_DEBUG_UV (("\n"));
+		dgInt32 count = m_mesh->GetVertexCount();
+		for (dgInt32 i = 0; count; i ++) {
+			CalculateHessianDiagonalUU (i);
+		}
+		DG_DEBUG_UV (("\n"));
+*/
+	}
 
 	void LagrangeOptimization()
 	{
-		CalculateGradientVector ();
+		CalculateGradientVectorAndHessianMatrix ();
 		Solve(2 * m_mesh->GetVertexCount(), dgABF_UV_TOL2, m_uvArray, m_gradients);
-
-//m_gradients[0] = 7; 
-//m_gradients[1] = 11; 
-//m_uvArray[0] = 0; 
-//m_uvArray[1] = 2; 
-//Solve(2, dgABF_UV_TOL2, m_uvArray, m_gradients);
-
 	}
 
-
+	dgArray<dgInt32> m_hessianCoLumnIndex;
+	dgArray<dgFloat64> m_hessianCoLumnValue;
 	dgMeshEffect* m_mesh;
 	dgEdge** m_triangles;
 	dgEdge** m_vertexEdge;
@@ -769,6 +827,7 @@ class dgTriangleAnglesToUV: public SymmetricBiconjugateGradientSolve
 	const dgFloat64* m_pinnedPoints;
 
 	dgInt32 m_trianglesCount;
+	dgInt32 m_matrixElementCount;
 	bool m_allocated;
 };
 
