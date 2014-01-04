@@ -411,9 +411,9 @@ void dRegisterInterferenceGraph::MakeWorkingRegisters(int totalRegisters)
     m_reg1 = dString (IndexToRegister(index1));
     //  m_reg2 = dString (IndexToRegister(index2));
 
-    m_local0 = dString (dString("_local") + dString(index0));
-    m_local1 = dString (dString("_local") + dString(index1));
-    //  m_local2 = dString (dString("_local") + dString(index2));
+    m_local0 = IndexToLocal(index0);
+    m_local1 = IndexToLocal(index1);
+    //  m_local2 = IndexToLocal(index2);
 
 
     dCIL::dListNode* nextNode;
@@ -604,13 +604,13 @@ stmt.Trace();
 
 dString dRegisterInterferenceGraph::MakeLocalVariable (int index)
 {
-	return  dString("_local") + dString(m_localLayer) + dString ('_') + dString(index);
+	return  dString(D_SPILL_REGISTER_SYMBOL) + dString(m_localLayer) + dString ('_') + dString(index);
 }
 
 dString dRegisterInterferenceGraph::MakeSpilledTemporary ()
 {
 	m_spillCount ++;
-	return dString("spilled") + dString(m_spillCount - 1);
+	return dString(D_SPILL_REGISTER_SYMBOL) + dString(m_spillCount - 1);
 }
 
 

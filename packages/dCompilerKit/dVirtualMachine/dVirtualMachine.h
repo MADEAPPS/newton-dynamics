@@ -14,7 +14,8 @@
 #define D_REGISTER_SET_FIELD			5
 #define D_OPCODE_FIELD					6
 
-#define D_REGISTER_SYMBOL				"reg"	
+#define D_REGISTER_SYMBOL				'$'
+#define D_SPILL_REGISTER_SYMBOL			"spilled"
 
 //#define D_INTEGER_REGISTER_COUNT		(1<<D_REGISTER_SET_FIELD)
 #define D_INTEGER_REGISTER_COUNT		(7)

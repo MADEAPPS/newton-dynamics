@@ -20,22 +20,20 @@
 inline dString IndexToRegister(int index)
 {
 	char regName[256];
-	sprintf (regName, "%s%d", D_REGISTER_SYMBOL, index);
+	sprintf (regName, "%c%d", D_REGISTER_SYMBOL, index);
 	return regName;			
+}
+
+inline int RegisterToIndex (const dString& reg)
+{
+	return dString(reg.GetStr() + 1).ToInteger();
 }
 
 inline dString IndexToLocal(int index)
 {
 	char regName[256];
-	sprintf (regName, "_local%d", index);
+	sprintf (regName, "%s%d", D_SPILL_REGISTER_SYMBOL, index);
 	return regName;			
-}
-
-
-inline int RegisterToIndex (const dString& reg)
-{
-	static int base = int (strlen (D_REGISTER_SYMBOL));
-	return dString(reg.GetStr() + base).ToInteger();
 }
 
 
