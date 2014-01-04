@@ -860,6 +860,9 @@ void AddPrimitiveArray (DemoEntityManager* const scene, dFloat mass, const dVect
 	NewtonWorld* const world = scene->GetNewton();
 	NewtonCollision* const collision = CreateConvexCollision (world, shapeOffsetMatrix, size, type, materialID);
 
+	// test collision mode
+	//NewtonCollisionSetCollisonMode(collision, 0);
+
 	DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
 	//dFloat startElevation = 1000.0f;

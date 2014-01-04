@@ -84,6 +84,9 @@ static void CreateConvexAproximation (const char* const name, DemoEntityManager*
 
 	// create a compound collision by creation a convex hull of each segment of the source mesh 
 	NewtonCollision* const compound = NewtonCreateCompoundCollisionFromMesh (world, convexApproximation, 0.001f, 0, 0);
+
+	// test collision mode
+//	NewtonCollisionSetCollisonMode(compound, 0);
 	
 	// make a visual Mesh
 	int tex = LoadTexture(texture);

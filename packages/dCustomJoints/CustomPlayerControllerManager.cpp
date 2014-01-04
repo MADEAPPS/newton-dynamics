@@ -101,7 +101,7 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 	NewtonBodySetMassProperties(m_body, mass, shape);
 
 	// make the body collidable with other dynamics bodies, by default
-	NewtonSetBodyCollidable (m_body, true);
+	NewtonKinematicBodySetCollidable (m_body, true);
 
 	dFloat castHigh = capsuleHigh * 0.4f;
 	dFloat castRadio = (m_innerRadio * 0.5f > 0.05f) ? m_innerRadio * 0.5f : 0.05f;

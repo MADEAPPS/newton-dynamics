@@ -1189,7 +1189,8 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 	bool tier4 = isDynamic1 & mass1; 
 	bool tier5 = isKinematic0 & mass1; 
 	bool tier6 = isKinematic1 & mass0; 
-	bool ret = tier0 & tier1 & tier2 & (tier3 | tier4 | tier5 | tier6);
+	bool tier7 = body0->m_collision->GetCollisionMode() & body1->m_collision->GetCollisionMode(); 
+	bool ret = tier0 & tier1 & tier2 & tier7 & (tier3 | tier4 | tier5 | tier6);
 
 	if (ret) {
 		const dgCollisionInstance* const instance0 = body0->GetCollision();
