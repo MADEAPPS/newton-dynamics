@@ -1413,6 +1413,18 @@ bool dDataFlowGraph::ApplyRemoveDeadCode()
 				}
 				break;
 			}
+
+			case dTreeAdressStmt::m_storeBase:
+			{
+				dDataFlowPoint& info = m_dataFlowGraph.Find(stmtNode)->GetInfo();
+				dDataFlowPoint::dVariableSet<dString>& liveOut = info.m_liveOutputSet;
+				if (!liveOut.Find (stmt.m_arg2.m_label)) {
+					ret = true;
+					stmt.m_instruction = dTreeAdressStmt::m_nop;
+					UpdateLiveInputLiveOutput();
+				}
+				break;
+			}
 		}
 	}
 	return ret;
@@ -1676,26 +1688,25 @@ bool dDataFlowGraph::ApplyLoopOptimization(dLoop& loop)
 
 void dDataFlowGraph::ApplyLocalOptimizations()
 {
-
-m_cil->Trace();
+//m_cil->Trace();
 
 	m_mark += 2;
 	BuildBasicBlockGraph();
-m_basicBlocks.Trace();
+//m_basicBlocks.Trace();
 
 	ApplyIfStatementsSimplification();
-m_basicBlocks.Trace();
+//m_basicBlocks.Trace();
 
 	CalculateReachingDefinitions();
 	for (bool optimized = true; optimized;) {
 		optimized = false;
 		optimized |= ApplySubExpresionToCopyPropagation();
 //m_cil->Trace();
-m_basicBlocks.Trace();
+//m_basicBlocks.Trace();
 		if (optimized) {
 			ApplyRemoveDeadCode();
 //m_cil->Trace();
-m_basicBlocks.Trace();
+//m_basicBlocks.Trace();
 		}
 	}
 
@@ -1706,19 +1717,19 @@ m_basicBlocks.Trace();
 
 		optimized |= ApplyConstantPropagation();
 //m_cil->Trace();
-m_basicBlocks.Trace();
+//m_basicBlocks.Trace();
 		optimized |= ApplyCopyPropagation();
 //m_cil->Trace();
-m_basicBlocks.Trace();
+//m_basicBlocks.Trace();
 		optimized |= ApplyConstantFolding();
 //m_cil->Trace();
-m_basicBlocks.Trace();
+//m_basicBlocks.Trace();
 		optimized |= ApplyInstructionSematicOrdering();
 //m_cil->Trace();
-m_basicBlocks.Trace();
+//m_basicBlocks.Trace();
 		optimized |= ApplyRemoveDeadCode();
 //m_cil->Trace();
-m_basicBlocks.Trace();
+//m_basicBlocks.Trace();
 	}
 
 	// apply peephole optimizations
@@ -1728,11 +1739,11 @@ m_basicBlocks.Trace();
 
 		optimized |= ApplySubExpresionToCopyPropagation();
 //m_cil->Trace();
-m_basicBlocks.Trace();
+//m_basicBlocks.Trace();
 		if (optimized) {
 			ApplyRemoveDeadCode();
 //m_cil->Trace();
-m_basicBlocks.Trace();
+//m_basicBlocks.Trace();
 		}
 	}
 
@@ -1742,14 +1753,13 @@ m_basicBlocks.Trace();
 
 		optimized |= ApplyCommonSubExpresion();
 //m_cil->Trace();
-m_basicBlocks.Trace();
-
+//m_basicBlocks.Trace();
 		optimized |= ApplyCopyPropagation();
 //m_cil->Trace();
-m_basicBlocks.Trace();
+//m_basicBlocks.Trace();
 		optimized |= ApplyRemoveDeadCode();
 //m_cil->Trace();
-m_basicBlocks.Trace();
+//m_basicBlocks.Trace();
 	}
 
 /*

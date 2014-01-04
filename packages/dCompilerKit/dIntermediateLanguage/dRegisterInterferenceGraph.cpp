@@ -58,15 +58,15 @@ m_flowGraph->m_cil->Trace();
 
 	m_flowGraph->BuildBasicBlockGraph();
 	m_flowGraph->CalculateLiveInputLiveOutput ();
-m_flowGraph->m_cil->Trace();
+//m_flowGraph->m_cil->Trace();
 
 	for (bool optimized = true; optimized;) {
 		optimized = false;
 		m_flowGraph->UpdateReachingDefinitions();
 		optimized |= m_flowGraph->ApplyCopyPropagation();
-m_flowGraph->m_cil->Trace();
+//m_flowGraph->m_cil->Trace();
 		optimized |= m_flowGraph->ApplyRemoveDeadCode();
-m_flowGraph->m_cil->Trace();
+//m_flowGraph->m_cil->Trace();
 	}
 }
 
@@ -107,7 +107,7 @@ void dRegisterInterferenceGraph::Build()
 				if (!interferanceGraphNode) {
 					interferanceGraphNode = Insert(variable);
 					interferanceGraphNode->GetInfo().m_name = variable;
-			dTrace (("%s\n", variable.GetStr()));
+//			dTrace (("%s\n", variable.GetStr()));
 				}
 			}
 		}
@@ -420,7 +420,7 @@ void dRegisterInterferenceGraph::MakeWorkingRegisters(int totalRegisters)
     for (dCIL::dListNode* node = m_flowGraph->m_function; node; node = nextNode) {
         nextNode = node->GetNext();
         dTreeAdressStmt& stmt = node->GetInfo();
-stmt.Trace();
+//stmt.Trace();
         switch (stmt.m_instruction)
         {
             case dTreeAdressStmt::m_pop:
@@ -507,10 +507,10 @@ stmt.Trace();
 void dRegisterInterferenceGraph::EmitSpillStatements(int totalRegisters)
 {
 	SortRegistersByFrequency(totalRegisters);
-m_flowGraph->m_cil->Trace();
+//m_flowGraph->m_cil->Trace();
 
     MakeWorkingRegisters (totalRegisters);
-m_flowGraph->m_cil->Trace();
+//m_flowGraph->m_cil->Trace();
 /*
 	dCIL::dListNode* nextNode;
 	for (dCIL::dListNode* node = m_flowGraph->m_function; node; node = nextNode) {

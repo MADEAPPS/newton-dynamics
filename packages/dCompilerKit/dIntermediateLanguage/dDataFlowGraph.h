@@ -168,7 +168,7 @@ class dDataFlowGraph
 			:dList<dBasicBlock> ()
 		{
 		}
-
+/*
 		void Trace() const
 		{
 			#ifdef TRACE_INTERMEDIATE_CODE
@@ -177,6 +177,7 @@ class dDataFlowGraph
 				}
 			#endif
 		}
+*/
 	};
 
 

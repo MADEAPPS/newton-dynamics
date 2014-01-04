@@ -76,13 +76,12 @@ dCIL::dListNode* dCIL::NewStatement()
 
 void dCIL::Trace()
 {
-	#ifdef TRACE_INTERMEDIATE_CODE
-		for (dCIL::dListNode* node = GetFirst(); node; node = node->GetNext()) {
-			const dTreeAdressStmt& stmt = node->GetInfo();
-			DTRACE_INTRUCTION(&stmt);
-		}
-		dTrace(("\n"));
-	#endif
+	for (dCIL::dListNode* node = GetFirst(); node; node = node->GetNext()) {
+		const dTreeAdressStmt& stmt = node->GetInfo();
+//		DTRACE_INTRUCTION(&stmt);
+		stmt.Trace();
+	}
+	dTrace(("\n"));
 }
 
 

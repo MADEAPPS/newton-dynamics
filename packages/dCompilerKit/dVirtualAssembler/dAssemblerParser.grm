@@ -18,7 +18,6 @@
 %}
 
 
-
 %union 
 {
 	class dUserVariable: public dDefualtUserVariable

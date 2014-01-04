@@ -19,7 +19,6 @@
  */
 
  
-
 %{
 // Newton Little Scripting Language specification 1.0.0
 // loosely based on a subset of Java and C sharp

@@ -319,9 +319,9 @@ void dTreeAdressStmt::Trace (char* const textOut) const
 
 void dTreeAdressStmt::Trace () const
 {
-	#ifdef TRACE_INTERMEDIATE_CODE
-		char text[2048];
-		Trace(text);
-		dTrace ((text));
-	#endif
+//	#ifdef TRACE_INTERMEDIATE_CODE
+	char text[2048];
+	Trace(text);
+	dTrace ((text));
+//	#endif
 }

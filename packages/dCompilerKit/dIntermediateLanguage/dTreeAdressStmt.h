@@ -13,7 +13,7 @@
 #define  __dTreeAdressStmt_H_
 
 #ifdef _DEBUG
-	#define TRACE_INTERMEDIATE_CODE
+//	#define TRACE_INTERMEDIATE_CODE
 #endif
 
 #ifdef TRACE_INTERMEDIATE_CODE

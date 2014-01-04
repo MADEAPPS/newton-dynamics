@@ -5553,7 +5553,7 @@ bool dLittleScriptParser::Parse(dLittleScriptLexical& scanner)
 	m_grammarError = false;
 	dToken token = dToken (scanner.NextToken());
 
-	#ifdef _DEBUG
+	#ifdef D_DEBUG_PARCEL
 	int oldLine = scanner.GetLineNumber();
 	#endif
 
@@ -5575,7 +5575,7 @@ bool dLittleScriptParser::Parse(dLittleScriptLexical& scanner)
 					entry.m_scannerIndex = scanner.GetIndex();
 					entry.m_value = dUserVariable (token, scanner.GetTokenString(), entry.m_scannerLine, entry.m_scannerIndex);
 
-					#ifdef _DEBUG
+					#ifdef D_DEBUG_PARCEL
 					if (scanner.GetLineNumber() != oldLine) {
 						oldLine = scanner.GetLineNumber();
 						dTrace (("\n"));
