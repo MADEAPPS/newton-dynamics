@@ -972,7 +972,7 @@ NewtonCollision* CreateCollisionTree (NewtonWorld* world, DemoEntity* const enti
 	unsigned64 timer0 = dGetTimeInMicrosenconds();
 
 	// create the collision tree geometry
-	NewtonCollision* const collision = NewtonCreateTreeCollision(world, materialID);
+	NewtonCollision* collision = NewtonCreateTreeCollision(world, materialID);
 
 	// set the application level callback
 #ifdef USE_STATIC_MESHES_DEBUG_COLLISION
@@ -985,7 +985,7 @@ NewtonCollision* CreateCollisionTree (NewtonWorld* world, DemoEntity* const enti
 	// iterate the entire geometry an build the collision
 	for (DemoEntity* model = entity->GetFirst(); model; model = model->GetNext()) {
 
-		dMatrix matrix (model->CalculateGlobalMatrix(entity));
+		dMatrix matrix (model->GetMeshMatrix() * model->CalculateGlobalMatrix(entity));
 		DemoMesh* const mesh = model->GetMesh();
 		dFloat* const vertex = mesh->m_vertex;
 		for (DemoMesh::dListNode* nodes = mesh->GetFirst(); nodes; nodes = nodes->GetNext()) {
@@ -1012,6 +1012,21 @@ NewtonCollision* CreateCollisionTree (NewtonWorld* world, DemoEntity* const enti
 		}
 	}
 	NewtonTreeCollisionEndBuild(collision, optimize ? 1 : 0);
+
+
+	// test Serialization
+#if 0
+	FILE* file = fopen ("serialize.bin", "wb");
+	NewtonCollisionSerialize (world, collision, DemoEntityManager::SerializeFile, file);
+	fclose (file);
+	NewtonDestroyCollision (collision);
+
+	file = fopen ("serialize.bin", "rb");
+	collision = NewtonCreateCollisionFromSerialization (world, DemoEntityManager::DeserializeFile, file);
+	fclose (file);
+#endif	
+
+
 
 	// measure the time to build a collision tree
 	timer0 = (dGetTimeInMicrosenconds() - timer0) / 1000;
