@@ -22,48 +22,61 @@ class dRegisterInterferenceNode;
 class dRegisterInterferenceNodeEdge
 {
 	public:
-	dRegisterInterferenceNodeEdge (dTree<dRegisterInterferenceNode, dString>::dTreeNode* const targetNode)
-		:m_isMov(false)
+	dRegisterInterferenceNodeEdge (dTree<dRegisterInterferenceNode, dString>::dTreeNode* const m_incidentNode)
+		:m_twin(NULL)
+		,m_incidentNode(m_incidentNode)
 		,m_mark (0)
-		,m_twin(NULL)
-		,m_targetNode(targetNode)
 	{
 	}
-
-	bool m_isMov;
+	
+	dList<dRegisterInterferenceNodeEdge>::dListNode* m_twin;
+	dTree<dRegisterInterferenceNode, dString>::dTreeNode* m_incidentNode;
 	int m_mark;
-	dRegisterInterferenceNodeEdge* m_twin;
-	dTree<dRegisterInterferenceNode, dString>::dTreeNode* m_targetNode;
 };
 
 class dRegisterInterferenceNode
 {
 	public: 
 	dRegisterInterferenceNode()
-		:m_inSet (false)
+		:m_name()
+		,m_interferanceEdge()
+		,m_coalescedParent(NULL)
 		,m_registerIndex (-1)
+		,m_inSet (false)
 	{
 	}
 
-	bool m_inSet;
-	int m_registerIndex;
 	dString m_name;
 	dList<dRegisterInterferenceNodeEdge> m_interferanceEdge;
+	dTree<dRegisterInterferenceNode, dString>::dTreeNode* m_coalescedParent;
+	int m_registerIndex;
+	bool m_inSet;
 };
 
 
 class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dString>
 {
 	public: 
+	class CoalescedNodePair
+	{
+		public:	
+		CoalescedNodePair (dTreeNode* const nodeA, dTreeNode* const nodeB)
+			:m_nodeA (nodeA)
+			,m_nodeB (nodeB)
+		{
+		}
+		dTreeNode* m_nodeA;
+		dTreeNode* m_nodeB;
+	};
+
 	dRegisterInterferenceGraph (dDataFlowGraph* const flowGraph, int registerCount);
 
 	private:
 
 	void Build();
-	int ColorGraph (int maxRegisters);
+	int ColorGraph ();
 	dTreeNode* GetBestNode();
-	
-
+	void CoalesceNodes();
 
 	void AllocateRegisters ();
 	void SortRegisters(int totalRegisters);
@@ -89,6 +102,8 @@ class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dStrin
 	int FindRegister (int regIndex, int totalRegisters) const;
 	static int Compare (const void* p1, const void* p2);
 
+
+	dList<CoalescedNodePair> m_coalescedNodes;
     dString m_reg0;
     dString m_reg1;
 

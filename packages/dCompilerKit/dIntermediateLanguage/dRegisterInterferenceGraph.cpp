@@ -26,14 +26,18 @@ dRegisterInterferenceGraph::dRegisterInterferenceGraph (dDataFlowGraph* const fl
 	while (m_flowGraph->ApplyRemoveDeadCode());
 
 	Build();
+	while (ColorGraph () > m_registerCount) {
+		dAssert(0);
+	}
+/*
 	int registersUsed = ColorGraph (0x7fffffff);
 	if (registersUsed > registerCount) {
-		dAssert (0);
-	} else {
-		AllocateRegisters();
+		SpillAndColorGraph ();
 	}
 
-/*
+	AllocateRegisters();
+
+
 	
 m_flowGraph->m_cil->Trace();
 	if (registersUsed > registerCount) {
@@ -47,16 +51,17 @@ m_flowGraph->m_cil->Trace();
 	}
 */
 
+	AllocateRegisters();
 	m_flowGraph->BuildBasicBlockGraph();
 	m_flowGraph->CalculateLiveInputLiveOutput ();
-//m_flowGraph->m_cil->Trace();
+m_flowGraph->m_cil->Trace();
 	for (bool optimized = true; optimized;) {
 		optimized = false;
 		m_flowGraph->UpdateReachingDefinitions();
 		optimized |= m_flowGraph->ApplyCopyPropagation();
-//m_flowGraph->m_cil->Trace();
+m_flowGraph->m_cil->Trace();
 		optimized |= m_flowGraph->ApplyRemoveDeadCode();
-//m_flowGraph->m_cil->Trace();
+m_flowGraph->m_cil->Trace();
 	}
 }
 
@@ -737,7 +742,7 @@ void dRegisterInterferenceGraph::Build()
 				if (!interferanceGraphNode) {
 					interferanceGraphNode = Insert(variable);
 					interferanceGraphNode->GetInfo().m_name = variable;
-					//			dTrace (("%s\n", variable.GetStr()));
+dTrace (("%s\n", variable.GetStr()));
 				}
 			}
 		}
@@ -771,16 +776,18 @@ void dRegisterInterferenceGraph::Build()
 
 						bool hasEdge = false;
 						for (dList<dRegisterInterferenceNodeEdge>::dListNode* ptr = inteferanceNodeA.m_interferanceEdge.GetFirst(); ptr; ptr = ptr->GetNext()) {
-							if (ptr->GetInfo().m_targetNode == nodeB) {
+							//dRegisterInterferenceNodeEdge* const twin = ptr->GetInfo().m_twin;
+							dList<dRegisterInterferenceNodeEdge>::dListNode* const twinEdgeNode = ptr->GetInfo().m_twin;
+							if (twinEdgeNode && (twinEdgeNode->GetInfo().m_incidentNode == nodeB)) {
 								hasEdge = true;
 								break;
 							}
 						}
 						if (!hasEdge) {
-							dList<dRegisterInterferenceNodeEdge>::dListNode* const entryA = inteferanceNodeA.m_interferanceEdge.Append(dRegisterInterferenceNodeEdge (nodeB));
-							dList<dRegisterInterferenceNodeEdge>::dListNode* const entryB = inteferanceNodeB.m_interferanceEdge.Append(dRegisterInterferenceNodeEdge (nodeA));
-							entryA->GetInfo().m_twin = &entryB->GetInfo();
-							entryB->GetInfo().m_twin = &entryA->GetInfo();
+							dList<dRegisterInterferenceNodeEdge>::dListNode* const entryA = inteferanceNodeA.m_interferanceEdge.Append(dRegisterInterferenceNodeEdge (nodeA));
+							dList<dRegisterInterferenceNodeEdge>::dListNode* const entryB = inteferanceNodeB.m_interferanceEdge.Append(dRegisterInterferenceNodeEdge (nodeB));
+							entryA->GetInfo().m_twin = entryB;
+							entryB->GetInfo().m_twin = entryA;
 						}
 					}
 				}
@@ -788,20 +795,34 @@ void dRegisterInterferenceGraph::Build()
 		}
 	}
 
+m_flowGraph->m_cil->Trace();
+
+	dList<dTreeNode*> moveNodes;
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowGraph::dDataFlowPoint& info = iter.GetNode()->GetInfo();
 		dTreeAdressStmt& stmt = info.m_statement->GetInfo();
-		if ((stmt.m_instruction == dTreeAdressStmt::m_assigment) && (stmt.m_operator == dTreeAdressStmt::m_nothing)) {
+		if ((stmt.m_instruction == dTreeAdressStmt::m_assigment) && (stmt.m_operator == dTreeAdressStmt::m_nothing) && (stmt.m_arg1.m_type != dTreeAdressStmt::m_intConst) &&  (stmt.m_arg1.m_type != dTreeAdressStmt::m_floatConst)) {
+
+stmt.Trace();
 			const dString& variableA = stmt.m_arg0.m_label;
 			const dString& variableB = stmt.m_arg1.m_label;
 			dTreeNode* const nodeA = Find(variableA);
 			dTreeNode* const nodeB = Find(variableB);
+
+			bool canCoalese = true;
 			for (dList<dRegisterInterferenceNodeEdge>::dListNode* edgeNode = nodeA->GetInfo().m_interferanceEdge.GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
 				dRegisterInterferenceNodeEdge& edge = edgeNode->GetInfo();
-				if (edge.m_targetNode == nodeB) {
-					edge.m_isMov = true;
-					edge.m_twin->m_isMov = true;
+				dList<dRegisterInterferenceNodeEdge>::dListNode* const twinEdgeNode = edge.m_twin;
+				if (twinEdgeNode->GetInfo().m_incidentNode == nodeB) {
+					canCoalese = false;
 					break;
+				}
+			}
+			if (canCoalese) {
+				if (nodeB == returnRegNode) {
+					m_coalescedNodes.Append(CoalescedNodePair (nodeB, nodeB));
+				} else {
+					m_coalescedNodes.Append(CoalescedNodePair (nodeA, nodeB));
 				}
 			}
 		}
@@ -837,10 +858,75 @@ dRegisterInterferenceGraph::dTreeNode* dRegisterInterferenceGraph::GetBestNode()
 }
 
 
-int dRegisterInterferenceGraph::ColorGraph (int maxRegisters)
+void dRegisterInterferenceGraph::CoalesceNodes()
+{
+	dList<CoalescedNodePair>::dListNode* nextNode;
+	for (dList<CoalescedNodePair>::dListNode* coalsescedNodePair = m_coalescedNodes.GetFirst(); coalsescedNodePair; coalsescedNodePair = nextNode) {
+		const CoalescedNodePair& pair = coalsescedNodePair->GetInfo();
+		nextNode = coalsescedNodePair->GetNext();
+
+		dTree<dTreeNode*, dTreeNode*> edgeUnion;
+		dRegisterInterferenceNode& nodeA = pair.m_nodeA->GetInfo();
+		dList<dRegisterInterferenceNodeEdge>& edgeListInfoA = nodeA.m_interferanceEdge; 
+		for (dList<dRegisterInterferenceNodeEdge>::dListNode* ptr = edgeListInfoA.GetFirst(); ptr; ptr = ptr->GetNext()) {
+			dRegisterInterferenceNodeEdge& edge = ptr->GetInfo();
+			dTreeNode* const otherNode = edge.m_twin->GetInfo().m_incidentNode;
+			if (!otherNode->GetInfo().m_inSet) {
+				edgeUnion.Insert(otherNode, otherNode);
+			}
+		}
+
+		dRegisterInterferenceNode& nodeB = pair.m_nodeB->GetInfo();
+		dList<dRegisterInterferenceNodeEdge>& edgeListInfoB = nodeB.m_interferanceEdge; 
+		for (dList<dRegisterInterferenceNodeEdge>::dListNode* ptr = edgeListInfoB.GetFirst(); ptr; ptr = ptr->GetNext()) {
+			dRegisterInterferenceNodeEdge& edge = ptr->GetInfo();
+			dTreeNode* const otherNode = edge.m_twin->GetInfo().m_incidentNode;
+			if (!otherNode->GetInfo().m_inSet) {
+				edgeUnion.Insert(otherNode, otherNode);
+			}
+		}
+
+		if (edgeUnion.GetCount() < m_registerCount) {
+			nodeB.m_registerIndex = nodeA.m_registerIndex;
+			nodeB.m_coalescedParent = pair.m_nodeA;
+
+			for (dList<dRegisterInterferenceNodeEdge>::dListNode* ptr = edgeListInfoB.GetFirst(); ptr; ptr = ptr->GetNext()) {
+				dRegisterInterferenceNodeEdge& edge = ptr->GetInfo();
+				dTreeNode* const otherNode = edge.m_twin->GetInfo().m_incidentNode;
+				dRegisterInterferenceNode& otherNodeInfo = otherNode->GetInfo();
+				otherNodeInfo.m_interferanceEdge.Remove(edge.m_twin);
+			}
+			edgeListInfoB.RemoveAll();
+
+			for (dList<dRegisterInterferenceNodeEdge>::dListNode* ptr = edgeListInfoA.GetFirst(); ptr; ptr = ptr->GetNext()) {
+				dRegisterInterferenceNodeEdge& edge = ptr->GetInfo();
+				dTreeNode* const otherNode = edge.m_twin->GetInfo().m_incidentNode;
+				edgeUnion.Remove(otherNode);
+			}
+
+			dTree<dTreeNode*, dTreeNode*>::Iterator iter (edgeUnion);
+			for (iter.Begin(); iter; iter ++) {
+				dTreeNode* const nodeA = pair.m_nodeA;
+				dTreeNode* const nodeB = iter.GetNode()->GetInfo();
+
+				dList<dRegisterInterferenceNodeEdge>::dListNode* const entryA = nodeA->GetInfo().m_interferanceEdge.Append(dRegisterInterferenceNodeEdge (nodeA));
+				dList<dRegisterInterferenceNodeEdge>::dListNode* const entryB = nodeB->GetInfo().m_interferanceEdge.Append(dRegisterInterferenceNodeEdge (nodeB));
+				entryA->GetInfo().m_twin = entryB;
+				entryB->GetInfo().m_twin = entryA;
+			}
+
+			m_coalescedNodes.Remove(coalsescedNodePair);
+		}
+
+	}
+}
+
+int dRegisterInterferenceGraph::ColorGraph ()
 {
 	dList<dTreeNode*> registerOrder;
 	for (int i = 0; i < GetCount(); i ++) {
+		CoalesceNodes();
+
 		dTreeNode* const bestNode = GetBestNode();
 		registerOrder.Addtop(bestNode);
 		dRegisterInterferenceNode& node = bestNode->GetInfo();
@@ -849,7 +935,7 @@ int dRegisterInterferenceGraph::ColorGraph (int maxRegisters)
 			dRegisterInterferenceNodeEdge& edge = ptr->GetInfo();
 			if (edge.m_mark == 0) {
 				edge.m_mark = 1;
-				edge.m_twin->m_mark = 1;
+				edge.m_twin->GetInfo().m_mark = 1;
 			}
 		}
 	} 
@@ -858,27 +944,38 @@ int dRegisterInterferenceGraph::ColorGraph (int maxRegisters)
 	for (dList<dTreeNode*>::dListNode* node = registerOrder.GetFirst(); node; node = node->GetNext()) {
 		dTreeNode* const varNode = node->GetInfo();
 		dRegisterInterferenceNode& variable = varNode->GetInfo();
-		if (variable.m_registerIndex == -1) {
-			int regMask = 0;
-			for (dList<dRegisterInterferenceNodeEdge>::dListNode* ptr = variable.m_interferanceEdge.GetFirst(); ptr; ptr = ptr->GetNext()) {
-				dRegisterInterferenceNodeEdge& edge = ptr->GetInfo();
-				dRegisterInterferenceNode& otherVariable = edge.m_targetNode->GetInfo();
-				if (otherVariable.m_registerIndex != -1) {
-					regMask |= (1 << otherVariable.m_registerIndex);
+		if (!variable.m_coalescedParent) {
+			if (variable.m_registerIndex == -1) {
+				int regMask = 0;
+				for (dList<dRegisterInterferenceNodeEdge>::dListNode* ptr = variable.m_interferanceEdge.GetFirst(); ptr; ptr = ptr->GetNext()) {
+					dRegisterInterferenceNodeEdge& edge = ptr->GetInfo();
+					dRegisterInterferenceNode& otherVariable = edge.m_twin->GetInfo().m_incidentNode->GetInfo();
+					if (otherVariable.m_registerIndex != -1) {
+						regMask |= (1 << otherVariable.m_registerIndex);
+					}
 				}
-			}
 
-			int index = 0;
-			for (int mask = regMask; mask & 1 ; mask >>= 1) {
-				index ++;
+				int index = 0;
+				for (int mask = regMask; mask & 1 ; mask >>= 1) {
+					index ++;
+				}
+				variable.m_registerIndex = index;
 			}
-			variable.m_registerIndex = index;
+			m_flowGraph->m_registersUsedMask |= (1 << variable.m_registerIndex);
+			registersUsed = dMax (registersUsed, variable.m_registerIndex);
 		}
-		m_flowGraph->m_registersUsedMask |= (1 << variable.m_registerIndex);
-		registersUsed = dMax (registersUsed, variable.m_registerIndex);
+	}
+
+	for (dList<dTreeNode*>::dListNode* node = registerOrder.GetFirst(); node; node = node->GetNext()) {
+		dTreeNode* const varNode = node->GetInfo();
+		dRegisterInterferenceNode& variable = varNode->GetInfo();
+		if (variable.m_coalescedParent) {
+			dTreeNode* const parentNode = (dTreeNode*)variable.m_coalescedParent;
+			dRegisterInterferenceNode& parentVariable = parentNode->GetInfo();
+			variable.m_registerIndex = parentVariable.m_registerIndex;
+		}
 	}
 	return registersUsed + 1;
 }
-
 
 
