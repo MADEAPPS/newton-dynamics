@@ -19,19 +19,20 @@
 
 class dDataFlowGraph;
 class dRegisterInterferenceNode;
+
 class dRegisterInterferenceNodeEdge
 {
 	public:
 	dRegisterInterferenceNodeEdge (dTree<dRegisterInterferenceNode, dString>::dTreeNode* const m_incidentNode)
 		:m_twin(NULL)
 		,m_incidentNode(m_incidentNode)
-		,m_mark (0)
+		,m_mark (false)
 	{
 	}
 	
 	dList<dRegisterInterferenceNodeEdge>::dListNode* m_twin;
 	dTree<dRegisterInterferenceNode, dString>::dTreeNode* m_incidentNode;
-	int m_mark;
+	bool m_mark;
 };
 
 class dRegisterInterferenceNode
@@ -43,6 +44,7 @@ class dRegisterInterferenceNode
 		,m_coalescedParent(NULL)
 		,m_registerIndex (-1)
 		,m_inSet (false)
+		,m_isMove(false)
 	{
 	}
 
@@ -51,6 +53,7 @@ class dRegisterInterferenceNode
 	dTree<dRegisterInterferenceNode, dString>::dTreeNode* m_coalescedParent;
 	int m_registerIndex;
 	bool m_inSet;
+	bool m_isMove;
 };
 
 
@@ -77,6 +80,8 @@ class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dStrin
 	int ColorGraph ();
 	dTreeNode* GetBestNode();
 	void CoalesceNodes();
+	bool CoalesceNodesRule1 (dTreeNode* const nodeA, dTreeNode* const nodeB);
+	bool CoalesceNodesRule2 (dTreeNode* const nodeA, dTreeNode* const nodeB);
 
 	void AllocateRegisters ();
 	void SortRegisters(int totalRegisters);
