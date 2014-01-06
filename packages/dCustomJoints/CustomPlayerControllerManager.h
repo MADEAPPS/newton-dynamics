@@ -47,6 +47,11 @@ class CustomPlayerController: public CustomControllerBase
 		return m_groundPlane;
 	}
 
+	bool IsInFreeFall() const
+	{
+		return m_isJumping;
+	}
+
 	void SetRestrainingDistance (dFloat distance)
 	{
 		m_restrainingDistance = dMax (dAbs (distance), dFloat(PLAYER_MIN_RESTRAINING_DISTANCE));
