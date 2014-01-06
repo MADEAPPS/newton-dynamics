@@ -746,7 +746,7 @@ void dRegisterInterferenceGraph::Build()
 				if (!interferanceGraphNode) {
 					interferanceGraphNode = Insert(variable);
 					interferanceGraphNode->GetInfo().m_name = variable;
-//dTrace (("%s\n", variable.GetStr()));
+dTrace (("%s\n", variable.GetStr()));
 				}
 			}
 		}
@@ -1205,8 +1205,7 @@ stmt.Trace();
 	}
 
 	dAssert (spillCandidate);
-//	ReWriteFunctionSpillingVarible (spillCandidate->GetKey());
-ReWriteFunctionSpillingVarible (dString ("t1"));
+	ReWriteFunctionSpillingVarible (spillCandidate->GetKey());
 }
 
 
