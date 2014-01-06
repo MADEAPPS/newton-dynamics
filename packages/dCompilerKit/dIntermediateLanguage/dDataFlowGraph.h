@@ -129,10 +129,10 @@ class dDataFlowGraph
 		dList<dDataFlowPoint*> m_successors;
 		dList<dDataFlowPoint*> m_predecessors; 
 	
-		dString m_killVariable;
+		dString m_generatedVariable;
 		dVariableSet<dString> m_liveInputSet;
 		dVariableSet<dString> m_liveOutputSet;
-		dVariableSet<dString> m_generatedVariableSet;
+		dVariableSet<dString> m_usedVariableSet;
 
 		int m_mark;
 		bool m_generateStmt;
@@ -250,7 +250,7 @@ class dDataFlowGraph
 	void UpdateLiveInputLiveOutput();
 
 	void BuildBasicBlockGraph();
-	void BuildGeneratedAndKillVariableSets();
+	void BuildGeneratedAndUsedlVariableSets();
 	void BuildGeneratedAndKillStatementSets();
 	void UpdateReachingDefinitions();
 

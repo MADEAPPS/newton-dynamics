@@ -597,49 +597,48 @@ bool dDataFlowGraph::DoStatementAreachesStatementB(dCIL::dListNode* const stmtNo
 }
 
 
-void dDataFlowGraph::BuildGeneratedAndKillVariableSets()
+void dDataFlowGraph::BuildGeneratedAndUsedlVariableSets()
 {
 	dTree<dDataFlowPoint, dCIL::dListNode*>::Iterator iter (m_dataFlowGraph);
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowPoint& point = iter.GetNode()->GetInfo();
-		point.m_generatedVariableSet.RemoveAll();
+		point.m_usedVariableSet.RemoveAll();
 	}
 
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowPoint& point = iter.GetNode()->GetInfo();
-		point.m_killVariable.Empty();
+		point.m_generatedVariable.Empty();
 		dTreeAdressStmt& stmt = point.m_statement->GetInfo();	
-
 		switch (stmt.m_instruction)
 		{
 			case dTreeAdressStmt::m_loadBase:
 			{
-				point.m_killVariable = stmt.m_arg0.m_label;
-				point.m_generatedVariableSet.Insert(stmt.m_arg2.m_label);
+				point.m_generatedVariable = stmt.m_arg0.m_label;
+				point.m_usedVariableSet.Insert(stmt.m_arg2.m_label);
 				break;
 			}
 
 			case dTreeAdressStmt::m_load:
 			{
-				point.m_killVariable = stmt.m_arg0.m_label;
-				point.m_generatedVariableSet.Insert(stmt.m_arg1.m_label);
-				point.m_generatedVariableSet.Insert(stmt.m_arg2.m_label);
+				point.m_generatedVariable = stmt.m_arg0.m_label;
+				point.m_usedVariableSet.Insert(stmt.m_arg1.m_label);
+				point.m_usedVariableSet.Insert(stmt.m_arg2.m_label);
 				break;
 			}
 
 			case dTreeAdressStmt::m_assigment:
 			{
-				point.m_killVariable = stmt.m_arg0.m_label;
+				point.m_generatedVariable = stmt.m_arg0.m_label;
 
 				if (stmt.m_arg1.m_type == dTreeAdressStmt::m_intVar) {
-					point.m_generatedVariableSet.Insert(stmt.m_arg1.m_label);
+					point.m_usedVariableSet.Insert(stmt.m_arg1.m_label);
 				} else if (stmt.m_arg1.m_type == dTreeAdressStmt::m_floatVar) {
 					dAssert (0);
 				}
 
 				if (stmt.m_operator != dTreeAdressStmt::m_nothing) {
 					if (stmt.m_arg2.m_type == dTreeAdressStmt::m_intVar) {
-						point.m_generatedVariableSet.Insert(stmt.m_arg2.m_label);
+						point.m_usedVariableSet.Insert(stmt.m_arg2.m_label);
 					} else if (stmt.m_arg2.m_type == dTreeAdressStmt::m_floatVar) {
 						dAssert (0);
 					}
@@ -649,14 +648,14 @@ void dDataFlowGraph::BuildGeneratedAndKillVariableSets()
 
 			case dTreeAdressStmt::m_alloc:
 			{
-				point.m_killVariable = stmt.m_arg0.m_label;
-				point.m_generatedVariableSet.Insert(stmt.m_arg1.m_label);
+				point.m_generatedVariable = stmt.m_arg0.m_label;
+				point.m_usedVariableSet.Insert(stmt.m_arg1.m_label);
 				break;
 			}
 
 			case dTreeAdressStmt::m_free:
 			{
-				point.m_generatedVariableSet.Insert(stmt.m_arg0.m_label);
+				point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
 				break;
 			}
 
@@ -664,7 +663,7 @@ void dDataFlowGraph::BuildGeneratedAndKillVariableSets()
 			case dTreeAdressStmt::m_call:
 			{
 				if (m_returnType != dCIL::m_void) {
-					point.m_killVariable = m_returnVariableName;
+					point.m_generatedVariable = m_returnVariableName;
 				}
 				break;
 			}
@@ -672,41 +671,41 @@ void dDataFlowGraph::BuildGeneratedAndKillVariableSets()
 			case dTreeAdressStmt::m_ret:
 			{
 				if (m_returnType != dCIL::m_void) {
-					point.m_generatedVariableSet.Insert(m_returnVariableName);
+					point.m_usedVariableSet.Insert(m_returnVariableName);
 				}
 				break;
 			}
 
 			case dTreeAdressStmt::m_store:
 			{
-				point.m_generatedVariableSet.Insert(stmt.m_arg0.m_label);
-				point.m_generatedVariableSet.Insert(stmt.m_arg1.m_label);
-				point.m_generatedVariableSet.Insert(stmt.m_arg2.m_label);
+				point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
+				point.m_usedVariableSet.Insert(stmt.m_arg1.m_label);
+				point.m_usedVariableSet.Insert(stmt.m_arg2.m_label);
 				break;
 			}
 
 			case dTreeAdressStmt::m_storeBase:
 			{
-				point.m_generatedVariableSet.Insert(stmt.m_arg0.m_label);
-				point.m_generatedVariableSet.Insert(stmt.m_arg2.m_label);
+				point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
+				point.m_usedVariableSet.Insert(stmt.m_arg2.m_label);
 				break;
 			}
 
 			case dTreeAdressStmt::m_if:
 			{
 				if (stmt.m_arg0.m_type == dTreeAdressStmt::m_intVar) {
-					point.m_generatedVariableSet.Insert(stmt.m_arg0.m_label);
+					point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
 				}
 
 				if (stmt.m_arg1.m_type == dTreeAdressStmt::m_intVar) {
-					point.m_generatedVariableSet.Insert(stmt.m_arg1.m_label);
+					point.m_usedVariableSet.Insert(stmt.m_arg1.m_label);
 				}
 				break;
 			}
 
 			case dTreeAdressStmt::m_push:
 			{
-				point.m_generatedVariableSet.Insert(stmt.m_arg0.m_label);
+				point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
 				break;
 			}
 
@@ -731,7 +730,7 @@ void dDataFlowGraph::BuildGeneratedAndKillVariableSets()
 
 void dDataFlowGraph::CalculateLiveInputLiveOutput ()
 {
-	BuildGeneratedAndKillVariableSets();
+	BuildGeneratedAndUsedlVariableSets();
 
 	dTree<dDataFlowPoint, dCIL::dListNode*>::Iterator iter (m_dataFlowGraph);
 	for (iter.Begin(); iter; iter ++) {
@@ -758,10 +757,10 @@ void dDataFlowGraph::CalculateLiveInputLiveOutput ()
 
 				info.m_liveInputSet.RemoveAll();
 				info.m_liveInputSet.Union(info.m_liveOutputSet);
-				if (info.m_killVariable.Size()) {
-					info.m_liveInputSet.Remove(info.m_killVariable);
+				if (info.m_generatedVariable.Size()) {
+					info.m_liveInputSet.Remove(info.m_generatedVariable);
 				}
-				info.m_liveInputSet.Union(info.m_generatedVariableSet);
+				info.m_liveInputSet.Union(info.m_usedVariableSet);
 
 				info.m_liveOutputSet.RemoveAll();
 				for (dList<dDataFlowPoint*>::dListNode* successorNode = info.m_successors.GetFirst(); successorNode; successorNode = successorNode->GetNext()) {

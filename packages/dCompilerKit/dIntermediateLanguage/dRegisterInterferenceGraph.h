@@ -60,10 +60,10 @@ class dRegisterInterferenceNode
 class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dString>
 {
 	public: 
-	class CoalescedNodePair
+	class dCoalescedNodePair
 	{
 		public:	
-		CoalescedNodePair (dTreeNode* const nodeA, dTreeNode* const nodeB)
+		dCoalescedNodePair (dTreeNode* const nodeA, dTreeNode* const nodeB)
 			:m_nodeA (nodeA)
 			,m_nodeB (nodeB)
 		{
@@ -72,8 +72,22 @@ class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dStrin
 		dTreeNode* m_nodeB;
 	};
 
-	dRegisterInterferenceGraph (dDataFlowGraph* const flowGraph, int registerCount);
 
+	class dVariableSpillPriority
+	{
+		public:
+		dVariableSpillPriority()
+			:m_useCount(0)
+			,m_loopUseCount(0)
+		{
+
+		}
+
+		int m_useCount;
+		int m_loopUseCount;
+	};
+
+	dRegisterInterferenceGraph (dDataFlowGraph* const flowGraph, int registerCount);
 	private:
 
 	void Build();
@@ -110,7 +124,7 @@ class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dStrin
 	static int Compare (const void* p1, const void* p2);
 
 
-	dList<CoalescedNodePair> m_coalescedNodes;
+	dList<dCoalescedNodePair> m_coalescedNodes;
     dString m_reg0;
     dString m_reg1;
 

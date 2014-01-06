@@ -15,6 +15,9 @@
 #include "dRegisterInterferenceGraph.h"
 
 
+#define D_SPILL_WEIGHT_FACTOR	10
+#define D_MOVE_WEIGHT_FACTOR	20
+
 dRegisterInterferenceGraph::dRegisterInterferenceGraph (dDataFlowGraph* const flowGraph, int registerCount)
 	:dTree<dRegisterInterferenceNode, dString>()
 	,m_flowGraph(flowGraph)
@@ -735,7 +738,7 @@ void dRegisterInterferenceGraph::Build()
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowGraph::dDataFlowPoint& point = iter.GetNode()->GetInfo();
 
-		dDataFlowGraph::dDataFlowPoint::dVariableSet<dString>::Iterator definedIter (point.m_generatedVariableSet);
+		dDataFlowGraph::dDataFlowPoint::dVariableSet<dString>::Iterator definedIter (point.m_usedVariableSet);
 		for (definedIter.Begin(); definedIter; definedIter ++) {
 			const dString& variable = definedIter.GetKey();
 			if (variable[0] != '_' ) {
@@ -743,7 +746,7 @@ void dRegisterInterferenceGraph::Build()
 				if (!interferanceGraphNode) {
 					interferanceGraphNode = Insert(variable);
 					interferanceGraphNode->GetInfo().m_name = variable;
-dTrace (("%s\n", variable.GetStr()));
+//dTrace (("%s\n", variable.GetStr()));
 				}
 			}
 		}
@@ -759,8 +762,8 @@ dTrace (("%s\n", variable.GetStr()));
 
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowGraph::dDataFlowPoint& info = iter.GetNode()->GetInfo();
-		if (info.m_killVariable.Size()) {
-			const dString& variableA = info.m_killVariable;
+		if (info.m_generatedVariable.Size()) {
+			const dString& variableA = info.m_generatedVariable;
 
 			if ((variableA[0] != '_')) {
 				dTreeNode* const nodeA = Find(variableA);
@@ -796,7 +799,7 @@ dTrace (("%s\n", variable.GetStr()));
 		}
 	}
 
-m_flowGraph->m_cil->Trace();
+//m_flowGraph->m_cil->Trace();
 
 	dList<dTreeNode*> moveNodes;
 	for (iter.Begin(); iter; iter ++) {
@@ -804,7 +807,7 @@ m_flowGraph->m_cil->Trace();
 		dTreeAdressStmt& stmt = info.m_statement->GetInfo();
 		if ((stmt.m_instruction == dTreeAdressStmt::m_assigment) && (stmt.m_operator == dTreeAdressStmt::m_nothing) && (stmt.m_arg1.m_type != dTreeAdressStmt::m_intConst) &&  (stmt.m_arg1.m_type != dTreeAdressStmt::m_floatConst)) {
 
-stmt.Trace();
+//stmt.Trace();
 			const dString& variableA = stmt.m_arg0.m_label;
 			const dString& variableB = stmt.m_arg1.m_label;
 			dTreeNode* const nodeA = Find(variableA);
@@ -823,9 +826,9 @@ stmt.Trace();
 				nodeA->GetInfo().m_isMove = true;
 				nodeB->GetInfo().m_isMove = true;
 				if (nodeB == returnRegNode) {
-					m_coalescedNodes.Append(CoalescedNodePair (nodeB, nodeA));
+					m_coalescedNodes.Append(dCoalescedNodePair (nodeB, nodeA));
 				} else {
-					m_coalescedNodes.Append(CoalescedNodePair (nodeA, nodeB));
+					m_coalescedNodes.Append(dCoalescedNodePair (nodeA, nodeB));
 				}
 			}
 		}
@@ -925,9 +928,9 @@ void dRegisterInterferenceGraph::CoalesceNodes()
 {
 	for (bool hasCoalesced = true; hasCoalesced; ) {
 		hasCoalesced = false;
-		dList<CoalescedNodePair>::dListNode* nextNode;
-		for (dList<CoalescedNodePair>::dListNode* coalsescedNodePair = m_coalescedNodes.GetFirst(); coalsescedNodePair; coalsescedNodePair = nextNode) {
-			const CoalescedNodePair& pair = coalsescedNodePair->GetInfo();
+		dList<dCoalescedNodePair>::dListNode* nextNode;
+		for (dList<dCoalescedNodePair>::dListNode* coalsescedNodePair = m_coalescedNodes.GetFirst(); coalsescedNodePair; coalsescedNodePair = nextNode) {
+			const dCoalescedNodePair& pair = coalsescedNodePair->GetInfo();
 			nextNode = coalsescedNodePair->GetNext();
 
 			bool coalesced = false;
@@ -968,9 +971,9 @@ int dRegisterInterferenceGraph::ColorGraph ()
 		}
 
 		if (node.m_isMove) {
-			dList<CoalescedNodePair>::dListNode* nextNode;
-			for (dList<CoalescedNodePair>::dListNode* coalsescedNodePair = m_coalescedNodes.GetFirst(); coalsescedNodePair; coalsescedNodePair = nextNode) {
-				const CoalescedNodePair& pair = coalsescedNodePair->GetInfo();
+			dList<dCoalescedNodePair>::dListNode* nextNode;
+			for (dList<dCoalescedNodePair>::dListNode* coalsescedNodePair = m_coalescedNodes.GetFirst(); coalsescedNodePair; coalsescedNodePair = nextNode) {
+				const dCoalescedNodePair& pair = coalsescedNodePair->GetInfo();
 				nextNode = coalsescedNodePair->GetNext();
 				if ((bestNode == pair.m_nodeA) || (bestNode == pair.m_nodeB)) {
 					m_coalescedNodes.Remove(coalsescedNodePair);
@@ -1020,5 +1023,185 @@ int dRegisterInterferenceGraph::ColorGraph ()
 
 void dRegisterInterferenceGraph::SelectSpillVariableAndReWriteFunction()
 {
+	dTree<dVariableSpillPriority,dString> spillPriority;
+	dTree<dDataFlowGraph::dDataFlowPoint, dCIL::dListNode*>::Iterator stmtIter (m_flowGraph->m_dataFlowGraph);
+
+	for (stmtIter.Begin(); stmtIter; stmtIter ++) {
+		dDataFlowGraph::dDataFlowPoint& point = stmtIter.GetNode()->GetInfo();
+		dTreeAdressStmt& stmt = point.m_statement->GetInfo();	
+		switch (stmt.m_instruction)
+		{
+			case dTreeAdressStmt::m_loadBase:
+			case dTreeAdressStmt::m_storeBase:
+			{
+				dAssert (point.m_generatedVariable.GetStr());
+				dTree<dVariableSpillPriority,dString>::dTreeNode* node = spillPriority.Find(point.m_generatedVariable);
+				if (!node) {
+					node = spillPriority.Insert(point.m_generatedVariable);
+				}
+				node->GetInfo().m_useCount += 1;
+				break;
+			}
+
+			default:
+			{
+				if (point.m_generatedVariable.GetStr()) {
+					dTree<dVariableSpillPriority,dString>::dTreeNode* node = spillPriority.Find(point.m_generatedVariable);
+					if (!node) {
+						node = spillPriority.Insert(point.m_generatedVariable);
+					}
+					node->GetInfo().m_useCount += 1;
+				}
+				
+				dDataFlowGraph::dDataFlowPoint::dVariableSet<dString>::Iterator usedIter (point.m_usedVariableSet);
+				for (usedIter.Begin(); usedIter; usedIter ++) {
+					const dString& key = usedIter.GetKey();
+					dTree<dVariableSpillPriority,dString>::dTreeNode* node = spillPriority.Find(key);
+					if (!node) {
+						node = spillPriority.Insert(key);
+					}
+					node->GetInfo().m_useCount += 1;
+				}
+			}
+		}
+	}
+
+
+
+	dList<dDataFlowGraph::dLoop> loops;
+	m_flowGraph->GetLoops (loops);
+	for (dList<dDataFlowGraph::dLoop>::dListNode* loopNode = loops.GetFirst(); loopNode; loopNode = loopNode->GetNext()) {
+		dDataFlowGraph::dLoop& loop = loopNode->GetInfo();
+
+		dCIL::dListNode* node = loop.m_head;
+		do {
+
+			dTreeAdressStmt& stmt = node->GetInfo();	
+stmt.Trace();
+			switch (stmt.m_instruction)
+			{
+
+				case dTreeAdressStmt::m_assigment:
+				{
+					dTree<dVariableSpillPriority,dString>::dTreeNode* const priorityNode = spillPriority.Find(stmt.m_arg0.m_label);
+					if (priorityNode) {
+						priorityNode->GetInfo().m_useCount --;
+						priorityNode->GetInfo().m_loopUseCount ++;
+					}
+
+					if (stmt.m_arg1.m_type == dTreeAdressStmt::m_intVar) {
+						dTree<dVariableSpillPriority,dString>::dTreeNode* const priorityNode = spillPriority.Find(stmt.m_arg1.m_label);
+						if (priorityNode) {
+							priorityNode->GetInfo().m_useCount --;
+							priorityNode->GetInfo().m_loopUseCount ++;
+						}
+					} else if (stmt.m_arg1.m_type == dTreeAdressStmt::m_floatVar) {
+						dAssert (0);
+					}
+
+					if (stmt.m_operator != dTreeAdressStmt::m_nothing) {
+						if (stmt.m_arg2.m_type == dTreeAdressStmt::m_intVar) {
+							dTree<dVariableSpillPriority,dString>::dTreeNode* const priorityNode = spillPriority.Find(stmt.m_arg2.m_label);
+							if (priorityNode) {
+								priorityNode->GetInfo().m_useCount --;
+								priorityNode->GetInfo().m_loopUseCount ++;
+							}
+						} else if (stmt.m_arg2.m_type == dTreeAdressStmt::m_floatVar) {
+							dAssert (0);
+						}
+					}
+					break;
+				}
+
+				case dTreeAdressStmt::m_if:
+				{
+					dTree<dVariableSpillPriority,dString>::dTreeNode* const priorityNode0 = spillPriority.Find(stmt.m_arg0.m_label);
+					if (priorityNode0) {
+						priorityNode0->GetInfo().m_useCount --;
+						priorityNode0->GetInfo().m_loopUseCount ++;
+					}
+
+					dTree<dVariableSpillPriority,dString>::dTreeNode* const priorityNode1 = spillPriority.Find(stmt.m_arg1.m_label);
+					if (priorityNode1) {
+						priorityNode1->GetInfo().m_useCount --;
+						priorityNode1->GetInfo().m_loopUseCount ++;
+					}
+					break;
+				}
+
+
+/*
+				case dTreeAdressStmt::m_pop:
+				case dTreeAdressStmt::m_push:
+				case dTreeAdressStmt::m_free:
+				case dTreeAdressStmt::m_loadBase:
+				case dTreeAdressStmt::m_storeBase:
+				{
+					stmt.m_arg0.m_label = GetRegisterName (stmt.m_arg0.m_label);
+					break;
+				}
+
+
+				case dTreeAdressStmt::m_load:
+				case dTreeAdressStmt::m_store:
+				{
+					stmt.m_arg0.m_label = GetRegisterName (stmt.m_arg0.m_label);
+					if (stmt.m_arg1.m_type == dTreeAdressStmt::m_intVar) {
+						stmt.m_arg1.m_label = GetRegisterName (stmt.m_arg1.m_label);
+					} else if (stmt.m_arg1.m_type == dTreeAdressStmt::m_floatVar) {
+						dAssert (0);
+					}
+
+					if (stmt.m_arg2.m_type == dTreeAdressStmt::m_intVar) {
+						stmt.m_arg2.m_label = GetRegisterName (stmt.m_arg2.m_label);
+					} else if (stmt.m_arg2.m_type == dTreeAdressStmt::m_floatVar) {
+						dAssert (0);
+					}
+					break;
+				}
+
+
+				case dTreeAdressStmt::m_alloc:
+				{
+					stmt.m_arg0.m_label = GetRegisterName (stmt.m_arg0.m_label);
+					stmt.m_arg1.m_label = GetRegisterName (stmt.m_arg1.m_label);
+					break;
+				}
+
+
+*/
+				case dTreeAdressStmt::m_call:
+				case dTreeAdressStmt::m_goto:
+				case dTreeAdressStmt::m_label:
+				case dTreeAdressStmt::m_nop:
+				case dTreeAdressStmt::m_enter:
+				case dTreeAdressStmt::m_leave:
+				case dTreeAdressStmt::m_function:
+				case dTreeAdressStmt::m_argument:
+					break;
+
+				default:
+				dAssert (0);
+			}
+			node = node->GetNext();
+		} while (node!= loop.m_tail);
+	}
+
+m_flowGraph->m_cil->Trace();
+	dFloat lowestUsage = 1.0e10f;
+	dTree<dVariableSpillPriority,dString>::dTreeNode* spillCandidate = NULL;
+	Iterator iter (*this);
+	for (iter.Begin(); iter; iter ++) {
+		dTree<dVariableSpillPriority,dString>::dTreeNode* const priorityNode = spillPriority.Find(iter.GetNode()->GetKey());
+		dAssert (priorityNode);
+
+		dRegisterInterferenceNode& iterferanceInfo = iter.GetNode()->GetInfo();
+		dList<dRegisterInterferenceNodeEdge>& edgeListInfo = iterferanceInfo.m_interferanceEdge; 
+		dFloat priority = dFloat ((iterferanceInfo.m_isMove ? D_MOVE_WEIGHT_FACTOR : 0) + priorityNode->GetInfo().m_useCount + D_SPILL_WEIGHT_FACTOR * priorityNode->GetInfo().m_loopUseCount) / (edgeListInfo.GetCount() + 1);
+		if (priority < lowestUsage) {
+			lowestUsage = priority;
+			spillCandidate = priorityNode;
+		}
+	}
 
 }
