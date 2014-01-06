@@ -888,12 +888,15 @@ bool dRegisterInterferenceGraph::CoalesceNodesRule1(dTreeNode* const nodePairA, 
 		nodeB.m_coalescedParent = nodePairA;
 
 		for (dList<dRegisterInterferenceNodeEdge>::dListNode* ptr = edgeListInfoB.GetFirst(); ptr; ptr = ptr->GetNext()) {
+//			dRegisterInterferenceNodeEdge& edge = ptr->GetInfo();
+//			dTreeNode* const otherNode = edge.m_twin->GetInfo().m_incidentNode;
+//			dRegisterInterferenceNode& otherNodeInfo = otherNode->GetInfo();
+//			otherNodeInfo.m_interferanceEdge.Remove(edge.m_twin);
 			dRegisterInterferenceNodeEdge& edge = ptr->GetInfo();
-			dTreeNode* const otherNode = edge.m_twin->GetInfo().m_incidentNode;
-			dRegisterInterferenceNode& otherNodeInfo = otherNode->GetInfo();
-			otherNodeInfo.m_interferanceEdge.Remove(edge.m_twin);
+			edge.m_mark = true;
+			edge.m_twin->GetInfo().m_mark = true;
 		}
-		edgeListInfoB.RemoveAll();
+		//edgeListInfoB.RemoveAll();
 
 		for (dList<dRegisterInterferenceNodeEdge>::dListNode* ptr = edgeListInfoA.GetFirst(); ptr; ptr = ptr->GetNext()) {
 			dRegisterInterferenceNodeEdge& edge = ptr->GetInfo();
