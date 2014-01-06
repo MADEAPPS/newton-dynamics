@@ -738,7 +738,6 @@ bool dRegisterInterferenceGraph::IsTempVariable (const dString& name) const
 
 void dRegisterInterferenceGraph::Build()
 {
-    int spillSize = strlen (D_SPILL_REGISTER_SYMBOL);
 	dTree<dDataFlowGraph::dDataFlowPoint, dCIL::dListNode*>::Iterator iter (m_flowGraph->m_dataFlowGraph);
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowGraph::dDataFlowPoint& point = iter.GetNode()->GetInfo();
@@ -770,7 +769,6 @@ dTrace (("%s\n", variable.GetStr()));
 		if (info.m_generatedVariable.Size()) {
 			const dString& variableA = info.m_generatedVariable;
 
-			//if ((variableA[0] != '_')) {
             if (IsTempVariable(variableA)) {
 				dTreeNode* const nodeA = Find(variableA);
 				dAssert (nodeA);
@@ -786,7 +784,6 @@ dTrace (("%s\n", variable.GetStr()));
 
 						bool hasEdge = false;
 						for (dList<dRegisterInterferenceNodeEdge>::dListNode* ptr = inteferanceNodeA.m_interferanceEdge.GetFirst(); ptr; ptr = ptr->GetNext()) {
-							//dRegisterInterferenceNodeEdge* const twin = ptr->GetInfo().m_twin;
 							dList<dRegisterInterferenceNodeEdge>::dListNode* const twinEdgeNode = ptr->GetInfo().m_twin;
 							if (twinEdgeNode && (twinEdgeNode->GetInfo().m_incidentNode == nodeB)) {
 								hasEdge = true;
@@ -987,6 +984,17 @@ int dRegisterInterferenceGraph::ColorGraph ()
 			}
 		}
 	} 
+
+dAssert (0);
+    for (dList<dTreeNode*>::dListNode* node = registerOrder.GetFirst(); node; node = node->GetNext()) {
+        dTreeNode* const varNode = node->GetInfo();
+        dRegisterInterferenceNode& variable = varNode->GetInfo();
+        if ((variable.m_registerIndex != -1) && (variable.m_coalescedParent)) {
+            dTreeNode* const parentNode = (dTreeNode*)variable.m_coalescedParent;
+            dRegisterInterferenceNode& parentVariable = parentNode->GetInfo();
+            variable.m_registerIndex = parentVariable.m_registerIndex;
+        }
+    }
 
 	int registersUsed = -1;
 	for (dList<dTreeNode*>::dListNode* node = registerOrder.GetFirst(); node; node = node->GetNext()) {
