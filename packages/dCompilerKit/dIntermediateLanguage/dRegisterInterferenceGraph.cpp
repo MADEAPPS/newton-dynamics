@@ -730,10 +730,15 @@ dString dRegisterInterferenceGraph::GetRegisterName (const dString& varName) con
 	}
 }
 
-
+bool dRegisterInterferenceGraph::IsTempVariable (const dString& name) const
+{
+    int spillSize = strlen (D_SPILL_REGISTER_SYMBOL);
+    return (name[0] != '_') && strncmp (name.GetStr(), D_SPILL_REGISTER_SYMBOL, spillSize);
+}
 
 void dRegisterInterferenceGraph::Build()
 {
+    int spillSize = strlen (D_SPILL_REGISTER_SYMBOL);
 	dTree<dDataFlowGraph::dDataFlowPoint, dCIL::dListNode*>::Iterator iter (m_flowGraph->m_dataFlowGraph);
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowGraph::dDataFlowPoint& point = iter.GetNode()->GetInfo();
@@ -741,7 +746,7 @@ void dRegisterInterferenceGraph::Build()
 		dDataFlowGraph::dDataFlowPoint::dVariableSet<dString>::Iterator definedIter (point.m_usedVariableSet);
 		for (definedIter.Begin(); definedIter; definedIter ++) {
 			const dString& variable = definedIter.GetKey();
-			if (variable[0] != '_' ) {
+			if (IsTempVariable(variable)) {
 				dTreeNode* interferanceGraphNode = Find(variable);
 				if (!interferanceGraphNode) {
 					interferanceGraphNode = Insert(variable);
@@ -765,7 +770,8 @@ dTrace (("%s\n", variable.GetStr()));
 		if (info.m_generatedVariable.Size()) {
 			const dString& variableA = info.m_generatedVariable;
 
-			if ((variableA[0] != '_')) {
+			//if ((variableA[0] != '_')) {
+            if (IsTempVariable(variableA)) {
 				dTreeNode* const nodeA = Find(variableA);
 				dAssert (nodeA);
 				dRegisterInterferenceNode& inteferanceNodeA = nodeA->GetInfo();
@@ -773,7 +779,7 @@ dTrace (("%s\n", variable.GetStr()));
 
 				for (aliveIter.Begin(); aliveIter; aliveIter ++) {
 					const dString& variableB = aliveIter.GetKey();
-					if ((variableB[0] != '_') && (variableA != variableB)) {
+					if (IsTempVariable(variableB) && (variableA != variableB)) {
 						dTreeNode* const nodeB = Find(variableB);
 						dAssert (nodeB);
 						dRegisterInterferenceNode& inteferanceNodeB = nodeB->GetInfo();

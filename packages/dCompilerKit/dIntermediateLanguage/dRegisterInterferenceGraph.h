@@ -95,6 +95,7 @@ class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dStrin
 	dTreeNode* GetBestNode();
 	void AllocateRegisters ();
 	void CoalesceNodes();
+    bool IsTempVariable (const dString& name) const;
 	bool CoalesceNodesRule1 (dTreeNode* const nodeA, dTreeNode* const nodeB);
 	bool CoalesceNodesRule2 (dTreeNode* const nodeA, dTreeNode* const nodeB);
 	void SelectSpillVariableAndReWriteFunction();
