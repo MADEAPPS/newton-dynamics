@@ -10,20 +10,25 @@
 */
 
 // standard library core support
-
 class string
 {
-	native string ()
-	native string (byte[] data)
+	string ()
+    {
+    }
+
+	string (byte[] data)
+    {
+        m_data = new init (data);
+    }
 	
-	int lenght() const
-	{
-//		return m_size
-	}
-	
-	private int m_size
-	private int m_capacity
-	private byte[] m_data
+    // public interface to native code
+    native int lenght() const;
+
+    // private interface to native code
+    private native void[] init (byte[] data);
+
+    // data is native
+    private void[] m_data;
 }
 
 
