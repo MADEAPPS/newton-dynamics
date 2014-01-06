@@ -85,10 +85,10 @@ class BasicPlayerEntity: public DemoEntity
 		// create the visual mesh from the player collision shape
 		NewtonCollision* const collision = NewtonBodyGetCollision(body);
 		DemoMesh* const geometry = new DemoMesh("player", collision, "smilli.tga", "smilli.tga", "smilli.tga");
-dAssert (0);
-//		SetMesh(geometry);
+		SetMesh(geometry, GetIdentityMatrix());
 		geometry->Release(); 
 	}
+
 
 	~BasicPlayerEntity ()
 	{
