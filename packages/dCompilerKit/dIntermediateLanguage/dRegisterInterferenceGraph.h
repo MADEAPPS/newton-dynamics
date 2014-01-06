@@ -79,11 +79,13 @@ class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dStrin
 	void Build();
 	int ColorGraph ();
 	dTreeNode* GetBestNode();
+	void AllocateRegisters ();
 	void CoalesceNodes();
 	bool CoalesceNodesRule1 (dTreeNode* const nodeA, dTreeNode* const nodeB);
 	bool CoalesceNodesRule2 (dTreeNode* const nodeA, dTreeNode* const nodeB);
+	void SelectSpillVariableAndReWriteFunction();
 
-	void AllocateRegisters ();
+
 	void SortRegisters(int totalRegisters);
 	void SortRegistersByFrequency (int totalRegisters);
 	void AllocatedSpilledRegister(int totalRegisters);

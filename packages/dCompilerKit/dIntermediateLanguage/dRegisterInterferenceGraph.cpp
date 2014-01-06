@@ -28,7 +28,7 @@ dRegisterInterferenceGraph::dRegisterInterferenceGraph (dDataFlowGraph* const fl
 	Build();
 	while (ColorGraph () > m_registerCount) {
 		// we have a spill, find a good spill node and try graph coloring again
-		dAssert(0);
+		SelectSpillVariableAndReWriteFunction();
 	}
 /*
 	int registersUsed = ColorGraph (0x7fffffff);
@@ -888,15 +888,10 @@ bool dRegisterInterferenceGraph::CoalesceNodesRule1(dTreeNode* const nodePairA, 
 		nodeB.m_coalescedParent = nodePairA;
 
 		for (dList<dRegisterInterferenceNodeEdge>::dListNode* ptr = edgeListInfoB.GetFirst(); ptr; ptr = ptr->GetNext()) {
-//			dRegisterInterferenceNodeEdge& edge = ptr->GetInfo();
-//			dTreeNode* const otherNode = edge.m_twin->GetInfo().m_incidentNode;
-//			dRegisterInterferenceNode& otherNodeInfo = otherNode->GetInfo();
-//			otherNodeInfo.m_interferanceEdge.Remove(edge.m_twin);
 			dRegisterInterferenceNodeEdge& edge = ptr->GetInfo();
 			edge.m_mark = true;
 			edge.m_twin->GetInfo().m_mark = true;
 		}
-		//edgeListInfoB.RemoveAll();
 
 		for (dList<dRegisterInterferenceNodeEdge>::dListNode* ptr = edgeListInfoA.GetFirst(); ptr; ptr = ptr->GetNext()) {
 			dRegisterInterferenceNodeEdge& edge = ptr->GetInfo();
@@ -934,7 +929,20 @@ void dRegisterInterferenceGraph::CoalesceNodes()
 		for (dList<CoalescedNodePair>::dListNode* coalsescedNodePair = m_coalescedNodes.GetFirst(); coalsescedNodePair; coalsescedNodePair = nextNode) {
 			const CoalescedNodePair& pair = coalsescedNodePair->GetInfo();
 			nextNode = coalsescedNodePair->GetNext();
-			bool coalesced = CoalesceNodesRule1 (pair.m_nodeA, pair.m_nodeB) || CoalesceNodesRule2 (pair.m_nodeA, pair.m_nodeB);
+
+			bool coalesced = false;
+			dRegisterInterferenceNode& nodeA = pair.m_nodeA->GetInfo();
+			dList<dRegisterInterferenceNodeEdge>& edgeListInfoA = nodeA.m_interferanceEdge; 
+			for (dList<dRegisterInterferenceNodeEdge>::dListNode* ptr = edgeListInfoA.GetFirst(); ptr; ptr = ptr->GetNext()) {
+				dRegisterInterferenceNodeEdge& edge = ptr->GetInfo();
+				dTreeNode* const otherNode = edge.m_twin->GetInfo().m_incidentNode;
+				if (pair.m_nodeB == otherNode) {
+					coalesced = true;
+					break;
+				}
+			}
+
+			coalesced = coalesced || CoalesceNodesRule1 (pair.m_nodeA, pair.m_nodeB) || CoalesceNodesRule2 (pair.m_nodeA, pair.m_nodeB);
 			if (coalesced) {
 				m_coalescedNodes.Remove(coalsescedNodePair);
 			}
@@ -1010,3 +1018,7 @@ int dRegisterInterferenceGraph::ColorGraph ()
 }
 
 
+void dRegisterInterferenceGraph::SelectSpillVariableAndReWriteFunction()
+{
+
+}
