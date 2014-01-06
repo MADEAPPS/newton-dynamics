@@ -609,6 +609,7 @@ void dDataFlowGraph::BuildGeneratedAndUsedlVariableSets()
 		dDataFlowPoint& point = iter.GetNode()->GetInfo();
 		point.m_generatedVariable.Empty();
 		dTreeAdressStmt& stmt = point.m_statement->GetInfo();	
+//stmt.Trace();
 		switch (stmt.m_instruction)
 		{
 			case dTreeAdressStmt::m_loadBase:

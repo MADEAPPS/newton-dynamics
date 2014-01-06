@@ -98,6 +98,9 @@ class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dStrin
 	bool CoalesceNodesRule1 (dTreeNode* const nodeA, dTreeNode* const nodeB);
 	bool CoalesceNodesRule2 (dTreeNode* const nodeA, dTreeNode* const nodeB);
 	void SelectSpillVariableAndReWriteFunction();
+	void ReWriteFunctionSpillingVarible(const dString& spillVariable);
+	void SaveSpillRegister(dCIL::dListNode* const node, dTreeAdressStmt::dArg& argument, const dString& spillVariable, const dString& spillMemory);
+	void LoadSpillRegister(dCIL::dListNode* const node, dTreeAdressStmt::dArg& argument, const dString& spillVariable, const dString& spillMemory);
 
 
 	void SortRegisters(int totalRegisters);
