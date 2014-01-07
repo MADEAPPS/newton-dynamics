@@ -563,8 +563,9 @@ bool dDataFlowGraph::DoStatementAreachesStatementB(dCIL::dListNode* const stmtNo
 			}
 		}
 
-		if ((constStmt.m_arg1.m_type == dTreeAdressStmt::m_intVar) || (constStmt.m_arg1.m_type == dTreeAdressStmt::m_floatVar)) {
-			dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const definedStatements = m_variableDefinitions.Find(constStmt.m_arg1.m_label);
+        bool isSpecialStoreType = (constStmt.m_instruction == dTreeAdressStmt::m_storeBase);
+		if (isSpecialStoreType || (constStmt.m_arg1.m_type == dTreeAdressStmt::m_intVar) || (constStmt.m_arg1.m_type == dTreeAdressStmt::m_floatVar)) {
+			dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const definedStatements = isSpecialStoreType ? m_variableDefinitions.Find(constStmt.m_arg2.m_label) : m_variableDefinitions.Find(constStmt.m_arg1.m_label);
 			if (definedStatements) {
 				dTree<int, dCIL::dListNode*> path;
 				FindNodesInPathway(stmtNodeA, stmtNodeB, path);
