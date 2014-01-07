@@ -76,12 +76,14 @@
 %token _BOOLEAN 
 %token _FLOAT
 %token _DOUBLE
+%token _CONST 
 %token _VOID
 %token _CLASS
 %token _IMPORT
 %token _FINAL
 %token _PUBLIC
 %token _STATIC
+%token _NATIVE
 %token _PACKAGE
 %token _INTERFACE
 %token _IDENTIFIER
@@ -181,13 +183,13 @@ PrimitiveType
 Modifier
 	: _PUBLIC													{$$ = $1;} 
 	| _STATIC													{$$ = $1;} 
-	| _FINAL													{$$ = $1;} 	
+	| _NATIVE													{$$ = $1;} 
+//	| _FINAL													{$$ = $1;} 	
 //	| ABSTRACT													{$$ = $1;} 
 //	| PROTECTED													{$$ = $1;} 
 //	| PRIVATE													{$$ = $1;} 
 //	| TRANSIENT													{$$ = $1;} 
 //	| VOLATILE													{$$ = $1;} 
-//	| NATIVE													{$$ = $1;} 
 //	| SYNCHRONIZED												{$$ = $1;} 	
 	;
 	
@@ -417,6 +419,7 @@ FunctionName
 
 ClassFunctionDeclaration
 	: FunctionName FunctionProtoTypeParameters FunctionBody			{$$ = MyModule->FunctionAddBodyBlock($3);}
+    | FunctionName FunctionProtoTypeParameters _CONST FunctionBody	{$$ = MyModule->FunctionAddBodyBlock($3);}
 	;
 	
 ConstructorName

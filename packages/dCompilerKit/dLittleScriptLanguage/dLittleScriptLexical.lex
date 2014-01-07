@@ -96,8 +96,8 @@ dimensionOp			[\[][ \t\n\r]*[\]]
 // "sizeof"			{return dLittleScriptParser::_SIZEOF;}
 // "cast"			{return dLittleScriptParser::_CAST;}
 // "gui"			{return dLittleScriptParser::_GUI;}
-// "const"			{return dLittleScriptParser::_CONSTANT;}
-// "native"			{return dLittleScriptParser::_NATIVE;}
+
+
 // "extends"		{return dLittleScriptParser::_EXTENDS;}
 // "private"		{return dLittleScriptParser::_PRIVATE;}
 // "base"			{return dLittleScriptParser::_BASE;}
@@ -125,6 +125,7 @@ dimensionOp			[\[][ \t\n\r]*[\]]
 "int"				{return dLittleScriptParser::_INT;}
 "short"				{return dLittleScriptParser::_SHORT;}
 "long"				{return dLittleScriptParser::_LONG;}
+"const"			    {return dLittleScriptParser::_CONST;}
 "bool"				{return dLittleScriptParser::_BOOLEAN;}
 "float"				{return dLittleScriptParser::_FLOAT;}
 "double"			{return dLittleScriptParser::_DOUBLE;}
@@ -135,6 +136,7 @@ dimensionOp			[\[][ \t\n\r]*[\]]
 "final"				{return dLittleScriptParser::_FINAL;}
 "public"			{return dLittleScriptParser::_PUBLIC;}
 "static"			{return dLittleScriptParser::_STATIC;}
+"native"			{return dLittleScriptParser::_NATIVE;}
 "interface"			{return dLittleScriptParser::_INTERFACE;}
 
 
