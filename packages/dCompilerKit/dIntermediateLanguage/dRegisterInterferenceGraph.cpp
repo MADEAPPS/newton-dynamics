@@ -489,6 +489,7 @@ void dRegisterInterferenceGraph::SelectSpillVariableAndReWriteFunction()
 	for (stmtIter.Begin(); stmtIter; stmtIter ++) {
 		dDataFlowGraph::dDataFlowPoint& point = stmtIter.GetNode()->GetInfo();
 		dTreeAdressStmt& stmt = point.m_statement->GetInfo();	
+stmt.Trace();
 		switch (stmt.m_instruction)
 		{
 			case dTreeAdressStmt::m_loadBase:
@@ -588,7 +589,29 @@ void dRegisterInterferenceGraph::SelectSpillVariableAndReWriteFunction()
 					}
 					break;
 				}
+                
+   				case dTreeAdressStmt::m_load:
+                case dTreeAdressStmt::m_store:
+                {
+                    dTree<dVariableSpillPriority,dString>::dTreeNode* const priorityNode0 = spillPriority.Find(stmt.m_arg0.m_label);
+                    if (priorityNode0) {
+                        priorityNode0->GetInfo().m_useCount --;
+                        priorityNode0->GetInfo().m_loopUseCount ++;
+                    }
 
+                    dTree<dVariableSpillPriority,dString>::dTreeNode* const priorityNode1 = spillPriority.Find(stmt.m_arg1.m_label);
+                    if (priorityNode1) {
+                        priorityNode1->GetInfo().m_useCount --;
+                        priorityNode1->GetInfo().m_loopUseCount ++;
+                    }
+
+                    dTree<dVariableSpillPriority,dString>::dTreeNode* const priorityNode2 = spillPriority.Find(stmt.m_arg2.m_label);
+                    if (priorityNode2) {
+                        priorityNode2->GetInfo().m_useCount --;
+                        priorityNode2->GetInfo().m_loopUseCount ++;
+                    }
+   					break;
+                }
 
 /*
 				case dTreeAdressStmt::m_pop:
@@ -600,26 +623,6 @@ void dRegisterInterferenceGraph::SelectSpillVariableAndReWriteFunction()
 					stmt.m_arg0.m_label = GetRegisterName (stmt.m_arg0.m_label);
 					break;
 				}
-
-
-				case dTreeAdressStmt::m_load:
-				case dTreeAdressStmt::m_store:
-				{
-					stmt.m_arg0.m_label = GetRegisterName (stmt.m_arg0.m_label);
-					if (stmt.m_arg1.m_type == dTreeAdressStmt::m_intVar) {
-						stmt.m_arg1.m_label = GetRegisterName (stmt.m_arg1.m_label);
-					} else if (stmt.m_arg1.m_type == dTreeAdressStmt::m_floatVar) {
-						dAssert (0);
-					}
-
-					if (stmt.m_arg2.m_type == dTreeAdressStmt::m_intVar) {
-						stmt.m_arg2.m_label = GetRegisterName (stmt.m_arg2.m_label);
-					} else if (stmt.m_arg2.m_type == dTreeAdressStmt::m_floatVar) {
-						dAssert (0);
-					}
-					break;
-				}
-
 
 				case dTreeAdressStmt::m_alloc:
 				{
@@ -716,7 +719,7 @@ void dRegisterInterferenceGraph::LoadSpillRegister(dCIL::dListNode* const node, 
 
 void dRegisterInterferenceGraph::ReWriteFunctionSpillingVarible(const dString& spillVariable)
 {
-//m_flowGraph->m_cil->Trace();
+m_flowGraph->m_cil->Trace();
 
 	dString spillLocal = IndexToLocal(m_spillCount);
 	m_spillCount ++;
@@ -728,6 +731,7 @@ void dRegisterInterferenceGraph::ReWriteFunctionSpillingVarible(const dString& s
 //stmt.Trace();
 		switch (stmt.m_instruction)
 		{
+            case dTreeAdressStmt::m_pop:
 			case dTreeAdressStmt::m_loadBase:
 			{
 				SaveSpillRegister (node, stmt.m_arg0, spillVariable, spillLocal);
@@ -751,31 +755,29 @@ void dRegisterInterferenceGraph::ReWriteFunctionSpillingVarible(const dString& s
 				break;
 			}
 
-/*
+            case dTreeAdressStmt::m_load:
+            {
+                LoadSpillRegister (node, stmt.m_arg2, spillVariable, spillLocal);
+                LoadSpillRegister (node, stmt.m_arg1, spillVariable, spillLocal);
+                SaveSpillRegister (node, stmt.m_arg0, spillVariable, spillLocal);
+            }
+
 			case dTreeAdressStmt::m_store:
 			{
-				LoadRegisterFromTemp (node, stmt.m_arg0);
-				LoadRegisterFromTemp (node, stmt.m_arg1);
-				LoadRegisterFromTemp (node, stmt.m_arg2);
+                LoadSpillRegister (node, stmt.m_arg2, spillVariable, spillLocal);
+                LoadSpillRegister (node, stmt.m_arg1, spillVariable, spillLocal);
+                LoadSpillRegister (node, stmt.m_arg0, spillVariable, spillLocal);
 				break;
 			}
 
-			case dTreeAdressStmt::m_load:
-			{
-				LoadRegisterFromTemp (node, stmt.m_arg1);
-				LoadRegisterFromTemp (node, stmt.m_arg2);
-				SaveRegisterToTemp (node, stmt.m_arg0);
-				break;
-			}
-
-			case dTreeAdressStmt::m_push:
-			case dTreeAdressStmt::m_storeBase:
-			{
-				LoadRegisterFromTemp (node, stmt.m_arg0);
-				break;
-			}
-
-
+            case dTreeAdressStmt::m_push:
+            case dTreeAdressStmt::m_storeBase:
+            {
+               LoadSpillRegister (node, stmt.m_arg0, spillVariable, spillLocal);
+               break;
+            }
+/*
+			
 			case dTreeAdressStmt::m_alloc:
 			{
 				dAssert (0);
@@ -791,7 +793,7 @@ void dRegisterInterferenceGraph::ReWriteFunctionSpillingVarible(const dString& s
 				break;
 			}
 */
-			case dTreeAdressStmt::m_pop:
+			
 			case dTreeAdressStmt::m_nop:
 			case dTreeAdressStmt::m_ret:
 			case dTreeAdressStmt::m_goto:
@@ -808,7 +810,7 @@ void dRegisterInterferenceGraph::ReWriteFunctionSpillingVarible(const dString& s
 		}
 	}
 
-//m_flowGraph->m_cil->Trace();
+m_flowGraph->m_cil->Trace();
 	m_flowGraph->m_returnVariableName = GetReturnVariableName();
 	m_flowGraph->BuildBasicBlockGraph();
 	m_flowGraph->CalculateLiveInputLiveOutput ();
