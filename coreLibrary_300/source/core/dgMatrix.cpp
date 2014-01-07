@@ -607,10 +607,11 @@ void dgMatrix::PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, d
 	pureRotation[1] = pureRotation[1].Scale3 (invdet2);
 	pureRotation[2] = pureRotation[2].Scale3 (invdet2);
 
+	dgFloat32 sign = ((((*this)[0] * (*this)[1]) % (*this)[2]) > 0.0f) ? 1.0f : -1.0f;
 	dgFloat32 det = (pureRotation[0] * pureRotation[1]) % pureRotation[2];
 	if (dgAbsf (det - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f)) {
 		// this is a pure scale * rotation * translation
-		det = dgSqrt (det2);
+		det = sign * dgSqrt (det2);
 		scale[0] = det;
 		scale[1] = det;
 		scale[2] = det;
@@ -633,9 +634,9 @@ void dgMatrix::PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, d
 		// do this later (maybe by a given rotation around the non uniform axis but I do not know if it will work)
 		// for now just us the matrix
 
-		scale[0] = dgSqrt (scale[0]);
-		scale[1] = dgSqrt (scale[1]);
-		scale[2] = dgSqrt (scale[2]);
+		scale[0] = sign * dgSqrt (scale[0]);
+		scale[1] = sign * dgSqrt (scale[1]);
+		scale[2] = sign * dgSqrt (scale[2]);
 		scale[3] = dgFloat32 (0.0f);
 
 		dgMatrix scaledAxis;

@@ -595,10 +595,12 @@ void dMatrix::PolarDecomposition (dMatrix& transformMatrix, dVector& scale, dMat
 	pureRotation[1] = pureRotation[1].Scale (invdet2);
 	pureRotation[2] = pureRotation[2].Scale (invdet2);
 
+	//dFloat soureSign = ((*this)[0] * (*this)[1]) % (*this)[2];
+	dFloat sign = ((((*this)[0] * (*this)[1]) % (*this)[2]) > 0.0f) ? 1.0f : -1.0f;
 	dFloat det = (pureRotation[0] * pureRotation[1]) % pureRotation[2];
-	if (dAbs (det - 1.0f) < 1.e-5f) {
+	if (dAbs (det - 1.0f) < 1.e-5f){
 		// this is a pure scale * rotation * translation
-		det = dSqrt (det2);
+		det = sign * dSqrt (det2);
 		scale[0] = det;
 		scale[1] = det;
 		scale[2] = det;
@@ -620,18 +622,10 @@ void dMatrix::PolarDecomposition (dMatrix& transformMatrix, dVector& scale, dMat
 		// do this later (maybe by a given rotation around the non uniform axis but I do not know if it will work)
 		// for now just us the matrix
 
-		scale[0] = dSqrt (scale[0]);
-		scale[1] = dSqrt (scale[1]);
-		scale[2] = dSqrt (scale[2]);
+		scale[0] = sign * dSqrt (scale[0]);
+		scale[1] = sign * dSqrt (scale[1]);
+		scale[2] = sign * dSqrt (scale[2]);
 		scale[3] = 1.0f;
-
-
-//		scaledAxis[0] = stretchAxis[0].Scale (scale[0]);
-//		scaledAxis[1] = stretchAxis[1].Scale (scale[1]);
-//		scaledAxis[2] = stretchAxis[2].Scale (scale[2]);
-//		scaledAxis[3] = stretchAxis[3];
-//		dMatrix symetric (stretchAxis.Transpose() * scaledAxis);
-//		transformMatrix = symetric.Inverse4x4 () * (*this);
 
 		dMatrix scaledAxis;
 		scaledAxis[0] = stretchAxis[0].Scale (1.0f / scale[0]);

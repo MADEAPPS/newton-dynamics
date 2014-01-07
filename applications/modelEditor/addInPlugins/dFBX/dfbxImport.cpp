@@ -93,9 +93,10 @@ bool dfbxImport::Import (const char* const fileName, dPluginInterface* const int
 		dMatrix convertMatrix (GetIdentityMatrix());
 
 		const FbxSystemUnit& systemUnit = settings.GetSystemUnit();
-		convertMatrix[0][0] = dFloat (systemUnit.GetScaleFactor() / 100.0f);
-		convertMatrix[1][1] = dFloat (systemUnit.GetScaleFactor() / 100.0f);
-		convertMatrix[2][2] = dFloat (systemUnit.GetScaleFactor() / 100.0f);
+		dFloat scaleFactor = systemUnit.GetScaleFactor();
+		convertMatrix[0][0] = dFloat (scaleFactor / 100.0f);
+		convertMatrix[1][1] = dFloat (scaleFactor / 100.0f);
+		convertMatrix[2][2] = dFloat (scaleFactor / 100.0f);
 
 		int sign;
 		dVector upVector (0.0f, 1.0f, 0.0f, 0.0f);
