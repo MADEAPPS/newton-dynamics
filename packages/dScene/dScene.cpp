@@ -791,10 +791,6 @@ void dScene::FreezeGeometryPivot () const
 
 			dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*)GetInfoFromNode(sceneNodeParent);
 
-
-dMatrix xxx (sceneInfo->GetTransform());
-dFloat xx = (xxx[0] * xxx[1]) % xxx[2];
-
 			dMatrix geoScaleMatrix (sceneInfo->GetGeometryTransform());
 			sceneInfo->SetGeometryTransform(GetIdentityMatrix());
 
@@ -802,8 +798,6 @@ dFloat xx = (xxx[0] * xxx[1]) % xxx[2];
 			meshInfo->SetPivotMatrix (GetIdentityMatrix());
 
 			dMatrix marix (meshPivotMatrix * geoScaleMatrix);
-dFloat xx1 = (marix[0] * marix[1]) % marix[2];
-
 			meshInfo->BakeTransform (marix);
 		}
 	}
