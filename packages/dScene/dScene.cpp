@@ -691,7 +691,7 @@ dScene::dTreeNode* dScene::FindParentByType(dTreeNode* const childNode, dCRCTYPE
 }
 
 
-void dScene::FreezeScale () const
+void dScene::FreezeScale ()
 {
 	dList<dTreeNode*> nodeStack;
 	dList<dMatrix> parentMatrixStack;
@@ -725,16 +725,6 @@ void dScene::FreezeScale () const
 		sceneNodeInfo->SetTransform (matrix);
 
 		dMatrix scaleMatrix (GetIdentityMatrix(), scale, stretchAxis);
-//		for (void* ptr = GetFirstChildLink(rootNode); ptr; ptr = GetNextChildLink(rootNode, ptr)) {
-//			dTreeNode* const geomNode = GetNodeFromLink(ptr);
-//			if (GetInfoFromNode(geomNode)->IsType(dGeometryNodeInfo::GetRttiType())) {
-//				dGeometryNodeInfo* const geom = (dGeometryNodeInfo*)GetInfoFromNode(geomNode);
-//				if (!geoFilter.Find(geom)) {
-//					geom->BakeTransform (scaleMatrix);
-//					geoFilter.Insert(geom, geom);
-//				}
-//			}
-//		}
 		sceneNodeInfo->SetGeometryTransform (sceneNodeInfo->GetGeometryTransform() * scaleMatrix);
 
 		for (void* link = GetFirstChildLink(rootNode); link; link = GetNextChildLink(rootNode, link)) {
@@ -750,27 +740,23 @@ void dScene::FreezeScale () const
 
 
 
-void dScene::FreezeGeometryPivot () const
+void dScene::FreezeGeometryPivot ()
 {
-/*
-	Iterator iter (*this);
-	for (iter.Begin(); iter; iter ++) {
-		dAssert (0);
-		dTreeNode* const node = iter.GetNode();
-		dNodeInfo* const nodeInfo = GetInfoFromNode(node);
-		if (nodeInfo->IsType(dGeometryNodeInfo::GetRttiType())) {
-			dGeometryNodeInfo* const geom = (dGeometryNodeInfo*)nodeInfo;
-			dMatrix matrix (geom->GetPivotMatrix());
-			geom->SetPivotMatrix (GetIdentityMatrix());
-			geom->BakeTransform (matrix);
-		}
-	}
-*/
-
 	dScene::dTreeNode* const geometryCache = FindGetGeometryCacheNode ();
+
+
+	dList<dScene::dTreeNode*> nodeList;
 	for (void* link = GetFirstChildLink(geometryCache); link; link = GetNextChildLink(geometryCache, link)) {
 		dScene::dTreeNode* const meshNode = GetNodeFromLink(link);
-		dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*)GetInfoFromNode(meshNode);
+		nodeList.Addtop(meshNode);
+	}
+
+	dList<dScene::dTreeNode*>::dListNode* nextLink; 
+	for (dList<dScene::dTreeNode*>::dListNode* link = nodeList.GetFirst(); link; link = nextLink) {
+		nextLink = link->GetNext();
+
+		dScene::dTreeNode* const meshNode = GetNodeFromLink(link);
+		dMeshNodeInfo* meshInfo = (dMeshNodeInfo*)GetInfoFromNode(meshNode);
 		if (meshInfo->IsType(dMeshNodeInfo::GetRttiType())) {
 			int parentCount = 0;
 			dScene::dTreeNode* sceneNodeParent = NULL;
@@ -786,7 +772,17 @@ void dScene::FreezeGeometryPivot () const
 			}
 
 			if (parentCount > 1) {
-				dAssert (0);
+/*
+				RemoveReference (meshNode, sceneNodeParent);
+
+				dScene::dTreeNode* const meshNodeCopy = CreateMeshNode (sceneNodeParent);
+				dMeshNodeInfo* const meshInfoCopy = (dMeshNodeInfo*) CloneNodeInfo (meshNode);
+				SetNodeInfo (meshInfoCopy, meshNode);
+				meshInfoCopy->Release();
+
+				meshInfo = meshInfoCopy;
+				nextLink = link;
+*/
 			}
 
 			dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*)GetInfoFromNode(sceneNodeParent);
@@ -805,7 +801,7 @@ void dScene::FreezeGeometryPivot () const
 
 
 
-void dScene::BakeTransform (const dMatrix& matrix) const
+void dScene::BakeTransform (const dMatrix& matrix)
 {
 	Iterator iter (*this);
 	for (iter.Begin(); iter; iter ++) {
