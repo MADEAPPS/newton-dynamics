@@ -275,9 +275,6 @@
     <ProjectReference Include="..\..\thirdParty\tinyxml\vs2010_static_mt\tinyxml.vcxproj">
       <Project>{18e509cf-46d2-4749-b3bb-160937cf2481}</Project>
     </ProjectReference>
-    <ProjectReference Include="dAnimation.vcxproj">
-      <Project>{e3c14351-bad1-4add-ab9a-31054d6e7cdb}</Project>
-    </ProjectReference>
     <ProjectReference Include="dContainers.vcxproj">
       <Project>{f67c4593-a914-4ddf-8cb5-c59a3ef3ece0}</Project>
     </ProjectReference>

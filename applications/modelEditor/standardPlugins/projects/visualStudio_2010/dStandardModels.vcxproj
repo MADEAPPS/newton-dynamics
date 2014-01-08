@@ -242,12 +242,6 @@ xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/stdPlugins/*.*"  /
     <ProjectReference Include="..\..\..\..\..\coreLibrary_300\projects\windows\project_vs2010_dll\newton.vcxproj">
       <Project>{68d9962c-0ec7-445a-b0fd-f87b16d43901}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\packages\projects\visualStudio_2010_dll\dAILibrary.vcxproj">
-      <Project>{2f95c24f-6935-4288-a71c-dab402e4eabc}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\packages\projects\visualStudio_2010_dll\dAnimation.vcxproj">
-      <Project>{e3c14351-bad1-4add-ab9a-31054d6e7cdb}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\packages\projects\visualStudio_2010_dll\dContainers.vcxproj">
       <Project>{f67c4593-a914-4ddf-8cb5-c59a3ef3ece0}</Project>
     </ProjectReference>
