@@ -488,19 +488,40 @@ void dRegisterInterferenceGraph::SelectSpillVariableAndReWriteFunction()
 
 	for (stmtIter.Begin(); stmtIter; stmtIter ++) {
 		dDataFlowGraph::dDataFlowPoint& point = stmtIter.GetNode()->GetInfo();
-		dTreeAdressStmt& stmt = point.m_statement->GetInfo();	
-stmt.Trace();
+//		dTreeAdressStmt& stmt = point.m_statement->GetInfo();	
+//stmt.Trace();
+
+        if (point.m_generatedVariable.GetStr()) {
+            dTree<dVariableSpillPriority,dString>::dTreeNode* node = spillPriority.Find(point.m_generatedVariable);
+            if (!node) {
+                node = spillPriority.Insert(point.m_generatedVariable);
+            }
+            node->GetInfo().m_useCount += 1;
+        }
+
+        dDataFlowGraph::dDataFlowPoint::dVariableSet<dString>::Iterator usedIter (point.m_usedVariableSet);
+        for (usedIter.Begin(); usedIter; usedIter ++) {
+            const dString& key = usedIter.GetKey();
+            dTree<dVariableSpillPriority,dString>::dTreeNode* node = spillPriority.Find(key);
+            if (!node) {
+                node = spillPriority.Insert(key);
+            }
+            node->GetInfo().m_useCount += 1;
+        }
+
+/*
 		switch (stmt.m_instruction)
 		{
 			case dTreeAdressStmt::m_loadBase:
 			case dTreeAdressStmt::m_storeBase:
 			{
-				dAssert (point.m_generatedVariable.GetStr());
-				dTree<dVariableSpillPriority,dString>::dTreeNode* node = spillPriority.Find(point.m_generatedVariable);
-				if (!node) {
-					node = spillPriority.Insert(point.m_generatedVariable);
-				}
-				node->GetInfo().m_useCount += 1;
+				if (point.m_generatedVariable.GetStr() {
+				    dTree<dVariableSpillPriority,dString>::dTreeNode* node = spillPriority.Find(point.m_generatedVariable);
+				    if (!node) {
+					    node = spillPriority.Insert(point.m_generatedVariable);
+				    }
+				    node->GetInfo().m_useCount += 1;
+                }
 				break;
 			}
 
@@ -525,6 +546,7 @@ stmt.Trace();
 				}
 			}
 		}
+*/
 	}
 
 
