@@ -206,6 +206,7 @@ xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/stdPlugins/*.*"  /
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\dStandardModels\dBoxCollision.cpp" />
+    <ClCompile Include="..\..\dStandardModels\dFreezeScale.cpp" />
     <ClCompile Include="..\..\dStandardModels\dMeshBoxPrimitive.cpp" />
     <ClCompile Include="..\..\dStandardModels\dPolygonizeSelections.cpp" />
     <ClCompile Include="..\..\dStandardModels\dRigidBody.cpp" />
@@ -223,6 +224,7 @@ xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/stdPlugins/*.*"  /
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dStandardModels\dBoxCollision.h" />
+    <ClInclude Include="..\..\dStandardModels\dFreezeScale.h" />
     <ClInclude Include="..\..\dStandardModels\dMeshBoxPrimitive.h" />
     <ClInclude Include="..\..\dStandardModels\dPolygonizeSelections.h" />
     <ClInclude Include="..\..\dStandardModels\dRigidBody.h" />

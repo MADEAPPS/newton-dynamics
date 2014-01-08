@@ -148,7 +148,7 @@ class dScene: public dSceneGraph, public dRefCounter
 	DSCENE_API virtual dFloat RayCast (const dVector& p0, const dVector& p1, dList<dTreeNode*>& traceRoot) const;
 
 	DSCENE_API virtual void FreezeScale () const;
-//	DSCENE_API virtual void FreezePivot () const;
+	DSCENE_API virtual void FreezeGeometryPivot () const;
 	DSCENE_API virtual void BakeTransform (const dMatrix& matrix) const;
 	
 	DSCENE_API virtual int GetRevision() const;

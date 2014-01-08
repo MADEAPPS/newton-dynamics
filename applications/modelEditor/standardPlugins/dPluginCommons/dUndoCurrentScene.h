@@ -23,8 +23,8 @@ enum dUndodeRedoMode;
 class dUndoCurrentScene: public dUndoRedo
 {
 	public:
-	dUndoCurrentScene(dPluginInterface* const interface, dPluginScene* const deltaScene);
-	virtual ~dUndoCurrentScene();
+	DPLUGIN_API dUndoCurrentScene(dPluginInterface* const interface, dPluginScene* const deltaScene);
+	DPLUGIN_API virtual ~dUndoCurrentScene();
 
 	protected:
 	virtual void RestoreState (dUndodeRedoMode mode);

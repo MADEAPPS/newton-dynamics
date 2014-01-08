@@ -50,17 +50,19 @@ void dfbxExport::Export (const char* const fileName, dPluginInterface* const int
 	FbxManager* const fbxSdk = FbxManager::Create();
 	dAssert (fbxSdk);
 
-	// for FBX formats, try sitting ascii format
 	int fileFormat = -1;
-	int formatsCount = fbxSdk->GetIOPluginRegistry()->GetWriterFormatCount();
-	for (int i = 0; i < formatsCount; i++)
-	{
-		if (fbxSdk->GetIOPluginRegistry()->WriterIsFBX(i)) {
-			const FbxString& lDesc = fbxSdk->GetIOPluginRegistry()->GetWriterFormatDescription(i);
-			if (lDesc.Find("ascii") >= 0)
-			{
-				fileFormat = i;
-				break;
+	if (!stricmp (m_ext, "*.fbx")) {
+		// for FBX formats, try sitting ascii format
+		int formatsCount = fbxSdk->GetIOPluginRegistry()->GetWriterFormatCount();
+		for (int i = 0; i < formatsCount; i++)
+		{
+			if (fbxSdk->GetIOPluginRegistry()->WriterIsFBX(i)) {
+				const FbxString& lDesc = fbxSdk->GetIOPluginRegistry()->GetWriterFormatDescription(i);
+				if (lDesc.Find("ascii") >= 0)
+				{
+					fileFormat = i;
+					break;
+				}
 			}
 		}
 	}
@@ -78,7 +80,7 @@ void dfbxExport::Export (const char* const fileName, dPluginInterface* const int
 		dPluginScene* const ngdScene = interface->GetScene();
 		dAssert (ngdScene);
 
-		// rotat scene 90 degree aroun teh y axis
+		// rotate scene 90 degree around the y axis
 		dMatrix rotateScene (GetZeroMatrix());
 		rotateScene[0][2] = -1.0f;
 		rotateScene[1][1] = 1.0f;
@@ -155,6 +157,7 @@ void dfbxExport::LoadNode (dPluginScene* const ngdScene, FbxScene* const fbxScen
 
 	{
 		dMatrix matrix (nodeInfo->GetTransform());
+		//dAssert (((matrix.m_front * matrix.m_up) % matrix.m_right) > 0.0f);
 		dVector scale;
 		dMatrix stretchAxis;
 		dMatrix transformMatrix; 
@@ -171,6 +174,7 @@ void dfbxExport::LoadNode (dPluginScene* const ngdScene, FbxScene* const fbxScen
 
 	{
 		dMatrix matrix (nodeInfo->GetGeometryTransform());
+		//dAssert (((matrix.m_front * matrix.m_up) % matrix.m_right) > 0.0f);
 		dVector scale;
 		dMatrix stretchAxis;
 		dMatrix transformMatrix; 
@@ -327,6 +331,7 @@ void dfbxExport::BuildMeshes (dPluginScene* const ngdScene, FbxScene* const fbxS
 				meshMap.Insert(fbxMesh, ngdMeshNode);
 
 				dMatrix matrix (meshInfo->GetPivotMatrix());
+				dAssert (((matrix.m_front * matrix.m_up) % matrix.m_right) > 0.0f);
 				FbxAMatrix fbxMatrix;
 				double* const data = fbxMatrix;
 				for (int i = 0; i < 4; i ++) {

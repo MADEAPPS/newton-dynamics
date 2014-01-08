@@ -348,6 +348,8 @@ void dfbxImport::ImportMeshNode (FbxScene* const fbxScene, dPluginScene* const n
 											   &uv0Array[0].m_x, sizeof (dVector), uv0Index,
 											   &uv1Array[0].m_x, sizeof (dVector), uv1Index);
 
+		// some meshes has degenerated faces we must repair them to be leagal manifold
+		instance->RepairTJoints();
 
 		delete[] uv1Array;
 		delete[] uv0Array;

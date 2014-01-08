@@ -21,6 +21,7 @@
 
 #include "dMeshNGD.h"
 #include "dRigidBody.h"
+#include "dFreezeScale.h"
 #include "dBoxCollision.h"
 #include "dStandardModel.h"
 #include "dSphereCollision.h"
@@ -39,6 +40,8 @@ dPluginRecord** GetPluginArray()
 		//dBoxCollision::GetPlugin(),
 		//dStandardModel::GetPlugin(),
 		//dSphereCollision::GetPlugin(),
+		dFreezeSceneScale::GetPlugin(),
+		dFreezeGeometryScale::GetPlugin(),
 		dMeshBoxPrimitive::GetPlugin(),
 		dMeshTriangulateMesh::GetPlugin(),
 		dPolygonizeSelections::GetPlugin(),

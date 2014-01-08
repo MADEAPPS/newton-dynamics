@@ -748,9 +748,11 @@ void dScene::FreezeScale () const
 	}
 }
 
-/*
-void dScene::FreezePivot () const
+
+
+void dScene::FreezeGeometryPivot () const
 {
+/*
 	Iterator iter (*this);
 	for (iter.Begin(); iter; iter ++) {
 		dAssert (0);
@@ -763,22 +765,51 @@ void dScene::FreezePivot () const
 			geom->BakeTransform (matrix);
 		}
 	}
-}
 */
 
-/*
-void dScene::FreezeGeometryPivot () const
-{
-	dTreeNode* const meshCache = FindGetGeometryCacheNode();
-	for (void* link = GetFirstChildLink(meshCache); link; link = GetNextChildLink(meshCache, link)) {
-		dTreeNode* const meshNode = GetNodeFromLink(link);
-		dGeometryNodeInfo* const geom = (dGeometryNodeInfo*)GetInfoFromNode(meshNode);
-		dMatrix matrix (geom->GetPivotMatrix());
-		geom->SetPivotMatrix (GetIdentityMatrix());
-		geom->BakeTransform (matrix);
+	dScene::dTreeNode* const geometryCache = FindGetGeometryCacheNode ();
+	for (void* link = GetFirstChildLink(geometryCache); link; link = GetNextChildLink(geometryCache, link)) {
+		dScene::dTreeNode* const meshNode = GetNodeFromLink(link);
+		dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*)GetInfoFromNode(meshNode);
+		if (meshInfo->IsType(dMeshNodeInfo::GetRttiType())) {
+			int parentCount = 0;
+			dScene::dTreeNode* sceneNodeParent = NULL;
+			for (void* meshParentlink = GetFirstParentLink(meshNode); meshParentlink; meshParentlink = GetNextChildLink(meshNode, meshParentlink)) {
+				dScene::dTreeNode* const parentNode = GetNodeFromLink(meshParentlink);
+				dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*)GetInfoFromNode(parentNode);
+				if (sceneInfo->IsType(dSceneNodeInfo::GetRttiType())) {
+					parentCount ++;
+					if (!sceneNodeParent) {
+						sceneNodeParent = parentNode;
+					}
+				}
+			}
+
+			if (parentCount > 1) {
+				dAssert (0);
+			}
+
+			dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*)GetInfoFromNode(sceneNodeParent);
+
+
+dMatrix xxx (sceneInfo->GetTransform());
+dFloat xx = (xxx[0] * xxx[1]) % xxx[2];
+
+			dMatrix geoScaleMatrix (sceneInfo->GetGeometryTransform());
+			sceneInfo->SetGeometryTransform(GetIdentityMatrix());
+
+			dMatrix meshPivotMatrix (meshInfo->GetPivotMatrix());
+			meshInfo->SetPivotMatrix (GetIdentityMatrix());
+
+			dMatrix marix (meshPivotMatrix * geoScaleMatrix);
+dFloat xx1 = (marix[0] * marix[1]) % marix[2];
+
+			meshInfo->BakeTransform (marix);
+		}
 	}
 }
-*/
+
+
 
 void dScene::BakeTransform (const dMatrix& matrix) const
 {
