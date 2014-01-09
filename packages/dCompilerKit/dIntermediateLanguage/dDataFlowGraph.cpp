@@ -205,6 +205,8 @@ void dDataFlowGraph::BuildGeneratedAndKillStatementSets()
 	for (dCIL::dListNode* ptr = m_function; ptr; ptr = ptr->GetNext()) {
 
 		dTreeAdressStmt& stmt = ptr->GetInfo();	
+
+//stmt.Trace();
 		switch (stmt.m_instruction)
 		{
 			case dTreeAdressStmt::m_assigment:
@@ -260,8 +262,6 @@ void dDataFlowGraph::BuildGeneratedAndKillStatementSets()
 			{
 				dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const node = m_variableDefinitions.Insert(stmt.m_arg0.m_label);
 				node->GetInfo().Append(ptr);
-
-				statementUsingReturnVariable.Insert(ptr);
 				break;
 			}
 
@@ -275,7 +275,6 @@ void dDataFlowGraph::BuildGeneratedAndKillStatementSets()
 				}
 				break;
 			}
-
 
 			case dTreeAdressStmt::m_push:
 			{
@@ -519,6 +518,7 @@ void dDataFlowGraph::FindNodesInPathway(dCIL::dListNode* const source, dCIL::dLi
 	m_mark ++;
 	dList<dDataFlowPoint*> queue; 
 	queue.Append(&m_dataFlowGraph.Find(source)->GetInfo());
+	dAssert (queue.GetFirst()->GetInfo()->m_statement == source);
 
 	while (queue.GetCount()) {
 		dDataFlowPoint* const rootNode = queue.GetFirst()->GetInfo();
@@ -535,7 +535,7 @@ void dDataFlowGraph::FindNodesInPathway(dCIL::dListNode* const source, dCIL::dLi
 			}
 		}
 	}
-
+//	pathOut.Remove(source);
 }
 
 
@@ -572,6 +572,7 @@ bool dDataFlowGraph::DoStatementAreachesStatementB(dCIL::dListNode* const stmtNo
 				dList<dCIL::dListNode*>& statementList = definedStatements->GetInfo();
 				for (dList<dCIL::dListNode*>::dListNode* ptr = statementList.GetFirst(); ptr; ptr = ptr->GetNext()) {
 					dCIL::dListNode* const stmt = ptr->GetInfo();
+//stmt->GetInfo().Trace();
 					if (path.Find(stmt)) {
 						return false;
 					}
@@ -620,9 +621,24 @@ void dDataFlowGraph::BuildGeneratedAndUsedlVariableSets()
 				break;
 			}
 
+			case dTreeAdressStmt::m_storeBase:
+			{
+				point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
+				point.m_usedVariableSet.Insert(stmt.m_arg2.m_label);
+				break;
+			}
+
 			case dTreeAdressStmt::m_load:
 			{
 				point.m_generatedVariable = stmt.m_arg0.m_label;
+				point.m_usedVariableSet.Insert(stmt.m_arg1.m_label);
+				point.m_usedVariableSet.Insert(stmt.m_arg2.m_label);
+				break;
+			}
+
+			case dTreeAdressStmt::m_store:
+			{
+				point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
 				point.m_usedVariableSet.Insert(stmt.m_arg1.m_label);
 				point.m_usedVariableSet.Insert(stmt.m_arg2.m_label);
 				break;
@@ -675,21 +691,6 @@ void dDataFlowGraph::BuildGeneratedAndUsedlVariableSets()
 				if (m_returnType != dCIL::m_void) {
 					point.m_usedVariableSet.Insert(m_returnVariableName);
 				}
-				break;
-			}
-
-			case dTreeAdressStmt::m_store:
-			{
-				point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
-				point.m_usedVariableSet.Insert(stmt.m_arg1.m_label);
-				point.m_usedVariableSet.Insert(stmt.m_arg2.m_label);
-				break;
-			}
-
-			case dTreeAdressStmt::m_storeBase:
-			{
-				point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
-				point.m_usedVariableSet.Insert(stmt.m_arg2.m_label);
 				break;
 			}
 
@@ -1065,6 +1066,7 @@ bool dDataFlowGraph::ApplyCopyPropagation()
             {
                 for (dCIL::dListNode* stmtNode1 = stmtNode->GetNext(); stmtNode1; stmtNode1 = stmtNode1->GetNext()) {
                     dTreeAdressStmt& stmt1 = stmtNode1->GetInfo();
+//stmt1.Trace();
                     switch (stmt1.m_instruction)
                     {
                         case dTreeAdressStmt::m_assigment:

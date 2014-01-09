@@ -20,7 +20,7 @@
 inline dString IndexToRegister(int index)
 {
 	char regName[256];
-	sprintf (regName, "%c%d", D_REGISTER_SYMBOL, index);
+	sprintf (regName, "%s%d", D_REGISTER_SYMBOL, index);
 	return regName;			
 }
 
