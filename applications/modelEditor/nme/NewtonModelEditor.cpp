@@ -609,7 +609,10 @@ void NewtonModelEditor::OnTool (wxCommandEvent& event)
 
 	wxProgressDialog progressDlg (wxT("Please wait"), wxT(plugin->GetFileDescription ()), 1000, NULL, wxPD_APP_MODAL | wxPD_AUTO_HIDE | wxPD_CAN_ABORT);
 	m_currentProgress = &progressDlg;
-	plugin->Execute(this);
+	if (plugin->Execute(this)) {
+		m_explorer->ReconstructScene(GetScene());
+		RefrehViewports();
+	}
 	m_currentProgress = NULL;
 }
 

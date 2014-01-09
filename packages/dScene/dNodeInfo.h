@@ -115,6 +115,7 @@ class dNodeInfo: public dClassInfo, public dVariableList
 
 	virtual void BakeTransform (const dMatrix& transform){};
 	virtual unsigned GetUniqueID() const {return m_uniqueID;}
+	virtual void SetUniqueID(unsigned id) {m_uniqueID = id;}
 
 	static dNodeInfo* CreateFromClassName (const char* const className, dScene* const world);
 	static dTree<const dNodeInfo*, dCRCTYPE>& GetSingletonDictionary();

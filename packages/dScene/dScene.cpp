@@ -772,17 +772,18 @@ void dScene::FreezeGeometryPivot ()
 			}
 
 			if (parentCount > 1) {
-/*
-				RemoveReference (meshNode, sceneNodeParent);
 
 				dScene::dTreeNode* const meshNodeCopy = CreateMeshNode (sceneNodeParent);
 				dMeshNodeInfo* const meshInfoCopy = (dMeshNodeInfo*) CloneNodeInfo (meshNode);
-				SetNodeInfo (meshInfoCopy, meshNode);
+				dString name (dString (meshInfo->GetName()) + dString ("_clone"));
+				meshInfoCopy->SetName(name.GetStr());
+				SetNodeInfo (meshInfoCopy, meshNodeCopy);
 				meshInfoCopy->Release();
+
+				RemoveReference (meshNode, sceneNodeParent);
 
 				meshInfo = meshInfoCopy;
 				nextLink = link;
-*/
 			}
 
 			dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*)GetInfoFromNode(sceneNodeParent);
