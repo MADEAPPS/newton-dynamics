@@ -15,8 +15,9 @@ public class sieves
 {
 	public sieves (int n)	
 	{
+        new int [n];
+/*
 		int[] m_data = new int [n];
-		
 		//Initialize the first n integer array
 		for (int i = 0; i < n; i ++) {
 			m_data[i] = i;
@@ -28,8 +29,9 @@ public class sieves
 				for(int j = i; j * i < n; j = j + 1) 
 					//mark all integers who are multiple of i
 					m_data[j * i] = 0;
+*/
 	}
 	
-	int[] m_data;
+//	int[] m_data;
 }
 

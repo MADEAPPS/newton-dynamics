@@ -32,6 +32,7 @@ dRegisterInterferenceGraph::dRegisterInterferenceGraph (dDataFlowGraph* const fl
 	Build();
 	while (ColorGraph () > m_registerCount) {
 		// we have a spill, find a good spill node and try graph coloring again
+dAssert (0);
 		SelectSpillVariableAndReWriteFunction();
 	}
 

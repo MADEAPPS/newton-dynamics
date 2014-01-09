@@ -250,6 +250,7 @@ void dDataFlowGraph::BuildGeneratedAndKillStatementSets()
 				break;
 			}
 
+            
 			case dTreeAdressStmt::m_store:
 			{
 				if (stmt.m_arg0.m_label == m_returnVariableName) {
@@ -275,6 +276,26 @@ void dDataFlowGraph::BuildGeneratedAndKillStatementSets()
 				}
 				break;
 			}
+
+            case dTreeAdressStmt::m_alloc:
+            {
+                dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const node = m_variableDefinitions.Insert(stmt.m_arg0.m_label);
+                node->GetInfo().Append(ptr);
+
+                if (stmt.m_arg1.m_label == m_returnVariableName) {
+                    statementUsingReturnVariable.Insert(ptr);
+                }
+                break;
+             }
+
+            case dTreeAdressStmt::m_free:
+            {
+                if (stmt.m_arg0.m_label == m_returnVariableName) {
+                    statementUsingReturnVariable.Insert(ptr);
+                }
+                break;
+            }
+
 
 			case dTreeAdressStmt::m_push:
 			{
@@ -1690,14 +1711,12 @@ bool dDataFlowGraph::ApplyLoopOptimization(dLoop& loop)
 
 void dDataFlowGraph::ApplyLocalOptimizations()
 {
-//m_cil->Trace();
-
 	m_mark += 2;
 	BuildBasicBlockGraph();
-//m_basicBlocks.Trace();
+m_cil->Trace();
 
 	ApplyIfStatementsSimplification();
-//m_basicBlocks.Trace();
+//m_cil->Trace();
 
 	CalculateReachingDefinitions();
 	for (bool optimized = true; optimized;) {
