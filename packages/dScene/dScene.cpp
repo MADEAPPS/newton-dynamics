@@ -760,7 +760,7 @@ void dScene::FreezeGeometryPivot ()
 		if (meshInfo->IsType(dMeshNodeInfo::GetRttiType())) {
 			int parentCount = 0;
 			dScene::dTreeNode* sceneNodeParent = NULL;
-			for (void* meshParentlink = GetFirstParentLink(meshNode); meshParentlink; meshParentlink = GetNextChildLink(meshNode, meshParentlink)) {
+			for (void* meshParentlink = GetFirstParentLink(meshNode); meshParentlink; meshParentlink = GetNextParentLink(meshNode, meshParentlink)) {
 				dScene::dTreeNode* const parentNode = GetNodeFromLink(meshParentlink);
 				dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*)GetInfoFromNode(parentNode);
 				if (sceneInfo->IsType(dSceneNodeInfo::GetRttiType())) {
@@ -774,12 +774,16 @@ void dScene::FreezeGeometryPivot ()
 			if (parentCount > 1) {
 
 				dScene::dTreeNode* const meshNodeCopy = CreateMeshNode (sceneNodeParent);
+				for (void* matLinks = GetFirstChildLink(meshNode); matLinks; matLinks = GetNextChildLink(meshNode, matLinks)) {
+					dScene::dTreeNode* const matNode = GetNodeFromLink(matLinks);
+					AddReference(meshNodeCopy, matNode);
+				}
+
 				dMeshNodeInfo* const meshInfoCopy = (dMeshNodeInfo*) CloneNodeInfo (meshNode);
 				dString name (dString (meshInfo->GetName()) + dString ("_clone"));
 				meshInfoCopy->SetName(name.GetStr());
 				SetNodeInfo (meshInfoCopy, meshNodeCopy);
 				meshInfoCopy->Release();
-
 				RemoveReference (meshNode, sceneNodeParent);
 
 				meshInfo = meshInfoCopy;
