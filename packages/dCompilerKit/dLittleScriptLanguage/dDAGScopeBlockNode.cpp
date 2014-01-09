@@ -71,7 +71,7 @@ void dDAGScopeBlockNode::CompileCIL(dCIL& cil)
 
 	for (dList<dString>::dListNode* node = m_allocations.GetLast(); node; node = node->GetPrev()) {
 		dTreeAdressStmt& allocationStmt = cil.NewStatement()->GetInfo();
-		allocationStmt.m_instruction = dTreeAdressStmt::m_free;
+		allocationStmt.m_instruction = dTreeAdressStmt::m_release;
 		allocationStmt.m_arg0.m_label = node->GetInfo();
 		DTRACE_INTRUCTION (&allocationStmt);
 	}

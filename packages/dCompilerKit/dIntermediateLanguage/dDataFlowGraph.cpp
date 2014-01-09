@@ -277,7 +277,7 @@ void dDataFlowGraph::BuildGeneratedAndKillStatementSets()
 				break;
 			}
 
-            case dTreeAdressStmt::m_alloc:
+            case dTreeAdressStmt::m_new:
             {
                 dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const node = m_variableDefinitions.Insert(stmt.m_arg0.m_label);
                 node->GetInfo().Append(ptr);
@@ -288,7 +288,7 @@ void dDataFlowGraph::BuildGeneratedAndKillStatementSets()
                 break;
              }
 
-            case dTreeAdressStmt::m_free:
+            case dTreeAdressStmt::m_release:
             {
                 if (stmt.m_arg0.m_label == m_returnVariableName) {
                     statementUsingReturnVariable.Insert(ptr);
@@ -685,14 +685,14 @@ void dDataFlowGraph::BuildGeneratedAndUsedlVariableSets()
 				break;
 			}
 
-			case dTreeAdressStmt::m_alloc:
+			case dTreeAdressStmt::m_new:
 			{
 				point.m_generatedVariable = stmt.m_arg0.m_label;
 				point.m_usedVariableSet.Insert(stmt.m_arg1.m_label);
 				break;
 			}
 
-			case dTreeAdressStmt::m_free:
+			case dTreeAdressStmt::m_release:
 			{
 				point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
 				break;

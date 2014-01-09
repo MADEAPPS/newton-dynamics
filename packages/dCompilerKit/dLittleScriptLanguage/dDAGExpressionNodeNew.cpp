@@ -58,7 +58,7 @@ void dDAGExpressionNodeNew::CompileCIL(dCIL& cil)
 	DTRACE_INTRUCTION (&arraySizeInBytes);
 
 	dTreeAdressStmt& operatorNewInstruction = cil.NewStatement()->GetInfo();
-	operatorNewInstruction.m_instruction = dTreeAdressStmt::m_alloc;
+	operatorNewInstruction.m_instruction = dTreeAdressStmt::m_new;
 	operatorNewInstruction.m_arg0.m_label = cil.NewTemp();
 	operatorNewInstruction.m_arg1.m_label = arraySizeInBytes.m_arg0.m_label; 
 	DTRACE_INTRUCTION (&operatorNewInstruction);

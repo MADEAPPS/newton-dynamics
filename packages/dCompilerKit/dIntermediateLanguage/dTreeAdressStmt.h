@@ -67,9 +67,10 @@ class dTreeAdressStmt
 	{
 		m_nop,
 		m_call,
-		m_alloc,
-		m_free,
-		m_ret,
+        m_ret,
+		m_new,
+		m_release,
+        m_reference,
 		m_if, 
 		m_enter,
 		m_leave,

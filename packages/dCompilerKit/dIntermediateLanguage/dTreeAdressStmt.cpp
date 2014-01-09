@@ -286,17 +286,23 @@ void dTreeAdressStmt::Trace (char* const textOut) const
 			break;
 		}
 		
-		case m_alloc:
+		case m_new:
 		{
-			sprintf (textOut, "\t%s = alloc %s\n", m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
+			sprintf (textOut, "\t%s = new %s\n", m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
 			break;
 		}
 
-		case m_free:
+		case m_release:
 		{
-			sprintf (textOut, "\tfree %s\n", m_arg0.m_label.GetStr());
+			sprintf (textOut, "\trelease %s\n", m_arg0.m_label.GetStr());
 			break;
 		}
+
+        case m_reference:
+        {
+            sprintf (textOut, "\t%s = reference %s\n", m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
+            break;
+        }
 
 
 		case m_ret:

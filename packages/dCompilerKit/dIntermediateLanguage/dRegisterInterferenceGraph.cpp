@@ -79,7 +79,7 @@ void dRegisterInterferenceGraph::AllocateRegisters ()
 
 			case dTreeAdressStmt::m_pop:
 			case dTreeAdressStmt::m_push:
-			case dTreeAdressStmt::m_free:
+			case dTreeAdressStmt::m_release:
 			case dTreeAdressStmt::m_loadBase:
 			case dTreeAdressStmt::m_storeBase:
 			{
@@ -107,7 +107,7 @@ void dRegisterInterferenceGraph::AllocateRegisters ()
 			}
 
 
-			case dTreeAdressStmt::m_alloc:
+			case dTreeAdressStmt::m_new:
 			{
 				stmt.m_arg0.m_label = GetRegisterName (stmt.m_arg0.m_label);
 				stmt.m_arg1.m_label = GetRegisterName (stmt.m_arg1.m_label);
