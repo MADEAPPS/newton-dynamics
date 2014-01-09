@@ -316,7 +316,7 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewExpressionNodeLogiOperator (c
 
 	_ASSERTE (GetCurrentScope());
 	dDAGExpressionNodeLogicOperator* const node = new dDAGExpressionNodeLogicOperator (m_allNodes, logOperator, (dDAGExpressionNode*)expressionA.m_node, (dDAGExpressionNode*)expressionB.m_node);
-_ASSERTE (0);
+
 //	expressionA.m_node->Release();
 //	expressionB.m_node->Release();
 	returnNode.m_node = node;

@@ -26,7 +26,7 @@ dDAGExpressionNodeLogicOperator::dDAGExpressionNodeLogicOperator(
 	,m_expressionA (expressionA)
 	,m_expressionB (expressionB)
 {
-	_ASSERTE (0);
+//	_ASSERTE (0);
 //	m_expressionA->AddRef();
 //	m_expressionB->AddRef();
 }

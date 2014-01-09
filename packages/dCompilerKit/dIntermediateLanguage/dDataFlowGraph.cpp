@@ -868,7 +868,6 @@ bool dDataFlowGraph::ApplyConstantPropagation()
 						} else if (m_cil->m_commutativeOperator[stmt1.m_operator]) {
 							
 							if ((stmt1.m_arg1.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
-								dAssert (0);
 								ret = true;
 								stmt1.m_arg1 = stmt1.m_arg2;
 								stmt1.m_arg2 = stmt.m_arg1;
