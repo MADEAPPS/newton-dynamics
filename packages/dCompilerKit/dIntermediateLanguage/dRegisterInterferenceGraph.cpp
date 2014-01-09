@@ -572,6 +572,19 @@ void dRegisterInterferenceGraph::SelectSpillVariableAndReWriteFunction()
 					}
 					break;
 				}
+
+				case dTreeAdressStmt::m_pop:
+				case dTreeAdressStmt::m_push:
+				case dTreeAdressStmt::m_storeBase:
+				case dTreeAdressStmt::m_loadBase:
+				{
+					dTree<dVariableSpillPriority,dString>::dTreeNode* const priorityNode0 = spillPriority.Find(stmt.m_arg0.m_label);
+					if (priorityNode0) {
+						priorityNode0->GetInfo().m_useCount --;
+						priorityNode0->GetInfo().m_loopUseCount ++;
+					}
+					break;
+				}
                 
    				case dTreeAdressStmt::m_load:
                 case dTreeAdressStmt::m_store:
@@ -597,15 +610,8 @@ void dRegisterInterferenceGraph::SelectSpillVariableAndReWriteFunction()
                 }
 
 /*
-				case dTreeAdressStmt::m_pop:
-				case dTreeAdressStmt::m_push:
 				case dTreeAdressStmt::m_free:
-				case dTreeAdressStmt::m_loadBase:
-				case dTreeAdressStmt::m_storeBase:
-				{
-					stmt.m_arg0.m_label = GetRegisterName (stmt.m_arg0.m_label);
-					break;
-				}
+
 
 				case dTreeAdressStmt::m_alloc:
 				{
