@@ -97,13 +97,39 @@ public:
 	{
 
 		NewtonDemos* const mainWindow = m_scene->GetRootWindow();
+
+        int key = 0;
+        static dLong timer = dGetTimeInMicrosenconds() + 100000;
+        if (dGetTimeInMicrosenconds() > timer) {
+            timer = dGetTimeInMicrosenconds() + 100000;
+            key = mainWindow->GetKeyState('R');
+        }
+        dVector dir = GetLookAtDirction(m_scene);
+        dVector pos = GetCamPosition(m_scene);
+
+#if 0
+    #if 0
+        static FILE* file = fopen ("log.bin", "wb");
+        if (file) {
+            fwrite (&key, sizeof (int), 1, file);
+            fwrite (&dir, sizeof (dVector), 1, file);
+            fwrite (&pos, sizeof (dVector), 1, file);
+            fflush(file);
+        }
+    #else 
+        static FILE* file = fopen ("log.bin", "rb");
+        if (file) {		
+            fread (&key, sizeof (int), 1, file);
+            fread (&dir, sizeof (dVector), 1, file);
+            fread (&pos, sizeof (dVector), 1, file);
+        }
+    #endif
+#endif
 		
 		// fire ammo
-		if (mainWindow->GetKeyState('R'))
+		if (key)
 		{
-			dVector dir = GetLookAtDirction(m_scene);
-			dVector pos = GetCamPosition(m_scene);
-			
+
 			float ammo_vel = 1000.0f;
 			dVector vel(dir.m_x*ammo_vel, dir.m_y*ammo_vel, dir.m_z*ammo_vel);
 
