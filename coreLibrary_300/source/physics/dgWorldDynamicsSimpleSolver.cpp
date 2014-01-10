@@ -1656,7 +1656,7 @@ void dgWorldDynamicUpdate::CalculateForcesSimulationMode (const dgIsland* const 
 		
 		dgFloat32 akDen;
 		tmpDen.StoreScalar(&akDen);
-		dgAssert (akDen.m_x > dgFloat32 (0.0f));
+		dgAssert (akDen > dgFloat32 (0.0f));
 
 		dgFloat32 ak = akNum / akDen;
 		dgInt32 clampedForceIndex = -1;
