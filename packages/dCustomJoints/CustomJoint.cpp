@@ -101,12 +101,11 @@ NewtonJoint* CustomJoint::GetJoint () const
 	return m_joint;
 }
 
+
 void CustomJoint::Destructor (const NewtonJoint* me)
 {
-	CustomJoint* joint;  
-
 	// get the pointer to the joint class
-	joint = (CustomJoint*) NewtonJointGetUserData (me);  
+	CustomJoint* const joint = (CustomJoint*) NewtonJointGetUserData (me);  
 
 	joint->m_autoDestroy = 1;
 
@@ -192,6 +191,14 @@ int CustomJoint::GetBodiesCollisionState () const
 	return NewtonJointGetCollisionState (m_joint);
 }
 
+void CustomJoint::JointSetSolverMode (bool mode, int maxContactJoints) const
+{
+	NewtonUserJointSetSolver (m_joint, mode, maxContactJoints);
+}
+
+
 void CustomJoint::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 }
+
+

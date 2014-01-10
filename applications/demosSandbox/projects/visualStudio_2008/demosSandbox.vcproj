@@ -949,6 +949,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\sdkDemos\demos\ContinueCollision1.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\sdkDemos\demos\ConvexApproximation.cpp"
 				>
 			</File>
