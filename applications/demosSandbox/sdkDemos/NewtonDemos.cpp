@@ -144,7 +144,7 @@ NewtonDemos::SDKDemos NewtonDemos::m_demosSelection[] =
 
 
 int NewtonDemos::m_threadsTracks[] = {1, 2, 3, 4, 8, 12, 16};
-
+int NewtonDemos::m_solverModes[] = {0, 1, 2, 4, 8};
 
 
 class NewtonDemosApp: public wxApp
@@ -180,6 +180,10 @@ class NewtonDemosApp: public wxApp
 		// load the default Scene		
 		wxMenuEvent loadDemo (wxEVT_COMMAND_MENU_SELECTED, NewtonDemos::ID_RUN_DEMO + DEFAULT_SCENE);
 		frame->GetEventHandler()->ProcessEvent(loadDemo);
+
+		// select solve mode
+		wxMenuEvent solverMode (wxEVT_COMMAND_MENU_SELECTED, NewtonDemos::ID_SOLVER_MODE + 1);
+		frame->GetEventHandler()->ProcessEvent(solverMode);
 
 		return true;
 	}
@@ -221,7 +225,7 @@ BEGIN_EVENT_TABLE(NewtonDemos, wxFrame)
 	EVT_MENU(ID_AUTOSLEEP_MODE,	NewtonDemos::OnAutoSleepMode)
 	EVT_MENU(ID_SHOW_STATISTICS, NewtonDemos::OnShowStatistics)
 //	EVT_MENU(ID_USE_PARALLEL_SOLVER, NewtonDemos::OnUseParallelSolver)
-	EVT_MENU(ID_USE_EXACT_SOLVER, NewtonDemos::OnUseExactSolver)
+	EVT_MENU_RANGE(ID_SOLVER_MODE, ID_SOLVER_MODE_COUNT, NewtonDemos::OnSelectSolverMode)
 
 	EVT_MENU(ID_HIDE_VISUAL_MESHES,	NewtonDemos::OnHideVisualMeshes)
 
@@ -268,7 +272,6 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	,m_suspendVisualUpdates(true)
 	,m_autoSleepState(true)
 	,m_useParallelSolver(false)
-	,m_useExactSolver(false)
 	,m_hideVisualMeshes(false)
 	,m_showContactPoints(false)
 	,m_showNormalForces(false)
@@ -279,6 +282,7 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	,m_concurrentProfilerState(false)
 	,m_threadProfilerState(false)
 	,m_hasJoysticController(false)
+	,m_solverModeIndex(1)
 	,m_debugDisplayMode(0)
 	,m_mousePosX(0)
 	,m_mousePosY(0)
@@ -391,8 +395,19 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 
 		optionsMenu->AppendCheckItem(ID_SHOW_STATISTICS, wxT("Show Stats on screen"), wxT("toogle on screen frame rate and other stats"));
 		optionsMenu->AppendCheckItem(ID_USE_PARALLEL_SOLVER, wxT("Parallel solver on"));
-		optionsMenu->AppendCheckItem(ID_USE_EXACT_SOLVER, wxT("Exact solver on"));
-		optionsMenu->Check (ID_USE_EXACT_SOLVER, m_useExactSolver);
+
+		optionsMenu->AppendSeparator();
+		optionsMenu->AppendRadioItem(ID_SOLVER_MODE + 0, wxT("Exact solver on"));
+		optionsMenu->AppendRadioItem(ID_SOLVER_MODE + 1, wxT("Iterative solver one passes"));
+		optionsMenu->AppendRadioItem(ID_SOLVER_MODE + 2, wxT("Iterative solver two passes"));
+		optionsMenu->AppendRadioItem(ID_SOLVER_MODE + 3, wxT("Iterative solver four passes"));
+		optionsMenu->AppendRadioItem(ID_SOLVER_MODE + 4, wxT("Iterative solver eight passes"));
+
+		dAssert (m_solverModeIndex >= 0);
+		dAssert (m_solverModeIndex < sizeof (m_solverModes)/sizeof (m_solverModes[0]));
+		optionsMenu->Check (ID_SOLVER_MODE + m_solverModeIndex, true);
+
+
 
 		optionsMenu->AppendSeparator();
 		optionsMenu->AppendRadioItem(ID_SHOW_COLLISION_MESH, wxT("Hide collision Mesh"));
@@ -497,7 +512,7 @@ void NewtonDemos::END_MENU_OPTION()
 	if (m_scene && m_scene->GetNewton()) {		
 		NewtonWaitForUpdateToFinish (m_scene->GetNewton());
 		SetAutoSleepMode (m_scene->GetNewton(), !m_autoSleepState);
-		NewtonSetSolverModel (m_scene->GetNewton(), m_useExactSolver ? 0 : 1);
+		NewtonSetSolverModel (m_scene->GetNewton(), m_solverModes[m_solverModeIndex]);
 		NewtonSetMultiThreadSolverOnSingleIsland (m_scene->GetNewton(), m_useParallelSolver ? 1 : 0);	
 	}
 }
@@ -754,11 +769,10 @@ void NewtonDemos::OnUseParallelSolver(wxCommandEvent& event)
 	END_MENU_OPTION();
 }
 
-void NewtonDemos::OnUseExactSolver(wxCommandEvent& event)
+void NewtonDemos::OnSelectSolverMode(wxCommandEvent& event)
 {
 	BEGIN_MENU_OPTION();
-	m_useExactSolver = event.IsChecked(); 
-	NewtonSetSolverModel (m_scene->GetNewton(), m_useExactSolver ? 0 : 1);
+	m_solverModeIndex = dClamp (event.GetId() - ID_SOLVER_MODE, 0, int (sizeof (m_solverModes)/sizeof (m_solverModes[0])));
 	END_MENU_OPTION();
 }
 

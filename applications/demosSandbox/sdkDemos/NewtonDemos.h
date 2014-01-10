@@ -25,7 +25,8 @@ class NewtonDemos: public wxFrame
 		ID_AUTOSLEEP_MODE,
 		ID_SHOW_STATISTICS,
 		ID_USE_PARALLEL_SOLVER,
-		ID_USE_EXACT_SOLVER,
+		ID_SOLVER_MODE,
+		ID_SOLVER_MODE_COUNT = ID_SOLVER_MODE + 5,
 
 		ID_HIDE_VISUAL_MESHES,
 		ID_SHOW_COLLISION_MESH,
@@ -108,7 +109,7 @@ class NewtonDemos: public wxFrame
 	void OnShowShowJoints(wxCommandEvent& event);
 	void OnShowCenterOfMass(wxCommandEvent& event);
 	void OnUseParallelSolver(wxCommandEvent& event);
-	void OnUseExactSolver(wxCommandEvent& event);
+	void OnSelectSolverMode(wxCommandEvent& event);
 	void OnShowConcurrentProfiler(wxCommandEvent& event);
 	void OnShowThreadProfiler(wxCommandEvent& event);
 	void OnShowProfiler(wxCommandEvent& event);
@@ -137,7 +138,7 @@ class NewtonDemos: public wxFrame
 	bool m_suspendVisualUpdates;
 	bool m_autoSleepState;
 	bool m_useParallelSolver;
-	bool m_useExactSolver;
+	
 	bool m_hideVisualMeshes;
 	bool m_showContactPoints;
 	bool m_showNormalForces;
@@ -149,6 +150,7 @@ class NewtonDemos: public wxFrame
 	bool m_threadProfilerState;
 	bool m_hasJoysticController;
 
+	int m_solverModeIndex;
 	int m_debugDisplayMode;
 	int m_mousePosX;
 	int m_mousePosY;
@@ -168,6 +170,7 @@ class NewtonDemos: public wxFrame
 	wxMenuItem* m_profilerTracksMenu[16];
 
 
+	static int m_solverModes[];
 	static int m_threadsTracks[];
 	static SDKDemos m_demosSelection[];
 
