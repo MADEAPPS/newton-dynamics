@@ -25,6 +25,7 @@ class NewtonDemos: public wxFrame
 		ID_AUTOSLEEP_MODE,
 		ID_SHOW_STATISTICS,
 		ID_USE_PARALLEL_SOLVER,
+		ID_USE_EXACT_SOLVER,
 
 		ID_HIDE_VISUAL_MESHES,
 		ID_SHOW_COLLISION_MESH,
@@ -107,6 +108,7 @@ class NewtonDemos: public wxFrame
 	void OnShowShowJoints(wxCommandEvent& event);
 	void OnShowCenterOfMass(wxCommandEvent& event);
 	void OnUseParallelSolver(wxCommandEvent& event);
+	void OnUseExactSolver(wxCommandEvent& event);
 	void OnShowConcurrentProfiler(wxCommandEvent& event);
 	void OnShowThreadProfiler(wxCommandEvent& event);
 	void OnShowProfiler(wxCommandEvent& event);
@@ -135,6 +137,7 @@ class NewtonDemos: public wxFrame
 	bool m_suspendVisualUpdates;
 	bool m_autoSleepState;
 	bool m_useParallelSolver;
+	bool m_useExactSolver;
 	bool m_hideVisualMeshes;
 	bool m_showContactPoints;
 	bool m_showNormalForces;

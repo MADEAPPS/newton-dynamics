@@ -49,9 +49,9 @@
 //#define DEFAULT_SCENE	23			// structured convex fracturing 
 //#define DEFAULT_SCENE	24			// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	25			// continue collision
-#define DEFAULT_SCENE	26			// paperwall continue collision
+//#define DEFAULT_SCENE	26			// paper wall continue collision
 //#define DEFAULT_SCENE	27			// puck slide continue collision
-//#define DEFAULT_SCENE	28			// articulated joints
+#define DEFAULT_SCENE	28			// articulated joints
 //#define DEFAULT_SCENE	29			// basic rag doll
 //#define DEFAULT_SCENE	20			// basic car
 //#define DEFAULT_SCENE	31			// high performance super car
@@ -220,7 +220,8 @@ BEGIN_EVENT_TABLE(NewtonDemos, wxFrame)
 
 	EVT_MENU(ID_AUTOSLEEP_MODE,	NewtonDemos::OnAutoSleepMode)
 	EVT_MENU(ID_SHOW_STATISTICS, NewtonDemos::OnShowStatistics)
-	EVT_MENU(ID_USE_PARALLEL_SOLVER, NewtonDemos::OnUseParallelSolver)
+//	EVT_MENU(ID_USE_PARALLEL_SOLVER, NewtonDemos::OnUseParallelSolver)
+	EVT_MENU(ID_USE_EXACT_SOLVER, NewtonDemos::OnUseExactSolver)
 
 	EVT_MENU(ID_HIDE_VISUAL_MESHES,	NewtonDemos::OnHideVisualMeshes)
 
@@ -267,6 +268,7 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	,m_suspendVisualUpdates(true)
 	,m_autoSleepState(true)
 	,m_useParallelSolver(false)
+	,m_useExactSolver(false)
 	,m_hideVisualMeshes(false)
 	,m_showContactPoints(false)
 	,m_showNormalForces(false)
@@ -389,6 +391,8 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 
 		optionsMenu->AppendCheckItem(ID_SHOW_STATISTICS, wxT("Show Stats on screen"), wxT("toogle on screen frame rate and other stats"));
 		optionsMenu->AppendCheckItem(ID_USE_PARALLEL_SOLVER, wxT("Parallel solver on"));
+		optionsMenu->AppendCheckItem(ID_USE_EXACT_SOLVER, wxT("Exact solver on"));
+		optionsMenu->Check (ID_USE_EXACT_SOLVER, m_useExactSolver);
 
 		optionsMenu->AppendSeparator();
 		optionsMenu->AppendRadioItem(ID_SHOW_COLLISION_MESH, wxT("Hide collision Mesh"));
@@ -493,6 +497,7 @@ void NewtonDemos::END_MENU_OPTION()
 	if (m_scene && m_scene->GetNewton()) {		
 		NewtonWaitForUpdateToFinish (m_scene->GetNewton());
 		SetAutoSleepMode (m_scene->GetNewton(), !m_autoSleepState);
+		NewtonSetSolverModel (m_scene->GetNewton(), m_useExactSolver ? 0 : 1);
 		NewtonSetMultiThreadSolverOnSingleIsland (m_scene->GetNewton(), m_useParallelSolver ? 1 : 0);	
 	}
 }
@@ -748,6 +753,15 @@ void NewtonDemos::OnUseParallelSolver(wxCommandEvent& event)
 	NewtonSetMultiThreadSolverOnSingleIsland (m_scene->GetNewton(), m_useParallelSolver ? 1 : 0);
 	END_MENU_OPTION();
 }
+
+void NewtonDemos::OnUseExactSolver(wxCommandEvent& event)
+{
+	BEGIN_MENU_OPTION();
+	m_useExactSolver = event.IsChecked(); 
+	NewtonSetSolverModel (m_scene->GetNewton(), m_useExactSolver ? 0 : 1);
+	END_MENU_OPTION();
+}
+
 
 
 void NewtonDemos::OnShowConcurrentProfiler(wxCommandEvent& event)
