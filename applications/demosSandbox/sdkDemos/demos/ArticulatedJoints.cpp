@@ -824,9 +824,9 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 
 
 	// add some object to play with
-//	DemoEntity entity (GetIdentityMatrix(), NULL);
-//	entity.LoadNGD_mesh ("lumber.ngd", scene->GetNewton());
-//	LoadLumberYardMesh (scene, entity, dVector(10.0f, 0.0f, 0.0f, 0.0f));
+	DemoEntity entity (GetIdentityMatrix(), NULL);
+	entity.LoadNGD_mesh ("lumber.ngd", scene->GetNewton());
+	LoadLumberYardMesh (scene, entity, dVector(10.0f, 0.0f, 0.0f, 0.0f));
 	
 	origin.m_x -= 5.0f;
 	origin.m_y += 5.0f;

@@ -304,6 +304,11 @@ class dgVector
 		dgAssert (dgCheckVector ((*this)));
 	}
 
+	DG_INLINE void StoreScalar (dgFloat32* const dst) const
+	{
+		*dst = m_x;
+	}
+
 	DG_INLINE dgFloat32& operator[] (dgInt32 i)
 	{
 		dgAssert (i < 4);
@@ -646,6 +651,12 @@ class dgVector
 	DG_INLINE dgVector (dgInt32 ix, dgInt32 iy, dgInt32 iz, dgInt32 iw)
 		:m_type(_mm_set_ps(*(dgFloat32*)&iw, *(dgFloat32*)&iz, *(dgFloat32*)&iy, *(dgFloat32*)&ix))
 	{
+	}
+	
+
+	DG_INLINE void StoreScalar (dgFloat32* const dst) const
+	{
+		_mm_store_ss(dst, m_type);
 	}
 	
 
