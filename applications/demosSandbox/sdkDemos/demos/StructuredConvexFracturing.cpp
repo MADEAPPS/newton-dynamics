@@ -206,7 +206,8 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
 	NewtonCollision* structuredFracturedCollision = NewtonCreateFracturedCompoundCollision (world, solidMesh, 0, debreePhysMaterial, pointCount, &points[0][0], sizeof (dVector), internalMaterial, &textureMatrix[0][0],
 																							OnReconstructMainMeshCallBack, OnEmitFracturedChunk);
 
-#if 1
+// uncomment this to test serialization
+#if 0
 	FILE* file = fopen ("serialize.bin", "wb");
 	NewtonCollisionSerialize (world, structuredFracturedCollision, DemoEntityManager::SerializeFile, file);
 	NewtonDestroyCollision (structuredFracturedCollision);
