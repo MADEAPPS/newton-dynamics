@@ -1159,8 +1159,10 @@ void dgCollisionCompoundFractured::CalcAABB (const dgMatrix& matrix, dgVector& p
 
 dgInt32 dgCollisionCompoundFractured::CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
+	dgBroadPhase* const broaphaPhase = m_world->GetBroadPhase();
 	dgInt32 count = dgCollisionCompound::CalculateContacts (pair, proxy);
-	if (!count) {
+	
+	if (!count && broaphaPhase->m_recursiveChunks) {
 		dgContact* const constraint = pair->m_contact;
 		dgBody* const myBody = constraint->GetBody0();
 		dgBody* const otherBody = constraint->GetBody1();

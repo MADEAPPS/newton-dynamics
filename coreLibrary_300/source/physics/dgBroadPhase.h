@@ -147,7 +147,7 @@ class dgBroadPhase
 	dgType m_broadPhaseType;
 	dgThread::dgCriticalSection m_contacJointLock;
 	dgThread::dgCriticalSection m_criticalSectionLock;
-	
+	bool m_recursiveChunks;
 
 	static dgVector m_conservativeRotAngle;
 	friend class dgBody;

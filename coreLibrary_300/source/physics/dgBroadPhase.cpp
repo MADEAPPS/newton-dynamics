@@ -390,6 +390,7 @@ dgBroadPhase::dgBroadPhase(dgWorld* const world)
 	,m_broadPhaseType(m_generic)
 	,m_contacJointLock()
 	,m_criticalSectionLock()
+	,m_recursiveChunks(false)
 {
 }
 
@@ -1846,6 +1847,7 @@ void dgBroadPhase::UpdateContacts( dgFloat32 timestep)
 	contactPairs->Init();
 	m_lru = m_lru + 1;
 
+	m_recursiveChunks = true;
 	dgInt32 threadsCount = m_world->GetThreadCount();	
 
 	dgBroadphaseSyncDescriptor syncPoints(m_broadPhaseType, &m_criticalSectionLock);
@@ -1889,6 +1891,7 @@ void dgBroadPhase::UpdateContacts( dgFloat32 timestep)
 	}
 	m_world->SynchronizationBarrier();
 
+	m_recursiveChunks = false;
 	if (m_generatedBodies.GetCount()) {
 		syncPoints.m_newBodiesNodes = m_generatedBodies.GetFirst();
 		for (dgInt32 i = 0; i < threadsCount; i ++) {
