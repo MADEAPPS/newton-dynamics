@@ -1195,6 +1195,7 @@ dgInt32 dgCollisionCompoundFractured::CalculateContacts (dgCollidingPairCollecto
 
 bool dgCollisionCompoundFractured::CanChunk (dgConectivityGraph::dgListNode* const chunkNode) const
 {
+/*
     const dgInt32 maxSize = 16;
     dgFloat32 matrix[maxSize][maxSize];
 
@@ -1210,18 +1211,6 @@ bool dgCollisionCompoundFractured::CanChunk (dgConectivityGraph::dgListNode* con
         }
         count ++;
     }
-/*
-count = 3;
-matrix[0][0] = 1;
-matrix[0][1] = 2;
-matrix[0][2] = 3;
-matrix[1][0] = 4;
-matrix[1][1] = 5;
-matrix[1][2] = 6;
-matrix[2][0] = 7;
-matrix[2][1] = 8;
-matrix[2][2] = 9;
-*/
     const dgFloat32 tol = dgFloat32 (1.0e-6f);
     dgFloat32 lowestDiagonal = dgFloat32 (1.0e10f);
     for(dgInt32 i = 0; i < count; i ++) {
@@ -1257,6 +1246,42 @@ matrix[2][2] = 9;
         }
     }
     return lowestDiagonal > tol;
+*/
+
+	dgVector directionsMap[32];
+	dgInt32 count = 0;
+	for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = chunkNode->GetInfo().GetFirst(); edgeNode && (count < sizeof (directionsMap)/sizeof (directionsMap[0])); edgeNode = edgeNode->GetNext()) {
+		directionsMap[count] = edgeNode->GetInfo().m_edgeData.m_normal;
+		count ++;
+	}
+
+	
+	dgVector error (dgFloat32 (1.0e-3f));
+	dgVector himespherePlane (directionsMap[0]);
+	for (dgInt32 i = 1; i < count; i ++) {
+		dgVector projection (himespherePlane.DotProduct4(directionsMap[i]));
+		dgInt32 sign = (projection < error).GetSignMask();
+		if (sign & 0x0f) {
+			dgFloat32 val;
+			projection.StoreScalar(&val);
+			dgAssert (val > dgFloat32 (-1.0f));
+			dgFloat32 angle = dgAcos (val) - dgFloat32 (3.141592f * 90.0f / 180.0f) + dgFloat32 (3.141592f * 15.0f / 180.0f);
+			dgVector axis (himespherePlane * directionsMap[i]);
+			axis = axis.CompProduct4(axis.DotProduct4(axis).InvSqrt());
+			dgQuaternion rot (axis, angle);
+			himespherePlane = dgMatrix (rot, dgVector::m_wOne).RotateVector(himespherePlane);
+
+			for (dgInt32 j = 0; j < i; j ++) {
+				dgVector projection (himespherePlane.DotProduct4(directionsMap[j]));
+				dgInt32 sign = (projection < error).GetSignMask();
+				if (sign & 0x0f) {
+					return false;
+				}
+			}
+		}
+	}
+
+	return true;
 }
 
 void dgCollisionCompoundFractured::SpawnChunks (dgBody* const myBody, const dgCollisionInstance* const myInstance, dgConectivityGraph::dgListNode* const rootNode, dgFloat32 impulseStimate2, dgFloat32 impulseStimateCut2)
