@@ -1368,10 +1368,16 @@ void dgCollisionCompoundFractured::SpawnChunks (dgBody* const myBody, const dgCo
 				}
 			}
 
-			for (dgConectivityGraph::dgListNode* node = m_conectivity.GetFirst(); node != m_conectivity.GetLast(); node = node->GetNext()) {
+			dgConectivityGraph::dgListNode* nextNode;
+			for (dgConectivityGraph::dgListNode* node = m_conectivity.GetFirst(); node != m_conectivity.GetLast(); node = nextNode) {
+				nextNode = node->GetNext();
 				dgDebriNodeInfo& nodeInfo = node->GetInfo().m_nodeData;
 				if (nodeInfo.m_lru != m_lru) {
-					dgAssert (0);
+					if (node->GetInfo().GetCount() == 0) {
+						SpawnSingleChunk (myBody, myInstance, node);
+					} else {
+						dgAssert (0);
+					}
 				}
 			}
 		}
