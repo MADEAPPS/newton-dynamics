@@ -1184,7 +1184,7 @@ dgInt32 dgCollisionCompoundFractured::CalculateContacts (dgCollidingPairCollecto
 	dgBroadPhase* const broaphaPhase = m_world->GetBroadPhase();
 	dgInt32 count = dgCollisionCompound::CalculateContacts (pair, proxy);
 	
-	if (!count && broaphaPhase->m_recursiveChunks && m_emitFracturedChunk) {
+	if (!count && broaphaPhase->m_recursiveChunks && m_emitFracturedChunk && m_root) {
 		dgContact* const constraint = pair->m_contact;
 		dgBody* const myBody = constraint->GetBody0();
 		dgBody* const otherBody = constraint->GetBody1();
@@ -1250,37 +1250,65 @@ bool dgCollisionCompoundFractured::CanChunk (dgConectivityGraph::dgListNode* con
 			}
 		}
 	}
-
 	return true;
+}
+
+void dgCollisionCompoundFractured::SpawnSingleChunk (dgBody* const myBody, const dgCollisionInstance* const myInstance, dgConectivityGraph::dgListNode* const chunkNode)
+{
+	m_world->GlobalLock();
+
+	const dgMatrix& matrix = myBody->GetMatrix();
+	const dgVector& veloc = myBody->GetVelocity();
+	const dgVector& omega = myBody->GetOmega();
+	dgVector com (matrix.TransformVector(myBody->GetCentreOfMass()));
+
+	dgDebriNodeInfo& nodeInfo = chunkNode->GetInfo().m_nodeData;
+	dgCollisionInstance* const chunkCollision = nodeInfo.m_shapeNode->GetInfo()->GetShape();
+	dgDynamicBody* const chunkBody = m_world->CreateDynamicBody (chunkCollision, matrix);
+	chunkBody->SetMassProperties(chunkCollision->GetVolume() * m_density, chunkBody->GetCollision());
+	m_world->GetBroadPhase()->AddInternallyGeneratedBody(chunkBody);
+
+	// calculate debris initial velocity
+	dgVector chunkOrigin (matrix.TransformVector(chunkCollision->GetLocalMatrix().m_posit));
+	dgVector chunkVeloc (veloc + omega * (chunkOrigin - com));
+
+	chunkBody->SetOmega(omega);
+	chunkBody->SetVelocity(chunkVeloc);
+	chunkBody->SetGroupID(chunkCollision->GetUserDataID());
+
+	m_emitFracturedChunk(chunkBody, chunkNode, myInstance);
+
+	m_conectivityMap.Remove (chunkCollision);
+	RemoveCollision (nodeInfo.m_shapeNode);
+	m_conectivity.DeleteNode(chunkNode);
+
+	m_world->GlobalUnlock();
 }
 
 void dgCollisionCompoundFractured::SpawnChunks (dgBody* const myBody, const dgCollisionInstance* const myInstance, dgConectivityGraph::dgListNode* const rootNode, dgFloat32 impulseStimate2, dgFloat32 impulseStimateCut2)
 {
-	dgFloat32 strengthPool[256];
-	dgConectivityGraph::dgListNode* pool[256];
+	dgFloat32 strengthPool[512];
+	dgConectivityGraph::dgListNode* pool[512];
 
-	dgMatrix matrix (myBody->GetMatrix());
-	dgVector veloc (myBody->GetVelocity());
-	dgVector omega (myBody->GetOmega());
 	dgVector massMatrix (myBody->GetMass());
-	dgVector com (matrix.TransformVector(myBody->GetCentreOfMass()));
-	
 	if (m_density < dgFloat32 (0.0f)) {
 		m_density = dgAbsf (massMatrix.m_w * m_density);
 	}
 
-	dgBroadPhase* const broaphaPhase = m_world->GetBroadPhase();
 	dgFloat32 attenuation = m_impulseAbsortionFactor;
 	m_lru ++;
-	dgInt32 stack = 1;
 	pool[0] = rootNode;
 	strengthPool[0] = impulseStimate2;
+
+	dgInt32 stack = 1;
+	bool spawned = false;
 	while (stack) {
 		stack --;
 		dgFloat32 strenght = strengthPool[stack] * attenuation;
 		dgConectivityGraph::dgListNode* const chunkNode = pool[stack];
 
         if ((strenght > impulseStimateCut2) && CanChunk (chunkNode)) {
+			spawned = true;
 		    dgDebriNodeInfo& nodeInfo = chunkNode->GetInfo().m_nodeData;
 
 		    nodeInfo.m_mesh->m_isVisible = true;
@@ -1310,37 +1338,54 @@ void dgCollisionCompoundFractured::SpawnChunks (dgBody* const myBody, const dgCo
 					dgAssert (stack < sizeof (pool)/sizeof (pool[0]));
 				}
 			}
-
-		    m_world->GlobalLock();
-
-		    dgCollisionInstance* const chunkCollision = nodeInfo.m_shapeNode->GetInfo()->GetShape();
-		    dgDynamicBody* const chunkBody = m_world->CreateDynamicBody (chunkCollision, matrix);
-		    chunkBody->SetMassProperties(chunkCollision->GetVolume() * m_density, chunkBody->GetCollision());
-			broaphaPhase->AddInternallyGeneratedBody(chunkBody);
-
-		    // calculate debris initial velocity
-		    dgVector chunkOrigin (matrix.TransformVector(chunkCollision->GetLocalMatrix().m_posit));
-		    dgVector chunkVeloc (veloc + omega * (chunkOrigin - com));
-
-		    chunkBody->SetOmega(omega);
-		    chunkBody->SetVelocity(chunkVeloc);
-		    chunkBody->SetGroupID(chunkCollision->GetUserDataID());
-
-		    m_emitFracturedChunk(chunkBody, chunkNode, myInstance);
-
-            m_conectivityMap.Remove (chunkCollision);
-            RemoveCollision (nodeInfo.m_shapeNode);
-            m_conectivity.DeleteNode(chunkNode);
-
-		    m_world->GlobalUnlock();
+			SpawnSingleChunk (myBody, myInstance, chunkNode);
         }
 	}
 
-	BuildMainMeshSubMehes();
-	m_reconstructMainMesh (myBody, m_conectivity.GetLast(), myInstance);
+	if (spawned) {
 
-	MassProperties ();
-	dgFloat32 mass = m_centerOfMass.m_w * m_density;
-	myBody->SetMassProperties(mass, myInstance);
+		if (m_conectivity.GetFirst() != m_conectivity.GetLast()) {
+			dgInt32 stackMark = m_lru + 1;
+			m_lru += 2;
+			pool[0] = m_conectivity.GetFirst();
+			stack = 1;
+			while (stack) {
+				stack --;
+				dgConectivityGraph::dgListNode* const node = pool[stack];
+				dgDebriNodeInfo& nodeInfo = node->GetInfo().m_nodeData;
+				if (nodeInfo.m_lru <= stackMark) {
+					nodeInfo.m_lru = m_lru;
+					for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = node->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
+						dgConectivityGraph::dgListNode* const node = edgeNode->GetInfo().m_node;
+						dgDebriNodeInfo& childNodeInfo = node->GetInfo().m_nodeData;
+						if (childNodeInfo.m_lru < stackMark) {
+							childNodeInfo.m_lru = stackMark;
+							pool[stack] = node;
+							stack ++;
+							dgAssert (stack < sizeof (pool)/sizeof (pool[0]));
+						}
+					}
+				}
+			}
+
+			for (dgConectivityGraph::dgListNode* node = m_conectivity.GetFirst(); node != m_conectivity.GetLast(); node = node->GetNext()) {
+				dgDebriNodeInfo& nodeInfo = node->GetInfo().m_nodeData;
+				if (nodeInfo.m_lru != m_lru) {
+					dgAssert (0);
+				}
+			}
+		}
+
+
+		BuildMainMeshSubMehes();
+		m_reconstructMainMesh (myBody, m_conectivity.GetLast(), myInstance);
+		if (m_root) {
+			MassProperties ();
+			dgFloat32 mass = m_centerOfMass.m_w * m_density;
+			myBody->SetMassProperties(mass, myInstance);
+		} else {
+			myBody->SetMassProperties(dgFloat32 (0.0f), myInstance);
+		}
+	}
 }
 
