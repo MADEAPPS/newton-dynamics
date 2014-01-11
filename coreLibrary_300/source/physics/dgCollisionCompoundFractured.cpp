@@ -1209,6 +1209,16 @@ bool dgCollisionCompoundFractured::CanChunk (dgConectivityGraph::dgListNode* con
         }
         count ++;
     }
+count = 3;
+matrix[0][0] = 1;
+matrix[0][1] = 2;
+matrix[0][2] = 3;
+matrix[1][0] = 4;
+matrix[1][1] = 5;
+matrix[1][2] = 6;
+matrix[2][0] = 7;
+matrix[2][1] = 8;
+matrix[2][2] = 9;
 
     const dgFloat32 tol = dgFloat32 (1.0e-6f);
     dgFloat32 lowestDiagonal = dgFloat32 (1.0e10f);
@@ -1238,7 +1248,7 @@ bool dgCollisionCompoundFractured::CanChunk (dgConectivityGraph::dgListNode* con
         }
 
         for(dgInt32 j = i + 1; j < count; j ++) {
-            dgFloat32 pivot = - matrix[i][j];
+            dgFloat32 pivot = - matrix[j][i];
             for(dgInt32 k = j; k < count; k ++) {
                 matrix[j][k] += pivot * matrix[i][k];
             }
