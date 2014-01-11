@@ -1195,66 +1195,12 @@ dgInt32 dgCollisionCompoundFractured::CalculateContacts (dgCollidingPairCollecto
 
 bool dgCollisionCompoundFractured::CanChunk (dgConectivityGraph::dgListNode* const chunkNode) const
 {
-/*
-    const dgInt32 maxSize = 16;
-    dgFloat32 matrix[maxSize][maxSize];
-
-    dgInt32 count = 0;
-    for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode0 = chunkNode->GetInfo().GetFirst(); edgeNode0 && (count < maxSize); edgeNode0 = edgeNode0->GetNext()) {
-        dgInt32 j = count;
-        const dgVector& jacobial0 = edgeNode0->GetInfo().m_edgeData.m_normal;
-        for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode1 = edgeNode0; edgeNode1; edgeNode1 = edgeNode1->GetNext()) {
-            const dgVector& jacobial1 = edgeNode1->GetInfo().m_edgeData.m_normal;
-            jacobial0.DotProduct4(jacobial1).StoreScalar(&matrix[count][j]);
-            matrix[j][count] = matrix[count][j];
-            j ++;
-        }
-        count ++;
-    }
-    const dgFloat32 tol = dgFloat32 (1.0e-6f);
-    dgFloat32 lowestDiagonal = dgFloat32 (1.0e10f);
-    for(dgInt32 i = 0; i < count; i ++) {
-        bool isInvertible = true;
-        if (dgAbsf (matrix[i][i]) < tol) {
-            isInvertible = false;
-            for(dgInt32 j = i + 1; j < count; j ++) {
-                if (dgAbsf (matrix[j][i]) > tol) {
-                    isInvertible = true;
-                    for(dgInt32 k = i; k < count; k ++) {
-                        matrix[i][k] += matrix[j][k];
-                    }
-                    break;
-                }
-            }
-            if (!isInvertible) {
-                lowestDiagonal = dgFloat32 (0.0f);
-                break;
-            }
-        }
-
-        dgFloat32 pivot = dgFloat32 (1.0f) /matrix[i][i];
-        matrix[i][i] = dgFloat32 (1.0f);
-        for(dgInt32 j = i + 1; j < count; j ++) {
-            matrix[i][j] *= pivot;
-        }
-
-        for(dgInt32 j = i + 1; j < count; j ++) {
-            dgFloat32 pivot = - matrix[j][i];
-            for(dgInt32 k = i + 1; k < count; k ++) {
-                matrix[j][k] += pivot * matrix[i][k];
-            }
-        }
-    }
-    return lowestDiagonal > tol;
-*/
-
 	dgVector directionsMap[32];
 	dgInt32 count = 0;
 	for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = chunkNode->GetInfo().GetFirst(); edgeNode && (count < sizeof (directionsMap)/sizeof (directionsMap[0])); edgeNode = edgeNode->GetNext()) {
 		directionsMap[count] = edgeNode->GetInfo().m_edgeData.m_normal;
 		count ++;
 	}
-
 	
 	dgVector error (dgFloat32 (1.0e-3f));
 	dgVector himespherePlane (directionsMap[0]);
@@ -1299,6 +1245,7 @@ void dgCollisionCompoundFractured::SpawnChunks (dgBody* const myBody, const dgCo
 		m_density = dgAbsf (massMatrix.m_w * m_density);
 	}
 
+	dgBroadPhase* const broaphaPhase = m_world->GetBroadPhase();
 	dgFloat32 attenuation = m_impulseAbsortionFactor;
 	m_lru ++;
 	dgInt32 stack = 1;
@@ -1345,6 +1292,7 @@ void dgCollisionCompoundFractured::SpawnChunks (dgBody* const myBody, const dgCo
 		    dgCollisionInstance* const chunkCollision = nodeInfo.m_shapeNode->GetInfo()->GetShape();
 		    dgDynamicBody* const chunkBody = m_world->CreateDynamicBody (chunkCollision, matrix);
 		    chunkBody->SetMassProperties(chunkCollision->GetVolume() * m_density, chunkBody->GetCollision());
+			broaphaPhase->AddInternallyGeneratedBody(chunkBody);
 
 		    // calculate debris initial velocity
 		    dgVector chunkOrigin (matrix.TransformVector(chunkCollision->GetLocalMatrix().m_posit));

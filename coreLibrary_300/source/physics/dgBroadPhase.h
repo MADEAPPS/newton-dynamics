@@ -103,6 +103,7 @@ class dgBroadPhase
 	void Remove (dgBody* const body);
 	void InvalidateCache ();
 	void UpdateContacts (dgFloat32 timestep);
+	void AddInternallyGeneratedBody(dgBody* const body);
 	void UpdateBodyBroadphase(dgBody* const body, dgInt32 threadIndex);
 
 	void ImproveFitness();
@@ -110,13 +111,13 @@ class dgBroadPhase
 	dgNode* InsertNode (dgNode* const node);
 	dgFloat32 CalculateSurfaceArea (const dgNode* const node0, const dgNode* const node1, dgVector& minBox, dgVector& maxBox) const;
 
-
 	void AddPair (dgBody* const body0, dgBody* const body1, const dgVector& timestep2, dgInt32 threadID);
 
 	static void ForceAndToqueKernel (void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void CollidingPairsKernel (void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void UpdateContactsKernel (void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void UpdateSoftBodyForcesKernel (void* const descriptor, void* const worldContext, dgInt32 threadID);
+	static void AddGeneratedBodyesContactsKernel (void* const descriptor, void* const worldContext, dgInt32 threadID);
 	
 	void UpdateContactsBroadPhaseEnd ();
 	void ApplyForceAndtorque (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
@@ -130,6 +131,8 @@ class dgBroadPhase
 	void FindCollidingPairsPersistent (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
 	void SubmitPairsPersistent (dgNode* const body, dgNode* const node, const dgVector& timeStepBound, dgInt32 threadID);
 
+	void FindGeneratedBodiesCollidingPairs (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
+
 	void KinematicBodyActivation (dgContact* const contatJoint) const;
 
 	bool TestOverlaping (const dgBody* const body0, const dgBody* const body1) const;
@@ -140,13 +143,16 @@ class dgBroadPhase
 	dgFloat64 m_treeEntropy;
 	dgUnsigned32 m_lru;
 	dgFitnessList m_fitness;
+	dgList<dgBody*> m_generatedBodies;
 	dgType m_broadPhaseType;
 	dgThread::dgCriticalSection m_contacJointLock;
 	dgThread::dgCriticalSection m_criticalSectionLock;
+	
 
 	static dgVector m_conservativeRotAngle;
 	friend class dgBody;
 	friend class dgWorld;
 	friend class dgWorldDynamicUpdate;
+	friend class dgCollisionCompoundFractured;
 };
 #endif
