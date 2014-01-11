@@ -161,7 +161,7 @@ dgGraphNode<dgNodeData, dgEdgeData>::~dgGraphNode()
 template<class dgNodeData, class dgEdgeData> 
 typename dgGraphNode<dgNodeData, dgEdgeData>::dgListNode* dgGraphNode<dgNodeData, dgEdgeData>::AddEdge (typename dgGraph<dgNodeData, dgEdgeData>::dgListNode* const node)
 {
-	typename dgGraphNode<dgNodeData, dgEdgeData>::dgListNode* edge = dgGraphNode<dgNodeData, dgEdgeData>::Append();
+	typename dgGraphNode<dgNodeData, dgEdgeData>::dgListNode* const edge = dgGraphNode<dgNodeData, dgEdgeData>::Append();
 
 	edge->GetInfo().m_node = node;
 	return edge;
@@ -178,7 +178,7 @@ void dgGraphNode<dgNodeData, dgEdgeData>::DeleteEdge(typename dgGraphNode<dgNode
 {
 	typename dgGraph<dgNodeData, dgEdgeData>::dgListNode* const node = edge->GetInfo().m_node;
 	
-	for (typename dgGraphNode<dgNodeData, dgEdgeData>::dgListNode* twinEdge = node->GetInfo().GetFirst(); twinEdge; twinEdge = twinEdge->GetNext()) {	
+	for (typename dgGraphNode<dgNodeData, dgEdgeData>::dgListNode* const twinEdge = node->GetInfo().GetFirst(); twinEdge; twinEdge = twinEdge->GetNext()) {	
 		if (&twinEdge->GetInfo().m_node->GetInfo() == this) {
 			node->GetInfo().DeleteHalfEdge(twinEdge);
 			break;

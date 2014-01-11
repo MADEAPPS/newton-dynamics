@@ -119,6 +119,7 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 		public:
 		dgSharedNodeMesh ();
 		~dgSharedNodeMesh ();
+        dgVector m_normal;
 	};
 
 	class dgConectivityGraph: public dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>
@@ -190,6 +191,7 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 	dgInt32 CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 	void SpawnChunks (dgBody* const myBody, const dgCollisionInstance* const myInstance, dgConectivityGraph::dgListNode* const rootNode, dgFloat32 impulseStimate2, dgFloat32 impulseStimateCut2);
 
+    bool CanChunk (dgConectivityGraph::dgListNode* const node) const;
 	
 	bool SanityCheck() const;
 
