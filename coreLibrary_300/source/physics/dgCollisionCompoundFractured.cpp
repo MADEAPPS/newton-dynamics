@@ -36,47 +36,6 @@ dgCollisionCompoundFractured::dgConectivityGraph::dgConectivityGraph (dgMemoryAl
 {
 }
 
-
-dgCollisionCompoundFractured::dgConectivityGraph::dgConectivityGraph (dgMemoryAllocator* const allocator, dgDeserialize callback, void* const userData)
-	:dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>(allocator)
-{
-	dgAssert (0);
-/*
-	dgInt32 count;
-	dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* node;
-
-	callback (userData, &count, dgInt32 (sizeof (dgInt32)));
-	dgStack<dgListNode*> nodesMap(count);
-
-	node = dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>::AddNode();
-	dgDebriNodeInfo& data = GetFirst()->GetInfo().m_nodeData;
-	callback (userData, &data.m_commonData, sizeof (data.m_commonData));
-
-	nodesMap[0] = node;
-	for (dgInt32 i = 1; i < count; i ++) {
-		dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* node;
-
-		node = dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>::AddNode();
-		dgDebriNodeInfo& data = node->GetInfo().m_nodeData;
-		callback (userData, &data.m_commonData, sizeof (data.m_commonData));
-		data.m_mesh = new (GetAllocator()) dgMesh (GetAllocator(), callback, userData);
-		nodesMap[i] = node;
-	}
-
-	for (dgInt32 i = 0; i < count - 1; i ++) {
-		dgInt32 edges;
-		callback (userData, &edges, dgInt32 (sizeof (dgInt32)));
-		dgStack<dgInt32> pool(edges);
-		callback (userData, &pool[0], size_t (edges * dgInt32 (sizeof (dgInt32))));
-		for (dgInt32 j = 0; j < edges; j ++) {
-			nodesMap[i]->GetInfo().AddEdge (nodesMap[pool[j]]);
-		}
-	}
-*/
-}
-
-
-
 dgCollisionCompoundFractured::dgConectivityGraph::dgConectivityGraph (const dgConectivityGraph& source)
 	:dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>(source.GetAllocator())
 {
@@ -110,19 +69,78 @@ dgCollisionCompoundFractured::dgConectivityGraph::~dgConectivityGraph ()
 
 void dgCollisionCompoundFractured::dgConectivityGraph::Serialize(dgSerialize callback, void* const userData) const
 {
-	dgAssert (0);
+	dgInt32 count = GetCount();
+
+	dgInt32 index = 0;
+	dgTree<dgInt32, dgListNode*> enumMap (GetAllocator());
+	callback (userData, &count, dgInt32 (sizeof (dgInt32)));
+	for (dgConectivityGraph::dgListNode* node = GetFirst(); node != GetLast(); node = node->GetNext() ) {
+		enumMap.Insert(index, node);
+		index ++;
+
+		dgDebriNodeInfo& data = node->GetInfo().m_nodeData;
+		dgInt32 nodeIndex = data.m_shapeNode->GetKey();
+		callback (userData, &nodeIndex, dgInt32 (sizeof (dgInt32)));
+		data.m_mesh->Serialize(callback, userData);
+	}
+
+	dgListNode* node = GetLast();
+	dgDebriNodeInfo& data = node->GetInfo().m_nodeData;
+	data.m_mesh->Serialize(callback, userData);
+
+	for (dgListNode* node = GetFirst(); node != GetLast(); node = node->GetNext()) {
+		dgInt32 count = node->GetInfo().GetCount();
+		callback (userData, &count, dgInt32 (sizeof (dgInt32)));
+		for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = node->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
+			dgListNode* const otherNode = edgeNode->GetInfo().m_node;
+			dgInt32 index = enumMap.Find(otherNode)->GetInfo();
+			dgVector normal (edgeNode->GetInfo().m_edgeData.m_normal); 
+			callback (userData, &index, dgInt32 (sizeof (dgInt32)));
+			callback (userData, &normal, dgInt32 (sizeof (dgVector)));
+		}
+	}
 }
 
-
-
-
-dgCollisionCompoundFractured::dgCollisionCompoundFractured (dgWorld* const world, dgDeserialize deserialization, void* const userData)
-	:dgCollisionCompound (world, deserialization, userData)
-	,m_conectivity (world->GetAllocator(), deserialization, userData)
-	,m_conectivityMap (world->GetAllocator())
+void dgCollisionCompoundFractured::dgConectivityGraph::Deserialize (dgCollisionCompoundFractured* const source, dgDeserialize callback, void* const userData)
 {
-	dgAssert (0);
+	dgInt32 count = 0;
+	callback (userData, &count, dgInt32 (sizeof (dgInt32)));
+
+	dgTree<dgListNode*, dgInt32> enumMap (GetAllocator());
+	for (dgInt32 i = 0; i < count - 1; i ++) {
+
+		dgListNode* const node = dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>::AddNode();
+		enumMap.Insert(node, i);
+
+		dgDebriNodeInfo& data = node->GetInfo().m_nodeData;
+		dgInt32 nodeIndex;
+		callback (userData, &nodeIndex, dgInt32 (sizeof (dgInt32)));
+		data.m_shapeNode = source->FindNodeByIndex (nodeIndex);
+		dgAssert (data.m_shapeNode);
+		data.m_mesh = new (GetAllocator()) dgMesh (GetAllocator(), callback, userData);
+	}
+
+	dgListNode* const node = dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>::AddNode();
+	dgDebriNodeInfo& data = node->GetInfo().m_nodeData;
+	data.m_mesh = new (GetAllocator()) dgMesh (GetAllocator(), callback, userData);
+
+	for (dgListNode* node = GetFirst(); node != GetLast(); node = node->GetNext()) {
+		dgInt32 count;
+		callback (userData, &count, dgInt32 (sizeof (dgInt32)));
+
+		for (dgInt32 i = 0; i < count; i ++) {
+			dgInt32 index;
+			dgVector normal;
+			callback (userData, &index, dgInt32 (sizeof (dgInt32)));
+			callback (userData, &normal, dgInt32 (sizeof (dgVector)));
+
+			dgListNode* const otherNode = enumMap.Find(index)->GetInfo();
+			dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* const edgeNode = node->GetInfo().AddEdge (otherNode);
+			edgeNode->GetInfo().m_edgeData.m_normal = normal;
+		}
+	}
 }
+
 
 
 class dgCollisionCompoundFractured::dgFractureBuilder: public dgTree<dgMeshEffect*, dgInt32>
@@ -585,12 +603,10 @@ dgCollisionCompoundFractured::dgDebriNodeInfo::dgDebriNodeInfo ()
 	,m_shapeNode(NULL)
 	,m_lru(0)
 {
-//	memset (&m_commonData, 0, sizeof (m_commonData));
 }
 
 dgCollisionCompoundFractured::dgDebriNodeInfo::~dgDebriNodeInfo ()
 {
-
 	if (m_mesh) {
 		m_mesh->Release();
 	}
@@ -615,7 +631,6 @@ dgCollisionCompoundFractured::dgVertexBuffer::~dgVertexBuffer ()
 
 dgCollisionCompoundFractured::dgVertexBuffer::dgVertexBuffer (dgMemoryAllocator* const allocator, dgDeserialize callback, void* const userData)
 {
-	dgAssert(0);
 	m_allocator = allocator;
 	callback (userData, &m_vertexCount, dgInt32 (sizeof (dgInt32)));
 
@@ -636,29 +651,6 @@ void dgCollisionCompoundFractured::dgVertexBuffer::Serialize(dgSerialize callbac
 	callback (userData, m_uv, size_t (2 * m_vertexCount * dgInt32 (sizeof (dgFloat32))));
 }
 
-/*
-void dgCollisionCompoundBreakable::dgVertexBuffer::GetVertexStreams (dgInt32 vertexStrideInByte, dgFloat32* const vertex, dgInt32 normalStrideInByte, dgFloat32* const normal, dgInt32 uvStrideInByte, dgFloat32* const uv) const
-{
-	uvStrideInByte /= dgInt32 (sizeof (dgFloat32));
-	vertexStrideInByte /= dgInt32 (sizeof (dgFloat32));
-	normalStrideInByte /= dgInt32 (sizeof (dgFloat32));
-	for (dgInt32 i = 0; i < m_vertexCount; i ++)	{
-		dgInt32 j = i * vertexStrideInByte;
-		vertex[j + 0] = m_vertex[i * 3 + 0];
-		vertex[j + 1] = m_vertex[i * 3 + 1];
-		vertex[j + 2] = m_vertex[i * 3 + 2];
-
-		j = i * normalStrideInByte;
-		normal[j + 0] = m_normal[i * 3 + 0];
-		normal[j + 1] = m_normal[i * 3 + 1];
-		normal[j + 2] = m_normal[i * 3 + 2];
-
-		j = i * uvStrideInByte;
-		uv[j + 0] = m_uv[i * 2 + 0];
-		uv[j + 1] = m_uv[i * 2 + 1];
-	}
-}
-*/
 
 dgCollisionCompoundFractured::dgSubMesh::dgSubMesh (dgMemoryAllocator* const allocator)
 	:m_indexes(NULL)
@@ -679,14 +671,12 @@ dgCollisionCompoundFractured::dgSubMesh::~dgSubMesh ()
 
 void dgCollisionCompoundFractured::dgSubMesh::Serialize(dgSerialize callback, void* const userData) const
 {
-	dgAssert(0);
-/*
+	dgInt32 visible = m_visibleFaces ? 1 : 0;
 	callback (userData, &m_material, dgInt32 (sizeof (dgInt32)));
+	callback (userData, &m_materialOrdinal, dgInt32 (sizeof (dgInt32)));
 	callback (userData, &m_faceCount, dgInt32 (sizeof (dgInt32)));
-	callback (userData, &m_faceOffset, dgInt32 (sizeof (dgInt32)));
-	callback (userData, &m_visibleFaces, dgInt32 (sizeof (dgInt32)));
+	callback (userData, &visible, dgInt32 (sizeof (dgInt32)));
 	callback (userData, m_indexes, size_t (3 * m_faceCount * dgInt32 (sizeof (dgInt32))));
-*/
 }
 
 dgCollisionCompoundFractured::dgSharedNodeMesh::dgSharedNodeMesh ()
@@ -702,7 +692,7 @@ dgCollisionCompoundFractured::dgMesh::dgMesh(dgMemoryAllocator* const allocator)
 	:dgList<dgSubMesh>(allocator)
 	,m_vertexOffsetStart(0)
 	,m_vertexCount(0)
-	,m_IsVisible(false)
+	,m_isVisible(false)
 {
 }
 
@@ -713,48 +703,47 @@ dgCollisionCompoundFractured::dgMesh::~dgMesh()
 dgCollisionCompoundFractured::dgMesh::dgMesh (dgMemoryAllocator* const allocator, dgDeserialize callback, void* const userData)
 	:dgList<dgSubMesh>(allocator), dgRefCounter ()
 {
-	dgAssert(0);
-	/*
-
 	dgInt32 count;
-
-	callback (userData, &m_IsVisible, dgInt32 (sizeof (dgInt32)));
+	dgInt32 visible;
+	callback (userData, &m_vertexOffsetStart, dgInt32 (sizeof (m_vertexOffsetStart)));
+	callback (userData, &m_vertexCount, dgInt32 (sizeof (m_vertexCount)));
+	callback (userData, &visible, dgInt32 (sizeof (m_vertexCount)));
 	callback (userData, &count, dgInt32 (sizeof (dgInt32)));
+	m_isVisible = visible ? true : false;
+
 	for (dgInt32 i = 0; i < count; i ++) {
 		dgInt32 material;
 		dgInt32 faceCount;
-		dgInt32 faceOffset;
-		dgInt32 exteriorFaces;
+		dgInt32 visible;
+		dgInt32 materialOrdinal;
 
 		callback (userData, &material, dgInt32 (sizeof (dgInt32)));
+		callback (userData, &materialOrdinal, dgInt32 (sizeof (dgInt32)));
 		callback (userData, &faceCount, dgInt32 (sizeof (dgInt32)));
-		callback (userData, &faceOffset, dgInt32 (sizeof (dgInt32)));
-		callback (userData, &exteriorFaces, dgInt32 (sizeof (dgInt32)));
+		callback (userData, &visible, dgInt32 (sizeof (dgInt32)));
+
 		dgSubMesh* const subMesh = AddgSubMesh (faceCount * 3, material);
-
-		subMesh->m_faceOffset = faceOffset;
-		subMesh->m_visibleFaces = exteriorFaces;
-
-		//		callback (userData, subMesh->m_visibilityMap, faceCount * dgInt32 (sizeof (dgInt32)));
-		callback (userData, subMesh->m_indexes, size_t (3 * faceCount * sizeof (dgInt32)));
+		subMesh->m_faceCount = faceCount;
+		subMesh->m_material = material;
+		subMesh->m_materialOrdinal = materialOrdinal;
+		subMesh->m_visibleFaces = visible ? true : false;
+		callback (userData, subMesh->m_indexes, size_t (3 * faceCount * dgInt32 (sizeof (dgInt32))));
 	}
-*/
 }
 
 void dgCollisionCompoundFractured::dgMesh::Serialize(dgSerialize callback, void* const userData) const
 {
-	dgAssert(0);
-/*
-	dgInt32 count;
-	count = GetCount();
+	dgInt32 count = GetCount();
+	dgInt32 visible = m_isVisible ? 1 : 0;
 
-	callback (userData, &m_IsVisible, dgInt32 (sizeof (dgInt32)));
+	callback (userData, &m_vertexOffsetStart, dgInt32 (sizeof (m_vertexOffsetStart)));
+	callback (userData, &m_vertexCount, dgInt32 (sizeof (m_vertexCount)));
+	callback (userData, &visible, dgInt32 (sizeof (m_vertexCount)));
 	callback (userData, &count, dgInt32 (sizeof (dgInt32)));
 	for (dgListNode* node = GetFirst(); node; node = node->GetNext()) {
 		dgSubMesh& subMesh = node->GetInfo();
 		subMesh.Serialize(callback, userData);
 	}
-*/
 }
 
 dgCollisionCompoundFractured::dgSubMesh* dgCollisionCompoundFractured::dgMesh::AddgSubMesh(dgInt32 indexCount, dgInt32 material)
@@ -817,7 +806,7 @@ dgCollisionCompoundFractured::dgSubMesh* dgCollisionCompoundFractured::dgMesh::A
 		dgInt32 material = factureVisualMesh->GetMaterialID (geometryHandle, handle);
 
 		bool isVisible = (material < interiorMaterialBase) ? true : false;
-		data.m_mesh->m_IsVisible |= isVisible;
+		data.m_mesh->m_isVisible |= isVisible;
 
 		dgInt32 indexCount = factureVisualMesh->GetMaterialIndexCount (geometryHandle, handle);
 		dgSubMesh* const segment = data.m_mesh->AddgSubMesh(indexCount, isVisible ? material : material - interiorMaterialBase);
@@ -886,6 +875,21 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (const dgCollisionCom
 }
 
 
+dgCollisionCompoundFractured::dgCollisionCompoundFractured (dgWorld* const world, dgDeserialize deserialization, void* const userData)
+	:dgCollisionCompound (world, deserialization, userData)
+	,m_conectivity (world->GetAllocator())
+	,m_conectivityMap (world->GetAllocator())
+{
+	m_conectivity.Deserialize(this, deserialization, userData);
+	m_vertexBuffer = new (m_world->GetAllocator()) dgVertexBuffer(m_world->GetAllocator(), deserialization, userData);
+
+	deserialization (userData, &m_impulseStrengthPerUnitMass, sizeof (m_impulseStrengthPerUnitMass));
+	deserialization (userData, &m_impulseAbsortionFactor, sizeof (m_impulseAbsortionFactor));
+	deserialization (userData, &m_density, sizeof (m_density));
+	deserialization (userData, &m_materialCount, sizeof (m_materialCount));
+}
+
+
 dgCollisionCompoundFractured::dgCollisionCompoundFractured (
 	dgWorld* const world, dgMeshEffect* const solidMesh, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& offsetMatrix, 
 	OnEmitFractureChunkCallBack emitFracturedChunk, OnReconstructFractureMainMeshCallBack reconstructMainMesh)
@@ -904,7 +908,7 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (
 {
 //pointcloudCount = 0;
 
-	m_collisionId = m_compoundBreakable;
+	m_collisionId = m_compoundFracturedCollision;
 	m_rtti |= dgCollisionCompoundBreakable_RTTI;
 
 	dgInt32 interiorMaterialBase = 1000;
@@ -995,6 +999,24 @@ dgCollisionCompoundFractured::~dgCollisionCompoundFractured(void)
     if (m_vertexBuffer) {
         m_vertexBuffer->Release();
     }
+}
+
+void dgCollisionCompoundFractured::Serialize(dgSerialize callback, void* const userData) const
+{
+	dgCollisionCompound::Serialize(callback, userData);
+	m_conectivity.Serialize(callback, userData);
+	m_vertexBuffer->Serialize(callback, userData);
+
+	callback (userData, &m_impulseStrengthPerUnitMass, sizeof (m_impulseStrengthPerUnitMass));
+	callback (userData, &m_impulseAbsortionFactor, sizeof (m_impulseAbsortionFactor));
+	callback (userData, &m_density, sizeof (m_density));
+	callback (userData, &m_materialCount, sizeof (m_materialCount));
+}
+
+void dgCollisionCompoundFractured::SetCallbacks(OnEmitFractureChunkCallBack emitFracturedChunk, OnReconstructFractureMainMeshCallBack reconstructMainMesh)
+{
+	m_emitFracturedChunk = emitFracturedChunk; 
+	m_reconstructMainMesh = reconstructMainMesh;
 }
 
 void dgCollisionCompoundFractured::BuildMainMeshSubMehes() const
@@ -1162,7 +1184,7 @@ dgInt32 dgCollisionCompoundFractured::CalculateContacts (dgCollidingPairCollecto
 	dgBroadPhase* const broaphaPhase = m_world->GetBroadPhase();
 	dgInt32 count = dgCollisionCompound::CalculateContacts (pair, proxy);
 	
-	if (!count && broaphaPhase->m_recursiveChunks) {
+	if (!count && broaphaPhase->m_recursiveChunks && m_emitFracturedChunk) {
 		dgContact* const constraint = pair->m_contact;
 		dgBody* const myBody = constraint->GetBody0();
 		dgBody* const otherBody = constraint->GetBody1();
@@ -1261,7 +1283,7 @@ void dgCollisionCompoundFractured::SpawnChunks (dgBody* const myBody, const dgCo
         if ((strenght > impulseStimateCut2) && CanChunk (chunkNode)) {
 		    dgDebriNodeInfo& nodeInfo = chunkNode->GetInfo().m_nodeData;
 
-		    nodeInfo.m_mesh->m_IsVisible = true;
+		    nodeInfo.m_mesh->m_isVisible = true;
 		    for (dgMesh::dgListNode* meshSegment = nodeInfo.m_mesh->GetFirst(); meshSegment; meshSegment = meshSegment->GetNext()) {
 			    dgSubMesh* const subMesh = &meshSegment->GetInfo();
 			    subMesh->m_visibleFaces = true;
@@ -1270,7 +1292,7 @@ void dgCollisionCompoundFractured::SpawnChunks (dgBody* const myBody, const dgCo
             for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = chunkNode->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
                 dgConectivityGraph::dgListNode* const node = edgeNode->GetInfo().m_node;
                 dgDebriNodeInfo& childNodeInfo = node->GetInfo().m_nodeData;
-                childNodeInfo.m_mesh->m_IsVisible = true;
+                childNodeInfo.m_mesh->m_isVisible = true;
                 for (dgMesh::dgListNode* meshSegment = childNodeInfo.m_mesh->GetFirst(); meshSegment; meshSegment = meshSegment->GetNext()) {
                     dgSubMesh* const subMesh = &meshSegment->GetInfo();
                     subMesh->m_visibleFaces = true;

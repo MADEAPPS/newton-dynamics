@@ -197,6 +197,12 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 					break;
 				}
 
+				case m_compoundFracturedCollision:
+				{
+					collision = new (allocator) dgCollisionCompoundFractured (world, deserialization, userData);
+					break;
+				}
+
 				case m_sceneCollision:
 				{
 					collision = new (allocator) dgCollisionScene (world, deserialization, userData);
@@ -289,12 +295,6 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 //					dgAssert (0);
 //					return NULL;
 //				}
-//				case m_compoundBreakable:
-//				{
-//					collision = new (allocator) dgCollisionCompoundBreakable (this, deserialization, userData);
-//					break;
-//				}
-
 
 				default:
 				dgAssert (0);

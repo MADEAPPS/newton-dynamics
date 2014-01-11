@@ -72,7 +72,7 @@ enum dgCollisionID
 	m_deformableSolidMesh,
 	m_userMesh,
 	m_sceneCollision,
-	m_compoundBreakable,
+	m_compoundFracturedCollision,
 
 	// these are for internal use only	
 	m_polygonCollision,

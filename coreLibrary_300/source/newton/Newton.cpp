@@ -2785,11 +2785,21 @@ NewtonCollision* NewtonCreateFracturedCompoundCollision (
 
 	dgMatrix textMatrix (textureMatrix);
 	dgCollisionInstance* const collision = world->CreateFracturedCompound (mesh, shapeID, fracturePhysicsMaterialID, pointcloudCount, vertexCloud, strideInBytes, materialID, textMatrix, 
-																					(dgCollisionCompoundFractured::OnEmitFractureChunkCallBack) emitFrafuredChunk,
-																					(dgCollisionCompoundFractured::OnReconstructFractureMainMeshCallBack) regenerateMainMeshCallback);
+																		  (dgCollisionCompoundFractured::OnEmitFractureChunkCallBack) emitFrafuredChunk,
+																		  (dgCollisionCompoundFractured::OnReconstructFractureMainMeshCallBack) regenerateMainMeshCallback);
 	return (NewtonCollision*) collision;
 }
 
+void NewtonFracturedCompoundSetCallbacks (const NewtonCollision* const fracturedCompound, NewtonFractureCompoundCollisionReconstructMainMeshCallBack regenerateMainMeshCallback, NewtonFractureCompoundCollisionOnEmitChunk emitFracfuredChunk)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgCollisionInstance* const collision = (dgCollisionInstance*) fracturedCompound;
+
+	if (collision->IsType (dgCollision::dgCollisionCompoundBreakable_RTTI)) {
+		dgCollisionCompoundFractured* const compound = (dgCollisionCompoundFractured*) collision->GetChildShape();
+		compound->SetCallbacks ((dgCollisionCompoundFractured::OnEmitFractureChunkCallBack) emitFracfuredChunk, (dgCollisionCompoundFractured::OnReconstructFractureMainMeshCallBack) regenerateMainMeshCallback);
+	}
+}
 
 NewtonFracturedCompoundMeshPart* NewtonFracturedCompoundGetFirstSubMesh(const NewtonCollision* const fracturedCompound)
 {
