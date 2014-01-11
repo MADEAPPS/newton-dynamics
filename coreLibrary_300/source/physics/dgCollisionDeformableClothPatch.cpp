@@ -372,12 +372,12 @@ void dgCollisionDeformableClothPatch::IntegrateParticles (dgFloat32 timestep)
 	dgFloat32 invTimeStep = dgFloat32 (1.0f) / timestep;
 	dgVector gravity (0.0f, -9.8f, 0.0f, 0.0f);
 	//dgVector gravity (0.0f, -1.0f, 0.0f, 0.0f);
-	dgVector gravityStep (gravity.Scale3 (timestep));
+	dgVector gravityStep (gravity.Scale4 (timestep));
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-		veloc[i] = (posit[i] - m_posit[i]).Scale3 (invTimeStep);
+		veloc[i] = (posit[i] - m_posit[i]).Scale4 (invTimeStep);
 		m_posit[i] = posit[i];
-		veloc[i] += gravityStep.Scale3 (unitMass[i]);
-		posit[i] += veloc[i].Scale3 (timestep);
+		veloc[i] += gravityStep.Scale4 (unitMass[i]);
+		posit[i] += veloc[i].Scale4 (timestep);
 	}
 /*
 	// calculate internal forces
@@ -403,7 +403,7 @@ void dgCollisionDeformableClothPatch::IntegrateParticles (dgFloat32 timestep)
 */
 }
 
-//using paper, this is more stable that spring mass  
+//using paper, this is more stable than spring mass  
 //http://www.pagines.ma1.upc.edu/~susin/files/AdvancedCharacterPhysics.pdf
 void dgCollisionDeformableClothPatch::ResolvePositionsConstraints (dgFloat32 timestep)
 {
@@ -421,14 +421,13 @@ void dgCollisionDeformableClothPatch::ResolvePositionsConstraints (dgFloat32 tim
 		dgFloat32 x2 = relPosit % relPosit; 
 #if 1
 		dgFloat32 x = dgSqrt(x2);
-		dgFloat32 error = (x - link->m_restLengh) / x;
 #else 
 		// using two turns of Taylor expansion for sqrt (x) with inital guess equa restlength the x = dgSqrt(x2) ~= (restLengh * restLengh + x2) / (2.0f * restLengh)
-
+		dgFloat32 x = (link->m_restLengh * link->m_restLengh + x2) / (2.0f * link->m_restLengh);
 #endif
+		dgFloat32 error = (x - link->m_restLengh) / x;
 		
-		posit[index0] -= relPosit.Scale3 (error * link->m_mass0_influence);
-		posit[index1] += relPosit.Scale3 (error * link->m_mass1_influence);
+		posit[index0] -= relPosit.Scale4 (error * link->m_mass0_influence);
+		posit[index1] += relPosit.Scale4 (error * link->m_mass1_influence);
 	}
-
 }

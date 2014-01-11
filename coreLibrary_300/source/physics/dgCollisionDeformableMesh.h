@@ -126,9 +126,7 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 
 	void CalculateContactsToCollisionTree (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy);
 	void CalculatePolygonContacts (dgDeformableNode* const node, const dgPlane& plane, dgCollisionConvexPolygon* const polygon, dgFloat32 timestep);
-	void CreateRegions();
-	dgFloat32 m_stiffness;
-	dgFloat32 m_plasticity;
+	
 */
 
 	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1);
@@ -142,7 +140,6 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 
 	dgInt32 CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy);
 	//dgInt32 CalculateContacts (dgCollisionParamProxy& proxy, dgVector* const contactsOut) const;
-
 
 	dgParticle m_particles;
 	dgList<dgMeshSegment> m_visualSegments;
@@ -158,6 +155,9 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	dgDeformableNode* m_nodesMemory;
 	dgVisualVertexData* m_visualVertexData; 
 	bool m_isdoubleSided;
+
+//	dgFloat32 m_stiffness;
+//	dgFloat32 m_plasticity;
 
 	friend class dgWorld;
 };

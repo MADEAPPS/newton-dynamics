@@ -48,6 +48,7 @@
 #include "dgCollisionTaperedCylinder.h"
 #include "dgCollisionChamferCylinder.h"
 #include "dgCollisionCompoundFractured.h"
+#include "dgCollisionDeformableSolidMesh.h"
 #include "dgCollisionDeformableClothPatch.h"
 
 #define DG_CONTACT_TRANSLATION_ERROR (dgFloat32 (1.0e-3f))
@@ -248,8 +249,11 @@ dgCollisionInstance* dgWorld::CreateClothPatchMesh (dgMeshEffect* const mesh, dg
 
 dgCollisionInstance* dgWorld::CreateDeformableMesh (dgMeshEffect* const mesh, dgInt32 shapeID)
 {
-dgAssert (0);
-return NULL;
+	dgAssert (m_allocator == mesh->GetAllocator());
+	dgCollision* const collision = new (m_allocator) dgCollisionDeformableSolidMesh (this, mesh);
+	dgCollisionInstance* const instance = CreateInstance (collision, shapeID, dgGetIdentityMatrix()); 
+	collision->Release();
+	return instance;
 }
 
 

@@ -40,38 +40,17 @@ class dgCollisionDeformableSolidMesh: public dgCollisionDeformableMesh
 	virtual ~dgCollisionDeformableSolidMesh(void);
 
 /*
-	dgInt32 GetVisualPointsCount() const;
-	void UpdateVisualNormals();
-	void GetVisualVertexData(dgInt32 vertexStrideInByte, dgFloat32* const vertex,
-		dgInt32 normalStrideInByte, dgFloat32* const normals, 
-		dgInt32 uvStrideInByte0, dgFloat32* const uv0,
-		dgInt32 uvStrideInByte1, dgFloat32* const uv1);
-
-	void* GetFirtVisualSegment() const;
-	void* GetNextVisualSegment(void* const segment) const;
-
-	dgInt32 GetSegmentMaterial (void* const segment) const;
-	dgInt32 GetSegmentIndexCount (void* const segment) const;
-	const dgInt16* GetSegmentIndexList (void* const segment) const;
-
 	void SetStiffness (dgFloat32 stiffness);
 	void SetPlasticity (dgFloat32 plasticity);
 	void SetSkinThickness (dgFloat32 skinThickness);
-
-
-	
 	virtual void SetParticlesMasses (dgFloat32 totalMass);
 	virtual void SetParticlesVelocities (const dgVector& velocity);
-
-	
 	virtual void SetMatrix (const dgMatrix& matrix);
 	virtual void ApplyExternalAndInternalForces (dgDeformableBody* const myBody, dgFloat32 timestep, dgInt32 threadIndex);
 
 	protected:
 	class dgDeformableNode;
-	class dgDeformationRegion;
 
-	
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
 	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
 	virtual void GetCollidingFaces (dgPolygonMeshDesc* const data) const;
@@ -94,13 +73,26 @@ class dgCollisionDeformableSolidMesh: public dgCollisionDeformableMesh
 	bool SanityCheck () const;
 */
 
+	class dgDeformationRegion;
+
 	void Serialize(dgSerialize callback, void* const userData) const;
 	virtual dgInt32 CalculateSignature () const;
 
-/*
-	dgParticle m_particles;
+	virtual void IntegrateParticles (dgFloat32 timestep);
+	virtual void ResolvePositionsConstraints (dgFloat32 timestep);
+
+	virtual void EndConfiguration ();
+	virtual void ConstraintParticle (dgInt32 particleIndex, const dgVector& posit, const dgBody* const body);
+
+
+	void CreateRegions();
+
+	dgVector* m_shapePosition;
+	dgDeformationRegion* m_regions;
 	dgInt32 m_regionsCount;
-	dgInt32 m_trianglesCount;
+
+	
+/*
 	dgInt32 m_nodesCount;
 	dgFloat32 m_stiffness;
 	dgFloat32 m_plasticity;
@@ -109,11 +101,7 @@ class dgCollisionDeformableSolidMesh: public dgCollisionDeformableMesh
 	dgVector* m_faceNormals;
 	dgDeformableNode* m_rootNode;
 	dgDeformableNode* m_nodesMemory;
-	dgDeformationRegion* m_regions;
 
-	dgInt32 m_visualVertexCount;
-	dgVisualVertexData* m_visualVertexData; 
-	dgList<dgMeshSegment> m_visualSegments;
 */
 	friend class dgWorld;
 };

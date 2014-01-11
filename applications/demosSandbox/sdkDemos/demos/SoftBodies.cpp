@@ -33,8 +33,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 
 		// create the render mesh
 		DemoMesh* const mesh = new DemoMesh ("softMesh");
-dAssert (0);
-//		SetMesh(mesh);
+		SetMesh(mesh, GetIdentityMatrix());
 		mesh->Release();
 
 		NewtonWorld* const world = scene->GetNewton();
@@ -129,9 +128,6 @@ dAssert (0);
 
 	static NewtonCollision* CreateSoftBodyCollisionShape (DemoEntityManager* const scene)
 	{
-		dAssert (0);
-		return NULL;
-/*
 		NewtonWorld* const world = scene->GetNewton();
 
 		// create two auxiliary objects to help with the graphics part
@@ -140,13 +136,12 @@ dAssert (0);
 
 		NewtonCollision* const box = CreateConvexCollision (world, GetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
 		//NewtonCollision* const box = CreateConvexCollision (world, GetIdentityMatrix(), size, _SPHERE_PRIMITIVE, 0);
-		
 
 		// now convert the collision into a mesh, with materials and UV
 		NewtonMesh* const mesh = NewtonMeshCreateFromCollision(box);
 		int material = LoadTexture("smilli.tga");
-		//NewtonMeshApplyBoxMapping(mesh, material, material, material);
-		NewtonMeshApplySphericalMapping(mesh, material);
+		NewtonMeshApplyBoxMapping(mesh, material, material, material);
+		//NewtonMeshApplySphericalMapping(mesh, material);
 
 		// now create a soft collision mesh
 		NewtonCollision* const softCollisionMesh = NewtonCreateDeformableMesh (world, mesh, 0);
@@ -157,7 +152,6 @@ dAssert (0);
 		NewtonMeshDestroy(mesh);
 		NewtonDestroyCollision (box);
 		return softCollisionMesh;
-*/
 	}
 
 
@@ -195,38 +189,77 @@ dAssert (0);
 		NewtonMesh* const mesh = NewtonMeshCreate(world);
 		NewtonMeshBeginFace (mesh);
 		for (int i = 0; i < steps - 1; i ++) {
-			for (int j = 0; j < steps - 1; j ++) {
-				face[0][0] = points[i][j].m_x;
-				face[0][1] = points[i][j].m_y;
-				face[0][2] = points[i][j].m_z;
-				face[0][3] = points[i][j].m_w;
+//			if (i & 1) {
+			if (1) {
+				for (int j = 0; j < steps - 1; j ++) {
+					face[0][0] = points[i][j].m_x;
+					face[0][1] = points[i][j].m_y;
+					face[0][2] = points[i][j].m_z;
+					face[0][3] = points[i][j].m_w;
 
-				face[1][0] = points[i][j + 1].m_x;
-				face[1][1] = points[i][j + 1].m_y;
-				face[1][2] = points[i][j + 1].m_z;
-				face[1][3] = points[i][j + 1].m_w;
+					face[1][0] = points[i][j + 1].m_x;
+					face[1][1] = points[i][j + 1].m_y;
+					face[1][2] = points[i][j + 1].m_z;
+					face[1][3] = points[i][j + 1].m_w;
 
-				face[2][0] = points[i + 1][j + 1].m_x;
-				face[2][1] = points[i + 1][j + 1].m_y;
-				face[2][2] = points[i + 1][j + 1].m_z;
-				face[2][3] = points[i + 1][j + 1].m_w;
-				NewtonMeshAddFace (mesh, 3, face[0], sizeof (face) / 3, 0);
+					face[2][0] = points[i + 1][j + 1].m_x;
+					face[2][1] = points[i + 1][j + 1].m_y;
+					face[2][2] = points[i + 1][j + 1].m_z;
+					face[2][3] = points[i + 1][j + 1].m_w;
+					NewtonMeshAddFace (mesh, 3, face[0], sizeof (face) / 3, 0);
 
-				face[0][0] = points[i][j].m_x;
-				face[0][1] = points[i][j].m_y;
-				face[0][2] = points[i][j].m_z;
-				face[0][3] = points[i][j].m_w;
+					face[0][0] = points[i][j].m_x;
+					face[0][1] = points[i][j].m_y;
+					face[0][2] = points[i][j].m_z;
+					face[0][3] = points[i][j].m_w;
 
-				face[1][0] = points[i + 1][j + 1].m_x;
-				face[1][1] = points[i + 1][j + 1].m_y;
-				face[1][2] = points[i + 1][j + 1].m_z;
-				face[1][3] = points[i + 1][j + 1].m_w;
+					face[1][0] = points[i + 1][j + 1].m_x;
+					face[1][1] = points[i + 1][j + 1].m_y;
+					face[1][2] = points[i + 1][j + 1].m_z;
+					face[1][3] = points[i + 1][j + 1].m_w;
 
-				face[2][0] = points[i + 1][j].m_x;
-				face[2][1] = points[i + 1][j].m_y;
-				face[2][2] = points[i + 1][j].m_z;
-				face[2][3] = points[i + 1][j].m_w;
-				NewtonMeshAddFace (mesh, 3, face[0], sizeof (face) / 3, 0);
+					face[2][0] = points[i + 1][j].m_x;
+					face[2][1] = points[i + 1][j].m_y;
+					face[2][2] = points[i + 1][j].m_z;
+					face[2][3] = points[i + 1][j].m_w;
+					NewtonMeshAddFace (mesh, 3, face[0], sizeof (face) / 3, 0);
+				}
+			} else {
+
+				for (int j = 0; j < steps - 1; j ++) {
+					face[0][0] = points[i][j].m_x;
+					face[0][1] = points[i][j].m_y;
+					face[0][2] = points[i][j].m_z;
+					face[0][3] = points[i][j].m_w;
+
+					face[1][0] = points[i][j + 1].m_x;
+					face[1][1] = points[i][j + 1].m_y;
+					face[1][2] = points[i][j + 1].m_z;
+					face[1][3] = points[i][j + 1].m_w;
+
+					face[2][0] = points[i + 1][j].m_x;
+					face[2][1] = points[i + 1][j].m_y;
+					face[2][2] = points[i + 1][j].m_z;
+					face[2][3] = points[i + 1][j].m_w;
+					NewtonMeshAddFace (mesh, 3, face[0], sizeof (face) / 3, 0);
+
+					face[0][0] = points[i][j + 1].m_x;
+					face[0][1] = points[i][j + 1].m_y;
+					face[0][2] = points[i][j + 1].m_z;
+					face[0][3] = points[i][j + 1].m_w;
+
+					face[1][0] = points[i + 1][j + 1].m_x;
+					face[1][1] = points[i + 1][j + 1].m_y;
+					face[1][2] = points[i + 1][j + 1].m_z;
+					face[1][3] = points[i + 1][j + 1].m_w;
+
+					face[2][0] = points[i + 1][j].m_x;
+					face[2][1] = points[i + 1][j].m_y;
+					face[2][2] = points[i + 1][j].m_z;
+					face[2][3] = points[i + 1][j].m_w;
+					NewtonMeshAddFace (mesh, 3, face[0], sizeof (face) / 3, 0);
+				}
+
 			}
 		}
 		NewtonMeshEndFace (mesh);
@@ -336,7 +369,7 @@ void SoftBodies(DemoEntityManager* const scene)
 	dVector location (8.0f, 0.0f, -10.0f, 0.0f) ;
 
 	NewtonCollision* const softBody = SimpleSoftBodyEntity::CreateSoftBodyCollisionShape (scene);
-//	new SimpleSoftBodyEntity (scene, softBody, location);
+	new SimpleSoftBodyEntity (scene, softBody, location);
 	NewtonDestroyCollision (softBody);
 
 	dQuaternion rot;
