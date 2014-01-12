@@ -2620,9 +2620,9 @@ void NewtonCompoundCollisionRemoveSubCollision (NewtonCollision* const compoundC
 	dgCollisionInstance* const instance = (dgCollisionInstance*) compoundCollision;
 	if (instance->IsType (dgCollision::dgCollisionCompound_RTTI)) {
 		dgCollisionCompound* const collision = (dgCollisionCompound*) instance->GetChildShape();
-		dgCollisionInstance* const childCollision = collision->GetCollisionFromNode((dgTree<dgCollisionCompound::dgNodeBase*, dgInt32>::dgTreeNode*)collisionNode);
+		dgCollisionInstance* const childCollision = collision->GetCollisionFromNode((dgCollisionCompound::dgTreeArray::dgTreeNode*)collisionNode);
 		if (childCollision && childCollision->IsType(dgCollision::dgCollisionConvexShape_RTTI)) {
-			collision->RemoveCollision ((dgTree<dgCollisionCompound::dgNodeBase*, dgInt32>::dgTreeNode*)collisionNode);
+			collision->RemoveCollision ((dgCollisionCompound::dgTreeArray::dgTreeNode*)collisionNode);
 		}
 	}
 }
@@ -2644,7 +2644,7 @@ void NewtonCompoundCollisionSetSubCollisionMatrix (NewtonCollision* const compou
 	dgCollisionInstance* const compoundInstance = (dgCollisionInstance*) compoundCollision;
 	if (compoundInstance->IsType (dgCollision::dgCollisionCompound_RTTI)) {
 		dgCollisionCompound* const collision = (dgCollisionCompound*) compoundInstance->GetChildShape();
-		collision->SetCollisionMatrix((dgTree<dgCollisionCompound::dgNodeBase*, dgInt32>::dgTreeNode*)collisionNode, dgMatrix(matrix));
+		collision->SetCollisionMatrix((dgCollisionCompound::dgTreeArray::dgTreeNode*)collisionNode, dgMatrix(matrix));
 	}
 }
 
@@ -2687,7 +2687,7 @@ void* NewtonCompoundCollisionGetNextNode (NewtonCollision* const compoundCollisi
 	dgCollisionInstance* const instance = (dgCollisionInstance*) compoundCollision;
 	if (instance->IsType (dgCollision::dgCollisionCompound_RTTI)) {
 		dgCollisionCompound* const collision = (dgCollisionCompound*) instance->GetChildShape();
-		return collision->GetNextNode((dgTree<dgCollisionCompound::dgNodeBase*, dgInt32>::dgTreeNode*)node);
+		return collision->GetNextNode((dgCollisionCompound::dgTreeArray::dgTreeNode*)node);
 	}
 	return NULL;
 }
@@ -2709,7 +2709,7 @@ int NewtonCompoundCollisionGetNodeIndex (NewtonCollision* const compoundCollisio
 	dgCollisionInstance* const instance = (dgCollisionInstance*) compoundCollision;
 	if (instance->IsType (dgCollision::dgCollisionCompound_RTTI)) {
 		dgCollisionCompound* const collision = (dgCollisionCompound*) instance->GetChildShape();
-		return collision->GetNodeIndex((dgTree<dgCollisionCompound::dgNodeBase*, dgInt32>::dgTreeNode*)node);
+		return collision->GetNodeIndex((dgCollisionCompound::dgTreeArray::dgTreeNode*)node);
 	}
 	return -1;
 }
@@ -2721,7 +2721,7 @@ NewtonCollision* NewtonCompoundCollisionGetCollisionFromNode (NewtonCollision* c
 	dgCollisionInstance* const compoundInstance = (dgCollisionInstance*) compoundCollision;
 	if (compoundInstance->IsType (dgCollision::dgCollisionCompound_RTTI)) {
 		dgCollisionCompound* const collision = (dgCollisionCompound*) compoundInstance->GetChildShape();
-		return (NewtonCollision*) collision->GetCollisionFromNode((dgTree<dgCollisionCompound::dgNodeBase*, dgInt32>::dgTreeNode*)node);
+		return (NewtonCollision*) collision->GetCollisionFromNode((dgCollisionCompound::dgTreeArray::dgTreeNode*)node);
 	}
 	return NULL;
 }
@@ -2799,6 +2799,58 @@ void NewtonFracturedCompoundSetCallbacks (const NewtonCollision* const fractured
 		dgCollisionCompoundFractured* const compound = (dgCollisionCompoundFractured*) collision->GetChildShape();
 		compound->SetCallbacks ((dgCollisionCompoundFractured::OnEmitFractureChunkCallBack) emitFracfuredChunk, (dgCollisionCompoundFractured::OnReconstructFractureMainMeshCallBack) regenerateMainMeshCallback);
 	}
+}
+
+/*
+void NewtonFracturedCompoundDetachNode (const NewtonCollision* const fracturedCompound, void* const collisionNode)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgCollisionInstance* const collision = (dgCollisionInstance*) fracturedCompound;
+
+	if (collision->IsType (dgCollision::dgCollisionCompoundBreakable_RTTI)) {
+		dgCollisionCompoundFractured* const compound = (dgCollisionCompoundFractured*) collision->GetChildShape();
+		compound->DetachNode((dgCollisionCompound::dgTreeArray::dgTreeNode*)collisionNode);
+	}
+}
+*/
+
+void* NewtonFracturedCompoundFirstNeighborNode (const NewtonCollision* const fracturedCompound, void* const collisionNode)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgCollisionInstance* const collision = (dgCollisionInstance*) fracturedCompound;
+dgAssert (0);
+	if (collision->IsType (dgCollision::dgCollisionCompoundBreakable_RTTI)) {
+		dgCollisionCompoundFractured* const compound = (dgCollisionCompoundFractured*) collision->GetChildShape();
+		return NULL;
+//		return compound->IsNodeSaseToDetach((dgCollisionCompound::dgTreeArray::dgTreeNode*)collisionNode) ? 1 : 0;
+	}
+	return 0;
+}
+
+void* NewtonFracturedCompoundNextNeighborNode (const NewtonCollision* const fracturedCompound, void* const collisionNode)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgCollisionInstance* const collision = (dgCollisionInstance*) fracturedCompound;
+dgAssert (0);
+	if (collision->IsType (dgCollision::dgCollisionCompoundBreakable_RTTI)) {
+		dgCollisionCompoundFractured* const compound = (dgCollisionCompoundFractured*) collision->GetChildShape();
+		return NULL;
+		//		return compound->IsNodeSaseToDetach((dgCollisionCompound::dgTreeArray::dgTreeNode*)collisionNode) ? 1 : 0;
+	}
+	return 0;
+}
+
+
+int NewtonFracturedCompoundIsNodeFreeToDetach (const NewtonCollision* const fracturedCompound, void* const collisionNode)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgCollisionInstance* const collision = (dgCollisionInstance*) fracturedCompound;
+
+	if (collision->IsType (dgCollision::dgCollisionCompoundBreakable_RTTI)) {
+		dgCollisionCompoundFractured* const compound = (dgCollisionCompoundFractured*) collision->GetChildShape();
+		return compound->IsNodeSaseToDetach((dgCollisionCompound::dgTreeArray::dgTreeNode*)collisionNode) ? 1 : 0;
+	}
+	return 0;
 }
 
 NewtonFracturedCompoundMeshPart* NewtonFracturedCompoundGetFirstSubMesh(const NewtonCollision* const fracturedCompound)
@@ -2942,121 +2994,6 @@ int NewtonFracturedCompoundMeshPartGetIndexCount (const void* const segment)
 
 
 
-/*
-void NewtonCompoundBreakableResetAnchoredPieces (const NewtonCollision* const fracturedCompound)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgCollisionInstance* const collision = (dgCollisionInstance*) compoundBreakable;
-
-	if (collision->IsType (dgCollision::dgCollisionCompoundBreakable_RTTI)) {
-		dgCollisionCompoundBreakable* const compound = (dgCollisionCompoundBreakable*) collision;
-		compound->ResetAnchor();
-	}
-}
-
-void NewtonCompoundBreakableSetAnchoredPieces (const NewtonCollision* const fracturedCompound, int fixShapesCount, dFloat* const matrixPallete, NewtonCollision** const fixedShapesArray)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgCollisionInstance* const collision = (dgCollisionInstance*) compoundBreakable;
-
-	if (collision->IsType (dgCollision::dgCollisionCompoundBreakable_RTTI)) {
-		dgCollisionCompoundBreakable* const compound = (dgCollisionCompoundBreakable*) collision;
-		compound->SetAnchoredParts (fixShapesCount, (dgMatrix*) matrixPallete, (const dgCollisionInstance**) fixedShapesArray);
-	}
-}
-
-
-
-void NewtonBreakableBeginDelete (const NewtonCollision* const fracturedCompound)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgCollisionInstance* const collision = (dgCollisionInstance*) compoundBreakable;
-	if (collision->IsType (dgCollision::dgCollisionCompoundBreakable_RTTI)) {
-		dgCollisionCompoundBreakable* const compound = (dgCollisionCompoundBreakable*) collision;
-		compound->DeleteComponentBegin ();
-	}
-}
-
-
-NewtonBody* NewtonBreakableCreateDebrieBody (const NewtonCollision* const fracturedCompound, const NewtonBreakableComponentMesh* const component)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgCollisionInstance* const collision = (dgCollisionInstance*) compoundBreakable;
-
-	dgBody* body = NULL;
-	if (collision->IsType (dgCollision::dgCollisionCompoundBreakable_RTTI)) {
-		dgCollisionCompoundBreakable* const compound = (dgCollisionCompoundBreakable*) collision;
-		body = compound->CreateComponentBody ((dgCollisionCompoundBreakable::dgDebriGraph::dgListNode*) component);
-	}
-
-	return (NewtonBody*) body;
-}
-
-
-void NewtonBreakableDeleteComponent (const NewtonCollision* const fracturedCompound, const NewtonBreakableComponentMesh* const component)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgCollisionInstance* const collision = (dgCollisionInstance*) compoundBreakable;
-
-	if (collision->IsType (dgCollision::dgCollisionCompoundBreakable_RTTI)) {
-		dgCollisionCompoundBreakable* const compound = (dgCollisionCompoundBreakable*) collision;
-		compound->DeleteComponent ((dgCollisionCompoundBreakable::dgDebriGraph::dgListNode*) component);
-	}
-}
-
-void NewtonBreakableEndDelete (const NewtonCollision* const fracturedCompound)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgCollisionInstance* const collision = (dgCollisionInstance*) compoundBreakable;
-
-	if (collision->IsType (dgCollision::dgCollisionCompoundBreakable_RTTI)) {
-		dgCollisionCompoundBreakable* const compound = (dgCollisionCompoundBreakable*) collision;
-		compound->DeleteComponentEnd ();
-	}
-}
-
-NewtonBreakableComponentMesh* NewtonBreakableGetFirstComponent (const NewtonCollision* const fracturedCompound)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgCollisionInstance* const collision = (dgCollisionInstance*) compoundBreakable;
-
-	NewtonBreakableComponentMesh* mesh = NULL;
-	if (collision->IsType (dgCollision::dgCollisionCompoundBreakable_RTTI)) {
-		dgCollisionCompoundBreakable* const compound = (dgCollisionCompoundBreakable*) collision;
-		mesh = (NewtonBreakableComponentMesh*) compound->GetFirstComponentMesh();
-	}
-	return mesh;
-}
-
-NewtonBreakableComponentMesh* NewtonBreakableGetNextComponent (const NewtonBreakableComponentMesh* const component)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgCollisionCompoundBreakable::dgDebriGraph::dgListNode* node = (dgCollisionCompoundBreakable::dgDebriGraph::dgListNode*) component;
-	node = node->GetNext();
-
-	return node->GetNext() ?  (NewtonBreakableComponentMesh*) node : NULL;
-}
-
-
-
-int NewtonBreakableGetComponentsInRadius (const NewtonCollision* const fracturedCompound, const dFloat* position, dFloat radius, NewtonBreakableComponentMesh** const segments, int maxCount)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-
-	dgInt32 count = 0;
-	dgCollisionInstance* const collision = (dgCollisionInstance*) compoundBreakable;
-	if (collision->IsType (dgCollision::dgCollisionCompoundBreakable_RTTI)) {
-		dgCollisionCompoundBreakable* const compound = (dgCollisionCompoundBreakable*) collision;
-		dgVector origin (position[0], position[1], position[2], dgFloat32 (0.0f));
-		count = compound->GetSegmentsInRadius(origin, radius, (dgCollisionCompoundBreakable::dgDebriGraph::dgListNode**) segments, maxCount);
-	}
-
-	return count;
-}
-
-
-
-*/
 
 
 // Return the trigger volume flag of this shape.
@@ -3719,9 +3656,9 @@ void NewtonSceneCollisionRemoveSubCollision (NewtonCollision* const sceneCollisi
 	dgCollisionInstance* const sceneInstance = (dgCollisionInstance*) sceneCollision;
 	if (sceneInstance->IsType (dgCollision::dgCollisionScene_RTTI)) {
 		dgCollisionScene* const collision = (dgCollisionScene*) sceneInstance->GetChildShape();
-		dgCollisionInstance* const childCollision = collision->GetCollisionFromNode((dgTree<dgCollisionCompound::dgNodeBase*, dgInt32>::dgTreeNode*)collisionNode);
+		dgCollisionInstance* const childCollision = collision->GetCollisionFromNode((dgCollisionCompound::dgTreeArray::dgTreeNode*)collisionNode);
 		if (childCollision) {
-			collision->RemoveCollision ((dgTree<dgCollisionCompound::dgNodeBase*, dgInt32>::dgTreeNode*)collisionNode);
+			collision->RemoveCollision ((dgCollisionCompound::dgTreeArray::dgTreeNode*)collisionNode);
 		}
 	}
 }

@@ -628,6 +628,35 @@ extern "C" {
 
 	// **********************************************************************************************
 	//
+	// Fractured compound collision primitives interface
+	//
+	// **********************************************************************************************
+	NEWTON_API NewtonCollision* NewtonCreateFracturedCompoundCollision (const NewtonWorld* const newtonWorld, const NewtonMesh* const solidMesh, int shapeID, int fracturePhysicsMaterialID, int pointcloudCount, const dFloat* const vertexCloud, int strideInBytes, int materialID, const dFloat* const textureMatrix,
+																		NewtonFractureCompoundCollisionReconstructMainMeshCallBack regenerateMainMeshCallback, NewtonFractureCompoundCollisionOnEmitChunk emitFracfuredChunk);
+	NEWTON_API void NewtonFracturedCompoundSetCallbacks (const NewtonCollision* const fracturedCompound, NewtonFractureCompoundCollisionReconstructMainMeshCallBack regenerateMainMeshCallback, NewtonFractureCompoundCollisionOnEmitChunk emitFracfuredChunk);
+
+	NEWTON_API int NewtonFracturedCompoundIsNodeFreeToDetach (const NewtonCollision* const fracturedCompound, void* const collisionNode);
+	NEWTON_API void* NewtonFracturedCompoundFirstNeighborNode (const NewtonCollision* const fracturedCompound, void* const collisionNode);
+	NEWTON_API void* NewtonFracturedCompoundNextNeighborNode (const NewtonCollision* const fracturedCompound, void* const collisionNode);
+	
+	NEWTON_API NewtonFracturedCompoundMeshPart* NewtonFracturedCompoundGetMainMesh (const NewtonCollision* const fracturedCompound);
+	NEWTON_API NewtonFracturedCompoundMeshPart* NewtonFracturedCompoundGetFirstSubMesh(const NewtonCollision* const fracturedCompound);
+	NEWTON_API NewtonFracturedCompoundMeshPart* NewtonFracturedCompoundGetNextSubMesh(const NewtonCollision* const fracturedCompound, NewtonFracturedCompoundMeshPart* const subMesh);
+
+	NEWTON_API int NewtonFracturedCompoundCollisionGetVertexCount (const NewtonCollision* const fracturedCompound, const NewtonFracturedCompoundMeshPart* const meshOwner); 
+	NEWTON_API const dFloat* NewtonFracturedCompoundCollisionGetVertexPositions (const NewtonCollision* const fracturedCompound, const NewtonFracturedCompoundMeshPart* const meshOwner);
+	NEWTON_API const dFloat* NewtonFracturedCompoundCollisionGetVertexNormals (const NewtonCollision* const fracturedCompound, const NewtonFracturedCompoundMeshPart* const meshOwner);
+	NEWTON_API const dFloat* NewtonFracturedCompoundCollisionGetVertexUVs (const NewtonCollision* const fracturedCompound, const NewtonFracturedCompoundMeshPart* const meshOwner);
+	NEWTON_API int NewtonFracturedCompoundMeshPartGetIndexStream (const NewtonCollision* const fracturedCompound, const NewtonFracturedCompoundMeshPart* const meshOwner, const void* const segment, int* const index); 
+
+	NEWTON_API void* NewtonFracturedCompoundMeshPartGetFirstSegment (const NewtonFracturedCompoundMeshPart* const fractureCompoundMeshPart); 
+	NEWTON_API void* NewtonFracturedCompoundMeshPartGetNextSegment (const void* const fractureCompoundMeshSegment); 
+	NEWTON_API int NewtonFracturedCompoundMeshPartGetMaterial (const void* const fractureCompoundMeshSegment); 
+	NEWTON_API int NewtonFracturedCompoundMeshPartGetIndexCount (const void* const fractureCompoundMeshSegment); 
+
+
+	// **********************************************************************************************
+	//
 	// scene collision are static compound collision that can take polygonal static collisions
 	//
 	// **********************************************************************************************
@@ -647,31 +676,6 @@ extern "C" {
 	NEWTON_API int NewtonSceneCollisionGetNodeIndex (NewtonCollision* const sceneCollision, void* const collisionNode);
 	NEWTON_API NewtonCollision* NewtonSceneCollisionGetCollisionFromNode (NewtonCollision* const sceneCollision, void* const collisionNode);
 
-
-
-	// **********************************************************************************************
-	//
-	// Fractured compound collision primitives interface
-	//
-	// **********************************************************************************************
-	NEWTON_API NewtonCollision* NewtonCreateFracturedCompoundCollision (const NewtonWorld* const newtonWorld, const NewtonMesh* const solidMesh, int shapeID, int fracturePhysicsMaterialID, int pointcloudCount, const dFloat* const vertexCloud, int strideInBytes, int materialID, const dFloat* const textureMatrix,
-																		NewtonFractureCompoundCollisionReconstructMainMeshCallBack regenerateMainMeshCallback, NewtonFractureCompoundCollisionOnEmitChunk emitFracfuredChunk);
-	NEWTON_API void NewtonFracturedCompoundSetCallbacks (const NewtonCollision* const fracturedCompound, NewtonFractureCompoundCollisionReconstructMainMeshCallBack regenerateMainMeshCallback, NewtonFractureCompoundCollisionOnEmitChunk emitFracfuredChunk);
-	
-	NEWTON_API NewtonFracturedCompoundMeshPart* NewtonFracturedCompoundGetMainMesh (const NewtonCollision* const fracturedCompound);
-	NEWTON_API NewtonFracturedCompoundMeshPart* NewtonFracturedCompoundGetFirstSubMesh(const NewtonCollision* const fracturedCompound);
-	NEWTON_API NewtonFracturedCompoundMeshPart* NewtonFracturedCompoundGetNextSubMesh(const NewtonCollision* const fracturedCompound, NewtonFracturedCompoundMeshPart* const subMesh);
-
-	NEWTON_API int NewtonFracturedCompoundCollisionGetVertexCount (const NewtonCollision* const fracturedCompound, const NewtonFracturedCompoundMeshPart* const meshOwner); 
-	NEWTON_API const dFloat* NewtonFracturedCompoundCollisionGetVertexPositions (const NewtonCollision* const fracturedCompound, const NewtonFracturedCompoundMeshPart* const meshOwner);
-	NEWTON_API const dFloat* NewtonFracturedCompoundCollisionGetVertexNormals (const NewtonCollision* const fracturedCompound, const NewtonFracturedCompoundMeshPart* const meshOwner);
-	NEWTON_API const dFloat* NewtonFracturedCompoundCollisionGetVertexUVs (const NewtonCollision* const fracturedCompound, const NewtonFracturedCompoundMeshPart* const meshOwner);
-	NEWTON_API int NewtonFracturedCompoundMeshPartGetIndexStream (const NewtonCollision* const fracturedCompound, const NewtonFracturedCompoundMeshPart* const meshOwner, const void* const segment, int* const index); 
-
-	NEWTON_API void* NewtonFracturedCompoundMeshPartGetFirstSegment (const NewtonFracturedCompoundMeshPart* const fractureCompoundMeshPart); 
-	NEWTON_API void* NewtonFracturedCompoundMeshPartGetNextSegment (const void* const fractureCompoundMeshSegment); 
-	NEWTON_API int NewtonFracturedCompoundMeshPartGetMaterial (const void* const fractureCompoundMeshSegment); 
-	NEWTON_API int NewtonFracturedCompoundMeshPartGetIndexCount (const void* const fractureCompoundMeshSegment); 
 
 
 //	NEWTON_API void NewtonCompoundBreakableResetAnchoredPieces (const NewtonCollision* const fracturedCompound);

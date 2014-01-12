@@ -218,6 +218,23 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
 	NewtonFracturedCompoundSetCallbacks (structuredFracturedCollision, OnReconstructMainMeshCallBack, OnEmitFracturedChunk);
 	fclose (file);
 #endif	
+
+#if 1
+	void* nextNode;
+	dList<void*> detachableNodes;
+	NewtonCompoundCollisionBeginAddRemove(structuredFracturedCollision);	
+	for (void* node = NewtonCompoundCollisionGetFirstNode(structuredFracturedCollision); node; node = nextNode) { 
+		nextNode = NewtonCompoundCollisionGetNextNode(structuredFracturedCollision, node);
+		if (NewtonFracturedCompoundIsNodeFreeToDetach (structuredFracturedCollision, node)) {
+			detachableNodes.Append(node);
+		}
+	}
+
+	for (dList<void*>::dListNode* node = detachableNodes.GetFirst(); node; node = node->GetNext()) { 
+		NewtonCompoundCollisionRemoveSubCollision (structuredFracturedCollision, node->GetInfo());
+	}
+	NewtonCompoundCollisionEndAddRemove(structuredFracturedCollision);	
+#endif
 	
 
     dVector com;

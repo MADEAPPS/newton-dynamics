@@ -917,7 +917,7 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (
 	dgFlatVertexArray vertexArray(m_world->GetAllocator());
 	dgTree<dgConectivityGraph::dgListNode*, dgInt32> conectinyMap(GetAllocator());
 	
-    BeginAddRemove ();
+    dgCollisionCompound::BeginAddRemove ();
     for (dgFractureBuilder::dgFractureConectivity::dgListNode* node = fractureBuilder.m_conectivity.GetFirst(); node; node = node->GetNext()) {
         dgInt32 index = node->GetInfo().m_nodeData;
         dgFractureBuilder::dgTreeNode* const fractureNode = fractureBuilder.Find(index);
@@ -929,7 +929,7 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (
 		conectinyMap.Insert(conectivityNode, index);
 		collisionInstance->Release();
 	}
-    EndAddRemove ();
+    dgCollisionCompound::EndAddRemove ();
 
 	for (dgFractureBuilder::dgFractureConectivity::dgListNode* node = fractureBuilder.m_conectivity.GetFirst(); node; node = node->GetNext()) {
 		dgInt32 index0 = node->GetInfo().m_nodeData;
@@ -1217,6 +1217,53 @@ dgInt32 dgCollisionCompoundFractured::CalculateContacts (dgCollidingPairCollecto
 	return count;
 }
 
+void dgCollisionCompoundFractured::BeginAddRemove ()
+{
+	dgCollisionCompound::BeginAddRemove ();
+}
+
+void dgCollisionCompoundFractured::EndAddRemove ()
+{
+	dgCollisionCompound::EndAddRemove ();
+	BuildMainMeshSubMehes();
+//	m_reconstructMainMesh (myBody, m_conectivity.GetLast(), myInstance);
+}
+
+
+void dgCollisionCompoundFractured::RemoveCollision (dgTreeArray::dgTreeNode* const node)
+{
+	dgConectivityGraphMap::dgTreeNode* const mapNode = m_conectivityMap.Find(node->GetInfo()->GetShape());
+	dgAssert (mapNode);
+
+	dgConectivityGraph::dgListNode* const chunkNode = mapNode->GetInfo();
+
+	for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = chunkNode->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
+		dgConectivityGraph::dgListNode* const node = edgeNode->GetInfo().m_node;
+		dgDebriNodeInfo& childNodeInfo = node->GetInfo().m_nodeData;
+		childNodeInfo.m_mesh->m_isVisible = true;
+		for (dgMesh::dgListNode* meshSegment = childNodeInfo.m_mesh->GetFirst(); meshSegment; meshSegment = meshSegment->GetNext()) {
+			dgSubMesh* const subMesh = &meshSegment->GetInfo();
+			subMesh->m_visibleFaces = true;
+		}
+	}
+
+
+	dgDebriNodeInfo& nodeInfo = chunkNode->GetInfo().m_nodeData;
+	dgCollisionInstance* const chunkCollision = nodeInfo.m_shapeNode->GetInfo()->GetShape();
+
+	m_conectivityMap.Remove (chunkCollision);
+//	RemoveCollision (nodeInfo.m_shapeNode);
+	m_conectivity.DeleteNode(chunkNode);
+	dgCollisionCompound::RemoveCollision (node);
+}
+
+bool dgCollisionCompoundFractured::IsNodeSaseToDetach(dgTreeArray::dgTreeNode* const node) const
+{
+	dgConectivityGraphMap::dgTreeNode* const mapNode = m_conectivityMap.Find(node->GetInfo()->GetShape());
+	dgAssert (mapNode);
+	return mapNode ? CanChunk (mapNode->GetInfo()) : false;
+}
+
 bool dgCollisionCompoundFractured::CanChunk (dgConectivityGraph::dgListNode* const chunkNode) const
 {
 	dgVector directionsMap[32];
@@ -1279,7 +1326,7 @@ void dgCollisionCompoundFractured::SpawnSingleChunk (dgBody* const myBody, const
 	m_emitFracturedChunk(chunkBody, chunkNode, myInstance);
 
 	m_conectivityMap.Remove (chunkCollision);
-	RemoveCollision (nodeInfo.m_shapeNode);
+	dgCollisionCompound::RemoveCollision (nodeInfo.m_shapeNode);
 	m_conectivity.DeleteNode(chunkNode);
 
 	m_world->GlobalUnlock();

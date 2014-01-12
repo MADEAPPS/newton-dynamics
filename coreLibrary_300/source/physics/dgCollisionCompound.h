@@ -143,11 +143,11 @@ class dgCollisionCompound: public dgCollision
 	dgCollisionCompound (dgWorld* const world, dgDeserialize deserialization, void* const userData);
 	virtual ~dgCollisionCompound();
 
-	void BeginAddRemove ();
-	dgTreeArray::dgTreeNode* AddCollision (dgCollisionInstance* const part);
-	void RemoveCollision (dgTreeArray::dgTreeNode* const node);
-	void SetCollisionMatrix (dgTreeArray::dgTreeNode* const node, const dgMatrix& matrix);
-	void EndAddRemove ();
+	virtual void BeginAddRemove ();
+	virtual dgTreeArray::dgTreeNode* AddCollision (dgCollisionInstance* const part);
+	virtual void RemoveCollision (dgTreeArray::dgTreeNode* const node);
+	virtual void SetCollisionMatrix (dgTreeArray::dgTreeNode* const node, const dgMatrix& matrix);
+	virtual void EndAddRemove ();
 
 	void ApplyScale (const dgVector& scale);
 	void GetAABB (dgVector& p0, dgVector& p1) const;

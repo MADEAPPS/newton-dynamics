@@ -185,6 +185,11 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 	void SetImpulsePropgationFactor(dgFloat32 factor);
 	dgFloat32 GetSetImpulsePropgationFactor() const;
 
+	virtual void BeginAddRemove ();
+	virtual void RemoveCollision (dgTreeArray::dgTreeNode* const node);
+	virtual void EndAddRemove ();
+	bool IsNodeSaseToDetach (dgTreeArray::dgTreeNode* const node) const;
+
 	private:
 	void BuildMainMeshSubMehes() const;
 	dgVector GetObbSize() const;
