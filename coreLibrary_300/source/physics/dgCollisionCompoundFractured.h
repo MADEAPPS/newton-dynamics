@@ -126,7 +126,6 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 		public:
 		dgConectivityGraph (dgMemoryAllocator* const allocator);
 		dgConectivityGraph (const dgConectivityGraph& source);
-//		dgConectivityGraph (dgCollisionCompoundFractured* const source, dgDeserialize deserialization, void* const userData);
 		~dgConectivityGraph ();
 
 		dgListNode* AddNode (dgFlatVertexArray& vertexArray, dgMeshEffect* const factureVisualMesh, dgTreeArray::dgTreeNode* const collisionNode, dgInt32 interiorMaterialBase);

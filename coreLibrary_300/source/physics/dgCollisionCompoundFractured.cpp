@@ -906,8 +906,6 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (
 	,m_emitFracturedChunk(emitFracturedChunk) 
 	,m_reconstructMainMesh(reconstructMainMesh)
 {
-//pointcloudCount = 0;
-
 	m_collisionId = m_compoundFracturedCollision;
 	m_rtti |= dgCollisionCompoundBreakable_RTTI;
 
@@ -1246,12 +1244,10 @@ void dgCollisionCompoundFractured::RemoveCollision (dgTreeArray::dgTreeNode* con
 		}
 	}
 
-
 	dgDebriNodeInfo& nodeInfo = chunkNode->GetInfo().m_nodeData;
 	dgCollisionInstance* const chunkCollision = nodeInfo.m_shapeNode->GetInfo()->GetShape();
 
 	m_conectivityMap.Remove (chunkCollision);
-//	RemoveCollision (nodeInfo.m_shapeNode);
 	m_conectivity.DeleteNode(chunkNode);
 	dgCollisionCompound::RemoveCollision (node);
 }
@@ -1554,26 +1550,18 @@ dgCollisionCompoundFractured* dgCollisionCompoundFractured::PlaneClip (const dgV
 		startNode = FirstAcrossPlane (startNode, plane);
 	}
 
-//	dgConectivityGraph::dgListNode* startNode = m_conectivity.GetFirst();
-//	dgDebriNodeInfo& nodeInfo = startNode->GetInfo().m_nodeData;
-//	dgCollisionInstance* const instance = nodeInfo.m_shapeNode->GetInfo()->GetShape();
-//	dgInt32 dommy;
-//	dgVector positiveDir (plane & dgVector::m_triplexMask);
-//	dgVector negativeDir (positiveDir.CompProduct4(dgVector::m_negOne));
-//	const dgMatrix& matrix = instance->GetLocalMatrix(); 
-//	dgVector support (matrix.TransformVector(instance->SupportVertex(matrix.UnrotateVector(positiveDir), &dommy)));
-
+	dgVector posgDir (plane & dgVector::m_triplexMask);
+	dgVector negDir (posgDir.CompProduct4(dgVector::m_negOne));
 	if (startNode) {
 		dgInt32 stack = 1;
 		dgConectivityGraph::dgListNode* pool[256];
 		pool[0] = startNode;
 		m_lru ++;
-
 		while (stack) {
 			stack --;
 			dgConectivityGraph::dgListNode* const planeNode = pool[stack];
-			dgDebriNodeInfo& nodeInfo = startNode->GetInfo().m_nodeData;
-	/*
+			dgDebriNodeInfo& nodeInfo = planeNode->GetInfo().m_nodeData;
+	
 			if (nodeInfo.m_lru != m_lru) {
 
 				nodeInfo.m_lru = m_lru;
@@ -1586,18 +1574,26 @@ dgCollisionCompoundFractured* dgCollisionCompoundFractured::PlaneClip (const dgV
 					dgDebriNodeInfo& neighborgInfo = node->GetInfo().m_nodeData;
 					if (neighborgInfo.m_lru != m_lru) {
 						dgCollisionInstance* const instance = neighborgInfo.m_shapeNode->GetInfo()->GetShape();
+						const dgMatrix& matrix = instance->GetLocalMatrix(); 
 
-						dgVector support (instance->SupportVertex(negativeDir, &dommy) | dgVector::m_wOne);
+						dgInt32 dommy;
+						dgFloat32 dist;
+						dgVector support (matrix.TransformVector(instance->SupportVertex(matrix.UnrotateVector(negDir), &dommy)));
 						support.DotProduct4(plane).StoreScalar(&dist);
 						if (dist > dgFloat32 (0.0f)) {
-							dgAssert (0);
+							planeNode->GetInfo().DeleteEdge (edgeNode);
 						} else {
-						
+							dgVector support (matrix.TransformVector(instance->SupportVertex(matrix.UnrotateVector(posgDir), &dommy)));
+							support.DotProduct4(plane).StoreScalar(&dist);
+							if (dist > dgFloat32 (0.0f)) {
+								pool[stack] = node;
+								stack ++;
+								dgAssert (stack < sizeof (pool) / sizeof (pool[0]));
+							}
 						}
 					}
 				}
 			}
-	*/
 		}
 	}
 
