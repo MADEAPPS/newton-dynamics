@@ -115,6 +115,41 @@ dMatrix::dMatrix (dFloat pitch, dFloat yaw, dFloat roll, const dVector& location
 }
 
 
+bool dMatrix::TestIdentity() const 
+{
+	const dMatrix& matrix = *this;
+	const dMatrix& identity = GetIdentityMatrix();
+	
+	bool isIdentity = true;
+	for (int i = 0; isIdentity && (i < 3); i ++) {
+		isIdentity &= dAbs (matrix[3][i]) < 1.0e-4f;
+		for (int j = i; isIdentity && (j < 3); j ++) {
+			isIdentity &= dAbs (matrix[i][j]-identity[i][j]) < 1.0e-4f;
+		}
+	}
+	return isIdentity;
+}
+
+
+bool dMatrix::TestOrthogonal() const
+{
+	dVector n (m_front * m_up);
+	dFloat a = m_right % m_right;
+	dFloat b = m_up % m_up;
+	dFloat c = m_front % m_front;
+	dFloat d = n % m_right;
+
+	return (m_front[3] == dFloat (0.0f)) & 
+		(m_up[3] == dFloat (0.0f)) & 
+		(m_right[3] == dFloat (0.0f)) & 
+		(m_posit[3] == dFloat (1.0f)) &
+		(dAbs(a - dFloat (1.0f)) < dFloat (1.0e-4f)) & 
+		(dAbs(b - dFloat (1.0f)) < dFloat (1.0e-4f)) &
+		(dAbs(c - dFloat (1.0f)) < dFloat (1.0e-4f)) &
+		(dAbs(d - dFloat (1.0f)) < dFloat (1.0e-4f)); 
+}
+
+
 dVector dMatrix::GetEulerAngles (dEulerAngleOrder order) const
 {
 	int a0 = (order>>8)&3;
@@ -366,6 +401,8 @@ dMatrix dMatrix::Inverse4x4 () const
 	}
 	return inv;
 }
+
+
 
 
 #if 0

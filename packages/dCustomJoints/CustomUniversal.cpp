@@ -203,7 +203,7 @@ void CustomUniversal::ProjectError () const
 	dMatrix expectedMatrix0 (offsetMatrix * matrix1);
 	dMatrix errorMatrix (matrix0 * expectedMatrix0.Inverse());
 
-	if (!TestIdentityMatrix(errorMatrix)) {
+	if (!errorMatrix.TestIdentity()) {
 		body0Matrix = m_localMatrix0.Inverse() * expectedMatrix0; 
 		NewtonBodySetMatrix(m_body0, &body0Matrix[0][0]);
 	}

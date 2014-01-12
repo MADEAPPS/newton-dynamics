@@ -51,6 +51,8 @@ class dMatrix
 	dVector UntransformPlane (const dVector &globalPlane) const;
 	dVector GetEulerAngles(dEulerAngleOrder order = m_pitchYawRoll) const;
 
+	bool TestIdentity() const; 
+	bool TestOrthogonal() const; 
 	dMatrix Inverse4x4 () const;
 	dVector RotateVector4x4 (const dVector &v) const;
 	dMatrix JacobiDiagonalization (dVector& eigenValues, const dMatrix& initialMatrix = GetIdentityMatrix()) const;
@@ -67,6 +69,7 @@ class dMatrix
 #endif
 
 	dMatrix operator* (const dMatrix & B) const;
+
 
 	bool SanityCheck() const;
 
@@ -131,6 +134,7 @@ inline const dVector& dMatrix::operator[] (int  i) const
 {
 	return (&m_front)[i];
 }
+
 
 dMatrix dRollMatrix(dFloat ang);
 dMatrix dYawMatrix(dFloat ang);
