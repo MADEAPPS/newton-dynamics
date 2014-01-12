@@ -1264,6 +1264,23 @@ bool dgCollisionCompoundFractured::IsNodeSaseToDetach(dgTreeArray::dgTreeNode* c
 	return mapNode ? CanChunk (mapNode->GetInfo()) : false;
 }
 
+int dgCollisionCompoundFractured::GetFirstNiegborghArray (dgTreeArray::dgTreeNode* const node, dgTreeArray::dgTreeNode** const nodesArray, int maxCount) const
+{
+	int count = 0;
+	dgConectivityGraphMap::dgTreeNode* const mapNode = m_conectivityMap.Find(node->GetInfo()->GetShape());
+	dgAssert (mapNode);
+
+	dgConectivityGraph::dgListNode* const chunkNode = mapNode->GetInfo();
+	for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = chunkNode->GetInfo().GetFirst(); edgeNode && (count < maxCount); edgeNode = edgeNode->GetNext()) {
+		dgConectivityGraph::dgListNode* const node = edgeNode->GetInfo().m_node;
+		dgDebriNodeInfo& childNodeInfo = node->GetInfo().m_nodeData;
+		nodesArray[count] = childNodeInfo.m_shapeNode;
+		count ++;
+	}
+
+	return count;
+}
+
 bool dgCollisionCompoundFractured::CanChunk (dgConectivityGraph::dgListNode* const chunkNode) const
 {
 	dgVector directionsMap[32];

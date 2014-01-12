@@ -636,8 +636,8 @@ extern "C" {
 	NEWTON_API void NewtonFracturedCompoundSetCallbacks (const NewtonCollision* const fracturedCompound, NewtonFractureCompoundCollisionReconstructMainMeshCallBack regenerateMainMeshCallback, NewtonFractureCompoundCollisionOnEmitChunk emitFracfuredChunk);
 
 	NEWTON_API int NewtonFracturedCompoundIsNodeFreeToDetach (const NewtonCollision* const fracturedCompound, void* const collisionNode);
-	NEWTON_API void* NewtonFracturedCompoundFirstNeighborNode (const NewtonCollision* const fracturedCompound, void* const collisionNode);
-	NEWTON_API void* NewtonFracturedCompoundNextNeighborNode (const NewtonCollision* const fracturedCompound, void* const collisionNode);
+	NEWTON_API int NewtonFracturedCompoundNeighborNodeList (const NewtonCollision* const fracturedCompound, void* const collisionNode, void** const list, int maxCount);
+
 	
 	NEWTON_API NewtonFracturedCompoundMeshPart* NewtonFracturedCompoundGetMainMesh (const NewtonCollision* const fracturedCompound);
 	NEWTON_API NewtonFracturedCompoundMeshPart* NewtonFracturedCompoundGetFirstSubMesh(const NewtonCollision* const fracturedCompound);

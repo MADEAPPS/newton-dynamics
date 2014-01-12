@@ -220,18 +220,31 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
 #endif	
 
 #if 1
-	void* nextNode;
-	dList<void*> detachableNodes;
+	// test the interface
+	dTree<void*, void*> detachableNodes;
 	NewtonCompoundCollisionBeginAddRemove(structuredFracturedCollision);	
-	for (void* node = NewtonCompoundCollisionGetFirstNode(structuredFracturedCollision); node; node = nextNode) { 
-		nextNode = NewtonCompoundCollisionGetNextNode(structuredFracturedCollision, node);
+
+	// remove all chunk that can be detached for the first layer
+	for (void* node = NewtonCompoundCollisionGetFirstNode(structuredFracturedCollision); node; node = NewtonCompoundCollisionGetNextNode(structuredFracturedCollision, node)) { 
 		if (NewtonFracturedCompoundIsNodeFreeToDetach (structuredFracturedCollision, node)) {
-			detachableNodes.Append(node);
+			detachableNodes.Insert(node, node);
+		}
+
+		// remove any node that can be deched fro the secund layer, this codul; be reusive
+		void* neighbors[32];
+		int count = NewtonFracturedCompoundNeighborNodeList (structuredFracturedCollision, node, neighbors, sizeof (neighbors) / sizeof (neighbors[0]));
+		for (int i = 0; i < count; i ++ ) {
+			if (NewtonFracturedCompoundIsNodeFreeToDetach (structuredFracturedCollision, neighbors[i])) {
+				detachableNodes.Insert(node, node);
+			}
 		}
 	}
 
-	for (dList<void*>::dListNode* node = detachableNodes.GetFirst(); node; node = node->GetNext()) { 
-		NewtonCompoundCollisionRemoveSubCollision (structuredFracturedCollision, node->GetInfo());
+	// now delete the actual nodes
+	dTree<void*, void*>::Iterator iter (detachableNodes) ;
+	for (iter.Begin(); iter; iter ++) { 
+		void* const node = iter.GetNode()->GetInfo(); 
+		NewtonCompoundCollisionRemoveSubCollision (structuredFracturedCollision, node);
 	}
 	NewtonCompoundCollisionEndAddRemove(structuredFracturedCollision);	
 #endif

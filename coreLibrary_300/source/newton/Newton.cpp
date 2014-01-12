@@ -2801,44 +2801,18 @@ void NewtonFracturedCompoundSetCallbacks (const NewtonCollision* const fractured
 	}
 }
 
-/*
-void NewtonFracturedCompoundDetachNode (const NewtonCollision* const fracturedCompound, void* const collisionNode)
+
+int NewtonFracturedCompoundNeighborNodeList (const NewtonCollision* const fracturedCompound, void* const collisionNode, void** const nodesArray, int maxCount)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const collision = (dgCollisionInstance*) fracturedCompound;
-
 	if (collision->IsType (dgCollision::dgCollisionCompoundBreakable_RTTI)) {
 		dgCollisionCompoundFractured* const compound = (dgCollisionCompoundFractured*) collision->GetChildShape();
-		compound->DetachNode((dgCollisionCompound::dgTreeArray::dgTreeNode*)collisionNode);
-	}
-}
-*/
-
-void* NewtonFracturedCompoundFirstNeighborNode (const NewtonCollision* const fracturedCompound, void* const collisionNode)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgCollisionInstance* const collision = (dgCollisionInstance*) fracturedCompound;
-dgAssert (0);
-	if (collision->IsType (dgCollision::dgCollisionCompoundBreakable_RTTI)) {
-		dgCollisionCompoundFractured* const compound = (dgCollisionCompoundFractured*) collision->GetChildShape();
-		return NULL;
-//		return compound->IsNodeSaseToDetach((dgCollisionCompound::dgTreeArray::dgTreeNode*)collisionNode) ? 1 : 0;
+		return  compound->GetFirstNiegborghArray ((dgCollisionCompound::dgTreeArray::dgTreeNode*)collisionNode, (dgCollisionCompound::dgTreeArray::dgTreeNode**) nodesArray, maxCount);
 	}
 	return 0;
 }
 
-void* NewtonFracturedCompoundNextNeighborNode (const NewtonCollision* const fracturedCompound, void* const collisionNode)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgCollisionInstance* const collision = (dgCollisionInstance*) fracturedCompound;
-dgAssert (0);
-	if (collision->IsType (dgCollision::dgCollisionCompoundBreakable_RTTI)) {
-		dgCollisionCompoundFractured* const compound = (dgCollisionCompoundFractured*) collision->GetChildShape();
-		return NULL;
-		//		return compound->IsNodeSaseToDetach((dgCollisionCompound::dgTreeArray::dgTreeNode*)collisionNode) ? 1 : 0;
-	}
-	return 0;
-}
 
 
 int NewtonFracturedCompoundIsNodeFreeToDetach (const NewtonCollision* const fracturedCompound, void* const collisionNode)

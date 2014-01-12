@@ -190,6 +190,8 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 	virtual void EndAddRemove ();
 	bool IsNodeSaseToDetach (dgTreeArray::dgTreeNode* const node) const;
 
+	int GetFirstNiegborghArray (dgTreeArray::dgTreeNode* const node, dgTreeArray::dgTreeNode** const nodesArray, int maxCount) const;
+
 	private:
 	void BuildMainMeshSubMehes() const;
 	dgVector GetObbSize() const;
