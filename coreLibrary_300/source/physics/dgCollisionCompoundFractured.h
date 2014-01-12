@@ -208,6 +208,11 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 	
 	bool SanityCheck() const;
 
+
+	inline bool IsAbovePlane (dgConectivityGraph::dgListNode* const node, const dgVector& plane) const;
+	inline bool IsBelowPlane (dgConectivityGraph::dgListNode* const node, const dgVector& plane) const;
+	inline dgConectivityGraph::dgListNode* FirstAcrossPlane (dgConectivityGraph::dgListNode* const node, const dgVector& plane) const;
+
 	dgConectivityGraph m_conectivity;
 	dgConectivityGraphMap m_conectivityMap;
 	dgVertexBuffer* m_vertexBuffer;

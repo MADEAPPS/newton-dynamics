@@ -2798,7 +2798,7 @@ NewtonCollision* NewtonFracturedCompoundPlaneClip (const NewtonCollision* const 
 	if (collision->IsType (dgCollision::dgCollisionCompoundBreakable_RTTI)) {
 		dgCollisionCompoundFractured* const compound = (dgCollisionCompoundFractured*) collision->GetChildShape();
 		dgWorld* const world = (dgWorld*)collision->GetWorld();
-		dgCollisionCompoundFractured* const newCompound = compound->PlaneClip(dgVector (plane));
+		dgCollisionCompoundFractured* const newCompound = compound->PlaneClip(dgVector (plane[0], plane[1], plane[2], plane[3]));
 		if (newCompound) {
 			dgCollisionInstance* const newCollision = world->CreateInstance (newCompound, collision->GetUserDataID(), dgGetIdentityMatrix());
 			newCompound->Release();

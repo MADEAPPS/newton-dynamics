@@ -1226,7 +1226,6 @@ void dgCollisionCompoundFractured::EndAddRemove ()
 {
 	dgCollisionCompound::EndAddRemove ();
 	BuildMainMeshSubMehes();
-//	m_reconstructMainMesh (myBody, m_conectivity.GetLast(), myInstance);
 }
 
 
@@ -1459,8 +1458,146 @@ void dgCollisionCompoundFractured::SpawnChunks (dgBody* const myBody, const dgCo
 	}
 }
 
+bool dgCollisionCompoundFractured::IsBelowPlane (dgConectivityGraph::dgListNode* const node, const dgVector& plane) const
+{
+	dgDebriNodeInfo& nodeInfo = node->GetInfo().m_nodeData;
+	dgCollisionInstance* const instance = nodeInfo.m_shapeNode->GetInfo()->GetShape();
+
+	dgInt32 dommy;
+	dgVector dir (plane & dgVector::m_triplexMask);
+
+	const dgMatrix& matrix = instance->GetLocalMatrix(); 
+	dgVector support (matrix.TransformVector(instance->SupportVertex(matrix.UnrotateVector(dir), &dommy)));
+
+	dgFloat32 dist;
+	support.DotProduct4(plane).StoreScalar(&dist);
+	return dist < dgFloat32 (0.0f);
+}
+
+bool dgCollisionCompoundFractured::IsAbovePlane (dgConectivityGraph::dgListNode* const node, const dgVector& plane) const
+{
+	dgDebriNodeInfo& nodeInfo = node->GetInfo().m_nodeData;
+	dgCollisionInstance* const instance = nodeInfo.m_shapeNode->GetInfo()->GetShape();
+
+	dgInt32 dommy;
+	dgVector dir ((plane & dgVector::m_triplexMask).CompProduct4(dgVector::m_negOne));
+
+	const dgMatrix& matrix = instance->GetLocalMatrix(); 
+	dgVector support (matrix.TransformVector(instance->SupportVertex(matrix.UnrotateVector(dir), &dommy)));
+
+	dgFloat32 dist;
+	support.DotProduct4(plane).StoreScalar(&dist);
+	return dist > dgFloat32 (0.0f);
+}
+
+dgCollisionCompoundFractured::dgConectivityGraph::dgListNode* dgCollisionCompoundFractured::FirstAcrossPlane (dgConectivityGraph::dgListNode* const node, const dgVector& plane) const
+{
+	dgDebriNodeInfo& nodeInfo = node->GetInfo().m_nodeData;
+	dgCollisionInstance* const instance = nodeInfo.m_shapeNode->GetInfo()->GetShape();
+
+	dgInt32 dommy;
+	dgVector dir (plane & dgVector::m_triplexMask);
+
+	const dgMatrix& matrix = instance->GetLocalMatrix(); 
+	dgVector support (matrix.TransformVector(instance->SupportVertex(matrix.UnrotateVector(dir), &dommy)));
+
+	dgFloat32 dist;
+	support.DotProduct4(plane).StoreScalar(&dist);
+	dgAssert (dist < dgFloat32 (0.0f));
+
+	dgConectivityGraph::dgListNode* startNode = node;
+	for (bool foundBetterNode = true; foundBetterNode; ) {
+		foundBetterNode = false;
+		for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = startNode->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
+			dgConectivityGraph::dgListNode* const node = edgeNode->GetInfo().m_node;
+			dgDebriNodeInfo& neighborgInfo = node->GetInfo().m_nodeData;
+			const dgMatrix& matrix = instance->GetLocalMatrix(); 
+			dgCollisionInstance* const instance = neighborgInfo.m_shapeNode->GetInfo()->GetShape();
+			dgVector support (matrix.TransformVector(instance->SupportVertex(matrix.UnrotateVector(dir), &dommy)));
+			dgFloat32 dist1;
+			support.DotProduct4(plane).StoreScalar(&dist1);
+			if ((dist1 > dist) && (dist1 < dgFloat32 (0.0f))) {
+				dist = dist1;
+				foundBetterNode = true;
+				startNode = node;
+			}
+		}
+	}
+
+	
+	dgDebriNodeInfo& nodeInfo1 = startNode->GetInfo().m_nodeData;
+	dgCollisionInstance* const instance1 = nodeInfo.m_shapeNode->GetInfo()->GetShape();
+	const dgMatrix& matrix1 = instance1->GetLocalMatrix(); 
+
+	dgFloat32 dist0;
+	dir = plane & dgVector::m_triplexMask;
+	support = matrix1.TransformVector(instance->SupportVertex(matrix.UnrotateVector(dir), &dommy));
+	support.DotProduct4(plane).StoreScalar(&dist0);
+
+	dgFloat32 dist1;
+	dir = dir.CompProduct4(dgVector::m_negOne);
+	support = matrix1.TransformVector(instance->SupportVertex(matrix.UnrotateVector(dir), &dommy));
+	support.DotProduct4(plane).StoreScalar(&dist1);
+
+	return (dist0 * dist1) < dgFloat32 (0.0f) ? startNode : NULL;
+}
+
 dgCollisionCompoundFractured* dgCollisionCompoundFractured::PlaneClip (const dgVector& plane)
 {
+	dgConectivityGraph::dgListNode* startNode = m_conectivity.GetFirst();
+	if (IsAbovePlane (startNode, plane)) {
+		startNode = FirstAcrossPlane (startNode, plane.CompProduct4(dgVector::m_negOne));
+	} else if (IsBelowPlane (startNode, plane)) {
+		startNode = FirstAcrossPlane (startNode, plane);
+	}
+
+//	dgConectivityGraph::dgListNode* startNode = m_conectivity.GetFirst();
+//	dgDebriNodeInfo& nodeInfo = startNode->GetInfo().m_nodeData;
+//	dgCollisionInstance* const instance = nodeInfo.m_shapeNode->GetInfo()->GetShape();
+//	dgInt32 dommy;
+//	dgVector positiveDir (plane & dgVector::m_triplexMask);
+//	dgVector negativeDir (positiveDir.CompProduct4(dgVector::m_negOne));
+//	const dgMatrix& matrix = instance->GetLocalMatrix(); 
+//	dgVector support (matrix.TransformVector(instance->SupportVertex(matrix.UnrotateVector(positiveDir), &dommy)));
+
+	if (startNode) {
+		dgInt32 stack = 1;
+		dgConectivityGraph::dgListNode* pool[256];
+		pool[0] = startNode;
+		m_lru ++;
+
+		while (stack) {
+			stack --;
+			dgConectivityGraph::dgListNode* const planeNode = pool[stack];
+			dgDebriNodeInfo& nodeInfo = startNode->GetInfo().m_nodeData;
+	/*
+			if (nodeInfo.m_lru != m_lru) {
+
+				nodeInfo.m_lru = m_lru;
+
+				dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* nextEdge;
+				for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = planeNode->GetInfo().GetFirst(); edgeNode; edgeNode = nextEdge) {
+					nextEdge = edgeNode->GetNext();
+
+					dgConectivityGraph::dgListNode* const node = edgeNode->GetInfo().m_node;
+					dgDebriNodeInfo& neighborgInfo = node->GetInfo().m_nodeData;
+					if (neighborgInfo.m_lru != m_lru) {
+						dgCollisionInstance* const instance = neighborgInfo.m_shapeNode->GetInfo()->GetShape();
+
+						dgVector support (instance->SupportVertex(negativeDir, &dommy) | dgVector::m_wOne);
+						support.DotProduct4(plane).StoreScalar(&dist);
+						if (dist > dgFloat32 (0.0f)) {
+							dgAssert (0);
+						} else {
+						
+						}
+					}
+				}
+			}
+	*/
+		}
+	}
+
 
 	return NULL;
 }
