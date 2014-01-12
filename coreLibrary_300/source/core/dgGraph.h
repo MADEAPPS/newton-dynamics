@@ -178,7 +178,7 @@ void dgGraphNode<dgNodeData, dgEdgeData>::DeleteEdge(typename dgGraphNode<dgNode
 {
 	typename dgGraph<dgNodeData, dgEdgeData>::dgListNode* const node = edge->GetInfo().m_node;
 	
-	for (typename dgGraphNode<dgNodeData, dgEdgeData>::dgListNode* const twinEdge = node->GetInfo().GetFirst(); twinEdge; twinEdge = twinEdge->GetNext()) {	
+	for (typename dgGraphNode<dgNodeData, dgEdgeData>::dgListNode* twinEdge = node->GetInfo().GetFirst(); twinEdge; twinEdge = twinEdge->GetNext()) {	
 		if (&twinEdge->GetInfo().m_node->GetInfo() == this) {
 			node->GetInfo().DeleteHalfEdge(twinEdge);
 			break;
