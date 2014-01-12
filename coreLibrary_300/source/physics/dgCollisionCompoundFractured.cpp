@@ -1552,6 +1552,8 @@ dgCollisionCompoundFractured* dgCollisionCompoundFractured::PlaneClip (const dgV
 
 	dgVector posgDir (plane & dgVector::m_triplexMask);
 	dgVector negDir (posgDir.CompProduct4(dgVector::m_negOne));
+
+	dgTree<dgConectivityGraph::dgListNode*, dgConectivityGraph::dgListNode*> upperSide (GetAllocator());
 	if (startNode) {
 		dgInt32 stack = 1;
 		dgConectivityGraph::dgListNode* pool[256];
@@ -1581,7 +1583,22 @@ dgCollisionCompoundFractured* dgCollisionCompoundFractured::PlaneClip (const dgV
 						dgVector support (matrix.TransformVector(instance->SupportVertex(matrix.UnrotateVector(negDir), &dommy)));
 						support.DotProduct4(plane).StoreScalar(&dist);
 						if (dist > dgFloat32 (0.0f)) {
+							upperSide.Insert(node, node);
 							planeNode->GetInfo().DeleteEdge (edgeNode);
+							node->GetInfo().m_nodeData.m_mesh->m_isVisible = true;
+							planeNode->GetInfo().m_nodeData.m_mesh->m_isVisible = true;
+
+							for (dgMesh::dgListNode* meshSegment = node->GetInfo().m_nodeData.m_mesh->GetFirst(); meshSegment; meshSegment = meshSegment->GetNext()) {
+								dgSubMesh* const subMesh = &meshSegment->GetInfo();
+								subMesh->m_visibleFaces = true;
+							}
+
+							for (dgMesh::dgListNode* meshSegment = planeNode->GetInfo().m_nodeData.m_mesh->GetFirst(); meshSegment; meshSegment = meshSegment->GetNext()) {
+								dgSubMesh* const subMesh = &meshSegment->GetInfo();
+								subMesh->m_visibleFaces = true;
+							}
+
+
 						} else {
 							dgVector support (matrix.TransformVector(instance->SupportVertex(matrix.UnrotateVector(posgDir), &dommy)));
 							support.DotProduct4(plane).StoreScalar(&dist);
@@ -1597,6 +1614,14 @@ dgCollisionCompoundFractured* dgCollisionCompoundFractured::PlaneClip (const dgV
 		}
 	}
 
+
+BeginAddRemove ();
+dgTree<dgConectivityGraph::dgListNode*, dgConectivityGraph::dgListNode*>::Iterator iter(upperSide);
+for (iter.Begin(); iter; iter ++) {
+	dgConectivityGraph::dgListNode* xxx = iter.GetNode()->GetInfo();
+	RemoveCollision (xxx->GetInfo().m_nodeData.m_shapeNode);
+}
+EndAddRemove ();
 
 	return NULL;
 }
