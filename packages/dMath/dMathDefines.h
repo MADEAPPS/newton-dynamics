@@ -39,6 +39,7 @@
 #define	dFloor(x)	dFloat (floor (dFloat(x))) 
 #define	dCiel(x)	dFloat (ceil (dFloat(x))) 
 #define	dMod(x,y)	dFloat (fmod (dFloat(x), dFloat(y))) 
+#define	dPow(x,y)	dFloat (pow (dFloat(x), dFloat(y))) 
 
 #define dSin(x)		dFloat (sin (dFloat(x)))
 #define dCos(x)		dFloat (cos (dFloat(x)))

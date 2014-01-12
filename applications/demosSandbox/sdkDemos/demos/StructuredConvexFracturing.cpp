@@ -24,6 +24,35 @@
 #define POISON_VARIANCE				(0.75f * POINT_DENSITY_PER_METERS)
 
 
+static int MakeRandomGuassianPointCloud (NewtonMesh* const mesh, dVector* const points, int count)
+{
+	dVector size;
+	dMatrix matrix(GetIdentityMatrix()); 
+	NewtonMeshCalculateOOBB(mesh, &matrix[0][0], &size.m_x, &size.m_y, &size.m_z);
+
+	dVector minBox (matrix.m_posit - matrix[0].Scale (size.m_x) - matrix[1].Scale (size.m_y) - matrix[2].Scale (size.m_z));
+	dVector maxBox (matrix.m_posit + matrix[0].Scale (size.m_x) + matrix[1].Scale (size.m_y) + matrix[2].Scale (size.m_z));
+
+	size = (maxBox - minBox).Scale (0.5f);
+	dVector origin = (maxBox + minBox).Scale (0.5f);
+
+	dFloat biasExp = 10.0f;
+	dFloat r = dSqrt (size % size);
+	r = powf(r, 1.0f/biasExp);
+	for (int i = 0; i < count; i++) {
+		dVector& p = points[i];
+		bool test;
+		do {
+			p = dVector (2.0f * RandomVariable(r), 2.0f * RandomVariable(r), 2.0f * RandomVariable(r), 0.0f);
+			dFloat len = dSqrt (p % p);
+			dFloat scale = powf(len, biasExp) / len;
+			p = p.Scale (scale) + origin;
+			test = (p.m_x > minBox.m_x) && (p.m_x < maxBox.m_x) && (p.m_y > minBox.m_y) && (p.m_y < maxBox.m_y) && (p.m_z > minBox.m_z) && (p.m_z < maxBox.m_z);
+		} while (!test);
+	}
+
+	return count;
+}
 
 static int MakeRandomPoisonPointCloud(NewtonMesh* const mesh, dVector* const points)
 {
@@ -61,7 +90,6 @@ static int MakeRandomPoisonPointCloud(NewtonMesh* const mesh, dVector* const poi
 		}
 		z0 += POINT_DENSITY_PER_METERS;
 	}
-	
 
 	return count;
 }
@@ -190,7 +218,8 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
 
 	// create a random point cloud
 	dVector points[MAX_POINT_CLOUD_SIZE];
-	int pointCount = MakeRandomPoisonPointCloud (solidMesh, points);
+//	int pointCount = MakeRandomPoisonPointCloud (solidMesh, points);
+	int pointCount = MakeRandomGuassianPointCloud (solidMesh, points, MAX_POINT_CLOUD_SIZE);
 
 	// create and interiors material for texturing the fractured pieces
 	//int internalMaterial = LoadTexture("KAMEN-stup.tga");
@@ -219,7 +248,7 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
 	fclose (file);
 #endif	
 
-#if 1
+#if 0
 	// test the interface
 	dTree<void*, void*> detachableNodes;
 	NewtonCompoundCollisionBeginAddRemove(structuredFracturedCollision);	
