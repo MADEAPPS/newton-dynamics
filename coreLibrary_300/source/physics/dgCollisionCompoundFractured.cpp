@@ -1459,3 +1459,8 @@ void dgCollisionCompoundFractured::SpawnChunks (dgBody* const myBody, const dgCo
 	}
 }
 
+dgCollisionCompoundFractured* dgCollisionCompoundFractured::PlaneClip (const dgVector& plane)
+{
+
+	return NULL;
+}

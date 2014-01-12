@@ -192,6 +192,8 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 
 	int GetFirstNiegborghArray (dgTreeArray::dgTreeNode* const node, dgTreeArray::dgTreeNode** const nodesArray, int maxCount) const;
 
+	dgCollisionCompoundFractured* PlaneClip (const dgVector& plane);
+
 	private:
 	void BuildMainMeshSubMehes() const;
 	dgVector GetObbSize() const;

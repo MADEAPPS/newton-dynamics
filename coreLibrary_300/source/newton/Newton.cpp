@@ -2790,6 +2790,24 @@ NewtonCollision* NewtonCreateFracturedCompoundCollision (
 	return (NewtonCollision*) collision;
 }
 
+NewtonCollision* NewtonFracturedCompoundPlaneClip (const NewtonCollision* const fracturedCompound, const dFloat* const plane)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgCollisionInstance* const collision = (dgCollisionInstance*) fracturedCompound;
+
+	if (collision->IsType (dgCollision::dgCollisionCompoundBreakable_RTTI)) {
+		dgCollisionCompoundFractured* const compound = (dgCollisionCompoundFractured*) collision->GetChildShape();
+		dgWorld* const world = (dgWorld*)collision->GetWorld();
+		dgCollisionCompoundFractured* const newCompound = compound->PlaneClip(dgVector (plane));
+		if (newCompound) {
+			dgCollisionInstance* const newCollision = world->CreateInstance (newCompound, collision->GetUserDataID(), dgGetIdentityMatrix());
+			newCompound->Release();
+			return (NewtonCollision*)newCollision;
+		}
+	}
+	return NULL;
+}
+
 void NewtonFracturedCompoundSetCallbacks (const NewtonCollision* const fracturedCompound, NewtonFractureCompoundCollisionReconstructMainMeshCallBack regenerateMainMeshCallback, NewtonFractureCompoundCollisionOnEmitChunk emitFracfuredChunk)
 {
 	TRACE_FUNCTION(__FUNCTION__);

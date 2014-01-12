@@ -278,6 +278,16 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
 	NewtonCompoundCollisionEndAddRemove(structuredFracturedCollision);	
 #endif
 	
+#if 1
+	dVector plane (0.0f, 1.0f, 0.0f, 0.0f);
+	NewtonCollision* const crack = NewtonFracturedCompoundPlaneClip (structuredFracturedCollision, &plane[0]);
+	if (crack) {
+		NewtonDestroyCollision (structuredFracturedCollision);
+	}
+#endif
+
+
+
 
     dVector com;
     dVector inertia;
