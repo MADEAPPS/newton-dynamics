@@ -107,7 +107,6 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 		dgDebriNodeInfo ();
 		~dgDebriNodeInfo ();
 
-dgInt32 xxxxx;
 		dgMesh* m_mesh;
 		dgTreeArray::dgTreeNode* m_shapeNode;
 		dgInt32 m_lru;
@@ -201,14 +200,17 @@ dgInt32 xxxxx;
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
     virtual void CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
 	dgInt32 CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
-	void SpawnChunks (dgBody* const myBody, const dgCollisionInstance* const myInstance, dgConectivityGraph::dgListNode* const rootNode, dgFloat32 impulseStimate2, dgFloat32 impulseStimateCut2);
+
+	void ColorDisjoinChunksIsland ();
+	bool SpawnChunks (dgBody* const myBody, const dgCollisionInstance* const myInstance, dgConectivityGraph::dgListNode* const rootNode, dgFloat32 impulseStimate2, dgFloat32 impulseStimateCut2);
+	void SpawnDisjointChunks (dgBody* const myBody, const dgCollisionInstance* const myInstance, dgConectivityGraph::dgListNode* const rootNode, dgFloat32 impulseStimate2, dgFloat32 impulseStimateCut2);
 
 	void SpawnSingleChunk (dgBody* const myBody, const dgCollisionInstance* const myInstance, dgConectivityGraph::dgListNode* const chunkNode);
+	void SpawnComplexChunk (dgBody* const myBody, const dgCollisionInstance* const myInstance, dgConectivityGraph::dgListNode* const chunkNode);
     bool CanChunk (dgConectivityGraph::dgListNode* const node) const;
 	
 	bool SanityCheck() const;
-
-
+	
 	inline bool IsAbovePlane (dgConectivityGraph::dgListNode* const node, const dgVector& plane) const;
 	inline bool IsBelowPlane (dgConectivityGraph::dgListNode* const node, const dgVector& plane) const;
 	inline dgConectivityGraph::dgListNode* FirstAcrossPlane (dgConectivityGraph::dgListNode* const node, const dgVector& plane) const;

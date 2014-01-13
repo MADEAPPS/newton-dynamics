@@ -821,11 +821,6 @@ dgCollisionCompoundFractured::dgSubMesh* dgCollisionCompoundFractured::dgMesh::A
 	dgListNode* const node = dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>::AddNode ();
 	dgDebriNodeInfo& data = node->GetInfo().m_nodeData;
 
-static int xxxx;
-data.xxxxx = xxxx;
-xxxx ++;
-
-
 	data.m_mesh = new (GetAllocator()) dgMesh(GetAllocator());
 	data.m_shapeNode = collisionNode;
 
@@ -1267,8 +1262,20 @@ dgInt32 dgCollisionCompoundFractured::CalculateContacts (dgCollidingPairCollecto
 				dgConectivityGraph::dgListNode* const rootNode = m_conectivityMap.Find(contactOut.m_collision0)->GetInfo();
 				dgDebriNodeInfo& nodeInfo = rootNode->GetInfo().m_nodeData;
 				nodeInfo.m_lru = 1;
-                ((dgCollisionCompoundFractured*)this)->SpawnChunks (myBody, myInstance, rootNode, impulseStimate2, impulseStrength * impulseStrength);
+				dgCollisionCompoundFractured* const me = (dgCollisionCompoundFractured*)this;
+                if (me->SpawnChunks (myBody, myInstance, rootNode, impulseStimate2, impulseStrength * impulseStrength)) {
+					me->SpawnDisjointChunks (myBody, myInstance, rootNode, impulseStimate2, impulseStrength * impulseStrength);
 
+					BuildMainMeshSubMehes();
+					m_reconstructMainMesh (myBody, m_conectivity.GetLast(), myInstance);
+					if (m_root) {
+						me->MassProperties ();
+						dgFloat32 mass = m_centerOfMass.m_w * m_density;
+						myBody->SetMassProperties(mass, myInstance);
+					} else {
+						myBody->SetMassProperties(dgFloat32 (0.0f), myInstance);
+					}
+				}
 			}
 		}
 	}
@@ -1373,147 +1380,8 @@ bool dgCollisionCompoundFractured::CanChunk (dgConectivityGraph::dgListNode* con
 	return true;
 }
 
-void dgCollisionCompoundFractured::SpawnSingleChunk (dgBody* const myBody, const dgCollisionInstance* const myInstance, dgConectivityGraph::dgListNode* const chunkNode)
-{
-	m_world->GlobalLock();
-
-	const dgMatrix& matrix = myBody->GetMatrix();
-	const dgVector& veloc = myBody->GetVelocity();
-	const dgVector& omega = myBody->GetOmega();
-	dgVector com (matrix.TransformVector(myBody->GetCentreOfMass()));
-
-	dgDebriNodeInfo& nodeInfo = chunkNode->GetInfo().m_nodeData;
-	dgCollisionInstance* const chunkCollision = nodeInfo.m_shapeNode->GetInfo()->GetShape();
-	dgDynamicBody* const chunkBody = m_world->CreateDynamicBody (chunkCollision, matrix);
-	chunkBody->SetMassProperties(chunkCollision->GetVolume() * m_density, chunkBody->GetCollision());
-	m_world->GetBroadPhase()->AddInternallyGeneratedBody(chunkBody);
-
-	// calculate debris initial velocity
-	dgVector chunkOrigin (matrix.TransformVector(chunkCollision->GetLocalMatrix().m_posit));
-	dgVector chunkVeloc (veloc + omega * (chunkOrigin - com));
-
-	chunkBody->SetOmega(omega);
-	chunkBody->SetVelocity(chunkVeloc);
-	chunkBody->SetGroupID(chunkCollision->GetUserDataID());
-
-	m_emitFracturedChunk(chunkBody, chunkNode, myInstance);
-
-	m_conectivityMap.Remove (chunkCollision);
-	dgCollisionCompound::RemoveCollision (nodeInfo.m_shapeNode);
-	m_conectivity.DeleteNode(chunkNode);
-
-	m_world->GlobalUnlock();
-}
-
-void dgCollisionCompoundFractured::SpawnChunks (dgBody* const myBody, const dgCollisionInstance* const myInstance, dgConectivityGraph::dgListNode* const rootNode, dgFloat32 impulseStimate2, dgFloat32 impulseStimateCut2)
-{
-	dgFloat32 strengthPool[512];
-	dgConectivityGraph::dgListNode* pool[512];
-
-	dgVector massMatrix (myBody->GetMass());
-	if (m_density < dgFloat32 (0.0f)) {
-		m_density = dgAbsf (massMatrix.m_w * m_density);
-	}
-
-	dgFloat32 attenuation = m_impulseAbsortionFactor;
-	m_lru ++;
-	pool[0] = rootNode;
-	strengthPool[0] = impulseStimate2;
-
-	dgInt32 stack = 1;
-	bool spawned = false;
-	while (stack) {
-		stack --;
-		dgFloat32 strenght = strengthPool[stack] * attenuation;
-		dgConectivityGraph::dgListNode* const chunkNode = pool[stack];
-
-        if ((strenght > impulseStimateCut2) && CanChunk (chunkNode)) {
-			spawned = true;
-		    dgDebriNodeInfo& nodeInfo = chunkNode->GetInfo().m_nodeData;
-
-		    nodeInfo.m_mesh->m_isVisible = true;
-		    for (dgMesh::dgListNode* meshSegment = nodeInfo.m_mesh->GetFirst(); meshSegment; meshSegment = meshSegment->GetNext()) {
-			    dgSubMesh* const subMesh = &meshSegment->GetInfo();
-			    subMesh->m_visibleFaces = true;
-		    }
-
-            for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = chunkNode->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
-                dgConectivityGraph::dgListNode* const node = edgeNode->GetInfo().m_node;
-                dgDebriNodeInfo& childNodeInfo = node->GetInfo().m_nodeData;
-                childNodeInfo.m_mesh->m_isVisible = true;
-                for (dgMesh::dgListNode* meshSegment = childNodeInfo.m_mesh->GetFirst(); meshSegment; meshSegment = meshSegment->GetNext()) {
-                    dgSubMesh* const subMesh = &meshSegment->GetInfo();
-                    subMesh->m_visibleFaces = true;
-                }
-            }
-		
-		    for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = chunkNode->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
-				dgConectivityGraph::dgListNode* const node = edgeNode->GetInfo().m_node;
-				dgDebriNodeInfo& childNodeInfo = node->GetInfo().m_nodeData;
-				if (childNodeInfo.m_lru != m_lru) {
-					childNodeInfo.m_lru = m_lru;
-					strengthPool[stack] = strenght;
-					pool[stack] = node;
-					stack ++;
-					dgAssert (stack < sizeof (pool)/sizeof (pool[0]));
-				}
-			}
-			SpawnSingleChunk (myBody, myInstance, chunkNode);
-        }
-	}
-
-	if (spawned) {
-
-		if (m_conectivity.GetFirst() != m_conectivity.GetLast()) {
-			dgInt32 stackMark = m_lru + 1;
-			m_lru += 2;
-			pool[0] = m_conectivity.GetFirst();
-			stack = 1;
-			while (stack) {
-				stack --;
-				dgConectivityGraph::dgListNode* const node = pool[stack];
-				dgDebriNodeInfo& nodeInfo = node->GetInfo().m_nodeData;
-				if (nodeInfo.m_lru <= stackMark) {
-					nodeInfo.m_lru = m_lru;
-					for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = node->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
-						dgConectivityGraph::dgListNode* const node = edgeNode->GetInfo().m_node;
-						dgDebriNodeInfo& childNodeInfo = node->GetInfo().m_nodeData;
-						if (childNodeInfo.m_lru < stackMark) {
-							childNodeInfo.m_lru = stackMark;
-							pool[stack] = node;
-							stack ++;
-							dgAssert (stack < sizeof (pool)/sizeof (pool[0]));
-						}
-					}
-				}
-			}
-
-			dgConectivityGraph::dgListNode* nextNode;
-			for (dgConectivityGraph::dgListNode* node = m_conectivity.GetFirst(); node != m_conectivity.GetLast(); node = nextNode) {
-				nextNode = node->GetNext();
-				dgDebriNodeInfo& nodeInfo = node->GetInfo().m_nodeData;
-				if (nodeInfo.m_lru != m_lru) {
-					if (node->GetInfo().GetCount() == 0) {
-						SpawnSingleChunk (myBody, myInstance, node);
-					} else {
-						dgAssert (0);
-					}
-				}
-			}
-		}
 
 
-		BuildMainMeshSubMehes();
-		m_reconstructMainMesh (myBody, m_conectivity.GetLast(), myInstance);
-		if (m_root) {
-			MassProperties ();
-			dgFloat32 mass = m_centerOfMass.m_w * m_density;
-			myBody->SetMassProperties(mass, myInstance);
-		} else {
-			myBody->SetMassProperties(dgFloat32 (0.0f), myInstance);
-		}
-	}
-}
 
 bool dgCollisionCompoundFractured::IsBelowPlane (dgConectivityGraph::dgListNode* const node, const dgVector& plane) const
 {
@@ -1562,8 +1430,6 @@ dgCollisionCompoundFractured::dgConectivityGraph::dgListNode* dgCollisionCompoun
 	support.DotProduct4(plane).StoreScalar(&dist);
 	dgAssert (dist < dgFloat32 (0.0f));
 
-//nodeInfo.m_lru = m_lru + 100;
-
 	dgConectivityGraph::dgListNode* startNode = nodeBelowPlane;
 	for (bool foundBetterNode = true; foundBetterNode; ) {
 		foundBetterNode = false;
@@ -1571,8 +1437,6 @@ dgCollisionCompoundFractured::dgConectivityGraph::dgListNode* dgCollisionCompoun
 			dgConectivityGraph::dgListNode* const node = edgeNode->GetInfo().m_node;
 			dgDebriNodeInfo& neighborgInfo = node->GetInfo().m_nodeData;
 			dgCollisionInstance* const instance = neighborgInfo.m_shapeNode->GetInfo()->GetShape();
-
-//neighborgInfo.m_lru = m_lru + 100;
 
 			const dgMatrix& matrix = instance->GetLocalMatrix(); 
 			dgVector support (matrix.TransformVector(instance->SupportVertex(matrix.UnrotateVector(dir), &dommy)));
@@ -1585,45 +1449,11 @@ dgCollisionCompoundFractured::dgConectivityGraph::dgListNode* dgCollisionCompoun
 				if (dist > dgFloat32 (0.0f)) {
 					foundBetterNode = false;
 					return startNode;
-/*
-dgDebriNodeInfo& nodeInfo1 = startNode->GetInfo().m_nodeData;
-dgCollisionInstance* const instance1 = nodeInfo1.m_shapeNode->GetInfo()->GetShape();
-const dgMatrix& matrix1 = instance1->GetLocalMatrix(); 
-
-dgFloat32 dist0;
-dgVector dir1 (dir);
-support = matrix1.TransformVector(instance1->SupportVertex(matrix1.UnrotateVector(dir1), &dommy));
-support.DotProduct4(plane).StoreScalar(&dist0);
-
-dgFloat32 dist1;
-dir1 = dir1.CompProduct4(dgVector::m_negOne);
-support = matrix1.TransformVector(instance1->SupportVertex(matrix1.UnrotateVector(dir1), &dommy));
-support.DotProduct4(plane).StoreScalar(&dist1);
-dist1 *=1;
-
-nodeInfo.m_lru = m_lru + 10;
-nodeInfo1.m_lru = m_lru + 10;
-//return startNode;
-*/
 				}
 			}
 		}
 	}
-/*
-	dgDebriNodeInfo& nodeInfo1 = startNode->GetInfo().m_nodeData;
-	dgCollisionInstance* const instance1 = nodeInfo1.m_shapeNode->GetInfo()->GetShape();
-	const dgMatrix& matrix1 = instance1->GetLocalMatrix(); 
 
-	dgFloat32 dist0;
-	support = matrix1.TransformVector(instance1->SupportVertex(matrix1.UnrotateVector(dir), &dommy));
-	support.DotProduct4(plane).StoreScalar(&dist0);
-
-	dgFloat32 dist1;
-	dir = dir.CompProduct4(dgVector::m_negOne);
-	support = matrix1.TransformVector(instance1->SupportVertex(matrix1.UnrotateVector(dir), &dommy));
-	support.DotProduct4(plane).StoreScalar(&dist1);
-	return (dist0 * dist1) < dgFloat32 (0.0f) ? startNode : NULL;
-*/
 	return NULL;
 }
 
@@ -1642,9 +1472,9 @@ dgCollisionCompoundFractured* dgCollisionCompoundFractured::PlaneClip (const dgV
 		dgTree<dgConectivityGraph::dgListNode*, dgConectivityGraph::dgListNode*> upperSide (GetAllocator());
 
 		dgInt32 stack = 1;
-		dgConectivityGraph::dgListNode* pool[256];
+		dgConectivityGraph::dgListNode* pool[512];
 		pool[0] = startNode;
-		m_lru ++;
+		m_lru += 2;
 		while (stack) {
 			stack --;
 			dgConectivityGraph::dgListNode* const planeNode = pool[stack];
@@ -1713,7 +1543,7 @@ dgTrace (("%d ", xxx->GetInfo().m_nodeData.xxxxx));
 }
 EndAddRemove ();
 dgTrace (("/n"));
-*/
+
 
 BeginAddRemove ();
 dgTree<dgConectivityGraph::dgListNode*, dgConectivityGraph::dgListNode*>::Iterator iter(upperSide);
@@ -1722,10 +1552,194 @@ for (iter.Begin(); iter; iter ++) {
 	RemoveCollision (xxx->GetInfo().m_nodeData.m_shapeNode);
 }
 EndAddRemove ();
-
+*/
 	}
 
-
-
 	return NULL;
+}
+
+bool dgCollisionCompoundFractured::SpawnChunks (dgBody* const myBody, const dgCollisionInstance* const myInstance, dgConectivityGraph::dgListNode* const rootNode, dgFloat32 impulseStimate2, dgFloat32 impulseStimateCut2)
+{
+	dgFloat32 strengthPool[512];
+	dgConectivityGraph::dgListNode* pool[512];
+
+	dgVector massMatrix (myBody->GetMass());
+	if (m_density < dgFloat32 (0.0f)) {
+		m_density = dgAbsf (massMatrix.m_w * m_density);
+	}
+
+	dgFloat32 attenuation = m_impulseAbsortionFactor;
+	m_lru ++;
+	pool[0] = rootNode;
+	strengthPool[0] = impulseStimate2;
+
+	dgInt32 stack = 1;
+	bool spawned = false;
+	while (stack) {
+		stack --;
+		dgFloat32 strenght = strengthPool[stack] * attenuation;
+		dgConectivityGraph::dgListNode* const chunkNode = pool[stack];
+
+		if ((strenght > impulseStimateCut2) && CanChunk (chunkNode)) {
+			spawned = true;
+			dgDebriNodeInfo& nodeInfo = chunkNode->GetInfo().m_nodeData;
+
+			nodeInfo.m_mesh->m_isVisible = true;
+			for (dgMesh::dgListNode* meshSegment = nodeInfo.m_mesh->GetFirst(); meshSegment; meshSegment = meshSegment->GetNext()) {
+				dgSubMesh* const subMesh = &meshSegment->GetInfo();
+				subMesh->m_visibleFaces = true;
+			}
+
+			for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = chunkNode->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
+				dgConectivityGraph::dgListNode* const node = edgeNode->GetInfo().m_node;
+				dgDebriNodeInfo& childNodeInfo = node->GetInfo().m_nodeData;
+				childNodeInfo.m_mesh->m_isVisible = true;
+				for (dgMesh::dgListNode* meshSegment = childNodeInfo.m_mesh->GetFirst(); meshSegment; meshSegment = meshSegment->GetNext()) {
+					dgSubMesh* const subMesh = &meshSegment->GetInfo();
+					subMesh->m_visibleFaces = true;
+				}
+			}
+
+			for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = chunkNode->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
+				dgConectivityGraph::dgListNode* const node = edgeNode->GetInfo().m_node;
+				dgDebriNodeInfo& childNodeInfo = node->GetInfo().m_nodeData;
+				if (childNodeInfo.m_lru != m_lru) {
+					childNodeInfo.m_lru = m_lru;
+					strengthPool[stack] = strenght;
+					pool[stack] = node;
+					stack ++;
+					dgAssert (stack < sizeof (pool)/sizeof (pool[0]));
+				}
+			}
+			SpawnSingleChunk (myBody, myInstance, chunkNode);
+		}
+	}
+	return spawned;
+}
+
+void dgCollisionCompoundFractured::ColorDisjoinChunksIsland ()
+{
+	dgInt32 stack = 1;
+	dgConectivityGraph::dgListNode* pool[512];
+
+	dgInt32 stackMark = m_lru + 1;
+	m_lru += 2;
+	pool[0] = m_conectivity.GetFirst();
+	stack = 1;
+	while (stack) {
+		stack --;
+		dgConectivityGraph::dgListNode* const node = pool[stack];
+		dgDebriNodeInfo& nodeInfo = node->GetInfo().m_nodeData;
+		if (nodeInfo.m_lru <= stackMark) {
+			nodeInfo.m_lru = m_lru;
+			for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = node->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
+				dgConectivityGraph::dgListNode* const node = edgeNode->GetInfo().m_node;
+				dgDebriNodeInfo& childNodeInfo = node->GetInfo().m_nodeData;
+				if (childNodeInfo.m_lru < stackMark) {
+					childNodeInfo.m_lru = stackMark;
+					pool[stack] = node;
+					stack ++;
+					dgAssert (stack < sizeof (pool)/sizeof (pool[0]));
+				}
+			}
+		}
+	}
+}
+
+void dgCollisionCompoundFractured::SpawnDisjointChunks (dgBody* const myBody, const dgCollisionInstance* const myInstance, dgConectivityGraph::dgListNode* const rootNode, dgFloat32 impulseStimate2, dgFloat32 impulseStimateCut2)
+{
+	if (m_conectivity.GetFirst() != m_conectivity.GetLast()) {
+		ColorDisjoinChunksIsland ();
+		dgConectivityGraph::dgListNode* nextNode;
+		for (dgConectivityGraph::dgListNode* node = m_conectivity.GetFirst(); node != m_conectivity.GetLast(); node = nextNode) {
+			nextNode = node->GetNext();
+			dgDebriNodeInfo& nodeInfo = node->GetInfo().m_nodeData;
+			if (nodeInfo.m_lru != m_lru) {
+				if (node->GetInfo().GetCount() == 0) {
+					SpawnSingleChunk (myBody, myInstance, node);
+				} else {
+					do {
+						nextNode = nextNode->GetPrev();
+					} while (nextNode && (nextNode->GetInfo().m_nodeData.m_lru != m_lru));
+					dgAssert (nextNode);
+					SpawnComplexChunk (myBody, myInstance, node);
+				}
+			}
+		}
+	}
+
+}
+
+
+void dgCollisionCompoundFractured::SpawnSingleChunk (dgBody* const myBody, const dgCollisionInstance* const myInstance, dgConectivityGraph::dgListNode* const chunkNode)
+{
+	m_world->GlobalLock();
+
+	const dgMatrix& matrix = myBody->GetMatrix();
+	const dgVector& veloc = myBody->GetVelocity();
+	const dgVector& omega = myBody->GetOmega();
+	dgVector com (matrix.TransformVector(myBody->GetCentreOfMass()));
+
+	dgDebriNodeInfo& nodeInfo = chunkNode->GetInfo().m_nodeData;
+	dgCollisionInstance* const chunkCollision = nodeInfo.m_shapeNode->GetInfo()->GetShape();
+	dgDynamicBody* const chunkBody = m_world->CreateDynamicBody (chunkCollision, matrix);
+	chunkBody->SetMassProperties(chunkCollision->GetVolume() * m_density, chunkBody->GetCollision());
+	m_world->GetBroadPhase()->AddInternallyGeneratedBody(chunkBody);
+
+	// calculate debris initial velocity
+	dgVector chunkOrigin (matrix.TransformVector(chunkCollision->GetLocalMatrix().m_posit));
+	dgVector chunkVeloc (veloc + omega * (chunkOrigin - com));
+
+	chunkBody->SetOmega(omega);
+	chunkBody->SetVelocity(chunkVeloc);
+	chunkBody->SetGroupID(chunkCollision->GetUserDataID());
+
+	m_emitFracturedChunk(chunkBody, chunkNode, myInstance);
+
+	m_conectivityMap.Remove (chunkCollision);
+	dgCollisionCompound::RemoveCollision (nodeInfo.m_shapeNode);
+	m_conectivity.DeleteNode(chunkNode);
+
+	m_world->GlobalUnlock();
+}
+
+void dgCollisionCompoundFractured::SpawnComplexChunk (dgBody* const myBody, const dgCollisionInstance* const myInstance, dgConectivityGraph::dgListNode* const chunkNode)
+{
+	dgInt32 stack = 1;
+	dgConectivityGraph::dgListNode* pool[512];
+
+	dgList<dgConectivityGraph::dgListNode*> islanList (GetAllocator());
+	dgInt32 stackMark = m_lru - 1;
+	pool[0] = chunkNode;
+	stack = 1;
+	while (stack) {
+		stack --;
+		dgConectivityGraph::dgListNode* const node = pool[stack];
+		dgDebriNodeInfo& nodeInfo = node->GetInfo().m_nodeData;
+		if (nodeInfo.m_lru <= stackMark) {
+			m_world->GlobalLock();
+			islanList.Append(node);
+			m_world->GlobalUnlock();
+
+			nodeInfo.m_lru = m_lru;
+			for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = node->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
+				dgConectivityGraph::dgListNode* const node = edgeNode->GetInfo().m_node;
+				dgDebriNodeInfo& childNodeInfo = node->GetInfo().m_nodeData;
+				if (childNodeInfo.m_lru < stackMark) {
+					childNodeInfo.m_lru = stackMark;
+					pool[stack] = node;
+					stack ++;
+					dgAssert (stack < sizeof (pool)/sizeof (pool[0]));
+				}
+			}
+		}
+	}
+
+m_world->GlobalLock();
+for (dgList<dgConectivityGraph::dgListNode*>::dgListNode* node = islanList.GetFirst(); node; node = node->GetNext()){
+dgConectivityGraph::dgListNode* const cell = node->GetInfo();
+RemoveCollision (cell->GetInfo().m_nodeData.m_shapeNode);
+}
+m_world->GlobalUnlock();
+
 }
