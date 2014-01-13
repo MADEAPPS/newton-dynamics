@@ -154,7 +154,7 @@ class dgCollisionCompoundFractured::dgFractureBuilder: public dgTree<dgMeshEffec
         const dgBigVector* m_vertex;
     };
 
-	class dgFractureConectivity: public dgGraph<int, int>
+	class dgFractureConectivity: public dgGraph<dgInt32, dgInt32>
 	{
 		public:
 		dgFractureConectivity(dgMemoryAllocator* const allocator)
@@ -243,7 +243,9 @@ class dgCollisionCompoundFractured::dgFractureBuilder: public dgTree<dgMeshEffec
 		dgInt32 tetraCount = delaunayTetrahedras.GetCount();
 		dgStack<dgBigVector> voronoiPoints(tetraCount + 32);
 		dgStack<dgDelaunayTetrahedralization::dgListNode*> tetradrumNode(tetraCount);
+
 		dgConvexSolidArray delanayNodes (allocator);	
+		dgTree<dgTree<dgConvexSolidArray::dgTreeNode*, dgConvexSolidArray::dgTreeNode*>, dgConvexSolidArray::dgTreeNode*> adjacentCell(allocator);
 
 		dgInt32 index = 0;
 		const dgHullVector* const delanayPoints = delaunayTetrahedras.GetHullVertexArray();
@@ -252,6 +254,7 @@ class dgCollisionCompoundFractured::dgFractureBuilder: public dgTree<dgMeshEffec
 			voronoiPoints[index] = tetra.CircumSphereCenter (delanayPoints);
 			tetradrumNode[index] = node;
 
+			dgConvexSolidArray::dgTreeNode* array[4];
 			for (dgInt32 i = 0; i < 4; i ++) {
 				dgConvexSolidArray::dgTreeNode* header = delanayNodes.Find(tetra.m_faces[0].m_index[i]);
 				if (!header) {
@@ -259,14 +262,30 @@ class dgCollisionCompoundFractured::dgFractureBuilder: public dgTree<dgMeshEffec
 					header = delanayNodes.Insert(list, tetra.m_faces[0].m_index[i]);
 				}
 				header->GetInfo().Append (index);
+				array[i] = header;
 			}
+
+			for (dgInt32 i = 0; i < 4; i ++) {
+				dgTree<dgTree<dgConvexSolidArray::dgTreeNode*, dgConvexSolidArray::dgTreeNode*>, dgConvexSolidArray::dgTreeNode*>::dgTreeNode* header = adjacentCell.Find (array[i]);
+				if (!header) {
+					dgTree<dgConvexSolidArray::dgTreeNode*, dgConvexSolidArray::dgTreeNode*> list (allocator);
+					header = adjacentCell.Insert(list, array[i]);
+				}
+
+				for (dgInt32 j = 0; j < 4; j ++) {
+					if (i != j) {
+						header->GetInfo().Insert(array[j], array[j]);
+					}
+				}
+			}
+
 			index ++;
 		}
 
 		dgConvexSolidArray::Iterator iter (delanayNodes);
 		dgFloat32 normalAngleInRadians = 30.0f * 3.1416f / 180.0f;
 
-		dgTree<dgFractureConectivity::dgListNode*, int> graphMap(allocator);
+		dgTree<dgFractureConectivity::dgListNode*, dgConvexSolidArray::dgTreeNode*> graphMap(allocator);
 		for (iter.Begin(); iter; iter ++) {
 
 			dgConvexSolidArray::dgTreeNode* const nodeNode = iter.GetNode();
@@ -307,32 +326,54 @@ class dgCollisionCompoundFractured::dgFractureBuilder: public dgTree<dgMeshEffec
 
 						dgFractureConectivity::dgListNode* const node = m_conectivity.AddNode ();
 						node->GetInfo().m_nodeData = key;
-						graphMap.Insert(node, key);
+						graphMap.Insert(node, nodeNode);
 					}
 					convexMesh->Release();
 				}
 			}
 		}
-		delanayNodes.RemoveAll();
 
-		for (dgDelaunayTetrahedralization::dgListNode* node = delaunayTetrahedras.GetFirst(); node; node = node->GetNext()) {
-			dgConvexHull4dTetraherum& tetra = node->GetInfo();
-			for (dgInt32 i = 0; i < 3; i ++) {
-				dgInt32 nodeindex0 = tetra.m_faces[0].m_index[i];
-				if (nodeindex0 < guadVertexKey) {
-					for (dgInt32 j = i + 1; j < 4; j ++) {
-						dgInt32 nodeindex1 = tetra.m_faces[0].m_index[j];
-						if (nodeindex1 < guadVertexKey) {
-							dgAssert (graphMap.Find(nodeindex0));
-							dgAssert (graphMap.Find(nodeindex1));
-							dgFractureConectivity::dgListNode* const node0 = graphMap.Find(nodeindex0)->GetInfo();
-							dgFractureConectivity::dgListNode* const node1 = graphMap.Find(nodeindex1)->GetInfo();
-							if (!IsPairConnected (node0, node1)) {
-								if (AreSolidNeigborg (nodeindex0, nodeindex1)) {
-									node0->GetInfo().AddEdge(node1);
-									node1->GetInfo().AddEdge(node0);
-								}
-							}
+
+		dgTree<dgTree<dgConvexSolidArray::dgTreeNode*, dgConvexSolidArray::dgTreeNode*>, dgConvexSolidArray::dgTreeNode*>::Iterator adjacentIter (adjacentCell);
+		for (adjacentIter.Begin(); adjacentIter; adjacentIter++) {
+			dgConvexSolidArray::dgTreeNode* const solidTree0 = adjacentIter.GetKey();
+			
+			dgTree<dgFractureConectivity::dgListNode*, dgConvexSolidArray::dgTreeNode*>::dgTreeNode* const mapNode0 = graphMap.Find(solidTree0);
+			if (mapNode0) {
+				dgFractureConectivity::dgListNode* const node0 = mapNode0->GetInfo();
+
+				const dgTree<dgConvexSolidArray::dgTreeNode*, dgConvexSolidArray::dgTreeNode*>& cell = adjacentIter.GetNode()->GetInfo();
+				dgTree<dgConvexSolidArray::dgTreeNode*, dgConvexSolidArray::dgTreeNode*>::Iterator iter (cell);
+				for (iter.Begin(); iter; iter ++) {
+					dgConvexSolidArray::dgTreeNode* const solidTree1 = iter.GetNode()->GetInfo();
+					dgTree<dgFractureConectivity::dgListNode*, dgConvexSolidArray::dgTreeNode*>::dgTreeNode* const mapNode1 = graphMap.Find(solidTree1);
+					if (mapNode1) {
+						dgFractureConectivity::dgListNode* const node1 = mapNode1->GetInfo();
+						if (!IsPairConnected (node0, node1)) {
+							node0->GetInfo().AddEdge(node1);
+							node1->GetInfo().AddEdge(node0);
+
+/*
+if ((node0->GetInfo().m_nodeData == 0) || (node1->GetInfo().m_nodeData == 0)){
+	dgInt32 index = node0->GetInfo().m_nodeData;
+	dgTrace (("node0 %d: ", index));
+	for (dgGraphNode<int, int>::dgListNode* edge = node0->GetInfo().GetFirst(); edge; edge = edge->GetNext()) {
+		dgFractureConectivity::dgListNode* const otherNode = edge->GetInfo().m_node;
+		dgInt32 index1 = otherNode->GetInfo().m_nodeData;
+		dgTrace (("%d ", index1));
+	}
+	dgTrace (("\n"));
+
+	index = node1->GetInfo().m_nodeData;
+	dgTrace (("node1 %d: ", index));
+	for (dgGraphNode<int, int>::dgListNode* edge = node1->GetInfo().GetFirst(); edge; edge = edge->GetNext()) {
+		dgFractureConectivity::dgListNode* const otherNode = edge->GetInfo().m_node;
+		dgInt32 index1 = otherNode->GetInfo().m_nodeData;
+		dgTrace (("%d ", index1));
+	}
+	dgTrace (("\n"));
+}
+*/
 						}
 					}
 				}
@@ -341,6 +382,20 @@ class dgCollisionCompoundFractured::dgFractureBuilder: public dgTree<dgMeshEffec
 
 		dgAssert (SanityCheck());
         ClipFractureParts (solidMesh);
+
+		for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; node = node->GetNext()) {
+			dgInt32 index0 = node->GetInfo().m_nodeData;
+
+			dgGraphNode<dgInt32, dgInt32>::dgListNode* nextEdge;
+			for (dgGraphNode<dgInt32, dgInt32>::dgListNode* edgeNode = node->GetInfo().GetFirst(); edgeNode; edgeNode = nextEdge) {
+				nextEdge = edgeNode->GetNext();
+				dgFractureConectivity::dgListNode* const otherNode = edgeNode->GetInfo().m_node; 
+				dgInt32 index1 = otherNode->GetInfo().m_nodeData;
+				if (!AreSolidNeigborg (index0, index1)) {
+					node->GetInfo().DeleteEdge(edgeNode);
+				}
+			}
+		}
 
 #if 0
 for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; node = node->GetNext()) {
@@ -766,6 +821,11 @@ dgCollisionCompoundFractured::dgSubMesh* dgCollisionCompoundFractured::dgMesh::A
 	dgListNode* const node = dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>::AddNode ();
 	dgDebriNodeInfo& data = node->GetInfo().m_nodeData;
 
+static int xxxx;
+data.xxxxx = xxxx;
+xxxx ++;
+
+
 	data.m_mesh = new (GetAllocator()) dgMesh(GetAllocator());
 	data.m_shapeNode = collisionNode;
 
@@ -866,6 +926,7 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (const dgCollisionCom
 	dgConectivityGraph::dgListNode* const mainNode = m_conectivity.dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>::AddNode ();
 	dgDebriNodeInfo& mainNodeData = mainNode->GetInfo().m_nodeData;
 	mainNodeData.m_mesh = mainMesh;
+
 
 	BuildMainMeshSubMehes();
 	m_conectivityMap.Pupolate(m_conectivity);
@@ -1486,9 +1547,9 @@ bool dgCollisionCompoundFractured::IsAbovePlane (dgConectivityGraph::dgListNode*
 	return dist > dgFloat32 (0.0f);
 }
 
-dgCollisionCompoundFractured::dgConectivityGraph::dgListNode* dgCollisionCompoundFractured::FirstAcrossPlane (dgConectivityGraph::dgListNode* const node, const dgVector& plane) const
+dgCollisionCompoundFractured::dgConectivityGraph::dgListNode* dgCollisionCompoundFractured::FirstAcrossPlane (dgConectivityGraph::dgListNode* const nodeBelowPlane, const dgVector& plane) const
 {
-	dgDebriNodeInfo& nodeInfo = node->GetInfo().m_nodeData;
+	dgDebriNodeInfo& nodeInfo = nodeBelowPlane->GetInfo().m_nodeData;
 	dgCollisionInstance* const instance = nodeInfo.m_shapeNode->GetInfo()->GetShape();
 
 	dgInt32 dommy;
@@ -1501,13 +1562,17 @@ dgCollisionCompoundFractured::dgConectivityGraph::dgListNode* dgCollisionCompoun
 	support.DotProduct4(plane).StoreScalar(&dist);
 	dgAssert (dist < dgFloat32 (0.0f));
 
-	dgConectivityGraph::dgListNode* startNode = node;
+//nodeInfo.m_lru = m_lru + 100;
+
+	dgConectivityGraph::dgListNode* startNode = nodeBelowPlane;
 	for (bool foundBetterNode = true; foundBetterNode; ) {
 		foundBetterNode = false;
 		for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = startNode->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
 			dgConectivityGraph::dgListNode* const node = edgeNode->GetInfo().m_node;
 			dgDebriNodeInfo& neighborgInfo = node->GetInfo().m_nodeData;
 			dgCollisionInstance* const instance = neighborgInfo.m_shapeNode->GetInfo()->GetShape();
+
+//neighborgInfo.m_lru = m_lru + 100;
 
 			const dgMatrix& matrix = instance->GetLocalMatrix(); 
 			dgVector support (matrix.TransformVector(instance->SupportVertex(matrix.UnrotateVector(dir), &dommy)));
@@ -1519,12 +1584,32 @@ dgCollisionCompoundFractured::dgConectivityGraph::dgListNode* dgCollisionCompoun
 				startNode = node;
 				if (dist > dgFloat32 (0.0f)) {
 					foundBetterNode = false;
-					break;
+					return startNode;
+/*
+dgDebriNodeInfo& nodeInfo1 = startNode->GetInfo().m_nodeData;
+dgCollisionInstance* const instance1 = nodeInfo1.m_shapeNode->GetInfo()->GetShape();
+const dgMatrix& matrix1 = instance1->GetLocalMatrix(); 
+
+dgFloat32 dist0;
+dgVector dir1 (dir);
+support = matrix1.TransformVector(instance1->SupportVertex(matrix1.UnrotateVector(dir1), &dommy));
+support.DotProduct4(plane).StoreScalar(&dist0);
+
+dgFloat32 dist1;
+dir1 = dir1.CompProduct4(dgVector::m_negOne);
+support = matrix1.TransformVector(instance1->SupportVertex(matrix1.UnrotateVector(dir1), &dommy));
+support.DotProduct4(plane).StoreScalar(&dist1);
+dist1 *=1;
+
+nodeInfo.m_lru = m_lru + 10;
+nodeInfo1.m_lru = m_lru + 10;
+//return startNode;
+*/
 				}
 			}
 		}
 	}
-
+/*
 	dgDebriNodeInfo& nodeInfo1 = startNode->GetInfo().m_nodeData;
 	dgCollisionInstance* const instance1 = nodeInfo1.m_shapeNode->GetInfo()->GetShape();
 	const dgMatrix& matrix1 = instance1->GetLocalMatrix(); 
@@ -1537,8 +1622,9 @@ dgCollisionCompoundFractured::dgConectivityGraph::dgListNode* dgCollisionCompoun
 	dir = dir.CompProduct4(dgVector::m_negOne);
 	support = matrix1.TransformVector(instance1->SupportVertex(matrix1.UnrotateVector(dir), &dommy));
 	support.DotProduct4(plane).StoreScalar(&dist1);
-
 	return (dist0 * dist1) < dgFloat32 (0.0f) ? startNode : NULL;
+*/
+	return NULL;
 }
 
 dgCollisionCompoundFractured* dgCollisionCompoundFractured::PlaneClip (const dgVector& plane)
@@ -1550,11 +1636,11 @@ dgCollisionCompoundFractured* dgCollisionCompoundFractured::PlaneClip (const dgV
 		startNode = FirstAcrossPlane (startNode, plane);
 	}
 
-	dgVector posgDir (plane & dgVector::m_triplexMask);
-	dgVector negDir (posgDir.CompProduct4(dgVector::m_negOne));
-
-	dgTree<dgConectivityGraph::dgListNode*, dgConectivityGraph::dgListNode*> upperSide (GetAllocator());
 	if (startNode) {
+		dgVector posgDir (plane & dgVector::m_triplexMask);
+		dgVector negDir (posgDir.CompProduct4(dgVector::m_negOne));
+		dgTree<dgConectivityGraph::dgListNode*, dgConectivityGraph::dgListNode*> upperSide (GetAllocator());
+
 		dgInt32 stack = 1;
 		dgConectivityGraph::dgListNode* pool[256];
 		pool[0] = startNode;
@@ -1612,8 +1698,22 @@ dgCollisionCompoundFractured* dgCollisionCompoundFractured::PlaneClip (const dgV
 				}
 			}
 		}
-	}
 
+/*
+BeginAddRemove ();
+dgConectivityGraph::dgListNode* xxx1;
+for (dgConectivityGraph::dgListNode* xxx = m_conectivity.GetFirst(); xxx != m_conectivity.GetLast(); xxx = xxx1) {
+	xxx1 = xxx->GetNext();
+	if (xxx->GetInfo().m_nodeData.m_lru == m_lru) {
+//	if (!((xxx->GetInfo().m_nodeData.xxxxx == 0) || (xxx->GetInfo().m_nodeData.xxxxx == 3))){
+	RemoveCollision (xxx->GetInfo().m_nodeData.m_shapeNode);
+	} else {
+dgTrace (("%d ", xxx->GetInfo().m_nodeData.xxxxx));
+	}
+}
+EndAddRemove ();
+dgTrace (("/n"));
+*/
 
 BeginAddRemove ();
 dgTree<dgConectivityGraph::dgListNode*, dgConectivityGraph::dgListNode*>::Iterator iter(upperSide);
@@ -1622,6 +1722,10 @@ for (iter.Begin(); iter; iter ++) {
 	RemoveCollision (xxx->GetInfo().m_nodeData.m_shapeNode);
 }
 EndAddRemove ();
+
+	}
+
+
 
 	return NULL;
 }

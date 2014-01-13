@@ -218,8 +218,8 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
 
 	// create a random point cloud
 	dVector points[MAX_POINT_CLOUD_SIZE];
-//	int pointCount = MakeRandomPoisonPointCloud (solidMesh, points);
-	int pointCount = MakeRandomGuassianPointCloud (solidMesh, points, MAX_POINT_CLOUD_SIZE);
+	int pointCount = MakeRandomPoisonPointCloud (solidMesh, points);
+//	int pointCount = MakeRandomGuassianPointCloud (solidMesh, points, MAX_POINT_CLOUD_SIZE);
 
 	// create and interiors material for texturing the fractured pieces
 	//int internalMaterial = LoadTexture("KAMEN-stup.tga");

@@ -107,6 +107,7 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 		dgDebriNodeInfo ();
 		~dgDebriNodeInfo ();
 
+dgInt32 xxxxx;
 		dgMesh* m_mesh;
 		dgTreeArray::dgTreeNode* m_shapeNode;
 		dgInt32 m_lru;
