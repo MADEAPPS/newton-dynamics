@@ -83,6 +83,19 @@ void dgDeformableBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadInd
 */
 }
 
+void dgDeformableBody::AttachCollision (dgCollisionInstance* const collision)
+{
+	if (m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
+		dgAssert (0);
+	}
+
+	dgBody::AttachCollision(collision);
+
+	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
+		dgAssert (0);
+	}
+}
+
 void dgDeformableBody::SetVelocity (const dgVector& velocity)
 {
 	dgAssert(0);

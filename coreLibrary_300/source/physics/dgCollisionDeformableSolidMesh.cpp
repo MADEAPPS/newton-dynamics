@@ -179,9 +179,10 @@ class dgCollisionDeformableSolidMesh::dgDeformationRegion
 		dgFree(m_indices);
 	}
 
-/*
+
 	void UpdateVelocities(const dgCollisionDeformableSolidMesh::dgParticle& particles, dgFloat32 timestep, dgFloat32 stiffness)
 	{
+/*
 		const dgFloat32* const mass = particles.m_mass;
 		const dgVector* const posit0 = particles.m_shapePosition;
 		const dgVector* const posit1 = particles.m_position;
@@ -256,8 +257,8 @@ m_rot = dgGetIdentityMatrix();
 			dgVector gi (m_rot.UnrotateVector(qi) + m_com);
 			velocity[index] += (gi - posit1[index]).Scale3 (invTimeScale);
 		}
-	}
 */
+	}
 
 	dgVector m_com;
 	dgVector m_com0;
@@ -908,72 +909,6 @@ void dgCollisionDeformableSolidMesh::SetMatrix (const dgMatrix& matrix)
 	SetCollisionBBox (m_rootNode->m_minBox, m_rootNode->m_maxBox);
 }
 
-void dgCollisionDeformableSolidMesh::ApplyExternalAndInternalForces (dgDeformableBody* const myBody, dgFloat32 timestep, dgInt32 threadIndex)
-{
-//	sleep (100);
-
-	// force are applied immediately to each particle
-	dgVector zero (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	dgVector* const positions = m_particles.m_position;
-	dgVector* const deltaPositions = m_particles.m_deltaPosition;
-	dgVector* const instantVelocity = m_particles.m_instantVelocity;
-	dgVector* const internalVelocity = m_particles.m_internalVelocity;
-
-	// integrate particles external forces and current velocity
-	dgVector extenalVelocityImpulse (myBody->m_accel.Scale3 (myBody->m_invMass.m_w * timestep));
-	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-		internalVelocity[i] = zero;
-		instantVelocity[i] += extenalVelocityImpulse;
-		deltaPositions[i] = instantVelocity[i].Scale3 (timestep);
-		positions[i] += deltaPositions[i];
-	}
-
-	// apply particle velocity contribution by each particle regions
-	for (dgInt32 i = 0; i < m_regionsCount; i ++) {
-		m_regions[i].UpdateVelocities(m_particles, timestep, m_stiffness);
-	}
-
-	// integrate each particle by the deformation velocity, also calculate the new com
-	dgFloat32 dampCoef = 0.0f;
-	dgVector com (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-		instantVelocity[i] += internalVelocity[i].Scale3 (dampCoef);
-		dgVector step (internalVelocity[i].Scale3 (timestep));
-		deltaPositions[i] += step;
-		positions[i] += step;
-		com += positions[i];
-	}
-
-	// center the particles around the new geometrics center of mass
-	dgVector oldCom (m_particles.m_com);
-	m_particles.m_com = com.Scale (dgFloat32 (1.0f) / m_particles.m_count); 
-
-	// calculate the new body average velocity
-	myBody->m_veloc = (m_particles.m_com - oldCom).Scale (dgFloat32 (1.0f) / timestep);
-	myBody->m_globalCentreOfMass = m_particles.m_com; 
-	myBody->m_matrix.m_posit = m_particles.m_com; 
-
-	//myBody->UpdateMatrix (timestep, threadIndex);
-	if (myBody->m_matrixUpdate) {
-		myBody->m_matrixUpdate (*myBody, myBody->m_matrix, threadIndex);
-	}
-
-	// the collision changed shape, need to update spatial structure 
-	UpdateCollision ();
-
-	SetCollisionBBox (m_rootNode->m_minBox, m_rootNode->m_maxBox);
-
-
-//	if (xxxx >= 70)
-//		xxxx *=1;
-//	dgTrace (("%d ", xxxx));
-//	dgVector xxx (myBody->m_collisionWorldMatrix.TransformVector(m_particles.m_position1[0]));
-//	dgTrace (("(%f %f %f) ", xxx.m_y, m_particles.m_instantVelocity[0].m_y, m_particles.m_internalVelocity[0].m_y));
-//	//dgTrace (("(%f %f %f) ", m_particles.m_position1[0].m_y, m_particles.m_instantVelocity[0].m_y, m_particles.m_internalVelocity[0].m_y));
-//	//dgTrace (("(%f %f %f) ", m_particles.m_position1[4].m_y, m_particles.m_instantVelocity[4].m_y, m_particles.m_internalVelocity[4].m_y));
-//	dgTrace (("\n"));
-
-}
 
 
 dgInt32 dgCollisionDeformableSolidMesh::CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy)
@@ -1440,10 +1375,87 @@ dgInt32 dgCollisionDeformableSolidMesh::CalculateSignature () const
 }
 
 
-
+//void dgCollisionDeformableSolidMesh::ApplyExternalAndInternalForces (dgDeformableBody* const myBody, dgFloat32 timestep, dgInt32 threadIndex)
 void dgCollisionDeformableSolidMesh::IntegrateParticles (dgFloat32 timestep)
 {
-	dgAssert(0);
+	dgVector* const posit = m_particles.m_posit;
+	dgVector* const veloc = m_particles.m_veloc;
+	dgFloat32* const unitMass = m_particles.m_unitMass;
+
+	//timestep /= 4.0f;
+	// apply gravity force
+	// I am restricting all particle masses to be either infinite of constant value
+	// this allow me to express then by a value that can be either 0.0 (infinite mass) or 1.0 (constant mass)
+	dgFloat32 invTimeStep = dgFloat32 (1.0f) / timestep;
+	dgVector gravity (0.0f, -9.8f, 0.0f, 0.0f);
+
+	dgVector gravityStep (gravity.Scale4 (timestep));
+	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
+		veloc[i] = (posit[i] - m_shapePosition[i]).Scale4 (invTimeStep);
+		m_shapePosition[i] = posit[i];
+		veloc[i] += gravityStep.Scale4 (unitMass[i]);
+		posit[i] += veloc[i].Scale4 (timestep);
+	}
+	
+
+/*
+	//	sleep (100);
+
+	// force are applied immediately to each particle
+	dgVector zero (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	dgVector* const positions = m_particles.m_position;
+	dgVector* const deltaPositions = m_particles.m_deltaPosition;
+	dgVector* const instantVelocity = m_particles.m_instantVelocity;
+	dgVector* const internalVelocity = m_particles.m_internalVelocity;
+
+	// integrate particles external forces and current velocity
+	dgVector extenalVelocityImpulse (myBody->m_accel.Scale3 (myBody->m_invMass.m_w * timestep));
+	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
+		internalVelocity[i] = zero;
+		instantVelocity[i] += extenalVelocityImpulse;
+		deltaPositions[i] = instantVelocity[i].Scale3 (timestep);
+		positions[i] += deltaPositions[i];
+	}
+
+	// apply particle velocity contribution by each particle regions
+	for (dgInt32 i = 0; i < m_regionsCount; i ++) {
+		m_regions[i].UpdateVelocities(m_particles, timestep, m_stiffness);
+	}
+
+	// integrate each particle by the deformation velocity, also calculate the new com
+	dgFloat32 dampCoef = 0.0f;
+	dgVector com (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
+		instantVelocity[i] += internalVelocity[i].Scale3 (dampCoef);
+		dgVector step (internalVelocity[i].Scale3 (timestep));
+		deltaPositions[i] += step;
+		positions[i] += step;
+		com += positions[i];
+	}
+
+	// center the particles around the new geometrics center of mass
+	dgVector oldCom (m_particles.m_com);
+	m_particles.m_com = com.Scale (dgFloat32 (1.0f) / m_particles.m_count); 
+
+	// calculate the new body average velocity
+	myBody->m_veloc = (m_particles.m_com - oldCom).Scale (dgFloat32 (1.0f) / timestep);
+	myBody->m_globalCentreOfMass = m_particles.m_com; 
+	myBody->m_matrix.m_posit = m_particles.m_com; 
+
+	//myBody->UpdateMatrix (timestep, threadIndex);
+	if (myBody->m_matrixUpdate) {
+		myBody->m_matrixUpdate (*myBody, myBody->m_matrix, threadIndex);
+	}
+
+	// the collision changed shape, need to update spatial structure 
+	UpdateCollision ();
+
+	SetCollisionBBox (m_rootNode->m_minBox, m_rootNode->m_maxBox);
+*/
+
+
+	
+
 }
 
 void dgCollisionDeformableSolidMesh::ResolvePositionsConstraints (dgFloat32 timestep)

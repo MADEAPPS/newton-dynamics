@@ -65,7 +65,7 @@ class dgDeformableBody: public dgBody
 	virtual dgMatrix CalculateInertiaMatrix () const {return dgGetZeroMatrix();}
 	virtual dgMatrix CalculateInvInertiaMatrix () const {return dgGetZeroMatrix();}
 
-	
+	virtual void AttachCollision (dgCollisionInstance* const collision);
 
 	virtual dgVector PredictLinearVelocity(dgFloat32 timestep) const {return m_veloc;}
 	virtual dgVector PredictAngularVelocity(dgFloat32 timestep) const {return m_omega;}
