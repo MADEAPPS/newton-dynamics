@@ -220,7 +220,6 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 	dgConectivityGraph m_conectivity;
 	dgConectivityGraphMap m_conectivityMap;
 	dgVertexBuffer* m_vertexBuffer;
-	mutable dgThread::dgCriticalSection m_criticalSectionLock;
 	dgFloat32 m_impulseStrengthPerUnitMass;
 	dgFloat32 m_impulseAbsortionFactor;
 	dgFloat32 m_density;

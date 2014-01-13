@@ -885,7 +885,6 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (const dgCollisionCom
 	,m_conectivity(source.m_conectivity)
 	,m_conectivityMap (source.m_conectivityMap)
 	,m_vertexBuffer(source.m_vertexBuffer)
-	,m_criticalSectionLock()
 	,m_impulseStrengthPerUnitMass(source.m_impulseStrengthPerUnitMass)
 	,m_impulseAbsortionFactor(source.m_impulseAbsortionFactor)
 	,m_density(dgFloat32 (-1.0f))
@@ -923,7 +922,6 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (const dgCollisionCom
 	dgDebriNodeInfo& mainNodeData = mainNode->GetInfo().m_nodeData;
 	mainNodeData.m_mesh = mainMesh;
 
-
 	BuildMainMeshSubMehes();
 	m_conectivityMap.Pupolate(m_conectivity);
 
@@ -936,7 +934,6 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (dgCollisionCompoundF
 	,m_conectivity(source.GetAllocator())
 	,m_conectivityMap (source.GetAllocator())
 	,m_vertexBuffer(source.m_vertexBuffer)
-	,m_criticalSectionLock()
 	,m_impulseStrengthPerUnitMass(source.m_impulseStrengthPerUnitMass)
 	,m_impulseAbsortionFactor(source.m_impulseAbsortionFactor)
 	,m_density(source.m_density)
@@ -1002,7 +999,6 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (
 	,m_conectivity(world->GetAllocator())
 	,m_conectivityMap (world->GetAllocator())
 	,m_vertexBuffer(NULL)
-	,m_criticalSectionLock()
 	,m_impulseStrengthPerUnitMass(10.0f)
 	,m_impulseAbsortionFactor(0.5f)
 	,m_density(dgFloat32 (-1.0f))
@@ -1128,9 +1124,8 @@ void dgCollisionCompoundFractured::BuildMainMeshSubMehes() const
 {
 	dgConectivityGraph::dgListNode* const mainNode = m_conectivity.GetLast();
 	dgMesh* const mainMesh = mainNode->GetInfo().m_nodeData.m_mesh;
-	m_world->GlobalLock();
+
 	mainMesh->RemoveAll();
-	m_world->GlobalUnlock();
 
 	dgAssert (mainMesh->m_vertexOffsetStart == 0);
 	mainMesh->m_vertexCount = m_vertexBuffer->m_vertexCount;
@@ -1154,9 +1149,7 @@ void dgCollisionCompoundFractured::BuildMainMeshSubMehes() const
 	dgSubMesh* mainSubMeshes[DG_FRACTURE_MAX_METERIAL_COUNT];
 	for (dgInt32 i = 0; i < m_materialCount; i ++) {
 		if (histogram[i]) {
-			m_world->GlobalLock();
 			mainSubMeshes[i] = mainMesh->AddgSubMesh (histogram[i] * 3, materials[i]);
-			m_world->GlobalUnlock();
 		}
 	}
 
@@ -1300,9 +1293,6 @@ dgInt32 dgCollisionCompoundFractured::CalculateContacts (dgCollidingPairCollecto
 		dgFloat32 impulseStrength = m_impulseStrengthPerUnitMass * myBody->GetMass().m_w;
 
 		if (impulseStimate2 > (impulseStrength * impulseStrength)) {
-
-			dgThreadHiveScopeLock lock (m_world, &m_criticalSectionLock);
-
 			dgCollisionInstance* const myInstance = myBody->GetCollision();
 			dgCollisionInstance* const otherInstance = otherBody->GetCollision();
 			dgAssert (myInstance->GetChildShape() == this);
@@ -1314,6 +1304,8 @@ dgInt32 dgCollisionCompoundFractured::CalculateContacts (dgCollidingPairCollecto
 				dgDebriNodeInfo& nodeInfo = rootNode->GetInfo().m_nodeData;
 				nodeInfo.m_lru = 1;
 				dgCollisionCompoundFractured* const me = (dgCollisionCompoundFractured*)this;
+
+				m_world->GlobalLock();
                 if (me->SpawnChunks (myBody, myInstance, rootNode, impulseStimate2, impulseStrength * impulseStrength)) {
 					me->SpawnDisjointChunks (myBody, myInstance, rootNode, impulseStimate2, impulseStrength * impulseStrength);
 
@@ -1327,6 +1319,7 @@ dgInt32 dgCollisionCompoundFractured::CalculateContacts (dgCollidingPairCollecto
 						myBody->SetMassProperties(dgFloat32 (0.0f), myInstance);
 					}
 				}
+				m_world->GlobalUnlock();
 			}
 		}
 	}
@@ -1724,8 +1717,6 @@ void dgCollisionCompoundFractured::SpawnDisjointChunks (dgBody* const myBody, co
 
 void dgCollisionCompoundFractured::SpawnSingleChunk (dgBody* const myBody, const dgCollisionInstance* const myInstance, dgConectivityGraph::dgListNode* const chunkNode)
 {
-	m_world->GlobalLock();
-
 	const dgMatrix& matrix = myBody->GetMatrix();
 	const dgVector& veloc = myBody->GetVelocity();
 	const dgVector& omega = myBody->GetOmega();
@@ -1750,8 +1741,6 @@ void dgCollisionCompoundFractured::SpawnSingleChunk (dgBody* const myBody, const
 	m_conectivityMap.Remove (chunkCollision);
 	dgCollisionCompound::RemoveCollision (nodeInfo.m_shapeNode);
 	m_conectivity.DeleteNode(chunkNode);
-
-	m_world->GlobalUnlock();
 }
 
 void dgCollisionCompoundFractured::SpawnComplexChunk (dgBody* const myBody, const dgCollisionInstance* const myInstance, dgConectivityGraph::dgListNode* const chunkNode)
@@ -1768,9 +1757,7 @@ void dgCollisionCompoundFractured::SpawnComplexChunk (dgBody* const myBody, cons
 		dgConectivityGraph::dgListNode* const node = pool[stack];
 		dgDebriNodeInfo& nodeInfo = node->GetInfo().m_nodeData;
 		if (nodeInfo.m_lru <= stackMark) {
-			m_world->GlobalLock();
 			islanList.Append(node);
-			m_world->GlobalUnlock();
 
 			nodeInfo.m_lru = m_lru;
 			for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = node->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
@@ -1790,9 +1777,7 @@ void dgCollisionCompoundFractured::SpawnComplexChunk (dgBody* const myBody, cons
 	const dgVector& veloc = myBody->GetVelocity();
 	const dgVector& omega = myBody->GetOmega();
 	dgVector com (matrix.TransformVector(myBody->GetCentreOfMass()));
-
-	m_world->GlobalLock();
-
+	
 	dgCollisionCompoundFractured* const childStructureCollision = new (GetAllocator()) dgCollisionCompoundFractured (*this, islanList);
 	dgCollisionInstance* const childStructureInstance = m_world->CreateInstance (childStructureCollision, myInstance->GetUserDataID(), myInstance->GetLocalMatrix()); 
 	childStructureCollision->Release();
@@ -1811,7 +1796,4 @@ void dgCollisionCompoundFractured::SpawnComplexChunk (dgBody* const myBody, cons
 
 	m_emitFracturedCompound (chunkBody);
 	childStructureInstance->Release();
-
-	m_world->GlobalUnlock();
-
 }
