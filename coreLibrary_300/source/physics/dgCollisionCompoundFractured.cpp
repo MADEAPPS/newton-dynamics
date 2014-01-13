@@ -892,6 +892,7 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (const dgCollisionCom
 	,m_lru(0)
 	,m_materialCount(source.m_materialCount)
 	,m_emitFracturedChunk(source.m_emitFracturedChunk)
+	,m_emitFracturedCompound(source.m_emitFracturedCompound)
 	,m_reconstructMainMesh(source.m_reconstructMainMesh)
 {
 	m_rtti |= dgCollisionCompoundBreakable_RTTI;
@@ -930,6 +931,54 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (const dgCollisionCom
 	dgAssert (SanityCheck());
 }
 
+dgCollisionCompoundFractured::dgCollisionCompoundFractured (dgCollisionCompoundFractured& source, const dgList<dgConectivityGraph::dgListNode*>& island)
+	:dgCollisionCompound(source.m_world)
+	,m_conectivity(source.GetAllocator())
+	,m_conectivityMap (source.GetAllocator())
+	,m_vertexBuffer(source.m_vertexBuffer)
+	,m_criticalSectionLock()
+	,m_impulseStrengthPerUnitMass(source.m_impulseStrengthPerUnitMass)
+	,m_impulseAbsortionFactor(source.m_impulseAbsortionFactor)
+	,m_density(source.m_density)
+	,m_lru(0)
+	,m_materialCount(source.m_materialCount)
+	,m_emitFracturedChunk(source.m_emitFracturedChunk)
+	,m_emitFracturedCompound(source.m_emitFracturedCompound)
+	,m_reconstructMainMesh(source.m_reconstructMainMesh)
+{
+	m_collisionId = m_compoundFracturedCollision;
+	m_rtti |= dgCollisionCompoundBreakable_RTTI;
+
+	m_vertexBuffer->AddRef();
+
+	dgCollisionCompound::BeginAddRemove ();
+	for (dgList<dgConectivityGraph::dgListNode*>::dgListNode* node = island.GetFirst(); node; node = node->GetNext()) {
+		dgConectivityGraph::dgListNode* const chunkNode = node->GetInfo();
+		dgDebriNodeInfo& nodeInfo = chunkNode->GetInfo().m_nodeData;
+
+		dgCollisionInstance* const chunkCollision = nodeInfo.m_shapeNode->GetInfo()->GetShape();
+		dgTreeArray::dgTreeNode* const treeNode = dgCollisionCompound::AddCollision (chunkCollision); 
+
+		source.m_conectivityMap.Remove (chunkCollision);
+		source.dgCollisionCompound::RemoveCollision (nodeInfo.m_shapeNode);
+		source.m_conectivity.Unlink(chunkNode);
+
+		m_conectivity.Append(chunkNode);
+		nodeInfo.m_shapeNode = treeNode;
+	}
+	dgCollisionCompound::EndAddRemove();
+
+	dgMesh* const mainMesh = new (m_world->GetAllocator()) dgMesh(m_world->GetAllocator());
+	dgConectivityGraph::dgListNode* const mainNode = m_conectivity.dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>::AddNode ();
+	dgDebriNodeInfo& mainNodeData = mainNode->GetInfo().m_nodeData;
+	mainNodeData.m_mesh = mainMesh;
+
+	BuildMainMeshSubMehes();
+	m_conectivityMap.Pupolate(m_conectivity);
+
+	m_density = -dgFloat32 (1.0f) / GetVolume();
+	dgAssert (SanityCheck());
+}
 
 dgCollisionCompoundFractured::dgCollisionCompoundFractured (dgWorld* const world, dgDeserialize deserialization, void* const userData)
 	:dgCollisionCompound (world, deserialization, userData)
@@ -948,7 +997,7 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (dgWorld* const world
 
 dgCollisionCompoundFractured::dgCollisionCompoundFractured (
 	dgWorld* const world, dgMeshEffect* const solidMesh, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& offsetMatrix, 
-	OnEmitFractureChunkCallBack emitFracturedChunk, OnReconstructFractureMainMeshCallBack reconstructMainMesh)
+	OnEmitFractureChunkCallBack emitFracturedChunk, OnEmitNewCompundFractureCallBack emitNewCompoundFactured, OnReconstructFractureMainMeshCallBack reconstructMainMesh)
 	:dgCollisionCompound (world)
 	,m_conectivity(world->GetAllocator())
 	,m_conectivityMap (world->GetAllocator())
@@ -960,6 +1009,7 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (
 	,m_lru(0)
 	,m_materialCount(0)
 	,m_emitFracturedChunk(emitFracturedChunk) 
+	,m_emitFracturedCompound(emitNewCompoundFactured)
 	,m_reconstructMainMesh(reconstructMainMesh)
 {
 	m_collisionId = m_compoundFracturedCollision;
@@ -1067,10 +1117,11 @@ void dgCollisionCompoundFractured::Serialize(dgSerialize callback, void* const u
 	callback (userData, &m_materialCount, sizeof (m_materialCount));
 }
 
-void dgCollisionCompoundFractured::SetCallbacks(OnEmitFractureChunkCallBack emitFracturedChunk, OnReconstructFractureMainMeshCallBack reconstructMainMesh)
+void dgCollisionCompoundFractured::SetCallbacks(OnEmitFractureChunkCallBack emitFracturedChunk, OnEmitNewCompundFractureCallBack emitNewCompoundFactured, OnReconstructFractureMainMeshCallBack reconstructMainMesh)
 {
 	m_emitFracturedChunk = emitFracturedChunk; 
 	m_reconstructMainMesh = reconstructMainMesh;
+	m_emitFracturedCompound = emitNewCompoundFactured;
 }
 
 void dgCollisionCompoundFractured::BuildMainMeshSubMehes() const
@@ -1735,11 +1786,32 @@ void dgCollisionCompoundFractured::SpawnComplexChunk (dgBody* const myBody, cons
 		}
 	}
 
-m_world->GlobalLock();
-for (dgList<dgConectivityGraph::dgListNode*>::dgListNode* node = islanList.GetFirst(); node; node = node->GetNext()){
-dgConectivityGraph::dgListNode* const cell = node->GetInfo();
-RemoveCollision (cell->GetInfo().m_nodeData.m_shapeNode);
-}
-m_world->GlobalUnlock();
+	const dgMatrix& matrix = myBody->GetMatrix();
+	const dgVector& veloc = myBody->GetVelocity();
+	const dgVector& omega = myBody->GetOmega();
+	dgVector com (matrix.TransformVector(myBody->GetCentreOfMass()));
+
+	m_world->GlobalLock();
+
+	dgCollisionCompoundFractured* const childStructureCollision = new (GetAllocator()) dgCollisionCompoundFractured (*this, islanList);
+	dgCollisionInstance* const childStructureInstance = m_world->CreateInstance (childStructureCollision, myInstance->GetUserDataID(), myInstance->GetLocalMatrix()); 
+	childStructureCollision->Release();
+
+	dgDynamicBody* const chunkBody = m_world->CreateDynamicBody (childStructureInstance, matrix);
+	chunkBody->SetMassProperties(childStructureInstance->GetVolume() * m_density, chunkBody->GetCollision());
+	m_world->GetBroadPhase()->AddInternallyGeneratedBody(chunkBody);
+
+	// calculate debris initial velocity
+	dgVector chunkOrigin (matrix.TransformVector(childStructureInstance->GetLocalMatrix().m_posit));
+	dgVector chunkVeloc (veloc + omega * (chunkOrigin - com));
+
+	chunkBody->SetOmega(omega);
+	chunkBody->SetVelocity(chunkVeloc);
+	chunkBody->SetGroupID(childStructureInstance->GetUserDataID());
+
+	m_emitFracturedCompound (chunkBody);
+	childStructureInstance->Release();
+
+	m_world->GlobalUnlock();
 
 }

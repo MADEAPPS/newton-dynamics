@@ -162,6 +162,43 @@ static void OnEmitFracturedChunk (NewtonBody* const chunkBody, NewtonFracturedCo
 	OnReconstructMainMeshCallBack (chunkBody, fractureChunkMesh, fracturedCompoundCollision);
 }
 
+static void OnEmitFracturedCompound (NewtonBody* const fracturedCompound)
+{
+	NewtonWorld* const world = NewtonBodyGetWorld(fracturedCompound);
+	DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+
+	// set the force an torque call back
+	NewtonBodySetForceAndTorqueCallback (fracturedCompound, PhysicsApplyGravityForce);
+
+	// set the transform callback 
+	NewtonBodySetTransformCallback (fracturedCompound, DemoEntity::TransformCallback);
+
+	// create the visual entity and mesh, and set the use data
+	dMatrix matrix;
+	NewtonBodyGetMatrix (fracturedCompound, &matrix[0][0]);
+
+	DemoEntity* const visualChunkEntity = new DemoEntity(matrix, NULL);
+	scene->Append(visualChunkEntity);
+
+	NewtonBodySetUserData (fracturedCompound, visualChunkEntity);
+
+	// create the mesh geometry and attach it to the entity
+	DemoMesh* const visualChunkMesh = new DemoMesh ("fracturedChuckMesh");
+	visualChunkEntity->SetMesh (visualChunkMesh, GetIdentityMatrix());
+	visualChunkMesh->Release();
+
+	// get the fractured compound mesh from the body
+	NewtonCollision* const fracturedCompoundCollision = NewtonBodyGetCollision(fracturedCompound);
+	dAssert (NewtonCollisionGetType(fracturedCompoundCollision) == SERIALIZE_ID_FRACTURED_COMPOUND);
+
+	// add the vertex data
+	NewtonFracturedCompoundMeshPart* const mainMesh = NewtonFracturedCompoundGetMainMesh (fracturedCompoundCollision);
+	AddMeshVertexwData (visualChunkMesh, mainMesh, fracturedCompoundCollision);
+
+	// add the mesh indices
+	OnReconstructMainMeshCallBack (fracturedCompound, mainMesh, fracturedCompoundCollision);
+}
+
 static void CreateVisualEntity (DemoEntityManager* const scene, NewtonBody* const body)
 {
 	dMatrix matrix;
@@ -233,7 +270,7 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
 	/// create the fractured collision and mesh
 	int debreePhysMaterial = NewtonMaterialGetDefaultGroupID(world);
 	NewtonCollision* structuredFracturedCollision = NewtonCreateFracturedCompoundCollision (world, solidMesh, 0, debreePhysMaterial, pointCount, &points[0][0], sizeof (dVector), internalMaterial, &textureMatrix[0][0],
-																							OnReconstructMainMeshCallBack, OnEmitFracturedChunk);
+																							OnReconstructMainMeshCallBack, OnEmitFracturedCompound, OnEmitFracturedChunk);
 
 // uncomment this to test serialization
 #if 0
@@ -244,7 +281,7 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
 
 	file = fopen ("serialize.bin", "rb");
 	structuredFracturedCollision = NewtonCreateCollisionFromSerialization (world, DemoEntityManager::DeserializeFile, file);
-	NewtonFracturedCompoundSetCallbacks (structuredFracturedCollision, OnReconstructMainMeshCallBack, OnEmitFracturedChunk);
+	NewtonFracturedCompoundSetCallbacks (structuredFracturedCollision, OnReconstructMainMeshCallBack, OnEmitFracturedCompound, OnEmitFracturedChunk);
 	fclose (file);
 #endif	
 

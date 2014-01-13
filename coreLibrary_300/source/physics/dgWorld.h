@@ -309,7 +309,7 @@ class dgWorld
 	dgCollisionInstance* CreateChamferCylinder (dgFloat32 radius, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix = dgGetIdentityMatrix());
 	dgCollisionInstance* CreateCompound ();
 	dgCollisionInstance* CreateFracturedCompound (dgMeshEffect* const solidMesh, int shapeID, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& textureMatrix,
-												  dgCollisionCompoundFractured::OnEmitFractureChunkCallBack emitFrafuredChunk, dgCollisionCompoundFractured::OnReconstructFractureMainMeshCallBack reconstructMainMesh);
+												  dgCollisionCompoundFractured::OnEmitFractureChunkCallBack emitFrafuredChunk, dgCollisionCompoundFractured::OnEmitNewCompundFractureCallBack emitFracturedCompound, dgCollisionCompoundFractured::OnReconstructFractureMainMeshCallBack reconstructMainMesh);
 	dgCollisionInstance* CreateDeformableMesh (dgMeshEffect* const mesh, dgInt32 shapeID);
 	dgCollisionInstance* CreateClothPatchMesh (dgMeshEffect* const mesh, dgInt32 shapeID, const dgClothPatchMaterial& structuralMaterial, const dgClothPatchMaterial& bendMaterial);
 	dgCollisionInstance* CreateBVH ();	

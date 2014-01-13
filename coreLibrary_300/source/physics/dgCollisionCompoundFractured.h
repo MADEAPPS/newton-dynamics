@@ -156,17 +156,19 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 	};
 
 	public:
+	typedef void (*OnEmitNewCompundFractureCallBack) (dgBody* const body);
 	typedef void (*OnEmitFractureChunkCallBack) (dgBody* const body, dgConectivityGraph::dgListNode* const chunkMeshNode, const dgCollisionInstance* const myInstance);
 	typedef void (*OnReconstructFractureMainMeshCallBack) (dgBody* const body, dgConectivityGraph::dgListNode* const mainMeshNode, const dgCollisionInstance* const myInstance);
 
 	dgCollisionCompoundFractured (const dgCollisionCompoundFractured& source);
+	dgCollisionCompoundFractured (dgCollisionCompoundFractured& source, const dgList<dgConectivityGraph::dgListNode*>& island);
 	dgCollisionCompoundFractured (dgWorld* const world, dgMeshEffect* const solidMesh, dgInt32 fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& offsetMatrix,
-								 OnEmitFractureChunkCallBack emitFracturedChunk, OnReconstructFractureMainMeshCallBack reconstructMainMesh);
+								 OnEmitFractureChunkCallBack emitFracturedChunk, OnEmitNewCompundFractureCallBack emitNewCompoundFactured, OnReconstructFractureMainMeshCallBack reconstructMainMesh);
 
 	dgCollisionCompoundFractured (dgWorld* const world, dgDeserialize deserialization, void* const userData);
 	virtual ~dgCollisionCompoundFractured(void);
 
-	void SetCallbacks(OnEmitFractureChunkCallBack emitFracturedChunk, OnReconstructFractureMainMeshCallBack reconstructMainMesh);
+	void SetCallbacks(OnEmitFractureChunkCallBack emitFracturedChunk, OnEmitNewCompundFractureCallBack emitNewCompoundFactured, OnReconstructFractureMainMeshCallBack reconstructMainMesh);
 
 	dgConectivityGraph::dgListNode* GetMainMesh() const;
 	dgConectivityGraph::dgListNode* GetFirstMesh() const;
@@ -225,6 +227,7 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 	dgInt32 m_lru;
 	dgInt32 m_materialCount;
 	OnEmitFractureChunkCallBack m_emitFracturedChunk;
+	OnEmitNewCompundFractureCallBack m_emitFracturedCompound;
 	OnReconstructFractureMainMeshCallBack m_reconstructMainMesh;
 };
 #endif
