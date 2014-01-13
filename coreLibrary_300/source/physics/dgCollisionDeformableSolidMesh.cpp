@@ -165,7 +165,6 @@ class dgCollisionDeformableSolidMesh::dgDeformationRegion
 		}
 	}
 
-/*
 	void Copy (const dgDeformationRegion& src)
 	{
 		dgAssert (!m_indices);
@@ -180,7 +179,7 @@ class dgCollisionDeformableSolidMesh::dgDeformationRegion
 		dgFree(m_indices);
 	}
 
-
+/*
 	void UpdateVelocities(const dgCollisionDeformableSolidMesh::dgParticle& particles, dgFloat32 timestep, dgFloat32 stiffness)
 	{
 		const dgFloat32* const mass = particles.m_mass;
@@ -1211,72 +1210,6 @@ xxx ++;
 
 
 
-dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh (const dgCollisionDeformableSolidMesh& source)
-	:dgCollisionDeformableMesh (source)
-//	,m_particles (source.m_particles)
-//	,m_regionsCount(source.m_regionsCount)
-//	,m_trianglesCount(source.m_trianglesCount)
-//	,m_nodesCount(source.m_nodesCount)
-//	,m_stiffness(source.m_stiffness)
-//	,m_plasticity(source.m_plasticity)
-//	,m_skinThickness(source.m_skinThickness)
-//	,m_visualVertexCount(source.m_visualVertexCount)
-//	,m_visualSegments (source.GetAllocator())
-{
-	dgAssert (0);
-/*
-	m_rtti = source.m_rtti;
-
-	m_indexList = (dgInt16*) dgMallocStack (sizeof (dgInt16) * m_trianglesCount * 3);
-	m_faceNormals = (dgVector*) dgMallocStack (sizeof (dgVector) * m_trianglesCount);
-	m_nodesMemory = (dgDeformableNode*) dgMallocStack(sizeof (dgDeformableNode) * m_nodesCount);
-	m_regions = (dgDeformationRegion*) dgMallocStack (sizeof (dgDeformationRegion) * m_regionsCount);
-
-	memset (m_regions, 0, sizeof (dgDeformationRegion) * m_regionsCount);
-	memcpy (m_indexList, source.m_indexList, sizeof (dgInt16) * m_trianglesCount * 3);
-	memcpy (m_faceNormals, source.m_faceNormals, sizeof (dgVector) * m_trianglesCount);
-	memcpy (m_nodesMemory, source.m_nodesMemory, sizeof (dgDeformableNode) * m_nodesCount);
-	for (dgInt32 i = 0; i < m_regionsCount; i ++) {
-		m_regions[i].Copy (source.m_regions[i]);
-	}
-
-
-	dgInt32 index = dgInt32 (source.m_rootNode - source.m_nodesMemory);
-	m_rootNode = &m_nodesMemory[index];
-
-	for (dgInt32 i = 0; i < m_nodesCount; i ++) {
-		dgDeformableNode* const node = &m_nodesMemory[i];
-		if (node->m_parent) {
-			dgInt32 index = dgInt32(node->m_parent - source.m_nodesMemory);
-			node->m_parent = &m_nodesMemory[index];
-		}
-
-		if (node->m_left) {
-			dgInt32 index = dgInt32 (node->m_left - source.m_nodesMemory);
-			node->m_left = &m_nodesMemory[index];
-		}
-
-		if (node->m_right) {
-			dgInt32 index = dgInt32 (node->m_right - source.m_nodesMemory);
-			node->m_right = &m_nodesMemory[index];
-		}
-	}
-
-	SetCollisionBBox (m_rootNode->m_minBox, m_rootNode->m_maxBox);
-
-	m_visualVertexData = (dgVisualVertexData*) dgMallocStack(sizeof (dgVisualVertexData) * m_visualVertexCount);
-	memcpy (m_visualVertexData, source.m_visualVertexData, sizeof (dgVisualVertexData) * m_visualVertexCount);
-
-	for (dgList<dgMeshSegment>::dgListNode* node = source.m_visualSegments.GetFirst(); node; node = node->GetNext() ) {
-		dgMeshSegment& srcSegment = node->GetInfo();
-		dgMeshSegment& segment = m_visualSegments.Append()->GetInfo();
-		segment.m_material = srcSegment.m_material;
-		segment.m_indexCount = srcSegment.m_indexCount;
-		segment.m_indexList = (dgInt16*) dgMallocStack(sizeof (dgInt16) * segment.m_indexCount);
-		memcpy (segment.m_indexList, srcSegment.m_indexList, sizeof (dgInt16) * segment.m_indexCount);
-	}
-*/
-}
 
 						   
 dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData)
@@ -1390,17 +1323,80 @@ dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(dgWorld* const wo
 */
 }
 
+dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh (const dgCollisionDeformableSolidMesh& source)
+	:dgCollisionDeformableMesh (source)
+//	,m_particles (source.m_particles)
+	,m_regionsCount(source.m_regionsCount)
+//	,m_trianglesCount(source.m_trianglesCount)
+//	,m_nodesCount(source.m_nodesCount)
+//	,m_stiffness(source.m_stiffness)
+//	,m_plasticity(source.m_plasticity)
+//	,m_skinThickness(source.m_skinThickness)
+//	,m_visualVertexCount(source.m_visualVertexCount)
+//	,m_visualSegments (source.GetAllocator())
+{
+	m_rtti |= dgCollisionCompoundBreakable_RTTI;
+
+//	m_indexList = (dgInt16*) dgMallocStack (sizeof (dgInt16) * m_trianglesCount * 3);
+//	m_faceNormals = (dgVector*) dgMallocStack (sizeof (dgVector) * m_trianglesCount);
+//	m_nodesMemory = (dgDeformableNode*) dgMallocStack(sizeof (dgDeformableNode) * m_nodesCount);
+//	m_regions = (dgDeformationRegion*) dgMallocStack (sizeof (dgDeformationRegion) * m_regionsCount);
+
+	m_shapePosition = (dgVector*) dgMallocStack (sizeof (dgVector) * m_particles.m_count);
+	m_regions = (dgDeformationRegion*) dgMallocStack (sizeof (dgDeformationRegion) * m_regionsCount);
+	memset (m_regions, 0, sizeof (dgDeformationRegion) * m_regionsCount);
+
+	memcpy (m_shapePosition, source.m_shapePosition, sizeof (dgVector) * m_particles.m_count);
+//	memcpy (m_indexList, source.m_indexList, sizeof (dgInt16) * m_trianglesCount * 3);
+//	memcpy (m_faceNormals, source.m_faceNormals, sizeof (dgVector) * m_trianglesCount);
+//	memcpy (m_nodesMemory, source.m_nodesMemory, sizeof (dgDeformableNode) * m_nodesCount);
+	for (dgInt32 i = 0; i < m_regionsCount; i ++) {
+		m_regions[i].Copy (source.m_regions[i]);
+	}
+
+/*
+	dgInt32 index = dgInt32 (source.m_rootNode - source.m_nodesMemory);
+	m_rootNode = &m_nodesMemory[index];
+
+	for (dgInt32 i = 0; i < m_nodesCount; i ++) {
+		dgDeformableNode* const node = &m_nodesMemory[i];
+		if (node->m_parent) {
+			dgInt32 index = dgInt32(node->m_parent - source.m_nodesMemory);
+			node->m_parent = &m_nodesMemory[index];
+		}
+
+		if (node->m_left) {
+			dgInt32 index = dgInt32 (node->m_left - source.m_nodesMemory);
+			node->m_left = &m_nodesMemory[index];
+		}
+
+		if (node->m_right) {
+			dgInt32 index = dgInt32 (node->m_right - source.m_nodesMemory);
+			node->m_right = &m_nodesMemory[index];
+		}
+	}
+
+	SetCollisionBBox (m_rootNode->m_minBox, m_rootNode->m_maxBox);
+
+	m_visualVertexData = (dgVisualVertexData*) dgMallocStack(sizeof (dgVisualVertexData) * m_visualVertexCount);
+	memcpy (m_visualVertexData, source.m_visualVertexData, sizeof (dgVisualVertexData) * m_visualVertexCount);
+
+	for (dgList<dgMeshSegment>::dgListNode* node = source.m_visualSegments.GetFirst(); node; node = node->GetNext() ) {
+		dgMeshSegment& srcSegment = node->GetInfo();
+		dgMeshSegment& segment = m_visualSegments.Append()->GetInfo();
+		segment.m_material = srcSegment.m_material;
+		segment.m_indexCount = srcSegment.m_indexCount;
+		segment.m_indexList = (dgInt16*) dgMallocStack(sizeof (dgInt16) * segment.m_indexCount);
+		memcpy (segment.m_indexList, srcSegment.m_indexList, sizeof (dgInt16) * segment.m_indexCount);
+	}
+*/
+}
+
 
 dgCollisionDeformableSolidMesh::~dgCollisionDeformableSolidMesh(void)
 {
-	dgAssert (0);
-/*
-	if (m_indexList) {
-		dgFree (m_indexList);
-		dgFree (m_faceNormals);
-	}
-	if (m_nodesMemory) {
-		dgFree (m_nodesMemory);
+	if (m_shapePosition) {
+		dgFree (m_shapePosition);
 	}
 
 	if (m_regions) {
@@ -1409,11 +1405,6 @@ dgCollisionDeformableSolidMesh::~dgCollisionDeformableSolidMesh(void)
 		}
 		dgFree (m_regions);
 	}
-
-	if (m_visualVertexData) {
-		dgFree (m_visualVertexData);
-	}
-*/
 }
 
 

@@ -992,8 +992,6 @@ void dgBroadPhase::ApplyForceAndtorque (dgBroadphaseSyncDescriptor* const descri
 
 void dgBroadPhase::UpdateSoftBodyForcesKernel (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID)
 {
-//	dgCollisionDeformableMeshList& softBodyList = *m_world;
-
 	dgFloat32 timestep = descriptor->m_timestep; 
 	dgDeformableBodiesUpdate::dgListNode* node = NULL;
 	{
