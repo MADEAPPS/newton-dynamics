@@ -97,10 +97,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 		mesh->AllocVertexData(vertexCount);
 
 		NewtonDeformableMeshUpdateRenderNormals(m_softCollision);
-		NewtonDeformableMeshGetVertexStreams (m_softCollision, 3 * sizeof (dFloat), (dFloat*) mesh->m_vertex,
-			3 * sizeof (dFloat), (dFloat*) mesh->m_normal,
-			2 * sizeof (dFloat), (dFloat*) mesh->m_uv, 
-			2 * sizeof (dFloat), (dFloat*) mesh->m_uv);
+		NewtonDeformableMeshGetVertexStreams (m_softCollision, 3 * sizeof (dFloat), (dFloat*) mesh->m_vertex, 3 * sizeof (dFloat), (dFloat*) mesh->m_normal, 2 * sizeof (dFloat), (dFloat*) mesh->m_uv);
 
 		for (NewtonDeformableMeshSegment* segmentNode = NewtonDeformableMeshGetFirstSegment (m_softCollision); segmentNode; segmentNode = NewtonDeformableMeshGetNextSegment (m_softCollision, segmentNode)) {
 			int materialID = NewtonDeformableMeshSegmentGetMaterialID(m_softCollision, segmentNode);
@@ -342,10 +339,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 		NewtonDeformableMeshUpdateRenderNormals(m_softCollision);
 
 		// update the vertex array
-		NewtonDeformableMeshGetVertexStreams (m_softCollision, 3 * sizeof (dFloat), (dFloat*) mesh->m_vertex,
-			3 * sizeof (dFloat), (dFloat*) mesh->m_normal,
-			2 * sizeof (dFloat), (dFloat*) mesh->m_uv, 
-			2 * sizeof (dFloat), (dFloat*) mesh->m_uv);
+		NewtonDeformableMeshGetVertexStreams (m_softCollision, 3 * sizeof (dFloat), (dFloat*) mesh->m_vertex, 3 * sizeof (dFloat), (dFloat*) mesh->m_normal, 2 * sizeof (dFloat), (dFloat*) mesh->m_uv);
 
 		// proceed with normal rendering
 		DemoEntity::Render(timeStep);

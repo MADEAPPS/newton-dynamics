@@ -8559,18 +8559,13 @@ void NewtonDeformableMeshUpdateRenderNormals (const NewtonCollision* const defor
 	}
 }
 
-void NewtonDeformableMeshGetVertexStreams (
-	const NewtonCollision* const deformableMesh, 
-	int vertexStrideInByte, dFloat* const vertex,
-	int normalStrideInByte, dFloat* const normal, 
-	int uvStrideInByte0, dFloat* const uv0,
-	int uvStrideInByte1, dFloat* const uv1)
+void NewtonDeformableMeshGetVertexStreams (const NewtonCollision* const deformableMesh, int vertexStrideInByte, dFloat* const vertex, int normalStrideInByte, dFloat* const normal, int uvStrideInByte0, dFloat* const uv0)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
 	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
 		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*) collision->GetChildShape();
-		deformableShape->GetVisualVertexData(vertexStrideInByte, vertex, normalStrideInByte, normal, uvStrideInByte0, uv0,uvStrideInByte1, uv1);
+		deformableShape->GetVisualVertexData(vertexStrideInByte, vertex, normalStrideInByte, normal, uvStrideInByte0, uv0);
 	}
 }
 

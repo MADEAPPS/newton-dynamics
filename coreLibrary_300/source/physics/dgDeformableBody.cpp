@@ -31,6 +31,9 @@ dgVector dgDeformableBody::m_dummy (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat3
 
 dgDeformableBody::dgDeformableBody()
 	:dgBody()
+	,m_force(dgFloat32 (0.0f))
+	,m_torque(dgFloat32 (0.0f))
+	,m_applyExtForces(NULL)
 {
 	m_type = m_deformableBody;
 	m_rtti |= m_deformableBodyRTTI;
@@ -60,39 +63,69 @@ void dgDeformableBody::Serialize (const dgTree<dgInt32, const dgCollision*>* con
 	dgAssert (0);
 }
 
+
+void dgDeformableBody::SetMassProperties (dgFloat32 mass, const dgCollisionInstance* const collision)
+{
+	SetMassMatrix (mass, dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f));
+}
+
 void dgDeformableBody::SetMassMatrix (dgFloat32 mass, dgFloat32 Ix, dgFloat32 Iy, dgFloat32 Iz)
 {
-	dgAssert (m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI));
+	dgBody::SetMassMatrix (mass, dgMax(Ix, dgFloat32 (0.1f)), dgMax(Iy, dgFloat32 (0.1f)), dgMax(Iz, dgFloat32 (0.1f)));
+//	m_mass = (mass < dgFloat32 (1.0e-3f) || (mass >= DG_INFINITE_MASS)) ? dgFloat32 (0.0f) : mass;
 //	dgCollisionDeformableMesh* const deformableCollision = (dgCollisionDeformableMesh*) m_collision;
 //	deformableCollision->SetParticlesMasses (mass);
 }
 
+OnApplyExtForceAndTorque dgDeformableBody::GetExtForceAndTorqueCallback () const
+{
+	return m_applyExtForces;
+}
+
+const dgVector& dgDeformableBody::GetForce() const 
+{
+	return m_force;
+}
+
+void dgDeformableBody::AddForce (const dgVector& force) 
+{
+	m_force += force;
+}
+
+void dgDeformableBody::SetForce (const dgVector& force)
+{
+	m_force = force;
+}
+
+
+
+void dgDeformableBody::SetExtForceAndTorqueCallback (OnApplyExtForceAndTorque callback)
+{
+	m_applyExtForces = callback;
+}
+
+
 void dgDeformableBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex)
 {
-	dgAssert(0);
-/*
-	m_dynamicsLru =  m_world->m_dynamicsLru + DG_BODY_LRU_STEP;
-
-	if (m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
-		dgBody::ApplyExtenalForces (timestep, threadIndex);
-		dgAssert (m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI));
-
-		dgCollisionDeformableMesh* const deformableCollision = (dgCollisionDeformableMesh*) m_collision;
-		deformableCollision->ApplyExternalAndInternalForces (this, timestep, threadIndex);
+	m_force = dgVector (dgFloat32 (0.0f));
+	m_torque = dgVector (dgFloat32 (0.0f));
+	if (m_applyExtForces) {
+		m_applyExtForces(*this, timestep, threadIndex);
 	}
-*/
 }
 
 void dgDeformableBody::AttachCollision (dgCollisionInstance* const collision)
 {
-	if (m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
-		dgAssert (0);
+	if (m_collision && m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
+		dgCollisionDeformableMesh* const defomableMesh = (dgCollisionDeformableMesh*) m_collision->GetChildShape();
+		defomableMesh->m_myBody = NULL;
 	}
 
 	dgBody::AttachCollision(collision);
 
-	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
-		dgAssert (0);
+	if (m_collision && m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
+		dgCollisionDeformableMesh* const defomableMesh = (dgCollisionDeformableMesh*) m_collision->GetChildShape();
+		defomableMesh->m_myBody = this;
 	}
 }
 

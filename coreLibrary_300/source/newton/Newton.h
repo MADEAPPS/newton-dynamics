@@ -980,11 +980,7 @@ extern "C" {
 
 	NEWTON_API void NewtonDeformableMeshUpdateRenderNormals (const NewtonCollision* const deformableMesh); 
 	NEWTON_API int NewtonDeformableMeshGetVertexCount (const NewtonCollision* const deformableMesh); 
-	NEWTON_API void NewtonDeformableMeshGetVertexStreams (const NewtonCollision* const deformableMesh, 
-		int vertexStrideInByte, dFloat* const vertex,
-		int normalStrideInByte, dFloat* const normal, 
-		int uvStrideInByte0, dFloat* const uv0,
-		int uvStrideInByte1, dFloat* const uv1);
+	NEWTON_API void NewtonDeformableMeshGetVertexStreams (const NewtonCollision* const deformableMesh, int vertexStrideInByte, dFloat* const vertex, int normalStrideInByte, dFloat* const normal, int uvStrideInByte0, dFloat* const uv0);
 	NEWTON_API NewtonDeformableMeshSegment* NewtonDeformableMeshGetFirstSegment (const NewtonCollision* const deformableMesh);
 	NEWTON_API NewtonDeformableMeshSegment* NewtonDeformableMeshGetNextSegment (const NewtonCollision* const deformableMesh, const NewtonDeformableMeshSegment* const segment);
 

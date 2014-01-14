@@ -821,6 +821,7 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh (const dgCollisionDeformabl
 	,m_trianglesCount(source.m_trianglesCount)
 	,m_visualVertexCount(source.m_visualVertexCount)
 	,m_world (source.m_world)
+	,m_myBody(NULL)
 	,m_indexList(NULL)
 	,m_faceNormals(NULL)
 	,m_rootNode(NULL)
@@ -885,6 +886,8 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh (dgWorld* const world, dgDe
 	,m_nodesCount(0)
 	,m_trianglesCount(0)
 	,m_visualVertexCount(0)
+	,m_world (world)
+	,m_myBody(NULL)
 	,m_indexList(NULL)
 	,m_faceNormals(NULL)
 	,m_rootNode(NULL)
@@ -917,6 +920,7 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMes
 	,m_trianglesCount(0)
 	,m_visualVertexCount(0)
 	,m_world (world)
+	,m_myBody(NULL)
 	,m_indexList(NULL)
 	,m_faceNormals(NULL)
 	,m_rootNode(NULL)
@@ -932,13 +936,13 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMes
 	dgMeshEffect meshCopy (*mesh);
 	meshCopy.Triangulate();
 
-	m_trianglesCount = mesh->GetTotalFaceCount (); 
+	m_trianglesCount = meshCopy.GetTotalFaceCount (); 
 	m_nodesMemory = (dgDeformableNode*) dgMallocStack((m_trianglesCount * 2 - 1) * sizeof (dgDeformableNode));
 	m_indexList = (dgInt16*) dgMallocStack (3 * m_trianglesCount * sizeof (dgInt16) );
 	m_faceNormals = (dgVector*) dgMallocStack (m_trianglesCount * sizeof (dgVector));
 
-	dgInt32 stride = mesh->GetVertexStrideInByte() / sizeof (dgFloat64);  
-	dgFloat64* const vertex = mesh->GetVertexPool();  
+	dgInt32 stride = meshCopy.GetVertexStrideInByte() / sizeof (dgFloat64);  
+	dgFloat64* const vertex = meshCopy.GetVertexPool();  
 
 //	dgVector delta (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 //	dgBigVector com (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
@@ -951,16 +955,16 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMes
 //	com = com.Scale3(dgFloat32 (1.0f / m_particles.m_count));
 //	m_particles.m_com = com;
 
-	dgInt32 indexCount = mesh->GetTotalIndexCount (); 
+	dgInt32 indexCount = meshCopy.GetTotalIndexCount (); 
 	dgStack<dgInt32> faceArray (m_trianglesCount);
 	dgStack<dgInt32> materials (m_trianglesCount);
 	dgStack<void*>indexArray (indexCount);
-	mesh->GetFaces (&faceArray[0], &materials[0], &indexArray[0]);
+	meshCopy.GetFaces (&faceArray[0], &materials[0], &indexArray[0]);
 	for (dgInt32 i = 0; i < m_trianglesCount; i ++) {
 		dgInt32 count = faceArray[i];
 		dgAssert (faceArray[i]);
 		for (dgInt32 j = 0; j < count; j ++) {
-			dgInt32 k = mesh->GetVertexIndex(indexArray[i * 3 + j]);
+			dgInt32 k = meshCopy.GetVertexIndex(indexArray[i * 3 + j]);
 			m_indexList[i * 3 + j] = dgInt16 (k);
 		}
 
@@ -979,20 +983,18 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMes
 	SetCollisionBBox (m_rootNode->m_minBox, m_rootNode->m_maxBox);
 
 	// create visual vertex data
-	m_visualVertexCount = mesh->GetPropertiesCount();
+	m_visualVertexCount = meshCopy.GetPropertiesCount();
 	m_visualVertexData = (dgVisualVertexData*) dgMallocStack(m_visualVertexCount * sizeof (dgVisualVertexData));
 
 	for (dgInt32 i = 0; i < m_visualVertexCount; i ++) {
-		dgMeshEffect::dgVertexAtribute& attribute = mesh->GetAttribute (i);
+		dgMeshEffect::dgVertexAtribute& attribute = meshCopy.GetAttribute (i);
 		m_visualVertexData[i].m_uv0[0] = dgFloat32 (attribute.m_u0);
 		m_visualVertexData[i].m_uv0[1] = dgFloat32 (attribute.m_v0);
-		m_visualVertexData[i].m_uv1[0] = dgFloat32 (attribute.m_u1);
-		m_visualVertexData[i].m_uv1[1] = dgFloat32 (attribute.m_v1);
 	}
 
-	for (void* point = mesh->GetFirstPoint(); point; point = mesh->GetNextPoint(point)) {
-		dgInt32 pointIndex = mesh->GetPointIndex (point);
-		dgInt32 vertexIndex = mesh->GetVertexIndexFromPoint (point);
+	for (void* point = meshCopy.GetFirstPoint(); point; point = meshCopy.GetNextPoint(point)) {
+		dgInt32 pointIndex = meshCopy.GetPointIndex (point);
+		dgInt32 vertexIndex = meshCopy.GetVertexIndexFromPoint (point);
 		m_visualVertexData[pointIndex].m_vertexIndex = vertexIndex;
 	}
 
@@ -1017,9 +1019,9 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMes
 			dgInt32 index1 = m_trianglesCount * 3;
 			for (dgInt32 j = i; j < m_trianglesCount; j ++) {
 				if (materials[j] == -1) {
-					dgInt32 m0 = mesh->GetPointIndex(indexArray[j * 3 + 0]);
-					dgInt32 m1 = mesh->GetPointIndex(indexArray[j * 3 + 1]);
-					dgInt32 m2 = mesh->GetPointIndex(indexArray[j * 3 + 2]);
+					dgInt32 m0 = meshCopy.GetPointIndex(indexArray[j * 3 + 0]);
+					dgInt32 m1 = meshCopy.GetPointIndex(indexArray[j * 3 + 1]);
+					dgInt32 m2 = meshCopy.GetPointIndex(indexArray[j * 3 + 2]);
 
 					segment.m_indexList[index0 + 0] = dgInt16 (m0);
 					segment.m_indexList[index0 + 1] = dgInt16 (m1);
@@ -1054,6 +1056,10 @@ dgCollisionDeformableMesh::~dgCollisionDeformableMesh(void)
 	softBodyList.RemoveShape (this);
 }
 
+dgBody* dgCollisionDeformableMesh::GetBody() const
+{
+	return m_myBody;
+}
 
 void dgCollisionDeformableMesh::SetCollisionBBox (const dgVector& p0, const dgVector& p1)
 {
@@ -1435,14 +1441,12 @@ void dgCollisionDeformableMesh::UpdateVisualNormals()
 }
 
 
-void dgCollisionDeformableMesh::GetVisualVertexData(dgInt32 vertexStrideInByte, dgFloat32* const vertex, dgInt32 normalStrideInByte, dgFloat32* const normals, dgInt32 uvStrideInByte0, dgFloat32* const uv0, dgInt32 uvStrideInByte1, dgFloat32* const uv1)
+void dgCollisionDeformableMesh::GetVisualVertexData(dgInt32 vertexStrideInByte, dgFloat32* const vertex, dgInt32 normalStrideInByte, dgFloat32* const normals, dgInt32 uvStrideInByte0, dgFloat32* const uv0)
 {
 	dgInt32 vertexStride = vertexStrideInByte / sizeof (dgFloat32); 
 	dgInt32 normalStride = normalStrideInByte / sizeof (dgFloat32);  
 	dgInt32 uvStride0 = uvStrideInByte0 / sizeof (dgFloat32); 
-	dgInt32 uvStride1 = uvStrideInByte1 / sizeof (dgFloat32); 
 
-//	dgVector com (m_particles.m_com);
 	for (dgInt32 i = 0; i < m_visualVertexCount; i ++) {
 		dgInt32 index = m_visualVertexData[i].m_vertexIndex;
 		const dgVector& p = m_particles.m_posit[index];
@@ -1453,9 +1457,6 @@ void dgCollisionDeformableMesh::GetVisualVertexData(dgInt32 vertexStrideInByte, 
 		normals[i * normalStride + 0] = m_visualVertexData[i].m_normals[0];
 		normals[i * normalStride + 1] = m_visualVertexData[i].m_normals[1];
 		normals[i * normalStride + 2] = m_visualVertexData[i].m_normals[2];
-
-		uv1[i * uvStride1 + 0] = m_visualVertexData[i].m_uv1[0];
-		uv1[i * uvStride1 + 1] = m_visualVertexData[i].m_uv1[1];
 
 		uv0[i * uvStride0 + 0] = m_visualVertexData[i].m_uv0[0];
 		uv0[i * uvStride0 + 1] = m_visualVertexData[i].m_uv0[1];
@@ -1473,9 +1474,6 @@ void dgCollisionDeformableMesh::GetVisualVertexData(dgInt32 vertexStrideInByte, 
 			normals[j * normalStride + 0] = m_visualVertexData[i].m_normals[0] * dgFloat32 (-1.0f);
 			normals[j * normalStride + 1] = m_visualVertexData[i].m_normals[1] * dgFloat32 (-1.0f);
 			normals[j * normalStride + 2] = m_visualVertexData[i].m_normals[2] * dgFloat32 (-1.0f);
-
-			uv1[j * uvStride1 + 0] = m_visualVertexData[i].m_uv1[0];
-			uv1[j * uvStride1 + 1] = m_visualVertexData[i].m_uv1[1];
 
 			uv0[j * uvStride0 + 0] = m_visualVertexData[i].m_uv0[0];
 			uv0[j * uvStride0 + 1] = m_visualVertexData[i].m_uv0[1];
@@ -1559,7 +1557,6 @@ dgVector dgCollisionDeformableMesh::GetParticlePosition(dgInt32 index) const
 
 void dgCollisionDeformableMesh::DebugCollision (const dgMatrix& matrixPtr, OnDebugCollisionMeshCallback callback, void* const userData) const
 {
-//	dgMatrix matrix (GetLocalMatrix() * matrixPtr);
 	for (dgInt32 i = 0; i < m_trianglesCount; i ++ ) {
 		dgTriplex points[3];
 		for (dgInt32 j = 0; j < 3; j ++) {

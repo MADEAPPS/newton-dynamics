@@ -45,16 +45,16 @@ class dgDeformableBody: public dgBody
 
 	virtual void SetMatrix(const dgMatrix& matrix);
 	virtual void SetMassMatrix (dgFloat32 mass, dgFloat32 Ix, dgFloat32 Iy, dgFloat32 Iz);
-	virtual void SetMassProperties (dgFloat32 mass, const dgCollisionInstance* const collision) {}
+	virtual void SetMassProperties (dgFloat32 mass, const dgCollisionInstance* const collision);
 
-	virtual const dgVector& GetForce() const {return m_dummy;}
+	virtual const dgVector& GetForce() const;
 	virtual const dgVector& GetTorque() const {return m_dummy;}
 	virtual void AddDampingAcceleration() {}
 
-	virtual void AddForce (const dgVector& force) {}
-	virtual void AddTorque (const dgVector& torque) {}
-	virtual void SetForce (const dgVector& force) {}
+	virtual void AddForce (const dgVector& force);
+	virtual void SetForce (const dgVector& force);
 	virtual void SetTorque (const dgVector& torque) {} 
+	virtual void AddTorque (const dgVector& torque) {}
 
 	virtual dgFloat32 GetLinearDamping () const {return dgFloat32 (0.0f);}
 	virtual dgVector GetAngularDamping () const {return m_dummy;}
@@ -75,9 +75,12 @@ class dgDeformableBody: public dgBody
 	virtual void ApplyImpulsePair (const dgVector& linearImpulse, const dgVector& angularImpulse) {dgAssert(0);}
 	virtual void ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, const dgFloat32* const impulseArray, const dgFloat32* const pointArray) {dgAssert(0);}
 
-	virtual void SetExtForceAndTorqueCallback (OnApplyExtForceAndTorque callback) {}
-	virtual OnApplyExtForceAndTorque GetExtForceAndTorqueCallback () const {return NULL;}
+	virtual void SetExtForceAndTorqueCallback (OnApplyExtForceAndTorque callback);
+	virtual OnApplyExtForceAndTorque GetExtForceAndTorqueCallback () const;
 
+	dgVector m_force;
+	dgVector m_torque;
+	OnApplyExtForceAndTorque m_applyExtForces;
 	static dgVector m_dummy;
 
 } DG_GCC_VECTOR_ALIGMENT;

@@ -968,6 +968,10 @@ void dgBroadPhase::ApplyForceAndtorque (dgBroadphaseSyncDescriptor* const descri
 		} else {
 			dgAssert (body->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI));
 
+			if (body->IsRTTIType(dgBody::m_deformableBodyRTTI)) {
+				body->ApplyExtenalForces (timestep, threadID);
+			}
+
 			// kinematic bodies are always sleeping (skip collision with kinematic bodies)
 			if (body->IsCollidable()) {
 				body->m_sleeping = false;	
@@ -1004,7 +1008,9 @@ void dgBroadPhase::UpdateSoftBodyForcesKernel (dgBroadphaseSyncDescriptor* const
 	for ( ; node; ) {
 		dgCollisionDeformableMesh* const softShape = node->GetInfo();
 
-		softShape->IntegrateParticles (timestep);
+		if (softShape->GetBody()) {
+			softShape->IntegrateParticles (timestep);
+		}
 
 		dgThreadHiveScopeLock lock (m_world, descriptor->m_lock);
 		node = descriptor->m_sofBodyNode;

@@ -56,7 +56,6 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 		public:
 		dgFloat32 m_normals[3];
 		dgFloat32 m_uv0[2];
-		dgFloat32 m_uv1[2];
 		dgInt32 m_vertexIndex;
 	};
 
@@ -83,13 +82,15 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	dgCollisionDeformableMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData);
 	virtual ~dgCollisionDeformableMesh(void);
 
+
+	dgBody* GetBody() const;
 	dgInt32 GetParticleCount() const;
 	dgVector GetParticlePosition(dgInt32 index) const;
 
 	void UpdateVisualNormals();
 	dgInt32 GetVisualPointsCount() const;
 	void SetSkinThickness (dgFloat32 skinThickness);
-	void GetVisualVertexData(dgInt32 vertexStrideInByte, dgFloat32* const vertex, dgInt32 normalStrideInByte, dgFloat32* const normals, dgInt32 uvStrideInByte0, dgFloat32* const uv0, dgInt32 uvStrideInByte1, dgFloat32* const uv1);
+	void GetVisualVertexData(dgInt32 vertexStrideInByte, dgFloat32* const vertex, dgInt32 normalStrideInByte, dgFloat32* const normals, dgInt32 uvStrideInByte0, dgFloat32* const uv0);
 	
 	virtual void IntegrateParticles (dgFloat32 timestep) = 0;
 	virtual void ResolvePositionsConstraints (dgFloat32 timestep) = 0;
@@ -149,6 +150,7 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	dgInt32 m_visualVertexCount;
 
 	dgWorld* m_world;
+	dgDeformableBody* m_myBody;
 	dgInt16* m_indexList;
 	dgVector* m_faceNormals;
 	dgDeformableNode* m_rootNode;
@@ -160,6 +162,7 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 //	dgFloat32 m_plasticity;
 
 	friend class dgWorld;
+	friend class dgDeformableBody;
 };
 
 

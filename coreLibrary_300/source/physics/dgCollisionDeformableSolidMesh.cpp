@@ -1375,19 +1375,30 @@ dgInt32 dgCollisionDeformableSolidMesh::CalculateSignature () const
 }
 
 
+
+
+
+void dgCollisionDeformableSolidMesh::EndConfiguration ()
+{
+	dgAssert(0);
+}
+
+void dgCollisionDeformableSolidMesh::ConstraintParticle (dgInt32 particleIndex, const dgVector& posit, const dgBody* const body)
+{
+	dgAssert(0);
+}
+
+
+
+
 //void dgCollisionDeformableSolidMesh::ApplyExternalAndInternalForces (dgDeformableBody* const myBody, dgFloat32 timestep, dgInt32 threadIndex)
 void dgCollisionDeformableSolidMesh::IntegrateParticles (dgFloat32 timestep)
 {
+	dgAssert (m_myBody);
+/*
 	dgVector* const posit = m_particles.m_posit;
 	dgVector* const veloc = m_particles.m_veloc;
 	dgFloat32* const unitMass = m_particles.m_unitMass;
-
-	//timestep /= 4.0f;
-	// apply gravity force
-	// I am restricting all particle masses to be either infinite of constant value
-	// this allow me to express then by a value that can be either 0.0 (infinite mass) or 1.0 (constant mass)
-	dgFloat32 invTimeStep = dgFloat32 (1.0f) / timestep;
-	dgVector gravity (0.0f, -9.8f, 0.0f, 0.0f);
 
 	dgVector gravityStep (gravity.Scale4 (timestep));
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
@@ -1396,11 +1407,25 @@ void dgCollisionDeformableSolidMesh::IntegrateParticles (dgFloat32 timestep)
 		veloc[i] += gravityStep.Scale4 (unitMass[i]);
 		posit[i] += veloc[i].Scale4 (timestep);
 	}
-	
+*/
+	dgBody* const body = GetBody();
+	dgFloat32 invMass = body->GetInvMass().m_w;
+	dgVector velocyStep (body->GetForce().Scale4(invMass * timestep));
 
+	dgVector* const veloc = m_particles.m_veloc;
+	dgFloat32* const unitMass = m_particles.m_unitMass;
+	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
+		veloc[i] += velocyStep.Scale4 (unitMass[i]);
+	}
+
+
+}
+
+void dgCollisionDeformableSolidMesh::ResolvePositionsConstraints (dgFloat32 timestep)
+{
+	dgAssert (m_myBody);
+	dgBody* const body = GetBody();
 /*
-	//	sleep (100);
-
 	// force are applied immediately to each particle
 	dgVector zero (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	dgVector* const positions = m_particles.m_position;
@@ -1452,24 +1477,5 @@ void dgCollisionDeformableSolidMesh::IntegrateParticles (dgFloat32 timestep)
 
 	SetCollisionBBox (m_rootNode->m_minBox, m_rootNode->m_maxBox);
 */
-
-
-	
-
 }
 
-void dgCollisionDeformableSolidMesh::ResolvePositionsConstraints (dgFloat32 timestep)
-{
-	dgAssert(0);
-}
-
-
-void dgCollisionDeformableSolidMesh::EndConfiguration ()
-{
-	dgAssert(0);
-}
-
-void dgCollisionDeformableSolidMesh::ConstraintParticle (dgInt32 particleIndex, const dgVector& posit, const dgBody* const body)
-{
-	dgAssert(0);
-}

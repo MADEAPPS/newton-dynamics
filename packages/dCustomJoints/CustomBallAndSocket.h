@@ -60,8 +60,5 @@ class CustomLimitBallAndSocket: public CustomBallAndSocket
 };
 
 
-
-
-
-#endif // !defined(AFX_CUSTOMBALLANDSOCKET_H__B631F556_468B_4331_B7D7_F85ECF3E9ADE_H)
+#endif 
 
