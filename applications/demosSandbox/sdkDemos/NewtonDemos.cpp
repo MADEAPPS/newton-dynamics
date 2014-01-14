@@ -46,7 +46,7 @@
 //#define DEFAULT_SCENE	20			// scene Collision
 //#define DEFAULT_SCENE	21          // simple boolean operators 
 //#define DEFAULT_SCENE	22			// simple convex fracturing 
-#define DEFAULT_SCENE	23			// structured convex fracturing 
+//#define DEFAULT_SCENE	23			// structured convex fracturing 
 //#define DEFAULT_SCENE	24			// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	25			// continue collision
 //#define DEFAULT_SCENE	26			// paper wall continue collision
@@ -58,7 +58,7 @@
 //#define DEFAULT_SCENE	32			// basic player controller
 //#define DEFAULT_SCENE	33			// advanced player controller
 //#define DEFAULT_SCENE	34			// cloth patch			
-//#define DEFAULT_SCENE	35			// soft bodies			
+#define DEFAULT_SCENE	35			// soft bodies			
 
 
 void Friction (DemoEntityManager* const scene);

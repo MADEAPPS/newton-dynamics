@@ -1389,6 +1389,13 @@ void dgCollisionDeformableSolidMesh::ConstraintParticle (dgInt32 particleIndex, 
 }
 
 
+void dgCollisionDeformableSolidMesh::SetParticlesPositions (const dgMatrix& matrix)
+{
+	dgVector* const posit = m_particles.m_posit;
+	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
+		posit[i] = matrix.TransformVector(m_shapePosition[i]);
+	}
+}
 
 
 //void dgCollisionDeformableSolidMesh::ApplyExternalAndInternalForces (dgDeformableBody* const myBody, dgFloat32 timestep, dgInt32 threadIndex)

@@ -126,6 +126,7 @@ void dgDeformableBody::AttachCollision (dgCollisionInstance* const collision)
 	if (m_collision && m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
 		dgCollisionDeformableMesh* const defomableMesh = (dgCollisionDeformableMesh*) m_collision->GetChildShape();
 		defomableMesh->m_myBody = this;
+		defomableMesh->SetParticlesPositions (m_matrix);
 	}
 }
 

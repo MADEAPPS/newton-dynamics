@@ -354,7 +354,10 @@ void dgCollisionDeformableClothPatch::EndConfiguration ()
 }
 
 
-
+void dgCollisionDeformableClothPatch::SetParticlesPositions (const dgMatrix& matrix)
+{
+	dgAssert(0);
+}
 
 
 void dgCollisionDeformableClothPatch::IntegrateParticles (dgFloat32 timestep)
