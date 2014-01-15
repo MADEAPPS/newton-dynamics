@@ -19,6 +19,7 @@ AddGearAndRack (mSceneMgr, m_physicsWorld, Vector3 (10.0f, 0.0f, -15.0f));
 #include "PhysicsUtils.h"
 #include "DemoMesh.h"
 #include "../toolBox/OpenGlUtil.h"
+#include <CustomHinge.h>
 #include <CustomBallAndSocket.h>
 
 
@@ -118,6 +119,50 @@ static void AddBallAndSockect (DemoEntityManager* const scene, const dVector& or
 }
 
 
+void AddHinge (DemoEntityManager* const scene, const dVector& origin)
+{
+    dVector size (1.5f, 4.0f, 0.125f);
+    NewtonBody* const box0 = CreateBox (scene, origin + dVector (0.0f, 4.0f, 0.0f, 0.0f), size);
+    NewtonBody* const box1 = CreateBox (scene, origin + dVector (1.5f, 4.0f, 0.0f, 0.0f), size);
+    NewtonBody* const box2 = CreateBox (scene, origin + dVector (3.0f, 4.0f, 0.0f, 0.0f), size);
+
+    // the joint pin is the first row of the matrix, to make a upright pin we
+    // take the x axis and rotate by 90 degree around the y axis
+    dMatrix localPin (dRollMatrix(90.0f * 3.141592f / 180.0f));
+
+    // connect first box to the world
+    dMatrix matrix;
+    NewtonBodyGetMatrix (box0, & matrix[0][0]);
+    matrix.m_posit += dVector (-size.m_x * 0.5f, 0.0f, 0.0f);
+    matrix = localPin * matrix;
+
+    // add hinge with limit and friction
+    CustomHinge* const hinge0 = new CustomHinge (matrix, box0, NULL);
+    hinge0->EnableLimits (true);
+    hinge0->SetLimis(-45.0f * 3.141592f / 180.0f, 45.0f * 3.141592f / 180.0f);
+    hinge0->SetFriction (20.0f);
+
+    // link the two boxes
+    NewtonBodyGetMatrix (box1, &matrix[0][0]);
+    matrix.m_posit += dVector (-size.m_x * 0.5f, 0.0f, 0.0f);
+    matrix = localPin * matrix;
+    CustomHinge* const hinge1 = new CustomHinge (matrix, box0, box1);
+    hinge1->EnableLimits (true);
+    hinge1->SetLimis (-45.0f * 3.141592f / 180.0f, 45.0f * 3.141592f / 180.0f);
+    hinge1->SetFriction (20.0f);
+
+    // link the two boxes
+    NewtonBodyGetMatrix (box2, &matrix[0][0]);
+    matrix.m_posit += dVector (-size.m_x * 0.5f, 0.0f, 0.0f);
+    matrix = localPin * matrix;
+    CustomHinge* const hinge2 = new CustomHinge (matrix, box1, box2);
+    hinge2->EnableLimits (true);
+    hinge2->SetLimis (-45.0f * 3.141592f / 180.0f, 45.0f * 3.141592f / 180.0f);
+    //hinge2->SetFriction (20.0f);
+}
+
+
+
 void StandardJoints (DemoEntityManager* const scene)
 {
     scene->CreateSkyBox();
@@ -133,8 +178,9 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
     AddBallAndSockect (scene, dVector (-20.0f, 0.0f, -15.0f));
-//    AddCylindrical (mSceneMgr, m_physicsWorld, Vector3 (-10.0f, 0.0f, -25.0f));
-//    AddHinge (mSceneMgr, m_physicsWorld, Vector3 (-5.0f, 0.0f, -25.0f));
+    AddHinge (scene, dVector (-20.0f, 0.0f, -10.0f));
+//    AddCylindrical (mSceneMgr, m_physicsWorld, Vector3 (-5.0f, 0.0f, -25.0f));
+    
 //    AddUniversal (mSceneMgr, m_physicsWorld, Vector3 (2.0f, 0.0f, -25.0f));
 //    AddSlider (mSceneMgr, m_physicsWorld, Vector3 (8.0f, 0.0f, -25.0f));
 

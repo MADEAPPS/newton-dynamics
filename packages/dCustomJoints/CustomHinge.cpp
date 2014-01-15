@@ -210,7 +210,43 @@ void CustomHinge::SubmitConstraints (dFloat timestep, int threadIndex)
 	if (m_friction != 0.0f) {
         if (m_limitsOn) {
             // friction and limits at the same time
-            dAssert (0);
+            if (m_curJointAngle.m_angle < m_minAngle) {
+                dFloat relAngle = m_curJointAngle.m_angle - m_minAngle;
+                // the angle was clipped save the new clip limit
+                m_curJointAngle.m_angle = m_minAngle;
+
+                // tell joint error will minimize the exceeded angle error
+                NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix1.m_front[0]);
+
+                // need high stiffness here
+                NewtonUserJointSetRowStiffness (m_joint, 1.0f);
+
+                // allow the joint to move back freely 
+                NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
+            } else if (m_curJointAngle.m_angle  > m_maxAngle) {
+                dFloat relAngle = m_curJointAngle.m_angle - m_maxAngle;
+
+                // the angle was clipped save the new clip limit
+                m_curJointAngle.m_angle = m_maxAngle;
+
+                // tell joint error will minimize the exceeded angle error
+                NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix1.m_front[0]);
+
+                // need high stiffness here
+                NewtonUserJointSetRowStiffness (m_joint, 1.0f);
+
+                // allow the joint to move back freely
+                NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
+            } else  {
+                // friction but not limits
+                dFloat alpha = m_jointOmega / timestep;
+                NewtonUserJointAddAngularRow (m_joint, 0, &matrix1.m_front[0]);		
+                NewtonUserJointSetRowAcceleration (m_joint, -alpha);
+                NewtonUserJointSetRowMinimumFriction (m_joint, -m_friction);
+                NewtonUserJointSetRowMaximumFriction (m_joint,  m_friction);
+                NewtonUserJointSetRowStiffness (m_joint, 1.0f);
+            }
+        
         } else {
             // friction but not limits
 		    dFloat alpha = m_jointOmega / timestep;
