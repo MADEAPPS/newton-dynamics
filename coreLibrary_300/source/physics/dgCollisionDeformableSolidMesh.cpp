@@ -33,7 +33,7 @@
 #include "dgCollisionDeformableSolidMesh.h"
 
 
-#define DG_DEFORMABLE_DEFAULT_STIFFNESS		 (dgFloat32 (0.9f))
+#define DG_DEFORMABLE_DEFAULT_STIFFNESS		 (dgFloat32 (0.8f))
 
 /*
 //////////////////////////////////////////////////////////////////////
@@ -176,7 +176,7 @@ class dgCollisionDeformableSolidMesh::dgDeformationRegion
 		m_totalMass = src.m_totalMass;
 		m_com0 = src.m_com0;
 		m_com = src.m_com;
-		m_rot = src.m_rot; 
+//		m_rot = src.m_rot; 
 		m_AqqInv = src.m_AqqInv; 
 		m_rotSeed = src.m_rotSeed; 
 
@@ -256,14 +256,23 @@ class dgCollisionDeformableSolidMesh::dgDeformationRegion
 		m.m_up    = m.m_up.Scale4 (eigenValues.m_y);
 		m.m_right = m.m_right.Scale4 (eigenValues.m_z);
 		dgMatrix invS = S.Transpose4X4() * m;
-		m_rot = invS * sumQiPi;
+		dgMatrix R (invS * sumQiPi);
+		dgMatrix A (m_AqqInv * sumQiPi);
+
+
+dgVector beta0 (dgFloat32 (0.99f));
+dgVector beta1 (dgVector::m_one - beta0);
+		dgMatrix deformationMatrix (dgGetIdentityMatrix());
+		deformationMatrix.m_front = A.m_front.CompProduct4(beta0) + R.m_front.CompProduct4(beta1);
+		deformationMatrix.m_up = A.m_up.CompProduct4(beta0) + R.m_up.CompProduct4(beta1);
+		deformationMatrix.m_right = A.m_right.CompProduct4(beta0) + R.m_right.CompProduct4(beta1);
 
 
 		dgVector invTimeScale (stiffness / timestep);
 		dgVector* const veloc = particles.m_veloc;
 		for (dgInt32 i = 0; i < m_count; i ++) {
 			dgInt32 index = m_indices[i];
-			dgVector gi (m_rot.RotateVector(posit0[index] - m_com0) + m_com);
+			dgVector gi (deformationMatrix.RotateVector(posit0[index] - m_com0) + m_com);
 			veloc[index] += (gi - posit1[index]).CompProduct4 (invTimeScale);
 //dgTrace (("%f %f %f\n", veloc[i][0], veloc[i][1], veloc[i][2] ));
 		}
@@ -271,7 +280,7 @@ class dgCollisionDeformableSolidMesh::dgDeformationRegion
 
 	dgVector m_com;
 	dgVector m_com0;
-	dgMatrix m_rot; 
+//	dgMatrix m_rot; 
 	dgMatrix m_AqqInv; 
 	dgMatrix m_rotSeed; 
 	
@@ -1438,36 +1447,30 @@ void dgCollisionDeformableSolidMesh::IntegrateParticles (dgFloat32 timestep)
 void dgCollisionDeformableSolidMesh::ResolvePositionsConstraints (dgFloat32 timestep)
 {
 	dgAssert (m_myBody);
-//	dgBody* const body = GetBody();
-/*
-	// force are applied immediately to each particle
-	dgVector zero (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	dgVector* const positions = m_particles.m_position;
-	dgVector* const deltaPositions = m_particles.m_deltaPosition;
-	dgVector* const instantVelocity = m_particles.m_instantVelocity;
-	dgVector* const internalVelocity = m_particles.m_internalVelocity;
+	dgVector* const posit = m_particles.m_posit;
+	dgVector* const veloc = m_particles.m_veloc;
 
-	// integrate particles external forces and current velocity
-	dgVector extenalVelocityImpulse (myBody->m_accel.Scale3 (myBody->m_invMass.m_w * timestep));
-	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-		internalVelocity[i] = zero;
-		instantVelocity[i] += extenalVelocityImpulse;
-		deltaPositions[i] = instantVelocity[i].Scale3 (timestep);
-		positions[i] += deltaPositions[i];
-	}
-*/
+//	dgBody* const body = GetBody();
 	// calculate velocity contribution by each particle regions
 	for (dgInt32 i = 0; i < m_regionsCount; i ++) {
 		m_regions[i].UpdateVelocities(this, timestep, m_stiffness);
 	}
 
-	// resolve collusions here
+	// resolve collisions here
+
+// for now just a hack until I get the engine up an running
+for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
+	if (posit[i].m_y < dgFloat32 (0.0f)) {
+		posit[i].m_y = dgFloat32 (0.0f);
+		veloc[i].m_y = dgFloat32 (0.0f);
+	}
+}
+
+
+
 	// integrate particle positions
-	dgVector* const posit = m_particles.m_posit;
-	const dgVector* const veloc = m_particles.m_veloc;
 	dgVector invTimeStep (timestep);
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-
 		posit[i] += veloc[i].CompProduct4 (invTimeStep);
 //dgTrace (("%f %f %f\n", posit[i][0], posit[i][1], posit[i][2] ));
 	}
