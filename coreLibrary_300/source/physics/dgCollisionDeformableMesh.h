@@ -105,31 +105,8 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	dgInt32 GetSegmentIndexCount (void* const segment) const;
 	const dgInt16* GetSegmentIndexList (void* const segment) const;
 
-/*
-	void SetStiffness (dgFloat32 stiffness);
-	void SetPlasticity (dgFloat32 plasticity);
-	virtual void SetParticlesMasses (dgFloat32 totalMass);
-	virtual void SetParticlesVelocities (const dgVector& velocity);
-	virtual void SetMatrix (const dgMatrix& matrix);
-	virtual void ApplyExternalAndInternalForces (dgDeformableBody* const myBody, dgFloat32 timestep, dgInt32 threadIndex);
-*/
 	protected:
-	
-
 	class dgDeformableNode;
-/*
-	void Serialize(dgSerialize callback, void* const userData) const;
-	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
-	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
-	virtual void GetCollidingFaces (dgPolygonMeshDesc* const data) const;
-
-	virtual dgInt32 CalculateSignature () const;
-	virtual void UpdateCollision ();
-
-	void CalculateContactsToCollisionTree (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy);
-	void CalculatePolygonContacts (dgDeformableNode* const node, const dgPlane& plane, dgCollisionConvexPolygon* const polygon, dgFloat32 timestep);
-	
-*/
 
 	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1);
 	virtual void DebugCollision (const dgMatrix& matrixPtr, OnDebugCollisionMeshCallback callback, void* const userData) const;
@@ -139,9 +116,7 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	void ImproveNodeFitness (dgDeformableNode* const node);
 	dgDeformableNode* BuildTopDown (dgInt32 count, dgDeformableNode* const children, dgDeformableNode* const parent);
 	dgFloat32 CalculateSurfaceArea (const dgDeformableNode* const node0, const dgDeformableNode* const node1, dgVector& minBox, dgVector& maxBox) const;
-
 	dgInt32 CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy);
-	//dgInt32 CalculateContacts (dgCollisionParamProxy& proxy, dgVector* const contactsOut) const;
 
 	dgParticle m_particles;
 	dgList<dgMeshSegment> m_visualSegments;
@@ -158,9 +133,6 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	dgDeformableNode* m_nodesMemory;
 	dgVisualVertexData* m_visualVertexData; 
 	bool m_isdoubleSided;
-
-//	dgFloat32 m_stiffness;
-//	dgFloat32 m_plasticity;
 
 	friend class dgWorld;
 	friend class dgDeformableBody;

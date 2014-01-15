@@ -51,7 +51,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 		//create the rigid body
 		dMatrix matrix (GetIdentityMatrix());
 		matrix.m_posit.m_x = location.m_x;
-		matrix.m_posit.m_y = location.m_y + 5.0f;
+		matrix.m_posit.m_y = location.m_y + 10.0f;
 		matrix.m_posit.m_z = location.m_z;
 
 		//matrix.m_posit.m_y = FindFloor (world, matrix.m_posit.m_x, matrix.m_posit.m_z) + 4.0f;
@@ -167,7 +167,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 		dFloat dimension = 0.25f;
 		dVector points[steps][steps];
 
-		dFloat y = 10.0f;
+		dFloat y = 0.0f;
 		int enumerator = 0;
 		for (int i = 0; i < steps; i ++) {
 			dFloat z = (i - steps / 2) * dimension;

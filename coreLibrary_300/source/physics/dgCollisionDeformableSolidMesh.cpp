@@ -33,6 +33,8 @@
 #include "dgCollisionDeformableSolidMesh.h"
 
 
+#define DG_DEFORMABLE_DEFAULT_STIFFNESS		 (dgFloat32 (0.9f))
+
 /*
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -43,7 +45,7 @@
 #define DG_DEFORMABLE_PADDING				 (dgFloat32 (4.0f))
 #define DG_DEFORMABLE_INV_PADDING			 (dgFloat32 (1.0f) / DG_DEFORMABLE_PADDING)
 
-#define DG_DEFORMABLE_DEFAULT_STIFFNESS		 (dgFloat32 (0.3f))
+
 #define DG_DEFORMABLE_DEFAULT_PLASTICITY	 (dgFloat32 (0.3f))
 #define DG_DEFORMABLE_PLANE_DISTANCE_TOL	 (dgFloat32 (1.0e-4f))
 #define DG_DEFORMABLE_DEFAULT_SKIN_THICKNESS (dgFloat32 (5.0e-2f))
@@ -122,16 +124,15 @@ class dgCollisionDeformableSolidMesh::dgDeformationRegion
 		for (dgInt32 i = 0; i < m_count; i ++) {
 			m_indices[i] = indexList[i];
 		}
-		Update(me);
+		PrecomputeValues(me);
 	}
 
-	void Update (dgCollisionDeformableSolidMesh* const me)
+	void PrecomputeValues (dgCollisionDeformableSolidMesh* const me)
 	{
 		m_com = dgVector (dgFloat32 (0.0f));
 		m_com0 = dgVector (dgFloat32 (0.0f));
 		m_AqqInv = dgGetIdentityMatrix();
 		m_rotSeed = dgGetIdentityMatrix();
-
 		
 		const dgVector* const shapePosit = me->m_shapePosition;
 		const dgFloat32* const unitMass = me->m_particles.m_unitMass;
@@ -140,7 +141,6 @@ class dgCollisionDeformableSolidMesh::dgDeformationRegion
 		dgVector accSum (dgFloat32 (0.0f));
 		for (dgInt32 i = 0; i < m_count; i ++) {
 			dgInt32 index = m_indices[i];
-			//dgFloat32 mass = particles.m_mass[index];
 			dgFloat32 mass = unitMass[index];
 			m_totalMass += mass;
 			accSum += shapePosit[index].Scale4 (mass);
@@ -152,7 +152,6 @@ class dgCollisionDeformableSolidMesh::dgDeformationRegion
 			dgMatrix sumQiQi (dgGetZeroMatrix());
 			for (dgInt32 i = 0; i < m_count; i ++) {
 				dgInt32 index = m_indices[i];
-
 				dgVector qi (shapePosit[index] - m_com0);
 				dgFloat32 mass = unitMass[index];
 				for (dgInt32 j = 0; j < 3; j ++) {
@@ -161,6 +160,11 @@ class dgCollisionDeformableSolidMesh::dgDeformationRegion
 					}
 				}
 			}
+
+			dgAssert (dgAbsf (sumQiQi[1][0] - sumQiQi[0][1]) < dgFloat32 (1.0e-6f));
+			dgAssert (dgAbsf (sumQiQi[2][0] - sumQiQi[0][2]) < dgFloat32 (1.0e-6f));
+			dgAssert (dgAbsf (sumQiQi[2][1] - sumQiQi[1][2]) < dgFloat32 (1.0e-6f));
+			sumQiQi[3][3] = dgFloat32 (1.0f);
 			m_AqqInv = sumQiQi.Symetric3by3Inverse();
 		}
 	}
@@ -169,9 +173,15 @@ class dgCollisionDeformableSolidMesh::dgDeformationRegion
 	{
 		dgAssert (!m_indices);
 		m_count = src.m_count;
+		m_totalMass = src.m_totalMass;
+		m_com0 = src.m_com0;
+		m_com = src.m_com;
+		m_rot = src.m_rot; 
+		m_AqqInv = src.m_AqqInv; 
+		m_rotSeed = src.m_rotSeed; 
+
 		m_indices = (dgInt16*) dgMallocStack(sizeof (dgInt16) * m_count);
 		memcpy (m_indices, src.m_indices, sizeof (dgInt16) * m_count);
-		m_com0 = src.m_com0;
 	}
 
 	void CleanUP()
@@ -180,19 +190,19 @@ class dgCollisionDeformableSolidMesh::dgDeformationRegion
 	}
 
 
-	void UpdateVelocities(const dgCollisionDeformableSolidMesh::dgParticle& particles, dgFloat32 timestep, dgFloat32 stiffness)
+	void UpdateVelocities(dgCollisionDeformableSolidMesh* const me, dgFloat32 timestep, dgFloat32 stiffness)
 	{
-/*
-		const dgFloat32* const mass = particles.m_mass;
-		const dgVector* const posit0 = particles.m_shapePosition;
-		const dgVector* const posit1 = particles.m_position;
+		const dgCollisionDeformableSolidMesh::dgParticle& particles = me->m_particles;
+		const dgFloat32* const mass = particles.m_unitMass;
+		const dgVector* const posit0 = me->m_shapePosition;
+		const dgVector* const posit1 = particles.m_posit;
 
 		dgVector com = dgVector (dgFloat32 (0.0f));
 		for (dgInt32 i = 0; i < m_count; i ++) {
 			dgInt32 index = m_indices[i];
-			com += posit1[index].Scale (mass[index]);
+			com += posit1[index].Scale4 (mass[index]);
 		}
-		m_com = com.Scale (dgFloat32 (1.0f) / m_totalMass);
+		m_com = com.Scale4 (dgFloat32 (1.0f) / m_totalMass);
 
 		dgMatrix sumQiPi (dgGetZeroMatrix());
 		for (dgInt32 i = 0; i < m_count; i ++) {
@@ -202,18 +212,23 @@ class dgCollisionDeformableSolidMesh::dgDeformationRegion
 			dgFloat32 massI = mass[index];
 			for (dgInt32 j = 0; j < 3; j ++) {
 				for (dgInt32 k = 0; k < 3; k ++) {
-					sumQiPi[j][k] += massI * qi[j] * pi[k];
+					sumQiPi[j][k] += massI * pi[j] * qi[k];
 				}
 			}
 		}
-		sumQiPi [3][3] = dgFloat32 (1.0f);
+
+		dgAssert (dgAbsf (sumQiPi[1][0] - sumQiPi[0][1]) < dgFloat32 (1.0e-6f));
+		dgAssert (dgAbsf (sumQiPi[2][0] - sumQiPi[0][2]) < dgFloat32 (1.0e-6f));
+		dgAssert (dgAbsf (sumQiPi[2][1] - sumQiPi[1][2]) < dgFloat32 (1.0e-6f));
+		sumQiPi[3][3] = dgFloat32 (1.0f);
 
 		dgMatrix S (sumQiPi * sumQiPi.Transpose4X4());
 		dgVector eigenValues;
 
 		S.EigenVectors (eigenValues, m_rotSeed);
 		m_rotSeed = S;
-#if 0
+
+
 		#ifdef _DEBUG
 			dgMatrix P0 (sumQiPi * sumQiPi.Transpose4X4());
 			dgMatrix D (dgGetIdentityMatrix());
@@ -233,31 +248,24 @@ class dgCollisionDeformableSolidMesh::dgDeformationRegion
 			dgAssert (dgAbsf (xx[2][0]) < dgFloat32 (1.0e-3f));
 			dgAssert (dgAbsf (xx[2][1]) < dgFloat32 (1.0e-3f));
 		#endif
-#endif
-		eigenValues.m_x = dgSqrt (eigenValues.m_x);
-		eigenValues.m_y = dgSqrt (eigenValues.m_y);
-		eigenValues.m_z = dgSqrt (eigenValues.m_z);
+
+		eigenValues = eigenValues.InvSqrt();
 
 		dgMatrix m (S);
-		m.m_front = m.m_front.Scale (eigenValues.m_x);
-		m.m_up    = m.m_up.Scale (eigenValues.m_y);
-		m.m_right = m.m_right.Scale (eigenValues.m_z);
-		S = S.Transpose4X4() * m;
-		m_rot = S.Symetric3by3Inverse() * sumQiPi;
-		dgMatrix A (m_AqqInv * sumQiPi);
-
-m_rot = dgGetIdentityMatrix();
+		m.m_front = m.m_front.Scale4 (eigenValues.m_x);
+		m.m_up    = m.m_up.Scale4 (eigenValues.m_y);
+		m.m_right = m.m_right.Scale4 (eigenValues.m_z);
+		dgMatrix invS = S.Transpose4X4() * m;
+		m_rot = invS * sumQiPi;
 
 
-		dgFloat32 invTimeScale = stiffness / timestep; 
-		dgVector* const velocity = particles.m_internalVelocity;
+		dgVector invTimeScale (stiffness / timestep);
+		dgVector* const velocity = particles.m_veloc;
 		for (dgInt32 i = 0; i < m_count; i ++) {
 			dgInt32 index = m_indices[i];
-			dgVector qi (posit0[index] - m_com0);
-			dgVector gi (m_rot.UnrotateVector(qi) + m_com);
-			velocity[index] += (gi - posit1[index]).Scale3 (invTimeScale);
+			dgVector gi (m_rot.RotateVector(posit0[index] - m_com0) + m_com);
+			velocity[index] += (gi - posit1[index]).CompProduct4 (invTimeScale);
 		}
-*/
 	}
 
 	dgVector m_com;
@@ -269,7 +277,6 @@ m_rot = dgGetIdentityMatrix();
 	dgFloat32 m_totalMass;
 	dgInt32 m_count;
 	dgInt16* m_indices;
-	dgVector* m_targetPostions;
 };
 
 #if 0
@@ -1178,9 +1185,8 @@ dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(dgWorld* const wo
 	,m_shapePosition(NULL)
 	,m_regions(NULL)
 	,m_regionsCount(0)
-//	,m_trianglesCount(0)
-//	,m_nodesCount(0)
-//	,m_stiffness(DG_DEFORMABLE_DEFAULT_STIFFNESS)
+	,m_stiffness(DG_DEFORMABLE_DEFAULT_STIFFNESS)
+	
 //	,m_plasticity(DG_DEFORMABLE_DEFAULT_PLASTICITY)
 //	,m_skinThickness(DG_DEFORMABLE_DEFAULT_SKIN_THICKNESS)
 //	,m_indexList(NULL)
@@ -1425,13 +1431,12 @@ void dgCollisionDeformableSolidMesh::IntegrateParticles (dgFloat32 timestep)
 		veloc[i] += velocyStep.Scale4 (unitMass[i]);
 	}
 
-
 }
 
 void dgCollisionDeformableSolidMesh::ResolvePositionsConstraints (dgFloat32 timestep)
 {
 	dgAssert (m_myBody);
-	dgBody* const body = GetBody();
+//	dgBody* const body = GetBody();
 /*
 	// force are applied immediately to each particle
 	dgVector zero (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
@@ -1448,12 +1453,13 @@ void dgCollisionDeformableSolidMesh::ResolvePositionsConstraints (dgFloat32 time
 		deltaPositions[i] = instantVelocity[i].Scale3 (timestep);
 		positions[i] += deltaPositions[i];
 	}
-
-	// apply particle velocity contribution by each particle regions
+*/
+	// calculate velocity contribution by each particle regions
 	for (dgInt32 i = 0; i < m_regionsCount; i ++) {
-		m_regions[i].UpdateVelocities(m_particles, timestep, m_stiffness);
+		m_regions[i].UpdateVelocities(this, timestep, m_stiffness);
 	}
 
+/*
 	// integrate each particle by the deformation velocity, also calculate the new com
 	dgFloat32 dampCoef = 0.0f;
 	dgVector com (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));

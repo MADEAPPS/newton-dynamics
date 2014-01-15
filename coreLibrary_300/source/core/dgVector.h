@@ -423,6 +423,10 @@ class dgVector
 		return dgVector (dgFloat32 (1.0f) / m_x, dgFloat32 (1.0f) / m_y, dgFloat32 (1.0f) / m_z, dgFloat32 (1.0f) / m_w);
 	}
 
+	DG_INLINE dgVector Sqrt () const
+	{
+		return dgVector (dgSqrt (m_x), dgSqrt (m_y), dgSqrt (m_z), dgSqrt (m_w));
+	}
 
 	DG_INLINE dgVector InvSqrt () const
 	{
@@ -843,6 +847,10 @@ class dgVector
 		return ret;
 	}
 
+	DG_INLINE dgVector Sqrt () const
+	{
+		return dgVector (_mm_sqrt_ps(m_type));
+	}
 
 	DG_INLINE dgVector InvSqrt () const
 	{

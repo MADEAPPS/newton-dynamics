@@ -502,7 +502,7 @@ void dgMatrix::EigenVectors (dgVector &eigenValues, const dgMatrix& initialGuess
 				eigenVectors.m_right = eigenVectors.m_right.Scale3 (-dgFloat32(1.0f));
 			}
 
-			eigenValues = dgVector (d[0], d[1], d[2], dgFloat32 (0.0f));
+			eigenValues = dgVector (d[0], d[1], d[2], dgFloat32 (1.0f));
 			*this = eigenVectors.Inverse();
 			return;
 		}
@@ -583,7 +583,7 @@ void dgMatrix::EigenVectors (dgVector &eigenValues, const dgMatrix& initialGuess
 		b[2] += z[2]; d[2] = b[2]; z[2] = dgFloat32 (0.0f);
 	}
 
-	eigenValues = dgVector (d[0], d[1], d[2], dgFloat32 (0.0f));
+	eigenValues = dgVector (d[0], d[1], d[2], dgFloat32 (1.0f));
 	*this = dgGetIdentityMatrix();
 }
 

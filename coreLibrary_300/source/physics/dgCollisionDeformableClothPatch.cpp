@@ -356,7 +356,11 @@ void dgCollisionDeformableClothPatch::EndConfiguration ()
 
 void dgCollisionDeformableClothPatch::SetParticlesPositions (const dgMatrix& matrix)
 {
-	dgAssert(0);
+	dgVector* const posit = m_particles.m_posit;
+	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
+		posit[i] = matrix.TransformVector(posit[i]);
+		m_posit[i] = posit[i];
+	}
 }
 
 

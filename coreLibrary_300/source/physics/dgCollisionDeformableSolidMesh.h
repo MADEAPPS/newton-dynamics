@@ -92,10 +92,10 @@ class dgCollisionDeformableSolidMesh: public dgCollisionDeformableMesh
 	dgDeformationRegion* m_regions;
 	dgInt32 m_regionsCount;
 
-	
+	dgFloat32 m_stiffness;
+
 /*
 	dgInt32 m_nodesCount;
-	dgFloat32 m_stiffness;
 	dgFloat32 m_plasticity;
 	dgFloat32 m_skinThickness;
 	dgInt16* m_indexList;
