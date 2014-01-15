@@ -245,6 +245,7 @@
     <ClCompile Include="..\..\sdkDemos\demos\BasicPlayerController.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicRagDoll.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicRestitution.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\ContinueCollision1.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ConvexCast.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\HeavyVehicles.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\HeighFieldCollision.cpp" />

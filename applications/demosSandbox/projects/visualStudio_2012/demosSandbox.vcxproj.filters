@@ -169,6 +169,9 @@
     <ClCompile Include="..\..\sdkDemos\demos\StructuredConvexFracturing.cpp">
       <Filter>demos</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\ContinueCollision1.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\sdkDemos\toolBox\DebugDisplay.h">
