@@ -51,7 +51,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 		//create the rigid body
 		dMatrix matrix (GetIdentityMatrix());
 		matrix.m_posit.m_x = location.m_x;
-		matrix.m_posit.m_y = location.m_y + 10.0f;
+		matrix.m_posit.m_y = location.m_y;
 		matrix.m_posit.m_z = location.m_z;
 
 		//matrix.m_posit.m_y = FindFloor (world, matrix.m_posit.m_x, matrix.m_posit.m_z) + 4.0f;
@@ -361,14 +361,14 @@ void SoftBodies(DemoEntityManager* const scene)
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 	//CreateLevelMesh (scene, "playground.ngd", 1);
 
-	dVector location (8.0f, 0.0f, 0.0f, 0.0f) ;
+	dVector location (15.0f, 10.0f, 0.0f, 0.0f) ;
 
 	NewtonCollision* const softBody = SimpleSoftBodyEntity::CreateSoftBodyCollisionShape (scene);
 	new SimpleSoftBodyEntity (scene, softBody, location);
 	NewtonDestroyCollision (softBody);
 
 	dQuaternion rot;
-	dVector origin (location.m_x - 10.0f, 2.0f, location.m_z, 0.0f);
+	dVector origin (location.m_x - 20.0f, 2.0f, location.m_z, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 
 //	scene->SaveScene ("test1.ngd");

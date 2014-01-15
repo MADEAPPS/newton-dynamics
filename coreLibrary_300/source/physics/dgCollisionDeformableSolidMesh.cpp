@@ -260,11 +260,12 @@ class dgCollisionDeformableSolidMesh::dgDeformationRegion
 
 
 		dgVector invTimeScale (stiffness / timestep);
-		dgVector* const velocity = particles.m_veloc;
+		dgVector* const veloc = particles.m_veloc;
 		for (dgInt32 i = 0; i < m_count; i ++) {
 			dgInt32 index = m_indices[i];
 			dgVector gi (m_rot.RotateVector(posit0[index] - m_com0) + m_com);
-			velocity[index] += (gi - posit1[index]).CompProduct4 (invTimeScale);
+			veloc[index] += (gi - posit1[index]).CompProduct4 (invTimeScale);
+//dgTrace (("%f %f %f\n", veloc[i][0], veloc[i][1], veloc[i][2] ));
 		}
 	}
 
@@ -1268,6 +1269,7 @@ dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh (const dgCollisio
 	:dgCollisionDeformableMesh (source)
 //	,m_particles (source.m_particles)
 	,m_regionsCount(source.m_regionsCount)
+	,m_stiffness(source.m_stiffness)
 //	,m_trianglesCount(source.m_trianglesCount)
 //	,m_nodesCount(source.m_nodesCount)
 //	,m_stiffness(source.m_stiffness)
@@ -1458,6 +1460,18 @@ void dgCollisionDeformableSolidMesh::ResolvePositionsConstraints (dgFloat32 time
 	for (dgInt32 i = 0; i < m_regionsCount; i ++) {
 		m_regions[i].UpdateVelocities(this, timestep, m_stiffness);
 	}
+
+	// resolve collusions here
+	// integrate particle positions
+	dgVector* const posit = m_particles.m_posit;
+	const dgVector* const veloc = m_particles.m_veloc;
+	dgVector invTimeStep (timestep);
+	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
+
+		posit[i] += veloc[i].CompProduct4 (invTimeStep);
+//dgTrace (("%f %f %f\n", posit[i][0], posit[i][1], posit[i][2] ));
+	}
+//dgTrace(("\n"));
 
 /*
 	// integrate each particle by the deformation velocity, also calculate the new com

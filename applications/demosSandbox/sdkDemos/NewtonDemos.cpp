@@ -57,8 +57,8 @@
 //#define DEFAULT_SCENE	31			// high performance super car
 //#define DEFAULT_SCENE	32			// basic player controller
 //#define DEFAULT_SCENE	33			// advanced player controller
-#define DEFAULT_SCENE	34			// cloth patch			
-//#define DEFAULT_SCENE	35			// soft bodies			
+//#define DEFAULT_SCENE	34			// cloth patch			
+#define DEFAULT_SCENE	35			// soft bodies			
 
 
 void Friction (DemoEntityManager* const scene);
