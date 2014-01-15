@@ -35,12 +35,14 @@ public:
     {
         CustomBallAndSocket::SubmitConstraints (timestep, threadIndex);
 
-        dVector omega0;
-        dVector omega1;
+        dVector omega0(0.0f, 0.0f, 0.0f, 0.0f);
+        dVector omega1(0.0f, 0.0f, 0.0f, 0.0f);
 
         // get the omega vector
         NewtonBodyGetOmega(m_body0, &omega0[0]);
-        NewtonBodyGetOmega(m_body1, &omega1[0]);
+        if (m_body1) {
+            NewtonBodyGetOmega(m_body1, &omega1[0]);
+        }
 
         dVector relOmega (omega0 - omega1);
         dFloat omegaMag = dSqrt (relOmega % relOmega);
@@ -54,18 +56,20 @@ public:
             // calculate the acceleration to stop the ball in one time step
             dFloat invTimestep = (timestep > 0.0f) ? 1.0f / timestep: 1.0f;
 
-            // if this does not work the first time is because omegaMag soudl be negative, try passing omegaMag instead of -omegaMag  
+            // override the desired accelearion, with the deseried acceleration for full stop. 
             NewtonUserJointSetRowAcceleration (m_joint, -omegaMag * invTimestep);
 
             // set the friction limit proportional the sphere Inertia
             NewtonUserJointSetRowMinimumFriction (m_joint, -m_dryFriction);
             NewtonUserJointSetRowMaximumFriction (m_joint,  m_dryFriction);
         } else {
-            // when omega is too low sheath a little bit and damp the omega directly
+            // when omega is too low this is correct but the small angle approximation theorem.
             dMatrix basis (GetIdentityMatrix());
-            NewtonUserJointAddAngularRow (m_joint, 0.0f, &basis[2][0]);
-            NewtonUserJointAddAngularRow (m_joint, 0.0f, &basis[1][0]);
-            NewtonUserJointAddAngularRow (m_joint, 0.0f, &basis[0][0]);
+            for (int i = 0; i < 3; i ++) {
+                NewtonUserJointAddAngularRow (m_joint, 0.0f, &basis[i][0]);
+                NewtonUserJointSetRowMinimumFriction (m_joint, -m_dryFriction);
+                NewtonUserJointSetRowMaximumFriction (m_joint,  m_dryFriction);
+            }
         }
     }
 
@@ -105,13 +109,12 @@ static void AddBallAndSockect (DemoEntityManager* const scene, const dVector& or
     dMatrix matrix;
     NewtonBodyGetMatrix (box0, & matrix[0][0]);
     matrix.m_posit += dVector (-size.m_x * 0.5f, size.m_y * 0.5f, -size.m_z * 0.5f, 0.0f);
-    new CustomBallAndSocket (matrix, box0, NULL);
+    new CustomBallAndSocketWithFriction (matrix, box0, NULL, 2.0f);
 
     // link the two boxes
     NewtonBodyGetMatrix (box1, & matrix[0][0]);
     matrix.m_posit += dVector (-size.m_x * 0.5f, size.m_y * 0.5f, -size.m_z * 0.5f, 0.0f);
-//    new CustomBallAndSocket (matrix, box0, box1);
-    new CustomBallAndSocketWithFriction(matrix, box0, box1, 10);
+    new CustomBallAndSocket (matrix, box0, box1);
 }
 
 
