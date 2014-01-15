@@ -256,6 +256,7 @@
     <ClCompile Include="..\..\sdkDemos\demos\ScaledCollision.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\SimpleBooleans.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\SimpleConvexFracturing.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\StandardJoints.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\StructuredConvexFracturing.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\UserStaticCollision.cpp" />
     <ClCompile Include="..\..\sdkDemos\DemoVisualDebugerListener.cpp" />

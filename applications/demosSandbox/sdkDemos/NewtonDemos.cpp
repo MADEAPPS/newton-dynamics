@@ -51,14 +51,15 @@
 //#define DEFAULT_SCENE	25			// continue collision
 //#define DEFAULT_SCENE	26			// paper wall continue collision
 //#define DEFAULT_SCENE	27			// puck slide continue collision
-//#define DEFAULT_SCENE	28			// articulated joints
-//#define DEFAULT_SCENE	29			// basic rag doll
-//#define DEFAULT_SCENE	20			// basic car
-//#define DEFAULT_SCENE	31			// high performance super car
-//#define DEFAULT_SCENE	32			// basic player controller
-//#define DEFAULT_SCENE	33			// advanced player controller
-//#define DEFAULT_SCENE	34			// cloth patch			
-#define DEFAULT_SCENE	35			// soft bodies			
+//#define DEFAULT_SCENE	28          // standard joints
+//#define DEFAULT_SCENE	29			// articulated joints
+//#define DEFAULT_SCENE	20			// basic rag doll
+//#define DEFAULT_SCENE	31			// basic car
+//#define DEFAULT_SCENE	32			// high performance super car
+//#define DEFAULT_SCENE	33			// basic player controller
+//#define DEFAULT_SCENE	34			// advanced player controller
+//#define DEFAULT_SCENE	35			// cloth patch			
+#define DEFAULT_SCENE	36			// soft bodies			
 
 
 void Friction (DemoEntityManager* const scene);
@@ -97,6 +98,7 @@ void UserPlaneCollision (DemoEntityManager* const scene);
 void UserHeightFieldCollision (DemoEntityManager* const scene);
 void DescreteRagDoll (DemoEntityManager* const scene);
 void ArticulatedJoints (DemoEntityManager* const scene);
+void StandardJoints (DemoEntityManager* const scene);
 
 
 NewtonDemos::SDKDemos NewtonDemos::m_demosSelection[] = 
@@ -129,7 +131,8 @@ NewtonDemos::SDKDemos NewtonDemos::m_demosSelection[] =
 	{wxT("Continue collision"), wxT("show continue collision"), ContinueCollision},
     {wxT("Paperwall continue collision"), wxT("show fast continue collision"), ContinueCollision1},
 	{wxT("Puck slide"), wxT("show continue collision"), PuckSlide},
-	{wxT("Articulated joints"), wxT("demonstrate complex array of bodies interconnect by joints"), ArticulatedJoints},
+    {wxT("Starndard Joints"), wxT("show sme of teh common joints"), StandardJoints},
+	{wxT("Articulated robotic actuators joints"), wxT("demonstrate complex array of bodies interconnect by joints"), ArticulatedJoints},
 	{wxT("Basic rag doll"), wxT("demonstrate simple rag doll"), DescreteRagDoll},
 	{wxT("Basic car"), wxT("implement a basic car"), BasicCar},
 	//{wxT("High performance super car"), wxT("implement a high performance ray cast car"), SuperCar},
@@ -138,6 +141,7 @@ NewtonDemos::SDKDemos NewtonDemos::m_demosSelection[] =
 	{wxT("Advanced player controller"), wxT("demonstrate player interacting with other objects"), AdvancedPlayerController},
 	{wxT("Simple cloth Path"), wxT("show simple cloth path"), ClothPath},
 	{wxT("Simple soft Body"), wxT("show simple soft body"), SoftBodies},
+    
 
 //	{wxT("skinned rag doll"), wxT("demonstrate simple rag doll"), SkinRagDoll},
 };

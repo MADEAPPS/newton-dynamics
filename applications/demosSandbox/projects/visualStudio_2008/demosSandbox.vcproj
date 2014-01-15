@@ -1013,6 +1013,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\sdkDemos\demos\StandardJoints.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\sdkDemos\demos\StructuredConvexFracturing.cpp"
 				>
 			</File>
