@@ -952,7 +952,7 @@ static void LoadPlayGroundScene(DemoEntityManager* const scene, TriggerManager* 
 		dMatrix slideMatrix(GetIdentityMatrix());
 		slideMatrix.m_posit.m_x += 80.0f;
 		slideMatrix.m_posit.m_z = -20.0f;
-		//LoadSlide(scene, triggerManager, sceneCollision, "slide.ngd", slideMatrix, playGroundBody);
+		LoadSlide(scene, triggerManager, sceneCollision, "slide.ngd", slideMatrix, playGroundBody);
 		LoadFerryBridge(scene, triggerManager, sceneCollision, "platformBridge.ngd", slideMatrix, playGroundBody);
 
 		// load another hanging bridge
