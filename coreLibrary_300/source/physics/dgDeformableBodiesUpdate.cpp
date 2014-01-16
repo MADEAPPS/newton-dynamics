@@ -20,8 +20,10 @@
 */
 
 #include "dgPhysicsStdafx.h"
+#include "dgBody.h"
+#include "dgWorld.h"
 #include "dgDeformableBodiesUpdate.h"
-
+#include "dgCollisionDeformableMesh.h"
 
 dgDeformableBodiesUpdate::dgDeformableBodiesUpdate (dgMemoryAllocator* const allocator)
 	:dgList<dgCollisionDeformableMesh*>(allocator)
@@ -41,4 +43,16 @@ void dgDeformableBodiesUpdate::RemoveShape(dgCollisionDeformableMesh* const shap
 	dgAssert (node);
 	Remove (node->GetInfo());
 	m_dictionary.Remove (node);
+}
+
+
+void dgDeformableBodiesUpdate::ApplyExternaForces(dgFloat32 timestep)
+{
+    for (dgListNode* node = GetFirst(); node; node = node->GetNext()) {
+        dgCollisionDeformableMesh* const softShape = node->GetInfo();
+
+        if (softShape->GetBody()) {
+            softShape->IntegrateParticles (timestep);
+        }
+    }
 }

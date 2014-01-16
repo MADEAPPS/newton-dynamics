@@ -167,7 +167,6 @@ class dgBroadphaseSyncDescriptor
 		,m_timestep(dgFloat32 (0.0f))
 		,m_collindPairBodyNode(NULL)
 		,m_forceAndTorqueBodyNode(NULL)
-		,m_sofBodyNode(NULL)
 		,m_newBodiesNodes(NULL)
 		,m_broadPhaseType(broadPhaseType)
 	{
@@ -277,7 +276,6 @@ class dgBroadphaseSyncDescriptor
 	dgFloat32 m_timestep;
 	dgBodyMasterList::dgListNode* m_collindPairBodyNode;
 	dgBodyMasterList::dgListNode* m_forceAndTorqueBodyNode;
-	dgDeformableBodiesUpdate::dgListNode* m_sofBodyNode;
 	dgList<dgBody*>::dgListNode* m_newBodiesNodes;
 	dgBroadPhase::dgType m_broadPhaseType;
 	dgBroadPhase::dgNode* m_pairs[1024 * 4];	
@@ -994,31 +992,6 @@ void dgBroadPhase::ApplyForceAndtorque (dgBroadphaseSyncDescriptor* const descri
 	}
 }
 
-void dgBroadPhase::UpdateSoftBodyForcesKernel (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID)
-{
-	dgFloat32 timestep = descriptor->m_timestep; 
-	dgDeformableBodiesUpdate::dgListNode* node = NULL;
-	{
-		dgThreadHiveScopeLock lock (m_world, descriptor->m_lock);
-		node = descriptor->m_sofBodyNode;
-		if (node) {
-			descriptor->m_sofBodyNode = node->GetNext();
-		}
-	}
-	for ( ; node; ) {
-		dgCollisionDeformableMesh* const softShape = node->GetInfo();
-
-		if (softShape->GetBody()) {
-			softShape->IntegrateParticles (timestep);
-		}
-
-		dgThreadHiveScopeLock lock (m_world, descriptor->m_lock);
-		node = descriptor->m_sofBodyNode;
-		if (node) {
-			descriptor->m_sofBodyNode = node->GetNext();
-		}
-	}
-}
 
 void dgBroadPhase::KinematicBodyActivation (dgContact* const contatJoint) const
 {
@@ -1188,14 +1161,6 @@ void dgBroadPhase::AddGeneratedBodyesContactsKernel (void* const context, void* 
 	}
 }
 
-
-void dgBroadPhase::UpdateSoftBodyForcesKernel (void* const context, void* const worldContext, dgInt32 threadID)
-{
-	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*) context;
-	dgWorld* const world = (dgWorld*) worldContext;
-	dgBroadPhase* const broadPhase = world->GetBroadPhase();
-	broadPhase->UpdateSoftBodyForcesKernel (descriptor, threadID);
-}
 
 bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* const body1) const
 {
@@ -1843,7 +1808,7 @@ void dgBroadPhase::AddInternallyGeneratedBody(dgBody* const body)
 	m_generatedBodies.Append(body);
 }
 
-void dgBroadPhase::UpdateContacts( dgFloat32 timestep)
+void dgBroadPhase::UpdateContacts (dgFloat32 timestep)
 {
 	dgUnsigned32 ticks = m_world->m_getPerformanceCount();
 
@@ -1858,12 +1823,9 @@ void dgBroadPhase::UpdateContacts( dgFloat32 timestep)
 	syncPoints.m_timestep = timestep;
 	
 	const dgBodyMasterList* const masterList = m_world;
-	const dgDeformableBodiesUpdate* const softBodyList = m_world;
-
 	dgBodyMasterList::dgListNode* const firstBodyNode = masterList->GetFirst()->GetNext();
 	syncPoints.m_collindPairBodyNode = firstBodyNode;
 	syncPoints.m_forceAndTorqueBodyNode = firstBodyNode;
-	syncPoints.m_sofBodyNode = softBodyList->GetFirst();
 
 	for (dgInt32 i = 0; i < threadsCount; i ++) {
 		m_world->QueueJob (ForceAndToqueKernel, &syncPoints, m_world);
@@ -1918,9 +1880,7 @@ void dgBroadPhase::UpdateContacts( dgFloat32 timestep)
 	m_world->m_perfomanceCounters[m_collisionTicks] = endTicks - ticks - m_world->m_perfomanceCounters[m_forceCallbackTicks];
 
 	// update soft body dynamics phase 1
-	for (dgInt32 i = 0; i < threadsCount; i ++) {
-		m_world->QueueJob (UpdateSoftBodyForcesKernel, &syncPoints, m_world);
-	}
-	m_world->SynchronizationBarrier();
+    dgDeformableBodiesUpdate* const softBodyList = m_world;
+    softBodyList->ApplyExternaForces(timestep);
 	m_world->m_perfomanceCounters[m_softBodyTicks] = m_world->m_getPerformanceCount() - endTicks;
 }

@@ -35,7 +35,10 @@ class dgDeformableBodiesUpdate: public dgList<dgCollisionDeformableMesh*>
 	void RemoveShape(dgCollisionDeformableMesh*  const shape);
 
 	private:
+    void ApplyExternaForces(dgFloat32 timestep);
+
 	dgTree <dgListNode*, const dgCollisionDeformableMesh*> m_dictionary;
+    friend class dgBroadPhase;
 };
 
 #endif 
