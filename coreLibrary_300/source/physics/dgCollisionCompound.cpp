@@ -1583,7 +1583,7 @@ dgInt32 dgCollisionCompound::ClosestDitanceToCompound (dgBody* const compoundBod
 {
 	dgAssert (0);
 	return 0;
-/*
+
 	dgCollisionCompound* const compoundCollisionB = (dgCollisionCompound *) compoundBodyB->m_collision;
 
 	dgVector p0;
