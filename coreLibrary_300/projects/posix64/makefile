@@ -123,7 +123,7 @@ DG_MESH_SRCS = \
 	$(DG_MESH_PATH)dgMeshEffect2.cpp \
 	$(DG_MESH_PATH)dgMeshEffect3.cpp \
 	$(DG_MESH_PATH)dgMeshEffect4.cpp \
-	$(DG_MESH_PATH)dgMeshEffect5.cpp \ 
+	$(DG_MESH_PATH)dgMeshEffect5.cpp \
 	$(DG_MESH_PATH)dgMeshEffect6.cpp
 
 
