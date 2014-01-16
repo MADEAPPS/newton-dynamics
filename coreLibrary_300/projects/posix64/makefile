@@ -74,7 +74,7 @@ DG_PHYSICS_SRCS = \
 	$(DG_PHYSICS_PATH)dgCollisionBVH.cpp \
 	$(DG_PHYSICS_PATH)dgCollisionCapsule.cpp \
 	$(DG_PHYSICS_PATH)dgCollisionChamferCylinder.cpp \
-	$(DG_PHYSICS_PATH)dgCollisionCompoundBreakable.cpp \
+	$(DG_PHYSICS_PATH)dgCollisionCompoundFractured.cpp \
 	$(DG_PHYSICS_PATH)dgCollisionCompound.cpp \
 	$(DG_PHYSICS_PATH)dgCollisionCone.cpp \
 	$(DG_PHYSICS_PATH)dgCollisionConvex.cpp \
@@ -123,7 +123,8 @@ DG_MESH_SRCS = \
 	$(DG_MESH_PATH)dgMeshEffect2.cpp \
 	$(DG_MESH_PATH)dgMeshEffect3.cpp \
 	$(DG_MESH_PATH)dgMeshEffect4.cpp \
-	$(DG_MESH_PATH)dgMeshEffect5.cpp 
+	$(DG_MESH_PATH)dgMeshEffect5.cpp \ 
+	$(DG_MESH_PATH)dgMeshEffect6.cpp
 
 
 # ******************************************************
