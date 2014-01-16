@@ -20,6 +20,8 @@ AddGearAndRack (mSceneMgr, m_physicsWorld, Vector3 (10.0f, 0.0f, -15.0f));
 #include "DemoMesh.h"
 #include "../toolBox/OpenGlUtil.h"
 #include <CustomHinge.h>
+#include <CustomSlider.h>
+#include <CustomCorkScrew.h>
 #include <CustomBallAndSocket.h>
 
 
@@ -83,6 +85,45 @@ static NewtonBody* CreateBox (DemoEntityManager* const scene, const dVector& loc
     int materialID =  NewtonMaterialGetDefaultGroupID (world);
     NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
    	DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+
+    dFloat mass = 1.0f;
+    dMatrix matrix (GetIdentityMatrix());
+    matrix.m_posit = location;
+    matrix.m_posit.m_w = 1.0f;
+    NewtonBody* const body = CreateSimpleSolid (scene, geometry, mass, matrix, collision, materialID);
+
+    geometry->Release();
+    NewtonDestroyCollision(collision);
+    return body;
+}
+
+
+static NewtonBody* CreateWheel (DemoEntityManager* const scene, const dVector& location, dFloat radius, dFloat height)
+{
+    NewtonWorld* const world = scene->GetNewton();
+    int materialID =  NewtonMaterialGetDefaultGroupID (world);
+    dVector size (radius, height, 0.0f, 0.0f);
+    NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), size, _CHAMFER_CYLINDER_PRIMITIVE, 0);
+    DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+
+    dFloat mass = 1.0f;
+    dMatrix matrix (GetIdentityMatrix());
+    matrix.m_posit = location;
+    matrix.m_posit.m_w = 1.0f;
+    NewtonBody* const body = CreateSimpleSolid (scene, geometry, mass, matrix, collision, materialID);
+
+    geometry->Release();
+    NewtonDestroyCollision(collision);
+    return body;
+}
+
+static NewtonBody* CreateCylinder (DemoEntityManager* const scene, const dVector& location, dFloat radius, dFloat height)
+{
+    NewtonWorld* const world = scene->GetNewton();
+    int materialID =  NewtonMaterialGetDefaultGroupID (world);
+    dVector size (radius, height, 0.0f, 0.0f);
+    NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), size, _CYLINDER_PRIMITIVE, 0);
+    DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
     dFloat mass = 1.0f;
     dMatrix matrix (GetIdentityMatrix());
@@ -161,6 +202,45 @@ void AddHinge (DemoEntityManager* const scene, const dVector& origin)
     //hinge2->SetFriction (20.0f);
 }
 
+static void AddSlider (DemoEntityManager* const scene, const dVector& origin)
+{
+    // make a reel static
+    NewtonBody* const reel = CreateBox (scene, origin + dVector (0.0f, 4.0f, 0.0f, 0.0f), dVector (8.0f, 0.25f, 0.25f, 0.0f));
+    NewtonBodySetMassMatrix (reel, 0.0f, 0.0f, 0.0f, 0.0f);
+
+    NewtonBody* const wheel = CreateWheel (scene, origin + dVector (0.0f, 4.0f, 0.0f, 0.0f), 1.0f, 0.5f);
+
+    dMatrix matrix;
+    NewtonBodyGetMatrix (wheel, &matrix[0][0]);
+
+    CustomSlider* const slider = new CustomSlider (matrix, wheel, reel);
+
+    // enable limit of first axis
+    slider->EnableLimits(true);
+
+    // set limit on second axis
+    slider->SetLimis (-4.0f, 4.0f);
+}
+
+static void AddCylindrical (DemoEntityManager* const scene, const dVector& origin)
+{
+    // make a reel static
+    NewtonBody* const reel = CreateCylinder (scene, origin + dVector (0.0f, 4.0f, 0.0f, 0.0f), 0.25f, 8.0f);
+    NewtonBodySetMassMatrix (reel, 0.0f, 0.0f, 0.0f, 0.0f);
+
+    NewtonBody* const wheel = CreateWheel (scene, origin + dVector (0.0f, 4.0f, 0.0f, 0.0f), 1.0f, 0.5f);
+
+    dMatrix matrix;
+    NewtonBodyGetMatrix (wheel, &matrix[0][0]);
+
+    CustomCorkScrew* const cylinder = new CustomCorkScrew (matrix, wheel, reel);
+
+    // enable limit of first axis
+    cylinder->EnableLinearLimits(true);
+
+    // set limit on second axis
+    cylinder->SetLinearLimis (-4.0f, 4.0f);
+}
 
 
 void StandardJoints (DemoEntityManager* const scene)
@@ -179,16 +259,16 @@ void StandardJoints (DemoEntityManager* const scene)
 
     AddBallAndSockect (scene, dVector (-20.0f, 0.0f, -15.0f));
     AddHinge (scene, dVector (-20.0f, 0.0f, -10.0f));
-//    AddCylindrical (mSceneMgr, m_physicsWorld, Vector3 (-5.0f, 0.0f, -25.0f));
-    
-//    AddUniversal (mSceneMgr, m_physicsWorld, Vector3 (2.0f, 0.0f, -25.0f));
-//    AddSlider (mSceneMgr, m_physicsWorld, Vector3 (8.0f, 0.0f, -25.0f));
+    AddSlider (scene, dVector (-20.0f, 0.0f, -5.0f));
+    AddCylindrical (scene, dVector (-20.0f, 0.0f, 0.0f));
+
+    // this joint is not very stable when using non rotational inertia, like these examples
+//  AddUniversal (mSceneMgr, m_physicsWorld, Vector3 (2.0f, 0.0f, -25.0f));
 
     //add relational joints example 
-//    AddGear (mSceneMgr, m_physicsWorld, Vector3 (-10.0f, 0.0f, -15.0f));
-//    AddPulley (mSceneMgr, m_physicsWorld, Vector3 (0.0f, 0.0f, -15.0f));
-//    AddGearAndRack (mSceneMgr, m_physicsWorld, Vector3 (10.0f, 0.0f, -15.0f));
-
+//  AddGear (mSceneMgr, m_physicsWorld, Vector3 (-10.0f, 0.0f, -15.0f));
+//  AddPulley (mSceneMgr, m_physicsWorld, Vector3 (0.0f, 0.0f, -15.0f));
+//  AddGearAndRack (mSceneMgr, m_physicsWorld, Vector3 (10.0f, 0.0f, -15.0f));
 
     // place camera into position
     dMatrix camMatrix (GetIdentityMatrix());
