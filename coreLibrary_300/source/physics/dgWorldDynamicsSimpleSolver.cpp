@@ -1378,7 +1378,7 @@ void dgWorldDynamicUpdate::CalculateForcesSimulationMode (const dgIsland* const 
 		internalForces[m1].m_angular += y1.m_angular;
 	}
 
-	for (dgInt32 i = 0; i < sizeof (forceStepBuffer) / sizeof (forceStepBuffer[0]); i ++) {
+	for (dgInt32 i = 0; i < dgInt32 (sizeof (forceStepBuffer) / sizeof (forceStepBuffer[0])); i ++) {
 		forceStepBuffer[i] = zero;
 	}
 
