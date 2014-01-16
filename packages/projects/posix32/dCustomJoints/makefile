@@ -49,6 +49,7 @@ LIB_SRCS = \
 	$(SRC_PATH)/CustomSliderActuator.cpp \
 	$(SRC_PATH)/CustomUniversalActuator.cpp \
 	$(SRC_PATH)/CustomControllerManager.cpp \
+	$(SRC_PATH)/CustomInputManager.cpp \
 	$(SRC_PATH)/CustomTriggerManager.cpp \
 	$(SRC_PATH)/CustomPlayerControllerManager.cpp \
 	$(SRC_PATH)/CustomVehicleControllerManager.cpp \
