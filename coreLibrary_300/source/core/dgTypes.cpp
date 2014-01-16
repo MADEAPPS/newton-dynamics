@@ -50,26 +50,26 @@ dgUnsigned64 dgGetTimeInMicrosenconds()
 
 #if (defined (_POSIX_VER) || defined (_POSIX_VER_64))
 	timespec ts;
-	static unsigned64 baseCount = 0;
+	static dgUnsigned64 baseCount = 0;
 	if (!baseCount) {
 		clock_gettime(CLOCK_REALTIME, &ts);
 		baseCount = unsigned64 (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000;
 	}
 	clock_gettime(CLOCK_REALTIME, &ts); // Works on Linux
-	return unsigned64 (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000 - baseCount;
+	return dgUnsigned64 (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000 - baseCount;
 #endif
 
 
 #ifdef _MACOSX_VER
 	timeval tp;
-	static unsigned64 baseCount = 0;
+	static dgUnsigned64 baseCount = 0;
 	if (!baseCount) {
 		gettimeofday(&tp, NULL);
 		baseCount = unsigned64 (tp.tv_sec) * 1000000 + tp.tv_usec;
 	}
 
 	gettimeofday(&tp, NULL);
-	unsigned64 microsecunds = unsigned64 (tp.tv_sec) * 1000000 + tp.tv_usec;
+	dgUnsigned64 microsecunds = dgUnsigned64 (tp.tv_sec) * 1000000 + tp.tv_usec;
 	return microsecunds - baseCount;
 #endif
 }
