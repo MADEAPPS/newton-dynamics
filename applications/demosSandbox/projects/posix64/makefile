@@ -111,6 +111,7 @@ SDK_MAIN_SRC = \
 SDK_DEMOS_SRC = \
 		$(SDK_DEMOS_PATH)/ArchimedesBuoyancy.cpp \
 		$(SDK_DEMOS_PATH)/AdvancedPlayerController.cpp \
+		$(SDK_DEMOS_PATH)/ArticulatedJoints.cpp \
 		$(SDK_DEMOS_PATH)/BasicCar.cpp \
 		$(SDK_DEMOS_PATH)/BasicFriction.cpp \
 		$(SDK_DEMOS_PATH)/BasicPlayerController.cpp \
@@ -134,31 +135,13 @@ SDK_DEMOS_SRC = \
 		$(SDK_DEMOS_PATH)/ScaledCollision.cpp \
 		$(SDK_DEMOS_PATH)/SceneCollision.cpp \
 		$(SDK_DEMOS_PATH)/SimpleBooleans.cpp \
-		$(SDK_DEMOS_PATH)/SimpleConvexShatter.cpp \
+		$(SDK_DEMOS_PATH)/SimpleConvexFracturing.cpp \
 		$(SDK_DEMOS_PATH)/SoftBodies.cpp \
+		$(SDK_DEMOS_PATH)/StandardJoints.cpp \
+		$(SDK_DEMOS_PATH)/StructuredConvexFracturing.cpp \
 		$(SDK_DEMOS_PATH)/SuperCar.cpp \
 		$(SDK_DEMOS_PATH)/UserStaticCollision.cpp \
 		$(SDK_DEMOS_PATH)/UsingNewtonMeshTool.cpp
-		
-#	$(SDK_DEMOS_PATH)/ArchimedesBuoyancy.cpp \
-#	$(SDK_DEMOS_PATH)/BasicCustomJoints.cpp \
-#	$(SDK_DEMOS_PATH)/BasicRobots.cpp \
-#	$(SDK_DEMOS_PATH)/BasicRagDoll.cpp \
-#	$(SDK_DEMOS_PATH)/BasicStacking.cpp \
-#	$(SDK_DEMOS_PATH)/Jengas.cpp \
-#	$(SDK_DEMOS_PATH)/LegacyJoints.cpp \
-#	$(SDK_DEMOS_PATH)/MeshCollision.cpp \
-#	$(SDK_DEMOS_PATH)/Pyramids.cpp \
-#	$(SDK_DEMOS_PATH)/RayCastCar.cpp \
-#	$(SDK_DEMOS_PATH)/ScaledCollision.cpp \
-#	$(SDK_DEMOS_PATH)/SpecialTrackJoints.cpp \
-#	$(SDK_DEMOS_PATH)/Towers.cpp \
-#	$(SDK_DEMOS_PATH)/TriggersAndForceFields.cpp \
-#	$(SDK_DEMOS_PATH)/UnstableStacks.cpp \
-#	$(SDK_DEMOS_PATH)/Walls.cpp 
-#	$(SDK_DEMOS_PATH)/BuildingDestruction.cpp \
-#	$(SDK_DEMOS_PATH)/RealTimeSimpleDestruction.cpp \
-#	$(SDK_DEMOS_PATH)/PrefabSimpleDestruction.cpp \
 
 
 SDK_TOOLBOX_SRC = \
