@@ -53,7 +53,7 @@ dgUnsigned64 dgGetTimeInMicrosenconds()
 	static dgUnsigned64 baseCount = 0;
 	if (!baseCount) {
 		clock_gettime(CLOCK_REALTIME, &ts);
-		baseCount = unsigned64 (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000;
+		baseCount = dgUnsigned64 (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000;
 	}
 	clock_gettime(CLOCK_REALTIME, &ts); // Works on Linux
 	return dgUnsigned64 (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000 - baseCount;
