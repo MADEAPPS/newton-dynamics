@@ -22,6 +22,7 @@ AddGearAndRack (mSceneMgr, m_physicsWorld, Vector3 (10.0f, 0.0f, -15.0f));
 #include <CustomGear.h>
 #include <CustomHinge.h>
 #include <CustomSlider.h>
+#include <CustomPulley.h>
 #include <CustomCorkScrew.h>
 #include <CustomBallAndSocket.h>
 
@@ -282,6 +283,49 @@ static void AddGear (DemoEntityManager* const scene, const dVector& origin)
 }
 
 
+static CustomSlider* AddSliderWheel (DemoEntityManager* const scene, const dVector& origin, dFloat radius, dFloat height, NewtonBody* const parent)
+{
+    NewtonBody* const wheel = CreateWheel (scene, origin, height, radius);
+
+    // the joint pin is the first row of the matrix
+    //dMatrix localPin (dRollMatrix(90.0f * 3.141592f / 180.0f));
+    dMatrix localPin (GetIdentityMatrix());
+    dMatrix matrix;
+    NewtonBodyGetMatrix (wheel, & matrix[0][0]);
+    matrix = localPin * matrix;
+
+    // connect first box to the world
+    return new CustomSlider (matrix, wheel, parent);
+}
+
+
+void AddPulley (DemoEntityManager* const scene, const dVector& origin)
+{
+    NewtonBody* const reel0 = CreateBox(scene, origin + dVector (0.0f, 4.0f, 2.0f), dVector(4.0f, 0.25f, 0.25f));
+    NewtonBody* const reel1 = CreateBox(scene, origin + dVector (0.0f, 4.0f, 0.0f), dVector(4.0f, 0.25f, 0.25f));
+    NewtonBodySetMassMatrix (reel0, 0.0f, 0.0f, 0.0f, 0.0f);
+    NewtonBodySetMassMatrix (reel1, 0.0f, 0.0f, 0.0f, 0.0f);
+
+    CustomSlider* const slider0 = AddSliderWheel (scene, origin + dVector (0.0f, 4.0f, 2.0f), 0.5f, 1.0f, reel0);
+    CustomSlider* const slider1 = AddSliderWheel (scene, origin + dVector (0.0f, 4.0f, 0.0f), 0.5f, 0.5f, reel1);
+
+    slider0->EnableLimits(true);
+    slider0->SetLimis (-2.0f, 2.0f);
+
+    NewtonBody* const body0 = slider0->GetBody0();
+    NewtonBody* const body1 = slider1->GetBody0();
+
+    dMatrix matrix0;
+    dMatrix matrix1;
+    NewtonBodyGetMatrix (body0, &matrix0[0][0]);
+    NewtonBodyGetMatrix (body1, &matrix1[0][0]);
+
+    dVector pin0 (matrix0.RotateVector(dVector (1.0f, 0.0f, 0.0f)));
+    dVector pin1 (matrix1.RotateVector(dVector (1.0f, 0.0f, 0.0f)));
+    new CustomPulley (4.0f, pin0, pin1, body0, body1);
+}
+
+
 void StandardJoints (DemoEntityManager* const scene)
 {
     scene->CreateSkyBox();
@@ -306,7 +350,7 @@ void StandardJoints (DemoEntityManager* const scene)
 
     //add relational joints example 
     AddGear (scene, dVector (-20.0f, 0.0f, 5.0f));
-//  AddPulley (mSceneMgr, m_physicsWorld, Vector3 (0.0f, 0.0f, -15.0f));
+    AddPulley (scene, dVector (-20.0f, 0.0f, 10.0f));
 //  AddGearAndRack (mSceneMgr, m_physicsWorld, Vector3 (10.0f, 0.0f, -15.0f));
 
     // place camera into position
