@@ -25,7 +25,7 @@ AddGearAndRack (mSceneMgr, m_physicsWorld, Vector3 (10.0f, 0.0f, -15.0f));
 #include <CustomPulley.h>
 #include <CustomCorkScrew.h>
 #include <CustomBallAndSocket.h>
-
+#include <CustomRackAndPinion.h>
 
 class CustomBallAndSocketWithFriction: public CustomBallAndSocket
 {
@@ -298,7 +298,6 @@ static CustomSlider* AddSliderWheel (DemoEntityManager* const scene, const dVect
     return new CustomSlider (matrix, wheel, parent);
 }
 
-
 void AddPulley (DemoEntityManager* const scene, const dVector& origin)
 {
     NewtonBody* const reel0 = CreateBox(scene, origin + dVector (0.0f, 4.0f, 2.0f), dVector(4.0f, 0.25f, 0.25f));
@@ -326,6 +325,55 @@ void AddPulley (DemoEntityManager* const scene, const dVector& origin)
 }
 
 
+static CustomCorkScrew* AddCylindricalWheel (DemoEntityManager* const scene, const dVector& origin, dFloat radius, dFloat height, NewtonBody* const parent)
+{
+    NewtonBody* const wheel = CreateWheel (scene, origin, height, radius);
+
+    // the joint pin is the first row of the matrix
+    dMatrix matrix;
+    NewtonBodyGetMatrix (wheel, &matrix[0][0]);
+
+    return new CustomCorkScrew (matrix, wheel, parent);
+}
+
+
+static void AddGearAndRack (DemoEntityManager* const scene, const dVector& origin)
+{
+    NewtonBody* const reel0 = CreateCylinder(scene, origin + dVector (0.0f, 4.0f, 0.0f), 0.25f, 4.0f);
+    NewtonBody* const reel1 = CreateBox(scene, origin + dVector (0.0f, 4.0f, 2.0f), dVector(4.0f, 0.25f, 0.25f));
+    NewtonBodySetMassMatrix (reel0, 0.0f, 0.0f, 0.0f, 0.0f);
+    NewtonBodySetMassMatrix (reel1, 0.0f, 0.0f, 0.0f, 0.0f);
+
+    CustomHinge* const hinge0 = AddHingeWheel (scene, origin + dVector (-1.0f, 4.0f, 0.0f), 0.5f, 0.5f, reel0);
+    CustomHinge* const hinge1 = AddHingeWheel (scene, origin + dVector ( 1.0f, 4.0f, 0.0f), 0.5f, 0.5f, reel0);
+    CustomCorkScrew* const cylinder = AddCylindricalWheel(scene, origin + dVector (0.0f, 4.0f, 2.0f), 0.5f, 1.0f, reel1);
+
+    cylinder->EnableLinearLimits(true);
+    cylinder->SetLinearLimis(-2.0f, 2.0f);
+
+    NewtonBody* const body0 = hinge0->GetBody0();
+    NewtonBody* const body1 = hinge1->GetBody0();
+    NewtonBody* const body2 = cylinder->GetBody0();
+
+    dMatrix matrix0;
+    dMatrix matrix1;
+    dMatrix matrix2;
+
+    NewtonBodyGetMatrix (body0, &matrix0[0][0]);
+    NewtonBodyGetMatrix (body1, &matrix1[0][0]);
+    NewtonBodyGetMatrix (body2, &matrix2[0][0]);
+
+    dVector pin0 (matrix0.RotateVector(dVector( 1.0f, 0.0f, 0.0f)));
+    dVector pin1 (matrix1.RotateVector(dVector( 1.0f, 0.0f, 0.0f)));
+    dVector pin2 (matrix2.RotateVector(dVector( 1.0f, 0.0f, 0.0f)));
+
+    new CustomGear (1.0f, pin0, pin2, body0, body2);
+    new CustomRackAndPinion (1.0f, pin1, pin2, body1, body2);
+}
+
+
+
+
 void StandardJoints (DemoEntityManager* const scene)
 {
     scene->CreateSkyBox();
@@ -351,7 +399,7 @@ void StandardJoints (DemoEntityManager* const scene)
     //add relational joints example 
     AddGear (scene, dVector (-20.0f, 0.0f, 5.0f));
     AddPulley (scene, dVector (-20.0f, 0.0f, 10.0f));
-//  AddGearAndRack (mSceneMgr, m_physicsWorld, Vector3 (10.0f, 0.0f, -15.0f));
+    AddGearAndRack (scene, dVector (-20.0f, 0.0f, 15.0f));
 
     // place camera into position
     dMatrix camMatrix (GetIdentityMatrix());

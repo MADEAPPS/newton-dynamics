@@ -27,7 +27,7 @@ class CustomCorkScrew: public CustomJoint
 
 	CUSTOM_JOINTS_API void EnableLinearLimits(bool state);
 	CUSTOM_JOINTS_API void EnableAngularLimits(bool state);
-	CUSTOM_JOINTS_API void SetLinearLimis(dFloat minAngle, dFloat maxAngle);
+	CUSTOM_JOINTS_API void SetLinearLimis(dFloat minDist, dFloat maxDist);
 	CUSTOM_JOINTS_API void SetAngularLimis(dFloat minAngle, dFloat maxAngle);
 
 	protected:
