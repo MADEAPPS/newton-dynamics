@@ -45,11 +45,15 @@ LIB_SRCS = \
 	$(SRC_PATH)/CustomUniversal.cpp \
 	$(SRC_PATH)/CustomUpVector.cpp \
 	$(SRC_PATH)/CustomUserBlank.cpp \
+	$(SRC_PATH)/CustomHingeActuator.cpp \
+	$(SRC_PATH)/CustomSliderActuator.cpp \
+	$(SRC_PATH)/CustomUniversalActuator.cpp \
 	$(SRC_PATH)/CustomControllerManager.cpp \
-	$(SRC_PATH)/CustomSkeletonTransformManager.cpp \
 	$(SRC_PATH)/CustomTriggerManager.cpp \
 	$(SRC_PATH)/CustomPlayerControllerManager.cpp \
-	$(SRC_PATH)/CustomVehicleControllerManager.cpp
+	$(SRC_PATH)/CustomVehicleControllerManager.cpp \
+	$(SRC_PATH)/CustomArcticulatedTransformManager.cpp
+
 
 
 # ******************************************************
