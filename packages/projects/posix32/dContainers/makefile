@@ -26,6 +26,7 @@ SRC_PATH = ../../../dContainers
 NEWTON_SDK = ../../../posix32
 
 LIB_SRCS = \
+	$(SRC_PATH)/dContainersAlloc.cpp \
 	$(SRC_PATH)/dBaseHierarchy.cpp \
 	$(SRC_PATH)/dClassInfo.cpp \
 	$(SRC_PATH)/dContainersStdAfx.cpp \
