@@ -106,6 +106,7 @@ DG_PHYSICS_SRCS = \
 	$(DG_PHYSICS_PATH)dgUpVectorConstraint.cpp \
 	$(DG_PHYSICS_PATH)dgUserConstraint.cpp \
 	$(DG_PHYSICS_PATH)dgWorld.cpp \
+	$(DG_PHYSICS_PATH)dgDeformableBodiesUpdate.cpp \
 	$(DG_PHYSICS_PATH)dgWorldDynamicsParallelSolver.cpp \
 	$(DG_PHYSICS_PATH)dgWorldDynamicsSimpleSolver.cpp \
 	$(DG_PHYSICS_PATH)dgWorldDynamicUpdate.cpp
