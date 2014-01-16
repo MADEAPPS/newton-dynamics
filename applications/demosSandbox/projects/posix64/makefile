@@ -120,6 +120,7 @@ SDK_DEMOS_SRC = \
 		$(SDK_DEMOS_PATH)/ClosestDistance.cpp \
 		$(SDK_DEMOS_PATH)/CompoundCollision.cpp \
 		$(SDK_DEMOS_PATH)/ContinueCollision.cpp \
+		$(SDK_DEMOS_PATH)/ContinueCollision1.cpp \
 		$(SDK_DEMOS_PATH)/ConvexApproximation.cpp \
 		$(SDK_DEMOS_PATH)/ConvexCast.cpp \
 		$(SDK_DEMOS_PATH)/HeavyVehicles.cpp \
@@ -127,7 +128,6 @@ SDK_DEMOS_SRC = \
 		$(SDK_DEMOS_PATH)/KinematicBodies.cpp \
 		$(SDK_DEMOS_PATH)/MeshCollision.cpp \
 		$(SDK_DEMOS_PATH)/MultiRayCasting.cpp \
-		$(SDK_DEMOS_PATH)/PostCompoundCreateBuildTest.cpp \
 		$(SDK_DEMOS_PATH)/PrecessingTops.cpp \
 		$(SDK_DEMOS_PATH)/PrimitiveCollision.cpp \
 		$(SDK_DEMOS_PATH)/PuckSlide.cpp \
