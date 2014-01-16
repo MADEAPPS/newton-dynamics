@@ -352,28 +352,6 @@ class dgCollisionCompoundFractured::dgFractureBuilder: public dgTree<dgMeshEffec
 						if (!IsPairConnected (node0, node1)) {
 							node0->GetInfo().AddEdge(node1);
 							node1->GetInfo().AddEdge(node0);
-
-/*
-if ((node0->GetInfo().m_nodeData == 0) || (node1->GetInfo().m_nodeData == 0)){
-	dgInt32 index = node0->GetInfo().m_nodeData;
-	dgTrace (("node0 %d: ", index));
-	for (dgGraphNode<int, int>::dgListNode* edge = node0->GetInfo().GetFirst(); edge; edge = edge->GetNext()) {
-		dgFractureConectivity::dgListNode* const otherNode = edge->GetInfo().m_node;
-		dgInt32 index1 = otherNode->GetInfo().m_nodeData;
-		dgTrace (("%d ", index1));
-	}
-	dgTrace (("\n"));
-
-	index = node1->GetInfo().m_nodeData;
-	dgTrace (("node1 %d: ", index));
-	for (dgGraphNode<int, int>::dgListNode* edge = node1->GetInfo().GetFirst(); edge; edge = edge->GetNext()) {
-		dgFractureConectivity::dgListNode* const otherNode = edge->GetInfo().m_node;
-		dgInt32 index1 = otherNode->GetInfo().m_nodeData;
-		dgTrace (("%d ", index1));
-	}
-	dgTrace (("\n"));
-}
-*/
 						}
 					}
 				}
@@ -1265,15 +1243,15 @@ dgFloat32 dgCollisionCompoundFractured::GetSetImpulsePropgationFactor() const
 
 dgVector dgCollisionCompoundFractured::GetObbSize() const
 {
-	return dgCollisionCompound::GetObbSize() + dgVector (DG_FRACTURE_AABB_GUARD_DISTANCE) & dgVector::m_triplexMask;;
+	return dgCollisionCompound::GetObbSize() + (dgVector (DG_FRACTURE_AABB_GUARD_DISTANCE) & dgVector::m_triplexMask);
 }
 
 
 void dgCollisionCompoundFractured::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const
 {
 	dgCollisionCompound::CalcAABB (matrix, p0, p1);
-	p0 -= dgVector (DG_FRACTURE_AABB_GUARD_DISTANCE) & dgVector::m_triplexMask;
-	p1 += dgVector (DG_FRACTURE_AABB_GUARD_DISTANCE) & dgVector::m_triplexMask;
+	p0 -= (dgVector (DG_FRACTURE_AABB_GUARD_DISTANCE) & dgVector::m_triplexMask);
+	p1 += (dgVector (DG_FRACTURE_AABB_GUARD_DISTANCE) & dgVector::m_triplexMask);
 }
 
 
@@ -1392,7 +1370,7 @@ bool dgCollisionCompoundFractured::CanChunk (dgConectivityGraph::dgListNode* con
 {
 	dgVector directionsMap[32];
 	dgInt32 count = 0;
-	for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = chunkNode->GetInfo().GetFirst(); edgeNode && (count < sizeof (directionsMap)/sizeof (directionsMap[0])); edgeNode = edgeNode->GetNext()) {
+	for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = chunkNode->GetInfo().GetFirst(); edgeNode && (count < dgInt32 (sizeof (directionsMap)/sizeof (directionsMap[0]))); edgeNode = edgeNode->GetNext()) {
 		directionsMap[count] = edgeNode->GetInfo().m_edgeData.m_normal;
 		count ++;
 	}
@@ -1572,31 +1550,6 @@ dgCollisionCompoundFractured* dgCollisionCompoundFractured::PlaneClip (const dgV
 				}
 			}
 		}
-
-/*
-BeginAddRemove ();
-dgConectivityGraph::dgListNode* xxx1;
-for (dgConectivityGraph::dgListNode* xxx = m_conectivity.GetFirst(); xxx != m_conectivity.GetLast(); xxx = xxx1) {
-	xxx1 = xxx->GetNext();
-	if (xxx->GetInfo().m_nodeData.m_lru == m_lru) {
-//	if (!((xxx->GetInfo().m_nodeData.xxxxx == 0) || (xxx->GetInfo().m_nodeData.xxxxx == 3))){
-	RemoveCollision (xxx->GetInfo().m_nodeData.m_shapeNode);
-	} else {
-dgTrace (("%d ", xxx->GetInfo().m_nodeData.xxxxx));
-	}
-}
-EndAddRemove ();
-dgTrace (("/n"));
-
-
-BeginAddRemove ();
-dgTree<dgConectivityGraph::dgListNode*, dgConectivityGraph::dgListNode*>::Iterator iter(upperSide);
-for (iter.Begin(); iter; iter ++) {
-	dgConectivityGraph::dgListNode* xxx = iter.GetNode()->GetInfo();
-	RemoveCollision (xxx->GetInfo().m_nodeData.m_shapeNode);
-}
-EndAddRemove ();
-*/
 	}
 
 	return NULL;

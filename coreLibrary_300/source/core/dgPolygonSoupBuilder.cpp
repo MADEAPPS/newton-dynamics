@@ -684,7 +684,6 @@ void dgPolygonSoupDatabaseBuilder::Optimize(dgInt32 faceId, const dgFaceBucket& 
 
 dgInt32 dgPolygonSoupDatabaseBuilder::FilterFace (dgInt32 count, dgInt32* const pool)
 {
-static int xxx;
 	if (count == 3) {
 		dgBigVector p0 (m_vertexPoints[pool[2]]);
 		for (dgInt32 i = 0; i < 3; i ++) {
