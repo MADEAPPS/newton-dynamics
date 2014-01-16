@@ -408,7 +408,7 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 		optionsMenu->AppendRadioItem(ID_SOLVER_MODE + 4, wxT("Iterative solver eight passes"));
 
 		dAssert (m_solverModeIndex >= 0);
-		dAssert (m_solverModeIndex < sizeof (m_solverModes)/sizeof (m_solverModes[0]));
+		dAssert (m_solverModeIndex < int (sizeof (m_solverModes)/sizeof (m_solverModes[0])));
 		optionsMenu->Check (ID_SOLVER_MODE + m_solverModeIndex, true);
 
 

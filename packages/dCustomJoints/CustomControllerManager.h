@@ -62,7 +62,7 @@ class CustomControllerConvexRayFilter: public CustomControllerConvexCastPreFilte
 		:CustomControllerConvexCastPreFilter(me)
 		,m_hitBody(NULL)
 		,m_shapeHit(NULL)
-		,m_collisionID(NULL) 
+		,m_collisionID(0) 
 		,m_intersectParam(1.2f)
 	{
 	}
