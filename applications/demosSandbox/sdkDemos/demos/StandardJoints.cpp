@@ -19,6 +19,7 @@ AddGearAndRack (mSceneMgr, m_physicsWorld, Vector3 (10.0f, 0.0f, -15.0f));
 #include "PhysicsUtils.h"
 #include "DemoMesh.h"
 #include "../toolBox/OpenGlUtil.h"
+#include <CustomGear.h>
 #include <CustomHinge.h>
 #include <CustomSlider.h>
 #include <CustomCorkScrew.h>
@@ -243,6 +244,44 @@ static void AddCylindrical (DemoEntityManager* const scene, const dVector& origi
 }
 
 
+static CustomHinge* AddHingeWheel (DemoEntityManager* const scene, const dVector& origin, dFloat radius, dFloat height, NewtonBody* const parent)
+{
+    NewtonBody* const wheel = CreateWheel (scene, origin, height, radius);
+
+    // the joint pin is the first row of the matrix
+    //dMatrix localPin (dRollMatrix(90.0f * 3.141592f / 180.0f));
+    dMatrix localPin (GetIdentityMatrix());
+    dMatrix matrix;
+    NewtonBodyGetMatrix (wheel, & matrix[0][0]);
+    matrix = localPin * matrix;
+
+    // connect first box to the world
+    return new CustomHinge (matrix, wheel, parent);
+}
+
+
+static void AddGear (DemoEntityManager* const scene, const dVector& origin)
+{
+    NewtonBody* const reel = CreateCylinder(scene, origin + dVector (0.0f, 4.0f, 0.0f), 0.25f, 4.0f);
+    NewtonBodySetMassMatrix (reel, 0.0f, 0.0f, 0.0f, 0.0f);
+
+    CustomHinge* const hinge0 = AddHingeWheel (scene, origin + dVector (-1.0f, 4.0f, 0.0f), 0.5f, 1.0f, reel);
+    CustomHinge* const hinge1 = AddHingeWheel (scene, origin + dVector ( 1.0f, 4.0f, 0.0f), 0.5f, 1.0f, reel);
+
+    NewtonBody* const body0 = hinge0->GetBody0();
+    NewtonBody* const body1 = hinge1->GetBody0();
+
+    dMatrix matrix0;
+    dMatrix matrix1;
+    NewtonBodyGetMatrix (body0, &matrix0[0][0]);
+    NewtonBodyGetMatrix (body1, &matrix1[0][0]);
+
+    dVector pin0 (matrix0.RotateVector(dVector (1.0f, 0.0f, 0.0f)));
+    dVector pin1 (matrix1.RotateVector(dVector (1.0f, 0.0f, 0.0f)));
+    new CustomGear (4.0f, pin0, pin1, body0, body1);
+}
+
+
 void StandardJoints (DemoEntityManager* const scene)
 {
     scene->CreateSkyBox();
@@ -266,7 +305,7 @@ void StandardJoints (DemoEntityManager* const scene)
 //  AddUniversal (mSceneMgr, m_physicsWorld, Vector3 (2.0f, 0.0f, -25.0f));
 
     //add relational joints example 
-//  AddGear (mSceneMgr, m_physicsWorld, Vector3 (-10.0f, 0.0f, -15.0f));
+    AddGear (scene, dVector (-20.0f, 0.0f, 5.0f));
 //  AddPulley (mSceneMgr, m_physicsWorld, Vector3 (0.0f, 0.0f, -15.0f));
 //  AddGearAndRack (mSceneMgr, m_physicsWorld, Vector3 (10.0f, 0.0f, -15.0f));
 
