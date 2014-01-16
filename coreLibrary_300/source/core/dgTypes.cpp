@@ -65,7 +65,7 @@ dgUnsigned64 dgGetTimeInMicrosenconds()
 	static dgUnsigned64 baseCount = 0;
 	if (!baseCount) {
 		gettimeofday(&tp, NULL);
-		baseCount = unsigned64 (tp.tv_sec) * 1000000 + tp.tv_usec;
+		baseCount = dgUnsigned64 (tp.tv_sec) * 1000000 + tp.tv_usec;
 	}
 
 	gettimeofday(&tp, NULL);

@@ -235,6 +235,8 @@
 		FF5067F9173F3EAD00D01FDF /* env1.tga in Resources */ = {isa = PBXBuildFile; fileRef = FF50669D173F3D8800D01FDF /* env1.tga */; };
 		FF5067FA173F3EAD00D01FDF /* f1.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF50669E173F3D8800D01FDF /* f1.ngd */; };
 		FF6FCF70175156940088B4D3 /* CocoaOpenglGlue.mm in Sources */ = {isa = PBXBuildFile; fileRef = FF6FCF6F175156940088B4D3 /* CocoaOpenglGlue.mm */; };
+		FF7EDAA5188843F000CB1FFA /* ContinueCollision1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF7EDAA3188843F000CB1FFA /* ContinueCollision1.cpp */; };
+		FF7EDAA6188843F000CB1FFA /* StandardJoints.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF7EDAA4188843F000CB1FFA /* StandardJoints.cpp */; };
 		FF82375D17C26DE6004C80D4 /* ArchimedesBuoyancy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF82375A17C26DE6004C80D4 /* ArchimedesBuoyancy.cpp */; };
 		FF82375E17C26DE6004C80D4 /* ArticulatedJoints.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF82375B17C26DE6004C80D4 /* ArticulatedJoints.cpp */; };
 		FF82375F17C26DE6004C80D4 /* SimpleConvexFracturing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF82375C17C26DE6004C80D4 /* SimpleConvexFracturing.cpp */; };
@@ -567,6 +569,8 @@
 		FF50671F173F3D8A00D01FDF /* x01_st.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = x01_st.tga; path = ../../../../media/x01_st.tga; sourceTree = "<group>"; };
 		FF506720173F3D8A00D01FDF /* yellow_p.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = yellow_p.tga; path = ../../../../media/yellow_p.tga; sourceTree = "<group>"; };
 		FF6FCF6F175156940088B4D3 /* CocoaOpenglGlue.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CocoaOpenglGlue.mm; path = ../../../sdkDemos/toolBox/CocoaOpenglGlue.mm; sourceTree = "<group>"; };
+		FF7EDAA3188843F000CB1FFA /* ContinueCollision1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ContinueCollision1.cpp; path = ../../../sdkDemos/demos/ContinueCollision1.cpp; sourceTree = "<group>"; };
+		FF7EDAA4188843F000CB1FFA /* StandardJoints.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = StandardJoints.cpp; path = ../../../sdkDemos/demos/StandardJoints.cpp; sourceTree = "<group>"; };
 		FF7F20861730187900AC6E4B /* enet_osx.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = enet_osx.xcodeproj; path = "../../../../../packages/thirdParty/enet-1.2/enet_osx/enet_osx.xcodeproj"; sourceTree = "<group>"; };
 		FF82375A17C26DE6004C80D4 /* ArchimedesBuoyancy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ArchimedesBuoyancy.cpp; path = ../../../sdkDemos/demos/ArchimedesBuoyancy.cpp; sourceTree = "<group>"; };
 		FF82375B17C26DE6004C80D4 /* ArticulatedJoints.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ArticulatedJoints.cpp; path = ../../../sdkDemos/demos/ArticulatedJoints.cpp; sourceTree = "<group>"; };
@@ -1051,6 +1055,8 @@
 		FF8F28D4131368B90019E923 /* demos */ = {
 			isa = PBXGroup;
 			children = (
+				FF7EDAA3188843F000CB1FFA /* ContinueCollision1.cpp */,
+				FF7EDAA4188843F000CB1FFA /* StandardJoints.cpp */,
 				FF8237C617CA218A004C80D4 /* StructuredConvexFracturing.cpp */,
 				FF82375A17C26DE6004C80D4 /* ArchimedesBuoyancy.cpp */,
 				FF82375B17C26DE6004C80D4 /* ArticulatedJoints.cpp */,
@@ -1602,6 +1608,8 @@
 				FF82377A17C26F8C004C80D4 /* SolidColor.vs in Sources */,
 				FF82377C17C26F8C004C80D4 /* TextureDecal.vs in Sources */,
 				FF8237C717CA218A004C80D4 /* StructuredConvexFracturing.cpp in Sources */,
+				FF7EDAA5188843F000CB1FFA /* ContinueCollision1.cpp in Sources */,
+				FF7EDAA6188843F000CB1FFA /* StandardJoints.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
