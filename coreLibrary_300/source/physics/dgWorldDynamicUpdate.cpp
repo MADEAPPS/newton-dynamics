@@ -52,7 +52,6 @@ class dgWorldDynamicUpdateSyncDescriptor
 	dgInt32 m_islandCount;
 	dgInt32 m_firstIsland;
 	dgThread::dgCriticalSection* m_criticalSection;
-	dgDeformableBodiesUpdate::dgListNode* m_sofBodyNode;
 };
 
 
@@ -187,13 +186,8 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	world->m_perfomanceCounters[m_dynamicsTicks] = ticks - updateTime;
 
 	// integrate soft body dynamics phase 2
-	const dgDeformableBodiesUpdate* const softBodyList = world;
-	descriptor.m_sofBodyNode = softBodyList->GetFirst();
-	descriptor.m_criticalSection = &m_softBodyCriticalSectionLock;
-	for (dgInt32 i = 0; i < threadCount; i ++) {
-		world->QueueJob (IntegrateSoftBodyForcesKernel, &descriptor, world);
-	}
-	world->SynchronizationBarrier();
+	dgDeformableBodiesUpdate* const softBodyList = world;
+    softBodyList->SolveConstraintsAndIntegrate (timestep);
 	world->m_perfomanceCounters[m_softBodyTicks] += (world->m_getPerformanceCount() - ticks);
 }
 
@@ -724,40 +718,6 @@ void dgWorldDynamicUpdate::FindActiveJointAndBodies (void* const context, void* 
 }
 
 
-
-void dgWorldDynamicUpdate::IntegrateSoftBody (dgWorldDynamicUpdateSyncDescriptor* const descriptor, dgInt32 threadID)
-{
-	dgFloat32 timestep = descriptor->m_timestep; 
-	dgWorld* const world = (dgWorld*) this;
-
-	dgDeformableBodiesUpdate::dgListNode* node = NULL;
-	{
-		dgThreadHiveScopeLock lock (world, descriptor->m_criticalSection);
-		node = descriptor->m_sofBodyNode;
-		if (node) {
-			descriptor->m_sofBodyNode = node->GetNext();
-		}
-	}
-
-	for ( ; node; ) {
-		dgCollisionDeformableMesh* const softShape = node->GetInfo();
-
-		softShape->ResolvePositionsConstraints (timestep);
-
-		dgThreadHiveScopeLock lock (world, descriptor->m_criticalSection);
-		node = descriptor->m_sofBodyNode;
-		if (node) {
-			descriptor->m_sofBodyNode = node->GetNext();
-		}
-	}
-}
-
-void dgWorldDynamicUpdate::IntegrateSoftBodyForcesKernel (void* const context, void* const worldContext, dgInt32 threadID)
-{
-	dgWorldDynamicUpdateSyncDescriptor* const descriptor = (dgWorldDynamicUpdateSyncDescriptor*) context;
-	dgWorld* const world = (dgWorld*) worldContext;
-	world->IntegrateSoftBody (descriptor, threadID);
-}
 
 void dgWorldDynamicUpdate::CalculateIslandReactionForcesKernel (void* const context, void* const worldContext, dgInt32 threadID)
 {

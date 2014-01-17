@@ -56,3 +56,14 @@ void dgDeformableBodiesUpdate::ApplyExternaForces(dgFloat32 timestep)
         }
     }
 }
+
+void dgDeformableBodiesUpdate::SolveConstraintsAndIntegrate (dgFloat32 timestep)
+{
+    for (dgListNode* node = GetFirst(); node; node = node->GetNext()) {
+        dgCollisionDeformableMesh* const softShape = node->GetInfo();
+
+        if (softShape->GetBody()) {
+            softShape->ResolvePositionsConstraints (timestep);
+        }
+    }
+}

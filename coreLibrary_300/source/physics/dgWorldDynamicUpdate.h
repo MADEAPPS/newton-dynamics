@@ -264,7 +264,6 @@ class dgWorldDynamicUpdate
 
 	static dgInt32 CompareIslands (const dgIsland* const islandA, const dgIsland* const islandB, void* notUsed);
 	static void CalculateIslandReactionForcesKernel (void* const context, void* const worldContext, dgInt32 threadID);
-	static void IntegrateSoftBodyForcesKernel (void* const context, void* const worldContext, dgInt32 threadID);
 
 	static void IntegrateInslandParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
 	static void InitilizeBodyArrayParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
@@ -280,11 +279,8 @@ class dgWorldDynamicUpdate
 	static void FindActiveJointAndBodies (void* const context, void* const worldContext, dgInt32 threadID); 
 	static dgInt32 SortJointInfoByColor (const dgParallelJointMap* const indirectIndexA, const dgParallelJointMap* const indirectIndexB, void* const constraintArray);
 
-
-
 	void GetJacobianDerivativesParallel (dgJointInfo* const jointInfo, dgInt32 threadID, dgInt32 rowBase, dgFloat32 timestep) const;	
 	void LinearizeJointParallelArray(dgParallelSolverSyncData* const solverSyncData, dgJointInfo* const constraintArray, const dgIsland* const island) const;
-
 
 	void FindActiveJointAndBodies (dgIsland* const island); 
 	void IntegrateInslandParallel(dgParallelSolverSyncData* const syncData) const; 
@@ -304,7 +300,6 @@ class dgWorldDynamicUpdate
 	void CalculateSimpleBodyReactionsForces (const dgIsland* const island, dgInt32 rowStart, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
 	void IntegrateArray (const dgIsland* const island, dgFloat32 accelTolerance, dgFloat32 timestep, dgInt32 threadID) const;
 	void GetJacobianDerivatives (const dgIsland* const island, dgInt32 threadID, dgInt32 rowCount, dgFloat32 timestep) const;	
-	void IntegrateSoftBody (dgWorldDynamicUpdateSyncDescriptor* const descriptor, dgInt32 threadID);
 	void CalculateIslandContacts (dgIsland* const island, dgFloat32 timestep, dgInt32 currLru, dgInt32 threadID) const;
 	
 
