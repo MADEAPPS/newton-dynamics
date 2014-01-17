@@ -364,7 +364,7 @@ void dgCollisionDeformableClothPatch::SetParticlesPositions (const dgMatrix& mat
 }
 
 
-void dgCollisionDeformableClothPatch::IntegrateParticles (dgFloat32 timestep)
+void dgCollisionDeformableClothPatch::ApplyExternalForces (dgFloat32 timestep)
 {
 	dgVector* const posit = m_particles.m_posit;
 	dgVector* const veloc = m_particles.m_veloc;

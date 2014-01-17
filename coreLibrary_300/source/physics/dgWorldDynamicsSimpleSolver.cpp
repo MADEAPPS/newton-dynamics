@@ -988,8 +988,10 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 
 							//row->m_force = f.m_x;
 							//normalForce[k] = f.m_x;
-							f.StoreScalar(&row->m_force);
-							f.StoreScalar(&normalForce[k]);
+							//f.StoreScalar(&row->m_force);
+							//f.StoreScalar(&normalForce[k]);
+							row->m_force = f.GetScalar();
+							normalForce[k] = f.GetScalar();
 
 							row->m_maxImpact = f.Abs().GetMax (row->m_maxImpact).m_x;
 
@@ -1193,7 +1195,8 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForces (const dgIsland* const isla
 
 			//deltaAccel[j] = acc.m_x + acc.m_y + acc.m_z + deltaForce[j] * row->m_diagDamp;
 			acc = dgVector (deltaForce[j] * row->m_diagDamp) + acc.AddHorizontal();
-			acc.StoreScalar(&deltaAccel[j]);
+			//acc.StoreScalar(&deltaAccel[j]);
+			deltaAccel[j] = acc.GetScalar();
 
 			akDen += deltaAccel[j] * deltaForce[j];
 		}
@@ -1453,7 +1456,8 @@ void dgWorldDynamicUpdate::CalculateForcesSimulationMode (const dgIsland* const 
 
 				//row->m_accel = row->m_coordenateAccel - acc.m_x - acc.m_y - acc.m_z - row->m_force * row->m_diagDamp;
 				acc = dgVector (row->m_coordenateAccel - row->m_force * row->m_diagDamp) - acc.AddHorizontal();
-				acc.StoreScalar(&row->m_accel);
+				//acc.StoreScalar(&row->m_accel);
+				row->m_accel = acc.GetScalar();
 			}
 
 			dgFloat32 jointAccel = CalculateJointForces (island, island->m_rowsStart, currJoint, forceStep, maxAccNorm, JMinv);
@@ -1539,7 +1543,8 @@ void dgWorldDynamicUpdate::CalculateForcesSimulationMode (const dgIsland* const 
 			dgVector acc (JMinvJacobianLinearM0.CompProduct4(y0.m_linear) + JMinvJacobianAngularM0.CompProduct4(y0.m_angular) + JMinvJacobianLinearM1.CompProduct4(y1.m_linear) + JMinvJacobianAngularM1.CompProduct4(y1.m_angular));
 			//row->m_accel = row->m_coordenateAccel - acc.m_x - acc.m_y - acc.m_z - row->m_force * row->m_diagDamp;
 			acc = dgVector (row->m_coordenateAccel - row->m_force * row->m_diagDamp) - acc.AddHorizontal();
-			acc.StoreScalar(&row->m_accel);
+			//acc.StoreScalar(&row->m_accel);
+			row->m_accel = acc.GetScalar();
 		}
 
 		dgInt32 activeCount = 0;
@@ -1646,7 +1651,8 @@ void dgWorldDynamicUpdate::CalculateForcesSimulationMode (const dgIsland* const 
 
 				//row->m_deltaAccel = tmpAccel.m_x + tmpAccel.m_y + tmpAccel.m_z + row->m_deltaForce * row->m_diagDamp;
 				tmpAccel = tmpAccel.AddHorizontal() + dgVector (row->m_deltaForce * row->m_diagDamp);
-				tmpAccel.StoreScalar(&row->m_deltaAccel);
+				//tmpAccel.StoreScalar(&row->m_deltaAccel);
+				row->m_deltaAccel = tmpAccel.GetScalar();
 
 				//akDen += row->m_deltaAccel * row->m_deltaForce;
 				tmpDen = tmpDen + dgVector (row->m_deltaAccel * row->m_deltaForce);
@@ -1654,8 +1660,9 @@ void dgWorldDynamicUpdate::CalculateForcesSimulationMode (const dgIsland* const 
 		}
 		tmpDen = tmpDen.GetMax(zeroDivide);
 		
-		dgFloat32 akDen;
-		tmpDen.StoreScalar(&akDen);
+		//dgFloat32 akDen;
+		//tmpDen.StoreScalar(&akDen);
+		dgFloat32 akDen = tmpDen.GetScalar();
 		dgAssert (akDen > dgFloat32 (0.0f));
 
 		dgFloat32 ak = akNum / akDen;

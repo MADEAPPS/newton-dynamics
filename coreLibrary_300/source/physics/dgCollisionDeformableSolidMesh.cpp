@@ -1415,34 +1415,7 @@ void dgCollisionDeformableSolidMesh::SetParticlesPositions (const dgMatrix& matr
 }
 
 
-//void dgCollisionDeformableSolidMesh::ApplyExternalAndInternalForces (dgDeformableBody* const myBody, dgFloat32 timestep, dgInt32 threadIndex)
-void dgCollisionDeformableSolidMesh::IntegrateParticles (dgFloat32 timestep)
-{
-	dgAssert (m_myBody);
-/*
-	dgVector* const posit = m_particles.m_posit;
-	dgVector* const veloc = m_particles.m_veloc;
-	dgFloat32* const unitMass = m_particles.m_unitMass;
 
-	dgVector gravityStep (gravity.Scale4 (timestep));
-	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-		veloc[i] = (posit[i] - m_shapePosition[i]).Scale4 (invTimeStep);
-		m_shapePosition[i] = posit[i];
-		veloc[i] += gravityStep.Scale4 (unitMass[i]);
-		posit[i] += veloc[i].Scale4 (timestep);
-	}
-*/
-	dgBody* const body = GetBody();
-	dgFloat32 invMass = body->GetInvMass().m_w;
-	dgVector velocyStep (body->GetForce().Scale4(invMass * timestep));
-
-	dgVector* const veloc = m_particles.m_veloc;
-	dgFloat32* const unitMass = m_particles.m_unitMass;
-	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-		veloc[i] += velocyStep.Scale4 (unitMass[i]);
-	}
-
-}
 
 void dgCollisionDeformableSolidMesh::ResolvePositionsConstraints (dgFloat32 timestep)
 {
@@ -1509,3 +1482,52 @@ for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
 */
 }
 
+
+
+void dgCollisionDeformableSolidMesh::ApplyExternalForces (dgFloat32 timestep)
+{
+	dgAssert (m_myBody);
+
+	dgBody* const body = GetBody();
+	dgFloat32 invMass = body->GetInvMass().m_w;
+	dgVector velocyStep (body->GetForce().Scale4(invMass * timestep));
+
+invMass /= m_particles.m_count;
+
+	dgVector* const veloc = m_particles.m_veloc;
+	const dgVector* const posit = m_particles.m_posit;
+	dgFloat32* const unitMass = m_particles.m_unitMass;
+
+	dgVector com (dgFloat32 (0.0f));
+	dgVector comVeloc (dgFloat32 (0.0f));
+
+	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
+		dgVector mass (unitMass[i]);
+		veloc[i] += velocyStep;
+		com += posit[i].CompProduct4(mass);
+		comVeloc += veloc[i].CompProduct4(mass);
+	}
+
+	com = com.Scale4(invMass);
+	comVeloc = comVeloc.Scale4(invMass);
+
+	dgMatrix InertiaMatrix (dgGetZeroMatrix());
+	dgVector angularMomentum (dgFloat32 (0.0f));
+	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
+		dgVector mass (unitMass[i]);
+		dgVector r (posit[i] - com);
+		angularMomentum += r * (veloc[i].CompProduct4(mass));
+
+		InertiaMatrix.m_front += r.CompProduct4(r.BroadcastX()); 
+		InertiaMatrix.m_up += r.CompProduct4(r.BroadcastY()); 
+		InertiaMatrix.m_right += r.CompProduct4(r.BroadcastZ()); 
+	}
+
+dgVector damp (0.1f); 
+	dgVector omega (InertiaMatrix.Symetric3by3Inverse().RotateVector(angularMomentum));
+	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
+		dgVector r (posit[i] - com);
+		dgVector deltaVeloc (comVeloc + omega * r - veloc[i]);
+		veloc[i] += deltaVeloc.CompProduct4(damp);
+	}
+}

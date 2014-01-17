@@ -240,44 +240,6 @@ DG_INLINE void dgMatrix::EigenVectors (const dgMatrix& initialGuess)
 }
 
 
-DG_INLINE dgMatrix dgPitchMatrix(dgFloat32 ang)
-{
-	dgFloat32 cosAng;
-	dgFloat32 sinAng;
-	sinAng = dgSin (ang);
-	cosAng = dgCos (ang);
-	return dgMatrix (dgVector (dgFloat32(1.0f),  dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f)), 
-					 dgVector (dgFloat32(0.0f),  cosAng,          sinAng,          dgFloat32(0.0f)),
-					 dgVector (dgFloat32(0.0f), -sinAng,          cosAng,          dgFloat32(0.0f)), 
-					 dgVector (dgFloat32(0.0f),  dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f))); 
-
-}
-
-DG_INLINE dgMatrix dgYawMatrix(dgFloat32 ang)
-{
-	dgFloat32 cosAng;
-	dgFloat32 sinAng;
-	sinAng = dgSin (ang);
-	cosAng = dgCos (ang);
-	return dgMatrix (dgVector (cosAng,          dgFloat32(0.0f), -sinAng,          dgFloat32(0.0f)), 
-					 dgVector (dgFloat32(0.0f), dgFloat32(1.0f),  dgFloat32(0.0f), dgFloat32(0.0f)), 
-					 dgVector (sinAng,          dgFloat32(0.0f),  cosAng,          dgFloat32(0.0f)), 
-					 dgVector (dgFloat32(0.0f), dgFloat32(0.0f),  dgFloat32(0.0f), dgFloat32(1.0f))); 
-}
-
-DG_INLINE dgMatrix dgRollMatrix(dgFloat32 ang)
-{
-	dgFloat32 cosAng;
-	dgFloat32 sinAng;
-	sinAng = dgSin (ang);
-	cosAng = dgCos (ang);
-	return dgMatrix (dgVector ( cosAng,          sinAng,          dgFloat32(0.0f), dgFloat32(0.0f)), 
-					 dgVector (-sinAng,          cosAng,          dgFloat32(0.0f), dgFloat32(0.0f)),
-					 dgVector ( dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f)), 
-					 dgVector ( dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f))); 
-}																		 
-
-
 DG_INLINE dgMatrix dgMatrix::Inverse () const
 {
 	return dgMatrix (dgVector (m_front.m_x, m_up.m_x, m_right.m_x, dgFloat32(0.0f)),
@@ -304,6 +266,46 @@ DG_INLINE bool dgMatrix::TestOrthogonal() const
 		   (dgAbsf(c - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f)) &
 		   (dgAbsf(d - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f)); 
 }
+
+
+
+DG_INLINE dgMatrix dgPitchMatrix(dgFloat32 ang)
+{
+	dgFloat32 sinAng = dgSin (ang);
+	dgFloat32 cosAng = dgCos (ang);
+	return dgMatrix (dgVector (dgFloat32(1.0f),  dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f)), 
+		dgVector (dgFloat32(0.0f),  cosAng,          sinAng,          dgFloat32(0.0f)),
+		dgVector (dgFloat32(0.0f), -sinAng,          cosAng,          dgFloat32(0.0f)), 
+		dgVector (dgFloat32(0.0f),  dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f))); 
+
+}
+
+DG_INLINE dgMatrix dgYawMatrix(dgFloat32 ang)
+{
+	dgFloat32 sinAng = dgSin (ang);
+	dgFloat32 cosAng = dgCos (ang);
+	return dgMatrix (dgVector (cosAng,          dgFloat32(0.0f), -sinAng,          dgFloat32(0.0f)), 
+		dgVector (dgFloat32(0.0f), dgFloat32(1.0f),  dgFloat32(0.0f), dgFloat32(0.0f)), 
+		dgVector (sinAng,          dgFloat32(0.0f),  cosAng,          dgFloat32(0.0f)), 
+		dgVector (dgFloat32(0.0f), dgFloat32(0.0f),  dgFloat32(0.0f), dgFloat32(1.0f))); 
+}
+
+DG_INLINE dgMatrix dgRollMatrix(dgFloat32 ang)
+{
+	dgFloat32 sinAng = dgSin (ang);
+	dgFloat32 cosAng = dgCos (ang);
+	return dgMatrix (dgVector ( cosAng,          sinAng,          dgFloat32(0.0f), dgFloat32(0.0f)), 
+		dgVector (-sinAng,          cosAng,          dgFloat32(0.0f), dgFloat32(0.0f)),
+		dgVector ( dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f)), 
+		dgVector ( dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f))); 
+}																		 
+
+DG_INLINE dgMatrix dgCovarianceMatrix (const dgVector& A, const dgVector& B)
+{
+
+	return dgMatrix (dgGetIdentityMatrix()) ;
+}
+
 
 #endif
 

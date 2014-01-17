@@ -52,7 +52,7 @@ void dgDeformableBodiesUpdate::ApplyExternaForces(dgFloat32 timestep)
         dgCollisionDeformableMesh* const softShape = node->GetInfo();
 
         if (softShape->GetBody()) {
-            softShape->IntegrateParticles (timestep);
+            softShape->ApplyExternalForces (timestep);
         }
     }
 }

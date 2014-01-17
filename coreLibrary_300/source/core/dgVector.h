@@ -304,10 +304,31 @@ class dgVector
 		dgAssert (dgCheckVector ((*this)));
 	}
 
-	DG_INLINE void StoreScalar (dgFloat32* const dst) const
+	DG_INLINE dgFloat32 GetScalar () const
 	{
-		*dst = m_x;
+		return m_x;
 	}
+
+	DG_INLINE dgVector BroadcastX () const
+	{
+		return dgVector (m_x);
+	}
+
+	DG_INLINE dgVector BroadcastY () const
+	{
+		return dgVector (m_y);
+	}
+
+	DG_INLINE dgVector BroadcastZ () const
+	{
+		return dgVector (m_z);
+	}
+
+	DG_INLINE dgVector BroadcastW () const
+	{
+		return dgVector (m_w);
+	}
+
 
 	DG_INLINE dgFloat32& operator[] (dgInt32 i)
 	{
@@ -658,9 +679,31 @@ class dgVector
 	}
 	
 
-	DG_INLINE void StoreScalar (dgFloat32* const dst) const
+	DG_INLINE dgFloat32 GetScalar () const
 	{
-		_mm_store_ss(dst, m_type);
+		dgFloat32 scalar;
+		_mm_store_ss(&scalar, m_type);
+		return scalar;
+	}
+
+	DG_INLINE dgVector BroadcastX () const
+	{
+		return _mm_shuffle_ps (m_type, m_type, PURMUT_MASK(0, 0, 0, 0));
+	}
+
+	DG_INLINE dgVector BroadcastY () const
+	{
+		return _mm_shuffle_ps (m_type, m_type, PURMUT_MASK(1, 1, 1, 1));
+	}
+
+	DG_INLINE dgVector BroadcastZ () const
+	{
+		return _mm_shuffle_ps (m_type, m_type, PURMUT_MASK(2, 2, 2, 2));
+	}
+
+	DG_INLINE dgVector BroadcastW () const
+	{
+		return _mm_shuffle_ps (m_type, m_type, PURMUT_MASK(3, 3, 3, 3));
 	}
 	
 
