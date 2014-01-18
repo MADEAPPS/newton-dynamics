@@ -25,8 +25,6 @@
 
 
 #include "dgCollision.h"
-
-
 #include "dgCollisionConvex.h"
 
 class dgDeformableBody;
