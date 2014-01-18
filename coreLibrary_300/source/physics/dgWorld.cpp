@@ -491,7 +491,6 @@ void dgWorld::InitBody (dgBody* const body, dgCollisionInstance* const collision
 	body->SetLinearDamping (dgFloat32 (0.1045f)) ;
 	body->SetAngularDamping (dgVector (dgFloat32 (0.1045f), dgFloat32 (0.1045f), dgFloat32 (0.1045f), dgFloat32 (0.0f)));
 
-	body->m_matrix = matrix;
 	body->AttachCollision(collision);
 	body->m_bodyGroupId = dgInt32 (m_defualtBodyGroupID);
 

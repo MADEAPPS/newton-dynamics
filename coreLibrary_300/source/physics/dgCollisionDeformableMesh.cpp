@@ -813,34 +813,34 @@ void dgCollisionDeformableMesh::GetVisualVertexData(dgInt32 vertexStrideInByte, 
 	dgInt32 normalStride = normalStrideInByte / sizeof (dgFloat32);  
 	dgInt32 uvStride0 = uvStrideInByte0 / sizeof (dgFloat32); 
 
-
-	const dgMatrix& matrix = m_myBody->GetMatrix();
+//	const dgMatrix& matrix = m_myBody->GetMatrix();
+	const dgVector* const posit = m_particles.m_posit;
 
 	if (m_isdoubleSided) {
 		for (dgInt32 i = 0; i < m_visualVertexCount; i ++) {
 			dgInt32 index = m_visualVertexData[i].m_vertexIndex;
-			dgVector p (matrix.UntransformVector (m_particles.m_posit[index]));
-			dgVector n (matrix.UnrotateVector(dgVector (&m_visualVertexData[i].m_normals[0])));
+//			dgVector p (matrix.UntransformVector (m_particles.m_posit[index]));
+//			dgVector n (matrix.UnrotateVector(dgVector (&m_visualVertexData[i].m_normals[0])));
 
-			vertex[i * vertexStride + 0] = p.m_x;
-			vertex[i * vertexStride + 1] = p.m_y;
-			vertex[i * vertexStride + 2] = p.m_z;
+			vertex[i * vertexStride + 0] = posit[index].m_x;
+			vertex[i * vertexStride + 1] = posit[index].m_y;
+			vertex[i * vertexStride + 2] = posit[index].m_z;
 
-			normals[i * normalStride + 0] = n[0];
-			normals[i * normalStride + 1] = n[1];
-			normals[i * normalStride + 2] = n[2];
+			normals[i * normalStride + 0] = m_visualVertexData[i].m_normals[0];
+			normals[i * normalStride + 1] = m_visualVertexData[i].m_normals[1];
+			normals[i * normalStride + 2] = m_visualVertexData[i].m_normals[2];
 
 			uv0[i * uvStride0 + 0] = m_visualVertexData[i].m_uv0[0];
 			uv0[i * uvStride0 + 1] = m_visualVertexData[i].m_uv0[1];
 
 			dgInt32 j = i + m_visualVertexCount;
-			vertex[j * vertexStride + 0] = p.m_x;
-			vertex[j * vertexStride + 1] = p.m_y;
-			vertex[j * vertexStride + 2] = p.m_z;
+			vertex[j * vertexStride + 0] = posit[index].m_x;
+			vertex[j * vertexStride + 1] = posit[index].m_y;
+			vertex[j * vertexStride + 2] = posit[index].m_z;
 
-			normals[j * normalStride + 0] = n[0];
-			normals[j * normalStride + 1] = n[1];
-			normals[j * normalStride + 2] = n[2];
+			normals[j * normalStride + 0] = -m_visualVertexData[i].m_normals[0];
+			normals[j * normalStride + 1] = -m_visualVertexData[i].m_normals[1];
+			normals[j * normalStride + 2] = -m_visualVertexData[i].m_normals[2];
 
 			uv0[j * uvStride0 + 0] = m_visualVertexData[i].m_uv0[0];
 			uv0[j * uvStride0 + 1] = m_visualVertexData[i].m_uv0[1];
@@ -848,16 +848,16 @@ void dgCollisionDeformableMesh::GetVisualVertexData(dgInt32 vertexStrideInByte, 
 	} else {
 		for (dgInt32 i = 0; i < m_visualVertexCount; i ++) {
 			dgInt32 index = m_visualVertexData[i].m_vertexIndex;
-			dgVector p (matrix.UntransformVector (m_particles.m_posit[index]));
-			dgVector n (matrix.UnrotateVector(dgVector (&m_visualVertexData[i].m_normals[0])));
+			//dgVector p (matrix.UntransformVector (m_particles.m_posit[index]));
+			//dgVector n (matrix.UnrotateVector(dgVector (&m_visualVertexData[i].m_normals[0])));
 
-			vertex[i * vertexStride + 0] = p.m_x;
-			vertex[i * vertexStride + 1] = p.m_y;
-			vertex[i * vertexStride + 2] = p.m_z;
+			vertex[i * vertexStride + 0] = posit[index].m_x;
+			vertex[i * vertexStride + 1] = posit[index].m_y;
+			vertex[i * vertexStride + 2] = posit[index].m_z;
 
-			normals[i * normalStride + 0] = n[0];
-			normals[i * normalStride + 1] = n[1];
-			normals[i * normalStride + 2] = n[2];
+			normals[i * normalStride + 0] = m_visualVertexData[i].m_normals[0];
+			normals[i * normalStride + 1] = m_visualVertexData[i].m_normals[1];
+			normals[i * normalStride + 2] = m_visualVertexData[i].m_normals[2];
 
 			uv0[i * uvStride0 + 0] = m_visualVertexData[i].m_uv0[0];
 			uv0[i * uvStride0 + 1] = m_visualVertexData[i].m_uv0[1];
@@ -939,14 +939,14 @@ dgVector dgCollisionDeformableMesh::GetParticlePosition(dgInt32 index) const
 	return m_particles.m_posit[index];
 }
 
-void dgCollisionDeformableMesh::DebugCollision (const dgMatrix& matrixPtr, OnDebugCollisionMeshCallback callback, void* const userData) const
+void dgCollisionDeformableMesh::DebugCollision (const dgMatrix& matrix, OnDebugCollisionMeshCallback callback, void* const userData) const
 {
+	const dgVector* const particlePosit = m_particles.m_posit;
 	for (dgInt32 i = 0; i < m_trianglesCount; i ++ ) {
 		dgTriplex points[3];
 		for (dgInt32 j = 0; j < 3; j ++) {
 			dgInt32 index = m_indexList[i * 3 + j];
-			//dgVector p (matrix.TransformVector(m_particles.m_position[index]));
-			const dgVector& p = m_particles.m_posit[index];
+			dgVector p (matrix.TransformVector(particlePosit[index]));
 			points[j].m_x = p.m_x;
 			points[j].m_y = p.m_y;
 			points[j].m_z = p.m_z;

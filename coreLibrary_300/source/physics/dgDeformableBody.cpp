@@ -72,9 +72,12 @@ void dgDeformableBody::SetMassProperties (dgFloat32 mass, const dgCollisionInsta
 void dgDeformableBody::SetMassMatrix (dgFloat32 mass, dgFloat32 Ix, dgFloat32 Iy, dgFloat32 Iz)
 {
 	dgBody::SetMassMatrix (mass, dgMax(Ix, dgFloat32 (0.1f)), dgMax(Iy, dgFloat32 (0.1f)), dgMax(Iz, dgFloat32 (0.1f)));
-//	m_mass = (mass < dgFloat32 (1.0e-3f) || (mass >= DG_INFINITE_MASS)) ? dgFloat32 (0.0f) : mass;
-//	dgCollisionDeformableMesh* const deformableCollision = (dgCollisionDeformableMesh*) m_collision;
-//	deformableCollision->SetParticlesMasses (mass);
+
+	dgAssert (mass > dgFloat32 (0.0f));
+	if (m_collision && m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
+		dgCollisionDeformableMesh* const defomableMesh = (dgCollisionDeformableMesh*) m_collision->GetChildShape();
+		defomableMesh->SetMass(mass);
+	}
 }
 
 OnApplyExtForceAndTorque dgDeformableBody::GetExtForceAndTorqueCallback () const
@@ -114,21 +117,6 @@ void dgDeformableBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadInd
 	}
 }
 
-void dgDeformableBody::AttachCollision (dgCollisionInstance* const collision)
-{
-	if (m_collision && m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
-		dgCollisionDeformableMesh* const defomableMesh = (dgCollisionDeformableMesh*) m_collision->GetChildShape();
-		defomableMesh->m_myBody = NULL;
-	}
-
-	dgBody::AttachCollision(collision);
-
-	if (m_collision && m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
-		dgCollisionDeformableMesh* const defomableMesh = (dgCollisionDeformableMesh*) m_collision->GetChildShape();
-		defomableMesh->m_myBody = this;
-		defomableMesh->SetParticlesPositions (m_matrix);
-	}
-}
 
 void dgDeformableBody::SetVelocity (const dgVector& velocity)
 {
@@ -149,18 +137,20 @@ bool dgDeformableBody::IsInEquilibrium  () const
 	return false;
 }
 
-void dgDeformableBody::SetMatrix(const dgMatrix& matrix)
-{
-	dgAssert(0);
-/*
-	if (m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
-		dgCollisionDeformableMesh* const deformableCollision = (dgCollisionDeformableMesh*) m_collision;
-		dgMatrix indentityRotation (matrix);
-		indentityRotation.m_posit = matrix.m_posit;
 
-		deformableCollision->SetMatrix(matrix);
-		dgBody::SetMatrix(indentityRotation);
+void dgDeformableBody::AttachCollision (dgCollisionInstance* const collision)
+{
+	if (m_collision && m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
+		dgCollisionDeformableMesh* const defomableMesh = (dgCollisionDeformableMesh*) m_collision->GetChildShape();
+		defomableMesh->m_myBody = NULL;
 	}
-*/
+
+	dgBody::AttachCollision(collision);
+
+	if (m_collision && m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
+		dgCollisionDeformableMesh* const defomableMesh = (dgCollisionDeformableMesh*) m_collision->GetChildShape();
+		defomableMesh->m_myBody = this;
+	}
 }
+
 

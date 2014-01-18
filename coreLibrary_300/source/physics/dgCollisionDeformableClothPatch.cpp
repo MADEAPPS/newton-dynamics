@@ -354,14 +354,12 @@ void dgCollisionDeformableClothPatch::EndConfiguration ()
 }
 
 
-void dgCollisionDeformableClothPatch::SetParticlesPositions (const dgMatrix& matrix)
+
+void dgCollisionDeformableClothPatch::SetMass (dgFloat32 mass)
 {
-	dgVector* const posit = m_particles.m_posit;
-	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-		posit[i] = matrix.TransformVector(posit[i]);
-		m_posit[i] = posit[i];
-	}
+	dgAssert(0);
 }
+
 
 
 void dgCollisionDeformableClothPatch::ApplyExternalForces (dgFloat32 timestep)
