@@ -469,22 +469,15 @@ for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
 }
 
 
-/*
-	// integrate each particle by the deformation velocity, also calculate the new com
-	dgFloat32 dampCoef = 0.0f;
-	dgVector com (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	dgVector time (timestep);
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-		instantVelocity[i] += internalVelocity[i].Scale3 (dampCoef);
-		dgVector step (internalVelocity[i].Scale3 (timestep));
-		deltaPositions[i] += step;
-		positions[i] += step;
-		com += positions[i];
+		m_posit[i] += veloc[i].CompProduct4 (time);
+		//dgTrace (("%f %f %f\n", posit[i][0], posit[i][1], posit[i][2] ));
 	}
 
-	// center the particles around the new geometrics center of mass
-	dgVector oldCom (m_particles.m_com);
-	m_particles.m_com = com.Scale (dgFloat32 (1.0f) / m_particles.m_count); 
 
+/*
+	// integrate each particle by the deformation velocity, also calculate the new com
 	// calculate the new body average velocity
 	myBody->m_veloc = (m_particles.m_com - oldCom).Scale (dgFloat32 (1.0f) / timestep);
 	myBody->m_globalCentreOfMass = m_particles.m_com; 
