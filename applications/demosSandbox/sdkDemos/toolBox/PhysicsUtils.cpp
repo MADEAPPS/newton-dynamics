@@ -1146,7 +1146,6 @@ NewtonMesh* LoadNewtonMesh (NewtonWorld* const world, const char* const name)
 	NewtonMesh* mesh = NULL;
 	FILE* const file = fopen (fileName, "rb");
 	if (file) {
-
 		char name[2048];
 		fread (name, strlen(D_MESH_HEADER), 1, file);
 		if (!strncmp (name, D_MESH_HEADER, strlen(D_MESH_HEADER))) {
@@ -1160,7 +1159,23 @@ NewtonMesh* LoadNewtonMesh (NewtonWorld* const world, const char* const name)
 		}
 		fclose (file);
 	}
-
 	return mesh;
+}
+
+void SaveNewtonMesh (NewtonMesh* const mesh, const char* const name)
+{
+	char fileName[2048];
+	GetWorkingFileName (name, fileName);
+	FILE* const file = fopen (fileName, "wb");
+	if (file) {
+		char* const header = D_MESH_HEADER;
+		fwrite (header, strlen(D_MESH_HEADER), 1, file);
+
+		int size = strlen(name);
+		fwrite (&size, sizeof (int), 1, file);
+		fwrite (name, size, 1, file);
+		NewtonMeshSerialize (mesh, DemoEntityManager::SerializeFile, file);
+		fclose (file);
+	}
 }
 

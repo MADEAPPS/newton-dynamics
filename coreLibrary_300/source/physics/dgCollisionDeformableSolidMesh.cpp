@@ -333,7 +333,6 @@ m_positRegionsStart[m_particles.m_count] = dgUnsigned16(m_particles.m_count);
 
 void dgCollisionDeformableSolidMesh::InitRegions()
 {
-
 	dgStack<dgVector> covarianceMatrixPool(m_particles.m_count * 3);
 	dgVector* const covarianceMatrix = &covarianceMatrixPool[0];
 
@@ -367,8 +366,11 @@ void dgCollisionDeformableSolidMesh::InitRegions()
 
 		m_regionCom0[i] = cr0;
 		m_regionAqqInv[i].m_front = mcr0.CompProduct4 (cr0.BroadcastX());
-		m_regionAqqInv[i].m_up = mcr0.CompProduct4 (cr0.BroadcastX());
-		m_regionAqqInv[i].m_right = mcr0.CompProduct4 (cr0.BroadcastX());
+		m_regionAqqInv[i].m_up = mcr0.CompProduct4 (cr0.BroadcastY());
+		m_regionAqqInv[i].m_right = mcr0.CompProduct4 (cr0.BroadcastZ());
+		dgAssert (dgAbsf (m_regionAqqInv[i][1][0] - m_regionAqqInv[i][0][1]) < dgFloat32 (1.0e-6f));
+		dgAssert (dgAbsf (m_regionAqqInv[i][2][0] - m_regionAqqInv[i][0][2]) < dgFloat32 (1.0e-6f));
+		dgAssert (dgAbsf (m_regionAqqInv[i][2][1] - m_regionAqqInv[i][1][2]) < dgFloat32 (1.0e-6f));
 		m_regionAqqInv[i].m_posit = dgVector::m_wOne;
 	}
 
@@ -378,18 +380,23 @@ void dgCollisionDeformableSolidMesh::InitRegions()
 
 		for (dgInt32 j = 0; j < count; j ++) {
 			dgInt32 index = m_positRegions[start + j];
-			m_regionAqqInv[index].m_front += covarianceMatrix[i * 3 + 0];
-			m_regionAqqInv[index].m_up += covarianceMatrix[i * 3 + 1];
-			m_regionAqqInv[index].m_right += covarianceMatrix[i * 3 + 2];
+			dgMatrix& covariance = m_regionAqqInv[index];
+			covariance.m_front += covarianceMatrix[i * 3 + 0];
+			covariance.m_up += covarianceMatrix[i * 3 + 1];
+			covariance.m_right += covarianceMatrix[i * 3 + 2];
+			dgAssert (dgAbsf (covariance[1][0] - covariance[0][1]) < dgFloat32 (1.0e-6f));
+			dgAssert (dgAbsf (covariance[2][0] - covariance[0][2]) < dgFloat32 (1.0e-6f));
+			dgAssert (dgAbsf (covariance[2][1] - covariance[1][2]) < dgFloat32 (1.0e-6f));
 		}
 	}
 
 	for (dgInt32 i = 0; i < m_regionsCount; i ++) {
-		dgAssert (dgAbsf (m_regionAqqInv[i][1][0] - m_regionAqqInv[i][0][1]) < dgFloat32 (1.0e-6f));
-		dgAssert (dgAbsf (m_regionAqqInv[i][2][0] - m_regionAqqInv[i][0][2]) < dgFloat32 (1.0e-6f));
-		dgAssert (dgAbsf (m_regionAqqInv[i][2][1] - m_regionAqqInv[i][1][2]) < dgFloat32 (1.0e-6f));
-		dgAssert (dgAbsf (m_regionAqqInv[i][3][3] - dgFloat32 (1.0f)) < dgFloat32 (1.0e-6f));
-		m_regionAqqInv[i] = m_regionAqqInv[i].Symetric3by3Inverse();
+		dgMatrix& covariance = m_regionAqqInv[i];
+		dgAssert (dgAbsf (covariance[1][0] - covariance[0][1]) < dgFloat32 (1.0e-6f));
+		dgAssert (dgAbsf (covariance[2][0] - covariance[0][2]) < dgFloat32 (1.0e-6f));
+		dgAssert (dgAbsf (covariance[2][1] - covariance[1][2]) < dgFloat32 (1.0e-6f));
+		dgAssert (dgAbsf (covariance[3][3] - dgFloat32 (1.0f)) < dgFloat32 (1.0e-6f));
+		covariance = covariance.Symetric3by3Inverse();
 	}
 }
 
