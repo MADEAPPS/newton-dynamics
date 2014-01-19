@@ -43,176 +43,6 @@
 //#define DG_DEFORMABLE_PLANE_DISTANCE_TOL	 (dgFloat32 (1.0e-4f))
 //#define DG_DEFORMABLE_DEFAULT_SKIN_THICKNESS (dgFloat32 (5.0e-2f))
 
-
-/*
-class dgCollisionDeformableSolidMesh::dgDeformationRegion
-{
-	public:
-
-	void Init (dgCollisionDeformableSolidMesh* const me, dgInt32 count)
-	{
-		m_count = count;
-	}
-
-	void PrecomputeValues (dgCollisionDeformableSolidMesh* const me)
-	{
-		m_com0 = dgVector (dgFloat32 (0.0f));
-		m_AqqInv = dgGetIdentityMatrix();
-		m_rotSeed = dgGetIdentityMatrix();
-		
-		const dgVector* const shapePosit = me->m_shapePosit;
-		const dgFloat32* const unitMass = me->m_particles.m_unitMass;
-
-		m_totalMass = dgFloat32 (0.0f);
-		dgVector accSum (dgFloat32 (0.0f));
-		for (dgInt32 i = 0; i < m_count; i ++) {
-			dgInt32 index = m_indices[i];
-			dgFloat32 mass = unitMass[index];
-			m_totalMass += mass;
-			accSum += shapePosit[index].Scale4 (mass);
-		}
-
-		if (m_totalMass > dgFloat32 (0.0f)) {
-			m_com0 = accSum.Scale4 (dgFloat32 (1.0f) / m_totalMass);
-
-			dgMatrix sumQiQi (dgGetZeroMatrix());
-			for (dgInt32 i = 0; i < m_count; i ++) {
-				dgInt32 index = m_indices[i];
-				dgVector qi (shapePosit[index] - m_com0);
-				dgFloat32 mass = unitMass[index];
-				for (dgInt32 j = 0; j < 3; j ++) {
-					for (dgInt32 k = 0; k < 3; k ++) {
-						sumQiQi[j][k] += mass * qi[j] * qi[k];
-					}
-				}
-			}
-
-			dgAssert (dgAbsf (sumQiQi[1][0] - sumQiQi[0][1]) < dgFloat32 (1.0e-6f));
-			dgAssert (dgAbsf (sumQiQi[2][0] - sumQiQi[0][2]) < dgFloat32 (1.0e-6f));
-			dgAssert (dgAbsf (sumQiQi[2][1] - sumQiQi[1][2]) < dgFloat32 (1.0e-6f));
-			sumQiQi[3][3] = dgFloat32 (1.0f);
-			m_AqqInv = sumQiQi.Symetric3by3Inverse();
-		}
-	}
-
-	void Copy (const dgDeformationRegion& src)
-	{
-		dgAssert (0);
-
-		dgAssert (!m_indices);
-		m_count = src.m_count;
-		m_totalMass = src.m_totalMass;
-		m_com0 = src.m_com0;
-		m_com = src.m_com;
-		m_AqqInv = src.m_AqqInv; 
-		m_rotSeed = src.m_rotSeed; 
-
-		m_indices = (dgInt16*) dgMallocStack(sizeof (dgInt16) * m_count);
-		memcpy (m_indices, src.m_indices, sizeof (dgInt16) * m_count);
-
-	}
-
-
-	void UpdateVelocities(dgCollisionDeformableSolidMesh* const me, dgFloat32 timestep, dgFloat32 stiffness)
-	{
-		dgAssert (0);
-
-		const dgCollisionDeformableSolidMesh::dgParticle& particles = me->m_particles;
-		const dgFloat32* const mass = particles.m_unitMass;
-		const dgVector* const posit0 = me->m_shapePosit;
-		const dgVector* const posit1 = particles.m_posit;
-
-		dgVector com = dgVector (dgFloat32 (0.0f));
-		for (dgInt32 i = 0; i < m_count; i ++) {
-			dgInt32 index = m_indices[i];
-			com += posit1[index].Scale4 (mass[index]);
-		}
-		m_com = com.Scale4 (dgFloat32 (1.0f) / m_totalMass);
-
-		dgMatrix sumQiPi (dgGetZeroMatrix());
-		for (dgInt32 i = 0; i < m_count; i ++) {
-			dgInt32 index = m_indices[i];
-			dgVector pi (posit1[index] - m_com);
-			dgVector qi (posit0[index] - m_com0);
-			dgFloat32 massI = mass[index];
-			for (dgInt32 j = 0; j < 3; j ++) {
-				for (dgInt32 k = 0; k < 3; k ++) {
-					sumQiPi[j][k] += massI * pi[j] * qi[k];
-				}
-			}
-		}
-
-		dgAssert (dgAbsf (sumQiPi[1][0] - sumQiPi[0][1]) < dgFloat32 (1.0e-6f));
-		dgAssert (dgAbsf (sumQiPi[2][0] - sumQiPi[0][2]) < dgFloat32 (1.0e-6f));
-		dgAssert (dgAbsf (sumQiPi[2][1] - sumQiPi[1][2]) < dgFloat32 (1.0e-6f));
-		sumQiPi[3][3] = dgFloat32 (1.0f);
-
-		dgMatrix S (sumQiPi * sumQiPi.Transpose4X4());
-		dgVector eigenValues;
-
-		S.EigenVectors (eigenValues, m_rotSeed);
-		m_rotSeed = S;
-
-
-		#ifdef _DEBUG
-			dgMatrix P0 (sumQiPi * sumQiPi.Transpose4X4());
-			dgMatrix D (dgGetIdentityMatrix());
-			D[0][0] = eigenValues[0];
-			D[1][1] = eigenValues[1];
-			D[2][2] = eigenValues[2];
-			dgMatrix P1 (S.Transpose4X4() * D * S);
-
-			dgMatrix xx (P1 * P0.Symetric3by3Inverse());
-			dgAssert (dgAbsf (xx[0][0] - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
-			dgAssert (dgAbsf (xx[1][1] - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
-			dgAssert (dgAbsf (xx[2][2] - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
-			dgAssert (dgAbsf (xx[0][1]) < dgFloat32 (1.0e-3f));
-			dgAssert (dgAbsf (xx[0][2]) < dgFloat32 (1.0e-3f));
-			dgAssert (dgAbsf (xx[1][0]) < dgFloat32 (1.0e-3f));
-			dgAssert (dgAbsf (xx[1][2]) < dgFloat32 (1.0e-3f));
-			dgAssert (dgAbsf (xx[2][0]) < dgFloat32 (1.0e-3f));
-			dgAssert (dgAbsf (xx[2][1]) < dgFloat32 (1.0e-3f));
-		#endif
-
-		eigenValues = eigenValues.InvSqrt();
-
-		dgMatrix m (S);
-		m.m_front = m.m_front.Scale4 (eigenValues.m_x);
-		m.m_up    = m.m_up.Scale4 (eigenValues.m_y);
-		m.m_right = m.m_right.Scale4 (eigenValues.m_z);
-		dgMatrix invS = S.Transpose4X4() * m;
-		dgMatrix R (invS * sumQiPi);
-		dgMatrix A (m_AqqInv * sumQiPi);
-
-
-dgVector beta0 (dgFloat32 (0.99f));
-dgVector beta1 (dgVector::m_one - beta0);
-		dgMatrix deformationMatrix (dgGetIdentityMatrix());
-		deformationMatrix.m_front = A.m_front.CompProduct4(beta0) + R.m_front.CompProduct4(beta1);
-		deformationMatrix.m_up = A.m_up.CompProduct4(beta0) + R.m_up.CompProduct4(beta1);
-		deformationMatrix.m_right = A.m_right.CompProduct4(beta0) + R.m_right.CompProduct4(beta1);
-
-
-		dgVector invTimeScale (stiffness / timestep);
-		dgVector* const veloc = particles.m_veloc;
-		for (dgInt32 i = 0; i < m_count; i ++) {
-			dgInt32 index = m_indices[i];
-			dgVector gi (deformationMatrix.RotateVector(posit0[index] - m_com0) + m_com);
-			veloc[index] += (gi - posit1[index]).CompProduct4 (invTimeScale);
-//dgTrace (("%f %f %f\n", veloc[i][0], veloc[i][1], veloc[i][2] ));
-		}
-
-	}
-
-	dgMatrix m_AqqInv; 
-	dgMatrix m_rotSeed; 
-	dgVector m_com0;
-	dgFloat32 m_totalMass;
-	dgInt32 m_count;
-};
-*/
-
-
 						   
 dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData)
 	:dgCollisionDeformableMesh (world, deserialization, userData)
@@ -290,12 +120,10 @@ dgCollisionDeformableSolidMesh::~dgCollisionDeformableSolidMesh(void)
 		dgFree (m_weight);
 		dgFree (m_positRegions);
 		dgFree (m_positRegionsStart);
-
 		dgFree (m_regionAqqInv); 
 		dgFree (m_regionRotSeed); 
 		dgFree (m_regionCom0);
 		dgFree (m_regionMass);
-		
 	}
 }
 
@@ -368,10 +196,11 @@ void dgCollisionDeformableSolidMesh::InitRegions()
 		m_regionAqqInv[i].m_front = mcr0.CompProduct4 (cr0.BroadcastX());
 		m_regionAqqInv[i].m_up = mcr0.CompProduct4 (cr0.BroadcastY());
 		m_regionAqqInv[i].m_right = mcr0.CompProduct4 (cr0.BroadcastZ());
+		m_regionAqqInv[i].m_posit = dgVector::m_wOne;
+
 		dgAssert (dgAbsf (m_regionAqqInv[i][1][0] - m_regionAqqInv[i][0][1]) < dgFloat32 (1.0e-6f));
 		dgAssert (dgAbsf (m_regionAqqInv[i][2][0] - m_regionAqqInv[i][0][2]) < dgFloat32 (1.0e-6f));
 		dgAssert (dgAbsf (m_regionAqqInv[i][2][1] - m_regionAqqInv[i][1][2]) < dgFloat32 (1.0e-6f));
-		m_regionAqqInv[i].m_posit = dgVector::m_wOne;
 	}
 
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
@@ -494,40 +323,24 @@ dgVector damp (0.1f);
 
 void dgCollisionDeformableSolidMesh::ResolvePositionsConstraints (dgFloat32 timestep)
 {
-	dgAssert (m_myBody);
-//	dgVector* const posit = m_particles.m_posit;
-//	dgVector* const veloc = m_particles.m_veloc;
-	const dgFloat32* const masses = m_particles.m_unitMass;
 
-//	dgBody* const body = GetBody();
-	// calculate velocity contribution by each particle regions
-//	for (dgInt32 i = 0; i < m_regionsCount; i ++) {
-//		m_regions[i].UpdateVelocities(this, timestep, m_stiffness);
-//	}
+	dgAssert (m_myBody);
 
 	dgInt32 strideInBytes = sizeof (dgVector) * m_regionsCount + sizeof (dgMatrix) * m_regionsCount + 3 * sizeof (dgVector) * m_particles.m_count;
 	m_world->m_solverMatrixMemory.ExpandCapacityIfNeessesary (1, strideInBytes);
-	dgMatrix* const sumQiPi = (dgMatrix*) &m_world->m_solverMatrixMemory[0];
-	dgVector* const covarianceMatrix = (dgVector*) &sumQiPi[m_regionsCount];
-	dgVector* const regionCom = &covarianceMatrix[m_particles.m_count * 3];
+	dgVector* const regionCom = (dgVector*)&m_world->m_solverMatrixMemory[0];
+	dgMatrix* const sumQiPi = (dgMatrix*) &regionCom[m_regionsCount];
+	dgVector* const covarianceMatrix = (dgVector*) &sumQiPi[3 * m_regionsCount];
 
-	memset (sumQiPi, 0, m_regionsCount * sizeof (dgMatrix));
-	memset (regionCom, 0, m_regionsCount * sizeof (dgVector));
-	memset (covarianceMatrix, 0, 3 * m_regionsCount * sizeof (dgVector));
+	const dgFloat32* const masses = m_particles.m_unitMass;
+	dgVector zero (dgFloat32 (0.0f));
+	for (dgInt32 i = 0; i < m_regionsCount; i ++) {
+		regionCom[i] = zero;
+	}
 
-//	const dgCollisionDeformableSolidMesh::dgParticle& particles = me->m_particles;
-//	const dgFloat32* const mass = particles.m_unitMass;
-//	const dgVector* const posit0 = me->m_shapePosit;
-//	const dgVector* const posit1 = particles.m_posit;
-//	dgVector com = dgVector (dgFloat32 (0.0f));
-//	for (dgInt32 i = 0; i < m_count; i ++) {
-//		dgInt32 index = m_indices[i];
-//		com += posit1[index].Scale4 (mass[index]);
-//	}
-//	m_com = com.Scale4 (dgFloat32 (1.0f) / m_totalMass);
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
 		const dgVector& r = m_posit[i];
-		dgVector mr (r.Scale4(masses[i]));
+		dgVector mr (r.Scale4(masses[i]) & dgVector::m_triplexMask);
 		covarianceMatrix[i * 3 + 0] = mr.CompProduct4(r.BroadcastX()); 
 		covarianceMatrix[i * 3 + 1] = mr.CompProduct4(r.BroadcastY()); 
 		covarianceMatrix[i * 3 + 2] = mr.CompProduct4(r.BroadcastZ()); 
@@ -541,21 +354,20 @@ void dgCollisionDeformableSolidMesh::ResolvePositionsConstraints (dgFloat32 time
 	}
 
 	for (dgInt32 i = 0; i < m_regionsCount; i ++) {
-		regionCom[i] = regionCom[i].Scale4 (dgFloat32 (1.0f) / m_regionMass[i]);
-	}
+		dgVector mcr (regionCom[i]);
+		dgVector cr (mcr.Scale4 (dgFloat32 (1.0f) / m_regionMass[i]));
+		mcr = mcr.CompProduct4(dgVector::m_negOne);
+		regionCom[i] = cr;
 
-//	dgMatrix sumQiPi (dgGetZeroMatrix());
-//	for (dgInt32 i = 0; i < m_count; i ++) {
-//		dgInt32 index = m_indices[i];
-//		dgVector pi (posit1[index] - m_com);
-//		dgVector qi (posit0[index] - m_com0);
-//		dgFloat32 massI = mass[index];
-//		for (dgInt32 j = 0; j < 3; j ++) {
-//			for (dgInt32 k = 0; k < 3; k ++) {
-//				sumQiPi[j][k] += massI * pi[j] * qi[k];
-//			}
-//		}
-//	}
+		dgMatrix& QiPi = sumQiPi[i];
+		QiPi.m_front = mcr.CompProduct4 (cr.BroadcastX());
+		QiPi.m_up = mcr.CompProduct4 (cr.BroadcastY());
+		QiPi.m_right = mcr.CompProduct4 (cr.BroadcastZ());
+		QiPi.m_posit = dgVector::m_wOne;
+		dgAssert (dgAbsf (QiPi[1][0] - QiPi[0][1]) < dgFloat32 (1.0e-6f));
+		dgAssert (dgAbsf (QiPi[2][0] - QiPi[0][2]) < dgFloat32 (1.0e-6f));
+		dgAssert (dgAbsf (QiPi[2][1] - QiPi[1][2]) < dgFloat32 (1.0e-6f));
+	}
 
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
 		const dgInt32 start = m_positRegionsStart[i];
@@ -563,131 +375,98 @@ void dgCollisionDeformableSolidMesh::ResolvePositionsConstraints (dgFloat32 time
 
 		for (dgInt32 j = 0; j < count; j ++) {
 			dgInt32 index = m_positRegions[start + j];
-			sumQiPi[index].m_front += covarianceMatrix[i * 3 + 0];
-			sumQiPi[index].m_up += covarianceMatrix[i * 3 + 1];
-			sumQiPi[index].m_right += covarianceMatrix[i * 3 + 2];
+			dgMatrix& covariance = sumQiPi[index];
+			covariance.m_front += covarianceMatrix[i * 3 + 0];
+			covariance.m_up += covarianceMatrix[i * 3 + 1];
+			covariance.m_right += covarianceMatrix[i * 3 + 2];
+//			dgAssert (dgAbsf (covariance[1][0] - covariance[0][1]) < dgFloat32 (1.0e-6f));
+//			dgAssert (dgAbsf (covariance[2][0] - covariance[0][2]) < dgFloat32 (1.0e-6f));
+//			dgAssert (dgAbsf (covariance[2][1] - covariance[1][2]) < dgFloat32 (1.0e-6f));
 		}
 	}
 
-/*
+
+	dgVector beta0 (dgFloat32 (0.99f));
+	dgVector beta1 (dgVector::m_one - beta0);
+	dgFloat32 stiffness = dgFloat32 (0.8f);
+
 	for (dgInt32 i = 0; i < m_regionsCount; i ++) {
-		dgMatrix matrixsumQiPi;
+		dgMatrix& QiPi = sumQiPi[i];
+		dgAssert (dgAbsf (QiPi[1][0] - QiPi[0][1]) < dgFloat32 (1.0e-6f));
+		dgAssert (dgAbsf (QiPi[2][0] - QiPi[0][2]) < dgFloat32 (1.0e-6f));
+		dgAssert (dgAbsf (QiPi[2][1] - QiPi[1][2]) < dgFloat32 (1.0e-6f));
+		dgAssert (dgAbsf (QiPi[3][3] - dgFloat32 (1.0f)) < dgFloat32 (1.0e-6f));
+
+		dgMatrix S (QiPi * QiPi.Transpose4X4());
 		dgVector eigenValues;
 
-		matrixsumQiPi.m_front = sumQiPi[i * 3 + 0];
-		matrixsumQiPi.m_up = sumQiPi[i * 3 + 1];
-		matrixsumQiPi.m_right = sumQiPi[i * 3 + 2];
-		matrixsumQiPi.m_posit = dgVector::m_wOne;
-
-		//dgAssert (dgAbsf (sumQiPi[1][0] - sumQiPi[0][1]) < dgFloat32 (1.0e-6f));
-		//dgAssert (dgAbsf (sumQiPi[2][0] - sumQiPi[0][2]) < dgFloat32 (1.0e-6f));
-		//dgAssert (dgAbsf (sumQiPi[2][1] - sumQiPi[1][2]) < dgFloat32 (1.0e-6f));
-		//sumQiPi[3][3] = dgFloat32 (1.0f);
-		dgAssert (dgAbsf (matrixsumQiPi[1][0] - matrixsumQiPi[0][1]) < dgFloat32 (1.0e-6f));
-		dgAssert (dgAbsf (matrixsumQiPi[2][0] - matrixsumQiPi[0][2]) < dgFloat32 (1.0e-6f));
-		dgAssert (dgAbsf (matrixsumQiPi[2][1] - matrixsumQiPi[1][2]) < dgFloat32 (1.0e-6f));
-
-		//dgMatrix S (sumQiPi * sumQiPi.Transpose4X4());
-		//S.EigenVectors (eigenValues, m_rotSeed);
-		//m_rotSeed = S;
-
-		dgMatrix S (matrixsumQiPi * matrixsumQiPi.Transpose4X4());
 		S.EigenVectors (eigenValues, m_regionRotSeed[i]);
 		m_regionRotSeed[i] = S;
 
 #ifdef _DEBUG
-//		dgMatrix P0 (sumQiPi * sumQiPi.Transpose4X4());
-//		dgMatrix D (dgGetIdentityMatrix());
-//		D[0][0] = eigenValues[0];
-//		D[1][1] = eigenValues[1];
-//		D[2][2] = eigenValues[2];
-//		dgMatrix P1 (S.Transpose4X4() * D * S);
+		dgMatrix P0 (QiPi * QiPi.Transpose4X4());
+		dgMatrix D (dgGetIdentityMatrix());
+		D[0][0] = eigenValues[0];
+		D[1][1] = eigenValues[1];
+		D[2][2] = eigenValues[2];
+		dgMatrix P1 (S.Transpose4X4() * D * S);
 
-//		dgMatrix xx (P1 * P0.Symetric3by3Inverse());
-//		dgAssert (dgAbsf (xx[0][0] - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
-//		dgAssert (dgAbsf (xx[1][1] - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
-//		dgAssert (dgAbsf (xx[2][2] - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
-//		dgAssert (dgAbsf (xx[0][1]) < dgFloat32 (1.0e-3f));
-//		dgAssert (dgAbsf (xx[0][2]) < dgFloat32 (1.0e-3f));
-//		dgAssert (dgAbsf (xx[1][0]) < dgFloat32 (1.0e-3f));
-//		dgAssert (dgAbsf (xx[1][2]) < dgFloat32 (1.0e-3f));
-//		dgAssert (dgAbsf (xx[2][0]) < dgFloat32 (1.0e-3f));
-//		dgAssert (dgAbsf (xx[2][1]) < dgFloat32 (1.0e-3f));
-
+		dgMatrix xx (P1 * P0.Symetric3by3Inverse());
+		dgAssert (dgAbsf (xx[0][0] - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+		dgAssert (dgAbsf (xx[1][1] - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+		dgAssert (dgAbsf (xx[2][2] - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+		dgAssert (dgAbsf (xx[0][1]) < dgFloat32 (1.0e-3f));
+		dgAssert (dgAbsf (xx[0][2]) < dgFloat32 (1.0e-3f));
+		dgAssert (dgAbsf (xx[1][0]) < dgFloat32 (1.0e-3f));
+		dgAssert (dgAbsf (xx[1][2]) < dgFloat32 (1.0e-3f));
+		dgAssert (dgAbsf (xx[2][0]) < dgFloat32 (1.0e-3f));
+		dgAssert (dgAbsf (xx[2][1]) < dgFloat32 (1.0e-3f));
 #endif
 
 		eigenValues = eigenValues.InvSqrt();
 
-//		dgMatrix m (S);
-//		m.m_front = m.m_front.Scale4 (eigenValues.m_x);
-//		m.m_up    = m.m_up.Scale4 (eigenValues.m_y);
-//		m.m_right = m.m_right.Scale4 (eigenValues.m_z);
-
 		dgMatrix m;
-		m.m_front = m.m_front.CompProduct4(eigenValues.BroadcastX());
-		m.m_up = m.m_up.CompProduct4(eigenValues.BroadcastX());
-		m.m_right = m.m_right.CompProduct4(eigenValues.BroadcastX());
+		m.m_front = m.m_front.Scale4 (eigenValues.m_x);
+		m.m_up    = m.m_up.Scale4 (eigenValues.m_y);
+		m.m_right = m.m_right.Scale4 (eigenValues.m_z);
 		m.m_posit = dgVector::m_wOne;
-
-		//dgMatrix invS = S.Transpose4X4() * m;
 		dgMatrix invS (S.Transpose4X4() * m);
-		dgMatrix R (invS * matrixsumQiPi[i]);
-		dgMatrix A (m_regionAqqInv[i] * matrixsumQiPi[i]);
+		dgMatrix R (invS * QiPi);
+		dgMatrix A (m_regionAqqInv[i] * QiPi);
 
-		dgVector beta0 (dgFloat32 (0.99f));
-		dgVector beta1 (dgVector::m_one - beta0);
-		sumQiPi[i].m_front = A.m_front.CompProduct4(beta0) + R.m_front.CompProduct4(beta1);
-		sumQiPi[i].m_up = A.m_up.CompProduct4(beta0) + R.m_up.CompProduct4(beta1);
-		sumQiPi[i].m_right = A.m_right.CompProduct4(beta0) + R.m_right.CompProduct4(beta1);
-		sumQiPi[i].m_posit = dgVector::m_wOne;
+		QiPi.m_front = A.m_front.CompProduct4(beta0) + R.m_front.CompProduct4(beta1);
+		QiPi.m_up = A.m_up.CompProduct4(beta0) + R.m_up.CompProduct4(beta1);
+		QiPi.m_right = A.m_right.CompProduct4(beta0) + R.m_right.CompProduct4(beta1);
 	}
 
 
-
-//	dgVector invTimeScale (stiffness / timestep);
-//	dgVector* const veloc = particles.m_veloc;
-//	for (dgInt32 i = 0; i < m_count; i ++) {
-//		dgInt32 index = m_indices[i];
-//		dgVector gi (deformationMatrix.RotateVector(posit0[index] - m_com0) + m_com);
-//		veloc[index] += (gi - posit1[index]).CompProduct4 (invTimeScale);
-//		//dgTrace (("%f %f %f\n", veloc[i][0], veloc[i][1], veloc[i][2] ));
-//	}
+	dgVector invTimeScale (stiffness / timestep);
+	dgVector* const veloc = m_particles.m_veloc;
 
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
 		const dgInt32 start = m_positRegionsStart[i];
 		const dgInt32 count = m_positRegionsStart[i + 1] - start;
 
-		const dgVector& p = m_shapePosit[i];
-		dgVector averageVeloc (dgFloat32(0.0f));
+		const dgVector& p0 = m_posit[i];
+		const dgVector& q0 = m_shapePosit[i];
 		for (dgInt32 j = 0; j < count; j ++) {
 			dgInt32 index = m_positRegions[start + j];
 			const dgMatrix& matrix = sumQiPi[index];
-			dgVector gi (matrix.RotateVector(p - m_regionCom0[index]) + regionCom[index]);
+			dgVector gi (matrix.RotateVector(q0 - m_regionCom0[index]) + regionCom[index]);
+			dgVector v ((gi - p0).CompProduct4(invTimeScale).Scale4 (m_weight[index]));
+			veloc[index] += v;
 		}
 	}
-*/
 
-/*
-	// resolve collisions here
+
+// resolve collisions here
 //for now just a hack a collision plane until I get the engine up an running
 for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-	if (posit[i].m_y < dgFloat32 (0.0f)) {
-		posit[i].m_y = dgFloat32 (0.0f);
+	if (m_posit[i].m_y < dgFloat32 (0.0f)) {
+		m_posit[i].m_y = dgFloat32 (0.0f);
 		veloc[i].m_y = dgFloat32 (0.0f);
 	}
 }
-
-
-
-	// integrate particle positions
-	dgVector invTimeStep (timestep);
-	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-		posit[i] += veloc[i].CompProduct4 (invTimeStep);
-//dgTrace (("%f %f %f\n", posit[i][0], posit[i][1], posit[i][2] ));
-	}
-//dgTrace(("\n"));
-
-*/
 
 
 /*
@@ -721,4 +500,7 @@ for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
 
 	SetCollisionBBox (m_rootNode->m_minBox, m_rootNode->m_maxBox);
 */
+
+
+
 }
