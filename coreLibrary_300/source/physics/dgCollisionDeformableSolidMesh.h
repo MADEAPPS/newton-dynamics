@@ -54,6 +54,7 @@ class dgCollisionDeformableSolidMesh: public dgCollisionDeformableMesh
 
 	dgVector* m_posit;
 	dgVector* m_shapePosit;
+	dgFloat32* m_weight;
 	dgUnsigned16* m_positRegions;
 	dgUnsigned16* m_positRegionsStart;
 	

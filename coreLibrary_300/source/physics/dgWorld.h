@@ -500,7 +500,6 @@ class dgWorld
 	friend class dgWorldDynamicUpdate;
 	friend class dgParallelSolverClear;	
 	friend class dgParallelSolverSolve;
-
 	friend class dgCollisionHeightField;
 	friend class dgSolverWorlkerThreads;
 	friend class dgCollisionConvexPolygon;
@@ -509,14 +508,14 @@ class dgWorld
 	friend class dgParallelSolverUpdateForce;
 	friend class dgParallelSolverUpdateVeloc;
 	friend class dgParallelSolverBodyInertia;
-	friend class dgParallelSolverInitFeedbackUpdate;
+	friend class dgCollisionDeformableSolidMesh;
 	friend class dgBroadPhaseApplyExternalForce;
 	friend class dgParallelSolverCalculateForces;
 	friend class dgParallelSolverJointAcceleration;
 	friend class dgParallelSolverBuildJacobianRows;
+	friend class dgParallelSolverInitFeedbackUpdate;
 	friend class dgParallelSolverInitInternalForces;
 	friend class dgParallelSolverBuildJacobianMatrix;
-	
 	friend class dgBroadPhaseMaterialCallbackWorkerThread;
 	friend class dgBroadPhaseCalculateContactsWorkerThread;
 } DG_GCC_VECTOR_ALIGMENT ;

@@ -124,19 +124,12 @@ class SimpleSoftBodyEntity: public DemoEntity
 		}
 	}
 
-	static NewtonCollision* CreateSoftBodyCollisionShape (DemoEntityManager* const scene)
+	static NewtonCollision* CreateSoftBodyCollisionShape (DemoEntityManager* const scene, const char* const meshName)
 	{
+		// load the mesh
 		NewtonWorld* const world = scene->GetNewton();
+		NewtonMesh* const mesh = LoadNewtonMesh (world, meshName);
 
-		// create two auxiliary objects to help with the graphics part
-		// make a Box collision as a source to make a mesh 
-		dVector size (2.0f, 2.0f, 2.0f, 0.0f);
-
-		NewtonCollision* const box = CreateConvexCollision (world, GetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
-		//NewtonCollision* const box = CreateConvexCollision (world, GetIdentityMatrix(), size, _SPHERE_PRIMITIVE, 0);
-
-		// now convert the collision into a mesh, with materials and UV
-		NewtonMesh* const mesh = NewtonMeshCreateFromCollision(box);
 		int material = LoadTexture("smilli.tga");
 		NewtonMeshApplyBoxMapping(mesh, material, material, material);
 		//NewtonMeshApplySphericalMapping(mesh, material);
@@ -148,7 +141,6 @@ class SimpleSoftBodyEntity: public DemoEntity
 		
 		// destroy the auxiliary objects
 		NewtonMeshDestroy(mesh);
-		NewtonDestroyCollision (box);
 		return softCollisionMesh;
 	}
 
@@ -363,7 +355,7 @@ void SoftBodies(DemoEntityManager* const scene)
 
 	dVector location (15.0f, 10.0f, 0.0f, 0.0f) ;
 
-	NewtonCollision* const softBody = SimpleSoftBodyEntity::CreateSoftBodyCollisionShape (scene);
+	NewtonCollision* const softBody = SimpleSoftBodyEntity::CreateSoftBodyCollisionShape (scene, "softBox.nme");
 	new SimpleSoftBodyEntity (scene, softBody, location);
 	NewtonDestroyCollision (softBody);
 

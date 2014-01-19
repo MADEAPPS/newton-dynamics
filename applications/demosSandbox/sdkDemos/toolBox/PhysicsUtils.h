@@ -87,6 +87,9 @@ void AddPrimitiveArray (DemoEntityManager* const scene, dFloat mass, const dVect
 NewtonBody* CreateLevelMesh (DemoEntityManager* const scene, const char* const levelName, bool optimized);
 
 
+NewtonMesh* LoadNewtonMesh (NewtonWorld* const world, const char* const fileName);
+
+
 //void SerializationWorld (const char* const name, NewtonWorld* const world);
 
 #endif
