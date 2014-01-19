@@ -265,6 +265,17 @@ void dgCollisionDeformableSolidMesh::SetMass (dgFloat32 mass)
 	}
 }
 
+void dgCollisionDeformableSolidMesh::SetMatrix(const dgMatrix& matrix)
+{
+   	dgAssert (m_myBody);
+   	dgBody* const body = GetBody();
+    dgMatrix globalMatrix (body->GetCollision()->GetLocalMatrix() * matrix);
+    for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
+        m_particles.m_posit[i] = m_shapePosit[i];
+        m_posit[i] = matrix.TransformVector(m_shapePosit[i]);
+    }
+}
+
 
 void dgCollisionDeformableSolidMesh::ApplyExternalForces (dgFloat32 timestep)
 {
@@ -280,21 +291,17 @@ void dgCollisionDeformableSolidMesh::ApplyExternalForces (dgFloat32 timestep)
 	dgVector velocyStep (body->GetForce().Scale4(invMass * timestep));
 
 	dgVector* const veloc = m_particles.m_veloc;
-	const dgVector* const particlePosit = m_particles.m_posit;
 	dgFloat32* const unitMass = m_particles.m_unitMass;
 
 	dgVector com (dgFloat32 (0.0f));
 	dgVector comVeloc (dgFloat32 (0.0f));
-
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
 		dgVector mass (unitMass[i]);
-		dgVector p (matrix.TransformVector(particlePosit[i]));
-		m_posit[i] = p;
+        const dgVector& p = m_posit[i]; 
 		veloc[i] += velocyStep;
 		com += p.CompProduct4(mass);
 		comVeloc += veloc[i].CompProduct4(mass);
 	}
-
 	com = com.Scale4(invMass);
 	comVeloc = comVeloc.Scale4(invMass);
 
@@ -317,13 +324,16 @@ dgVector damp (0.1f);
 		dgVector deltaVeloc (comVeloc + omega * r - veloc[i]);
 		veloc[i] += deltaVeloc.CompProduct4(damp);
 	}
+
+    InertiaMatrix.EigenVectors (matrix);
+    InertiaMatrix.m_posit = matrix.m_posit;
+
+    body->GetCollision()->SetGlobalMatrix(InertiaMatrix);
+    body->SetMatrixOriginAndRotation(body->GetCollision()->GetLocalMatrix().Inverse() * InertiaMatrix);
 }
-
-
 
 void dgCollisionDeformableSolidMesh::ResolvePositionsConstraints (dgFloat32 timestep)
 {
-
 	dgAssert (m_myBody);
 
 	dgInt32 strideInBytes = sizeof (dgVector) * m_regionsCount + sizeof (dgMatrix) * m_regionsCount + 3 * sizeof (dgVector) * m_particles.m_count;
@@ -379,9 +389,9 @@ void dgCollisionDeformableSolidMesh::ResolvePositionsConstraints (dgFloat32 time
 			covariance.m_front += covarianceMatrix[i * 3 + 0];
 			covariance.m_up += covarianceMatrix[i * 3 + 1];
 			covariance.m_right += covarianceMatrix[i * 3 + 2];
-//			dgAssert (dgAbsf (covariance[1][0] - covariance[0][1]) < dgFloat32 (1.0e-6f));
-//			dgAssert (dgAbsf (covariance[2][0] - covariance[0][2]) < dgFloat32 (1.0e-6f));
-//			dgAssert (dgAbsf (covariance[2][1] - covariance[1][2]) < dgFloat32 (1.0e-6f));
+			dgAssert (dgAbsf (covariance[1][0] - covariance[0][1]) < dgFloat32 (1.0e-6f));
+			dgAssert (dgAbsf (covariance[2][0] - covariance[0][2]) < dgFloat32 (1.0e-6f));
+			dgAssert (dgAbsf (covariance[2][1] - covariance[1][2]) < dgFloat32 (1.0e-6f));
 		}
 	}
 
@@ -403,7 +413,7 @@ void dgCollisionDeformableSolidMesh::ResolvePositionsConstraints (dgFloat32 time
 		S.EigenVectors (eigenValues, m_regionRotSeed[i]);
 		m_regionRotSeed[i] = S;
 
-#ifdef _DEBUG
+#if 0
 		dgMatrix P0 (QiPi * QiPi.Transpose4X4());
 		dgMatrix D (dgGetIdentityMatrix());
 		D[0][0] = eigenValues[0];
@@ -426,9 +436,9 @@ void dgCollisionDeformableSolidMesh::ResolvePositionsConstraints (dgFloat32 time
 		eigenValues = eigenValues.InvSqrt();
 
 		dgMatrix m;
-		m.m_front = m.m_front.Scale4 (eigenValues.m_x);
-		m.m_up    = m.m_up.Scale4 (eigenValues.m_y);
-		m.m_right = m.m_right.Scale4 (eigenValues.m_z);
+		m.m_front = S.m_front.Scale4 (eigenValues.m_x);
+		m.m_up    = S.m_up.Scale4 (eigenValues.m_y);
+		m.m_right = S.m_right.Scale4 (eigenValues.m_z);
 		m.m_posit = dgVector::m_wOne;
 		dgMatrix invS (S.Transpose4X4() * m);
 		dgMatrix R (invS * QiPi);
@@ -468,32 +478,24 @@ for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
 	}
 }
 
-
 	dgVector time (timestep);
+    dgVector minBox (dgFloat32 (1.0e10f));
+    dgVector maxBox (dgFloat32 (-1.0e10f));
+    dgMatrix matrix (m_myBody->GetCollision()->GetGlobalMatrix().Inverse());
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
 		m_posit[i] += veloc[i].CompProduct4 (time);
-		//dgTrace (("%f %f %f\n", posit[i][0], posit[i][1], posit[i][2] ));
+		minBox = minBox.GetMin(m_posit[i]);
+        maxBox = maxBox.GetMax(m_posit[i]);
+        m_particles.m_posit[i] = matrix.TransformVector(m_posit[i]);
 	}
 
-
-/*
 	// integrate each particle by the deformation velocity, also calculate the new com
 	// calculate the new body average velocity
-	myBody->m_veloc = (m_particles.m_com - oldCom).Scale (dgFloat32 (1.0f) / timestep);
-	myBody->m_globalCentreOfMass = m_particles.m_com; 
-	myBody->m_matrix.m_posit = m_particles.m_com; 
-
-	//myBody->UpdateMatrix (timestep, threadIndex);
-	if (myBody->m_matrixUpdate) {
-		myBody->m_matrixUpdate (*myBody, myBody->m_matrix, threadIndex);
-	}
-
+//	myBody->m_veloc = (m_particles.m_com - oldCom).Scale (dgFloat32 (1.0f) / timestep);
+//	if (myBody->m_matrixUpdate) {
+//		myBody->m_matrixUpdate (*myBody, myBody->m_matrix, threadIndex);
+//	}
 	// the collision changed shape, need to update spatial structure 
-	UpdateCollision ();
-
-	SetCollisionBBox (m_rootNode->m_minBox, m_rootNode->m_maxBox);
-*/
-
-
-
+//	UpdateCollision ();
+//	SetCollisionBBox (m_rootNode->m_minBox, m_rootNode->m_maxBox);
 }

@@ -40,6 +40,7 @@ class dgDeformableBody: public dgBody
 	virtual bool IsDeformable() const;
 	virtual bool IsInEquilibrium  () const;
 
+    virtual void SetMatrix(const dgMatrix& matrix);
 	virtual void ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex);
 	virtual void SetVelocity (const dgVector& velocity);
 

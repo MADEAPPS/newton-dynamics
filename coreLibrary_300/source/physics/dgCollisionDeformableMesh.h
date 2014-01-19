@@ -91,6 +91,7 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	void GetVisualVertexData(dgInt32 vertexStrideInByte, dgFloat32* const vertex, dgInt32 normalStrideInByte, dgFloat32* const normals, dgInt32 uvStrideInByte0, dgFloat32* const uv0);
 	
 	virtual void SetMass (dgFloat32 mass) = 0;
+    virtual void SetMatrix(const dgMatrix& matrix) = 0;
 	virtual void ApplyExternalForces (dgFloat32 timestep) = 0;
 	virtual void ResolvePositionsConstraints (dgFloat32 timestep) = 0;
 	

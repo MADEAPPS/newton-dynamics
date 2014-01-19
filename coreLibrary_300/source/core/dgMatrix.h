@@ -84,9 +84,7 @@ class dgMatrix
 	dgMatrix operator* (const dgMatrix &B) const;
 	
 
-	// this function can not be a member of dgMatrix, because
-	// dgMatrix a define to handle only orthogonal matrices
-	// and this function take a parameter to a symmetric matrix
+	// these function can only be called when dgMatrix is a PDS matrix
 	void EigenVectors (dgVector &eigenValues, const dgMatrix& initialGuess = dgGetIdentityMatrix());
 	void EigenVectors (const dgMatrix& initialGuess = dgGetIdentityMatrix());
 	void PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, dgMatrix& stretchAxis, const dgMatrix& initialStretchAxis = dgGetIdentityMatrix()) const;
@@ -299,12 +297,6 @@ DG_INLINE dgMatrix dgRollMatrix(dgFloat32 ang)
 		dgVector ( dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f)), 
 		dgVector ( dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f))); 
 }																		 
-
-DG_INLINE dgMatrix dgCovarianceMatrix (const dgVector& A, const dgVector& B)
-{
-
-	return dgMatrix (dgGetIdentityMatrix()) ;
-}
 
 
 #endif

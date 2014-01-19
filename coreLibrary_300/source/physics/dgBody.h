@@ -81,7 +81,6 @@ class dgBody
 
 
 	const dgMatrix& GetMatrix() const;
-	void SetMatrix(const dgMatrix& matrix);
 	const dgQuaternion& GetRotation() const;
 	const dgVector& GetPosition() const;
 	
@@ -166,10 +165,11 @@ class dgBody
 	
 	virtual void InvalidateCache();
 	
+    virtual void SetMatrix(const dgMatrix& matrix);
+    virtual void SetMatrixIgnoreSleep(const dgMatrix& matrix);
 	virtual void IntegrateVelocity (dgFloat32 timestep);
 	virtual void AttachCollision (dgCollisionInstance* const collision);
-	virtual void SetMatrixIgnoreSleep(const dgMatrix& matrix);
-
+    
 	virtual void ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex) = 0;		
 	virtual OnApplyExtForceAndTorque GetExtForceAndTorqueCallback () const = 0;
 	virtual void SetExtForceAndTorqueCallback (OnApplyExtForceAndTorque callback) = 0;
@@ -186,9 +186,10 @@ class dgBody
 	virtual dgConstraint* GetNextContact(dgConstraint* const joint) const;
 	virtual dgVector CalculateInverseDynamicForce (const dgVector& desiredVeloc, dgFloat32 timestep) const;
 
+    void SetMatrixOriginAndRotation(const dgMatrix& matrix);
+
 	protected:
 	void UpdateWorlCollisionMatrix() const;
-	void SetMatrixOriginAndRotation(const dgMatrix& matrix);
 	void UpdateMatrix (dgFloat32 timestep, dgInt32 threadIndex);
 	void UpdateCollisionMatrix (dgFloat32 timestep, dgInt32 threadIndex);
 

@@ -499,6 +499,7 @@ void dgMatrix::EigenVectors (dgVector &eigenValues, const dgMatrix& initialGuess
 			// order the eigenvalue vectors	
 			dgVector tmp (eigenVectors.m_front * eigenVectors.m_up);
 			if (tmp % eigenVectors.m_right < dgFloat32(0.0f)) {
+                dgAssert (0.0f);
 				eigenVectors.m_right = eigenVectors.m_right.Scale3 (-dgFloat32(1.0f));
 			}
 

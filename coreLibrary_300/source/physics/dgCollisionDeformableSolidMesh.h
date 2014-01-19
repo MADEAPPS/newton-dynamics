@@ -42,6 +42,7 @@ class dgCollisionDeformableSolidMesh: public dgCollisionDeformableMesh
 	virtual dgInt32 CalculateSignature () const;
 
 	virtual void SetMass (dgFloat32 mass);
+    virtual void SetMatrix(const dgMatrix& matrix);
 	virtual void ApplyExternalForces (dgFloat32 timestep);
 	virtual void ResolvePositionsConstraints (dgFloat32 timestep);
 

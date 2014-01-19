@@ -353,7 +353,10 @@ void dgCollisionDeformableClothPatch::EndConfiguration ()
 	}
 }
 
-
+void dgCollisionDeformableClothPatch::SetMatrix(const dgMatrix& matrix)
+{
+    dgAssert (0);
+}
 
 void dgCollisionDeformableClothPatch::SetMass (dgFloat32 mass)
 {

@@ -154,3 +154,12 @@ void dgDeformableBody::AttachCollision (dgCollisionInstance* const collision)
 }
 
 
+void dgDeformableBody::SetMatrix(const dgMatrix& matrix)
+{
+    if (m_collision && m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
+        dgCollisionDeformableMesh* const defomableMesh = (dgCollisionDeformableMesh*) m_collision->GetChildShape();
+        defomableMesh->SetMatrix (matrix);
+    }
+   
+    dgBody::SetMatrix(matrix);
+}
