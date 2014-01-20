@@ -47,8 +47,11 @@ class dgMatrix
 	dgMatrix (const dgVector &front, const dgVector &up, const dgVector &right, const dgVector &posit);
 	dgMatrix (const dgQuaternion &rotation, const dgVector &position);
 
-	// create a orthonormal normal vector basis
+	// create a orthonormal normal vector basis, front become m_front vector, and m_up and m_right are mutualiperpendicular to fron and to each other
 	dgMatrix (const dgVector &front);
+
+	// create a covariance Matrix = transpose(p) * q 
+	dgMatrix (const dgVector& p, const dgVector& q);
 
 	dgVector& operator[] (dgInt32 i);
 	const dgVector& operator[] (dgInt32 i) const;
@@ -82,6 +85,9 @@ class dgMatrix
 
 
 	dgMatrix operator* (const dgMatrix &B) const;
+
+
+	
 	
 
 	// these function can only be called when dgMatrix is a PDS matrix
@@ -114,6 +120,14 @@ DG_INLINE dgMatrix::dgMatrix (const dgFloat32* const array)
 
 DG_INLINE dgMatrix::dgMatrix (const dgVector &front, const dgVector &up, const dgVector &right, const dgVector &posit)
 	:m_front (front), m_up(up), m_right(right), m_posit(posit)
+{
+}
+
+DG_INLINE dgMatrix::dgMatrix (const dgVector& p, const dgVector& q)
+	:m_front(q.CompProduct4(p.BroadcastX()))
+	,m_up(q.CompProduct4(p.BroadcastY()))
+	,m_right(q.CompProduct4(p.BroadcastZ()))
+	,m_posit (dgVector::m_wOne)
 {
 }
 
@@ -297,6 +311,7 @@ DG_INLINE dgMatrix dgRollMatrix(dgFloat32 ang)
 		dgVector ( dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f)), 
 		dgVector ( dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f))); 
 }																		 
+
 
 
 #endif
