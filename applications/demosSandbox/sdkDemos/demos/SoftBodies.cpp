@@ -127,7 +127,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 	static NewtonCollision* CreateSoftBodyCollisionShape (DemoEntityManager* const scene, const char* const meshName, const char* const textureName)
 	{
 		NewtonWorld* const world = scene->GetNewton();
-/*
+#if 0
 		// load the mesh
 		NewtonMesh* const mesh = LoadNewtonMesh (world, meshName);
 		// replace the materials
@@ -135,18 +135,16 @@ class SimpleSoftBodyEntity: public DemoEntity
 		for (void* face = NewtonMeshGetFirstFace (mesh); face; face = NewtonMeshGetNextFace(mesh, face)) {
 			NewtonMeshSetFaceMaterial (mesh, face, material);
 		}
-
 		// reconstruct the vertex normals
 		NewtonMeshCalculateVertexNormals (mesh, 45.8f * 3.1415f/ 180.0f);
-*/
-
-dVector size (2.0f, 2.0f, 2.0f, 0.0f);
-NewtonCollision* const box = CreateConvexCollision (world, GetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
-NewtonMesh* const mesh = NewtonMeshCreateFromCollision(box);
-int material = LoadTexture("smilli.tga");
-NewtonMeshApplyBoxMapping(mesh, material, material, material);
-NewtonDestroyCollision(box);
-
+#else
+		dVector size (2.0f, 2.0f, 2.0f, 0.0f);
+		NewtonCollision* const box = CreateConvexCollision (world, GetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
+		NewtonMesh* const mesh = NewtonMeshCreateFromCollision(box);
+		int material = LoadTexture("smilli.tga");
+		NewtonMeshApplyBoxMapping(mesh, material, material, material);
+		NewtonDestroyCollision(box);
+#endif
 
 		// now create a soft collision mesh
 		NewtonCollision* const softCollisionMesh = NewtonCreateDeformableMesh (world, mesh, 0);
@@ -367,7 +365,7 @@ void SoftBodies(DemoEntityManager* const scene)
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 	//CreateLevelMesh (scene, "playground.ngd", 1);
 
-	dVector location (15.0f, 10.0f, 0.0f, 0.0f) ;
+	dVector location (5.0f, 2.0f, 0.0f, 0.0f) ;
 
 	NewtonCollision* const softBody = SimpleSoftBodyEntity::CreateSoftBodyCollisionShape (scene, "softBox.nme", "smilli.tga");
 //	NewtonCollision* const softBody = SimpleSoftBodyEntity::CreateSoftBodyCollisionShape (scene, "softTPot.nme", "marble.tga");

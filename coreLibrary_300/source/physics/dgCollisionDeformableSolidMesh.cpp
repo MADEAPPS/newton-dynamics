@@ -376,9 +376,6 @@ void dgCollisionDeformableSolidMesh::ResolvePositionsConstraints (dgFloat32 time
 		QiPi.m_up = cr0.CompProduct4 (mcr.BroadcastY());
 		QiPi.m_right = cr0.CompProduct4 (mcr.BroadcastZ());
 		QiPi.m_posit = dgVector::m_wOne;
-		dgAssert (dgAbsf (QiPi[1][0] - QiPi[0][1]) < dgFloat32 (1.0e-6f));
-		dgAssert (dgAbsf (QiPi[2][0] - QiPi[0][2]) < dgFloat32 (1.0e-6f));
-		dgAssert (dgAbsf (QiPi[2][1] - QiPi[1][2]) < dgFloat32 (1.0e-6f));
 	}
 
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
@@ -401,10 +398,10 @@ void dgCollisionDeformableSolidMesh::ResolvePositionsConstraints (dgFloat32 time
 
 	for (dgInt32 i = 0; i < m_regionsCount; i ++) {
 		dgMatrix& QiPi = sumQiPi[i];
-		dgAssert (dgAbsf (QiPi[1][0] - QiPi[0][1]) < dgFloat32 (1.0e-6f));
-		dgAssert (dgAbsf (QiPi[2][0] - QiPi[0][2]) < dgFloat32 (1.0e-6f));
-		dgAssert (dgAbsf (QiPi[2][1] - QiPi[1][2]) < dgFloat32 (1.0e-6f));
-		dgAssert (dgAbsf (QiPi[3][3] - dgFloat32 (1.0f)) < dgFloat32 (1.0e-6f));
+//		dgAssert (dgAbsf (QiPi[1][0] - QiPi[0][1]) < dgFloat32 (1.0e-3f));
+//		dgAssert (dgAbsf (QiPi[2][0] - QiPi[0][2]) < dgFloat32 (1.0e-3f));
+//		dgAssert (dgAbsf (QiPi[2][1] - QiPi[1][2]) < dgFloat32 (1.0e-3f));
+//		dgAssert (dgAbsf (QiPi[3][3] - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 
 		dgMatrix S (QiPi * QiPi.Transpose4X4());
 		dgVector eigenValues;
