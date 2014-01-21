@@ -82,7 +82,7 @@ class dgMatrix
 #endif
 
 	bool TestOrthogonal() const;
-
+	bool TestSymetric3x3() const;
 
 	dgMatrix operator* (const dgMatrix &B) const;
 
@@ -279,6 +279,20 @@ DG_INLINE bool dgMatrix::TestOrthogonal() const
 		   (dgAbsf(d - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f)); 
 }
 
+DG_INLINE bool dgMatrix::TestSymetric3x3() const
+{
+	const dgMatrix& me = *this;
+	return (dgAbsf (me[0][1] - me[1][0]) < dgFloat32 (1.0e-5f)) && 
+		   (dgAbsf (me[0][2] - me[2][0]) < dgFloat32 (1.0e-5f)) &&
+		   (dgAbsf (me[1][2] - me[2][1]) < dgFloat32 (1.0e-5f)) &&
+		   (me[0][3] == dgFloat32 (0.0f)) &&
+		   (me[1][3] == dgFloat32 (0.0f)) &&
+		   (me[2][3] == dgFloat32 (0.0f)) &&
+		   (me[3][0] == dgFloat32 (0.0f)) &&
+		   (me[3][1] == dgFloat32 (0.0f)) &&
+		   (me[3][2] == dgFloat32 (0.0f)) &&
+		   (me[3][3] == dgFloat32 (1.0f));
+}
 
 
 DG_INLINE dgMatrix dgPitchMatrix(dgFloat32 ang)

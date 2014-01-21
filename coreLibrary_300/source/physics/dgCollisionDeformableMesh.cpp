@@ -310,16 +310,11 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMes
 	dgInt32 stride = meshCopy.GetVertexStrideInByte() / sizeof (dgFloat64);  
 	dgFloat64* const vertex = meshCopy.GetVertexPool();  
 
-//	dgVector delta (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-//	dgBigVector com (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-//		m_particles.m_edge[i] = NULL;
 		m_particles.m_unitMass[i] = dgFloat32 (1.0f);
-		m_particles.m_posit[i] = dgVector (dgFloat32 (vertex[i * stride + 0]), dgFloat32 (vertex[i * stride + 1]), dgFloat32 (vertex[i * stride + 2]), dgFloat32 (0.0f));
 		m_particles.m_veloc[i] = dgVector (dgFloat32 (0.0f));
+		m_particles.m_posit[i] = dgVector (&vertex[i * stride]) & dgVector::m_triplexMask;
 	}
-//	com = com.Scale3(dgFloat32 (1.0f / m_particles.m_count));
-//	m_particles.m_com = com;
 
 	dgInt32 indexCount = meshCopy.GetTotalIndexCount (); 
 	dgStack<dgInt32> faceArray (m_trianglesCount);

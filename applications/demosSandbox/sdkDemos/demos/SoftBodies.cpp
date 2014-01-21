@@ -43,7 +43,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 		dVector inertia;
 		NewtonConvexCollisionCalculateInertialMatrix (softCollision, &inertia[0], &origin[0]);	
 
-		dFloat mass = 1.0f;
+		dFloat mass = 8.0f;
 		dFloat Ixx = mass * inertia[0];
 		dFloat Iyy = mass * inertia[1];
 		dFloat Izz = mass * inertia[2];
@@ -127,7 +127,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 	static NewtonCollision* CreateSoftBodyCollisionShape (DemoEntityManager* const scene, const char* const meshName, const char* const textureName)
 	{
 		NewtonWorld* const world = scene->GetNewton();
-#if 0
+#if 1
 		// load the mesh
 		NewtonMesh* const mesh = LoadNewtonMesh (world, meshName);
 		// replace the materials
@@ -365,17 +365,18 @@ void SoftBodies(DemoEntityManager* const scene)
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 	//CreateLevelMesh (scene, "playground.ngd", 1);
 
-	dVector location (5.0f, 2.0f, 0.0f, 0.0f) ;
+//	dVector location (5.0f, 2.0f, 0.0f, 0.0f) ;
+	dVector location (0.0f, 2.0f, 0.0f, 0.0f);
 
-	NewtonCollision* const softBody = SimpleSoftBodyEntity::CreateSoftBodyCollisionShape (scene, "softBox.nme", "smilli.tga");
+//	NewtonCollision* const softBody = SimpleSoftBodyEntity::CreateSoftBodyCollisionShape (scene, "softBox.nme", "smilli.tga");
 //	NewtonCollision* const softBody = SimpleSoftBodyEntity::CreateSoftBodyCollisionShape (scene, "softTPot.nme", "marble.tga");
-//	NewtonCollision* const softBody = SimpleSoftBodyEntity::CreateSoftBodyCollisionShape (scene, "softTPot.nme", "smilli.tga");
+	NewtonCollision* const softBody = SimpleSoftBodyEntity::CreateSoftBodyCollisionShape (scene, "softTPot.nme", "smilli.tga");
 	
 	new SimpleSoftBodyEntity (scene, softBody, location);
 	NewtonDestroyCollision (softBody);
 
 	dQuaternion rot;
-	dVector origin (location.m_x - 20.0f, 2.0f, location.m_z, 0.0f);
+	dVector origin (location.m_x - 10.0f, 2.0f, location.m_z, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 
 //	scene->SaveScene ("test1.ngd");
@@ -395,7 +396,7 @@ void ClothPath(DemoEntityManager* const scene)
 	//CreateLevelMesh (scene, "playground.ngd", 1);
 
 //	dVector location (8.0f, 0.0f, -10.0f, 0.0f) ;
-	dVector location (0.0f, 0.0f, 0.0f, 0.0f) ;
+	dVector location (0.0f, 2.0f, 0.0f, 0.0f) ;
 
 	NewtonCollision* const softBody = SimpleSoftBodyEntity::CreateClothPatchShape (scene);
 	new SimpleSoftBodyEntity (scene, softBody, location);
