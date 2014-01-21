@@ -8615,7 +8615,7 @@ int NewtonDeformableMeshSegmentGetIndexCount (const NewtonCollision* const defor
 	return 0;
 }
 
-const short* NewtonDeformableMeshSegmentGetIndexList (const NewtonCollision* const deformableMesh, const NewtonDeformableMeshSegment* const segment)
+const int* NewtonDeformableMeshSegmentGetIndexList (const NewtonCollision* const deformableMesh, const NewtonDeformableMeshSegment* const segment)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
@@ -8623,6 +8623,6 @@ const short* NewtonDeformableMeshSegmentGetIndexList (const NewtonCollision* con
 		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*) collision->GetChildShape();
 		return deformableShape->GetSegmentIndexList((void*)segment);
 	}
-	return 0;
+	return NULL;
 }
 

@@ -478,9 +478,9 @@ void dgMatrix::EigenVectors (dgVector &eigenValues, const dgMatrix& initialGuess
 		dgFloat32 sm = dgAbsf(mat[0][1]) + dgAbsf(mat[0][2]) + dgAbsf(mat[1][2]);
 
 		if (sm < dgFloat32 (1.0e-12f)) {
-			dgAssert (dgAbsf((eigenVectors.m_front % eigenVectors.m_front) - dgFloat32(1.0f)) < dgEPSILON);
-			dgAssert (dgAbsf((eigenVectors.m_up % eigenVectors.m_up) - dgFloat32(1.0f)) < dgEPSILON);
-			dgAssert (dgAbsf((eigenVectors.m_right % eigenVectors.m_right) - dgFloat32(1.0f)) < dgEPSILON);
+			//dgAssert (dgAbsf((eigenVectors.m_front % eigenVectors.m_front) - dgFloat32(1.0f)) < dgEPSILON);
+			//dgAssert (dgAbsf((eigenVectors.m_up % eigenVectors.m_up) - dgFloat32(1.0f)) < dgEPSILON);
+			//dgAssert (dgAbsf((eigenVectors.m_right % eigenVectors.m_right) - dgFloat32(1.0f)) < dgEPSILON);
 
 			// order the eigenvalue vectors	
 			dgVector tmp (eigenVectors.m_front * eigenVectors.m_up);

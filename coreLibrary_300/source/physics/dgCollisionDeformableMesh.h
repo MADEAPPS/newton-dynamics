@@ -72,7 +72,7 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 
 		dgInt32 m_material;
 		dgInt32 m_indexCount;
-		dgInt16* m_indexList;
+		dgInt32* m_indexList;
 	};
 
 	dgCollisionDeformableMesh (const dgCollisionDeformableMesh& source);
@@ -102,7 +102,7 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	void* GetNextVisualSegment(void* const segment) const;
 	dgInt32 GetSegmentMaterial (void* const segment) const;
 	dgInt32 GetSegmentIndexCount (void* const segment) const;
-	const dgInt16* GetSegmentIndexList (void* const segment) const;
+	const dgInt32* GetSegmentIndexList (void* const segment) const;
 
 	protected:
 	class dgDeformableNode;
@@ -126,7 +126,7 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 
 	dgWorld* m_world;
 	dgDeformableBody* m_myBody;
-	dgInt16* m_indexList;
+	dgInt32* m_indexList;
 	dgVector* m_faceNormals;
 	dgDeformableNode* m_rootNode;
 	dgDeformableNode* m_nodesMemory;

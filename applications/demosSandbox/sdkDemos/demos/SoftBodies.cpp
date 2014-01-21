@@ -103,7 +103,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 		for (NewtonDeformableMeshSegment* segmentNode = NewtonDeformableMeshGetFirstSegment (m_softCollision); segmentNode; segmentNode = NewtonDeformableMeshGetNextSegment (m_softCollision, segmentNode)) {
 			int materialID = NewtonDeformableMeshSegmentGetMaterialID(m_softCollision, segmentNode);
 			int indexCount = NewtonDeformableMeshSegmentGetIndexCount(m_softCollision, segmentNode);
-			const short* const indexList = NewtonDeformableMeshSegmentGetIndexList(m_softCollision, segmentNode);
+			const int* const indexList = NewtonDeformableMeshSegmentGetIndexList(m_softCollision, segmentNode);
 
 			DemoSubMesh* const segment = mesh->AddSubMesh();
 			const char* const textName = FindTextureById(materialID);
@@ -127,7 +127,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 	static NewtonCollision* CreateSoftBodyCollisionShape (DemoEntityManager* const scene, const char* const meshName, const char* const textureName)
 	{
 		NewtonWorld* const world = scene->GetNewton();
-#if 1
+#if 0
 		// load the mesh
 		NewtonMesh* const mesh = LoadNewtonMesh (world, meshName);
 		// replace the materials
@@ -135,8 +135,6 @@ class SimpleSoftBodyEntity: public DemoEntity
 		for (void* face = NewtonMeshGetFirstFace (mesh); face; face = NewtonMeshGetNextFace(mesh, face)) {
 			NewtonMeshSetFaceMaterial (mesh, face, material);
 		}
-		// reconstruct the vertex normals
-		NewtonMeshCalculateVertexNormals (mesh, 45.8f * 3.1415f/ 180.0f);
 #else
 		dVector size (2.0f, 2.0f, 2.0f, 0.0f);
 		NewtonCollision* const box = CreateConvexCollision (world, GetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);

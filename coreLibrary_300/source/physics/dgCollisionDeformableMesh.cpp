@@ -101,7 +101,7 @@ class dgCollisionDeformableMesh::dgDeformableNode
 		}
 	}
 
-	void TriangleBox (const dgVector* const position, const dgInt16* const faceIndices, dgVector& minP, dgVector& maxP) const
+	void TriangleBox (const dgVector* const position, const dgInt32* const faceIndices, dgVector& minP, dgVector& maxP) const
 	{
 		minP = position[faceIndices[0]]; 
 		maxP = position[faceIndices[0]]; 
@@ -119,7 +119,7 @@ class dgCollisionDeformableMesh::dgDeformableNode
 		}
 	}
 
-	void CalculateBox (const dgVector* const position, const dgInt16* const faceIndices) 
+	void CalculateBox (const dgVector* const position, const dgInt32* const faceIndices) 
 	{
 		dgVector p0;
 		dgVector p1;
@@ -143,7 +143,7 @@ class dgCollisionDeformableMesh::dgDeformableNode
 		m_surfaceArea = side0 % side1;
 	}
 
-	dgInt32 UpdateBox (const dgVector* const position, const dgInt16* const faceIndices)
+	dgInt32 UpdateBox (const dgVector* const position, const dgInt32* const faceIndices)
 	{
 		dgVector p0;
 		dgVector p1;
@@ -200,11 +200,11 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh (const dgCollisionDeformabl
 	dgDeformableBodiesUpdate& softBodyList = *m_world;
 	softBodyList.AddShape (this);
 
-	m_indexList = (dgInt16*) dgMallocStack (3 * m_trianglesCount * sizeof (dgInt16));
+	m_indexList = (dgInt32*) dgMallocStack (3 * m_trianglesCount * sizeof (dgInt32));
 	m_faceNormals = (dgVector*) dgMallocStack (m_trianglesCount * sizeof (dgVector));
 	m_nodesMemory = (dgDeformableNode*) dgMallocStack(m_nodesCount * sizeof (dgDeformableNode));
 
-	memcpy (m_indexList, source.m_indexList, 3 * m_trianglesCount * sizeof (dgInt16));
+	memcpy (m_indexList, source.m_indexList, 3 * m_trianglesCount * sizeof (dgInt32));
 	memcpy (m_faceNormals, source.m_faceNormals, m_trianglesCount * sizeof (dgVector));
 	memcpy (m_nodesMemory, source.m_nodesMemory, m_nodesCount * sizeof (dgDeformableNode));
 
@@ -238,8 +238,8 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh (const dgCollisionDeformabl
 		dgMeshSegment& segment = m_visualSegments.Append()->GetInfo();
 		segment.m_material = srcSegment.m_material;
 		segment.m_indexCount = srcSegment.m_indexCount;
-		segment.m_indexList = (dgInt16*) dgMallocStack (2 * segment.m_indexCount * sizeof (dgInt16));
-		memcpy (segment.m_indexList, srcSegment.m_indexList, 2 * segment.m_indexCount * sizeof (dgInt16));
+		segment.m_indexList = (dgInt32*) dgMallocStack (2 * segment.m_indexCount * sizeof (dgInt32));
+		memcpy (segment.m_indexList, srcSegment.m_indexList, 2 * segment.m_indexCount * sizeof (dgInt32));
 	}
 }
 
@@ -304,7 +304,7 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMes
 
 	m_trianglesCount = meshCopy.GetTotalFaceCount (); 
 	m_nodesMemory = (dgDeformableNode*) dgMallocStack((m_trianglesCount * 2 - 1) * sizeof (dgDeformableNode));
-	m_indexList = (dgInt16*) dgMallocStack (3 * m_trianglesCount * sizeof (dgInt16) );
+	m_indexList = (dgInt32*) dgMallocStack (3 * m_trianglesCount * sizeof (dgInt32));
 	m_faceNormals = (dgVector*) dgMallocStack (m_trianglesCount * sizeof (dgVector));
 
 	dgInt32 stride = meshCopy.GetVertexStrideInByte() / sizeof (dgFloat64);  
@@ -326,8 +326,10 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMes
 		dgAssert (faceArray[i]);
 		for (dgInt32 j = 0; j < count; j ++) {
 			dgInt32 k = meshCopy.GetVertexIndex(indexArray[i * 3 + j]);
-			m_indexList[i * 3 + j] = dgInt16 (k);
+			m_indexList[i * 3 + j] = k;
 		}
+
+dgTrace (("%d %d %d\n", m_indexList[i * 3 + 0], m_indexList[i * 3 + 1], m_indexList[i * 3 + 2]));
 
 		dgDeformableNode& node = m_nodesMemory[i];
 		node.m_left = NULL;
@@ -374,7 +376,7 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMes
 			dgMeshSegment& segment = m_visualSegments.Append()->GetInfo();
 			segment.m_material = mat;
 			segment.m_indexCount = count * 3;
-			segment.m_indexList = (dgInt16*) dgMallocStack( 2 * segment.m_indexCount * sizeof (dgInt16));
+			segment.m_indexList = (dgInt32*) dgMallocStack( 2 * segment.m_indexCount * sizeof (dgInt32));
 
 			dgInt32 index0 = 0;
 			dgInt32 index1 = m_trianglesCount * 3;
@@ -769,7 +771,7 @@ void dgCollisionDeformableMesh::UpdateVisualNormals()
 		dgInt32 i2 = m_indexList[i * 3 + 2];
 		dgVector e0 (m_particles.m_posit[i1] - m_particles.m_posit[i0]);
 		dgVector e1 (m_particles.m_posit[i2] - m_particles.m_posit[i0]);
-		dgVector n = e1 * e0;
+		dgVector n = e0 * e1;
 		n = n.Scale3(dgRsqrt (n % n));
 		m_faceNormals[i] = n;
 	} 
@@ -884,7 +886,7 @@ dgInt32 dgCollisionDeformableMesh::GetSegmentIndexCount (void* const segment) co
 	return info.m_indexCount * (m_isdoubleSided ? 2 : 1);
 }
 
-const dgInt16* dgCollisionDeformableMesh::GetSegmentIndexList (void* const segment) const
+const dgInt32* dgCollisionDeformableMesh::GetSegmentIndexList (void* const segment) const
 {
 	const dgMeshSegment& info = ((dgList<dgMeshSegment>::dgListNode*) segment)->GetInfo();
 	return info.m_indexList;
