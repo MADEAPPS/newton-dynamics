@@ -180,6 +180,7 @@ class dgCollisionDeformableMesh::dgDeformableNode
 
 dgCollisionDeformableMesh::dgCollisionDeformableMesh (const dgCollisionDeformableMesh& source)
 	:dgCollisionConvex (source.GetAllocator(), source.m_signature, source.m_collisionId)
+	,m_basePosit(dgFloat32 (0.0f))
 	,m_particles (source.m_particles)
 	,m_visualSegments(source.m_allocator)	
 	,m_skinThickness(source.m_skinThickness)
@@ -300,7 +301,7 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMes
 	softBodyList.AddShape (this);
 
 	dgMeshEffect meshCopy (*mesh);
-	meshCopy.Triangulate();
+//	meshCopy.Triangulate();
 
 	m_trianglesCount = meshCopy.GetTotalFaceCount (); 
 	m_nodesMemory = (dgDeformableNode*) dgMallocStack((m_trianglesCount * 2 - 1) * sizeof (dgDeformableNode));

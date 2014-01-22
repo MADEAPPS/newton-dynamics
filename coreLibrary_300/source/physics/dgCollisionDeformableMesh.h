@@ -31,6 +31,8 @@ class dgDeformableBody;
 class dgDeformableContact;
 class dgCollisionConvexPolygon;
 
+#define DG_SOFTBODY_BASE_SIZE	8
+
 class dgCollisionDeformableMesh: public dgCollisionConvex
 {
 	public:
@@ -118,6 +120,7 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	dgFloat32 CalculateSurfaceArea (const dgDeformableNode* const node0, const dgDeformableNode* const node1, dgVector& minBox, dgVector& maxBox) const;
 	dgInt32 CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy);
 
+	dgVector m_basePosit;
 	dgParticle m_particles;
 	dgList<dgMeshSegment> m_visualSegments;
 	dgFloat32 m_skinThickness;

@@ -395,6 +395,7 @@ void SoftBodies(DemoEntityManager* const scene)
 //	NewtonCollision* const softBody = SimpleSoftBodyEntity::CreateSoftBodyCollisionShape (scene, "softBox.nme", "smilli.tga");
 //	NewtonCollision* const softBody = SimpleSoftBodyEntity::CreateSoftBodyCollisionShape (scene, "softTPot.nme", "marble.tga");
 	NewtonCollision* const softBody = SimpleSoftBodyEntity::CreateSoftBodyCollisionShape (scene, "softTPot.nme", "smilli.tga");
+//	NewtonCollision* const softBody = SimpleSoftBodyEntity::CreateSoftBodyCollisionShape (scene, "softVRaptor.nme", "smilli.tga");
 	
 	new SimpleSoftBodyEntity (scene, softBody, location);
 	NewtonDestroyCollision (softBody);

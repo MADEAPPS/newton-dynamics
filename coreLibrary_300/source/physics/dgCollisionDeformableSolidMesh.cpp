@@ -469,21 +469,36 @@ dgVector beta1 (dgVector::m_one - beta0);
 // resolve collisions here
 //for now just a hack a collision plane until I get the engine up an running
 for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-	if (m_posit[i].m_y < dgFloat32 (0.0f)) {
-		m_posit[i].m_y = dgFloat32 (0.0f);
+	dgVector p (m_basePosit + m_posit[i].m_y);
+	if (p.m_y < dgFloat32 (0.0f)) {
+		m_posit[i].m_y = -m_basePosit.m_y;
 		veloc[i].m_y = dgFloat32 (0.0f);
 	}
 }
 
 	dgVector time (timestep);
+	dgVector minBase(dgFloat32 (1.0e10f));
     dgVector minBox (dgFloat32 (1.0e10f));
     dgVector maxBox (dgFloat32 (-1.0e10f));
     dgMatrix matrix (m_myBody->GetCollision()->GetGlobalMatrix().Inverse());
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
 		m_posit[i] += veloc[i].CompProduct4 (time);
-        m_particles.m_posit[i] = matrix.TransformVector(m_posit[i]);
+        m_particles.m_posit[i] = matrix.TransformVector(m_posit[i] + m_basePosit);
+		minBase = minBase.GetMin (m_posit[i]);
         minBox = minBox.GetMin(m_particles.m_posit[i]);
         maxBox = maxBox.GetMax(m_particles.m_posit[i]);
+	}
+
+	minBase = minBase.Floor();
+	dgVector mask ((minBase < dgVector (dgFloat32 (0.0f))) | (minBase >= dgVector (dgFloat32 (DG_SOFTBODY_BASE_SIZE))));
+	dgInt32 test = mask.GetSignMask();
+	if (test & 0x07) {
+		dgVector offset (((minBase < dgVector (dgFloat32 (0.0f))) & dgVector (dgFloat32 (DG_SOFTBODY_BASE_SIZE/2))) + 
+			             ((minBase >= dgVector (dgFloat32 (DG_SOFTBODY_BASE_SIZE))) & dgVector (dgFloat32 (-DG_SOFTBODY_BASE_SIZE/2))));
+		m_basePosit -= offset;
+		for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
+			m_posit[i] += offset;
+		}
 	}
 
 	// integrate each particle by the deformation velocity, also calculate the new com
