@@ -150,7 +150,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 		NewtonDeformableMeshSetSkinThickness (softCollisionMesh, 0.05f);
 
 		// create some overlapping regions 
-		NewtonDeformableMeshCreateClusters (softCollisionMesh, 8, 0.05f);
+		NewtonDeformableMeshCreateClusters (softCollisionMesh, 8, 0.15f);
 		
 		// destroy the auxiliary objects
 		NewtonMeshDestroy(mesh);
