@@ -65,6 +65,8 @@ class dgCollisionDeformableClothPatch: public dgCollisionDeformableMesh
 	virtual void ApplyExternalForces (dgFloat32 timestep);
 	virtual void ResolvePositionsConstraints (dgFloat32 timestep);
 
+	virtual void CreateClusters (dgInt32 count, dgFloat32 overlaringWidth);
+
 	virtual void EndConfiguration ();
 	virtual void ConstraintParticle (dgInt32 particleIndex, const dgVector& posit, const dgBody* const body);
 

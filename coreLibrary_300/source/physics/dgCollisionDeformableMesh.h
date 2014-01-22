@@ -96,7 +96,9 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
     virtual void SetMatrix(const dgMatrix& matrix) = 0;
 	virtual void ApplyExternalForces (dgFloat32 timestep) = 0;
 	virtual void ResolvePositionsConstraints (dgFloat32 timestep) = 0;
-	
+
+	virtual void CreateClusters (dgInt32 count, dgFloat32 overlaringWidth) = 0;
+
 	virtual void EndConfiguration () = 0;
 	virtual void ConstraintParticle (dgInt32 particleIndex, const dgVector& posit, const dgBody* const body) = 0;
 

@@ -148,6 +148,9 @@ class SimpleSoftBodyEntity: public DemoEntity
 		NewtonCollision* const softCollisionMesh = NewtonCreateDeformableMesh (world, mesh, 0);
 		//NewtonDeformableMeshSetSkinThickness (softCollisionMesh, 1.0f);
 		NewtonDeformableMeshSetSkinThickness (softCollisionMesh, 0.05f);
+
+		// create some overlapping regions 
+		NewtonDeformableMeshCreateClusters (softCollisionMesh, 8, 0.05f);
 		
 		// destroy the auxiliary objects
 		NewtonMeshDestroy(mesh);
@@ -279,7 +282,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 
 		NewtonCollision* const softCollisionMesh = NewtonCreateClothPatch (world, mesh, 0, &structuralMaterial, &bendMaterial);
 
-		int particlesCount = NewtonDeformableMeshParticleCount (softCollisionMesh);
+		int particlesCount = NewtonDeformableMeshGetParticleCount (softCollisionMesh);
 
 		int index0 = -1; 
 		int index1 = -1; 
@@ -392,9 +395,9 @@ void SoftBodies(DemoEntityManager* const scene)
 //	dVector location (5.0f, 2.0f, 0.0f, 0.0f) ;
 	dVector location (0.0f, 2.0f, 0.0f, 0.0f);
 
-//	NewtonCollision* const softBody = SimpleSoftBodyEntity::CreateSoftBodyCollisionShape (scene, "softBox.nme", "smilli.tga");
+	NewtonCollision* const softBody = SimpleSoftBodyEntity::CreateSoftBodyCollisionShape (scene, "softBox.nme", "smilli.tga");
 //	NewtonCollision* const softBody = SimpleSoftBodyEntity::CreateSoftBodyCollisionShape (scene, "softTPot.nme", "marble.tga");
-	NewtonCollision* const softBody = SimpleSoftBodyEntity::CreateSoftBodyCollisionShape (scene, "softTPot.nme", "smilli.tga");
+//	NewtonCollision* const softBody = SimpleSoftBodyEntity::CreateSoftBodyCollisionShape (scene, "softTPot.nme", "smilli.tga");
 //	NewtonCollision* const softBody = SimpleSoftBodyEntity::CreateSoftBodyCollisionShape (scene, "softVRaptor.nme", "smilli.tga");
 	
 	new SimpleSoftBodyEntity (scene, softBody, location);

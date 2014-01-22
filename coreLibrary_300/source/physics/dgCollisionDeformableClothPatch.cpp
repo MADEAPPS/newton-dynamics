@@ -364,6 +364,10 @@ void dgCollisionDeformableClothPatch::SetMass (dgFloat32 mass)
 }
 
 
+void dgCollisionDeformableClothPatch::CreateClusters (dgInt32 count, dgFloat32 overlaringWidth)
+{
+	dgAssert(0);
+}
 
 void dgCollisionDeformableClothPatch::ApplyExternalForces (dgFloat32 timestep)
 {

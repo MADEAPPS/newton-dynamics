@@ -43,6 +43,38 @@
 //#define DG_DEFORMABLE_PLANE_DISTANCE_TOL	 (dgFloat32 (1.0e-4f))
 //#define DG_DEFORMABLE_DEFAULT_SKIN_THICKNESS (dgFloat32 (5.0e-2f))
 
+
+
+class dgCollisionDeformableSolidMesh::dgCluster
+{
+	public:
+	dgCluster()
+		:m_count(0)
+		,m_points(NULL)
+	{
+	}
+
+	~dgCluster()
+	{
+		if (m_points) {
+			dgFree (m_points); 			
+		}
+	}
+
+	dgInt32 m_count;
+	dgInt32* m_points;
+
+};
+
+class dgCollisionDeformableSolidMesh::dgClusterBuilder: public dgList<dgCluster>
+{
+	public:
+	dgClusterBuilder (dgMemoryAllocator* const allocator)
+		:dgList<dgCluster>(allocator)
+	{
+	}
+};
+
 						   
 dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData)
 	:dgCollisionDeformableMesh (world, deserialization, userData)
@@ -55,57 +87,57 @@ dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(dgWorld* const wo
 	:dgCollisionDeformableMesh (world, mesh, m_deformableSolidMesh)
 	,m_posit(NULL)
 	,m_shapePosit(NULL)
-	,m_weight(NULL)
-	,m_positRegions(NULL)
-	,m_positRegionsStart(NULL)
-	,m_regionAqqInv(NULL) 
-	,m_regionRotSeed(NULL) 
-	,m_regionCom0(NULL)
-	,m_regionMass(NULL)
-	,m_regionsCount(0)
+	,m_clusterWeight(NULL)
+	,m_clusterAqqInv(NULL) 
+	,m_clusterRotationInitialGuess(NULL) 
+	,m_clusterCom0(NULL)
+	,m_clusterMass(NULL)
+	,m_clusterPosit(NULL)
+	,m_clusterPositStart(NULL)
+	,m_clustersCount(0)
 	,m_stiffness(DG_DEFORMABLE_DEFAULT_STIFFNESS)
 {
 	m_rtti |= dgCollisionDeformableSolidMesh_RTTI;
 
-	m_regionsCount = 1;
+	m_clustersCount = 1;
 	m_shapePosit = (dgVector*) dgMallocStack (sizeof (dgVector) * m_particles.m_count);
 	m_posit = (dgVector*) dgMallocStack (sizeof (dgVector) * m_particles.m_count);
-	m_positRegionsStart = (dgUnsigned16*) dgMallocStack (sizeof (dgUnsigned16) * (m_particles.m_count + 1));
+	m_clusterPositStart = (dgInt32*) dgMallocStack (sizeof (dgInt32) * (m_particles.m_count + 1));
 
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
 		m_shapePosit[i] = m_particles.m_posit[i];
 	}
-	CreateRegions();
+	CreateClusters(1, dgFloat32 (1.0e10f));
 }
 
 dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh (const dgCollisionDeformableSolidMesh& source)
 	:dgCollisionDeformableMesh (source)
-	,m_regionsCount(source.m_regionsCount)
+	,m_clustersCount(source.m_clustersCount)
 	,m_stiffness(source.m_stiffness)
 {
 	m_rtti |= dgCollisionCompoundBreakable_RTTI;
 	m_shapePosit = (dgVector*) dgMallocStack (sizeof (dgVector) * source.m_particles.m_count);
 	m_posit = (dgVector*) dgMallocStack (sizeof (dgVector) * source.m_particles.m_count);
-	m_weight = (dgFloat32*) dgMallocStack (sizeof (dgFloat32) * (source.m_positRegionsStart[source.m_particles.m_count]));
-	m_positRegions = (dgUnsigned16*) dgMallocStack (sizeof (dgUnsigned16) * (source.m_positRegionsStart[source.m_particles.m_count]));
-	m_positRegionsStart = (dgUnsigned16*) dgMallocStack (sizeof (dgUnsigned16) * (source.m_particles.m_count + 1));
+	m_clusterWeight = (dgFloat32*) dgMallocStack (sizeof (dgFloat32) * (source.m_clusterPositStart[source.m_particles.m_count]));
+	m_clusterPosit = (dgInt32*) dgMallocStack (sizeof (dgInt32) * (source.m_clusterPositStart[source.m_particles.m_count]));
+	m_clusterPositStart = (dgInt32*) dgMallocStack (sizeof (dgInt32) * (source.m_particles.m_count + 1));
 	
-	m_regionAqqInv = (dgMatrix*) dgMallocStack (sizeof (dgMatrix) * m_regionsCount);
-	m_regionRotSeed = (dgMatrix*) dgMallocStack (sizeof (dgMatrix) * m_regionsCount);
-	m_regionCom0 = (dgVector*) dgMallocStack (sizeof (dgVector) * m_regionsCount);
-	m_regionMass = (dgFloat32*) dgMallocStack (sizeof (dgVector) * m_regionsCount);
+	m_clusterAqqInv = (dgMatrix*) dgMallocStack (sizeof (dgMatrix) * m_clustersCount);
+	m_clusterRotationInitialGuess = (dgMatrix*) dgMallocStack (sizeof (dgMatrix) * m_clustersCount);
+	m_clusterCom0 = (dgVector*) dgMallocStack (sizeof (dgVector) * m_clustersCount);
+	m_clusterMass = (dgFloat32*) dgMallocStack (sizeof (dgVector) * m_clustersCount);
 
 	memcpy (m_posit, source.m_posit, sizeof (dgVector) * source.m_particles.m_count);
 	memcpy (m_shapePosit, source.m_shapePosit, sizeof (dgVector) * source.m_particles.m_count);
 
-	memcpy (m_regionAqqInv, source.m_regionAqqInv, sizeof (dgMatrix) * m_regionsCount);
-	memcpy (m_regionRotSeed, source.m_regionRotSeed, sizeof (dgMatrix) * m_regionsCount);
-	memcpy (m_regionCom0, source.m_regionCom0, sizeof (dgVector) * m_regionsCount);
-	memcpy (m_regionMass, source.m_regionMass, sizeof (dgFloat32) * m_regionsCount);
+	memcpy (m_clusterAqqInv, source.m_clusterAqqInv, sizeof (dgMatrix) * m_clustersCount);
+	memcpy (m_clusterRotationInitialGuess, source.m_clusterRotationInitialGuess, sizeof (dgMatrix) * m_clustersCount);
+	memcpy (m_clusterCom0, source.m_clusterCom0, sizeof (dgVector) * m_clustersCount);
+	memcpy (m_clusterMass, source.m_clusterMass, sizeof (dgFloat32) * m_clustersCount);
 
-	memcpy (m_weight, source.m_weight, sizeof (dgFloat32) * (source.m_positRegionsStart[source.m_particles.m_count]));
-	memcpy (m_positRegions, source.m_positRegions, sizeof (dgUnsigned16) * (source.m_positRegionsStart[source.m_particles.m_count]));
-	memcpy (m_positRegionsStart, source.m_positRegionsStart, sizeof (dgUnsigned16) * (source.m_particles.m_count + 1));
+	memcpy (m_clusterWeight, source.m_clusterWeight, sizeof (dgFloat32) * (source.m_clusterPositStart[source.m_particles.m_count]));
+	memcpy (m_clusterPosit, source.m_clusterPosit, sizeof (dgInt32) * (source.m_clusterPositStart[source.m_particles.m_count]));
+	memcpy (m_clusterPositStart, source.m_clusterPositStart, sizeof (dgInt32) * (source.m_particles.m_count + 1));
 }
 
 
@@ -114,59 +146,231 @@ dgCollisionDeformableSolidMesh::~dgCollisionDeformableSolidMesh(void)
 	if (m_shapePosit) {
 		dgFree (m_shapePosit);
 		dgFree (m_posit);
-		dgFree (m_weight);
-		dgFree (m_positRegions);
-		dgFree (m_positRegionsStart);
-		dgFree (m_regionAqqInv); 
-		dgFree (m_regionRotSeed); 
-		dgFree (m_regionCom0);
-		dgFree (m_regionMass);
+		dgFree (m_clusterWeight);
+		dgFree (m_clusterPosit);
+		dgFree (m_clusterPositStart);
+		dgFree (m_clusterAqqInv); 
+		dgFree (m_clusterRotationInitialGuess); 
+		dgFree (m_clusterCom0);
+		dgFree (m_clusterMass);
 	}
 }
 
 
-void dgCollisionDeformableSolidMesh::CreateRegions()
+void dgCollisionDeformableSolidMesh::CreateClusters (dgInt32 count, dgFloat32 overlapingWidth)
 {
-	if (m_positRegions) {
-		dgFree (m_regionAqqInv); 
-		dgFree (m_regionRotSeed); 
-		dgFree (m_regionCom0);
-		dgFree (m_regionMass);
-		dgFree (m_weight);
-		dgFree (m_positRegions);
+	if (m_clusterPosit) {
+		dgFree (m_clusterAqqInv); 
+		dgFree (m_clusterRotationInitialGuess); 
+		dgFree (m_clusterCom0);
+		dgFree (m_clusterMass);
+		dgFree (m_clusterWeight);
+		dgFree (m_clusterPosit);
 	}
 
+	if (count <= 1) {
+		// special case of only one region
+		m_clustersCount = 1;
+		m_clusterAqqInv = (dgMatrix*) dgMallocStack (sizeof (dgMatrix) * m_clustersCount);
+		m_clusterRotationInitialGuess = (dgMatrix*) dgMallocStack (sizeof (dgMatrix) * m_clustersCount);
+		m_clusterCom0 = (dgVector*) dgMallocStack (sizeof (dgVector) * m_clustersCount);
+		m_clusterMass = (dgFloat32*) dgMallocStack (sizeof (dgFloat32) * m_clustersCount);
+		m_clusterWeight = (dgFloat32*) dgMallocStack (sizeof (dgFloat32) * (m_particles.m_count));
+		m_clusterPosit = (dgInt32*) dgMallocStack (sizeof (dgInt32) * (m_particles.m_count));
+		for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
+			m_clusterPositStart[i] = i;
+			m_clusterPosit[i] = 0;
+			m_clusterWeight[i] = dgFloat32 (1.0f);
+		}
+		m_clusterPositStart[m_particles.m_count] = m_particles.m_count;
+	} else {
+		dgClusterBuilder clusterList (GetAllocator());
 
-	// for now only region
-	m_regionsCount = 1;
-	m_regionAqqInv = (dgMatrix*) dgMallocStack (sizeof (dgMatrix) * m_regionsCount);
-	m_regionRotSeed = (dgMatrix*) dgMallocStack (sizeof (dgMatrix) * m_regionsCount);
-	m_regionCom0 = (dgVector*) dgMallocStack (sizeof (dgVector) * m_regionsCount);
-	m_regionMass = (dgFloat32*) dgMallocStack (sizeof (dgFloat32) * m_regionsCount);
+		dgCluster& cluster = clusterList.Append()->GetInfo();
 
-m_weight = (dgFloat32*) dgMallocStack (sizeof (dgFloat32) * (m_particles.m_count));
-m_positRegions = (dgUnsigned16*) dgMallocStack (sizeof (dgUnsigned16) * (m_particles.m_count));
-for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-	m_positRegionsStart[i] = dgUnsigned16(i);
-	m_positRegions[i] = 0;
-	m_weight[i] = dgFloat32 (1.0f);
+		cluster.m_count = m_particles.m_count;
+		cluster.m_points = ((dgInt32*) dgMallocStack (sizeof (dgUnsigned32) * cluster.m_count));
+		for (dgInt32 i = 0; i < cluster.m_count; i ++) {
+			cluster.m_points[i] = i;
+		}
+
+		dgClusterBuilder::dgListNode* nextNode = NULL;
+		for (dgClusterBuilder::dgListNode* node = clusterList.GetFirst(); node && (clusterList.GetCount() < count); node = nextNode) {
+			dgCluster& cluster = node->GetInfo();
+			dgVector median (dgFloat32 (0.0f));
+			dgVector varian (dgFloat32 (0.0f));
+
+			for (dgInt32 i = 0; i < cluster.m_count; i ++) {
+				const dgVector& p = m_shapePosit[cluster.m_points[i]];
+				median += p;
+				varian += p.CompProduct4(p);
+			}
+
+			varian = varian.Scale4 (dgFloat32 (cluster.m_count)) - median.CompProduct4(median);
+
+			dgInt32 index = 0;
+			dgFloat32 maxVarian = dgFloat32 (-1.0e10f);
+			for (dgInt32 i = 0; i < 3; i ++) {
+				if (varian[i] > maxVarian) {
+					index = i;
+					maxVarian = varian[i];
+				}
+			}
+
+			dgVector center = median.Scale4 (dgFloat32 (1.0f) / dgFloat32 (cluster.m_count));
+			dgFloat32 test = center[index];
+
+			dgInt32 i0 = 0;
+			dgInt32 i1 = cluster.m_count - 1;
+			do {    
+
+				for (; i0 <= i1; i0 ++) {
+					const dgVector& p = m_shapePosit[cluster.m_points[i0]];
+					if (p[index] > test) {
+						break;
+					}
+				}
+
+				for (; i1 >= i0; i1 --) {
+					const dgVector& p = m_shapePosit[cluster.m_points[i1]];
+					if (p[index] < test) {
+						break;
+					}
+				}
+
+				if (i0 < i1)	{
+					dgSwap(cluster.m_points[i0], cluster.m_points[i1]);
+					i0++; 
+					i1--;
+				}
+
+			} while (i0 <= i1);
+
+			dgInt32 middle = i0 + 1;
+
+			dgInt32 leftSideOvelap = 0;
+			dgFloat32 leftBarrier = test + overlapingWidth;
+			for (dgInt32 i = middle; i < cluster.m_count; i ++) {
+				const dgVector& p = m_shapePosit[cluster.m_points[i]];
+				leftSideOvelap += (p[index] < leftBarrier) ? 1 : 0;
+			}
+
+			dgInt32 rightSideOvelap = 0;
+			dgFloat32 rightBarrier = test - overlapingWidth;
+			for (dgInt32 i = 0; i < middle; i ++) {
+				const dgVector& p = m_shapePosit[cluster.m_points[i]];
+				rightSideOvelap += (p[index] > rightBarrier) ? 1 : 0;
+			}
+
+			if (rightSideOvelap || leftSideOvelap) {
+				dgCluster& leftCluster = clusterList.Append()->GetInfo();
+				leftCluster.m_count = middle + leftSideOvelap;
+				leftCluster.m_points = ((dgInt32*) dgMallocStack (sizeof (dgUnsigned32) * leftCluster.m_count));
+
+				dgInt32 j = 0;
+				for (dgInt32 i = 0; i < middle; i ++) {
+					leftCluster.m_points[j] = cluster.m_points[i];
+					j ++;
+				}
+				
+				for (dgInt32 i = middle; i < cluster.m_count; i ++) {
+					const dgVector& p = m_shapePosit[cluster.m_points[i]];
+					if (p[index] < leftBarrier) {
+						leftCluster.m_points[j] = cluster.m_points[i];
+						j ++;
+						dgAssert (j <= leftCluster.m_count);
+					}
+				}
+
+				j = 0;
+				dgCluster& rightCluster = clusterList.Append()->GetInfo();
+				rightCluster.m_count = cluster.m_count - middle + rightSideOvelap;
+				rightCluster.m_points = ((dgInt32*) dgMallocStack (sizeof (dgUnsigned32) * rightCluster.m_count));
+				for (dgInt32 i = middle; i < cluster.m_count; i ++) {
+					rightCluster.m_points[j] = cluster.m_points[i];
+					j ++;
+				}
+				for (dgInt32 i = 0; i < middle; i ++) {
+					const dgVector& p = m_shapePosit[cluster.m_points[i]];
+					if (p[index] > rightBarrier) {
+						rightCluster.m_points[j] = cluster.m_points[i];
+						j ++;
+						dgAssert (j <= rightCluster.m_count);
+					}
+				}
+				nextNode = node->GetNext();
+				clusterList.Remove(node);
+			} else {
+				dgAssert(0);
+			}
+		}
+
+		m_clustersCount = clusterList.GetCount();
+		m_clusterAqqInv = (dgMatrix*) dgMallocStack (sizeof (dgMatrix) * m_clustersCount);
+		m_clusterRotationInitialGuess = (dgMatrix*) dgMallocStack (sizeof (dgMatrix) * m_clustersCount);
+		m_clusterCom0 = (dgVector*) dgMallocStack (sizeof (dgVector) * m_clustersCount);
+		m_clusterMass = (dgFloat32*) dgMallocStack (sizeof (dgFloat32) * m_clustersCount);
+
+		dgInt32 poolSize = 0;
+		dgStack<dgInt32> particleClusterCountPool(m_particles.m_count);
+		dgInt32* const particleClusterCount = &particleClusterCountPool[0];
+		memset (particleClusterCount, 0, particleClusterCountPool.GetSizeInBytes());
+		for (dgClusterBuilder::dgListNode* node = clusterList.GetFirst(); node; node = node->GetNext()) {
+			dgCluster& cluster = node->GetInfo();
+			poolSize += cluster.m_count;
+			for (dgInt32 i = 0; i < cluster.m_count; i ++) {
+				dgInt32 j = cluster.m_points[i];
+				particleClusterCount[j] ++;
+			}
+		}
+
+		m_clusterWeight = (dgFloat32*) dgMallocStack (sizeof (dgFloat32) * poolSize);
+		m_clusterPosit = (dgInt32*) dgMallocStack (sizeof (dgInt32) * poolSize);
+		
+		dgInt32 acc = 0;
+		for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
+			dgInt32 count = particleClusterCount[i];
+			m_clusterPositStart[i] = acc;
+			particleClusterCount[i] = acc;
+			acc += count;
+		}
+		m_clusterPositStart[m_particles.m_count] = acc;
+
+		dgInt32 clusterIndex = 0;
+		for (dgClusterBuilder::dgListNode* node = clusterList.GetFirst(); node; node = node->GetNext()) {
+			dgCluster& cluster = node->GetInfo();
+			for (dgInt32 i = 0; i < cluster.m_count; i ++) {
+				dgInt32 j = cluster.m_points[i];
+				dgInt32 base = particleClusterCount[j];
+				m_clusterPosit[base] = clusterIndex;
+				m_clusterWeight[base] += dgFloat32 (1.0f);
+				particleClusterCount[j] ++;
+			}
+			clusterIndex ++;
+		}
+
+		for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
+			const dgInt32 start = m_clusterPositStart[i];
+			const dgInt32 count = m_clusterPositStart[i + 1] - start;
+			dgAssert (count);
+			dgFloat32 weight = dgFloat32 (1.0f) / count;
+			for (dgInt32 j = 0; j < count; j ++) {
+				m_clusterWeight[start + j] = weight;
+			}
+		}
+	}
 }
-m_positRegionsStart[m_particles.m_count] = dgUnsigned16(m_particles.m_count);
 
-
-}
-
-
-void dgCollisionDeformableSolidMesh::InitRegions()
+void dgCollisionDeformableSolidMesh::InitClusters()
 {
 	dgStack<dgMatrix> covarianceMatrixPool(m_particles.m_count);
 	dgMatrix* const covarianceMatrix = &covarianceMatrixPool[0];
 
 	const dgFloat32* const masses = m_particles.m_unitMass;
-	for (dgInt32 i = 0; i < m_regionsCount; i ++) {
-		m_regionCom0[i] = dgVector (dgFloat32 (0.0f));
-		m_regionMass[i] = dgFloat32 (0.0f);
-		m_regionRotSeed[i] = dgGetIdentityMatrix();
+	for (dgInt32 i = 0; i < m_clustersCount; i ++) {
+		m_clusterCom0[i] = dgVector (dgFloat32 (0.0f));
+		m_clusterMass[i] = dgFloat32 (0.0f);
+		m_clusterRotationInitialGuess[i] = dgGetIdentityMatrix();
 	}
 
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
@@ -175,30 +379,30 @@ void dgCollisionDeformableSolidMesh::InitRegions()
 		covarianceMatrix[i] = dgMatrix (mr, r);
 		dgAssert (covarianceMatrix[i].TestSymetric3x3());
 
-		const dgInt32 start = m_positRegionsStart[i];
-		const dgInt32 count = m_positRegionsStart[i + 1] - start;
+		const dgInt32 start = m_clusterPositStart[i];
+		const dgInt32 count = m_clusterPositStart[i + 1] - start;
 		for (dgInt32 j = 0; j < count; j ++) {
-			dgInt32 index = m_positRegions[start + j];
-			m_regionCom0[index] += mr;
-			m_regionMass[index] += masses[i];
+			dgInt32 index = m_clusterPosit[start + j];
+			m_clusterCom0[index] += mr;
+			m_clusterMass[index] += masses[i];
 		}
 	}
 
-	for (dgInt32 i = 0; i < m_regionsCount; i ++) {
-		dgVector mcr0 (m_regionCom0[i]);
-		m_regionCom0[i] = mcr0.Scale4 (dgFloat32 (1.0f) / m_regionMass[i]);
-		m_regionAqqInv[i] = dgMatrix (mcr0.CompProduct4(dgVector::m_negOne), m_regionCom0[i]);
-		dgAssert (m_regionAqqInv[i].TestSymetric3x3());
+	for (dgInt32 i = 0; i < m_clustersCount; i ++) {
+		dgVector mcr0 (m_clusterCom0[i]);
+		m_clusterCom0[i] = mcr0.Scale4 (dgFloat32 (1.0f) / m_clusterMass[i]);
+		m_clusterAqqInv[i] = dgMatrix (mcr0.CompProduct4(dgVector::m_negOne), m_clusterCom0[i]);
+		dgAssert (m_clusterAqqInv[i].TestSymetric3x3());
 	}
 
 
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-		const dgInt32 start = m_positRegionsStart[i];
-		const dgInt32 count = m_positRegionsStart[i + 1] - start;
+		const dgInt32 start = m_clusterPositStart[i];
+		const dgInt32 count = m_clusterPositStart[i + 1] - start;
 
 		for (dgInt32 j = 0; j < count; j ++) {
-			dgInt32 index = m_positRegions[start + j];
-			dgMatrix& covariance = m_regionAqqInv[index];
+			dgInt32 index = m_clusterPosit[start + j];
+			dgMatrix& covariance = m_clusterAqqInv[index];
 			covariance.m_front += covarianceMatrix[i].m_front;
 			covariance.m_up += covarianceMatrix[i].m_up;
 			covariance.m_right += covarianceMatrix[i].m_right;
@@ -206,8 +410,8 @@ void dgCollisionDeformableSolidMesh::InitRegions()
 		}
 	}
 
-	for (dgInt32 i = 0; i < m_regionsCount; i ++) {
-		dgMatrix& AqqInv = m_regionAqqInv[i];
+	for (dgInt32 i = 0; i < m_clustersCount; i ++) {
+		dgMatrix& AqqInv = m_clusterAqqInv[i];
 		dgAssert (AqqInv.TestSymetric3x3());
 		AqqInv = AqqInv.Symetric3by3Inverse();
 	}
@@ -245,7 +449,7 @@ void dgCollisionDeformableSolidMesh::SetMass (dgFloat32 mass)
 			unitMass[i] = mass;
 		}
 
-		InitRegions();
+		InitClusters();
 	}
 }
 
@@ -347,15 +551,15 @@ void dgCollisionDeformableSolidMesh::ResolvePositionsConstraints (dgFloat32 time
 {
 	dgAssert (m_myBody);
 
-	dgInt32 strideInBytes = sizeof (dgVector) * m_regionsCount + sizeof (dgMatrix) * m_regionsCount + sizeof (dgMatrix) * m_particles.m_count;
+	dgInt32 strideInBytes = sizeof (dgVector) * m_clustersCount + sizeof (dgMatrix) * m_clustersCount + sizeof (dgMatrix) * m_particles.m_count;
 	m_world->m_solverMatrixMemory.ExpandCapacityIfNeessesary (1, strideInBytes);
 	dgVector* const regionCom = (dgVector*)&m_world->m_solverMatrixMemory[0];
-	dgMatrix* const sumQiPi = (dgMatrix*) &regionCom[m_regionsCount];
-	dgMatrix* const covarianceMatrix = (dgMatrix*) &sumQiPi[m_regionsCount];
+	dgMatrix* const sumQiPi = (dgMatrix*) &regionCom[m_clustersCount];
+	dgMatrix* const covarianceMatrix = (dgMatrix*) &sumQiPi[m_clustersCount];
 
 	const dgFloat32* const masses = m_particles.m_unitMass;
 	dgVector zero (dgFloat32 (0.0f));
-	for (dgInt32 i = 0; i < m_regionsCount; i ++) {
+	for (dgInt32 i = 0; i < m_clustersCount; i ++) {
 		regionCom[i] = zero;
 	}
 
@@ -366,27 +570,27 @@ void dgCollisionDeformableSolidMesh::ResolvePositionsConstraints (dgFloat32 time
 		dgVector mr (r.Scale4(masses[i]));
 		covarianceMatrix[i] = dgMatrix (r0, mr);
 	
-		const dgInt32 start = m_positRegionsStart[i];
-		const dgInt32 count = m_positRegionsStart[i + 1] - start;
+		const dgInt32 start = m_clusterPositStart[i];
+		const dgInt32 count = m_clusterPositStart[i + 1] - start;
 		for (dgInt32 j = 0; j < count; j ++) {
-			dgInt32 index = m_positRegions[start + j];
+			dgInt32 index = m_clusterPosit[start + j];
 			regionCom[index] += mr;
 		}
 	}
 
-	for (dgInt32 i = 0; i < m_regionsCount; i ++) {
+	for (dgInt32 i = 0; i < m_clustersCount; i ++) {
 		dgVector mcr (regionCom[i]);
-		regionCom[i] = mcr.Scale4 (dgFloat32 (1.0f) / m_regionMass[i]);
-		const dgVector& cr0 = m_regionCom0[i];
+		regionCom[i] = mcr.Scale4 (dgFloat32 (1.0f) / m_clusterMass[i]);
+		const dgVector& cr0 = m_clusterCom0[i];
 		sumQiPi[i] = dgMatrix (cr0, mcr.CompProduct4(dgVector::m_negOne));
 	}
 
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-		const dgInt32 start = m_positRegionsStart[i];
-		const dgInt32 count = m_positRegionsStart[i + 1] - start;
+		const dgInt32 start = m_clusterPositStart[i];
+		const dgInt32 count = m_clusterPositStart[i + 1] - start;
 		const dgMatrix& covariance = covarianceMatrix[i];
 		for (dgInt32 j = 0; j < count; j ++) {
-			dgInt32 index = m_positRegions[start + j];
+			dgInt32 index = m_clusterPosit[start + j];
 			dgMatrix& QiPi = sumQiPi[index];
 			QiPi.m_front += covariance.m_front;
 			QiPi.m_up += covariance.m_up;
@@ -399,16 +603,16 @@ dgVector beta0 (dgFloat32 (0.93f));
 dgVector beta1 (dgVector::m_one - beta0);
 	dgFloat32 stiffness = dgFloat32 (0.3f);
 
-	for (dgInt32 i = 0; i < m_regionsCount; i ++) {
+	for (dgInt32 i = 0; i < m_clustersCount; i ++) {
 		dgMatrix& QiPi = sumQiPi[i];
 
 		dgMatrix S (QiPi * QiPi.Transpose4X4());
 		dgVector eigenValues;
 
-		S.EigenVectors (eigenValues, m_regionRotSeed[i]);
-		m_regionRotSeed[i] = S;
+		S.EigenVectors (eigenValues, m_clusterRotationInitialGuess[i]);
+		m_clusterRotationInitialGuess[i] = S;
 
-#ifdef _DEBUG 
+#ifdef _DEBUG_____ 
 		dgMatrix P0 (QiPi * QiPi.Transpose4X4());
 		dgMatrix D (dgGetIdentityMatrix());
 		D[0][0] = eigenValues[0];
@@ -439,7 +643,7 @@ dgVector beta1 (dgVector::m_one - beta0);
 		m.m_posit = dgVector::m_wOne;
 		dgMatrix invS (S.Transpose4X4() * m);
 		dgMatrix R (invS * QiPi);
-		dgMatrix A (m_regionAqqInv[i] * QiPi);
+		dgMatrix A (m_clusterAqqInv[i] * QiPi);
 
 		QiPi.m_front = A.m_front.CompProduct4(beta0) + R.m_front.CompProduct4(beta1);
 		QiPi.m_up = A.m_up.CompProduct4(beta0) + R.m_up.CompProduct4(beta1);
@@ -450,17 +654,17 @@ dgVector beta1 (dgVector::m_one - beta0);
 	dgVector* const veloc = m_particles.m_veloc;
 
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
-		const dgInt32 start = m_positRegionsStart[i];
-		const dgInt32 count = m_positRegionsStart[i + 1] - start;
+		const dgInt32 start = m_clusterPositStart[i];
+		const dgInt32 count = m_clusterPositStart[i + 1] - start;
 
 		dgVector v (dgFloat32 (0.0f));
 		const dgVector& p = m_posit[i];
 		const dgVector& p0 = m_shapePosit[i];
 		for (dgInt32 j = 0; j < count; j ++) {
-			dgInt32 index = m_positRegions[start + j];
+			dgInt32 index = m_clusterPosit[start + j];
 			const dgMatrix& matrix = sumQiPi[index];
-			dgVector gi (matrix.RotateVector(p0 - m_regionCom0[index]) + regionCom[index]);
-			v += ((gi - p).CompProduct4(invTimeScale).Scale4 (m_weight[index]));
+			dgVector gi (matrix.RotateVector(p0 - m_clusterCom0[index]) + regionCom[index]);
+			v += ((gi - p).CompProduct4(invTimeScale).Scale4 (m_clusterWeight[index]));
 		}
 		veloc[i] += v;
 	}

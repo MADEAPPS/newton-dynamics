@@ -33,11 +33,15 @@
 class dgCollisionDeformableSolidMesh: public dgCollisionDeformableMesh
 {
 	public:
+	class dgCluster;
+	class dgClusterBuilder;
+
 	dgCollisionDeformableSolidMesh (const dgCollisionDeformableSolidMesh& source);
 	dgCollisionDeformableSolidMesh (dgWorld* const world, dgMeshEffect* const mesh);
 	dgCollisionDeformableSolidMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData);
 	virtual ~dgCollisionDeformableSolidMesh(void);
 
+	void InitClusters();
 	void Serialize(dgSerialize callback, void* const userData) const;
 	virtual dgInt32 CalculateSignature () const;
 
@@ -46,25 +50,23 @@ class dgCollisionDeformableSolidMesh: public dgCollisionDeformableMesh
 	virtual void ApplyExternalForces (dgFloat32 timestep);
 	virtual void ResolvePositionsConstraints (dgFloat32 timestep);
 
+	virtual void CreateClusters (dgInt32 count, dgFloat32 overlaringWidth);
+	
 	virtual void EndConfiguration ();
 	virtual void ConstraintParticle (dgInt32 particleIndex, const dgVector& posit, const dgBody* const body);
-
-	void InitRegions();
-	void CreateRegions();
 	
 
 	dgVector* m_posit;
 	dgVector* m_shapePosit;
-	dgFloat32* m_weight;
-	dgUnsigned16* m_positRegions;
-	dgUnsigned16* m_positRegionsStart;
-	
-	dgMatrix* m_regionAqqInv; 
-	dgMatrix* m_regionRotSeed; 
-	dgVector* m_regionCom0;
-	dgFloat32* m_regionMass;
-	dgInt32 m_regionsCount;
+	dgFloat32* m_clusterWeight;
+	dgMatrix* m_clusterAqqInv; 
+	dgMatrix* m_clusterRotationInitialGuess; 
+	dgVector* m_clusterCom0;
+	dgFloat32* m_clusterMass;
+	dgInt32* m_clusterPosit;
+	dgInt32* m_clusterPositStart;
 
+	dgInt32 m_clustersCount;
 	dgFloat32 m_stiffness;
 	friend class dgWorld;
 };

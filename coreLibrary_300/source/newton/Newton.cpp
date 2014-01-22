@@ -4536,6 +4536,24 @@ NewtonBody* NewtonCreateKinematicBody(const NewtonWorld* const newtonWorld, cons
 	return (NewtonBody*) world->CreateKinematicBody(collision, matrix);
 }
 
+NewtonBody* NewtonCreateDeformableBody (const NewtonWorld* const newtonWorld, const NewtonCollision* const deformableMesh, const dFloat* const matrixPtr)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *)newtonWorld;
+	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
+
+#ifdef SAVE_COLLISION
+	SaveCollision (collisionPtr);
+#endif
+
+	dgMatrix matrix (matrixPtr);
+	matrix.m_front.m_w = dgFloat32 (0.0f);
+	matrix.m_up.m_w    = dgFloat32 (0.0f);
+	matrix.m_right.m_w = dgFloat32 (0.0f);
+	matrix.m_posit.m_w = dgFloat32 (1.0f);
+
+	return (NewtonBody*) world->CreateDeformableBody (collision, matrix);
+}
 
 // Name: NewtonDestroyBody 
 // Destroy a rigid body.
@@ -8427,26 +8445,18 @@ NewtonCollision* NewtonCreateDeformableMesh (const NewtonWorld* const newtonWorl
 }
 
 
-NewtonBody* NewtonCreateDeformableBody (const NewtonWorld* const newtonWorld, const NewtonCollision* const deformableMesh, const dFloat* const matrixPtr)
+void NewtonDeformableMeshCreateClusters (NewtonCollision* const deformableMesh, int clunsterCount, dFloat overlapingWidth)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	Newton* const world = (Newton *)newtonWorld;
 	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
-
-#ifdef SAVE_COLLISION
-	SaveCollision (collisionPtr);
-#endif
-
-	dgMatrix matrix (matrixPtr);
-	matrix.m_front.m_w = dgFloat32 (0.0f);
-	matrix.m_up.m_w    = dgFloat32 (0.0f);
-	matrix.m_right.m_w = dgFloat32 (0.0f);
-	matrix.m_posit.m_w = dgFloat32 (1.0f);
-
-	return (NewtonBody*) world->CreateDeformableBody (collision, matrix);
+	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
+		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*) collision->GetChildShape();
+		deformableShape->CreateClusters(clunsterCount, overlapingWidth);
+	}
 }
 
-int NewtonDeformableMeshParticleCount (const NewtonCollision* const deformableMesh)
+
+int NewtonDeformableMeshGetParticleCount (const NewtonCollision* const deformableMesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
