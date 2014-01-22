@@ -109,6 +109,7 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 
 	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1);
 	virtual void DebugCollision (const dgMatrix& matrixPtr, OnDebugCollisionMeshCallback callback, void* const userData) const;
+    virtual void CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
 
 	bool SanityCheck () const;
 	void ImproveTotalFitness();

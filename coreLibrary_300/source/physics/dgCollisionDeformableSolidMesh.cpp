@@ -337,8 +337,10 @@ dgVector damp (0.3f);
 	dgMatrix transform;
 	dgVector scale;
 	inertiaMatrix.PolarDecomposition (transform, scale, tmp, matrix);
-//	body->GetCollision()->SetGlobalMatrix(transform);
-//	body->SetMatrixOriginAndRotation(body->GetCollision()->GetLocalMatrix().Inverse() * transform);
+	body->GetCollision()->SetGlobalMatrix(transform);
+	body->SetMatrixOriginAndRotation(body->GetCollision()->GetLocalMatrix().Inverse() * transform);
+    body->SetVelocity(comVeloc);
+    body->SetOmega(omega);
 }
 
 void dgCollisionDeformableSolidMesh::ResolvePositionsConstraints (dgFloat32 timestep)
@@ -479,18 +481,18 @@ for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
     dgMatrix matrix (m_myBody->GetCollision()->GetGlobalMatrix().Inverse());
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
 		m_posit[i] += veloc[i].CompProduct4 (time);
-		minBox = minBox.GetMin(m_posit[i]);
-        maxBox = maxBox.GetMax(m_posit[i]);
         m_particles.m_posit[i] = matrix.TransformVector(m_posit[i]);
+        minBox = minBox.GetMin(m_particles.m_posit[i]);
+        maxBox = maxBox.GetMax(m_particles.m_posit[i]);
 	}
 
 	// integrate each particle by the deformation velocity, also calculate the new com
 	// calculate the new body average velocity
-//	myBody->m_veloc = (m_particles.m_com - oldCom).Scale (dgFloat32 (1.0f) / timestep);
-//	if (myBody->m_matrixUpdate) {
+//	if (m_myBody->m_matrixUpdate) {
 //		myBody->m_matrixUpdate (*myBody, myBody->m_matrix, threadIndex);
 //	}
 	// the collision changed shape, need to update spatial structure 
 //	UpdateCollision ();
 //	SetCollisionBBox (m_rootNode->m_minBox, m_rootNode->m_maxBox);
+    SetCollisionBBox (minBox, maxBox);
 }

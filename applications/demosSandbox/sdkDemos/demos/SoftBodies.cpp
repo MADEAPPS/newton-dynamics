@@ -127,7 +127,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 	static NewtonCollision* CreateSoftBodyCollisionShape (DemoEntityManager* const scene, const char* const meshName, const char* const textureName)
 	{
 		NewtonWorld* const world = scene->GetNewton();
-#if 0
+#if 1
 		// load the mesh
 		NewtonMesh* const mesh = LoadNewtonMesh (world, meshName);
 		// replace the materials
@@ -354,6 +354,32 @@ class SimpleSoftBodyEntity: public DemoEntity
 #endif
 
 
+void ClothPath(DemoEntityManager* const scene)
+{
+    // load the skybox
+    scene->CreateSkyBox();
+
+    // load the scene from a ngd file format
+    CreateLevelMesh (scene, "flatPlane.ngd", 1);
+    //CreateLevelMesh (scene, "playground.ngd", 1);
+
+    //	dVector location (8.0f, 0.0f, -10.0f, 0.0f) ;
+    dVector location (0.0f, 2.0f, 0.0f, 0.0f) ;
+
+    NewtonCollision* const softBody = SimpleSoftBodyEntity::CreateClothPatchShape (scene);
+    new SimpleSoftBodyEntity (scene, softBody, location);
+    NewtonDestroyCollision (softBody);
+
+    dQuaternion rot;
+    dVector origin (location.m_x - 10.0f, 2.0f, location.m_z, 0.0f);
+    scene->SetCameraMatrix(rot, origin);
+
+    //	scene->SaveScene ("test1.ngd");
+    //	dScene CreateAlchemediaFromPhysic(); 
+}
+
+
+
 void SoftBodies(DemoEntityManager* const scene)
 {
 	// load the skybox
@@ -383,28 +409,4 @@ void SoftBodies(DemoEntityManager* const scene)
 }
 
 
-
-void ClothPath(DemoEntityManager* const scene)
-{
-	// load the skybox
-	scene->CreateSkyBox();
-
-	// load the scene from a ngd file format
-	CreateLevelMesh (scene, "flatPlane.ngd", 1);
-	//CreateLevelMesh (scene, "playground.ngd", 1);
-
-//	dVector location (8.0f, 0.0f, -10.0f, 0.0f) ;
-	dVector location (0.0f, 2.0f, 0.0f, 0.0f) ;
-
-	NewtonCollision* const softBody = SimpleSoftBodyEntity::CreateClothPatchShape (scene);
-	new SimpleSoftBodyEntity (scene, softBody, location);
-	NewtonDestroyCollision (softBody);
-
-	dQuaternion rot;
-	dVector origin (location.m_x - 10.0f, 2.0f, location.m_z, 0.0f);
-	scene->SetCameraMatrix(rot, origin);
-
-	//	scene->SaveScene ("test1.ngd");
-	//	dScene CreateAlchemediaFromPhysic(); 
-}
 

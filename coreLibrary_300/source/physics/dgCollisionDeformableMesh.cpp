@@ -936,6 +936,15 @@ dgVector dgCollisionDeformableMesh::GetParticlePosition(dgInt32 index) const
 	return m_particles.m_posit[index];
 }
 
+void dgCollisionDeformableMesh::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const
+{
+    dgVector origin (matrix.TransformVector(m_boxOrigin));
+    dgVector size (matrix.m_front.Abs().Scale4(m_boxSize.m_x) + matrix.m_up.Abs().Scale4(m_boxSize.m_y) + matrix.m_right.Abs().Scale4(m_boxSize.m_z));
+
+    p0 = (origin - size) & dgVector::m_triplexMask;
+    p1 = (origin + size) & dgVector::m_triplexMask;
+}
+
 void dgCollisionDeformableMesh::DebugCollision (const dgMatrix& matrix, OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 	const dgVector* const particlePosit = m_particles.m_posit;
