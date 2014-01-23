@@ -616,7 +616,7 @@ dgInt32 dgCollisionCompound::CalculatePlaneIntersection (const dgVector& normal,
 }
 
 
-void dgCollisionCompound::DebugCollision (const dgMatrix& matrix, OnDebugCollisionMeshCallback callback, void* const userData) const
+void dgCollisionCompound::DebugCollision (const dgMatrix& matrix, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 	dgTreeArray::Iterator iter (m_array);
 	for (iter.Begin(); iter; iter ++) {

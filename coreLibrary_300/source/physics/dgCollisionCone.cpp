@@ -146,7 +146,7 @@ dgInt32 dgCollisionCone::CalculateSignature () const
 }
 
 
-void dgCollisionCone::DebugCollision (const dgMatrix& matrix, OnDebugCollisionMeshCallback callback, void* const userData) const
+void dgCollisionCone::DebugCollision (const dgMatrix& matrix, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 	#define NUMBER_OF_DEBUG_SEGMENTS  40
 	dgTriplex pool[NUMBER_OF_DEBUG_SEGMENTS + 1];

@@ -54,6 +54,7 @@ class dgCollisionDeformableSolidMesh: public dgCollisionDeformableMesh
 	
 	virtual void EndConfiguration ();
 	virtual void ConstraintParticle (dgInt32 particleIndex, const dgVector& posit, const dgBody* const body);
+	virtual void DebugCollision (const dgMatrix& matrixPtr, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData) const;
 	
 
 	dgVector* m_posit;

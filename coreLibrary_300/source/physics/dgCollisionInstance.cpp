@@ -423,7 +423,7 @@ void dgCollisionInstance::SetLocalMatrix (const dgMatrix& matrix)
 }
 
 
-void dgCollisionInstance::DebugCollision (const dgMatrix& matrix, OnDebugCollisionMeshCallback callback, void* const userData) const
+void dgCollisionInstance::DebugCollision (const dgMatrix& matrix, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 	dgMatrix scaledMatrix (m_localMatrix * matrix);
 	scaledMatrix[0] = scaledMatrix[0].Scale3 (m_scale[0]);

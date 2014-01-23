@@ -255,14 +255,14 @@ void NewtonSerializeBodyArray (const NewtonWorld* const newtonWorld, NewtonBody*
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *) newtonWorld;
-	world->SerializeBodyArray ((dgBody**)bodyArray, bodyCount, OnBodySerialize (serializeBody), (dgSerialize) serializeFunction, serializeHandle);
+	world->SerializeBodyArray ((dgBody**)bodyArray, bodyCount, dgWorld::OnBodySerialize (serializeBody), (dgSerialize) serializeFunction, serializeHandle);
 }
 
 void NewtonDeserializeBodyArray (const NewtonWorld* const newtonWorld, NewtonOnBodyDeserializationCallback deserializeBody, NewtonDeserializeCallback serializeFunction, void* const serializeHandle)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *) newtonWorld;
-	world->DeserializeBodyArray (OnBodyDeserialize (deserializeBody), (dgDeserialize) serializeFunction, serializeHandle);
+	world->DeserializeBodyArray (dgWorld::OnBodyDeserialize (deserializeBody), (dgDeserialize) serializeFunction, serializeHandle);
 }
 
 
@@ -838,10 +838,10 @@ void NewtonSetIslandUpdateEvent(const NewtonWorld* const newtonWorld, NewtonIsla
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *) newtonWorld;
-	world->SetIslandUpdateCallback((OnIslandUpdate) islandUpdate); 
+	world->SetIslandUpdateCallback((dgWorld::OnIslandUpdate) islandUpdate); 
 }
 
-
+/*
 // Name: NewtonSetDestroyBodyByExeciveForce
 // Set a function callback to be call when the force applied at a contact point exceed the max force allowed for that convex shape 
 //
@@ -859,7 +859,7 @@ void NewtonSetDestroyBodyByExeciveForce(const NewtonWorld* const newtonWorld, Ne
 	world->SetBodyDestructionByExeciveForce((OnBodyDestructionByExeciveForce) callback); 
 }
 
-
+*/
 
 
 
@@ -1100,7 +1100,7 @@ void NewtonWorldSetCollisionConstructorDestuctorCallback (const NewtonWorld* con
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *) newtonWorld;
-	world->SetCollisionInstanceConstructorDestructor((OnCollisionInstanceDuplicate) constructor, (OnCollisionInstanceDestroy)destructor);
+	world->SetCollisionInstanceConstructorDestructor((dgWorld::OnCollisionInstanceDuplicate) constructor, (dgWorld::OnCollisionInstanceDestroy)destructor);
 }
 
 
@@ -1115,7 +1115,7 @@ void* NewtonWorldAddPreListener (const NewtonWorld* const newtonWorld, const cha
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *) newtonWorld;
-	return world->AddPreListener (nameId, listenerUserData, (OnListenerUpdateCallback) update, (OnListenerDestroyCallback) destroy);
+	return world->AddPreListener (nameId, listenerUserData, (dgWorld::OnListenerUpdateCallback) update, (dgWorld::OnListenerDestroyCallback) destroy);
 }
 
 void* NewtonWorldGetPreListener (const NewtonWorld* const newtonWorld, const char* const nameId)
@@ -1129,7 +1129,7 @@ void* NewtonWorldAddPostListener (const NewtonWorld* const newtonWorld, const ch
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *) newtonWorld;
-	return world->AddPostListener (nameId, listenerUserData, (OnListenerUpdateCallback) update, (OnListenerDestroyCallback) destroy);
+	return world->AddPostListener (nameId, listenerUserData, (dgWorld::OnListenerUpdateCallback) update, (dgWorld::OnListenerDestroyCallback) destroy);
 }
 
 void* NewtonWorldGetPostListener (const NewtonWorld* const newtonWorld, const char* const nameId)
@@ -1660,7 +1660,7 @@ void NewtonMaterialSetCollisionCallback(const NewtonWorld* const newtonWorld, in
 	dgContactMaterial* const material = world->GetMaterial (dgUnsigned32 (id0), dgUnsigned32 (id1));
 
 	material->SetUserData (userData);
-	material->SetCollisionCallback ((OnAABBOverlap) aabbOverlap, (OnContactCallback) processCallback);
+	material->SetCollisionCallback ((dgContactMaterial::OnAABBOverlap) aabbOverlap, (dgContactMaterial::OnContactCallback) processCallback);
 	//material->SetCompoundCollisionCallback ((OnCompoundCollisionPrefilter) compoundAabbOverlap);
 }
 
@@ -1702,7 +1702,7 @@ void NewtonMaterialSetCompoundCollisionCallback(const NewtonWorld* const newtonW
 	Newton* const world = (Newton *)newtonWorld;
 	dgContactMaterial* const material = world->GetMaterial (dgUnsigned32 (id0), dgUnsigned32 (id1));
 
-	material->SetCompoundCollisionCallback ((OnCompoundCollisionPrefilter) compoundAabbOverlap);
+	material->SetCompoundCollisionCallback ((dgContactMaterial::OnCompoundCollisionPrefilter) compoundAabbOverlap);
 }
 
 
@@ -3234,13 +3234,13 @@ NewtonCollision* NewtonCreateUserMeshCollision(
 
 	dgUserMeshCreation data;
 	data.m_userData = userData; 
-	data.m_collideCallback = (OnUserMeshCollideCallback) collideCallback; 
-	data.m_rayHitCallback = (OnUserMeshRayHitCallback) rayHitCallback; 
-	data.m_destroyCallback = (OnUserMeshDestroyCallback) destroyCallback;
-	data.m_getInfoCallback = (OnUserMeshCollisionInfo)getInfoCallback;
-	data.m_getAABBOvelapTestCallback = (OnUserMeshAABBOverlapTest) getAABBOverlapTestCallback;
-	data.m_faceInAABBCallback = (OnUserMeshFacesInAABB) facesInAABBCallback;
-	data.m_serializeCallback = (OnUserMeshSerialize) serializeCallback;
+	data.m_collideCallback = (dgCollisionUserMesh::OnUserMeshCollideCallback) collideCallback; 
+	data.m_rayHitCallback = (dgCollisionUserMesh::OnUserMeshRayHitCallback) rayHitCallback; 
+	data.m_destroyCallback = (dgCollisionUserMesh::OnUserMeshDestroyCallback) destroyCallback;
+	data.m_getInfoCallback = (dgCollisionUserMesh::OnUserMeshCollisionInfo)getInfoCallback;
+	data.m_getAABBOvelapTestCallback = (dgCollisionUserMesh::OnUserMeshAABBOverlapTest) getAABBOverlapTestCallback;
+	data.m_faceInAABBCallback = (dgCollisionUserMesh::OnUserMeshFacesInAABB) facesInAABBCallback;
+	data.m_serializeCallback = (dgCollisionUserMesh::OnUserMeshSerialize) serializeCallback;
 	
 
 	dgCollisionInstance* const collision = world->CreateStaticUserMesh (p0, p1, data);
@@ -4029,7 +4029,7 @@ void NewtonCollisionForEachPolygonDo(const NewtonCollision* const collisionPtr, 
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const collision = (dgCollisionInstance*) (collisionPtr);
-	collision->DebugCollision (dgMatrix (matrixPtr), (OnDebugCollisionMeshCallback) callback, userDataPtr);
+	collision->DebugCollision (dgMatrix (matrixPtr), (dgContactMaterial::OnDebugCollisionMeshCallback) callback, userDataPtr);
 }
 
 
@@ -4626,7 +4626,7 @@ void  NewtonBodySetTransformCallback(const NewtonBody* const bodyPtr, NewtonSetT
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)bodyPtr;
-	body->SetMatrixUpdateCallback ((OnMatrixUpdateCallback) callback);
+	body->SetMatrixUpdateCallback ((dgBody::OnMatrixUpdateCallback) callback);
 }
 
 
@@ -4673,7 +4673,7 @@ void  NewtonBodySetForceAndTorqueCallback(const NewtonBody* const bodyPtr, Newto
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)bodyPtr;
-	body->SetExtForceAndTorqueCallback ((OnApplyExtForceAndTorque) callback);
+	body->SetExtForceAndTorqueCallback ((dgBody::OnApplyExtForceAndTorque) callback);
 }
 
 
@@ -4727,7 +4727,7 @@ void NewtonBodySetDestructorCallback(const NewtonBody* const bodyPtr, NewtonBody
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)bodyPtr;
-	body->SetDestructorCallback (OnBodyDestroy (callback));
+	body->SetDestructorCallback (dgBody::OnBodyDestroy (callback));
 }
 
 NewtonBodyDestructor NewtonBodyGetDestructorCallback (const NewtonBody* const bodyPtr)

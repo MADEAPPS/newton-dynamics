@@ -39,9 +39,6 @@ class dgCollisionInstance;
 
 
 
-typedef void (dgApi *OnBodyDestroy) (dgBody& me);
-typedef void (dgApi *OnApplyExtForceAndTorque) (dgBody& me, dgFloat32 timestep, dgInt32 threadIndex);
-typedef void (dgApi *OnMatrixUpdateCallback) (const dgBody& me, const dgMatrix& matrix, dgInt32 threadIndex);
 #define OverlapTest(body0,body1) dgOverlapTest ((body0)->m_minAABB, (body0)->m_maxAABB, (body1)->m_minAABB, (body1)->m_maxAABB)
 
 //DG_MSC_VECTOR_ALIGMENT
@@ -49,6 +46,10 @@ DG_MSC_VECTOR_ALIGMENT
 class dgBody  
 {
 	public:
+	typedef void (dgApi *OnBodyDestroy) (dgBody& me);
+	typedef void (dgApi *OnApplyExtForceAndTorque) (dgBody& me, dgFloat32 timestep, dgInt32 threadIndex);
+	typedef void (dgApi *OnMatrixUpdateCallback) (const dgBody& me, const dgMatrix& matrix, dgInt32 threadIndex);
+
 	enum dgRTTI
 	{
 		m_baseBodyRTTI = 1<<0,
@@ -413,7 +414,7 @@ DG_INLINE void dgBody::SetDestructorCallback (OnBodyDestroy destructor)
 	m_destructor = destructor;
 }
 
-DG_INLINE OnBodyDestroy dgBody::GetDestructorCallback () const
+DG_INLINE dgBody::OnBodyDestroy dgBody::GetDestructorCallback () const
 {
 	return m_destructor;
 }
@@ -424,7 +425,7 @@ DG_INLINE void dgBody::SetMatrixUpdateCallback (OnMatrixUpdateCallback callback)
 	m_matrixUpdate = callback;
 }
 
-DG_INLINE OnMatrixUpdateCallback dgBody::GetMatrixUpdateCallback () const
+DG_INLINE dgBody::OnMatrixUpdateCallback dgBody::GetMatrixUpdateCallback () const
 {
 	return m_matrixUpdate;
 }

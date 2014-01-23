@@ -112,21 +112,6 @@ enum dgPerformanceCounters
 class dgWorld;
 class dgCollisionInstance;
 
-
-
-typedef dgUnsigned32 (dgApi *OnIslandUpdate) (const dgWorld* const world, void* island, dgInt32 bodyCount);
-typedef void (dgApi *OnBodyDestructionByExeciveForce) (const dgBody* const body, const dgContact* joint);
-typedef void (dgApi *OnListenerUpdateCallback) (const dgWorld* const world, void* const listenerUserData, dgFloat32 timestep);
-typedef void (dgApi *OnListenerDestroyCallback) (const dgWorld* const world, void* const listenerUserData);
-
-typedef void (dgApi *OnBodySerialize) (dgBody& me, dgSerialize funt, void* const serilalizeObject);
-typedef void (dgApi *OnBodyDeserialize) (dgBody& me, dgDeserialize funt, void* const serilalizeObject);
-
-
-typedef void (dgApi *OnCollisionInstanceDestroy) (const dgWorld* const world, const dgCollisionInstance* const collision);
-typedef void (dgApi *OnCollisionInstanceDuplicate) (const dgWorld* const world, dgCollisionInstance* const collision, const dgCollisionInstance* const sourceCollision);
-
-
 class dgSolverSleepTherfesholds
 {
 	public:
@@ -164,6 +149,18 @@ class dgWorld
 	,public dgWorldThreadPool
 {
 	public:
+
+	typedef dgUnsigned32 (dgApi *OnIslandUpdate) (const dgWorld* const world, void* island, dgInt32 bodyCount);
+	typedef void (dgApi *OnBodyDestructionByExeciveForce) (const dgBody* const body, const dgContact* joint);
+	typedef void (dgApi *OnListenerUpdateCallback) (const dgWorld* const world, void* const listenerUserData, dgFloat32 timestep);
+	typedef void (dgApi *OnListenerDestroyCallback) (const dgWorld* const world, void* const listenerUserData);
+	typedef void (dgApi *OnBodySerialize) (dgBody& me, dgSerialize funt, void* const serilalizeObject);
+	typedef void (dgApi *OnBodyDeserialize) (dgBody& me, dgDeserialize funt, void* const serilalizeObject);
+	typedef void (dgApi *OnCollisionInstanceDestroy) (const dgWorld* const world, const dgCollisionInstance* const collision);
+	typedef void (dgApi *OnCollisionInstanceDuplicate) (const dgWorld* const world, dgCollisionInstance* const collision, const dgCollisionInstance* const sourceCollision);
+
+
+
 	class dgDetroyBodyByForce
 	{	
 		public:

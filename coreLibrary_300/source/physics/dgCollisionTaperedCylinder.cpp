@@ -156,13 +156,13 @@ dgInt32 dgCollisionTaperedCylinder::CalculateSignature () const
 }
 
 
-void dgCollisionTaperedCylinder::SetCollisionBBox (const dgVector& p0__, const dgVector& p1__)
+void dgCollisionTaperedCylinder::SetCollisionBBox (const dgVector& p0, const dgVector& p1)
 {
 	dgAssert (0);
 }
 
 
-void dgCollisionTaperedCylinder::DebugCollision (const dgMatrix& matrix, OnDebugCollisionMeshCallback callback, void* const userData) const
+void dgCollisionTaperedCylinder::DebugCollision (const dgMatrix& matrix, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 	dgTriplex pool[24 * 2];
 

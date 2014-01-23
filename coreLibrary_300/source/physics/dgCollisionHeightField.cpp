@@ -638,7 +638,7 @@ struct dgCollisionHeightFieldShowPolyContext
 {
 	dgMatrix m_matrix;
 	void* m_userData;
-	OnDebugCollisionMeshCallback m_callback;
+	dgContactMaterial::OnDebugCollisionMeshCallback m_callback;
 };
 
 dgVector dgCollisionHeightField::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
@@ -678,7 +678,7 @@ dgVector dgCollisionHeightField::SupportVertex (const dgVector& dir, dgInt32* co
 	return support;
 }
 
-void dgCollisionHeightField::DebugCollision (const dgMatrix& matrix, OnDebugCollisionMeshCallback callback, void* const userData) const
+void dgCollisionHeightField::DebugCollision (const dgMatrix& matrix, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 	dgVector points[4];
 

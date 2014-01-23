@@ -753,7 +753,7 @@ void dgCollisionConvexHull::SetCollisionBBox (const dgVector& p0__, const dgVect
 
 
 
-void dgCollisionConvexHull::DebugCollision (const dgMatrix& matrix, OnDebugCollisionMeshCallback callback, void* const userData) const
+void dgCollisionConvexHull::DebugCollision (const dgMatrix& matrix, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 //	dgTriplex tmp[1024 * 4];
 //	matrix.TransformTriplex (&tmp[0].m_x, sizeof (dgTriplex), &m_vertex[0].m_x, sizeof (dgVector), m_vertexCount);

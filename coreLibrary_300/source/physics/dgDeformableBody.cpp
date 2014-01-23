@@ -80,7 +80,7 @@ void dgDeformableBody::SetMassMatrix (dgFloat32 mass, dgFloat32 Ix, dgFloat32 Iy
 	}
 }
 
-OnApplyExtForceAndTorque dgDeformableBody::GetExtForceAndTorqueCallback () const
+dgBody::OnApplyExtForceAndTorque dgDeformableBody::GetExtForceAndTorqueCallback () const
 {
 	return m_applyExtForces;
 }

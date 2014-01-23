@@ -195,6 +195,7 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh (const dgCollisionDeformabl
 	,m_rootNode(NULL)
 	,m_nodesMemory(NULL)
 	,m_visualVertexData(NULL) 
+	,m_onDebugDisplay(source.m_onDebugDisplay)
 	,m_isdoubleSided(source.m_isdoubleSided)
 {
 	m_rtti = source.m_rtti;
@@ -294,6 +295,7 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMes
 	,m_rootNode(NULL)
 	,m_nodesMemory(NULL)
 	,m_visualVertexData(NULL)
+	,m_onDebugDisplay(NULL)
 	,m_isdoubleSided(false)
 {
 	m_rtti |= dgCollisionDeformableMesh_RTTI;
@@ -947,7 +949,12 @@ void dgCollisionDeformableMesh::CalcAABB (const dgMatrix& matrix, dgVector& p0, 
     p1 = (origin + size) & dgVector::m_triplexMask;
 }
 
-void dgCollisionDeformableMesh::DebugCollision (const dgMatrix& matrix, OnDebugCollisionMeshCallback callback, void* const userData) const
+void dgCollisionDeformableMesh::SetOnDebugDisplay (OnDebugCollision debugDisplay)
+{
+	m_onDebugDisplay = debugDisplay;
+}
+
+void dgCollisionDeformableMesh::DebugCollision (const dgMatrix& matrix, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 	const dgVector* const particlePosit = m_particles.m_posit;
 	for (dgInt32 i = 0; i < m_trianglesCount; i ++ ) {

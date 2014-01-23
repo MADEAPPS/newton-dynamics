@@ -53,13 +53,13 @@ dgCollisionNull::~dgCollisionNull()
 {
 }
 
-void dgCollisionNull::SetCollisionBBox (const dgVector& p0__, const dgVector& p1__)
+void dgCollisionNull::SetCollisionBBox (const dgVector& p0, const dgVector& p1)
 {
 	dgAssert (0);
 }
 
 
-void dgCollisionNull::DebugCollision (const dgMatrix& matrixPtr, OnDebugCollisionMeshCallback callback, void* const userData) const
+void dgCollisionNull::DebugCollision (const dgMatrix& matrixPtr, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 }
 

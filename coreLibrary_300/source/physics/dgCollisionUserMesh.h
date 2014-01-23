@@ -26,35 +26,18 @@
 #include "dgCollisionMesh.h"
 
 
-typedef void (dgApi *OnUserMeshDestroyCallback) (void* const userData);
-
-typedef void (dgApi *OnUserMeshCollideCallback) (void* const collideData, const void* const continueHandle);
-typedef dgFloat32 (dgApi *OnUserMeshRayHitCallback) (dgCollisionMeshRayHitDesc& rayHitdata);
-typedef void (dgApi *OnUserMeshCollisionInfo) (void* userData, dgCollisionInfo* infoRecord);
-typedef dgInt32 (dgApi *OnUserMeshAABBOverlapTest) (void* const userData, const dgVector& boxP0, const dgVector& boxP1);
-typedef void (dgApi *OnUserMeshFacesInAABB) (void* userData, const dgFloat32* p0, const dgFloat32* p1,
-										   const dgFloat32** vertexArray, dgInt32* vertexCount, dgInt32* vertexStrideInBytes, 
-										   const dgInt32* indexList, dgInt32 maxIndexCount, const dgInt32* faceAttribute);
-typedef void (dgApi *OnUserMeshSerialize) (void* const userSerializeData, dgSerialize function, void* const serilalizeObject);
-
-
-class dgUserMeshCreation
-{
-	public:
-	void* m_userData;
-	OnUserMeshSerialize m_serializeCallback;
-	OnUserMeshCollideCallback m_collideCallback;
-	OnUserMeshRayHitCallback m_rayHitCallback;
-	OnUserMeshDestroyCallback m_destroyCallback;
-	OnUserMeshCollisionInfo m_getInfoCallback;
-	OnUserMeshFacesInAABB m_faceInAABBCallback;
-	OnUserMeshAABBOverlapTest m_getAABBOvelapTestCallback;
-};
-
 
 class dgCollisionUserMesh: public dgCollisionMesh
 {
 	public:
+	typedef void (dgApi *OnUserMeshDestroyCallback) (void* const userData);
+	typedef dgFloat32 (dgApi *OnUserMeshRayHitCallback) (dgCollisionMeshRayHitDesc& rayHitdata);
+	typedef void (dgApi *OnUserMeshCollisionInfo) (void* userData, dgCollisionInfo* infoRecord);
+	typedef void (dgApi *OnUserMeshCollideCallback) (void* const collideData, const void* const continueHandle);
+	typedef dgInt32 (dgApi *OnUserMeshAABBOverlapTest) (void* const userData, const dgVector& boxP0, const dgVector& boxP1);
+	typedef void (dgApi *OnUserMeshSerialize) (void* const userSerializeData, dgSerialize function, void* const serilalizeObject);
+	typedef void (dgApi *OnUserMeshFacesInAABB) (void* userData, const dgFloat32* p0, const dgFloat32* p1, const dgFloat32** vertexArray, dgInt32* vertexCount, dgInt32* vertexStrideInBytes, const dgInt32* indexList, dgInt32 maxIndexCount, const dgInt32* faceAttribute);
+
 	dgCollisionUserMesh(dgWorld* const world, const dgVector& boxP0, const dgVector& boxP1, const dgUserMeshCreation& data);
 	dgCollisionUserMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData);
 	virtual ~dgCollisionUserMesh(void);
@@ -71,7 +54,7 @@ class dgCollisionUserMesh: public dgCollisionMesh
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
 	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
 	virtual void GetCollidingFaces (dgPolygonMeshDesc* const data) const;
-	virtual void DebugCollision (const dgMatrix& matrixPtr, OnDebugCollisionMeshCallback callback, void* const userData) const;
+	virtual void DebugCollision (const dgMatrix& matrixPtr, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData) const;
 
 	void* m_userData;
 	OnUserMeshSerialize m_serializeCallback;
@@ -81,6 +64,19 @@ class dgCollisionUserMesh: public dgCollisionMesh
 	OnUserMeshCollideCallback m_collideCallback;
 	OnUserMeshDestroyCallback m_destroyCallback;
 	OnUserMeshAABBOverlapTest m_getAABBOvelapTestCallback;
+};
+
+class dgUserMeshCreation
+{
+	public:
+	void* m_userData;
+	dgCollisionUserMesh::OnUserMeshSerialize m_serializeCallback;
+	dgCollisionUserMesh::OnUserMeshCollideCallback m_collideCallback;
+	dgCollisionUserMesh::OnUserMeshRayHitCallback m_rayHitCallback;
+	dgCollisionUserMesh::OnUserMeshDestroyCallback m_destroyCallback;
+	dgCollisionUserMesh::OnUserMeshCollisionInfo m_getInfoCallback;
+	dgCollisionUserMesh::OnUserMeshFacesInAABB m_faceInAABBCallback;
+	dgCollisionUserMesh::OnUserMeshAABBOverlapTest m_getAABBOvelapTestCallback;
 };
 
 

@@ -195,7 +195,7 @@ DG_INLINE dgVector dgDynamicBody::PredictAngularVelocity(dgFloat32 timestep) con
 }
 
 
-DG_INLINE OnApplyExtForceAndTorque dgDynamicBody::GetExtForceAndTorqueCallback () const
+DG_INLINE dgBody::OnApplyExtForceAndTorque dgDynamicBody::GetExtForceAndTorqueCallback () const
 {
 	return m_applyExtForces;
 }

@@ -361,7 +361,7 @@ struct dgCollisionBVHShowPolyContext
 {
 	dgMatrix m_matrix;
 	void* m_userData;
-	OnDebugCollisionMeshCallback m_callback;
+	dgContactMaterial::OnDebugCollisionMeshCallback m_callback;
 };
 
 dgIntersectStatus dgCollisionBVH::ShowDebugPolygon (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount, dgFloat32 hitDistance)
@@ -388,7 +388,7 @@ dgVector dgCollisionBVH::SupportVertex (const dgVector& dir, dgInt32* const vert
 }
 
 
-void dgCollisionBVH::DebugCollision (const dgMatrix& matrixPtr, OnDebugCollisionMeshCallback callback, void* const userData) const
+void dgCollisionBVH::DebugCollision (const dgMatrix& matrixPtr, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 	dgCollisionBVHShowPolyContext context;
 

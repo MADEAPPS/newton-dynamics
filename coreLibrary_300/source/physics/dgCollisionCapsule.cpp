@@ -213,7 +213,7 @@ void dgCollisionCapsule::TesselateTriangle (dgInt32 level, const dgVector& p0, c
 }
 
 
-void dgCollisionCapsule::DebugCollision (const dgMatrix& matrix, OnDebugCollisionMeshCallback callback, void* const userData) const
+void dgCollisionCapsule::DebugCollision (const dgMatrix& matrix, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 	#define POWER 2
 	dgVector tmpVectex[512];

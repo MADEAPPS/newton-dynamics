@@ -38,14 +38,6 @@ class dgCollisionInstance;
 #define DG_MAX_CONTATCS			128
 
 
-
-typedef bool (dgApi *OnAABBOverlap) (const dgContactMaterial& material, const dgBody& body0, const dgBody& body1, dgInt32 threadIndex);
-typedef void (dgApi *OnContactCallback) (dgContact& contactJoint, dgFloat32 timestep, dgInt32 threadIndex);
-typedef bool (dgApi *OnCompoundCollisionPrefilter) (const dgContactMaterial& material, const dgBody* bodyA, const void* collisionNodeA, const dgBody* bodyB, const void* collisionNodeB, dgInt32 threadIndex);
-
-typedef void (dgApi *OnDebugCollisionMeshCallback) (void* userData, int vertexCount, const dgFloat32* FaceArray, int faceId);
-
-
 class dgActiveContacts: public dgList<dgContact*>
 {
 	public:
@@ -156,6 +148,11 @@ class dgContactMaterial: public dgContactPoint
 		m_override1Accel  = 1<<4,
 		m_overrideNormalAccel = 1<<5,
 	};
+
+	typedef void (dgApi *OnContactCallback) (dgContact& contactJoint, dgFloat32 timestep, dgInt32 threadIndex);
+	typedef void (dgApi *OnDebugCollisionMeshCallback) (void* userData, int vertexCount, const dgFloat32* FaceArray, int faceId);
+	typedef bool (dgApi *OnAABBOverlap) (const dgContactMaterial& material, const dgBody& body0, const dgBody& body1, dgInt32 threadIndex);
+	typedef bool (dgApi *OnCompoundCollisionPrefilter) (const dgContactMaterial& material, const dgBody* bodyA, const void* collisionNodeA, const dgBody* bodyB, const void* collisionNodeB, dgInt32 threadIndex);
 
 	dgContactMaterial();
 	void* GetUserData () const; 

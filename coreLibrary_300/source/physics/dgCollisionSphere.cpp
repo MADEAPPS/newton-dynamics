@@ -219,7 +219,7 @@ dgInt32 dgCollisionSphere::CalculatePlaneIntersection (const dgVector& normal, c
 }
 
 
-void dgCollisionSphere::DebugCollision (const dgMatrix& matrix, OnDebugCollisionMeshCallback callback, void* const userData) const
+void dgCollisionSphere::DebugCollision (const dgMatrix& matrix, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 	dgTriplex pool[1024 * 2];
 	dgVector tmpVectex[1024 * 2];

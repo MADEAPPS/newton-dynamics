@@ -37,6 +37,8 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 {
 	public:
 
+	typedef void (dgApi* OnDebugCollision) (dgBody& body, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData, int detail);
+
 	class dgParticle
 	{
 		public:
@@ -82,11 +84,12 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	dgCollisionDeformableMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData);
 	virtual ~dgCollisionDeformableMesh(void);
 
-
 	dgBody* GetBody() const;
 	dgInt32 GetParticleCount() const;
 	dgVector GetParticlePosition(dgInt32 index) const;
 
+
+	void SetOnDebugDisplay (OnDebugCollision debugDisplay);
 	void UpdateVisualNormals();
 	dgInt32 GetVisualPointsCount() const;
 	void SetSkinThickness (dgFloat32 skinThickness);
@@ -112,7 +115,7 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	class dgDeformableNode;
 
 	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1);
-	virtual void DebugCollision (const dgMatrix& matrixPtr, OnDebugCollisionMeshCallback callback, void* const userData) const;
+	virtual void DebugCollision (const dgMatrix& matrixPtr, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData) const;
     virtual void CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
 
 	bool SanityCheck () const;
@@ -137,6 +140,7 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	dgDeformableNode* m_rootNode;
 	dgDeformableNode* m_nodesMemory;
 	dgVisualVertexData* m_visualVertexData; 
+	OnDebugCollision m_onDebugDisplay;
 	bool m_isdoubleSided;
 
 	friend class dgWorld;

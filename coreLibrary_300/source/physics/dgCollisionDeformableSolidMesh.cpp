@@ -464,6 +464,13 @@ void dgCollisionDeformableSolidMesh::SetMatrix(const dgMatrix& matrix)
     }
 }
 
+void dgCollisionDeformableSolidMesh::DebugCollision (const dgMatrix& matrixPtr, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData) const
+{
+	dgCollisionDeformableMesh::DebugCollision (matrixPtr, callback, userData);
+	if (m_onDebugDisplay) {
+
+	}
+}
 
 void dgCollisionDeformableSolidMesh::ApplyExternalForces (dgFloat32 timestep)
 {

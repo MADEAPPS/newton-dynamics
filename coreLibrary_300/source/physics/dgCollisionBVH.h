@@ -79,7 +79,7 @@ class dgCollisionBVH: public dgCollisionMesh, public dgAABBPolygonSoup
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
 
 	virtual void GetLocalAABB (const dgVector& p0, const dgVector& p1, dgVector& boxP0, dgVector& boxP1) const;
-	virtual void DebugCollision (const dgMatrix& matrixPtr, OnDebugCollisionMeshCallback callback, void* const userData) const;
+	virtual void DebugCollision (const dgMatrix& matrixPtr, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData) const;
 	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
 
 	dgPolygonSoupDatabaseBuilder* m_builder;
