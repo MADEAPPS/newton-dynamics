@@ -17,7 +17,7 @@
 #include "DemoEntityManager.h"
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
-
+#include "DebugDisplay.h"
 
 
 
@@ -151,6 +151,9 @@ class SimpleSoftBodyEntity: public DemoEntity
 
 		// create some overlapping regions 
 		NewtonDeformableMeshCreateClusters (softCollisionMesh, 8, 0.15f);
+
+		// set a debug display call back for looking at the clusters layout 
+		NewtonDeformableMeshSetDebugCallback (softCollisionMesh, DebugShowSoftBodySpecialCollision);
 		
 		// destroy the auxiliary objects
 		NewtonMeshDestroy(mesh);

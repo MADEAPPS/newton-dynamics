@@ -949,12 +949,23 @@ void dgCollisionDeformableMesh::CalcAABB (const dgMatrix& matrix, dgVector& p0, 
     p1 = (origin + size) & dgVector::m_triplexMask;
 }
 
-void dgCollisionDeformableMesh::SetOnDebugDisplay (OnDebugCollision debugDisplay)
+dgFloat32 dgCollisionDeformableMesh::CalculateMassProperties (const dgMatrix& offset, dgVector& inertia, dgVector& crossInertia, dgVector& centerOfMass) const
+{
+	dgCollision::OnDebugCollisionMeshCallback saveCallback = m_onDebugDisplay;
+	m_onDebugDisplay = NULL;
+
+	dgFloat32 volume = dgCollisionConvex::CalculateMassProperties (offset, inertia, crossInertia, centerOfMass);
+
+	m_onDebugDisplay = saveCallback;
+	return volume;
+}
+
+void dgCollisionDeformableMesh::SetOnDebugDisplay (dgCollision::OnDebugCollisionMeshCallback debugDisplay)
 {
 	m_onDebugDisplay = debugDisplay;
 }
 
-void dgCollisionDeformableMesh::DebugCollision (const dgMatrix& matrix, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData) const
+void dgCollisionDeformableMesh::DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 	const dgVector* const particlePosit = m_particles.m_posit;
 	for (dgInt32 i = 0; i < m_trianglesCount; i ++ ) {

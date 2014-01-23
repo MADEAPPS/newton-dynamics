@@ -464,11 +464,41 @@ void dgCollisionDeformableSolidMesh::SetMatrix(const dgMatrix& matrix)
     }
 }
 
-void dgCollisionDeformableSolidMesh::DebugCollision (const dgMatrix& matrixPtr, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData) const
+void dgCollisionDeformableSolidMesh::DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
-	dgCollisionDeformableMesh::DebugCollision (matrixPtr, callback, userData);
+	dgCollisionDeformableMesh::DebugCollision (matrix, callback, userData);
 	if (m_onDebugDisplay) {
+		dgStack<dgBigVector> points (m_particles.m_count);
+		for (dgInt32 k = 0; k < m_clustersCount; k ++) {
 
+			dgInt32 vertexCount = 0;
+			for (dgInt32 i = 0; (i < m_particles.m_count); i ++) {
+				const dgInt32 start = m_clusterPositStart[i];
+				const dgInt32 count = m_clusterPositStart[i + 1] - start;
+				for (dgInt32 j = 0; j < count; j ++) {
+					dgInt32 index = m_clusterPosit[start + j];
+					if (index == k) {
+						points[vertexCount] = m_posit[i] + m_basePosit;
+						vertexCount ++;
+						break;
+					}
+				}
+			}
+
+			dgConvexHull3d convexHull (GetAllocator(), &points[0].m_x, sizeof (dgBigVector), vertexCount, dgFloat32 (0.0f));
+			for (dgConvexHull3d::dgListNode* faceNode = convexHull.GetFirst(); faceNode; faceNode = faceNode->GetNext()) {
+				const dgConvexHull3DFace& face = faceNode->GetInfo();
+
+				dgTriplex points[3];
+				for (dgInt32 l = 0; l < 3; l ++) {
+					dgVector p (convexHull.GetVertex(face.m_index[l]));
+					points[l].m_x = p.m_x;
+					points[l].m_y = p.m_y;
+					points[l].m_z = p.m_z;
+				}
+				m_onDebugDisplay (userData, 3, &points[0].m_x, k);
+			}
+		}
 	}
 }
 
@@ -485,6 +515,7 @@ void dgCollisionDeformableSolidMesh::ApplyExternalForces (dgFloat32 timestep)
 
 	dgFloat32 invMass = body->GetInvMass().m_w;
 	dgVector velocyStep (body->GetForce().Scale4(invMass * timestep));
+//velocyStep = dgVector(0.0f);
 
 	dgVector* const veloc = m_particles.m_veloc;
 	dgFloat32* const unitMass = m_particles.m_unitMass;

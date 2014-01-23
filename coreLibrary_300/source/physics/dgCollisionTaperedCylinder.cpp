@@ -162,7 +162,7 @@ void dgCollisionTaperedCylinder::SetCollisionBBox (const dgVector& p0, const dgV
 }
 
 
-void dgCollisionTaperedCylinder::DebugCollision (const dgMatrix& matrix, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData) const
+void dgCollisionTaperedCylinder::DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 	dgTriplex pool[24 * 2];
 

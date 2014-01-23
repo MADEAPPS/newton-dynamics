@@ -229,7 +229,7 @@ void dgCollisionUserMesh::GetCollidingFaces (dgPolygonMeshDesc* const data) cons
 }
 
 
-void dgCollisionUserMesh::DebugCollision (const dgMatrix& matrixPtr, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData) const
+void dgCollisionUserMesh::DebugCollision (const dgMatrix& matrixPtr, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 /*
 	dgCollisionUserMeshShowPolyContext context;

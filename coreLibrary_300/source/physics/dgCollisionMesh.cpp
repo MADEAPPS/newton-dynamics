@@ -182,7 +182,7 @@ dgVector dgCollisionMesh::CalculateVolumeIntegral (const dgMatrix& globalMatrix,
 }
 
 
-void dgCollisionMesh::DebugCollision (const dgMatrix& matrixPtr, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData) const
+void dgCollisionMesh::DebugCollision (const dgMatrix& matrixPtr, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 	dgAssert (0);
 }

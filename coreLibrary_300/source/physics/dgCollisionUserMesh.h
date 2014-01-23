@@ -54,7 +54,7 @@ class dgCollisionUserMesh: public dgCollisionMesh
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
 	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
 	virtual void GetCollidingFaces (dgPolygonMeshDesc* const data) const;
-	virtual void DebugCollision (const dgMatrix& matrixPtr, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData) const;
+	virtual void DebugCollision (const dgMatrix& matrixPtr, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
 
 	void* m_userData;
 	OnUserMeshSerialize m_serializeCallback;

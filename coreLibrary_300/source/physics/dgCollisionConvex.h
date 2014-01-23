@@ -106,7 +106,7 @@ class dgCollisionConvex: public dgCollision
 	
 	void SetVolumeAndCG ();
 	bool SanityCheck (dgPolyhedra& hull) const;
-	virtual void DebugCollision  (const dgMatrix& matrix, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData) const;
+	virtual void DebugCollision  (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
 
 	virtual void MassProperties ();
 	virtual dgMatrix CalculateInertiaAndCenterOfMass (const dgMatrix& m_alignMatrix, const dgVector& localScale, const dgMatrix& matrix) const;

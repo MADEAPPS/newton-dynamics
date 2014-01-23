@@ -179,7 +179,7 @@ class dgCollisionCompound: public dgCollision
 	
 	virtual dgVector CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& plane) const;
 
-	virtual void DebugCollision (const dgMatrix& matrix, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData) const;
+	virtual void DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
 	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
 
 	virtual dgFloat32 ConvexRayCast (const dgCollisionInstance* const instance, const dgMatrix& instanceMatrix, const dgVector& instanceVeloc, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const referenceBody, const dgCollisionInstance* const referenceInstance, void* const userData, dgInt32 threadId) const; 

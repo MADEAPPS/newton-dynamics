@@ -287,7 +287,8 @@ void RenderNormalForces (NewtonWorld* const world)
 }
 
 
-void DebugShowGeometryCollision (void* userData, int vertexCount, const dFloat* faceVertec, int id)
+
+void DebugShowGeometryCollision (void* userData, int vertexCount, const dFloat* const faceVertec, int id)
 {
 	//DEBUG_DRAW_MODE mode = (DEBUG_DRAW_MODE) ((int)userData); //NOTE error: cast from ‘void*’ to ‘int’ loses precision
 	DEBUG_DRAW_MODE mode = (DEBUG_DRAW_MODE) ((intptr_t)userData);
@@ -317,6 +318,17 @@ void DebugShowGeometryCollision (void* userData, int vertexCount, const dFloat* 
 			p1 = p2;
 		}
 	}
+}
+
+void DebugShowSoftBodySpecialCollision (void* userData, int vertexCount, const dFloat* const faceVertec, int clusterIndex)
+{
+	static dVector color[] = {dVector(1.0f, 0.0f, 0.0f, 0.0f), dVector(0.0f, 1.0f, 0.0f, 0.0f), dVector(0.0f, 0.0f, 1.0f, 0.0f), 
+							  dVector(1.0f, 1.0f, 0.0f, 0.0f), dVector(0.0f, 1.0f, 1.0f, 0.0f), dVector(1.0f, 0.0f, 1.0f, 0.0f),
+							  dVector(0.5f, 0.5f, 0.0f, 0.0f), dVector(0.0f, 0.5f, 0.5f, 0.0f), dVector(0.5f, 0.0f, 0.5f, 0.0f)};
+		
+	int index = clusterIndex % (sizeof (color) / sizeof (color[0]));
+	glColor3f(color[index].m_x, color[index].m_y, color[index].m_z);
+	DebugShowGeometryCollision (userData, vertexCount, faceVertec, clusterIndex);
 }
 
 

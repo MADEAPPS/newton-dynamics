@@ -43,7 +43,7 @@ class dgCollisionChamferCylinder: public dgCollisionConvex
 	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
 	virtual dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut)  const;
 
-	virtual void DebugCollision  (const dgMatrix& matrix, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData) const;
+	virtual void DebugCollision  (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
 	virtual dgInt32 CalculateSignature () const;
 	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1);
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;

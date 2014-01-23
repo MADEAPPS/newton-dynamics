@@ -36,9 +36,6 @@ class dgCollisionConvexPolygon;
 class dgCollisionDeformableMesh: public dgCollisionConvex
 {
 	public:
-
-	typedef void (dgApi* OnDebugCollision) (dgBody& body, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData, int detail);
-
 	class dgParticle
 	{
 		public:
@@ -88,12 +85,14 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	dgInt32 GetParticleCount() const;
 	dgVector GetParticlePosition(dgInt32 index) const;
 
+	void SetOnDebugDisplay (dgCollision::OnDebugCollisionMeshCallback debugDisplay);
 
-	void SetOnDebugDisplay (OnDebugCollision debugDisplay);
 	void UpdateVisualNormals();
 	dgInt32 GetVisualPointsCount() const;
 	void SetSkinThickness (dgFloat32 skinThickness);
 	void GetVisualVertexData(dgInt32 vertexStrideInByte, dgFloat32* const vertex, dgInt32 normalStrideInByte, dgFloat32* const normals, dgInt32 uvStrideInByte0, dgFloat32* const uv0);
+
+
 	
 	virtual void SetMass (dgFloat32 mass) = 0;
     virtual void SetMatrix(const dgMatrix& matrix) = 0;
@@ -115,7 +114,7 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	class dgDeformableNode;
 
 	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1);
-	virtual void DebugCollision (const dgMatrix& matrixPtr, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData) const;
+	virtual void DebugCollision (const dgMatrix& matrixPtr, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
     virtual void CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
 
 	bool SanityCheck () const;
@@ -124,6 +123,8 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	dgDeformableNode* BuildTopDown (dgInt32 count, dgDeformableNode* const children, dgDeformableNode* const parent);
 	dgFloat32 CalculateSurfaceArea (const dgDeformableNode* const node0, const dgDeformableNode* const node1, dgVector& minBox, dgVector& maxBox) const;
 	dgInt32 CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy);
+
+	dgFloat32 CalculateMassProperties (const dgMatrix& offset, dgVector& inertia, dgVector& crossInertia, dgVector& centerOfMass) const;
 
 	dgVector m_basePosit;
 	dgParticle m_particles;
@@ -140,7 +141,7 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	dgDeformableNode* m_rootNode;
 	dgDeformableNode* m_nodesMemory;
 	dgVisualVertexData* m_visualVertexData; 
-	OnDebugCollision m_onDebugDisplay;
+	mutable dgCollision::OnDebugCollisionMeshCallback m_onDebugDisplay;
 	bool m_isdoubleSided;
 
 	friend class dgWorld;

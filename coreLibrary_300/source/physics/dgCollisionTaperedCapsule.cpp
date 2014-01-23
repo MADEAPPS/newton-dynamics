@@ -234,7 +234,7 @@ void dgCollisionTaperedCapsule::TesselateTriangle (dgInt32 level, const dgVector
 }
 
 
-void dgCollisionTaperedCapsule::DebugCollision (const dgMatrix& matrix, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData) const
+void dgCollisionTaperedCapsule::DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 	#define POWER 2
 	dgVector tmpVectex[1024 * 2];

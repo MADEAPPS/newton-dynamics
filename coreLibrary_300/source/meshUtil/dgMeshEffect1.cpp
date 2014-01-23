@@ -969,12 +969,12 @@ dgMeshEffect::dgMeshEffect(dgCollisionInstance* const collision)
 			builder.m_brush = brush;
 			brush ++;
 			dgCollisionInstance* const childShape = compoundCollision->GetCollisionFromNode(node);
-			childShape->DebugCollision (matrix, (dgContactMaterial::OnDebugCollisionMeshCallback) dgMeshEffectBuilder::GetShapeFromCollision, &builder);
+			childShape->DebugCollision (matrix, (dgCollision::OnDebugCollisionMeshCallback) dgMeshEffectBuilder::GetShapeFromCollision, &builder);
 		}
 
 	} else {
 		dgMatrix matrix (dgGetIdentityMatrix());
-		collision->DebugCollision (matrix, (dgContactMaterial::OnDebugCollisionMeshCallback) dgMeshEffectBuilder::GetShapeFromCollision, &builder);
+		collision->DebugCollision (matrix, (dgCollision::OnDebugCollisionMeshCallback) dgMeshEffectBuilder::GetShapeFromCollision, &builder);
 	}
 
 	dgStack<dgInt32>indexList (builder.m_vertexCount);

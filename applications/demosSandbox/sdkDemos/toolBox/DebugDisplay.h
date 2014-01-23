@@ -33,6 +33,8 @@ void RenderNormalForces (NewtonWorld* const world);
 void RenderContactPoints (NewtonWorld* const world); 
 void RenderJointsDebugInfo (NewtonWorld* const world, dFloat size);
 
+void DebugShowSoftBodySpecialCollision (void* userData, int vertexCount, const dFloat* const faceVertec, int faceId);
+
 void DebugRenderWorldCollision (const NewtonWorld* const world, DEBUG_DRAW_MODE mode);
 
 void DebugDrawPoint (const dVector& p0, dFloat size);

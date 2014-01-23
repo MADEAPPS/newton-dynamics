@@ -104,7 +104,7 @@ class dgCollisionInstance
 	dgFloat32 GetBoxMinRadius () const; 
 	dgFloat32 GetBoxMaxRadius () const; 
 	dgMatrix CalculateInertia () const;
-	void DebugCollision  (const dgMatrix& matrix, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData) const;
+	void DebugCollision  (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
 //	dgVector CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& plane) const;
 
 	dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;

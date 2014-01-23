@@ -4029,7 +4029,7 @@ void NewtonCollisionForEachPolygonDo(const NewtonCollision* const collisionPtr, 
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const collision = (dgCollisionInstance*) (collisionPtr);
-	collision->DebugCollision (dgMatrix (matrixPtr), (dgContactMaterial::OnDebugCollisionMeshCallback) callback, userDataPtr);
+	collision->DebugCollision (dgMatrix (matrixPtr), (dgCollision::OnDebugCollisionMeshCallback) callback, userDataPtr);
 }
 
 
@@ -8369,6 +8369,16 @@ void NewtonDeformableMeshCreateClusters (NewtonCollision* const deformableMesh, 
 	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
 		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*) collision->GetChildShape();
 		deformableShape->CreateClusters(clunsterCount, overlapingWidth);
+	}
+}
+
+void NewtonDeformableMeshSetDebugCallback (NewtonCollision* const deformableMesh, NewtonCollisionIterator callback)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
+	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
+		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*) collision->GetChildShape();
+		deformableShape->SetOnDebugDisplay((dgCollision::OnDebugCollisionMeshCallback)callback); 
 	}
 }
 

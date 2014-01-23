@@ -149,7 +149,7 @@ void dgCollisionChamferCylinder::Init (dgFloat32 radius, dgFloat32 height)
 }
 
 
-void dgCollisionChamferCylinder::DebugCollision (const dgMatrix& matrix, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData) const
+void dgCollisionChamferCylinder::DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 	dgInt32 slices = 12;
 	dgInt32 brakes = 24;

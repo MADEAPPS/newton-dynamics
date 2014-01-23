@@ -390,7 +390,7 @@ void DemoEntity::Render(dFloat timestep) const
 		glPushMatrix();
 		glMultMatrix(&m_meshMatrix[0][0]);
 		m_mesh->Render ();
-		m_mesh->RenderNormals ();
+//		m_mesh->RenderNormals ();
 
 		if (m_userData) {
 			m_userData->OnRender(timestep);

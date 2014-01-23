@@ -1596,7 +1596,7 @@ bool dgCollisionConvex::SanityCheck (dgPolyhedra& hull) const
 }
 
 
-void dgCollisionConvex::DebugCollision (const dgMatrix& matrix, dgContactMaterial::OnDebugCollisionMeshCallback callback, void* const userData) const
+void dgCollisionConvex::DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 	dgInt8 mark[DG_MAX_EDGE_COUNT];
 	dgVector tmp[DG_MAX_EDGE_COUNT];
