@@ -2638,7 +2638,7 @@ void NewtonCompoundCollisionRemoveSubCollisionByIndex (NewtonCollision* const co
 }
 
 
-void NewtonCompoundCollisionSetSubCollisionMatrix (NewtonCollision* const compoundCollision, void* const collisionNode, dFloat* const matrix)
+void NewtonCompoundCollisionSetSubCollisionMatrix (NewtonCollision* const compoundCollision, void* const collisionNode, const dFloat* const matrix)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const compoundInstance = (dgCollisionInstance*) compoundCollision;
@@ -3625,7 +3625,7 @@ void NewtonSceneCollisionEndAddRemove (NewtonCollision* const sceneCollision)
 }
 
 
-void NewtonSceneCollisionSetSubCollisionMatrix (NewtonCollision* const sceneCollision, void* const collisionNode, dFloat* const matrix)	
+void NewtonSceneCollisionSetSubCollisionMatrix (NewtonCollision* const sceneCollision, void* const collisionNode, const dFloat* const matrix)	
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	NewtonCompoundCollisionSetSubCollisionMatrix (sceneCollision, collisionNode, matrix);

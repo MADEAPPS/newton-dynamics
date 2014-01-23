@@ -616,7 +616,7 @@ extern "C" {
 	NEWTON_API void* NewtonCompoundCollisionAddSubCollision (NewtonCollision* const compoundCollision, NewtonCollision* const convexCollision);	
 	NEWTON_API void NewtonCompoundCollisionRemoveSubCollision (NewtonCollision* const compoundCollision, void* const collisionNode);	
 	NEWTON_API void NewtonCompoundCollisionRemoveSubCollisionByIndex (NewtonCollision* const compoundCollision, int nodeIndex);	
-	NEWTON_API void NewtonCompoundCollisionSetSubCollisionMatrix (NewtonCollision* const compoundCollision, void* const collisionNode, dFloat* const matrix);	
+	NEWTON_API void NewtonCompoundCollisionSetSubCollisionMatrix (NewtonCollision* const compoundCollision, void* const collisionNode, const dFloat* const matrix);	
 	NEWTON_API void NewtonCompoundCollisionEndAddRemove (NewtonCollision* const compoundCollision);	
 
 	NEWTON_API void* NewtonCompoundCollisionGetFirstNode (NewtonCollision* const compoundCollision);
@@ -672,7 +672,7 @@ extern "C" {
 	NEWTON_API void* NewtonSceneCollisionAddSubCollision (NewtonCollision* const sceneCollision, NewtonCollision* const collision);	
 	NEWTON_API void NewtonSceneCollisionRemoveSubCollision (NewtonCollision* const compoundCollision, void* const collisionNode);	
 	NEWTON_API void NewtonSceneCollisionRemoveSubCollisionByIndex (NewtonCollision* const sceneCollision, int nodeIndex);
-	NEWTON_API void NewtonSceneCollisionSetSubCollisionMatrix (NewtonCollision* const sceneCollision, void* const collisionNode, dFloat* const matrix);	
+	NEWTON_API void NewtonSceneCollisionSetSubCollisionMatrix (NewtonCollision* const sceneCollision, void* const collisionNode, const dFloat* const matrix);	
 	NEWTON_API void NewtonSceneCollisionEndAddRemove (NewtonCollision* const sceneCollision);	
 
 	NEWTON_API void* NewtonSceneCollisionGetFirstNode (NewtonCollision* const sceneCollision);
