@@ -2600,7 +2600,7 @@ NewtonCollision* NewtonCreateCompoundCollision(const NewtonWorld* const newtonWo
 	return (NewtonCollision*) collision;
 }
 
-void* NewtonCompoundCollisionAddSubCollision (NewtonCollision* const compoundCollision, NewtonCollision* const convexCollision)
+void* NewtonCompoundCollisionAddSubCollision (NewtonCollision* const compoundCollision, const NewtonCollision* const convexCollision)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	
@@ -2614,7 +2614,7 @@ void* NewtonCompoundCollisionAddSubCollision (NewtonCollision* const compoundCol
 }
 
 
-void NewtonCompoundCollisionRemoveSubCollision (NewtonCollision* const compoundCollision, void* const collisionNode)
+void NewtonCompoundCollisionRemoveSubCollision (NewtonCollision* const compoundCollision, const void* const collisionNode)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const instance = (dgCollisionInstance*) compoundCollision;
@@ -2638,7 +2638,7 @@ void NewtonCompoundCollisionRemoveSubCollisionByIndex (NewtonCollision* const co
 }
 
 
-void NewtonCompoundCollisionSetSubCollisionMatrix (NewtonCollision* const compoundCollision, void* const collisionNode, const dFloat* const matrix)
+void NewtonCompoundCollisionSetSubCollisionMatrix (NewtonCollision* const compoundCollision, const void* const collisionNode, const dFloat* const matrix)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const compoundInstance = (dgCollisionInstance*) compoundCollision;
@@ -2681,7 +2681,7 @@ void* NewtonCompoundCollisionGetFirstNode (NewtonCollision* const compoundCollis
 	return NULL;
 }
 
-void* NewtonCompoundCollisionGetNextNode (NewtonCollision* const compoundCollision, void* const node)
+void* NewtonCompoundCollisionGetNextNode (NewtonCollision* const compoundCollision, const void* const node)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const instance = (dgCollisionInstance*) compoundCollision;
@@ -2703,7 +2703,7 @@ void* NewtonCompoundCollisionGetNodeByIndex (NewtonCollision* const compoundColl
 	return NULL;
 }
 
-int NewtonCompoundCollisionGetNodeIndex (NewtonCollision* const compoundCollision, void* const node)
+int NewtonCompoundCollisionGetNodeIndex (NewtonCollision* const compoundCollision, const void* const node)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const instance = (dgCollisionInstance*) compoundCollision;
@@ -2715,7 +2715,7 @@ int NewtonCompoundCollisionGetNodeIndex (NewtonCollision* const compoundCollisio
 }
 
 
-NewtonCollision* NewtonCompoundCollisionGetCollisionFromNode (NewtonCollision* const compoundCollision, void* const node)
+NewtonCollision* NewtonCompoundCollisionGetCollisionFromNode (NewtonCollision* const compoundCollision, const void* const node)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const compoundInstance = (dgCollisionInstance*) compoundCollision;
@@ -3625,14 +3625,14 @@ void NewtonSceneCollisionEndAddRemove (NewtonCollision* const sceneCollision)
 }
 
 
-void NewtonSceneCollisionSetSubCollisionMatrix (NewtonCollision* const sceneCollision, void* const collisionNode, const dFloat* const matrix)	
+void NewtonSceneCollisionSetSubCollisionMatrix (NewtonCollision* const sceneCollision, const void* const collisionNode, const dFloat* const matrix)	
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	NewtonCompoundCollisionSetSubCollisionMatrix (sceneCollision, collisionNode, matrix);
 }
 
 
-void* NewtonSceneCollisionAddSubCollision (NewtonCollision* const sceneCollision, NewtonCollision* const collision)
+void* NewtonSceneCollisionAddSubCollision (NewtonCollision* const sceneCollision, const NewtonCollision* const collision)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 
@@ -3645,7 +3645,7 @@ void* NewtonSceneCollisionAddSubCollision (NewtonCollision* const sceneCollision
 	return NULL;
 }
 
-void NewtonSceneCollisionRemoveSubCollision (NewtonCollision* const sceneCollision, void* const collisionNode)
+void NewtonSceneCollisionRemoveSubCollision (NewtonCollision* const sceneCollision, const void* const collisionNode)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const sceneInstance = (dgCollisionInstance*) sceneCollision;
@@ -3675,14 +3675,14 @@ void* NewtonSceneCollisionGetNodeByIndex (NewtonCollision* const sceneCollision,
 	return NewtonCompoundCollisionGetNodeByIndex (sceneCollision, index);
 }
 
-int NewtonSceneCollisionGetNodeIndex (NewtonCollision* const sceneCollision, void* const collisionNode)
+int NewtonSceneCollisionGetNodeIndex (NewtonCollision* const sceneCollision, const void* const collisionNode)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	return NewtonCompoundCollisionGetNodeIndex (sceneCollision, collisionNode);
 }
 
 
-NewtonCollision* NewtonSceneCollisionGetCollisionFromNode (NewtonCollision* const sceneCollision, void* const node)
+NewtonCollision* NewtonSceneCollisionGetCollisionFromNode (NewtonCollision* const sceneCollision, const void* const node)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	return NewtonCompoundCollisionGetCollisionFromNode (sceneCollision, node);
@@ -3694,94 +3694,11 @@ NEWTON_API void* NewtonSceneCollisionGetFirstNode (NewtonCollision* const sceneC
 	return NewtonCompoundCollisionGetFirstNode (sceneCollision);
 }
 
-NEWTON_API void* NewtonSceneCollisionGetNextNode (NewtonCollision* const sceneCollision, void* const node)
+NEWTON_API void* NewtonSceneCollisionGetNextNode (NewtonCollision* const sceneCollision, const void* const node)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	return NewtonCompoundCollisionGetNextNode (sceneCollision, node);
 }
-
-
-/*
-NewtonSceneProxy* NewtonSceneCollisionCreateProxy (NewtonCollision* const scene, NewtonCollision* const collision, const dFloat* const matrixPtr)
-{
-	dgAssert (0);
-	return NULL;
-
-	dgMatrix matrix (matrixPtr);
-	matrix.m_front.m_w = dgFloat32 (0.0f);
-	matrix.m_up.m_w    = dgFloat32 (0.0f);
-	matrix.m_right.m_w = dgFloat32 (0.0f);
-	matrix.m_posit.m_w = dgFloat32 (1.0f);
-
-	dgCollisionScene* const newtonScene = (dgCollisionScene*) scene;
-	dgAssert (newtonScene->IsType(dgCollision::dgCollisionScene_RTTI));
-	return (NewtonSceneProxy*) newtonScene->AddProxy ((dgCollisionInstance*) collision, matrix);
-}
-
-
-void NewtonSceneCollisionDestroyProxy (NewtonCollision* const scene, NewtonSceneProxy* const proxy)
-{
-	dgCollisionScene* const newtonScene = (dgCollisionScene*) scene;
-	dgAssert (newtonScene->IsType(dgCollision::dgCollisionScene_RTTI));
-	newtonScene->RemoveProxy (proxy);
-}
-
-void NewtonSceneProxySetMatrix (NewtonSceneProxy* const proxy, const dFloat* const matrix)
-{
-	dgList<dgCollisionScene::dgProxy*>::dgListNode* const node = (dgList<dgCollisionScene::dgProxy*>::dgListNode*) proxy;
-	dgCollisionScene* const newtonScene = node->GetInfo()->m_owner;
-	dgMatrix offset (matrix);
-	newtonScene->SetProxyMatrix (node, offset);
-}
-
-void NewtonSceneProxyGetMatrix (NewtonSceneProxy* const proxy, dFloat* const matrix)
-{
-	dgList<dgCollisionScene::dgProxy*>::dgListNode* const node = (dgList<dgCollisionScene::dgProxy*>::dgListNode*) proxy;
-	dgCollisionScene* const newtonScene = node->GetInfo()->m_owner;
-dgAssert (0);
-	dgMatrix offset (matrix);
-	offset = newtonScene->GetProxyMatrix (node);
-}
-
-void NewtonSceneSetProxyUserData (NewtonSceneProxy* const proxy, void* userData)
-{
-	dgList<dgCollisionScene::dgProxy*>::dgListNode* const node = (dgList<dgCollisionScene::dgProxy*>::dgListNode*) proxy;
-	dgCollisionScene* const newtonScene = node->GetInfo()->m_owner;
-
-	newtonScene->SetProxyUserData(node, userData);
-}
-
-void* NewtonSceneGetProxyUserData (NewtonSceneProxy* const proxy)
-{
-	dgList<dgCollisionScene::dgProxy*>::dgListNode* const node = (dgList<dgCollisionScene::dgProxy*>::dgListNode*) proxy;
-	dgCollisionScene* const newtonScene = node->GetInfo()->m_owner;
-
-	return newtonScene->GetProxyUserData(node);
-}
-
-
-NewtonSceneProxy* NewtonSceneGetFirstProxy (NewtonCollision* const scene)
-{
-	dgCollisionScene* const newtonScene = (dgCollisionScene*) scene;
-	return (NewtonSceneProxy*) newtonScene->GetFirstProxy();
-}
-
-NewtonSceneProxy* NewtonSceneGetNextProxy (NewtonCollision* const scene, NewtonSceneProxy* const proxy)
-{
-	dgList<dgCollisionScene::dgProxy*>::dgListNode* const node = (dgList<dgCollisionScene::dgProxy*>::dgListNode*) proxy;
-	dgCollisionScene* const newtonScene = node->GetInfo()->m_owner;
-
-	return (NewtonSceneProxy*) newtonScene->GetNextProxy(proxy);
-}
-
-
-void NewtonSceneCollisionOptimize (NewtonCollision* const scene)
-{
-	dgCollisionScene* const newtonScene = (dgCollisionScene*) scene;
-	dgAssert (newtonScene->IsType(dgCollision::dgCollisionScene_RTTI));
-	newtonScene->ImproveTotalFitness();
-}
-*/
 
 
 dFloat NewtonCollisionGetSkinThickness (const NewtonCollision* const collision)
