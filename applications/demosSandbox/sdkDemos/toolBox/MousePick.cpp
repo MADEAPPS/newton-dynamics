@@ -277,6 +277,13 @@ class dMousePickClass
 	{
 		// ray cannot pick trigger volumes
 		//return NewtonCollisionIsTriggerVolume(collision) ? 0 : 1;
+
+		const NewtonCollision* const parent = NewtonCollisionGetParentInstance(collision);
+		if (parent) {
+			// you can use this to filter sub collision shapes.  
+			dAssert (NewtonCollisionGetSubCollisionHandle (collision));
+		}
+
 		return (NewtonBodyGetType(body) == NEWTON_DYNAMIC_BODY) ? 1 : 0;
 	}
 
@@ -286,6 +293,16 @@ class dMousePickClass
 		dFloat Ixx;
 		dFloat Iyy;
 		dFloat Izz;
+
+		// check if we are hitting a sub shape
+		const NewtonCollision* const parent = NewtonCollisionGetParentInstance(collisionHit);
+		if (parent) {
+			// you can use this to filter sub collision shapes.  
+			dAssert (NewtonCollisionGetSubCollisionHandle (collisionHit));
+		}
+
+
+
 		dMousePickClass* const data = (dMousePickClass*) userData;
 		NewtonBodyGetMassMatrix (body, &mass, &Ixx, &Iyy, &Izz);
 		if ((mass > 0.0f) || (NewtonBodyGetType(body) == NEWTON_KINEMATIC_BODY)) {

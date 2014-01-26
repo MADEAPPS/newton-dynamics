@@ -160,12 +160,12 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 	typedef void (*OnEmitFractureChunkCallBack) (dgBody* const body, dgConectivityGraph::dgListNode* const chunkMeshNode, const dgCollisionInstance* const myInstance);
 	typedef void (*OnReconstructFractureMainMeshCallBack) (dgBody* const body, dgConectivityGraph::dgListNode* const mainMeshNode, const dgCollisionInstance* const myInstance);
 
-	dgCollisionCompoundFractured (const dgCollisionCompoundFractured& source);
-	dgCollisionCompoundFractured (dgCollisionCompoundFractured& source, const dgList<dgConectivityGraph::dgListNode*>& island);
+	dgCollisionCompoundFractured (const dgCollisionCompoundFractured& source, const dgCollisionInstance* const myInstance);
+	dgCollisionCompoundFractured (dgCollisionCompoundFractured& source, const dgCollisionInstance* const myInstance, const dgList<dgConectivityGraph::dgListNode*>& island);
 	dgCollisionCompoundFractured (dgWorld* const world, dgMeshEffect* const solidMesh, dgInt32 fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& offsetMatrix,
 								 OnEmitFractureChunkCallBack emitFracturedChunk, OnEmitNewCompundFractureCallBack emitNewCompoundFactured, OnReconstructFractureMainMeshCallBack reconstructMainMesh);
 
-	dgCollisionCompoundFractured (dgWorld* const world, dgDeserialize deserialization, void* const userData);
+	dgCollisionCompoundFractured (dgWorld* const world, dgDeserialize deserialization, void* const userData, const dgCollisionInstance* const myInstance);
 	virtual ~dgCollisionCompoundFractured(void);
 
 	void SetCallbacks(OnEmitFractureChunkCallBack emitFracturedChunk, OnEmitNewCompundFractureCallBack emitNewCompoundFactured, OnReconstructFractureMainMeshCallBack reconstructMainMesh);

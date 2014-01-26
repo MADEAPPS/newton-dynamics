@@ -47,10 +47,8 @@ class dgCollisionCompound: public dgCollision
 	class dgTreeArray: public dgTree<dgNodeBase*, dgInt32>
 	{
 		public:
-		dgTreeArray (dgMemoryAllocator* const allocator)
-			:dgTree<dgNodeBase*, dgInt32>(allocator)
-		{
-		}
+		dgTreeArray (dgMemoryAllocator* const allocator);
+		void AddNode (dgNodeBase* const node, dgInt32 index, const dgCollisionInstance* const parent); 
 	};
 
 	DG_MSC_VECTOR_ALIGMENT
@@ -139,8 +137,10 @@ class dgCollisionCompound: public dgCollision
 
 	public:
 	dgCollisionCompound (dgWorld* const world);
-	dgCollisionCompound (const dgCollisionCompound& source);
-	dgCollisionCompound (dgWorld* const world, dgDeserialize deserialization, void* const userData);
+	dgCollisionCompound (const dgCollisionCompound& source, const dgCollisionInstance* const myInstance);
+	dgCollisionCompound (dgWorld* const world, dgDeserialize deserialization, void* const userData, const dgCollisionInstance* const myInstance);
+
+	void SetParent (const dgCollisionInstance* const myInstance);
 	virtual ~dgCollisionCompound();
 
 	virtual void BeginAddRemove ();
@@ -180,7 +180,7 @@ class dgCollisionCompound: public dgCollision
 	virtual dgVector CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& plane) const;
 
 	virtual void DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
-	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
+	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const;
 
 	virtual dgFloat32 ConvexRayCast (const dgCollisionInstance* const instance, const dgMatrix& instanceMatrix, const dgVector& instanceVeloc, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const referenceBody, const dgCollisionInstance* const referenceInstance, void* const userData, dgInt32 threadId) const; 
 	
@@ -225,6 +225,7 @@ class dgCollisionCompound: public dgCollision
 	dgFloat64 m_treeEntropy;
 	dgWorld* m_world;	
 	dgNodeBase* m_root;
+	const dgCollisionInstance* m_myInstance;
 	dgThread::dgCriticalSection m_criticalSectionLock;
 	dgTreeArray m_array;
 	dgInt32 m_idIndex;

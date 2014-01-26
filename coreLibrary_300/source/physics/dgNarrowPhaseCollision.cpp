@@ -231,8 +231,30 @@ dgCollisionInstance* dgWorld::CreateConvexHull (dgInt32 count, const dgFloat32* 
 dgCollisionInstance* dgWorld::CreateCompound ()
 {
 	// compound collision are not cached
-	dgCollision* const collision = new  (m_allocator) dgCollisionCompound (this);
+	dgCollisionCompound* const collision = new  (m_allocator) dgCollisionCompound (this);
 	dgCollisionInstance* const instance = CreateInstance (collision, 0, dgGetIdentityMatrix()); 
+	collision->SetParent(instance);
+	collision->Release();
+	return instance;
+}
+
+dgCollisionInstance* dgWorld::CreateScene ()
+{
+	dgCollisionScene* const collision = new (m_allocator) dgCollisionScene(this);
+	dgCollisionInstance* const instance = CreateInstance (collision, 0, dgGetIdentityMatrix()); 
+	collision->SetParent(instance);
+	collision->Release();
+	return instance;
+}
+
+dgCollisionInstance* dgWorld::CreateFracturedCompound (dgMeshEffect* const solidMesh, int shapeID, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& textureMatrix,
+													  dgCollisionCompoundFractured::OnEmitFractureChunkCallBack emitFracfuredChunk, 
+													  dgCollisionCompoundFractured::OnEmitNewCompundFractureCallBack emitFracturedCompound,
+													  dgCollisionCompoundFractured::OnReconstructFractureMainMeshCallBack reconstructMainMesh)
+{
+	dgCollisionCompoundFractured* const collision = new (m_allocator) dgCollisionCompoundFractured (this, solidMesh, fracturePhysicsMaterialID, pointcloudCount, vertexCloud, strideInBytes, materialID, textureMatrix, emitFracfuredChunk, emitFracturedCompound, reconstructMainMesh);
+	dgCollisionInstance* const instance = CreateInstance (collision, shapeID, dgGetIdentityMatrix()); 
+	collision->SetParent(instance);
 	collision->Release();
 	return instance;
 }
@@ -257,24 +279,11 @@ dgCollisionInstance* dgWorld::CreateDeformableMesh (dgMeshEffect* const mesh, dg
 }
 
 
-dgCollisionInstance* dgWorld::CreateFracturedCompound (dgMeshEffect* const solidMesh, int shapeID, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& textureMatrix,
-													  dgCollisionCompoundFractured::OnEmitFractureChunkCallBack emitFracfuredChunk, 
-													  dgCollisionCompoundFractured::OnEmitNewCompundFractureCallBack emitFracturedCompound,
-													  dgCollisionCompoundFractured::OnReconstructFractureMainMeshCallBack reconstructMainMesh)
-{
-	dgAssert (m_allocator == solidMesh->GetAllocator());
-
-	dgCollision* const collision = new (m_allocator) dgCollisionCompoundFractured (this, solidMesh, fracturePhysicsMaterialID, pointcloudCount, vertexCloud, strideInBytes, materialID, textureMatrix, emitFracfuredChunk, emitFracturedCompound, reconstructMainMesh);
-	dgCollisionInstance* const instance = CreateInstance (collision, shapeID, dgGetIdentityMatrix()); 
-	collision->Release();
-	return instance;
-}
 
 
 dgCollisionInstance* dgWorld::CreateBVH ()	
 {
 	// collision tree are not cached
-//	return new  (m_allocator) dgCollisionBVH (this);
 	dgCollision* const collision = new  (m_allocator) dgCollisionBVH (this);
 	dgCollisionInstance* const instance = CreateInstance (collision, 0, dgGetIdentityMatrix()); 
 	collision->Release();
@@ -303,13 +312,6 @@ dgCollisionInstance* dgWorld::CreateHeightField(
 }
 
 
-dgCollisionInstance* dgWorld::CreateScene ()
-{
-	dgCollision* const collision = new (m_allocator) dgCollisionScene(this);
-	dgCollisionInstance* const instance = CreateInstance (collision, 0, dgGetIdentityMatrix()); 
-	collision->Release();
-	return instance;
-}
 
 dgCollisionInstance* dgWorld::CreateInstance (const dgCollision* const child, dgInt32 shapeID, const dgMatrix& offsetMatrix)
 {

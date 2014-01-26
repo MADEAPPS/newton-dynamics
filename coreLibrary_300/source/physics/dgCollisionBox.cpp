@@ -164,10 +164,8 @@ void dgCollisionBox::CalcAABB (const dgMatrix& matrix, dgVector &p0, dgVector &p
 
 
 
-dgFloat32 dgCollisionBox::RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
+dgFloat32 dgCollisionBox::RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
 {
-//	return dgCollisionConvex::RayCast (localP0, localP1, maxT, contactOut, body, userData);
-
 	dgAssert (localP0.m_w == dgFloat32 (0.0f));
 	dgAssert (localP1.m_w == dgFloat32 (0.0f));
 

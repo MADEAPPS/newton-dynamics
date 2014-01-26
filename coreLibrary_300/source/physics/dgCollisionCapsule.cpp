@@ -323,13 +323,13 @@ dgVector dgCollisionCapsule::SupportVertex (const dgVector& dir, dgInt32* const 
 }
 
 
-dgFloat32 dgCollisionCapsule::RayCast (const dgVector& q0, const dgVector& q1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
+dgFloat32 dgCollisionCapsule::RayCast (const dgVector& q0, const dgVector& q1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
 {
 	dgVector origin0 ( m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	dgVector origin1 (-m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	dgFloat32 t0 = dgRayCastSphere (q0, q1, origin0, m_radius);
 	dgFloat32 t1 = dgRayCastSphere (q0, q1, origin1, m_radius);
-//	if ((t0 < dgFloat32 (1.2f)) && (t1 < dgFloat32 (1.2f))) {
+
 	if ((t0 < maxT) && (t1 < maxT)) {
 		if (t0 < t1) {
 			dgVector q (q0 + (q1 - q0).Scale4 (t0));

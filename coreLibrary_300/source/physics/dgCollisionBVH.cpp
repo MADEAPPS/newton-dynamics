@@ -244,7 +244,7 @@ dgAssert (0);
 
 
 
-dgFloat32 dgCollisionBVH::RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
+dgFloat32 dgCollisionBVH::RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
 {
 	dgBVHRay ray (localP0, localP1);
 	ray.m_t = dgMin(maxT, dgFloat32 (1.0f));

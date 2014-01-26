@@ -58,6 +58,14 @@ void GetConnectedBodiesByJoints (NewtonBody* const body)
 
 static dFloat RayCastPlacement (const NewtonBody* const body, const NewtonCollision* const collisionHit, const dFloat* const contact, const dFloat* const normal, dLong collisionID, void* const userData, dFloat intersetParam)
 {
+	// if the collision has a parent, the this can be it si a sub shape of a compound collision 
+	const NewtonCollision* const parent = NewtonCollisionGetParentInstance(collisionHit);
+	if (parent) {
+		// you can use this to filter sub collision shapes.  
+		dAssert (NewtonCollisionGetSubCollisionHandle (collisionHit));
+	}
+
+
 	dFloat* const paramPtr = (dFloat*)userData;
 	if (intersetParam < paramPtr[0]) {
 		paramPtr[0] = intersetParam;
@@ -66,7 +74,18 @@ static dFloat RayCastPlacement (const NewtonBody* const body, const NewtonCollis
 }
 
 
-//dFloat FindFloor (const NewtonWorld* world, dFloat x, dFloat z)
+static unsigned RayPrefilter (const NewtonBody* const body, const NewtonCollision* const collision, void* const userData)
+{
+	// if the collision has a parent, the this can be it si a sub shape of a compound collision 
+	const NewtonCollision* const parent = NewtonCollisionGetParentInstance(collision);
+	if (parent) {
+		// you can use this to filter sub collision shapes.  
+		dAssert (NewtonCollisionGetSubCollisionHandle (collision));
+	}
+
+	return 1;
+}
+
 dVector FindFloor (const NewtonWorld* world, const dVector& origin, dFloat dist)
 {
 	// shot a vertical ray from a high altitude and collect the intersection parameter.
@@ -74,7 +93,7 @@ dVector FindFloor (const NewtonWorld* world, const dVector& origin, dFloat dist)
 	dVector p1 (origin - dVector (0.0f, dAbs (dist), 0.0f, 0.0f)); 
 
 	dFloat parameter = 1.2f;
-	NewtonWorldRayCast (world, &p0[0], &p1[0], RayCastPlacement, &parameter, NULL, 0);
+	NewtonWorldRayCast (world, &p0[0], &p1[0], RayCastPlacement, &parameter, RayPrefilter, 0);
 	if (parameter < 1.0f) {
 		p0 -= dVector (0.0f, dAbs (dist) * parameter, 0.0f, 0.0f);
 	}

@@ -436,7 +436,7 @@ dgFloat32 dgCollisionHeightField::RayCastCell (const dgFastRayTest& ray, dgInt32
 		return dgFloat32 (1.2f);
 	}
 	
-	dgAssert (maxT >= 1.0);
+	dgAssert (maxT <= 1.0);
 
 	dgInt32 base = zIndex0 * m_width + xIndex0;
 	
@@ -526,7 +526,7 @@ dgFloat32 dgCollisionHeightField::RayCastCell (const dgFastRayTest& ray, dgInt32
 }
 
 
-dgFloat32 dgCollisionHeightField::RayCast (const dgVector& q0, const dgVector& q1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
+dgFloat32 dgCollisionHeightField::RayCast (const dgVector& q0, const dgVector& q1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
 {
 	dgVector boxP0;
 	dgVector boxP1;

@@ -4092,6 +4092,20 @@ void* NewtonCollisionGetUserData (const NewtonCollision* const collision)
 	return instance->GetUserData();
 }
 
+void* NewtonCollisionGetSubCollisionHandle (const NewtonCollision* const collision)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgCollisionInstance* const instance = (dgCollisionInstance*) collision;
+	return (void*)instance->GetCollisionHandle ();
+}
+
+NewtonCollision* NewtonCollisionGetParentInstance (const NewtonCollision* const collision)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgCollisionInstance* const instance = (dgCollisionInstance*) collision;
+	return (NewtonCollision*)instance->GetParent();
+}
+
 
 void NewtonCollisionSetMatrix (const NewtonCollision* collision, const dFloat* const matrix)
 {

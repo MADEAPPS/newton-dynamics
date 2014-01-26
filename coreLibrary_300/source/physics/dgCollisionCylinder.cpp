@@ -302,9 +302,8 @@ dgInt32 dgCollisionCylinder::CalculatePlaneIntersection (const dgVector& normal,
 }
 
 
-dgFloat32 dgCollisionCylinder::RayCast (const dgVector& q0, const dgVector& q1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
+dgFloat32 dgCollisionCylinder::RayCast (const dgVector& q0, const dgVector& q1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
 {
-//	dgFloat32 t = dgFloat32 (1.2f);
 	dgFloat32 t = maxT;
 	dgVector p0 (q0);
 	p0.m_x = dgFloat32 (0.0f);

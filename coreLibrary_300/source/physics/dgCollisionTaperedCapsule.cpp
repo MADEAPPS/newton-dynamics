@@ -363,7 +363,7 @@ dgVector dgCollisionTaperedCapsule::SupportVertex (const dgVector& dir, dgInt32*
 
 
 
-dgFloat32 dgCollisionTaperedCapsule::RayCast (const dgVector& q0, const dgVector& q1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
+dgFloat32 dgCollisionTaperedCapsule::RayCast (const dgVector& q0, const dgVector& q1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
 {
 	dgVector origin0 ( m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	dgVector origin1 (-m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
@@ -412,7 +412,7 @@ dgFloat32 dgCollisionTaperedCapsule::RayCast (const dgVector& q0, const dgVector
 			return t1;
 		}
 	}
-	return dgCollisionConvex::RayCast (q0, q1, maxT, contactOut, NULL, NULL);
+	return dgCollisionConvex::RayCast (q0, q1, maxT, contactOut, NULL, NULL, NULL);
 
 }
 

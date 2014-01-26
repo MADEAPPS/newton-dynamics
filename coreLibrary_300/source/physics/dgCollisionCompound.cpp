@@ -46,6 +46,20 @@ class dgCollisionCompound::dgHeapNodePair
 };
 
 
+dgCollisionCompound::dgTreeArray::dgTreeArray (dgMemoryAllocator* const allocator)
+	:dgTree<dgNodeBase*, dgInt32>(allocator)
+{
+}
+
+void dgCollisionCompound::dgTreeArray::AddNode (dgNodeBase* const node, dgInt32 index, const dgCollisionInstance* const parent) 
+{
+	dgTreeNode* const myNode = dgTree<dgNodeBase*, dgInt32>::Insert(node, index);
+	node->m_myNode = myNode;
+	node->m_shape->m_parent = parent;
+	node->m_shape->m_subCollisionHandle = myNode;
+}
+
+
 dgCollisionCompound::dgOOBBTestData::dgOOBBTestData (const dgMatrix& matrix)
 	:m_matrix (matrix)
 {
@@ -448,6 +462,7 @@ dgCollisionCompound::dgCollisionCompound(dgWorld* const world)
 	,m_treeEntropy (dgFloat32 (0.0f))
 	,m_world(world)
 	,m_root(NULL)
+	,m_myInstance(NULL)
 	,m_criticalSectionLock()
 	,m_array (world->GetAllocator())
 	,m_idIndex(0)
@@ -455,13 +470,14 @@ dgCollisionCompound::dgCollisionCompound(dgWorld* const world)
 	m_rtti |= dgCollisionCompound_RTTI;
 }
 
-dgCollisionCompound::dgCollisionCompound (const dgCollisionCompound& source)
+dgCollisionCompound::dgCollisionCompound (const dgCollisionCompound& source, const dgCollisionInstance* const myInstance)
 	:dgCollision (source) 
 	,m_boxMinRadius(source.m_boxMinRadius)
 	,m_boxMaxRadius(source.m_boxMaxRadius)
 	,m_treeEntropy(source.m_treeEntropy)
 	,m_world (source.m_world)	
 	,m_root(NULL)
+	,m_myInstance(myInstance)
 	,m_criticalSectionLock()
 	,m_array (source.GetAllocator())
 	,m_idIndex(source.m_idIndex)
@@ -472,7 +488,7 @@ dgCollisionCompound::dgCollisionCompound (const dgCollisionCompound& source)
 	for (iter.Begin(); iter; iter ++) {
 		dgNodeBase* const node = iter.GetNode()->GetInfo();
 		dgNodeBase* const newNode = new (m_allocator) dgNodeBase (node->GetShape());
-		newNode->m_myNode = m_array.Insert(newNode, iter.GetNode()->GetKey());
+		m_array.AddNode(newNode, iter.GetNode()->GetKey(), m_myInstance);
 	}
 
 	if (source.m_root) {
@@ -535,13 +551,14 @@ dgCollisionCompound::dgCollisionCompound (const dgCollisionCompound& source)
 	}
 }
 
-dgCollisionCompound::dgCollisionCompound (dgWorld* const world, dgDeserialize deserialization, void* const userData)
+dgCollisionCompound::dgCollisionCompound (dgWorld* const world, dgDeserialize deserialization, void* const userData, const dgCollisionInstance* const myInstance)
 	:dgCollision (world, deserialization, userData)
 	,m_boxMinRadius (dgFloat32 (0.0f))
 	,m_boxMaxRadius (dgFloat32 (0.0f))
 	,m_treeEntropy (dgFloat32 (0.0f))
 	,m_world(world)
 	,m_root(NULL)
+	,m_myInstance(myInstance)
 	,m_criticalSectionLock()
 	,m_array (world->GetAllocator())
 	,m_idIndex(0)
@@ -567,6 +584,10 @@ dgCollisionCompound::~dgCollisionCompound()
 	}
 }
 
+void dgCollisionCompound::SetParent (const dgCollisionInstance* const instance)
+{
+	m_myInstance = instance;
+}
 
 void dgCollisionCompound::SetCollisionBBox (const dgVector& p0__, const dgVector& p1__)
 {
@@ -626,7 +647,7 @@ void dgCollisionCompound::DebugCollision (const dgMatrix& matrix, dgCollision::O
 }
 
 
-dgFloat32 dgCollisionCompound::RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
+dgFloat32 dgCollisionCompound::RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
 {
 	if (!m_root) {
 		return dgFloat32 (1.2f);
@@ -655,12 +676,14 @@ dgFloat32 dgCollisionCompound::RayCast (const dgVector& localP0, const dgVector&
 				dgCollisionInstance* const shape = me->GetShape();
 				dgVector p0 (shape->GetLocalMatrix().UntransformVector (localP0));
 				dgVector p1 (shape->GetLocalMatrix().UntransformVector (localP1));
-				dgFloat32 param = shape->RayCast (p0, p1, maxT, tmpContactOut, NULL, body, userData);
+				dgFloat32 param = shape->RayCast (p0, p1, maxT, tmpContactOut, preFilter, body, userData);
 				if (param < maxT) {
 					maxT = param;
-					contactOut.m_normal = shape->GetLocalMatrix().RotateVector (tmpContactOut.m_normal);;
-//					contactOut.m_userId = tmpContactOut.m_userId;
+					contactOut.m_normal = shape->GetLocalMatrix().RotateVector (tmpContactOut.m_normal);
 					contactOut.m_shapeId0 = tmpContactOut.m_shapeId0;
+					contactOut.m_shapeId1 = tmpContactOut.m_shapeId0;
+					contactOut.m_collision0 = tmpContactOut.m_collision0;
+					contactOut.m_collision1 = tmpContactOut.m_collision1;
 				}
 
 			} else {
@@ -977,7 +1000,8 @@ void dgCollisionCompound::EndAddRemove ()
 dgTree<dgCollisionCompound::dgNodeBase*, dgInt32>::dgTreeNode* dgCollisionCompound::AddCollision (dgCollisionInstance* const shape)
 {
 	dgNodeBase* const newNode = new (m_allocator) dgNodeBase (shape);
-	newNode->m_myNode = m_array.Insert(newNode, m_idIndex);
+	m_array.AddNode(newNode, m_idIndex, m_myInstance);
+
 	m_idIndex ++;
 
 	if (!m_root) {

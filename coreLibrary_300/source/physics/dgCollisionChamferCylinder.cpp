@@ -265,7 +265,7 @@ void dgCollisionChamferCylinder::Serialize(dgSerialize callback, void* const use
 
 
 
-dgFloat32 dgCollisionChamferCylinder::RayCast (const dgVector& q0, const dgVector& q1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
+dgFloat32 dgCollisionChamferCylinder::RayCast (const dgVector& q0, const dgVector& q1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
 {
 	if (q0.m_x > m_height) {
 		if (q1.m_x < m_height) {
@@ -297,7 +297,7 @@ dgFloat32 dgCollisionChamferCylinder::RayCast (const dgVector& q0, const dgVecto
 	dgAssert ((dq % dq) > 0.0f);
 	dgVector dir (dq.Scale3 (dgRsqrt(dq % dq)));
 	if (dgAbsf (dir.m_x) > 0.9999f) {
-		return dgCollisionConvex::RayCast (q0, q1, maxT, contactOut, NULL, NULL);
+		return dgCollisionConvex::RayCast (q0, q1, maxT, contactOut, NULL, NULL, NULL);
 	}
 
 	dgVector p0 (q0);

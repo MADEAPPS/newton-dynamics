@@ -61,6 +61,8 @@ dgCollisionInstance::dgCollisionInstance()
 	,m_userData(NULL)
 	,m_world(NULL)
 	,m_childShape (NULL)
+	,m_subCollisionHandle(NULL)
+	,m_parent(NULL)
 	,m_collisionMode(1)
 	,m_scaleType(m_unit)
 {
@@ -79,6 +81,8 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const world, const dgCol
 	,m_userData(NULL)
 	,m_world(world)
 	,m_childShape (childCollision)
+	,m_subCollisionHandle(NULL)
+	,m_parent(NULL)
 	,m_collisionMode(1)
 	,m_scaleType(m_unit)
 {
@@ -97,19 +101,21 @@ dgCollisionInstance::dgCollisionInstance(const dgCollisionInstance& instance)
 	,m_userData(instance.m_userData)
 	,m_world(instance.m_world)
 	,m_childShape (instance.m_childShape)
+	,m_subCollisionHandle(NULL)
+	,m_parent(NULL)
 	,m_collisionMode(instance.m_collisionMode)
 	,m_scaleType(instance.m_scaleType)
 {
 	if (m_childShape->IsType (dgCollision::dgCollisionCompound_RTTI)) {
 		if (m_childShape->IsType (dgCollision::dgCollisionCompoundBreakable_RTTI)) {
 			dgCollisionCompoundFractured* const compound = (dgCollisionCompoundFractured*) m_childShape;
-			m_childShape = new (m_world->GetAllocator()) dgCollisionCompoundFractured (*compound);
+			m_childShape = new (m_world->GetAllocator()) dgCollisionCompoundFractured (*compound, this);
 		} else if (m_childShape->IsType (dgCollision::dgCollisionScene_RTTI)) {
 			dgCollisionScene* const scene = (dgCollisionScene*) m_childShape;
-			m_childShape = new (m_world->GetAllocator()) dgCollisionScene (*scene);
+			m_childShape = new (m_world->GetAllocator()) dgCollisionScene (*scene, this);
 		} else {
 			dgCollisionCompound *const compound = (dgCollisionCompound*) m_childShape;
-			m_childShape = new (m_world->GetAllocator()) dgCollisionCompound (*compound);
+			m_childShape = new (m_world->GetAllocator()) dgCollisionCompound (*compound, this);
 		}
 	} else if (m_childShape->IsType (dgCollision::dgCollisionDeformableClothPatch_RTTI)) {
 		dgCollisionDeformableClothPatch* const deformable = (dgCollisionDeformableClothPatch*) m_childShape;
@@ -138,6 +144,8 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 	,m_userData(NULL)
 	,m_world(constWorld)
 	,m_childShape (NULL)
+	,m_subCollisionHandle(NULL)
+	,m_parent(NULL)
 	,m_collisionMode(1)
 	,m_scaleType(m_unit)
 {
@@ -192,19 +200,19 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 
 				case m_compoundCollision:
 				{
-					collision = new (allocator) dgCollisionCompound (world, deserialization, userData);
+					collision = new (allocator) dgCollisionCompound (world, deserialization, userData, this);
 					break;
 				}
 
 				case m_compoundFracturedCollision:
 				{
-					collision = new (allocator) dgCollisionCompoundFractured (world, deserialization, userData);
+					collision = new (allocator) dgCollisionCompoundFractured (world, deserialization, userData, this);
 					break;
 				}
 
 				case m_sceneCollision:
 				{
-					collision = new (allocator) dgCollisionScene (world, deserialization, userData);
+					collision = new (allocator) dgCollisionScene (world, deserialization, userData, this);
 					break;
 				}
 
@@ -562,14 +570,16 @@ dgFloat32 dgCollisionInstance::RayCast (const dgVector& localP0, const dgVector&
 		{
 			case m_unit:
 			{
-				dgFloat32 t = m_childShape->RayCast (localP0, localP1, maxT, contactOut, body, userData);
+				dgFloat32 t = m_childShape->RayCast (localP0, localP1, maxT, contactOut, body, userData, preFilter);
 				if (t <= maxT) {
 					if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
 						contactOut.m_shapeId0 = GetUserDataID();
 						contactOut.m_shapeId1 = GetUserDataID();
 					}
-					contactOut.m_collision0 = this;
-					contactOut.m_collision1 = this;
+					if (!m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI)) {
+						contactOut.m_collision0 = this;
+						contactOut.m_collision1 = this;
+					}
 				}
 				return t;
 			}
@@ -578,14 +588,16 @@ dgFloat32 dgCollisionInstance::RayCast (const dgVector& localP0, const dgVector&
 			{
 				dgVector p0 (localP0.CompProduct4(m_invScale));
 				dgVector p1 (localP1.CompProduct4(m_invScale));
-				dgFloat32 t = m_childShape->RayCast (p0, p1, maxT, contactOut, body, userData);
+				dgFloat32 t = m_childShape->RayCast (p0, p1, maxT, contactOut, body, userData, preFilter);
 				if (t <= maxT) {
 					if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
 						contactOut.m_shapeId0 = GetUserDataID();
 						contactOut.m_shapeId1 = GetUserDataID();
 					}
-					contactOut.m_collision0 = this;
-					contactOut.m_collision1 = this;
+					if (!m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI)) {
+						contactOut.m_collision0 = this;
+						contactOut.m_collision1 = this;
+					}
 				}
 				return t;
 			}
@@ -594,7 +606,7 @@ dgFloat32 dgCollisionInstance::RayCast (const dgVector& localP0, const dgVector&
 			{
 				dgVector p0 (localP0.CompProduct4(m_invScale));
 				dgVector p1 (localP1.CompProduct4(m_invScale));
-				dgFloat32 t = m_childShape->RayCast (p0, p1, maxT, contactOut, body, userData);
+				dgFloat32 t = m_childShape->RayCast (p0, p1, maxT, contactOut, body, userData, preFilter);
 				if (t <= maxT) {
 					if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
 						contactOut.m_shapeId0 = GetUserDataID();
@@ -602,8 +614,10 @@ dgFloat32 dgCollisionInstance::RayCast (const dgVector& localP0, const dgVector&
 						dgVector n (m_invScale.CompProduct4 (contactOut.m_normal));
 						contactOut.m_normal = n.CompProduct4(n.InvMagSqrt());
 					}
-					contactOut.m_collision0 = this;
-					contactOut.m_collision1 = this;
+					if (!m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI)) {
+						contactOut.m_collision0 = this;
+						contactOut.m_collision1 = this;
+					}
 				}
 				return t;
 			}
@@ -613,7 +627,7 @@ dgFloat32 dgCollisionInstance::RayCast (const dgVector& localP0, const dgVector&
 			{
 				dgVector p0 (m_aligmentMatrix.UntransformVector (localP0.CompProduct4(m_invScale)));
 				dgVector p1 (m_aligmentMatrix.UntransformVector (localP1.CompProduct4(m_invScale)));
-				dgFloat32 t = m_childShape->RayCast (p0, p1, maxT, contactOut, body, userData);
+				dgFloat32 t = m_childShape->RayCast (p0, p1, maxT, contactOut, body, userData, preFilter);
 				if (t <= maxT) {
 					if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
 						contactOut.m_shapeId0 = GetUserDataID();
@@ -621,8 +635,10 @@ dgFloat32 dgCollisionInstance::RayCast (const dgVector& localP0, const dgVector&
 						dgVector n (m_aligmentMatrix.RotateVector(m_invScale.CompProduct4 (contactOut.m_normal)));
 						contactOut.m_normal = n.CompProduct4(n.InvMagSqrt());
 					}
-					contactOut.m_collision0 = this;
-					contactOut.m_collision1 = this;
+					if (!(m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
+						contactOut.m_collision0 = this;
+						contactOut.m_collision1 = this;
+					}
 				}
 				return t;
 			}

@@ -266,7 +266,7 @@ dgVector dgCollisionPoint::SupportVertex (const dgVector& dir, dgInt32* const ve
 }
 
 
-dgFloat32 dgCollisionSphere::RayCast (const dgVector& p0, const dgVector& p1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const
+dgFloat32 dgCollisionSphere::RayCast (const dgVector& p0, const dgVector& p1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
 {
 	dgFloat32 t = dgRayCastSphere (p0, p1, dgVector (dgFloat32 (0.0f)), m_radius);
 	if (t < maxT) {

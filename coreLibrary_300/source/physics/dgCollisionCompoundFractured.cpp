@@ -858,8 +858,8 @@ dgCollisionCompoundFractured::dgSubMesh* dgCollisionCompoundFractured::dgMesh::A
 }
  
 
-dgCollisionCompoundFractured::dgCollisionCompoundFractured (const dgCollisionCompoundFractured& source)
-    :dgCollisionCompound(source)
+dgCollisionCompoundFractured::dgCollisionCompoundFractured (const dgCollisionCompoundFractured& source, const dgCollisionInstance* const myInstance)
+    :dgCollisionCompound(source, myInstance)
 	,m_conectivity(source.m_conectivity)
 	,m_conectivityMap (source.m_conectivityMap)
 	,m_vertexBuffer(source.m_vertexBuffer)
@@ -907,8 +907,8 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (const dgCollisionCom
 	dgAssert (SanityCheck());
 }
 
-dgCollisionCompoundFractured::dgCollisionCompoundFractured (dgCollisionCompoundFractured& source, const dgList<dgConectivityGraph::dgListNode*>& island)
-	:dgCollisionCompound(source.m_world)
+dgCollisionCompoundFractured::dgCollisionCompoundFractured (dgCollisionCompoundFractured& source, const dgCollisionInstance* const myInstance, const dgList<dgConectivityGraph::dgListNode*>& island)
+	:dgCollisionCompound(source.m_world, myInstance)
 	,m_conectivity(source.GetAllocator())
 	,m_conectivityMap (source.GetAllocator())
 	,m_vertexBuffer(source.m_vertexBuffer)
@@ -955,8 +955,8 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (dgCollisionCompoundF
 	dgAssert (SanityCheck());
 }
 
-dgCollisionCompoundFractured::dgCollisionCompoundFractured (dgWorld* const world, dgDeserialize deserialization, void* const userData)
-	:dgCollisionCompound (world, deserialization, userData)
+dgCollisionCompoundFractured::dgCollisionCompoundFractured (dgWorld* const world, dgDeserialize deserialization, void* const userData, const dgCollisionInstance* const myInstance)
+	:dgCollisionCompound (world, deserialization, userData, myInstance)
 	,m_conectivity (world->GetAllocator())
 	,m_conectivityMap (world->GetAllocator())
 {
@@ -1705,6 +1705,8 @@ void dgCollisionCompoundFractured::SpawnSingleChunk (dgBody* const myBody, const
 
 void dgCollisionCompoundFractured::SpawnComplexChunk (dgBody* const myBody, const dgCollisionInstance* const myInstance, dgConectivityGraph::dgListNode* const chunkNode)
 {
+	dgAssert (0);
+/*
 	dgInt32 stack = 1;
 	dgConectivityGraph::dgListNode* pool[512];
 
@@ -1756,4 +1758,5 @@ void dgCollisionCompoundFractured::SpawnComplexChunk (dgBody* const myBody, cons
 
 	m_emitFracturedCompound (chunkBody);
 	childStructureInstance->Release();
+*/
 }

@@ -28,21 +28,21 @@
 #include "dgCollisionInstance.h"
 
 
-dgCollisionScene::dgCollisionScene(dgWorld* const world)
+dgCollisionScene::dgCollisionScene (dgWorld* const world)
 	:dgCollisionCompound(world)
 {
 	m_collisionId = m_sceneCollision;
 	m_rtti |= dgCollisionScene_RTTI;
 }
 
-dgCollisionScene::dgCollisionScene (const dgCollisionScene& source)
-	:dgCollisionCompound(source)
+dgCollisionScene::dgCollisionScene (const dgCollisionScene& source, const dgCollisionInstance* const myInstance)
+	:dgCollisionCompound(source, myInstance)
 {
 	m_rtti |= dgCollisionScene_RTTI;
 }
 
-dgCollisionScene::dgCollisionScene(dgWorld* const world, dgDeserialize deserialization, void* const userData)
-	:dgCollisionCompound(world, deserialization, userData)
+dgCollisionScene::dgCollisionScene (dgWorld* const world, dgDeserialize deserialization, void* const userData, const dgCollisionInstance* const myInstance)
+	:dgCollisionCompound(world, deserialization, userData, myInstance)
 {
 	dgAssert (m_rtti | dgCollisionScene_RTTI);
 }

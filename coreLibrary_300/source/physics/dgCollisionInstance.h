@@ -70,6 +70,9 @@ class dgCollisionInstance
 	void* GetUserData () const;
 	void SetUserData (void* const userData);
 
+	const void* GetCollisionHandle () const;
+	const dgCollisionInstance* GetParent () const;
+
 	dgVector GetBoxSize() const;
 	dgVector GetBoxOrigin() const;
 
@@ -131,6 +134,8 @@ class dgCollisionInstance
 	void* m_userData;
 	const dgWorld* m_world;
 	const dgCollision* m_childShape;
+	const void* m_subCollisionHandle;
+	const dgCollisionInstance* m_parent;
 	dgInt32 m_collisionMode;
 	dgScaleType m_scaleType;
 
@@ -149,6 +154,8 @@ DG_INLINE dgCollisionInstance::dgCollisionInstance(const dgCollisionInstance& me
 	,m_userData(NULL)
 	,m_world(meshInstance.m_world)
 	,m_childShape (shape)
+	,m_subCollisionHandle(NULL)
+	,m_parent(NULL)
 	,m_collisionMode(meshInstance.m_collisionMode)
 	,m_scaleType(meshInstance.m_scaleType)
 {
@@ -283,6 +290,17 @@ DG_INLINE dgFloat32 dgCollisionInstance::GetBreakImpulse() const
 DG_INLINE void* dgCollisionInstance::GetUserData () const
 {
 	return m_userData;
+}
+
+
+DG_INLINE const void* dgCollisionInstance::GetCollisionHandle () const
+{
+	return m_subCollisionHandle;
+}
+
+DG_INLINE const dgCollisionInstance* dgCollisionInstance::GetParent () const
+{
+	return m_parent;
 }
 
 DG_INLINE void dgCollisionInstance::SetUserData (void* const userData)
