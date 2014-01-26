@@ -5526,9 +5526,11 @@ void NewtonBodySetCollisionScale (const NewtonBody* const bodyPtr, dFloat scaleX
 	NewtonCollisionSetScale(NewtonBodyGetCollision(bodyPtr), scaleX, scaleY, scaleZ);
 	world->GetBroadPhase()->ResetEntropy ();
 
-//	dgMatrix matrix;
-//	NewtonBodyGetMatrix (bodyPtr, &matrix[0][0]);
-//	NewtonBodySetMatrix (bodyPtr, &matrix[0][0]);
+	NewtonJoint* nextJoint;
+	for (NewtonJoint* contactJoint = NewtonBodyGetFirstContactJoint(bodyPtr); contactJoint; contactJoint = nextJoint) {
+		nextJoint = NewtonBodyGetNextContactJoint(bodyPtr, contactJoint);
+		world->DestroyConstraint ((dgConstraint*)contactJoint);
+	}
 }
 
 
