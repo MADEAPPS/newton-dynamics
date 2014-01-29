@@ -188,8 +188,10 @@ class BasicVehicleEntity: public DemoEntity
 		dAssert (chassis);
 
 		DemoMesh* const mesh = chassis->GetMesh();
+		//dAssert (chassis->GetMeshMatrix().TestIdentity());
+		const dMatrix& meshMatrix = chassis->GetMeshMatrix();
 		float* const vertexList = mesh->m_vertex;
-		return NewtonCreateConvexHull(world, mesh->m_vertexCount, vertexList, 3 * sizeof (float), 0.001f, 0, NULL);
+		return NewtonCreateConvexHull(world, mesh->m_vertexCount, vertexList, 3 * sizeof (float), 0.001f, 0, &meshMatrix[0][0]);
 	}
 
 	void CalculateTireDimensions (const char* const tireName, dFloat& width, dFloat& radius) const
@@ -204,7 +206,12 @@ class BasicVehicleEntity: public DemoEntity
 
 		// make a convex hull collision shape to assist in calculation of the tire shape size
 		DemoMesh* const tireMesh = tirePart->GetMesh();
-		NewtonCollision* const collision = NewtonCreateConvexHull(world, tireMesh->m_vertexCount, tireMesh->m_vertex, 3 * sizeof (dFloat), 0, 0, NULL);
+		//dAssert (tirePart->GetMeshMatrix().TestIdentity());
+		const dMatrix& meshMatrix = tirePart->GetMeshMatrix();
+		dVector* const temp = new dVector [tireMesh->m_vertexCount];
+		meshMatrix.TransformTriplex (&temp[0].m_x, sizeof (dVector), tireMesh->m_vertex, 3 * sizeof (dFloat), tireMesh->m_vertexCount);
+		NewtonCollision* const collision = NewtonCreateConvexHull(world, tireMesh->m_vertexCount, &temp[0].m_x, sizeof (dVector), 0, 0, NULL);
+		delete[] temp;
 
 		// get the location of this tire relative to the car chassis
 		dMatrix tireLocalMatrix (entity->GetNextMatrix());
@@ -751,7 +758,6 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 
 	void RenderVehicleHud (DemoEntityManager* const scene, int lineNumber) const
 	{
-		dAssert (0);
 		// set to transparent color
 		glEnable (GL_BLEND);
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -840,8 +846,7 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 	{
 		// do the base class post update
 		CustomVehicleControllerManager::PostUpdate(timestep);
-		dAssert (0);
-/*
+		
 		// update the visual transformation matrices for all vehicle tires
 		for (CustomListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
 			CustomVehicleController* const controller = &ptr->GetInfo();
@@ -856,7 +861,7 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
 		DemoCamera* const camera = scene->GetCamera();
-		camera->SetNavigationMode (false);
+		//camera->SetNavigationMode (false);
 
 		dMatrix camMatrix (camera->GetNextMatrix ());
 		if (m_externalView) {
@@ -880,7 +885,7 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 		// smooth out the camera position 
 //		playerMatrix.m_posit = camMatrix.m_posit + (playerMatrix.m_posit - camMatrix.m_posit).Scale(0.5f);
 		camera->SetNextMatrix(*scene, m_camRotation, m_camPosit);
-*/
+
 	}
 
 	// use this to display debug information about vehicle 
@@ -949,7 +954,7 @@ void BasicCar (DemoEntityManager* const scene)
 //location.m_posit.m_z = 0.0f;
 
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
-	location.m_posit.m_y += 0.5f;
+	location.m_posit.m_y += 5.5f;
 
 	// make a vehicle entity shell
 	//BasicVehicleEntity* const vehicle = new BasicVehicleEntity (scene, manager, location, "f1.ngd");
