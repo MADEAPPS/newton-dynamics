@@ -237,7 +237,6 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	m_allocator = allocator;
 	m_islandUpdate = NULL;
 	m_getPerformanceCount = NULL;
-	m_destroyBodyByExeciveForce = NULL;
 
 	m_onCollisionInstanceDestruction = NULL;
 	m_onCollisionInstanceCopyConstrutor = NULL;
@@ -260,7 +259,6 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 
 	m_userData = NULL;
 	m_islandUpdate = NULL;
-	m_destroyBodyByExeciveForce = NULL;
 
 	m_freezeAccel2 = DG_FREEZE_MAG2;
 	m_freezeAlpha2 = DG_FREEZE_MAG2;
@@ -628,12 +626,6 @@ void dgWorld::SetIslandUpdateCallback (OnIslandUpdate callback)
 }
 
 
-void dgWorld::SetBodyDestructionByExeciveForce (OnBodyDestructionByExeciveForce callback) 
-{
-	m_destroyBodyByExeciveForce = callback;
-}
-
-
 void* dgWorld::AddPreListener (const char* const nameid, void* const userData, OnListenerUpdateCallback updateCallback, OnListenerDestroyCallback destroyCallback)
 {
 	dgListenerList::dgListNode* const node = m_preListener.Append();
@@ -939,8 +931,6 @@ void dgWorld::StepDynamics (dgFloat32 timestep)
 	dgAssert (m_inUpdate == 0);
 //SerializeToFile ("xxx.bin");
 
-	m_destroyeddBodiesPool.m_count = 0;
-
 	dgThreadHive::ClearTimers();
 	memset (m_perfomanceCounters, 0, sizeof (m_perfomanceCounters));
 	dgUnsigned32 ticks = m_getPerformanceCount();
@@ -950,12 +940,6 @@ void dgWorld::StepDynamics (dgFloat32 timestep)
 
 	m_broadPhase->UpdateContacts (timestep);
 	UpdateDynamics (timestep);
-
-	if (m_destroyBodyByExeciveForce) {
-		for (dgInt32 i = 0; i < m_destroyeddBodiesPool.m_count; i ++) {
-			m_destroyBodyByExeciveForce (m_destroyeddBodiesPool.m_bodies[i], m_destroyeddBodiesPool.m_joint[i]);
-		}
-	}
 
 	if (m_postListener.GetCount()) {
 		dgUnsigned32 ticks = m_getPerformanceCount();

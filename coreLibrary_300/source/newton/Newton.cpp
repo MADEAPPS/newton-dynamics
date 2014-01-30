@@ -841,26 +841,6 @@ void NewtonSetIslandUpdateEvent(const NewtonWorld* const newtonWorld, NewtonIsla
 	world->SetIslandUpdateCallback((dgWorld::OnIslandUpdate) islandUpdate); 
 }
 
-/*
-// Name: NewtonSetDestroyBodyByExeciveForce
-// Set a function callback to be call when the force applied at a contact point exceed the max force allowed for that convex shape 
-//
-// Parameters:
-// *const NewtonWorld* *newtonWorld - is the pointer to the Newton world
-// *NewtonDestroyBodyByExeciveForce* callback - application defined callback 
-//
-//Remarks: Only convex Hull shapes can have max brak force parameter.
-// 
-// Return: Nothing.
-void NewtonSetDestroyBodyByExeciveForce(const NewtonWorld* const newtonWorld, NewtonDestroyBodyByExeciveForce callback)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	Newton* const world = (Newton *) newtonWorld;
-	world->SetBodyDestructionByExeciveForce((OnBodyDestructionByExeciveForce) callback); 
-}
-
-*/
-
 
 
 // Name: NewtonWorldGetFirstBody 

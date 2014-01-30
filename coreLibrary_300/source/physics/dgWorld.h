@@ -151,28 +151,12 @@ class dgWorld
 	public:
 
 	typedef dgUnsigned32 (dgApi *OnIslandUpdate) (const dgWorld* const world, void* island, dgInt32 bodyCount);
-	typedef void (dgApi *OnBodyDestructionByExeciveForce) (const dgBody* const body, const dgContact* joint);
 	typedef void (dgApi *OnListenerUpdateCallback) (const dgWorld* const world, void* const listenerUserData, dgFloat32 timestep);
 	typedef void (dgApi *OnListenerDestroyCallback) (const dgWorld* const world, void* const listenerUserData);
 	typedef void (dgApi *OnBodySerialize) (dgBody& me, dgSerialize funt, void* const serilalizeObject);
 	typedef void (dgApi *OnBodyDeserialize) (dgBody& me, dgDeserialize funt, void* const serilalizeObject);
 	typedef void (dgApi *OnCollisionInstanceDestroy) (const dgWorld* const world, const dgCollisionInstance* const collision);
 	typedef void (dgApi *OnCollisionInstanceDuplicate) (const dgWorld* const world, dgCollisionInstance* const collision, const dgCollisionInstance* const sourceCollision);
-
-
-
-	class dgDetroyBodyByForce
-	{	
-		public:
-		dgDetroyBodyByForce()
-			:m_count(0)
-		{
-		}
-		dgInt32 m_count;
-		dgFloat32 m_force[DG_MAX_DESTROYED_BODIES_BY_FORCE];
-		const dgBody* m_bodies[DG_MAX_DESTROYED_BODIES_BY_FORCE];
-		const dgContact* m_joint[DG_MAX_DESTROYED_BODIES_BY_FORCE];
-	};
 
 	class dgListener
 	{
@@ -266,9 +250,7 @@ class dgWorld
 	void* AddPreListener (const char* const nameid, void* const userData, OnListenerUpdateCallback updateCallback, OnListenerDestroyCallback destroyCallback);
 	void* AddPostListener (const char* const nameid, void* const userData, OnListenerUpdateCallback updateCallback, OnListenerDestroyCallback destroyCallback);
 
-
 	void SetIslandUpdateCallback (OnIslandUpdate callback); 
-	void SetBodyDestructionByExeciveForce (OnBodyDestructionByExeciveForce callback); 
 
 	void InitBody (dgBody* const body, dgCollisionInstance* const collision, const dgMatrix& matrix);
 	dgDynamicBody* CreateDynamicBody (dgCollisionInstance* const collision, const dgMatrix& matrix);
@@ -459,14 +441,10 @@ class dgWorld
 	dgInt32 m_hardwaredIndex;
 	OnIslandUpdate m_islandUpdate;
 	OnGetPerformanceCountCallback m_getPerformanceCount;
-	OnBodyDestructionByExeciveForce m_destroyBodyByExeciveForce;
-
 	OnCollisionInstanceDestroy	m_onCollisionInstanceDestruction;
 	OnCollisionInstanceDuplicate m_onCollisionInstanceCopyConstrutor;
 
-	dgDetroyBodyByForce m_destroyeddBodiesPool;
 
-	
 	dgUnsigned32 m_perfomanceCounters[m_counterSize];	
 	dgUnsigned32 m_perfomanceCountersBack[m_counterSize];	
 
@@ -528,32 +506,4 @@ inline dgBroadPhase* dgWorld::GetBroadPhase() const
 	return m_broadPhase;
 }
 
-/*
-inline void dgWorld::AddToBreakQueue (const dgContact* const contactJoint, dgBody* const body, dgFloat32 maxForce)
-{
-	if (m_destroyeddBodiesPool.m_count < DG_MAX_DESTROYED_BODIES_BY_FORCE) {
-		if (body->m_isInDestructionArrayLRU != body->m_dynamicsLru) {
-			body->m_isInDestructionArrayLRU = body->m_dynamicsLru;
-			m_destroyeddBodiesPool.m_force[m_destroyeddBodiesPool.m_count] = maxForce;
-			m_destroyeddBodiesPool.m_bodies[m_destroyeddBodiesPool.m_count] = body;
-			m_destroyeddBodiesPool.m_joint[m_destroyeddBodiesPool.m_count] = contactJoint;
-			m_destroyeddBodiesPool.m_count ++;
-		} else {
-			for (dgInt32 i = 0; i < m_destroyeddBodiesPool.m_count; i ++) {
-				if (m_destroyeddBodiesPool.m_bodies[i] == body) {
-					if (maxForce > m_destroyeddBodiesPool.m_force[i]) {
-						m_destroyeddBodiesPool.m_force[i] = maxForce;
-						m_destroyeddBodiesPool.m_joint[i] = contactJoint;
-					}
-				}
-			}
-		}
-	}
-}
-*/
-
-
-
-
-#endif 
-
+#endif

@@ -616,7 +616,7 @@ dgFloat32 dgCollisionHeightField::RayCast (const dgVector& q0, const dgVector& q
 				txAcc += stepX;
 			} else {
 				zIndex0 += zInc;
-				tz = txAcc;
+				tz = tzAcc;
 				tzAcc += stepZ;
 			}
 		} while ((tx <= dgFloat32 (1.0f)) || (tz <= dgFloat32 (1.0f)));
