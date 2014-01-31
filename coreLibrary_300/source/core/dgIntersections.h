@@ -253,7 +253,7 @@ class dgFastAABBInfo: public dgObb
 		,m_scale (dgFloat32 (1.0f))
 		,m_invScale (dgFloat32 (1.0f))
 	{
-		SetInvMatrix (matrix);
+		SetTransposeAbsMatrix (matrix);
 		dgVector size1 (matrix[0].Abs().Scale4(size.m_x) + matrix[1].Abs().Scale4(size.m_y) + matrix[2].Abs().Scale4(size.m_z));
 		m_p0 = (matrix[3] - size1) & dgVector::m_triplexMask;
 		m_p1 = (matrix[3] + size1) & dgVector::m_triplexMask;
@@ -270,7 +270,7 @@ class dgFastAABBInfo: public dgObb
 		m_posit = ((p1 + p0).CompProduct4(dgVector::m_half) & dgVector::m_triplexMask) | dgVector::m_wOne;
 	}
 
-	void SetInvMatrix (const dgMatrix& matrix)
+	DG_INLINE void SetTransposeAbsMatrix (const dgMatrix& matrix)
 	{
 		m_absDir = matrix.Transpose();
 		m_absDir[0] = m_absDir[0].Abs();

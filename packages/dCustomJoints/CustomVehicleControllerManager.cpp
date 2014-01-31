@@ -870,11 +870,6 @@ void CustomVehicleController::TireBodyState::Init (CustomVehicleController* cons
 	BodyState::Init (controller);
 	NewtonBody* const body = m_controller->GetBody();
 
-//static int xxxx;
-//xxx = xxxx;
-//xxxx ++;
-
-
 	const dMatrix& vehicleFrame = m_controller->m_chassisState.m_localFrame;
 
 	// build a normalized size collision shape and scale to math the tire size, make it is also transparent to collision  
