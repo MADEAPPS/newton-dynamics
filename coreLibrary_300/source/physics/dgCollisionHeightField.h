@@ -116,32 +116,16 @@ class dgCollisionHeightField: public dgCollisionMesh
 
 DG_INLINE void dgCollisionHeightField::CalculateMinExtend2d (const dgVector& p0, const dgVector& p1, dgVector& boxP0, dgVector& boxP1) const
 {
-	//	dgFloat32 x0 = dgMin (p0.m_x, p1.m_x) - dgFloat32 (1.0e-3f);
-	//	dgFloat32 z0 = dgMin (p0.m_z, p1.m_z) - dgFloat32 (1.0e-3f);
-
-	//	dgFloat32 x1 = dgMax (p0.m_x, p1.m_x) + dgFloat32 (1.0e-3f);
-	//	dgFloat32 z1 = dgMax (p0.m_z, p1.m_z) + dgFloat32 (1.0e-3f);
-
 	dgVector q0 (p0.GetMin(p1) - m_padding);
 	dgVector q1 (p0.GetMax(p1) + m_padding);
 
 	boxP0 = ((q0.Scale4(m_horizontalScaleInv).Floor().Scale4(m_horizontalScale) & m_yMask) + dgVector(dgFloat32 (-1.0e10f)).AndNot(m_yMask)) & dgVector::m_triplexMask;
 	boxP1 = (((q1.Scale4(m_horizontalScaleInv).Floor().Scale4(m_horizontalScale) + dgVector(m_horizontalScale)) & m_yMask) + dgVector(dgFloat32 (1.0e10f)).AndNot(m_yMask)) & dgVector::m_triplexMask;
 
-	//	x0 = m_horizontalScale * dgFloor (x0 * m_horizontalScaleInv);
-	//	z0 = m_horizontalScale * dgFloor (z0 * m_horizontalScaleInv);
-	//	x1 = m_horizontalScale * dgFloor (x1 * m_horizontalScaleInv) + m_horizontalScale;
-	//	z1 = m_horizontalScale * dgFloor (z1 * m_horizontalScaleInv) + m_horizontalScale;
-
-	//	boxP0.m_x = dgMax (x0, m_minBox.m_x);
-	//	boxP0.m_z = dgMax (z0, m_minBox.m_z);
-	//	boxP0.m_y = -dgFloat32 (1.0e10f);
-	//	boxP0.m_w = dgFloat32 (0.0f);
-
-	//	boxP1.m_x = dgMin (x1, m_maxBox.m_x);
-	//	boxP1.m_z = dgMin (z1, m_maxBox.m_z);
-	//	boxP1.m_y = dgFloat32 (1.0e10f);
-	//	boxP1.m_w = dgFloat32 (0.0f);
+	dgVector minBox ((m_minBox & m_yMask) + boxP0.AndNot(m_yMask));
+	dgVector maxBox ((m_maxBox & m_yMask) + boxP1.AndNot(m_yMask));
+	boxP0 = boxP0.GetMax (minBox);
+	boxP1 = boxP1.GetMin (maxBox);
 }
 
 
@@ -153,26 +137,16 @@ DG_INLINE void dgCollisionHeightField::CalculateMinExtend3d (const dgVector& p0,
 	dgAssert (p0.m_w == dgFloat32 (0.0f));
 	dgAssert (p1.m_w == dgFloat32 (0.0f));
 
-	//	dgFloat32 x0 = m_horizontalScale * dgFloor ((p0.m_x - dgFloat32 (1.0e-3f)) * m_horizontalScaleInv);
-	//	dgFloat32 z0 = m_horizontalScale * dgFloor ((p0.m_z - dgFloat32 (1.0e-3f)) * m_horizontalScaleInv);
-	//	dgFloat32 x1 = m_horizontalScale * dgFloor ((p1.m_x + dgFloat32 (1.0e-3f)) * m_horizontalScaleInv) + m_horizontalScale;
-	//	dgFloat32 z1 = m_horizontalScale * dgFloor ((p1.m_z + dgFloat32 (1.0e-3f)) * m_horizontalScaleInv) + m_horizontalScale;
-
 	dgVector q0 (p0 - m_padding);
 	dgVector q1 (p1 + m_padding);
 
 	boxP0 = (q0.Scale4(m_horizontalScaleInv).Floor().Scale4(m_horizontalScale) & m_yMask) + q0.AndNot(m_yMask);
 	boxP1 = ((q1.Scale4(m_horizontalScaleInv).Floor().Scale4(m_horizontalScale) + dgVector(m_horizontalScale)) & m_yMask) + q1.AndNot(m_yMask);
 
-	//	boxP0.m_x = dgMax (x0, m_minBox.m_x);
-	//	boxP0.m_z = dgMax (z0, m_minBox.m_z);
-	//	boxP0.m_y = p0.m_y - dgFloat32 (1.0e-3f);
-	//	boxP0.m_w = dgFloat32 (0.0f);
-
-	//	boxP1.m_x = dgMin (x1, m_maxBox.m_x);
-	//	boxP1.m_z = dgMin (z1, m_maxBox.m_z);
-	//	boxP1.m_y = p1.m_y + dgFloat32 (1.0e-3f);
-	//	boxP1.m_w = dgFloat32 (0.0f);
+	dgVector minBox ((m_minBox & m_yMask) + boxP0.AndNot(m_yMask));
+	dgVector maxBox ((m_maxBox & m_yMask) + boxP1.AndNot(m_yMask));
+	boxP0 = boxP0.GetMax (minBox);
+	boxP1 = boxP1.GetMin (maxBox);
 }
 
 
