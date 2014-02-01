@@ -18,14 +18,13 @@
 #include "HeightFieldPrimitive.h"
 #include "DemoMesh.h"
 #include "DemoCamera.h"
-//#include "DemoAIAgent.h"
 #include "DemoEntityManager.h"
 #include "DebugDisplay.h"
 #include "UserPlaneCollision.h"
 #include "CustomVehicleControllerManager.h"
 
 
-// some figures form the 2000 SRT Viper data sheet, http://www.reefcorner.com/Viper/viper_specs.htm
+// some figures form the 2000 SRT Viper data sheet: http://www.vipercentral.com/specifications/
 //the 2000 Vipers’ 8.4-liter engine generates
 // max speed: 164 miles per hours					= 73.0f meter per seconds		
 // horse power: 450 hp @ 5,200 rpm                    
@@ -61,7 +60,7 @@
 //#define VIPER_MASS					700.0f
 #define VIPER_TIRE_STEER_ANGLE			35.0f
 
-// note: the tire mass is too an break 100 : 1 mass ratio rule for float point solver) 
+// note: the tire real mass is too small an break 100 : 1 mass ratio rule for float point solver 
 #define VIPER_TIRE_MASS					(VIPER_MASS / 50.0f)  
 //#define VIPER_TIRE_TOP_SPEED			164 mile / hours
 #define VIPER_TIRE_TOP_SPEED_KMH		(264.0f)			 
