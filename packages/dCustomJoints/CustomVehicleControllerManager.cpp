@@ -77,20 +77,52 @@ dFloat CustomVehicleController::InterpolationCurve::GetValue (dFloat param) cons
 
 
 
-
-
 CustomVehicleController::EngineComponent::GearBox::GearBox(CustomVehicleController* const controller, dFloat reverseGearRatio, int gearCount, const dFloat* const gearBox)
 	:m_gearsCount(gearCount + 2)
 	,m_currentGear(m_newtralGear)
+	,m_automatic(true)
 {
-	memset (gears, 0, sizeof (gears));
+	memset (m_gears, 0, sizeof (m_gears));
 	dAssert (gearCount < (m_maxGears - 2));
-	gears[m_reverseGear] = reverseGearRatio;
-	gears[m_newtralGear] = 0.0f;
+
+	m_gears[m_reverseGear].m_ratio = reverseGearRatio;
+	m_gears[m_reverseGear].m_shiftUp = dFloat(1.0e10f);
+	m_gears[m_reverseGear].m_shiftDown = dFloat(-1.0e10f);
+	m_gears[m_reverseGear].m_next = &m_gears[m_firstGear];
+	m_gears[m_reverseGear].m_prev = &m_gears[m_firstGear];
+
+	m_gears[m_newtralGear].m_ratio = dFloat (0.0f);
+	m_gears[m_newtralGear].m_shiftUp = dFloat(-1.0e10f);
+	m_gears[m_newtralGear].m_shiftDown = dFloat(1.0e10f);
+	m_gears[m_newtralGear].m_next = &m_gears[m_firstGear];
+	m_gears[m_newtralGear].m_prev = &m_gears[m_reverseGear];
+
 	for (int i = 0; i < gearCount; i ++) {
-		gears[i + m_firstGear] = gearBox[i];
+		m_gears[i + m_firstGear].m_ratio = gearBox[i];
+		m_gears[i + m_firstGear].m_next = &m_gears[i + m_firstGear + 1];
+		m_gears[i + m_firstGear].m_prev = &m_gears[i + m_firstGear - 1];
+		m_gears[i + m_firstGear].m_shiftUp = dFloat(0.9f);
+		m_gears[i + m_firstGear].m_shiftDown = dFloat(0.3f);
+	}
+	m_gears[gearCount + m_firstGear - 1].m_next = &m_gears[gearCount + m_firstGear - 1];
+}
+
+
+dFloat CustomVehicleController::EngineComponent::GearBox::GetGearRatio(int gear) const 
+{
+	dFloat ratio = m_gears[gear].m_ratio;
+	return (gear != m_reverseGear) ? ratio : -ratio;
+}
+
+
+
+void CustomVehicleController::EngineComponent::GearBox::Update(dFloat timestep)
+{
+	if (m_automatic) {
+
 	}
 }
+
 
 CustomVehicleController::EngineComponent::EngineComponent (CustomVehicleController* const controller, GearBox* const gearBox, TireBodyState* const leftTire, TireBodyState* const righTire)
 	:Component (controller)
@@ -264,6 +296,7 @@ void CustomVehicleController::EngineComponent::Update (dFloat timestep)
 	TireBodyState& leftTire = m_leftTire->GetInfo();
 	TireBodyState& righTire = m_righTire->GetInfo();
 
+	m_gearBox->Update (timestep);
 	int gear = m_gearBox->GetGear();
 	dFloat gearGain = m_gearBox->GetGearRatio(gear) * m_differentialGearRatio;
 

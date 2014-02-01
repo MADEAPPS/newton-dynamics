@@ -120,16 +120,31 @@ class CustomVehicleController: public CustomControllerBase
 				m_maxGears = 16
 			};
 
-			CUSTOM_JOINTS_API GearBox(CustomVehicleController* const controller, dFloat reverseGearRatio, int gearCount, const dFloat* const gearBoxRatios);
+			class GearState
+			{
+				public:
+				dFloat m_ratio;
+				dFloat m_shiftUp;
+				dFloat m_shiftDown;
+				GearState* m_next;
+				GearState* m_prev;
+			};
+
+			CUSTOM_JOINTS_API GearBox (CustomVehicleController* const controller, dFloat reverseGearRatio, int gearCount, const dFloat* const gearBoxRatios);
+			CUSTOM_JOINTS_API void Update (dFloat timestep);
+			CUSTOM_JOINTS_API dFloat GetGearRatio(int gear) const;
+
+			CUSTOM_JOINTS_API void SetMode (bool mode) {m_automatic = true;}
+			CUSTOM_JOINTS_API bool GetMode (bool mode) const {return m_automatic;}
 
 			CUSTOM_JOINTS_API int GetGear() const {return m_currentGear;}
 			CUSTOM_JOINTS_API void SetGear(int gear) {m_currentGear = dClamp (gear, int (m_reverseGear), m_gearsCount - 1);}
 			CUSTOM_JOINTS_API int GetGearCount() const {return m_gearsCount;}
-			CUSTOM_JOINTS_API dFloat GetGearRatio(int gear) const {return (gear != m_reverseGear) ? gears[gear] : -gears[gear];}
 
+			GearState m_gears[m_maxGears];
 			int m_gearsCount;
 			int m_currentGear;
-			dFloat gears[m_maxGears];
+			bool m_automatic;
 		};
 
 
