@@ -34,7 +34,7 @@
 //#define DEFAULT_SCENE	8			// Box stacks
 //#define DEFAULT_SCENE	9			// simple level mesh collision
 //#define DEFAULT_SCENE	10			// optimized level mesh collision
-#define DEFAULT_SCENE	11			// height field Collision
+//#define DEFAULT_SCENE	11			// height field Collision
 //#define DEFAULT_SCENE	12			// infinite user plane collision
 //#define DEFAULT_SCENE	13			// user height field Collision
 //#define DEFAULT_SCENE	14			// compound Collision
@@ -54,7 +54,7 @@
 //#define DEFAULT_SCENE	28          // standard joints
 //#define DEFAULT_SCENE	29			// articulated joints
 //#define DEFAULT_SCENE	20			// basic rag doll
-//#define DEFAULT_SCENE	31			// basic car
+#define DEFAULT_SCENE	31			// basic car
 //#define DEFAULT_SCENE	32			// high performance super car
 //#define DEFAULT_SCENE	33			// basic player controller
 //#define DEFAULT_SCENE	34			// advanced player controller

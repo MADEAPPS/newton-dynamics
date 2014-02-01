@@ -77,6 +77,7 @@ dgPolygonMeshDesc::dgPolygonMeshDesc(dgCollisionParamProxy& proxy, void* const u
 		}
 
 		case dgCollisionInstance::m_uniform:
+        case dgCollisionInstance::m_nonUniform:
 		{
 			dgMatrix& matrix = *this;
 			matrix = proxy.m_matrix;
@@ -95,12 +96,6 @@ dgPolygonMeshDesc::dgPolygonMeshDesc(dgCollisionParamProxy& proxy, void* const u
 			m_posit += matrix.RotateVector (collision->GetObbOrigin().CompProduct4(m_objCollision->GetScale()));
 			m_size = collision->GetObbSize().CompProduct4(m_objCollision->GetScale()) + dgCollisionInstance::m_padding;
 			break;
-		}
-
-		case dgCollisionInstance::m_nonUniform:
-		{
-
-			dgAssert (0);
 		}
 
 		default:
