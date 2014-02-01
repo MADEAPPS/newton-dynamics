@@ -84,7 +84,7 @@
 #define VIPER_COM_Y_OFFSET				-0.30f
 
 
-
+#define VEHICLE_THIRD_PERSON_VIEW_HIGHT		2.0f
 #define VEHICLE_THIRD_PERSON_VIEW_DIST		12.0f
 #define VEHICLE_THIRD_PERSON_VIEW_FILTER	0.125f
 
@@ -628,8 +628,6 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 	BasicVehicleControllerManager (NewtonWorld* const world)
 		:CustomVehicleControllerManager (world)
 		,m_externalView(true)
-		,m_camPosit(0.0f, 0.0f, 0.0f, 0.0f)
-		,m_camRotation(1.0f, 0.0f, 0.0f, 0.0f)
 		,m_player (NULL) 
 	{
 		// hook a callback for 2d help display
@@ -855,37 +853,23 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 		}
 
 
-		// now overwrite the camera to match the player character location 
-		dMatrix playerMatrix (m_player->GetNextMatrix()); 
-		playerMatrix.m_posit.m_y += 3.0f;
-
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
 		DemoCamera* const camera = scene->GetCamera();
-		//camera->SetNavigationMode (false);
-
 		dMatrix camMatrix (camera->GetNextMatrix ());
+        dMatrix playerMatrix (m_player->GetNextMatrix());
+
+        dVector frontDir (camMatrix[0]);
+        dVector camOrigin; 
 		if (m_externalView) {
-			playerMatrix.m_right = playerMatrix.m_front * dVector (0.0f, 1.0f, 0.0f, 0.0f);
-			playerMatrix.m_right = playerMatrix.m_right.Scale(1.0f / dSqrt (playerMatrix.m_right % playerMatrix.m_right));
-			playerMatrix.m_up = playerMatrix.m_right * playerMatrix.m_front;
-			camMatrix.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0);
-			camMatrix = camMatrix * playerMatrix;
-			camMatrix.m_posit -= camMatrix.m_front.Scale(VEHICLE_THIRD_PERSON_VIEW_DIST);
-		}
+            camOrigin = playerMatrix.TransformVector( dVector(0.0f, VEHICLE_THIRD_PERSON_VIEW_HIGHT, 0.0f, 0.0f));
+            camOrigin -= frontDir.Scale(VEHICLE_THIRD_PERSON_VIEW_DIST);
+        } else {
+            dAssert (0);
+//            camMatrix = camMatrix * playerMatrix;
+//            camOrigin = playerMatrix.TransformVector(dVector(-0.8f, ARTICULATED_VEHICLE_CAMERA_EYEPOINT, 0.0f, 0.0f));
+        }
 
-		dVector posit (camMatrix.m_posit);
-		dQuaternion rot (camMatrix);
-		if (rot.DotProduct(m_camRotation) < -0.0f) {
-			m_camRotation.Scale(-1.0f);
-		}
-
-		m_camPosit = m_camPosit + (posit - m_camPosit).Scale(VEHICLE_THIRD_PERSON_VIEW_FILTER);
-		m_camRotation = m_camRotation.Slerp(rot, VEHICLE_THIRD_PERSON_VIEW_FILTER);
-
-		// smooth out the camera position 
-//		playerMatrix.m_posit = camMatrix.m_posit + (playerMatrix.m_posit - camMatrix.m_posit).Scale(0.5f);
-		camera->SetNextMatrix(*scene, m_camRotation, m_camPosit);
-
+        camera->SetNextMatrix (*scene, camMatrix, camOrigin);
 	}
 
 	// use this to display debug information about vehicle 
@@ -899,8 +883,6 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 	}
 
 	bool m_externalView;
-	dVector m_camPosit;
-	dQuaternion m_camRotation;
 	BasicVehicleEntity* m_player;
 
 	GLuint m_gears;
@@ -909,8 +891,6 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 	GLuint m_odometer;
 	GLuint m_tachometer;
 	GLuint m_needle;
-	
-
 	void* m_engineSounds[10];
 };
 
@@ -959,9 +939,6 @@ void BasicCar (DemoEntityManager* const scene)
 	// make a vehicle entity shell
 	//BasicVehicleEntity* const vehicle = new BasicVehicleEntity (scene, manager, location, "f1.ngd");
 	BasicVehicleEntity* const vehicle = new BasicVehicleEntity (scene, manager, location, "viper.ngd");
-
-	manager->m_camPosit = location.m_posit;
-	manager->m_camRotation = location;
 
 	// build a muscle car from this vehicle controller
 	vehicle->BuildMuscleCar();
