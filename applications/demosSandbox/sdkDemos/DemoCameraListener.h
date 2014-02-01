@@ -40,6 +40,8 @@ class DemoCameraListener: public DemoListenerBase
 		m_pitch = m_camera->GetPichAngle();
 	}
 
+	void SetCameraMouseLock (bool loockState);
+
 	void RenderPickedTarget () const;
 	void InterpolateMatrices (DemoEntityManager* const scene, dFloat timeStepFraction);
 
@@ -65,6 +67,7 @@ class DemoCameraListener: public DemoListenerBase
 	dFloat m_pickedBodyParam;
 
 	bool m_prevMouseState;	
+	bool m_mouseLockState;	
 	static dVector m_pickedBodyDisplacement;
 	static dVector m_pickedBodyLocalAtachmentPoint;
 	static dVector m_pickedBodyLocalAtachmentNormal;

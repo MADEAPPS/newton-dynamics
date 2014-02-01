@@ -48,6 +48,7 @@ DemoCameraListener::DemoCameraListener(DemoEntityManager* const scene)
 	,m_sidewaysSpeed(10.0f)
 	,m_pickedBodyParam(0.0f)
 	,m_prevMouseState(false)
+	,m_mouseLockState(false)
 {
 }
 
@@ -101,7 +102,7 @@ void DemoCameraListener::PostUpdate (const NewtonWorld* const world, dFloat time
 	}
 
 	// do camera rotation, only if we do not have anything picked
-	bool buttonState = mainWin->GetMouseKeyState(0);
+	bool buttonState = m_mouseLockState || mainWin->GetMouseKeyState(0);
 	if (!m_targetPicked && buttonState) {
 		int mouseSpeedX = mouseX - m_mousePosX;
 		int mouseSpeedY = mouseY - m_mousePosY;
@@ -128,6 +129,11 @@ void DemoCameraListener::PostUpdate (const NewtonWorld* const world, dFloat time
 	m_camera->SetMatrix (*scene, rot, targetMatrix.m_posit);
 
 	UpdatePickBody(scene, timestep);
+}
+
+void DemoCameraListener::SetCameraMouseLock (bool loockState)
+{
+	m_mouseLockState = loockState;
 }
 
 void DemoCameraListener::OnPickedBodyDestroyedNotify (const NewtonBody* body)

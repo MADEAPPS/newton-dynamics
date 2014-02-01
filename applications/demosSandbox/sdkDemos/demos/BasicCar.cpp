@@ -72,7 +72,6 @@
 #define VIPER_TIRE_BRAKE_TORQUE			(2000.0f)
 
 #define VIPER_TIRE_GEAR_1				2.66f
-//#define VIPER_TIRE_GEAR_1				3.00f
 #define VIPER_TIRE_GEAR_2				1.78f
 #define VIPER_TIRE_GEAR_3 				1.30f
 #define VIPER_TIRE_GEAR_4 				1.00f
@@ -852,24 +851,29 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 			vehicleEntity->UpdateTireTransforms();
 		}
 
+		UpdateCamera (timestep);
+	}
 
+
+	void UpdateCamera (dFloat timestep)
+	{
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
 		DemoCamera* const camera = scene->GetCamera();
 		dMatrix camMatrix (camera->GetNextMatrix ());
-        dMatrix playerMatrix (m_player->GetNextMatrix());
+		dMatrix playerMatrix (m_player->GetNextMatrix());
 
-        dVector frontDir (camMatrix[0]);
-        dVector camOrigin; 
+		dVector frontDir (camMatrix[0]);
+		dVector camOrigin; 
 		if (m_externalView) {
-            camOrigin = playerMatrix.TransformVector( dVector(0.0f, VEHICLE_THIRD_PERSON_VIEW_HIGHT, 0.0f, 0.0f));
-            camOrigin -= frontDir.Scale(VEHICLE_THIRD_PERSON_VIEW_DIST);
-        } else {
-            dAssert (0);
-//            camMatrix = camMatrix * playerMatrix;
-//            camOrigin = playerMatrix.TransformVector(dVector(-0.8f, ARTICULATED_VEHICLE_CAMERA_EYEPOINT, 0.0f, 0.0f));
-        }
+			camOrigin = playerMatrix.TransformVector( dVector(0.0f, VEHICLE_THIRD_PERSON_VIEW_HIGHT, 0.0f, 0.0f));
+			camOrigin -= frontDir.Scale(VEHICLE_THIRD_PERSON_VIEW_DIST);
+		} else {
+			dAssert (0);
+			//            camMatrix = camMatrix * playerMatrix;
+			//            camOrigin = playerMatrix.TransformVector(dVector(-0.8f, ARTICULATED_VEHICLE_CAMERA_EYEPOINT, 0.0f, 0.0f));
+		}
 
-        camera->SetNextMatrix (*scene, camMatrix, camOrigin);
+		camera->SetNextMatrix (*scene, camMatrix, camOrigin);
 	}
 
 	// use this to display debug information about vehicle 
@@ -915,9 +919,6 @@ void BasicCar (DemoEntityManager* const scene)
 	//CreateHeightFieldTerrain (scene, 10, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
 	//CreatePlaneCollision (scene, dVector (0.0f, 1.0f, 0.0f, 0.0f));
 
-	dMatrix camMatrix (GetIdentityMatrix());
-	camMatrix.m_posit = dVector (0.0f, 2.0f, 0.0f, 1.0f);
-
 
 	NewtonWorld* const world = scene->GetNewton();
 
@@ -930,11 +931,8 @@ void BasicCar (DemoEntityManager* const scene)
 	location.m_posit.m_y = 50.0f;
 	location.m_posit.m_z = 50.0f;
 
-//location.m_posit.m_x = -100.0f;
-//location.m_posit.m_z = 0.0f;
-
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
-	location.m_posit.m_y += 5.5f;
+	location.m_posit.m_y += 0.5f;
 
 	// make a vehicle entity shell
 	//BasicVehicleEntity* const vehicle = new BasicVehicleEntity (scene, manager, location, "f1.ngd");
@@ -947,6 +945,10 @@ void BasicCar (DemoEntityManager* const scene)
 	manager->SetAsPlayer(vehicle);
 
 
+	// set the camera matrix, we only care the initial direction since it will be following the player vehicle
+	dMatrix camMatrix (manager->m_player->GetNextMatrix());
+	scene->SetCameraMouseLock (true);
+	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
 
 //	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());

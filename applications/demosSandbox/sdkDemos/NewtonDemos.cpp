@@ -90,7 +90,6 @@ void StructuredConvexFracturing (DemoEntityManager* const scene);
 void UsingNewtonMeshTool (DemoEntityManager* const scene);
 void MultiRayCast (DemoEntityManager* const scene);
 void BasicCar (DemoEntityManager* const scene);
-void SuperCar (DemoEntityManager* const scene);
 void BasicPlayerController (DemoEntityManager* const scene);
 void AdvancedPlayerController (DemoEntityManager* const scene);
 void HeightFieldCollision (DemoEntityManager* const scene);
@@ -135,7 +134,6 @@ NewtonDemos::SDKDemos NewtonDemos::m_demosSelection[] =
 	{wxT("Articulated robotic actuators joints"), wxT("demonstrate complex array of bodies interconnect by joints"), ArticulatedJoints},
 	{wxT("Basic rag doll"), wxT("demonstrate simple rag doll"), DescreteRagDoll},
 	{wxT("Basic car"), wxT("implement a basic car"), BasicCar},
-	//{wxT("High performance super car"), wxT("implement a high performance ray cast car"), SuperCar},
 	{wxT("High performance super car"), wxT("implement a high performance ray cast car"), BasicCar},
 	{wxT("Basic player controller"), wxT("demonstrate simple player controller"), BasicPlayerController},
 	{wxT("Advanced player controller"), wxT("demonstrate player interacting with other objects"), AdvancedPlayerController},

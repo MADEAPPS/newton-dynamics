@@ -517,6 +517,11 @@ DemoCamera* DemoEntityManager::GetCamera() const
 	return m_cameraManager->GetCamera();
 }
 
+void DemoEntityManager::SetCameraMouseLock (bool state)
+{
+	m_cameraManager->SetCameraMouseLock(state);
+}
+
 void DemoEntityManager::SetCameraMatrix (const dQuaternion& rotation, const dVector& position)
 {
 	m_cameraManager->SetCameraMatrix(this, rotation, position);

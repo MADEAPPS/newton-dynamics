@@ -76,8 +76,9 @@ class DemoEntityManager: public wxGLCanvas, public dList <DemoEntity*>
 	NewtonDemos* GetRootWindow() const;
 
 	DemoCamera* GetCamera() const;
+	void SetCameraMouseLock (bool state);
 	void SetCameraMatrix (const dQuaternion& rotation, const dVector& position);
-//	void SetNewCamera(DemoCamera* const camera);
+	
 
 	void Set2DDisplayRenderFunction (RenderHoodCallback callback, void* const context);
 
