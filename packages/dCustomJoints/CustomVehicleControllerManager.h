@@ -188,6 +188,9 @@ class CustomVehicleController: public CustomControllerBase
 			CUSTOM_JOINTS_API int GetGear() const {return m_currentGear->m_id;}
 			CUSTOM_JOINTS_API int GetGearCount() const {return m_gearsCount;}
 
+
+			void SetOptimalShiftLimits (dFloat minShift, dFloat maxShift);
+
 			GearState* m_gears[m_maxGears];
             GearState* m_currentGear;
             CustomVehicleController* m_controller;

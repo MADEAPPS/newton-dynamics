@@ -113,6 +113,25 @@ CustomVehicleController::EngineComponent::GearBox::GearBox(CustomVehicleControll
     }
 }
 
+CustomVehicleController::EngineComponent::GearBox::~GearBox ()
+{
+	for (int i = 0; i < m_gearsCount; i ++) {
+		delete m_gears[i]; 
+	}
+}
+
+
+void CustomVehicleController::EngineComponent::GearBox::SetOptimalShiftLimits (dFloat minShift, dFloat maxShift)
+{
+	minShift = dMax (minShift - 0.05f, 0.10f);
+	maxShift = dMin (maxShift + 0.05f, 0.95f);
+	for (int i = m_firstGear; i < m_gearsCount; i ++) {
+		GearState* const state = m_gears[i];
+		state->m_shiftUp = maxShift;
+		state->m_shiftDown = minShift;
+	}
+}
+
 CustomVehicleController::EngineComponent::GearBox::GearState* CustomVehicleController::EngineComponent::GearBox::NeutralGearState::Update(CustomVehicleController* const vehicle)
 {
     const EngineComponent* const engine = vehicle->GetEngine();
@@ -163,12 +182,6 @@ CustomVehicleController::EngineComponent::GearBox::GearState* CustomVehicleContr
 }
 
 
-CustomVehicleController::EngineComponent::GearBox::~GearBox ()
-{
-    for (int i = 0; i < m_gearsCount; i ++) {
-        delete m_gears[i]; 
-    }
-}
 
 dFloat CustomVehicleController::EngineComponent::GearBox::GetGearRatio(int gear) const 
 {
@@ -272,6 +285,9 @@ void CustomVehicleController::EngineComponent::InitEngineTorqueCurve (dFloat veh
 
 	m_engineOptimalRevPerSec = peakHorsePowerRPM;
 	SetTopSpeed (vehicleSpeedKPH * 0.278f);
+
+	m_gearBox->SetOptimalShiftLimits (peakTorqueRPM / redLineTorqueRPM, peakHorsePowerRPM/ redLineTorqueRPM);
+
 }
 
 
