@@ -330,7 +330,7 @@ void CustomVehicleController::EngineComponent::SetTopSpeed (dFloat topSpeedMPS)
 	// G1 = m_transmissionGearRatio
 	// w = engine radians per seconds
 	// r = tire radius in meters
-	// v = vehicle top speed in meters per secunds
+	// v = vehicle top speed in meters per seconds
 
 	// using the top gear and the optimal engine torque for the calculations
 	dFloat topGearRatio = m_gearBox->GetGearRatio(m_gearBox->GetGearCount() - 1);
@@ -432,6 +432,26 @@ void CustomVehicleController::EngineComponent::Update (dFloat timestep)
 
 	leftTire.m_engineTorque = leftTorque;
 	righTire.m_engineTorque = rightTorque;
+
+/*
+if (tire.m_myIndex == 2){
+    static FILE* xxx;
+    if (!xxx) 
+    {
+        fopen_s (&xxx, "torque_rpm.csv", "wt");
+        fprintf (xxx, "gear, tire_torque, tire_rps, eng_rps,\n");
+    }
+
+    if ((vehicle->xxxxxxxx > (1000 + 0)) && (vehicle->xxxxxxxx < (1000 + 750))) {
+
+        PxReal tireRps___ = (tire.m_omega - vehicle->m_bodyState.m_omega).dot (tire.m_matrix[0]);
+        PxI32 gear = m_transmission->GetGear();
+        fprintf (xxx, "%d, %f, %f, %f,\n", gear * 100, xxxxxxxxxxx, tireRps, tireRps___);
+        fflush (xxx);
+    }
+}
+*/
+
 
 	// set the vehicle speed
 	const ChassisBodyState& chassis = m_controller->m_chassisState;
