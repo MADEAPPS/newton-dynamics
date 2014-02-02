@@ -387,6 +387,7 @@ class CustomVehicleController: public CustomControllerBase
 		CUSTOM_JOINTS_API void Init(CustomVehicleController* const controller);
 		CUSTOM_JOINTS_API void UpdateInertia();
 		CUSTOM_JOINTS_API virtual void IntegrateForce (dFloat timestep, const dVector& force, const dVector& torque);
+        CUSTOM_JOINTS_API virtual void CalculateAverageAcceleration (dFloat invTimestep, const dVector& veloc, const dVector& omega);
 		
 		dMatrix m_matrix;
 		dMatrix m_localFrame;
@@ -414,6 +415,7 @@ class CustomVehicleController: public CustomControllerBase
 		public:
 		CUSTOM_JOINTS_API void Init (CustomVehicleController* const controller, const dMatrix& localframe);
 		CUSTOM_JOINTS_API void UpdateDynamicInputs();
+        CUSTOM_JOINTS_API virtual void CalculateAverageAcceleration (dFloat invTimestep, const dVector& veloc, const dVector& omega);
 
 		dVector m_com;
 		dVector m_comOffset;
@@ -437,6 +439,7 @@ class CustomVehicleController: public CustomControllerBase
 
 		CUSTOM_JOINTS_API void UpdateTransform ();
 		CUSTOM_JOINTS_API virtual void IntegrateForce (dFloat timestep, const dVector& force, const dVector& torque);
+        CUSTOM_JOINTS_API virtual void CalculateAverageAcceleration (dFloat invTimestep, const dVector& veloc, const dVector& omega);
 
 		dVector m_tireLoad;
 		dVector m_lateralForce;

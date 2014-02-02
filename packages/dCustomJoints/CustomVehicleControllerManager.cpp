@@ -444,8 +444,8 @@ if (tire.m_myIndex == 2){
 
     if ((vehicle->xxxxxxxx > (1000 + 0)) && (vehicle->xxxxxxxx < (1000 + 750))) {
 
-        PxReal tireRps___ = (tire.m_omega - vehicle->m_bodyState.m_omega).dot (tire.m_matrix[0]);
-        PxI32 gear = m_transmission->GetGear();
+        dFloat tireRps___ = (tire.m_omega - vehicle->m_bodyState.m_omega).dot (tire.m_matrix[0]);
+        int gear = m_transmission->GetGear();
         fprintf (xxx, "%d, %f, %f, %f,\n", gear * 100, xxxxxxxxxxx, tireRps, tireRps___);
         fflush (xxx);
     }
@@ -798,7 +798,7 @@ void CustomVehicleController::ContactJoint::JacobianDerivative (ParamInfo* const
 				dFloat vy = dSqrt (dMax (mag2 - vx * vx, dFloat(0.1f)));
 				sideSlipAngle = dAtan2 (vy, vx);
 				dAssert (sideSlipAngle >= 0.0f);
-				dAssert (sideSlipAngle <= 3.141592);
+				dAssert (sideSlipAngle <= (3.141592f * 0.5f));
 			}
 
 			// get the normalized lateral and longitudinal forces
@@ -967,33 +967,10 @@ void CustomVehicleController::BodyState::IntegrateForce (dFloat timestep, const 
 	m_omega += alpha.Scale (timestep);
 }
 
-
-void CustomVehicleController::ChassisBodyState::Init (CustomVehicleController* const controller, const dMatrix& localframe)
+void CustomVehicleController::BodyState::CalculateAverageAcceleration (dFloat invTimestep, const dVector& veloc, const dVector& omega)
 {
-	BodyState::Init (controller);
-	NewtonBody* const body = m_controller->GetBody();
-
-	m_localFrame = localframe;
-	m_localFrame[3] = m_com + m_comOffset;
-	m_localFrame[3][3] = 1.0f;
-
-	NewtonBodySetCentreOfMass(body, &m_localFrame[3][0]);
-
-	NewtonBodyGetMatrix(body, &m_matrix[0][0]);
-	NewtonBodyGetMassMatrix(body, &m_mass, &m_localInertia[0], &m_localInertia[1], &m_localInertia[2]);
-
-	NewtonBodyGetOmega(body, &m_omega[0]);
-	NewtonBodyGetVelocity(body, &m_veloc[0]);
-
-	m_invMass = 1.0f / m_mass;
-	m_localInvInertia[0] = 1.0f / m_localInertia[0];
-	m_localInvInertia[1] = 1.0f / m_localInertia[1];
-	m_localInvInertia[2] = 1.0f / m_localInertia[2];
-
-	UpdateInertia();
+    dAssert (0);
 }
-
-
 
 void CustomVehicleController::TireBodyState::Init (CustomVehicleController* const controller, const TireCreationInfo& tireInfo)
 {
@@ -1136,6 +1113,33 @@ void CustomVehicleController::TireBodyState::UpdateTransform()
 }
 
 
+void CustomVehicleController::ChassisBodyState::Init (CustomVehicleController* const controller, const dMatrix& localframe)
+{
+    BodyState::Init (controller);
+    NewtonBody* const body = m_controller->GetBody();
+
+    m_localFrame = localframe;
+    m_localFrame[3] = m_com + m_comOffset;
+    m_localFrame[3][3] = 1.0f;
+
+    NewtonBodySetCentreOfMass(body, &m_localFrame[3][0]);
+
+    NewtonBodyGetMatrix(body, &m_matrix[0][0]);
+    NewtonBodyGetMassMatrix(body, &m_mass, &m_localInertia[0], &m_localInertia[1], &m_localInertia[2]);
+
+    NewtonBodyGetOmega(body, &m_omega[0]);
+    NewtonBodyGetVelocity(body, &m_veloc[0]);
+
+    m_invMass = 1.0f / m_mass;
+    m_localInvInertia[0] = 1.0f / m_localInertia[0];
+    m_localInvInertia[1] = 1.0f / m_localInertia[1];
+    m_localInvInertia[2] = 1.0f / m_localInertia[2];
+
+    UpdateInertia();
+}
+
+
+
 void CustomVehicleController::ChassisBodyState::UpdateDynamicInputs()
 {
 	NewtonBody* const body = m_controller->GetBody();
@@ -1150,6 +1154,16 @@ void CustomVehicleController::ChassisBodyState::UpdateDynamicInputs()
 	m_globalCentreOfMass = m_matrix.TransformVector(m_localFrame.m_posit);
 
 	UpdateInertia();
+}
+
+void CustomVehicleController::ChassisBodyState::CalculateAverageAcceleration (dFloat invTimestep, const dVector& veloc, const dVector& omega)
+{
+    dVector accel = (m_veloc - veloc).Scale(invTimestep);
+    dVector alpha = (m_omega - omega).Scale(invTimestep);
+
+    m_externalForce = accel.Scale(m_mass);
+    alpha = m_matrix.UnrotateVector(alpha);
+    m_externalTorque = m_matrix.RotateVector(alpha.CompProduct(m_localInertia));
 }
 
 
@@ -1210,6 +1224,71 @@ void CustomVehicleController::TireBodyState::UpdateDynamicInputs(dFloat timestep
 void CustomVehicleController::TireBodyState::IntegrateForce (dFloat timestep, const dVector& force, const dVector& torque)
 {
 	BodyState::IntegrateForce (timestep, force, torque);
+}
+
+void CustomVehicleController::TireBodyState::CalculateAverageAcceleration (dFloat invTimestep, const dVector& veloc, const dVector& omega)
+{
+    dVector accel = (m_veloc - veloc).Scale(invTimestep);
+    dVector alpha = (m_omega - omega).Scale(invTimestep);
+
+    m_externalForce = accel.Scale(m_mass);
+    alpha = m_matrix.UnrotateVector(alpha);
+    m_externalTorque = m_matrix.RotateVector(alpha.CompProduct(m_localInertia));
+
+/*
+    dAssert (m_tireConstraint.m_state0 != this);
+    dAssert (m_tireConstraint.m_state1 == this);
+    const AppVehicleBodyState* const chassis = m_tireConstraint.m_state0;
+
+    dVector upPin (chassis->m_matrix[1]);
+    dVector lateralPin (m_matrix[0]);
+    dVector longitudinalPin (crossProduct (lateralPin, upPin));
+
+    const dFloat speedFactor = 2.0f;
+    dFloat tireSpeed = m_veloc.dot (longitudinalPin);
+    dFloat maxSpeed = dSqrt(m_veloc.dot(m_veloc)) * speedFactor + 2.0f;
+
+    dFloat tireRps = (m_omega - chassis->m_omega).dot (lateralPin);
+    if ((m_radius * dgAbsf(tireRps)) > maxSpeed) 
+    {
+        if ((tireRps > 0.0f) && (tireSpeed > 0.0f)) 
+        {
+            m_omega = chassis->m_omega + lateralPin * ((tireSpeed * speedFactor + 2.0f) / m_radius);
+        } 
+        else if ((tireRps < 0.0f) && (tireSpeed < 0.0f)) 
+        {
+            m_omega = chassis->m_omega + lateralPin * ((tireSpeed * speedFactor - 2.0f) / m_radius);
+        } 
+        else 
+        {
+            m_omega = chassis->m_omega + lateralPin * (dSign(tireRps) * dAbs (tireSpeed) * speedFactor / m_radius);
+        }
+    }
+
+    tireRps = (m_omega - chassis->m_omega).dot (lateralPin);
+    const dFloat maxRpsAccel = 4.0f;
+    if ((tireRps - m_prevRps) > maxRpsAccel) 
+    {
+        tireRps = m_prevRps + maxRpsAccel;
+        m_omega = chassis->m_omega + lateralPin * tireRps;
+    } 
+    else if ((tireRps - m_prevRps) < -maxRpsAccel) 
+    {
+        tireRps = m_prevRps - maxRpsAccel;
+        m_omega = chassis->m_omega + lateralPin * tireRps;
+    }
+
+    m_prevRps = tireRps;
+    m_averageRps = tireRps;
+    const int count = sizeof (m_averageRpsToople)/sizeof (m_averageRpsToople[0]);
+    for (int i = 1; i < count; i ++) 
+    {
+        m_averageRps += m_averageRpsToople[i];
+        m_averageRpsToople[i - 1] = m_averageRpsToople[i];
+    }
+    m_averageRpsToople[count - 1] = tireRps;
+    m_averageRps *= dFloat (1.0f / count);
+*/
 }
 
 CustomVehicleControllerManager::CustomVehicleControllerManager(NewtonWorld* const world)
@@ -1735,19 +1814,7 @@ void CustomVehicleController::CalculateReactionsForces (int jointCount, VehicleJ
 	for (CustomList<BodyState*>::CustomListNode* stateNode = m_stateList.GetFirst()->GetNext(); stateNode; stateNode = stateNode->GetNext()) {
 		BodyState* const state = stateNode->GetInfo();
 		int index = state->m_myIndex;
-
-		dVector accel = (state->m_veloc - stateVeloc[index].m_linear).Scale(invTimestepSrc);
-		dVector alpha = (state->m_omega - stateVeloc[index].m_angular).Scale(invTimestepSrc);
-		//if ((accel % accel) < maxAccNorm2) {
-		//	accel = zero;
-		//}
-		//if ((alpha % alpha) < maxAccNorm2) {
-		//	alpha = zero;
-		//}
-
-		state->m_externalForce = accel.Scale(state->m_mass);
-		alpha = state->m_matrix.UnrotateVector(alpha);
-		state->m_externalTorque = state->m_matrix.RotateVector(alpha.CompProduct(state->m_localInertia));
+        state->CalculateAverageAcceleration (invTimestepSrc, stateVeloc[index].m_linear, stateVeloc[index].m_angular);
 	}
 
 	for (int i = 0; i < jointCount; i ++) {
