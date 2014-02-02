@@ -502,7 +502,7 @@ class BasicVehicleEntity: public DemoEntity
 
 
 #if 0
-	#if 0
+	#if 1
 		static FILE* file = fopen ("log.bin", "wb");
 		if (file) {
 			fwrite (&gear, sizeof (int), 1, file);
@@ -523,11 +523,8 @@ class BasicVehicleEntity: public DemoEntity
 		}
 	#endif
 #endif
-//if (engineGasPedal > 0.0f)
-//engineGasPedal =1;
 
 //		engine->SetGear(gear);
-
 		brakes->SetParam(brakePedal);
 		steering->SetParam(steeringVal);
 		engine->SetParam(engineGasPedal);

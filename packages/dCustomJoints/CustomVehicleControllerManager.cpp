@@ -404,8 +404,8 @@ void CustomVehicleController::EngineComponent::Update (dFloat timestep)
 		m_currentRPS = m_currentRPS + (rps - m_currentRPS) * m_fakeIdleInertia * 60.0f * timestep;
 
 		// when adding a differential torque distribution if control by the differential, for now add 50% to each tire
-		leftTorque = gearGain * m_torqueCurve.GetValue(leftRPS) * m_param * 0.5f;
-		rightTorque = gearGain * m_torqueCurve.GetValue(rightRPS) * m_param * 0.5f;
+		leftTorque = gearGain * m_torqueCurve.GetValue(leftRPS * dFloat(1.0f/60.0f)) * m_param * 0.5f;
+		rightTorque = gearGain * m_torqueCurve.GetValue(rightRPS * dFloat(1.0f/60.0f)) * m_param * 0.5f;
 
 		if (gear != GearBox::m_reverseGear) {
 			if (leftTorque < m_torqueCurve.m_nodes[1].m_value * 0.125f) {
@@ -457,7 +457,6 @@ if (tire.m_myIndex == 2){
 	const ChassisBodyState& chassis = m_controller->m_chassisState;
 	dVector front (chassis.m_matrix.RotateVector(chassis.m_localFrame[0]));
 	m_speedMPS = chassis.m_veloc % front;
-//dTrace  (("speed:%f leftRps:%f leftTorque: %f  rightRps:%f rightTorque: %f\n", m_speedMPS, leftTire.m_rotatonSpeed, leftTire.m_engineTorque, righTire.m_rotatonSpeed, righTire.m_engineTorque));
 }
 
 
@@ -1288,6 +1287,26 @@ void CustomVehicleController::TireBodyState::CalculateAverageAcceleration (dFloa
     }
     m_averageRpsToople[count - 1] = tireRps;
     m_averageRps *= dFloat (1.0f / count);
+*/
+
+/*
+static int xxxxxxx;
+static FILE* xxx;
+if (!xxx) 
+{
+    fopen_s (&xxx, "tire_rpm.csv", "wt");
+    fprintf (xxx, "gear, rps, torque\n");
+}
+
+int gear = m_controller->GetEngine()->GetGear();
+//if ((gear == 2) && (m_myIndex == 4)) {
+if ((gear > 1) && (m_myIndex == 4)) {
+    dFloat tireRps = (m_omega - m_controller->m_chassisState.m_omega) % m_matrix[0];
+    fprintf (xxx, "%d, %f, %f,\n", gear, -tireRps, m_engineTorque);
+    fflush (xxx);
+    dTrace (("%d, %d, %f, %f,\n", xxxxxxx, gear, -tireRps, m_engineTorque));
+    xxxxxxx ++;
+}
 */
 }
 
