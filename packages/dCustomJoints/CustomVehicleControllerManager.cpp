@@ -79,47 +79,119 @@ dFloat CustomVehicleController::InterpolationCurve::GetValue (dFloat param) cons
 
 CustomVehicleController::EngineComponent::GearBox::GearBox(CustomVehicleController* const controller, dFloat reverseGearRatio, int gearCount, const dFloat* const gearBox)
 	:m_gearsCount(gearCount + 2)
-	,m_currentGear(m_newtralGear)
+	,m_currentGear(NULL)
+    ,m_controller(controller)
 	,m_automatic(true)
 {
 	memset (m_gears, 0, sizeof (m_gears));
+
 	dAssert (gearCount < (m_maxGears - 2));
-
-	m_gears[m_reverseGear].m_ratio = reverseGearRatio;
-	m_gears[m_reverseGear].m_shiftUp = dFloat(1.0e10f);
-	m_gears[m_reverseGear].m_shiftDown = dFloat(-1.0e10f);
-	m_gears[m_reverseGear].m_next = &m_gears[m_firstGear];
-	m_gears[m_reverseGear].m_prev = &m_gears[m_firstGear];
-
-	m_gears[m_newtralGear].m_ratio = dFloat (0.0f);
-	m_gears[m_newtralGear].m_shiftUp = dFloat(-1.0e10f);
-	m_gears[m_newtralGear].m_shiftDown = dFloat(1.0e10f);
-	m_gears[m_newtralGear].m_next = &m_gears[m_firstGear];
-	m_gears[m_newtralGear].m_prev = &m_gears[m_reverseGear];
-
 	for (int i = 0; i < gearCount; i ++) {
-		m_gears[i + m_firstGear].m_ratio = gearBox[i];
-		m_gears[i + m_firstGear].m_next = &m_gears[i + m_firstGear + 1];
-		m_gears[i + m_firstGear].m_prev = &m_gears[i + m_firstGear - 1];
-		m_gears[i + m_firstGear].m_shiftUp = dFloat(0.9f);
-		m_gears[i + m_firstGear].m_shiftDown = dFloat(0.3f);
+        m_gears[i + m_firstGear] = new GearState (gearBox[i], 0.9f, 0.3f, GearID(i + m_firstGear)); 
 	}
-	m_gears[gearCount + m_firstGear - 1].m_next = &m_gears[gearCount + m_firstGear - 1];
+
+    for (int i = 0; i < gearCount - 1; i ++) {
+        m_gears[i + m_firstGear]->m_next = m_gears[i + m_firstGear + 1]; 
+    }
+    
+
+    for (int i = gearCount - 1; i; i --) {
+        m_gears[i + m_firstGear]->m_prev = m_gears[i + m_firstGear - 1]; 
+    }
+ 
+    m_gears[m_reverseGear] = new ReverseGearState(reverseGearRatio);
+    m_gears[m_newtralGear] = new NeutralGearState(m_gears[m_firstGear], m_gears[m_reverseGear]);
+
+    m_gears[m_firstGear]->m_prev = m_gears[m_firstGear];
+    m_gears[m_firstGear + gearCount - 1]->m_next = m_gears[m_firstGear + gearCount - 1];
+
+    m_currentGear = m_gears[m_newtralGear];
+
+    for (int i = 0; i < gearCount; i ++) {
+        m_gears[i]->m_neutral = m_gears[m_newtralGear];
+        m_gears[i]->m_reverse = m_gears[m_reverseGear];
+    }
 }
 
+CustomVehicleController::EngineComponent::GearBox::GearState* CustomVehicleController::EngineComponent::GearBox::NeutralGearState::Update(CustomVehicleController* const vehicle)
+{
+    const EngineComponent* const engine = vehicle->GetEngine();
+    dFloat param = engine->GetParam();
+
+    if (param > dFloat (1.0e-3f)) {
+        return m_next;
+    } else if (param < dFloat(-1.0e-3f)) {
+        return m_prev;
+    }
+    return this;
+}
+
+CustomVehicleController::EngineComponent::GearBox::GearState* CustomVehicleController::EngineComponent::GearBox::GearState::Update(CustomVehicleController* const vehicle)
+{
+    const EngineComponent* const engine = vehicle->GetEngine();
+
+    dFloat param = engine->GetParam();
+    dFloat speed = engine->GetSpeed();
+    dFloat normalrpm = engine->GetRPM() / engine->GetTopRPM ();
+
+    if ((normalrpm > m_shiftUp) && (speed > 1.0f)) {
+        return m_next;
+    } else if (normalrpm < m_shiftDown) {
+        if ((dAbs (speed) < 0.5f) && (param < dFloat (1.0e-3f))) {
+            return m_neutral;
+        }
+
+        if ((dAbs (speed) < 2.0f) && (param < dFloat (-1.0e-3f))) {
+            return m_reverse;
+        }
+
+        if (param > dFloat (-1.0e-3f)) 
+
+        dAssert (m_prev != m_neutral);
+        dAssert (m_prev != m_reverse);
+        return m_prev;
+    } else if (param < 0.0f) {
+        dAssert (0);
+/*
+        if (speed < 1.0f) {
+            return m_reverse;
+        }
+*/
+    }
+
+    return this;
+}
+
+
+CustomVehicleController::EngineComponent::GearBox::~GearBox ()
+{
+    for (int i = 0; i < m_gearsCount; i ++) {
+        delete m_gears[i]; 
+    }
+}
 
 dFloat CustomVehicleController::EngineComponent::GearBox::GetGearRatio(int gear) const 
 {
-	dFloat ratio = m_gears[gear].m_ratio;
+	dFloat ratio = m_gears[gear]->m_ratio;
 	return (gear != m_reverseGear) ? ratio : -ratio;
 }
 
+
+void CustomVehicleController::EngineComponent::GearBox::SetGear(int gear) 
+{
+    for (int i = 0; i < m_gearsCount; i ++) {
+        if (m_gears[i]->m_id == gear) {
+            m_currentGear = m_gears[i];
+            break;
+        }
+    }
+}
 
 
 void CustomVehicleController::EngineComponent::GearBox::Update(dFloat timestep)
 {
 	if (m_automatic) {
-
+        m_currentGear = m_currentGear->Update(m_controller);
 	}
 }
 
@@ -236,6 +308,11 @@ int CustomVehicleController::EngineComponent::GetGear () const
 dFloat CustomVehicleController::EngineComponent::GetRPM () const
 {
 	return m_currentRPS * 9.55f;
+}
+
+dFloat CustomVehicleController::EngineComponent::GetTopRPM () const
+{
+    return m_engineOptimalRevPerSec * 9.55f;
 }
 
 void CustomVehicleController::EngineComponent::SetTopSpeed (dFloat topSpeedMPS)

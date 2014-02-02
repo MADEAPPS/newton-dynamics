@@ -84,7 +84,7 @@ class CustomVehicleController: public CustomControllerBase
 			m_param = param;
 		}
 
-		dFloat GetParam() 
+		dFloat GetParam() const 
 		{
 			return m_param;
 		}
@@ -112,7 +112,7 @@ class CustomVehicleController: public CustomControllerBase
 		class GearBox
 		{
 			public:
-			enum Gear
+			enum GearID
 			{
 				m_reverseGear = 0,
 				m_newtralGear,
@@ -123,27 +123,75 @@ class CustomVehicleController: public CustomControllerBase
 			class GearState
 			{
 				public:
+                GearState (dFloat ratio, dFloat shiftUp, dFloat shiftDown, GearID id) 
+                    :m_ratio(ratio)
+                    ,m_shiftUp (shiftUp)
+                    ,m_shiftDown (shiftDown)
+                    ,m_next(NULL)
+                    ,m_prev(NULL)
+                    ,m_id(id)
+                {
+                }
+
+                virtual ~GearState()
+                {
+                }
+                virtual GearState* Update(CustomVehicleController* const vehicle);
+
 				dFloat m_ratio;
 				dFloat m_shiftUp;
 				dFloat m_shiftDown;
 				GearState* m_next;
 				GearState* m_prev;
+                GearState* m_neutral;
+                GearState* m_reverse;
+                GearID m_id;
 			};
 
+            class ReverseGearState: public GearState
+            {
+                public:
+                ReverseGearState (dFloat ratio)
+                    :GearState(ratio, 1000.0f, -1000.0f, m_reverseGear)
+                {
+                }
+
+                 GearState* Update(CustomVehicleController* const vehicle)
+                 {
+                     return NULL;
+                 }
+            };
+            
+            class NeutralGearState: public GearState
+            {
+                public:
+                NeutralGearState (GearState* const first, GearState* const reverse)
+                    :GearState(0.0f, 1000.0f, -1000.0f, m_newtralGear)
+                {
+                    m_next = first;
+                    m_prev = reverse;
+                }
+                GearState* Update(CustomVehicleController* const vehicle);
+            };
+
+
+
 			CUSTOM_JOINTS_API GearBox (CustomVehicleController* const controller, dFloat reverseGearRatio, int gearCount, const dFloat* const gearBoxRatios);
+            CUSTOM_JOINTS_API ~GearBox ();
 			CUSTOM_JOINTS_API void Update (dFloat timestep);
 			CUSTOM_JOINTS_API dFloat GetGearRatio(int gear) const;
 
 			CUSTOM_JOINTS_API void SetMode (bool mode) {m_automatic = true;}
 			CUSTOM_JOINTS_API bool GetMode (bool mode) const {return m_automatic;}
 
-			CUSTOM_JOINTS_API int GetGear() const {return m_currentGear;}
-			CUSTOM_JOINTS_API void SetGear(int gear) {m_currentGear = dClamp (gear, int (m_reverseGear), m_gearsCount - 1);}
+            CUSTOM_JOINTS_API void SetGear(int gear);
+			CUSTOM_JOINTS_API int GetGear() const {return m_currentGear->m_id;}
 			CUSTOM_JOINTS_API int GetGearCount() const {return m_gearsCount;}
 
-			GearState m_gears[m_maxGears];
+			GearState* m_gears[m_maxGears];
+            GearState* m_currentGear;
+            CustomVehicleController* m_controller;
 			int m_gearsCount;
-			int m_currentGear;
 			bool m_automatic;
 		};
 
@@ -162,6 +210,7 @@ class CustomVehicleController: public CustomControllerBase
 		CUSTOM_JOINTS_API int GetGear () const;
 		CUSTOM_JOINTS_API void SetGear (int gear);
 		CUSTOM_JOINTS_API dFloat GetRPM () const;
+        CUSTOM_JOINTS_API dFloat GetTopRPM () const;
 		CUSTOM_JOINTS_API dFloat GetSpeed () const;
 		CUSTOM_JOINTS_API dFloat GetTopSpeed () const;
 		CUSTOM_JOINTS_API dFloat GetIdleFakeInertia() const;
@@ -179,7 +228,7 @@ class CustomVehicleController: public CustomControllerBase
 		dFloat m_speedMPS;
 		dFloat m_currentRPS;
 		dFloat m_topSpeedMPS;
-		dFloat m_fakeIdleInertia;
+    	dFloat m_fakeIdleInertia;
 		dFloat m_engineInternalInertia;
 		dFloat m_differentialGearRatio;
 		dFloat m_engineOptimalRevPerSec;

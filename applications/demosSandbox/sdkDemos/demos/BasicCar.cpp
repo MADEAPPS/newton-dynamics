@@ -526,7 +526,8 @@ class BasicVehicleEntity: public DemoEntity
 //if (engineGasPedal > 0.0f)
 //engineGasPedal =1;
 
-		engine->SetGear(gear);
+//		engine->SetGear(gear);
+
 		brakes->SetParam(brakePedal);
 		steering->SetParam(steeringVal);
 		engine->SetParam(engineGasPedal);
