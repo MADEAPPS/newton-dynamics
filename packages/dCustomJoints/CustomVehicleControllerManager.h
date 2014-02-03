@@ -204,11 +204,11 @@ class CustomVehicleController: public CustomControllerBase
 
 		CUSTOM_JOINTS_API virtual void Update (dFloat timestep);
 		
-		CUSTOM_JOINTS_API void InitEngineTorqueCurve (dFloat vehicleSpeedKPH,
-									dFloat poundFootIdleTorque, dFloat idleTorqueRPM, 
-									dFloat poundFootPeakTorque, dFloat peakTorqueRPM, 
-									dFloat poundFootPeackHorsePower, dFloat peakHorsePowerRPM, 
-									dFloat poundFootRedLineTorque, dFloat redLineTorqueRPM);
+		CUSTOM_JOINTS_API void InitEngineTorqueCurve (dFloat vehicleSpeedInKilometerPerHours,
+									dFloat idleTorqueInPoundFoot, dFloat revolutionsPerMinutesAtIdleTorque, 
+									dFloat peakTorqueInPoundFoot, dFloat revolutionsPerMinutesAtPeakTorque, 
+									dFloat peakHorsePower, dFloat revolutionsPerMinutesAtPeakHorsePower, 
+									dFloat torqueArRedLineInPoundFoot, dFloat revolutionsPerMinutesAtRedLineTorque);
 
 		CUSTOM_JOINTS_API int GetGear () const;
 		CUSTOM_JOINTS_API void SetGear (int gear);
@@ -234,7 +234,8 @@ class CustomVehicleController: public CustomControllerBase
     	dFloat m_fakeIdleInertia;
 		dFloat m_engineInternalInertia;
 		dFloat m_differentialGearRatio;
-		dFloat m_engineOptimalRevPerSec;
+		dFloat m_radiansPerSecundsAtRedLine;
+		dFloat m_radiansPerSecundsAtPeakPower;
 	};
 
 	class BrakeComponent: public Component

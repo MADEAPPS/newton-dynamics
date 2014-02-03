@@ -234,7 +234,7 @@ class BasicVehicleEntity: public DemoEntity
 		NewtonDestroyCollision (collision);	
 	}
 
-	CustomVehicleController::TireBodyState* AddTire (const char* const tireName, dFloat width, dFloat radius, dFloat mass, dFloat suspensionLength, dFloat suspensionSpring, dFloat suspensionDamper) 
+	CustomVehicleController::TireBodyState* AddTire (const char* const tireName, const dVector& offset, dFloat width, dFloat radius, dFloat mass, dFloat suspensionLength, dFloat suspensionSpring, dFloat suspensionDamper) 
 	{
 		NewtonBody* const body = m_controller->GetBody();
 		DemoEntity* const entity = (DemoEntity*) NewtonBodyGetUserData(body);
@@ -242,6 +242,9 @@ class BasicVehicleEntity: public DemoEntity
 
 		// add this tire, get local position and rise it by the suspension length 
 		dMatrix tireMatrix (tirePart->CalculateGlobalMatrix(entity));
+
+		// add the offset location
+		tireMatrix.m_posit += offset;
 
 		//lower the tire base position by some distance
 		tireMatrix.m_posit.m_y -= suspensionLength * 0.25f;
@@ -309,19 +312,20 @@ class BasicVehicleEntity: public DemoEntity
 
 		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
 		CalculateTireDimensions ("fl_tire", width, radius);
-		CustomVehicleController::TireBodyState* const leftFrontTireHandle = AddTire ("fl_tire", width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
-		CustomVehicleController::TireBodyState* const rightFrontTireHandle = AddTire ("fr_tire", width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
+		dVector offset (0.0f, 0.0f, 0.0f, 0.0f);
+		CustomVehicleController::TireBodyState* const leftFrontTireHandle = AddTire ("fl_tire", offset, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
+		CustomVehicleController::TireBodyState* const rightFrontTireHandle = AddTire ("fr_tire", offset, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
 
 		// add real tires
 		CalculateTireDimensions ("rl_tire", width, radius);
-		CustomVehicleController::TireBodyState* const leftRearTireHandle = AddTire ("rl_tire", width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
-		CustomVehicleController::TireBodyState* const rightRearTireHandle = AddTire ("rr_tire", width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
+		dVector offset1 (0.0f, 0.05f, 0.0f, 0.0f);
+		CustomVehicleController::TireBodyState* const leftRearTireHandle = AddTire ("rl_tire", offset1, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
+		CustomVehicleController::TireBodyState* const rightRearTireHandle = AddTire ("rr_tire", offset1, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
 
 		// add an engine
 		// first make the gear Box
 		dFloat fowardSpeedGearsBoxRatios[] = {VIPER_TIRE_GEAR_1, VIPER_TIRE_GEAR_2, VIPER_TIRE_GEAR_3, VIPER_TIRE_GEAR_4, VIPER_TIRE_GEAR_5, VIPER_TIRE_GEAR_6};
 		CustomVehicleController::EngineComponent::GearBox* const gearBox = new CustomVehicleController::EngineComponent::GearBox(m_controller, VIPER_TIRE_GEAR_REVERSE, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios); 
-		//CustomVehicleController::EngineComponent::GearBox* const gearBox = new CustomVehicleController::EngineComponent::GearBox(m_controller, VIPER_TIRE_GEAR_REVERSE, 2, fowardSpeedGearsBoxRatios); 
 		CustomVehicleController::EngineComponent* const engine = new CustomVehicleController::EngineComponent (m_controller, gearBox, leftRearTireHandle, rightRearTireHandle);
 
 		dFloat viperIdleRPM = VIPER_IDLE_TORQUE_RPM;
@@ -376,13 +380,14 @@ class BasicVehicleEntity: public DemoEntity
 
 		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
 		CalculateTireDimensions ("fl_tire", width, radius);
-		CustomVehicleController::TireBodyState* const leftFrontTireHandle = AddTire ("fl_tire", width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
-		CustomVehicleController::TireBodyState* const rightFrontTireHandle = AddTire ("fr_tire", width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
+		dVector offset (0.0f, 0.0f, 0.0f, 0.0f);
+		CustomVehicleController::TireBodyState* const leftFrontTireHandle = AddTire ("fl_tire", offset, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
+		CustomVehicleController::TireBodyState* const rightFrontTireHandle = AddTire ("fr_tire", offset, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
 
 		// add real tires
 		CalculateTireDimensions ("rl_tire", width, radius);
-		CustomVehicleController::TireBodyState* const leftRearTireHandle = AddTire ("rl_tire", width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
-		CustomVehicleController::TireBodyState* const rightRearTireHandle = AddTire ("rr_tire", width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
+		CustomVehicleController::TireBodyState* const leftRearTireHandle = AddTire ("rl_tire", offset, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
+		CustomVehicleController::TireBodyState* const rightRearTireHandle = AddTire ("rr_tire", offset, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
 
 		// add an engine
 		// first make the gear Box
