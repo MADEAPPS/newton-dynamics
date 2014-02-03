@@ -1180,6 +1180,10 @@ void CustomVehicleController::ChassisBodyState::CalculateAverageAcceleration (dF
     m_externalForce = accel.Scale(m_mass);
     alpha = m_matrix.UnrotateVector(alpha);
     m_externalTorque = m_matrix.RotateVector(alpha.CompProduct(m_localInertia));
+
+	NewtonBody* const body = m_controller->GetBody();
+	NewtonBodySetForce (body, &m_externalForce[0]);
+	NewtonBodySetTorque (body, &m_externalTorque[0]);
 }
 
 
@@ -1250,6 +1254,8 @@ void CustomVehicleController::TireBodyState::CalculateAverageAcceleration (dFloa
     m_externalForce = accel.Scale(m_mass);
     alpha = m_matrix.UnrotateVector(alpha);
     m_externalTorque = m_matrix.RotateVector(alpha.CompProduct(m_localInertia));
+
+	const ChassisBodyState& chassis = m_controller->m_chassisState;
 
 /*
     dAssert (m_tireConstraint.m_state0 != this);
@@ -1325,6 +1331,12 @@ if ((gear > 1) && (m_myIndex == 4)) {
     xxxxxxx ++;
 }
 */
+
+
+	// integrate tires angular velocity
+	dVector relOmega (m_omega - chassis.m_omega);
+	m_rotatonSpeed = relOmega % m_matrix[0];
+	m_rotationAngle = dMod (m_rotationAngle + m_rotatonSpeed / invTimestep, 2.0f * 3.141592f);
 }
 
 CustomVehicleControllerManager::CustomVehicleControllerManager(NewtonWorld* const world)
@@ -1846,7 +1858,6 @@ void CustomVehicleController::CalculateReactionsForces (int jointCount, VehicleJ
 		}
 	}
 
-	//dFloat maxAccNorm2 = maxAccNorm * maxAccNorm;
 	for (CustomList<BodyState*>::CustomListNode* stateNode = m_stateList.GetFirst()->GetNext(); stateNode; stateNode = stateNode->GetNext()) {
 		BodyState* const state = stateNode->GetInfo();
 		int index = state->m_myIndex;
@@ -1904,18 +1915,6 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 	int jointCount = GetActiveJoints(jointArray);
 	BuildJacobianMatrix (jointCount, jointArray, timestep, jacobianPairArray, jacobianColumn);
 	CalculateReactionsForces (jointCount, jointArray, timestep, jacobianPairArray, jacobianColumn);
-
-	NewtonBodySetForce (body, &m_chassisState.m_externalForce[0]);
-	NewtonBodySetTorque (body, &m_chassisState.m_externalTorque[0]);
-
-	// integrate tires angular velocity
-	const dVector& chassisOmega = m_chassisState.m_omega;
-	for (TireList::CustomListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
-		TireBodyState* const tire = &node->GetInfo();
-		dVector relOmega (tire->m_omega - chassisOmega);
-		tire->m_rotatonSpeed = relOmega % tire->m_matrix[0];
-		tire->m_rotationAngle = dMod (tire->m_rotationAngle + tire->m_rotatonSpeed * timestep, 2.0f * 3.141592f);
-	}
 }
 
 
