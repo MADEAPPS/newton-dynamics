@@ -440,6 +440,10 @@ class CustomVehicleController: public CustomControllerBase
         public:
         CUSTOM_JOINTS_API void Init (CustomVehicleController* const controller);
 
+        CUSTOM_JOINTS_API void Update (dFloat timestep, CustomVehicleController* const controller);
+        CUSTOM_JOINTS_API void CalculateAverageAcceleration (dFloat invTimestep, const dVector& veloc, const dVector& omega);
+        CUSTOM_JOINTS_API int CalculateActiveJoints (CustomVehicleController* const controller, VehicleJoint** const jointArray);
+        
         EngineGearJoint m_leftTire;
         EngineGearJoint m_rightTire;
     };
@@ -489,8 +493,6 @@ class CustomVehicleController: public CustomControllerBase
 	};
 
 	public:
-
-	// public functions
 	CUSTOM_JOINTS_API TireBodyState* AddTire (const TireCreationInfo& tireInfo);
 	CUSTOM_JOINTS_API TireBodyState* GetFirstTire () const ;
 	CUSTOM_JOINTS_API TireBodyState* GetNextTire (TireBodyState* const tire) const;
