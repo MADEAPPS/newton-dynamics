@@ -446,6 +446,22 @@ void CustomVehicleController::EngineComponent::Update (dFloat timestep)
 
 		leftTire.m_engineTorqueResistance = dAbs (gearGain * m_engineInternalInertia);
 		righTire.m_engineTorqueResistance = dAbs (gearGain * m_engineInternalInertia);
+
+
+/*
+static FILE* xxx;
+if (!xxx) 
+{
+	fopen_s (&xxx, "torque_rpm.csv", "wt");
+	fprintf (xxx, "gear, tire_torque, tire_rps\n");
+}
+
+static int xxxxx;
+dTrace (("%d %f\n", xxxxx, leftRPS));
+xxxxx ++;
+fprintf (xxx, "%d, %f, %f,\n", gear * 100, leftTorque, leftRPS);
+fflush (xxx);
+*/
 	}
 
 	leftTire.m_engineTorque = leftTorque;
@@ -455,26 +471,6 @@ void CustomVehicleController::EngineComponent::Update (dFloat timestep)
 	const ChassisBodyState& chassis = m_controller->m_chassisState;
 	dVector front (chassis.m_matrix.RotateVector(chassis.m_localFrame[0]));
 	m_speedMPS = chassis.m_veloc % front;
-
-/*
-if (tire.m_myIndex == 2){
-    static FILE* xxx;
-    if (!xxx) 
-    {
-        fopen_s (&xxx, "torque_rpm.csv", "wt");
-        fprintf (xxx, "gear, tire_torque, tire_rps, eng_rps,\n");
-    }
-
-    if ((vehicle->xxxxxxxx > (1000 + 0)) && (vehicle->xxxxxxxx < (1000 + 750))) {
-
-        dFloat tireRps___ = (tire.m_omega - vehicle->m_bodyState.m_omega).dot (tire.m_matrix[0]);
-        int gear = m_transmission->GetGear();
-        fprintf (xxx, "%d, %f, %f, %f,\n", gear * 100, xxxxxxxxxxx, tireRps, tireRps___);
-        fflush (xxx);
-    }
-}
-*/
-
 }
 
 
