@@ -243,7 +243,6 @@ void CustomVehicleController::EngineComponent::InitEngineTorqueCurve (
 	dFloat radianPerSecunds[5];
 	dFloat torqueInNewtonMeters[5];
 	
-//	dFloat torqueAtPeakPower;
 	const dFloat horsePowerToWatts = 735.5f;
 	const dFloat rpmToRadiansPerSecunds = 0.105f;
 	const dFloat poundFootToNewtonMeters = 1.356f;
@@ -304,6 +303,16 @@ dFloat CustomVehicleController::EngineComponent::GetIdleFakeInertia() const
 void CustomVehicleController::EngineComponent::SetIdleFakeInertia(dFloat value)
 {
 	m_fakeIdleInertia = value;
+}
+
+CustomVehicleController::TireList::CustomListNode* CustomVehicleController::EngineComponent::GetLeftTireNode() const
+{
+    return m_leftTire;
+}
+
+CustomVehicleController::TireList::CustomListNode* CustomVehicleController::EngineComponent::GetRightTireNode() const
+{
+    return m_righTire;
 }
 
 
@@ -702,6 +711,17 @@ void CustomVehicleController::VehicleJoint::JointAccelerations (JointAcceleratio
 }
 
 
+void CustomVehicleController::EngineGearJoint::UpdateSolverForces (const JacobianPair* const jacobians) const
+{
+    dAssert (0);
+}
+
+void CustomVehicleController::EngineGearJoint::JacobianDerivative (ParamInfo* const constraintParams)
+{
+    dAssert (0);
+}
+
+
 void CustomVehicleController::TireJoint::JacobianDerivative (ParamInfo* const constraintParams)
 {
 	// Restrict the movement on the pivot point along all two orthonormal direction
@@ -739,6 +759,8 @@ void CustomVehicleController::TireJoint::JacobianDerivative (ParamInfo* const co
 	tire->m_engineTorqueResistance = 0.0f;
 }
 
+
+
 void CustomVehicleController::TireJoint::UpdateSolverForces (const JacobianPair* const jacobians) const
 {
 	TireBodyState* const tire = (TireBodyState*) m_state1;
@@ -750,6 +772,13 @@ void CustomVehicleController::TireJoint::UpdateSolverForces (const JacobianPair*
 	// get tire longitudinal force
 	tire->m_longitidinalForce = jacobians[index + 1].m_jacobian_IM0.m_linear.Scale(tire->m_chassisJoint.m_jointFeebackForce[1]); 
 }
+
+
+CustomVehicleController::ContactJoint::ContactJoint ()
+    :m_contactCount(0)
+{
+}
+
 
 void CustomVehicleController::ContactJoint::JacobianDerivative (ParamInfo* const constraintParams)
 {
@@ -983,6 +1012,18 @@ void CustomVehicleController::BodyState::IntegrateForce (dFloat timestep, const 
 void CustomVehicleController::BodyState::CalculateAverageAcceleration (dFloat invTimestep, const dVector& veloc, const dVector& omega)
 {
     dAssert (0);
+}
+
+void CustomVehicleController::EngineBodyState::Init (CustomVehicleController* const controller)
+{
+    BodyState::Init (controller);
+
+//  NewtonBody* const body = m_controller->GetBody();
+//  const dMatrix& vehicleFrame = m_controller->m_chassisState.m_localFrame;
+    EngineComponent* const engine = controller->GetEngine();
+
+	m_leftTire.Init (m_controller, &engine->GetLeftTireNode()->GetInfo(), this);
+    m_rightTire.Init (m_controller, &engine->GetRightTireNode()->GetInfo(), this);
 }
 
 void CustomVehicleController::TireBodyState::Init (CustomVehicleController* const controller, const TireCreationInfo& tireInfo)
@@ -1491,9 +1532,15 @@ CustomVehicleController::BrakeComponent* CustomVehicleController::GetHandBrakes(
 void CustomVehicleController::SetEngine(EngineComponent* const engine)
 {
 	if (m_engine) {
+        m_stateList.Remove(&m_engineState);
 		delete m_engine;
 	}
+
 	m_engine = engine;
+    if (m_engine) {
+        m_engineState.Init(this);
+        m_stateList.Append(&m_engineState);
+    }
 }
 
 void CustomVehicleController::SetSteering(SteeringComponent* const steering)
@@ -1605,6 +1652,8 @@ int CustomVehicleController::GetActiveJoints(VehicleJoint** const jointArray)
 			dAssert (jointCount < VEHICLE_CONTROLLER_MAX_JOINTS);
 		}
 	}
+
+   dAssert (0);
 
 //	for (int i = 0; i < m_angularJointCount; i ++) {
 //		constraintArray[jointCount] = &m_angularVelocityLinks[i];

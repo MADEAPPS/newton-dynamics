@@ -218,6 +218,9 @@ class CustomVehicleController: public CustomControllerBase
 		CUSTOM_JOINTS_API dFloat GetTopSpeed () const;
 		CUSTOM_JOINTS_API dFloat GetIdleFakeInertia() const;
 
+        TireList::CustomListNode* GetLeftTireNode() const;
+        TireList::CustomListNode* GetRightTireNode() const;
+
 		protected:
 		CUSTOM_JOINTS_API void SetIdleFakeInertia(dFloat inertia);
 		CUSTOM_JOINTS_API void SetTopSpeed (dFloat topSpeedMeterPerSecunds);
@@ -236,6 +239,8 @@ class CustomVehicleController: public CustomControllerBase
 		dFloat m_currentRadiansPerSecund;
 		dFloat m_radiansPerSecundsAtRedLine;
 		dFloat m_radiansPerSecundsAtPeakPower;
+
+
 	};
 
 	class BrakeComponent: public Component
@@ -359,20 +364,24 @@ class CustomVehicleController: public CustomControllerBase
 		int m_count;
 	};
 
+    class EngineGearJoint: public VehicleJoint
+    {
+        public:
+        CUSTOM_JOINTS_API virtual void JacobianDerivative (ParamInfo* const constraintParams); 
+        CUSTOM_JOINTS_API virtual void UpdateSolverForces (const JacobianPair* const jacobians) const;
+    };
+
 	class TireJoint: public VehicleJoint
 	{
 		public:
+        CUSTOM_JOINTS_API virtual void JacobianDerivative (ParamInfo* const constraintParams); 
 		CUSTOM_JOINTS_API virtual void UpdateSolverForces (const JacobianPair* const jacobians) const; 
-		CUSTOM_JOINTS_API virtual void JacobianDerivative (ParamInfo* const constraintParams); 
 	};
 
 	class ContactJoint: public VehicleJoint
 	{
 		public:
-		ContactJoint ()
-			:m_contactCount(0)
-		{
-		}
+		CUSTOM_JOINTS_API ContactJoint ();
 		CUSTOM_JOINTS_API virtual void UpdateSolverForces (const JacobianPair* const jacobians) const; 
 		CUSTOM_JOINTS_API virtual void JacobianDerivative (ParamInfo* const constraintParams); 
 		CUSTOM_JOINTS_API virtual void JointAccelerations (JointAccelerationDecriptor* const accelParam);
@@ -425,6 +434,15 @@ class CustomVehicleController: public CustomControllerBase
 		dVector m_comOffset;
 		dVector m_gravity;
 	};
+
+    class EngineBodyState: public BodyState
+    {
+        public:
+        CUSTOM_JOINTS_API void Init (CustomVehicleController* const controller);
+
+        EngineGearJoint m_leftTire;
+        EngineGearJoint m_rightTire;
+    };
 
 	class TireBodyState: public BodyState
 	{
@@ -512,6 +530,7 @@ class CustomVehicleController: public CustomControllerBase
 	CUSTOM_JOINTS_API void UpdateTireTransforms ();
 
 	BodyState m_staticWorld;
+    EngineBodyState m_engineState;
 	ChassisBodyState m_chassisState;
 	TireList m_tireList;
 
