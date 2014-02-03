@@ -229,11 +229,11 @@ class CustomVehicleController: public CustomControllerBase
 		InterpolationCurve m_torqueCurve;
 
 		dFloat m_speedMPS;
-		dFloat m_currentRPS;
 		dFloat m_topSpeedMPS;
     	dFloat m_fakeIdleInertia;
 		dFloat m_engineInternalInertia;
 		dFloat m_differentialGearRatio;
+		dFloat m_currentRadiansPerSecund;
 		dFloat m_radiansPerSecundsAtRedLine;
 		dFloat m_radiansPerSecundsAtPeakPower;
 	};

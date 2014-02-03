@@ -215,11 +215,12 @@ CustomVehicleController::EngineComponent::EngineComponent (CustomVehicleControll
 	,m_leftTire(controller->m_tireList.GetNodeFromInfo (*leftTire))
 	,m_righTire(controller->m_tireList.GetNodeFromInfo (*righTire))
 	,m_speedMPS(0.0f)
-	,m_currentRPS(0.0f)
 	,m_topSpeedMPS(0.0f)
-	,m_fakeIdleInertia (0.05f)
-	,m_engineInternalInertia (0.0f)
+	,m_fakeIdleInertia (3.0f)
+	,m_engineInternalInertia(0.0f)
 	,m_differentialGearRatio(1.0f)
+	,m_currentRadiansPerSecund(0.0f)
+	,m_radiansPerSecundsAtRedLine(0.0f)
 	,m_radiansPerSecundsAtPeakPower(0.0f)
 {
 }
@@ -328,7 +329,7 @@ int CustomVehicleController::EngineComponent::GetGear () const
 
 dFloat CustomVehicleController::EngineComponent::GetRPM () const
 {
-	return m_currentRPS * 9.55f;
+	return m_currentRadiansPerSecund * 9.55f;
 }
 
 dFloat CustomVehicleController::EngineComponent::GetTopRPM () const
@@ -400,10 +401,10 @@ void CustomVehicleController::EngineComponent::Update (dFloat timestep)
 	if (gear == GearBox::m_newtralGear) {
 		// vehicle in neutral fake some engine inertia
 		dFloat rps = m_radiansPerSecundsAtPeakPower * m_param;
-		m_currentRPS = m_currentRPS + (rps - m_currentRPS) * m_fakeIdleInertia * 60.0f * timestep;
+		m_currentRadiansPerSecund = m_currentRadiansPerSecund + (rps - m_currentRadiansPerSecund) * m_fakeIdleInertia * timestep;
 
-		if (m_currentRPS < m_torqueCurve.m_nodes[1].m_param) {
-			m_currentRPS = m_torqueCurve.m_nodes[1].m_param;
+		if (m_currentRadiansPerSecund < m_torqueCurve.m_nodes[1].m_param) {
+			m_currentRadiansPerSecund = m_torqueCurve.m_nodes[1].m_param;
 		}
 	
 	} else {
@@ -417,12 +418,12 @@ void CustomVehicleController::EngineComponent::Update (dFloat timestep)
 			rightRPS = m_torqueCurve.m_nodes[1].m_param * 0.5f;
 		}
 
-		dFloat rps = (leftRPS + rightRPS) * 0.5f;
-		m_currentRPS = m_currentRPS + (rps - m_currentRPS) * m_fakeIdleInertia * 60.0f * timestep;
+		dFloat radiansPerSecond = (leftRPS + rightRPS) * 0.5f;
+		m_currentRadiansPerSecund = m_currentRadiansPerSecund + (radiansPerSecond - m_currentRadiansPerSecund) * m_fakeIdleInertia * timestep;
 
 		// when adding a differential torque distribution if control by the differential, for now add 50% to each tire
-		leftTorque = gearGain * m_torqueCurve.GetValue(leftRPS * dFloat(1.0f/60.0f)) * m_param * 0.5f;
-		rightTorque = gearGain * m_torqueCurve.GetValue(rightRPS * dFloat(1.0f/60.0f)) * m_param * 0.5f;
+		leftTorque = gearGain * m_torqueCurve.GetValue(leftRPS) * m_param * 0.5f;
+		rightTorque = gearGain * m_torqueCurve.GetValue(rightRPS) * m_param * 0.5f;
 
 		if (gear != GearBox::m_reverseGear) {
 			if (leftTorque < m_torqueCurve.m_nodes[1].m_value * 0.125f) {
@@ -450,6 +451,11 @@ void CustomVehicleController::EngineComponent::Update (dFloat timestep)
 	leftTire.m_engineTorque = leftTorque;
 	righTire.m_engineTorque = rightTorque;
 
+	// set the vehicle speed
+	const ChassisBodyState& chassis = m_controller->m_chassisState;
+	dVector front (chassis.m_matrix.RotateVector(chassis.m_localFrame[0]));
+	m_speedMPS = chassis.m_veloc % front;
+
 /*
 if (tire.m_myIndex == 2){
     static FILE* xxx;
@@ -469,11 +475,6 @@ if (tire.m_myIndex == 2){
 }
 */
 
-
-	// set the vehicle speed
-	const ChassisBodyState& chassis = m_controller->m_chassisState;
-	dVector front (chassis.m_matrix.RotateVector(chassis.m_localFrame[0]));
-	m_speedMPS = chassis.m_veloc % front;
 }
 
 
