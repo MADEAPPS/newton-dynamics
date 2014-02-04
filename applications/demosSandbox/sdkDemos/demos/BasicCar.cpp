@@ -511,7 +511,7 @@ class BasicVehicleEntity: public DemoEntity
 
 
 #if 0
-	#if 1
+	#if 0
 		static FILE* file = fopen ("log.bin", "wb");
 		if (file) {
 			fwrite (&gear, sizeof (int), 1, file);

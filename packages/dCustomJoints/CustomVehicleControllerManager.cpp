@@ -1694,7 +1694,12 @@ CustomVehicleController::BrakeComponent* CustomVehicleController::GetHandBrakes(
 void CustomVehicleController::SetEngine(EngineComponent* const engine)
 {
 	if (m_engine) {
-        m_stateList.Remove(&m_engineState);
+		for (CustomList<BodyState*>::CustomListNode* node = m_stateList.GetFirst(); node; node = node->GetNext()) {
+			if (node->GetInfo() == &m_engineState) {
+				m_stateList.Remove(node);
+				break;
+			}
+		}
 		delete m_engine;
 	}
 
