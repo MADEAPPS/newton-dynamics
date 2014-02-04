@@ -267,6 +267,7 @@ END_EVENT_TABLE()
 
 NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize& size)
 	:wxFrame(NULL, -1, title, pos, size)
+//	,m_joystick()
 	,m_mainMenu(NULL)
 	,m_statusbar(NULL)
 	,m_scene(NULL)
@@ -320,6 +321,25 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	m_statusbar->SetFieldsCount (sizeof (widths)/sizeof (widths[0]), widths);
 	CalculateFPS(0.0f);
 	m_mainMenu = CreateMainMenu();
+
+
+/*
+	wxJoystick stick(wxJOYSTICK1);
+	if (!stick.IsOk())
+	{
+		wxMessageBox(wxT("No joystick detected!"));
+		return false;
+	}
+
+#if wxUSE_SOUND
+	m_fire.Create(wxT("buttonpress.wav"));
+#endif // wxUSE_SOUND
+
+	m_minX = stick.GetXMin();
+	m_minY = stick.GetYMin();
+	m_maxX = stick.GetXMax();
+	m_maxY = stick.GetYMax();
+*/
 
 m_showStatistics = true;
 #if 0

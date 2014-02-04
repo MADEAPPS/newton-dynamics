@@ -189,6 +189,16 @@ dFloat CustomVehicleController::EngineComponent::GearBox::GetGearRatio(int gear)
 	return (gear != m_reverseGear) ? ratio : -ratio;
 }
 
+void CustomVehicleController::EngineComponent::GearBox::SetTransmissionMode (bool mode) 
+{
+	m_automatic = mode;
+}
+
+bool CustomVehicleController::EngineComponent::GearBox::GetTransmissionMode () const 
+{
+	return m_automatic;
+}
+
 
 void CustomVehicleController::EngineComponent::GearBox::SetGear(int gear) 
 {
@@ -314,10 +324,32 @@ void CustomVehicleController::EngineComponent::SetInertia(dFloat inertia)
 }
 
 
+
 CustomVehicleController::EngineComponent::GearBox* CustomVehicleController::EngineComponent::GetGearBox() const
 {
     return m_gearBox;
 }
+
+void CustomVehicleController::EngineComponent::SetGear (int gear)
+{
+	m_gearBox->SetGear(gear);
+}
+
+int CustomVehicleController::EngineComponent::GetGear () const
+{
+	return m_gearBox->GetGear();
+}
+
+void CustomVehicleController::EngineComponent::SetTransmissionMode (bool mode)
+{
+	m_gearBox->SetTransmissionMode(mode);
+}
+
+bool CustomVehicleController::EngineComponent::GetTransmissionMode () const
+{
+	return m_gearBox->GetTransmissionMode();
+}
+
 
 dFloat CustomVehicleController::EngineComponent::GetIdleResistance() const
 {
@@ -361,16 +393,6 @@ dFloat CustomVehicleController::EngineComponent::GetTopSpeed () const
 dFloat CustomVehicleController::EngineComponent::GetSpeed () const
 {
 	return m_speedMPS;
-}
-
-void CustomVehicleController::EngineComponent::SetGear (int gear)
-{
-	m_gearBox->SetGear(gear);
-}
-
-int CustomVehicleController::EngineComponent::GetGear () const
-{
-	return m_gearBox->GetGear();
 }
 
 dFloat CustomVehicleController::EngineComponent::GetRPM () const

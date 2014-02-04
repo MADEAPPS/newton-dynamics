@@ -107,6 +107,7 @@ typedef long long unsigned64;
 #include <wx/event.h>
 #include <wx/dcclient.h>
 #include <wx/glcanvas.h>
+#include <wx/joystick.h>
 
 
 

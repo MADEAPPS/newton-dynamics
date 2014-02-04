@@ -181,14 +181,13 @@ class CustomVehicleController: public CustomControllerBase
 			CUSTOM_JOINTS_API void Update (dFloat timestep);
 			CUSTOM_JOINTS_API dFloat GetGearRatio(int gear) const;
 
-			CUSTOM_JOINTS_API void SetMode (bool mode) {m_automatic = true;}
-			CUSTOM_JOINTS_API bool GetMode (bool mode) const {return m_automatic;}
 
             CUSTOM_JOINTS_API void SetGear(int gear);
 			CUSTOM_JOINTS_API int GetGear() const {return m_currentGear->m_id;}
 			CUSTOM_JOINTS_API int GetGearCount() const {return m_gearsCount;}
 
-
+			bool GetTransmissionMode () const;
+			void SetTransmissionMode (bool mode);
 			void SetOptimalShiftLimits (dFloat minShift, dFloat maxShift);
 
 			GearState* m_gears[m_maxGears];
@@ -219,6 +218,9 @@ class CustomVehicleController: public CustomControllerBase
 		CUSTOM_JOINTS_API dFloat GetTopSpeed () const;
 		CUSTOM_JOINTS_API dFloat GetInertia() const;
 		CUSTOM_JOINTS_API void SetInertia(dFloat inertia);
+		CUSTOM_JOINTS_API bool GetTransmissionMode () const;
+		CUSTOM_JOINTS_API void SetTransmissionMode (bool mode);
+
 
         GearBox* GetGearBox() const;
         dFloat GetIdleResistance () const;

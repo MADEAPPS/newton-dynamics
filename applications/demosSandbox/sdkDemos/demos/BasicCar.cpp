@@ -113,6 +113,7 @@ class BasicVehicleEntity: public DemoEntity
 		,m_helpKey (true)
 		,m_gearUpKey (false)
 		,m_gearDownKey (false)
+		,m_manualTransmission(false)
 	{
 		// add this entity to the scene for rendering
 		scene->Append(this);
@@ -156,7 +157,6 @@ class BasicVehicleEntity: public DemoEntity
 
 		// destroy the collision helper shape 
 		NewtonDestroyCollision(chassisCollision);
-
 
 		for (int i = 0; i < int ((sizeof (m_gearMap) / sizeof (m_gearMap[0]))); i ++) {
 			m_gearMap[i] = i;
@@ -346,14 +346,14 @@ class BasicVehicleEntity: public DemoEntity
         dFloat vehicleMomentOfInteria  = VIPER_ENGINE_MOMENT_OF_INERTIA;
 		engine->InitEngineTorqueCurve (vehicleTopSpeedKPH, vehicleMomentOfInteria, viperIdleTorquePoundPerFoot, viperIdleRPM, viperPeakTorquePoundPerFoot, viperPeakTorqueRPM, viperPeakHorsePower, viperPeakHorsePowerRPM, viperRedLineTorquePoundPerFoot, viperRedLineRPM);
 		m_controller->SetEngine(engine);
-		
+
+		engine->SetTransmissionMode(m_manualTransmission.GetPushButtonState());
 
 		// add an steering Wheel
 		CustomVehicleController::SteeringComponent* const steering = new CustomVehicleController::SteeringComponent (m_controller, VIPER_TIRE_STEER_ANGLE * 3.141592f / 180.0f);
 		steering->AddSteeringTire(leftFrontTireHandle, -1.0f);
 		steering->AddSteeringTire(rightFrontTireHandle, -1.0f);
 		m_controller->SetSteering(steering);
-
 
 		// add vehicle brakes
 		CustomVehicleController::BrakeComponent* const brakes = new CustomVehicleController::BrakeComponent (m_controller, VIPER_TIRE_BRAKE_TORQUE);
@@ -363,7 +363,6 @@ class BasicVehicleEntity: public DemoEntity
 		brakes->AddBrakeTire (rightRearTireHandle);
 		m_controller->SetBrakes(brakes);
 		
-
 		// add vehicle hand brakes
 		CustomVehicleController::BrakeComponent* const handBrakes = new CustomVehicleController::BrakeComponent (m_controller, VIPER_TIRE_BRAKE_TORQUE);
 		handBrakes->AddBrakeTire (leftRearTireHandle);
@@ -509,11 +508,14 @@ class BasicVehicleEntity: public DemoEntity
 		// set the help key
 		m_helpKey.UpdatePushButton (mainWindow, 'H');
 
+		// check transmission type
+		int toggleTransmission = m_manualTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
 #if 0
-	#if 0
+	#if 1
 		static FILE* file = fopen ("log.bin", "wb");
 		if (file) {
+			fwrite (&toggleTransmissionr, sizeof (int), 1, file);
 			fwrite (&gear, sizeof (int), 1, file);
 			fwrite (&steeringVal, sizeof (dFloat), 1, file);
 			fwrite (&engineGasPedal, sizeof (dFloat), 1, file);
@@ -524,6 +526,7 @@ class BasicVehicleEntity: public DemoEntity
 	#else 
 		static FILE* file = fopen ("log.bin", "rb");
 		if (file) {		
+			fread (&toggleTransmissionr, sizeof (int), 1, file);
 			fread (&gear, sizeof (int), 1, file);
 			fread (&steeringVal, sizeof (dFloat), 1, file);
 			fread (&engineGasPedal, sizeof (dFloat), 1, file);
@@ -533,7 +536,13 @@ class BasicVehicleEntity: public DemoEntity
 	#endif
 #endif
 
-//		engine->SetGear(gear);
+		if (toggleTransmission) {
+			engine->SetTransmissionMode (!engine->GetTransmissionMode());
+		}
+		if (engine->GetTransmissionMode()) {
+			engine->SetGear(gear);
+		}
+
 		brakes->SetParam(brakePedal);
 		steering->SetParam(steeringVal);
 		engine->SetParam(engineGasPedal);
@@ -619,6 +628,7 @@ class BasicVehicleEntity: public DemoEntity
 	DemoEntityManager::ButtonKey m_helpKey;
 	DemoEntityManager::ButtonKey m_gearUpKey;
 	DemoEntityManager::ButtonKey m_gearDownKey;
+	DemoEntityManager::ButtonKey m_manualTransmission;
 
 	int m_gearMap[10];
 };
@@ -746,15 +756,15 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 		if (m_player->m_helpKey.GetPushButtonState()) {
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "Vehicle driving keyboard control:   Joystick control");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "accelerator : 'W'                   stick forward");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "brakes      : 'S'                   stick back");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right  : 'D'                   stick right");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right  : 'S'                   stick left");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear up     : '>'                   button 2");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear down   : '<'                   button 4");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear neutral: enter                 button 4");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "hand brakes : space                 button 1");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help   : H");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "accelerator         : 'W'           stick forward");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "brakes              : 'S'           stick back");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right          : 'D'           stick right");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right          : 'S'           stick left");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear up             : '>'           button 2");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear down           : '<'           button 4");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "manual transmission : enter         button 4");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "hand brakes         : space         button 1");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help           : H");
 		}
 	}
 
