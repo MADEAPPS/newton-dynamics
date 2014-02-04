@@ -204,7 +204,8 @@ class CustomVehicleController: public CustomControllerBase
 
 		CUSTOM_JOINTS_API virtual void Update (dFloat timestep);
 		
-		CUSTOM_JOINTS_API void InitEngineTorqueCurve (dFloat vehicleSpeedInKilometerPerHours,
+		CUSTOM_JOINTS_API void InitEngineTorqueCurve (
+                                    dFloat vehicleSpeedInKilometerPerHours, dFloat engineMomentOfInertia,
 									dFloat idleTorqueInPoundFoot, dFloat revolutionsPerMinutesAtIdleTorque, 
 									dFloat peakTorqueInPoundFoot, dFloat revolutionsPerMinutesAtPeakTorque, 
 									dFloat peakHorsePower, dFloat revolutionsPerMinutesAtPeakHorsePower, 
@@ -216,13 +217,18 @@ class CustomVehicleController: public CustomControllerBase
         CUSTOM_JOINTS_API dFloat GetTopRPM () const;
 		CUSTOM_JOINTS_API dFloat GetSpeed () const;
 		CUSTOM_JOINTS_API dFloat GetTopSpeed () const;
-		CUSTOM_JOINTS_API dFloat GetIdleFakeInertia() const;
+		CUSTOM_JOINTS_API dFloat GetInertia() const;
+//		CUSTOM_JOINTS_API void SetIdleFakeInertia(dFloat inertia);
 
-        TireList::CustomListNode* GetLeftTireNode() const;
-        TireList::CustomListNode* GetRightTireNode() const;
+        CUSTOM_JOINTS_API GearBox* GetGearBox() const;
+        CUSTOM_JOINTS_API dFloat GetIdleResistance () const;
+        CUSTOM_JOINTS_API dFloat GetDifferencialGearRatio () const;
+        CUSTOM_JOINTS_API dFloat GetTorque (dFloat radianPerSeconds) const;
+        
+        CUSTOM_JOINTS_API TireList::CustomListNode* GetLeftTireNode() const;
+        CUSTOM_JOINTS_API TireList::CustomListNode* GetRightTireNode() const;
 
 		protected:
-		CUSTOM_JOINTS_API void SetIdleFakeInertia(dFloat inertia);
 		CUSTOM_JOINTS_API void SetTopSpeed (dFloat topSpeedMeterPerSecunds);
 		CUSTOM_JOINTS_API dFloat CaculateEngineRPS (const TireBodyState* const tire, dFloat gearGain) const;
 
@@ -233,14 +239,12 @@ class CustomVehicleController: public CustomControllerBase
 
 		dFloat m_speedMPS;
 		dFloat m_topSpeedMPS;
-    	dFloat m_fakeIdleInertia;
-		dFloat m_engineInternalInertia;
+        dFloat m_momentOfInertia;
+		dFloat m_engineResistance;
+        dFloat m_engineIdleResistance;
 		dFloat m_differentialGearRatio;
-		dFloat m_currentRadiansPerSecund;
 		dFloat m_radiansPerSecundsAtRedLine;
 		dFloat m_radiansPerSecundsAtPeakPower;
-
-
 	};
 
 	class BrakeComponent: public Component
@@ -446,6 +450,7 @@ class CustomVehicleController: public CustomControllerBase
         
         EngineGearJoint m_leftTire;
         EngineGearJoint m_rightTire;
+        dFloat m_radianPerSecund;
     };
 
 	class TireBodyState: public BodyState

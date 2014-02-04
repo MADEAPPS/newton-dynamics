@@ -46,6 +46,8 @@
 #define VIPER_IDLE_TORQUE				300.0f
 #define VIPER_IDLE_TORQUE_RPM			500.0f
 
+#define VIPER_ENGINE_MOMENT_OF_INERTIA  40.0f
+
 #define VIPER_PEAK_TORQUE				490.0f
 #define VIPER_PEAK_TORQUE_RPM			3700.0f
 
@@ -341,7 +343,8 @@ class BasicVehicleEntity: public DemoEntity
 		dFloat viperRedLineTorquePoundPerFoot = VIPER_REDLINE_TORQUE;
 
 		dFloat vehicleTopSpeedKPH = VIPER_TIRE_TOP_SPEED_KMH;
-		engine->InitEngineTorqueCurve (vehicleTopSpeedKPH, viperIdleTorquePoundPerFoot, viperIdleRPM, viperPeakTorquePoundPerFoot, viperPeakTorqueRPM, viperPeakHorsePower, viperPeakHorsePowerRPM, viperRedLineTorquePoundPerFoot, viperRedLineRPM);
+        dFloat vehicleMomentOfInteria  = VIPER_ENGINE_MOMENT_OF_INERTIA;
+		engine->InitEngineTorqueCurve (vehicleTopSpeedKPH, vehicleMomentOfInteria, viperIdleTorquePoundPerFoot, viperIdleRPM, viperPeakTorquePoundPerFoot, viperPeakTorqueRPM, viperPeakHorsePower, viperPeakHorsePowerRPM, viperRedLineTorquePoundPerFoot, viperRedLineRPM);
 		m_controller->SetEngine(engine);
 		
 
@@ -410,7 +413,8 @@ class BasicVehicleEntity: public DemoEntity
 		dFloat viperRedLineTorquePoundPerFoot = VIPER_REDLINE_TORQUE;
 
 		dFloat vehicleTopSpeedKPH = VIPER_TIRE_TOP_SPEED_KMH;
-		engine->InitEngineTorqueCurve (vehicleTopSpeedKPH, viperIdleTorquePoundPerFoot, viperIdleRPM, viperPeakTorquePoundPerFoot, viperPeakTorqueRPM, viperPeakHorsePower, viperPeakHorsePowerRPM, viperRedLineTorquePoundPerFoot, viperRedLineRPM);
+        dFloat vehicleMomentOfInteria = VIPER_ENGINE_MOMENT_OF_INERTIA;
+		engine->InitEngineTorqueCurve (vehicleTopSpeedKPH, vehicleMomentOfInteria, viperIdleTorquePoundPerFoot, viperIdleRPM, viperPeakTorquePoundPerFoot, viperPeakTorqueRPM, viperPeakHorsePower, viperPeakHorsePowerRPM, viperRedLineTorquePoundPerFoot, viperRedLineRPM);
 		m_controller->SetEngine(engine);
 
 

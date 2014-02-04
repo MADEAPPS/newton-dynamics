@@ -217,10 +217,10 @@ CustomVehicleController::EngineComponent::EngineComponent (CustomVehicleControll
 	,m_righTire(controller->m_tireList.GetNodeFromInfo (*righTire))
 	,m_speedMPS(0.0f)
 	,m_topSpeedMPS(0.0f)
-	,m_fakeIdleInertia (3.0f)
-	,m_engineInternalInertia(0.0f)
+    ,m_momentOfInertia(0.0f)
+    ,m_engineResistance(0.0f)
+    ,m_engineIdleResistance(0.0f)
 	,m_differentialGearRatio(1.0f)
-	,m_currentRadiansPerSecund(0.0f)
 	,m_radiansPerSecundsAtRedLine(0.0f)
 	,m_radiansPerSecundsAtPeakPower(0.0f)
 {
@@ -233,9 +233,8 @@ CustomVehicleController::EngineComponent::~EngineComponent()
 	}
 }
 
-//dFloat vehicleSpeedKPH, dFloat idleTorquePoundPerFoot, dFloat idleTorqueRPM, dFloat peakTorquePoundPerFoot, dFloat peakTorqueRPM, dFloat peakHorsePower, dFloat peakHorsePowerRPM, dFloat redLineTorque, dFloat redLineTorqueRPM)
 void CustomVehicleController::EngineComponent::InitEngineTorqueCurve (
-	dFloat vehicleSpeedInKilometerPerHours,
+	dFloat vehicleSpeedInKilometerPerHours, dFloat engineMomentOfInertia,
 	dFloat idleTorqueInPoundFoot, dFloat revolutionsPerMinutesAtIdleTorque, 
 	dFloat peakTorqueInPoundFoot, dFloat revolutionsPerMinutesAtPeakTorque, 
 	dFloat peakHorsePower, dFloat revolutionsPerMinutesAtPeakHorsePower, 
@@ -286,7 +285,11 @@ void CustomVehicleController::EngineComponent::InitEngineTorqueCurve (
 	torqueInNewtonMeters[3] = torqueAtPeakPower;
 	torqueInNewtonMeters[4] = redLineTorque;
 
-	m_engineInternalInertia = redLineTorque * 1.25f;
+//	m_engineInternalInertia = redLineTorque * 1.25f;
+    m_momentOfInertia = engineMomentOfInertia;
+    m_engineIdleResistance = redLineTorque / (rpsAtIdleTorque * 0.99f);
+    m_engineResistance = redLineTorque / (rpsAtRedLineTorque * rpsAtRedLineTorque * 0.99f * 0.99f);
+
 	m_torqueCurve.InitalizeCurve (sizeof (radianPerSecunds)/sizeof (radianPerSecunds[0]), radianPerSecunds, torqueInNewtonMeters);
 
 	m_radiansPerSecundsAtPeakPower = rpsAtPeakPower;
@@ -297,13 +300,36 @@ void CustomVehicleController::EngineComponent::InitEngineTorqueCurve (
 }
 
 
-dFloat CustomVehicleController::EngineComponent::GetIdleFakeInertia() const
+dFloat CustomVehicleController::EngineComponent::GetInertia() const
 {
-	return m_fakeIdleInertia;
+	return m_momentOfInertia;
 }
+
+/*
 void CustomVehicleController::EngineComponent::SetIdleFakeInertia(dFloat value)
 {
 	m_fakeIdleInertia = value;
+}
+*/
+
+CustomVehicleController::EngineComponent::GearBox* CustomVehicleController::EngineComponent::GetGearBox() const
+{
+    return m_gearBox;
+}
+
+dFloat CustomVehicleController::EngineComponent::GetIdleResistance() const
+{
+    return m_engineIdleResistance;
+}
+
+dFloat CustomVehicleController::EngineComponent::GetTorque (dFloat radianPerSeconds) const
+{
+    return m_torqueCurve.GetValue(radianPerSeconds);
+}
+
+dFloat CustomVehicleController::EngineComponent::GetDifferencialGearRatio() const
+{
+    return m_differentialGearRatio;
 }
 
 CustomVehicleController::TireList::CustomListNode* CustomVehicleController::EngineComponent::GetLeftTireNode() const
@@ -339,7 +365,7 @@ int CustomVehicleController::EngineComponent::GetGear () const
 
 dFloat CustomVehicleController::EngineComponent::GetRPM () const
 {
-	return m_currentRadiansPerSecund * 9.55f;
+	return m_controller->m_engineState.m_radianPerSecund * 9.55f;
 }
 
 dFloat CustomVehicleController::EngineComponent::GetTopRPM () const
@@ -1027,6 +1053,20 @@ void CustomVehicleController::EngineBodyState::Init (CustomVehicleController* co
 //  const dMatrix& vehicleFrame = m_controller->m_chassisState.m_localFrame;
     EngineComponent* const engine = controller->GetEngine();
 
+    m_mass = 0.0f; 
+    m_invMass = 0.0f;
+    m_radianPerSecund = 0.0f;
+
+    m_localInertia[0] = engine->GetInertia();
+    m_localInertia[1] = engine->GetInertia();
+    m_localInertia[2] = engine->GetInertia();
+    m_localInertia[3] = 0.0f;
+
+    m_localInvInertia[0] = 1.0f / m_localInertia[0];
+    m_localInvInertia[1] = 1.0f / m_localInertia[1];
+    m_localInvInertia[2] = 1.0f / m_localInertia[2];
+    m_localInvInertia[3] = 0.0f;
+
 	m_leftTire.Init (m_controller, &engine->GetLeftTireNode()->GetInfo(), this);
     m_rightTire.Init (m_controller, &engine->GetRightTireNode()->GetInfo(), this);
 }
@@ -1055,19 +1095,24 @@ void CustomVehicleController::EngineBodyState::CalculateAverageAcceleration (dFl
 
 void CustomVehicleController::EngineBodyState::Update (dFloat timestep, CustomVehicleController* const controller)
 {
-    dAssert (0);
-/*
-	m_gearBox->Update (timestep);
-	int gear = m_gearBox->GetGear();
-	dFloat gearGain = m_gearBox->GetGearRatio(gear) * m_differentialGearRatio;
+    EngineComponent* const engine = controller->GetEngine();
+    EngineComponent::GearBox* const gearBox = engine->GetGearBox();
 
-	dFloat leftTorque = 0.0f;
-	dFloat rightTorque = 0.0f;
+	gearBox->Update (timestep);
+	int gear = gearBox->GetGear();
 	
-    TireBodyState& leftTire = m_leftTire->GetInfo();
-    TireBodyState& righTire = m_righTire->GetInfo();
 
-	if (gear == GearBox::m_newtralGear) {
+//	dFloat leftTorque = 0.0f;
+//	dFloat rightTorque = 0.0f;
+//  TireBodyState& leftTire = m_leftTire->GetInfo();
+//  TireBodyState& righTire = m_righTire->GetInfo();
+
+    dFloat torque = 0.0f;
+	if (gear == EngineComponent::GearBox::m_newtralGear) {
+
+        torque = engine->GetTorque (0.0f) * engine->GetParam();
+        torque -= m_radianPerSecund * engine->GetIdleResistance();
+/*
 		// vehicle in neutral fake some engine inertia
 		dFloat rps = m_radiansPerSecundsAtPeakPower * m_param;
 		m_currentRadiansPerSecund = m_currentRadiansPerSecund + (rps - m_currentRadiansPerSecund) * m_fakeIdleInertia * timestep;
@@ -1075,8 +1120,11 @@ void CustomVehicleController::EngineBodyState::Update (dFloat timestep, CustomVe
 		if (m_currentRadiansPerSecund < m_torqueCurve.m_nodes[1].m_param) {
 			m_currentRadiansPerSecund = m_torqueCurve.m_nodes[1].m_param;
 		}
-	
+*/	
 	} else {
+        dAssert (0);
+/*
+        dFloat gearGain = gearBox->GetGearRatio(gear) * engine->GetGetDifferencialGeraRatio();
 		dFloat leftRPS = CaculateEngineRPS (&leftTire, gearGain);
 		dFloat rightRPS = CaculateEngineRPS (&righTire, gearGain);
 
@@ -1131,16 +1179,16 @@ xxxxx ++;
 fprintf (xxx, "%d, %f, %f,\n", gear * 100, leftTorque, leftRPS);
 fflush (xxx);
 #endif
-	}
-
-	leftTire.m_engineTorque = leftTorque;
-	righTire.m_engineTorque = rightTorque;
-
-	// set the vehicle speed
-	const ChassisBodyState& chassis = m_controller->m_chassisState;
-	dVector front (chassis.m_matrix.RotateVector(chassis.m_localFrame[0]));
-	m_speedMPS = chassis.m_veloc % front;
 */
+	}
+//	leftTire.m_engineTorque = leftTorque;
+//	righTire.m_engineTorque = rightTorque;
+	// set the vehicle speed
+//	const ChassisBodyState& chassis = m_controller->m_chassisState;
+//	dVector front (chassis.m_matrix.RotateVector(chassis.m_localFrame[0]));
+//	m_speedMPS = chassis.m_veloc % front;
+    m_externalForce = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+    m_externalTorque = dVector (torque, 0.0f, 0.0f, 0.0f);
 }
 
 void CustomVehicleController::TireBodyState::Init (CustomVehicleController* const controller, const TireCreationInfo& tireInfo)
