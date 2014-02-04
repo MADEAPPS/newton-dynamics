@@ -223,6 +223,7 @@ CustomVehicleController::EngineComponent::EngineComponent (CustomVehicleControll
 	,m_differentialGearRatio(1.0f)
 	,m_radiansPerSecundsAtRedLine(0.0f)
 	,m_radiansPerSecundsAtPeakPower(0.0f)
+	,m_radiansPerSecundsAtIdleTorque(0.0f)
 {
 }
 
@@ -292,6 +293,7 @@ void CustomVehicleController::EngineComponent::InitEngineTorqueCurve (
 
 	m_torqueCurve.InitalizeCurve (sizeof (radianPerSecunds)/sizeof (radianPerSecunds[0]), radianPerSecunds, torqueInNewtonMeters);
 
+	m_radiansPerSecundsAtIdleTorque = rpsAtIdleTorque;
 	m_radiansPerSecundsAtPeakPower = rpsAtPeakPower;
 	m_radiansPerSecundsAtRedLine = rpsAtRedLineTorque;
 	SetTopSpeed (vehicleSpeedInKilometerPerHours * 0.278f);
@@ -305,12 +307,12 @@ dFloat CustomVehicleController::EngineComponent::GetInertia() const
 	return m_momentOfInertia;
 }
 
-/*
-void CustomVehicleController::EngineComponent::SetIdleFakeInertia(dFloat value)
+void CustomVehicleController::EngineComponent::SetInertia(dFloat inertia)
 {
-	m_fakeIdleInertia = value;
+	m_momentOfInertia = inertia;
+	m_controller->m_engineState.UpdateInertia();
 }
-*/
+
 
 CustomVehicleController::EngineComponent::GearBox* CustomVehicleController::EngineComponent::GetGearBox() const
 {
@@ -322,10 +324,18 @@ dFloat CustomVehicleController::EngineComponent::GetIdleResistance() const
     return m_engineIdleResistance;
 }
 
+dFloat CustomVehicleController::EngineComponent::GetIdleRadianPerSeconds () const
+{
+	return m_radiansPerSecundsAtIdleTorque;
+}
+
+
 dFloat CustomVehicleController::EngineComponent::GetTorque (dFloat radianPerSeconds) const
 {
     return m_torqueCurve.GetValue(radianPerSeconds);
 }
+
+
 
 dFloat CustomVehicleController::EngineComponent::GetDifferencialGearRatio() const
 {
@@ -685,7 +695,6 @@ void CustomVehicleController::VehicleJoint::CalculateAngularDerivative (ParamInf
 
 	m_rowIsMotor[index] = false;
 	m_motorAcceleration[index] = 0.0f;
-	//constraintParams->m_jointAccel[index] = 0;
 	constraintParams->m_jointAccel[index] = alphaError;
 	constraintParams->m_jointLowFriction[index] = VEHICLE_MIN_FRICTION_BOUND;
 	constraintParams->m_jointHighFriction[index] = VEHICLE_MAX_FRICTION_BOUND;
@@ -717,11 +726,8 @@ void CustomVehicleController::VehicleJoint::JointAccelerations (JointAcceleratio
     dFloat ks = VEHICLE_POS_DAMP * dFloat (0.25f);
 	for (int k = 0; k < params->m_rowsCount; k ++) {
 		if (m_rowIsMotor[k]) {
-			dAssert (0);
-			//jacobianColElements[k].m_coordenateAccel = m_motorAcceleration[k] + jacobianColElements[k].m_deltaAccel;
+			jacobianColElements[k].m_coordenateAccel = m_motorAcceleration[k] + jacobianColElements[k].m_deltaAccel;
 		} else {
-			//jacobianColElements[k].m_coordenateAccel = jacobianColElements[k].m_deltaAccel;
-
             const JacobianPair& Jt = jacobianRowElements[k];
 			dVector relVeloc (Jt.m_jacobian_IM0.m_linear.CompProduct(bodyVeloc0) +
 							  Jt.m_jacobian_IM0.m_angular.CompProduct(bodyOmega0) + 
@@ -752,6 +758,30 @@ void CustomVehicleController::EngineGearJoint::JacobianDerivative (ParamInfo* co
     dAssert (0);
 }
 
+void CustomVehicleController::EngineIdleJoint::UpdateSolverForces (const JacobianPair* const jacobians) const
+{
+}
+
+void CustomVehicleController::EngineIdleJoint::JacobianDerivative (ParamInfo* const constraintParams)
+{
+	EngineComponent* const engine = m_controller->GetEngine();
+	EngineBodyState* const engineState = (EngineBodyState*) m_state0;
+	
+	const dVector& ping = engineState->m_matrix[0];
+
+	int index = constraintParams->m_count;
+	CalculateAngularDerivative (constraintParams, ping, 0.0f);
+	dAssert (engineState == &m_controller->m_engineState);
+
+	dFloat alpha = 0.35f * (engineState->m_omega % ping - engine->GetIdleRadianPerSeconds()) * constraintParams->m_timestepInv;
+
+	m_rowIsMotor[index] = true;
+	m_motorAcceleration[index] = - alpha;
+	constraintParams->m_jointAccel[index] = 0.0f;
+	constraintParams->m_jointLowFriction[index] = -m_friction;
+	constraintParams->m_jointHighFriction[index] = m_friction;
+}
+
 
 void CustomVehicleController::TireJoint::JacobianDerivative (ParamInfo* const constraintParams)
 {
@@ -772,7 +802,6 @@ void CustomVehicleController::TireJoint::JacobianDerivative (ParamInfo* const co
 		//m_tire->m_suspensionTochassisImpulseIndex = params.m_rows - 1;
 	}
 
-	// get a point along the pin axis at some reasonable large distance from the pivot
 	CalculateAngularDerivative (constraintParams, tire->m_matrix[1], 0.0f);
 	CalculateAngularDerivative (constraintParams, tire->m_matrix[2], 0.0f);
 
@@ -1067,30 +1096,39 @@ void CustomVehicleController::EngineBodyState::Init (CustomVehicleController* co
     m_localInvInertia[2] = 1.0f / m_localInertia[2];
     m_localInvInertia[3] = 0.0f;
 
-	m_leftTire.Init (m_controller, &engine->GetLeftTireNode()->GetInfo(), this);
-    m_rightTire.Init (m_controller, &engine->GetRightTireNode()->GetInfo(), this);
+	UpdateInertia();
+
+	m_idleFriction.Init (m_controller, this, &controller->m_staticWorld);
+	m_leftTire.Init (m_controller, this, &engine->GetLeftTireNode()->GetInfo());
+    m_rightTire.Init (m_controller, this, &engine->GetRightTireNode()->GetInfo());
 }
 
 int CustomVehicleController::EngineBodyState::CalculateActiveJoints (CustomVehicleController* const controller, VehicleJoint** const jointArray)
 {
     EngineComponent* const engine = controller->GetEngine();
     int gear = engine->GetGear();
+	int count = 0;
     if (gear >= EngineComponent::GearBox::m_firstGear) {
         dAssert (0);
     } else if (gear == EngineComponent::GearBox::m_reverseGear) {
         dAssert (0);
-    }
-    return 0;
+    } else {
+		count = 1;
+		jointArray[0] = &m_idleFriction;
+	}
+    return count;
 }
 
 void CustomVehicleController::EngineBodyState::CalculateAverageAcceleration (dFloat invTimestep, const dVector& veloc, const dVector& omega)
 {
     m_veloc = dVector (0.0f, 0.0f, 0.0f, 0.0f);
     m_externalForce = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+	m_externalTorque = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+//  dVector alpha = m_omega.Scale(invTimestep);
+//  alpha = m_matrix.UnrotateVector(alpha);
+//  m_externalTorque = m_matrix.RotateVector(alpha.CompProduct(m_localInertia));
 
-    dVector alpha = (m_omega - omega).Scale(invTimestep);
-    alpha = m_matrix.UnrotateVector(alpha);
-    m_externalTorque = m_matrix.RotateVector(alpha.CompProduct(m_localInertia));
+	m_radianPerSecund = m_omega % m_matrix[0];
 }
 
 void CustomVehicleController::EngineBodyState::Update (dFloat timestep, CustomVehicleController* const controller)
@@ -1100,7 +1138,6 @@ void CustomVehicleController::EngineBodyState::Update (dFloat timestep, CustomVe
 
 	gearBox->Update (timestep);
 	int gear = gearBox->GetGear();
-	
 
 //	dFloat leftTorque = 0.0f;
 //	dFloat rightTorque = 0.0f;
@@ -1110,14 +1147,15 @@ void CustomVehicleController::EngineBodyState::Update (dFloat timestep, CustomVe
     dFloat torque = 0.0f;
 	if (gear == EngineComponent::GearBox::m_newtralGear) {
 
-        dFloat param = dMax (engine->GetParam(), 0.01f);
-        torque = engine->GetTorque (0.0f) * param;
-        torque -= m_radianPerSecund * m_radianPerSecund * engine->GetIdleResistance();
-        dFloat alpha = torque / m_localInertia.m_x;
-        m_radianPerSecund += alpha * timestep;
+        dFloat param = engine->GetParam();
+		dFloat idleRps = engine->GetIdleRadianPerSeconds();
+		dFloat idleTorque = engine->GetTorque (idleRps);
 
-        m_veloc = dVector (0.0f, 0.0f, 0.0f, 0.0);
-        m_omega = dVector (m_radianPerSecund, 0.0f, 0.0f, 0.0);
+        torque = idleTorque * param;
+        torque -= m_radianPerSecund * m_radianPerSecund * engine->GetIdleResistance();
+
+		m_idleFriction.m_omega = idleRps;
+		m_idleFriction.m_friction = idleTorque * 0.1f;
 	} else {
         dAssert (0);
 /*

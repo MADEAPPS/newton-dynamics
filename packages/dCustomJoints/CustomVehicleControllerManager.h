@@ -218,25 +218,27 @@ class CustomVehicleController: public CustomControllerBase
 		CUSTOM_JOINTS_API dFloat GetSpeed () const;
 		CUSTOM_JOINTS_API dFloat GetTopSpeed () const;
 		CUSTOM_JOINTS_API dFloat GetInertia() const;
-//		CUSTOM_JOINTS_API void SetIdleFakeInertia(dFloat inertia);
+		CUSTOM_JOINTS_API void SetInertia(dFloat inertia);
 
-        CUSTOM_JOINTS_API GearBox* GetGearBox() const;
-        CUSTOM_JOINTS_API dFloat GetIdleResistance () const;
-        CUSTOM_JOINTS_API dFloat GetDifferencialGearRatio () const;
-        CUSTOM_JOINTS_API dFloat GetTorque (dFloat radianPerSeconds) const;
+        GearBox* GetGearBox() const;
+        dFloat GetIdleResistance () const;
+		dFloat GetIdleRadianPerSeconds () const;
+        dFloat GetDifferencialGearRatio () const;
+        dFloat GetTorque (dFloat radianPerSeconds) const;
         
-        CUSTOM_JOINTS_API TireList::CustomListNode* GetLeftTireNode() const;
-        CUSTOM_JOINTS_API TireList::CustomListNode* GetRightTireNode() const;
+        TireList::CustomListNode* GetLeftTireNode() const;
+        TireList::CustomListNode* GetRightTireNode() const;
 
 		protected:
-		CUSTOM_JOINTS_API void SetTopSpeed (dFloat topSpeedMeterPerSecunds);
-		CUSTOM_JOINTS_API dFloat CaculateEngineRPS (const TireBodyState* const tire, dFloat gearGain) const;
+		void SetTopSpeed (dFloat topSpeedMeterPerSecunds);
+		dFloat CaculateEngineRPS (const TireBodyState* const tire, dFloat gearGain) const;
 
 		GearBox* m_gearBox;
 		TireList::CustomListNode* m_leftTire;
 		TireList::CustomListNode* m_righTire;
 		InterpolationCurve m_torqueCurve;
 
+		
 		dFloat m_speedMPS;
 		dFloat m_topSpeedMPS;
         dFloat m_momentOfInertia;
@@ -245,6 +247,7 @@ class CustomVehicleController: public CustomControllerBase
 		dFloat m_differentialGearRatio;
 		dFloat m_radiansPerSecundsAtRedLine;
 		dFloat m_radiansPerSecundsAtPeakPower;
+		dFloat m_radiansPerSecundsAtIdleTorque;
 	};
 
 	class BrakeComponent: public Component
@@ -375,6 +378,17 @@ class CustomVehicleController: public CustomControllerBase
         CUSTOM_JOINTS_API virtual void UpdateSolverForces (const JacobianPair* const jacobians) const;
     };
 
+	class EngineIdleJoint: public VehicleJoint
+	{
+		public:
+		CUSTOM_JOINTS_API virtual void JacobianDerivative (ParamInfo* const constraintParams); 
+		CUSTOM_JOINTS_API virtual void UpdateSolverForces (const JacobianPair* const jacobians) const;
+
+		dFloat m_omega;
+		dFloat m_friction;
+	};
+
+
 	class TireJoint: public VehicleJoint
 	{
 		public:
@@ -450,6 +464,7 @@ class CustomVehicleController: public CustomControllerBase
         
         EngineGearJoint m_leftTire;
         EngineGearJoint m_rightTire;
+		EngineIdleJoint	m_idleFriction;
         dFloat m_radianPerSecund;
     };
 
