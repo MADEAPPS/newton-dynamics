@@ -1860,15 +1860,8 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 
 int CustomVehicleController::GetActiveJoints(VehicleJoint** const jointArray)
 {
-	int jointCount = 0;
-
-	// add the joints that connect tire to chassis
-	for (TireList::CustomListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
-		TireBodyState* const tire = &node->GetInfo();
-		jointArray[jointCount] = &tire->m_chassisJoint;
-		jointCount ++;
-		dAssert (jointCount < VEHICLE_CONTROLLER_MAX_JOINTS);
-	}
+	// add the engine joints
+	int jointCount = m_engineState.CalculateActiveJoints(this, &jointArray[0]);
 
 	// add all contact joints if any
 	for (TireList::CustomListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
@@ -1880,7 +1873,14 @@ int CustomVehicleController::GetActiveJoints(VehicleJoint** const jointArray)
 		}
 	}
 
-    jointCount += m_engineState.CalculateActiveJoints(this, &jointArray[jointCount]);
+	// add the joints that connect tire to chassis
+	for (TireList::CustomListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+		TireBodyState* const tire = &node->GetInfo();
+		jointArray[jointCount] = &tire->m_chassisJoint;
+		jointCount ++;
+		dAssert (jointCount < VEHICLE_CONTROLLER_MAX_JOINTS);
+	}
+    
 
 //	for (int i = 0; i < m_angularJointCount; i ++) {
 //		constraintArray[jointCount] = &m_angularVelocityLinks[i];
