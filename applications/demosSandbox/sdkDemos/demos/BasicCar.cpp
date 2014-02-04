@@ -113,7 +113,7 @@ class BasicVehicleEntity: public DemoEntity
 		,m_helpKey (true)
 		,m_gearUpKey (false)
 		,m_gearDownKey (false)
-		,m_manualTransmission(false)
+		,m_automaticTransmission(true)
 	{
 		// add this entity to the scene for rendering
 		scene->Append(this);
@@ -347,7 +347,8 @@ class BasicVehicleEntity: public DemoEntity
 		engine->InitEngineTorqueCurve (vehicleTopSpeedKPH, vehicleMomentOfInteria, viperIdleTorquePoundPerFoot, viperIdleRPM, viperPeakTorquePoundPerFoot, viperPeakTorqueRPM, viperPeakHorsePower, viperPeakHorsePowerRPM, viperRedLineTorquePoundPerFoot, viperRedLineRPM);
 		m_controller->SetEngine(engine);
 
-		engine->SetTransmissionMode(m_manualTransmission.GetPushButtonState());
+        // the the defualt transmission type
+		engine->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
 
 		// add an steering Wheel
 		CustomVehicleController::SteeringComponent* const steering = new CustomVehicleController::SteeringComponent (m_controller, VIPER_TIRE_STEER_ANGLE * 3.141592f / 180.0f);
@@ -509,7 +510,7 @@ class BasicVehicleEntity: public DemoEntity
 		m_helpKey.UpdatePushButton (mainWindow, 'H');
 
 		// check transmission type
-		int toggleTransmission = m_manualTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
+		int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
 #if 0
 	#if 1
@@ -539,7 +540,7 @@ class BasicVehicleEntity: public DemoEntity
 		if (toggleTransmission) {
 			engine->SetTransmissionMode (!engine->GetTransmissionMode());
 		}
-		if (engine->GetTransmissionMode()) {
+		if (!engine->GetTransmissionMode()) {
 			engine->SetGear(gear);
 		}
 
@@ -628,7 +629,7 @@ class BasicVehicleEntity: public DemoEntity
 	DemoEntityManager::ButtonKey m_helpKey;
 	DemoEntityManager::ButtonKey m_gearUpKey;
 	DemoEntityManager::ButtonKey m_gearDownKey;
-	DemoEntityManager::ButtonKey m_manualTransmission;
+	DemoEntityManager::ButtonKey m_automaticTransmission;
 
 	int m_gearMap[10];
 };

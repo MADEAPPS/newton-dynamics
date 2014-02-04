@@ -174,8 +174,6 @@ class CustomVehicleController: public CustomControllerBase
                 GearState* Update(CustomVehicleController* const vehicle);
             };
 
-
-
 			CUSTOM_JOINTS_API GearBox (CustomVehicleController* const controller, dFloat reverseGearRatio, int gearCount, const dFloat* const gearBoxRatios);
             CUSTOM_JOINTS_API ~GearBox ();
 			CUSTOM_JOINTS_API void Update (dFloat timestep);
@@ -224,22 +222,22 @@ class CustomVehicleController: public CustomControllerBase
 
         GearBox* GetGearBox() const;
         dFloat GetIdleResistance () const;
+        dFloat GetRedLineResistance () const;
 		dFloat GetIdleRadianPerSeconds () const;
         dFloat GetDifferencialGearRatio () const;
         dFloat GetTorque (dFloat radianPerSeconds) const;
-        
+
+        void SetTopSpeed (dFloat topSpeedMeterPerSecunds);
         TireList::CustomListNode* GetLeftTireNode() const;
         TireList::CustomListNode* GetRightTireNode() const;
 
 		protected:
-		void SetTopSpeed (dFloat topSpeedMeterPerSecunds);
-		dFloat CaculateEngineRPS (const TireBodyState* const tire, dFloat gearGain) const;
+		
 
 		GearBox* m_gearBox;
 		TireList::CustomListNode* m_leftTire;
 		TireList::CustomListNode* m_righTire;
 		InterpolationCurve m_torqueCurve;
-
 		
 		dFloat m_speedMPS;
 		dFloat m_topSpeedMPS;
@@ -378,6 +376,8 @@ class CustomVehicleController: public CustomControllerBase
         public:
         CUSTOM_JOINTS_API virtual void JacobianDerivative (ParamInfo* const constraintParams); 
         CUSTOM_JOINTS_API virtual void UpdateSolverForces (const JacobianPair* const jacobians) const;
+
+        dFloat m_powerTrainGain;
     };
 
 	class EngineIdleJoint: public VehicleJoint
@@ -506,7 +506,7 @@ class CustomVehicleController: public CustomControllerBase
 		dFloat m_suspensionlenght;
 		dFloat m_adhesionCoefficient; 
 		dFloat m_idleRollingResistance;
-		dFloat m_engineTorqueResistance;
+//		dFloat m_engineTorqueResistance;
 	
 		void* m_userData;
 		NewtonCollision* m_shape;

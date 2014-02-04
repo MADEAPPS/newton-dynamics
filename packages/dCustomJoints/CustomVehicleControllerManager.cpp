@@ -130,6 +130,8 @@ void CustomVehicleController::EngineComponent::GearBox::SetOptimalShiftLimits (d
 		state->m_shiftUp = maxShift;
 		state->m_shiftDown = minShift;
 	}
+
+m_gears[m_firstGear]->m_shiftUp = 1000.0f;
 }
 
 CustomVehicleController::EngineComponent::GearBox::GearState* CustomVehicleController::EngineComponent::GearBox::NeutralGearState::Update(CustomVehicleController* const vehicle)
@@ -186,7 +188,8 @@ CustomVehicleController::EngineComponent::GearBox::GearState* CustomVehicleContr
 dFloat CustomVehicleController::EngineComponent::GearBox::GetGearRatio(int gear) const 
 {
 	dFloat ratio = m_gears[gear]->m_ratio;
-	return (gear != m_reverseGear) ? ratio : -ratio;
+//	return (gear != m_reverseGear) ? ratio : -ratio;
+    return ratio;
 }
 
 void CustomVehicleController::EngineComponent::GearBox::SetTransmissionMode (bool mode) 
@@ -215,7 +218,6 @@ void CustomVehicleController::EngineComponent::GearBox::Update(dFloat timestep)
 {
 	if (m_automatic) {
         m_currentGear = m_currentGear->Update(m_controller);
-m_currentGear = m_gears[m_newtralGear];
 	}
 }
 
@@ -351,10 +353,16 @@ bool CustomVehicleController::EngineComponent::GetTransmissionMode () const
 }
 
 
+dFloat CustomVehicleController::EngineComponent::GetRedLineResistance() const
+{
+    return m_engineResistance;
+}
+
 dFloat CustomVehicleController::EngineComponent::GetIdleResistance() const
 {
     return m_engineIdleResistance;
 }
+
 
 dFloat CustomVehicleController::EngineComponent::GetIdleRadianPerSeconds () const
 {
@@ -434,23 +442,13 @@ void CustomVehicleController::EngineComponent::SetTopSpeed (dFloat topSpeedMPS)
 	dFloat tireTopOmega = m_topSpeedMPS / tire->m_radio;
 
 	dFloat engineTorque = m_torqueCurve.GetValue(m_radiansPerSecundsAtPeakPower);
-	dFloat tireTorque = 0.5f * engineTorque * gain;
+	dFloat tireTorque = engineTorque * gain;
 	dFloat tireRollingResistance = tireTorque / (tireTopOmega * tireTopOmega);
 
 	for (TireList::CustomListNode* node = m_controller->m_tireList.GetFirst(); node; node = node->GetNext()) {
 		TireBodyState* const tire = &node->GetInfo();
 		tire->m_idleRollingResistance = tireRollingResistance;
 	}
-}
-
-
-dFloat CustomVehicleController::EngineComponent::CaculateEngineRPS (const TireBodyState* const tire, dFloat gearGain) const
-{
-	dFloat rps = -gearGain * tire->m_rotatonSpeed;
-	if (rps < 0.0f) {
-		rps = 0.0f;
-	}
-	return rps;
 }
 
 
@@ -772,7 +770,6 @@ void CustomVehicleController::VehicleJoint::JointAccelerations (JointAcceleratio
 
 void CustomVehicleController::EngineGearJoint::UpdateSolverForces (const JacobianPair* const jacobians) const
 {
-    dAssert (0);
 }
 
 void CustomVehicleController::EngineGearJoint::JacobianDerivative (ParamInfo* const constraintParams)
@@ -828,7 +825,8 @@ void CustomVehicleController::TireJoint::JacobianDerivative (ParamInfo* const co
 	CalculateAngularDerivative (constraintParams, tire->m_matrix[2], 0.0f);
 
 	// check if the brakes are applied
-	dFloat breakResistance = dMax(tire->m_breakTorque, tire->m_engineTorqueResistance);
+	//dFloat breakResistance = dMax(tire->m_breakTorque, tire->m_engineTorqueResistance);
+    dFloat breakResistance = tire->m_breakTorque;
 	if (breakResistance > 1.0e-3f) {
 		int index = constraintParams->m_count;
 		CalculateAngularDerivative (constraintParams, tire->m_matrix[0], 0.0f);                    
@@ -838,7 +836,7 @@ void CustomVehicleController::TireJoint::JacobianDerivative (ParamInfo* const co
 
 	// clear the input variable after there are res
 	tire->m_breakTorque = 0.0f;
-	tire->m_engineTorqueResistance = 0.0f;
+//	tire->m_engineTorqueResistance = 0.0f;
 }
 
 
@@ -1130,10 +1128,10 @@ int CustomVehicleController::EngineBodyState::CalculateActiveJoints (CustomVehic
     EngineComponent* const engine = controller->GetEngine();
     int gear = engine->GetGear();
 	int count = 0;
-    if (gear >= EngineComponent::GearBox::m_firstGear) {
-        dAssert (0);
-    } else if (gear == EngineComponent::GearBox::m_reverseGear) {
-        dAssert (0);
+    if (gear != EngineComponent::GearBox::m_newtralGear) {
+        count = 2;
+        jointArray[0] = &m_leftTire;
+        jointArray[1] = &m_rightTire;
     } else {
 		count = 1;
 		jointArray[0] = &m_idleFriction;
@@ -1167,9 +1165,8 @@ void CustomVehicleController::EngineBodyState::Update (dFloat timestep, CustomVe
 //  TireBodyState& righTire = m_righTire->GetInfo();
 
     dFloat torque = 0.0f;
+    dFloat param = engine->GetParam();
 	if (gear == EngineComponent::GearBox::m_newtralGear) {
-
-        dFloat param = engine->GetParam();
 		dFloat idleRps = engine->GetIdleRadianPerSeconds();
 		dFloat idleTorque = engine->GetTorque (idleRps);
 
@@ -1179,9 +1176,15 @@ void CustomVehicleController::EngineBodyState::Update (dFloat timestep, CustomVe
 		m_idleFriction.m_omega = idleRps;
 		m_idleFriction.m_friction = idleTorque * 0.1f;
 	} else {
-        dAssert (0);
+        dFloat gearGain = gearBox->GetGearRatio(gear) * engine->GetDifferencialGearRatio();
+        dFloat nominalTorque = engine->GetTorque (m_radianPerSecund);
+
+        torque = nominalTorque * param;
+        torque -= m_radianPerSecund * m_radianPerSecund * engine->GetRedLineResistance();
+
+        m_leftTire.m_powerTrainGain = gearGain;
+        m_rightTire.m_powerTrainGain = gearGain;
 /*
-        dFloat gearGain = gearBox->GetGearRatio(gear) * engine->GetGetDifferencialGeraRatio();
 		dFloat leftRPS = CaculateEngineRPS (&leftTire, gearGain);
 		dFloat rightRPS = CaculateEngineRPS (&righTire, gearGain);
 
@@ -1306,7 +1309,7 @@ void CustomVehicleController::TireBodyState::Init (CustomVehicleController* cons
 	m_steeringAngle = 0.0f;
 	m_adhesionCoefficient = 2.0f;
 	m_idleRollingResistance = 0.0f;
-	m_engineTorqueResistance = 0.0f;
+//	m_engineTorqueResistance = 0.0f;
 	m_tireLoad = dVector(0.0f, 0.0f, 0.0f, 0.0f);
 	m_lateralForce = dVector(0.0f, 0.0f, 0.0f, 0.0f);
 	m_longitidinalForce = dVector(0.0f, 0.0f, 0.0f, 0.0f);
