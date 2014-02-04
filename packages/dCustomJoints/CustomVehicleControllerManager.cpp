@@ -287,8 +287,8 @@ void CustomVehicleController::EngineComponent::InitEngineTorqueCurve (
 
 //	m_engineInternalInertia = redLineTorque * 1.25f;
     m_momentOfInertia = engineMomentOfInertia;
-    m_engineIdleResistance = redLineTorque / (rpsAtIdleTorque * 0.99f);
     m_engineResistance = redLineTorque / (rpsAtRedLineTorque * rpsAtRedLineTorque * 0.99f * 0.99f);
+    m_engineIdleResistance = idleTorque / (rpsAtRedLineTorque * rpsAtRedLineTorque * 0.99f * 0.99f);
 
 	m_torqueCurve.InitalizeCurve (sizeof (radianPerSecunds)/sizeof (radianPerSecunds[0]), radianPerSecunds, torqueInNewtonMeters);
 
@@ -1110,17 +1110,14 @@ void CustomVehicleController::EngineBodyState::Update (dFloat timestep, CustomVe
     dFloat torque = 0.0f;
 	if (gear == EngineComponent::GearBox::m_newtralGear) {
 
-        torque = engine->GetTorque (0.0f) * engine->GetParam();
-        torque -= m_radianPerSecund * engine->GetIdleResistance();
-/*
-		// vehicle in neutral fake some engine inertia
-		dFloat rps = m_radiansPerSecundsAtPeakPower * m_param;
-		m_currentRadiansPerSecund = m_currentRadiansPerSecund + (rps - m_currentRadiansPerSecund) * m_fakeIdleInertia * timestep;
+        dFloat param = dMax (engine->GetParam(), 0.01f);
+        torque = engine->GetTorque (0.0f) * param;
+        torque -= m_radianPerSecund * m_radianPerSecund * engine->GetIdleResistance();
+        dFloat alpha = torque / m_localInertia.m_x;
+        m_radianPerSecund += alpha * timestep;
 
-		if (m_currentRadiansPerSecund < m_torqueCurve.m_nodes[1].m_param) {
-			m_currentRadiansPerSecund = m_torqueCurve.m_nodes[1].m_param;
-		}
-*/	
+        m_veloc = dVector (0.0f, 0.0f, 0.0f, 0.0);
+        m_omega = dVector (m_radianPerSecund, 0.0f, 0.0f, 0.0);
 	} else {
         dAssert (0);
 /*
