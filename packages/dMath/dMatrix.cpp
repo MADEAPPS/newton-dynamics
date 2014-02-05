@@ -241,18 +241,6 @@ dVector dMatrix::RotateVector4x4 (const dVector &v) const
 	return tmp;
 }
 
-/*
-dVector dMatrix::UnrotateVector4x4 (const dVector &v) const
-{
-	dVector tmp;
-	const dMatrix& me = *this;
-	for (int i = 0; i < 4; i ++) {
-		tmp[i] = v[0] * me[i][0] + v[1] * me[i][1] +  v[2] * me[i][2] +  v[3] * me[i][3];
-	}
-	return tmp;
-}
-*/
-
 
 dVector dMatrix::TransformVector (const dVector &v) const
 {

@@ -357,7 +357,8 @@ class CustomVehicleController: public CustomControllerBase
 		CUSTOM_JOINTS_API virtual void JointAccelerations (JointAccelerationDecriptor* const accelParam);
 
 		CUSTOM_JOINTS_API void InitPointParam (PointDerivativeParam& param, const dVector& pivot) const;
-		CUSTOM_JOINTS_API void CalculateAngularDerivative (ParamInfo* const constraintParams, const dVector& dir,	dFloat jointAngle);
+		CUSTOM_JOINTS_API void CalculateAngularDerivative (ParamInfo* const constraintParams, const dVector& dir, dFloat jointAngle);
+		CUSTOM_JOINTS_API void CalculateAngularDerivative (ParamInfo* const constraintParams, const dVector& dir0, const dVector& dir1, dFloat ratio);
 		CUSTOM_JOINTS_API void CalculatePointDerivative (ParamInfo* const constraintParams, const dVector& dir, const PointDerivativeParam& param);
 		CUSTOM_JOINTS_API void AddLinearRowJacobian (ParamInfo* const constraintParams, const dVector& pivot, const dVector& dir);
 
