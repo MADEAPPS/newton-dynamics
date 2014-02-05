@@ -504,6 +504,17 @@ class BasicVehicleEntity: public DemoEntity
 
 			// check for gear change (note key code for '>' = '.' and key code for '<' == ',')
 			gear += int (m_gearUpKey.UpdateTriggerButton(mainWindow, '.')) - int (m_gearDownKey.UpdateTriggerButton(mainWindow, ','));
+
+			// do driving heuristic for automatic transmission
+			if (engine->GetTransmissionMode()) {
+				dFloat speed = engine->GetSpeed();
+				// check if vehicle is parked
+				if ((dAbs (speed) < 1.0f) && !engineGasPedal && !brakePedal && !handBrakePedal) {
+					handBrakePedal = 0.5f;
+				};
+
+			}
+
 		}
 				
 		// set the help key
@@ -513,10 +524,10 @@ class BasicVehicleEntity: public DemoEntity
 		int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
 #if 0
-	#if 1
+	#if 0
 		static FILE* file = fopen ("log.bin", "wb");
 		if (file) {
-			fwrite (&toggleTransmissionr, sizeof (int), 1, file);
+			fwrite (&toggleTransmission, sizeof (int), 1, file);
 			fwrite (&gear, sizeof (int), 1, file);
 			fwrite (&steeringVal, sizeof (dFloat), 1, file);
 			fwrite (&engineGasPedal, sizeof (dFloat), 1, file);
@@ -527,7 +538,7 @@ class BasicVehicleEntity: public DemoEntity
 	#else 
 		static FILE* file = fopen ("log.bin", "rb");
 		if (file) {		
-			fread (&toggleTransmissionr, sizeof (int), 1, file);
+			fread (&toggleTransmission, sizeof (int), 1, file);
 			fread (&gear, sizeof (int), 1, file);
 			fread (&steeringVal, sizeof (dFloat), 1, file);
 			fread (&engineGasPedal, sizeof (dFloat), 1, file);
@@ -928,9 +939,9 @@ void BasicCar (DemoEntityManager* const scene)
 	// load the sky box
 	scene->CreateSkyBox();
 	
-	CreateLevelMesh (scene, "flatPlane.ngd", 1);
+	//CreateLevelMesh (scene, "flatPlane.ngd", 1);
 	//CreateLevelMesh (scene, "raceTrack2.ngd", 0);
-	//CreateLevelMesh (scene, "raceTrack2.ngd", 1);
+	CreateLevelMesh (scene, "raceTrack2.ngd", 1);
 	//CreateLevelMesh (scene, "raceTrack1.ngd", 0);
 	//CreateLevelMesh (scene, "raceTrack1.ngd", 1);
 	//CreateHeightFieldTerrain (scene, 10, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
