@@ -66,6 +66,9 @@ void CustomRackAndPinion::SubmitConstraints (dFloat timestep, int threadIndex)
 
 	// establish the gear equation.
 	dFloat relVeloc = w0 + m_gearRatio * w1;
+	if (m_gearRatio > dFloat (1.0f)) {
+		relVeloc = w0 / m_gearRatio +  w1;
+	}
 
 	// calculate the relative angular acceleration by dividing by the time step
 

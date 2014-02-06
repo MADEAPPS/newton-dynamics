@@ -69,6 +69,10 @@ void CustomGear::SubmitConstraints (dFloat timestep, int threadIndex)
 
 	// establish the gear equation.
 	dFloat relOmega = w0 + m_gearRatio * w1;
+	if (m_gearRatio > dFloat(1.0f)) {
+		relOmega = w0 / m_gearRatio  + w1;
+	}
+	
 
 	// calculate the relative angular acceleration by dividing by the time step
 	// ideally relative acceleration should be zero, but is practice there will always 
@@ -134,14 +138,9 @@ void CustomGear::GetInfo (NewtonJointRecord* const info) const
 	info->m_minAngularDof[2] = -FLT_MAX;;
 	info->m_maxAngularDof[2] =  FLT_MAX;
 
-	
-
 	memcpy (info->m_attachmenMatrix_0, &m_localMatrix0, sizeof (dMatrix));
 	memcpy (info->m_attachmenMatrix_1, &m_localMatrix1, sizeof (dMatrix));
-
 }
-
-
 
 
 CustomGearAndSlide::CustomGearAndSlide (dFloat gearRatio, dFloat slideRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const child, NewtonBody* const parent)
@@ -186,6 +185,9 @@ void CustomGearAndSlide::SubmitConstraints (dFloat timestep, int threadIndex)
 
 	// establish the gear equation.
 	dFloat relVeloc = w0 + m_gearRatio * w1;
+	if (m_gearRatio > dFloat(1.0f)) {
+		relVeloc = w0 / m_gearRatio  + w1;
+	}
 
 	// calculate the relative angular acceleration by dividing by the time step
 
@@ -225,7 +227,7 @@ void CustomGearAndSlide::SubmitConstraints (dFloat timestep, int threadIndex)
 	// set the desired angular acceleration between the two bodies
 	NewtonUserJointSetRowAcceleration (m_joint, relAccel);
 
-	// add the anguler relation constraint form teh base class
+	// add the angular relation constraint form the base class
 	CustomGear::SubmitConstraints (timestep, threadIndex);
 }
 

@@ -33,27 +33,19 @@ CustomPulley::CustomPulley(
 	m_gearRatio = gearRatio;
 
 	// calculate the two local matrix of the pivot point
-//	dVector pivot (0.0f, 0.0f, 0.0f);
-
 	dMatrix dommyMatrix;
 	// calculate the local matrix for body body0
 	dMatrix pinAndPivot0 (dgGrammSchmidt (childPin));
-//	CalculateLocalMatrix (pivot, childPin, m_localMatrix0, dommyMatrix);
 	CalculateLocalMatrix (pinAndPivot0, m_localMatrix0, dommyMatrix);
 
-
 	// calculate the local matrix for body body1  
-//dAssert (0);
 	dMatrix pinAndPivot1 (dgGrammSchmidt (parentPin));
-//	CalculateLocalMatrix (pivot, parentPin, dommyMatrix, m_localMatrix1);
 	CalculateLocalMatrix (pinAndPivot1, dommyMatrix, m_localMatrix1);
 }
 
 CustomPulley::~CustomPulley()
 {
-	
 }
-
 
 void CustomPulley::SubmitConstraints (dFloat timestep, int threadIndex)
 {
@@ -77,6 +69,9 @@ void CustomPulley::SubmitConstraints (dFloat timestep, int threadIndex)
 
 	// establish the gear equation.
 	dFloat relVeloc = w0 + m_gearRatio * w1;
+	if (m_gearRatio > dFloat(1.0f)) {
+		relVeloc = w0 / m_gearRatio + w1;
+	}
 
 	// calculate the relative angular acceleration by dividing by the time step
 	// ideally relative acceleration should be zero, but is practice there will always 
