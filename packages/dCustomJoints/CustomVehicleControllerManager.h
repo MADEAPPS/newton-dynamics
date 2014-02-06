@@ -180,9 +180,9 @@ class CustomVehicleController: public CustomControllerBase
 			CUSTOM_JOINTS_API dFloat GetGearRatio(int gear) const;
 
 
-            CUSTOM_JOINTS_API void SetGear(int gear);
-			CUSTOM_JOINTS_API int GetGear() const {return m_currentGear->m_id;}
-			CUSTOM_JOINTS_API int GetGearCount() const {return m_gearsCount;}
+			CUSTOM_JOINTS_API int GetGear() const;
+            CUSTOM_JOINTS_API void SetGear (int gear);
+			CUSTOM_JOINTS_API int GetGearCount() const;
 
 			bool GetTransmissionMode () const;
 			void SetTransmissionMode (bool mode);
@@ -357,10 +357,10 @@ class CustomVehicleController: public CustomControllerBase
 		CUSTOM_JOINTS_API virtual void JointAccelerations (JointAccelerationDecriptor* const accelParam);
 
 		CUSTOM_JOINTS_API void InitPointParam (PointDerivativeParam& param, const dVector& pivot) const;
-		CUSTOM_JOINTS_API void CalculateAngularDerivative (ParamInfo* const constraintParams, const dVector& dir, dFloat jointAngle);
-		CUSTOM_JOINTS_API void CalculateAngularDerivative (ParamInfo* const constraintParams, const dVector& dir0, const dVector& dir1, dFloat ratio);
-		CUSTOM_JOINTS_API void CalculatePointDerivative (ParamInfo* const constraintParams, const dVector& dir, const PointDerivativeParam& param);
+		CUSTOM_JOINTS_API void AddAngularRowJacobian (ParamInfo* const constraintParams, const dVector& dir, dFloat jointAngle);
 		CUSTOM_JOINTS_API void AddLinearRowJacobian (ParamInfo* const constraintParams, const dVector& pivot, const dVector& dir);
+		CUSTOM_JOINTS_API void AddAngularRowJacobian (ParamInfo* const constraintParams, const dVector& dir0, const dVector& dir1, dFloat ratio);
+		CUSTOM_JOINTS_API void CalculatePointDerivative (ParamInfo* const constraintParams, const dVector& dir, const PointDerivativeParam& param);
 
 		int m_rowIsMotor[8];
 		dFloat m_motorAcceleration[8];
