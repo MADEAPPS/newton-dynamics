@@ -12,10 +12,12 @@
 #include "dLSCstdafx.h"
 #include "dDAG.h"
 #include "dDAGTypeNode.h"
+#include "dDAGFunctionNode.h"
 #include "dDAGExpressionNodeConstant.h"
 
 
 dInitRtti(dDAGExpressionNodeConstant);
+dInitRtti(dDAGExpressionNodeOperatorThisConstant);
 
 dDAGExpressionNodeConstant::dDAGExpressionNodeConstant(dList<dDAG*>& allNodes, dType type, const char* const value)
 	:dDAGExpressionNode(allNodes)
@@ -41,31 +43,47 @@ void dDAGExpressionNodeConstant::CompileCIL(dCIL& cil)
 	stmt.m_instruction = dTreeAdressStmt::m_assigment;
 	stmt.m_operator = dTreeAdressStmt::m_nothing;
 	stmt.m_arg0.m_label = cil.NewTemp();
-/*
+
 	switch (m_type) 
 	{
-//		case m_intValue:
-//			m_result.m_type = dTreeAdressStmt::m_intConst;
-//			break;
+		case m_intValue:
+		{
+			stmt.m_arg1.m_type = dTreeAdressStmt::m_intConst;
+			break;
+		}
 
 		case m_floatValue:
-			_ASSERTE (0)
-			m_result.m_type = dTreeAdressStmt::m_floatConst;
+		{
+			dAssert (0);
+			stmt.m_arg1.m_type = dTreeAdressStmt::m_floatConst;
 			break;
+		}
+
+		case m_classPointer:
+		{
+			stmt.m_arg1.m_type = dTreeAdressStmt::m_classPointer;
+			break;
+		}
 
 		default:
-			m_result.m_type = dTreeAdressStmt::m_intVar;
-
-	}
-*/
-	if (m_type == m_floatValue) {
-		_ASSERTE (0);
-		m_result.m_type = dTreeAdressStmt::m_floatVar;
+			dAssert (0);
 	}
 
-	stmt.m_arg1.m_type = dTreeAdressStmt::m_intConst;
 	stmt.m_arg1.m_label = m_name; 
 	DTRACE_INTRUCTION (&stmt);
-
 	m_result = stmt.m_arg0;
+}
+
+
+dDAGExpressionNodeOperatorThisConstant::dDAGExpressionNodeOperatorThisConstant (dList<dDAG*>& allNodes)
+	:dDAGExpressionNodeConstant(allNodes, dDAGExpressionNodeConstant::m_classPointer, "this")
+{
+}
+
+
+void dDAGExpressionNodeOperatorThisConstant::CompileCIL(dCIL& cil)
+{
+	dDAGFunctionNode* const function = GetFunction();
+	m_result.m_type = dTreeAdressStmt::m_classPointer;
+	m_result.m_label = function->m_opertatorThis;
 }

@@ -124,7 +124,7 @@ void dDAGExpressionNodeBinaryOperator::CompileCIL(dCIL& cil)
 		}
 		
 		default:
-			_ASSERTE (0);
+			dAssert (0);
 	}
 
 	DTRACE_INTRUCTION (&stmt);

@@ -74,6 +74,7 @@ class dLittleScriptParser
 		_LOGIC_OR,
 		_LOGIC_AND,
 		_NEW,
+		_THIS,
 		_FLOAT_CONST,
 		_INTEGER_CONST,
 		_OP_INC,

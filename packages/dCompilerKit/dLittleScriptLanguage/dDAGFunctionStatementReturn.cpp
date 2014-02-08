@@ -53,7 +53,7 @@ void dDAGFunctionStatementReturn::CompileCIL(dCIL& cil)
 		} else if (returnType->m_name == "int") {
 			returnTypeVal = dCIL::m_intRegister;
 		} else {
-			_ASSERTE (0);
+			dAssert (0);
 		}
 
 		if (returnTypeVal == dCIL::m_intRegister) {
@@ -64,7 +64,7 @@ void dDAGFunctionStatementReturn::CompileCIL(dCIL& cil)
 			stmt.m_arg1 = m_expression->m_result;
 			DTRACE_INTRUCTION (&stmt);
 		} else if (returnTypeVal == dCIL::m_floatRegister) {
-			_ASSERTE (0);
+			dAssert (0);
 		}
 	}
 

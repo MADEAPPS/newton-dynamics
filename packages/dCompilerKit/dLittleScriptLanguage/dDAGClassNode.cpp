@@ -20,6 +20,7 @@ dInitRtti(dDAGClassNode);
 
 dDAGClassNode::dDAGClassNode(dList<dDAG*>& allNodes)
 	:dDAG(allNodes)
+	,m_isFinal(false)
 	,m_isPublic(true)
 	,m_baseClass (NULL)
 	,m_variables()
@@ -35,7 +36,9 @@ dDAGClassNode::~dDAGClassNode(void)
 
 void dDAGClassNode::FinalizeImplementation (const char* const visibility, const char* const name, dDAGClassNode* const baseClass)
 {
-	m_isPublic = (dString (visibility) == "") ? true : false;
+	dString visibilityString (visibility);
+	m_isFinal = (visibilityString == "final") ? true : false;
+	m_isPublic = (visibilityString == "private") ? false : true;
 	m_name = name;
 //	m_baseClass = baseClass;
 //	_ASSERTE (!m_baseClass);
@@ -62,7 +65,7 @@ dString dDAGClassNode::GetFunctionName (const char* const functionName, dList<dD
 			return dString (m_name + "::" + name);
 		}
 	}
-	_ASSERTE (0);
+	dAssert (0);
 	return "xxx";
 }
 
@@ -77,7 +80,7 @@ dString dDAGClassNode::GetFunctionName (const char* const functionName, dList<dD
 		}
 	}
 
-	_ASSERTE (0);
+	dAssert (0);
 	return "xxxx";
 }
 
@@ -91,7 +94,7 @@ dDAGTypeNode* dDAGClassNode::GetFunctionReturnType(const char* const functionNam
 		}
 	}
 
-	_ASSERTE (0);
+	dAssert (0);
 	return NULL;
 }
 
@@ -143,7 +146,7 @@ void dDAGClassNode::CompileCIL(dCIL& cil)
 		} else if (function->m_returnType->m_name == "int" ) {
 			returnType = dCIL::m_intRegister;
 		} else if (function->m_returnType->m_name == "float") {
-			_ASSERTE (0);
+			dAssert (0);
 		} else {
 			//_ASSERTE (0);
 			returnType = dCIL::m_intRegister;

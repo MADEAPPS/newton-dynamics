@@ -48,7 +48,7 @@ dDAG* dDAGTypeNode::Clone (dList<dDAG*>& allNodes) const
 void dDAGTypeNode::AddDimensions (dDAGDimensionNode* const dimList)
 {
 	for (dDAGDimensionNode* node = dimList; node; node = node->m_next) {
-		_ASSERTE (node->IsType(dDAGDimensionNode::GetRttiType()));
+		dAssert (node->IsType(dDAGDimensionNode::GetRttiType()));
 		m_dimensions.Append(node);
 	}
 }

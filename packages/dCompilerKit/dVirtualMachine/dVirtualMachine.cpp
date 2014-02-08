@@ -52,7 +52,7 @@ dVirtualMachine::dVirtualMachine(void)
 	:m_codeSegementSize(0)
 	,m_codeSegment(NULL)
 {	
-	_ASSERTE (nop <= 1 << D_OPCODE_FIELD);
+	dAssert (nop <= 1 << D_OPCODE_FIELD);
 }
 
 dVirtualMachine::~dVirtualMachine(void)

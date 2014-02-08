@@ -29,7 +29,7 @@ dDAGExpressionNodeFunctionCall::dDAGExpressionNodeFunctionCall(dList<dDAG*>& all
 	dDAGExpressionNode* next;
 	for (dDAGExpressionNode* param = argumentList; param; param = next) {
 		next = (dDAGExpressionNode*) param->m_next;
-		_ASSERTE (param->IsType(dDAGExpressionNode::GetRttiType()));
+		dAssert (param->IsType(dDAGExpressionNode::GetRttiType()));
 		m_argumentList.Append(param);
 	}
 }
@@ -91,7 +91,7 @@ void dDAGExpressionNodeFunctionCall::CompileCIL(dCIL& cil)
 	} else if (returnType->m_name == "int") {
 		returnTypeVal = dCIL::m_intRegister;
 	} else {
-		_ASSERTE (0);
+		dAssert (0);
 	}
 
 	m_result.m_label = cil.NewTemp ();		

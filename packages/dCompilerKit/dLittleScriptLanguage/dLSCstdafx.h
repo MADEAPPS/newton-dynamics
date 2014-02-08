@@ -32,4 +32,7 @@
 #include <dContainersStdAfx.h>
 
 
+#define D_DEBUG_PARCEL
+
+
 #endif

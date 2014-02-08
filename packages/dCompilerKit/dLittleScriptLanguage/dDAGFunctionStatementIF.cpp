@@ -25,8 +25,8 @@ dDAGFunctionStatementIF::dDAGFunctionStatementIF(dList<dDAG*>& allNodes,
 	,m_thenStmt (thenStmt)
 	,m_elseStmt (elseStmt)
 {
-	_ASSERTE (m_expression);
-	_ASSERTE (m_thenStmt);
+	dAssert (m_expression);
+	dAssert (m_thenStmt);
 }
 
 

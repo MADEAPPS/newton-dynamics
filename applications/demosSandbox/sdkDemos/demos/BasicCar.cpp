@@ -58,7 +58,7 @@
 #define VIPER_REDLINE_TORQUE			30.0f
 #define VIPER_REDLINE_TORQUE_RPM		6000.0f
 
-#define VIPER_MASS						1560.0f
+#define VIPER_MASS						(1560.0f/5.0f)
 //#define VIPER_MASS					700.0f
 #define VIPER_TIRE_STEER_ANGLE			35.0f
 
@@ -523,8 +523,8 @@ class BasicVehicleEntity: public DemoEntity
 		// check transmission type
 		int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
-#if 0
-	#if 0
+#if 1
+	#if 1
 		static FILE* file = fopen ("log.bin", "wb");
 		if (file) {
 			fwrite (&toggleTransmission, sizeof (int), 1, file);
@@ -939,9 +939,9 @@ void BasicCar (DemoEntityManager* const scene)
 	// load the sky box
 	scene->CreateSkyBox();
 	
-	//CreateLevelMesh (scene, "flatPlane.ngd", 1);
+	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 	//CreateLevelMesh (scene, "raceTrack2.ngd", 0);
-	CreateLevelMesh (scene, "raceTrack2.ngd", 1);
+	//CreateLevelMesh (scene, "raceTrack2.ngd", 1);
 	//CreateLevelMesh (scene, "raceTrack1.ngd", 0);
 	//CreateLevelMesh (scene, "raceTrack1.ngd", 1);
 	//CreateHeightFieldTerrain (scene, 10, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);

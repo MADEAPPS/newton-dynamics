@@ -52,7 +52,7 @@ dDAGFunctionNode* dDAG::GetFunction() const
 			return (dDAGFunctionNode*) node;
 		}
 	}
-	_ASSERTE (0);
+	dAssert (0);
 	return NULL;
 }
 
@@ -63,7 +63,7 @@ dDAGClassNode* dDAG::GetClass() const
 			return (dDAGClassNode*) node;
 		}
 	}
-	_ASSERTE (0);
+	dAssert (0);
 	return NULL;
 }
 
@@ -96,10 +96,10 @@ bool dDAG::RenameLocalVariable(dCIL& cil, dString& variable) const
 
 	dDAGClassNode* const classNode = function->GetClass();
 	if (classNode->FindVariable(variable.GetStr())) {
-		_ASSERTE (0);
+		dAssert (0);
 		return true;
 	}
 
-	_ASSERTE (0);
+	dAssert (0);
 	return false;
 }

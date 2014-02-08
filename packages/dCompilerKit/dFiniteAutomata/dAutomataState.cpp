@@ -83,7 +83,7 @@ void dAutomataState::GetStateArray (dList<dAutomataState*>& statesList)
 				pool[stack] = state;
 				filter.Insert(state, state);
 				stack ++;
-				_ASSERTE (stack < sizeof (pool)/sizeof (pool[0]));
+				dAssert (stack < sizeof (pool)/sizeof (pool[0]));
 			}
 		}
 	}

@@ -26,7 +26,7 @@ class dDAGFunctionModifier: public dDAG
 	dDAGFunctionModifier(dList<dDAG*>& allNodes);
 	~dDAGFunctionModifier(void);
 
-	virtual void CompileCIL(dCIL& cil)  {_ASSERTE (0);}
+	virtual void CompileCIL(dCIL& cil)  {dAssert (0);}
 	virtual void ConnectParent(dDAG* const parent);
 
 	bool m_private;

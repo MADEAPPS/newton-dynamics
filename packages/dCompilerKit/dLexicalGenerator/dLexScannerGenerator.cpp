@@ -42,7 +42,7 @@ dLexScannerGenerator::dLexScannerGenerator(const dNonDeterministicFiniteAutonata
 	:dDeterministicFiniteAutonata (), m_stateCount(0), m_nfa(&nfa)
 {
 	CreateDeterministicFiniteAutomaton (nfa);
-	_ASSERTE (m_charaterSetMap.GetSets().GetCount() == 0);
+	dAssert (m_charaterSetMap.GetSets().GetCount() == 0);
 
 	dTree<dAutomataState*,dAutomataState*> filter;
 
@@ -57,7 +57,7 @@ dLexScannerGenerator::dLexScannerGenerator(const dNonDeterministicFiniteAutonata
 		stack --;
 
 		dExpandedState* const state = (dExpandedState*) pool[stack];
-		_ASSERTE (filter.Find(state));
+		dAssert (filter.Find(state));
 
 		if (state != m_startState) {
 			if (state->m_exitState) {
@@ -75,7 +75,7 @@ dLexScannerGenerator::dLexScannerGenerator(const dNonDeterministicFiniteAutonata
 				pool[stack] = targetState;
 				filter.Insert(targetState, targetState);
 				stack ++;
-				_ASSERTE (stack < sizeof (pool)/sizeof (pool[0]));
+				dAssert (stack < sizeof (pool)/sizeof (pool[0]));
 			}
 		}
 	}
@@ -163,7 +163,7 @@ void dLexScannerGenerator::LoadTemplateFile(const char* const templateName, dStr
 	sprintf (ptr, templateName);
 
 	FILE* const templateFile = fopen (path, "rb");
-	_ASSERTE (templateFile);
+	dAssert (templateFile);
 
 	templateOuput.LoadFile(templateFile);
 	fclose (templateFile);	
@@ -181,7 +181,7 @@ void dLexScannerGenerator::SaveFile(const char* const fileName, const char* cons
 	}
 	strcat (path, extention);
 	FILE* const headerFile = fopen (path, "wb");
-	_ASSERTE (headerFile);
+	dAssert (headerFile);
 	fprintf (headerFile, "%s", input.GetStr());
 	fclose (headerFile);
 
@@ -211,7 +211,7 @@ int dLexScannerGenerator::CompareChar (const void* ptr0, const void* ptr1)
 	} else if (ch0.m_symbol > ch1.m_symbol) {
 		return 1;
 	}
-	_ASSERTE (0);
+	dAssert (0);
 	return 0;
 }
 
@@ -254,7 +254,7 @@ void dLexScannerGenerator::CreateCodeFile (const char* const fileName, const dSt
 		stack --;
 
 		dExpandedState* const state = (dExpandedState*) pool[stack];
-		_ASSERTE (filter.Find(state));
+		dAssert (filter.Find(state));
 		stateSort.Insert(state, state->m_id);
 		for (dList<dAutomataState::dTransition>::dListNode* node = state->m_transtions.GetFirst(); node; node = node->GetNext()) {
 			dAutomataState::dTransition& sourceTransition = node->GetInfo();
@@ -264,7 +264,7 @@ void dLexScannerGenerator::CreateCodeFile (const char* const fileName, const dSt
 				pool[stack] = targetState;
 				filter.Insert(targetState, targetState);
 				stack ++;
-				_ASSERTE (stack < sizeof (pool)/sizeof (pool[0]));
+				dAssert (stack < sizeof (pool)/sizeof (pool[0]));
 			}
 		}
 	}
@@ -302,7 +302,7 @@ void dLexScannerGenerator::CreateCodeFile (const char* const fileName, const dSt
 			dAutomataState* const targetState = sourceTransition.GetState();
 
 			dAutomataState::dCharacter ch (sourceTransition.GetCharater());
-			_ASSERTE (ch.m_type == dAutomataState::CHARACTER);
+			dAssert (ch.m_type == dAutomataState::CHARACTER);
 			symbols[count].m_symbol = char (GetScapeChar(ch.m_info));
 			symbols[count]. m_nextState = targetState->m_id;
 			count ++;

@@ -22,7 +22,7 @@ dDAGFunctionStatementCase::dDAGFunctionStatementCase(dList<dDAG*>& allNodes, con
 {
 	for (dDAGFunctionStatement* node = childStatement; node; node = (dDAGFunctionStatement*) node->m_next) {
 		m_statementList.Append(node);
-		_ASSERTE (0);
+		dAssert (0);
 //		node->AddRef();
 	}
 }
@@ -30,7 +30,7 @@ dDAGFunctionStatementCase::dDAGFunctionStatementCase(dList<dDAG*>& allNodes, con
 dDAGFunctionStatementCase::~dDAGFunctionStatementCase()
 {
 	for (dList<dDAGFunctionStatement*>::dListNode* node = m_statementList.GetFirst(); node; node = node->GetNext()) {
-		_ASSERTE (0);
+		dAssert (0);
 //		dDAGFunctionStatement* const statement = node->GetInfo();
 //		statement->Release();
 	}

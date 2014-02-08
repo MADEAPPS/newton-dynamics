@@ -30,7 +30,7 @@ dDAGExpressionNodeVariable::dDAGExpressionNodeVariable(dList<dDAG*>& allNodes, c
 	for (dDAGDimensionNode* node = expressionDimIndex; node; node = next) {
 		next = node->m_next;
 		node->m_next = NULL;
-		_ASSERTE (node->IsType(dDAGDimensionNode::GetRttiType()));
+		dAssert (node->IsType(dDAGDimensionNode::GetRttiType()));
 		m_dimExpressions.Append(node);
 	}
 }
@@ -80,7 +80,7 @@ void dDAGExpressionNodeVariable::CompileCIL(dCIL& cil)
 		bool state = RenameLocalVariable(cil, variable);
 		if (!state) {
 			dTrace (("undefined local variable\n"));
-			_ASSERTE (0);
+			dAssert (0);
 		}
 	}
 
@@ -97,7 +97,7 @@ void dDAGExpressionNodeVariable::CompileCIL(dCIL& cil)
 		DTRACE_INTRUCTION (&addressIndex);
 
 		for (dList<dDAGDimensionNode*>::dListNode* node = m_dimExpressions.GetFirst()->GetNext(); node; node = node->GetNext()) {
-			_ASSERTE (0);
+			dAssert (0);
 /*
 			dDAGDimensionNode* const dim = node->GetInfo();
 			dim->CompileCIL(cil);
@@ -124,7 +124,7 @@ void dDAGExpressionNodeVariable::CompileCIL(dCIL& cil)
 */
 		}
 
-		_ASSERTE (m_parent);
+		dAssert (m_parent);
 		#ifdef D_USE_COMPLEX_ADRESSING_MODE
 
 			// emit an indirect addressing mode
@@ -148,7 +148,7 @@ void dDAGExpressionNodeVariable::CompileCIL(dCIL& cil)
 			dimSize.m_arg2.m_label = "4"; 
 			DTRACE_INTRUCTION (&dimSize);
 
-			_ASSERTE (m_parent);
+			dAssert (m_parent);
 			// emit an indirect addressing mode
 			dTreeAdressStmt& tmp = cil.NewStatement()->GetInfo();
 			tmp.m_instruction = dTreeAdressStmt::m_load;

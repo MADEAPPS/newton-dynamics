@@ -173,7 +173,7 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 
 
 					default:
-						_ASSERTE (0);
+						dAssert (0);
 				}
 				count ++;
 				break;
@@ -226,7 +226,7 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 							}
 
 							default:
-								_ASSERTE (0);
+								dAssert (0);
 						}
 					} else {
 						tmp[count].m_reg2 = RegisterToIndex (stmt.m_arg2.m_label.GetStr());
@@ -283,7 +283,7 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 
 
 							default:
-								_ASSERTE (0);
+								dAssert (0);
 						}
 					}
 				}
@@ -335,7 +335,7 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 				break;
 			
 			default: 
-				_ASSERTE (0);
+				dAssert (0);
 		}
 	}
 
@@ -404,7 +404,7 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 				break;
 
 			default:
-				_ASSERTE (0);
+				dAssert (0);
 
 		}
 	}

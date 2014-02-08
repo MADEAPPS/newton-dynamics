@@ -24,7 +24,6 @@ dDAGParameterNode::dDAGParameterNode(dList<dDAG*>& allNodes, const char* const i
 	:dDAGFunctionStatement(allNodes)
 	,m_isPublic(true)
 	,m_type(NULL)
-//	,m_initializationExp(NULL)
 {
 	m_name = identifier;
 }
@@ -39,14 +38,6 @@ void dDAGParameterNode::SetType(dDAGTypeNode* const type)
 {
 	m_type = type;
 }
-/*
-void dDAGParameterNode::SetInitializationExpression(dDAGExpressionNode* const exp)
-{
-	m_initializationExp = exp;
-	_ASSERTE (0);
-//	m_initializationExp->AddRef();
-}
-*/
 
 void dDAGParameterNode::ConnectParent(dDAG* const parent)  
 {
@@ -66,7 +57,7 @@ void dDAGParameterNode::CompileCIL(dCIL& cil)
 	sprintf (text, "%s%d%s", D_SCOPE_PREFIX, scope->m_scopeLayer, m_name.GetStr());
 	if (scope->m_localVariablesFilter.FindVariable (text)) {
 		dTrace (("duplicated local variable\n"));
-		_ASSERTE (0);
+		dAssert (0);
 	}
 	m_name = text;
 	scope->m_localVariablesFilter.Append(m_name);

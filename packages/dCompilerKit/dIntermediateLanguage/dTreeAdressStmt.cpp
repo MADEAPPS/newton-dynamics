@@ -129,7 +129,7 @@ void dTreeAdressStmt::TraceAssigment (char* const text) const
 			break;
 		}
 		default:;
-			_ASSERTE (0);
+			dAssert (0);
 
 	}
 
@@ -318,7 +318,7 @@ void dTreeAdressStmt::Trace (char* const textOut) const
 		}
 
 		default:;
-		_ASSERTE (0);
+		dAssert (0);
 	}
 }
 

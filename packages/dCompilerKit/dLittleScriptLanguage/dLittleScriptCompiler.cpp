@@ -121,7 +121,7 @@ void dScriptCompiler::SyntaxError (const dLittleScriptLexical& scanner, const dU
 	while (data[end] && isspace (data[end])) {
 		end --;
 	}
-	_ASSERTE (end >= start);
+	dAssert (end >= start);
 
 	int length = end - start + 1;
 	dString errorLine (&data[start], length);
@@ -176,12 +176,9 @@ void dScriptCompiler::ImportAllClasses (const dString& className)
 }
 
 
-
-
-
 dDAGScopeBlockNode* dScriptCompiler::GetCurrentScope() const
 {
-	_ASSERTE (m_scopeStack.GetCount());
+	dAssert (m_scopeStack.GetCount());
 	return m_scopeStack.GetLast()->GetInfo();
 }
 
@@ -193,6 +190,10 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewExpressionNodeConstant (const
 	dDAGExpressionNodeConstant::dType type = dDAGExpressionNodeConstant::m_intValue;
 	switch (int (value.m_token))
 	{
+		case _THIS:
+			type = dDAGExpressionNodeConstant::m_classPointer;
+			break;
+
 		case _FLOAT_CONST:
 			type = dDAGExpressionNodeConstant::m_floatValue;
 			break;
@@ -206,20 +207,27 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewExpressionNodeConstant (const
 			break;
 */
 		default:
-			_ASSERTE (0);
+			dAssert (0);
 	}
 
-//	_ASSERTE (GetCurrentScope());
 	dDAGExpressionNodeConstant* const node = new dDAGExpressionNodeConstant (m_allNodes, type, value.m_data.GetStr());
 	returnNode.m_node = node;
 	return returnNode;
 }
 
+dScriptCompiler::dUserVariable dScriptCompiler::NewExpressionNodeOperatorThisConstant(const dUserVariable& value)
+{
+	dUserVariable returnNode;
+	dDAGExpressionNodeConstant* const node = new dDAGExpressionNodeOperatorThisConstant (m_allNodes);
+	returnNode.m_node = node;
+	return returnNode;
+
+}
 
 dScriptCompiler::dUserVariable dScriptCompiler::NewExpresionNodePrefixPostfixOperator (const dUserVariable& expression, bool isPrefix, bool isIncrement)
 {
 	dUserVariable returnNode;
-	_ASSERTE (expression.m_node && expression.m_node->IsType(dDAGExpressionNodeVariable::GetRttiType()));
+	dAssert (expression.m_node && expression.m_node->IsType(dDAGExpressionNodeVariable::GetRttiType()));
 	
 	dDAGExpressionNodePrefixPostfix* const node = new dDAGExpressionNodePrefixPostfix (m_allNodes, (dDAGExpressionNode*)expression.m_node, isPrefix, isIncrement);
 	returnNode.m_node = node;
@@ -230,8 +238,8 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewExpressionNodeBinaryOperator 
 {
 	dUserVariable returnNode;
 
-	_ASSERTE (expressionA.m_node && expressionA.m_node->IsType(dDAGExpressionNode::GetRttiType()));
-	_ASSERTE (expressionB.m_node && expressionB.m_node->IsType(dDAGExpressionNode::GetRttiType()));
+	dAssert (expressionA.m_node && expressionA.m_node->IsType(dDAGExpressionNode::GetRttiType()));
+	dAssert (expressionB.m_node && expressionB.m_node->IsType(dDAGExpressionNode::GetRttiType()));
 
 	dDAGExpressionNodeBinaryOperator::dBinaryOperator binOperator = dDAGExpressionNodeBinaryOperator::m_add;
 	switch (int (binaryOperator.m_token))
@@ -282,7 +290,7 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewExpressionNodeBinaryOperator 
 			break;
 
 		default:
-			_ASSERTE (0);
+			dAssert (0);
 	}
 
 
@@ -296,8 +304,8 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewExpressionNodeLogiOperator (c
 {
 	dUserVariable returnNode;
 
-	_ASSERTE (expressionA.m_node && expressionA.m_node->IsType(dDAGExpressionNode::GetRttiType()));
-	_ASSERTE (expressionB.m_node && expressionB.m_node->IsType(dDAGExpressionNode::GetRttiType()));
+	dAssert (expressionA.m_node && expressionA.m_node->IsType(dDAGExpressionNode::GetRttiType()));
+	dAssert (expressionB.m_node && expressionB.m_node->IsType(dDAGExpressionNode::GetRttiType()));
 
 	dDAGExpressionNodeLogicOperator::dLogicOperator logOperator = dDAGExpressionNodeLogicOperator::m_and;
 	switch (int (logicOperator.m_token))
@@ -311,10 +319,10 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewExpressionNodeLogiOperator (c
 			break;
 
 		default:
-			_ASSERTE (0);
+			dAssert (0);
 	}
 
-	_ASSERTE (GetCurrentScope());
+	dAssert (GetCurrentScope());
 	dDAGExpressionNodeLogicOperator* const node = new dDAGExpressionNodeLogicOperator (m_allNodes, logOperator, (dDAGExpressionNode*)expressionA.m_node, (dDAGExpressionNode*)expressionB.m_node);
 
 //	expressionA.m_node->Release();
@@ -327,7 +335,7 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewExpressionNodeLogiOperator (c
 
 dDAGClassNode* dScriptCompiler::GetCurrentClass() const
 {
-	_ASSERTE (m_classList.GetCount());
+	dAssert (m_classList.GetCount());
 	return m_classList.GetLast()->GetInfo();
 }
 
@@ -349,7 +357,7 @@ dScriptCompiler::dUserVariable dScriptCompiler::EmitTypeNode (const dUserVariabl
 
 	if (dim.m_node) {
 		dDAGDimensionNode* const dimList = (dDAGDimensionNode*) dim.m_node;
-		_ASSERTE (dimList->IsType(dDAGDimensionNode::GetRttiType()));
+		dAssert (dimList->IsType(dDAGDimensionNode::GetRttiType()));
 		typeNode->AddDimensions (dimList);
 	}
 
@@ -362,7 +370,7 @@ dScriptCompiler::dUserVariable dScriptCompiler::AddClassFunction (const dUserVar
 	dUserVariable returnNode;
 
 	dDAGTypeNode* const typeNode = (dDAGTypeNode*) returnType.m_node;
-	_ASSERTE (typeNode->IsType(dDAGTypeNode::GetRttiType()));
+	dAssert (typeNode->IsType(dDAGTypeNode::GetRttiType()));
 
 	dDAGFunctionNode* const functionNode = new dDAGFunctionNode (m_allNodes, typeNode, name.GetStr(), visibility.GetStr());
 	GetCurrentClass()->AddFunction(functionNode);
@@ -376,7 +384,7 @@ dScriptCompiler::dUserVariable dScriptCompiler::AddClassContructor (const dStrin
 	dDAGClassNode* const curClass = GetCurrentClass();
 
 	dUserVariable typeVariable;
-	_ASSERTE (name == curClass->m_name);
+	dAssert (name == curClass->m_name);
 
 	typeVariable.m_node = new dDAGTypeNode (m_allNodes, "void");
 	dUserVariable returnNode (AddClassFunction (typeVariable, name, "public static"));
@@ -390,7 +398,7 @@ dScriptCompiler::dUserVariable dScriptCompiler::FunctionAddParameterNode (const 
 	dUserVariable returnNode;
 
 	dDAGParameterNode* const parameterNode = (dDAGParameterNode*)parameter.m_node;
-	_ASSERTE (parameterNode->GetTypeId() == dDAGParameterNode::GetRttiType());
+	dAssert (parameterNode->GetTypeId() == dDAGParameterNode::GetRttiType());
 
 	dDAGFunctionNode* const function = GetCurrentClass()->GetCurrentFunction();
 	function->AddParameter(parameterNode);
@@ -404,7 +412,7 @@ dScriptCompiler::dUserVariable dScriptCompiler::FunctionAddBodyBlock (const dUse
 	dDAGFunctionNode* const function = GetCurrentClass()->GetCurrentFunction();
 
 	dDAGScopeBlockNode* const bodyNode = (dDAGScopeBlockNode*) functionBody.m_node;
-	_ASSERTE (bodyNode->IsType (dDAGScopeBlockNode::GetRttiType()));
+	dAssert (bodyNode->IsType (dDAGScopeBlockNode::GetRttiType()));
 	function->SetBody(bodyNode);
 
 	returnNode.m_node = function;
@@ -416,7 +424,7 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewDimensionNode(const dUserVari
 {
 	dUserVariable returnNode;
 	dDAGExpressionNode* const expressionNode = (dDAGExpressionNode*)expression.m_node;
-	_ASSERTE (!expressionNode || (expressionNode->IsType (dDAGExpressionNode::GetRttiType())));
+	dAssert (!expressionNode || (expressionNode->IsType (dDAGExpressionNode::GetRttiType())));
 	dDAGDimensionNode* const node = new dDAGDimensionNode (m_allNodes, expressionNode);
 
 	returnNode.m_node = node;
@@ -428,7 +436,7 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewExpressionOperatorNew (const 
 	dUserVariable returnNode;
 
 	dDAGDimensionNode* const dimensionNode = (dDAGDimensionNode*) dimension.m_node;
-	_ASSERTE (dimensionNode->IsType (dDAGDimensionNode::GetRttiType()));
+	dAssert (dimensionNode->IsType (dDAGDimensionNode::GetRttiType()));
 	dDAGExpressionNodeNew* const node = new dDAGExpressionNodeNew (m_allNodes, typeName.GetStr(), dimensionNode);
 
 	returnNode.m_node = node;
@@ -439,8 +447,8 @@ dScriptCompiler::dUserVariable dScriptCompiler::ConcatenateDimensionNode(const d
 {
 	dUserVariable returnNode;
 
-	_ASSERTE (dim0.m_node->GetTypeId() == dDAGDimensionNode::GetRttiType());
-	_ASSERTE (dim1.m_node->GetTypeId() == dDAGDimensionNode::GetRttiType());
+	dAssert (dim0.m_node->GetTypeId() == dDAGDimensionNode::GetRttiType());
+	dAssert (dim1.m_node->GetTypeId() == dDAGDimensionNode::GetRttiType());
 
 	dDAGDimensionNode* param = (dDAGDimensionNode*) dim0.m_node;
 	for ( ;param->m_next; param = param->m_next);
@@ -457,7 +465,7 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewParameterNode (const dUserVar
 	dDAGParameterNode* const parameter = new dDAGParameterNode(m_allNodes, name.GetStr());
 	dDAGTypeNode* const typeNode = (dDAGTypeNode*) primitiveType.m_node;
 	if (typeNode) {
-		_ASSERTE (typeNode->GetTypeId() == dDAGTypeNode::GetRttiType());
+		dAssert (typeNode->GetTypeId() == dDAGTypeNode::GetRttiType());
 		parameter->SetType(typeNode);
 	}
 	returnNode.m_node = parameter;
@@ -484,7 +492,7 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewExpressionNodeVariable (const
 
 //	_ASSERTE (GetCurrentScope());
 	dDAGDimensionNode* const dimensionNode = (dDAGDimensionNode*) dimArray.m_node;
-	_ASSERTE (!dimensionNode || dimensionNode->IsType(dDAGDimensionNode::GetRttiType()));
+	dAssert (!dimensionNode || dimensionNode->IsType(dDAGDimensionNode::GetRttiType()));
 
 	dDAGExpressionNodeVariable* const node = new dDAGExpressionNodeVariable (m_allNodes, name.GetStr(), dimensionNode);
 	returnNode.m_node = node;
@@ -527,12 +535,12 @@ dScriptCompiler::dUserVariable dScriptCompiler::ConcatenateVariables(const dUser
 	dUserVariable returnNode;
 
 	dDAGFunctionStatement* const node = (dDAGFunctionStatement*)variableA.m_node;
-	_ASSERTE (node->GetTypeId() == dDAGParameterNode::GetRttiType());
+	dAssert (node->GetTypeId() == dDAGParameterNode::GetRttiType());
 
 	dDAGFunctionStatement* nextNode = node;
 	for (; nextNode->m_next; nextNode = (dDAGFunctionStatement*)nextNode->m_next);
 	nextNode->m_next = variableB.m_node;
-	_ASSERTE (nextNode->m_next->IsType(dDAGFunctionStatement::GetRttiType()));
+	dAssert (nextNode->m_next->IsType(dDAGFunctionStatement::GetRttiType()));
 
 	returnNode.m_node = node;
 	return returnNode;
@@ -546,14 +554,14 @@ dScriptCompiler::dUserVariable dScriptCompiler::AddClassVariable (const dString&
 	dUserVariable returnNode;
 
 	dDAGParameterNode* const node = (dDAGParameterNode*)variableList.m_node;
-	_ASSERTE (node->GetTypeId() == dDAGParameterNode::GetRttiType());
+	dAssert (node->GetTypeId() == dDAGParameterNode::GetRttiType());
 
 	dDAGTypeNode* const typeNode = (dDAGTypeNode*)type.m_node;
-	_ASSERTE (typeNode->GetTypeId() == dDAGTypeNode::GetRttiType());
+	dAssert (typeNode->GetTypeId() == dDAGTypeNode::GetRttiType());
 
 	node->SetType(typeNode);
 	for (dDAGParameterNode* nextNode = (dDAGParameterNode*) node->m_next; nextNode; nextNode = (dDAGParameterNode*) nextNode->m_next) {
-		_ASSERTE (nextNode->GetTypeId() == dDAGParameterNode::GetRttiType());
+		dAssert (nextNode->GetTypeId() == dDAGParameterNode::GetRttiType());
 		nextNode->SetType((dDAGTypeNode*) typeNode->Clone (m_allNodes));
 	}
 
@@ -571,10 +579,10 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewVariableToCurrentBlock (const
 	dUserVariable variableName(NewVariableStatement (name));
 
 	dDAGParameterNode* const variableNameNode = (dDAGParameterNode*)variableName.m_node;
-	_ASSERTE (variableNameNode->IsType(dDAGParameterNode::GetRttiType()));
+	dAssert (variableNameNode->IsType(dDAGParameterNode::GetRttiType()));
 
 	dDAGTypeNode* const typeNode = (dDAGTypeNode*)type.m_node;
-	_ASSERTE (typeNode->GetTypeId() == dDAGTypeNode::GetRttiType());
+	dAssert (typeNode->GetTypeId() == dDAGTypeNode::GetRttiType());
 	variableNameNode->SetType(typeNode);
 
 	if (m_scopeStack.GetCount()) {
@@ -586,7 +594,7 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewVariableToCurrentBlock (const
 	}
 
 	dUserVariable returnNode (NewExpressionNodeVariable (name));
-	_ASSERTE (returnNode.m_node->GetTypeId() == dDAGExpressionNodeVariable::GetRttiType());
+	dAssert (returnNode.m_node->GetTypeId() == dDAGExpressionNodeVariable::GetRttiType());
 	dDAGExpressionNodeVariable* const node = (dDAGExpressionNodeVariable*) returnNode.m_node;
 	node->SetType((dDAGTypeNode*) typeNode->Clone (m_allNodes));
 
@@ -606,7 +614,7 @@ dScriptCompiler::dUserVariable dScriptCompiler::AddStatementToCurrentBlock(const
 				block->AddStatement(node);
 			}
 		} else {
-			_ASSERTE (statementNode->IsType(dDAGFunctionStatement::GetRttiType()));
+			dAssert (statementNode->IsType(dDAGFunctionStatement::GetRttiType()));
 			block->AddStatement(statementNode);
 		}
 	}
@@ -622,8 +630,8 @@ dScriptCompiler::dUserVariable dScriptCompiler::ConcatenateExpressions(const dUs
 
 	dDAGExpressionNode* const nodeA = (dDAGExpressionNode*)expressionA.m_node;
 	dDAGExpressionNode* const nodeB = (dDAGExpressionNode*)expressionB.m_node;
-	_ASSERTE (nodeA->IsType(dDAGExpressionNode::GetRttiType()));
-	_ASSERTE (nodeB->IsType(dDAGExpressionNode::GetRttiType()));
+	dAssert (nodeA->IsType(dDAGExpressionNode::GetRttiType()));
+	dAssert (nodeB->IsType(dDAGExpressionNode::GetRttiType()));
 
 	dDAGExpressionNode* nextNode = nodeA;
 	for (; nextNode->m_next; nextNode = (dDAGExpressionNode*) nextNode->m_next);
@@ -636,7 +644,7 @@ dScriptCompiler::dUserVariable dScriptCompiler::ConcatenateExpressions(const dUs
 			dUserVariable localVariable(NewVariableStatement (leftVarListB->m_name));
 
 			dDAGParameterNode* const variableNode = (dDAGParameterNode*)localVariable.m_node;
-			_ASSERTE (variableNode->IsType(dDAGParameterNode::GetRttiType()));
+			dAssert (variableNode->IsType(dDAGParameterNode::GetRttiType()));
 			variableNode->SetType((dDAGTypeNode*) leftVarListA->m_type->Clone(m_allNodes));
 			leftVarListB->SetType((dDAGTypeNode*) leftVarListA->m_type->Clone(m_allNodes));
 
@@ -671,10 +679,10 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewExpresionNodeAssigment (const
 	dUserVariable returnNode;
 
 	dDAGExpressionNodeVariable* const leftNode = (dDAGExpressionNodeVariable*) leftVariable.m_node;
-	_ASSERTE (leftNode->IsType(dDAGExpressionNodeVariable::GetRttiType()));
+	dAssert (leftNode->IsType(dDAGExpressionNodeVariable::GetRttiType()));
 
 	dDAGExpressionNode* const expressionNode = (dDAGExpressionNode*) expression.m_node;
-	_ASSERTE (expressionNode->IsType(dDAGExpressionNode::GetRttiType()));
+	dAssert (expressionNode->IsType(dDAGExpressionNode::GetRttiType()));
 	dDAGExpressionNodeAssigment* const assigment = new dDAGExpressionNodeAssigment(m_allNodes, leftNode, expressionNode);
 
 	returnNode.m_node = assigment;
@@ -687,7 +695,7 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewExpresionNodeAssigment (const
 	dUserVariable leftVariableCopy;
 
 	dDAGExpressionNodeVariable* const leftNode = (dDAGExpressionNodeVariable*) leftVariable.m_node;
-	_ASSERTE (leftNode->IsType(dDAGExpressionNodeVariable::GetRttiType()));
+	dAssert (leftNode->IsType(dDAGExpressionNodeVariable::GetRttiType()));
 
 
 	dUserVariable tmpOperator;
@@ -750,7 +758,7 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewExpresionNodeAssigment (const
 		}
 
 		default:
-			_ASSERTE (0);
+			dAssert (0);
 	}
 
 	dUserVariable expressionA;
@@ -775,7 +783,7 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewExpressionFunctionCall (const
 	dUserVariable returnNode;
 
 	dDAGExpressionNode* const argumentListNode = (dDAGExpressionNode*) argumnetList.m_node;
-	_ASSERTE (!argumentListNode || argumentListNode->IsType(dDAGExpressionNode::GetRttiType()));
+	dAssert (!argumentListNode || argumentListNode->IsType(dDAGExpressionNode::GetRttiType()));
 	dDAGExpressionNodeFunctionCall* const fntCall = new dDAGExpressionNodeFunctionCall(m_allNodes, name.GetStr(), argumentListNode);
 
 	returnNode.m_node = fntCall;
@@ -788,7 +796,7 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewIFStatement(const dUserVariab
 	dUserVariable returnNode;
 
 	dDAGExpressionNode* const expresionNode = (dDAGExpressionNode*) expression.m_node;
-	_ASSERTE (expresionNode->IsType(dDAGExpressionNode::GetRttiType()));
+	dAssert (expresionNode->IsType(dDAGExpressionNode::GetRttiType()));
 
 	dDAGFunctionStatement* const thenStmt = (dDAGFunctionStatement*) thenExpression.m_node;
 
@@ -799,7 +807,7 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewIFStatement(const dUserVariab
 
 	dDAGFunctionStatementIF* const stmt = new dDAGFunctionStatementIF(m_allNodes, expresionNode, thenStmt, elseStmt);
 
-	_ASSERTE (thenStmt->IsType(dDAGFunctionStatement::GetRttiType()) || thenStmt->IsType(dDAGExpressionNode::GetRttiType()));
+	dAssert (thenStmt->IsType(dDAGFunctionStatement::GetRttiType()) || thenStmt->IsType(dDAGExpressionNode::GetRttiType()));
 	returnNode.m_node = stmt;
 	return returnNode;
 }
@@ -810,8 +818,8 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewDoStatement(const dUserVariab
 	dDAGExpressionNode* const conditionalNode = (dDAGExpressionNode*) expression.m_node;
 	dDAGFunctionStatement* const bodyStmt = (dDAGFunctionStatement*) statement.m_node;
 
-	_ASSERTE (conditionalNode->IsType(dDAGExpressionNode::GetRttiType()));
-	_ASSERTE (!bodyStmt || bodyStmt->IsType(dDAGFunctionStatement::GetRttiType()) || bodyStmt->IsType(dDAGExpressionNode::GetRttiType()));
+	dAssert (conditionalNode->IsType(dDAGExpressionNode::GetRttiType()));
+	dAssert (!bodyStmt || bodyStmt->IsType(dDAGFunctionStatement::GetRttiType()) || bodyStmt->IsType(dDAGExpressionNode::GetRttiType()));
 
 	dUserVariable doVariable;
 	doVariable.m_node = new dDAGFunctionStatementDO(m_allNodes, conditionalNode, bodyStmt);
@@ -827,10 +835,10 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewForStatement(const dUserVaria
 	dDAGFunctionStatement* const stepStmtNode = (dDAGFunctionStatement*) step_Exp.m_node;
 	dDAGFunctionStatement* const bodyStmt = (dDAGFunctionStatement*) statement.m_node;
 
-	_ASSERTE (!conditionalNode || conditionalNode->IsType(dDAGExpressionNode::GetRttiType()));
-	_ASSERTE (!initStmtNode || initStmtNode->IsType(dDAGExpressionNode::GetRttiType()));
-	_ASSERTE (!stepStmtNode || stepStmtNode->IsType(dDAGExpressionNode::GetRttiType()));
-	_ASSERTE (!bodyStmt || bodyStmt->IsType(dDAGFunctionStatement::GetRttiType()) || bodyStmt->IsType(dDAGExpressionNode::GetRttiType()));
+	dAssert (!conditionalNode || conditionalNode->IsType(dDAGExpressionNode::GetRttiType()));
+	dAssert (!initStmtNode || initStmtNode->IsType(dDAGExpressionNode::GetRttiType()));
+	dAssert (!stepStmtNode || stepStmtNode->IsType(dDAGExpressionNode::GetRttiType()));
+	dAssert (!bodyStmt || bodyStmt->IsType(dDAGFunctionStatement::GetRttiType()) || bodyStmt->IsType(dDAGExpressionNode::GetRttiType()));
 
 	dUserVariable forVariable;
 	forVariable.m_node = new dDAGFunctionStatementFOR(m_allNodes, initStmtNode, conditionalNode, stepStmtNode, bodyStmt);
@@ -843,8 +851,8 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewWhileStatement(const dUserVar
 	dDAGExpressionNode* const conditionalNode = (dDAGExpressionNode*) expression.m_node;
 	dDAGFunctionStatement* const bodyStmt = (dDAGFunctionStatement*) statement.m_node;
 
-	_ASSERTE (conditionalNode->IsType(dDAGExpressionNode::GetRttiType()));
-	_ASSERTE (!bodyStmt || bodyStmt->IsType(dDAGFunctionStatement::GetRttiType()) || bodyStmt->IsType(dDAGExpressionNode::GetRttiType()));
+	dAssert (conditionalNode->IsType(dDAGExpressionNode::GetRttiType()));
+	dAssert (!bodyStmt || bodyStmt->IsType(dDAGFunctionStatement::GetRttiType()) || bodyStmt->IsType(dDAGExpressionNode::GetRttiType()));
 
 	dUserVariable whileNode;
 	whileNode.m_node = new dDAGFunctionStatementWHILE(m_allNodes, conditionalNode, bodyStmt);
@@ -880,12 +888,12 @@ dScriptCompiler::dUserVariable dScriptCompiler::ConcatenateCaseStatement (const 
 	dUserVariable returnNode;
 
 	dDAGFunctionStatement* const node = (dDAGFunctionStatement*)firstStatement.m_node;
-	_ASSERTE (node->IsType(dDAGFunctionStatement::GetRttiType()));
+	dAssert (node->IsType(dDAGFunctionStatement::GetRttiType()));
 
 	dDAGFunctionStatement* nextNode = node;
 	for (; nextNode->m_next; nextNode = (dDAGFunctionStatement*) nextNode->m_next);
 	nextNode->m_next = (dDAGFunctionStatement*)lastStatement.m_node;
-	_ASSERTE (nextNode->m_next->IsType(dDAGFunctionStatement::GetRttiType()));
+	dAssert (nextNode->m_next->IsType(dDAGFunctionStatement::GetRttiType()));
 
 	returnNode.m_node = node;
 	return returnNode;
@@ -900,8 +908,8 @@ dScriptCompiler::dUserVariable dScriptCompiler::ConcatenateParametersExpressions
 {
 	dUserVariable returnNode;
 
-	_ASSERTE (expressionA.m_node->IsType(dDAGExpressionNode::GetRttiType()));
-	_ASSERTE (expressionB.m_node->IsType(dDAGExpressionNode::GetRttiType()));
+	dAssert (expressionA.m_node->IsType(dDAGExpressionNode::GetRttiType()));
+	dAssert (expressionB.m_node->IsType(dDAGExpressionNode::GetRttiType()));
 
 	dDAGExpressionNode* const node = (dDAGExpressionNode*)expressionA.m_node;
 
@@ -920,11 +928,11 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewCaseStatement(const dString& 
 	dUserVariable returnNode;
 
 	dDAGFunctionStatement* const statementListNode = (dDAGFunctionStatement*) statementList.m_node;
-	_ASSERTE (statementListNode->IsType(dDAGFunctionStatement::GetRttiType()));
+	dAssert (statementListNode->IsType(dDAGFunctionStatement::GetRttiType()));
 
 	dDAGFunctionStatementCase* const caseNode = new dDAGFunctionStatementCase(m_allNodes, constID.GetStr(), statementListNode);
 
-_ASSERTE (0);
+dAssert (0);
 	for (dDAGFunctionStatement* nextNode = statementListNode; nextNode; nextNode = (dDAGFunctionStatement*) nextNode->m_next) {
 //		nextNode->Release();
 	}
@@ -939,17 +947,17 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewSwitchStatement(const dUserVa
 	dUserVariable returnNode;
 
 	dDAGFunctionStatementCase* const casetListNode = (dDAGFunctionStatementCase*) caseStatementList.m_node;
-	_ASSERTE (casetListNode->IsType(dDAGFunctionStatementCase::GetRttiType()));
+	dAssert (casetListNode->IsType(dDAGFunctionStatementCase::GetRttiType()));
 
 	dDAGExpressionNode* const expressionNode = (dDAGExpressionNode*) expression.m_node;
-	_ASSERTE (expressionNode->IsType(dDAGExpressionNode::GetRttiType()));
+	dAssert (expressionNode->IsType(dDAGExpressionNode::GetRttiType()));
 
 	dDAGFunctionStatementSWITCH* const switchNode = new dDAGFunctionStatementSWITCH (m_allNodes, expressionNode, casetListNode);
 
-_ASSERTE (0);
+dAssert (0);
 //	expressionNode->Release();
 	for (dDAGFunctionStatement* nextNode = casetListNode; nextNode; nextNode = (dDAGFunctionStatement*) nextNode->m_next) {
-		_ASSERTE (0);
+		dAssert (0);
 //		_ASSERTE (nextNode->IsType(dDAGFunctionStatementCase::GetRttiType()));
 //		nextNode->Release();
 	}

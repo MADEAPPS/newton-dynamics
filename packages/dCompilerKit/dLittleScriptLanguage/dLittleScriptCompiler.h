@@ -74,9 +74,10 @@ class dScriptCompiler: public dLittleScriptParser
 	dUserVariable ConcatenateVariables(const dUserVariable& variableA, const dUserVariable& variableB);
 	dUserVariable ConcatenateExpressions(const dUserVariable& expressionA, const dUserVariable& expressionB);
 
+	
 	dUserVariable NewVariableStatement(const dString& name);
-//	dUserVariable SetLocalVariablesType (const dUserVariable& type, const dUserVariable& variableList);
 	dUserVariable NewExpressionNodeConstant (const dUserVariable& identifier);
+	dUserVariable NewExpressionNodeOperatorThisConstant (const dUserVariable& identifier);
 
 	dUserVariable NewExpresionNodePrefixPostfixOperator (const dUserVariable& expression, bool isPrefix, bool isIncrement);
 	dUserVariable NewExpressionNodeBinaryOperator (const dUserVariable& expressionA, const dUserVariable& binaryOperator, const dUserVariable& expressionB);

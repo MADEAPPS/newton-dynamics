@@ -60,6 +60,6 @@ void dDAGDimensionNode::CompileCIL(dCIL& cil)
 		m_dimExp->CompileCIL(cil) ;
 		m_result = m_dimExp->m_result;
 	} else {
-		_ASSERTE (0);
+		dAssert (0);
 	}
 }

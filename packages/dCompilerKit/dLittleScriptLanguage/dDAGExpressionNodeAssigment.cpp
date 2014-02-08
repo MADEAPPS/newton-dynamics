@@ -46,7 +46,7 @@ void dDAGExpressionNodeAssigment::CompileCIL(dCIL& cil)
 			bool state = RenameLocalVariable(cil, variable);
 			if (!state) {
 				dTrace (("undefined local variable\n"));
-				_ASSERTE (0);
+				dAssert (0);
 			}
 		}
 
@@ -62,7 +62,7 @@ void dDAGExpressionNodeAssigment::CompileCIL(dCIL& cil)
 		DTRACE_INTRUCTION (&addressIndex);
 
 		for (dList<dDAGDimensionNode*>::dListNode* node = m_leftVariable->m_dimExpressions.GetFirst()->GetNext(); node; node = node->GetNext()) {
-			_ASSERTE (0);
+			dAssert (0);
 /*
 			dDAGDimensionNode* const dim = node->GetInfo();
 			dim->CompileCIL(cil);
@@ -89,7 +89,7 @@ void dDAGExpressionNodeAssigment::CompileCIL(dCIL& cil)
 */
 		}
 
-		_ASSERTE (m_parent);
+		dAssert (m_parent);
 		#ifdef D_USE_COMPLEX_ADRESSING_MODE
 			// emit an indirect addressing mode
 			dTreeAdressStmt& tmp = cil.NewStatement()->GetInfo();

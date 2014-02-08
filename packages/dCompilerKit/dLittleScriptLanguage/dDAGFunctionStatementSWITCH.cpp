@@ -26,7 +26,7 @@ dDAGFunctionStatementSWITCH::dDAGFunctionStatementSWITCH(dList<dDAG*>& allNodes,
 //	m_expression->AddRef();
 	for (dDAGFunctionStatementCase* node = (dDAGFunctionStatementCase*)caseList; node; node = (dDAGFunctionStatementCase*)node->m_next) {
 		m_caseList.Append(node);
-		_ASSERTE (0);
+		dAssert (0);
 //		node->AddRef();
 	}
 }
@@ -36,7 +36,7 @@ dDAGFunctionStatementSWITCH::~dDAGFunctionStatementSWITCH()
 {
 //	m_expression->Release();
 	for (dList<dDAGFunctionStatementCase*>::dListNode* node = m_caseList.GetFirst(); node; node = node->GetNext()) {
-		_ASSERTE (0);
+		dAssert (0);
 //		dDAGFunctionStatementCase* const caseBlock = node->GetInfo();
 //		caseBlock->Release();
 	}
@@ -56,7 +56,7 @@ void dDAGFunctionStatementSWITCH::ConnectParent(dDAG* const parent)
 
 void dDAGFunctionStatementSWITCH::CompileCIL(dCIL& cil)  
 {
-_ASSERTE (0);
+dAssert (0);
 /*
 	string exitLabel (cil.NewLabel());
 	m_currentBreakLabel = exitLabel;

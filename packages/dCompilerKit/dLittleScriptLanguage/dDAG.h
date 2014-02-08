@@ -39,9 +39,9 @@ class dDAG
 	dDAG(dList<dDAG*>& allNodes);
 	virtual ~dDAG(void);
 	
-	virtual void CompileCIL(dCIL& cil)  {_ASSERTE (0);}
-	virtual void ConnectParent(dDAG* const parent) {_ASSERTE (0);}
-	virtual dDAG* Clone (dList<dDAG*>& allNodes) const {_ASSERTE (0); return NULL;}
+	virtual void CompileCIL(dCIL& cil)  {dAssert (0);}
+	virtual void ConnectParent(dDAG* const parent) {dAssert (0);}
+	virtual dDAG* Clone (dList<dDAG*>& allNodes) const {dAssert (0); return NULL;}
 
 	dDAGClassNode* GetClass() const;
 	dDAGScopeBlockNode* GetScope() const;

@@ -26,16 +26,11 @@ class dDAGParameterNode: public dDAGFunctionStatement
 	~dDAGParameterNode(void);
 
 	void SetType(dDAGTypeNode* const type);
-//	void SetInitializationExpression(dDAGExpressionNode* const exp);
-
 	virtual void CompileCIL(dCIL& cil); 
 	virtual void ConnectParent(dDAG* const parent);
 
-
 	bool m_isPublic;
 	dDAGTypeNode* m_type;
-//	dDAGExpressionNode* m_initializationExp;
-	
 	dDAGRtti(dDAGFunctionStatement);
 };
 

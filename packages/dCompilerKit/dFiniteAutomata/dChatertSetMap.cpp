@@ -17,7 +17,7 @@ dChatertSetMap::ChatertSet::ChatertSet (const char* const set, int count, int id
 	:m_count (count)
 	,m_id (id)
 {
-	_ASSERTE (sizeof (m_characters) > count * sizeof (char));
+	dAssert (sizeof (m_characters) > count * sizeof (char));
 	memcpy (m_characters, set, count * sizeof (char));
 	m_characters[count] = 0;
 	qsort (m_characters, count, sizeof (char), sort);

@@ -37,12 +37,13 @@ class dDAGFunctionNode: public dDAG
 	bool m_isStatic;
 	bool m_isPublic;
 	bool m_isConstructor;
-//	int m_argumentsCount;
 	int m_loopLayer;
 	dString m_exitLabel;
+	dString m_opertatorThis;
 	dDAGTypeNode* m_returnType;
 	dDAGScopeBlockNode* m_body;
 	dDAGFunctionModifier* m_modifier;
+	
 	dList<dDAGParameterNode*> m_parameters; 
 	dDAGRtti(dDAG);
 };

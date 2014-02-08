@@ -73,7 +73,7 @@ void dDeterministicFiniteAutonata::CopySet (const dNonDeterministicFiniteAutonat
 	for (iter.Begin(); iter; iter ++) {
 		dAutomataState::dCharacter ch (iter.GetNode()->GetInfo());
 		const dChatertSetMap::ChatertSet* const set = charaterSet.FindSet (ch.m_info);
-		_ASSERTE (set);
+		dAssert (set);
 		m_charaterSetMap.AddSet(set->GetSet(), set->GetLength());
 	}
 }
@@ -108,7 +108,7 @@ void dDeterministicFiniteAutonata::EmptyTransitionClosure (const dTree<dAutomata
 		dAutomataState* const state = iter.GetNode()->GetInfo();
 		stackPool[stack] = state;
 		stack ++;
-		_ASSERTE (stack  < sizeof (stackPool) / sizeof (stackPool[0]));
+		dAssert (stack  < sizeof (stackPool) / sizeof (stackPool[0]));
 		closureStates.Insert(state, state);
 	}
 
@@ -124,7 +124,7 @@ void dDeterministicFiniteAutonata::EmptyTransitionClosure (const dTree<dAutomata
 					closureStates.Insert(targetState, targetState);
 					stackPool[stack] = targetState;
 					stack ++;
-					_ASSERTE (stack  < sizeof (stackPool) / sizeof (stackPool[0]));
+					dAssert (stack  < sizeof (stackPool) / sizeof (stackPool[0]));
 				}
 			}
 		}
@@ -232,7 +232,7 @@ void dDeterministicFiniteAutonata::CreateDeterministicFiniteAutomaton (const dNo
 						dAutomataState* const targetState = CreateTargetState(subSet, stateID ++);
 						stackPool[stack] = targetState;
 						stack ++;
-						_ASSERTE (stack < sizeof (stackPool)/sizeof (stackPool[0]));
+						dAssert (stack < sizeof (stackPool)/sizeof (stackPool[0]));
 
 						newStatesList.Append(targetState);
 						state->m_transtions.Append(dAutomataState::dTransition(ch, targetState));
@@ -260,7 +260,7 @@ int dDeterministicFiniteAutonata::FindMatch(const char* const text) const
 			if (ch == '\\') {
 				i ++;
 				extendChar = 1;
-				_ASSERTE (text[i]);
+				dAssert (text[i]);
 				ch = (ch << 8) + text[i];
 				ch = GetScapeChar (ch);
 			}
@@ -277,9 +277,9 @@ int dDeterministicFiniteAutonata::FindMatch(const char* const text) const
 						break;
 					}
 				} else {
-					_ASSERTE (symbol.m_type == dAutomataState::CHARACTER_SET);
+					dAssert (symbol.m_type == dAutomataState::CHARACTER_SET);
 					const dChatertSetMap::ChatertSet* const characterSet = m_charaterSetMap.FindSet(symbol.m_info);
-					_ASSERTE (characterSet);
+					dAssert (characterSet);
 					if (characterSet->IsCharAMatch (GetScapeChar (ch))) {
 						transition = trans;
 						break;

@@ -27,7 +27,7 @@ class dDAGTypeNode: public dDAG
 
 	void AddDimensions (dDAGDimensionNode* const dimList);
 
-	virtual void CompileCIL(dCIL& cil)  {_ASSERTE (0);}
+	virtual void CompileCIL(dCIL& cil)  {dAssert (0);}
 	virtual void ConnectParent(dDAG* const parent);
 	virtual dDAG* Clone (dList<dDAG*>& allNodes) const;
 

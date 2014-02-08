@@ -58,5 +58,5 @@ void dDAGFunctionStatementBREAK::CompileCIL(dCIL& cil)
 	}
 
 	// warning break instruction outside of a flow control statement
-	_ASSERTE (0);
+	dAssert (0);
 }

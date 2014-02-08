@@ -173,7 +173,7 @@ public:
 	{
 		char buffer[D_ASCII_SET_MAX_SIZE];
 
-		_ASSERTE (sizeof (m_regularExpression) > strlen (regularExpression));
+		dAssert (sizeof (m_regularExpression) > strlen (regularExpression));
 		sprintf (m_regularExpression, "%s", regularExpression);
 
 		int i = 0;
@@ -253,7 +253,7 @@ public:
 			CompileExpression(expression.GetStr());
 
 			dExpandedState* const acceptingState = (dExpandedState*) m_acceptingState;
-			_ASSERTE (acceptingState->m_exitState);
+			dAssert (acceptingState->m_exitState);
 			acceptingState->m_hasUserAction = true;
 			acceptingState->m_userAction = userAction;
 
@@ -263,7 +263,7 @@ public:
 			
 			CompileExpression(expression.GetStr());
 			dExpandedState* const acceptingState = (dExpandedState*) m_acceptingState;
-			_ASSERTE (acceptingState->m_exitState);
+			dAssert (acceptingState->m_exitState);
 			acceptingState->m_hasUserAction = true;
 			acceptingState->m_userAction = userAction;
 
@@ -390,7 +390,7 @@ void dLexCompiler::ParseDefinitionExpression (dString& preheaderCode)
 void dLexCompiler::ParseDefinitionBlock (dString& preheaderCode)
 {
 	if (m_token == m_comment) {
-		_ASSERTE (0);
+		dAssert (0);
 //		MatchToken (m_token);
 
 	} else if (m_token == m_codeBlock) {
@@ -414,7 +414,7 @@ void dLexCompiler::ParseDefinitionBlock (dString& preheaderCode)
 		m_defintions.AddDefinition(extendedRegularExpresion, literal);
 
 	} else {
-		_ASSERTE (0);
+		dAssert (0);
 	}
 }
 
@@ -424,7 +424,7 @@ void dLexCompiler::MatchToken (dToken token)
 	if (m_token == token) {
 		NextToken ();
 	} else {
-		_ASSERTE (0);
+		dAssert (0);
 		dTrace(("parse error\n"));
 		//		m_error = true;
 	}
@@ -542,7 +542,7 @@ void dLexCompiler::ParseDefinitions (dExpandedNFA& nfa, dString& preHeaderCode, 
 						break;
 					}
 					default:;
-					_ASSERTE (0);
+					dAssert (0);
 				}
 
 				m_grammarTokenStart += length;

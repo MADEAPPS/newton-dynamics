@@ -41,6 +41,7 @@ class dDAGClassNode: public dDAG
 	virtual void CompileCIL(dCIL& cil);
 	virtual void ConnectParent(dDAG* const parent);
 
+	bool m_isFinal;
 	bool m_isPublic;
 	const dDAGClassNode* m_baseClass;
 	dList<dDAGParameterNode*> m_variables;

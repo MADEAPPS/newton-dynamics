@@ -139,7 +139,7 @@ bool dCIL::RemoveRedundantJumps(dListNode* const function)
 		dListNode* const node = iter.GetKey();
 		dTreeAdressStmt& stmt = node->GetInfo();
 		if (stmt.m_instruction == dTreeAdressStmt::m_goto) {
-			_ASSERTE (jumpMap.Find (stmt.m_jmpTarget));
+			dAssert (jumpMap.Find (stmt.m_jmpTarget));
 			dListNode* const targetNode = jumpMap.Find (stmt.m_jmpTarget)->GetKey();
 			dTreeAdressStmt& stmt1 = targetNode->GetInfo();
 			dListNode* nextGotoNode = targetNode->GetNext();
@@ -153,7 +153,7 @@ bool dCIL::RemoveRedundantJumps(dListNode* const function)
 				ret = true;
 			}
 		} else if (stmt.m_instruction == dTreeAdressStmt::m_if) {
-			_ASSERTE (jumpMap.Find (stmt.m_jmpTarget));
+			dAssert (jumpMap.Find (stmt.m_jmpTarget));
 			dListNode* const targetNode = jumpMap.Find (stmt.m_jmpTarget)->GetKey();
 			dTreeAdressStmt& stmt1 = targetNode->GetInfo();
 			dListNode* nextGotoNode = targetNode->GetNext();

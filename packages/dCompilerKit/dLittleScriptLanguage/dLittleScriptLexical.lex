@@ -130,6 +130,7 @@ dimensionOp			[\[][ \t\n\r]*[\]]
 "float"				{return dLittleScriptParser::_FLOAT;}
 "double"			{return dLittleScriptParser::_DOUBLE;}
 
+"this"				{return dLittleScriptParser::_THIS;}
 "class"				{return dLittleScriptParser::_CLASS;}
 "import"			{return dLittleScriptParser::_IMPORT;}
 "package"			{return dLittleScriptParser::_PACKAGE;}

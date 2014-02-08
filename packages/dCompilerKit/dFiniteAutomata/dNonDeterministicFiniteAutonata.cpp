@@ -105,14 +105,14 @@ bool dNonDeterministicFiniteAutonata::dAutomataStateConstructStack::IsEmpty() co
 
 dNonDeterministicFiniteAutonata::dStateConstructPair dNonDeterministicFiniteAutonata::dAutomataStateConstructStack::Pop ()
 {
-	_ASSERTE (m_index);
+	dAssert (m_index);
 	return m_pool[--m_index];
 }
 
 void dNonDeterministicFiniteAutonata::dAutomataStateConstructStack::Push (dAutomataState* const start, dAutomataState* const accepting)
 {
 	m_pool[m_index++] = dStateConstructPair (start, accepting);
-	_ASSERTE (m_index <= sizeof (m_pool)/sizeof (m_pool[0]));
+	dAssert (m_index <= sizeof (m_pool)/sizeof (m_pool[0]));
 }
 
 
@@ -226,7 +226,7 @@ bool dNonDeterministicFiniteAutonata::CheckInsertConcatenation (int left, int ri
 
 void dNonDeterministicFiniteAutonata::PreProcessExpression (const char* const regularExpression)
 {
-	_ASSERTE (sizeof (m_regularExpression) > strlen (regularExpression));
+	dAssert (sizeof (m_regularExpression) > strlen (regularExpression));
 	sprintf (m_regularExpression, "%s", regularExpression);
 
 	char buffer[2048];
@@ -235,11 +235,11 @@ void dNonDeterministicFiniteAutonata::PreProcessExpression (const char* const re
 	for (int ch1 = GetChar(); ch1; ch1 = GetChar()) {
 		if (ch0 > 256) {
 			buffer[count ++] = char (ch0>>8);
-			_ASSERTE (count < sizeof (buffer));
+			dAssert (count < sizeof (buffer));
 		}
 
 		buffer[count ++] = char (ch0);
-		_ASSERTE (count < sizeof (buffer));
+		dAssert (count < sizeof (buffer));
 
 //		#ifdef _DEBUG
 //		bool test0 = CheckInsertConcatenation (ch0, ch1);
@@ -250,18 +250,18 @@ void dNonDeterministicFiniteAutonata::PreProcessExpression (const char* const re
 
 		if (CheckInsertConcatenation (ch0, ch1)) {
 			buffer[count ++] = char (m_concatenation);
-			_ASSERTE (count < sizeof (buffer));
+			dAssert (count < sizeof (buffer));
 		}
 		ch0 = ch1;
 	}
 	if (ch0 > 256) {
 		buffer[count ++] = char (ch0 >> 8);
-		_ASSERTE (count < sizeof (buffer));
+		dAssert (count < sizeof (buffer));
 	}
 	buffer[count ++] = char (ch0);
-	_ASSERTE (count < sizeof (buffer));
+	dAssert (count < sizeof (buffer));
 	buffer[count ++] = 0;
-	_ASSERTE (count < sizeof (buffer));
+	dAssert (count < sizeof (buffer));
 
 	m_regularExpressionIndex = 0;
 	sprintf (m_regularExpression, "%s", buffer);
@@ -527,7 +527,7 @@ int dNonDeterministicFiniteAutonata::BracketedExpression (char* const set, int s
 				if (j == exclusiveSize) {
 					set[size] = ch;
 					size ++;
-					_ASSERTE (size < D_ASCII_SET_MAX_SIZE);
+					dAssert (size < D_ASCII_SET_MAX_SIZE);
 				}
 			}
 
@@ -559,7 +559,7 @@ int dNonDeterministicFiniteAutonata::BracketedExpression (char* const set, int s
 					}
 					set[size] = char (ch);
 					size ++;
-					_ASSERTE (size < D_ASCII_SET_MAX_SIZE);
+					dAssert (size < D_ASCII_SET_MAX_SIZE);
 					size = BracketedExpression (set, size);
 				}
 
@@ -569,7 +569,7 @@ int dNonDeterministicFiniteAutonata::BracketedExpression (char* const set, int s
 				}
 				set[size] = char (ch);
 				size ++;
-				_ASSERTE (size < D_ASCII_SET_MAX_SIZE);
+				dAssert (size < D_ASCII_SET_MAX_SIZE);
 			}
 		}
 	}
@@ -593,7 +593,7 @@ void dNonDeterministicFiniteAutonata::ShiftID()
 		char asciiSet[D_ASCII_SET_MAX_SIZE];
 		Match (m_openSquareBrakect);
 		int size = BracketedExpression (asciiSet, 0);
-		_ASSERTE (size < D_ASCII_SET_MAX_SIZE);
+		dAssert (size < D_ASCII_SET_MAX_SIZE);
 		asciiSet[size] = 0;
 
 
@@ -647,7 +647,7 @@ void dNonDeterministicFiniteAutonata::ParseExpresionToNFA ()
 	}
 
 	if (m_error) {
-		_ASSERTE (0);
+		dAssert (0);
 		while (!m_stack.IsEmpty()) {
 			dStateConstructPair operand (m_stack.Pop());
 			DeleteNFA (operand.GetStart());

@@ -21,7 +21,7 @@
 public final class nbody 
 {
     public static void main(String[] args) 
-    {
+	{
         int n = Integer.parseInt(args[0]);
 
         NBodySystem bodies = new NBodySystem();
@@ -31,14 +31,15 @@ public final class nbody
         System.out.printf("%.9f\n", bodies.energy());
     }
 }
-
+*/
+/*
 final class NBodySystem 
 {
    private Body[] bodies;
 
    public NBodySystem()
    {
-      bodies = new Body[]{Body.sun(), Body.jupiter(), Body.saturn(), Body.uranus(), Body.neptune()};
+      bodies = new Body[] {Body.sun(), Body.jupiter(), Body.saturn(), Body.uranus(), Body.neptune()};
 
       double px = 0.0;
       double py = 0.0;
@@ -53,6 +54,7 @@ final class NBodySystem
 
    public void advance(double dt) 
    {
+
       for(int i=0; i < bodies.length; ++i) {
          Body iBody = bodies[i];
          for(int j=i+1; j < bodies.length; ++j) {
@@ -90,15 +92,15 @@ final class NBodySystem
             Body iBody = bodies[i];
             e += 0.5 * iBody.mass * ( iBody.vx * iBody.vx + iBody.vy * iBody.vy + iBody.vz * iBody.vz );
 
-         for (int j=i+1; j < bodies.length; ++j) {
-            Body jBody = bodies[j];
-            dx = iBody.x - jBody.x;
-            dy = iBody.y - jBody.y;
-            dz = iBody.z - jBody.z;
+			for (int j=i+1; j < bodies.length; ++j) {
+                Body jBody = bodies[j];
+                dx = iBody.x - jBody.x;
+				dy = iBody.y - jBody.y;
+				dz = iBody.z - jBody.z;
 
-            distance = Math.sqrt(dx*dx + dy*dy + dz*dz);
-            e -= (iBody.mass * jBody.mass) / distance;
-         }
+				distance = Math.sqrt(dx*dx + dy*dy + dz*dz);
+				e -= (iBody.mass * jBody.mass) / distance;
+			}
       }
       return e;
    }
@@ -107,26 +109,30 @@ final class NBodySystem
 
 final class Body 
 {
-//   static final double PI = 3.141592653589793;
-//   static final double SOLAR_MASS = 4 * PI * PI;
-//   static final double DAYS_PER_YEAR = 365.24;
-//   public double x, y, z, vx, vy, vz, mass;
-
-	public Body(){}
-
-	static Body jupiter()
-    {
-		Body p = new Body();
-//      p.x = 4.84143144246472090e+00;
-//      p.y = -1.16032004402742839e+00;
-//      p.z = -1.03622044471123109e-01;
-//      p.vx = 1.66007664274403694e-03 * DAYS_PER_YEAR;
-//      p.vy = 7.69901118419740425e-03 * DAYS_PER_YEAR;
-//      p.vz = -6.90460016972063023e-05 * DAYS_PER_YEAR;
-//      p.mass = 9.54791938424326609e-04 * SOLAR_MASS;
-		return p;
-   }
 /*
+   static final double PI = 3.141592653589793;
+   static final double SOLAR_MASS = 4 * PI * PI;
+   static final double DAYS_PER_YEAR = 365.24;
+
+   public double x, y, z, vx, vy, vz, mass;
+
+   public Body()
+   {
+   }
+
+   static Body jupiter()
+   {
+      Body p = new Body();
+      p.x = 4.84143144246472090e+00;
+      p.y = -1.16032004402742839e+00;
+      p.z = -1.03622044471123109e-01;
+      p.vx = 1.66007664274403694e-03 * DAYS_PER_YEAR;
+      p.vy = 7.69901118419740425e-03 * DAYS_PER_YEAR;
+      p.vz = -6.90460016972063023e-05 * DAYS_PER_YEAR;
+      p.mass = 9.54791938424326609e-04 * SOLAR_MASS;
+      return p;
+   }
+
    static Body saturn()
    {
       Body p = new Body();
@@ -153,7 +159,8 @@ final class Body
       return p;
    }
 
-   static Body neptune(){
+   static Body neptune()
+   {
       Body p = new Body();
       p.x = 1.53796971148509165e+01;
       p.y = -2.59193146099879641e+01;
@@ -171,14 +178,12 @@ final class Body
       p.mass = SOLAR_MASS;
       return p;
    }
-
+*/
    Body offsetMomentum(double px, double py, double pz)
    {
-      vx = -px / SOLAR_MASS;
-      vy = -py / SOLAR_MASS;
-      vz = -pz / SOLAR_MASS;
+//      vx = -px / SOLAR_MASS;
+//      vy = -py / SOLAR_MASS;
+//      vz = -pz / SOLAR_MASS;
       return this;
    }
-*/   
 }
-

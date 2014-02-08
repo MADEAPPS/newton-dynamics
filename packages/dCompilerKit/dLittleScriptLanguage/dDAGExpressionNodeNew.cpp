@@ -53,7 +53,7 @@ void dDAGExpressionNodeNew::CompileCIL(dCIL& cil)
 	if (m_name == "int") {
 		arraySizeInBytes.m_arg2.m_label = "4"; 
 	} else {
-		_ASSERTE (0);
+		dAssert (0);
 	}
 	DTRACE_INTRUCTION (&arraySizeInBytes);
 

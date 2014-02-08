@@ -24,7 +24,7 @@ dScriptPackage::~dScriptPackage(void)
 
 void dScriptPackage::Load (const char* const packageFileName)
 {
-	_ASSERTE (0);
+	dAssert (0);
 }
 
 void dScriptPackage::Save (const char* const packageFileName)

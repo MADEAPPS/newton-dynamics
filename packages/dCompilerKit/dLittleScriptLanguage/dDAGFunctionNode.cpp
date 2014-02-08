@@ -36,19 +36,26 @@ dDAGFunctionNode::dDAGFunctionNode(dList<dDAG*>& allNodes, dDAGTypeNode* const t
 
 	m_isStatic = strstr (visivility, "static") ? true : false;
 	m_isPublic = strstr (visivility, "public") ? true : false;
+
+	if (!m_isStatic) {
+		dDAGParameterNode* const operatorThis = new dDAGParameterNode (allNodes, "this");
+		operatorThis->SetType(new dDAGTypeNode (allNodes, "this"));
+		AddParameter(operatorThis);
+	}
+
 }
 
 
 dDAGFunctionNode::~dDAGFunctionNode(void)
 {
-	_ASSERTE (m_returnType);
+	dAssert (m_returnType);
 }
 
 
 
 void dDAGFunctionNode::AddParameter(dDAGParameterNode* const parameter)
 {
-	_ASSERTE (parameter->IsType(dDAGParameterNode::GetRttiType()));
+	dAssert (parameter->IsType(dDAGParameterNode::GetRttiType()));
 	m_parameters.Append(parameter);
 }
 
@@ -60,7 +67,7 @@ void dDAGFunctionNode::SetBody(dDAGScopeBlockNode* const body)
 void dDAGFunctionNode::SetModifier(dDAGFunctionModifier* const modifier)
 {
 	m_modifier = modifier;
-	_ASSERTE (0);
+	dAssert (0);
 //	m_modifier->AddRef();
 }
 
@@ -94,7 +101,7 @@ void dDAGFunctionNode::ConnectParent(dDAG* const parent)
 
 void dDAGFunctionNode::CompileCIL(dCIL& cil)  
 {
-	_ASSERTE (m_body);
+	dAssert (m_body);
 	dDAGClassNode* const myClass = GetClass();
 
 	cil.ResetTemporaries();
@@ -106,7 +113,7 @@ void dDAGFunctionNode::CompileCIL(dCIL& cil)
 	} else if (m_returnType->m_name == "int") {
 		returnTypeVal = dCIL::m_intRegister;
 	} else if (m_returnType->m_name == "float") {
-		_ASSERTE (0);
+		dAssert (0);
 	} else {
 		//_ASSERTE (0);
 		returnTypeVal = dCIL::m_intRegister;
@@ -127,7 +134,6 @@ void dDAGFunctionNode::CompileCIL(dCIL& cil)
 	enter.m_extraInformation = 0;
 	DTRACE_INTRUCTION (&enter);
 
-
 	// emit the function arguments
 	for (dList<dDAGParameterNode*>::dListNode* argNode = m_parameters.GetFirst(); argNode; argNode = argNode->GetNext()) {
 		dDAGParameterNode* const arg = argNode->GetInfo();
@@ -140,10 +146,15 @@ void dDAGFunctionNode::CompileCIL(dCIL& cil)
 		DTRACE_INTRUCTION (&fntArg);
 	}
 
+	if (!m_isStatic) {
+		dList<dDAGParameterNode*>::dListNode* const argNode = m_parameters.GetFirst();
+		dDAGParameterNode* const arg = argNode->GetInfo();
+		m_opertatorThis = arg->m_result.m_label;
+	}
+
 	// load arguments to local variables
 	for (dList<dDAGParameterNode*>::dListNode* argNode = m_parameters.GetFirst(); argNode; argNode = argNode->GetNext()) {
 		dDAGParameterNode* const arg = argNode->GetInfo();
-		//arg->m_result.m_label = cil.NewTemp();
 		dTreeAdressStmt& fntArg = cil.NewStatement()->GetInfo();
 		fntArg.m_instruction = dTreeAdressStmt::m_loadBase;
 		fntArg.m_arg0 = arg->m_result;
@@ -159,7 +170,7 @@ void dDAGFunctionNode::CompileCIL(dCIL& cil)
 		returnVariable.m_arg1.m_label = "0";
 		DTRACE_INTRUCTION (&returnVariable);
 	} else if (returnTypeVal == dCIL::m_floatRegister) {
-		_ASSERTE (0);
+		dAssert (0);
 	}
 
 	m_body->CompileCIL(cil);

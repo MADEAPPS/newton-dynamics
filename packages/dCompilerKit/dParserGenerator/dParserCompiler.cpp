@@ -147,7 +147,7 @@ class dParserCompiler::dProductionRule: public dList<dParserCompiler::dRuleInfo>
 			}
 		}
 
-		_ASSERTE (0);
+		dAssert (0);
 		return NULL;
 	}
 };
@@ -260,7 +260,7 @@ class dParserCompiler::dState: public dList<dParserCompiler::dItem>
 		}
 
 		if (item.m_indexMarker == 0) {
-			_ASSERTE (item.m_ruleNode);
+			dAssert (item.m_ruleNode);
 			const dRuleInfo& ruleInfo = item.m_ruleNode->GetInfo();
 			if (ruleInfo.GetCount()) {
 				const dSymbol& symbol = ruleInfo.GetFirst()->GetInfo();
@@ -273,7 +273,7 @@ class dParserCompiler::dState: public dList<dParserCompiler::dItem>
 
 		dList<dState::dListNode*>& bucket = mapNode->GetInfo();
 		// check if bucket is not too big
-		_ASSERTE (bucket.GetCount() < 16);
+		dAssert (bucket.GetCount() < 16);
 		bucket.Append(node);
 	}
 
@@ -314,8 +314,8 @@ class dParserCompiler::dState: public dList<dParserCompiler::dItem>
 					dState::dListNode* const nodeItem = node->GetInfo();
 					const dItem& item = nodeItem->GetInfo();
 				if (item.m_indexMarker == marker) {
-					_ASSERTE (item.m_ruleNode == rule);
-						_ASSERTE (item.m_lookAheadSymbolCRC == lookAheadSymbol);
+					dAssert (item.m_ruleNode == rule);
+						dAssert (item.m_lookAheadSymbolCRC == lookAheadSymbol);
 						return nodeItem;
 					}
 				}
@@ -533,7 +533,7 @@ void dParserCompiler::LoadTemplateFile(const char* const templateName, dString& 
 	sprintf (ptr, templateName);
 
 	FILE* const templateFile = fopen (path, "rb");
-	_ASSERTE (templateFile);
+	dAssert (templateFile);
 
 	templateOuput.LoadFile(templateFile);
 	fclose (templateFile);	
@@ -550,7 +550,7 @@ void dParserCompiler::SaveFile(const char* const fileName, const char* const ext
 	}
 	strcat (path, extention);
 	FILE* const headerFile = fopen (path, "wb");
-	_ASSERTE (headerFile);
+	dAssert (headerFile);
 	fprintf (headerFile, "%s", input.GetStr());
 	fclose (headerFile);
 }
@@ -622,7 +622,7 @@ void dParserCompiler::ScanGrammarFile(
 			case UNION:
 			{
 				token = dToken(lexical.NextToken());
-				_ASSERTE (token == SEMANTIC_ACTION);
+				dAssert (token == SEMANTIC_ACTION);
 				userVariableClass = lexical.GetTokenString() + 1;
 				userVariableClass.Replace(userVariableClass.Size() - 1, 1, "");
 				token = dToken(lexical.NextToken());
@@ -640,7 +640,7 @@ void dParserCompiler::ScanGrammarFile(
 			case EXPECT:
 			{
 				token = dToken(lexical.NextToken());
-				_ASSERTE (token == INTEGER);
+				dAssert (token == INTEGER);
 				m_shiftReduceExpectedWarnings = atoi (lexical.GetTokenString());
 				token = dToken(lexical.NextToken());
 				break;
@@ -648,7 +648,7 @@ void dParserCompiler::ScanGrammarFile(
 
 			default:;
 			{
-				_ASSERTE (0);
+				dAssert (0);
 				token = dToken(lexical.NextToken());
 			}
 		}
@@ -686,7 +686,7 @@ void dParserCompiler::ScanGrammarFile(
 				break;
 			}
 			default:
-				_ASSERTE (0);
+				dAssert (0);
 		}
 	}
 
@@ -736,7 +736,7 @@ dParserCompiler::dToken dParserCompiler::ScanGrammarRule(
 		
 		dList<dTokenStringPair> ruleTokens;
 		for (token = dToken(lexical.NextToken()); !((token == SIMICOLOM) || (token == OR)); token = dToken(lexical.NextToken())) {
-			_ASSERTE (token != -1);
+			dAssert (token != -1);
 
 			dTokenStringPair& pair = ruleTokens.Append()->GetInfo();
 			pair.m_token = token;
@@ -768,7 +768,7 @@ dParserCompiler::dToken dParserCompiler::ScanGrammarRule(
 				symbol.m_type = symbolNode->GetInfo().m_type;
 
 			} else if (pair.m_token < 256) {
-				_ASSERTE (pair.m_info.Size() == 1);
+				dAssert (pair.m_info.Size() == 1);
 				dSymbol& symbol = currentRule->Append()->GetInfo();
 				symbol.m_name = pair.m_info;
 				symbol.m_nameCRC = dCRC64 (symbol.m_name.GetStr());
@@ -873,7 +873,7 @@ void dParserCompiler::CanonicalItemSets (
 				transition.m_symbol = symbol;
 				transition.m_name = tokenInfo.m_name; 
 				transition.m_type = tokenInfo.m_type;
-				_ASSERTE (transition.m_symbol == dCRC64(transition.m_name.GetStr()));
+				dAssert (transition.m_symbol == dCRC64(transition.m_name.GetStr()));
 				transition.m_targetState = newState;
 
 				dTree<dState*, dCRCTYPE>::dTreeNode* const targetStateNode = stateMap.Find(newState->GetKey());
@@ -932,10 +932,10 @@ dParserCompiler::dState* dParserCompiler::Closure (
 			dTree<dList<void*>, dCRCTYPE>::dTreeNode* const ruleNodes = ruleMap.Find(sentenceSymbol.m_nameCRC);
 			if (ruleNodes) {
 				const dList<void*>& matchingRulesList = ruleNodes->GetInfo();
-				_ASSERTE (matchingRulesList);
+				dAssert (matchingRulesList);
 				for (dList<void*>::dListNode* node = matchingRulesList.GetFirst(); node; node = node->GetNext()) {
 					dProductionRule::dListNode* const ruleNode = (dProductionRule::dListNode*) node->GetInfo();
-					_ASSERTE (ruleNode->GetInfo().m_name == sentenceSymbol.m_name);
+					dAssert (ruleNode->GetInfo().m_name == sentenceSymbol.m_name);
 					dTree<int, dCRCTYPE> firstList;
 					First (firstSymbolList, symbolList, ruleMap, firstList);
 					dTree<int, dCRCTYPE>::Iterator firstIter (firstList);
@@ -1015,7 +1015,7 @@ void dParserCompiler::First (
 	symbolListMark.Insert(0, symbol);
 
 	dTree<dTokenInfo, dCRCTYPE>::dTreeNode* const node = symbolList.Find(symbol);
-	_ASSERTE (node);
+	dAssert (node);
 	if (node->GetInfo().m_type == TERMINAL) {
 		firstSetOut.Insert(0, symbol);
 	} else if (DoesSymbolDeriveEmpty (symbol, ruleMap)) {
@@ -1039,8 +1039,8 @@ void dParserCompiler::First (
 						dTree<int, dCRCTYPE>::Iterator iter (newFirstSetOut);
 						for (iter.Begin(); iter; iter ++) {
 							dCRCTYPE symbol = iter.GetKey();
-							_ASSERTE (symbol != 0);
-							_ASSERTE (symbolList.Find(symbol)->GetInfo().m_type == TERMINAL);
+							dAssert (symbol != 0);
+							dAssert (symbolList.Find(symbol)->GetInfo().m_type == TERMINAL);
 							firstSetOut.Insert(0, symbol);
 						}
 						break;
@@ -1125,7 +1125,7 @@ void dParserCompiler::ReplaceMacro (dString& data, const dString& newName, const
 {
 	int size = int(macro.Size());
 	int position = int (data.Find (macro));
-	_ASSERTE (position != -1);
+	dAssert (position != -1);
 	data.Replace(position, size, newName);
 }
 
@@ -1254,7 +1254,7 @@ void dParserCompiler::GenerateParserCode (
 			dAction& action = actionIter.GetNode()->GetInfo();
 			if (action.m_type == dSHIFT) {
 				dCRCTYPE actionSymbol = actionIter.GetKey();
-				_ASSERTE (symbolList.Find(actionSymbol));
+				dAssert (symbolList.Find(actionSymbol));
 
 				dActionEntry entry;
 				entry.m_stateType = char (action.m_type);
@@ -1269,11 +1269,11 @@ void dParserCompiler::GenerateParserCode (
 			} else if (action.m_type == dREDUCE) {
 
 				dCRCTYPE actionSymbol = actionIter.GetKey();
-				_ASSERTE (symbolList.Find(actionSymbol));
+				dAssert (symbolList.Find(actionSymbol));
 
 				dRuleInfo& reduceRule = action.m_reduceRuleNode->GetInfo();
-				_ASSERTE (symbolList.Find(reduceRule.m_nameCRC));
-				_ASSERTE (symbolList.Find(reduceRule.m_nameCRC)->GetInfo().m_tokenId >= 256);
+				dAssert (symbolList.Find(reduceRule.m_nameCRC));
+				dAssert (symbolList.Find(reduceRule.m_nameCRC)->GetInfo().m_tokenId >= 256);
 
 				dActionEntry entry;
 				entry.m_stateType = char (action.m_type);
@@ -1323,7 +1323,7 @@ void dParserCompiler::GenerateParserCode (
 				}
 
 			} else {
-				_ASSERTE (action.m_type == dACCEPT);
+				dAssert (action.m_type == dACCEPT);
 
 				dActionEntry entry;
 				entry.m_stateType = char (action.m_type);
@@ -1476,7 +1476,7 @@ void dParserCompiler::BuildParsingTable (
 
 				// find item generating this shift action and mark it as used.
 				const dState* const targetState = transition.m_targetState;
-				_ASSERTE (!state->m_actions.Find (transition.m_symbol));
+				dAssert (!state->m_actions.Find (transition.m_symbol));
 				dTree<dAction, dCRCTYPE>::dTreeNode* const actionNode = state->m_actions.Insert (transition.m_symbol); 
 				dAction& action = actionNode->GetInfo();
 				action.m_type = dSHIFT;
@@ -1493,7 +1493,7 @@ void dParserCompiler::BuildParsingTable (
 			const dRuleInfo& ruleInfo = item.m_ruleNode->GetInfo();
 			if ((ruleInfo.m_ruleNumber == 0) && (item.m_indexMarker == 1)) {
 				dTree<dAction, dCRCTYPE>::dTreeNode* const actionNode = state->m_actions.Insert (acceptingSymbol); 
-				_ASSERTE (actionNode);
+				dAssert (actionNode);
 				dAction& action = actionNode->GetInfo();
 				action.m_type = dACCEPT;
 				action.m_myItem = &item;
@@ -1526,7 +1526,7 @@ void dParserCompiler::BuildParsingTable (
 
 				if (action->m_type == dREDUCE) {
 					// this is a reduce reduce conflict
-					_ASSERTE (0);
+					dAssert (0);
 					dTrace (("This is a reduce Reduce conflict, resolve in favor of of first production rule\n")); 
 				}
 				nextActionNode = actionNode->GetNext();
@@ -1534,7 +1534,7 @@ void dParserCompiler::BuildParsingTable (
 				const dItem& item = *action->m_myItem;
 				if (item.m_lastOperatorSymbolCRC != emptySymbol) {
 					const dOperatorsAssociation* const operatorAssosiation = operatorPrecedence.FindAssociation (item.m_lastOperatorSymbolCRC);
-					_ASSERTE (operatorAssosiation);
+					dAssert (operatorAssosiation);
 					if (operatorAssosiation->m_associativity == dOperatorsAssociation::m_left) {
 
 						const dOperatorsAssociation* const lookAheadOperatorAssosiation = operatorPrecedence.FindAssociation (item.m_lookAheadSymbolCRC);
@@ -1570,7 +1570,7 @@ void dParserCompiler::BuildParsingTable (
 					}
 					
 				} else {
-					_ASSERTE (0);
+					dAssert (0);
 					DisplayError ("\nstate %d: reduce reduce error resolved in favor of first sentence. on rule\n", state->m_number);
 					DisplayError ("  %s\n", sentence.GetStr());
 				}

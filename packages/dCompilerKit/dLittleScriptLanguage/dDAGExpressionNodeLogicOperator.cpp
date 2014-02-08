@@ -34,7 +34,7 @@ dDAGExpressionNodeLogicOperator::dDAGExpressionNodeLogicOperator(
 
 dDAGExpressionNodeLogicOperator::~dDAGExpressionNodeLogicOperator(void)
 {
-	_ASSERTE (0);
+	dAssert (0);
 //	m_expressionA->Release();
 //	m_expressionB->Release();
 }
@@ -49,7 +49,7 @@ void dDAGExpressionNodeLogicOperator::ConnectParent(dDAG* const parent)
 dTreeAdressStmt::dArg dDAGExpressionNodeLogicOperator::SetArgument(dDAGExpressionNode* const expression)
 {
 	dTreeAdressStmt::dArg argument;
-	_ASSERTE (0);
+	dAssert (0);
 /*
 	argument.m_label = expression->m_result;
 

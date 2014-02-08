@@ -59,7 +59,7 @@ bool dAssemblerCompiler::Parse(dAssemblerLexical& scanner)
 
 void dAssemblerCompiler::EmitByteCode (int count, const dVirtualMachine::dOpCode* const code)
 {
-	_ASSERTE (0);
+	dAssert (0);
 /*
 	if ((m_codeSegmentSize + count) > D_CODE_SEGMNET_ALLOC_SHUNK_SIZE) {
 		// realloc the code segment
@@ -100,7 +100,7 @@ void dAssemblerCompiler::EmitInitilizedDataDeclaration (const dUserVariable& typ
 
 void dAssemblerCompiler::EmitLocalLabel (const dUserVariable& symbol) const
 {
-	_ASSERTE (m_currentFunction);
+	dAssert (m_currentFunction);
 	if (m_currentFunction->m_localSymbols.Find(symbol.m_data)) {
 		// ERROR local symbol duplication
 	}
@@ -117,7 +117,7 @@ void dAssemblerCompiler::EmitLocalLabel (const dUserVariable& symbol) const
 
 dAssemblerCompiler::dUserVariable dAssemblerCompiler::TypeCheckRegister (const dUserVariable& symbol)
 {
-	_ASSERTE (0);
+	dAssert (0);
 	return dUserVariable(symbol);
 /*
 	dAssemblerCompiler::dUserVariable reg (symbol);
@@ -146,7 +146,7 @@ dAssemblerCompiler::dUserVariable dAssemblerCompiler::EmitIntegerConst (const dU
 
 void dAssemblerCompiler::EmitPushAndPop (const dUserVariable& instruction, const dUserVariable& registerMask)
 {
-	_ASSERTE (0);
+	dAssert (0);
 /*
 	// check that the register mask is no making reference to non existing registers;
 	int mask = registerMask.m_semanticValue;
@@ -179,12 +179,12 @@ void dAssemblerCompiler::EmitPushAndPop (const dUserVariable& instruction, const
 
 void dAssemblerCompiler::EmitInstructionType1_saveLocalAdress (const dUserVariable& instruction, const dUserVariable& symbol)
 {
-	_ASSERTE (0);
+	dAssert (0);
 }
 
 void dAssemblerCompiler::EmitInstructionType4_saveLocalAdress (const dUserVariable& instruction, const dUserVariable& reg0, const dUserVariable& reg1, const dUserVariable& symbol)
 {
-	_ASSERTE (0);
+	dAssert (0);
 	dReference& reference = m_currentFunction->m_localReferences.Append()->GetInfo();
 
 	reference.m_location = m_codeSegmentSize + 1;
@@ -204,7 +204,7 @@ void dAssemblerCompiler::EmitInstructionType1_saveGlobalAdress (const dUserVaria
 
 void dAssemblerCompiler::EmitInstructionType0 (const dUserVariable& instruction)
 {
-	_ASSERTE (0);
+	dAssert (0);
 /*
 	dVirtualMachine::dOpCode bytecode[1];
 
@@ -218,7 +218,7 @@ void dAssemblerCompiler::EmitInstructionType0 (const dUserVariable& instruction)
 
 void dAssemblerCompiler::EmitInstructionType1 (const dUserVariable& instruction, const dUserVariable& immediate)
 {
-	_ASSERTE (0);
+	dAssert (0);
 	dVirtualMachine::dOpCode bytecode[3];
 
 	bytecode[0].m_opcode = instruction.m_semanticValue;
@@ -234,7 +234,7 @@ void dAssemblerCompiler::EmitInstructionType1 (const dUserVariable& instruction,
 
 void dAssemblerCompiler::EmitInstructionType2 (const dUserVariable& instruction, const dUserVariable& reg)
 {
-	_ASSERTE (0);
+	dAssert (0);
 /*
 	dVirtualMachine::dOpCode bytecode[1];
 	bytecode[0].m_opcode = instruction.m_semanticValue;
@@ -251,7 +251,7 @@ void dAssemblerCompiler::EmitInstructionType2 (const dUserVariable& instruction,
 
 void dAssemblerCompiler::EmitInstructionType3 (const dUserVariable& instruction, const dUserVariable& dst, const dUserVariable& src)
 {
-	_ASSERTE (0);
+	dAssert (0);
 /*
 	dVirtualMachine::dOpCode bytecode[1];
 	bytecode[0].m_opcode = instruction.m_semanticValue;
@@ -271,7 +271,7 @@ void dAssemblerCompiler::EmitInstructionType3 (const dUserVariable& instruction,
 
 void dAssemblerCompiler::EmitInstructionType4 (const dUserVariable& instruction, const dUserVariable& dst, const dUserVariable& src, const dUserVariable& immediate)
 {
-	_ASSERTE (0);
+	dAssert (0);
 /*
 	dVirtualMachine::dOpCode bytecode[3];
 	bytecode[0].m_opcode = instruction.m_semanticValue;
@@ -294,10 +294,10 @@ void dAssemblerCompiler::EmitInstructionType4 (const dUserVariable& instruction,
 
 void dAssemblerCompiler::EmitBeginFunction (const dUserVariable& name, const dUserVariable& functionScope)
 {
-	_ASSERTE (0);
+	dAssert (0);
 	if (m_globalSymbols.Find(name.m_data)) {
 		// WARNING FUNTION DUPLICATION;
-		_ASSERTE (0);
+		dAssert (0);
 	} 
 
 	// add new symbol to the global symbol table; 
@@ -313,9 +313,9 @@ void dAssemblerCompiler::EmitBeginFunction (const dUserVariable& name, const dUs
 
 void dAssemblerCompiler::EmitEndFunction ()
 {
-	_ASSERTE (0);
-	_ASSERTE (m_currentFunction);
+	dAssert (0);
+	dAssert (m_currentFunction);
 	for (dList<dReference>::dListNode* node = m_currentFunction->m_localReferences.GetFirst(); node; node = node->GetNext()) {
-		_ASSERTE (0);
+		dAssert (0);
 	}
 }

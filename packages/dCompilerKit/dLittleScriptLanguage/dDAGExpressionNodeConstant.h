@@ -24,6 +24,7 @@ class dDAGExpressionNodeConstant: public dDAGExpressionNode
 		m_intValue = 1,
 		m_floatValue,
 		m_stringValue,
+		m_classPointer,
 	};
 
 	dDAGExpressionNodeConstant (dList<dDAG*>& allNodes, dType type, const char* const identifier);
@@ -36,5 +37,13 @@ class dDAGExpressionNodeConstant: public dDAGExpressionNode
 	dDAGRtti(dDAGExpressionNode);
 };
 
+class dDAGExpressionNodeOperatorThisConstant: public dDAGExpressionNodeConstant
+{
+	public:
+	dDAGExpressionNodeOperatorThisConstant (dList<dDAG*>& allNodes);
+	virtual void CompileCIL(dCIL& cil);
+
+	dDAGRtti(dDAGExpressionNodeOperatorThisConstant);
+};
 
 #endif
