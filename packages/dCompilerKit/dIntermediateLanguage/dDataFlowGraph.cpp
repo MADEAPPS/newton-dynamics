@@ -669,9 +669,13 @@ void dDataFlowGraph::BuildGeneratedAndUsedlVariableSets()
 			{
 				point.m_generatedVariable = stmt.m_arg0.m_label;
 
-				if (stmt.m_arg1.m_type == dTreeAdressStmt::m_intVar) {
+				if ((stmt.m_arg1.m_type == dTreeAdressStmt::m_intVar) || (stmt.m_arg1.m_type == dTreeAdressStmt::m_classPointer)) {
 					point.m_usedVariableSet.Insert(stmt.m_arg1.m_label);
 				} else if (stmt.m_arg1.m_type == dTreeAdressStmt::m_floatVar) {
+					dAssert (0);
+				} else if ((stmt.m_arg1.m_type == dTreeAdressStmt::m_intConst) || (stmt.m_arg1.m_type == dTreeAdressStmt::m_floatConst)) {
+					// do nothing
+				} else {
 					dAssert (0);
 				}
 
@@ -1713,7 +1717,7 @@ void dDataFlowGraph::ApplyLocalOptimizations()
 {
 	m_mark += 2;
 	BuildBasicBlockGraph();
-m_cil->Trace();
+//m_cil->Trace();
 
 	ApplyIfStatementsSimplification();
 //m_cil->Trace();

@@ -46,6 +46,7 @@ class dCIL: public dList<dTreeAdressStmt>
 		m_void,
 		m_intRegister,
 		m_floatRegister,
+		m_classPointer,
 	};
 	
 	dCIL(void);

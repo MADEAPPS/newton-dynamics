@@ -52,8 +52,12 @@ void dDAGFunctionStatementReturn::CompileCIL(dCIL& cil)
 			returnTypeVal = dCIL::m_void;
 		} else if (returnType->m_name == "int") {
 			returnTypeVal = dCIL::m_intRegister;
-		} else {
+		} else if (returnType->m_name == "float") {
 			dAssert (0);
+		} else if (returnType->m_name == "double") {
+			dAssert (0);
+		} else {
+			returnTypeVal = dCIL::m_intRegister;
 		}
 
 		if (returnTypeVal == dCIL::m_intRegister) {

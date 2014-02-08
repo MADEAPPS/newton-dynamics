@@ -278,7 +278,7 @@ void dCIL::Optimize(dListNode* const functionNode, int argumentInRegisters, dRet
 	datFlowGraph.ApplyLocalOptimizations();
 
 	// do register allocation before removing dead jumps and nops
-	datFlowGraph.RegistersAllocation (D_INTEGER_REGISTER_COUNT - 2);
+	datFlowGraph.RegistersAllocation (D_INTEGER_REGISTER_COUNT - 1);
 
 	for (bool isDirty = true; isDirty; ) {
 		isDirty = false;

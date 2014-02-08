@@ -252,6 +252,7 @@ ExpressionNew
 
 Expression
 	: Expression '=' Expression										{$$ = MyModule->NewExpresionNodeAssigment ($1, $3);} 
+/*
 	| Expression _ASS_ADD Expression								{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
 	| Expression _ASS_SUB Expression								{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
 	| Expression _ASS_MUL Expression								{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
@@ -281,7 +282,8 @@ Expression
 	| Expression _OP_DEC											{$$ = MyModule->NewExpresionNodePrefixPostfixOperator ($1, false, false);}
 	| _OP_INC Expression 											{$$ = MyModule->NewExpresionNodePrefixPostfixOperator ($2, true, true);}
 	| _OP_DEC Expression 											{$$ = MyModule->NewExpresionNodePrefixPostfixOperator ($2, true, false);}
-	| '(' Expression ')'											{$$ = $2;}	
+	| '(' Expression ')'											{$$ = $2;}
+*/
 	| FunctionCall		 											{$$ = $1;}
 	| ExpressionNew													{$$ = $1;}
 	| TypeSpecifier _IDENTIFIER										{$$ = MyModule->NewVariableToCurrentBlock ("", $1, $2.m_data);}
@@ -435,23 +437,69 @@ ClassConstructorDeclaration
 	;
 
 
-ClassVariableIdentifierList
-	: ClassVariableIdentifier										{$$ = $1;} 
-	| ClassVariableIdentifierList ',' ClassVariableIdentifier		{$$ = MyModule->ConcatenateVariables($1, $3);} 
+//ClassVariableIdentifierList
+//	: ClassVariableIdentifier										{$$ = $1;} 
+//	| ClassVariableIdentifierList ',' ClassVariableIdentifier		{$$ = MyModule->ConcatenateVariables($1, $3);} 
+//	;
+
+//ClassVariableIdentifier
+//	: _IDENTIFIER													{$$ = MyModule->NewVariableStatement ($1.m_data);}
+//	;
+
+//ClassVariableDeclaration
+//	:           TypeSpecifier ClassVariableIdentifierList 			{$$ = MyModule->AddClassVariable ("", $1, $2);}
+//	| Modifiers TypeSpecifier ClassVariableIdentifierList			{dAssert (0); $$ = MyModule->AddClassVariable ($1.m_data, $2, $3);}
+//	;
+
+
+
+
+
+ClassVariableExpression
+	: ClassVariableExpression '=' ClassVariableExpression				{$$ = MyModule->NewExpresionNodeAssigment ($1, $3);} 
+	| ClassVariableExpression '+' ClassVariableExpression				{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);} 
+	| ClassVariableExpression '-' ClassVariableExpression				{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);} 
+	| ClassVariableExpression '*' ClassVariableExpression				{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);} 
+	| ClassVariableExpression '/' ClassVariableExpression				{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);} 
+	| ClassVariableExpression '%' ClassVariableExpression				{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);}
+	| ClassVariableExpression '>' ClassVariableExpression				{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);} 
+	| ClassVariableExpression '<' ClassVariableExpression				{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);} 
+	| ClassVariableExpression _IDENTICAL ClassVariableExpression		{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);}
+	| ClassVariableExpression _DIFFERENT ClassVariableExpression		{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);}
+	| ClassVariableExpression _LESS_EQUAL ClassVariableExpression		{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);}
+	| ClassVariableExpression _GREATHER_EQUAL ClassVariableExpression	{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);}
+	| ClassVariableExpression _LOGIC_OR ClassVariableExpression			{$$ = MyModule->NewExpressionNodeLogiOperator ($1, $2, $3);}
+	| ClassVariableExpression _LOGIC_AND ClassVariableExpression		{$$ = MyModule->NewExpressionNodeLogiOperator ($1, $2, $3);}
+	| '+' ClassVariableExpression %prec '~'								{$$ = $2;}
+	| '-' ClassVariableExpression %prec '~'								{dUserVariable tmp; tmp.m_token = _INTEGER_CONST; tmp.m_data = "0"; tmp = MyModule->NewExpressionNodeConstant (tmp); $$ = MyModule->NewExpressionNodeBinaryOperator (tmp, $1, $2);}
+	| ClassVariableExpression _OP_INC									{$$ = MyModule->NewExpresionNodePrefixPostfixOperator ($1, false, true);}
+	| ClassVariableExpression _OP_DEC									{$$ = MyModule->NewExpresionNodePrefixPostfixOperator ($1, false, false);}
+	| _OP_INC ClassVariableExpression 									{$$ = MyModule->NewExpresionNodePrefixPostfixOperator ($2, true, true);}
+	| _OP_DEC ClassVariableExpression 									{$$ = MyModule->NewExpresionNodePrefixPostfixOperator ($2, true, false);}
+	| '(' ClassVariableExpression ')'									{$$ = $2;}
+	| ExpressionNew														{$$ = $1;}
+	| TypeSpecifier _IDENTIFIER											{$$ = MyModule->NewVariableToCurrentBlock ("", $1, $2.m_data);}
+	| Modifiers TypeSpecifier _IDENTIFIER								{$$ = MyModule->NewVariableToCurrentBlock ($1.m_data, $2, $3.m_data);}
+	| QualifiedName DimemsionExprList									{$$ = MyModule->NewExpressionNodeVariable ($1.m_data, $2);}
+	| QualifiedName														{$$ = MyModule->NewExpressionNodeVariable ($1.m_data);}
+	| _FLOAT_CONST														{$$ = MyModule->NewExpressionNodeConstant($1);} 
+	| _INTEGER_CONST													{$$ = MyModule->NewExpressionNodeConstant($1);} 
 	;
 
-ClassVariableIdentifier
-	: _IDENTIFIER													{$$ = MyModule->NewVariableStatement ($1.m_data);}
+
+ClassVariableExpressionList
+	: ClassVariableExpression											{$$ = $1;} 
+	| ClassVariableExpressionList ',' ClassVariableExpression			{$$ = MyModule->ConcatenateExpressions($1, $3);} 
 	;
 
-ClassVariableDeclaration
-	:           TypeSpecifier ClassVariableIdentifierList 			{$$ = MyModule->AddClassVariable ("", $1, $2);}
-	| Modifiers TypeSpecifier ClassVariableIdentifierList			{dAssert (0); $$ = MyModule->AddClassVariable ($1.m_data, $2, $3);}
+ClassVariableDeclaration 
+	: ClassVariableExpressionList ';'									{dAssert (0);}
 	;
 
 
 ClassFieldDeclaration
-	: ClassConstructorDeclaration
+	: ';'
+	| ClassConstructorDeclaration
 	| ClassFunctionDeclaration
 	| ClassVariableDeclaration 
 //	| StaticInitializer
@@ -459,15 +507,9 @@ ClassFieldDeclaration
 //	| ClassDeclaration
 	;
 
-ClassFieldDeclarationAndOrSemiColon
-    : ClassFieldDeclaration
-    | ClassFieldDeclaration SemiColons
-    ;
-
-
 ClassFieldDeclarationList
-	: ClassFieldDeclarationAndOrSemiColon
-    | ClassFieldDeclarationList ClassFieldDeclarationAndOrSemiColon
+	: ClassFieldDeclaration
+	| ClassFieldDeclarationList ClassFieldDeclaration 
 	;
 
 ClassWord
@@ -488,18 +530,14 @@ ClassHeader
 
 
 ClassDeclaration
-	: ClassHeader '{' '}'											
+	: ';'
+	| ClassHeader '{' '}'											
 	| ClassHeader '{' ClassFieldDeclarationList '}'							
 	;
 
-ClassDeclarationAndOrSemiColon
-	: ClassDeclaration
-	| ClassDeclaration SemiColons
-	;
-
 ClassDeclarationList
-	: ClassDeclarationAndOrSemiColon
-	| ClassDeclarationList ClassDeclarationAndOrSemiColon
+	: ClassDeclaration
+	| ClassDeclarationList ClassDeclaration
 	;	
 
 %%
