@@ -131,7 +131,13 @@ void dDAGClassNode::ConnectParent(dDAG* const parent)
 
 void dDAGClassNode::CompileCIL(dCIL& cil)  
 {
-	dTrace (("\ndo not forget to emit the class variables here !!\n"));
+	for (dList<dDAGParameterNode*>::dListNode* node = m_variables.GetFirst(); node; node = node->GetNext()) {
+dAssert (0);
+		dDAGParameterNode* const variable = node->GetInfo();
+		variable->CompileCIL(cil);
+	}
+	
+
 	for (dList<dDAGFunctionNode*>::dListNode* node = m_functionList.GetFirst(); node; node = node->GetNext()) {
 		m_cilCodeList.Append (cil.NewStatement());
 		dDAGFunctionNode* const function = node->GetInfo();

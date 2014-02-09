@@ -252,7 +252,6 @@ ExpressionNew
 
 Expression
 	: Expression '=' Expression										{$$ = MyModule->NewExpresionNodeAssigment ($1, $3);} 
-/*
 	| Expression _ASS_ADD Expression								{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
 	| Expression _ASS_SUB Expression								{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
 	| Expression _ASS_MUL Expression								{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
@@ -283,7 +282,6 @@ Expression
 	| _OP_INC Expression 											{$$ = MyModule->NewExpresionNodePrefixPostfixOperator ($2, true, true);}
 	| _OP_DEC Expression 											{$$ = MyModule->NewExpresionNodePrefixPostfixOperator ($2, true, false);}
 	| '(' Expression ')'											{$$ = $2;}
-*/
 	| FunctionCall		 											{$$ = $1;}
 	| ExpressionNew													{$$ = $1;}
 	| TypeSpecifier _IDENTIFIER										{$$ = MyModule->NewVariableToCurrentBlock ("", $1, $2.m_data);}
@@ -452,9 +450,6 @@ ClassConstructorDeclaration
 //	;
 
 
-
-
-
 ClassVariableExpression
 	: ClassVariableExpression '=' ClassVariableExpression				{$$ = MyModule->NewExpresionNodeAssigment ($1, $3);} 
 	| ClassVariableExpression '+' ClassVariableExpression				{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);} 
@@ -478,8 +473,8 @@ ClassVariableExpression
 	| _OP_DEC ClassVariableExpression 									{$$ = MyModule->NewExpresionNodePrefixPostfixOperator ($2, true, false);}
 	| '(' ClassVariableExpression ')'									{$$ = $2;}
 	| ExpressionNew														{$$ = $1;}
-	| TypeSpecifier _IDENTIFIER											{$$ = MyModule->NewVariableToCurrentBlock ("", $1, $2.m_data);}
-	| Modifiers TypeSpecifier _IDENTIFIER								{$$ = MyModule->NewVariableToCurrentBlock ($1.m_data, $2, $3.m_data);}
+	| TypeSpecifier _IDENTIFIER											{$$ = MyModule->AddClassVariable ("", $1, $2.m_data);}
+	| Modifiers TypeSpecifier _IDENTIFIER								{$$ = MyModule->AddClassVariable ($1.m_data, $2, $3.m_data);}
 	| QualifiedName DimemsionExprList									{$$ = MyModule->NewExpressionNodeVariable ($1.m_data, $2);}
 	| QualifiedName														{$$ = MyModule->NewExpressionNodeVariable ($1.m_data);}
 	| _FLOAT_CONST														{$$ = MyModule->NewExpressionNodeConstant($1);} 
@@ -488,12 +483,12 @@ ClassVariableExpression
 
 
 ClassVariableExpressionList
-	: ClassVariableExpression											{$$ = $1;} 
-	| ClassVariableExpressionList ',' ClassVariableExpression			{$$ = MyModule->ConcatenateExpressions($1, $3);} 
+	: ClassVariableExpression											{$$ = MyModule->AddClassVariableInitilization ($1);}
+	| ClassVariableExpressionList ',' ClassVariableExpression			{$$ = MyModule->AddClassVariableInitilization ($3);}
 	;
 
 ClassVariableDeclaration 
-	: ClassVariableExpressionList ';'									{dAssert (0);}
+	: ClassVariableExpressionList ';'									
 	;
 
 
