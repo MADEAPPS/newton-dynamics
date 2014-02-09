@@ -110,9 +110,9 @@ final class NBodySystem
 final class Body 
 {
    static final double PI = 3.141592653589793;
-//   static final double SOLAR_MASS = 4 * PI * PI;
-//   static final double DAYS_PER_YEAR = 365.24;
-    public double x, y, z, vx, vy, vz, mass;
+   static final double SOLAR_MASS = 4 * PI * PI;
+   static final double DAYS_PER_YEAR = 365.24;
+   public double x, y, z, vx, vy, vz, mass;
 /*
    public Body()
    {

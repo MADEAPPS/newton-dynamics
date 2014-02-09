@@ -20,12 +20,14 @@
 
 dInitRtti(dDAGParameterNode);
 
-dDAGParameterNode::dDAGParameterNode(dList<dDAG*>& allNodes, const char* const identifier)
+dDAGParameterNode::dDAGParameterNode(dList<dDAG*>& allNodes, const dString& name, const dString& modifiers)
 	:dDAGFunctionStatement(allNodes)
-	,m_isPublic(true)
 	,m_type(NULL)
 {
-	m_name = identifier;
+	m_name = name;
+	m_isFinal = modifiers.Find ("final") >= 0;
+	m_isStatic = modifiers.Find ("static") >= 0;
+	m_isPublic = modifiers.Find ("public") >= 0;
 }
 
 
@@ -38,6 +40,7 @@ void dDAGParameterNode::SetType(dDAGTypeNode* const type)
 {
 	m_type = type;
 }
+
 
 void dDAGParameterNode::ConnectParent(dDAG* const parent)  
 {

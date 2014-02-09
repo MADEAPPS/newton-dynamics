@@ -19,12 +19,16 @@
 
 dInitRtti(dDAGExpressionNodeVariable);
 
-dDAGExpressionNodeVariable::dDAGExpressionNodeVariable(dList<dDAG*>& allNodes, const char* const identifier, dDAGDimensionNode* const expressionDimIndex)
+dDAGExpressionNodeVariable::dDAGExpressionNodeVariable(dList<dDAG*>& allNodes, const dString& name, const dString& modifiers, dDAGDimensionNode* const expressionDimIndex)
 	:dDAGExpressionNode(allNodes)
 	,m_type(NULL)
 	,m_dimExpressions ()
 {
-	m_name = identifier;
+	m_name = name;
+
+	m_isFinal = modifiers.Find ("final") >= 0;
+	m_isPublic = modifiers.Find ("public") >= 0;
+	m_isStatic = modifiers.Find ("static") >= 0;
 
 	dDAGDimensionNode* next;
 	for (dDAGDimensionNode* node = expressionDimIndex; node; node = next) {
@@ -37,6 +41,9 @@ dDAGExpressionNodeVariable::dDAGExpressionNodeVariable(dList<dDAG*>& allNodes, c
 
 dDAGExpressionNodeVariable::dDAGExpressionNodeVariable (dList<dDAG*>& allNodes, const dDAGExpressionNodeVariable& copySource)
 	:dDAGExpressionNode(allNodes)
+	,m_isFinal(copySource.m_isFinal)
+	,m_isPublic(copySource.m_isPublic)
+	,m_isStatic(copySource.m_isStatic)
 {
 	m_name = copySource.m_name;
 	for (dList<dDAGDimensionNode*>::dListNode* node = copySource.m_dimExpressions.GetFirst(); node; node = node->GetNext()) {

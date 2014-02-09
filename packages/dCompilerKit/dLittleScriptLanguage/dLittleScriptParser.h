@@ -48,6 +48,7 @@ class dLittleScriptParser
 		_IMPORT,
 		_FINAL,
 		_PUBLIC,
+		_PRIVATE,
 		_STATIC,
 		_NATIVE,
 		_PACKAGE,

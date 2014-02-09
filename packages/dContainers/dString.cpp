@@ -459,7 +459,7 @@ int dString::Find (const char* const subString, int subStringLength, int from, i
 					return i;
 				}
 			}
-		} else if ((str2Size <= 4) || (m_size < 256)) {
+		} else if ((str2Size < 4) || (m_size < 64)) {
 			const int size = m_size - str2Size;
 			for (int j = from; j <= size; j ++) {
 				const char* const ptr1 = &m_string[j];

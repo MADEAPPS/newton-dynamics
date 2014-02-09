@@ -38,7 +38,7 @@ dDAGFunctionNode::dDAGFunctionNode(dList<dDAG*>& allNodes, dDAGTypeNode* const t
 	m_isPublic = strstr (visivility, "public") ? true : false;
 
 	if (!m_isStatic) {
-		dDAGParameterNode* const operatorThis = new dDAGParameterNode (allNodes, "this");
+		dDAGParameterNode* const operatorThis = new dDAGParameterNode (allNodes, "this", "");
 		operatorThis->SetType(new dDAGTypeNode (allNodes, "this"));
 		AddParameter(operatorThis);
 	}

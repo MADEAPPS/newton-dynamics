@@ -73,11 +73,11 @@ class dScriptCompiler: public dLittleScriptParser
 	dUserVariable AddClassVariable (const dString& modifiers, const dUserVariable& type, const dString& name);
 	dUserVariable AddClassVariableInitilization(const dUserVariable& statement);
 	
-	dUserVariable ConcatenateVariables(const dUserVariable& variableA, const dUserVariable& variableB);
+//	dUserVariable ConcatenateVariables(const dUserVariable& variableA, const dUserVariable& variableB);
 	dUserVariable ConcatenateExpressions(const dUserVariable& expressionA, const dUserVariable& expressionB);
 
 	
-	dUserVariable NewVariableStatement(const dString& name);
+	dUserVariable NewVariableStatement(const dString& name, const dString& modifiers);
 	dUserVariable NewExpressionNodeConstant (const dUserVariable& identifier);
 	dUserVariable NewExpressionNodeOperatorThisConstant (const dUserVariable& identifier);
 
@@ -90,7 +90,7 @@ class dScriptCompiler: public dLittleScriptParser
 	dUserVariable ConcatenateDimensionNode(const dUserVariable& dim0, const dUserVariable& dim1);
 	dUserVariable NewExpressionOperatorNew (const dString& typeName, const dUserVariable& dimension);
 
-	dUserVariable NewExpressionNodeVariable (const dString& name, const dUserVariable& dimArray = dUserVariable());
+	dUserVariable NewExpressionNodeVariable (const dString& name, const dString& modifiers, const dUserVariable& dimArray = dUserVariable());
 	dUserVariable NewExpresionNodeAssigment (const dUserVariable& leftVariable, const dUserVariable& expression);
 	dUserVariable NewExpresionNodeAssigment (const dUserVariable& leftVariable, const dUserVariable& assigmentOperator, const dUserVariable& expression);
 

@@ -99,7 +99,7 @@ dimensionOp			[\[][ \t\n\r]*[\]]
 
 
 // "extends"		{return dLittleScriptParser::_EXTENDS;}
-// "private"		{return dLittleScriptParser::_PRIVATE;}
+
 // "base"			{return dLittleScriptParser::_BASE;}
 
 
@@ -136,6 +136,7 @@ dimensionOp			[\[][ \t\n\r]*[\]]
 "package"			{return dLittleScriptParser::_PACKAGE;}
 "final"				{return dLittleScriptParser::_FINAL;}
 "public"			{return dLittleScriptParser::_PUBLIC;}
+"private"			{return dLittleScriptParser::_PRIVATE;}
 "static"			{return dLittleScriptParser::_STATIC;}
 "native"			{return dLittleScriptParser::_NATIVE;}
 "interface"			{return dLittleScriptParser::_INTERFACE;}

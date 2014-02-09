@@ -23,7 +23,6 @@ class dDAGExpressionNode: public dDAG
 	dDAGExpressionNode (dList<dDAG*>& allNodes);
 	~dDAGExpressionNode(void);
 
-
 	virtual void CompileCIL(dCIL& cil)  {dAssert (0);}
 	virtual void ConnectParent(dDAG* const parent)  {dAssert (0);}
 	virtual dDAGExpressionNodeVariable* FindLeftVariable() {dAssert (0); return NULL; }

@@ -21,7 +21,7 @@ class dDAGDimensionNode;
 class dDAGExpressionNodeVariable: public dDAGExpressionNode
 {
 	public:
-	dDAGExpressionNodeVariable (dList<dDAG*>& allNodes, const char* const identifier, dDAGDimensionNode* const expressionDimIndex);
+	dDAGExpressionNodeVariable (dList<dDAG*>& allNodes, const dString& name, const dString& modifiers, dDAGDimensionNode* const expressionDimIndex);
 	dDAGExpressionNodeVariable (dList<dDAG*>& allNodes, const dDAGExpressionNodeVariable& copySource);
 	~dDAGExpressionNodeVariable(void);
 
@@ -34,6 +34,9 @@ class dDAGExpressionNodeVariable: public dDAGExpressionNode
 
 	dDAGTypeNode* m_type;
 	dList<dDAGDimensionNode*> m_dimExpressions;
+	bool m_isFinal;
+	bool m_isPublic;
+	bool m_isStatic;
 	dDAGRtti(dDAGExpressionNode);
 };
 

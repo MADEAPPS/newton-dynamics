@@ -22,14 +22,18 @@ class dDAGScopeBlockNode;
 class dDAGParameterNode: public dDAGFunctionStatement
 {
 	public:
-	dDAGParameterNode (dList<dDAG*>& allNodes, const char* const identifier);
+	dDAGParameterNode (dList<dDAG*>& allNodes, const dString& name, const dString& modifiers);
 	~dDAGParameterNode(void);
 
 	void SetType(dDAGTypeNode* const type);
+
 	virtual void CompileCIL(dCIL& cil); 
 	virtual void ConnectParent(dDAG* const parent);
 
+	bool m_isFinal;
 	bool m_isPublic;
+	bool m_isStatic;
+
 	dDAGTypeNode* m_type;
 	dDAGRtti(dDAGFunctionStatement);
 };
