@@ -32,6 +32,8 @@ class dDAGExpressionNodeVariable: public dDAGExpressionNode
 	virtual dDAGExpressionNodeVariable* FindLeftVariable();
 	virtual dDAG* Clone (dList<dDAG*>& allNodes) const;
 
+	void InitParam (const dDAGExpressionNodeVariable& source);
+
 	dDAGTypeNode* m_type;
 	dList<dDAGDimensionNode*> m_dimExpressions;
 	bool m_isFinal;

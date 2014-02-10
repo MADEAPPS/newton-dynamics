@@ -65,6 +65,13 @@ dDAG* dDAGExpressionNodeVariable::Clone (dList<dDAG*>& allNodes) const
 	return new dDAGExpressionNodeVariable (allNodes, *this);
 }
 
+void dDAGExpressionNodeVariable::InitParam (const dDAGExpressionNodeVariable& source)
+{
+	m_isFinal = source.m_isFinal;
+	m_isPublic = source.m_isPublic;
+	m_isStatic = source.m_isStatic;
+}
+
 void dDAGExpressionNodeVariable::ConnectParent(dDAG* const parent)  
 {
 	m_parent = parent;

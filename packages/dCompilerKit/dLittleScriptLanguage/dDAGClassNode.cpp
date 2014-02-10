@@ -15,6 +15,7 @@
 #include "dDAGClassNode.h"
 #include "dDAGFunctionNode.h"
 #include "dDAGParameterNode.h"
+#include "dDAGExpressionClassVariable.h"
 
 dInitRtti(dDAGClassNode);
 
@@ -23,9 +24,9 @@ dDAGClassNode::dDAGClassNode(dList<dDAG*>& allNodes)
 	,m_isFinal(false)
 	,m_isPublic(true)
 	,m_baseClass (NULL)
-	,m_variables()
 	,m_functionList()
 	,m_constructors()
+	,m_variables____()
 {
 }
 
@@ -99,27 +100,30 @@ dDAGTypeNode* dDAGClassNode::GetFunctionReturnType(const char* const functionNam
 }
 
 
-void dDAGClassNode::AddVariable (dDAGParameterNode* const variable)
+void dDAGClassNode::AddVariable (dDAGExpressionClassVariable* const variable)
 {
-	m_variables.Append(variable);
+	m_variables____.Append(variable);
 }
 
 dDAGParameterNode* dDAGClassNode::FindVariable(const char* name) const
 {
+	dAssert (0);
+/*
 	for (dList<dDAGParameterNode*>::dListNode* node = m_variables.GetFirst(); node; node = node->GetNext()) {
 		dDAGParameterNode* const variable = node->GetInfo();
 		if (variable->m_name == name) {
 			return variable;
 		}
 	}
+*/
 	return NULL;
 }
 
 void dDAGClassNode::ConnectParent(dDAG* const parent)  
 {
 	m_parent = parent;
-	for (dList<dDAGParameterNode*>::dListNode* node = m_variables.GetFirst(); node; node = node->GetNext()) {
-		dDAGParameterNode* const variable = node->GetInfo();
+	for (dList<dDAGExpressionClassVariable*>::dListNode* node = m_variables____.GetFirst(); node; node = node->GetNext()) {
+		dDAGExpressionClassVariable* const variable = node->GetInfo();
 		variable->ConnectParent(this);
 	}
 
@@ -131,12 +135,11 @@ void dDAGClassNode::ConnectParent(dDAG* const parent)
 
 void dDAGClassNode::CompileCIL(dCIL& cil)  
 {
-	for (dList<dDAGParameterNode*>::dListNode* node = m_variables.GetFirst(); node; node = node->GetNext()) {
-dAssert (0);
-		dDAGParameterNode* const variable = node->GetInfo();
-		variable->CompileCIL(cil);
+	for (dList<dDAGExpressionClassVariable*>::dListNode* node = m_variables____.GetFirst(); node; node = node->GetNext()) {
+		dAssert (0);
+		dDAGExpressionClassVariable* const variable = node->GetInfo();
+//		variable->CompileCIL(cil);
 	}
-	
 
 	for (dList<dDAGFunctionNode*>::dListNode* node = m_functionList.GetFirst(); node; node = node->GetNext()) {
 		m_cilCodeList.Append (cil.NewStatement());

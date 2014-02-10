@@ -19,6 +19,7 @@ class dDAGTypeNode;
 class dDAGFunctionNode;
 class dDAGParameterNode;
 class dDAGExpressionNode;
+class dDAGExpressionClassVariable;
 
 class dDAGClassNode: public dDAG
 {
@@ -27,9 +28,9 @@ class dDAGClassNode: public dDAG
 	~dDAGClassNode(void);
 
 	void FinalizeImplementation (const char* const visibility, const char* const name, dDAGClassNode* const baseClass);
-
-	void AddVariable (dDAGParameterNode* const variable);
+	
 	void AddFunction (dDAGFunctionNode* const functionNode);
+	void AddVariable (dDAGExpressionClassVariable* const variable);
 
 	dString GetFunctionName (const char* const functionName, dList<dDAGParameterNode*>& parameterNodeList) const;
 	dString GetFunctionName (const char* const functionName, dList<dDAGExpressionNode*>& argumentList) const;
@@ -44,10 +45,11 @@ class dDAGClassNode: public dDAG
 	bool m_isFinal;
 	bool m_isPublic;
 	const dDAGClassNode* m_baseClass;
-	dList<dDAGParameterNode*> m_variables;
+//	dList<dDAGParameterNode*> m_variables;
 	dList<dDAGFunctionNode*> m_functionList;
 	dList<dDAGFunctionNode*> m_constructors;
 	dList<dCIL::dListNode*> m_cilCodeList;
+	dList<dDAGExpressionClassVariable*> m_variables____;
 	dDAGRtti(dDAG);
 };
 

@@ -2790,7 +2790,7 @@ break;
 break;
 
 						case 126:// ClassVariableExpressionList : ClassVariableExpressionList , ClassVariableExpression 
-{entry.m_value = MyModule->AddClassVariableInitilization (parameter[2].m_value);}
+{entry.m_value = MyModule->AddClassVariableInitilization (MyModule->ConcatenateVariables (parameter[0].m_value, parameter[2].m_value));}
 break;
 
 						case 120:// ClassFunctionDeclaration : FunctionName FunctionProtoTypeParameters FunctionBody 

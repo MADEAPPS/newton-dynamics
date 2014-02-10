@@ -321,7 +321,6 @@ ClassVariableExpression
 	| _INTEGER_CONST													{$$ = MyModule->NewExpressionNodeConstant($1);} 
 	;
 	
-	
 BeginScope
 	:																{$$ = MyModule->BeginScopeBlock ();} 
 	;
@@ -465,7 +464,7 @@ ClassConstructorDeclaration
 
 ClassVariableExpressionList
 	: ClassVariableExpression											{$$ = MyModule->AddClassVariableInitilization ($1);}
-	| ClassVariableExpressionList ',' ClassVariableExpression			{$$ = MyModule->AddClassVariableInitilization ($3);}
+	| ClassVariableExpressionList ',' ClassVariableExpression			{$$ = MyModule->AddClassVariableInitilization (MyModule->ConcatenateVariables ($1, $3));}
 	;
 
 ClassVariableDeclaration 

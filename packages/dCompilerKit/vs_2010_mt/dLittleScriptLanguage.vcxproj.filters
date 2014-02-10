@@ -106,6 +106,9 @@
     <ClCompile Include="..\dLittleScriptLanguage\dLSCstdafx.cpp" />
     <ClCompile Include="..\dLittleScriptLanguage\dScriptClass.cpp" />
     <ClCompile Include="..\dLittleScriptLanguage\dScriptPackage.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionClassVariable.cpp">
+      <Filter>SyntaxTree</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\dLittleScriptLanguage\dLittleScriptLexical.h">
@@ -202,6 +205,9 @@
     <ClInclude Include="..\dLittleScriptLanguage\dLSCstdafx.h" />
     <ClInclude Include="..\dLittleScriptLanguage\dScriptClass.h" />
     <ClInclude Include="..\dLittleScriptLanguage\dScriptPackage.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionClassVariable.h">
+      <Filter>SyntaxTree</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\dLittleScriptLanguage\dLittleScriptLexical.lex">

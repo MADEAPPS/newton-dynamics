@@ -138,6 +138,7 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionClassVariable.cpp" />
     <ClCompile Include="..\dLittleScriptLanguage\dLittleScriptLexical.cpp" />
     <ClCompile Include="..\dLittleScriptLanguage\dLittleScriptParser.cpp" />
     <ClCompile Include="..\dLittleScriptLanguage\dDAG.cpp" />
@@ -179,6 +180,7 @@
     <ClCompile Include="..\dLittleScriptLanguage\dScriptPackage.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionClassVariable.h" />
     <ClInclude Include="..\dLittleScriptLanguage\dLittleScriptLexical.h" />
     <ClInclude Include="..\dLittleScriptLanguage\dLittleScriptParser.h" />
     <ClInclude Include="..\dLittleScriptLanguage\dDAG.h" />
