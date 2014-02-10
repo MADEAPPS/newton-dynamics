@@ -45,11 +45,10 @@ class dDAGClassNode: public dDAG
 	bool m_isFinal;
 	bool m_isPublic;
 	const dDAGClassNode* m_baseClass;
-//	dList<dDAGParameterNode*> m_variables;
 	dList<dDAGFunctionNode*> m_functionList;
 	dList<dDAGFunctionNode*> m_constructors;
 	dList<dCIL::dListNode*> m_cilCodeList;
-	dList<dDAGExpressionClassVariable*> m_variables____;
+	dList<dDAGExpressionClassVariable*> m_variables;
 	dDAGRtti(dDAG);
 };
 

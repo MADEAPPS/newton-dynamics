@@ -36,6 +36,14 @@ void dDAGExpressionNodeAssigment::ConnectParent(dDAG* const parent)
 }
 
 
+dDAGExpressionNode::dDAGEvaluation dDAGExpressionNodeAssigment::Evalue(dCIL& cil)
+{
+	dDAGEvaluation val (m_expression->Evalue(cil));
+	dAssert (0);
+
+	return val;
+}
+
 void dDAGExpressionNodeAssigment::CompileCIL(dCIL& cil)  
 {
 	m_expression->CompileCIL(cil); 

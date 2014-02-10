@@ -29,9 +29,14 @@ dDAGExpressionClassVariable::~dDAGExpressionClassVariable ()
 	dAssert (0);
 }
 
-void dDAGExpressionClassVariable::CompileCIL(dCIL& cil)
+
+dDAGExpressionNode::dDAGEvaluation dDAGExpressionClassVariable::Evalue(dCIL& cil) 
 {
+	dDAGEvaluation val (m_expression->Evalue(cil));
+	
 	dAssert (0);
+
+	return val;
 }
 
 void dDAGExpressionClassVariable::ConnectParent(dDAG* const parent)

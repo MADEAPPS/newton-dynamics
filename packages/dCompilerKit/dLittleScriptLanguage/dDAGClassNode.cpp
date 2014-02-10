@@ -26,7 +26,7 @@ dDAGClassNode::dDAGClassNode(dList<dDAG*>& allNodes)
 	,m_baseClass (NULL)
 	,m_functionList()
 	,m_constructors()
-	,m_variables____()
+	,m_variables()
 {
 }
 
@@ -102,7 +102,7 @@ dDAGTypeNode* dDAGClassNode::GetFunctionReturnType(const char* const functionNam
 
 void dDAGClassNode::AddVariable (dDAGExpressionClassVariable* const variable)
 {
-	m_variables____.Append(variable);
+	m_variables.Append(variable);
 }
 
 dDAGParameterNode* dDAGClassNode::FindVariable(const char* name) const
@@ -122,7 +122,7 @@ dDAGParameterNode* dDAGClassNode::FindVariable(const char* name) const
 void dDAGClassNode::ConnectParent(dDAG* const parent)  
 {
 	m_parent = parent;
-	for (dList<dDAGExpressionClassVariable*>::dListNode* node = m_variables____.GetFirst(); node; node = node->GetNext()) {
+	for (dList<dDAGExpressionClassVariable*>::dListNode* node = m_variables.GetFirst(); node; node = node->GetNext()) {
 		dDAGExpressionClassVariable* const variable = node->GetInfo();
 		variable->ConnectParent(this);
 	}
@@ -135,10 +135,9 @@ void dDAGClassNode::ConnectParent(dDAG* const parent)
 
 void dDAGClassNode::CompileCIL(dCIL& cil)  
 {
-	for (dList<dDAGExpressionClassVariable*>::dListNode* node = m_variables____.GetFirst(); node; node = node->GetNext()) {
-		dAssert (0);
+	for (dList<dDAGExpressionClassVariable*>::dListNode* node = m_variables.GetFirst(); node; node = node->GetNext()) {
 		dDAGExpressionClassVariable* const variable = node->GetInfo();
-//		variable->CompileCIL(cil);
+		variable->Evalue(cil);
 	}
 
 	for (dList<dDAGFunctionNode*>::dListNode* node = m_functionList.GetFirst(); node; node = node->GetNext()) {

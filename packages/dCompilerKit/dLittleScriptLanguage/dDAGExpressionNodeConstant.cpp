@@ -37,6 +37,34 @@ void dDAGExpressionNodeConstant::ConnectParent(dDAG* const parent)
 	m_parent = parent;
 }
 
+dDAGExpressionNode::dDAGEvaluation dDAGExpressionNodeConstant::Evalue(dCIL& cil)
+{
+	dDAGEvaluation val;
+
+	switch (m_type) 
+	{
+		case m_intValue:
+		{
+			val.m_type = dDAGEvaluation::m_int;
+			val.m_f = m_name.ToInteger();
+			break;
+		}
+
+		case m_floatValue:
+		{
+			val.m_type = dDAGEvaluation::m_float;
+			val.m_f = m_name.ToFloat();
+			break;
+		}
+
+		case m_classPointer:
+		default:
+			dAssert (0);
+	}
+
+	return val;
+}
+
 void dDAGExpressionNodeConstant::CompileCIL(dCIL& cil)
 {
 	dTreeAdressStmt& stmt = cil.NewStatement()->GetInfo();

@@ -361,6 +361,7 @@ int dString::ToInteger() const
 	return value;
 }
 
+
 long long dString::ToInteger64() const
 {
 	long long value = 0;
@@ -376,6 +377,32 @@ long long dString::ToInteger64() const
 		}
 		value *= base ? -1 : 1;
 	}
+	return value;
+}
+
+
+double dString::ToFloat() const
+{
+	double value = 0.0;
+	double power = 1.0;
+	double decimalBase = 1.0;
+	if (m_size) {
+		int base = (m_string[0] == '-') ? 1 : 0;
+		for (int i = base; i < m_size; i ++) {
+			char ch = m_string[i]; 		
+			if ((ch >= '0') && (ch <= '9')) {
+				value = value * 10ll + ch - '0';
+				power *= decimalBase;
+			} else if (ch == '.') {
+				decimalBase = 10.0;
+			} else {
+				break;
+			}
+		}
+		value *= base ? -1 : 1;
+	}
+	value /= power;
+
 	return value;
 }
 

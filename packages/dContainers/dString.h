@@ -58,6 +58,7 @@ class dString: public dContainersAlloc
 	DCONTAINERS_API void ToUpper();
 	DCONTAINERS_API void ToLower();
 	DCONTAINERS_API int ToInteger() const;
+	DCONTAINERS_API double ToFloat() const;
 	DCONTAINERS_API long long ToInteger64() const;
 
 	int Size() const;

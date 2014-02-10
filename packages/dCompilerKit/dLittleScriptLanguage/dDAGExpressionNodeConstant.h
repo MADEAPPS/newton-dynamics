@@ -30,6 +30,7 @@ class dDAGExpressionNodeConstant: public dDAGExpressionNode
 	dDAGExpressionNodeConstant (dList<dDAG*>& allNodes, dType type, const char* const identifier);
 	~dDAGExpressionNodeConstant(void);
 
+	virtual dDAGEvaluation Evalue(dCIL& cil);
 	virtual void CompileCIL(dCIL& cil);
 	virtual void ConnectParent(dDAG* const parent);
 
