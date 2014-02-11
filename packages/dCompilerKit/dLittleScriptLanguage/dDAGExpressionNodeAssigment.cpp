@@ -11,6 +11,7 @@
 
 #include "dLSCstdafx.h"
 #include "dDAG.h"
+#include "dDAGTypeNode.h"
 #include "dDAGDimensionNode.h"
 #include "dDAGExpressionNodeAssigment.h"
 
@@ -36,11 +37,15 @@ void dDAGExpressionNodeAssigment::ConnectParent(dDAG* const parent)
 }
 
 
-dDAGExpressionNode::dDAGEvaluation dDAGExpressionNodeAssigment::Evalue(dCIL& cil)
+dCIL::dReturnValue dDAGExpressionNodeAssigment::Evalue(dCIL& cil)
 {
-	dDAGEvaluation val (m_expression->Evalue(cil));
-	dAssert (0);
+	dCIL::dReturnValue val (m_expression->Evalue(cil));
+	dAssert (!m_leftVariable->m_dimExpressions.GetCount());
 
+	if (m_leftVariable->m_type->m_intrinsicType != val.m_type) {
+		// see if is ok to do cast prom0tions
+		dAssert (0);
+	}
 	return val;
 }
 

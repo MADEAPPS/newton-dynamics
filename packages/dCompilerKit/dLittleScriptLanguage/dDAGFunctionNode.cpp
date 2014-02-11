@@ -101,6 +101,8 @@ void dDAGFunctionNode::ConnectParent(dDAG* const parent)
 
 void dDAGFunctionNode::CompileCIL(dCIL& cil)  
 {
+	dAssert (0);
+/*
 	dAssert (m_body);
 	dDAGClassNode* const myClass = GetClass();
 
@@ -211,4 +213,5 @@ void dDAGFunctionNode::CompileCIL(dCIL& cil)
 	ret.m_instruction = dTreeAdressStmt::m_ret;
 	ret.m_extraInformation = m_parameters.GetCount() * 4;
 	DTRACE_INTRUCTION (&ret);
+*/
 }

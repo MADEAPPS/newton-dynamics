@@ -19,6 +19,8 @@ dDAGExpressionClassVariable::dDAGExpressionClassVariable (dList<dDAG*>& allNodes
 	:dDAGExpressionNode(allNodes)
 	,m_expression(expression)
 	,m_variable (expression->FindLeftVariable()) 
+	,m_iniatilized(false)
+	,m_initialValue()
 {
 	dAssert (m_variable);
 }
@@ -30,12 +32,11 @@ dDAGExpressionClassVariable::~dDAGExpressionClassVariable ()
 }
 
 
-dDAGExpressionNode::dDAGEvaluation dDAGExpressionClassVariable::Evalue(dCIL& cil) 
+dCIL::dReturnValue dDAGExpressionClassVariable::Evalue(dCIL& cil) 
 {
-	dDAGEvaluation val (m_expression->Evalue(cil));
-	
-	dAssert (0);
-
+	dCIL::dReturnValue val (m_expression->Evalue(cil));
+	m_iniatilized = true;
+	m_initialValue = val;
 	return val;
 }
 

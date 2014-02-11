@@ -40,6 +40,157 @@ void dDAGExpressionNodeBinaryOperator::ConnectParent(dDAG* const parent)
 	m_expressionB->ConnectParent(this);
 }
 
+void dDAGExpressionNodeBinaryOperator::PromoteTypes (dCIL::dReturnValue& typeA, dCIL::dReturnValue& typeB) const
+{
+	if (typeA.m_type != typeB.m_type) {
+		switch (typeA.m_type) 
+		{
+			case dCIL::m_int:
+			{
+				switch (typeB.m_type) 
+				{
+					case dCIL::m_double:
+					{
+						typeA.m_type = dCIL::m_double;
+						typeA.m_f = typeA.m_i;
+						break;
+					}
+
+					case dCIL::m_void:
+					case dCIL::m_bool:
+					case dCIL::m_byte:
+					case dCIL::m_short:
+					case dCIL::m_int:
+					case dCIL::m_long:
+					case dCIL::m_float:
+					case dCIL::m_classPointer:
+						dAssert (0);
+						break;
+				}
+
+				break;
+			}
+
+			case dCIL::m_void:
+			case dCIL::m_bool:
+			case dCIL::m_byte:
+			case dCIL::m_short:
+			
+			case dCIL::m_long:
+			case dCIL::m_float:
+			case dCIL::m_double:
+			case dCIL::m_classPointer:
+				dAssert (0);
+				break;
+		}
+	}
+}
+
+dCIL::dReturnValue dDAGExpressionNodeBinaryOperator::Evalue(dCIL& cil)
+{
+	dCIL::dReturnValue val;
+	dCIL::dReturnValue operandA (m_expressionA->Evalue(cil));
+	dCIL::dReturnValue operandB (m_expressionB->Evalue(cil));
+	PromoteTypes (operandA, operandB);
+
+	val.m_type = operandA.m_type;
+	switch (m_operator) 
+	{
+		case m_add:
+		{
+			dAssert (0);
+			break;
+		}
+
+		case m_sub:
+		{
+			dAssert (0);
+			break;
+		}
+
+		case m_mul:
+		{
+			switch (operandA.m_type) 
+			{
+				case dCIL::m_float:
+				case dCIL::m_double:
+				{
+					val.m_f = operandA.m_f * operandB.m_f;
+					break;
+				}
+
+				case dCIL::m_void:
+				case dCIL::m_bool:
+				case dCIL::m_byte:
+				case dCIL::m_short:
+				case dCIL::m_int:
+				case dCIL::m_long:
+				case dCIL::m_classPointer:
+					dAssert (0);
+					break;
+			}
+
+			
+			break;
+		}
+
+		case m_div:
+		{
+			dAssert (0);
+			break;
+		}
+
+		case m_mod:
+		{
+			dAssert (0);
+			break;
+		}
+
+		case m_identical:
+		{
+			dAssert (0);
+			break;
+		}
+
+		case m_different:
+		{
+			dAssert (0);
+			break;
+		}
+
+
+		case m_less:
+		{
+			dAssert (0);
+			break;
+		}
+
+		case m_lessEqual:
+		{
+			dAssert (0);
+			break;
+		}
+
+		case m_greather:
+		{
+			dAssert (0);
+			break;
+		}
+
+		case m_greatherEqual:
+		{
+			dAssert (0);
+			break;
+		}
+
+		default:
+			dAssert (0);
+	}
+
+
+	return val;
+}
+
 void dDAGExpressionNodeBinaryOperator::CompileCIL(dCIL& cil)  
 {
 	m_expressionA->CompileCIL(cil);

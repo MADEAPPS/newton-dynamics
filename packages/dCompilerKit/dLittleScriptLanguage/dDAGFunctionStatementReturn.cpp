@@ -41,6 +41,8 @@ void dDAGFunctionStatementReturn::ConnectParent(dDAG* const parent)
 
 void dDAGFunctionStatementReturn::CompileCIL(dCIL& cil)
 {
+	dAssert (0);
+/*
 	dDAGFunctionNode* const function = GetFunction();
 
 	if (m_expression) {
@@ -88,4 +90,5 @@ void dDAGFunctionStatementReturn::CompileCIL(dCIL& cil)
 	stmt.m_instruction = dTreeAdressStmt::m_goto;
 	stmt.m_arg0.m_label = function->m_exitLabel;
 	DTRACE_INTRUCTION (&stmt);
+*/
 }

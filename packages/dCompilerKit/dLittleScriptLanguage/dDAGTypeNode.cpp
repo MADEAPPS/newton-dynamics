@@ -16,11 +16,30 @@
 
 dInitRtti(dDAGTypeNode);
 
-dDAGTypeNode::dDAGTypeNode(dList<dDAG*>& allNodes, const char* const type)
+dDAGTypeNode::dDAGTypeNode(dList<dDAG*>& allNodes, const dString& typeName)
 	:dDAG(allNodes)
 	,m_dimensions()
+	,m_intrinsicType(dCIL::m_int)
 {
-	m_name = dString (type);
+	m_name = typeName;
+
+//	m_void,
+//	m_bool,
+//	m_byte,
+//	m_short,
+//	m_int,
+//	m_long,
+//	m_float,
+//	m_double,
+//	m_classPointer,
+
+	static dString doubleType ("double");
+
+	if (m_name == doubleType) {
+		m_intrinsicType = dCIL::m_double;
+	} else if (m_name == "int") {
+		dAssert (0);
+	}
 }
 
 dDAGTypeNode::dDAGTypeNode(dList<dDAG*>& allNodes, const dDAGTypeNode& copySource)

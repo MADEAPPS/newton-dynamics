@@ -24,12 +24,14 @@ class dDAGExpressionClassVariable: public dDAGExpressionNode
 	dDAGExpressionClassVariable (dList<dDAG*>& allNodes, dDAGExpressionNode* const expression);
 	~dDAGExpressionClassVariable ();
 
-	virtual dDAGEvaluation Evalue(dCIL& cil);
+	virtual dCIL::dReturnValue Evalue(dCIL& cil);
 	virtual void ConnectParent(dDAG* const parent);
 
 	dDAGExpressionNode* m_expression;
 	dDAGExpressionNodeVariable* m_variable;
 
+	bool m_iniatilized;
+	dCIL::dReturnValue m_initialValue;
 	dDAGRtti(dDAGExpressionNode);
 };
 

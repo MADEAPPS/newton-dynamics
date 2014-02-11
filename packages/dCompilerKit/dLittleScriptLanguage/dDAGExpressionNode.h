@@ -20,32 +20,10 @@ class dDAGExpressionNodeVariable;
 class dDAGExpressionNode: public dDAG
 {
 	public:
-	class dDAGEvaluation
-	{
-		public:
-		enum dDAGType
-		{
-			m_int,
-			m_float
-		};
-
-		dDAGEvaluation ()
-			:m_type(m_int)
-		{
-			m_f = 0.0;
-		}
-
-		dDAGType m_type;
-		union {;
-			dMachineIntRegister m_i;
-			dMachineFloatRegister m_f;
-		};
-	};
-
 	dDAGExpressionNode (dList<dDAG*>& allNodes);
 	~dDAGExpressionNode(void);
 
-	virtual dDAGEvaluation Evalue(dCIL& cil) {dAssert (0); return dDAGEvaluation();}
+	virtual dCIL::dReturnValue Evalue(dCIL& cil) {dAssert (0); return dCIL::dReturnValue();}
 	virtual void CompileCIL(dCIL& cil) {dAssert (0);}
 	virtual void ConnectParent(dDAG* const parent)  {dAssert (0);}
 	virtual dDAGExpressionNodeVariable* FindLeftVariable() {dAssert (0); return NULL; }

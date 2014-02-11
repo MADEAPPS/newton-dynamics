@@ -43,11 +43,40 @@ class dCIL: public dList<dTreeAdressStmt>
 	public:
 	enum dReturnType
 	{
-		m_void,
+		m_voidNone,
 		m_intRegister,
 		m_floatRegister,
+	};
+
+	enum dIntrisicType
+	{
+		m_void,
+		m_bool,
+		m_byte,
+		m_short,
+		m_int,
+		m_long,
+		m_float,
+		m_double,
 		m_classPointer,
 	};
+
+	class dReturnValue
+	{
+		public:
+		dReturnValue ()
+			:m_type(m_int)
+		{
+			m_f = 0.0;
+		}
+
+		dIntrisicType m_type;
+		union {;
+			dMachineIntRegister m_i;
+			dMachineFloatRegister m_f;
+		};
+	};
+
 	
 	dCIL(void);
 	virtual ~dCIL(void);

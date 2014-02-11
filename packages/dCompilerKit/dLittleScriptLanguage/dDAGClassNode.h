@@ -26,18 +26,18 @@ class dDAGClassNode: public dDAG
 	public:
 	dDAGClassNode(dList<dDAG*>& allNodes);
 	~dDAGClassNode(void);
-
-	void FinalizeImplementation (const char* const visibility, const char* const name, dDAGClassNode* const baseClass);
+	
+	void FinalizeImplementation (const dString& visibility, const dString& name, dDAGClassNode* const baseClass);
 	
 	void AddFunction (dDAGFunctionNode* const functionNode);
 	void AddVariable (dDAGExpressionClassVariable* const variable);
 
-	dString GetFunctionName (const char* const functionName, dList<dDAGParameterNode*>& parameterNodeList) const;
-	dString GetFunctionName (const char* const functionName, dList<dDAGExpressionNode*>& argumentList) const;
-	dDAGTypeNode* GetFunctionReturnType(const char* const functionName, dList<dDAGExpressionNode*>& argumentList) const;
+	dString GetFunctionName (const dString& functionName, dList<dDAGParameterNode*>& parameterNodeList) const;
+	dString GetFunctionName (const dString& functionName, dList<dDAGExpressionNode*>& argumentList) const;
+	dDAGTypeNode* GetFunctionReturnType (const dString& functionName, dList<dDAGExpressionNode*>& argumentList) const;
 
 	dDAGFunctionNode* GetCurrentFunction ();
-	dDAGParameterNode* FindVariable(const char* name) const;
+	dDAGParameterNode* FindVariable(const dString& name) const;
 
 	virtual void CompileCIL(dCIL& cil);
 	virtual void ConnectParent(dDAG* const parent);

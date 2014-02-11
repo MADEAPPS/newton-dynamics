@@ -38,10 +38,11 @@ class dDAGExpressionNodeBinaryOperator: public dDAGExpressionNode
 	~dDAGExpressionNodeBinaryOperator(void);
 
 
-//	dTreeAdressStmt::dArg SetArgument(dDAGExpressionNode* const expresion);
-
+	virtual dCIL::dReturnValue Evalue(dCIL& cil);
 	virtual void CompileCIL(dCIL& cil);
 	virtual void ConnectParent(dDAG* const parent);
+
+	void PromoteTypes (dCIL::dReturnValue& typeA, dCIL::dReturnValue& typeB) const;
 
 	dBinaryOperator m_operator;
 	dDAGExpressionNode* m_expressionA;

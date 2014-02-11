@@ -55,10 +55,10 @@ void dDAGExpressionNodeFunctionCall::ConnectParent(dDAG* const parent)
 
 void dDAGExpressionNodeFunctionCall::CompileCIL(dCIL& cil)  
 {
+	dAssert (0);
+/*
 	dDAGClassNode* const myClass = GetClass();
-//	dDAGFunctionNode* const function = GetFunction();
 
-//	int argumentsCount = m_argumentList.GetCount();
 	for (dList<dDAGExpressionNode*>::dListNode* node = m_argumentList.GetLast(); node; node = node->GetPrev()) {
 		dDAGExpressionNode* const expNode = node->GetInfo();
 		expNode->CompileCIL(cil);
@@ -123,4 +123,5 @@ void dDAGExpressionNodeFunctionCall::CompileCIL(dCIL& cil)
 	} else if (returnTypeVal == dCIL::m_floatRegister) {
 		_ASSERT (0);
 	}
+*/
 }

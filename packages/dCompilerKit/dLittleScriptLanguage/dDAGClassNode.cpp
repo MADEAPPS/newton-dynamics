@@ -35,11 +35,11 @@ dDAGClassNode::~dDAGClassNode(void)
 {
 }
 
-void dDAGClassNode::FinalizeImplementation (const char* const visibility, const char* const name, dDAGClassNode* const baseClass)
+void dDAGClassNode::FinalizeImplementation (const dString& visibility, const dString& name, dDAGClassNode* const baseClass)
 {
-	dString visibilityString (visibility);
-	m_isFinal = (visibilityString == "final") ? true : false;
-	m_isPublic = (visibilityString == "private") ? false : true;
+//	dString visibilityString (visibility);
+	m_isFinal = (visibility.Find("final") >= 0) ? true : false;
+	m_isPublic = (visibility.Find("private") >= 0) ? false : true;
 	m_name = name;
 //	m_baseClass = baseClass;
 //	_ASSERTE (!m_baseClass);
@@ -56,9 +56,8 @@ dDAGFunctionNode* dDAGClassNode::GetCurrentFunction ()
 	return m_functionList.GetLast()->GetInfo();
 }
 
-dString dDAGClassNode::GetFunctionName (const char* const functionName, dList<dDAGExpressionNode*>& argumentList) const
+dString dDAGClassNode::GetFunctionName (const dString& name, dList<dDAGExpressionNode*>& argumentList) const
 {
-	dString name (functionName);
 	for (dList<dDAGFunctionNode*>::dListNode* functionNode = m_functionList.GetFirst(); functionNode; functionNode = functionNode->GetNext()) {
 		dDAGFunctionNode* const function = functionNode->GetInfo();
 		if (function->m_name == name) {
@@ -70,9 +69,8 @@ dString dDAGClassNode::GetFunctionName (const char* const functionName, dList<dD
 	return "xxx";
 }
 
-dString dDAGClassNode::GetFunctionName (const char* const functionName, dList<dDAGParameterNode*>& parameterNodeList) const
+dString dDAGClassNode::GetFunctionName (const dString& name, dList<dDAGParameterNode*>& parameterNodeList) const
 {
-	dString name (functionName);
 	for (dList<dDAGFunctionNode*>::dListNode* functionNode = m_functionList.GetFirst(); functionNode; functionNode = functionNode->GetNext()) {
 		dDAGFunctionNode* const function = functionNode->GetInfo();
 		if (function->m_name == name) {
@@ -85,9 +83,8 @@ dString dDAGClassNode::GetFunctionName (const char* const functionName, dList<dD
 	return "xxxx";
 }
 
-dDAGTypeNode* dDAGClassNode::GetFunctionReturnType(const char* const functionName, dList<dDAGExpressionNode*>& argumentList) const
+dDAGTypeNode* dDAGClassNode::GetFunctionReturnType (const dString& name, dList<dDAGExpressionNode*>& argumentList) const
 {
-	dString name (functionName);
 	for (dList<dDAGFunctionNode*>::dListNode* functionNode = m_functionList.GetFirst(); functionNode; functionNode = functionNode->GetNext()) {
 		dDAGFunctionNode* const function = functionNode->GetInfo();
 		if (function->m_name == name) {
@@ -105,7 +102,7 @@ void dDAGClassNode::AddVariable (dDAGExpressionClassVariable* const variable)
 	m_variables.Append(variable);
 }
 
-dDAGParameterNode* dDAGClassNode::FindVariable(const char* name) const
+dDAGParameterNode* dDAGClassNode::FindVariable (const dString& name) const
 {
 	dAssert (0);
 /*
@@ -135,11 +132,13 @@ void dDAGClassNode::ConnectParent(dDAG* const parent)
 
 void dDAGClassNode::CompileCIL(dCIL& cil)  
 {
+
 	for (dList<dDAGExpressionClassVariable*>::dListNode* node = m_variables.GetFirst(); node; node = node->GetNext()) {
 		dDAGExpressionClassVariable* const variable = node->GetInfo();
 		variable->Evalue(cil);
 	}
-
+dAssert (0);
+/*
 	for (dList<dDAGFunctionNode*>::dListNode* node = m_functionList.GetFirst(); node; node = node->GetNext()) {
 		m_cilCodeList.Append (cil.NewStatement());
 		dDAGFunctionNode* const function = node->GetInfo();
@@ -156,13 +155,14 @@ void dDAGClassNode::CompileCIL(dCIL& cil)
 		} else if (function->m_returnType->m_name == "float") {
 			dAssert (0);
 		} else {
-			//_ASSERTE (0);
+			//dAssert (0);
 			returnType = dCIL::m_intRegister;
 		}
 
 		//cil.Optimize(functionNode->GetNext(), function->m_argumentsCount, returnType);
 		cil.Optimize(functionNode->GetNext(), 0, returnType);
 	}
+*/
 }
 
 

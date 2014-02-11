@@ -12,10 +12,12 @@
 #include "dLSCstdafx.h"
 #include "dDAG.h"
 #include "dDAGTypeNode.h"
+#include "dDAGClassNode.h"
 #include "dDAGDimensionNode.h"
 #include "dDAGScopeBlockNode.h"
 #include "dDAGExpressionNodeVariable.h"
 #include "dDAGExpressionNodeAssigment.h"
+#include "dDAGExpressionClassVariable.h"
 
 dInitRtti(dDAGExpressionNodeVariable);
 
@@ -85,9 +87,28 @@ void dDAGExpressionNodeVariable::ConnectParent(dDAG* const parent)
 	}
 }
 
+dCIL::dReturnValue dDAGExpressionNodeVariable::Evalue(dCIL& cil)
+{
+	dCIL::dReturnValue val;
+	dDAGClassNode* const myClass = GetClass();
+	for (dList<dDAGExpressionClassVariable*>::dListNode* node = myClass->m_variables.GetFirst(); node; node = node->GetNext()) {
+		dDAGExpressionClassVariable* const variable = node->GetInfo();
+		if (variable->m_variable->m_name == m_name) {
+			if (variable->m_iniatilized) {
+				return variable->m_initialValue;
+			} else {
+				dAssert (0);
+			}
+		}
+	}
+	dAssert(0);
+	return val;
+}
 
 void dDAGExpressionNodeVariable::CompileCIL(dCIL& cil)
 {
+dAssert (0);
+
 	dString variable (m_name);
 	int pos = variable.Find (D_SCOPE_PREFIX, 0, int (strlen (D_SCOPE_PREFIX)));
 	if (pos != 0) {

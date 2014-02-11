@@ -188,25 +188,25 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewExpressionNodeConstant (const
 {
 	dUserVariable returnNode;
 
-	dDAGExpressionNodeConstant::dType type = dDAGExpressionNodeConstant::m_intValue;
+	dCIL::dIntrisicType type = dCIL::m_int;
 	switch (int (value.m_token))
 	{
 		case _THIS:
-			type = dDAGExpressionNodeConstant::m_classPointer;
+			type = dCIL::m_classPointer;
 			break;
 
 		case _FLOAT_CONST:
-			type = dDAGExpressionNodeConstant::m_floatValue;
+			type = dCIL::m_double;
 			break;
 
 		case _INTEGER_CONST:
-			type = dDAGExpressionNodeConstant::m_intValue;
+			type = dCIL::m_int;
 			break;
-/*
-		case STRING_VALUE:
-			type = dDAGExpressionNodeConstant::m_stringValue;
-			break;
-*/
+
+//		case STRING_VALUE:
+//			type = dDAGExpressionNodeConstant::m_stringValue;
+//			break;
+
 		default:
 			dAssert (0);
 	}
@@ -354,7 +354,7 @@ dScriptCompiler::dUserVariable dScriptCompiler::CreateClass (const dString& visi
 dScriptCompiler::dUserVariable dScriptCompiler::EmitTypeNode (const dUserVariable& type, const dUserVariable& dim)
 {
 	dUserVariable returnNode;
-	dDAGTypeNode* const typeNode = new dDAGTypeNode (m_allNodes, type.m_data.GetStr());
+	dDAGTypeNode* const typeNode = new dDAGTypeNode (m_allNodes, type.m_data);
 
 	if (dim.m_node) {
 		dDAGDimensionNode* const dimList = (dDAGDimensionNode*) dim.m_node;

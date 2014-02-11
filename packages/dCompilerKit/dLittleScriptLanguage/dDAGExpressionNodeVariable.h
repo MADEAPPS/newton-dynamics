@@ -25,6 +25,7 @@ class dDAGExpressionNodeVariable: public dDAGExpressionNode
 	dDAGExpressionNodeVariable (dList<dDAG*>& allNodes, const dDAGExpressionNodeVariable& copySource);
 	~dDAGExpressionNodeVariable(void);
 
+	virtual dCIL::dReturnValue Evalue(dCIL& cil);
 	virtual void CompileCIL(dCIL& cil);
 	virtual void ConnectParent(dDAG* const parent);
 

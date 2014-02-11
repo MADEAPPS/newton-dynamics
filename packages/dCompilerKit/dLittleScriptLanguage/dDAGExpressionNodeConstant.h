@@ -19,22 +19,15 @@
 class dDAGExpressionNodeConstant: public dDAGExpressionNode
 {
 	public:
-	enum dType
-	{
-		m_intValue = 1,
-		m_floatValue,
-		m_stringValue,
-		m_classPointer,
-	};
 
-	dDAGExpressionNodeConstant (dList<dDAG*>& allNodes, dType type, const char* const identifier);
+	dDAGExpressionNodeConstant (dList<dDAG*>& allNodes, dCIL::dIntrisicType type, const char* const identifier);
 	~dDAGExpressionNodeConstant(void);
 
-	virtual dDAGEvaluation Evalue(dCIL& cil);
+	virtual dCIL::dReturnValue Evalue(dCIL& cil);
 	virtual void CompileCIL(dCIL& cil);
 	virtual void ConnectParent(dDAG* const parent);
 
-	dType m_type;
+	dCIL::dIntrisicType m_type;
 	dDAGRtti(dDAGExpressionNode);
 };
 
