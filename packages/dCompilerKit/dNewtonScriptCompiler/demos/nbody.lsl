@@ -179,9 +179,9 @@ final class Body
 */
    Body offsetMomentum(double px, double py, double pz)
    {
-//      vx = -px / SOLAR_MASS;
-//      vy = -py / SOLAR_MASS;
-//      vz = -pz / SOLAR_MASS;
+      vx = -px / SOLAR_MASS;
+      vy = -py / SOLAR_MASS;
+      vz = -pz / SOLAR_MASS;
       return this;
    }
 }
