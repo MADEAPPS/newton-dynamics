@@ -11,6 +11,8 @@
 
 #include "dLSCstdafx.h"
 #include "dDAG.h"
+#include "dDAGTypeNode.h"
+#include "dDAGExpressionNodeVariable.h"
 #include "dDAGExpressionClassVariable.h"
 
 dInitRtti(dDAGExpressionClassVariable);
@@ -34,7 +36,12 @@ dDAGExpressionClassVariable::~dDAGExpressionClassVariable ()
 
 dCIL::dReturnValue dDAGExpressionClassVariable::Evalue(dCIL& cil) 
 {
-	dCIL::dReturnValue val (m_expression->Evalue(cil));
+	dCIL::dReturnValue val;
+	val.m_type = m_variable->m_type->m_intrinsicType;
+	val.m_f = 0.0;
+	if ((dDAG*)m_expression != (dDAG*)m_variable) {
+		val = m_expression->Evalue(cil);
+	}
 	m_iniatilized = true;
 	m_initialValue = val;
 	return val;
