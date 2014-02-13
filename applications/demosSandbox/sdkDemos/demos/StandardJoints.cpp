@@ -200,7 +200,7 @@ static void AddDistance (DemoEntityManager* const scene, const dVector& origin)
 	dMatrix matrix;
 	NewtonBodyGetMatrix (box0, & matrix[0][0]);
 	matrix.m_posit += dVector (-size.m_x * 0.5f, size.m_y * 0.5f, -size.m_z * 0.5f, 0.0f);
-	new CustomBallAndSocketWithFriction (matrix, box0, NULL, 2.0f);
+//	new CustomBallAndSocketWithFriction (matrix, box0, NULL, 2.0f);
 
 	// link the two boxes with a distance joint
 	dMatrix matrix0;
