@@ -252,7 +252,6 @@ ExpressionNew
 
 Expression
 	: Expression '=' Expression											{$$ = MyModule->NewExpresionNodeAssigment ($1, $3);} 
-/*
 	| Expression _ASS_ADD Expression									{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
 	| Expression _ASS_SUB Expression									{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
 	| Expression _ASS_MUL Expression									{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
@@ -266,9 +265,7 @@ Expression
 	| Expression '+' Expression											{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);} 
 	| Expression '-' Expression											{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);} 
 	| Expression '*' Expression											{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);} 
-*/
 	| Expression '/' Expression											{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);} 
-/*
 	| Expression '%' Expression											{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);}
 	| Expression '>' Expression											{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);} 
 	| Expression '<' Expression											{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);} 
@@ -279,15 +276,12 @@ Expression
 	| Expression _LOGIC_OR Expression									{$$ = MyModule->NewExpressionNodeLogiOperator ($1, $2, $3);}
 	| Expression _LOGIC_AND Expression									{$$ = MyModule->NewExpressionNodeLogiOperator ($1, $2, $3);}
 	| '+' Expression %prec '~'											{$$ = $2;}
-*/
 	| '-' Expression %prec '~'											{dUserVariable tmp; tmp.m_token = _INTEGER_CONST; tmp.m_data = "0"; tmp = MyModule->NewExpressionNodeConstant (tmp); $$ = MyModule->NewExpressionNodeBinaryOperator (tmp, $1, $2);}
-/*
 	| Expression _OP_INC												{$$ = MyModule->NewExpresionNodePrefixPostfixOperator ($1, false, true);}
 	| Expression _OP_DEC												{$$ = MyModule->NewExpresionNodePrefixPostfixOperator ($1, false, false);}
 	| _OP_INC Expression 												{$$ = MyModule->NewExpresionNodePrefixPostfixOperator ($2, true, true);}
 	| _OP_DEC Expression 												{$$ = MyModule->NewExpresionNodePrefixPostfixOperator ($2, true, false);}
 	| '(' Expression ')'												{$$ = $2;}
-*/
 	| FunctionCall		 												{$$ = $1;}
 	| ExpressionNew														{$$ = $1;}
 	| TypeSpecifier _IDENTIFIER											{$$ = MyModule->NewVariableToCurrentBlock ("", $1, $2.m_data);}
