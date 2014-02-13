@@ -207,8 +207,14 @@ static void AddDistance (DemoEntityManager* const scene, const dVector& origin)
 	dMatrix matrix1;
 	NewtonBodyGetMatrix (box0, &matrix0[0][0]);
 	NewtonBodyGetMatrix (box1, &matrix1[0][0]);
-	dVector pivot0 (matrix0.m_posit + dVector ( size.m_x * 0.5f, -size.m_y * 0.5f,  size.m_z * 0.5f, 0.0f));
-	dVector pivot1 (matrix1.m_posit + dVector (-size.m_x * 0.5f,  size.m_y * 0.5f, -size.m_z * 0.5f, 0.0f));
+
+	// get the origins
+	dVector pivot0 (matrix0.m_posit);
+	dVector pivot1 (matrix1.m_posit);
+
+	// connect bodies at a corner
+	//pivot0 += dVector (size.m_x * 0.5f, -size.m_y * 0.5f,  size.m_z * 0.5f, 0.0f);
+	//pivot1 += dVector (-size.m_x * 0.5f,  size.m_y * 0.5f, -size.m_z * 0.5f, 0.0f);
 	new CustomDistance (pivot0, pivot1, box0, box1);
 }
 
