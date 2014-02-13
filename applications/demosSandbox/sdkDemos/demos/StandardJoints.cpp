@@ -27,9 +27,60 @@ AddGearAndRack (mSceneMgr, m_physicsWorld, Vector3 (10.0f, 0.0f, -15.0f));
 #include <CustomBallAndSocket.h>
 #include <CustomRackAndPinion.h>
 
+class CustomDistance: public CustomJoint  
+{
+	public: 
+	CustomDistance (const dVector& pivotInChildInGlobalSpace, const dVector& pivotInParentInGlobalSpace, NewtonBody* const child, NewtonBody* const parent)
+		:CustomJoint(3, child, parent)
+	{
+		dVector dist (pivotInChildInGlobalSpace - pivotInParentInGlobalSpace) ;
+		m_distance = dSqrt (dist % dist);
+
+		dMatrix childMatrix (GetIdentityMatrix());
+		dMatrix parentMatrix (GetIdentityMatrix());
+
+		childMatrix.m_posit = pivotInChildInGlobalSpace;
+		parentMatrix.m_posit = pivotInParentInGlobalSpace;
+		childMatrix.m_posit.m_w = 1.0f;
+		parentMatrix.m_posit.m_w = 1.0f;
+
+		dMatrix dummy;
+		CalculateLocalMatrix (childMatrix, m_localPivot, dummy);
+		CalculateLocalMatrix (parentMatrix, dummy, m_parentPivot);
+	}
+
+    void SubmitConstraints (dFloat timestep, int threadIndex)
+	{
+		dMatrix matrix0;
+		dMatrix matrix1;
+
+		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
+		CalculateGlobalMatrix (m_localPivot, m_parentPivot, matrix0, matrix1);
+
+		dVector p0 (matrix0.m_posit);
+		dVector p1 (matrix1.m_posit);
+
+		dVector dist (p1 - p0);
+		dFloat mag2 = dist % dist;
+		if (mag2 > 0.0f) {
+			dist = dist.Scale (1.0f / dSqrt (mag2));
+			p0 += dist.Scale(m_distance);
+		}
+
+		// Restrict the movement on the pivot point along all tree orthonormal direction
+		NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_front[0]);
+		NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_up[0]);
+		NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_right[0]);
+	}
+
+	dMatrix m_localPivot;
+	dMatrix m_parentPivot;
+	dFloat m_distance;
+};
+
 class CustomBallAndSocketWithFriction: public CustomBallAndSocket
 {
-public:
+	public:
     CustomBallAndSocketWithFriction (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent, dFloat dryFriction)
         :CustomBallAndSocket (pinAndPivotFrame, child, parent)
         ,m_dryFriction (dryFriction)
@@ -61,7 +112,7 @@ public:
             // calculate the acceleration to stop the ball in one time step
             dFloat invTimestep = (timestep > 0.0f) ? 1.0f / timestep: 1.0f;
 
-            // override the desired accelearion, with the deseried acceleration for full stop. 
+            // override the desired acceleration, with the desired acceleration for full stop. 
             NewtonUserJointSetRowAcceleration (m_joint, -omegaMag * invTimestep);
 
             // set the friction limit proportional the sphere Inertia
@@ -139,16 +190,37 @@ static NewtonBody* CreateCylinder (DemoEntityManager* const scene, const dVector
 }
 
 
+static void AddDistance (DemoEntityManager* const scene, const dVector& origin)
+{
+	dVector size (1.0f, 1.0f, 1.0f);
+	NewtonBody* const box0 = CreateBox (scene, origin + dVector (0.0f, 5.0f, 0.0f, 0.0f), size);
+	NewtonBody* const box1 = CreateBox (scene, origin + dVector (size.m_x * 2.0f, 5.0 - size.m_y * 2.0f, size.m_z * 2.0f, 0.0f), size);
+
+	// connect first box to the world
+	dMatrix matrix;
+	NewtonBodyGetMatrix (box0, & matrix[0][0]);
+	matrix.m_posit += dVector (-size.m_x * 0.5f, size.m_y * 0.5f, -size.m_z * 0.5f, 0.0f);
+	new CustomBallAndSocketWithFriction (matrix, box0, NULL, 2.0f);
+
+	// link the two boxes with a distance joint
+	dMatrix matrix0;
+	dMatrix matrix1;
+	NewtonBodyGetMatrix (box0, &matrix0[0][0]);
+	NewtonBodyGetMatrix (box1, &matrix1[0][0]);
+	dVector pivot0 (matrix0.m_posit + dVector ( size.m_x * 0.5f, -size.m_y * 0.5f,  size.m_z * 0.5f, 0.0f));
+	dVector pivot1 (matrix1.m_posit + dVector (-size.m_x * 0.5f,  size.m_y * 0.5f, -size.m_z * 0.5f, 0.0f));
+	new CustomDistance (pivot0, pivot1, box0, box1);
+}
+
+
+
+
 static void AddBallAndSockect (DemoEntityManager* const scene, const dVector& origin)
 {
-//    NewtonWork* const world = scene->GetNewton();
     dVector size (1.0f, 1.0f, 1.0f);
     NewtonBody* const box0 = CreateBox (scene, origin + dVector (0.0f, 5.0f, 0.0f, 0.0f), size);
     NewtonBody* const box1 = CreateBox (scene, origin + dVector (size.m_x, 5.0 - size.m_y, size.m_z, 0.0f), size);
-
-    // make the first body static
-    //NewtonBodySetMassMatrix(box0, 0.0f, 0.0f, 0.0f, 0.0f);
-    
+   
     // connect first box to the world
     dMatrix matrix;
     NewtonBodyGetMatrix (box0, & matrix[0][0]);
@@ -387,6 +459,8 @@ void StandardJoints (DemoEntityManager* const scene)
 
     dVector location (0.0f, 0.0f, 0.0f, 0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
+
+	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
 
     AddBallAndSockect (scene, dVector (-20.0f, 0.0f, -15.0f));
     AddHinge (scene, dVector (-20.0f, 0.0f, -10.0f));
