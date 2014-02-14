@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\ExecutionEngine\ExecutionEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\ExecutionEngine\ExecutionEngineBindings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\ExecutionEngine\RTDyldMemoryManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\ExecutionEngine\TargetSelect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\ExecutionEngine\EventListenerCommon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{523F9274-5504-4BF0-BA41-C2B36527DA4A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{54CBF8D9-88C5-4EE8-803C-3C1ABBD0AF46}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

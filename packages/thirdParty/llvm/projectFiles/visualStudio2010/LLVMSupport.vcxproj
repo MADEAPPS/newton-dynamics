@@ -1,0 +1,667 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGUID>{3DFC67EA-0970-4A47-B8F0-6F3B8F2B7C46}</ProjectGUID>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>Win32</Platform>
+    <ProjectName>LLVMSupport</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">LLVMSupport</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">LLVMSupport</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalOptions> -w14062 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>include;../../lib/IR;../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Debug/</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4275;4146;4180;4244;4267;4345;4351;4355;4503;4624;4800;4291</DisableSpecificWarnings>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <TreatSpecificWarningsAsErrors>4238</TreatSpecificWarningsAsErrors>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_HAS_EXCEPTIONS=0;GTEST_HAS_RTTI=0;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_HAS_EXCEPTIONS=0;GTEST_HAS_RTTI=0;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:/Development/newton-dynamicsLLVM/packages/thirdParty/llvm/lib/Support;C:/Development/newton-dynamicsLLVM/packages/thirdParty/llvm/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:/Development/newton-dynamicsLLVM/packages/thirdParty/llvm/lib/Support;C:/Development/newton-dynamicsLLVM/packages/thirdParty/llvm/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalOptions> -w14062 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>include;../../lib/IR;../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Release/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DisableSpecificWarnings>4275;4146;4180;4244;4267;4345;4351;4355;4503;4624;4800;4291</DisableSpecificWarnings>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <TreatSpecificWarningsAsErrors>4238</TreatSpecificWarningsAsErrors>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_HAS_EXCEPTIONS=0;GTEST_HAS_RTTI=0;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_HAS_EXCEPTIONS=0;GTEST_HAS_RTTI=0;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:/Development/newton-dynamicsLLVM/packages/thirdParty/llvm/lib/Support;C:/Development/newton-dynamicsLLVM/packages/thirdParty/llvm/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:/Development/newton-dynamicsLLVM/packages/thirdParty/llvm/lib/Support;C:/Development/newton-dynamicsLLVM/packages/thirdParty/llvm/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\Support\regcclass.h" />
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\Support\regcname.h" />
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\Support\regex2.h" />
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\Support\regex_impl.h" />
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\Support\regutils.h" />
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\Support\Unix\Host.inc" />
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\Support\Unix\Memory.inc" />
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\Support\Unix\Mutex.inc" />
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\Support\Unix\Path.inc" />
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\Support\Unix\Process.inc" />
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\Support\Unix\Program.inc" />
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\Support\Unix\RWMutex.inc" />
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\Support\Unix\Signals.inc" />
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\Support\Unix\system_error.inc" />
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\Support\Unix\ThreadLocal.inc" />
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\Support\Unix\TimeValue.inc" />
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\Support\Unix\Watchdog.inc" />
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\Support\Windows\DynamicLibrary.inc" />
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\Support\Windows\Host.inc" />
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\Support\Windows\Memory.inc" />
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\Support\Windows\Mutex.inc" />
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\Support\Windows\Path.inc" />
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\Support\Windows\Process.inc" />
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\Support\Windows\Program.inc" />
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\Support\Windows\RWMutex.inc" />
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\Support\Windows\Signals.inc" />
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\Support\Windows\system_error.inc" />
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\Support\Windows\ThreadLocal.inc" />
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\Support\Windows\TimeValue.inc" />
+    <ClInclude Include="..\..\..\..\thirdParty\llvm\lib\Support\Windows\Watchdog.inc" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\APFloat.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\APInt.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\APSInt.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\ARMBuildAttrs.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\Allocator.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\BlockFrequency.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\BranchProbability.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\circular_raw_ostream.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\CommandLine.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\Compression.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\ConstantRange.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\ConvertUTF.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\ConvertUTFWrapper.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\CrashRecoveryContext.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\DataExtractor.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\DataStream.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\Debug.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\DeltaAlgorithm.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\DAGDeltaAlgorithm.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\Dwarf.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\ErrorHandling.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\FileUtilities.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\FileOutputBuffer.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\FoldingSet.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\FormattedStream.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\GraphWriter.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\Hashing.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\IntEqClasses.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\IntervalMap.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\IntrusiveRefCntPtr.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\IsInf.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\IsNAN.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\LineIterator.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\Locale.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\LockFileManager.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\ManagedStatic.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\MemoryBuffer.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\MemoryObject.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\MD5.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\PluginLoader.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\PrettyStackTrace.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\Regex.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\SmallPtrSet.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\SmallVector.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\SourceMgr.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\Statistic.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\StreamableMemoryObject.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\StringExtras.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\StringMap.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\StringPool.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\StringRef.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\StringRefMemoryObject.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\SystemUtils.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\Timer.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\ToolOutputFile.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\Triple.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\Twine.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\Unicode.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\YAMLParser.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\YAMLTraits.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\raw_os_ostream.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\raw_ostream.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\regcomp.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\regerror.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\regexec.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\regfree.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\regstrlcpy.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\Atomic.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\Disassembler.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\DynamicLibrary.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\Errno.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\Host.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\IncludeFile.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\Memory.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\Mutex.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\Path.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\Process.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\Program.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\RWMutex.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\SearchForAddressOfSpecialSymbol.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\Signals.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\system_error.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\TargetRegistry.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\ThreadLocal.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\Threading.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\TimeValue.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\Valgrind.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\Support\Watchdog.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</RuntimeTypeInfo>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"> /EHs-c- %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</RuntimeTypeInfo>
+    </ClCompile>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
