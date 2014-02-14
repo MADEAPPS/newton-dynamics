@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGUID>{4F961D9F-3D2F-437A-AA9C-61AA65888CA1}</ProjectGUID>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>Win32</Platform>
+    <ProjectName>LLVMMC</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">LLVMMC</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">LLVMMC</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalOptions> /EHs-c- -w14062 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>include;../../lib/IR;../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Debug/</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4275;4146;4180;4244;4267;4345;4351;4355;4503;4624;4800;4291</DisableSpecificWarnings>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <TreatSpecificWarningsAsErrors>4238</TreatSpecificWarningsAsErrors>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_HAS_EXCEPTIONS=0;GTEST_HAS_RTTI=0;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_HAS_EXCEPTIONS=0;GTEST_HAS_RTTI=0;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:/Development/newton-dynamicsLLVM/packages/thirdParty/llvm/lib/MC;C:/Development/newton-dynamicsLLVM/packages/thirdParty/llvm/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:/Development/newton-dynamicsLLVM/packages/thirdParty/llvm/lib/MC;C:/Development/newton-dynamicsLLVM/packages/thirdParty/llvm/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalOptions> /EHs-c- -w14062 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>include;../../lib/IR;../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Release/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DisableSpecificWarnings>4275;4146;4180;4244;4267;4345;4351;4355;4503;4624;4800;4291</DisableSpecificWarnings>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <TreatSpecificWarningsAsErrors>4238</TreatSpecificWarningsAsErrors>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_HAS_EXCEPTIONS=0;GTEST_HAS_RTTI=0;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_HAS_EXCEPTIONS=0;GTEST_HAS_RTTI=0;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:/Development/newton-dynamicsLLVM/packages/thirdParty/llvm/lib/MC;C:/Development/newton-dynamicsLLVM/packages/thirdParty/llvm/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:/Development/newton-dynamicsLLVM/packages/thirdParty/llvm/lib/MC;C:/Development/newton-dynamicsLLVM/packages/thirdParty/llvm/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\ELFObjectWriter.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCAsmBackend.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCAsmInfo.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCAsmInfoCOFF.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCAsmInfoDarwin.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCAsmInfoELF.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCAsmStreamer.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCAssembler.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCAtom.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCCodeEmitter.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCCodeGenInfo.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCContext.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCDisassembler.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCDwarf.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCELF.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCELFObjectTargetWriter.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCELFStreamer.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCFunction.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCExpr.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCExternalSymbolizer.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCInst.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCInstPrinter.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCInstrAnalysis.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCLabel.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCMachOStreamer.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCMachObjectTargetWriter.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCModule.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCModuleYAML.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCNullStreamer.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCObjectFileInfo.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCObjectDisassembler.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCObjectStreamer.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCObjectSymbolizer.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCObjectWriter.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCPureStreamer.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCRegisterInfo.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCRelocationInfo.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCSection.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCSectionCOFF.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCSectionELF.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCSectionMachO.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCStreamer.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCSubtargetInfo.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCSymbol.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCSymbolizer.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCValue.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MCWin64EH.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\MachObjectWriter.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\SubtargetFeature.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\WinCOFFObjectWriter.cpp" />
+    <ClCompile Include="..\..\..\..\thirdParty\llvm\lib\MC\WinCOFFStreamer.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

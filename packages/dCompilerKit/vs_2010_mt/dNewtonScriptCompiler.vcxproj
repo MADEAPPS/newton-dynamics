@@ -176,6 +176,9 @@
     <ProjectReference Include="..\..\projects\visualStudio_2010_static_mt\dContainers.vcxproj">
       <Project>{f67c4593-a914-4ddf-8cb5-c59a3ef3ece0}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\thirdParty\llvm\projectFiles\visualStudio2010\LLVMAnalysis.vcxproj">
+      <Project>{19272d62-92aa-4342-8bae-3e6c04dfd32b}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\thirdParty\llvm\projectFiles\visualStudio2010\LLVMCodeGen.vcxproj">
       <Project>{34658906-6f2d-40f4-88f0-891f25efe0fb}</Project>
     </ProjectReference>
@@ -191,8 +194,14 @@
     <ProjectReference Include="..\..\thirdParty\llvm\projectFiles\visualStudio2010\LLVMJIT.vcxproj">
       <Project>{62eb7271-3e20-4e6a-a5db-1c0c907062ba}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\thirdParty\llvm\projectFiles\visualStudio2010\LLVMMC.vcxproj">
+      <Project>{4f961d9f-3d2f-437a-aa9c-61aa65888ca1}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\thirdParty\llvm\projectFiles\visualStudio2010\LLVMSupport.vcxproj">
       <Project>{3dfc67ea-0970-4a47-b8f0-6f3b8f2b7c46}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\thirdParty\llvm\projectFiles\visualStudio2010\LLVMTarget.vcxproj">
+      <Project>{a8bc1f2d-fd79-45e1-89e8-5711370095a8}</Project>
     </ProjectReference>
     <ProjectReference Include="dAssembleCompiler.vcxproj">
       <Project>{e77610c5-a79b-4bbd-b5d8-76fba50b1adb}</Project>
