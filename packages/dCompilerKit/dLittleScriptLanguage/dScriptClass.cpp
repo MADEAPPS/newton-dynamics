@@ -30,6 +30,8 @@ dScriptClass::~dScriptClass(void)
 
 void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 {
+	dAssert (0);
+/*
 	int size = classCode.GetCount() * 2 + 256;
 
 	int paramIndex = 0;	
@@ -408,5 +410,5 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 
 		}
 	}
-
+*/
 }

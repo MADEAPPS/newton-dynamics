@@ -47,6 +47,9 @@ void dDAGFunctionStatementIF::ConnectParent(dDAG* const parent)
 
 void dDAGFunctionStatementIF::CompileCIL(dCIL& cil)  
 {
+	dAssert (0);
+	/*
+
 	m_expression->CompileCIL(cil);
 
 	dTreeAdressStmt& tmpTest = cil.NewStatement()->GetInfo();
@@ -102,4 +105,5 @@ void dDAGFunctionStatementIF::CompileCIL(dCIL& cil)
 		gotoTarget.m_arg0.m_label = gotoStmt.m_arg0.m_label;
 		DTRACE_INTRUCTION (&gotoTarget);
 	}
+*/
 }

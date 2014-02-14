@@ -132,13 +132,13 @@ void dDAGClassNode::ConnectParent(dDAG* const parent)
 
 void dDAGClassNode::CompileCIL(dCIL& cil)  
 {
-
+dAssert (0);
+/*
 	for (dList<dDAGExpressionClassVariable*>::dListNode* node = m_variables.GetFirst(); node; node = node->GetNext()) {
 		dDAGExpressionClassVariable* const variable = node->GetInfo();
 		variable->Evalue(cil);
 	}
-dAssert (0);
-/*
+
 	for (dList<dDAGFunctionNode*>::dListNode* node = m_functionList.GetFirst(); node; node = node->GetNext()) {
 		m_cilCodeList.Append (cil.NewStatement());
 		dDAGFunctionNode* const function = node->GetInfo();

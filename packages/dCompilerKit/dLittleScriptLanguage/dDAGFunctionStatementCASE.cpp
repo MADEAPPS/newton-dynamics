@@ -49,8 +49,11 @@ void dDAGFunctionStatementCase::ConnectParent(dDAG* const parent)
 
 void dDAGFunctionStatementCase::CompileCIL(dCIL& cil)
 {
+	dAssert (0);
+	/*
 	for (dList<dDAGFunctionStatement*>::dListNode* node = m_statementList.GetFirst(); node; node = node->GetNext()) {
 		dDAGFunctionStatement* const statement = node->GetInfo();
 		statement->CompileCIL(cil);
 	}
+*/
 }

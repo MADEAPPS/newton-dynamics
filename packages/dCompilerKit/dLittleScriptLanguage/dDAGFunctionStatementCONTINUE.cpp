@@ -34,6 +34,9 @@ void dDAGFunctionStatementCONTINUE::ConnectParent(dDAG* const parent)
 
 void dDAGFunctionStatementCONTINUE::CompileCIL(dCIL& cil)  
 {
+	dAssert (0);
+	/*
+
 	for (dDAG* node = m_parent; node && (node->GetTypeId() != dDAGFunctionNode::GetRttiType()); node = node->m_parent) {
 		if (node->IsType(dDAGFunctionStatementFlow::GetRttiType())) {
 			dDAGFunctionStatementFlow* const flowControl = (dDAGFunctionStatementFlow*) node;
@@ -51,4 +54,5 @@ void dDAGFunctionStatementCONTINUE::CompileCIL(dCIL& cil)
 
 	// warning break instruction outside of a flow control statement
 	dAssert (0);
+*/
 }

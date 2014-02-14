@@ -39,6 +39,8 @@ void dDAGExpressionNodePrefixPostfix::ConnectParent(dDAG* const parent)
 
 void dDAGExpressionNodePrefixPostfix::CompileCIL(dCIL& cil)
 {
+	dAssert (0);
+/*
 	m_expression->CompileCIL(cil);
 
 	if (m_isPrefix) {
@@ -69,5 +71,6 @@ void dDAGExpressionNodePrefixPostfix::CompileCIL(dCIL& cil)
 
 		m_result = stmt1.m_arg0;
 	}
+*/
 }
 

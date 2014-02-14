@@ -31,14 +31,14 @@ class dDAGFunctionStatementFlow: public dDAGFunctionStatement
 	void OpenPreHeaderBlock(dCIL& cil);
 	void ClosePreHeaderBlock(dCIL& cil);
 
-	dCIL::dListNode* CompileCILLoopBody(dCIL& cil, dDAGFunctionStatement* const posFixStmt);
+//	dCIL::dListNode* CompileCILLoopBody(dCIL& cil, dDAGFunctionStatement* const posFixStmt);
 
 	dDAGRtti(dDAGFunctionStatement);
 
 	dString m_currentBreakLabel;
 	dString m_currentContinueLabel;
-	dCIL::dListNode* m_continueTarget;
-	dCIL::dListNode* m_backPatchStart;
+//	dCIL::dListNode* m_continueTarget;
+//	dCIL::dListNode* m_backPatchStart;
 	dDAGExpressionNode* m_testExpression;
 	dDAGFunctionStatement* m_loopBodyStmt;
 };

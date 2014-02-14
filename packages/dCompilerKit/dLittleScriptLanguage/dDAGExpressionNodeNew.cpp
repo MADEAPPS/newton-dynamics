@@ -40,6 +40,8 @@ void dDAGExpressionNodeNew::ConnectParent(dDAG* const parent)
 
 void dDAGExpressionNodeNew::CompileCIL(dCIL& cil)
 {
+dAssert(0);
+/*
 	m_dimension->CompileCIL(cil);
 
 	dTreeAdressStmt& arraySizeInBytes = cil.NewStatement()->GetInfo();
@@ -67,4 +69,5 @@ void dDAGExpressionNodeNew::CompileCIL(dCIL& cil)
 
 	dDAGScopeBlockNode* const scope = GetScope();
 	scope->m_allocations.Append(m_result.m_label);
+*/
 }

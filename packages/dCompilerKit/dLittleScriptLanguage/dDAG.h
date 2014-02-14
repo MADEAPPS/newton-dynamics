@@ -49,7 +49,7 @@ class dDAG
 	bool RenameLocalVariable(dCIL& cil, dString& variable) const;
 	
 	dString m_name;
-	dTreeAdressStmt::dArg m_result;
+//	dTreeAdressStmt::dArg m_result;
 	dDAG* m_next;
 	dDAG* m_parent;
 	dList<dDAG*>::dListNode* m_myListNode;

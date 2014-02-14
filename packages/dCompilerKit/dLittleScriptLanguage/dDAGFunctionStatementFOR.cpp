@@ -44,6 +44,9 @@ void dDAGFunctionStatementFOR::ConnectParent(dDAG* const parent)
 
 void dDAGFunctionStatementFOR::CompileCIL(dCIL& cil)  
 {
+	dAssert (0);
+	/*
+
 	if (m_initialStmt) {
 		m_initialStmt->CompileCIL(cil);
 	}
@@ -77,4 +80,5 @@ void dDAGFunctionStatementFOR::CompileCIL(dCIL& cil)
 		stmt.m_jmpTarget = exitLabelStmtNode;
 		stmt.m_arg2.m_label = exitLabelStmtNode->GetInfo().m_arg0.m_label; 
 	}
+*/
 }

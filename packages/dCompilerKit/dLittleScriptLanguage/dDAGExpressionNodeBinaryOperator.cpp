@@ -193,6 +193,9 @@ dCIL::dReturnValue dDAGExpressionNodeBinaryOperator::Evalue(dCIL& cil)
 
 void dDAGExpressionNodeBinaryOperator::CompileCIL(dCIL& cil)  
 {
+	dAssert(0);
+	/*
+
 	m_expressionA->CompileCIL(cil);
 	m_expressionB->CompileCIL(cil);
 
@@ -279,4 +282,5 @@ void dDAGExpressionNodeBinaryOperator::CompileCIL(dCIL& cil)
 	}
 
 	DTRACE_INTRUCTION (&stmt);
+*/
 }

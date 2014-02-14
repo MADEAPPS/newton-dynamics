@@ -64,6 +64,9 @@ void dDAGScopeBlockNode::ConnectParent(dDAG* const parent)
 
 void dDAGScopeBlockNode::CompileCIL(dCIL& cil)  
 {
+	dAssert (0);
+	/*
+
 	for (dList<dDAGFunctionStatement*>::dListNode* node = m_statementList.GetFirst(); node; node = node->GetNext()) {
 		dDAGFunctionStatement* const stmt = node->GetInfo();
 		stmt->CompileCIL(cil);
@@ -75,6 +78,7 @@ void dDAGScopeBlockNode::CompileCIL(dCIL& cil)
 		allocationStmt.m_arg0.m_label = node->GetInfo();
 		DTRACE_INTRUCTION (&allocationStmt);
 	}
+*/
 }
 
 

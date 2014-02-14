@@ -60,18 +60,25 @@ void* operator new (size_t size)
 
 dScriptCompiler::dScriptCompiler(const char* const pakacgesRootNameDirectory)
 	:dLittleScriptParser ()
-	,m_packageRootDirectory (pakacgesRootNameDirectory)
-	,m_currentPackage(NULL)
-	,m_currentFunction(NULL)
-	,m_classList()
-	,m_scopeStack()
+	,LLVMContext()
+//	,m_packageRootDirectory (pakacgesRootNameDirectory)
+//	,m_currentPackage(NULL)
+//	,m_currentFunction(NULL)
+//	,m_classList()
+//	,m_scopeStack()
 	,m_allNodes()
 {
-	_mkdir(m_packageRootDirectory.GetStr());
+
+//	_mkdir(m_packageRootDirectory.GetStr());
+
+dAssert (0);
+  OwningPtr<Module> M(new Module("test", *this));
 }
 
 dScriptCompiler::~dScriptCompiler()
 {
+dAssert (0);
+/*
 	for(dList<dDAG*>::dListNode* nodePtr = m_allNodes.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext() ) {
 		dDAG* const node = nodePtr->GetInfo();
 		delete node;
@@ -82,6 +89,7 @@ dScriptCompiler::~dScriptCompiler()
 
 		delete m_currentPackage;
 	}
+*/
 }
 
 
@@ -144,7 +152,7 @@ int dScriptCompiler::CompileSource (const char* const source)
 	dLittleScriptLexical scanner (source);
 
 	bool status = Parse(scanner);
-
+/*
 	if (status) {
 		for (dList<dDAGClassNode*>::dListNode* node = m_classList.GetFirst(); node; node = node->GetNext()) {
 			dDAGClassNode* const scripClass =  node->GetInfo();
@@ -165,6 +173,7 @@ int dScriptCompiler::CompileSource (const char* const source)
 			//m_currentPackage->AddClass(scripClass, cil);
 		}
 	}
+*/
 	return 0;
 }
 
@@ -179,8 +188,12 @@ void dScriptCompiler::ImportAllClasses (const dString& className)
 
 dDAGScopeBlockNode* dScriptCompiler::GetCurrentScope() const
 {
+dAssert (0);
+return NULL;
+/*
 	dAssert (m_scopeStack.GetCount());
 	return m_scopeStack.GetLast()->GetInfo();
+*/
 }
 
 
@@ -336,17 +349,22 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewExpressionNodeLogiOperator (c
 
 dDAGClassNode* dScriptCompiler::GetCurrentClass() const
 {
-	dAssert (m_classList.GetCount());
-	return m_classList.GetLast()->GetInfo();
+dAssert (0);
+return NULL;
+//	dAssert (m_classList.GetCount());
+//	return m_classList.GetLast()->GetInfo();
 }
 
 dScriptCompiler::dUserVariable dScriptCompiler::CreateClass (const dString& visibility, const dString& callType, const dString& className, const dString& superClassName, const dString& interfaces)
 {
 	dUserVariable returnNode;
+dAssert (0);
+/*
 	dDAGClassNode* const classNode = new dDAGClassNode (m_allNodes);
 	m_classList.Append(classNode);
 	returnNode.m_node = classNode;
 	classNode->FinalizeImplementation (visibility.GetStr(), className.GetStr(), NULL);
+*/
 	return returnNode;
 }
 
@@ -478,9 +496,12 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewParameterNode (const dUserVar
 dScriptCompiler::dUserVariable dScriptCompiler::BeginScopeBlock ()
 {
 	dUserVariable returnNode;
+	dAssert (0);
+/*
 	dDAGScopeBlockNode* const scope = new dDAGScopeBlockNode (m_allNodes);
 	m_scopeStack.Append(scope);
 	returnNode.m_node = scope;
+*/
 	return returnNode;
 }
 
@@ -509,7 +530,9 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewVariableStatement (const dStr
 dScriptCompiler::dUserVariable dScriptCompiler::NewVariableToCurrentBlock (const dString& modifiers, const dUserVariable& type, const dString& name)
 {
 	dUserVariable variableName(NewVariableStatement (name, modifiers));
-
+return variableName;
+dAssert (0);
+/*
 	dDAGParameterNode* const variableNameNode = (dDAGParameterNode*)variableName.m_node;
 	dAssert (variableNameNode->IsType(dDAGParameterNode::GetRttiType()));
 
@@ -525,8 +548,8 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewVariableToCurrentBlock (const
 	dAssert (returnNode.m_node->GetTypeId() == dDAGExpressionNodeVariable::GetRttiType());
 	dDAGExpressionNodeVariable* const node = (dDAGExpressionNodeVariable*) returnNode.m_node;
 	node->SetType((dDAGTypeNode*) typeNode->Clone (m_allNodes));
-
 	return returnNode;
+*/
 }
 
 
@@ -667,8 +690,11 @@ dAssert (0);
 dScriptCompiler::dUserVariable dScriptCompiler::EndScopeBlock ()
 {
 	dUserVariable returnNode;
+dAssert(0);
+/*
 	returnNode.m_node = GetCurrentScope();
 	m_scopeStack.Remove(m_scopeStack.GetLast());
+*/
 	return returnNode;
 }
 
@@ -969,6 +995,8 @@ dAssert (0);
 
 void dScriptCompiler::OpenPackage (const dString& packageName)
 {
+	dAssert (0);
+/*
 	m_packageFileName = m_packageRootDirectory + dString ("/") + dString (packageName);
 
 	for (int i = m_packageFileName.Find('_'); i >= 0; i = m_packageFileName.Find('_')) {
@@ -986,6 +1014,7 @@ void dScriptCompiler::OpenPackage (const dString& packageName)
 		// load package does not exist, make a new package 
 		m_currentPackage->Load (m_packageFileName.GetStr());	
 	}
+*/
 }
 
 

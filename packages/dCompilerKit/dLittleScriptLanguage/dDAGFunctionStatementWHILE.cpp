@@ -37,7 +37,8 @@ void dDAGFunctionStatementWHILE::ConnectParent(dDAG* const parent)
 
 void dDAGFunctionStatementWHILE::CompileCIL(dCIL& cil)  
 {
-
+	dAssert (0);
+	/*
 	dCIL::dListNode* startExpressionTestNode = NULL;
 	if (m_testExpression) {
 		m_testExpression->CompileCIL(cil);
@@ -68,5 +69,5 @@ void dDAGFunctionStatementWHILE::CompileCIL(dCIL& cil)
 		stmt.m_jmpTarget = exitLabelStmtNode;
 		stmt.m_arg2.m_label = exitLabelStmtNode->GetInfo().m_arg0.m_label; 
 	}
-
+*/
 }

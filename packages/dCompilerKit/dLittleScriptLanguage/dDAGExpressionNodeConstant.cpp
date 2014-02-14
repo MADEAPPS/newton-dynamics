@@ -113,7 +113,11 @@ dDAGExpressionNodeOperatorThisConstant::dDAGExpressionNodeOperatorThisConstant (
 
 void dDAGExpressionNodeOperatorThisConstant::CompileCIL(dCIL& cil)
 {
+	dAssert(0);
+	/*
+
 	dDAGFunctionNode* const function = GetFunction();
 	m_result.m_type = dTreeAdressStmt::m_classPointer;
 	m_result.m_label = function->m_opertatorThis;
+	*/
 }

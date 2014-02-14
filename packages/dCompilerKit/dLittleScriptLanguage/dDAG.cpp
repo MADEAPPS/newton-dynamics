@@ -21,11 +21,12 @@ dRttiRootClassSupportImplement(dDAG);
 
 dDAG::dDAG(dList<dDAG*>& allNodes)
 	:m_name ("")
-	,m_result()
+//	,m_result()
 	,m_next (NULL)
 	,m_parent (NULL)
 	,m_myListNode(NULL)
 {
+	dAssert (0);
 	m_myListNode = allNodes.Append(this);
 }
 
@@ -69,6 +70,8 @@ dDAGClassNode* dDAG::GetClass() const
 
 bool dDAG::RenameLocalVariable(dCIL& cil, dString& variable) const
 {
+	dAssert (0);
+	/*
 	for (dDAGScopeBlockNode* scope = GetScope(); scope; scope = (dDAGScopeBlockNode*)scope->m_parent->GetScope()) {
 		char text[256];
 		sprintf (text, "%s%d%s", D_SCOPE_PREFIX, scope->m_scopeLayer, variable.GetStr());
@@ -101,5 +104,6 @@ bool dDAG::RenameLocalVariable(dCIL& cil, dString& variable) const
 	}
 
 	dAssert (0);
+*/
 	return false;
 }

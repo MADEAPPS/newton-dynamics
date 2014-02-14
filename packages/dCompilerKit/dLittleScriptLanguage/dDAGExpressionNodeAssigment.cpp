@@ -49,8 +49,15 @@ dCIL::dReturnValue dDAGExpressionNodeAssigment::Evalue(dCIL& cil)
 	return val;
 }
 
+dDAGExpressionNodeVariable* dDAGExpressionNodeAssigment::FindLeftVariable()
+{
+	return m_leftVariable->FindLeftVariable();
+}
+
 void dDAGExpressionNodeAssigment::CompileCIL(dCIL& cil)  
 {
+	dAssert(0);
+/*
 	m_expression->CompileCIL(cil); 
 	if (m_leftVariable->m_dimExpressions.GetCount()) {
 		dString& variable (m_leftVariable->m_name);
@@ -76,7 +83,7 @@ void dDAGExpressionNodeAssigment::CompileCIL(dCIL& cil)
 
 		for (dList<dDAGDimensionNode*>::dListNode* node = m_leftVariable->m_dimExpressions.GetFirst()->GetNext(); node; node = node->GetNext()) {
 			dAssert (0);
-/*
+#if 0
 			dDAGDimensionNode* const dim = node->GetInfo();
 			dim->CompileCIL(cil);
 			
@@ -99,7 +106,7 @@ void dDAGExpressionNodeAssigment::CompileCIL(dCIL& cil)
 			result = stmtAdd.m_arg0.m_label;
 
 			DTRACE_INTRUCTION (&stmtAdd);
-*/
+#endif
 		}
 
 		dAssert (m_parent);
@@ -143,10 +150,7 @@ void dDAGExpressionNodeAssigment::CompileCIL(dCIL& cil)
 		stmt.m_arg1 = m_expression->m_result;
 		DTRACE_INTRUCTION (&stmt);
 	}
+*/
 }
 
 
-dDAGExpressionNodeVariable* dDAGExpressionNodeAssigment::FindLeftVariable()
-{
-	return m_leftVariable->FindLeftVariable();
-}

@@ -54,6 +54,9 @@ void dDAGParameterNode::ConnectParent(dDAG* const parent)
 
 void dDAGParameterNode::CompileCIL(dCIL& cil)  
 {
+	dAssert (0);
+	/*
+
 	char text[512];
 	dDAGScopeBlockNode* const scope = GetScope();
 
@@ -64,4 +67,5 @@ void dDAGParameterNode::CompileCIL(dCIL& cil)
 	}
 	m_name = text;
 	scope->m_localVariablesFilter.Append(m_name);
+*/
 }

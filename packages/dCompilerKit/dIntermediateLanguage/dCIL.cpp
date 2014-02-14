@@ -11,15 +11,16 @@
 
 #include "dCILstdafx.h"
 #include "dCIL.h"
-#include "dDataFlowGraph.h"
+//#include "dDataFlowGraph.h"
 
 
 dCIL::dCIL(void)
-	:dList()
-	,m_mark(1)
-	,m_tempIndex (0)
-	,m_labelIndex (0)
+//	:dList()
+//	,m_mark(1)
+//	,m_tempIndex (0)
+//	,m_labelIndex (0)
 {
+/*
 	memset (m_conditionals, 0, sizeof (m_conditionals));
 	m_conditionals[dTreeAdressStmt::m_identical] = dTreeAdressStmt::m_identical;
 	m_conditionals[dTreeAdressStmt::m_different] = dTreeAdressStmt::m_different;
@@ -42,12 +43,14 @@ dCIL::dCIL(void)
 	m_commutativeOperator[dTreeAdressStmt::m_mul] = true;
 	m_commutativeOperator[dTreeAdressStmt::m_identical] = true;
 	m_commutativeOperator[dTreeAdressStmt::m_different] = true;
+*/
 }
 
 dCIL::~dCIL(void)
 {
 }
 
+/*
 void dCIL::ResetTemporaries()
 {
 	m_tempIndex = 0;
@@ -294,6 +297,6 @@ void dCIL::Optimize(dListNode* const functionNode, int argumentInRegisters, dRet
 //	Trace();
 }
 
-
+*/
 
 

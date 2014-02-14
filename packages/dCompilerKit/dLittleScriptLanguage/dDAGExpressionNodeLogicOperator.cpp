@@ -46,11 +46,11 @@ void dDAGExpressionNodeLogicOperator::ConnectParent(dDAG* const parent)
 	m_expressionB->ConnectParent(this);
 }
 
+/*
 dTreeAdressStmt::dArg dDAGExpressionNodeLogicOperator::SetArgument(dDAGExpressionNode* const expression)
 {
 	dTreeAdressStmt::dArg argument;
-	dAssert (0);
-/*
+
 	argument.m_label = expression->m_result;
 
 	if (expression->GetTypeId() == dDAGExpressionNodeConstant::GetRttiType()) {
@@ -65,12 +65,14 @@ dTreeAdressStmt::dArg dDAGExpressionNodeLogicOperator::SetArgument(dDAGExpressio
 				_ASSERTE (0);
 		}
 	}
-*/
 	return argument;
 }
+*/
 
 void dDAGExpressionNodeLogicOperator::CompileCIL(dCIL& cil)  
 {
+dAssert(0);
+/*
 	dTreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
 	m_result.m_label = cil.NewTemp ();		
 
@@ -126,4 +128,5 @@ void dDAGExpressionNodeLogicOperator::CompileCIL(dCIL& cil)
 
 	testExpressionA.m_jmpTarget = jmpTarget;
 	testExpressionB.m_jmpTarget = jmpTarget;
+*/
 }

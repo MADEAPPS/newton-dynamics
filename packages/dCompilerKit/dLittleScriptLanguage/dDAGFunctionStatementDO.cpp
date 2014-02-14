@@ -36,5 +36,9 @@ void dDAGFunctionStatementDO::ConnectParent(dDAG* const parent)
 
 void dDAGFunctionStatementDO::CompileCIL(dCIL& cil)  
 {
+	dAssert (0);
+	/*
+
 	CompileCILLoopBody(cil, NULL);
+*/
 }
