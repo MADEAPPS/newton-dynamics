@@ -41,6 +41,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LLVMTarget", "..\..\thirdPa
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LLVMScalarOpts", "..\..\thirdParty\llvm\projectFiles\visualStudio2010\LLVMScalarOpts.vcxproj", "{DBAE1ACE-1779-48B8-85AD-8A1B56CFB365}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LLVMTransformUtils", "..\..\thirdParty\llvm\projectFiles\visualStudio2010\LLVMTransformUtils.vcxproj", "{E66B6D1D-214D-4D1C-B041-AE134AA7AA97}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -313,6 +315,18 @@ Global
 		{DBAE1ACE-1779-48B8-85AD-8A1B56CFB365}.RelWithDebInfo|Win32.ActiveCfg = Release|Win32
 		{DBAE1ACE-1779-48B8-85AD-8A1B56CFB365}.RelWithDebInfo|Win32.Build.0 = Release|Win32
 		{DBAE1ACE-1779-48B8-85AD-8A1B56CFB365}.RelWithDebInfo|x64.ActiveCfg = Release|Win32
+		{E66B6D1D-214D-4D1C-B041-AE134AA7AA97}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E66B6D1D-214D-4D1C-B041-AE134AA7AA97}.Debug|Win32.Build.0 = Debug|Win32
+		{E66B6D1D-214D-4D1C-B041-AE134AA7AA97}.Debug|x64.ActiveCfg = Debug|Win32
+		{E66B6D1D-214D-4D1C-B041-AE134AA7AA97}.MinSizeRel|Win32.ActiveCfg = Release|Win32
+		{E66B6D1D-214D-4D1C-B041-AE134AA7AA97}.MinSizeRel|Win32.Build.0 = Release|Win32
+		{E66B6D1D-214D-4D1C-B041-AE134AA7AA97}.MinSizeRel|x64.ActiveCfg = Release|Win32
+		{E66B6D1D-214D-4D1C-B041-AE134AA7AA97}.Release|Win32.ActiveCfg = Release|Win32
+		{E66B6D1D-214D-4D1C-B041-AE134AA7AA97}.Release|Win32.Build.0 = Release|Win32
+		{E66B6D1D-214D-4D1C-B041-AE134AA7AA97}.Release|x64.ActiveCfg = Release|Win32
+		{E66B6D1D-214D-4D1C-B041-AE134AA7AA97}.RelWithDebInfo|Win32.ActiveCfg = Release|Win32
+		{E66B6D1D-214D-4D1C-B041-AE134AA7AA97}.RelWithDebInfo|Win32.Build.0 = Release|Win32
+		{E66B6D1D-214D-4D1C-B041-AE134AA7AA97}.RelWithDebInfo|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
