@@ -14,6 +14,9 @@
 
 #include "dCILstdafx.h"
 
+
+
+
 /*
 #define D_USE_COMPLEX_ADRESSING_MODE
 #define D_TEMPRARY_SYMBOL			"t"
@@ -36,8 +39,9 @@ inline dString GetReturnVariableName()
 class dDataFlowGraph; 
 */
 
+using  namespace llvm;
 
-class dCIL
+class dCIL: public LLVMTargetMachine
 {
 	public:
 	enum dReturnType
@@ -77,8 +81,10 @@ class dCIL
 	};
 
 	
-	dCIL(void);
+	dCIL (const Target &T, StringRef TargetTriple, StringRef CPU, StringRef FS, TargetOptions Options, Reloc::Model RM, CodeModel::Model CM, CodeGenOpt::Level OL);
 	virtual ~dCIL(void);
+
+	static void RegisterTarget(); 
 
 //	void Trace();
 //	dString NewTemp (); 
@@ -101,6 +107,39 @@ class dCIL
 	dTreeAdressStmt::dOperator m_operatorComplement[dTreeAdressStmt::m_operatorsCount];
 	friend dDataFlowGraph;
 */
+
+	public:
+	
+
+
+	private:
+	static bool getArchMatch(Triple::ArchType Arch);
+//	SparcTargetMachine(const Module &M, const std::string &FS);
+
+//	virtual const SparcInstrInfo *getInstrInfo() const {return &InstrInfo; }
+//	virtual const TargetFrameInfo *getFrameInfo() const {return &FrameInfo; }
+//	virtual const TargetSubtarget *getSubtargetImpl() const{return &Subtarget; }
+//	virtual const TargetRegisterInfo *getRegisterInfo() const {
+//		return &InstrInfo.getRegisterInfo();
+//	}
+//	virtual const DataLayout *getDataLayout() const { return &DataLayout; }
+//	static unsigned getModuleMatchQuality(const Module &M);
+
+	// Pass Pipeline Configuration
+//	virtual bool addInstSelector(PassManagerBase &PM, bool Fast);
+//	virtual bool addPreEmitPass(PassManagerBase &PM, bool Fast);
+
+
+//	protected:
+//	virtual const TargetAsmInfo *createTargetAsmInfo() const;
+
+
+//	const DataLayout DataLayout;       // Calculates type size & alignment
+//	SparcSubtarget Subtarget;
+//	SparcInstrInfo InstrInfo;
+//	TargetFrameInfo FrameInfo;
+
+	static Target m_target;
 };
 
 

@@ -296,10 +296,10 @@ public:
 ///
 class LLVMTargetMachine : public TargetMachine {
 protected: // Can only create subclasses.
-  LLVMTargetMachine(const Target &T, StringRef TargetTriple,
-                    StringRef CPU, StringRef FS, TargetOptions Options,
-                    Reloc::Model RM, CodeModel::Model CM,
-                    CodeGenOpt::Level OL);
+	LLVMTargetMachine(const Target &T, StringRef TargetTriple,
+		StringRef CPU, StringRef FS, TargetOptions Options,
+		Reloc::Model RM, CodeModel::Model CM,
+		CodeGenOpt::Level OL);
 
   void initAsmInfo();
 public:

@@ -14,7 +14,10 @@
 //#include "dDataFlowGraph.h"
 
 
-dCIL::dCIL(void)
+Target dCIL::m_target;
+
+dCIL::dCIL(const Target &T, StringRef arch, StringRef cpu, StringRef featuresStr, TargetOptions options, Reloc::Model relocModel, CodeModel::Model CMModel, CodeGenOpt::Level optLevel)
+	:LLVMTargetMachine (m_target, arch, cpu, featuresStr, options, relocModel, CMModel, optLevel)
 //	:dList()
 //	,m_mark(1)
 //	,m_tempIndex (0)
@@ -49,6 +52,30 @@ dCIL::dCIL(void)
 dCIL::~dCIL(void)
 {
 }
+
+void dCIL::RegisterTarget()
+{
+	if (!m_target.getName()) {
+		TargetRegistry::RegisterTarget(m_target, D_VIRTUAL_MACHINE_NAME, D_VIRTUAL_MACHINE_DESC, &getArchMatch, true);
+
+//		std::string MArch;
+//		std::string MCPU;
+//		std::string FeaturesStr;
+//		TargetOptions Options;
+//		Reloc::Model RelocModel;
+//		CodeModel::Model CMModel;
+//		CodeGenOpt::Level OptLevel;
+		RegisterTargetMachine<dCIL> dommy(m_target);
+	}
+}
+
+bool dCIL::getArchMatch(Triple::ArchType Arch) 
+{
+	dAssert (0);
+//	return Arch == TargetArchType;
+	return true;
+}
+
 
 /*
 void dCIL::ResetTemporaries()

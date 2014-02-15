@@ -197,6 +197,9 @@
     <ProjectReference Include="..\..\thirdParty\llvm\projectFiles\visualStudio2010\LLVMMC.vcxproj">
       <Project>{4f961d9f-3d2f-437a-aa9c-61aa65888ca1}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\thirdParty\llvm\projectFiles\visualStudio2010\LLVMScalarOpts.vcxproj">
+      <Project>{dbae1ace-1779-48b8-85ad-8a1b56cfb365}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\thirdParty\llvm\projectFiles\visualStudio2010\LLVMSupport.vcxproj">
       <Project>{3dfc67ea-0970-4a47-b8f0-6f3b8f2b7c46}</Project>
     </ProjectReference>
