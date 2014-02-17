@@ -53,19 +53,66 @@ dCIL::~dCIL(void)
 {
 }
 
+dCIL* dCIL::CreateTargetMachine()
+{
+	StringRef CPU;
+	StringRef Features;
+	TargetOptions Options;
+
+
+//	PassRegistry *Registry = PassRegistry::getPassRegistry();
+//	initializeCore(*Registry);
+//	initializeCodeGen(*Registry);
+//	initializeLoopStrengthReducePass(*Registry);
+//	initializeLowerIntrinsicsPass(*Registry);
+//	initializeUnreachableBlockElimPass(*Registry);
+
+
+
+	RegisterTarget();
+	return (dCIL*)m_target.createTargetMachine(D_VIRTUAL_MACHINE_NAME, CPU, Features, Options);
+}
+
 void dCIL::RegisterTarget()
 {
 	if (!m_target.getName()) {
 		TargetRegistry::RegisterTarget(m_target, D_VIRTUAL_MACHINE_NAME, D_VIRTUAL_MACHINE_DESC, &getArchMatch, true);
 
-//		std::string MArch;
-//		std::string MCPU;
-//		std::string FeaturesStr;
-//		TargetOptions Options;
-//		Reloc::Model RelocModel;
-//		CodeModel::Model CMModel;
-//		CodeGenOpt::Level OptLevel;
 		RegisterTargetMachine<dCIL> dommy(m_target);
+/*
+		// Register assembler
+		RegisterMCAsmInfoFn A(m_target, createLSLAsmInfo);
+
+		// Register the MC codegen info.
+		RegisterMCCodeGenInfoFn C(m_target, createLSLCodeGenInfo);
+
+		// Register the MC instruction info.
+		TargetRegistry::RegisterMCInstrInfo(m_target, createLSLInstrInfo);
+
+		// Register the MC register info.
+		TargetRegistry::RegisterMCRegInfo(m_target, createLSLRegisterInfo);
+
+		// Register the MC subtarget info.
+		TargetRegistry::RegisterMCSubtargetInfo(m_target, X86_MC::createLSLSubtargetInfo);
+
+		// Register the MC instruction analyzer.
+		TargetRegistry::RegisterMCInstrAnalysis(m_target, createLSLInstrAnalysis);
+
+		// Register the code emitter.
+		TargetRegistry::RegisterMCCodeEmitter(m_target, createLSLCodeEmitter);
+
+		// Register the asm backend.
+		TargetRegistry::RegisterMCAsmBackend(m_target, createX86_32AsmBackend);
+
+		// Register the object streamer.
+		TargetRegistry::RegisterMCObjectStreamer(m_target, createMCStreamer);
+
+		// Register the MCInstPrinter.
+		TargetRegistry::RegisterMCInstPrinter(m_target, createLSLInstPrinter);
+
+		// Register the MC relocation info.
+		TargetRegistry::RegisterMCRelocationInfo(m_target, createLSLRelocationInfo);
+*/
 	}
 }
 

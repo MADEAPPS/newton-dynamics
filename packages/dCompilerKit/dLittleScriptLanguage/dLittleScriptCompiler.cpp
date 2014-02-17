@@ -136,8 +136,15 @@ if (verifyModule(*M)) {
 }
 errs() << *M;
 
-dCIL::RegisterTarget();
-//dCIL cil;
+
+
+//formatted_raw_ostream out;
+std::string errorInfo;
+raw_fd_ostream out ("xxxxxxx.bc", errorInfo);
+WriteBitcodeToFile (M.get(), out);
+out.close();
+
+//dCIL* const cil = dCIL::CreateTargetMachine();
 //scripClass->CompileCIL (cil);
 
 

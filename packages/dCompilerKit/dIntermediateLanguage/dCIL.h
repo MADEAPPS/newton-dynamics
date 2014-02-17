@@ -84,8 +84,9 @@ class dCIL: public LLVMTargetMachine
 	dCIL (const Target &T, StringRef TargetTriple, StringRef CPU, StringRef FS, TargetOptions Options, Reloc::Model RM, CodeModel::Model CM, CodeGenOpt::Level OL);
 	virtual ~dCIL(void);
 
-	static void RegisterTarget(); 
 
+
+	static dCIL* CreateTargetMachine();
 //	void Trace();
 //	dString NewTemp (); 
 //	dString NewLabel (); 
@@ -108,11 +109,10 @@ class dCIL: public LLVMTargetMachine
 	friend dDataFlowGraph;
 */
 
-	public:
-	
 
 
 	private:
+	static void RegisterTarget(); 
 	static bool getArchMatch(Triple::ArchType Arch);
 //	SparcTargetMachine(const Module &M, const std::string &FS);
 

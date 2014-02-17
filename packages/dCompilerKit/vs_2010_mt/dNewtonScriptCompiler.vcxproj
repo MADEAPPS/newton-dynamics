@@ -179,6 +179,12 @@
     <ProjectReference Include="..\..\thirdParty\llvm\projectFiles\visualStudio2010\LLVMAnalysis.vcxproj">
       <Project>{19272d62-92aa-4342-8bae-3e6c04dfd32b}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\thirdParty\llvm\projectFiles\visualStudio2010\LLVMBitReader.vcxproj">
+      <Project>{c14fbb5e-a465-4359-a513-0a03cc123f7d}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\thirdParty\llvm\projectFiles\visualStudio2010\LLVMBitWriter.vcxproj">
+      <Project>{53c3d68d-a164-4598-b965-2f31a96e4955}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\thirdParty\llvm\projectFiles\visualStudio2010\LLVMCodeGen.vcxproj">
       <Project>{34658906-6f2d-40f4-88f0-891f25efe0fb}</Project>
     </ProjectReference>
