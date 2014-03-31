@@ -994,6 +994,8 @@ void dgCollisionCompound::EndAddRemove ()
 		m_boxSize = m_root->m_size;
 		m_boxOrigin = m_root->m_origin;
 		MassProperties ();
+
+		m_world->FlushCache ();
 	}
 }
 

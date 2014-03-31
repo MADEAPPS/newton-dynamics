@@ -485,9 +485,9 @@ void dgBody::SetMassMatrix(dgFloat32 mass, dgFloat32 Ixx, dgFloat32 Iyy, dgFloat
 		Iyy = dgAbsf (Iyy);
 		Izz = dgAbsf (Izz);
 
-		dgFloat32 Ixx1 = dgClamp (Ixx, dgFloat32 (0.001f) * mass, dgFloat32 (100.0f) * mass);
-		dgFloat32 Iyy1 = dgClamp (Iyy, dgFloat32 (0.001f) * mass, dgFloat32 (100.0f) * mass);
-		dgFloat32 Izz1 = dgClamp (Izz, dgFloat32 (0.001f) * mass, dgFloat32 (100.0f) * mass);
+		dgFloat32 Ixx1 = dgClamp (Ixx, dgFloat32 (0.001f) * mass, dgFloat32 (1000.0f) * mass);
+		dgFloat32 Iyy1 = dgClamp (Iyy, dgFloat32 (0.001f) * mass, dgFloat32 (1000.0f) * mass);
+		dgFloat32 Izz1 = dgClamp (Izz, dgFloat32 (0.001f) * mass, dgFloat32 (1000.0f) * mass);
 
 		dgAssert (Ixx > dgFloat32 (0.0f));
 		dgAssert (Iyy > dgFloat32 (0.0f));
