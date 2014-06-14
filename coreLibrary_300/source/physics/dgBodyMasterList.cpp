@@ -225,6 +225,16 @@ void dgBodyMasterList::RemoveConstraint (dgConstraint* const constraint)
 }
 
 
+DG_INLINE dgUnsigned32 dgBodyMasterList::MakeSortMask(const dgBody* const body) const
+{
+//	return body->m_uniqueID | ((body->GetInvMass().m_w > 0.0f) << 30);
+	dgUnsigned32 val0 = body->IsRTTIType(dgBody::m_dynamicBodyRTTI) ? (body->GetInvMass().m_w > 0.0f) << 30 : 0;
+	dgUnsigned32 val1 = body->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? 1<<29 : 0;
+	dgUnsigned32 val2 = body->IsRTTIType(dgBody::m_deformableBodyRTTI) ? 1<<28 : 0;
+	return body->m_uniqueID | val0 | val1 | val2;
+}
+
+
 void dgBodyMasterList::SortMasterList()
 {
 	GetFirst()->GetInfo().SortList();
@@ -237,20 +247,14 @@ void dgBodyMasterList::SortMasterList()
 
 		body1->InvalidateCache ();
 
-		dgInt32 val0 = (body1->GetInvMass().m_w > 0.0f) << 28;
-		dgInt32 val1 = body1->IsRTTIType(dgBody::m_kinematicBodyRTTI) ?  1<<29 : 0;
-		dgInt32 val2 = body1->IsRTTIType(dgBody::m_deformableBodyRTTI) ? 1<<30 : 0;
-		dgInt32 key1 = body1->m_uniqueID | val0 | val1 | val2;
+		dgInt32 key1 = MakeSortMask (body1);
 		dgListNode* const entry = node;
 		node = node->GetNext();
 		dgListNode* prev = entry->GetPrev();
 		for (; prev != GetFirst(); prev = prev->GetPrev()) {
 			dgBody* const body0 = prev->GetInfo().GetBody();
 
-			val0 = (body0->GetInvMass().m_w > 0.0f) << 28;
-			val1 = body0->IsRTTIType(dgBody::m_kinematicBodyRTTI) ?  1<<29 : 0;
-			val2 = body0->IsRTTIType(dgBody::m_deformableBodyRTTI) ? 1<<30 : 0;
-			dgInt32 key0 = body0->m_uniqueID | val0 | val1 | val2;
+			dgInt32 key0 = MakeSortMask (body0);
 			if (key0 < key1) {
 				break;
 			}
@@ -263,4 +267,5 @@ void dgBodyMasterList::SortMasterList()
 			InsertAfter (prev, entry);
 		}
 	}
+
 }

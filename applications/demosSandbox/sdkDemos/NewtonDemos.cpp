@@ -54,10 +54,10 @@
 //#define DEFAULT_SCENE	28          // standard joints
 //#define DEFAULT_SCENE	29			// articulated joints
 //#define DEFAULT_SCENE	20			// basic rag doll
-#define DEFAULT_SCENE	31			// basic car
+//#define DEFAULT_SCENE	31			// basic car
 //#define DEFAULT_SCENE	32			// high performance super car
 //#define DEFAULT_SCENE	33			// basic player controller
-//#define DEFAULT_SCENE	34			// advanced player controller
+#define DEFAULT_SCENE	34			// advanced player controller
 //#define DEFAULT_SCENE	35			// cloth patch			
 //#define DEFAULT_SCENE	36			// soft bodies			
 

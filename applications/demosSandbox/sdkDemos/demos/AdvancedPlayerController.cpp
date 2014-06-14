@@ -141,8 +141,8 @@ class AdvancePlayerEntity: public DemoEntity
 		// create the visual mesh from the player collision shape
 		NewtonCollision* const collision = NewtonBodyGetCollision(body);
 		DemoMesh* const geometry = new DemoMesh("player", collision, "smilli.tga", "smilli.tga", "smilli.tga");
-dAssert (0);
-//		SetMesh(geometry);
+
+		SetMesh(geometry, GetIdentityMatrix());
 		geometry->Release(); 
 	}
 
@@ -514,8 +514,7 @@ class PlaformEntityEntity: public DemoEntity
 		scene->Append(this);
 
 		DemoMesh* const mesh = source->GetMesh();
-dAssert (0);
-//		SetMesh(mesh);
+		SetMesh(mesh, GetIdentityMatrix());
 
 		const dFloat mass = 100.9f;
 		dMatrix matrix (source->GetNextMatrix()) ;
@@ -952,7 +951,7 @@ static void LoadPlayGroundScene(DemoEntityManager* const scene, TriggerManager* 
 		dMatrix slideMatrix(GetIdentityMatrix());
 		slideMatrix.m_posit.m_x += 80.0f;
 		slideMatrix.m_posit.m_z = -20.0f;
-		LoadSlide(scene, triggerManager, sceneCollision, "slide.ngd", slideMatrix, playGroundBody);
+		//LoadSlide(scene, triggerManager, sceneCollision, "slide.ngd", slideMatrix, playGroundBody);
 		LoadFerryBridge(scene, triggerManager, sceneCollision, "platformBridge.ngd", slideMatrix, playGroundBody);
 
 		// load another hanging bridge

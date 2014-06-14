@@ -67,7 +67,7 @@ class dgBodyMasterList: public dgList<dgBodyMasterListRow>
 
 	dgBodyMasterListRow::dgListNode* FindConstraintLink (const dgBody* const body0, const dgBody* const body1) const;
 	dgBodyMasterListRow::dgListNode* FindConstraintLinkNext (const dgBodyMasterListRow::dgListNode* const me, const dgBody* const body) const;
-
+	dgUnsigned32 MakeSortMask(const dgBody* const body) const;
 	void SortMasterList();
 
 	public:
