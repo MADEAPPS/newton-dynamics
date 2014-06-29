@@ -16,11 +16,12 @@
 
 #define D_OPTIMIZE_REDUNDANCE_COPY_ON_ARRAYS
 
-dDataFlowGraph::dDataFlowGraph (dCIL* const cil, dCIL::dListNode* const function, dCIL::dReturnType returnType)
+//dDataFlowGraph::dDataFlowGraph (dCIL* const cil, dCIL::dListNode* const function, dCIL::dReturnType returnType)
+dDataFlowGraph::dDataFlowGraph (dCIL* const cil, dCIL::dListNode* const function)
 	:m_mark (0)
 	,m_registersUsedMask(0)
 	,m_cil (cil)
-	,m_returnType(returnType)
+//	,m_returnType(returnType)
 	,m_returnVariableName(GetReturnVariableName())
 	,m_function(function)
 {
@@ -176,7 +177,7 @@ void dDataFlowGraph::BuildBasicBlockGraph()
 	}
 }
 
-
+#if 0
 void dDataFlowGraph::dBasicBlock::Trace() const
 {
 	#ifdef TRACE_INTERMEDIATE_CODE
@@ -1809,3 +1810,4 @@ void dDataFlowGraph::RegistersAllocation (int registerCount)
 	dRegisterInterferenceGraph interferenceGraph(this, registerCount);
 }
 
+#endif

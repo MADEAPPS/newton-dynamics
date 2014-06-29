@@ -28,12 +28,10 @@ dDAGFunctionStatement::~dDAGFunctionStatement()
 
 void dDAGFunctionStatement::CompileCIL(dCIL& cil)  
 {
-dAssert (0);
-/*
-*/
 }
 
 void dDAGFunctionStatement::ConnectParent(dDAG* const parent)  
 {
+dAssert (0);
 	m_parent = parent;
 }

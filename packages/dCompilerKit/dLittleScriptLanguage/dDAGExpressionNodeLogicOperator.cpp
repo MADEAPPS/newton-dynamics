@@ -41,16 +41,17 @@ dDAGExpressionNodeLogicOperator::~dDAGExpressionNodeLogicOperator(void)
 
 void dDAGExpressionNodeLogicOperator::ConnectParent(dDAG* const parent)  
 {
+dAssert (0);
 	m_parent = parent;
 	m_expressionA->ConnectParent(this);
 	m_expressionB->ConnectParent(this);
 }
 
-/*
 dTreeAdressStmt::dArg dDAGExpressionNodeLogicOperator::SetArgument(dDAGExpressionNode* const expression)
 {
 	dTreeAdressStmt::dArg argument;
-
+	dAssert (0);
+/*
 	argument.m_label = expression->m_result;
 
 	if (expression->GetTypeId() == dDAGExpressionNodeConstant::GetRttiType()) {
@@ -65,14 +66,15 @@ dTreeAdressStmt::dArg dDAGExpressionNodeLogicOperator::SetArgument(dDAGExpressio
 				_ASSERTE (0);
 		}
 	}
+*/
 	return argument;
 }
-*/
 
 void dDAGExpressionNodeLogicOperator::CompileCIL(dCIL& cil)  
 {
-dAssert(0);
-/*
+	dAssert (0);
+	/*
+
 	dTreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
 	m_result.m_label = cil.NewTemp ();		
 

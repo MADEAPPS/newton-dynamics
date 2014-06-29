@@ -16,7 +16,7 @@
 #define	D_VIRTUAL_MACHINE_DESC			"32 litle indian bit newton newton virtual machine"
 
 #define D_REGISTER_SET_FIELD			5
-#define D_OPCODE_FIELD					6
+#define D_OPCODE_FIELD					7
 
 #define D_REGISTER_SYMBOL				"$reg"
 #define D_SPILL_REGISTER_SYMBOL			"spilled"

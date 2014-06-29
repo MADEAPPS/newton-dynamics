@@ -32,6 +32,7 @@ dDAGFunctionStatementFOR::~dDAGFunctionStatementFOR()
 
 void dDAGFunctionStatementFOR::ConnectParent(dDAG* const parent)  
 {
+dAssert (0);
 	dDAGFunctionStatementFlow::ConnectParent(parent);
 
 	if (m_initialStmt) {

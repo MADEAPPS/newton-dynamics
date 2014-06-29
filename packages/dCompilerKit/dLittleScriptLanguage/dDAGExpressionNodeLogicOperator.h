@@ -30,7 +30,7 @@ class dDAGExpressionNodeLogicOperator: public dDAGExpressionNode
 	~dDAGExpressionNodeLogicOperator(void);
 
 
-//	dTreeAdressStmt::dArg SetArgument(dDAGExpressionNode* const expresion);
+	dTreeAdressStmt::dArg SetArgument(dDAGExpressionNode* const expresion);
 
 	virtual void CompileCIL(dCIL& cil);
 	virtual void ConnectParent(dDAG* const parent);

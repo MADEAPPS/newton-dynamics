@@ -20,8 +20,8 @@ class dDAGDimensionNode;
 
 class dDAGTypeNode: public dDAG
 {
-	public:
 
+	public:	
 	dDAGTypeNode(dList<dDAG*>& allNodes, const dString& typeName);
 	dDAGTypeNode(dList<dDAG*>& allNodes, const dDAGTypeNode& copySource);
 	~dDAGTypeNode(void);
@@ -33,9 +33,8 @@ class dDAGTypeNode: public dDAG
 	virtual dDAG* Clone (dList<dDAG*>& allNodes) const;
 
 	dList<dDAGDimensionNode*> m_dimensions;
-
-	dCIL::dIntrisicType m_intrinsicType;
-
+	dTreeAdressStmt::dArgType m_intrinsicType;
+	
 	dDAGRtti(dDAG);
 };
 

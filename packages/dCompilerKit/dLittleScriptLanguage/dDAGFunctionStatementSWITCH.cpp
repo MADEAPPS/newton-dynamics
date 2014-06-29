@@ -45,6 +45,7 @@ dDAGFunctionStatementSWITCH::~dDAGFunctionStatementSWITCH()
 
 void dDAGFunctionStatementSWITCH::ConnectParent(dDAG* const parent)
 {
+dAssert (0);
 	m_parent = parent;
 	m_expression->ConnectParent(this);
 	for (dList<dDAGFunctionStatementCase*>::dListNode* node = m_caseList.GetFirst(); node; node = node->GetNext()) {

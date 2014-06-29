@@ -11,19 +11,15 @@
 
 #include "dCILstdafx.h"
 #include "dCIL.h"
-//#include "dDataFlowGraph.h"
+#include "dDataFlowGraph.h"
 
 
-Target dCIL::m_target;
-
-dCIL::dCIL(const Target &T, StringRef arch, StringRef cpu, StringRef featuresStr, TargetOptions options, Reloc::Model relocModel, CodeModel::Model CMModel, CodeGenOpt::Level optLevel)
-	:LLVMTargetMachine (m_target, arch, cpu, featuresStr, options, relocModel, CMModel, optLevel)
-//	:dList()
-//	,m_mark(1)
-//	,m_tempIndex (0)
-//	,m_labelIndex (0)
+dCIL::dCIL(void)
+	:dList()
+	,m_mark(1)
+	,m_tempIndex (0)
+	,m_labelIndex (0)
 {
-/*
 	memset (m_conditionals, 0, sizeof (m_conditionals));
 	m_conditionals[dTreeAdressStmt::m_identical] = dTreeAdressStmt::m_identical;
 	m_conditionals[dTreeAdressStmt::m_different] = dTreeAdressStmt::m_different;
@@ -46,85 +42,12 @@ dCIL::dCIL(const Target &T, StringRef arch, StringRef cpu, StringRef featuresStr
 	m_commutativeOperator[dTreeAdressStmt::m_mul] = true;
 	m_commutativeOperator[dTreeAdressStmt::m_identical] = true;
 	m_commutativeOperator[dTreeAdressStmt::m_different] = true;
-*/
 }
 
 dCIL::~dCIL(void)
 {
 }
 
-dCIL* dCIL::CreateTargetMachine()
-{
-	StringRef CPU;
-	StringRef Features;
-	TargetOptions Options;
-
-
-//	PassRegistry *Registry = PassRegistry::getPassRegistry();
-//	initializeCore(*Registry);
-//	initializeCodeGen(*Registry);
-//	initializeLoopStrengthReducePass(*Registry);
-//	initializeLowerIntrinsicsPass(*Registry);
-//	initializeUnreachableBlockElimPass(*Registry);
-
-
-
-	RegisterTarget();
-	return (dCIL*)m_target.createTargetMachine(D_VIRTUAL_MACHINE_NAME, CPU, Features, Options);
-}
-
-void dCIL::RegisterTarget()
-{
-	if (!m_target.getName()) {
-		TargetRegistry::RegisterTarget(m_target, D_VIRTUAL_MACHINE_NAME, D_VIRTUAL_MACHINE_DESC, &getArchMatch, true);
-
-		RegisterTargetMachine<dCIL> dommy(m_target);
-/*
-		// Register assembler
-		RegisterMCAsmInfoFn A(m_target, createLSLAsmInfo);
-
-		// Register the MC codegen info.
-		RegisterMCCodeGenInfoFn C(m_target, createLSLCodeGenInfo);
-
-		// Register the MC instruction info.
-		TargetRegistry::RegisterMCInstrInfo(m_target, createLSLInstrInfo);
-
-		// Register the MC register info.
-		TargetRegistry::RegisterMCRegInfo(m_target, createLSLRegisterInfo);
-
-		// Register the MC subtarget info.
-		TargetRegistry::RegisterMCSubtargetInfo(m_target, X86_MC::createLSLSubtargetInfo);
-
-		// Register the MC instruction analyzer.
-		TargetRegistry::RegisterMCInstrAnalysis(m_target, createLSLInstrAnalysis);
-
-		// Register the code emitter.
-		TargetRegistry::RegisterMCCodeEmitter(m_target, createLSLCodeEmitter);
-
-		// Register the asm backend.
-		TargetRegistry::RegisterMCAsmBackend(m_target, createX86_32AsmBackend);
-
-		// Register the object streamer.
-		TargetRegistry::RegisterMCObjectStreamer(m_target, createMCStreamer);
-
-		// Register the MCInstPrinter.
-		TargetRegistry::RegisterMCInstPrinter(m_target, createLSLInstPrinter);
-
-		// Register the MC relocation info.
-		TargetRegistry::RegisterMCRelocationInfo(m_target, createLSLRelocationInfo);
-*/
-	}
-}
-
-bool dCIL::getArchMatch(Triple::ArchType Arch) 
-{
-	dAssert (0);
-//	return Arch == TargetArchType;
-	return true;
-}
-
-
-/*
 void dCIL::ResetTemporaries()
 {
 	m_tempIndex = 0;
@@ -161,7 +84,7 @@ void dCIL::Trace()
 	dTrace(("\n"));
 }
 
-
+/*
 bool dCIL::RemoveRedundantJumps(dListNode* const function)
 {
 	bool ret = false;
@@ -343,8 +266,11 @@ bool dCIL::RemoveNop(dListNode* const functionNode)
 
 
 
-void dCIL::Optimize(dListNode* const functionNode, int argumentInRegisters, dReturnType returnType)
+//void dCIL::Optimize(dListNode* const functionNode, int argumentInRegisters, dReturnType returnType)
+void dCIL::Optimize(dListNode* const functionNode, int argumentInRegisters)
 {
+	dAssert (0);
+
 	// remove all redundant newly generate extra jumps 
 	//RemoveRedundantJumps(functionNode);
 
@@ -369,8 +295,9 @@ void dCIL::Optimize(dListNode* const functionNode, int argumentInRegisters, dRet
 	}
 
 //	Trace();
-}
 
+}
 */
+
 
 

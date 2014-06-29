@@ -263,6 +263,7 @@ Expression
 	| Expression _ASS_AND Expression									{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
 	| Expression _ASS_XOR Expression									{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
 	| Expression _ASS_OR Expression										{$$ = MyModule->NewExpresionNodeAssigment ($1, $2, $3);} 
+*/
 	| Expression '+' Expression											{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);} 
 	| Expression '-' Expression											{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);} 
 	| Expression '*' Expression											{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);} 
@@ -282,7 +283,6 @@ Expression
 	| Expression _OP_DEC												{$$ = MyModule->NewExpresionNodePrefixPostfixOperator ($1, false, false);}
 	| _OP_INC Expression 												{$$ = MyModule->NewExpresionNodePrefixPostfixOperator ($2, true, true);}
 	| _OP_DEC Expression 												{$$ = MyModule->NewExpresionNodePrefixPostfixOperator ($2, true, false);}
-*/
 	| '(' Expression ')'												{$$ = $2;}
 	| FunctionCall		 												{$$ = $1;}
 	| ExpressionNew														{$$ = $1;}
@@ -305,7 +305,9 @@ ClassVariableExpression
 	| ClassVariableExpression '%' ClassVariableExpression				{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);}
 	| ClassVariableExpression '>' ClassVariableExpression				{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);} 
 	| ClassVariableExpression '<' ClassVariableExpression				{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);} 
+*/
 	| ClassVariableExpression _IDENTICAL ClassVariableExpression		{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);}
+/*
 	| ClassVariableExpression _DIFFERENT ClassVariableExpression		{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);}
 	| ClassVariableExpression _LESS_EQUAL ClassVariableExpression		{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);}
 	| ClassVariableExpression _GREATHER_EQUAL ClassVariableExpression	{$$ = MyModule->NewExpressionNodeBinaryOperator ($1, $2, $3);}

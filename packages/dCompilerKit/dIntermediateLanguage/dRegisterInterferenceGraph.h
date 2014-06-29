@@ -16,7 +16,7 @@
 #include "dCILstdafx.h"
 #include "dTreeAdressStmt.h"
 
-
+/*
 class dDataFlowGraph;
 class dRegisterInterferenceNode;
 
@@ -112,6 +112,6 @@ class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dStrin
 	int m_registerCount;
 	int m_spillPenatryFactor;
 };
-
+*/
 
 #endif

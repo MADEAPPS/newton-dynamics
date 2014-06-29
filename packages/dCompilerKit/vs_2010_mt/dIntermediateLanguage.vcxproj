@@ -145,10 +145,16 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\dIntermediateLanguage\dDataFlowGraph.cpp" />
+    <ClCompile Include="..\dIntermediateLanguage\dRegisterInterferenceGraph.cpp" />
+    <ClCompile Include="..\dIntermediateLanguage\dTreeAdressStmt.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\dIntermediateLanguage\dCIL.h" />
     <ClInclude Include="..\dIntermediateLanguage\dCILstdafx.h" />
+    <ClInclude Include="..\dIntermediateLanguage\dDataFlowGraph.h" />
+    <ClInclude Include="..\dIntermediateLanguage\dRegisterInterferenceGraph.h" />
+    <ClInclude Include="..\dIntermediateLanguage\dTreeAdressStmt.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\projects\visualStudio_2010_static_mt\dContainers.vcxproj">

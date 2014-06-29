@@ -28,24 +28,6 @@ class dDAGExpressionNodeVariable;
 class dDAGScopeBlockNode: public dDAGFunctionStatement
 {
 	public:
-	class dLocalVariables: public dList<dString>
-	{
-		public:
-		dLocalVariables()
-		{
-		}
-
-		bool FindVariable (const char* const name) const
-		{
-			for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
-				if (node->GetInfo() == name) {
-					return true;
-				}
-			}
-			return false;
-		}
-
-	};
 
 	dDAGScopeBlockNode(dList<dDAG*>& allNodes);
 	~dDAGScopeBlockNode(void);
@@ -54,19 +36,17 @@ class dDAGScopeBlockNode: public dDAGFunctionStatement
 
 	virtual void CompileCIL(dCIL& cil);
 	virtual void ConnectParent(dDAG* const parent);
-
-
 	void AddSize(int size) ;
 
+	void AddVariable (const dString& name, dTreeAdressStmt::dArgType type);
+	virtual dTree<dTreeAdressStmt::dArg, dString>::dTreeNode* FindVariable(const dString& name) const;
+
 	dDAGRtti(dDAGFunctionStatement);
-
-	int m_scopeLayer;
-
-	dList<dString> m_allocations;
-	dList<dDAGFunctionStatement*> m_statementList;
-
 	
-	dLocalVariables m_localVariablesFilter;
+	dList<dString> m_allocations;
+	dTree<dTreeAdressStmt::dArg, dString> m_localVariables;	
+	dList<dDAGFunctionStatement*> m_statementList;
+	int m_scopeLayer;
 };
 
 

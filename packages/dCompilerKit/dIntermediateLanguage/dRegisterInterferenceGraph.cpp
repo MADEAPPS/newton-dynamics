@@ -14,6 +14,7 @@
 #include "dDataFlowGraph.h"
 #include "dRegisterInterferenceGraph.h"
 
+#if 0
 
 #define D_SPILL_WEIGHT_FACTOR	10
 #define D_MOVE_WEIGHT_FACTOR	20
@@ -828,3 +829,5 @@ void dRegisterInterferenceGraph::ReWriteFunctionSpillingVarible(const dString& s
 	RemoveAll();
 	Build();
 }
+
+#endif

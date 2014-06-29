@@ -22,12 +22,11 @@ dDAGFunctionStatementFlow::dDAGFunctionStatementFlow(dList<dDAG*>& allNodes, dDA
 	:dDAGFunctionStatement(allNodes)
 	,m_currentBreakLabel()
 	,m_currentContinueLabel()
-//	,m_backPatchStart (NULL)
-//	,m_continueTarget (NULL)
+	,m_backPatchStart (NULL)
+	,m_continueTarget (NULL)
 	,m_testExpression (testExpression)
 	,m_loopBodyStmt (loopBodyStmt)
 {
-	dAssert (0);
 }
 
 
@@ -38,6 +37,7 @@ dDAGFunctionStatementFlow::~dDAGFunctionStatementFlow()
 
 void dDAGFunctionStatementFlow::ConnectParent(dDAG* const parent)
 {
+dAssert (0);
 	m_parent = parent;
 	if (m_loopBodyStmt) {
 		m_loopBodyStmt->ConnectParent(this);
@@ -50,12 +50,16 @@ void dDAGFunctionStatementFlow::ConnectParent(dDAG* const parent)
 
 
 
+void dDAGFunctionStatementFlow::CompileCIL(dCIL& cil)  
+{
+	m_backPatchStart = cil.GetLast();
+	m_currentBreakLabel = cil.NewLabel();
+	//m_currentContinueLabel = cil.NewLabel();
+	m_currentContinueLabel = "";
+}
 
 void dDAGFunctionStatementFlow::BackPatch (dCIL& cil)
 {
-	dAssert (0);
-	/*
-
 	if (!m_backPatchStart) {
 		m_backPatchStart = cil.GetFirst();
 	}
@@ -92,15 +96,11 @@ void dDAGFunctionStatementFlow::BackPatch (dCIL& cil)
 	}
 
 	m_continueTarget = NULL;
-*/
 }
 
 
 void dDAGFunctionStatementFlow::OpenPreHeaderBlock(dCIL& cil)
 {
-	dAssert (0);
-	/*
-
 	dDAGFunctionNode* const function = GetFunction();
 	function->m_loopLayer ++ ;
 
@@ -111,14 +111,10 @@ void dDAGFunctionStatementFlow::OpenPreHeaderBlock(dCIL& cil)
 	stmt.m_arg2.m_label = D_LOOP_HEADER_SYMBOL;
 	stmt.m_extraInformation = layer;
 	DTRACE_INTRUCTION (&stmt);
-*/
 }
 
 void dDAGFunctionStatementFlow::ClosePreHeaderBlock(dCIL& cil)
 {
-	dAssert (0);
-	/*
-
 	dDAGFunctionNode* const function = GetFunction();
 	int layer = function->m_loopLayer;
 
@@ -134,12 +130,14 @@ void dDAGFunctionStatementFlow::ClosePreHeaderBlock(dCIL& cil)
 	DTRACE_INTRUCTION (&stmt);
 
 	function->m_loopLayer --;
-*/
 }
 
-/*
+
 dCIL::dListNode* dDAGFunctionStatementFlow::CompileCILLoopBody(dCIL& cil, dDAGFunctionStatement* const posFixStmt)
 {
+dAssert (0);
+return NULL;
+	/*
 
 	OpenPreHeaderBlock(cil);
 
@@ -208,16 +206,5 @@ dCIL::dListNode* dDAGFunctionStatementFlow::CompileCILLoopBody(dCIL& cil, dDAGFu
 	exitLabelStmt.m_arg0.m_label = exitLabel;
 	DTRACE_INTRUCTION (&exitLabelStmt);
 	return exitLabelStmtNode;
-}
-*/
-
-void dDAGFunctionStatementFlow::CompileCIL(dCIL& cil)  
-{
-dAssert (0);
-/*
-	m_backPatchStart = cil.GetLast();
-	m_currentBreakLabel = cil.NewLabel();
-	//m_currentContinueLabel = cil.NewLabel();
-	m_currentContinueLabel = "";
 */
 }

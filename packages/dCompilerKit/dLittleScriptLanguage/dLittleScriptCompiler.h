@@ -33,9 +33,9 @@ class dDAGFunctionNode;
 class dDAGScopeBlockNode;
 class dLittleScriptLexical;
 
-using namespace llvm;
+//using namespace llvm;
 
-class dScriptCompiler: public dLittleScriptParser, public LLVMContext
+class dScriptCompiler: public dLittleScriptParser
 {
 	public:
 	dScriptCompiler(const char* const pakacgesRootNameDirectory);
@@ -115,12 +115,12 @@ class dScriptCompiler: public dLittleScriptParser, public LLVMContext
 	dUserVariable NewForStatement(const dUserVariable& init_exp, const dUserVariable& conditional, const dUserVariable& step_Exp, const dUserVariable& statement);
 
 
-//	dString m_packageFileName;
-//	dString m_packageRootDirectory;
-//	dScriptPackage* m_currentPackage;
-//	dDAGFunctionNode* m_currentFunction;
-//	dList<dDAGClassNode*> m_classList;
-//	dList<dDAGScopeBlockNode*> m_scopeStack;
+	dString m_packageFileName;
+	dString m_packageRootDirectory;
+	dScriptPackage* m_currentPackage;
+	dDAGFunctionNode* m_currentFunction;
+	dList<dDAGClassNode*> m_classList;
+	dList<dDAGScopeBlockNode*> m_scopeStack;
 	dList<dDAG*> m_allNodes;
 
 

@@ -132,8 +132,6 @@ void dDAGClassNode::ConnectParent(dDAG* const parent)
 
 void dDAGClassNode::CompileCIL(dCIL& cil)  
 {
-dAssert (0);
-/*
 	for (dList<dDAGExpressionClassVariable*>::dListNode* node = m_variables.GetFirst(); node; node = node->GetNext()) {
 		dDAGExpressionClassVariable* const variable = node->GetInfo();
 		variable->Evalue(cil);
@@ -145,24 +143,11 @@ dAssert (0);
 
 		dCIL::dListNode* const functionNode = cil.GetLast();
 		function->CompileCIL(cil);
-		cil.NewStatement();
-
-		dCIL::dReturnType returnType = dCIL::m_intRegister;
-		if (function->m_returnType->m_name == "void" ) {
-			returnType = dCIL::m_void;
-		} else if (function->m_returnType->m_name == "int" ) {
-			returnType = dCIL::m_intRegister;
-		} else if (function->m_returnType->m_name == "float") {
-			dAssert (0);
-		} else {
-			//dAssert (0);
-			returnType = dCIL::m_intRegister;
-		}
 
 		//cil.Optimize(functionNode->GetNext(), function->m_argumentsCount, returnType);
-		cil.Optimize(functionNode->GetNext(), 0, returnType);
+		//cil.Optimize(functionNode->GetNext(), 0, returnType);
+		function->BuildBasicBlocks (cil, functionNode->GetNext());
 	}
-*/
 }
 
 

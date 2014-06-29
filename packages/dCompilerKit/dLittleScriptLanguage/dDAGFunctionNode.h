@@ -23,9 +23,46 @@ class dDAGFunctionModifier;
 class dDAGFunctionNode: public dDAG
 {
 	public:
+	class dBasicBlock
+	{
+		public:
+		dBasicBlock (dCIL::dListNode* const begin)
+			:m_mark (0)
+			,m_begin (begin)
+			,m_end(NULL)
+		{
+		}
+		void Trace() const;
+
+		int m_mark;
+		dCIL::dListNode* m_begin;
+		dCIL::dListNode* m_end;
+	};
+
+	class dBasicBlocks: public dList<dBasicBlock> 
+	{
+		public:
+		dBasicBlocks()
+			:dList<dBasicBlock> ()
+		{
+		}
+/*
+		void Trace() const
+		{
+			#ifdef TRACE_INTERMEDIATE_CODE
+				for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
+					node->GetInfo().Trace();
+				}
+			#endif
+		}
+*/
+	};
+
+
 	dDAGFunctionNode(dList<dDAG*>& allNodes, dDAGTypeNode* const type, const char* const name, const char* const visibility);
 	~dDAGFunctionNode(void);
 
+	void BuildBasicBlocks(dCIL& cil, dCIL::dListNode* const functionNode);
 	void AddParameter(dDAGParameterNode* const parameter);
 	void SetBody(dDAGScopeBlockNode* const body);
 	void SetModifier(dDAGFunctionModifier* const modifier);
@@ -34,17 +71,20 @@ class dDAGFunctionNode: public dDAG
 	virtual void ConnectParent(dDAG* const parent);
 	dDAGParameterNode* FindArgumentVariable(const char* const name) const;
 
+	
+
 	bool m_isStatic;
 	bool m_isPublic;
 	bool m_isConstructor;
 	int m_loopLayer;
-	dString m_exitLabel;
 	dString m_opertatorThis;
 	dDAGTypeNode* m_returnType;
 	dDAGScopeBlockNode* m_body;
 	dDAGFunctionModifier* m_modifier;
-	
 	dList<dDAGParameterNode*> m_parameters; 
+	dBasicBlocks m_basicBlocks; 
+
+
 	dDAGRtti(dDAG);
 };
 

@@ -19,7 +19,7 @@
 dInitRtti(dDAGExpressionNodeConstant);
 dInitRtti(dDAGExpressionNodeOperatorThisConstant);
 
-dDAGExpressionNodeConstant::dDAGExpressionNodeConstant(dList<dDAG*>& allNodes, dCIL::dIntrisicType type, const char* const value)
+dDAGExpressionNodeConstant::dDAGExpressionNodeConstant(dList<dDAG*>& allNodes, dTreeAdressStmt::dArgType type, const char* const value)
 	:dDAGExpressionNode(allNodes)
 	,m_type(type)
 {
@@ -40,6 +40,8 @@ void dDAGExpressionNodeConstant::ConnectParent(dDAG* const parent)
 dCIL::dReturnValue dDAGExpressionNodeConstant::Evalue(dCIL& cil)
 {
 	dCIL::dReturnValue val;
+	dAssert (0);
+	/*
 
 	val.m_type = m_type;
 	switch (m_type) 
@@ -61,12 +63,12 @@ dCIL::dReturnValue dDAGExpressionNodeConstant::Evalue(dCIL& cil)
 		default:
 			dAssert (0);
 	}
+*/
 	return val;
 }
 
 void dDAGExpressionNodeConstant::CompileCIL(dCIL& cil)
 {
-dAssert (0);
 /*
 	dTreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
 	stmt.m_instruction = dTreeAdressStmt::m_assigment;
@@ -75,9 +77,10 @@ dAssert (0);
 
 	switch (m_type) 
 	{
-		case m_intValue:
+		case dTreeAdressStmt::m_int:
 		{
 			stmt.m_arg1.m_type = dTreeAdressStmt::m_intConst;
+			arg.m_type = 
 			break;
 		}
 
@@ -102,22 +105,20 @@ dAssert (0);
 	DTRACE_INTRUCTION (&stmt);
 	m_result = stmt.m_arg0;
 */
+	m_result.m_type = m_type;
+	m_result.m_label = m_name;
 }
 
 
 dDAGExpressionNodeOperatorThisConstant::dDAGExpressionNodeOperatorThisConstant (dList<dDAG*>& allNodes)
-	:dDAGExpressionNodeConstant(allNodes, dCIL::m_classPointer, "this")
+	:dDAGExpressionNodeConstant(allNodes, dTreeAdressStmt::m_classPointer, "this")
 {
 }
 
 
 void dDAGExpressionNodeOperatorThisConstant::CompileCIL(dCIL& cil)
 {
-	dAssert(0);
-	/*
-
 	dDAGFunctionNode* const function = GetFunction();
 	m_result.m_type = dTreeAdressStmt::m_classPointer;
 	m_result.m_label = function->m_opertatorThis;
-	*/
 }

@@ -55,73 +55,25 @@ void dDAGExpressionNodeFunctionCall::ConnectParent(dDAG* const parent)
 
 void dDAGExpressionNodeFunctionCall::CompileCIL(dCIL& cil)  
 {
-	dAssert (0);
-/*
 	dDAGClassNode* const myClass = GetClass();
 
 	for (dList<dDAGExpressionNode*>::dListNode* node = m_argumentList.GetLast(); node; node = node->GetPrev()) {
 		dDAGExpressionNode* const expNode = node->GetInfo();
 		expNode->CompileCIL(cil);
 		
-//		argumentsCount --;		
-//		if (argumentsCount < function->m_argumentsCount) {
-//			dTreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
-//			stmt.m_instruction = dTreeAdressStmt::m_push;
-//			stmt.m_arg0.m_label = GetTemporaryVariableName(argumentsCount + 1);
-//			DTRACE_INTRUCTION (&stmt);
-//
-//			dTreeAdressStmt& stmt1 = cil.NewStatement()->GetInfo();
-//			stmt1.m_instruction = dTreeAdressStmt::m_assigment;
-//			stmt1.m_arg0.m_label = stmt.m_arg0.m_label;
-//			stmt1.m_arg1 = expNode->m_result;
-//			DTRACE_INTRUCTION (&stmt1);
-//
-//		} else {
-			dTreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
-			stmt.m_instruction = dTreeAdressStmt::m_push;
-			stmt.m_arg0 = expNode->m_result;
-			DTRACE_INTRUCTION (&stmt);
-//		}
+		dTreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
+		stmt.m_instruction = dTreeAdressStmt::m_param;
+		stmt.m_arg0 = expNode->m_result;
+		DTRACE_INTRUCTION (&stmt);
 	}
 
-	dCIL::dReturnType returnTypeVal = dCIL::m_intRegister;
 	dDAGTypeNode* const returnType = myClass->GetFunctionReturnType(m_name.GetStr(), m_argumentList);
-	if (returnType->m_name == "void") {
-		returnTypeVal = dCIL::m_void;
-	} else if (returnType->m_name == "int") {
-		returnTypeVal = dCIL::m_intRegister;
-	} else {
-		dAssert (0);
-	}
 
-	m_result.m_label = cil.NewTemp ();		
+	m_result.m_label = cil.NewTemp ();
+	m_result.m_type = returnType->m_intrinsicType;
 	dTreeAdressStmt& call = cil.NewStatement()->GetInfo();
 	call.m_instruction = dTreeAdressStmt::m_call;
-	call.m_arg0.m_label = myClass->GetFunctionName (m_name.GetStr(), m_argumentList);
-	call.m_extraInformation = returnTypeVal;
+	call.m_arg0 = m_result;
+	call.m_arg1.m_label = myClass->GetFunctionName (m_name.GetStr(), m_argumentList);
 	DTRACE_INTRUCTION (&call);
-
-//	argumentsCount = 0;
-//	for (dList<dDAGExpressionNode*>::dListNode* node = m_argumentList.GetFirst(); node; node = node->GetNext()) {
-//		if (argumentsCount < function->m_argumentsCount) {
-//			dTreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
-//			stmt.m_instruction = dTreeAdressStmt::m_pop;
-//			stmt.m_arg0.m_label = GetTemporaryVariableName(argumentsCount + 1);
-//			DTRACE_INTRUCTION (&stmt);
-//		}
-//		argumentsCount ++;
-//	}
-
-	
-	if (returnTypeVal == dCIL::m_intRegister) {
-		dTreeAdressStmt& result = cil.NewStatement()->GetInfo();
-		result.m_instruction = dTreeAdressStmt::m_assigment;
-		result.m_arg0 = m_result;
-
-		result.m_arg1.m_label = GetReturnVariableName();
-		DTRACE_INTRUCTION (&result);
-	} else if (returnTypeVal == dCIL::m_floatRegister) {
-		_ASSERT (0);
-	}
-*/
 }

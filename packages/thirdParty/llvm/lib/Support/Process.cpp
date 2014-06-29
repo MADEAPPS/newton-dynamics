@@ -57,7 +57,7 @@ self_process::~self_process() {
 /// first time it was called. However, we arrange to have it called during the
 /// startup of the process to get approximately correct results.
 static TimeValue getElapsedWallTime() {
-  static TimeValue &StartTime = *new TimeValue(TimeValue::now());
+  static TimeValue StartTime = TimeValue(TimeValue::now());
   return TimeValue::now() - StartTime;
 }
 

@@ -21,7 +21,7 @@
 
 
 
-#define D_SCOPE_PREFIX		"scope" 
+//#define D_SCOPE_PREFIX		"scope" 
 
 
 class dDAGClassNode;
@@ -46,13 +46,17 @@ class dDAG
 	dDAGClassNode* GetClass() const;
 	dDAGScopeBlockNode* GetScope() const;
 	dDAGFunctionNode* GetFunction() const;
-	bool RenameLocalVariable(dCIL& cil, dString& variable) const;
+	virtual dTree<dTreeAdressStmt::dArg, dString>::dTreeNode* FindLocalVariable(const dString& name) const;
+
+	dTreeAdressStmt::dArg LoadLocalVariable (dCIL& cil, const dTreeAdressStmt::dArg& arg) const;
 	
 	dString m_name;
-//	dTreeAdressStmt::dArg m_result;
+	dTreeAdressStmt::dArg m_result;
 	dDAG* m_next;
 	dDAG* m_parent;
 	dList<dDAG*>::dListNode* m_myListNode;
+
+	static dString dScopePrefix;
 
 	dDAGRttiRootClassSupportDeclare(dDAG);
 	

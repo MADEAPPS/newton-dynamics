@@ -45,6 +45,12 @@ void dDAGParameterNode::SetType(dDAGTypeNode* const type)
 void dDAGParameterNode::ConnectParent(dDAG* const parent)  
 {
 	m_parent = parent;
+
+	dDAGScopeBlockNode* const scope = GetScope();
+	if (scope) {
+		scope->AddVariable (m_name, m_type->m_intrinsicType);
+	}
+
 	m_type->ConnectParent(this);
 //	if (m_initializationExp) {
 //		m_initializationExp->ConnectParent(this);
@@ -54,18 +60,14 @@ void dDAGParameterNode::ConnectParent(dDAG* const parent)
 
 void dDAGParameterNode::CompileCIL(dCIL& cil)  
 {
-	dAssert (0);
-	/*
-
-	char text[512];
 	dDAGScopeBlockNode* const scope = GetScope();
+	dTree<dTreeAdressStmt::dArg, dString>::dTreeNode* const varNameNode = scope->FindVariable(m_name);
+	dAssert (varNameNode);
 
-	sprintf (text, "%s%d%s", D_SCOPE_PREFIX, scope->m_scopeLayer, m_name.GetStr());
-	if (scope->m_localVariablesFilter.FindVariable (text)) {
-		dTrace (("duplicated local variable\n"));
-		dAssert (0);
-	}
-	m_name = text;
-	scope->m_localVariablesFilter.Append(m_name);
-*/
+	dTreeAdressStmt& fntArg = cil.NewStatement()->GetInfo();
+	fntArg.m_instruction = dTreeAdressStmt::m_local;
+	fntArg.m_arg0 = varNameNode->GetInfo();
+	fntArg.m_arg1 = fntArg.m_arg0;
+	m_result = fntArg.m_arg0;
+	DTRACE_INTRUCTION (&fntArg);
 }

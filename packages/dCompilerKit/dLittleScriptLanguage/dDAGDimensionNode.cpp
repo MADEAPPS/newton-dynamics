@@ -48,6 +48,7 @@ dDAG* dDAGDimensionNode::Clone (dList<dDAG*>& allNodes) const
 
 void dDAGDimensionNode::ConnectParent(dDAG* const parent)  
 {
+dAssert (0);
 	m_parent = parent;
 	if (m_dimExp) {
 		m_dimExp->ConnectParent(this);
@@ -56,13 +57,10 @@ void dDAGDimensionNode::ConnectParent(dDAG* const parent)
 
 void dDAGDimensionNode::CompileCIL(dCIL& cil)  
 {
-dAssert(0);
-/*
 	if (m_dimExp) {
 		m_dimExp->CompileCIL(cil) ;
 		m_result = m_dimExp->m_result;
 	} else {
 		dAssert (0);
 	}
-*/
 }

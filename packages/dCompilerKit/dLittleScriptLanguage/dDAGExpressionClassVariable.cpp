@@ -49,6 +49,7 @@ dCIL::dReturnValue dDAGExpressionClassVariable::Evalue(dCIL& cil)
 
 void dDAGExpressionClassVariable::ConnectParent(dDAG* const parent)
 {
+dAssert (0);
 	m_parent = parent;
 	m_expression->ConnectParent(this);
 }

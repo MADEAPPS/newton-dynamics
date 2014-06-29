@@ -16,6 +16,8 @@
 #include <io.h>
 #include <direct.h>
 
+
+
 #include <dCIL.h>
 #include <dCRC.h>
 #include <dTree.h>
@@ -24,8 +26,11 @@
 #include <dString.h>
 #include <dCILstdafx.h>
 #include <dRefCounter.h>
+#include <dDataFlowGraph.h>
 #include <dVirtualMachine.h>
+#include <dTreeAdressStmt.h>
 #include <dContainersStdAfx.h>
+
 
 #define D_DEBUG_PARCEL
 

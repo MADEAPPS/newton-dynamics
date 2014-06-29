@@ -36,59 +36,38 @@ void dDAGFunctionStatementReturn::ConnectParent(dDAG* const parent)
 	if (m_expression) {
 		m_expression->ConnectParent(this);
 	}
-
 }
 
 void dDAGFunctionStatementReturn::CompileCIL(dCIL& cil)
 {
-	dAssert (0);
-/*
-	dDAGFunctionNode* const function = GetFunction();
+	dTreeAdressStmt::dArg retValue;
+	retValue.m_type = dTreeAdressStmt::m_void;
 
 	if (m_expression) {
 		m_expression->CompileCIL(cil);
-		
-		dCIL::dReturnType returnTypeVal = dCIL::m_intRegister;
-		dDAGTypeNode* const returnType = function->m_returnType;
-		if (returnType->m_name == "void") {
-			returnTypeVal = dCIL::m_void;
-		} else if (returnType->m_name == "int") {
-			returnTypeVal = dCIL::m_intRegister;
-		} else if (returnType->m_name == "float") {
-			dAssert (0);
-		} else if (returnType->m_name == "double") {
-			dAssert (0);
-		} else {
-			returnTypeVal = dCIL::m_intRegister;
-		}
-
-		if (returnTypeVal == dCIL::m_intRegister) {
-			dTreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
-			stmt.m_instruction = dTreeAdressStmt::m_assigment;
-			stmt.m_arg0.m_label = GetReturnVariableName();
-
-			stmt.m_arg1 = m_expression->m_result;
-			DTRACE_INTRUCTION (&stmt);
-		} else if (returnTypeVal == dCIL::m_floatRegister) {
-			dAssert (0);
-		}
+		retValue = m_expression->m_result;
 	}
+
+	
 
 	for (dDAG* node = m_parent; node && (node->GetTypeId() != dDAGFunctionNode::GetRttiType()); node = node->m_parent) {
 		if (node->IsType(dDAGScopeBlockNode::GetRttiType())) {
 			dDAGScopeBlockNode* const scope = (dDAGScopeBlockNode*)node;
 			for (dList<dString>::dListNode* node = scope->m_allocations.GetLast(); node; node = node->GetPrev()) {
+				dAssert(0);
+/*
 				dTreeAdressStmt& allocationStmt = cil.NewStatement()->GetInfo();
 				allocationStmt.m_instruction = dTreeAdressStmt::m_release;
 				allocationStmt.m_arg0.m_label = node->GetInfo();
 				DTRACE_INTRUCTION (&allocationStmt);
+*/
 			}
 		}
 	}
 
+	dTreeAdressStmt::dArg arg1 (LoadLocalVariable(cil, retValue));
 	dTreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
-	stmt.m_instruction = dTreeAdressStmt::m_goto;
-	stmt.m_arg0.m_label = function->m_exitLabel;
+	stmt.m_instruction = dTreeAdressStmt::m_ret;
+	stmt.m_arg0 = arg1;
 	DTRACE_INTRUCTION (&stmt);
-*/
 }

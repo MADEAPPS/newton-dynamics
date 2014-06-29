@@ -238,18 +238,21 @@ class dDataFlowGraph
 
 
 
-	dDataFlowGraph(dCIL* const cil, dCIL::dListNode* const function, dCIL::dReturnType returnType);
+//	dDataFlowGraph(dCIL* const cil, dCIL::dListNode* const function, dCIL::dReturnType returnType);
+	dDataFlowGraph(dCIL* const cil, dCIL::dListNode* const function);
 	virtual ~dDataFlowGraph(void);
 
 	void ApplyLocalOptimizations();
 	void RegistersAllocation (int registerCount);
 
 	private:
+	void BuildBasicBlockGraph();
+
 	void CalculateReachingDefinitions();
 	void CalculateLiveInputLiveOutput();
 	void UpdateLiveInputLiveOutput();
 
-	void BuildBasicBlockGraph();
+	
 	void BuildGeneratedAndUsedlVariableSets();
 	void BuildGeneratedAndKillStatementSets();
 	void UpdateReachingDefinitions();
@@ -279,7 +282,7 @@ class dDataFlowGraph
 	mutable int m_mark;
 	int m_registersUsedMask;
 	dCIL* m_cil;
-	dCIL::dReturnType m_returnType;
+//	dCIL::dReturnType m_returnType;
 	dString m_returnVariableName;
 	dCIL::dListNode* m_function;
 	dBasicBlocks m_basicBlocks; 

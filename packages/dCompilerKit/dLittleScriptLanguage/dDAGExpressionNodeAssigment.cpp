@@ -43,23 +43,18 @@ dCIL::dReturnValue dDAGExpressionNodeAssigment::Evalue(dCIL& cil)
 	dAssert (!m_leftVariable->m_dimExpressions.GetCount());
 
 	if (m_leftVariable->m_type->m_intrinsicType != val.m_type) {
-		// see if is ok to do cast prom0tions
+		// see if is ok to do cast promotions
 		dAssert (0);
 	}
 	return val;
 }
 
-dDAGExpressionNodeVariable* dDAGExpressionNodeAssigment::FindLeftVariable()
-{
-	return m_leftVariable->FindLeftVariable();
-}
-
 void dDAGExpressionNodeAssigment::CompileCIL(dCIL& cil)  
 {
-	dAssert(0);
-/*
 	m_expression->CompileCIL(cil); 
 	if (m_leftVariable->m_dimExpressions.GetCount()) {
+		dAssert(0);
+/*
 		dString& variable (m_leftVariable->m_name);
 		int pos = variable.Find (D_SCOPE_PREFIX, 0, int (strlen (D_SCOPE_PREFIX)));
 		if (pos != 0) {
@@ -83,7 +78,6 @@ void dDAGExpressionNodeAssigment::CompileCIL(dCIL& cil)
 
 		for (dList<dDAGDimensionNode*>::dListNode* node = m_leftVariable->m_dimExpressions.GetFirst()->GetNext(); node; node = node->GetNext()) {
 			dAssert (0);
-#if 0
 			dDAGDimensionNode* const dim = node->GetInfo();
 			dim->CompileCIL(cil);
 			
@@ -106,7 +100,6 @@ void dDAGExpressionNodeAssigment::CompileCIL(dCIL& cil)
 			result = stmtAdd.m_arg0.m_label;
 
 			DTRACE_INTRUCTION (&stmtAdd);
-#endif
 		}
 
 		dAssert (m_parent);
@@ -142,15 +135,20 @@ void dDAGExpressionNodeAssigment::CompileCIL(dCIL& cil)
 			DTRACE_INTRUCTION (&tmp);
 			m_result.m_label = tmp.m_arg0.m_label; 
 		#endif
+*/
 	} else {
 		m_leftVariable->CompileCIL(cil); 
+		dTreeAdressStmt::dArg arg1 (LoadLocalVariable(cil, m_expression->m_result));
 		dTreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
-		stmt.m_instruction = dTreeAdressStmt::m_assigment;
+		stmt.m_instruction = (m_leftVariable->m_result.m_label.Find(dScopePrefix) == 0) ? dTreeAdressStmt::m_storeBase : stmt.m_instruction = dTreeAdressStmt::m_assigment;
 		stmt.m_arg0 = m_leftVariable->m_result;
-		stmt.m_arg1 = m_expression->m_result;
+		stmt.m_arg1 = arg1;
 		DTRACE_INTRUCTION (&stmt);
 	}
-*/
 }
 
 
+dDAGExpressionNodeVariable* dDAGExpressionNodeAssigment::FindLeftVariable()
+{
+	return m_leftVariable->FindLeftVariable();
+}

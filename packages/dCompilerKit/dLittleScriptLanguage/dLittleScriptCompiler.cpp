@@ -51,60 +51,52 @@
 #include "dScriptPackage.h"
 
 
-void* operator new (size_t size)
-{
-	void* const ptr = malloc (size);
-	return ptr;
-}
-
-
-
-
-static Function *CreateFibFunction(Module *M, LLVMContext &Context) 
+static llvm::Function *CreateFibFunction(llvm::Module *M, llvm::LLVMContext &Context) 
 {
 	// Create the fib function and insert it into module M. This function is said
 	// to return an int and take an int parameter.
-	Function *FibF = cast<Function>(M->getOrInsertFunction("fib", Type::getInt32Ty(Context), Type::getInt32Ty(Context), (Type *)0));
-
-	// Add a basic block to the function.
-	BasicBlock *BB = BasicBlock::Create(Context, "EntryBlock", FibF);
-
-	// Get pointers to the constants.
-	Value *One = ConstantInt::get(Type::getInt32Ty(Context), 1);
-	Value *Two = ConstantInt::get(Type::getInt32Ty(Context), 2);
+	llvm::Function *FibF = llvm::cast<llvm::Function>(M->getOrInsertFunction("fib", llvm::Type::getInt32Ty(Context), llvm::Type::getInt32Ty(Context), (llvm::Type *)0));
 
 	// Get pointer to the integer argument of the add1 function...
-	Argument *ArgX = FibF->arg_begin();   // Get the arg.
+	llvm::Argument *ArgX = FibF->arg_begin();   // Get the arg.
 	ArgX->setName("AnArg");            // Give it a nice symbolic name for fun.
 
+	// Add a basic block to the function.
+	llvm::BasicBlock *BB = llvm::BasicBlock::Create(Context, "EntryBlock", FibF);
+
+	// Get pointers to the constants.
+	llvm::Value *One = llvm::ConstantInt::get(llvm::Type::getInt32Ty(Context), 1);
+	llvm::Value *Two = llvm::ConstantInt::get(llvm::Type::getInt32Ty(Context), 2);
+
+
 	// Create the true_block.
-	BasicBlock *RetBB = BasicBlock::Create(Context, "return", FibF);
+	llvm::BasicBlock *RetBB = llvm::BasicBlock::Create(Context, "return", FibF);
 	// Create an exit block.
-	BasicBlock* RecurseBB = BasicBlock::Create(Context, "recurse", FibF);
+	llvm::BasicBlock* RecurseBB = llvm::BasicBlock::Create(Context, "recurse", FibF);
 
 	// Create the "if (arg <= 2) goto exitbb"
-	Value *CondInst = new ICmpInst(*BB, ICmpInst::ICMP_SLE, ArgX, Two, "cond");
-	BranchInst::Create(RetBB, RecurseBB, CondInst, BB);
+	llvm::Value *CondInst = new llvm::ICmpInst(*BB, llvm::ICmpInst::ICMP_SLE, ArgX, Two, "cond");
+	llvm::BranchInst::Create(RetBB, RecurseBB, CondInst, BB);
 
 	// Create: ret int 1
-	ReturnInst::Create(Context, One, RetBB);
+	llvm::ReturnInst::Create(Context, One, RetBB);
 
 	// create fib(x-1)
-	Value *Sub = BinaryOperator::CreateSub(ArgX, One, "arg", RecurseBB);
-	CallInst *CallFibX1 = CallInst::Create(FibF, Sub, "fibx1", RecurseBB);
+	llvm::Value *Sub = llvm::BinaryOperator::CreateSub(ArgX, One, "arg", RecurseBB);
+	llvm::CallInst *CallFibX1 = llvm::CallInst::Create(FibF, Sub, "fibx1", RecurseBB);
 	CallFibX1->setTailCall();
 
 	// create fib(x-2)
-	Sub = BinaryOperator::CreateSub(ArgX, Two, "arg", RecurseBB);
-	CallInst *CallFibX2 = CallInst::Create(FibF, Sub, "fibx2", RecurseBB);
+	Sub = llvm::BinaryOperator::CreateSub(ArgX, Two, "arg", RecurseBB);
+	llvm::CallInst *CallFibX2 = llvm::CallInst::Create(FibF, Sub, "fibx2", RecurseBB);
 	CallFibX2->setTailCall();
 
 
 	// fib(x-1)+fib(x-2)
-	Value *Sum = BinaryOperator::CreateAdd(CallFibX1, CallFibX2, "addresult", RecurseBB);
+	llvm::Value *Sum = llvm::BinaryOperator::CreateAdd(CallFibX1, CallFibX2, "addresult", RecurseBB);
 
 	// Create the return instruction and add it to the basic block
-	ReturnInst::Create(Context, Sum, RecurseBB);
+	llvm::ReturnInst::Create(Context, Sum, RecurseBB);
 
 	return FibF;
 }
@@ -113,57 +105,58 @@ static Function *CreateFibFunction(Module *M, LLVMContext &Context)
 
 dScriptCompiler::dScriptCompiler(const char* const pakacgesRootNameDirectory)
 	:dLittleScriptParser ()
-	,LLVMContext()
-//	,m_packageRootDirectory (pakacgesRootNameDirectory)
+//	,LLVMContext()
+	,m_packageRootDirectory (pakacgesRootNameDirectory)
 //	,m_currentPackage(NULL)
 //	,m_currentFunction(NULL)
-//	,m_classList()
-//	,m_scopeStack()
+	,m_classList()
+	,m_scopeStack()
 	,m_allNodes()
 {
 
-//	_mkdir(m_packageRootDirectory.GetStr());
-
+	_mkdir(m_packageRootDirectory.GetStr());
 
 //	InitializeNativeTarget();
-OwningPtr<Module> M(new Module("test", *this));
+llvm::LLVMContext context;
+llvm::OwningPtr<llvm::Module> M(new llvm::Module("test", context));
+//IRBuilder<> builder (*this);
 
-Function* FibF = CreateFibFunction(M.get(), *this);
+llvm::Function* FibF = CreateFibFunction(M.get(), context);
 
-if (verifyModule(*M)) {
-	errs() << ": Error constructing function!\n";
+if (llvm::verifyModule(*M)) {
+	llvm::errs() << ": Error constructing function!\n";
 	dAssert (0);
 }
-errs() << *M;
+llvm::errs() << *M;
 
 
-
+/*
 //formatted_raw_ostream out;
-std::string errorInfo;
-raw_fd_ostream out ("xxxxxxx.bc", errorInfo);
-WriteBitcodeToFile (M.get(), out);
-out.close();
-
+//std::string errorInfo;
+//raw_fd_ostream out ("xxxxxxx.bc", errorInfo);
+//WriteBitcodeToFile (M.get(), out);
+//out.close();
+//formatted_raw_ostream input;
+//ReadBitcodeToFile (M.get(), input);
 //dCIL* const cil = dCIL::CreateTargetMachine();
 //scripClass->CompileCIL (cil);
 
-
+M->dump();
 
 	dAssert (0);
+*/
 }
 
 dScriptCompiler::~dScriptCompiler()
 {
-dAssert (0);
-/*
 	for(dList<dDAG*>::dListNode* nodePtr = m_allNodes.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext() ) {
 		dDAG* const node = nodePtr->GetInfo();
 		delete node;
 	}
-
+/*
 	if (m_currentPackage) {
+		dAssert (0);
 		m_currentPackage->Save (m_packageFileName.GetStr());
-
 		delete m_currentPackage;
 	}
 */
@@ -229,28 +222,35 @@ int dScriptCompiler::CompileSource (const char* const source)
 	dLittleScriptLexical scanner (source);
 
 	bool status = Parse(scanner);
-/*
+
 	if (status) {
 		for (dList<dDAGClassNode*>::dListNode* node = m_classList.GetFirst(); node; node = node->GetNext()) {
 			dDAGClassNode* const scripClass =  node->GetInfo();
 			scripClass->ConnectParent (NULL);
 		}
 
-		
+//		llvm::OwningPtr<llvm::Module> llvmModule (new llvm::Module("test", *this));
+//		dCIL cil(llvmModule.get(), this);
+		dCIL cil;
+
 		for (dList<dDAGClassNode*>::dListNode* node = m_classList.GetFirst(); node; node = node->GetNext()) {
 			dDAGClassNode* const scripClass = node->GetInfo();
-			dCIL cil;
 			scripClass->CompileCIL (cil);
-
-			dTrace(("\n"));
-			dTrace(("optimized version\n"));
-			cil.Trace();
+//			dTrace(("\n"));
+//			dTrace(("optimized version\n"));
+//			cil.Trace();
 
 			//_ASSERTE (m_currentPackage);
-			//m_currentPackage->AddClass(scripClass, cil);
+//			//m_currentPackage->AddClass(scripClass, cil);
 		}
+
+//		if (llvm::verifyModule(*llvmModule)) {
+//			llvm::errs() << ": Error constructing function!\n";
+//			dAssert (0);
+//		}
+//		llvm::errs() << *llvmModule;
+
 	}
-*/
 	return 0;
 }
 
@@ -265,32 +265,27 @@ void dScriptCompiler::ImportAllClasses (const dString& className)
 
 dDAGScopeBlockNode* dScriptCompiler::GetCurrentScope() const
 {
-dAssert (0);
-return NULL;
-/*
 	dAssert (m_scopeStack.GetCount());
 	return m_scopeStack.GetLast()->GetInfo();
-*/
 }
 
 
 dScriptCompiler::dUserVariable dScriptCompiler::NewExpressionNodeConstant (const dUserVariable& value)
 {
 	dUserVariable returnNode;
-
-	dCIL::dIntrisicType type = dCIL::m_int;
+	dTreeAdressStmt::dArgType type = dTreeAdressStmt::m_int;
 	switch (int (value.m_token))
 	{
 		case _THIS:
-			type = dCIL::m_classPointer;
+			type = dTreeAdressStmt::m_classPointer;
 			break;
 
 		case _FLOAT_CONST:
-			type = dCIL::m_double;
+			type = dTreeAdressStmt::m_double;
 			break;
 
 		case _INTEGER_CONST:
-			type = dCIL::m_int;
+			type = dTreeAdressStmt::m_int;
 			break;
 
 //		case STRING_VALUE:
@@ -303,6 +298,7 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewExpressionNodeConstant (const
 
 	dDAGExpressionNodeConstant* const node = new dDAGExpressionNodeConstant (m_allNodes, type, value.m_data.GetStr());
 	returnNode.m_node = node;
+
 	return returnNode;
 }
 
@@ -426,22 +422,17 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewExpressionNodeLogiOperator (c
 
 dDAGClassNode* dScriptCompiler::GetCurrentClass() const
 {
-dAssert (0);
-return NULL;
-//	dAssert (m_classList.GetCount());
-//	return m_classList.GetLast()->GetInfo();
+	dAssert (m_classList.GetCount());
+	return m_classList.GetLast()->GetInfo();
 }
 
 dScriptCompiler::dUserVariable dScriptCompiler::CreateClass (const dString& visibility, const dString& callType, const dString& className, const dString& superClassName, const dString& interfaces)
 {
 	dUserVariable returnNode;
-dAssert (0);
-/*
 	dDAGClassNode* const classNode = new dDAGClassNode (m_allNodes);
 	m_classList.Append(classNode);
 	returnNode.m_node = classNode;
 	classNode->FinalizeImplementation (visibility.GetStr(), className.GetStr(), NULL);
-*/
 	return returnNode;
 }
 
@@ -573,12 +564,9 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewParameterNode (const dUserVar
 dScriptCompiler::dUserVariable dScriptCompiler::BeginScopeBlock ()
 {
 	dUserVariable returnNode;
-	dAssert (0);
-/*
 	dDAGScopeBlockNode* const scope = new dDAGScopeBlockNode (m_allNodes);
 	m_scopeStack.Append(scope);
 	returnNode.m_node = scope;
-*/
 	return returnNode;
 }
 
@@ -607,9 +595,7 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewVariableStatement (const dStr
 dScriptCompiler::dUserVariable dScriptCompiler::NewVariableToCurrentBlock (const dString& modifiers, const dUserVariable& type, const dString& name)
 {
 	dUserVariable variableName(NewVariableStatement (name, modifiers));
-return variableName;
-dAssert (0);
-/*
+
 	dDAGParameterNode* const variableNameNode = (dDAGParameterNode*)variableName.m_node;
 	dAssert (variableNameNode->IsType(dDAGParameterNode::GetRttiType()));
 
@@ -626,7 +612,6 @@ dAssert (0);
 	dDAGExpressionNodeVariable* const node = (dDAGExpressionNodeVariable*) returnNode.m_node;
 	node->SetType((dDAGTypeNode*) typeNode->Clone (m_allNodes));
 	return returnNode;
-*/
 }
 
 
@@ -767,11 +752,8 @@ dAssert (0);
 dScriptCompiler::dUserVariable dScriptCompiler::EndScopeBlock ()
 {
 	dUserVariable returnNode;
-dAssert(0);
-/*
 	returnNode.m_node = GetCurrentScope();
 	m_scopeStack.Remove(m_scopeStack.GetLast());
-*/
 	return returnNode;
 }
 

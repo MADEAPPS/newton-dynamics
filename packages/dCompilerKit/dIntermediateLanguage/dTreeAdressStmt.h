@@ -27,17 +27,34 @@ class dTreeAdressStmt
 	public:
 	enum dArgType
 	{
-		m_intVar,
-		m_floatVar,
-		m_intConst,
-		m_floatConst,
+//		m_intVar,
+//		m_floatVar,
+//		m_intConst,
+//		m_floatConst,
+//		m_classPointer,
+
+		m_void,
+		m_bool,
+		m_byte,
+		m_short,
+		m_int,
+		m_long,
+		m_float,
+		m_double,
 		m_classPointer,
 	};
+
+	struct dMapTable 
+	{
+		dTreeAdressStmt::dArgType m_type;
+		dString m_name;
+	};
+
 
 	struct dArg
 	{
 		dArg ()
-			:m_type (m_intVar)
+			:m_type (m_int)
 			,m_label("")
 		{
 		}
@@ -73,9 +90,9 @@ class dTreeAdressStmt
 		m_release,
         m_reference,
 		m_if, 
-		m_enter,
-		m_leave,
 		m_function,
+		m_local,
+		m_param,
 		m_argument,
 		m_load,
 		m_store,
@@ -84,8 +101,6 @@ class dTreeAdressStmt
 		m_label,
 		m_loadBase,
 		m_storeBase,
-		m_push,
-		m_pop,
 	};
 	dTreeAdressStmt(void);
 	~dTreeAdressStmt(void);
@@ -107,6 +122,10 @@ class dTreeAdressStmt
 	void Trace (char* const textOut) const;
 	void TraceAssigment (char* const textOut) const;
 	void TraceConditional (char* const textOut) const;
+
+	const char* GetTypeString (const dArg& arg) const;
+
+	static dMapTable m_maptable[];
 };
 
 

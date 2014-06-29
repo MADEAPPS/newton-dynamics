@@ -13,6 +13,7 @@
 #include "dDAG.h"
 #include "dDAGTypeNode.h"
 #include "dDAGClassNode.h"
+#include "dDAGFunctionNode.h"
 #include "dDAGDimensionNode.h"
 #include "dDAGScopeBlockNode.h"
 #include "dDAGExpressionNodeVariable.h"
@@ -77,6 +78,8 @@ void dDAGExpressionNodeVariable::InitParam (const dDAGExpressionNodeVariable& so
 void dDAGExpressionNodeVariable::ConnectParent(dDAG* const parent)  
 {
 	m_parent = parent;
+
+	dAssert (FindLocalVariable(m_name));
 	if (m_type) {
 		m_type->ConnectParent(this);
 	}
@@ -105,28 +108,12 @@ dCIL::dReturnValue dDAGExpressionNodeVariable::Evalue(dCIL& cil)
 	return val;
 }
 
-
-dDAGExpressionNodeVariable* dDAGExpressionNodeVariable::FindLeftVariable()
-{
-	return this;
-}
-
-
 void dDAGExpressionNodeVariable::CompileCIL(dCIL& cil)
 {
-dAssert (0);
-/*
-	dString variable (m_name);
-	int pos = variable.Find (D_SCOPE_PREFIX, 0, int (strlen (D_SCOPE_PREFIX)));
-	if (pos != 0) {
-		bool state = RenameLocalVariable(cil, variable);
-		if (!state) {
-			dTrace (("undefined local variable\n"));
-			dAssert (0);
-		}
-	}
-
+//	dDAGFunctionNode* const function = GetFunction();
 	if (m_dimExpressions.GetCount()) {
+		dAssert(0);
+/*
 		dDAGDimensionNode* const dim = m_dimExpressions.GetFirst()->GetInfo();
 		dim->CompileCIL(cil);
 		dCIL::dListNode* const dimInstruction = cil.NewStatement();
@@ -140,7 +127,7 @@ dAssert (0);
 
 		for (dList<dDAGDimensionNode*>::dListNode* node = m_dimExpressions.GetFirst()->GetNext(); node; node = node->GetNext()) {
 			dAssert (0);
-#if 0
+
 			dDAGDimensionNode* const dim = node->GetInfo();
 			dim->CompileCIL(cil);
 			
@@ -163,7 +150,6 @@ dAssert (0);
 			result = stmtAdd.m_arg0.m_label;
 
 			DTRACE_INTRUCTION (&stmtAdd);
-#endif
 		}
 
 		dAssert (m_parent);
@@ -200,12 +186,27 @@ dAssert (0);
 			DTRACE_INTRUCTION (&tmp);
 			m_result.m_label = tmp.m_arg0.m_label; 
 	   #endif
-
+*/
 
 	} else {
-		//m_result.m_label = m_name;
-		m_result.m_label = variable;
-	}
+		dTree<dTreeAdressStmt::dArg, dString>::dTreeNode* const variable = dDAG::FindLocalVariable(m_name);
+		dAssert (variable);
+		m_result = variable->GetInfo();
+/*
+		dTreeAdressStmt& loadVar = cil.NewStatement()->GetInfo();
+		loadVar.m_instruction = dTreeAdressStmt::m_loadBase;
+		loadVar.m_arg1 = variable->GetInfo();
+		loadVar.m_arg0.m_label = cil.NewTemp();
+		loadVar.m_arg0.m_type = loadVar.m_arg1.m_type;
+		m_result = loadVar.m_arg0;
+		DTRACE_INTRUCTION (&loadVar);
 */
+	}
+}
+
+
+dDAGExpressionNodeVariable* dDAGExpressionNodeVariable::FindLeftVariable()
+{
+	return this;
 }
 

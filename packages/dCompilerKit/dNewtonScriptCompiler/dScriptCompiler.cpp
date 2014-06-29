@@ -14,14 +14,32 @@
 #include <crtdbg.h>
 #endif
 
+void *operator new(size_t s) 
+{
+	static int installmemmoryLeaksTracker = 1;
+	if (installmemmoryLeaksTracker) {
+		installmemmoryLeaksTracker = 0;
+		#ifdef _MSC_VER
+			_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+		#endif
+	}
+	void* const mem = malloc (s);
+	unsigned long xxx = unsigned long (mem);
+	if (((xxx & 0xffff) == 0xEF90) && (s == 12))
+		dAssert(0);
+	return mem;
+}
+
+void operator delete (void* ptr) 
+{
+//	unsigned long xxx = unsigned long (ptr);
+//	if (((xxx & 0xffff) == 0x3DF0))
+//		dAssert(0);
+	free (ptr);
+}
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	#ifdef _MSC_VER
-		_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
-	#endif
-
-
 	if (argc < 2) {
 		fprintf (stdout, "usage: dNewtonScriptCompiler filename\n");
 		exit (0);
@@ -41,6 +59,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	const char* const packacgeName = "demos";
 	dScriptCompiler compiler(packacgeName);
 	compiler.CompileSource (source.GetStr());
+
+	llvm::llvm_shutdown();
 	return 0;
 }
 

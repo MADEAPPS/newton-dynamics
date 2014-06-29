@@ -33,6 +33,7 @@ dDAGExpressionNodeNew::~dDAGExpressionNodeNew(void)
 
 void dDAGExpressionNodeNew::ConnectParent(dDAG* const parent)  
 {
+dAssert (0);
 	m_parent = parent;
 	m_dimension->ConnectParent(this)  ;
 }
@@ -40,8 +41,9 @@ void dDAGExpressionNodeNew::ConnectParent(dDAG* const parent)
 
 void dDAGExpressionNodeNew::CompileCIL(dCIL& cil)
 {
-dAssert(0);
-/*
+	dAssert (0);
+	/*
+
 	m_dimension->CompileCIL(cil);
 
 	dTreeAdressStmt& arraySizeInBytes = cil.NewStatement()->GetInfo();

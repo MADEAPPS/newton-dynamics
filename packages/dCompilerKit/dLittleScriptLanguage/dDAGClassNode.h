@@ -47,7 +47,7 @@ class dDAGClassNode: public dDAG
 	const dDAGClassNode* m_baseClass;
 	dList<dDAGFunctionNode*> m_functionList;
 	dList<dDAGFunctionNode*> m_constructors;
-//	dList<dCIL::dListNode*> m_cilCodeList;
+	dList<dCIL::dListNode*> m_cilCodeList;
 	dList<dDAGExpressionClassVariable*> m_variables;
 	dDAGRtti(dDAG);
 };

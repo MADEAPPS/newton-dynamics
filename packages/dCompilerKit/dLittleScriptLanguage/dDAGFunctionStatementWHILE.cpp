@@ -31,14 +31,15 @@ dDAGFunctionStatementWHILE::~dDAGFunctionStatementWHILE()
 
 void dDAGFunctionStatementWHILE::ConnectParent(dDAG* const parent)
 {
+dAssert (0);
 	dDAGFunctionStatementFlow::ConnectParent(parent);
 }
 
 
 void dDAGFunctionStatementWHILE::CompileCIL(dCIL& cil)  
 {
-	dAssert (0);
-	/*
+dAssert (0);
+/*
 	dCIL::dListNode* startExpressionTestNode = NULL;
 	if (m_testExpression) {
 		m_testExpression->CompileCIL(cil);

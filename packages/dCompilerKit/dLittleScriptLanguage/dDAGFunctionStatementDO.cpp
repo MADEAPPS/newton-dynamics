@@ -30,15 +30,12 @@ dDAGFunctionStatementDO::~dDAGFunctionStatementDO()
 
 void dDAGFunctionStatementDO::ConnectParent(dDAG* const parent)
 {
+dAssert (0);
 	dDAGFunctionStatementFlow::ConnectParent(parent);
 }
 
 
 void dDAGFunctionStatementDO::CompileCIL(dCIL& cil)  
 {
-	dAssert (0);
-	/*
-
 	CompileCILLoopBody(cil, NULL);
-*/
 }

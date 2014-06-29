@@ -30,5 +30,6 @@ dDAGFunctionModifier::~dDAGFunctionModifier(void)
 
 void dDAGFunctionModifier::ConnectParent(dDAG* const parent)
 {
+dAssert (0);
 	m_parent = parent;
 }

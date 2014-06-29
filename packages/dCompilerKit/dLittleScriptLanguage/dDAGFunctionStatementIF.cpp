@@ -47,24 +47,14 @@ void dDAGFunctionStatementIF::ConnectParent(dDAG* const parent)
 
 void dDAGFunctionStatementIF::CompileCIL(dCIL& cil)  
 {
-	dAssert (0);
-	/*
-
 	m_expression->CompileCIL(cil);
-
-	dTreeAdressStmt& tmpTest = cil.NewStatement()->GetInfo();
-	tmpTest.m_instruction = dTreeAdressStmt::m_assigment;
-	tmpTest.m_operator = dTreeAdressStmt::m_nothing;
-	tmpTest.m_arg0.m_label = cil.NewTemp();
-	tmpTest.m_arg1.m_type = dTreeAdressStmt::m_intConst;
-	tmpTest.m_arg1.m_label = "0"; 
-	DTRACE_INTRUCTION (&tmpTest);
 
 	dTreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
 	stmt.m_instruction = dTreeAdressStmt::m_if;
 	stmt.m_operator = dTreeAdressStmt::m_identical;
 	stmt.m_arg0 = m_expression->m_result;
-	stmt.m_arg1 = tmpTest.m_arg0;
+	stmt.m_arg1.m_label = "0";
+	stmt.m_arg1.m_type = stmt.m_arg0.m_type;
 	stmt.m_arg2.m_label = cil.NewLabel();
 	DTRACE_INTRUCTION (&stmt);
 
@@ -74,16 +64,22 @@ void dDAGFunctionStatementIF::CompileCIL(dCIL& cil)
 	DTRACE_INTRUCTION (&dommyLabel);
 
 	m_thenStmt->CompileCIL(cil);
-
 	if (!m_elseStmt) {
+		dTreeAdressStmt& gotoStmt = cil.NewStatement()->GetInfo();
 		stmt.m_jmpTarget = cil.NewStatement();
-		dTreeAdressStmt& jmpTarget = stmt.m_jmpTarget->GetInfo();
 
+		gotoStmt.m_instruction = dTreeAdressStmt::m_goto;
+		gotoStmt.m_arg0.m_label = stmt.m_arg2.m_label;
+		gotoStmt.m_jmpTarget = stmt.m_jmpTarget;
+		DTRACE_INTRUCTION (&gotoStmt);
+		
+		dTreeAdressStmt& jmpTarget = stmt.m_jmpTarget->GetInfo();
 		jmpTarget.m_instruction = dTreeAdressStmt::m_label;
 		jmpTarget.m_arg0.m_label = stmt.m_arg2.m_label;
 		DTRACE_INTRUCTION (&jmpTarget);
 
 	} else {
+dAssert (0);
 		dTreeAdressStmt& gotoStmt = cil.NewStatement()->GetInfo();
 		gotoStmt.m_instruction = dTreeAdressStmt::m_goto;
 		gotoStmt.m_arg0.m_label = cil.NewLabel();
@@ -91,19 +87,22 @@ void dDAGFunctionStatementIF::CompileCIL(dCIL& cil)
 
 		stmt.m_jmpTarget = cil.NewStatement();
 		dTreeAdressStmt& jmpTarget = stmt.m_jmpTarget->GetInfo();
-
 		jmpTarget.m_instruction = dTreeAdressStmt::m_label;
 		jmpTarget.m_arg0.m_label = stmt.m_arg2.m_label;
 		DTRACE_INTRUCTION (&jmpTarget);
 
 		m_elseStmt->CompileCIL(cil);
 
+		dTreeAdressStmt& gotoStmtElse = cil.NewStatement()->GetInfo();
+		gotoStmtElse.m_instruction = dTreeAdressStmt::m_goto;
+		gotoStmtElse.m_arg0.m_label = gotoStmt.m_arg0.m_label;
+		DTRACE_INTRUCTION (&gotoStmtElse);
+
 		gotoStmt.m_jmpTarget = cil.NewStatement();
 		dTreeAdressStmt& gotoTarget = gotoStmt.m_jmpTarget->GetInfo();
-
 		gotoTarget.m_instruction = dTreeAdressStmt::m_label;
 		gotoTarget.m_arg0.m_label = gotoStmt.m_arg0.m_label;
 		DTRACE_INTRUCTION (&gotoTarget);
 	}
-*/
+
 }

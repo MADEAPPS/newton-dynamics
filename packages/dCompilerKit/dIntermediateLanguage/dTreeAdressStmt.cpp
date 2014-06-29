@@ -16,6 +16,20 @@
 int dTreeAdressStmt::m_debugCount = 0;
 #endif
 
+
+dTreeAdressStmt::dMapTable dTreeAdressStmt::m_maptable[] = {
+	{dTreeAdressStmt::m_void, "void"}, 
+	{dTreeAdressStmt::m_bool, "bool"}, 
+	{dTreeAdressStmt::m_byte, "byte"}, 
+	{dTreeAdressStmt::m_short, "short"}, 
+	{dTreeAdressStmt::m_int, "int"}, 
+	{dTreeAdressStmt::m_long, "long"}, 
+	{dTreeAdressStmt::m_float, "float"}, 
+	{dTreeAdressStmt::m_double, "double"}, 
+	{dTreeAdressStmt::m_classPointer, "classPointer"}
+};
+
+
 dTreeAdressStmt::dTreeAdressStmt(void)
 	:m_instruction(m_nop)
 	,m_operator(m_nothing)
@@ -35,6 +49,10 @@ dTreeAdressStmt::~dTreeAdressStmt(void)
 {
 }
 
+const char* dTreeAdressStmt::GetTypeString (const dArg& arg) const
+{
+	return m_maptable[arg.m_type].m_name.GetStr();
+}
 
 void dTreeAdressStmt::TraceAssigment (char* const text) const
 {
@@ -133,7 +151,7 @@ void dTreeAdressStmt::TraceAssigment (char* const text) const
 
 	}
 
-	sprintf(text, "\t%s = %s%s%s\n", m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), assignOperator, m_arg2.m_label.GetStr() );
+	sprintf(text, "\t%s %s = %s%s%s\n", GetTypeString(m_arg0), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), assignOperator, m_arg2.m_label.GetStr() );
 }
 
 void dTreeAdressStmt::TraceConditional (char* const textOut) const
@@ -184,24 +202,41 @@ void dTreeAdressStmt::Trace (char* const textOut) const
 	textOut[0] = 0;
 	switch (m_instruction)
 	{
-		case m_enter:
-		{
-			sprintf (textOut, "\tenter %d\n", m_extraInformation);
-			break;
-		}
-
-		case m_leave:
-		{
-			sprintf (textOut, "\tleave %d\n", m_extraInformation);
-			break;
-		}
-
-
 		case m_function:
 		{
-			sprintf (textOut, "\nfunction %s\n", m_arg0.m_label.GetStr());
+			//sprintf (textOut, "\nfunction %s\n", m_arg0.m_label.GetStr());
+			sprintf (textOut, "\nfunction %s %s\n", GetTypeString(m_arg0), m_arg0.m_label.GetStr());
 			break;
 		}
+
+		case m_argument:
+		{
+			sprintf (textOut, "\targument %s %s\n", GetTypeString(m_arg0), m_arg0.m_label.GetStr());
+			break;
+		}
+
+		case m_local:
+		{
+			sprintf (textOut, "\tlocal %s %s\n", GetTypeString(m_arg0), m_arg0.m_label.GetStr());
+			break;
+		}
+
+
+		case m_ret:
+		{
+			//sprintf (textOut, "\tret %d\n", m_extraInformation);
+			sprintf (textOut, "\tret %s %s\n", GetTypeString(m_arg0), m_arg0.m_label.GetStr());
+			break;
+		}
+
+		case m_call:
+		{
+			sprintf (textOut, "\t%s %s = call %s\n", GetTypeString(m_arg0), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
+			break;
+		}
+
+
+
 
 		case m_assigment:
 		{
@@ -229,32 +264,19 @@ void dTreeAdressStmt::Trace (char* const textOut) const
 
 		case m_loadBase:
 		{
-			sprintf (textOut, "\t%s = [%s]\n", m_arg0.m_label.GetStr(), m_arg2.m_label.GetStr());
+			sprintf (textOut, "\t%s %s = [%s]\n", GetTypeString(m_arg0), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
 			break;
 		}
 
 		case m_storeBase:
 		{
-			sprintf (textOut, "\t[%s] = %s\n", m_arg2.m_label.GetStr(), m_arg0.m_label.GetStr());
+			sprintf (textOut, "\t[%s] = %s %s\n", m_arg0.m_label.GetStr(), GetTypeString(m_arg1), m_arg1.m_label.GetStr());
 			break;
 		}
 
-
-		case m_argument:
+		case m_param:
 		{
-			sprintf (textOut, "\targument %s\t; passed on the stack frame %s\n", m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
-			break;
-		}
-
-		case m_push:
-		{
-			sprintf (textOut, "\tpush %s\n", m_arg0.m_label.GetStr());
-			break;
-		}
-
-		case m_pop:
-		{
-			sprintf (textOut, "\tpop %s\n", m_arg0.m_label.GetStr());
+			sprintf (textOut, "\tparam %s %s\n", GetTypeString(m_arg0), m_arg0.m_label.GetStr());
 			break;
 		}
 
@@ -280,12 +302,6 @@ void dTreeAdressStmt::Trace (char* const textOut) const
 			break;
 		}
 
-		case m_call:
-		{
-			sprintf (textOut, "\tcall %s\n", m_arg0.m_label.GetStr());
-			break;
-		}
-		
 		case m_new:
 		{
 			sprintf (textOut, "\t%s = new %s\n", m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
@@ -305,11 +321,6 @@ void dTreeAdressStmt::Trace (char* const textOut) const
         }
 
 
-		case m_ret:
-		{
-			sprintf (textOut, "\tret %d\n", m_extraInformation);
-			break;
-		}
 
 		case m_nop:
 		{

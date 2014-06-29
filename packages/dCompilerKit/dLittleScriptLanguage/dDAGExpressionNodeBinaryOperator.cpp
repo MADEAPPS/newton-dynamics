@@ -42,6 +42,8 @@ void dDAGExpressionNodeBinaryOperator::ConnectParent(dDAG* const parent)
 
 void dDAGExpressionNodeBinaryOperator::PromoteTypes (dCIL::dReturnValue& typeA, dCIL::dReturnValue& typeB) const
 {
+dAssert (0);
+/*
 	if (typeA.m_type != typeB.m_type) {
 		switch (typeA.m_type) 
 		{
@@ -84,11 +86,14 @@ void dDAGExpressionNodeBinaryOperator::PromoteTypes (dCIL::dReturnValue& typeA, 
 				break;
 		}
 	}
+*/
 }
 
 dCIL::dReturnValue dDAGExpressionNodeBinaryOperator::Evalue(dCIL& cil)
 {
 	dCIL::dReturnValue val;
+dAssert (0);
+/*
 	dCIL::dReturnValue operandA (m_expressionA->Evalue(cil));
 	dCIL::dReturnValue operandB (m_expressionB->Evalue(cil));
 	PromoteTypes (operandA, operandB);
@@ -186,26 +191,27 @@ dCIL::dReturnValue dDAGExpressionNodeBinaryOperator::Evalue(dCIL& cil)
 		default:
 			dAssert (0);
 	}
-
-
+*/
 	return val;
 }
 
 void dDAGExpressionNodeBinaryOperator::CompileCIL(dCIL& cil)  
 {
-	dAssert(0);
-	/*
-
 	m_expressionA->CompileCIL(cil);
+	dTreeAdressStmt::dArg arg1 (LoadLocalVariable(cil, m_expressionA->m_result));
+
 	m_expressionB->CompileCIL(cil);
+	dTreeAdressStmt::dArg arg2 (LoadLocalVariable(cil, m_expressionB->m_result));
 
 	dTreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
 	m_result.m_label = cil.NewTemp ();		
-
 	stmt.m_instruction = dTreeAdressStmt::m_assigment;
 	stmt.m_arg0 = m_result;
-	stmt.m_arg1 = m_expressionA->m_result;
-	stmt.m_arg2 = m_expressionB->m_result;
+	stmt.m_arg0.m_type = m_expressionA->m_result.m_type;
+
+	stmt.m_arg1 = arg1;
+	stmt.m_arg2 = arg2;
+	dAssert (stmt.m_arg1.m_type == stmt.m_arg2.m_type);
 
 	switch (m_operator) 
 	{
@@ -282,5 +288,4 @@ void dDAGExpressionNodeBinaryOperator::CompileCIL(dCIL& cil)
 	}
 
 	DTRACE_INTRUCTION (&stmt);
-*/
 }

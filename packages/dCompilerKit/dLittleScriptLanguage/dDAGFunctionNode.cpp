@@ -31,6 +31,7 @@ dDAGFunctionNode::dDAGFunctionNode(dList<dDAG*>& allNodes, dDAGTypeNode* const t
 	,m_body(NULL)
 	,m_modifier(NULL)
 	,m_parameters() 
+	,m_basicBlocks()
 {
 	m_name = name;
 
@@ -86,132 +87,115 @@ dDAGParameterNode* dDAGFunctionNode::FindArgumentVariable(const char* const name
 void dDAGFunctionNode::ConnectParent(dDAG* const parent)
 {
 	m_parent = parent;
+
+	for (dList<dDAGParameterNode*>::dListNode* argNode = m_parameters.GetFirst(); argNode; argNode = argNode->GetNext()) {
+		dDAGParameterNode* const arg = argNode->GetInfo();
+		m_body->AddVariable (arg->m_name, arg->m_type->m_intrinsicType);
+		arg->ConnectParent(this);
+	}
+
 	m_body->ConnectParent(this);
 	m_returnType->ConnectParent(this);
 
 	if (m_modifier) {
 		m_modifier->ConnectParent(this);
 	}
-
-	for (dList<dDAGParameterNode*>::dListNode* node = m_parameters.GetFirst(); node; node = node->GetNext()) {
-		dDAGParameterNode* const variable = node->GetInfo();
-		variable->ConnectParent(this);
-	}
 }
+
 
 void dDAGFunctionNode::CompileCIL(dCIL& cil)  
 {
-	dAssert (0);
-/*
 	dAssert (m_body);
 	dDAGClassNode* const myClass = GetClass();
 
 	cil.ResetTemporaries();
 	dString returnVariable (cil.NewTemp());
 
-	dCIL::dReturnType returnTypeVal = dCIL::m_intRegister;
-	if (m_returnType->m_name == "void") {
-		returnTypeVal = dCIL::m_void;
-	} else if (m_returnType->m_name == "int") {
-		returnTypeVal = dCIL::m_intRegister;
-	} else if (m_returnType->m_name == "float") {
-		dAssert (0);
-	} else {
-		//_ASSERTE (0);
-		returnTypeVal = dCIL::m_intRegister;
-	}
-
-	m_exitLabel = cil.NewLabel();
 	dString functionName (myClass->GetFunctionName (m_name.GetStr(), m_parameters));
 
 	dCIL::dListNode* const functionNode = cil.NewStatement();
 	dTreeAdressStmt& function = functionNode->GetInfo();
 	function.m_instruction = dTreeAdressStmt::m_function;
 	function.m_arg0.m_label = functionName;
+	function.m_arg0.m_type = m_returnType->m_intrinsicType;
 	DTRACE_INTRUCTION (&function);
 
-	dCIL::dListNode* const enterNode = cil.NewStatement();
-	dTreeAdressStmt& enter = enterNode->GetInfo();
-	enter.m_instruction = dTreeAdressStmt::m_enter;
-	enter.m_extraInformation = 0;
-	DTRACE_INTRUCTION (&enter);
+
+	if (!m_isStatic) {
+		dAssert (0);
+//		dList<dDAGParameterNode*>::dListNode* const argNode = m_parameters.GetFirst();
+//		dDAGParameterNode* const arg = argNode->GetInfo();
+//		m_opertatorThis = arg->m_result.m_label;
+	}
+
+
+	dTreeAdressStmt& entryPoint = cil.NewStatement()->GetInfo();
+	entryPoint.m_instruction = dTreeAdressStmt::m_label;
+	entryPoint.m_arg0.m_label = cil.NewLabel();
+	DTRACE_INTRUCTION (&entryPoint);
 
 	// emit the function arguments
 	for (dList<dDAGParameterNode*>::dListNode* argNode = m_parameters.GetFirst(); argNode; argNode = argNode->GetNext()) {
 		dDAGParameterNode* const arg = argNode->GetInfo();
+		dTree<dTreeAdressStmt::dArg, dString>::dTreeNode* const varNameNode = m_body->FindVariable(arg->m_name);
+		dAssert (varNameNode);
+
 		dTreeAdressStmt& fntArg = cil.NewStatement()->GetInfo();
 		fntArg.m_instruction = dTreeAdressStmt::m_argument;
-		fntArg.m_arg0.m_label = arg->m_name;
-		fntArg.m_arg1.m_label = arg->m_name;
-		arg->m_result.m_label = cil.NewTemp();
-		fntArg.m_arg1 = arg->m_result;
+		fntArg.m_arg0 = varNameNode->GetInfo();
+		fntArg.m_arg1 = fntArg.m_arg0;
+		arg->m_result = fntArg.m_arg0;
 		DTRACE_INTRUCTION (&fntArg);
 	}
-
-	if (!m_isStatic) {
-		dList<dDAGParameterNode*>::dListNode* const argNode = m_parameters.GetFirst();
-		dDAGParameterNode* const arg = argNode->GetInfo();
-		m_opertatorThis = arg->m_result.m_label;
-	}
-
-	// load arguments to local variables
-	for (dList<dDAGParameterNode*>::dListNode* argNode = m_parameters.GetFirst(); argNode; argNode = argNode->GetNext()) {
-		dDAGParameterNode* const arg = argNode->GetInfo();
-		dTreeAdressStmt& fntArg = cil.NewStatement()->GetInfo();
-		fntArg.m_instruction = dTreeAdressStmt::m_loadBase;
-		fntArg.m_arg0 = arg->m_result;
-		fntArg.m_arg2.m_label = arg->m_name;
-		DTRACE_INTRUCTION (&fntArg);
-	}
-
-	if (returnTypeVal == dCIL::m_intRegister) {
-		dTreeAdressStmt& returnVariable = cil.NewStatement()->GetInfo();
-		returnVariable.m_instruction = dTreeAdressStmt::m_assigment;
-		returnVariable.m_arg0.m_label = GetReturnVariableName();
-		returnVariable.m_arg1.m_type = dTreeAdressStmt::m_intConst;
-		returnVariable.m_arg1.m_label = "0";
-		DTRACE_INTRUCTION (&returnVariable);
-	} else if (returnTypeVal == dCIL::m_floatRegister) {
-		dAssert (0);
-	}
-
 	m_body->CompileCIL(cil);
+}
 
 
-	bool returnStmt = false;
-	for (dCIL::dListNode* node = functionNode; node; node = node->GetNext()) {
-		dTreeAdressStmt& stmt = node->GetInfo();
-		if ((stmt.m_instruction == dTreeAdressStmt::m_goto) && (stmt.m_arg0.m_label == m_exitLabel))  {
-			returnStmt = true;
-			break;
-		}
-	}
+void dDAGFunctionNode::BuildBasicBlocks(dCIL& cil, dCIL::dListNode* const functionNode)
+{
+	// build leading block map table
+	m_basicBlocks.RemoveAll();
 
-	if (returnStmt) {
-		dCIL::dListNode* const retLabelNode = cil.NewStatement();
-		dTreeAdressStmt& retLabel = retLabelNode->GetInfo();
-		retLabel.m_instruction = dTreeAdressStmt::m_label;
-		retLabel.m_arg0.m_label = m_exitLabel;
-		DTRACE_INTRUCTION (&retLabel);
-
-		for (dCIL::dListNode* node = functionNode; node; node = node->GetNext()) {
-			dTreeAdressStmt& stmt = node->GetInfo();
-			if ((stmt.m_instruction == dTreeAdressStmt::m_goto) && (stmt.m_arg0.m_label == m_exitLabel))  {
-				stmt.m_jmpTarget = retLabelNode;
+	// remove redundant jumps
+	dCIL::dListNode* nextNode;
+	for (dCIL::dListNode* node = functionNode; node; node = nextNode) {
+		nextNode = node->GetNext(); 
+		const dTreeAdressStmt& stmt = node->GetInfo();
+		if (stmt.m_instruction == dTreeAdressStmt::m_goto) {
+			if (stmt.m_jmpTarget == nextNode) {
+				const dTreeAdressStmt& nextStmt = nextNode->GetInfo();
+				dAssert (nextStmt.m_instruction == dTreeAdressStmt::m_label);
+				dCIL::dListNode* const prevNode = node->GetPrev();
+				const dTreeAdressStmt& prevStmt = prevNode->GetInfo();
+				if (prevStmt.m_instruction == dTreeAdressStmt::m_ret) {
+					cil.Remove(node);
+				}
 			}
 		}
 	}
 
-	dCIL::dListNode* const exitNode = cil.NewStatement();
-	dTreeAdressStmt& exit = exitNode->GetInfo();
-	exit.m_instruction = dTreeAdressStmt::m_leave;
-	exit.m_extraInformation = 0;
-	DTRACE_INTRUCTION (&exit);
+	// find the root of all basic blocks leaders
+	for (dCIL::dListNode* node = functionNode; node; node = node->GetNext()) {
+		const dTreeAdressStmt& stmt = node->GetInfo();
 
-	dCIL::dListNode* const retNode = cil.NewStatement();
-	dTreeAdressStmt& ret = retNode->GetInfo();
-	ret.m_instruction = dTreeAdressStmt::m_ret;
-	ret.m_extraInformation = m_parameters.GetCount() * 4;
-	DTRACE_INTRUCTION (&ret);
-*/
+		if (stmt.m_instruction == dTreeAdressStmt::m_label) {
+			m_basicBlocks.Append(dBasicBlock(node));
+		}
+	}
+
+	for (dList<dBasicBlock>::dListNode* blockNode = m_basicBlocks.GetFirst(); blockNode; blockNode = blockNode->GetNext()) {
+		dBasicBlock& block = blockNode->GetInfo();
+
+		for (dCIL::dListNode* stmtNode = block.m_begin; !block.m_end && stmtNode; stmtNode = stmtNode->GetNext()) {
+			const dTreeAdressStmt& stmt = stmtNode->GetInfo();
+			switch (stmt.m_instruction)
+			{
+				case dTreeAdressStmt::m_if:
+				case dTreeAdressStmt::m_goto:
+				case dTreeAdressStmt::m_ret:
+					block.m_end = stmtNode;
+					break;
+			}
+		} 
+	}
 }
