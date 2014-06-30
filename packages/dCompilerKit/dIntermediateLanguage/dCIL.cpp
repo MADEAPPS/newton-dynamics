@@ -300,4 +300,9 @@ void dCIL::Optimize(dListNode* const functionNode, int argumentInRegisters)
 */
 
 
+/*
+void dCIL::ConvertToLLVM (llvm::Module* const module, llvm::LLVMContext &Context)
+{
 
+}
+*/

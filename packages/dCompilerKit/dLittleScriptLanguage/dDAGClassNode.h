@@ -42,6 +42,8 @@ class dDAGClassNode: public dDAG
 	virtual void CompileCIL(dCIL& cil);
 	virtual void ConnectParent(dDAG* const parent);
 
+	void TranslateToLLVM (dCIL& cil, llvm::Module* const module, llvm::LLVMContext &Context);
+
 	bool m_isFinal;
 	bool m_isPublic;
 	const dDAGClassNode* m_baseClass;

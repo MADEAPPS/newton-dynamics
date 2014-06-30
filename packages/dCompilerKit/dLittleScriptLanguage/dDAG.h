@@ -19,11 +19,6 @@
 #endif
 
 
-
-
-//#define D_SCOPE_PREFIX		"scope" 
-
-
 class dDAGClassNode;
 class dDAGFunctionNode;
 class dDAGScopeBlockNode;

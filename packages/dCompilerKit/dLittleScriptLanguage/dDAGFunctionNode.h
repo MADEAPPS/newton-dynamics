@@ -39,10 +39,10 @@ class dDAGFunctionNode: public dDAG
 		dCIL::dListNode* m_end;
 	};
 
-	class dBasicBlocks: public dList<dBasicBlock> 
+	class dBasicBlocksList: public dList<dBasicBlock> 
 	{
 		public:
-		dBasicBlocks()
+		dBasicBlocksList()
 			:dList<dBasicBlock> ()
 		{
 		}
@@ -71,8 +71,25 @@ class dDAGFunctionNode: public dDAG
 	virtual void ConnectParent(dDAG* const parent);
 	dDAGParameterNode* FindArgumentVariable(const char* const name) const;
 
+	void TranslateToLLVM (dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context);
 	
+	private:
+	struct LLVMBlockScripBlockPair
+	{
+		LLVMBlockScripBlockPair (llvm::BasicBlock* const llvmBlock, dBasicBlocksList::dListNode* const node)
+			:m_llvmBlock(llvmBlock)
+			,m_blockNode(node)
+		{
+		}
+		llvm::BasicBlock* m_llvmBlock;
+		dBasicBlocksList::dListNode* m_blockNode;
+	};
 
+	llvm::Function* CreateLLVMfuntionPrototype (dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context);
+	void CreateLLVMBasicBlocks (dList<LLVMBlockScripBlockPair>& llvmBlocks, llvm::Function* const function, dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context);
+	void TranslateLLVmBlock (const LLVMBlockScripBlockPair& llvmBlockPair, llvm::Function* const function, dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context);
+
+	public:
 	bool m_isStatic;
 	bool m_isPublic;
 	bool m_isConstructor;
@@ -82,7 +99,7 @@ class dDAGFunctionNode: public dDAG
 	dDAGScopeBlockNode* m_body;
 	dDAGFunctionModifier* m_modifier;
 	dList<dDAGParameterNode*> m_parameters; 
-	dBasicBlocks m_basicBlocks; 
+	dBasicBlocksList m_basicBlocks; 
 
 
 	dDAGRtti(dDAG);

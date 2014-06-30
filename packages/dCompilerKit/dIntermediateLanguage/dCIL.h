@@ -17,8 +17,6 @@
 
 #define D_USE_COMPLEX_ADRESSING_MODE
 
-
-
 #define D_TEMPRARY_SYMBOL			"t"
 #define D_LOOP_HEADER_SYMBOL		"loopHeader"
 #define D_LOOP_TAIL_SYMBOL			"loopTail"
@@ -89,6 +87,9 @@ class dCIL: public dList<dTreeAdressStmt>
 	dString NewLabel (); 
 	void ResetTemporaries();
 	dListNode* NewStatement();
+
+
+//	void ConvertToLLVM (llvm::Module* const module, llvm::LLVMContext &Context);
 	
 //	void Optimize (dListNode* const functionNode, int argumentInRegisters, dReturnType returnType);
 //	void Optimize (dListNode* const functionNode, int argumentInRegisters);

@@ -74,6 +74,11 @@ static llvm::Function *CreateFibFunction(llvm::Module *M, llvm::LLVMContext &Con
 	// Create an exit block.
 	llvm::BasicBlock* RecurseBB = llvm::BasicBlock::Create(Context, "recurse", FibF);
 
+
+//	llvm::AllocaInst (llvm::Type::getInt32Ty(Context), Value *ArraySize, const Twine &Name, BasicBlock *InsertAtEnd);
+	
+
+
 	// Create the "if (arg <= 2) goto exitbb"
 	llvm::Value *CondInst = new llvm::ICmpInst(*BB, llvm::ICmpInst::ICMP_SLE, ArgX, Two, "cond");
 	llvm::BranchInst::Create(RetBB, RecurseBB, CondInst, BB);
@@ -105,29 +110,29 @@ static llvm::Function *CreateFibFunction(llvm::Module *M, llvm::LLVMContext &Con
 
 dScriptCompiler::dScriptCompiler(const char* const pakacgesRootNameDirectory)
 	:dLittleScriptParser ()
-//	,LLVMContext()
 	,m_packageRootDirectory (pakacgesRootNameDirectory)
-//	,m_currentPackage(NULL)
-//	,m_currentFunction(NULL)
+	,m_currentPackage(NULL)
+	,m_currentFunction(NULL)
 	,m_classList()
 	,m_scopeStack()
 	,m_allNodes()
+	,m_context()
+	,m_module()
 {
-
 	_mkdir(m_packageRootDirectory.GetStr());
 
+	m_module = llvm::OwningPtr<llvm::Module> (new llvm::Module("test", m_context));
+
 //	InitializeNativeTarget();
-llvm::LLVMContext context;
-llvm::OwningPtr<llvm::Module> M(new llvm::Module("test", context));
+//llvm::LLVMContext context;
+//llvm::OwningPtr<llvm::Module> M(new llvm::Module("test", context));
 //IRBuilder<> builder (*this);
-
-llvm::Function* FibF = CreateFibFunction(M.get(), context);
-
-if (llvm::verifyModule(*M)) {
-	llvm::errs() << ": Error constructing function!\n";
-	dAssert (0);
-}
-llvm::errs() << *M;
+CreateFibFunction(m_module.get(), m_context);
+//if (llvm::verifyModule(*m_module)) {
+//	llvm::errs() << ": Error constructing function!\n";
+//	dAssert (0);
+//}
+//llvm::errs() << *m_module;
 
 
 /*
@@ -229,10 +234,7 @@ int dScriptCompiler::CompileSource (const char* const source)
 			scripClass->ConnectParent (NULL);
 		}
 
-//		llvm::OwningPtr<llvm::Module> llvmModule (new llvm::Module("test", *this));
-//		dCIL cil(llvmModule.get(), this);
 		dCIL cil;
-
 		for (dList<dDAGClassNode*>::dListNode* node = m_classList.GetFirst(); node; node = node->GetNext()) {
 			dDAGClassNode* const scripClass = node->GetInfo();
 			scripClass->CompileCIL (cil);
@@ -240,15 +242,17 @@ int dScriptCompiler::CompileSource (const char* const source)
 //			dTrace(("optimized version\n"));
 //			cil.Trace();
 
+			scripClass->TranslateToLLVM (cil, m_module.get(), m_context);
+
 			//_ASSERTE (m_currentPackage);
 //			//m_currentPackage->AddClass(scripClass, cil);
 		}
 
-//		if (llvm::verifyModule(*llvmModule)) {
-//			llvm::errs() << ": Error constructing function!\n";
-//			dAssert (0);
-//		}
-//		llvm::errs() << *llvmModule;
+		if (llvm::verifyModule(*m_module)) {
+			llvm::errs() << ": Error constructing function!\n";
+			dAssert (0);
+		}
+		llvm::errs() << *m_module;
 
 	}
 	return 0;
@@ -1077,3 +1081,4 @@ void dScriptCompiler::OpenPackage (const dString& packageName)
 }
 
 
+void CompileToLLVM ();

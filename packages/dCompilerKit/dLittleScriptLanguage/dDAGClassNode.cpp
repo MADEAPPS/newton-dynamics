@@ -151,3 +151,10 @@ void dDAGClassNode::CompileCIL(dCIL& cil)
 }
 
 
+void dDAGClassNode::TranslateToLLVM (dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context)
+{
+	for (dList<dDAGFunctionNode*>::dListNode* node = m_functionList.GetFirst(); node; node = node->GetNext()) {
+		dDAGFunctionNode* const function = node->GetInfo();
+		function->TranslateToLLVM (cil, module, context);
+	}
+}

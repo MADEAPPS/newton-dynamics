@@ -199,3 +199,125 @@ void dDAGFunctionNode::BuildBasicBlocks(dCIL& cil, dCIL::dListNode* const functi
 		} 
 	}
 }
+
+llvm::Function* dDAGFunctionNode::CreateLLVMfuntionPrototype (dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context)
+{
+	const dBasicBlock& firstBlock = m_basicBlocks.GetFirst()->GetInfo();
+	dCIL::dListNode* funtionNameNode = firstBlock.m_begin->GetPrev();
+
+	std::vector<llvm::Type *> argumentList;
+	for (dCIL::dListNode* argNode = firstBlock.m_begin->GetNext(); argNode; argNode = argNode->GetNext()) {
+		const dTreeAdressStmt& stmt = argNode->GetInfo();
+
+		if (stmt.m_instruction != dTreeAdressStmt::m_argument)	{
+			break;
+		} else {
+			switch (stmt.m_arg0.m_type)
+			{
+			case dTreeAdressStmt::m_int:
+				argumentList.push_back(llvm::Type::getInt32Ty(context));
+				break;
+
+			default:
+				dAssert(0);
+			}
+		}
+	}
+
+	const dTreeAdressStmt& functionProto = funtionNameNode->GetInfo();
+	llvm::Type* returnTypeVal = NULL;
+	switch (functionProto.m_arg0.m_type)
+	{
+		case dTreeAdressStmt::m_int:
+		{
+			returnTypeVal = llvm::Type::getInt32Ty(context);
+			break;
+		}
+
+		default:
+			dAssert (0);
+	}
+
+	// create the function prototype
+	llvm::FunctionType* const funtionParametersAndType = llvm::FunctionType::get (returnTypeVal, argumentList, false);
+	llvm::Function* const llvmFunction = llvm::cast<llvm::Function>(module->getOrInsertFunction(functionProto.m_arg0.m_label.GetStr(), funtionParametersAndType));
+
+	// set arguments names.
+	llvm::Function::arg_iterator argumnetIter = llvmFunction->arg_begin();  
+	for (dCIL::dListNode* argNode = firstBlock.m_begin->GetNext(); argNode; argNode = argNode->GetNext()) {
+		const dTreeAdressStmt& stmt = argNode->GetInfo();
+
+		if (stmt.m_instruction != dTreeAdressStmt::m_argument)	{
+			break;
+		} else {
+			switch (stmt.m_arg0.m_type)
+			{
+			case dTreeAdressStmt::m_int:
+				{
+					llvm::Argument* const funtionArg = argumnetIter;
+					funtionArg->setName (stmt.m_arg0.m_label.GetStr());
+					break;
+				}
+
+			default:
+				dAssert(0);
+			}
+			argumnetIter ++;
+		}
+	}
+
+	return llvmFunction;
+}
+
+void dDAGFunctionNode::CreateLLVMBasicBlocks (dList<LLVMBlockScripBlockPair>& llvmBlocks, llvm::Function* const function, dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context)
+{
+	for (dList<dBasicBlock>::dListNode* blockNode = m_basicBlocks.GetFirst(); blockNode; blockNode = blockNode->GetNext()) {
+		dBasicBlock& block = blockNode->GetInfo();
+		dCIL::dListNode* const blockNameNode = block.m_begin;
+		const dTreeAdressStmt& blockStmt = blockNameNode->GetInfo();
+		dAssert (blockStmt.m_instruction == dTreeAdressStmt::m_label);
+		llvm::BasicBlock* const llvmBlock = llvm::BasicBlock::Create(context, blockStmt.m_arg0.m_label.GetStr(), function);
+		dAssert (llvmBlock);
+		llvmBlocks.Append(LLVMBlockScripBlockPair (llvmBlock, blockNode));
+	}
+}
+
+void dDAGFunctionNode::TranslateLLVmBlock (const LLVMBlockScripBlockPair& llvmBlockPair, llvm::Function* const function, dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context)
+{
+	llvm::BasicBlock* const llvmBlock = llvmBlockPair.m_llvmBlock;
+	const dBasicBlock& block = llvmBlockPair.m_blockNode->GetInfo();
+
+	dCIL::dListNode* argNode = block.m_begin;
+	do {
+		const dTreeAdressStmt& stmt = argNode->GetInfo();
+
+		switch (stmt.m_instruction)
+		{
+			case dTreeAdressStmt::m_argument:
+
+				break;
+
+			case dTreeAdressStmt::m_label:
+				break;
+
+			default:
+				dAssert (0);
+		}
+
+		argNode = argNode->GetNext();
+	} while (argNode != block.m_end);
+}
+
+void dDAGFunctionNode::TranslateToLLVM (dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context)
+{
+	llvm::Function* const llvmFunction = CreateLLVMfuntionPrototype (cil, module, context);
+
+	dList<LLVMBlockScripBlockPair> llvmBlocks;
+	CreateLLVMBasicBlocks (llvmBlocks, llvmFunction, cil, module, context);
+
+	for (dList<LLVMBlockScripBlockPair>::dListNode* node = llvmBlocks.GetFirst(); node; node = node->GetNext()) {
+		const LLVMBlockScripBlockPair& pair = node->GetInfo();
+		TranslateLLVmBlock (pair, llvmFunction, cil, module, context);
+	}
+
+}

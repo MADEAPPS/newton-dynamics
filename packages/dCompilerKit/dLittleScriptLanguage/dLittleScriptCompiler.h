@@ -123,6 +123,9 @@ class dScriptCompiler: public dLittleScriptParser
 	dList<dDAGScopeBlockNode*> m_scopeStack;
 	dList<dDAG*> m_allNodes;
 
+	llvm::LLVMContext m_context;
+	llvm::OwningPtr<llvm::Module> m_module;
+
 
 	friend class dLittleScriptParser;
 };
