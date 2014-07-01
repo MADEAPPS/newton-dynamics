@@ -51,61 +51,6 @@
 #include "dScriptPackage.h"
 
 
-static llvm::Function *CreateFibFunction(llvm::Module *M, llvm::LLVMContext &Context) 
-{
-	// Create the fib function and insert it into module M. This function is said
-	// to return an int and take an int parameter.
-	llvm::Function *FibF = llvm::cast<llvm::Function>(M->getOrInsertFunction("fib", llvm::Type::getInt32Ty(Context), llvm::Type::getInt32Ty(Context), (llvm::Type *)0));
-
-	// Get pointer to the integer argument of the add1 function...
-	llvm::Argument *ArgX = FibF->arg_begin();   // Get the arg.
-	ArgX->setName("AnArg");            // Give it a nice symbolic name for fun.
-
-	// Add a basic block to the function.
-	llvm::BasicBlock *BB = llvm::BasicBlock::Create(Context, "EntryBlock", FibF);
-
-	// Get pointers to the constants.
-	llvm::Value *One = llvm::ConstantInt::get(llvm::Type::getInt32Ty(Context), 1);
-	llvm::Value *Two = llvm::ConstantInt::get(llvm::Type::getInt32Ty(Context), 2);
-
-
-	// Create the true_block.
-	llvm::BasicBlock *RetBB = llvm::BasicBlock::Create(Context, "return", FibF);
-	// Create an exit block.
-	llvm::BasicBlock* RecurseBB = llvm::BasicBlock::Create(Context, "recurse", FibF);
-
-
-//	llvm::AllocaInst (llvm::Type::getInt32Ty(Context), Value *ArraySize, const Twine &Name, BasicBlock *InsertAtEnd);
-	
-
-
-	// Create the "if (arg <= 2) goto exitbb"
-	llvm::Value *CondInst = new llvm::ICmpInst(*BB, llvm::ICmpInst::ICMP_SLE, ArgX, Two, "cond");
-	llvm::BranchInst::Create(RetBB, RecurseBB, CondInst, BB);
-
-	// Create: ret int 1
-	llvm::ReturnInst::Create(Context, One, RetBB);
-
-	// create fib(x-1)
-	llvm::Value *Sub = llvm::BinaryOperator::CreateSub(ArgX, One, "arg", RecurseBB);
-	llvm::CallInst *CallFibX1 = llvm::CallInst::Create(FibF, Sub, "fibx1", RecurseBB);
-	CallFibX1->setTailCall();
-
-	// create fib(x-2)
-	Sub = llvm::BinaryOperator::CreateSub(ArgX, Two, "arg", RecurseBB);
-	llvm::CallInst *CallFibX2 = llvm::CallInst::Create(FibF, Sub, "fibx2", RecurseBB);
-	CallFibX2->setTailCall();
-
-
-	// fib(x-1)+fib(x-2)
-	llvm::Value *Sum = llvm::BinaryOperator::CreateAdd(CallFibX1, CallFibX2, "addresult", RecurseBB);
-
-	// Create the return instruction and add it to the basic block
-	llvm::ReturnInst::Create(Context, Sum, RecurseBB);
-
-	return FibF;
-}
-
 
 
 dScriptCompiler::dScriptCompiler(const char* const pakacgesRootNameDirectory)
@@ -123,18 +68,6 @@ dScriptCompiler::dScriptCompiler(const char* const pakacgesRootNameDirectory)
 
 	m_module = llvm::OwningPtr<llvm::Module> (new llvm::Module("test", m_context));
 
-//	InitializeNativeTarget();
-//llvm::LLVMContext context;
-//llvm::OwningPtr<llvm::Module> M(new llvm::Module("test", context));
-//IRBuilder<> builder (*this);
-CreateFibFunction(m_module.get(), m_context);
-//if (llvm::verifyModule(*m_module)) {
-//	llvm::errs() << ": Error constructing function!\n";
-//	dAssert (0);
-//}
-//llvm::errs() << *m_module;
-
-
 /*
 //formatted_raw_ostream out;
 //std::string errorInfo;
@@ -145,9 +78,7 @@ CreateFibFunction(m_module.get(), m_context);
 //ReadBitcodeToFile (M.get(), input);
 //dCIL* const cil = dCIL::CreateTargetMachine();
 //scripClass->CompileCIL (cil);
-
-M->dump();
-
+//M->dump();
 	dAssert (0);
 */
 }
