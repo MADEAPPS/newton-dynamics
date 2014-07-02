@@ -121,7 +121,7 @@ class dTreeAdressStmt
 	void Trace () const;
 	void Trace (char* const textOut) const;
 	void TraceAssigment (char* const textOut) const;
-	void TraceConditional (char* const textOut) const;
+//	void TraceConditional (char* const textOut) const;
 
 	const char* GetTypeString (const dArg& arg) const;
 

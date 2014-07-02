@@ -49,13 +49,21 @@ void dDAGFunctionStatementIF::CompileCIL(dCIL& cil)
 {
 	m_expression->CompileCIL(cil);
 
+	dTreeAdressStmt& test = cil.NewStatement()->GetInfo();
+	test.m_instruction = dTreeAdressStmt::m_assigment;
+	test.m_operator = dTreeAdressStmt::m_identical;
+	test.m_arg0.m_label = cil.NewTemp();
+	test.m_arg0.m_type = m_expression->m_result.m_type;
+	test.m_arg1 = m_expression->m_result;
+	test.m_arg2.m_label = "0";
+	test.m_arg2.m_type = m_expression->m_result.m_type;
+	DTRACE_INTRUCTION (&test);
+
 	dTreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
 	stmt.m_instruction = dTreeAdressStmt::m_if;
-	stmt.m_operator = dTreeAdressStmt::m_identical;
-	stmt.m_arg0 = m_expression->m_result;
-	stmt.m_arg1.m_label = "0";
-	stmt.m_arg1.m_type = stmt.m_arg0.m_type;
-	stmt.m_arg2.m_label = cil.NewLabel();
+	stmt.m_operator = dTreeAdressStmt::m_nothing;
+	stmt.m_arg0 = test.m_arg0;
+	stmt.m_arg1.m_label = cil.NewLabel();
 	DTRACE_INTRUCTION (&stmt);
 
 	dTreeAdressStmt& dommyLabel = cil.NewStatement()->GetInfo();
@@ -69,13 +77,13 @@ void dDAGFunctionStatementIF::CompileCIL(dCIL& cil)
 		stmt.m_jmpTarget = cil.NewStatement();
 
 		gotoStmt.m_instruction = dTreeAdressStmt::m_goto;
-		gotoStmt.m_arg0.m_label = stmt.m_arg2.m_label;
+		gotoStmt.m_arg0.m_label = stmt.m_arg1.m_label;
 		gotoStmt.m_jmpTarget = stmt.m_jmpTarget;
 		DTRACE_INTRUCTION (&gotoStmt);
 		
 		dTreeAdressStmt& jmpTarget = stmt.m_jmpTarget->GetInfo();
 		jmpTarget.m_instruction = dTreeAdressStmt::m_label;
-		jmpTarget.m_arg0.m_label = stmt.m_arg2.m_label;
+		jmpTarget.m_arg0.m_label = stmt.m_arg1.m_label;
 		DTRACE_INTRUCTION (&jmpTarget);
 
 	} else {

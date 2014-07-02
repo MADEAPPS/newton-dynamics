@@ -74,17 +74,41 @@ class dDAGFunctionNode: public dDAG
 	void TranslateToLLVM (dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context);
 	
 	private:
-	struct LLVMBlockScripBlockPair
+	class LLVMBlockScripBlockPair
 	{
+		public:
 		LLVMBlockScripBlockPair (llvm::BasicBlock* const llvmBlock, dBasicBlocksList::dListNode* const node)
 			:m_llvmBlock(llvmBlock)
 			,m_blockNode(node)
 		{
 		}
+
 		llvm::BasicBlock* m_llvmBlock;
 		dBasicBlocksList::dListNode* m_blockNode;
 	};
 
+	class LLVMBlockScripBlockPairMap: public dList<LLVMBlockScripBlockPair>
+	{
+		public:
+		LLVMBlockScripBlockPairMap ()
+			:dList<LLVMBlockScripBlockPair>()
+		{
+		}
+
+		llvm::BasicBlock* Find (dCIL::dListNode* const blockNode) const
+		{
+			for (dListNode* node = GetFirst(); node; node = node->GetNext())
+			{
+				const LLVMBlockScripBlockPair& pair = node->GetInfo();
+				if (pair.m_blockNode->GetInfo().m_begin == blockNode) {
+					return pair.m_llvmBlock;
+				}
+			}
+
+			dAssert (0);
+			return NULL;
+		}
+	};
 
 	class dSymbols: public dTree <llvm::Value*, dString>
 	{
@@ -96,14 +120,23 @@ class dDAGFunctionNode: public dDAG
 	};
 
 
-	void CreateLLVMBasicBlocks (dList<LLVMBlockScripBlockPair>& llvmBlocks, llvm::Function* const function, dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context);
+	void CreateLLVMBasicBlocks (llvm::Function* const function, dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context);
+
 
 	llvm::Function* CreateLLVMfuntionPrototype (dSymbols& symbols, dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context);
+	llvm::Value* GetLLVMConstantOrValue (dSymbols& symbols, const dTreeAdressStmt::dArg& arg, llvm::LLVMContext &context);
+
 	void TranslateLLVMBlock (dSymbols& symbols, const LLVMBlockScripBlockPair& llvmBlockPair, llvm::Function* const function, dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context);
-	void EmitLLVMLocalVariable (dSymbols& symbols, const dTreeAdressStmt& stmt, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context);
-	void EmitLLVMStoreBase (dSymbols& symbols, const dTreeAdressStmt& stmt, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context);
-	void EmitLLVMLoadBase (dSymbols& symbols, const dTreeAdressStmt& stmt, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context);
-	void EmitLLVMReturn (dSymbols& symbols, const dTreeAdressStmt& stmt, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context);
+	void EmitLLVMLocalVariable (dSymbols& symbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context);
+	void EmitLLVMStoreBase (dSymbols& symbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context);
+	void EmitLLVMLoadBase (dSymbols& symbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context);
+	void EmitLLVMAssignment (dSymbols& symbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context);
+
+	void EmitLLVMIf (dSymbols& symbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context);
+	void EmitLLVMReturn (dSymbols& symbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context);
+
+	
+				
 
 	public:
 	bool m_isStatic;
@@ -117,6 +150,8 @@ class dDAGFunctionNode: public dDAG
 	dCIL::dListNode* m_functionStart;
 	dBasicBlocksList m_basicBlocks; 
 	dList<dDAGParameterNode*> m_parameters; 
+	LLVMBlockScripBlockPairMap m_blockMap; 
+//	dTreeAdressStmt::dArg m_zero;
 
 
 	dDAGRtti(dDAG);

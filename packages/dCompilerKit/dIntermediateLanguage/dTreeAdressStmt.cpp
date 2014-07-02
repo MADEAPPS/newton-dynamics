@@ -154,6 +154,7 @@ void dTreeAdressStmt::TraceAssigment (char* const text) const
 	sprintf(text, "\t%s %s = %s%s%s\n", GetTypeString(m_arg0), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), assignOperator, m_arg2.m_label.GetStr() );
 }
 
+/*
 void dTreeAdressStmt::TraceConditional (char* const textOut) const
 {
 	textOut[0] = 0;
@@ -196,6 +197,7 @@ void dTreeAdressStmt::TraceConditional (char* const textOut) const
 		}
 	}
 }
+*/
 
 void dTreeAdressStmt::Trace (char* const textOut) const
 {
@@ -246,7 +248,7 @@ void dTreeAdressStmt::Trace (char* const textOut) const
 
 		case m_if:
 		{
-			TraceConditional (textOut);
+			sprintf (textOut, "\tif (%s) goto %s\n", m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
 			break;
 		}
 
