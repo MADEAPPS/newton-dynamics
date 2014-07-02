@@ -60,6 +60,8 @@ void dDAGFunctionStatementFlow::CompileCIL(dCIL& cil)
 
 void dDAGFunctionStatementFlow::BackPatch (dCIL& cil)
 {
+dAssert (0);
+/*
 	if (!m_backPatchStart) {
 		m_backPatchStart = cil.GetFirst();
 	}
@@ -96,11 +98,14 @@ void dDAGFunctionStatementFlow::BackPatch (dCIL& cil)
 	}
 
 	m_continueTarget = NULL;
+*/
 }
 
 
 void dDAGFunctionStatementFlow::OpenPreHeaderBlock(dCIL& cil)
 {
+dAssert (0);
+/*
 	dDAGFunctionNode* const function = GetFunction();
 	function->m_loopLayer ++ ;
 
@@ -111,13 +116,15 @@ void dDAGFunctionStatementFlow::OpenPreHeaderBlock(dCIL& cil)
 	stmt.m_arg2.m_label = D_LOOP_HEADER_SYMBOL;
 	stmt.m_extraInformation = layer;
 	DTRACE_INTRUCTION (&stmt);
+*/
 }
 
 void dDAGFunctionStatementFlow::ClosePreHeaderBlock(dCIL& cil)
 {
+dAssert (0);
+/*
 	dDAGFunctionNode* const function = GetFunction();
 	int layer = function->m_loopLayer;
-
 
 	dTreeAdressStmt& stmt0 = cil.NewStatement()->GetInfo();
 	stmt0.m_instruction = dTreeAdressStmt::m_nop;
@@ -130,6 +137,7 @@ void dDAGFunctionStatementFlow::ClosePreHeaderBlock(dCIL& cil)
 	DTRACE_INTRUCTION (&stmt);
 
 	function->m_loopLayer --;
+*/
 }
 
 

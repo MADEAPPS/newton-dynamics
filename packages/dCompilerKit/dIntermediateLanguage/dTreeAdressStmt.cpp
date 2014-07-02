@@ -36,8 +36,8 @@ dTreeAdressStmt::dTreeAdressStmt(void)
 	,m_arg0()
 	,m_arg1()
 	,m_arg2()
-	,m_extraInformation(0)
-	,m_jmpTarget (NULL)
+    ,m_trueTargetJump(NULL)
+    ,m_falseTargetJump(NULL)
 {
 #ifdef _DEBUG
 	m_debug = m_debugCount;
@@ -248,7 +248,7 @@ void dTreeAdressStmt::Trace (char* const textOut) const
 
 		case m_if:
 		{
-			sprintf (textOut, "\tif (%s) goto %s\n", m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
+			sprintf (textOut, "\tif (%s) goto %s else goto %s\n", m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), m_arg2.m_label.GetStr());
 			break;
 		}
 
@@ -284,23 +284,29 @@ void dTreeAdressStmt::Trace (char* const textOut) const
 
 		case m_load:
 		{
+            dAssert (0);
+/*
 			int multiplier = 1 << m_extraInformation;
 			if (multiplier != 1) {
 				sprintf (textOut, "\t%s = [%s + %s * %d]\n", m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), m_arg2.m_label.GetStr(), multiplier);
 			} else {
 				sprintf (textOut, "\t%s = [%s + %s]\n", m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), m_arg2.m_label.GetStr());
 			}
+*/
 			break;
 		}
 
 		case m_store:
 		{
+            dAssert (0);
+            /*
 			int multiplier = 1 << m_extraInformation;
 			if (multiplier != 1) {
 				sprintf (textOut, "\t[%s + %s * %d] = %s\n", m_arg1.m_label.GetStr(), m_arg2.m_label.GetStr(), multiplier, m_arg0.m_label.GetStr());
 			} else {
 				sprintf (textOut, "\t[%s + %s] = %s\n", m_arg1.m_label.GetStr(), m_arg2.m_label.GetStr(), m_arg0.m_label.GetStr());
 			}
+*/
 			break;
 		}
 

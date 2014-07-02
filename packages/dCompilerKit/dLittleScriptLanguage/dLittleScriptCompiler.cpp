@@ -165,7 +165,7 @@ int dScriptCompiler::CompileSource (const char* const source)
 			scripClass->ConnectParent (NULL);
 		}
 
-		dCIL cil;
+		dCIL cil (m_module.get());
 		for (dList<dDAGClassNode*>::dListNode* node = m_classList.GetFirst(); node; node = node->GetNext()) {
 			dDAGClassNode* const scripClass = node->GetInfo();
 			scripClass->CompileCIL (cil);
@@ -184,7 +184,6 @@ int dScriptCompiler::CompileSource (const char* const source)
 			dAssert (0);
 		}
 		llvm::errs() << *m_module;
-
 	}
 	return 0;
 }

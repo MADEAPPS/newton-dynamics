@@ -78,7 +78,7 @@ class dCIL: public dList<dTreeAdressStmt>
 	};
 
 	
-	dCIL(void);
+	dCIL(llvm::Module* const module);
 	virtual ~dCIL(void);
 
 	void Trace();
@@ -89,8 +89,8 @@ class dCIL: public dList<dTreeAdressStmt>
 	dListNode* NewStatement();
 
 
+    void Optimize (llvm::Function* const function);
 //	void ConvertToLLVM (llvm::Module* const module, llvm::LLVMContext &Context);
-	
 //	void Optimize (dListNode* const functionNode, int argumentInRegisters, dReturnType returnType);
 //	void Optimize (dListNode* const functionNode, int argumentInRegisters);
 	private:
@@ -104,6 +104,7 @@ class dCIL: public dList<dTreeAdressStmt>
 	dTreeAdressStmt::dOperator m_conditionals[dTreeAdressStmt::m_operatorsCount];
 	dTreeAdressStmt::dOperator m_operatorComplement[dTreeAdressStmt::m_operatorsCount];
 
+    llvm::legacy::FunctionPassManager m_optimizer;
 	friend dDataFlowGraph;
 };
 

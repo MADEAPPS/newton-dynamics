@@ -34,6 +34,8 @@ dDataFlowGraph::~dDataFlowGraph(void)
 
 void dDataFlowGraph::BuildBasicBlockGraph()
 {
+    dAssert (0);
+/*
 	// build leading block map table
 	m_basicBlocks.RemoveAll();
 	m_dataFlowGraph.RemoveAll();
@@ -175,6 +177,7 @@ void dDataFlowGraph::BuildBasicBlockGraph()
 			}
 		}
 	}
+*/
 }
 
 #if 0

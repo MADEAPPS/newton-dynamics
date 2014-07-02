@@ -110,8 +110,8 @@ class dTreeAdressStmt
 	dArg m_arg0;
 	dArg m_arg1;
 	dArg m_arg2;
-	int m_extraInformation;
-	dList<dTreeAdressStmt>::dListNode* m_jmpTarget;
+	dList<dTreeAdressStmt>::dListNode* m_trueTargetJump;
+    dList<dTreeAdressStmt>::dListNode* m_falseTargetJump;
 
 #ifdef _DEBUG
 	int m_debug;

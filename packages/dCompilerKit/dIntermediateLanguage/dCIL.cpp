@@ -14,11 +14,12 @@
 #include "dDataFlowGraph.h"
 
 
-dCIL::dCIL(void)
+dCIL::dCIL(llvm::Module* const module)
 	:dList()
 	,m_mark(1)
 	,m_tempIndex (0)
 	,m_labelIndex (0)
+    ,m_optimizer(module)
 {
 	memset (m_conditionals, 0, sizeof (m_conditionals));
 	m_conditionals[dTreeAdressStmt::m_identical] = dTreeAdressStmt::m_identical;
@@ -42,6 +43,28 @@ dCIL::dCIL(void)
 	m_commutativeOperator[dTreeAdressStmt::m_mul] = true;
 	m_commutativeOperator[dTreeAdressStmt::m_identical] = true;
 	m_commutativeOperator[dTreeAdressStmt::m_different] = true;
+
+
+//  llvm::legacy::FunctionPassManager functionPassManager(m_module.get());
+
+    // Set up the optimizer pipeline.  Start with registering info about how the
+    // target lays out data structures.
+    //        functionPassManager.add(new DataLayout(*TheExecutionEngine->getDataLayout()));
+    // Provide basic AliasAnalysis support for GVN.
+    //        functionPassManager.add(createBasicAliasAnalysisPass());
+
+    // Promote allocas to registers.
+    m_optimizer.add(llvm::createPromoteMemoryToRegisterPass());
+    // Do simple "peephole" optimizations and bit-twiddling optzns.
+    //        functionPassManager.add(createInstructionCombiningPass());
+    // Reassociate expressions.
+    //        functionPassManager.add(createReassociatePass());
+    // Eliminate Common SubExpressions.
+    //        functionPassManager.add(createGVNPass());
+    // Simplify the control flow graph (deleting unreachable blocks, etc).
+    //        functionPassManager.add(createCFGSimplificationPass());
+
+    m_optimizer.doInitialization();
 }
 
 dCIL::~dCIL(void)
@@ -306,3 +329,9 @@ void dCIL::ConvertToLLVM (llvm::Module* const module, llvm::LLVMContext &Context
 
 }
 */
+
+void dCIL::Optimize (llvm::Function* const function)
+{
+    // Optimize the function.
+    m_optimizer.run(*function);
+}
