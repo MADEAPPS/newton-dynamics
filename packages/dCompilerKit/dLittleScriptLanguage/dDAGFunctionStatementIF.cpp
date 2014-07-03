@@ -66,44 +66,42 @@ void dDAGFunctionStatementIF::CompileCIL(dCIL& cil)
 
 	if (!m_elseStmt) {
 		dTreeAdressStmt& gotoStmt = cil.NewStatement()->GetInfo();
-
-        stmt.m_falseTargetJump = cil.NewStatement();
 		gotoStmt.m_instruction = dTreeAdressStmt::m_goto;
 		gotoStmt.m_arg0.m_label = stmt.m_arg2.m_label;
 		gotoStmt.m_trueTargetJump = stmt.m_falseTargetJump;
 		DTRACE_INTRUCTION (&gotoStmt);
 		
+		stmt.m_falseTargetJump = cil.NewStatement();
 		dTreeAdressStmt& falseLabel = stmt.m_falseTargetJump->GetInfo();
 		falseLabel.m_instruction = dTreeAdressStmt::m_label;
 		falseLabel.m_arg0.m_label = stmt.m_arg2.m_label;
 		DTRACE_INTRUCTION (&falseLabel);
 	} else {
-dAssert (0);
-/*
-		dTreeAdressStmt& gotoStmt = cil.NewStatement()->GetInfo();
-		gotoStmt.m_instruction = dTreeAdressStmt::m_goto;
-		gotoStmt.m_arg0.m_label = cil.NewLabel();
-		DTRACE_INTRUCTION (&gotoStmt);
+		dTreeAdressStmt& gotoExitStmt0 = cil.NewStatement()->GetInfo();
+		gotoExitStmt0.m_instruction = dTreeAdressStmt::m_goto;
+		gotoExitStmt0.m_arg0.m_label = cil.NewLabel();
+		DTRACE_INTRUCTION (&gotoExitStmt0);
 
-		stmt.m_jmpTarget = cil.NewStatement();
-		dTreeAdressStmt& jmpTarget = stmt.m_jmpTarget->GetInfo();
-		jmpTarget.m_instruction = dTreeAdressStmt::m_label;
-		jmpTarget.m_arg0.m_label = stmt.m_arg2.m_label;
-		DTRACE_INTRUCTION (&jmpTarget);
+		stmt.m_falseTargetJump = cil.NewStatement();
+		dTreeAdressStmt& falseLabel = stmt.m_falseTargetJump->GetInfo();
+		falseLabel.m_instruction = dTreeAdressStmt::m_label;
+		falseLabel.m_arg0.m_label = stmt.m_arg2.m_label;
+		DTRACE_INTRUCTION (&falseLabel);
 
 		m_elseStmt->CompileCIL(cil);
 
-		dTreeAdressStmt& gotoStmtElse = cil.NewStatement()->GetInfo();
-		gotoStmtElse.m_instruction = dTreeAdressStmt::m_goto;
-		gotoStmtElse.m_arg0.m_label = gotoStmt.m_arg0.m_label;
-		DTRACE_INTRUCTION (&gotoStmtElse);
+		dTreeAdressStmt& gotoExitStmt1 = cil.NewStatement()->GetInfo();
+		gotoExitStmt1.m_instruction = dTreeAdressStmt::m_goto;
+		gotoExitStmt1.m_arg0.m_label = gotoExitStmt0.m_arg0.m_label;
+		DTRACE_INTRUCTION (&gotoExitStmt0);
 
-		gotoStmt.m_jmpTarget = cil.NewStatement();
-		dTreeAdressStmt& gotoTarget = gotoStmt.m_jmpTarget->GetInfo();
-		gotoTarget.m_instruction = dTreeAdressStmt::m_label;
-		gotoTarget.m_arg0.m_label = gotoStmt.m_arg0.m_label;
-		DTRACE_INTRUCTION (&gotoTarget);
-*/
+		dCIL::dListNode* const exitNode = cil.NewStatement();
+		gotoExitStmt0.m_trueTargetJump = exitNode;
+		gotoExitStmt1.m_trueTargetJump = exitNode;
+
+		dTreeAdressStmt& exitLabel = exitNode->GetInfo();
+		exitLabel.m_instruction = dTreeAdressStmt::m_label;
+		exitLabel.m_arg0.m_label = gotoExitStmt0.m_arg0.m_label;
+		DTRACE_INTRUCTION (&exitLabel);
 	}
-
 }

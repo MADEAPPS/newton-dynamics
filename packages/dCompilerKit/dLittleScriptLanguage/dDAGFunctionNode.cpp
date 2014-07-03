@@ -356,9 +356,9 @@ void dDAGFunctionNode::EmitLLVMStoreBase (dSymbols& symbols, dCIL::dListNode* co
 {
 	const dTreeAdressStmt& stmt = stmtNode->GetInfo();
 	dAssert (symbols.Find (stmt.m_arg0.m_label.GetStr()));
-	dAssert (symbols.Find (stmt.m_arg1.m_label.GetStr()));
+//	dAssert (symbols.Find (stmt.m_arg1.m_label.GetStr()));
 	llvm::Value* const dst = symbols.Find (stmt.m_arg0.m_label.GetStr())->GetInfo();
-	llvm::Value* const src = symbols.Find (stmt.m_arg1.m_label.GetStr())->GetInfo();
+	llvm::Value* const src = GetLLVMConstantOrValue (symbols, stmt.m_arg1, context);;
 	switch (stmt.m_arg0.m_type)
 	{
 		case dTreeAdressStmt::m_int:
@@ -429,6 +429,49 @@ void dDAGFunctionNode::EmitLLVMIf (dSymbols& symbols, dCIL::dListNode* const stm
 	llvm::BranchInst::Create (thenBlock, continueBlock, arg0, llvmBlock);
 }
 
+void dDAGFunctionNode::EmitLLVMGoto (dSymbols& symbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context)
+{
+	const dTreeAdressStmt& stmt = stmtNode->GetInfo();
+	dAssert (stmt.m_operator == dTreeAdressStmt::m_nothing);
+	llvm::BasicBlock* const targetBlock = m_blockMap.Find (stmt.m_trueTargetJump);
+	dAssert (targetBlock);
+	llvm::BranchInst::Create (targetBlock, llvmBlock);
+}
+
+void dDAGFunctionNode::EmitLLVMParam (dSymbols& symbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context)
+{
+	const dTreeAdressStmt& stmt = stmtNode->GetInfo();
+	llvm::Value* const src = GetLLVMConstantOrValue (symbols, stmt.m_arg0, context);
+	m_paramList.Append(src);
+}
+
+void dDAGFunctionNode::EmitLLVMCall (dSymbols& symbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context)
+{
+	const dTreeAdressStmt& stmt = stmtNode->GetInfo();
+	dAssert (stmt.m_operator == dTreeAdressStmt::m_nothing);
+
+	dAssert (symbols.Find (stmt.m_arg1.m_label.GetStr()));
+	llvm::Value* const function = symbols.Find (stmt.m_arg1.m_label.GetStr())->GetInfo();
+
+	int count = 0;
+	llvm::Value* buffer[128];
+	for (dList<llvm::Value*>::dListNode* node = m_paramList.GetFirst(); node; node = node->GetNext()) {
+		buffer[count] = node->GetInfo();
+		count ++;
+	}
+
+	llvm::ArrayRef<llvm::Value *> paramList (buffer, count);
+
+	llvm::CallInst* const call = llvm::CallInst::Create(function, paramList, stmt.m_arg0.m_label.GetStr(), llvmBlock);
+	call->setCallingConv(llvm::CallingConv::C);
+	call->setTailCall (true);
+	llvm::AttributeSet callAttrib;
+	call->setAttributes (callAttrib);
+	symbols.Insert(call, stmt.m_arg0.m_label.GetStr()) ;
+
+	m_paramList.RemoveAll();
+}
+
 
 void dDAGFunctionNode::EmitLLVMAssignment (dSymbols& symbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context)
 {
@@ -448,6 +491,13 @@ void dDAGFunctionNode::EmitLLVMAssignment (dSymbols& symbols, dCIL::dListNode* c
 			break;
 		}
 
+		case dTreeAdressStmt::m_sub:
+		{
+			dAssert (stmt.m_arg1.m_type == dTreeAdressStmt::m_int);
+			arg0 = llvm::BinaryOperator::Create (llvm::Instruction::Sub, arg1, arg2, stmt.m_arg0.m_label.GetStr(), llvmBlock);
+			break;
+		}
+
 		default:
 		dAssert(0);
 	}
@@ -463,6 +513,7 @@ void dDAGFunctionNode::TranslateLLVMBlock (dSymbols& symbols, const LLVMBlockScr
 	dCIL::dListNode* const endNode = block.m_end->GetNext();
 	for (dCIL::dListNode* argNode = block.m_begin->GetNext(); argNode != endNode; argNode = argNode->GetNext()) {
 		const dTreeAdressStmt& stmt = argNode->GetInfo();
+		DTRACE_INTRUCTION (&stmt);
 		dAssert (stmt.m_instruction != dTreeAdressStmt::m_label);	
 
 		switch (stmt.m_instruction)
@@ -503,6 +554,23 @@ void dDAGFunctionNode::TranslateLLVMBlock (dSymbols& symbols, const LLVMBlockScr
 				break;
 			}
 
+			case dTreeAdressStmt::m_goto:
+			{
+				EmitLLVMGoto (symbols, argNode, llvmBlock, context);
+				break;
+			}
+
+			case dTreeAdressStmt::m_param:
+			{
+				EmitLLVMParam(symbols, argNode, llvmBlock, context);
+				break;
+			}
+
+			case dTreeAdressStmt::m_call:
+			{
+				EmitLLVMCall (symbols, argNode, llvmBlock, context);
+				break;
+			}
 
 			default:
 				dAssert (0);
@@ -517,7 +585,7 @@ void dDAGFunctionNode::TranslateToLLVM (dCIL& cil, llvm::Module* const module, l
 
 	CreateLLVMBasicBlocks (llvmFunction, cil, module, context);
 
-	cil.Trace();
+//	cil.Trace();
 	for (LLVMBlockScripBlockPairMap::dListNode* node = m_blockMap.GetFirst(); node; node = node->GetNext()) {
 		const LLVMBlockScripBlockPair& pair = node->GetInfo();
 		TranslateLLVMBlock (symbols, pair, llvmFunction, cil, module, context);
@@ -526,5 +594,5 @@ void dDAGFunctionNode::TranslateToLLVM (dCIL& cil, llvm::Module* const module, l
     // Validate the generated code, checking for consistency.
     dAssert (!llvm::verifyFunction(*llvmFunction));
 
-    cil.Optimize (llvmFunction);
+//    cil.Optimize (llvmFunction);
 }

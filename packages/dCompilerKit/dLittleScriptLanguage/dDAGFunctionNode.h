@@ -133,10 +133,10 @@ class dDAGFunctionNode: public dDAG
 	void EmitLLVMAssignment (dSymbols& symbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context);
 
 	void EmitLLVMIf (dSymbols& symbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context);
+	void EmitLLVMGoto (dSymbols& symbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context);
+	void EmitLLVMParam (dSymbols& symbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context);
+	void EmitLLVMCall (dSymbols& symbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context);
 	void EmitLLVMReturn (dSymbols& symbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context);
-
-	
-				
 
 	public:
 	bool m_isStatic;
@@ -151,9 +151,9 @@ class dDAGFunctionNode: public dDAG
 	dBasicBlocksList m_basicBlocks; 
 	dList<dDAGParameterNode*> m_parameters; 
 	LLVMBlockScripBlockPairMap m_blockMap; 
-//	dTreeAdressStmt::dArg m_zero;
-
-
+//	llvm::ArrayRef<llvm::Value *> m_paramList;
+	dList<llvm::Value*> m_paramList;
+	
 	dDAGRtti(dDAG);
 };
 
