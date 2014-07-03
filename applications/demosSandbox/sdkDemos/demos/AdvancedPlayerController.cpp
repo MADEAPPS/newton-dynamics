@@ -514,12 +514,18 @@ class PlaformEntityEntity: public DemoEntity
 		scene->Append(this);
 
 		DemoMesh* const mesh = source->GetMesh();
-		SetMesh(mesh, GetIdentityMatrix());
+		SetMesh(mesh, source->GetMeshMatrix());
 
 		const dFloat mass = 100.9f;
 		dMatrix matrix (source->GetNextMatrix()) ;
 		NewtonWorld* const world = scene->GetNewton();
-		NewtonCollision* const collision = NewtonCreateConvexHull(world, mesh->m_vertexCount, mesh->m_vertex, 3 * sizeof (dFloat), 0, 0, NULL);
+
+		// note: because the mesh matrix can have scale, for simplicity just apply the local mesh matrix to the vertex cloud
+		dVector pool[128];
+		const dMatrix& meshMatrix = GetMeshMatrix();
+		meshMatrix.TransformTriplex(&pool[0].m_x, sizeof (dVector), mesh->m_vertex, 3 * sizeof (dFloat), mesh->m_vertexCount);
+		NewtonCollision* const collision = NewtonCreateConvexHull(world, mesh->m_vertexCount, &pool[0].m_x, sizeof (dVector), 0, 0, NULL);
+
 		NewtonBody* body = CreateSimpleBody (world, this, 100, matrix, collision, 0);
 		NewtonDestroyCollision(collision);
 
@@ -650,19 +656,18 @@ static void LoadFerryBridge (DemoEntityManager* const scene, TriggerManager* con
 		if (entity->GetName().Find("ramp") != -1) {
 			DemoMesh* const mesh = entity->GetMesh();
 
-			NewtonCollision* const collision = NewtonCreateConvexHull(world, mesh->m_vertexCount, mesh->m_vertex, 3 * sizeof (dFloat), 0, 0, NULL);
+			const dMatrix& meshMatrix = entity->GetMeshMatrix();
+			NewtonCollision* const collision = NewtonCreateConvexHull(world, mesh->m_vertexCount, mesh->m_vertex, 3 * sizeof (dFloat), 0, 0, &meshMatrix[0][0]);
 			void* const proxy = NewtonSceneCollisionAddSubCollision (sceneCollision, collision);
 			NewtonDestroyCollision (collision);
 
-			// get the location of this tire relative to the car chassis
+			// set the matrix for this sub shape
 			dMatrix matrix (entity->GetNextMatrix());
-
 			NewtonCollision* const bridgeCollision = NewtonSceneCollisionGetCollisionFromNode (sceneCollision, proxy);
 			NewtonSceneCollisionSetSubCollisionMatrix (sceneCollision, proxy, &matrix[0][0]);	
 			NewtonCollisionSetUserData(bridgeCollision, entity);
 		}
 	}
-
 
 	// add start triggers
 	CustomTriggerController* trigger0 = NULL;
@@ -673,8 +678,9 @@ static void LoadFerryBridge (DemoEntityManager* const scene, TriggerManager* con
 		if (entity->GetName().Find("startTrigger") != -1) {
 			DemoMesh* const mesh = entity->GetMesh();
 
+			const dMatrix& meshMatrix = entity->GetMeshMatrix();
 			// create a trigger to match his mesh
-			NewtonCollision* const collision = NewtonCreateConvexHull(world, mesh->m_vertexCount, mesh->m_vertex, 3 * sizeof (dFloat), 0, 0, NULL);
+			NewtonCollision* const collision = NewtonCreateConvexHull(world, mesh->m_vertexCount, mesh->m_vertex, 3 * sizeof (dFloat), 0, 0, &meshMatrix[0][0]);
 			dMatrix matrix (entity->GetNextMatrix());
 			CustomTriggerController* const controller = triggerManager->CreateTrigger(matrix, collision, NULL);
 			NewtonDestroyCollision (collision);
@@ -809,12 +815,19 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 
 	// add all the planks that form the bridge
 	dTree<NewtonBody*, dString> planks;
+	dFloat plankMass = 30.0f;
 	for (DemoEntityManager::dListNode* node = bridgeNodes->GetNext(); node; node = node->GetNext()) {
 		DemoEntity* const entity = node->GetInfo();
 		if (entity->GetName().Find("plank") != -1) {	
 			DemoMesh* const mesh = entity->GetMesh();
-			NewtonCollision* const collision = NewtonCreateConvexHull(world, mesh->m_vertexCount, mesh->m_vertex, 3 * sizeof (dFloat), 0, 0, NULL);
-			NewtonBody* const body = CreateSimpleBody (world, entity, 30.0f, entity->GetNextMatrix(), collision, 0);
+
+			// note: because the mesh matrix can have scale, for simplicity just apply the local mesh matrix to the vertex cloud
+			dVector pool[128];
+			const dMatrix& meshMatrix = entity->GetMeshMatrix();
+			meshMatrix.TransformTriplex(&pool[0].m_x, sizeof (dVector), mesh->m_vertex, 3 * sizeof (dFloat), mesh->m_vertexCount);
+
+			NewtonCollision* const collision = NewtonCreateConvexHull(world, mesh->m_vertexCount, &pool[0].m_x, sizeof (dVector), 0, 0, NULL);
+			NewtonBody* const body = CreateSimpleBody (world, entity, plankMass, entity->GetNextMatrix(), collision, 0);
 			NewtonDestroyCollision (collision);
 			planks.Insert(body, entity->GetName());
 		}
@@ -986,7 +999,6 @@ void AdvancedPlayerController (DemoEntityManager* const scene)
 
 	NewtonWorld* const world = scene->GetNewton();
 
-
 	// add an input Manage to manage the inputs and user interaction 
 	AdvancedPlayerInputManager* const inputManager = new AdvancedPlayerInputManager (scene);
 
@@ -1009,6 +1021,7 @@ void AdvancedPlayerController (DemoEntityManager* const scene)
 
 	// set as the player with the camera
 	inputManager->AddPlayer(player);
+
 
 /*
 	//dFloat x0 = location.m_posit.m_x;

@@ -2935,13 +2935,14 @@ dgInt32 dgCollisionConvex::CalculateConvexToConvexContact (dgCollisionParamProxy
 	} else {
 		minkHull.CalculateClosestPoints ();
 		minkHull.m_p = ConvexConicSupporVertex(minkHull.m_p, minkHull.m_normal);
-		dgFloat32 penetration = minkHull.m_normal % (minkHull.m_p - minkHull.m_q) + proxy.m_skinThickness;
-		if (penetration >= dgFloat32 (0.0f)) {
-			penetration = dgMax(penetration - DG_IMPULSIVE_CONTACT_PENETRATION, dgFloat32 (0.0f));
+		//dgFloat32 penetration = minkHull.m_normal % (minkHull.m_p - minkHull.m_q) + proxy.m_skinThickness;
+		dgFloat32 penetration = minkHull.m_normal % (minkHull.m_q - minkHull.m_p) + proxy.m_skinThickness;
+		if (penetration <= dgFloat32 (0.0f)) {
+			penetration = dgMax(penetration,  - DG_IMPULSIVE_CONTACT_PENETRATION);
 			dgVector contactPoint ((minkHull.m_p + minkHull.m_q).Scale4 (dgFloat32 (0.5f)));
 			count = CalculateContacts (contactPoint, minkHull.m_normal.Scale4 (-1.0f), proxy, minkHull.m_hullDiff);
 		}
-		proxy.m_contactJoint->m_closestDistance = - penetration;
+		proxy.m_contactJoint->m_closestDistance = penetration;
 
 		dgCollisionInstance* const collConicConvexInstance = proxy.m_referenceCollision;
 		const dgVector& scale = collConicConvexInstance->GetScale();
@@ -2956,7 +2957,7 @@ dgInt32 dgCollisionConvex::CalculateConvexToConvexContact (dgCollisionParamProxy
 				for (dgInt32 i = 0; i < count; i ++) {
 					contactOut[i].m_point = matrix.TransformVector(scale.CompProduct3(minkHull.m_hullDiff[i]));
 					contactOut[i].m_normal = proxy.m_normal;
-					contactOut[i].m_penetration = penetration;
+					contactOut[i].m_penetration = - penetration;
 				}
 			}
 			proxy.m_closestPointBody0 = matrix.TransformVector(scale.CompProduct4(minkHull.m_p));
@@ -2972,7 +2973,7 @@ dgInt32 dgCollisionConvex::CalculateConvexToConvexContact (dgCollisionParamProxy
 				for (dgInt32 i = 0; i < count; i ++) {
 					contactOut[i].m_point = matrix.TransformVector(scale.CompProduct3(alignMatrix.TransformVector(minkHull.m_hullDiff[i])));
 					contactOut[i].m_normal = proxy.m_normal;
-					contactOut[i].m_penetration = penetration;
+					contactOut[i].m_penetration = -penetration;
 				}
 			}
 			proxy.m_closestPointBody0 = matrix.TransformVector(scale.CompProduct4(alignMatrix.TransformVector(minkHull.m_p)));
