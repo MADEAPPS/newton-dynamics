@@ -7505,7 +7505,9 @@ NewtonBody* NewtonJointGetBody0(const NewtonJoint* const joint)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgConstraint* const contraint = (dgConstraint*) joint;
-	return (NewtonBody*) contraint->GetBody0();
+	dgBody* const body = contraint->GetBody0();
+	dgWorld* const world = body->GetWorld();
+	return (world->GetSentinelBody() != body) ? (NewtonBody*) body : NULL;
 }
 
 
@@ -7519,11 +7521,9 @@ NewtonBody* NewtonJointGetBody0(const NewtonJoint* const joint)
 NewtonBody* NewtonJointGetBody1(const NewtonJoint* const joint)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-
 	dgConstraint* const contraint = (dgConstraint*) joint;
 	dgBody* const body = contraint->GetBody1();
 	dgWorld* const world = body->GetWorld();
-
 	return (world->GetSentinelBody() != body) ? (NewtonBody*) body : NULL;
 }
 
