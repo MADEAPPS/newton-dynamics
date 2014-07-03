@@ -2938,9 +2938,11 @@ dgInt32 dgCollisionConvex::CalculateConvexToConvexContact (dgCollisionParamProxy
 		//dgFloat32 penetration = minkHull.m_normal % (minkHull.m_p - minkHull.m_q) + proxy.m_skinThickness;
 		dgFloat32 penetration = minkHull.m_normal % (minkHull.m_q - minkHull.m_p) + proxy.m_skinThickness;
 		if (penetration <= dgFloat32 (0.0f)) {
-			penetration = dgMax(penetration,  - DG_IMPULSIVE_CONTACT_PENETRATION);
-			dgVector contactPoint ((minkHull.m_p + minkHull.m_q).Scale4 (dgFloat32 (0.5f)));
-			count = CalculateContacts (contactPoint, minkHull.m_normal.Scale4 (-1.0f), proxy, minkHull.m_hullDiff);
+            if (proxy.m_referenceCollision->GetCollisionMode() & proxy.m_floatingCollision->GetCollisionMode()) {
+                penetration = dgMax(penetration,  - DG_IMPULSIVE_CONTACT_PENETRATION);
+			    dgVector contactPoint ((minkHull.m_p + minkHull.m_q).Scale4 (dgFloat32 (0.5f)));
+			    count = CalculateContacts (contactPoint, minkHull.m_normal.Scale4 (-1.0f), proxy, minkHull.m_hullDiff);
+            }
 		}
 		proxy.m_contactJoint->m_closestDistance = penetration;
 
@@ -3196,23 +3198,24 @@ dgInt32 dgCollisionConvex::CalculateConvexCastContacts(dgCollisionParamProxy& pr
 
 			dgFloat32 penetration = dgMax(num * dgFloat32 (-1.0f) - DG_IMPULSIVE_CONTACT_PENETRATION, dgFloat32 (0.0f));
 			if (proxy.m_contacts) {
-				dgVector contactPoint ((minkHull.m_p + minkHull.m_q).Scale3 (dgFloat32 (0.5f)));
-				// note: not sure if I need to restore the proxy.m_matrix, provable so, but for now I will not
-				proxy.m_matrix = minkHull.m_matrix;
-				count = CalculateContacts (contactPoint, minkHull.m_normal.Scale4 (-1.0f), proxy, minkHull.m_hullDiff);
-				if (count) {
-					
-					proxy.m_timestep = tacc;
-					count = dgMin(proxy.m_maxContacts, count);
-					dgContactPoint* const contactOut = proxy.m_contacts;
-					for (dgInt32 i = 0; i < count; i ++) {
-						contactOut[i].m_point = matrix.TransformVector(scale.CompProduct4(minkHull.m_hullDiff[i] - step)) & dgVector::m_triplexMask;
-						contactOut[i].m_normal = proxy.m_normal;
-						contactOut[i].m_penetration = penetration;
-						contactOut[i].m_shapeId0 = collConicConvexInstance->GetUserDataID();
-						contactOut[i].m_shapeId1 = proxy.m_shapeFaceID;
-					}
-				}
+                if (proxy.m_referenceCollision->GetCollisionMode() & proxy.m_floatingCollision->GetCollisionMode()) {
+				    dgVector contactPoint ((minkHull.m_p + minkHull.m_q).Scale3 (dgFloat32 (0.5f)));
+				    // note: not sure if I need to restore the proxy.m_matrix, provable so, but for now I will not
+				    proxy.m_matrix = minkHull.m_matrix;
+				    count = CalculateContacts (contactPoint, minkHull.m_normal.Scale4 (-1.0f), proxy, minkHull.m_hullDiff);
+				    if (count) {
+					    proxy.m_timestep = tacc;
+					    count = dgMin(proxy.m_maxContacts, count);
+					    dgContactPoint* const contactOut = proxy.m_contacts;
+					    for (dgInt32 i = 0; i < count; i ++) {
+						    contactOut[i].m_point = matrix.TransformVector(scale.CompProduct4(minkHull.m_hullDiff[i] - step)) & dgVector::m_triplexMask;
+						    contactOut[i].m_normal = proxy.m_normal;
+						    contactOut[i].m_penetration = penetration;
+						    contactOut[i].m_shapeId0 = collConicConvexInstance->GetUserDataID();
+						    contactOut[i].m_shapeId1 = proxy.m_shapeFaceID;
+					    }
+				    }
+                }
 			} else {
 				proxy.m_contactJoint->m_closestDistance = penetration;
 				proxy.m_timestep = tacc;

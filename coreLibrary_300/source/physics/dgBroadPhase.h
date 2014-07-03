@@ -79,6 +79,7 @@ class dgBroadPhase
 	dgBroadPhase(dgWorld* const world);
 	virtual ~dgBroadPhase();
 
+    dgUnsigned32 GetLRU () const;
 	void GetWorldSize (dgVector& p0, dgVector& p1) const;
 	void RayCast (const dgVector& p0, const dgVector& p1, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData) const;
 	void ConvexRayCast (dgCollisionInstance* const shape, const dgMatrix& matrx, const dgVector& p1, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData, dgInt32 threadId) const;

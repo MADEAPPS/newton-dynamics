@@ -1809,6 +1809,11 @@ void dgBroadPhase::AddInternallyGeneratedBody(dgBody* const body)
 	m_generatedBodies.Append(body);
 }
 
+dgUnsigned32 dgBroadPhase::GetLRU () const
+{
+    return m_lru;
+}
+
 void dgBroadPhase::UpdateContacts (dgFloat32 timestep)
 {
 	dgUnsigned32 ticks = m_world->m_getPerformanceCount();

@@ -195,6 +195,7 @@ DG_MSC_VECTOR_ALIGMENT
 class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 {
 	public:
+    dgFloat32 GetClosestDistance() const;
 	dgFloat32 GetTimeOfImpact() const;
 	void SetTimeOfImpact(dgFloat32 timetoImpact);
 	const dgContactMaterial* GetMaterial() const;
@@ -231,6 +232,7 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 	dgUnsigned32 m_isNewContact				: 1;
 
 
+    friend class dgBody;
 	friend class dgWorld;
 	friend class dgBroadPhase;
 	friend class dgContactSolver;
@@ -287,6 +289,11 @@ inline void dgContact::SetTimeOfImpact(dgFloat32 timetoImpact)
 inline dgFloat32 dgContact::GetTimeOfImpact() const
 {
 	return m_timeOfImpact;
+}
+
+inline dgFloat32 dgContact::GetClosestDistance() const
+{
+    return m_closestDistance;
 }
 #endif 
 

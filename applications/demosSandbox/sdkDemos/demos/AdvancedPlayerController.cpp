@@ -283,81 +283,85 @@ class AdvancedPlayerInputManager: public CustomInputManager
 
 	void OnBeginUpdate (dFloat timestepInSecunds)
 	{
-		AdvancePlayerEntity::InputRecord inputs;
+        if (m_player) {
+		    AdvancePlayerEntity::InputRecord inputs;
 
-		DemoCamera* const camera = m_scene->GetCamera();
-		NewtonDemos* const mainWindow = m_scene->GetRootWindow();
+		    DemoCamera* const camera = m_scene->GetCamera();
+		    NewtonDemos* const mainWindow = m_scene->GetRootWindow();
 
-		// set the help key
-		m_helpKey.UpdatePushButton (mainWindow, 'H');
+		    // set the help key
+		    m_helpKey.UpdatePushButton (mainWindow, 'H');
 
-		// read the player inputs
-		inputs.m_headinAngle = camera->GetYawAngle();
-		inputs.m_cameraMode = m_cameraMode.UpdatePushButton(m_scene->GetRootWindow(), 'C') ? 1 : 0;
-		inputs.m_forwarSpeed = (int (mainWindow->GetKeyState ('W')) - int (mainWindow->GetKeyState ('S'))) * PLAYER_WALK_SPEED;
-		inputs.m_strafeSpeed = (int (mainWindow->GetKeyState ('D')) - int (mainWindow->GetKeyState ('A'))) * PLAYER_WALK_SPEED;
-		inputs.m_jumpSpeed = (m_jumpKey.UpdateTriggerButton(mainWindow, ' ')) ? PLAYER_JUMP_SPEED : 0.0f;
+		    // read the player inputs
+		    inputs.m_headinAngle = camera->GetYawAngle();
+		    inputs.m_cameraMode = m_cameraMode.UpdatePushButton(m_scene->GetRootWindow(), 'C') ? 1 : 0;
+		    inputs.m_forwarSpeed = (int (mainWindow->GetKeyState ('W')) - int (mainWindow->GetKeyState ('S'))) * PLAYER_WALK_SPEED;
+		    inputs.m_strafeSpeed = (int (mainWindow->GetKeyState ('D')) - int (mainWindow->GetKeyState ('A'))) * PLAYER_WALK_SPEED;
+		    inputs.m_jumpSpeed = (m_jumpKey.UpdateTriggerButton(mainWindow, ' ')) ? PLAYER_JUMP_SPEED : 0.0f;
 
-		// normalize player speed
-		dFloat mag2 = inputs.m_forwarSpeed * inputs.m_forwarSpeed + inputs.m_strafeSpeed * inputs.m_strafeSpeed;
-		if (mag2 > 0.0f) {
-			dFloat invMag = PLAYER_WALK_SPEED / dSqrt (mag2);
-			inputs.m_forwarSpeed *= invMag;
-			inputs.m_strafeSpeed *= invMag;
-		}
+		    // normalize player speed
+		    dFloat mag2 = inputs.m_forwarSpeed * inputs.m_forwarSpeed + inputs.m_strafeSpeed * inputs.m_strafeSpeed;
+		    if (mag2 > 0.0f) {
+			    dFloat invMag = PLAYER_WALK_SPEED / dSqrt (mag2);
+			    inputs.m_forwarSpeed *= invMag;
+			    inputs.m_strafeSpeed *= invMag;
+		    }
 
-		// see if we are shotting some props
-		m_shootState = m_shootProp.UpdateTriggerButton(mainWindow, 0x0d) ? 1 : 0;
+		    // see if we are shotting some props
+		    m_shootState = m_shootProp.UpdateTriggerButton(mainWindow, 0x0d) ? 1 : 0;
 
 
-#if 0
-	#if 0
-		static FILE* file = fopen ("log.bin", "wb");
-		if (file) {
-			fwrite (&inputs, sizeof (inputs), 1, file);
-			fflush(file);
-		}
-	#else 
-		static FILE* file = fopen ("log.bin", "rb");
-		if (file) {
-			fread (&inputs, sizeof (inputs), 1, file);
-		}
-	#endif
-#endif
-		m_player->SetInput(inputs);
+    #if 0
+	    #if 0
+		    static FILE* file = fopen ("log.bin", "wb");
+		    if (file) {
+			    fwrite (&inputs, sizeof (inputs), 1, file);
+			    fflush(file);
+		    }
+	    #else 
+		    static FILE* file = fopen ("log.bin", "rb");
+		    if (file) {
+			    fread (&inputs, sizeof (inputs), 1, file);
+		    }
+	    #endif
+    #endif
+		    m_player->SetInput(inputs);
+        }
 	}
 
 	void OnEndUpdate (dFloat timestepInSecunds)
 	{
-		DemoCamera* const camera = m_scene->GetCamera();
+        if (m_player) {
+		    DemoCamera* const camera = m_scene->GetCamera();
 
-		dMatrix camMatrix(camera->GetNextMatrix());
-		dMatrix playerMatrix (m_player->GetNextMatrix());
+		    dMatrix camMatrix(camera->GetNextMatrix());
+		    dMatrix playerMatrix (m_player->GetNextMatrix());
 
-		dVector frontDir (camMatrix[0]);
+		    dVector frontDir (camMatrix[0]);
 
-		CustomPlayerController* const controller = m_player->m_controller; 
-		dFloat height = controller->GetHigh();
-		dVector upDir (controller->GetUpDir());
+		    CustomPlayerController* const controller = m_player->m_controller; 
+		    dFloat height = controller->GetHigh();
+		    dVector upDir (controller->GetUpDir());
 
-		dVector camOrigin; 
+		    dVector camOrigin; 
 
-		if (m_player->m_inputs.m_cameraMode) {
-			// set third person view camera
-			camOrigin = playerMatrix.TransformVector (upDir.Scale(height));
-			camOrigin -= frontDir.Scale (PLAYER_THIRD_PERSON_VIEW_DIST);
-		} else {
-			// set first person view camera
-			camMatrix = camMatrix * playerMatrix;
-			camOrigin = playerMatrix.TransformVector (upDir.Scale(height));
-		}
+		    if (m_player->m_inputs.m_cameraMode) {
+			    // set third person view camera
+			    camOrigin = playerMatrix.TransformVector (upDir.Scale(height));
+			    camOrigin -= frontDir.Scale (PLAYER_THIRD_PERSON_VIEW_DIST);
+		    } else {
+			    // set first person view camera
+			    camMatrix = camMatrix * playerMatrix;
+			    camOrigin = playerMatrix.TransformVector (upDir.Scale(height));
+		    }
 
-		camera->SetNextMatrix (*m_scene, camMatrix, camOrigin);
+		    camera->SetNextMatrix (*m_scene, camMatrix, camOrigin);
 
-		// update the shot button
-		if (m_shootState) {
-			SpawnRandomProp (camera->GetNextMatrix());
-		}
+		    // update the shot button
+		    if (m_shootState) {
+			    SpawnRandomProp (camera->GetNextMatrix());
+		    }
+        }
 	}
 
 	void AddPlayer (AdvancePlayerEntity* const player)
