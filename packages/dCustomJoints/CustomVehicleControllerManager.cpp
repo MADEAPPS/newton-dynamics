@@ -1206,7 +1206,7 @@ void CustomVehicleController::TireBodyState::Init (CustomVehicleController* cons
 
 	// build a normalized size collision shape and scale to math the tire size, make it is also transparent to collision  
 	NewtonCollisionSetScale (m_controller->m_tireCastShape, tireInfo.m_width, tireInfo.m_radio, tireInfo.m_radio);
-	NewtonCollisionSetCollisonMode (m_controller->m_tireCastShape, 0);
+	NewtonCollisionSetCollisionMode (m_controller->m_tireCastShape, 0);
 
 	// calculate the location of the tire matrix
 	m_localFrame = vehicleFrame * dYawMatrix(-3.141592f * 0.5f);
@@ -1222,7 +1222,7 @@ void CustomVehicleController::TireBodyState::Init (CustomVehicleController* cons
 
 	// restore the cast shape transform to identity
 	dMatrix identMatrix (GetIdentityMatrix());
-	NewtonCollisionSetCollisonMode (m_controller->m_tireCastShape, 1);
+	NewtonCollisionSetCollisionMode (m_controller->m_tireCastShape, 1);
 	NewtonCollisionSetMatrix (m_controller->m_tireCastShape, &identMatrix[0][0]);
 
 	// get the collision shape

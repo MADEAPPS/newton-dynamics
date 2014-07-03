@@ -208,7 +208,7 @@ void CustomTriggerController::Init (NewtonCollision* const convexShape, const dM
 	
 	// set this shape do not collide with other bodies
 	NewtonCollision* const collision = NewtonBodyGetCollision (m_body);
-	NewtonCollisionSetCollisonMode(collision, 0);
+	NewtonCollisionSetCollisionMode(collision, 0);
 }
 
 

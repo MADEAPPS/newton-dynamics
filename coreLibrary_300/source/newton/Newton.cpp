@@ -3001,7 +3001,7 @@ int NewtonCollisionGetMode(const NewtonCollision* const convexCollision)
 // Setting this flag is not really a necessary to place a collision trigger however this option hint the engine that 
 // this particular shape is a trigger volume and no contact calculation is desired.
 //
-void NewtonCollisionSetCollisonMode (const NewtonCollision* convexCollision, int mode)
+void NewtonCollisionSetCollisionMode (const NewtonCollision* const convexCollision, int mode)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const collision = (dgCollisionInstance*) convexCollision;
