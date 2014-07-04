@@ -66,6 +66,7 @@ class TriggerManager: public CustomTriggerManager
 				case m_enterTrigger:
 					message = ENTER_TRIGGER;
 					break;
+
 				case m_exitTrigger:
 					message = EXIT_TRIGGER;
 					break;
@@ -380,6 +381,7 @@ class AdvancedPlayerInputManager: public CustomInputManager
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "strafe left:             A");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "toggle camera mode:      C");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "jump:                    Space");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "throw solids at player:  Enter");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help:               H");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "change player direction: Left mouse button");
 		}
@@ -661,6 +663,7 @@ static void LoadFerryBridge (DemoEntityManager* const scene, TriggerManager* con
 			DemoMesh* const mesh = entity->GetMesh();
 
 			const dMatrix& meshMatrix = entity->GetMeshMatrix();
+			//const dMatrix& meshMatrix (GetIdentityMatrix());
 			NewtonCollision* const collision = NewtonCreateConvexHull(world, mesh->m_vertexCount, mesh->m_vertex, 3 * sizeof (dFloat), 0, 0, &meshMatrix[0][0]);
 			void* const proxy = NewtonSceneCollisionAddSubCollision (sceneCollision, collision);
 			NewtonDestroyCollision (collision);
@@ -1025,7 +1028,6 @@ void AdvancedPlayerController (DemoEntityManager* const scene)
 
 	// set as the player with the camera
 	inputManager->AddPlayer(player);
-
 
 /*
 	//dFloat x0 = location.m_posit.m_x;

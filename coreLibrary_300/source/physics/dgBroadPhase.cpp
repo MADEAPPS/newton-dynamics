@@ -913,6 +913,7 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgVe
 		}
 
 		if (newContact) {
+			contact->m_contactActive = 0;
 			contact->m_broadphaseLru = m_lru;
 			contact->m_timeOfImpact = dgFloat32 (1.0e10f);
 			contactPairs->AddPair(contact, threadID);
@@ -920,6 +921,7 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgVe
 			dgAssert (contact);
 			bool kinematicBodyEquilibrium = (((body0->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body0->IsCollidable()) | ((body1->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body1->IsCollidable())) ? false : true;
 			if (!(body0->m_equilibrium & body1->m_equilibrium & kinematicBodyEquilibrium & (contact->m_closestDistance > (DG_CACHE_DIST_TOL * dgFloat32 (4.0f))))) {
+				contact->m_contactActive = 0;
 				contact->m_broadphaseLru = m_lru;
 				contact->m_timeOfImpact = dgFloat32 (1.0e10f);
 				contactPairs->AddPair(contact, threadID);

@@ -353,7 +353,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (dgIsland* const island, dgInt32 
 		for (dgInt32 k = 0; k < jointCount; k ++) {
 			const dgJointInfo* const jointInfo = &constraintArray[k];
 			dgConstraint* const constraint = jointInfo->m_joint;
-			if (constraint->m_active) {
+			if (constraint->m_solverActive) {
 				dgInt32 index = jointInfo->m_autoPairstart;
 				dgInt32 count = jointInfo->m_autoPaircount;
 				dgInt32 m0 = jointInfo->m_m0;
@@ -827,7 +827,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 	for (dgInt32 i = 0; i < jointCount; i ++) {
 		dgJointInfo* const jointInfo = &constraintArray[i];
 		dgConstraint* const constraint = jointInfo->m_joint;
-		if (constraint->m_active) {
+		if (constraint->m_solverActive) {
 			dgJacobian y0;
 			dgJacobian y1;
 			y0.m_linear = zero;
@@ -883,7 +883,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 			for (dgInt32 curJoint = 0; curJoint < jointCount; curJoint ++) {
 				dgJointInfo* const jointInfo = &constraintArray[curJoint];
 				dgConstraint* const constraint = jointInfo->m_joint;
-				if (constraint->m_active) {
+				if (constraint->m_solverActive) {
 					joindDesc.m_rowsCount = constraintArray[curJoint].m_autoPaircount;
 					joindDesc.m_rowMatrix = &matrixRow[constraintArray[curJoint].m_autoPairstart];
 					constraint->JointAccelerations (&joindDesc);
@@ -894,7 +894,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 			for (dgInt32 curJoint = 0; curJoint < jointCount; curJoint ++) {
 				dgJointInfo* const jointInfo = &constraintArray[curJoint];
 				dgConstraint* const constraint = jointInfo->m_joint;
-				if (constraint->m_active) {
+				if (constraint->m_solverActive) {
 					dgInt32 m0 = constraintArray[curJoint].m_m0;
 					dgInt32 m1 = constraintArray[curJoint].m_m1;
 					const dgBody* const body0 = bodyArray[m0].m_body;
@@ -915,7 +915,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 			for (dgInt32 curJoint = 0; curJoint < jointCount; curJoint ++) {
 				dgJointInfo* const jointInfo = &constraintArray[curJoint];
 				dgConstraint* const constraint = jointInfo->m_joint;
-				if(constraint->m_active) {
+				if(constraint->m_solverActive) {
 					dgInt32 m0 = constraintArray[curJoint].m_m0;
 					dgInt32 m1 = constraintArray[curJoint].m_m1;
 					const dgBody* const body0 = bodyArray[m0].m_body;
@@ -1056,7 +1056,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 		for (dgInt32 i = 0; i < jointCount; i ++) {
 			dgJointInfo* const jointInfo = &constraintArray[i];
 			dgConstraint* const constraint = jointInfo->m_joint;
-			if (constraint->m_active) {
+			if (constraint->m_solverActive) {
 				dgInt32 first = constraintArray[i].m_autoPairstart;
 				dgInt32 count = constraintArray[i].m_autoPaircount;
 

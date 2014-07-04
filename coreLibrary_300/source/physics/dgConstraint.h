@@ -164,6 +164,8 @@ class dgConstraint
 	dgBodyMasterListRow::dgListNode* GetLink0()	const;
 	dgBodyMasterListRow::dgListNode* GetLink1()	const;
 	void* GetUserData () const;
+
+	bool IsActive() const;
 	bool IsCollidable () const;
 	
 
@@ -175,7 +177,7 @@ class dgConstraint
 	virtual dgFloat32 GetStiffness() const;
 	virtual void SetStiffness(dgFloat32 stiffness);
 	virtual void GetInfo (dgConstraintInfo* const info) const;
-	virtual bool IsActive() const;
+	
 
 	class dgPointParam
 	{
@@ -223,8 +225,9 @@ class dgConstraint
 	dgUnsigned32 m_constId			:  6;		
 	dgUnsigned32 m_enableCollision	:  1;
 	dgUnsigned32 m_useExactSolver	:  1;
-	dgUnsigned32 m_active			:  1;
-
+	dgUnsigned32 m_solverActive		:  1;
+	dgUnsigned32 m_contactActive	:  1;
+	
 	friend class dgWorld;
 	friend class dgJacobianMemory;
 	friend class dgBodyMasterList;
@@ -248,7 +251,8 @@ inline dgConstraint::dgConstraint()
 	,m_constId(m_unknownConstraint)
 	,m_enableCollision(false)
 	,m_useExactSolver(false)
-	,m_active(false)
+	,m_solverActive(false)
+	,m_contactActive(false)
 {
 	dgAssert ((((dgUnsigned64) this) & 15) == 0);
 }
@@ -320,7 +324,7 @@ inline dgInt32 dgConstraint::GetMaxDOF() const
 
 inline bool dgConstraint::IsActive() const
 {
-	return true;
+	return m_contactActive ? true : false;
 }
 
 #endif // !defined(AFX_DGCONSTRAINT_H__F9EC24E0_6E0F_4CD5_909E_A5F5E1AC7C0B_H)

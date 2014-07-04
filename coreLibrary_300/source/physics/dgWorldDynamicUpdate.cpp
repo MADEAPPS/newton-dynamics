@@ -672,7 +672,7 @@ void dgWorldDynamicUpdate::FindActiveJointAndBodies (dgIsland* const island)
 			body1->m_resting &= (resting | !m1);
 			body0->m_active |= !(!m0);
 			body1->m_active |= !(!m1);
-			joint->m_active = true;
+			joint->m_solverActive = true;
 		}
 	} else if (jointCount){
 		for (dgInt32 i = 0; i < jointCount; i ++) {
@@ -682,7 +682,7 @@ void dgWorldDynamicUpdate::FindActiveJointAndBodies (dgIsland* const island)
 			dgInt32 m1 = (joint->m_body1->GetInvMass().m_w != dgFloat32(0.0f)) ? joint->m_body1->m_index: 0;
 			jointInfo->m_m0 = m0;
 			jointInfo->m_m1 = m1;
-			joint->m_active = true;
+			joint->m_solverActive = true;
 		}
 
 		dgInt32 bodyCount = island->m_bodyCount;
@@ -754,7 +754,7 @@ void dgWorldDynamicUpdate::GetJacobianDerivatives (const dgIsland* const island,
 		dgJointInfo* const jointInfo = &constraintArray[j];
 		dgConstraint* const constraint = jointInfo->m_joint;
 
-		if (constraint->m_active) {
+		if (constraint->m_solverActive) {
 			dgInt32 dof = dgInt32 (constraint->m_maxDOF);
 			dgAssert (dof <= DG_CONSTRAINT_MAX_ROWS);
 			for (dgInt32 i = 0; i < dof; i ++) {

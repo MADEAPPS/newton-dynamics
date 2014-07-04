@@ -105,12 +105,6 @@ void dgContact::SwapBodies()
 	dgSwap (m_link0, m_link1);
 }
 
-bool dgContact::IsActive() const
-{
-	dgAssert (m_body0);
-	dgUnsigned32 lru = m_body0->m_world->GetBroadPhase()->GetLRU() - 1;
-	return (m_broadphaseLru >= lru);
-}
 
 void dgContact::GetInfo (dgConstraintInfo* const info) const
 {

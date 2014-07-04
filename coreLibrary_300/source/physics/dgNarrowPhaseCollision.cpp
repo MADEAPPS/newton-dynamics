@@ -999,7 +999,9 @@ dgInt32 dgWorld::ValidateContactCache (dgContact* const contact, dgFloat32 times
 	dgVector mask ((positError2 < m_linearContactError2) & (rotatError2 < m_angularContactError2));
 
 	dgList<dgContactMaterial>& list = *contact;
-	return mask.GetSignMask() ? list.GetCount() : 0;
+	dgInt32 testMask = mask.GetSignMask() ? 1 : 0;
+	contact->m_contactActive = testMask;
+	return testMask * list.GetCount();
 }
 
 
@@ -1598,6 +1600,7 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) 
 				}
 			}
 
+
 			count = convexShape->CalculateConvexToConvexContact (tmp);
 			proxy.m_timestep = tmp.m_timestep;
 
@@ -1846,6 +1849,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts (dgCollisionParamProxy& prox
 		}
 
 		if (count > 0) {
+			proxy.m_contactJoint->m_contactActive = 1;
 			count = PruneContacts (count, proxy.m_contacts);
 			dgContactPoint* const contactOut = proxy.m_contacts;
 			for (dgInt32 i = 0; i < count; i ++) {
