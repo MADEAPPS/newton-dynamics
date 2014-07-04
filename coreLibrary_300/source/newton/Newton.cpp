@@ -5368,7 +5368,7 @@ void* NewtonContactJointGetFirstContact(const NewtonJoint* const contactJoint)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgContact* const joint = (dgContact *)contactJoint;
-	if ((joint->GetId() == dgConstraint::m_contactConstraint) && joint->GetCount()){
+	if ((joint->GetId() == dgConstraint::m_contactConstraint) && joint->GetCount() && joint->GetMaxDOF()){
 		return joint->GetFirst();
 	} else {
 		return NULL;
