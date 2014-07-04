@@ -995,12 +995,12 @@ dgInt32 dgWorld::ValidateContactCache (dgContact* const contact, dgFloat32 times
 
 	dgVector positError2 (contact->m_positAcc.DotProduct4 (contact->m_positAcc));
 	dgVector rotatError2 (angle.DotProduct4(angle));
-	
+
 	dgVector mask ((positError2 < m_linearContactError2) & (rotatError2 < m_angularContactError2));
 
 	dgList<dgContactMaterial>& list = *contact;
 	dgInt32 testMask = mask.GetSignMask() ? 1 : 0;
-	contact->m_contactActive = testMask;
+	contact->m_contactActive |= testMask;
 	return testMask * list.GetCount();
 }
 

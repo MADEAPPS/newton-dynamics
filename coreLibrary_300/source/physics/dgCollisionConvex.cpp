@@ -3076,7 +3076,7 @@ dgInt32 dgCollisionConvex::CalculateConvexToConvexContact (dgCollisionParamProxy
 		minkHull.m_p = ConvexConicSupporVertex(minkHull.m_p, minkHull.m_normal);
 		//dgFloat32 penetration = minkHull.m_normal % (minkHull.m_p - minkHull.m_q) + proxy.m_skinThickness;
 		//return (penetration < dgFloat32 (0.0f)) ? 0 : -1;
-		dgFloat32 penetration = minkHull.m_normal % (minkHull.m_q - minkHull.m_p) + proxy.m_skinThickness;
+		dgFloat32 penetration = minkHull.m_normal % (minkHull.m_q - minkHull.m_p) - proxy.m_skinThickness;
 		dgInt32 retVal = (penetration <= dgFloat32 (0.0f)) ? -1 : 0;
 		proxy.m_contactJoint->m_contactActive = retVal;
 		return retVal;
@@ -3084,11 +3084,11 @@ dgInt32 dgCollisionConvex::CalculateConvexToConvexContact (dgCollisionParamProxy
 		minkHull.CalculateClosestPoints ();
 		minkHull.m_p = ConvexConicSupporVertex(minkHull.m_p, minkHull.m_normal);
 		//dgFloat32 penetration = minkHull.m_normal % (minkHull.m_p - minkHull.m_q) + proxy.m_skinThickness;
-		dgFloat32 penetration = minkHull.m_normal % (minkHull.m_q - minkHull.m_p) + proxy.m_skinThickness;
+		dgFloat32 penetration = minkHull.m_normal % (minkHull.m_q - minkHull.m_p) - proxy.m_skinThickness;
 		if (penetration <= dgFloat32 (0.0f)) {
 			proxy.m_contactJoint->m_contactActive = 1;
 			if (proxy.m_referenceCollision->GetCollisionMode() & proxy.m_floatingCollision->GetCollisionMode()) {
-				penetration = dgMax(penetration,  - DG_IMPULSIVE_CONTACT_PENETRATION);
+				penetration = dgMin(penetration + DG_IMPULSIVE_CONTACT_PENETRATION, dgFloat32 (0.0f));
 				dgVector contactPoint ((minkHull.m_p + minkHull.m_q).Scale4 (dgFloat32 (0.5f)));
 				count = CalculateContacts (contactPoint, minkHull.m_normal.Scale4 (-1.0f), proxy, minkHull.m_hullDiff);
 			}

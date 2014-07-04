@@ -522,7 +522,7 @@ class PlaformEntityEntity: public DemoEntity
 		DemoMesh* const mesh = source->GetMesh();
 		SetMesh(mesh, source->GetMeshMatrix());
 
-		const dFloat mass = 100.9f;
+		const dFloat mass = 100.0f;
 		dMatrix matrix (source->GetNextMatrix()) ;
 		NewtonWorld* const world = scene->GetNewton();
 
