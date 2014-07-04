@@ -5325,6 +5325,13 @@ NewtonJoint* NewtonBodyGetNextContactJoint(const NewtonBody* const bodyPtr, cons
 }
 
 
+int NewtonJointIsActive(const NewtonJoint* const jointPtr)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgConstraint* const joint = (dgConstraint*) jointPtr;
+	return joint->IsActive() ? 1 : 0;
+}
+
 
 // Name: NewtonContactJointGetContactCount 
 // Return to number of contact in this contact joint.

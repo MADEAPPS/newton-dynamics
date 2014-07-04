@@ -367,16 +367,9 @@ dgConstraint* dgBody::GetFirstContact() const
 {
 	for (dgBodyMasterListRow::dgListNode* node = m_masterNode->GetInfo().GetFirst(); node; node = node->GetNext()) {
 		dgConstraint* const joint = node->GetInfo().m_joint;
-//		if ((joint->GetId() == dgConstraint::m_contactConstraint) && (joint->GetMaxDOF() != 0)) {
-        if (joint->GetId() == dgConstraint::m_contactConstraint) {
-            if (joint->GetMaxDOF() != 0) {
-                return joint;
-            } else {
-                dgUnsigned32 lru = m_world->GetBroadPhase()->GetLRU() - 1;
-                dgContact* const contact = (dgContact*) joint;
-                //dgFloat32 closestDistance = contact->GetClosestDistance();
-                return (contact->m_broadphaseLru >= lru) ? joint : NULL;
-            }
+		//if ((joint->GetId() == dgConstraint::m_contactConstraint) && (joint->GetMaxDOF() != 0)) {
+		if (joint->GetId() == dgConstraint::m_contactConstraint) {
+			return joint;
 		}
 	}
 	return NULL;
@@ -392,16 +385,9 @@ dgConstraint* dgBody::GetNextContact(dgConstraint* const joint) const
 	if (node->GetInfo().m_joint == joint) {
 		for (node = node->GetNext(); node; node = node->GetNext()) {
 			dgConstraint* const joint = node->GetInfo().m_joint;
-//			if ((joint->GetId() == dgConstraint::m_contactConstraint) && (joint->GetMaxDOF() != 0)) {
-            if (joint->GetId() == dgConstraint::m_contactConstraint) {
-                if (joint->GetMaxDOF() != 0) {
-                    return joint;
-                } else {
-                    dgUnsigned32 lru = m_world->GetBroadPhase()->GetLRU() - 1;
-                    dgContact* const contact = (dgContact*) joint;
-                    //dgFloat32 closestDistance = contact->GetClosestDistance();
-                    return (contact->m_broadphaseLru >= lru) ? joint : NULL;
-                }
+			//if ((joint->GetId() == dgConstraint::m_contactConstraint) && (joint->GetMaxDOF() != 0)) {
+			if (joint->GetId() == dgConstraint::m_contactConstraint) {
+				return joint;
 			}
 		}
 	}

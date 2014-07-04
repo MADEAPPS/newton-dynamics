@@ -28,30 +28,6 @@
 // they are not visible and do not collide with bodies, but the generate contacts
 class CustomTriggerController: public CustomControllerBase
 {
-	protected:
-	class Passenger
-	{
-		public:
-		unsigned m_lru;
-		NewtonBody* m_body;
-		CustomTriggerController* m_controller;
-	};
-
-	class PassangerManifest: public CustomList<Passenger>
-	{
-		public:
-		CUSTOM_JOINTS_API PassangerManifest ();
-		CUSTOM_JOINTS_API ~PassangerManifest ();
-
-		CUSTOM_JOINTS_API Passenger* Find (NewtonBody* const m_body);
-		CUSTOM_JOINTS_API Passenger* Insert (NewtonBody* const m_body, CustomTriggerController* const controller);
-		CUSTOM_JOINTS_API void Pack();
-
-		int m_count;
-		int m_capacity;
-		CustomListNode** m_passangerList;
-	};
-
 	public:
 	CUSTOM_JOINTS_API CustomTriggerController();
 	CUSTOM_JOINTS_API ~CustomTriggerController();
@@ -61,7 +37,7 @@ class CustomTriggerController: public CustomControllerBase
 	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 	
 	private:
-	PassangerManifest m_manifest;
+	dTree<NewtonBody*,NewtonBody*> m_manifest;
 	friend class CustomTriggerManager;
 };
 
@@ -70,8 +46,8 @@ class CustomTriggerManager: public CustomControllerManager<CustomTriggerControll
 	public:
 	enum TriggerEventType
 	{
-		m_enterTrigger,
 		m_inTrigger,
+		m_enterTrigger,
 		m_exitTrigger,
 	};
 
@@ -91,10 +67,9 @@ class CustomTriggerManager: public CustomControllerManager<CustomTriggerControll
 
 	private:
 	void UpdateTrigger (CustomTriggerController* const controller);
-	static void EnterTriggerKernel (NewtonWorld* const world, void* const context, int threadIndex);
-	static void InTriggerKernel (NewtonWorld* const world, void* const context, int threadIndex);
+	static void UpdateTrigger (NewtonWorld* const world, void* const context, int threadIndex);
 
-	unsigned m_lru;
+	unsigned m_lock;
 	friend class CustomTriggerController;
 };
 

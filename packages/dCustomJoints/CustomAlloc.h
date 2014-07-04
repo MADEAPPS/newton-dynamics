@@ -43,6 +43,24 @@
 #endif
 
 
+class CustomScopeLock
+{
+	public:
+	CustomScopeLock (unsigned* const lock)
+		:m_atomicLock(lock)
+	{
+		while (NewtonAtomicSwap((int*)m_atomicLock, 1)) {
+			NewtonYield();
+		}
+	}
+	~CustomScopeLock()
+	{
+		NewtonAtomicSwap((int*)m_atomicLock, 0);	
+	}
+
+	unsigned* m_atomicLock;
+};
+
 
 class CustomAlloc  
 {

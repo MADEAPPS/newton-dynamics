@@ -165,7 +165,7 @@ class dgConstraint
 	dgBodyMasterListRow::dgListNode* GetLink1()	const;
 	void* GetUserData () const;
 	bool IsCollidable () const;
-
+	
 
 	dgInt32 GetMaxDOF() const;
 	void SetUserData (void *userData);
@@ -175,6 +175,7 @@ class dgConstraint
 	virtual dgFloat32 GetStiffness() const;
 	virtual void SetStiffness(dgFloat32 stiffness);
 	virtual void GetInfo (dgConstraintInfo* const info) const;
+	virtual bool IsActive() const;
 
 	class dgPointParam
 	{
@@ -317,6 +318,10 @@ inline dgInt32 dgConstraint::GetMaxDOF() const
 	return dgInt32 (m_maxDOF);
 }
 
+inline bool dgConstraint::IsActive() const
+{
+	return true;
+}
 
 #endif // !defined(AFX_DGCONSTRAINT_H__F9EC24E0_6E0F_4CD5_909E_A5F5E1AC7C0B_H)
 

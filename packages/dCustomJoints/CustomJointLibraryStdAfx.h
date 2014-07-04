@@ -53,6 +53,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <Newton.h>
+#include <dTree.h>
 #include <dMathDefines.h>
 #include <CustomAlloc.h>
 
