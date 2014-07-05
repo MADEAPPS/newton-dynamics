@@ -52,6 +52,10 @@ LIB_SRCS = \
 	$(SRC_PATH)/CustomInputManager.cpp \
 	$(SRC_PATH)/CustomTriggerManager.cpp \
 	$(SRC_PATH)/CustomPlayerControllerManager.cpp \
+	$(SRC_PATH)/CustomVehicleControllerJoint.cpp \
+	$(SRC_PATH)/CustomVehicleControllerBodyState.cpp \
+	$(SRC_PATH)/CustomVehicleControllerComponent.cpp \
+	$(SRC_PATH)/CustomVehicleControllerManager.cpp \
 	$(SRC_PATH)/CustomVehicleControllerManager.cpp \
 	$(SRC_PATH)/CustomArcticulatedTransformManager.cpp
 
