@@ -67,9 +67,14 @@ void CustomVehicleControllerBodyState::IntegrateForce (dFloat timestep, const dV
 	m_omega += alpha.Scale (timestep);
 }
 
-void CustomVehicleControllerBodyState::CalculateAverageAcceleration (dFloat invTimestep, const dVector& veloc, const dVector& omega)
+void CustomVehicleControllerBodyState::CalculateNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega)
 {
-	dAssert (0);
+	dVector accel = (m_veloc - veloc).Scale(invTimestep);
+	dVector alpha = (m_omega - omega).Scale(invTimestep);
+
+	m_externalForce = accel.Scale(m_mass);
+	alpha = m_matrix.UnrotateVector(alpha);
+	m_externalTorque = m_matrix.RotateVector(alpha.CompProduct(m_localInertia));
 }
 
 
@@ -117,21 +122,13 @@ void CustomVehicleControllerBodyStateChassis::UpdateDynamicInputs()
 	UpdateInertia();
 }
 
-void CustomVehicleControllerBodyStateChassis::CalculateAverageAcceleration (dFloat invTimestep, const dVector& veloc, const dVector& omega)
+void CustomVehicleControllerBodyStateChassis::CalculateNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega)
 {
-    dVector accel = (m_veloc - veloc).Scale(invTimestep);
-    dVector alpha = (m_omega - omega).Scale(invTimestep);
-
-    m_externalForce = accel.Scale(m_mass);
-    alpha = m_matrix.UnrotateVector(alpha);
-    m_externalTorque = m_matrix.RotateVector(alpha.CompProduct(m_localInertia));
-
+	CustomVehicleControllerBodyState::CalculateNetForceAndTorque (invTimestep, veloc, omega);
 	NewtonBody* const body = m_controller->GetBody();
 	NewtonBodySetForce (body, &m_externalForce[0]);
 	NewtonBodySetTorque (body, &m_externalTorque[0]);
 }
-
-
 
 
 void CustomVehicleControllerBodyStateEngine::Init (CustomVehicleController* const controller)
@@ -167,16 +164,14 @@ dAssert (0);
 */
 }
 
-int CustomVehicleControllerBodyStateEngine::CalculateActiveJoints (CustomVehicleController* const controller, VehicleJoint** const jointArray)
+int CustomVehicleControllerBodyStateEngine::CalculateActiveJoints (CustomVehicleController* const controller, CustomVehicleControllerJoint** const jointArray)
 {
 	int count = 0;
     CustomVehicleControllerComponentEngine* const engine = controller->GetEngine();
 	if (engine) {
 		dAssert (0);
-/*
 		int gear = engine->GetGear();
-		
-		if (gear != EngineComponent::GearBox::m_newtralGear) {
+		if (gear != CustomVehicleControllerComponentEngine::dGearBox::m_newtralGear) {
 			count = 2;
 			jointArray[0] = &m_leftTire;
 			jointArray[1] = &m_rightTire;
@@ -184,13 +179,11 @@ int CustomVehicleControllerBodyStateEngine::CalculateActiveJoints (CustomVehicle
 			count = 1;
 			jointArray[0] = &m_idleFriction;
 		}
-*/
 	}
     return count;
-
 }
 
-void CustomVehicleControllerBodyStateEngine::CalculateAverageAcceleration (dFloat invTimestep, const dVector& veloc, const dVector& omega)
+void CustomVehicleControllerBodyStateEngine::CalculateNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega)
 {
 dAssert (0);
 /*
@@ -466,16 +459,12 @@ void CustomVehicleControllerBodyStateTire::IntegrateForce (dFloat timestep, cons
 	BodyState::IntegrateForce (timestep, force, torque);
 }
 
-void CustomVehicleControllerBodyStateTire::CalculateAverageAcceleration (dFloat invTimestep, const dVector& veloc, const dVector& omega)
+*/
+
+void CustomVehicleControllerBodyStateTire::CalculateNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega)
 {
-    dVector accel = (m_veloc - veloc).Scale(invTimestep);
-    dVector alpha = (m_omega - omega).Scale(invTimestep);
-
-    m_externalForce = accel.Scale(m_mass);
-    alpha = m_matrix.UnrotateVector(alpha);
-    m_externalTorque = m_matrix.RotateVector(alpha.CompProduct(m_localInertia));
-
-	const ChassisBodyState& chassis = m_controller->m_chassisState;
+	CustomVehicleControllerBodyState::CalculateNetForceAndTorque (invTimestep, veloc, omega);
+	const CustomVehicleControllerBodyStateChassis& chassis = m_controller->m_chassisState;
 
 #if 0
     dAssert (m_tireConstraint.m_state0 != this);
@@ -558,4 +547,4 @@ if ((gear > 1) && (m_myIndex == 4)) {
 	m_rotatonSpeed = relOmega % m_matrix[0];
 	m_rotationAngle = dMod (m_rotationAngle + m_rotatonSpeed / invTimestep, 2.0f * 3.141592f);
 }
-*/
+

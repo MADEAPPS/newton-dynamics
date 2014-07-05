@@ -38,18 +38,15 @@
 #define VEHICLE_CONTROLLER_MAX_JOINTS			32
 #define VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS	(VEHICLE_CONTROLLER_MAX_JOINTS * 4)
 
-#if 0
-
-
-
-
 #define VEHICLE_PSD_DAMP_TOL                    dFloat(1.0e-4f)
+
+#if 0
 #define VEHICLE_VEL_DAMP				        dFloat(100.0f)
 #define VEHICLE_POS_DAMP				        dFloat(1500.0f)
 #define VEHICLE_MAX_FRICTION_BOUND	            dFloat(1.0e15f)
 #define VEHICLE_MIN_FRICTION_BOUND			    -VEHICLE_MAX_FRICTION_BOUND
 
-#define VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SLIP_ANGLE 0.25f
+
 
 
 void CustomVehicleController::SetLateralSlipAngle(dFloat maxLongitudinalSlipAngleIndDegrees)
@@ -115,256 +112,7 @@ void CustomVehicleController::UpdateTireTransforms ()
 }
 
 
-int CustomVehicleController::BuildJacobianMatrix (int jointCount, VehicleJoint** const jointArray, dFloat timestep, VehicleJoint::JacobianPair* const jacobianArray, VehicleJoint::JacobianColum* const jacobianColumnArray)
-{
-	int rowCount = 0;
 
-	VehicleJoint::ParamInfo constraintParams;
-	constraintParams.m_timestep = timestep;
-	constraintParams.m_timestepInv = 1.0f / timestep;
-
-	// calculate Jacobian derivative for each active joint	
-	for (int j = 0; j < jointCount; j ++) {
-		VehicleJoint* const joint = jointArray[j];
-		constraintParams.m_count = 0;
-		joint->JacobianDerivative (&constraintParams); 
-
-		int dofCount = constraintParams.m_count;
-		joint->m_count = dofCount;
-		joint->m_start = rowCount;
-
-		// copy the rows and columns from the Jacobian derivative descriptor
-		for (int i = 0; i < dofCount; i ++) {
-			VehicleJoint::JacobianColum* const col = &jacobianColumnArray[rowCount];
-			jacobianArray[rowCount] = constraintParams.m_jacobians[i]; 
-			col->m_diagDamp = 1.0f;
-			col->m_coordenateAccel = constraintParams.m_jointAccel[i];
-			col->m_jointLowFriction = constraintParams.m_jointLowFriction[i];
-			col->m_jointHighFriction = constraintParams.m_jointHighFriction[i];
-
-			rowCount ++;
-			dAssert (rowCount < VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS);
-		}
-
-
-		// complete the derivative matrix for this joint
-		int index = joint->m_start;
-		BodyState* const state0 = joint->m_state0;
-		BodyState* const state1 = joint->m_state1;
-
-		const dMatrix& invInertia0 = state0->m_invInertia;
-		const dMatrix& invInertia1 = state1->m_invInertia;
-
-		dFloat invMass0 = state0->m_invMass;
-		dFloat invMass1 = state1->m_invMass;
-		dFloat weight = 0.9f;
-		for (int i = 0; i < dofCount; i ++) {
-			VehicleJoint::JacobianPair* const row = &jacobianArray[index];
-			VehicleJoint::JacobianColum* const col = &jacobianColumnArray[index];
-
-			dVector JMinvIM0linear (row->m_jacobian_IM0.m_linear.Scale (invMass0));
-			dVector JMinvIM1linear (row->m_jacobian_IM1.m_linear.Scale (invMass1));
-			dVector JMinvIM0angular = invInertia0.UnrotateVector(row->m_jacobian_IM0.m_angular);
-			dVector JMinvIM1angular = invInertia1.UnrotateVector(row->m_jacobian_IM1.m_angular);
-
-			dVector tmpDiag (JMinvIM0linear.CompProduct(row->m_jacobian_IM0.m_linear) + 
-							 JMinvIM0angular.CompProduct(row->m_jacobian_IM0.m_angular) +
-							 JMinvIM1linear.CompProduct(row->m_jacobian_IM1.m_linear) + 
-							 JMinvIM1angular.CompProduct(row->m_jacobian_IM1.m_angular));
-
-			dVector tmpAccel (JMinvIM0linear.CompProduct (state0->m_externalForce) + 
-							  JMinvIM0angular.CompProduct(state0->m_externalTorque) + 
-							  JMinvIM1linear.CompProduct (state1->m_externalForce) + 
-							  JMinvIM1angular.CompProduct(state1->m_externalTorque));
-
-			dFloat extenalAcceleration = -(tmpAccel[0] + tmpAccel[1] + tmpAccel[2]);
-
-			col->m_deltaAccel = extenalAcceleration;
-			col->m_coordenateAccel += extenalAcceleration;
-
-			col->m_force = joint->m_jointFeebackForce[i] * weight;
-
-			dFloat stiffness = VEHICLE_PSD_DAMP_TOL * col->m_diagDamp;
-			dFloat diag = (tmpDiag[0] + tmpDiag[1] + tmpDiag[2]);
-			dAssert (diag > dFloat (0.0f));
-			col->m_diagDamp = diag * stiffness;
-
-			diag *= (dFloat(1.0f) + stiffness);
-			col->m_invDJMinvJt = dFloat(1.0f) / diag;
-			index ++;
-		}
-	}
-
-	return rowCount;
-}
-
-void CustomVehicleController::CalculateReactionsForces (int jointCount, VehicleJoint** const jointArray, dFloat timestepSrc, VehicleJoint::JacobianPair* const jacobianArray, VehicleJoint::JacobianColum* const jacobianColumnArray)
-{
-	VehicleJoint::Jacobian stateVeloc[VEHICLE_CONTROLLER_MAX_JOINTS / 2];
-	VehicleJoint::Jacobian internalForces[VEHICLE_CONTROLLER_MAX_JOINTS / 2];
-
-	int stateIndex = 0;
-	dVector zero(dFloat (0.0f), dFloat (0.0f), dFloat (0.0f), dFloat (0.0f));
-	for (CustomList<BodyState*>::CustomListNode* stateNode = m_stateList.GetFirst(); stateNode; stateNode = stateNode->GetNext()) {
-		BodyState* const state = stateNode->GetInfo();
-		stateVeloc[stateIndex].m_linear = state->m_veloc;
-		stateVeloc[stateIndex].m_angular = state->m_omega;
-
-		internalForces[stateIndex].m_linear = zero;
-		internalForces[stateIndex].m_angular = zero;
-
-		state->m_myIndex = stateIndex;
-		stateIndex ++;
-		dAssert (stateIndex < int (sizeof (stateVeloc)/sizeof (stateVeloc[0])));
-	}
-
-	for (int i = 0; i < jointCount; i ++) {
-		VehicleJoint::Jacobian y0;
-		VehicleJoint::Jacobian y1;
-		y0.m_linear = zero;
-		y0.m_angular = zero;
-		y1.m_linear = zero;
-		y1.m_angular = zero;
-		VehicleJoint* const constraint = jointArray[i];
-		int first = constraint->m_start;
-		int count = constraint->m_count;
-		for (int j = 0; j < count; j ++) { 
-			VehicleJoint::JacobianPair* const row = &jacobianArray[j + first];
-			const VehicleJoint::JacobianColum* const col = &jacobianColumnArray[j + first];
-			dFloat val = col->m_force; 
-			y0.m_linear += row->m_jacobian_IM0.m_linear.Scale(val);
-			y0.m_angular += row->m_jacobian_IM0.m_angular.Scale(val);
-			y1.m_linear += row->m_jacobian_IM1.m_linear.Scale(val);
-			y1.m_angular += row->m_jacobian_IM1.m_angular.Scale(val);
-		}
-		int m0 = constraint->m_state0->m_myIndex;
-		int m1 = constraint->m_state1->m_myIndex;
-		internalForces[m0].m_linear += y0.m_linear;
-		internalForces[m0].m_angular += y0.m_angular;
-		internalForces[m1].m_linear += y1.m_linear;
-		internalForces[m1].m_angular += y1.m_angular;
-	}
-
-
-	dFloat invTimestepSrc = dFloat (1.0f) / timestepSrc;
-	dFloat invStep = dFloat (0.25f);
-	dFloat timestep = timestepSrc * invStep;
-	dFloat invTimestep = invTimestepSrc * dFloat (4.0f);
-
-	int maxPasses = 5;
-	dFloat firstPassCoef = dFloat (0.0f);
-	dFloat maxAccNorm = dFloat (1.0e-2f);
-
-	for (int step = 0; step < 4; step ++) {
-		VehicleJoint::JointAccelerationDecriptor joindDesc;
-		joindDesc.m_timeStep = timestep;
-		joindDesc.m_invTimeStep = invTimestep;
-		joindDesc.m_firstPassCoefFlag = firstPassCoef;
-
-		for (int curJoint = 0; curJoint < jointCount; curJoint ++) {
-			VehicleJoint* const constraint = jointArray[curJoint];
-			joindDesc.m_rowsCount = constraint->m_count;
-			joindDesc.m_rowMatrix = &jacobianArray[constraint->m_start];
-			joindDesc.m_colMatrix = &jacobianColumnArray[constraint->m_start];
-			constraint->JointAccelerations (&joindDesc);
-		}
-		firstPassCoef = dFloat (1.0f);
-
-		dFloat accNorm = dFloat (1.0e10f);
-		for (int passes = 0; (passes < maxPasses) && (accNorm > maxAccNorm); passes ++) {
-			accNorm = dFloat (0.0f);
-			for (int curJoint = 0; curJoint < jointCount; curJoint ++) {
-
-				VehicleJoint* const constraint = jointArray[curJoint];
-				int index = constraint->m_start;
-				int rowsCount = constraint->m_count;
-				int m0 = constraint->m_state0->m_myIndex;
-				int m1 = constraint->m_state1->m_myIndex;
-
-				dVector linearM0 (internalForces[m0].m_linear);
-				dVector angularM0 (internalForces[m0].m_angular);
-				dVector linearM1 (internalForces[m1].m_linear);
-				dVector angularM1 (internalForces[m1].m_angular);
-
-				BodyState* const state0 = constraint->m_state0;
-				BodyState* const state1 = constraint->m_state1;
-				const dMatrix& invInertia0 = state0->m_invInertia;
-				const dMatrix& invInertia1 = state1->m_invInertia;
-				dFloat invMass0 = state0->m_invMass;
-				dFloat invMass1 = state1->m_invMass;
-
-				for (int k = 0; k < rowsCount; k ++) {
-					VehicleJoint::JacobianPair* const row = &jacobianArray[index];
-					VehicleJoint::JacobianColum* const col = &jacobianColumnArray[index];
-	
-					dVector JMinvIM0linear (row->m_jacobian_IM0.m_linear.Scale (invMass0));
-					dVector JMinvIM1linear (row->m_jacobian_IM1.m_linear.Scale (invMass1));
-					dVector JMinvIM0angular = invInertia0.UnrotateVector(row->m_jacobian_IM0.m_angular);
-					dVector JMinvIM1angular = invInertia1.UnrotateVector(row->m_jacobian_IM1.m_angular);
-					dVector acc (JMinvIM0linear.CompProduct(linearM0) + JMinvIM0angular.CompProduct(angularM0) + JMinvIM1linear.CompProduct(linearM1) + JMinvIM1angular.CompProduct(angularM1));
-
-					dFloat a = col->m_coordenateAccel - acc.m_x - acc.m_y - acc.m_z - col->m_force * col->m_diagDamp;
-					dFloat f = col->m_force + col->m_invDJMinvJt * a;
-
-					dFloat lowerFrictionForce = col->m_jointLowFriction;
-					dFloat upperFrictionForce = col->m_jointHighFriction;
-
-					if (f > upperFrictionForce) {
-						a = dFloat (0.0f);
-						f = upperFrictionForce;
-					} else if (f < lowerFrictionForce) {
-						a = dFloat (0.0f);
-						f = lowerFrictionForce;
-					}
-
-					accNorm = dMax (accNorm, dAbs (a));
-					dFloat prevValue = f - col->m_force;
-					col->m_force = f;
-
-					linearM0 += row->m_jacobian_IM0.m_linear.Scale (prevValue);
-					angularM0 += row->m_jacobian_IM0.m_angular.Scale (prevValue);
-					linearM1 += row->m_jacobian_IM1.m_linear.Scale (prevValue);
-					angularM1 += row->m_jacobian_IM1.m_angular.Scale (prevValue);
-					index ++;
-				}
-				internalForces[m0].m_linear = linearM0;
-				internalForces[m0].m_angular = angularM0;
-				internalForces[m1].m_linear = linearM1;
-				internalForces[m1].m_angular = angularM1;
-			}
-		}
-
-		for (CustomList<BodyState*>::CustomListNode* stateNode = m_stateList.GetFirst()->GetNext(); stateNode; stateNode = stateNode->GetNext()) {
-			BodyState* const state = stateNode->GetInfo();
-			int index = state->m_myIndex;
-			dVector force (state->m_externalForce + internalForces[index].m_linear);
-			dVector torque (state->m_externalTorque + internalForces[index].m_angular);
-			state->IntegrateForce(timestep, force, torque);
-		}
-	}
-
-	for (int i = 0; i < jointCount; i ++) {
-		VehicleJoint* const constraint = jointArray[i];
-		int first = constraint->m_start;
-		int count = constraint->m_count;
-		for (int j = 0; j < count; j ++) { 
-			const VehicleJoint::JacobianColum* const col = &jacobianColumnArray[j + first];
-			dFloat val = col->m_force; 
-			constraint->m_jointFeebackForce[j] = val;
-		}
-	}
-
-	for (CustomList<BodyState*>::CustomListNode* stateNode = m_stateList.GetFirst()->GetNext(); stateNode; stateNode = stateNode->GetNext()) {
-		BodyState* const state = stateNode->GetInfo();
-		int index = state->m_myIndex;
-        state->CalculateAverageAcceleration (invTimestepSrc, stateVeloc[index].m_linear, stateVeloc[index].m_angular);
-	}
-
-	for (int i = 0; i < jointCount; i ++) {
-		VehicleJoint* const constraint = jointArray[i];
-		constraint->UpdateSolverForces (jacobianArray);
-	}
-}
 
 
 #endif
@@ -558,7 +306,7 @@ void CustomVehicleController::SetHandBrakes(CustomVehicleControllerComponentBrak
 }
 
 
-int CustomVehicleController::GetActiveJoints(VehicleJoint** const jointArray)
+int CustomVehicleController::GetActiveJoints(CustomVehicleControllerJoint** const jointArray)
 {
 	// add the engine joints
 	int jointCount = m_engineState.CalculateActiveJoints(this, &jointArray[0]);
@@ -614,11 +362,263 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 }
 
 
+int CustomVehicleController::BuildJacobianMatrix (int jointCount, CustomVehicleControllerJoint** const jointArray, dFloat timestep, CustomVehicleControllerJoint::JacobianPair* const jacobianArray, CustomVehicleControllerJoint::JacobianColum* const jacobianColumnArray)
+{
+	int rowCount = 0;
+
+	CustomVehicleControllerJoint::ParamInfo constraintParams;
+	constraintParams.m_timestep = timestep;
+	constraintParams.m_timestepInv = 1.0f / timestep;
+
+	// calculate Jacobian derivative for each active joint	
+	for (int j = 0; j < jointCount; j ++) {
+		CustomVehicleControllerJoint* const joint = jointArray[j];
+		constraintParams.m_count = 0;
+		joint->JacobianDerivative (&constraintParams); 
+
+		int dofCount = constraintParams.m_count;
+		joint->m_count = dofCount;
+		joint->m_start = rowCount;
+
+		// copy the rows and columns from the Jacobian derivative descriptor
+		for (int i = 0; i < dofCount; i ++) {
+			CustomVehicleControllerJoint::JacobianColum* const col = &jacobianColumnArray[rowCount];
+			jacobianArray[rowCount] = constraintParams.m_jacobians[i]; 
+			col->m_diagDamp = 1.0f;
+			col->m_coordenateAccel = constraintParams.m_jointAccel[i];
+			col->m_jointLowFriction = constraintParams.m_jointLowFriction[i];
+			col->m_jointHighFriction = constraintParams.m_jointHighFriction[i];
+
+			rowCount ++;
+			dAssert (rowCount < VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS);
+		}
+
+
+		// complete the derivative matrix for this joint
+		int index = joint->m_start;
+		CustomVehicleControllerBodyState* const state0 = joint->m_state0;
+		CustomVehicleControllerBodyState* const state1 = joint->m_state1;
+
+		const dMatrix& invInertia0 = state0->m_invInertia;
+		const dMatrix& invInertia1 = state1->m_invInertia;
+
+		dFloat invMass0 = state0->m_invMass;
+		dFloat invMass1 = state1->m_invMass;
+		dFloat weight = 0.9f;
+		for (int i = 0; i < dofCount; i ++) {
+			CustomVehicleControllerJoint::JacobianPair* const row = &jacobianArray[index];
+			CustomVehicleControllerJoint::JacobianColum* const col = &jacobianColumnArray[index];
+
+			dVector JMinvIM0linear (row->m_jacobian_IM0.m_linear.Scale (invMass0));
+			dVector JMinvIM1linear (row->m_jacobian_IM1.m_linear.Scale (invMass1));
+			dVector JMinvIM0angular = invInertia0.UnrotateVector(row->m_jacobian_IM0.m_angular);
+			dVector JMinvIM1angular = invInertia1.UnrotateVector(row->m_jacobian_IM1.m_angular);
+
+			dVector tmpDiag (JMinvIM0linear.CompProduct(row->m_jacobian_IM0.m_linear) + 
+				JMinvIM0angular.CompProduct(row->m_jacobian_IM0.m_angular) +
+				JMinvIM1linear.CompProduct(row->m_jacobian_IM1.m_linear) + 
+				JMinvIM1angular.CompProduct(row->m_jacobian_IM1.m_angular));
+
+			dVector tmpAccel (JMinvIM0linear.CompProduct (state0->m_externalForce) + 
+				JMinvIM0angular.CompProduct(state0->m_externalTorque) + 
+				JMinvIM1linear.CompProduct (state1->m_externalForce) + 
+				JMinvIM1angular.CompProduct(state1->m_externalTorque));
+
+			dFloat extenalAcceleration = -(tmpAccel[0] + tmpAccel[1] + tmpAccel[2]);
+
+			col->m_deltaAccel = extenalAcceleration;
+			col->m_coordenateAccel += extenalAcceleration;
+
+			col->m_force = joint->m_jointFeebackForce[i] * weight;
+
+			dFloat stiffness = VEHICLE_PSD_DAMP_TOL * col->m_diagDamp;
+			dFloat diag = (tmpDiag[0] + tmpDiag[1] + tmpDiag[2]);
+			dAssert (diag > dFloat (0.0f));
+			col->m_diagDamp = diag * stiffness;
+
+			diag *= (dFloat(1.0f) + stiffness);
+			col->m_invDJMinvJt = dFloat(1.0f) / diag;
+			index ++;
+		}
+	}
+	return rowCount;
+}
+
+void CustomVehicleController::CalculateReactionsForces (int jointCount, CustomVehicleControllerJoint** const jointArray, dFloat timestepSrc, CustomVehicleControllerJoint::JacobianPair* const jacobianArray, CustomVehicleControllerJoint::JacobianColum* const jacobianColumnArray)
+{
+	CustomVehicleControllerJoint::Jacobian stateVeloc[VEHICLE_CONTROLLER_MAX_JOINTS / 2];
+	CustomVehicleControllerJoint::Jacobian internalForces[VEHICLE_CONTROLLER_MAX_JOINTS / 2];
+
+	int stateIndex = 0;
+	dVector zero(dFloat (0.0f), dFloat (0.0f), dFloat (0.0f), dFloat (0.0f));
+	for (dList<CustomVehicleControllerBodyState*>::dListNode* stateNode = m_stateList.GetFirst(); stateNode; stateNode = stateNode->GetNext()) {
+		CustomVehicleControllerBodyState* const state = stateNode->GetInfo();
+		stateVeloc[stateIndex].m_linear = state->m_veloc;
+		stateVeloc[stateIndex].m_angular = state->m_omega;
+
+		internalForces[stateIndex].m_linear = zero;
+		internalForces[stateIndex].m_angular = zero;
+
+		state->m_myIndex = stateIndex;
+		stateIndex ++;
+		dAssert (stateIndex < int (sizeof (stateVeloc)/sizeof (stateVeloc[0])));
+	}
+
+	for (int i = 0; i < jointCount; i ++) {
+		CustomVehicleControllerJoint::Jacobian y0;
+		CustomVehicleControllerJoint::Jacobian y1;
+		y0.m_linear = zero;
+		y0.m_angular = zero;
+		y1.m_linear = zero;
+		y1.m_angular = zero;
+		CustomVehicleControllerJoint* const constraint = jointArray[i];
+		int first = constraint->m_start;
+		int count = constraint->m_count;
+		for (int j = 0; j < count; j ++) { 
+			CustomVehicleControllerJoint::JacobianPair* const row = &jacobianArray[j + first];
+			const CustomVehicleControllerJoint::JacobianColum* const col = &jacobianColumnArray[j + first];
+			dFloat val = col->m_force; 
+			y0.m_linear += row->m_jacobian_IM0.m_linear.Scale(val);
+			y0.m_angular += row->m_jacobian_IM0.m_angular.Scale(val);
+			y1.m_linear += row->m_jacobian_IM1.m_linear.Scale(val);
+			y1.m_angular += row->m_jacobian_IM1.m_angular.Scale(val);
+		}
+		int m0 = constraint->m_state0->m_myIndex;
+		int m1 = constraint->m_state1->m_myIndex;
+		internalForces[m0].m_linear += y0.m_linear;
+		internalForces[m0].m_angular += y0.m_angular;
+		internalForces[m1].m_linear += y1.m_linear;
+		internalForces[m1].m_angular += y1.m_angular;
+	}
+
+
+	dFloat invTimestepSrc = dFloat (1.0f) / timestepSrc;
+	dFloat invStep = dFloat (0.25f);
+	dFloat timestep = timestepSrc * invStep;
+	dFloat invTimestep = invTimestepSrc * dFloat (4.0f);
+
+	int maxPasses = 5;
+	dFloat firstPassCoef = dFloat (0.0f);
+	dFloat maxAccNorm = dFloat (1.0e-2f);
+
+	for (int step = 0; step < 4; step ++) {
+		CustomVehicleControllerJoint::JointAccelerationDecriptor joindDesc;
+		joindDesc.m_timeStep = timestep;
+		joindDesc.m_invTimeStep = invTimestep;
+		joindDesc.m_firstPassCoefFlag = firstPassCoef;
+
+		for (int curJoint = 0; curJoint < jointCount; curJoint ++) {
+			CustomVehicleControllerJoint* const constraint = jointArray[curJoint];
+			joindDesc.m_rowsCount = constraint->m_count;
+			joindDesc.m_rowMatrix = &jacobianArray[constraint->m_start];
+			joindDesc.m_colMatrix = &jacobianColumnArray[constraint->m_start];
+			constraint->JointAccelerations (&joindDesc);
+		}
+		firstPassCoef = dFloat (1.0f);
+
+		dFloat accNorm = dFloat (1.0e10f);
+		for (int passes = 0; (passes < maxPasses) && (accNorm > maxAccNorm); passes ++) {
+			accNorm = dFloat (0.0f);
+			for (int curJoint = 0; curJoint < jointCount; curJoint ++) {
+
+				CustomVehicleControllerJoint* const constraint = jointArray[curJoint];
+				int index = constraint->m_start;
+				int rowsCount = constraint->m_count;
+				int m0 = constraint->m_state0->m_myIndex;
+				int m1 = constraint->m_state1->m_myIndex;
+
+				dVector linearM0 (internalForces[m0].m_linear);
+				dVector angularM0 (internalForces[m0].m_angular);
+				dVector linearM1 (internalForces[m1].m_linear);
+				dVector angularM1 (internalForces[m1].m_angular);
+
+				CustomVehicleControllerBodyState* const state0 = constraint->m_state0;
+				CustomVehicleControllerBodyState* const state1 = constraint->m_state1;
+				const dMatrix& invInertia0 = state0->m_invInertia;
+				const dMatrix& invInertia1 = state1->m_invInertia;
+				dFloat invMass0 = state0->m_invMass;
+				dFloat invMass1 = state1->m_invMass;
+
+				for (int k = 0; k < rowsCount; k ++) {
+					CustomVehicleControllerJoint::JacobianPair* const row = &jacobianArray[index];
+					CustomVehicleControllerJoint::JacobianColum* const col = &jacobianColumnArray[index];
+
+					dVector JMinvIM0linear (row->m_jacobian_IM0.m_linear.Scale (invMass0));
+					dVector JMinvIM1linear (row->m_jacobian_IM1.m_linear.Scale (invMass1));
+					dVector JMinvIM0angular = invInertia0.UnrotateVector(row->m_jacobian_IM0.m_angular);
+					dVector JMinvIM1angular = invInertia1.UnrotateVector(row->m_jacobian_IM1.m_angular);
+					dVector acc (JMinvIM0linear.CompProduct(linearM0) + JMinvIM0angular.CompProduct(angularM0) + JMinvIM1linear.CompProduct(linearM1) + JMinvIM1angular.CompProduct(angularM1));
+
+					dFloat a = col->m_coordenateAccel - acc.m_x - acc.m_y - acc.m_z - col->m_force * col->m_diagDamp;
+					dFloat f = col->m_force + col->m_invDJMinvJt * a;
+
+					dFloat lowerFrictionForce = col->m_jointLowFriction;
+					dFloat upperFrictionForce = col->m_jointHighFriction;
+
+					if (f > upperFrictionForce) {
+						a = dFloat (0.0f);
+						f = upperFrictionForce;
+					} else if (f < lowerFrictionForce) {
+						a = dFloat (0.0f);
+						f = lowerFrictionForce;
+					}
+
+					accNorm = dMax (accNorm, dAbs (a));
+					dFloat prevValue = f - col->m_force;
+					col->m_force = f;
+
+					linearM0 += row->m_jacobian_IM0.m_linear.Scale (prevValue);
+					angularM0 += row->m_jacobian_IM0.m_angular.Scale (prevValue);
+					linearM1 += row->m_jacobian_IM1.m_linear.Scale (prevValue);
+					angularM1 += row->m_jacobian_IM1.m_angular.Scale (prevValue);
+					index ++;
+				}
+				internalForces[m0].m_linear = linearM0;
+				internalForces[m0].m_angular = angularM0;
+				internalForces[m1].m_linear = linearM1;
+				internalForces[m1].m_angular = angularM1;
+			}
+		}
+
+		for (dList<CustomVehicleControllerBodyState*>::dListNode* stateNode = m_stateList.GetFirst()->GetNext(); stateNode; stateNode = stateNode->GetNext()) {
+			CustomVehicleControllerBodyState* const state = stateNode->GetInfo();
+			int index = state->m_myIndex;
+			dVector force (state->m_externalForce + internalForces[index].m_linear);
+			dVector torque (state->m_externalTorque + internalForces[index].m_angular);
+			state->IntegrateForce(timestep, force, torque);
+		}
+	}
+
+	for (int i = 0; i < jointCount; i ++) {
+		CustomVehicleControllerJoint* const constraint = jointArray[i];
+		int first = constraint->m_start;
+		int count = constraint->m_count;
+		for (int j = 0; j < count; j ++) { 
+			const CustomVehicleControllerJoint::JacobianColum* const col = &jacobianColumnArray[j + first];
+			dFloat val = col->m_force; 
+			constraint->m_jointFeebackForce[j] = val;
+		}
+	}
+
+	for (dList<CustomVehicleControllerBodyState*>::dListNode* stateNode = m_stateList.GetFirst()->GetNext(); stateNode; stateNode = stateNode->GetNext()) {
+		CustomVehicleControllerBodyState* const state = stateNode->GetInfo();
+		int index = state->m_myIndex;
+		state->CalculateNetForceAndTorque (invTimestepSrc, stateVeloc[index].m_linear, stateVeloc[index].m_angular);
+	}
+
+	for (int i = 0; i < jointCount; i ++) {
+		CustomVehicleControllerJoint* const constraint = jointArray[i];
+		constraint->UpdateSolverForces (jacobianArray);
+	}
+}
+
+
+
 void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 {
-	VehicleJoint* jointArray[VEHICLE_CONTROLLER_MAX_JOINTS];
-	VehicleJoint::JacobianColum jacobianColumn[VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS];
-	VehicleJoint::JacobianPair jacobianPairArray[VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS];
+	CustomVehicleControllerJoint* jointArray[VEHICLE_CONTROLLER_MAX_JOINTS];
+	CustomVehicleControllerJoint::JacobianColum jacobianColumn[VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS];
+	CustomVehicleControllerJoint::JacobianPair jacobianPairArray[VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS];
 
 	// apply all external forces and torques to chassis and all tire velocities
 	dFloat timestepInv = 1.0f / timestep;
@@ -630,7 +630,7 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 		tire->Collide(castFilter, timestepInv);
 		tire->UpdateDynamicInputs(timestep);
 	}
-/*
+
 	// update all components
 	if (m_engine) {
 		m_engine->Update(timestep);
@@ -647,17 +647,15 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 	if (m_brakes) {
 		m_brakes->Update(timestep);
 	}
-*/
+
 
 
 	// Get the number of active joints for this integration step
-//	int jointCount = GetActiveJoints(jointArray);
+	int jointCount = GetActiveJoints(jointArray);
 
-//dAssert (0);
-/*
 	BuildJacobianMatrix (jointCount, jointArray, timestep, jacobianPairArray, jacobianColumn);
 	CalculateReactionsForces (jointCount, jointArray, timestep, jacobianPairArray, jacobianColumn);
-*/
+
 }
 
 

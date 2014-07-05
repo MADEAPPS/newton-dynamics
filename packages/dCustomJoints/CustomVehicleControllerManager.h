@@ -20,6 +20,7 @@
 #include <CustomJointLibraryStdAfx.h>
 #include <CustomAlloc.h>
 #include <CustomControllerManager.h>
+#include <CustomVehicleControllerComponent.h>
 #include <CustomVehicleControllerBodyState.h>
 
 #define VEHICLE_PLUGIN_NAME			"__vehicleManager__"
@@ -79,23 +80,18 @@ class CustomVehicleController: public CustomControllerBase
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 
-	CUSTOM_JOINTS_API int GetActiveJoints(VehicleJoint** const jointArray);
+	CUSTOM_JOINTS_API int GetActiveJoints(CustomVehicleControllerJoint** const jointArray);
+	CUSTOM_JOINTS_API int BuildJacobianMatrix (int jointCount, CustomVehicleControllerJoint** const jointArray, dFloat timestep, CustomVehicleControllerJoint::JacobianPair* const jacobianArray, CustomVehicleControllerJoint::JacobianColum* const jacobianColumnArray);
+	CUSTOM_JOINTS_API void CalculateReactionsForces(int jointCount, CustomVehicleControllerJoint** const jointArray, dFloat timestep, CustomVehicleControllerJoint::JacobianPair* const jacobianArray, CustomVehicleControllerJoint::JacobianColum* const jacobianColumnArray);
 
-/*
-	CUSTOM_JOINTS_API int BuildJacobianMatrix (int jointCount, VehicleJoint** const jointArray, dFloat timestep, VehicleJoint::JacobianPair* const jacobianArray, VehicleJoint::JacobianColum* const jacobianColumnArray);
-	CUSTOM_JOINTS_API void CalculateReactionsForces(int jointCount, VehicleJoint** const jointArray, dFloat timestep, VehicleJoint::JacobianPair* const jacobianArray, VehicleJoint::JacobianColum* const jacobianColumnArray);
-	CUSTOM_JOINTS_API void UpdateTireTransforms ();
-*/
+//	CUSTOM_JOINTS_API void UpdateTireTransforms ();
+
 	CustomVehicleControllerBodyState m_staticWorld;
-	CustomVehicleControllerBodyStateChassis m_chassisState;
 	CustomVehicleControllerBodyStateEngine m_engineState;
-/*
-	
+	CustomVehicleControllerBodyStateChassis m_chassisState;
+	CustomVehicleControllerComponent::dInterpolationCurve m_tireLateralSlipAngle;
+	CustomVehicleControllerComponent::dInterpolationCurve m_tireLongitidialSlipRatio;
 
-	InterpolationCurve m_tireLateralSlipAngle;
-	InterpolationCurve m_tireLongitidialSlipRatio;
-	friend class CustomVehicleControllerManager;
-*/
 	TireList m_tireList;
 	dList<CustomVehicleControllerBodyState*> m_stateList;
 	NewtonCollision* m_tireCastShape;
@@ -104,8 +100,14 @@ class CustomVehicleController: public CustomControllerBase
 	CustomVehicleControllerComponentEngine* m_engine;
 	CustomVehicleControllerComponentBrake* m_handBrakes;
 	CustomVehicleControllerComponentSteering* m_steering; 
-	
+
 	friend class CustomVehicleControllerManager;
+	friend class CustomVehicleControllerTireJoint;
+	
+	friend class CustomVehicleControllerContactJoint;
+	friend class CustomVehicleControllerEngineIdleJoint;
+	friend class CustomVehicleControllerEngineGearJoint;
+	
 	friend class CustomVehicleControllerBodyStateTire;
 	friend class CustomVehicleControllerComponentBrake;
 	friend class CustomVehicleControllerComponentEngine;

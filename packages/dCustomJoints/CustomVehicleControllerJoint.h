@@ -24,7 +24,7 @@
 class CustomVehicleController;
 class CustomVehicleControllerBodyState;
 
-class VehicleJoint
+class CustomVehicleControllerJoint
 {
 	public:
 	class Jacobian
@@ -91,8 +91,8 @@ class VehicleJoint
 	};
 
 
-	VehicleJoint(){}
-	virtual ~VehicleJoint(){}
+	CustomVehicleControllerJoint(){}
+	virtual ~CustomVehicleControllerJoint(){}
 
 	CUSTOM_JOINTS_API virtual void Init(CustomVehicleController* const controller, CustomVehicleControllerBodyState* const state0, CustomVehicleControllerBodyState* const state1);
 
@@ -116,7 +116,7 @@ class VehicleJoint
 	int m_count;
 };
 
-class EngineGearJoint: public VehicleJoint
+class CustomVehicleControllerEngineGearJoint: public CustomVehicleControllerJoint
 {
 	public:
 	CUSTOM_JOINTS_API virtual void JacobianDerivative (ParamInfo* const constraintParams); 
@@ -125,7 +125,7 @@ class EngineGearJoint: public VehicleJoint
 	dFloat m_powerTrainGain;
 };
 
-class EngineIdleJoint: public VehicleJoint
+class CustomVehicleControllerEngineIdleJoint: public CustomVehicleControllerJoint
 {
 	public:
 	CUSTOM_JOINTS_API virtual void JacobianDerivative (ParamInfo* const constraintParams); 
@@ -136,17 +136,17 @@ class EngineIdleJoint: public VehicleJoint
 };
 
 
-class TireJoint: public VehicleJoint
+class CustomVehicleControllerTireJoint: public CustomVehicleControllerJoint
 {
-public:
+	public:
 	CUSTOM_JOINTS_API virtual void JacobianDerivative (ParamInfo* const constraintParams); 
 	CUSTOM_JOINTS_API virtual void UpdateSolverForces (const JacobianPair* const jacobians) const; 
 };
 
-class ContactJoint: public VehicleJoint
+class CustomVehicleControllerContactJoint: public CustomVehicleControllerJoint
 {
 	public:
-	CUSTOM_JOINTS_API ContactJoint ();
+	CUSTOM_JOINTS_API CustomVehicleControllerContactJoint ();
 	CUSTOM_JOINTS_API virtual void UpdateSolverForces (const JacobianPair* const jacobians) const; 
 	CUSTOM_JOINTS_API virtual void JacobianDerivative (ParamInfo* const constraintParams); 
 	CUSTOM_JOINTS_API virtual void JointAccelerations (JointAccelerationDecriptor* const accelParam);

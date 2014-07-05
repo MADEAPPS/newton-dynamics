@@ -16,16 +16,17 @@
 #include <CustomJointLibraryStdAfx.h>
 #include <CustomVehicleControllerJoint.h>
 #include <CustomVehicleControllerManager.h>
+#include <CustomVehicleControllerComponent.h>
 #include <CustomVehicleControllerBodyState.h>
 
 
-#define VEHICLE_VEL_DAMP				        dFloat(100.0f)
-#define VEHICLE_POS_DAMP				        dFloat(1500.0f)
-#define VEHICLE_MAX_FRICTION_BOUND	            dFloat(1.0e15f)
-#define VEHICLE_MIN_FRICTION_BOUND			    -VEHICLE_MAX_FRICTION_BOUND
+#define VEHICLE_VEL_DAMP										dFloat(100.0f)
+#define VEHICLE_POS_DAMP										dFloat(1500.0f)
+#define VEHICLE_MAX_FRICTION_BOUND								dFloat(1.0e15f)
+#define VEHICLE_MIN_FRICTION_BOUND								-VEHICLE_MAX_FRICTION_BOUND
+#define VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SLIP_ANGLE	dFloat(0.25f)
 
-
-void VehicleJoint::Init(CustomVehicleController* const controller, CustomVehicleControllerBodyState* const state0, CustomVehicleControllerBodyState* const state1)
+void CustomVehicleControllerJoint::Init(CustomVehicleController* const controller, CustomVehicleControllerBodyState* const state0, CustomVehicleControllerBodyState* const state1)
 {
 	m_start = 0;
 	m_count = 0;
@@ -39,7 +40,7 @@ void VehicleJoint::Init(CustomVehicleController* const controller, CustomVehicle
 }
 
 
-void VehicleJoint::InitPointParam (PointDerivativeParam& param, const dVector& pivot) const
+void CustomVehicleControllerJoint::InitPointParam (PointDerivativeParam& param, const dVector& pivot) const
 {
 	dAssert (m_state0);
 	dAssert (m_state1);
@@ -58,7 +59,7 @@ void VehicleJoint::InitPointParam (PointDerivativeParam& param, const dVector& p
 }
 
 
-void VehicleJoint::CalculatePointDerivative (ParamInfo* const constraintParams, const dVector& dir, const PointDerivativeParam& param)
+void CustomVehicleControllerJoint::CalculatePointDerivative (ParamInfo* const constraintParams, const dVector& dir, const PointDerivativeParam& param)
 {
 	int index = constraintParams->m_count;
 
@@ -109,7 +110,7 @@ void VehicleJoint::CalculatePointDerivative (ParamInfo* const constraintParams, 
 }
 
 
-void VehicleJoint::AddAngularRowJacobian (ParamInfo* const constraintParams, const dVector& dir, dFloat jointAngle)
+void CustomVehicleControllerJoint::AddAngularRowJacobian (ParamInfo* const constraintParams, const dVector& dir, dFloat jointAngle)
 {
 	int index = constraintParams->m_count;
 	Jacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_IM0; 
@@ -156,7 +157,7 @@ void VehicleJoint::AddAngularRowJacobian (ParamInfo* const constraintParams, con
 }
 
 
-void VehicleJoint::AddAngularRowJacobian (ParamInfo* const constraintParams, const dVector& dir0, const dVector& dir1, dFloat accelerationRatio)
+void CustomVehicleControllerJoint::AddAngularRowJacobian (ParamInfo* const constraintParams, const dVector& dir0, const dVector& dir1, dFloat accelerationRatio)
 {
 	int index = constraintParams->m_count;
 	Jacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_IM0; 
@@ -188,7 +189,7 @@ void VehicleJoint::AddAngularRowJacobian (ParamInfo* const constraintParams, con
 	constraintParams->m_count = index + 1;
 }
 
-void VehicleJoint::AddLinearRowJacobian (ParamInfo* const constraintParams, const dVector& pivot, const dVector& dir)
+void CustomVehicleControllerJoint::AddLinearRowJacobian (ParamInfo* const constraintParams, const dVector& pivot, const dVector& dir)
 {
 	PointDerivativeParam pointData;
 	InitPointParam (pointData, pivot);
@@ -196,7 +197,7 @@ void VehicleJoint::AddLinearRowJacobian (ParamInfo* const constraintParams, cons
 }
 
 
-void VehicleJoint::JointAccelerations (JointAccelerationDecriptor* const params)
+void CustomVehicleControllerJoint::JointAccelerations (JointAccelerationDecriptor* const params)
 {
 	JacobianColum* const jacobianColElements = params->m_colMatrix;
 	JacobianPair* const jacobianRowElements = params->m_rowMatrix;
@@ -233,7 +234,7 @@ void VehicleJoint::JointAccelerations (JointAccelerationDecriptor* const params)
 }
 
 
-void EngineGearJoint::UpdateSolverForces (const JacobianPair* const jacobians) const
+void CustomVehicleControllerEngineGearJoint::UpdateSolverForces (const JacobianPair* const jacobians) const
 {
 #if 0
 	const CustomVehicleControllerBodyStateTire* const tire = (CustomVehicleControllerBodyStateTire*)m_state1;
@@ -250,7 +251,7 @@ void EngineGearJoint::UpdateSolverForces (const JacobianPair* const jacobians) c
 #endif
 }
 
-void EngineGearJoint::JacobianDerivative (ParamInfo* const constraintParams)
+void CustomVehicleControllerEngineGearJoint::JacobianDerivative (ParamInfo* const constraintParams)
 {
 	dAssert (0);
 /*
@@ -272,11 +273,11 @@ void EngineGearJoint::JacobianDerivative (ParamInfo* const constraintParams)
 */
 }
 
-void EngineIdleJoint::UpdateSolverForces (const JacobianPair* const jacobians) const
+void CustomVehicleControllerEngineIdleJoint::UpdateSolverForces (const JacobianPair* const jacobians) const
 {
 }
 
-void EngineIdleJoint::JacobianDerivative (ParamInfo* const constraintParams)
+void CustomVehicleControllerEngineIdleJoint::JacobianDerivative (ParamInfo* const constraintParams)
 {
 	dAssert (0);
 	/*
@@ -301,7 +302,7 @@ void EngineIdleJoint::JacobianDerivative (ParamInfo* const constraintParams)
 }
 
 
-void TireJoint::JacobianDerivative (ParamInfo* const constraintParams)
+void CustomVehicleControllerTireJoint::JacobianDerivative (ParamInfo* const constraintParams)
 {
 	// Restrict the movement on the pivot point along all two orthonormal direction
 	CustomVehicleControllerBodyStateTire* const tire = (CustomVehicleControllerBodyStateTire*) m_state1;
@@ -339,7 +340,7 @@ void TireJoint::JacobianDerivative (ParamInfo* const constraintParams)
 
 
 
-void TireJoint::UpdateSolverForces (const JacobianPair* const jacobians) const
+void CustomVehicleControllerTireJoint::UpdateSolverForces (const JacobianPair* const jacobians) const
 {
 	CustomVehicleControllerBodyStateTire* const tire = (CustomVehicleControllerBodyStateTire*) m_state1;
 
@@ -352,22 +353,20 @@ void TireJoint::UpdateSolverForces (const JacobianPair* const jacobians) const
 }
 
 
-ContactJoint::ContactJoint ()
+CustomVehicleControllerContactJoint::CustomVehicleControllerContactJoint ()
     :m_contactCount(0)
 {
 }
 
 
-void ContactJoint::JacobianDerivative (ParamInfo* const constraintParams)
+void CustomVehicleControllerContactJoint::JacobianDerivative (ParamInfo* const constraintParams)
 {
-	dAssert (0);
-	/*
 
 	CustomVehicleControllerBodyStateTire* const tire = (CustomVehicleControllerBodyStateTire*) m_state1;
 	const dMatrix& tireMatrix = tire->m_matrix;
 
-	const InterpolationCurve& lateralSlipAngleCurve = m_controller->m_tireLateralSlipAngle;
-	const InterpolationCurve& longitudinalSlipRationCurve = m_controller->m_tireLongitidialSlipRatio;
+	const CustomVehicleControllerComponent::dInterpolationCurve& lateralSlipAngleCurve = m_controller->m_tireLateralSlipAngle;
+	const CustomVehicleControllerComponent::dInterpolationCurve& longitudinalSlipRationCurve = m_controller->m_tireLongitidialSlipRatio;
 	for (int i = 0; i < m_contactCount; i ++) {
 		// rubber tire traction friction model
 		dVector normal (m_contacts[i].m_normal);
@@ -473,8 +472,9 @@ void ContactJoint::JacobianDerivative (ParamInfo* const constraintParams)
 
 				dAssert (0);
 				// add the stop constraint here
-				AddLinearRowJacobian (params, tire.m_contactPoint, tire.m_contactPoint, upPin);
-				params.m_jointLowFriction[params.m_rows - 1] = 0;
+/*
+				AddLinearRowJacobian (constraintParams, tire->m_contactPoint, tire->m_contactPoint, upPin);
+				constraintParams.m_jointLowFriction[params.m_rows - 1] = 0;
 
 				PointDerivativeParam pointData;
 				InitPointParam (pointData, tire.m_contactPoint, tire.m_contactPoint);
@@ -484,14 +484,13 @@ void ContactJoint::JacobianDerivative (ParamInfo* const constraintParams)
 				if (relVelocErr > 0.0f) {
 					relVelocErr *= (restitution + dFloat (1.0f));
 				params.m_jointAccel[params.m_rows - 1] = dgMax (dFloat (-4.0f), relVelocErr) * params.m_invTimestep;
-
+*/
 			}
 		}
 	}
-*/
 }
 
-void ContactJoint::UpdateSolverForces (const JacobianPair* const jacobians) const
+void CustomVehicleControllerContactJoint::UpdateSolverForces (const JacobianPair* const jacobians) const
 {
 	CustomVehicleControllerBodyStateTire* const tire = (CustomVehicleControllerBodyStateTire*) m_state1;
 	const dMatrix& tireMatrix = tire->m_matrix;
@@ -516,7 +515,7 @@ void ContactJoint::UpdateSolverForces (const JacobianPair* const jacobians) cons
 }
 
 
-void ContactJoint::JointAccelerations (JointAccelerationDecriptor* const accelParam)
+void CustomVehicleControllerContactJoint::JointAccelerations (JointAccelerationDecriptor* const accelParam)
 {
 	JacobianColum* const jacobianColElements = accelParam->m_colMatrix;
 	JacobianPair* const jacobianMatrixElements = accelParam->m_rowMatrix;
