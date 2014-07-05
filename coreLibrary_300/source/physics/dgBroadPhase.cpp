@@ -1495,6 +1495,19 @@ void dgBroadPhase::UpdateContactsBroadPhaseEnd ()
 			if (! ((body0->m_sleeping | body0->m_equilibrium) & (body1->m_sleeping | body1->m_equilibrium)) ) {
 				deadContacs[count] = contact;
 				count ++;
+			} else if ((lru -  contact->m_broadphaseLru) > 200) {
+				dgVector minBox (body0->m_minAABB - body1->m_maxAABB);
+				dgVector maxBox (body0->m_maxAABB - body0->m_minAABB);
+				dgVector mask ((minBox.CompProduct4(maxBox)) > dgVector (dgFloat32 (0.0f)));
+				dgVector dist (maxBox.GetMin (minBox.Abs()) & mask);
+				dist = dist.GetMax(dist.ShiftTripleRight());
+				dist = dist.GetMax(dist.ShiftTripleRight());
+				if (dist.GetScalar() > dgFloat32(-4.0f)) {
+					contact->m_broadphaseLru = lru - 1;
+				} else {
+					deadContacs[count] = contact;
+					count ++;
+				}
 			}
 		}
 	}

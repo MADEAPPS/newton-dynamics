@@ -226,7 +226,7 @@ BEGIN_EVENT_TABLE(NewtonDemos, wxFrame)
 
 	EVT_MENU(ID_AUTOSLEEP_MODE,	NewtonDemos::OnAutoSleepMode)
 	EVT_MENU(ID_SHOW_STATISTICS, NewtonDemos::OnShowStatistics)
-//	EVT_MENU(ID_USE_PARALLEL_SOLVER, NewtonDemos::OnUseParallelSolver)
+	EVT_MENU(ID_USE_PARALLEL_SOLVER, NewtonDemos::OnUseParallelSolver)
 	EVT_MENU_RANGE(ID_SOLVER_MODE, ID_SOLVER_MODE_COUNT, NewtonDemos::OnSelectSolverMode)
 
 	EVT_MENU(ID_HIDE_VISUAL_MESHES,	NewtonDemos::OnHideVisualMeshes)

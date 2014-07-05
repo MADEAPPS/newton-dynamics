@@ -145,7 +145,7 @@ class dgFastRayTest
 		dgVector maxDist (dgFloat32 (1.2f));
 		t0 = (t0 & mask) | maxDist.AndNot(mask);
 		dgAssert ((mask.GetSignMask() & 1) == (t0.m_x < dgFloat32 (1.0f)));
-		return t0.m_x;
+		return t0.GetScalar();
 	}
 
 
@@ -228,12 +228,13 @@ DG_INLINE void dgMovingAABB (dgVector& p0, dgVector& p1, const dgVector& veloc, 
 DG_INLINE dgFloat32 BoxPenetration (const dgVector& minBox, const dgVector& maxBox)
 {
 	dgVector mask ((minBox.CompProduct4(maxBox)) < dgVector (dgFloat32 (0.0f)));
-	mask = mask & mask.ShiftTripleRight();
-	mask = mask & mask.ShiftTripleRight();
+//	mask = mask & mask.ShiftTripleRight();
+//	mask = mask & mask.ShiftTripleRight();
 	dgVector dist (maxBox.GetMin (minBox.Abs()) & mask);
 	dist = dist.GetMin(dist.ShiftTripleRight());
 	dist = dist.GetMin(dist.ShiftTripleRight());
-	return dist.m_x;
+	//return dist.m_x;
+	return dist.GetScalar();
 }
 
 DG_MSC_VECTOR_ALIGMENT 
