@@ -57,7 +57,6 @@
 		FF084ACD173F1B310059C41D /* ScaledCollision.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F6E1556DA2300E7B112 /* ScaledCollision.cpp */; };
 		FF084ACE173F1B310059C41D /* SceneCollision.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F6F1556DA2300E7B112 /* SceneCollision.cpp */; };
 		FF084AD0173F1B310059C41D /* SoftBodies.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F711556DA2300E7B112 /* SoftBodies.cpp */; };
-		FF084AD1173F1B310059C41D /* SuperCar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F731556DA2300E7B112 /* SuperCar.cpp */; };
 		FF084AD2173F1B310059C41D /* UsingNewtonMeshTool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F771556DA2300E7B112 /* UsingNewtonMeshTool.cpp */; };
 		FF084ADF173F1C8D0059C41D /* libnewton.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF99361C1735F69E000533B7 /* libnewton.a */; };
 		FF50660B173F34B600D01FDF /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF50660A173F34B600D01FDF /* Cocoa.framework */; };
@@ -656,7 +655,6 @@
 		FFF60F6E1556DA2300E7B112 /* ScaledCollision.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScaledCollision.cpp; path = ../../../sdkDemos/demos/ScaledCollision.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60F6F1556DA2300E7B112 /* SceneCollision.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SceneCollision.cpp; path = ../../../sdkDemos/demos/SceneCollision.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60F711556DA2300E7B112 /* SoftBodies.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SoftBodies.cpp; path = ../../../sdkDemos/demos/SoftBodies.cpp; sourceTree = SOURCE_ROOT; };
-		FFF60F731556DA2300E7B112 /* SuperCar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SuperCar.cpp; path = ../../../sdkDemos/demos/SuperCar.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60F771556DA2300E7B112 /* UsingNewtonMeshTool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UsingNewtonMeshTool.cpp; path = ../../../sdkDemos/demos/UsingNewtonMeshTool.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60FA01556DBB400E7B112 /* DebugDisplay.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DebugDisplay.cpp; path = ../../../sdkDemos/toolBox/DebugDisplay.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60FA21556DBB400E7B112 /* dHighResolutionTimer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dHighResolutionTimer.cpp; path = ../../../sdkDemos/toolBox/dHighResolutionTimer.cpp; sourceTree = SOURCE_ROOT; };
@@ -1086,7 +1084,6 @@
 				FFF60F6E1556DA2300E7B112 /* ScaledCollision.cpp */,
 				FFF60F6F1556DA2300E7B112 /* SceneCollision.cpp */,
 				FFF60F711556DA2300E7B112 /* SoftBodies.cpp */,
-				FFF60F731556DA2300E7B112 /* SuperCar.cpp */,
 				FFF60F771556DA2300E7B112 /* UsingNewtonMeshTool.cpp */,
 			);
 			name = demos;
@@ -1571,7 +1568,6 @@
 				FF084ACD173F1B310059C41D /* ScaledCollision.cpp in Sources */,
 				FF084ACE173F1B310059C41D /* SceneCollision.cpp in Sources */,
 				FF084AD0173F1B310059C41D /* SoftBodies.cpp in Sources */,
-				FF084AD1173F1B310059C41D /* SuperCar.cpp in Sources */,
 				FF084AD2173F1B310059C41D /* UsingNewtonMeshTool.cpp in Sources */,
 				FF084A9D173F1B090059C41D /* UserHeightFieldCollision.cpp in Sources */,
 				FF084A9F173F1B090059C41D /* UserPlaneCollision.cpp in Sources */,
