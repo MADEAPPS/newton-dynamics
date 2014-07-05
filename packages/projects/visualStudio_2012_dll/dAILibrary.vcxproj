@@ -30,15 +30,15 @@
     <WholeProgramOptimization>false</WholeProgramOptimization>
     <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
-    <PlatformToolset>v110</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-    <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -52,10 +52,10 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
@@ -65,12 +65,12 @@
   <PropertyGroup>
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)_d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectName)_d</TargetName>
@@ -78,86 +78,79 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_NEWTON_STATIC_LIB</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_NEWTON_STATIC_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>dAI.h</PrecompiledHeaderFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalOptions>
-      </AdditionalOptions>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
     </ClCompile>
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_NEWTON_STATIC_LIB</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_NEWTON_STATIC_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>dAI.h</PrecompiledHeaderFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalOptions>
-      </AdditionalOptions>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Full</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_NEWTON_STATIC_LIB</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_NEWTON_STATIC_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>dAI.h</PrecompiledHeaderFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalOptions>
-      </AdditionalOptions>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
     </ClCompile>
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
     <ClCompile>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Full</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_NEWTON_STATIC_LIB</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_NEWTON_STATIC_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>dAI.h</PrecompiledHeaderFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalOptions>
-      </AdditionalOptions>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>

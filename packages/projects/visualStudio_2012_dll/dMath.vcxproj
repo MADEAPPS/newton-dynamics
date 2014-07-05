@@ -29,12 +29,12 @@
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v110</PlatformToolset>
@@ -51,11 +51,11 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
   </ImportGroup>
@@ -67,15 +67,15 @@
   <PropertyGroup>
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)_d</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectName)_d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -83,19 +83,18 @@
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>dStdAfxMath.h</PrecompiledHeaderFile>
-      <WarningLevel>Level4</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalOptions>
-      </AdditionalOptions>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <FloatingPointModel>Precise</FloatingPointModel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>dStdAfxMath.h</PrecompiledHeaderFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
@@ -106,24 +105,27 @@
       </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>dStdAfxMath.h</PrecompiledHeaderFile>
-      <WarningLevel>Level4</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalOptions>
-      </AdditionalOptions>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>dStdAfxMath.h</PrecompiledHeaderFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
@@ -139,17 +141,16 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Precise</FloatingPointModel>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>dStdAfxMath.h</PrecompiledHeaderFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalOptions>
-      </AdditionalOptions>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
@@ -161,21 +162,23 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
     <ClCompile>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>dStdAfxMath.h</PrecompiledHeaderFile>
-      <WarningLevel>Level4</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalOptions>
-      </AdditionalOptions>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>dStdAfxMath.h</PrecompiledHeaderFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
@@ -192,7 +195,7 @@
     <ClCompile Include="..\..\dMath\dQuaternion.cpp" />
     <ClCompile Include="..\..\dMath\dStdAfxMath.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|x64'">Create</PrecompiledHeader>
     </ClCompile>

@@ -1,0 +1,187 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="joints">
+      <UniqueIdentifier>{01ecbae6-b886-47df-8302-ce59bb4a6a37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="managers">
+      <UniqueIdentifier>{ff43c3ef-67aa-4cfd-af01-2663406610b6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\dCustomJoints\Custom6DOF.cpp">
+      <Filter>joints</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\CustomBallAndSocket.cpp">
+      <Filter>joints</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\CustomCorkScrew.cpp">
+      <Filter>joints</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\CustomDryRollingFriction.cpp">
+      <Filter>joints</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\CustomGear.cpp">
+      <Filter>joints</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\CustomHinge.cpp">
+      <Filter>joints</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\CustomHingeActuator.cpp">
+      <Filter>joints</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\CustomJoint.cpp">
+      <Filter>joints</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\CustomKinematicController.cpp">
+      <Filter>joints</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\CustomPathFollow.cpp">
+      <Filter>joints</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\CustomPulley.cpp">
+      <Filter>joints</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\CustomRackAndPinion.cpp">
+      <Filter>joints</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\CustomSlider.cpp">
+      <Filter>joints</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\CustomSliderActuator.cpp">
+      <Filter>joints</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\CustomSlidingContact.cpp">
+      <Filter>joints</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\CustomUniversal.cpp">
+      <Filter>joints</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\CustomUniversalActuator.cpp">
+      <Filter>joints</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\CustomUpVector.cpp">
+      <Filter>joints</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\CustomUserBlank.cpp">
+      <Filter>joints</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\CustomArcticulatedTransformManager.cpp">
+      <Filter>managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\CustomControllerManager.cpp">
+      <Filter>managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\CustomInputManager.cpp">
+      <Filter>managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\CustomPlayerControllerManager.cpp">
+      <Filter>managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\CustomTriggerManager.cpp">
+      <Filter>managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerManager.cpp">
+      <Filter>managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\CustomAlloc.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomJointLibraryStdAfx.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerBodyState.cpp">
+      <Filter>managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerComponent.cpp">
+      <Filter>managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerJoint.cpp">
+      <Filter>managers</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\dCustomJoints\Custom6DOF.h">
+      <Filter>joints</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dCustomJoints\CustomBallAndSocket.h">
+      <Filter>joints</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dCustomJoints\CustomCorkScrew.h">
+      <Filter>joints</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dCustomJoints\CustomDryRollingFriction.h">
+      <Filter>joints</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dCustomJoints\CustomGear.h">
+      <Filter>joints</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dCustomJoints\CustomHinge.h">
+      <Filter>joints</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dCustomJoints\CustomHingeActuator.h">
+      <Filter>joints</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dCustomJoints\CustomJoint.h">
+      <Filter>joints</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dCustomJoints\CustomKinematicController.h">
+      <Filter>joints</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dCustomJoints\CustomPathFollow.h">
+      <Filter>joints</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dCustomJoints\CustomPulley.h">
+      <Filter>joints</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dCustomJoints\CustomRackAndPinion.h">
+      <Filter>joints</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dCustomJoints\CustomSlider.h">
+      <Filter>joints</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dCustomJoints\CustomSliderActuator.h">
+      <Filter>joints</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dCustomJoints\CustomSlidingContact.h">
+      <Filter>joints</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dCustomJoints\CustomUniversal.h">
+      <Filter>joints</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dCustomJoints\CustomUniversalActuator.h">
+      <Filter>joints</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dCustomJoints\CustomUpVector.h">
+      <Filter>joints</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dCustomJoints\CustomUserBlank.h">
+      <Filter>joints</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dCustomJoints\CustomArcticulatedTransformManager.h">
+      <Filter>managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dCustomJoints\CustomControllerManager.h">
+      <Filter>managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dCustomJoints\CustomInputManager.h">
+      <Filter>managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dCustomJoints\CustomPlayerControllerManager.h">
+      <Filter>managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dCustomJoints\CustomTriggerManager.h">
+      <Filter>managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerManager.h">
+      <Filter>managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dCustomJoints\CustomAlloc.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomJointLibraryStdAfx.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerBodyState.h">
+      <Filter>managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerComponent.h">
+      <Filter>managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerJoint.h">
+      <Filter>managers</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

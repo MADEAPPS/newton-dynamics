@@ -29,13 +29,13 @@
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
@@ -54,11 +54,11 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
   </ImportGroup>
@@ -70,25 +70,25 @@
   <PropertyGroup>
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">$(ProjectName)_d</TargetName>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)_d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
     <ClCompile>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>../../../source/pthreads.2</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;PTW32_STATIC_LIB;_WIN_32_VER</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../../source/pthreads.2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;PTW32_STATIC_LIB;_WIN_32_VER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>
       </ExceptionHandling>
@@ -97,6 +97,8 @@
       <StructMemberAlignment>Default</StructMemberAlignment>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>dgStdafx.h</PrecompiledHeaderFile>
@@ -108,13 +110,8 @@
       <BrowseInformation>
       </BrowseInformation>
       <WarningLevel>Level4</WarningLevel>
-      <TreatWarningAsError>true</TreatWarningAsError>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWarningAsError>false</TreatWarningAsError>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalOptions>
-      </AdditionalOptions>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -127,14 +124,17 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
     <ClCompile>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>../../../source/pthreads.2</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;PTW32_STATIC_LIB;_WIN_64_VER</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../../source/pthreads.2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;PTW32_STATIC_LIB;_WIN_64_VER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>
       </ExceptionHandling>
@@ -143,6 +143,8 @@
       <StructMemberAlignment>Default</StructMemberAlignment>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>dgStdafx.h</PrecompiledHeaderFile>
@@ -154,13 +156,8 @@
       <BrowseInformation>
       </BrowseInformation>
       <WarningLevel>Level4</WarningLevel>
-      <TreatWarningAsError>true</TreatWarningAsError>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWarningAsError>false</TreatWarningAsError>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalOptions>
-      </AdditionalOptions>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -176,17 +173,19 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
-      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
-      <AdditionalIncludeDirectories>../../../source/pthreads.2</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;PTW32_STATIC_LIB;_WIN_32_VER</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../../source/pthreads.2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;PTW32_STATIC_LIB;_WIN_32_VER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>
       </ExceptionHandling>
-      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <StructMemberAlignment>Default</StructMemberAlignment>
       <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Precise</FloatingPointModel>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>dgStdafx.h</PrecompiledHeaderFile>
@@ -196,12 +195,7 @@
       <BrowseInformation>true</BrowseInformation>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>false</TreatWarningAsError>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalOptions>
-      </AdditionalOptions>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Precise</FloatingPointModel>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -212,21 +206,26 @@
       <SuppressStartupBanner>false</SuppressStartupBanner>
     </Lib>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
-      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
-      <AdditionalIncludeDirectories>../../../source/pthreads.2</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;PTW32_STATIC_LIB;_WIN_64_VER</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../../source/pthreads.2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;PTW32_STATIC_LIB;_WIN_64_VER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>
       </ExceptionHandling>
-      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <StructMemberAlignment>Default</StructMemberAlignment>
       <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>dgStdafx.h</PrecompiledHeaderFile>
@@ -236,12 +235,7 @@
       <BrowseInformation>true</BrowseInformation>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>false</TreatWarningAsError>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalOptions>
-      </AdditionalOptions>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -253,8 +247,6 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\source\core\dgAsyncThread.cpp" />
-    <ClCompile Include="..\..\..\source\core\dgMutexThread.cpp" />
     <ClCompile Include="..\..\..\source\core\dgNode.cpp" />
     <ClCompile Include="..\..\..\source\core\dgObb.cpp" />
     <ClCompile Include="..\..\..\source\core\dgRef.cpp" />
@@ -263,11 +255,9 @@
     <ClCompile Include="..\..\..\source\core\dgCRC.cpp" />
     <ClCompile Include="..\..\..\source\core\dgDebug.cpp" />
     <ClCompile Include="..\..\..\source\core\dgMemory.cpp" />
-    <ClCompile Include="..\..\..\source\core\dgThread.cpp" />
-    <ClCompile Include="..\..\..\source\core\dgThreadHive.cpp" />
     <ClCompile Include="..\..\..\source\core\dgTypes.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|x64'">Create</PrecompiledHeader>
     </ClCompile>
@@ -282,16 +272,25 @@
     <ClCompile Include="..\..\..\source\core\dgTree.cpp" />
     <ClCompile Include="..\..\..\source\core\dgGeneralMatrix.cpp" />
     <ClCompile Include="..\..\..\source\core\dgGeneralVector.cpp" />
-    <ClCompile Include="..\..\..\source\core\dgGoogol.cpp" />
+    <ClCompile Include="..\..\..\source\core\dgGoogol.cpp">
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotSet</EnableEnhancedInstructionSet>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='release|Win32'">NotSet</EnableEnhancedInstructionSet>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\..\..\source\core\dgMatrix.cpp" />
     <ClCompile Include="..\..\..\source\core\dgQuaternion.cpp" />
     <ClCompile Include="..\..\..\source\core\dgRandom.cpp" />
     <ClCompile Include="..\..\..\source\core\dgSmallDeterminant.cpp" />
     <ClCompile Include="..\..\..\source\core\dgSPDMatrix.cpp" />
+    <ClCompile Include="..\..\..\source\core\dgAsyncThread.cpp" />
+    <ClCompile Include="..\..\..\source\core\dgMutexThread.cpp" />
+    <ClCompile Include="..\..\..\source\core\dgThread.cpp" />
+    <ClCompile Include="..\..\..\source\core\dgThreadHive.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\source\core\dgAsyncThread.h" />
-    <ClInclude Include="..\..\..\source\core\dgMutexThread.h" />
     <ClInclude Include="..\..\..\source\core\dgNode.h" />
     <ClInclude Include="..\..\..\source\core\dgObb.h" />
     <ClInclude Include="..\..\..\source\core\dgRef.h" />
@@ -302,9 +301,6 @@
     <ClInclude Include="..\..\..\source\core\dgDebug.h" />
     <ClInclude Include="..\..\..\source\core\dgMemory.h" />
     <ClInclude Include="..\..\..\source\core\dgStdafx.h" />
-    <ClInclude Include="..\..\..\source\core\dgThread.h" />
-    <ClInclude Include="..\..\..\source\core\dgThreadHive.h" />
-    <ClInclude Include="..\..\..\source\core\dgThreadProfiler.h" />
     <ClInclude Include="..\..\..\source\core\dgTypes.h" />
     <ClInclude Include="..\..\..\source\core\dgAABBPolygonSoup.h" />
     <ClInclude Include="..\..\..\source\core\dgConvexHull3d.h" />
@@ -316,6 +312,7 @@
     <ClInclude Include="..\..\..\source\core\dgPolyhedra.h" />
     <ClInclude Include="..\..\..\source\core\dgPolyhedraMassProperties.h" />
     <ClInclude Include="..\..\..\source\core\dgArray.h" />
+    <ClInclude Include="..\..\..\source\core\dgFastQueue.h" />
     <ClInclude Include="..\..\..\source\core\dgGraph.h" />
     <ClInclude Include="..\..\..\source\core\dgHeap.h" />
     <ClInclude Include="..\..\..\source\core\dgList.h" />
@@ -332,11 +329,11 @@
     <ClInclude Include="..\..\..\source\core\dgSmallDeterminant.h" />
     <ClInclude Include="..\..\..\source\core\dgSPDMatrix.h" />
     <ClInclude Include="..\..\..\source\core\dgVector.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\source\pthreads.2\VS_2012_static_mt\pthread.vcxproj">
-      <Project>{03bca23c-02a5-415b-a37b-26600bc2ce96}</Project>
-    </ProjectReference>
+    <ClInclude Include="..\..\..\source\core\dgAsyncThread.h" />
+    <ClInclude Include="..\..\..\source\core\dgMutexThread.h" />
+    <ClInclude Include="..\..\..\source\core\dgThread.h" />
+    <ClInclude Include="..\..\..\source\core\dgThreadHive.h" />
+    <ClInclude Include="..\..\..\source\core\dgThreadProfiler.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

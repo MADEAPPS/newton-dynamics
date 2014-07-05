@@ -30,13 +30,13 @@
     <WholeProgramOptimization>false</WholeProgramOptimization>
     <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
     <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
@@ -54,10 +54,10 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="PropertySheets">
@@ -67,111 +67,40 @@
   <PropertyGroup>
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">false</LinkIncremental>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug|x64'">false</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release|Win32'">false</LinkIncremental>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release|x64'">false</LinkIncremental>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)_d</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectName)_d</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">$(ProjectName)_d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton;</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>CustomJointLibraryStdAfx.h</PrecompiledHeaderFile>
-      <WarningLevel>Level4</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalOptions>
-      </AdditionalOptions>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Precise</FloatingPointModel>
-    </ClCompile>
-    <Lib>
-      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
-    </Lib>
-    <PostBuildEvent>
-      <Command>
-      </Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ClCompile>
-      <Optimization>Disabled</Optimization>
-      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton;</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>CustomJointLibraryStdAfx.h</PrecompiledHeaderFile>
-      <WarningLevel>Level4</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalOptions>
-      </AdditionalOptions>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Fast</FloatingPointModel>
-    </ClCompile>
-    <Lib>
-      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
-    </Lib>
-    <PostBuildEvent>
-      <Command>
-      </Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">
-    <ClCompile>
-      <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton;</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_DCONTAINERS_DLL;_CUSTOM_JOINTS_BUILD_DLL;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_DCONTAINERS_DLL;_CUSTOM_JOINTS_BUILD_DLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>CustomJointLibraryStdAfx.h</PrecompiledHeaderFile>
-      <WarningLevel>Level4</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <FloatingPointModel>Precise</FloatingPointModel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>CustomJointLibraryStdAfx.h</PrecompiledHeaderFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
-      <SubSystem>Windows</SubSystem>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention>
-      </DataExecutionPrevention>
-      <ImportLibrary>$(OutDir)$(ProjectName)_d.lib</ImportLibrary>
+      <ImportLibrary>
+      </ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <SuppressStartupBanner>false</SuppressStartupBanner>
     </Link>
@@ -181,32 +110,33 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton;</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_DCONTAINERS_DLL;_CUSTOM_JOINTS_BUILD_DLL;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_DCONTAINERS_DLL;_CUSTOM_JOINTS_BUILD_DLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>CustomJointLibraryStdAfx.h</PrecompiledHeaderFile>
-      <WarningLevel>Level4</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>CustomJointLibraryStdAfx.h</PrecompiledHeaderFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
-      <SubSystem>Windows</SubSystem>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention>
-      </DataExecutionPrevention>
-      <ImportLibrary>$(OutDir)$(ProjectName)_d.lib</ImportLibrary>
+      <ImportLibrary>
+      </ImportLibrary>
+      <TargetMachine>MachineX64</TargetMachine>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>false</SuppressStartupBanner>
     </Link>
     <PostBuildEvent>
@@ -221,29 +151,24 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton;</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_DCONTAINERS_DLL;_CUSTOM_JOINTS_BUILD_DLL;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_DCONTAINERS_DLL;_CUSTOM_JOINTS_BUILD_DLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Precise</FloatingPointModel>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>CustomJointLibraryStdAfx.h</PrecompiledHeaderFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Precise</FloatingPointModel>
     </ClCompile>
     <Link>
-      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
-      <OptimizeReferences>true</OptimizeReferences>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention>
-      </DataExecutionPrevention>
-      <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>false</SuppressStartupBanner>
+      <ImportLibrary>
+      </ImportLibrary>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -251,33 +176,32 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton;</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_DCONTAINERS_DLL;_CUSTOM_JOINTS_BUILD_DLL;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_DCONTAINERS_DLL;_CUSTOM_JOINTS_BUILD_DLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>CustomJointLibraryStdAfx.h</PrecompiledHeaderFile>
-      <WarningLevel>Level4</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>CustomJointLibraryStdAfx.h</PrecompiledHeaderFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
-      <OptimizeReferences>true</OptimizeReferences>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention>
-      </DataExecutionPrevention>
-      <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
+      <ImportLibrary>
+      </ImportLibrary>
+      <TargetMachine>MachineX64</TargetMachine>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>false</SuppressStartupBanner>
     </Link>
     <PostBuildEvent>
@@ -287,74 +211,72 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\dCustomJoints\Custom6DOF.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomAlloc.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomArcticulatedTransformManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomBallAndSocket.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomControllerManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomCorkScrew.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomDryRollingFriction.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomGear.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomHinge.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomHingeActuator.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomInputManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomJoint.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomJointLibraryStdAfx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|x64'">Create</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="..\..\dCustomJoints\CustomKinematicController.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomPathFollow.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomPlayerControllerManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomPulley.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomRackAndPinion.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomSlider.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomSliderActuator.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomSlidingContact.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomTriggerManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomUniversal.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomUniversalActuator.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomUpVector.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomUserBlank.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomArcticulatedTransformManager.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomControllerManager.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomInputManager.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomPlayerControllerManager.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomTriggerManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerBodyState.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerComponent.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerJoint.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerManager.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomAlloc.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomJointLibraryStdAfx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dCustomJoints\Custom6DOF.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomAlloc.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomArcticulatedTransformManager.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomBallAndSocket.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomControllerManager.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomCorkScrew.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomDryRollingFriction.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomGear.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomHinge.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomHingeActuator.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomInputManager.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomJoint.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomJointLibraryStdAfx.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomKinematicController.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomPathFollow.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomPlayerControllerManager.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomPulley.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomRackAndPinion.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomSlider.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomSliderActuator.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomSlidingContact.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomTriggerManager.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomUniversal.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomUniversalActuator.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomUpVector.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomUserBlank.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomArcticulatedTransformManager.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomControllerManager.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomInputManager.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomPlayerControllerManager.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomTriggerManager.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerBodyState.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerComponent.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerJoint.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerManager.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomAlloc.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomJointLibraryStdAfx.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\coreLibrary_300\projects\windows\project_vs2012_dll\core.vcxproj">
@@ -365,6 +287,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\coreLibrary_300\projects\windows\project_vs2012_dll\physics.vcxproj">
       <Project>{39737a8f-6151-4259-8e39-25530345d4b4}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\coreLibrary_300\source\pthreads.2\VS_2012_static_mt\pthread.vcxproj">
+      <Project>{03bca23c-02a5-415b-a37b-26600bc2ce96}</Project>
     </ProjectReference>
     <ProjectReference Include="dContainers.vcxproj">
       <Project>{f67c4593-a914-4ddf-8cb5-c59a3ef3ece0}</Project>

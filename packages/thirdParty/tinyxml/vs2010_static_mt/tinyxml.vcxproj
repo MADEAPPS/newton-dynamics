@@ -28,13 +28,13 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -181,7 +181,6 @@
       <BrowseInformation>
       </BrowseInformation>
       <WarningLevel>Level4</WarningLevel>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
@@ -223,7 +222,6 @@
       <BrowseInformation>
       </BrowseInformation>
       <WarningLevel>Level4</WarningLevel>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
