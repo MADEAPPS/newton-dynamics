@@ -272,7 +272,7 @@ CONTROLLER_BASE* CustomControllerManager<CONTROLLER_BASE>::CreateController ()
 template<class CONTROLLER_BASE>
 void CustomControllerManager<CONTROLLER_BASE>::DestroyController (CONTROLLER_BASE* const controller)
 {
-	dAssert (GetNodeFromInfo (*controller));
+	dAssert (CustomControllerManager<CONTROLLER_BASE>::GetNodeFromInfo (*controller));
 	typename CustomControllerManager<CONTROLLER_BASE>::dListNode* const node = CustomControllerManager<CONTROLLER_BASE>::GetNodeFromInfo (*controller);
 //	dListNode* const node = GetNodeFromInfo (*controller);
 	CustomControllerManager<CONTROLLER_BASE>::Remove (node);
