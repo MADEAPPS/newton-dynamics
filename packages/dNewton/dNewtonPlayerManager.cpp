@@ -37,7 +37,7 @@ dNewtonPlayerManager::~dNewtonPlayerManager ()
 
 dNewtonPlayerManager::dNewtonPlayer* dNewtonPlayerManager::GetFirstPlayer() const
 {
-	CustomListNode* const node = GetFirst();
+	dListNode* const node = GetFirst();
 	if (node) {
 		return (dNewtonPlayerManager::dNewtonPlayer*) NewtonBodyGetUserData (node->GetInfo().GetBody());
 	}
@@ -47,8 +47,8 @@ dNewtonPlayerManager::dNewtonPlayer* dNewtonPlayerManager::GetFirstPlayer() cons
 dNewtonPlayerManager::dNewtonPlayer* dNewtonPlayerManager::GetNextPlayer(const dNewtonPlayer* const player) const
 {
 	dAssert (player);
-	dAssert (FindNodeFromInfo(*player->m_controller));
-	CustomListNode* const node = GetNodeFromInfo(*player->m_controller)->GetNext();
+	dAssert (GetNodeFromInfo(*player->m_controller));
+	dListNode* const node = GetNodeFromInfo(*player->m_controller)->GetNext();
 	if (node) {
 		return (dNewtonPlayerManager::dNewtonPlayer*) NewtonBodyGetUserData (node->GetInfo().GetBody());
 	}

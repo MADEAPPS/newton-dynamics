@@ -202,8 +202,9 @@ void RenderContactPoints (NewtonWorld* const world)
 	glColor3f(0.0f, 0.5f, 1.0f);
 
 	glBegin(GL_LINES);
-	float length = 0.5f;
+	
 	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
+//		const float length = 0.5f;
 //		RenderBodyContactsAndTangentDiretions (body, length);
 	}
 	glEnd();

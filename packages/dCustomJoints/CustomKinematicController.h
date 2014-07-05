@@ -19,7 +19,7 @@
 #define __CUSTOM_KINEMATIC_CONTROLLER_H__
 
 
-#include "CustomJoint.h"
+#include <CustomJoint.h>
 
 class CustomKinematicController: public CustomJoint
 {

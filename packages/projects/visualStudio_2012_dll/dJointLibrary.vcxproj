@@ -151,7 +151,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton;</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CUSTOM_JOINTS_BUILD_DLL;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_DCONTAINERS_DLL;_CUSTOM_JOINTS_BUILD_DLL;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -187,7 +187,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton;</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CUSTOM_JOINTS_BUILD_DLL;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_DCONTAINERS_DLL;_CUSTOM_JOINTS_BUILD_DLL;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -222,7 +222,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton;</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_CUSTOM_JOINTS_BUILD_DLL;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_DCONTAINERS_DLL;_CUSTOM_JOINTS_BUILD_DLL;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>CustomJointLibraryStdAfx.h</PrecompiledHeaderFile>
@@ -258,7 +258,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton;</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_CUSTOM_JOINTS_BUILD_DLL;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_DCONTAINERS_DLL;_CUSTOM_JOINTS_BUILD_DLL;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>CustomJointLibraryStdAfx.h</PrecompiledHeaderFile>
@@ -319,6 +319,9 @@
     <ClCompile Include="..\..\dCustomJoints\CustomUniversalActuator.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomUpVector.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomUserBlank.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerBodyState.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerComponent.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerJoint.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -336,7 +339,6 @@
     <ClInclude Include="..\..\dCustomJoints\CustomJoint.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomJointLibraryStdAfx.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomKinematicController.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomList.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomPathFollow.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomPlayerControllerManager.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomPulley.h" />
@@ -349,6 +351,9 @@
     <ClInclude Include="..\..\dCustomJoints\CustomUniversalActuator.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomUpVector.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomUserBlank.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerBodyState.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerComponent.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerJoint.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerManager.h" />
   </ItemGroup>
   <ItemGroup>

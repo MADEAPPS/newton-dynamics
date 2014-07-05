@@ -575,6 +575,9 @@
     <ClCompile Include="..\..\dCustomJoints\CustomUniversalActuator.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomUpVector.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomUserBlank.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerBodyState.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerComponent.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerJoint.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -604,6 +607,9 @@
     <ClInclude Include="..\..\dCustomJoints\CustomUniversalActuator.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomUpVector.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomUserBlank.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerBodyState.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerComponent.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerJoint.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerManager.h" />
   </ItemGroup>
   <ItemGroup>

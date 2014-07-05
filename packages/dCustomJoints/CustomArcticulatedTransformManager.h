@@ -15,8 +15,8 @@
 #ifndef D_CUSTOM_ARTICULATED_TRANSFORM_MANAGER_H_
 #define D_CUSTOM_ARTICULATED_TRANSFORM_MANAGER_H_
 
-#include "CustomJointLibraryStdAfx.h"
-#include "CustomControllerManager.h"
+#include <CustomJointLibraryStdAfx.h>
+#include <CustomControllerManager.h>
 
 #define D_HIERACHICAL_CONTROLLER_MAX_BONES	64
 

@@ -82,7 +82,7 @@ class LineOfSightRayCastEntity: public DemoEntity
 	
 		glColor3f(0.0f, 0.5f, 0.5f);
 		glBegin(GL_LINES);
-		for (CustomControllerManager<dRayCastRecord>::CustomListNode* node = m_casterManager->GetFirst(); node; node = node->GetNext()) {
+		for (CustomControllerManager<dRayCastRecord>::dListNode* node = m_casterManager->GetFirst(); node; node = node->GetNext()) {
 			dRayCastRecord* const ray = &node->GetInfo();
 			glVertex3f(ray->m_p0.m_x, ray->m_p0.m_y, ray->m_p0.m_z);
 			glVertex3f(ray->m_p1.m_x, ray->m_p1.m_y, ray->m_p1.m_z);
@@ -93,7 +93,7 @@ class LineOfSightRayCastEntity: public DemoEntity
 		glColor3f(1.0f, 0.0f, 0.0f);
 		glPointSize(6.0f);
 		glBegin(GL_POINTS);
-		for (CustomControllerManager<dRayCastRecord>::CustomListNode* node = m_casterManager->GetFirst(); node; node = node->GetNext()) {
+		for (CustomControllerManager<dRayCastRecord>::dListNode* node = m_casterManager->GetFirst(); node; node = node->GetNext()) {
 			dRayCastRecord* const ray = &node->GetInfo();
 			glVertex3f(ray->m_p1.m_x, ray->m_p1.m_y, ray->m_p1.m_z);
 		}

@@ -38,7 +38,7 @@ dNewtonArticulationManager::~dNewtonArticulationManager ()
 dNewtonArticulationManager::dNewtonArticulationController* dNewtonArticulationManager::GetFirstController() const
 {
 	dAssert (0);
-	CustomListNode* const node = GetFirst();
+	dListNode* const node = GetFirst();
 	if (node) {
 		return (dNewtonArticulationManager::dNewtonArticulationController*) NewtonBodyGetUserData (node->GetInfo().GetBody());
 	}
@@ -49,8 +49,8 @@ dNewtonArticulationManager::dNewtonArticulationController* dNewtonArticulationMa
 {
 	dAssert (0);
 	dAssert (controller);
-	dAssert (FindNodeFromInfo(*controller->m_controller));
-	CustomListNode* const node = GetNodeFromInfo(*controller->m_controller)->GetNext();
+	dAssert (GetNodeFromInfo(*controller->m_controller));
+	dListNode* const node = GetNodeFromInfo(*controller->m_controller)->GetNext();
 	if (node) {
 		return (dNewtonArticulationManager::dNewtonArticulationController*) NewtonBodyGetUserData (node->GetInfo().GetBody());
 	}

@@ -333,6 +333,11 @@
     <ClInclude Include="..\..\..\source\core\dgSPDMatrix.h" />
     <ClInclude Include="..\..\..\source\core\dgVector.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\source\pthreads.2\VS_2012_static_mt\pthread.vcxproj">
+      <Project>{03bca23c-02a5-415b-a37b-26600bc2ce96}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

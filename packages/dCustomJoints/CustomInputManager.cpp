@@ -20,9 +20,9 @@
 */
 
 
-#include "CustomJointLibraryStdAfx.h"
-#include "CustomJoint.h"
-#include "CustomInputManager.h"
+#include <CustomJointLibraryStdAfx.h>
+#include <CustomJoint.h>
+#include <CustomInputManager.h>
 
 
 CustomInputManager::CustomInputManager (NewtonWorld* const world)

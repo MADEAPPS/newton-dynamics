@@ -37,7 +37,7 @@ dNewtonTriggerManager::~dNewtonTriggerManager ()
 
 dNewtonTriggerManager::dNewtonTrigger* dNewtonTriggerManager::GetFirstTrigger() const
 {
-	CustomListNode* const node = GetFirst();
+	dListNode* const node = GetFirst();
 	if (node) {
 		return (dNewtonTriggerManager::dNewtonTrigger*) NewtonBodyGetUserData (node->GetInfo().GetBody());
 	}
@@ -47,8 +47,8 @@ dNewtonTriggerManager::dNewtonTrigger* dNewtonTriggerManager::GetFirstTrigger() 
 dNewtonTriggerManager::dNewtonTrigger* dNewtonTriggerManager::GetNextTrigger(const dNewtonTrigger* const trigger) const
 {
 	dAssert (trigger);
-	dAssert (FindNodeFromInfo(*trigger->m_controller));
-	CustomListNode* const node = GetNodeFromInfo(*trigger->m_controller)->GetNext();
+	dAssert (GetNodeFromInfo(*trigger->m_controller));
+	dListNode* const node = GetNodeFromInfo(*trigger->m_controller)->GetNext();
 	if (node) {
 		return (dNewtonTriggerManager::dNewtonTrigger*) NewtonBodyGetUserData (node->GetInfo().GetBody());
 	}

@@ -54,8 +54,12 @@
 #include <stdlib.h>
 #include <Newton.h>
 #include <dTree.h>
+#include <dList.h>
 #include <dMathDefines.h>
-#include <CustomAlloc.h>
+#include <dVector.h>
+#include <dMatrix.h>
+#include <dQuaternion.h>
+//#include <CustomAlloc.h>
 
 
 #endif

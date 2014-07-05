@@ -17,13 +17,8 @@
 #ifndef D_CUSTOM_CONTROLLER_MANAGER_H_
 #define D_CUSTOM_CONTROLLER_MANAGER_H_
 
-#include "CustomJointLibraryStdAfx.h"
-#include "CustomList.h"
-#include "dMathDefines.h"
-#include "dVector.h"
-#include "dMatrix.h"
-#include "dQuaternion.h"
-#include "CustomAlloc.h"
+#include <CustomJointLibraryStdAfx.h>
+#include <CustomAlloc.h>
 
 
 class CustomControllerConvexCastPreFilter
@@ -134,7 +129,8 @@ class CustomControllerBase
 };
 
 template<class CONTROLLER_BASE>
-class CustomControllerManager: public CustomList<CONTROLLER_BASE>
+//class CustomControllerManager: public CustomList<CONTROLLER_BASE>
+class CustomControllerManager: public dList<CONTROLLER_BASE>
 {
 	public:
 	CustomControllerManager(NewtonWorld* const world, const char* const managerName);
@@ -190,7 +186,8 @@ CustomControllerManager<CONTROLLER_BASE>::~CustomControllerManager()
 template<class CONTROLLER_BASE>
 void CustomControllerManager<CONTROLLER_BASE>::DestroyAllController ()
 {
-	while (CustomControllerManager<CONTROLLER_BASE>::GetCount()) {
+//	while (CustomControllerManager<CONTROLLER_BASE>::GetCount()) {
+	while (GetCount()) {
 		DestroyController (&CustomControllerManager<CONTROLLER_BASE>::GetLast()->GetInfo());
 	}
 }
@@ -203,7 +200,8 @@ void CustomControllerManager<CONTROLLER_BASE>::Debug () const
 template<class CONTROLLER_BASE>
 void CustomControllerManager<CONTROLLER_BASE>::PreUpdate(dFloat timestep)
 {
-	for (typename CustomControllerManager<CONTROLLER_BASE>::CustomListNode* node = CustomControllerManager<CONTROLLER_BASE>::GetFirst(); node; node = node->GetNext()) {
+//	for (typename CustomControllerManager<CONTROLLER_BASE>::dListNode* node = CustomControllerManager<CONTROLLER_BASE>::GetFirst(); node; node = node->GetNext()) {
+	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
 		NewtonDispachThreadJob(m_world, PreUpdateKernel, &node->GetInfo());
 	}
 	NewtonSyncThreadJobs(m_world);
@@ -212,7 +210,8 @@ void CustomControllerManager<CONTROLLER_BASE>::PreUpdate(dFloat timestep)
 template<class CONTROLLER_BASE>
 void CustomControllerManager<CONTROLLER_BASE>::PostUpdate(dFloat timestep)
 {
-	for (typename CustomList<CONTROLLER_BASE>::CustomListNode* node = CustomList<CONTROLLER_BASE>::GetFirst(); node; node = node->GetNext()) {
+//	for (typename dList<CONTROLLER_BASE>::dListNode* node = dList<CONTROLLER_BASE>::GetFirst(); node; node = node->GetNext()) {
+	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
 		NewtonDispachThreadJob(m_world, PostUpdateKernel, &node->GetInfo());
 	}
 	NewtonSyncThreadJobs(m_world);
@@ -263,7 +262,8 @@ void CustomControllerManager<CONTROLLER_BASE>::PostUpdateKernel (NewtonWorld* co
 template<class CONTROLLER_BASE>
 CONTROLLER_BASE* CustomControllerManager<CONTROLLER_BASE>::CreateController ()
 {
-	CONTROLLER_BASE* const controller = &CustomControllerManager<CONTROLLER_BASE>::Append()->GetInfo();
+//	CONTROLLER_BASE* const controller = &CustomControllerManager<CONTROLLER_BASE>::Append()->GetInfo();
+	CONTROLLER_BASE* const controller = &Append()->GetInfo();
 
 	controller->m_manager = this;
 	return controller;
@@ -272,8 +272,9 @@ CONTROLLER_BASE* CustomControllerManager<CONTROLLER_BASE>::CreateController ()
 template<class CONTROLLER_BASE>
 void CustomControllerManager<CONTROLLER_BASE>::DestroyController (CONTROLLER_BASE* const controller)
 {
-	dAssert (CustomControllerManager<CONTROLLER_BASE>::FindNodeFromInfo (*controller));
-	typename CustomControllerManager<CONTROLLER_BASE>::CustomListNode* const node = CustomControllerManager<CONTROLLER_BASE>::GetNodeFromInfo (*controller);
+	dAssert (GetNodeFromInfo (*controller));
+//	typename CustomControllerManager<CONTROLLER_BASE>::dListNode* const node = CustomControllerManager<CONTROLLER_BASE>::GetNodeFromInfo (*controller);
+	dListNode* const node = GetNodeFromInfo (*controller);
 	CustomControllerManager<CONTROLLER_BASE>::Remove (node);
 }
 

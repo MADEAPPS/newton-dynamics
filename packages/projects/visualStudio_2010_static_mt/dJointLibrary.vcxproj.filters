@@ -4,7 +4,7 @@
     <Filter Include="joints">
       <UniqueIdentifier>{d4edf520-b183-4c36-9cd8-c1b8181e8073}</UniqueIdentifier>
     </Filter>
-    <Filter Include="factories">
+    <Filter Include="managers">
       <UniqueIdentifier>{310b2521-a4d4-4926-95cf-23c4d5511066}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -67,22 +67,22 @@
       <Filter>joints</Filter>
     </ClCompile>
     <ClCompile Include="..\..\dCustomJoints\CustomArcticulatedTransformManager.cpp">
-      <Filter>factories</Filter>
+      <Filter>managers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\dCustomJoints\CustomControllerManager.cpp">
-      <Filter>factories</Filter>
+      <Filter>managers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\dCustomJoints\CustomInputManager.cpp">
-      <Filter>factories</Filter>
+      <Filter>managers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\dCustomJoints\CustomPlayerControllerManager.cpp">
-      <Filter>factories</Filter>
+      <Filter>managers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\dCustomJoints\CustomTriggerManager.cpp">
-      <Filter>factories</Filter>
+      <Filter>managers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerManager.cpp">
-      <Filter>factories</Filter>
+      <Filter>managers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\dCustomJoints\CustomAlloc.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomJointLibraryStdAfx.cpp" />
@@ -113,9 +113,6 @@
       <Filter>joints</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dCustomJoints\CustomKinematicController.h">
-      <Filter>joints</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dCustomJoints\CustomList.h">
       <Filter>joints</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dCustomJoints\CustomPathFollow.h">
@@ -149,22 +146,22 @@
       <Filter>joints</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dCustomJoints\CustomArcticulatedTransformManager.h">
-      <Filter>factories</Filter>
+      <Filter>managers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dCustomJoints\CustomControllerManager.h">
-      <Filter>factories</Filter>
+      <Filter>managers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dCustomJoints\CustomInputManager.h">
-      <Filter>factories</Filter>
+      <Filter>managers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dCustomJoints\CustomPlayerControllerManager.h">
-      <Filter>factories</Filter>
+      <Filter>managers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dCustomJoints\CustomTriggerManager.h">
-      <Filter>factories</Filter>
+      <Filter>managers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerManager.h">
-      <Filter>factories</Filter>
+      <Filter>managers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dCustomJoints\CustomAlloc.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomJointLibraryStdAfx.h" />

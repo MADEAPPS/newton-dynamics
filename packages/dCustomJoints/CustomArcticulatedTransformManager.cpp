@@ -10,9 +10,9 @@
 */
 
 //////////////////////////////////////////////////////////////////////
-#include "CustomJointLibraryStdAfx.h"
-#include "CustomJoint.h"
-#include "CustomArcticulatedTransformManager.h"
+#include <CustomJointLibraryStdAfx.h>
+#include <CustomJoint.h>
+#include <CustomArcticulatedTransformManager.h>
 
 
 CustomArticulaledTransformManager::CustomArticulaledTransformManager(NewtonWorld* const world, bool applyLocalTransform)

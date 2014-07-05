@@ -13,9 +13,9 @@
 // NewtonCustomJoint.cpp: implementation of the NewtonCustomJoint class.
 //
 //////////////////////////////////////////////////////////////////////
-#include "CustomJointLibraryStdAfx.h"
-#include "CustomJoint.h"
-#include "CustomPlayerControllerManager.h"
+#include <CustomJointLibraryStdAfx.h>
+#include <CustomJoint.h>
+#include <CustomPlayerControllerManager.h>
 
 
 #define D_DESCRETE_MOTION_STEPS				8

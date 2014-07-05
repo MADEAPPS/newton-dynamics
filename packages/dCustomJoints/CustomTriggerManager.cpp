@@ -13,9 +13,9 @@
 // NewtonPlayerControllerManager.h: interface for the NewtonPlayerControllerManager class.
 //
 //////////////////////////////////////////////////////////////////////
-#include "CustomJointLibraryStdAfx.h"
-#include "CustomJoint.h"
-#include "CustomTriggerManager.h"
+#include <CustomJointLibraryStdAfx.h>
+#include <CustomJoint.h>
+#include <CustomTriggerManager.h>
 
 
 
@@ -39,7 +39,7 @@ CustomTriggerController* CustomTriggerManager::CreateTrigger (const dMatrix& mat
 
 void CustomTriggerManager::PreUpdate(dFloat timestep)
 {
-	for (CustomListNode* node = GetFirst(); node; node = node->GetNext()) {
+	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
 		NewtonDispachThreadJob (m_world, UpdateTrigger, &node->GetInfo());
 	}
 	NewtonSyncThreadJobs(m_world);
