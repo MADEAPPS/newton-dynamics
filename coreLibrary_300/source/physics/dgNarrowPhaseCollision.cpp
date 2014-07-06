@@ -711,11 +711,10 @@ void dgWorld::ProcessCachedContacts (dgContact* const contact, dgFloat32 timeste
 		contactMaterial.m_userData = material->m_userData;
 	}
 
+	contact->m_maxDOF = dgUnsigned32 (3 * contact->GetCount());
 	if (material->m_contactPoint) {
 		material->m_contactPoint(*contact, timestep, threadIndex);
 	}
-
-	contact->m_maxDOF = dgUnsigned32 (3 * contact->GetCount());
 }
 
 
@@ -916,13 +915,13 @@ void dgWorld::PopulateContacts (dgCollidingPairCollector::dgPair* const pair, dg
 		GlobalUnlock();
 	}
 
+	contact->m_maxDOF = dgUnsigned32 (3 * contact->GetCount());
 	if (material->m_contactPoint) {
 		material->m_contactPoint(*contact, timestep, threadIndex);
 	}
 
-	if (maxImpulse > dgFloat32 (1.0f)) {
-
 /*
+	if (maxImpulse > dgFloat32 (1.0f)) {
 		maxImpulse /= (body0->m_invMass.m_w + body1->m_invMass.m_w) ;
 		if ((maxImpulse > breakImpulse0) || (maxImpulse > breakImpulse1)) {
 			GetLock(threadIndex);
@@ -934,10 +933,8 @@ void dgWorld::PopulateContacts (dgCollidingPairCollector::dgPair* const pair, dg
 			}
 			ReleaseLock();
 		}
-*/
 	}
-
-	contact->m_maxDOF = dgUnsigned32 (3 * contact->GetCount());
+*/
 }
 
 void dgWorld::ProcessContacts (dgCollidingPairCollector::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex)
@@ -1217,6 +1214,7 @@ dgFloat32 dgWorld::CalculateTimeToImpact (dgContact* const contact, dgFloat32 ti
 {
 	dgCollidingPairCollector::dgPair pair;
 
+	dgInt32 isActive = contact->m_contactActive;
 	dgInt32 contactCount = contact->m_maxDOF;
 
 	contact->m_maxDOF = 0;
@@ -1267,6 +1265,7 @@ dgFloat32 dgWorld::CalculateTimeToImpact (dgContact* const contact, dgFloat32 ti
 		q = proxy.m_closestPointBody0;
 	}
 
+	contact->m_contactActive = isActive;
 	contact->m_maxDOF = contactCount;
 	return proxy.m_timestep;
 }
