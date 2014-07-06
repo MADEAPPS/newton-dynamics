@@ -907,7 +907,8 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 		dVector frontDir (camMatrix[0]);
 		dVector camOrigin; 
 		if (m_externalView) {
-			camOrigin = playerMatrix.TransformVector( dVector(0.0f, VEHICLE_THIRD_PERSON_VIEW_HIGHT, 0.0f, 0.0f));
+//			camOrigin = playerMatrix.TransformVector( dVector(0.0f, VEHICLE_THIRD_PERSON_VIEW_HIGHT, 0.0f, 0.0f));
+			camOrigin = playerMatrix.m_posit + dVector(0.0f, VEHICLE_THIRD_PERSON_VIEW_HIGHT, 0.0f, 0.0f);
 			camOrigin -= frontDir.Scale(VEHICLE_THIRD_PERSON_VIEW_DIST);
 		} else {
 			dAssert (0);
