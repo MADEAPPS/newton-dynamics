@@ -32,7 +32,7 @@ class CustomVehicleControllerBodyState
 	CUSTOM_JOINTS_API void UpdateInertia();
 	CUSTOM_JOINTS_API void Init(CustomVehicleController* const controller);
 	CUSTOM_JOINTS_API virtual void IntegrateForce (dFloat timestep, const dVector& force, const dVector& torque);
-	CUSTOM_JOINTS_API virtual void CalculateNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega);
+	CUSTOM_JOINTS_API virtual void ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega);
 
 	dMatrix m_matrix;
 	dMatrix m_localFrame;
@@ -60,7 +60,7 @@ class CustomVehicleControllerBodyStateChassis: public CustomVehicleControllerBod
 	public:
 	CUSTOM_JOINTS_API void Init (CustomVehicleController* const controller, const dMatrix& localframe);
 	CUSTOM_JOINTS_API void UpdateDynamicInputs();
-	CUSTOM_JOINTS_API virtual void CalculateNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega);
+	CUSTOM_JOINTS_API virtual void ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega);
 
 	dVector m_com;
 	dVector m_comOffset;
@@ -74,7 +74,7 @@ class CustomVehicleControllerBodyStateEngine: public CustomVehicleControllerBody
 	CUSTOM_JOINTS_API void Init (CustomVehicleController* const controller);
 
 	CUSTOM_JOINTS_API void Update (dFloat timestep, CustomVehicleController* const controller);
-	CUSTOM_JOINTS_API void CalculateNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega);
+	CUSTOM_JOINTS_API void ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega);
 	CUSTOM_JOINTS_API int CalculateActiveJoints (CustomVehicleController* const controller, CustomVehicleControllerJoint** const jointArray);
 
 	CustomVehicleControllerEngineGearJoint m_leftTire;
@@ -118,7 +118,7 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 	CUSTOM_JOINTS_API void SetAdhesionCoefficient(dFloat Coefficient);
 	CUSTOM_JOINTS_API virtual void IntegrateForce (dFloat timestep, const dVector& force, const dVector& torque);
 */
-	CUSTOM_JOINTS_API virtual void CalculateNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega);
+	CUSTOM_JOINTS_API virtual void ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega);
 
 	dVector m_tireLoad;
 	dVector m_lateralForce;

@@ -67,7 +67,7 @@ void CustomVehicleControllerBodyState::IntegrateForce (dFloat timestep, const dV
 	m_omega += alpha.Scale (timestep);
 }
 
-void CustomVehicleControllerBodyState::CalculateNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega)
+void CustomVehicleControllerBodyState::ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega)
 {
 	dVector accel = (m_veloc - veloc).Scale(invTimestep);
 	dVector alpha = (m_omega - omega).Scale(invTimestep);
@@ -122,9 +122,9 @@ void CustomVehicleControllerBodyStateChassis::UpdateDynamicInputs()
 	UpdateInertia();
 }
 
-void CustomVehicleControllerBodyStateChassis::CalculateNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega)
+void CustomVehicleControllerBodyStateChassis::ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega)
 {
-	CustomVehicleControllerBodyState::CalculateNetForceAndTorque (invTimestep, veloc, omega);
+	CustomVehicleControllerBodyState::ApplyNetForceAndTorque (invTimestep, veloc, omega);
 	NewtonBody* const body = m_controller->GetBody();
 	NewtonBodySetForce (body, &m_externalForce[0]);
 	NewtonBodySetTorque (body, &m_externalTorque[0]);
@@ -183,7 +183,7 @@ int CustomVehicleControllerBodyStateEngine::CalculateActiveJoints (CustomVehicle
     return count;
 }
 
-void CustomVehicleControllerBodyStateEngine::CalculateNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega)
+void CustomVehicleControllerBodyStateEngine::ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega)
 {
 dAssert (0);
 /*
@@ -472,9 +472,9 @@ void CustomVehicleControllerBodyStateTire::IntegrateForce (dFloat timestep, cons
 
 
 
-void CustomVehicleControllerBodyStateTire::CalculateNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega)
+void CustomVehicleControllerBodyStateTire::ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega)
 {
-	CustomVehicleControllerBodyState::CalculateNetForceAndTorque (invTimestep, veloc, omega);
+	CustomVehicleControllerBodyState::ApplyNetForceAndTorque (invTimestep, veloc, omega);
 	const CustomVehicleControllerBodyStateChassis& chassis = m_controller->m_chassisState;
 
 #if 0
@@ -556,7 +556,7 @@ if ((gear > 1) && (m_myIndex == 4)) {
 	// integrate tires angular velocity
 	dVector relOmega (m_omega - chassis.m_omega);
 	m_rotatonSpeed = relOmega % m_matrix[0];
-m_rotatonSpeed = 2.0f;
+//m_rotatonSpeed = 2.0f;
 	m_rotationAngle = dMod (m_rotationAngle + m_rotatonSpeed / invTimestep, 2.0f * 3.141592f);
 }
 

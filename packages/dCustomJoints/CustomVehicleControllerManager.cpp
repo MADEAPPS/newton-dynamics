@@ -567,7 +567,7 @@ void CustomVehicleController::CalculateReactionsForces (int jointCount, CustomVe
 	for (dList<CustomVehicleControllerBodyState*>::dListNode* stateNode = m_stateList.GetFirst()->GetNext(); stateNode; stateNode = stateNode->GetNext()) {
 		CustomVehicleControllerBodyState* const state = stateNode->GetInfo();
 		int index = state->m_myIndex;
-		state->CalculateNetForceAndTorque (invTimestepSrc, stateVeloc[index].m_linear, stateVeloc[index].m_angular);
+		state->ApplyNetForceAndTorque (invTimestepSrc, stateVeloc[index].m_linear, stateVeloc[index].m_angular);
 	}
 
 	for (int i = 0; i < jointCount; i ++) {
@@ -576,6 +576,16 @@ void CustomVehicleController::CalculateReactionsForces (int jointCount, CustomVe
 	}
 }
 
+
+void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
+{
+	NewtonBody* const body = GetBody();
+	NewtonBodyGetMatrix(body, &m_chassisState.m_matrix[0][0]);
+	for (TireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+		CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
+		tire->UpdateTransform();
+	}
+}
 
 
 void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
@@ -620,13 +630,4 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 }
 
 
-void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
-{
-	NewtonBody* const body = GetBody();
-	NewtonBodyGetMatrix(body, &m_chassisState.m_matrix[0][0]);
-	for (TireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
-		CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
-		tire->UpdateTransform();
-	}
-}
 
