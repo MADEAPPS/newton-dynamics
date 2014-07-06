@@ -86,7 +86,7 @@
 
 
 #define VEHICLE_THIRD_PERSON_VIEW_HIGHT		2.0f
-#define VEHICLE_THIRD_PERSON_VIEW_DIST		12.0f
+#define VEHICLE_THIRD_PERSON_VIEW_DIST		10.0f
 #define VEHICLE_THIRD_PERSON_VIEW_FILTER	0.125f
 
 class BasicVehicleEntity: public DemoEntity
@@ -185,20 +185,17 @@ class BasicVehicleEntity: public DemoEntity
 		return NewtonCreateConvexHull(world, mesh->m_vertexCount, vertexList, 3 * sizeof (float), 0.001f, 0, &meshMatrix[0][0]);
 	}
 
-
-/*
 	// interpolate all skeleton transform 
 	virtual void InterpolateMatrix (DemoEntityManager& world, dFloat param)
 	{
 		DemoEntity::InterpolateMatrix (world, param);
 		if (m_controller){
-			for (CustomVehicleControllerBodyStateTire* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
-				DemoEntity* const tirePart = (DemoEntity*) m_controller->GetUserData(node);
+			for (CustomVehicleControllerBodyStateTire* tire = m_controller->GetFirstTire(); tire; tire = m_controller->GetNextTire(tire)) {
+				DemoEntity* const tirePart = (DemoEntity*) tire->GetUserData();
 				tirePart->InterpolateMatrix (world, param);
 			}
 		}
 	}
-*/
 
 	void CalculateTireDimensions (const char* const tireName, dFloat& width, dFloat& radius) const
 	{
@@ -283,31 +280,29 @@ class BasicVehicleEntity: public DemoEntity
 
 	void UpdateTireTransforms()
 	{
-/*
 		NewtonBody* const body = m_controller->GetBody();
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(body));
 		
 #if 0
 		// this is the general way for getting the tire matrices
 		dMatrix rootMatrixInv (GetNextMatrix().Inverse());
-		for (CustomVehicleControllerBodyStateTire* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
-			DemoEntity* const tirePart = (DemoEntity*) m_controller->GetUserData(node);
+		for (CustomVehicleControllerBodyStateTire* tire = m_controller->GetFirstTire(); tire; tire = m_controller->GetNextTire(tire)) {
+			DemoEntity* const tirePart = (DemoEntity*) tire->GetUserData();
 			TireAligmentTransform* const aligmentMatrix = (TireAligmentTransform*)tirePart->GetUserData();
-			dMatrix matrix (aligmentMatrix->m_matrix * m_controller->GetTireGlobalMatrix(node) * rootMatrixInv);
+			dMatrix matrix (aligmentMatrix->m_matrix * tire->CalculateGlobalMatrix() * rootMatrixInv);
 			dQuaternion rot (matrix);
 			tirePart->SetMatrix(*scene, rot, matrix.m_posit);
 		}
 #else
-		// this is saves some calculation since it get the tire local to the chassis
-		for (CustomVehicleControllerBodyStateTire* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
-			DemoEntity* const tirePart = (DemoEntity*) m_controller->GetUserData(node);
+		// this saves some calculation since it get the tire local to the chassis
+		for (CustomVehicleControllerBodyStateTire* tire = m_controller->GetFirstTire(); tire; tire = m_controller->GetNextTire(tire)) {
+			DemoEntity* const tirePart = (DemoEntity*) tire->GetUserData();
 			TireAligmentTransform* const aligmentMatrix = (TireAligmentTransform*)tirePart->GetUserData();
-			dMatrix matrix (aligmentMatrix->m_matrix * m_controller->GetTireLocalMatrix(node));
+			dMatrix matrix (aligmentMatrix->m_matrix * tire->CalculateLocalMatrix());
 			dQuaternion rot (matrix);
 			tirePart->SetMatrix(*scene, rot, matrix.m_posit);
 		}
 #endif
-*/
 	}
 
 
@@ -893,14 +888,14 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 	{
 		// do the base class post update
 		CustomVehicleControllerManager::PostUpdate(timestep);
-/*		
+		
 		// update the visual transformation matrices for all vehicle tires
-		for (CustomListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
-			CustomVehicleController* const controller = &ptr->GetInfo();
+		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
+			CustomVehicleController* const controller = &node->GetInfo();
 			BasicVehicleEntity* const vehicleEntity = (BasicVehicleEntity*)NewtonBodyGetUserData (controller->GetBody());
 			vehicleEntity->UpdateTireTransforms();
 		}
-*/
+
 		UpdateCamera (timestep);
 	}
 

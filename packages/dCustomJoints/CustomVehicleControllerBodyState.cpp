@@ -328,9 +328,9 @@ void CustomVehicleControllerBodyStateTire::Init (CustomVehicleController* const 
 	m_contactJoint.Init(m_controller, &m_controller->m_staticWorld, this);
 }
 
-dMatrix CustomVehicleControllerBodyStateTire::CalculateSteeringMatrix () const
+void* CustomVehicleControllerBodyStateTire::GetUserData() const
 {
-	return dYawMatrix(m_steeringAngle) * CalculateSuspensionMatrix ();
+	return m_userData;
 }
 
 dMatrix CustomVehicleControllerBodyStateTire::CalculateSuspensionMatrix () const
@@ -338,6 +338,31 @@ dMatrix CustomVehicleControllerBodyStateTire::CalculateSuspensionMatrix () const
 	dMatrix matrix (m_localFrame);
 	matrix.m_posit -= m_localFrame.m_up.Scale (m_posit);
 	return matrix;
+}
+
+dMatrix CustomVehicleControllerBodyStateTire::CalculateSteeringMatrix () const
+{
+	return dYawMatrix(m_steeringAngle) * CalculateSuspensionMatrix ();
+}
+
+dMatrix CustomVehicleControllerBodyStateTire::CalculateLocalMatrix () const
+{
+	return dPitchMatrix(m_rotationAngle) * CalculateSteeringMatrix ();
+}
+
+dMatrix CustomVehicleControllerBodyStateTire::CalculateGlobalMatrix () const
+{
+	dMatrix matrix;
+	NewtonBodyGetMatrix(m_controller->GetBody(), &matrix[0][0]);
+	return CalculateLocalMatrix () * matrix;
+}
+
+
+void CustomVehicleControllerBodyStateTire::UpdateTransform()
+{
+	//dMatrix localMatrix (CustomVehicleController::TireBodyState::CalculateSteeringMatrix ());
+	dMatrix localMatrix (CalculateLocalMatrix ());
+	NewtonCollisionSetMatrix(m_shape, &localMatrix[0][0]);	
 }
 
 
@@ -439,30 +464,13 @@ void CustomVehicleControllerBodyStateTire::SetAdhesionCoefficient(dFloat Coeffic
 	m_adhesionCoefficient = 2.0f * dClamp (Coefficient, dFloat(0.0f), dFloat(1.0f));
 }
 
-
-
-dMatrix CustomVehicleControllerBodyStateTire::CalculateMatrix () const
-{
-	return dPitchMatrix(m_rotationAngle) * CalculateSteeringMatrix ();
-}
-
-
-
-void CustomVehicleControllerBodyStateTire::UpdateTransform()
-{
-	//dMatrix localMatrix (CustomVehicleController::TireBodyState::CalculateSteeringMatrix ());
-	dMatrix localMatrix (CustomVehicleController::TireBodyState::CalculateMatrix());
-	NewtonCollisionSetMatrix(m_shape, &localMatrix[0][0]);	
-}
-
-
-
 void CustomVehicleControllerBodyStateTire::IntegrateForce (dFloat timestep, const dVector& force, const dVector& torque)
 {
 	BodyState::IntegrateForce (timestep, force, torque);
 }
-
 */
+
+
 
 void CustomVehicleControllerBodyStateTire::CalculateNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega)
 {
@@ -548,6 +556,7 @@ if ((gear > 1) && (m_myIndex == 4)) {
 	// integrate tires angular velocity
 	dVector relOmega (m_omega - chassis.m_omega);
 	m_rotatonSpeed = relOmega % m_matrix[0];
+m_rotatonSpeed = 2.0f;
 	m_rotationAngle = dMod (m_rotationAngle + m_rotatonSpeed / invTimestep, 2.0f * 3.141592f);
 }
 

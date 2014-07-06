@@ -43,21 +43,15 @@ class CustomVehicleController: public CustomControllerBase
 		}
 	};
 
-/*
+
 	public:
-	
-	CUSTOM_JOINTS_API TireBodyState* GetFirstTire () const ;
-	CUSTOM_JOINTS_API TireBodyState* GetNextTire (TireBodyState* const tire) const;
+	CUSTOM_JOINTS_API CustomVehicleControllerBodyStateTire* GetFirstTire () const ;
+	CUSTOM_JOINTS_API CustomVehicleControllerBodyStateTire* GetNextTire (CustomVehicleControllerBodyStateTire* const tire) const;
 
-	CUSTOM_JOINTS_API void* GetUserData (TireBodyState* const tireNode) const;
-	CUSTOM_JOINTS_API dMatrix GetTireLocalMatrix (TireBodyState* const tireNode) const;
-	CUSTOM_JOINTS_API dMatrix GetTireGlobalMatrix (TireBodyState* const tireNode) const;
-
+/*
 	CUSTOM_JOINTS_API const ChassisBodyState& GetChassisState () const;
-
 	CUSTOM_JOINTS_API void SetLongitudinalSlipRatio(dFloat maxLongitudinalSlipRatio);
 	CUSTOM_JOINTS_API void SetLateralSlipAngle(dFloat maxLongitudinalSlipAngleIndDegrees);
-
 */	
 
 	CUSTOM_JOINTS_API CustomVehicleControllerComponentBrake* GetBrakes() const;

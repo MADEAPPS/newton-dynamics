@@ -102,18 +102,20 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 
 	CUSTOM_JOINTS_API void Init (CustomVehicleController* const controller, const TireCreationInfo& tireInfo);
 
+	CUSTOM_JOINTS_API void* GetUserData() const;
+	CUSTOM_JOINTS_API dMatrix CalculateLocalMatrix () const;
+	CUSTOM_JOINTS_API dMatrix CalculateGlobalMatrix () const;
 
 	CUSTOM_JOINTS_API dMatrix CalculateSteeringMatrix () const;
 	CUSTOM_JOINTS_API dMatrix CalculateSuspensionMatrix () const;
 
+	private:
 	CUSTOM_JOINTS_API void UpdateDynamicInputs(dFloat timestep);
 	CUSTOM_JOINTS_API void Collide (CustomControllerConvexCastPreFilter& filter, dFloat timestepInv);
+	CUSTOM_JOINTS_API void UpdateTransform ();
 /*
 	CUSTOM_JOINTS_API dFloat GetAdhesionCoefficient() const;
 	CUSTOM_JOINTS_API void SetAdhesionCoefficient(dFloat Coefficient);
-
-	CUSTOM_JOINTS_API dMatrix CalculateMatrix () const;
-	CUSTOM_JOINTS_API void UpdateTransform ();
 	CUSTOM_JOINTS_API virtual void IntegrateForce (dFloat timestep, const dVector& force, const dVector& torque);
 */
 	CUSTOM_JOINTS_API virtual void CalculateNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega);
@@ -141,6 +143,14 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 	NewtonCollision* m_shape;
 	CustomVehicleControllerTireJoint m_chassisJoint;
 	CustomVehicleControllerContactJoint m_contactJoint;
+
+	friend class CustomVehicleController;
+	friend class CustomVehicleControllerTireJoint;
+	friend class CustomVehicleControllerContactJoint;
+	friend class CustomVehicleControllerComponentBrake;
+	friend class CustomVehicleControllerComponentEngine;
+	friend class CustomVehicleControllerComponentSteering;
+	
 };
 
 

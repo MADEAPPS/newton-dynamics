@@ -73,36 +73,6 @@ const CustomVehicleController::ChassisBodyState& CustomVehicleController::GetCha
 }
 
 
-CustomVehicleController::TireBodyState* CustomVehicleController::GetFirstTire () const
-{
-	return m_tireList.GetFirst() ? &m_tireList.GetFirst()->GetInfo() : NULL;
-}
-
-CustomVehicleController::TireBodyState* CustomVehicleController::GetNextTire (TireBodyState* const tire) const
-{
-	TireList::CustomListNode* const tireNode = m_tireList.GetNodeFromInfo(*tire);
-	return tireNode->GetNext() ? &tireNode->GetNext()->GetInfo() : NULL;
-}
-
-
-void* CustomVehicleController::GetUserData (TireBodyState* const tire) const
-{
-	return tire->m_userData;
-}
-
-dMatrix CustomVehicleController::GetTireLocalMatrix (TireBodyState* const tire) const
-{
-	return tire->CalculateMatrix ();
-}
-
-dMatrix CustomVehicleController::GetTireGlobalMatrix (TireBodyState* const tire) const
-{
-	dMatrix matrix;
-	NewtonBodyGetMatrix(GetBody(), &matrix[0][0]);
-	return GetTireLocalMatrix (tire) * matrix;
-}
-
-
 void CustomVehicleController::UpdateTireTransforms ()
 {
 	for (TireList::CustomListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
@@ -110,11 +80,6 @@ void CustomVehicleController::UpdateTireTransforms ()
 		tire->UpdateTransform();
 	}
 }
-
-
-
-
-
 #endif
 
 
@@ -220,6 +185,17 @@ void CustomVehicleController::Cleanup()
 	NewtonDestroyCollision(m_tireCastShape);
 }
 
+
+CustomVehicleControllerBodyStateTire* CustomVehicleController::GetFirstTire () const
+{
+	return m_tireList.GetFirst() ? &m_tireList.GetFirst()->GetInfo() : NULL;
+}
+
+CustomVehicleControllerBodyStateTire* CustomVehicleController::GetNextTire (CustomVehicleControllerBodyStateTire* const tire) const
+{
+	TireList::dListNode* const tireNode = m_tireList.GetNodeFromInfo(*tire);
+	return tireNode->GetNext() ? &tireNode->GetNext()->GetInfo() : NULL;
+}
 
 
 void CustomVehicleController::SetCenterOfGravity(const dVector& comRelativeToGeomtriCenter)
@@ -646,14 +622,11 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 
 void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 {
-//	dAssert (0);
-/*
 	NewtonBody* const body = GetBody();
 	NewtonBodyGetMatrix(body, &m_chassisState.m_matrix[0][0]);
-	for (TireList::CustomListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
-		TireBodyState* const tire = &node->GetInfo();
+	for (TireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+		CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
 		tire->UpdateTransform();
 	}
-*/
 }
 
