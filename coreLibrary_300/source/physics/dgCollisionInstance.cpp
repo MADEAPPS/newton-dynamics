@@ -692,6 +692,7 @@ void dgCollisionInstance::CalculateBuoyancyAcceleration (const dgMatrix& matrix,
 			scaledMatrix[0] = scaledMatrix[0].Scale4 (m_scale[0]);
 			scaledMatrix[1] = scaledMatrix[1].Scale4 (m_scale[1]);
 			scaledMatrix[2] = scaledMatrix[2].Scale4 (m_scale[2]);
+			break;
 		}
 		default:
 			dgAssert(0);
