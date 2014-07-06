@@ -109,6 +109,22 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 	CUSTOM_JOINTS_API dMatrix CalculateSteeringMatrix () const;
 	CUSTOM_JOINTS_API dMatrix CalculateSuspensionMatrix () const;
 
+	const dVector& GetTireLoad () const
+	{
+		return m_tireLoad;
+	}
+
+	const dVector& GetLateralForce () const
+	{
+		return m_lateralForce;
+	}
+
+	const dVector& GetLongitudinalForce () const
+	{
+		return m_longitudinalForce;
+	}
+
+
 	private:
 	CUSTOM_JOINTS_API void UpdateDynamicInputs(dFloat timestep);
 	CUSTOM_JOINTS_API void Collide (CustomControllerConvexCastPreFilter& filter, dFloat timestepInv);
@@ -122,7 +138,7 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 
 	dVector m_tireLoad;
 	dVector m_lateralForce;
-	dVector m_longitidinalForce;
+	dVector m_longitudinalForce;
 	dFloat m_radio;
 	dFloat m_width;
 	dFloat m_posit;

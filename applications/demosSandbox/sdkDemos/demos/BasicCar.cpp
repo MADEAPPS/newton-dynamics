@@ -579,11 +579,8 @@ class BasicVehicleEntity: public DemoEntity
 
 	void Debug () const 
 	{
-/*
 		NewtonBody* const body = m_controller->GetBody();
-//		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(body));
-
-		const CustomVehicleController::ChassisBodyState& chassis = m_controller->GetChassisState ();
+		const CustomVehicleControllerBodyStateChassis& chassis = m_controller->GetChassisState ();
 
 		dFloat scale = -4.0f / (chassis.m_mass * DEMO_GRAVITY);
 		dVector p0 (chassis.m_globalCentreOfMass);
@@ -623,19 +620,19 @@ class BasicVehicleEntity: public DemoEntity
 			dVector p0 (tire.m_globalCentreOfMass);
 
 			// draw the tire load 
-			dVector p1 (p0 + tire.m_tireLoad.Scale (scale));
+			dVector p1 (p0 + tire.GetTireLoad().Scale (scale));
 			glColor3f (0.0f, 0.0f, 1.0f);
 			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
 			glVertex3f (p1.m_x, p1.m_y, p1.m_z);
 
 			// show tire lateral force
-			dVector p2 (p0 - tire.m_lateralForce.Scale (scale));
+			dVector p2 (p0 - tire.GetLateralForce().Scale (scale));
 			glColor3f(1.0f, 0.0f, 0.0f);
 			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
 			glVertex3f (p2.m_x, p2.m_y, p2.m_z);
 
 			// show tire longitudinal force
-			dVector p3 (p0 - tire.m_longitidinalForce.Scale (scale));
+			dVector p3 (p0 - tire.GetLongitudinalForce().Scale (scale));
 			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
 			glVertex3f (p3.m_x, p3.m_y, p3.m_z);
 		}
@@ -643,7 +640,7 @@ class BasicVehicleEntity: public DemoEntity
 		glEnd();
 
 		glLineWidth(1.0f);
-*/
+
 	}
 
 

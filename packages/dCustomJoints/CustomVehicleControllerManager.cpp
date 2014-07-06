@@ -66,13 +66,6 @@ void CustomVehicleController::SetLongitudinalSlipRatio(dFloat maxLongitudinalSli
 	m_tireLongitidialSlipRatio.InitalizeCurve(sizeof (slips) / sizeof (slips[0]), slips, force);
 }
 
-
-const CustomVehicleController::ChassisBodyState& CustomVehicleController::GetChassisState () const
-{
-	return m_chassisState;
-}
-
-
 void CustomVehicleController::UpdateTireTransforms ()
 {
 	for (TireList::CustomListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
@@ -184,6 +177,12 @@ void CustomVehicleController::Cleanup()
 	SetHandBrakes(NULL);
 	NewtonDestroyCollision(m_tireCastShape);
 }
+
+const CustomVehicleControllerBodyStateChassis& CustomVehicleController::GetChassisState () const
+{
+	return m_chassisState;
+}
+
 
 
 CustomVehicleControllerBodyStateTire* CustomVehicleController::GetFirstTire () const
@@ -604,6 +603,7 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 		tire->Collide(castFilter, timestepInv);
 		tire->UpdateDynamicInputs(timestep);
 	}
+m_chassisState.m_externalForce += m_chassisState.m_matrix[2].Scale (0.5f * m_chassisState.m_mass);
 
 	// update all components
 	if (m_engine) {

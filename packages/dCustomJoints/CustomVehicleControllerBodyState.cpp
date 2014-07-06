@@ -315,7 +315,7 @@ void CustomVehicleControllerBodyStateTire::Init (CustomVehicleController* const 
 	m_idleRollingResistance = 0.0f;
 	m_tireLoad = dVector(0.0f, 0.0f, 0.0f, 0.0f);
 	m_lateralForce = dVector(0.0f, 0.0f, 0.0f, 0.0f);
-	m_longitidinalForce = dVector(0.0f, 0.0f, 0.0f, 0.0f);
+	m_longitudinalForce = dVector(0.0f, 0.0f, 0.0f, 0.0f);
 
 	m_speed = 0.0f;
 	m_posit = m_suspensionlenght;
@@ -423,7 +423,7 @@ void CustomVehicleControllerBodyStateTire::UpdateDynamicInputs(dFloat timestep)
 	// calculate force an torque generate by the suspension
 	m_tireLoad = dVector(0.0f, 0.0f, 0.0f, 0.0f);
 	m_lateralForce = dVector(0.0f, 0.0f, 0.0f, 0.0f);
-	m_longitidinalForce = dVector(0.0f, 0.0f, 0.0f, 0.0f);
+	m_longitudinalForce = dVector(0.0f, 0.0f, 0.0f, 0.0f);
 	if (m_contactJoint.m_contactCount) {
 		dFloat distance = m_suspensionlenght - m_posit;
 		dAssert (distance >= 0.0f);

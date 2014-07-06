@@ -349,7 +349,7 @@ void CustomVehicleControllerTireJoint::UpdateSolverForces (const JacobianPair* c
 	tire->m_lateralForce = jacobians[index].m_jacobian_IM1.m_linear.Scale(m_jointFeebackForce[0]); 
 
 	// get tire longitudinal force
-	tire->m_longitidinalForce = jacobians[index + 1].m_jacobian_IM1.m_linear.Scale(m_jointFeebackForce[1]); 
+	tire->m_longitudinalForce = jacobians[index + 1].m_jacobian_IM1.m_linear.Scale(m_jointFeebackForce[1]); 
 }
 
 
@@ -361,7 +361,6 @@ CustomVehicleControllerContactJoint::CustomVehicleControllerContactJoint ()
 
 void CustomVehicleControllerContactJoint::JacobianDerivative (ParamInfo* const constraintParams)
 {
-
 	CustomVehicleControllerBodyStateTire* const tire = (CustomVehicleControllerBodyStateTire*) m_state1;
 	const dMatrix& tireMatrix = tire->m_matrix;
 
@@ -372,9 +371,9 @@ void CustomVehicleControllerContactJoint::JacobianDerivative (ParamInfo* const c
 		dVector normal (m_contacts[i].m_normal);
 		dVector lateralPin (tireMatrix[0]);
 		dVector longitudinalPin (normal * lateralPin);
-		dFloat mag2 = longitudinalPin % longitudinalPin;
-		if (mag2 > 1.0e-3f) {
-			longitudinalPin = longitudinalPin.Scale (1.0f / dSqrt(mag2));
+		dFloat pinMag2 = longitudinalPin % longitudinalPin;
+		if (pinMag2 > 1.0e-3f) {
+			longitudinalPin = longitudinalPin.Scale (1.0f / dSqrt(pinMag2));
 			lateralPin = longitudinalPin * normal;
 	
 			dVector contactPoint (m_contacts[i].m_point);
