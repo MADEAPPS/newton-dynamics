@@ -288,7 +288,7 @@ void CustomVehicleControllerBodyStateTire::Init (CustomVehicleController* const 
 
 	// initialize all constants
 	m_userData = tireInfo.m_userData;
-	m_mass = tireInfo.m_mass; 
+	m_mass = dMax (tireInfo.m_mass, m_controller->m_chassisState.m_mass / 50.0f); 
 	m_invMass = 1.0f / m_mass;
 	m_radio = tireInfo.m_radio;
 	m_width = tireInfo.m_width;
@@ -380,16 +380,19 @@ void CustomVehicleControllerBodyStateTire::UpdateDynamicInputs(dFloat timestep)
 	UpdateInertia();
 
 	// get the velocity state for this tire
-	dVector com (m_matrix.m_posit - chassis.m_globalCentreOfMass);
+	dVector relPosit (m_matrix.m_posit - chassis.m_globalCentreOfMass);
 	m_omega = chassis.m_omega + m_matrix[0].Scale (m_rotatonSpeed);
-	m_veloc = chassis.m_veloc + chassis.m_omega * com + m_matrix[1].Scale (m_speed);
+	m_veloc = chassis.m_veloc + chassis.m_omega * relPosit + m_matrix[1].Scale (m_speed);
 
 	// set the initial force on this tire
 	m_externalForce = chassis.m_gravity.Scale (m_mass);
 
 	// apply the engine torque on this tire
 	dVector torque (m_matrix[0].Scale (m_engineTorque));
-	chassis.m_externalTorque += torque;
+
+	// there is not direct joint between the tire and the chassis, but there tire inertia should apply some toque to the engine
+	// I will use an arbitrary 25% of the torque goes to the chassis.
+	chassis.m_externalTorque += torque.Scale (0.25f);
 	m_externalTorque = torque.Scale(-1.0f);
 
 	// calculate force an torque generate by the suspension
@@ -416,7 +419,7 @@ void CustomVehicleControllerBodyStateTire::UpdateDynamicInputs(dFloat timestep)
 
 		// calculate tire force and torque spring and damper apply to the chassis
 		//dVector force (m_matrix[1].Scale(m_tireLoad));
-		dVector torque (com * m_tireLoad);
+		dVector torque (relPosit * m_tireLoad);
 		chassis.m_externalForce += m_tireLoad;
 		chassis.m_externalTorque += torque;
 

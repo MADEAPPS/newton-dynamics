@@ -348,18 +348,6 @@ int CustomVehicleController::GetActiveJoints(CustomVehicleControllerJoint** cons
 
 
 
-void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
-{
-//	dAssert (0);
-/*
-	NewtonBody* const body = GetBody();
-	NewtonBodyGetMatrix(body, &m_chassisState.m_matrix[0][0]);
-	for (TireList::CustomListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
-		TireBodyState* const tire = &node->GetInfo();
-		tire->UpdateTransform();
-	}
-*/
-}
 
 
 int CustomVehicleController::BuildJacobianMatrix (int jointCount, CustomVehicleControllerJoint** const jointArray, dFloat timestep, CustomVehicleControllerJoint::JacobianPair* const jacobianArray, CustomVehicleControllerJoint::JacobianColum* const jacobianColumnArray)
@@ -648,15 +636,24 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 		m_brakes->Update(timestep);
 	}
 
-
-
 	// Get the number of active joints for this integration step
 	int jointCount = GetActiveJoints(jointArray);
 
 	BuildJacobianMatrix (jointCount, jointArray, timestep, jacobianPairArray, jacobianColumn);
 	CalculateReactionsForces (jointCount, jointArray, timestep, jacobianPairArray, jacobianColumn);
-
 }
 
 
+void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
+{
+//	dAssert (0);
+/*
+	NewtonBody* const body = GetBody();
+	NewtonBodyGetMatrix(body, &m_chassisState.m_matrix[0][0]);
+	for (TireList::CustomListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+		TireBodyState* const tire = &node->GetInfo();
+		tire->UpdateTransform();
+	}
+*/
+}
 

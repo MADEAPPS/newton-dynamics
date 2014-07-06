@@ -58,12 +58,13 @@
 #define VIPER_REDLINE_TORQUE			30.0f
 #define VIPER_REDLINE_TORQUE_RPM		6000.0f
 
-#define VIPER_MASS						(1560.0f/5.0f)
-//#define VIPER_MASS					700.0f
+#define VIPER_MASS						1500.0f
 #define VIPER_TIRE_STEER_ANGLE			35.0f
 
-// note: the tire real mass is too small an break 100 : 1 mass ratio rule for float point solver 
-#define VIPER_TIRE_MASS					(VIPER_MASS / 50.0f)  
+// note: tire unsprung mass (note the engine impose a limit of 1.0 / 50.0 mass ratio between connected bodies 
+//#define VIPER_TIRE_MASS				(VIPER_MASS / 50.0f)  
+#define VIPER_TIRE_MASS					40.0f  
+
 //#define VIPER_TIRE_TOP_SPEED			164 mile / hours
 #define VIPER_TIRE_TOP_SPEED_KMH		(264.0f)			 
 
@@ -890,7 +891,6 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 
 	virtual void PostUpdate (dFloat timestep)
 	{
-
 		// do the base class post update
 		CustomVehicleControllerManager::PostUpdate(timestep);
 /*		
@@ -900,15 +900,13 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 			BasicVehicleEntity* const vehicleEntity = (BasicVehicleEntity*)NewtonBodyGetUserData (controller->GetBody());
 			vehicleEntity->UpdateTireTransforms();
 		}
-
-		UpdateCamera (timestep);
 */
+		UpdateCamera (timestep);
 	}
 
 
 	void UpdateCamera (dFloat timestep)
 	{
-/*
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
 		DemoCamera* const camera = scene->GetCamera();
 		dMatrix camMatrix (camera->GetNextMatrix ());
@@ -926,7 +924,6 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 		}
 
 		camera->SetNextMatrix (*scene, camMatrix, camOrigin);
-*/
 	}
 
 	// use this to display debug information about vehicle 
@@ -993,7 +990,6 @@ void BasicCar (DemoEntityManager* const scene)
 
 	// build a muscle car from this vehicle controller
 	vehicle->BuildMuscleCar();
-/*
 
 	// set this vehicle as the player
 	manager->SetAsPlayer(vehicle);
@@ -1002,7 +998,7 @@ void BasicCar (DemoEntityManager* const scene)
 	dMatrix camMatrix (manager->m_player->GetNextMatrix());
 	scene->SetCameraMouseLock (true);
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
-*/
+
 
 //	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 //	dVector location (origin);
