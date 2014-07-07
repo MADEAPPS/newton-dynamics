@@ -141,6 +141,9 @@ void CustomVehicleController::Init (NewtonCollision* const chassisShape, const d
 	//dFloat slips[] = {0.0f, 0.1f, 0.2f, 1.0f};
 	//dFloat normalizedLongitudinalForce[] = {0.0f, 0.8f, 1.0f, 1.0f};
 	//SetLongitudinalSlipRatio (sizeof (slips) / sizeof (slips[0]), slips, normalizedLongitudinalForce);
+
+
+	m_dryFrictionTorque = 100.0;
 	SetLongitudinalSlipRatio (0.2f);
 	SetLateralSlipAngle(3.0f);
 }
@@ -159,6 +162,17 @@ const CustomVehicleControllerBodyStateChassis& CustomVehicleController::GetChass
 {
 	return m_chassisState;
 }
+
+void CustomVehicleController::SetDryRollingFrictionTorque (dFloat torque)
+{
+	m_dryFrictionTorque = dAbs (torque);
+}
+
+dFloat CustomVehicleController::GetDryRollingFrictionTorque () const
+{
+	return m_dryFrictionTorque;
+}
+
 
 void CustomVehicleController::SetLateralSlipAngle(dFloat maxLongitudinalSlipAngleIndDegrees)
 {
@@ -592,10 +606,12 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 	NewtonBody* const body = GetBody();
 	CustomControllerConvexCastPreFilter castFilter (body);
 	m_chassisState.UpdateDynamicInputs();
+
+	dFloat tireDryFriction = m_tireList.GetCount() ?  m_dryFrictionTorque / m_tireList.GetCount() : m_dryFrictionTorque;
 	for (TireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
 		CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
 		tire->Collide(castFilter, timestepInv);
-		tire->UpdateDynamicInputs(timestep);
+		tire->UpdateDynamicInputs(timestep, tireDryFriction);
 	}
 m_chassisState.m_externalForce += m_chassisState.m_matrix[2].Scale (5.0f * m_chassisState.m_mass);
 

@@ -321,17 +321,21 @@ void CustomVehicleControllerTireJoint::JacobianDerivative (ParamInfo* const cons
 		//m_tire->m_suspensionTochassisImpulseIndex = params.m_rows - 1;
 	}
 
+	
 	AddAngularRowJacobian (constraintParams, tire->m_matrix[1], 0.0f);
 	AddAngularRowJacobian (constraintParams, tire->m_matrix[2], 0.0f);
 
+	int index = constraintParams->m_count;
+	AddAngularRowJacobian (constraintParams, tire->m_matrix[0], 0.0f);
+	constraintParams->m_jointLowFriction[index] = - tire->m_dryFrictionTorque;
+	constraintParams->m_jointHighFriction[index] = tire->m_dryFrictionTorque;
+
 	// check if the brakes are applied
-	//dFloat breakResistance = dMax(tire->m_breakTorque, tire->m_engineTorqueResistance);
-    dFloat breakResistance = tire->m_breakTorque;
-	if (breakResistance > 1.0e-3f) {
-		int index = constraintParams->m_count;
-		AddAngularRowJacobian (constraintParams, tire->m_matrix[0], 0.0f);                    
-		constraintParams->m_jointLowFriction[index] = -breakResistance;
-		constraintParams->m_jointHighFriction[index] = breakResistance;
+//	dFloat breakResistance = dMax(tire->m_breakTorque, tire->m_engineTorqueResistance);
+//	if (breakResistance > 1.0e-3f) {
+	if (tire->m_breakTorque > 1.0e-3f) {
+		constraintParams->m_jointLowFriction[index] = -tire->m_breakTorque;
+		constraintParams->m_jointHighFriction[index] = tire->m_breakTorque;
 	}
 
 	// clear the input variable after there are res

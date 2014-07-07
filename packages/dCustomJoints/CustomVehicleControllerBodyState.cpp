@@ -300,6 +300,7 @@ void CustomVehicleControllerBodyStateTire::Init (CustomVehicleController* const 
 	m_localInvInertia[1] = 1.0f / m_localInertia[1];
 	m_localInvInertia[2] = 1.0f / m_localInertia[2];
 	m_localInvInertia[3] = 0.0f;
+	
 
 	m_dampingRatio = tireInfo.m_dampingRatio;
 	m_springStrength = tireInfo.m_springStrength;
@@ -312,6 +313,7 @@ void CustomVehicleControllerBodyStateTire::Init (CustomVehicleController* const 
 	m_rotationAngle = 0.0f;
 	m_steeringAngle = 0.0f;
 	m_adhesionCoefficient = 1.0f;
+	m_dryFrictionTorque = 0.0f;
 	m_idleRollingResistance = 0.0f;
 	m_tireLoad = dVector(0.0f, 0.0f, 0.0f, 0.0f);
 	m_lateralForce = dVector(0.0f, 0.0f, 0.0f, 0.0f);
@@ -396,9 +398,11 @@ void CustomVehicleControllerBodyStateTire::Collide (CustomControllerConvexCastPr
 }
 
 
-void CustomVehicleControllerBodyStateTire::UpdateDynamicInputs(dFloat timestep)
+void CustomVehicleControllerBodyStateTire::UpdateDynamicInputs(dFloat timestep, dFloat dryFriction)
 {
 	CustomVehicleControllerBodyStateChassis& chassis = m_controller->m_chassisState;
+
+	m_dryFrictionTorque = dryFriction;
 
 	m_matrix = CalculateSteeringMatrix() * chassis.m_matrix;
 	m_globalCentreOfMass = m_matrix.m_posit;

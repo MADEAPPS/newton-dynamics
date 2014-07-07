@@ -126,7 +126,7 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 
 
 	private:
-	CUSTOM_JOINTS_API void UpdateDynamicInputs(dFloat timestep);
+	CUSTOM_JOINTS_API void UpdateDynamicInputs(dFloat timestep, dFloat dryFriction);
 	CUSTOM_JOINTS_API void Collide (CustomControllerConvexCastPreFilter& filter, dFloat timestepInv);
 	CUSTOM_JOINTS_API void UpdateTransform ();
 /*
@@ -153,6 +153,7 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 	dFloat m_suspensionlenght;
 	dFloat m_adhesionCoefficient; 
 	dFloat m_idleRollingResistance;
+	dFloat m_dryFrictionTorque;
 	//dFloat m_engineTorqueResistance;
 
 	void* m_userData;
