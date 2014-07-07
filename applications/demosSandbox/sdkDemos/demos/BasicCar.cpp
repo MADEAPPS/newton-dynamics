@@ -328,6 +328,28 @@ class BasicVehicleEntity: public DemoEntity
 		CustomVehicleControllerBodyStateTire* const leftRearTire = AddTire ("rl_tire", offset1, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
 		CustomVehicleControllerBodyStateTire* const rightRearTire = AddTire ("rr_tire", offset1, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER);
 
+		// add an steering Wheel
+		CustomVehicleControllerComponentSteering* const steering = new CustomVehicleControllerComponentSteering (m_controller, VIPER_TIRE_STEER_ANGLE * 3.141592f / 180.0f);
+		steering->AddSteeringTire(leftFrontTire, -1.0f);
+		steering->AddSteeringTire(rightFrontTire, -1.0f);
+		m_controller->SetSteering(steering);
+
+		// add vehicle brakes
+		CustomVehicleControllerComponentBrake* const brakes = new CustomVehicleControllerComponentBrake (m_controller, VIPER_TIRE_BRAKE_TORQUE);
+		brakes->AddBrakeTire (leftFrontTire);
+		brakes->AddBrakeTire (rightFrontTire);
+		brakes->AddBrakeTire (leftRearTire);
+		brakes->AddBrakeTire (rightRearTire);
+		m_controller->SetBrakes(brakes);
+
+		// add vehicle hand brakes
+		CustomVehicleControllerComponentBrake* const handBrakes = new CustomVehicleControllerComponentBrake (m_controller, VIPER_TIRE_BRAKE_TORQUE);
+		handBrakes->AddBrakeTire (leftRearTire);
+		handBrakes->AddBrakeTire (rightRearTire);
+		m_controller->SetHandBrakes(handBrakes);
+
+
+
 /*
 		// add an engine
 		// first make the gear Box
@@ -354,26 +376,6 @@ class BasicVehicleEntity: public DemoEntity
 
         // the the defualt transmission type
 		engine->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
-
-		// add an steering Wheel
-		CustomVehicleController::SteeringComponent* const steering = new CustomVehicleController::SteeringComponent (m_controller, VIPER_TIRE_STEER_ANGLE * 3.141592f / 180.0f);
-		steering->AddSteeringTire(leftFrontTireHandle, -1.0f);
-		steering->AddSteeringTire(rightFrontTireHandle, -1.0f);
-		m_controller->SetSteering(steering);
-
-		// add vehicle brakes
-		CustomVehicleController::BrakeComponent* const brakes = new CustomVehicleController::BrakeComponent (m_controller, VIPER_TIRE_BRAKE_TORQUE);
-		brakes->AddBrakeTire (leftFrontTireHandle);
-		brakes->AddBrakeTire (rightFrontTireHandle);
-		brakes->AddBrakeTire (leftRearTireHandle);
-		brakes->AddBrakeTire (rightRearTireHandle);
-		m_controller->SetBrakes(brakes);
-		
-		// add vehicle hand brakes
-		CustomVehicleController::BrakeComponent* const handBrakes = new CustomVehicleController::BrakeComponent (m_controller, VIPER_TIRE_BRAKE_TORQUE);
-		handBrakes->AddBrakeTire (leftRearTireHandle);
-		handBrakes->AddBrakeTire (rightRearTireHandle);
-		m_controller->SetHandBrakes(handBrakes);
 */
 	}
 
@@ -452,27 +454,22 @@ class BasicVehicleEntity: public DemoEntity
 
 	void ApplyPlayerControl ()
 	{
-/*
 		NewtonBody* const body = m_controller->GetBody();
 		NewtonWorld* const world = NewtonBodyGetWorld(body);
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 		NewtonDemos* const mainWindow = scene->GetRootWindow();
 
-		CustomVehicleController::EngineComponent* const engine = m_controller->GetEngine();
-		CustomVehicleController::SteeringComponent* const steering = m_controller->GetSteering();
-		CustomVehicleController::BrakeComponent* const brakes = m_controller->GetBrakes();
-		CustomVehicleController::BrakeComponent* const handBrakes = m_controller->GetHandBrakes();
-		dAssert (engine);
-		dAssert (brakes);
-		dAssert (steering);
-		dAssert (handBrakes);
+		CustomVehicleControllerComponentEngine* const engine = m_controller->GetEngine();
+		CustomVehicleControllerComponentSteering* const steering = m_controller->GetSteering();
+		CustomVehicleControllerComponentBrake* const brakes = m_controller->GetBrakes();
+		CustomVehicleControllerComponentBrake* const handBrakes = m_controller->GetHandBrakes();
 
 		// get the throttler input
 		dFloat joyPosX;
 		dFloat joyPosY;
 		int joyButtons;
 
-		int gear = engine->GetGear();
+//		int gear = engine->GetGear();
 		dFloat steeringVal = 0.0f;
 		dFloat engineGasPedal = 0.0f;
 		dFloat brakePedal = 0.0f;
@@ -480,6 +477,8 @@ class BasicVehicleEntity: public DemoEntity
 
 		bool hasJopytick = mainWindow->GetJoytickPosition (joyPosX, joyPosY, joyButtons);
 		if (hasJopytick) {
+			dAssert (0);
+/*
 			// apply a cubic attenuation to the joystick inputs
 			joyPosX = joyPosX * joyPosX * joyPosX;
 			joyPosY = joyPosY * joyPosY * joyPosY;
@@ -490,7 +489,7 @@ class BasicVehicleEntity: public DemoEntity
 
 			gear += int (m_gearUpKey.UpdateTriggerJoystick(mainWindow, joyButtons & 2)) - int (m_gearDownKey.UpdateTriggerJoystick(mainWindow, joyButtons & 4));
 			handBrakePedal = (joyButtons & 1) ? 1.0f : 0.0f;
-			
+*/			
 		} else {
 
 			// get keyboard controls
@@ -511,33 +510,32 @@ class BasicVehicleEntity: public DemoEntity
 			// get the steering input
 			steeringVal = (dFloat (mainWindow->GetKeyState ('D')) - dFloat (mainWindow->GetKeyState ('A')));
 
+/*
 			// check for gear change (note key code for '>' = '.' and key code for '<' == ',')
 			gear += int (m_gearUpKey.UpdateTriggerButton(mainWindow, '.')) - int (m_gearDownKey.UpdateTriggerButton(mainWindow, ','));
-
 			// do driving heuristic for automatic transmission
 			if (engine->GetTransmissionMode()) {
 				dFloat speed = engine->GetSpeed();
 				// check if vehicle is parked
 				if ((dAbs (speed) < 1.0f) && !engineGasPedal && !brakePedal && !handBrakePedal) {
 					handBrakePedal = 0.5f;
-				};
-
+				}
 			}
-
+*/
 		}
 				
 		// set the help key
 		m_helpKey.UpdatePushButton (mainWindow, 'H');
 
 		// check transmission type
-		int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
+//		int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
-#if 1
+#if 0
 	#if 1
 		static FILE* file = fopen ("log.bin", "wb");
 		if (file) {
 			fwrite (&toggleTransmission, sizeof (int), 1, file);
-			fwrite (&gear, sizeof (int), 1, file);
+//			fwrite (&gear, sizeof (int), 1, file);
 			fwrite (&steeringVal, sizeof (dFloat), 1, file);
 			fwrite (&engineGasPedal, sizeof (dFloat), 1, file);
 			fwrite (&handBrakePedal, sizeof (dFloat), 1, file);
@@ -557,18 +555,25 @@ class BasicVehicleEntity: public DemoEntity
 	#endif
 #endif
 
-		if (toggleTransmission) {
-			engine->SetTransmissionMode (!engine->GetTransmissionMode());
+		if (engine) {
+//			if (toggleTransmission) {
+//				engine->SetTransmissionMode (!engine->GetTransmissionMode());
+//			}
+//			if (!engine->GetTransmissionMode()) {
+//				engine->SetGear(gear);
+//			}
+//			engine->SetParam(engineGasPedal);
 		}
-		if (!engine->GetTransmissionMode()) {
-			engine->SetGear(gear);
+		if (steering) {
+			steering->SetParam(steeringVal);
 		}
-
-		brakes->SetParam(brakePedal);
-		steering->SetParam(steeringVal);
-		engine->SetParam(engineGasPedal);
-		handBrakes->SetParam(handBrakePedal);
-*/
+		if (brakes) {
+			brakes->SetParam(brakePedal);
+		}
+		if (handBrakes) {
+			handBrakes->SetParam(handBrakePedal);
+		}
+		
 	}
 
 	void ApplyNPCControl ()
@@ -836,19 +841,18 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 
 	virtual void PreUpdate (dFloat timestep)
 	{
-/*
 		// apply the vehicle controls, and all simulation time effect
-		NewtonWorld* const world = GetWorld(); 
-		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-		dSoundManager* const soundManager = scene->GetSoundManager();
-		for (CustomListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
+//		NewtonWorld* const world = GetWorld(); 
+//		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
+//		dSoundManager* const soundManager = scene->GetSoundManager();
+		for (dListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
 			CustomVehicleController* const controller = &ptr->GetInfo();
 			
 			NewtonBody* const body = controller->GetBody();
 			BasicVehicleEntity* const vehicleEntity = (BasicVehicleEntity*) NewtonBodyGetUserData(body);
-			CustomVehicleController::EngineComponent* const engine = vehicleEntity->m_controller->GetEngine();
 
 			if (vehicleEntity == m_player) {
+/*
 				// player need to check if the start engine sound is still on
 				void* const starEngine = m_engineSounds[0];
 				void* const startEngineSoundAsset = soundManager->GetAsset(starEngine);
@@ -859,6 +863,7 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 					dFloat volume = soundManager->GetChannelVolume(starEngine);
 					soundManager->SetChannelVolume(starEngine, volume * 0.98f);
 				}
+*/
 
 				// do player control
 				vehicleEntity->ApplyPlayerControl ();
@@ -867,14 +872,16 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 				vehicleEntity->ApplyNPCControl ();
 			}
 
-
+/*
 			// update engine rpm sound for all vehicles
+			CustomVehicleControllerComponentEngine* const engine = vehicleEntity->m_controller->GetEngine();
 			dFloat rpm = 2.0f * engine->GetRPM () / VIPER_REDLINE_TORQUE_RPM;
 //rpm = 0.0f;
 			void* const rpmEngine = m_engineSounds[1];
 			soundManager->SetChannelPitch (rpmEngine, rpm);
-		}
 */
+		}
+
 
 		// do the base class post update
 		CustomVehicleControllerManager::PreUpdate(timestep);

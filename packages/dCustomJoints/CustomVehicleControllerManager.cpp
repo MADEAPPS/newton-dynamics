@@ -613,7 +613,7 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 		tire->Collide(castFilter, timestepInv);
 		tire->UpdateDynamicInputs(timestep, tireDryFriction);
 	}
-m_chassisState.m_externalForce += m_chassisState.m_matrix[2].Scale (5.0f * m_chassisState.m_mass);
+m_chassisState.m_externalForce += m_chassisState.m_matrix[0].Scale (2.0f * m_chassisState.m_mass);
 
 	// update all components
 	if (m_engine) {
