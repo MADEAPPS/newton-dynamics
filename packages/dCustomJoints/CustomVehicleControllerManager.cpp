@@ -35,16 +35,13 @@
 #include <CustomVehicleControllerComponent.h>
 #include <CustomVehicleControllerBodyState.h>
 
-#define VEHICLE_CONTROLLER_MAX_JOINTS							32
-#define VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS					(VEHICLE_CONTROLLER_MAX_JOINTS * 4)
-#define VEHICLE_PSD_DAMP_TOL									dFloat(1.0e-4f)
-#define VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SLIP_ANGLE	dFloat(0.75f)
+#define VEHICLE_CONTROLLER_MAX_JOINTS								32
+#define VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS						(VEHICLE_CONTROLLER_MAX_JOINTS * 4)
+#define VEHICLE_PSD_DAMP_TOL										dFloat(1.0e-4f)
+#define VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SLIP_ANGLE		dFloat(0.75f)
+#define VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SIDESLIP_RATIO	dFloat(0.95f)
 
 #if 0
-#define VEHICLE_VEL_DAMP				        dFloat(100.0f)
-#define VEHICLE_POS_DAMP				        dFloat(1500.0f)
-#define VEHICLE_MAX_FRICTION_BOUND	            dFloat(1.0e15f)
-#define VEHICLE_MIN_FRICTION_BOUND			    -VEHICLE_MAX_FRICTION_BOUND
 void CustomVehicleController::UpdateTireTransforms ()
 {
 	for (TireList::CustomListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
@@ -145,7 +142,7 @@ void CustomVehicleController::Init (NewtonCollision* const chassisShape, const d
 
 	m_dryFrictionTorque = 100.0;
 	SetLongitudinalSlipRatio (0.2f);
-	SetLateralSlipAngle(3.0f);
+	SetLateralSlipAngle(8.0f);
 }
 
 
@@ -187,7 +184,7 @@ void CustomVehicleController::SetLongitudinalSlipRatio(dFloat maxLongitudinalSli
 	dClamp(maxLongitudinalSlipRatio, dFloat(0.01f), dFloat(0.9f));
 
 	dFloat slips[] = {0.0f, maxLongitudinalSlipRatio, 1.0f};
-	dFloat force[] = {0.0f, 1.0f, VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SLIP_ANGLE};
+	dFloat force[] = {0.0f, 1.0f, VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SIDESLIP_RATIO};
 	m_tireLongitidialSlipRatio.InitalizeCurve(sizeof (slips) / sizeof (slips[0]), slips, force);
 }
 

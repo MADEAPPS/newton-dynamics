@@ -368,6 +368,8 @@ void CustomVehicleControllerContactJoint::JacobianDerivative (ParamInfo* const c
 	CustomVehicleControllerBodyStateTire* const tire = (CustomVehicleControllerBodyStateTire*) m_state1;
 	const dMatrix& tireMatrix = tire->m_matrix;
 
+if (tire->m_breakTorque > 10)
+tire->m_breakTorque *=1;
 
 	const CustomVehicleControllerComponent::dInterpolationCurve& lateralSlipAngleCurve = m_controller->m_tireLateralSlipAngle;
 	const CustomVehicleControllerComponent::dInterpolationCurve& longitudinalSlipRationCurve = m_controller->m_tireLongitidialSlipRatio;
@@ -384,6 +386,7 @@ void CustomVehicleControllerContactJoint::JacobianDerivative (ParamInfo* const c
 			dVector contactPoint (m_contacts[i].m_point);
 			dVector hitBodyPointVelocity;
 			NewtonBodyGetPointVelocity (m_contacts[i].m_hitBody, &contactPoint[0], &hitBodyPointVelocity[0]);
+			hitBodyPointVelocity.m_w = 0.0f;
 
 			dVector headingVeloc (tire->m_veloc + hitBodyPointVelocity);
 			headingVeloc -= normal.Scale (headingVeloc % normal);
@@ -417,7 +420,7 @@ void CustomVehicleControllerContactJoint::JacobianDerivative (ParamInfo* const c
 			dFloat longitudinalSlipRatio = 1.0f;
 			dVector contactVelocity = headingVeloc + contactRotationalVeloc;
 			dFloat longitudinalSpeed = longitudinalPin % contactVelocity;
-			if ((uAbs > 0.25f) && (wrAbs > 0.25f)) {
+			if ((uAbs > 0.25f) || (wrAbs > 0.25f)) {
 				if (wrAbs >= uAbs) {
 					longitudinalSlipRatio = (Rw + u) / Rw;
 					if (dAbs (longitudinalSlipRatio) > 1.0f) {
@@ -444,19 +447,19 @@ void CustomVehicleControllerContactJoint::JacobianDerivative (ParamInfo* const c
 			dFloat normalizedLateralForce = lateralSlipAngleCurve.GetValue (sideSlipAngle);
 			dAssert (normalizedLateralForce >= 0.0f);
 			dAssert (normalizedLateralForce <= 1.0f);
-/*
+
 			// apply circle of friction
 			dFloat mag2 = normalizedLongitudinalForce * normalizedLongitudinalForce + normalizedLateralForce * normalizedLateralForce;
 			if (mag2 > 1.0f) {
 				// if tire fore is large that the circle of friction, 
 				// longitudinal force is the dominant force, and the lateral force is project over the circle of friction
 				normalizedLateralForce = dSqrt (1.0f - normalizedLongitudinalForce * normalizedLongitudinalForce);
-				if (normalizedLateralForce < VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SLIP_ANGLE){
+				dFloat minLateralForce = lateralSlipAngleCurve.GetValue (0.5f * 3.14159f) * 0.25f;
+				if (normalizedLateralForce < minLateralForce){
 					// do not allow lateral friction to be zero
-					normalizedLateralForce = VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SLIP_ANGLE;
+					normalizedLateralForce = minLateralForce;
 				}
 			}
-*/
 		
 			// for now make the material friction ate the tire contact 100%
 			dFloat contactGroundFriction = 1.0f;
