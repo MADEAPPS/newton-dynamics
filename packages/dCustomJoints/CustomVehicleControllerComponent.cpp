@@ -33,6 +33,7 @@ void CustomVehicleControllerComponent::dInterpolationCurve::InitalizeCurve (int 
 
 dFloat CustomVehicleControllerComponent::dInterpolationCurve::GetValue (dFloat param) const
 {
+	dAssert (m_count);
 	dFloat sign = (param >= 0.0f ) ? 1.0f : -1.0f;
 	param = dAbs (param);
 	dFloat interplatedValue = m_nodes[m_count - 1].m_value;

@@ -35,37 +35,16 @@
 #include <CustomVehicleControllerComponent.h>
 #include <CustomVehicleControllerBodyState.h>
 
-#define VEHICLE_CONTROLLER_MAX_JOINTS			32
-#define VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS	(VEHICLE_CONTROLLER_MAX_JOINTS * 4)
-
-#define VEHICLE_PSD_DAMP_TOL                    dFloat(1.0e-4f)
+#define VEHICLE_CONTROLLER_MAX_JOINTS							32
+#define VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS					(VEHICLE_CONTROLLER_MAX_JOINTS * 4)
+#define VEHICLE_PSD_DAMP_TOL									dFloat(1.0e-4f)
+#define VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SLIP_ANGLE	dFloat(0.75f)
 
 #if 0
 #define VEHICLE_VEL_DAMP				        dFloat(100.0f)
 #define VEHICLE_POS_DAMP				        dFloat(1500.0f)
 #define VEHICLE_MAX_FRICTION_BOUND	            dFloat(1.0e15f)
 #define VEHICLE_MIN_FRICTION_BOUND			    -VEHICLE_MAX_FRICTION_BOUND
-
-
-
-
-void CustomVehicleController::SetLateralSlipAngle(dFloat maxLongitudinalSlipAngleIndDegrees)
-{
-	dClamp (maxLongitudinalSlipAngleIndDegrees, dFloat(1.0f), dFloat(30.0f));
-	dFloat slips[] = {0.0f, maxLongitudinalSlipAngleIndDegrees * 3.141592f / 180.0f, 90.0f * 3.141592f / 180.0f};
-	dFloat force[] = {0.0f, 1.0f, dSqrt (1.0f - VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SLIP_ANGLE * VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SLIP_ANGLE)};
-	m_tireLateralSlipAngle.InitalizeCurve(sizeof (slips) / sizeof (slips[0]), slips, force);
-}
-                                  
-void CustomVehicleController::SetLongitudinalSlipRatio(dFloat maxLongitudinalSlipRatio)
-{
-	dClamp(maxLongitudinalSlipRatio, dFloat(0.01f), dFloat(0.9f));
-
-	dFloat slips[] = {0.0f, maxLongitudinalSlipRatio, 1.0f};
-	dFloat force[] = {0.0f, 1.0f, dSqrt (1.0f - VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SLIP_ANGLE * VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SLIP_ANGLE)};
-	m_tireLongitidialSlipRatio.InitalizeCurve(sizeof (slips) / sizeof (slips[0]), slips, force);
-}
-
 void CustomVehicleController::UpdateTireTransforms ()
 {
 	for (TireList::CustomListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
@@ -155,7 +134,6 @@ void CustomVehicleController::Init (NewtonCollision* const chassisShape, const d
 	m_steering = NULL;
 	m_handBrakes = NULL;
 
-/*
 	// set default tire model, Create a simplified normalized Tire Curve
 	// we will use a simple piece wise curve from Pacejkas tire model, 
 	// http://en.wikipedia.org/wiki/File:Magic_Formula_Curve.png
@@ -165,7 +143,6 @@ void CustomVehicleController::Init (NewtonCollision* const chassisShape, const d
 	//SetLongitudinalSlipRatio (sizeof (slips) / sizeof (slips[0]), slips, normalizedLongitudinalForce);
 	SetLongitudinalSlipRatio (0.2f);
 	SetLateralSlipAngle(3.0f);
-*/
 }
 
 
@@ -181,6 +158,23 @@ void CustomVehicleController::Cleanup()
 const CustomVehicleControllerBodyStateChassis& CustomVehicleController::GetChassisState () const
 {
 	return m_chassisState;
+}
+
+void CustomVehicleController::SetLateralSlipAngle(dFloat maxLongitudinalSlipAngleIndDegrees)
+{
+	dClamp (maxLongitudinalSlipAngleIndDegrees, dFloat(1.0f), dFloat(30.0f));
+	dFloat slips[] = {0.0f, maxLongitudinalSlipAngleIndDegrees * 3.141592f / 180.0f, 90.0f * 3.141592f / 180.0f};
+	dFloat force[] = {0.0f, 1.0f, VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SLIP_ANGLE};
+	m_tireLateralSlipAngle.InitalizeCurve(sizeof (slips) / sizeof (slips[0]), slips, force);
+}
+
+void CustomVehicleController::SetLongitudinalSlipRatio(dFloat maxLongitudinalSlipRatio)
+{
+	dClamp(maxLongitudinalSlipRatio, dFloat(0.01f), dFloat(0.9f));
+
+	dFloat slips[] = {0.0f, maxLongitudinalSlipRatio, 1.0f};
+	dFloat force[] = {0.0f, 1.0f, VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SLIP_ANGLE};
+	m_tireLongitidialSlipRatio.InitalizeCurve(sizeof (slips) / sizeof (slips[0]), slips, force);
 }
 
 
@@ -603,7 +597,7 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 		tire->Collide(castFilter, timestepInv);
 		tire->UpdateDynamicInputs(timestep);
 	}
-m_chassisState.m_externalForce += m_chassisState.m_matrix[2].Scale (0.5f * m_chassisState.m_mass);
+m_chassisState.m_externalForce += m_chassisState.m_matrix[2].Scale (5.0f * m_chassisState.m_mass);
 
 	// update all components
 	if (m_engine) {

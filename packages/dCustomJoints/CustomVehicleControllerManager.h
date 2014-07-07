@@ -50,10 +50,9 @@ class CustomVehicleController: public CustomControllerBase
 
 	CUSTOM_JOINTS_API const CustomVehicleControllerBodyStateChassis& GetChassisState () const;
 
-/*
 	CUSTOM_JOINTS_API void SetLongitudinalSlipRatio(dFloat maxLongitudinalSlipRatio);
 	CUSTOM_JOINTS_API void SetLateralSlipAngle(dFloat maxLongitudinalSlipAngleIndDegrees);
-*/	
+	
 
 	CUSTOM_JOINTS_API CustomVehicleControllerComponentBrake* GetBrakes() const;
 	CUSTOM_JOINTS_API CustomVehicleControllerComponentEngine* GetEngine() const;

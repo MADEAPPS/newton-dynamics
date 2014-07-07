@@ -298,6 +298,10 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	,m_timestepAcc(0)
 	,m_fps(0.0f)
 {
+
+m_showNormalForces = true;
+m_showCenterOfMass = true;
+
 	memset (m_profilerTracksMenu, 0, sizeof (m_profilerTracksMenu));
 
 	// clear the key map
