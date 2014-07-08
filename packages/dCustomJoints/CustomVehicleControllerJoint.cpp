@@ -310,10 +310,12 @@ void CustomVehicleControllerTireJoint::JacobianDerivative (ParamInfo* const cons
 	dAssert (chassis == &m_controller->GetChassisState());
 	
 	// lateral force
-	AddLinearRowJacobian (constraintParams, tire->m_matrix.m_posit, tire->m_matrix[0]);
+//	AddLinearRowJacobian (constraintParams, tire->m_matrix.m_posit, tire->m_matrix[0]);
+    AddLinearRowJacobian (constraintParams, tire->m_matrix.m_posit, chassis->m_matrix[2]);
 
 	// longitudinal force
-	AddLinearRowJacobian (constraintParams, tire->m_matrix.m_posit, tire->m_matrix[2]);
+//	AddLinearRowJacobian (constraintParams, tire->m_matrix.m_posit, tire->m_matrix[2]);
+    AddLinearRowJacobian (constraintParams, tire->m_matrix.m_posit, chassis->m_matrix[0]);
 
 	if (tire->m_posit <= 1.0e-3f)  {
 		//dAssert (0);
