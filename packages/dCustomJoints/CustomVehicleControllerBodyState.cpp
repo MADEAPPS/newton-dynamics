@@ -44,6 +44,23 @@ void CustomVehicleControllerBodyState::Init(CustomVehicleController* const contr
 	m_controller = controller;
 }
 
+dFloat CustomVehicleControllerBodyState::GetMass () const
+{
+	return m_mass;
+}
+
+const dMatrix& CustomVehicleControllerBodyState::GetMatrix () const
+{
+	return m_matrix;
+}
+
+const dVector& CustomVehicleControllerBodyState::GetCenterOfMass () const
+{
+	return m_globalCentreOfMass;
+}
+
+
+
 void CustomVehicleControllerBodyState::UpdateInertia()
 {
 	dMatrix tmpMatrix (GetZeroMatrix());
@@ -104,6 +121,31 @@ void CustomVehicleControllerBodyStateChassis::Init (CustomVehicleController* con
     UpdateInertia();
 }
 
+dFloat CustomVehicleControllerBodyStateChassis::GetAerodynamicsDowforceCoeficient () const
+{
+	return m_aerodynamicsDownForceCoefficient;
+}
+
+void CustomVehicleControllerBodyStateChassis::SetAerodynamicsDownforceCoefficient (dFloat maxDownforceInGravities, dFloat topSpeed)
+{
+	dFloat Ixx;
+	dFloat Iyy;
+	dFloat Izz;
+	dFloat mass;
+	NewtonBody* const body = m_controller->GetBody();
+	NewtonBodyGetMassMatrix(body, &mass, &Ixx, &Iyy, &Izz);
+	m_aerodynamicsDownForceCoefficient = mass * maxDownforceInGravities / (topSpeed * topSpeed);
+}
+
+void CustomVehicleControllerBodyStateChassis::SetDryRollingFrictionTorque (dFloat dryRollingFrictionTorque)
+{
+	m_dryRollingFrictionTorque = dAbs (dryRollingFrictionTorque);
+}
+
+dFloat CustomVehicleControllerBodyStateChassis::GetDryRollingFrictionTorque () const
+{
+	return m_dryRollingFrictionTorque;
+}
 
 
 void CustomVehicleControllerBodyStateChassis::UpdateDynamicInputs()
@@ -116,6 +158,9 @@ void CustomVehicleControllerBodyStateChassis::UpdateDynamicInputs()
 
 	NewtonBodyGetForceAcc(body, &m_externalForce[0]);
 	NewtonBodyGetTorqueAcc(body, &m_externalTorque[0]);
+
+	dFloat frontSpeed = dMin (m_veloc % m_matrix[0], 50.0f);
+	m_externalForce -= m_matrix[1].Scale (m_aerodynamicsDownForceCoefficient * frontSpeed * frontSpeed);
 
 	m_globalCentreOfMass = m_matrix.TransformVector(m_localFrame.m_posit);
 
@@ -313,7 +358,6 @@ void CustomVehicleControllerBodyStateTire::Init (CustomVehicleController* const 
 	m_rotationAngle = 0.0f;
 	m_steeringAngle = 0.0f;
 	m_adhesionCoefficient = 1.0f;
-	m_dryFrictionTorque = 0.0f;
 	m_idleRollingResistance = 0.0f;
 	m_tireLoad = dVector(0.0f, 0.0f, 0.0f, 0.0f);
 	m_lateralForce = dVector(0.0f, 0.0f, 0.0f, 0.0f);
@@ -398,11 +442,11 @@ void CustomVehicleControllerBodyStateTire::Collide (CustomControllerConvexCastPr
 }
 
 
-void CustomVehicleControllerBodyStateTire::UpdateDynamicInputs(dFloat timestep, dFloat dryFriction)
+void CustomVehicleControllerBodyStateTire::UpdateDynamicInputs(dFloat timestep)
 {
 	CustomVehicleControllerBodyStateChassis& chassis = m_controller->m_chassisState;
 
-	m_dryFrictionTorque = dryFriction;
+//	m_dryFrictionTorque = chassis.m_dryRollingFrictionTorque;
 
 	m_matrix = CalculateSteeringMatrix() * chassis.m_matrix;
 	m_globalCentreOfMass = m_matrix.m_posit;

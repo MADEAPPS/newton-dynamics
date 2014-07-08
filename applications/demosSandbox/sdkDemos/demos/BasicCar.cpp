@@ -469,7 +469,7 @@ class BasicVehicleEntity: public DemoEntity
 		dFloat joyPosY;
 		int joyButtons;
 
-//		int gear = engine->GetGear();
+		int gear = engine ? engine->GetGear() : CustomVehicleControllerComponentEngine::dGearBox::m_newtralGear;
 		dFloat steeringVal = 0.0f;
 		dFloat engineGasPedal = 0.0f;
 		dFloat brakePedal = 0.0f;
@@ -528,14 +528,14 @@ class BasicVehicleEntity: public DemoEntity
 		m_helpKey.UpdatePushButton (mainWindow, 'H');
 
 		// check transmission type
-//		int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
+		int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
 #if 0
-	#if 1
+	#if 0
 		static FILE* file = fopen ("log.bin", "wb");
 		if (file) {
 			fwrite (&toggleTransmission, sizeof (int), 1, file);
-//			fwrite (&gear, sizeof (int), 1, file);
+			fwrite (&gear, sizeof (int), 1, file);
 			fwrite (&steeringVal, sizeof (dFloat), 1, file);
 			fwrite (&engineGasPedal, sizeof (dFloat), 1, file);
 			fwrite (&handBrakePedal, sizeof (dFloat), 1, file);
@@ -587,8 +587,8 @@ class BasicVehicleEntity: public DemoEntity
 		NewtonBody* const body = m_controller->GetBody();
 		const CustomVehicleControllerBodyStateChassis& chassis = m_controller->GetChassisState ();
 
-		dFloat scale = -4.0f / (chassis.m_mass * DEMO_GRAVITY);
-		dVector p0 (chassis.m_globalCentreOfMass);
+		dFloat scale = -4.0f / (chassis.GetMass() * DEMO_GRAVITY);
+		dVector p0 (chassis.GetCenterOfMass());
 
 		glDisable (GL_LIGHTING);
 		glDisable(GL_TEXTURE_2D);
@@ -598,15 +598,15 @@ class BasicVehicleEntity: public DemoEntity
 
 
 		// draw vehicle weight at the center of mass
-		dFloat lenght = scale * chassis.m_mass * DEMO_GRAVITY;
+		dFloat lenght = scale * chassis.GetMass() * DEMO_GRAVITY;
 		glColor3f(0.0f, 0.0f, 1.0f);
 		glVertex3f (p0.m_x, p0.m_y, p0.m_z);
 		glVertex3f (p0.m_x, p0.m_y - lenght, p0.m_z);
 
 		// draw vehicle front dir
 		glColor3f(1.0f, 1.0f, 1.0f);
-		dVector r0 (p0 + chassis.m_matrix[1].Scale (0.5f));
-		dVector r1 (r0 + chassis.m_matrix[0].Scale (1.0f));
+		dVector r0 (p0 + chassis.GetMatrix()[1].Scale (0.5f));
+		dVector r1 (r0 + chassis.GetMatrix()[0].Scale (1.0f));
 		glVertex3f (r0.m_x, r0.m_y, r0.m_z);
 		glVertex3f (r1.m_x, r1.m_y, r1.m_z);
 
@@ -614,7 +614,7 @@ class BasicVehicleEntity: public DemoEntity
 		// draw the velocity vector, a little higher so that is not hidden by the vehicle mesh 
 		dVector veloc;
 		NewtonBodyGetVelocity(body, &veloc[0]);
-		dVector q0 (p0 + chassis.m_matrix[1].Scale (0.5f));
+		dVector q0 (p0 + chassis.GetMatrix()[1].Scale (0.5f));
 		dVector q1 (q0 + veloc.Scale (0.25f));
 		glColor3f(0.0f, 1.0f, 1.0f);
 		glVertex3f (q0.m_x, q0.m_y, q0.m_z);
@@ -622,7 +622,7 @@ class BasicVehicleEntity: public DemoEntity
 		
 		for (CustomVehicleControllerBodyStateTire* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
 			const CustomVehicleControllerBodyStateTire& tire = *node;
-			dVector p0 (tire.m_globalCentreOfMass);
+			dVector p0 (tire.GetCenterOfMass());
 
 			// draw the tire load 
 			dVector p1 (p0 + tire.GetTireLoad().Scale (scale));

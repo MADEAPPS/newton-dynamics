@@ -26,6 +26,11 @@ class CustomVehicleController;
 class CustomVehicleControllerBodyState
 {
 	public:
+	CUSTOM_JOINTS_API dFloat GetMass () const;
+	CUSTOM_JOINTS_API const dMatrix& GetMatrix () const;
+	CUSTOM_JOINTS_API const dVector& GetCenterOfMass () const;
+
+	protected:
 	CUSTOM_JOINTS_API CustomVehicleControllerBodyState();
 	CUSTOM_JOINTS_API virtual ~CustomVehicleControllerBodyState() {}
 
@@ -52,19 +57,51 @@ class CustomVehicleControllerBodyState
 	dFloat m_invMass;
 	int m_myIndex;
 	CustomVehicleController* m_controller;
+
+	friend class CustomVehicleController;
+	friend class CustomVehicleControllerJoint;
+	friend class CustomVehicleControllerTireJoint;
+	friend class CustomVehicleControllerContactJoint;
+	friend class CustomVehicleControllerBodyStateTire;
+	friend class CustomVehicleControllerBodyStateChassis;
+	friend class CustomVehicleControllerBodyStateEngine;
+	friend class CustomVehicleControllerComponentBrake;
+	friend class CustomVehicleControllerComponentEngine;
+	friend class CustomVehicleControllerComponentSteering;
+
 };
 
 
 class CustomVehicleControllerBodyStateChassis: public CustomVehicleControllerBodyState
 {
 	public:
+	CUSTOM_JOINTS_API dFloat GetAerodynamicsDowforceCoeficient () const;
+	CUSTOM_JOINTS_API void SetAerodynamicsDownforceCoefficient (dFloat maxDownforceInGravities, dFloat topSpeed);
+
+	CUSTOM_JOINTS_API void SetDryRollingFrictionTorque (dFloat torque);
+	CUSTOM_JOINTS_API dFloat GetDryRollingFrictionTorque () const;
+
+	private:
 	CUSTOM_JOINTS_API void Init (CustomVehicleController* const controller, const dMatrix& localframe);
 	CUSTOM_JOINTS_API void UpdateDynamicInputs();
 	CUSTOM_JOINTS_API virtual void ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega);
 
+
 	dVector m_com;
 	dVector m_comOffset;
 	dVector m_gravity;
+
+	dFloat m_dryRollingFrictionTorque;
+	dFloat m_aerodynamicsDownForceCoefficient;
+
+	friend class CustomVehicleController;
+	friend class CustomVehicleControllerTireJoint;
+	friend class CustomVehicleControllerContactJoint;
+	friend class CustomVehicleControllerBodyStateTire;
+	friend class CustomVehicleControllerBodyStateEngine;
+	friend class CustomVehicleControllerComponentBrake;
+	friend class CustomVehicleControllerComponentEngine;
+	friend class CustomVehicleControllerComponentSteering;
 };
 
 
@@ -81,6 +118,15 @@ class CustomVehicleControllerBodyStateEngine: public CustomVehicleControllerBody
 	CustomVehicleControllerEngineGearJoint m_rightTire;
 	CustomVehicleControllerEngineIdleJoint	m_idleFriction;
 	dFloat m_radianPerSecund;
+
+	friend class CustomVehicleController;
+	friend class CustomVehicleControllerTireJoint;
+	friend class CustomVehicleControllerBodyStateTire;
+	friend class CustomVehicleControllerBodyStateChassis;
+	friend class CustomVehicleControllerContactJoint;
+	friend class CustomVehicleControllerComponentBrake;
+	friend class CustomVehicleControllerComponentEngine;
+	friend class CustomVehicleControllerComponentSteering;
 };
 
 
@@ -126,7 +172,7 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 
 
 	private:
-	CUSTOM_JOINTS_API void UpdateDynamicInputs(dFloat timestep, dFloat dryFriction);
+	CUSTOM_JOINTS_API void UpdateDynamicInputs(dFloat timestep);
 	CUSTOM_JOINTS_API void Collide (CustomControllerConvexCastPreFilter& filter, dFloat timestepInv);
 	CUSTOM_JOINTS_API void UpdateTransform ();
 /*
@@ -153,7 +199,7 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 	dFloat m_suspensionlenght;
 	dFloat m_adhesionCoefficient; 
 	dFloat m_idleRollingResistance;
-	dFloat m_dryFrictionTorque;
+	//dFloat m_dryFrictionTorque;
 	//dFloat m_engineTorqueResistance;
 
 	void* m_userData;
@@ -167,7 +213,8 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 	friend class CustomVehicleControllerComponentBrake;
 	friend class CustomVehicleControllerComponentEngine;
 	friend class CustomVehicleControllerComponentSteering;
-	
+	friend class CustomVehicleControllerBodyStateEngine;
+	friend class CustomVehicleControllerBodyStateChassis;
 };
 
 

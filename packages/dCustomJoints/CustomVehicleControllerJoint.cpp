@@ -306,7 +306,9 @@ void CustomVehicleControllerTireJoint::JacobianDerivative (ParamInfo* const cons
 {
 	// Restrict the movement on the pivot point along all two orthonormal direction
 	CustomVehicleControllerBodyStateTire* const tire = (CustomVehicleControllerBodyStateTire*) m_state1;
-
+	CustomVehicleControllerBodyStateChassis* const chassis = (CustomVehicleControllerBodyStateChassis*) m_state0;
+	dAssert (chassis == &m_controller->GetChassisState());
+	
 	// lateral force
 	AddLinearRowJacobian (constraintParams, tire->m_matrix.m_posit, tire->m_matrix[0]);
 
@@ -327,8 +329,8 @@ void CustomVehicleControllerTireJoint::JacobianDerivative (ParamInfo* const cons
 
 	int index = constraintParams->m_count;
 	AddAngularRowJacobian (constraintParams, tire->m_matrix[0], 0.0f);
-	constraintParams->m_jointLowFriction[index] = - tire->m_dryFrictionTorque;
-	constraintParams->m_jointHighFriction[index] = tire->m_dryFrictionTorque;
+	constraintParams->m_jointLowFriction[index] = - chassis->m_dryRollingFrictionTorque;
+	constraintParams->m_jointHighFriction[index] = chassis->m_dryRollingFrictionTorque;
 
 	// check if the brakes are applied
 //	dFloat breakResistance = dMax(tire->m_breakTorque, tire->m_engineTorqueResistance);
@@ -367,9 +369,6 @@ void CustomVehicleControllerContactJoint::JacobianDerivative (ParamInfo* const c
 {
 	CustomVehicleControllerBodyStateTire* const tire = (CustomVehicleControllerBodyStateTire*) m_state1;
 	const dMatrix& tireMatrix = tire->m_matrix;
-
-if (tire->m_breakTorque > 10)
-tire->m_breakTorque *=1;
 
 	const CustomVehicleControllerComponent::dInterpolationCurve& lateralSlipAngleCurve = m_controller->m_tireLateralSlipAngle;
 	const CustomVehicleControllerComponent::dInterpolationCurve& longitudinalSlipRationCurve = m_controller->m_tireLongitidialSlipRatio;

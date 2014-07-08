@@ -114,6 +114,17 @@ class CustomVehicleControllerJoint
 	CustomVehicleController* m_controller; 
 	int m_start;
 	int m_count;
+
+	friend class CustomVehicleController;
+	friend class CustomVehicleControllerBodyState;
+	friend class CustomVehicleControllerTireJoint;
+	friend class CustomVehicleControllerBodyStateTire;
+	friend class CustomVehicleControllerBodyStateChassis;
+	friend class CustomVehicleControllerContactJoint;
+	friend class CustomVehicleControllerComponentBrake;
+	friend class CustomVehicleControllerComponentEngine;
+	friend class CustomVehicleControllerComponentSteering;
+
 };
 
 class CustomVehicleControllerEngineGearJoint: public CustomVehicleControllerJoint

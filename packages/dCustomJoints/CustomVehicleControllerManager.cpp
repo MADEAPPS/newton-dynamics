@@ -139,8 +139,9 @@ void CustomVehicleController::Init (NewtonCollision* const chassisShape, const d
 	//dFloat normalizedLongitudinalForce[] = {0.0f, 0.8f, 1.0f, 1.0f};
 	//SetLongitudinalSlipRatio (sizeof (slips) / sizeof (slips[0]), slips, normalizedLongitudinalForce);
 
+	SetDryRollingFrictionTorque (100.0f/4.0f);
+	SetAerodynamicsDownforceCoefficient (0.5f * dSqrt (gravityVector % gravityVector), 60.0f * 0.447f);
 
-	m_dryFrictionTorque = 100.0;
 	SetLongitudinalSlipRatio (0.2f);
 	SetLateralSlipAngle(8.0f);
 }
@@ -160,14 +161,25 @@ const CustomVehicleControllerBodyStateChassis& CustomVehicleController::GetChass
 	return m_chassisState;
 }
 
-void CustomVehicleController::SetDryRollingFrictionTorque (dFloat torque)
+dFloat CustomVehicleController::GetAerodynamicsDowforceCoeficient () const
 {
-	m_dryFrictionTorque = dAbs (torque);
+	return m_chassisState.GetAerodynamicsDowforceCoeficient();
+}
+
+void CustomVehicleController::SetAerodynamicsDownforceCoefficient (dFloat maxDownforceInGravity, dFloat topSpeed)
+{
+	m_chassisState.SetAerodynamicsDownforceCoefficient (maxDownforceInGravity, topSpeed);
+}
+
+
+void CustomVehicleController::SetDryRollingFrictionTorque (dFloat dryRollingFrictionTorque)
+{
+	m_chassisState.SetDryRollingFrictionTorque (dryRollingFrictionTorque);
 }
 
 dFloat CustomVehicleController::GetDryRollingFrictionTorque () const
 {
-	return m_dryFrictionTorque;
+	return m_chassisState.GetDryRollingFrictionTorque();
 }
 
 
@@ -604,12 +616,16 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 	CustomControllerConvexCastPreFilter castFilter (body);
 	m_chassisState.UpdateDynamicInputs();
 
-	dFloat tireDryFriction = m_tireList.GetCount() ?  m_dryFrictionTorque / m_tireList.GetCount() : m_dryFrictionTorque;
 	for (TireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
 		CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
 		tire->Collide(castFilter, timestepInv);
-		tire->UpdateDynamicInputs(timestep, tireDryFriction);
+		tire->UpdateDynamicInputs(timestep);
 	}
+
+static int xxx;
+xxx ++;
+if (xxx > 200)
+xxx *=1;
 m_chassisState.m_externalForce += m_chassisState.m_matrix[0].Scale (2.0f * m_chassisState.m_mass);
 
 	// update all components

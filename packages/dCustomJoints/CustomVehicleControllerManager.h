@@ -50,12 +50,14 @@ class CustomVehicleController: public CustomControllerBase
 
 	CUSTOM_JOINTS_API const CustomVehicleControllerBodyStateChassis& GetChassisState () const;
 
+	CUSTOM_JOINTS_API dFloat GetAerodynamicsDowforceCoeficient () const;
+	CUSTOM_JOINTS_API void SetAerodynamicsDownforceCoefficient (dFloat maxDownforceInGravities, dFloat topSpeed);
+
 	CUSTOM_JOINTS_API void SetDryRollingFrictionTorque (dFloat torque);
 	CUSTOM_JOINTS_API dFloat GetDryRollingFrictionTorque () const;
 
 	CUSTOM_JOINTS_API void SetLongitudinalSlipRatio(dFloat maxLongitudinalSlipRatio);
 	CUSTOM_JOINTS_API void SetLateralSlipAngle(dFloat maxLongitudinalSlipAngleIndDegrees);
-
 
 	CUSTOM_JOINTS_API CustomVehicleControllerComponentBrake* GetBrakes() const;
 	CUSTOM_JOINTS_API CustomVehicleControllerComponentEngine* GetEngine() const;
@@ -92,7 +94,6 @@ class CustomVehicleController: public CustomControllerBase
 	TireList m_tireList;
 	dList<CustomVehicleControllerBodyState*> m_stateList;
 	NewtonCollision* m_tireCastShape;
-	dFloat m_dryFrictionTorque;
 
 	CustomVehicleControllerComponentBrake* m_brakes;
 	CustomVehicleControllerComponentEngine* m_engine;
@@ -110,7 +111,6 @@ class CustomVehicleController: public CustomControllerBase
 	friend class CustomVehicleControllerComponentBrake;
 	friend class CustomVehicleControllerComponentEngine;
 	friend class CustomVehicleControllerComponentSteering;
-	
 };
 
 
