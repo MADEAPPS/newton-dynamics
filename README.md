@@ -1,5 +1,3 @@
-Newton Dynamics
-===============
 ![emscripten logo](http://newtondynamics.com/forum/styles/prosilver/imageset/site_logo.png)
 
 Newton dynamics is a realistic, cross-platform physics simulation library. It can easily be integrated into games and game engines and provides top of it's class performance and simulation stability.
