@@ -11,5 +11,5 @@ License
 =======
 Newton Dynamics is licensed under the zlib open source license, with little if any practical difference between them.
 
-See LICENSE for the full content of the licenses.
+See `LICENSE` for the full content of the licenses.
 
