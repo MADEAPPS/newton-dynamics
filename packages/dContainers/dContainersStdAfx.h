@@ -59,7 +59,6 @@
 	#include <sys/sysctl.h>
 #endif
 
-
 #include <dMathDefines.h>
 
 #endif

@@ -54,6 +54,11 @@ const dMatrix& CustomVehicleControllerBodyState::GetMatrix () const
 	return m_matrix;
 }
 
+const dMatrix& CustomVehicleControllerBodyState::GetLocalMatrix () const
+{
+	return m_localFrame;
+}
+
 const dVector& CustomVehicleControllerBodyState::GetCenterOfMass () const
 {
 	return m_globalCentreOfMass;
@@ -183,9 +188,7 @@ void CustomVehicleControllerBodyStateEngine::Init (CustomVehicleController* cons
 //  NewtonBody* const body = m_controller->GetBody();
 //  const dMatrix& vehicleFrame = m_controller->m_chassisState.m_localFrame;
 
-dAssert (0);
-/*
-    EngineComponent* const engine = controller->GetEngine();
+	CustomVehicleControllerComponentEngine* const engine = controller->GetEngine();
 
     m_mass = 0.0f; 
     m_invMass = 0.0f;
@@ -206,12 +209,12 @@ dAssert (0);
 	m_idleFriction.Init (m_controller, this, &controller->m_staticWorld);
 	m_leftTire.Init (m_controller, this, &engine->GetLeftTireNode()->GetInfo());
     m_rightTire.Init (m_controller, this, &engine->GetRightTireNode()->GetInfo());
-*/
 }
 
 int CustomVehicleControllerBodyStateEngine::CalculateActiveJoints (CustomVehicleController* const controller, CustomVehicleControllerJoint** const jointArray)
 {
 	int count = 0;
+/*
     CustomVehicleControllerComponentEngine* const engine = controller->GetEngine();
 	if (engine) {
 		dAssert (0);
@@ -225,6 +228,7 @@ int CustomVehicleControllerBodyStateEngine::CalculateActiveJoints (CustomVehicle
 			jointArray[0] = &m_idleFriction;
 		}
 	}
+*/
     return count;
 }
 

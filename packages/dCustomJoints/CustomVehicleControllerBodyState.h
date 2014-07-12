@@ -28,6 +28,7 @@ class CustomVehicleControllerBodyState
 	public:
 	CUSTOM_JOINTS_API dFloat GetMass () const;
 	CUSTOM_JOINTS_API const dMatrix& GetMatrix () const;
+	CUSTOM_JOINTS_API const dMatrix& GetLocalMatrix () const;
 	CUSTOM_JOINTS_API const dVector& GetCenterOfMass () const;
 
 	protected:
@@ -68,7 +69,6 @@ class CustomVehicleControllerBodyState
 	friend class CustomVehicleControllerComponentBrake;
 	friend class CustomVehicleControllerComponentEngine;
 	friend class CustomVehicleControllerComponentSteering;
-
 };
 
 
@@ -85,7 +85,6 @@ class CustomVehicleControllerBodyStateChassis: public CustomVehicleControllerBod
 	CUSTOM_JOINTS_API void Init (CustomVehicleController* const controller, const dMatrix& localframe);
 	CUSTOM_JOINTS_API void UpdateDynamicInputs();
 	CUSTOM_JOINTS_API virtual void ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega);
-
 
 	dVector m_com;
 	dVector m_comOffset;

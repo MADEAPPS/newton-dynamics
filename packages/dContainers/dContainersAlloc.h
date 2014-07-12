@@ -23,6 +23,8 @@
 #define _D_CONTAINERS_ALLOC_H_
 #include "dContainersStdAfx.h"
 
+#define D_MAX_ENTRIES_IN_FREELIST	32
+
 class dContainersAlloc  
 {
 	public:
@@ -40,5 +42,34 @@ class dContainersAlloc
 	static DCONTAINERS_API void* Alloc (size_t size);
 	static DCONTAINERS_API void Free (void* const ptr);
 };
+
+
+class dContainerFixSizeAllocator
+{
+	public:
+	static DCONTAINERS_API dContainerFixSizeAllocator* Create (int size, int poolSize);
+	DCONTAINERS_API ~dContainerFixSizeAllocator();
+	DCONTAINERS_API void* Alloc();
+	DCONTAINERS_API void Free(void* const ptr);
+//	DCONTAINERS_API bool IsAlive() const;
+	DCONTAINERS_API void Flush ();
+
+	private:
+	DCONTAINERS_API dContainerFixSizeAllocator(int size, int poolSize);
+
+	class dFreeListNode
+	{
+		public:
+		int m_count;
+		dFreeListNode* m_next;
+	};
+
+	DCONTAINERS_API void Prefetch ();
+
+	dFreeListNode* m_freeListNode;
+	int m_size;
+	int m_poolSize;
+};
+
 
 #endif

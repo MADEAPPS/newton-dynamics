@@ -46,7 +46,7 @@
 #define VIPER_IDLE_TORQUE				300.0f
 #define VIPER_IDLE_TORQUE_RPM			500.0f
 
-#define VIPER_ENGINE_MOMENT_OF_INERTIA   1.0f
+#define VIPER_ENGINE_MOMENT_OF_INERTIA  40.0f
 
 #define VIPER_PEAK_TORQUE				490.0f
 #define VIPER_PEAK_TORQUE_RPM			3700.0f
@@ -335,7 +335,7 @@ class BasicVehicleEntity: public DemoEntity
 		m_controller->SetSteering(steering);
 
 		// add vehicle brakes
-		CustomVehicleControllerComponentBrake* const brakes = new CustomVehicleControllerComponentBrake (m_controller, VIPER_TIRE_BRAKE_TORQUE);
+		CustomVehicleControllerComponentBrake* const brakes = new CustomVehicleControllerComponentBrake (m_controller, VIPER_TIRE_BRAKE_TORQUE * 0.5f);
 		brakes->AddBrakeTire (leftFrontTire);
 		brakes->AddBrakeTire (rightFrontTire);
 		brakes->AddBrakeTire (leftRearTire);
@@ -348,14 +348,13 @@ class BasicVehicleEntity: public DemoEntity
 		handBrakes->AddBrakeTire (rightRearTire);
 		m_controller->SetHandBrakes(handBrakes);
 
-
-
 /*
 		// add an engine
 		// first make the gear Box
 		dFloat fowardSpeedGearsBoxRatios[] = {VIPER_TIRE_GEAR_1, VIPER_TIRE_GEAR_2, VIPER_TIRE_GEAR_3, VIPER_TIRE_GEAR_4, VIPER_TIRE_GEAR_5, VIPER_TIRE_GEAR_6};
-		CustomVehicleController::EngineComponent::GearBox* const gearBox = new CustomVehicleController::EngineComponent::GearBox(m_controller, VIPER_TIRE_GEAR_REVERSE, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios); 
-		CustomVehicleController::EngineComponent* const engine = new CustomVehicleController::EngineComponent (m_controller, gearBox, leftRearTireHandle, rightRearTireHandle);
+		CustomVehicleControllerComponentEngine::dGearBox* const gearBox = new CustomVehicleControllerComponentEngine::dGearBox(m_controller, VIPER_TIRE_GEAR_REVERSE, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios); 
+		CustomVehicleControllerComponentEngine* const engine = new CustomVehicleControllerComponentEngine (m_controller, gearBox, leftRearTire, rightRearTire);
+
 
 		dFloat viperIdleRPM = VIPER_IDLE_TORQUE_RPM;
 		dFloat viperIdleTorquePoundPerFoot = VIPER_IDLE_TORQUE;
@@ -372,9 +371,10 @@ class BasicVehicleEntity: public DemoEntity
 		dFloat vehicleTopSpeedKPH = VIPER_TIRE_TOP_SPEED_KMH;
         dFloat vehicleMomentOfInteria  = VIPER_ENGINE_MOMENT_OF_INERTIA;
 		engine->InitEngineTorqueCurve (vehicleTopSpeedKPH, vehicleMomentOfInteria, viperIdleTorquePoundPerFoot, viperIdleRPM, viperPeakTorquePoundPerFoot, viperPeakTorqueRPM, viperPeakHorsePower, viperPeakHorsePowerRPM, viperRedLineTorquePoundPerFoot, viperRedLineRPM);
+
 		m_controller->SetEngine(engine);
 
-        // the the defualt transmission type
+        // the the default transmission type
 		engine->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
 */
 	}
@@ -624,6 +624,9 @@ class BasicVehicleEntity: public DemoEntity
 			const CustomVehicleControllerBodyStateTire& tire = *node;
 			dVector p0 (tire.GetCenterOfMass());
 
+const dMatrix& tireMatrix = tire.GetLocalMatrix ();
+p0 += chassis.GetMatrix()[2].Scale ((tireMatrix.m_posit.m_z > 0.0f ? 1.0f : -1.0f) * 0.5f);
+
 			// draw the tire load 
 			dVector p1 (p0 + tire.GetTireLoad().Scale (scale));
 			glColor3f (0.0f, 0.0f, 1.0f);
@@ -670,7 +673,6 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 		,m_externalView(true)
 		,m_player (NULL) 
 	{
-/*
 		// hook a callback for 2d help display
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 		scene->Set2DDisplayRenderFunction (RenderVehicleHud, this);
@@ -682,7 +684,7 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 		m_redNeedle = LoadTexture ("needle_red.tga");
 		m_greenNeedle = LoadTexture ("needle_green.tga");
 
-		// create the vehicle sound 
+/*		// create the vehicle sound 
 		const char* engineSounds[] = {"engine_start.wav", "engine_rpm.wav", "tire_skid.wav"};
 		dSoundManager* const soundManager = scene->GetSoundManager();
 		for (int i = 0; i < int (sizeof (engineSounds) / sizeof (engineSounds[0])); i ++) {
@@ -705,9 +707,14 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 
 	~BasicVehicleControllerManager ()
 	{
+		ReleaseTexture (m_gears);
+		ReleaseTexture (m_tachometer);
+		ReleaseTexture (m_odometer);
+		ReleaseTexture (m_redNeedle);
+		ReleaseTexture (m_greenNeedle);
 	}
 	
-/*
+
 	static void RenderVehicleHud (DemoEntityManager* const scene, void* const context, int lineNumber)
 	{
 		BasicVehicleControllerManager* const me = (BasicVehicleControllerManager*) context;
@@ -794,42 +801,41 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help           : H");
 		}
 	}
-*/
+
 
 	void RenderVehicleHud (DemoEntityManager* const scene, int lineNumber) const
 	{
-/*
 		// set to transparent color
 		glEnable (GL_BLEND);
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		CustomVehicleController::EngineComponent* const engine = m_player->m_controller->GetEngine();
+		CustomVehicleControllerComponentEngine* const engine = m_player->m_controller->GetEngine();
+		if (engine) {
+			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+			dFloat width = scene->GetWidth();
+			//dFloat height = scene->getHeight();
+			dFloat gageSize = 200.0f;
 
-		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-		dFloat width = scene->GetWidth();
-		//dFloat height = scene->getHeight();
-		dFloat gageSize = 200.0f;
+			//dFloat y = -height / 2.0f + gageSize / 2.0f + 60.0f;
+			dFloat y = gageSize / 2.0f + 60.0f;
 
-		//dFloat y = -height / 2.0f + gageSize / 2.0f + 60.0f;
-		dFloat y = gageSize / 2.0f + 60.0f;
+			// draw the tachometer
+			dFloat x = gageSize / 2 + 80.0f;
+			dFloat rpm = engine->GetRPM () / VIPER_REDLINE_TORQUE_RPM;
+			DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize);
 
-		// draw the tachometer
-		dFloat x = gageSize / 2 + 80.0f;
-		dFloat rpm = engine->GetRPM () / VIPER_REDLINE_TORQUE_RPM;
-		DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize);
-
-		// draw the odometer
-		x = width - gageSize / 2 - 80.0f;
-		dFloat speed = dAbs(engine->GetSpeed()) * 3.6f / 340.0f;
-		DrawGage(m_odometer, m_greenNeedle, speed, x, y, gageSize);
-		DrawGear(speed, x, y, m_player->m_gearMap[engine->GetGear()], gageSize);
+			// draw the odometer
+			x = width - gageSize / 2 - 80.0f;
+			dFloat speed = dAbs(engine->GetSpeed()) * 3.6f / 340.0f;
+			DrawGage(m_odometer, m_greenNeedle, speed, x, y, gageSize);
+			DrawGear(speed, x, y, m_player->m_gearMap[engine->GetGear()], gageSize);
+		}
 
 		//print controllers help 
 		DrawHelp(scene, lineNumber);
 
 		// restore color and blend mode
 		glDisable (GL_BLEND);
-*/
 	}
 
 
@@ -976,10 +982,13 @@ void BasicCar (DemoEntityManager* const scene)
 	BasicVehicleControllerManager* const manager = new BasicVehicleControllerManager (world);
 
 	// create a simple vehicle
-	dMatrix location (dYawMatrix(90.0f * 3.1416f/ 180.0f));
-	location.m_posit.m_x = 126.0f;
-	location.m_posit.m_y = 50.0f;
-	location.m_posit.m_z = 50.0f;
+//	dMatrix location (dYawMatrix(90.0f * 3.1416f/ 180.0f));
+//	location.m_posit.m_x = 126.0f;
+//	location.m_posit.m_y = 50.0f;
+//	location.m_posit.m_z = 50.0f;
+
+dMatrix location (GetIdentityMatrix());
+location.m_posit.m_y = 50.0f;
 
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
 	location.m_posit.m_y += 0.5f;

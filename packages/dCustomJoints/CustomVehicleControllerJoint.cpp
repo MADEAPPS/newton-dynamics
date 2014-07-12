@@ -310,12 +310,12 @@ void CustomVehicleControllerTireJoint::JacobianDerivative (ParamInfo* const cons
 	dAssert (chassis == &m_controller->GetChassisState());
 	
 	// lateral force
-//	AddLinearRowJacobian (constraintParams, tire->m_matrix.m_posit, tire->m_matrix[0]);
-    AddLinearRowJacobian (constraintParams, tire->m_matrix.m_posit, chassis->m_matrix[2]);
+	AddLinearRowJacobian (constraintParams, tire->m_matrix.m_posit, tire->m_matrix[0]);
+//    AddLinearRowJacobian (constraintParams, tire->m_matrix.m_posit, chassis->m_matrix[2]);
 
 	// longitudinal force
-//	AddLinearRowJacobian (constraintParams, tire->m_matrix.m_posit, tire->m_matrix[2]);
-    AddLinearRowJacobian (constraintParams, tire->m_matrix.m_posit, chassis->m_matrix[0]);
+	AddLinearRowJacobian (constraintParams, tire->m_matrix.m_posit, tire->m_matrix[2]);
+//    AddLinearRowJacobian (constraintParams, tire->m_matrix.m_posit, chassis->m_matrix[0]);
 
 	if (tire->m_posit <= 1.0e-3f)  {
 		//dAssert (0);
@@ -406,14 +406,14 @@ void CustomVehicleControllerContactJoint::JacobianDerivative (ParamInfo* const c
 			// calculate lateral slip angle
 			dFloat sideSlipAngle = 1.0f;
 			dFloat lateralSpeed = v;
-			if (dAbs (u) > 0.5f) {
+			if (uAbs > 0.25f) {
 				sideSlipAngle = dAtan2 (vAbs, uAbs);
 				dAssert (sideSlipAngle >= 0.0f);
 				dAssert (sideSlipAngle <= (3.141592f * 0.5f));
 
 				// max sideSlip = tan(20.0f)
 				if (sideSlipAngle > 0.364f) {
-					lateralSpeed = v - 0.364f * u * dSign (v);
+					lateralSpeed = v - 0.364f * uAbs * dSign (v);
 				}
 			}
 
@@ -438,7 +438,6 @@ void CustomVehicleControllerContactJoint::JacobianDerivative (ParamInfo* const c
 			}
 
 			// the SlipRatio must be between -1.0 and 1.0 
-//			longitudinalSlipRatio = dClamp(longitudinalSlipRatio, dFloat(-1.0f), dFloat(1.0f));
 			dFloat normalizedLongitudinalForce = longitudinalSlipRationCurve.GetValue (longitudinalSlipRatio);
 			dAssert (normalizedLongitudinalForce >= 0.0f);
 			dAssert (normalizedLongitudinalForce <= 1.0f);

@@ -62,33 +62,9 @@ class dRedBackNode
 	dRedBackNode* m_parent;
 };
 
-#define D_MAX_ENTRIES_IN_FREETREENODE	32
-template<class OBJECT, class KEY>
-class dTreeAllocator
-{
-	public:
-	dTreeAllocator();
-	~dTreeAllocator();
-	void* Alloc();
-	void Free(void* const ptr);
-	void Flush ();
-	bool IsAlive() const;
-
-	private:
-	class dFreeTreeNode
-	{
-		public:
-		int m_count;
-		dFreeTreeNode* m_next;
-	};
-	
-	void Prefetch ();
-	dFreeTreeNode* m_freeTreeNode;
-	bool m_alive;
-};
 
 
-template<class OBJECT, class KEY, class Allocator = dTreeAllocator<OBJECT, KEY> >
+template<class OBJECT, class KEY, int poolSize = D_MAX_ENTRIES_IN_FREELIST>
 class dTree: public dContainersAlloc 
 {
 	public:
@@ -282,10 +258,13 @@ class dTree: public dContainersAlloc
 	// member variables
 	// ***********************************************************
 	private:
-	Allocator& GetAllocator()
+	dContainerFixSizeAllocator& GetAllocator()
 	{
-		static Allocator allocator;
-		return allocator;
+		static dContainerFixSizeAllocator* allocator = NULL;
+		if (!allocator) {
+			allocator = dContainerFixSizeAllocator::Create (sizeof (dTree<OBJECT, KEY, poolSize>::dTreeNode), poolSize);
+		}
+		return *allocator;
 	}
 
 
@@ -335,56 +314,54 @@ inline void dRedBackNode::SetInTreeFlag (bool flag)
 
 
 
-template<class OBJECT, class KEY, class Allocator>
-dTree<OBJECT, KEY, Allocator>::dTree ()
+template<class OBJECT, class KEY, int poolSize>
+dTree<OBJECT, KEY, poolSize>::dTree ()
 {
 	m_count	= 0;
 	m_head = NULL;
+	GetAllocator();
 }
 
 
-template<class OBJECT, class KEY, class Allocator>
-dTree<OBJECT, KEY, Allocator>::~dTree () 
+template<class OBJECT, class KEY, int poolSize>
+dTree<OBJECT, KEY, poolSize>::~dTree () 
 {
 	RemoveAll();
-	if (!GetAllocator().IsAlive()) {
-		GetAllocator().Flush();
-	}
 }
 
 
-template<class OBJECT, class KEY, class Allocator>
-dTree<OBJECT, KEY, Allocator>::operator int() const
+template<class OBJECT, class KEY, int poolSize>
+dTree<OBJECT, KEY, poolSize>::operator int() const
 {
 	return m_head != NULL;
 }
 
-template<class OBJECT, class KEY, class Allocator>
-int dTree<OBJECT, KEY, Allocator>::GetCount() const
+template<class OBJECT, class KEY, int poolSize>
+int dTree<OBJECT, KEY, poolSize>::GetCount() const
 {
 	return m_count;
 }
 
-template<class OBJECT, class KEY, class Allocator>
-typename dTree<OBJECT, KEY, Allocator>::dTreeNode* dTree<OBJECT, KEY, Allocator>::Minimum () const
+template<class OBJECT, class KEY, int poolSize>
+typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::Minimum () const
 {
 	return m_head ? (dTreeNode*) m_head->Minimum() : NULL;
 }
 
-template<class OBJECT, class KEY, class Allocator>
-typename dTree<OBJECT, KEY, Allocator>::dTreeNode* dTree<OBJECT, KEY, Allocator>::Maximum () const
+template<class OBJECT, class KEY, int poolSize>
+typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::Maximum () const
 {
 	return m_head ? (dTreeNode*) m_head->Maximum() : NULL;
 }
 
-template<class OBJECT, class KEY, class Allocator>
-typename dTree<OBJECT, KEY, Allocator>::dTreeNode* dTree<OBJECT, KEY, Allocator>::GetRoot () const
+template<class OBJECT, class KEY, int poolSize>
+typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::GetRoot () const
 {
 	return m_head;
 }
 
-template<class OBJECT, class KEY, class Allocator>
-typename dTree<OBJECT, KEY, Allocator>::dTreeNode* dTree<OBJECT, KEY, Allocator>::Find (KEY key) const
+template<class OBJECT, class KEY, int poolSize>
+typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::Find (KEY key) const
 {
 	if (m_head == NULL) {
 		return NULL;
@@ -405,8 +382,8 @@ typename dTree<OBJECT, KEY, Allocator>::dTreeNode* dTree<OBJECT, KEY, Allocator>
 	return ptr;
 }
 
-template<class OBJECT, class KEY, class Allocator>
-typename dTree<OBJECT, KEY, Allocator>::dTreeNode* dTree<OBJECT, KEY, Allocator>::GetNodeFromInfo (OBJECT &info) const
+template<class OBJECT, class KEY, int poolSize>
+typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::GetNodeFromInfo (OBJECT &info) const
 {
 	dTreeNode* node = (dTreeNode*) &info;
 	int offset = ((char*) &node->m_info) - ((char *) node);
@@ -417,8 +394,8 @@ typename dTree<OBJECT, KEY, Allocator>::dTreeNode* dTree<OBJECT, KEY, Allocator>
 	return (node->IsInTree ()) ? node : NULL;
 }
 
-template<class OBJECT, class KEY, class Allocator>
-typename dTree<OBJECT, KEY, Allocator>::dTreeNode* dTree<OBJECT, KEY, Allocator>::FindGreater (KEY key) const
+template<class OBJECT, class KEY, int poolSize>
+typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::FindGreater (KEY key) const
 {
 	if (m_head == NULL) {
 		return NULL;
@@ -449,8 +426,8 @@ typename dTree<OBJECT, KEY, Allocator>::dTreeNode* dTree<OBJECT, KEY, Allocator>
 	return (dTreeNode*) prev; 
 }
 
-template<class OBJECT, class KEY, class Allocator>
-typename dTree<OBJECT, KEY, Allocator>::dTreeNode* dTree<OBJECT, KEY, Allocator>::FindGreaterEqual (KEY key) const
+template<class OBJECT, class KEY, int poolSize>
+typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::FindGreaterEqual (KEY key) const
 {
 	if (m_head == NULL) {
 		return NULL;
@@ -481,8 +458,8 @@ typename dTree<OBJECT, KEY, Allocator>::dTreeNode* dTree<OBJECT, KEY, Allocator>
 	return (dTreeNode*) prev; 
 }
 
-template<class OBJECT, class KEY, class Allocator>
-typename dTree<OBJECT, KEY, Allocator>::dTreeNode* dTree<OBJECT, KEY, Allocator>::FindLessEqual (KEY key) const
+template<class OBJECT, class KEY, int poolSize>
+typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::FindLessEqual (KEY key) const
 {
 	if (m_head == NULL) {
 		return NULL;
@@ -514,8 +491,8 @@ typename dTree<OBJECT, KEY, Allocator>::dTreeNode* dTree<OBJECT, KEY, Allocator>
 }
 
 
-template<class OBJECT, class KEY, class Allocator>
-typename dTree<OBJECT, KEY, Allocator>::dTreeNode* dTree<OBJECT, KEY, Allocator>::Insert (KEY key)
+template<class OBJECT, class KEY, int poolSize>
+typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::Insert (KEY key)
 {
 	dTreeNode* parent = NULL;
 	dTreeNode* ptr = m_head;
@@ -550,8 +527,8 @@ typename dTree<OBJECT, KEY, Allocator>::dTreeNode* dTree<OBJECT, KEY, Allocator>
 
 
 
-template<class OBJECT, class KEY, class Allocator>
-typename dTree<OBJECT, KEY, Allocator>::dTreeNode* dTree<OBJECT, KEY, Allocator>::Insert (const OBJECT &element, KEY key, bool& elementWasInTree)
+template<class OBJECT, class KEY, int poolSize>
+typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::Insert (const OBJECT &element, KEY key, bool& elementWasInTree)
 {
 	dTreeNode* parent = NULL;
 	dTreeNode* ptr = m_head;
@@ -586,8 +563,8 @@ typename dTree<OBJECT, KEY, Allocator>::dTreeNode* dTree<OBJECT, KEY, Allocator>
 	return ptr;
 }
 
-template<class OBJECT, class KEY, class Allocator>
-typename dTree<OBJECT, KEY, Allocator>::dTreeNode* dTree<OBJECT, KEY, Allocator>::Insert (const OBJECT &element, KEY key)
+template<class OBJECT, class KEY, int poolSize>
+typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::Insert (const OBJECT &element, KEY key)
 {
 	bool foundState;
 	dTreeNode* node = Insert (element, key, foundState);
@@ -597,8 +574,8 @@ typename dTree<OBJECT, KEY, Allocator>::dTreeNode* dTree<OBJECT, KEY, Allocator>
 	return node;
 }
 
-template<class OBJECT, class KEY, class Allocator>
-typename dTree<OBJECT, KEY, Allocator>::dTreeNode* dTree<OBJECT, KEY, Allocator>::Insert (typename dTree<OBJECT, KEY, Allocator>::dTreeNode* const node, KEY key)
+template<class OBJECT, class KEY, int poolSize>
+typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::Insert (typename dTree<OBJECT, KEY, poolSize>::dTreeNode* const node, KEY key)
 {
 	int val = 0;
 	dTreeNode* ptr = m_head;
@@ -635,8 +612,8 @@ typename dTree<OBJECT, KEY, Allocator>::dTreeNode* dTree<OBJECT, KEY, Allocator>
 	return ptr;
 }
 
-template<class OBJECT, class KEY, class Allocator>
-typename dTree<OBJECT, KEY, Allocator>::dTreeNode* dTree<OBJECT, KEY, Allocator>::Replace (OBJECT &element, KEY key)
+template<class OBJECT, class KEY, int poolSize>
+typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::Replace (OBJECT &element, KEY key)
 {
 	dTreeNode* parent = NULL;
 	dTreeNode* ptr = m_head;
@@ -669,8 +646,8 @@ typename dTree<OBJECT, KEY, Allocator>::dTreeNode* dTree<OBJECT, KEY, Allocator>
 	return ptr;
 }
 
-template<class OBJECT, class KEY, class Allocator>
-typename dTree<OBJECT, KEY, Allocator>::dTreeNode* dTree<OBJECT, KEY, Allocator>::ReplaceKey (typename dTree<OBJECT, KEY, Allocator>::dTreeNode* node, KEY key)
+template<class OBJECT, class KEY, int poolSize>
+typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::ReplaceKey (typename dTree<OBJECT, KEY, poolSize>::dTreeNode* node, KEY key)
 {
 	Unlink(node);
 	dTreeNode* const ptr = Insert (node, key);
@@ -679,23 +656,23 @@ typename dTree<OBJECT, KEY, Allocator>::dTreeNode* dTree<OBJECT, KEY, Allocator>
 	return ptr;
 }
 
-template<class OBJECT, class KEY, class Allocator>
-typename dTree<OBJECT, KEY, Allocator>::dTreeNode* dTree<OBJECT, KEY, Allocator>::ReplaceKey (KEY oldKey, KEY newKey)
+template<class OBJECT, class KEY, int poolSize>
+typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::ReplaceKey (KEY oldKey, KEY newKey)
 {
 	dTreeNode* const node = Find (oldKey);
 	return node ? ReplaceKey (node, newKey) : NULL;
 }
 
-template<class OBJECT, class KEY, class Allocator>
-void dTree<OBJECT, KEY, Allocator>::Unlink (typename dTree<OBJECT, KEY, Allocator>::dTreeNode* const node)
+template<class OBJECT, class KEY, int poolSize>
+void dTree<OBJECT, KEY, poolSize>::Unlink (typename dTree<OBJECT, KEY, poolSize>::dTreeNode* const node)
 {
 	m_count	--;
 	node->Unlink((dRedBackNode** )&m_head);
 }
 
 
-template<class OBJECT, class KEY, class Allocator>
-void dTree<OBJECT, KEY, Allocator>::Remove (typename dTree<OBJECT, KEY, Allocator>::dTreeNode* const node)
+template<class OBJECT, class KEY, int poolSize>
+void dTree<OBJECT, KEY, poolSize>::Remove (typename dTree<OBJECT, KEY, poolSize>::dTreeNode* const node)
 {
 	m_count	--;
 	node->Unlink ((dRedBackNode** )&m_head);
@@ -703,8 +680,8 @@ void dTree<OBJECT, KEY, Allocator>::Remove (typename dTree<OBJECT, KEY, Allocato
 	GetAllocator().Free (node);
 }
 
-template<class OBJECT, class KEY, class Allocator>
-void dTree<OBJECT, KEY, Allocator>::Remove (KEY key) 
+template<class OBJECT, class KEY, int poolSize>
+void dTree<OBJECT, KEY, poolSize>::Remove (KEY key) 
 {
 	// find node in tree 
 	dTreeNode* const node = Find (key);
@@ -714,8 +691,8 @@ void dTree<OBJECT, KEY, Allocator>::Remove (KEY key)
 }
 
 
-template<class OBJECT, class KEY, class Allocator>
-void dTree<OBJECT, KEY, Allocator>::RemoveAllLow (dTreeNode* const root) 
+template<class OBJECT, class KEY, int poolSize>
+void dTree<OBJECT, KEY, poolSize>::RemoveAllLow (dTreeNode* const root) 
 {
 	if (root->m_left) {
 		RemoveAllLow((dTreeNode*)root->m_left);
@@ -729,8 +706,8 @@ void dTree<OBJECT, KEY, Allocator>::RemoveAllLow (dTreeNode* const root)
 }
 
 
-template<class OBJECT, class KEY, class Allocator>
-void dTree<OBJECT, KEY, Allocator>::RemoveAll () 
+template<class OBJECT, class KEY, int poolSize>
+void dTree<OBJECT, KEY, poolSize>::RemoveAll () 
 {
 	if (m_head) {
 		m_count	 = 0;
@@ -741,15 +718,15 @@ void dTree<OBJECT, KEY, Allocator>::RemoveAll ()
 	}
 }
 
-template<class OBJECT, class KEY, class Allocator>
-bool dTree<OBJECT, KEY, Allocator>::SanityCheck () const
+template<class OBJECT, class KEY, int poolSize>
+bool dTree<OBJECT, KEY, poolSize>::SanityCheck () const
 {
 	return SanityCheck (m_head, 0);
 }
 
 
-template<class OBJECT, class KEY, class Allocator>
-bool dTree<OBJECT, KEY, Allocator>::SanityCheck (typename dTree<OBJECT, KEY, Allocator>::dTreeNode* ptr, int height) const
+template<class OBJECT, class KEY, int poolSize>
+bool dTree<OBJECT, KEY, poolSize>::SanityCheck (typename dTree<OBJECT, KEY, poolSize>::dTreeNode* ptr, int height) const
 {
 	if (!ptr) {
 		return true;
@@ -796,8 +773,8 @@ bool dTree<OBJECT, KEY, Allocator>::SanityCheck (typename dTree<OBJECT, KEY, All
 	return true;
 }
 
-template<class OBJECT, class KEY, class Allocator>
-int dTree<OBJECT, KEY, Allocator>::CompareKeys (const KEY &key0, const KEY &key1) const
+template<class OBJECT, class KEY, int poolSize>
+int dTree<OBJECT, KEY, poolSize>::CompareKeys (const KEY &key0, const KEY &key1) const
 {
 	if (key1 < key0) {
 		return - 1;
@@ -806,76 +783,6 @@ int dTree<OBJECT, KEY, Allocator>::CompareKeys (const KEY &key0, const KEY &key1
 		return 1;
 	}
 	return 0;
-}
-
-template<class OBJECT, class KEY>
-dTreeAllocator<OBJECT, KEY>::dTreeAllocator()
-	:m_freeTreeNode(NULL)
-	,m_alive(true)
-{
-	Prefetch ();
-}
-
-template<class OBJECT, class KEY>
-dTreeAllocator<OBJECT, KEY>::~dTreeAllocator()
-{
-	Flush();
-	m_alive = false;
-}
-
-template<class OBJECT, class KEY>
-bool dTreeAllocator<OBJECT, KEY>::IsAlive() const
-{
-	return m_alive;
-}
-
-
-template<class OBJECT, class KEY>
-void dTreeAllocator<OBJECT, KEY>::Prefetch ()
-{
-	for (int i = 0; i < D_MAX_ENTRIES_IN_FREETREENODE; i ++) {
-		//dFreeTreeNode* const data = (dFreeTreeNode*) new char[sizeof (typename dTree<OBJECT, KEY, dTreeAllocator<OBJECT, KEY> >::dTreeNode)];
-		dFreeTreeNode* const data = (dFreeTreeNode*) dContainersAlloc::Alloc (sizeof (typename dTree<OBJECT, KEY, dTreeAllocator<OBJECT, KEY> >::dTreeNode));
-		data->m_count = i + 1; 
-		data->m_next = m_freeTreeNode; 
-		m_freeTreeNode = data;
-	}
-}
-
-template<class OBJECT, class KEY>
-void dTreeAllocator<OBJECT, KEY>::Flush ()
-{
-	for (int i = 0; m_freeTreeNode && (i < D_MAX_ENTRIES_IN_FREETREENODE); i ++) {
-		dAssert (m_freeTreeNode);
-		dFreeTreeNode* const ptr = m_freeTreeNode;
-		m_freeTreeNode = m_freeTreeNode->m_next;
-		//delete[] (char*) ptr;
-		dContainersAlloc::Free (ptr);
-	}
-}
-
-
-template<class OBJECT, class KEY>
-void* dTreeAllocator<OBJECT, KEY>::Alloc() 
-{
-	if (!m_freeTreeNode) {
-		Prefetch ();
-	}
-	dFreeTreeNode* const data = m_freeTreeNode;
-	m_freeTreeNode = m_freeTreeNode->m_next;
-	return data;
-}
-
-template<class OBJECT, class KEY>
-void dTreeAllocator<OBJECT, KEY>::Free(void* const ptr) 
-{
-	dFreeTreeNode* const data = (dFreeTreeNode*) ptr;
-	data->m_count = m_freeTreeNode ? m_freeTreeNode->m_count + 1 : 1;
-	data->m_next = m_freeTreeNode;
-	m_freeTreeNode = data;
-	if (data->m_count >= 2 * D_MAX_ENTRIES_IN_FREETREENODE) {
-		Flush();
-	}
 }
 
 #endif

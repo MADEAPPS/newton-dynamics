@@ -694,9 +694,9 @@ DemoSubMesh* DemoMesh::AddSubMesh()
 
 void DemoMesh::Render ()
 {
-	
+
+//	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );	
 	if (m_optilizedDiplayList) {
-//		glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 		glCallList(m_optilizedDiplayList);
 	} else {
 		glEnableClientState (GL_VERTEX_ARRAY);
@@ -706,8 +706,6 @@ void DemoMesh::Render ()
 		glVertexPointer (3, GL_FLOAT, 0, m_vertex);
 		glNormalPointer (GL_FLOAT, 0, m_normal);
 		glTexCoordPointer (2, GL_FLOAT, 0, m_uv);
-
-//	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 		for (dListNode* nodes = GetFirst(); nodes; nodes = nodes->GetNext()) {
 			DemoSubMesh& segment = nodes->GetInfo();

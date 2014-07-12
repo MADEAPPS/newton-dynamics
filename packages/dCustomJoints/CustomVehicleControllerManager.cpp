@@ -267,8 +267,8 @@ void CustomVehicleController::SetEngine(CustomVehicleControllerComponentEngine* 
 
 	m_engine = engine;
 	if (m_engine) {
-		m_engineState.Init(this);
 		m_stateList.Append(&m_engineState);
+		m_engineState.Init(this);
 	}
 }
 
@@ -624,13 +624,13 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 
 static int xxx;
 xxx ++;
-if (xxx > 200)
+if (xxx > 1385)
 xxx *=1;
 m_chassisState.m_externalForce += m_chassisState.m_matrix[0].Scale (2.0f * m_chassisState.m_mass);
 
 	// update all components
 	if (m_engine) {
-		m_engine->Update(timestep);
+//		m_engine->Update(timestep);
 	}
 
 	if (m_steering) {

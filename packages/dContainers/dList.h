@@ -16,39 +16,9 @@
 #include "dContainersStdAfx.h"
 #include "dContainersAlloc.h"
 
-#define D_MAX_ENTRIES_IN_FREELIST	32
 
-template<class T>
-class dListAllocator
-{
-	public:
-	dListAllocator();
-	~dListAllocator();
-	void* Alloc();
-	void Free(void* const ptr);
-	bool IsAlive() const;
-	void Flush ();
-
-	private:
-	class dFreeListNode
-	{
-		public:
-		int m_count;
-		dFreeListNode* m_next;
-	};
-	
-	void Prefetch ();
-
-	dFreeListNode* m_freeListNode;
-	bool m_alive;
-};
-
-
-// this is a small double link list container similar to STL, 
-// it is used to provide low level support for this demos.
-// it implements an iterators, and all the basics operation on list found on the STL class
-
-template<class T, class Allocator = dListAllocator<T> >
+// a small double link list container similar to STL, 
+template<class T, int poolSize = D_MAX_ENTRIES_IN_FREELIST>
 class dList: public dContainersAlloc
 {
 	public:
@@ -141,13 +111,13 @@ class dList: public dContainersAlloc
 		T m_info;
 		dListNode* m_next;
 		dListNode* m_prev;
-		friend class dList<T, Allocator>;
+		friend class dList<T, poolSize>;
 	};
 
 	class Iterator
 	{
 		public:
-		Iterator (const dList<T> &me)
+		Iterator (const dList<T, poolSize> &me)
 		{
 			m_ptr = NULL;
 			m_list = (dList *)&me;
@@ -259,10 +229,13 @@ class dList: public dContainersAlloc
 	}
 */
 	bool Sanity() const {return true;}
-	Allocator& GetAllocator()
+	dContainerFixSizeAllocator& GetAllocator()
 	{
-		static Allocator allocator;
-		return allocator;
+		static dContainerFixSizeAllocator* allocator = NULL;
+		if (!allocator) {
+			allocator = dContainerFixSizeAllocator::Create (sizeof (dList<T, poolSize>::dListNode), poolSize);
+		}
+		return *allocator;
 	}
 
 	int m_count;
@@ -272,51 +245,49 @@ class dList: public dContainersAlloc
 };
 
 
-template<class T, class Allocator>
-dList<T, Allocator>::dList ()
+template<class T, int poolSize>
+dList<T, poolSize>::dList ()
 {
 	m_count = 0;
 	m_first = NULL;
 	m_last = NULL;
+	GetAllocator();
 }
 
 
-template<class T, class Allocator>
-dList<T, Allocator>::~dList () 
+template<class T, int poolSize>
+dList<T, poolSize>::~dList () 
 {
 	RemoveAll ();
-	if (!GetAllocator().IsAlive()) {
-		GetAllocator().Flush();
-	}
 }
 
 
-template<class T, class Allocator>
-int dList<T, Allocator>::GetCount() const
+template<class T, int poolSize>
+int dList<T, poolSize>::GetCount() const
 {
 	return m_count;
 }
 
-template<class T, class Allocator>
-dList<T, Allocator>::operator int() const
+template<class T, int poolSize>
+dList<T, poolSize>::operator int() const
 {
 	return m_first != NULL;
 }
 
-template<class T, class Allocator>
-typename dList<T, Allocator>::dListNode* dList<T, Allocator>::GetFirst() const
+template<class T, int poolSize>
+typename dList<T, poolSize>::dListNode* dList<T, poolSize>::GetFirst() const
 {
 	return m_first;
 }
 
-template<class T, class Allocator>
-typename dList<T, Allocator>::dListNode* dList<T, Allocator>::GetLast() const
+template<class T, int poolSize>
+typename dList<T, poolSize>::dListNode* dList<T, poolSize>::GetLast() const
 {
 	return m_last;
 }
 
-template<class T, class Allocator>
-typename dList<T, Allocator>::dListNode* dList<T, Allocator>::Append ()
+template<class T, int poolSize>
+typename dList<T, poolSize>::dListNode* dList<T, poolSize>::Append ()
 {
 	m_count	++;
 	if (m_first == NULL) {
@@ -329,16 +300,16 @@ typename dList<T, Allocator>::dListNode* dList<T, Allocator>::Append ()
 	return m_last;
 }
 
-template<class T, class Allocator>
-typename dList<T, Allocator>::dListNode* dList<T, Allocator>::AppendAfter (dListNode* const node)
+template<class T, int poolSize>
+typename dList<T, poolSize>::dListNode* dList<T, poolSize>::AppendAfter (dListNode* const node)
 {
 	dListNode* const ptr = Append ();
 	InsertAfter (node, ptr);
 	return ptr;
 }
 
-template<class T, class Allocator>
-typename dList<T, Allocator>::dListNode* dList<T, Allocator>::Append (const T &element)
+template<class T, int poolSize>
+typename dList<T, poolSize>::dListNode* dList<T, poolSize>::Append (const T &element)
 {
 	m_count	++;
 	if (m_first == NULL) {
@@ -351,8 +322,8 @@ typename dList<T, Allocator>::dListNode* dList<T, Allocator>::Append (const T &e
 	return m_last;
 }
 
-template<class T, class Allocator>
-typename dList<T, Allocator>::dListNode* dList<T, Allocator>::Addtop ()
+template<class T, int poolSize>
+typename dList<T, poolSize>::dListNode* dList<T, poolSize>::Addtop ()
 {
 	m_count	++;
 	if (m_last == NULL) {
@@ -366,8 +337,8 @@ typename dList<T, Allocator>::dListNode* dList<T, Allocator>::Addtop ()
 }
 
 
-template<class T, class Allocator>
-typename dList<T, Allocator>::dListNode* dList<T, Allocator>::Addtop (const T &element)
+template<class T, int poolSize>
+typename dList<T, poolSize>::dListNode* dList<T, poolSize>::Addtop (const T &element)
 {
 	m_count	++;
 	if (m_last == NULL) {
@@ -380,8 +351,8 @@ typename dList<T, Allocator>::dListNode* dList<T, Allocator>::Addtop (const T &e
 	return m_first;
 }
 
-template<class T, class Allocator>
-void dList<T, Allocator>::InsertAfter (dListNode* const root, dListNode* const node)
+template<class T, int poolSize>
+void dList<T, poolSize>::InsertAfter (dListNode* const root, dListNode* const node)
 {
 	dAssert (root != node);
 	if (node == m_last) {
@@ -403,8 +374,8 @@ void dList<T, Allocator>::InsertAfter (dListNode* const root, dListNode* const n
 	dAssert (Sanity());
 }
 
-template<class T, class Allocator>
-void dList<T, Allocator>::RotateToEnd (dListNode* const node)
+template<class T, int poolSize>
+void dList<T, poolSize>::RotateToEnd (dListNode* const node)
 {
 	if (node != m_last) {
 		if (m_last != m_first) {
@@ -418,8 +389,8 @@ void dList<T, Allocator>::RotateToEnd (dListNode* const node)
 	}
 }
 
-template<class T, class Allocator>
-void dList<T, Allocator>::RotateToBegin (dListNode* const node)
+template<class T, int poolSize>
+void dList<T, poolSize>::RotateToBegin (dListNode* const node)
 {
 	if (node != m_first) {
 		if (m_last != m_first) {
@@ -434,8 +405,8 @@ void dList<T, Allocator>::RotateToBegin (dListNode* const node)
 }
 
 
-template<class T, class Allocator>
-typename dList<T, Allocator>::dListNode* dList<T, Allocator>::Find (const T &element) const
+template<class T, int poolSize>
+typename dList<T, poolSize>::dListNode* dList<T, poolSize>::Find (const T &element) const
 {
 	dListNode* node;
 	for (node = m_first; node; node = node->GetNext()) {
@@ -447,8 +418,8 @@ typename dList<T, Allocator>::dListNode* dList<T, Allocator>::Find (const T &ele
 }
 
 
-template<class T, class Allocator>
-typename dList<T, Allocator>::dListNode* dList<T, Allocator>::GetNodeFromInfo (T &info) const
+template<class T, int poolSize>
+typename dList<T, poolSize>::dListNode* dList<T, poolSize>::GetNodeFromInfo (T &info) const
 {
 	dListNode* const node = (dListNode*) &info;
 	long long offset = ((char*) &node->m_info) - ((char*)node);
@@ -458,8 +429,8 @@ typename dList<T, Allocator>::dListNode* dList<T, Allocator>::GetNodeFromInfo (T
 }
 
 
-template<class T, class Allocator> 
-void dList<T, Allocator>::Remove (const T &element)
+template<class T, int poolSize> 
+void dList<T, poolSize>::Remove (const T &element)
 {
 	dListNode* const node = Find (element);
 	if (node) {
@@ -467,8 +438,8 @@ void dList<T, Allocator>::Remove (const T &element)
 	}
 }
 
-template<class T, class Allocator>
-void dList<T, Allocator>::Remove (dListNode* const node)
+template<class T, int poolSize>
+void dList<T, poolSize>::Remove (dListNode* const node)
 {
 	m_count --;
 	if (node == m_first) {
@@ -482,8 +453,8 @@ void dList<T, Allocator>::Remove (dListNode* const node)
 	dAssert (Sanity());
 }
 
-template<class T, class Allocator>
-void dList<T, Allocator>::RemoveAll ()
+template<class T, int poolSize>
+void dList<T, poolSize>::RemoveAll ()
 {
 	while (m_first) {
 		Remove(m_first);
@@ -491,74 +462,6 @@ void dList<T, Allocator>::RemoveAll ()
 	dAssert (!m_count);
 }
 
-
-template<class T>
-dListAllocator<T>::dListAllocator()
-	:m_freeListNode(NULL)
-	,m_alive(true)
-{
-	Prefetch ();
-}
-
-template<class T>
-dListAllocator<T>::~dListAllocator()
-{
-	Flush();
-	m_alive = false;
-}
-
-template<class T>
-bool dListAllocator<T>::IsAlive() const
-{
-	return m_alive;
-}
-
-template<class T>
-void dListAllocator<T>::Prefetch ()
-{
-	int sizeInBytes = sizeof (typename dList<T, dListAllocator<T> >::dListNode);
-	for (int i = 0; i < D_MAX_ENTRIES_IN_FREELIST; i ++) {
-		//dFreeListNode* const data = (dFreeListNode*) new char[sizeInBytes];
-		dFreeListNode* const data = (dFreeListNode*) dContainersAlloc::Alloc (sizeInBytes);
-		data->m_count = i + 1; 
-		data->m_next = m_freeListNode; 
-		m_freeListNode = data;
-	}
-}
-
-template<class T>
-void dListAllocator<T>::Flush ()
-{
-	for (int i = 0; m_freeListNode && (i < D_MAX_ENTRIES_IN_FREELIST); i ++) {
-		dFreeListNode* const ptr = m_freeListNode;
-		m_freeListNode = m_freeListNode->m_next;
-		//delete[] (char*) ptr;
-		dContainersAlloc::Free (ptr);
-	}
-}
-
-template<class T>
-void* dListAllocator<T>::Alloc() 
-{
-	if (!m_freeListNode) {
-		Prefetch ();
-	}
-	dFreeListNode* const data = m_freeListNode;
-	m_freeListNode = m_freeListNode->m_next;
-	return data;
-}
-
-template<class T>
-void dListAllocator<T>::Free(void* const ptr) 
-{
-	dFreeListNode* const data = (dFreeListNode*) ptr;
-	data->m_count = m_freeListNode ? m_freeListNode->m_count + 1 : 1;
-	data->m_next = m_freeListNode;
-	m_freeListNode = data;
-	if (data->m_count >= 2 * D_MAX_ENTRIES_IN_FREELIST) {
-		Flush();
-	}
-}
 
 #endif
 

@@ -108,6 +108,9 @@ class CustomVehicleController: public CustomControllerBase
 	friend class CustomVehicleControllerEngineGearJoint;
 	
 	friend class CustomVehicleControllerBodyStateTire;
+	friend class CustomVehicleControllerBodyStateEngine;
+	friend class CustomVehicleControllerBodyStateChassis;
+
 	friend class CustomVehicleControllerComponentBrake;
 	friend class CustomVehicleControllerComponentEngine;
 	friend class CustomVehicleControllerComponentSteering;
