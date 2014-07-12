@@ -109,6 +109,16 @@ extern "C" {
 	#define SERIALIZE_ID_SCENE								16
 	#define SERIALIZE_ID_FRACTURED_COMPOUND					17
 
+#ifdef __cplusplus
+	class NewtonMesh;
+	class NewtonBody;
+	class NewtonWorld;
+	class NewtonJoint;
+	class NewtonMaterial;
+	class NewtonCollision;
+	class NewtonDeformableMeshSegment;
+	class NewtonFracturedCompoundMeshPart;
+#else
 	typedef struct NewtonMesh{} NewtonMesh;
 	typedef struct NewtonBody{} NewtonBody;
 	typedef struct NewtonWorld{} NewtonWorld;
@@ -117,6 +127,7 @@ extern "C" {
 	typedef struct NewtonCollision{} NewtonCollision;
 	typedef struct NewtonDeformableMeshSegment{} NewtonDeformableMeshSegment;
 	typedef struct NewtonFracturedCompoundMeshPart{} NewtonFracturedCompoundMeshPart;
+#endif
 
 
 	typedef struct NewtonBoxParam
