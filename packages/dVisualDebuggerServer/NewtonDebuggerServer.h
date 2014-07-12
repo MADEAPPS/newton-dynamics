@@ -34,13 +34,9 @@ extern "C" {
 	#define NEWTON_DEBUGGER_END_UPDATE		3
 	#define NEWTON_CHECK_CONNECTED			4
 
-	struct NewtonWorld;
-
 	void* NewtonDebuggerCreateServer (NewtonWorld* const world);
 	void NewtonDebuggerDestroyServer (void* const server);
 	void NewtonDebuggerServe (void* const server, dFloat timestep);
-
-	
 
 
 #ifdef __cplusplus 

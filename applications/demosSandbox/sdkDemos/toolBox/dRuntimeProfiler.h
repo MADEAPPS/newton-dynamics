@@ -9,10 +9,8 @@
 * freely
 */
 
-#ifndef _D_RUNTINE_PROFILER_164045623__
-#define _D_RUNTINE_PROFILER_164045623__
-
-struct NewtonWorld;
+#ifndef _D_RUNTINE_PROFILER_
+#define _D_RUNTINE_PROFILER_
 
 #define MAX_FRAMES 350
 #define MAX_FRAMES_STEP 1

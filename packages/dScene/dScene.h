@@ -21,7 +21,7 @@
 
 #include "dSceneGraph.h"
 
-struct NewtonWorld;
+class NewtonWorld;
 class dCameraNodeInfo;
 class dRootNodeInfo;
 class dMaterialNodeInfo;

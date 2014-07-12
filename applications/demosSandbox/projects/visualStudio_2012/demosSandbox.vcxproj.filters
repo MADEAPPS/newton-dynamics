@@ -61,9 +61,6 @@
     <ClCompile Include="..\..\sdkDemos\demos\SoftBodies.cpp">
       <Filter>demos</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\demos\SuperCar.cpp">
-      <Filter>demos</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\sdkDemos\toolBox\TargaToOpenGl.cpp">
       <Filter>tooBox</Filter>
     </ClCompile>

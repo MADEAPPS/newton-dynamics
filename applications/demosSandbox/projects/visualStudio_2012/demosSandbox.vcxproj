@@ -288,7 +288,6 @@
     <ClCompile Include="..\..\sdkDemos\demos\MultiRayCasting.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\SceneCollision.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\SoftBodies.cpp" />
-    <ClCompile Include="..\..\sdkDemos\demos\SuperCar.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\UsingNewtonMeshTool.cpp" />
     <ClCompile Include="..\..\sdkDemos\DemoAIAgent.cpp" />
     <ClCompile Include="..\..\sdkDemos\DemoCamera.cpp" />
