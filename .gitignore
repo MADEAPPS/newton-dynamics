@@ -26,6 +26,9 @@ DerivedData
 *.suo
 *.user
 *.sln.docstates
+*.opensdf
+*.sdf
+*.userprefs
 
 # Build results
 [Dd]ebug/
@@ -38,3 +41,6 @@ build/
 bld/
 [Bb]in/
 [Oo]bj/
+
+# third party
+packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/
