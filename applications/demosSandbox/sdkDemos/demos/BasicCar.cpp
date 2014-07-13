@@ -348,12 +348,16 @@ class BasicVehicleEntity: public DemoEntity
 		handBrakes->AddBrakeTire (rightRearTire);
 		m_controller->SetHandBrakes(handBrakes);
 
-/*
 		// add an engine
 		// first make the gear Box
 		dFloat fowardSpeedGearsBoxRatios[] = {VIPER_TIRE_GEAR_1, VIPER_TIRE_GEAR_2, VIPER_TIRE_GEAR_3, VIPER_TIRE_GEAR_4, VIPER_TIRE_GEAR_5, VIPER_TIRE_GEAR_6};
 		CustomVehicleControllerComponentEngine::dGearBox* const gearBox = new CustomVehicleControllerComponentEngine::dGearBox(m_controller, VIPER_TIRE_GEAR_REVERSE, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios); 
 		CustomVehicleControllerComponentEngine* const engine = new CustomVehicleControllerComponentEngine (m_controller, gearBox, leftRearTire, rightRearTire);
+
+		// the the default transmission type
+		engine->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
+
+		m_controller->SetEngine(engine);
 
 
 		dFloat viperIdleRPM = VIPER_IDLE_TORQUE_RPM;
@@ -371,12 +375,6 @@ class BasicVehicleEntity: public DemoEntity
 		dFloat vehicleTopSpeedKPH = VIPER_TIRE_TOP_SPEED_KMH;
         dFloat vehicleMomentOfInteria  = VIPER_ENGINE_MOMENT_OF_INERTIA;
 		engine->InitEngineTorqueCurve (vehicleTopSpeedKPH, vehicleMomentOfInteria, viperIdleTorquePoundPerFoot, viperIdleRPM, viperPeakTorquePoundPerFoot, viperPeakTorqueRPM, viperPeakHorsePower, viperPeakHorsePowerRPM, viperRedLineTorquePoundPerFoot, viperRedLineRPM);
-
-		m_controller->SetEngine(engine);
-
-        // the the default transmission type
-		engine->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
-*/
 	}
 
 
@@ -530,6 +528,8 @@ class BasicVehicleEntity: public DemoEntity
 		// check transmission type
 		int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
+engineGasPedal = 1.0f;
+
 #if 0
 	#if 0
 		static FILE* file = fopen ("log.bin", "wb");
@@ -556,13 +556,13 @@ class BasicVehicleEntity: public DemoEntity
 #endif
 
 		if (engine) {
-//			if (toggleTransmission) {
-//				engine->SetTransmissionMode (!engine->GetTransmissionMode());
-//			}
-//			if (!engine->GetTransmissionMode()) {
-//				engine->SetGear(gear);
-//			}
-//			engine->SetParam(engineGasPedal);
+			if (toggleTransmission) {
+				engine->SetTransmissionMode (!engine->GetTransmissionMode());
+			}
+			if (!engine->GetTransmissionMode()) {
+				engine->SetGear(gear);
+			}
+			engine->SetParam(engineGasPedal);
 		}
 		if (steering) {
 			steering->SetParam(steeringVal);
@@ -821,7 +821,7 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 
 			// draw the tachometer
 			dFloat x = gageSize / 2 + 80.0f;
-			dFloat rpm = engine->GetRPM () / VIPER_REDLINE_TORQUE_RPM;
+			dFloat rpm = engine->GetRPM () / engine->GetRedLineRPM();
 			DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize);
 
 			// draw the odometer
@@ -887,7 +887,6 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 			soundManager->SetChannelPitch (rpmEngine, rpm);
 */
 		}
-
 
 		// do the base class post update
 		CustomVehicleControllerManager::PreUpdate(timestep);

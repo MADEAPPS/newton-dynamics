@@ -181,128 +181,6 @@ void CustomVehicleControllerBodyStateChassis::ApplyNetForceAndTorque (dFloat inv
 }
 
 
-void CustomVehicleControllerBodyStateEngine::Init (CustomVehicleController* const controller)
-{
-    CustomVehicleControllerBodyState::Init (controller);
-
-//  NewtonBody* const body = m_controller->GetBody();
-//  const dMatrix& vehicleFrame = m_controller->m_chassisState.m_localFrame;
-
-	CustomVehicleControllerComponentEngine* const engine = controller->GetEngine();
-
-    m_mass = 0.0f; 
-    m_invMass = 0.0f;
-    m_radianPerSecund = 0.0f;
-
-    m_localInertia[0] = engine->GetInertia();
-    m_localInertia[1] = engine->GetInertia();
-    m_localInertia[2] = engine->GetInertia();
-    m_localInertia[3] = 0.0f;
-
-    m_localInvInertia[0] = 1.0f / m_localInertia[0];
-    m_localInvInertia[1] = 1.0f / m_localInertia[1];
-    m_localInvInertia[2] = 1.0f / m_localInertia[2];
-    m_localInvInertia[3] = 0.0f;
-
-	UpdateInertia();
-
-	m_idleFriction.Init (m_controller, this, &controller->m_staticWorld);
-	m_leftTire.Init (m_controller, this, &engine->GetLeftTireNode()->GetInfo());
-    m_rightTire.Init (m_controller, this, &engine->GetRightTireNode()->GetInfo());
-}
-
-int CustomVehicleControllerBodyStateEngine::CalculateActiveJoints (CustomVehicleController* const controller, CustomVehicleControllerJoint** const jointArray)
-{
-	int count = 0;
-/*
-    CustomVehicleControllerComponentEngine* const engine = controller->GetEngine();
-	if (engine) {
-		dAssert (0);
-		int gear = engine->GetGear();
-		if (gear != CustomVehicleControllerComponentEngine::dGearBox::m_newtralGear) {
-			count = 2;
-			jointArray[0] = &m_leftTire;
-			jointArray[1] = &m_rightTire;
-		} else {
-			count = 1;
-			jointArray[0] = &m_idleFriction;
-		}
-	}
-*/
-    return count;
-}
-
-void CustomVehicleControllerBodyStateEngine::ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega)
-{
-dAssert (0);
-/*
-    m_veloc = dVector (0.0f, 0.0f, 0.0f, 0.0f);
-    m_externalForce = dVector (0.0f, 0.0f, 0.0f, 0.0f);
-	m_externalTorque = dVector (0.0f, 0.0f, 0.0f, 0.0f);
-	m_radianPerSecund = m_omega % m_matrix[0];
-
-	dFloat idleRps = m_controller->GetEngine()->GetIdleRadianPerSeconds();
-	if (m_radianPerSecund < (idleRps * 0.25f)) {
-		m_radianPerSecund = idleRps * 0.25f;
-		m_omega = m_matrix[0].Scale (m_radianPerSecund);
-	}
-*/
-}
-
-void CustomVehicleControllerBodyStateEngine::Update (dFloat timestep, CustomVehicleController* const controller)
-{
-dAssert (0);
-/*
-    EngineComponent* const engine = controller->GetEngine();
-    EngineComponent::GearBox* const gearBox = engine->GetGearBox();
-
-	gearBox->Update (timestep);
-	int gear = gearBox->GetGear();
-
-    dFloat torque = 0.0f;
-    dFloat param = engine->GetParam();
-	if (gear == EngineComponent::GearBox::m_newtralGear) {
-		dFloat idleRps = engine->GetIdleRadianPerSeconds();
-		dFloat idleTorque = engine->GetTorque (idleRps);
-
-        torque = idleTorque * param;
-        torque -= m_radianPerSecund * m_radianPerSecund * engine->GetIdleResistance();
-
-		m_idleFriction.m_omega = idleRps;
-		m_idleFriction.m_friction = idleTorque * 0.1f;
-	} else {
-        dFloat gearGain = gearBox->GetGearRatio(gear) * engine->GetDifferencialGearRatio();
-        dFloat nominalTorque = engine->GetTorque (m_radianPerSecund);
-
-        torque = nominalTorque * param;
-        torque -= m_radianPerSecund * m_radianPerSecund * engine->GetRedLineResistance();
-
-        m_leftTire.m_powerTrainGain = gearGain;
-        m_rightTire.m_powerTrainGain = gearGain;
-	}
-*/
-/*
-static FILE* xxx;
-if (!xxx) 
-{
-	fopen_s (&xxx, "torque_rpm.csv", "wt");
-	fprintf (xxx, "gear, tire_torque, tire_rps\n");
-}
-
-static int xxxxx;
-dTrace (("%d %f\n", xxxxx, leftRPS));
-xxxxx ++;
-fprintf (xxx, "%d, %f, %f,\n", gear * 100, leftTorque, leftRPS);
-fflush (xxx);
-*/
-
-//    m_externalForce = dVector (0.0f, 0.0f, 0.0f, 0.0f);
-//    m_externalTorque = dVector (torque, 0.0f, 0.0f, 0.0f);
-}
-
-
-
-
 void CustomVehicleControllerBodyStateTire::Init (CustomVehicleController* const controller, const TireCreationInfo& tireInfo)
 {
 	CustomVehicleControllerBodyState::Init (controller);
@@ -610,5 +488,117 @@ if ((gear > 1) && (m_myIndex == 4)) {
 	m_rotatonSpeed = relOmega % m_matrix[0];
 //m_rotatonSpeed = 2.0f;
 	m_rotationAngle = dMod (m_rotationAngle + m_rotatonSpeed / invTimestep, 2.0f * 3.141592f);
+}
+
+
+
+void CustomVehicleControllerBodyStateEngine::Init (CustomVehicleController* const controller)
+{
+    CustomVehicleControllerBodyState::Init (controller);
+
+//  NewtonBody* const body = m_controller->GetBody();
+//  const dMatrix& vehicleFrame = m_controller->m_chassisState.m_localFrame;
+
+	CustomVehicleControllerComponentEngine* const engine = controller->GetEngine();
+
+    m_mass = 0.0f; 
+    m_invMass = 0.0f;
+    m_radianPerSecund = 0.0f;
+
+    m_localInertia[0] = engine->GetInertia();
+    m_localInertia[1] = engine->GetInertia();
+    m_localInertia[2] = engine->GetInertia();
+    m_localInertia[3] = 0.0f;
+
+    m_localInvInertia[0] = 1.0f / m_localInertia[0];
+    m_localInvInertia[1] = 1.0f / m_localInertia[1];
+    m_localInvInertia[2] = 1.0f / m_localInertia[2];
+    m_localInvInertia[3] = 0.0f;
+
+	UpdateInertia();
+
+	m_idleFriction.Init (m_controller, this, &controller->m_staticWorld);
+	m_leftTire.Init (m_controller, this, &engine->GetLeftTireNode()->GetInfo());
+    m_rightTire.Init (m_controller, this, &engine->GetRightTireNode()->GetInfo());
+}
+
+int CustomVehicleControllerBodyStateEngine::CalculateActiveJoints (CustomVehicleController* const controller, CustomVehicleControllerJoint** const jointArray)
+{
+	int count = 0;
+
+    CustomVehicleControllerComponentEngine* const engine = controller->GetEngine();
+	if (engine) {
+		int gear = engine->GetGear();
+		if (gear != CustomVehicleControllerComponentEngine::dGearBox::m_newtralGear) {
+			count = 2;
+			jointArray[0] = &m_leftTire;
+			jointArray[1] = &m_rightTire;
+		} else {
+			count = 1;
+			jointArray[0] = &m_idleFriction;
+		}
+	}
+
+    return count;
+}
+
+void CustomVehicleControllerBodyStateEngine::ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega)
+{
+//	ApplyNetForceAndTorque (invTimestep, veloc, omega)
+
+    m_veloc = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+    m_externalForce = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+	m_externalTorque = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+	m_radianPerSecund = m_omega % m_matrix[0];
+
+/*
+	dFloat idleRps = m_controller->GetEngine()->GetIdleRadianPerSeconds();
+	if (m_radianPerSecund < (idleRps * 0.25f)) {
+		m_radianPerSecund = idleRps * 0.25f;
+		m_omega = m_matrix[0].Scale (m_radianPerSecund);
+	}
+*/
+}
+
+void CustomVehicleControllerBodyStateEngine::Update (dFloat timestep, CustomVehicleController* const controller)
+{
+	
+    CustomVehicleControllerComponentEngine* const engine = controller->GetEngine();
+    CustomVehicleControllerComponentEngine::dGearBox* const gearBox = engine->GetGearBox();
+
+	gearBox->Update (timestep);
+gearBox->SetGear (CustomVehicleControllerComponentEngine::dGearBox::m_newtralGear);
+
+	int gear = gearBox->GetGear();
+
+    dFloat torque = 0.0f;
+    dFloat param = engine->GetParam();
+	if (gear == CustomVehicleControllerComponentEngine::dGearBox::m_newtralGear) {
+		dFloat idleRps = engine->GetIdleRadianPerSeconds();
+		dFloat idleTorque = engine->GetTorque (idleRps);
+
+        torque = idleTorque * param;
+        torque -= m_radianPerSecund * m_radianPerSecund * engine->GetIdleResistance();
+
+		m_idleFriction.m_omega = idleRps;
+		m_idleFriction.m_friction = idleTorque * 0.1f;
+
+torque = 1000.0f;
+m_idleFriction.m_friction = 0;
+
+	} else {
+dAssert (0);
+        dFloat gearGain = gearBox->GetGearRatio(gear) * engine->GetDifferencialGearRatio();
+        dFloat nominalTorque = engine->GetTorque (m_radianPerSecund);
+
+        torque = nominalTorque * param;
+        torque -= m_radianPerSecund * m_radianPerSecund * engine->GetRedLineResistance();
+
+        m_leftTire.m_powerTrainGain = gearGain;
+        m_rightTire.m_powerTrainGain = gearGain;
+	}
+
+    m_externalForce = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+    m_externalTorque = dVector (torque, 0.0f, 0.0f, 0.0f);
 }
 

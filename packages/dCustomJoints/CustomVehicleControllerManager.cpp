@@ -302,6 +302,7 @@ int CustomVehicleController::GetActiveJoints(CustomVehicleControllerJoint** cons
 {
 	// add the engine joints
 	int jointCount = m_engineState.CalculateActiveJoints(this, &jointArray[0]);
+return jointCount;
 
 	// add all contact joints if any
 	for (TireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
@@ -619,18 +620,18 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 	for (TireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
 		CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
 		tire->Collide(castFilter, timestepInv);
-		tire->UpdateDynamicInputs(timestep);
+//		tire->UpdateDynamicInputs(timestep);
 	}
 
 static int xxx;
 xxx ++;
 if (xxx > 1385)
 xxx *=1;
-m_chassisState.m_externalForce += m_chassisState.m_matrix[0].Scale (2.0f * m_chassisState.m_mass);
+//m_chassisState.m_externalForce += m_chassisState.m_matrix[0].Scale (2.0f * m_chassisState.m_mass);
 
 	// update all components
 	if (m_engine) {
-//		m_engine->Update(timestep);
+		m_engine->Update(timestep);
 	}
 
 	if (m_steering) {
@@ -647,7 +648,6 @@ m_chassisState.m_externalForce += m_chassisState.m_matrix[0].Scale (2.0f * m_cha
 
 	// Get the number of active joints for this integration step
 	int jointCount = GetActiveJoints(jointArray);
-
 	BuildJacobianMatrix (jointCount, jointArray, timestep, jacobianPairArray, jacobianColumn);
 	CalculateReactionsForces (jointCount, jointArray, timestep, jacobianPairArray, jacobianColumn);
 }

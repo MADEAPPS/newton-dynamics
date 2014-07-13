@@ -63,6 +63,7 @@ class CustomVehicleControllerBodyState
 	friend class CustomVehicleControllerJoint;
 	friend class CustomVehicleControllerTireJoint;
 	friend class CustomVehicleControllerContactJoint;
+	friend class CustomVehicleControllerEngineIdleJoint;
 	friend class CustomVehicleControllerBodyStateTire;
 	friend class CustomVehicleControllerBodyStateChassis;
 	friend class CustomVehicleControllerBodyStateEngine;
@@ -115,7 +116,7 @@ class CustomVehicleControllerBodyStateEngine: public CustomVehicleControllerBody
 
 	CustomVehicleControllerEngineGearJoint m_leftTire;
 	CustomVehicleControllerEngineGearJoint m_rightTire;
-	CustomVehicleControllerEngineIdleJoint	m_idleFriction;
+	CustomVehicleControllerEngineIdleJoint m_idleFriction;
 	dFloat m_radianPerSecund;
 
 	friend class CustomVehicleController;

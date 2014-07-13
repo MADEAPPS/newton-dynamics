@@ -273,33 +273,6 @@ void CustomVehicleControllerEngineGearJoint::JacobianDerivative (ParamInfo* cons
 */
 }
 
-void CustomVehicleControllerEngineIdleJoint::UpdateSolverForces (const JacobianPair* const jacobians) const
-{
-}
-
-void CustomVehicleControllerEngineIdleJoint::JacobianDerivative (ParamInfo* const constraintParams)
-{
-	dAssert (0);
-	/*
-
-	EngineComponent* const engine = m_controller->GetEngine();
-	CustomVehicleControllerBodyStateEngine* const engineState = (CustomVehicleControllerBodyStateEngine*) m_state0;
-	
-	const dVector& pin = engineState->m_matrix[0];
-
-	int index = constraintParams->m_count;
-	AddAngularRowJacobian (constraintParams, pin, 0.0f);
-	dAssert (engineState == &m_controller->m_engineState);
-
-	dFloat alpha = 0.35f * (engineState->m_omega % pin - engine->GetIdleRadianPerSeconds()) * constraintParams->m_timestepInv;
-
-	m_rowIsMotor[index] = true;
-	m_motorAcceleration[index] = - alpha;
-	constraintParams->m_jointAccel[index] = 0.0f;
-	constraintParams->m_jointLowFriction[index] = -m_friction;
-	constraintParams->m_jointHighFriction[index] = m_friction;
-*/
-}
 
 
 void CustomVehicleControllerTireJoint::JacobianDerivative (ParamInfo* const constraintParams)
@@ -555,3 +528,28 @@ void CustomVehicleControllerContactJoint::JointAccelerations (JointAccelerationD
 	}
 }
 
+
+
+void CustomVehicleControllerEngineIdleJoint::UpdateSolverForces (const JacobianPair* const jacobians) const
+{
+}
+
+void CustomVehicleControllerEngineIdleJoint::JacobianDerivative (ParamInfo* const constraintParams)
+{
+	CustomVehicleControllerComponentEngine* const engine = m_controller->GetEngine();
+	CustomVehicleControllerBodyStateEngine* const engineState = (CustomVehicleControllerBodyStateEngine*) m_state0;
+
+	const dVector& pin = engineState->m_matrix[0];
+
+	int index = constraintParams->m_count;
+	AddAngularRowJacobian (constraintParams, pin, 0.0f);
+	dAssert (engineState == &m_controller->m_engineState);
+
+	dFloat alpha = 0.35f * (engineState->m_omega % pin - engine->GetIdleRadianPerSeconds()) * constraintParams->m_timestepInv;
+
+	m_rowIsMotor[index] = true;
+	m_motorAcceleration[index] = - alpha;
+	constraintParams->m_jointAccel[index] = 0.0f;
+	constraintParams->m_jointLowFriction[index] = -m_friction;
+	constraintParams->m_jointHighFriction[index] = m_friction;
+}

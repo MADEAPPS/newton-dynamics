@@ -155,7 +155,6 @@ class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComp
 		CUSTOM_JOINTS_API void Update (dFloat timestep);
 		CUSTOM_JOINTS_API dFloat GetGearRatio(int gear) const;
 
-
 		CUSTOM_JOINTS_API int GetGear() const;
 		CUSTOM_JOINTS_API void SetGear (int gear);
 		CUSTOM_JOINTS_API int GetGearCount() const;
@@ -188,6 +187,7 @@ class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComp
 	CUSTOM_JOINTS_API void SetGear (int gear);
 	CUSTOM_JOINTS_API dFloat GetRPM () const;
 	CUSTOM_JOINTS_API dFloat GetTopRPM () const;
+	CUSTOM_JOINTS_API dFloat GetRedLineRPM () const;
 	CUSTOM_JOINTS_API dFloat GetSpeed () const;
 	CUSTOM_JOINTS_API dFloat GetTopSpeed () const;
 	CUSTOM_JOINTS_API dFloat GetInertia() const;
@@ -203,11 +203,18 @@ class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComp
 	dFloat GetDifferencialGearRatio () const;
 	dFloat GetTorque (dFloat radianPerSeconds) const;
 
-	void SetTopSpeed (dFloat topSpeedMeterPerSecunds);
+	void SetTopSpeed (dFloat topSpeedMeterPerSecunds, dFloat rpsAtPeckPower);
 	dList<CustomVehicleControllerBodyStateTire>::dListNode* GetLeftTireNode() const;
 	dList<CustomVehicleControllerBodyStateTire>::dListNode* GetRightTireNode() const;
 
 	protected:
+	void ConvertToMatricSystem (
+			dFloat& vehicleSpeedInKilometerPerHours, dFloat& engineMomentOfInertia,
+			dFloat& idleTorqueInPoundFoot, dFloat& revolutionsPerMinutesAtIdleTorque, 
+			dFloat& peakTorqueInPoundFoot, dFloat& revolutionsPerMinutesAtPeakTorque, 
+			dFloat& peakHorsePower, dFloat& revolutionsPerMinutesAtPeakHorsePower, 
+			dFloat& torqueArRedLineInPoundFoot, dFloat& revolutionsPerMinutesAtRedLineTorque) const;
+
 	dGearBox* m_gearBox;
 	dList<CustomVehicleControllerBodyStateTire>::dListNode* m_leftTire;
 	dList<CustomVehicleControllerBodyStateTire>::dListNode* m_righTire;
@@ -215,10 +222,10 @@ class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComp
 
 	dFloat m_speedMPS;
 	dFloat m_topSpeedMPS;
+	dFloat m_crownGearRatio;
 	dFloat m_momentOfInertia;
 	dFloat m_engineResistance;
 	dFloat m_engineIdleResistance;
-	dFloat m_differentialGearRatio;
 	dFloat m_radiansPerSecundsAtRedLine;
 	dFloat m_radiansPerSecundsAtPeakPower;
 	dFloat m_radiansPerSecundsAtIdleTorque;

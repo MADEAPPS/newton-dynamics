@@ -52,6 +52,55 @@ dFloat CustomVehicleControllerComponent::dInterpolationCurve::GetValue (dFloat p
 
 
 
+
+CustomVehicleControllerComponentSteering::CustomVehicleControllerComponentSteering (CustomVehicleController* const controller, dFloat maxAngleInRadians)
+	:CustomVehicleControllerComponent (controller)
+	,m_maxAngle (dAbs (maxAngleInRadians))
+{
+}
+
+void CustomVehicleControllerComponentSteering::AddSteeringTire (CustomVehicleControllerBodyStateTire* const tireNode, dFloat sign)
+{
+	dTireSignPair& pair = m_steeringTires.Append()->GetInfo();
+
+	pair.m_sign = (sign >= 0.0f) ? 1.0f : -1.0f;
+	pair.m_tireNode = m_controller->m_tireList.GetNodeFromInfo (*tireNode);
+}
+
+
+void CustomVehicleControllerComponentSteering::Update (dFloat timestep)
+{
+	for (dList<dTireSignPair>::dListNode* node = m_steeringTires.GetFirst(); node; node = node->GetNext()) {
+		dTireSignPair& pair = node->GetInfo();
+		CustomVehicleControllerBodyStateTire& tire = pair.m_tireNode->GetInfo();
+		tire.m_steeringAngle = m_maxAngle * m_param * pair.m_sign;
+	}
+}
+
+
+CustomVehicleControllerComponentBrake::CustomVehicleControllerComponentBrake (CustomVehicleController* const controller, dFloat maxBrakeTorque)
+	:CustomVehicleControllerComponent (controller)
+	,m_maxBrakeTorque (dAbs (maxBrakeTorque))
+{
+}
+
+void CustomVehicleControllerComponentBrake::AddBrakeTire (CustomVehicleControllerBodyStateTire* const tire)
+{
+	m_brakeTires.Append(m_controller->m_tireList.GetNodeFromInfo (*tire));
+}
+
+
+void CustomVehicleControllerComponentBrake::Update (dFloat timestep)
+{
+	for (dList<dList<CustomVehicleControllerBodyStateTire>::dListNode*>::dListNode* node = m_brakeTires.GetFirst(); node; node = node->GetNext()) {
+		CustomVehicleControllerBodyStateTire& tire = node->GetInfo()->GetInfo();
+		tire.m_breakTorque = dMax (tire.m_breakTorque, dAbs (m_maxBrakeTorque * m_param));
+	}
+}
+
+
+
+
 CustomVehicleControllerComponentEngine::dGearBox::dGearBox(CustomVehicleController* const controller, dFloat reverseGearRatio, int gearCount, const dFloat* const gearBox)
 	:m_gearsCount(gearCount + 2)
 	,m_currentGear(NULL)
@@ -210,10 +259,10 @@ CustomVehicleControllerComponentEngine::CustomVehicleControllerComponentEngine (
 	,m_righTire(controller->m_tireList.GetNodeFromInfo (*righTire))
 	,m_speedMPS(0.0f)
 	,m_topSpeedMPS(0.0f)
-    ,m_momentOfInertia(0.0f)
+	,m_crownGearRatio(1.0f)
+    ,m_momentOfInertia(10.0f)
     ,m_engineResistance(0.0f)
     ,m_engineIdleResistance(0.0f)
-	,m_differentialGearRatio(1.0f)
 	,m_radiansPerSecundsAtRedLine(0.0f)
 	,m_radiansPerSecundsAtPeakPower(0.0f)
 	,m_radiansPerSecundsAtIdleTorque(0.0f)
@@ -227,71 +276,6 @@ CustomVehicleControllerComponentEngine::~CustomVehicleControllerComponentEngine(
 	}
 }
 
-void CustomVehicleControllerComponentEngine::InitEngineTorqueCurve (
-	dFloat vehicleSpeedInKilometerPerHours, dFloat engineMomentOfInertia,
-	dFloat idleTorqueInPoundFoot, dFloat revolutionsPerMinutesAtIdleTorque, 
-	dFloat peakTorqueInPoundFoot, dFloat revolutionsPerMinutesAtPeakTorque, 
-	dFloat peakHorsePower, dFloat revolutionsPerMinutesAtPeakHorsePower, 
-	dFloat torqueArRedLineInPoundFoot, dFloat revolutionsPerMinutesAtRedLineTorque)
-{
-	dFloat radianPerSecunds[5];
-	dFloat torqueInNewtonMeters[5];
-	
-	const dFloat horsePowerToWatts = 735.5f;
-	const dFloat rpmToRadiansPerSecunds = 0.105f;
-	const dFloat poundFootToNewtonMeters = 1.356f;
-
-	dFloat idleTorque = idleTorqueInPoundFoot * poundFootToNewtonMeters;
-	dFloat rpsAtIdleTorque = revolutionsPerMinutesAtIdleTorque * rpmToRadiansPerSecunds;
-
-	dFloat peakTorque = peakTorqueInPoundFoot * poundFootToNewtonMeters;
-	dFloat rpsAtPeakTorque = revolutionsPerMinutesAtPeakTorque * rpmToRadiansPerSecunds;
-	
-	dFloat powerInNewtonMetersPerSecunds = peakHorsePower * horsePowerToWatts;
-	dFloat rpsAtPeakPower = revolutionsPerMinutesAtPeakHorsePower * rpmToRadiansPerSecunds;
-	dFloat torqueAtPeakPower = powerInNewtonMetersPerSecunds / rpsAtPeakPower;
-	
-	dFloat redLineTorque = torqueArRedLineInPoundFoot * poundFootToNewtonMeters;
-	dFloat rpsAtRedLineTorque = revolutionsPerMinutesAtRedLineTorque * rpmToRadiansPerSecunds;
-
-	dAssert (rpsAtIdleTorque > 0.0f);
-	dAssert (rpsAtIdleTorque < rpsAtPeakTorque);
-	dAssert (rpsAtPeakTorque < rpsAtPeakPower);
-	dAssert (rpsAtPeakPower < rpsAtRedLineTorque);
-
-	dAssert (idleTorque > 0.0f);
-	dAssert (idleTorque < peakTorque);
-	dAssert (peakTorque > torqueAtPeakPower);
-	dAssert (torqueAtPeakPower > redLineTorque);
-	dAssert (redLineTorque > 0.0f);
-
-	dAssert (peakTorque * rpsAtPeakTorque < powerInNewtonMetersPerSecunds);
-
-	radianPerSecunds[0] = 0.0f;
-	radianPerSecunds[1] = rpsAtIdleTorque;
-	radianPerSecunds[2] = rpsAtPeakTorque;
-	radianPerSecunds[3] = rpsAtPeakPower;
-	radianPerSecunds[4] = rpsAtRedLineTorque;
-
-	torqueInNewtonMeters[0] = idleTorque;
-	torqueInNewtonMeters[1] = idleTorque;
-	torqueInNewtonMeters[2] = peakTorque;
-	torqueInNewtonMeters[3] = torqueAtPeakPower;
-	torqueInNewtonMeters[4] = redLineTorque;
-
-    m_momentOfInertia = engineMomentOfInertia;
-    m_engineResistance = redLineTorque / (rpsAtRedLineTorque * rpsAtRedLineTorque * 0.99f * 0.99f);
-    m_engineIdleResistance = idleTorque / (rpsAtRedLineTorque * rpsAtRedLineTorque * 0.99f * 0.99f);
-
-	m_torqueCurve.InitalizeCurve (sizeof (radianPerSecunds)/sizeof (radianPerSecunds[0]), radianPerSecunds, torqueInNewtonMeters);
-
-	m_radiansPerSecundsAtIdleTorque = rpsAtIdleTorque;
-	m_radiansPerSecundsAtPeakPower = rpsAtPeakPower;
-	m_radiansPerSecundsAtRedLine = rpsAtRedLineTorque;
-	SetTopSpeed (vehicleSpeedInKilometerPerHours * 0.278f);
-
-	m_gearBox->SetOptimalShiftLimits (rpsAtPeakTorque / rpsAtRedLineTorque, rpsAtPeakPower/ rpsAtRedLineTorque);
-}
 
 
 dFloat CustomVehicleControllerComponentEngine::GetInertia() const
@@ -359,7 +343,8 @@ dFloat CustomVehicleControllerComponentEngine::GetTorque (dFloat radianPerSecond
 
 dFloat CustomVehicleControllerComponentEngine::GetDifferencialGearRatio() const
 {
-    return m_differentialGearRatio;
+	dAssert(0);
+    return m_crownGearRatio;
 }
 
 dList<CustomVehicleControllerBodyStateTire>::dListNode* CustomVehicleControllerComponentEngine::GetLeftTireNode() const
@@ -385,37 +370,44 @@ dFloat CustomVehicleControllerComponentEngine::GetSpeed () const
 
 dFloat CustomVehicleControllerComponentEngine::GetRPM () const
 {
-	return m_controller->m_engineState.m_radianPerSecund * 9.55f;
+	return m_controller->m_engineState.m_radianPerSecund * m_crownGearRatio * 9.55f;
 }
 
 dFloat CustomVehicleControllerComponentEngine::GetTopRPM () const
 {
-    return m_radiansPerSecundsAtPeakPower * 9.55f;
+    return m_radiansPerSecundsAtPeakPower * m_crownGearRatio * 9.55f;
 }
 
-void CustomVehicleControllerComponentEngine::SetTopSpeed (dFloat topSpeedMPS)
+dFloat CustomVehicleControllerComponentEngine::GetRedLineRPM() const 
+{
+	return m_radiansPerSecundsAtRedLine * m_crownGearRatio * 9.55f;
+}
+
+void CustomVehicleControllerComponentEngine::SetTopSpeed (dFloat topSpeedMPS, dFloat rpsAtPickPower)
 {
 	dAssert (topSpeedMPS >= 0.0f);
 	dAssert (topSpeedMPS < 100.0f);
 
 	CustomVehicleControllerBodyStateTire* const tire = &m_leftTire->GetInfo();
+	dAssert (tire);
 	m_topSpeedMPS = topSpeedMPS;
 
 	// drive train geometrical relations
-	// w = v * G0 * G1 / r
-	// v = w * r / (G0 * G1)
 	// G0 = m_differentialGearRatio
 	// G1 = m_transmissionGearRatio
-	// w = engine radians per seconds
-	// r = tire radius in meters
-	// v = vehicle top speed in meters per seconds
+	// s = topSpeedMPS
+	// r = tireRatio
+	// wt = rpsAtTire
+	// we = rpsAtPickPower
+	// we = G1 * G0 * wt;
+	// wt = e / r
+	// we = G0 * G1 * s / r
+	// G0 = r * we / (G1 * s)
 
 	// using the top gear and the optimal engine torque for the calculations
 	dFloat topGearRatio = m_gearBox->GetGearRatio(m_gearBox->GetGearCount() - 1);
-
-	// G0 = w * r / (G1 * v)
-	m_differentialGearRatio = m_radiansPerSecundsAtPeakPower * tire->m_radio / (topGearRatio * m_topSpeedMPS);
-
+	m_crownGearRatio = tire->m_radio * rpsAtPickPower / (topSpeedMPS * topGearRatio);
+/*
 	// calculate internal tire rolling resistance, (assume no transmission power lost)
 	dFloat gain = m_differentialGearRatio * topGearRatio;
 	dFloat tireTopOmega = m_topSpeedMPS / tire->m_radio;
@@ -428,6 +420,7 @@ void CustomVehicleControllerComponentEngine::SetTopSpeed (dFloat topSpeedMPS)
 		CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
 		tire->m_idleRollingResistance = tireRollingResistance;
 	}
+*/
 }
 
 
@@ -457,48 +450,88 @@ fflush (xxx);
 }
 
 
-CustomVehicleControllerComponentSteering::CustomVehicleControllerComponentSteering (CustomVehicleController* const controller, dFloat maxAngleInRadians)
-	:CustomVehicleControllerComponent (controller)
-	,m_maxAngle (dAbs (maxAngleInRadians))
+void CustomVehicleControllerComponentEngine::ConvertToMatricSystem (
+	dFloat& vehicleSpeedInKilometerPerHours, dFloat& engineMomentOfInertia,
+	dFloat& idleTorqueInPoundFoot, dFloat& revolutionsPerMinutesAtIdleTorque, 
+	dFloat& peakTorqueInPoundFoot, dFloat& revolutionsPerMinutesAtPeakTorque, 
+	dFloat& peakHorsePower, dFloat& revolutionsPerMinutesAtPeakHorsePower, 
+	dFloat& torqueAtRedLineInPoundFoot, dFloat& revolutionsPerMinutesAtRedLineTorque) const
 {
-}
+	const dFloat horsePowerToWatts = 735.5f;
+	const dFloat kmhToMetersPerSecunds = 0.278f;
+	const dFloat rpmToRadiansPerSecunds = 0.105f;
+	const dFloat poundFootToNewtonMeters = 1.356f;
+		
+	peakHorsePower *= horsePowerToWatts;
+	idleTorqueInPoundFoot *= poundFootToNewtonMeters;
+	peakTorqueInPoundFoot *= poundFootToNewtonMeters;
+	torqueAtRedLineInPoundFoot *= poundFootToNewtonMeters;
 
-void CustomVehicleControllerComponentSteering::AddSteeringTire (CustomVehicleControllerBodyStateTire* const tireNode, dFloat sign)
-{
-	dTireSignPair& pair = m_steeringTires.Append()->GetInfo();
+	revolutionsPerMinutesAtIdleTorque *= rpmToRadiansPerSecunds;
+	revolutionsPerMinutesAtPeakTorque *= rpmToRadiansPerSecunds;
+	revolutionsPerMinutesAtPeakHorsePower *= rpmToRadiansPerSecunds;
+	revolutionsPerMinutesAtRedLineTorque *= rpmToRadiansPerSecunds;
 
-	pair.m_sign = (sign >= 0.0f) ? 1.0f : -1.0f;
-	pair.m_tireNode = m_controller->m_tireList.GetNodeFromInfo (*tireNode);
-}
-
-
-void CustomVehicleControllerComponentSteering::Update (dFloat timestep)
-{
-	for (dList<dTireSignPair>::dListNode* node = m_steeringTires.GetFirst(); node; node = node->GetNext()) {
-		dTireSignPair& pair = node->GetInfo();
-		CustomVehicleControllerBodyStateTire& tire = pair.m_tireNode->GetInfo();
-		tire.m_steeringAngle = m_maxAngle * m_param * pair.m_sign;
-	}
-}
-
-
-CustomVehicleControllerComponentBrake::CustomVehicleControllerComponentBrake (CustomVehicleController* const controller, dFloat maxBrakeTorque)
-	:CustomVehicleControllerComponent (controller)
-	,m_maxBrakeTorque (dAbs (maxBrakeTorque))
-{
-}
-
-void CustomVehicleControllerComponentBrake::AddBrakeTire (CustomVehicleControllerBodyStateTire* const tire)
-{
-	m_brakeTires.Append(m_controller->m_tireList.GetNodeFromInfo (*tire));
+	vehicleSpeedInKilometerPerHours *= kmhToMetersPerSecunds;
 }
 
 
-void CustomVehicleControllerComponentBrake::Update (dFloat timestep)
+void CustomVehicleControllerComponentEngine::InitEngineTorqueCurve (
+	dFloat vehicleSpeed, dFloat engineMomentOfInertia,
+	dFloat idleTorque, dFloat rpsAtIdleTorque, 
+	dFloat peakTorque, dFloat rpsAtPeakTorque, 
+	dFloat peakHorsePower, dFloat rpsAtPeakHorsePower, 
+	dFloat torqueAtRedLine, dFloat rpsAtRedLineTorque)
 {
-	for (dList<dList<CustomVehicleControllerBodyStateTire>::dListNode*>::dListNode* node = m_brakeTires.GetFirst(); node; node = node->GetNext()) {
-		CustomVehicleControllerBodyStateTire& tire = node->GetInfo()->GetInfo();
-		tire.m_breakTorque = dMax (tire.m_breakTorque, dAbs (m_maxBrakeTorque * m_param));
-	}
-}
+	int oldGear = m_gearBox->GetGear();
+	m_gearBox->SetGear(m_gearBox->GetGearCount() - 1);
 
+	m_momentOfInertia = engineMomentOfInertia;
+	m_controller->m_engineState.Init (m_controller);
+
+	ConvertToMatricSystem (vehicleSpeed, engineMomentOfInertia, idleTorque, rpsAtIdleTorque, peakTorque, rpsAtPeakTorque, peakHorsePower, rpsAtPeakHorsePower, torqueAtRedLine, rpsAtRedLineTorque);
+	SetTopSpeed (vehicleSpeed, rpsAtPeakHorsePower);				  	   
+
+	dFloat torqueAtPeakPower = peakHorsePower / rpsAtPeakHorsePower;
+	dAssert (rpsAtIdleTorque > 0.0f);
+	dAssert (rpsAtIdleTorque < rpsAtPeakTorque);
+	dAssert (rpsAtPeakTorque < rpsAtPeakHorsePower);
+	dAssert (rpsAtPeakHorsePower < rpsAtRedLineTorque);
+
+	dAssert (idleTorque > 0.0f);
+	dAssert (idleTorque < peakTorque);
+	dAssert (peakTorque > torqueAtPeakPower);
+	dAssert (torqueAtPeakPower > torqueAtRedLine);
+	dAssert (torqueAtRedLine > 0.0f);
+	dAssert (peakTorque * rpsAtPeakTorque < peakHorsePower);
+
+	dFloat rpsTable[5];
+	dFloat torqueTable[5];
+
+	rpsTable[0] = 0.0f;
+	rpsTable[1] = rpsAtIdleTorque / m_crownGearRatio;
+	rpsTable[2] = rpsAtPeakTorque / m_crownGearRatio;
+	rpsTable[3] = rpsAtPeakHorsePower / m_crownGearRatio;
+	rpsTable[4] = rpsAtRedLineTorque / m_crownGearRatio;
+
+	torqueTable[0] = idleTorque * m_crownGearRatio;
+	torqueTable[1] = idleTorque * m_crownGearRatio;
+	torqueTable[2] = peakTorque * m_crownGearRatio;
+	torqueTable[3] = torqueAtPeakPower * m_crownGearRatio;
+	torqueTable[4] = rpsAtRedLineTorque * m_crownGearRatio;
+
+	m_torqueCurve.InitalizeCurve (sizeof (rpsTable)/sizeof (rpsTable[0]), rpsTable, torqueTable);
+
+//	m_engineResistance = redLineTorque / (rpsAtRedLineTorque * rpsAtRedLineTorque * 0.99f * 0.99f);
+//	m_engineIdleResistance = idleTorque / (rpsAtRedLineTorque * rpsAtRedLineTorque * 0.99f * 0.99f);
+
+
+//	m_radiansPerSecundsAtIdleTorque = rpsAtIdleTorque;
+//	m_radiansPerSecundsAtPeakPower = rpsAtPeakPower;
+	m_radiansPerSecundsAtRedLine = rpsAtRedLineTorque;
+
+//	m_gearBox->SetOptimalShiftLimits (rpsAtPeakTorque / rpsAtRedLineTorque, rpsAtPeakPower/ rpsAtRedLineTorque);
+
+
+	m_gearBox->SetGear(oldGear);
+}
