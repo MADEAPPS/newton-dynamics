@@ -341,14 +341,7 @@ void CustomVehicleControllerBodyStateTire::UpdateDynamicInputs(dFloat timestep)
 
 	// set the initial force on this tire
 	m_externalForce = chassis.m_gravity.Scale (m_mass);
-
-	// apply the engine torque on this tire
-	dVector torque (m_matrix[0].Scale (m_engineTorque));
-
-	// there is not direct joint between the tire and the chassis, but there tire inertia should apply some toque to the engine
-	// I will use an arbitrary 25% of the torque goes to the chassis.
-	chassis.m_externalTorque += torque.Scale (0.25f);
-	m_externalTorque = torque.Scale(-1.0f);
+	m_externalTorque = dVector (0.0f, 0.0f, 0.0f, 0.0f);
 
 	// calculate force an torque generate by the suspension
 	m_tireLoad = dVector(0.0f, 0.0f, 0.0f, 0.0f);
@@ -482,11 +475,9 @@ if ((gear > 1) && (m_myIndex == 4)) {
 }
 #endif
 
-
 	// integrate tires angular velocity
 	dVector relOmega (m_omega - chassis.m_omega);
 	m_rotatonSpeed = relOmega % m_matrix[0];
-//m_rotatonSpeed = 2.0f;
 	m_rotationAngle = dMod (m_rotationAngle + m_rotatonSpeed / invTimestep, 2.0f * 3.141592f);
 }
 
@@ -562,7 +553,6 @@ void CustomVehicleControllerBodyStateEngine::ApplyNetForceAndTorque (dFloat invT
 
 void CustomVehicleControllerBodyStateEngine::Update (dFloat timestep, CustomVehicleController* const controller)
 {
-	
     CustomVehicleControllerComponentEngine* const engine = controller->GetEngine();
     CustomVehicleControllerComponentEngine::dGearBox* const gearBox = engine->GetGearBox();
 
@@ -602,5 +592,15 @@ dAssert (0);
 
     m_externalForce = dVector (0.0f, 0.0f, 0.0f, 0.0f);
     m_externalTorque = dVector (torque, 0.0f, 0.0f, 0.0f);
+
+	CustomVehicleControllerBodyStateChassis* const chassis = &m_controller->m_chassisState;
+	dFloat sign = (gear != CustomVehicleControllerComponentEngine::dGearBox::m_newtralGear) ? ((gear == CustomVehicleControllerComponentEngine::dGearBox::m_reverseGear) ? -1.0f : 1.0f) : 0.0f;
+	// apply the engine torque on this tire
+	dVector reactionTorque (chassis->m_matrix[2].Scale (torque * sign * 0.25f));
+
+	// there is not direct joint between the tire and the chassis, but there tire inertia should apply some toque to the engine
+	// I will use an arbitrary 25% of the torque goes to the chassis.
+	chassis->m_externalTorque += reactionTorque;
+
 }
 
