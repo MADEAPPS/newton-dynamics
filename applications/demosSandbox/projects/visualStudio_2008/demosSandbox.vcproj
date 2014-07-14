@@ -1021,10 +1021,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\sdkDemos\demos\SuperCar.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\sdkDemos\demos\UserStaticCollision.cpp"
 				>
 			</File>

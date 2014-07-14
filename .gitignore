@@ -62,3 +62,6 @@ packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/
 *.idb
 *.ipch
 *.bin
+*.ncb
+*.htm
+*.dep
