@@ -209,10 +209,6 @@
     <ClInclude Include="..\..\dAnimation\dAnimationStdAfx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\coreLibrary_300\projects\windows\project_vs2010_dll\ai.vcxproj">
-      <Project>{7d48cee3-5263-46ca-bd69-924881f0ea2f}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\coreLibrary_300\projects\windows\project_vs2010_dll\core.vcxproj">
       <Project>{57ac4f2d-b115-4931-8f6e-af8ad616b6aa}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

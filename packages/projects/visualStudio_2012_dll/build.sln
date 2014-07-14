@@ -17,8 +17,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dAILibrary", "dAILibrary.vc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tinyxml", "..\..\thirdParty\tinyxml\vs2010_static_mt\tinyxml.vcxproj", "{18E509CF-46D2-4749-B3BB-160937CF2481}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ai", "..\..\..\coreLibrary_300\projects\windows\project_vs2012_dll\ai.vcxproj", "{7D48CEE3-5263-46CA-BD69-924881F0EA2F}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "core", "..\..\..\coreLibrary_300\projects\windows\project_vs2012_dll\core.vcxproj", "{57AC4F2D-B115-4931-8F6E-AF8AD616B6AA}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "newton", "..\..\..\coreLibrary_300\projects\windows\project_vs2012_dll\newton.vcxproj", "{68D9962C-0EC7-445A-B0FD-F87B16D43901}"

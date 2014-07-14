@@ -764,9 +764,6 @@ rem xcopy  "$(OutDir)$(TargetName).dll" "C:\dev\pengII\pengII\Debug\*.*"  /F /Y 
     <ProjectReference Include="..\..\..\source\pthreads.2\VS_2010\pthread.vcxproj">
       <Project>{03bca23c-02a5-415b-a37b-26600bc2ce96}</Project>
     </ProjectReference>
-    <ProjectReference Include="ai.vcxproj">
-      <Project>{7d48cee3-5263-46ca-bd69-924881f0ea2f}</Project>
-    </ProjectReference>
     <ProjectReference Include="core.vcxproj">
       <Project>{57ac4f2d-b115-4931-8f6e-af8ad616b6aa}</Project>
     </ProjectReference>

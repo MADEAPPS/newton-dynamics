@@ -11,8 +11,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread", "..\..\..\coreLib
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tutorial_101_GettingStarted", "tutorial_101_GettingStarted\tutorial_101_GettingStarted.vcxproj", "{7FB7F3A0-7508-4DB5-A79A-EBEDE896DB71}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ai", "..\..\..\coreLibrary_300\projects\windows\project_vs2010_static_md\ai.vcxproj", "{7D48CEE3-5263-46CA-BD69-924881F0EA2F}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dMath", "..\..\..\packages\projects\visualStudio_2010_static_md\dMath.vcxproj", "{CBE9E751-E58B-46C1-B6B0-873670D0F981}"
 EndProject
 Global
