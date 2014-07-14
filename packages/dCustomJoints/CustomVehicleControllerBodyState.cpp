@@ -570,24 +570,25 @@ void CustomVehicleControllerBodyStateEngine::Update (dFloat timestep, CustomVehi
 gearBox->SetGear (CustomVehicleControllerComponentEngine::dGearBox::m_newtralGear);
 
 	int gear = gearBox->GetGear();
-
     dFloat torque = 0.0f;
-    dFloat param = engine->GetParam();
+    dFloat param = engine->m_engineSwitch ? dMax (engine->GetParam(), 0.1f) : 0.0f;
 	if (gear == CustomVehicleControllerComponentEngine::dGearBox::m_newtralGear) {
-		dFloat idleRps = engine->GetIdleRadianPerSeconds();
-		dFloat idleTorque = engine->GetTorque (idleRps);
 
-        torque = idleTorque * param;
-        torque -= m_radianPerSecund * m_radianPerSecund * engine->GetIdleResistance();
+		dFloat nominalTorque = engine->GetTorque (m_radianPerSecund) * param;
+		dFloat resistance = engine->m_engineIdleResistance * m_radianPerSecund * m_radianPerSecund;
 
-		m_idleFriction.m_omega = idleRps;
-		m_idleFriction.m_friction = idleTorque * 0.1f;
+		torque = nominalTorque - resistance;
 
-torque = 1000.0f;
-m_idleFriction.m_friction = 0;
+//		dFloat idleRps = engine->GetIdleRadianPerSeconds();
+//		dFloat idleTorque = engine->GetTorque (idleRps);
+//      torque = idleTorque * param;
+//      torque -= m_radianPerSecund * m_radianPerSecund * engine->GetIdleResistance();
+		m_idleFriction.m_omega = engine->m_radiansPerSecundsAtIdleTorque;
+		m_idleFriction.m_friction = engine->m_engineIdleFriction;
 
 	} else {
 dAssert (0);
+/*
         dFloat gearGain = gearBox->GetGearRatio(gear) * engine->GetDifferencialGearRatio();
         dFloat nominalTorque = engine->GetTorque (m_radianPerSecund);
 
@@ -596,6 +597,7 @@ dAssert (0);
 
         m_leftTire.m_powerTrainGain = gearGain;
         m_rightTire.m_powerTrainGain = gearGain;
+*/
 	}
 
     m_externalForce = dVector (0.0f, 0.0f, 0.0f, 0.0f);

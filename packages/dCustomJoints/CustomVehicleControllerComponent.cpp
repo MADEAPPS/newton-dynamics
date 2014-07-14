@@ -261,11 +261,13 @@ CustomVehicleControllerComponentEngine::CustomVehicleControllerComponentEngine (
 	,m_topSpeedMPS(0.0f)
 	,m_crownGearRatio(1.0f)
     ,m_momentOfInertia(10.0f)
-    ,m_engineResistance(0.0f)
+//    ,m_engineResistance(0.0f)
+	,m_engineIdleFriction(0.0f)
     ,m_engineIdleResistance(0.0f)
 	,m_radiansPerSecundsAtRedLine(0.0f)
 	,m_radiansPerSecundsAtPeakPower(0.0f)
 	,m_radiansPerSecundsAtIdleTorque(0.0f)
+	,m_engineSwitch(true)
 {
 }
 
@@ -316,7 +318,7 @@ bool CustomVehicleControllerComponentEngine::GetTransmissionMode () const
 	return m_gearBox->GetTransmissionMode();
 }
 
-
+/*
 dFloat CustomVehicleControllerComponentEngine::GetRedLineResistance() const
 {
     return m_engineResistance;
@@ -333,18 +335,16 @@ dFloat CustomVehicleControllerComponentEngine::GetIdleRadianPerSeconds () const
 	return m_radiansPerSecundsAtIdleTorque;
 }
 
+dFloat CustomVehicleControllerComponentEngine::GetDifferencialGearRatio() const
+{
+	dAssert(0);
+	return m_crownGearRatio;
+}
+*/
 
 dFloat CustomVehicleControllerComponentEngine::GetTorque (dFloat radianPerSeconds) const
 {
     return m_torqueCurve.GetValue(radianPerSeconds);
-}
-
-
-
-dFloat CustomVehicleControllerComponentEngine::GetDifferencialGearRatio() const
-{
-	dAssert(0);
-    return m_crownGearRatio;
 }
 
 dList<CustomVehicleControllerBodyStateTire>::dListNode* CustomVehicleControllerComponentEngine::GetLeftTireNode() const
@@ -450,7 +450,7 @@ fflush (xxx);
 }
 
 
-void CustomVehicleControllerComponentEngine::ConvertToMatricSystem (
+void CustomVehicleControllerComponentEngine::ConvertToMetricSystem (
 	dFloat& vehicleSpeedInKilometerPerHours, dFloat& engineMomentOfInertia,
 	dFloat& idleTorqueInPoundFoot, dFloat& revolutionsPerMinutesAtIdleTorque, 
 	dFloat& peakTorqueInPoundFoot, dFloat& revolutionsPerMinutesAtPeakTorque, 
@@ -489,7 +489,7 @@ void CustomVehicleControllerComponentEngine::InitEngineTorqueCurve (
 	m_momentOfInertia = engineMomentOfInertia;
 	m_controller->m_engineState.Init (m_controller);
 
-	ConvertToMatricSystem (vehicleSpeed, engineMomentOfInertia, idleTorque, rpsAtIdleTorque, peakTorque, rpsAtPeakTorque, peakHorsePower, rpsAtPeakHorsePower, torqueAtRedLine, rpsAtRedLineTorque);
+	ConvertToMetricSystem (vehicleSpeed, engineMomentOfInertia, idleTorque, rpsAtIdleTorque, peakTorque, rpsAtPeakTorque, peakHorsePower, rpsAtPeakHorsePower, torqueAtRedLine, rpsAtRedLineTorque);
 	SetTopSpeed (vehicleSpeed, rpsAtPeakHorsePower);				  	   
 
 	dFloat torqueAtPeakPower = peakHorsePower / rpsAtPeakHorsePower;
@@ -523,7 +523,20 @@ void CustomVehicleControllerComponentEngine::InitEngineTorqueCurve (
 	m_torqueCurve.InitalizeCurve (sizeof (rpsTable)/sizeof (rpsTable[0]), rpsTable, torqueTable);
 
 //	m_engineResistance = redLineTorque / (rpsAtRedLineTorque * rpsAtRedLineTorque * 0.99f * 0.99f);
-//	m_engineIdleResistance = idleTorque / (rpsAtRedLineTorque * rpsAtRedLineTorque * 0.99f * 0.99f);
+
+	m_radiansPerSecundsAtIdleTorque = rpsTable[1];
+	m_radiansPerSecundsAtPeakPower = rpsTable[3];
+	m_radiansPerSecundsAtRedLine = rpsTable[4];
+
+
+	dFloat redLineRps = rpsTable[4];
+	dFloat idleEngineRps = rpsTable[1];;
+	dFloat idleEngineTorque = GetTorque (idleEngineRps);
+	dFloat redLineEngineTorque = GetTorque (redLineRps);
+
+	m_engineIdleFriction = idleEngineTorque * 0.5f;
+	dAssert ((redLineEngineTorque - m_engineIdleFriction) > 0.0f);
+	m_engineIdleResistance = (redLineEngineTorque - m_engineIdleFriction) / (rpsAtRedLineTorque * rpsAtRedLineTorque);
 
 
 //	m_radiansPerSecundsAtIdleTorque = rpsAtIdleTorque;

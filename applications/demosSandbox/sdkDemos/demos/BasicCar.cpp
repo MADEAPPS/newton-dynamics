@@ -46,7 +46,7 @@
 #define VIPER_IDLE_TORQUE				300.0f
 #define VIPER_IDLE_TORQUE_RPM			500.0f
 
-#define VIPER_ENGINE_MOMENT_OF_INERTIA  40.0f
+#define VIPER_ENGINE_MOMENT_OF_INERTIA  10.0f
 
 #define VIPER_PEAK_TORQUE				490.0f
 #define VIPER_PEAK_TORQUE_RPM			3700.0f
@@ -159,13 +159,11 @@ class BasicVehicleEntity: public DemoEntity
 		// destroy the collision helper shape 
 		NewtonDestroyCollision(chassisCollision);
 
-/*
 		for (int i = 0; i < int ((sizeof (m_gearMap) / sizeof (m_gearMap[0]))); i ++) {
 			m_gearMap[i] = i;
 		}
 		m_gearMap[0] = 1;
 		m_gearMap[1] = 0;
-*/
 	}
 
 	~BasicVehicleEntity ()
@@ -528,8 +526,6 @@ class BasicVehicleEntity: public DemoEntity
 		// check transmission type
 		int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
-engineGasPedal = 1.0f;
-
 #if 0
 	#if 0
 		static FILE* file = fopen ("log.bin", "wb");
@@ -684,7 +680,7 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 		m_redNeedle = LoadTexture ("needle_red.tga");
 		m_greenNeedle = LoadTexture ("needle_green.tga");
 
-/*		// create the vehicle sound 
+		// create the vehicle sound 
 		const char* engineSounds[] = {"engine_start.wav", "engine_rpm.wav", "tire_skid.wav"};
 		dSoundManager* const soundManager = scene->GetSoundManager();
 		for (int i = 0; i < int (sizeof (engineSounds) / sizeof (engineSounds[0])); i ++) {
@@ -702,7 +698,6 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 		soundManager->PlayChannel(rpmEngine);
 		soundManager->SetChannelPitch (rpmEngine, 0.2f);
 		soundManager->SetChannelLoopMode(rpmEngine, true);
-*/
 	}
 
 	~BasicVehicleControllerManager ()
@@ -848,9 +843,9 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 	virtual void PreUpdate (dFloat timestep)
 	{
 		// apply the vehicle controls, and all simulation time effect
-//		NewtonWorld* const world = GetWorld(); 
-//		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-//		dSoundManager* const soundManager = scene->GetSoundManager();
+		NewtonWorld* const world = GetWorld(); 
+		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
+		dSoundManager* const soundManager = scene->GetSoundManager();
 		for (dListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
 			CustomVehicleController* const controller = &ptr->GetInfo();
 			
@@ -858,7 +853,7 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 			BasicVehicleEntity* const vehicleEntity = (BasicVehicleEntity*) NewtonBodyGetUserData(body);
 
 			if (vehicleEntity == m_player) {
-/*
+
 				// player need to check if the start engine sound is still on
 				void* const starEngine = m_engineSounds[0];
 				void* const startEngineSoundAsset = soundManager->GetAsset(starEngine);
@@ -869,7 +864,6 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 					dFloat volume = soundManager->GetChannelVolume(starEngine);
 					soundManager->SetChannelVolume(starEngine, volume * 0.98f);
 				}
-*/
 
 				// do player control
 				vehicleEntity->ApplyPlayerControl ();
@@ -878,14 +872,14 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 				vehicleEntity->ApplyNPCControl ();
 			}
 
-/*
+
 			// update engine rpm sound for all vehicles
 			CustomVehicleControllerComponentEngine* const engine = vehicleEntity->m_controller->GetEngine();
-			dFloat rpm = 2.0f * engine->GetRPM () / VIPER_REDLINE_TORQUE_RPM;
+			//dFloat rpm = engine->GetRPM () / engine->GetRedLineRPM();
+			dFloat rpm = engine->GetRPM () / engine->GetTopRPM();
 //rpm = 0.0f;
 			void* const rpmEngine = m_engineSounds[1];
 			soundManager->SetChannelPitch (rpmEngine, rpm);
-*/
 		}
 
 		// do the base class post update

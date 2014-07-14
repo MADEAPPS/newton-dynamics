@@ -536,7 +536,7 @@ void CustomVehicleControllerEngineIdleJoint::UpdateSolverForces (const JacobianP
 
 void CustomVehicleControllerEngineIdleJoint::JacobianDerivative (ParamInfo* const constraintParams)
 {
-	CustomVehicleControllerComponentEngine* const engine = m_controller->GetEngine();
+	//CustomVehicleControllerComponentEngine* const engine = m_controller->GetEngine();
 	CustomVehicleControllerBodyStateEngine* const engineState = (CustomVehicleControllerBodyStateEngine*) m_state0;
 
 	const dVector& pin = engineState->m_matrix[0];
@@ -545,7 +545,7 @@ void CustomVehicleControllerEngineIdleJoint::JacobianDerivative (ParamInfo* cons
 	AddAngularRowJacobian (constraintParams, pin, 0.0f);
 	dAssert (engineState == &m_controller->m_engineState);
 
-	dFloat alpha = 0.35f * (engineState->m_omega % pin - engine->GetIdleRadianPerSeconds()) * constraintParams->m_timestepInv;
+	dFloat alpha = 0.35f * (engineState->m_omega % pin - m_omega) * constraintParams->m_timestepInv;
 
 	m_rowIsMotor[index] = true;
 	m_motorAcceleration[index] = - alpha;
