@@ -85,7 +85,7 @@ class CustomVehicleControllerComponent: public CustomAlloc
 class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComponent
 {
 	public:
-	class dGearBox
+	class dGearBox: public CustomAlloc
 	{
 		public:
 		enum dGearID
@@ -96,7 +96,7 @@ class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComp
 			m_maxGears = 16
 		};
 
-		class dGearState
+		class dGearState: public CustomAlloc  
 		{
 			public:
 			dGearState (dFloat ratio, dFloat shiftUp, dFloat shiftDown, dGearID id) 
