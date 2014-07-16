@@ -561,7 +561,7 @@ gearBox->SetGear (CustomVehicleControllerComponentEngine::dGearBox::m_newtralGea
 
 	int gear = gearBox->GetGear();
     dFloat torque = 0.0f;
-    dFloat param = engine->m_engineSwitch ? dMax (engine->GetParam(), 0.1f) : 0.0f;
+    dFloat param = engine->m_engineSwitch ? dMax (engine->GetParam(), 0.2f) : 0.0f;
 	if (gear == CustomVehicleControllerComponentEngine::dGearBox::m_newtralGear) {
 
 		dFloat nominalTorque = engine->GetTorque (m_radianPerSecund) * param;
@@ -573,7 +573,7 @@ gearBox->SetGear (CustomVehicleControllerComponentEngine::dGearBox::m_newtralGea
 //		dFloat idleTorque = engine->GetTorque (idleRps);
 //      torque = idleTorque * param;
 //      torque -= m_radianPerSecund * m_radianPerSecund * engine->GetIdleResistance();
-		m_idleFriction.m_omega = engine->m_radiansPerSecundsAtIdleTorque;
+		m_idleFriction.m_omega = engine->m_radiansPerSecundsAtIdleTorque * (engine->m_engineSwitch ? 4.0f : 0.0f);
 		m_idleFriction.m_friction = engine->m_engineIdleFriction;
 
 	} else {
