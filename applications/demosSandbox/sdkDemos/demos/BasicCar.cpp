@@ -697,8 +697,7 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 		m_greenNeedle = LoadTexture ("needle_green.tga");
 
 		// create the vehicle sound 
-		//const char* engineSounds[] = {"starter.wav", "tire_skid.wav", "rev2000.wav", "rev3000.wav", "rev4000.wav", "rev5000.wav", "rev6000.wav", "rev7000.wav", "rev8000.wav"};
-		const char* engineSounds[] = {"starter.wav", "tire_skid.wav", "rev2000.wav", "rev5000.wav", "rev8000.wav"};
+		const char* engineSounds[] = {"starter.wav", "tire_skid.wav", "revLow.wav", "revMiddle.wav", "revHigh.wav"};
 		dSoundManager* const soundManager = scene->GetSoundManager();
 		for (int i = 0; i < int (sizeof (engineSounds) / sizeof (engineSounds[0])); i ++) {
 			void* const sound = soundManager->CreateSound(engineSounds[i]);
