@@ -114,7 +114,11 @@ class BasicVehicleEntity: public DemoEntity
 		,m_helpKey (true)
 		,m_gearUpKey (false)
 		,m_gearDownKey (false)
+		,m_engineKeySwitch(false)
 		,m_automaticTransmission(true)
+		,m_engineKeySwitchCounter(0)
+		,m_engineOldKeyState(false)
+		,m_engineRPMOn(false)
 	{
 		// add this entity to the scene for rendering
 		scene->Append(this);
@@ -470,7 +474,7 @@ class BasicVehicleEntity: public DemoEntity
 		dFloat engineGasPedal = 0.0f;
 		dFloat brakePedal = 0.0f;
 		dFloat handBrakePedal = 0.0f;
-
+	
 		bool hasJopytick = mainWindow->GetJoytickPosition (joyPosX, joyPosY, joyButtons);
 		if (hasJopytick) {
 			dAssert (0);
@@ -488,6 +492,7 @@ class BasicVehicleEntity: public DemoEntity
 */			
 		} else {
 
+	
 			// get keyboard controls
 			if (mainWindow->GetKeyState ('W')) {
 				engineGasPedal = 1.0f;
@@ -523,11 +528,15 @@ class BasicVehicleEntity: public DemoEntity
 		// set the help key
 		m_helpKey.UpdatePushButton (mainWindow, 'H');
 
+		// count the engine key switch
+		m_engineKeySwitchCounter += m_engineKeySwitch.UpdateTriggerButton(mainWindow, 'Y');
+		
+
 		// check transmission type
 		int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
-#if 0
-	#if 0
+#if 1
+	#if 1
 		static FILE* file = fopen ("log.bin", "wb");
 		if (file) {
 			fwrite (&toggleTransmission, sizeof (int), 1, file);
@@ -552,6 +561,9 @@ class BasicVehicleEntity: public DemoEntity
 #endif
 
 		if (engine) {
+			m_engineOldKeyState = engine->GetKey();
+			engine->SetKey ((m_engineKeySwitchCounter & 1) ? true : false);
+
 			if (toggleTransmission) {
 				engine->SetTransmissionMode (!engine->GetTransmissionMode());
 			}
@@ -652,9 +664,12 @@ p0 += chassis.GetMatrix()[2].Scale ((tireMatrix.m_posit.m_z > 0.0f ? 1.0f : -1.0
 	DemoEntityManager::ButtonKey m_helpKey;
 	DemoEntityManager::ButtonKey m_gearUpKey;
 	DemoEntityManager::ButtonKey m_gearDownKey;
+	DemoEntityManager::ButtonKey m_engineKeySwitch;
 	DemoEntityManager::ButtonKey m_automaticTransmission;
-
 	int m_gearMap[10];
+	int m_engineKeySwitchCounter;
+	bool m_engineOldKeyState;
+	bool m_engineRPMOn;
 };
 
 
@@ -668,6 +683,7 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 		:CustomVehicleControllerManager (world)
 		,m_externalView(true)
 		,m_player (NULL) 
+		,m_soundsCount(0)
 	{
 		// hook a callback for 2d help display
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
@@ -681,23 +697,25 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 		m_greenNeedle = LoadTexture ("needle_green.tga");
 
 		// create the vehicle sound 
-		const char* engineSounds[] = {"engine_start.wav", "engine_rpm.wav", "tire_skid.wav"};
+		//const char* engineSounds[] = {"starter.wav", "tire_skid.wav", "rev2000.wav", "rev3000.wav", "rev4000.wav", "rev5000.wav", "rev6000.wav", "rev7000.wav", "rev8000.wav"};
+		const char* engineSounds[] = {"starter.wav", "tire_skid.wav", "rev2000.wav", "rev5000.wav", "rev8000.wav"};
 		dSoundManager* const soundManager = scene->GetSoundManager();
 		for (int i = 0; i < int (sizeof (engineSounds) / sizeof (engineSounds[0])); i ++) {
 			void* const sound = soundManager->CreateSound(engineSounds[i]);
 			void* const channel = soundManager->CreatePlayChannel(sound);
 			m_engineSounds[i] = channel;
+			m_soundsCount ++;
 		}
 
 		// play start engine sound
-		void* const startEngine = m_engineSounds[0];
-		soundManager->PlayChannel(startEngine);
+//		void* const startEngine = m_engineSounds[0];
+//		soundManager->PlayChannel(startEngine);
 
 		// play engine RPM sound
-		void* const rpmEngine = m_engineSounds[1];
-		soundManager->PlayChannel(rpmEngine);
-		soundManager->SetChannelPitch (rpmEngine, 0.2f);
-		soundManager->SetChannelLoopMode(rpmEngine, true);
+//		void* const rpmEngine = m_engineSounds[2];
+//		soundManager->PlayChannel(rpmEngine);
+//		soundManager->SetChannelPitch (rpmEngine, 1.0f);
+//		soundManager->SetChannelLoopMode(rpmEngine, true);
 	}
 
 	~BasicVehicleControllerManager ()
@@ -785,6 +803,7 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 		if (m_player->m_helpKey.GetPushButtonState()) {
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "Vehicle driving keyboard control:   Joystick control");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "keySwich			: 'Y'           start engine");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "accelerator         : 'W'           stick forward");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "brakes              : 'S'           stick back");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right          : 'D'           stick right");
@@ -848,23 +867,11 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 		dSoundManager* const soundManager = scene->GetSoundManager();
 		for (dListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
 			CustomVehicleController* const controller = &ptr->GetInfo();
-			
+		
 			NewtonBody* const body = controller->GetBody();
 			BasicVehicleEntity* const vehicleEntity = (BasicVehicleEntity*) NewtonBodyGetUserData(body);
 
 			if (vehicleEntity == m_player) {
-
-				// player need to check if the start engine sound is still on
-				void* const starEngine = m_engineSounds[0];
-				void* const startEngineSoundAsset = soundManager->GetAsset(starEngine);
-				dFloat length = soundManager->GetSoundlength (startEngineSoundAsset);
-				dFloat posit = soundManager->GetChannelSecPosition(starEngine);
-				if (posit >= length * 0.5f) {
-					// attenuate star engine volume 
-					dFloat volume = soundManager->GetChannelVolume(starEngine);
-					soundManager->SetChannelVolume(starEngine, volume * 0.98f);
-				}
-
 				// do player control
 				vehicleEntity->ApplyPlayerControl ();
 			} else {
@@ -872,14 +879,65 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 				vehicleEntity->ApplyNPCControl ();
 			}
 
-
-			// update engine rpm sound for all vehicles
 			CustomVehicleControllerComponentEngine* const engine = vehicleEntity->m_controller->GetEngine();
-			//dFloat rpm = engine->GetRPM () / engine->GetRedLineRPM();
-			dFloat rpm = engine->GetRPM () / engine->GetTopRPM();
-//rpm = 0.0f;
-			void* const rpmEngine = m_engineSounds[1];
-			soundManager->SetChannelPitch (rpmEngine, rpm);
+			if (engine->GetKey()) {
+				// see if the player started the engine
+				void* const startEngine = m_engineSounds[0];
+
+				if (!vehicleEntity->m_engineOldKeyState) {
+					// play engine start sound;
+					soundManager->PlayChannel(startEngine);
+
+					for (int i = 2; i < m_soundsCount; i ++) {
+						void* const rpmEngine = m_engineSounds[i];
+						soundManager->PlayChannel(rpmEngine);
+						soundManager->SetChannelPitch (rpmEngine, 1.0f);
+						soundManager->SetChannelVolume(rpmEngine, 0.0f);
+						soundManager->SetChannelLoopMode(rpmEngine, true);
+					}
+				} 
+
+				// player need to check if the start engine sound is still on
+				void* const startEngineSoundAsset = soundManager->GetAsset(startEngine);
+				dFloat length = soundManager->GetSoundlength (startEngineSoundAsset);
+				dFloat posit = soundManager->GetChannelSecPosition(startEngine);
+				
+				if (posit >= length * 0.5f) {
+					// attenuate star engine volume 
+					dFloat volume = soundManager->GetChannelVolume(startEngine);
+					if (volume < 1.0e-3f) {
+						volume = 0.0f;
+					}
+					soundManager->SetChannelVolume(startEngine, volume * 0.98f);
+					vehicleEntity->m_engineRPMOn = true;
+				}
+
+				// update engine rpm sound for all vehicles
+				if (vehicleEntity->m_engineRPMOn) {
+					int count = m_soundsCount - 3;
+					//dFloat rpm = engine->GetRPM () / engine->GetRedLineRPM();
+					dFloat rpm = count * (dClamp (engine->GetRPM () / engine->GetRedLineRPM(), 0.0f, 0.999f));
+
+					int index = dFloor(rpm);
+					rpm = dClamp (rpm - dFloat(index), 0.0f, 1.0f);
+					dAssert (index >= 0);
+					dAssert (index < count);
+					soundManager->SetChannelVolume(m_engineSounds[index + 2], 1.0f - rpm);
+					soundManager->SetChannelPitch (m_engineSounds[index + 2], rpm + 1.0f);
+
+					soundManager->SetChannelVolume(m_engineSounds[index + 3], rpm);
+					soundManager->SetChannelPitch (m_engineSounds[index + 3], rpm * 0.5f + 0.5f);
+				}
+			} else {
+				vehicleEntity->m_engineRPMOn = false;
+				if (vehicleEntity->m_engineOldKeyState) {
+					for (int i = 0; i < m_soundsCount; i ++) {
+						soundManager->SetChannelVolume(m_engineSounds[i], 0.0f);
+						soundManager->StopChannel(m_engineSounds[i]);
+					}
+				}
+			}
+
 		}
 
 		// do the base class post update
@@ -944,7 +1002,8 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 	GLuint m_odometer;
 	GLuint m_tachometer;
 	GLuint m_needle;
-	void* m_engineSounds[10];
+	int m_soundsCount;
+	void* m_engineSounds[16];
 };
 
 
