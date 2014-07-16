@@ -267,7 +267,7 @@ CustomVehicleControllerComponentEngine::CustomVehicleControllerComponentEngine (
 	,m_radiansPerSecundsAtRedLine(0.0f)
 	,m_radiansPerSecundsAtPeakPower(0.0f)
 	,m_radiansPerSecundsAtIdleTorque(0.0f)
-	,m_engineSwitch(true)
+	,m_engineSwitch(false)
 {
 }
 
@@ -297,6 +297,17 @@ CustomVehicleControllerComponentEngine::dGearBox* CustomVehicleControllerCompone
 {
     return m_gearBox;
 }
+
+bool CustomVehicleControllerComponentEngine::GetKey() const
+{
+	return m_engineSwitch;
+}
+
+void CustomVehicleControllerComponentEngine::SetKey (bool key)
+{
+	m_engineSwitch = key;
+}
+
 
 void CustomVehicleControllerComponentEngine::SetGear (int gear)
 {

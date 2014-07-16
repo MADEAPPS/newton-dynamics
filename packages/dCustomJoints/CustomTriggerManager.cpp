@@ -18,6 +18,67 @@
 #include <CustomTriggerManager.h>
 
 
+/*
+static int aabbCollisionCallback (const NewtonBody * const otherBody, void * const userData)
+{   
+	NewtonBody* const myBody = (NewtonBody*)userData;
+	dAssert (myBody);
+
+	// not interested in self collision
+	if ( myBody == otherBody ) {
+		return 1;
+	}
+
+	NewtonWorld* const world = NewtonBodyGetWorld(myBody);
+	NewtonCollision* const collisionA = NewtonBodyGetCollision(myBody);
+	NewtonCollision* const collisionB = NewtonBodyGetCollision(otherBody);
+	
+	dMatrix poseA;
+	NewtonBodyGetMatrix(myBody, &poseA[0][0]);
+
+	dMatrix poseB;
+	NewtonBodyGetMatrix(otherBody,&poseB[0][0]);
+
+	if( NewtonCollisionIntersectionTest(world, collisionA, &poseA[0][0], collisionB, &poseB[0][0],0) )
+	{
+		// ignore contact with no penetration
+		const int maxSize = 2;
+		dFloat contacts[maxSize * 3];
+		dFloat normals[maxSize * 3];
+		dFloat penetrations[maxSize];
+		dLong attrbA[maxSize * 3];
+		dLong attrbB[maxSize * 3];
+		int contactCount = NewtonCollisionCollide(world, maxSize,
+			collisionA, &poseA[0][0], 
+			collisionB, &poseB[0][0],
+			&contacts[0],
+			&normals[0],
+			&penetrations[0],
+			&attrbA[0],
+			&attrbB[0],
+			0);
+		if(contactCount) {
+//			dAssert (0);
+			contactCount*=1;
+			//entity->bodyDesc.collisionInfo.collisionList.push_back( (PhysicsBody*)(otherEntity) );
+
+		}
+	}
+	return 1;
+}
+
+
+static bool testForCollision (NewtonBody * const pBody)
+{
+	// this body has NewtonCollisionSetCollisonMode set to 0
+	dVector min;
+	dVector max;
+	NewtonBodyGetAABB (pBody, &min.m_x, &max.m_x);
+	NewtonWorld* const world = NewtonBodyGetWorld(pBody);
+	NewtonWorldForEachBodyInAABBDo(world, &min.m_x, &max.m_x, aabbCollisionCallback, pBody);
+	return true;
+}
+*/
 
 CustomTriggerManager::CustomTriggerManager(NewtonWorld* const world)
 	:CustomControllerManager<CustomTriggerController>(world, TRIGGER_PLUGIN_NAME)
@@ -53,6 +114,8 @@ void CustomTriggerManager::UpdateTrigger (CustomTriggerController* const control
 {
 	NewtonBody* const triggerBody = controller->GetBody();
 	dTree<NewtonBody*,NewtonBody*>& manifest = controller->m_manifest;
+
+//bool xxx = testForCollision (triggerBody);
 
 	for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint (triggerBody); joint; joint = NewtonBodyGetNextContactJoint (triggerBody, joint)) {
 

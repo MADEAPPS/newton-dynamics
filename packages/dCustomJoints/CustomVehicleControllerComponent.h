@@ -183,6 +183,8 @@ class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComp
 		dFloat peakHorsePower, dFloat revolutionsPerMinutesAtPeakHorsePower, 
 		dFloat torqueArRedLineInPoundFoot, dFloat revolutionsPerMinutesAtRedLineTorque);
 
+	CUSTOM_JOINTS_API bool GetKey() const;
+	CUSTOM_JOINTS_API void SetKey (bool key);
 	CUSTOM_JOINTS_API int GetGear () const;
 	CUSTOM_JOINTS_API void SetGear (int gear);
 	CUSTOM_JOINTS_API dFloat GetRPM () const;
