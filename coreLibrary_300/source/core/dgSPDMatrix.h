@@ -236,11 +236,11 @@ void dgSPDMatrix<T>::DownDateCholeskyDecomposition (dgInt32 column)
 }
 */
 
-class SymmetricBiconjugateGradientSolve
+class dgSymmetricBiconjugateGradientSolve
 {
 	public:
-	SymmetricBiconjugateGradientSolve ();
-	~SymmetricBiconjugateGradientSolve ();	
+	dgSymmetricBiconjugateGradientSolve ();
+	~dgSymmetricBiconjugateGradientSolve ();	
 
 	dgFloat64 Solve (dgInt32 size, dgFloat64 tolerance, dgFloat64* const x, const dgFloat64* const b) const;
 

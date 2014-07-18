@@ -303,30 +303,30 @@ class TestSolver_xxxxxxx: public SymmetricBiconjugateGradientSolve
 */
 
 
-SymmetricBiconjugateGradientSolve::SymmetricBiconjugateGradientSolve ()
+dgSymmetricBiconjugateGradientSolve::dgSymmetricBiconjugateGradientSolve ()
 {
 }
 
-SymmetricBiconjugateGradientSolve::~SymmetricBiconjugateGradientSolve ()
+dgSymmetricBiconjugateGradientSolve::~dgSymmetricBiconjugateGradientSolve ()
 {
 }
 
 
-void SymmetricBiconjugateGradientSolve::ScaleAdd (dgInt32 size, dgFloat64* const a, const dgFloat64* const b, dgFloat64 scale, const dgFloat64* const c) const
+void dgSymmetricBiconjugateGradientSolve::ScaleAdd (dgInt32 size, dgFloat64* const a, const dgFloat64* const b, dgFloat64 scale, const dgFloat64* const c) const
 {
 	for (dgInt32 i = 0; i < size; i ++) {
 		a[i] = b[i] + scale * c[i];
 	}
 }
 
-void SymmetricBiconjugateGradientSolve::Sub (dgInt32 size, dgFloat64* const a, const dgFloat64* const b, const dgFloat64* const c) const
+void dgSymmetricBiconjugateGradientSolve::Sub (dgInt32 size, dgFloat64* const a, const dgFloat64* const b, const dgFloat64* const c) const
 {
 	for (dgInt32 i = 0; i < size; i ++) {
 		a[i] = b[i] - c[i];
 	}
 }
 
-dgFloat64 SymmetricBiconjugateGradientSolve::DotProduct (dgInt32 size, const dgFloat64* const b, const dgFloat64* const c) const
+dgFloat64 dgSymmetricBiconjugateGradientSolve::DotProduct (dgInt32 size, const dgFloat64* const b, const dgFloat64* const c) const
 {
 	dgFloat64 product = dgFloat64 (0.0f);
 	for (dgInt32 i = 0; i < size; i ++) {
@@ -335,7 +335,7 @@ dgFloat64 SymmetricBiconjugateGradientSolve::DotProduct (dgInt32 size, const dgF
 	return product;
 }
 
-dgFloat64 SymmetricBiconjugateGradientSolve::Solve (dgInt32 size, dgFloat64 tolerance, dgFloat64* const x, const dgFloat64* const b) const
+dgFloat64 dgSymmetricBiconjugateGradientSolve::Solve (dgInt32 size, dgFloat64 tolerance, dgFloat64* const x, const dgFloat64* const b) const
 {
 	dgStack<dgFloat64> bufferR0(size);
 	dgStack<dgFloat64> bufferP0(size);

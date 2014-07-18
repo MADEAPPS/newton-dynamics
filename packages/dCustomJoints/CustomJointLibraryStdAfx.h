@@ -59,7 +59,7 @@
 #include <dVector.h>
 #include <dMatrix.h>
 #include <dQuaternion.h>
-//#include <CustomAlloc.h>
+#include <dLinearAlgebra.h>
 
 
 #endif

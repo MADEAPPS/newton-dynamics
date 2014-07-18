@@ -73,6 +73,9 @@ class CustomVehicleController: public CustomControllerBase
 	CUSTOM_JOINTS_API void SetSteering(CustomVehicleControllerComponentSteering* const steering);
 
 
+	CUSTOM_JOINTS_API void Finalize();
+
+
 	protected:
 	CUSTOM_JOINTS_API void Cleanup();
 	CUSTOM_JOINTS_API void Init (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, const dVector& gravityVector);
@@ -80,8 +83,8 @@ class CustomVehicleController: public CustomControllerBase
 	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 
 	CUSTOM_JOINTS_API int GetActiveJoints(CustomVehicleControllerJoint** const jointArray);
-	CUSTOM_JOINTS_API int BuildJacobianMatrix (int jointCount, CustomVehicleControllerJoint** const jointArray, dFloat timestep, CustomVehicleControllerJoint::JacobianPair* const jacobianArray, CustomVehicleControllerJoint::JacobianColum* const jacobianColumnArray);
-	CUSTOM_JOINTS_API void CalculateReactionsForces(int jointCount, CustomVehicleControllerJoint** const jointArray, dFloat timestep, CustomVehicleControllerJoint::JacobianPair* const jacobianArray, CustomVehicleControllerJoint::JacobianColum* const jacobianColumnArray);
+	CUSTOM_JOINTS_API int BuildJacobianMatrix (int jointCount, CustomVehicleControllerJoint** const jointArray, dFloat timestep, CustomVehicleControllerJoint::dJacobianPair* const jacobianArray, CustomVehicleControllerJoint::dJacobianColum* const jacobianColumnArray);
+	CUSTOM_JOINTS_API void CalculateReactionsForces(int jointCount, CustomVehicleControllerJoint** const jointArray, dFloat timestep, CustomVehicleControllerJoint::dJacobianPair* const jacobianArray, CustomVehicleControllerJoint::dJacobianColum* const jacobianColumnArray);
 
 //	CUSTOM_JOINTS_API void UpdateTireTransforms ();
 
@@ -94,11 +97,11 @@ class CustomVehicleController: public CustomControllerBase
 	TireList m_tireList;
 	dList<CustomVehicleControllerBodyState*> m_stateList;
 	NewtonCollision* m_tireCastShape;
-
 	CustomVehicleControllerComponentBrake* m_brakes;
 	CustomVehicleControllerComponentEngine* m_engine;
 	CustomVehicleControllerComponentBrake* m_handBrakes;
 	CustomVehicleControllerComponentSteering* m_steering; 
+	bool m_finalized;
 
 	friend class CustomVehicleControllerManager;
 	friend class CustomVehicleControllerTireJoint;
