@@ -688,8 +688,22 @@ void CustomVehicleController::Finalize()
 			return true;
 		}
 
-		CustomVehicleControllerJoint::dJacobian m_jacobians [VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS];
+		CustomVehicleControllerJoint::dJacobian m_jacobians [VEHICLE_CONTROLLER_MAX_JOINTS];
 		int m_count;
 	};
 	dWeightDistibutionSolver solver;
+
+	int count = 0;
+	m_chassisState.m_matrix = GetIdentityMatrix();
+	m_chassisState.UpdateInertia();
+	dVector dir (m_chassisState.m_localFrame[1]);
+	for (TireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+		CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
+		dVector posit  (tire->m_localFrame.m_posit);  
+		CustomVehicleControllerJoint::dJacobian &jacobian0 = solver.m_jacobians[count];
+		jacobian0.m_linear = dir;
+		jacobian0.m_angular = posit * dir;
+		jacobian0.m_angular.m_w = 0.0f;
+		count ++;
+	}
 }
