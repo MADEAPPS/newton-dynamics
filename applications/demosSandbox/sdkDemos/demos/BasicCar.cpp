@@ -622,9 +622,9 @@ class BasicVehicleEntity: public DemoEntity
 		// draw the velocity vector, a little higher so that is not hidden by the vehicle mesh 
 		dVector veloc;
 		NewtonBodyGetVelocity(body, &veloc[0]);
-		dVector q0 (p0 + chassis.GetMatrix()[1].Scale (0.5f));
+		dVector q0 (p0 + chassis.GetMatrix()[1].Scale (1.5f));
 		dVector q1 (q0 + veloc.Scale (0.25f));
-		glColor3f(0.0f, 1.0f, 1.0f);
+		glColor3f(1.0f, 0.0f, 0.0f);
 		glVertex3f (q0.m_x, q0.m_y, q0.m_z);
 		glVertex3f (q1.m_x, q1.m_y, q1.m_z);
 		
@@ -795,11 +795,14 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 		glTexCoord2f(u1, 0.0f); glVertex3f( x1, -y1, 0.0f);
 		glTexCoord2f(u1, 1.0f); glVertex3f( x1,  y1, 0.0f);
 		glEnd();
+
+		glPopMatrix();
 	}
 
 	void DrawHelp(DemoEntityManager* const scene, int lineNumber) const
 	{
 		if (m_player->m_helpKey.GetPushButtonState()) {
+/*
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "Vehicle driving keyboard control:   Joystick control");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "keySwich			: 'Y'           start engine");
@@ -812,6 +815,7 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "manual transmission : enter         button 4");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "hand brakes         : space         button 1");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help           : H");
+*/
 		}
 	}
 

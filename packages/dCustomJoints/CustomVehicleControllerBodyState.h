@@ -63,6 +63,7 @@ class CustomVehicleControllerBodyState
 	friend class CustomVehicleControllerJoint;
 	friend class CustomVehicleControllerTireJoint;
 	friend class CustomVehicleControllerContactJoint;
+	friend class CustomVehicleControllerEngineGearJoint;
 	friend class CustomVehicleControllerEngineIdleJoint;
 	friend class CustomVehicleControllerBodyStateTire;
 	friend class CustomVehicleControllerBodyStateChassis;
@@ -121,6 +122,8 @@ class CustomVehicleControllerBodyStateEngine: public CustomVehicleControllerBody
 
 	friend class CustomVehicleController;
 	friend class CustomVehicleControllerTireJoint;
+	friend class CustomVehicleControllerEngineGearJoint;
+	friend class CustomVehicleControllerEngineIdleJoint;
 	friend class CustomVehicleControllerBodyStateTire;
 	friend class CustomVehicleControllerBodyStateChassis;
 	friend class CustomVehicleControllerContactJoint;
@@ -210,6 +213,8 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 	friend class CustomVehicleController;
 	friend class CustomVehicleControllerTireJoint;
 	friend class CustomVehicleControllerContactJoint;
+	friend class CustomVehicleControllerEngineGearJoint;
+	friend class CustomVehicleControllerEngineIdleJoint;
 	friend class CustomVehicleControllerComponentBrake;
 	friend class CustomVehicleControllerComponentEngine;
 	friend class CustomVehicleControllerComponentSteering;

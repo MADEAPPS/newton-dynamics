@@ -967,32 +967,32 @@ void DemoEntityManager::RenderFrame ()
 
 		glColor3f(1.0, 1.0, 1.0);
 
-		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
+		glMatrixMode(GL_PROJECTION);
+
 		glLoadIdentity();
-		//glOrtho(0.0f, width, 0.0f, height, 0.0, 1.0);
 		gluOrtho2D(0, width, 0, height);
+		
+			glPushMatrix();
+			glMatrixMode(GL_MODELVIEW);
+			glLoadIdentity();
+
+			glDisable(GL_LIGHTING);
+			glDisable(GL_DEPTH_TEST);
+			glEnable(GL_TEXTURE_2D);	
+
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+			// render 2d display
+			m_renderHood (this, m_renderHoodContext, lineNumber);
+
+			// restore display mode
+			glMatrixMode(GL_PROJECTION);
+			glPopMatrix();
+
 
 		glMatrixMode(GL_MODELVIEW);
-		glPushMatrix();
-		glLoadIdentity();
-
-		glDisable(GL_LIGHTING);
-		glDisable(GL_DEPTH_TEST);
-		glEnable(GL_TEXTURE_2D);	
-
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-		// render 2d display
-		m_renderHood (this, m_renderHoodContext, lineNumber);
-
-		// restore display mode
 		glPopMatrix();
-
-		glMatrixMode(GL_PROJECTION);
-		glPopMatrix();
-
-		glMatrixMode(GL_MODELVIEW);
 	}
 
 

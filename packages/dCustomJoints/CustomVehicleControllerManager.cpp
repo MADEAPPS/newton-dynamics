@@ -628,6 +628,7 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 //if (xxx > 1385)
 //xxx *=1;
 //m_chassisState.m_externalForce += m_chassisState.m_matrix[0].Scale (2.0f * m_chassisState.m_mass);
+//m_chassisState.m_externalForce = dVector (0, 0, 0, 0);
 
 	// update all components
 	if (m_engine) {
