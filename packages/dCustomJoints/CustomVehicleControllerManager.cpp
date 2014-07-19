@@ -54,6 +54,47 @@ void CustomVehicleController::UpdateTireTransforms ()
 
 
 
+class CustomVehicleController::dWeightDistibutionSolver: public dSymmetricBiconjugateGradientSolve
+{
+	public:
+	dWeightDistibutionSolver ()
+		:dSymmetricBiconjugateGradientSolve()
+		,m_count(0)
+	{
+
+	}
+
+	virtual void MatrixTimeVector (dFloat64* const out, const dFloat64* const v) const
+	{
+		CustomVehicleControllerJoint::dJacobian invMassJacobians [VEHICLE_CONTROLLER_MAX_JOINTS];
+		for (int i = 0; i < m_count; i ++) {
+			out[i] = m_diagRegularizer[i] * v[i];
+			invMassJacobians[i].m_linear = m_invMassJacobians[i].m_linear.Scale (dFloat(v[i]));
+			invMassJacobians[i].m_angular = m_invMassJacobians[i].m_angular.Scale (dFloat(v[i]));
+		}
+
+		for (int i = 0; i < m_count; i ++) {
+			out[i] = invMassJacobians[i].m_linear % m_jacobians[i].m_linear + invMassJacobians[i].m_angular % m_jacobians[i].m_angular;
+		}
+	}
+
+	virtual bool InversePrecoditionerTimeVector (dFloat64* const out, const dFloat64* const v) const
+	{
+		for (int i = 0; i < m_count; i ++) {
+			out[i] = v[i] * m_invDiag[i];
+		}
+		return true;
+	}
+
+	CustomVehicleControllerJoint::dJacobian m_jacobians [VEHICLE_CONTROLLER_MAX_JOINTS];
+	CustomVehicleControllerJoint::dJacobian m_invMassJacobians [VEHICLE_CONTROLLER_MAX_JOINTS];
+	dFloat m_invDiag[VEHICLE_CONTROLLER_MAX_JOINTS];
+	dFloat m_diagRegularizer[VEHICLE_CONTROLLER_MAX_JOINTS];
+
+	int m_count;
+};
+
+
 CustomVehicleControllerManager::CustomVehicleControllerManager(NewtonWorld* const world)
 	:CustomControllerManager<CustomVehicleController> (world, VEHICLE_PLUGIN_NAME)
 {
@@ -596,6 +637,54 @@ void CustomVehicleController::CalculateReactionsForces (int jointCount, CustomVe
 }
 
 
+void CustomVehicleController::Finalize()
+{
+	dWeightDistibutionSolver solver;
+	dFloat64 unitAccel[VEHICLE_CONTROLLER_MAX_JOINTS];
+	dFloat64 sprungMass[VEHICLE_CONTROLLER_MAX_JOINTS];
+
+	dAssert (m_tireList.GetCount() <= 4);
+
+	m_finalized = true;
+	int count = 0;
+	m_chassisState.m_matrix = GetIdentityMatrix();
+	m_chassisState.UpdateInertia();
+	dVector dir (m_chassisState.m_localFrame[1]);
+	for (TireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+		CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
+		dVector posit  (tire->m_localFrame.m_posit);  
+		CustomVehicleControllerJoint::dJacobian &jacobian0 = solver.m_jacobians[count];
+		CustomVehicleControllerJoint::dJacobian &invMassJacobian0 = solver.m_invMassJacobians[count];
+		jacobian0.m_linear = dir;
+		jacobian0.m_angular = posit * dir;
+		jacobian0.m_angular.m_w = 0.0f;
+
+		invMassJacobian0.m_linear = jacobian0.m_linear.Scale(m_chassisState.m_invMass);
+		invMassJacobian0.m_angular = jacobian0.m_angular.CompProduct(m_chassisState.m_localInvInertia);
+
+		dFloat diagnal = jacobian0.m_linear % invMassJacobian0.m_linear + jacobian0.m_angular % invMassJacobian0.m_angular;
+		solver.m_diagRegularizer[count] = diagnal * 0.005f;
+		solver.m_invDiag[count] = 1.0f / (diagnal + solver.m_diagRegularizer[count]);
+
+		unitAccel[count] = 1.0f;
+		sprungMass[count] = 0.0f;
+		count ++;
+	}
+
+	solver.m_count = count;
+	solver.Solve (count, 1.0e-6f, sprungMass, unitAccel);
+
+	int index = 0;
+	for (TireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+		CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
+		tire->m_restSprunMass = sprungMass[index];
+		index ++;
+	}
+
+}
+
+
+
 void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 {
 	if (m_finalized) {
@@ -660,84 +749,4 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 	CalculateReactionsForces (jointCount, jointArray, timestep, jacobianPairArray, jacobianColumn);
 }
 
-
-void CustomVehicleController::Finalize()
-{
-	m_finalized = true;
-
-	class dWeightDistibutionSolver: public dSymmetricBiconjugateGradientSolve
-	{
-		public:
-		dWeightDistibutionSolver ()
-			:dSymmetricBiconjugateGradientSolve()
-			,m_count(0)
-		{
-
-		}
-		
-		virtual void MatrixTimeVector (dFloat64* const out, const dFloat64* const v) const
-		{
-            CustomVehicleControllerJoint::dJacobian invMassJacobians [VEHICLE_CONTROLLER_MAX_JOINTS];
-            for (int i = 0; i < m_count; i ++) {
-                out[i] = m_diagRegularizer[i] * v[i];
-                invMassJacobians[i].m_linear = m_invMassJacobians[i].m_linear.Scale (dFloat(v[i]));
-                invMassJacobians[i].m_angular = m_invMassJacobians[i].m_angular.Scale (dFloat(v[i]));
-            }
-
-            for (int i = 0; i < m_count; i ++) {
-                out[i] = invMassJacobians[i].m_linear % m_jacobians[i].m_linear + invMassJacobians[i].m_angular % m_jacobians[i].m_angular;
-            }
-		}
-
-		virtual bool InversePrecoditionerTimeVector (dFloat64* const out, const dFloat64* const v) const
-		{
-            for (int i = 0; i < m_count; i ++) {
-            	out[i] = v[i] * m_invDiag[i];
-            }
-			return true;
-		}
-
-		CustomVehicleControllerJoint::dJacobian m_jacobians [VEHICLE_CONTROLLER_MAX_JOINTS];
-        CustomVehicleControllerJoint::dJacobian m_invMassJacobians [VEHICLE_CONTROLLER_MAX_JOINTS];
-        dFloat m_invDiag[VEHICLE_CONTROLLER_MAX_JOINTS];
-        dFloat m_diagRegularizer[VEHICLE_CONTROLLER_MAX_JOINTS];
-
-		int m_count;
-	};
-
-    dFloat64 unitAccel[VEHICLE_CONTROLLER_MAX_JOINTS];
-    dFloat64 sprungMass[VEHICLE_CONTROLLER_MAX_JOINTS];
-	dWeightDistibutionSolver solver;
-
-
-	int count = 0;
-	m_chassisState.m_matrix = GetIdentityMatrix();
-	m_chassisState.UpdateInertia();
-	dVector dir (m_chassisState.m_localFrame[1]);
-	for (TireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
-		CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
-		dVector posit  (tire->m_localFrame.m_posit);  
-		CustomVehicleControllerJoint::dJacobian &jacobian0 = solver.m_jacobians[count];
-        CustomVehicleControllerJoint::dJacobian &invMassJacobian0 = solver.m_invMassJacobians[count];
-		jacobian0.m_linear = dir;
-		jacobian0.m_angular = posit * dir;
-		jacobian0.m_angular.m_w = 0.0f;
-
-        invMassJacobian0.m_linear = jacobian0.m_linear.Scale(m_chassisState.m_invMass);
-        invMassJacobian0.m_angular = jacobian0.m_angular.CompProduct(m_chassisState.m_localInvInertia);
-
-        dFloat diagnal = jacobian0.m_linear % invMassJacobian0.m_linear + jacobian0.m_angular % invMassJacobian0.m_angular;
-        solver.m_diagRegularizer[count] = diagnal * 0.005f;
-        solver.m_invDiag[count] = 1.0f / (diagnal + solver.m_diagRegularizer[count]);
-
-        unitAccel[count] = 1.0f;
-        sprungMass[count] = 0.0f;
-		count ++;
-	}
-
-    solver.m_count = count;
-    solver.Solve (count, 1.0e-6f, sprungMass, unitAccel);
-
-solver.m_count = count;
-}
 

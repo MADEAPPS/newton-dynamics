@@ -229,6 +229,7 @@ void CustomVehicleControllerBodyStateTire::Init (CustomVehicleController* const 
 	m_localInvInertia[3] = 0.0f;
 	
 
+	m_restSprunMass = 0.0f;
 	m_dampingRatio = tireInfo.m_dampingRatio;
 	m_springStrength = tireInfo.m_springStrength;
 	m_suspensionlenght = tireInfo.m_suspesionlenght;
@@ -239,8 +240,9 @@ void CustomVehicleControllerBodyStateTire::Init (CustomVehicleController* const 
 	m_rotatonSpeed = 0.0f;
 	m_rotationAngle = 0.0f;
 	m_steeringAngle = 0.0f;
-	m_adhesionCoefficient = 1.0f;
-	m_idleRollingResistance = 0.0f;
+	
+	//m_adhesionCoefficient = 1.0f;
+	//m_idleRollingResistance = 0.0f;
 	m_tireLoad = dVector(0.0f, 0.0f, 0.0f, 0.0f);
 	m_lateralForce = dVector(0.0f, 0.0f, 0.0f, 0.0f);
 	m_longitudinalForce = dVector(0.0f, 0.0f, 0.0f, 0.0f);

@@ -101,9 +101,6 @@ dFloat64 dSymmetricBiconjugateGradientSolve::Solve (int size, dFloat64 tolerance
 		}
 	}
 
-	
-	
-
 	delete[] matrixP0;
 	delete[] MinvR0;
 	delete[] p0;

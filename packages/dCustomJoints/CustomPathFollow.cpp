@@ -26,6 +26,8 @@
 
 CustomPathFollow::CustomPathFollow (const dMatrix& pinAndPivotFrame, NewtonBody* const child)
 	:CustomJoint(6, child, NULL)
+	,m_pathTangent (1.0f, 0.0f, 0.0f, 0.0f)
+	,m_pointOnPath (0.0f, 10.0f, 0.0f, 0.0)
 {
 	// calculate the two local matrix of the pivot point
 	dMatrix tmp;
@@ -82,25 +84,27 @@ void CustomPathFollow::GetInfo (NewtonJointRecord* const info) const
 }
 
 
-// caluate the closest point from the spline to point point
+void CustomPathFollow::SetPathTarget (const dVector& posit, const dVector& tangent)
+{
+	m_pointOnPath = posit;
+	m_pathTangent = tangent.Scale (1.0f / dSqrt (m_pathTangent % m_pathTangent));
+}
+
+// calculate the closest point from the spline to point point
 dMatrix CustomPathFollow::EvalueCurve (const dVector& posit)
 {
 	dMatrix matrix;
 
-	// as demonstraction I will use a starion line for path
-	dVector lineSlope (1.0f, 0.0f, 0.0f, 0.0f);
-	dVector lineOrigin (0.0f, 10.0f, 0.0f, 0.0);
 
-
-	// calculate distacne for point to list
-	matrix.m_posit = lineOrigin + lineSlope.Scale ((posit - lineOrigin) % lineSlope);
+	// calculate distance for point to list
+	matrix.m_posit = m_pointOnPath + m_pathTangent.Scale ((posit - m_pointOnPath) % m_pathTangent);
 	matrix.m_posit.m_w = 1.0f;
 
 
-	//the tangent of the path is the line slope, passes in the forst matrix dir
-	matrix.m_front = lineSlope;
+	//the tangent of the path is the line slope, passes in the first matrix dir
+	matrix.m_front = m_pathTangent;
 
-	// the normal will be such tha is is hortizaontl to the the floor and perpendicular to the path 
+	// the normal will be such that it is horizontal to the the floor and perpendicular to the path 
 	dVector normal (dVector (0.0f, 1.0f, 0.0f, 0.0f) * matrix.m_front);
 	matrix.m_up = normal.Scale (1.0f / dSqrt (normal % matrix.m_front));
 

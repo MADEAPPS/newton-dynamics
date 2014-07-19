@@ -34,6 +34,7 @@ class CustomVehicleControllerComponentSteering;
 class CustomVehicleController: public CustomControllerBase
 {
 	public:
+	class dWeightDistibutionSolver;
 	class TireList: public dList<CustomVehicleControllerBodyStateTire>
 	{
 		public:

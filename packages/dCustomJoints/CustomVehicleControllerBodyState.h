@@ -192,16 +192,19 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 	dFloat m_width;
 	dFloat m_posit;
 	dFloat m_speed;
+	
 	dFloat m_breakTorque;
 	dFloat m_engineTorque;
 	dFloat m_rotatonSpeed;
 	dFloat m_rotationAngle;
 	dFloat m_steeringAngle;
+	dFloat m_restSprunMass;
 	dFloat m_dampingRatio;
 	dFloat m_springStrength;
+	
 	dFloat m_suspensionlenght;
-	dFloat m_adhesionCoefficient; 
-	dFloat m_idleRollingResistance;
+	//dFloat m_adhesionCoefficient; 
+	//dFloat m_idleRollingResistance;
 	//dFloat m_dryFrictionTorque;
 	//dFloat m_engineTorqueResistance;
 
