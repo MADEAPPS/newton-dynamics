@@ -555,6 +555,7 @@ void CustomVehicleControllerBodyStateEngine::Update (dFloat timestep, CustomVehi
 
 	gearBox->Update (timestep);
 
+/*
 static int xxxx;
 xxxx ++;
 if(xxxx < 1000)
@@ -564,9 +565,15 @@ controller->GetSteering()->SetParam(-1.0f);
 gearBox->SetGear (CustomVehicleControllerComponentEngine::dGearBox::m_firstGear);
 engine->m_engineSwitch = true;
 }
-
+*/
 
 	int gear = gearBox->GetGear();
+if (gear > CustomVehicleControllerComponentEngine::dGearBox::m_firstGear)
+{
+gearBox->SetGear (CustomVehicleControllerComponentEngine::dGearBox::m_firstGear);
+}
+
+
     dFloat torque = 0.0f;
     dFloat param = engine->m_engineSwitch ? dMax (engine->GetParam(), 0.2f) : 0.0f;
 
@@ -581,7 +588,7 @@ engine->m_engineSwitch = true;
 		m_idleFriction.m_omega = engine->m_radiansPerSecundsAtIdleTorque * (engine->m_engineSwitch ? 4.0f : 0.0f);
 		m_idleFriction.m_friction = engine->m_engineIdleFriction;
 	} else {
-torque *= 3.0f;
+//torque *= 3.0f;
         dFloat gearGain = gearBox->GetGearRatio(gear);
         m_leftTire.m_powerTrainGain = gearGain;
         m_rightTire.m_powerTrainGain = gearGain;

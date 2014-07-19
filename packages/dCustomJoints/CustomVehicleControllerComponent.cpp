@@ -175,7 +175,7 @@ CustomVehicleControllerComponentEngine::dGearBox::dGearState* CustomVehicleContr
 
     dFloat param = engine->GetParam();
     dFloat speed = engine->GetSpeed();
-    dFloat normalrpm = engine->GetRPM() / engine->GetTopRPM ();
+    dFloat normalrpm = engine->GetRPM() / engine->GetRedLineRPM();
 
     if ((normalrpm > m_shiftUp) && (speed > 1.0f)) {
         return m_next;

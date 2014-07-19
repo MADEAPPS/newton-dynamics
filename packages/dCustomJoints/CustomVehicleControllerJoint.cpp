@@ -486,6 +486,8 @@ void CustomVehicleControllerContactJoint::JacobianDerivative (dParamInfo* const 
 				dVector contactVelocity = headingVeloc + contactRotationalVeloc;
 				dFloat longitudinalSpeed = longitudinalPin % contactVelocity;
 				if ((uAbs > 0.25f) || (wrAbs > 0.25f)) {
+					longitudinalSlipRatio = dClamp((u + Rw) / u, -1.0f, 1.0f);
+/*
 					if (wrAbs >= uAbs) {
 						longitudinalSlipRatio = (Rw + u) / Rw;
 						if (dAbs (longitudinalSlipRatio) > 1.0f) {
@@ -499,6 +501,7 @@ void CustomVehicleControllerContactJoint::JacobianDerivative (dParamInfo* const 
 							longitudinalSlipRatio = dSign(longitudinalSlipRatio);
 						}
 					}
+*/
 				}
 
 				// the SlipRatio must be between -1.0 and 1.0 
@@ -567,7 +570,7 @@ void CustomVehicleControllerContactJoint::JacobianDerivative (dParamInfo* const 
 				dFloat longitudinalForce = dAbs (longitudinalSlipRatio * tireForceCoef * f0);
 				dFloat aligningMoment = nu * tire->m_aligningMomentTrail * Teff * tireMomentCoef * f0;
 
-				//chassis.m_externalTorque += upPin.Scale (aligningMoment);
+				chassis.m_externalTorque += upPin.Scale (aligningMoment);
 
 				// add a lateral force constraint row at the contact point
 				int index = constraintParams->m_count;
