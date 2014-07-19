@@ -12,7 +12,6 @@
 
 // most the work for the tire model comes from this paper
 // http://code.eng.buffalo.edu/dat/sites/tire/tire.html 
-// http://www.ricblues.nl/techniek/Technisch%20Specialist%2093430/6%20Remgedrag%20ABS%20weggedrag/Carsim%20-%20remsimulatieprogramma/Handleiding%20carsim.pdf
 // I do not really use their Simplified Tire Model Equations, 
 // instead I use the explanation of the empirical tire model and use the slip and 
 // side slip coefficients to determine friction limits from piecewise normalized tire force curves.
@@ -25,6 +24,13 @@
 // in fact the constraint joint effect is negligible so it can be left on during the entire simulation.
 // when the car is moving a at any speed the constraint joint act a dry dolling friction.
 
+// replaced the tire model base of Pacejkas (which seems to always produce a very poor tire behavior) 
+// with the the method use in this paper 
+// http://www.ricblues.nl/techniek/Technisch%20Specialist%2093430/6%20Remgedrag%20ABS%20weggedrag/Carsim%20-%20remsimulatieprogramma/Handleiding%20carsim.pdf
+// basically th replace the Pajecka equation with the with the two series expansions 
+// f = x - |x| * x / 3 + x * x * x / 27
+// T = x - |x| * x + x * x * x / 3 - |x| * x * x * x / 27 
+// they also have a better tire fristion modle that teh naive friction cilcle projection
 
 // NewtonCustomJoint.cpp: implementation of the NewtonCustomJoint class.
 //
@@ -159,7 +165,8 @@ void CustomVehicleController::Init (NewtonCollision* const chassisShape, const d
 	// initialize vehicle internal components
 	NewtonBodyGetCentreOfMass (m_body, &m_chassisState.m_com[0]);
 
-	m_chassisState.m_gravity = gravityVector;
+	m_chassisState.m_gravity____ = gravityVector;
+	m_chassisState.m_gravityMag = dSqrt (gravityVector % gravityVector);
 	m_chassisState.Init(this, vehicleFrame);
 
 	m_stateList.Append(&m_staticWorld);
@@ -174,19 +181,8 @@ void CustomVehicleController::Init (NewtonCollision* const chassisShape, const d
 	m_steering = NULL;
 	m_handBrakes = NULL;
 
-	// set default tire model, Create a simplified normalized Tire Curve
-	// we will use a simple piece wise curve from Pacejkas tire model, 
-	// http://en.wikipedia.org/wiki/File:Magic_Formula_Curve.png
-	//an application can use advance curves like platting the complete Pacejkas empirical equation
-	//dFloat slips[] = {0.0f, 0.1f, 0.2f, 1.0f};
-	//dFloat normalizedLongitudinalForce[] = {0.0f, 0.8f, 1.0f, 1.0f};
-	//SetLongitudinalSlipRatio (sizeof (slips) / sizeof (slips[0]), slips, normalizedLongitudinalForce);
-
 	SetDryRollingFrictionTorque (100.0f/4.0f);
 	SetAerodynamicsDownforceCoefficient (0.5f * dSqrt (gravityVector % gravityVector), 60.0f * 0.447f);
-
-	SetLongitudinalSlipRatio (0.2f);
-	SetLateralSlipAngle(8.0f);
 }
 
 
@@ -224,25 +220,6 @@ dFloat CustomVehicleController::GetDryRollingFrictionTorque () const
 {
 	return m_chassisState.GetDryRollingFrictionTorque();
 }
-
-
-void CustomVehicleController::SetLateralSlipAngle(dFloat maxLongitudinalSlipAngleIndDegrees)
-{
-	dClamp (maxLongitudinalSlipAngleIndDegrees, dFloat(1.0f), dFloat(30.0f));
-	dFloat slips[] = {0.0f, maxLongitudinalSlipAngleIndDegrees * 3.141592f / 180.0f, 90.0f * 3.141592f / 180.0f};
-	dFloat force[] = {0.0f, 1.0f, VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SLIP_ANGLE};
-	m_tireLateralSlipAngle.InitalizeCurve(sizeof (slips) / sizeof (slips[0]), slips, force);
-}
-
-void CustomVehicleController::SetLongitudinalSlipRatio(dFloat maxLongitudinalSlipRatio)
-{
-	dClamp(maxLongitudinalSlipRatio, dFloat(0.01f), dFloat(0.9f));
-
-	dFloat slips[] = {0.0f, maxLongitudinalSlipRatio, 1.0f};
-	dFloat force[] = {0.0f, 1.0f, VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SIDESLIP_RATIO};
-	m_tireLongitidialSlipRatio.InitalizeCurve(sizeof (slips) / sizeof (slips[0]), slips, force);
-}
-
 
 
 CustomVehicleControllerBodyStateTire* CustomVehicleController::GetFirstTire () const
@@ -677,7 +654,7 @@ void CustomVehicleController::Finalize()
 	int index = 0;
 	for (TireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
 		CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
-		tire->m_restSprunMass = sprungMass[index];
+		tire->m_restSprunMass = dFloat (sprungMass[index]);
 		index ++;
 	}
 

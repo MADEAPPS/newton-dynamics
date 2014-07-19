@@ -219,6 +219,9 @@ void CustomVehicleControllerBodyStateTire::Init (CustomVehicleController* const 
 	m_invMass = 1.0f / m_mass;
 	m_radio = tireInfo.m_radio;
 	m_width = tireInfo.m_width;
+	m_lateralStiffness = tireInfo.m_lateralStiffness;
+	m_longitudialStiffness = tireInfo.m_longitudialStiffness;
+
 	m_localInertia[0] = m_mass * (0.50f * m_radio * m_radio);
 	m_localInertia[1] = m_mass * (0.25f * m_radio * m_radio + (1.0f / 12.0f) * m_width * m_width);
 	m_localInertia[2] = m_localInertia[1];
@@ -342,7 +345,7 @@ void CustomVehicleControllerBodyStateTire::UpdateDynamicInputs(dFloat timestep)
 	m_veloc = chassis.m_veloc + chassis.m_omega * relPosit + m_matrix[1].Scale (m_speed);
 
 	// set the initial force on this tire
-	m_externalForce = chassis.m_gravity.Scale (m_mass);
+	m_externalForce = chassis.m_gravity____.Scale (m_mass);
 	m_externalTorque = dVector (0.0f, 0.0f, 0.0f, 0.0f);
 
 	// calculate force an torque generate by the suspension

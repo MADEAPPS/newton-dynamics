@@ -439,21 +439,6 @@ void CustomVehicleControllerComponentEngine::Update (dFloat timestep)
 {
     m_controller->m_engineState.Update(timestep, m_controller);
 
-/*
-static FILE* xxx;
-if (!xxx) 
-{
-	fopen_s (&xxx, "torque_rpm.csv", "wt");
-	fprintf (xxx, "gear, tire_torque, tire_rps\n");
-}
-
-static int xxxxx;
-dTrace (("%d %f\n", xxxxx, leftRPS));
-xxxxx ++;
-fprintf (xxx, "%d, %f, %f,\n", gear * 100, leftTorque, leftRPS);
-fflush (xxx);
-*/
-
 	// set the vehicle speed
 	const CustomVehicleControllerBodyStateChassis& chassis = m_controller->m_chassisState;
 	dVector front (chassis.m_matrix.RotateVector(chassis.m_localFrame[0]));
