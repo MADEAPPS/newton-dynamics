@@ -90,7 +90,7 @@ class CustomVehicleControllerBodyStateChassis: public CustomVehicleControllerBod
 
 	dVector m_com;
 	dVector m_comOffset;
-	dVector m_gravity____;
+	dVector m_gravity;
 
 	dFloat m_gravityMag;
 	dFloat m_dryRollingFrictionTorque;
@@ -149,6 +149,7 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 		dFloat m_suspesionlenght;
 		dFloat m_lateralStiffness;
 		dFloat m_longitudialStiffness;
+		dFloat m_aligningMomentTrail;
 		void* m_userData;
 	};
 
@@ -207,6 +208,7 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 	dFloat m_suspensionlenght;
 	dFloat m_lateralStiffness;
 	dFloat m_longitudialStiffness;
+	dFloat m_aligningMomentTrail;
 	
 	//dFloat m_adhesionCoefficient; 
 	//dFloat m_idleRollingResistance;

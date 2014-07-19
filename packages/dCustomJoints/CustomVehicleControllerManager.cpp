@@ -165,7 +165,7 @@ void CustomVehicleController::Init (NewtonCollision* const chassisShape, const d
 	// initialize vehicle internal components
 	NewtonBodyGetCentreOfMass (m_body, &m_chassisState.m_com[0]);
 
-	m_chassisState.m_gravity____ = gravityVector;
+	m_chassisState.m_gravity = gravityVector;
 	m_chassisState.m_gravityMag = dSqrt (gravityVector % gravityVector);
 	m_chassisState.Init(this, vehicleFrame);
 
@@ -622,7 +622,20 @@ void CustomVehicleController::Finalize()
 
 	dAssert (m_tireList.GetCount() <= 4);
 
-	m_finalized = true;
+	// make sure tire are aligned
+/*
+	memset (unitAccel, sizeof (unitAccel), 0);
+	int index = 0;
+	for (TireList::dListNode* node0 = m_tireList.GetFirst(); node0; node0 = node0->GetNext()) {
+		if (unitAccel[index] == 0) {
+			CustomVehicleControllerBodyStateTire* const tire0 = &node0->GetInfo();
+			for (TireList::dListNode* node1 = node0->GetNext(); node1; node1 = node1->GetNext()) {
+				CustomVehicleControllerBodyStateTire* const tire1 = &node->GetInfo();
+			}
+		}
+	}
+*/
+	
 	int count = 0;
 	m_chassisState.m_matrix = GetIdentityMatrix();
 	m_chassisState.UpdateInertia();
@@ -654,10 +667,11 @@ void CustomVehicleController::Finalize()
 	int index = 0;
 	for (TireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
 		CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
-		tire->m_restSprunMass = dFloat (sprungMass[index]);
+		tire->m_restSprunMass = dFloat (5.0f * dFloor (sprungMass[index] / 5.0f + 0.5f));
 		index ++;
 	}
 
+	m_finalized = true;
 }
 
 
@@ -696,10 +710,15 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 		tire->UpdateDynamicInputs(timestep);
 	}
 
-//static int xxx;
-//xxx ++;
-//if (xxx > 1385)
-//xxx *=1;
+static int xxx;
+xxx ++;
+if (xxx > 1780)
+xxx *=1;
+
+//dVector xxxxx;
+//NewtonBodyGetOmega(body, &xxxxx[0]);
+//dAssert (dAbs(xxxxx.m_y) < 0.01f);
+//NewtonBodySetOmega(body, &xxxxx[0]);
 //m_chassisState.m_externalForce += m_chassisState.m_matrix[0].Scale (2.0f * m_chassisState.m_mass);
 //m_chassisState.m_externalForce = dVector (0, 0, 0, 0);
 
@@ -724,6 +743,8 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 	int jointCount = GetActiveJoints(jointArray);
 	BuildJacobianMatrix (jointCount, jointArray, timestep, jacobianPairArray, jacobianColumn);
 	CalculateReactionsForces (jointCount, jointArray, timestep, jacobianPairArray, jacobianColumn);
+
+//dTrace (("f(%f %f %f) T(%f %f %f)\n", m_chassisState.m_externalForce.m_x, m_chassisState.m_externalForce.m_y, m_chassisState.m_externalForce.m_z, m_chassisState.m_externalTorque.m_x, m_chassisState.m_externalTorque.m_y, m_chassisState.m_externalTorque.m_z));
 }
 
 

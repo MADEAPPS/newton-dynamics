@@ -429,171 +429,178 @@ void CustomVehicleControllerContactJoint::UpdateSolverForces (const dJacobianPai
 
 void CustomVehicleControllerContactJoint::JacobianDerivative (dParamInfo* const constraintParams)
 {
+	CustomVehicleControllerBodyStateChassis& chassis = m_controller->m_chassisState;
 	CustomVehicleControllerBodyStateTire* const tire = (CustomVehicleControllerBodyStateTire*) m_state1;
-	const CustomVehicleControllerBodyStateChassis& chassis = m_controller->GetChassisState();
 	const dMatrix& tireMatrix = tire->m_matrix;
 
-//	const CustomVehicleControllerComponent::dInterpolationCurve& lateralSlipAngleCurve = m_controller->m_tireLateralSlipAngle;
-//	const CustomVehicleControllerComponent::dInterpolationCurve& longitudinalSlipRationCurve = m_controller->m_tireLongitidialSlipRatio;
-
 	const dVector& upPin = chassis.m_matrix[1];
-	dFloat restTireLoad = chassis.m_gravityMag * tire->m_restSprunMass;
-	for (int i = 0; i < m_contactCount; i ++) {
-		// rubber tire traction friction model
-		dVector normal (m_contacts[i].m_normal);
-		dVector lateralPin (tireMatrix[0]);
-		dVector longitudinalPin (normal * lateralPin);
-		dFloat pinMag2 = longitudinalPin % longitudinalPin;
-		if (pinMag2 > 1.0e-3f) {
+	dFloat tireLoad = tire->m_tireLoad % upPin;
+	if (tireLoad > 0.01f) {
+		dFloat restTireLoad = chassis.m_gravityMag * tire->m_restSprunMass;
+		for (int i = 0; i < m_contactCount; i ++) {
+			// rubber tire traction friction model
+			dVector normal (m_contacts[i].m_normal);
+			dVector lateralPin (tireMatrix[0]);
+			dVector longitudinalPin (normal * lateralPin);
+			dFloat pinMag2 = longitudinalPin % longitudinalPin;
+			if (pinMag2 > 1.0e-3f) {
 
-			longitudinalPin = longitudinalPin.Scale (1.0f / dSqrt(pinMag2));
-			lateralPin = longitudinalPin * normal;
+				longitudinalPin = longitudinalPin.Scale (1.0f / dSqrt(pinMag2));
+				lateralPin = longitudinalPin * normal;
 
-			dVector contactPoint (m_contacts[i].m_point);
-			dVector hitBodyPointVelocity;
-			NewtonBodyGetPointVelocity (m_contacts[i].m_hitBody, &contactPoint[0], &hitBodyPointVelocity[0]);
-			hitBodyPointVelocity.m_w = 0.0f;
+				dVector contactPoint (m_contacts[i].m_point);
+				dVector hitBodyPointVelocity;
+				NewtonBodyGetPointVelocity (m_contacts[i].m_hitBody, &contactPoint[0], &hitBodyPointVelocity[0]);
+				hitBodyPointVelocity.m_w = 0.0f;
 
-			dVector headingVeloc (tire->m_veloc + hitBodyPointVelocity);
-			headingVeloc -= normal.Scale (headingVeloc % normal);
+				dVector headingVeloc (tire->m_veloc + hitBodyPointVelocity);
+				headingVeloc -= normal.Scale (headingVeloc % normal);
 
-			dFloat v = lateralPin % headingVeloc;
-			dFloat u = longitudinalPin % headingVeloc;
+				dFloat v = lateralPin % headingVeloc;
+				dFloat u = longitudinalPin % headingVeloc;
 
-			dVector radius (contactPoint - tireMatrix[3]);
-			dVector contactRotationalVeloc (tire->m_omega * radius);
-			dFloat Rw = longitudinalPin % contactRotationalVeloc;
+				dVector radius (contactPoint - tireMatrix[3]);
+				dVector contactRotationalVeloc (tire->m_omega * radius);
+				dFloat Rw = longitudinalPin % contactRotationalVeloc;
 
-			dFloat uAbs = dAbs (u);
-			dFloat vAbs = dAbs (v);
-			dFloat wrAbs = dAbs (Rw);
+				dFloat uAbs = dAbs (u);
+				dFloat vAbs = dAbs (v);
+				dFloat wrAbs = dAbs (Rw);
 
-			// calculate lateral slip angle
-			dFloat sideSlipAngle = 1.0f;
-			dFloat lateralSpeed = v;
-			if (uAbs > 0.25f) {
-				sideSlipAngle = dAtan2 (vAbs, uAbs);
-				dAssert (sideSlipAngle >= 0.0f);
-				dAssert (sideSlipAngle <= (3.141592f * 0.5f));
+				// calculate lateral slip angle
+				dFloat sideSlipAngle = 1.0f;
+				dFloat lateralSpeed = v;
+				if (uAbs > 0.25f) {
+					sideSlipAngle = dAtan2 (vAbs, uAbs);
+					dAssert (sideSlipAngle >= 0.0f);
+					dAssert (sideSlipAngle <= (3.141592f * 0.5f));
 
-				// max sideSlip = tan(20.0f)
-				if (sideSlipAngle > 0.364f) {
-					lateralSpeed = v - 0.364f * uAbs * dSign (v);
-				}
-			}
-
-			// calculate longitudinal slip ratio 
-			dFloat longitudinalSlipRatio = 1.0f;
-			dVector contactVelocity = headingVeloc + contactRotationalVeloc;
-			dFloat longitudinalSpeed = longitudinalPin % contactVelocity;
-			if ((uAbs > 0.25f) || (wrAbs > 0.25f)) {
-				if (wrAbs >= uAbs) {
-					longitudinalSlipRatio = (Rw + u) / Rw;
-					if (dAbs (longitudinalSlipRatio) > 1.0f) {
-						// here the tire loses traction, but for now do not calculate velocity
-						longitudinalSlipRatio = dSign(longitudinalSlipRatio);
-					}
-				}  else {
-					longitudinalSlipRatio = (Rw + u) / u;
-					if (dAbs (longitudinalSlipRatio) > 1.0f) {
-						// here the tire is in kinetic friction state, but for now do not calculate velocity
-						longitudinalSlipRatio = dSign(longitudinalSlipRatio);
+					// max sideSlip = tan(20.0f)
+					if (sideSlipAngle > 0.364f) {
+						lateralSpeed = v - 0.364f * uAbs * dSign (v);
 					}
 				}
-			}
 
-			// the SlipRatio must be between -1.0 and 1.0 
-//			dFloat normalizedLongitudinalForce = longitudinalSlipRationCurve.GetValue (longitudinalSlipRatio);
-//			dAssert (normalizedLongitudinalForce >= 0.0f);
-//			dAssert (normalizedLongitudinalForce <= 1.0f);
+				// calculate longitudinal slip ratio 
+				dFloat longitudinalSlipRatio = 1.0f;
+				dVector contactVelocity = headingVeloc + contactRotationalVeloc;
+				dFloat longitudinalSpeed = longitudinalPin % contactVelocity;
+				if ((uAbs > 0.25f) || (wrAbs > 0.25f)) {
+					if (wrAbs >= uAbs) {
+						longitudinalSlipRatio = (Rw + u) / Rw;
+						if (dAbs (longitudinalSlipRatio) > 1.0f) {
+							// here the tire loses traction, but for now do not calculate velocity
+							longitudinalSlipRatio = dSign(longitudinalSlipRatio);
+						}
+					}  else {
+						longitudinalSlipRatio = (Rw + u) / u;
+						if (dAbs (longitudinalSlipRatio) > 1.0f) {
+							// here the tire is in kinetic friction state, but for now do not calculate velocity
+							longitudinalSlipRatio = dSign(longitudinalSlipRatio);
+						}
+					}
+				}
 
-			// get the normalized lateral and longitudinal forces
-//			dAssert (sideSlipAngle >= 0.0f);
-//			dFloat normalizedLateralForce = lateralSlipAngleCurve.GetValue (sideSlipAngle);
-//			dAssert (normalizedLateralForce >= 0.0f);
-//			dAssert (normalizedLateralForce <= 1.0f);
+				// the SlipRatio must be between -1.0 and 1.0 
+	//			dFloat normalizedLongitudinalForce = longitudinalSlipRationCurve.GetValue (longitudinalSlipRatio);
+	//			dAssert (normalizedLongitudinalForce >= 0.0f);
+	//			dAssert (normalizedLongitudinalForce <= 1.0f);
 
-			// get the normalize tire load
-			dFloat tireLoad = tire->m_tireLoad % upPin;
-			dFloat normalizedTireLoad = dClamp (tireLoad / restTireLoad, 0.0f, 4.0f);
+				// get the normalized lateral and longitudinal forces
+	//			dAssert (sideSlipAngle >= 0.0f);
+	//			dFloat normalizedLateralForce = lateralSlipAngleCurve.GetValue (sideSlipAngle);
+	//			dAssert (normalizedLateralForce >= 0.0f);
+	//			dAssert (normalizedLateralForce <= 1.0f);
 
-			// calculate longitudinal and lateral forces magnitude when no friction Limit (for now ignore camber angle effects)
-			dFloat camberEffect = 0.0f;
-			dFloat longitudinalStiffness = tire->m_longitudialStiffness * chassis.m_gravityMag;
-			dFloat lateralStiffness = restTireLoad * tire->m_lateralStiffness * normalizedTireLoad;
-			dFloat Teff = dTan (sideSlipAngle - camberEffect);
-
-			dFloat Fy0 = lateralStiffness * Teff;
-			dFloat Fx0 = longitudinalStiffness * longitudinalSlipRatio;
-
-			// for now assume tire/road friction is 1.0
-			dFloat contactGroundFriction = 1.0f;
-
-			dFloat tireLoadFriction = contactGroundFriction * tireLoad;
-			dFloat K = dSqrt (Fx0 * Fx0 + Fy0 * Fy0) / tireLoadFriction;
-
-			// now use the friction curve approximation 
-			// http://www.ricblues.nl/techniek/Technisch%20Specialist%2093430/6%20Remgedrag%20ABS%20weggedrag/Carsim%20-%20remsimulatieprogramma/Handleiding%20carsim.pdf
-			// basically it replace the Pajecka equation with the with the two series expansions 
-			// f = x - |x| * x / 3 + x * x * x / 27
-			dFloat tireNormalizeForce = dMin (K * (1.0f - dAbs (K) / 3.0f + K * K / 27.0f), 1.5f);
-
-			dFloat nu = 1.0f;
-			if (K < 2.0f * 3.141592f) {
-				dFloat lateralToLongitudinalRatio = lateralStiffness / longitudinalStiffness;
-				nu = 0.5f * (1.0f + lateralToLongitudinalRatio - (1.0f - lateralToLongitudinalRatio) * dCos (0.5f * K));
-			}
-
-			// apply circle of friction
-			//dFloat mag2 = normalizedLongitudinalForce * normalizedLongitudinalForce + normalizedLateralForce * normalizedLateralForce;
-			//if (mag2 > 1.0f) {
-				// if tire fore is large that the circle of friction, 
-				// longitudinal force is the dominant force, and the lateral force is project over the circle of friction
-				//normalizedLateralForce = dSqrt (1.0f - normalizedLongitudinalForce * normalizedLongitudinalForce);
-				//dFloat minLateralForce = lateralSlipAngleCurve.GetValue (0.5f * 3.14159f) * 0.25f;
-				//if (normalizedLateralForce < minLateralForce){
-					// do not allow lateral friction to be zero
-					//normalizedLateralForce = minLateralForce;
-				//}
-			//}
-			// get tire load
-			//dFloat tireLoad = (tire->m_tireLoad % tireMatrix[1]) * contactGroundFriction * tire->m_adhesionCoefficient;
+				// get the normalize tire load
 			
-			dFloat f0 = tireLoadFriction / dSqrt (longitudinalSlipRatio * longitudinalSlipRatio + nu * Teff * nu * Teff);
-			dFloat lateralForce = dAbs (nu * Teff * tireNormalizeForce * f0);
-			dFloat longitudinalForce = dAbs (longitudinalSlipRatio * tireNormalizeForce * f0);
+				dFloat normalizedTireLoad = dClamp (tireLoad / restTireLoad, 0.0f, 4.0f);
 
-			// add a lateral force constraint row at the contact point
-			int index = constraintParams->m_count;
-			AddLinearRowJacobian (constraintParams, contactPoint, lateralPin);
-			constraintParams->m_jointLowFriction[index] = -lateralForce;
-			constraintParams->m_jointHighFriction[index] = lateralForce;
-			constraintParams->m_jointAccel[index] = - 0.7f * lateralSpeed * constraintParams->m_timestepInv;
-			index ++;
+				// calculate longitudinal and lateral forces magnitude when no friction Limit (for now ignore camber angle effects)
+				dFloat camberEffect = 0.0f;
+				dFloat longitudinalStiffness = tire->m_longitudialStiffness * chassis.m_gravityMag;
+				dFloat lateralStiffness = restTireLoad * tire->m_lateralStiffness * normalizedTireLoad;
+				dFloat Teff = dTan (sideSlipAngle - camberEffect);
 
-			// add a longitudinal force constraint row at the contact point
-			AddLinearRowJacobian (constraintParams, contactPoint, longitudinalPin);
-			constraintParams->m_jointLowFriction[index] = - longitudinalForce;
-			constraintParams->m_jointHighFriction[index] = longitudinalForce;
-			constraintParams->m_jointAccel[index] = - 0.7f * longitudinalSpeed * constraintParams->m_timestepInv;
+				dFloat Fy0 = lateralStiffness * Teff;
+				dFloat Fx0 = longitudinalStiffness * longitudinalSlipRatio;
 
-			if (tire->m_posit <= 1.0e-3f)  {
+				// for now assume tire/road friction is 1.0
+				dFloat contactGroundFriction = 1.0f;
 
-				dAssert (0);
-				// add the stop constraint here
-/*
-				AddLinearRowJacobian (constraintParams, tire->m_contactPoint, tire->m_contactPoint, upPin);
-				constraintParams.m_jointLowFriction[params.m_rows - 1] = 0;
+				dFloat tireLoadFriction = contactGroundFriction * tireLoad;
+				dFloat K = dSqrt (Fx0 * Fx0 + Fy0 * Fy0) / tireLoadFriction;
+				dAssert (K >= 0.0f);
 
-				PointDerivativeParam pointData;
-				InitPointParam (pointData, tire.m_contactPoint, tire.m_contactPoint);
-				dVector velocError (pointData.m_veloc1 - pointData.m_veloc0);
-				dFloat restitution = 0.01f;
-				dFloat relVelocErr = velocError.dot(upPin);
-				if (relVelocErr > 0.0f) {
-					relVelocErr *= (restitution + dFloat (1.0f));
-				params.m_jointAccel[params.m_rows - 1] = dgMax (dFloat (-4.0f), relVelocErr) * params.m_invTimestep;
-*/
+				// now use the friction curve approximation 
+				// http://www.ricblues.nl/techniek/Technisch%20Specialist%2093430/6%20Remgedrag%20ABS%20weggedrag/Carsim%20-%20remsimulatieprogramma/Handleiding%20carsim.pdf
+				// basically it replace the Pajecka equation with the with the two series expansions 
+				// f = x - |x| * x / 3 + x * x * x / 27
+				// m = x - |x| * x + x * x * x / 3 + x * x * x * x / 27
+				dFloat tireForceCoef = dMin (K * (1.0f - K / 3.0f + K * K / 27.0f), 1.5f);
+				dFloat k1 = dMin (K, 3.0f);
+				dFloat tireMomentCoef = k1 * (1.0f - k1 + k1 * k1 / 3.0f - k1 * k1 * k1 / 27.0f);
+
+				dFloat nu = 1.0f;
+				if (K < 2.0f * 3.141592f) {
+					dFloat lateralToLongitudinalRatio = lateralStiffness / longitudinalStiffness;
+					nu = 0.5f * (1.0f + lateralToLongitudinalRatio - (1.0f - lateralToLongitudinalRatio) * dCos (0.5f * K));
+				}
+
+				// apply circle of friction
+				//dFloat mag2 = normalizedLongitudinalForce * normalizedLongitudinalForce + normalizedLateralForce * normalizedLateralForce;
+				//if (mag2 > 1.0f) {
+					// if tire fore is large that the circle of friction, 
+					// longitudinal force is the dominant force, and the lateral force is project over the circle of friction
+					//normalizedLateralForce = dSqrt (1.0f - normalizedLongitudinalForce * normalizedLongitudinalForce);
+					//dFloat minLateralForce = lateralSlipAngleCurve.GetValue (0.5f * 3.14159f) * 0.25f;
+					//if (normalizedLateralForce < minLateralForce){
+						// do not allow lateral friction to be zero
+						//normalizedLateralForce = minLateralForce;
+					//}
+				//}
+				// get tire load
+				//dFloat tireLoad = (tire->m_tireLoad % tireMatrix[1]) * contactGroundFriction * tire->m_adhesionCoefficient;
+			
+				dFloat f0 = tireLoadFriction / dSqrt (longitudinalSlipRatio * longitudinalSlipRatio + nu * Teff * nu * Teff);
+				dFloat lateralForce = dAbs (nu * Teff * tireForceCoef * f0);
+				dFloat longitudinalForce = dAbs (longitudinalSlipRatio * tireForceCoef * f0);
+				dFloat aligningMoment = nu * tire->m_aligningMomentTrail * Teff * tireMomentCoef * f0;
+
+				//chassis.m_externalTorque += upPin.Scale (aligningMoment);
+
+				// add a lateral force constraint row at the contact point
+				int index = constraintParams->m_count;
+				AddLinearRowJacobian (constraintParams, contactPoint, lateralPin);
+				constraintParams->m_jointLowFriction[index] = -lateralForce;
+				constraintParams->m_jointHighFriction[index] = lateralForce;
+				constraintParams->m_jointAccel[index] = - 0.7f * lateralSpeed * constraintParams->m_timestepInv;
+				index ++;
+
+				// add a longitudinal force constraint row at the contact point
+				AddLinearRowJacobian (constraintParams, contactPoint, longitudinalPin);
+				constraintParams->m_jointLowFriction[index] = - longitudinalForce;
+				constraintParams->m_jointHighFriction[index] = longitudinalForce;
+				constraintParams->m_jointAccel[index] = - 0.7f * longitudinalSpeed * constraintParams->m_timestepInv;
+
+				if (tire->m_posit <= 1.0e-3f)  {
+
+					dAssert (0);
+					// add the stop constraint here
+	/*
+					AddLinearRowJacobian (constraintParams, tire->m_contactPoint, tire->m_contactPoint, upPin);
+					constraintParams.m_jointLowFriction[params.m_rows - 1] = 0;
+
+					PointDerivativeParam pointData;
+					InitPointParam (pointData, tire.m_contactPoint, tire.m_contactPoint);
+					dVector velocError (pointData.m_veloc1 - pointData.m_veloc0);
+					dFloat restitution = 0.01f;
+					dFloat relVelocErr = velocError.dot(upPin);
+					if (relVelocErr > 0.0f) {
+						relVelocErr *= (restitution + dFloat (1.0f));
+					params.m_jointAccel[params.m_rows - 1] = dgMax (dFloat (-4.0f), relVelocErr) * params.m_invTimestep;
+	*/
+				}
 			}
 		}
 	}
