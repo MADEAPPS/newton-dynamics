@@ -90,6 +90,12 @@ void CustomPathFollow::SetPathTarget (const dVector& posit, const dVector& tange
 	m_pathTangent = tangent.Scale (1.0f / dSqrt (m_pathTangent % m_pathTangent));
 }
 
+void CustomPathFollow::GetPathTarget (dVector& posit, dVector& tangent) const 
+{
+	posit = m_pointOnPath;
+	tangent = m_pathTangent;
+}
+
 // calculate the closest point from the spline to point point
 dMatrix CustomPathFollow::EvalueCurve (const dVector& posit)
 {

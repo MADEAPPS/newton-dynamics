@@ -26,7 +26,10 @@ class CustomPathFollow: public CustomJoint
 	CUSTOM_JOINTS_API CustomPathFollow (const dMatrix& pinAndPivotFrame, NewtonBody* const body);
 	CUSTOM_JOINTS_API virtual ~CustomPathFollow();
 
+
+	CUSTOM_JOINTS_API void GetPathTarget (dVector& posit, dVector& tangent) const;
 	CUSTOM_JOINTS_API void SetPathTarget (const dVector& posit, const dVector& tangent);
+	
 	
 
 	protected:
