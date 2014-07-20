@@ -186,6 +186,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\dMath\dLinearAlgebra.cpp" />
     <ClCompile Include="..\..\dMath\dMathDefines.cpp" />
     <ClCompile Include="..\..\dMath\dMatrix.cpp" />
     <ClCompile Include="..\..\dMath\dQuaternion.cpp" />
@@ -198,6 +199,7 @@
     <ClCompile Include="..\..\dMath\dVector.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\dMath\dLinearAlgebra.h" />
     <ClInclude Include="..\..\dMath\dMathDefines.h" />
     <ClInclude Include="..\..\dMath\dMatrix.h" />
     <ClInclude Include="..\..\dMath\dQuaternion.h" />

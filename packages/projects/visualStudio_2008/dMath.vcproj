@@ -608,6 +608,14 @@
 	</References>
 	<Files>
 		<File
+			RelativePath="..\..\dMath\dLinearAlgebra.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dMath\dLinearAlgebra.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\dMath\dMathDefines.cpp"
 			>
 		</File>
