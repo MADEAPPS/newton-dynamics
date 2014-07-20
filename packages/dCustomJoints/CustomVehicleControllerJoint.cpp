@@ -355,7 +355,7 @@ void CustomVehicleControllerEngineGearJoint::JacobianDerivative (dParamInfo* con
 	dFloat tireOmega = tireAxis % tire->m_omega;  
 	dFloat engineOmega = engineAxis % engine->m_omega;  
 
-//	dTrace (("tire = %f, engine = %f\n", tireOmega, engineOmega));
+	//dFloat ratio = -(m_powerTrainGain * tireOmega + engineOmega) * constraintParams->m_timestepInv;
 	dFloat ratio = -(tireOmega + engineOmega / m_powerTrainGain) * constraintParams->m_timestepInv;
 	AddAngularRowJacobian (constraintParams, engineAxis, tireAxis.Scale (scale), ratio);
 }
@@ -483,8 +483,8 @@ void CustomVehicleControllerContactJoint::JacobianDerivative (dParamInfo* const 
 
 				// calculate longitudinal slip ratio 
 				dFloat longitudinalSlipRatio = 1.0f;
-				dVector contactVelocity = headingVeloc + contactRotationalVeloc;
-				dFloat longitudinalSpeed = longitudinalPin % contactVelocity;
+				//dVector contactVelocity = headingVeloc + contactRotationalVeloc;
+				//dFloat longitudinalSpeed = longitudinalPin % contactVelocity;
 				if ((uAbs > 0.25f) || (wrAbs > 0.25f)) {
 					longitudinalSlipRatio = dClamp((u + Rw) / u, -1.0f, 1.0f);
 /*
@@ -529,7 +529,7 @@ void CustomVehicleControllerContactJoint::JacobianDerivative (dParamInfo* const 
 				dFloat Fx0 = longitudinalStiffness * longitudinalSlipRatio;
 
 				// for now assume tire/road friction is 1.0
-				dFloat contactGroundFriction = 1.0f;
+				dFloat contactGroundFriction = 1.5f;
 
 				dFloat tireLoadFriction = contactGroundFriction * tireLoad;
 				dFloat K = dSqrt (Fx0 * Fx0 + Fy0 * Fy0) / tireLoadFriction;
@@ -581,10 +581,11 @@ void CustomVehicleControllerContactJoint::JacobianDerivative (dParamInfo* const 
 				index ++;
 
 				// add a longitudinal force constraint row at the contact point
+				dFloat longitudinalSpeed = u + Rw;
 				AddLinearRowJacobian (constraintParams, contactPoint, longitudinalPin);
 				constraintParams->m_jointLowFriction[index] = - longitudinalForce;
 				constraintParams->m_jointHighFriction[index] = longitudinalForce;
-				constraintParams->m_jointAccel[index] = - 0.7f * longitudinalSpeed * constraintParams->m_timestepInv;
+				constraintParams->m_jointAccel[index] = - longitudinalSpeed * constraintParams->m_timestepInv;
 
 				if (tire->m_posit <= 1.0e-3f)  {
 

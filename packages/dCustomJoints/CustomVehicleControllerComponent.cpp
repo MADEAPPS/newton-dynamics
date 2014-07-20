@@ -505,20 +505,22 @@ void CustomVehicleControllerComponentEngine::InitEngineTorqueCurve (
 	dFloat torqueTable[5];
 
 	rpsTable[0] = 0.0f;
-	rpsTable[1] = rpsAtIdleTorque / m_crownGearRatio;
-	rpsTable[2] = rpsAtPeakTorque / m_crownGearRatio;
-	rpsTable[3] = rpsAtPeakHorsePower / m_crownGearRatio;
-	rpsTable[4] = rpsAtRedLineTorque / m_crownGearRatio;
+	rpsTable[1] = rpsAtIdleTorque;
+	rpsTable[2] = rpsAtPeakTorque;
+	rpsTable[3] = rpsAtPeakHorsePower;
+	rpsTable[4] = rpsAtRedLineTorque;
 
-	torqueTable[0] = idleTorque * m_crownGearRatio;
-	torqueTable[1] = idleTorque * m_crownGearRatio;
-	torqueTable[2] = peakTorque * m_crownGearRatio;
-	torqueTable[3] = torqueAtPeakPower * m_crownGearRatio;
-	torqueTable[4] = rpsAtRedLineTorque * m_crownGearRatio;
+	torqueTable[0] = idleTorque;
+	torqueTable[1] = idleTorque;
+	torqueTable[2] = peakTorque;
+	torqueTable[3] = torqueAtPeakPower;
+	torqueTable[4] = rpsAtRedLineTorque;
 
+	for (int i = 0; i < sizeof (rpsTable) / sizeof (rpsTable[0]); i ++) {
+		rpsTable[i] /= m_crownGearRatio;
+		//torqueTable[i] *= m_crownGearRatio;
+	}
 	m_torqueCurve.InitalizeCurve (sizeof (rpsTable)/sizeof (rpsTable[0]), rpsTable, torqueTable);
-
-//	m_engineResistance = redLineTorque / (rpsAtRedLineTorque * rpsAtRedLineTorque * 0.99f * 0.99f);
 
 	m_radiansPerSecundsAtIdleTorque = rpsTable[1];
 	m_radiansPerSecundsAtPeakPower = rpsTable[3];
@@ -526,7 +528,7 @@ void CustomVehicleControllerComponentEngine::InitEngineTorqueCurve (
 
 
 	dFloat redLineRps = rpsTable[4];
-	dFloat idleEngineRps = rpsTable[1];;
+	dFloat idleEngineRps = rpsTable[1];
 	dFloat idleEngineTorque = GetTorque (idleEngineRps);
 	dFloat redLineEngineTorque = GetTorque (redLineRps);
 

@@ -318,6 +318,7 @@ void CustomVehicleControllerBodyStateTire::Collide (CustomControllerConvexCastPr
 	dVector rayDestination (tireMatrix.TransformVector(localMatrix.m_up.Scale(-m_suspensionlenght)));   
 
 	m_contactJoint.m_contactCount = 0;
+
 	NewtonCollisionSetScale (m_controller->m_tireCastShape, m_width, m_radio, m_radio);
 	m_contactJoint.m_contactCount = NewtonWorldConvexCast (world, &tireMatrix[0][0], &rayDestination[0], m_controller->m_tireCastShape, &hitParam, &filter, CustomControllerConvexCastPreFilter::Prefilter, m_contactJoint.m_contacts, sizeof (m_contactJoint.m_contacts) / sizeof (m_contactJoint.m_contacts[0]), 0);
 	if (m_contactJoint.m_contactCount) {
@@ -348,6 +349,21 @@ void CustomVehicleControllerBodyStateTire::UpdateDynamicInputs(dFloat timestep)
 	// set the initial force on this tire
 	m_externalForce = chassis.m_gravity.Scale (m_mass);
 	m_externalTorque = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+
+	// project contact to the surface of the tire shape
+	for (int i = 0; i < m_contactJoint.m_contactCount; i ++) {
+		NewtonWorldConvexCastReturnInfo& contact = m_contactJoint.m_contacts[i];
+
+		dVector point (contact.m_point[0], contact.m_point[1], contact.m_point[2], 0.0f);
+		dVector radius (point - m_matrix[3]);
+		radius -= m_matrix[0].Scale (m_matrix[0] % radius);
+		dAssert ((radius % radius) > 0.0f);
+		radius = radius.Scale (m_radio / dSqrt (radius % radius));
+		point = m_matrix[3] + radius;
+		contact.m_point[0] = point.m_x;
+		contact.m_point[1] = point.m_y;
+		contact.m_point[2] = point.m_z;
+	}
 
 	// calculate force an torque generate by the suspension
 	m_tireLoad = dVector(0.0f, 0.0f, 0.0f, 0.0f);
@@ -380,6 +396,9 @@ void CustomVehicleControllerBodyStateTire::UpdateDynamicInputs(dFloat timestep)
 		// the spring apply the same force in the opposite direction to the tire
 		m_externalForce -= m_tireLoad;
 	}
+
+
+
 }
 
 
@@ -588,7 +607,7 @@ gearBox->SetGear (CustomVehicleControllerComponentEngine::dGearBox::m_firstGear)
 		m_idleFriction.m_omega = engine->m_radiansPerSecundsAtIdleTorque * (engine->m_engineSwitch ? 4.0f : 0.0f);
 		m_idleFriction.m_friction = engine->m_engineIdleFriction;
 	} else {
-//torque *= 3.0f;
+torque *= 2.0f;
         dFloat gearGain = gearBox->GetGearRatio(gear);
         m_leftTire.m_powerTrainGain = gearGain;
         m_rightTire.m_powerTrainGain = gearGain;

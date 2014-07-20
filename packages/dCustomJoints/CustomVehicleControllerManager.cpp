@@ -744,6 +744,15 @@ xxx *=1;
 	BuildJacobianMatrix (jointCount, jointArray, timestep, jacobianPairArray, jacobianColumn);
 	CalculateReactionsForces (jointCount, jointArray, timestep, jacobianPairArray, jacobianColumn);
 
+/*
+dTrace (("%f %f %f  ", m_engine->GetSpeed(), m_engineState.m_radianPerSecund, m_engine->GetGearBox()->GetGearRatio(m_engine->GetGear())));
+//for (TireList::dListNode* node = m_tireList.GetFirst()->GetNext()->GetNext(); node; node = node->GetNext()) {
+for (TireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
+dTrace (("%f ", tire->m_rotatonSpeed * tire->m_radio));
+}
+dTrace (("\n"));
+*/
 //dTrace (("f(%f %f %f) T(%f %f %f)\n", m_chassisState.m_externalForce.m_x, m_chassisState.m_externalForce.m_y, m_chassisState.m_externalForce.m_z, m_chassisState.m_externalTorque.m_x, m_chassisState.m_externalTorque.m_y, m_chassisState.m_externalTorque.m_z));
 }
 

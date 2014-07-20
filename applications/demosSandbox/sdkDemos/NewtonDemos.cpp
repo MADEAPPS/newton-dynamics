@@ -299,8 +299,8 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	,m_fps(0.0f)
 {
 
-m_showNormalForces = true;
-m_showCenterOfMass = true;
+//m_showNormalForces = true;
+//m_showCenterOfMass = true;
 //m_hideVisualMeshes = true;
 
 	memset (m_profilerTracksMenu, 0, sizeof (m_profilerTracksMenu));

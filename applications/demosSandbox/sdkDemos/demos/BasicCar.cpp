@@ -42,51 +42,48 @@
 // Reverse 2.90:1 
 
 // vehicle definition for a Muscle car
-//#define VIPER_IDLE_TORQUE				 40.0f
-#define VIPER_IDLE_TORQUE				300.0f
-#define VIPER_IDLE_TORQUE_RPM			500.0f
+//#define VIPER_IDLE_TORQUE					 40.0f
+#define VIPER_IDLE_TORQUE					300.0f
+#define VIPER_IDLE_TORQUE_RPM				500.0f
 
-#define VIPER_ENGINE_MOMENT_OF_INERTIA  10.0f
+#define VIPER_ENGINE_MOMENT_OF_INERTIA		10.0f
 
-#define VIPER_PEAK_TORQUE				490.0f
-#define VIPER_PEAK_TORQUE_RPM			3700.0f
+#define VIPER_PEAK_TORQUE					490.0f
+#define VIPER_PEAK_TORQUE_RPM				3700.0f
 
-#define VIPER_PEAK_HP					450.0f
-#define VIPER_PEAK_HP_RPM				5200.0f
+#define VIPER_PEAK_HP						450.0f
+#define VIPER_PEAK_HP_RPM					5200.0f
 
 
-#define VIPER_REDLINE_TORQUE			30.0f
-#define VIPER_REDLINE_TORQUE_RPM		6000.0f
+#define VIPER_REDLINE_TORQUE				30.0f
+#define VIPER_REDLINE_TORQUE_RPM			6000.0f
 
-#define VIPER_MASS						1500.0f
-#define VIPER_TIRE_STEER_ANGLE			35.0f
+#define VIPER_MASS							1500.0f
+#define VIPER_TIRE_STEER_ANGLE				35.0f
 
 // note: tire unsprung mass (note the engine impose a limit of 1.0 / 50.0 mass ratio between connected bodies 
-//#define VIPER_TIRE_MASS				(VIPER_MASS / 50.0f)  
-#define VIPER_TIRE_MASS					40.0f  
+//#define VIPER_TIRE_MASS					(VIPER_MASS / 50.0f)  
+#define VIPER_TIRE_MASS						40.0f  
 
-//#define VIPER_TIRE_TOP_SPEED			164 mile / hours
-#define VIPER_TIRE_TOP_SPEED_KMH		(264.0f)			 
+//#define VIPER_TIRE_TOP_SPEED				164 mile / hours
+#define VIPER_TIRE_TOP_SPEED_KMH			264.0f			 
 
-#define VIPER_TIRE_LATERAL_STIFFNESS		(20.0f)
-#define VIPER_TIRE_LONGITUDINAL_STIFFNESS	(1000.0f)
-#define VIPER_TIRE_ALIGNING_MOMENT_TRAIL	(0.5f)
-#define VIPER_TIRE_SUSPENSION_SPRING		(15000.0f)
-#define VIPER_TIRE_SUSPENSION_DAMPER		(600.0f)
-#define VIPER_TIRE_SUSPENSION_LENGTH		(0.20f)
-#define VIPER_TIRE_BRAKE_TORQUE				(2000.0f)
+#define VIPER_TIRE_LATERAL_STIFFNESS		20.0f
+#define VIPER_TIRE_LONGITUDINAL_STIFFNESS	1000.0f
+#define VIPER_TIRE_ALIGNING_MOMENT_TRAIL	0.5f
+#define VIPER_TIRE_SUSPENSION_SPRING		15000.0f
+#define VIPER_TIRE_SUSPENSION_DAMPER		600.0f
+#define VIPER_TIRE_SUSPENSION_LENGTH		0.20f
+#define VIPER_TIRE_BRAKE_TORQUE				2000.0f
 
-#define VIPER_TIRE_GEAR_1				2.66f
-#define VIPER_TIRE_GEAR_2				1.78f
-#define VIPER_TIRE_GEAR_3 				1.30f
-#define VIPER_TIRE_GEAR_4 				1.00f
-#define VIPER_TIRE_GEAR_5 				0.74f
-#define VIPER_TIRE_GEAR_6 				0.50f
-#define VIPER_TIRE_GEAR_REVERSE			2.90f
-
-
-#define VIPER_COM_Y_OFFSET				-0.30f
-
+#define VIPER_TIRE_GEAR_1					2.66f
+#define VIPER_TIRE_GEAR_2					1.78f
+#define VIPER_TIRE_GEAR_3 					1.30f
+#define VIPER_TIRE_GEAR_4 					1.00f
+#define VIPER_TIRE_GEAR_5 					0.74f
+#define VIPER_TIRE_GEAR_6 					0.50f
+#define VIPER_TIRE_GEAR_REVERSE				2.90f
+#define VIPER_COM_Y_OFFSET					-0.30f
 
 #define VEHICLE_THIRD_PERSON_VIEW_HIGHT		2.0f
 #define VEHICLE_THIRD_PERSON_VIEW_DIST		10.0f
@@ -633,9 +630,9 @@ class BasicVehicleEntity: public DemoEntity
 		// draw the velocity vector, a little higher so that is not hidden by the vehicle mesh 
 		dVector veloc;
 		NewtonBodyGetVelocity(body, &veloc[0]);
-		dVector q0 (p0 + chassis.GetMatrix()[1].Scale (1.5f));
+		dVector q0 (p0 + chassis.GetMatrix()[1].Scale (1.0f));
 		dVector q1 (q0 + veloc.Scale (0.25f));
-		glColor3f(1.0f, 0.0f, 0.0f);
+		glColor3f(1.0f, 1.0f, 0.0f);
 		glVertex3f (q0.m_x, q0.m_y, q0.m_z);
 		glVertex3f (q1.m_x, q1.m_y, q1.m_z);
 		
@@ -684,8 +681,6 @@ p0 += chassis.GetMatrix()[2].Scale ((tireMatrix.m_posit.m_z > 0.0f ? 1.0f : -1.0
 };
 
 
-
-
 class BasicVehicleControllerManager: public CustomVehicleControllerManager
 {
 	public:
@@ -716,16 +711,6 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 			m_engineSounds[i] = channel;
 			m_soundsCount ++;
 		}
-
-		// play start engine sound
-//		void* const startEngine = m_engineSounds[0];
-//		soundManager->PlayChannel(startEngine);
-
-		// play engine RPM sound
-//		void* const rpmEngine = m_engineSounds[2];
-//		soundManager->PlayChannel(rpmEngine);
-//		soundManager->SetChannelPitch (rpmEngine, 1.0f);
-//		soundManager->SetChannelLoopMode(rpmEngine, true);
 	}
 
 	~BasicVehicleControllerManager ()
@@ -813,7 +798,6 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 	void DrawHelp(DemoEntityManager* const scene, int lineNumber) const
 	{
 		if (m_player->m_helpKey.GetPushButtonState()) {
-/*
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "Vehicle driving keyboard control:   Joystick control");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "keySwich			: 'Y'           start engine");
@@ -826,7 +810,6 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "manual transmission : enter         button 4");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "hand brakes         : space         button 1");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help           : H");
-*/
 		}
 	}
 
@@ -985,7 +968,6 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 		dVector frontDir (camMatrix[0]);
 		dVector camOrigin; 
 		if (m_externalView) {
-//			camOrigin = playerMatrix.TransformVector( dVector(0.0f, VEHICLE_THIRD_PERSON_VIEW_HIGHT, 0.0f, 0.0f));
 			camOrigin = playerMatrix.m_posit + dVector(0.0f, VEHICLE_THIRD_PERSON_VIEW_HIGHT, 0.0f, 0.0f);
 			camOrigin -= frontDir.Scale(VEHICLE_THIRD_PERSON_VIEW_DIST);
 		} else {

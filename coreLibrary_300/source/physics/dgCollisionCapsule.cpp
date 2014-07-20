@@ -302,17 +302,6 @@ dgVector dgCollisionCapsule::SupportVertex (const dgVector& dir, dgInt32* const 
 {
 	dgAssert (dgAbsf(dir % dir - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 
-//	dgVector p0(dir.Scale3 (m_radius));
-//	dgVector p1(p0);
-//	p0.m_x += m_height;
-//	p1.m_x -= m_height;
-//	dgFloat32 dir0 = p0 % dir;
-//	dgFloat32 dir1 = p1 % dir;
-//	if (dir1 > dir0) {
-//		p0 = p1;
-//	}
-//	return p0;
-
 	dgVector p0(dir.Scale4 (m_radius));
 	dgVector p1(p0);
 	dgVector height (m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));

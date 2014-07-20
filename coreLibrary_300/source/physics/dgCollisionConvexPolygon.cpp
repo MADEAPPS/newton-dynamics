@@ -707,9 +707,9 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue (dgCollis
 
 	dgMatrix polygonMatrix;
 	polygonMatrix[0] = m_localPoly[1] - m_localPoly[0];
-	polygonMatrix[0] = polygonMatrix[0].CompProduct4 (polygonMatrix[0].DotProduct4(polygonMatrix[0]).InvSqrt());
-	polygonMatrix[1] = m_normal * polygonMatrix[0];
-	polygonMatrix[2] = m_normal;
+	polygonMatrix[0] = polygonMatrix[0].CompProduct4 (polygonMatrix[0].InvMagSqrt());
+	polygonMatrix[1] = m_normal;
+	polygonMatrix[2] = polygonMatrix[0] * m_normal;
 	polygonMatrix[3] = hullOrigin;
 	dgAssert (polygonMatrix.TestOrthogonal());
 

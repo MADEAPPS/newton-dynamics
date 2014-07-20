@@ -68,6 +68,7 @@ class dgCollisionChamferCylinder: public dgCollisionConvex
 	static dgInt32 m_shapeRefCount;
 	static dgConvexSimplexEdge m_edgeArray[];
 	static dgVector m_shapesDirs[];
+	static dgVector m_yzMask;
 
 	friend class dgWorld;
 };

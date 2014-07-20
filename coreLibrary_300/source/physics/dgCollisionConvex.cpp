@@ -1537,7 +1537,7 @@ void dgCollisionConvex::SetVolumeAndCG ()
 	dgVector p0; 
 	dgVector p1;
 	for (dgInt32 i = 0; i < 3; i ++) {
-		dgVector dir (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)); 
+		dgVector dir (dgFloat32 (0.0f)); 
 		dir[i] = dgFloat32 (-1.0f);
 		p0[i] = SupportVertex(dir, NULL)[i];
 
