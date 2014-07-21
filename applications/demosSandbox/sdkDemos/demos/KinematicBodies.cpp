@@ -18,10 +18,10 @@
 #include "PhysicsUtils.h"
 
 
-class PhantomPlacemet: public DemoEntity
+class PhantomPlacement: public DemoEntity
 {
 	public:
-	PhantomPlacemet (DemoEntityManager* const scene)
+	PhantomPlacement (DemoEntityManager* const scene)
 		:DemoEntity (GetIdentityMatrix(), NULL)
 	{
 		NewtonWorld* const world = scene->GetNewton();
@@ -87,7 +87,7 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 	{
 		scene->Set2DDisplayRenderFunction (RenderHelp, this);
 
-		m_phantomEntity = new PhantomPlacemet (scene);
+		m_phantomEntity = new PhantomPlacement (scene);
 		scene->Append (m_phantomEntity);
 	}
 
@@ -111,10 +111,86 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 	{
 	};
 
+    static dFloat RayCastFilter (const NewtonBody* const body, const NewtonCollision* const collisionHit, const dFloat* const contact, const dFloat* const normal, dLong collisionID, void* const userData, dFloat intersetParam)
+    {
+        dKinematicPlacementManager* const me = (dKinematicPlacementManager*) userData;
+        if (me->m_phantomEntity->m_phantom != body) {
+            if (intersetParam < me->m_hitPoint) {
+                me->m_hitPoint = intersetParam;
+            }
+            return intersetParam;
+        }
+        return 1.0f;
+    }
+
+    virtual void PostUpdate (dFloat timestep)
+    {
+    }
+
+/*
+    static int aabbCollisionCallback (const NewtonBody * const otherBody, void * const userData)
+    {   
+	    NewtonBody* const myBody = (NewtonBody*)userData;
+	    dAssert (myBody);
+
+	    // not interested in self collision
+	    if ( myBody == otherBody ) {
+		    return 1;
+	    }
+
+	    NewtonWorld* const world = NewtonBodyGetWorld(myBody);
+	    NewtonCollision* const collisionA = NewtonBodyGetCollision(myBody);
+	    NewtonCollision* const collisionB = NewtonBodyGetCollision(otherBody);
+	
+	    dMatrix poseA;
+	    NewtonBodyGetMatrix(myBody, &poseA[0][0]);
+
+	    dMatrix poseB;
+	    NewtonBodyGetMatrix(otherBody,&poseB[0][0]);
+
+	    if( NewtonCollisionIntersectionTest(world, collisionA, &poseA[0][0], collisionB, &poseB[0][0],0) )
+	    {
+		    // ignore contact with no penetration
+		    const int maxSize = 2;
+		    dFloat contacts[maxSize * 3];
+		    dFloat normals[maxSize * 3];
+		    dFloat penetrations[maxSize];
+		    dLong attrbA[maxSize * 3];
+		    dLong attrbB[maxSize * 3];
+		    int contactCount = NewtonCollisionCollide(world, maxSize,
+			    collisionA, &poseA[0][0], 
+			    collisionB, &poseB[0][0],
+			    &contacts[0],
+			    &normals[0],
+			    &penetrations[0],
+			    &attrbA[0],
+			    &attrbB[0],
+			    0);
+		    if(contactCount) {
+    //			dAssert (0);
+			    contactCount*=1;
+			    //entity->bodyDesc.collisionInfo.collisionList.push_back( (PhysicsBody*)(otherEntity) );
+
+		    }
+	    }
+	    return 1;
+    }
+
+
+    static bool testForCollision (NewtonBody * const pBody)
+    {
+	    // this body has NewtonCollisionSetCollisonMode set to 0
+	    dVector min;
+	    dVector max;
+	    NewtonBodyGetAABB (pBody, &min.m_x, &max.m_x);
+	    NewtonWorld* const world = NewtonBodyGetWorld(pBody);
+	    NewtonWorldForEachBodyInAABBDo(world, &min.m_x, &max.m_x, aabbCollisionCallback, pBody);
+	    return true;
+    }
+*/
 
 	virtual void PreUpdate (dFloat timestep)
 	{
-		//CustomControllerManager<dKinematicPlacement>::PreUpdate (timestep);
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 		NewtonDemos* const mainWindow = scene->GetRootWindow();
@@ -138,11 +214,21 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 			dVector p0 (camera->ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
 			dVector p1 (camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
 
+//            dMousePickClass rayCast;
+            m_hitPoint = 1.2f;
+            NewtonWorldRayCast(world, &p0[0], &p1[0], RayCastFilter, this, NULL, 0);
+            if (m_hitPoint < 1.0f) {
+                dMatrix matrix (GetIdentityMatrix());
+                matrix.m_posit = p0 + (p1 - p0).Scale (m_hitPoint);
+                NewtonBodySetMatrix(m_phantomEntity->m_phantom, &matrix[0][0]);
+            }
+
+
+/*
 			// do the convex cast here 
 			dMatrix matrix (GetIdentityMatrix());
 			matrix.m_posit = p0;
 
-/*
 			dFloat hitParam;
 			NewtonWorldConvexCastReturnInfo info[16];
 			NewtonCollision* const shape = m_stupidLevel->GetCurrentShape();
@@ -156,9 +242,10 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 		}
 	}
 
-	PhantomPlacemet* m_phantomEntity;
+	PhantomPlacement* m_phantomEntity;
 	DemoEntityManager::ButtonKey m_helpKey;
 	DemoEntityManager::ButtonKey m_selectShape;
+    dFloat m_hitPoint;
 };
 
 
