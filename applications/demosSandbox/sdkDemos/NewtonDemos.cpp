@@ -68,7 +68,7 @@ void PrecessingTops (DemoEntityManager* const scene);
 void ClosestDistance (DemoEntityManager* const scene);
 void ConvexCast (DemoEntityManager* const scene);
 void PrimitiveCollision (DemoEntityManager* const scene);
-void KinematicBodies (DemoEntityManager* const scene);
+void KinematicPlacement (DemoEntityManager* const scene);
 void ClothPath(DemoEntityManager* const scene);
 void SoftBodies (DemoEntityManager* const scene);
 void BasicBoxStacks (DemoEntityManager* const scene);
@@ -108,7 +108,7 @@ NewtonDemos::SDKDemos NewtonDemos::m_demosSelection[] =
 	{wxT("Precessing tops"), wxT("show natural precession"), PrecessingTops},
 	{wxT("Closest distance"), wxT("demonstrate closest distance to a convex shape"), ClosestDistance},
 	{wxT("Primitive Collision"), wxT("demonstrate separate collision of primitives"), PrimitiveCollision},
-	{wxT("Kinematic bodies"), wxT("demonstrate separate collision of primitives"), KinematicBodies},
+	{wxT("Kinematic bodies"), wxT("demonstrate separate collision of primitives"), KinematicPlacement},
 	{wxT("Primitive convex cast"), wxT("demonstrate separate primitive convex cast"), ConvexCast},
 	{wxT("Simple box Stacks"), wxT("show simple stack of Boxes"), BasicBoxStacks},
 	{wxT("Unoptimized mesh collision"), wxT("show simple level mesh"), SimpleMeshLevelCollision},
