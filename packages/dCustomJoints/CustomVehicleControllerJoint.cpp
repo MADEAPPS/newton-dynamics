@@ -483,40 +483,11 @@ void CustomVehicleControllerContactJoint::JacobianDerivative (dParamInfo* const 
 
 				// calculate longitudinal slip ratio 
 				dFloat longitudinalSlipRatio = 1.0f;
-				//dVector contactVelocity = headingVeloc + contactRotationalVeloc;
-				//dFloat longitudinalSpeed = longitudinalPin % contactVelocity;
 				if ((uAbs > 0.25f) || (wrAbs > 0.25f)) {
 					longitudinalSlipRatio = dClamp((u + Rw) / u, -1.0f, 1.0f);
-/*
-					if (wrAbs >= uAbs) {
-						longitudinalSlipRatio = (Rw + u) / Rw;
-						if (dAbs (longitudinalSlipRatio) > 1.0f) {
-							// here the tire loses traction, but for now do not calculate velocity
-							longitudinalSlipRatio = dSign(longitudinalSlipRatio);
-						}
-					}  else {
-						longitudinalSlipRatio = (Rw + u) / u;
-						if (dAbs (longitudinalSlipRatio) > 1.0f) {
-							// here the tire is in kinetic friction state, but for now do not calculate velocity
-							longitudinalSlipRatio = dSign(longitudinalSlipRatio);
-						}
-					}
-*/
 				}
 
-				// the SlipRatio must be between -1.0 and 1.0 
-	//			dFloat normalizedLongitudinalForce = longitudinalSlipRationCurve.GetValue (longitudinalSlipRatio);
-	//			dAssert (normalizedLongitudinalForce >= 0.0f);
-	//			dAssert (normalizedLongitudinalForce <= 1.0f);
-
-				// get the normalized lateral and longitudinal forces
-	//			dAssert (sideSlipAngle >= 0.0f);
-	//			dFloat normalizedLateralForce = lateralSlipAngleCurve.GetValue (sideSlipAngle);
-	//			dAssert (normalizedLateralForce >= 0.0f);
-	//			dAssert (normalizedLateralForce <= 1.0f);
-
 				// get the normalize tire load
-			
 				dFloat normalizedTireLoad = dClamp (tireLoad / restTireLoad, 0.0f, 4.0f);
 
 				// calculate longitudinal and lateral forces magnitude when no friction Limit (for now ignore camber angle effects)
@@ -541,36 +512,22 @@ void CustomVehicleControllerContactJoint::JacobianDerivative (dParamInfo* const 
 				// f = x - |x| * x / 3 + x * x * x / 27
 				// m = x - |x| * x + x * x * x / 3 + x * x * x * x / 27
 				dFloat tireForceCoef = dMin (K * (1.0f - K / 3.0f + K * K / 27.0f), 1.5f);
-				dFloat k1 = dMin (K, 3.0f);
-				dFloat tireMomentCoef = k1 * (1.0f - k1 + k1 * k1 / 3.0f - k1 * k1 * k1 / 27.0f);
 
 				dFloat nu = 1.0f;
 				if (K < 2.0f * 3.141592f) {
 					dFloat lateralToLongitudinalRatio = lateralStiffness / longitudinalStiffness;
 					nu = 0.5f * (1.0f + lateralToLongitudinalRatio - (1.0f - lateralToLongitudinalRatio) * dCos (0.5f * K));
 				}
-
-				// apply circle of friction
-				//dFloat mag2 = normalizedLongitudinalForce * normalizedLongitudinalForce + normalizedLateralForce * normalizedLateralForce;
-				//if (mag2 > 1.0f) {
-					// if tire fore is large that the circle of friction, 
-					// longitudinal force is the dominant force, and the lateral force is project over the circle of friction
-					//normalizedLateralForce = dSqrt (1.0f - normalizedLongitudinalForce * normalizedLongitudinalForce);
-					//dFloat minLateralForce = lateralSlipAngleCurve.GetValue (0.5f * 3.14159f) * 0.25f;
-					//if (normalizedLateralForce < minLateralForce){
-						// do not allow lateral friction to be zero
-						//normalizedLateralForce = minLateralForce;
-					//}
-				//}
-				// get tire load
-				//dFloat tireLoad = (tire->m_tireLoad % tireMatrix[1]) * contactGroundFriction * tire->m_adhesionCoefficient;
 			
 				dFloat f0 = tireLoadFriction / dSqrt (longitudinalSlipRatio * longitudinalSlipRatio + nu * Teff * nu * Teff);
 				dFloat lateralForce = dAbs (nu * Teff * tireForceCoef * f0);
 				dFloat longitudinalForce = dAbs (longitudinalSlipRatio * tireForceCoef * f0);
-				dFloat aligningMoment = nu * tire->m_aligningMomentTrail * Teff * tireMomentCoef * f0;
 
-				chassis.m_externalTorque += upPin.Scale (aligningMoment);
+				// ignore the tire alignment torque for now
+				//dFloat k1 = dMin (K, 3.0f);
+				//dFloat tireMomentCoef = k1 * (1.0f - k1 + k1 * k1 / 3.0f - k1 * k1 * k1 / 27.0f);
+				//dFloat aligningMoment = nu * tire->m_aligningMomentTrail * Teff * tireMomentCoef * f0;
+				//chassis.m_externalTorque += upPin.Scale (aligningMoment);
 
 				// add a lateral force constraint row at the contact point
 				int index = constraintParams->m_count;

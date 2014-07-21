@@ -712,7 +712,7 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 
 static int xxx;
 xxx ++;
-if (xxx > 1780)
+if (xxx > 1500)
 xxx *=1;
 
 //dVector xxxxx;

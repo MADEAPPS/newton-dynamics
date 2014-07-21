@@ -518,7 +518,7 @@ void CustomVehicleControllerComponentEngine::InitEngineTorqueCurve (
 
 	for (int i = 0; i < sizeof (rpsTable) / sizeof (rpsTable[0]); i ++) {
 		rpsTable[i] /= m_crownGearRatio;
-		//torqueTable[i] *= m_crownGearRatio;
+		torqueTable[i] *= m_crownGearRatio;
 	}
 	m_torqueCurve.InitalizeCurve (sizeof (rpsTable)/sizeof (rpsTable[0]), rpsTable, torqueTable);
 
