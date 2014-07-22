@@ -104,8 +104,9 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 		if (m_helpKey.GetPushButtonState()) {
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "Right click and drag the location where you want to place a dynamic body");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "space      : change casting shape");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "h          : hide help");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "Left click while Right click down place a dynamics body if the location is free of intersection");
+			//lineNumber = scene->Print (color, 10, lineNumber + 20, "space      : change casting shape");
+			//lineNumber = scene->Print (color, 10, lineNumber + 20, "h          : hide help");
 		}
 	}
 
