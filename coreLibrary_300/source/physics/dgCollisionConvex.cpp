@@ -3166,7 +3166,7 @@ dgInt32 dgCollisionConvex::CalculateConvexCastContacts(dgCollisionParamProxy& pr
 		{
 			case dgCollisionInstance::m_unit:
 			case dgCollisionInstance::m_uniform:
-			break;
+				break;
 			case dgCollisionInstance::m_nonUniform:
 			{
 				normal = normal.CompProduct4(invScale);
@@ -3207,7 +3207,7 @@ dgInt32 dgCollisionConvex::CalculateConvexCastContacts(dgCollisionParamProxy& pr
 				if (proxy.m_referenceCollision->GetCollisionMode() & proxy.m_floatingCollision->GetCollisionMode()) {
 
 					proxy.m_contactJoint->m_contactActive = 1;	
-					dgVector contactPoint ((minkHull.m_p + minkHull.m_q).Scale3 (dgFloat32 (0.5f)));
+					dgVector contactPoint ((minkHull.m_p + minkHull.m_q).Scale4 (dgFloat32 (0.5f)));
 					// note: not sure if I need to restore the proxy.m_matrix, provable so, but for now I will not
 					proxy.m_matrix = minkHull.m_matrix;
 					count = CalculateContacts (contactPoint, minkHull.m_normal.Scale4 (-1.0f), proxy, minkHull.m_hullDiff);
@@ -3231,10 +3231,11 @@ dgInt32 dgCollisionConvex::CalculateConvexCastContacts(dgCollisionParamProxy& pr
 			break;
 		}
 
-		num += DG_RESTING_CONTACT_PENETRATION; 
-		dgFloat32 dt = - (num / den);
-		tacc += dt; 
-		if (tacc >= timestep) {
+		//num += DG_RESTING_CONTACT_PENETRATION; 
+		dgFloat32 invDen = dgFloat32 (1.0f) / den;
+		dgFloat32 dt = - ((num + DG_RESTING_CONTACT_PENETRATION) * invDen);
+		//tacc += dt; 
+		if ((tacc + dt) >= timestep) {
 			// object do not collide on this timestep
 			count = 0;
 			proxy.m_timestep = timestep;
@@ -3245,6 +3246,7 @@ dgInt32 dgCollisionConvex::CalculateConvexCastContacts(dgCollisionParamProxy& pr
 			break;
 		}
 
+		tacc -= num * invDen; 
 		//dgVector step (veloc.Scale4(tacc));
 		dgVector step (veloc.Scale4(dt));
 		minkHull.TranslateSimplex(step);

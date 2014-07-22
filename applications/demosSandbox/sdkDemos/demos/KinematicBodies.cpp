@@ -84,6 +84,8 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 		,m_phantomEntity(NULL)
 		,m_helpKey (true)
 		,m_selectShape (true)
+		,m_placeInstance (false)
+		,m_isCollisionFree(false)
 	{
 		scene->Set2DDisplayRenderFunction (RenderHelp, this);
 
@@ -123,14 +125,17 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
         return 1.0f;
     }
 
-    virtual void PostUpdate (dFloat timestep)
-    {
-    }
+	static unsigned RayPrefilterCallback (const NewtonBody* const body, const NewtonCollision* const collision, void* const userData)
+	{
+		dKinematicPlacementManager* const me = (dKinematicPlacementManager*) userData;
+		return (me->m_phantomEntity->m_phantom != body) ? 1 : 0;
+	}
 
-/*
     static int aabbCollisionCallback (const NewtonBody * const otherBody, void * const userData)
     {   
-	    NewtonBody* const myBody = (NewtonBody*)userData;
+		dKinematicPlacementManager* const me = (dKinematicPlacementManager*) userData;
+
+	    NewtonBody* const myBody = (NewtonBody*)me->m_phantomEntity->m_phantom;
 	    dAssert (myBody);
 
 	    // not interested in self collision
@@ -151,43 +156,59 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 	    if( NewtonCollisionIntersectionTest(world, collisionA, &poseA[0][0], collisionB, &poseB[0][0],0) )
 	    {
 		    // ignore contact with no penetration
-		    const int maxSize = 2;
-		    dFloat contacts[maxSize * 3];
-		    dFloat normals[maxSize * 3];
+		    const int maxSize = 4;
+		    dFloat contacts[maxSize][3];
+		    dFloat normals[maxSize][3];
 		    dFloat penetrations[maxSize];
-		    dLong attrbA[maxSize * 3];
-		    dLong attrbB[maxSize * 3];
-		    int contactCount = NewtonCollisionCollide(world, maxSize,
-			    collisionA, &poseA[0][0], 
-			    collisionB, &poseB[0][0],
-			    &contacts[0],
-			    &normals[0],
-			    &penetrations[0],
-			    &attrbA[0],
-			    &attrbB[0],
-			    0);
-		    if(contactCount) {
-    //			dAssert (0);
-			    contactCount*=1;
-			    //entity->bodyDesc.collisionInfo.collisionList.push_back( (PhysicsBody*)(otherEntity) );
-
+		    dLong attrbA[maxSize];
+		    dLong attrbB[maxSize];
+		    int contactCount = NewtonCollisionCollide(world, maxSize, collisionA, &poseA[0][0], collisionB, &poseB[0][0], 
+													  &contacts[0][0], &normals[0][0], &penetrations[0], &attrbA[0], &attrbB[0], 0);
+			for(int i = 0; i < contactCount; i ++) {
+				me->m_isCollisionFree |= (penetrations[i] > 1.0e-3f);
 		    }
 	    }
+
 	    return 1;
     }
 
-
-    static bool testForCollision (NewtonBody * const pBody)
+    bool testForCollision ()
     {
-	    // this body has NewtonCollisionSetCollisonMode set to 0
 	    dVector min;
 	    dVector max;
-	    NewtonBodyGetAABB (pBody, &min.m_x, &max.m_x);
-	    NewtonWorld* const world = NewtonBodyGetWorld(pBody);
-	    NewtonWorldForEachBodyInAABBDo(world, &min.m_x, &max.m_x, aabbCollisionCallback, pBody);
-	    return true;
+	    NewtonBodyGetAABB (m_phantomEntity->m_phantom, &min.m_x, &max.m_x);
+	    NewtonWorld* const world = NewtonBodyGetWorld(m_phantomEntity->m_phantom);
+
+		m_isCollisionFree = false;
+	    NewtonWorldForEachBodyInAABBDo(world, &min.m_x, &max.m_x, aabbCollisionCallback, this);
+		return m_isCollisionFree;
     }
-*/
+
+
+	bool SetPlacementMatrix (const dVector& posit) const
+	{
+		dMatrix matrix (GetIdentityMatrix());
+
+		matrix.m_posit = posit;
+		matrix.m_posit.m_y += 3.0f;
+		matrix.m_posit.m_w = 1.0f;
+
+		dVector dest (matrix.m_posit);
+		dest.m_y -= 6.0f;
+
+		dFloat hitParam;
+		NewtonWorldConvexCastReturnInfo info[16];
+		NewtonCollision* const shape = NewtonBodyGetCollision(m_phantomEntity->m_phantom);
+
+		NewtonWorld* const world = GetWorld();
+		int count = NewtonWorldConvexCast (world, &matrix[0][0], &dest[0], shape, &hitParam, (void*)this, RayPrefilterCallback, &info[0], 4, 0);		
+		if (count) {
+			matrix.m_posit += (dest - matrix.m_posit).Scale (hitParam);
+			NewtonBodySetMatrix(m_phantomEntity->m_phantom, &matrix[0][0]);
+			return true;
+		}
+		return false;
+	}
 
 	virtual void PreUpdate (dFloat timestep)
 	{
@@ -214,38 +235,37 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 			dVector p0 (camera->ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
 			dVector p1 (camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
 
-//            dMousePickClass rayCast;
             m_hitPoint = 1.2f;
             NewtonWorldRayCast(world, &p0[0], &p1[0], RayCastFilter, this, NULL, 0);
             if (m_hitPoint < 1.0f) {
-                dMatrix matrix (GetIdentityMatrix());
-                matrix.m_posit = p0 + (p1 - p0).Scale (m_hitPoint);
-                NewtonBodySetMatrix(m_phantomEntity->m_phantom, &matrix[0][0]);
+				if (SetPlacementMatrix (p0 + (p1 - p0).Scale (m_hitPoint))) {
+					if (!testForCollision ()) {
+						if (m_placeInstance.UpdateTriggerJoystick (mainWindow, mainWindow->GetMouseKeyState(0))) {
+							//dTrace (("xxx\n"));
+							dMatrix matrix;
+							NewtonBodyGetMatrix(m_phantomEntity->m_phantom, &matrix[0][0]);
+							NewtonCollision* const collision = NewtonBodyGetCollision(m_phantomEntity->m_phantom);
+							NewtonBody* const body = CreateSimpleSolid (scene, m_phantomEntity->GetMesh(), 10.0f, matrix, collision, NewtonMaterialGetDefaultGroupID(world));
+
+						} 
+					}
+				}
             }
-
-
-/*
-			// do the convex cast here 
-			dMatrix matrix (GetIdentityMatrix());
-			matrix.m_posit = p0;
-
-			dFloat hitParam;
-			NewtonWorldConvexCastReturnInfo info[16];
-			NewtonCollision* const shape = m_stupidLevel->GetCurrentShape();
-			int count = NewtonWorldConvexCast (world, &matrix[0][0], &p1[0], shape, &hitParam, NULL, NULL, &info[0], 4, 0);		
-			if (count) {
-				matrix.m_posit += (p1 - matrix.m_posit).Scale (hitParam);
-				m_stupidLevel->SetCastEntityMatrix (scene, matrix);
-			}
-			m_stupidLevel->SetCastingLine (p0, p1);
-*/
 		}
 	}
+
+	virtual void PostUpdate (dFloat timestep)
+	{
+	}
+
+
 
 	PhantomPlacement* m_phantomEntity;
 	DemoEntityManager::ButtonKey m_helpKey;
 	DemoEntityManager::ButtonKey m_selectShape;
+	DemoEntityManager::ButtonKey m_placeInstance;
     dFloat m_hitPoint;
+	bool m_isCollisionFree;
 };
 
 
@@ -286,7 +306,7 @@ void KinematicPlacement (DemoEntityManager* const scene)
 
 	// place camera into position
 	dQuaternion rot;
-	dVector origin (-100.0f, 40.0f, 0.0f, 0.0f);
+	dVector origin (-10.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 
 

@@ -204,7 +204,7 @@ dgFloat32 dgCollisionBox::RayCast (const dgVector& localP0, const dgVector& loca
 	}
 
 	if (tmin > dgFloat32 (0.0f)) {
-		dgAssert (tmin < 1.0f);
+		dgAssert (tmin <= 1.0f);
 		contactOut.m_normal = dgVector (dgFloat32 (0.0f));
 		contactOut.m_normal[index] = signDir;
 		//contactOut.m_userId = SetUserDataID();

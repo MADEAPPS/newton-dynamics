@@ -534,8 +534,8 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete (dgCollis
 	dgMatrix polygonMatrix;
 	polygonMatrix[0] = m_localPoly[1] - m_localPoly[0];
 	polygonMatrix[0] = polygonMatrix[0].CompProduct4 (polygonMatrix[0].DotProduct4(polygonMatrix[0]).InvSqrt());
-	polygonMatrix[1] = m_normal * polygonMatrix[0];
-	polygonMatrix[2] = m_normal;
+	polygonMatrix[1] = m_normal;
+	polygonMatrix[2] = polygonMatrix[0] * m_normal;
 	polygonMatrix[3] = (hullOrigin - m_normal.CompProduct4(m_normal.DotProduct4(hullOrigin - m_localPoly[0]))) | dgVector::m_wOne;
 
 	dgAssert (polygonMatrix.TestOrthogonal());
@@ -601,11 +601,13 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete (dgCollis
 		dgAssert (penetration >= dgFloat32 (0.0f));
 		dgVector pointsContacts[64];
 		//penetration = dgMin (penetration, DG_IMPULSIVE_CONTACT_PENETRATION);
-		penetration = dgMax (penetration, DG_IMPULSIVE_CONTACT_PENETRATION);
-		dgVector point (pointInHull + normalInHull.Scale4(penetration));
+		//penetration = dgMax (penetration, DG_IMPULSIVE_CONTACT_PENETRATION);
+		dgFloat32 clippedPenetration = dgMax (penetration, DG_IMPULSIVE_CONTACT_PENETRATION);
+		dgVector point (pointInHull + normalInHull.Scale4(clippedPenetration));
 
 		count = hull->CalculatePlaneIntersection (normalInHull.Scale4 (dgFloat32 (-1.0f)), point, pointsContacts);
-		dgVector step (normalInHull.Scale4((penetration - proxy.m_skinThickness) * dgFloat32 (0.5f)));
+		//dgVector step (normalInHull.Scale4((clippedPenetration - proxy.m_skinThickness) * dgFloat32 (0.5f)));
+		dgVector step (normalInHull.Scale4((proxy.m_skinThickness - clippedPenetration) * dgFloat32 (0.5f)));
 
 		const dgMatrix& worldMatrix = hull->m_globalMatrix;
 		dgContactPoint* const contactsOut = proxy.m_contacts;
