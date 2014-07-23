@@ -42,9 +42,10 @@
 #include <CustomVehicleControllerComponent.h>
 #include <CustomVehicleControllerBodyState.h>
 
+#define VEHICLE_CONTROLLER_MAX_BODIES								16
 #define VEHICLE_CONTROLLER_MAX_JOINTS								32
 #define VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS						(VEHICLE_CONTROLLER_MAX_JOINTS * 4)
-#define VEHICLE_PSD_DAMP_TOL										dFloat(1.0e-4f)
+
 #define VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SLIP_ANGLE		dFloat(0.75f)
 #define VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SIDESLIP_RATIO	dFloat(0.95f)
 
@@ -58,7 +59,119 @@ void CustomVehicleController::UpdateTireTransforms ()
 }
 #endif
 
+class CustomVehicleController::dTireForceSolverSolver: public dComplemtaritySolver
+{
+	public:
+	dTireForceSolverSolver(CustomVehicleController* const controller, dFloat timestep)
+		:dComplemtaritySolver()
+		,m_controller(controller)
+	{
+		// apply all external forces and torques to chassis and all tire velocities
+		dFloat timestepInv = 1.0f / timestep;
+		NewtonBody* const body = controller->GetBody();
 
+		CustomControllerConvexCastPreFilter castFilter (body);
+		controller->m_chassisState.UpdateDynamicInputs();
+
+		for (TireList::dListNode* node = controller->m_tireList.GetFirst(); node; node = node->GetNext()) {
+			CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
+			tire->Collide(castFilter, timestepInv);
+			tire->UpdateDynamicInputs(timestep);
+		}
+
+static int xxx;
+xxx ++;
+if (xxx > 1500)
+xxx *=1;
+
+		//dVector xxxxx;
+		//NewtonBodyGetOmega(body, &xxxxx[0]);
+		//dAssert (dAbs(xxxxx.m_y) < 0.01f);
+		//NewtonBodySetOmega(body, &xxxxx[0]);
+		//m_chassisState.m_externalForce += m_chassisState.m_matrix[0].Scale (2.0f * m_chassisState.m_mass);
+		//m_chassisState.m_externalForce = dVector (0, 0, 0, 0);
+
+		// update all components
+		if (controller->m_engine) {
+			controller->m_engine->Update(timestep);
+		}
+
+		if (controller->m_steering) {
+			controller->m_steering->Update(timestep);
+		}
+
+		if (controller->m_handBrakes) {
+			controller->m_handBrakes->Update(timestep);
+		}
+
+		if (controller->m_brakes) {
+			controller->m_brakes->Update(timestep);
+		}
+
+		// Get the number of active joints for this integration step
+		
+		int bodyCount = 0;
+		for (dList<CustomVehicleControllerBodyState*>::dListNode* stateNode = controller->m_stateList.GetFirst()->GetNext(); stateNode; stateNode = stateNode->GetNext()) {
+			m_bodyArray[bodyCount] = stateNode->GetInfo();
+			bodyCount ++;
+		}
+		int jointCount = GetActiveJoints();
+		BuildJacobianMatrix (jointCount, m_jointArray, timestep, jacobianPairArray, jacobianColumn, sizeof (jacobianPairArray)/ sizeof (jacobianPairArray[0]));
+		CalculateReactionsForces (bodyCount, m_bodyArray, jointCount, m_jointArray, timestep, jacobianPairArray, jacobianColumn);
+	}
+
+	~dTireForceSolverSolver()
+	{
+	}
+
+	int GetActiveJoints()
+	{
+		// add the engine joints
+		int jointCount = m_controller->m_engineState.CalculateActiveJoints (m_controller, (CustomVehicleControllerJoint**) &m_jointArray[0]);
+		//return jointCount;
+
+		// add all contact joints if any
+		for (TireList::dListNode* node = m_controller->m_tireList.GetFirst(); node; node = node->GetNext()) {
+			CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
+			if (tire->m_contactJoint.m_contactCount) {
+				m_jointArray[jointCount] = &tire->m_contactJoint;
+				jointCount ++;
+				dAssert (jointCount < VEHICLE_CONTROLLER_MAX_JOINTS);
+			}
+		}
+
+		// add the joints that connect tire to chassis
+		for (TireList::dListNode* node = m_controller->m_tireList.GetFirst(); node; node = node->GetNext()) {
+			CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
+			m_jointArray[jointCount] = &tire->m_chassisJoint;
+			jointCount ++;
+			dAssert (jointCount < VEHICLE_CONTROLLER_MAX_JOINTS);
+		}
+
+
+		//	for (int i = 0; i < m_angularJointCount; i ++) {
+		//		constraintArray[jointCount] = &m_angularVelocityLinks[i];
+		//		jointCount ++;
+		//	}
+		//	for (int i = 0; i < m_trackSteeringCount; i ++) {
+		//		constraintArray[jointCount] = &m_trackSteering[i];
+		//		jointCount ++;
+		//	}
+
+		//	if (m_dryFriction.m_maxForce > 1.0f) {
+		//		constraintArray[jointCount] = &m_dryFriction;
+		//		jointCount ++;
+		//	}
+		return jointCount;
+	}
+
+	dBodyState* m_bodyArray[VEHICLE_CONTROLLER_MAX_BODIES];
+	dBilateralJoint* m_jointArray[VEHICLE_CONTROLLER_MAX_JOINTS];
+	dJacobianColum jacobianColumn[VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS];
+	dJacobianPair jacobianPairArray[VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS];
+
+	CustomVehicleController* m_controller;
+};
 
 class CustomVehicleController::dWeightDistibutionSolver: public dSymmetricBiconjugateGradientSolve
 {
@@ -67,12 +180,11 @@ class CustomVehicleController::dWeightDistibutionSolver: public dSymmetricBiconj
 		:dSymmetricBiconjugateGradientSolve()
 		,m_count(0)
 	{
-
 	}
 
 	virtual void MatrixTimeVector (dFloat64* const out, const dFloat64* const v) const
 	{
-		CustomVehicleControllerJoint::dJacobian invMassJacobians [VEHICLE_CONTROLLER_MAX_JOINTS];
+		dComplemtaritySolver::dJacobian invMassJacobians [VEHICLE_CONTROLLER_MAX_JOINTS];
 		for (int i = 0; i < m_count; i ++) {
 			out[i] = m_diagRegularizer[i] * v[i];
 			invMassJacobians[i].m_linear = m_invMassJacobians[i].m_linear.Scale (dFloat(v[i]));
@@ -92,8 +204,8 @@ class CustomVehicleController::dWeightDistibutionSolver: public dSymmetricBiconj
 		return true;
 	}
 
-	CustomVehicleControllerJoint::dJacobian m_jacobians [VEHICLE_CONTROLLER_MAX_JOINTS];
-	CustomVehicleControllerJoint::dJacobian m_invMassJacobians [VEHICLE_CONTROLLER_MAX_JOINTS];
+	dComplemtaritySolver::dJacobian m_jacobians [VEHICLE_CONTROLLER_MAX_JOINTS];
+	dComplemtaritySolver::dJacobian m_invMassJacobians [VEHICLE_CONTROLLER_MAX_JOINTS];
 	dFloat m_invDiag[VEHICLE_CONTROLLER_MAX_JOINTS];
 	dFloat m_diagRegularizer[VEHICLE_CONTROLLER_MAX_JOINTS];
 
@@ -317,51 +429,7 @@ void CustomVehicleController::SetHandBrakes(CustomVehicleControllerComponentBrak
 	m_handBrakes = brakes;
 }
 
-
-int CustomVehicleController::GetActiveJoints(CustomVehicleControllerJoint** const jointArray)
-{
-	// add the engine joints
-	int jointCount = m_engineState.CalculateActiveJoints(this, &jointArray[0]);
-//return jointCount;
-
-	// add all contact joints if any
-	for (TireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
-		CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
-		if (tire->m_contactJoint.m_contactCount) {
-			jointArray[jointCount] = &tire->m_contactJoint;
-			jointCount ++;
-			dAssert (jointCount < VEHICLE_CONTROLLER_MAX_JOINTS);
-		}
-	}
-
-	// add the joints that connect tire to chassis
-	for (TireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
-		CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
-		jointArray[jointCount] = &tire->m_chassisJoint;
-		jointCount ++;
-		dAssert (jointCount < VEHICLE_CONTROLLER_MAX_JOINTS);
-	}
-
-
-	//	for (int i = 0; i < m_angularJointCount; i ++) {
-	//		constraintArray[jointCount] = &m_angularVelocityLinks[i];
-	//		jointCount ++;
-	//	}
-	//	for (int i = 0; i < m_trackSteeringCount; i ++) {
-	//		constraintArray[jointCount] = &m_trackSteering[i];
-	//		jointCount ++;
-	//	}
-
-	//	if (m_dryFriction.m_maxForce > 1.0f) {
-	//		constraintArray[jointCount] = &m_dryFriction;
-	//		jointCount ++;
-	//	}
-	return jointCount;
-}
-
-
-
-
+/*
 
 int CustomVehicleController::BuildJacobianMatrix (int jointCount, CustomVehicleControllerJoint** const jointArray, dFloat timestep, CustomVehicleControllerJoint::dJacobianPair* const jacobianArray, CustomVehicleControllerJoint::dJacobianColum* const jacobianColumnArray)
 {
@@ -612,7 +680,7 @@ void CustomVehicleController::CalculateReactionsForces (int jointCount, CustomVe
 		constraint->UpdateSolverForces (jacobianArray);
 	}
 }
-
+*/
 
 void CustomVehicleController::Finalize()
 {
@@ -643,8 +711,8 @@ void CustomVehicleController::Finalize()
 	for (TireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
 		CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
 		dVector posit  (tire->m_localFrame.m_posit);  
-		CustomVehicleControllerJoint::dJacobian &jacobian0 = solver.m_jacobians[count];
-		CustomVehicleControllerJoint::dJacobian &invMassJacobian0 = solver.m_invMassJacobians[count];
+		dComplemtaritySolver::dJacobian &jacobian0 = solver.m_jacobians[count];
+		dComplemtaritySolver::dJacobian &invMassJacobian0 = solver.m_invMassJacobians[count];
 		jacobian0.m_linear = dir;
 		jacobian0.m_angular = posit * dir;
 		jacobian0.m_angular.m_w = 0.0f;
@@ -675,74 +743,11 @@ void CustomVehicleController::Finalize()
 }
 
 
-
-void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
+void CustomVehicleController::PreUpdate (dFloat timestep, int threadIndex)
 {
 	if (m_finalized) {
-		NewtonBody* const body = GetBody();
-		NewtonBodyGetMatrix(body, &m_chassisState.m_matrix[0][0]);
-		for (TireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
-			CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
-			tire->UpdateTransform();
-		}
+		dTireForceSolverSolver tireSolver (this, timestep);	
 	}
-}
-
-
-void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
-{
-	if (!m_finalized) {
-		return;
-	}
-	CustomVehicleControllerJoint* jointArray[VEHICLE_CONTROLLER_MAX_JOINTS];
-	CustomVehicleControllerJoint::dJacobianColum jacobianColumn[VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS];
-	CustomVehicleControllerJoint::dJacobianPair jacobianPairArray[VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS];
-
-	// apply all external forces and torques to chassis and all tire velocities
-	dFloat timestepInv = 1.0f / timestep;
-	NewtonBody* const body = GetBody();
-	CustomControllerConvexCastPreFilter castFilter (body);
-	m_chassisState.UpdateDynamicInputs();
-
-	for (TireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
-		CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
-		tire->Collide(castFilter, timestepInv);
-		tire->UpdateDynamicInputs(timestep);
-	}
-
-static int xxx;
-xxx ++;
-if (xxx > 1500)
-xxx *=1;
-
-//dVector xxxxx;
-//NewtonBodyGetOmega(body, &xxxxx[0]);
-//dAssert (dAbs(xxxxx.m_y) < 0.01f);
-//NewtonBodySetOmega(body, &xxxxx[0]);
-//m_chassisState.m_externalForce += m_chassisState.m_matrix[0].Scale (2.0f * m_chassisState.m_mass);
-//m_chassisState.m_externalForce = dVector (0, 0, 0, 0);
-
-	// update all components
-	if (m_engine) {
-		m_engine->Update(timestep);
-	}
-
-	if (m_steering) {
-		m_steering->Update(timestep);
-	}
-
-	if (m_handBrakes) {
-		m_handBrakes->Update(timestep);
-	}
-
-	if (m_brakes) {
-		m_brakes->Update(timestep);
-	}
-
-	// Get the number of active joints for this integration step
-	int jointCount = GetActiveJoints(jointArray);
-	BuildJacobianMatrix (jointCount, jointArray, timestep, jacobianPairArray, jacobianColumn);
-	CalculateReactionsForces (jointCount, jointArray, timestep, jacobianPairArray, jacobianColumn);
 
 /*
 dTrace (("%f %f %f  ", m_engine->GetSpeed(), m_engineState.m_radianPerSecund, m_engine->GetGearBox()->GetGearRatio(m_engine->GetGear())));
@@ -756,4 +761,14 @@ dTrace (("\n"));
 //dTrace (("f(%f %f %f) T(%f %f %f)\n", m_chassisState.m_externalForce.m_x, m_chassisState.m_externalForce.m_y, m_chassisState.m_externalForce.m_z, m_chassisState.m_externalTorque.m_x, m_chassisState.m_externalTorque.m_y, m_chassisState.m_externalTorque.m_z));
 }
 
-
+void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
+{
+	if (m_finalized) {
+		NewtonBody* const body = GetBody();
+		NewtonBodyGetMatrix(body, &m_chassisState.m_matrix[0][0]);
+		for (TireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+			CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
+			tire->UpdateTransform();
+		}
+	}
+}

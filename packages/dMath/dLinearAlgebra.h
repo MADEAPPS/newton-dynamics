@@ -22,10 +22,10 @@
 class dSymmetricBiconjugateGradientSolve
 {
 	public:
-	dSymmetricBiconjugateGradientSolve ();
-	~dSymmetricBiconjugateGradientSolve ();	
+	dSymmetricBiconjugateGradientSolve () {}
+	virtual ~dSymmetricBiconjugateGradientSolve () {}	
 
-	dFloat64 Solve (int size, dFloat64 tolerance, dFloat64* const x, const dFloat64* const b) const;
+	virtual dFloat64 Solve (int size, dFloat64 tolerance, dFloat64* const x, const dFloat64* const b) const;
 
 	protected:
 	virtual void MatrixTimeVector (dFloat64* const out, const dFloat64* const v) const = 0;
@@ -106,6 +106,35 @@ class dComplemtaritySolver
 		dJacobianColum* m_colMatrix;
 	};
 
+	class dBilateralJoint
+	{
+		public:
+		dBilateralJoint(){}
+		virtual ~dBilateralJoint(){}
+
+		protected:
+		virtual void Init (dBodyState* const state0, dBodyState* const state1);
+		virtual void JacobianDerivative (dParamInfo* const constraintParams) = 0; 
+		virtual void UpdateSolverForces (const dJacobianPair* const jacobians) const = 0; 
+		virtual void JointAccelerations (dJointAccelerationDecriptor* const accelParam);
+
+		void InitPointParam (dPointDerivativeParam& param, const dVector& pivot) const;
+		void AddAngularRowJacobian (dParamInfo* const constraintParams, const dVector& dir, dFloat jointAngle);
+		void AddLinearRowJacobian (dParamInfo* const constraintParams, const dVector& pivot, const dVector& dir);
+		void AddAngularRowJacobian (dParamInfo* const constraintParams, const dVector& dir0, const dVector& dir1, dFloat ratio);
+		void CalculatePointDerivative (dParamInfo* const constraintParams, const dVector& dir, const dPointDerivativeParam& param);
+
+		dFloat m_motorAcceleration[8];
+		dFloat m_jointFeebackForce[8];
+		int m_rowIsMotor[8];
+		dBodyState* m_state0;
+		dBodyState* m_state1;
+		int m_start;
+		int m_count;
+
+		friend class dBodyState;
+		friend class dComplemtaritySolver;
+	};
 
 
 	class dBodyState
@@ -115,6 +144,9 @@ class dComplemtaritySolver
 		virtual ~dBodyState() {}
 
 		dFloat GetMass () const;
+		const dVector& GetOmega() const; 
+		const dVector& GetVelocity() const; 
+
 		void UpdateInertia();
 		const dMatrix& GetMatrix () const;
 		const dMatrix& GetLocalMatrix () const;
@@ -143,44 +175,18 @@ class dComplemtaritySolver
 		int m_myIndex;
 
 		friend class dBilateralJoint;
+		friend class dComplemtaritySolver;
 	};
 
 
-	class dBilateralJoint
-	{
-		dBilateralJoint(){}
-		virtual ~dBilateralJoint(){}
-
-		virtual void Init (dBodyState* const state0, dBodyState* const state1);
-
-		virtual void UpdateSolverForces (const dJacobianPair* const jacobians) const = 0; 
-		virtual void JacobianDerivative (dParamInfo* const constraintParams) = 0; 
-		virtual void JointAccelerations (dJointAccelerationDecriptor* const accelParam);
-
-		void InitPointParam (dPointDerivativeParam& param, const dVector& pivot) const;
-		void AddAngularRowJacobian (dParamInfo* const constraintParams, const dVector& dir, dFloat jointAngle);
-		void AddLinearRowJacobian (dParamInfo* const constraintParams, const dVector& pivot, const dVector& dir);
-		void AddAngularRowJacobian (dParamInfo* const constraintParams, const dVector& dir0, const dVector& dir1, dFloat ratio);
-		void CalculatePointDerivative (dParamInfo* const constraintParams, const dVector& dir, const dPointDerivativeParam& param);
-
-		dFloat m_motorAcceleration[8];
-		dFloat m_jointFeebackForce[8];
-		int m_rowIsMotor[8];
-		dBodyState* m_state0;
-		dBodyState* m_state1;
-		int m_start;
-		int m_count;
-
-		friend class dBodyState;
-	};
 
 	public:
-	dComplemtaritySolver();
-	~dComplemtaritySolver() {};
+	dComplemtaritySolver() {};
+	virtual ~dComplemtaritySolver() {};
 
 	virtual int GetActiveJoints (dBilateralJoint** const jointArray, int bufferSize);
-	int BuildJacobianMatrix (int jointCount, dBilateralJoint** const jointArray, dFloat timestep, dJacobianPair* const jacobianArray, dJacobianColum* const jacobianColumnArray);
-	void CalculateReactionsForces(int jointCount, dBilateralJoint** const jointArray, dFloat timestep, dJacobianPair* const jacobianArray, dJacobianColum* const jacobianColumnArray);
+	virtual int BuildJacobianMatrix (int jointCount, dBilateralJoint** const jointArray, dFloat timestep, dJacobianPair* const jacobianArray, dJacobianColum* const jacobianColumnArray, int maxRowCount);
+	virtual void CalculateReactionsForces (int bodyCount, dBodyState** const bodyArray, int jointCount, dBilateralJoint** const jointArray, dFloat timestep, dJacobianPair* const jacobianArray, dJacobianColum* const jacobianColumnArray);
 };
 
 

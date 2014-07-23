@@ -13,20 +13,16 @@
 #include "dMathDefines.h"
 #include "dLinearAlgebra.h"
 
-#define VEHICLE_VEL_DAMP										dFloat(100.0f)
-#define VEHICLE_POS_DAMP										dFloat(1500.0f)
-#define VEHICLE_MAX_FRICTION_BOUND								dFloat(1.0e15f)
-#define VEHICLE_MIN_FRICTION_BOUND								-VEHICLE_MAX_FRICTION_BOUND
+#define COMPLEMENTARITY_VEL_DAMP			dFloat(100.0f)
+#define COMPLEMENTARITY_POS_DAMP			dFloat(1500.0f)
+#define COMPLEMENTARITY_MAX_FRICTION_BOUND	dFloat(1.0e15f)
+#define COMPLEMENTARITY_PSD_DAMP_TOL		dFloat(1.0e-4f)
+#define COMPLEMENTARITY_MIN_FRICTION_BOUND	-COMPLEMENTARITY_MAX_FRICTION_BOUND
 
 
-
-dSymmetricBiconjugateGradientSolve::dSymmetricBiconjugateGradientSolve ()
-{
-}
-
-dSymmetricBiconjugateGradientSolve::~dSymmetricBiconjugateGradientSolve ()
-{
-}
+#ifdef _MSC_VER
+#pragma warning (disable: 4100) //unreferenced formal parameter
+#endif
 
 
 void dSymmetricBiconjugateGradientSolve::ScaleAdd (int size, dFloat64* const a, const dFloat64* const b, dFloat64 scale, const dFloat64* const c) const
@@ -133,6 +129,17 @@ dComplemtaritySolver::dBodyState::dBodyState()
 	,m_invMass(0.0f)
 	,m_myIndex(0)
 {
+}
+
+
+const dVector& dComplemtaritySolver::dBodyState::GetOmega() const
+{
+	return m_omega;
+}
+
+const dVector& dComplemtaritySolver::dBodyState::GetVelocity() const
+{
+	return m_veloc;
 }
 
 
@@ -260,8 +267,8 @@ void dComplemtaritySolver::dBilateralJoint::CalculatePointDerivative (dParamInfo
 	dFloat relCentr = centrError % dir; 
 
 	dFloat dt = constraintParams->m_timestep;
-	dFloat ks = VEHICLE_POS_DAMP;
-	dFloat kd = VEHICLE_VEL_DAMP;
+	dFloat ks = COMPLEMENTARITY_POS_DAMP;
+	dFloat kd = COMPLEMENTARITY_VEL_DAMP;
 	dFloat ksd = dt * ks;
 	dFloat num = ks * relPosit + kd * relVeloc + ksd * relVeloc;
 	dFloat den = dFloat (1.0f) + dt * kd + dt * ksd;
@@ -270,8 +277,8 @@ void dComplemtaritySolver::dBilateralJoint::CalculatePointDerivative (dParamInfo
 	m_rowIsMotor[index] = false;
 	m_motorAcceleration[index] = 0.0f;
 	constraintParams->m_jointAccel[index] = accelError + relCentr;
-	constraintParams->m_jointLowFriction[index] = VEHICLE_MIN_FRICTION_BOUND;
-	constraintParams->m_jointHighFriction[index] = VEHICLE_MAX_FRICTION_BOUND;
+	constraintParams->m_jointLowFriction[index] = COMPLEMENTARITY_MIN_FRICTION_BOUND;
+	constraintParams->m_jointHighFriction[index] = COMPLEMENTARITY_MAX_FRICTION_BOUND;
 	constraintParams->m_count = index + 1;
 }
 
@@ -307,8 +314,8 @@ void dComplemtaritySolver::dBilateralJoint::AddAngularRowJacobian (dParamInfo* c
 
 	//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
 	dFloat dt = constraintParams->m_timestep;
-	dFloat ks = VEHICLE_POS_DAMP;
-	dFloat kd = VEHICLE_VEL_DAMP;
+	dFloat ks = COMPLEMENTARITY_POS_DAMP;
+	dFloat kd = COMPLEMENTARITY_VEL_DAMP;
 	dFloat ksd = dt * ks;
 	dFloat num = ks * jointAngle + kd * omegaError + ksd * omegaError;
 	dFloat den = dFloat (1.0f) + dt * kd + dt * ksd;
@@ -317,8 +324,8 @@ void dComplemtaritySolver::dBilateralJoint::AddAngularRowJacobian (dParamInfo* c
 	m_rowIsMotor[index] = false;
 	m_motorAcceleration[index] = 0.0f;
 	constraintParams->m_jointAccel[index] = alphaError;
-	constraintParams->m_jointLowFriction[index] = VEHICLE_MIN_FRICTION_BOUND;
-	constraintParams->m_jointHighFriction[index] = VEHICLE_MAX_FRICTION_BOUND;
+	constraintParams->m_jointLowFriction[index] = COMPLEMENTARITY_MIN_FRICTION_BOUND;
+	constraintParams->m_jointHighFriction[index] = COMPLEMENTARITY_MAX_FRICTION_BOUND;
 	constraintParams->m_count = index + 1;
 }
 
@@ -350,8 +357,8 @@ void dComplemtaritySolver::dBilateralJoint::AddAngularRowJacobian (dParamInfo* c
 	m_rowIsMotor[index] = true;
 	m_motorAcceleration[index] = accelerationRatio;
 	constraintParams->m_jointAccel[index] = 0.0f;
-	constraintParams->m_jointLowFriction[index] = VEHICLE_MIN_FRICTION_BOUND;
-	constraintParams->m_jointHighFriction[index] = VEHICLE_MAX_FRICTION_BOUND;
+	constraintParams->m_jointLowFriction[index] = COMPLEMENTARITY_MIN_FRICTION_BOUND;
+	constraintParams->m_jointHighFriction[index] = COMPLEMENTARITY_MAX_FRICTION_BOUND;
 	constraintParams->m_count = index + 1;
 }
 
@@ -374,8 +381,8 @@ void dComplemtaritySolver::dBilateralJoint::JointAccelerations (dJointAccelerati
 	const dVector& bodyOmega1 = m_state1->m_omega;
 
 	dFloat timestep = params->m_timeStep;
-	dFloat kd = VEHICLE_VEL_DAMP * dFloat (4.0f);
-	dFloat ks = VEHICLE_POS_DAMP * dFloat (0.25f);
+	dFloat kd = COMPLEMENTARITY_VEL_DAMP * dFloat (4.0f);
+	dFloat ks = COMPLEMENTARITY_POS_DAMP * dFloat (0.25f);
 	for (int k = 0; k < params->m_rowsCount; k ++) {
 		if (m_rowIsMotor[k]) {
 			jacobianColElements[k].m_coordenateAccel = m_motorAcceleration[k] + jacobianColElements[k].m_deltaAccel;
@@ -405,19 +412,17 @@ int dComplemtaritySolver::GetActiveJoints (dBilateralJoint** const jointArray, i
 }
 
 
-int dComplemtaritySolver::BuildJacobianMatrix (int jointCount, dBilateralJoint** const jointArray, dFloat timestep, dJacobianPair* const jacobianArray, dJacobianColum* const jacobianColumnArray)
+int dComplemtaritySolver::BuildJacobianMatrix (int jointCount, dBilateralJoint** const jointArray, dFloat timestep, dJacobianPair* const jacobianArray, dJacobianColum* const jacobianColumnArray, int maxRowCount)
 {
-	return 0;
-/*
 	int rowCount = 0;
 
-	CustomVehicleControllerJoint::dParamInfo constraintParams;
+	dParamInfo constraintParams;
 	constraintParams.m_timestep = timestep;
 	constraintParams.m_timestepInv = 1.0f / timestep;
 
 	// calculate Jacobian derivative for each active joint	
 	for (int j = 0; j < jointCount; j ++) {
-		CustomVehicleControllerJoint* const joint = jointArray[j];
+		dBilateralJoint* const joint = jointArray[j];
 		constraintParams.m_count = 0;
 		joint->JacobianDerivative (&constraintParams); 
 
@@ -427,7 +432,7 @@ int dComplemtaritySolver::BuildJacobianMatrix (int jointCount, dBilateralJoint**
 
 		// copy the rows and columns from the Jacobian derivative descriptor
 		for (int i = 0; i < dofCount; i ++) {
-			CustomVehicleControllerJoint::dJacobianColum* const col = &jacobianColumnArray[rowCount];
+			dJacobianColum* const col = &jacobianColumnArray[rowCount];
 			jacobianArray[rowCount] = constraintParams.m_jacobians[i]; 
 			col->m_diagDamp = 1.0f;
 			col->m_coordenateAccel = constraintParams.m_jointAccel[i];
@@ -435,14 +440,15 @@ int dComplemtaritySolver::BuildJacobianMatrix (int jointCount, dBilateralJoint**
 			col->m_jointHighFriction = constraintParams.m_jointHighFriction[i];
 
 			rowCount ++;
-			dAssert (rowCount < VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS);
+			//dAssert (rowCount < VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS);
+			dAssert (rowCount < maxRowCount);
 		}
 
 
 		// complete the derivative matrix for this joint
 		int index = joint->m_start;
-		CustomVehicleControllerBodyState* const state0 = joint->m_state0;
-		CustomVehicleControllerBodyState* const state1 = joint->m_state1;
+		dBodyState* const state0 = joint->m_state0;
+		dBodyState* const state1 = joint->m_state1;
 
 		const dMatrix& invInertia0 = state0->m_invInertia;
 		const dMatrix& invInertia1 = state1->m_invInertia;
@@ -451,8 +457,8 @@ int dComplemtaritySolver::BuildJacobianMatrix (int jointCount, dBilateralJoint**
 		dFloat invMass1 = state1->m_invMass;
 		dFloat weight = 0.9f;
 		for (int i = 0; i < dofCount; i ++) {
-			CustomVehicleControllerJoint::dJacobianPair* const row = &jacobianArray[index];
-			CustomVehicleControllerJoint::dJacobianColum* const col = &jacobianColumnArray[index];
+			dJacobianPair* const row = &jacobianArray[index];
+			dJacobianColum* const col = &jacobianColumnArray[index];
 
 			dVector JMinvIM0linear (row->m_jacobian_IM0.m_linear.Scale (invMass0));
 			dVector JMinvIM1linear (row->m_jacobian_IM1.m_linear.Scale (invMass1));
@@ -476,7 +482,7 @@ int dComplemtaritySolver::BuildJacobianMatrix (int jointCount, dBilateralJoint**
 
 			col->m_force = joint->m_jointFeebackForce[i] * weight;
 
-			dFloat stiffness = VEHICLE_PSD_DAMP_TOL * col->m_diagDamp;
+			dFloat stiffness = COMPLEMENTARITY_PSD_DAMP_TOL * col->m_diagDamp;
 			dFloat diag = (tmpDiag[0] + tmpDiag[1] + tmpDiag[2]);
 			dAssert (diag > dFloat (0.0f));
 			col->m_diagDamp = diag * stiffness;
@@ -487,19 +493,18 @@ int dComplemtaritySolver::BuildJacobianMatrix (int jointCount, dBilateralJoint**
 		}
 	}
 	return rowCount;
-*/
 }
 
-void dComplemtaritySolver::CalculateReactionsForces (int jointCount, dBilateralJoint** const jointArray, dFloat timestepSrc, dJacobianPair* const jacobianArray, dJacobianColum* const jacobianColumnArray)
+void dComplemtaritySolver::CalculateReactionsForces (int bodyCount, dBodyState** const bodyArray, int jointCount, dBilateralJoint** const jointArray, dFloat timestepSrc, dJacobianPair* const jacobianArray, dJacobianColum* const jacobianColumnArray)
 {
-/*
-	CustomVehicleControllerJoint::dJacobian stateVeloc[VEHICLE_CONTROLLER_MAX_JOINTS / 2];
-	CustomVehicleControllerJoint::dJacobian internalForces[VEHICLE_CONTROLLER_MAX_JOINTS / 2];
+	dJacobian stateVeloc[128];
+	dJacobian internalForces [128];
 
 	int stateIndex = 0;
 	dVector zero(dFloat (0.0f), dFloat (0.0f), dFloat (0.0f), dFloat (0.0f));
-	for (dList<CustomVehicleControllerBodyState*>::dListNode* stateNode = m_stateList.GetFirst(); stateNode; stateNode = stateNode->GetNext()) {
-		CustomVehicleControllerBodyState* const state = stateNode->GetInfo();
+	//for (dList<dBodyState*>::dListNode* stateNode = m_stateList.GetFirst(); stateNode; stateNode = stateNode->GetNext()) {
+	for (int i = 0; i < bodyCount; i ++) {
+		dBodyState* const state = bodyArray[i];
 		stateVeloc[stateIndex].m_linear = state->m_veloc;
 		stateVeloc[stateIndex].m_angular = state->m_omega;
 
@@ -512,18 +517,18 @@ void dComplemtaritySolver::CalculateReactionsForces (int jointCount, dBilateralJ
 	}
 
 	for (int i = 0; i < jointCount; i ++) {
-		CustomVehicleControllerJoint::dJacobian y0;
-		CustomVehicleControllerJoint::dJacobian y1;
+		dJacobian y0;
+		dJacobian y1;
 		y0.m_linear = zero;
 		y0.m_angular = zero;
 		y1.m_linear = zero;
 		y1.m_angular = zero;
-		CustomVehicleControllerJoint* const constraint = jointArray[i];
+		dBilateralJoint* const constraint = jointArray[i];
 		int first = constraint->m_start;
 		int count = constraint->m_count;
 		for (int j = 0; j < count; j ++) { 
-			CustomVehicleControllerJoint::dJacobianPair* const row = &jacobianArray[j + first];
-			const CustomVehicleControllerJoint::dJacobianColum* const col = &jacobianColumnArray[j + first];
+			dJacobianPair* const row = &jacobianArray[j + first];
+			const dJacobianColum* const col = &jacobianColumnArray[j + first];
 			dFloat val = col->m_force; 
 			y0.m_linear += row->m_jacobian_IM0.m_linear.Scale(val);
 			y0.m_angular += row->m_jacobian_IM0.m_angular.Scale(val);
@@ -549,13 +554,13 @@ void dComplemtaritySolver::CalculateReactionsForces (int jointCount, dBilateralJ
 	dFloat maxAccNorm = dFloat (1.0e-2f);
 
 	for (int step = 0; step < 4; step ++) {
-		CustomVehicleControllerJoint::dJointAccelerationDecriptor joindDesc;
+		dJointAccelerationDecriptor joindDesc;
 		joindDesc.m_timeStep = timestep;
 		joindDesc.m_invTimeStep = invTimestep;
 		joindDesc.m_firstPassCoefFlag = firstPassCoef;
 
 		for (int curJoint = 0; curJoint < jointCount; curJoint ++) {
-			CustomVehicleControllerJoint* const constraint = jointArray[curJoint];
+			dBilateralJoint* const constraint = jointArray[curJoint];
 			joindDesc.m_rowsCount = constraint->m_count;
 			joindDesc.m_rowMatrix = &jacobianArray[constraint->m_start];
 			joindDesc.m_colMatrix = &jacobianColumnArray[constraint->m_start];
@@ -568,7 +573,7 @@ void dComplemtaritySolver::CalculateReactionsForces (int jointCount, dBilateralJ
 			accNorm = dFloat (0.0f);
 			for (int curJoint = 0; curJoint < jointCount; curJoint ++) {
 
-				CustomVehicleControllerJoint* const constraint = jointArray[curJoint];
+				dBilateralJoint* const constraint = jointArray[curJoint];
 				int index = constraint->m_start;
 				int rowsCount = constraint->m_count;
 				int m0 = constraint->m_state0->m_myIndex;
@@ -579,16 +584,16 @@ void dComplemtaritySolver::CalculateReactionsForces (int jointCount, dBilateralJ
 				dVector linearM1 (internalForces[m1].m_linear);
 				dVector angularM1 (internalForces[m1].m_angular);
 
-				CustomVehicleControllerBodyState* const state0 = constraint->m_state0;
-				CustomVehicleControllerBodyState* const state1 = constraint->m_state1;
+				dBodyState* const state0 = constraint->m_state0;
+				dBodyState* const state1 = constraint->m_state1;
 				const dMatrix& invInertia0 = state0->m_invInertia;
 				const dMatrix& invInertia1 = state1->m_invInertia;
 				dFloat invMass0 = state0->m_invMass;
 				dFloat invMass1 = state1->m_invMass;
 
 				for (int k = 0; k < rowsCount; k ++) {
-					CustomVehicleControllerJoint::dJacobianPair* const row = &jacobianArray[index];
-					CustomVehicleControllerJoint::dJacobianColum* const col = &jacobianColumnArray[index];
+					dJacobianPair* const row = &jacobianArray[index];
+					dJacobianColum* const col = &jacobianColumnArray[index];
 
 					dVector JMinvIM0linear (row->m_jacobian_IM0.m_linear.Scale (invMass0));
 					dVector JMinvIM1linear (row->m_jacobian_IM1.m_linear.Scale (invMass1));
@@ -627,8 +632,10 @@ void dComplemtaritySolver::CalculateReactionsForces (int jointCount, dBilateralJ
 			}
 		}
 
-		for (dList<CustomVehicleControllerBodyState*>::dListNode* stateNode = m_stateList.GetFirst()->GetNext(); stateNode; stateNode = stateNode->GetNext()) {
-			CustomVehicleControllerBodyState* const state = stateNode->GetInfo();
+		//for (dList<CustomVehicleControllerBodyState*>::dListNode* stateNode = m_stateList.GetFirst()->GetNext(); stateNode; stateNode = stateNode->GetNext()) {
+			//CustomVehicleControllerBodyState* const state = stateNode->GetInfo();
+		for (int i = 0; i < bodyCount; i ++) {
+			dBodyState* const state = bodyArray[i];
 			int index = state->m_myIndex;
 			dVector force (state->m_externalForce + internalForces[index].m_linear);
 			dVector torque (state->m_externalTorque + internalForces[index].m_angular);
@@ -637,26 +644,27 @@ void dComplemtaritySolver::CalculateReactionsForces (int jointCount, dBilateralJ
 	}
 
 	for (int i = 0; i < jointCount; i ++) {
-		CustomVehicleControllerJoint* const constraint = jointArray[i];
+		dBilateralJoint* const constraint = jointArray[i];
 		int first = constraint->m_start;
 		int count = constraint->m_count;
 		for (int j = 0; j < count; j ++) { 
-			const CustomVehicleControllerJoint::dJacobianColum* const col = &jacobianColumnArray[j + first];
+			const dJacobianColum* const col = &jacobianColumnArray[j + first];
 			dFloat val = col->m_force; 
 			constraint->m_jointFeebackForce[j] = val;
 		}
 	}
 
-	for (dList<CustomVehicleControllerBodyState*>::dListNode* stateNode = m_stateList.GetFirst()->GetNext(); stateNode; stateNode = stateNode->GetNext()) {
-		CustomVehicleControllerBodyState* const state = stateNode->GetInfo();
+	//for (dList<CustomVehicleControllerBodyState*>::dListNode* stateNode = m_stateList.GetFirst()->GetNext(); stateNode; stateNode = stateNode->GetNext()) {
+		//CustomVehicleControllerBodyState* const state = stateNode->GetInfo();
+	for (int i = 0; i < bodyCount; i ++) {
+		dBodyState* const state = bodyArray[i];
 		int index = state->m_myIndex;
 		state->ApplyNetForceAndTorque (invTimestepSrc, stateVeloc[index].m_linear, stateVeloc[index].m_angular);
 	}
 
 	for (int i = 0; i < jointCount; i ++) {
-		CustomVehicleControllerJoint* const constraint = jointArray[i];
+		dBilateralJoint* const constraint = jointArray[i];
 		constraint->UpdateSolverForces (jacobianArray);
 	}
-*/
 }
 

@@ -21,20 +21,7 @@
 
 
 CustomVehicleControllerBodyState::CustomVehicleControllerBodyState()
-	:m_matrix(GetIdentityMatrix())
-	,m_localFrame(GetZeroMatrix())
-	,m_inertia(GetZeroMatrix())
-	,m_invInertia(GetZeroMatrix())
-	,m_localInertia (0.0f, 0.0f, 0.0f, 0.0f)
-	,m_localInvInertia(0.0f, 0.0f, 0.0f, 0.0f)
-	,m_veloc(0.0f, 0.0f, 0.0f, 0.0f)
-	,m_omega(0.0f, 0.0f, 0.0f, 0.0f)
-	,m_externalForce(0.0f, 0.0f, 0.0f, 0.0f)
-	,m_externalTorque(0.0f, 0.0f, 0.0f, 0.0f)
-	,m_globalCentreOfMass(0.0f, 0.0f, 0.0f, 0.0f)
-	,m_mass(0.0f)
-	,m_invMass(0.0f)
-	,m_myIndex(0)
+	:dComplemtaritySolver::dBodyState()
 	,m_controller(NULL)
 {
 }
@@ -46,57 +33,39 @@ void CustomVehicleControllerBodyState::Init(CustomVehicleController* const contr
 
 dFloat CustomVehicleControllerBodyState::GetMass () const
 {
-	return m_mass;
+	return dComplemtaritySolver::dBodyState::GetMass();
 }
 
 const dMatrix& CustomVehicleControllerBodyState::GetMatrix () const
 {
-	return m_matrix;
+	return dComplemtaritySolver::dBodyState::GetMatrix();
 }
 
 const dMatrix& CustomVehicleControllerBodyState::GetLocalMatrix () const
 {
-	return m_localFrame;
+	return dComplemtaritySolver::dBodyState::GetLocalMatrix();
 }
 
 const dVector& CustomVehicleControllerBodyState::GetCenterOfMass () const
 {
-	return m_globalCentreOfMass;
+	return dComplemtaritySolver::dBodyState::GetCenterOfMass();
 }
 
 
 
 void CustomVehicleControllerBodyState::UpdateInertia()
 {
-	dMatrix tmpMatrix (GetZeroMatrix());
-
-	tmpMatrix[0] = m_localInertia.CompProduct (dVector (m_matrix[0][0], m_matrix[1][0], m_matrix[2][0], 0.0f));
-	tmpMatrix[1] = m_localInertia.CompProduct (dVector (m_matrix[0][1], m_matrix[1][1], m_matrix[2][1], 0.0f));
-	tmpMatrix[2] = m_localInertia.CompProduct (dVector (m_matrix[0][2], m_matrix[1][2], m_matrix[2][2], 0.0f));
-	m_inertia = tmpMatrix * m_matrix;
-
-	tmpMatrix[0] = m_localInvInertia.CompProduct (dVector (m_matrix[0][0], m_matrix[1][0], m_matrix[2][0], 0.0f));
-	tmpMatrix[1] = m_localInvInertia.CompProduct (dVector (m_matrix[0][1], m_matrix[1][1], m_matrix[2][1], 0.0f));
-	tmpMatrix[2] = m_localInvInertia.CompProduct (dVector (m_matrix[0][2], m_matrix[1][2], m_matrix[2][2], 0.0f));
-	m_invInertia = tmpMatrix * m_matrix;
+	dComplemtaritySolver::dBodyState::UpdateInertia();
 }
 
 void CustomVehicleControllerBodyState::IntegrateForce (dFloat timestep, const dVector& force, const dVector& torque)
 {
-	dVector accel (force.Scale (m_invMass));
-	dVector alpha (m_invInertia.RotateVector(torque));
-	m_veloc += accel.Scale (timestep);
-	m_omega += alpha.Scale (timestep);
+	dComplemtaritySolver::dBodyState::IntegrateForce(timestep, force, torque);
 }
 
 void CustomVehicleControllerBodyState::ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega)
 {
-	dVector accel = (m_veloc - veloc).Scale(invTimestep);
-	dVector alpha = (m_omega - omega).Scale(invTimestep);
-
-	m_externalForce = accel.Scale(m_mass);
-	alpha = m_matrix.UnrotateVector(alpha);
-	m_externalTorque = m_matrix.RotateVector(alpha.CompProduct(m_localInertia));
+	dComplemtaritySolver::dBodyState::ApplyNetForceAndTorque (invTimestep, veloc, omega);
 }
 
 

@@ -34,6 +34,7 @@ class CustomVehicleControllerComponentSteering;
 class CustomVehicleController: public CustomControllerBase
 {
 	public:
+	class dTireForceSolverSolver;
 	class dWeightDistibutionSolver;
 	class TireList: public dList<CustomVehicleControllerBodyStateTire>
 	{
@@ -79,12 +80,6 @@ class CustomVehicleController: public CustomControllerBase
 	CUSTOM_JOINTS_API void Init (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, const dVector& gravityVector);
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
-
-	CUSTOM_JOINTS_API int GetActiveJoints(CustomVehicleControllerJoint** const jointArray);
-	CUSTOM_JOINTS_API int BuildJacobianMatrix (int jointCount, CustomVehicleControllerJoint** const jointArray, dFloat timestep, CustomVehicleControllerJoint::dJacobianPair* const jacobianArray, CustomVehicleControllerJoint::dJacobianColum* const jacobianColumnArray);
-	CUSTOM_JOINTS_API void CalculateReactionsForces(int jointCount, CustomVehicleControllerJoint** const jointArray, dFloat timestep, CustomVehicleControllerJoint::dJacobianPair* const jacobianArray, CustomVehicleControllerJoint::dJacobianColum* const jacobianColumnArray);
-
-//	CUSTOM_JOINTS_API void UpdateTireTransforms ();
 
 	CustomVehicleControllerBodyState m_staticWorld;
 	CustomVehicleControllerBodyStateEngine m_engineState;

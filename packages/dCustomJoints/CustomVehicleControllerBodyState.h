@@ -23,7 +23,7 @@
 
 class CustomVehicleController;
 
-class CustomVehicleControllerBodyState
+class CustomVehicleControllerBodyState: public dComplemtaritySolver::dBodyState
 {
 	public:
 	CUSTOM_JOINTS_API dFloat GetMass () const;
@@ -40,23 +40,6 @@ class CustomVehicleControllerBodyState
 	CUSTOM_JOINTS_API virtual void IntegrateForce (dFloat timestep, const dVector& force, const dVector& torque);
 	CUSTOM_JOINTS_API virtual void ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega);
 
-	dMatrix m_matrix;
-	dMatrix m_localFrame;
-	dMatrix m_inertia;
-	dMatrix m_invInertia;
-
-	dVector m_localInertia;
-	dVector m_localInvInertia;
-
-	dVector m_veloc;
-	dVector m_omega;
-	dVector m_externalForce;
-	dVector m_externalTorque;
-	dVector m_globalCentreOfMass;
-
-	dFloat m_mass;
-	dFloat m_invMass;
-	int m_myIndex;
 	CustomVehicleController* m_controller;
 
 	friend class CustomVehicleController;
