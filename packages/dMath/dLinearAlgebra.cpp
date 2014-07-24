@@ -13,10 +13,12 @@
 #include "dMathDefines.h"
 #include "dLinearAlgebra.h"
 
+
 #define COMPLEMENTARITY_VEL_DAMP			dFloat(100.0f)
 #define COMPLEMENTARITY_POS_DAMP			dFloat(1500.0f)
-#define COMPLEMENTARITY_MAX_FRICTION_BOUND	dFloat(1.0e15f)
 #define COMPLEMENTARITY_PSD_DAMP_TOL		dFloat(1.0e-4f)
+#define COMPLEMENTARITY_STACK_ENTRIES		64
+#define COMPLEMENTARITY_MAX_FRICTION_BOUND	dFloat(1.0e15f)
 #define COMPLEMENTARITY_MIN_FRICTION_BOUND	-COMPLEMENTARITY_MAX_FRICTION_BOUND
 
 
@@ -497,12 +499,11 @@ int dComplemtaritySolver::BuildJacobianMatrix (int jointCount, dBilateralJoint**
 
 void dComplemtaritySolver::CalculateReactionsForces (int bodyCount, dBodyState** const bodyArray, int jointCount, dBilateralJoint** const jointArray, dFloat timestepSrc, dJacobianPair* const jacobianArray, dJacobianColum* const jacobianColumnArray)
 {
-	dJacobian stateVeloc[128];
-	dJacobian internalForces [128];
+	dJacobian stateVeloc[COMPLEMENTARITY_STACK_ENTRIES];
+	dJacobian internalForces [COMPLEMENTARITY_STACK_ENTRIES];
 
 	int stateIndex = 0;
 	dVector zero(dFloat (0.0f), dFloat (0.0f), dFloat (0.0f), dFloat (0.0f));
-	//for (dList<dBodyState*>::dListNode* stateNode = m_stateList.GetFirst(); stateNode; stateNode = stateNode->GetNext()) {
 	for (int i = 0; i < bodyCount; i ++) {
 		dBodyState* const state = bodyArray[i];
 		stateVeloc[stateIndex].m_linear = state->m_veloc;
@@ -632,13 +633,12 @@ void dComplemtaritySolver::CalculateReactionsForces (int bodyCount, dBodyState**
 			}
 		}
 
-		//for (dList<CustomVehicleControllerBodyState*>::dListNode* stateNode = m_stateList.GetFirst()->GetNext(); stateNode; stateNode = stateNode->GetNext()) {
-			//CustomVehicleControllerBodyState* const state = stateNode->GetInfo();
 		for (int i = 0; i < bodyCount; i ++) {
 			dBodyState* const state = bodyArray[i];
-			int index = state->m_myIndex;
-			dVector force (state->m_externalForce + internalForces[index].m_linear);
-			dVector torque (state->m_externalTorque + internalForces[index].m_angular);
+			//int index = state->m_myIndex;
+			dAssert (state->m_myIndex == i);
+			dVector force (state->m_externalForce + internalForces[i].m_linear);
+			dVector torque (state->m_externalTorque + internalForces[i].m_angular);
 			state->IntegrateForce(timestep, force, torque);
 		}
 	}
@@ -654,12 +654,11 @@ void dComplemtaritySolver::CalculateReactionsForces (int bodyCount, dBodyState**
 		}
 	}
 
-	//for (dList<CustomVehicleControllerBodyState*>::dListNode* stateNode = m_stateList.GetFirst()->GetNext(); stateNode; stateNode = stateNode->GetNext()) {
-		//CustomVehicleControllerBodyState* const state = stateNode->GetInfo();
 	for (int i = 0; i < bodyCount; i ++) {
 		dBodyState* const state = bodyArray[i];
-		int index = state->m_myIndex;
-		state->ApplyNetForceAndTorque (invTimestepSrc, stateVeloc[index].m_linear, stateVeloc[index].m_angular);
+		//int index = state->m_myIndex;
+		dAssert (state->m_myIndex == i);
+		state->ApplyNetForceAndTorque (invTimestepSrc, stateVeloc[i].m_linear, stateVeloc[i].m_angular);
 	}
 
 	for (int i = 0; i < jointCount; i ++) {
