@@ -688,12 +688,17 @@ void  DemoMesh::OptimizeForRender()
 
         glNewList(m_optimizedTransparentDiplayList, GL_COMPILE);
         //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+
+        glEnable (GL_BLEND);
+        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
             DemoSubMesh& segment = node->GetInfo();
             if (segment.m_opacity <= 0.999f) {
+                glColor4f(1.0f, 1.0f, 1.0f, segment.m_opacity);
                 segment.OptimizeForRender(this);
             }
         }
+        glDisable(GL_BLEND);
         glEndList();
 	}
 #endif
@@ -735,7 +740,6 @@ DemoSubMesh* DemoMesh::AddSubMesh()
 void DemoMesh::Render (DemoEntityManager* const scene)
 {
 //	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );	
-
     if (m_optimizedTransparentDiplayList) {
         scene->PushTransparentMesh (this); 
     }
@@ -759,6 +763,33 @@ void DemoMesh::Render (DemoEntityManager* const scene)
 		glDisableClientState(GL_NORMAL_ARRAY);	// disable normal arrays
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);	// disable normal arrays
 	}
+}
+
+void DemoMesh::RenderTransparency () const
+{
+//dMatrix xxxx;
+//glGetFloat (GL_MODELVIEW_MATRIX, &xxxx[0][0]);
+//glCallList(m_optimizedOpaqueDiplayList);
+
+    if (m_optimizedTransparentDiplayList) {
+        glCallList(m_optimizedTransparentDiplayList);
+    } else {
+        glEnableClientState (GL_VERTEX_ARRAY);
+        glEnableClientState (GL_NORMAL_ARRAY);
+        glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+
+        glVertexPointer (3, GL_FLOAT, 0, m_vertex);
+        glNormalPointer (GL_FLOAT, 0, m_normal);
+        glTexCoordPointer (2, GL_FLOAT, 0, m_uv);
+
+        for (dListNode* nodes = GetFirst(); nodes; nodes = nodes->GetNext()) {
+            DemoSubMesh& segment = nodes->GetInfo();
+            segment.Render();
+        }
+        glDisableClientState(GL_VERTEX_ARRAY);	// disable vertex arrays
+        glDisableClientState(GL_NORMAL_ARRAY);	// disable normal arrays
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);	// disable normal arrays
+    }
 }
 
 void DemoMesh::RenderNormals ()

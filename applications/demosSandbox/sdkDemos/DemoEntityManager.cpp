@@ -892,10 +892,17 @@ void DemoEntityManager::RenderFrame ()
 		}
 	}
 
+dMatrix xxxx;
+glGetFloat (GL_MODELVIEW_MATRIX, &xxxx[0][0]);
+
     while (m_tranparentHeap.GetCount()) {
         const TransparentMesh& transparentMesh = m_tranparentHeap[0];
 
 
+        glPushMatrix();	
+        glMultMatrix(&transparentMesh.m_matrix[0][0]);
+        transparentMesh.m_mesh->RenderTransparency();
+        glPopMatrix();
         m_tranparentHeap.Pop();
     }
 

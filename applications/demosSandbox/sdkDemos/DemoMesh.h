@@ -60,6 +60,7 @@ class DemoMesh: public dList<DemoSubMesh>, virtual public dClassInfo
 	virtual const dString& GetName () const;
 	virtual const dString& GetTextureName (const DemoSubMesh* const subMesh) const;
 
+    virtual void RenderTransparency () const;
 	virtual void Render (DemoEntityManager* const scene);
 	virtual void RenderNormals ();
 

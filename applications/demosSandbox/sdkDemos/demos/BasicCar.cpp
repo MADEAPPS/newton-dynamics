@@ -819,7 +819,7 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 		// set to transparent color
 		glEnable (GL_BLEND);
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+        
 		CustomVehicleControllerComponentEngine* const engine = m_player->m_controller->GetEngine();
 		if (engine) {
 			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
