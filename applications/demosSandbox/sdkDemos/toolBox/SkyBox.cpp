@@ -41,7 +41,7 @@ SkyBox::SkyBox()
 }
 
 
-void SkyBox::Render(dFloat timeStep) const
+void SkyBox::Render(dFloat timeStep, DemoEntityManager* const scene) const
 {
 	dMatrix matrix;
 

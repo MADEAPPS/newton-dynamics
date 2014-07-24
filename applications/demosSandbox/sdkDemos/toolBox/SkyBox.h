@@ -28,7 +28,7 @@ class SkyBox: public DemoEntity
 	SkyBox();
 	~SkyBox();
 
-	virtual void Render(dFloat timeStep) const;
+	virtual void Render(dFloat timeStep, DemoEntityManager* const scene) const;
 
 	private:
 	dVector m_size;

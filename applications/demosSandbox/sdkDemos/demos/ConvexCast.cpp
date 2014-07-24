@@ -171,10 +171,10 @@ z = size * (i - count / 2);
 	}
 
 
-	virtual void Render(dFloat timeStep) const
+	virtual void Render(dFloat timeStep, DemoEntityManager* const scene) const
 	{
-		DemoEntity::Render(timeStep);
-		m_castingEntity->Render(timeStep);
+		DemoEntity::Render(timeStep, scene);
+		m_castingEntity->Render(timeStep, scene);
 
 		// draw the last casting line
 		glDisable(GL_TEXTURE_2D);

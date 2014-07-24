@@ -376,18 +376,28 @@ const dMatrix& DemoEntity::GetRenderMatrix () const
 }
 
 
-void DemoEntity::Render(dFloat timestep) const
+void DemoEntity::Render(dFloat timestep, DemoEntityManager* const scene) const
 {
 	// save the model matrix before changing it Matrix
 	glPushMatrix();
 
+dMatrix xxxx0;
+glGetFloat (GL_MODELVIEW_MATRIX, &xxxx0[0][0]);
+
 	// Set The matrix for this entity Node
 	glMultMatrix(&m_matrix[0][0]);
 
+dMatrix xxxx;
+glGetFloat (GL_MODELVIEW_MATRIX, &xxxx[0][0]);
+
+
 	// Render mesh if there is one 
 	if (m_mesh) {
+//		if (m_mesh->)
 		glPushMatrix();
 		glMultMatrix(&m_meshMatrix[0][0]);
+
+
 		m_mesh->Render ();
 //		m_mesh->RenderNormals ();
 
@@ -398,7 +408,7 @@ void DemoEntity::Render(dFloat timestep) const
 	}
 
 	for (DemoEntity* child = GetChild(); child; child = child->GetSibling()) {
-		child->Render(timestep);
+		child->Render(timestep, scene);
 	}
 
 	// restore the matrix before leaving

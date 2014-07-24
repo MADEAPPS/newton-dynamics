@@ -340,7 +340,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 	}
 
 
-	void Render(dFloat timeStep) const
+	virtual void Render(dFloat timeStep, DemoEntityManager* const scene) const
 	{
 		DemoMesh* const mesh = GetMesh();
 
@@ -351,7 +351,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 		NewtonDeformableMeshGetVertexStreams (m_softCollision, 3 * sizeof (dFloat), (dFloat*) mesh->m_vertex, 3 * sizeof (dFloat), (dFloat*) mesh->m_normal, 2 * sizeof (dFloat), (dFloat*) mesh->m_uv);
 
 		// proceed with normal rendering
-		DemoEntity::Render(timeStep);
+		DemoEntity::Render(timeStep, scene);
 	}
 
 	NewtonCollision* m_softCollision;

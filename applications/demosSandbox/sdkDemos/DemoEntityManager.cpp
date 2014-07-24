@@ -873,7 +873,7 @@ void DemoEntityManager::RenderFrame ()
 	if (m_mainWindow->m_hideVisualMeshes) {
 		if (m_sky) {
 			glPushMatrix();	
-			m_sky->Render(timestep);
+			m_sky->Render(timestep, this);
 			glPopMatrix();
 		}
 
@@ -881,7 +881,7 @@ void DemoEntityManager::RenderFrame ()
 		for (dListNode* node = dList<DemoEntity*>::GetFirst(); node; node = node->GetNext()) {
 			DemoEntity* const entity = node->GetInfo();
 			glPushMatrix();	
-			entity->Render(timestep);
+			entity->Render(timestep, this);
 			glPopMatrix();
 		}
 	}

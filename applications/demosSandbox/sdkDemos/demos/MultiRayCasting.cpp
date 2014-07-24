@@ -74,7 +74,7 @@ class LineOfSightRayCastEntity: public DemoEntity
 	{
 	}
 
-	void Render(dFloat timeStep) const
+	virtual void Render(dFloat timeStep, DemoEntityManager* const scene) const
 	{
 		glDisable (GL_LIGHTING);
 		glDisable(GL_TEXTURE_2D);

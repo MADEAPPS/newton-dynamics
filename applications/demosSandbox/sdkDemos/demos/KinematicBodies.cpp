@@ -42,7 +42,7 @@ class PhantomPlacement: public DemoEntity
 		NewtonDestroyCollision(shape);
 	}
 
-	virtual void Render(dFloat timeStep) const
+	virtual void Render(dFloat timeStep, DemoEntityManager* const scene) const
 	{
 		glEnable (GL_BLEND);
 		glDisable(GL_TEXTURE_2D);
@@ -53,7 +53,7 @@ class PhantomPlacement: public DemoEntity
 		//glBlendFunc (GL_ONE, GL_ONE);
 		glColor4f(1.0f, 0.0f, 1.0f, 0.25f);
 
-		DemoEntity::Render(timeStep);
+		DemoEntity::Render(timeStep, scene);
 		
 		//glEnable(GL_CULL_FACE);
 		glEnable (GL_LIGHTING);

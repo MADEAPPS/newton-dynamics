@@ -101,11 +101,11 @@ class BasicPlayerEntity: public DemoEntity
 		m_inputs = inputs;
 	}
 
-	virtual void Render(dFloat timeStep) const
+	virtual void Render(dFloat timeStep, DemoEntityManager* const scene) const
 	{
 		if (m_inputs.m_cameraMode) {
 			// render only when external view mode
-			DemoEntity::Render(timeStep);
+			DemoEntity::Render(timeStep, scene);
 		}
 	}
 

@@ -46,9 +46,9 @@ class dClosestDistanceRecord: public CustomControllerBase
 			NewtonDestroyCollision (m_castingShape);
 		}
 
-		virtual void Render(dFloat timestep) const
+		virtual void Render(dFloat timeStep, DemoEntityManager* const scene) const
 		{
-			DemoEntity::Render(timestep);
+			DemoEntity::Render(timeStep, scene);
 
 			ShowMousePicking (m_contact0, m_contact1, dVector (1, 0, 0, 0), dVector (0, 1, 0, 0));
 			ShowMousePicking (m_contact1, m_contact0, dVector (1, 0, 0, 0), dVector (0, 1, 0, 0));

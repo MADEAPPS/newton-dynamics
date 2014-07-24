@@ -43,7 +43,7 @@ DemoCamera::~DemoCamera()
 {
 }
 
-void DemoCamera::Render(dFloat timeStep) const
+void DemoCamera::Render(dFloat timeStep, DemoEntityManager* const scene) const
 {
 }
 

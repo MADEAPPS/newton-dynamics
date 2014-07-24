@@ -33,7 +33,7 @@ class DemoCamera: public DemoEntity
 	void SetMatrix (DemoEntityManager& world, const dQuaternion& rotation, const dVector& position);
 	void SetViewMatrix (int width, int height);
 
-	virtual void Render(dFloat timeStep) const;
+	virtual void Render(dFloat timeStep, DemoEntityManager* const scene) const;
 
 	dVector ScreenToWorld (const dVector& screenPoint) const;
 	dVector WorldToScreen (const dVector& worldPoint) const;
