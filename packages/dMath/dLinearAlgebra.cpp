@@ -432,21 +432,6 @@ int dComplemtaritySolver::BuildJacobianMatrix (int jointCount, dBilateralJoint**
 		joint->m_count = dofCount;
 		joint->m_start = rowCount;
 
-		// copy the rows and columns from the Jacobian derivative descriptor
-		for (int i = 0; i < dofCount; i ++) {
-			dJacobianColum* const col = &jacobianColumnArray[rowCount];
-			jacobianArray[rowCount] = constraintParams.m_jacobians[i]; 
-			col->m_diagDamp = 1.0f;
-			col->m_coordenateAccel = constraintParams.m_jointAccel[i];
-			col->m_jointLowFriction = constraintParams.m_jointLowFriction[i];
-			col->m_jointHighFriction = constraintParams.m_jointHighFriction[i];
-
-			rowCount ++;
-			//dAssert (rowCount < VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS);
-			dAssert (rowCount < maxRowCount);
-		}
-
-
 		// complete the derivative matrix for this joint
 		int index = joint->m_start;
 		dBodyState* const state0 = joint->m_state0;
@@ -458,26 +443,25 @@ int dComplemtaritySolver::BuildJacobianMatrix (int jointCount, dBilateralJoint**
 		dFloat invMass0 = state0->m_invMass;
 		dFloat invMass1 = state1->m_invMass;
 		dFloat weight = 0.9f;
+
 		for (int i = 0; i < dofCount; i ++) {
 			dJacobianPair* const row = &jacobianArray[index];
 			dJacobianColum* const col = &jacobianColumnArray[index];
+			jacobianArray[rowCount] = constraintParams.m_jacobians[i]; 
 
 			dVector JMinvIM0linear (row->m_jacobian_IM0.m_linear.Scale (invMass0));
 			dVector JMinvIM1linear (row->m_jacobian_IM1.m_linear.Scale (invMass1));
 			dVector JMinvIM0angular = invInertia0.UnrotateVector(row->m_jacobian_IM0.m_angular);
 			dVector JMinvIM1angular = invInertia1.UnrotateVector(row->m_jacobian_IM1.m_angular);
 
-			dVector tmpDiag (JMinvIM0linear.CompProduct(row->m_jacobian_IM0.m_linear) + 
-				JMinvIM0angular.CompProduct(row->m_jacobian_IM0.m_angular) +
-				JMinvIM1linear.CompProduct(row->m_jacobian_IM1.m_linear) + 
-				JMinvIM1angular.CompProduct(row->m_jacobian_IM1.m_angular));
-
-			dVector tmpAccel (JMinvIM0linear.CompProduct (state0->m_externalForce) + 
-				JMinvIM0angular.CompProduct(state0->m_externalTorque) + 
-				JMinvIM1linear.CompProduct (state1->m_externalForce) + 
-				JMinvIM1angular.CompProduct(state1->m_externalTorque));
-
+			dVector tmpDiag (JMinvIM0linear.CompProduct(row->m_jacobian_IM0.m_linear) + JMinvIM0angular.CompProduct(row->m_jacobian_IM0.m_angular) + JMinvIM1linear.CompProduct(row->m_jacobian_IM1.m_linear) + JMinvIM1angular.CompProduct(row->m_jacobian_IM1.m_angular));
+			dVector tmpAccel (JMinvIM0linear.CompProduct (state0->m_externalForce) + JMinvIM0angular.CompProduct(state0->m_externalTorque) + JMinvIM1linear.CompProduct (state1->m_externalForce) + JMinvIM1angular.CompProduct(state1->m_externalTorque));
 			dFloat extenalAcceleration = -(tmpAccel[0] + tmpAccel[1] + tmpAccel[2]);
+
+			col->m_diagDamp = 1.0f;
+			col->m_coordenateAccel = constraintParams.m_jointAccel[i];
+			col->m_jointLowFriction = constraintParams.m_jointLowFriction[i];
+			col->m_jointHighFriction = constraintParams.m_jointHighFriction[i];
 
 			col->m_deltaAccel = extenalAcceleration;
 			col->m_coordenateAccel += extenalAcceleration;
@@ -492,6 +476,8 @@ int dComplemtaritySolver::BuildJacobianMatrix (int jointCount, dBilateralJoint**
 			diag *= (dFloat(1.0f) + stiffness);
 			col->m_invDJMinvJt = dFloat(1.0f) / diag;
 			index ++;
+			rowCount ++;
+			dAssert (rowCount < maxRowCount);
 		}
 	}
 	return rowCount;

@@ -45,19 +45,9 @@
 #define VEHICLE_CONTROLLER_MAX_BODIES								16
 #define VEHICLE_CONTROLLER_MAX_JOINTS								32
 #define VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS						(VEHICLE_CONTROLLER_MAX_JOINTS * 4)
-
 #define VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SLIP_ANGLE		dFloat(0.75f)
 #define VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SIDESLIP_RATIO	dFloat(0.95f)
 
-#if 0
-void CustomVehicleController::UpdateTireTransforms ()
-{
-	for (TireList::CustomListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
-		TireBodyState* const tire = &node->GetInfo();
-		tire->UpdateTransform();
-	}
-}
-#endif
 
 class CustomVehicleController::dTireForceSolverSolver: public dComplemtaritySolver
 {
