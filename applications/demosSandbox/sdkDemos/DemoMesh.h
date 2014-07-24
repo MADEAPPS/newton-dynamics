@@ -35,6 +35,7 @@ class DemoSubMesh
 	dVector m_ambient;
 	dVector m_diffuse;
 	dVector m_specular;
+	dFloat m_opacity;
 	//char m_textureName[D_NAME_STRING_LENGTH];
 	dString  m_textureName;
 };
@@ -78,7 +79,8 @@ class DemoMesh: public dList<DemoSubMesh>, virtual public dClassInfo
 	dFloat* m_uv;
 	dFloat* m_vertex;
 	dFloat* m_normal;
-	unsigned m_optilizedDiplayList;		
+	unsigned m_optimizedOpaqueDiplayList;
+	unsigned m_optimizedTransparentDiplayList;		
 	dString m_name;
 };
 
