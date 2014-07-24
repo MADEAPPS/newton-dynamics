@@ -393,12 +393,9 @@ glGetFloat (GL_MODELVIEW_MATRIX, &xxxx[0][0]);
 
 	// Render mesh if there is one 
 	if (m_mesh) {
-//		if (m_mesh->)
 		glPushMatrix();
 		glMultMatrix(&m_meshMatrix[0][0]);
-
-
-		m_mesh->Render ();
+		m_mesh->Render (scene);
 //		m_mesh->RenderNormals ();
 
 		if (m_userData) {

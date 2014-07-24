@@ -13,9 +13,9 @@
 #ifndef _D_MESH_H_
 #define _D_MESH_H_
 
-
-
 class DemoMesh;
+class DemoEntityManager;
+
 class DemoSubMesh
 {
 	public:
@@ -60,7 +60,7 @@ class DemoMesh: public dList<DemoSubMesh>, virtual public dClassInfo
 	virtual const dString& GetName () const;
 	virtual const dString& GetTextureName (const DemoSubMesh* const subMesh) const;
 
-	virtual void Render ();
+	virtual void Render (DemoEntityManager* const scene);
 	virtual void RenderNormals ();
 
 	NewtonMesh* CreateNewtonMesh(NewtonWorld* const workd, const dMatrix& meshMatrix);

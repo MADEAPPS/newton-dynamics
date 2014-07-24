@@ -21,7 +21,6 @@
 #include "DebugDisplay.h"
 #include "TargaToOpenGl.h"
 #include "DemoEntityManager.h"
-#include "DemoEntityManager.h"
 
 #include "DemoAIListener.h"
 #include "DemoSoundListener.h"
@@ -90,7 +89,6 @@ DemoEntityManager::DemoEntityManager(NewtonDemos* const parent)
 	,dList <DemoEntity*>() 
 	,m_mainWindow(parent)
 	,m_world(NULL)
-//	,m_aiWorld(NULL)
 	,m_sky(NULL)
 	,m_microsecunds(0)
 	,m_physicsTime(0.0f)
@@ -103,13 +101,13 @@ DemoEntityManager::DemoEntityManager(NewtonDemos* const parent)
 	,m_fontImage(0)
 	,m_soundManager(NULL)
 	,m_cameraManager(NULL)
+    ,m_tranparentHeap()
 //	,m_visualDebugger(NULL)
 	,m_profiler(60, 40)
 	,m_mainThreadGraphicsTime(0.0f)
 	,m_mainThreadPhysicsTime(0.0f)
 	,m_physThreadTime(0.0f)
 {
-
 	// initialized the physics world for the new scene
 	Cleanup ();
 
@@ -228,6 +226,14 @@ void DemoEntityManager::RemoveEntity (DemoEntity* const ent)
 			break;
 		}
 	}
+}
+
+void DemoEntityManager::PushTransparentMesh (const DemoMesh* const mesh)
+{
+    dMatrix matrix;
+    glGetFloat (GL_MODELVIEW_MATRIX, &matrix[0][0]);
+    TransparentMesh entry (matrix, mesh);
+    m_tranparentHeap.Push (entry, matrix.m_posit.m_z);
 }
 
 void DemoEntityManager::CreateOpenGlFont()
@@ -885,6 +891,14 @@ void DemoEntityManager::RenderFrame ()
 			glPopMatrix();
 		}
 	}
+
+    while (m_tranparentHeap.GetCount()) {
+        const TransparentMesh& transparentMesh = m_tranparentHeap[0];
+
+
+        m_tranparentHeap.Pop();
+    }
+
 
 	m_cameraManager->RenderPickedTarget ();
 

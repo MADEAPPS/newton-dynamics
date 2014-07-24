@@ -18,6 +18,7 @@ class dHeapBase: public dContainersAlloc
 	struct dHeapRecord 
 	{
 		dHeapRecord ()
+            :m_key(), m_obj()
 		{
 		}
 
@@ -91,7 +92,6 @@ dHeapBase<OBJECT,KEY>::dHeapBase (int maxElements)
 	,m_allocated(true)
 	,m_pool(new dHeapRecord[maxElements])
 {
-dAssert (0);
 	Flush();
 }
 
@@ -100,7 +100,6 @@ template <class OBJECT, class KEY>
 dHeapBase<OBJECT,KEY>::~dHeapBase ()
 {   
 	if (m_allocated == true) {
-dAssert (0);
 		delete[] m_pool;
 	}
 }
@@ -327,7 +326,7 @@ void dUpHeap<OBJECT,KEY>::Push (OBJECT &obj, KEY key)
 	int j;
 	int i = dHeapBase<OBJECT,KEY>::m_curCount;
 	for (; i; i = j) {
-		int j = i >> 1;
+		j = i >> 1;
 		if (!j || (dHeapBase<OBJECT,KEY>::m_pool[j - 1].m_key < key)) {
 			break;
 		}

@@ -12,6 +12,7 @@
 #ifndef __DEMO_ENTITY_MANAGER_H__
 #define __DEMO_ENTITY_MANAGER_H__
 
+#include "DemoMesh.h"
 #include "dRuntimeProfiler.h"
 #include "DemoSoundListener.h"
 #include "DemoEntityListener.h"
@@ -19,7 +20,7 @@
 #include "dHighResolutionTimer.h"
 //#include "DemoVisualDebugerListener.h"
 
-class DemoMesh;
+//class DemoMesh;
 class DemoEntity;
 class DemoCamera;
 class NewtonDemos;
@@ -32,6 +33,36 @@ typedef void (*RenderHoodCallback) (DemoEntityManager* const manager, void* cons
 class DemoEntityManager: public wxGLCanvas, public dList <DemoEntity*>
 {
 	public:
+    class TransparentMesh
+    {
+        public: 
+        TransparentMesh()
+            :m_matrix(GetIdentityMatrix())
+            ,m_mesh(NULL)
+//            ,m_subMesh (NULL)
+        {
+        }
+
+        TransparentMesh(const dMatrix& matrix, const DemoMesh* const mesh)
+            :m_matrix(matrix)
+            ,m_mesh(mesh)
+//            ,m_subMesh (subMesh)
+        {
+        }
+
+        dMatrix m_matrix;
+        const DemoMesh* m_mesh;
+//        const DemoSubMesh* m_subMesh;
+    };
+
+    class TransparentHeap: public dUpHeap <TransparentMesh, dFloat>
+    {
+        public:
+        TransparentHeap()
+            :dUpHeap <TransparentMesh, dFloat>(256)
+        {
+        }
+    };
 
 	class ButtonKey
 	{
@@ -71,14 +102,14 @@ class DemoEntityManager: public wxGLCanvas, public dList <DemoEntity*>
 	int GetWidth() const;
 	int GetHeight() const;
 
-//	dAI* GetAI() const;
 	NewtonWorld* GetNewton() const;
 	NewtonDemos* GetRootWindow() const;
 
 	DemoCamera* GetCamera() const;
 	void SetCameraMouseLock (bool state);
 	void SetCameraMatrix (const dQuaternion& rotation, const dVector& position);
-	
+
+    void PushTransparentMesh (const DemoMesh* const mesh); 
 
 	void Set2DDisplayRenderFunction (RenderHoodCallback callback, void* const context);
 
@@ -125,7 +156,6 @@ class DemoEntityManager: public wxGLCanvas, public dList <DemoEntity*>
 	NewtonDemos* m_mainWindow;
 	NewtonWorld* m_world;
 	
-//	dAI* m_aiWorld;
 	DemoEntity* m_sky;
 	unsigned64 m_microsecunds;
 	dFloat m_physicsTime;
@@ -138,6 +168,8 @@ class DemoEntityManager: public wxGLCanvas, public dList <DemoEntity*>
 	GLuint m_fontImage;
 	DemoSoundListener* m_soundManager;
 	DemoCameraListener* m_cameraManager;
+
+    TransparentHeap m_tranparentHeap;
 //	DemoVisualDebugerListener* m_visualDebugger;
 
 	int m_showProfiler[10]; 
@@ -179,11 +211,6 @@ inline NewtonWorld* DemoEntityManager::GetNewton() const
 {
 	return m_world;
 }
-
-//inline dAI* DemoEntityManager::GetAI() const
-//{
-//	return m_aiWorld;
-//}
 
 inline NewtonDemos* DemoEntityManager::GetRootWindow () const
 {

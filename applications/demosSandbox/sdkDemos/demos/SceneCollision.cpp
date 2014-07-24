@@ -93,7 +93,7 @@ class ComplexScene: public DemoEntity
 			glPushMatrix();
 			NewtonCollisionGetMatrix (collision, &matrix[0][0]);
 			glMultMatrix(&matrix[0][0]);
-			mesh->Render();
+			mesh->Render(scene);
 
 			glPopMatrix();
 		}

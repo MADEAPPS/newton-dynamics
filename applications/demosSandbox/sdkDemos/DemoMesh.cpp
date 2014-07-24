@@ -16,6 +16,7 @@
 #include "toolbox_stdafx.h"
 #include "DemoMesh.h"
 #include "TargaToOpenGl.h"
+#include "DemoEntityManager.h"
 
 dInitRtti(DemoMesh);
 
@@ -683,7 +684,17 @@ void  DemoMesh::OptimizeForRender()
 	}
 
 	if (hasTranparency) {
+        m_optimizedTransparentDiplayList = glGenLists(1);
 
+        glNewList(m_optimizedTransparentDiplayList, GL_COMPILE);
+        //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+        for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
+            DemoSubMesh& segment = node->GetInfo();
+            if (segment.m_opacity <= 0.999f) {
+                segment.OptimizeForRender(this);
+            }
+        }
+        glEndList();
 	}
 #endif
 }
@@ -721,10 +732,14 @@ DemoSubMesh* DemoMesh::AddSubMesh()
 }
 
 
-void DemoMesh::Render ()
+void DemoMesh::Render (DemoEntityManager* const scene)
 {
-
 //	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );	
+
+    if (m_optimizedTransparentDiplayList) {
+        scene->PushTransparentMesh (this); 
+    }
+
 	if (m_optimizedOpaqueDiplayList) {
 		glCallList(m_optimizedOpaqueDiplayList);
 	} else {
