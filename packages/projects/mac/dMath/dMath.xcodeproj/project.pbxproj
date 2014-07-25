@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C54C93AC19824F5D00A280B3 /* dLinearAlgebra.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C54C93AB19824F5D00A280B3 /* dLinearAlgebra.cpp */; };
 		FF8C264E1313D28E00646B90 /* dMathDefines.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C26441313D28E00646B90 /* dMathDefines.cpp */; };
 		FF8C26501313D28E00646B90 /* dMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C26461313D28E00646B90 /* dMatrix.cpp */; };
 		FF8C26521313D28E00646B90 /* dQuaternion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C26481313D28E00646B90 /* dQuaternion.cpp */; };
@@ -16,6 +17,7 @@
 
 /* Begin PBXFileReference section */
 		32BAE0B70371A74B00C91783 /* dMath_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dMath_Prefix.pch; sourceTree = "<group>"; };
+		C54C93AB19824F5D00A280B3 /* dLinearAlgebra.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dLinearAlgebra.cpp; path = ../../../dMath/dLinearAlgebra.cpp; sourceTree = "<group>"; };
 		D2AAC06F0554671400DB518D /* libdMath.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libdMath.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF8C26441313D28E00646B90 /* dMathDefines.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dMathDefines.cpp; path = ../../../dMath/dMathDefines.cpp; sourceTree = SOURCE_ROOT; };
 		FF8C26461313D28E00646B90 /* dMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dMatrix.cpp; path = ../../../dMath/dMatrix.cpp; sourceTree = SOURCE_ROOT; };
@@ -55,12 +57,13 @@
 		08FB77ACFE841707C02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				FF8C26481313D28E00646B90 /* dQuaternion.cpp */,
+				C54C93AB19824F5D00A280B3 /* dLinearAlgebra.cpp */,
+				32BAE0B70371A74B00C91783 /* dMath_Prefix.pch */,
 				FF8C26441313D28E00646B90 /* dMathDefines.cpp */,
 				FF8C26461313D28E00646B90 /* dMatrix.cpp */,
-				FF8C26481313D28E00646B90 /* dQuaternion.cpp */,
 				FF8C264A1313D28E00646B90 /* dStdAfxMath.cpp */,
 				FF8C264C1313D28E00646B90 /* dVector.cpp */,
-				32BAE0B70371A74B00C91783 /* dMath_Prefix.pch */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -101,7 +104,7 @@
 		0867D690FE84028FC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0450;
+				LastUpgradeCheck = 0600;
 			};
 			buildConfigurationList = 1DEB920508733DBB0010E9CD /* Build configuration list for PBXProject "dMath" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -132,6 +135,7 @@
 				FF8C26501313D28E00646B90 /* dMatrix.cpp in Sources */,
 				FF8C26521313D28E00646B90 /* dQuaternion.cpp in Sources */,
 				FF8C26541313D28E00646B90 /* dStdAfxMath.cpp in Sources */,
+				C54C93AC19824F5D00A280B3 /* dLinearAlgebra.cpp in Sources */,
 				FF8C26561313D28E00646B90 /* dVector.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -143,7 +147,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
@@ -161,11 +164,8 @@
 					"../../../thirdParty/enet-1.2/include",
 				);
 				INSTALL_PATH = /usr/local/lib;
-				MACOSX_DEPLOYMENT_TARGET = "";
-				ONLY_ACTIVE_ARCH = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = "";
-				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Debug;
 		};
@@ -173,7 +173,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
@@ -190,11 +189,8 @@
 					"../../../thirdParty/enet-1.2/include",
 				);
 				INSTALL_PATH = /usr/local/lib;
-				MACOSX_DEPLOYMENT_TARGET = "";
-				ONLY_ACTIVE_ARCH = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = "";
-				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Release;
 		};
@@ -208,11 +204,10 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = dMath_d;
 				SDKROOT = macosx;
-				VALID_ARCHS = x86_64;
 			};
 			name = Debug;
 		};
@@ -226,11 +221,10 @@
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				ONLY_ACTIVE_ARCH = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = dMath;
 				SDKROOT = macosx;
-				VALID_ARCHS = x86_64;
 			};
 			name = Release;
 		};

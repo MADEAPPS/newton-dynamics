@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C54C93AA19824CF700A280B3 /* libnewton.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C54C939319824CD400A280B3 /* libnewton.a */; };
 		FF084A3F173F188B0059C41D /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = FF084A3D173F188B0059C41D /* MainMenu.xib */; };
 		FF084A85173F1AD30059C41D /* DemoCameraListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFD27435172DA06D00114513 /* DemoCameraListener.cpp */; };
 		FF084A87173F1AD30059C41D /* DemoListenerBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFD2742E172DA02000114513 /* DemoListenerBase.cpp */; };
@@ -58,7 +59,6 @@
 		FF084ACE173F1B310059C41D /* SceneCollision.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F6F1556DA2300E7B112 /* SceneCollision.cpp */; };
 		FF084AD0173F1B310059C41D /* SoftBodies.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F711556DA2300E7B112 /* SoftBodies.cpp */; };
 		FF084AD2173F1B310059C41D /* UsingNewtonMeshTool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F771556DA2300E7B112 /* UsingNewtonMeshTool.cpp */; };
-		FF084ADF173F1C8D0059C41D /* libnewton.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF99361C1735F69E000533B7 /* libnewton.a */; };
 		FF50660B173F34B600D01FDF /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF50660A173F34B600D01FDF /* Cocoa.framework */; };
 		FF50660D173F360C00D01FDF /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF50660C173F360C00D01FDF /* IOKit.framework */; };
 		FF50660F173F36B200D01FDF /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF50660E173F36B200D01FDF /* Carbon.framework */; };
@@ -280,12 +280,89 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		FF084A79173F1A9C0059C41D /* PBXContainerItemProxy */ = {
+		C54C939219824CD400A280B3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = FF9936141735F69D000533B7 /* newton.xcodeproj */;
+			containerPortal = C54C938E19824CD400A280B3 /* newton.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D2AAC06F0554671400DB518D;
+			remoteInfo = newton;
+		};
+		C54C939419824CF100A280B3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C54C938E19824CD400A280B3 /* newton.xcodeproj */;
 			proxyType = 1;
 			remoteGlobalIDString = D2AAC06E0554671400DB518D;
 			remoteInfo = newton;
+		};
+		C54C939619824CF100A280B3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FF8C2CE91313DC3700646B90 /* dMath.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = D2AAC06E0554671400DB518D;
+			remoteInfo = dMath;
+		};
+		C54C939819824CF100A280B3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FF8C2CFF1313DC7F00646B90 /* dScene.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = D2AAC06E0554671400DB518D;
+			remoteInfo = dScene;
+		};
+		C54C939A19824CF100A280B3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FFD2A799172E126900114513 /* dCustomJoints.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = FFD2A791172E123500114513;
+			remoteInfo = dCustomJoints;
+		};
+		C54C939C19824CF100A280B3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FF8C2CF41313DC6A00646B90 /* dContainers.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = D2AAC06E0554671400DB518D;
+			remoteInfo = dContainers;
+		};
+		C54C939E19824CF100A280B3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FF8402EB17353606008E038A /* wxcocoaStatic.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = BAB02EC06578349A9171CCAC;
+			remoteInfo = wxWidget;
+		};
+		C54C93A019824CF100A280B3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FF0A5030173163D5005D6C12 /* glew-osx.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = FF0A4FEB173160E6005D6C12;
+			remoteInfo = "glew-osx";
+		};
+		C54C93A219824CF100A280B3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FF7F20861730187900AC6E4B /* enet_osx.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = FF3B29D5173014AE007E6FEC;
+			remoteInfo = enet_osx;
+		};
+		C54C93A419824CF100A280B3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FF8C2D0A1313DC9500646B90 /* tinyxml.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = D2AAC06E0554671400DB518D;
+			remoteInfo = tinyxml;
+		};
+		C54C93A619824CF100A280B3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FF8B5E081750EFC00076BE6C /* freeType.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = FF8B5D7B175056CD0076BE6C;
+			remoteInfo = freeType;
+		};
+		C54C93A819824CF100A280B3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FFD2A77A172E0A1200114513 /* dVisualDebuggerServer.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = FFD2749E172E08F400114513;
+			remoteInfo = dVisualDebuggerServer;
 		};
 		FF85000017405FDE00BEE80B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -357,13 +434,6 @@
 			remoteGlobalIDString = FF8B5D7C175056CD0076BE6C;
 			remoteInfo = freeType;
 		};
-		FF99361B1735F69E000533B7 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FF9936141735F69D000533B7 /* newton.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = D2AAC06F0554671400DB518D;
-			remoteInfo = newton;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -379,6 +449,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		C54C938E19824CD400A280B3 /* newton.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = newton.xcodeproj; path = "../../../../../coreLibrary_300/projects/mac/os10.8-xcode-4.0/newton.xcodeproj"; sourceTree = "<group>"; };
 		FF084A25173F188A0059C41D /* demosSandbox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = demosSandbox.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF084A30173F188A0059C41D /* demosSandbox-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "demosSandbox-Info.plist"; path = "demosSandbox/demosSandbox-Info.plist"; sourceTree = "<group>"; };
 		FF084A36173F188A0059C41D /* demosSandbox-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "demosSandbox-Prefix.pch"; path = "demosSandbox/demosSandbox-Prefix.pch"; sourceTree = "<group>"; };
@@ -616,7 +687,6 @@
 		FF8C2CF41313DC6A00646B90 /* dContainers.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = dContainers.xcodeproj; path = ../../../../../packages/projects/mac/dContainers/dContainers.xcodeproj; sourceTree = "<group>"; };
 		FF8C2CFF1313DC7F00646B90 /* dScene.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = dScene.xcodeproj; path = ../../../../../packages/projects/mac/dScene/dScene.xcodeproj; sourceTree = "<group>"; };
 		FF8C2D0A1313DC9500646B90 /* tinyxml.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = tinyxml.xcodeproj; path = ../../../../../packages/projects/mac/tinyxml/tinyxml.xcodeproj; sourceTree = "<group>"; };
-		FF9936141735F69D000533B7 /* newton.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = newton.xcodeproj; path = "../../../../../coreLibrary_300/projects/mac/os10.6-xcode-3.2.5/newton.xcodeproj"; sourceTree = "<group>"; };
 		FF9BBC4C18351FB90060F147 /* lumber.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = lumber.ngd; path = ../../../../media/lumber.ngd; sourceTree = "<group>"; };
 		FF9BBC4D18351FB90060F147 /* ramp.off */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ramp.off; path = ../../../../media/ramp.off; sourceTree = "<group>"; };
 		FF9BBC4E18351FB90060F147 /* ruins.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = ruins.ngd; path = ../../../../media/ruins.ngd; sourceTree = "<group>"; };
@@ -674,6 +744,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C54C93AA19824CF700A280B3 /* libnewton.a in Frameworks */,
 				FF8B5E1A1750F3E70076BE6C /* libfreeType.a in Frameworks */,
 				FF85000C1740605300BEE80B /* libdContainers.a in Frameworks */,
 				FF85000D1740605400BEE80B /* libdCustomJoints.a in Frameworks */,
@@ -684,7 +755,6 @@
 				FF8500121740605400BEE80B /* libglew-osx.a in Frameworks */,
 				FF8500131740605400BEE80B /* libtinyxml.a in Frameworks */,
 				FF8500141740605400BEE80B /* libwxWidget.a in Frameworks */,
-				FF084ADF173F1C8D0059C41D /* libnewton.a in Frameworks */,
 				FF50660D173F360C00D01FDF /* IOKit.framework in Frameworks */,
 				FF50660F173F36B200D01FDF /* Carbon.framework in Frameworks */,
 				FF50660B173F34B600D01FDF /* Cocoa.framework in Frameworks */,
@@ -713,6 +783,14 @@
 			isa = PBXGroup;
 			children = (
 				FF084A25173F188A0059C41D /* demosSandbox.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C54C938F19824CD400A280B3 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C54C939319824CD400A280B3 /* libnewton.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1021,7 +1099,7 @@
 		FF8C27F31313DB2700646B90 /* dependencies */ = {
 			isa = PBXGroup;
 			children = (
-				FF9936141735F69D000533B7 /* newton.xcodeproj */,
+				C54C938E19824CD400A280B3 /* newton.xcodeproj */,
 				FF8C2CE91313DC3700646B90 /* dMath.xcodeproj */,
 				FF8C2CFF1313DC7F00646B90 /* dScene.xcodeproj */,
 				FFD2A799172E126900114513 /* dCustomJoints.xcodeproj */,
@@ -1121,14 +1199,6 @@
 			name = main;
 			sourceTree = "<group>";
 		};
-		FF9936151735F69D000533B7 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				FF99361C1735F69E000533B7 /* libnewton.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		FFF184A113130A6F0077CF7A /* source */ = {
 			isa = PBXGroup;
 			children = (
@@ -1177,7 +1247,17 @@
 			buildRules = (
 			);
 			dependencies = (
-				FF084A7A173F1A9C0059C41D /* PBXTargetDependency */,
+				C54C939519824CF100A280B3 /* PBXTargetDependency */,
+				C54C939719824CF100A280B3 /* PBXTargetDependency */,
+				C54C939919824CF100A280B3 /* PBXTargetDependency */,
+				C54C939B19824CF100A280B3 /* PBXTargetDependency */,
+				C54C939D19824CF100A280B3 /* PBXTargetDependency */,
+				C54C939F19824CF100A280B3 /* PBXTargetDependency */,
+				C54C93A119824CF100A280B3 /* PBXTargetDependency */,
+				C54C93A319824CF100A280B3 /* PBXTargetDependency */,
+				C54C93A519824CF100A280B3 /* PBXTargetDependency */,
+				C54C93A719824CF100A280B3 /* PBXTargetDependency */,
+				C54C93A919824CF100A280B3 /* PBXTargetDependency */,
 			);
 			name = demosSandbox;
 			productName = demosSandbox;
@@ -1190,7 +1270,7 @@
 		08FB7793FE84155DC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0450;
+				LastUpgradeCheck = 0600;
 			};
 			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "demosSandbox" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -1239,8 +1319,8 @@
 					ProjectRef = FF0A5030173163D5005D6C12 /* glew-osx.xcodeproj */;
 				},
 				{
-					ProductGroup = FF9936151735F69D000533B7 /* Products */;
-					ProjectRef = FF9936141735F69D000533B7 /* newton.xcodeproj */;
+					ProductGroup = C54C938F19824CD400A280B3 /* Products */;
+					ProjectRef = C54C938E19824CD400A280B3 /* newton.xcodeproj */;
 				},
 				{
 					ProductGroup = FF85000717405FDE00BEE80B /* Products */;
@@ -1259,6 +1339,13 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		C54C939319824CD400A280B3 /* libnewton.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libnewton.a;
+			remoteRef = C54C939219824CD400A280B3 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		FF85000117405FDE00BEE80B /* libdMath.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -1327,13 +1414,6 @@
 			fileType = archive.ar;
 			path = libfreeType.a;
 			remoteRef = FF8B5E0F1750EFC00076BE6C /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		FF99361C1735F69E000533B7 /* libnewton.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libnewton.a;
-			remoteRef = FF99361B1735F69E000533B7 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -1612,10 +1692,60 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		FF084A7A173F1A9C0059C41D /* PBXTargetDependency */ = {
+		C54C939519824CF100A280B3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = newton;
-			targetProxy = FF084A79173F1A9C0059C41D /* PBXContainerItemProxy */;
+			targetProxy = C54C939419824CF100A280B3 /* PBXContainerItemProxy */;
+		};
+		C54C939719824CF100A280B3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = dMath;
+			targetProxy = C54C939619824CF100A280B3 /* PBXContainerItemProxy */;
+		};
+		C54C939919824CF100A280B3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = dScene;
+			targetProxy = C54C939819824CF100A280B3 /* PBXContainerItemProxy */;
+		};
+		C54C939B19824CF100A280B3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = dCustomJoints;
+			targetProxy = C54C939A19824CF100A280B3 /* PBXContainerItemProxy */;
+		};
+		C54C939D19824CF100A280B3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = dContainers;
+			targetProxy = C54C939C19824CF100A280B3 /* PBXContainerItemProxy */;
+		};
+		C54C939F19824CF100A280B3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = wxWidget;
+			targetProxy = C54C939E19824CF100A280B3 /* PBXContainerItemProxy */;
+		};
+		C54C93A119824CF100A280B3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "glew-osx";
+			targetProxy = C54C93A019824CF100A280B3 /* PBXContainerItemProxy */;
+		};
+		C54C93A319824CF100A280B3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = enet_osx;
+			targetProxy = C54C93A219824CF100A280B3 /* PBXContainerItemProxy */;
+		};
+		C54C93A519824CF100A280B3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = tinyxml;
+			targetProxy = C54C93A419824CF100A280B3 /* PBXContainerItemProxy */;
+		};
+		C54C93A719824CF100A280B3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = freeType;
+			targetProxy = C54C93A619824CF100A280B3 /* PBXContainerItemProxy */;
+		};
+		C54C93A919824CF100A280B3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = dVisualDebuggerServer;
+			targetProxy = C54C93A819824CF100A280B3 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1635,12 +1765,13 @@
 		1DEB923608733DC60010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_PARAMETER = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = demosSandbox_d;
 				SDKROOT = macosx;
@@ -1650,11 +1781,12 @@
 		1DEB923708733DC60010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_PARAMETER = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = demosSandbox;
 				SDKROOT = macosx;
 			};
@@ -1664,7 +1796,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CLANG_CXX_LIBRARY = "compiler-default";
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -1717,8 +1848,6 @@
 					"../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/build/osx/setup/cocoa/include",
 				);
 				INFOPLIST_FILE = "demosSandbox/demosSandbox-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = "";
-				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-pipe",
 					"-g",
@@ -1729,7 +1858,6 @@
 					"-DQT_SHARED",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = "";
 				WRAPPER_EXTENSION = app;
 				WXPLATFORM = "__WXOSX_$(WXTOOLKITUPPER)__";
 				WXTOOLKIT = cocoa;
@@ -1742,7 +1870,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CLANG_CXX_LIBRARY = "compiler-default";
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -1793,8 +1920,6 @@
 					"../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/build/osx/setup/cocoa/include",
 				);
 				INFOPLIST_FILE = "demosSandbox/demosSandbox-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = "";
-				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-pipe",
 					"-g",
@@ -1805,7 +1930,6 @@
 					"-DQT_SHARED",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = "";
 				WRAPPER_EXTENSION = app;
 				WXPLATFORM = "__WXOSX_$(WXTOOLKITUPPER)__";
 				WXTOOLKIT = cocoa;

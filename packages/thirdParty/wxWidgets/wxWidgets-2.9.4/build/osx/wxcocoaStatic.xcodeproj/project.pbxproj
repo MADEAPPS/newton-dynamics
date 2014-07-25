@@ -3833,6 +3833,7 @@
 			baseConfigurationReference = 8707324525DB344EA0E7D5CE /* wxdebug.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				SDKROOT = macosx;
 				WXROOT = "$(PROJECT_DIR)/../..";
 			};
@@ -3849,8 +3850,7 @@
 				GCC_VERSION = "";
 				"GCC_VERSION[arch=ppc]" = "";
 				"HEADER_SEARCH_PATHS[arch=*]" = "\"$(WXROOT)/src/tiff/libtiff\"";
-				MACOSX_DEPLOYMENT_TARGET = "";
-				"MACOSX_DEPLOYMENT_TARGET[arch=x86_64]" = "";
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				OTHER_LDFLAGS = (
 					"-framework",
 					Carbon,
@@ -3868,6 +3868,7 @@
 			baseConfigurationReference = D5B7B7C10A3E3C689AE1E418 /* wxrelease.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				SDKROOT = macosx;
 				WXROOT = "$(PROJECT_DIR)/../..";
 			};
@@ -3903,8 +3904,7 @@
 				GCC_VERSION = "";
 				"GCC_VERSION[arch=ppc]" = "";
 				HEADER_SEARCH_PATHS = "\"$(WXROOT)/src/tiff/libtiff\"";
-				MACOSX_DEPLOYMENT_TARGET = "";
-				"MACOSX_DEPLOYMENT_TARGET[arch=x86_64]" = "";
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				OTHER_CFLAGS = (
 					"-Wall",
 					"-Wundef",
