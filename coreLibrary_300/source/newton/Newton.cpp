@@ -4505,14 +4505,14 @@ void NewtonBodyDisableSimulation(const NewtonBody* const bodyPtr)
 	world->BodyDisableSimulation (body);
 }
 
-int NewtonKinematicBodyGetCollidable (const NewtonBody* const bodyPtr)
+int NewtonBodyGetCollidable (const NewtonBody* const bodyPtr)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)bodyPtr;
 	return body->IsCollidable() ? 1 : 0;
 }
 
-void NewtonKinematicBodySetCollidable (const NewtonBody* const bodyPtr, int collidable)
+void NewtonBodySetCollidable (const NewtonBody* const bodyPtr, int collidable)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)bodyPtr;
