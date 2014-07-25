@@ -48,7 +48,7 @@ class DemoMesh: public dList<DemoSubMesh>, virtual public dClassInfo
 	DemoMesh(const char* const name);
 	DemoMesh(NewtonMesh* const mesh);
 	DemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode);
-	DemoMesh(const char* const name, const NewtonCollision* const collision, const char* const texture0, const char* const texture1, const char* const texture2);
+	DemoMesh(const char* const name, const NewtonCollision* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat opacity = 1.0f);
 	DemoMesh(const char* const name, dFloat* const elevation, int size, dFloat cellSize, dFloat texelsDensity, int tileSize);
 
 	using dClassInfo::operator new;
@@ -64,13 +64,14 @@ class DemoMesh: public dList<DemoSubMesh>, virtual public dClassInfo
 	virtual void Render (DemoEntityManager* const scene);
 	virtual void RenderNormals ();
 
+	void OptimizeForRender();
 	NewtonMesh* CreateNewtonMesh(NewtonWorld* const workd, const dMatrix& meshMatrix);
 
 	protected:
 	virtual ~DemoMesh();
 
 	dAddRtti(dClassInfo,DOMMY_API);
-	void  OptimizeForRender();
+	
 	void  ResetOptimization();
 	void  SpliteSegment(dListNode* const node, int maxIndexCount);
 

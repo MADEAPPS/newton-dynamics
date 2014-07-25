@@ -30,7 +30,14 @@ class PhantomPlacement: public DemoEntity
 		NewtonCollision* const shape = NewtonCreateBox(world, 1.0f, 1.0f, 1.0f, 0, NULL);
 		m_phantom = NewtonCreateKinematicBody(world, shape, &matrix[0][0]);
 
-		DemoMesh* const geometry = new DemoMesh("primitive", shape, NULL, NULL, NULL);
+		m_solideMesh = new DemoMesh("primitive", shape, "smilli.tga", "smilli.tga", "smilli.tga");
+		DemoMesh* const geometry = new DemoMesh("primitive", shape, "smilli.tga", "smilli.tga", "smilli.tga", 0.5f);
+		DemoSubMesh& subMesh = geometry->GetFirst()->GetInfo();
+		subMesh.m_specular.m_z = 0.0f;
+		subMesh.m_diffuse.m_z = 0.0f;
+		subMesh.m_specular.m_z = 0.0f;
+		geometry->OptimizeForRender();
+
 		SetMesh(geometry, GetIdentityMatrix());
 		geometry->Release();
 
@@ -42,26 +49,13 @@ class PhantomPlacement: public DemoEntity
 		NewtonDestroyCollision(shape);
 	}
 
-	virtual void Render(dFloat timeStep, DemoEntityManager* const scene) const
+	~PhantomPlacement()
 	{
-		glEnable (GL_BLEND);
-		glDisable(GL_TEXTURE_2D);
-		glDisable (GL_LIGHTING);
-		//glDisable(GL_CULL_FACE);
-
-		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		//glBlendFunc (GL_ONE, GL_ONE);
-		glColor4f(1.0f, 0.0f, 1.0f, 0.25f);
-
-		DemoEntity::Render(timeStep, scene);
-		
-		//glEnable(GL_CULL_FACE);
-		glEnable (GL_LIGHTING);
-		glEnable(GL_TEXTURE_2D);
-		glDisable (GL_BLEND);
+		m_solideMesh->Release();
 	}
-
+	
 	NewtonBody* m_phantom;
+	DemoMesh* m_solideMesh;
 };
 
 class dKinematicPlacement: public CustomControllerBase
@@ -246,7 +240,7 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 							dMatrix matrix;
 							NewtonBodyGetMatrix(m_phantomEntity->m_phantom, &matrix[0][0]);
 							NewtonCollision* const collision = NewtonBodyGetCollision(m_phantomEntity->m_phantom);
-							NewtonBody* const body = CreateSimpleSolid (scene, m_phantomEntity->GetMesh(), 10.0f, matrix, collision, NewtonMaterialGetDefaultGroupID(world));
+							NewtonBody* const body = CreateSimpleSolid (scene, m_phantomEntity->m_solideMesh, 10.0f, matrix, collision, NewtonMaterialGetDefaultGroupID(world));
 
 						} 
 					}

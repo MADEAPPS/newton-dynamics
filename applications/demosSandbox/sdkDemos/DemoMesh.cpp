@@ -184,6 +184,10 @@ DemoMesh::DemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode)
 			segment->m_ambient = material->GetAmbientColor();
 			segment->m_diffuse = material->GetDiffuseColor();
 			segment->m_specular = material->GetSpecularColor();
+			
+			segment->m_ambient.m_w = material->GetOpacity();
+			segment->m_diffuse.m_w = material->GetOpacity();
+			segment->m_specular.m_w = material->GetOpacity();
 			segment->m_opacity = material->GetOpacity();
 		}
 
@@ -300,7 +304,7 @@ DemoMesh::DemoMesh(const DemoMesh& mesh)
 	OptimizeForRender ();
 }
 
-DemoMesh::DemoMesh(const char* const name, const NewtonCollision* const collision, const char* const texture0, const char* const texture1, const char* const texture2)
+DemoMesh::DemoMesh(const char* const name, const NewtonCollision* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat opacity)
 	:dClassInfo()
 	,dList<DemoSubMesh>()
 	,m_uv(NULL)
@@ -367,6 +371,10 @@ DemoMesh::DemoMesh(const char* const name, const NewtonCollision* const collisio
 		DemoSubMesh* const segment = AddSubMesh();
 
 		segment->m_textureHandle = (GLuint)material;
+		segment->m_opacity = opacity;
+		segment->m_ambient.m_w = opacity;
+		segment->m_specular.m_w = opacity;
+		segment->m_diffuse.m_w = opacity;
 
 		segment->AllocIndexData (indexCount);
 		NewtonMeshMaterialGetIndexStream (mesh, geometryHandle, handle, (int*)segment->m_indexes); 
@@ -689,16 +697,17 @@ void  DemoMesh::OptimizeForRender()
         glNewList(m_optimizedTransparentDiplayList, GL_COMPILE);
         //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
-        glEnable (GL_BLEND);
-        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		glEnable (GL_BLEND);
+		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
             DemoSubMesh& segment = node->GetInfo();
             if (segment.m_opacity <= 0.999f) {
-                glColor4f(1.0f, 1.0f, 1.0f, segment.m_opacity);
                 segment.OptimizeForRender(this);
             }
         }
-        glDisable(GL_BLEND);
+		glDisable(GL_BLEND);
+		glLoadIdentity();
         glEndList();
 	}
 #endif
@@ -746,7 +755,7 @@ void DemoMesh::Render (DemoEntityManager* const scene)
 
 	if (m_optimizedOpaqueDiplayList) {
 		glCallList(m_optimizedOpaqueDiplayList);
-	} else {
+	} else if (!m_optimizedTransparentDiplayList) {
 		glEnableClientState (GL_VERTEX_ARRAY);
 		glEnableClientState (GL_NORMAL_ARRAY);
 		glEnableClientState (GL_TEXTURE_COORD_ARRAY);

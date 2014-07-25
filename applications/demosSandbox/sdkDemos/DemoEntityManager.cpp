@@ -892,19 +892,18 @@ void DemoEntityManager::RenderFrame ()
 		}
 	}
 
-dMatrix xxxx;
-glGetFloat (GL_MODELVIEW_MATRIX, &xxxx[0][0]);
-
-    while (m_tranparentHeap.GetCount()) {
-        const TransparentMesh& transparentMesh = m_tranparentHeap[0];
-
-
-        glPushMatrix();	
-        glMultMatrix(&transparentMesh.m_matrix[0][0]);
-        transparentMesh.m_mesh->RenderTransparency();
-        glPopMatrix();
-        m_tranparentHeap.Pop();
-    }
+	if (m_tranparentHeap.GetCount()) {
+		dMatrix modelView;
+		glGetFloat (GL_MODELVIEW_MATRIX, &modelView[0][0]);
+		while (m_tranparentHeap.GetCount()) {
+			const TransparentMesh& transparentMesh = m_tranparentHeap[0];
+			glLoadIdentity();
+			glLoadMatrix(&transparentMesh.m_matrix[0][0]);
+			transparentMesh.m_mesh->RenderTransparency();
+			m_tranparentHeap.Pop();
+		}
+		glLoadMatrix(&modelView[0][0]);
+	}
 
 
 	m_cameraManager->RenderPickedTarget ();
