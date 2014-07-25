@@ -372,7 +372,13 @@ protected :
 #ifdef __LP64__
     WXEXPORT
 #endif // 64 bit builds
-    @interface wxNSAppController : NSObject wxOSX_10_6_AND_LATER(<NSApplicationDelegate>)
+
+
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_8
+@interface wxNSAppController : NSObject <NSApplicationDelegate, NSFileManagerDelegate >
+#else
+@interface wxNSAppController : NSObject wxOSX_10_6_AND_LATER(<NSApplicationDelegate>)
+#endif
     {
     }
 

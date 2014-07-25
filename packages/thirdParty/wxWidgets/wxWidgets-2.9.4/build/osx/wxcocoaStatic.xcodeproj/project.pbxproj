@@ -2979,7 +2979,7 @@
 		19367367C9323490BB936F06 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0450;
+				LastUpgradeCheck = 0600;
 			};
 			buildConfigurationList = 6976B5F5F3A63A21A92029E3 /* Build configuration list for PBXProject "wxcocoaStatic" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -3832,6 +3832,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8707324525DB344EA0E7D5CE /* wxdebug.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				SDKROOT = macosx;
 				WXROOT = "$(PROJECT_DIR)/../..";
 			};
 			name = Debug;
@@ -3849,7 +3851,6 @@
 				"HEADER_SEARCH_PATHS[arch=*]" = "\"$(WXROOT)/src/tiff/libtiff\"";
 				MACOSX_DEPLOYMENT_TARGET = "";
 				"MACOSX_DEPLOYMENT_TARGET[arch=x86_64]" = "";
-				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"-framework",
 					Carbon,
@@ -3859,8 +3860,6 @@
 					OpenGL,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = "";
-				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Debug;
 		};
@@ -3868,6 +3867,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D5B7B7C10A3E3C689AE1E418 /* wxrelease.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				SDKROOT = macosx;
 				WXROOT = "$(PROJECT_DIR)/../..";
 			};
 			name = Release;
@@ -3904,7 +3905,6 @@
 				HEADER_SEARCH_PATHS = "\"$(WXROOT)/src/tiff/libtiff\"";
 				MACOSX_DEPLOYMENT_TARGET = "";
 				"MACOSX_DEPLOYMENT_TARGET[arch=x86_64]" = "";
-				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-Wall",
 					"-Wundef",
@@ -3925,9 +3925,7 @@
 					OpenGL,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = "";
 				USER_HEADER_SEARCH_PATHS = "\"$(WXROOT)/include\" \"$(WXROOT)/build/osx/setup/$(WXTOOLKIT)/include\" \"$(WXROOT)/src/jpeg\" \"$(WXROOT)/src/png\" \"$(WXROOT)/src/regex\" \"$(WXROOT)/src/expat/lib\" \"$(WXROOT)/src/tiff/libtiff\" \"$(WXROOT)/src/stc/scintilla/src\" \"$(WXROOT)/src/stc/scintilla/include\"";
-				VALID_ARCHS = "i386 x86_64";
 				WXPLATFORM = "__WXOSX_$(WXTOOLKITUPPER)__";
 				WXTOOLKIT = cocoa;
 				WXTOOLKITUPPER = COCOA;
