@@ -1502,7 +1502,7 @@ void dgBroadPhase::UpdateContactsBroadPhaseEnd ()
 				dgVector dist ((maxBox.Abs()).GetMin (minBox.Abs()) & mask);
 				dist = dist.GetMax(dist.ShiftTripleRight());
 				dist = dist.GetMax(dist.ShiftTripleRight());
-				if (dist.GetScalar() > dgFloat32(2.0f)) {
+				if (dist.GetScalar() < dgFloat32(2.0f)) {
 					contact->m_broadphaseLru = lru - 1;
 				} else {
 					deadContacs[count] = contact;
