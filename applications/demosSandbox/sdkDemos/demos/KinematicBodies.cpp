@@ -106,24 +106,39 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 
 	virtual void Debug () const 
 	{
-	};
+	}
+
+
+	bool CanBeRayCasted(const NewtonBody* const body) const 
+	{
+		if (m_phantomEntity->m_phantom != body) {
+			for (dList<NewtonBody*>::dListNode* node = m_selectionToIgnore.GetFirst(); node; node = node->GetNext()) {
+				if (node->GetInfo() == body) {
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
 
     static dFloat RayCastFilter (const NewtonBody* const body, const NewtonCollision* const collisionHit, const dFloat* const contact, const dFloat* const normal, dLong collisionID, void* const userData, dFloat intersetParam)
     {
-        dKinematicPlacementManager* const me = (dKinematicPlacementManager*) userData;
-        if (me->m_phantomEntity->m_phantom != body) {
-            if (intersetParam < me->m_hitPoint) {
-                me->m_hitPoint = intersetParam;
-            }
-            return intersetParam;
-        }
-        return 1.0f;
+		dKinematicPlacementManager* const me = (dKinematicPlacementManager*) userData;
+		if (me->m_phantomEntity->m_phantom != body) {
+			if (intersetParam < me->m_hitParam) {
+				me->m_hitParam = intersetParam;
+			}
+			return intersetParam;
+		}
+		return 1.0f;
     }
 
 	static unsigned RayPrefilterCallback (const NewtonBody* const body, const NewtonCollision* const collision, void* const userData)
 	{
 		dKinematicPlacementManager* const me = (dKinematicPlacementManager*) userData;
-		return (me->m_phantomEntity->m_phantom != body) ? 1 : 0;
+		//return (me->m_phantomEntity->m_phantom != body) ? 1 : 0;
+		return me->CanBeRayCasted (body) ? 1 : 0;
 	}
 
     static int aabbCollisionCallback (const NewtonBody * const otherBody, void * const userData)
@@ -230,10 +245,10 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 			dVector p0 (camera->ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
 			dVector p1 (camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
 
-            m_hitPoint = 1.2f;
-            NewtonWorldRayCast(world, &p0[0], &p1[0], RayCastFilter, this, NULL, 0);
-            if (m_hitPoint < 1.0f) {
-				if (SetPlacementMatrix (p0 + (p1 - p0).Scale (m_hitPoint))) {
+            m_hitParam = 1.2f;
+            NewtonWorldRayCast(world, &p0[0], &p1[0], RayCastFilter, this, RayPrefilterCallback, 0);
+            if (m_hitParam < 1.0f) {
+				if (SetPlacementMatrix (p0 + (p1 - p0).Scale (m_hitParam))) {
 					if (!testForCollision ()) {
 						if (m_placeInstance.UpdateTriggerJoystick (mainWindow, mainWindow->GetMouseKeyState(0))) {
 							//dTrace (("xxx\n"));
@@ -241,11 +256,13 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 							NewtonBodyGetMatrix(m_phantomEntity->m_phantom, &matrix[0][0]);
 							NewtonCollision* const collision = NewtonBodyGetCollision(m_phantomEntity->m_phantom);
 							NewtonBody* const body = CreateSimpleSolid (scene, m_phantomEntity->m_solideMesh, 10.0f, matrix, collision, NewtonMaterialGetDefaultGroupID(world));
-
+							m_selectionToIgnore.Append(body);
 						} 
 					}
 				}
             }
+		} else {
+			m_selectionToIgnore.RemoveAll();
 		}
 	}
 
@@ -259,7 +276,8 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 	DemoEntityManager::ButtonKey m_helpKey;
 	DemoEntityManager::ButtonKey m_selectShape;
 	DemoEntityManager::ButtonKey m_placeInstance;
-    dFloat m_hitPoint;
+	dList<NewtonBody*> m_selectionToIgnore;
+    dFloat m_hitParam;
 	bool m_isCollisionFree;
 };
 
