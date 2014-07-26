@@ -184,10 +184,12 @@ dVector dQuaternion::UnrotateVector (const dVector& point) const
 	return matrix.UnrotateVector(point);
 }
 
-dVector dQuaternion::GetEulerAngles (dEulerAngleOrder order) const
+//dVector dQuaternion::GetEulerAngles (dEulerAngleOrder order) const
+void dQuaternion::GetEulerAngles(dVector& euler1, dVector& euler2, dEulerAngleOrder order) const 
 {
 	dMatrix matrix (*this, dVector (0.0f,0.0f,0.0f,1.0f));
-	return matrix.GetEulerAngles (order);
+	//return matrix.GetEulerAngles (order);
+    matrix.GetEulerAngles (euler1, euler2, order);
 }
 
 

@@ -150,13 +150,16 @@ bool dMatrix::TestOrthogonal() const
 }
 
 
-dVector dMatrix::GetEulerAngles (dEulerAngleOrder order) const
+//dVector dMatrix::GetEulerAngles (dEulerAngleOrder order) const
+void dMatrix::GetEulerAngles(dVector& euler1, dVector& euler2, dEulerAngleOrder order) const
 {
 	int a0 = (order>>8)&3;
 	int a1 = (order>>4)&3;
 	int a2 = (order>>0)&3;
 	const dMatrix& matrix = *this;
 
+    dAssert (0);
+/*
 	// array of the 3 euler angles
 	dVector euler; 
 	// Assuming the angles are in radians.
@@ -190,6 +193,7 @@ dVector dMatrix::GetEulerAngles (dEulerAngleOrder order) const
 		}
 	#endif
 	return euler;
+*/
 }
 
 

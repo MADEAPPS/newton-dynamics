@@ -34,8 +34,8 @@ class dQuaternion
 	dVector RotateVector (const dVector& point) const;
 	dVector UnrotateVector (const dVector& point) const;
 
-	//dVector GetXYZ_EulerAngles() const;
-	dVector GetEulerAngles (dEulerAngleOrder order = m_pitchYawRoll) const;
+	//dVector GetEulerAngles (dEulerAngleOrder order = m_pitchYawRoll) const;
+    void GetEulerAngles(dVector& euler1, dVector& euler2, dEulerAngleOrder order = m_pitchYawRoll) const;
 	dVector CalcAverageOmega (const dQuaternion &q1, dFloat invdt) const;
 	dQuaternion Slerp (const dQuaternion &q1, dFloat t) const;
 	dQuaternion IntegrateOmega (const dVector& omega, dFloat timestep) const;
