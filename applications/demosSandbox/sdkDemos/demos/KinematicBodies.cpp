@@ -125,13 +125,10 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
     static dFloat RayCastFilter (const NewtonBody* const body, const NewtonCollision* const collisionHit, const dFloat* const contact, const dFloat* const normal, dLong collisionID, void* const userData, dFloat intersetParam)
     {
 		dKinematicPlacementManager* const me = (dKinematicPlacementManager*) userData;
-		if (me->m_phantomEntity->m_phantom != body) {
-			if (intersetParam < me->m_hitParam) {
-				me->m_hitParam = intersetParam;
-			}
-			return intersetParam;
+		if (intersetParam < me->m_hitParam) {
+			me->m_hitParam = intersetParam;
 		}
-		return 1.0f;
+		return intersetParam;
     }
 
 	static unsigned RayPrefilterCallback (const NewtonBody* const body, const NewtonCollision* const collision, void* const userData)
@@ -269,8 +266,6 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 	virtual void PostUpdate (dFloat timestep)
 	{
 	}
-
-
 
 	PhantomPlacement* m_phantomEntity;
 	DemoEntityManager::ButtonKey m_helpKey;
