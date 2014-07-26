@@ -34,6 +34,7 @@ DemoSubMesh::DemoSubMesh ()
 	,m_ambient (0.8f, 0.8f, 0.8f, 1.0f)
 	,m_diffuse (0.8f, 0.8f, 0.8f, 1.0f)
 	,m_specular (1.0f, 1.0f, 1.0f, 1.0f)
+	,m_opacity(1.0f)
 {
 }
 
@@ -48,7 +49,13 @@ DemoSubMesh::~DemoSubMesh ()
 	}
 }
 
-
+void DemoSubMesh::SetOpacity(dFloat opacity)
+{
+	m_opacity = opacity;
+	m_ambient.m_w = opacity;
+	m_diffuse.m_w = opacity;
+	m_specular.m_w = opacity;
+}
 
 void DemoSubMesh::Render() const
 {
@@ -184,11 +191,7 @@ DemoMesh::DemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode)
 			segment->m_ambient = material->GetAmbientColor();
 			segment->m_diffuse = material->GetDiffuseColor();
 			segment->m_specular = material->GetSpecularColor();
-			
-			segment->m_ambient.m_w = material->GetOpacity();
-			segment->m_diffuse.m_w = material->GetOpacity();
-			segment->m_specular.m_w = material->GetOpacity();
-			segment->m_opacity = material->GetOpacity();
+			segment->SetOpacity(material->GetOpacity());
 		}
 
 		segment->AllocIndexData (indexCount);
@@ -371,10 +374,7 @@ DemoMesh::DemoMesh(const char* const name, const NewtonCollision* const collisio
 		DemoSubMesh* const segment = AddSubMesh();
 
 		segment->m_textureHandle = (GLuint)material;
-		segment->m_opacity = opacity;
-		segment->m_ambient.m_w = opacity;
-		segment->m_specular.m_w = opacity;
-		segment->m_diffuse.m_w = opacity;
+		segment->SetOpacity(opacity);
 
 		segment->AllocIndexData (indexCount);
 		NewtonMeshMaterialGetIndexStream (mesh, geometryHandle, handle, (int*)segment->m_indexes); 

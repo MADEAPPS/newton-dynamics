@@ -147,7 +147,7 @@ class dgCollisionCompound: public dgCollision
 	virtual dgTreeArray::dgTreeNode* AddCollision (dgCollisionInstance* const part);
 	virtual void RemoveCollision (dgTreeArray::dgTreeNode* const node);
 	virtual void SetCollisionMatrix (dgTreeArray::dgTreeNode* const node, const dgMatrix& matrix);
-	virtual void EndAddRemove ();
+	virtual void EndAddRemove (bool flushCache = true);
 
 	void ApplyScale (const dgVector& scale);
 	void GetAABB (dgVector& p0, dgVector& p1) const;

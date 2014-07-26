@@ -113,6 +113,8 @@ static void OnReconstructMainMeshCallBack (NewtonBody* const body, NewtonFractur
 		subMesh->AllocIndexData (indexCount);
 		subMesh->m_indexCount = NewtonFracturedCompoundMeshPartGetIndexStream (fracturedCompoundCollision, mainMesh, segment, (int*)subMesh->m_indexes); 
 	}
+
+	visualMesh->OptimizeForRender();
 }
 
 

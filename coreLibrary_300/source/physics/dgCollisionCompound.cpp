@@ -929,7 +929,7 @@ dgFloat64 dgCollisionCompound::CalculateEntropy (dgList<dgNodeBase*>& list)
 	return cost0;
 }
 
-void dgCollisionCompound::EndAddRemove ()
+void dgCollisionCompound::EndAddRemove (bool flushCache)
 {
 	if (m_root) {
 		dgWorld* const world = m_world;
@@ -995,7 +995,9 @@ void dgCollisionCompound::EndAddRemove ()
 		m_boxOrigin = m_root->m_origin;
 		MassProperties ();
 
-		m_world->FlushCache ();
+		if (flushCache) {
+			m_world->FlushCache ();
+		}
 	}
 }
 

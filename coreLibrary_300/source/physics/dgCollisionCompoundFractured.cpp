@@ -907,8 +907,8 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (const dgCollisionCom
 	dgAssert (SanityCheck());
 }
 
-dgCollisionCompoundFractured::dgCollisionCompoundFractured (dgCollisionCompoundFractured& source, const dgCollisionInstance* const myInstance, const dgList<dgConectivityGraph::dgListNode*>& island)
-	:dgCollisionCompound(source.m_world, myInstance)
+dgCollisionCompoundFractured::dgCollisionCompoundFractured (dgCollisionCompoundFractured& source, const dgList<dgConectivityGraph::dgListNode*>& island)
+	:dgCollisionCompound(source.m_world, NULL)
 	,m_conectivity(source.GetAllocator())
 	,m_conectivityMap (source.GetAllocator())
 	,m_vertexBuffer(source.m_vertexBuffer)
@@ -941,7 +941,7 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (dgCollisionCompoundF
 		m_conectivity.Append(chunkNode);
 		nodeInfo.m_shapeNode = treeNode;
 	}
-	dgCollisionCompound::EndAddRemove();
+	dgCollisionCompound::EndAddRemove(false);
 
 	dgMesh* const mainMesh = new (m_world->GetAllocator()) dgMesh(m_world->GetAllocator());
 	dgConectivityGraph::dgListNode* const mainNode = m_conectivity.dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>::AddNode ();
@@ -1703,10 +1703,8 @@ void dgCollisionCompoundFractured::SpawnSingleChunk (dgBody* const myBody, const
 	m_conectivity.DeleteNode(chunkNode);
 }
 
-void dgCollisionCompoundFractured::SpawnComplexChunk (dgBody* const myBody, const dgCollisionInstance* const myInstance, dgConectivityGraph::dgListNode* const chunkNode)
+void dgCollisionCompoundFractured::SpawnComplexChunk (dgBody* const myBody, const dgCollisionInstance* const parentInstance, dgConectivityGraph::dgListNode* const chunkNode)
 {
-	dgAssert (0);
-/*
 	dgInt32 stack = 1;
 	dgConectivityGraph::dgListNode* pool[512];
 
@@ -1739,9 +1737,10 @@ void dgCollisionCompoundFractured::SpawnComplexChunk (dgBody* const myBody, cons
 	const dgVector& veloc = myBody->GetVelocity();
 	const dgVector& omega = myBody->GetOmega();
 	dgVector com (matrix.TransformVector(myBody->GetCentreOfMass()));
-	
+
 	dgCollisionCompoundFractured* const childStructureCollision = new (GetAllocator()) dgCollisionCompoundFractured (*this, islanList);
-	dgCollisionInstance* const childStructureInstance = m_world->CreateInstance (childStructureCollision, myInstance->GetUserDataID(), myInstance->GetLocalMatrix()); 
+	dgCollisionInstance* const childStructureInstance = m_world->CreateInstance (childStructureCollision, parentInstance->GetUserDataID(), parentInstance->GetLocalMatrix()); 
+	childStructureCollision->m_myInstance = childStructureInstance;
 	childStructureCollision->Release();
 
 	dgDynamicBody* const chunkBody = m_world->CreateDynamicBody (childStructureInstance, matrix);
@@ -1758,5 +1757,4 @@ void dgCollisionCompoundFractured::SpawnComplexChunk (dgBody* const myBody, cons
 
 	m_emitFracturedCompound (chunkBody);
 	childStructureInstance->Release();
-*/
 }

@@ -26,6 +26,7 @@ class DemoSubMesh
 	void AllocIndexData (int indexCount);
 	void OptimizeForRender(const DemoMesh* const mesh) const;
 	
+	void SetOpacity(dFloat opacity);
 
 	int m_indexCount;
 	unsigned *m_indexes;

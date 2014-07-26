@@ -159,7 +159,9 @@ DG_INLINE dgCollisionInstance::dgCollisionInstance(const dgCollisionInstance& me
 	,m_collisionMode(meshInstance.m_collisionMode)
 	,m_scaleType(meshInstance.m_scaleType)
 {
-	m_childShape->AddRef();
+	if (m_childShape) {
+		m_childShape->AddRef();
+	}
 }
 
 

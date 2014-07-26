@@ -161,7 +161,7 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 	typedef void (*OnReconstructFractureMainMeshCallBack) (dgBody* const body, dgConectivityGraph::dgListNode* const mainMeshNode, const dgCollisionInstance* const myInstance);
 
 	dgCollisionCompoundFractured (const dgCollisionCompoundFractured& source, const dgCollisionInstance* const myInstance);
-	dgCollisionCompoundFractured (dgCollisionCompoundFractured& source, const dgCollisionInstance* const myInstance, const dgList<dgConectivityGraph::dgListNode*>& island);
+	dgCollisionCompoundFractured (dgCollisionCompoundFractured& source, const dgList<dgConectivityGraph::dgListNode*>& island);
 	dgCollisionCompoundFractured (dgWorld* const world, dgMeshEffect* const solidMesh, dgInt32 fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& offsetMatrix,
 								 OnEmitFractureChunkCallBack emitFracturedChunk, OnEmitNewCompundFractureCallBack emitNewCompoundFactured, OnReconstructFractureMainMeshCallBack reconstructMainMesh);
 
