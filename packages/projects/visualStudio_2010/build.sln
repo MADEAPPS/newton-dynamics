@@ -67,6 +67,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dNewton", "dNewton.vcxproj"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread", "..\..\..\coreLibrary_300\source\pthreads.2\VS_2010\pthread.vcxproj", "{03BCA23C-02A5-415B-A37B-26600BC2CE96}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tinyxml", "..\..\thirdParty\tinyxml\vs2010\tinyxml.vcxproj", "{18E509CF-46D2-4749-B3BB-160937CF2481}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug_md|Win32 = Debug_md|Win32
@@ -323,6 +325,26 @@ Global
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.releaseDll|Win32.Build.0 = release|Win32
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.releaseDll|x64.ActiveCfg = release|x64
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.releaseDll|x64.Build.0 = release|x64
+		{18E509CF-46D2-4749-B3BB-160937CF2481}.Debug_md|Win32.ActiveCfg = debug|x64
+		{18E509CF-46D2-4749-B3BB-160937CF2481}.Debug_md|x64.ActiveCfg = debug|x64
+		{18E509CF-46D2-4749-B3BB-160937CF2481}.Debug_md|x64.Build.0 = debug|x64
+		{18E509CF-46D2-4749-B3BB-160937CF2481}.Debug|Win32.ActiveCfg = debug|Win32
+		{18E509CF-46D2-4749-B3BB-160937CF2481}.Debug|Win32.Build.0 = debug|Win32
+		{18E509CF-46D2-4749-B3BB-160937CF2481}.Debug|x64.ActiveCfg = debug|x64
+		{18E509CF-46D2-4749-B3BB-160937CF2481}.Debug|x64.Build.0 = debug|x64
+		{18E509CF-46D2-4749-B3BB-160937CF2481}.debugDll|Win32.ActiveCfg = debug|x64
+		{18E509CF-46D2-4749-B3BB-160937CF2481}.debugDll|x64.ActiveCfg = debug|x64
+		{18E509CF-46D2-4749-B3BB-160937CF2481}.debugDll|x64.Build.0 = debug|x64
+		{18E509CF-46D2-4749-B3BB-160937CF2481}.Release_md|Win32.ActiveCfg = release|x64
+		{18E509CF-46D2-4749-B3BB-160937CF2481}.Release_md|x64.ActiveCfg = release|x64
+		{18E509CF-46D2-4749-B3BB-160937CF2481}.Release_md|x64.Build.0 = release|x64
+		{18E509CF-46D2-4749-B3BB-160937CF2481}.Release|Win32.ActiveCfg = release|Win32
+		{18E509CF-46D2-4749-B3BB-160937CF2481}.Release|Win32.Build.0 = release|Win32
+		{18E509CF-46D2-4749-B3BB-160937CF2481}.Release|x64.ActiveCfg = release|x64
+		{18E509CF-46D2-4749-B3BB-160937CF2481}.Release|x64.Build.0 = release|x64
+		{18E509CF-46D2-4749-B3BB-160937CF2481}.releaseDll|Win32.ActiveCfg = release|x64
+		{18E509CF-46D2-4749-B3BB-160937CF2481}.releaseDll|x64.ActiveCfg = release|x64
+		{18E509CF-46D2-4749-B3BB-160937CF2481}.releaseDll|x64.Build.0 = release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

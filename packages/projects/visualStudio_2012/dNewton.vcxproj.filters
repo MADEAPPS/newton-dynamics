@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="dJoints">
+      <UniqueIdentifier>{524ed6ac-7168-4737-a2de-5f96ccf32ac2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\dNewton\dNewtonActuatorJoints.cpp">
+      <Filter>dJoints</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dNewton\dNewtonJoint.cpp">
+      <Filter>dJoints</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dNewton\dNewton.cpp" />
+    <ClCompile Include="..\..\dNewton\dNewtonAlloc.cpp" />
+    <ClCompile Include="..\..\dNewton\dNewtonArticulationManager.cpp" />
+    <ClCompile Include="..\..\dNewton\dNewtonBody.cpp" />
+    <ClCompile Include="..\..\dNewton\dNewtonCollision.cpp" />
+    <ClCompile Include="..\..\dNewton\dNewtonDynamicBody.cpp" />
+    <ClCompile Include="..\..\dNewton\dNewtonInputManager.cpp" />
+    <ClCompile Include="..\..\dNewton\dNewtonKinematicBody.cpp" />
+    <ClCompile Include="..\..\dNewton\dNewtonMaterial.cpp" />
+    <ClCompile Include="..\..\dNewton\dNewtonMesh.cpp" />
+    <ClCompile Include="..\..\dNewton\dNewtonPlayerManager.cpp" />
+    <ClCompile Include="..\..\dNewton\dNewtonRayCast.cpp" />
+    <ClCompile Include="..\..\dNewton\dNewtonScopeBuffer.cpp" />
+    <ClCompile Include="..\..\dNewton\dNewtonTransformLerp.cpp" />
+    <ClCompile Include="..\..\dNewton\dNewtonTriggerManager.cpp" />
+    <ClCompile Include="..\..\dNewton\dStdAfxNewton.cpp" />
+    <ClCompile Include="..\..\dNewton\dMaterialPairManager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\dNewton\dNewtonActuatorJoints.h">
+      <Filter>dJoints</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dNewton\dNewtonJoint.h">
+      <Filter>dJoints</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dNewton\dNewton.h" />
+    <ClInclude Include="..\..\dNewton\dNewtonAlloc.h" />
+    <ClInclude Include="..\..\dNewton\dNewtonArticulationManager.h" />
+    <ClInclude Include="..\..\dNewton\dNewtonBody.h" />
+    <ClInclude Include="..\..\dNewton\dNewtonCollision.h" />
+    <ClInclude Include="..\..\dNewton\dNewtonDynamicBody.h" />
+    <ClInclude Include="..\..\dNewton\dNewtonInputManager.h" />
+    <ClInclude Include="..\..\dNewton\dNewtonKinematicBody.h" />
+    <ClInclude Include="..\..\dNewton\dNewtonMaterial.h" />
+    <ClInclude Include="..\..\dNewton\dNewtonMesh.h" />
+    <ClInclude Include="..\..\dNewton\dNewtonPlayerManager.h" />
+    <ClInclude Include="..\..\dNewton\dNewtonRayCast.h" />
+    <ClInclude Include="..\..\dNewton\dNewtonScopeBuffer.h" />
+    <ClInclude Include="..\..\dNewton\dNewtonTransformLerp.h" />
+    <ClInclude Include="..\..\dNewton\dNewtonTriggerManager.h" />
+    <ClInclude Include="..\..\dNewton\dStdAfxNewton.h" />
+    <ClInclude Include="..\..\dNewton\dMaterialPairManager.h" />
+  </ItemGroup>
+</Project>
