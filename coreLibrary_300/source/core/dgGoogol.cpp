@@ -52,7 +52,8 @@ dgGoogol dgGoogol::m_half(0.5);
 		m_mantissa[0] = (dgInt64 (dgFloat64 (dgUnsigned64(1)<<62) * mantissa));
 
 		// it looks like GCC have problems with this
-		dgAssert (m_mantissa[0] >= 0);
+		//dgAssert (m_mantissa[0] >= 0);
+		dgAssert ((m_mantissa[0] & dgUnsigned64(1)<<63) == 0);
 	}
 
 	void dgGoogol::CopySignedMantissa (dgUnsigned64* const mantissa) const
@@ -246,7 +247,9 @@ dgGoogol dgGoogol::m_half(0.5);
 		for (dgInt32 i = DG_GOOGOL_SIZE - 1; i > start; i --) {
 			tmp.m_mantissa[i] = 0;
 		}
-		dgUnsigned64 mask = (-1LL) << (64 - bits);
+		//dgUnsigned64 mask = (-1LL) << (64 - bits);
+		dgUnsigned64 mask (-1LL);
+		mask <<= (64 - bits);
 		tmp.m_mantissa[start] &= mask;
 		if (m_sign) {
 			dgAssert (0);

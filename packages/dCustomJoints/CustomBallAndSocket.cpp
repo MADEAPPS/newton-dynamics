@@ -211,19 +211,3 @@ void CustomLimitBallAndSocket::SubmitConstraints (dFloat timestep, int threadInd
 	}
 }
 
-
-
-
-/*
-dVector euler0;
-dVector euler1;
-localMatrix.GetEulerAngles(euler0, euler1);
-
-AngularIntegration m_pitch;
-AngularIntegration m_yaw;
-AngularIntegration m_roll;
-
-m_pitch.CalculateJointAngle (euler0.m_x);
-m_yaw.CalculateJointAngle (euler0.m_y);
-m_roll.CalculateJointAngle (euler0.m_z);
-*/

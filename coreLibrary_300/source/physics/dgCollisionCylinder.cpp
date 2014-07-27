@@ -199,7 +199,7 @@ void dgCollisionCylinder::DebugCollision (const dgMatrix& matrix, dgCollision::O
 
 dgVector dgCollisionCylinder::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
-	dgAssert (dgAbsf ((dir % dir - dgFloat32 (1.0f))) < dgFloat32 (1.0e-3f));
+	dgAssert (dgAbsf (dir % dir - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 
 	dgFloat32 y0 = m_radius;
 	dgFloat32 z0 = dgFloat32 (0.0f);

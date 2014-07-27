@@ -949,11 +949,12 @@ void dgCollisionCompound::EndAddRemove (bool flushCache)
 			dgNodeBase* const node = stackNode->GetInfo();
 			stack.Remove(stackNode);
 
-			if (node->m_type == m_node) {
-				list.Append(node);
-			}
+			//if (node->m_type == m_node) {
+			//	list.Append(node);
+			//}
 
 			if (node->m_type == m_node) {
+				list.Append(node);
 				stack.Append(node->m_right);
 				stack.Append(node->m_left);
 			} 
@@ -1843,6 +1844,8 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompound (dgCollidingPairCollect
 						}
 						//childInstance.SetUserData(NULL);
 						//otherChildInstance.SetUserData(NULL);
+						proxy.m_referenceCollision = NULL;
+						proxy.m_floatingCollision = NULL; 
 					}
 				}
 
@@ -1991,6 +1994,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToHeightField (dgCollidingPairColl
 							break;
 						}
 						//childInstance.SetUserData(NULL);
+						proxy.m_referenceCollision = NULL;
 					}
 				}
 
@@ -2090,6 +2094,7 @@ dgInt32 dgCollisionCompound::CalculateContactsUserDefinedCollision (dgCollidingP
 							break;
 						}
 						//childInstance.SetUserData(NULL);
+						proxy.m_referenceCollision = NULL;
 					}
 				}
 
@@ -2184,6 +2189,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingle (dgCollidingPairCollector
 							break;
 						}
 						//childInstance.SetUserData(NULL);
+						proxy.m_referenceCollision = NULL;
 					}
 				}
 
@@ -2307,6 +2313,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTree (dgCollidingPairCo
 							break;
 						}
 						//childInstance.SetUserData(NULL);
+						proxy.m_referenceCollision = NULL; 
 					}
 				}
 
@@ -2616,6 +2623,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgCollidingPairCo
 								}
 							}
 						}
+						proxy.m_referenceCollision = NULL; 
 					}
 				}
 			} else {
@@ -2758,6 +2766,8 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompoundContinue(dgCollidingPair
 								}
 							}
 						}
+						proxy.m_referenceCollision = NULL; 
+						proxy.m_floatingCollision = NULL; 
 					}
 				}
 			} else if (me->m_type == m_leaf) {
@@ -2972,6 +2982,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTreeContinue (dgCollidi
 								}
 							}
 						}
+						proxy.m_referenceCollision = NULL; 
 					}
 				}
 

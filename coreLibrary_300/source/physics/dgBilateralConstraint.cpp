@@ -171,7 +171,10 @@ dgVector dgBilateralConstraint::CalculateGlobalMatrixAndAngle (dgMatrix& globalM
 	dgAssert (dgAbsf (dgFloat32 (1.0f) - (relMatrix.m_up % relMatrix.m_up)) < 1.0e-5f); 
 	dgAssert (dgAbsf (dgFloat32 (1.0f) - (relMatrix.m_right % relMatrix.m_right)) < 1.0e-5f); 
 
-	return relMatrix.CalcPitchYawRoll ();
+	dgVector euler0;
+	dgVector euler1;
+	relMatrix.CalcPitchYawRoll (euler0, euler1);
+	return euler0;
 }
 
 void dgBilateralConstraint::SetMotorAcceleration (dgInt32 index, dgFloat32 acceleration, dgContraintDescritor& desc)

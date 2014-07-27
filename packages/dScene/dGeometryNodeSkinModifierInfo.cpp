@@ -94,8 +94,8 @@ void dGeometryNodeSkinModifierInfo::RemoveUnusedVertices(const int* const vertex
 	}
 	m_vertexCount = vertexCount;
 
-	delete boneWeightIndex;
-	delete vertexWeights;
+	delete[] boneWeightIndex;
+	delete[] vertexWeights;
 }
 
 

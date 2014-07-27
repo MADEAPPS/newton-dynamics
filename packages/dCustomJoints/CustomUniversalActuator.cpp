@@ -184,7 +184,6 @@ void CustomUniversalActuator::GetInfo (NewtonJointRecord* const info) const
 
 void CustomUniversalActuator::SubmitConstraints (dFloat timestep, int threadIndex)
 {
-
 	CustomUniversal::SubmitConstraints (timestep, threadIndex);
 
 	if (m_flag0 | m_flag1){

@@ -85,13 +85,13 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	dgWorld* const world = (dgWorld*) this;
 	dgUnsigned32 updateTime = world->m_getPerformanceCount();
 
+	world->m_dynamicsLru = world->m_dynamicsLru + DG_BODY_LRU_STEP;
+
 	m_bodies = 0;
 	m_joints = 0;
 	m_islands = 0;
-	m_markLru = 0;
-
-	world->m_dynamicsLru = world->m_dynamicsLru + DG_BODY_LRU_STEP;
 	m_markLru = world->m_dynamicsLru;
+
 	dgUnsigned32 lru = m_markLru - 1;
 
 	dgBodyMasterList& me = *world;

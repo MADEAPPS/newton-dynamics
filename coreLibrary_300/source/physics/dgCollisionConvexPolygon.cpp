@@ -87,7 +87,8 @@ dgFloat32 dgCollisionConvexPolygon::GetBoxMinRadius () const
 
 dgFloat32 dgCollisionConvexPolygon::GetBoxMaxRadius () const
 {
-	return m_faceClipSize;  
+	//return m_faceClipSize;  
+	return GetBoxMinRadius ();
 }
 
 

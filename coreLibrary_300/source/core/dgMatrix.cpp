@@ -263,12 +263,11 @@ dgMatrix dgMatrix::Symetric3by3Inverse () const
 
 
 
-dgVector dgMatrix::CalcPitchYawRoll () const
+void dgMatrix::CalcPitchYawRoll (dgVector& euler0, dgVector& euler1) const
 {
-	const dgFloat32 minSin = dgFloat32(0.99995f);
-
 	const dgMatrix& matrix = *this;
-
+/*
+	const dgFloat32 minSin = dgFloat32(0.99995f);
 	dgFloat32 roll = dgFloat32(0.0f);
 	dgFloat32 pitch  = dgFloat32(0.0f);
 	dgFloat32 yaw = dgAsin (-dgClamp (matrix[0][2], dgFloat32(-0.999999f), dgFloat32(0.999999f)));
@@ -294,8 +293,72 @@ dgVector dgMatrix::CalcPitchYawRoll () const
 		}
 	}
 #endif
-
 	return dgVector (pitch, yaw, roll, dgFloat32(0.0f));
+*/
+
+	// Assuming the angles are in radians.
+	if (matrix[0][2] > 0.99995f) {
+		dgFloat32 picth0 = 0.0f;
+		dgFloat32 yaw0 = -3.141592f * 0.5f;
+		dgFloat32 roll0 = - dgAtan2(matrix[2][1], matrix[1][1]);
+		euler0[0] = picth0;
+		euler0[1] = yaw0;
+		euler0[2] = roll0;
+
+		euler1[0] = picth0;
+		euler1[1] = yaw0;
+		euler1[2] = roll0;
+
+	} else if (matrix[0][2] < -0.99995f) {
+		dgFloat32 picth0 = 0.0f;
+		dgFloat32 yaw0 = 3.141592f * 0.5f;
+		dgFloat32 roll0 = dgAtan2(matrix[2][1], matrix[1][1]);
+		euler0[0] = picth0;
+		euler0[1] = yaw0;
+		euler0[2] = roll0;
+
+		euler1[0] = picth0;
+		euler1[1] = yaw0;
+		euler1[2] = roll0;
+	} else {
+		dgFloat32 yaw0 = -dgSin ( matrix[0][2]);
+		dgFloat32 yaw1 = 3.141592f - yaw0;
+		dgFloat32 sign0 = dgSign(dgCos (yaw0));
+		dgFloat32 sign1 = dgSign(dgCos (yaw1));
+
+		dgFloat32 picth0 = dgAtan2(matrix[1][2] * sign0, matrix[2][2] * sign0);
+		dgFloat32 picth1 = dgAtan2(matrix[1][2] * sign1, matrix[2][2] * sign1);
+
+		dgFloat32 roll0 = dgAtan2(matrix[0][1] * sign0, matrix[0][0] * sign0);
+		dgFloat32 roll1 = dgAtan2(matrix[0][1] * sign1, matrix[0][0] * sign1);
+
+		if (yaw1 > 3.141592f) {
+			yaw1 -= 2.0f * 3.141592f;
+		}
+
+		euler0[0] = picth0;
+		euler0[1] = yaw0;
+		euler0[2] = roll0;
+
+		euler1[0] = picth1;
+		euler1[1] = yaw1;
+		euler1[2] = roll1;
+	}
+	euler0[3] = dgFloat32(0.0f);
+	euler1[3] = dgFloat32(0.0f);
+
+#ifdef _DEBUG
+	dgMatrix m0 (dgPitchMatrix (euler0[0]) * dgYawMatrix(euler0[1]) * dgRollMatrix(euler0[2]));
+	dgMatrix m1 (dgPitchMatrix (euler1[0]) * dgYawMatrix(euler1[1]) * dgRollMatrix(euler1[2]));
+	for (int i = 0; i < 3; i ++) {
+		for (int j = 0; j < 3; j ++) {
+			dgFloat32 error = dgAbsf (m0[i][j] - matrix[i][j]);
+			dgAssert (error < 5.0e-2f);
+			error = dgAbsf (m1[i][j] - matrix[i][j]);
+			dgAssert (error < 5.0e-2f);
+		}
+	}
+#endif
 }
 
 

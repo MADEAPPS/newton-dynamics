@@ -338,7 +338,8 @@ DG_INLINE dgFloat32 dgCollisionInstance::GetBoxMinRadius () const
 
 DG_INLINE dgFloat32 dgCollisionInstance::GetBoxMaxRadius () const
 {
-	return m_childShape->GetBoxMaxRadius() * m_maxScale.m_x;
+	//return m_childShape->GetBoxMaxRadius() * m_maxScale.m_x;
+	return GetBoxMinRadius ();
 } 
 
 

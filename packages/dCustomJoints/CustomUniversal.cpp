@@ -67,6 +67,70 @@ CustomUniversal::~CustomUniversal()
 }
 
 
+void CustomUniversal::GetInfo (NewtonJointRecord* const info) const
+{
+	strcpy (info->m_descriptionType, "universal");
+
+	info->m_attachBody_0 = m_body0;
+	info->m_attachBody_1 = m_body1;
+
+	dMatrix matrix0;
+	dMatrix matrix1;
+	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
+	CalculateGlobalMatrix (matrix0, matrix1);
+
+	info->m_minLinearDof[0] = 0.0f;
+	info->m_maxLinearDof[0] = 0.0f;
+
+	info->m_minLinearDof[1] = 0.0f;
+	info->m_maxLinearDof[1] = 0.0f;;
+
+	info->m_minLinearDof[2] = 0.0f;
+	info->m_maxLinearDof[2] = 0.0f;
+
+
+	if (m_limit_0_On) {
+		dFloat angle;
+		dFloat sinAngle;
+		dFloat cosAngle;
+
+		sinAngle = (matrix0.m_front * matrix1.m_front) % matrix1.m_up;
+		cosAngle = matrix0.m_front % matrix1.m_front;
+		angle = dAtan2 (sinAngle, cosAngle);
+
+		info->m_minAngularDof[0] = (m_minAngle_0 - angle) * 180.0f / 3.141592f ;
+		info->m_maxAngularDof[0] = (m_maxAngle_0 - angle) * 180.0f / 3.141592f ;
+	} else {
+		info->m_minAngularDof[0] = -FLT_MAX ;
+		info->m_maxAngularDof[0] =  FLT_MAX ;
+	}
+
+	//	 info->m_minAngularDof[1] = m_minAngle_1 * 180.0f / 3.141592f;
+	//	 info->m_maxAngularDof[1] = m_maxAngle_1 * 180.0f / 3.141592f;
+
+	if (m_limit_1_On) {
+		dFloat angle;
+		dFloat sinAngle;
+		dFloat cosAngle;
+
+		sinAngle = (matrix0.m_up * matrix1.m_up) % matrix0.m_front;
+		cosAngle = matrix0.m_up % matrix1.m_up;
+		angle = dAtan2 (sinAngle, cosAngle);
+
+		info->m_minAngularDof[1] = (m_minAngle_1 - angle) * 180.0f / 3.141592f ;
+		info->m_maxAngularDof[1] = (m_maxAngle_1 - angle) * 180.0f / 3.141592f ;
+	} else {
+		info->m_minAngularDof[1] = -FLT_MAX ;
+		info->m_maxAngularDof[1] =  FLT_MAX ;
+	}
+
+	info->m_minAngularDof[2] = 0.0f;
+	info->m_maxAngularDof[2] = 0.0f;
+
+	memcpy (info->m_attachmenMatrix_0, &m_localMatrix0, sizeof (dMatrix));
+	memcpy (info->m_attachmenMatrix_1, &m_localMatrix1, sizeof (dMatrix));
+}
+
 void CustomUniversal::EnableLimit_0(bool state)
 {
 	m_limit_0_On = state;
@@ -260,8 +324,10 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 	const dVector& p1 = matrix1.m_posit;
 	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &dir0[0]);
 	NewtonUserJointSetRowStiffness (m_joint, 1.0f);
+
 	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &dir1[0]);
 	NewtonUserJointSetRowStiffness (m_joint, 1.0f);
+
 	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &dir2[0]);
 	NewtonUserJointSetRowStiffness (m_joint, 1.0f);
 
@@ -372,66 +438,3 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 }
 
 
-void CustomUniversal::GetInfo (NewtonJointRecord* const info) const
-{
-	strcpy (info->m_descriptionType, "universal");
-
-	info->m_attachBody_0 = m_body0;
-	info->m_attachBody_1 = m_body1;
-
-	dMatrix matrix0;
-	dMatrix matrix1;
-	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	CalculateGlobalMatrix (matrix0, matrix1);
-
-	info->m_minLinearDof[0] = 0.0f;
-	info->m_maxLinearDof[0] = 0.0f;
-
-	info->m_minLinearDof[1] = 0.0f;
-	info->m_maxLinearDof[1] = 0.0f;;
-
-	info->m_minLinearDof[2] = 0.0f;
-	info->m_maxLinearDof[2] = 0.0f;
-
-
-	if (m_limit_0_On) {
-		dFloat angle;
-		dFloat sinAngle;
-		dFloat cosAngle;
-
-		sinAngle = (matrix0.m_front * matrix1.m_front) % matrix1.m_up;
-		cosAngle = matrix0.m_front % matrix1.m_front;
-		angle = dAtan2 (sinAngle, cosAngle);
-
-		info->m_minAngularDof[0] = (m_minAngle_0 - angle) * 180.0f / 3.141592f ;
-		info->m_maxAngularDof[0] = (m_maxAngle_0 - angle) * 180.0f / 3.141592f ;
-	} else {
-		info->m_minAngularDof[0] = -FLT_MAX ;
-		info->m_maxAngularDof[0] =  FLT_MAX ;
-	}
-
-	//	 info->m_minAngularDof[1] = m_minAngle_1 * 180.0f / 3.141592f;
-	//	 info->m_maxAngularDof[1] = m_maxAngle_1 * 180.0f / 3.141592f;
-
-	if (m_limit_1_On) {
-		dFloat angle;
-		dFloat sinAngle;
-		dFloat cosAngle;
-
-		sinAngle = (matrix0.m_up * matrix1.m_up) % matrix0.m_front;
-		cosAngle = matrix0.m_up % matrix1.m_up;
-		angle = dAtan2 (sinAngle, cosAngle);
-
-		info->m_minAngularDof[1] = (m_minAngle_1 - angle) * 180.0f / 3.141592f ;
-		info->m_maxAngularDof[1] = (m_maxAngle_1 - angle) * 180.0f / 3.141592f ;
-	} else {
-		info->m_minAngularDof[1] = -FLT_MAX ;
-		info->m_maxAngularDof[1] =  FLT_MAX ;
-	}
-
-	info->m_minAngularDof[2] = 0.0f;
-	info->m_maxAngularDof[2] = 0.0f;
-
-	memcpy (info->m_attachmenMatrix_0, &m_localMatrix0, sizeof (dMatrix));
-	memcpy (info->m_attachmenMatrix_1, &m_localMatrix1, sizeof (dMatrix));
-}

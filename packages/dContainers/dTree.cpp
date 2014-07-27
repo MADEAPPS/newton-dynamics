@@ -201,7 +201,8 @@ void dRedBackNode::RemoveFixup (dRedBackNode* const me, dRedBackNode** const hea
 				ptr->SetColor(RED) ;
 				ptr->RotateLeft (head);
 				tmp = ptr->m_right;
-				if (!ptr || !tmp) {
+				//if (!ptr || !tmp) {
+				if (!tmp) {
 					return;
 				}
 			}
@@ -216,7 +217,8 @@ void dRedBackNode::RemoveFixup (dRedBackNode* const me, dRedBackNode** const hea
 				tmp->SetColor(RED);
 				tmp->RotateRight (head);
 				tmp = ptr->m_right;
-				if (!ptr || !tmp) {
+				//if (!ptr || !tmp) {
+				if (!tmp) {
 					return;
 				}
 			}
@@ -243,7 +245,8 @@ void dRedBackNode::RemoveFixup (dRedBackNode* const me, dRedBackNode** const hea
 				ptr->SetColor(RED) ;
 				ptr->RotateRight (head);
 				tmp = ptr->m_left;
-				if (!ptr || !tmp) {
+				//if (!ptr || !tmp) {
+				if (!tmp) {
 					return;
 				}
 			}
@@ -259,7 +262,8 @@ void dRedBackNode::RemoveFixup (dRedBackNode* const me, dRedBackNode** const hea
 				tmp->SetColor(RED) ;
 				tmp->RotateLeft (head);
 				tmp = ptr->m_left;
-				if (!ptr || !tmp) {
+				//if (!ptr || !tmp) {
+				if (!tmp) {
 					return;
 				}
 			}

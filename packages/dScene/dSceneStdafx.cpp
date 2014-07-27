@@ -636,15 +636,15 @@ bool DeserializeMesh (const NewtonMesh* const mesh, TiXmlElement* const rootNode
 		&uv1[0], 2 * sizeof (dFloat), uv1VertexIndex);
 
 
-	delete uv1VertexIndex;
-	delete uv0VertexIndex;
-	delete normalVertexIndex;
-	delete positionVertexIndex;
-	delete faceMaterials;
-	delete faceIndexCount;
-	delete uv1;	
-	delete uv0;	
-	delete normals;	
-	delete positions;	
+	delete[] uv1VertexIndex;
+	delete[] uv0VertexIndex;
+	delete[] normalVertexIndex;
+	delete[] positionVertexIndex;
+	delete[] faceMaterials;
+	delete[] faceIndexCount;
+	delete[] uv1;	
+	delete[] uv0;	
+	delete[] normals;	
+	delete[] positions;	
 	return true;
 }

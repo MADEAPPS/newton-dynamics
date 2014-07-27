@@ -1030,7 +1030,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 					} else {
 						dgVector velocStep2 (velocStep.DotProduct4(velocStep));
 						dgVector omegaStep2 (omegaStep.DotProduct4(omegaStep));
-						dgVector test ((velocStep2 > speedFreeze2) | (omegaStep2 > omegaStep2) | forceActiveMask);
+						dgVector test ((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2) | forceActiveMask);
 						if (test.GetSignMask()) {
 							body->m_resting = false;
 						}

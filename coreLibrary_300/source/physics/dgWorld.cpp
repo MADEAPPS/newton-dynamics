@@ -305,8 +305,6 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	AddSentinelBody();
 	SetPerfomanceCounter(NULL);
 
-
-
 	#ifdef _NEWTON_OPENCL
 	//m_openCL = dgOpencl::GetOpenCL(GetAllocator());
 	m_openCL = new (GetAllocator()) dgOpenclInstance(this);

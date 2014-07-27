@@ -69,7 +69,7 @@ class dgMatrix
 	dgPlane UntransformPlane (const dgPlane &globalPlane) const;
 	void TransformBBox (const dgVector& p0local, const dgVector& p1local, dgVector& p0, dgVector& p1) const; 
 
-	dgVector CalcPitchYawRoll () const;
+	void CalcPitchYawRoll (dgVector& euler0, dgVector& euler1) const;
 	void TransformTriplex (dgFloat32* const dst, dgInt32 dstStrideInBytes,
 						   const dgFloat32* const src, dgInt32 srcStrideInBytes, dgInt32 count) const;
 

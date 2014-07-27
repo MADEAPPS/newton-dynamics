@@ -543,7 +543,7 @@ void dgWorldDynamicUpdate::CalculateJointsVelocParallelKernel (void* const conte
 		} else {
 			dgVector velocStep2 (velocStep.DotProduct4(velocStep));
 			dgVector omegaStep2 (omegaStep.DotProduct4(omegaStep));
-			dgVector test ((velocStep2 > speedFreeze2) | (omegaStep2 > omegaStep2));
+			dgVector test ((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2));
 			if (test.GetSignMask()) {
 				body->m_resting = false;
 			}

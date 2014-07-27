@@ -206,7 +206,7 @@ void dSceneGraph::AddEdge (dTreeNode* const parent, dTreeNode* const child)
 	}
 
 	dAssert ((parentLink && childLink) || (!parentLink && !childLink));
-	if ((!parentLink && !childLink)) {
+	if (!parentLink && !childLink) {
 		parentNode.m_children.Append(child);
 		childNode.m_parents.Append(parent);
 	}

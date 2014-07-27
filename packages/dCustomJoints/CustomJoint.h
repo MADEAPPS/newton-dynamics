@@ -37,27 +37,54 @@ class CustomJoint: public CustomAlloc
 	struct AngularIntegration
 	{
 		AngularIntegration()
+			:m_angle(0.0f)
+			,m_sinJointAngle(0.0f)
+			,m_cosJointAngle(1.0f)
 		{
-			m_angle = 0.0f;
+		}
+
+		AngularIntegration(dFloat angle)
+			:m_angle(angle)
+			,m_sinJointAngle(dSin (angle))
+			,m_cosJointAngle(dCos (angle))
+		{
 		}
 
 		dFloat CalculateJointAngle (dFloat newAngleCos, dFloat newAngleSin)
 		{
-			dFloat sinJointAngle = dSin (m_angle);
-			dFloat cosJointAngle = dCos (m_angle);
-
-			dFloat sin_da = newAngleSin * cosJointAngle - newAngleCos * sinJointAngle; 
-			dFloat cos_da = newAngleCos * cosJointAngle + newAngleSin * sinJointAngle; 
+			dFloat sin_da = newAngleSin * m_cosJointAngle - newAngleCos * m_sinJointAngle; 
+			dFloat cos_da = newAngleCos * m_cosJointAngle + newAngleSin * m_sinJointAngle; 
 
 			m_angle += dAtan2 (sin_da, cos_da);
-			return  m_angle;
+			m_cosJointAngle = newAngleCos;
+			m_sinJointAngle = newAngleSin;
+			return m_angle;
 		}
+
+		AngularIntegration operator+ (const AngularIntegration& angle) const
+		{
+			dFloat sin_da = angle.m_sinJointAngle * m_cosJointAngle + angle.m_cosJointAngle * m_sinJointAngle; 
+			dFloat cos_da = angle.m_cosJointAngle * m_cosJointAngle - angle.m_sinJointAngle * m_sinJointAngle; 
+			dFloat angle_da = dAtan2 (sin_da, cos_da);
+			return AngularIntegration(m_angle + angle_da);
+		}
+
+		AngularIntegration operator- (const AngularIntegration& angle) const
+		{
+			dFloat sin_da = angle.m_sinJointAngle * m_cosJointAngle - angle.m_cosJointAngle * m_sinJointAngle; 
+			dFloat cos_da = angle.m_cosJointAngle * m_cosJointAngle + angle.m_sinJointAngle * m_sinJointAngle; 
+			dFloat angle_da = dAtan2 (sin_da, cos_da);
+			return AngularIntegration (angle_da);
+		}
+
 
 		dFloat CalculateJointAngle (dFloat angle)
 		{
 			return CalculateJointAngle (dCos (angle), dSin (angle));
 		}
 		dFloat m_angle;
+		dFloat m_sinJointAngle;
+		dFloat m_cosJointAngle;
 	};
 
 	CUSTOM_JOINTS_API CustomJoint();

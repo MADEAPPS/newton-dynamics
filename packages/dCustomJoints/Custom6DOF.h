@@ -31,29 +31,26 @@ class Custom6DOF: public CustomJoint
 	CUSTOM_JOINTS_API void GetLinearLimits (dVector& minLinearLimits, dVector& maxLinearLimits);
 	CUSTOM_JOINTS_API void GetAngularLimits (dVector& minAngularLimits, dVector& maxAngularLimits);
 
-
-	CUSTOM_JOINTS_API void SetReverserUniversal (int order);
-
 	protected:
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
-
 	CUSTOM_JOINTS_API void SubmitConstraints (const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
-
-	protected:
-	CUSTOM_JOINTS_API dMatrix CalculateBasisAndJointAngle (const dMatrix& matrix0, const dMatrix& matrix1) const;
-	CUSTOM_JOINTS_API dMatrix CalculateHinge_Angles (const dMatrix& matrix0, const dMatrix& matrix1, int x, int y, int z) const;
-	CUSTOM_JOINTS_API dMatrix CalculateUniversal_Angles (const dMatrix& matrix0, const dMatrix& matrix1, int x, int y, int z) const;
 
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;
+
 	dVector m_minLinearLimits;
 	dVector m_maxLinearLimits;
 	dVector m_minAngularLimits;
 	dVector m_maxAngularLimits;
+
 	dVector m_maxMaxLinearErrorRamp;
 	dVector m_maxMaxAngularErrorRamp;
-	bool m_reverseUniversal;
+
+	AngularIntegration m_pitch;
+	AngularIntegration m_yaw;
+	AngularIntegration m_roll;
+
 };
 
 #endif // !defined(AFX_Custom6DOF_H__B631F556_B7D7_F85ECF3E9ADE_H)
