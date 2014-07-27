@@ -76,9 +76,6 @@ void Custom6DOF::GetAngularLimits (dVector& minAngularLimits, dVector& maxAngula
 
 void Custom6DOF::GetInfo (NewtonJointRecord* const info) const
 {
-	dAssert (0);
-/*
-	int i;
 	dFloat dist;
 	dMatrix matrix0;
 	dMatrix matrix1;
@@ -94,13 +91,13 @@ void Custom6DOF::GetInfo (NewtonJointRecord* const info) const
 	dVector p0 (matrix0.m_posit);
 	dVector p1 (matrix1.m_posit);
 	dVector dp (p0 - p1);
-	for (i = 0; i < 3; i ++) {
+	for (int i = 0; i < 3; i ++) {
 		if (!((m_minLinearLimits[i] == 0.0f) && (m_maxLinearLimits[i] == 0.0f))) {
 			p1 += matrix1[i].Scale (dp % matrix1[i]);
 		}
 	}
 
-	for (i = 0; i < 3; i ++) {
+	for (int i = 0; i < 3; i ++) {
 		if ((m_minLinearLimits[i] == 0.0f) && (m_maxLinearLimits[i] == 0.0f)) {
 			info->m_minLinearDof[i] = 0.0f;
 			info->m_maxLinearDof[i] = 0.0f;
@@ -111,14 +108,14 @@ void Custom6DOF::GetInfo (NewtonJointRecord* const info) const
 		}
 	}
 
-	dMatrix eulerAngles (CalculateBasisAndJointAngle (matrix0, matrix1));
-	for (i = 0; i < 3; i ++) {
+	dVector eulerAngles (m_pitch.m_angle, m_yaw.m_angle, m_roll.m_angle, 0.0f);
+	for (int i = 0; i < 3; i ++) {
 		if ((m_minAngularLimits[i] == 0.0f) && (m_maxAngularLimits[i] == 0.0f)) {
 			info->m_minAngularDof[i] = 0.0f;
 			info->m_maxAngularDof[i] = 0.0f;
 		} else {
-			info->m_maxAngularDof[i] = (m_maxAngularLimits[i] - eulerAngles.m_posit[i]) * 180.0f / 3.141592f;
-			info->m_minAngularDof[i] = (m_minAngularLimits[i] - eulerAngles.m_posit[i]) * 180.0f / 3.141592f;
+			info->m_maxAngularDof[i] = (m_maxAngularLimits[i] - eulerAngles[i]) * 180.0f / 3.141592f;
+			info->m_minAngularDof[i] = (m_minAngularLimits[i] - eulerAngles[i]) * 180.0f / 3.141592f;
 		}
 	}
 
@@ -126,101 +123,6 @@ void Custom6DOF::GetInfo (NewtonJointRecord* const info) const
 
 	memcpy (info->m_attachmenMatrix_0, &m_localMatrix0, sizeof (dMatrix));
 	memcpy (info->m_attachmenMatrix_1, &m_localMatrix1, sizeof (dMatrix));
-*/
-}
-
-
-
-void Custom6DOF::SubmitConstraints (const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
-{
-	dAssert (0);
-/*
-	// add the linear limits
-	const dVector& p0 = matrix0.m_posit;
-	const dVector& p1 (matrix1.m_posit);
-	dVector dp (p0 - p1);
-
-	for (int i = 0; i < 3; i ++) {
-		if ((m_minLinearLimits[i] == 0.0f) && (m_maxLinearLimits[i] == 0.0f)) {
-			NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0[i][0]);
-			NewtonUserJointSetRowStiffness (m_joint, 1.0f);
-		} else {
-			// it is a limited linear dof, check if it pass the limits
-			dFloat dist = dp % matrix1[i];
-			if (dist > m_maxLinearLimits[i]) {
-				dVector q1 (p1 + matrix1[i].Scale (m_maxLinearLimits[i]));
-
-				// clamp the error, so the not too much energy is added when constraint violation occurs
-				dFloat maxDist = (p0 - q1) % matrix1[i];
-				if (maxDist > m_maxMaxLinearErrorRamp[i]) {
-					q1 = p0 - matrix1[i].Scale(m_maxMaxLinearErrorRamp[i]);
-				}
-
-				NewtonUserJointAddLinearRow (m_joint, &p0[0], &q1[0], &matrix0[i][0]);
-				NewtonUserJointSetRowStiffness (m_joint, 1.0f);
-				// allow the object to return but not to kick going forward
-				NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
-
-			} else if (dist < m_minLinearLimits[i]) {
-				dVector q1 (p1 + matrix1[i].Scale (m_minLinearLimits[i]));
-
-				// clamp the error, so the not too much energy is added when constraint violation occurs
-				dFloat maxDist = (p0 - q1) % matrix1[i];
-				if (maxDist < -m_maxMaxLinearErrorRamp[i]) {
-					q1 = p0 - matrix1[i].Scale(-m_maxMaxLinearErrorRamp[i]);
-				}
-				
-				NewtonUserJointAddLinearRow (m_joint, &p0[0], &q1[0], &matrix0[i][0]);
-				NewtonUserJointSetRowStiffness (m_joint, 1.0f);
-				// allow the object to return but not to kick going forward
-				NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
-			}
-		}
-	}
-
-	dMatrix basisAndEulerAngles (CalculateBasisAndJointAngle (matrix0, matrix1));
-	const dVector& eulerAngles = basisAndEulerAngles.m_posit;
-	for (int i = 0; i < 3; i ++) {
-		if ((m_minAngularLimits[i] == 0.0f) && (m_maxAngularLimits[i] == 0.0f)) {
-			NewtonUserJointAddAngularRow (m_joint, eulerAngles[i], &basisAndEulerAngles[i][0]);
-			NewtonUserJointSetRowStiffness (m_joint, 1.0f);
-		} else {
-			// it is a limited linear dof, check if it pass the limits
-			if (eulerAngles[i] > m_maxAngularLimits[i]) {
-				dFloat dist = eulerAngles[i] - m_maxAngularLimits[i];
-				// clamp the error, so the not too much energy is added when constraint violation occurs
-				if (dist > m_maxMaxAngularErrorRamp[i]) {
-					dist = m_maxMaxAngularErrorRamp[i];
-				}
-
-				// tell joint error will minimize the exceeded angle error
-				NewtonUserJointAddAngularRow (m_joint, dist, &basisAndEulerAngles[i][0]);
-
-				// need high stiffness here
-				NewtonUserJointSetRowStiffness (m_joint, 1.0f);
-
-				// allow the joint to move back freely
-				NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
-
-			} else if (eulerAngles[i] < m_minAngularLimits[i]) {
-				dFloat dist = eulerAngles[i] - m_minAngularLimits[i];
-				// clamp the error, so the not too much energy is added when constraint violation occurs
-				if (dist < -m_maxMaxAngularErrorRamp[i]) {
-					dist = -m_maxMaxAngularErrorRamp[i];
-				}
-
-				// tell joint error will minimize the exceeded angle error
-				NewtonUserJointAddAngularRow (m_joint, dist, &basisAndEulerAngles[i][0]);
-
-				// need high stiffness here
-				NewtonUserJointSetRowStiffness (m_joint, 1.0f);
-
-				// allow the joint to move back freely 
-				NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
-			}
-		}
-	}
-*/
 }
 
 
@@ -231,8 +133,6 @@ void Custom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
-//	SubmitConstraints (matrix0, matrix1, timestep);
-
 
 	// add the linear limits
 	const dVector& p0 = matrix0.m_posit;
@@ -288,26 +188,13 @@ void Custom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 		euler0 = euler1;
 	}
 
-	m_pitch.CalculateJointAngle (euler0.m_x);
 	m_yaw.CalculateJointAngle (euler0.m_y);
 	m_roll.CalculateJointAngle (euler0.m_z);
-
-	if ((m_minAngularLimits[0] == 0.0f) && (m_maxAngularLimits[0] == 0.0f)) {
-		dAssert (0);
-	} else {
-		if (m_pitch.m_angle > m_maxAngularLimits[0]) {
-//			dAssert (0);
-		} else if (m_pitch.m_angle < m_minAngularLimits[0]) {
-			dAssert (0);
-		}
-	}
-
-/*
-	dVector eulerAngles (m_pitch.m_angle, m_yaw.m_angle, m_roll.m_angle, 0.0f);
-
+	m_pitch.CalculateJointAngle (euler0.m_x);
+	dVector eulerAngles (-m_pitch.m_angle, -m_yaw.m_angle, -m_roll.m_angle, 0.0f);
 	for (int i = 0; i < 3; i ++) {
 		if ((m_minAngularLimits[i] == 0.0f) && (m_maxAngularLimits[i] == 0.0f)) {
-			NewtonUserJointAddAngularRow (m_joint, eulerAngles[i], &basisAndEulerAngles[i][0]);
+			NewtonUserJointAddAngularRow (m_joint, eulerAngles[i], &matrix0[i][0]);
 			NewtonUserJointSetRowStiffness (m_joint, 1.0f);
 		} else {
 			// it is a limited linear dof, check if it pass the limits
@@ -319,7 +206,7 @@ void Custom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 				}
 
 				// tell joint error will minimize the exceeded angle error
-				NewtonUserJointAddAngularRow (m_joint, dist, &basisAndEulerAngles[i][0]);
+				NewtonUserJointAddAngularRow (m_joint, dist, &matrix0[i][0]);
 
 				// need high stiffness here
 				NewtonUserJointSetRowStiffness (m_joint, 1.0f);
@@ -335,7 +222,7 @@ void Custom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 				}
 
 				// tell joint error will minimize the exceeded angle error
-				NewtonUserJointAddAngularRow (m_joint, dist, &basisAndEulerAngles[i][0]);
+				NewtonUserJointAddAngularRow (m_joint, dist, &matrix0[i][0]);
 
 				// need high stiffness here
 				NewtonUserJointSetRowStiffness (m_joint, 1.0f);
@@ -345,8 +232,6 @@ void Custom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 			}
 		}
 	}
-*/
-
 }
 
 

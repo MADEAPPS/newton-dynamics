@@ -20,6 +20,7 @@ AddGearAndRack (mSceneMgr, m_physicsWorld, Vector3 (10.0f, 0.0f, -15.0f));
 #include "DemoMesh.h"
 #include "../toolBox/OpenGlUtil.h"
 #include <CustomGear.h>
+#include <Custom6DOF.h>
 #include <CustomHinge.h>
 #include <CustomSlider.h>
 #include <CustomPulley.h>
@@ -218,6 +219,30 @@ static void AddDistance (DemoEntityManager* const scene, const dVector& origin)
 	new CustomDistance (pivot0, pivot1, box0, box1);
 }
 
+
+
+static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)
+{
+	dVector size (1.0f, 1.0f, 1.0f);
+	NewtonBody* const box0 = CreateBox (scene, origin + dVector (0.0f, 5.0f, 0.0f, 0.0f), size);
+	NewtonBody* const box1 = CreateBox (scene, origin + dVector (size.m_x, 5.0 - size.m_y, size.m_z, 0.0f), size);
+
+	// connect first box to the world
+	dMatrix matrix;
+
+	const dFloat angle = 60.0f * 3.1415592f / 180.0f;
+
+	NewtonBodyGetMatrix (box0, & matrix[0][0]);
+	matrix.m_posit += dVector (-size.m_x * 0.5f, size.m_y * 0.5f, -size.m_z * 0.5f, 0.0f);
+	Custom6DOF* const joint0 = new Custom6DOF (matrix, matrix, box0, NULL);
+	joint0->SetAngularLimits (dVector (-angle, -angle, -angle, 0.0f), dVector (angle, angle, angle, 0.0f));
+
+	// link the two boxes
+	NewtonBodyGetMatrix (box1, & matrix[0][0]);
+	matrix.m_posit += dVector (-size.m_x * 0.5f, size.m_y * 0.5f, -size.m_z * 0.5f, 0.0f);
+	Custom6DOF* const joint1 = new Custom6DOF (matrix, matrix, box0, box1);
+	joint1->SetAngularLimits (dVector (-angle, -angle, -angle, 0.0f), dVector (angle, angle, angle, 0.0f));
+}
 
 
 
@@ -467,19 +492,20 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
 	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
+	AddBallAndSockect (scene, dVector (-20.0f, 0.0f, -15.0f));
+	Add6DOF (scene, dVector (-20.0f, 0.0f, -10.0f));
 
-    AddBallAndSockect (scene, dVector (-20.0f, 0.0f, -15.0f));
-    AddHinge (scene, dVector (-20.0f, 0.0f, -10.0f));
-    AddSlider (scene, dVector (-20.0f, 0.0f, -5.0f));
-    AddCylindrical (scene, dVector (-20.0f, 0.0f, 0.0f));
-
-    // this joint is not very stable when using non rotational inertia, like these examples
-//  AddUniversal (mSceneMgr, m_physicsWorld, Vector3 (2.0f, 0.0f, -25.0f));
+    AddHinge (scene, dVector (-20.0f, 0.0f, -5.0f));
+    AddSlider (scene, dVector (-20.0f, 0.0f, -0.0f));
+    AddCylindrical (scene, dVector (-20.0f, 0.0f, 5.0f));
 
     //add relational joints example 
-    AddGear (scene, dVector (-20.0f, 0.0f, 5.0f));
-    AddPulley (scene, dVector (-20.0f, 0.0f, 10.0f));
-    AddGearAndRack (scene, dVector (-20.0f, 0.0f, 15.0f));
+    AddGear (scene, dVector (-20.0f, 0.0f, 10.0f));
+    AddPulley (scene, dVector (-20.0f, 0.0f, 15.0f));
+    AddGearAndRack (scene, dVector (-20.0f, 0.0f, 20.0f));
+
+	// this joint is not very stable when using non rotational inertia, like these examples
+	// AddUniversal (mSceneMgr, m_physicsWorld, Vector3 (2.0f, 0.0f, 25.0f));
 
     // place camera into position
     dMatrix camMatrix (GetIdentityMatrix());

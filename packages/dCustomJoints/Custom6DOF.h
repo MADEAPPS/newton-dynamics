@@ -34,7 +34,6 @@ class Custom6DOF: public CustomJoint
 	protected:
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
-	CUSTOM_JOINTS_API void SubmitConstraints (const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
 
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;
