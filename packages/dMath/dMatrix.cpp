@@ -17,7 +17,7 @@
 
 // calculate an orthonormal matrix with the front vector pointing on the 
 // dir direction, and the up and right are determined by using the GramSchidth procedure
-dMatrix dgGrammSchmidt(const dVector& dir)
+dMatrix dGrammSchmidt(const dVector& dir)
 {
 	dVector up;
 	dVector right;

@@ -35,12 +35,14 @@ CustomPulley::CustomPulley(
 	// calculate the two local matrix of the pivot point
 	dMatrix dommyMatrix;
 	// calculate the local matrix for body body0
-	dMatrix pinAndPivot0 (dgGrammSchmidt (childPin));
+	dMatrix pinAndPivot0 (dGrammSchmidt (childPin));
 	CalculateLocalMatrix (pinAndPivot0, m_localMatrix0, dommyMatrix);
+	m_localMatrix0.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 
 	// calculate the local matrix for body body1  
-	dMatrix pinAndPivot1 (dgGrammSchmidt (parentPin));
+	dMatrix pinAndPivot1 (dGrammSchmidt (parentPin));
 	CalculateLocalMatrix (pinAndPivot1, dommyMatrix, m_localMatrix1);
+	m_localMatrix1.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 }
 
 CustomPulley::~CustomPulley()

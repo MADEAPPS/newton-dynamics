@@ -65,7 +65,7 @@ class CustomDistance: public CustomJoint
 		dFloat mag2 = dist % dist;
 		if (mag2 > 0.0f) {
 			dist = dist.Scale (1.0f / dSqrt (mag2));
-			p0 += dist.Scale(m_distance);
+			p1 -= dist.Scale(m_distance);
 		}
 
 		// Restrict the movement on the pivot point along all tree orthonormal direction
@@ -105,7 +105,7 @@ class CustomBallAndSocketWithFriction: public CustomBallAndSocket
         dFloat omegaMag = dSqrt (relOmega % relOmega);
         if (omegaMag > 0.1f) {
             // tell newton to used this the friction of the omega vector to apply the rolling friction
-            dMatrix basis (dgGrammSchmidt (relOmega));
+            dMatrix basis (dGrammSchmidt (relOmega));
             NewtonUserJointAddAngularRow (m_joint, 0.0f, &basis[2][0]);
             NewtonUserJointAddAngularRow (m_joint, 0.0f, &basis[1][0]);
             NewtonUserJointAddAngularRow (m_joint, 0.0f, &basis[0][0]);
@@ -151,6 +151,26 @@ static NewtonBody* CreateBox (DemoEntityManager* const scene, const dVector& loc
     return body;
 }
 
+static NewtonBody* CreateCapule (DemoEntityManager* const scene, const dVector& location, const dVector& size)
+{
+	NewtonWorld* const world = scene->GetNewton();
+	int materialID =  NewtonMaterialGetDefaultGroupID (world);
+	dMatrix uprightAligment (dRollMatrix(3.141592f * 90.0f / 180.0f));
+	NewtonCollision* const collision = CreateConvexCollision (world, &uprightAligment[0][0], size, _CAPSULE_PRIMITIVE, 0);
+	DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+
+	dFloat mass = 1.0f;
+	dMatrix matrix (GetIdentityMatrix());
+	matrix.m_posit = location;
+	matrix.m_posit.m_w = 1.0f;
+	NewtonBody* const body = CreateSimpleSolid (scene, geometry, mass, matrix, collision, materialID);
+
+	geometry->Release();
+	NewtonDestroyCollision(collision);
+	return body;
+}
+
+
 
 static NewtonBody* CreateWheel (DemoEntityManager* const scene, const dVector& location, dFloat radius, dFloat height)
 {
@@ -194,19 +214,19 @@ static NewtonBody* CreateCylinder (DemoEntityManager* const scene, const dVector
 static void AddDistance (DemoEntityManager* const scene, const dVector& origin)
 {
 	dVector size (1.0f, 1.0f, 1.0f);
-	NewtonBody* const box0 = CreateBox (scene, origin + dVector (0.0f, 5.0f, 0.0f, 0.0f), size);
-	NewtonBody* const box1 = CreateBox (scene, origin + dVector (size.m_x * 2.0f, 5.0 - size.m_y * 2.0f, size.m_z * 2.0f, 0.0f), size);
+	NewtonBody* const box0 = CreateCapule (scene, origin + dVector (0.0f,  5.0f, 0.0f, 0.0f), size);
+	NewtonBody* const box1 = CreateCapule (scene, origin + dVector (0.0f,  5.0 - size.m_y * 4.0f, 0.0f, 0.0f), size);
+
+	dMatrix pinMatrix (dGrammSchmidt (dVector (0.0f, -1.0f, 0.0f, 0.0f)));
 
 	// connect first box to the world
-	dMatrix matrix;
-	NewtonBodyGetMatrix (box0, & matrix[0][0]);
-	matrix.m_posit += dVector (-size.m_x * 0.5f, size.m_y * 0.5f, -size.m_z * 0.5f, 0.0f);
-//	new CustomBallAndSocketWithFriction (matrix, box0, NULL, 2.0f);
+	dMatrix matrix0;
+	NewtonBodyGetMatrix (box0, &matrix0[0][0]);
+	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y * 0.5f, 0.0f, 0.0f);
+	new CustomBallAndSocket (pinMatrix, box0, NULL);
 
 	// link the two boxes with a distance joint
-	dMatrix matrix0;
 	dMatrix matrix1;
-	NewtonBodyGetMatrix (box0, &matrix0[0][0]);
 	NewtonBodyGetMatrix (box1, &matrix1[0][0]);
 
 	// get the origins
@@ -214,54 +234,54 @@ static void AddDistance (DemoEntityManager* const scene, const dVector& origin)
 	dVector pivot1 (matrix1.m_posit);
 
 	// connect bodies at a corner
-	//pivot0 += dVector (size.m_x * 0.5f, -size.m_y * 0.5f,  size.m_z * 0.5f, 0.0f);
-	//pivot1 += dVector (-size.m_x * 0.5f,  size.m_y * 0.5f, -size.m_z * 0.5f, 0.0f);
 	new CustomDistance (pivot0, pivot1, box0, box1);
 }
 
+
+static void AddBallAndSockect (DemoEntityManager* const scene, const dVector& origin)
+{
+	dVector size (1.0f, 1.0f, 1.0f);
+	NewtonBody* const box0 = CreateCapule (scene, origin + dVector (0.0f,  5.0f, 0.0f, 0.0f), size);
+	NewtonBody* const box1 = CreateCapule (scene, origin + dVector (0.0f,  5.0 - size.m_y * 2.0f, 0.0f, 0.0f), size);
+
+	dMatrix pinMatrix (dGrammSchmidt (dVector (0.0f, -1.0f, 0.0f, 0.0f)));
+
+	// connect first box to the world
+	dMatrix matrix0;
+	NewtonBodyGetMatrix (box0, &matrix0[0][0]);
+	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y * 0.5f, 0.0f, 0.0f);
+	new CustomBallAndSocketWithFriction (pinMatrix, box0, NULL, 2.0f);
+
+	// link the two boxes
+	dMatrix matrix1;
+	NewtonBodyGetMatrix (box1, & matrix1[0][0]);
+	pinMatrix.m_posit = (matrix0.m_posit + matrix1.m_posit).Scale (0.5f);
+	new CustomBallAndSocket (pinMatrix, box0, box1);
+}
 
 
 static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)
 {
 	dVector size (1.0f, 1.0f, 1.0f);
-	NewtonBody* const box0 = CreateBox (scene, origin + dVector (0.0f, 5.0f, 0.0f, 0.0f), size);
-	NewtonBody* const box1 = CreateBox (scene, origin + dVector (size.m_x, 5.0 - size.m_y, size.m_z, 0.0f), size);
-
-	// connect first box to the world
-	dMatrix matrix;
+	NewtonBody* const box0 = CreateCapule (scene, origin + dVector (0.0f,  5.0f, 0.0f, 0.0f), size);
+//	NewtonBody* const box1 = CreateCapule (scene, origin + dVector (0.0f,  5.0 - size.m_y * 2.0f, 0.0f, 0.0f), size);
 
 	const dFloat angle = 60.0f * 3.1415592f / 180.0f;
+	dMatrix pinMatrix (dGrammSchmidt (dVector (0.0f, -1.0f, 0.0f, 0.0f)));
 
-	NewtonBodyGetMatrix (box0, & matrix[0][0]);
-	matrix.m_posit += dVector (-size.m_x * 0.5f, size.m_y * 0.5f, -size.m_z * 0.5f, 0.0f);
-	Custom6DOF* const joint0 = new Custom6DOF (matrix, matrix, box0, NULL);
+	// connect first box to the world
+	dMatrix matrix0;
+	NewtonBodyGetMatrix (box0, & matrix0[0][0]);
+	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y * 0.5f, 0.0f, 0.0f);
+	Custom6DOF* const joint0 = new Custom6DOF (pinMatrix, pinMatrix, box0, NULL);
 	joint0->SetAngularLimits (dVector (-angle, -angle, -angle, 0.0f), dVector (angle, angle, angle, 0.0f));
 
 	// link the two boxes
-	NewtonBodyGetMatrix (box1, & matrix[0][0]);
-	matrix.m_posit += dVector (-size.m_x * 0.5f, size.m_y * 0.5f, -size.m_z * 0.5f, 0.0f);
-	Custom6DOF* const joint1 = new Custom6DOF (matrix, matrix, box0, box1);
-	joint1->SetAngularLimits (dVector (-angle, -angle, -angle, 0.0f), dVector (angle, angle, angle, 0.0f));
-}
-
-
-
-static void AddBallAndSockect (DemoEntityManager* const scene, const dVector& origin)
-{
-    dVector size (1.0f, 1.0f, 1.0f);
-    NewtonBody* const box0 = CreateBox (scene, origin + dVector (0.0f, 5.0f, 0.0f, 0.0f), size);
-    NewtonBody* const box1 = CreateBox (scene, origin + dVector (size.m_x, 5.0 - size.m_y, size.m_z, 0.0f), size);
-   
-    // connect first box to the world
-    dMatrix matrix;
-    NewtonBodyGetMatrix (box0, & matrix[0][0]);
-    matrix.m_posit += dVector (-size.m_x * 0.5f, size.m_y * 0.5f, -size.m_z * 0.5f, 0.0f);
-    new CustomBallAndSocketWithFriction (matrix, box0, NULL, 2.0f);
-
-    // link the two boxes
-    NewtonBodyGetMatrix (box1, & matrix[0][0]);
-    matrix.m_posit += dVector (-size.m_x * 0.5f, size.m_y * 0.5f, -size.m_z * 0.5f, 0.0f);
-    new CustomBallAndSocket (matrix, box0, box1);
+//	dMatrix matrix1;
+//	NewtonBodyGetMatrix (box1, &matrix1[0][0]);
+//	pinMatrix.m_posit = (matrix0.m_posit + matrix1.m_posit).Scale (0.5f);
+//	Custom6DOF* const joint1 = new Custom6DOF (pinMatrix, pinMatrix, box0, box1);
+//	joint1->SetAngularLimits (dVector (-angle, -angle, -angle, 0.0f), dVector (angle, angle, angle, 0.0f));
 }
 
 
@@ -491,18 +511,18 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector location (0.0f, 0.0f, 0.0f, 0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
-	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
-	AddBallAndSockect (scene, dVector (-20.0f, 0.0f, -15.0f));
+//	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
+//	AddBallAndSockect (scene, dVector (-20.0f, 0.0f, -15.0f));
 	Add6DOF (scene, dVector (-20.0f, 0.0f, -10.0f));
 
-    AddHinge (scene, dVector (-20.0f, 0.0f, -5.0f));
-    AddSlider (scene, dVector (-20.0f, 0.0f, -0.0f));
-    AddCylindrical (scene, dVector (-20.0f, 0.0f, 5.0f));
+//	AddHinge (scene, dVector (-20.0f, 0.0f, -5.0f));
+//	AddSlider (scene, dVector (-20.0f, 0.0f, -0.0f));
+//	AddCylindrical (scene, dVector (-20.0f, 0.0f, 5.0f));
 
     //add relational joints example 
-    AddGear (scene, dVector (-20.0f, 0.0f, 10.0f));
-    AddPulley (scene, dVector (-20.0f, 0.0f, 15.0f));
-    AddGearAndRack (scene, dVector (-20.0f, 0.0f, 20.0f));
+//	AddGear (scene, dVector (-20.0f, 0.0f, 10.0f));
+//	AddPulley (scene, dVector (-20.0f, 0.0f, 15.0f));
+//	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 20.0f));
 
 	// this joint is not very stable when using non rotational inertia, like these examples
 	// AddUniversal (mSceneMgr, m_physicsWorld, Vector3 (2.0f, 0.0f, 25.0f));

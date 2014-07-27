@@ -197,7 +197,7 @@ void CustomKinematicController::SubmitConstraints (dFloat timestep, int threadIn
 			dFloat mag = relOmega % relOmega;
 			if (mag > 1.0e-6f) {
 				dVector pin (relOmega.Scale (1.0f / mag));
-				dMatrix basis (dgGrammSchmidt (pin)); 	
+				dMatrix basis (dGrammSchmidt (pin)); 	
 				dFloat relSpeed = dSqrt (relOmega % relOmega);
 				dFloat relAlpha = relSpeed * invTimestep;
 

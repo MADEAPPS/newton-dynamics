@@ -31,7 +31,7 @@ class dInfinitePlane
 
 	{
 		// get the transformation matrix that takes the plane to the world local space
-		m_rotation = dgGrammSchmidt(plane);
+		m_rotation = dGrammSchmidt(plane);
 
 		// build a unit grid in local space (this will be the shadow at projection of the collision aabb)
 		m_unitSphape[0] = dVector (0.0f,  1.0f,  1.0f);

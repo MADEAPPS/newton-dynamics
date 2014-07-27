@@ -439,73 +439,77 @@ void RenderJointsDebugInfo (NewtonWorld* const world, dFloat size)
 			NewtonJointRecord info;
 			NewtonJointGetInfo (joint, &info);
 
-			// draw first frame
-			dMatrix matrix0;
-			NewtonBodyGetMatrix (info.m_attachBody_0, &matrix0[0][0]);
-			matrix0 = dMatrix (&info.m_attachmenMatrix_0[0][0]) * matrix0;
-			dVector o0 (matrix0.m_posit);
+			if (strcmp (info.m_descriptionType, "customJointNotInfo")) {
 
-			dVector x (o0 + matrix0.RotateVector (dVector (size, 0.0f, 0.0f, 0.0f)));
-			glColor3f (1.0f, 0.0f, 0.0f);
-			glVertex3f (o0.m_x, o0.m_y, o0.m_z);
-			glVertex3f (x.m_x, x.m_y, x.m_z);
+				// draw first frame
+				dMatrix matrix0;
+				NewtonBodyGetMatrix (info.m_attachBody_0, &matrix0[0][0]);
+				matrix0 = dMatrix (&info.m_attachmenMatrix_0[0][0]) * matrix0;
+				dVector o0 (matrix0.m_posit);
 
-			dVector y (o0 + matrix0.RotateVector (dVector (0.0f, size, 0.0f, 0.0f)));
-			glColor3f (0.0f, 1.0f, 0.0f);
-			glVertex3f (o0.m_x, o0.m_y, o0.m_z);
-			glVertex3f (y.m_x, y.m_y, y.m_z);
+				dVector x (o0 + matrix0.RotateVector (dVector (size, 0.0f, 0.0f, 0.0f)));
+				glColor3f (1.0f, 0.0f, 0.0f);
+				glVertex3f (o0.m_x, o0.m_y, o0.m_z);
+				glVertex3f (x.m_x, x.m_y, x.m_z);
 
-			dVector z (o0 + matrix0.RotateVector (dVector (0.0f, 0.0f, size, 0.0f)));
-			glColor3f (0.0f, 0.0f, 1.0f);
-			glVertex3f (o0.m_x, o0.m_y, o0.m_z);
-			glVertex3f (z.m_x, z.m_y, z.m_z);
+				dVector y (o0 + matrix0.RotateVector (dVector (0.0f, size, 0.0f, 0.0f)));
+				glColor3f (0.0f, 1.0f, 0.0f);
+				glVertex3f (o0.m_x, o0.m_y, o0.m_z);
+				glVertex3f (y.m_x, y.m_y, y.m_z);
+
+				dVector z (o0 + matrix0.RotateVector (dVector (0.0f, 0.0f, size, 0.0f)));
+				glColor3f (0.0f, 0.0f, 1.0f);
+				glVertex3f (o0.m_x, o0.m_y, o0.m_z);
+				glVertex3f (z.m_x, z.m_y, z.m_z);
 
 
-			// draw second first frame
-			dMatrix matrix1;
-			NewtonBodyGetMatrix (info.m_attachBody_1, &matrix1[0][0]);
-			matrix1 = dMatrix (&info.m_attachmenMatrix_1[0][0]) * matrix1;
-			dVector o1 (matrix1.m_posit);
-
-			x = o1 + matrix1.RotateVector (dVector (size, 0.0f, 0.0f, 0.0f));
-			glColor3f (1.0f, 0.0f, 0.0f);
-			glVertex3f (o1.m_x, o1.m_y, o1.m_z);
-			glVertex3f (x.m_x, x.m_y, x.m_z);
-
-			y = o1 + matrix1.RotateVector (dVector (0.0f, size, 0.0f, 0.0f));
-			glColor3f (0.0f, 1.0f, 0.0f);
-			glVertex3f (o1.m_x, o1.m_y, o1.m_z);
-			glVertex3f (y.m_x, y.m_y, y.m_z);
-
-			z = o1 + matrix1.RotateVector (dVector (0.0f, 0.0f, size, 0.0f));
-			glColor3f (0.0f, 0.0f, 1.0f);
-			glVertex3f (o1.m_x, o1.m_y, o1.m_z);
-			glVertex3f (z.m_x, z.m_y, z.m_z);
-
-			if (!strcmp (info.m_descriptionType, "limitballsocket")) {
-				// draw the cone limit of this joint
-				int steps = 12;
-				dMatrix coneMatrix (dRollMatrix(info.m_maxAngularDof[1]));
-				dMatrix ratationStep (dPitchMatrix(2.0f * 3.14151693f / steps));
-
-				dVector p0 (coneMatrix.RotateVector(dVector (size * 0.5f, 0.0f, 0.0f, 0.0f)));
-				dVector q0 (matrix1.TransformVector(p0));
-
-				glColor3f (1.0f, 1.0f, 0.0f);
-				for (int i = 0; i < (steps + 1); i ++) {
-					dVector p1 (ratationStep.RotateVector(p0));
-					dVector q1 (matrix1.TransformVector(p1));
-
-					glVertex3f (o0.m_x, o0.m_y, o0.m_z);
-					glVertex3f (q0.m_x, q0.m_y, q0.m_z);
-				
-					glVertex3f (q0.m_x, q0.m_y, q0.m_z);
-					glVertex3f (q1.m_x, q1.m_y, q1.m_z);
-
-					p0 = p1;
-					q0 = q1;
+				// draw second frame
+				dMatrix matrix1 (GetIdentityMatrix());
+				if (info.m_attachBody_1) {
+					NewtonBodyGetMatrix (info.m_attachBody_1, &matrix1[0][0]);
 				}
+				matrix1 = dMatrix (&info.m_attachmenMatrix_1[0][0]) * matrix1;
+				dVector o1 (matrix1.m_posit);
 
+				x = o1 + matrix1.RotateVector (dVector (size, 0.0f, 0.0f, 0.0f));
+				glColor3f (1.0f, 0.0f, 0.0f);
+				glVertex3f (o1.m_x, o1.m_y, o1.m_z);
+				glVertex3f (x.m_x, x.m_y, x.m_z);
+
+				y = o1 + matrix1.RotateVector (dVector (0.0f, size, 0.0f, 0.0f));
+				glColor3f (0.0f, 1.0f, 0.0f);
+				glVertex3f (o1.m_x, o1.m_y, o1.m_z);
+				glVertex3f (y.m_x, y.m_y, y.m_z);
+
+				z = o1 + matrix1.RotateVector (dVector (0.0f, 0.0f, size, 0.0f));
+				glColor3f (0.0f, 0.0f, 1.0f);
+				glVertex3f (o1.m_x, o1.m_y, o1.m_z);
+				glVertex3f (z.m_x, z.m_y, z.m_z);
+
+				if (!strcmp (info.m_descriptionType, "limitballsocket")) {
+					// draw the cone limit of this joint
+					int steps = 12;
+					dMatrix coneMatrix (dRollMatrix(info.m_maxAngularDof[1]));
+					dMatrix ratationStep (dPitchMatrix(2.0f * 3.14151693f / steps));
+
+					dVector p0 (coneMatrix.RotateVector(dVector (size * 0.5f, 0.0f, 0.0f, 0.0f)));
+					dVector q0 (matrix1.TransformVector(p0));
+
+					glColor3f (1.0f, 1.0f, 0.0f);
+					for (int i = 0; i < (steps + 1); i ++) {
+						dVector p1 (ratationStep.RotateVector(p0));
+						dVector q1 (matrix1.TransformVector(p1));
+
+						glVertex3f (o0.m_x, o0.m_y, o0.m_z);
+						glVertex3f (q0.m_x, q0.m_y, q0.m_z);
+				
+						glVertex3f (q0.m_x, q0.m_y, q0.m_z);
+						glVertex3f (q1.m_x, q1.m_y, q1.m_z);
+
+						p0 = p1;
+						q0 = q1;
+					}
+				}
 			}
 		}
 	}

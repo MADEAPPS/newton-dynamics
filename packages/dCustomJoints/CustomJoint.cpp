@@ -173,7 +173,7 @@ void CustomJoint::CalculateGlobalMatrix (const dMatrix& localMatrix0, const dMat
 
 void CustomJoint::GetInfo (NewtonJointRecord* const info) const
 {
-	dAssert (0);
+	strcpy (info->m_descriptionType, "customJointNotInfo");
 }
 
 

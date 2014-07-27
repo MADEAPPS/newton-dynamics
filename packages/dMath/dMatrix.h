@@ -140,6 +140,6 @@ inline const dVector& dMatrix::operator[] (int  i) const
 dMatrix dRollMatrix(dFloat ang);
 dMatrix dYawMatrix(dFloat ang);
 dMatrix dPitchMatrix(dFloat ang);
-dMatrix dgGrammSchmidt(const dVector& dir);
+dMatrix dGrammSchmidt(const dVector& dir);
 #endif
 

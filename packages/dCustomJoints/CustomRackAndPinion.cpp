@@ -30,19 +30,19 @@ CustomRackAndPinion::CustomRackAndPinion(dFloat gearRatio, const dVector& rotati
 
 	dMatrix dommyMatrix;
 
-	dMatrix pinAndPivot0 (dgGrammSchmidt (rotationalPin));
+	dMatrix pinAndPivot0 (dGrammSchmidt (rotationalPin));
 	CalculateLocalMatrix (pinAndPivot0, m_localMatrix0, dommyMatrix);
+	m_localMatrix0.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 
 	// calculate the local matrix for body body1  
-	dMatrix pinAndPivot1 (dgGrammSchmidt(linearPin));
+	dMatrix pinAndPivot1 (dGrammSchmidt(linearPin));
 	CalculateLocalMatrix (pinAndPivot1, dommyMatrix, m_localMatrix1);
+	m_localMatrix1.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 }
 
 CustomRackAndPinion::~CustomRackAndPinion()
 {
-	
 }
-
 
 void CustomRackAndPinion::SubmitConstraints (dFloat timestep, int threadIndex)
 {
