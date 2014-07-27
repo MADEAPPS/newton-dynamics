@@ -43,7 +43,6 @@ class CustomJoint: public CustomAlloc
 
 		dFloat CalculateJointAngle (dFloat newAngleCos, dFloat newAngleSin)
 		{
-			// the joint angle can be determine by getting the angle between any two non parallel vectors
 			dFloat sinJointAngle = dSin (m_angle);
 			dFloat cosJointAngle = dCos (m_angle);
 
@@ -52,6 +51,11 @@ class CustomJoint: public CustomAlloc
 
 			m_angle += dAtan2 (sin_da, cos_da);
 			return  m_angle;
+		}
+
+		dFloat CalculateJointAngle (dFloat angle)
+		{
+			return CalculateJointAngle (dCos (angle), dSin (angle));
 		}
 		dFloat m_angle;
 	};

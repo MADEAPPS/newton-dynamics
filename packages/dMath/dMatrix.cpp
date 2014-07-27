@@ -151,49 +151,82 @@ bool dMatrix::TestOrthogonal() const
 
 
 //dVector dMatrix::GetEulerAngles (dEulerAngleOrder order) const
-void dMatrix::GetEulerAngles(dVector& euler1, dVector& euler2, dEulerAngleOrder order) const
+void dMatrix::GetEulerAngles(dVector& euler0, dVector& euler1, dEulerAngleOrder order) const
 {
 	int a0 = (order>>8)&3;
 	int a1 = (order>>4)&3;
 	int a2 = (order>>0)&3;
 	const dMatrix& matrix = *this;
 
-    dAssert (0);
-/*
-	// array of the 3 euler angles
-	dVector euler; 
 	// Assuming the angles are in radians.
 	if (matrix[a0][a2] > 0.99995f) {
-	 // singularity at north pole
-		euler[a0] = -dAtan2(matrix[a2][a1], matrix[a1][a1]);
-		euler[a1] = -3.141592f * 0.5f;
-		euler[a2] = 0;
+		dFloat picth0 = 0.0f;
+		dFloat yaw0 = -3.141592f * 0.5f;
+		dFloat roll0 = - dAtan2(matrix[a2][a1], matrix[a1][a1]);
+		euler0[a0] = picth0;
+		euler0[a1] = yaw0;
+		euler0[a2] = roll0;
+
+		euler1[a0] = picth0;
+		euler1[a1] = yaw0;
+		euler1[a2] = roll0;
+
 	} else if (matrix[a0][a2] < -0.99995f) {
-	 // singularity at south pole
-		euler[a0] = -dAtan2(matrix[a2][a1], matrix[a1][a1]);
-		euler[a1] = 3.141592f * 0.5f;
-		euler[a2] = 0;
-		
+		dFloat picth0 = 0.0f;
+		dFloat yaw0 = 3.141592f * 0.5f;
+		dFloat roll0 = dAtan2(matrix[a2][a1], matrix[a1][a1]);
+		euler0[a0] = picth0;
+		euler0[a1] = yaw0;
+		euler0[a2] = roll0;
+
+		euler1[a0] = picth0;
+		euler1[a1] = yaw0;
+		euler1[a2] = roll0;
 	} else {
-		euler[a0] = -dAtan2(-matrix[a1][a2], matrix[a2][a2]);
-		euler[a1] = -dAsin ( matrix[a0][a2]);
-		euler[a2] = -dAtan2(-matrix[a0][a1], matrix[a0][a0]);
+		//euler[a0] = -dAtan2(-matrix[a1][a2], matrix[a2][a2]);
+		//euler[a1] = -dAsin ( matrix[a0][a2]);
+		//euler[a2] = -dAtan2(-matrix[a0][a1], matrix[a0][a0]);
+
+		dFloat yaw0 = -dAsin ( matrix[a0][a2]);
+		dFloat yaw1 = 3.141592f - yaw0;
+		dFloat sign0 = dSign(dCos (yaw0));
+		dFloat sign1 = dSign(dCos (yaw1));
+
+		dFloat picth0 = dAtan2(matrix[a1][a2] * sign0, matrix[a2][a2] * sign0);
+		dFloat picth1 = dAtan2(matrix[a1][a2] * sign1, matrix[a2][a2] * sign1);
+
+		dFloat roll0 = dAtan2(matrix[a0][a1] * sign0, matrix[a0][a0] * sign0);
+		dFloat roll1 = dAtan2(matrix[a0][a1] * sign1, matrix[a0][a0] * sign1);
+
+		if (yaw1 > 3.141592f) {
+			yaw1 -= 2.0f * 3.141592f;
+		}
+
+		euler0[a0] = picth0;
+		euler0[a1] = yaw0;
+		euler0[a2] = roll0;
+
+		euler1[a0] = picth1;
+		euler1[a1] = yaw1;
+		euler1[a2] = roll1;
 	}
-	euler[3] = dFloat(0.0f);
+	euler0[3] = dFloat(0.0f);
+	euler1[3] = dFloat(0.0f);
 
 	#ifdef _DEBUG
 		if (order == m_pitchYawRoll) {
-			dMatrix m (dPitchMatrix (euler[0]) * dYawMatrix(euler[1]) * dRollMatrix(euler[2]));
+			dMatrix m0 (dPitchMatrix (euler0[0]) * dYawMatrix(euler0[1]) * dRollMatrix(euler0[2]));
+			dMatrix m1 (dPitchMatrix (euler1[0]) * dYawMatrix(euler1[1]) * dRollMatrix(euler1[2]));
 			for (int i = 0; i < 3; i ++) {
 				for (int j = 0; j < 3; j ++) {
-					dFloat error = dAbs (m[i][j] - matrix[i][j]);
+					dFloat error = dAbs (m0[i][j] - matrix[i][j]);
+					dAssert (error < 5.0e-2f);
+					error = dAbs (m1[i][j] - matrix[i][j]);
 					dAssert (error < 5.0e-2f);
 				}
 			}
 		}
 	#endif
-	return euler;
-*/
 }
 
 

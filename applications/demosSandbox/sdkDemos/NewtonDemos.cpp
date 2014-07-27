@@ -53,7 +53,7 @@
 //#define DEFAULT_SCENE	27			// puck slide continue collision
 //#define DEFAULT_SCENE	28          // standard joints
 //#define DEFAULT_SCENE	29			// articulated joints
-//#define DEFAULT_SCENE	20			// basic rag doll
+//#define DEFAULT_SCENE	30			// basic rag doll
 //#define DEFAULT_SCENE	31			// basic car
 //#define DEFAULT_SCENE	32			// high performance super car
 //#define DEFAULT_SCENE	33			// basic player controller
@@ -298,9 +298,8 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	,m_timestepAcc(0)
 	,m_fps(0.0f)
 {
-
-m_showNormalForces = true;
-m_showCenterOfMass = true;
+//m_showNormalForces = true;
+//m_showCenterOfMass = true;
 //m_hideVisualMeshes = true;
 
 	memset (m_profilerTracksMenu, 0, sizeof (m_profilerTracksMenu));
