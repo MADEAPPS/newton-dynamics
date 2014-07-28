@@ -189,22 +189,19 @@
 #endif
 
 
+#include <stdint.h>
 
+typedef int8_t dgInt8;
+typedef uint8_t dgUnsigned8;
 
+typedef int16_t dgInt16;
+typedef uint16_t dgUnsigned16;
 
-typedef char dgInt8;
-typedef unsigned char dgUnsigned8;
+typedef int32_t dgInt32;
+typedef uint32_t dgUnsigned32;
 
-typedef short dgInt16;
-typedef unsigned short dgUnsigned16;
-
-typedef int dgInt32;
-typedef unsigned dgUnsigned32;
-typedef unsigned int dgUnsigned32;
-
-typedef long long dgInt64;
-typedef unsigned long long dgUnsigned64;
-
+typedef int64_t dgInt64;
+typedef uint64_t dgUnsigned64;
 
 typedef double dgFloat64;
 

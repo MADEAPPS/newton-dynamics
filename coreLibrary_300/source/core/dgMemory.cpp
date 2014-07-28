@@ -198,7 +198,7 @@ void *dgMemoryAllocator::Malloc (dgInt32 memsize)
 
 			m_memoryDirectory[entry].m_first = bin;
 
-			dgInt8* charPtr = bin->m_pool;
+			dgInt8* charPtr = reinterpret_cast<dgInt8*>(bin->m_pool);
 			m_memoryDirectory[entry].m_cache = (dgMemoryCacheEntry*)charPtr;
 
 			for (dgInt32 i = 0; i < count; i ++) {

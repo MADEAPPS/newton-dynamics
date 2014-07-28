@@ -3566,7 +3566,7 @@ int NewtonTreeCollisionGetVertexListTriangleListInAABB(const NewtonCollision* co
 	Newton* const world = (Newton *)newtonWorld;
 
 	TRACE_FUNCTION(__FUNCTION__);
-	dgCollisionInstance* const collision = world->CreateHeightField(width, height, gridsDiagonals, elevationdatType, elevationMap, attributeMap, verticalScale, horizontalScale);
+	dgCollisionInstance* const collision = world->CreateHeightField(width, height, gridsDiagonals, elevationdatType, elevationMap, (const dgInt8* const) attributeMap, verticalScale, horizontalScale);
 	collision->SetUserDataID(dgUnsigned32 (shapeID));
 	return (NewtonCollision*) collision;
 }
