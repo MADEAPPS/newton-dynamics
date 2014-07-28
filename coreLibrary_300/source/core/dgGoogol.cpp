@@ -248,7 +248,7 @@ dgGoogol dgGoogol::m_half(0.5);
 			tmp.m_mantissa[i] = 0;
 		}
 		//dgUnsigned64 mask = (-1LL) << (64 - bits);
-		dgUnsigned64 mask (-1LL);
+		dgUnsigned64 mask (~0ULL);
 		mask <<= (64 - bits);
 		tmp.m_mantissa[start] &= mask;
 		if (m_sign) {
