@@ -957,7 +957,7 @@ void DemoEntityManager::RenderFrame ()
 	if (m_mainWindow->m_showStatistics) {
 		dVector color (1.0f, 1.0f, 1.0f, 0.0f);
 		Print (color, 10,  20, "render fps: %7.2f", m_mainWindow->m_fps);
-		Print (color, 10,  42, "physics time on main thread: %d micro secunds", int (GetPhysicsTime() * 1000000.0f));
+		Print (color, 10,  42, "physics time on main thread: %d ms", int (GetPhysicsTime() * 1000000.0f));
 		Print (color, 10,  64, "total memory: %d kbytes", NewtonGetMemoryUsed() / (1024));
 		Print (color, 10,  86, "number of bodies: %d", NewtonWorldGetBodyCount(GetNewton()));
 		Print (color, 10, 108, "number of threads: %d", NewtonGetThreadsCount(GetNewton()));
