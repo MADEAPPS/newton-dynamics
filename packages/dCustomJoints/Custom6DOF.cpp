@@ -227,6 +227,9 @@ void Custom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 		}
 	}
 
+matrix1 = GetIdentityMatrix();
+matrix0 = dPitchMatrix(65.0f * 3.141592 / 180.0f);
+
 	dVector euler0;
 	dVector euler1;
 	dMatrix localMatrix (matrix0 * matrix1.Inverse());
@@ -261,10 +264,40 @@ dTrace (("(%f %f %f) (%f %f %f)\n", m_pitch.m_angle * 180.0f / 3.141592f, m_yaw.
 	if (limitViolation) {
 		dMatrix pyr (dPitchMatrix(m_pitch.m_angle) * dYawMatrix(m_yaw.m_angle) * dRollMatrix(m_roll.m_angle));
 		dMatrix p0y0r0 (dPitchMatrix(euler[0]) * dYawMatrix(euler[1]) * dRollMatrix(euler[2]));
-		dMatrix rotation (pyr * p0y0r0.Inverse());
+		//dMatrix rotation (pyr * p0y0r0.Inverse());
 		dMatrix baseMatrix (p0y0r0 * matrix1);
-dMatrix xxxx (rotation * baseMatrix);
-dMatrix xxxx1 (rotation * baseMatrix);
+        dMatrix rotation (matrix0.Inverse() * baseMatrix);
+dMatrix xxxx (matrix0 * rotation);
+//dMatrix xxxx1 (rotation * baseMatrix);
+
+        dQuaternion quat (rotation);
+        if (quat.m_q0 > dFloat (0.99995f)) {
+//            dAssert (0);
+        } else {
+            dMatrix basis (dGrammSchmidt (dVector (quat.m_q1, quat.m_q2, quat.m_q3, 0.0f)));
+            dAssert (0);
+        }
+
+
+/*
+dFloat cosAngle;
+cosAngle = coneDir0 % coneDir1;
+if (cosAngle < m_coneAngleCos) {
+    lateralDir = lateralDir.Scale (1.0f / dSqrt (mag2));
+    dQuaternion rot (m_coneAngleHalfCos, lateralDir.m_x * m_coneAngleHalfSin, lateralDir.m_y * m_coneAngleHalfSin, lateralDir.m_z * m_coneAngleHalfSin);
+    r1 = p1 + rot.UnrotateVector (r1 - p1);
+
+    NewtonUserJointAddLinearRow (m_joint, &r0[0], &r1[0], &lateralDir[0]);
+
+    dVector longitudinalDir (lateralDir * matrix0.m_front);
+    NewtonUserJointAddLinearRow (m_joint, &r0[0], &r1[0], &longitudinalDir[0]);
+    NewtonUserJointSetRowMinimumFriction (m_joint, -0.0f);
+*/
+
+
+
+
+
 	}
 
 /*
