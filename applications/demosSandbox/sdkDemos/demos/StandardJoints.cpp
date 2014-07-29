@@ -222,7 +222,7 @@ static void AddDistance (DemoEntityManager* const scene, const dVector& origin)
 	// connect first box to the world
 	dMatrix matrix0;
 	NewtonBodyGetMatrix (box0, &matrix0[0][0]);
-	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y * 0.5f, 0.0f, 0.0f);
+	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y, 0.0f, 0.0f);
 	new CustomBallAndSocket (pinMatrix, box0, NULL);
 
 	// link the two boxes with a distance joint
@@ -249,7 +249,7 @@ static void AddBallAndSockect (DemoEntityManager* const scene, const dVector& or
 	// connect first box to the world
 	dMatrix matrix0;
 	NewtonBodyGetMatrix (box0, &matrix0[0][0]);
-	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y * 0.5f, 0.0f, 0.0f);
+	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y, 0.0f, 0.0f);
 	new CustomBallAndSocketWithFriction (pinMatrix, box0, NULL, 2.0f);
 
 	// link the two boxes
@@ -272,7 +272,7 @@ static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)
 	// connect first box to the world
 	dMatrix matrix0;
 	NewtonBodyGetMatrix (box0, & matrix0[0][0]);
-	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y * 0.5f, 0.0f, 0.0f);
+	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y, 0.0f, 0.0f);
 	Custom6DOF* const joint0 = new Custom6DOF (pinMatrix, pinMatrix, box0, NULL);
 	joint0->SetAngularLimits (dVector (-angle, -angle, -angle, 0.0f), dVector (angle, angle, angle, 0.0f));
 

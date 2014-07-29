@@ -340,12 +340,12 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 	dFloat sinAngle_0;
 	dFloat cosAngle_0;
 	CalculatePitchAngle (matrix0, matrix1, sinAngle_0, cosAngle_0);
-	m_curJointAngle_0.CalculateJointAngle (cosAngle_0, sinAngle_0);
+	m_curJointAngle_0.Update (cosAngle_0, sinAngle_0);
 
 	dFloat sinAngle_1;
 	dFloat cosAngle_1;
 	CalculateYawAngle (matrix0, matrix1, sinAngle_1, cosAngle_1);
-	m_curJointAngle_1.CalculateJointAngle (cosAngle_1, sinAngle_1);
+	m_curJointAngle_1.Update (cosAngle_1, sinAngle_1);
 
 	dVector omega0 (0.0f, 0.0f, 0.0f, 0.0f);
 	dVector omega1 (0.0f, 0.0f, 0.0f, 0.0f);

@@ -126,7 +126,7 @@ void CustomCorkScrew::SubmitConstraints (dFloat timestep, int threadIndex)
 	dFloat cosAngle;
 	sinAngle = (matrix0.m_up * matrix1.m_up) % matrix0.m_front;
 	cosAngle = matrix0.m_up % matrix1.m_up;
-	angle = m_curJointAngle.CalculateJointAngle (cosAngle, sinAngle);
+	angle = m_curJointAngle.Update (cosAngle, sinAngle);
 
 	if (m_limitsAngularOn) {
 		// the joint angle can be determine by getting the angle between any two non parallel vectors

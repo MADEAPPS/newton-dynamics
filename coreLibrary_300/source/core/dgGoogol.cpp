@@ -247,6 +247,7 @@ dgGoogol dgGoogol::m_half(0.5);
 		for (dgInt32 i = DG_GOOGOL_SIZE - 1; i > start; i --) {
 			tmp.m_mantissa[i] = 0;
 		}
+		// some compilers do no like this and I do not know why is that
 		//dgUnsigned64 mask = (-1LL) << (64 - bits);
 		dgUnsigned64 mask (~0ULL);
 		mask <<= (64 - bits);

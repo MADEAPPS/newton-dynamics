@@ -43,9 +43,6 @@ class Custom6DOF: public CustomJoint
 	dVector m_minAngularLimits;
 	dVector m_maxAngularLimits;
 
-	dVector m_maxMaxLinearErrorRamp;
-	dVector m_maxMaxAngularErrorRamp;
-
 	AngularIntegration m_pitch;
 	AngularIntegration m_yaw;
 	AngularIntegration m_roll;

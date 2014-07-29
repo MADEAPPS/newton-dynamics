@@ -50,7 +50,7 @@ class CustomJoint: public CustomAlloc
 		{
 		}
 
-		dFloat CalculateJointAngle (dFloat newAngleCos, dFloat newAngleSin)
+		dFloat Update (dFloat newAngleCos, dFloat newAngleSin)
 		{
 			dFloat sin_da = newAngleSin * m_cosJointAngle - newAngleCos * m_sinJointAngle; 
 			dFloat cos_da = newAngleCos * m_cosJointAngle + newAngleSin * m_sinJointAngle; 
@@ -78,10 +78,11 @@ class CustomJoint: public CustomAlloc
 		}
 
 
-		dFloat CalculateJointAngle (dFloat angle)
+		dFloat Update (dFloat angle)
 		{
-			return CalculateJointAngle (dCos (angle), dSin (angle));
+			return Update (dCos (angle), dSin (angle));
 		}
+
 		dFloat m_angle;
 		dFloat m_sinJointAngle;
 		dFloat m_cosJointAngle;

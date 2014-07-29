@@ -195,7 +195,7 @@ void CustomHinge::SubmitConstraints (dFloat timestep, int threadIndex)
 	dFloat sinAngle;
 	dFloat cosAngle;
 	CalculatePitchAngle (matrix0, matrix1, sinAngle, cosAngle);
-	m_curJointAngle.CalculateJointAngle (cosAngle, sinAngle);
+	m_curJointAngle.Update (cosAngle, sinAngle);
 
 	// save the current joint Omega
 	dVector omega0(0.0f, 0.0f, 0.0f, 0.0f);
