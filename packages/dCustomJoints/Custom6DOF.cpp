@@ -127,55 +127,6 @@ void Custom6DOF::GetInfo (NewtonJointRecord* const info) const
 }
 
 
-/*
-static dMatrix CalculateUniversal_Angles (dMatrix matrix0, dMatrix matrix1, int x, int y, int z)
-{
-	dFloat sinAngle;
-	dFloat cosAngle;
-
-matrix1 = GetIdentityMatrix();
-matrix0 = dPitchMatrix(1.0f * 3.141792 / 180.0f) * dYawMatrix(45.0f * 3.141792 / 180.0f) * dRollMatrix(3.0f * 3.141792 / 180.0f);
-
-	// this assumes calculation assumes that the angle relative to the z axis is alway small
-	// because it is the unconstitutionally strong angle
-	dMatrix basisAndEulerAngles;
-	basisAndEulerAngles[x] = matrix0[x];
-	basisAndEulerAngles[y] = matrix1[y];
-	basisAndEulerAngles[z] = basisAndEulerAngles[x] * basisAndEulerAngles[y];
-	basisAndEulerAngles[z] = basisAndEulerAngles[z].Scale (1.0f / dSqrt (basisAndEulerAngles[z] % basisAndEulerAngles[z]));
-
-	cosAngle = matrix0[y] % matrix1[y];
-	sinAngle = (matrix0[y] * matrix1[y]) % basisAndEulerAngles[x];
-	basisAndEulerAngles[3][x] = dAtan2 (sinAngle, cosAngle);
-
-	cosAngle = matrix0[x] % matrix1[x];
-	sinAngle = (matrix0[x] * matrix1[x]) % matrix1[y];
-	basisAndEulerAngles[3][y] = dAtan2 (sinAngle, cosAngle);
-
-	dVector dir3 (basisAndEulerAngles[z] * basisAndEulerAngles[x]);
-	dir3 = dir3.Scale (1.0f / dSqrt (dir3 % dir3));
-	cosAngle = dir3 % basisAndEulerAngles[y];
-	sinAngle = (dir3 * basisAndEulerAngles[y]) % basisAndEulerAngles[z];
-	basisAndEulerAngles[3][z] = dAtan2 (sinAngle, cosAngle);
-	//	dAssert (dAbs (angle_z) < 0.1f);
-	basisAndEulerAngles[3][3] = 1.0f;
-
-
-dVector euler0;
-dVector euler1;
-dMatrix xxx (matrix0 * matrix1.Inverse());
-xxx.GetEulerAngles(euler0, euler1);
-dVector xxx1 = basisAndEulerAngles.m_posit.Scale (-1.0f);
-
-
-dTrace (("(%f %f %f) (%f %f %f) (%f %f %f)\n", xxx1.m_x * 180.0f / 3.141592f, xxx1.m_y * 180.0f / 3.141592f, xxx1.m_z * 180.0f / 3.141592f, 
-		euler0.m_x * 180.0f / 3.141592f, euler0.m_y * 180.0f / 3.141592f, euler0.m_z * 180.0f / 3.141592f, 
-		euler1.m_x * 180.0f / 3.141592f, euler1.m_y * 180.0f / 3.141592f, euler1.m_z * 180.0f / 3.141592f));
-
-	return basisAndEulerAngles;
-}
-*/
-
 void Custom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
@@ -227,15 +178,11 @@ void Custom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 		}
 	}
 
-matrix1 = GetIdentityMatrix();
-matrix0 = dPitchMatrix(65.0f * 3.141592 / 180.0f);
 
 	dVector euler0;
 	dVector euler1;
 	dMatrix localMatrix (matrix0 * matrix1.Inverse());
 	localMatrix.GetEulerAngles(euler0, euler1);
-
-//CalculateUniversal_Angles (matrix0, matrix1, 0, 1, 2);
 
 	AngularIntegration pitchStep0 (AngularIntegration (euler0.m_x) - m_pitch);
 	AngularIntegration pitchStep1 (AngularIntegration (euler1.m_x) - m_pitch);
@@ -245,10 +192,7 @@ matrix0 = dPitchMatrix(65.0f * 3.141592 / 180.0f);
 
 	dVector euler (m_pitch.Update (euler0.m_x), m_yaw.Update (euler0.m_y), m_roll.Update (euler0.m_z), 0.0f);
 
-//dAssert (dAbs (m_pitch.m_angle * 180.0f / 3.141592f) < 70.0f);
-//dAssert (dAbs (m_yaw.m_angle * 180.0f / 3.141592f) < 70.0f);
-//dAssert (dAbs (m_roll.m_angle * 180.0f / 3.141592f) < 70.0f);
-dTrace (("(%f %f %f) (%f %f %f)\n", m_pitch.m_angle * 180.0f / 3.141592f, m_yaw.m_angle * 180.0f / 3.141592f, m_roll.m_angle * 180.0f / 3.141592f,  euler0.m_x * 180.0f / 3.141592f, euler0.m_y * 180.0f / 3.141592f, euler0.m_z * 180.0f / 3.141592f));
+//dTrace (("(%f %f %f) (%f %f %f)\n", m_pitch.m_angle * 180.0f / 3.141592f, m_yaw.m_angle * 180.0f / 3.141592f, m_roll.m_angle * 180.0f / 3.141592f,  euler0.m_x * 180.0f / 3.141592f, euler0.m_y * 180.0f / 3.141592f, euler0.m_z * 180.0f / 3.141592f));
 
 	bool limitViolation = false;
 	for (int i = 0; i < 3; i ++) {
@@ -267,89 +211,30 @@ dTrace (("(%f %f %f) (%f %f %f)\n", m_pitch.m_angle * 180.0f / 3.141592f, m_yaw.
 		//dMatrix rotation (pyr * p0y0r0.Inverse());
 		dMatrix baseMatrix (p0y0r0 * matrix1);
         dMatrix rotation (matrix0.Inverse() * baseMatrix);
-dMatrix xxxx (matrix0 * rotation);
-//dMatrix xxxx1 (rotation * baseMatrix);
 
         dQuaternion quat (rotation);
         if (quat.m_q0 > dFloat (0.99995f)) {
-//            dAssert (0);
+			//dVector p0 (matrix0[3] + baseMatrix[1].Scale (MIN_JOINT_PIN_LENGTH));
+			//dVector p1 (matrix0[3] + baseMatrix[1].Scale (MIN_JOINT_PIN_LENGTH));
+			//NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &baseMatrix[2][0]);
+			//NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+
+			//dVector q0 (matrix0[3] + baseMatrix[0].Scale (MIN_JOINT_PIN_LENGTH));
+			//NewtonUserJointAddLinearRow (m_joint, &q0[0], &q0[0], &baseMatrix[1][0]);
+			//NewtonUserJointAddLinearRow (m_joint, &q0[0], &q0[0], &baseMatrix[2][0]);
+
         } else {
             dMatrix basis (dGrammSchmidt (dVector (quat.m_q1, quat.m_q2, quat.m_q3, 0.0f)));
-            dAssert (0);
+
+			dVector p0 (matrix0[3] + basis[1].Scale (MIN_JOINT_PIN_LENGTH));
+			dVector p1 (matrix0[3] + rotation.RotateVector(basis[1].Scale (MIN_JOINT_PIN_LENGTH)));
+			NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &basis[2][0]);
+			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+
+			//dVector q0 (matrix0[3] + basis[0].Scale (MIN_JOINT_PIN_LENGTH));
+			//NewtonUserJointAddLinearRow (m_joint, &q0[0], &q0[0], &basis[1][0]);
+			//NewtonUserJointAddLinearRow (m_joint, &q0[0], &q0[0], &basis[2][0]);
         }
-
-
-/*
-dFloat cosAngle;
-cosAngle = coneDir0 % coneDir1;
-if (cosAngle < m_coneAngleCos) {
-    lateralDir = lateralDir.Scale (1.0f / dSqrt (mag2));
-    dQuaternion rot (m_coneAngleHalfCos, lateralDir.m_x * m_coneAngleHalfSin, lateralDir.m_y * m_coneAngleHalfSin, lateralDir.m_z * m_coneAngleHalfSin);
-    r1 = p1 + rot.UnrotateVector (r1 - p1);
-
-    NewtonUserJointAddLinearRow (m_joint, &r0[0], &r1[0], &lateralDir[0]);
-
-    dVector longitudinalDir (lateralDir * matrix0.m_front);
-    NewtonUserJointAddLinearRow (m_joint, &r0[0], &r1[0], &longitudinalDir[0]);
-    NewtonUserJointSetRowMinimumFriction (m_joint, -0.0f);
-*/
-
-
-
-
-
 	}
-
-/*
-	dVector eulerAngles (-m_pitch.m_angle, -m_yaw.m_angle, -m_roll.m_angle, 0.0f);
-	for (int i = 0; i < 1; i ++) {
-		if ((m_minAngularLimits[i] == 0.0f) && (m_maxAngularLimits[i] == 0.0f)) {
-			NewtonUserJointAddAngularRow (m_joint, eulerAngles[i], &matrix0[i][0]);
-			NewtonUserJointSetRowStiffness (m_joint, 1.0f);
-		} else {
-			// it is a limited linear dof, check if it pass the limits
-			if (eulerAngles[i] > m_maxAngularLimits[i]) {
-				dFloat dist = eulerAngles[i] - m_maxAngularLimits[i];
-				// clamp the error, so the not too much energy is added when constraint violation occurs
-				if (dist > D_6DOF_ANGULAR_MAX_ANGULAR_CORRECTION) {
-					dist = D_6DOF_ANGULAR_MAX_ANGULAR_CORRECTION;
-				}
-
-				// tell joint error will minimize the exceeded angle error
-				NewtonUserJointAddAngularRow (m_joint, dist, &matrix0[i][0]);
-
-				// need high stiffness here
-				NewtonUserJointSetRowStiffness (m_joint, 1.0f);
-
-				// allow the joint to move back freely
-				NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
-
-			} else if (eulerAngles[i] < m_minAngularLimits[i]) {
-				dFloat dist = eulerAngles[i] - m_minAngularLimits[i];
-				// clamp the error, so the not too much energy is added when constraint violation occurs
-				if (dist < -D_6DOF_ANGULAR_MAX_ANGULAR_CORRECTION) {
-					dist = -D_6DOF_ANGULAR_MAX_ANGULAR_CORRECTION;
-				}
-
-				// tell joint error will minimize the exceeded angle error
-				NewtonUserJointAddAngularRow (m_joint, dist, &matrix0[i][0]);
-
-				// need high stiffness here
-				NewtonUserJointSetRowStiffness (m_joint, 1.0f);
-
-				// allow the joint to move back freely 
-				NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
-			}
-		}
-	}
-*/
 }
-
-
-
-
-
-
-
-
 
