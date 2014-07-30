@@ -178,7 +178,6 @@ void Custom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 		}
 	}
 
-
 	dVector euler0;
 	dVector euler1;
 	dMatrix localMatrix (matrix0 * matrix1.Inverse());

@@ -92,6 +92,9 @@ CustomLimitBallAndSocket::CustomLimitBallAndSocket(const dMatrix& pinAndPivotFra
 CustomLimitBallAndSocket::CustomLimitBallAndSocket(const dMatrix& childPinAndPivotFrame, NewtonBody* const child, const dMatrix& parentPinAndPivotFrame, NewtonBody* const parent)
 	:CustomBallAndSocket(childPinAndPivotFrame, child, parent)
 	,m_rotationOffset(childPinAndPivotFrame * parentPinAndPivotFrame.Inverse())
+	,m_pitch()
+	,m_yaw()
+	,m_roll()
 {
 	SetConeAngle (0.0f);
 	SetTwistAngle (0.0f, 0.0f);
@@ -107,10 +110,11 @@ CustomLimitBallAndSocket::~CustomLimitBallAndSocket()
 
 void CustomLimitBallAndSocket::SetConeAngle (dFloat angle)
 {
-	m_coneAngleCos = dCos (angle);
-	m_coneAngleSin = dSin (angle);
-	m_coneAngleHalfCos = dCos (angle * 0.5f);
-	m_coneAngleHalfSin = dSin (angle * 0.5f);
+//	m_coneAngleCos = dCos (angle);
+//	m_coneAngleSin = dSin (angle);
+//	m_coneAngleHalfCos = dCos (angle * 0.5f);
+//	m_coneAngleHalfSin = dSin (angle * 0.5f);
+	m_coneAngle = angle;
 }
 
 
@@ -120,6 +124,17 @@ void CustomLimitBallAndSocket::SetTwistAngle (dFloat minAngle, dFloat maxAngle)
 	m_maxTwistAngle = maxAngle;
 }
 
+dFloat CustomLimitBallAndSocket::GetConeAngle () const
+{
+	return m_coneAngle;
+}
+
+void CustomLimitBallAndSocket::GetTwistAngle (dFloat& minAngle, dFloat& maxAngle) const
+{
+	minAngle = m_minTwistAngle;
+	maxAngle = m_maxTwistAngle;
+}
+
 
 void CustomLimitBallAndSocket::GetInfo (NewtonJointRecord* const info) const
 {
@@ -127,10 +142,15 @@ void CustomLimitBallAndSocket::GetInfo (NewtonJointRecord* const info) const
 
 	info->m_minAngularDof[0] = m_minTwistAngle;
 	info->m_maxAngularDof[0] = m_maxTwistAngle;
-	info->m_minAngularDof[1] = -dAcos (m_coneAngleCos);
-	info->m_maxAngularDof[1] =  dAcos (m_coneAngleCos);
-	info->m_minAngularDof[2] = -dAcos (m_coneAngleCos); 
-	info->m_maxAngularDof[2] =  dAcos (m_coneAngleCos);
+//	info->m_minAngularDof[1] = -dAcos (m_coneAngleCos);
+//	info->m_maxAngularDof[1] =  dAcos (m_coneAngleCos);
+//	info->m_minAngularDof[2] = -dAcos (m_coneAngleCos); 
+//	info->m_maxAngularDof[2] =  dAcos (m_coneAngleCos);
+
+	info->m_minAngularDof[1] = -m_coneAngle;
+	info->m_maxAngularDof[1] =  m_coneAngle;
+	info->m_minAngularDof[2] = -m_coneAngle; 
+	info->m_maxAngularDof[2] =  m_coneAngle;
 
 	strcpy (info->m_descriptionType, "limitballsocket");
 }
@@ -151,6 +171,99 @@ void CustomLimitBallAndSocket::SubmitConstraints (dFloat timestep, int threadInd
 	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_up[0]);
 	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_right[0]);
 
+	matrix1 = m_rotationOffset * matrix1;
+
+	dVector euler0;
+	dVector euler1;
+	dMatrix localMatrix (matrix0 * matrix1.Inverse());
+	localMatrix.GetEulerAngles(euler0, euler1);
+
+	AngularIntegration pitchStep0 (AngularIntegration (euler0.m_x) - m_pitch);
+	AngularIntegration pitchStep1 (AngularIntegration (euler1.m_x) - m_pitch);
+	if (dAbs (pitchStep0.m_angle) > dAbs (pitchStep1.m_angle)) {
+		euler0 = euler1;
+	}
+
+	dVector euler (m_pitch.Update (euler0.m_x), m_yaw.Update (euler0.m_y), m_roll.Update (euler0.m_z), 0.0f);
+
+	//dTrace (("(%f %f %f) (%f %f %f)\n", m_pitch.m_angle * 180.0f / 3.141592f, m_yaw.m_angle * 180.0f / 3.141592f, m_roll.m_angle * 180.0f / 3.141592f,  euler0.m_x * 180.0f / 3.141592f, euler0.m_y * 180.0f / 3.141592f, euler0.m_z * 180.0f / 3.141592f));
+/*
+	// handle the cone angle zero as special case of a hinge
+	if (m_coneAngle == 0.0f) {
+		dAssert (0);
+
+	} else {
+
+		bool limitViolation = false;
+		if (euler[0] < m_minTwistAngle) {
+			limitViolation = true;
+			euler[0] = m_minTwistAngle;
+		} else if (euler[0] > m_maxTwistAngle) {
+			limitViolation = true;
+			euler[0] = m_maxTwistAngle;
+		}
+
+		dMatrix coneMatrix (dYawMatrix(euler[1]) * dRollMatrix(euler[2]));
+		dFloat coneAngle = dAcos (coneMatrix[0][0]);
+		if (coneAngle >m_coneAngle) {
+			dAssert (0);
+		}
+	}
+*/
+
+/*
+	bool limitViolation = false;
+	for (int i = 0; i < 3; i ++) {
+		if (euler[i] < m_minAngularLimits[i]) {
+			limitViolation = true;
+			euler[i] = m_minAngularLimits[i];
+		} else if (euler[i] > m_maxAngularLimits[i]) {
+			limitViolation = true;
+			euler[i] = m_maxAngularLimits[i];
+		}
+	}
+
+	if (limitViolation) {
+		dMatrix pyr (dPitchMatrix(m_pitch.m_angle) * dYawMatrix(m_yaw.m_angle) * dRollMatrix(m_roll.m_angle));
+		dMatrix p0y0r0 (dPitchMatrix(euler[0]) * dYawMatrix(euler[1]) * dRollMatrix(euler[2]));
+		//dMatrix rotation (pyr * p0y0r0.Inverse());
+		dMatrix baseMatrix (p0y0r0 * matrix1);
+		dMatrix rotation (matrix0.Inverse() * baseMatrix);
+
+		dQuaternion quat (rotation);
+		if (quat.m_q0 > dFloat (0.99995f)) {
+			//dVector p0 (matrix0[3] + baseMatrix[1].Scale (MIN_JOINT_PIN_LENGTH));
+			//dVector p1 (matrix0[3] + baseMatrix[1].Scale (MIN_JOINT_PIN_LENGTH));
+			//NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &baseMatrix[2][0]);
+			//NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+
+			//dVector q0 (matrix0[3] + baseMatrix[0].Scale (MIN_JOINT_PIN_LENGTH));
+			//NewtonUserJointAddLinearRow (m_joint, &q0[0], &q0[0], &baseMatrix[1][0]);
+			//NewtonUserJointAddLinearRow (m_joint, &q0[0], &q0[0], &baseMatrix[2][0]);
+
+		} else {
+			dMatrix basis (dGrammSchmidt (dVector (quat.m_q1, quat.m_q2, quat.m_q3, 0.0f)));
+
+			dVector p0 (matrix0[3] + basis[1].Scale (MIN_JOINT_PIN_LENGTH));
+			dVector p1 (matrix0[3] + rotation.RotateVector(basis[1].Scale (MIN_JOINT_PIN_LENGTH)));
+			NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &basis[2][0]);
+			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+
+			//dVector q0 (matrix0[3] + basis[0].Scale (MIN_JOINT_PIN_LENGTH));
+			//NewtonUserJointAddLinearRow (m_joint, &q0[0], &q0[0], &basis[1][0]);
+			//NewtonUserJointAddLinearRow (m_joint, &q0[0], &q0[0], &basis[2][0]);
+		}
+	}
+*/
+
+
+
+
+
+
+
+
+/*
 	dMatrix localMatrix (matrix0 * (m_rotationOffset * matrix1).Inverse());
 	dFloat pitchAngle = -dAtan2(localMatrix[1][2], localMatrix[2][2]);
 
@@ -209,5 +322,6 @@ void CustomLimitBallAndSocket::SubmitConstraints (dFloat timestep, int threadInd
 			NewtonUserJointSetRowMinimumFriction (m_joint, -0.0f);
 		}
 	}
+*/
 }
 

@@ -44,19 +44,29 @@ class CustomLimitBallAndSocket: public CustomBallAndSocket
 
 	CUSTOM_JOINTS_API void SetConeAngle (dFloat angle);
 	CUSTOM_JOINTS_API void SetTwistAngle (dFloat minAngle, dFloat maxAngle);
+
+	CUSTOM_JOINTS_API dFloat GetConeAngle () const;
+	CUSTOM_JOINTS_API void GetTwistAngle (dFloat& minAngle, dFloat& maxAngle) const;
+
 	protected:
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
-
 	dMatrix m_rotationOffset;
+
+	dFloat m_coneAngle;
 	dFloat m_minTwistAngle;
 	dFloat m_maxTwistAngle;
+	
+	AngularIntegration m_pitch;
+	AngularIntegration m_yaw;
+	AngularIntegration m_roll;
 
-	dFloat m_coneAngleCos;
-	dFloat m_coneAngleSin;
-	dFloat m_coneAngleHalfCos;
-	dFloat m_coneAngleHalfSin;
+
+//	dFloat m_coneAngleCos;
+//	dFloat m_coneAngleSin;
+//	dFloat m_coneAngleHalfCos;
+//	dFloat m_coneAngleHalfSin;
 };
 
 
