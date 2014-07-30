@@ -50,7 +50,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="0"
 				OmitFramePointers="false"
-				AdditionalIncludeDirectories="../../../source/core;../../../source/physics;../../../source/openCL;../../../source/meshUtil;&quot;$(INTELOCLSDKROOT)\include&quot;;../../../../packages/thirdParty/pthreads.2"
+				AdditionalIncludeDirectories="../../../source/core;../../../source/physics;../../../source/openCL;../../../source/meshUtil;../../../source/pthreads.2;&quot;$(INTELOCLSDKROOT)\include&quot;"
 				PreprocessorDefinitions="_DEBUG;WIN32;_LIB;_NEWTON_OPENCL;_CRT_SECURE_NO_WARNINGS;PTW32_STATIC_LIB;_WIN_32_VER"
 				StringPooling="true"
 				ExceptionHandling="0"
@@ -141,7 +141,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="0"
 				OmitFramePointers="false"
-				AdditionalIncludeDirectories="../../../source/core;../../../source/physics;../../../source/openCL;../../../source/meshUtil;&quot;$(INTELOCLSDKROOT)\include&quot;;../../../../packages/thirdParty/pthreads.2"
+				AdditionalIncludeDirectories="../../../source/core;../../../source/physics;../../../source/openCL;../../../source/meshUtil;../../../source/pthreads.2;&quot;$(INTELOCLSDKROOT)\include&quot;"
 				PreprocessorDefinitions="_DEBUG;WIN32;_LIB;_NEWTON_OPENCL;_CRT_SECURE_NO_WARNINGS;PTW32_STATIC_LIB;_WIN_64_VER"
 				StringPooling="true"
 				ExceptionHandling="0"
@@ -231,7 +231,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="../../../source/core;../../../source/physics;../../../source/openCL;../../../source/meshUtil;&quot;$(INTELOCLSDKROOT)\include&quot;;../../../../packages/thirdParty/pthreads.2"
+				AdditionalIncludeDirectories="../../../source/core;../../../source/physics;../../../source/openCL;../../../source/meshUtil;../../../source/pthreads.2;&quot;$(INTELOCLSDKROOT)\include&quot;"
 				PreprocessorDefinitions="NDEBUG;WIN32;_LIB;_NEWTON_OPENCL;_CRT_SECURE_NO_WARNINGS;PTW32_STATIC_LIB;_WIN_32_VER"
 				StringPooling="true"
 				ExceptionHandling="0"
@@ -324,7 +324,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="../../../source/core;../../../source/physics;../../../source/openCL;../../../source/meshUtil;&quot;$(INTELOCLSDKROOT)\include&quot;;../../../../packages/thirdParty/pthreads.2"
+				AdditionalIncludeDirectories="../../../source/core;../../../source/physics;../../../source/openCL;../../../source/meshUtil;../../../source/pthreads.2;&quot;$(INTELOCLSDKROOT)\include&quot;"
 				PreprocessorDefinitions="NDEBUG;WIN32;_LIB;_NEWTON_OPENCL;_CRT_SECURE_NO_WARNINGS;PTW32_STATIC_LIB;_WIN_64_VER"
 				StringPooling="true"
 				ExceptionHandling="0"
@@ -532,11 +532,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\source\physics\dgCollisionCompoundBreakable.cpp"
+				RelativePath="..\..\..\source\physics\dgCollisionCompoundFractured.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\source\physics\dgCollisionCompoundBreakable.h"
+				RelativePath="..\..\..\source\physics\dgCollisionCompoundFractured.h"
 				>
 			</File>
 			<File

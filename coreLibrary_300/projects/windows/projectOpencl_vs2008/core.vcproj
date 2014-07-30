@@ -50,7 +50,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="../../../sdk/coreLIB;../../../../packages/thirdParty/pthreads.2"
+				AdditionalIncludeDirectories="../../../sdk/coreLIB;../../../source/pthreads.2"
 				PreprocessorDefinitions="NDEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;PTW32_STATIC_LIB;_WIN_32_VER"
 				StringPooling="true"
 				ExceptionHandling="0"
@@ -141,7 +141,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="../../../sdk/coreLIB;../../../../packages/thirdParty/pthreads.2"
+				AdditionalIncludeDirectories="../../../sdk/coreLIB;../../../source/pthreads.2"
 				PreprocessorDefinitions="NDEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;PTW32_STATIC_LIB;_WIN_64_VER"
 				StringPooling="true"
 				ExceptionHandling="0"
@@ -231,7 +231,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="0"
 				OmitFramePointers="false"
-				AdditionalIncludeDirectories="../../../sdk/coreLIB;../../../../packages/thirdParty/pthreads.2"
+				AdditionalIncludeDirectories="../../../sdk/coreLIB;../../../source/pthreads.2"
 				PreprocessorDefinitions="_DEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;PTW32_STATIC_LIB;_WIN_32_VER"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="0"
@@ -318,7 +318,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="0"
 				OmitFramePointers="false"
-				AdditionalIncludeDirectories="../../../sdk/coreLIB;../../../../packages/thirdParty/pthreads.2"
+				AdditionalIncludeDirectories="../../../sdk/coreLIB;../../../source/pthreads.2"
 				PreprocessorDefinitions="_DEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;PTW32_STATIC_LIB;_WIN_64_VER"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="0"
@@ -636,6 +636,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\source\core\dgObb.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\source\core\dgObb.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\source\core\dgPlane.h"
 				>
 			</File>
@@ -669,14 +677,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\source\core\dgSPDMatrix.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\source\core\dgSphere.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\source\core\dgSphere.h"
 				>
 			</File>
 			<File
