@@ -557,23 +557,23 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
     <ProjectReference Include="..\..\..\..\coreLibrary_300\source\pthreads.2\VS_2010\pthread.vcxproj">
       <Project>{03bca23c-02a5-415b-a37b-26600bc2ce96}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010\dAnimation.vcxproj">
+    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010_OpenCL\dAnimation.vcxproj">
       <Project>{e3c14351-bad1-4add-ab9a-31054d6e7cdb}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010\dContainers.vcxproj">
+    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010_OpenCL\dContainers.vcxproj">
       <Project>{f67c4593-a914-4ddf-8cb5-c59a3ef3ece0}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010\dJointLibrary.vcxproj">
+    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010_OpenCL\dJointLibrary.vcxproj">
       <Project>{721c99ce-4716-4146-9817-59bc2671b844}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010\dMath.vcxproj">
+    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010_OpenCL\dMath.vcxproj">
       <Project>{cbe9e751-e58b-46c1-b6b0-873670d0f981}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010\dScene.vcxproj">
-      <Project>{b5eec82d-938f-44c9-89bb-4a058581750b}</Project>
+    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010_OpenCL\dNewton.vcxproj">
+      <Project>{8a04a234-b1ca-464d-a2dd-34ceb583ba6a}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010\dVisualDebuggerServer.vcxproj">
-      <Project>{2ffeb5b8-8929-469f-bb13-4e391cd3213c}</Project>
+    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010_OpenCL\dScene.vcxproj">
+      <Project>{b5eec82d-938f-44c9-89bb-4a058581750b}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\thirdParty\enet-1.2\VS_2010\enet.vcxproj">
       <Project>{a862a496-668a-41ca-ba4b-8c86892006b7}</Project>
