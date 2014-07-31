@@ -22,8 +22,19 @@
 
 
 #include "dgOpencl.h"
-#include <CL\cl.h>
-#include <CL\cl_ext.h>
+
+
+#if (defined (_WIN_32_VER) || defined (_WIN_64_VER) || defined (_POSIX_VER) || defined (_POSIX_VER_64) || defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
+	#include <CL\cl.h>
+	#include <CL\cl_ext.h>
+#else 
+	#ifdef _MACOSX_VER
+			#error "No OpenCL SDK" 
+	#else 
+		#error "No OpenCL SDK" 
+	#endif
+#endif
+
 
 
 dgOpencl* dgOpencl::GetOpenCL(dgMemoryAllocator* allocator)
