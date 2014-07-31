@@ -84,7 +84,7 @@ class ArticulatedEntityModel: public DemoEntity
 	};
 
 	ArticulatedEntityModel (DemoEntityManager* const scene, const char* const name)
-		:DemoEntity(GetIdentityMatrix(), NULL)
+		:DemoEntity(dGetIdentityMatrix(), NULL)
 		,m_rearTiresCount(0)
 		,m_frontTiresCount(0)
 		,m_angularActuatorsCount(0)
@@ -515,7 +515,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 		dVector p0;
 		dVector p1;
-		CalculateAABB (tireShape, GetIdentityMatrix(), p0, p1);
+		CalculateAABB (tireShape, dGetIdentityMatrix(), p0, p1);
 
 		dFloat Ixx;
 		dFloat Iyy;
@@ -561,7 +561,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		//NewtonBodySetMassMatrix(rootBody, 0,0,0,0);
 
 		// add the root bone to the articulation manager
-		CustomArticulatedTransformController::dSkeletonBone* const bone = controller->AddBone (rootBody, GetIdentityMatrix());
+		CustomArticulatedTransformController::dSkeletonBone* const bone = controller->AddBone (rootBody, dGetIdentityMatrix());
 		// save the bone as the shape use data for self collision test
 		NewtonCollisionSetUserData (NewtonBodyGetCollision(rootBody), bone);
 
@@ -772,7 +772,7 @@ static void LoadLumberYardMesh (DemoEntityManager* const scene, const DemoEntity
 				}
 
 				dVector size (maxBox - minBox);
-				dMatrix offset (GetIdentityMatrix());
+				dMatrix offset (dGetIdentityMatrix());
 				offset.m_posit = (maxBox + minBox).Scale (0.5f);
 				//NewtonCollision* const shape = NewtonCreateBox(world, size.m_x, size.m_y, size.m_z, 0, NULL);
 				NewtonCollision* const shape = NewtonCreateBox(world, size.m_x, size.m_y, size.m_z, 0, &offset[0][0]);
@@ -817,14 +817,14 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	NewtonWorld* const world = scene->GetNewton();
 	dVector origin (FindFloor (world, dVector (-10.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
 
-	dMatrix matrix (GetIdentityMatrix());
+	dMatrix matrix (dGetIdentityMatrix());
 	matrix.m_posit = FindFloor (world, origin, 100.0f);
 	matrix.m_posit.m_y += 0.75f;
 	inputManager->AddPlayer (vehicleManager->CreateForklift (matrix, &forkliffModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition));
 
 
 	// add some object to play with
-	DemoEntity entity (GetIdentityMatrix(), NULL);
+	DemoEntity entity (dGetIdentityMatrix(), NULL);
 	entity.LoadNGD_mesh ("lumber.ngd", scene->GetNewton());
 	LoadLumberYardMesh (scene, entity, dVector(10.0f, 0.0f, 0.0f, 0.0f));
 	

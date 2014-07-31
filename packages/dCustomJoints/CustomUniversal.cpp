@@ -52,7 +52,7 @@ CustomUniversal::CustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* ch
 	// Get the global matrices of each rigid body.
 	NewtonBodyGetMatrix(m_body0, &matrix0[0][0]);
 
-	dMatrix matrix1 (GetIdentityMatrix());
+	dMatrix matrix1 (dGetIdentityMatrix());
 	if (m_body1) {
 		NewtonBodyGetMatrix(m_body1, &matrix1[0][0]);
 	}
@@ -232,7 +232,7 @@ void CustomUniversal::ProjectError () const
 	NewtonBodyGetMatrix(m_body0, &body0Matrix[0][0]);
 	NewtonBodyGetMatrix(m_body1, &body1Matrix[0][0]);
 
-	const dMatrix& identity = GetIdentityMatrix();
+	const dMatrix& identity = dGetIdentityMatrix();
 
 	dMatrix matrix0 (m_localMatrix0 * body0Matrix);
 	dMatrix matrix1 (m_localMatrix1 * body1Matrix);

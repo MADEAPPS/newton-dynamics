@@ -78,7 +78,7 @@ static void CreateBooleanPhysics (DemoEntityManager* const scene, NewtonMesh* co
 	NewtonCollision* const compound = NewtonCreateCompoundCollisionFromMesh (world, convexApproximation, 0.001f, 0, 0);
 //	NewtonCollision* const compound = NewtonCreateConvexHullFromMesh(world, mesh, 0.001f, 0);
 
-	dMatrix matrix (GetIdentityMatrix());
+	dMatrix matrix (dGetIdentityMatrix());
 	matrix.m_posit = origin;
 	for (int ix = 0; ix < instaceCount; ix ++) {
 		for (int iz = 0; iz < instaceCount; iz ++) {
@@ -130,7 +130,7 @@ void SimpleBooleanOperations (DemoEntityManager* const scene)
 	// make a box for boolean operations
 	NewtonMesh* const box = MakeBox (scene, dVector (1.0f, 1.0f, 1.0f, 0.0f) , "wood_0.tga");
 
-	dMatrix alignMatrix (GetIdentityMatrix());
+	dMatrix alignMatrix (dGetIdentityMatrix());
 
 	// extract the cruz from the base model
 //	NewtonMesh* const boxCruzDiff = NewtonMeshDifference(box, cruz, &alignMatrix[0][0]);

@@ -105,7 +105,7 @@ void CustomDryRollingFriction::GetInfo (NewtonJointRecord* const info) const
 	info->m_minAngularDof[2] = -1.0e10f;;
 	info->m_maxAngularDof[2] =  1.0e10f;
 
-	dMatrix matrix (GetIdentityMatrix());
+	dMatrix matrix (dGetIdentityMatrix());
 	memcpy (info->m_attachmenMatrix_0, &matrix[0][0], sizeof (dMatrix));
 
 	// note this is not a bug

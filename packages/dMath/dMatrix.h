@@ -21,7 +21,8 @@ class dQuaternion;
 // small but fully operational 4x4 matrix class
 class dQuaternion;
 
-inline dMatrix GetIdentityMatrix();
+dMatrix dGetZeroMatrix ();
+dMatrix dGetIdentityMatrix();
 
 D_MSC_VECTOR_ALIGMENT
 class dMatrix
@@ -56,10 +57,10 @@ class dMatrix
 	bool TestOrthogonal() const; 
 	dMatrix Inverse4x4 () const;
 	dVector RotateVector4x4 (const dVector &v) const;
-	dMatrix JacobiDiagonalization (dVector& eigenValues, const dMatrix& initialMatrix = GetIdentityMatrix()) const;
+	dMatrix JacobiDiagonalization (dVector& eigenValues, const dMatrix& initialMatrix = dGetIdentityMatrix()) const;
 
 	// decompose this matrix into [this = transpose(stretchAxis) * matrix(scale) * stretchAxis * transformMatrix];
-	void PolarDecomposition (dMatrix& transformMatrix, dVector& scale, dMatrix& stretchAxis, const dMatrix& initialStretchAxis = GetIdentityMatrix()) const;
+	void PolarDecomposition (dMatrix& transformMatrix, dVector& scale, dMatrix& stretchAxis, const dMatrix& initialStretchAxis = dGetIdentityMatrix()) const;
 	
 	// constructor for polar composition
 	dMatrix (const dMatrix& transformMatrix, const dVector& scale, const dMatrix& stretchAxis);
@@ -80,22 +81,6 @@ class dMatrix
 	dVector m_posit;
 };
 
-
-inline dMatrix GetIdentityMatrix()
-{
-	return dMatrix (dVector (1.0f, 0.0f, 0.0f, 0.0f),
-				    dVector (0.0f, 1.0f, 0.0f, 0.0f),
-				    dVector (0.0f, 0.0f, 1.0f, 0.0f),
-				    dVector (0.0f, 0.0f, 0.0f, 1.0f));
-}
-
-inline dMatrix GetZeroMatrix ()
-{
-	return dMatrix (dVector (0.0f, 0.0f, 0.0f, 0.0f),
-					dVector (0.0f, 0.0f, 0.0f, 0.0f),
-					dVector (0.0f, 0.0f, 0.0f, 0.0f),
-					dVector (0.0f, 0.0f, 0.0f, 0.0f));
-}
 
 
 inline dMatrix::dMatrix ()

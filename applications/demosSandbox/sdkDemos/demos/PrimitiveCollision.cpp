@@ -103,11 +103,11 @@ static void AddSinglePrimitive (DemoEntityManager* const scene, dFloat x, Primit
 {
 
 	dVector size(0.5f, 0.5f, 0.75f, 0.0f);
-	dMatrix matrix (GetIdentityMatrix());
+	dMatrix matrix (dGetIdentityMatrix());
 
 	// create the shape and visual mesh as a common data to be re used
 	NewtonWorld* const world = scene->GetNewton();
-	NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), size, type, materialID);
+	NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), size, type, materialID);
 
 	//	DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "wood_0.tga", "wood_0.tga", "wood_1.tga");
 	DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "smilli.tga", "smilli.tga", "smilli.tga");
@@ -139,7 +139,7 @@ void PrimitiveCollision (DemoEntityManager* const scene)
 	// set a user friction variable in the body for variable friction demos
 	// later this will be done using LUA script
 	NewtonWorld* const world = scene->GetNewton();
-	dMatrix offsetMatrix (GetIdentityMatrix());
+	dMatrix offsetMatrix (dGetIdentityMatrix());
 
 	int materialID = NewtonMaterialGetDefaultGroupID (world);
 
@@ -168,7 +168,7 @@ void PrimitiveCollision (DemoEntityManager* const scene)
 
 	// place camera into position
 	//dMatrix camMatrix (dYawMatrix(90.0f * 3.1416f /180.0f));
-	dMatrix camMatrix (GetIdentityMatrix());
+	dMatrix camMatrix (dGetIdentityMatrix());
 	dQuaternion rot (camMatrix);
 	dVector origin (-15.0f, 0.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);

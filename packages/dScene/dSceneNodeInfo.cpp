@@ -34,8 +34,8 @@ dSceneNodeInfo::dSceneNodeInfo(dScene* const world)
 	,m_position (0.0f, 0.0f, 0.0f, 1.0f)  // node location in global space
 	,m_euler (0.0f, 0.0f, 0.0f, 1.0f)     // node orientation matrix R: x = pitch, y = yaw, z = roll, 
 	,m_scale (1.0f, 1.0f, 1.0f, 1.0f)	// local scale: x = scale_x, y = scale_y, z = scale_z, 
-	,m_eigenScaleAxis (GetIdentityMatrix())
-	,m_geometryTransform(GetIdentityMatrix())
+	,m_eigenScaleAxis (dGetIdentityMatrix())
+	,m_geometryTransform(dGetIdentityMatrix())
 	,m_solidColor (0.75f, 0.75f, 0.0f, 0.0f)
 	,m_editorMinOOBB (0.0f, 0.0f, 0.0f, 0.0f) 
 	,m_editorMaxOOBB (0.0f, 0.0f, 0.0f, 0.0f)
@@ -48,8 +48,8 @@ dSceneNodeInfo::dSceneNodeInfo()
 	,m_position (0.0f, 0.0f, 0.0f, 1.0f)  // node location in global space
 	,m_euler (0.0f, 0.0f, 0.0f, 1.0f)     // node orientation matrix R: x = pitch, y = yaw, z = roll, 
 	,m_scale (1.0f, 1.0f, 1.0f, 1.0f)	// local scale: x = scale_x, y = scale_y, z = scale_z, 
-	,m_eigenScaleAxis (GetIdentityMatrix())
-	,m_geometryTransform(GetIdentityMatrix())
+	,m_eigenScaleAxis (dGetIdentityMatrix())
+	,m_geometryTransform(dGetIdentityMatrix())
 	,m_solidColor (0.75f, 0.75f, 0.0f, 0.0f)
 	,m_editorMinOOBB (0.0f, 0.0f, 0.0f, 0.0f) 
 	,m_editorMaxOOBB (0.0f, 0.0f, 0.0f, 0.0f)
@@ -90,7 +90,7 @@ void dSceneNodeInfo::SetTransform (const dMatrix& matrix)
 
 dMatrix dSceneNodeInfo::CalculateScaleMatrix() const
 {
-	return dMatrix (GetIdentityMatrix(), m_scale, m_eigenScaleAxis);
+	return dMatrix (dGetIdentityMatrix(), m_scale, m_eigenScaleAxis);
 }
 
 dMatrix dSceneNodeInfo::CalculateOrthoMatrix() const

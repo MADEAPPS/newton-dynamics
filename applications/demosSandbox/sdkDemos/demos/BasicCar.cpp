@@ -109,7 +109,7 @@ class BasicVehicleEntity: public DemoEntity
 
 
 	BasicVehicleEntity (DemoEntityManager* const scene, CustomVehicleControllerManager* const manager, const dMatrix& location, const char* const filename)
-		:DemoEntity (GetIdentityMatrix(), NULL)
+		:DemoEntity (dGetIdentityMatrix(), NULL)
 		,m_controller(NULL)
 		,m_helpKey (true)
 		,m_gearUpKey (false)
@@ -258,7 +258,7 @@ class BasicVehicleEntity: public DemoEntity
 		tireMatrix.m_posit.m_y -= suspensionLength * 0.25f;
 
 		// add and alignment matrix,to match visual mesh to physics collision shape
-		dMatrix aligmentMatrix (GetIdentityMatrix());
+		dMatrix aligmentMatrix (dGetIdentityMatrix());
 		if (tireMatrix[0][2] < 0.0f) {
 			aligmentMatrix = dYawMatrix(3.141592f);
 		}
@@ -732,7 +732,7 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 	void DrawGage(GLuint gage, GLuint needle, dFloat param, dFloat origin_x, dFloat origin_y, dFloat size) const
 	{
 		size *= 0.5f;
-		dMatrix origin (GetIdentityMatrix());
+		dMatrix origin (dGetIdentityMatrix());
 		origin.m_posit = dVector(origin_x, origin_y, 0.0f, 1.0f);
 
 		// render dial
@@ -771,7 +771,7 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 
 	void DrawGear(dFloat param, dFloat origin_x, dFloat origin_y, int gear, dFloat size) const
 	{
-		dMatrix origin (GetIdentityMatrix());
+		dMatrix origin (dGetIdentityMatrix());
 		origin.m_posit = dVector(origin_x + size * 0.3f, origin_y - size * 0.25f, 0.0f, 1.0f);
 
 		glPushMatrix();
@@ -1035,7 +1035,7 @@ void BasicCar (DemoEntityManager* const scene)
 //	location.m_posit.m_y = 50.0f;
 //	location.m_posit.m_z = 50.0f;
 
-dMatrix location (GetIdentityMatrix());
+dMatrix location (dGetIdentityMatrix());
 location.m_posit.m_y = 50.0f;
 location.m_posit.m_x = -150.0f;
 

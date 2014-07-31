@@ -175,7 +175,7 @@ void CustomVehicleControllerBodyStateTire::Init (CustomVehicleController* const 
 	NewtonCompoundCollisionEndAddRemove (vehShape);	
 
 	// restore the cast shape transform to identity
-	dMatrix identMatrix (GetIdentityMatrix());
+	dMatrix identMatrix (dGetIdentityMatrix());
 	NewtonCollisionSetCollisionMode (m_controller->m_tireCastShape, 1);
 	NewtonCollisionSetMatrix (m_controller->m_tireCastShape, &identMatrix[0][0]);
 

@@ -306,9 +306,9 @@ freq *= 0.5f;
 		//	// create the visual mesh
 		DemoMesh* const mesh = new DemoMesh ("terrain", elevation, size, cellSize, 1.0f/16.0f, TILE_SIZE);
 
-		DemoEntity* const entity = new DemoEntity(GetIdentityMatrix(), NULL);
+		DemoEntity* const entity = new DemoEntity(dGetIdentityMatrix(), NULL);
 		scene->Append (entity);
-		entity->SetMesh(mesh, GetIdentityMatrix());
+		entity->SetMesh(mesh, dGetIdentityMatrix());
 		mesh->Release();
 
 		// create the height field collision and rigid body

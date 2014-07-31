@@ -46,7 +46,7 @@ class FractureEffect: public dList<FractureAtom>
 		// and have precise control of how the debris are created.
 		// the number of pieces is equal to the number of point inside the Mesh plus the number of point on the mesh 
 		dVector size;
-		dMatrix matrix(GetIdentityMatrix()); 
+		dMatrix matrix(dGetIdentityMatrix()); 
 		NewtonMeshCalculateOOBB(mesh, &matrix[0][0], &size.m_x, &size.m_y, &size.m_z);
 
 
@@ -77,7 +77,7 @@ class FractureEffect: public dList<FractureAtom>
 
 
 		// create a texture matrix, for applying the material's UV to all internal faces
-		dMatrix textureMatrix (GetIdentityMatrix());
+		dMatrix textureMatrix (dGetIdentityMatrix());
 		textureMatrix[0][0] = 1.0f / size.m_x;
 		textureMatrix[1][1] = 1.0f / size.m_y;
 
@@ -147,9 +147,9 @@ class SimpleFracturedEffectEntity: public DemoEntity
 {
 	public:
 	SimpleFracturedEffectEntity (DemoMesh* const mesh, const FractureEffect& columnDebris)
-		:DemoEntity (GetIdentityMatrix(), NULL), m_delay (INITIAL_DELAY), m_effect(columnDebris), m_myBody(NULL)
+		:DemoEntity (dGetIdentityMatrix(), NULL), m_delay (INITIAL_DELAY), m_effect(columnDebris), m_myBody(NULL)
 	{
-		SetMesh(mesh, GetIdentityMatrix());
+		SetMesh(mesh, dGetIdentityMatrix());
 	}
 
 	~SimpleFracturedEffectEntity ()
@@ -205,7 +205,7 @@ class SimpleFracturedEffectEntity: public DemoEntity
 				FractureAtom& atom = node->GetInfo();
 
 				DemoEntity* const entity = new DemoEntity (dMatrix (rotation, matrix.m_posit), NULL);
-				entity->SetMesh (atom.m_mesh, GetIdentityMatrix());
+				entity->SetMesh (atom.m_mesh, dGetIdentityMatrix());
 				scene->Append(entity);
 
 				int materialId = 0;
@@ -281,7 +281,7 @@ static void AddFracturedEntity (DemoEntityManager* const scene, DemoMesh* const 
 	int materialId = 0;
 
 	//create the rigid body
-	dMatrix matrix (GetIdentityMatrix());
+	dMatrix matrix (dGetIdentityMatrix());
 	matrix.m_posit = location;
 
 	NewtonWorld* const world = scene->GetNewton();
@@ -339,7 +339,7 @@ static void AddFracturedPrimitive (DemoEntityManager* const scene, dFloat mass, 
 	DemoMesh* const visualMesh = new DemoMesh(mesh);
 
 	dFloat startElevation = 100.0f;
-	dMatrix matrix (GetIdentityMatrix());
+	dMatrix matrix (dGetIdentityMatrix());
 	for (int i = 0; i < xCount; i ++) {
 		dFloat x = origin.m_x + (i - xCount / 2) * spacing;
 		for (int j = 0; j < zCount; j ++) {
@@ -380,7 +380,7 @@ void SimpleConvexFracturing (DemoEntityManager* const scene)
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 	dVector location (0.0f, 0.0f, 0.0f, 0.0f);
 	dVector size (0.75f, 0.75f, 0.75f, 0.0f);
-	dMatrix shapeOffsetMatrix (GetIdentityMatrix());
+	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 
 	int count = 4;
 	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);

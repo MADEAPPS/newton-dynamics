@@ -49,7 +49,7 @@ void PrecessingTops (DemoEntityManager* const scene)
 	// customize the scene after loading
 	// set a user friction variable in the body for variable friction demos
 	// later this will be done using LUA script
-	dMatrix offsetMatrix (GetIdentityMatrix());
+	dMatrix offsetMatrix (dGetIdentityMatrix());
 
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 
@@ -89,7 +89,7 @@ void PrecessingTops (DemoEntityManager* const scene)
 	}
 
 	// place camera into position
-	dMatrix camMatrix (GetIdentityMatrix());
+	dMatrix camMatrix (dGetIdentityMatrix());
 	dQuaternion rot (camMatrix);
 	dVector origin (-40.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);

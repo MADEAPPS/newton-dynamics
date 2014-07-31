@@ -151,7 +151,7 @@ void AlchimedesBuoyancy(DemoEntityManager* const scene)
 	// add a trigger Manager to the world
 	MyTriggerManager* const triggerManager = new MyTriggerManager(scene->GetNewton());
 
-	dMatrix triggerLocation (GetIdentityMatrix());
+	dMatrix triggerLocation (dGetIdentityMatrix());
 	triggerLocation.m_posit.m_x =  17.0f;
 	triggerLocation.m_posit.m_y = -3.5f;
 
@@ -162,10 +162,10 @@ void AlchimedesBuoyancy(DemoEntityManager* const scene)
 	// customize the scene after loading
 	// set a user friction variable in the body for variable friction demos
 	// later this will be done using LUA script
-	dMatrix offsetMatrix (GetIdentityMatrix());
+	dMatrix offsetMatrix (dGetIdentityMatrix());
 
 	// place camera into position
-	dMatrix camMatrix (GetIdentityMatrix());
+	dMatrix camMatrix (dGetIdentityMatrix());
 	dQuaternion rot (camMatrix);
 	dVector origin (-20.0f, 10.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
@@ -176,7 +176,7 @@ void AlchimedesBuoyancy(DemoEntityManager* const scene)
 	int count = 5;
 	dVector size (1.0f, 0.25f, 0.5f);
 	dVector location (10.0f, 0.0f, 0.0f, 0.0f);
-	dMatrix shapeOffsetMatrix (GetIdentityMatrix());
+	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);

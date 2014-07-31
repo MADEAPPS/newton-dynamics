@@ -27,7 +27,7 @@ D_IMPLEMENT_CLASS_NODE(dCollisionNodeInfo);
 
 dCollisionNodeInfo::dCollisionNodeInfo(dScene* const world) 
 	:dNodeInfo (), 
-	m_matrix (GetIdentityMatrix()),
+	m_matrix (dGetIdentityMatrix()),
 	m_geometricInertia(0.0f, 0.0f, 0.0f, 0.0f),
 	m_geometricCenterAndVolume(0.0f, 0.0f, 0.0f, 0.0f),
 	m_shapeID(0)
@@ -37,7 +37,7 @@ dCollisionNodeInfo::dCollisionNodeInfo(dScene* const world)
 
 dCollisionNodeInfo::dCollisionNodeInfo()
 	:dNodeInfo (), 
-	m_matrix (GetIdentityMatrix()), 
+	m_matrix (dGetIdentityMatrix()), 
 	m_geometricInertia(0.0f, 0.0f, 0.0f, 0.0f),
 	m_geometricCenterAndVolume(0.0f, 0.0f, 0.0f, 0.0f),
 	m_shapeID(0)

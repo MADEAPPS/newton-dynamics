@@ -150,7 +150,7 @@ class RagDollManager: public CustomArticulaledTransformManager
 	{
 		dVector size;
 		dVector origin;
-		dMatrix matrix (GetIdentityMatrix());
+		dMatrix matrix (dGetIdentityMatrix());
 
 		matrix.m_posit.m_x = definition.m_shape_x;
 		matrix.m_posit.m_y = definition.m_shape_y;
@@ -287,7 +287,7 @@ class RagDollManager: public CustomArticulaledTransformManager
 		// for debugging
 		//NewtonBodySetMassMatrix(rootBone, 0.0f, 0.0f, 0.0f, 0.0f);
 
-		CustomArticulatedTransformController::dSkeletonBone* const bone = controller->AddBone (rootBone, GetIdentityMatrix());
+		CustomArticulatedTransformController::dSkeletonBone* const bone = controller->AddBone (rootBone, dGetIdentityMatrix());
 		// save the controller as the collision user data, for collision culling
 		NewtonCollisionSetUserData (NewtonBodyGetCollision(rootBone), bone);
 
@@ -350,14 +350,14 @@ void DescreteRagDoll (DemoEntityManager* const scene)
 	CreateHeightFieldTerrain (scene, 9, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
 
 	// load a skeleton mesh for using as a ragdoll manager
-	DemoEntity ragDollModel(GetIdentityMatrix(), NULL);
+	DemoEntity ragDollModel(dGetIdentityMatrix(), NULL);
 	ragDollModel.LoadNGD_mesh ("skeleton.ngd", scene->GetNewton());
 
 	//  create a skeletal transform controller for controlling rag doll
 	RagDollManager* const manager = new RagDollManager (scene);
 
 	NewtonWorld* const world = scene->GetNewton();
-	dMatrix matrix (GetIdentityMatrix());
+	dMatrix matrix (dGetIdentityMatrix());
 
 //	dVector origin (-10.0f, 1.0f, 0.0f, 1.0f);
 	dVector origin (FindFloor (world, dVector (-10.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));

@@ -250,7 +250,7 @@ void CustomVehicleController::Init (NewtonCollision* const chassisShape, const d
 	NewtonCompoundCollisionEndAddRemove (vehShape);	
 
 	// create the rigid body for this vehicle
-	dMatrix locationMatrix (GetIdentityMatrix());
+	dMatrix locationMatrix (dGetIdentityMatrix());
 	m_body = NewtonCreateDynamicBody(world, vehShape, &locationMatrix[0][0]);
 
 	// set vehicle mass, inertia and center of mass
@@ -443,7 +443,7 @@ void CustomVehicleController::Finalize()
 */
 	
 	int count = 0;
-	m_chassisState.m_matrix = GetIdentityMatrix();
+	m_chassisState.m_matrix = dGetIdentityMatrix();
 	m_chassisState.UpdateInertia();
 	dVector dir (m_chassisState.m_localFrame[1]);
 	for (TireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {

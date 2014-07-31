@@ -104,7 +104,7 @@ class AdvancePlayerEntity: public DemoEntity
 	};
 
 	AdvancePlayerEntity (DemoEntityManager* const scene, CustomPlayerControllerManager* const manager, dFloat radius, dFloat height, const dMatrix& location)
-		:DemoEntity (GetIdentityMatrix(), NULL)
+		:DemoEntity (dGetIdentityMatrix(), NULL)
 		,m_inputs()
 		,m_currentTrigger(NULL)
 		,m_controller(NULL) 
@@ -143,7 +143,7 @@ class AdvancePlayerEntity: public DemoEntity
 		NewtonCollision* const collision = NewtonBodyGetCollision(body);
 		DemoMesh* const geometry = new DemoMesh("player", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
-		SetMesh(geometry, GetIdentityMatrix());
+		SetMesh(geometry, dGetIdentityMatrix());
 		geometry->Release(); 
 	}
 
@@ -266,7 +266,7 @@ class AdvancedPlayerInputManager: public CustomInputManager
 		PrimitiveType type = PrimitiveType (dRand() % (sizeof (proSelection) / sizeof (proSelection[0])));
 
 		dVector size (0.35f, 0.25f, 0.25f, 0.0f);
-		NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), size, type, 0);
+		NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), size, type, 0);
 		DemoMesh* const geometry = new DemoMesh("prop", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
 		dMatrix matrix (location);
@@ -597,7 +597,7 @@ static void LoadFloor(DemoEntityManager* const scene, NewtonCollision* const sce
 	NewtonWorld* const world = scene->GetNewton();
 
 	// add a flat plane
-	dMatrix matrix (GetIdentityMatrix());
+	dMatrix matrix (dGetIdentityMatrix());
 	DemoEntityManager::dListNode* const floorNode = LoadScene(scene, "flatPlane.ngd", matrix);
 
 	DemoEntity* const entity = floorNode->GetInfo();
@@ -882,7 +882,7 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 		NewtonBodyGetMatrix(body1, &matrix1[0][0]);
 
 		// calculate the hinge parameter form the matrix location of each plank
-		dMatrix pinMatrix0 (GetIdentityMatrix());
+		dMatrix pinMatrix0 (dGetIdentityMatrix());
 		pinMatrix0[0] = pinMatrix0[1] * planksideDir;
 		pinMatrix0[0] = pinMatrix0[0].Scale (1.0f / dSqrt (pinMatrix0[0] % pinMatrix0[0]));
 		pinMatrix0[2] = pinMatrix0[0] * pinMatrix0[1];
@@ -911,7 +911,7 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 		body0 = iter.GetNode()->GetInfo();
 		NewtonBodyGetMatrix(body0, &matrix0[0][0]);
 
-		dMatrix pinMatrix0 (GetIdentityMatrix());
+		dMatrix pinMatrix0 (dGetIdentityMatrix());
 		pinMatrix0[0] = pinMatrix0[1] * planksideDir;
 		pinMatrix0[0] = pinMatrix0[0].Scale (1.0f / dSqrt (pinMatrix0[0] % pinMatrix0[0]));
 		pinMatrix0[2] = pinMatrix0[0] * pinMatrix0[1];
@@ -928,7 +928,7 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 		body0 = iter.GetNode()->GetInfo();
 		NewtonBodyGetMatrix(body0, &matrix0[0][0]);
 
-		dMatrix pinMatrix0 (GetIdentityMatrix());
+		dMatrix pinMatrix0 (dGetIdentityMatrix());
 		pinMatrix0[0] = pinMatrix0[1] * planksideDir;
 		pinMatrix0[0] = pinMatrix0[0].Scale (1.0f / dSqrt (pinMatrix0[0] % pinMatrix0[0]));
 		pinMatrix0[2] = pinMatrix0[0] * pinMatrix0[1];
@@ -950,7 +950,7 @@ static void LoadPlayGroundScene(DemoEntityManager* const scene, TriggerManager* 
 	//	return;
 
 	// make the body with a dummy null collision, so that we can use for attaching world objects
-	dMatrix matrix (GetIdentityMatrix());
+	dMatrix matrix (dGetIdentityMatrix());
 	NewtonCollision* const dommyCollision = NewtonCreateNull(world);
 	NewtonBody* const playGroundBody = NewtonCreateDynamicBody (world, dommyCollision, &matrix[0][0]);
 	NewtonDestroyCollision (dommyCollision);	
@@ -968,14 +968,14 @@ static void LoadPlayGroundScene(DemoEntityManager* const scene, TriggerManager* 
 		LoadFloor(scene, sceneCollision);
 
 		// load a slide platform
-		dMatrix slideMatrix(GetIdentityMatrix());
+		dMatrix slideMatrix(dGetIdentityMatrix());
 		slideMatrix.m_posit.m_x += 80.0f;
 		slideMatrix.m_posit.m_z = -20.0f;
 		//LoadSlide(scene, triggerManager, sceneCollision, "slide.ngd", slideMatrix, playGroundBody);
 		LoadFerryBridge(scene, triggerManager, sceneCollision, "platformBridge.ngd", slideMatrix, playGroundBody);
 
 		// load another hanging bridge
-		dMatrix bridgeMatrix(GetIdentityMatrix());
+		dMatrix bridgeMatrix(dGetIdentityMatrix());
 		bridgeMatrix.m_posit.m_x += 40.0f;
 		LoadHangingBridge(scene, triggerManager, sceneCollision, "hangingBridge.ngd", bridgeMatrix, playGroundBody);
 
@@ -1019,7 +1019,7 @@ void AdvancedPlayerController (DemoEntityManager* const scene)
 	LoadPlayGroundScene(scene, triggerManager);
 
 	// add main player
-	dMatrix location (GetIdentityMatrix());
+	dMatrix location (dGetIdentityMatrix());
 	location.m_posit.m_x = 45.0f;
 	location.m_posit.m_y = 5.0f;
 	location.m_posit.m_z = -10.0f;

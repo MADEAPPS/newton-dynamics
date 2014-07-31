@@ -464,7 +464,7 @@ void RenderJointsDebugInfo (NewtonWorld* const world, dFloat size)
 
 
 				// draw second frame
-				dMatrix matrix1 (GetIdentityMatrix());
+				dMatrix matrix1 (dGetIdentityMatrix());
 				if (info.m_attachBody_1) {
 					NewtonBodyGetMatrix (info.m_attachBody_1, &matrix1[0][0]);
 				}

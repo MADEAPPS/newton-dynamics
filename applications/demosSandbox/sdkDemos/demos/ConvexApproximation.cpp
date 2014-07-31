@@ -40,7 +40,7 @@ static void CreateConvexAproximation (const char* const name, DemoEntityManager*
 
 	
 	dMeshNodeInfo* meshInfo = NULL;
-	dMatrix scale (GetIdentityMatrix());
+	dMatrix scale (dGetIdentityMatrix());
 	for (dScene::dTreeNode* node = compoundTestMesh.GetFirstNode (); node; node = compoundTestMesh.GetNextNode (node)) {
 		dNodeInfo* info = compoundTestMesh.GetInfoFromNode(node);
 		if (info->GetTypeId() == dMeshNodeInfo::GetRttiType()) {
@@ -93,7 +93,7 @@ static void CreateConvexAproximation (const char* const name, DemoEntityManager*
 	NewtonMeshApplyBoxMapping(mesh, tex, tex, tex);
 	DemoMesh* const visualMesh = new DemoMesh (mesh);
 
-	dMatrix matrix (GetIdentityMatrix());
+	dMatrix matrix (dGetIdentityMatrix());
 	matrix.m_posit = origin;
 	for (int ix = 0; ix < instaceCount; ix ++) {
 		for (int iz = 0; iz < instaceCount; iz ++) {
@@ -159,7 +159,7 @@ void SimpleConvexApproximation (DemoEntityManager* const scene)
 
 
 	dVector size (0.5f, 0.5f, 0.75f, 0.0f);
-	dMatrix shapeOffsetMatrix (GetIdentityMatrix());
+	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 	
 
 	int count = 5;

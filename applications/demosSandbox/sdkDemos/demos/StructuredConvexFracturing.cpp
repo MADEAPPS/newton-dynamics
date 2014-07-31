@@ -27,7 +27,7 @@
 static int MakeRandomGuassianPointCloud (NewtonMesh* const mesh, dVector* const points, int count)
 {
 	dVector size;
-	dMatrix matrix(GetIdentityMatrix()); 
+	dMatrix matrix(dGetIdentityMatrix()); 
 	NewtonMeshCalculateOOBB(mesh, &matrix[0][0], &size.m_x, &size.m_y, &size.m_z);
 
 	dVector minBox (matrix.m_posit - matrix[0].Scale (size.m_x) - matrix[1].Scale (size.m_y) - matrix[2].Scale (size.m_z));
@@ -57,7 +57,7 @@ static int MakeRandomGuassianPointCloud (NewtonMesh* const mesh, dVector* const 
 static int MakeRandomPoisonPointCloud(NewtonMesh* const mesh, dVector* const points)
 {
 	dVector size;
-	dMatrix matrix(GetIdentityMatrix()); 
+	dMatrix matrix(dGetIdentityMatrix()); 
 	NewtonMeshCalculateOOBB(mesh, &matrix[0][0], &size.m_x, &size.m_y, &size.m_z);
 
 	dVector minBox (matrix.m_posit - matrix[0].Scale (size.m_x) - matrix[1].Scale (size.m_y) - matrix[2].Scale (size.m_z));
@@ -154,7 +154,7 @@ static void OnEmitFracturedChunk (NewtonBody* const chunkBody, NewtonFracturedCo
 
 	// create the mesh geometry and attach it to the entity
 	DemoMesh* const visualChunkMesh = new DemoMesh ("fracturedChuckMesh");
-	visualChunkEntity->SetMesh (visualChunkMesh, GetIdentityMatrix());
+	visualChunkEntity->SetMesh (visualChunkMesh, dGetIdentityMatrix());
 	visualChunkMesh->Release();
 
 	// add the vertex data
@@ -186,7 +186,7 @@ static void OnEmitFracturedCompound (NewtonBody* const fracturedCompound)
 
 	// create the mesh geometry and attach it to the entity
 	DemoMesh* const visualChunkMesh = new DemoMesh ("fracturedChuckMesh");
-	visualChunkEntity->SetMesh (visualChunkMesh, GetIdentityMatrix());
+	visualChunkEntity->SetMesh (visualChunkMesh, dGetIdentityMatrix());
 	visualChunkMesh->Release();
 
 	// get the fractured compound mesh from the body
@@ -214,7 +214,7 @@ static void CreateVisualEntity (DemoEntityManager* const scene, NewtonBody* cons
 
 	// create the mesh geometry and attach it to the entity
 	DemoMesh* const visualMesh = new DemoMesh ("fraturedMainMesh");
-	visualEntity->SetMesh (visualMesh, GetIdentityMatrix());
+	visualEntity->SetMesh (visualMesh, dGetIdentityMatrix());
 	visualMesh->Release();
 
 	// create the mesh and set the vertex array, but not the sub meshes
@@ -247,7 +247,7 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
 	NewtonMesh* const solidMesh = mesh->CreateNewtonMesh (world, entity.GetMeshMatrix() * entity.GetCurrentMatrix());
 #else
 	int externalMaterial = LoadTexture("wood_0.tga");
-	NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), dVector (3.0f, 3.0f, 3.0f, 0.0), _BOX_PRIMITIVE, 0);
+	NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), dVector (3.0f, 3.0f, 3.0f, 0.0), _BOX_PRIMITIVE, 0);
 	NewtonMesh* const solidMesh = NewtonMeshCreateFromCollision(collision);
 	NewtonDestroyCollision(collision);
 	//NewtonMeshTriangulate(solidMesh);
@@ -265,7 +265,7 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
 	int internalMaterial = LoadTexture("concreteBrick.tga");
 
 	// crate a texture matrix for uv mapping of fractured pieces
-	dMatrix textureMatrix (GetIdentityMatrix());
+	dMatrix textureMatrix (dGetIdentityMatrix());
 	textureMatrix[0][0] = 1.0f / 2.0f;
 	textureMatrix[1][1] = 1.0f / 2.0f;
 
@@ -335,7 +335,7 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
     //float mass = 10.0f;
     //int materialId = 0;
     //create the rigid body
-	dMatrix matrix (GetIdentityMatrix());
+	dMatrix matrix (dGetIdentityMatrix());
 	matrix.m_posit = origin;
 	matrix.m_posit.m_y = 20.0;
 	matrix.m_posit.m_w = 1.0f;
@@ -384,7 +384,7 @@ void StructuredConvexFracturing (DemoEntityManager* const scene)
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
 	//CreateLevelMesh (scene, "sponza.ngd", true);
 	//CreateLevelMesh (scene, "sponza.ngd", true);
-	AddPrimitiveArray (scene, 0.0f, dVector (0.0f, 0.0f, 0.0f, 0.0f), dVector (100.0f, 1.0f, 100.0f, 0.0f), 1, 1, 0, _BOX_PRIMITIVE, 0, GetIdentityMatrix());
+	AddPrimitiveArray (scene, 0.0f, dVector (0.0f, 0.0f, 0.0f, 0.0f), dVector (100.0f, 1.0f, 100.0f, 0.0f), 1, 1, 0, _BOX_PRIMITIVE, 0, dGetIdentityMatrix());
 
 
 
@@ -397,7 +397,7 @@ void StructuredConvexFracturing (DemoEntityManager* const scene)
 	//int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 	dVector location (0.0f, 0.0f, 0.0f, 0.0f);
 	dVector size (0.75f, 0.75f, 0.75f, 0.0f);
-	dMatrix shapeOffsetMatrix (GetIdentityMatrix());
+	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 
 	// place camera into position
 	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -30.0f * 3.141592f / 180.0f); 

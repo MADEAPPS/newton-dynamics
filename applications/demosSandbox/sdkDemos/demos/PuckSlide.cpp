@@ -51,7 +51,7 @@ class PuckEntity: public DemoEntity
 {
 	public: 
 	PuckEntity (DemoEntityManager* const scene, int materialID)
-		:DemoEntity (GetIdentityMatrix(), NULL)
+		:DemoEntity (dGetIdentityMatrix(), NULL)
 		,m_launched(false)
 	{
 		scene->Append(this);
@@ -61,7 +61,7 @@ class PuckEntity: public DemoEntity
 		dVector puckSize(WEIGHT_DIAMETER, WEIGHT_HEIGHT, 0.0f, 0.0f);
 
 		// create the shape and visual mesh as a common data to be re used
-		NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), puckSize, _CYLINDER_PRIMITIVE, materialID);
+		NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), puckSize, _CYLINDER_PRIMITIVE, materialID);
 
 		// correction: make the puck an upright cylinder, this makes everything simpler  
 		dMatrix collisionAligmentMatrix (dRollMatrix(3.141592f/2.0f));
@@ -70,7 +70,7 @@ class PuckEntity: public DemoEntity
 		DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
 		//dMatrix matrix = dRollMatrix(3.141592f/2.0f);
-		dMatrix matrix (GetIdentityMatrix());
+		dMatrix matrix (dGetIdentityMatrix());
 		matrix.m_posit.m_x = -TABLE_LENGTH*0.5f+WEIGHT_DIAMETER;
 		matrix.m_posit.m_z = -11.8f;
 //matrix.m_posit.m_z += 4.0f;
@@ -230,11 +230,11 @@ void PuckSlide (DemoEntityManager* const scene)
 		dVector tableSize(TABLE_LENGTH, TABLE_HEIGHT, TABLE_WIDTH, 0.0f);
 
 		// create the shape and visual mesh as a common data to be re used
-		NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), tableSize, _BOX_PRIMITIVE, materialGroupIDs[SBMaterial_SURFACE]);
+		NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), tableSize, _BOX_PRIMITIVE, materialGroupIDs[SBMaterial_SURFACE]);
 
 		DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "wood_3.tga", "wood_3.tga", "wood_3.tga");
 
-		dMatrix matrix = GetIdentityMatrix();
+		dMatrix matrix = dGetIdentityMatrix();
 		matrix.m_posit.m_x = 0.0f;
 		matrix.m_posit.m_z = 0.0f;
 		matrix.m_posit.m_y = 0.0f;

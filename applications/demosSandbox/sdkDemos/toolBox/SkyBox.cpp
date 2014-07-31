@@ -25,7 +25,7 @@
 
 
 SkyBox::SkyBox()
-	:DemoEntity (GetIdentityMatrix(), NULL)
+	:DemoEntity (dGetIdentityMatrix(), NULL)
 {
 	dFloat boxsize;
 
@@ -48,7 +48,7 @@ void SkyBox::Render(dFloat timeStep, DemoEntityManager* const scene) const
 	// get the model viewMatrix; 
 	glGetFloat (GL_MODELVIEW_MATRIX, &matrix[0][0]);
 
-	dMatrix skyMatrix (GetIdentityMatrix());
+	dMatrix skyMatrix (dGetIdentityMatrix());
 	skyMatrix.m_posit = matrix.UnrotateVector (matrix.m_posit.Scale (-1.0f));
 	skyMatrix.m_posit.m_y += 25.0f; 
 

@@ -49,7 +49,7 @@ static void SimpleMeshLevel (DemoEntityManager* const scene, bool optimization)
 
 //	int count = 1;
 	int count = 6;
-	dMatrix shapeOffsetMatrix (GetIdentityMatrix());
+	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 	for (int i = 0; i < 3; i ++) {
 		AddPrimitiveArray(scene, 10.0f, location, size, count, count, 3.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 		AddPrimitiveArray(scene, 10.0f, location, size, count, count, 3.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);

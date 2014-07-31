@@ -93,7 +93,7 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 	NewtonCompoundCollisionEndAddRemove (playerShape);	
 
 	// create the kinematic body
-	dMatrix locationMatrix (GetIdentityMatrix());
+	dMatrix locationMatrix (dGetIdentityMatrix());
 	m_body = NewtonCreateKinematicBody(world, playerShape, &locationMatrix[0][0]);
 
 	// players must have weight, otherwise they are infinitely strong when they collide
@@ -154,7 +154,7 @@ void CustomPlayerController::SetPlayerOrigin (dFloat originHigh)
 	NewtonCollision* const playerShape = NewtonBodyGetCollision(m_body);
 	NewtonCompoundCollisionBeginAddRemove(playerShape);	
 
-		dMatrix supportShapeMatrix (GetIdentityMatrix());
+		dMatrix supportShapeMatrix (dGetIdentityMatrix());
 		supportShapeMatrix[0] = m_upVector;
 		supportShapeMatrix[1] = m_frontVector;
 		supportShapeMatrix[2] = supportShapeMatrix[0] * supportShapeMatrix[1];

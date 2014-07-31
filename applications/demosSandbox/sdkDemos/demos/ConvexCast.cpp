@@ -23,7 +23,7 @@ class StupidComplexOfConvexShapes: public DemoEntity
 {
 	public:
 	StupidComplexOfConvexShapes (DemoEntityManager* const scene, int count)
-		:DemoEntity (GetIdentityMatrix(), NULL)
+		:DemoEntity (dGetIdentityMatrix(), NULL)
 		,m_rayP0(0.0f, 0.0f, 0.0f, 0.0f)
 		,m_rayP1(0.0f, 0.0f, 0.0f, 0.0f)
 	{
@@ -44,7 +44,7 @@ PrimitiveType selection[] = {_SPHERE_PRIMITIVE};
 			int index = dRand() % (sizeof (selection) / sizeof (selection[0]));
 			dVector shapeSize (size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), 0.0f);
 shapeSize = dVector(size, size, size, 0.0f);
-			collisionArray[i] = CreateConvexCollision (world, GetIdentityMatrix(), shapeSize, selection[index], materialID);
+			collisionArray[i] = CreateConvexCollision (world, dGetIdentityMatrix(), shapeSize, selection[index], materialID);
 			gemetries[i] = new DemoMesh("geometry", collisionArray[i], "wood_4.tga", "wood_4.tga", "wood_1.tga");
 		}
 
@@ -76,7 +76,7 @@ z = size * (i - count / 2);
 				int index = dRand() % (sizeof (selection) / sizeof (selection[0]));
 				DemoEntity* const entity = new DemoEntity(matrix, this);
 
-				entity->SetMesh(gemetries[index], GetIdentityMatrix());
+				entity->SetMesh(gemetries[index], dGetIdentityMatrix());
 
 				NewtonCollisionSetMatrix (collisionArray[index], &matrix[0][0]);
 				NewtonCompoundCollisionAddSubCollision (compound, collisionArray[index]);
@@ -84,7 +84,7 @@ z = size * (i - count / 2);
 		}
 		NewtonCompoundCollisionEndAddRemove(compound);	
 
-		CreateSimpleBody (world, NULL, 0.0f, GetIdentityMatrix(), compound, 0);
+		CreateSimpleBody (world, NULL, 0.0f, dGetIdentityMatrix(), compound, 0);
 
 		// destroy all collision shapes after they are used
 		NewtonDestroyCollision(compound);
@@ -139,12 +139,12 @@ z = size * (i - count / 2);
 		}
 
 		// make and entity for showing the result of the convex cast
-		dMatrix matrix (GetIdentityMatrix());
+		dMatrix matrix (dGetIdentityMatrix());
 		matrix.m_posit.m_y = 2.0f;
 
 		m_currentCastingShape = 0;
 		m_castingEntity = new DemoEntity (matrix, NULL);
-		m_castingEntity->SetMesh(m_castingGeometries[m_currentCastingShape], GetIdentityMatrix());
+		m_castingEntity->SetMesh(m_castingGeometries[m_currentCastingShape], dGetIdentityMatrix());
 	}
 
 	NewtonCollision* GetCurrentShape() const 
@@ -162,7 +162,7 @@ z = size * (i - count / 2);
 	void ChangeCastingShape()
 	{
 		m_currentCastingShape = (m_currentCastingShape + 1) % m_count;
-		m_castingEntity->SetMesh(m_castingGeometries[m_currentCastingShape], GetIdentityMatrix());
+		m_castingEntity->SetMesh(m_castingGeometries[m_currentCastingShape], dGetIdentityMatrix());
 	}
 
 	void SetCastEntityMatrix (DemoEntityManager* const scene, const dMatrix& matrix) const
@@ -273,7 +273,7 @@ class dConvexCastManager: public CustomControllerManager<dConvexCastRecord>
 //dTrace (("%f, %f, %f\n", p1[0], p1[1], p1[2]));
 
 			// do the convex cast here 
-			dMatrix matrix (GetIdentityMatrix());
+			dMatrix matrix (dGetIdentityMatrix());
 			matrix.m_posit = p0;
 
 			dFloat hitParam;
@@ -305,7 +305,7 @@ static void AddSingleCompound(DemoEntityManager* const scene)
 	NewtonCompoundCollisionAddSubCollision(compoundCollision, boxCollision);
 	NewtonDestroyCollision(boxCollision);
 
-dMatrix matrix(GetIdentityMatrix());
+dMatrix matrix(dGetIdentityMatrix());
 matrix.m_posit.m_y = 10.0f;
 
 	NewtonCompoundCollisionEndAddRemove(compoundCollision);
@@ -323,7 +323,7 @@ NewtonBodySetForceAndTorqueCallback(compoundBody, PhysicsApplyGravityForce);
 
 DemoMesh* mesh = new DemoMesh("geometry", NewtonBodyGetCollision(compoundBody), "smilli.tga", "smilli.tga", "smilli.tga");
 DemoEntity* const entity = new DemoEntity(matrix, NULL);
-entity->SetMesh(mesh, GetIdentityMatrix());
+entity->SetMesh(mesh, dGetIdentityMatrix());
 mesh->Release();
 NewtonBodySetUserData(compoundBody, entity);
 scene->Append(entity);
@@ -343,10 +343,10 @@ static void AddStaticMesh(DemoEntityManager* const scene)
 	GetWorkingFileName ("ramp.off", fileName);
 	NewtonMesh* const ntMesh = NewtonMeshLoadOFF(world, fileName);
 
-	dMatrix matrix (GetIdentityMatrix());
+	dMatrix matrix (dGetIdentityMatrix());
 	DemoMesh* mesh = new DemoMesh(ntMesh);
 	DemoEntity* const entity = new DemoEntity(matrix, NULL);
-	entity->SetMesh(mesh, GetIdentityMatrix());
+	entity->SetMesh(mesh, dGetIdentityMatrix());
 	mesh->Release();
 
 	scene->Append(entity);
@@ -362,7 +362,7 @@ static void AddUserDefineStaticMesh(DemoEntityManager* const scene)
 	NewtonCollision* const planeCollision = CreateInfinitePlane (scene->GetNewton(), planeEquation);
 
 	// create the the rigid body for
-	dMatrix matrix (GetIdentityMatrix());
+	dMatrix matrix (dGetIdentityMatrix());
 	NewtonBody* const body = NewtonCreateDynamicBody(scene->GetNewton(), planeCollision, &matrix[0][0]);
 
 	// create a visual mesh
@@ -400,7 +400,7 @@ void ConvexCast (DemoEntityManager* const scene)
 	// set a user friction variable in the body for variable friction demos
 	// later this will be done using LUA script
 	//NewtonWorld* const world = scene->GetNewton();
-	dMatrix offsetMatrix (GetIdentityMatrix());
+	dMatrix offsetMatrix (dGetIdentityMatrix());
 
 //	CreateLevelMesh (scene, "flatPlane.ngd", 0);
 //	CreateLevelMesh (scene, "playground.ngd", 0);
@@ -414,7 +414,7 @@ AddStaticMesh(scene);
 AddUserDefineStaticMesh(scene);
 
 	// place camera into position
-	dMatrix camMatrix (GetIdentityMatrix());
+	dMatrix camMatrix (dGetIdentityMatrix());
 	dQuaternion rot (camMatrix);
 	dVector origin (-30.0f, 10.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);

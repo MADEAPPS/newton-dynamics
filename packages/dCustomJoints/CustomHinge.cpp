@@ -127,7 +127,7 @@ void CustomHinge::ProjectError () const
 	sinAngle *= angleMag;
 	cosAngle *= angleMag;
 
-	const dMatrix& identity = GetIdentityMatrix();
+	const dMatrix& identity = dGetIdentityMatrix();
 	dMatrix angleMatrix (identity);
 	angleMatrix[1][1] = cosAngle;
 	angleMatrix[1][2] = -sinAngle;

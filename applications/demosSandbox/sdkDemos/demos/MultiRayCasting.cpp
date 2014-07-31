@@ -64,7 +64,7 @@ class LineOfSightRayCastEntity: public DemoEntity
 {
 	public:
 	LineOfSightRayCastEntity (DemoEntityManager* const scene, CustomControllerManager<dRayCastRecord>* casterManager)
-		:DemoEntity (GetIdentityMatrix(), NULL)
+		:DemoEntity (dGetIdentityMatrix(), NULL)
 		,m_casterManager(casterManager)
 	{
 		scene->Append(this);
@@ -182,7 +182,7 @@ void MultiRayCast (DemoEntityManager* const scene)
 	dVector location3 (0.2f, 0.0f, 0.2f, 0.0f);
 	dVector size (1.0f, 0.5f, 0.5f, 0.0f);
 
-	dMatrix shapeOffsetMatrix (GetIdentityMatrix());
+	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 
 	// populate the world with few objects
 	int count = 8;

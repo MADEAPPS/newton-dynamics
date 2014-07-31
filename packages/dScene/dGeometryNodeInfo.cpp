@@ -27,12 +27,12 @@ D_IMPLEMENT_CLASS_NODE(dGeometryNodeInfo);
 
 
 dGeometryNodeInfo::dGeometryNodeInfo()
-	:dNodeInfo (), m_matrix (GetIdentityMatrix())
+	:dNodeInfo (), m_matrix (dGetIdentityMatrix())
 {
 }
 
 dGeometryNodeInfo::dGeometryNodeInfo(dScene* const world)
-	:dNodeInfo (), m_matrix (GetIdentityMatrix())
+	:dNodeInfo (), m_matrix (dGetIdentityMatrix())
 {
 }
 

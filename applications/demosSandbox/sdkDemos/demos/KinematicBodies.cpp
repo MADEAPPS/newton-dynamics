@@ -22,11 +22,11 @@ class PhantomPlacement: public DemoEntity
 {
 	public:
 	PhantomPlacement (DemoEntityManager* const scene)
-		:DemoEntity (GetIdentityMatrix(), NULL)
+		:DemoEntity (dGetIdentityMatrix(), NULL)
 	{
 		NewtonWorld* const world = scene->GetNewton();
 
-		dMatrix matrix (GetIdentityMatrix());
+		dMatrix matrix (dGetIdentityMatrix());
 		NewtonCollision* const shape = NewtonCreateBox(world, 1.0f, 1.0f, 1.0f, 0, NULL);
 		m_phantom = NewtonCreateKinematicBody(world, shape, &matrix[0][0]);
 
@@ -38,7 +38,7 @@ class PhantomPlacement: public DemoEntity
 		subMesh.m_specular.m_z = 0.0f;
 		geometry->OptimizeForRender();
 
-		SetMesh(geometry, GetIdentityMatrix());
+		SetMesh(geometry, dGetIdentityMatrix());
 		geometry->Release();
 
 		
@@ -194,7 +194,7 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 
 	bool SetPlacementMatrix (const dVector& posit) const
 	{
-		dMatrix matrix (GetIdentityMatrix());
+		dMatrix matrix (dGetIdentityMatrix());
 
 		matrix.m_posit = posit;
 		matrix.m_posit.m_y += 3.0f;

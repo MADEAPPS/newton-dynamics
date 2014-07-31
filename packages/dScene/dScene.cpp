@@ -50,7 +50,7 @@ static void MakeSceneNodeMatricesLocalToNodeParent (dScene* const scene)
 		dNodeInfo* const sceneNodeInfo = scene->GetInfoFromNode(sceneNode);
 		if (sceneNodeInfo->IsType(dSceneNodeInfo::GetRttiType())) {
 			stackPool.Append(sceneNode);
-			matrixPool.Append(GetIdentityMatrix());
+			matrixPool.Append(dGetIdentityMatrix());
 		}
 	}
 
@@ -182,7 +182,7 @@ static void RemoveLocalTransformFromGeometries (dScene* const scene)
 				sceneInfo->SetGeometryTransform(matrix * sceneInfo->GetGeometryTransform());
 			}
 		}
-		geometryInfo->SetPivotMatrix(GetIdentityMatrix());
+		geometryInfo->SetPivotMatrix(dGetIdentityMatrix());
 	}
 	scene->FreezeScale();
 }
@@ -702,7 +702,7 @@ void dScene::FreezeScale ()
 		dNodeInfo* const nodeInfo = GetInfoFromNode(node);
 		if (nodeInfo->IsType(dSceneNodeInfo::GetRttiType())) {
 			nodeStack.Append(node);
-			parentMatrixStack.Append(GetIdentityMatrix());
+			parentMatrixStack.Append(dGetIdentityMatrix());
 		}
 	}
 
@@ -724,7 +724,7 @@ void dScene::FreezeScale ()
 		transform.PolarDecomposition (matrix, scale, stretchAxis);
 		sceneNodeInfo->SetTransform (matrix);
 
-		dMatrix scaleMatrix (GetIdentityMatrix(), scale, stretchAxis);
+		dMatrix scaleMatrix (dGetIdentityMatrix(), scale, stretchAxis);
 		sceneNodeInfo->SetGeometryTransform (sceneNodeInfo->GetGeometryTransform() * scaleMatrix);
 
 		for (void* link = GetFirstChildLink(rootNode); link; link = GetNextChildLink(rootNode, link)) {
@@ -793,10 +793,10 @@ void dScene::FreezeGeometryPivot ()
 			dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*)GetInfoFromNode(sceneNodeParent);
 
 			dMatrix geoScaleMatrix (sceneInfo->GetGeometryTransform());
-			sceneInfo->SetGeometryTransform(GetIdentityMatrix());
+			sceneInfo->SetGeometryTransform(dGetIdentityMatrix());
 
 			dMatrix meshPivotMatrix (meshInfo->GetPivotMatrix());
-			meshInfo->SetPivotMatrix (GetIdentityMatrix());
+			meshInfo->SetPivotMatrix (dGetIdentityMatrix());
 
 			dMatrix marix (meshPivotMatrix * geoScaleMatrix);
 			meshInfo->BakeTransform (marix);
@@ -1269,7 +1269,7 @@ dFloat dScene::RayCast (const dVector& globalP0, const dVector& globalP1, dList<
 		dTreeNode* const node = GetNodeFromLink(link);
 		dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*) GetInfoFromNode(node);
 		if (sceneInfo->IsType(dSceneNodeInfo::GetRttiType())){
-			rootMatrix.Append(GetIdentityMatrix());
+			rootMatrix.Append(dGetIdentityMatrix());
 			rootNodes.Append(node);
 			parentIndex.Append(0);
 		}

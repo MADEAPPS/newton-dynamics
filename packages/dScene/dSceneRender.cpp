@@ -202,7 +202,7 @@ void dSceneRender::DrawCone(int segments, dFloat radius, dFloat heigh)
 
 void dSceneRender::DrawArrow (int segments, dFloat radius, dFloat heigh, const dVector& stemColor, const dVector& tipColor)
 {
-	dMatrix matrix (GetIdentityMatrix());
+	dMatrix matrix (dGetIdentityMatrix());
 	matrix.m_posit.m_x = heigh / 2.0f;
 	PushMatrix(matrix);
 	SetColor(stemColor);

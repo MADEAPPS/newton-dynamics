@@ -120,7 +120,7 @@ void dMeshNodeInfo::BakeTransform (const dMatrix& transform)
 	//dMatrix tmp (m_matrix);
 	dMatrix matrix (transform.Inverse4x4() * m_matrix * transform);
 	matrix.PolarDecomposition (m_matrix, scale, stretchMatrix);
-	matrix = transform * dMatrix (GetIdentityMatrix(), scale, stretchMatrix);
+	matrix = transform * dMatrix (dGetIdentityMatrix(), scale, stretchMatrix);
 
 	NewtonMeshApplyTransform (m_mesh, &matrix[0][0]);
 }

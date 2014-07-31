@@ -30,7 +30,7 @@ dGeometryNodeSkinModifierInfo::dGeometryNodeSkinModifierInfo()
 	:dGeometryNodeModifierInfo (), 
 	 m_boneCount(0),
 	 m_vertexCount(0),
-	 m_shapeBindMatrix(GetIdentityMatrix()), 
+	 m_shapeBindMatrix(dGetIdentityMatrix()), 
 	 m_vertexWeights(NULL),
 	 m_boneBindingMatrix(NULL),
 	 m_boneWeightIndex(NULL)
@@ -42,7 +42,7 @@ dGeometryNodeSkinModifierInfo::dGeometryNodeSkinModifierInfo(dScene* const world
 	:dGeometryNodeModifierInfo (),
 	 m_boneCount(0),
 	 m_vertexCount(0),
-	 m_shapeBindMatrix(GetIdentityMatrix()), 
+	 m_shapeBindMatrix(dGetIdentityMatrix()), 
 	 m_vertexWeights(NULL),
 	 m_boneBindingMatrix(NULL),
 	 m_boneWeightIndex(NULL)
@@ -55,7 +55,7 @@ dGeometryNodeSkinModifierInfo::dGeometryNodeSkinModifierInfo(const dGeometryNode
 	:dGeometryNodeModifierInfo (me),
 	 m_boneCount(0),
 	 m_vertexCount(0),
-	 m_shapeBindMatrix(GetIdentityMatrix()), 
+	 m_shapeBindMatrix(dGetIdentityMatrix()), 
 	 m_vertexWeights(NULL),
 	 m_boneBindingMatrix(NULL),
 	 m_boneWeightIndex(NULL)

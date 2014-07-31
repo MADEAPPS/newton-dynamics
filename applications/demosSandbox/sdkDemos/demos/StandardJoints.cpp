@@ -37,8 +37,8 @@ class CustomDistance: public CustomJoint
 		dVector dist (pivotInChildInGlobalSpace - pivotInParentInGlobalSpace) ;
 		m_distance = dSqrt (dist % dist);
 
-		dMatrix childMatrix (GetIdentityMatrix());
-		dMatrix parentMatrix (GetIdentityMatrix());
+		dMatrix childMatrix (dGetIdentityMatrix());
+		dMatrix parentMatrix (dGetIdentityMatrix());
 
 		childMatrix.m_posit = pivotInChildInGlobalSpace;
 		parentMatrix.m_posit = pivotInParentInGlobalSpace;
@@ -121,7 +121,7 @@ class CustomBallAndSocketWithFriction: public CustomBallAndSocket
             NewtonUserJointSetRowMaximumFriction (m_joint,  m_dryFriction);
         } else {
             // when omega is too low this is correct but the small angle approximation theorem.
-            dMatrix basis (GetIdentityMatrix());
+            dMatrix basis (dGetIdentityMatrix());
             for (int i = 0; i < 3; i ++) {
                 NewtonUserJointAddAngularRow (m_joint, 0.0f, &basis[i][0]);
                 NewtonUserJointSetRowMinimumFriction (m_joint, -m_dryFriction);
@@ -137,11 +137,11 @@ static NewtonBody* CreateBox (DemoEntityManager* const scene, const dVector& loc
 {
     NewtonWorld* const world = scene->GetNewton();
     int materialID =  NewtonMaterialGetDefaultGroupID (world);
-    NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
+    NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
    	DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
     dFloat mass = 1.0f;
-    dMatrix matrix (GetIdentityMatrix());
+    dMatrix matrix (dGetIdentityMatrix());
     matrix.m_posit = location;
     matrix.m_posit.m_w = 1.0f;
     NewtonBody* const body = CreateSimpleSolid (scene, geometry, mass, matrix, collision, materialID);
@@ -160,7 +160,7 @@ static NewtonBody* CreateCapule (DemoEntityManager* const scene, const dVector& 
 	DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
 	dFloat mass = 1.0f;
-	dMatrix matrix (GetIdentityMatrix());
+	dMatrix matrix (dGetIdentityMatrix());
 	matrix.m_posit = location;
 	matrix.m_posit.m_w = 1.0f;
 	NewtonBody* const body = CreateSimpleSolid (scene, geometry, mass, matrix, collision, materialID);
@@ -177,11 +177,11 @@ static NewtonBody* CreateWheel (DemoEntityManager* const scene, const dVector& l
     NewtonWorld* const world = scene->GetNewton();
     int materialID =  NewtonMaterialGetDefaultGroupID (world);
     dVector size (radius, height, 0.0f, 0.0f);
-    NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), size, _CHAMFER_CYLINDER_PRIMITIVE, 0);
+    NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), size, _CHAMFER_CYLINDER_PRIMITIVE, 0);
     DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
     dFloat mass = 1.0f;
-    dMatrix matrix (GetIdentityMatrix());
+    dMatrix matrix (dGetIdentityMatrix());
     matrix.m_posit = location;
     matrix.m_posit.m_w = 1.0f;
     NewtonBody* const body = CreateSimpleSolid (scene, geometry, mass, matrix, collision, materialID);
@@ -196,11 +196,11 @@ static NewtonBody* CreateCylinder (DemoEntityManager* const scene, const dVector
     NewtonWorld* const world = scene->GetNewton();
     int materialID =  NewtonMaterialGetDefaultGroupID (world);
     dVector size (radius, height, 0.0f, 0.0f);
-    NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), size, _CYLINDER_PRIMITIVE, 0);
+    NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), size, _CYLINDER_PRIMITIVE, 0);
     DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
     dFloat mass = 1.0f;
-    dMatrix matrix (GetIdentityMatrix());
+    dMatrix matrix (dGetIdentityMatrix());
     matrix.m_posit = location;
     matrix.m_posit.m_w = 1.0f;
     NewtonBody* const body = CreateSimpleSolid (scene, geometry, mass, matrix, collision, materialID);
@@ -374,7 +374,7 @@ static CustomHinge* AddHingeWheel (DemoEntityManager* const scene, const dVector
 
     // the joint pin is the first row of the matrix
     //dMatrix localPin (dRollMatrix(90.0f * 3.141592f / 180.0f));
-    dMatrix localPin (GetIdentityMatrix());
+    dMatrix localPin (dGetIdentityMatrix());
     dMatrix matrix;
     NewtonBodyGetMatrix (wheel, & matrix[0][0]);
     matrix = localPin * matrix;
@@ -412,7 +412,7 @@ static CustomSlider* AddSliderWheel (DemoEntityManager* const scene, const dVect
 
     // the joint pin is the first row of the matrix
     //dMatrix localPin (dRollMatrix(90.0f * 3.141592f / 180.0f));
-    dMatrix localPin (GetIdentityMatrix());
+    dMatrix localPin (dGetIdentityMatrix());
     dMatrix matrix;
     NewtonBodyGetMatrix (wheel, & matrix[0][0]);
     matrix = localPin * matrix;
@@ -504,7 +504,7 @@ void StandardJoints (DemoEntityManager* const scene)
     // customize the scene after loading
     // set a user friction variable in the body for variable friction demos
     // later this will be done using LUA script
-    dMatrix offsetMatrix (GetIdentityMatrix());
+    dMatrix offsetMatrix (dGetIdentityMatrix());
 
     CreateLevelMesh (scene, "flatPlane.ngd", 1);
 
@@ -528,7 +528,7 @@ void StandardJoints (DemoEntityManager* const scene)
 	// AddUniversal (mSceneMgr, m_physicsWorld, Vector3 (2.0f, 0.0f, 25.0f));
 
     // place camera into position
-    dMatrix camMatrix (GetIdentityMatrix());
+    dMatrix camMatrix (dGetIdentityMatrix());
     dQuaternion rot (camMatrix);
     dVector origin (-40.0f, 5.0f, 0.0f, 0.0f);
     scene->SetCameraMatrix(rot, origin);

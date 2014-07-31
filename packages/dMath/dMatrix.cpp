@@ -17,6 +17,26 @@
 
 // calculate an orthonormal matrix with the front vector pointing on the 
 // dir direction, and the up and right are determined by using the GramSchidth procedure
+
+
+dMatrix dGetIdentityMatrix()
+{
+	return dMatrix (dVector (1.0f, 0.0f, 0.0f, 0.0f),
+					dVector (0.0f, 1.0f, 0.0f, 0.0f),
+					dVector (0.0f, 0.0f, 1.0f, 0.0f),
+					dVector (0.0f, 0.0f, 0.0f, 1.0f));
+}
+
+dMatrix dGetZeroMatrix ()
+{
+	return dMatrix (dVector (0.0f, 0.0f, 0.0f, 0.0f),
+					dVector (0.0f, 0.0f, 0.0f, 0.0f),
+					dVector (0.0f, 0.0f, 0.0f, 0.0f),
+					dVector (0.0f, 0.0f, 0.0f, 0.0f));
+}
+
+
+
 dMatrix dGrammSchmidt(const dVector& dir)
 {
 	dVector up;
@@ -118,7 +138,7 @@ dMatrix::dMatrix (dFloat pitch, dFloat yaw, dFloat roll, const dVector& location
 bool dMatrix::TestIdentity() const 
 {
 	const dMatrix& matrix = *this;
-	const dMatrix& identity = GetIdentityMatrix();
+	const dMatrix& identity = dGetIdentityMatrix();
 	
 	bool isIdentity = true;
 	for (int i = 0; isIdentity && (i < 3); i ++) {
@@ -387,7 +407,7 @@ dMatrix dMatrix::Inverse4x4 () const
 {
 	const dFloat tol = 1.0e-4f;
 	dMatrix tmp (*this);
-	dMatrix inv (GetIdentityMatrix());
+	dMatrix inv (dGetIdentityMatrix());
 	for (int i = 0; i < 4; i ++) {
 		dFloat diag = tmp[i][i];
 		if (dAbs (diag) < tol) {
@@ -631,7 +651,7 @@ dMatrix dMatrix::JacobiDiagonalization (dVector &eigenValues, const dMatrix& ini
 
 	dAssert (0);
 	eigenValues = dVector (d[0], d[1], d[2], dFloat (0.0f));
-	return GetIdentityMatrix();
+	return dGetIdentityMatrix();
 } 	
 
 
@@ -675,7 +695,7 @@ void dMatrix::PolarDecomposition (dMatrix& transformMatrix, dVector& scale, dMat
 		transformMatrix[1][3] = 0.0f;
 		transformMatrix[2][3] = 0.0f;
 		transformMatrix.m_posit = m_posit;
-		stretchAxis = GetIdentityMatrix();
+		stretchAxis = dGetIdentityMatrix();
 		
 	} else {
 		stretchAxis = LL.JacobiDiagonalization(scale, initialStretchAxis);

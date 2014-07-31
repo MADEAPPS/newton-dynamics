@@ -29,7 +29,7 @@
 
 
 DemoCamera::DemoCamera()
-	:DemoEntity (GetIdentityMatrix(), NULL) 
+	:DemoEntity (dGetIdentityMatrix(), NULL) 
 	,m_fov (60.0f * 3.1416f / 180.0f)
 	,m_backPlane(2000.0f)
 	,m_frontPlane (0.1f)

@@ -65,7 +65,7 @@ static void FireNewtonCcdBox(NewtonWorld* world, const dVector & postion, const 
 {
 	NewtonCollision* collision = NewtonCreateBox(world, 1.0f, 1.0f, 1.0f, 0, NULL);
 
-	dMatrix matrix(GetIdentityMatrix());
+	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = postion;
 
 	NewtonBody* const body = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
@@ -222,7 +222,7 @@ static NewtonBody* CreateBackgroundWallsAndCellingBody(NewtonWorld* world)
 	NewtonTreeCollisionEndBuild(collision, 1);
 
 	// create a body with a collision and locate at the identity matrix position 
-	dMatrix matrix(GetIdentityMatrix());
+	dMatrix matrix(dGetIdentityMatrix());
 	NewtonBody* const body = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
 
 	// do no forget to destroy the collision after you not longer need it

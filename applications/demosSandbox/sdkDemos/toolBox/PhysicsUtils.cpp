@@ -456,7 +456,7 @@ static void ExtrudeFaces (void* userData, int vertexCount, const dFloat* faceVer
 NewtonMesh* CreateCollisionTreeDoubleFaces (NewtonWorld* world, NewtonCollision* optimizedDoubelFacesTree)
 {
 	NewtonMesh* mesh = NewtonMeshCreate(world);
-	dMatrix matrix (GetIdentityMatrix());
+	dMatrix matrix (dGetIdentityMatrix());
 
 	NewtonMeshBeginFace(mesh);
 	NewtonCollisionForEachPolygonDo (optimizedDoubelFacesTree, &matrix[0][0], ExtrudeFaces, mesh);	
@@ -751,7 +751,7 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* world, const dMatrix& srcMa
 				dFloat pad = ((i == 1) || (i == 2)) * 0.25f * radius;
 				dVector p (x, 0.0f, radius + pad);
 				x += 0.3333f * height;
-				dMatrix acc (GetIdentityMatrix());
+				dMatrix acc (dGetIdentityMatrix());
 				for (int j = 0; j < STEPS_HULL; j ++) {
 					cloud[count] = acc.RotateVector(p);
 					acc = acc * rotation;
@@ -868,7 +868,7 @@ NewtonBody* CreateSimpleSolid (DemoEntityManager* const scene, DemoMesh* const m
 	// add an new entity to the world
 	DemoEntity* const entity = new DemoEntity(matrix, NULL);
 	scene->Append (entity);
-	entity->SetMesh(mesh, GetIdentityMatrix());
+	entity->SetMesh(mesh, dGetIdentityMatrix());
 	return CreateSimpleBody (scene->GetNewton(), entity, mass, matrix, collision, materialId);
 }
 
@@ -888,7 +888,7 @@ void AddPrimitiveArray (DemoEntityManager* const scene, dFloat mass, const dVect
 	//dFloat startElevation = 1000.0f;
 	//dFloat startElevation = 20.0f;
 
-	dMatrix matrix (GetIdentityMatrix());
+	dMatrix matrix (dGetIdentityMatrix());
 	for (int i = 0; i < xCount; i ++) {
 		dFloat x = origin.m_x + (i - xCount / 2) * spacing;
 		for (int j = 0; j < zCount; j ++) {

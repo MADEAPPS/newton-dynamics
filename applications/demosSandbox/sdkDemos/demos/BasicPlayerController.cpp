@@ -46,7 +46,7 @@ class BasicPlayerEntity: public DemoEntity
 	};
 
 	BasicPlayerEntity (DemoEntityManager* const scene, CustomPlayerControllerManager* const manager, dFloat radius, dFloat height, const dMatrix& location)
-		:DemoEntity (GetIdentityMatrix(), NULL)
+		:DemoEntity (dGetIdentityMatrix(), NULL)
 	{
 		// add this entity to the scene for rendering
 		scene->Append(this);
@@ -85,7 +85,7 @@ class BasicPlayerEntity: public DemoEntity
 		// create the visual mesh from the player collision shape
 		NewtonCollision* const collision = NewtonBodyGetCollision(body);
 		DemoMesh* const geometry = new DemoMesh("player", collision, "smilli.tga", "smilli.tga", "smilli.tga");
-		SetMesh(geometry, GetIdentityMatrix());
+		SetMesh(geometry, dGetIdentityMatrix());
 		geometry->Release(); 
 	}
 
@@ -179,7 +179,7 @@ class BasicPlayerInputManager: public CustomInputManager
 		PrimitiveType type = PrimitiveType (dRand() % (sizeof (proSelection) / sizeof (proSelection[0])));
 
 		dVector size (0.35f, 0.25f, 0.25f, 0.0f);
-		NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), size, type, 0);
+		NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), size, type, 0);
 		DemoMesh* const geometry = new DemoMesh("prop", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
 		dMatrix matrix (location);
@@ -336,7 +336,7 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	BasicPlayerControllerManager* const playerManager = new BasicPlayerControllerManager (world);
 
 	// add main player
-	dMatrix location (GetIdentityMatrix());
+	dMatrix location (dGetIdentityMatrix());
 	location.m_posit.m_x = -4.0f;
 	location.m_posit.m_y = 5.0f;
 	location.m_posit.m_z = 0.0f;
@@ -352,7 +352,7 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	location.m_posit.m_x += 5.0f;
 	dVector size (2.0f, 2.0f, 2.0f, 0.0f);
 	int count = 1;
-	dMatrix shapeOffsetMatrix (GetIdentityMatrix());
+	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix, 10.0f);
 
 	dVector origin (-10.0f, 2.0f, 0.0f, 0.0f);

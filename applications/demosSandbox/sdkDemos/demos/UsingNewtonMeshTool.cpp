@@ -125,7 +125,7 @@ static void CreateSimpleNewtonMeshBox (DemoEntityManager* const scene, const dVe
 
 //	int instaceCount = 2;
 	int instaceCount = 1;
-	dMatrix matrix (GetIdentityMatrix());
+	dMatrix matrix (dGetIdentityMatrix());
 	matrix.m_posit = origin;
 	for (int ix = 0; ix < instaceCount; ix ++) {
 		for (int iz = 0; iz < instaceCount; iz ++) {

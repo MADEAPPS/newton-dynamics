@@ -116,10 +116,10 @@ dFloat64 dSymmetricBiconjugateGradientSolve::Solve (int size, dFloat64 tolerance
 
 
 dComplemtaritySolver::dBodyState::dBodyState()
-	:m_matrix(GetIdentityMatrix())
-	,m_localFrame(GetZeroMatrix())
-	,m_inertia(GetZeroMatrix())
-	,m_invInertia(GetZeroMatrix())
+	:m_matrix(dGetIdentityMatrix())
+	,m_localFrame(dGetIdentityMatrix())
+	,m_inertia(dGetZeroMatrix())
+	,m_invInertia(dGetZeroMatrix())
 	,m_localInertia (0.0f, 0.0f, 0.0f, 0.0f)
 	,m_localInvInertia(0.0f, 0.0f, 0.0f, 0.0f)
 	,m_veloc(0.0f, 0.0f, 0.0f, 0.0f)
@@ -169,7 +169,7 @@ const dVector& dComplemtaritySolver::dBodyState::GetCenterOfMass () const
 
 void dComplemtaritySolver::dBodyState::UpdateInertia()
 {
-	dMatrix tmpMatrix (GetZeroMatrix());
+	dMatrix tmpMatrix (dGetZeroMatrix());
 
 	tmpMatrix[0] = m_localInertia.CompProduct (dVector (m_matrix[0][0], m_matrix[1][0], m_matrix[2][0], 0.0f));
 	tmpMatrix[1] = m_localInertia.CompProduct (dVector (m_matrix[0][1], m_matrix[1][1], m_matrix[2][1], 0.0f));

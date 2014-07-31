@@ -60,7 +60,7 @@ class ComplexScene: public DemoEntity
 {
 	public:
 	ComplexScene (NewtonCollision* const sceneCollision)
-		:DemoEntity (GetIdentityMatrix(), NULL)
+		:DemoEntity (dGetIdentityMatrix(), NULL)
 		,m_sceneCollision (sceneCollision)
 	{
 		
@@ -209,7 +209,7 @@ class ComplexScene: public DemoEntity
 
 
 		// set the parameter on the added collision share
-		dMatrix matrix (GetIdentityMatrix());
+		dMatrix matrix (dGetIdentityMatrix());
 		matrix.m_posit.m_y = -2.0f;
 		matrix.m_posit.m_x = -15.0f;
 		matrix.m_posit.m_z = -10.0f;
@@ -224,7 +224,7 @@ class ComplexScene: public DemoEntity
 
 	void AddCollisionSingleShape(DemoEntityManager* const scene)
 	{
-		dMatrix offsetMatrix (GetIdentityMatrix());
+		dMatrix offsetMatrix (dGetIdentityMatrix());
 		NewtonCollision* const box = NewtonCreateBox (scene->GetNewton(), 4.0f, 0.1f, 4.0f, 0, &offsetMatrix[0][0]) ;
 		DemoMesh* const mesh = new DemoMesh (" box",  box, "metal_30.tga", "metal_30.tga", "metal_30.tga");
 
@@ -321,7 +321,7 @@ void SceneCollision (DemoEntityManager* const scene)
 	visualMesh->AddPrimitives(scene);
 
 	// this is optional, finish the scene construction, optimize the collision scene
-	dMatrix matrix (GetIdentityMatrix());
+	dMatrix matrix (dGetIdentityMatrix());
 
 
 	// create the level body and add it to the world
@@ -346,7 +346,7 @@ void SceneCollision (DemoEntityManager* const scene)
 
 	dVector location (0.0f, 0.0f, 0.0f, 0.0f);
 	dVector size (0.5f, 0.5f, 0.5f, 0.0f);
-	dMatrix shapeOffsetMatrix (GetIdentityMatrix());
+	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 
 	int count = 5;
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 1.7f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);

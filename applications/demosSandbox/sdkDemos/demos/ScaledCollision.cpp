@@ -59,10 +59,10 @@ static void AddNonUniformScaledPrimitives (DemoEntityManager* const scene, dFloa
 	// create the shape and visual mesh as a common data to be re used
 	NewtonWorld* const world = scene->GetNewton();
 //	NewtonCollision* const collision = CreateConvexCollision (world, &shapeOffsetMatrix[0][0], size, type, materialID);
-	NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), size, type, materialID);
+	NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), size, type, materialID);
 
 	dFloat startElevation = 1000.0f;
-	dMatrix matrix (GetIdentityMatrix());
+	dMatrix matrix (dGetIdentityMatrix());
 //matrix = dPitchMatrix(-45.0f * 3.141592f/180.0f);
 	for (int i = 0; i < xCount; i ++) {
 		dFloat x = origin.m_x + (i - xCount / 2) * spacing;
@@ -124,7 +124,7 @@ static void CreateScaleStaticMesh (DemoEntity* const entity, NewtonCollision* co
 
 	DemoEntity* const scaledEntity = new DemoEntity(location, NULL);
 	scene->Append (scaledEntity);
-	scaledEntity->SetMesh(scaledMesh, GetIdentityMatrix());
+	scaledEntity->SetMesh(scaledMesh, dGetIdentityMatrix());
 	scaledMesh->Release();
 
 	// now make a body with a scaled collision mesh
@@ -249,14 +249,14 @@ void ScaledMeshCollision (DemoEntityManager* const scene)
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (world);
 	dVector location (0.0f, 0.0f, 0.0f, 0.0f);
 
-	dMatrix matrix (GetIdentityMatrix());
+	dMatrix matrix (dGetIdentityMatrix());
 	matrix.m_posit = location;
 	matrix.m_posit.m_x = 0.0f;
 	matrix.m_posit.m_y = 0.0f;
 	matrix.m_posit.m_z = 0.0f;
 	matrix.m_posit.m_w = 1.0f;
 
-	DemoEntity teaPot (GetIdentityMatrix(), NULL);
+	DemoEntity teaPot (dGetIdentityMatrix(), NULL);
 	teaPot.LoadNGD_mesh("teapot.ngd", world);
 	//teaPot.LoadNGD_mesh("cube.ngd", world);
 

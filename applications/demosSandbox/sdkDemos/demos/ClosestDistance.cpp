@@ -32,10 +32,10 @@ class dClosestDistanceRecord: public CustomControllerBase
 			NewtonWorld* const world = scene->GetNewton();
 
 			dVector size(1.0f, 1.0f, 1.0f, 0.0f);
-			m_castingShape = CreateConvexCollision (world, GetIdentityMatrix(), size, castingShapeType, 0);
+			m_castingShape = CreateConvexCollision (world, dGetIdentityMatrix(), size, castingShapeType, 0);
 
 			DemoMesh* const geometry = new DemoMesh("convexShape", m_castingShape, "smilli.tga", "smilli.tga", "smilli.tga");
-			SetMesh(geometry, GetIdentityMatrix());
+			SetMesh(geometry, dGetIdentityMatrix());
 			geometry->Release();
 
 			scene->Append(this);
@@ -125,7 +125,7 @@ class dClosestDistanceRecord: public CustomControllerBase
 
 		// create the shape and visual mesh as a common data to be re used
 		dVector size(0.5f, 0.5f, 0.75f, 0.0f);
-		NewtonCollision* const collision = CreateConvexCollision (world, GetIdentityMatrix(), size, shapeType, materialID);
+		NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), size, shapeType, materialID);
 
 		//	DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "wood_0.tga", "wood_0.tga", "wood_1.tga");
 		DemoMesh* const geometry = new DemoMesh("convexShape", collision, "smilli.tga", "smilli.tga", "smilli.tga");
@@ -187,7 +187,7 @@ void ClosestDistance (DemoEntityManager* const scene)
 	// set a user friction variable in the body for variable friction demos
 	// later this will be done using LUA script
 	NewtonWorld* const world = scene->GetNewton();
-	dMatrix offsetMatrix (GetIdentityMatrix());
+	dMatrix offsetMatrix (dGetIdentityMatrix());
 
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 	//	CreateLevelMesh (scene, "playground.ngd", 0);
@@ -227,7 +227,7 @@ void ClosestDistance (DemoEntityManager* const scene)
 
 	// place camera into position
 	//dMatrix camMatrix (dYawMatrix(90.0f * 3.1416f /180.0f));
-	dMatrix camMatrix (GetIdentityMatrix());
+	dMatrix camMatrix (dGetIdentityMatrix());
 	dQuaternion rot (camMatrix);
 	dVector origin (-30.0f, 10.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);

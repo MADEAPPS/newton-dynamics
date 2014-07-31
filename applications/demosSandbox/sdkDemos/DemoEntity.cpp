@@ -24,7 +24,7 @@ DemoEntity::DemoEntity(const dMatrix& matrix, DemoEntity* const parent)
 	,m_nextPosition (matrix.m_posit)
 	,m_curRotation (dQuaternion (matrix))
 	,m_nextRotation (dQuaternion (matrix))
-	,m_meshMatrix(GetIdentityMatrix())
+	,m_meshMatrix(dGetIdentityMatrix())
 	,m_mesh (NULL)
 	,m_userData(NULL)
 	,m_lock(0) 
@@ -39,12 +39,12 @@ DemoEntity::DemoEntity(const dMatrix& matrix, DemoEntity* const parent)
 DemoEntity::DemoEntity(DemoEntityManager& world, const dScene* const scene, dScene::dTreeNode* const rootSceneNode, dTree<DemoMesh*, dScene::dTreeNode*>& meshCache, DemoEntityManager::EntityDictionary& entityDictionary, DemoEntity* const parent)
 	:dClassInfo()
 	,dHierarchy<DemoEntity>() 
-	,m_matrix(GetIdentityMatrix()) 
+	,m_matrix(dGetIdentityMatrix()) 
 	,m_curPosition (0.0f, 0.0f, 0.0f, 1.0f)
 	,m_nextPosition (0.0f, 0.0f, 0.0f, 1.0f)
 	,m_curRotation (1.0f, 0.0f, 0.0f, 0.0f)
 	,m_nextRotation (1.0f, 0.0f, 0.0f, 0.0f)
-	,m_meshMatrix(GetIdentityMatrix())
+	,m_meshMatrix(dGetIdentityMatrix())
 	,m_mesh (NULL)
 	,m_userData(NULL)
 	,m_lock(0) 
@@ -110,7 +110,7 @@ DemoEntity::~DemoEntity(void)
 	if (m_userData) {
 		delete m_userData;
 	}
-	SetMesh(NULL, GetIdentityMatrix());
+	SetMesh(NULL, dGetIdentityMatrix());
 }
 
 
@@ -203,7 +203,7 @@ void DemoEntity::LoadNGD_mesh (const char* const fileName, NewtonWorld* const wo
 				dNodeInfo* const info = scene.GetInfoFromNode(node);
 				if (info->IsType(dSceneNodeInfo::GetRttiType())) {
 					nodeStack[stack] = node;
-					entityStack[stack] = new DemoEntity (GetIdentityMatrix(), entity);
+					entityStack[stack] = new DemoEntity (dGetIdentityMatrix(), entity);
 					stack ++;
 				}
 			}
@@ -284,7 +284,7 @@ dMatrix DemoEntity::GetNextMatrix () const
 
 dMatrix DemoEntity::CalculateGlobalMatrix (const DemoEntity* const root) const
 {
-	dMatrix matrix (GetIdentityMatrix());
+	dMatrix matrix (dGetIdentityMatrix());
 	for (const DemoEntity* ptr = this; ptr != root; ptr = ptr->GetParent()) {
 		matrix = matrix * ptr->GetCurrentMatrix ();
 	}
@@ -293,7 +293,7 @@ dMatrix DemoEntity::CalculateGlobalMatrix (const DemoEntity* const root) const
 
 dMatrix DemoEntity::CalculateInterpolatedGlobalMatrix (const DemoEntity* const root) const
 {
-	dMatrix matrix (GetIdentityMatrix());
+	dMatrix matrix (dGetIdentityMatrix());
 	for (const DemoEntity* ptr = this; ptr != root; ptr = ptr->GetParent()) {
 		matrix = matrix * ptr->m_matrix;
 	}

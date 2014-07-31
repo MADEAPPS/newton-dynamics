@@ -59,7 +59,7 @@ void Restitution (DemoEntityManager* const scene)
 	// set a user friction variable in the body for variable friction demos
 	// later this will be done using LUA script
 	NewtonWorld* const world = scene->GetNewton();
-	dMatrix offsetMatrix (GetIdentityMatrix());
+	dMatrix offsetMatrix (dGetIdentityMatrix());
 
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (world);
 	NewtonMaterialSetCollisionCallback (world, defaultMaterialID, defaultMaterialID, NULL, NULL, UserContactRestitution); 
@@ -83,7 +83,7 @@ void Restitution (DemoEntityManager* const scene)
 
 	int zCount = 10;
 	dFloat spacing = 4.0f;
-	dMatrix matrix (GetIdentityMatrix());
+	dMatrix matrix (dGetIdentityMatrix());
 	dVector origin (matrix.m_posit);
 	origin.m_x -= 0.0f;
 
@@ -143,7 +143,7 @@ void Restitution (DemoEntityManager* const scene)
 	NewtonDestroyCollision(sphereCollision);
 
 
-	dMatrix camMatrix (GetIdentityMatrix());
+	dMatrix camMatrix (dGetIdentityMatrix());
 	dQuaternion rot (camMatrix);
 	origin = dVector (-25.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);

@@ -37,7 +37,7 @@ class DemoEntityManager: public wxGLCanvas, public dList <DemoEntity*>
     {
         public: 
         TransparentMesh()
-            :m_matrix(GetIdentityMatrix())
+            :m_matrix(dGetIdentityMatrix())
             ,m_mesh(NULL)
 //            ,m_subMesh (NULL)
         {

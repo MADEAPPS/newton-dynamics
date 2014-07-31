@@ -462,7 +462,7 @@ void DemoEntityManager::BodyDeserialization (NewtonBody* const body, NewtonDeser
 
 	//for visual mesh we will collision mesh and convert it to a visual mesh using NewtonMesh 
 	DemoMesh* const mesh = new DemoMesh(bodyIndentification, collision, NULL, NULL, NULL);
-	entity->SetMesh(mesh, GetIdentityMatrix());
+	entity->SetMesh(mesh, dGetIdentityMatrix());
 	mesh->Release();
 }
 

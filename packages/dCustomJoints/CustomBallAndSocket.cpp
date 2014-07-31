@@ -83,7 +83,7 @@ void CustomBallAndSocket::SubmitConstraints (dFloat timestep, int threadIndex)
 
 CustomLimitBallAndSocket::CustomLimitBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:CustomBallAndSocket(pinAndPivotFrame, child, parent)
-	,m_rotationOffset(GetIdentityMatrix())
+	,m_rotationOffset(dGetIdentityMatrix())
 {
 	SetConeAngle (0.0f);
 	SetTwistAngle (0.0f, 0.0f);
@@ -173,6 +173,9 @@ void CustomLimitBallAndSocket::SubmitConstraints (dFloat timestep, int threadInd
 
 	matrix1 = m_rotationOffset * matrix1;
 
+matrix1 = dGetIdentityMatrix();
+matrix0 = dPitchMatrix(30.0f * 3.141592f / 180.0f);
+
 	dVector euler0;
 	dVector euler1;
 	dMatrix localMatrix (matrix0 * matrix1.Inverse());
@@ -185,12 +188,42 @@ void CustomLimitBallAndSocket::SubmitConstraints (dFloat timestep, int threadInd
 	}
 
 	dVector euler (m_pitch.Update (euler0.m_x), m_yaw.Update (euler0.m_y), m_roll.Update (euler0.m_z), 0.0f);
-
 	//dTrace (("(%f %f %f) (%f %f %f)\n", m_pitch.m_angle * 180.0f / 3.141592f, m_yaw.m_angle * 180.0f / 3.141592f, m_roll.m_angle * 180.0f / 3.141592f,  euler0.m_x * 180.0f / 3.141592f, euler0.m_y * 180.0f / 3.141592f, euler0.m_z * 180.0f / 3.141592f));
-/*
+
 	// handle the cone angle zero as special case of a hinge
 	if (m_coneAngle == 0.0f) {
-		dAssert (0);
+//		dMatrix localMatrix (matrix0 * (m_rotationOffset * matrix1).Inverse());
+//		dFloat pitchAngle = -dAtan2(localMatrix[1][2], localMatrix[2][2]);
+
+		if ((m_maxTwistAngle - m_minTwistAngle) < 1.0e-4f) {
+//			dAssert (0);
+/*
+			dMatrix base (dPitchMatrix(pitchAngle) * matrix0);
+			dVector q0 (p1 + matrix0.m_up.Scale(MIN_JOINT_PIN_LENGTH));
+			dVector q1 (p1 + base.m_up.Scale(MIN_JOINT_PIN_LENGTH));
+
+			NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &base.m_right[0]);
+*/
+		} else {
+/*
+			if (pitchAngle > m_maxTwistAngle) {
+				pitchAngle -= m_maxTwistAngle;
+				dMatrix base (dPitchMatrix(pitchAngle) * matrix0);
+				dVector q0 (p1 + matrix0.m_up.Scale(MIN_JOINT_PIN_LENGTH));
+				dVector q1 (p1 + base.m_up.Scale(MIN_JOINT_PIN_LENGTH));
+				NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &base.m_right[0]);
+				NewtonUserJointSetRowMinimumFriction (m_joint, -0.0f);
+			} else if (pitchAngle < m_minTwistAngle) {
+				pitchAngle -= m_minTwistAngle;
+				dMatrix base (dPitchMatrix(pitchAngle) * matrix0);
+				dVector q0 (p1 + matrix0.m_up.Scale(MIN_JOINT_PIN_LENGTH));
+				dVector q1 (p1 + base.m_up.Scale(MIN_JOINT_PIN_LENGTH));
+				NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &base.m_right[0]);
+				NewtonUserJointSetRowMaximumFriction (m_joint,  0.0f);
+			}
+*/
+		}
+
 
 	} else {
 
@@ -209,7 +242,7 @@ void CustomLimitBallAndSocket::SubmitConstraints (dFloat timestep, int threadInd
 			dAssert (0);
 		}
 	}
-*/
+
 
 /*
 	bool limitViolation = false;
