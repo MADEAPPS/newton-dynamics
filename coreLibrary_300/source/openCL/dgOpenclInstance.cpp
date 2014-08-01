@@ -28,33 +28,31 @@ dgOpenclInstance::dgOpenclInstance(dgWorld* const world)
 	:m_world (world)
 	,m_opencl (dgOpencl::GetOpenCL(world->GetAllocator()))
 {
-	_ASSERTE (0);
 }
 
 dgOpenclInstance::~dgOpenclInstance(void)
 {
-	_ASSERTE (0);
+	m_opencl->CleanUp();
 }
 
 
 void dgOpenclInstance::CleanUp()
 {
-	_ASSERTE (0);
+	m_opencl->CleanUp();
 }
 
 void dgOpenclInstance::SelectPlaform(dgInt32 deviceIndex)
 {
-	_ASSERTE (0);
+	m_opencl->SelectPlaform(deviceIndex);
 }
 
 dgInt32 dgOpenclInstance::GetPlatformsCount() const
 {
-	_ASSERTE (0);
-	return 0;
+	return m_opencl->GetPlatformsCount();
 }
 
 void dgOpenclInstance::GetVendorString(dgInt32 deviceIndex, char* const name, dgInt32 maxlength) const
 {
-	_ASSERTE (0);
+	m_opencl->GetVendorString (deviceIndex, name, maxlength);
 }
 

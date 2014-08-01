@@ -41,7 +41,6 @@ class dgOpenclInstance
 
 
 	private:
-
 	dgWorld* m_world;
 	dgOpencl* m_opencl;
 };

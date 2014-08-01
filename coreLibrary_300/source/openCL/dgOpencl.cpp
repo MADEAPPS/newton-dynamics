@@ -24,6 +24,8 @@
 #include "dgOpencl.h"
 
 
+#define NEWTON_OPENCL_SOURCE	"NEWTON_DYNAMICS"
+
 #if (defined (_WIN_32_VER) || defined (_WIN_64_VER) || defined (_POSIX_VER) || defined (_POSIX_VER_64) || defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
 	#include <CL\cl.h>
 	#include <CL\cl_ext.h>
@@ -54,7 +56,7 @@ dgOpencl::dgOpencl(dgMemoryAllocator* const allocator)
 	,m_aligment(0)
 {
 	char buffer[2048];
-	DWORD varCount = GetEnvironmentVariable("NEWTON_OPENCL_PATH", buffer, sizeof (buffer));
+	DWORD varCount = GetEnvironmentVariable(NEWTON_OPENCL_SOURCE, buffer, sizeof (buffer));
 
 	if (varCount) {
 		cl_uint count;
@@ -82,12 +84,6 @@ dgInt32 dgOpencl::GetPlatformsCount() const
 
 void dgOpencl::CleanUp()
 {
-//	for (dgList<void*>::dgListNode* node = m_kernels.GetFirst(); node; node = node->GetNext()) {
-//		cl_kernel kernel = (cl_kernel) node->GetInfo();
-//		clReleaseKernel(kernel);
-//	}
-
-_ASSERTE (0);
 	if (m_program) {
 		clReleaseProgram(cl_program (m_program));
 		m_program = NULL;
@@ -104,7 +100,8 @@ _ASSERTE (0);
 void dgOpencl::GetVendorString(dgInt32 deviceIndex, char* const name, dgInt32 maxlength) const
 {
 	deviceIndex = dgClamp(deviceIndex, 0, m_platformsCount - 1);
-	clGetPlatformInfo(cl_platform_id (m_platforms[deviceIndex]), CL_PLATFORM_NAME, maxlength, name, NULL);
+	//clGetPlatformInfo(cl_platform_id (m_platforms[deviceIndex]), CL_PLATFORM_NAME, maxlength, name, NULL);
+	clGetPlatformInfo(cl_platform_id (m_platforms[deviceIndex]), CL_PLATFORM_VERSION, maxlength, name, NULL);
 }
 
 
@@ -127,8 +124,25 @@ void dgOpencl::SelectPlaform(dgInt32 platform)
 
 	// get the memory alignment
 	cl_uint alignment;
-	clGetDeviceInfo (cl_device_id (m_devices[0]), CL_DEVICE_MEM_BASE_ADDR_ALIGN , sizeof(cl_uint), &alignment, NULL);
+	clGetDeviceInfo (cl_device_id (m_devices[0]), CL_DEVICE_MEM_BASE_ADDR_ALIGN, sizeof(cl_uint), &alignment, NULL);
 	m_aligment = alignment/8; //in bytes
+
+	cl_uint computeUnits;
+	clGetDeviceInfo (cl_device_id (m_devices[0]), CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(cl_uint), &computeUnits, NULL);
+
+//	cl_uint cpuSize;
+//	clGetDeviceInfo (cl_device_id (m_devices[0]), CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, sizeof(cl_uint), &cpuSize, NULL);
+
+	cl_uint workGroupSize;
+	clGetDeviceInfo (cl_device_id (m_devices[0]), CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(cl_uint), &workGroupSize, NULL);
+
+	cl_uint workItemDim;
+	clGetDeviceInfo (cl_device_id (m_devices[0]), CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, sizeof(cl_uint), &workItemDim, NULL);
+
+	cl_uint workItemSize[8];
+	clGetDeviceInfo (cl_device_id (m_devices[0]), CL_DEVICE_MAX_WORK_ITEM_SIZES, sizeof(workItemSize), workItemSize, NULL);
+		  
+
 
 	// create command queue
 //	m_cmd_queue = clCreateCommandQueue(cl_context (m_context), cl_device_id (m_devices[0]), 0, NULL);
@@ -144,10 +158,14 @@ void dgOpencl::SelectPlaform(dgInt32 platform)
 
 void dgOpencl::CompileProgram ()
 {
+	char tmp[2048];
 	char path[2048];
 	char fullPathName[2048];
-	GetEnvironmentVariable("NEWTON_OPENCL_PATH", path, sizeof (path));
+	GetEnvironmentVariable(NEWTON_OPENCL_SOURCE, tmp, sizeof (tmp));
+	sprintf (path, "%s/coreLibrary_300/source/openCL", tmp);  
 	
+	char* programSource[256];
+
 	dgInt32 programCount = 0;
 	sprintf (fullPathName, "%s/*.*", path);
 	_finddata_t data;
@@ -157,39 +175,21 @@ void dgOpencl::CompileProgram ()
 			char tmpPath[2048];
 			sprintf (tmpPath, "%s/%s", path, data.name);
 			if (strstr (data.name, ".cl")) {
-				programCount ++;
-			}
-		} while (_findnext (handle, &data) == 0);
-		_findclose (handle);
-	}
-
-	dgStack<char*> programSourceBuff (programCount);
-
-	char** programSource = &programSourceBuff[0];
-	dgInt32 index = 0;
-	sprintf (fullPathName, "%s/*.*", path);
-	handle = _findfirst (fullPathName, &data);
-	if (handle != -1) {
-		do {
-			char tmpPath[256];
-			sprintf (tmpPath, "%s/%s", path, data.name);
-			if (strstr (data.name, ".cl")) {
 				FILE* const file = fopen (tmpPath, "rb");
 				_ASSERTE (file);
 				fseek (file, 0, SEEK_END);
 				dgInt32 size = ftell(file); 
 				fseek (file, 0, SEEK_SET);
-				programSource[index] = (char*)dgMallocStack (size + 1);
-				fread (programSource[index], 1, size, file);
-				programSource[index][size] = 0;
-
+				programSource[programCount] = (char*)dgMallocStack (size + 1);
+				fread (programSource[programCount], 1, size, file);
+				programSource[programCount][size] = 0;
 				fclose(file);
-				index ++;
+				programCount ++;
+				dgAssert (programCount < (sizeof (programSource) / sizeof(programSource[0])));
 			}
 		} while (_findnext (handle, &data) == 0);
 		_findclose (handle);
 	}
-
 
 	cl_int errcode_ret;
 	m_program = clCreateProgramWithSource(cl_context (m_context), programCount, (const char**)&programSource[0], NULL, &errcode_ret);
@@ -202,6 +202,4 @@ void dgOpencl::CompileProgram ()
 	errcode_ret = clBuildProgram(cl_program (m_program), m_devicesCount, (cl_device_id*)m_devices, NULL, NULL, NULL);
 	_ASSERTE (errcode_ret ==  CL_SUCCESS);
 }
-
-
 

@@ -43,6 +43,7 @@ class dgOpencl
 	~dgOpencl(void);
 	
 	void CompileProgram ();
+	
 
 	dgMemoryAllocator* m_allocator;
 	void* m_currentPlatform;
