@@ -33,7 +33,9 @@ template<class T, dgInt32 sizeInPowerOfTwo>
 class dgFastQueue
 {
 	public:
-	dgFastQueue ();
+    DG_CLASS_ALLOCATOR_NEW(allocator)
+
+	dgFastQueue (dgMemoryAllocator* const allocator);
 	~dgFastQueue ();
 
 	bool IsEmpty() const;
@@ -43,25 +45,29 @@ class dgFastQueue
 	void Push(T& object);
 
 	private:
-	dgInt32 m_head;
-	dgInt32 m_tail;
-	T m_pool[sizeInPowerOfTwo];
+	T* m_pool;
+    dgMemoryAllocator* m_allocator;
+    dgInt32 m_head;
+    dgInt32 m_tail;
 };
 
 
 
 template<class T, dgInt32 sizeInPowerOfTwo>
-dgFastQueue<T, sizeInPowerOfTwo>::dgFastQueue ()
-	:m_head(0)
+dgFastQueue<T, sizeInPowerOfTwo>::dgFastQueue (dgMemoryAllocator* const allocator)
+    :m_allocator(allocator)
+	,m_head(0)
 	,m_tail(0)
 {
-	dgAssert (((sizeInPowerOfTwo -1) & (-sizeInPowerOfTwo)) == 0);
+    dgAssert (((sizeInPowerOfTwo -1) & (-sizeInPowerOfTwo)) == 0);
+    m_pool = (T*) m_allocator->MallocLow(sizeInPowerOfTwo * sizeof (T));
 }
 
 
 template<class T, dgInt32 sizeInPowerOfTwo>
 dgFastQueue<T, sizeInPowerOfTwo>::~dgFastQueue ()
 {
+    m_allocator->FreeLow(m_pool); 
 }
 
 template<class T, dgInt32 sizeInPowerOfTwo>

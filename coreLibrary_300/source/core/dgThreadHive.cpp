@@ -122,6 +122,7 @@ dgThreadHive::dgThreadHive(dgMemoryAllocator* const allocator)
 	,m_allocator(allocator)
 	,m_jobsCriticalSection()
 	,m_globalCriticalSection()
+    ,m_jobsPool(allocator)
 {
 }
 

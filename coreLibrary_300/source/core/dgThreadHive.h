@@ -29,12 +29,10 @@
 
 
 
-#define DG_THREAD_POOL_JOB_SIZE (512)
+//#define DG_THREAD_POOL_JOB_SIZE (512)
+#define DG_THREAD_POOL_JOB_SIZE (1024 * 8)
 
 typedef void (*dgWorkerThreadTaskCallback) (void* const context0, void* const context1, dgInt32 threadID);
-
-
-
 
 class dgThreadHive  
 {
@@ -111,7 +109,6 @@ class dgThreadHive
 
 	private:
 	void DestroyThreads();
-	
 
 	dgInt32 m_beesCount;
 	dgInt32 m_currentIdleBee;
