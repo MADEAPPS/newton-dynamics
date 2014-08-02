@@ -25,8 +25,8 @@ class CustomBallAndSocket: public CustomJoint
 	CUSTOM_JOINTS_API virtual ~CustomBallAndSocket();
 
 	protected:
-	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
+	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;
@@ -49,8 +49,9 @@ class CustomLimitBallAndSocket: public CustomBallAndSocket
 	CUSTOM_JOINTS_API void GetTwistAngle (dFloat& minAngle, dFloat& maxAngle) const;
 
 	protected:
-	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
+	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+
 
 	dMatrix m_rotationOffset;
 	dFloat m_coneAngle;
@@ -66,6 +67,27 @@ class CustomLimitBallAndSocket: public CustomBallAndSocket
 //	AngularIntegration m_roll;
 };
 
+
+class CustomTargetBallAndSocket: public CustomBallAndSocket  
+{
+	public:
+	CUSTOM_JOINTS_API CustomTargetBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
+	CUSTOM_JOINTS_API virtual ~CustomTargetBallAndSocket();
+
+
+	protected:
+	CUSTOM_JOINTS_API void GetInfo (NewtonJointRecord* const info) const;
+	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+
+
+	dFloat m_targetPitch;
+	dFloat m_targetYaw;
+	dFloat m_targetRall;
+	AngularIntegration m_pitch;
+	AngularIntegration m_yaw;
+	AngularIntegration m_roll;
+	dFloat m_angulaSpeed;
+};
 
 #endif 
 

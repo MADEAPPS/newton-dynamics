@@ -342,3 +342,53 @@ void CustomLimitBallAndSocket::SubmitConstraints (dFloat timestep, int threadInd
 	}
 }
 
+
+CustomTargetBallAndSocket::CustomTargetBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
+	:CustomBallAndSocket(pinAndPivotFrame, child, parent)
+	,m_targetPitch(0.0f)
+	,m_targetYaw(0.0f)
+	,m_targetRall(0.0f)
+	,m_pitch(0.0f)
+	,m_yaw(0.0f)
+	,m_roll(0.0f)
+	,m_angulaSpeed (1.0f)
+{
+}
+
+CustomTargetBallAndSocket::~CustomTargetBallAndSocket()
+{
+}
+
+
+void CustomTargetBallAndSocket::GetInfo (NewtonJointRecord* const info) const
+{
+	CustomBallAndSocket::GetInfo (info);
+	dAssert (0);
+//	info->m_minAngularDof[0] = m_minTwistAngle;
+//	info->m_maxAngularDof[0] = m_maxTwistAngle;
+//	info->m_minAngularDof[1] = -m_coneAngle;
+//	info->m_maxAngularDof[1] =  m_coneAngle;
+//	info->m_minAngularDof[2] = -m_coneAngle; 
+//	info->m_maxAngularDof[2] =  m_coneAngle;
+
+	strcpy (info->m_descriptionType, "targetballsocket");
+}
+
+
+void CustomTargetBallAndSocket::SubmitConstraints (dFloat timestep, int threadIndex)
+{
+	dMatrix matrix0;
+	dMatrix matrix1;
+
+	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
+	CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
+
+	const dVector& p0 = matrix0.m_posit;
+	const dVector& p1 = matrix1.m_posit;
+
+	// Restrict the movement on the pivot point along all tree orthonormal direction
+	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_front[0]);
+	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_up[0]);
+	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_right[0]);
+
+}
