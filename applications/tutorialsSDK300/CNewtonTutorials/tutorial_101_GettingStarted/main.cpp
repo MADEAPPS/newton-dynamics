@@ -60,7 +60,7 @@ dNewtonDynamicBody* CreateBackgroundBody(dNewton* const world)
 	collision.EndFace();
 
 	// create a body with a collision and locate at the identity matrix position 
-	return new MyDynamicBody (world, 0, &collision, NULL, GetIdentityMatrix());
+	return new MyDynamicBody (world, 0, &collision, NULL, dGetIdentityMatrix());
 }
 
 
@@ -70,7 +70,7 @@ static dNewtonDynamicBody* CreateFreeFallBall(dNewton* const world)
 	dNewtonCollisionSphere collision (world, 1.0f, 1);
 
 	// create a dynamic body with a sphere shape, mass of 1.0 kg, located 50 units above the ground 
-	dMatrix matrix (GetIdentityMatrix());
+	dMatrix matrix (dGetIdentityMatrix());
 	matrix.m_posit.m_y = 50.0f;
 	dNewtonDynamicBody* const body = new MyDynamicBody (world, 1.0, &collision, NULL, matrix);
 
