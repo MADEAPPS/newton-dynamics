@@ -1026,6 +1026,8 @@ dgInt32 dgWorldDynamicUpdate::SortJointInfoByColor (const dgParallelJointMap* co
 
 void dgWorldDynamicUpdate::LinearizeJointParallelArray(dgParallelSolverSyncData* const solverSyncData, dgJointInfo* const constraintArray, const dgIsland* const island) const
 {
+//	memset (solverSyncData->m_bodyAtomic, 0, island->m_bodyCount * sizeof (solverSyncData->m_bodyAtomic[0]));
+
 	dgParallelJointMap* const jointInfoMap = solverSyncData->m_jointInfoMap;
 	dgInt32 count = island->m_jointCount;
 	dgInt32 index = island->m_jointStart;

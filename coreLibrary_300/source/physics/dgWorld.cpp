@@ -1002,7 +1002,7 @@ void dgWorld::Update (dgFloat32 timestep)
 		dgFloatExceptions exception;
 		dgSetPrecisionDouble precision;
 
-		// runs the update in same separate thread as the calling application, as if it was a separate thread  
+		// run update in same thread as the calling application as if it was a separate thread  
 		StepDynamics (m_savetimestep);
 		memcpy (m_perfomanceCountersBack, m_perfomanceCounters, sizeof (m_perfomanceCounters));
 	#else 

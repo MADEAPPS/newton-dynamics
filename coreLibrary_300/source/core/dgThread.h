@@ -99,8 +99,7 @@ public:
 };
 
 
-
-inline void dgThread::dgCriticalSection::Lock()
+DG_INLINE void dgThread::dgCriticalSection::Lock()
 {
 	#ifndef DG_USE_THREAD_EMULATION 
 		#ifdef DG_USE_MUTEX_CRITICAL_SECTION
@@ -114,7 +113,7 @@ inline void dgThread::dgCriticalSection::Lock()
 	#endif
 }
 
-inline void dgThread::dgCriticalSection::Unlock()
+DG_INLINE void dgThread::dgCriticalSection::Unlock()
 {
 	#ifndef DG_USE_THREAD_EMULATION 
 		#ifdef DG_USE_MUTEX_CRITICAL_SECTION

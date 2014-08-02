@@ -151,6 +151,7 @@ class dgParallelSolverSyncData
 
 	const dgIsland* m_islandArray;
 	dgParallelJointMap* m_jointInfoMap;
+//	dgThread::dgCriticalSection* m_bodyAtomic;
 	JointsBashes m_jointBatches[64];
 	dgInt32 m_hasJointFeeback[DG_MAX_THREADS_HIVE_COUNT];
 };
