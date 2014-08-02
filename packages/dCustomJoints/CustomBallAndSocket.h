@@ -53,20 +53,17 @@ class CustomLimitBallAndSocket: public CustomBallAndSocket
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dMatrix m_rotationOffset;
-
 	dFloat m_coneAngle;
 	dFloat m_minTwistAngle;
 	dFloat m_maxTwistAngle;
-	
-	AngularIntegration m_pitch;
-	AngularIntegration m_yaw;
-	AngularIntegration m_roll;
+	dFloat m_coneAngleCos;
+	dFloat m_coneAngleSin;
+	dFloat m_coneAngleHalfCos;
+	dFloat m_coneAngleHalfSin;	
 
-
-//	dFloat m_coneAngleCos;
-//	dFloat m_coneAngleSin;
-//	dFloat m_coneAngleHalfCos;
-//	dFloat m_coneAngleHalfSin;
+//	AngularIntegration m_pitch;
+//	AngularIntegration m_yaw;
+//	AngularIntegration m_roll;
 };
 
 
