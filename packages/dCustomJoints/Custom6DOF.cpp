@@ -205,7 +205,7 @@ void Custom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 	}
 
 	if (limitViolation) {
-		dMatrix pyr (dPitchMatrix(m_pitch.m_angle) * dYawMatrix(m_yaw.m_angle) * dRollMatrix(m_roll.m_angle));
+		//dMatrix pyr (dPitchMatrix(m_pitch.m_angle) * dYawMatrix(m_yaw.m_angle) * dRollMatrix(m_roll.m_angle));
 		dMatrix p0y0r0 (dPitchMatrix(euler[0]) * dYawMatrix(euler[1]) * dRollMatrix(euler[2]));
 		dMatrix baseMatrix (p0y0r0 * matrix1);
         dMatrix rotation (matrix0.Inverse() * baseMatrix);
