@@ -90,9 +90,6 @@ class CustomControlledBallAndSocket: public CustomBallAndSocket
 	CUSTOM_JOINTS_API void GetInfo (NewtonJointRecord* const info) const;
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 
-//	dFloat m_targetPitch;
-//	dFloat m_targetYaw;
-//	dFloat m_targetRoll;
 	dVector m_targetAngles;
 	AngularIntegration m_pitch;
 	AngularIntegration m_yaw;
