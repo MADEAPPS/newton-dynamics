@@ -282,17 +282,6 @@
     <ClInclude Include="..\..\..\source\newton\NewtonClass.h" />
     <ClInclude Include="..\..\..\source\newton\NewtonStdAfx.h" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\source\pthreads.2\VS_2012_static_mt\pthread.vcxproj">
-      <Project>{03bca23c-02a5-415b-a37b-26600bc2ce96}</Project>
-    </ProjectReference>
-    <ProjectReference Include="core.vcxproj">
-      <Project>{57ac4f2d-b115-4931-8f6e-af8ad616b6aa}</Project>
-    </ProjectReference>
-    <ProjectReference Include="physics.vcxproj">
-      <Project>{39737a8f-6151-4259-8e39-25530345d4b4}</Project>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
