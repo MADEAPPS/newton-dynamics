@@ -27,7 +27,7 @@ NewtonBody* CreateBackgroundBody(NewtonWorld* const world)
 	NewtonTreeCollisionEndBuild (collision, 1);
 
 	// create a body with a collision and locate at the identity matrix position 
-	dMatrix matrix (GetIdentityMatrix());
+	dMatrix matrix (dGetIdentityMatrix());
 	NewtonBody* const body = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
 
 	// do no forget to destroy the collision after you not longer need it
@@ -54,7 +54,7 @@ NewtonBody* CreateFreeFallBall(NewtonWorld* const world)
 	NewtonCollision* const collision = NewtonCreateSphere(world, 1.0f, 0, NULL);
 
 	// create a dynamic body with a sphere shape, and 
-	dMatrix matrix (GetIdentityMatrix());
+	dMatrix matrix (dGetIdentityMatrix());
 	matrix.m_posit.m_y = 50.0f;
 	NewtonBody* const body = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
 

@@ -98,7 +98,7 @@ void dNewtonTransformLerp::Update (const dFloat* const matrix)
 }
 
 
-void dNewtonTransformLerp::InterplateMatrix (dFloat param, dFloat* const matrix) const
+void dNewtonTransformLerp::InterpolateMatrix (dFloat param, dFloat* const matrix) const
 {
 	dNewton::ScopeLock scopelock (&m_lock);
 	dVector posit (m_posit0 + (m_posit1 - m_posit0).Scale (param));

@@ -19,6 +19,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dJointLibrary", "..\..\..\p
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dContainers", "..\..\..\packages\projects\visualStudio_2010_static_md\dContainers.vcxproj", "{F67C4593-A914-4DDF-8CB5-C59A3EF3ECE0}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tutorial_201_PlayerController", "tutorial_201_PlayerController\tutorial_101_PlayerController.vcxproj", "{A8F20E0B-EF43-40A1-9579-D9376AD9FD68}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -97,6 +99,12 @@ Global
 		{F67C4593-A914-4DDF-8CB5-C59A3EF3ECE0}.Release|Win32.Build.0 = release|Win32
 		{F67C4593-A914-4DDF-8CB5-C59A3EF3ECE0}.Release|x64.ActiveCfg = release|x64
 		{F67C4593-A914-4DDF-8CB5-C59A3EF3ECE0}.Release|x64.Build.0 = release|x64
+		{A8F20E0B-EF43-40A1-9579-D9376AD9FD68}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A8F20E0B-EF43-40A1-9579-D9376AD9FD68}.Debug|Win32.Build.0 = Debug|Win32
+		{A8F20E0B-EF43-40A1-9579-D9376AD9FD68}.Debug|x64.ActiveCfg = Debug|Win32
+		{A8F20E0B-EF43-40A1-9579-D9376AD9FD68}.Release|Win32.ActiveCfg = Release|Win32
+		{A8F20E0B-EF43-40A1-9579-D9376AD9FD68}.Release|Win32.Build.0 = Release|Win32
+		{A8F20E0B-EF43-40A1-9579-D9376AD9FD68}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

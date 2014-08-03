@@ -242,7 +242,7 @@ void dNewtonBody::OnBodyDestroy (const NewtonBody* const body)
 
 void dNewtonBody::GetVisualMatrix (dFloat param, dFloat* const matrix) const
 {
-	InterplateMatrix (param, matrix);
+	InterpolateMatrix (param, matrix);
 }
 
 

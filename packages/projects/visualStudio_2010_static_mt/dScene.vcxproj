@@ -268,28 +268,6 @@
     <ClInclude Include="..\..\dScene\dTextureNodeInfo.h" />
     <ClInclude Include="..\..\dScene\dVariable.h" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\coreLibrary_300\source\pthreads.2\VS_2010_static_mt\pthread.vcxproj">
-      <Project>{03bca23c-02a5-415b-a37b-26600bc2ce96}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="dAnimation.vcxproj">
-      <Project>{e3c14351-bad1-4add-ab9a-31054d6e7cdb}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="dContainers.vcxproj">
-      <Project>{f67c4593-a914-4ddf-8cb5-c59a3ef3ece0}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="dJointLibrary.vcxproj">
-      <Project>{721c99ce-4716-4146-9817-59bc2671b844}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="dMath.vcxproj">
-      <Project>{cbe9e751-e58b-46c1-b6b0-873670d0f981}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -206,12 +206,6 @@
     <ClInclude Include="..\..\dMath\dStdAfxMath.h" />
     <ClInclude Include="..\..\dMath\dVector.h" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\coreLibrary_300\source\pthreads.2\VS_2010_static_mt\pthread.vcxproj">
-      <Project>{03bca23c-02a5-415b-a37b-26600bc2ce96}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
