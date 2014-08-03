@@ -539,22 +539,22 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector location (0.0f, 0.0f, 0.0f, 0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
-//	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
-//	AddBallAndSockect (scene, dVector (-20.0f, 0.0f, -15.0f));
-//	Add6DOF (scene, dVector (-20.0f, 0.0f, -10.0f));
-	AddPoweredRagDoll (scene, dVector (-20.0f, 0.0f, -10.0f));
+	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
+	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -15.0f));
+	Add6DOF (scene, dVector (-20.0f, 0.0f, -10.0f));
+	AddPoweredRagDoll (scene, dVector (-20.0f, 0.0f, -5.0f));
 
-//	AddHinge (scene, dVector (-20.0f, 0.0f, -5.0f));
-//	AddSlider (scene, dVector (-20.0f, 0.0f, -0.0f));
-//	AddCylindrical (scene, dVector (-20.0f, 0.0f, 5.0f));
+	AddHinge (scene, dVector (-20.0f, 0.0f, -0.0f));
+	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
+	AddCylindrical (scene, dVector (-20.0f, 0.0f, 10.0f));
 
     //add relational joints example 
-//	AddGear (scene, dVector (-20.0f, 0.0f, 10.0f));
-//	AddPulley (scene, dVector (-20.0f, 0.0f, 15.0f));
-//	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 20.0f));
+	AddGear (scene, dVector (-20.0f, 0.0f, 15.0f));
+	AddPulley (scene, dVector (-20.0f, 0.0f, 20.0f));
+	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 25.0f));
 
 	// this joint is not very stable when using non rotational inertia, like these examples
-	// AddUniversal (mSceneMgr, m_physicsWorld, Vector3 (2.0f, 0.0f, 25.0f));
+	// AddUniversal (mSceneMgr, m_physicsWorld, Vector3 (2.0f, 0.0f, 30.0f));
 
     // place camera into position
     dMatrix camMatrix (dGetIdentityMatrix());
