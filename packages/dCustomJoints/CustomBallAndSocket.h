@@ -68,21 +68,32 @@ class CustomLimitBallAndSocket: public CustomBallAndSocket
 };
 
 
-class CustomTargetBallAndSocket: public CustomBallAndSocket  
+class CustomControlledBallAndSocket: public CustomBallAndSocket  
 {
 	public:
-	CUSTOM_JOINTS_API CustomTargetBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
-	CUSTOM_JOINTS_API virtual ~CustomTargetBallAndSocket();
+	CUSTOM_JOINTS_API CustomControlledBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
+	CUSTOM_JOINTS_API virtual ~CustomControlledBallAndSocket();
 
+	CUSTOM_JOINTS_API void SetAngularVelocity (dFloat omegaMag);
+	CUSTOM_JOINTS_API dFloat GetAngularVelocity () const;
+
+	CUSTOM_JOINTS_API void SetPitchAngle (dFloat angle);
+	CUSTOM_JOINTS_API dFloat SetPitchAngle () const;
+
+	CUSTOM_JOINTS_API void SetYawAngle (dFloat angle);
+	CUSTOM_JOINTS_API dFloat SetYawAngle () const;
+
+	CUSTOM_JOINTS_API void SetRollAngle (dFloat angle);
+	CUSTOM_JOINTS_API dFloat SetRollAngle () const;
 
 	protected:
 	CUSTOM_JOINTS_API void GetInfo (NewtonJointRecord* const info) const;
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 
-
-	dFloat m_targetPitch;
-	dFloat m_targetYaw;
-	dFloat m_targetRall;
+//	dFloat m_targetPitch;
+//	dFloat m_targetYaw;
+//	dFloat m_targetRoll;
+	dVector m_targetAngles;
 	AngularIntegration m_pitch;
 	AngularIntegration m_yaw;
 	AngularIntegration m_roll;

@@ -51,9 +51,9 @@
 //#define DEFAULT_SCENE	25			// continue collision
 //#define DEFAULT_SCENE	26			// paper wall continue collision
 //#define DEFAULT_SCENE	27			// puck slide continue collision
-//#define DEFAULT_SCENE	28          // standard joints
+#define DEFAULT_SCENE	28          // standard joints
 //#define DEFAULT_SCENE	29			// articulated joints
-#define DEFAULT_SCENE	30			// basic rag doll
+//#define DEFAULT_SCENE	30			// basic rag doll
 //#define DEFAULT_SCENE	31			// basic car
 //#define DEFAULT_SCENE	32			// high performance super car
 //#define DEFAULT_SCENE	33			// basic player controller
