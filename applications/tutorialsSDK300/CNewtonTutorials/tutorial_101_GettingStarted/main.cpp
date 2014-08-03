@@ -205,7 +205,7 @@ int main(int argc, char** argv)
     // create floor
     dNewtonCollisionBox floor_collision (world, 100, 1, 100, 1);
     
-    //floor_collision.SetScale(1, 2, 1); // If I uncomment this line dNewtonPlayer->CustomPlayerController->m_isJumping never change.
+    floor_collision.SetScale(1, 2, 1); // If I uncomment this line dNewtonPlayer->CustomPlayerController->m_isJumping never change.
     
     MyDynamicBody* floor = new MyDynamicBody (world, 0, &floor_collision, NULL, dGetIdentityMatrix());
     

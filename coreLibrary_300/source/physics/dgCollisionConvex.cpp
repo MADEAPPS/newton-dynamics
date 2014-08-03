@@ -2977,13 +2977,14 @@ dgFloat32 dgCollisionConvex::ConvexConicConvexRayCast (const dgCollisionInstance
 	proxy.m_skinThickness = dgFloat32 (0.0f);
 	proxy.m_matrix = shapeInstance.m_globalMatrix * matrix.Inverse();
 
-
 	contactOut.m_normal = dgVector (dgFloat32 (0.0f));
 	contactOut.m_point = dgVector (dgFloat32 (0.0f));
 	dgContactPoint lastContact(contactOut);
 
 	const dgVector& scale = convexConicShape->GetScale();
 	const dgVector& invScale = convexConicShape->GetInvScale();
+
+	veloc = veloc.CompProduct4(invScale);
 
 	dgFloat32 param = dgFloat32 (1.2f);
 	dgMinkHull minkHull (proxy);
