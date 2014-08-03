@@ -73,6 +73,27 @@ class dKinematicPlacement: public CustomControllerBase
 class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlacement>, public dComplemtaritySolver 
 {
 	public:
+	class dContactJoint: public dBilateralJoint
+	{
+		public: 
+		dContactJoint()
+			:dBilateralJoint()
+		{
+		}
+
+		void UpdateSolverForces (const dJacobianPair* const jacobians) const
+		{
+			dAssert (0);
+		}
+
+		void JacobianDerivative (dParamInfo* const constraintParams)
+		{
+			dAssert (0);
+		}
+
+	};
+
+
 	dKinematicPlacementManager(DemoEntityManager* const scene)
 		:CustomControllerManager<dKinematicPlacement>(scene->GetNewton(), "dKinematicPlacementManager")
 		,m_castDir (0.0f, -1.0f, 0.0f, 0.0f)
@@ -84,9 +105,9 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 		,m_isInPenetration(false)
 	{
 		scene->Set2DDisplayRenderFunction (RenderHelp, this);
-
 		m_phantomEntity = new PhantomPlacement (scene);
 		scene->Append (m_phantomEntity);
+		m_contactJoint.Init (&m_body, &m_static);
 	}
 
 	static void RenderHelp (DemoEntityManager* const scene, void* const context, int lineNumber)
@@ -291,21 +312,41 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 	}
 
 
-	int GetActiveJoints (dBilateralJoint** const jointArray, int bufferSize)
-	{
-		return 1;
-	}
-
 	int BuildJacobianMatrix (int jointCount, dBilateralJoint** const jointArray, dFloat timestep, dJacobianPair* const jacobianArray, dJacobianColum* const jacobianColumnArray, int maxRowCount)
 	{
-		return 0;
+		return dComplemtaritySolver::BuildJacobianMatrix (jointCount, jointArray, timestep, jacobianArray, jacobianColumnArray, maxRowCount);
 	}
 	void CalculateReactionsForces (int bodyCount, dBodyState** const bodyArray, int jointCount, dBilateralJoint** const jointArray, dFloat timestep, dJacobianPair* const jacobianArray, dJacobianColum* const jacobianColumnArray)
 	{
 	}
 
-	bool AdjustRotaionMatrix (dMatrix& matrix, const NewtonCollision* const collision, int contactCount, const float* const contacts, const float* const normals) const
+	bool AdjustRotaionMatrix (dMatrix& matrix, const NewtonCollision* const collision, int contactCount, const float* const contacts, const float* const normals)
 	{
+		dMatrix localMatrix;
+		NewtonCollisionGetMatrix (collision, &localMatrix[0][0]);
+
+		m_body.SetMatrix(matrix);
+		m_body.SetLocalMatrix(localMatrix);
+
+		dVector com;
+		dVector inertia;
+		NewtonConvexCollisionCalculateInertialMatrix (collision, &inertia[0], &com[0]);	
+
+		dFloat mass = 10.0f;
+		m_body.SetMass(mass);
+		m_body.SetInertia (mass * inertia[0], mass * inertia[1], mass * inertia[2]);
+		m_body.UpdateInertia();
+
+		m_body.SetForce (m_castDir.Scale (30.0f));
+		m_body.SetVeloc (dVector (0.0f, 0.0f, 0.0f, 0.0f));
+		m_body.SetOmega (dVector (0.0f, 0.0f, 0.0f, 0.0f));
+		m_body.SetTorque (dVector (0.0f, 0.0f, 0.0f, 0.0f));
+
+		dBilateralJoint* jointArray[1];
+		jointArray[0] = &m_contactJoint;
+		BuildJacobianMatrix (1, jointArray, 0.01f, jacobianPairArray, jacobianColumn, sizeof (jacobianPairArray)/ sizeof (jacobianPairArray[0]));
+		//CalculateReactionsForces (bodyCount, m_bodyArray, jointCount, m_jointArray, timestep, jacobianPairArray, jacobianColumn);
+
 		return true;
 	}
 
@@ -319,8 +360,9 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 	bool m_isInPenetration;
 
 
-	dBodyState* m_body;
-	dBilateralJoint* m_jointArray;
+	dBodyState m_body;
+	dBodyState m_static;
+	dContactJoint m_contactJoint;
 	dJacobianColum jacobianColumn[4];
 	dJacobianPair jacobianPairArray[4];
 

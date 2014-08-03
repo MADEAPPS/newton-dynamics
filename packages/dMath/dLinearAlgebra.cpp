@@ -150,9 +150,47 @@ dFloat dComplemtaritySolver::dBodyState::GetMass () const
 	return m_mass;
 }
 
+void dComplemtaritySolver::dBodyState::SetMass (dFloat mass)
+{
+	m_mass = mass;
+	m_invMass = 1.0f / mass;
+}
+
+void dComplemtaritySolver::dBodyState::SetInertia (dFloat Ixx, dFloat Iyy, dFloat Izz)
+{
+	m_localInertia[0] = Ixx;
+	m_localInertia[1] =	Iyy;
+	m_localInertia[2] =	Izz;
+	m_localInvInertia[0] = 1.0f / Ixx;
+	m_localInvInertia[1] = 1.0f / Iyy;
+	m_localInvInertia[2] = 1.0f / Izz;
+}
+
+void dComplemtaritySolver::dBodyState::GetInertia (dFloat& Ixx, dFloat& Iyy, dFloat& Izz) const
+{
+	Ixx = m_localInertia[0];
+	Iyy = m_localInertia[1];
+	Izz = m_localInertia[2];
+}
+
+
+
+void dComplemtaritySolver::dBodyState::SetMatrix (const dMatrix& matrix)
+{
+	m_matrix = matrix;
+	m_globalCentreOfMass = m_matrix.TransformVector(m_localFrame.m_posit);
+}
+
+
 const dMatrix& dComplemtaritySolver::dBodyState::GetMatrix () const
 {
 	return m_matrix;
+}
+
+void dComplemtaritySolver::dBodyState::SetLocalMatrix (const dMatrix& matrix)
+{
+	m_localFrame = matrix;
+	m_globalCentreOfMass = m_matrix.TransformVector(m_localFrame.m_posit);
 }
 
 const dMatrix& dComplemtaritySolver::dBodyState::GetLocalMatrix () const
@@ -165,6 +203,25 @@ const dVector& dComplemtaritySolver::dBodyState::GetCenterOfMass () const
 	return m_globalCentreOfMass;
 }
 
+void dComplemtaritySolver::dBodyState::SetVeloc (const dVector& veloc)
+{
+	m_veloc = veloc;
+}
+
+void dComplemtaritySolver::dBodyState::SetOmega (const dVector& omega)
+{
+	m_omega = omega;
+}
+
+void dComplemtaritySolver::dBodyState::SetForce (const dVector& force)
+{
+	m_externalForce = force;
+}
+
+void dComplemtaritySolver::dBodyState::SetTorque (const dVector& torque)
+{
+	m_externalTorque = torque;
+}
 
 
 void dComplemtaritySolver::dBodyState::UpdateInertia()

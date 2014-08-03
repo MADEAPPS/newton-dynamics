@@ -75,24 +75,24 @@ void CustomVehicleControllerBodyStateChassis::Init (CustomVehicleController* con
     CustomVehicleControllerBodyState::Init (controller);
     NewtonBody* const body = m_controller->GetBody();
 
-    m_localFrame = localframe;
-    m_localFrame[3] = m_com + m_comOffset;
-    m_localFrame[3][3] = 1.0f;
+	m_localFrame = localframe;
+	m_localFrame[3] = m_com + m_comOffset;
+	m_localFrame[3][3] = 1.0f;
 
-    NewtonBodySetCentreOfMass(body, &m_localFrame[3][0]);
+	NewtonBodySetCentreOfMass(body, &m_localFrame[3][0]);
 
-    NewtonBodyGetMatrix(body, &m_matrix[0][0]);
-    NewtonBodyGetMassMatrix(body, &m_mass, &m_localInertia[0], &m_localInertia[1], &m_localInertia[2]);
+	NewtonBodyGetMatrix(body, &m_matrix[0][0]);
+	NewtonBodyGetMassMatrix(body, &m_mass, &m_localInertia[0], &m_localInertia[1], &m_localInertia[2]);
 
-    NewtonBodyGetOmega(body, &m_omega[0]);
-    NewtonBodyGetVelocity(body, &m_veloc[0]);
+	NewtonBodyGetOmega(body, &m_omega[0]);
+	NewtonBodyGetVelocity(body, &m_veloc[0]);
 
-    m_invMass = 1.0f / m_mass;
-    m_localInvInertia[0] = 1.0f / m_localInertia[0];
-    m_localInvInertia[1] = 1.0f / m_localInertia[1];
-    m_localInvInertia[2] = 1.0f / m_localInertia[2];
+	m_invMass = 1.0f / m_mass;
+	m_localInvInertia[0] = 1.0f / m_localInertia[0];
+	m_localInvInertia[1] = 1.0f / m_localInertia[1];
+	m_localInvInertia[2] = 1.0f / m_localInertia[2];
 
-    UpdateInertia();
+	UpdateInertia();
 }
 
 dFloat CustomVehicleControllerBodyStateChassis::GetAerodynamicsDowforceCoeficient () const

@@ -112,8 +112,9 @@ class dComplemtaritySolver
 		dBilateralJoint(){}
 		virtual ~dBilateralJoint(){}
 
-		protected:
 		virtual void Init (dBodyState* const state0, dBodyState* const state1);
+
+		protected:
 		virtual void JacobianDerivative (dParamInfo* const constraintParams) = 0; 
 		virtual void UpdateSolverForces (const dJacobianPair* const jacobians) const = 0; 
 		virtual void JointAccelerations (dJointAccelerationDecriptor* const accelParam);
@@ -144,12 +145,27 @@ class dComplemtaritySolver
 		virtual ~dBodyState() {}
 
 		dFloat GetMass () const;
+		void SetMass (dFloat mass);
+
+		void SetInertia (dFloat Ixx, dFloat Iyy, dFloat Izz);
+		void GetInertia (dFloat& Ixx, dFloat& Iyy, dFloat& Izz) const;
+
 		const dVector& GetOmega() const; 
 		const dVector& GetVelocity() const; 
 
 		void UpdateInertia();
+
+		void SetMatrix (const dMatrix& matrix);
 		const dMatrix& GetMatrix () const;
+
+		void SetLocalMatrix (const dMatrix& matrix);
 		const dMatrix& GetLocalMatrix () const;
+
+		void SetVeloc (const dVector& veloc);
+		void SetOmega (const dVector& omega);
+		void SetForce (const dVector& force);
+		void SetTorque (const dVector& torque);
+
 		const dVector& GetCenterOfMass () const;
 
 		protected:
