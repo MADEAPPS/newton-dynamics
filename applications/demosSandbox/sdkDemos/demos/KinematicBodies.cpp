@@ -233,7 +233,7 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 				me->m_isInPenetration |= (penetrations[i] > 1.0e-3f);
 			}
 		}
-
+/*
 		if (!me->m_isInPenetration && contactCount) {
 			bool wasAjusted = true;
 			for (int i = 0; (i < 8) & wasAjusted; i ++) {
@@ -250,10 +250,11 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 				}
 			}
 		}
+*/
 	    return me->m_isInPenetration ? 0 : 1;
     }
 
-    bool testForCollision ()
+    bool TestForCollision ()
     {
 	    dVector minP;
 	    dVector maxP;
@@ -266,9 +267,11 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 	    NewtonWorld* const world = NewtonBodyGetWorld(m_phantomEntity->m_phantom);
 
 		m_isInPenetration = false;
+        m_bodiesInAABB.RemoveAll();
 	    NewtonWorldForEachBodyInAABBDo(world, &minP.m_x, &maxP.m_x, aabbCollisionCallback, this);
 
-		return false;
+
+		return m_isInPenetration;
     }
 
 
@@ -326,7 +329,7 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
             NewtonWorldRayCast(world, &p0[0], &p1[0], RayCastFilter, this, RayPrefilterCallback, 0);
             if (m_hitParam < 1.0f) {
 				if (SetPlacementMatrix (p0 + (p1 - p0).Scale (m_hitParam))) {
-					if (!testForCollision ()) {
+					if (!TestForCollision ()) {
 						if (m_placeInstance.UpdateTriggerJoystick (mainWindow, mainWindow->GetMouseKeyState(0))) {
 							//dTrace (("xxx\n"));
 							dMatrix matrix;
@@ -395,6 +398,7 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 
 	dVector m_castDir;
 	PhantomPlacement* m_phantomEntity;
+    dList<NewtonBody*> m_bodiesInAABB;
 	dList<NewtonBody*> m_selectionToIgnore;
 	DemoEntityManager::ButtonKey m_helpKey;
 	DemoEntityManager::ButtonKey m_selectShape;
