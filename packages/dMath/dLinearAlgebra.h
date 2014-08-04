@@ -168,6 +168,8 @@ class dComplemtaritySolver
 
 		const dVector& GetCenterOfMass () const;
 
+		void IntegrateVelocity (dFloat timestep);
+
 		protected:
 		virtual void IntegrateForce (dFloat timestep, const dVector& force, const dVector& torque);
 		virtual void ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega);

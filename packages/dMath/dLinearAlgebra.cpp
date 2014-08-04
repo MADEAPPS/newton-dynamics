@@ -247,6 +247,48 @@ void dComplemtaritySolver::dBodyState::IntegrateForce (dFloat timestep, const dV
 	m_omega += alpha.Scale (timestep);
 }
 
+void dComplemtaritySolver::dBodyState::IntegrateVelocity (dFloat timestep)
+{
+	const dFloat D_MAX_ANGLE_STEP = dFloat (45.0f * 3.141592f / 180.0f);
+	const dFloat D_ANGULAR_TOL = dFloat (0.0125f * 3.141592f / 180.0f);
+
+	m_globalCentreOfMass += m_veloc.Scale (timestep); 
+	while (((m_omega % m_omega) * timestep * timestep) > (D_MAX_ANGLE_STEP * D_MAX_ANGLE_STEP)) {
+		m_omega = m_omega.Scale (dFloat (0.8f));
+	}
+
+	// this is correct
+	dFloat omegaMag2 = m_omega % m_omega;
+	if (omegaMag2 > (D_ANGULAR_TOL * D_ANGULAR_TOL)) {
+		dFloat invOmegaMag = 1.0f / dSqrt (omegaMag2);
+		dVector omegaAxis (m_omega.Scale (invOmegaMag));
+		dFloat omegaAngle = invOmegaMag * omegaMag2 * timestep;
+		dQuaternion rotation (omegaAxis, omegaAngle);
+		dQuaternion rotMatrix (m_matrix);
+		rotMatrix = rotMatrix * rotation;
+		rotMatrix.Scale( 1.0f / dSqrt (rotMatrix.DotProduct (rotMatrix)));
+		m_matrix = dMatrix (rotMatrix, m_matrix.m_posit);
+	}
+
+	m_matrix.m_posit = m_globalCentreOfMass - m_matrix.RotateVector(m_localFrame.m_posit);
+
+#ifdef _DEBUG
+	int j0 = 1;
+	int j1 = 2;
+	for (int i = 0; i < 3; i ++) {
+		dAssert (m_matrix[i][3] == 0.0f);
+		dFloat val = m_matrix[i] % m_matrix[i];
+		dAssert (dAbs (val - 1.0f) < 1.0e-5f);
+		dVector tmp (m_matrix[j0] * m_matrix[j1]);
+		val = tmp % m_matrix[i];
+		dAssert (dAbs (val - 1.0f) < 1.0e-5f);
+		j0 = j1;
+		j1 = i;
+	}
+#endif
+}
+
+
 void dComplemtaritySolver::dBodyState::ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega)
 {
 	dVector accel = (m_veloc - veloc).Scale(invTimestep);
