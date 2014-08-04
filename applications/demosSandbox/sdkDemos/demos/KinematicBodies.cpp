@@ -388,6 +388,7 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 		if ((vMag2 > 1.0e-6f) || (wMag2 > 1.0e-6f)) {
 			ret = true;
 			m_body.IntegrateVelocity (timeStep);
+			matrix = m_body.GetMatrix();
 		}
 		return ret;
 	}
