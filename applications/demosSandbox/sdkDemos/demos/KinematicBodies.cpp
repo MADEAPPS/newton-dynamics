@@ -31,16 +31,9 @@ class PhantomPlacement: public DemoEntity
 		m_phantom = NewtonCreateKinematicBody(world, shape, &matrix[0][0]);
 
 		m_solideMesh = new DemoMesh("primitive", shape, "smilli.tga", "smilli.tga", "smilli.tga");
-		DemoMesh* const geometry = new DemoMesh("primitive", shape, "smilli.tga", "smilli.tga", "smilli.tga", 0.5f);
-		DemoSubMesh& subMesh = geometry->GetFirst()->GetInfo();
-		subMesh.m_specular.m_z = 0.0f;
-		subMesh.m_diffuse.m_z = 0.0f;
-		subMesh.m_specular.m_z = 0.0f;
-		geometry->OptimizeForRender();
-
-		SetMesh(geometry, dGetIdentityMatrix());
-		geometry->Release();
-
+		m_redMesh = CreatePhantomMesh (shape, dVector (1.0f, 0.0f, 0.0f, 0.5f)); 
+        m_blueMesh = CreatePhantomMesh (shape, dVector (0.0f, 0.5f, 0.0f, 0.5f)); 
+		SetMesh (m_redMesh, dGetIdentityMatrix());
 		
 		NewtonBodySetUserData (m_phantom, this);
 		NewtonBodySetMassProperties (m_phantom, 10.0f, shape);
@@ -51,11 +44,31 @@ class PhantomPlacement: public DemoEntity
 
 	~PhantomPlacement()
 	{
+        m_redMesh->Release();
+        m_blueMesh->Release();
 		m_solideMesh->Release();
 	}
 	
+    DemoMesh* CreatePhantomMesh (NewtonCollision* const shape, const dVector& color) 
+    {
+        DemoMesh* const mesh = new DemoMesh("primitive", shape, "smilli.tga", "smilli.tga", "smilli.tga", 0.5f);
+        DemoSubMesh& subMesh = mesh->GetFirst()->GetInfo();
+        subMesh.m_specular = color;
+        subMesh.m_diffuse = color;
+        subMesh.m_ambient = color;
+        mesh->OptimizeForRender();
+        return mesh;
+    }
+
+    void SetPhantomMesh (bool redOrBlue)
+    {
+        redOrBlue ? SetMesh(m_redMesh, dGetIdentityMatrix()) : SetMesh(m_blueMesh, dGetIdentityMatrix());
+    }
+
 	NewtonBody* m_phantom;
 	DemoMesh* m_solideMesh;
+    DemoMesh* m_redMesh;
+    DemoMesh* m_blueMesh;
 };
 
 class dKinematicPlacement: public CustomControllerBase
@@ -331,6 +344,7 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
             if (m_hitParam < 1.0f) {
 				if (SetPlacementMatrix (p0 + (p1 - p0).Scale (m_hitParam))) {
 					if (!TestForCollision ()) {
+                        m_phantomEntity->SetPhantomMesh (false);
 						if (m_placeInstance.UpdateTriggerJoystick (mainWindow, mainWindow->GetMouseKeyState(0))) {
 							//dTrace (("xxx\n"));
 							dMatrix matrix;
@@ -339,7 +353,9 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 							NewtonBody* const body = CreateSimpleSolid (scene, m_phantomEntity->m_solideMesh, 10.0f, matrix, collision, NewtonMaterialGetDefaultGroupID(world));
 							m_selectionToIgnore.Append(body);
 						} 
-					}
+					} else {
+                        m_phantomEntity->SetPhantomMesh (true);
+                    }
 				}
             }
 		} else {
