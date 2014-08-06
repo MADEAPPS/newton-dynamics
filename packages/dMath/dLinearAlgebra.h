@@ -19,6 +19,8 @@
 #ifndef __D_LINEAR_ALGEBRA_H__
 #define __D_LINEAR_ALGEBRA_H__
 
+#define dMaxParamInfoSize	8 
+
 class dSymmetricBiconjugateGradientSolve
 {
 	public:
@@ -72,10 +74,10 @@ class dComplemtaritySolver
 	class dParamInfo
 	{
 		public:
-		dJacobianPair m_jacobians[8];
-		dFloat m_jointAccel[8];
-		dFloat m_jointLowFriction[8];
-		dFloat m_jointHighFriction[8];
+		dJacobianPair m_jacobians[dMaxParamInfoSize];
+		dFloat m_jointAccel[dMaxParamInfoSize];
+		dFloat m_jointLowFriction[dMaxParamInfoSize];
+		dFloat m_jointHighFriction[dMaxParamInfoSize];
 		dFloat m_timestep;
 		dFloat m_timestepInv;
 		int m_count;
@@ -125,9 +127,9 @@ class dComplemtaritySolver
 		void AddAngularRowJacobian (dParamInfo* const constraintParams, const dVector& dir0, const dVector& dir1, dFloat ratio);
 		void CalculatePointDerivative (dParamInfo* const constraintParams, const dVector& dir, const dPointDerivativeParam& param);
 
-		dFloat m_motorAcceleration[8];
-		dFloat m_jointFeebackForce[8];
-		int m_rowIsMotor[8];
+		dFloat m_motorAcceleration[dMaxParamInfoSize];
+		dFloat m_jointFeebackForce[dMaxParamInfoSize];
+		int m_rowIsMotor[dMaxParamInfoSize];
 		dBodyState* m_state0;
 		dBodyState* m_state1;
 		int m_start;

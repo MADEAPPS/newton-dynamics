@@ -83,9 +83,18 @@ class dKinematicPlacement: public CustomControllerBase
 	}
 };
 
+
+#define D_MAX_PLACEMENT_CONTACTS 128
 class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlacement>, public dComplemtaritySolver 
 {
 	public:
+	class dContact 
+	{
+		public:
+		dVector m_point;
+		dVector m_normal;
+	};
+
 	class dContactJoint: public dBilateralJoint
 	{
 		public: 
@@ -98,27 +107,80 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 		{
 		}
 
-		void SetContacts (int count, const dFloat* const points, const dFloat* const normals)
+		static inline int CompareContact (const dContact* const contactA, const dContact* const contactB, void* dommy)
 		{
-			m_count = dMin (count, int (sizeof (m_points) / sizeof (m_points[0])));
-			for (int i = 0; i < count; i ++) {
-				m_points[i] = dVector (points[i * 3 + 0], points[i * 3 + 1], points[i * 3 + 2], 1.0f);
-				m_normals[i] = dVector (normals[i * 3 + 0], normals[i * 3 + 1], normals[i * 3 + 2], 1.0f);
+			if (contactA->m_point[0] < contactB->m_point[0]) {
+				return -1;
+			} else if (contactA->m_point[0] > contactB->m_point[0]) {
+				return 1;
+			} else {
+				return 0;
 			}
+		}
+
+
+		int ReduceContacts (int count, dContact* const contacts, dFloat tol)
+		{
+			int mask[D_MAX_PLACEMENT_CONTACTS];
+			int index = 0;
+			int packContacts = 0;
+			dFloat window = tol;
+			dFloat window2 = window * window;
+			memset (mask, 0, size_t (count));
+			dSort (contacts, count, CompareContact, NULL);
+			for (int i = 0; i < count; i ++) {
+				if (!mask[i]) {
+					dFloat val = contacts[i].m_point[index] + window;
+					for (int j = i + 1; (j < count) && (contacts[j].m_point[index] < val) ; j ++) {
+						if (!mask[j]) {
+							dVector dp (contacts[j].m_point - contacts[i].m_point);
+							dFloat dist2 = dp % dp;
+							if (dist2 < window2) {
+								mask[j] = 1;
+								packContacts = 1;
+							}
+						}
+					}
+				}
+			}
+
+			if (packContacts) {
+				int j = 0;
+				for (int i = 0; i < count; i ++) {
+					if (!mask[i]) {
+						contacts[j] = contacts[i];
+						j ++;
+					}
+				}
+				count = j;
+			}
+			return count;
+		}
+
+		void SetContacts (int count, dContact* const contacts)
+		{
+			dFloat tol = 5.0e-3f;
+			count = ReduceContacts(count, contacts, tol);
+			while (count > dMaxParamInfoSize) {
+				tol *= 2.0f; 
+				count = ReduceContacts(count, contacts, tol);
+			}
+
+			m_count = count;
+			memcpy (m_contacts, contacts, count * sizeof (dContact));
 		}
 
 		void JacobianDerivative (dParamInfo* const constraintParams)
 		{
-		
 			for (int i = 0; i < m_count; i ++) {
 				dPointDerivativeParam pointData;
-				InitPointParam (pointData, m_points[i]);
-				CalculatePointDerivative (constraintParams, m_normals[i], pointData);
+				InitPointParam (pointData, m_contacts[i].m_point);
+				CalculatePointDerivative (constraintParams, m_contacts[i].m_normal, pointData);
 
 				dVector velocError (pointData.m_veloc1 - pointData.m_veloc0);
 
-				dFloat restitution = 0.0f;
-				dFloat relVelocErr = velocError % m_normals[i];
+				dFloat restitution = 0.05f;
+				dFloat relVelocErr = velocError % m_contacts[i].m_normal;
 				dFloat penetration = 0.0f;
 				dFloat penetrationStiffness = 0.0f;
 				dFloat penetrationVeloc = penetration * penetrationStiffness;
@@ -132,8 +194,7 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 			}
 		}
 
-		dVector m_points[8];
-		dVector m_normals[8];
+		dContact m_contacts[dMaxParamInfoSize];
 		int m_count;
 	};
 
@@ -147,6 +208,9 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 		,m_placeInstance (false)
 		,m_hitParam(0.0f)
 		,m_isInPenetration(false)
+		,m_pitch(0.0f)
+		,m_yaw(0.0f)
+		,m_roll(0.0f)
 	{
 		scene->Set2DDisplayRenderFunction (RenderHelp, this);
 		m_phantomEntity = new PhantomPlacement (scene);
@@ -236,11 +300,13 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 
 		if( NewtonCollisionIntersectionTest(world, collisionA, &poseA[0][0], collisionB, &poseB[0][0],0) ) {
 			int contactCount = NewtonCollisionCollide(world, maxSize, collisionA, &poseA[0][0], collisionB, &poseB[0][0], &contacts[0][0], &normals[0][0], &penetrations[0], &attrbA[0], &attrbB[0], 0);
-			for(int i = 0; i < contactCount; i ++) {
-				me->m_isInPenetration |= (penetrations[i] > 1.0e-3f);
-			}
-			if (!me->m_isInPenetration) {
-				me->m_collidingMap.Append(otherBody);
+			if (contactCount) {
+				for(int i = 0; i < contactCount; i ++) {
+					me->m_isInPenetration |= (penetrations[i] > 1.0e-3f);
+				}
+				if (!me->m_isInPenetration) {
+					me->m_collidingMap.Append(otherBody);
+				}
 			}
 		}
 	    return me->m_isInPenetration ? 0 : 1;
@@ -262,43 +328,18 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
         m_collidingMap.RemoveAll();
 	    NewtonWorldForEachBodyInAABBDo(world, &minP.m_x, &maxP.m_x, aabbCollisionCallback, this);
 		if (!m_isInPenetration && m_collidingMap.GetCount()) {
-
-			for (int i = 0; i < 8; i ++) {
-				AdjustRotationMatrix ();
-/*
-			bool wasAjusted = true;
-			for (int i = 0; (i < 8) & wasAjusted; i ++) {
-				dMatrix savedMatrix (poseA);
-				wasAjusted = me->AdjustRotationMatrix (poseA, collisionA, contactCount, &contacts[0][0], &normals[0][0]);
-				if (wasAjusted) {
-					contactCount = NewtonCollisionCollide(world, maxSize, collisionA, &poseA[0][0], collisionB, &poseB[0][0], &contacts[0][0], &normals[0][0], &penetrations[0], &attrbA[0], &attrbB[0], 0);
-					for(int i = 0; i < contactCount; i ++) {
-						wasAjusted &= (penetrations[i] < 1.0e-3f);
-					}
-					if (!wasAjusted) {
-						poseA = savedMatrix;
-					}
-				}
-			}
-*/
-			}
+			matrix = CalculateRotationMatrix (1000.0f);
+			NewtonBodySetMatrix (m_phantomEntity->m_phantom, &matrix[0][0]);
 		}
-
-
 		return m_isInPenetration;
     }
 
 
-	bool SetPlacementMatrix (const dVector& posit) const
+	bool CalculatePlacementMatrix (dMatrix& matrix) const
 	{
-		dMatrix matrix (dGetIdentityMatrix());
-
-		matrix.m_posit = posit - m_castDir.Scale (3.0f);
-		//matrix.m_posit.m_y += 3.0f;
+		matrix.m_posit -= m_castDir.Scale (3.0f);
 		matrix.m_posit.m_w = 1.0f;
-
 		dVector dest (matrix.m_posit + m_castDir.Scale (6.0f));
-		//dest.m_y -= 6.0f;
 
 		dFloat hitParam;
 		NewtonWorldConvexCastReturnInfo info[16];
@@ -308,7 +349,6 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 		int count = NewtonWorldConvexCast (world, &matrix[0][0], &dest[0], shape, &hitParam, (void*)this, RayPrefilterCallback, &info[0], 4, 0);		
 		if (count) {
 			matrix.m_posit += (dest - matrix.m_posit).Scale (hitParam);
-			NewtonBodySetMatrix(m_phantomEntity->m_phantom, &matrix[0][0]);
 			return true;
 		}
 		return false;
@@ -342,7 +382,11 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
             m_hitParam = 1.2f;
             NewtonWorldRayCast(world, &p0[0], &p1[0], RayCastFilter, this, RayPrefilterCallback, 0);
             if (m_hitParam < 1.0f) {
-				if (SetPlacementMatrix (p0 + (p1 - p0).Scale (m_hitParam))) {
+				dMatrix matrix (dPitchMatrix(m_pitch) * dYawMatrix(m_yaw) * dRollMatrix(m_roll));
+				matrix.m_posit = p0 + (p1 - p0).Scale (m_hitParam);
+				matrix.m_posit.m_w = 1.0f;
+				if (CalculatePlacementMatrix (matrix)) {
+					NewtonBodySetMatrix(m_phantomEntity->m_phantom, &matrix[0][0]);
 					if (!TestForCollision ()) {
                         m_phantomEntity->SetPhantomMesh (false);
 						if (m_placeInstance.UpdateTriggerJoystick (mainWindow, mainWindow->GetMouseKeyState(0))) {
@@ -367,91 +411,90 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 	{
 	}
 
-	//bool AdjustRotationMatrix (dMatrix& matrix, const NewtonCollision* const collision, int contactCount, const float* const contacts, const float* const normals)
-	bool AdjustRotationMatrix ()
+	dMatrix CalculateRotationMatrix (dFloat power)
 	{
-		dVector contactsPoint[32];
-		dVector contactsNormals[32];
-		//dFloat penetrations[maxSize];
-		//dLong attrbA[maxSize];
-		//dLong attrbB[maxSize];
+		dContact contacts[D_MAX_PLACEMENT_CONTACTS];
 		dMatrix poseA;
 
 		NewtonWorld* const world = NewtonBodyGetWorld (m_phantomEntity->m_phantom);
-
 		NewtonBodyGetMatrix (m_phantomEntity->m_phantom, &poseA[0][0]);
 		NewtonCollision* const collisionA = NewtonBodyGetCollision (m_phantomEntity->m_phantom);
-		
-		
-		dInt32 contactCount = 0;
-		for (dList<const NewtonBody*>::dListNode* node = m_collidingMap.GetFirst(); node; node = node->GetNext()) {
-			dMatrix poseB;
-			const NewtonBody* const otherBody = node->GetInfo();
-			NewtonBodyGetMatrix (otherBody, &poseB[0][0]);
 
-			NewtonBodyGetMatrix (otherBody, &poseB[0][0]);
-			NewtonCollision* const collisionB = NewtonBodyGetCollision (otherBody);
+		bool isUnstable = true;
+		for (int i = 0; (i < 106) && isUnstable; i ++) {
+			isUnstable = false;
+			dInt32 contactCount = 0;
+			bool isInPenetration = false;
 
-			dFloat points[4][3];
-			dFloat normals[4][3];
-			dFloat penetrations[4];
-			dLong attrbA[4];
-			dLong attrbB[4];
-			int count = NewtonCollisionCollide(world, 4, collisionA, &poseA[0][0], collisionB, &poseB[0][0], &points[0][0], &normals[0][0], &penetrations[0], &attrbA[0], &attrbB[0], 0);
-			for(int i = 0; i < count; i ++) {
-				contactsPoint[contactCount] = dVector (points[i][0], points[i][1], points[i][2], 1.0f);
-				contactsNormals[contactCount] = dVector (normals[i][0], normals[i][1], normals[i][2], 0.0f);
-				//me->m_isInPenetration |= (penetrations[i] > 1.0e-3f);
-				contactCount ++;
-				dAssert (contactCount < sizeof (contactsPoint) / sizeof (contactsPoint[0]));
+			CalculatePlacementMatrix (poseA);
+			for (dList<const NewtonBody*>::dListNode* node = m_collidingMap.GetFirst(); node && !isInPenetration; node = node->GetNext()) {
+				dMatrix poseB;
+				const NewtonBody* const otherBody = node->GetInfo();
+
+				NewtonBodyGetMatrix (otherBody, &poseB[0][0]);
+				NewtonCollision* const collisionB = NewtonBodyGetCollision (otherBody);
+
+				dFloat points[4][3];
+				dFloat normals[4][3];
+				dFloat penetrations[4];
+				dLong attrbA[4];
+				dLong attrbB[4];
+				int count = NewtonCollisionCollide(world, 4, collisionA, &poseA[0][0], collisionB, &poseB[0][0], &points[0][0], &normals[0][0], &penetrations[0], &attrbA[0], &attrbB[0], 0);
+
+				if ((contactCount + count) <= sizeof (contacts) / sizeof (contacts[0])) {
+					for(int i = 0; i < count; i ++) {
+						contacts[contactCount].m_point = dVector (points[i][0], points[i][1], points[i][2], 1.0f);
+						contacts[contactCount].m_normal = dVector (normals[i][0], normals[i][1], normals[i][2], 0.0f);
+						isInPenetration |= (penetrations[i] > 1.0e-3f);
+						contactCount ++;
+					}
+				}
+			}
+
+			if (contactCount) {
+				dMatrix localMatrix;
+				NewtonCollisionGetMatrix (collisionA, &localMatrix[0][0]);
+
+				m_body.SetMatrix(poseA);
+				m_body.SetLocalMatrix(localMatrix);
+
+				dVector com;
+				dVector inertia;
+				NewtonConvexCollisionCalculateInertialMatrix (collisionA, &inertia[0], &com[0]);	
+
+				dFloat mass = 1.0f;
+				m_body.SetMass(mass);
+				m_body.SetInertia (mass * inertia[0], mass * inertia[1], mass * inertia[2]);
+				m_body.UpdateInertia();
+
+				m_body.SetForce (m_castDir.Scale (power * mass));
+				m_body.SetVeloc (dVector (0.0f, 0.0f, 0.0f, 0.0f));
+				m_body.SetOmega (dVector (0.0f, 0.0f, 0.0f, 0.0f));
+				m_body.SetTorque (dVector (0.0f, 0.0f, 0.0f, 0.0f));
+
+				dFloat timeStep = 0.005f;
+				dBodyState* bodyArray[2];
+				dBilateralJoint* jointArray[1];
+				dJacobianColum jacobianColumn[32];
+				dJacobianPair jacobianPairArray[32];
+
+				bodyArray[0] = &m_body;
+				bodyArray[1] = &m_static;
+				jointArray[0] = &m_contactJoint;
+				m_contactJoint.SetContacts (contactCount, contacts);
+				BuildJacobianMatrix (1, jointArray, timeStep, jacobianPairArray, jacobianColumn, sizeof (jacobianPairArray)/ sizeof (jacobianPairArray[0]));
+				CalculateReactionsForces (2, bodyArray, 1, jointArray, timeStep, jacobianPairArray, jacobianColumn);
+
+				dFloat vMag2 = m_body.GetVelocity() % m_body.GetVelocity();
+				dFloat wMag2 = m_body.GetOmega() % m_body.GetOmega();
+				if ((vMag2 > 1.0e-6f) || (wMag2 > 1.0e-6f)) {
+					isUnstable = true;
+					m_body.IntegrateVelocity (timeStep);
+					poseA = m_body.GetMatrix();
+				}
 			}
 		}
-
-/*
-		dMatrix localMatrix;
-		NewtonCollisionGetMatrix (collision, &localMatrix[0][0]);
-
-		m_body.SetMatrix(matrix);
-		m_body.SetLocalMatrix(localMatrix);
-
-		dVector com;
-		dVector inertia;
-		NewtonConvexCollisionCalculateInertialMatrix (collision, &inertia[0], &com[0]);	
-
-		dFloat mass = 1.0f;
-		m_body.SetMass(mass);
-		m_body.SetInertia (mass * inertia[0], mass * inertia[1], mass * inertia[2]);
-		m_body.UpdateInertia();
-
-		m_body.SetForce (m_castDir.Scale (30.0f * mass));
-		m_body.SetVeloc (dVector (0.0f, 0.0f, 0.0f, 0.0f));
-		m_body.SetOmega (dVector (0.0f, 0.0f, 0.0f, 0.0f));
-		m_body.SetTorque (dVector (0.0f, 0.0f, 0.0f, 0.0f));
-
-		dFloat timeStep = 0.005f;
-		dBodyState* bodyArray[2];
-		dBilateralJoint* jointArray[1];
-		dJacobianColum jacobianColumn[32];
-		dJacobianPair jacobianPairArray[32];
-		
-		bodyArray[0] = &m_body;
-		bodyArray[1] = &m_static;
-		jointArray[0] = &m_contactJoint;
-		m_contactJoint.SetContacts (contactCount, contacts, normals);
-		BuildJacobianMatrix (1, jointArray, timeStep, jacobianPairArray, jacobianColumn, sizeof (jacobianPairArray)/ sizeof (jacobianPairArray[0]));
-		CalculateReactionsForces (2, bodyArray, 1, jointArray, timeStep, jacobianPairArray, jacobianColumn);
-
-		bool ret = false;
-		dFloat vMag2 = m_body.GetVelocity() % m_body.GetVelocity();
-		dFloat wMag2 = m_body.GetOmega() % m_body.GetOmega();
-		if ((vMag2 > 1.0e-6f) || (wMag2 > 1.0e-6f)) {
-			ret = true;
-			m_body.IntegrateVelocity (timeStep);
-			matrix = m_body.GetMatrix();
-		}
-		return ret;
-*/
-		return false;
+		return poseA;
 	}
 
 	dVector m_castDir;
@@ -463,6 +506,10 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 	DemoEntityManager::ButtonKey m_placeInstance;
     dFloat m_hitParam;
 	bool m_isInPenetration;
+
+	dFloat m_pitch;
+	dFloat m_yaw;
+	dFloat m_roll;
 
 	dBodyState m_body;
 	dBodyState m_static;

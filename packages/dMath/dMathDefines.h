@@ -101,6 +101,74 @@ T dClamp(T val, T min, T max)
 	return dMax (min, dMin (max, val));
 }
 
+template <class T> 
+void dSort (T* const array, int elements, int (*compare) (const T* const  A, const T* const B, void* const context), void* const context = NULL)
+{
+	int stride = 8;
+	int stack[1024][2];
+
+	stack[0][0] = 0;
+	stack[0][1] = elements - 1;
+	int stackIndex = 1;
+	while (stackIndex) {
+		stackIndex --;
+		int lo = stack[stackIndex][0];
+		int hi = stack[stackIndex][1];
+		if ((hi - lo) > stride) {
+			int i = lo;
+			int j = hi;
+			T val (array[(lo + hi) >> 1]);
+			do {    
+				while (compare (&array[i], &val, context) < 0) i ++;
+				while (compare (&array[j], &val, context) > 0) j --;
+
+				if (i <= j)	{
+					dSwap(array[i], array[j]);
+					i++; 
+					j--;
+				}
+			} while (i <= j);
+
+			if (i < hi) {
+				stack[stackIndex][0] = i;
+				stack[stackIndex][1] = hi;
+				stackIndex ++;
+			}
+			if (lo < j) {
+				stack[stackIndex][0] = lo;
+				stack[stackIndex][1] = j;
+				stackIndex ++;
+			}
+			dAssert (stackIndex < int (sizeof (stack) / (2 * sizeof (stack[0][0]))));
+		}
+	}
+
+	stride = stride * 2;
+	if (elements < stride) {
+		stride = elements;
+	}
+	for (int i = 1; i < stride; i ++) {
+		if (compare (&array[0], &array[i], context) > 0) {
+			dSwap(array[0], array[i]);
+		}
+	}
+
+	for (int i = 1; i < elements; i ++) {
+		int j = i;
+		T tmp (array[i]);
+		for (; compare (&array[j - 1], &tmp, context) > 0; j --) {
+			dAssert (j > 0);
+			array[j] = array[j - 1];
+		}
+		array[j] = tmp;
+	}
+
+#ifdef _DEBUG
+	for (int i = 0; i < (elements - 1); i ++) {
+		dAssert (compare (&array[i], &array[i + 1], context) <= 0);
+	}
+#endif
+}
 
 
 
