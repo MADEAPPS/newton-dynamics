@@ -406,7 +406,7 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
     }
 
 
-	bool CalculatePlacementMatrix (dMatrix& matrix) const
+	bool CalculateTranslationMatrix (dMatrix& matrix) const
 	{
 		matrix.m_posit -= m_castDir.Scale (3.0f);
 		matrix.m_posit.m_w = 1.0f;
@@ -456,7 +456,7 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 				dMatrix matrix (dPitchMatrix(m_pitch) * dYawMatrix(m_yaw) * dRollMatrix(m_roll));
 				matrix.m_posit = p0 + (p1 - p0).Scale (m_hitParam);
 				matrix.m_posit.m_w = 1.0f;
-				if (CalculatePlacementMatrix (matrix)) {
+				if (CalculateTranslationMatrix (matrix)) {
 					NewtonBodySetMatrix(m_phantomEntity->m_phantom, &matrix[0][0]);
 					if (!TestForCollision ()) {
                         CalculateRotationMatrix (1000.0f);
@@ -499,7 +499,7 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
             dVector maxP;
 
 			isUnstable = false;
-			CalculatePlacementMatrix (matrix);
+			CalculateTranslationMatrix (matrix);
             CalculateAABB (collision, matrix, minP, maxP);
             m_isInPenetration = false;
             m_contactCount = 0;
