@@ -285,18 +285,16 @@ void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 		if (!rowMatrix[k].m_accelIsMotor) {
 			dgJacobianMatrixElement* const row = &rowMatrix[k];
 
-			dgVector relVeloc (row->m_Jt.m_jacobianM0.m_linear.CompProduct3(bodyVeloc0)+
-							   row->m_Jt.m_jacobianM0.m_angular.CompProduct3(bodyOmega0)+
-							   row->m_Jt.m_jacobianM1.m_linear.CompProduct3(bodyVeloc1)+
-							   row->m_Jt.m_jacobianM1.m_angular.CompProduct3(bodyOmega1));
+			dgVector relVeloc (row->m_Jt.m_jacobianM0.m_linear.CompProduct3(bodyVeloc0) + row->m_Jt.m_jacobianM0.m_angular.CompProduct3(bodyOmega0) + row->m_Jt.m_jacobianM1.m_linear.CompProduct3(bodyVeloc1) + row->m_Jt.m_jacobianM1.m_angular.CompProduct3(bodyOmega1));
 			dgFloat32 vRel = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
 			dgFloat32 aRel = row->m_deltaAccel;
 
 			if (row->m_normalForceIndex < 0) {
-				dgFloat32 restitution = dgFloat32 (1.0f);
-				if (vRel <= dgFloat32 (0.0f)) {
-					restitution += row->m_restitution;
-				}
+				//dgFloat32 restitution = dgFloat32 (1.0f);
+				//if (vRel <= dgFloat32 (0.0f)) {
+					//restitution += row->m_restitution;
+				//}
+				dgFloat32 restitution = (vRel <= dgFloat32 (0.0f)) ? (dgFloat32 (1.0f) + row->m_restitution) : dgFloat32 (1.0f);
 
 				dgFloat32 penetrationVeloc = dgFloat32 (0.0f);
 				if (row->m_penetration > dgFloat32 (1.0e-2f)) {
