@@ -84,151 +84,10 @@ class dKinematicPlacement: public CustomControllerBase
 };
 
 
-#define D_MAX_PLACEMENT_CONTACTS 128
+
 class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlacement>, public dComplemtaritySolver 
 {
 	public:
-	class dContact
-	{
-		public:
-		dVector m_point;
-		dVector m_normal;
-	};
-
-	class dContactJoint: public dBilateralJoint
-	{
-		public: 
-		dContactJoint()
-			:dBilateralJoint()
-		{
-		}
-
-		void UpdateSolverForces (const dJacobianPair* const jacobians) const
-		{
-		}
-
-		static inline int CompareContact (const dContact* const contactA, const dContact* const contactB, void* dommy)
-		{
-			if (contactA->m_point[0] < contactB->m_point[0]) {
-				return -1;
-			} else if (contactA->m_point[0] > contactB->m_point[0]) {
-				return 1;
-			} else {
-				return 0;
-			}
-		}
-
-
-		int ReduceContacts (int count, dContact* const contacts, dFloat tol)
-		{
-			int mask[D_MAX_PLACEMENT_CONTACTS];
-			int index = 0;
-			int packContacts = 0;
-			dFloat window = tol;
-			dFloat window2 = window * window;
-			memset (mask, 0, size_t (count));
-			dSort (contacts, count, CompareContact, NULL);
-			for (int i = 0; i < count; i ++) {
-				if (!mask[i]) {
-					dFloat val = contacts[i].m_point[index] + window;
-					for (int j = i + 1; (j < count) && (contacts[j].m_point[index] < val) ; j ++) {
-						if (!mask[j]) {
-							dVector dp (contacts[j].m_point - contacts[i].m_point);
-							dFloat dist2 = dp % dp;
-							if (dist2 < window2) {
-								mask[j] = 1;
-								packContacts = 1;
-							}
-						}
-					}
-				}
-			}
-
-			if (packContacts) {
-				int j = 0;
-				for (int i = 0; i < count; i ++) {
-					if (!mask[i]) {
-						contacts[j] = contacts[i];
-						j ++;
-					}
-				}
-				count = j;
-			}
-			return count;
-		}
-
-		void SetContacts (int count, dContact* const contacts)
-		{
-			dFloat tol = 5.0e-3f;
-			count = ReduceContacts(count, contacts, tol);
-			while (count > dMaxParamInfoSize) {
-				tol *= 2.0f; 
-				count = ReduceContacts(count, contacts, tol);
-			}
-
-			m_count = count;
-			memcpy (m_contacts, contacts, count * sizeof (dContact));
-		}
-
-		void JacobianDerivative (dParamInfo* const constraintParams)
-		{
-			for (int i = 0; i < m_count; i ++) {
-				dPointDerivativeParam pointData;
-				InitPointParam (pointData, m_contacts[i].m_point);
-				CalculatePointDerivative (constraintParams, m_contacts[i].m_normal, pointData);
-
-				dVector velocError (pointData.m_veloc1 - pointData.m_veloc0);
-
-				dFloat restitution = 0.05f;
-				dFloat relVelocErr = velocError % m_contacts[i].m_normal;
-				dFloat penetration = 0.0f;
-				dFloat penetrationStiffness = 0.0f;
-				dFloat penetrationVeloc = penetration * penetrationStiffness;
-
-				if (relVelocErr > 1.0e-3f) {
-					relVelocErr *= (restitution + dFloat (1.0f));
-				}
-								
-				constraintParams->m_jointLowFriction[i] = dFloat (0.0f);
-				constraintParams->m_jointAccel[i] = dMax (dFloat (-4.0f), relVelocErr + penetrationVeloc) * constraintParams->m_timestepInv;
-			}
-		}
-
-
-		void JointAccelerations (dJointAccelerationDecriptor* const params)
-		{
-			dJacobianPair* const rowMatrix = params->m_rowMatrix;
-			dJacobianColum* const jacobianColElements = params->m_colMatrix;
-
-			const dVector& bodyVeloc0 = m_state0->GetVelocity();
-			const dVector& bodyOmega0 = m_state0->GetOmega();
-			const dVector& bodyVeloc1 = m_state1->GetVelocity();
-			const dVector& bodyOmega1 = m_state1->GetOmega();
-
-			int count = params->m_rowsCount;
-
-			dAssert (params->m_timeStep > dFloat (0.0f));
-			for (int k = 0; k < count; k ++) {
-				const dJacobianPair& Jt = rowMatrix[k];
-				dJacobianColum& element = jacobianColElements[k];
-
-				dVector relVeloc (Jt.m_jacobian_IM0.m_linear.CompProduct(bodyVeloc0) + Jt.m_jacobian_IM0.m_angular.CompProduct(bodyOmega0) + Jt.m_jacobian_IM1.m_linear.CompProduct(bodyVeloc1) + Jt.m_jacobian_IM1.m_angular.CompProduct(bodyOmega1));
-
-				dFloat vRel = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
-				dFloat aRel = element.m_deltaAccel;
-				dFloat restitution = (vRel <= 0.0f) ? 1.05f : 1.0f;
-				vRel *= restitution;
-				vRel = dMin (dFloat (4.0f), vRel);
-				element.m_coordenateAccel = (aRel - vRel * params->m_invTimeStep);
-			}
-		}
-
-		dContact m_contacts[dMaxParamInfoSize];
-		int m_count;
-	};
-
-
-
 
 	dKinematicPlacementManager(DemoEntityManager* const scene)
 		:CustomControllerManager<dKinematicPlacement>(scene->GetNewton(), "dKinematicPlacementManager")
@@ -564,11 +423,32 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 
 	dBodyState m_body;
 	dBodyState m_static;
-	dContactJoint m_contactJoint;
+	dFrictionLessContactJoint m_contactJoint;
     int m_contactCount;
     dContact m_contacts[D_MAX_PLACEMENT_CONTACTS];
 };
 
+
+static void AddStaticMesh(DemoEntityManager* const scene)
+{
+	char fileName[2048];
+
+	NewtonWorld* const world = scene->GetNewton();
+	GetWorkingFileName ("ramp.off", fileName);
+	NewtonMesh* const ntMesh = NewtonMeshLoadOFF(world, fileName);
+
+	dMatrix matrix (dGetIdentityMatrix());
+	DemoMesh* mesh = new DemoMesh(ntMesh);
+	DemoEntity* const entity = new DemoEntity(matrix, NULL);
+	entity->SetMesh(mesh, dGetIdentityMatrix());
+	mesh->Release();
+
+	scene->Append(entity);
+
+	CreateLevelMeshBody (world, entity, true);
+
+	NewtonMeshDestroy (ntMesh);
+}
 
 
 void KinematicPlacement (DemoEntityManager* const scene)
@@ -579,6 +459,7 @@ void KinematicPlacement (DemoEntityManager* const scene)
 	// load the scene from a ngd file format
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 
+	AddStaticMesh (scene);
 
 	// create a system for object placement
 	new dKinematicPlacementManager (scene);

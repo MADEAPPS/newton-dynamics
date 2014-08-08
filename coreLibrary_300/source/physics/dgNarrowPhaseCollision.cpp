@@ -512,15 +512,14 @@ bool dgWorld::IntersectionTest (const dgCollisionInstance* const collisionSrcA, 
 	dgCollisionInstance collisionA(*collisionSrcA, collisionSrcA->GetChildShape());
 	dgCollisionInstance collisionB(*collisionSrcB, collisionSrcB->GetChildShape());
 
-//	dgContactPoint contacts[DG_MAX_CONTATCS];
 	collideBodyA.m_world = this;
-	collideBodyA.SetContinuesCollisionMode(false); 
+	collideBodyA.SetContinueCollisionMode(false); 
 	collideBodyA.m_matrix = matrixA;
 	collideBodyA.m_collision = &collisionA;
 	collideBodyA.UpdateCollisionMatrix(dgFloat32 (0.0f), 0);
 
 	collideBodyB.m_world = this;
-	collideBodyB.SetContinuesCollisionMode(false); 
+	collideBodyB.SetContinueCollisionMode(false); 
 	collideBodyB.m_matrix = matrixB;
 	collideBodyB.m_collision = &collisionB;
 	collideBodyB.UpdateCollisionMatrix(dgFloat32 (0.0f), 0);
@@ -1297,7 +1296,7 @@ dgInt32 dgWorld::CollideContinue (
 	maxContacts = dgMin (DG_MAX_CONTATCS, maxContacts);
 
 	collideBodyA.m_world = this;
-	collideBodyA.SetContinuesCollisionMode(true); 
+	collideBodyA.SetContinueCollisionMode(true); 
 	collideBodyA.m_matrix = matrixA;
 	collideBodyA.m_collision = &collisionA;
 	collideBodyA.m_masterNode = NULL;
@@ -1307,7 +1306,7 @@ dgInt32 dgWorld::CollideContinue (
 	collisionA.SetGlobalMatrix(collisionA.GetLocalMatrix() * matrixA);
 
 	collideBodyB.m_world = this;
-	collideBodyB.SetContinuesCollisionMode(true); 
+	collideBodyB.SetContinueCollisionMode(true); 
 	collideBodyB.m_matrix = matrixB;
 	collideBodyB.m_collision = &collisionB;
 	collideBodyB.m_masterNode = NULL;
@@ -1378,13 +1377,13 @@ dgInt32 dgWorld::Collide (
 	maxContacts = dgMin (DG_MAX_CONTATCS, maxContacts);
 		
 	collideBodyA.m_world = this;
-	collideBodyA.SetContinuesCollisionMode(false); 
+	collideBodyA.SetContinueCollisionMode(false); 
 	collideBodyA.m_matrix = matrixA;
 	collideBodyA.m_collision = &collisionA;
 	collideBodyA.UpdateCollisionMatrix(dgFloat32 (0.0f), 0);
 
 	collideBodyB.m_world = this;
-	collideBodyB.SetContinuesCollisionMode(false); 
+	collideBodyB.SetContinueCollisionMode(false); 
 	collideBodyB.m_matrix = matrixB;
 	collideBodyB.m_collision = &collisionB;
 	collideBodyB.UpdateCollisionMatrix(dgFloat32 (0.0f), 0);

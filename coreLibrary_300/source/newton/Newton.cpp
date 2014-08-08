@@ -5621,7 +5621,7 @@ void NewtonBodySetContinuousCollisionMode(const NewtonBody* const bodyPtr, unsig
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)bodyPtr;
-	body->SetContinuesCollisionMode (state ? true : false);
+	body->SetContinueCollisionMode (state ? true : false);
 }
 
 
@@ -5645,7 +5645,7 @@ int NewtonBodyGetContinuousCollisionMode (const NewtonBody* const bodyPtr)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)bodyPtr;
-	return body->GetContinuesCollisionMode () ? 1 : false;
+	return body->GetContinueCollisionMode () ? 1 : false;
 }
 
 

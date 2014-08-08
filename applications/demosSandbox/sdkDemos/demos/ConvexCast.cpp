@@ -62,13 +62,14 @@ shapeSize = dVector(size, size, size, 0.0f);
 				float x = size * (j - count / 2) + RandomVariable (size * 0.5f);
 				float y = RandomVariable (size * 2.0f);
 				float z = size * (i - count / 2) + RandomVariable (size * 0.5f);
-
+/*
 pitch = 0;
 yaw = 0;
 roll = 0;
 x = size * (j - count / 2);
 y = 0;
 z = size * (i - count / 2);
+*/
 
 				dMatrix matrix (dPitchMatrix (pitch) * dYawMatrix (yaw) * dRollMatrix (roll));
 				matrix.m_posit = dVector (x, y, z, 1.0f);
