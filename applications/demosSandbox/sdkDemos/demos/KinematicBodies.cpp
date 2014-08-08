@@ -393,7 +393,7 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 				bodyArray[0] = &m_body;
 				bodyArray[1] = &m_static;
 				jointArray[0] = &m_contactJoint;
-				m_contactJoint.SetContacts (m_contactCount, m_contacts);
+				m_contactJoint.SetContacts (m_contactCount, m_contacts, 0.05f);
 				BuildJacobianMatrix (1, jointArray, timeStep, jacobianPairArray, jacobianColumn, sizeof (jacobianPairArray)/ sizeof (jacobianPairArray[0]));
 				CalculateReactionsForces (2, bodyArray, 1, jointArray, timeStep, jacobianPairArray, jacobianColumn);
 

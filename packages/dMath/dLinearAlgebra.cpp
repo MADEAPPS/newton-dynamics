@@ -558,7 +558,7 @@ int dComplemtaritySolver::dFrictionLessContactJoint::ReduceContacts (int count, 
 	return count;
 }
 
-void dComplemtaritySolver::dFrictionLessContactJoint::SetContacts (int count, dContact* const contacts)
+void dComplemtaritySolver::dFrictionLessContactJoint::SetContacts (int count, dContact* const contacts, dFloat restitution)
 {
 	dFloat tol = 5.0e-3f;
 	count = ReduceContacts(count, contacts, tol);
@@ -568,6 +568,7 @@ void dComplemtaritySolver::dFrictionLessContactJoint::SetContacts (int count, dC
 	}
 
 	m_count = count;
+	m_restitution = restitution;
 	memcpy (m_contacts, contacts, count * sizeof (dContact));
 }
 
@@ -580,14 +581,14 @@ void dComplemtaritySolver::dFrictionLessContactJoint::JacobianDerivative (dParam
 
 		dVector velocError (pointData.m_veloc1 - pointData.m_veloc0);
 
-		dFloat restitution = 0.05f;
+		//dFloat restitution = 0.05f;
 		dFloat relVelocErr = velocError % m_contacts[i].m_normal;
 		dFloat penetration = 0.0f;
 		dFloat penetrationStiffness = 0.0f;
 		dFloat penetrationVeloc = penetration * penetrationStiffness;
 
-		if (relVelocErr > 1.0e-3f) {
-			relVelocErr *= (restitution + dFloat (1.0f));
+		if (relVelocErr > dFloat(1.0e-3f)) {
+			relVelocErr *= (m_restitution + dFloat (1.0f));
 		}
 
 		constraintParams->m_jointLowFriction[i] = dFloat (0.0f);
@@ -617,7 +618,9 @@ void dComplemtaritySolver::dFrictionLessContactJoint::JointAccelerations (dJoint
 
 		dFloat vRel = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
 		dFloat aRel = element.m_deltaAccel;
-		dFloat restitution = (vRel <= 0.0f) ? 1.05f : 1.0f;
+		//dFloat restitution = (vRel <= 0.0f) ? 1.05f : 1.0f;
+		dFloat restitution = (vRel <= 0.0f) ? (dFloat (1.0f) + m_restitution) : dFloat(1.0f);
+		
 		vRel *= restitution;
 		vRel = dMin (dFloat (4.0f), vRel);
 		element.m_coordenateAccel = (aRel - vRel * params->m_invTimeStep);

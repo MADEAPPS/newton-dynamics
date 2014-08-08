@@ -125,7 +125,13 @@ class dComplemtaritySolver
 	class dBilateralJoint
 	{
 		public:
-		dBilateralJoint(){}
+		dBilateralJoint()
+			:m_state0(NULL)
+			,m_state1(NULL)
+			,m_start(0)
+			,m_count(0)
+		{
+		}
 		virtual ~dBilateralJoint(){}
 
 		virtual void Init (dBodyState* const state0, dBodyState* const state1);
@@ -156,10 +162,14 @@ class dComplemtaritySolver
 	class dFrictionLessContactJoint: public dBilateralJoint
 	{
 		public: 
-		dFrictionLessContactJoint(): dBilateralJoint(){}
+		dFrictionLessContactJoint()
+			:dBilateralJoint()
+			,m_restitution(0.0f)
+			,m_count (0)
+		{}
 		virtual ~dFrictionLessContactJoint(){}
 
-		void SetContacts (int count, dContact* const contacts);
+		void SetContacts (int count, dContact* const contacts, dFloat restitution);
 
 		protected:
 		void UpdateSolverForces (const dJacobianPair* const jacobians) const {}
@@ -169,8 +179,8 @@ class dComplemtaritySolver
 		void JacobianDerivative (dParamInfo* const constraintParams);
 		void JointAccelerations (dJointAccelerationDecriptor* const params);
 
-
 		dContact m_contacts[D_MAX_PRAM_INFO_SIZE];
+		dFloat m_restitution;
 		int m_count;
 	};
 
