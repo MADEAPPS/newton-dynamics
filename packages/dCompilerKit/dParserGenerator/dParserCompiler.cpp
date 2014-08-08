@@ -206,7 +206,7 @@ class dParserCompiler::dState: public dList<dParserCompiler::dItem>
 		{
 		}
 
-		dItemKey (dCRCTYPE symbol, dProductionRule::dListNode* rule)
+		dItemKey (dCRCTYPE symbol, dProductionRule::dListNode* const rule)
 			:m_lookAheadSymbolCRC (symbol), m_rule (rule)
 		{
 		}
@@ -215,8 +215,9 @@ class dParserCompiler::dState: public dList<dParserCompiler::dItem>
 		{	
 			if (m_lookAheadSymbolCRC < key.m_lookAheadSymbolCRC) {
 				return true;	
-			} else if (m_lookAheadSymbolCRC == key.m_lookAheadSymbolCRC){
-				if (m_rule < key.m_rule) {
+			} else if (m_lookAheadSymbolCRC == key.m_lookAheadSymbolCRC) {
+				//if (m_rule < key.m_rule) {
+                if (m_rule->GetInfo().m_ruleNumber < key.m_rule->GetInfo().m_ruleNumber) {
 					return true;	
 				} 
 			}
@@ -228,7 +229,8 @@ class dParserCompiler::dState: public dList<dParserCompiler::dItem>
 			if (m_lookAheadSymbolCRC > key.m_lookAheadSymbolCRC) {
 				return true;	
 			} else if (m_lookAheadSymbolCRC == key.m_lookAheadSymbolCRC){
-				if (m_rule > key.m_rule) {
+				//if (m_rule > key.m_rule) {
+                if (m_rule->GetInfo().m_ruleNumber > key.m_rule->GetInfo().m_ruleNumber) {
 					return true;	
 				} 
 			}
