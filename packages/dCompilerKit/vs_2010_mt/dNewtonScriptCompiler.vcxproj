@@ -176,45 +176,6 @@
     <ProjectReference Include="..\..\projects\visualStudio_2010_static_mt\dContainers.vcxproj">
       <Project>{f67c4593-a914-4ddf-8cb5-c59a3ef3ece0}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\thirdParty\llvm\projectFiles\visualStudio2010\LLVMAnalysis.vcxproj">
-      <Project>{19272d62-92aa-4342-8bae-3e6c04dfd32b}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\thirdParty\llvm\projectFiles\visualStudio2010\LLVMBitReader.vcxproj">
-      <Project>{c14fbb5e-a465-4359-a513-0a03cc123f7d}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\thirdParty\llvm\projectFiles\visualStudio2010\LLVMBitWriter.vcxproj">
-      <Project>{53c3d68d-a164-4598-b965-2f31a96e4955}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\thirdParty\llvm\projectFiles\visualStudio2010\LLVMCodeGen.vcxproj">
-      <Project>{34658906-6f2d-40f4-88f0-891f25efe0fb}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\thirdParty\llvm\projectFiles\visualStudio2010\LLVMCore.vcxproj">
-      <Project>{3a68bec1-2d41-4a9d-aa6e-c64206d22929}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\thirdParty\llvm\projectFiles\visualStudio2010\LLVMExecutionEngine.vcxproj">
-      <Project>{9ef643c5-d45b-49ad-b672-de94ed0178dd}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\thirdParty\llvm\projectFiles\visualStudio2010\LLVMInterpreter.vcxproj">
-      <Project>{16d9cc9b-7dbe-4e51-84c7-f5e870426aa1}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\thirdParty\llvm\projectFiles\visualStudio2010\LLVMJIT.vcxproj">
-      <Project>{62eb7271-3e20-4e6a-a5db-1c0c907062ba}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\thirdParty\llvm\projectFiles\visualStudio2010\LLVMMC.vcxproj">
-      <Project>{4f961d9f-3d2f-437a-aa9c-61aa65888ca1}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\thirdParty\llvm\projectFiles\visualStudio2010\LLVMScalarOpts.vcxproj">
-      <Project>{dbae1ace-1779-48b8-85ad-8a1b56cfb365}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\thirdParty\llvm\projectFiles\visualStudio2010\LLVMSupport.vcxproj">
-      <Project>{3dfc67ea-0970-4a47-b8f0-6f3b8f2b7c46}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\thirdParty\llvm\projectFiles\visualStudio2010\LLVMTarget.vcxproj">
-      <Project>{a8bc1f2d-fd79-45e1-89e8-5711370095a8}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\thirdParty\llvm\projectFiles\visualStudio2010\LLVMTransformUtils.vcxproj">
-      <Project>{e66b6d1d-214d-4d1c-b041-ae134aa7aa97}</Project>
-    </ProjectReference>
     <ProjectReference Include="dAssembleCompiler.vcxproj">
       <Project>{e77610c5-a79b-4bbd-b5d8-76fba50b1adb}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
