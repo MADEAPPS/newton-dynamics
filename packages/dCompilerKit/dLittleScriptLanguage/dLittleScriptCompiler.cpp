@@ -66,7 +66,7 @@ dScriptCompiler::dScriptCompiler(const char* const pakacgesRootNameDirectory)
 {
 	_mkdir(m_packageRootDirectory.GetStr());
 
-	m_module = llvm::OwningPtr<llvm::Module> (new llvm::Module("test", m_context));
+	m_module = std::unique_ptr<llvm::Module> (new llvm::Module("test", m_context));
 
 /*
 //formatted_raw_ostream out;

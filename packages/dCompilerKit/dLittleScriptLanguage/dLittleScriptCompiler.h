@@ -124,7 +124,7 @@ class dScriptCompiler: public dLittleScriptParser
 	dList<dDAG*> m_allNodes;
 
 	llvm::LLVMContext m_context;
-	llvm::OwningPtr<llvm::Module> m_module;
+	std::unique_ptr<llvm::Module> m_module;
 
 
 	friend class dLittleScriptParser;
