@@ -1,0 +1,297 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{96AE3E6F-7B6E-4570-A220-D16C3523D43C}</ProjectGuid>
+    <RootNamespace>dCompilerKit</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../../dMath;../../dContainers;../dVirtualMachine;../dIntermediateLanguage;../../thirdParty/llvm/include;../../thirdParty/llvm/projectFiles/visualStudio2010/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>dLSCstdafx.h</PrecompiledHeaderFile>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../../dMath;../../dContainers;../dVirtualMachine;../dIntermediateLanguage;../../thirdParty/llvm/include;../../thirdParty/llvm/projectFiles/visualStudio2010/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>dLSCstdafx.h</PrecompiledHeaderFile>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>../../dMath;../../dContainers;../dVirtualMachine;../dIntermediateLanguage;../../thirdParty/llvm/include;../../thirdParty/llvm/projectFiles/visualStudio2010/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>dLSCstdafx.h</PrecompiledHeaderFile>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>../../dMath;../../dContainers;../dVirtualMachine;../dIntermediateLanguage;../../thirdParty/llvm/include;../../thirdParty/llvm/projectFiles/visualStudio2010/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>dLSCstdafx.h</PrecompiledHeaderFile>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionClassVariable.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dLittleScriptLexical.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dLittleScriptParser.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dDAG.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGClassNode.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGDimensionNode.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionNode.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionNodeAssigment.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionNodeBinaryOperator.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionNodeConstant.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionNodeFunctionCall.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionNodeLogicOperator.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionNodeNew.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionNodePrefixPostfix.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGExpressionNodeVariable.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionModifier.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionNode.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatement.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatementBREAK.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatementCASE.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatementCONTINUE.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatementDO.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatementFlow.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatementFOR.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatementIF.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatementReturn.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatementSWITCH.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGFunctionStatementWHILE.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGParamerNode.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGScopeBlockNode.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dDAGTypeNode.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dLittleScriptCompiler.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dLSCstdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\dLittleScriptLanguage\dScriptClass.cpp" />
+    <ClCompile Include="..\dLittleScriptLanguage\dScriptPackage.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionClassVariable.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dLittleScriptLexical.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dLittleScriptParser.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dDAG.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGClassNode.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGDimensionNode.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionNode.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionNodeAssigment.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionNodeBinaryOperator.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionNodeConstant.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionNodeFunctionCall.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionNodeLogicOperator.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionNodeNew.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionNodePrefixPostfix.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGExpressionNodeVariable.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionModifier.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionNode.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatement.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatementBREAK.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatementCASE.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatementCONTINUE.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatementDO.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatementFlow.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatementFOR.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatementIF.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatementReturn.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatementSWITCH.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGFunctionStatementWHILE.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGParameterNode.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGScopeBlockNode.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dDAGTypeNode.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dLittleScriptCompiler.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dLSCstdafx.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dScriptClass.h" />
+    <ClInclude Include="..\dLittleScriptLanguage\dScriptPackage.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\dLittleScriptLanguage\dLittleScriptLexical.lex">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">dLexicalGenerator.exe %(Filename)%(Extension) %(Filename).h %(Filename).cpp </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\dLexicalGenerator.exe %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)%(Filename).cpp</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Filename).h</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">dLexicalGenerator.exe %(Filename)%(Extension) %(Filename).h %(Filename).cpp </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">bin\dLexicalGenerator.exe %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)%(Filename).cpp</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).cpp;%(Filename).h</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">dLexicalGenerator.exe %(Filename)%(Extension) %(Filename).h %(Filename).cpp </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\dLexicalGenerator.exe %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)%(Filename).cpp</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Filename).h</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">dLexicalGenerator.exe %(Filename)%(Extension) %(Filename).h %(Filename).cpp </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">bin\dLexicalGenerator.exe %(RelativeDir)%(Filename)%(Extension) %(RelativeDir)%(Filename).cpp</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).cpp;%(Filename).h</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\dLittleScriptLanguage\dLittleScriptParser.grm">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">dParserGenerator.exe %(Filename)%(Extension)  %(Filename).h %(Filename).cpp </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\dParserGenerator.exe %(RelativeDir)%(Filename)%(Extension) dLittleScriptLexical %(RelativeDir)%(Filename).cpp</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Filename).h</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">dParserGenerator.exe %(Filename)%(Extension)  %(Filename).h %(Filename).cpp </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">bin\dParserGenerator.exe %(RelativeDir)%(Filename)%(Extension) dLittleScriptLexical %(RelativeDir)%(Filename).cpp</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).cpp;%(Filename).h</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">dParserGenerator.exe %(Filename)%(Extension)  %(Filename).h %(Filename).cpp </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\dParserGenerator.exe %(RelativeDir)%(Filename)%(Extension) dLittleScriptLexical %(RelativeDir)%(Filename).cpp</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Filename).h</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">dParserGenerator.exe %(Filename)%(Extension)  %(Filename).h %(Filename).cpp </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">bin\dParserGenerator.exe %(RelativeDir)%(Filename)%(Extension) dLittleScriptLexical %(RelativeDir)%(Filename).cpp</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).cpp;%(Filename).h</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\projects\visualStudio_2010_static_mt\dContainers.vcxproj">
+      <Project>{f67c4593-a914-4ddf-8cb5-c59a3ef3ece0}</Project>
+    </ProjectReference>
+    <ProjectReference Include="dAssembleCompiler.vcxproj">
+      <Project>{e77610c5-a79b-4bbd-b5d8-76fba50b1adb}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="dAssembler.vcxproj">
+      <Project>{c2df8489-bb02-470e-bd2a-a728784158e5}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="dFiniteAutomata.vcxproj">
+      <Project>{a84e1056-fd95-416b-badd-e180e8be7aec}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="dIntermediateLanguage.vcxproj">
+      <Project>{0bf56f49-1c3c-4d8c-9209-052e70919fe5}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="dLexicalGenerator.vcxproj">
+      <Project>{6fb5beb5-2a22-42e6-a575-6bce0da07684}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="dParcerGenerator.vcxproj">
+      <Project>{b27af501-3f19-49ff-9db0-ff60b17508f6}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="dVirtualMachine.vcxproj">
+      <Project>{61d6a343-3a8f-440e-8fa6-2c342abb6896}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
