@@ -31,13 +31,14 @@
 		#undef min
 	#endif
 
-//#pragma warning (disable: 4100)		// 'O' : unreferenced formal parameter
-//#pragma warning (disable: 4127)		//'warning C4127: conditional expression is constant
-#pragma warning (disable: 4244)		//'argument' : conversion from 'unsigned int' to 'unsigned short', possible loss of data
-//#pragma warning (disable: 4480)		// nonstandard extension used: specifying underlying type for enum ''
-//#pragma warning (disable: 4355)		//'this' : used in base member initializer list
-#pragma warning (disable: 4800)		//'unsigned int' : forcing value to bool 'true' or 'false' (performance warning)
-#pragma warning (disable: 4512)		//'llvm::Type' : assignment operator could not be generated
+	//#pragma warning (disable: 4100)	// 'O' : unreferenced formal parameter
+	//#pragma warning (disable: 4127)	//'warning C4127: conditional expression is constant
+	//#pragma warning (disable: 4480)	// nonstandard extension used: specifying underlying type for enum ''
+	//#pragma warning (disable: 4355)	//'this' : used in base member initializer list
+	#pragma warning (disable: 4244)		//'argument' : conversion from 'unsigned int' to 'unsigned short', possible loss of data
+	#pragma warning (disable: 4800)		//'unsigned int' : forcing value to bool 'true' or 'false' (performance warning)
+	#pragma warning (disable: 4512)		//'llvm::Type' : assignment operator could not be generated
+	#pragma warning (disable: 4267)		// 'return' : conversion from 'size_t' to 'unsigned int', possible loss of data
 #endif
 
 #include <llvm/Pass.h>
