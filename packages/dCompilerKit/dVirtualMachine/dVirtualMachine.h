@@ -1,3 +1,15 @@
+/* Copyright (c) <2009> <Newton Game Dynamics>
+* 
+* This software is provided 'as-is', without any express or implied
+* warranty. In no event will the authors be held liable for any damages
+* arising from the use of this software.
+* 
+* Permission is granted to anyone to use this software for any purpose,
+* including commercial applications, and to alter it and redistribute it
+* freely
+*/
+
+
 #ifndef __dVirtualMachine_h__
 #define __dVirtualMachine_h__
 
@@ -12,8 +24,9 @@
 #endif
 
 
-#define	D_VIRTUAL_MACHINE_NAME			"Newton Virual Machine"
-#define	D_VIRTUAL_MACHINE_DESC			"32 litle indian bit newton newton virtual machine"
+#define	D_VIRTUAL_MACHINE_NAME			"NVM"
+#define	D_VIRTUAL_MACHINE_DESCRIPTION	"Newton Virtual Machine, 32 litle indian, 32 int registers, 32 double presiction floating points registers"
+
 
 #define D_REGISTER_SET_FIELD			5
 #define D_OPCODE_FIELD					7

@@ -150,6 +150,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\dIntermediateLanguage\dDataFlowGraph.cpp" />
+    <ClCompile Include="..\dIntermediateLanguage\dNVMAsmParser.cpp" />
+    <ClCompile Include="..\dIntermediateLanguage\dNVMAsmPrinter.cpp" />
+    <ClCompile Include="..\dIntermediateLanguage\dNVMTargetMachine.cpp" />
     <ClCompile Include="..\dIntermediateLanguage\dRegisterInterferenceGraph.cpp" />
     <ClCompile Include="..\dIntermediateLanguage\dTreeAdressStmt.cpp" />
   </ItemGroup>
@@ -157,6 +160,9 @@
     <ClInclude Include="..\dIntermediateLanguage\dCIL.h" />
     <ClInclude Include="..\dIntermediateLanguage\dCILstdafx.h" />
     <ClInclude Include="..\dIntermediateLanguage\dDataFlowGraph.h" />
+    <ClInclude Include="..\dIntermediateLanguage\dNVMAsmParser.h" />
+    <ClInclude Include="..\dIntermediateLanguage\dNVMAsmPrinter.h" />
+    <ClInclude Include="..\dIntermediateLanguage\dNVMTargetMachine.h" />
     <ClInclude Include="..\dIntermediateLanguage\dRegisterInterferenceGraph.h" />
     <ClInclude Include="..\dIntermediateLanguage\dTreeAdressStmt.h" />
   </ItemGroup>

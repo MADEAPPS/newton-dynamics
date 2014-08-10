@@ -12,7 +12,13 @@
 #include "dCILstdafx.h"
 #include "dCIL.h"
 #include "dDataFlowGraph.h"
+#include "dNVMAsmParser.h"
+#include "dNVMAsmPrinter.h"
+#include "dNVMTargetMachine.h"
 
+
+
+llvm::Target dCIL::m_target;
 
 dCIL::dCIL(llvm::Module* const module)
 	:dList()
@@ -28,7 +34,6 @@ dCIL::dCIL(llvm::Module* const module)
 	m_conditionals[dTreeAdressStmt::m_lessEqual] = dTreeAdressStmt::m_lessEqual;
 	m_conditionals[dTreeAdressStmt::m_greather] = dTreeAdressStmt::m_greather;
 	m_conditionals[dTreeAdressStmt::m_greatherEqual] = dTreeAdressStmt::m_greatherEqual;
-
 
 	memset (m_operatorComplement, 0, sizeof (m_operatorComplement));
 	m_operatorComplement[dTreeAdressStmt::m_identical] = dTreeAdressStmt::m_different;
@@ -65,11 +70,78 @@ dCIL::dCIL(llvm::Module* const module)
     //        functionPassManager.add(createCFGSimplificationPass());
 
     m_optimizer.doInitialization();
+
+	// register the target
+	InitializeTargetInfo();
+	InitializeTarget();
+	InitializeTargetMC();
+	InitializeAsmPrinter();
+	InitializeMCAsmParser();
 }
 
 dCIL::~dCIL(void)
 {
 }
+
+void dCIL::InitializeTargetInfo()
+{
+	//llvm::RegisterTarget<llvm::Triple::arm, false> Y(m_target, "arm", "ARM");
+	llvm::RegisterTarget<llvm::Triple::UnknownArch, false> X (m_target, D_VIRTUAL_MACHINE_NAME, D_VIRTUAL_MACHINE_DESCRIPTION);
+}
+
+void dCIL::InitializeTarget()
+{
+	llvm::RegisterTargetMachine<dNVMTargetMachine> X(m_target);
+}
+
+
+void dCIL::InitializeTargetMC() 
+{
+  // Register the MC asm info.
+/*
+  llvm::RegisterMCAsmInfoFn X(m_target, createSparcMCAsmInfo);
+
+  // Register the MC codegen info.
+  llvm::TargetRegistry::RegisterMCCodeGenInfo(m_target, createSparcMCCodeGenInfo);
+
+  // Register the MC instruction info.
+  llvm::TargetRegistry::RegisterMCInstrInfo(m_target, createSparcMCInstrInfo);
+
+  // Register the MC register info.
+  llvm::TargetRegistry::RegisterMCRegInfo(m_target, createSparcMCRegisterInfo);
+
+  // Register the MC subtarget info.
+  llvm::TargetRegistry::RegisterMCSubtargetInfo(m_target, createSparcMCSubtargetInfo);
+
+  // Register the MC Code Emitter.
+  llvm::TargetRegistry::RegisterMCCodeEmitter(m_target, createSparcMCCodeEmitter);
+
+  //Register the asm backend.
+  llvm::TargetRegistry::RegisterMCAsmBackend(m_target, createSparcAsmBackend);
+
+  // Register the object streamer.
+  llvm::TargetRegistry::RegisterMCObjectStreamer(m_target, createMCStreamer);
+
+  // Register the asm streamer.
+  llvm::TargetRegistry::RegisterAsmStreamer(m_target, createMCAsmStreamer);
+
+  // Register the MCInstPrinter
+  llvm::TargetRegistry::RegisterMCInstPrinter(m_target, createSparcMCInstPrinter);
+*/
+}
+
+
+void dCIL::InitializeAsmPrinter() 
+{
+  llvm::RegisterAsmPrinter<NVMAsmPrinter> X(m_target);
+}
+
+void dCIL::InitializeMCAsmParser() 
+{
+//  llvm::RegisterMCAsmParser<NVMAsmParser> X(m_target);
+	llvm::RegisterMCAsmParser<NVMAsmParser> X(m_target);
+}
+
 
 void dCIL::ResetTemporaries()
 {

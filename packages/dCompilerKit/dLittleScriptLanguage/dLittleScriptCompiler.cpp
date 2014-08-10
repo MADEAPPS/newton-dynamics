@@ -184,6 +184,20 @@ int dScriptCompiler::CompileSource (const char* const source)
 			dAssert (0);
 		}
 		llvm::errs() << *m_module;
+
+
+		std::string error; 
+		const std::string archName (D_VIRTUAL_MACHINE_NAME);
+		const llvm::Target* const target = llvm::TargetRegistry::lookupTarget(archName, error);
+		dAssert (target);
+
+		llvm::StringRef mcpu;
+		llvm::StringRef triple;
+		llvm::StringRef feature;
+		llvm::TargetOptions options;
+		std::unique_ptr<llvm::TargetMachine> targetMachine(target->createTargetMachine(triple, mcpu, feature, options));
+		dAssert (0);
+
 	}
 	return 0;
 }

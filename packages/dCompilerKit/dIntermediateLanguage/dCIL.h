@@ -15,6 +15,7 @@
 #include "dCILstdafx.h"
 #include "dTreeAdressStmt.h"
 
+
 #define D_USE_COMPLEX_ADRESSING_MODE
 
 #define D_TEMPRARY_SYMBOL			"t"
@@ -97,6 +98,12 @@ class dCIL: public dList<dTreeAdressStmt>
 //	bool RemoveNop(dListNode* const functionNode);
 //	bool RemoveRedundantJumps(dListNode* const functionNode);
 
+	void InitializeTarget();
+	void InitializeTargetMC();
+	void InitializeTargetInfo();
+	void InitializeAsmPrinter();
+	void InitializeMCAsmParser();
+
 	int m_mark;
 	int m_tempIndex;
 	int m_labelIndex;
@@ -104,7 +111,10 @@ class dCIL: public dList<dTreeAdressStmt>
 	dTreeAdressStmt::dOperator m_conditionals[dTreeAdressStmt::m_operatorsCount];
 	dTreeAdressStmt::dOperator m_operatorComplement[dTreeAdressStmt::m_operatorsCount];
 
+	//dNVMTragetMacrhine m_targetMachile;
+	static llvm::Target m_target;
     llvm::legacy::FunctionPassManager m_optimizer;
+	
 	friend dDataFlowGraph;
 };
 

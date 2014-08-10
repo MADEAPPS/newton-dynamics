@@ -594,5 +594,5 @@ void dDAGFunctionNode::TranslateToLLVM (dCIL& cil, llvm::Module* const module, l
     // Validate the generated code, checking for consistency.
     dAssert (!llvm::verifyFunction(*llvmFunction));
 
-//    cil.Optimize (llvmFunction);
+    cil.Optimize (llvmFunction);
 }

@@ -31,7 +31,7 @@
 		#undef min
 	#endif
 
-	//#pragma warning (disable: 4100)	// 'O' : unreferenced formal parameter
+	#pragma warning (disable: 4100)	// 'O' : unreferenced formal parameter
 	//#pragma warning (disable: 4127)	//'warning C4127: conditional expression is constant
 	//#pragma warning (disable: 4480)	// nonstandard extension used: specifying underlying type for enum ''
 	//#pragma warning (disable: 4355)	//'this' : used in base member initializer list
@@ -44,38 +44,34 @@
 #include <llvm/Pass.h>
 #include <llvm/IR/Value.h>
 #include <llvm/IR/Module.h>
+#include <llvm/ADT/Triple.h>
 #include <llvm/IR/Function.h>
 #include <llvm/IR/Verifier.h>
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Instructions.h>
 #include <llvm/Transforms/Scalar.h>
+#include <llvm/CodeGen/AsmPrinter.h>
 #include <llvm/Support/raw_ostream.h>
-#include <llvm\IR\LegacyPassManager.h>
+#include <llvm/Target/TargetMachine.h>
+#include <llvm/IR/LegacyPassManager.h>
+#include <llvm/MC/MCTargetAsmParser.h>
 #include <llvm/Support/ManagedStatic.h>
-
+#include <llvm/Support/TargetRegistry.h>
 
 
 /*
-#include <llvm\ADT\Triple.h>
-
+#include <llvm/IR/IRBuilder.h>
 #include <llvm/ExecutionEngine/GenericValue.h>
 #include <llvm/ExecutionEngine/Interpreter.h>
 #include <llvm/ExecutionEngine/JIT.h>
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/Instructions.h>
-
-
-#include <llvm/IR/IRBuilder.h>
-#include <llvm/Target/TargetMachine.h>
 #include <llvm/Target/TargetOptions.h>
-
 //#include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/CodeGen.h>
-
 #include <llvm/Bitcode/ReaderWriter.h>
-#include <llvm/Support/TargetRegistry.h>
 #include <llvm/Support/FormattedStream.h>
 */
 

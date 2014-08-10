@@ -98,8 +98,8 @@
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
-      <AdditionalLibraryDirectories>../llvm/win32/lib/debug</AdditionalLibraryDirectories>
-      <AdditionalDependencies>LLVMCore.lib;LLVMTarget.lib;LLVMSupport.lib;LLVMAnalysis.lib;LLVMTransformUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../llvm/lib/win32/debug</AdditionalLibraryDirectories>
+      <AdditionalDependencies>LLVMMC.lib;LLVMCore.lib;LLVMTarget.lib;LLVMSupport.lib;LLVMAnalysis.lib;LLVMMCParser.lib;LLVMAsmPrinter.lib;LLVMScalarOpts.lib;LLVMCodeGen.lib;LLVMTransformUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -124,8 +124,8 @@
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
-      <AdditionalLibraryDirectories>../llvm/win64/lib/debug</AdditionalLibraryDirectories>
-      <AdditionalDependencies>LLVMCore.lib;LLVMTarget.lib;LLVMSupport.lib;LLVMAnalysis.lib;LLVMTransformUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../llvm/lib/win64/debug</AdditionalLibraryDirectories>
+      <AdditionalDependencies>LLVMMC.lib;LLVMCore.lib;LLVMTarget.lib;LLVMSupport.lib;LLVMAnalysis.lib;LLVMMCParser.lib;LLVMAsmPrinter.lib;LLVMScalarOpts.lib;LLVMCodeGen.lib;LLVMTransformUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -149,8 +149,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX86</TargetMachine>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
-      <AdditionalLibraryDirectories>../llvm/win32/lib/release</AdditionalLibraryDirectories>
-      <AdditionalDependencies>LLVMCore.lib;LLVMTarget.lib;LLVMSupport.lib;LLVMAnalysis.lib;LLVMTransformUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../llvm/lib/win32/release</AdditionalLibraryDirectories>
+      <AdditionalDependencies>LLVMMC.lib;LLVMCore.lib;LLVMTarget.lib;LLVMSupport.lib;LLVMAnalysis.lib;LLVMMCParser.lib;LLVMAsmPrinter.lib;LLVMScalarOpts.lib;LLVMCodeGen.lib;LLVMTransformUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -177,8 +177,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX64</TargetMachine>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
-      <AdditionalLibraryDirectories>../llvm/win64/lib/release</AdditionalLibraryDirectories>
-      <AdditionalDependencies>LLVMCore.lib;LLVMTarget.lib;LLVMSupport.lib;LLVMAnalysis.lib;LLVMTransformUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../llvm/lib/win64/release</AdditionalLibraryDirectories>
+      <AdditionalDependencies>LLVMMC.lib;LLVMCore.lib;LLVMTarget.lib;LLVMSupport.lib;LLVMAnalysis.lib;LLVMMCParser.lib;LLVMAsmPrinter.lib;LLVMScalarOpts.lib;LLVMCodeGen.lib;LLVMTransformUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
