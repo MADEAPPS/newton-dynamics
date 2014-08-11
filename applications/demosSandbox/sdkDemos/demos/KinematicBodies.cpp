@@ -17,7 +17,7 @@
 #include "NewtonDemos.h"
 #include "PhysicsUtils.h"
 
-#define D_PLACEMENT_PENETRATION   0.0025f
+#define D_PLACEMENT_PENETRATION   0.005f
 
 class PhantomPlacement: public DemoEntity
 {
@@ -354,61 +354,71 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 		NewtonCollision* const collision = NewtonBodyGetCollision (m_phantomEntity->m_phantom);
 		NewtonBodyGetMatrix (m_phantomEntity->m_phantom, &matrix[0][0]);
 
+dMatrix xxxxx (matrix);
 		bool isUnstable = true;
+int xxx = 0;
 		for (int i = 0; (i < 16) && isUnstable; i ++) {
             dVector minP;
             dVector maxP;
-
+xxx ++;
 			isUnstable = false;
-			CalculateTranslationMatrix (matrix);
-            CalculateAABB (collision, matrix, minP, maxP);
-            m_isInPenetration = false;
-            m_contactCount = 0;
-            NewtonWorldForEachBodyInAABBDo(world, &minP.m_x, &maxP.m_x, RotationCollisionCallback, this);
-            if (m_contactCount) {
-				dMatrix localMatrix;
-				NewtonCollisionGetMatrix (collision, &localMatrix[0][0]);
+			if (CalculateTranslationMatrix (matrix)) {
+                NewtonBodySetMatrix(m_phantomEntity->m_phantom, &matrix[0][0]);
+                CalculateAABB (collision, matrix, minP, maxP);
+                m_isInPenetration = false;
+                m_contactCount = 0;
+                NewtonWorldForEachBodyInAABBDo(world, &minP.m_x, &maxP.m_x, RotationCollisionCallback, this);
+dAssert (m_contactCount);
+                if (m_contactCount) {
+				    dMatrix localMatrix;
+				    NewtonCollisionGetMatrix (collision, &localMatrix[0][0]);
 
-				m_body.SetMatrix(matrix);
-				m_body.SetLocalMatrix(localMatrix);
+				    m_body.SetMatrix(matrix);
+				    m_body.SetLocalMatrix(localMatrix);
 
-				dVector com;
-				dVector inertia;
-				NewtonConvexCollisionCalculateInertialMatrix (collision, &inertia[0], &com[0]);	
+				    dVector com;
+				    dVector inertia;
+				    NewtonConvexCollisionCalculateInertialMatrix (collision, &inertia[0], &com[0]);	
 
-				dFloat mass = 1.0f;
-				m_body.SetMass(mass);
-				m_body.SetInertia (mass * inertia[0], mass * inertia[1], mass * inertia[2]);
-				m_body.UpdateInertia();
+				    dFloat mass = 1.0f;
+				    m_body.SetMass(mass);
+				    m_body.SetInertia (mass * inertia[0], mass * inertia[1], mass * inertia[2]);
+				    m_body.UpdateInertia();
 
-				m_body.SetForce (m_castDir.Scale (power * mass));
-				m_body.SetVeloc (dVector (0.0f, 0.0f, 0.0f, 0.0f));
-				m_body.SetOmega (dVector (0.0f, 0.0f, 0.0f, 0.0f));
-				m_body.SetTorque (dVector (0.0f, 0.0f, 0.0f, 0.0f));
+				    m_body.SetForce (m_castDir.Scale (power * mass));
+				    m_body.SetVeloc (dVector (0.0f, 0.0f, 0.0f, 0.0f));
+				    m_body.SetOmega (dVector (0.0f, 0.0f, 0.0f, 0.0f));
+				    m_body.SetTorque (dVector (0.0f, 0.0f, 0.0f, 0.0f));
 
-				dFloat timeStep = 0.005f;
-				dBodyState* bodyArray[2];
-				dBilateralJoint* jointArray[1];
-				dJacobianColum jacobianColumn[32];
-				dJacobianPair jacobianPairArray[32];
+				    dFloat timeStep = 0.005f;
+				    dBodyState* bodyArray[2];
+				    dBilateralJoint* jointArray[1];
+				    dJacobianColum jacobianColumn[32];
+				    dJacobianPair jacobianPairArray[32];
 
-				bodyArray[0] = &m_body;
-				bodyArray[1] = &m_static;
-				jointArray[0] = &m_contactJoint;
-				m_contactJoint.SetContacts (m_contactCount, m_contacts, 0.05f);
-				BuildJacobianMatrix (1, jointArray, timeStep, jacobianPairArray, jacobianColumn, sizeof (jacobianPairArray)/ sizeof (jacobianPairArray[0]));
-				CalculateReactionsForces (2, bodyArray, 1, jointArray, timeStep, jacobianPairArray, jacobianColumn);
+				    bodyArray[0] = &m_body;
+				    bodyArray[1] = &m_static;
+				    jointArray[0] = &m_contactJoint;
+				    m_contactJoint.SetContacts (m_contactCount, m_contacts, 0.05f);
+				    BuildJacobianMatrix (1, jointArray, timeStep, jacobianPairArray, jacobianColumn, sizeof (jacobianPairArray)/ sizeof (jacobianPairArray[0]));
+				    CalculateReactionsForces (2, bodyArray, 1, jointArray, timeStep, jacobianPairArray, jacobianColumn);
 
-				dFloat vMag2 = m_body.GetVelocity() % m_body.GetVelocity();
-				dFloat wMag2 = m_body.GetOmega() % m_body.GetOmega();
-				if ((vMag2 > 1.0e-6f) || (wMag2 > 1.0e-6f)) {
-					isUnstable = true;
-					m_body.IntegrateVelocity (timeStep);
-					matrix = m_body.GetMatrix();
-					NewtonBodySetMatrix (m_phantomEntity->m_phantom, &matrix[0][0]);
-				}
-			}
+				    dFloat vMag2 = m_body.GetVelocity() % m_body.GetVelocity();
+				    dFloat wMag2 = m_body.GetOmega() % m_body.GetOmega();
+				    if ((vMag2 > 1.0e-6f) || (wMag2 > 1.0e-6f)) {
+					    isUnstable = true;
+					    m_body.IntegrateVelocity (timeStep);
+					    matrix = m_body.GetMatrix();
+					    NewtonBodySetMatrix (m_phantomEntity->m_phantom, &matrix[0][0]);
+				    }
+			    }
+            }
 		}
+
+if (xxx == 1){
+NewtonBodySetMatrix (m_phantomEntity->m_phantom, &xxxxx[0][0]);
+}
+
 	}
 
 	dVector m_castDir;
