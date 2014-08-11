@@ -354,13 +354,13 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 		NewtonCollision* const collision = NewtonBodyGetCollision (m_phantomEntity->m_phantom);
 		NewtonBodyGetMatrix (m_phantomEntity->m_phantom, &matrix[0][0]);
 
-dMatrix xxxxx (matrix);
+//dMatrix xxxxx (matrix);
 		bool isUnstable = true;
-int xxx = 0;
+//int xxx = 0;
 		for (int i = 0; (i < 16) && isUnstable; i ++) {
             dVector minP;
             dVector maxP;
-xxx ++;
+//xxx ++;
 			isUnstable = false;
 			if (CalculateTranslationMatrix (matrix)) {
                 NewtonBodySetMatrix(m_phantomEntity->m_phantom, &matrix[0][0]);
@@ -368,7 +368,7 @@ xxx ++;
                 m_isInPenetration = false;
                 m_contactCount = 0;
                 NewtonWorldForEachBodyInAABBDo(world, &minP.m_x, &maxP.m_x, RotationCollisionCallback, this);
-dAssert (m_contactCount);
+//dAssert (m_contactCount);
                 if (m_contactCount) {
 				    dMatrix localMatrix;
 				    NewtonCollisionGetMatrix (collision, &localMatrix[0][0]);
@@ -415,10 +415,9 @@ dAssert (m_contactCount);
             }
 		}
 
-if (xxx == 1){
-NewtonBodySetMatrix (m_phantomEntity->m_phantom, &xxxxx[0][0]);
-}
-
+//if (xxx == 1){
+//NewtonBodySetMatrix (m_phantomEntity->m_phantom, &xxxxx[0][0]);
+//}
 	}
 
 	dVector m_castDir;
