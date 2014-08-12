@@ -9,17 +9,48 @@
 * freely
 */
 
-
-
 #include "dCILstdafx.h"
 #include "dNVMTargetMachine.h"
 
+//dNVMSubtarget(const std::string &TT, const std::string &CPU, const std::string &FS, llvm::TargetMachine &TM);
+
 dNVMTargetMachine::dNVMTargetMachine(const llvm::Target &T, llvm::StringRef TT, llvm::StringRef CPU, llvm::StringRef FS, const llvm::TargetOptions &options, llvm::Reloc::Model RM, llvm::CodeModel::Model CM, llvm::CodeGenOpt::Level OL)
-  : LLVMTargetMachine(T, TT, CPU, FS, Options, RM, CM, OL)
-//  ,Subtarget(TT, CPU, FS, *this, is64bit) 
+	:LLVMTargetMachine(T, TT, CPU, FS, options, RM, CM, OL)
+//	,m_dataLayout ("e-p:32:32-f64:64:64")
 {
 //  initAsmInfo();
 }
+
+dNVMTargetMachine::~dNVMTargetMachine()
+{
+}
+
+
+const llvm::TargetSubtargetInfo *dNVMTargetMachine::getSubtargetImpl() const
+{
+	dAssert (0);
+	return NULL;
+}
+
+const llvm::TargetIntrinsicInfo *dNVMTargetMachine::getIntrinsicInfo() const 
+{
+	dAssert (0);
+    return nullptr;
+}
+
+
+/*
+const llvm::dNVMSubtarget *dNVMTargetMachine::getSubtargetImpl() const
+{ 
+	return &m_subtarget; 
+}
+
+
+llvm::dNVMSubtarget *dNVMTargetMachine::getSubtargetImpl()
+{
+	return static_cast<llvm::dNVMSubtarget *>(TargetMachine::getSubtargetImpl());
+}
+*/
 
 /*
 namespace {

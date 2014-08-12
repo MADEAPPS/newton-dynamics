@@ -31,8 +31,8 @@
 		#undef min
 	#endif
 
-	#pragma warning (disable: 4100)	// 'O' : unreferenced formal parameter
-	//#pragma warning (disable: 4127)	//'warning C4127: conditional expression is constant
+	#pragma warning (disable: 4100)		// 'O' : unreferenced formal parameter
+	#pragma warning (disable: 4127)		//'warning C4127: conditional expression is constant
 	//#pragma warning (disable: 4480)	// nonstandard extension used: specifying underlying type for enum ''
 	//#pragma warning (disable: 4355)	//'this' : used in base member initializer list
 	#pragma warning (disable: 4244)		//'argument' : conversion from 'unsigned int' to 'unsigned short', possible loss of data
@@ -48,9 +48,11 @@
 #include <llvm/IR/Function.h>
 #include <llvm/IR/Verifier.h>
 #include <llvm/IR/Constants.h>
+#include <llvm/IR/DataLayout.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Instructions.h>
 #include <llvm/Transforms/Scalar.h>
+#include <llvm/Support/MathExtras.h>
 #include <llvm/CodeGen/AsmPrinter.h>
 #include <llvm/Support/raw_ostream.h>
 #include <llvm/Target/TargetMachine.h>
@@ -58,6 +60,12 @@
 #include <llvm/MC/MCTargetAsmParser.h>
 #include <llvm/Support/ManagedStatic.h>
 #include <llvm/Support/TargetRegistry.h>
+#include <llvm/Target/TargetSubtargetInfo.h>
+#include <llvm/Target/TargetFrameLowering.h>
+#include <llvm/Target/TargetSubtargetInfo.h>
+
+
+
 
 
 /*

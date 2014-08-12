@@ -165,7 +165,8 @@ int dScriptCompiler::CompileSource (const char* const source)
 			scripClass->ConnectParent (NULL);
 		}
 
-		dCIL cil (m_module.get());
+		llvm::Module* const module = m_module.get();
+		dCIL cil (module);
 		for (dList<dDAGClassNode*>::dListNode* node = m_classList.GetFirst(); node; node = node->GetNext()) {
 			dDAGClassNode* const scripClass = node->GetInfo();
 			scripClass->CompileCIL (cil);
@@ -173,17 +174,17 @@ int dScriptCompiler::CompileSource (const char* const source)
 //			dTrace(("optimized version\n"));
 //			cil.Trace();
 
-			scripClass->TranslateToLLVM (cil, m_module.get(), m_context);
+			scripClass->TranslateToLLVM (cil, module, m_context);
 
 			//_ASSERTE (m_currentPackage);
 //			//m_currentPackage->AddClass(scripClass, cil);
 		}
 
-		if (llvm::verifyModule(*m_module)) {
+		if (llvm::verifyModule(*module)) {
 			llvm::errs() << ": Error constructing function!\n";
 			dAssert (0);
 		}
-		llvm::errs() << *m_module;
+		llvm::errs() << *module;
 
 
 		std::string error; 
@@ -191,12 +192,35 @@ int dScriptCompiler::CompileSource (const char* const source)
 		const llvm::Target* const target = llvm::TargetRegistry::lookupTarget(archName, error);
 		dAssert (target);
 
-		llvm::StringRef mcpu;
-		llvm::StringRef triple;
-		llvm::StringRef feature;
+		llvm::StringRef mcpu("");
+		llvm::StringRef triple("");
+		llvm::StringRef feature("");
 		llvm::TargetOptions options;
-		std::unique_ptr<llvm::TargetMachine> targetMachine(target->createTargetMachine(triple, mcpu, feature, options));
-		dAssert (0);
+//		InitTargetOptionsFromCodeGenFlags();
+//		options.DisableIntegratedAS = NoIntegratedAssembler;
+//		options.MCOptions.ShowMCEncoding = ShowMCEncoding;
+//		options.MCOptions.MCUseDwarfDirectory = EnableDwarfDirectory;
+//		options.MCOptions.AsmVerbose = AsmVerbose;
+		
+		std::unique_ptr<llvm::TargetMachine> targetMachinePtr(target->createTargetMachine(triple, mcpu, feature, options));
+		dAssert (targetMachinePtr.get());
+		llvm::TargetMachine &targetMachine = *targetMachinePtr.get();
+
+		llvm::legacy::PassManager passManager;
+
+		// Newton Virtual machine does no have subtarget 
+		const llvm::DataLayout* const dataLayout = targetMachine.getSubtargetImpl()->getDataLayout();
+		dAssert (dataLayout);
+		m_module->setDataLayout(dataLayout);
+
+		passManager.add(new llvm::DataLayoutPass(module));
+
+
+		passManager.run(*module);
+
+		
+
+
 
 	}
 	return 0;

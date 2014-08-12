@@ -14,31 +14,27 @@
 #define _dNVMTargetMachine_H_
 
 #include "dCILstdafx.h"
-//#include "SparcInstrInfo.h"
-//#include "SparcSubtarget.h"
-//#include "llvm/Target/TargetMachine.h"
 
+//#include "SparcInstrInfo.h"
+//#include "dNVMSubtarget.h"
 
 
 class dNVMTargetMachine : public llvm::LLVMTargetMachine 
 {
-//  SparcSubtarget Subtarget;
 	public:
 	dNVMTargetMachine(const llvm::Target &T, llvm::StringRef TT, llvm::StringRef CPU, llvm::StringRef FS, const llvm::TargetOptions &options, llvm::Reloc::Model RM, llvm::CodeModel::Model CM, llvm::CodeGenOpt::Level OL);
+	~dNVMTargetMachine();
 
-//	const SparcSubtarget *getSubtargetImpl() const override 
-//	{ 
-//		return &Subtarget; 
-//	}
+	const llvm::TargetSubtargetInfo *getSubtargetImpl() const;
+	const llvm::TargetIntrinsicInfo *getIntrinsicInfo() const;
 
-//	SparcSubtarget *getSubtargetImpl() 
-//	{
-//		return static_cast<SparcSubtarget *>(TargetMachine::getSubtargetImpl());
-//	}
 
 	// Pass Pipeline Configuration
 //	TargetPassConfig *createPassConfig(PassManagerBase &PM) override;
 //	bool addCodeEmitter(PassManagerBase &PM, JITCodeEmitter &JCE) override;
+
+	//llvm::dNVMSubtarget m_subtarget;
+	//llvm::DataLayout m_dataLayout;
 };
 
 
