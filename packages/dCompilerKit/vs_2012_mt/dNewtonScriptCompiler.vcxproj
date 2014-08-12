@@ -98,7 +98,7 @@
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
-      <AdditionalLibraryDirectories>../llvm/lib/win32/debug</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../llvm/lib/win32/release</AdditionalLibraryDirectories>
       <AdditionalDependencies>LLVMMC.lib;LLVMCore.lib;LLVMTarget.lib;LLVMSupport.lib;LLVMAnalysis.lib;LLVMMCParser.lib;LLVMAsmPrinter.lib;LLVMScalarOpts.lib;LLVMCodeGen.lib;LLVMTransformUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
