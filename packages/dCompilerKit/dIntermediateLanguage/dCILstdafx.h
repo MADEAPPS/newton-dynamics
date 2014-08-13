@@ -61,6 +61,7 @@
 #include <llvm/MC/MCTargetAsmParser.h>
 #include <llvm/Support/ManagedStatic.h>
 #include <llvm/Support/TargetRegistry.h>
+#include <llvm/Support/FormattedStream.h>
 #include <llvm/Target/TargetSubtargetInfo.h>
 #include <llvm/Target/TargetFrameLowering.h>
 #include <llvm/Target/TargetSubtargetInfo.h>

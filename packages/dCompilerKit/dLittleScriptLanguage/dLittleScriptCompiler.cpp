@@ -215,6 +215,10 @@ int dScriptCompiler::CompileSource (const char* const source)
 
 		passManager.add(new llvm::DataLayoutPass(module));
 
+		llvm::formatted_raw_ostream outputStream;
+		targetMachine.addPassesToEmitFile (passManager, outputStream, llvm::TargetMachine::CGFT_AssemblyFile, false, NULL, NULL);
+
+
 
 		passManager.run(*module);
 

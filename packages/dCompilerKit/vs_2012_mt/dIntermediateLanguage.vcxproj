@@ -152,6 +152,7 @@
     <ClCompile Include="..\dIntermediateLanguage\dDataFlowGraph.cpp" />
     <ClCompile Include="..\dIntermediateLanguage\dNVMAsmParser.cpp" />
     <ClCompile Include="..\dIntermediateLanguage\dNVMAsmPrinter.cpp" />
+    <ClCompile Include="..\dIntermediateLanguage\dNVMSubTarget.cpp" />
     <ClCompile Include="..\dIntermediateLanguage\dNVMTargetMachine.cpp" />
     <ClCompile Include="..\dIntermediateLanguage\dRegisterInterferenceGraph.cpp" />
     <ClCompile Include="..\dIntermediateLanguage\dTreeAdressStmt.cpp" />
@@ -162,6 +163,7 @@
     <ClInclude Include="..\dIntermediateLanguage\dDataFlowGraph.h" />
     <ClInclude Include="..\dIntermediateLanguage\dNVMAsmParser.h" />
     <ClInclude Include="..\dIntermediateLanguage\dNVMAsmPrinter.h" />
+    <ClInclude Include="..\dIntermediateLanguage\dNVMSubTarget.h" />
     <ClInclude Include="..\dIntermediateLanguage\dNVMTargetMachine.h" />
     <ClInclude Include="..\dIntermediateLanguage\dRegisterInterferenceGraph.h" />
     <ClInclude Include="..\dIntermediateLanguage\dTreeAdressStmt.h" />

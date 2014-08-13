@@ -16,9 +16,9 @@
 
 dNVMTargetMachine::dNVMTargetMachine(const llvm::Target &T, llvm::StringRef TT, llvm::StringRef CPU, llvm::StringRef FS, const llvm::TargetOptions &options, llvm::Reloc::Model RM, llvm::CodeModel::Model CM, llvm::CodeGenOpt::Level OL)
 	:LLVMTargetMachine(T, TT, CPU, FS, options, RM, CM, OL)
-//	,m_dataLayout ("e-p:32:32-f64:64:64")
+	,m_subtarget()
 {
-//  initAsmInfo();
+	initAsmInfo();
 }
 
 dNVMTargetMachine::~dNVMTargetMachine()
@@ -28,8 +28,7 @@ dNVMTargetMachine::~dNVMTargetMachine()
 
 const llvm::TargetSubtargetInfo *dNVMTargetMachine::getSubtargetImpl() const
 {
-	dAssert (0);
-	return NULL;
+	return &m_subtarget;
 }
 
 const llvm::TargetIntrinsicInfo *dNVMTargetMachine::getIntrinsicInfo() const 

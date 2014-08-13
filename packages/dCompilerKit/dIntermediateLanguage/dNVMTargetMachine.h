@@ -14,9 +14,7 @@
 #define _dNVMTargetMachine_H_
 
 #include "dCILstdafx.h"
-
-//#include "SparcInstrInfo.h"
-//#include "dNVMSubtarget.h"
+#include "dNVMSubtarget.h"
 
 
 class dNVMTargetMachine : public llvm::LLVMTargetMachine 
@@ -33,8 +31,8 @@ class dNVMTargetMachine : public llvm::LLVMTargetMachine
 //	TargetPassConfig *createPassConfig(PassManagerBase &PM) override;
 //	bool addCodeEmitter(PassManagerBase &PM, JITCodeEmitter &JCE) override;
 
-	//llvm::dNVMSubtarget m_subtarget;
-	//llvm::DataLayout m_dataLayout;
+	dNVMSubTarget m_subtarget;
+	
 };
 
 
