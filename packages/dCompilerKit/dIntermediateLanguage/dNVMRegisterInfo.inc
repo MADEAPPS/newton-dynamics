@@ -393,22 +393,6 @@ class NVMRegister<string NVMRegister:n = ?> {	// Register
   bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
   string NAME = ?;
 }
-class NewtonDoubleReg<string NewtonDoubleReg:n = ?, list<Register> NewtonDoubleReg:subregs = ?> {	// Register RegisterWithSubRegs
-  field bits<5> Num = { ?, ?, ?, ?, ? };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = NewtonDoubleReg:n;
-  list<string> AltNames = Register:altNames;
-  list<Register> Aliases = [];
-  list<Register> SubRegs = NewtonDoubleReg:subregs;
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
 class NoCapture<int NoCapture:argNo = ?> {	// IntrinsicProperty
   int ArgNo = NoCapture:argNo;
   string NAME = ?;
@@ -727,22 +711,6 @@ class Rj<string Rj:n = ?, Ri Rj:R = ?> {	// Register NVMRegister
   string AsmName = Rj:n;
   list<string> AltNames = Register:altNames;
   list<Register> Aliases = [Rj:R];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
-class Rp<bits<5> Rp:num = { ?, ?, ?, ?, ? }, string Rp:n = ?> {	// Register NVMRegister
-  field bits<5> Num = { Rp:num{4}, Rp:num{3}, Rp:num{2}, Rp:num{1}, Rp:num{0} };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = Rp:n;
-  list<string> AltNames = Register:altNames;
-  list<Register> Aliases = [];
   list<Register> SubRegs = [];
   list<SubRegIndex> SubRegIndices = [];
   list<RegAltNameIndex> RegAltNameIndices = [];
@@ -1193,21 +1161,37 @@ def COPY_TO_REGCLASS {	// Instruction
   bit UseNamedOperandTable = 0;
   string NAME = ?;
 }
-def CRRegs {	// DAGOperand RegisterClass
+def CTRL {	// Register NVMRegister Rc DwarfRegNum
+  field bits<5> Num = { 0, 0, 0, 0, 1 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "ctrl";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [65];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def Commutative {	// IntrinsicProperty
+  string NAME = ?;
+}
+def ControlRegs {	// DAGOperand RegisterClass
   RegAltNameIndex RegisterClass:idx = NoRegAltName;
   string Namespace = "Newton";
   list<ValueType> RegTypes = [i32];
   int Size = 32;
   int Alignment = 32;
   int CopyCost = 1;
-  dag MemberList = (add (sequence "LC%u", 0, 1), (sequence "SA%u", 0, 1), (sequence "M%u", 0, 1), PC, GP);
+  dag MemberList = (add CTRL, PC);
   RegAltNameIndex altNameIndex = NoRegAltName;
   bit isAllocatable = 1;
   list<dag> AltOrders = [];
   string AltOrderSelect = "";
-  string NAME = ?;
-}
-def Commutative {	// IntrinsicProperty
   string NAME = ?;
 }
 def DBG_VALUE {	// Instruction
@@ -1398,17 +1382,513 @@ def EXTRACT_SUBREG {	// Instruction
 def EponymousProcResourceKind {	// ProcResourceKind
   string NAME = ?;
 }
-def FP {	// Register NVMRegister Rj DwarfRegNum
-  field bits<5> Num = { 1, 1, 1, 1, 0 };
+def F0 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 0, 0, 0, 0, 0 };
   list<string> Register:altNames = [];
   string Namespace = "Newton";
-  string AsmName = "fp";
+  string AsmName = "f0";
   list<string> AltNames = [];
-  list<Register> Aliases = [R30];
+  list<Register> Aliases = [];
   list<Register> SubRegs = [];
   list<SubRegIndex> SubRegIndices = [];
   list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [30];
+  list<int> DwarfNumbers = [32];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F1 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 0, 0, 0, 0, 1 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f1";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [33];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F10 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 0, 1, 0, 1, 0 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f10";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [42];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F11 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 0, 1, 0, 1, 1 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f11";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [43];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F12 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 0, 1, 1, 0, 0 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f12";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [44];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F13 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 0, 1, 1, 0, 1 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f13";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [45];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F14 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 0, 1, 1, 1, 0 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f14";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [46];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F15 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 0, 1, 1, 1, 1 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f15";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [47];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F16 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 0, 0, 0, 0 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f16";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [48];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F17 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 0, 0, 0, 1 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f17";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [49];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F18 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 0, 0, 1, 0 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f18";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [50];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F19 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 0, 0, 1, 1 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f19";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [51];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F2 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 0, 0, 0, 1, 0 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f2";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [34];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F20 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 0, 1, 0, 0 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f20";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [52];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F21 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 0, 1, 0, 1 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f21";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [53];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F22 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 0, 1, 1, 0 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f22";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [54];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F23 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 0, 1, 1, 1 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f23";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [55];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F24 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 1, 0, 0, 0 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f24";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [56];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F25 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 1, 0, 0, 1 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f25";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [57];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F26 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 1, 0, 1, 0 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f26";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [58];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F27 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 1, 0, 1, 1 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f27";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [59];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F28 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 1, 1, 0, 0 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f28";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [60];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F29 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 1, 1, 0, 1 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f29";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [61];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F3 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 0, 0, 0, 1, 1 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f3";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [35];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F30 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 1, 1, 1, 0 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f30";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [62];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F31 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 1, 1, 1, 1 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f31";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [63];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F4 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 0, 0, 1, 0, 0 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f4";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [36];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F5 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 0, 0, 1, 0, 1 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f5";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [37];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F6 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 0, 0, 1, 1, 0 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f6";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [38];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F7 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 0, 0, 1, 1, 1 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f7";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [39];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F8 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 0, 1, 0, 0, 0 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f8";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [40];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F9 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 0, 1, 0, 0, 1 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f9";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [41];
   int CostPerUse = 0;
   bit CoveredBySubRegs = 0;
   bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -1473,22 +1953,6 @@ def GC_LABEL {	// Instruction
   string AsmMatchConverter = "";
   string TwoOperandAliasConstraint = "";
   bit UseNamedOperandTable = 0;
-  string NAME = ?;
-}
-def GP {	// Register NVMRegister Rc DwarfRegNum
-  field bits<5> Num = { 0, 1, 0, 1, 1 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "gp";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [33];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
   string NAME = ?;
 }
 def IMPLICIT_DEF {	// Instruction
@@ -1665,14 +2129,14 @@ def ImmAsmOperand {	// AsmOperandClass
   string DiagnosticType = "";
   string NAME = ?;
 }
-def IntRegs {	// DAGOperand RegisterClass
+def IntegerRegs {	// DAGOperand RegisterClass
   RegAltNameIndex RegisterClass:idx = NoRegAltName;
   string Namespace = "Newton";
-  list<ValueType> RegTypes = [i32, f32];
+  list<ValueType> RegTypes = [i32];
   int Size = 0;
   int Alignment = 32;
   int CopyCost = 1;
-  dag MemberList = (add (sequence "R%u", 0, 9), (sequence "R%u", 12, 28), R10, R11, R29, R30, R31);
+  dag MemberList = (add (sequence "r%u", 0, 31));
   RegAltNameIndex altNameIndex = NoRegAltName;
   bit isAllocatable = 1;
   list<dag> AltOrders = [];
@@ -1750,38 +2214,6 @@ def KILL {	// Instruction
   string AsmMatchConverter = "";
   string TwoOperandAliasConstraint = "";
   bit UseNamedOperandTable = 0;
-  string NAME = ?;
-}
-def LC0 {	// Register NVMRegister Rc DwarfRegNum
-  field bits<5> Num = { 0, 0, 0, 0, 1 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "lc0";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [68];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
-def LC1 {	// Register NVMRegister Rc DwarfRegNum
-  field bits<5> Num = { 0, 0, 0, 1, 1 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "lc1";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [70];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
   string NAME = ?;
 }
 def LIFETIME_END {	// Instruction
@@ -1949,54 +2381,6 @@ def LOAD_STACK_GUARD {	// Instruction
   bit UseNamedOperandTable = 0;
   string NAME = ?;
 }
-def LR {	// Register NVMRegister Rj DwarfRegNum
-  field bits<5> Num = { 1, 1, 1, 1, 1 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "lr";
-  list<string> AltNames = [];
-  list<Register> Aliases = [R31];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [31];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
-def M0 {	// Register NVMRegister Rc DwarfRegNum
-  field bits<5> Num = { 0, 0, 1, 1, 0 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "m0";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [71];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
-def M1 {	// Register NVMRegister Rc DwarfRegNum
-  field bits<5> Num = { 0, 0, 1, 1, 1 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "m1";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [72];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
 def MetadataVT {	// ValueType
   string Namespace = "MVT";
   int Size = 0;
@@ -2067,70 +2451,6 @@ def OtherVT {	// ValueType
   int Value = 0;
   string NAME = ?;
 }
-def P0 {	// Register NVMRegister Rp DwarfRegNum
-  field bits<5> Num = { 0, 0, 0, 0, 0 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "p0";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [63];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
-def P1 {	// Register NVMRegister Rp DwarfRegNum
-  field bits<5> Num = { 0, 0, 0, 0, 1 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "p1";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [64];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
-def P2 {	// Register NVMRegister Rp DwarfRegNum
-  field bits<5> Num = { 0, 0, 0, 1, 0 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "p2";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [65];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
-def P3 {	// Register NVMRegister Rp DwarfRegNum
-  field bits<5> Num = { 0, 0, 0, 1, 1 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "p3";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [66];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
 def PATCHPOINT {	// Instruction
   string Namespace = "TargetOpcode";
   dag OutOperandList = (outs unknown:$dst);
@@ -2196,7 +2516,7 @@ def PC {	// Register NVMRegister Rc DwarfRegNum
   list<Register> SubRegs = [];
   list<SubRegIndex> SubRegIndices = [];
   list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [32];
+  list<int> DwarfNumbers = [64];
   int CostPerUse = 0;
   bit CoveredBySubRegs = 0;
   bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -2255,20 +2575,6 @@ def PHI {	// Instruction
   string AsmMatchConverter = "";
   string TwoOperandAliasConstraint = "";
   bit UseNamedOperandTable = 0;
-  string NAME = ?;
-}
-def PredRegs {	// DAGOperand RegisterClass
-  RegAltNameIndex RegisterClass:idx = NoRegAltName;
-  string Namespace = "Newton";
-  list<ValueType> RegTypes = [i1];
-  int Size = 32;
-  int Alignment = 32;
-  int CopyCost = 1;
-  dag MemberList = (add (sequence "P%u", 0, 3));
-  RegAltNameIndex altNameIndex = NoRegAltName;
-  bit isAllocatable = 1;
-  list<dag> AltOrders = [];
-  string AltOrderSelect = "";
   string NAME = ?;
 }
 def R0 {	// Register NVMRegister Ri DwarfRegNum
@@ -2849,38 +3155,6 @@ def Reserved {	// ReservationKind
   int Value = 1;
   string NAME = ?;
 }
-def SA0 {	// Register NVMRegister Rc DwarfRegNum
-  field bits<5> Num = { 0, 0, 0, 0, 0 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "sa0";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [67];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
-def SA1 {	// Register NVMRegister Rc DwarfRegNum
-  field bits<5> Num = { 0, 0, 0, 1, 0 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "sa1";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [69];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
 def SDNPAssociative {	// SDNodeProperty
   string NAME = ?;
 }
@@ -3257,16 +3531,16 @@ def SETUO {	// CondCode
   string NAME = ?;
 }
 def SP {	// Register NVMRegister Rj DwarfRegNum
-  field bits<5> Num = { 1, 1, 1, 0, 1 };
+  field bits<5> Num = { 1, 1, 1, 1, 1 };
   list<string> Register:altNames = [];
   string Namespace = "Newton";
   string AsmName = "sp";
   list<string> AltNames = [];
-  list<Register> Aliases = [R29];
+  list<Register> Aliases = [R31];
   list<Register> SubRegs = [];
   list<SubRegIndex> SubRegIndices = [];
   list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [29];
+  list<int> DwarfNumbers = [31];
   int CostPerUse = 0;
   bit CoveredBySubRegs = 0;
   bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -5649,6 +5923,20 @@ def fgetsign {	// SDPatternOperator SDNode
   string SDClass = "SDNode";
   list<SDNodeProperty> Properties = [];
   SDTypeProfile TypeProfile = SDTFPToIntOp;
+  string NAME = ?;
+}
+def floatRegs {	// DAGOperand RegisterClass
+  RegAltNameIndex RegisterClass:idx = NoRegAltName;
+  string Namespace = "Newton";
+  list<ValueType> RegTypes = [f64];
+  int Size = 0;
+  int Alignment = 32;
+  int CopyCost = 1;
+  dag MemberList = (add (sequence "f%u", 0, 31));
+  RegAltNameIndex altNameIndex = NoRegAltName;
+  bit isAllocatable = 1;
+  list<dag> AltOrders = [];
+  string AltOrderSelect = "";
   string NAME = ?;
 }
 def flog2 {	// SDPatternOperator SDNode
@@ -8133,23 +8421,6 @@ def sube {	// SDPatternOperator SDNode
   string SDClass = "SDNode";
   list<SDNodeProperty> Properties = [SDNPOutGlue, SDNPInGlue];
   SDTypeProfile TypeProfile = SDTIntBinOp;
-  string NAME = ?;
-}
-def subreg_hireg {	// SubRegIndex
-  string Namespace = "Newton";
-  int Size = 32;
-  int Offset = 32;
-  list<SubRegIndex> ComposedOf = [];
-  list<SubRegIndex> CoveringSubRegIndices = [];
-  string NAME = ?;
-}
-def subreg_loreg {	// SubRegIndex
-  int SubRegIndex:offset = 0;
-  string Namespace = "Newton";
-  int Size = 32;
-  int Offset = 0;
-  list<SubRegIndex> ComposedOf = [];
-  list<SubRegIndex> CoveringSubRegIndices = [];
   string NAME = ?;
 }
 def tblockaddress {	// SDPatternOperator SDNode

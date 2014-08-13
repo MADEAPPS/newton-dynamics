@@ -19,12 +19,6 @@ let Namespace = "Newton" in
     field bits<5> Num;
   }
 
-  class NewtonDoubleReg<string n, list<Register> subregs> : RegisterWithSubRegs<n, subregs> 
-  {
-    field bits<5> Num;
-  }
-
-  // Registers are identified with 5-bit ID numbers.
   // Ri - 32-bit integer registers.
   class Ri<bits<5> num, string n> : NVMRegister<n> 
   {
@@ -33,13 +27,6 @@ let Namespace = "Newton" in
 
   // Rf - 32-bit floating-point registers.
   class Rf<bits<5> num, string n> : NVMRegister<n> 
-  {
-    let Num = num;
-  }
-
-
-  // Rp - predicate registers
-  class Rp<bits<5> num, string n> : NVMRegister<n> 
   {
     let Num = num;
   }
@@ -56,9 +43,6 @@ let Namespace = "Newton" in
     let Num = R.Num;
     let Aliases = [R];
   }
-
-  def subreg_loreg  : SubRegIndex<32>;
-  def subreg_hireg  : SubRegIndex<32, 32>;
 
   // Integer registers.
   def R0 : Ri< 0, "r0">, DwarfRegNum<[0]>;
@@ -94,47 +78,59 @@ let Namespace = "Newton" in
   def R30 : Ri<30, "r30">, DwarfRegNum<[30]>;
   def R31 : Ri<31, "r31">, DwarfRegNum<[31]>;
 
-  def SP : Rj<"sp", R29>, DwarfRegNum<[29]>;
-  def FP : Rj<"fp", R30>, DwarfRegNum<[30]>;
-  def LR : Rj<"lr", R31>, DwarfRegNum<[31]>;
+  // alias stack pointer
+  def SP : Rj<"sp", R31>, DwarfRegNum<[31]>;
 
-  
-  // Predicate registers.
-  def P0 : Rp<0, "p0">, DwarfRegNum<[63]>;
-  def P1 : Rp<1, "p1">, DwarfRegNum<[64]>;
-  def P2 : Rp<2, "p2">, DwarfRegNum<[65]>;
-  def P3 : Rp<3, "p3">, DwarfRegNum<[66]>;
+  def F0	: Rf< 0, "f0">, DwarfRegNum<[32]>;
+  def F1	: Rf< 1, "f1">, DwarfRegNum<[33]>;
+  def F2	: Rf< 2, "f2">, DwarfRegNum<[34]>;
+  def F3	: Rf< 3, "f3">, DwarfRegNum<[35]>;
+  def F4	: Rf< 4, "f4">, DwarfRegNum<[36]>;
+  def F5	: Rf< 5, "f5">, DwarfRegNum<[37]>;
+  def F6	: Rf< 6, "f6">, DwarfRegNum<[38]>;
+  def F7	: Rf< 7, "f7">, DwarfRegNum<[39]>;
+  def F8	: Rf< 8, "f8">, DwarfRegNum<[40]>;
+  def F9	: Rf< 9, "f9">, DwarfRegNum<[41]>;
+  def F10	: Rf<10, "f10">, DwarfRegNum<[42]>;
+  def F11	: Rf<11, "f11">, DwarfRegNum<[43]>;
+  def F12	: Rf<12, "f12">, DwarfRegNum<[44]>;
+  def F13	: Rf<13, "f13">, DwarfRegNum<[45]>;
+  def F14	: Rf<14, "f14">, DwarfRegNum<[46]>;
+  def F15	: Rf<15, "f15">, DwarfRegNum<[47]>;
+  def F16	: Rf<16, "f16">, DwarfRegNum<[48]>;
+  def F17	: Rf<17, "f17">, DwarfRegNum<[49]>;
+  def F18	: Rf<18, "f18">, DwarfRegNum<[50]>;
+  def F19	: Rf<19, "f19">, DwarfRegNum<[51]>;
+  def F20	: Rf<20, "f20">, DwarfRegNum<[52]>;
+  def F21	: Rf<21, "f21">, DwarfRegNum<[53]>;
+  def F22	: Rf<22, "f22">, DwarfRegNum<[54]>;
+  def F23	: Rf<23, "f23">, DwarfRegNum<[55]>;
+  def F24	: Rf<24, "f24">, DwarfRegNum<[56]>;
+  def F25	: Rf<25, "f25">, DwarfRegNum<[57]>;
+  def F26	: Rf<26, "f26">, DwarfRegNum<[58]>;
+  def F27	: Rf<27, "f27">, DwarfRegNum<[59]>;
+  def F28	: Rf<28, "f28">, DwarfRegNum<[60]>;
+  def F29	: Rf<29, "f29">, DwarfRegNum<[61]>;
+  def F30	: Rf<30, "f30">, DwarfRegNum<[62]>;
+  def F31	: Rf<31, "f31">, DwarfRegNum<[63]>;
 
   // Control registers.
-  def SA0 : Rc<0, "sa0">, DwarfRegNum<[67]>;
-  def LC0 : Rc<1, "lc0">, DwarfRegNum<[68]>;
+  def PC   : Rc<9,  "pc">, DwarfRegNum<[64]>; 
+  def CTRL : Rc<1, "ctrl">, DwarfRegNum<[65]>;
 
-  def SA1 : Rc<2, "sa1">, DwarfRegNum<[69]>;
-  def LC1 : Rc<3, "lc1">, DwarfRegNum<[70]>;
-
-  def M0 : Rc<6, "m0">, DwarfRegNum<[71]>;
-  def M1 : Rc<7, "m1">, DwarfRegNum<[72]>;
-
-  def PC : Rc<9,  "pc">, DwarfRegNum<[32]>; // is the Dwarf number correct?
-  def GP : Rc<11, "gp">, DwarfRegNum<[33]>; // is the Dwarf number correct?
 }
 
 // Register classes.
-//
-// FIXME: the register order should be defined in terms of the preferred
-// allocation order...
-//
-def IntRegs : RegisterClass<"Newton", [i32,f32], 32, (add (sequence "R%u", 0, 9), (sequence "R%u", 12, 28), R10, R11, R29, R30, R31)> 
+def IntegerRegs : RegisterClass<"Newton", [i32], 32, (add (sequence "r%u", 0, 31))> 
+{
+}
+
+def floatRegs : RegisterClass<"Newton", [f64], 32, (add (sequence "f%u", 0, 31))> 
 {
 }
 
 
-def PredRegs : RegisterClass<"Newton", [i1], 32, (add (sequence "P%u", 0, 3))>
-{
-  let Size = 32;
-}
-
-def CRRegs : RegisterClass<"Newton", [i32], 32, (add (sequence "LC%u", 0, 1), (sequence "SA%u", 0, 1), (sequence "M%u", 0, 1), PC, GP)> 
+def ControlRegs : RegisterClass<"Newton", [i32], 32, (add CTRL, PC)> 
 {
   let Size = 32;
 }
