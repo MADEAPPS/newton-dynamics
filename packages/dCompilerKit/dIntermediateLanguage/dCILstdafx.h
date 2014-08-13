@@ -33,6 +33,7 @@
 
 	#pragma warning (disable: 4100)		// 'O' : unreferenced formal parameter
 	#pragma warning (disable: 4127)		//'warning C4127: conditional expression is constant
+	#pragma warning (disable: 4510)		//'llvm::MCRegisterClass' : default constructor could not be generated
 	//#pragma warning (disable: 4480)	// nonstandard extension used: specifying underlying type for enum ''
 	//#pragma warning (disable: 4355)	//'this' : used in base member initializer list
 	#pragma warning (disable: 4244)		//'argument' : conversion from 'unsigned int' to 'unsigned short', possible loss of data
