@@ -1382,11 +1382,11 @@ def EXTRACT_SUBREG {	// Instruction
 def EponymousProcResourceKind {	// ProcResourceKind
   string NAME = ?;
 }
-def F0 {	// Register NVMRegister Rf DwarfRegNum
+def F32 {	// Register NVMRegister Rf DwarfRegNum
   field bits<5> Num = { 0, 0, 0, 0, 0 };
   list<string> Register:altNames = [];
   string Namespace = "Newton";
-  string AsmName = "f0";
+  string AsmName = "f32";
   list<string> AltNames = [];
   list<Register> Aliases = [];
   list<Register> SubRegs = [];
@@ -1398,11 +1398,11 @@ def F0 {	// Register NVMRegister Rf DwarfRegNum
   bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
   string NAME = ?;
 }
-def F1 {	// Register NVMRegister Rf DwarfRegNum
+def F33 {	// Register NVMRegister Rf DwarfRegNum
   field bits<5> Num = { 0, 0, 0, 0, 1 };
   list<string> Register:altNames = [];
   string Namespace = "Newton";
-  string AsmName = "f1";
+  string AsmName = "f33";
   list<string> AltNames = [];
   list<Register> Aliases = [];
   list<Register> SubRegs = [];
@@ -1414,171 +1414,11 @@ def F1 {	// Register NVMRegister Rf DwarfRegNum
   bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
   string NAME = ?;
 }
-def F10 {	// Register NVMRegister Rf DwarfRegNum
-  field bits<5> Num = { 0, 1, 0, 1, 0 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "f10";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [42];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
-def F11 {	// Register NVMRegister Rf DwarfRegNum
-  field bits<5> Num = { 0, 1, 0, 1, 1 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "f11";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [43];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
-def F12 {	// Register NVMRegister Rf DwarfRegNum
-  field bits<5> Num = { 0, 1, 1, 0, 0 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "f12";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [44];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
-def F13 {	// Register NVMRegister Rf DwarfRegNum
-  field bits<5> Num = { 0, 1, 1, 0, 1 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "f13";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [45];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
-def F14 {	// Register NVMRegister Rf DwarfRegNum
-  field bits<5> Num = { 0, 1, 1, 1, 0 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "f14";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [46];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
-def F15 {	// Register NVMRegister Rf DwarfRegNum
-  field bits<5> Num = { 0, 1, 1, 1, 1 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "f15";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [47];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
-def F16 {	// Register NVMRegister Rf DwarfRegNum
-  field bits<5> Num = { 1, 0, 0, 0, 0 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "f16";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [48];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
-def F17 {	// Register NVMRegister Rf DwarfRegNum
-  field bits<5> Num = { 1, 0, 0, 0, 1 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "f17";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [49];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
-def F18 {	// Register NVMRegister Rf DwarfRegNum
-  field bits<5> Num = { 1, 0, 0, 1, 0 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "f18";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [50];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
-def F19 {	// Register NVMRegister Rf DwarfRegNum
-  field bits<5> Num = { 1, 0, 0, 1, 1 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "f19";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [51];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
-def F2 {	// Register NVMRegister Rf DwarfRegNum
+def F34 {	// Register NVMRegister Rf DwarfRegNum
   field bits<5> Num = { 0, 0, 0, 1, 0 };
   list<string> Register:altNames = [];
   string Namespace = "Newton";
-  string AsmName = "f2";
+  string AsmName = "f34";
   list<string> AltNames = [];
   list<Register> Aliases = [];
   list<Register> SubRegs = [];
@@ -1590,171 +1430,11 @@ def F2 {	// Register NVMRegister Rf DwarfRegNum
   bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
   string NAME = ?;
 }
-def F20 {	// Register NVMRegister Rf DwarfRegNum
-  field bits<5> Num = { 1, 0, 1, 0, 0 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "f20";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [52];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
-def F21 {	// Register NVMRegister Rf DwarfRegNum
-  field bits<5> Num = { 1, 0, 1, 0, 1 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "f21";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [53];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
-def F22 {	// Register NVMRegister Rf DwarfRegNum
-  field bits<5> Num = { 1, 0, 1, 1, 0 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "f22";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [54];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
-def F23 {	// Register NVMRegister Rf DwarfRegNum
-  field bits<5> Num = { 1, 0, 1, 1, 1 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "f23";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [55];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
-def F24 {	// Register NVMRegister Rf DwarfRegNum
-  field bits<5> Num = { 1, 1, 0, 0, 0 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "f24";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [56];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
-def F25 {	// Register NVMRegister Rf DwarfRegNum
-  field bits<5> Num = { 1, 1, 0, 0, 1 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "f25";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [57];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
-def F26 {	// Register NVMRegister Rf DwarfRegNum
-  field bits<5> Num = { 1, 1, 0, 1, 0 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "f26";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [58];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
-def F27 {	// Register NVMRegister Rf DwarfRegNum
-  field bits<5> Num = { 1, 1, 0, 1, 1 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "f27";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [59];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
-def F28 {	// Register NVMRegister Rf DwarfRegNum
-  field bits<5> Num = { 1, 1, 1, 0, 0 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "f28";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [60];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
-def F29 {	// Register NVMRegister Rf DwarfRegNum
-  field bits<5> Num = { 1, 1, 1, 0, 1 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "f29";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [61];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
-def F3 {	// Register NVMRegister Rf DwarfRegNum
+def F35 {	// Register NVMRegister Rf DwarfRegNum
   field bits<5> Num = { 0, 0, 0, 1, 1 };
   list<string> Register:altNames = [];
   string Namespace = "Newton";
-  string AsmName = "f3";
+  string AsmName = "f35";
   list<string> AltNames = [];
   list<Register> Aliases = [];
   list<Register> SubRegs = [];
@@ -1766,43 +1446,11 @@ def F3 {	// Register NVMRegister Rf DwarfRegNum
   bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
   string NAME = ?;
 }
-def F30 {	// Register NVMRegister Rf DwarfRegNum
-  field bits<5> Num = { 1, 1, 1, 1, 0 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "f30";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [62];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
-def F31 {	// Register NVMRegister Rf DwarfRegNum
-  field bits<5> Num = { 1, 1, 1, 1, 1 };
-  list<string> Register:altNames = [];
-  string Namespace = "Newton";
-  string AsmName = "f31";
-  list<string> AltNames = [];
-  list<Register> Aliases = [];
-  list<Register> SubRegs = [];
-  list<SubRegIndex> SubRegIndices = [];
-  list<RegAltNameIndex> RegAltNameIndices = [];
-  list<int> DwarfNumbers = [63];
-  int CostPerUse = 0;
-  bit CoveredBySubRegs = 0;
-  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  string NAME = ?;
-}
-def F4 {	// Register NVMRegister Rf DwarfRegNum
+def F36 {	// Register NVMRegister Rf DwarfRegNum
   field bits<5> Num = { 0, 0, 1, 0, 0 };
   list<string> Register:altNames = [];
   string Namespace = "Newton";
-  string AsmName = "f4";
+  string AsmName = "f36";
   list<string> AltNames = [];
   list<Register> Aliases = [];
   list<Register> SubRegs = [];
@@ -1814,11 +1462,11 @@ def F4 {	// Register NVMRegister Rf DwarfRegNum
   bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
   string NAME = ?;
 }
-def F5 {	// Register NVMRegister Rf DwarfRegNum
+def F37 {	// Register NVMRegister Rf DwarfRegNum
   field bits<5> Num = { 0, 0, 1, 0, 1 };
   list<string> Register:altNames = [];
   string Namespace = "Newton";
-  string AsmName = "f5";
+  string AsmName = "f37";
   list<string> AltNames = [];
   list<Register> Aliases = [];
   list<Register> SubRegs = [];
@@ -1830,11 +1478,11 @@ def F5 {	// Register NVMRegister Rf DwarfRegNum
   bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
   string NAME = ?;
 }
-def F6 {	// Register NVMRegister Rf DwarfRegNum
+def F38 {	// Register NVMRegister Rf DwarfRegNum
   field bits<5> Num = { 0, 0, 1, 1, 0 };
   list<string> Register:altNames = [];
   string Namespace = "Newton";
-  string AsmName = "f6";
+  string AsmName = "f38";
   list<string> AltNames = [];
   list<Register> Aliases = [];
   list<Register> SubRegs = [];
@@ -1846,11 +1494,11 @@ def F6 {	// Register NVMRegister Rf DwarfRegNum
   bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
   string NAME = ?;
 }
-def F7 {	// Register NVMRegister Rf DwarfRegNum
+def F39 {	// Register NVMRegister Rf DwarfRegNum
   field bits<5> Num = { 0, 0, 1, 1, 1 };
   list<string> Register:altNames = [];
   string Namespace = "Newton";
-  string AsmName = "f7";
+  string AsmName = "f39";
   list<string> AltNames = [];
   list<Register> Aliases = [];
   list<Register> SubRegs = [];
@@ -1862,11 +1510,11 @@ def F7 {	// Register NVMRegister Rf DwarfRegNum
   bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
   string NAME = ?;
 }
-def F8 {	// Register NVMRegister Rf DwarfRegNum
+def F40 {	// Register NVMRegister Rf DwarfRegNum
   field bits<5> Num = { 0, 1, 0, 0, 0 };
   list<string> Register:altNames = [];
   string Namespace = "Newton";
-  string AsmName = "f8";
+  string AsmName = "f40";
   list<string> AltNames = [];
   list<Register> Aliases = [];
   list<Register> SubRegs = [];
@@ -1878,17 +1526,369 @@ def F8 {	// Register NVMRegister Rf DwarfRegNum
   bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
   string NAME = ?;
 }
-def F9 {	// Register NVMRegister Rf DwarfRegNum
+def F41 {	// Register NVMRegister Rf DwarfRegNum
   field bits<5> Num = { 0, 1, 0, 0, 1 };
   list<string> Register:altNames = [];
   string Namespace = "Newton";
-  string AsmName = "f9";
+  string AsmName = "f41";
   list<string> AltNames = [];
   list<Register> Aliases = [];
   list<Register> SubRegs = [];
   list<SubRegIndex> SubRegIndices = [];
   list<RegAltNameIndex> RegAltNameIndices = [];
   list<int> DwarfNumbers = [41];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F42 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 0, 1, 0, 1, 0 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f42";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [42];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F43 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 0, 1, 0, 1, 1 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f43";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [43];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F44 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 0, 1, 1, 0, 0 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f44";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [44];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F45 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 0, 1, 1, 0, 1 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f45";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [45];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F46 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 0, 1, 1, 1, 0 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f46";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [46];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F47 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 0, 1, 1, 1, 1 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f47";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [47];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F48 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 0, 0, 0, 0 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f48";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [48];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F49 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 0, 0, 0, 1 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f49";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [49];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F50 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 0, 0, 1, 0 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f50";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [50];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F51 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 0, 0, 1, 1 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f51";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [51];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F52 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 0, 1, 0, 0 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f52";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [52];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F53 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 0, 1, 0, 1 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f53";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [53];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F54 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 0, 1, 1, 0 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f54";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [54];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F55 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 0, 1, 1, 1 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f55";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [55];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F56 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 1, 0, 0, 0 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f56";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [56];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F57 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 1, 0, 0, 1 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f57";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [57];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F58 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 1, 0, 1, 0 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f58";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [58];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F59 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 1, 0, 1, 1 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f59";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [59];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F60 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 1, 1, 0, 0 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f60";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [60];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F61 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 1, 1, 0, 1 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f61";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [61];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F62 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 1, 1, 1, 0 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f62";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [62];
+  int CostPerUse = 0;
+  bit CoveredBySubRegs = 0;
+  bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  string NAME = ?;
+}
+def F63 {	// Register NVMRegister Rf DwarfRegNum
+  field bits<5> Num = { 1, 1, 1, 1, 1 };
+  list<string> Register:altNames = [];
+  string Namespace = "Newton";
+  string AsmName = "f63";
+  list<string> AltNames = [];
+  list<Register> Aliases = [];
+  list<Register> SubRegs = [];
+  list<SubRegIndex> SubRegIndices = [];
+  list<RegAltNameIndex> RegAltNameIndices = [];
+  list<int> DwarfNumbers = [63];
   int CostPerUse = 0;
   bit CoveredBySubRegs = 0;
   bits<16> HWEncoding = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -2133,7 +2133,7 @@ def IntegerRegs {	// DAGOperand RegisterClass
   RegAltNameIndex RegisterClass:idx = NoRegAltName;
   string Namespace = "Newton";
   list<ValueType> RegTypes = [i32];
-  int Size = 0;
+  int Size = 64;
   int Alignment = 32;
   int CopyCost = 1;
   dag MemberList = (add (sequence "r%u", 0, 31));
@@ -2507,7 +2507,7 @@ def PATCHPOINT {	// Instruction
   string NAME = ?;
 }
 def PC {	// Register NVMRegister Rc DwarfRegNum
-  field bits<5> Num = { 0, 1, 0, 0, 1 };
+  field bits<5> Num = { 0, 0, 0, 0, 0 };
   list<string> Register:altNames = [];
   string Namespace = "Newton";
   string AsmName = "pc";
@@ -4626,8 +4626,8 @@ def atomic_cmp_swap_16 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$cmp, node:$swap);
   dag Fragment = (atomic_cmp_swap node:$ptr, node:$cmp, node:$swap);
-  string PredicateCode = "
-  return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i16;
+  string PredicateCode = "
+  return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i16;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -4637,8 +4637,8 @@ def atomic_cmp_swap_32 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$cmp, node:$swap);
   dag Fragment = (atomic_cmp_swap node:$ptr, node:$cmp, node:$swap);
-  string PredicateCode = "
-  return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i32;
+  string PredicateCode = "
+  return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i32;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -4648,8 +4648,8 @@ def atomic_cmp_swap_64 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$cmp, node:$swap);
   dag Fragment = (atomic_cmp_swap node:$ptr, node:$cmp, node:$swap);
-  string PredicateCode = "
-  return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i64;
+  string PredicateCode = "
+  return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i64;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -4659,8 +4659,8 @@ def atomic_cmp_swap_8 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$cmp, node:$swap);
   dag Fragment = (atomic_cmp_swap node:$ptr, node:$cmp, node:$swap);
-  string PredicateCode = "
-  return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i8;
+  string PredicateCode = "
+  return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i8;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -4686,8 +4686,8 @@ def atomic_load_16 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (atomic_load node:$ptr);
-  string PredicateCode = "
-  return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i16;
+  string PredicateCode = "
+  return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i16;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -4697,8 +4697,8 @@ def atomic_load_32 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (atomic_load node:$ptr);
-  string PredicateCode = "
-  return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i32;
+  string PredicateCode = "
+  return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i32;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -4708,8 +4708,8 @@ def atomic_load_64 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (atomic_load node:$ptr);
-  string PredicateCode = "
-  return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i64;
+  string PredicateCode = "
+  return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i64;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -4719,8 +4719,8 @@ def atomic_load_8 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (atomic_load node:$ptr);
-  string PredicateCode = "
-  return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i8;
+  string PredicateCode = "
+  return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i8;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -4738,8 +4738,8 @@ def atomic_load_add_16 {	// SDPatternOperator PatFrag _16
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_add node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i16;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i16;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -4749,8 +4749,8 @@ def atomic_load_add_32 {	// SDPatternOperator PatFrag _32
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_add node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i32;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i32;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -4760,8 +4760,8 @@ def atomic_load_add_64 {	// SDPatternOperator PatFrag _64
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_add node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i64;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i64;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -4771,8 +4771,8 @@ def atomic_load_add_8 {	// SDPatternOperator PatFrag _8
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_add node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i8;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i8;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -4790,8 +4790,8 @@ def atomic_load_and_16 {	// SDPatternOperator PatFrag _16
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_and node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i16;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i16;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -4801,8 +4801,8 @@ def atomic_load_and_32 {	// SDPatternOperator PatFrag _32
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_and node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i32;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i32;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -4812,8 +4812,8 @@ def atomic_load_and_64 {	// SDPatternOperator PatFrag _64
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_and node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i64;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i64;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -4823,8 +4823,8 @@ def atomic_load_and_8 {	// SDPatternOperator PatFrag _8
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_and node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i8;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i8;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -4842,8 +4842,8 @@ def atomic_load_max_16 {	// SDPatternOperator PatFrag _16
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_max node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i16;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i16;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -4853,8 +4853,8 @@ def atomic_load_max_32 {	// SDPatternOperator PatFrag _32
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_max node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i32;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i32;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -4864,8 +4864,8 @@ def atomic_load_max_64 {	// SDPatternOperator PatFrag _64
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_max node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i64;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i64;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -4875,8 +4875,8 @@ def atomic_load_max_8 {	// SDPatternOperator PatFrag _8
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_max node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i8;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i8;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -4894,8 +4894,8 @@ def atomic_load_min_16 {	// SDPatternOperator PatFrag _16
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_min node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i16;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i16;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -4905,8 +4905,8 @@ def atomic_load_min_32 {	// SDPatternOperator PatFrag _32
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_min node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i32;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i32;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -4916,8 +4916,8 @@ def atomic_load_min_64 {	// SDPatternOperator PatFrag _64
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_min node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i64;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i64;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -4927,8 +4927,8 @@ def atomic_load_min_8 {	// SDPatternOperator PatFrag _8
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_min node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i8;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i8;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -4946,8 +4946,8 @@ def atomic_load_nand_16 {	// SDPatternOperator PatFrag _16
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_nand node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i16;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i16;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -4957,8 +4957,8 @@ def atomic_load_nand_32 {	// SDPatternOperator PatFrag _32
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_nand node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i32;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i32;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -4968,8 +4968,8 @@ def atomic_load_nand_64 {	// SDPatternOperator PatFrag _64
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_nand node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i64;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i64;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -4979,8 +4979,8 @@ def atomic_load_nand_8 {	// SDPatternOperator PatFrag _8
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_nand node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i8;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i8;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -4998,8 +4998,8 @@ def atomic_load_or_16 {	// SDPatternOperator PatFrag _16
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_or node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i16;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i16;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5009,8 +5009,8 @@ def atomic_load_or_32 {	// SDPatternOperator PatFrag _32
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_or node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i32;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i32;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5020,8 +5020,8 @@ def atomic_load_or_64 {	// SDPatternOperator PatFrag _64
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_or node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i64;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i64;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5031,8 +5031,8 @@ def atomic_load_or_8 {	// SDPatternOperator PatFrag _8
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_or node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i8;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i8;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5050,8 +5050,8 @@ def atomic_load_sub_16 {	// SDPatternOperator PatFrag _16
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_sub node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i16;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i16;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5061,8 +5061,8 @@ def atomic_load_sub_32 {	// SDPatternOperator PatFrag _32
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_sub node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i32;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i32;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5072,8 +5072,8 @@ def atomic_load_sub_64 {	// SDPatternOperator PatFrag _64
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_sub node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i64;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i64;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5083,8 +5083,8 @@ def atomic_load_sub_8 {	// SDPatternOperator PatFrag _8
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_sub node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i8;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i8;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5102,8 +5102,8 @@ def atomic_load_umax_16 {	// SDPatternOperator PatFrag _16
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_umax node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i16;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i16;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5113,8 +5113,8 @@ def atomic_load_umax_32 {	// SDPatternOperator PatFrag _32
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_umax node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i32;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i32;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5124,8 +5124,8 @@ def atomic_load_umax_64 {	// SDPatternOperator PatFrag _64
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_umax node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i64;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i64;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5135,8 +5135,8 @@ def atomic_load_umax_8 {	// SDPatternOperator PatFrag _8
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_umax node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i8;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i8;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5154,8 +5154,8 @@ def atomic_load_umin_16 {	// SDPatternOperator PatFrag _16
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_umin node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i16;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i16;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5165,8 +5165,8 @@ def atomic_load_umin_32 {	// SDPatternOperator PatFrag _32
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_umin node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i32;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i32;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5176,8 +5176,8 @@ def atomic_load_umin_64 {	// SDPatternOperator PatFrag _64
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_umin node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i64;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i64;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5187,8 +5187,8 @@ def atomic_load_umin_8 {	// SDPatternOperator PatFrag _8
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_umin node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i8;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i8;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5206,8 +5206,8 @@ def atomic_load_xor_16 {	// SDPatternOperator PatFrag _16
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_xor node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i16;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i16;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5217,8 +5217,8 @@ def atomic_load_xor_32 {	// SDPatternOperator PatFrag _32
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_xor node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i32;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i32;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5228,8 +5228,8 @@ def atomic_load_xor_64 {	// SDPatternOperator PatFrag _64
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_xor node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i64;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i64;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5239,8 +5239,8 @@ def atomic_load_xor_8 {	// SDPatternOperator PatFrag _8
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_load_xor node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i8;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i8;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5258,8 +5258,8 @@ def atomic_store_16 {	// SDPatternOperator PatFrag _16
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_store node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i16;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i16;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5269,8 +5269,8 @@ def atomic_store_32 {	// SDPatternOperator PatFrag _32
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_store node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i32;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i32;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5280,8 +5280,8 @@ def atomic_store_64 {	// SDPatternOperator PatFrag _64
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_store node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i64;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i64;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5291,8 +5291,8 @@ def atomic_store_8 {	// SDPatternOperator PatFrag _8
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_store node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i8;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i8;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5310,8 +5310,8 @@ def atomic_swap_16 {	// SDPatternOperator PatFrag _16
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_swap node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i16;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i16;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5321,8 +5321,8 @@ def atomic_swap_32 {	// SDPatternOperator PatFrag _32
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_swap node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i32;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i32;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5332,8 +5332,8 @@ def atomic_swap_64 {	// SDPatternOperator PatFrag _64
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_swap node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i64;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i64;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5343,8 +5343,8 @@ def atomic_swap_8 {	// SDPatternOperator PatFrag _8
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr, node:$val);
   dag Fragment = (atomic_swap node:$ptr, node:$val);
-  string PredicateCode = "
-    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i8;
+  string PredicateCode = "
+    return cast<AtomicSDNode>(N)->getMemoryVT() == MVT::i8;
   ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5494,8 +5494,8 @@ def cvtff {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$dty, node:$sty, node:$rd, node:$sat);
   dag Fragment = (cvt node:$val, node:$dty, node:$sty, node:$rd, node:$sat);
-  string PredicateCode = "
-       return cast<CvtRndSatSDNode>(N)->getCvtCode() == ISD::CVT_FF;
+  string PredicateCode = "
+       return cast<CvtRndSatSDNode>(N)->getCvtCode() == ISD::CVT_FF;
     ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5505,8 +5505,8 @@ def cvtfs {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$dty, node:$sty, node:$rd, node:$sat);
   dag Fragment = (cvt node:$val, node:$dty, node:$sty, node:$rd, node:$sat);
-  string PredicateCode = "
-       return cast<CvtRndSatSDNode>(N)->getCvtCode() == ISD::CVT_FS;
+  string PredicateCode = "
+       return cast<CvtRndSatSDNode>(N)->getCvtCode() == ISD::CVT_FS;
     ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5516,8 +5516,8 @@ def cvtfu {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$dty, node:$sty, node:$rd, node:$sat);
   dag Fragment = (cvt node:$val, node:$dty, node:$sty, node:$rd, node:$sat);
-  string PredicateCode = "
-       return cast<CvtRndSatSDNode>(N)->getCvtCode() == ISD::CVT_FU;
+  string PredicateCode = "
+       return cast<CvtRndSatSDNode>(N)->getCvtCode() == ISD::CVT_FU;
     ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5527,8 +5527,8 @@ def cvtsf {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$dty, node:$sty, node:$rd, node:$sat);
   dag Fragment = (cvt node:$val, node:$dty, node:$sty, node:$rd, node:$sat);
-  string PredicateCode = "
-       return cast<CvtRndSatSDNode>(N)->getCvtCode() == ISD::CVT_SF;
+  string PredicateCode = "
+       return cast<CvtRndSatSDNode>(N)->getCvtCode() == ISD::CVT_SF;
     ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5538,8 +5538,8 @@ def cvtss {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$dty, node:$sty, node:$rd, node:$sat);
   dag Fragment = (cvt node:$val, node:$dty, node:$sty, node:$rd, node:$sat);
-  string PredicateCode = "
-       return cast<CvtRndSatSDNode>(N)->getCvtCode() == ISD::CVT_SS;
+  string PredicateCode = "
+       return cast<CvtRndSatSDNode>(N)->getCvtCode() == ISD::CVT_SS;
     ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5549,8 +5549,8 @@ def cvtsu {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$dty, node:$sty, node:$rd, node:$sat);
   dag Fragment = (cvt node:$val, node:$dty, node:$sty, node:$rd, node:$sat);
-  string PredicateCode = "
-       return cast<CvtRndSatSDNode>(N)->getCvtCode() == ISD::CVT_SU;
+  string PredicateCode = "
+       return cast<CvtRndSatSDNode>(N)->getCvtCode() == ISD::CVT_SU;
     ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5560,8 +5560,8 @@ def cvtuf {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$dty, node:$sty, node:$rd, node:$sat);
   dag Fragment = (cvt node:$val, node:$dty, node:$sty, node:$rd, node:$sat);
-  string PredicateCode = "
-       return cast<CvtRndSatSDNode>(N)->getCvtCode() == ISD::CVT_UF;
+  string PredicateCode = "
+       return cast<CvtRndSatSDNode>(N)->getCvtCode() == ISD::CVT_UF;
     ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5571,8 +5571,8 @@ def cvtus {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$dty, node:$sty, node:$rd, node:$sat);
   dag Fragment = (cvt node:$val, node:$dty, node:$sty, node:$rd, node:$sat);
-  string PredicateCode = "
-       return cast<CvtRndSatSDNode>(N)->getCvtCode() == ISD::CVT_US;
+  string PredicateCode = "
+       return cast<CvtRndSatSDNode>(N)->getCvtCode() == ISD::CVT_US;
     ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5582,8 +5582,8 @@ def cvtuu {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$dty, node:$sty, node:$rd, node:$sat);
   dag Fragment = (cvt node:$val, node:$dty, node:$sty, node:$rd, node:$sat);
-  string PredicateCode = "
-       return cast<CvtRndSatSDNode>(N)->getCvtCode() == ISD::CVT_UU;
+  string PredicateCode = "
+       return cast<CvtRndSatSDNode>(N)->getCvtCode() == ISD::CVT_UU;
     ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5611,8 +5611,8 @@ def extload {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (unindexedload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getExtensionType() == ISD::EXTLOAD;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getExtensionType() == ISD::EXTLOAD;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5622,8 +5622,8 @@ def extloadf32 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (extload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getMemoryVT() == MVT::f32;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getMemoryVT() == MVT::f32;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5633,8 +5633,8 @@ def extloadf64 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (extload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getMemoryVT() == MVT::f64;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getMemoryVT() == MVT::f64;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5644,8 +5644,8 @@ def extloadi1 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (extload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getMemoryVT() == MVT::i1;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getMemoryVT() == MVT::i1;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5655,8 +5655,8 @@ def extloadi16 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (extload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getMemoryVT() == MVT::i16;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getMemoryVT() == MVT::i16;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5666,8 +5666,8 @@ def extloadi32 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (extload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getMemoryVT() == MVT::i32;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getMemoryVT() == MVT::i32;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5677,8 +5677,8 @@ def extloadi8 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (extload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getMemoryVT() == MVT::i8;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getMemoryVT() == MVT::i8;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5688,8 +5688,8 @@ def extloadvf32 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (extload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getMemoryVT().getScalarType() == MVT::f32;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getMemoryVT().getScalarType() == MVT::f32;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5699,8 +5699,8 @@ def extloadvf64 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (extload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getMemoryVT().getScalarType() == MVT::f64;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getMemoryVT().getScalarType() == MVT::f64;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5710,8 +5710,8 @@ def extloadvi1 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (extload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getMemoryVT().getScalarType() == MVT::i1;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getMemoryVT().getScalarType() == MVT::i1;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5721,8 +5721,8 @@ def extloadvi16 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (extload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getMemoryVT().getScalarType() == MVT::i16;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getMemoryVT().getScalarType() == MVT::i16;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5732,8 +5732,8 @@ def extloadvi32 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (extload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getMemoryVT().getScalarType() == MVT::i32;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getMemoryVT().getScalarType() == MVT::i32;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5743,8 +5743,8 @@ def extloadvi8 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (extload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getMemoryVT().getScalarType() == MVT::i8;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getMemoryVT().getScalarType() == MVT::i8;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -5929,8 +5929,8 @@ def floatRegs {	// DAGOperand RegisterClass
   RegAltNameIndex RegisterClass:idx = NoRegAltName;
   string Namespace = "Newton";
   list<ValueType> RegTypes = [f64];
-  int Size = 0;
-  int Alignment = 32;
+  int Size = 64;
+  int Alignment = 64;
   int CopyCost = 1;
   dag MemberList = (add (sequence "f%u", 0, 31));
   RegAltNameIndex altNameIndex = NoRegAltName;
@@ -6244,8 +6244,8 @@ def immAllOnesV {	// SDPatternOperator PatFrag PatLeaf
   SDNodeXForm PatLeaf:xform = NOOP_SDNodeXForm;
   dag Operands = (ops);
   dag Fragment = (build_vector);
-  string PredicateCode = "
-  return ISD::isBuildVectorAllOnes(N);
+  string PredicateCode = "
+  return ISD::isBuildVectorAllOnes(N);
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -6255,8 +6255,8 @@ def immAllZerosV {	// SDPatternOperator PatFrag PatLeaf
   SDNodeXForm PatLeaf:xform = NOOP_SDNodeXForm;
   dag Operands = (ops);
   dag Fragment = (build_vector);
-  string PredicateCode = "
-  return ISD::isBuildVectorAllZeros(N);
+  string PredicateCode = "
+  return ISD::isBuildVectorAllZeros(N);
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -7378,8 +7378,8 @@ def istore {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$base, node:$offset);
   dag Fragment = (ist node:$val, node:$base, node:$offset);
-  string PredicateCode = "
-  return !cast<StoreSDNode>(N)->isTruncatingStore();
+  string PredicateCode = "
+  return !cast<StoreSDNode>(N)->isTruncatingStore();
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -7389,8 +7389,8 @@ def itruncstore {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$base, node:$offset);
   dag Fragment = (ist node:$val, node:$base, node:$offset);
-  string PredicateCode = "
-  return cast<StoreSDNode>(N)->isTruncatingStore();
+  string PredicateCode = "
+  return cast<StoreSDNode>(N)->isTruncatingStore();
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -7684,8 +7684,8 @@ def load {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (unindexedload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getExtensionType() == ISD::NON_EXTLOAD;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getExtensionType() == ISD::NON_EXTLOAD;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -7749,9 +7749,9 @@ def post_store {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$ptr, node:$offset);
   dag Fragment = (istore node:$val, node:$ptr, node:$offset);
-  string PredicateCode = "
-  ISD::MemIndexedMode AM = cast<StoreSDNode>(N)->getAddressingMode();
-  return AM == ISD::POST_INC || AM == ISD::POST_DEC;
+  string PredicateCode = "
+  ISD::MemIndexedMode AM = cast<StoreSDNode>(N)->getAddressingMode();
+  return AM == ISD::POST_INC || AM == ISD::POST_DEC;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -7761,9 +7761,9 @@ def post_truncst {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$base, node:$offset);
   dag Fragment = (itruncstore node:$val, node:$base, node:$offset);
-  string PredicateCode = "
-  ISD::MemIndexedMode AM = cast<StoreSDNode>(N)->getAddressingMode();
-  return AM == ISD::POST_INC || AM == ISD::POST_DEC;
+  string PredicateCode = "
+  ISD::MemIndexedMode AM = cast<StoreSDNode>(N)->getAddressingMode();
+  return AM == ISD::POST_INC || AM == ISD::POST_DEC;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -7773,8 +7773,8 @@ def post_truncstf32 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$base, node:$offset);
   dag Fragment = (post_truncst node:$val, node:$base, node:$offset);
-  string PredicateCode = "
-  return cast<StoreSDNode>(N)->getMemoryVT() == MVT::f32;
+  string PredicateCode = "
+  return cast<StoreSDNode>(N)->getMemoryVT() == MVT::f32;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -7784,8 +7784,8 @@ def post_truncsti1 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$base, node:$offset);
   dag Fragment = (post_truncst node:$val, node:$base, node:$offset);
-  string PredicateCode = "
-  return cast<StoreSDNode>(N)->getMemoryVT() == MVT::i1;
+  string PredicateCode = "
+  return cast<StoreSDNode>(N)->getMemoryVT() == MVT::i1;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -7795,8 +7795,8 @@ def post_truncsti16 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$base, node:$offset);
   dag Fragment = (post_truncst node:$val, node:$base, node:$offset);
-  string PredicateCode = "
-  return cast<StoreSDNode>(N)->getMemoryVT() == MVT::i16;
+  string PredicateCode = "
+  return cast<StoreSDNode>(N)->getMemoryVT() == MVT::i16;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -7806,8 +7806,8 @@ def post_truncsti32 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$base, node:$offset);
   dag Fragment = (post_truncst node:$val, node:$base, node:$offset);
-  string PredicateCode = "
-  return cast<StoreSDNode>(N)->getMemoryVT() == MVT::i32;
+  string PredicateCode = "
+  return cast<StoreSDNode>(N)->getMemoryVT() == MVT::i32;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -7817,8 +7817,8 @@ def post_truncsti8 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$base, node:$offset);
   dag Fragment = (post_truncst node:$val, node:$base, node:$offset);
-  string PredicateCode = "
-  return cast<StoreSDNode>(N)->getMemoryVT() == MVT::i8;
+  string PredicateCode = "
+  return cast<StoreSDNode>(N)->getMemoryVT() == MVT::i8;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -7834,9 +7834,9 @@ def pre_store {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$base, node:$offset);
   dag Fragment = (istore node:$val, node:$base, node:$offset);
-  string PredicateCode = "
-  ISD::MemIndexedMode AM = cast<StoreSDNode>(N)->getAddressingMode();
-  return AM == ISD::PRE_INC || AM == ISD::PRE_DEC;
+  string PredicateCode = "
+  ISD::MemIndexedMode AM = cast<StoreSDNode>(N)->getAddressingMode();
+  return AM == ISD::PRE_INC || AM == ISD::PRE_DEC;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -7846,9 +7846,9 @@ def pre_truncst {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$base, node:$offset);
   dag Fragment = (itruncstore node:$val, node:$base, node:$offset);
-  string PredicateCode = "
-  ISD::MemIndexedMode AM = cast<StoreSDNode>(N)->getAddressingMode();
-  return AM == ISD::PRE_INC || AM == ISD::PRE_DEC;
+  string PredicateCode = "
+  ISD::MemIndexedMode AM = cast<StoreSDNode>(N)->getAddressingMode();
+  return AM == ISD::PRE_INC || AM == ISD::PRE_DEC;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -7858,8 +7858,8 @@ def pre_truncstf32 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$base, node:$offset);
   dag Fragment = (pre_truncst node:$val, node:$base, node:$offset);
-  string PredicateCode = "
-  return cast<StoreSDNode>(N)->getMemoryVT() == MVT::f32;
+  string PredicateCode = "
+  return cast<StoreSDNode>(N)->getMemoryVT() == MVT::f32;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -7869,8 +7869,8 @@ def pre_truncsti1 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$base, node:$offset);
   dag Fragment = (pre_truncst node:$val, node:$base, node:$offset);
-  string PredicateCode = "
-  return cast<StoreSDNode>(N)->getMemoryVT() == MVT::i1;
+  string PredicateCode = "
+  return cast<StoreSDNode>(N)->getMemoryVT() == MVT::i1;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -7880,8 +7880,8 @@ def pre_truncsti16 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$base, node:$offset);
   dag Fragment = (pre_truncst node:$val, node:$base, node:$offset);
-  string PredicateCode = "
-  return cast<StoreSDNode>(N)->getMemoryVT() == MVT::i16;
+  string PredicateCode = "
+  return cast<StoreSDNode>(N)->getMemoryVT() == MVT::i16;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -7891,8 +7891,8 @@ def pre_truncsti32 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$base, node:$offset);
   dag Fragment = (pre_truncst node:$val, node:$base, node:$offset);
-  string PredicateCode = "
-  return cast<StoreSDNode>(N)->getMemoryVT() == MVT::i32;
+  string PredicateCode = "
+  return cast<StoreSDNode>(N)->getMemoryVT() == MVT::i32;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -7902,8 +7902,8 @@ def pre_truncsti8 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$base, node:$offset);
   dag Fragment = (pre_truncst node:$val, node:$base, node:$offset);
-  string PredicateCode = "
-  return cast<StoreSDNode>(N)->getMemoryVT() == MVT::i8;
+  string PredicateCode = "
+  return cast<StoreSDNode>(N)->getMemoryVT() == MVT::i8;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -8228,8 +8228,8 @@ def sextload {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (unindexedload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getExtensionType() == ISD::SEXTLOAD;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getExtensionType() == ISD::SEXTLOAD;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -8239,8 +8239,8 @@ def sextloadi1 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (sextload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getMemoryVT() == MVT::i1;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getMemoryVT() == MVT::i1;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -8250,8 +8250,8 @@ def sextloadi16 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (sextload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getMemoryVT() == MVT::i16;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getMemoryVT() == MVT::i16;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -8261,8 +8261,8 @@ def sextloadi32 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (sextload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getMemoryVT() == MVT::i32;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getMemoryVT() == MVT::i32;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -8272,8 +8272,8 @@ def sextloadi8 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (sextload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getMemoryVT() == MVT::i8;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getMemoryVT() == MVT::i8;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -8283,8 +8283,8 @@ def sextloadvi1 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (sextload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getMemoryVT().getScalarType() == MVT::i1;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getMemoryVT().getScalarType() == MVT::i1;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -8294,8 +8294,8 @@ def sextloadvi16 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (sextload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getMemoryVT().getScalarType() == MVT::i16;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getMemoryVT().getScalarType() == MVT::i16;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -8305,8 +8305,8 @@ def sextloadvi32 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (sextload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getMemoryVT().getScalarType() == MVT::i32;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getMemoryVT().getScalarType() == MVT::i32;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -8316,8 +8316,8 @@ def sextloadvi8 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (sextload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getMemoryVT().getScalarType() == MVT::i8;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getMemoryVT().getScalarType() == MVT::i8;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -8391,8 +8391,8 @@ def store {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$ptr);
   dag Fragment = (unindexedstore node:$val, node:$ptr);
-  string PredicateCode = "
-  return !cast<StoreSDNode>(N)->isTruncatingStore();
+  string PredicateCode = "
+  return !cast<StoreSDNode>(N)->isTruncatingStore();
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -8500,8 +8500,8 @@ def truncstore {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$ptr);
   dag Fragment = (unindexedstore node:$val, node:$ptr);
-  string PredicateCode = "
-  return cast<StoreSDNode>(N)->isTruncatingStore();
+  string PredicateCode = "
+  return cast<StoreSDNode>(N)->isTruncatingStore();
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -8511,8 +8511,8 @@ def truncstoref32 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$ptr);
   dag Fragment = (truncstore node:$val, node:$ptr);
-  string PredicateCode = "
-  return cast<StoreSDNode>(N)->getMemoryVT() == MVT::f32;
+  string PredicateCode = "
+  return cast<StoreSDNode>(N)->getMemoryVT() == MVT::f32;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -8522,8 +8522,8 @@ def truncstoref64 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$ptr);
   dag Fragment = (truncstore node:$val, node:$ptr);
-  string PredicateCode = "
-  return cast<StoreSDNode>(N)->getMemoryVT() == MVT::f64;
+  string PredicateCode = "
+  return cast<StoreSDNode>(N)->getMemoryVT() == MVT::f64;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -8533,8 +8533,8 @@ def truncstorei16 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$ptr);
   dag Fragment = (truncstore node:$val, node:$ptr);
-  string PredicateCode = "
-  return cast<StoreSDNode>(N)->getMemoryVT() == MVT::i16;
+  string PredicateCode = "
+  return cast<StoreSDNode>(N)->getMemoryVT() == MVT::i16;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -8544,8 +8544,8 @@ def truncstorei32 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$ptr);
   dag Fragment = (truncstore node:$val, node:$ptr);
-  string PredicateCode = "
-  return cast<StoreSDNode>(N)->getMemoryVT() == MVT::i32;
+  string PredicateCode = "
+  return cast<StoreSDNode>(N)->getMemoryVT() == MVT::i32;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -8555,8 +8555,8 @@ def truncstorei8 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$ptr);
   dag Fragment = (truncstore node:$val, node:$ptr);
-  string PredicateCode = "
-  return cast<StoreSDNode>(N)->getMemoryVT() == MVT::i8;
+  string PredicateCode = "
+  return cast<StoreSDNode>(N)->getMemoryVT() == MVT::i8;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -8609,8 +8609,8 @@ def unindexedload {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (ld node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getAddressingMode() == ISD::UNINDEXED;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getAddressingMode() == ISD::UNINDEXED;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -8620,8 +8620,8 @@ def unindexedstore {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$val, node:$ptr);
   dag Fragment = (st node:$val, node:$ptr);
-  string PredicateCode = "
-  return cast<StoreSDNode>(N)->getAddressingMode() == ISD::UNINDEXED;
+  string PredicateCode = "
+  return cast<StoreSDNode>(N)->getAddressingMode() == ISD::UNINDEXED;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -9006,8 +9006,8 @@ def zextload {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (unindexedload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getExtensionType() == ISD::ZEXTLOAD;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getExtensionType() == ISD::ZEXTLOAD;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -9017,8 +9017,8 @@ def zextloadi1 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (zextload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getMemoryVT() == MVT::i1;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getMemoryVT() == MVT::i1;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -9028,8 +9028,8 @@ def zextloadi16 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (zextload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getMemoryVT() == MVT::i16;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getMemoryVT() == MVT::i16;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -9039,8 +9039,8 @@ def zextloadi32 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (zextload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getMemoryVT() == MVT::i32;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getMemoryVT() == MVT::i32;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -9050,8 +9050,8 @@ def zextloadi8 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (zextload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getMemoryVT() == MVT::i8;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getMemoryVT() == MVT::i8;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -9061,8 +9061,8 @@ def zextloadvi1 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (zextload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getMemoryVT().getScalarType() == MVT::i1;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getMemoryVT().getScalarType() == MVT::i1;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -9072,8 +9072,8 @@ def zextloadvi16 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (zextload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getMemoryVT().getScalarType() == MVT::i16;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getMemoryVT().getScalarType() == MVT::i16;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -9083,8 +9083,8 @@ def zextloadvi32 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (zextload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getMemoryVT().getScalarType() == MVT::i32;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getMemoryVT().getScalarType() == MVT::i32;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
@@ -9094,8 +9094,8 @@ def zextloadvi8 {	// SDPatternOperator PatFrag
   SDNodeXForm PatFrag:xform = NOOP_SDNodeXForm;
   dag Operands = (ops node:$ptr);
   dag Fragment = (zextload node:$ptr);
-  string PredicateCode = "
-  return cast<LoadSDNode>(N)->getMemoryVT().getScalarType() == MVT::i8;
+  string PredicateCode = "
+  return cast<LoadSDNode>(N)->getMemoryVT().getScalarType() == MVT::i8;
 ";
   string ImmediateCode = "";
   SDNodeXForm OperandTransform = NOOP_SDNodeXForm;
