@@ -90,11 +90,14 @@ class dCIL: public dList<dTreeAdressStmt>
 	void ResetTemporaries();
 	dListNode* NewStatement();
 
-	void BuildFromLLVMFuntions (const llvm::Function& funtion);
+	void BuildFromLLVMFunctions (const llvm::Function& funtion);
     void Optimize (llvm::Function* const function);
 
 
 	private:
+	dTreeAdressStmt::dArgType GetType (const llvm::Type* const type) const;
+	void EmitFunctionDeclaration(const llvm::Function& funtion);
+
 //	bool RemoveNop(dListNode* const functionNode);
 //	bool RemoveRedundantJumps(dListNode* const functionNode);
 

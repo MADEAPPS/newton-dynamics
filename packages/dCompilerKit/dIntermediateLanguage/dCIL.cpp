@@ -415,20 +415,16 @@ void dCIL::Optimize (llvm::Function* const function)
     m_optimizer.run(*function);
 }
 
-void dCIL::BuildFromLLVMFuntions (const llvm::Function& llvmFuntion)
+dTreeAdressStmt::dArgType dCIL::GetType (const llvm::Type* const type) const
 {
-	dCIL::dListNode* const functionNode = NewStatement();
-	const llvm::StringRef& functionName = llvmFuntion.getName();
-	const llvm::Type* const returnType = llvmFuntion.getReturnType();
-	//const llvm::FunctionType* const functionType = llvmFuntion.getFunctionType();
-	llvm::Type::TypeID returnTypeID = returnType->getTypeID();
-
 	dTreeAdressStmt::dArgType intrinsicType;
+
+	llvm::Type::TypeID returnTypeID = type->getTypeID();
 	switch (returnTypeID)
 	{
 		case llvm::Type::TypeID::IntegerTyID:
 		{
-			if (returnType->isIntegerTy (32)) {
+			if (type->isIntegerTy (32)) {
 				intrinsicType = dTreeAdressStmt::dArgType (dTreeAdressStmt::m_int);
 			} else {
 				dAssert (0);
@@ -454,11 +450,44 @@ void dCIL::BuildFromLLVMFuntions (const llvm::Function& llvmFuntion)
 		//MetadataTyID,    ///<  8: Metadata
 	}
 
+	return intrinsicType;
+}
 
+void dCIL::EmitFunctionDeclaration (const llvm::Function& llvmFunction)
+{
+	const llvm::StringRef& functionName = llvmFunction.getName();
+	const llvm::Type* const returnType = llvmFunction.getReturnType();
+	//const llvm::FunctionType* const functionType = llvmFuntion.getFunctionType();
+	llvm::Type::TypeID returnTypeID = returnType->getTypeID();
+
+	dTreeAdressStmt::dArgType intrinsicType = GetType (returnType);
+
+	dCIL::dListNode* const functionNode = NewStatement();
 	dTreeAdressStmt& function = functionNode->GetInfo();
 	function.m_instruction = dTreeAdressStmt::m_function;
 	function.m_arg0.m_label = functionName.data();
 	function.m_arg0.m_type = intrinsicType;
 	DTRACE_INTRUCTION (&function);
+
+	for (llvm::Function::const_arg_iterator iter (llvmFunction.arg_begin()); iter != llvmFunction.arg_end(); iter ++) {
+		const llvm::Argument* const argument = iter;
+		const llvm::StringRef& name = argument->getName();
+
+		const llvm::Type* const argType = argument->getType();
+		dTreeAdressStmt::dArgType intrinsicType = GetType (argType);
+
+		dCIL::dListNode* const argNode = NewStatement();
+		dTreeAdressStmt& stmt = argNode->GetInfo();
+
+		stmt.m_instruction = dTreeAdressStmt::m_argument;
+		stmt.m_arg0.m_type = intrinsicType;
+		stmt.m_arg0.m_label = name.data();
+		DTRACE_INTRUCTION (&stmt);
+	}
+}
+
+void dCIL::BuildFromLLVMFunctions (const llvm::Function& llvmFuntion)
+{
+	EmitFunctionDeclaration (llvmFuntion);
 
 }
