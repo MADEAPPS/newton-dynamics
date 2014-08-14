@@ -486,8 +486,50 @@ void dCIL::EmitFunctionDeclaration (const llvm::Function& llvmFunction)
 	}
 }
 
-void dCIL::BuildFromLLVMFunctions (const llvm::Function& llvmFuntion)
-{
-	EmitFunctionDeclaration (llvmFuntion);
 
+
+void dCIL::EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dTree<const llvm::BasicBlock*, const llvm::BasicBlock*>& visited)
+{
+	if (!visited.Find (block)) {
+		visited.Insert (block, block);
+
+		EmitBasicBlockBody (function, block);
+
+		const llvm::TerminatorInst* const teminatorIntruction = block->getTerminator();
+		int successorsCount = teminatorIntruction->getNumSuccessors();
+		for (int i = 0; i < successorsCount; i ++) { 
+			const llvm::BasicBlock* const successorBlock = teminatorIntruction->getSuccessor(i);
+			EmitBasicBlockBody (function, successorBlock, visited);
+		}
+	}
+}
+
+void dCIL::BuildFromLLVMFunctions (const llvm::Function& llvmFunction)
+{
+	// emet function decalaration
+	EmitFunctionDeclaration (llvmFunction);
+
+	// iterate over bascia block and emit teh block body
+	dTree<const llvm::BasicBlock*, const llvm::BasicBlock*> visited;
+	const llvm::BasicBlock* const entryBlock = &llvmFunction.getEntryBlock();
+	EmitBasicBlockBody (llvmFunction, entryBlock, visited);
+}
+
+
+void dCIL::EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block)
+{
+	const llvm::StringRef& blockName = block->getName ();
+
+	dCIL::dListNode* const blockLabelNode = NewStatement();
+	dTreeAdressStmt& blockLabel = blockLabelNode->GetInfo();
+	blockLabel.m_instruction = dTreeAdressStmt::m_label;
+	blockLabel.m_arg0.m_label = blockName.data();
+	DTRACE_INTRUCTION (&blockLabel);
+
+	for (llvm::BasicBlock::const_iterator iter (block->begin()); iter != block->end(); iter ++) {
+		const llvm::Instruction* const intruction = iter;
+
+		const char *xxx = intruction->getOpcodeName();
+		const char *xxx1 = intruction->getOpcodeName();
+	}
 }

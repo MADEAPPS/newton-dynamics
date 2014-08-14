@@ -186,15 +186,15 @@ int dScriptCompiler::CompileSource (const char* const source)
 		}
 		llvm::errs() << *module;
 
+		//CreateLLVMTargetMachine (module);
+
 		cil.Clear();
 		llvm::Module::FunctionListType& funtionList = module->getFunctionList();
 		for (llvm::Module::FunctionListType::iterator iter (funtionList.begin()); iter != funtionList.end(); iter ++) {
 			const llvm::Function& funtion = *iter;
 			cil.BuildFromLLVMFunctions (funtion);
 		}
-		
 
-		//CreateLLVMTargetMachine (module);
 	}
 	return 0;
 }

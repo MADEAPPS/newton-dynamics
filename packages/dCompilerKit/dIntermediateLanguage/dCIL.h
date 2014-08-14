@@ -96,7 +96,9 @@ class dCIL: public dList<dTreeAdressStmt>
 
 	private:
 	dTreeAdressStmt::dArgType GetType (const llvm::Type* const type) const;
-	void EmitFunctionDeclaration(const llvm::Function& funtion);
+	void EmitFunctionDeclaration(const llvm::Function& function);
+	void EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block);
+	void EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dTree<const llvm::BasicBlock*, const llvm::BasicBlock*>& visited);
 
 //	bool RemoveNop(dListNode* const functionNode);
 //	bool RemoveRedundantJumps(dListNode* const functionNode);
