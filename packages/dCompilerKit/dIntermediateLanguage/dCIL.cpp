@@ -488,18 +488,17 @@ void dCIL::EmitFunctionDeclaration (const llvm::Function& llvmFunction)
 
 
 
-void dCIL::EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dTree<const llvm::BasicBlock*, const llvm::BasicBlock*>& visited)
+void dCIL::EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dTree<const dCIL::dListNode*, const llvm::BasicBlock*>& visited, dList<const dCIL::dListNode*>& terminalInstructions)
 {
 	if (!visited.Find (block)) {
-		visited.Insert (block, block);
-
-		EmitBasicBlockBody (function, block);
+		const dCIL::dListNode* const blockNode = EmitBasicBlockBody (function, block, terminalInstructions);
+		visited.Insert (blockNode, block);
 
 		const llvm::TerminatorInst* const teminatorIntruction = block->getTerminator();
 		int successorsCount = teminatorIntruction->getNumSuccessors();
 		for (int i = 0; i < successorsCount; i ++) { 
 			const llvm::BasicBlock* const successorBlock = teminatorIntruction->getSuccessor(i);
-			EmitBasicBlockBody (function, successorBlock, visited);
+			EmitBasicBlockBody (function, successorBlock, visited, terminalInstructions);
 		}
 	}
 }
@@ -510,13 +509,14 @@ void dCIL::BuildFromLLVMFunctions (const llvm::Function& llvmFunction)
 	EmitFunctionDeclaration (llvmFunction);
 
 	// iterate over bascia block and emit teh block body
-	dTree<const llvm::BasicBlock*, const llvm::BasicBlock*> visited;
+	dList<const dCIL::dListNode*> terminalInstructions;
+	dTree<const dCIL::dListNode*, const llvm::BasicBlock*> visited;
 	const llvm::BasicBlock* const entryBlock = &llvmFunction.getEntryBlock();
-	EmitBasicBlockBody (llvmFunction, entryBlock, visited);
+	EmitBasicBlockBody (llvmFunction, entryBlock, visited, terminalInstructions);
 }
 
 
-void dCIL::EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block)
+const dCIL::dListNode*dCIL::EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dList<const dCIL::dListNode*>& terminalInstructions)
 {
 	const llvm::StringRef& blockName = block->getName ();
 
@@ -528,8 +528,67 @@ void dCIL::EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicB
 
 	for (llvm::BasicBlock::const_iterator iter (block->begin()); iter != block->end(); iter ++) {
 		const llvm::Instruction* const intruction = iter;
+		int opcode = intruction->getOpcode();
 
-		const char *xxx = intruction->getOpcodeName();
-		const char *xxx1 = intruction->getOpcodeName();
+		dCIL::dListNode* node = NULL;
+		switch (opcode)
+		{
+			case llvm::Instruction::Ret:
+			{
+				node = EmitReturn (intruction);
+				break;
+			}
+
+			case llvm::Instruction::ICmp:
+			{
+				node = EmitIntegerCompare (intruction);
+				break;
+			}
+
+			case llvm::Instruction::Br:
+			{
+				node = dCIL::EmitIntegerBranch (intruction);
+				break;
+			}
+
+			case llvm::Instruction::Sub:
+			{
+				node = EmitIntegerAritmetic (intruction);
+				break;
+			}
+
+				
+			default:
+				dAssert (0);
+		}
+
+		if (intruction->isTerminator()) {
+			terminalInstructions.Append (node);
+		}
 	}
+
+	return blockLabelNode;
+}
+
+dCIL::dListNode* dCIL::EmitReturn (const llvm::Instruction* const intruction) const
+{
+	return NULL;
+}
+
+dCIL::dListNode* dCIL::EmitIntegerCompare (const llvm::Instruction* const intruction) const
+{
+	return NULL;
+}
+
+dCIL::dListNode* dCIL::EmitIntegerBranch (const llvm::Instruction* const intruction) const
+{
+//		const char *xxx = intruction->getOpcodeName();
+//		const char *xxx1 = intruction->getOpcodeName();
+
+	return NULL;
+}
+
+dCIL::dListNode* dCIL::EmitIntegerAritmetic (const llvm::Instruction* const intruction) const
+{
+	return NULL;
 }
