@@ -62,7 +62,9 @@ class dDAGFunctionNode: public dDAG
 	dDAGFunctionNode(dList<dDAG*>& allNodes, dDAGTypeNode* const type, const char* const name, const char* const visibility);
 	~dDAGFunctionNode(void);
 
+	void ClearBasicBlocks ();
 	void BuildBasicBlocks(dCIL& cil, dCIL::dListNode* const functionNode);
+	
 	void AddParameter(dDAGParameterNode* const parameter);
 	void SetBody(dDAGScopeBlockNode* const body);
 	void SetModifier(dDAGFunctionModifier* const modifier);

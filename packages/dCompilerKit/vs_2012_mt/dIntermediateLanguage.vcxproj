@@ -186,10 +186,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\dIntermediateLanguage\dDataFlowGraph.cpp" />
-    <ClCompile Include="..\dIntermediateLanguage\dNVMAsmParser.cpp" />
-    <ClCompile Include="..\dIntermediateLanguage\dNVMAsmPrinter.cpp" />
-    <ClCompile Include="..\dIntermediateLanguage\dNVMSubTarget.cpp" />
-    <ClCompile Include="..\dIntermediateLanguage\dNVMTargetMachine.cpp" />
     <ClCompile Include="..\dIntermediateLanguage\dRegisterInterferenceGraph.cpp" />
     <ClCompile Include="..\dIntermediateLanguage\dTreeAdressStmt.cpp" />
   </ItemGroup>
@@ -197,10 +193,6 @@
     <ClInclude Include="..\dIntermediateLanguage\dCIL.h" />
     <ClInclude Include="..\dIntermediateLanguage\dCILstdafx.h" />
     <ClInclude Include="..\dIntermediateLanguage\dDataFlowGraph.h" />
-    <ClInclude Include="..\dIntermediateLanguage\dNVMAsmParser.h" />
-    <ClInclude Include="..\dIntermediateLanguage\dNVMAsmPrinter.h" />
-    <ClInclude Include="..\dIntermediateLanguage\dNVMSubTarget.h" />
-    <ClInclude Include="..\dIntermediateLanguage\dNVMTargetMachine.h" />
     <ClInclude Include="..\dIntermediateLanguage\dRegisterInterferenceGraph.h" />
     <ClInclude Include="..\dIntermediateLanguage\dTreeAdressStmt.h" />
   </ItemGroup>
@@ -220,28 +212,6 @@
       <Project>{b27af501-3f19-49ff-9db0-ff60b17508f6}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="..\dIntermediateLanguage\dNVMRegisterInfo.td">
-      <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(LLVM_WIN32_BUILD)/Debug/bin/llvm-tblgen.exe  -o=%(RelativeDir)%(Filename).inc  %(RelativeDir)%(Filename)%(Extension)</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">llvm-tblgen.exe %(Filename)%(Extension)</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).inc</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(LLVM_WIN32_BUILD)/Debug/bin/llvm-tblgen.exe  -o=%(RelativeDir)%(Filename).inc  %(RelativeDir)%(Filename)%(Extension)</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(LLVM_WIN32_BUILD)/Debug/bin/llvm-tblgen.exe  -o=%(RelativeDir)%(Filename).inc  %(RelativeDir)%(Filename)%(Extension)</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(LLVM_WIN32_BUILD)/Debug/bin/llvm-tblgen.exe  -o=%(RelativeDir)%(Filename).inc  %(RelativeDir)%(Filename)%(Extension)</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">llvm-tblgen.exe %(Filename)%(Extension)</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).inc</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">llvm-tblgen.exe %(Filename)%(Extension)</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).inc</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">llvm-tblgen.exe %(Filename)%(Extension)</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).inc</Outputs>
-    </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="..\dIntermediateLanguage\dNVMTarget.td">
-      <FileType>Document</FileType>
-    </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -115,6 +115,9 @@ class dScriptCompiler: public dLittleScriptParser
 	dUserVariable NewForStatement(const dUserVariable& init_exp, const dUserVariable& conditional, const dUserVariable& step_Exp, const dUserVariable& statement);
 
 
+	void CreateLLVMTargetMachine (llvm::Module* const module);
+
+
 	dString m_packageFileName;
 	dString m_packageRootDirectory;
 	dScriptPackage* m_currentPackage;

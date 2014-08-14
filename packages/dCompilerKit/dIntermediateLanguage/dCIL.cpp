@@ -18,7 +18,7 @@
 
 
 
-llvm::Target dCIL::m_target;
+//llvm::Target dCIL::m_target;
 
 dCIL::dCIL(llvm::Module* const module)
 	:dList()
@@ -49,9 +49,7 @@ dCIL::dCIL(llvm::Module* const module)
 	m_commutativeOperator[dTreeAdressStmt::m_identical] = true;
 	m_commutativeOperator[dTreeAdressStmt::m_different] = true;
 
-
-//  llvm::legacy::FunctionPassManager functionPassManager(m_module.get());
-
+	//llvm::legacy::FunctionPassManager functionPassManager(m_module.get());
     // Set up the optimizer pipeline.  Start with registering info about how the
     // target lays out data structures.
     //        functionPassManager.add(new DataLayout(*TheExecutionEngine->getDataLayout()));
@@ -72,33 +70,42 @@ dCIL::dCIL(llvm::Module* const module)
     m_optimizer.doInitialization();
 
 	// register the target
-	InitializeTargetInfo();
-	InitializeTarget();
-	InitializeTargetMC();
-	InitializeAsmPrinter();
-	InitializeMCAsmParser();
+	//InitializeTargetInfo();
+	//InitializeTarget();
+	//InitializeTargetMC();
+	//InitializeAsmPrinter();
+	//InitializeMCAsmParser();
 }
 
 dCIL::~dCIL(void)
 {
 }
 
+
+void dCIL::Clear()
+{
+	ResetTemporaries();
+	RemoveAll();
+}
+
+/*
 void dCIL::InitializeTargetInfo()
 {
-	//llvm::RegisterTarget<llvm::Triple::arm, false> Y(m_target, "arm", "ARM");
-	llvm::RegisterTarget<llvm::Triple::UnknownArch, false> X (m_target, D_VIRTUAL_MACHINE_NAME, D_VIRTUAL_MACHINE_DESCRIPTION);
+	dAssert (0);
+//	llvm::RegisterTarget<llvm::Triple::UnknownArch, false> X (m_target, D_VIRTUAL_MACHINE_NAME, D_VIRTUAL_MACHINE_DESCRIPTION);
 }
 
 void dCIL::InitializeTarget()
 {
-	llvm::RegisterTargetMachine<dNVMTargetMachine> X(m_target);
+	dAssert (0);
+//	llvm::RegisterTargetMachine<dNVMTargetMachine> X(m_target);
 }
 
 
 void dCIL::InitializeTargetMC() 
 {
   // Register the MC asm info.
-/*
+
   llvm::RegisterMCAsmInfoFn X(m_target, createSparcMCAsmInfo);
 
   // Register the MC codegen info.
@@ -127,21 +134,21 @@ void dCIL::InitializeTargetMC()
 
   // Register the MCInstPrinter
   llvm::TargetRegistry::RegisterMCInstPrinter(m_target, createSparcMCInstPrinter);
-*/
 }
 
 
 void dCIL::InitializeAsmPrinter() 
 {
-  llvm::RegisterAsmPrinter<NVMAsmPrinter> X(m_target);
+	dAssert (0);
+//  llvm::RegisterAsmPrinter<NVMAsmPrinter> X(m_target);
 }
 
 void dCIL::InitializeMCAsmParser() 
 {
-//  llvm::RegisterMCAsmParser<NVMAsmParser> X(m_target);
-	llvm::RegisterMCAsmParser<NVMAsmParser> X(m_target);
+	dAssert (0);
+//	llvm::RegisterMCAsmParser<NVMAsmParser> X(m_target);
 }
-
+*/
 
 void dCIL::ResetTemporaries()
 {
@@ -406,4 +413,10 @@ void dCIL::Optimize (llvm::Function* const function)
 {
     // Optimize the function.
     m_optimizer.run(*function);
+}
+
+void dCIL::BuildFromLLVMFuntions (const llvm::Function& funtion)
+{
+//	llvm::Function* const llvmFunction = CreateLLVMfuntionPrototype (symbols, cil, module, context);
+
 }

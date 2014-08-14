@@ -82,6 +82,7 @@ class dCIL: public dList<dTreeAdressStmt>
 	dCIL(llvm::Module* const module);
 	virtual ~dCIL(void);
 
+	void Clear();
 	void Trace();
 
 	dString NewTemp (); 
@@ -89,20 +90,19 @@ class dCIL: public dList<dTreeAdressStmt>
 	void ResetTemporaries();
 	dListNode* NewStatement();
 
-
+	void BuildFromLLVMFuntions (const llvm::Function& funtion);
     void Optimize (llvm::Function* const function);
-//	void ConvertToLLVM (llvm::Module* const module, llvm::LLVMContext &Context);
-//	void Optimize (dListNode* const functionNode, int argumentInRegisters, dReturnType returnType);
-//	void Optimize (dListNode* const functionNode, int argumentInRegisters);
+
+
 	private:
 //	bool RemoveNop(dListNode* const functionNode);
 //	bool RemoveRedundantJumps(dListNode* const functionNode);
 
-	void InitializeTarget();
-	void InitializeTargetMC();
-	void InitializeTargetInfo();
-	void InitializeAsmPrinter();
-	void InitializeMCAsmParser();
+//	void InitializeTarget();
+//	void InitializeTargetMC();
+//	void InitializeTargetInfo();
+//	void InitializeAsmPrinter();
+//	void InitializeMCAsmParser();
 
 	int m_mark;
 	int m_tempIndex;
@@ -112,7 +112,7 @@ class dCIL: public dList<dTreeAdressStmt>
 	dTreeAdressStmt::dOperator m_operatorComplement[dTreeAdressStmt::m_operatorsCount];
 
 	//dNVMTragetMacrhine m_targetMachile;
-	static llvm::Target m_target;
+	//static llvm::Target m_target;
     llvm::legacy::FunctionPassManager m_optimizer;
 	
 	friend dDataFlowGraph;

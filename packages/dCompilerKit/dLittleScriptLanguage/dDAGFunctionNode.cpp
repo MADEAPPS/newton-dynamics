@@ -200,11 +200,15 @@ void dDAGFunctionNode::CompileCIL(dCIL& cil)
 	m_body->CompileCIL(cil);
 }
 
+void dDAGFunctionNode::ClearBasicBlocks ()
+{
+	m_basicBlocks.RemoveAll();
+}
 
 void dDAGFunctionNode::BuildBasicBlocks(dCIL& cil, dCIL::dListNode* const functionNode)
 {
 	// build leading block map table
-	m_basicBlocks.RemoveAll();
+	void ClearBasicBlocks ();
 
 	// remove redundant jumps
 	dCIL::dListNode* nextNode;
@@ -513,7 +517,7 @@ void dDAGFunctionNode::TranslateLLVMBlock (dSymbols& symbols, const LLVMBlockScr
 	dCIL::dListNode* const endNode = block.m_end->GetNext();
 	for (dCIL::dListNode* argNode = block.m_begin->GetNext(); argNode != endNode; argNode = argNode->GetNext()) {
 		const dTreeAdressStmt& stmt = argNode->GetInfo();
-		DTRACE_INTRUCTION (&stmt);
+//		DTRACE_INTRUCTION (&stmt);
 		dAssert (stmt.m_instruction != dTreeAdressStmt::m_label);	
 
 		switch (stmt.m_instruction)
@@ -590,6 +594,7 @@ void dDAGFunctionNode::TranslateToLLVM (dCIL& cil, llvm::Module* const module, l
 		const LLVMBlockScripBlockPair& pair = node->GetInfo();
 		TranslateLLVMBlock (symbols, pair, llvmFunction, cil, module, context);
 	}
+	ClearBasicBlocks();
 
     // Validate the generated code, checking for consistency.
     dAssert (!llvm::verifyFunction(*llvmFunction));

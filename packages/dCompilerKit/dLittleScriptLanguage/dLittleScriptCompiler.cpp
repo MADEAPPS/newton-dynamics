@@ -172,7 +172,7 @@ int dScriptCompiler::CompileSource (const char* const source)
 			scripClass->CompileCIL (cil);
 //			dTrace(("\n"));
 //			dTrace(("optimized version\n"));
-//			cil.Trace();
+			cil.Trace();
 
 			scripClass->TranslateToLLVM (cil, module, m_context);
 
@@ -186,49 +186,54 @@ int dScriptCompiler::CompileSource (const char* const source)
 		}
 		llvm::errs() << *module;
 
+		cil.Clear();
+		llvm::Module::FunctionListType& funtionList = module->getFunctionList();
+		for (llvm::Module::FunctionListType::iterator iter (funtionList.begin()); iter; iter ++) {
+			const llvm::Function& funtion = *iter;
+			cil.BuildFromLLVMFuntions (funtion);
+		}
+		
 
-		std::string error; 
-		const std::string archName (D_VIRTUAL_MACHINE_NAME);
-		const llvm::Target* const target = llvm::TargetRegistry::lookupTarget(archName, error);
-		dAssert (target);
+		//CreateLLVMTargetMachine (module);
+	}
+	return 0;
+}
 
-		llvm::StringRef mcpu("");
-		llvm::StringRef triple("");
-		llvm::StringRef feature("");
-		llvm::TargetOptions options;
+void dScriptCompiler::CreateLLVMTargetMachine (llvm::Module* const module)
+{
+	std::string error; 
+	const std::string archName (D_VIRTUAL_MACHINE_NAME);
+	const llvm::Target* const target = llvm::TargetRegistry::lookupTarget(archName, error);
+	dAssert (target);
+
+	llvm::StringRef mcpu("");
+	llvm::StringRef triple("");
+	llvm::StringRef feature("");
+	llvm::TargetOptions options;
 //		InitTargetOptionsFromCodeGenFlags();
 //		options.DisableIntegratedAS = NoIntegratedAssembler;
 //		options.MCOptions.ShowMCEncoding = ShowMCEncoding;
 //		options.MCOptions.MCUseDwarfDirectory = EnableDwarfDirectory;
 //		options.MCOptions.AsmVerbose = AsmVerbose;
 		
-		std::unique_ptr<llvm::TargetMachine> targetMachinePtr(target->createTargetMachine(triple, mcpu, feature, options));
-		dAssert (targetMachinePtr.get());
-		llvm::TargetMachine &targetMachine = *targetMachinePtr.get();
+	std::unique_ptr<llvm::TargetMachine> targetMachinePtr(target->createTargetMachine(triple, mcpu, feature, options));
+	dAssert (targetMachinePtr.get());
+	llvm::TargetMachine &targetMachine = *targetMachinePtr.get();
 
-		llvm::legacy::PassManager passManager;
+	llvm::legacy::PassManager passManager;
 
-		// Newton Virtual machine does no have subtarget 
-		const llvm::DataLayout* const dataLayout = targetMachine.getSubtargetImpl()->getDataLayout();
-		dAssert (dataLayout);
-		m_module->setDataLayout(dataLayout);
+	// Newton Virtual machine does no have subtarget 
+	const llvm::DataLayout* const dataLayout = targetMachine.getSubtargetImpl()->getDataLayout();
+	dAssert (dataLayout);
+	m_module->setDataLayout(dataLayout);
 
-		passManager.add(new llvm::DataLayoutPass(module));
+	passManager.add(new llvm::DataLayoutPass(module));
 
-		llvm::formatted_raw_ostream outputStream;
-		targetMachine.addPassesToEmitFile (passManager, outputStream, llvm::TargetMachine::CGFT_AssemblyFile, false, NULL, NULL);
-
-
-
-		passManager.run(*module);
-
-		
-
-
-
-	}
-	return 0;
+	llvm::formatted_raw_ostream outputStream;
+	targetMachine.addPassesToEmitFile (passManager, outputStream, llvm::TargetMachine::CGFT_AssemblyFile, false, NULL, NULL);
+	passManager.run(*module);
 }
+
 
 void dScriptCompiler::ImportClass (const dString& className)
 {
