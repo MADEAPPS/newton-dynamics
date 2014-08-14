@@ -15,9 +15,9 @@
 #include "dNVMSubTarget.h"
 
 
-dNVMSubTarget::dNVMSubTarget()
+dNVMSubTarget::dNVMSubTarget(llvm::StringRef TT, llvm::StringRef CPU, llvm::StringRef FS, const llvm::TargetMachine &targetMachine, const llvm::TargetOptions &options)
 	:llvm::TargetSubtargetInfo()
-	,m_dataLayout ("e-p:32:32-f64:64:64")
+	,m_dataLayout ("e-p:32:32:32-i8:8:32-i16:16:32-i32:32:32-i64:64:64-f32:32:64-f64:64:64")
 {
 }
 

@@ -89,6 +89,15 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
+    <CustomBuild>
+      <Command>$(LLVM_WIN32_BUILD)/Debug/bin/llvm-tblgen.exe  -gen-subtarget -o=%(RelativeDir)%(Filename).inc  %(RelativeDir)%(Filename)%(Extension)</Command>
+    </CustomBuild>
+    <CustomBuild>
+      <Message>llvm-tblgen.exe %(Filename)%(Extension)</Message>
+    </CustomBuild>
+    <CustomBuild>
+      <Outputs>%(Filename).inc</Outputs>
+    </CustomBuild>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Midl>
@@ -107,6 +116,15 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
+    <CustomBuild>
+      <Command>$(LLVM_WIN32_BUILD)/Debug/bin/llvm-tblgen.exe  -gen-subtarget -o=%(RelativeDir)%(Filename).inc  %(RelativeDir)%(Filename)%(Extension)</Command>
+    </CustomBuild>
+    <CustomBuild>
+      <Message>llvm-tblgen.exe %(Filename)%(Extension)</Message>
+    </CustomBuild>
+    <CustomBuild>
+      <Outputs>%(Filename).inc</Outputs>
+    </CustomBuild>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -122,6 +140,15 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
+    <CustomBuild>
+      <Command>$(LLVM_WIN32_BUILD)/Debug/bin/llvm-tblgen.exe  -gen-subtarget -o=%(RelativeDir)%(Filename).inc  %(RelativeDir)%(Filename)%(Extension)</Command>
+    </CustomBuild>
+    <CustomBuild>
+      <Message>llvm-tblgen.exe %(Filename)%(Extension)</Message>
+    </CustomBuild>
+    <CustomBuild>
+      <Outputs>%(Filename).inc</Outputs>
+    </CustomBuild>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Midl>
@@ -140,6 +167,15 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
+    <CustomBuild>
+      <Command>$(LLVM_WIN32_BUILD)/Debug/bin/llvm-tblgen.exe  -gen-subtarget -o=%(RelativeDir)%(Filename).inc  %(RelativeDir)%(Filename)%(Extension)</Command>
+    </CustomBuild>
+    <CustomBuild>
+      <Message>llvm-tblgen.exe %(Filename)%(Extension)</Message>
+    </CustomBuild>
+    <CustomBuild>
+      <Outputs>%(Filename).inc</Outputs>
+    </CustomBuild>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\dIntermediateLanguage\dCIL.cpp" />
@@ -203,7 +239,9 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\dIntermediateLanguage\dNVMRegisterInfo.inc" />
+    <CustomBuild Include="..\dIntermediateLanguage\dNVMTarget.td">
+      <FileType>Document</FileType>
+    </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

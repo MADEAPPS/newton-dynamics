@@ -14,9 +14,9 @@
 
 //dNVMSubtarget(const std::string &TT, const std::string &CPU, const std::string &FS, llvm::TargetMachine &TM);
 
-dNVMTargetMachine::dNVMTargetMachine(const llvm::Target &T, llvm::StringRef TT, llvm::StringRef CPU, llvm::StringRef FS, const llvm::TargetOptions &options, llvm::Reloc::Model RM, llvm::CodeModel::Model CM, llvm::CodeGenOpt::Level OL)
+dNVMTargetMachine::dNVMTargetMachine (const llvm::Target &T, llvm::StringRef TT, llvm::StringRef CPU, llvm::StringRef FS, const llvm::TargetOptions &options, llvm::Reloc::Model RM, llvm::CodeModel::Model CM, llvm::CodeGenOpt::Level OL)
 	:LLVMTargetMachine(T, TT, CPU, FS, options, RM, CM, OL)
-	,m_subtarget()
+	,m_subtarget(TT, CPU, FS, *this, options)
 {
 	initAsmInfo();
 }

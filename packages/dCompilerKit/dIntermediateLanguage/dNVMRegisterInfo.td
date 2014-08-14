@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2009> <nvm Game Dynamics>
 *
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -12,33 +12,33 @@
 
 include "../dIntermediateLanguage/Target.td"
 
-let Namespace = "Newton" in 
+let Namespace = "nvm" in 
 {
-	  class NVMRegister<string n> : Register<n> 
+	  class nvmRegister<string n> : Register<n> 
 	  {
 		field bits<5> Num;
 	  }
 
 	  // Ri - 32-bit integer registers.
-	  class Ri<bits<5> num, string n> : NVMRegister<n> 
+	  class Ri<bits<5> num, string n> : nvmRegister<n> 
 	  {
 		let Num = num;
 	  }
 
 	  // Rf - 64-bit floating-point register.
-	  class Rf<bits<5> num, string n> : NVMRegister<n> 
+	  class Rf<bits<5> num, string n> : nvmRegister<n> 
 	  {
 		let Num = num;
 	  }
 
 	  // Rc - control registers
-	  class Rc<bits<5> num, string n> : NVMRegister<n> 
+	  class Rc<bits<5> num, string n> : nvmRegister<n> 
 	  {
 		let Num = num;
 	  }
 
 	  // Rj - aliased integer registers
-	  class Rj<string n, Ri R>: NVMRegister<n> 
+	  class Rj<string n, Ri R>: nvmRegister<n> 
 	  {
 		let Num = R.Num;
 		let Aliases = [R];
@@ -61,17 +61,17 @@ let Namespace = "Newton" in
 }
 
 // Register classes.
-def IntegerRegs : RegisterClass<"Newton", [i32], 32, (add (sequence "r%u", 0, 31))> 
+def IntegerRegs : RegisterClass<"nvm", [i32], 32, (add (sequence "r%u", 0, 31))> 
 {
 	let Size = 64;
 }
 
-def floatRegs : RegisterClass<"Newton", [f64], 64, (add (sequence "f%u", 0, 31))> 
+def floatRegs : RegisterClass<"nvm", [f64], 64, (add (sequence "f%u", 0, 31))> 
 {
 	let Size = 64;
 }
 
-def ControlRegs : RegisterClass<"Newton", [i32], 32, (add CTRL, PC)> 
+def ControlRegs : RegisterClass<"nvm", [i32], 32, (add CTRL, PC)> 
 {
 	let Size = 32;
 }

@@ -20,7 +20,7 @@
 class dNVMTargetMachine : public llvm::LLVMTargetMachine 
 {
 	public:
-	dNVMTargetMachine(const llvm::Target &T, llvm::StringRef TT, llvm::StringRef CPU, llvm::StringRef FS, const llvm::TargetOptions &options, llvm::Reloc::Model RM, llvm::CodeModel::Model CM, llvm::CodeGenOpt::Level OL);
+	dNVMTargetMachine (const llvm::Target &T, llvm::StringRef TT, llvm::StringRef CPU, llvm::StringRef FS, const llvm::TargetOptions &options, llvm::Reloc::Model RM, llvm::CodeModel::Model CM, llvm::CodeGenOpt::Level OL);
 	~dNVMTargetMachine();
 
 	const llvm::TargetSubtargetInfo *getSubtargetImpl() const;

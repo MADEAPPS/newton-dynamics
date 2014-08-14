@@ -20,7 +20,7 @@
 class dNVMSubTarget: public llvm::TargetSubtargetInfo
 {
 	public:
-	dNVMSubTarget();
+	dNVMSubTarget (llvm::StringRef TT, llvm::StringRef CPU, llvm::StringRef FS, const llvm::TargetMachine &targetMachine, const llvm::TargetOptions &options);
 	~dNVMSubTarget();
 
 
