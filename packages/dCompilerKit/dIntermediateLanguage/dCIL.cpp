@@ -415,8 +415,50 @@ void dCIL::Optimize (llvm::Function* const function)
     m_optimizer.run(*function);
 }
 
-void dCIL::BuildFromLLVMFuntions (const llvm::Function& funtion)
+void dCIL::BuildFromLLVMFuntions (const llvm::Function& llvmFuntion)
 {
-//	llvm::Function* const llvmFunction = CreateLLVMfuntionPrototype (symbols, cil, module, context);
+	dCIL::dListNode* const functionNode = NewStatement();
+	const llvm::StringRef& functionName = llvmFuntion.getName();
+	const llvm::Type* const returnType = llvmFuntion.getReturnType();
+	//const llvm::FunctionType* const functionType = llvmFuntion.getFunctionType();
+	llvm::Type::TypeID returnTypeID = returnType->getTypeID();
+
+	dTreeAdressStmt::dArgType intrinsicType;
+	switch (returnTypeID)
+	{
+		case llvm::Type::TypeID::IntegerTyID:
+		{
+			if (returnType->isIntegerTy (32)) {
+				intrinsicType = dTreeAdressStmt::dArgType (dTreeAdressStmt::m_int);
+			} else {
+				dAssert (0);
+			}
+			break;
+		}
+
+		default:
+		{
+			dAssert (0);
+			break;
+		}
+
+
+		//VoidTyID = 0,    ///<  0: type with no size
+		//HalfTyID,        ///<  1: 16-bit floating point type
+		//FloatTyID,       ///<  2: 32-bit floating point type
+		//DoubleTyID,      ///<  3: 64-bit floating point type
+		//X86_FP80TyID,    ///<  4: 80-bit floating point type (X87)
+		//FP128TyID,       ///<  5: 128-bit floating point type (112-bit mantissa)
+		//PPC_FP128TyID,   ///<  6: 128-bit floating point type (two 64-bits, PowerPC)
+		//LabelTyID,       ///<  7: Labels
+		//MetadataTyID,    ///<  8: Metadata
+	}
+
+
+	dTreeAdressStmt& function = functionNode->GetInfo();
+	function.m_instruction = dTreeAdressStmt::m_function;
+	function.m_arg0.m_label = functionName.data();
+	function.m_arg0.m_type = intrinsicType;
+	DTRACE_INTRUCTION (&function);
 
 }
