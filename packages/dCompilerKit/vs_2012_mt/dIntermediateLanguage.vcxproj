@@ -178,6 +178,7 @@
     </CustomBuild>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\dIntermediateLanguage\dBasicBlockList.cpp" />
     <ClCompile Include="..\dIntermediateLanguage\dCIL.cpp" />
     <ClCompile Include="..\dIntermediateLanguage\dCILstdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -190,6 +191,7 @@
     <ClCompile Include="..\dIntermediateLanguage\dTreeAdressStmt.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\dIntermediateLanguage\dBasicBlockList.h" />
     <ClInclude Include="..\dIntermediateLanguage\dCIL.h" />
     <ClInclude Include="..\dIntermediateLanguage\dCILstdafx.h" />
     <ClInclude Include="..\dIntermediateLanguage\dDataFlowGraph.h" />

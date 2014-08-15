@@ -32,7 +32,7 @@ dDAGFunctionNode::dDAGFunctionNode(dList<dDAG*>& allNodes, dDAGTypeNode* const t
 	,m_body(NULL)
 	,m_modifier(NULL)
 	,m_functionStart(NULL)
-	,m_basicBlocks()
+//	,m_basicBlocks____()
 	,m_parameters() 
 	,m_blockMap()
 {
@@ -200,6 +200,7 @@ void dDAGFunctionNode::CompileCIL(dCIL& cil)
 	m_body->CompileCIL(cil);
 }
 
+/*
 void dDAGFunctionNode::ClearBasicBlocks ()
 {
 	m_basicBlocks.RemoveAll();
@@ -249,6 +250,7 @@ void dDAGFunctionNode::BuildBasicBlocks(dCIL& cil, dCIL::dListNode* const functi
 		} 
 	}
 }
+*/
 
 llvm::Function* dDAGFunctionNode::CreateLLVMfuntionPrototype (dSymbols& symbols, dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context)
 {
@@ -325,7 +327,8 @@ llvm::Value* dDAGFunctionNode::GetLLVMConstantOrValue (dSymbols& symbols, const 
 
 void dDAGFunctionNode::CreateLLVMBasicBlocks (llvm::Function* const function, dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context)
 {
-	for (dList<dBasicBlock>::dListNode* blockNode = m_basicBlocks.GetFirst(); blockNode; blockNode = blockNode->GetNext()) {
+	dBasicBlocksList basicBlocks (cil, m_functionStart);
+	for (dList<dBasicBlock>::dListNode* blockNode = basicBlocks.GetFirst(); blockNode; blockNode = blockNode->GetNext()) {
 		dBasicBlock& block = blockNode->GetInfo();
 		dCIL::dListNode* const blockNameNode = block.m_begin;
 		const dTreeAdressStmt& blockStmt = blockNameNode->GetInfo();
@@ -594,7 +597,6 @@ void dDAGFunctionNode::TranslateToLLVM (dCIL& cil, llvm::Module* const module, l
 		const LLVMBlockScripBlockPair& pair = node->GetInfo();
 		TranslateLLVMBlock (symbols, pair, llvmFunction, cil, module, context);
 	}
-	ClearBasicBlocks();
 
     // Validate the generated code, checking for consistency.
     dAssert (!llvm::verifyFunction(*llvmFunction));

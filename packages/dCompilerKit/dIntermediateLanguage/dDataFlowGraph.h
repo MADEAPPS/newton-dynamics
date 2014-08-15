@@ -15,7 +15,7 @@
 
 #include "dCILstdafx.h"
 #include "dTreeAdressStmt.h"
-
+#include "dBasicBlockList.h"
 
 inline dString IndexToRegister(int index)
 {
@@ -42,7 +42,6 @@ class dRegisterInterferenceGraph;
 class dDataFlowGraph 
 {
 	public:
-
 	class dDataFlowPoint
 	{
 		public:
@@ -142,44 +141,6 @@ class dDataFlowGraph
 		dVariableSet<dCIL::dListNode*> m_reachStmtInputSet;
 		dVariableSet<dCIL::dListNode*> m_reachStmtOutputSet;
 	};
-
-
-
-	class dBasicBlock
-	{
-		public:
-		dBasicBlock (dCIL::dListNode* const begin)
-			:m_mark (0)
-			,m_begin (begin)
-			,m_end(NULL)
-		{
-		}
-		void Trace() const;
-
-		int m_mark;
-		dCIL::dListNode* m_begin;
-		dCIL::dListNode* m_end;
-	};
-
-	class dBasicBlocks: public dList<dBasicBlock> 
-	{
-		public:
-		dBasicBlocks()
-			:dList<dBasicBlock> ()
-		{
-		}
-/*
-		void Trace() const
-		{
-			#ifdef TRACE_INTERMEDIATE_CODE
-				for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
-					node->GetInfo().Trace();
-				}
-			#endif
-		}
-*/
-	};
-
 
 	class dLoop 
 	{
@@ -285,7 +246,7 @@ class dDataFlowGraph
 //	dCIL::dReturnType m_returnType;
 	dString m_returnVariableName;
 	dCIL::dListNode* m_function;
-	dBasicBlocks m_basicBlocks; 
+	dBasicBlocksList m_basicBlocks; 
 	dList<dBasicBlock*> m_traversalBlocksOrder; 
 	dTree<dDataFlowPoint, dCIL::dListNode*> m_dataFlowGraph;
 	dTree<dList<dCIL::dListNode*>, dString> m_variableDefinitions;

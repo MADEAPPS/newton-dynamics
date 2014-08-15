@@ -27,6 +27,7 @@
 #include <dCILstdafx.h>
 #include <dRefCounter.h>
 #include <dDataFlowGraph.h>
+#include <dBasicBlockList.h>
 #include <dVirtualMachine.h>
 #include <dTreeAdressStmt.h>
 #include <dContainersStdAfx.h>

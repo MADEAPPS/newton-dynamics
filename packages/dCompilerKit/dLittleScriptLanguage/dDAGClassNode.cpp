@@ -146,7 +146,6 @@ void dDAGClassNode::CompileCIL(dCIL& cil)
 
 		//cil.Optimize(functionNode->GetNext(), function->m_argumentsCount, returnType);
 		//cil.Optimize(functionNode->GetNext(), 0, returnType);
-		function->BuildBasicBlocks (cil, functionNode->GetNext());
 	}
 }
 

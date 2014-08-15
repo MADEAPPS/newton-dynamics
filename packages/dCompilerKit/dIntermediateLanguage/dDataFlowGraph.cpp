@@ -34,67 +34,14 @@ dDataFlowGraph::~dDataFlowGraph(void)
 
 void dDataFlowGraph::BuildBasicBlockGraph()
 {
-    dAssert (0);
-/*
+	m_basicBlocks.Clear();
+	m_basicBlocks.Build (*m_cil, m_function);
+
 	// build leading block map table
-	m_basicBlocks.RemoveAll();
 	m_dataFlowGraph.RemoveAll();
 
-	dTree<dList<dBasicBlock>::dListNode*, dCIL::dListNode*> blocksMap;
-
-	dList<dBasicBlock>::dListNode* const root = m_basicBlocks.Append(dBasicBlock(m_function));
-	blocksMap.Insert(root, m_function);
-	dBasicBlock* last = &root->GetInfo();
-
-	for (dCIL::dListNode* node = m_function->GetNext(); node; node = node->GetNext()) {
-		const dTreeAdressStmt& stmt = node->GetInfo();
-		switch (stmt.m_instruction) 
-		{
-			case dTreeAdressStmt::m_label:
-			{
-				last->m_end = node->GetPrev();
-				dList<dBasicBlock>::dListNode* const root = m_basicBlocks.Append(dBasicBlock(node));
-				blocksMap.Insert(root, node);
-				last = &root->GetInfo();
-				break;
-			}
-
-			case dTreeAdressStmt::m_if:
-			{
-				dCIL::dListNode* const nextNode = node->GetNext();
-				const dTreeAdressStmt& stmt = nextNode->GetInfo();
-				if (stmt.m_instruction != dTreeAdressStmt::m_label) {
-					last->m_end = node;
-					dList<dBasicBlock>::dListNode* const root = m_basicBlocks.Append(dBasicBlock(nextNode));
-					blocksMap.Insert(root, nextNode);
-					last = &root->GetInfo();
-				}
-				break;
-			}
-
-			default:
-			{
-				const dTreeAdressStmt& prevInst = node->GetPrev()->GetInfo();
-				if ((prevInst.m_instruction == dTreeAdressStmt::m_if) && !blocksMap.Find(node)) {
-					last->m_end = node->GetPrev();
-					dList<dBasicBlock>::dListNode* const root = m_basicBlocks.Append(dBasicBlock(node));
-					blocksMap.Insert(root, node);
-					last = &root->GetInfo();
-				}
-				break;
-			}
-		}
-	}
-
-	last->m_end = m_cil->GetLast();
-	while (last->m_end->GetInfo().m_instruction != dTreeAdressStmt::m_ret) {
-		last->m_end = last->m_end->GetPrev();
-	}
-	dAssert (last->m_end->GetInfo().m_instruction == dTreeAdressStmt::m_ret);
-
-
 	dTree<dBasicBlock*, dCIL::dListNode*> blockMap;
-	for (dList<dBasicBlock>::dListNode* blockNode = m_basicBlocks.GetFirst(); blockNode; blockNode = blockNode->GetNext()) {
+	for (dBasicBlocksList::dListNode* blockNode = m_basicBlocks.GetFirst(); blockNode; blockNode = blockNode->GetNext()) {
 		dBasicBlock& block = blockNode->GetInfo();
 
 		blockMap.Insert(&block, block.m_begin);
@@ -132,24 +79,28 @@ void dDataFlowGraph::BuildBasicBlockGraph()
 
 			if (stmt.m_instruction == dTreeAdressStmt::m_if) {
 				dAssert (m_dataFlowGraph.Find(block->m_end));
-				dAssert (m_dataFlowGraph.Find(stmt.m_jmpTarget));
-				dAssert (blockMap.Find(stmt.m_jmpTarget));
+				dAssert (m_dataFlowGraph.Find(stmt.m_trueTargetJump));
+				dAssert (m_dataFlowGraph.Find(stmt.m_falseTargetJump));
+				dAssert (blockMap.Find(stmt.m_trueTargetJump));
+				dAssert (blockMap.Find(stmt.m_falseTargetJump));
 				dAssert (m_dataFlowGraph.Find(block->m_end->GetNext()));
 				dAssert (blockMap.Find(block->m_end->GetNext()));
 
 				dDataFlowPoint* const graphStatement = &m_dataFlowGraph.Find(block->m_end)->GetInfo();
-				dDataFlowPoint* const child0 = &m_dataFlowGraph.Find(stmt.m_jmpTarget)->GetInfo();
-				dDataFlowPoint* const child1 = &m_dataFlowGraph.Find(block->m_end->GetNext())->GetInfo();
+				dDataFlowPoint* const child0 = &m_dataFlowGraph.Find(stmt.m_trueTargetJump)->GetInfo();
+				dDataFlowPoint* const child1 = &m_dataFlowGraph.Find(stmt.m_falseTargetJump)->GetInfo();
 
 				graphStatement->m_successors.Append(child0);
 				graphStatement->m_successors.Append(child1);
 				child0->m_predecessors.Append(graphStatement);
 				child1->m_predecessors.Append(graphStatement);
 
-				stack.Append(blockMap.Find(stmt.m_jmpTarget)->GetInfo());
-				stack.Append(blockMap.Find(block->m_end->GetNext())->GetInfo());
+				stack.Append(blockMap.Find(stmt.m_trueTargetJump)->GetInfo());
+				stack.Append(blockMap.Find(stmt.m_falseTargetJump)->GetInfo());
 
 			} else if (stmt.m_instruction == dTreeAdressStmt::m_goto) {
+dAssert (0);
+/*
 				dAssert (m_dataFlowGraph.Find(block->m_end));
 				dAssert (m_dataFlowGraph.Find(stmt.m_jmpTarget));
 				dAssert (blockMap.Find(stmt.m_jmpTarget));
@@ -161,8 +112,10 @@ void dDataFlowGraph::BuildBasicBlockGraph()
 				child0->m_predecessors.Append(graphStatement);
 
 				stack.Append(blockMap.Find(stmt.m_jmpTarget)->GetInfo());
+*/
 
 			} else if (stmt.m_instruction != dTreeAdressStmt::m_ret) {
+dAssert (0);
 				dAssert (m_dataFlowGraph.Find(block->m_end));
 				dAssert (m_dataFlowGraph.Find(block->m_end->GetNext()));
 				dAssert (blockMap.Find(block->m_end->GetNext()));
@@ -177,7 +130,6 @@ void dDataFlowGraph::BuildBasicBlockGraph()
 			}
 		}
 	}
-*/
 }
 
 #if 0
@@ -1376,8 +1328,6 @@ void dDataFlowGraph::UpdateReachingDefinitions()
 
 void dDataFlowGraph::BuildGeneratedAndUsedlVariableSets()
 {
-dAssert (0);
-/*
 	dTree<dDataFlowPoint, dCIL::dListNode*>::Iterator iter (m_dataFlowGraph);
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowPoint& point = iter.GetNode()->GetInfo();
@@ -1425,23 +1375,26 @@ dAssert (0);
 			{
 				point.m_generatedVariable = stmt.m_arg0.m_label;
 
-				if ((stmt.m_arg1.m_type == dTreeAdressStmt::m_intVar) || (stmt.m_arg1.m_type == dTreeAdressStmt::m_classPointer)) {
+				dAssert (0);
+				if ((stmt.m_arg1.m_type == dTreeAdressStmt::m_int) || (stmt.m_arg1.m_type == dTreeAdressStmt::m_classPointer)) {
 					point.m_usedVariableSet.Insert(stmt.m_arg1.m_label);
-				} else if (stmt.m_arg1.m_type == dTreeAdressStmt::m_floatVar) {
+				} else if (stmt.m_arg1.m_type == dTreeAdressStmt::m_float) {
 					dAssert (0);
-				} else if ((stmt.m_arg1.m_type == dTreeAdressStmt::m_intConst) || (stmt.m_arg1.m_type == dTreeAdressStmt::m_floatConst)) {
+//				} else if ((stmt.m_arg1.m_type == dTreeAdressStmt::m_intConst) || (stmt.m_arg1.m_type == dTreeAdressStmt::m_floatConst)) {
 					// do nothing
 				} else {
 					dAssert (0);
 				}
 
+
 				if (stmt.m_operator != dTreeAdressStmt::m_nothing) {
-					if (stmt.m_arg2.m_type == dTreeAdressStmt::m_intVar) {
+					if (stmt.m_arg2.m_type == dTreeAdressStmt::m_int) {
 						point.m_usedVariableSet.Insert(stmt.m_arg2.m_label);
-					} else if (stmt.m_arg2.m_type == dTreeAdressStmt::m_floatVar) {
+					} else if (stmt.m_arg2.m_type == dTreeAdressStmt::m_float) {
 						dAssert (0);
 					}
 				}
+
 				break;
 			}
 
@@ -1461,22 +1414,30 @@ dAssert (0);
 
 			case dTreeAdressStmt::m_call:
 			{
+dAssert (0);
+/*
 				if (m_returnType != dCIL::m_void) {
 					point.m_generatedVariable = m_returnVariableName;
 				}
+*/
 				break;
 			}
 
 			case dTreeAdressStmt::m_ret:
 			{
+dAssert (0);
+/*
 				if (m_returnType != dCIL::m_void) {
 					point.m_usedVariableSet.Insert(m_returnVariableName);
 				}
+*/
 				break;
 			}
 
 			case dTreeAdressStmt::m_if:
 			{
+				dAssert (0);
+/*
 				if (stmt.m_arg0.m_type == dTreeAdressStmt::m_intVar) {
 					point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
 				}
@@ -1484,22 +1445,23 @@ dAssert (0);
 				if (stmt.m_arg1.m_type == dTreeAdressStmt::m_intVar) {
 					point.m_usedVariableSet.Insert(stmt.m_arg1.m_label);
 				}
+*/
 				break;
 			}
-
+/*
 			case dTreeAdressStmt::m_push:
 			{
 				point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
 				break;
 			}
-
+*/
 
 //			case dTreeAdressStmt::m_pop:
 			case dTreeAdressStmt::m_nop:
 			case dTreeAdressStmt::m_goto:
 			case dTreeAdressStmt::m_label:
-			case dTreeAdressStmt::m_enter:
-			case dTreeAdressStmt::m_leave:
+			//case dTreeAdressStmt::m_enter:
+			//case dTreeAdressStmt::m_leave:
 			case dTreeAdressStmt::m_function:
 			case dTreeAdressStmt::m_argument:
 				break;
@@ -1508,7 +1470,7 @@ dAssert (0);
 				dAssert (0);
 		}
 	}
-*/
+
 }
 
 
