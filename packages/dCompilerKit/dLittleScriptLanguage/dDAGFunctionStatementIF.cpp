@@ -68,10 +68,10 @@ void dDAGFunctionStatementIF::CompileCIL(dCIL& cil)
 		dTreeAdressStmt& gotoStmt = cil.NewStatement()->GetInfo();
 		gotoStmt.m_instruction = dTreeAdressStmt::m_goto;
 		gotoStmt.m_arg0.m_label = stmt.m_arg2.m_label;
-		gotoStmt.m_trueTargetJump = stmt.m_falseTargetJump;
 		DTRACE_INTRUCTION (&gotoStmt);
 		
 		stmt.m_falseTargetJump = cil.NewStatement();
+		gotoStmt.m_trueTargetJump = stmt.m_falseTargetJump;
 		dTreeAdressStmt& falseLabel = stmt.m_falseTargetJump->GetInfo();
 		falseLabel.m_instruction = dTreeAdressStmt::m_label;
 		falseLabel.m_arg0.m_label = stmt.m_arg2.m_label;

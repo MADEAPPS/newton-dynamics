@@ -412,7 +412,11 @@ void dCIL::ConvertToLLVM (llvm::Module* const module, llvm::LLVMContext &Context
 void dCIL::Optimize (llvm::Function* const function)
 {
     // Optimize the function.
-    m_optimizer.run(*function);
+	bool unOpmized = true;
+	for (int i = 0; (i < 32) && unOpmized; i ++) {
+		unOpmized = m_optimizer.run(*function);
+	}
+    
 }
 
 dTreeAdressStmt::dArgType dCIL::GetType (const llvm::Type* const type) const
@@ -674,24 +678,31 @@ dCIL::dListNode* dCIL::EmitIntegerBranch (const llvm::Instruction* const intruct
 //	int type = xxx->getValueID();
 //	int type1 = llvm::ICmpInst::ICMP_EQ;
 
-	dAssert (instr->getNumOperands() == 3);
-	llvm::Value* const arg0 = instr->getOperand(0);
-	llvm::Value* const arg2 = instr->getOperand(1);
-	llvm::Value* const arg1 = instr->getOperand(2);
-	dAssert (((llvm::ICmpInst*) arg0)->getPredicate() == llvm::ICmpInst::ICMP_EQ);
-
 	dCIL::dListNode* const node = NewStatement();
 	dTreeAdressStmt& stmt = node->GetInfo();
+	llvm::Value* const arg0 = instr->getOperand(0);
+	if (instr->getNumOperands() == 3) {
+		llvm::Value* const arg2 = instr->getOperand(1);
+		llvm::Value* const arg1 = instr->getOperand(2);
+		dAssert (((llvm::ICmpInst*) arg0)->getPredicate() == llvm::ICmpInst::ICMP_EQ);
 
-	stmt.m_instruction = dTreeAdressStmt::m_if;
-	stmt.m_arg0.m_type = dTreeAdressStmt::m_int;
-	stmt.m_arg0.m_label = arg0->getName().data();
-	stmt.m_arg1.m_label = arg1->getName().data();
-	stmt.m_arg2.m_label = arg2->getName().data();
+		stmt.m_instruction = dTreeAdressStmt::m_if;
+		stmt.m_arg0.m_type = dTreeAdressStmt::m_int;
+		stmt.m_arg0.m_label = arg0->getName().data();
+		stmt.m_arg1.m_label = arg1->getName().data();
+		stmt.m_arg2.m_label = arg2->getName().data();
 
-	// use thsi to save the link later
-	stmt.m_trueTargetJump = (dList<dTreeAdressStmt>::dListNode*) arg1;
-	stmt.m_falseTargetJump = (dList<dTreeAdressStmt>::dListNode*) arg2;
+		// use thsi to save the link later
+		stmt.m_trueTargetJump = (dList<dTreeAdressStmt>::dListNode*) arg1;
+		stmt.m_falseTargetJump = (dList<dTreeAdressStmt>::dListNode*) arg2;
+	} else {
+		dAssert (instr->getNumOperands() == 1);
+		stmt.m_instruction = dTreeAdressStmt::m_goto;
+		stmt.m_operator = dTreeAdressStmt::m_nothing;
+		stmt.m_arg0.m_label = arg0->getName().data();
+		// use thsi to save the link later
+		stmt.m_trueTargetJump = (dList<dTreeAdressStmt>::dListNode*) arg0;
+	}
 
 	DTRACE_INTRUCTION (&stmt);
 	return node;
