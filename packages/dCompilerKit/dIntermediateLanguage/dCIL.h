@@ -94,18 +94,20 @@ class dCIL: public dList<dTreeAdressStmt>
     void Optimize (llvm::Function* const function);
 
 	private:
-	dCIL::dListNode* EmitIntegerAritmetic (const llvm::Instruction* const intruction) const;
-	dCIL::dListNode* EmitReturn (const llvm::Instruction* const intruction) const;
-	dCIL::dListNode* EmitIntegerCompare (const llvm::Instruction* const intruction) const;
-	dCIL::dListNode* EmitIntegerBranch (const llvm::Instruction* const intruction) const;
+	dString GetName (llvm::Value* const value) const;
 	dTreeAdressStmt::dArgType GetType (const llvm::Type* const type) const;
+	dCIL::dListNode* EmitReturn (const llvm::Instruction* const intruction);
+	dCIL::dListNode* EmitIntegerAritmetic (const llvm::Instruction* const intruction);
+	dCIL::dListNode* EmitIntegerCompare (const llvm::Instruction* const intruction);
+	dCIL::dListNode* EmitIntegerBranch (const llvm::Instruction* const intruction);
+	
+
 	void EmitFunctionDeclaration(const llvm::Function& function);
-	const dCIL::dListNode* EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dList<const dCIL::dListNode*>& terminalInstructions);
-	void EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dTree<const dCIL::dListNode*, const llvm::BasicBlock*>& visited, dList<const dCIL::dListNode*>& terminalInstructions);
+	const dCIL::dListNode* EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dList<dCIL::dListNode*>& terminalInstructions);
+	void EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dTree<const dCIL::dListNode*, const llvm::BasicBlock*>& visited, dList<dCIL::dListNode*>& terminalInstructions);
 
 //	bool RemoveNop(dListNode* const functionNode);
 //	bool RemoveRedundantJumps(dListNode* const functionNode);
-
 //	void InitializeTarget();
 //	void InitializeTargetMC();
 //	void InitializeTargetInfo();

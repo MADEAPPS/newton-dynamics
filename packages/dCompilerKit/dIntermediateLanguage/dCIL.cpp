@@ -453,6 +453,17 @@ dTreeAdressStmt::dArgType dCIL::GetType (const llvm::Type* const type) const
 	return intrinsicType;
 }
 
+dString dCIL::GetName (llvm::Value* const value) const
+{
+	int type = value->getValueID();
+	if (type == llvm::Value::ConstantIntVal) {
+		llvm::ConstantInt* constValue = (llvm::ConstantInt*) value;
+		return dString (int (constValue->getZExtValue()));
+	} else {
+		return value->getName().data();
+	}
+}
+
 void dCIL::EmitFunctionDeclaration (const llvm::Function& llvmFunction)
 {
 	const llvm::StringRef& functionName = llvmFunction.getName();
@@ -488,7 +499,7 @@ void dCIL::EmitFunctionDeclaration (const llvm::Function& llvmFunction)
 
 
 
-void dCIL::EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dTree<const dCIL::dListNode*, const llvm::BasicBlock*>& visited, dList<const dCIL::dListNode*>& terminalInstructions)
+void dCIL::EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dTree<const dCIL::dListNode*, const llvm::BasicBlock*>& visited, dList<dCIL::dListNode*>& terminalInstructions)
 {
 	if (!visited.Find (block)) {
 		const dCIL::dListNode* const blockNode = EmitBasicBlockBody (function, block, terminalInstructions);
@@ -509,14 +520,37 @@ void dCIL::BuildFromLLVMFunctions (const llvm::Function& llvmFunction)
 	EmitFunctionDeclaration (llvmFunction);
 
 	// iterate over bascia block and emit teh block body
-	dList<const dCIL::dListNode*> terminalInstructions;
+	dList<dCIL::dListNode*> terminalInstructions;
 	dTree<const dCIL::dListNode*, const llvm::BasicBlock*> visited;
 	const llvm::BasicBlock* const entryBlock = &llvmFunction.getEntryBlock();
 	EmitBasicBlockBody (llvmFunction, entryBlock, visited, terminalInstructions);
+
+	for (dList<dCIL::dListNode*>::dListNode* node = terminalInstructions.GetFirst(); node; node = node->GetNext()) {
+		dTreeAdressStmt& stmt = node->GetInfo()->GetInfo();
+		switch (stmt.m_instruction)
+		{
+			case dTreeAdressStmt::m_if:
+			{
+				llvm::BasicBlock* const trueTargetJump = (llvm::BasicBlock*) stmt.m_trueTargetJump;
+				llvm::BasicBlock* const falseTargetJump = (llvm::BasicBlock*) stmt.m_falseTargetJump;
+				stmt.m_trueTargetJump = (dCIL::dListNode*) visited.Find (trueTargetJump)->GetInfo();
+				stmt.m_falseTargetJump = (dCIL::dListNode*) visited.Find (falseTargetJump)->GetInfo();
+				break;
+			}
+
+			case dTreeAdressStmt::m_ret:
+				break;
+
+			default:
+				dAssert (0);
+				break;
+		}
+
+	}
 }
 
 
-const dCIL::dListNode*dCIL::EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dList<const dCIL::dListNode*>& terminalInstructions)
+const dCIL::dListNode*dCIL::EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dList<dCIL::dListNode*>& terminalInstructions)
 {
 	const llvm::StringRef& blockName = block->getName ();
 
@@ -529,6 +563,8 @@ const dCIL::dListNode*dCIL::EmitBasicBlockBody(const llvm::Function& function, c
 	for (llvm::BasicBlock::const_iterator iter (block->begin()); iter != block->end(); iter ++) {
 		const llvm::Instruction* const intruction = iter;
 		int opcode = intruction->getOpcode();
+
+		//const char* const xxx = intruction->getOpcodeName();
 
 		dCIL::dListNode* node = NULL;
 		switch (opcode)
@@ -570,25 +606,134 @@ const dCIL::dListNode*dCIL::EmitBasicBlockBody(const llvm::Function& function, c
 	return blockLabelNode;
 }
 
-dCIL::dListNode* dCIL::EmitReturn (const llvm::Instruction* const intruction) const
+dCIL::dListNode* dCIL::EmitReturn (const llvm::Instruction* const intruction)
 {
-	return NULL;
+	llvm::ReturnInst* const instr =  (llvm::ReturnInst*) intruction;
+
+	dAssert (instr->getNumOperands() == 1);
+	llvm::Value* const arg0 = instr->getOperand(0);
+
+	dString arg1Label (GetName (arg0));
+	dTreeAdressStmt::dArgType type = GetType (arg0->getType());
+
+	dCIL::dListNode* const node = NewStatement();
+	dTreeAdressStmt& stmt = node->GetInfo();
+
+	stmt.m_instruction = dTreeAdressStmt::m_ret;
+	stmt.m_arg0.m_type = type;
+	stmt.m_arg0.m_label = arg1Label;
+
+	DTRACE_INTRUCTION (&stmt);
+	return node;
 }
 
-dCIL::dListNode* dCIL::EmitIntegerCompare (const llvm::Instruction* const intruction) const
+dCIL::dListNode* dCIL::EmitIntegerCompare (const llvm::Instruction* const intruction)
 {
-	return NULL;
+	llvm::ICmpInst* const instr =  (llvm::ICmpInst*) intruction;
+
+	llvm::CmpInst::Predicate predicate = instr->getPredicate();
+	dTreeAdressStmt::dOperator prediccateOperator = dTreeAdressStmt::m_identical;;
+	switch (predicate)
+	{
+		case llvm::CmpInst::FCMP_OEQ:
+		{
+			prediccateOperator = dTreeAdressStmt::m_identical;
+		}
+
+		default:
+			break;
+	}
+
+	dAssert (instr->getNumOperands() == 2);
+	llvm::Value* const arg0 = instr->getOperand(0);
+	llvm::Value* const arg1 = instr->getOperand(1);
+
+	dCIL::dListNode* const node = NewStatement();
+	dTreeAdressStmt& stmt = node->GetInfo();
+	stmt.m_instruction = dTreeAdressStmt::m_assigment;
+
+	stmt.m_operator = prediccateOperator;
+
+	stmt.m_arg0.m_type = dTreeAdressStmt::m_int;
+	stmt.m_arg0.m_label = instr->getName().data();
+
+	stmt.m_arg1.m_type = dTreeAdressStmt::m_int;
+	stmt.m_arg1.m_label = GetName (arg0);
+
+	stmt.m_arg2.m_type = dTreeAdressStmt::m_int;
+	stmt.m_arg2.m_label = GetName (arg1);
+	DTRACE_INTRUCTION (&stmt);
+	return node;
 }
 
-dCIL::dListNode* dCIL::EmitIntegerBranch (const llvm::Instruction* const intruction) const
+dCIL::dListNode* dCIL::EmitIntegerBranch (const llvm::Instruction* const intruction)
 {
-//		const char *xxx = intruction->getOpcodeName();
-//		const char *xxx1 = intruction->getOpcodeName();
+	llvm::BranchInst* const instr =  (llvm::BranchInst*) intruction;
 
-	return NULL;
+//	llvm::Value* const xxx = instr->getCondition();
+//	int type = xxx->getValueID();
+//	int type1 = llvm::ICmpInst::ICMP_EQ;
+
+	dAssert (instr->getNumOperands() == 3);
+	llvm::Value* const arg0 = instr->getOperand(0);
+	llvm::Value* const arg2 = instr->getOperand(1);
+	llvm::Value* const arg1 = instr->getOperand(2);
+	dAssert (((llvm::ICmpInst*) arg0)->getPredicate() == llvm::ICmpInst::ICMP_EQ);
+
+	dCIL::dListNode* const node = NewStatement();
+	dTreeAdressStmt& stmt = node->GetInfo();
+
+	stmt.m_instruction = dTreeAdressStmt::m_if;
+	stmt.m_arg0.m_type = dTreeAdressStmt::m_int;
+	stmt.m_arg0.m_label = arg0->getName().data();
+	stmt.m_arg1.m_label = arg1->getName().data();
+	stmt.m_arg2.m_label = arg2->getName().data();
+
+	// use thsi to save the link later
+	stmt.m_trueTargetJump = (dList<dTreeAdressStmt>::dListNode*) arg1;
+	stmt.m_falseTargetJump = (dList<dTreeAdressStmt>::dListNode*) arg2;
+
+	DTRACE_INTRUCTION (&stmt);
+	return node;
 }
 
-dCIL::dListNode* dCIL::EmitIntegerAritmetic (const llvm::Instruction* const intruction) const
+dCIL::dListNode* dCIL::EmitIntegerAritmetic (const llvm::Instruction* const intruction)
 {
-	return NULL;
+	llvm::BinaryOperator* const instr = (llvm::BinaryOperator*) intruction;
+
+	dTreeAdressStmt::dOperator operation = dTreeAdressStmt::m_nothing;
+	llvm::BinaryOperator::BinaryOps opcode = instr->getOpcode();
+	switch (opcode) 
+	{
+		case llvm::Instruction::Sub:
+		{
+			operation = dTreeAdressStmt::m_sub;
+			break;
+		}
+
+		default:
+			dAssert (0);
+	}
+
+
+	dAssert (instr->getNumOperands() == 2);
+	llvm::Value* const arg0 = instr->getOperand(0);
+	llvm::Value* const arg1 = instr->getOperand(1);
+
+	dCIL::dListNode* const node = NewStatement();
+	dTreeAdressStmt& stmt = node->GetInfo();
+	stmt.m_instruction = dTreeAdressStmt::m_assigment;
+	stmt.m_operator = operation;
+
+	stmt.m_arg0.m_type = dTreeAdressStmt::m_int;
+	stmt.m_arg0.m_label = instr->getName().data();
+
+	stmt.m_arg1.m_type = dTreeAdressStmt::m_int;
+	stmt.m_arg1.m_label = GetName (arg0);
+
+	stmt.m_arg2.m_type = dTreeAdressStmt::m_int;
+	stmt.m_arg2.m_label = GetName (arg1);
+	DTRACE_INTRUCTION (&stmt);
+	return node;
+
 }

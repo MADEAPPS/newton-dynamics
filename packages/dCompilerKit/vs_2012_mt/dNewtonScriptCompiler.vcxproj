@@ -99,7 +99,7 @@
       <TargetMachine>MachineX86</TargetMachine>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
       <AdditionalLibraryDirectories>$(LLVM_WIN32_BUILD)/Debug/lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>LLVMMC.lib;LLVMCore.lib;LLVMTarget.lib;LLVMSupport.lib;LLVMAnalysis.lib;LLVMMCParser.lib;LLVMAsmPrinter.lib;LLVMScalarOpts.lib;LLVMCodeGen.lib;LLVMTransformUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>LLVMMC.lib;LLVMCore.lib;LLVMTarget.lib;LLVMSupport.lib;LLVMAnalysis.lib;LLVMScalarOpts.lib;LLVMTransformUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -125,7 +125,7 @@
       <TargetMachine>MachineX64</TargetMachine>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
       <AdditionalLibraryDirectories>$(LLVM_WIN64_BUILD)/Release/lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>LLVMMC.lib;LLVMCore.lib;LLVMTarget.lib;LLVMSupport.lib;LLVMAnalysis.lib;LLVMMCParser.lib;LLVMAsmPrinter.lib;LLVMScalarOpts.lib;LLVMCodeGen.lib;LLVMTransformUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>LLVMMC.lib;LLVMCore.lib;LLVMTarget.lib;LLVMSupport.lib;LLVMAnalysis.lib;LLVMScalarOpts.lib;LLVMTransformUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -150,7 +150,7 @@
       <TargetMachine>MachineX86</TargetMachine>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
       <AdditionalLibraryDirectories>$(LLVM_WIN32_BUILD)/Release/lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>LLVMMC.lib;LLVMCore.lib;LLVMTarget.lib;LLVMSupport.lib;LLVMAnalysis.lib;LLVMMCParser.lib;LLVMAsmPrinter.lib;LLVMScalarOpts.lib;LLVMCodeGen.lib;LLVMTransformUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>LLVMMC.lib;LLVMCore.lib;LLVMTarget.lib;LLVMSupport.lib;LLVMAnalysis.lib;LLVMScalarOpts.lib;LLVMTransformUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -178,7 +178,7 @@
       <TargetMachine>MachineX64</TargetMachine>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
       <AdditionalLibraryDirectories>$(LLVM_WIN64_BUILD)/Release/lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>LLVMMC.lib;LLVMCore.lib;LLVMTarget.lib;LLVMSupport.lib;LLVMAnalysis.lib;LLVMMCParser.lib;LLVMAsmPrinter.lib;LLVMScalarOpts.lib;LLVMCodeGen.lib;LLVMTransformUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>LLVMMC.lib;LLVMCore.lib;LLVMTarget.lib;LLVMSupport.lib;LLVMAnalysis.lib;LLVMScalarOpts.lib;LLVMTransformUtils.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
