@@ -12,13 +12,7 @@
 #include "dCILstdafx.h"
 #include "dCIL.h"
 #include "dDataFlowGraph.h"
-#include "dNVMAsmParser.h"
-#include "dNVMAsmPrinter.h"
-#include "dNVMTargetMachine.h"
 
-
-
-//llvm::Target dCIL::m_target;
 
 dCIL::dCIL(llvm::Module* const module)
 	:dList()
@@ -68,13 +62,6 @@ dCIL::dCIL(llvm::Module* const module)
     //        functionPassManager.add(createCFGSimplificationPass());
 
     m_optimizer.doInitialization();
-
-	// register the target
-	//InitializeTargetInfo();
-	//InitializeTarget();
-	//InitializeTargetMC();
-	//InitializeAsmPrinter();
-	//InitializeMCAsmParser();
 }
 
 dCIL::~dCIL(void)
@@ -88,67 +75,6 @@ void dCIL::Clear()
 	RemoveAll();
 }
 
-/*
-void dCIL::InitializeTargetInfo()
-{
-	dAssert (0);
-//	llvm::RegisterTarget<llvm::Triple::UnknownArch, false> X (m_target, D_VIRTUAL_MACHINE_NAME, D_VIRTUAL_MACHINE_DESCRIPTION);
-}
-
-void dCIL::InitializeTarget()
-{
-	dAssert (0);
-//	llvm::RegisterTargetMachine<dNVMTargetMachine> X(m_target);
-}
-
-
-void dCIL::InitializeTargetMC() 
-{
-  // Register the MC asm info.
-
-  llvm::RegisterMCAsmInfoFn X(m_target, createSparcMCAsmInfo);
-
-  // Register the MC codegen info.
-  llvm::TargetRegistry::RegisterMCCodeGenInfo(m_target, createSparcMCCodeGenInfo);
-
-  // Register the MC instruction info.
-  llvm::TargetRegistry::RegisterMCInstrInfo(m_target, createSparcMCInstrInfo);
-
-  // Register the MC register info.
-  llvm::TargetRegistry::RegisterMCRegInfo(m_target, createSparcMCRegisterInfo);
-
-  // Register the MC subtarget info.
-  llvm::TargetRegistry::RegisterMCSubtargetInfo(m_target, createSparcMCSubtargetInfo);
-
-  // Register the MC Code Emitter.
-  llvm::TargetRegistry::RegisterMCCodeEmitter(m_target, createSparcMCCodeEmitter);
-
-  //Register the asm backend.
-  llvm::TargetRegistry::RegisterMCAsmBackend(m_target, createSparcAsmBackend);
-
-  // Register the object streamer.
-  llvm::TargetRegistry::RegisterMCObjectStreamer(m_target, createMCStreamer);
-
-  // Register the asm streamer.
-  llvm::TargetRegistry::RegisterAsmStreamer(m_target, createMCAsmStreamer);
-
-  // Register the MCInstPrinter
-  llvm::TargetRegistry::RegisterMCInstPrinter(m_target, createSparcMCInstPrinter);
-}
-
-
-void dCIL::InitializeAsmPrinter() 
-{
-	dAssert (0);
-//  llvm::RegisterAsmPrinter<NVMAsmPrinter> X(m_target);
-}
-
-void dCIL::InitializeMCAsmParser() 
-{
-	dAssert (0);
-//	llvm::RegisterMCAsmParser<NVMAsmParser> X(m_target);
-}
-*/
 
 void dCIL::ResetTemporaries()
 {
@@ -402,12 +328,6 @@ void dCIL::Optimize(dListNode* const functionNode, int argumentInRegisters)
 */
 
 
-/*
-void dCIL::ConvertToLLVM (llvm::Module* const module, llvm::LLVMContext &Context)
-{
-
-}
-*/
 
 void dCIL::Optimize (llvm::Function* const function)
 {
@@ -416,7 +336,6 @@ void dCIL::Optimize (llvm::Function* const function)
 	for (int i = 0; (i < 32) && unOpmized; i ++) {
 		unOpmized = m_optimizer.run(*function);
 	}
-    
 }
 
 dTreeAdressStmt::dArgType dCIL::GetType (const llvm::Type* const type) const
@@ -468,7 +387,7 @@ dString dCIL::GetName (llvm::Value* const value) const
 	}
 }
 
-void dCIL::EmitFunctionDeclaration (const llvm::Function& llvmFunction)
+dCIL::dListNode* dCIL::EmitFunctionDeclaration (const llvm::Function& llvmFunction)
 {
 	const llvm::StringRef& functionName = llvmFunction.getName();
 	const llvm::Type* const returnType = llvmFunction.getReturnType();
@@ -499,9 +418,9 @@ void dCIL::EmitFunctionDeclaration (const llvm::Function& llvmFunction)
 		stmt.m_arg0.m_label = name.data();
 		DTRACE_INTRUCTION (&stmt);
 	}
+
+	return functionNode;
 }
-
-
 
 void dCIL::EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dTree<const dCIL::dListNode*, const llvm::BasicBlock*>& visited, dList<dCIL::dListNode*>& terminalInstructions)
 {
@@ -521,7 +440,7 @@ void dCIL::EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicB
 void dCIL::BuildFromLLVMFunctions (const llvm::Function& llvmFunction)
 {
 	// emet function decalaration
-	EmitFunctionDeclaration (llvmFunction);
+	dCIL::dListNode* const function = EmitFunctionDeclaration (llvmFunction);
 
 	// iterate over bascia block and emit teh block body
 	dList<dCIL::dListNode*> terminalInstructions;
@@ -549,8 +468,9 @@ void dCIL::BuildFromLLVMFunctions (const llvm::Function& llvmFunction)
 				dAssert (0);
 				break;
 		}
-
 	}
+
+	RegisterAllocation (function, 8);
 }
 
 
@@ -746,5 +666,29 @@ dCIL::dListNode* dCIL::EmitIntegerAritmetic (const llvm::Instruction* const intr
 	stmt.m_arg2.m_label = GetName (arg1);
 	DTRACE_INTRUCTION (&stmt);
 	return node;
+}
 
+
+void dCIL::RegisterAllocation (dListNode* const functionNode, int argumentInRegisters)
+{
+	//dDataFlowGraph datFlowGraph (this, functionNode, returnType);
+	dDataFlowGraph datFlowGraph (this, functionNode);
+
+	// apply all basic blocks peephole optimizations 
+	//datFlowGraph.ApplyLocalOptimizations();
+
+	// do register allocation before removing dead jumps and nops
+	datFlowGraph.RegistersAllocation (D_INTEGER_REGISTER_COUNT - 1);
+/*
+	for (bool isDirty = true; isDirty; ) {
+		isDirty = false;
+		// remove all redundant newly generate extra jumps 
+		isDirty |= RemoveRedundantJumps(functionNode);
+//Trace();
+
+		// clean up all nop instruction added by the optimizer
+		isDirty |= RemoveNop(functionNode);
+//Trace();
+	}
+*/
 }

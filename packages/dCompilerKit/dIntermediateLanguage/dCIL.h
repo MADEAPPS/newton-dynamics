@@ -100,19 +100,14 @@ class dCIL: public dList<dTreeAdressStmt>
 	dCIL::dListNode* EmitIntegerAritmetic (const llvm::Instruction* const intruction);
 	dCIL::dListNode* EmitIntegerCompare (const llvm::Instruction* const intruction);
 	dCIL::dListNode* EmitIntegerBranch (const llvm::Instruction* const intruction);
-	
 
-	void EmitFunctionDeclaration(const llvm::Function& function);
+	dCIL::dListNode* EmitFunctionDeclaration(const llvm::Function& function);
 	const dCIL::dListNode* EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dList<dCIL::dListNode*>& terminalInstructions);
 	void EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dTree<const dCIL::dListNode*, const llvm::BasicBlock*>& visited, dList<dCIL::dListNode*>& terminalInstructions);
 
+	void RegisterAllocation (dListNode* const functionNode, int argumentInRegisters);
 //	bool RemoveNop(dListNode* const functionNode);
 //	bool RemoveRedundantJumps(dListNode* const functionNode);
-//	void InitializeTarget();
-//	void InitializeTargetMC();
-//	void InitializeTargetInfo();
-//	void InitializeAsmPrinter();
-//	void InitializeMCAsmParser();
 
 	int m_mark;
 	int m_tempIndex;
@@ -121,8 +116,6 @@ class dCIL: public dList<dTreeAdressStmt>
 	dTreeAdressStmt::dOperator m_conditionals[dTreeAdressStmt::m_operatorsCount];
 	dTreeAdressStmt::dOperator m_operatorComplement[dTreeAdressStmt::m_operatorsCount];
 
-	//dNVMTragetMacrhine m_targetMachile;
-	//static llvm::Target m_target;
     llvm::legacy::FunctionPassManager m_optimizer;
 	
 	friend dDataFlowGraph;
