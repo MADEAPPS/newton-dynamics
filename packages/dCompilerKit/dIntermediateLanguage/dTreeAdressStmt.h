@@ -27,12 +27,6 @@ class dTreeAdressStmt
 	public:
 	enum dArgType
 	{
-//		m_intVar,
-//		m_floatVar,
-//		m_intConst,
-//		m_floatConst,
-//		m_classPointer,
-
 		m_void,
 		m_bool,
 		m_byte,
@@ -42,6 +36,8 @@ class dTreeAdressStmt
 		m_float,
 		m_double,
 		m_classPointer,
+		m_constInt,
+		m_constFloat,
 	};
 
 	struct dMapTable 
@@ -86,19 +82,24 @@ class dTreeAdressStmt
 		m_nop,
 		m_call,
         m_ret,
+		
+		m_function,
+		m_assigment,
+
+		m_if, 
+		m_goto,
+		m_label,
+
 		m_new,
 		m_release,
         m_reference,
-		m_if, 
-		m_function,
-		m_local,
-		m_param,
+
 		m_argument,
 		m_load,
 		m_store,
-		m_assigment,
-		m_goto,
-		m_label,
+
+		m_local,
+		m_param,
 		m_loadBase,
 		m_storeBase,
 	};

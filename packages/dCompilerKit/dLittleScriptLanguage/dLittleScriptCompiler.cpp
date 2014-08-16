@@ -192,7 +192,7 @@ int dScriptCompiler::CompileSource (const char* const source)
 		llvm::Module::FunctionListType& funtionList = module->getFunctionList();
 		for (llvm::Module::FunctionListType::iterator iter (funtionList.begin()); iter != funtionList.end(); iter ++) {
 			const llvm::Function& funtion = *iter;
-			cil.BuildFromLLVMFunctions (funtion);
+			cil.ConvertLLVMFunctionToNVMFuntion (funtion);
 		}
 
 	}
@@ -254,7 +254,8 @@ dDAGScopeBlockNode* dScriptCompiler::GetCurrentScope() const
 dScriptCompiler::dUserVariable dScriptCompiler::NewExpressionNodeConstant (const dUserVariable& value)
 {
 	dUserVariable returnNode;
-	dTreeAdressStmt::dArgType type = dTreeAdressStmt::m_int;
+	dTreeAdressStmt::dArgType type (dTreeAdressStmt::m_constInt);
+
 	switch (int (value.m_token))
 	{
 		case _THIS:
@@ -262,11 +263,11 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewExpressionNodeConstant (const
 			break;
 
 		case _FLOAT_CONST:
-			type = dTreeAdressStmt::m_double;
+			type = dTreeAdressStmt::m_constFloat;
 			break;
 
 		case _INTEGER_CONST:
-			type = dTreeAdressStmt::m_int;
+			type = dTreeAdressStmt::m_constInt;
 			break;
 
 //		case STRING_VALUE:
@@ -279,7 +280,6 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewExpressionNodeConstant (const
 
 	dDAGExpressionNodeConstant* const node = new dDAGExpressionNodeConstant (m_allNodes, type, value.m_data.GetStr());
 	returnNode.m_node = node;
-
 	return returnNode;
 }
 

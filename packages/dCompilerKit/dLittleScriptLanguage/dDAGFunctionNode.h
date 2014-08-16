@@ -90,7 +90,7 @@ class dDAGFunctionNode: public dDAG
 	void CreateLLVMBasicBlocks (llvm::Function* const function, dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context);
 
 
-	llvm::Function* CreateLLVMfuntionPrototype (dSymbols& symbols, dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context);
+	llvm::Function* CreateLLVMfuntionDeclaration (dSymbols& symbols, dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context);
 	llvm::Value* GetLLVMConstantOrValue (dSymbols& symbols, const dTreeAdressStmt::dArg& arg, llvm::LLVMContext &context);
 
 	void TranslateLLVMBlock (dSymbols& symbols, const LLVMBlockScripBlockPair& llvmBlockPair, llvm::Function* const function, dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context);

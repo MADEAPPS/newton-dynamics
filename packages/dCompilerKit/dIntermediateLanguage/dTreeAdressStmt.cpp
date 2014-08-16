@@ -26,7 +26,9 @@ dTreeAdressStmt::dMapTable dTreeAdressStmt::m_maptable[] = {
 	{dTreeAdressStmt::m_long, "long"}, 
 	{dTreeAdressStmt::m_float, "float"}, 
 	{dTreeAdressStmt::m_double, "double"}, 
-	{dTreeAdressStmt::m_classPointer, "classPointer"}
+	{dTreeAdressStmt::m_classPointer, "classPointer"},
+	{dTreeAdressStmt::m_constInt, "constInt"},
+	{dTreeAdressStmt::m_constFloat, "constFloat"}
 };
 
 

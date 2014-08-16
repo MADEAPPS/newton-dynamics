@@ -141,7 +141,7 @@ void dDAGClassNode::CompileCIL(dCIL& cil)
 		m_cilCodeList.Append (cil.NewStatement());
 		dDAGFunctionNode* const function = node->GetInfo();
 
-		dCIL::dListNode* const functionNode = cil.GetLast();
+		//dCIL::dListNode* const functionNode = cil.GetLast();
 		function->CompileCIL(cil);
 
 		//cil.Optimize(functionNode->GetNext(), function->m_argumentsCount, returnType);

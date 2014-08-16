@@ -28,10 +28,10 @@
 #define	D_VIRTUAL_MACHINE_DESCRIPTION	"Newton Virtual Machine, 32 litle indian, 32 int registers, 32 double presiction floating points registers"
 
 
-#define D_REGISTER_SET_FIELD			5
 #define D_OPCODE_FIELD					7
+#define D_REGISTER_SET_FIELD			5
 
-#define D_REGISTER_SYMBOL				"$reg"
+#define D_REGISTER_SYMBOL				"%reg"
 #define D_SPILL_REGISTER_SYMBOL			"spilled"
 
 #define D_INTEGER_REGISTER_COUNT		(1<<D_REGISTER_SET_FIELD)

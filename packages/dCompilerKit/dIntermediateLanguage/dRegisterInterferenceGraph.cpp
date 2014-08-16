@@ -21,13 +21,15 @@
 
 dRegisterInterferenceGraph::dRegisterInterferenceGraph (dDataFlowGraph* const flowGraph, int registerCount)
 	:dTree<dRegisterInterferenceNode, dString>()
+	,m_spillPenalty()
+	,m_coalescedNodes()
 	,m_flowGraph(flowGraph)
 	,m_spillCount(0)
 	,m_registerCount(registerCount)
 	,m_spillPenatryFactor(0)
 {
 	m_flowGraph->BuildBasicBlockGraph();
-	m_flowGraph->CalculateLiveInputLiveOutput ();
+	//m_flowGraph->CalculateLiveInputLiveOutput ();
 	while (m_flowGraph->ApplyRemoveDeadCode());
 
 	Build();
@@ -54,34 +56,52 @@ dAssert (0);
 
 void dRegisterInterferenceGraph::AllocateRegisters ()
 {
-	dAssert (0);
-/*
 	for (dCIL::dListNode* node = m_flowGraph->m_function; node; node = node->GetNext()) {
 		dTreeAdressStmt& stmt = node->GetInfo();	
-//stmt.Trace();
+
+stmt.Trace();
 		switch (stmt.m_instruction)
 		{
 			case dTreeAdressStmt::m_assigment:
 			{
+				dAssert (0);
 				stmt.m_arg0.m_label = GetRegisterName (stmt.m_arg0.m_label);
-				if ((stmt.m_arg1.m_type == dTreeAdressStmt::m_intVar) || (stmt.m_arg1.m_type == dTreeAdressStmt::m_classPointer)) {
-					stmt.m_arg1.m_label = GetRegisterName (stmt.m_arg1.m_label);
-				} else if (stmt.m_arg1.m_type == dTreeAdressStmt::m_floatVar) {
-					dAssert (0);
+				switch (stmt.m_arg1.m_type) 
+				{
+					case dTreeAdressStmt::m_int:
+					{
+						stmt.m_arg1.m_label = GetRegisterName (stmt.m_arg1.m_label);
+						break;
+					}
+
+					case dTreeAdressStmt::m_constInt:
+						break;
+		
+					default:
+						dAssert (0);
 				}
 
 				if (stmt.m_operator != dTreeAdressStmt::m_nothing) {
-					if (stmt.m_arg2.m_type == dTreeAdressStmt::m_intVar) {
-						stmt.m_arg2.m_label = GetRegisterName (stmt.m_arg2.m_label);
-					} else if (stmt.m_arg2.m_type == dTreeAdressStmt::m_floatVar) {
-						dAssert (0);
+					switch (stmt.m_arg2.m_type) 
+					{
+						case dTreeAdressStmt::m_int:
+						{
+							stmt.m_arg2.m_label = GetRegisterName (stmt.m_arg2.m_label);
+							break;
+						}
+
+						case dTreeAdressStmt::m_constInt:
+							break;
+		
+						default:
+							dAssert (0);
 					}
 				}
 				break;
 			}
 
-			case dTreeAdressStmt::m_pop:
-			case dTreeAdressStmt::m_push:
+			//case dTreeAdressStmt::m_pop:
+			//case dTreeAdressStmt::m_push:
 			case dTreeAdressStmt::m_release:
 			case dTreeAdressStmt::m_loadBase:
 			case dTreeAdressStmt::m_storeBase:
@@ -94,6 +114,8 @@ void dRegisterInterferenceGraph::AllocateRegisters ()
 			case dTreeAdressStmt::m_load:
 			case dTreeAdressStmt::m_store:
 			{
+				dAssert(0);
+/*
 				stmt.m_arg0.m_label = GetRegisterName (stmt.m_arg0.m_label);
 				if (stmt.m_arg1.m_type == dTreeAdressStmt::m_intVar) {
 					stmt.m_arg1.m_label = GetRegisterName (stmt.m_arg1.m_label);
@@ -106,6 +128,7 @@ void dRegisterInterferenceGraph::AllocateRegisters ()
 				} else if (stmt.m_arg2.m_type == dTreeAdressStmt::m_floatVar) {
 					dAssert (0);
 				}
+*/
 				break;
 			}
 
@@ -117,16 +140,13 @@ void dRegisterInterferenceGraph::AllocateRegisters ()
 				break;
 			}
 
-
+			case dTreeAdressStmt::m_ret:
 			case dTreeAdressStmt::m_if:
 			{
 				stmt.m_arg0.m_label = GetRegisterName (stmt.m_arg0.m_label);
-				if (stmt.m_arg1.m_type == dTreeAdressStmt::m_intVar) {
-					stmt.m_arg1.m_label = GetRegisterName (stmt.m_arg1.m_label);
-				}
 				break;
 			}
-
+/*
 			case dTreeAdressStmt::m_enter:
 			{
 				int returnRegisterMask = ~((m_flowGraph->m_returnType == 1) ? (1 << D_RETURN_REGISTER_INDEX) : 0);
@@ -142,9 +162,9 @@ void dRegisterInterferenceGraph::AllocateRegisters ()
 				stmt.m_extraInformation = regMask;
 				break;
 			}
-
+*/
 			case dTreeAdressStmt::m_call:
-			case dTreeAdressStmt::m_ret:
+			
 			case dTreeAdressStmt::m_goto:
 			case dTreeAdressStmt::m_nop:
 			case dTreeAdressStmt::m_label:
@@ -155,8 +175,8 @@ void dRegisterInterferenceGraph::AllocateRegisters ()
 			default:
 				dAssert (0);
 		}
+stmt.Trace();
 	}
-*/
 }
 
 
@@ -191,8 +211,6 @@ bool dRegisterInterferenceGraph::IsTempVariable (const dString& name) const
 
 void dRegisterInterferenceGraph::Build()
 {
-dAssert (0);
-/*
 	dTree<dDataFlowGraph::dDataFlowPoint, dCIL::dListNode*>::Iterator iter (m_flowGraph->m_dataFlowGraph);
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowGraph::dDataFlowPoint& point = iter.GetNode()->GetInfo();
@@ -205,19 +223,36 @@ dAssert (0);
 				if (!interferanceGraphNode) {
 					interferanceGraphNode = Insert(variable);
 					interferanceGraphNode->GetInfo().m_name = variable;
-//dTrace (("%s\n", variable.GetStr()));
+dTrace (("%s\n", variable.GetStr()));
 				}
 			}
 		}
 	}
 
 	// pre-color some special nodes
-	dTreeNode* const returnRegNode = Find(GetReturnVariableName());
-	if (returnRegNode) {
-		dRegisterInterferenceNode& returnReginster = returnRegNode->GetInfo();
-		returnReginster.m_registerIndex = D_RETURN_REGISTER_INDEX;
-		m_flowGraph->m_returnVariableName = GetRegisterName (returnReginster.m_name);
+	m_flowGraph->m_returnVariables.RemoveAll();
+	for (dCIL::dListNode* stmtNode = m_flowGraph->m_function; stmtNode; stmtNode = stmtNode->GetNext()) {
+		dTreeAdressStmt& stmt = stmtNode->GetInfo();
+		if (stmt.m_instruction == dTreeAdressStmt::m_ret) {
+			switch (stmt.m_arg0.m_type) 
+			{
+				case dTreeAdressStmt::m_int:
+				{
+					dTreeNode* const returnRegNode = Find(stmt.m_arg0.m_label);
+					dAssert (returnRegNode);
+					dRegisterInterferenceNode& returnReginster = returnRegNode->GetInfo();
+					returnReginster.m_registerIndex = D_RETURN_REGISTER_INDEX;
+					m_flowGraph->m_returnVariables.Insert (D_RETURN_REGISTER_INDEX, stmt.m_arg0.m_label);
+					break;
+				}
+
+				default:
+					dAssert (0);
+
+			}
+		}
 	}
+
 
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowGraph::dDataFlowPoint& info = iter.GetNode()->GetInfo();
@@ -257,16 +292,17 @@ dAssert (0);
 		}
 	}
 
-m_flowGraph->m_cil->Trace();
+//m_flowGraph->m_cil->Trace();
 
 	dList<dTreeNode*> moveNodes;
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowGraph::dDataFlowPoint& info = iter.GetNode()->GetInfo();
 		dTreeAdressStmt& stmt = info.m_statement->GetInfo();
-		if ((stmt.m_instruction == dTreeAdressStmt::m_assigment) && (stmt.m_operator == dTreeAdressStmt::m_nothing) && 
-			(stmt.m_arg1.m_type != dTreeAdressStmt::m_intConst) && (stmt.m_arg1.m_type != dTreeAdressStmt::m_floatConst) && (stmt.m_arg1.m_type != dTreeAdressStmt::m_classPointer)) {
 
-//stmt.Trace();
+		if ((stmt.m_instruction == dTreeAdressStmt::m_assigment) && (stmt.m_operator == dTreeAdressStmt::m_nothing) && 
+			(stmt.m_arg1.m_type != dTreeAdressStmt::m_constInt) && (stmt.m_arg1.m_type != dTreeAdressStmt::m_constFloat) && (stmt.m_arg1.m_type != dTreeAdressStmt::m_classPointer)) {
+stmt.Trace();
+dAssert (0);
 			const dString& variableA = stmt.m_arg0.m_label;
 			const dString& variableB = stmt.m_arg1.m_label;
 			dTreeNode* const nodeA = Find(variableA);
@@ -284,15 +320,17 @@ m_flowGraph->m_cil->Trace();
 			if (canCoalese) {
 				nodeA->GetInfo().m_isMove = true;
 				nodeB->GetInfo().m_isMove = true;
+				dAssert (0);
+/*
 				if (nodeB == returnRegNode) {
 					m_coalescedNodes.Append(dCoalescedNodePair (nodeB, nodeA));
 				} else {
 					m_coalescedNodes.Append(dCoalescedNodePair (nodeA, nodeB));
 				}
+*/
 			}
 		}
 	}
-*/
 }
 
 dRegisterInterferenceGraph::dTreeNode* dRegisterInterferenceGraph::GetBestNode()

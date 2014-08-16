@@ -340,15 +340,14 @@ void dCIL::Optimize (llvm::Function* const function)
 
 dTreeAdressStmt::dArgType dCIL::GetType (const llvm::Type* const type) const
 {
-	dTreeAdressStmt::dArgType intrinsicType;
-
-	llvm::Type::TypeID returnTypeID = type->getTypeID();
-	switch (returnTypeID)
+	dTreeAdressStmt::dArgType intrinsicType (dTreeAdressStmt::m_int);
+	llvm::Type::TypeID typeId = type->getTypeID();
+	switch (typeId)
 	{
 		case llvm::Type::TypeID::IntegerTyID:
 		{
 			if (type->isIntegerTy (32)) {
-				intrinsicType = dTreeAdressStmt::dArgType (dTreeAdressStmt::m_int);
+				intrinsicType = dTreeAdressStmt::m_int;
 			} else {
 				dAssert (0);
 			}
@@ -361,7 +360,6 @@ dTreeAdressStmt::dArgType dCIL::GetType (const llvm::Type* const type) const
 			break;
 		}
 
-
 		//VoidTyID = 0,    ///<  0: type with no size
 		//HalfTyID,        ///<  1: 16-bit floating point type
 		//FloatTyID,       ///<  2: 32-bit floating point type
@@ -372,7 +370,28 @@ dTreeAdressStmt::dArgType dCIL::GetType (const llvm::Type* const type) const
 		//LabelTyID,       ///<  7: Labels
 		//MetadataTyID,    ///<  8: Metadata
 	}
+	return intrinsicType;
+}
 
+
+
+dTreeAdressStmt::dArgType dCIL::GetType (const llvm::Value* const value) const
+{
+	dTreeAdressStmt::dArgType intrinsicType (dTreeAdressStmt::m_int);
+	llvm::Value::ValueTy valueId = llvm::Value::ValueTy (value->getValueID());
+	switch (valueId)
+	{
+		case llvm::Value::ConstantIntVal:
+		{
+			intrinsicType = dTreeAdressStmt::m_constInt;
+			break;
+		}
+
+		default:
+		{
+			intrinsicType = GetType (value->getType());
+		}
+	}
 	return intrinsicType;
 }
 
@@ -437,12 +456,12 @@ void dCIL::EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicB
 	}
 }
 
-void dCIL::BuildFromLLVMFunctions (const llvm::Function& llvmFunction)
+void dCIL::ConvertLLVMFunctionToNVMFuntion (const llvm::Function& llvmFunction)
 {
 	// emet function decalaration
 	dCIL::dListNode* const function = EmitFunctionDeclaration (llvmFunction);
 
-	// iterate over bascia block and emit teh block body
+	// iterate over bascia block and emit the block body
 	dList<dCIL::dListNode*> terminalInstructions;
 	dTree<const dCIL::dListNode*, const llvm::BasicBlock*> visited;
 	const llvm::BasicBlock* const entryBlock = &llvmFunction.getEntryBlock();
@@ -538,7 +557,36 @@ dCIL::dListNode* dCIL::EmitReturn (const llvm::Instruction* const intruction)
 	llvm::Value* const arg0 = instr->getOperand(0);
 
 	dString arg1Label (GetName (arg0));
-	dTreeAdressStmt::dArgType type = GetType (arg0->getType());
+	dTreeAdressStmt::dArgType type = GetType (arg0);
+	switch (type) 
+	{
+		case dTreeAdressStmt::m_constInt:
+		{
+			dCIL::dListNode* const node = NewStatement();
+			dTreeAdressStmt& stmt = node->GetInfo();
+
+			stmt.m_instruction = dTreeAdressStmt::m_assigment;
+			stmt.m_operator = dTreeAdressStmt::m_nothing;
+
+			stmt.m_arg0.m_type = dTreeAdressStmt::m_int;
+			stmt.m_arg0.m_label = GetReturnVariableName();
+
+			stmt.m_arg1.m_type = type;
+			stmt.m_arg1.m_label = arg1Label;
+
+			type = dTreeAdressStmt::m_int;
+			arg1Label = stmt.m_arg0.m_label;
+
+			DTRACE_INTRUCTION (&stmt);
+			break;
+		}
+
+		case dTreeAdressStmt::m_int:
+			break;
+
+		default:
+			dAssert (0);
+	}
 
 	dCIL::dListNode* const node = NewStatement();
 	dTreeAdressStmt& stmt = node->GetInfo();
@@ -584,7 +632,7 @@ dCIL::dListNode* dCIL::EmitIntegerCompare (const llvm::Instruction* const intruc
 	stmt.m_arg1.m_type = dTreeAdressStmt::m_int;
 	stmt.m_arg1.m_label = GetName (arg0);
 
-	stmt.m_arg2.m_type = dTreeAdressStmt::m_int;
+	stmt.m_arg2.m_type = GetType (arg1);
 	stmt.m_arg2.m_label = GetName (arg1);
 	DTRACE_INTRUCTION (&stmt);
 	return node;
@@ -662,7 +710,7 @@ dCIL::dListNode* dCIL::EmitIntegerAritmetic (const llvm::Instruction* const intr
 	stmt.m_arg1.m_type = dTreeAdressStmt::m_int;
 	stmt.m_arg1.m_label = GetName (arg0);
 
-	stmt.m_arg2.m_type = dTreeAdressStmt::m_int;
+	stmt.m_arg2.m_type = GetType (arg1);
 	stmt.m_arg2.m_label = GetName (arg1);
 	DTRACE_INTRUCTION (&stmt);
 	return node;

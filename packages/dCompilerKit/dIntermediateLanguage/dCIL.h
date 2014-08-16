@@ -47,19 +47,6 @@ class dCIL: public dList<dTreeAdressStmt>
 		m_intRegister,
 		m_floatRegister,
 	};
-
-	enum dIntrisicType
-	{
-		m_void,
-		m_bool,
-		m_byte,
-		m_short,
-		m_int,
-		m_long,
-		m_float,
-		m_double,
-		m_classPointer,
-	};
 */
 
 	class dReturnValue
@@ -90,12 +77,13 @@ class dCIL: public dList<dTreeAdressStmt>
 	void ResetTemporaries();
 	dListNode* NewStatement();
 
-	void BuildFromLLVMFunctions (const llvm::Function& funtion);
+	void ConvertLLVMFunctionToNVMFuntion (const llvm::Function& funtion);
     void Optimize (llvm::Function* const function);
 
 	private:
 	dString GetName (llvm::Value* const value) const;
 	dTreeAdressStmt::dArgType GetType (const llvm::Type* const type) const;
+	dTreeAdressStmt::dArgType GetType (const llvm::Value* const value) const;
 	dCIL::dListNode* EmitReturn (const llvm::Instruction* const intruction);
 	dCIL::dListNode* EmitIntegerAritmetic (const llvm::Instruction* const intruction);
 	dCIL::dListNode* EmitIntegerCompare (const llvm::Instruction* const intruction);

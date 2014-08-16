@@ -22,7 +22,6 @@ dDataFlowGraph::dDataFlowGraph (dCIL* const cil, dCIL::dListNode* const function
 	,m_registersUsedMask(0)
 	,m_cil (cil)
 //	,m_returnType(returnType)
-	,m_returnVariableName(GetReturnVariableName())
 	,m_function(function)
 {
 }
@@ -1338,7 +1337,8 @@ void dDataFlowGraph::BuildGeneratedAndUsedlVariableSets()
 		dDataFlowPoint& point = iter.GetNode()->GetInfo();
 		point.m_generatedVariable.Empty();
 		dTreeAdressStmt& stmt = point.m_statement->GetInfo();	
-//stmt.Trace();
+
+		//stmt.Trace();
 		switch (stmt.m_instruction)
 		{
 			case dTreeAdressStmt::m_loadBase:
@@ -1374,27 +1374,39 @@ void dDataFlowGraph::BuildGeneratedAndUsedlVariableSets()
 			case dTreeAdressStmt::m_assigment:
 			{
 				point.m_generatedVariable = stmt.m_arg0.m_label;
+				switch (stmt.m_arg1.m_type)
+				{
+					case dTreeAdressStmt::m_int:
+					//case dTreeAdressStmt::m_classPointer:
+					{
+						point.m_usedVariableSet.Insert(stmt.m_arg1.m_label);
+						break;
+					}
 
-				dAssert (0);
-				if ((stmt.m_arg1.m_type == dTreeAdressStmt::m_int) || (stmt.m_arg1.m_type == dTreeAdressStmt::m_classPointer)) {
-					point.m_usedVariableSet.Insert(stmt.m_arg1.m_label);
-				} else if (stmt.m_arg1.m_type == dTreeAdressStmt::m_float) {
-					dAssert (0);
-//				} else if ((stmt.m_arg1.m_type == dTreeAdressStmt::m_intConst) || (stmt.m_arg1.m_type == dTreeAdressStmt::m_floatConst)) {
-					// do nothing
-				} else {
-					dAssert (0);
+					case dTreeAdressStmt::m_constInt:
+						break;
+
+					default:	
+						dAssert (0);
 				}
-
 
 				if (stmt.m_operator != dTreeAdressStmt::m_nothing) {
-					if (stmt.m_arg2.m_type == dTreeAdressStmt::m_int) {
-						point.m_usedVariableSet.Insert(stmt.m_arg2.m_label);
-					} else if (stmt.m_arg2.m_type == dTreeAdressStmt::m_float) {
-						dAssert (0);
+					switch (stmt.m_arg2.m_type)
+					{
+						case dTreeAdressStmt::m_int:
+						//case dTreeAdressStmt::m_classPointer:
+						{
+							point.m_usedVariableSet.Insert(stmt.m_arg1.m_label);
+							break;
+						}
+
+						case dTreeAdressStmt::m_constInt:
+							break;
+
+						default:	
+							dAssert (0);
 					}
 				}
-
 				break;
 			}
 
@@ -1425,27 +1437,32 @@ dAssert (0);
 
 			case dTreeAdressStmt::m_ret:
 			{
-dAssert (0);
-/*
-				if (m_returnType != dCIL::m_void) {
-					point.m_usedVariableSet.Insert(m_returnVariableName);
+				switch (stmt.m_arg0.m_type)
+				{
+					case dTreeAdressStmt::m_int:
+						//point.m_usedVariableSet.Insert(m_returnVariableName);
+						point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
+						break;
+
+					case dTreeAdressStmt::m_void:
+					case dTreeAdressStmt::m_constInt:
+						break;
+
+					default:	
+						dAssert (0);
 				}
-*/
 				break;
 			}
 
 			case dTreeAdressStmt::m_if:
 			{
-				dAssert (0);
-/*
-				if (stmt.m_arg0.m_type == dTreeAdressStmt::m_intVar) {
+				if (stmt.m_arg0.m_type == dTreeAdressStmt::m_int) {
 					point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
+				} else {
+					dAssert (0);
 				}
 
-				if (stmt.m_arg1.m_type == dTreeAdressStmt::m_intVar) {
-					point.m_usedVariableSet.Insert(stmt.m_arg1.m_label);
-				}
-*/
+
 				break;
 			}
 /*

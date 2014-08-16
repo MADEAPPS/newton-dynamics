@@ -244,9 +244,10 @@ class dDataFlowGraph
 	int m_registersUsedMask;
 	dCIL* m_cil;
 //	dCIL::dReturnType m_returnType;
-	dString m_returnVariableName;
+//	dString m_returnVariableName;
 	dCIL::dListNode* m_function;
 	dBasicBlocksList m_basicBlocks; 
+	dTree<int , dString> m_returnVariables;
 	dList<dBasicBlock*> m_traversalBlocksOrder; 
 	dTree<dDataFlowPoint, dCIL::dListNode*> m_dataFlowGraph;
 	dTree<dList<dCIL::dListNode*>, dString> m_variableDefinitions;

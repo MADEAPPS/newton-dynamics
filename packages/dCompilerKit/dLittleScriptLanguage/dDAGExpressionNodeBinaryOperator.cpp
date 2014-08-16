@@ -211,7 +211,8 @@ void dDAGExpressionNodeBinaryOperator::CompileCIL(dCIL& cil)
 
 	stmt.m_arg1 = arg1;
 	stmt.m_arg2 = arg2;
-	dAssert (stmt.m_arg1.m_type == stmt.m_arg2.m_type);
+	//dAssert (stmt.m_arg1.m_type == stmt.m_arg2.m_type);
+
 
 	switch (m_operator) 
 	{

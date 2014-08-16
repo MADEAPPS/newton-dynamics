@@ -105,6 +105,7 @@ class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dStrin
 	void SaveSpillRegister(dCIL::dListNode* const node, dTreeAdressStmt::dArg& argument, const dString& spillVariable, const dString& spillMemory);
 	void LoadSpillRegister(dCIL::dListNode* const node, dTreeAdressStmt::dArg& argument, const dString& spillVariable, const dString& spillMemory);
 
+	
 	dTree<int, dString> m_spillPenalty;
 	dList<dCoalescedNodePair> m_coalescedNodes;
 	dDataFlowGraph* m_flowGraph;
