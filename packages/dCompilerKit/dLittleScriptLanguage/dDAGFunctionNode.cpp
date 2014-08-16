@@ -133,6 +133,10 @@ void dDAGFunctionNode::CompileCIL(dCIL& cil)
 //		m_opertatorThis = arg->m_result.m_label;
 	}
 
+	dTreeAdressStmt& entryPoint = cil.NewStatement()->GetInfo();
+	entryPoint.m_instruction = dTreeAdressStmt::m_label;
+	entryPoint.m_arg0.m_label = cil.NewLabel();
+	DTRACE_INTRUCTION (&entryPoint);
 
 	// emit the function arguments
 	for (dList<dDAGParameterNode*>::dListNode* argNode = m_parameters.GetFirst(); argNode; argNode = argNode->GetNext()) {
@@ -146,11 +150,6 @@ void dDAGFunctionNode::CompileCIL(dCIL& cil)
 		arg->m_result = fntArg.m_arg0;
 		DTRACE_INTRUCTION (&fntArg);
 	}
-
-	dTreeAdressStmt& entryPoint = cil.NewStatement()->GetInfo();
-	entryPoint.m_instruction = dTreeAdressStmt::m_label;
-	entryPoint.m_arg0.m_label = cil.NewLabel();
-	DTRACE_INTRUCTION (&entryPoint);
 
 
 	for (dList<dDAGParameterNode*>::dListNode* argNode = m_parameters.GetFirst(); argNode; argNode = argNode->GetNext()) {
@@ -255,17 +254,19 @@ void dDAGFunctionNode::BuildBasicBlocks(dCIL& cil, dCIL::dListNode* const functi
 llvm::Function* dDAGFunctionNode::CreateLLVMfuntionDeclaration (dSymbols& symbols, dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context)
 {
 	std::vector<llvm::Type *> argumentList;
-	for (dCIL::dListNode* argNode = m_functionStart->GetNext(); argNode && (argNode->GetInfo().m_instruction != dTreeAdressStmt::m_label); argNode = argNode->GetNext()) {
+	for (dCIL::dListNode* argNode = m_functionStart->GetNext()->GetNext(); argNode && (argNode->GetInfo().m_instruction != dTreeAdressStmt::m_label); argNode = argNode->GetNext()) {
 		const dTreeAdressStmt& stmt = argNode->GetInfo();
-		dAssert (stmt.m_instruction == dTreeAdressStmt::m_argument);	
-		switch (stmt.m_arg0.m_type)
-		{
-			case dTreeAdressStmt::m_int:
-				argumentList.push_back(llvm::Type::getInt32Ty(context));
-				break;
+		if (stmt.m_instruction == dTreeAdressStmt::m_argument) {
 
-			default:
-				dAssert(0);
+			switch (stmt.m_arg0.m_type)
+			{
+				case dTreeAdressStmt::m_int:
+					argumentList.push_back(llvm::Type::getInt32Ty(context));
+					break;
+
+				default:
+					dAssert(0);
+			}
 		}
 	}
 
@@ -290,23 +291,25 @@ llvm::Function* dDAGFunctionNode::CreateLLVMfuntionDeclaration (dSymbols& symbol
 
 	// set arguments names.
 	llvm::Function::arg_iterator argumnetIter = llvmFunction->arg_begin();  
-	for (dCIL::dListNode* argNode = m_functionStart->GetNext(); argNode && (argNode->GetInfo().m_instruction != dTreeAdressStmt::m_label); argNode = argNode->GetNext()) {
+	for (dCIL::dListNode* argNode = m_functionStart->GetNext()->GetNext(); argNode && (argNode->GetInfo().m_instruction != dTreeAdressStmt::m_label); argNode = argNode->GetNext()) {
 		const dTreeAdressStmt& stmt = argNode->GetInfo();
-		dAssert (stmt.m_instruction == dTreeAdressStmt::m_argument);	
-		switch (stmt.m_arg0.m_type)
+		if (stmt.m_instruction == dTreeAdressStmt::m_argument)
 		{
-			case dTreeAdressStmt::m_int:
+			switch (stmt.m_arg0.m_type)
 			{
-				llvm::Argument* const funtionArg = argumnetIter;
-				funtionArg->setName (stmt.m_arg0.m_label.GetStr());
-				break;
-			}
+				case dTreeAdressStmt::m_int:
+				{
+					llvm::Argument* const funtionArg = argumnetIter;
+					funtionArg->setName (stmt.m_arg0.m_label.GetStr());
+					break;
+				}
 
-			default:
-				dAssert(0);
+				default:
+					dAssert(0);
+			}
+			symbols.Insert(argumnetIter, stmt.m_arg0.m_label.GetStr());
+			argumnetIter ++;
 		}
-		symbols.Insert(argumnetIter, stmt.m_arg0.m_label.GetStr());
-		argumnetIter ++;
 	}
 
 	return llvmFunction;
@@ -532,7 +535,7 @@ void dDAGFunctionNode::TranslateLLVMBlock (dSymbols& symbols, const LLVMBlockScr
 	dCIL::dListNode* const endNode = block.m_end->GetNext();
 	for (dCIL::dListNode* argNode = block.m_begin->GetNext(); argNode != endNode; argNode = argNode->GetNext()) {
 		const dTreeAdressStmt& stmt = argNode->GetInfo();
-		//DTRACE_INTRUCTION (&stmt);
+DTRACE_INTRUCTION (&stmt);
 		dAssert (stmt.m_instruction != dTreeAdressStmt::m_label);	
 
 		switch (stmt.m_instruction)
@@ -590,6 +593,9 @@ void dDAGFunctionNode::TranslateLLVMBlock (dSymbols& symbols, const LLVMBlockScr
 				EmitLLVMCall (symbols, argNode, llvmBlock, context);
 				break;
 			}
+
+			case dTreeAdressStmt::m_argument:
+				break;
 
 			default:
 				dAssert (0);

@@ -422,6 +422,12 @@ dCIL::dListNode* dCIL::EmitFunctionDeclaration (const llvm::Function& llvmFuncti
 	function.m_arg0.m_type = intrinsicType;
 	DTRACE_INTRUCTION (&function);
 
+	dCIL::dListNode* const entryPointNode = NewStatement();
+	dTreeAdressStmt& entryPoint = entryPointNode->GetInfo();
+	entryPoint.m_instruction = dTreeAdressStmt::m_label;
+	entryPoint.m_arg0.m_label = "entryPoint";
+	DTRACE_INTRUCTION (&entryPoint);
+
 	for (llvm::Function::const_arg_iterator iter (llvmFunction.arg_begin()); iter != llvmFunction.arg_end(); iter ++) {
 		const llvm::Argument* const argument = iter;
 		const llvm::StringRef& name = argument->getName();

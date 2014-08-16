@@ -40,7 +40,7 @@ dAssert (0);
 	}
 
 	AllocateRegisters();
-//m_flowGraph->m_cil->Trace();
+m_flowGraph->m_cil->Trace();
 
 	m_flowGraph->BuildBasicBlockGraph();
 	m_flowGraph->CalculateLiveInputLiveOutput ();
@@ -59,12 +59,17 @@ void dRegisterInterferenceGraph::AllocateRegisters ()
 	for (dCIL::dListNode* node = m_flowGraph->m_function; node; node = node->GetNext()) {
 		dTreeAdressStmt& stmt = node->GetInfo();	
 
-stmt.Trace();
+//stmt.Trace();
 		switch (stmt.m_instruction)
 		{
+			case dTreeAdressStmt::m_argument:
+			{
+				stmt.m_arg0.m_label = GetRegisterName (stmt.m_arg0.m_label);
+				break;
+			}
+
 			case dTreeAdressStmt::m_assigment:
 			{
-				dAssert (0);
 				stmt.m_arg0.m_label = GetRegisterName (stmt.m_arg0.m_label);
 				switch (stmt.m_arg1.m_type) 
 				{
@@ -168,14 +173,13 @@ stmt.Trace();
 			case dTreeAdressStmt::m_goto:
 			case dTreeAdressStmt::m_nop:
 			case dTreeAdressStmt::m_label:
-			case dTreeAdressStmt::m_argument:
 			case dTreeAdressStmt::m_function:
 				break;
 
 			default:
 				dAssert (0);
 		}
-stmt.Trace();
+//stmt.Trace();
 	}
 }
 
@@ -183,11 +187,11 @@ stmt.Trace();
 int dRegisterInterferenceGraph::GetRegisterIndex (const dString& varName) const
 {
 	int index = -1;
-	if (varName[0] != '_') {
+//	if (varName[0] != '_') {
 		dTreeNode* const node = Find (varName);
 		dRegisterInterferenceNode& var = node->GetInfo();
 		index = var.m_registerIndex;
-	}
+//	}
 	return index;
 }
 
@@ -197,6 +201,7 @@ dString dRegisterInterferenceGraph::GetRegisterName (const dString& varName) con
 {
 	int index = GetRegisterIndex (varName);
 	if (index == -1) {
+		dAssert (0);
 		return varName;
 	} else {
 		return IndexToRegister(index);
@@ -206,7 +211,8 @@ dString dRegisterInterferenceGraph::GetRegisterName (const dString& varName) con
 bool dRegisterInterferenceGraph::IsTempVariable (const dString& name) const
 {
     int spillSize = strlen (D_SPILL_REGISTER_SYMBOL);
-    return (name[0] != '_') && strncmp (name.GetStr(), D_SPILL_REGISTER_SYMBOL, spillSize);
+//    return (name[0] != '_') && strncmp (name.GetStr(), D_SPILL_REGISTER_SYMBOL, spillSize);
+	return strncmp (name.GetStr(), D_SPILL_REGISTER_SYMBOL, spillSize);
 }
 
 void dRegisterInterferenceGraph::Build()
@@ -223,33 +229,63 @@ void dRegisterInterferenceGraph::Build()
 				if (!interferanceGraphNode) {
 					interferanceGraphNode = Insert(variable);
 					interferanceGraphNode->GetInfo().m_name = variable;
-dTrace (("%s\n", variable.GetStr()));
+//dTrace (("%s\n", variable.GetStr()));
 				}
 			}
 		}
 	}
 
 	// pre-color some special nodes
+	int intArgumentIndex = 0; 
 	m_flowGraph->m_returnVariables.RemoveAll();
 	for (dCIL::dListNode* stmtNode = m_flowGraph->m_function; stmtNode; stmtNode = stmtNode->GetNext()) {
 		dTreeAdressStmt& stmt = stmtNode->GetInfo();
-		if (stmt.m_instruction == dTreeAdressStmt::m_ret) {
-			switch (stmt.m_arg0.m_type) 
+
+		switch (stmt.m_instruction)
+		{
+			case dTreeAdressStmt::m_ret:
 			{
-				case dTreeAdressStmt::m_int:
+				switch (stmt.m_arg0.m_type) 
 				{
-					dTreeNode* const returnRegNode = Find(stmt.m_arg0.m_label);
-					dAssert (returnRegNode);
-					dRegisterInterferenceNode& returnReginster = returnRegNode->GetInfo();
-					returnReginster.m_registerIndex = D_RETURN_REGISTER_INDEX;
-					m_flowGraph->m_returnVariables.Insert (D_RETURN_REGISTER_INDEX, stmt.m_arg0.m_label);
-					break;
+					case dTreeAdressStmt::m_int:
+					{
+						dTreeNode* const returnRegNode = Find(stmt.m_arg0.m_label);
+						dAssert (returnRegNode);
+						dRegisterInterferenceNode& returnReginster = returnRegNode->GetInfo();
+						returnReginster.m_registerIndex = D_RETURN_REGISTER_INDEX;
+						m_flowGraph->m_returnVariables.Insert (D_RETURN_REGISTER_INDEX, stmt.m_arg0.m_label);
+						break;
+					}
+					default:
+						dAssert (0);
 				}
-
-				default:
-					dAssert (0);
-
+				break;
 			}
+
+			case dTreeAdressStmt::m_argument:
+			{
+				switch (stmt.m_arg0.m_type) 
+				{
+					case dTreeAdressStmt::m_int:
+					{
+						if (intArgumentIndex < 8) {
+							dTreeNode* const returnRegNode = Find(stmt.m_arg0.m_label);
+							dAssert (returnRegNode);
+							dRegisterInterferenceNode& returnReginster = returnRegNode->GetInfo();
+							returnReginster.m_registerIndex = intArgumentIndex;
+							intArgumentIndex ++;
+						} else {
+							dAssert (0);
+						}
+						break;
+					}
+					default:
+						dAssert (0);
+				}
+				break;
+			}
+
+			default:;
 		}
 	}
 

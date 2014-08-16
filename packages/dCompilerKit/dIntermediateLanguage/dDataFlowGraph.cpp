@@ -1338,9 +1338,16 @@ void dDataFlowGraph::BuildGeneratedAndUsedlVariableSets()
 		point.m_generatedVariable.Empty();
 		dTreeAdressStmt& stmt = point.m_statement->GetInfo();	
 
-		//stmt.Trace();
+//stmt.Trace();
 		switch (stmt.m_instruction)
 		{
+			case dTreeAdressStmt::m_argument:
+			{
+				point.m_generatedVariable = stmt.m_arg0.m_label;
+				break;
+			}
+
+
 			case dTreeAdressStmt::m_loadBase:
 			{
 				point.m_generatedVariable = stmt.m_arg0.m_label;
@@ -1461,8 +1468,6 @@ dAssert (0);
 				} else {
 					dAssert (0);
 				}
-
-
 				break;
 			}
 /*
@@ -1480,7 +1485,6 @@ dAssert (0);
 			//case dTreeAdressStmt::m_enter:
 			//case dTreeAdressStmt::m_leave:
 			case dTreeAdressStmt::m_function:
-			case dTreeAdressStmt::m_argument:
 				break;
 
 			default:
