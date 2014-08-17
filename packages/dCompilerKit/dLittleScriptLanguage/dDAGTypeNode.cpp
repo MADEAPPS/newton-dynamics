@@ -59,6 +59,16 @@ dDAG* dDAGTypeNode::Clone (dList<dDAG*>& allNodes) const
 }
 
 
+dTreeAdressStmt::dArgType dDAGTypeNode::GetIntrisicType() const
+{
+	return m_intrinsicType;
+}
+
+const char* dDAGTypeNode::GetIntrisicTypeString() const
+{
+	return  dTreeAdressStmt::GetTypeString (GetIntrisicType());
+}
+
 void dDAGTypeNode::AddDimensions (dDAGDimensionNode* const dimList)
 {
 	for (dDAGDimensionNode* node = dimList; node; node = node->m_next) {

@@ -42,6 +42,11 @@ void dDAGParameterNode::SetType(dDAGTypeNode* const type)
 }
 
 
+dDAGTypeNode* dDAGParameterNode::GetType() const 
+{
+	return m_type;
+}
+
 void dDAGParameterNode::ConnectParent(dDAG* const parent)  
 {
 	m_parent = parent;

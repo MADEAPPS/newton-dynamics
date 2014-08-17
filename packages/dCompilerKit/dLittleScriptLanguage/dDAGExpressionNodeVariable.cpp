@@ -90,22 +90,29 @@ void dDAGExpressionNodeVariable::ConnectParent(dDAG* const parent)
 	}
 }
 
-dCIL::dReturnValue dDAGExpressionNodeVariable::Evalue(dCIL& cil)
+dCIL::dReturnValue dDAGExpressionNodeVariable::Evalue(const dDAGFunctionNode* const function)
 {
-	dCIL::dReturnValue val;
-	dDAGClassNode* const myClass = GetClass();
-	for (dList<dDAGExpressionClassVariable*>::dListNode* node = myClass->m_variables.GetFirst(); node; node = node->GetNext()) {
-		dDAGExpressionClassVariable* const variable = node->GetInfo();
-		if (variable->m_variable->m_name == m_name) {
-			if (variable->m_iniatilized) {
-				return variable->m_initialValue;
-			} else {
-				dAssert (0);
+	if (function) {
+		dTree<dTreeAdressStmt::dArg, dString>::dTreeNode* const node = FindLocalVariable (m_name);
+		dAssert (node);
+
+	} else {
+		dAssert(0);
+		dCIL::dReturnValue val;
+		dDAGClassNode* const myClass = GetClass();
+		for (dList<dDAGExpressionClassVariable*>::dListNode* node = myClass->m_variables.GetFirst(); node; node = node->GetNext()) {
+			dDAGExpressionClassVariable* const variable = node->GetInfo();
+			if (variable->m_variable->m_name == m_name) {
+				if (variable->m_iniatilized) {
+					return variable->m_initialValue;
+				} else {
+					dAssert (0);
+				}
 			}
 		}
 	}
 	dAssert(0);
-	return val;
+	return dCIL::dReturnValue();
 }
 
 void dDAGExpressionNodeVariable::CompileCIL(dCIL& cil)

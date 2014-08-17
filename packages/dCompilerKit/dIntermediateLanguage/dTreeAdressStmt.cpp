@@ -51,9 +51,16 @@ dTreeAdressStmt::~dTreeAdressStmt(void)
 {
 }
 
+
+const char* dTreeAdressStmt::GetTypeString (const dArgType argType)
+{
+	return m_maptable[argType].m_name.GetStr();
+}
+
 const char* dTreeAdressStmt::GetTypeString (const dArg& arg) const
 {
-	return m_maptable[arg.m_type].m_name.GetStr();
+	//return m_maptable[arg.m_type].m_name.GetStr();
+	return GetTypeString (arg.m_type);
 }
 
 void dTreeAdressStmt::TraceAssigment (char* const text) const

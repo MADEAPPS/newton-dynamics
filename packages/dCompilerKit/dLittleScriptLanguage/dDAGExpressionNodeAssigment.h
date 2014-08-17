@@ -23,7 +23,7 @@ class dDAGExpressionNodeAssigment: public dDAGExpressionNode
 	dDAGExpressionNodeAssigment(dList<dDAG*>& allNodes, dDAGExpressionNodeVariable* const leftVariable, dDAGExpressionNode* const expression);
 	~dDAGExpressionNodeAssigment();
 
-	virtual dCIL::dReturnValue Evalue(dCIL& cil);
+	virtual dCIL::dReturnValue Evalue(const dDAGFunctionNode* const function);
 	virtual void CompileCIL(dCIL& cil);
 	virtual void ConnectParent(dDAG* const parent);
 	virtual dDAGExpressionNodeVariable* FindLeftVariable();

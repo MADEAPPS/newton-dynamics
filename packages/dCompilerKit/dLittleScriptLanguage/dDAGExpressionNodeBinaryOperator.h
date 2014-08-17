@@ -38,7 +38,7 @@ class dDAGExpressionNodeBinaryOperator: public dDAGExpressionNode
 	~dDAGExpressionNodeBinaryOperator(void);
 
 
-	virtual dCIL::dReturnValue Evalue(dCIL& cil);
+	virtual dCIL::dReturnValue Evalue(const dDAGFunctionNode* const function);
 	virtual void CompileCIL(dCIL& cil);
 	virtual void ConnectParent(dDAG* const parent);
 

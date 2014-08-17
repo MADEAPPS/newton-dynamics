@@ -17,7 +17,8 @@
 #include "dDAGScopeBlockNode.h"
 
 
-dString dDAG::dScopePrefix ("scope");
+dString dDAG::m_scopePrefix ("scope");
+dString dDAG::m_prototypeSeparator ("::");
 
 dRttiRootClassSupportImplement(dDAG);
 
@@ -59,7 +60,7 @@ dTree<dTreeAdressStmt::dArg, dString>::dTreeNode* dDAG::FindLocalVariable(const 
 
 dTreeAdressStmt::dArg dDAG::LoadLocalVariable (dCIL& cil, const dTreeAdressStmt::dArg& arg) const
 {
-	if (arg.m_label.Find(dScopePrefix) == 0) {
+	if (arg.m_label.Find(m_scopePrefix) == 0) {
 		dTreeAdressStmt& loadVar = cil.NewStatement()->GetInfo();
 		loadVar.m_instruction = dTreeAdressStmt::m_loadBase;
 		loadVar.m_arg1 = arg;

@@ -124,7 +124,9 @@ class dTreeAdressStmt
 	void TraceAssigment (char* const textOut) const;
 //	void TraceConditional (char* const textOut) const;
 
+	
 	const char* GetTypeString (const dArg& arg) const;
+	static const char* GetTypeString (const dArgType argType);
 
 	static dMapTable m_maptable[];
 };

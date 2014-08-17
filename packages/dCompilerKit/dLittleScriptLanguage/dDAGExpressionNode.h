@@ -16,6 +16,7 @@
 #include "dLSCstdafx.h"
 class dDAGExpressionNodeVariable;
 
+class dDAGFunctionNode;
 
 class dDAGExpressionNode: public dDAG
 {
@@ -23,7 +24,9 @@ class dDAGExpressionNode: public dDAG
 	dDAGExpressionNode (dList<dDAG*>& allNodes);
 	~dDAGExpressionNode(void);
 
-	virtual dCIL::dReturnValue Evalue(dCIL& cil) {dAssert (0); return dCIL::dReturnValue();}
+	//virtual dCIL::dReturnValue Evalue(const dDAGFunctionNode* const function) = 0;
+	virtual dCIL::dReturnValue Evalue(const dDAGFunctionNode* const function) {dAssert (0); return dCIL::dReturnValue();}
+
 	virtual void CompileCIL(dCIL& cil) {dAssert (0);}
 	virtual void ConnectParent(dDAG* const parent)  {dAssert (0);}
 	virtual dDAGExpressionNodeVariable* FindLeftVariable() {dAssert (0); return NULL; }

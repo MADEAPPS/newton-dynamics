@@ -44,7 +44,7 @@ void dDAGScopeBlockNode::AddVariable (const dString& name, dTreeAdressStmt::dArg
 	dAssert (node);
 	dTreeAdressStmt::dArg& arg = node->GetInfo();
 	arg.m_type = type;
-	arg.m_label = dScopePrefix + dString (m_scopeLayer) + name, name;
+	arg.m_label = m_scopePrefix + dString (m_scopeLayer) + name, name;
 }
 
 dTree<dTreeAdressStmt::dArg, dString>::dTreeNode* dDAGScopeBlockNode::FindVariable(const dString& name) const

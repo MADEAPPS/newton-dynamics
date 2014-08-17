@@ -57,7 +57,7 @@ dScriptCompiler::dScriptCompiler(const char* const pakacgesRootNameDirectory)
 	:dLittleScriptParser ()
 	,m_packageRootDirectory (pakacgesRootNameDirectory)
 	,m_currentPackage(NULL)
-	,m_currentFunction(NULL)
+	//,m_currentFunction(NULL)
 	,m_classList()
 	,m_scopeStack()
 	,m_allNodes()
@@ -167,6 +167,15 @@ int dScriptCompiler::CompileSource (const char* const source)
 
 		llvm::Module* const module = m_module.get();
 		dCIL cil (module);
+
+		dDAG::dLLVMSymbols globalLLVMSymbols;
+		for (dList<dDAGClassNode*>::dListNode* node = m_classList.GetFirst(); node; node = node->GetNext()) {
+			dDAGClassNode* const scripClass = node->GetInfo();
+			scripClass->CompileCIL (cil);
+			scripClass->AddLLVMGlobalSymbols (cil, module, m_context, globalLLVMSymbols);
+		}
+
+		cil.Trace();
 		for (dList<dDAGClassNode*>::dListNode* node = m_classList.GetFirst(); node; node = node->GetNext()) {
 			dDAGClassNode* const scripClass = node->GetInfo();
 			scripClass->CompileCIL (cil);
@@ -174,11 +183,14 @@ int dScriptCompiler::CompileSource (const char* const source)
 //			dTrace(("optimized version\n"));
 			cil.Trace();
 
-			scripClass->TranslateToLLVM (cil, module, m_context);
+			scripClass->TranslateToLLVM (cil, module, m_context, globalLLVMSymbols);
 
 			//_ASSERTE (m_currentPackage);
 //			//m_currentPackage->AddClass(scripClass, cil);
 		}
+
+
+
 
 		if (llvm::verifyModule(*module)) {
 			llvm::errs() << ": Error constructing function!\n";
@@ -444,6 +456,7 @@ dScriptCompiler::dUserVariable dScriptCompiler::AddClassFunction (const dUserVar
 	GetCurrentClass()->AddFunction(functionNode);
 
 	returnNode.m_node = functionNode;
+	//m_currentFunction = functionNode;
 	return returnNode;
 }
 
@@ -847,6 +860,7 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewExpressionFunctionCall (const
 {
 	dUserVariable returnNode;
 
+	//dAssert (m_currentFunction);
 	dDAGExpressionNode* const argumentListNode = (dDAGExpressionNode*) argumnetList.m_node;
 	dAssert (!argumentListNode || argumentListNode->IsType(dDAGExpressionNode::GetRttiType()));
 	dDAGExpressionNodeFunctionCall* const fntCall = new dDAGExpressionNodeFunctionCall(m_allNodes, name.GetStr(), argumentListNode);

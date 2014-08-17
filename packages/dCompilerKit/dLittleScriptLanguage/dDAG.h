@@ -12,6 +12,7 @@
 #ifndef __dDAG_h_
 #define __dDAG_h_
 
+#include "dCILstdafx.h"
 #include "dLSCstdafx.h"
 
 #ifdef _MSC_VER
@@ -31,6 +32,16 @@ class dDAGScopeBlockNode;
 class dDAG
 {
 	public:
+	class dLLVMSymbols: public dTree <llvm::Value*, dString>
+	{
+		public:
+		dLLVMSymbols ()
+			:dTree <llvm::Value*, dString>()
+		{
+		}
+	};
+
+
 	dDAG(dList<dDAG*>& allNodes);
 	virtual ~dDAG(void);
 	
@@ -51,7 +62,8 @@ class dDAG
 	dDAG* m_parent;
 	dList<dDAG*>::dListNode* m_myListNode;
 
-	static dString dScopePrefix;
+	static dString m_scopePrefix;
+	static dString m_prototypeSeparator;
 
 	dDAGRttiRootClassSupportDeclare(dDAG);
 	

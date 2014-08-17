@@ -89,15 +89,14 @@ dAssert (0);
 */
 }
 
-dCIL::dReturnValue dDAGExpressionNodeBinaryOperator::Evalue(dCIL& cil)
+dCIL::dReturnValue dDAGExpressionNodeBinaryOperator::Evalue(const dDAGFunctionNode* const function)
 {
-	dCIL::dReturnValue val;
-dAssert (0);
-/*
-	dCIL::dReturnValue operandA (m_expressionA->Evalue(cil));
-	dCIL::dReturnValue operandB (m_expressionB->Evalue(cil));
+	dCIL::dReturnValue operandA (m_expressionA->Evalue(function));
+	dCIL::dReturnValue operandB (m_expressionB->Evalue(function));
 	PromoteTypes (operandA, operandB);
 
+	dCIL::dReturnValue val (operandA);	
+/*
 	val.m_type = operandA.m_type;
 	switch (m_operator) 
 	{

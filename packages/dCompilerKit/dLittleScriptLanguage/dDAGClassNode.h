@@ -35,14 +35,15 @@ class dDAGClassNode: public dDAG
 	dString GetFunctionName (const dString& functionName, dList<dDAGParameterNode*>& parameterNodeList) const;
 	dString GetFunctionName (const dString& functionName, dList<dDAGExpressionNode*>& argumentList) const;
 	dDAGTypeNode* GetFunctionReturnType (const dString& functionName, dList<dDAGExpressionNode*>& argumentList) const;
-
+	
 	dDAGFunctionNode* GetCurrentFunction ();
 	dDAGParameterNode* FindVariable(const dString& name) const;
 
 	virtual void CompileCIL(dCIL& cil);
 	virtual void ConnectParent(dDAG* const parent);
 
-	void TranslateToLLVM (dCIL& cil, llvm::Module* const module, llvm::LLVMContext &Context);
+	void AddLLVMGlobalSymbols (dCIL& cil, llvm::Module* const module, llvm::LLVMContext &Context, dDAG::dLLVMSymbols& globalLLVMSymbols);
+	void TranslateToLLVM (dCIL& cil, llvm::Module* const module, llvm::LLVMContext &Context, const dDAG::dLLVMSymbols& globalLLVMSymbols);
 
 	bool m_isFinal;
 	bool m_isPublic;

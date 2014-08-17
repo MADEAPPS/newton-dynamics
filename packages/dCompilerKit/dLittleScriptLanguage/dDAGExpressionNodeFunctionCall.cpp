@@ -56,7 +56,10 @@ void dDAGExpressionNodeFunctionCall::ConnectParent(dDAG* const parent)
 void dDAGExpressionNodeFunctionCall::CompileCIL(dCIL& cil)  
 {
 	dDAGClassNode* const myClass = GetClass();
+	dAssert (myClass);
+	//dDAGFunctionNode* const myFunction = myClass->GetCurrentFunction ();
 
+	dString name (m_name);
 	for (dList<dDAGExpressionNode*>::dListNode* node = m_argumentList.GetLast(); node; node = node->GetPrev()) {
 		dDAGExpressionNode* const expNode = node->GetInfo();
 		expNode->CompileCIL(cil);
@@ -65,15 +68,18 @@ void dDAGExpressionNodeFunctionCall::CompileCIL(dCIL& cil)
 		stmt.m_instruction = dTreeAdressStmt::m_param;
 		stmt.m_arg0 = expNode->m_result;
 		DTRACE_INTRUCTION (&stmt);
+
+		name += m_prototypeSeparator + dTreeAdressStmt::GetTypeString (stmt.m_arg0.m_type);
 	}
 
-	dDAGTypeNode* const returnType = myClass->GetFunctionReturnType(m_name.GetStr(), m_argumentList);
+	dDAGTypeNode* const returnType = myClass->GetFunctionReturnType(name.GetStr(), m_argumentList);
 
 	m_result.m_label = cil.NewTemp ();
 	m_result.m_type = returnType->m_intrinsicType;
 	dTreeAdressStmt& call = cil.NewStatement()->GetInfo();
 	call.m_instruction = dTreeAdressStmt::m_call;
 	call.m_arg0 = m_result;
-	call.m_arg1.m_label = myClass->GetFunctionName (m_name.GetStr(), m_argumentList);
+	//call.m_arg1.m_label = myClass->GetFunctionName (name.GetStr(), m_argumentList);
+	call.m_arg1.m_label = name.GetStr();
 	DTRACE_INTRUCTION (&call);
 }

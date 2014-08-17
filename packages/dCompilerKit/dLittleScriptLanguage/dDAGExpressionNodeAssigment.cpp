@@ -37,9 +37,10 @@ void dDAGExpressionNodeAssigment::ConnectParent(dDAG* const parent)
 }
 
 
-dCIL::dReturnValue dDAGExpressionNodeAssigment::Evalue(dCIL& cil)
+dCIL::dReturnValue dDAGExpressionNodeAssigment::Evalue(const dDAGFunctionNode* const function)
 {
-	dCIL::dReturnValue val (m_expression->Evalue(cil));
+	dAssert (0);
+	dCIL::dReturnValue val (m_expression->Evalue(function));
 	dAssert (!m_leftVariable->m_dimExpressions.GetCount());
 
 	if (m_leftVariable->m_type->m_intrinsicType != val.m_type) {
@@ -140,7 +141,7 @@ void dDAGExpressionNodeAssigment::CompileCIL(dCIL& cil)
 		m_leftVariable->CompileCIL(cil); 
 		dTreeAdressStmt::dArg arg1 (LoadLocalVariable(cil, m_expression->m_result));
 		dTreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
-		stmt.m_instruction = (m_leftVariable->m_result.m_label.Find(dScopePrefix) == 0) ? dTreeAdressStmt::m_storeBase : stmt.m_instruction = dTreeAdressStmt::m_assigment;
+		stmt.m_instruction = (m_leftVariable->m_result.m_label.Find(m_scopePrefix) == 0) ? dTreeAdressStmt::m_storeBase : stmt.m_instruction = dTreeAdressStmt::m_assigment;
 		stmt.m_arg0 = m_leftVariable->m_result;
 		stmt.m_arg1 = arg1;
 		DTRACE_INTRUCTION (&stmt);

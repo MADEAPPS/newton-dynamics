@@ -25,7 +25,9 @@ class dDAGParameterNode: public dDAGFunctionStatement
 	dDAGParameterNode (dList<dDAG*>& allNodes, const dString& name, const dString& modifiers);
 	~dDAGParameterNode(void);
 
+	dDAGTypeNode* GetType() const;
 	void SetType(dDAGTypeNode* const type);
+	
 
 	virtual void CompileCIL(dCIL& cil); 
 	virtual void ConnectParent(dDAG* const parent);

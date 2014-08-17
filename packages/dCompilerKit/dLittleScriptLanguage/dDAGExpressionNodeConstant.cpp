@@ -37,7 +37,7 @@ void dDAGExpressionNodeConstant::ConnectParent(dDAG* const parent)
 	m_parent = parent;
 }
 
-dCIL::dReturnValue dDAGExpressionNodeConstant::Evalue(dCIL& cil)
+dCIL::dReturnValue dDAGExpressionNodeConstant::Evalue(const dDAGFunctionNode* const function)
 {
 	dCIL::dReturnValue val;
 	dAssert (0);

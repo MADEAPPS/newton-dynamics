@@ -33,8 +33,6 @@ class dDAGFunctionNode;
 class dDAGScopeBlockNode;
 class dLittleScriptLexical;
 
-//using namespace llvm;
-
 class dScriptCompiler: public dLittleScriptParser
 {
 	public:
@@ -121,7 +119,7 @@ class dScriptCompiler: public dLittleScriptParser
 	dString m_packageFileName;
 	dString m_packageRootDirectory;
 	dScriptPackage* m_currentPackage;
-	dDAGFunctionNode* m_currentFunction;
+	//dDAGFunctionNode* m_currentFunction;
 	dList<dDAGClassNode*> m_classList;
 	dList<dDAGScopeBlockNode*> m_scopeStack;
 	dList<dDAG*> m_allNodes;
