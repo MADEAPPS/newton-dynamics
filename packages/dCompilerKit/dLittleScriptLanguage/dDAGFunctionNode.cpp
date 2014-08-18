@@ -539,6 +539,13 @@ void dDAGFunctionNode::EmitLLVMAssignment (dLLVMSymbols& localSymbols, dCIL::dLi
 			break;
 		}
 
+		case dTreeAdressStmt::m_add:
+		{
+			dAssert (stmt.m_arg1.m_type == dTreeAdressStmt::m_int);
+			arg0 = llvm::BinaryOperator::Create (llvm::Instruction::Add, arg1, arg2, stmt.m_arg0.m_label.GetStr(), llvmBlock);
+			break;
+		}
+
 		case dTreeAdressStmt::m_sub:
 		{
 			dAssert (stmt.m_arg1.m_type == dTreeAdressStmt::m_int);

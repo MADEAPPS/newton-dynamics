@@ -63,10 +63,11 @@ void dDAGExpressionNodeFunctionCall::CompileCIL(dCIL& cil)
 	for (dList<dDAGExpressionNode*>::dListNode* node = m_argumentList.GetLast(); node; node = node->GetPrev()) {
 		dDAGExpressionNode* const expNode = node->GetInfo();
 		expNode->CompileCIL(cil);
-		
+
+		dTreeAdressStmt::dArg arg1 (LoadLocalVariable(cil, expNode->m_result));
 		dTreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
 		stmt.m_instruction = dTreeAdressStmt::m_param;
-		stmt.m_arg0 = expNode->m_result;
+		stmt.m_arg0 = arg1;
 		DTRACE_INTRUCTION (&stmt);
 
 		dTreeAdressStmt::dArgType intrisicType = stmt.m_arg0.m_type;
