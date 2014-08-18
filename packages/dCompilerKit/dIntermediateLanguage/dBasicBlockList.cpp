@@ -52,9 +52,12 @@ void dBasicBlocksList::Clear ()
 
 void dBasicBlocksList::Build(dCIL& cil, dCIL::dListNode* const functionNode)
 {
+	dCIL::dListNode* lastNode = functionNode->GetNext();
+	for (; lastNode && (lastNode->GetInfo().m_instruction != dTreeAdressStmt::m_function); lastNode = lastNode->GetNext());
+
 	// remove redundant jumps
 	dCIL::dListNode* nextNode;
-	for (dCIL::dListNode* node = functionNode; node; node = nextNode) {
+	for (dCIL::dListNode* node = functionNode; node != lastNode; node = nextNode) {
 		nextNode = node->GetNext(); 
 		const dTreeAdressStmt& stmt = node->GetInfo();
 		if (stmt.m_instruction == dTreeAdressStmt::m_goto) {
@@ -67,7 +70,7 @@ void dBasicBlocksList::Build(dCIL& cil, dCIL::dListNode* const functionNode)
 	}
 
 	// find the root of all basic blocks leaders
-	for (dCIL::dListNode* node = functionNode; node; node = node->GetNext()) {
+	for (dCIL::dListNode* node = functionNode; node != lastNode; node = node->GetNext()) {
 		const dTreeAdressStmt& stmt = node->GetInfo();
 
 		if (stmt.m_instruction == dTreeAdressStmt::m_label) {

@@ -1433,12 +1433,9 @@ void dDataFlowGraph::BuildGeneratedAndUsedlVariableSets()
 
 			case dTreeAdressStmt::m_call:
 			{
-dAssert (0);
-/*
-				if (m_returnType != dCIL::m_void) {
-					point.m_generatedVariable = m_returnVariableName;
+				if (stmt.m_arg0.m_type != dTreeAdressStmt::m_void) {
+					point.m_generatedVariable = stmt.m_arg0.m_label;
 				}
-*/
 				break;
 			}
 
@@ -1458,6 +1455,12 @@ dAssert (0);
 					default:	
 						dAssert (0);
 				}
+				break;
+			}
+
+			case dTreeAdressStmt::m_param:
+			{
+				point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
 				break;
 			}
 
@@ -1758,6 +1761,7 @@ bool dDataFlowGraph::ApplyRemoveDeadCode()
 {
 	CalculateLiveInputLiveOutput ();
 
+xxxxxxxxxxxx
 	bool ret = false;
 	dCIL::dListNode* nextStmtNode;
 	for (dCIL::dListNode* stmtNode = m_function; stmtNode; stmtNode = nextStmtNode) {

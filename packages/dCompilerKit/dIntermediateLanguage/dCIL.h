@@ -84,6 +84,8 @@ class dCIL: public dList<dTreeAdressStmt>
 	dString GetName (llvm::Value* const value) const;
 	dTreeAdressStmt::dArgType GetType (const llvm::Type* const type) const;
 	dTreeAdressStmt::dArgType GetType (const llvm::Value* const value) const;
+
+	dCIL::dListNode* EmitCall (const llvm::Instruction* const intruction);
 	dCIL::dListNode* EmitReturn (const llvm::Instruction* const intruction);
 	dCIL::dListNode* EmitIntegerAritmetic (const llvm::Instruction* const intruction);
 	dCIL::dListNode* EmitIntegerCompare (const llvm::Instruction* const intruction);

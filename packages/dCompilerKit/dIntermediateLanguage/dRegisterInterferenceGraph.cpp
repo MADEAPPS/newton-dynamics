@@ -41,7 +41,7 @@ dAssert (0);
 
 	AllocateRegisters();
 m_flowGraph->m_cil->Trace();
-
+/*
 	m_flowGraph->BuildBasicBlockGraph();
 	m_flowGraph->CalculateLiveInputLiveOutput ();
 	for (bool optimized = true; optimized;) {
@@ -52,6 +52,7 @@ m_flowGraph->m_cil->Trace();
 		optimized |= m_flowGraph->ApplyRemoveDeadCode();
 //m_flowGraph->m_cil->Trace();
 	}
+*/
 }
 
 void dRegisterInterferenceGraph::AllocateRegisters ()
@@ -229,7 +230,7 @@ void dRegisterInterferenceGraph::Build()
 				if (!interferanceGraphNode) {
 					interferanceGraphNode = Insert(variable);
 					interferanceGraphNode->GetInfo().m_name = variable;
-//dTrace (("%s\n", variable.GetStr()));
+dTrace (("%s\n", variable.GetStr()));
 				}
 			}
 		}

@@ -524,6 +524,10 @@ const dCIL::dListNode*dCIL::EmitBasicBlockBody(const llvm::Function& function, c
 				break;
 			}
 
+			case llvm::Instruction::Call:
+				node = EmitCall (intruction);
+				break;
+
 			case llvm::Instruction::ICmp:
 			{
 				node = EmitIntegerCompare (intruction);
@@ -536,6 +540,7 @@ const dCIL::dListNode*dCIL::EmitBasicBlockBody(const llvm::Function& function, c
 				break;
 			}
 
+			case llvm::Instruction::Add:
 			case llvm::Instruction::Sub:
 			{
 				node = EmitIntegerAritmetic (intruction);
@@ -553,6 +558,37 @@ const dCIL::dListNode*dCIL::EmitBasicBlockBody(const llvm::Function& function, c
 	}
 
 	return blockLabelNode;
+}
+
+dCIL::dListNode* dCIL::EmitCall (const llvm::Instruction* const intruction)
+{
+	llvm::CallInst* const instr =  (llvm::CallInst*) intruction;
+
+	int argCount = instr->getNumOperands();
+	for (int i = 0; i < argCount - 1; i ++) {
+		llvm::Value* const arg = instr->getOperand(i);
+
+		dCIL::dListNode* const node = NewStatement();
+		dTreeAdressStmt& stmt = node->GetInfo();
+		stmt.m_instruction = dTreeAdressStmt::m_param;
+		stmt.m_arg0.m_type = GetType (arg);
+		stmt.m_arg0.m_label = GetName (arg);
+		DTRACE_INTRUCTION (&stmt);
+	}
+
+	dCIL::dListNode* const node = NewStatement();
+	dTreeAdressStmt& stmt = node->GetInfo();
+
+	llvm::Value* const arg = instr->getOperand(argCount - 1);
+	stmt.m_instruction = dTreeAdressStmt::m_call;
+
+	stmt.m_arg0.m_type = GetType (instr);
+	stmt.m_arg0.m_label = instr->getName().data();
+
+	stmt.m_arg1.m_type = stmt.m_arg0.m_type;
+	stmt.m_arg1.m_label = GetName (arg);
+	DTRACE_INTRUCTION (&stmt);
+	return node;
 }
 
 dCIL::dListNode* dCIL::EmitReturn (const llvm::Instruction* const intruction)
@@ -690,6 +726,12 @@ dCIL::dListNode* dCIL::EmitIntegerAritmetic (const llvm::Instruction* const intr
 	llvm::BinaryOperator::BinaryOps opcode = instr->getOpcode();
 	switch (opcode) 
 	{
+		case llvm::Instruction::Add:
+		{
+			operation = dTreeAdressStmt::m_add;
+			break;
+		}
+
 		case llvm::Instruction::Sub:
 		{
 			operation = dTreeAdressStmt::m_sub;
