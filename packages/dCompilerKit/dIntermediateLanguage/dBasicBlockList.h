@@ -36,16 +36,8 @@ class dBasicBlocksList: public dList<dBasicBlock>
 
 	void Clear ();
 	void Build(dCIL& cil, dCIL::dListNode* const functionNode);
-/*
-	void Trace() const
-	{
-		#ifdef TRACE_INTERMEDIATE_CODE
-			for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
-				node->GetInfo().Trace();
-			}
-		#endif
-	}
-*/
+	dCIL::dListNode* m_begin;
+	dCIL::dListNode* m_end;
 };
 
 

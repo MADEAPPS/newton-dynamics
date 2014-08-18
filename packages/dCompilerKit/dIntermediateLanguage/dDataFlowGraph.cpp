@@ -1325,7 +1325,7 @@ void dDataFlowGraph::UpdateReachingDefinitions()
 }
 
 
-void dDataFlowGraph::BuildGeneratedAndUsedlVariableSets()
+void dDataFlowGraph::BuildGeneratedAndUsedVariableSets()
 {
 	dTree<dDataFlowPoint, dCIL::dListNode*>::Iterator iter (m_dataFlowGraph);
 	for (iter.Begin(); iter; iter ++) {
@@ -1403,7 +1403,7 @@ void dDataFlowGraph::BuildGeneratedAndUsedlVariableSets()
 						case dTreeAdressStmt::m_int:
 						//case dTreeAdressStmt::m_classPointer:
 						{
-							point.m_usedVariableSet.Insert(stmt.m_arg1.m_label);
+							point.m_usedVariableSet.Insert(stmt.m_arg2.m_label);
 							break;
 						}
 
@@ -1500,7 +1500,7 @@ void dDataFlowGraph::BuildGeneratedAndUsedlVariableSets()
 
 void dDataFlowGraph::CalculateLiveInputLiveOutput ()
 {
-	BuildGeneratedAndUsedlVariableSets();
+	BuildGeneratedAndUsedVariableSets();
 
 	dTree<dDataFlowPoint, dCIL::dListNode*>::Iterator iter (m_dataFlowGraph);
 	for (iter.Begin(); iter; iter ++) {
@@ -1761,10 +1761,10 @@ bool dDataFlowGraph::ApplyRemoveDeadCode()
 {
 	CalculateLiveInputLiveOutput ();
 
-xxxxxxxxxxxx
 	bool ret = false;
 	dCIL::dListNode* nextStmtNode;
-	for (dCIL::dListNode* stmtNode = m_function; stmtNode; stmtNode = nextStmtNode) {
+//	for (dCIL::dListNode* stmtNode = m_function; stmtNode; stmtNode = nextStmtNode) {
+	for (dCIL::dListNode* stmtNode = m_basicBlocks.m_begin; stmtNode != m_basicBlocks.m_end; stmtNode = nextStmtNode) {
 		dTreeAdressStmt& stmt = stmtNode->GetInfo();
 //stmt.Trace();
 		nextStmtNode = stmtNode->GetNext();

@@ -29,7 +29,7 @@ dRegisterInterferenceGraph::dRegisterInterferenceGraph (dDataFlowGraph* const fl
 	,m_spillPenatryFactor(0)
 {
 	m_flowGraph->BuildBasicBlockGraph();
-	//m_flowGraph->CalculateLiveInputLiveOutput ();
+//	m_flowGraph->CalculateLiveInputLiveOutput ();
 	while (m_flowGraph->ApplyRemoveDeadCode());
 
 	Build();
@@ -57,8 +57,9 @@ m_flowGraph->m_cil->Trace();
 
 void dRegisterInterferenceGraph::AllocateRegisters ()
 {
-	for (dCIL::dListNode* node = m_flowGraph->m_function; node; node = node->GetNext()) {
-		dTreeAdressStmt& stmt = node->GetInfo();	
+//	for (dCIL::dListNode* node = m_flowGraph->m_function; node; node = node->GetNext()) {
+	for (dCIL::dListNode* stmtNode = m_flowGraph->m_basicBlocks.m_begin; stmtNode != m_flowGraph->m_basicBlocks.m_end; stmtNode = stmtNode->GetNext()) {
+		dTreeAdressStmt& stmt = stmtNode->GetInfo();	
 
 //stmt.Trace();
 		switch (stmt.m_instruction)
@@ -148,8 +149,17 @@ void dRegisterInterferenceGraph::AllocateRegisters ()
 
 			case dTreeAdressStmt::m_ret:
 			case dTreeAdressStmt::m_if:
+			case dTreeAdressStmt::m_param:
 			{
 				stmt.m_arg0.m_label = GetRegisterName (stmt.m_arg0.m_label);
+				break;
+			}
+
+			case dTreeAdressStmt::m_call:
+			{
+				if (stmt.m_arg0.m_type != dTreeAdressStmt::m_void) {
+					stmt.m_arg0.m_label = GetRegisterName (stmt.m_arg0.m_label);
+				}
 				break;
 			}
 /*
@@ -169,7 +179,7 @@ void dRegisterInterferenceGraph::AllocateRegisters ()
 				break;
 			}
 */
-			case dTreeAdressStmt::m_call:
+			
 			
 			case dTreeAdressStmt::m_goto:
 			case dTreeAdressStmt::m_nop:
@@ -239,7 +249,8 @@ dTrace (("%s\n", variable.GetStr()));
 	// pre-color some special nodes
 	int intArgumentIndex = 0; 
 	m_flowGraph->m_returnVariables.RemoveAll();
-	for (dCIL::dListNode* stmtNode = m_flowGraph->m_function; stmtNode; stmtNode = stmtNode->GetNext()) {
+//	for (dCIL::dListNode* stmtNode = m_flowGraph->m_function; stmtNode; stmtNode = stmtNode->GetNext()) {
+	for (dCIL::dListNode* stmtNode = m_flowGraph->m_basicBlocks.m_begin; stmtNode != m_flowGraph->m_basicBlocks.m_end; stmtNode = stmtNode->GetNext()) {
 		dTreeAdressStmt& stmt = stmtNode->GetInfo();
 
 		switch (stmt.m_instruction)

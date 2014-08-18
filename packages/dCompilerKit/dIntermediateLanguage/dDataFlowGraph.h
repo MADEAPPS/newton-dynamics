@@ -214,7 +214,7 @@ class dDataFlowGraph
 	void UpdateLiveInputLiveOutput();
 
 	
-	void BuildGeneratedAndUsedlVariableSets();
+	void BuildGeneratedAndUsedVariableSets();
 	void BuildGeneratedAndKillStatementSets();
 	void UpdateReachingDefinitions();
 
