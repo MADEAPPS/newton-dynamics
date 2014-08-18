@@ -38,7 +38,8 @@ class dDAGFunctionNode: public dDAG
 	virtual void ConnectParent(dDAG* const parent);
 	dDAGParameterNode* FindArgumentVariable(const char* const name) const;
 
-	void TranslateToLLVM (dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context);
+	void TranslateToLLVM (dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context, dDAG::dLLVMSymbols& globalLLVMSymbols);
+	void AddLLVMGlobalSymbols (dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context, dDAG::dLLVMSymbols& globalLLVMSymbols);
 	
 	private:
 	class LLVMBlockScripBlockPair
@@ -77,12 +78,13 @@ class dDAGFunctionNode: public dDAG
 		}
 	};
 
+	void TranslateLLVMBlock (dLLVMSymbols& localSymbols, const LLVMBlockScripBlockPair& llvmBlockPair, llvm::Function* const function, dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context, dDAG::dLLVMSymbols& globalLLVMSymbols);
+
+	llvm::Function* CreateLLVMfunctionDeclaration (dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context);
+	llvm::Value* GetLLVMConstantOrValue (dLLVMSymbols& localSymbols, const dTreeAdressStmt::dArg& arg, llvm::LLVMContext &context);
 	void CreateLLVMBasicBlocks (llvm::Function* const function, dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context);
 
-	llvm::Function* CreateLLVMfuntionDeclaration (dLLVMSymbols& localSymbols, dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context);
-	llvm::Value* GetLLVMConstantOrValue (dLLVMSymbols& localSymbols, const dTreeAdressStmt::dArg& arg, llvm::LLVMContext &context);
-
-	void TranslateLLVMBlock (dLLVMSymbols& localSymbols, const LLVMBlockScripBlockPair& llvmBlockPair, llvm::Function* const function, dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context);
+	llvm::Function* EmitLLVMfunction (dLLVMSymbols& localSymbols, dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context, dDAG::dLLVMSymbols& globalLLVMSymbols);
 	void EmitLLVMLocalVariable (dLLVMSymbols& localSymbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context);
 	void EmitLLVMStoreBase (dLLVMSymbols& localSymbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context);
 	void EmitLLVMLoadBase (dLLVMSymbols& localSymbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context);
@@ -91,7 +93,7 @@ class dDAGFunctionNode: public dDAG
 	void EmitLLVMIf (dLLVMSymbols& localSymbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context);
 	void EmitLLVMGoto (dLLVMSymbols& localSymbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context);
 	void EmitLLVMParam (dLLVMSymbols& localSymbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context);
-	void EmitLLVMCall (dLLVMSymbols& localSymbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context);
+	void EmitLLVMCall (dLLVMSymbols& localSymbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context, dDAG::dLLVMSymbols& globalLLVMSymbols);
 	void EmitLLVMReturn (dLLVMSymbols& localSymbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context);
 
 	public:

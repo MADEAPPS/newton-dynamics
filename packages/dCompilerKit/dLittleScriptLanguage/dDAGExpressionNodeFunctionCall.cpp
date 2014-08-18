@@ -69,17 +69,52 @@ void dDAGExpressionNodeFunctionCall::CompileCIL(dCIL& cil)
 		stmt.m_arg0 = expNode->m_result;
 		DTRACE_INTRUCTION (&stmt);
 
-		name += m_prototypeSeparator + dTreeAdressStmt::GetTypeString (stmt.m_arg0.m_type);
+		dTreeAdressStmt::dArgType intrisicType = stmt.m_arg0.m_type;
+		switch (intrisicType) 
+		{
+			case dTreeAdressStmt::m_constInt:
+			{
+				intrisicType = dTreeAdressStmt::m_int;
+				break;
+			}
+			case dTreeAdressStmt::m_constFloat:
+			{
+				intrisicType = dTreeAdressStmt::m_float;
+				break;
+			}
+			case dTreeAdressStmt::m_int:
+			{
+				break;
+			}
+
+			//case dTreeAdressStmt::m_void:
+			//case dTreeAdressStmt::m_bool:
+			//case dTreeAdressStmt::m_byte:
+			//case dTreeAdressStmt::m_short:
+			//case dTreeAdressStmt::m_long:
+			//case dTreeAdressStmt::m_float:
+			//case dTreeAdressStmt::m_double:
+			//case dTreeAdressStmt::m_classPointer:
+				default:	
+					dAssert (0);
+		}
+
+		name += m_prototypeSeparator + dTreeAdressStmt::GetTypeString (intrisicType);
 	}
 
-	dDAGTypeNode* const returnType = myClass->GetFunctionReturnType(name.GetStr(), m_argumentList);
+	dDAGFunctionNode* const function = myClass->GetFunction (name);
+	dAssert (function);
+	if (function->m_isStatic) {
+		name = myClass->m_name + m_prototypeSeparator + name;
+	}
+
+	dDAGTypeNode* const returnType = function->m_returnType;
 
 	m_result.m_label = cil.NewTemp ();
 	m_result.m_type = returnType->m_intrinsicType;
 	dTreeAdressStmt& call = cil.NewStatement()->GetInfo();
 	call.m_instruction = dTreeAdressStmt::m_call;
 	call.m_arg0 = m_result;
-	//call.m_arg1.m_label = myClass->GetFunctionName (name.GetStr(), m_argumentList);
-	call.m_arg1.m_label = name.GetStr();
+	call.m_arg1.m_label = name;
 	DTRACE_INTRUCTION (&call);
 }

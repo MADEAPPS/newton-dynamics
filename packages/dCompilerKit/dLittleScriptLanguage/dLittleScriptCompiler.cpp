@@ -178,18 +178,10 @@ int dScriptCompiler::CompileSource (const char* const source)
 		cil.Trace();
 		for (dList<dDAGClassNode*>::dListNode* node = m_classList.GetFirst(); node; node = node->GetNext()) {
 			dDAGClassNode* const scripClass = node->GetInfo();
-			scripClass->CompileCIL (cil);
-//			dTrace(("\n"));
-//			dTrace(("optimized version\n"));
-			cil.Trace();
-
 			scripClass->TranslateToLLVM (cil, module, m_context, globalLLVMSymbols);
-
 			//_ASSERTE (m_currentPackage);
-//			//m_currentPackage->AddClass(scripClass, cil);
+			//m_currentPackage->AddClass(scripClass, cil);
 		}
-
-
 
 
 		if (llvm::verifyModule(*module)) {
