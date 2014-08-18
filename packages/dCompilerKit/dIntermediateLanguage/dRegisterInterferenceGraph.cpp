@@ -247,8 +247,7 @@ dTrace (("%s\n", variable.GetStr()));
 	}
 
 	// pre-color some special nodes
-	int intArgumentIndex = 0; 
-	m_flowGraph->m_returnVariables.RemoveAll();
+	int intArgumentIndex = 1; 
 //	for (dCIL::dListNode* stmtNode = m_flowGraph->m_function; stmtNode; stmtNode = stmtNode->GetNext()) {
 	for (dCIL::dListNode* stmtNode = m_flowGraph->m_basicBlocks.m_begin; stmtNode != m_flowGraph->m_basicBlocks.m_end; stmtNode = stmtNode->GetNext()) {
 		dTreeAdressStmt& stmt = stmtNode->GetInfo();
@@ -265,11 +264,37 @@ dTrace (("%s\n", variable.GetStr()));
 						dAssert (returnRegNode);
 						dRegisterInterferenceNode& returnReginster = returnRegNode->GetInfo();
 						returnReginster.m_registerIndex = D_RETURN_REGISTER_INDEX;
-						m_flowGraph->m_returnVariables.Insert (D_RETURN_REGISTER_INDEX, stmt.m_arg0.m_label);
 						break;
 					}
 					default:
 						dAssert (0);
+				}
+				break;
+			}
+
+			case dTreeAdressStmt::m_call:
+			{
+				switch (stmt.m_arg0.m_type) 
+				{
+					case dTreeAdressStmt::m_int:
+					{
+						dTreeNode* const returnRegNode = Find(stmt.m_arg0.m_label);
+						dAssert (returnRegNode);
+						dRegisterInterferenceNode& returnReginster = returnRegNode->GetInfo();
+						returnReginster.m_registerIndex = D_RETURN_REGISTER_INDEX;
+						break;
+					}
+					default:
+						dAssert (0);
+				}
+
+				int index = D_RETURN_REGISTER_INDEX + 1;
+				for (dCIL::dListNode* node = stmtNode->GetPrev(); node->GetInfo().m_instruction == dTreeAdressStmt::m_param; node = node->GetPrev()) {
+					dTreeAdressStmt& paramStmt = node->GetInfo();
+					dTreeNode* const regNode = Find(paramStmt.m_arg0.m_label);
+					dAssert (regNode);
+					dRegisterInterferenceNode& reg = regNode->GetInfo();
+					reg.m_registerIndex = index;
 				}
 				break;
 			}
