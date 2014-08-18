@@ -108,6 +108,7 @@ class dCIL: public dList<dTreeAdressStmt>
 
     llvm::legacy::FunctionPassManager m_optimizer;
 	
+	static dString m_variablePrefix;
 	friend dDataFlowGraph;
 };
 

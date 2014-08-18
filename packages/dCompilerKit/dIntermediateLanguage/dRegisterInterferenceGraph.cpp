@@ -366,7 +366,7 @@ dTrace (("%s\n", variable.GetStr()));
 	}
 
 //m_flowGraph->m_cil->Trace();
-
+/*
 	dList<dTreeNode*> moveNodes;
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowGraph::dDataFlowPoint& info = iter.GetNode()->GetInfo();
@@ -394,16 +394,16 @@ dAssert (0);
 				nodeA->GetInfo().m_isMove = true;
 				nodeB->GetInfo().m_isMove = true;
 				dAssert (0);
-/*
+
 				if (nodeB == returnRegNode) {
 					m_coalescedNodes.Append(dCoalescedNodePair (nodeB, nodeA));
 				} else {
 					m_coalescedNodes.Append(dCoalescedNodePair (nodeA, nodeB));
 				}
-*/
 			}
 		}
 	}
+*/
 }
 
 dRegisterInterferenceGraph::dTreeNode* dRegisterInterferenceGraph::GetBestNode()

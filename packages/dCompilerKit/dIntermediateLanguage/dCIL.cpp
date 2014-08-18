@@ -13,6 +13,7 @@
 #include "dCIL.h"
 #include "dDataFlowGraph.h"
 
+dString dCIL::m_variablePrefix ("_arg");
 
 dCIL::dCIL(llvm::Module* const module)
 	:dList()
@@ -440,9 +441,31 @@ dCIL::dListNode* dCIL::EmitFunctionDeclaration (const llvm::Function& llvmFuncti
 
 		stmt.m_instruction = dTreeAdressStmt::m_argument;
 		stmt.m_arg0.m_type = intrinsicType;
-		stmt.m_arg0.m_label = name.data();
+		stmt.m_arg0.m_label = m_variablePrefix + name.data();
 		DTRACE_INTRUCTION (&stmt);
 	}
+
+	for (llvm::Function::const_arg_iterator iter (llvmFunction.arg_begin()); iter != llvmFunction.arg_end(); iter ++) {
+		const llvm::Argument* const argument = iter;
+		const llvm::StringRef& name = argument->getName();
+
+		const llvm::Type* const argType = argument->getType();
+		dTreeAdressStmt::dArgType intrinsicType = GetType (argType);
+
+		dCIL::dListNode* const argNode = NewStatement();
+		dTreeAdressStmt& stmt = argNode->GetInfo();
+
+		stmt.m_instruction = dTreeAdressStmt::m_assigment;
+		stmt.m_operator = dTreeAdressStmt::m_nothing;
+		stmt.m_arg0.m_type = intrinsicType;
+		stmt.m_arg0.m_label = name.data();
+
+		stmt.m_arg1.m_type = intrinsicType;
+		stmt.m_arg1.m_label = m_variablePrefix + name.data();
+		DTRACE_INTRUCTION (&stmt);
+	}
+
+
 
 	return functionNode;
 }

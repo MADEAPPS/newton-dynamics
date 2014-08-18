@@ -20,6 +20,7 @@
 dString dDAG::m_scopePrefix ("scope");
 dString dDAG::m_prototypeSeparator ("::");
 
+
 dRttiRootClassSupportImplement(dDAG);
 
 dDAG::dDAG(dList<dDAG*>& allNodes)
