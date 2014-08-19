@@ -241,7 +241,7 @@ class dDataFlowGraph
 	bool IsStatementInReachList(dCIL::dListNode* const node, dList<dCIL::dListNode*>& definitionList, dCIL::dListNode* const me) const;
 
 	mutable int m_mark;
-//	int m_registersUsedMask;
+	int m_savedRegistersMask;
 	dCIL* m_cil;
 //	dCIL::dReturnType m_returnType;
 //	dString m_returnVariableName;

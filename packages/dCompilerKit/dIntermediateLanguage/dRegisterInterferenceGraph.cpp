@@ -41,18 +41,17 @@ dAssert (0);
 
 	AllocateRegisters();
 m_flowGraph->m_cil->Trace();
-/*
+
 	m_flowGraph->BuildBasicBlockGraph();
 	m_flowGraph->CalculateLiveInputLiveOutput ();
 	for (bool optimized = true; optimized;) {
 		optimized = false;
 		m_flowGraph->UpdateReachingDefinitions();
-		optimized |= m_flowGraph->ApplyCopyPropagation();
+//		optimized |= m_flowGraph->ApplyCopyPropagation();
 //m_flowGraph->m_cil->Trace();
 		optimized |= m_flowGraph->ApplyRemoveDeadCode();
 //m_flowGraph->m_cil->Trace();
 	}
-*/
 }
 
 void dRegisterInterferenceGraph::AllocateRegisters ()
@@ -541,7 +540,7 @@ int dRegisterInterferenceGraph::ColorGraph ()
 {
 	dList<dTreeNode*> registerOrder;
 
-//	m_flowGraph->m_registersUsedMask = 0;
+	m_flowGraph->m_savedRegistersMask = 0;
 	for (int i = 0; i < GetCount(); i ++) {
 		CoalesceNodes();
 
@@ -641,24 +640,37 @@ int dRegisterInterferenceGraph::ColorGraph ()
 		registerNode[j + 1] = varNode;
 	}
 
+	int saveOnEntryStart = 100000;
+	for (int i = 0; i < count; i ++) {
+		int cost = registerCost[i];
+		if (cost >=  1 << 24) {
+			saveOnEntryStart = i;
+			break;
+		}
+	}
 
-/*
+	int saveOnEntryIndex = D_CALLER_SAVE_REGISTER_COUNT;
+	memset (registerCost, -1, count * sizeof (registerCost[0]));
+	for (int i = 0; i < count; i ++) {
 		dTreeNode* const varNode = registerNode[i];
 		dRegisterInterferenceNode& variable = varNode->GetInfo();
-		if (variable.m_isPrecolored) {
-			registerRemapedIndex[i] = variable.m_registerIndex;
-		} else if(variable.m_saveRegisterOnEntry) {
-			registerRemapedIndex[i] = variable.m_registerIndex - savedRegisterBase + D_CALLER_SAVE_REGISTER_INDEX;
-		} else {
-			registerRemapedIndex[i] = 
+		int index = variable.m_registerIndex;
+		if (registerCost[index] == -1) {
+			if (variable.m_saveRegisterOnEntry) {
+				registerCost[index] = saveOnEntryIndex;
+				m_flowGraph->m_savedRegistersMask |= (1 << saveOnEntryIndex);
+				saveOnEntryIndex ++;
+			} else if (variable.m_isPrecolored) {
+				registerCost[index] = variable.m_registerIndex;
+			} else {
+				dAssert (0);
+			}
 		}
-*/
-//	}
-
+		variable.m_registerIndex = registerCost[index];
+	}
 	
 	delete[] registerCost;
 	delete[] registerNode;
-//	delete[] registerRemapedIndex;
 	return registersUsed + 1;
 }
 

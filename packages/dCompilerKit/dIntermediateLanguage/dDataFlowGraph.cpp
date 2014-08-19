@@ -19,7 +19,7 @@
 //dDataFlowGraph::dDataFlowGraph (dCIL* const cil, dCIL::dListNode* const function, dCIL::dReturnType returnType)
 dDataFlowGraph::dDataFlowGraph (dCIL* const cil, dCIL::dListNode* const function)
 	:m_mark (0)
-//	,m_registersUsedMask(0)
+	,m_savedRegistersMask(0)
 	,m_cil (cil)
 //	,m_returnType(returnType)
 	,m_function(function)
