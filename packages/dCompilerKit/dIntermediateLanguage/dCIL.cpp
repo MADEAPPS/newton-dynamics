@@ -13,7 +13,7 @@
 #include "dCIL.h"
 #include "dDataFlowGraph.h"
 
-dString dCIL::m_variablePrefix ("_arg");
+dString dCIL::m_variableUndercore ("_");
 
 dCIL::dCIL(llvm::Module* const module)
 	:dList()
@@ -441,7 +441,7 @@ dCIL::dListNode* dCIL::EmitFunctionDeclaration (const llvm::Function& llvmFuncti
 
 		stmt.m_instruction = dTreeAdressStmt::m_argument;
 		stmt.m_arg0.m_type = intrinsicType;
-		stmt.m_arg0.m_label = m_variablePrefix + name.data();
+		stmt.m_arg0.m_label = dString(name.data()) + m_variableUndercore;
 		DTRACE_INTRUCTION (&stmt);
 	}
 
@@ -461,12 +461,9 @@ dCIL::dListNode* dCIL::EmitFunctionDeclaration (const llvm::Function& llvmFuncti
 		stmt.m_arg0.m_label = name.data();
 
 		stmt.m_arg1.m_type = intrinsicType;
-		stmt.m_arg1.m_label = m_variablePrefix + name.data();
+		stmt.m_arg1.m_label = stmt.m_arg0.m_label + m_variableUndercore;
 		DTRACE_INTRUCTION (&stmt);
 	}
-
-
-
 	return functionNode;
 }
 
@@ -606,12 +603,25 @@ dCIL::dListNode* dCIL::EmitCall (const llvm::Instruction* const intruction)
 	stmt.m_instruction = dTreeAdressStmt::m_call;
 
 	stmt.m_arg0.m_type = GetType (instr);
-	stmt.m_arg0.m_label = instr->getName().data();
+	stmt.m_arg0.m_label = dString  (instr->getName().data()) + m_variableUndercore;
 
 	stmt.m_arg1.m_type = stmt.m_arg0.m_type;
 	stmt.m_arg1.m_label = GetName (arg);
 	DTRACE_INTRUCTION (&stmt);
-	return node;
+
+	dCIL::dListNode* const copyNode = NewStatement();
+	dTreeAdressStmt& copyStmt = copyNode->GetInfo();
+
+	copyStmt.m_instruction = dTreeAdressStmt::m_assigment;
+	copyStmt.m_operator = dTreeAdressStmt::m_nothing;
+	copyStmt.m_arg0.m_type = stmt.m_arg0.m_type;
+	copyStmt.m_arg0.m_label = instr->getName().data();
+
+	copyStmt.m_arg1.m_type = stmt.m_arg0.m_type;
+	copyStmt.m_arg1.m_label = stmt.m_arg0.m_label;
+	DTRACE_INTRUCTION (&copyStmt);
+
+	return copyNode;
 }
 
 dCIL::dListNode* dCIL::EmitReturn (const llvm::Instruction* const intruction)
