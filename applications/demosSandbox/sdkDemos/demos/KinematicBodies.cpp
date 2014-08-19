@@ -482,6 +482,12 @@ void KinematicPlacement (DemoEntityManager* const scene)
 	location.m_z += 0.0f;
 	dVector size (0.5f, 0.5f, 0.75f, 0.0f);
 
+dMatrix matrix (dGetIdentityMatrix());
+float pts[] = { 0,0,0, 0,0,0.01, 0.01,0,0.01,  0.01,0,0, 0,0.03,0, 0,0.03,0.01, 0.01, 0.03,0, 0.01,0.03,0.01 };
+NewtonCollision* col = NewtonCreateConvexHull(scene->GetNewton(), 8, pts, 12, 0.0, 0, NULL);
+NewtonBody* body = NewtonCreateDynamicBody(scene->GetNewton(), col, &matrix[0][0]);
+NewtonBodySetMassProperties(body, 1.0, col);
+
 //	int count = 1;
 //	dMatrix shapeOffsetMatrix (GetIdentityMatrix());
 //	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
