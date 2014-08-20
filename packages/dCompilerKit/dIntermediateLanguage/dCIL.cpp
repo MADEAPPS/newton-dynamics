@@ -44,24 +44,31 @@ dCIL::dCIL(llvm::Module* const module)
 	m_commutativeOperator[dTreeAdressStmt::m_identical] = true;
 	m_commutativeOperator[dTreeAdressStmt::m_different] = true;
 
-	//llvm::legacy::FunctionPassManager functionPassManager(m_module.get());
-    // Set up the optimizer pipeline.  Start with registering info about how the
-    // target lays out data structures.
-    //        functionPassManager.add(new DataLayout(*TheExecutionEngine->getDataLayout()));
-    // Provide basic AliasAnalysis support for GVN.
-    //        functionPassManager.add(createBasicAliasAnalysisPass());
 
     // Promote allocas to registers.
     m_optimizer.add(llvm::createPromoteMemoryToRegisterPass());
-    // Do simple "peephole" optimizations and bit-twiddling optzns.
-    //        functionPassManager.add(createInstructionCombiningPass());
-    // Reassociate expressions.
-    //        functionPassManager.add(createReassociatePass());
-    // Eliminate Common SubExpressions.
-    //        functionPassManager.add(createGVNPass());
-    // Simplify the control flow graph (deleting unreachable blocks, etc).
-    //        functionPassManager.add(createCFGSimplificationPass());
+	m_optimizer.add(llvm::createReassociatePass());
+/*
+	m_optimizer.add(llvm::createDeadInstEliminationPass());
+	m_optimizer.add(llvm::createDeadCodeEliminationPass());
+	m_optimizer.add(llvm::createConstantHoistingPass());
+	m_optimizer.add(llvm::createConstantPropagationPass());
+	m_optimizer.add(llvm::createInstructionCombiningPass());
 
+	m_optimizer.add(llvm::createTailCallEliminationPass());
+	m_optimizer.add(llvm::createJumpThreadingPass());
+
+	//m_optimizer.add(llvm::createGVNPass());
+	//m_optimizer.add(llvm::createCFGSimplificationPass());
+	//m_optimizer.add(llvm::createLowerSwitchPass());
+
+	m_optimizer.add(llvm::createLCSSAPass());
+	m_optimizer.add(llvm::createLICMPass());
+	m_optimizer.add(llvm::createIndVarSimplifyPass());
+	m_optimizer.add(llvm::createLoopStrengthReducePass());
+	m_optimizer.add(llvm::createLoopInstSimplifyPass());
+	m_optimizer.add(llvm::createLoopUnswitchPass());
+*/
     m_optimizer.doInitialization();
 }
 
@@ -113,188 +120,9 @@ void dCIL::Trace()
 	dTrace(("\n"));
 }
 
+
+
 /*
-bool dCIL::RemoveRedundantJumps(dListNode* const function)
-{
-	bool ret = false;
-	dTree<int, dListNode*> jumpMap;
-
-	// create jump and label map;
-	for (dListNode* node = function; node; node = node->GetNext()) {
-		const dTreeAdressStmt& stmt = node->GetInfo();
-		switch (stmt.m_instruction) 
-		{
-			
-			case dTreeAdressStmt::m_if:
-			case dTreeAdressStmt::m_label:
-			case dTreeAdressStmt::m_goto:
-				jumpMap.Insert(0, node);
-		}
-	}
-
-	// remove redundant adjacent labels
-	dTree<int, dListNode*>::Iterator iter (jumpMap);
-	for (iter.Begin(); iter; iter ++) {
-		dListNode* const node = iter.GetKey();
-		const dTreeAdressStmt& stmt = node->GetInfo();
-		if (stmt.m_instruction == dTreeAdressStmt::m_label) {
-			dListNode* const labelNode = node->GetNext();
-			if (labelNode && (labelNode->GetInfo().m_instruction == dTreeAdressStmt::m_label)) {
-				dTree<int, dListNode*>::Iterator iter1 (jumpMap);
-				for (iter1.Begin(); iter1; iter1 ++) {
-					dListNode* const node1 = iter1.GetKey();
-					dTreeAdressStmt& stmt1 = node1->GetInfo();
-					if (stmt1.m_instruction == dTreeAdressStmt::m_goto) {
-						if (stmt1.m_jmpTarget == labelNode)	{
-							stmt1.m_jmpTarget = node;
-							stmt1.m_arg0.m_label = stmt.m_arg0.m_label;
-						}
-					} else if (stmt1.m_instruction == dTreeAdressStmt::m_if) { 
-						if (stmt1.m_jmpTarget == labelNode)	{
-							stmt1.m_jmpTarget = node;	
-							stmt1.m_arg2.m_label = stmt.m_arg0.m_label;
-						}
-					}
-				}
-				ret = true;
-				Remove(labelNode);
-				jumpMap.Remove(labelNode);
-			}
-		}
-	}
-
-	// redirect double indirect goto
-	for (iter.Begin(); iter; iter ++) {
-		dListNode* const node = iter.GetKey();
-		dTreeAdressStmt& stmt = node->GetInfo();
-		if (stmt.m_instruction == dTreeAdressStmt::m_goto) {
-			dAssert (jumpMap.Find (stmt.m_jmpTarget));
-			dListNode* const targetNode = jumpMap.Find (stmt.m_jmpTarget)->GetKey();
-			dTreeAdressStmt& stmt1 = targetNode->GetInfo();
-			dListNode* nextGotoNode = targetNode->GetNext();
-			while (nextGotoNode->GetInfo().m_instruction == dTreeAdressStmt::m_nop) {
-				nextGotoNode = nextGotoNode->GetNext();
-			}
-			if ((stmt1.m_instruction == dTreeAdressStmt::m_label) && (nextGotoNode->GetInfo().m_instruction == dTreeAdressStmt::m_goto)) {
-				const dTreeAdressStmt& stmt2 = nextGotoNode->GetInfo();
-				stmt.m_arg0.m_label = stmt2.m_arg0.m_label;
-				stmt.m_jmpTarget = stmt2.m_jmpTarget;
-				ret = true;
-			}
-		} else if (stmt.m_instruction == dTreeAdressStmt::m_if) {
-			dAssert (jumpMap.Find (stmt.m_jmpTarget));
-			dListNode* const targetNode = jumpMap.Find (stmt.m_jmpTarget)->GetKey();
-			dTreeAdressStmt& stmt1 = targetNode->GetInfo();
-			dListNode* nextGotoNode = targetNode->GetNext();
-			while (nextGotoNode->GetInfo().m_instruction == dTreeAdressStmt::m_nop) {
-				nextGotoNode = nextGotoNode->GetNext();
-			}
-			if ((stmt1.m_instruction == dTreeAdressStmt::m_label) && (nextGotoNode->GetInfo().m_instruction == dTreeAdressStmt::m_goto)) {
-				const dTreeAdressStmt& stmt2 = nextGotoNode->GetInfo();
-				stmt.m_arg2.m_label = stmt2.m_arg0.m_label;
-				stmt.m_jmpTarget = stmt2.m_jmpTarget;
-				ret = true;
-			}
-		}
-	}
-
-
-	// remove jumps over jumps
-	for (iter.Begin(); iter; iter ++) {
-		dListNode* const node = iter.GetKey();
-		dTreeAdressStmt& stmt = node->GetInfo();
-		if (stmt.m_instruction == dTreeAdressStmt::m_if) {
-			dListNode* const gotoNode = node->GetNext();
-			dTreeAdressStmt& gotoStmt = gotoNode->GetInfo();
-			if (gotoStmt.m_instruction == dTreeAdressStmt::m_goto) {
-				dListNode* const target = gotoNode->GetNext();
-				if (stmt.m_jmpTarget == target) {
-					dTreeAdressStmt& gotoStmt = gotoNode->GetInfo();
-					stmt.m_operator = m_operatorComplement[stmt.m_operator];
-					stmt.m_jmpTarget = gotoStmt.m_jmpTarget;
-					stmt.m_arg2.m_label = gotoStmt.m_arg0.m_label;
-					Remove(gotoNode);
-					jumpMap.Remove(gotoNode);
-					ret = true;
-				}
-			}
-		}
-	}
-
-
-	// remove goto to immediate labels
-	for (iter.Begin(); iter; ) {
-		dListNode* const node = iter.GetKey();
-		dTreeAdressStmt& stmt = node->GetInfo();
-		iter ++;
-		dListNode* const nextNode = node->GetNext();
-		if (((stmt.m_instruction == dTreeAdressStmt::m_if) || (stmt.m_instruction == dTreeAdressStmt::m_goto)) && (stmt.m_jmpTarget == nextNode)) {
-			ret = true;
-			Remove(node);
-			jumpMap.Remove(node);
-		}
-	}
-
-
-	// delete unreferenced labels
-	for (iter.Begin(); iter; ) {
-		dListNode* const node = iter.GetKey();
-		dTreeAdressStmt& stmt = node->GetInfo();
-		iter ++;
-		if (stmt.m_instruction == dTreeAdressStmt::m_label) {		
-			dTree<int, dListNode*>::Iterator iter1 (jumpMap);
-			bool isReferenced = false;
-			for (iter1.Begin(); iter1; iter1 ++) {
-				dListNode* const node1 = iter1.GetKey();
-				dTreeAdressStmt& stmt1 = node1->GetInfo();
-				if ((stmt1.m_instruction == dTreeAdressStmt::m_goto) || (stmt1.m_instruction == dTreeAdressStmt::m_if)){
-					if (stmt1.m_jmpTarget == node) {
-						isReferenced = true;
-						break;
-					}
-				}
-			}
-			if (!isReferenced) {
-				ret = true;
-				Remove(node);
-				jumpMap.Remove(node);
-			}
-		}
-	}
-
-	// delete dead code labels
-	for (iter.Begin(); iter; ) {
-		dListNode* const node = iter.GetKey();
-		dTreeAdressStmt& stmt = node->GetInfo();
-		iter ++;
-		if (stmt.m_instruction == dTreeAdressStmt::m_goto) {
-			for (dListNode* deadNode = node->GetNext(); deadNode && (deadNode->GetInfo().m_instruction != dTreeAdressStmt::m_label); deadNode = node->GetNext()) {
-				ret = true;
-				Remove(deadNode);
-			}
-		}
-	}
-
-	return ret;
-}
-
-bool dCIL::RemoveNop(dListNode* const functionNode)
-{
-	bool ret = false;
-	dCIL::dListNode* nextStmtNode;
-	for (dCIL::dListNode* stmtNode = functionNode; stmtNode; stmtNode = nextStmtNode) {
-		nextStmtNode = stmtNode->GetNext();
-		dTreeAdressStmt& stmt = stmtNode->GetInfo();	
-		if (stmt.m_instruction == dTreeAdressStmt::m_nop) {
-			Remove(stmtNode);
-			ret = true;
-		}
-	}
-	return ret;
-}
-
-
-
 //void dCIL::Optimize(dListNode* const functionNode, int argumentInRegisters, dReturnType returnType)
 void dCIL::Optimize(dListNode* const functionNode, int argumentInRegisters)
 {
@@ -385,6 +213,12 @@ dTreeAdressStmt::dArgType dCIL::GetType (const llvm::Value* const value) const
 		case llvm::Value::ConstantIntVal:
 		{
 			intrinsicType = dTreeAdressStmt::m_constInt;
+			break;
+		}
+
+		case llvm::Value::ConstantFPVal:
+		{
+			dAssert (0);
 			break;
 		}
 
@@ -717,10 +551,6 @@ dCIL::dListNode* dCIL::EmitIntegerBranch (const llvm::Instruction* const intruct
 {
 	llvm::BranchInst* const instr =  (llvm::BranchInst*) intruction;
 
-//	llvm::Value* const xxx = instr->getCondition();
-//	int type = xxx->getValueID();
-//	int type1 = llvm::ICmpInst::ICMP_EQ;
-
 	dCIL::dListNode* const node = NewStatement();
 	dTreeAdressStmt& stmt = node->GetInfo();
 	llvm::Value* const arg0 = instr->getOperand(0);
@@ -788,7 +618,7 @@ dCIL::dListNode* dCIL::EmitIntegerAritmetic (const llvm::Instruction* const intr
 	stmt.m_arg0.m_type = dTreeAdressStmt::m_int;
 	stmt.m_arg0.m_label = instr->getName().data();
 
-	stmt.m_arg1.m_type = dTreeAdressStmt::m_int;
+	stmt.m_arg1.m_type = GetType (arg0);
 	stmt.m_arg1.m_label = GetName (arg0);
 
 	stmt.m_arg2.m_type = GetType (arg1);
@@ -808,16 +638,6 @@ void dCIL::RegisterAllocation (dListNode* const functionNode, int argumentInRegi
 
 	// do register allocation before removing dead jumps and nops
 	datFlowGraph.RegistersAllocation (D_INTEGER_REGISTER_COUNT - 1);
-/*
-	for (bool isDirty = true; isDirty; ) {
-		isDirty = false;
-		// remove all redundant newly generate extra jumps 
-		isDirty |= RemoveRedundantJumps(functionNode);
-//Trace();
 
-		// clean up all nop instruction added by the optimizer
-		isDirty |= RemoveNop(functionNode);
-//Trace();
-	}
-*/
+
 }

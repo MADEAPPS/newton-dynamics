@@ -42,7 +42,8 @@ class dDAGExpressionNodeBinaryOperator: public dDAGExpressionNode
 	virtual void CompileCIL(dCIL& cil);
 	virtual void ConnectParent(dDAG* const parent);
 
-	void PromoteTypes (dCIL::dReturnValue& typeA, dCIL::dReturnValue& typeB) const;
+	//void PromoteTypes (dCIL::dReturnValue& typeA, dCIL::dReturnValue& typeB) const;
+	dTreeAdressStmt::dArgType PromoteTypes (const dTreeAdressStmt::dArgType typeA, const dTreeAdressStmt::dArgType typeB) const;
 
 	dBinaryOperator m_operator;
 	dDAGExpressionNode* m_expressionA;

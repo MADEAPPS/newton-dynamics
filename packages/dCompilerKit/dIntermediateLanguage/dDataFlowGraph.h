@@ -226,11 +226,11 @@ class dDataFlowGraph
 	bool ApplyInstructionSematicOrdering();
 	bool ApplyIfStatementsSimplification();
 	bool ApplySubExpresionToCopyPropagation();
-	
 	bool ApplyLoopOptimization(dLoop& loop);
-//	void AllocateRegisters (dRegisterInterferenceGraph& interferenceGraph);
-//	dString GetRegisterName (dRegisterInterferenceGraph& interferenceGraph, const dString& varName) const;
 
+	bool RemoveNop ();
+	bool RemoveDeadInstructions();
+	bool RemoveRedundantJumps ();
 	void FindNodesInPathway(dCIL::dListNode* const source, dCIL::dListNode* const destination, dTree<int, dCIL::dListNode*>& pathOut) const;
 
 	bool DoStatementAreachesStatementB(dCIL::dListNode* const stmtNodeB, dCIL::dListNode* const stmtNodeA) const;

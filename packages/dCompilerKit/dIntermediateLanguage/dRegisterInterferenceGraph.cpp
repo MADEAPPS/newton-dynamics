@@ -29,6 +29,9 @@ dRegisterInterferenceGraph::dRegisterInterferenceGraph (dDataFlowGraph* const fl
 	,m_spillPenatryFactor(0)
 {
 	m_flowGraph->BuildBasicBlockGraph();
+	if (m_flowGraph->ApplyInstructionSematicOrdering()) {
+		m_flowGraph->BuildBasicBlockGraph();
+	}
 //	m_flowGraph->CalculateLiveInputLiveOutput ();
 	while (m_flowGraph->ApplyRemoveDeadCode());
 
@@ -40,18 +43,34 @@ dAssert (0);
 	}
 
 	AllocateRegisters();
-m_flowGraph->m_cil->Trace();
+//m_flowGraph->m_cil->Trace();
 
 	m_flowGraph->BuildBasicBlockGraph();
-	m_flowGraph->CalculateLiveInputLiveOutput ();
+//	m_flowGraph->CalculateLiveInputLiveOutput ();
 	for (bool optimized = true; optimized;) {
 		optimized = false;
-		m_flowGraph->UpdateReachingDefinitions();
+//		m_flowGraph->UpdateReachingDefinitions();
 //		optimized |= m_flowGraph->ApplyCopyPropagation();
 //m_flowGraph->m_cil->Trace();
 		optimized |= m_flowGraph->ApplyRemoveDeadCode();
 //m_flowGraph->m_cil->Trace();
 	}
+
+	m_flowGraph->RemoveDeadInstructions();
+m_flowGraph->m_cil->Trace();
+	for (bool isDirty = true; isDirty; ) {
+		isDirty = false;
+
+		// remove all redundant newly generate extra jumps 
+		isDirty |= m_flowGraph->RemoveRedundantJumps();
+//Trace();
+
+		// clean up all nop instruction added by the optimizer
+		isDirty |= m_flowGraph->RemoveNop();
+//Trace();
+	}
+m_flowGraph->m_cil->Trace();
+
 }
 
 void dRegisterInterferenceGraph::AllocateRegisters ()
@@ -614,7 +633,6 @@ int dRegisterInterferenceGraph::ColorGraph ()
 	// remap register
 	int count = 0;
 	int* registerCost = new int[registerOrder.GetCount()];
-
 	dTreeNode** registerNode = new dTreeNode*[registerOrder.GetCount()];
 	for (dList<dTreeNode*>::dListNode* node = registerOrder.GetFirst(); node; node = node->GetNext()) {
 		dTreeNode* const varNode = node->GetInfo();
@@ -663,7 +681,7 @@ int dRegisterInterferenceGraph::ColorGraph ()
 			} else if (variable.m_isPrecolored) {
 				registerCost[index] = variable.m_registerIndex;
 			} else {
-				dAssert (0);
+				registerCost[index] = variable.m_registerIndex;
 			}
 		}
 		variable.m_registerIndex = registerCost[index];

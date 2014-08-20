@@ -525,8 +525,9 @@ void dDAGFunctionNode::EmitLLVMAssignment (dLLVMSymbols& localSymbols, dCIL::dLi
 {
 	const dTreeAdressStmt& stmt = stmtNode->GetInfo();
 	dAssert (stmt.m_operator != dTreeAdressStmt::m_nothing);
-	dAssert (localSymbols.Find (stmt.m_arg1.m_label));
-	llvm::Value* const arg1 = localSymbols.Find (stmt.m_arg1.m_label)->GetInfo();
+	//dAssert (localSymbols.Find (stmt.m_arg1.m_label));
+	//llvm::Value* const arg1 = localSymbols.Find (stmt.m_arg1.m_label)->GetInfo();
+	llvm::Value* const arg1 = GetLLVMConstantOrValue (localSymbols, stmt.m_arg1, context);
 	llvm::Value* const arg2 = GetLLVMConstantOrValue (localSymbols, stmt.m_arg2, context);
 
 	llvm::Value* arg0 = NULL;
@@ -534,21 +535,21 @@ void dDAGFunctionNode::EmitLLVMAssignment (dLLVMSymbols& localSymbols, dCIL::dLi
 	{
 		case dTreeAdressStmt::m_identical:
 		{
-			dAssert (stmt.m_arg1.m_type == dTreeAdressStmt::m_int);
+			//dAssert (stmt.m_arg1.m_type == dTreeAdressStmt::m_int);
 			arg0 = new llvm::ICmpInst (*llvmBlock, llvm::ICmpInst::ICMP_EQ, arg1, arg2, stmt.m_arg0.m_label.GetStr());
 			break;
 		}
 
 		case dTreeAdressStmt::m_add:
 		{
-			dAssert (stmt.m_arg1.m_type == dTreeAdressStmt::m_int);
+			//dAssert (stmt.m_arg1.m_type == dTreeAdressStmt::m_int);
 			arg0 = llvm::BinaryOperator::Create (llvm::Instruction::Add, arg1, arg2, stmt.m_arg0.m_label.GetStr(), llvmBlock);
 			break;
 		}
 
 		case dTreeAdressStmt::m_sub:
 		{
-			dAssert (stmt.m_arg1.m_type == dTreeAdressStmt::m_int);
+			//dAssert (stmt.m_arg1.m_type == dTreeAdressStmt::m_int);
 			arg0 = llvm::BinaryOperator::Create (llvm::Instruction::Sub, arg1, arg2, stmt.m_arg0.m_label.GetStr(), llvmBlock);
 			break;
 		}

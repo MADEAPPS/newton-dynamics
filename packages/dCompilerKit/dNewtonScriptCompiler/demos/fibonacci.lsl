@@ -15,21 +15,22 @@
 // naive method to calculate a fibonacci number
 public class Fibonacci
 {
-/*
+
 	// test inlining
 	public static int test (int n)
 	{
-		return n;
+		return 1 - n;
 	}
-*/
+
 	public static int Fibonacci (int n)
 	{
-//		n = test(n);
-//		if (n == 0)
-//			return 0;
-//		if (n == 1)
-//			return 1;
-		return Fibonacci (n - 1) + Fibonacci (n - 2);
+		//n = test(n);
+		if (n == 0)
+			return 0;
+		if (n == 1)
+			return 1;
+		//return Fibonacci (n - 1) + Fibonacci (n - 2);
+		return Fibonacci (n - 1);
 	}
 }
 

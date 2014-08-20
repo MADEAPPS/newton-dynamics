@@ -208,7 +208,8 @@ bool dDataFlowGraph::DoStatementAreachesStatementB(dCIL::dListNode* const stmtNo
 				dList<dCIL::dListNode*>& statementList = definedStatements->GetInfo();
 				for (dList<dCIL::dListNode*>::dListNode* ptr = statementList.GetFirst(); ptr; ptr = ptr->GetNext()) {
 					dCIL::dListNode* const stmt = ptr->GetInfo();
-//stmt->GetInfo().Trace();
+
+//DTRACE_INTRUCTION (&stmt);		
 					if (path.Find(stmt)) {
 						return false;
 					}
@@ -588,39 +589,6 @@ bool dDataFlowGraph::ApplyConstantFolding()
 	return ret;
 }
 
-bool dDataFlowGraph::ApplyInstructionSematicOrdering()
-{
-	bool ret = false;
-	for (dCIL::dListNode* stmtNode = m_function; stmtNode; stmtNode = stmtNode->GetNext()) {
-		dTreeAdressStmt& stmt = stmtNode->GetInfo();
-		
-		switch (stmt.m_instruction) 
-		{
-			case dTreeAdressStmt::m_assigment:
-			{
-//				if (stmt.m_operator != dTreeAdressStmt::m_nothing) {
-//					if ((stmt.m_arg1.m_type == dTreeAdressStmt::m_intConst) && (stmt.m_arg2.m_type == dTreeAdressStmt::m_intVar)) {			
-//						dAssert (0);
-//					} else if (m_cil->m_commutativeOperator[stmt.m_operator] && (stmt.m_arg1.m_type == dTreeAdressStmt::m_intVar) && (stmt.m_arg2.m_type == dTreeAdressStmt::m_intVar)) {
-//						dAssert (0);
-//					}
-//				}
-				break;
-			}
-
-			case dTreeAdressStmt::m_if:
-			{
-				if ((stmt.m_arg0.m_type == dTreeAdressStmt::m_intConst) && (stmt.m_arg1.m_type == dTreeAdressStmt::m_intVar)) {
-					stmt.m_operator = m_cil->m_operatorComplement[stmt.m_operator];
-					dTreeAdressStmt::dArg arg (stmt.m_arg0);
-					stmt.m_arg0 = stmt.m_arg1;
-					stmt.m_arg1 = arg;
-				}
-			}
-		}
-	}
-	return ret;
-}
 
 
 
@@ -975,8 +943,6 @@ m_cil->Trace();
 
 void dDataFlowGraph::BuildGeneratedAndKillStatementSets()
 {
-dAssert (0);
-/*
 	dTree<dDataFlowPoint, dCIL::dListNode*>::Iterator iter (m_dataFlowGraph);
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowPoint& point = iter.GetNode()->GetInfo();
@@ -985,15 +951,17 @@ dAssert (0);
 
 	m_variableDefinitions.RemoveAll();
 	dDataFlowPoint::dVariableSet<dCIL::dListNode*> statementUsingReturnVariable;
-	for (dCIL::dListNode* ptr = m_function; ptr; ptr = ptr->GetNext()) {
+	for (dCIL::dListNode* stmtNode = m_basicBlocks.m_begin; stmtNode != m_basicBlocks.m_end; stmtNode = stmtNode->GetNext()) {
 
-		dTreeAdressStmt& stmt = ptr->GetInfo();	
+		dTreeAdressStmt& stmt = stmtNode->GetInfo();	
 
-//stmt.Trace();
+DTRACE_INTRUCTION (&stmt);		
 		switch (stmt.m_instruction)
 		{
 			case dTreeAdressStmt::m_assigment:
 			{
+				dAssert (0);
+/*
 				dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const node = m_variableDefinitions.Insert(stmt.m_arg0.m_label);
 				node->GetInfo().Append(ptr);
 
@@ -1014,12 +982,14 @@ dAssert (0);
 						dAssert (0);
 					}
 				}
+*/
 				break;
 			}
 
-
+/*
 			case dTreeAdressStmt::m_load:
 			{
+
 				dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const node = m_variableDefinitions.Insert(stmt.m_arg0.m_label);
 				node->GetInfo().Append(ptr);
 
@@ -1132,21 +1102,21 @@ dAssert (0);
 				}
 				break;
 			}
-
-			case dTreeAdressStmt::m_enter:
-			case dTreeAdressStmt::m_leave:
+*/
+			//case dTreeAdressStmt::m_enter:
+			//case dTreeAdressStmt::m_leave:
 			case dTreeAdressStmt::m_goto:
 			case dTreeAdressStmt::m_nop:
 			case dTreeAdressStmt::m_label:
 			case dTreeAdressStmt::m_function:
-			break;
+				break;
 
 			default:
 				dAssert (0);
 		}
 	}
 
-
+/*
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowPoint& point = iter.GetNode()->GetInfo();
 
@@ -1252,7 +1222,7 @@ void dDataFlowGraph::CalculateReachingDefinitions()
 				dAssert (m_dataFlowGraph.Find(stmtNode));
 				dDataFlowPoint& info = m_dataFlowGraph.Find(stmtNode)->GetInfo();
 
-//info.m_statement->GetInfo().Trace();
+				//DTRACE_INTRUCTION (&info.m_statement->GetInfo());		
 
 				dDataFlowPoint::dVariableSet<dCIL::dListNode*> oldInput (info.m_reachStmtInputSet);
 				dDataFlowPoint::dVariableSet<dCIL::dListNode*> oldOutput (info.m_reachStmtOutputSet);
@@ -1338,7 +1308,7 @@ void dDataFlowGraph::BuildGeneratedAndUsedVariableSets()
 		point.m_generatedVariable.Empty();
 		dTreeAdressStmt& stmt = point.m_statement->GetInfo();	
 
-//stmt.Trace();
+		//DTRACE_INTRUCTION (&stmt);		
 		switch (stmt.m_instruction)
 		{
 			case dTreeAdressStmt::m_argument:
@@ -1551,7 +1521,7 @@ dAssert (0);
 /*
 	for (dCIL::dListNode* stmtNode = m_function; stmtNode; stmtNode = stmtNode->GetNext()) {
 		dTreeAdressStmt& stmt = stmtNode->GetInfo();
-//stmt.Trace();
+//DTRACE_INTRUCTION (&stmt);		
 		switch (stmt.m_instruction)
 		{
 			case dTreeAdressStmt::m_assigment:
@@ -1642,7 +1612,7 @@ dAssert (0);
             {
                 for (dCIL::dListNode* stmtNode1 = stmtNode->GetNext(); stmtNode1; stmtNode1 = stmtNode1->GetNext()) {
                     dTreeAdressStmt& stmt1 = stmtNode1->GetInfo();
-//stmt1.Trace();
+//DTRACE_INTRUCTION (&stmt1);		
                     switch (stmt1.m_instruction)
                     {
                         case dTreeAdressStmt::m_assigment:
@@ -1756,6 +1726,70 @@ dAssert (0);
 	return ret;
 }
 
+bool dDataFlowGraph::ApplyInstructionSematicOrdering()
+{
+	bool ret = false;
+	for (dCIL::dListNode* stmtNode = m_basicBlocks.m_begin; stmtNode != m_basicBlocks.m_end; stmtNode = stmtNode->GetNext()) {
+		dTreeAdressStmt& stmt = stmtNode->GetInfo();
+		DTRACE_INTRUCTION (&stmt);		
+
+		switch (stmt.m_instruction) 
+		{
+			case dTreeAdressStmt::m_assigment:
+			{
+				if (stmt.m_operator != dTreeAdressStmt::m_nothing) {
+					switch (stmt.m_arg1.m_type)
+					{
+						case dTreeAdressStmt::m_constInt:
+						{
+							if (m_cil->m_commutativeOperator[stmt.m_operator]) {
+								dAssert (stmt.m_arg2.m_type != dTreeAdressStmt::m_constInt);
+								dSwap (stmt.m_arg1, stmt.m_arg2);
+							} else {
+								dCIL::dListNode* const node = m_cil->NewStatement();
+								m_cil->InsertAfter (stmtNode, node);
+
+								dTreeAdressStmt& tmpStmt = node->GetInfo();
+								tmpStmt = stmt;
+								
+								stmt.m_instruction = dTreeAdressStmt::m_assigment;
+								stmt.m_operator = dTreeAdressStmt::m_nothing;
+								stmt.m_arg0.m_label += dCIL::m_variableUndercore; 
+								stmt.m_arg2.m_label = "";
+								tmpStmt.m_arg1 = stmt.m_arg0;
+							}
+							ret = 1;
+							break;
+						}
+
+						default:
+							break;
+					}
+				}
+				break;
+			}
+
+			case dTreeAdressStmt::m_if:
+			{
+				dAssert (0);
+/*
+				if ((stmt.m_arg0.m_type == dTreeAdressStmt::m_intConst) && (stmt.m_arg1.m_type == dTreeAdressStmt::m_intVar)) {
+					stmt.m_operator = m_cil->m_operatorComplement[stmt.m_operator];
+					dTreeAdressStmt::dArg arg (stmt.m_arg0);
+					stmt.m_arg0 = stmt.m_arg1;
+					stmt.m_arg1 = arg;
+					ret = true;
+				}
+	*/			
+				break;
+			}
+		}
+	}
+
+//m_cil->Trace();
+	return ret;
+}
+
 
 bool dDataFlowGraph::ApplyRemoveDeadCode()
 {
@@ -1763,10 +1797,10 @@ bool dDataFlowGraph::ApplyRemoveDeadCode()
 
 	bool ret = false;
 	dCIL::dListNode* nextStmtNode;
-//	for (dCIL::dListNode* stmtNode = m_function; stmtNode; stmtNode = nextStmtNode) {
 	for (dCIL::dListNode* stmtNode = m_basicBlocks.m_begin; stmtNode != m_basicBlocks.m_end; stmtNode = nextStmtNode) {
 		dTreeAdressStmt& stmt = stmtNode->GetInfo();
-//stmt.Trace();
+
+//		DTRACE_INTRUCTION (&stmt);		
 		nextStmtNode = stmtNode->GetNext();
 		switch (stmt.m_instruction) 
 		{
@@ -1812,6 +1846,219 @@ bool dDataFlowGraph::ApplyRemoveDeadCode()
 			}
 		}
 	}
+	return ret;
+}
+
+bool dDataFlowGraph::RemoveDeadInstructions()
+{
+	bool ret = false;
+
+	int count = 0;
+	for (dCIL::dListNode* stmtNode = m_basicBlocks.m_begin->GetNext()->GetNext(); (stmtNode != m_basicBlocks.m_end) && (stmtNode->GetInfo().m_instruction == dTreeAdressStmt::m_argument) && (count < D_CALLER_SAVE_REGISTER_COUNT); stmtNode = stmtNode->GetNext()) {
+		dTreeAdressStmt& stmt = stmtNode->GetInfo();
+		stmt.m_instruction = dTreeAdressStmt::m_nop;
+	}
+
+	return ret;
+}
+
+bool dDataFlowGraph::RemoveNop()
+{
+	bool ret = false;
+	dCIL::dListNode* nextStmtNode;
+	for (dCIL::dListNode* stmtNode = m_basicBlocks.m_begin; stmtNode != m_basicBlocks.m_end; stmtNode = nextStmtNode) {
+		nextStmtNode = stmtNode->GetNext();
+		dTreeAdressStmt& stmt = stmtNode->GetInfo();	
+		if (stmt.m_instruction == dTreeAdressStmt::m_nop) {
+			m_cil->Remove(stmtNode);
+			ret = true;
+		}
+	}
+	return ret;
+}
+
+
+
+bool dDataFlowGraph::RemoveRedundantJumps ()
+{
+	bool ret = false;
+	dTree<int, dCIL::dListNode*> jumpMap;
+
+	// create jump and label map;
+//	for (dListNode* node = function; node; node = node->GetNext()) {
+	for (dCIL::dListNode* stmtNode = m_basicBlocks.m_begin; stmtNode != m_basicBlocks.m_end; stmtNode = stmtNode->GetNext()) {
+		const dTreeAdressStmt& stmt = stmtNode->GetInfo();
+		switch (stmt.m_instruction) 
+		{
+			case dTreeAdressStmt::m_if:
+			case dTreeAdressStmt::m_label:
+			case dTreeAdressStmt::m_goto:
+				jumpMap.Insert(0, stmtNode);
+				break;
+		}
+	}
+
+	// remove redundant adjacent labels
+	dTree<int, dCIL::dListNode*>::Iterator iter (jumpMap);
+	for (iter.Begin(); iter; iter ++) {
+		dCIL::dListNode* const node = iter.GetKey();
+		const dTreeAdressStmt& stmt = node->GetInfo();
+
+		if (stmt.m_instruction == dTreeAdressStmt::m_label) {
+			dCIL::dListNode* const labelNode = node->GetNext();
+			if (labelNode && (labelNode->GetInfo().m_instruction == dTreeAdressStmt::m_label)) {
+				dTree<int, dCIL::dListNode*>::Iterator iter1 (jumpMap);
+				for (iter1.Begin(); iter1; iter1 ++) {
+					dCIL::dListNode* const node1 = iter1.GetKey();
+					dTreeAdressStmt& stmt1 = node1->GetInfo();
+					if (stmt1.m_instruction == dTreeAdressStmt::m_goto) {
+						dAssert (0);
+//						if (stmt1.m_jmpTarget == labelNode)	{
+//							stmt1.m_jmpTarget = node;
+//							stmt1.m_arg0.m_label = stmt.m_arg0.m_label;
+//						}
+					} else if (stmt1.m_instruction == dTreeAdressStmt::m_if) { 
+						dAssert (0);
+//						if (stmt1.m_jmpTarget == labelNode)	{
+//							stmt1.m_jmpTarget = node;	
+//							stmt1.m_arg2.m_label = stmt.m_arg0.m_label;
+//						}
+					}
+				}
+				ret = true;
+				m_cil->Remove(labelNode);
+				jumpMap.Remove(labelNode);
+			}
+		}
+	}
+
+
+	// redirect double indirect goto
+	for (iter.Begin(); iter; iter ++) {
+		dCIL::dListNode* const node = iter.GetKey();
+		dTreeAdressStmt& stmt = node->GetInfo();
+		if (stmt.m_instruction == dTreeAdressStmt::m_goto) {
+			dAssert (0);
+/*
+			dAssert (jumpMap.Find (stmt.m_jmpTarget));
+			dListNode* const targetNode = jumpMap.Find (stmt.m_jmpTarget)->GetKey();
+			dTreeAdressStmt& stmt1 = targetNode->GetInfo();
+			dListNode* nextGotoNode = targetNode->GetNext();
+			while (nextGotoNode->GetInfo().m_instruction == dTreeAdressStmt::m_nop) {
+				nextGotoNode = nextGotoNode->GetNext();
+			}
+			if ((stmt1.m_instruction == dTreeAdressStmt::m_label) && (nextGotoNode->GetInfo().m_instruction == dTreeAdressStmt::m_goto)) {
+				const dTreeAdressStmt& stmt2 = nextGotoNode->GetInfo();
+				stmt.m_arg0.m_label = stmt2.m_arg0.m_label;
+				stmt.m_jmpTarget = stmt2.m_jmpTarget;
+				ret = true;
+			}
+*/
+		} else if (stmt.m_instruction == dTreeAdressStmt::m_if) {
+			dAssert (0);
+/*
+			dAssert (jumpMap.Find (stmt.m_jmpTarget));
+			dListNode* const targetNode = jumpMap.Find (stmt.m_jmpTarget)->GetKey();
+			dTreeAdressStmt& stmt1 = targetNode->GetInfo();
+			dListNode* nextGotoNode = targetNode->GetNext();
+			while (nextGotoNode->GetInfo().m_instruction == dTreeAdressStmt::m_nop) {
+				nextGotoNode = nextGotoNode->GetNext();
+			}
+			if ((stmt1.m_instruction == dTreeAdressStmt::m_label) && (nextGotoNode->GetInfo().m_instruction == dTreeAdressStmt::m_goto)) {
+				const dTreeAdressStmt& stmt2 = nextGotoNode->GetInfo();
+				stmt.m_arg2.m_label = stmt2.m_arg0.m_label;
+				stmt.m_jmpTarget = stmt2.m_jmpTarget;
+				ret = true;
+			}
+*/
+		}
+	}
+
+
+	// remove jumps over jumps
+	for (iter.Begin(); iter; iter ++) {
+		dCIL::dListNode* const node = iter.GetKey();
+		dTreeAdressStmt& stmt = node->GetInfo();
+		if (stmt.m_instruction == dTreeAdressStmt::m_if) {
+			dAssert (0);
+/*
+			dListNode* const gotoNode = node->GetNext();
+			dTreeAdressStmt& gotoStmt = gotoNode->GetInfo();
+			if (gotoStmt.m_instruction == dTreeAdressStmt::m_goto) {
+				dListNode* const target = gotoNode->GetNext();
+				if (stmt.m_jmpTarget == target) {
+					dTreeAdressStmt& gotoStmt = gotoNode->GetInfo();
+					stmt.m_operator = m_operatorComplement[stmt.m_operator];
+					stmt.m_jmpTarget = gotoStmt.m_jmpTarget;
+					stmt.m_arg2.m_label = gotoStmt.m_arg0.m_label;
+					Remove(gotoNode);
+					jumpMap.Remove(gotoNode);
+					ret = true;
+				}
+			}
+*/
+		}
+	}
+
+/*
+	// remove goto to immediate labels
+	for (iter.Begin(); iter; ) {
+		dCIL::dListNode* const node = iter.GetKey();
+		dTreeAdressStmt& stmt = node->GetInfo();
+		iter ++;
+		dCIL::dListNode* const nextNode = node->GetNext();
+		dAssert (0);
+
+		if (((stmt.m_instruction == dTreeAdressStmt::m_if) || (stmt.m_instruction == dTreeAdressStmt::m_goto)) && (stmt.m_jmpTarget == nextNode)) {
+			ret = true;
+			Remove(node);
+			jumpMap.Remove(node);
+		}
+	}
+*/
+
+	// delete unreferenced labels
+	for (iter.Begin(); iter; ) {
+		dCIL::dListNode* const node = iter.GetKey();
+		dTreeAdressStmt& stmt = node->GetInfo();
+		iter ++;
+		if (stmt.m_instruction == dTreeAdressStmt::m_label) {		
+			dTree<int, dCIL::dListNode*>::Iterator iter1 (jumpMap);
+			bool isReferenced = false;
+			for (iter1.Begin(); iter1; iter1 ++) {
+				dCIL::dListNode* const node1 = iter1.GetKey();
+				dTreeAdressStmt& stmt1 = node1->GetInfo();
+				if ((stmt1.m_instruction == dTreeAdressStmt::m_goto) || (stmt1.m_instruction == dTreeAdressStmt::m_if)){
+					dAssert (0);
+/*
+					if (stmt1.m_jmpTarget == node) {
+						isReferenced = true;
+						break;
+					}
+*/
+				}
+			}
+			if (!isReferenced) {
+				ret = true;
+				m_cil->Remove(node);
+				jumpMap.Remove(node);
+			}
+		}
+	}
+
+	// delete dead code labels
+	for (iter.Begin(); iter; ) {
+		dCIL::dListNode* const node = iter.GetKey();
+		dTreeAdressStmt& stmt = node->GetInfo();
+		iter ++;
+		if (stmt.m_instruction == dTreeAdressStmt::m_goto) {
+			for (dCIL::dListNode* deadNode = node->GetNext(); deadNode && (deadNode->GetInfo().m_instruction != dTreeAdressStmt::m_label); deadNode = node->GetNext()) {
+				ret = true;
+				m_cil->Remove(deadNode);
+			}
+		}
+	}
+
 	return ret;
 }
 

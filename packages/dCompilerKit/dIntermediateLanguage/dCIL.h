@@ -40,15 +40,6 @@ class dDataFlowGraph;
 class dCIL: public dList<dTreeAdressStmt>
 {
 	public:
-/*
-	enum dReturnType
-	{
-		m_voidNone,
-		m_intRegister,
-		m_floatRegister,
-	};
-*/
-
 	class dReturnValue
 	{
 		public:
@@ -96,8 +87,8 @@ class dCIL: public dList<dTreeAdressStmt>
 	void EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dTree<const dCIL::dListNode*, const llvm::BasicBlock*>& visited, dList<dCIL::dListNode*>& terminalInstructions);
 
 	void RegisterAllocation (dListNode* const functionNode, int argumentInRegisters);
-//	bool RemoveNop(dListNode* const functionNode);
-//	bool RemoveRedundantJumps(dListNode* const functionNode);
+	
+	
 
 	int m_mark;
 	int m_tempIndex;
