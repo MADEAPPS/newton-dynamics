@@ -309,7 +309,8 @@ void dCIL::EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicB
 
 		const llvm::TerminatorInst* const teminatorIntruction = block->getTerminator();
 		int successorsCount = teminatorIntruction->getNumSuccessors();
-		for (int i = 0; i < successorsCount; i ++) { 
+		//for (int i = 0; i < successorsCount; i ++) { 
+		for (int i = successorsCount - 1; i >= 0; i --) { 
 			const llvm::BasicBlock* const successorBlock = teminatorIntruction->getSuccessor(i);
 			EmitBasicBlockBody (function, successorBlock, visited, terminalInstructions);
 		}

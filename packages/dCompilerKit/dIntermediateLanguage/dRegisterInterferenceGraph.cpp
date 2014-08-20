@@ -56,13 +56,14 @@ dAssert (0);
 //m_flowGraph->m_cil->Trace();
 	}
 
+
 	m_flowGraph->RemoveDeadInstructions();
 m_flowGraph->m_cil->Trace();
 	for (bool isDirty = true; isDirty; ) {
 		isDirty = false;
 
 		// remove all redundant newly generate extra jumps 
-		isDirty |= m_flowGraph->RemoveRedundantJumps();
+//		isDirty |= m_flowGraph->RemoveRedundantJumps();
 //Trace();
 
 		// clean up all nop instruction added by the optimizer
@@ -75,11 +76,10 @@ m_flowGraph->m_cil->Trace();
 
 void dRegisterInterferenceGraph::AllocateRegisters ()
 {
-//	for (dCIL::dListNode* node = m_flowGraph->m_function; node; node = node->GetNext()) {
 	for (dCIL::dListNode* stmtNode = m_flowGraph->m_basicBlocks.m_begin; stmtNode != m_flowGraph->m_basicBlocks.m_end; stmtNode = stmtNode->GetNext()) {
 		dTreeAdressStmt& stmt = stmtNode->GetInfo();	
 
-//stmt.Trace();
+//DTRACE_INTRUCTION (&stmt);
 		switch (stmt.m_instruction)
 		{
 			case dTreeAdressStmt::m_argument:
@@ -210,6 +210,84 @@ void dRegisterInterferenceGraph::AllocateRegisters ()
 		}
 //stmt.Trace();
 	}
+
+	m_flowGraph->CalculateLiveInputLiveOutput ();
+
+	for (dCIL::dListNode* stmtNode = m_flowGraph->m_basicBlocks.m_begin; stmtNode != m_flowGraph->m_basicBlocks.m_end; stmtNode = stmtNode->GetNext()) {
+		dTreeAdressStmt& stmt = stmtNode->GetInfo();
+DTRACE_INTRUCTION (&stmt);
+
+		switch (stmt.m_instruction)
+		{
+/*
+			case dTreeAdressStmt::m_ret:
+			{
+				switch (stmt.m_arg0.m_type) 
+				{
+					case dTreeAdressStmt::m_int:
+					{
+						dTreeNode* const returnRegNode = Find(stmt.m_arg0.m_label);
+						dAssert (returnRegNode);
+						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
+						registerInfo.m_registerIndex = D_RETURN_REGISTER_INDEX;
+						//registerInfo.m_isPrecolored = true;
+						break;
+					}
+					default:
+						dAssert (0);
+				}
+				break;
+			}
+*/
+			case dTreeAdressStmt::m_call:
+			{
+				dAssert (m_flowGraph->m_dataFlowGraph.Find (stmtNode));
+				dDataFlowGraph::dDataFlowPoint& point = m_flowGraph->m_dataFlowGraph.Find (stmtNode)->GetInfo();
+				dDataFlowGraph::dDataFlowPoint::dVariableSet<dString>::Iterator iter (point.m_liveOutputSet);
+				for (iter.Begin(); iter; iter ++) {
+					const dString& varName = iter.GetKey();
+					dTreeNode* const interferanceGraphNode = Find(varName);
+//					dRegisterInterferenceNode& interferanceGraphVariable = interferanceGraphNode->GetInfo();
+//					if (interferanceGraphVariable.m_registerIndex == -1) {
+//						interferanceGraphVariable.m_saveRegisterOnEntry = true;
+//					}
+				}
+				break;
+			}
+/*
+			case dTreeAdressStmt::m_argument:
+			{
+				switch (stmt.m_arg0.m_type) 
+				{
+					case dTreeAdressStmt::m_int:
+					{
+						if (intArgumentIndex < D_CALLER_SAVE_REGISTER_COUNT) {
+							dTreeNode* const returnRegNode = Find(stmt.m_arg0.m_label);
+							dAssert (returnRegNode);
+							dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
+							registerInfo.m_registerIndex = intArgumentIndex;
+							//registerInfo.m_isPrecolored = true;
+							intArgumentIndex ++;
+						} else {
+							dAssert (0);
+						}
+						break;
+					}
+					default:
+						dAssert (0);
+				}
+				break;
+			}
+*/
+			case dTreeAdressStmt::m_label:
+			case dTreeAdressStmt::m_function:
+			case dTreeAdressStmt::m_argument:
+				break;
+
+			default:;
+//				dAssert (0);
+		}
+	}
 }
 
 
@@ -266,7 +344,6 @@ dTrace (("%s\n", variable.GetStr()));
 
 	// pre-color some special nodes
 	int intArgumentIndex = D_CALLER_SAVE_REGISTER_INDEX; 
-//	for (dCIL::dListNode* stmtNode = m_flowGraph->m_function; stmtNode; stmtNode = stmtNode->GetNext()) {
 	for (dCIL::dListNode* stmtNode = m_flowGraph->m_basicBlocks.m_begin; stmtNode != m_flowGraph->m_basicBlocks.m_end; stmtNode = stmtNode->GetNext()) {
 		dTreeAdressStmt& stmt = stmtNode->GetInfo();
 

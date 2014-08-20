@@ -1771,7 +1771,7 @@ bool dDataFlowGraph::ApplyInstructionSematicOrdering()
 
 			case dTreeAdressStmt::m_if:
 			{
-				dAssert (0);
+//				dAssert (0);
 /*
 				if ((stmt.m_arg0.m_type == dTreeAdressStmt::m_intConst) && (stmt.m_arg1.m_type == dTreeAdressStmt::m_intVar)) {
 					stmt.m_operator = m_cil->m_operatorComplement[stmt.m_operator];
