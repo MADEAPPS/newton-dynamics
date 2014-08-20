@@ -282,7 +282,7 @@ dTrace (("%s\n", variable.GetStr()));
 						dAssert (returnRegNode);
 						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
 						registerInfo.m_registerIndex = D_RETURN_REGISTER_INDEX;
-						registerInfo.m_isPrecolored = true;
+						//registerInfo.m_isPrecolored = true;
 						break;
 					}
 					default:
@@ -301,7 +301,7 @@ dTrace (("%s\n", variable.GetStr()));
 						dAssert (returnRegNode);
 						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
 						registerInfo.m_registerIndex = D_RETURN_REGISTER_INDEX;
-						registerInfo.m_isPrecolored = true;
+						//registerInfo.m_isPrecolored = true;
 						break;
 					}
 					default:
@@ -315,9 +315,9 @@ dTrace (("%s\n", variable.GetStr()));
 					dAssert (regNode);
 					dRegisterInterferenceNode& registerInfo = regNode->GetInfo();
 					registerInfo.m_registerIndex = index;
-					registerInfo.m_isPrecolored = true;
+					//registerInfo.m_isPrecolored = true;
 				}
-
+/*
 				dAssert (m_flowGraph->m_dataFlowGraph.Find (stmtNode));
 				dDataFlowGraph::dDataFlowPoint& point = m_flowGraph->m_dataFlowGraph.Find (stmtNode)->GetInfo();
 				//dDataFlowGraph::dDataFlowPoint::dVariableSet<dString> liveVariable = point.m_liveOutputSet;
@@ -330,6 +330,7 @@ dTrace (("%s\n", variable.GetStr()));
 						interferanceGraphVariable.m_saveRegisterOnEntry = true;
 					}
 				}
+*/
 				break;
 			}
 
@@ -344,7 +345,7 @@ dTrace (("%s\n", variable.GetStr()));
 							dAssert (returnRegNode);
 							dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
 							registerInfo.m_registerIndex = intArgumentIndex;
-							registerInfo.m_isPrecolored = true;
+							//registerInfo.m_isPrecolored = true;
 							intArgumentIndex ++;
 						} else {
 							dAssert (0);
@@ -559,7 +560,7 @@ int dRegisterInterferenceGraph::ColorGraph ()
 {
 	dList<dTreeNode*> registerOrder;
 
-	m_flowGraph->m_savedRegistersMask = 0;
+//	m_flowGraph->m_savedRegistersMask = 0;
 	for (int i = 0; i < GetCount(); i ++) {
 		CoalesceNodes();
 
@@ -629,7 +630,7 @@ int dRegisterInterferenceGraph::ColorGraph ()
 		//m_flowGraph->m_registersUsedMask |= (1 << variable.m_registerIndex);
 		registersUsed = dMax (registersUsed, variable.m_registerIndex);
 	}
-
+/*
 	// remap register
 	int count = 0;
 	int* registerCost = new int[registerOrder.GetCount()];
@@ -689,6 +690,7 @@ int dRegisterInterferenceGraph::ColorGraph ()
 	
 	delete[] registerCost;
 	delete[] registerNode;
+*/
 	return registersUsed + 1;
 }
 
