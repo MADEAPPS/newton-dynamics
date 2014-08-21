@@ -859,7 +859,7 @@ void dDataFlowGraph::BuildGeneratedAndKillStatementSets()
 
 		dTreeAdressStmt& stmt = ptr->GetInfo();	
 
-DTRACE_INTRUCTION (&stmt);		
+//DTRACE_INTRUCTION (&stmt);		
 		switch (stmt.m_instruction)
 		{
 			case dTreeAdressStmt::m_argument:
@@ -988,7 +988,7 @@ DTRACE_INTRUCTION (&stmt);
 
 		point.m_generateStmt = false;
 		dTreeAdressStmt& stmt = point.m_statement->GetInfo();	
-DTRACE_INTRUCTION (&stmt);		
+//DTRACE_INTRUCTION (&stmt);		
 		switch (stmt.m_instruction)
 		{
 			case dTreeAdressStmt::m_assigment:
@@ -1005,7 +1005,7 @@ DTRACE_INTRUCTION (&stmt);
 				break;
 			}
 
-			/*
+/*
 			case dTreeAdressStmt::m_storeBase:
 			{
 				point.m_generateStmt = true;
@@ -1486,7 +1486,7 @@ bool dDataFlowGraph::ApplyCopyPropagation()
 	bool ret = false;
 	for (dCIL::dListNode* stmtNode = m_basicBlocks.m_begin; stmtNode != m_basicBlocks.m_end; stmtNode = stmtNode->GetNext()) {
 		dTreeAdressStmt& stmt = stmtNode->GetInfo();
-DTRACE_INTRUCTION (&stmt);		
+//DTRACE_INTRUCTION (&stmt);		
 
 		switch (stmt.m_instruction)
 		{
@@ -1496,7 +1496,7 @@ DTRACE_INTRUCTION (&stmt);
 				if ((stmt.m_operator == dTreeAdressStmt::m_nothing) && (stmt.m_arg1.m_type != dTreeAdressStmt::m_constInt) && (stmt.m_arg1.m_type != dTreeAdressStmt::m_constFloat)){
 					for (dCIL::dListNode* stmtNode1 = stmtNode->GetNext(); stmtNode1; stmtNode1 = stmtNode1->GetNext()) {
 						dTreeAdressStmt& stmt1 = stmtNode1->GetInfo();
-DTRACE_INTRUCTION (&stmt1);		
+//DTRACE_INTRUCTION (&stmt1);		
 						switch (stmt1.m_instruction)
 						{
 							case dTreeAdressStmt::m_assigment:
@@ -1700,7 +1700,7 @@ bool dDataFlowGraph::ApplyInstructionSematicOrdering()
 	bool ret = false;
 	for (dCIL::dListNode* stmtNode = m_function->GetNext(); stmtNode && (stmtNode->GetInfo().m_instruction != dTreeAdressStmt::m_function); stmtNode = stmtNode->GetNext()) {
 		dTreeAdressStmt& stmt = stmtNode->GetInfo();
-		DTRACE_INTRUCTION (&stmt);		
+//DTRACE_INTRUCTION (&stmt);		
 
 		switch (stmt.m_instruction) 
 		{
@@ -1854,7 +1854,6 @@ bool dDataFlowGraph::RemoveRedundantJumps ()
 	dTree<int, dCIL::dListNode*> jumpMap;
 
 	// create jump and label map;
-//	for (dListNode* node = function; node; node = node->GetNext()) {
 	for (dCIL::dListNode* stmtNode = m_basicBlocks.m_begin; stmtNode != m_basicBlocks.m_end; stmtNode = stmtNode->GetNext()) {
 		const dTreeAdressStmt& stmt = stmtNode->GetInfo();
 		switch (stmt.m_instruction) 
@@ -1988,10 +1987,10 @@ bool dDataFlowGraph::RemoveRedundantJumps ()
 */
 
 	// delete unreferenced labels
-	for (iter.Begin(); iter; ) {
+	for (iter.Begin(); iter; iter ++) {
 		dCIL::dListNode* const node = iter.GetKey();
 		dTreeAdressStmt& stmt = node->GetInfo();
-		iter ++;
+		
 		if (stmt.m_instruction == dTreeAdressStmt::m_label) {		
 			dTree<int, dCIL::dListNode*>::Iterator iter1 (jumpMap);
 			bool isReferenced = false;
@@ -2010,21 +2009,24 @@ bool dDataFlowGraph::RemoveRedundantJumps ()
 			}
 			if (!isReferenced) {
 				ret = true;
-				m_cil->Remove(node);
+				stmt.m_instruction = dTreeAdressStmt::m_nop;
+				//m_cil->Remove(node);
 				jumpMap.Remove(node);
 			}
 		}
 	}
 
 	// delete dead code labels
-	for (iter.Begin(); iter; ) {
+	for (iter.Begin(); iter; iter ++) {
 		dCIL::dListNode* const node = iter.GetKey();
 		dTreeAdressStmt& stmt = node->GetInfo();
-		iter ++;
+		
 		if (stmt.m_instruction == dTreeAdressStmt::m_goto) {
 			for (dCIL::dListNode* deadNode = node->GetNext(); deadNode && (deadNode->GetInfo().m_instruction != dTreeAdressStmt::m_label); deadNode = node->GetNext()) {
+				dAssert (0);
 				ret = true;
-				m_cil->Remove(deadNode);
+				stmt.m_instruction = dTreeAdressStmt::m_nop;
+				//m_cil->Remove(deadNode);
 			}
 		}
 	}

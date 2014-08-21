@@ -29,17 +29,17 @@ dRegisterInterferenceGraph::dRegisterInterferenceGraph (dDataFlowGraph* const fl
 	,m_spillPenatryFactor(0)
 {
 	m_flowGraph->ApplyInstructionSematicOrdering();
-m_flowGraph->m_cil->Trace();
+//m_flowGraph->m_cil->Trace();
 	m_flowGraph->BuildBasicBlockGraph();
 	for (bool optimized = true; optimized;) {
 		optimized = false;
 		m_flowGraph->CalculateLiveInputLiveOutput();
 		m_flowGraph->UpdateReachingDefinitions();
 		optimized |= m_flowGraph->ApplyCopyPropagation();
-m_flowGraph->m_cil->Trace();
+//m_flowGraph->m_cil->Trace();
 		m_flowGraph->CalculateLiveInputLiveOutput();
 		optimized |= m_flowGraph->ApplyRemoveDeadCode();
-m_flowGraph->m_cil->Trace();
+//m_flowGraph->m_cil->Trace();
 	}
 
 	m_flowGraph->CalculateLiveInputLiveOutput();
@@ -65,19 +65,12 @@ dAssert (0);
 //m_flowGraph->m_cil->Trace();
 	}
 
-
+m_flowGraph->m_cil->Trace();	
+	while (m_flowGraph->RemoveRedundantJumps());
+m_flowGraph->m_cil->Trace();
 	m_flowGraph->RemoveDeadInstructions();
 m_flowGraph->m_cil->Trace();
-	for (bool isDirty = true; isDirty; ) {
-		isDirty = false;
-
-		// remove all redundant newly generate extra jumps 
-		isDirty |= m_flowGraph->RemoveRedundantJumps();
-m_flowGraph->m_cil->Trace();
-
-		// clean up all nop instruction added by the optimizer
-		isDirty |= m_flowGraph->RemoveNop();
-	}
+	m_flowGraph->RemoveNop();
 m_flowGraph->m_cil->Trace();
 
 }
@@ -288,7 +281,7 @@ void dRegisterInterferenceGraph::Build()
 				if (!interferanceGraphNode) {
 					interferanceGraphNode = Insert(variable);
 					interferanceGraphNode->GetInfo().m_name = variable;
-dTrace (("%s\n", variable.GetStr()));
+//dTrace (("%s\n", variable.GetStr()));
 				}
 			}
 		}
@@ -629,7 +622,7 @@ int dRegisterInterferenceGraph::ColorGraph ()
 	m_flowGraph->CalculateLiveInputLiveOutput ();
 	for (dCIL::dListNode* stmtNode = m_flowGraph->m_basicBlocks.m_begin; stmtNode != m_flowGraph->m_basicBlocks.m_end; stmtNode = stmtNode->GetNext()) {
 		dTreeAdressStmt& stmt = stmtNode->GetInfo();
-DTRACE_INTRUCTION (&stmt);
+//DTRACE_INTRUCTION (&stmt);
 		if (stmt.m_instruction == dTreeAdressStmt::m_call) {
 			dAssert (m_flowGraph->m_dataFlowGraph.Find (stmtNode));
 			dDataFlowGraph::dDataFlowPoint& point = m_flowGraph->m_dataFlowGraph.Find (stmtNode)->GetInfo();
