@@ -263,6 +263,7 @@ dCIL::dListNode* dCIL::EmitFunctionDeclaration (const llvm::Function& llvmFuncti
 	entryPoint.m_arg0.m_label = "entryPoint";
 	DTRACE_INTRUCTION (&entryPoint);
 
+	bool isFirst = true;
 	for (llvm::Function::const_arg_iterator iter (llvmFunction.arg_begin()); iter != llvmFunction.arg_end(); iter ++) {
 		const llvm::Argument* const argument = iter;
 		const llvm::StringRef& name = argument->getName();
@@ -275,10 +276,16 @@ dCIL::dListNode* dCIL::EmitFunctionDeclaration (const llvm::Function& llvmFuncti
 
 		stmt.m_instruction = dTreeAdressStmt::m_argument;
 		stmt.m_arg0.m_type = intrinsicType;
-		stmt.m_arg0.m_label = dString(name.data()) + m_variableUndercore;
+		if (isFirst) {
+			stmt.m_arg0.m_label = GetReturnVariableName();		
+		} else {
+			stmt.m_arg0.m_label = dString(name.data()) + m_variableUndercore;
+		}
+		isFirst = false;
 		DTRACE_INTRUCTION (&stmt);
 	}
 
+	isFirst = true;
 	for (llvm::Function::const_arg_iterator iter (llvmFunction.arg_begin()); iter != llvmFunction.arg_end(); iter ++) {
 		const llvm::Argument* const argument = iter;
 		const llvm::StringRef& name = argument->getName();
@@ -289,13 +296,19 @@ dCIL::dListNode* dCIL::EmitFunctionDeclaration (const llvm::Function& llvmFuncti
 		dCIL::dListNode* const argNode = NewStatement();
 		dTreeAdressStmt& stmt = argNode->GetInfo();
 
+		
 		stmt.m_instruction = dTreeAdressStmt::m_assigment;
 		stmt.m_operator = dTreeAdressStmt::m_nothing;
 		stmt.m_arg0.m_type = intrinsicType;
 		stmt.m_arg0.m_label = name.data();
 
 		stmt.m_arg1.m_type = intrinsicType;
-		stmt.m_arg1.m_label = stmt.m_arg0.m_label + m_variableUndercore;
+		if (isFirst) {
+			stmt.m_arg1.m_label = GetReturnVariableName();
+		} else {
+			stmt.m_arg1.m_label = stmt.m_arg0.m_label + m_variableUndercore;
+		}
+		isFirst = false;
 		DTRACE_INTRUCTION (&stmt);
 	}
 	return functionNode;
@@ -317,7 +330,7 @@ void dCIL::EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicB
 	}
 }
 
-void dCIL::ConvertLLVMFunctionToNVMFuntion (const llvm::Function& llvmFunction)
+void dCIL::ConvertLLVMFunctionToNVMFunction (const llvm::Function& llvmFunction)
 {
 	// emet function decalaration
 	dCIL::dListNode* const function = EmitFunctionDeclaration (llvmFunction);
@@ -438,7 +451,7 @@ dCIL::dListNode* dCIL::EmitCall (const llvm::Instruction* const intruction)
 	stmt.m_instruction = dTreeAdressStmt::m_call;
 
 	stmt.m_arg0.m_type = GetType (instr);
-	stmt.m_arg0.m_label = dString  (instr->getName().data()) + m_variableUndercore;
+	stmt.m_arg0.m_label = GetReturnVariableName();
 
 	stmt.m_arg1.m_type = stmt.m_arg0.m_type;
 	stmt.m_arg1.m_label = GetName (arg);

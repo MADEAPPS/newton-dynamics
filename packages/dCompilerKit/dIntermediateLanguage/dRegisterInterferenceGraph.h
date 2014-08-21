@@ -46,7 +46,7 @@ class dRegisterInterferenceNode
 		,m_inSet (false)
 		,m_isMove(false)
 		//,m_isPrecolored(false)
-		//,m_saveRegisterOnEntry(false)
+		,m_saveRegisterOnEntry(false)
 	{
 	}
 
@@ -57,7 +57,7 @@ class dRegisterInterferenceNode
 	bool m_inSet;
 	bool m_isMove;
 	//bool m_isPrecolored;
-	//bool m_saveRegisterOnEntry;
+	bool m_saveRegisterOnEntry;
 };
 
 

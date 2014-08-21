@@ -196,7 +196,7 @@ int dScriptCompiler::CompileSource (const char* const source)
 		llvm::Module::FunctionListType& funtionList = module->getFunctionList();
 		for (llvm::Module::FunctionListType::iterator iter (funtionList.begin()); iter != funtionList.end(); iter ++) {
 			const llvm::Function& funtion = *iter;
-			cil.ConvertLLVMFunctionToNVMFuntion (funtion);
+			cil.ConvertLLVMFunctionToNVMFunction (funtion);
 		}
 
 	}

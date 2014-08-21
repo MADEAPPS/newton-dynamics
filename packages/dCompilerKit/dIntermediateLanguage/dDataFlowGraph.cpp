@@ -145,102 +145,6 @@ void dDataFlowGraph::dBasicBlock::Trace() const
 	#endif
 }
 
-
-
-
-
-void dDataFlowGraph::FindNodesInPathway(dCIL::dListNode* const source, dCIL::dListNode* const destination, dTree<int, dCIL::dListNode*>& pathOut) const
-{
-	m_mark ++;
-	dList<dDataFlowPoint*> queue; 
-	queue.Append(&m_dataFlowGraph.Find(source)->GetInfo());
-	dAssert (queue.GetFirst()->GetInfo()->m_statement == source);
-
-	while (queue.GetCount()) {
-		dDataFlowPoint* const rootNode = queue.GetFirst()->GetInfo();
-		queue.Remove(queue.GetFirst());
-		if (rootNode->m_mark != m_mark) {
-			rootNode->m_mark = m_mark;
-			pathOut.Insert(rootNode->m_statement);
-
-			for (dList<dDataFlowPoint*>::dListNode* successorsNode = rootNode->m_successors.GetFirst(); successorsNode; successorsNode = successorsNode->GetNext()) {
-				dDataFlowPoint* const successor = successorsNode->GetInfo();
-				if (successor->m_statement != destination) {
-					queue.Append(successor);
-				}
-			}
-		}
-	}
-//	pathOut.Remove(source);
-}
-
-
-bool dDataFlowGraph::DoStatementAreachesStatementB(dCIL::dListNode* const stmtNodeB, dCIL::dListNode* const stmtNodeA) const
-{
-	bool canApplyPropagation = false;	
-	dDataFlowPoint& info = m_dataFlowGraph.Find(stmtNodeB)->GetInfo();
-	dDataFlowPoint::dVariableSet<dCIL::dListNode*>& reachingInputs = info.m_reachStmtInputSet;
-
-	if (reachingInputs.Find (stmtNodeA)) {
-		canApplyPropagation = true;
-		const dTreeAdressStmt& constStmt = stmtNodeA->GetInfo();
-		dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const definitions = m_variableDefinitions.Find(constStmt.m_arg0.m_label);
-		dAssert (definitions);
-
-		dList<dCIL::dListNode*>& defintionList = definitions->GetInfo();
-		for (dList<dCIL::dListNode*>::dListNode* otherStmtNode = defintionList.GetFirst(); otherStmtNode; otherStmtNode = otherStmtNode->GetNext()){
-			dCIL::dListNode* const duplicateDefinition = otherStmtNode->GetInfo();
-			if (duplicateDefinition != stmtNodeA) {
-				if (reachingInputs.Find(duplicateDefinition)) {
-					if (stmtNodeB->GetInfo().m_instruction != dTreeAdressStmt::m_loadBase) {
-						return false;
-					}
-				}
-			}
-		}
-
-        bool isSpecialStoreType = (constStmt.m_instruction == dTreeAdressStmt::m_storeBase);
-		if (isSpecialStoreType || (constStmt.m_arg1.m_type == dTreeAdressStmt::m_intVar) || (constStmt.m_arg1.m_type == dTreeAdressStmt::m_floatVar)) {
-			dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const definedStatements = isSpecialStoreType ? m_variableDefinitions.Find(constStmt.m_arg2.m_label) : m_variableDefinitions.Find(constStmt.m_arg1.m_label);
-			if (definedStatements) {
-				dTree<int, dCIL::dListNode*> path;
-				FindNodesInPathway(stmtNodeA, stmtNodeB, path);
-				dList<dCIL::dListNode*>& statementList = definedStatements->GetInfo();
-				for (dList<dCIL::dListNode*>::dListNode* ptr = statementList.GetFirst(); ptr; ptr = ptr->GetNext()) {
-					dCIL::dListNode* const stmt = ptr->GetInfo();
-
-//DTRACE_INTRUCTION (&stmt);		
-					if (path.Find(stmt)) {
-						return false;
-					}
-				}
-
-				
-				if ((constStmt.m_instruction == dTreeAdressStmt::m_load) || ((constStmt.m_operator != dTreeAdressStmt::m_nothing) && ((constStmt.m_arg2.m_type == dTreeAdressStmt::m_intVar) || (constStmt.m_arg2.m_type == dTreeAdressStmt::m_floatVar)))) {
-					dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const definedStatements = m_variableDefinitions.Find(constStmt.m_arg2.m_label);
-					if (definedStatements) {
-						dList<dCIL::dListNode*>& statementList = definedStatements->GetInfo();
-						for (dList<dCIL::dListNode*>::dListNode* ptr = statementList.GetFirst(); ptr; ptr = ptr->GetNext()) {
-							dCIL::dListNode* const stmt = ptr->GetInfo();
-							if (path.Find(stmt)) {
-								return false;
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	return canApplyPropagation;
-}
-
-
-
-
-
-
-
 int dDataFlowGraph::EvaluateBinaryExpression (const dString& arg1, dTreeAdressStmt::dOperator operation, const dString& arg2) const
 {
 	int operando = 0;
@@ -950,46 +854,25 @@ void dDataFlowGraph::BuildGeneratedAndKillStatementSets()
 	}
 
 	m_variableDefinitions.RemoveAll();
-	dDataFlowPoint::dVariableSet<dCIL::dListNode*> statementUsingReturnVariable;
-	for (dCIL::dListNode* stmtNode = m_basicBlocks.m_begin; stmtNode != m_basicBlocks.m_end; stmtNode = stmtNode->GetNext()) {
+//	dDataFlowPoint::dVariableSet<dCIL::dListNode*> statementUsingReturnVariable;
+	for (dCIL::dListNode* ptr = m_basicBlocks.m_begin; ptr != m_basicBlocks.m_end; ptr = ptr->GetNext()) {
 
-		dTreeAdressStmt& stmt = stmtNode->GetInfo();	
+		dTreeAdressStmt& stmt = ptr->GetInfo();	
 
 DTRACE_INTRUCTION (&stmt);		
 		switch (stmt.m_instruction)
 		{
+			case dTreeAdressStmt::m_argument:
 			case dTreeAdressStmt::m_assigment:
 			{
-				dAssert (0);
-/*
 				dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const node = m_variableDefinitions.Insert(stmt.m_arg0.m_label);
 				node->GetInfo().Append(ptr);
-
-				if (stmt.m_arg1.m_type == dTreeAdressStmt::m_intVar) {
-					if (stmt.m_arg1.m_label == m_returnVariableName) {
-						statementUsingReturnVariable.Insert(ptr);
-					}
-				} else if (stmt.m_arg1.m_type == dTreeAdressStmt::m_floatVar) {
-					dAssert (0);
-				}
-
-				if (stmt.m_operator != dTreeAdressStmt::m_nothing) {
-					if (stmt.m_arg2.m_type == dTreeAdressStmt::m_intVar) {
-						if (stmt.m_arg2.m_label == m_returnVariableName) {
-							statementUsingReturnVariable.Insert(ptr);
-						}
-					} else if (stmt.m_arg2.m_type == dTreeAdressStmt::m_floatVar) {
-						dAssert (0);
-					}
-				}
-*/
 				break;
 			}
 
 /*
 			case dTreeAdressStmt::m_load:
 			{
-
 				dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const node = m_variableDefinitions.Insert(stmt.m_arg0.m_label);
 				node->GetInfo().Append(ptr);
 
@@ -1002,7 +885,6 @@ DTRACE_INTRUCTION (&stmt);
 				}
 				break;
 			}
-
             
 			case dTreeAdressStmt::m_store:
 			{
@@ -1058,15 +940,6 @@ DTRACE_INTRUCTION (&stmt);
 				break;
 			}
 
-
-			case dTreeAdressStmt::m_pop:
-			case dTreeAdressStmt::m_argument:
-			{
-				dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const node = m_variableDefinitions.Insert(stmt.m_arg0.m_label);
-				node->GetInfo().Append(ptr);
-				break;
-			}
-
 			case dTreeAdressStmt::m_if:
 			{
 				if (stmt.m_arg0.m_type == dTreeAdressStmt::m_intVar) {
@@ -1082,29 +955,23 @@ DTRACE_INTRUCTION (&stmt);
 				}
 				break;
 			}
-
+*/
 
 			case dTreeAdressStmt::m_call:
 			{
-				if (stmt.m_extraInformation == dCIL::m_intRegister) {
-					dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const node = m_variableDefinitions.Insert(GetReturnVariableName());
+				if (stmt.m_arg0.m_type != dTreeAdressStmt::m_void) {
+					dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const node = m_variableDefinitions.Insert(stmt.m_arg0.m_label);
 					node->GetInfo().Append(ptr);
-				} else if (stmt.m_extraInformation == dCIL::m_floatRegister) {
-					dAssert (0);
 				}
 				break;					
 			}
 
-			case dTreeAdressStmt::m_ret:
-			{
-				if (stmt.m_arg0.m_label == m_returnVariableName) {
-					statementUsingReturnVariable.Insert(ptr);
-				}
-				break;
-			}
-*/
+			//case dTreeAdressStmt::m_pop:
 			//case dTreeAdressStmt::m_enter:
 			//case dTreeAdressStmt::m_leave:
+			case dTreeAdressStmt::m_param:
+			case dTreeAdressStmt::m_if:
+			case dTreeAdressStmt::m_ret:
 			case dTreeAdressStmt::m_goto:
 			case dTreeAdressStmt::m_nop:
 			case dTreeAdressStmt::m_label:
@@ -1116,17 +983,14 @@ DTRACE_INTRUCTION (&stmt);
 		}
 	}
 
-/*
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowPoint& point = iter.GetNode()->GetInfo();
 
 		point.m_generateStmt = false;
 		dTreeAdressStmt& stmt = point.m_statement->GetInfo();	
+DTRACE_INTRUCTION (&stmt);		
 		switch (stmt.m_instruction)
 		{
-			case dTreeAdressStmt::m_pop:
-			case dTreeAdressStmt::m_load:
-			case dTreeAdressStmt::m_loadBase:
 			case dTreeAdressStmt::m_assigment:
 			{
 				point.m_generateStmt = true;
@@ -1141,6 +1005,7 @@ DTRACE_INTRUCTION (&stmt);
 				break;
 			}
 
+			/*
 			case dTreeAdressStmt::m_storeBase:
 			{
 				point.m_generateStmt = true;
@@ -1154,12 +1019,31 @@ DTRACE_INTRUCTION (&stmt);
 				}
 				break;
 			}
+*/
+
+			case dTreeAdressStmt::m_param:
+			{
+				point.m_generateStmt = true;
+				dAssert (m_variableDefinitions.Find(stmt.m_arg0.m_label));
+
+				dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const retRegisterNode = m_variableDefinitions.Find(stmt.m_arg0.m_label);
+				dList<dCIL::dListNode*>& defsList = retRegisterNode->GetInfo();
+				for (dList<dCIL::dListNode*>::dListNode* defNode = defsList.GetFirst(); defNode; defNode = defNode->GetNext()) {
+					dCIL::dListNode* const killStement = defNode->GetInfo();
+					if (killStement != point.m_statement) {
+						point.m_killStmtSet.Insert(killStement);
+					}
+				}
+				break;
+			}
 
 			case dTreeAdressStmt::m_call:
 			{
-				if (m_returnType != dCIL::m_void) {
+				if (stmt.m_arg0.m_type != dTreeAdressStmt::m_void) {
 					point.m_generateStmt = true;
-					dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const retRegisterNode = m_variableDefinitions.Find(m_returnVariableName);
+					dAssert (m_variableDefinitions.Find(stmt.m_arg0.m_label));
+
+					dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const retRegisterNode = m_variableDefinitions.Find(stmt.m_arg0.m_label);
 					dList<dCIL::dListNode*>& defsList = retRegisterNode->GetInfo();
 					for (dList<dCIL::dListNode*>::dListNode* defNode = defsList.GetFirst(); defNode; defNode = defNode->GetNext()) {
 						dCIL::dListNode* const killStement = defNode->GetInfo();
@@ -1167,20 +1051,19 @@ DTRACE_INTRUCTION (&stmt);
 							point.m_killStmtSet.Insert(killStement);
 						}
 					}
-					dDataFlowPoint::dVariableSet<dCIL::dListNode*>::Iterator iter (statementUsingReturnVariable);
-					for (iter.Begin(); iter; iter ++) {
-						dCIL::dListNode* const stmtNode = iter.GetKey();
-						point.m_killStmtSet.Insert(stmtNode);
-					}
 				}
 
 				break;
 			}
 
-			case dTreeAdressStmt::m_enter:
-			case dTreeAdressStmt::m_leave:
+			//case dTreeAdressStmt::m_enter:
+			//case dTreeAdressStmt::m_leave:
+			
+			case dTreeAdressStmt::m_load:
+			case dTreeAdressStmt::m_loadBase:
 			case dTreeAdressStmt::m_store:
-			case dTreeAdressStmt::m_push:
+			//case dTreeAdressStmt::m_push:
+			//case dTreeAdressStmt::m_pop:
 			case dTreeAdressStmt::m_function:
 			case dTreeAdressStmt::m_nop:
 			case dTreeAdressStmt::m_if:
@@ -1194,7 +1077,6 @@ DTRACE_INTRUCTION (&stmt);
 				dAssert (0);
 		}
 	}
-*/
 }
 
 
@@ -1513,22 +1395,108 @@ void dDataFlowGraph::CalculateLiveInputLiveOutput ()
 	}
 }
 
+void dDataFlowGraph::FindNodesInPathway(dCIL::dListNode* const source, dCIL::dListNode* const destination, dTree<int, dCIL::dListNode*>& pathOut) const
+{
+	m_mark ++;
+	dList<dDataFlowPoint*> queue; 
+	queue.Append(&m_dataFlowGraph.Find(source)->GetInfo());
+	dAssert (queue.GetFirst()->GetInfo()->m_statement == source);
+
+	while (queue.GetCount()) {
+		dDataFlowPoint* const rootNode = queue.GetFirst()->GetInfo();
+		queue.Remove(queue.GetFirst());
+		if (rootNode->m_mark != m_mark) {
+			rootNode->m_mark = m_mark;
+			pathOut.Insert(rootNode->m_statement);
+
+			for (dList<dDataFlowPoint*>::dListNode* successorsNode = rootNode->m_successors.GetFirst(); successorsNode; successorsNode = successorsNode->GetNext()) {
+				dDataFlowPoint* const successor = successorsNode->GetInfo();
+				if (successor->m_statement != destination) {
+					queue.Append(successor);
+				}
+			}
+		}
+	}
+//	pathOut.Remove(source);
+}
+
+
+bool dDataFlowGraph::DoStatementAreachesStatementB(dCIL::dListNode* const stmtNodeB, dCIL::dListNode* const stmtNodeA) const
+{
+	bool canApplyPropagation = false;	
+	dDataFlowPoint& info = m_dataFlowGraph.Find(stmtNodeB)->GetInfo();
+	dDataFlowPoint::dVariableSet<dCIL::dListNode*>& reachingInputs = info.m_reachStmtInputSet;
+
+	if (reachingInputs.Find (stmtNodeA)) {
+		canApplyPropagation = true;
+		const dTreeAdressStmt& constStmt = stmtNodeA->GetInfo();
+		dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const definitions = m_variableDefinitions.Find(constStmt.m_arg0.m_label);
+		dAssert (definitions);
+
+		dList<dCIL::dListNode*>& defintionList = definitions->GetInfo();
+		for (dList<dCIL::dListNode*>::dListNode* otherStmtNode = defintionList.GetFirst(); otherStmtNode; otherStmtNode = otherStmtNode->GetNext()){
+			dCIL::dListNode* const duplicateDefinition = otherStmtNode->GetInfo();
+			if (duplicateDefinition != stmtNodeA) {
+				if (reachingInputs.Find(duplicateDefinition)) {
+					if (stmtNodeB->GetInfo().m_instruction != dTreeAdressStmt::m_loadBase) {
+						return false;
+					}
+				}
+			}
+		}
+
+        bool isSpecialStoreType = (constStmt.m_instruction == dTreeAdressStmt::m_storeBase);
+		if (isSpecialStoreType || (constStmt.m_arg1.m_type == dTreeAdressStmt::m_int) || (constStmt.m_arg1.m_type == dTreeAdressStmt::m_float)) {
+			dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const definedStatements = isSpecialStoreType ? m_variableDefinitions.Find(constStmt.m_arg2.m_label) : m_variableDefinitions.Find(constStmt.m_arg1.m_label);
+			if (definedStatements) {
+				dTree<int, dCIL::dListNode*> path;
+				FindNodesInPathway(stmtNodeA, stmtNodeB, path);
+				dList<dCIL::dListNode*>& statementList = definedStatements->GetInfo();
+				for (dList<dCIL::dListNode*>::dListNode* ptr = statementList.GetFirst(); ptr; ptr = ptr->GetNext()) {
+					dCIL::dListNode* const stmt = ptr->GetInfo();
+
+//DTRACE_INTRUCTION (&stmt);		
+					if (path.Find(stmt)) {
+						return false;
+					}
+				}
+				
+				if ((constStmt.m_instruction == dTreeAdressStmt::m_load) || ((constStmt.m_operator != dTreeAdressStmt::m_nothing) && ((constStmt.m_arg2.m_type == dTreeAdressStmt::m_int) || (constStmt.m_arg2.m_type == dTreeAdressStmt::m_float)))) {
+					dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const definedStatements = m_variableDefinitions.Find(constStmt.m_arg2.m_label);
+					if (definedStatements) {
+						dList<dCIL::dListNode*>& statementList = definedStatements->GetInfo();
+						for (dList<dCIL::dListNode*>::dListNode* ptr = statementList.GetFirst(); ptr; ptr = ptr->GetNext()) {
+							dCIL::dListNode* const stmt = ptr->GetInfo();
+							if (path.Find(stmt)) {
+								return false;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return canApplyPropagation;
+}
+
 
 bool dDataFlowGraph::ApplyCopyPropagation()
 {
 	bool ret = false;
-dAssert (0);
-/*
-	for (dCIL::dListNode* stmtNode = m_function; stmtNode; stmtNode = stmtNode->GetNext()) {
+	for (dCIL::dListNode* stmtNode = m_basicBlocks.m_begin; stmtNode != m_basicBlocks.m_end; stmtNode = stmtNode->GetNext()) {
 		dTreeAdressStmt& stmt = stmtNode->GetInfo();
-//DTRACE_INTRUCTION (&stmt);		
+DTRACE_INTRUCTION (&stmt);		
+
 		switch (stmt.m_instruction)
 		{
 			case dTreeAdressStmt::m_assigment:
 			{
-				if ((stmt.m_operator == dTreeAdressStmt::m_nothing) && (stmt.m_arg1.m_type == dTreeAdressStmt::m_intVar)) {
+				//if ((stmt.m_operator == dTreeAdressStmt::m_nothing) && (stmt.m_arg1.m_type == dTreeAdressStmt::m_intVar)) {
+				if ((stmt.m_operator == dTreeAdressStmt::m_nothing) && (stmt.m_arg1.m_type != dTreeAdressStmt::m_constInt) && (stmt.m_arg1.m_type != dTreeAdressStmt::m_constFloat)){
 					for (dCIL::dListNode* stmtNode1 = stmtNode->GetNext(); stmtNode1; stmtNode1 = stmtNode1->GetNext()) {
 						dTreeAdressStmt& stmt1 = stmtNode1->GetInfo();
+DTRACE_INTRUCTION (&stmt1);		
 						switch (stmt1.m_instruction)
 						{
 							case dTreeAdressStmt::m_assigment:
@@ -1607,7 +1575,7 @@ dAssert (0);
 				}
 				break;
 			}
-
+/*
             case dTreeAdressStmt::m_storeBase:
             {
                 for (dCIL::dListNode* stmtNode1 = stmtNode->GetNext(); stmtNode1; stmtNode1 = stmtNode1->GetNext()) {
@@ -1720,16 +1688,17 @@ dAssert (0);
 				#endif
 				break;
 			}
+*/
 		}
 	}
-*/
+
 	return ret;
 }
 
 bool dDataFlowGraph::ApplyInstructionSematicOrdering()
 {
 	bool ret = false;
-	for (dCIL::dListNode* stmtNode = m_basicBlocks.m_begin; stmtNode != m_basicBlocks.m_end; stmtNode = stmtNode->GetNext()) {
+	for (dCIL::dListNode* stmtNode = m_function->GetNext(); stmtNode && (stmtNode->GetInfo().m_instruction != dTreeAdressStmt::m_function); stmtNode = stmtNode->GetNext()) {
 		dTreeAdressStmt& stmt = stmtNode->GetInfo();
 		DTRACE_INTRUCTION (&stmt);		
 
@@ -1926,8 +1895,9 @@ bool dDataFlowGraph::RemoveRedundantJumps ()
 					}
 				}
 				ret = true;
-				m_cil->Remove(labelNode);
-				jumpMap.Remove(labelNode);
+				dAssert (0);
+				//m_cil->Remove(labelNode);
+				//jumpMap.Remove(labelNode);
 			}
 		}
 	}

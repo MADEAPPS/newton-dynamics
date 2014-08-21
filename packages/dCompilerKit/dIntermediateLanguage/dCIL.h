@@ -68,7 +68,7 @@ class dCIL: public dList<dTreeAdressStmt>
 	void ResetTemporaries();
 	dListNode* NewStatement();
 
-	void ConvertLLVMFunctionToNVMFuntion (const llvm::Function& funtion);
+	void ConvertLLVMFunctionToNVMFunction (const llvm::Function& funtion);
     void Optimize (llvm::Function* const function);
 
 	private:
