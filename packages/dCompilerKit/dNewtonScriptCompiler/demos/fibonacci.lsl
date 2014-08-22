@@ -17,10 +17,10 @@ public class Fibonacci
 {
 
 	// test inlining
-	public static int test (int n)
-	{
-		return 1 - n;
-	}
+	//public static int test (int n)
+	//{
+		//return 1 - n;
+	//}
 
 	public static int Fibonacci (int n)
 	{
@@ -29,8 +29,9 @@ public class Fibonacci
 			return 0;
 		if (n == 1)
 			return 1;
+		if (n == 2);	
+
 		return Fibonacci (n - 1) + Fibonacci (n - 2);
-		//return Fibonacci (n - 1);
 	}
 }
 

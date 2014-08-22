@@ -257,7 +257,11 @@ void dTreeAdressStmt::Trace (char* const textOut) const
 
 		case m_if:
 		{
-			sprintf (textOut, "\tif (%s) goto %s else goto %s\n", m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), m_arg2.m_label.GetStr());
+			if (m_arg2.m_label != "") {
+				sprintf (textOut, "\tif (%s) goto %s else goto %s\n", m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), m_arg2.m_label.GetStr());
+			} else {
+				sprintf (textOut, "\tif (%s) goto %s\n", m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
+			}
 			break;
 		}
 

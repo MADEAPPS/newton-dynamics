@@ -98,20 +98,17 @@ void dDataFlowGraph::BuildBasicBlockGraph()
 				stack.Append(blockMap.Find(stmt.m_falseTargetJump)->GetInfo());
 
 			} else if (stmt.m_instruction == dTreeAdressStmt::m_goto) {
-dAssert (0);
-/*
 				dAssert (m_dataFlowGraph.Find(block->m_end));
-				dAssert (m_dataFlowGraph.Find(stmt.m_jmpTarget));
-				dAssert (blockMap.Find(stmt.m_jmpTarget));
+				dAssert (m_dataFlowGraph.Find(stmt.m_trueTargetJump));
+				dAssert (blockMap.Find(stmt.m_trueTargetJump));
 
 				dDataFlowPoint* const graphStatement = &m_dataFlowGraph.Find(block->m_end)->GetInfo();
-				dDataFlowPoint* const child0 = &m_dataFlowGraph.Find(stmt.m_jmpTarget)->GetInfo();
+				dDataFlowPoint* const child0 = &m_dataFlowGraph.Find(stmt.m_trueTargetJump)->GetInfo();
 
 				graphStatement->m_successors.Append(child0);
 				child0->m_predecessors.Append(graphStatement);
 
-				stack.Append(blockMap.Find(stmt.m_jmpTarget)->GetInfo());
-*/
+				stack.Append(blockMap.Find(stmt.m_trueTargetJump)->GetInfo());
 
 			} else if (stmt.m_instruction != dTreeAdressStmt::m_ret) {
 dAssert (0);
@@ -1866,8 +1863,35 @@ bool dDataFlowGraph::RemoveRedundantJumps ()
 		}
 	}
 
-	// remove redundant adjacent labels
 	dTree<int, dCIL::dListNode*>::Iterator iter (jumpMap);
+
+	// remove if else to immidiate label
+	for (iter.Begin(); iter; iter ++) {
+		dCIL::dListNode* const node = iter.GetKey();
+		dTreeAdressStmt& stmt = node->GetInfo();
+		if (stmt.m_instruction == dTreeAdressStmt::m_if) {
+			if (stmt.m_falseTargetJump) {
+				dAssert (jumpMap.Find (stmt.m_falseTargetJump));
+				dCIL::dListNode* const falseTargetJump = jumpMap.Find (stmt.m_falseTargetJump)->GetKey();
+				dTreeAdressStmt& stmt1 = falseTargetJump->GetInfo();
+
+				dCIL::dListNode* nextGotoNode = falseTargetJump->GetNext();
+				while (nextGotoNode->GetInfo().m_instruction == dTreeAdressStmt::m_nop) {
+					nextGotoNode = nextGotoNode->GetNext();
+				}
+
+				dTreeAdressStmt& nextStmt = nextGotoNode->GetInfo();
+				dAssert (nextStmt.m_instruction != dTreeAdressStmt::m_label);
+				stmt.m_falseTargetJump = NULL;
+				stmt.m_arg2.m_label = "";
+			}
+		}
+	}
+
+
+#if 0
+	// remove redundant adjacent labels
+	
 	for (iter.Begin(); iter; iter ++) {
 		dCIL::dListNode* const node = iter.GetKey();
 		const dTreeAdressStmt& stmt = node->GetInfo();
@@ -1906,34 +1930,50 @@ bool dDataFlowGraph::RemoveRedundantJumps ()
 	for (iter.Begin(); iter; iter ++) {
 		dCIL::dListNode* const node = iter.GetKey();
 		dTreeAdressStmt& stmt = node->GetInfo();
+DTRACE_INTRUCTION (&stmt);
 		if (stmt.m_instruction == dTreeAdressStmt::m_goto) {
-			dAssert (0);
-/*
-			dAssert (jumpMap.Find (stmt.m_jmpTarget));
-			dListNode* const targetNode = jumpMap.Find (stmt.m_jmpTarget)->GetKey();
+			dAssert (jumpMap.Find (stmt.m_trueTargetJump));
+			dCIL::dListNode* const targetNode = jumpMap.Find (stmt.m_trueTargetJump)->GetKey();
 			dTreeAdressStmt& stmt1 = targetNode->GetInfo();
-			dListNode* nextGotoNode = targetNode->GetNext();
+			dCIL::dListNode* nextGotoNode = targetNode->GetNext();
 			while (nextGotoNode->GetInfo().m_instruction == dTreeAdressStmt::m_nop) {
 				nextGotoNode = nextGotoNode->GetNext();
 			}
 			if ((stmt1.m_instruction == dTreeAdressStmt::m_label) && (nextGotoNode->GetInfo().m_instruction == dTreeAdressStmt::m_goto)) {
 				const dTreeAdressStmt& stmt2 = nextGotoNode->GetInfo();
 				stmt.m_arg0.m_label = stmt2.m_arg0.m_label;
-				stmt.m_jmpTarget = stmt2.m_jmpTarget;
+				stmt.m_trueTargetJump = stmt2.m_trueTargetJump;
 				ret = true;
 			}
-*/
+
 		} else if (stmt.m_instruction == dTreeAdressStmt::m_if) {
-			dAssert (0);
+			if (stmt.m_falseTargetJump) {
+				dAssert (jumpMap.Find (stmt.m_falseTargetJump));
+				dCIL::dListNode* const falseTargetJump = jumpMap.Find (stmt.m_falseTargetJump)->GetKey();
+				dTreeAdressStmt& stmt1 = falseTargetJump->GetInfo();
+
+				dCIL::dListNode* nextGotoNode = falseTargetJump->GetNext();
+				while (nextGotoNode->GetInfo().m_instruction == dTreeAdressStmt::m_nop) {
+					nextGotoNode = nextGotoNode->GetNext();
+				}
+
+				dTreeAdressStmt& nextStmt = nextGotoNode->GetInfo();
+				dAssert (nextStmt.m_instruction != dTreeAdressStmt::m_label);
+				stmt.m_falseTargetJump = NULL;
+				stmt.m_arg2.m_label = "";
+			}
 /*
-			dAssert (jumpMap.Find (stmt.m_jmpTarget));
-			dListNode* const targetNode = jumpMap.Find (stmt.m_jmpTarget)->GetKey();
-			dTreeAdressStmt& stmt1 = targetNode->GetInfo();
-			dListNode* nextGotoNode = targetNode->GetNext();
+			dAssert (jumpMap.Find (stmt.m_trueTargetJump));
+			dCIL::dListNode* const trueTargetNode = jumpMap.Find (stmt.m_trueTargetJump)->GetKey();
+			dTreeAdressStmt& stmt1 = trueTargetNode->GetInfo();
+
+			dCIL::dListNode* nextGotoNode = trueTargetNode->GetNext();
 			while (nextGotoNode->GetInfo().m_instruction == dTreeAdressStmt::m_nop) {
 				nextGotoNode = nextGotoNode->GetNext();
 			}
 			if ((stmt1.m_instruction == dTreeAdressStmt::m_label) && (nextGotoNode->GetInfo().m_instruction == dTreeAdressStmt::m_goto)) {
+				dAssert (0);
+
 				const dTreeAdressStmt& stmt2 = nextGotoNode->GetInfo();
 				stmt.m_arg2.m_label = stmt2.m_arg0.m_label;
 				stmt.m_jmpTarget = stmt2.m_jmpTarget;
@@ -1949,72 +1989,43 @@ bool dDataFlowGraph::RemoveRedundantJumps ()
 		dCIL::dListNode* const node = iter.GetKey();
 		dTreeAdressStmt& stmt = node->GetInfo();
 		if (stmt.m_instruction == dTreeAdressStmt::m_if) {
-			dAssert (0);
-/*
-			dListNode* const gotoNode = node->GetNext();
+			dCIL::dListNode* const gotoNode = node->GetNext();
 			dTreeAdressStmt& gotoStmt = gotoNode->GetInfo();
 			if (gotoStmt.m_instruction == dTreeAdressStmt::m_goto) {
-				dListNode* const target = gotoNode->GetNext();
-				if (stmt.m_jmpTarget == target) {
+				dCIL::dListNode* const target = gotoNode->GetNext();
+				if (stmt.m_trueTargetJump == target) {
+					dAssert (0);
+/*
 					dTreeAdressStmt& gotoStmt = gotoNode->GetInfo();
 					stmt.m_operator = m_operatorComplement[stmt.m_operator];
 					stmt.m_jmpTarget = gotoStmt.m_jmpTarget;
 					stmt.m_arg2.m_label = gotoStmt.m_arg0.m_label;
 					Remove(gotoNode);
 					jumpMap.Remove(gotoNode);
+*/
 					ret = true;
 				}
 			}
-*/
 		}
 	}
 
-/*
+
 	// remove goto to immediate labels
-	for (iter.Begin(); iter; ) {
-		dCIL::dListNode* const node = iter.GetKey();
-		dTreeAdressStmt& stmt = node->GetInfo();
-		iter ++;
-		dCIL::dListNode* const nextNode = node->GetNext();
-		dAssert (0);
-
-		if (((stmt.m_instruction == dTreeAdressStmt::m_if) || (stmt.m_instruction == dTreeAdressStmt::m_goto)) && (stmt.m_jmpTarget == nextNode)) {
-			ret = true;
-			Remove(node);
-			jumpMap.Remove(node);
-		}
-	}
-*/
-
-	// delete unreferenced labels
 	for (iter.Begin(); iter; iter ++) {
 		dCIL::dListNode* const node = iter.GetKey();
 		dTreeAdressStmt& stmt = node->GetInfo();
-		
-		if (stmt.m_instruction == dTreeAdressStmt::m_label) {		
-			dTree<int, dCIL::dListNode*>::Iterator iter1 (jumpMap);
-			bool isReferenced = false;
-			for (iter1.Begin(); iter1; iter1 ++) {
-				dCIL::dListNode* const node1 = iter1.GetKey();
-				dTreeAdressStmt& stmt1 = node1->GetInfo();
-				if ((stmt1.m_instruction == dTreeAdressStmt::m_goto) || (stmt1.m_instruction == dTreeAdressStmt::m_if)){
-					dAssert (0);
-/*
-					if (stmt1.m_jmpTarget == node) {
-						isReferenced = true;
-						break;
-					}
-*/
-				}
-			}
-			if (!isReferenced) {
-				ret = true;
-				stmt.m_instruction = dTreeAdressStmt::m_nop;
-				//m_cil->Remove(node);
-				jumpMap.Remove(node);
-			}
-		}
+		dCIL::dListNode* const nextNode = node->GetNext();
+		dAssert (0);
+
+		//if (((stmt.m_instruction == dTreeAdressStmt::m_if) || (stmt.m_instruction == dTreeAdressStmt::m_goto)) && (stmt.m_jmpTarget == nextNode)) {
+			dAssert (0);
+			ret = true;
+			//Remove(node);
+			//jumpMap.Remove(node);
+		//}
 	}
+
+
 
 	// delete dead code labels
 	for (iter.Begin(); iter; iter ++) {
@@ -2030,6 +2041,42 @@ bool dDataFlowGraph::RemoveRedundantJumps ()
 			}
 		}
 	}
+#endif
+
+		// delete unreferenced labels
+	for (iter.Begin(); iter; ) {
+		dCIL::dListNode* const node = iter.GetKey();
+		dTreeAdressStmt& stmt = node->GetInfo();
+		iter ++;
+DTRACE_INTRUCTION (&stmt);		
+		if (stmt.m_instruction == dTreeAdressStmt::m_label) {		
+			dTree<int, dCIL::dListNode*>::Iterator iter1 (jumpMap);
+			bool isReferenced = false;
+			for (iter1.Begin(); iter1; iter1 ++) {
+				dCIL::dListNode* const node1 = iter1.GetKey();
+				dTreeAdressStmt& stmt1 = node1->GetInfo();
+				if (stmt1.m_instruction == dTreeAdressStmt::m_goto){
+					if (stmt1.m_trueTargetJump == node) {
+						isReferenced = true;
+						break;
+					}
+				} else if (stmt1.m_instruction == dTreeAdressStmt::m_if) {
+					if ((stmt1.m_trueTargetJump == node) || (stmt1.m_falseTargetJump == node)) {
+						isReferenced = true;
+						break;
+					}
+				}
+			}
+			if (!isReferenced) {
+				ret = true;
+				stmt.m_instruction = dTreeAdressStmt::m_nop;
+				//m_cil->Remove(node);
+				jumpMap.Remove(node);
+			}
+		}
+	}
+
+
 
 	return ret;
 }

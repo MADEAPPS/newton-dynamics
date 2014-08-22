@@ -86,7 +86,7 @@ class dCIL: public dList<dTreeAdressStmt>
 	const dCIL::dListNode* EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dList<dCIL::dListNode*>& terminalInstructions);
 	void EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dTree<const dCIL::dListNode*, const llvm::BasicBlock*>& visited, dList<dCIL::dListNode*>& terminalInstructions);
 
-	void RegisterAllocation (dListNode* const functionNode, int argumentInRegisters);
+	void RegisterAllocation (dListNode* const functionNode);
 	
 	
 

@@ -343,6 +343,8 @@ void dCIL::ConvertLLVMFunctionToNVMFunction (const llvm::Function& llvmFunction)
 
 	for (dList<dCIL::dListNode*>::dListNode* node = terminalInstructions.GetFirst(); node; node = node->GetNext()) {
 		dTreeAdressStmt& stmt = node->GetInfo()->GetInfo();
+
+//DTRACE_INTRUCTION (&stmt);
 		switch (stmt.m_instruction)
 		{
 			case dTreeAdressStmt::m_if:
@@ -351,6 +353,13 @@ void dCIL::ConvertLLVMFunctionToNVMFunction (const llvm::Function& llvmFunction)
 				llvm::BasicBlock* const falseTargetJump = (llvm::BasicBlock*) stmt.m_falseTargetJump;
 				stmt.m_trueTargetJump = (dCIL::dListNode*) visited.Find (trueTargetJump)->GetInfo();
 				stmt.m_falseTargetJump = (dCIL::dListNode*) visited.Find (falseTargetJump)->GetInfo();
+				break;
+			}
+
+			case dTreeAdressStmt::m_goto:
+			{
+				llvm::BasicBlock* const trueTargetJump = (llvm::BasicBlock*) stmt.m_trueTargetJump;
+				stmt.m_trueTargetJump = (dCIL::dListNode*) visited.Find (trueTargetJump)->GetInfo();
 				break;
 			}
 
@@ -363,7 +372,7 @@ void dCIL::ConvertLLVMFunctionToNVMFunction (const llvm::Function& llvmFunction)
 		}
 	}
 
-	RegisterAllocation (function, 8);
+	RegisterAllocation (function);
 }
 
 
@@ -642,7 +651,7 @@ dCIL::dListNode* dCIL::EmitIntegerAritmetic (const llvm::Instruction* const intr
 }
 
 
-void dCIL::RegisterAllocation (dListNode* const functionNode, int argumentInRegisters)
+void dCIL::RegisterAllocation (dListNode* const functionNode)
 {
 	//dDataFlowGraph datFlowGraph (this, functionNode, returnType);
 	dDataFlowGraph datFlowGraph (this, functionNode);
