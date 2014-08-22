@@ -2003,48 +2003,7 @@ DTRACE_INTRUCTION (&stmt);
 
 
 
-	// delete dead code labels
-	for (iter.Begin(); iter; iter ++) {
-		dCIL::dListNode* const node = iter.GetKey();
-		dTreeAdressStmt& stmt = node->GetInfo();
-		
-		if (stmt.m_instruction == dTreeAdressStmt::m_goto) {
-			for (dCIL::dListNode* deadNode = node->GetNext(); deadNode && (deadNode->GetInfo().m_instruction != dTreeAdressStmt::m_label); deadNode = node->GetNext()) {
-				dAssert (0);
-				ret = true;
-				stmt.m_instruction = dTreeAdressStmt::m_nop;
-				//m_cil->Remove(deadNode);
-			}
-		}
-	}
 #endif
-
-/*
-	// remove jumps over jumps
-	for (iter.Begin(); iter; iter ++) {
-		dCIL::dListNode* const node = iter.GetKey();
-		dTreeAdressStmt& stmt = node->GetInfo();
-		if (stmt.m_instruction == dTreeAdressStmt::m_if) {
-DTRACE_INTRUCTION (&stmt);
-			dCIL::dListNode* const gotoNode = node->GetNext();
-			dTreeAdressStmt& gotoStmt = gotoNode->GetInfo();
-			if (gotoStmt.m_instruction == dTreeAdressStmt::m_goto) {
-				dCIL::dListNode* const target = gotoNode->GetNext();
-				if (stmt.m_trueTargetJump == target) {
-					dAssert (0);
-					dTreeAdressStmt& gotoStmt = gotoNode->GetInfo();
-					stmt.m_operator = m_operatorComplement[stmt.m_operator];
-					stmt.m_jmpTarget = gotoStmt.m_jmpTarget;
-					stmt.m_arg2.m_label = gotoStmt.m_arg0.m_label;
-					Remove(gotoNode);
-					jumpMap.Remove(gotoNode);
-
-					ret = true;
-				}
-			}
-		}
-	}
-*/
 
 
 	// redirect double indirect if
@@ -2072,9 +2031,48 @@ DTRACE_INTRUCTION (&stmt);
 		}
 	}
 
-//m_cil->Trace();	
 
-	// redirect if to immideate lablel
+	// delete goto to immidiate label
+	for (iter.Begin(); iter; iter ++) {
+		dCIL::dListNode* const node = iter.GetKey();
+		dTreeAdressStmt& stmt = node->GetInfo();
+		if (stmt.m_instruction == dTreeAdressStmt::m_goto) {
+			dCIL::dListNode* const trueTargetNode = jumpMap.Find (stmt.m_trueTargetJump)->GetKey();
+			dCIL::dListNode* nextGotoNode = trueTargetNode;
+			while (nextGotoNode->GetInfo().m_instruction == dTreeAdressStmt::m_nop) {
+				nextGotoNode = nextGotoNode->GetNext();
+			}
+			dTreeAdressStmt& stmt1 = nextGotoNode->GetInfo();
+			dAssert (stmt1.m_instruction == dTreeAdressStmt::m_label);
+			if (stmt1.m_trueTargetJump == nextGotoNode) {
+				ret = true;
+				stmt.m_instruction = dTreeAdressStmt::m_nop;
+				jumpMap.Remove(node);
+			}
+		}
+	}
+
+	// delete unreacheble goto
+	for (iter.Begin(); iter; iter ++) {
+		dCIL::dListNode* const node = iter.GetKey();
+		dTreeAdressStmt& stmt = node->GetInfo();
+		if (stmt.m_instruction == dTreeAdressStmt::m_goto) {
+			//dCIL::dListNode* const trueTargetNode = jumpMap.Find (stmt.m_trueTargetJump)->GetKey();
+			dCIL::dListNode* prevNode = node->GetPrev();
+			while (prevNode->GetInfo().m_instruction == dTreeAdressStmt::m_nop) {
+				prevNode = prevNode->GetPrev();
+			}
+			dTreeAdressStmt& stmt1 = prevNode->GetInfo();
+			if ((stmt1.m_instruction == dTreeAdressStmt::m_ret) || (stmt1.m_instruction == dTreeAdressStmt::m_goto)){
+				ret = true;
+				stmt.m_instruction = dTreeAdressStmt::m_nop;
+				jumpMap.Remove(node);
+			}
+		}
+	}
+
+
+	// redirect if to immideate label
 	for (iter.Begin(); iter; ) {
 		dCIL::dListNode* const node = iter.GetKey();
 		dTreeAdressStmt& stmt = node->GetInfo();
@@ -2083,8 +2081,6 @@ DTRACE_INTRUCTION (&stmt);
 		if (stmt.m_instruction == dTreeAdressStmt::m_if) {
 			dAssert (jumpMap.Find (stmt.m_trueTargetJump));
 			dCIL::dListNode* const trueTargetNode = jumpMap.Find (stmt.m_trueTargetJump)->GetKey();
-			//dTreeAdressStmt& stmt1 = trueTargetNode->GetInfo();
-
 			dCIL::dListNode* nextGotoNode = trueTargetNode;
 			while ((nextGotoNode->GetInfo().m_instruction == dTreeAdressStmt::m_nop) || (nextGotoNode->GetInfo().m_instruction == dTreeAdressStmt::m_label)) {
 				nextGotoNode = nextGotoNode->GetNext();
@@ -2105,8 +2101,6 @@ DTRACE_INTRUCTION (&stmt);
 			}
 		}
 	}
-
-
 
 	// delete unreferenced labels
 	for (iter.Begin(); iter; ) {
@@ -2141,7 +2135,7 @@ DTRACE_INTRUCTION (&stmt);
 	}
 
 
-
+//m_cil->Trace();	
 	return ret;
 }
 
