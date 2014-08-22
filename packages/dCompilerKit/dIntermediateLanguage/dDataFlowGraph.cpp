@@ -1823,6 +1823,19 @@ bool dDataFlowGraph::RemoveDeadInstructions()
 	for (dCIL::dListNode* stmtNode = m_basicBlocks.m_begin->GetNext()->GetNext(); (stmtNode != m_basicBlocks.m_end) && (stmtNode->GetInfo().m_instruction == dTreeAdressStmt::m_argument) && (count < D_CALLER_SAVE_REGISTER_COUNT); stmtNode = stmtNode->GetNext()) {
 		dTreeAdressStmt& stmt = stmtNode->GetInfo();
 		stmt.m_instruction = dTreeAdressStmt::m_nop;
+		count ++;
+	}
+
+	for (dCIL::dListNode* stmtNode = m_basicBlocks.m_begin->GetNext()->GetNext(); stmtNode != m_basicBlocks.m_end; stmtNode = stmtNode->GetNext()) {
+		dTreeAdressStmt& stmt = stmtNode->GetInfo();
+		if (stmt.m_instruction == dTreeAdressStmt::m_call) {
+			int count = 0;
+			for (dCIL::dListNode* node = stmtNode->GetPrev(); (node->GetInfo().m_instruction == dTreeAdressStmt::m_param) && (count < D_CALLER_SAVE_REGISTER_COUNT); node = node->GetPrev()) {
+				dTreeAdressStmt& stmt1 = node->GetInfo();
+				stmt1.m_instruction = dTreeAdressStmt::m_nop;
+				count ++;
+			}
+		}
 	}
 
 	return ret;

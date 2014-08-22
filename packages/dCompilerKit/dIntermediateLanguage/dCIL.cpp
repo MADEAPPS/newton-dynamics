@@ -48,7 +48,7 @@ dCIL::dCIL(llvm::Module* const module)
     // Promote allocas to registers.
     m_optimizer.add(llvm::createPromoteMemoryToRegisterPass());
 	m_optimizer.add(llvm::createReassociatePass());
-/*
+
 	m_optimizer.add(llvm::createDeadInstEliminationPass());
 	m_optimizer.add(llvm::createDeadCodeEliminationPass());
 	m_optimizer.add(llvm::createConstantHoistingPass());
@@ -68,7 +68,7 @@ dCIL::dCIL(llvm::Module* const module)
 	m_optimizer.add(llvm::createLoopStrengthReducePass());
 	m_optimizer.add(llvm::createLoopInstSimplifyPass());
 	m_optimizer.add(llvm::createLoopUnswitchPass());
-*/
+
     m_optimizer.doInitialization();
 }
 
