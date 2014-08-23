@@ -48,10 +48,13 @@ dDAG* dDAGDimensionNode::Clone (dList<dDAG*>& allNodes) const
 
 void dDAGDimensionNode::ConnectParent(dDAG* const parent)  
 {
-dAssert (0);
 	m_parent = parent;
 	if (m_dimExp) {
 		m_dimExp->ConnectParent(this);
+	}
+
+	if (m_next) {
+		m_next->ConnectParent(this);
 	}
 }
 

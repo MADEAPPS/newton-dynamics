@@ -31,7 +31,7 @@ class dDAGFunctionStatementFlow: public dDAGFunctionStatement
 	void OpenPreHeaderBlock(dCIL& cil);
 	void ClosePreHeaderBlock(dCIL& cil);
 
-	dCIL::dListNode* CompileCILLoopBody(dCIL& cil, dDAGFunctionStatement* const posFixStmt);
+	dCIL::dListNode* CompileCILLoopBody(dCIL& cil, dCIL::dListNode* const entryLabel, dDAGFunctionStatement* const posFixStmt);
 
 	dDAGRtti(dDAGFunctionStatement);
 

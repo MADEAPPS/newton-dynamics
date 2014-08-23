@@ -16,12 +16,8 @@
 #include "dTreeAdressStmt.h"
 
 
-#define D_USE_COMPLEX_ADRESSING_MODE
 
 #define D_TEMPRARY_SYMBOL			"t"
-//#define D_LOOP_HEADER_SYMBOL		"loopHeader"
-//#define D_LOOP_TAIL_SYMBOL		"loopTail"
-
 
 inline dString GetTemporaryVariableName(int index)
 {
@@ -99,6 +95,8 @@ class dCIL: public dList<dTreeAdressStmt>
 
     llvm::legacy::FunctionPassManager m_optimizer;
 	
+	public:
+	static dString m_pointerSize;
 	static dString m_variableUndercore;
 	friend dDataFlowGraph;
 };

@@ -77,6 +77,7 @@ void dDAGFunctionStatementIF::CompileCIL(dCIL& cil)
 		falseLabel.m_arg0.m_label = stmt.m_arg2.m_label;
 		DTRACE_INTRUCTION (&falseLabel);
 	} else {
+		dAssert (0);
 		dTreeAdressStmt& gotoExitStmt0 = cil.NewStatement()->GetInfo();
 		gotoExitStmt0.m_instruction = dTreeAdressStmt::m_goto;
 		gotoExitStmt0.m_arg0.m_label = cil.NewLabel();

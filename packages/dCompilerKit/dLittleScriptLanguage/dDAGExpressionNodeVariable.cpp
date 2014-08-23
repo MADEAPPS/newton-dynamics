@@ -119,22 +119,19 @@ void dDAGExpressionNodeVariable::CompileCIL(dCIL& cil)
 {
 //	dDAGFunctionNode* const function = GetFunction();
 	if (m_dimExpressions.GetCount()) {
-		dAssert(0);
-/*
 		dDAGDimensionNode* const dim = m_dimExpressions.GetFirst()->GetInfo();
 		dim->CompileCIL(cil);
-		dCIL::dListNode* const dimInstruction = cil.NewStatement();
-		dTreeAdressStmt& addressIndex = dimInstruction->GetInfo();
-		addressIndex.m_instruction = dTreeAdressStmt::m_assigment;
-		addressIndex.m_arg0.m_label = cil.NewTemp();
-		addressIndex.m_arg1 = dim->m_result; 
+		//dCIL::dListNode* const dimInstruction = cil.NewStatement();
+		//dTreeAdressStmt& addressIndex = dimInstruction->GetInfo();
+		//addressIndex.m_instruction = dTreeAdressStmt::m_assigment;
+		//addressIndex.m_arg0.m_label = cil.NewTemp();
+		//addressIndex.m_arg1 = dim->m_result; 
+		//dString result = addressIndex.m_arg0.m_label;
+		//DTRACE_INTRUCTION (&addressIndex);
 
-		dString result = addressIndex.m_arg0.m_label;
-		DTRACE_INTRUCTION (&addressIndex);
-
+		dString result = dim->m_result.m_label;
 		for (dList<dDAGDimensionNode*>::dListNode* node = m_dimExpressions.GetFirst()->GetNext(); node; node = node->GetNext()) {
 			dAssert (0);
-
 			dDAGDimensionNode* const dim = node->GetInfo();
 			dim->CompileCIL(cil);
 			
@@ -160,41 +157,27 @@ void dDAGExpressionNodeVariable::CompileCIL(dCIL& cil)
 		}
 
 		dAssert (m_parent);
-		#ifdef D_USE_COMPLEX_ADRESSING_MODE
+		dTree<dTreeAdressStmt::dArg, dString>::dTreeNode* const variable = dDAG::FindLocalVariable(m_name);
+		dAssert (variable);
 
-			// emit an indirect addressing mode
-			dTreeAdressStmt& tmp = cil.NewStatement()->GetInfo();
-			tmp.m_instruction = dTreeAdressStmt::m_load;
-			tmp.m_arg0.m_label = cil.NewTemp();
-			tmp.m_arg1.m_label = variable;
-			tmp.m_arg2.m_label = result;
-			// the size of the integer register in power of two
-			tmp.m_extraInformation = 2;
-			DTRACE_INTRUCTION (&tmp);
-			m_result.m_label = tmp.m_arg0.m_label; 
+		dTreeAdressStmt& dimSize = cil.NewStatement()->GetInfo();
+		dimSize.m_instruction = dTreeAdressStmt::m_assigment;
+		dimSize.m_operator = dTreeAdressStmt::m_mul;
+		dimSize.m_arg0.m_label = cil.NewTemp();
+		dimSize.m_arg1.m_label = result; 
+		dimSize.m_arg2.m_type = dTreeAdressStmt::m_constInt;
+		dimSize.m_arg2.m_label = dCIL::m_pointerSize; 
+		DTRACE_INTRUCTION (&dimSize);
 
-		#else
-			dTreeAdressStmt& dimSize = cil.NewStatement()->GetInfo();
-			dimSize.m_instruction = dTreeAdressStmt::m_assigment;
-			dimSize.m_operator = dTreeAdressStmt::m_mul;
-			dimSize.m_arg0.m_label = cil.NewTemp();
-			dimSize.m_arg1.m_label = result; 
-			dimSize.m_arg2.m_type = dTreeAdressStmt::m_intConst;
-			dimSize.m_arg2.m_label = "4"; 
-			DTRACE_INTRUCTION (&dimSize);
-
-			dAssert (m_parent);
-			// emit an indirect addressing mode
-			dTreeAdressStmt& tmp = cil.NewStatement()->GetInfo();
-			tmp.m_instruction = dTreeAdressStmt::m_load;
-			tmp.m_arg0.m_label = cil.NewTemp();
-			tmp.m_arg1.m_label = variable;
-			tmp.m_arg2.m_label = dimSize.m_arg0.m_label;
-			DTRACE_INTRUCTION (&tmp);
-			m_result.m_label = tmp.m_arg0.m_label; 
-	   #endif
-*/
-
+		dAssert (m_parent);
+		// emit an indirect addressing mode
+		dTreeAdressStmt& tmp = cil.NewStatement()->GetInfo();
+		tmp.m_instruction = dTreeAdressStmt::m_load;
+		tmp.m_arg0.m_label = cil.NewTemp();
+		tmp.m_arg1 = variable->GetInfo();
+		tmp.m_arg2 = dimSize.m_arg0;
+		DTRACE_INTRUCTION (&tmp);
+		m_result = tmp.m_arg0; 
 	} else {
 		dTree<dTreeAdressStmt::dArg, dString>::dTreeNode* const variable = dDAG::FindLocalVariable(m_name);
 		dAssert (variable);

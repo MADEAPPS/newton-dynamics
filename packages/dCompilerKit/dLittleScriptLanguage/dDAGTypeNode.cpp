@@ -39,7 +39,8 @@ dDAGTypeNode::dDAGTypeNode(dList<dDAG*>& allNodes, const dString& typeName)
 
 dDAGTypeNode::dDAGTypeNode(dList<dDAG*>& allNodes, const dDAGTypeNode& copySource)
 	:dDAG(allNodes)
-	,m_dimensions()
+	,m_dimensions(copySource.m_dimensions)
+	,m_intrinsicType (copySource.m_intrinsicType)
 {
 	m_name = copySource.m_name;
 	for (dList<dDAGDimensionNode*>::dListNode* node = copySource.m_dimensions.GetFirst(); node; node = node->GetNext()) {

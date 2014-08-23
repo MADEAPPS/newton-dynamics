@@ -695,8 +695,6 @@ dScriptCompiler::dUserVariable dScriptCompiler::AddClassVariableInitilization(co
 dScriptCompiler::dUserVariable dScriptCompiler::ConcatenateExpressions(const dUserVariable& expressionA, const dUserVariable& expressionB)
 {
 	dUserVariable returnNode;
-dAssert (0);
-/*
 	dDAGExpressionNode* const nodeA = (dDAGExpressionNode*)expressionA.m_node;
 	dDAGExpressionNode* const nodeB = (dDAGExpressionNode*)expressionB.m_node;
 	dAssert (nodeA->IsType(dDAGExpressionNode::GetRttiType()));
@@ -710,7 +708,7 @@ dAssert (0);
 	if (leftVarListA && leftVarListA->m_type) {
 		dDAGExpressionNodeVariable* const leftVarListB = nodeB->FindLeftVariable();
 		if (leftVarListB && !leftVarListB->m_type) {
-dAssert (0);
+
 			dUserVariable localVariable(NewVariableStatement (leftVarListB->m_name, ""));
 
 			dDAGParameterNode* const variableNode = (dDAGParameterNode*)localVariable.m_node;
@@ -722,13 +720,14 @@ dAssert (0);
 				dDAGScopeBlockNode* const block = GetCurrentScope();
 				block->AddStatement(variableNode);
 			} else {
-				dDAGClassNode* const curClass = GetCurrentClass();
-				curClass->AddVariable(variableNode);
+				dAssert (0);
+				//dDAGClassNode* const curClass = GetCurrentClass();
+				//curClass->AddVariable(variableNode);
 			}
 		}
 	}
 	returnNode.m_node = nodeA;
-*/
+
 	return returnNode;
 }
 

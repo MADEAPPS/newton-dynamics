@@ -14,6 +14,7 @@
 #include "dDataFlowGraph.h"
 
 dString dCIL::m_variableUndercore ("_");
+dString dCIL::m_pointerSize (int (sizeof (int)));
 
 dCIL::dCIL(llvm::Module* const module)
 	:dList()

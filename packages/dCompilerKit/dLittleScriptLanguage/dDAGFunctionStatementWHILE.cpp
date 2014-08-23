@@ -31,44 +31,49 @@ dDAGFunctionStatementWHILE::~dDAGFunctionStatementWHILE()
 
 void dDAGFunctionStatementWHILE::ConnectParent(dDAG* const parent)
 {
-dAssert (0);
 	dDAGFunctionStatementFlow::ConnectParent(parent);
+	if (m_expression) {
+		m_expression->ConnectParent(this);
+	}
 }
 
 
 void dDAGFunctionStatementWHILE::CompileCIL(dCIL& cil)  
 {
-dAssert (0);
-/*
 	dCIL::dListNode* startExpressionTestNode = NULL;
+
+	dString startLabel (cil.NewLabel());
+//	dString exitLabel (cil.NewLabel());
 	if (m_testExpression) {
 		m_testExpression->CompileCIL(cil);
-
-		dTreeAdressStmt& tmpTest = cil.NewStatement()->GetInfo();
-		tmpTest.m_instruction = dTreeAdressStmt::m_assigment;
-		tmpTest.m_operator = dTreeAdressStmt::m_nothing;
-		tmpTest.m_arg0.m_label = cil.NewTemp();
-		tmpTest.m_arg1.m_type = dTreeAdressStmt::m_intConst;
-		tmpTest.m_arg1.m_label = "0"; 
-		DTRACE_INTRUCTION (&tmpTest);
 
 		startExpressionTestNode = cil.NewStatement();
 		dTreeAdressStmt& stmt = startExpressionTestNode->GetInfo();
 		stmt.m_instruction = dTreeAdressStmt::m_if;
-		stmt.m_operator = dTreeAdressStmt::m_identical;
+		stmt.m_operator = dTreeAdressStmt::m_nothing;
 		stmt.m_arg0 = m_testExpression->m_result;
-		stmt.m_arg1 = tmpTest.m_arg0;
-		
-		stmt.m_arg2.m_label = "loopExit"; 
+		stmt.m_arg1.m_label = startLabel;
+		stmt.m_arg2.m_label = "";
+		//stmt.m_arg1 = tmpTest.m_arg0;
+		//stmt.m_arg2.m_label = cil.NewLabel();
 		DTRACE_INTRUCTION (&stmt);
 	}
 
-	dCIL::dListNode* const exitLabelStmtNode = CompileCILLoopBody(cil, NULL);
+	dCIL::dListNode* const entryLabelNode = cil.NewStatement();
+	if (startExpressionTestNode) {
+		startExpressionTestNode->GetInfo().m_trueTargetJump = entryLabelNode;
+	}
+	dTreeAdressStmt& entryLabel = entryLabelNode->GetInfo();
+	entryLabel.m_instruction = dTreeAdressStmt::m_label;
+	entryLabel.m_arg0.m_label = startLabel;
+	DTRACE_INTRUCTION (&entryLabel);
+
+
+	dCIL::dListNode* const exitLabelStmtNode = CompileCILLoopBody(cil, entryLabelNode, NULL);
 
 	if (startExpressionTestNode) {
 		dTreeAdressStmt& stmt = startExpressionTestNode->GetInfo();
-		stmt.m_jmpTarget = exitLabelStmtNode;
-		stmt.m_arg2.m_label = exitLabelStmtNode->GetInfo().m_arg0.m_label; 
+		stmt.m_falseTargetJump = exitLabelStmtNode;
+		stmt.m_arg2 = exitLabelStmtNode->GetInfo().m_arg0; 
 	}
-*/
 }

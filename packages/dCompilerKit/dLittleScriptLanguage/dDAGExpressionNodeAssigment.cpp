@@ -104,38 +104,24 @@ void dDAGExpressionNodeAssigment::CompileCIL(dCIL& cil)
 		}
 
 		dAssert (m_parent);
-		#ifdef D_USE_COMPLEX_ADRESSING_MODE
-			// emit an indirect addressing mode
-			dTreeAdressStmt& tmp = cil.NewStatement()->GetInfo();
-			tmp.m_instruction = dTreeAdressStmt::m_store;
-			tmp.m_arg0 = m_expression->m_result;
-			tmp.m_arg1.m_label = variable;
-			tmp.m_arg2.m_label = result;
-			// the size of the integer register in power of two
-			tmp.m_extraInformation = 2;
-			DTRACE_INTRUCTION (&tmp);
-			m_result.m_label = tmp.m_arg0.m_label; 
-
-		#else
-			dTreeAdressStmt& dimSize = cil.NewStatement()->GetInfo();
-			dimSize.m_instruction = dTreeAdressStmt::m_assigment;
-			dimSize.m_operator = dTreeAdressStmt::m_mul;
-			dimSize.m_arg0.m_label = cil.NewTemp();
-			dimSize.m_arg1.m_label = result; 
-			dimSize.m_arg2.m_type = dTreeAdressStmt::m_intConst;
-			dimSize.m_arg2.m_label = "4"; 
-			DTRACE_INTRUCTION (&dimSize);
+		dTreeAdressStmt& dimSize = cil.NewStatement()->GetInfo();
+		dimSize.m_instruction = dTreeAdressStmt::m_assigment;
+		dimSize.m_operator = dTreeAdressStmt::m_mul;
+		dimSize.m_arg0.m_label = cil.NewTemp();
+		dimSize.m_arg1.m_label = result; 
+		dimSize.m_arg2.m_type = dTreeAdressStmt::m_intConst;
+		dimSize.m_arg2.m_label = "4"; 
+		DTRACE_INTRUCTION (&dimSize);
 
 			
-			// emit an indirect addressing mode
-			dTreeAdressStmt& tmp = cil.NewStatement()->GetInfo();
-			tmp.m_instruction = dTreeAdressStmt::m_store;
-			tmp.m_arg0 = m_expression->m_result;
-			tmp.m_arg1.m_label = variable;
-			tmp.m_arg2.m_label = dimSize.m_arg0.m_label;
-			DTRACE_INTRUCTION (&tmp);
-			m_result.m_label = tmp.m_arg0.m_label; 
-		#endif
+		// emit an indirect addressing mode
+		dTreeAdressStmt& tmp = cil.NewStatement()->GetInfo();
+		tmp.m_instruction = dTreeAdressStmt::m_store;
+		tmp.m_arg0 = m_expression->m_result;
+		tmp.m_arg1.m_label = variable;
+		tmp.m_arg2.m_label = dimSize.m_arg0.m_label;
+		DTRACE_INTRUCTION (&tmp);
+		m_result.m_label = tmp.m_arg0.m_label; 
 */
 	} else {
 		m_leftVariable->CompileCIL(cil); 

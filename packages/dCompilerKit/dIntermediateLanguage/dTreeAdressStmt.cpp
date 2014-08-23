@@ -297,15 +297,7 @@ void dTreeAdressStmt::Trace (char* const textOut) const
 
 		case m_load:
 		{
-            dAssert (0);
-/*
-			int multiplier = 1 << m_extraInformation;
-			if (multiplier != 1) {
-				sprintf (textOut, "\t%s = [%s + %s * %d]\n", m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), m_arg2.m_label.GetStr(), multiplier);
-			} else {
-				sprintf (textOut, "\t%s = [%s + %s]\n", m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), m_arg2.m_label.GetStr());
-			}
-*/
+			sprintf (textOut, "\t%s %s = [%s + %s]\n", GetTypeString(m_arg0), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), m_arg2.m_label.GetStr());
 			break;
 		}
 

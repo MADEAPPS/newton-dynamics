@@ -14,6 +14,9 @@
 #include "dDAGFunctionStatement.h"
 
 dInitRtti(dDAGFunctionStatement);
+dString dDAGFunctionStatement::m_loopHeadMetaData	("loopHeader");
+dString dDAGFunctionStatement::m_loopTailMetaData	("loopTail");
+
 
 dDAGFunctionStatement::dDAGFunctionStatement(dList<dDAG*>& allNodes)
 	:dDAG(allNodes)

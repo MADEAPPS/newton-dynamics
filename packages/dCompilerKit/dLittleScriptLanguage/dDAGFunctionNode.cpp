@@ -34,7 +34,6 @@ dDAGFunctionNode::dDAGFunctionNode(dList<dDAG*>& allNodes, dDAGTypeNode* const t
 	,m_body(NULL)
 	,m_modifier(NULL)
 	,m_functionStart(NULL)
-//	,m_basicBlocks____()
 	,m_parameters() 
 	,m_blockMap()
 {

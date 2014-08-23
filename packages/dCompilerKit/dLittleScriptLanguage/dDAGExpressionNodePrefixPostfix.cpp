@@ -33,16 +33,12 @@ dDAGExpressionNodePrefixPostfix::~dDAGExpressionNodePrefixPostfix(void)
 
 void dDAGExpressionNodePrefixPostfix::ConnectParent(dDAG* const parent) 
 {
-dAssert (0);
 	m_parent = parent;
 	m_expression->ConnectParent(this) ;
 }
 
 void dDAGExpressionNodePrefixPostfix::CompileCIL(dCIL& cil)
 {
-	dAssert (0);
-	/*
-
 	m_expression->CompileCIL(cil);
 
 	if (m_isPrefix) {
@@ -51,7 +47,7 @@ void dDAGExpressionNodePrefixPostfix::CompileCIL(dCIL& cil)
 		stmt.m_operator = m_isIncrement ? dTreeAdressStmt::m_add : dTreeAdressStmt::m_sub;
 		stmt.m_arg0 = m_expression->m_result;
 		stmt.m_arg1 = m_expression->m_result;
-		stmt.m_arg2.m_type = dTreeAdressStmt::m_intConst;
+		stmt.m_arg2.m_type = dTreeAdressStmt::m_constInt;
 		stmt.m_arg2.m_label = "1";
 		DTRACE_INTRUCTION (&stmt);
 		m_result = stmt.m_arg0;
@@ -67,12 +63,11 @@ void dDAGExpressionNodePrefixPostfix::CompileCIL(dCIL& cil)
 		stmt.m_operator = m_isIncrement ? dTreeAdressStmt::m_add : dTreeAdressStmt::m_sub;
 		stmt.m_arg0 = m_expression->m_result;
 		stmt.m_arg1 = m_expression->m_result;
-		stmt.m_arg2.m_type = dTreeAdressStmt::m_intConst;
+		stmt.m_arg2.m_type = dTreeAdressStmt::m_constInt;
 		stmt.m_arg2.m_label = "1";
 		DTRACE_INTRUCTION (&stmt);
 
 		m_result = stmt1.m_arg0;
 	}
-*/
 }
 
