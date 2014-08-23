@@ -19,7 +19,7 @@
 dInitRtti(dDAGExpressionNodeConstant);
 dInitRtti(dDAGExpressionNodeOperatorThisConstant);
 
-dDAGExpressionNodeConstant::dDAGExpressionNodeConstant(dList<dDAG*>& allNodes, dTreeAdressStmt::dArgType type, const char* const value)
+dDAGExpressionNodeConstant::dDAGExpressionNodeConstant(dList<dDAG*>& allNodes, dThreeAdressStmt::dArgType type, const char* const value)
 	:dDAGExpressionNode(allNodes)
 	,m_type(type)
 {
@@ -70,16 +70,16 @@ dCIL::dReturnValue dDAGExpressionNodeConstant::Evalue(const dDAGFunctionNode* co
 void dDAGExpressionNodeConstant::CompileCIL(dCIL& cil)
 {
 /*
-	dTreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
-	stmt.m_instruction = dTreeAdressStmt::m_assigment;
-	stmt.m_operator = dTreeAdressStmt::m_nothing;
+	dThreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
+	stmt.m_instruction = dThreeAdressStmt::m_assigment;
+	stmt.m_operator = dThreeAdressStmt::m_nothing;
 	stmt.m_arg0.m_label = cil.NewTemp();
 
 	switch (m_type) 
 	{
-		case dTreeAdressStmt::m_int:
+		case dThreeAdressStmt::m_int:
 		{
-			stmt.m_arg1.m_type = dTreeAdressStmt::m_intConst;
+			stmt.m_arg1.m_type = dThreeAdressStmt::m_intConst;
 			arg.m_type = 
 			break;
 		}
@@ -87,13 +87,13 @@ void dDAGExpressionNodeConstant::CompileCIL(dCIL& cil)
 		case m_floatValue:
 		{
 			dAssert (0);
-			stmt.m_arg1.m_type = dTreeAdressStmt::m_floatConst;
+			stmt.m_arg1.m_type = dThreeAdressStmt::m_floatConst;
 			break;
 		}
 
 		case m_classPointer:
 		{
-			stmt.m_arg1.m_type = dTreeAdressStmt::m_classPointer;
+			stmt.m_arg1.m_type = dThreeAdressStmt::m_classPointer;
 			break;
 		}
 
@@ -111,7 +111,7 @@ void dDAGExpressionNodeConstant::CompileCIL(dCIL& cil)
 
 
 dDAGExpressionNodeOperatorThisConstant::dDAGExpressionNodeOperatorThisConstant (dList<dDAG*>& allNodes)
-	:dDAGExpressionNodeConstant(allNodes, dTreeAdressStmt::m_classPointer, "this")
+	:dDAGExpressionNodeConstant(allNodes, dThreeAdressStmt::m_classPointer, "this")
 {
 }
 
@@ -119,6 +119,6 @@ dDAGExpressionNodeOperatorThisConstant::dDAGExpressionNodeOperatorThisConstant (
 void dDAGExpressionNodeOperatorThisConstant::CompileCIL(dCIL& cil)
 {
 	dDAGFunctionNode* const function = GetFunction();
-	m_result.m_type = dTreeAdressStmt::m_classPointer;
+	m_result.m_type = dThreeAdressStmt::m_classPointer;
 	m_result.m_label = function->m_opertatorThis;
 }

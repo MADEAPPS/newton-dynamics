@@ -47,10 +47,10 @@ dDAGScopeBlockNode* dDAG::GetScope() const
 	return NULL;
 }
 
-dTree<dTreeAdressStmt::dArg, dString>::dTreeNode* dDAG::FindLocalVariable(const dString& name) const
+dTree<dThreeAdressStmt::dArg, dString>::dTreeNode* dDAG::FindLocalVariable(const dString& name) const
 {
 	for (const dDAGScopeBlockNode* scope = GetScope(); scope; scope = scope->m_parent->GetScope()) {
-		dTree<dTreeAdressStmt::dArg, dString>::dTreeNode* const variableNode = scope->m_localVariables.Find(name);	
+		dTree<dThreeAdressStmt::dArg, dString>::dTreeNode* const variableNode = scope->m_localVariables.Find(name);	
 		if (variableNode) {
 			return variableNode;
 		}
@@ -59,11 +59,11 @@ dTree<dTreeAdressStmt::dArg, dString>::dTreeNode* dDAG::FindLocalVariable(const 
 }
 
 
-dTreeAdressStmt::dArg dDAG::LoadLocalVariable (dCIL& cil, const dTreeAdressStmt::dArg& arg) const
+dThreeAdressStmt::dArg dDAG::LoadLocalVariable (dCIL& cil, const dThreeAdressStmt::dArg& arg) const
 {
 	if (arg.m_label.Find(m_scopePrefix) == 0) {
-		dTreeAdressStmt& loadVar = cil.NewStatement()->GetInfo();
-		loadVar.m_instruction = dTreeAdressStmt::m_loadBase;
+		dThreeAdressStmt& loadVar = cil.NewStatement()->GetInfo();
+		loadVar.m_instruction = dThreeAdressStmt::m_loadBase;
 		loadVar.m_arg1 = arg;
 		loadVar.m_arg0.m_label = cil.NewTemp();
 		loadVar.m_arg0.m_type = loadVar.m_arg1.m_type;
@@ -103,7 +103,7 @@ bool dDAG::RenameLocalVariable(dCIL& cil, dString& variable) const
 		char text[256];
 		sprintf (text, "%s%d%s", D_SCOPE_PREFIX, scope->m_scopeLayer, variable.GetStr());
 
-		dTree<dTreeAdressStmt::dArg, dString>::dTreeNode* const varNode = scope->m_localVariables.Find(text);
+		dTree<dThreeAdressStmt::dArg, dString>::dTreeNode* const varNode = scope->m_localVariables.Find(text);
 		if (varNode) {
 			variable = text;
 			return true;
@@ -115,8 +115,8 @@ bool dDAG::RenameLocalVariable(dCIL& cil, dString& variable) const
 	if (functionVariable) {
 		if (functionVariable->m_result.m_label == "") {
 			dAssert(0);
-			dTreeAdressStmt& fntArg = cil.NewStatement()->GetInfo();
-			fntArg.m_instruction = dTreeAdressStmt::m_loadBase;
+			dThreeAdressStmt& fntArg = cil.NewStatement()->GetInfo();
+			fntArg.m_instruction = dThreeAdressStmt::m_loadBase;
 			fntArg.m_arg0.m_label = cil.NewTemp();
 			fntArg.m_arg2.m_label = functionVariable->m_name;
 			DTRACE_INTRUCTION (&fntArg);

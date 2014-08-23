@@ -69,8 +69,8 @@ void dDAGExpressionNodeAssigment::CompileCIL(dCIL& cil)
 		dDAGDimensionNode* const dim = m_leftVariable->m_dimExpressions.GetFirst()->GetInfo();
 		dim->CompileCIL(cil);
 		dCIL::dListNode* const dimInstruction = cil.NewStatement();
-		dTreeAdressStmt& addressIndex = dimInstruction->GetInfo();
-		addressIndex.m_instruction = dTreeAdressStmt::m_assigment;
+		dThreeAdressStmt& addressIndex = dimInstruction->GetInfo();
+		addressIndex.m_instruction = dThreeAdressStmt::m_assigment;
 		addressIndex.m_arg0.m_label = cil.NewTemp();
 		addressIndex.m_arg1 = dim->m_result; 
 
@@ -82,18 +82,18 @@ void dDAGExpressionNodeAssigment::CompileCIL(dCIL& cil)
 			dDAGDimensionNode* const dim = node->GetInfo();
 			dim->CompileCIL(cil);
 			
-			dTreeAdressStmt& stmtMul = cil.NewStatement()->GetInfo();
-			stmtMul.m_instruction = dTreeAdressStmt::m_assigment;
-			stmtMul.m_operator = dTreeAdressStmt::m_mul;
+			dThreeAdressStmt& stmtMul = cil.NewStatement()->GetInfo();
+			stmtMul.m_instruction = dThreeAdressStmt::m_assigment;
+			stmtMul.m_operator = dThreeAdressStmt::m_mul;
 			stmtMul.m_arg0.m_label = cil.NewTemp();
 			stmtMul.m_arg1.m_label = result;
 			stmtMul.m_arg2.m_label = dim->m_arraySize;
 
 			DTRACE_INTRUCTION (&stmtMul);
 
-			dTreeAdressStmt& stmtAdd = cil.NewStatement()->GetInfo();
-			stmtAdd.m_instruction = dTreeAdressStmt::m_assigment;
-			stmtAdd.m_operator = dTreeAdressStmt::m_add;
+			dThreeAdressStmt& stmtAdd = cil.NewStatement()->GetInfo();
+			stmtAdd.m_instruction = dThreeAdressStmt::m_assigment;
+			stmtAdd.m_operator = dThreeAdressStmt::m_add;
 			stmtAdd.m_arg0.m_label = cil.NewTemp();
 			stmtAdd.m_arg1.m_label = stmtMul.m_arg0.m_label;
 			stmtAdd.m_arg2 = dim->m_result;
@@ -104,19 +104,19 @@ void dDAGExpressionNodeAssigment::CompileCIL(dCIL& cil)
 		}
 
 		dAssert (m_parent);
-		dTreeAdressStmt& dimSize = cil.NewStatement()->GetInfo();
-		dimSize.m_instruction = dTreeAdressStmt::m_assigment;
-		dimSize.m_operator = dTreeAdressStmt::m_mul;
+		dThreeAdressStmt& dimSize = cil.NewStatement()->GetInfo();
+		dimSize.m_instruction = dThreeAdressStmt::m_assigment;
+		dimSize.m_operator = dThreeAdressStmt::m_mul;
 		dimSize.m_arg0.m_label = cil.NewTemp();
 		dimSize.m_arg1.m_label = result; 
-		dimSize.m_arg2.m_type = dTreeAdressStmt::m_intConst;
+		dimSize.m_arg2.m_type = dThreeAdressStmt::m_intConst;
 		dimSize.m_arg2.m_label = "4"; 
 		DTRACE_INTRUCTION (&dimSize);
 
 			
 		// emit an indirect addressing mode
-		dTreeAdressStmt& tmp = cil.NewStatement()->GetInfo();
-		tmp.m_instruction = dTreeAdressStmt::m_store;
+		dThreeAdressStmt& tmp = cil.NewStatement()->GetInfo();
+		tmp.m_instruction = dThreeAdressStmt::m_store;
 		tmp.m_arg0 = m_expression->m_result;
 		tmp.m_arg1.m_label = variable;
 		tmp.m_arg2.m_label = dimSize.m_arg0.m_label;
@@ -125,9 +125,9 @@ void dDAGExpressionNodeAssigment::CompileCIL(dCIL& cil)
 */
 	} else {
 		m_leftVariable->CompileCIL(cil); 
-		dTreeAdressStmt::dArg arg1 (LoadLocalVariable(cil, m_expression->m_result));
-		dTreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
-		stmt.m_instruction = (m_leftVariable->m_result.m_label.Find(m_scopePrefix) == 0) ? dTreeAdressStmt::m_storeBase : stmt.m_instruction = dTreeAdressStmt::m_assigment;
+		dThreeAdressStmt::dArg arg1 (LoadLocalVariable(cil, m_expression->m_result));
+		dThreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
+		stmt.m_instruction = (m_leftVariable->m_result.m_label.Find(m_scopePrefix) == 0) ? dThreeAdressStmt::m_storeBase : stmt.m_instruction = dThreeAdressStmt::m_assigment;
 		stmt.m_arg0 = m_leftVariable->m_result;
 		stmt.m_arg1 = arg1;
 		DTRACE_INTRUCTION (&stmt);

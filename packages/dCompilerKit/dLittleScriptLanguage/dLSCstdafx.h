@@ -29,7 +29,7 @@
 #include <dDataFlowGraph.h>
 #include <dBasicBlockList.h>
 #include <dVirtualMachine.h>
-#include <dTreeAdressStmt.h>
+#include <dThreeAdressStmt.h>
 #include <dContainersStdAfx.h>
 
 

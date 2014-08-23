@@ -41,18 +41,18 @@ void dDAGExpressionNodeBinaryOperator::ConnectParent(dDAG* const parent)
 }
 
 //void dDAGExpressionNodeBinaryOperator::PromoteTypes (dCIL::dReturnValue& typeA, dCIL::dReturnValue& typeB) const
-dTreeAdressStmt::dArgType dDAGExpressionNodeBinaryOperator::PromoteTypes (const dTreeAdressStmt::dArgType typeA, const dTreeAdressStmt::dArgType typeB) const
+dThreeAdressStmt::dArgType dDAGExpressionNodeBinaryOperator::PromoteTypes (const dThreeAdressStmt::dArgType typeA, const dThreeAdressStmt::dArgType typeB) const
 {
-	dTreeAdressStmt::dArgType type = typeA;
+	dThreeAdressStmt::dArgType type = typeA;
 	if (typeA != typeB) {
 		switch (typeA) 
 		{
-			case dTreeAdressStmt::m_constInt:
+			case dThreeAdressStmt::m_constInt:
 			{
 				switch (typeB) 
 				{
-					case dTreeAdressStmt::m_int:
-						type = dTreeAdressStmt::m_int;
+					case dThreeAdressStmt::m_int:
+						type = dThreeAdressStmt::m_int;
 						break;
 					default:;
 						dAssert (0);
@@ -60,12 +60,12 @@ dTreeAdressStmt::dArgType dDAGExpressionNodeBinaryOperator::PromoteTypes (const 
 				break;
 			}
 
-			case dTreeAdressStmt::m_int:
+			case dThreeAdressStmt::m_int:
 			{
 				switch (typeB) 
 				{
-					case dTreeAdressStmt::m_constInt:
-						type = dTreeAdressStmt::m_int;
+					case dThreeAdressStmt::m_constInt:
+						type = dThreeAdressStmt::m_int;
 						break;
 
 					default:;
@@ -81,11 +81,11 @@ dTreeAdressStmt::dArgType dDAGExpressionNodeBinaryOperator::PromoteTypes (const 
 
 	switch (type) 
 	{
-		case dTreeAdressStmt::m_constInt:
-			type = dTreeAdressStmt::m_int;
+		case dThreeAdressStmt::m_constInt:
+			type = dThreeAdressStmt::m_int;
 			break;
 
-		case dTreeAdressStmt::m_int:
+		case dThreeAdressStmt::m_int:
 			break;
 
 		default:;
@@ -205,14 +205,14 @@ return dCIL::dReturnValue();
 void dDAGExpressionNodeBinaryOperator::CompileCIL(dCIL& cil)  
 {
 	m_expressionA->CompileCIL(cil);
-	dTreeAdressStmt::dArg arg1 (LoadLocalVariable(cil, m_expressionA->m_result));
+	dThreeAdressStmt::dArg arg1 (LoadLocalVariable(cil, m_expressionA->m_result));
 
 	m_expressionB->CompileCIL(cil);
-	dTreeAdressStmt::dArg arg2 (LoadLocalVariable(cil, m_expressionB->m_result));
+	dThreeAdressStmt::dArg arg2 (LoadLocalVariable(cil, m_expressionB->m_result));
 
-	dTreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
+	dThreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
 	m_result.m_label = cil.NewTemp ();		
-	stmt.m_instruction = dTreeAdressStmt::m_assigment;
+	stmt.m_instruction = dThreeAdressStmt::m_assigment;
 	stmt.m_arg0 = m_result;
 	//stmt.m_arg0.m_type = m_expressionA->m_result.m_type;
 	stmt.m_arg0.m_type = PromoteTypes (m_expressionA->m_result.m_type, m_expressionB->m_result.m_type);
@@ -226,69 +226,69 @@ void dDAGExpressionNodeBinaryOperator::CompileCIL(dCIL& cil)
 	{
 		case m_add:
 		{
-			stmt.m_operator = dTreeAdressStmt::m_add;
+			stmt.m_operator = dThreeAdressStmt::m_add;
 			break;
 		}
 
 
 		case m_sub:
 		{
-			stmt.m_operator = dTreeAdressStmt::m_sub;
+			stmt.m_operator = dThreeAdressStmt::m_sub;
 			break;
 		}
 
 		case m_mul:
 		{
-			stmt.m_operator = dTreeAdressStmt::m_mul;
+			stmt.m_operator = dThreeAdressStmt::m_mul;
 			break;
 		}
 
 		case m_div:
 		{
-			stmt.m_operator = dTreeAdressStmt::m_div;
+			stmt.m_operator = dThreeAdressStmt::m_div;
 			break;
 		}
 
 		case m_mod:
 		{
-			stmt.m_operator = dTreeAdressStmt::m_mod;
+			stmt.m_operator = dThreeAdressStmt::m_mod;
 			break;
 		}
 
 		case m_identical:
 		{
-			stmt.m_operator = dTreeAdressStmt::m_identical;
+			stmt.m_operator = dThreeAdressStmt::m_identical;
 			break;
 		}
 
 		case m_different:
 		{
-			stmt.m_operator = dTreeAdressStmt::m_different;
+			stmt.m_operator = dThreeAdressStmt::m_different;
 			break;
 		}
 
 
 		case m_less:
 		{
-			stmt.m_operator = dTreeAdressStmt::m_less;
+			stmt.m_operator = dThreeAdressStmt::m_less;
 			break;
 		}
 
 		case m_lessEqual:
 		{
-			stmt.m_operator = dTreeAdressStmt::m_lessEqual;
+			stmt.m_operator = dThreeAdressStmt::m_lessEqual;
 			break;
 		}
 		
 		case m_greather:
 		{
-			stmt.m_operator = dTreeAdressStmt::m_greather;
+			stmt.m_operator = dThreeAdressStmt::m_greather;
 			break;
 		}
 	
 		case m_greatherEqual:
 		{
-			stmt.m_operator = dTreeAdressStmt::m_greatherEqual;
+			stmt.m_operator = dThreeAdressStmt::m_greatherEqual;
 			break;
 		}
 		

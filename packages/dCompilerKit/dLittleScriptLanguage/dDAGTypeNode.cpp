@@ -21,20 +21,8 @@ dInitRtti(dDAGTypeNode);
 dDAGTypeNode::dDAGTypeNode(dList<dDAG*>& allNodes, const dString& typeName)
 	:dDAG(allNodes)
 	,m_dimensions()
-	,m_intrinsicType(dTreeAdressStmt::m_int)
+	,m_intrinsicType (dThreeAdressStmt::GetTypeID (typeName))
 {
-	/*
-	m_name = typeName;
-	bool foundMatch = false;
-	for (int i = 0; sizeof (m_maptable) / sizeof (m_maptable[0]); i ++) {
-		if (m_name == m_maptable[i].m_name) {
-			foundMatch = true;
-			m_intrinsicType = m_maptable[i].m_type;
-			break;
-		}
-	}
-	dAssert (foundMatch);
-*/
 }
 
 dDAGTypeNode::dDAGTypeNode(dList<dDAG*>& allNodes, const dDAGTypeNode& copySource)
@@ -60,14 +48,14 @@ dDAG* dDAGTypeNode::Clone (dList<dDAG*>& allNodes) const
 }
 
 
-dTreeAdressStmt::dArgType dDAGTypeNode::GetIntrisicType() const
+dThreeAdressStmt::dArgType dDAGTypeNode::GetIntrisicType() const
 {
 	return m_intrinsicType;
 }
 
 const char* dDAGTypeNode::GetIntrisicTypeString() const
 {
-	return  dTreeAdressStmt::GetTypeString (GetIntrisicType());
+	return  dThreeAdressStmt::GetTypeString (GetIntrisicType());
 }
 
 void dDAGTypeNode::AddDimensions (dDAGDimensionNode* const dimList)

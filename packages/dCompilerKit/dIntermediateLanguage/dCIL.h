@@ -13,7 +13,7 @@
 #define __dCIL_H_
 
 #include "dCILstdafx.h"
-#include "dTreeAdressStmt.h"
+#include "dThreeAdressStmt.h"
 
 
 
@@ -33,19 +33,19 @@ inline dString GetReturnVariableName()
 
 class dDataFlowGraph; 
 
-class dCIL: public dList<dTreeAdressStmt>
+class dCIL: public dList<dThreeAdressStmt>
 {
 	public:
 	class dReturnValue
 	{
 		public:
 		dReturnValue ()
-			:m_type(dTreeAdressStmt::m_int)
+			:m_type(dThreeAdressStmt::m_int)
 		{
 			m_f = 0.0;
 		}
 
-		dTreeAdressStmt::dArgType m_type;
+		dThreeAdressStmt::dArgType m_type;
 		union {;
 			dMachineIntRegister m_i;
 			dMachineFloatRegister m_f;
@@ -69,8 +69,8 @@ class dCIL: public dList<dTreeAdressStmt>
 
 	private:
 	dString GetName (llvm::Value* const value) const;
-	dTreeAdressStmt::dArgType GetType (const llvm::Type* const type) const;
-	dTreeAdressStmt::dArgType GetType (const llvm::Value* const value) const;
+	dThreeAdressStmt::dArgType GetType (const llvm::Type* const type) const;
+	dThreeAdressStmt::dArgType GetType (const llvm::Value* const value) const;
 
 	dCIL::dListNode* EmitCall (const llvm::Instruction* const intruction);
 	dCIL::dListNode* EmitReturn (const llvm::Instruction* const intruction);
@@ -89,9 +89,9 @@ class dCIL: public dList<dTreeAdressStmt>
 	int m_mark;
 	int m_tempIndex;
 	int m_labelIndex;
-	bool m_commutativeOperator[dTreeAdressStmt::m_operatorsCount];
-	dTreeAdressStmt::dOperator m_conditionals[dTreeAdressStmt::m_operatorsCount];
-	dTreeAdressStmt::dOperator m_operatorComplement[dTreeAdressStmt::m_operatorsCount];
+	bool m_commutativeOperator[dThreeAdressStmt::m_operatorsCount];
+	dThreeAdressStmt::dOperator m_conditionals[dThreeAdressStmt::m_operatorsCount];
+	dThreeAdressStmt::dOperator m_operatorComplement[dThreeAdressStmt::m_operatorsCount];
 
     llvm::legacy::FunctionPassManager m_optimizer;
 	

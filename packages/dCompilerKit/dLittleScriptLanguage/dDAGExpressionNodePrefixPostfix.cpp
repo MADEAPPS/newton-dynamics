@@ -42,28 +42,28 @@ void dDAGExpressionNodePrefixPostfix::CompileCIL(dCIL& cil)
 	m_expression->CompileCIL(cil);
 
 	if (m_isPrefix) {
-		dTreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
-		stmt.m_instruction = dTreeAdressStmt::m_assigment;
-		stmt.m_operator = m_isIncrement ? dTreeAdressStmt::m_add : dTreeAdressStmt::m_sub;
+		dThreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
+		stmt.m_instruction = dThreeAdressStmt::m_assigment;
+		stmt.m_operator = m_isIncrement ? dThreeAdressStmt::m_add : dThreeAdressStmt::m_sub;
 		stmt.m_arg0 = m_expression->m_result;
 		stmt.m_arg1 = m_expression->m_result;
-		stmt.m_arg2.m_type = dTreeAdressStmt::m_constInt;
+		stmt.m_arg2.m_type = dThreeAdressStmt::m_constInt;
 		stmt.m_arg2.m_label = "1";
 		DTRACE_INTRUCTION (&stmt);
 		m_result = stmt.m_arg0;
 	} else {
-		dTreeAdressStmt& stmt1 = cil.NewStatement()->GetInfo();
-		stmt1.m_instruction = dTreeAdressStmt::m_assigment;
+		dThreeAdressStmt& stmt1 = cil.NewStatement()->GetInfo();
+		stmt1.m_instruction = dThreeAdressStmt::m_assigment;
 		stmt1.m_arg0.m_label = cil.NewTemp();
 		stmt1.m_arg1 = m_expression->m_result;
 		DTRACE_INTRUCTION (&stmt1);
 
-		dTreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
-		stmt.m_instruction = dTreeAdressStmt::m_assigment;
-		stmt.m_operator = m_isIncrement ? dTreeAdressStmt::m_add : dTreeAdressStmt::m_sub;
+		dThreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
+		stmt.m_instruction = dThreeAdressStmt::m_assigment;
+		stmt.m_operator = m_isIncrement ? dThreeAdressStmt::m_add : dThreeAdressStmt::m_sub;
 		stmt.m_arg0 = m_expression->m_result;
 		stmt.m_arg1 = m_expression->m_result;
-		stmt.m_arg2.m_type = dTreeAdressStmt::m_constInt;
+		stmt.m_arg2.m_type = dThreeAdressStmt::m_constInt;
 		stmt.m_arg2.m_label = "1";
 		DTRACE_INTRUCTION (&stmt);
 

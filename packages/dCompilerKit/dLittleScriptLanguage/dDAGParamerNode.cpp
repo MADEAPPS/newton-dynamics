@@ -66,11 +66,11 @@ void dDAGParameterNode::ConnectParent(dDAG* const parent)
 void dDAGParameterNode::CompileCIL(dCIL& cil)  
 {
 	dDAGScopeBlockNode* const scope = GetScope();
-	dTree<dTreeAdressStmt::dArg, dString>::dTreeNode* const varNameNode = scope->FindVariable(m_name);
+	dTree<dThreeAdressStmt::dArg, dString>::dTreeNode* const varNameNode = scope->FindVariable(m_name);
 	dAssert (varNameNode);
 
-	dTreeAdressStmt& fntArg = cil.NewStatement()->GetInfo();
-	fntArg.m_instruction = dTreeAdressStmt::m_local;
+	dThreeAdressStmt& fntArg = cil.NewStatement()->GetInfo();
+	fntArg.m_instruction = dThreeAdressStmt::m_local;
 	fntArg.m_arg0 = varNameNode->GetInfo();
 	fntArg.m_arg1 = fntArg.m_arg0;
 	m_result = fntArg.m_arg0;

@@ -52,12 +52,12 @@ class dDAG
 	dDAGClassNode* GetClass() const;
 	dDAGScopeBlockNode* GetScope() const;
 	dDAGFunctionNode* GetFunction() const;
-	virtual dTree<dTreeAdressStmt::dArg, dString>::dTreeNode* FindLocalVariable(const dString& name) const;
+	virtual dTree<dThreeAdressStmt::dArg, dString>::dTreeNode* FindLocalVariable(const dString& name) const;
 
-	dTreeAdressStmt::dArg LoadLocalVariable (dCIL& cil, const dTreeAdressStmt::dArg& arg) const;
+	dThreeAdressStmt::dArg LoadLocalVariable (dCIL& cil, const dThreeAdressStmt::dArg& arg) const;
 	
 	dString m_name;
-	dTreeAdressStmt::dArg m_result;
+	dThreeAdressStmt::dArg m_result;
 	dDAG* m_next;
 	dDAG* m_parent;
 	dList<dDAG*>::dListNode* m_myListNode;

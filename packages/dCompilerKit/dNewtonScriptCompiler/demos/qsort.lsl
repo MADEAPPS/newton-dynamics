@@ -12,10 +12,6 @@
 // a very naive qsort for integers
 public class qsort
 {
-	public static void qsort (int a, int left, int right)
-	{
-	}
-/*
 	public static void qsort (int[] a, int left, int right)
 	{
       int i = left, j = right;
@@ -42,7 +38,6 @@ public class qsort
 	  if (i < right)
 		qsort (a, i, right);
 	}
-*/
 }
 
 

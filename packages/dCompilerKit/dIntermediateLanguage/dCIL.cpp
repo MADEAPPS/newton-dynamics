@@ -24,26 +24,26 @@ dCIL::dCIL(llvm::Module* const module)
     ,m_optimizer(module)
 {
 	memset (m_conditionals, 0, sizeof (m_conditionals));
-	m_conditionals[dTreeAdressStmt::m_identical] = dTreeAdressStmt::m_identical;
-	m_conditionals[dTreeAdressStmt::m_different] = dTreeAdressStmt::m_different;
-	m_conditionals[dTreeAdressStmt::m_less] = dTreeAdressStmt::m_less;
-	m_conditionals[dTreeAdressStmt::m_lessEqual] = dTreeAdressStmt::m_lessEqual;
-	m_conditionals[dTreeAdressStmt::m_greather] = dTreeAdressStmt::m_greather;
-	m_conditionals[dTreeAdressStmt::m_greatherEqual] = dTreeAdressStmt::m_greatherEqual;
+	m_conditionals[dThreeAdressStmt::m_identical] = dThreeAdressStmt::m_identical;
+	m_conditionals[dThreeAdressStmt::m_different] = dThreeAdressStmt::m_different;
+	m_conditionals[dThreeAdressStmt::m_less] = dThreeAdressStmt::m_less;
+	m_conditionals[dThreeAdressStmt::m_lessEqual] = dThreeAdressStmt::m_lessEqual;
+	m_conditionals[dThreeAdressStmt::m_greather] = dThreeAdressStmt::m_greather;
+	m_conditionals[dThreeAdressStmt::m_greatherEqual] = dThreeAdressStmt::m_greatherEqual;
 
 	memset (m_operatorComplement, 0, sizeof (m_operatorComplement));
-	m_operatorComplement[dTreeAdressStmt::m_identical] = dTreeAdressStmt::m_different;
-	m_operatorComplement[dTreeAdressStmt::m_different] = dTreeAdressStmt::m_identical;
-	m_operatorComplement[dTreeAdressStmt::m_less] = dTreeAdressStmt::m_greatherEqual;
-	m_operatorComplement[dTreeAdressStmt::m_lessEqual] = dTreeAdressStmt::m_greather;
-	m_operatorComplement[dTreeAdressStmt::m_greather] = dTreeAdressStmt::m_lessEqual;
-	m_operatorComplement[dTreeAdressStmt::m_greatherEqual] = dTreeAdressStmt::m_less;
+	m_operatorComplement[dThreeAdressStmt::m_identical] = dThreeAdressStmt::m_different;
+	m_operatorComplement[dThreeAdressStmt::m_different] = dThreeAdressStmt::m_identical;
+	m_operatorComplement[dThreeAdressStmt::m_less] = dThreeAdressStmt::m_greatherEqual;
+	m_operatorComplement[dThreeAdressStmt::m_lessEqual] = dThreeAdressStmt::m_greather;
+	m_operatorComplement[dThreeAdressStmt::m_greather] = dThreeAdressStmt::m_lessEqual;
+	m_operatorComplement[dThreeAdressStmt::m_greatherEqual] = dThreeAdressStmt::m_less;
 
 	memset (m_commutativeOperator, false, sizeof (m_commutativeOperator));
-	m_commutativeOperator[dTreeAdressStmt::m_add] = true;
-	m_commutativeOperator[dTreeAdressStmt::m_mul] = true;
-	m_commutativeOperator[dTreeAdressStmt::m_identical] = true;
-	m_commutativeOperator[dTreeAdressStmt::m_different] = true;
+	m_commutativeOperator[dThreeAdressStmt::m_add] = true;
+	m_commutativeOperator[dThreeAdressStmt::m_mul] = true;
+	m_commutativeOperator[dThreeAdressStmt::m_identical] = true;
+	m_commutativeOperator[dThreeAdressStmt::m_different] = true;
 
 
     // Promote allocas to registers.
@@ -114,7 +114,7 @@ dCIL::dListNode* dCIL::NewStatement()
 void dCIL::Trace()
 {
 	for (dCIL::dListNode* node = GetFirst(); node; node = node->GetNext()) {
-		const dTreeAdressStmt& stmt = node->GetInfo();
+		const dThreeAdressStmt& stmt = node->GetInfo();
 //		DTRACE_INTRUCTION(&stmt);
 		stmt.Trace();
 	}
@@ -168,16 +168,16 @@ void dCIL::Optimize (llvm::Function* const function)
 	}
 }
 
-dTreeAdressStmt::dArgType dCIL::GetType (const llvm::Type* const type) const
+dThreeAdressStmt::dArgType dCIL::GetType (const llvm::Type* const type) const
 {
-	dTreeAdressStmt::dArgType intrinsicType (dTreeAdressStmt::m_int);
+	dThreeAdressStmt::dArgType intrinsicType (dThreeAdressStmt::m_int);
 	llvm::Type::TypeID typeId = type->getTypeID();
 	switch (typeId)
 	{
 		case llvm::Type::TypeID::IntegerTyID:
 		{
 			if (type->isIntegerTy (32)) {
-				intrinsicType = dTreeAdressStmt::m_int;
+				intrinsicType = dThreeAdressStmt::m_int;
 			} else {
 				dAssert (0);
 			}
@@ -205,15 +205,15 @@ dTreeAdressStmt::dArgType dCIL::GetType (const llvm::Type* const type) const
 
 
 
-dTreeAdressStmt::dArgType dCIL::GetType (const llvm::Value* const value) const
+dThreeAdressStmt::dArgType dCIL::GetType (const llvm::Value* const value) const
 {
-	dTreeAdressStmt::dArgType intrinsicType (dTreeAdressStmt::m_int);
+	dThreeAdressStmt::dArgType intrinsicType (dThreeAdressStmt::m_int);
 	llvm::Value::ValueTy valueId = llvm::Value::ValueTy (value->getValueID());
 	switch (valueId)
 	{
 		case llvm::Value::ConstantIntVal:
 		{
-			intrinsicType = dTreeAdressStmt::m_constInt;
+			intrinsicType = dThreeAdressStmt::m_constInt;
 			break;
 		}
 
@@ -249,18 +249,18 @@ dCIL::dListNode* dCIL::EmitFunctionDeclaration (const llvm::Function& llvmFuncti
 	//const llvm::FunctionType* const functionType = llvmFuntion.getFunctionType();
 	llvm::Type::TypeID returnTypeID = returnType->getTypeID();
 
-	dTreeAdressStmt::dArgType intrinsicType = GetType (returnType);
+	dThreeAdressStmt::dArgType intrinsicType = GetType (returnType);
 
 	dCIL::dListNode* const functionNode = NewStatement();
-	dTreeAdressStmt& function = functionNode->GetInfo();
-	function.m_instruction = dTreeAdressStmt::m_function;
+	dThreeAdressStmt& function = functionNode->GetInfo();
+	function.m_instruction = dThreeAdressStmt::m_function;
 	function.m_arg0.m_label = functionName.data();
 	function.m_arg0.m_type = intrinsicType;
 	DTRACE_INTRUCTION (&function);
 
 	dCIL::dListNode* const entryPointNode = NewStatement();
-	dTreeAdressStmt& entryPoint = entryPointNode->GetInfo();
-	entryPoint.m_instruction = dTreeAdressStmt::m_label;
+	dThreeAdressStmt& entryPoint = entryPointNode->GetInfo();
+	entryPoint.m_instruction = dThreeAdressStmt::m_label;
 	entryPoint.m_arg0.m_label = "entryPoint";
 	DTRACE_INTRUCTION (&entryPoint);
 
@@ -270,12 +270,12 @@ dCIL::dListNode* dCIL::EmitFunctionDeclaration (const llvm::Function& llvmFuncti
 		const llvm::StringRef& name = argument->getName();
 
 		const llvm::Type* const argType = argument->getType();
-		dTreeAdressStmt::dArgType intrinsicType = GetType (argType);
+		dThreeAdressStmt::dArgType intrinsicType = GetType (argType);
 
 		dCIL::dListNode* const argNode = NewStatement();
-		dTreeAdressStmt& stmt = argNode->GetInfo();
+		dThreeAdressStmt& stmt = argNode->GetInfo();
 
-		stmt.m_instruction = dTreeAdressStmt::m_argument;
+		stmt.m_instruction = dThreeAdressStmt::m_argument;
 		stmt.m_arg0.m_type = intrinsicType;
 		if (isFirst) {
 			stmt.m_arg0.m_label = GetReturnVariableName();		
@@ -292,14 +292,14 @@ dCIL::dListNode* dCIL::EmitFunctionDeclaration (const llvm::Function& llvmFuncti
 		const llvm::StringRef& name = argument->getName();
 
 		const llvm::Type* const argType = argument->getType();
-		dTreeAdressStmt::dArgType intrinsicType = GetType (argType);
+		dThreeAdressStmt::dArgType intrinsicType = GetType (argType);
 
 		dCIL::dListNode* const argNode = NewStatement();
-		dTreeAdressStmt& stmt = argNode->GetInfo();
+		dThreeAdressStmt& stmt = argNode->GetInfo();
 
 		
-		stmt.m_instruction = dTreeAdressStmt::m_assigment;
-		stmt.m_operator = dTreeAdressStmt::m_nothing;
+		stmt.m_instruction = dThreeAdressStmt::m_assigment;
+		stmt.m_operator = dThreeAdressStmt::m_nothing;
 		stmt.m_arg0.m_type = intrinsicType;
 		stmt.m_arg0.m_label = name.data();
 
@@ -343,12 +343,12 @@ void dCIL::ConvertLLVMFunctionToNVMFunction (const llvm::Function& llvmFunction)
 	EmitBasicBlockBody (llvmFunction, entryBlock, visited, terminalInstructions);
 
 	for (dList<dCIL::dListNode*>::dListNode* node = terminalInstructions.GetFirst(); node; node = node->GetNext()) {
-		dTreeAdressStmt& stmt = node->GetInfo()->GetInfo();
+		dThreeAdressStmt& stmt = node->GetInfo()->GetInfo();
 
 //DTRACE_INTRUCTION (&stmt);
 		switch (stmt.m_instruction)
 		{
-			case dTreeAdressStmt::m_if:
+			case dThreeAdressStmt::m_if:
 			{
 				llvm::BasicBlock* const trueTargetJump = (llvm::BasicBlock*) stmt.m_trueTargetJump;
 				llvm::BasicBlock* const falseTargetJump = (llvm::BasicBlock*) stmt.m_falseTargetJump;
@@ -357,14 +357,14 @@ void dCIL::ConvertLLVMFunctionToNVMFunction (const llvm::Function& llvmFunction)
 				break;
 			}
 
-			case dTreeAdressStmt::m_goto:
+			case dThreeAdressStmt::m_goto:
 			{
 				llvm::BasicBlock* const trueTargetJump = (llvm::BasicBlock*) stmt.m_trueTargetJump;
 				stmt.m_trueTargetJump = (dCIL::dListNode*) visited.Find (trueTargetJump)->GetInfo();
 				break;
 			}
 
-			case dTreeAdressStmt::m_ret:
+			case dThreeAdressStmt::m_ret:
 				break;
 
 			default:
@@ -382,8 +382,8 @@ const dCIL::dListNode*dCIL::EmitBasicBlockBody(const llvm::Function& function, c
 	const llvm::StringRef& blockName = block->getName ();
 
 	dCIL::dListNode* const blockLabelNode = NewStatement();
-	dTreeAdressStmt& blockLabel = blockLabelNode->GetInfo();
-	blockLabel.m_instruction = dTreeAdressStmt::m_label;
+	dThreeAdressStmt& blockLabel = blockLabelNode->GetInfo();
+	blockLabel.m_instruction = dThreeAdressStmt::m_label;
 	blockLabel.m_arg0.m_label = blockName.data();
 	DTRACE_INTRUCTION (&blockLabel);
 
@@ -447,18 +447,18 @@ dCIL::dListNode* dCIL::EmitCall (const llvm::Instruction* const intruction)
 		llvm::Value* const arg = instr->getOperand(i);
 
 		dCIL::dListNode* const node = NewStatement();
-		dTreeAdressStmt& stmt = node->GetInfo();
-		stmt.m_instruction = dTreeAdressStmt::m_param;
+		dThreeAdressStmt& stmt = node->GetInfo();
+		stmt.m_instruction = dThreeAdressStmt::m_param;
 		stmt.m_arg0.m_type = GetType (arg);
 		stmt.m_arg0.m_label = GetName (arg);
 		DTRACE_INTRUCTION (&stmt);
 	}
 
 	dCIL::dListNode* const node = NewStatement();
-	dTreeAdressStmt& stmt = node->GetInfo();
+	dThreeAdressStmt& stmt = node->GetInfo();
 
 	llvm::Value* const arg = instr->getOperand(argCount - 1);
-	stmt.m_instruction = dTreeAdressStmt::m_call;
+	stmt.m_instruction = dThreeAdressStmt::m_call;
 
 	stmt.m_arg0.m_type = GetType (instr);
 	stmt.m_arg0.m_label = GetReturnVariableName();
@@ -468,10 +468,10 @@ dCIL::dListNode* dCIL::EmitCall (const llvm::Instruction* const intruction)
 	DTRACE_INTRUCTION (&stmt);
 
 	dCIL::dListNode* const copyNode = NewStatement();
-	dTreeAdressStmt& copyStmt = copyNode->GetInfo();
+	dThreeAdressStmt& copyStmt = copyNode->GetInfo();
 
-	copyStmt.m_instruction = dTreeAdressStmt::m_assigment;
-	copyStmt.m_operator = dTreeAdressStmt::m_nothing;
+	copyStmt.m_instruction = dThreeAdressStmt::m_assigment;
+	copyStmt.m_operator = dThreeAdressStmt::m_nothing;
 	copyStmt.m_arg0.m_type = stmt.m_arg0.m_type;
 	copyStmt.m_arg0.m_label = instr->getName().data();
 
@@ -490,31 +490,31 @@ dCIL::dListNode* dCIL::EmitReturn (const llvm::Instruction* const intruction)
 	llvm::Value* const arg0 = instr->getOperand(0);
 
 	dString arg1Label (GetName (arg0));
-	dTreeAdressStmt::dArgType type = GetType (arg0);
+	dThreeAdressStmt::dArgType type = GetType (arg0);
 	switch (type) 
 	{
-		case dTreeAdressStmt::m_constInt:
+		case dThreeAdressStmt::m_constInt:
 		{
 			dCIL::dListNode* const node = NewStatement();
-			dTreeAdressStmt& stmt = node->GetInfo();
+			dThreeAdressStmt& stmt = node->GetInfo();
 
-			stmt.m_instruction = dTreeAdressStmt::m_assigment;
-			stmt.m_operator = dTreeAdressStmt::m_nothing;
+			stmt.m_instruction = dThreeAdressStmt::m_assigment;
+			stmt.m_operator = dThreeAdressStmt::m_nothing;
 
-			stmt.m_arg0.m_type = dTreeAdressStmt::m_int;
+			stmt.m_arg0.m_type = dThreeAdressStmt::m_int;
 			stmt.m_arg0.m_label = GetReturnVariableName();
 
 			stmt.m_arg1.m_type = type;
 			stmt.m_arg1.m_label = arg1Label;
 
-			type = dTreeAdressStmt::m_int;
+			type = dThreeAdressStmt::m_int;
 			arg1Label = stmt.m_arg0.m_label;
 
 			DTRACE_INTRUCTION (&stmt);
 			break;
 		}
 
-		case dTreeAdressStmt::m_int:
+		case dThreeAdressStmt::m_int:
 			break;
 
 		default:
@@ -522,9 +522,9 @@ dCIL::dListNode* dCIL::EmitReturn (const llvm::Instruction* const intruction)
 	}
 
 	dCIL::dListNode* const node = NewStatement();
-	dTreeAdressStmt& stmt = node->GetInfo();
+	dThreeAdressStmt& stmt = node->GetInfo();
 
-	stmt.m_instruction = dTreeAdressStmt::m_ret;
+	stmt.m_instruction = dThreeAdressStmt::m_ret;
 	stmt.m_arg0.m_type = type;
 	stmt.m_arg0.m_label = arg1Label;
 
@@ -537,12 +537,12 @@ dCIL::dListNode* dCIL::EmitIntegerCompare (const llvm::Instruction* const intruc
 	llvm::ICmpInst* const instr =  (llvm::ICmpInst*) intruction;
 
 	llvm::CmpInst::Predicate predicate = instr->getPredicate();
-	dTreeAdressStmt::dOperator prediccateOperator = dTreeAdressStmt::m_identical;;
+	dThreeAdressStmt::dOperator prediccateOperator = dThreeAdressStmt::m_identical;;
 	switch (predicate)
 	{
 		case llvm::CmpInst::FCMP_OEQ:
 		{
-			prediccateOperator = dTreeAdressStmt::m_identical;
+			prediccateOperator = dThreeAdressStmt::m_identical;
 		}
 
 		default:
@@ -554,15 +554,15 @@ dCIL::dListNode* dCIL::EmitIntegerCompare (const llvm::Instruction* const intruc
 	llvm::Value* const arg1 = instr->getOperand(1);
 
 	dCIL::dListNode* const node = NewStatement();
-	dTreeAdressStmt& stmt = node->GetInfo();
-	stmt.m_instruction = dTreeAdressStmt::m_assigment;
+	dThreeAdressStmt& stmt = node->GetInfo();
+	stmt.m_instruction = dThreeAdressStmt::m_assigment;
 
 	stmt.m_operator = prediccateOperator;
 
-	stmt.m_arg0.m_type = dTreeAdressStmt::m_int;
+	stmt.m_arg0.m_type = dThreeAdressStmt::m_int;
 	stmt.m_arg0.m_label = instr->getName().data();
 
-	stmt.m_arg1.m_type = dTreeAdressStmt::m_int;
+	stmt.m_arg1.m_type = dThreeAdressStmt::m_int;
 	stmt.m_arg1.m_label = GetName (arg0);
 
 	stmt.m_arg2.m_type = GetType (arg1);
@@ -576,29 +576,29 @@ dCIL::dListNode* dCIL::EmitIntegerBranch (const llvm::Instruction* const intruct
 	llvm::BranchInst* const instr =  (llvm::BranchInst*) intruction;
 
 	dCIL::dListNode* const node = NewStatement();
-	dTreeAdressStmt& stmt = node->GetInfo();
+	dThreeAdressStmt& stmt = node->GetInfo();
 	llvm::Value* const arg0 = instr->getOperand(0);
 	if (instr->getNumOperands() == 3) {
 		llvm::Value* const arg2 = instr->getOperand(1);
 		llvm::Value* const arg1 = instr->getOperand(2);
 		dAssert (((llvm::ICmpInst*) arg0)->getPredicate() == llvm::ICmpInst::ICMP_EQ);
 
-		stmt.m_instruction = dTreeAdressStmt::m_if;
-		stmt.m_arg0.m_type = dTreeAdressStmt::m_int;
+		stmt.m_instruction = dThreeAdressStmt::m_if;
+		stmt.m_arg0.m_type = dThreeAdressStmt::m_int;
 		stmt.m_arg0.m_label = arg0->getName().data();
 		stmt.m_arg1.m_label = arg1->getName().data();
 		stmt.m_arg2.m_label = arg2->getName().data();
 
 		// use thsi to save the link later
-		stmt.m_trueTargetJump = (dList<dTreeAdressStmt>::dListNode*) arg1;
-		stmt.m_falseTargetJump = (dList<dTreeAdressStmt>::dListNode*) arg2;
+		stmt.m_trueTargetJump = (dList<dThreeAdressStmt>::dListNode*) arg1;
+		stmt.m_falseTargetJump = (dList<dThreeAdressStmt>::dListNode*) arg2;
 	} else {
 		dAssert (instr->getNumOperands() == 1);
-		stmt.m_instruction = dTreeAdressStmt::m_goto;
-		stmt.m_operator = dTreeAdressStmt::m_nothing;
+		stmt.m_instruction = dThreeAdressStmt::m_goto;
+		stmt.m_operator = dThreeAdressStmt::m_nothing;
 		stmt.m_arg0.m_label = arg0->getName().data();
 		// use thsi to save the link later
-		stmt.m_trueTargetJump = (dList<dTreeAdressStmt>::dListNode*) arg0;
+		stmt.m_trueTargetJump = (dList<dThreeAdressStmt>::dListNode*) arg0;
 	}
 
 	DTRACE_INTRUCTION (&stmt);
@@ -609,19 +609,19 @@ dCIL::dListNode* dCIL::EmitIntegerAritmetic (const llvm::Instruction* const intr
 {
 	llvm::BinaryOperator* const instr = (llvm::BinaryOperator*) intruction;
 
-	dTreeAdressStmt::dOperator operation = dTreeAdressStmt::m_nothing;
+	dThreeAdressStmt::dOperator operation = dThreeAdressStmt::m_nothing;
 	llvm::BinaryOperator::BinaryOps opcode = instr->getOpcode();
 	switch (opcode) 
 	{
 		case llvm::Instruction::Add:
 		{
-			operation = dTreeAdressStmt::m_add;
+			operation = dThreeAdressStmt::m_add;
 			break;
 		}
 
 		case llvm::Instruction::Sub:
 		{
-			operation = dTreeAdressStmt::m_sub;
+			operation = dThreeAdressStmt::m_sub;
 			break;
 		}
 
@@ -635,11 +635,11 @@ dCIL::dListNode* dCIL::EmitIntegerAritmetic (const llvm::Instruction* const intr
 	llvm::Value* const arg1 = instr->getOperand(1);
 
 	dCIL::dListNode* const node = NewStatement();
-	dTreeAdressStmt& stmt = node->GetInfo();
-	stmt.m_instruction = dTreeAdressStmt::m_assigment;
+	dThreeAdressStmt& stmt = node->GetInfo();
+	stmt.m_instruction = dThreeAdressStmt::m_assigment;
 	stmt.m_operator = operation;
 
-	stmt.m_arg0.m_type = dTreeAdressStmt::m_int;
+	stmt.m_arg0.m_type = dThreeAdressStmt::m_int;
 	stmt.m_arg0.m_label = instr->getName().data();
 
 	stmt.m_arg1.m_type = GetType (arg0);

@@ -26,7 +26,7 @@ class dDAGTypeNode: public dDAG
 	~dDAGTypeNode(void);
 
 	const char* GetIntrisicTypeString() const;
-	dTreeAdressStmt::dArgType GetIntrisicType() const;
+	dThreeAdressStmt::dArgType GetIntrisicType() const;
 	
 
 	void AddDimensions (dDAGDimensionNode* const dimList);
@@ -36,7 +36,7 @@ class dDAGTypeNode: public dDAG
 	virtual dDAG* Clone (dList<dDAG*>& allNodes) const;
 
 	dList<dDAGDimensionNode*> m_dimensions;
-	dTreeAdressStmt::dArgType m_intrinsicType;
+	dThreeAdressStmt::dArgType m_intrinsicType;
 	
 	dDAGRtti(dDAG);
 };

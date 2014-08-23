@@ -56,17 +56,17 @@ void dBasicBlocksList::Build(dCIL& cil, dCIL::dListNode* const functionNode)
 {
 	m_begin = functionNode;
 	m_end = functionNode->GetNext();
-	for (; m_end && (m_end->GetInfo().m_instruction != dTreeAdressStmt::m_function); m_end = m_end->GetNext());
+	for (; m_end && (m_end->GetInfo().m_instruction != dThreeAdressStmt::m_function); m_end = m_end->GetNext());
 
 	// remove redundant jumps
 	dCIL::dListNode* nextNode;
 	for (dCIL::dListNode* node = m_begin; node != m_end; node = nextNode) {
 		nextNode = node->GetNext(); 
-		const dTreeAdressStmt& stmt = node->GetInfo();
-		if (stmt.m_instruction == dTreeAdressStmt::m_goto) {
+		const dThreeAdressStmt& stmt = node->GetInfo();
+		if (stmt.m_instruction == dThreeAdressStmt::m_goto) {
 			dCIL::dListNode* const prevNode = node->GetPrev();
-			const dTreeAdressStmt& prevStmt = prevNode->GetInfo();
-			if (prevStmt.m_instruction == dTreeAdressStmt::m_ret) {
+			const dThreeAdressStmt& prevStmt = prevNode->GetInfo();
+			if (prevStmt.m_instruction == dThreeAdressStmt::m_ret) {
 				cil.Remove(node);
 			}
 		}
@@ -74,9 +74,9 @@ void dBasicBlocksList::Build(dCIL& cil, dCIL::dListNode* const functionNode)
 
 	// find the root of all basic blocks leaders
 	for (dCIL::dListNode* node = m_begin; node != m_end; node = node->GetNext()) {
-		const dTreeAdressStmt& stmt = node->GetInfo();
+		const dThreeAdressStmt& stmt = node->GetInfo();
 
-		if (stmt.m_instruction == dTreeAdressStmt::m_label) {
+		if (stmt.m_instruction == dThreeAdressStmt::m_label) {
 			Append(dBasicBlock(node));
 		}
 	}
@@ -85,12 +85,12 @@ void dBasicBlocksList::Build(dCIL& cil, dCIL::dListNode* const functionNode)
 		dBasicBlock& block = blockNode->GetInfo();
 
 		for (dCIL::dListNode* stmtNode = block.m_begin; !block.m_end && stmtNode; stmtNode = stmtNode->GetNext()) {
-			const dTreeAdressStmt& stmt = stmtNode->GetInfo();
+			const dThreeAdressStmt& stmt = stmtNode->GetInfo();
 			switch (stmt.m_instruction)
 			{
-				case dTreeAdressStmt::m_if:
-				case dTreeAdressStmt::m_goto:
-				case dTreeAdressStmt::m_ret:
+				case dThreeAdressStmt::m_if:
+				case dThreeAdressStmt::m_goto:
+				case dThreeAdressStmt::m_ret:
 					block.m_end = stmtNode;
 					break;
 			}

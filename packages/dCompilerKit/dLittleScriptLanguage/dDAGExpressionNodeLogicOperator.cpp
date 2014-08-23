@@ -47,9 +47,9 @@ dAssert (0);
 	m_expressionB->ConnectParent(this);
 }
 
-dTreeAdressStmt::dArg dDAGExpressionNodeLogicOperator::SetArgument(dDAGExpressionNode* const expression)
+dThreeAdressStmt::dArg dDAGExpressionNodeLogicOperator::SetArgument(dDAGExpressionNode* const expression)
 {
-	dTreeAdressStmt::dArg argument;
+	dThreeAdressStmt::dArg argument;
 	dAssert (0);
 /*
 	argument.m_label = expression->m_result;
@@ -59,7 +59,7 @@ dTreeAdressStmt::dArg dDAGExpressionNodeLogicOperator::SetArgument(dDAGExpressio
 		switch (expressionConst->m_type) 
 		{
 			case dDAGExpressionNodeConstant::m_intValue:
-				argument.m_type = dTreeAdressStmt::m_intConst;
+				argument.m_type = dThreeAdressStmt::m_intConst;
 				break;
 
 			default:
@@ -75,56 +75,56 @@ void dDAGExpressionNodeLogicOperator::CompileCIL(dCIL& cil)
 	dAssert (0);
 	/*
 
-	dTreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
+	dThreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
 	m_result.m_label = cil.NewTemp ();		
 
 	const char* initialBool = "0";
 	const char* complementBool = "1";
-	dTreeAdressStmt::dOperator logicOperation = dTreeAdressStmt::m_identical;
+	dThreeAdressStmt::dOperator logicOperation = dThreeAdressStmt::m_identical;
 	if (m_operator == m_or) {
 		initialBool = "1";
 		complementBool = "0";
-		logicOperation = dTreeAdressStmt::m_different;
+		logicOperation = dThreeAdressStmt::m_different;
 	}
 	
 	
-	stmt.m_instruction = dTreeAdressStmt::m_assigment;
+	stmt.m_instruction = dThreeAdressStmt::m_assigment;
 	stmt.m_arg0 = m_result;
-	stmt.m_arg1.m_type = dTreeAdressStmt::m_intConst;
+	stmt.m_arg1.m_type = dThreeAdressStmt::m_intConst;
 	stmt.m_arg1.m_label = dString (initialBool);
 	DTRACE_INTRUCTION (&stmt);
 
 	dString exitLabel (cil.NewLabel()) ;
 	m_expressionA->CompileCIL(cil);
-	dTreeAdressStmt& testExpressionA = cil.NewStatement()->GetInfo();
-	testExpressionA.m_instruction = dTreeAdressStmt::m_if;
+	dThreeAdressStmt& testExpressionA = cil.NewStatement()->GetInfo();
+	testExpressionA.m_instruction = dThreeAdressStmt::m_if;
 	testExpressionA.m_operator = logicOperation;
 	testExpressionA.m_arg0 = m_expressionA->m_result;
-	testExpressionA.m_arg1.m_type = dTreeAdressStmt::m_intConst;
+	testExpressionA.m_arg1.m_type = dThreeAdressStmt::m_intConst;
 	testExpressionA.m_arg1.m_label = "0";
 	testExpressionA.m_arg2.m_label = exitLabel;
 	DTRACE_INTRUCTION (&testExpressionA);
 
 	m_expressionB->CompileCIL(cil);
-	dTreeAdressStmt& testExpressionB = cil.NewStatement()->GetInfo();
-	testExpressionB.m_instruction = dTreeAdressStmt::m_if;
+	dThreeAdressStmt& testExpressionB = cil.NewStatement()->GetInfo();
+	testExpressionB.m_instruction = dThreeAdressStmt::m_if;
 	testExpressionB.m_operator = logicOperation;
 	testExpressionB.m_arg0 = m_expressionB->m_result;
-	testExpressionA.m_arg1.m_type = dTreeAdressStmt::m_intConst;
+	testExpressionA.m_arg1.m_type = dThreeAdressStmt::m_intConst;
 	testExpressionB.m_arg1.m_label = "0";
 	testExpressionB.m_arg2.m_label = exitLabel;
 	DTRACE_INTRUCTION (&testExpressionB);
 
-	dTreeAdressStmt& stmt1 = cil.NewStatement()->GetInfo();
-	stmt1.m_instruction = dTreeAdressStmt::m_assigment;
+	dThreeAdressStmt& stmt1 = cil.NewStatement()->GetInfo();
+	stmt1.m_instruction = dThreeAdressStmt::m_assigment;
 	stmt1.m_arg0 = m_result;
-	stmt1.m_arg1.m_type = dTreeAdressStmt::m_intConst;
+	stmt1.m_arg1.m_type = dThreeAdressStmt::m_intConst;
 	stmt1.m_arg1.m_label = dString (complementBool);
 	DTRACE_INTRUCTION (&stmt1);
 
 	dCIL::dListNode* const jmpTarget = cil.NewStatement();
-	dTreeAdressStmt& labelStmt = jmpTarget->GetInfo();
-	labelStmt.m_instruction = dTreeAdressStmt::m_label;
+	dThreeAdressStmt& labelStmt = jmpTarget->GetInfo();
+	labelStmt.m_instruction = dThreeAdressStmt::m_label;
 	labelStmt.m_arg0.m_label = exitLabel;
 	DTRACE_INTRUCTION (&labelStmt);
 

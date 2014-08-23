@@ -14,7 +14,7 @@
 
 
 #include "dCILstdafx.h"
-#include "dTreeAdressStmt.h"
+#include "dThreeAdressStmt.h"
 
 
 class dDataFlowGraph;
@@ -106,8 +106,8 @@ class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dStrin
 	bool CoalesceNodesRule1 (dTreeNode* const nodeA, dTreeNode* const nodeB);
 	bool CoalesceNodesRule2 (dTreeNode* const nodeA, dTreeNode* const nodeB);
 	void ReWriteFunctionSpillingVarible(const dString& spillVariable);
-	void SaveSpillRegister(dCIL::dListNode* const node, dTreeAdressStmt::dArg& argument, const dString& spillVariable, const dString& spillMemory);
-	void LoadSpillRegister(dCIL::dListNode* const node, dTreeAdressStmt::dArg& argument, const dString& spillVariable, const dString& spillMemory);
+	void SaveSpillRegister(dCIL::dListNode* const node, dThreeAdressStmt::dArg& argument, const dString& spillVariable, const dString& spillMemory);
+	void LoadSpillRegister(dCIL::dListNode* const node, dThreeAdressStmt::dArg& argument, const dString& spillVariable, const dString& spillMemory);
 
 	
 	dTree<int, dString> m_spillPenalty;

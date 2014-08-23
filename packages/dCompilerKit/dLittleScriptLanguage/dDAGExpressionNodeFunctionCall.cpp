@@ -60,47 +60,50 @@ void dDAGExpressionNodeFunctionCall::CompileCIL(dCIL& cil)
 	//dDAGFunctionNode* const myFunction = myClass->GetCurrentFunction ();
 
 	dString name (m_name);
+	dList<dThreeAdressStmt::dArg> paramList;
 	for (dList<dDAGExpressionNode*>::dListNode* node = m_argumentList.GetLast(); node; node = node->GetPrev()) {
 		dDAGExpressionNode* const expNode = node->GetInfo();
 		expNode->CompileCIL(cil);
+		paramList.Append (LoadLocalVariable(cil, expNode->m_result));
+	}
 
-		dTreeAdressStmt::dArg arg1 (LoadLocalVariable(cil, expNode->m_result));
-		dTreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
-		stmt.m_instruction = dTreeAdressStmt::m_param;
-		stmt.m_arg0 = arg1;
+	for (dList<dThreeAdressStmt::dArg>::dListNode* node = paramList.GetFirst(); node; node = node->GetNext()) {
+		dThreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
+		stmt.m_instruction = dThreeAdressStmt::m_param;
+		stmt.m_arg0 = node->GetInfo();
 		DTRACE_INTRUCTION (&stmt);
 
-		dTreeAdressStmt::dArgType intrisicType = stmt.m_arg0.m_type;
+		dThreeAdressStmt::dArgType intrisicType = stmt.m_arg0.m_type;
 		switch (intrisicType) 
 		{
-			case dTreeAdressStmt::m_constInt:
+			case dThreeAdressStmt::m_constInt:
 			{
-				intrisicType = dTreeAdressStmt::m_int;
+				intrisicType = dThreeAdressStmt::m_int;
 				break;
 			}
-			case dTreeAdressStmt::m_constFloat:
+			case dThreeAdressStmt::m_constFloat:
 			{
-				intrisicType = dTreeAdressStmt::m_float;
+				intrisicType = dThreeAdressStmt::m_float;
 				break;
 			}
-			case dTreeAdressStmt::m_int:
+			case dThreeAdressStmt::m_int:
 			{
 				break;
 			}
 
-			//case dTreeAdressStmt::m_void:
-			//case dTreeAdressStmt::m_bool:
-			//case dTreeAdressStmt::m_byte:
-			//case dTreeAdressStmt::m_short:
-			//case dTreeAdressStmt::m_long:
-			//case dTreeAdressStmt::m_float:
-			//case dTreeAdressStmt::m_double:
-			//case dTreeAdressStmt::m_classPointer:
+			//case dThreeAdressStmt::m_void:
+			//case dThreeAdressStmt::m_bool:
+			//case dThreeAdressStmt::m_byte:
+			//case dThreeAdressStmt::m_short:
+			//case dThreeAdressStmt::m_long:
+			//case dThreeAdressStmt::m_float:
+			//case dThreeAdressStmt::m_double:
+			//case dThreeAdressStmt::m_classPointer:
 				default:	
 					dAssert (0);
 		}
 
-		name += m_prototypeSeparator + dTreeAdressStmt::GetTypeString (intrisicType);
+		name += m_prototypeSeparator + dThreeAdressStmt::GetTypeString (intrisicType);
 	}
 
 	dDAGFunctionNode* const function = myClass->GetFunction (name);
@@ -113,8 +116,8 @@ void dDAGExpressionNodeFunctionCall::CompileCIL(dCIL& cil)
 
 	m_result.m_label = cil.NewTemp ();
 	m_result.m_type = returnType->m_intrinsicType;
-	dTreeAdressStmt& call = cil.NewStatement()->GetInfo();
-	call.m_instruction = dTreeAdressStmt::m_call;
+	dThreeAdressStmt& call = cil.NewStatement()->GetInfo();
+	call.m_instruction = dThreeAdressStmt::m_call;
 	call.m_arg0 = m_result;
 	call.m_arg1.m_label = name;
 	DTRACE_INTRUCTION (&call);

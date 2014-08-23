@@ -40,8 +40,8 @@ void dDAGFunctionStatementReturn::ConnectParent(dDAG* const parent)
 
 void dDAGFunctionStatementReturn::CompileCIL(dCIL& cil)
 {
-	dTreeAdressStmt::dArg retValue;
-	retValue.m_type = dTreeAdressStmt::m_void;
+	dThreeAdressStmt::dArg retValue;
+	retValue.m_type = dThreeAdressStmt::m_void;
 
 	if (m_expression) {
 		m_expression->CompileCIL(cil);
@@ -56,8 +56,8 @@ void dDAGFunctionStatementReturn::CompileCIL(dCIL& cil)
 			for (dList<dString>::dListNode* node = scope->m_allocations.GetLast(); node; node = node->GetPrev()) {
 				dAssert(0);
 /*
-				dTreeAdressStmt& allocationStmt = cil.NewStatement()->GetInfo();
-				allocationStmt.m_instruction = dTreeAdressStmt::m_release;
+				dThreeAdressStmt& allocationStmt = cil.NewStatement()->GetInfo();
+				allocationStmt.m_instruction = dThreeAdressStmt::m_release;
 				allocationStmt.m_arg0.m_label = node->GetInfo();
 				DTRACE_INTRUCTION (&allocationStmt);
 */
@@ -65,9 +65,9 @@ void dDAGFunctionStatementReturn::CompileCIL(dCIL& cil)
 		}
 	}
 
-	dTreeAdressStmt::dArg arg1 (LoadLocalVariable(cil, retValue));
-	dTreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
-	stmt.m_instruction = dTreeAdressStmt::m_ret;
+	dThreeAdressStmt::dArg arg1 (LoadLocalVariable(cil, retValue));
+	dThreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
+	stmt.m_instruction = dThreeAdressStmt::m_ret;
 	stmt.m_arg0 = arg1;
 	DTRACE_INTRUCTION (&stmt);
 }

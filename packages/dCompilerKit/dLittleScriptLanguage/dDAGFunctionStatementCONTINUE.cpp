@@ -38,8 +38,8 @@ void dDAGFunctionStatementCONTINUE::CompileCIL(dCIL& cil)
 	for (dDAG* node = m_parent; node && (node->GetTypeId() != dDAGFunctionNode::GetRttiType()); node = node->m_parent) {
 		if (node->IsType(dDAGFunctionStatementFlow::GetRttiType())) {
 			dDAGFunctionStatementFlow* const flowControl = (dDAGFunctionStatementFlow*) node;
-			dTreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
-			stmt.m_instruction = dTreeAdressStmt::m_goto;
+			dThreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
+			stmt.m_instruction = dThreeAdressStmt::m_goto;
 			if (flowControl->m_currentContinueLabel == "") {
 				flowControl->m_currentContinueLabel = cil.NewLabel();
 			} 
