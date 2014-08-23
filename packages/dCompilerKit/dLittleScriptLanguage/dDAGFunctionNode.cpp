@@ -296,6 +296,12 @@ llvm::Function* dDAGFunctionNode::CreateLLVMfunctionDeclaration (dCIL& cil, llvm
 			break;
 		}
 
+		case dThreeAdressStmt::m_void:
+		{
+			returnTypeVal = llvm::Type::getVoidTy (context);
+			break;
+		}
+
 		default:
 			dAssert (0);
 	}
@@ -537,15 +543,25 @@ void dDAGFunctionNode::EmitLLVMAssignment (dLLVMSymbols& localSymbols, dCIL::dLi
 
 		case dThreeAdressStmt::m_add:
 		{
-			//dAssert (stmt.m_arg1.m_type == dThreeAdressStmt::m_int);
 			arg0 = llvm::BinaryOperator::Create (llvm::Instruction::Add, arg1, arg2, stmt.m_arg0.m_label.GetStr(), llvmBlock);
 			break;
 		}
 
 		case dThreeAdressStmt::m_sub:
 		{
-			//dAssert (stmt.m_arg1.m_type == dThreeAdressStmt::m_int);
 			arg0 = llvm::BinaryOperator::Create (llvm::Instruction::Sub, arg1, arg2, stmt.m_arg0.m_label.GetStr(), llvmBlock);
+			break;
+		}
+
+		case dThreeAdressStmt::m_mul:
+		{
+			arg0 = llvm::BinaryOperator::Create (llvm::Instruction::Mul, arg1, arg2, stmt.m_arg0.m_label.GetStr(), llvmBlock);
+			break;
+		}
+
+		case dThreeAdressStmt::m_div:
+		{
+			arg0 = llvm::BinaryOperator::Create (llvm::Instruction::SDiv, arg1, arg2, stmt.m_arg0.m_label.GetStr(), llvmBlock);
 			break;
 		}
 
