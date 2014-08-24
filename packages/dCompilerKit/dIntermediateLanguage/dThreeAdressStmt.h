@@ -125,8 +125,8 @@ class dThreeAdressStmt
 //	void TraceConditional (char* const textOut) const;
 
 	
-	const char* GetTypeString (const dArg& arg) const;
-	static const char* GetTypeString (const dArgType argType);
+	dString GetTypeString (const dArg& arg) const;
+	static dString GetTypeString (const dArgType argType);
 	static dArgType GetTypeID (const dString& typeName);
 
 	static dMapTable m_maptable[];

@@ -25,8 +25,9 @@ class dDAGTypeNode: public dDAG
 	dDAGTypeNode(dList<dDAG*>& allNodes, const dDAGTypeNode& copySource);
 	~dDAGTypeNode(void);
 
-	const char* GetIntrisicTypeString() const;
-	dThreeAdressStmt::dArgType GetIntrisicType() const;
+	bool IsPointer() const;
+	dString GetIntrisicTypeString() const;
+	dThreeAdressStmt::dArgType GetIntrinsicType() const;
 	
 
 	void AddDimensions (dDAGDimensionNode* const dimList);
@@ -37,6 +38,7 @@ class dDAGTypeNode: public dDAG
 
 	dList<dDAGDimensionNode*> m_dimensions;
 	dThreeAdressStmt::dArgType m_intrinsicType;
+	bool m_isPointer;
 	
 	dDAGRtti(dDAG);
 };

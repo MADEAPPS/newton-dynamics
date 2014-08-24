@@ -97,6 +97,7 @@ class dCIL: public dList<dThreeAdressStmt>
 	
 	public:
 	static dString m_pointerSize;
+	static dString m_pointerDecoration;
 	static dString m_variableUndercore;
 	friend dDataFlowGraph;
 };

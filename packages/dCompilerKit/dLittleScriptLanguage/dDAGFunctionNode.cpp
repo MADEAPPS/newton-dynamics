@@ -119,7 +119,7 @@ void dDAGFunctionNode::CompileCIL(dCIL& cil)
 	cil.ResetTemporaries();
 	dString returnVariable (cil.NewTemp());
 
-	dString functionName (myClass->GetFunctionName (m_name.GetStr(), m_parameters));
+	dString functionName (myClass->GetFunctionName (m_name, m_parameters));
 
 	dCIL::dListNode* const functionNode = cil.NewStatement();
 	m_functionStart = functionNode;
@@ -146,7 +146,7 @@ void dDAGFunctionNode::CompileCIL(dCIL& cil)
 	// emit the function arguments
 	for (dList<dDAGParameterNode*>::dListNode* argNode = m_parameters.GetFirst(); argNode; argNode = argNode->GetNext()) {
 		dDAGParameterNode* const arg = argNode->GetInfo();
-
+dAssert (0);
 		dThreeAdressStmt& fntArg = cil.NewStatement()->GetInfo();
 		fntArg.m_instruction = dThreeAdressStmt::m_argument;
 		fntArg.m_arg0.m_label = arg->m_name;
@@ -421,6 +421,36 @@ void dDAGFunctionNode::EmitLLVMStoreBase (dLLVMSymbols& localSymbols, dCIL::dLis
 	}
 }
 
+void dDAGFunctionNode::EmitLLVMLoad (dLLVMSymbols& localSymbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context)
+{
+	const dThreeAdressStmt& stmt = stmtNode->GetInfo();
+	dAssert (localSymbols.Find (stmt.m_arg1.m_label));
+	dAssert (localSymbols.Find (stmt.m_arg2.m_label));
+	llvm::Value* const src = localSymbols.Find (stmt.m_arg1.m_label)->GetInfo();
+	llvm::Value* const index = localSymbols.Find (stmt.m_arg2.m_label)->GetInfo();
+	dAssert (stmt.m_arg0.m_type == stmt.m_arg1.m_type);
+	switch (stmt.m_arg0.m_type)
+	{
+		case dThreeAdressStmt::m_int:
+		{
+			//llvm::LoadInst* const local = new llvm::LoadInst (src, stmt.m_arg0.m_label.GetStr(), false, llvmBlock);
+			//inline GetElementPtrInst(Value *Ptr, ArrayRef<Value *> IdxList, unsigned Values, const Twine &NameStr,  BasicBlock *InsertAtEnd);
+			//static GetElementPtrInst *Create(Value *Ptr, ArrayRef<Value *> IdxList,  const Twine &NameStr,  BasicBlock *InsertAtEnd) {
+
+			dString baseAdress (stmt.m_arg0.m_label + dCIL::m_variableUndercore);
+			llvm::GetElementPtrInst* const load = llvm::GetElementPtrInst::Create (src, index, baseAdress.GetStr(), llvmBlock);
+			llvm::LoadInst* const local = new llvm::LoadInst (load, stmt.m_arg0.m_label.GetStr(), false, llvmBlock);
+			local->setAlignment(4);
+			localSymbols.Insert(local, stmt.m_arg0.m_label.GetStr()) ;
+			break;
+		}
+
+		default:
+			dAssert(0);
+	}
+
+}
+
 void dDAGFunctionNode::EmitLLVMLoadBase (dLLVMSymbols& localSymbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context)
 {
 	const dThreeAdressStmt& stmt = stmtNode->GetInfo();
@@ -590,9 +620,9 @@ DTRACE_INTRUCTION (&stmt);
 				break;
 			}
 
-			case dThreeAdressStmt::m_storeBase:
+			case dThreeAdressStmt::m_load:
 			{
-				EmitLLVMStoreBase (localSymbols, argNode, llvmBlock, context);
+				EmitLLVMLoad (localSymbols, argNode, llvmBlock, context);
 				break;
 			}
 
@@ -601,6 +631,13 @@ DTRACE_INTRUCTION (&stmt);
 				EmitLLVMLoadBase (localSymbols, argNode, llvmBlock, context);
 				break;
 			}
+
+			case dThreeAdressStmt::m_storeBase:
+			{
+				EmitLLVMStoreBase (localSymbols, argNode, llvmBlock, context);
+				break;
+			}
+
 
 			case dThreeAdressStmt::m_ret:
 			{

@@ -62,13 +62,13 @@ dThreeAdressStmt::dArgType dThreeAdressStmt::GetTypeID (const dString& typeName)
 	return dThreeAdressStmt::m_int;
 }
 
-const char* dThreeAdressStmt::GetTypeString (const dArgType argType)
+dString dThreeAdressStmt::GetTypeString (const dArgType argType)
 {
 	dAssert (argType < sizeof (m_maptable) / sizeof (m_maptable[0]));
-	return m_maptable[argType].m_name.GetStr();
+	return m_maptable[argType].m_name;
 }
 
-const char* dThreeAdressStmt::GetTypeString (const dArg& arg) const
+dString dThreeAdressStmt::GetTypeString (const dArg& arg) const
 {
 	return GetTypeString (arg.m_type);
 }
@@ -170,7 +170,7 @@ void dThreeAdressStmt::TraceAssigment (char* const text) const
 
 	}
 
-	sprintf(text, "\t%s %s = %s%s%s\n", GetTypeString(m_arg0), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), assignOperator, m_arg2.m_label.GetStr() );
+	sprintf(text, "\t%s %s = %s%s%s\n", GetTypeString(m_arg0).GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), assignOperator, m_arg2.m_label.GetStr() );
 }
 
 /*
@@ -226,19 +226,19 @@ void dThreeAdressStmt::Trace (char* const textOut) const
 		case m_function:
 		{
 			//sprintf (textOut, "\nfunction %s\n", m_arg0.m_label.GetStr());
-			sprintf (textOut, "\nfunction %s %s\n", GetTypeString(m_arg0), m_arg0.m_label.GetStr());
+			sprintf (textOut, "\nfunction %s %s\n", GetTypeString(m_arg0).GetStr(), m_arg0.m_label.GetStr());
 			break;
 		}
 
 		case m_argument:
 		{
-			sprintf (textOut, "\targument %s %s\n", GetTypeString(m_arg0), m_arg0.m_label.GetStr());
+			sprintf (textOut, "\targument %s %s\n", GetTypeString(m_arg0).GetStr(), m_arg0.m_label.GetStr());
 			break;
 		}
 
 		case m_local:
 		{
-			sprintf (textOut, "\tlocal %s %s\n", GetTypeString(m_arg0), m_arg0.m_label.GetStr());
+			sprintf (textOut, "\tlocal %s %s\n", GetTypeString(m_arg0).GetStr(), m_arg0.m_label.GetStr());
 			break;
 		}
 
@@ -246,16 +246,16 @@ void dThreeAdressStmt::Trace (char* const textOut) const
 		case m_ret:
 		{
 			//sprintf (textOut, "\tret %d\n", m_extraInformation);
-			sprintf (textOut, "\tret %s %s\n", GetTypeString(m_arg0), m_arg0.m_label.GetStr());
+			sprintf (textOut, "\tret %s %s\n", GetTypeString(m_arg0).GetStr(), m_arg0.m_label.GetStr());
 			break;
 		}
 
 		case m_call:
 		{
 			if (m_arg0.m_type != m_void) {
-				sprintf (textOut, "\t%s %s = call %s\n", GetTypeString(m_arg0), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
+				sprintf (textOut, "\t%s %s = call %s\n", GetTypeString(m_arg0).GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
 			} else {
-				sprintf (textOut, "\t%s call %s\n", GetTypeString(m_arg0), m_arg1.m_label.GetStr());
+				sprintf (textOut, "\t%s call %s\n", GetTypeString(m_arg0).GetStr(), m_arg1.m_label.GetStr());
 			}
 			break;
 		}
@@ -293,25 +293,25 @@ void dThreeAdressStmt::Trace (char* const textOut) const
 
 		case m_loadBase:
 		{
-			sprintf (textOut, "\t%s %s = [%s]\n", GetTypeString(m_arg0), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
+			sprintf (textOut, "\t%s %s = [%s]\n", GetTypeString(m_arg0).GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
 			break;
 		}
 
 		case m_storeBase:
 		{
-			sprintf (textOut, "\t[%s] = %s %s\n", m_arg0.m_label.GetStr(), GetTypeString(m_arg1), m_arg1.m_label.GetStr());
+			sprintf (textOut, "\t[%s] = %s %s\n", m_arg0.m_label.GetStr(), GetTypeString(m_arg1).GetStr(), m_arg1.m_label.GetStr());
 			break;
 		}
 
 		case m_param:
 		{
-			sprintf (textOut, "\tparam %s %s\n", GetTypeString(m_arg0), m_arg0.m_label.GetStr());
+			sprintf (textOut, "\tparam %s %s\n", GetTypeString(m_arg0).GetStr(), m_arg0.m_label.GetStr());
 			break;
 		}
 
 		case m_load:
 		{
-			sprintf (textOut, "\t%s %s = [%s + %s]\n", GetTypeString(m_arg0), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), m_arg2.m_label.GetStr());
+			sprintf (textOut, "\t%s %s = [%s + %s]\n", GetTypeString(m_arg0).GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), m_arg2.m_label.GetStr());
 			break;
 		}
 

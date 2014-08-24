@@ -71,6 +71,7 @@ class dString::dStringAllocator
 
 			char* Alloc(int size)
 			{
+				dAssert (size < 1024 * 4);
 				if (!m_freeListDataChunk) {
 					Prefetch (size);
 				}

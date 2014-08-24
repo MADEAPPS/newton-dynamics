@@ -121,13 +121,6 @@ void dDAGExpressionNodeVariable::CompileCIL(dCIL& cil)
 	if (m_dimExpressions.GetCount()) {
 		dDAGDimensionNode* const dim = m_dimExpressions.GetFirst()->GetInfo();
 		dim->CompileCIL(cil);
-		//dCIL::dListNode* const dimInstruction = cil.NewStatement();
-		//dThreeAdressStmt& addressIndex = dimInstruction->GetInfo();
-		//addressIndex.m_instruction = dThreeAdressStmt::m_assigment;
-		//addressIndex.m_arg0.m_label = cil.NewTemp();
-		//addressIndex.m_arg1 = dim->m_result; 
-		//dString result = addressIndex.m_arg0.m_label;
-		//DTRACE_INTRUCTION (&addressIndex);
 
 		dString result = dim->m_result.m_label;
 		for (dList<dDAGDimensionNode*>::dListNode* node = m_dimExpressions.GetFirst()->GetNext(); node; node = node->GetNext()) {
@@ -159,38 +152,31 @@ void dDAGExpressionNodeVariable::CompileCIL(dCIL& cil)
 		dAssert (m_parent);
 		dTree<dThreeAdressStmt::dArg, dString>::dTreeNode* const variable = dDAG::FindLocalVariable(m_name);
 		dAssert (variable);
+		dThreeAdressStmt::dArg arg1 (LoadLocalVariable(cil, variable->GetInfo()));
 
-		dThreeAdressStmt& dimSize = cil.NewStatement()->GetInfo();
-		dimSize.m_instruction = dThreeAdressStmt::m_assigment;
-		dimSize.m_operator = dThreeAdressStmt::m_mul;
-		dimSize.m_arg0.m_label = cil.NewTemp();
-		dimSize.m_arg1.m_label = result; 
-		dimSize.m_arg2.m_type = dThreeAdressStmt::m_constInt;
-		dimSize.m_arg2.m_label = dCIL::m_pointerSize; 
-		DTRACE_INTRUCTION (&dimSize);
+		//dThreeAdressStmt& dimSize = cil.NewStatement()->GetInfo();
+		//dimSize.m_instruction = dThreeAdressStmt::m_assigment;
+		//dimSize.m_operator = dThreeAdressStmt::m_mul;
+		//dimSize.m_arg0.m_label = cil.NewTemp();
+		//dimSize.m_arg1.m_label = result; 
+		//dimSize.m_arg2.m_type = dThreeAdressStmt::m_constInt;
+		//dimSize.m_arg2.m_label = dCIL::m_pointerSize; 
+		//DTRACE_INTRUCTION (&dimSize);
 
 		dAssert (m_parent);
 		// emit an indirect addressing mode
 		dThreeAdressStmt& tmp = cil.NewStatement()->GetInfo();
 		tmp.m_instruction = dThreeAdressStmt::m_load;
 		tmp.m_arg0.m_label = cil.NewTemp();
-		tmp.m_arg1 = variable->GetInfo();
-		tmp.m_arg2 = dimSize.m_arg0;
+		tmp.m_arg1 = arg1;
+		//tmp.m_arg2 = dimSize.m_arg0;
+		tmp.m_arg2.m_label = result;
 		DTRACE_INTRUCTION (&tmp);
 		m_result = tmp.m_arg0; 
 	} else {
 		dTree<dThreeAdressStmt::dArg, dString>::dTreeNode* const variable = dDAG::FindLocalVariable(m_name);
 		dAssert (variable);
 		m_result = variable->GetInfo();
-/*
-		dThreeAdressStmt& loadVar = cil.NewStatement()->GetInfo();
-		loadVar.m_instruction = dThreeAdressStmt::m_loadBase;
-		loadVar.m_arg1 = variable->GetInfo();
-		loadVar.m_arg0.m_label = cil.NewTemp();
-		loadVar.m_arg0.m_type = loadVar.m_arg1.m_type;
-		m_result = loadVar.m_arg0;
-		DTRACE_INTRUCTION (&loadVar);
-*/
 	}
 }
 

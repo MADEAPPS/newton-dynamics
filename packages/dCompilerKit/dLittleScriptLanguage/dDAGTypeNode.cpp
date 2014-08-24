@@ -22,6 +22,7 @@ dDAGTypeNode::dDAGTypeNode(dList<dDAG*>& allNodes, const dString& typeName)
 	:dDAG(allNodes)
 	,m_dimensions()
 	,m_intrinsicType (dThreeAdressStmt::GetTypeID (typeName))
+	,m_isPointer(false)
 {
 }
 
@@ -29,6 +30,7 @@ dDAGTypeNode::dDAGTypeNode(dList<dDAG*>& allNodes, const dDAGTypeNode& copySourc
 	:dDAG(allNodes)
 	,m_dimensions(copySource.m_dimensions)
 	,m_intrinsicType (copySource.m_intrinsicType)
+	,m_isPointer(copySource.m_isPointer)
 {
 	m_name = copySource.m_name;
 	for (dList<dDAGDimensionNode*>::dListNode* node = copySource.m_dimensions.GetFirst(); node; node = node->GetNext()) {
@@ -48,18 +50,28 @@ dDAG* dDAGTypeNode::Clone (dList<dDAG*>& allNodes) const
 }
 
 
-dThreeAdressStmt::dArgType dDAGTypeNode::GetIntrisicType() const
+dThreeAdressStmt::dArgType dDAGTypeNode::GetIntrinsicType() const
 {
 	return m_intrinsicType;
 }
 
-const char* dDAGTypeNode::GetIntrisicTypeString() const
+bool dDAGTypeNode::IsPointer() const
 {
-	return  dThreeAdressStmt::GetTypeString (GetIntrisicType());
+	return m_isPointer;
+}
+
+dString dDAGTypeNode::GetIntrisicTypeString() const
+{
+	if (IsPointer()) {
+		return dThreeAdressStmt::GetTypeString (GetIntrinsicType()) + dCIL::m_pointerDecoration;
+	} else {
+		return dThreeAdressStmt::GetTypeString (GetIntrinsicType());
+	}
 }
 
 void dDAGTypeNode::AddDimensions (dDAGDimensionNode* const dimList)
 {
+	m_isPointer = true;
 	for (dDAGDimensionNode* node = dimList; node; node = node->m_next) {
 		dAssert (node->IsType(dDAGDimensionNode::GetRttiType()));
 		m_dimensions.Append(node);
