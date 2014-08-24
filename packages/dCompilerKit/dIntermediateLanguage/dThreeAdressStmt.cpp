@@ -51,11 +51,11 @@ dThreeAdressStmt::~dThreeAdressStmt(void)
 {
 }
 
-dThreeAdressStmt::dArgType dThreeAdressStmt::GetTypeID (const dString& typeName)
+dThreeAdressStmt::dIntrisicType dThreeAdressStmt::GetTypeID (const dString& typeName)
 {
 	for (int i = 0; i < sizeof (m_maptable) / sizeof (m_maptable[0]); i ++) {
 		if (m_maptable[i].m_name == typeName) {
-			return m_maptable[i].m_type;
+			return m_maptable[i].m_intrinsicType;
 		}
 	}
 	dAssert (0);
@@ -64,13 +64,16 @@ dThreeAdressStmt::dArgType dThreeAdressStmt::GetTypeID (const dString& typeName)
 
 dString dThreeAdressStmt::GetTypeString (const dArgType argType)
 {
-	dAssert (argType < sizeof (m_maptable) / sizeof (m_maptable[0]));
-	return m_maptable[argType].m_name;
+	dAssert (0);
+	dAssert (argType.m_intrinsicType < sizeof (m_maptable) / sizeof (m_maptable[0]));
+	return m_maptable[argType.m_intrinsicType].m_name;
 }
 
 dString dThreeAdressStmt::GetTypeString (const dArg& arg) const
 {
-	return GetTypeString (arg.m_type);
+	dAssert (0);
+//	return GetTypeString (arg.m_type);
+	return "";
 }
 
 void dThreeAdressStmt::TraceAssigment (char* const text) const
@@ -252,11 +255,12 @@ void dThreeAdressStmt::Trace (char* const textOut) const
 
 		case m_call:
 		{
-			if (m_arg0.m_type != m_void) {
-				sprintf (textOut, "\t%s %s = call %s\n", GetTypeString(m_arg0).GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
-			} else {
-				sprintf (textOut, "\t%s call %s\n", GetTypeString(m_arg0).GetStr(), m_arg1.m_label.GetStr());
-			}
+			dAssert (0);
+//			if (m_arg0.m_type____ != m_void) {
+//				sprintf (textOut, "\t%s %s = call %s\n", GetTypeString(m_arg0).GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
+//			} else {
+//				sprintf (textOut, "\t%s call %s\n", GetTypeString(m_arg0).GetStr(), m_arg1.m_label.GetStr());
+//			}
 			break;
 		}
 

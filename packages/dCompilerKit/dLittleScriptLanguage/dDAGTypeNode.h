@@ -37,8 +37,8 @@ class dDAGTypeNode: public dDAG
 	virtual dDAG* Clone (dList<dDAG*>& allNodes) const;
 
 	dList<dDAGDimensionNode*> m_dimensions;
-	dThreeAdressStmt::dArgType m_intrinsicType;
-	bool m_isPointer;
+//	dThreeAdressStmt::dArgType m_intrinsicType;
+//	bool m_isPointer;
 	
 	dDAGRtti(dDAG);
 };

@@ -39,7 +39,9 @@ void dDAGExpressionNodeAssigment::ConnectParent(dDAG* const parent)
 
 dCIL::dReturnValue dDAGExpressionNodeAssigment::Evalue(const dDAGFunctionNode* const function)
 {
-	dAssert (0);
+dAssert (0);
+return dCIL::dReturnValue();
+/*
 	dCIL::dReturnValue val (m_expression->Evalue(function));
 	dAssert (!m_leftVariable->m_dimExpressions.GetCount());
 
@@ -48,6 +50,7 @@ dCIL::dReturnValue dDAGExpressionNodeAssigment::Evalue(const dDAGFunctionNode* c
 		dAssert (0);
 	}
 	return val;
+*/
 }
 
 void dDAGExpressionNodeAssigment::CompileCIL(dCIL& cil)  

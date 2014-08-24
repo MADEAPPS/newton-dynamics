@@ -844,6 +844,8 @@ m_cil->Trace();
 
 void dDataFlowGraph::BuildGeneratedAndKillStatementSets()
 {
+dAssert (0);
+/*
 	dTree<dDataFlowPoint, dCIL::dListNode*>::Iterator iter (m_dataFlowGraph);
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowPoint& point = iter.GetNode()->GetInfo();
@@ -867,7 +869,7 @@ void dDataFlowGraph::BuildGeneratedAndKillStatementSets()
 				break;
 			}
 
-/*
+#if 0
 			case dThreeAdressStmt::m_load:
 			{
 				dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const node = m_variableDefinitions.Insert(stmt.m_arg0.m_label);
@@ -952,7 +954,7 @@ void dDataFlowGraph::BuildGeneratedAndKillStatementSets()
 				}
 				break;
 			}
-*/
+#endif
 
 			case dThreeAdressStmt::m_call:
 			{
@@ -980,6 +982,7 @@ void dDataFlowGraph::BuildGeneratedAndKillStatementSets()
 		}
 	}
 
+
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowPoint& point = iter.GetNode()->GetInfo();
 
@@ -1002,21 +1005,20 @@ void dDataFlowGraph::BuildGeneratedAndKillStatementSets()
 				break;
 			}
 
-/*
-			case dThreeAdressStmt::m_storeBase:
-			{
-				point.m_generateStmt = true;
-				dAssert (m_variableDefinitions.Find(stmt.m_arg2.m_label));
-				dList<dCIL::dListNode*>& defsList = m_variableDefinitions.Find(stmt.m_arg2.m_label)->GetInfo();
-				for (dList<dCIL::dListNode*>::dListNode* defNode = defsList.GetFirst(); defNode; defNode = defNode->GetNext()) {
-					dCIL::dListNode* const killStement = defNode->GetInfo();
-					if (killStement != point.m_statement) {
-						point.m_killStmtSet.Insert(killStement);
-					}
-				}
-				break;
-			}
-*/
+//			case dThreeAdressStmt::m_storeBase:
+//			{
+//				point.m_generateStmt = true;
+//				dAssert (m_variableDefinitions.Find(stmt.m_arg2.m_label));
+//				dList<dCIL::dListNode*>& defsList = m_variableDefinitions.Find(stmt.m_arg2.m_label)->GetInfo();
+//				for (dList<dCIL::dListNode*>::dListNode* defNode = defsList.GetFirst(); defNode; defNode = defNode->GetNext()) {
+//					dCIL::dListNode* const killStement = defNode->GetInfo();
+//					if (killStement != point.m_statement) {
+//						point.m_killStmtSet.Insert(killStement);
+//					}
+//				}
+//				break;
+//			}
+
 
 			case dThreeAdressStmt::m_param:
 			{
@@ -1074,6 +1076,7 @@ void dDataFlowGraph::BuildGeneratedAndKillStatementSets()
 				dAssert (0);
 		}
 	}
+*/
 }
 
 
@@ -1176,6 +1179,8 @@ void dDataFlowGraph::UpdateReachingDefinitions()
 
 void dDataFlowGraph::BuildGeneratedAndUsedVariableSets()
 {
+dAssert (0);
+/*
 	dTree<dDataFlowPoint, dCIL::dListNode*>::Iterator iter (m_dataFlowGraph);
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowPoint& point = iter.GetNode()->GetInfo();
@@ -1322,13 +1327,13 @@ void dDataFlowGraph::BuildGeneratedAndUsedVariableSets()
 				}
 				break;
 			}
-/*
-			case dThreeAdressStmt::m_push:
-			{
-				point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
-				break;
-			}
-*/
+
+//			case dThreeAdressStmt::m_push:
+//			{
+//				point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
+//				break;
+//			}
+
 
 //			case dThreeAdressStmt::m_pop:
 			case dThreeAdressStmt::m_nop:
@@ -1343,7 +1348,7 @@ void dDataFlowGraph::BuildGeneratedAndUsedVariableSets()
 				dAssert (0);
 		}
 	}
-
+*/
 }
 
 
@@ -1420,6 +1425,9 @@ void dDataFlowGraph::FindNodesInPathway(dCIL::dListNode* const source, dCIL::dLi
 
 bool dDataFlowGraph::DoStatementAreachesStatementB(dCIL::dListNode* const stmtNodeB, dCIL::dListNode* const stmtNodeA) const
 {
+dAssert (0);
+return NULL;
+/*
 	bool canApplyPropagation = false;	
 	dDataFlowPoint& info = m_dataFlowGraph.Find(stmtNodeB)->GetInfo();
 	dDataFlowPoint::dVariableSet<dCIL::dListNode*>& reachingInputs = info.m_reachStmtInputSet;
@@ -1475,11 +1483,15 @@ bool dDataFlowGraph::DoStatementAreachesStatementB(dCIL::dListNode* const stmtNo
 	}
 
 	return canApplyPropagation;
+*/
 }
 
 
 bool dDataFlowGraph::ApplyCopyPropagation()
 {
+dAssert (0);
+return NULL;
+/*
 	bool ret = false;
 	for (dCIL::dListNode* stmtNode = m_basicBlocks.m_begin; stmtNode != m_basicBlocks.m_end; stmtNode = stmtNode->GetNext()) {
 		dThreeAdressStmt& stmt = stmtNode->GetInfo();
@@ -1572,7 +1584,7 @@ bool dDataFlowGraph::ApplyCopyPropagation()
 				}
 				break;
 			}
-/*
+#if 0
             case dThreeAdressStmt::m_storeBase:
             {
                 for (dCIL::dListNode* stmtNode1 = stmtNode->GetNext(); stmtNode1; stmtNode1 = stmtNode1->GetNext()) {
@@ -1685,15 +1697,19 @@ bool dDataFlowGraph::ApplyCopyPropagation()
 				#endif
 				break;
 			}
-*/
+#endif
 		}
 	}
 
 	return ret;
+*/
 }
 
 bool dDataFlowGraph::ApplyInstructionSematicOrdering()
 {
+dAssert (0);
+return NULL;
+/*
 	bool ret = false;
 	for (dCIL::dListNode* stmtNode = m_function->GetNext(); stmtNode && (stmtNode->GetInfo().m_instruction != dThreeAdressStmt::m_function); stmtNode = stmtNode->GetNext()) {
 		dThreeAdressStmt& stmt = stmtNode->GetInfo();
@@ -1738,15 +1754,14 @@ bool dDataFlowGraph::ApplyInstructionSematicOrdering()
 			case dThreeAdressStmt::m_if:
 			{
 //				dAssert (0);
-/*
-				if ((stmt.m_arg0.m_type == dThreeAdressStmt::m_intConst) && (stmt.m_arg1.m_type == dThreeAdressStmt::m_intVar)) {
-					stmt.m_operator = m_cil->m_operatorComplement[stmt.m_operator];
-					dThreeAdressStmt::dArg arg (stmt.m_arg0);
-					stmt.m_arg0 = stmt.m_arg1;
-					stmt.m_arg1 = arg;
-					ret = true;
-				}
-	*/			
+				//if ((stmt.m_arg0.m_type == dThreeAdressStmt::m_intConst) && (stmt.m_arg1.m_type == dThreeAdressStmt::m_intVar)) {
+					//stmt.m_operator = m_cil->m_operatorComplement[stmt.m_operator];
+					//dThreeAdressStmt::dArg arg (stmt.m_arg0);
+					//stmt.m_arg0 = stmt.m_arg1;
+					//stmt.m_arg1 = arg;
+					//ret = true;
+				//}
+				
 				break;
 			}
 		}
@@ -1754,6 +1769,7 @@ bool dDataFlowGraph::ApplyInstructionSematicOrdering()
 
 //m_cil->Trace();
 	return ret;
+*/
 }
 
 

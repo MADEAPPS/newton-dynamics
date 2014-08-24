@@ -40,6 +40,8 @@ void dDAGFunctionStatementReturn::ConnectParent(dDAG* const parent)
 
 void dDAGFunctionStatementReturn::CompileCIL(dCIL& cil)
 {
+dAssert (0);
+/*
 	dThreeAdressStmt::dArg retValue;
 	retValue.m_type = dThreeAdressStmt::m_void;
 
@@ -55,12 +57,10 @@ void dDAGFunctionStatementReturn::CompileCIL(dCIL& cil)
 			dDAGScopeBlockNode* const scope = (dDAGScopeBlockNode*)node;
 			for (dList<dString>::dListNode* node = scope->m_allocations.GetLast(); node; node = node->GetPrev()) {
 				dAssert(0);
-/*
-				dThreeAdressStmt& allocationStmt = cil.NewStatement()->GetInfo();
-				allocationStmt.m_instruction = dThreeAdressStmt::m_release;
-				allocationStmt.m_arg0.m_label = node->GetInfo();
-				DTRACE_INTRUCTION (&allocationStmt);
-*/
+				//dThreeAdressStmt& allocationStmt = cil.NewStatement()->GetInfo();
+				//allocationStmt.m_instruction = dThreeAdressStmt::m_release;
+				//allocationStmt.m_arg0.m_label = node->GetInfo();
+				//DTRACE_INTRUCTION (&allocationStmt);
 			}
 		}
 	}
@@ -70,4 +70,5 @@ void dDAGFunctionStatementReturn::CompileCIL(dCIL& cil)
 	stmt.m_instruction = dThreeAdressStmt::m_ret;
 	stmt.m_arg0 = arg1;
 	DTRACE_INTRUCTION (&stmt);
+*/
 }

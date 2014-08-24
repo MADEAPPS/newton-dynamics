@@ -19,7 +19,6 @@
 class dDAGExpressionNodeConstant: public dDAGExpressionNode
 {
 	public:
-
 	dDAGExpressionNodeConstant (dList<dDAG*>& allNodes, dThreeAdressStmt::dArgType type, const char* const identifier);
 	~dDAGExpressionNodeConstant(void);
 

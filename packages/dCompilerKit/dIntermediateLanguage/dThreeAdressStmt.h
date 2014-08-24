@@ -25,7 +25,7 @@
 class dThreeAdressStmt
 {
 	public:
-	enum dArgType
+	enum dIntrisicType
 	{
 		m_void,
 		m_bool,
@@ -42,19 +42,29 @@ class dThreeAdressStmt
 
 	struct dMapTable 
 	{
-		dThreeAdressStmt::dArgType m_type;
+		dIntrisicType m_intrinsicType;
 		dString m_name;
 	};
 
+	struct dArgType
+	{
+		dArgType ()
+			:m_intrinsicType(m_int)
+			,m_isPointer(false)
+		{
+		}
 
-	struct dArg
+		dIntrisicType m_intrinsicType;
+		bool m_isPointer;
+	};
+
+	struct dArg: public dArgType
 	{
 		dArg ()
-			:m_type (m_int)
+			:dArgType()
 			,m_label("")
 		{
 		}
-		dArgType m_type;
 		dString m_label;
 	};
 
@@ -127,7 +137,7 @@ class dThreeAdressStmt
 	
 	dString GetTypeString (const dArg& arg) const;
 	static dString GetTypeString (const dArgType argType);
-	static dArgType GetTypeID (const dString& typeName);
+	static dIntrisicType GetTypeID (const dString& typeName);
 
 	static dMapTable m_maptable[];
 };

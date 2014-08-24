@@ -43,6 +43,9 @@ void dDAGExpressionNodeBinaryOperator::ConnectParent(dDAG* const parent)
 //void dDAGExpressionNodeBinaryOperator::PromoteTypes (dCIL::dReturnValue& typeA, dCIL::dReturnValue& typeB) const
 dThreeAdressStmt::dArgType dDAGExpressionNodeBinaryOperator::PromoteTypes (const dThreeAdressStmt::dArgType typeA, const dThreeAdressStmt::dArgType typeB) const
 {
+dAssert (0);
+return dThreeAdressStmt::dArgType();
+/*
 	dThreeAdressStmt::dArgType type = typeA;
 	if (typeA != typeB) {
 		switch (typeA) 
@@ -93,6 +96,7 @@ dThreeAdressStmt::dArgType dDAGExpressionNodeBinaryOperator::PromoteTypes (const
 	}
 
 	return type;
+*/
 }
 
 dCIL::dReturnValue dDAGExpressionNodeBinaryOperator::Evalue(const dDAGFunctionNode* const function)
@@ -204,6 +208,8 @@ return dCIL::dReturnValue();
 
 void dDAGExpressionNodeBinaryOperator::CompileCIL(dCIL& cil)  
 {
+dAssert (0);
+/*
 	m_expressionA->CompileCIL(cil);
 	dThreeAdressStmt::dArg arg1 (LoadLocalVariable(cil, m_expressionA->m_result));
 
@@ -297,4 +303,5 @@ void dDAGExpressionNodeBinaryOperator::CompileCIL(dCIL& cil)
 	}
 
 	DTRACE_INTRUCTION (&stmt);
+*/
 }

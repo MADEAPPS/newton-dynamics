@@ -36,6 +36,7 @@ class dDataFlowGraph;
 class dCIL: public dList<dThreeAdressStmt>
 {
 	public:
+
 	class dReturnValue
 	{
 		public:
@@ -45,7 +46,7 @@ class dCIL: public dList<dThreeAdressStmt>
 			m_f = 0.0;
 		}
 
-		dThreeAdressStmt::dArgType m_type;
+		dThreeAdressStmt::dIntrisicType m_type;
 		union {;
 			dMachineIntRegister m_i;
 			dMachineFloatRegister m_f;

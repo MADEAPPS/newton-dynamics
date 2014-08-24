@@ -105,20 +105,29 @@ void dDAGExpressionNodeConstant::CompileCIL(dCIL& cil)
 	DTRACE_INTRUCTION (&stmt);
 	m_result = stmt.m_arg0;
 */
+
+	dAssert (0);
+/*
 	m_result.m_type = m_type;
 	m_result.m_label = m_name;
+*/
 }
 
 
 dDAGExpressionNodeOperatorThisConstant::dDAGExpressionNodeOperatorThisConstant (dList<dDAG*>& allNodes)
-	:dDAGExpressionNodeConstant(allNodes, dThreeAdressStmt::m_classPointer, "this")
+//	:dDAGExpressionNodeConstant(allNodes, dThreeAdressStmt::m_classPointer, "this")
+	:dDAGExpressionNodeConstant(allNodes, dThreeAdressStmt::dArgType(), "this")
 {
+	dAssert (0);
 }
 
 
 void dDAGExpressionNodeOperatorThisConstant::CompileCIL(dCIL& cil)
 {
+dAssert (0);
+/*
 	dDAGFunctionNode* const function = GetFunction();
 	m_result.m_type = dThreeAdressStmt::m_classPointer;
 	m_result.m_label = function->m_opertatorThis;
+*/
 }

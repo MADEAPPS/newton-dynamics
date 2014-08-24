@@ -171,6 +171,9 @@ void dCIL::Optimize (llvm::Function* const function)
 
 dThreeAdressStmt::dArgType dCIL::GetType (const llvm::Type* const type) const
 {
+dAssert (0);
+return dThreeAdressStmt::dArgType();
+/*
 	dThreeAdressStmt::dArgType intrinsicType (dThreeAdressStmt::m_int);
 	llvm::Type::TypeID typeId = type->getTypeID();
 	switch (typeId)
@@ -202,12 +205,16 @@ dThreeAdressStmt::dArgType dCIL::GetType (const llvm::Type* const type) const
 		//MetadataTyID,    ///<  8: Metadata
 	}
 	return intrinsicType;
+*/
 }
 
 
 
 dThreeAdressStmt::dArgType dCIL::GetType (const llvm::Value* const value) const
 {
+dAssert (0);
+return dThreeAdressStmt::dArgType();
+/*
 	dThreeAdressStmt::dArgType intrinsicType (dThreeAdressStmt::m_int);
 	llvm::Value::ValueTy valueId = llvm::Value::ValueTy (value->getValueID());
 	switch (valueId)
@@ -230,6 +237,7 @@ dThreeAdressStmt::dArgType dCIL::GetType (const llvm::Value* const value) const
 		}
 	}
 	return intrinsicType;
+*/
 }
 
 dString dCIL::GetName (llvm::Value* const value) const
@@ -245,6 +253,9 @@ dString dCIL::GetName (llvm::Value* const value) const
 
 dCIL::dListNode* dCIL::EmitFunctionDeclaration (const llvm::Function& llvmFunction)
 {
+dAssert (0);
+return NULL;
+/*
 	const llvm::StringRef& functionName = llvmFunction.getName();
 	const llvm::Type* const returnType = llvmFunction.getReturnType();
 	//const llvm::FunctionType* const functionType = llvmFuntion.getFunctionType();
@@ -314,6 +325,7 @@ dCIL::dListNode* dCIL::EmitFunctionDeclaration (const llvm::Function& llvmFuncti
 		DTRACE_INTRUCTION (&stmt);
 	}
 	return functionNode;
+*/
 }
 
 void dCIL::EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dTree<const dCIL::dListNode*, const llvm::BasicBlock*>& visited, dList<dCIL::dListNode*>& terminalInstructions)
@@ -441,6 +453,9 @@ const dCIL::dListNode*dCIL::EmitBasicBlockBody(const llvm::Function& function, c
 
 dCIL::dListNode* dCIL::EmitCall (const llvm::Instruction* const intruction)
 {
+dAssert (0);
+return NULL;
+/*
 	llvm::CallInst* const instr =  (llvm::CallInst*) intruction;
 
 	int argCount = instr->getNumOperands();
@@ -481,10 +496,14 @@ dCIL::dListNode* dCIL::EmitCall (const llvm::Instruction* const intruction)
 	DTRACE_INTRUCTION (&copyStmt);
 
 	return copyNode;
+*/
 }
 
 dCIL::dListNode* dCIL::EmitReturn (const llvm::Instruction* const intruction)
 {
+dAssert (0);
+return NULL;
+/*
 	llvm::ReturnInst* const instr =  (llvm::ReturnInst*) intruction;
 
 	dAssert (instr->getNumOperands() == 1);
@@ -531,10 +550,14 @@ dCIL::dListNode* dCIL::EmitReturn (const llvm::Instruction* const intruction)
 
 	DTRACE_INTRUCTION (&stmt);
 	return node;
+*/
 }
 
 dCIL::dListNode* dCIL::EmitIntegerCompare (const llvm::Instruction* const intruction)
 {
+dAssert (0);
+return NULL;
+/*
 	llvm::ICmpInst* const instr =  (llvm::ICmpInst*) intruction;
 
 	llvm::CmpInst::Predicate predicate = instr->getPredicate();
@@ -570,10 +593,14 @@ dCIL::dListNode* dCIL::EmitIntegerCompare (const llvm::Instruction* const intruc
 	stmt.m_arg2.m_label = GetName (arg1);
 	DTRACE_INTRUCTION (&stmt);
 	return node;
+*/
 }
 
 dCIL::dListNode* dCIL::EmitIntegerBranch (const llvm::Instruction* const intruction)
 {
+dAssert (0);
+return NULL;
+/*
 	llvm::BranchInst* const instr =  (llvm::BranchInst*) intruction;
 
 	dCIL::dListNode* const node = NewStatement();
@@ -604,10 +631,14 @@ dCIL::dListNode* dCIL::EmitIntegerBranch (const llvm::Instruction* const intruct
 
 	DTRACE_INTRUCTION (&stmt);
 	return node;
+*/
 }
 
 dCIL::dListNode* dCIL::EmitIntegerAritmetic (const llvm::Instruction* const intruction)
 {
+dAssert (0);
+return NULL;
+/*
 	llvm::BinaryOperator* const instr = (llvm::BinaryOperator*) intruction;
 
 	dThreeAdressStmt::dOperator operation = dThreeAdressStmt::m_nothing;
@@ -650,6 +681,7 @@ dCIL::dListNode* dCIL::EmitIntegerAritmetic (const llvm::Instruction* const intr
 	stmt.m_arg2.m_label = GetName (arg1);
 	DTRACE_INTRUCTION (&stmt);
 	return node;
+*/
 }
 
 

@@ -257,6 +257,9 @@ dDAGScopeBlockNode* dScriptCompiler::GetCurrentScope() const
 
 dScriptCompiler::dUserVariable dScriptCompiler::NewExpressionNodeConstant (const dUserVariable& value)
 {
+dAssert (0);
+return dUserVariable();
+/*
 	dUserVariable returnNode;
 	dThreeAdressStmt::dArgType type (dThreeAdressStmt::m_constInt);
 
@@ -285,6 +288,7 @@ dScriptCompiler::dUserVariable dScriptCompiler::NewExpressionNodeConstant (const
 	dDAGExpressionNodeConstant* const node = new dDAGExpressionNodeConstant (m_allNodes, type, value.m_data.GetStr());
 	returnNode.m_node = node;
 	return returnNode;
+*/
 }
 
 dScriptCompiler::dUserVariable dScriptCompiler::NewExpressionNodeOperatorThisConstant(const dUserVariable& value)
