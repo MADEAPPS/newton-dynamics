@@ -150,9 +150,9 @@ void dDAGExpressionNodeVariable::CompileCIL(dCIL& cil)
 		}
 
 		dAssert (m_parent);
-		dTree<dThreeAdressStmt::dArg, dString>::dTreeNode* const variable = dDAG::FindLocalVariable(m_name);
-		dAssert (variable);
-		dThreeAdressStmt::dArg arg1 (LoadLocalVariable(cil, variable->GetInfo()));
+		dTree<dThreeAdressStmt::dArg, dString>::dTreeNode* const variable1 = dDAG::FindLocalVariable(m_name);
+		dAssert (variable1);
+		dThreeAdressStmt::dArg arg1 (LoadLocalVariable(cil, variable1->GetInfo()));
 
 		dAssert (m_parent);
 		// emit an indirect addressing mode
@@ -160,7 +160,6 @@ void dDAGExpressionNodeVariable::CompileCIL(dCIL& cil)
 		tmp.m_instruction = dThreeAdressStmt::m_load;
 		tmp.m_arg0.m_label = cil.NewTemp();
 		tmp.m_arg1 = arg1;
-		//tmp.m_arg2 = dimSize.m_arg0;
 		tmp.m_arg2.m_label = result;
 		DTRACE_INTRUCTION (&tmp);
 		m_result = tmp.m_arg0; 

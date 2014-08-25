@@ -62,7 +62,7 @@ void dDAGDimensionNode::CompileCIL(dCIL& cil)
 {
 	if (m_dimExp) {
 		m_dimExp->CompileCIL(cil) ;
-		m_result = m_dimExp->m_result;
+		m_result = LoadLocalVariable(cil, m_dimExp->m_result);
 	} else {
 		dAssert (0);
 	}
