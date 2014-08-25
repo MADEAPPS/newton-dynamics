@@ -51,12 +51,17 @@ void dDAGExpressionNodePrefixPostfix::CompileCIL(dCIL& cil)
 	stmt.m_arg2.SetType (dThreeAdressStmt::m_constInt, false);
 	stmt.m_arg2.m_label = "1";
 	DTRACE_INTRUCTION (&stmt);
-	m_result = stmt.m_arg0;
 
 	dThreeAdressStmt& stmt1 = cil.NewStatement()->GetInfo();
 	stmt1.m_instruction = dThreeAdressStmt::m_storeBase;
 	stmt1.m_arg0 = m_expression->m_result;
 	stmt1.m_arg1 = stmt.m_arg0;
 	DTRACE_INTRUCTION (&stmt1);
+
+	if (m_isPrefix) {
+		m_result = stmt.m_arg0;
+	} else {
+		m_result = arg1;
+	}
 }
 

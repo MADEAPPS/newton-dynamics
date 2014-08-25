@@ -43,7 +43,6 @@ void dDAGFunctionStatementWHILE::CompileCIL(dCIL& cil)
 	dCIL::dListNode* startExpressionTestNode = NULL;
 
 	dString startLabel (cil.NewLabel());
-//	dString exitLabel (cil.NewLabel());
 	if (m_testExpression) {
 		m_testExpression->CompileCIL(cil);
 

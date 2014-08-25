@@ -39,6 +39,10 @@ void dDAGFunctionStatementDO::ConnectParent(dDAG* const parent)
 
 void dDAGFunctionStatementDO::CompileCIL(dCIL& cil)  
 {
-	dAssert (0);
-//	CompileCILLoopBody(cil, NULL);
+	dCIL::dListNode* const entryLabelNode = cil.NewStatement();
+	dThreeAdressStmt& entryLabel = entryLabelNode->GetInfo();
+	entryLabel.m_instruction = dThreeAdressStmt::m_label;
+	entryLabel.m_arg0.m_label = cil.NewLabel();
+	DTRACE_INTRUCTION (&entryLabel);
+	CompileCILLoopBody(cil, entryLabelNode, NULL);
 }
