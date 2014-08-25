@@ -40,14 +40,11 @@ void dDAGScopeBlockNode::AddStatement (dDAGFunctionStatement* const statement)
 
 void dDAGScopeBlockNode::AddVariable (const dString& name, dThreeAdressStmt::dArgType type)
 {
-dAssert (0);
-/*
 	dTree<dThreeAdressStmt::dArg, dString>::dTreeNode* const node = m_localVariables.Insert(name);
 	dAssert (node);
 	dThreeAdressStmt::dArg& arg = node->GetInfo();
-	arg.m_type = type;
-	arg.m_label = m_scopePrefix + dString (m_scopeLayer) + name, name;
-*/
+	arg.SetType (type);
+	arg.m_label = m_scopePrefix + dString (m_scopeLayer) + name;
 }
 
 dTree<dThreeAdressStmt::dArg, dString>::dTreeNode* dDAGScopeBlockNode::FindVariable(const dString& name) const

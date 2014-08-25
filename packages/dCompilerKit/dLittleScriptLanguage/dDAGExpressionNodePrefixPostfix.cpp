@@ -39,8 +39,7 @@ void dDAGExpressionNodePrefixPostfix::ConnectParent(dDAG* const parent)
 
 void dDAGExpressionNodePrefixPostfix::CompileCIL(dCIL& cil)
 {
-dAssert (0);
-/*
+	dAssert (0);
 	m_expression->CompileCIL(cil);
 
 	if (m_isPrefix) {
@@ -49,7 +48,7 @@ dAssert (0);
 		stmt.m_operator = m_isIncrement ? dThreeAdressStmt::m_add : dThreeAdressStmt::m_sub;
 		stmt.m_arg0 = m_expression->m_result;
 		stmt.m_arg1 = m_expression->m_result;
-		stmt.m_arg2.m_type = dThreeAdressStmt::m_constInt;
+		stmt.m_arg2.SetType (dThreeAdressStmt::m_constInt, false);
 		stmt.m_arg2.m_label = "1";
 		DTRACE_INTRUCTION (&stmt);
 		m_result = stmt.m_arg0;
@@ -65,12 +64,11 @@ dAssert (0);
 		stmt.m_operator = m_isIncrement ? dThreeAdressStmt::m_add : dThreeAdressStmt::m_sub;
 		stmt.m_arg0 = m_expression->m_result;
 		stmt.m_arg1 = m_expression->m_result;
-		stmt.m_arg2.m_type = dThreeAdressStmt::m_constInt;
+		stmt.m_arg2.SetType (dThreeAdressStmt::m_constInt, false);
 		stmt.m_arg2.m_label = "1";
 		DTRACE_INTRUCTION (&stmt);
 
 		m_result = stmt1.m_arg0;
 	}
-*/
 }
 

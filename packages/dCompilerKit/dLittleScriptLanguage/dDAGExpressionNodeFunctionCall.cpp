@@ -55,8 +55,6 @@ void dDAGExpressionNodeFunctionCall::ConnectParent(dDAG* const parent)
 
 void dDAGExpressionNodeFunctionCall::CompileCIL(dCIL& cil)  
 {
-dAssert (0);
-/*
 	dDAGClassNode* const myClass = GetClass();
 	dAssert (myClass);
 	//dDAGFunctionNode* const myFunction = myClass->GetCurrentFunction ();
@@ -74,39 +72,13 @@ dAssert (0);
 		stmt.m_instruction = dThreeAdressStmt::m_param;
 		stmt.m_arg0 = node->GetInfo();
 		DTRACE_INTRUCTION (&stmt);
-
-		dThreeAdressStmt::dArgType intrisicType = stmt.m_arg0.m_type;
-		switch (intrisicType) 
-		{
-			case dThreeAdressStmt::m_constInt:
-			{
-				intrisicType = dThreeAdressStmt::m_int;
-				break;
-			}
-			case dThreeAdressStmt::m_constFloat:
-			{
-				intrisicType = dThreeAdressStmt::m_float;
-				break;
-			}
-			case dThreeAdressStmt::m_int:
-			{
-				break;
-			}
-
-			//case dThreeAdressStmt::m_void:
-			//case dThreeAdressStmt::m_bool:
-			//case dThreeAdressStmt::m_byte:
-			//case dThreeAdressStmt::m_short:
-			//case dThreeAdressStmt::m_long:
-			//case dThreeAdressStmt::m_float:
-			//case dThreeAdressStmt::m_double:
-			//case dThreeAdressStmt::m_classPointer:
-				default:	
-					dAssert (0);
-		}
-
-		name += m_prototypeSeparator + dThreeAdressStmt::GetTypeString (intrisicType);
 	}
+
+	for (dList<dThreeAdressStmt::dArg>::dListNode* node = paramList.GetLast(); node; node = node->GetPrev()) {
+		//name += m_prototypeSeparator + expNode->GetTypeName();
+		name += m_prototypeSeparator +node->GetInfo().GetTypeName();
+	}
+
 
 	dDAGFunctionNode* const function = myClass->GetFunction (name);
 	dAssert (function);
@@ -117,11 +89,10 @@ dAssert (0);
 	dDAGTypeNode* const returnType = function->m_returnType;
 
 	m_result.m_label = cil.NewTemp ();
-	m_result.m_type = returnType->m_intrinsicType;
+	m_result.SetType (returnType->GetArgType());
 	dThreeAdressStmt& call = cil.NewStatement()->GetInfo();
 	call.m_instruction = dThreeAdressStmt::m_call;
 	call.m_arg0 = m_result;
 	call.m_arg1.m_label = name;
 	DTRACE_INTRUCTION (&call);
-*/
 }

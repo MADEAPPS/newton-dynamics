@@ -146,7 +146,7 @@ dCIL::dListNode* dDAGFunctionStatementFlow::CompileCILLoopBody(dCIL& cil, dCIL::
 
 	dDAGFunctionStatementFlow::CompileCIL(cil);
 	if (m_loopBodyStmt) {
-//		m_loopBodyStmt->CompileCIL(cil);
+		m_loopBodyStmt->CompileCIL(cil);
 	}
 
 	if (m_currentContinueLabel != "") {

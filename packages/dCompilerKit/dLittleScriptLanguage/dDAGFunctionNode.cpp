@@ -64,7 +64,7 @@ void dDAGFunctionNode::AddParameter(dDAGParameterNode* const parameter)
 	dAssert (parameter->IsType(dDAGParameterNode::GetRttiType()));
 
 	dDAGTypeNode* const type = parameter->GetType();
-	m_name += m_prototypeSeparator + type->GetIntrisicTypeString();
+	m_name += m_prototypeSeparator + type->GetArgType().GetTypeName();
 	m_parameters.Append(parameter);
 }
 
@@ -94,13 +94,11 @@ dDAGParameterNode* dDAGFunctionNode::FindArgumentVariable(const char* const name
 
 void dDAGFunctionNode::ConnectParent(dDAG* const parent)
 {
-	dAssert (0);
-/*
 	m_parent = parent;
 
 	for (dList<dDAGParameterNode*>::dListNode* argNode = m_parameters.GetFirst(); argNode; argNode = argNode->GetNext()) {
 		dDAGParameterNode* const arg = argNode->GetInfo();
-		m_body->AddVariable (arg->m_name, arg->m_type->m_intrinsicType);
+		m_body->AddVariable (arg->m_name, arg->m_type->GetArgType());
 		arg->ConnectParent(this);
 	}
 
@@ -110,14 +108,11 @@ void dDAGFunctionNode::ConnectParent(dDAG* const parent)
 	if (m_modifier) {
 		m_modifier->ConnectParent(this);
 	}
-*/
 }
 
 
 void dDAGFunctionNode::CompileCIL(dCIL& cil)  
 {
-dAssert (0);
-/*
 	dAssert (m_body);
 	dDAGClassNode* const myClass = GetClass();
 
@@ -132,7 +127,7 @@ dAssert (0);
 	dThreeAdressStmt& function = functionNode->GetInfo();
 	function.m_instruction = dThreeAdressStmt::m_function;
 	function.m_arg0.m_label = functionName;
-	function.m_arg0.m_type = m_returnType->m_intrinsicType;
+	function.m_arg0.SetType (m_returnType->GetArgType());
 	DTRACE_INTRUCTION (&function);
 
 
@@ -151,11 +146,10 @@ dAssert (0);
 	// emit the function arguments
 	for (dList<dDAGParameterNode*>::dListNode* argNode = m_parameters.GetFirst(); argNode; argNode = argNode->GetNext()) {
 		dDAGParameterNode* const arg = argNode->GetInfo();
-dAssert (0);
 		dThreeAdressStmt& fntArg = cil.NewStatement()->GetInfo();
 		fntArg.m_instruction = dThreeAdressStmt::m_argument;
 		fntArg.m_arg0.m_label = arg->m_name;
-		fntArg.m_arg0.m_type = arg->m_type->m_intrinsicType;
+		fntArg.m_arg0.SetType (arg->m_type->GetArgType());
 		fntArg.m_arg1 = fntArg.m_arg0;
 		arg->m_result = fntArg.m_arg0;
 		DTRACE_INTRUCTION (&fntArg);
@@ -185,25 +179,24 @@ dAssert (0);
 		fntArg.m_instruction = dThreeAdressStmt::m_storeBase;
 		fntArg.m_arg0 = varNameNode->GetInfo();
 		fntArg.m_arg1.m_label = arg->m_name;
-		fntArg.m_arg1.m_type = arg->m_type->m_intrinsicType;
+		fntArg.m_arg1.SetType (arg->GetType()->GetArgType());
 		arg->m_result = fntArg.m_arg1;
 		DTRACE_INTRUCTION (&fntArg);
 	}
 
 	m_body->CompileCIL(cil);
-	if (m_returnType->m_intrinsicType == dThreeAdressStmt::m_void) {
+	if (m_returnType->GetArgType().m_intrinsicType == dThreeAdressStmt::m_void) {
 		const dThreeAdressStmt& lastInstruction = cil.GetLast()->GetInfo();
 		if (lastInstruction.m_instruction != dThreeAdressStmt::m_ret) {
 			dThreeAdressStmt& fntArg = cil.NewStatement()->GetInfo();
 			fntArg.m_instruction = dThreeAdressStmt::m_ret;
 			fntArg.m_arg0.m_label = "";
-			fntArg.m_arg0.m_type = m_returnType->m_intrinsicType;
+			fntArg.m_arg0.SetType (m_returnType->GetArgType());
 			DTRACE_INTRUCTION (&fntArg);
 		}
 	}
 
 	cil.Trace();
-*/
 }
 
 /*

@@ -49,20 +49,13 @@ dDAGTypeNode* dDAGParameterNode::GetType() const
 
 void dDAGParameterNode::ConnectParent(dDAG* const parent)  
 {
-	dAssert (0);
-/*
 	m_parent = parent;
 
 	dDAGScopeBlockNode* const scope = GetScope();
 	if (scope) {
-		scope->AddVariable (m_name, m_type->m_intrinsicType);
+		scope->AddVariable (m_name, m_type->GetArgType());
 	}
-
 	m_type->ConnectParent(this);
-//	if (m_initializationExp) {
-//		m_initializationExp->ConnectParent(this);
-//	}
-*/
 }
 
 

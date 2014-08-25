@@ -12,6 +12,7 @@
 // a very naive qsort for integers
 public class qsort
 {
+
 	public static void qsort (int[] a, int left, int right)
 	{
       int i = left, j = right;

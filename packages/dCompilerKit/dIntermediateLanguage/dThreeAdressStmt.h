@@ -54,6 +54,15 @@ class dThreeAdressStmt
 		{
 		}
 
+		dArgType (dIntrisicType intrinsicType)
+			:m_intrinsicType(intrinsicType)
+			,m_isPointer(false)
+		{
+		}
+
+		dString GetTypeName () const;
+		void SetType (const dArgType& type);
+
 		dIntrisicType m_intrinsicType;
 		bool m_isPointer;
 	};
@@ -65,6 +74,11 @@ class dThreeAdressStmt
 			,m_label("")
 		{
 		}
+
+		const dArgType& GetType () const;
+		void SetType (const dArgType& type);
+		void SetType (dIntrisicType intrinsicType, bool pointer);
+
 		dString m_label;
 	};
 
@@ -136,7 +150,7 @@ class dThreeAdressStmt
 
 	
 	dString GetTypeString (const dArg& arg) const;
-	static dString GetTypeString (const dArgType argType);
+//	static dString GetTypeString (const dArgType argType);
 	static dIntrisicType GetTypeID (const dString& typeName);
 
 	static dMapTable m_maptable[];

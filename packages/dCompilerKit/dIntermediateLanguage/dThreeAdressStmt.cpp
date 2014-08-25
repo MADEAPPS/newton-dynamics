@@ -10,6 +10,7 @@
 */
 
 #include "dCILstdafx.h"
+#include "dCIL.h"
 #include "dThreeAdressStmt.h"
 
 #ifdef _DEBUG
@@ -51,6 +52,9 @@ dThreeAdressStmt::~dThreeAdressStmt(void)
 {
 }
 
+
+
+
 dThreeAdressStmt::dIntrisicType dThreeAdressStmt::GetTypeID (const dString& typeName)
 {
 	for (int i = 0; i < sizeof (m_maptable) / sizeof (m_maptable[0]); i ++) {
@@ -62,11 +66,47 @@ dThreeAdressStmt::dIntrisicType dThreeAdressStmt::GetTypeID (const dString& type
 	return dThreeAdressStmt::m_int;
 }
 
+/*
 dString dThreeAdressStmt::GetTypeString (const dArgType argType)
 {
 	dAssert (0);
 	dAssert (argType.m_intrinsicType < sizeof (m_maptable) / sizeof (m_maptable[0]));
 	return m_maptable[argType.m_intrinsicType].m_name;
+}
+*/
+
+
+dString dThreeAdressStmt::dArgType::GetTypeName () const 
+{
+	dAssert (m_intrinsicType < sizeof (m_maptable) / sizeof (m_maptable[0]));
+	if (m_isPointer) {
+		return m_maptable[m_intrinsicType].m_name + dCIL::m_pointerDecoration;
+	} else {
+		return m_maptable[m_intrinsicType].m_name;
+	}
+}
+
+void dThreeAdressStmt::dArgType::SetType (const dThreeAdressStmt::dArgType& type)
+{
+	m_isPointer = type.m_isPointer;
+	m_intrinsicType = type.m_intrinsicType;
+}
+
+
+const dThreeAdressStmt::dArgType& dThreeAdressStmt::dArg::GetType () const
+{
+	return *this;
+}
+
+void dThreeAdressStmt::dArg::SetType (const dArgType& type)
+{
+	dArgType::SetType (type);
+}
+
+void dThreeAdressStmt::dArg::SetType (dIntrisicType intrinsicType, bool pointer)
+{
+	m_isPointer = pointer;
+	m_intrinsicType = intrinsicType;
 }
 
 dString dThreeAdressStmt::GetTypeString (const dArg& arg) const
@@ -173,7 +213,7 @@ void dThreeAdressStmt::TraceAssigment (char* const text) const
 
 	}
 
-	sprintf(text, "\t%s %s = %s%s%s\n", GetTypeString(m_arg0).GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), assignOperator, m_arg2.m_label.GetStr() );
+	sprintf(text, "\t%s %s = %s %s%s%s %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.GetTypeName().GetStr(), m_arg1.m_label.GetStr(), assignOperator, m_arg2.GetTypeName().GetStr(), m_arg2.m_label.GetStr() );
 }
 
 /*
@@ -229,19 +269,20 @@ void dThreeAdressStmt::Trace (char* const textOut) const
 		case m_function:
 		{
 			//sprintf (textOut, "\nfunction %s\n", m_arg0.m_label.GetStr());
-			sprintf (textOut, "\nfunction %s %s\n", GetTypeString(m_arg0).GetStr(), m_arg0.m_label.GetStr());
+			//sprintf (textOut, "\nfunction %s %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr());
+			sprintf (textOut, "\nfunction %s %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr());
 			break;
 		}
 
 		case m_argument:
 		{
-			sprintf (textOut, "\targument %s %s\n", GetTypeString(m_arg0).GetStr(), m_arg0.m_label.GetStr());
+			sprintf (textOut, "\targument %s %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr());
 			break;
 		}
 
 		case m_local:
 		{
-			sprintf (textOut, "\tlocal %s %s\n", GetTypeString(m_arg0).GetStr(), m_arg0.m_label.GetStr());
+			sprintf (textOut, "\tlocal %s %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr());
 			break;
 		}
 
@@ -249,23 +290,19 @@ void dThreeAdressStmt::Trace (char* const textOut) const
 		case m_ret:
 		{
 			//sprintf (textOut, "\tret %d\n", m_extraInformation);
-			sprintf (textOut, "\tret %s %s\n", GetTypeString(m_arg0).GetStr(), m_arg0.m_label.GetStr());
+			sprintf (textOut, "\tret %s %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr());
 			break;
 		}
 
 		case m_call:
 		{
-			dAssert (0);
-//			if (m_arg0.m_type____ != m_void) {
-//				sprintf (textOut, "\t%s %s = call %s\n", GetTypeString(m_arg0).GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
-//			} else {
-//				sprintf (textOut, "\t%s call %s\n", GetTypeString(m_arg0).GetStr(), m_arg1.m_label.GetStr());
-//			}
+			if (m_arg0.m_isPointer || (m_arg0.m_intrinsicType != m_void)) {
+				sprintf (textOut, "\t%s %s = call %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
+			} else {
+				sprintf (textOut, "\t%s call %s\n", m_arg0.GetTypeName().GetStr(), m_arg1.m_label.GetStr());
+			}
 			break;
 		}
-
-
-
 
 		case m_assigment:
 		{
@@ -276,9 +313,9 @@ void dThreeAdressStmt::Trace (char* const textOut) const
 		case m_if:
 		{
 			if (m_arg2.m_label != "") {
-				sprintf (textOut, "\tif (%s) goto %s else goto %s\n", m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), m_arg2.m_label.GetStr());
+				sprintf (textOut, "\tif (%s %s) goto %s else goto %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), m_arg2.m_label.GetStr());
 			} else {
-				sprintf (textOut, "\tif (%s) goto %s\n", m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
+				sprintf (textOut, "\tif (%s %s) goto %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
 			}
 			break;
 		}
@@ -297,25 +334,25 @@ void dThreeAdressStmt::Trace (char* const textOut) const
 
 		case m_loadBase:
 		{
-			sprintf (textOut, "\t%s %s = [%s]\n", GetTypeString(m_arg0).GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
+			sprintf (textOut, "\t%s %s = [%s %s]\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.GetTypeName().GetStr(), m_arg1.m_label.GetStr());
 			break;
 		}
 
 		case m_storeBase:
 		{
-			sprintf (textOut, "\t[%s] = %s %s\n", m_arg0.m_label.GetStr(), GetTypeString(m_arg1).GetStr(), m_arg1.m_label.GetStr());
+			sprintf (textOut, "\t[%s %s] = %s %s\n", m_arg0.GetTypeName().GetStr(),  m_arg0.m_label.GetStr(), m_arg1.GetTypeName().GetStr(), m_arg1.m_label.GetStr());
 			break;
 		}
 
 		case m_param:
 		{
-			sprintf (textOut, "\tparam %s %s\n", GetTypeString(m_arg0).GetStr(), m_arg0.m_label.GetStr());
+			sprintf (textOut, "\tparam %s %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr());
 			break;
 		}
 
 		case m_load:
 		{
-			sprintf (textOut, "\t%s %s = [%s + %s]\n", GetTypeString(m_arg0).GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), m_arg2.m_label.GetStr());
+			sprintf (textOut, "\t%s %s = [%s %s + %s %s]\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.GetTypeName().GetStr(), m_arg1.m_label.GetStr(), m_arg2.GetTypeName().GetStr(), m_arg2.m_label.GetStr());
 			break;
 		}
 

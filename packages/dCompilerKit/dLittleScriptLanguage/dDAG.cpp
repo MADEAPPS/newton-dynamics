@@ -61,18 +61,15 @@ dTree<dThreeAdressStmt::dArg, dString>::dTreeNode* dDAG::FindLocalVariable(const
 
 dThreeAdressStmt::dArg dDAG::LoadLocalVariable (dCIL& cil, const dThreeAdressStmt::dArg& arg) const
 {
-	dAssert (0);
-/*
 	if (arg.m_label.Find(m_scopePrefix) == 0) {
 		dThreeAdressStmt& loadVar = cil.NewStatement()->GetInfo();
 		loadVar.m_instruction = dThreeAdressStmt::m_loadBase;
 		loadVar.m_arg1 = arg;
 		loadVar.m_arg0.m_label = cil.NewTemp();
-		loadVar.m_arg0.m_type = loadVar.m_arg1.m_type;
+		loadVar.m_arg0.SetType (loadVar.m_arg1);
 		DTRACE_INTRUCTION (&loadVar);
 		return loadVar.m_arg0;
 	}
-*/
 	return arg;
 }
 

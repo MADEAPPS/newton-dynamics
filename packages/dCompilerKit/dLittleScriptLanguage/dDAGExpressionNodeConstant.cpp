@@ -106,11 +106,8 @@ void dDAGExpressionNodeConstant::CompileCIL(dCIL& cil)
 	m_result = stmt.m_arg0;
 */
 
-	dAssert (0);
-/*
-	m_result.m_type = m_type;
+	m_result.SetType (m_type);
 	m_result.m_label = m_name;
-*/
 }
 
 

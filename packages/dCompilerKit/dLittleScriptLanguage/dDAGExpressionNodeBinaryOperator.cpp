@@ -43,19 +43,18 @@ void dDAGExpressionNodeBinaryOperator::ConnectParent(dDAG* const parent)
 //void dDAGExpressionNodeBinaryOperator::PromoteTypes (dCIL::dReturnValue& typeA, dCIL::dReturnValue& typeB) const
 dThreeAdressStmt::dArgType dDAGExpressionNodeBinaryOperator::PromoteTypes (const dThreeAdressStmt::dArgType typeA, const dThreeAdressStmt::dArgType typeB) const
 {
-dAssert (0);
-return dThreeAdressStmt::dArgType();
-/*
-	dThreeAdressStmt::dArgType type = typeA;
-	if (typeA != typeB) {
-		switch (typeA) 
+	dThreeAdressStmt::dArgType type (typeA);
+	dAssert (!typeA.m_isPointer);
+	dAssert (!typeB.m_isPointer);
+	if (typeA.m_intrinsicType != typeB.m_intrinsicType) {
+		switch (typeA.m_intrinsicType) 
 		{
 			case dThreeAdressStmt::m_constInt:
 			{
-				switch (typeB) 
+				switch (typeB.m_intrinsicType) 
 				{
 					case dThreeAdressStmt::m_int:
-						type = dThreeAdressStmt::m_int;
+						type.m_intrinsicType = dThreeAdressStmt::m_int;
 						break;
 					default:;
 						dAssert (0);
@@ -65,10 +64,10 @@ return dThreeAdressStmt::dArgType();
 
 			case dThreeAdressStmt::m_int:
 			{
-				switch (typeB) 
+				switch (typeB.m_intrinsicType) 
 				{
 					case dThreeAdressStmt::m_constInt:
-						type = dThreeAdressStmt::m_int;
+						type.m_intrinsicType = dThreeAdressStmt::m_int;
 						break;
 
 					default:;
@@ -82,10 +81,10 @@ return dThreeAdressStmt::dArgType();
 		}
 	}
 
-	switch (type) 
+	switch (type.m_intrinsicType) 
 	{
 		case dThreeAdressStmt::m_constInt:
-			type = dThreeAdressStmt::m_int;
+			type.m_intrinsicType = dThreeAdressStmt::m_int;
 			break;
 
 		case dThreeAdressStmt::m_int:
@@ -96,7 +95,7 @@ return dThreeAdressStmt::dArgType();
 	}
 
 	return type;
-*/
+
 }
 
 dCIL::dReturnValue dDAGExpressionNodeBinaryOperator::Evalue(const dDAGFunctionNode* const function)
@@ -208,8 +207,6 @@ return dCIL::dReturnValue();
 
 void dDAGExpressionNodeBinaryOperator::CompileCIL(dCIL& cil)  
 {
-dAssert (0);
-/*
 	m_expressionA->CompileCIL(cil);
 	dThreeAdressStmt::dArg arg1 (LoadLocalVariable(cil, m_expressionA->m_result));
 
@@ -221,7 +218,7 @@ dAssert (0);
 	stmt.m_instruction = dThreeAdressStmt::m_assigment;
 	stmt.m_arg0 = m_result;
 	//stmt.m_arg0.m_type = m_expressionA->m_result.m_type;
-	stmt.m_arg0.m_type = PromoteTypes (m_expressionA->m_result.m_type, m_expressionB->m_result.m_type);
+	stmt.m_arg0.SetType (PromoteTypes (m_expressionA->m_result, m_expressionB->m_result));
 
 	stmt.m_arg1 = arg1;
 	stmt.m_arg2 = arg2;
@@ -303,5 +300,4 @@ dAssert (0);
 	}
 
 	DTRACE_INTRUCTION (&stmt);
-*/
 }
