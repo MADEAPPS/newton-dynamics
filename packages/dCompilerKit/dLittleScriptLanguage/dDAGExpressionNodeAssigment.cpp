@@ -57,7 +57,53 @@ void dDAGExpressionNodeAssigment::CompileCIL(dCIL& cil)
 {
 	m_expression->CompileCIL(cil); 
 	if (m_leftVariable->m_dimExpressions.GetCount()) {
-		dAssert(0);
+		dDAGDimensionNode* const dim = m_leftVariable->m_dimExpressions.GetFirst()->GetInfo();
+		dim->CompileCIL(cil);
+
+		dString result = dim->m_result.m_label;
+		for (dList<dDAGDimensionNode*>::dListNode* node = m_leftVariable->m_dimExpressions.GetFirst()->GetNext(); node; node = node->GetNext()) {
+			dAssert (0);
+			dDAGDimensionNode* const dim = node->GetInfo();
+			dim->CompileCIL(cil);
+/*			
+			dThreeAdressStmt& stmtMul = cil.NewStatement()->GetInfo();
+			stmtMul.m_instruction = dThreeAdressStmt::m_assigment;
+			stmtMul.m_operator = dThreeAdressStmt::m_mul;
+			stmtMul.m_arg0.m_label = cil.NewTemp();
+			stmtMul.m_arg1.m_label = result;
+			stmtMul.m_arg2.m_label = dim->m_arraySize;
+
+			DTRACE_INTRUCTION (&stmtMul);
+
+			dThreeAdressStmt& stmtAdd = cil.NewStatement()->GetInfo();
+			stmtAdd.m_instruction = dThreeAdressStmt::m_assigment;
+			stmtAdd.m_operator = dThreeAdressStmt::m_add;
+			stmtAdd.m_arg0.m_label = cil.NewTemp();
+			stmtAdd.m_arg1.m_label = stmtMul.m_arg0.m_label;
+			stmtAdd.m_arg2 = dim->m_result;
+
+			result = stmtAdd.m_arg0.m_label;
+
+			DTRACE_INTRUCTION (&stmtAdd);
+*/
+		}
+
+		dAssert (m_leftVariable->m_parent);
+		dTree<dThreeAdressStmt::dArg, dString>::dTreeNode* const variable = dDAG::FindLocalVariable(m_leftVariable->m_name);
+		dAssert (variable);
+		dThreeAdressStmt::dArg arg1 (LoadLocalVariable(cil, variable->GetInfo()));
+
+		dAssert (m_parent);
+		// emit an indirect addressing mode
+		dThreeAdressStmt& tmp = cil.NewStatement()->GetInfo();
+		tmp.m_instruction = dThreeAdressStmt::m_store;
+		tmp.m_arg0.m_label = cil.NewTemp();
+		tmp.m_arg1 = arg1;
+		//tmp.m_arg2 = dimSize.m_arg0;
+		tmp.m_arg2.m_label = result;
+		DTRACE_INTRUCTION (&tmp);
+		m_result = tmp.m_arg0; 
+
 /*
 		dString& variable (m_leftVariable->m_name);
 		int pos = variable.Find (D_SCOPE_PREFIX, 0, int (strlen (D_SCOPE_PREFIX)));

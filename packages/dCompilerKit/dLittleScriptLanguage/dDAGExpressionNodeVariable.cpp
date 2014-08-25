@@ -154,15 +154,6 @@ void dDAGExpressionNodeVariable::CompileCIL(dCIL& cil)
 		dAssert (variable);
 		dThreeAdressStmt::dArg arg1 (LoadLocalVariable(cil, variable->GetInfo()));
 
-		//dThreeAdressStmt& dimSize = cil.NewStatement()->GetInfo();
-		//dimSize.m_instruction = dThreeAdressStmt::m_assigment;
-		//dimSize.m_operator = dThreeAdressStmt::m_mul;
-		//dimSize.m_arg0.m_label = cil.NewTemp();
-		//dimSize.m_arg1.m_label = result; 
-		//dimSize.m_arg2.m_type = dThreeAdressStmt::m_constInt;
-		//dimSize.m_arg2.m_label = dCIL::m_pointerSize; 
-		//DTRACE_INTRUCTION (&dimSize);
-
 		dAssert (m_parent);
 		// emit an indirect addressing mode
 		dThreeAdressStmt& tmp = cil.NewStatement()->GetInfo();

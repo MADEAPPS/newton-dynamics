@@ -358,15 +358,7 @@ void dThreeAdressStmt::Trace (char* const textOut) const
 
 		case m_store:
 		{
-            dAssert (0);
-            /*
-			int multiplier = 1 << m_extraInformation;
-			if (multiplier != 1) {
-				sprintf (textOut, "\t[%s + %s * %d] = %s\n", m_arg1.m_label.GetStr(), m_arg2.m_label.GetStr(), multiplier, m_arg0.m_label.GetStr());
-			} else {
-				sprintf (textOut, "\t[%s + %s] = %s\n", m_arg1.m_label.GetStr(), m_arg2.m_label.GetStr(), m_arg0.m_label.GetStr());
-			}
-*/
+			sprintf (textOut, "\t[%s %s + %s %s] = %s %s\n", m_arg1.GetTypeName().GetStr(), m_arg1.m_label.GetStr(), m_arg2.GetTypeName().GetStr(), m_arg2.m_label.GetStr(), m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr());
 			break;
 		}
 
