@@ -267,30 +267,65 @@ void dDAGFunctionNode::CreateLLVMBasicBlocks (llvm::Function* const function, dC
 }
 
 
-
-llvm::Function* dDAGFunctionNode::CreateLLVMfunctionDeclaration (dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context)
+llvm::Type* dDAGFunctionNode::GetLLVMType (const dThreeAdressStmt::dArg& arg, llvm::LLVMContext &context)
 {
-dAssert (0);
-return NULL;
-/*
-	std::vector<llvm::Type *> argumentList;
-	for (dCIL::dListNode* argNode = m_functionStart->GetNext()->GetNext(); argNode && (argNode->GetInfo().m_instruction == dThreeAdressStmt::m_argument); argNode = argNode->GetNext()) {
-		const dThreeAdressStmt& stmt = argNode->GetInfo();
-		switch (stmt.m_arg0.m_type)
+	llvm::Type* type = NULL;
+	if (arg.m_isPointer) {
+		switch (arg.m_intrinsicType)
 		{
 			case dThreeAdressStmt::m_int:
-				argumentList.push_back(llvm::Type::getInt32Ty(context));
+
+				type = llvm::Type::getInt32PtrTy(context);
 				break;
+
+			case dThreeAdressStmt::m_void:
+			{
+				//type = llvm::Type::getVoidTy (voidType->getElement);
+				break;
+			}
+
+
+			default:
+				dAssert(0);
+		}
+
+	} else {
+		switch (arg.m_intrinsicType)
+		{
+			case dThreeAdressStmt::m_int:
+
+				type = llvm::Type::getInt32Ty(context);
+				break;
+
+			case dThreeAdressStmt::m_void:
+			{
+				type = llvm::Type::getVoidTy (context);
+				break;
+			}
+
 
 			default:
 				dAssert(0);
 		}
 	}
 
+	dAssert (type);
+	return type;
+}
+
+llvm::Function* dDAGFunctionNode::CreateLLVMfunctionDeclaration (dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context)
+{
+	std::vector<llvm::Type *> argumentList;
+	for (dCIL::dListNode* argNode = m_functionStart->GetNext()->GetNext(); argNode && (argNode->GetInfo().m_instruction == dThreeAdressStmt::m_argument); argNode = argNode->GetNext()) {
+		const dThreeAdressStmt& stmt = argNode->GetInfo();
+		argumentList.push_back (GetLLVMType (stmt.m_arg0, context));
+	}
+
 	const dThreeAdressStmt& functionProto = m_functionStart->GetInfo();
 	dAssert (functionProto.m_instruction == dThreeAdressStmt::m_function);	
-	llvm::Type* returnTypeVal = NULL;
-	switch (functionProto.m_arg0.m_type)
+	llvm::Type* const returnTypeVal = GetLLVMType (functionProto.m_arg0, context);
+/*
+	switch (functionProto.m_arg0.m_intrinsicType)
 	{
 		case dThreeAdressStmt::m_int:
 		{
@@ -307,7 +342,7 @@ return NULL;
 		default:
 			dAssert (0);
 	}
-
+*/
 	// create the function prototype
 	llvm::FunctionType* const funtionParametersAndType = llvm::FunctionType::get (returnTypeVal, argumentList, false);
 	llvm::Function* const llvmFunction = llvm::cast<llvm::Function>(module->getOrInsertFunction(functionProto.m_arg0.m_label.GetStr(), funtionParametersAndType));
@@ -318,7 +353,7 @@ return NULL;
 		const dThreeAdressStmt& stmt = argNode->GetInfo();
 		if (stmt.m_instruction == dThreeAdressStmt::m_argument)
 		{
-			switch (stmt.m_arg0.m_type)
+			switch (stmt.m_arg0.m_intrinsicType)
 			{
 				case dThreeAdressStmt::m_int:
 				{
@@ -335,7 +370,6 @@ return NULL;
 	}
 
 	return llvmFunction;
-*/
 }
 
 
