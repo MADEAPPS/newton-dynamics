@@ -520,25 +520,15 @@ void dDAGFunctionNode::EmitLLVMLoadBase (dLLVMSymbols& localSymbols, dCIL::dList
 
 void dDAGFunctionNode::EmitLLVMReturn (dLLVMSymbols& localSymbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context)
 {
-dAssert (0);
-/*
 	const dThreeAdressStmt& stmt = stmtNode->GetInfo();
 //	dAssert (localSymbols.Find (stmt.m_arg0.m_label));
 //	llvm::Value* const src = localSymbols.Find (stmt.m_arg0.m_label)->GetInfo();
-	llvm::Value* const src = GetLLVMConstantOrValue (localSymbols, stmt.m_arg0, context);
-	switch (stmt.m_arg0.m_type)
-	{
-		case dThreeAdressStmt::m_int:
-		case dThreeAdressStmt::m_constInt:
-		{
-			llvm::ReturnInst::Create(context, src, llvmBlock);
-			break;
-		}
-
-		default:
-			dAssert(0);
+	if (!stmt.m_arg0.m_isPointer && (stmt.m_arg0.m_intrinsicType == dThreeAdressStmt::m_void)) {
+		llvm::ReturnInst::Create(context, NULL, llvmBlock);
+	} else {
+		llvm::Value* const src = GetLLVMConstantOrValue (localSymbols, stmt.m_arg0, context);
+		llvm::ReturnInst::Create(context, src, llvmBlock);
 	}
-*/
 }
 
 
@@ -583,21 +573,23 @@ void dDAGFunctionNode::EmitLLVMCall (dLLVMSymbols& localSymbols, dCIL::dListNode
 
 	int count = 0;
 	llvm::Value* buffer[128];
-	for (dList<llvm::Value*>::dListNode* node = m_paramList.GetFirst(); node; node = node->GetNext()) {
+	for (dList<llvm::Value*>::dListNode* node = m_paramList.GetLast(); node; node = node->GetPrev()) {
 		buffer[count] = node->GetInfo();
 		count ++;
 	}
 
+	llvm::CallInst* call = NULL;
 	llvm::ArrayRef<llvm::Value *> paramList (buffer, count);
-
-	//llvm::CallInst* const call = llvm::CallInst::Create(function, paramList, stmt.m_arg0.m_label.GetStr(), llvmBlock);
-	llvm::CallInst* const call = llvm::CallInst::Create(function, paramList, "", llvmBlock);
+	if (stmt.m_arg0.m_isPointer || (stmt.m_arg0.m_intrinsicType != dThreeAdressStmt::m_void)) {
+		call = llvm::CallInst::Create(function, paramList, stmt.m_arg0.m_label.GetStr(), llvmBlock);
+		localSymbols.Insert(call, stmt.m_arg0.m_label.GetStr()) ;
+	} else {
+		call = llvm::CallInst::Create(function, paramList, "", llvmBlock);
+	}
 	call->setCallingConv(llvm::CallingConv::C);
 	call->setTailCall (true);
 	llvm::AttributeSet callAttrib;
 	call->setAttributes (callAttrib);
-	localSymbols.Insert(call, stmt.m_arg0.m_label.GetStr()) ;
-
 	m_paramList.RemoveAll();
 }
 
