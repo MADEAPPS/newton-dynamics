@@ -1,6 +1,6 @@
 
 [Visualizer]
-; autoexpad type for for dgVetore type, in th enewtyon engine
+; autoexpand type definition for dgVector type of Newton Dynamics 
 dgVector{
 	children
 	(
