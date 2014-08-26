@@ -56,17 +56,21 @@ dCIL::dCIL(llvm::Module* const module)
 	m_optimizer.add(llvm::createConstantHoistingPass());
 	m_optimizer.add(llvm::createConstantPropagationPass());
 	m_optimizer.add(llvm::createInstructionCombiningPass());
+	m_optimizer.add(llvm::createMergedLoadStoreMotionPass());
 
+	m_optimizer.add(llvm::createGVNPass ());
+	m_optimizer.add(llvm::createCFGSimplificationPass());
 	m_optimizer.add(llvm::createTailCallEliminationPass());
 	m_optimizer.add(llvm::createJumpThreadingPass());
 
 	//m_optimizer.add(llvm::createGVNPass());
 	//m_optimizer.add(llvm::createCFGSimplificationPass());
 	//m_optimizer.add(llvm::createLowerSwitchPass());
-
+	
 	m_optimizer.add(llvm::createLCSSAPass());
 	m_optimizer.add(llvm::createLICMPass());
 	m_optimizer.add(llvm::createIndVarSimplifyPass());
+	m_optimizer.add(llvm::createLoopIdiomPass());
 	m_optimizer.add(llvm::createLoopStrengthReducePass());
 	m_optimizer.add(llvm::createLoopInstSimplifyPass());
 	m_optimizer.add(llvm::createLoopUnswitchPass());
