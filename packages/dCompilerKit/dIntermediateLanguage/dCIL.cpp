@@ -16,6 +16,7 @@
 dString dCIL::m_variableUndercore ("_");
 dString dCIL::m_pointerDecoration ("*");
 dString dCIL::m_functionArgument ("_arg");
+dString dCIL::m_phi_source ("phi_source");
 dString dCIL::m_pointerSize (int (sizeof (int)));
 
 dCIL::dCIL(llvm::Module* const module)
@@ -656,7 +657,7 @@ dCIL::dListNode* dCIL::EmitPhiNode (const llvm::Instruction* const intruction)
 		dCIL::dListNode* const node = NewStatement();
 		dThreeAdressStmt& stmt = node->GetInfo();
 		stmt.m_instruction = dThreeAdressStmt::m_nop;
-		stmt.m_arg0.m_label = "phi_source";
+		stmt.m_arg0.m_label = m_phi_source;
 		stmt.m_arg1.m_label = variable->getName().data();
 		stmt.m_arg2.m_label = block->getName().data();
 		stmt.m_trueTargetJump = (dCIL::dListNode*)block;
