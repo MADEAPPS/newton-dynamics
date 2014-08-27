@@ -126,6 +126,8 @@ class dThreeAdressStmt
 		m_param,
 		m_loadBase,
 		m_storeBase,
+
+		m_phi,
 	};
 	dThreeAdressStmt(void);
 	~dThreeAdressStmt(void);

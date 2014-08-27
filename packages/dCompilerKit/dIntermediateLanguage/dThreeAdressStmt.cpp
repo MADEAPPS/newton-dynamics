@@ -384,11 +384,15 @@ void dThreeAdressStmt::Trace (char* const textOut) const
             break;
         }
 
-
-
 		case m_nop:
 		{
-			//sprintf (textOut, "\tnop %s %d \n", m_arg2.m_label.GetStr(), m_extraInformation);
+			sprintf (textOut, "\tnop %s %s %s\n", m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), m_arg2.m_label.GetStr());
+			break;
+		}
+
+		case m_phi:
+		{
+			sprintf (textOut, "\tphi %s %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr());
 			break;
 		}
 

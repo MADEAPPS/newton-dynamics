@@ -645,12 +645,40 @@ dCIL::dListNode* dCIL::EmitIntegerBranch (const llvm::Instruction* const intruct
 
 dCIL::dListNode* dCIL::EmitPhiNode (const llvm::Instruction* const intruction)
 {
-	dAssert (0);
-	return  NULL;
+	llvm::PHINode* const instr =  (llvm::PHINode*) intruction;
+	int agrCount = instr->getNumIncomingValues();
+
+	for (int i = 0; i < agrCount; i ++) {
+		llvm::Value* const variable = instr->getIncomingValue(i);
+		llvm::BasicBlock* const block = instr->getIncomingBlock (i);
+		const llvm::StringRef& variableName = variable->getName ();
+
+		dCIL::dListNode* const node = NewStatement();
+		dThreeAdressStmt& stmt = node->GetInfo();
+		stmt.m_instruction = dThreeAdressStmt::m_nop;
+		stmt.m_arg0.m_label = "phi_source";
+		stmt.m_arg1.m_label = variable->getName().data();
+		stmt.m_arg2.m_label = block->getName().data();
+		stmt.m_trueTargetJump = (dCIL::dListNode*)block;
+		DTRACE_INTRUCTION (&stmt);
+	}
+
+	llvm::Type* const type = instr->getType();
+	const llvm::StringRef& name = instr->getName ();
+
+	dCIL::dListNode* const node = NewStatement();
+	dThreeAdressStmt& stmt = node->GetInfo();
+	stmt.m_instruction = dThreeAdressStmt::m_phi;
+	stmt.m_arg0.SetType (GetType (type));
+	stmt.m_arg0.m_label = name.data();
+	DTRACE_INTRUCTION (&stmt);
+
+	return  node;
 }
 
 dCIL::dListNode* dCIL::EmitIntegerAritmetic (const llvm::Instruction* const intruction)
 {
+	
 dAssert (0);
 return NULL;
 /*
