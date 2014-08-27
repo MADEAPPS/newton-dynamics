@@ -152,6 +152,7 @@ class DemoEntityManager: public wxGLCanvas, public dList <DemoEntity*>
 
 	void CreateOpenGlFont();
 
+	wxGLContext* m_context;	
 
 	NewtonDemos* m_mainWindow;
 	NewtonWorld* m_world;

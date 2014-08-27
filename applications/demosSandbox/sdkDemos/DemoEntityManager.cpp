@@ -51,7 +51,7 @@ BEGIN_EVENT_TABLE (DemoEntityManager, wxGLCanvas)
 END_EVENT_TABLE()
 
 
-int DemoEntityManager::m_attributes[] = {WX_GL_DOUBLEBUFFER, WX_GL_RGBA, WX_GL_DEPTH_SIZE, 32, 0};
+int DemoEntityManager::m_attributes[] = {WX_GL_DOUBLEBUFFER, WX_GL_RGBA, WX_GL_DEPTH_SIZE, 16, 0};
 
 
 DemoEntityManager::ButtonKey::ButtonKey (bool state)
@@ -85,7 +85,7 @@ bool DemoEntityManager::ButtonKey::UpdatePushButton (const NewtonDemos* const ma
 
 
 DemoEntityManager::DemoEntityManager(NewtonDemos* const parent)
-	:wxGLCanvas(parent, wxID_ANY, wxDefaultPosition, wxSize (300, 300), wxSUNKEN_BORDER|wxFULL_REPAINT_ON_RESIZE, _("GLRenderCanvas"), m_attributes)
+	:wxGLCanvas(parent, wxID_ANY, m_attributes, wxDefaultPosition, wxSize(300, 300), wxSUNKEN_BORDER|wxFULL_REPAINT_ON_RESIZE, _("GLRenderCanvas"))
 	,dList <DemoEntity*>() 
 	,m_mainWindow(parent)
 	,m_world(NULL)
@@ -117,6 +117,7 @@ DemoEntityManager::DemoEntityManager(NewtonDemos* const parent)
 	memset (m_showProfiler, 0, sizeof (m_showProfiler));
 	m_profiler.Init(this);
 
+	m_context = new wxGLContext(this);
 }
 
 
@@ -379,9 +380,14 @@ void DemoEntityManager::CreateOpenGlFont()
 
 void DemoEntityManager::InitGraphicsSystem()
 {
-	SetCurrent();
-
-	glewInit();
+	wxGLCanvas::SetCurrent(*m_context);
+	
+	GLenum err = glewInit();
+	
+	// if Glew doesn't initialize correctly.
+	if (err != GLEW_OK) {
+	  wxMessageBox(wxString("GLEW Error: ") + wxString(glewGetErrorString(err)), _("ERROR"), wxOK | wxICON_EXCLAMATION);
+	}
 	
 #if defined (_MSC_VER)
 	if (wglSwapIntervalEXT) {
@@ -796,11 +802,6 @@ void DemoEntityManager::RenderFrame ()
 
 	dFloat timestep = dGetElapsedSeconds();	
 	m_mainWindow->CalculateFPS(timestep);
-
-	SetCurrent();
-	if (!GetContext()) {
-		return;
-	}
 
 	// update the the state of all bodies in the scene
 	unsigned64 time0 = dGetTimeInMicrosenconds ();
