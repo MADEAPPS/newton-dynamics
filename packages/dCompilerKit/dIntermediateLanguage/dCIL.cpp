@@ -183,7 +183,7 @@ dThreeAdressStmt::dArgType dCIL::GetType (const llvm::Type* const type) const
 
 	if (typeId == llvm::Type::TypeID::PointerTyID) {
 		intrinsicType.m_isPointer = true;
-		myType = type->getPointerElementType();
+		myType = myType->getPointerElementType();
 		dAssert (myType);
 		typeId = myType->getTypeID();
 	}
@@ -198,6 +198,9 @@ dThreeAdressStmt::dArgType dCIL::GetType (const llvm::Type* const type) const
 
 		case llvm::Type::TypeID::IntegerTyID:
 		{
+//			unsigned xxx = myType->getSubclassData();
+			const llvm::Type* const xxx = myType->getScalarType() ;
+
 			if (myType->isIntegerTy (32)) {
 				intrinsicType.m_intrinsicType = dThreeAdressStmt::m_int;
 			} else {
@@ -228,19 +231,15 @@ dThreeAdressStmt::dArgType dCIL::GetType (const llvm::Type* const type) const
 }
 
 
-
 dThreeAdressStmt::dArgType dCIL::GetType (const llvm::Value* const value) const
 {
-dAssert (0);
-return dThreeAdressStmt::dArgType();
-/*
 	dThreeAdressStmt::dArgType intrinsicType (dThreeAdressStmt::m_int);
 	llvm::Value::ValueTy valueId = llvm::Value::ValueTy (value->getValueID());
 	switch (valueId)
 	{
 		case llvm::Value::ConstantIntVal:
 		{
-			intrinsicType = dThreeAdressStmt::m_constInt;
+			intrinsicType.m_intrinsicType = dThreeAdressStmt::m_constInt;
 			break;
 		}
 
@@ -252,12 +251,14 @@ return dThreeAdressStmt::dArgType();
 
 		default:
 		{
-			intrinsicType = GetType (value->getType());
+			intrinsicType = GetType(value->getType());
 		}
 	}
 	return intrinsicType;
-*/
 }
+
+
+
 
 dString dCIL::GetName (llvm::Value* const value) const
 {
@@ -441,6 +442,7 @@ const dCIL::dListNode*dCIL::EmitBasicBlockBody(const llvm::Function& function, c
 
 			case llvm::Instruction::Add:
 			case llvm::Instruction::Sub:
+			case llvm::Instruction::SDiv:
 			{
 				node = EmitIntegerAritmetic (intruction);
 				break;
@@ -679,10 +681,6 @@ dCIL::dListNode* dCIL::EmitPhiNode (const llvm::Instruction* const intruction)
 
 dCIL::dListNode* dCIL::EmitIntegerAritmetic (const llvm::Instruction* const intruction)
 {
-	
-dAssert (0);
-return NULL;
-/*
 	llvm::BinaryOperator* const instr = (llvm::BinaryOperator*) intruction;
 
 	dThreeAdressStmt::dOperator operation = dThreeAdressStmt::m_nothing;
@@ -701,6 +699,12 @@ return NULL;
 			break;
 		}
 
+		case llvm::Instruction::SDiv:
+		{
+			operation = dThreeAdressStmt::m_div;
+			break;
+		}
+
 		default:
 			dAssert (0);
 	}
@@ -715,17 +719,16 @@ return NULL;
 	stmt.m_instruction = dThreeAdressStmt::m_assigment;
 	stmt.m_operator = operation;
 
-	stmt.m_arg0.m_type = dThreeAdressStmt::m_int;
+	stmt.m_arg0.SetType(GetType(instr->getType()));
 	stmt.m_arg0.m_label = instr->getName().data();
 
-	stmt.m_arg1.m_type = GetType (arg0);
+	stmt.m_arg1.SetType(GetType (arg0));
 	stmt.m_arg1.m_label = GetName (arg0);
 
-	stmt.m_arg2.m_type = GetType (arg1);
+	stmt.m_arg2.SetType(GetType (arg1));
 	stmt.m_arg2.m_label = GetName (arg1);
 	DTRACE_INTRUCTION (&stmt);
 	return node;
-*/
 }
 
 
