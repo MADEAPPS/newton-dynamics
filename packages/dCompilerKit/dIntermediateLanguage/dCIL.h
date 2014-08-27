@@ -75,6 +75,7 @@ class dCIL: public dList<dThreeAdressStmt>
 
 	dCIL::dListNode* EmitCall (const llvm::Instruction* const intruction);
 	dCIL::dListNode* EmitReturn (const llvm::Instruction* const intruction);
+	dCIL::dListNode* EmitPhiNode (const llvm::Instruction* const intruction);
 	dCIL::dListNode* EmitIntegerAritmetic (const llvm::Instruction* const intruction);
 	dCIL::dListNode* EmitIntegerCompare (const llvm::Instruction* const intruction);
 	dCIL::dListNode* EmitIntegerBranch (const llvm::Instruction* const intruction);
@@ -100,6 +101,7 @@ class dCIL: public dList<dThreeAdressStmt>
 	static dString m_pointerSize;
 	static dString m_pointerDecoration;
 	static dString m_variableUndercore;
+	static dString m_functionArgument;
 	friend dDataFlowGraph;
 };
 

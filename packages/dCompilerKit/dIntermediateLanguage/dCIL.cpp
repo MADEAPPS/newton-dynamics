@@ -15,6 +15,7 @@
 
 dString dCIL::m_variableUndercore ("_");
 dString dCIL::m_pointerDecoration ("*");
+dString dCIL::m_functionArgument ("_arg");
 dString dCIL::m_pointerSize (int (sizeof (int)));
 
 dCIL::dCIL(llvm::Module* const module)
@@ -175,17 +176,29 @@ void dCIL::Optimize (llvm::Function* const function)
 
 dThreeAdressStmt::dArgType dCIL::GetType (const llvm::Type* const type) const
 {
-dAssert (0);
-return dThreeAdressStmt::dArgType();
-/*
+	const llvm::Type* myType = type;
 	dThreeAdressStmt::dArgType intrinsicType (dThreeAdressStmt::m_int);
-	llvm::Type::TypeID typeId = type->getTypeID();
+	llvm::Type::TypeID typeId = myType->getTypeID();
+
+	if (typeId == llvm::Type::TypeID::PointerTyID) {
+		intrinsicType.m_isPointer = true;
+		myType = type->getPointerElementType();
+		dAssert (myType);
+		typeId = myType->getTypeID();
+	}
+
 	switch (typeId)
 	{
+		case llvm::Type::TypeID::VoidTyID:
+		{
+			intrinsicType.m_intrinsicType = dThreeAdressStmt::m_void;
+			break;
+		}
+
 		case llvm::Type::TypeID::IntegerTyID:
 		{
-			if (type->isIntegerTy (32)) {
-				intrinsicType = dThreeAdressStmt::m_int;
+			if (myType->isIntegerTy (32)) {
+				intrinsicType.m_intrinsicType = dThreeAdressStmt::m_int;
 			} else {
 				dAssert (0);
 			}
@@ -197,19 +210,20 @@ return dThreeAdressStmt::dArgType();
 			dAssert (0);
 			break;
 		}
-
-		//VoidTyID = 0,    ///<  0: type with no size
-		//HalfTyID,        ///<  1: 16-bit floating point type
-		//FloatTyID,       ///<  2: 32-bit floating point type
-		//DoubleTyID,      ///<  3: 64-bit floating point type
-		//X86_FP80TyID,    ///<  4: 80-bit floating point type (X87)
-		//FP128TyID,       ///<  5: 128-bit floating point type (112-bit mantissa)
-		//PPC_FP128TyID,   ///<  6: 128-bit floating point type (two 64-bits, PowerPC)
-		//LabelTyID,       ///<  7: Labels
-		//MetadataTyID,    ///<  8: Metadata
 	}
+
+
+	//VoidTyID = 0,    ///<  0: type with no size
+	//HalfTyID,        ///<  1: 16-bit floating point type
+	//FloatTyID,       ///<  2: 32-bit floating point type
+	//DoubleTyID,      ///<  3: 64-bit floating point type
+	//X86_FP80TyID,    ///<  4: 80-bit floating point type (X87)
+	//FP128TyID,       ///<  5: 128-bit floating point type (112-bit mantissa)
+	//PPC_FP128TyID,   ///<  6: 128-bit floating point type (two 64-bits, PowerPC)
+	//LabelTyID,       ///<  7: Labels
+	//MetadataTyID,    ///<  8: Metadata
+
 	return intrinsicType;
-*/
 }
 
 
@@ -257,21 +271,15 @@ dString dCIL::GetName (llvm::Value* const value) const
 
 dCIL::dListNode* dCIL::EmitFunctionDeclaration (const llvm::Function& llvmFunction)
 {
-dAssert (0);
-return NULL;
-/*
 	const llvm::StringRef& functionName = llvmFunction.getName();
 	const llvm::Type* const returnType = llvmFunction.getReturnType();
-	//const llvm::FunctionType* const functionType = llvmFuntion.getFunctionType();
 	llvm::Type::TypeID returnTypeID = returnType->getTypeID();
-
-	dThreeAdressStmt::dArgType intrinsicType = GetType (returnType);
 
 	dCIL::dListNode* const functionNode = NewStatement();
 	dThreeAdressStmt& function = functionNode->GetInfo();
 	function.m_instruction = dThreeAdressStmt::m_function;
 	function.m_arg0.m_label = functionName.data();
-	function.m_arg0.m_type = intrinsicType;
+	function.m_arg0.SetType (GetType (returnType));
 	DTRACE_INTRUCTION (&function);
 
 	dCIL::dListNode* const entryPointNode = NewStatement();
@@ -286,17 +294,15 @@ return NULL;
 		const llvm::StringRef& name = argument->getName();
 
 		const llvm::Type* const argType = argument->getType();
-		dThreeAdressStmt::dArgType intrinsicType = GetType (argType);
-
 		dCIL::dListNode* const argNode = NewStatement();
 		dThreeAdressStmt& stmt = argNode->GetInfo();
 
 		stmt.m_instruction = dThreeAdressStmt::m_argument;
-		stmt.m_arg0.m_type = intrinsicType;
-		if (isFirst) {
+		stmt.m_arg0.SetType (GetType (argType));
+		if (isFirst && (returnTypeID != llvm::Type::TypeID::VoidTyID)) {
 			stmt.m_arg0.m_label = GetReturnVariableName();		
 		} else {
-			stmt.m_arg0.m_label = dString(name.data()) + m_variableUndercore;
+			stmt.m_arg0.m_label = dString(name.data()) + m_functionArgument;
 		}
 		isFirst = false;
 		DTRACE_INTRUCTION (&stmt);
@@ -308,28 +314,25 @@ return NULL;
 		const llvm::StringRef& name = argument->getName();
 
 		const llvm::Type* const argType = argument->getType();
-		dThreeAdressStmt::dArgType intrinsicType = GetType (argType);
 
 		dCIL::dListNode* const argNode = NewStatement();
 		dThreeAdressStmt& stmt = argNode->GetInfo();
 
-		
 		stmt.m_instruction = dThreeAdressStmt::m_assigment;
 		stmt.m_operator = dThreeAdressStmt::m_nothing;
-		stmt.m_arg0.m_type = intrinsicType;
+		stmt.m_arg0.SetType (GetType (argType));
 		stmt.m_arg0.m_label = name.data();
 
-		stmt.m_arg1.m_type = intrinsicType;
-		if (isFirst) {
+		stmt.m_arg1.SetType (stmt.m_arg0.GetType());
+		if (isFirst && (returnTypeID != llvm::Type::TypeID::VoidTyID)) {
 			stmt.m_arg1.m_label = GetReturnVariableName();
 		} else {
-			stmt.m_arg1.m_label = stmt.m_arg0.m_label + m_variableUndercore;
+			stmt.m_arg1.m_label = stmt.m_arg0.m_label + m_functionArgument;
 		}
 		isFirst = false;
 		DTRACE_INTRUCTION (&stmt);
 	}
 	return functionNode;
-*/
 }
 
 void dCIL::EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dTree<const dCIL::dListNode*, const llvm::BasicBlock*>& visited, dList<dCIL::dListNode*>& terminalInstructions)
@@ -442,6 +445,12 @@ const dCIL::dListNode*dCIL::EmitBasicBlockBody(const llvm::Function& function, c
 				break;
 			}
 
+			case llvm::Instruction::PHI:
+			{
+				node = EmitPhiNode (intruction);
+				break;
+			}
+			
 				
 			default:
 				dAssert (0);
@@ -602,9 +611,6 @@ return NULL;
 
 dCIL::dListNode* dCIL::EmitIntegerBranch (const llvm::Instruction* const intruction)
 {
-dAssert (0);
-return NULL;
-/*
 	llvm::BranchInst* const instr =  (llvm::BranchInst*) intruction;
 
 	dCIL::dListNode* const node = NewStatement();
@@ -616,7 +622,7 @@ return NULL;
 		dAssert (((llvm::ICmpInst*) arg0)->getPredicate() == llvm::ICmpInst::ICMP_EQ);
 
 		stmt.m_instruction = dThreeAdressStmt::m_if;
-		stmt.m_arg0.m_type = dThreeAdressStmt::m_int;
+		stmt.m_arg0.SetType (dThreeAdressStmt::m_int);
 		stmt.m_arg0.m_label = arg0->getName().data();
 		stmt.m_arg1.m_label = arg1->getName().data();
 		stmt.m_arg2.m_label = arg2->getName().data();
@@ -635,7 +641,12 @@ return NULL;
 
 	DTRACE_INTRUCTION (&stmt);
 	return node;
-*/
+}
+
+dCIL::dListNode* dCIL::EmitPhiNode (const llvm::Instruction* const intruction)
+{
+	dAssert (0);
+	return  NULL;
 }
 
 dCIL::dListNode* dCIL::EmitIntegerAritmetic (const llvm::Instruction* const intruction)
