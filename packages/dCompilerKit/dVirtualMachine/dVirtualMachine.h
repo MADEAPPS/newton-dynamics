@@ -31,7 +31,7 @@
 #define D_OPCODE_FIELD					7
 #define D_REGISTER_SET_FIELD			5
 
-#define D_REGISTER_SYMBOL				"%reg"
+#define D_REGISTER_SYMBOL				"%r"
 #define D_SPILL_REGISTER_SYMBOL			"spilled"
 
 #define D_INTEGER_REGISTER_COUNT		(1<<D_REGISTER_SET_FIELD)
@@ -45,7 +45,7 @@
 #define D_FLOAT_REGISTER_COUNT			D_INTEGER_REGISTER_COUNT		
 
 
-#define D_VECTOR_REGISTES_SIZE			4
+//#define D_REGISTER_BANK_SIZE			4
 
 typedef unsigned dMachineIntRegister;
 typedef double dMachineFloatRegister;
@@ -156,8 +156,8 @@ class dVirtualMachine
 	virtual ~dVirtualMachine(void);
 
 	protected:
-	dMachineIntRegister m_integerRegistes[D_VECTOR_REGISTES_SIZE][D_INTEGER_REGISTER_COUNT];
-	dMachineFloatRegister m_floatRegistes[D_VECTOR_REGISTES_SIZE][D_FLOAT_REGISTER_COUNT];
+	dMachineIntRegister m_integerRegisters[D_INTEGER_REGISTER_COUNT];
+	dMachineFloatRegister m_floatRegisters[D_FLOAT_REGISTER_COUNT];
 	int m_codeSegementSize;
 	dOpCode* m_codeSegment;
 

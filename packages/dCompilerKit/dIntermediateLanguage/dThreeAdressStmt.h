@@ -60,6 +60,8 @@ class dThreeAdressStmt
 		{
 		}
 
+		int GetSizeInByte() const;
+
 		dString GetTypeName () const;
 		void SetType (const dArgType& type);
 

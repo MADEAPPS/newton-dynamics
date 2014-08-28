@@ -73,9 +73,12 @@ class dCIL: public dList<dThreeAdressStmt>
 	dThreeAdressStmt::dArgType GetType (const llvm::Type* const type) const;
 	dThreeAdressStmt::dArgType GetType (const llvm::Value* const value) const;
 
+	dCIL::dListNode* EmitLoad (const llvm::Instruction* const intruction);
+	dCIL::dListNode* EmitStore (const llvm::Instruction* const intruction);
 	dCIL::dListNode* EmitCall (const llvm::Instruction* const intruction);
 	dCIL::dListNode* EmitReturn (const llvm::Instruction* const intruction);
 	dCIL::dListNode* EmitPhiNode (const llvm::Instruction* const intruction);
+	dCIL::dListNode* EmitGetElementPtr (const llvm::Instruction* const intruction);
 	dCIL::dListNode* EmitIntegerAritmetic (const llvm::Instruction* const intruction);
 	dCIL::dListNode* EmitIntegerCompare (const llvm::Instruction* const intruction);
 	dCIL::dListNode* EmitIntegerBranch (const llvm::Instruction* const intruction);

@@ -92,6 +92,20 @@ void dThreeAdressStmt::dArgType::SetType (const dThreeAdressStmt::dArgType& type
 	m_intrinsicType = type.m_intrinsicType;
 }
 
+int dThreeAdressStmt::dArgType::GetSizeInByte() const
+{
+	switch (m_intrinsicType)
+	{
+		case m_int:
+			return sizeof (int);
+		default:
+			dAssert (0);
+			break;
+	}
+
+	dAssert (0);
+	return 0;
+}
 
 const dThreeAdressStmt::dArgType& dThreeAdressStmt::dArg::GetType () const
 {
