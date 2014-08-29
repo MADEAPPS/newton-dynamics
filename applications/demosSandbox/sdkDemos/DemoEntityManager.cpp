@@ -139,6 +139,8 @@ DemoEntityManager::~DemoEntityManager(void)
 		m_world = NULL;
 	}
 	dAssert (NewtonGetMemoryUsed () == 0);
+
+	delete m_context;
 }
 
 

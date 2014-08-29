@@ -440,7 +440,7 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 };
 
 
-static void AddStaticMesh(DemoEntityManager* const scene)
+static NewtonBody* AddStaticMesh(DemoEntityManager* const scene)
 {
 	char fileName[2048];
 
@@ -456,9 +456,10 @@ static void AddStaticMesh(DemoEntityManager* const scene)
 
 	scene->Append(entity);
 
-	CreateLevelMeshBody (world, entity, true);
-
+	NewtonBody* const body = CreateLevelMeshBody (world, entity, true);
 	NewtonMeshDestroy (ntMesh);
+
+	return body;
 }
 
 
