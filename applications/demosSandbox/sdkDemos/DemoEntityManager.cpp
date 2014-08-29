@@ -50,8 +50,12 @@ BEGIN_EVENT_TABLE (DemoEntityManager, wxGLCanvas)
 	EVT_ERASE_BACKGROUND(DemoEntityManager::OnEraseBackground)
 END_EVENT_TABLE()
 
-
-int DemoEntityManager::m_attributes[] = {WX_GL_DOUBLEBUFFER, WX_GL_RGBA, WX_GL_DEPTH_SIZE, 16, 0};
+#ifdef _MSC_VER
+	int DemoEntityManager::m_attributes[] = {WX_GL_DOUBLEBUFFER, WX_GL_RGBA, WX_GL_DEPTH_SIZE, 32, 0};
+#else 
+	// some linux systems and laptop are still 16 bit 
+	int DemoEntityManager::m_attributes[] = {WX_GL_DOUBLEBUFFER, WX_GL_RGBA, WX_GL_DEPTH_SIZE, 16, 0};
+#endif
 
 
 DemoEntityManager::ButtonKey::ButtonKey (bool state)

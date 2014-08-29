@@ -77,7 +77,7 @@ void DemoCameraListener::PostUpdate (const NewtonWorld* const world, dFloat time
 	mainWin->GetMousePosition (mouseX, mouseY);
 
 	// slow down the Camera if we have a Body
-	float slowDownFactor = mainWin->IsShiftKeyDown() ? 0.125f : 0.5f;
+	float slowDownFactor = mainWin->IsShiftKeyDown() ? 0.5f/10.0f : 0.5f;
 
 	// do camera translation
 	if (mainWin->GetKeyState ('W')) {
