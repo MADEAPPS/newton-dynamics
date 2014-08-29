@@ -107,7 +107,8 @@ class NewtonDemos: public wxFrame
 	bool GetMousePosition (int& posX, int& posY) const;
 	bool GetJoytickPosition (dFloat& posX, dFloat& posY, int& buttonsMask) const;
 
-
+	bool IsShiftKeyDown () const;
+	bool IsControlKeyDown () const;
 
 	void OnQuit(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);
@@ -160,6 +161,9 @@ class NewtonDemos: public wxFrame
 	bool m_concurrentProfilerState;
 	bool m_threadProfilerState;
 	bool m_hasJoysticController;
+	bool m_shiftKey;
+	bool m_controlKey;
+
 
 	int m_solverModeIndex;
 	int m_debugDisplayMode;

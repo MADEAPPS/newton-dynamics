@@ -285,6 +285,8 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	,m_concurrentProfilerState(false)
 	,m_threadProfilerState(false)
 	,m_hasJoysticController(false)
+	,m_shiftKey(false)
+	,m_controlKey(false)
 	,m_solverModeIndex(1)
 	,m_debugDisplayMode(0)
 	,m_mousePosX(0)
@@ -567,6 +569,17 @@ void NewtonDemos::LoadDemo (int index)
 }
 
 
+bool NewtonDemos::IsShiftKeyDown () const
+{
+	return m_shiftKey;
+}
+
+bool NewtonDemos::IsControlKeyDown () const
+{
+	return m_controlKey;
+}
+
+
 
 void NewtonDemos::KeyDown(const wxKeyEvent &event)
 {
@@ -577,21 +590,26 @@ void NewtonDemos::KeyDown(const wxKeyEvent &event)
 		GetEventHandler()->ProcessEvent(exitEvent);
 	}
 
+	m_shiftKey = event.ShiftDown();
+	m_controlKey = event.ControlDown();
 
-	if (!event.GetModifiers()) {
+//	if (!event.GetModifiers()) {
 		int code = keyCode & 0xff; 
 		m_key[m_keyMap[code]] = true;
-	}
+//	}
 }
 
 
 void NewtonDemos::KeyUp(const wxKeyEvent &event)
 {
-	if (!event.GetModifiers()) {
+	m_shiftKey = event.ShiftDown();
+	m_controlKey = event.ControlDown();
+
+//	if (!event.GetModifiers()) {
 		int keyCode = event.GetKeyCode();
 		int code = keyCode & 0xff;
 		m_key[m_keyMap[code]] = false;
-	}
+//	}
 }
 
 
