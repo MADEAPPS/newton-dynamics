@@ -84,8 +84,8 @@ class dCIL: public dList<dThreeAdressStmt>
 	dCIL::dListNode* EmitIntegerBranch (const llvm::Instruction* const intruction);
 
 	dCIL::dListNode* EmitFunctionDeclaration(const llvm::Function& function);
-	const dCIL::dListNode* EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dList<dCIL::dListNode*>& terminalInstructions);
-	void EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dTree<const dCIL::dListNode*, const llvm::BasicBlock*>& visited, dList<dCIL::dListNode*>& terminalInstructions);
+	dCIL::dListNode* EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dTree<dCIL::dListNode*, const llvm::BasicBlock*>& terminalInstructions);
+	void EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dTree<dCIL::dListNode*, const llvm::BasicBlock*>& visited, dTree<dCIL::dListNode*, const llvm::BasicBlock*>& terminalInstructions);
 
 	void RegisterAllocation (dListNode* const functionNode);
 	
@@ -101,8 +101,8 @@ class dCIL: public dList<dThreeAdressStmt>
     llvm::legacy::FunctionPassManager m_optimizer;
 	
 	public:
+	static dString m_phiSource;
 	static dString m_pointerSize;
-	static dString m_phi_source;
 	static dString m_pointerDecoration;
 	static dString m_variableUndercore;
 	static dString m_functionArgument;

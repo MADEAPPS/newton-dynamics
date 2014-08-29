@@ -16,7 +16,7 @@
 dString dCIL::m_variableUndercore ("_");
 dString dCIL::m_pointerDecoration ("*");
 dString dCIL::m_functionArgument ("_arg");
-dString dCIL::m_phi_source ("phi_source");
+dString dCIL::m_phiSource ("phi_source");
 dString dCIL::m_pointerSize (int (sizeof (int)));
 
 dCIL::dCIL(llvm::Module* const module)
@@ -52,7 +52,7 @@ dCIL::dCIL(llvm::Module* const module)
     // Promote allocas to registers.
     m_optimizer.add(llvm::createPromoteMemoryToRegisterPass());
 	m_optimizer.add(llvm::createReassociatePass());
-
+/*
 	m_optimizer.add(llvm::createDeadInstEliminationPass());
 	m_optimizer.add(llvm::createDeadCodeEliminationPass());
 	m_optimizer.add(llvm::createConstantHoistingPass());
@@ -76,7 +76,7 @@ dCIL::dCIL(llvm::Module* const module)
 	m_optimizer.add(llvm::createLoopStrengthReducePass());
 	m_optimizer.add(llvm::createLoopInstSimplifyPass());
 	m_optimizer.add(llvm::createLoopUnswitchPass());
-
+*/
     m_optimizer.doInitialization();
 }
 
@@ -337,16 +337,16 @@ dCIL::dListNode* dCIL::EmitFunctionDeclaration (const llvm::Function& llvmFuncti
 	return functionNode;
 }
 
-void dCIL::EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dTree<const dCIL::dListNode*, const llvm::BasicBlock*>& visited, dList<dCIL::dListNode*>& terminalInstructions)
+void dCIL::EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dTree<dCIL::dListNode*, const llvm::BasicBlock*>& visited, dTree<dCIL::dListNode*, const llvm::BasicBlock*>& terminalInstructions)
 {
 	if (!visited.Find (block)) {
-		const dCIL::dListNode* const blockNode = EmitBasicBlockBody (function, block, terminalInstructions);
+		dCIL::dListNode* const blockNode = EmitBasicBlockBody (function, block, terminalInstructions);
 		visited.Insert (blockNode, block);
 
 		const llvm::TerminatorInst* const teminatorIntruction = block->getTerminator();
 		int successorsCount = teminatorIntruction->getNumSuccessors();
-		//for (int i = 0; i < successorsCount; i ++) { 
-		for (int i = successorsCount - 1; i >= 0; i --) { 
+		for (int i = 0; i < successorsCount; i ++) { 
+		//for (int i = successorsCount - 1; i >= 0; i --) { 
 			const llvm::BasicBlock* const successorBlock = teminatorIntruction->getSuccessor(i);
 			EmitBasicBlockBody (function, successorBlock, visited, terminalInstructions);
 		}
@@ -359,15 +359,19 @@ void dCIL::ConvertLLVMFunctionToNVMFunction (const llvm::Function& llvmFunction)
 	dCIL::dListNode* const function = EmitFunctionDeclaration (llvmFunction);
 
 	// iterate over bascia block and emit the block body
-	dList<dCIL::dListNode*> terminalInstructions;
-	dTree<const dCIL::dListNode*, const llvm::BasicBlock*> visited;
+	dTree<dCIL::dListNode*, const llvm::BasicBlock*> visited;
+	dTree<dCIL::dListNode*, const llvm::BasicBlock*> terminalInstructions;
 	const llvm::BasicBlock* const entryBlock = &llvmFunction.getEntryBlock();
 	EmitBasicBlockBody (llvmFunction, entryBlock, visited, terminalInstructions);
 
-	for (dList<dCIL::dListNode*>::dListNode* node = terminalInstructions.GetFirst(); node; node = node->GetNext()) {
-		dThreeAdressStmt& stmt = node->GetInfo()->GetInfo();
+//Trace();
+	// bind Basic blocks 
+	dTree<dCIL::dListNode*, const llvm::BasicBlock*>::Iterator iter(terminalInstructions);
+	for (iter.Begin(); iter; iter ++) {
+		dCIL::dListNode* const node = iter.GetNode()->GetInfo();
+		dThreeAdressStmt& stmt = node->GetInfo();
 
-//DTRACE_INTRUCTION (&stmt);
+DTRACE_INTRUCTION (&stmt);
 		switch (stmt.m_instruction)
 		{
 			case dThreeAdressStmt::m_if:
@@ -376,6 +380,17 @@ void dCIL::ConvertLLVMFunctionToNVMFunction (const llvm::Function& llvmFunction)
 				llvm::BasicBlock* const falseTargetJump = (llvm::BasicBlock*) stmt.m_falseTargetJump;
 				stmt.m_trueTargetJump = (dCIL::dListNode*) visited.Find (trueTargetJump)->GetInfo();
 				stmt.m_falseTargetJump = (dCIL::dListNode*) visited.Find (falseTargetJump)->GetInfo();
+
+				dCIL::dListNode* ptr = node->GetNext();
+				for (; ptr && ptr->GetInfo().m_instruction != dThreeAdressStmt::m_label; ptr = ptr->GetNext());
+				if (stmt.m_falseTargetJump != ptr) {
+					dAssert (stmt.m_trueTargetJump == ptr);
+					dSwap (stmt.m_falseTargetJump, stmt.m_trueTargetJump);
+					dSwap (stmt.m_arg1, stmt.m_arg2);
+					stmt.m_instruction = dThreeAdressStmt::m_ifnot;
+					DTRACE_INTRUCTION (&stmt);
+				}
+
 				break;
 			}
 
@@ -395,11 +410,46 @@ void dCIL::ConvertLLVMFunctionToNVMFunction (const llvm::Function& llvmFunction)
 		}
 	}
 
+
+	// resolve PhiNodes
+	dCIL::dListNode* nextNode;
+	for (dCIL::dListNode* node = function; node; node = nextNode) {
+		nextNode = node->GetNext();
+		dThreeAdressStmt& stmt = node->GetInfo();
+//DTRACE_INTRUCTION (&stmt);
+		if (stmt.m_instruction == dThreeAdressStmt::m_phi) {
+			dCIL::dListNode* nextNode1;
+			for (dCIL::dListNode* node1 = node->GetPrev(); node1 && (node1->GetInfo().m_instruction == dThreeAdressStmt::m_nop); node1 = nextNode1) {
+				nextNode1 = node1->GetPrev();
+				dThreeAdressStmt& variableStmt = node1->GetInfo();
+				dAssert (variableStmt.m_arg0.m_label == m_phiSource);
+				llvm::BasicBlock* const sourceBlock = (llvm::BasicBlock*) variableStmt.m_trueTargetJump;
+				dAssert (sourceBlock);
+				dAssert (terminalInstructions.Find (sourceBlock));
+				dCIL::dListNode* const terminalNode = (dCIL::dListNode*) terminalInstructions.Find (sourceBlock)->GetInfo();
+				dAssert (terminalNode);
+				dCIL::dListNode* const assigmentNode = NewStatement();
+				InsertAfter (terminalNode->GetPrev(), assigmentNode);
+
+				dThreeAdressStmt& assigmentStmt = assigmentNode->GetInfo();
+				assigmentStmt.m_instruction = dThreeAdressStmt::m_assigment;
+				assigmentStmt.m_operator = dThreeAdressStmt::m_nothing;
+				assigmentStmt.m_arg0 = stmt.m_arg0;
+				assigmentStmt.m_arg1 = variableStmt.m_arg1;
+				dAssert (assigmentStmt.m_arg0.m_intrinsicType == assigmentStmt.m_arg1.m_intrinsicType);
+//DTRACE_INTRUCTION (&terminalNode->GetInfo());
+				Remove (node1);
+			}
+			Remove (node);
+		}
+	}
+
+//Trace();
 	RegisterAllocation (function);
 }
 
 
-const dCIL::dListNode*dCIL::EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dList<dCIL::dListNode*>& terminalInstructions)
+dCIL::dListNode*dCIL::EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dTree<dCIL::dListNode*, const llvm::BasicBlock*>& terminalInstructions)
 {
 	const llvm::StringRef& blockName = block->getName ();
 
@@ -477,7 +527,7 @@ const dCIL::dListNode*dCIL::EmitBasicBlockBody(const llvm::Function& function, c
 		}
 
 		if (intruction->isTerminator()) {
-			terminalInstructions.Append (node);
+			terminalInstructions.Insert (node, block);
 		}
 	}
 
@@ -486,9 +536,6 @@ const dCIL::dListNode*dCIL::EmitBasicBlockBody(const llvm::Function& function, c
 
 dCIL::dListNode* dCIL::EmitCall (const llvm::Instruction* const intruction)
 {
-dAssert (0);
-return NULL;
-/*
 	llvm::CallInst* const instr =  (llvm::CallInst*) intruction;
 
 	int argCount = instr->getNumOperands();
@@ -498,38 +545,39 @@ return NULL;
 		dCIL::dListNode* const node = NewStatement();
 		dThreeAdressStmt& stmt = node->GetInfo();
 		stmt.m_instruction = dThreeAdressStmt::m_param;
-		stmt.m_arg0.m_type = GetType (arg);
+		stmt.m_arg0.SetType (GetType (arg));
 		stmt.m_arg0.m_label = GetName (arg);
 		DTRACE_INTRUCTION (&stmt);
 	}
 
-	dCIL::dListNode* const node = NewStatement();
+	dCIL::dListNode* node = NewStatement();
 	dThreeAdressStmt& stmt = node->GetInfo();
 
 	llvm::Value* const arg = instr->getOperand(argCount - 1);
 	stmt.m_instruction = dThreeAdressStmt::m_call;
 
-	stmt.m_arg0.m_type = GetType (instr);
+	stmt.m_arg0.SetType (GetType (instr));
 	stmt.m_arg0.m_label = GetReturnVariableName();
 
-	stmt.m_arg1.m_type = stmt.m_arg0.m_type;
+	stmt.m_arg1.SetType (stmt.m_arg0.GetType());
 	stmt.m_arg1.m_label = GetName (arg);
 	DTRACE_INTRUCTION (&stmt);
 
-	dCIL::dListNode* const copyNode = NewStatement();
-	dThreeAdressStmt& copyStmt = copyNode->GetInfo();
+	if ((stmt.m_arg0.m_isPointer) || (stmt.m_arg0.m_intrinsicType != dThreeAdressStmt::m_void)) { 
+		dCIL::dListNode* const copyNode = NewStatement();
+		dThreeAdressStmt& copyStmt = copyNode->GetInfo();
 
-	copyStmt.m_instruction = dThreeAdressStmt::m_assigment;
-	copyStmt.m_operator = dThreeAdressStmt::m_nothing;
-	copyStmt.m_arg0.m_type = stmt.m_arg0.m_type;
-	copyStmt.m_arg0.m_label = instr->getName().data();
+		copyStmt.m_instruction = dThreeAdressStmt::m_assigment;
+		copyStmt.m_operator = dThreeAdressStmt::m_nothing;
+		copyStmt.m_arg0.SetType(stmt.m_arg0.GetType());
+		copyStmt.m_arg0.m_label = instr->getName().data();
 
-	copyStmt.m_arg1.m_type = stmt.m_arg0.m_type;
-	copyStmt.m_arg1.m_label = stmt.m_arg0.m_label;
-	DTRACE_INTRUCTION (&copyStmt);
-
-	return copyNode;
-*/
+		copyStmt.m_arg1.SetType(stmt.m_arg0.GetType());
+		copyStmt.m_arg1.m_label = stmt.m_arg0.m_label;
+		DTRACE_INTRUCTION (&copyStmt);
+		node = copyNode;
+	}
+	return node;
 }
 
 dCIL::dListNode* dCIL::EmitReturn (const llvm::Instruction* const intruction)
@@ -604,7 +652,13 @@ dCIL::dListNode* dCIL::EmitIntegerCompare (const llvm::Instruction* const intruc
 			break;
 		}
 
-		case llvm::CmpInst::ICMP_SGT:
+		case llvm::CmpInst::ICMP_SLE:
+		{
+			predicateOperator = dThreeAdressStmt::m_lessEqual;
+			break;
+		}
+
+		case llvm::CmpInst::ICMP_SGE:
 		{
 			predicateOperator = dThreeAdressStmt::m_greatherEqual;
 			break;
@@ -612,10 +666,15 @@ dCIL::dListNode* dCIL::EmitIntegerCompare (const llvm::Instruction* const intruc
 
 		case llvm::CmpInst::ICMP_SLT:
 		{
-			predicateOperator = dThreeAdressStmt::m_lessEqual;
+			predicateOperator = dThreeAdressStmt::m_less;
 			break;
 		}
-
+		
+		case llvm::CmpInst::ICMP_SGT:
+		{
+			predicateOperator = dThreeAdressStmt::m_greather;
+			break;
+		}
 
 		default:
 			dAssert (0);
@@ -658,6 +717,10 @@ dCIL::dListNode* dCIL::EmitIntegerBranch (const llvm::Instruction* const intruct
 		//llvm::CmpInst::Predicate predicate = ((llvm::ICmpInst*) arg0)->getPredicate();
 		//dAssert (((llvm::ICmpInst*) arg0)->getPredicate() == llvm::ICmpInst::ICMP_EQ);
 
+		 dAssert (instr->getNumSuccessors() == 2);
+		 const llvm::BasicBlock* const block1 = instr->getSuccessor(0);
+		 const llvm::BasicBlock* const block2 = instr->getSuccessor(1);
+
 		stmt.m_instruction = dThreeAdressStmt::m_if;
 		stmt.m_arg0.SetType (dThreeAdressStmt::m_int);
 		stmt.m_arg0.m_label = arg0->getName().data();
@@ -693,7 +756,7 @@ dCIL::dListNode* dCIL::EmitPhiNode (const llvm::Instruction* const intruction)
 		dCIL::dListNode* const node = NewStatement();
 		dThreeAdressStmt& stmt = node->GetInfo();
 		stmt.m_instruction = dThreeAdressStmt::m_nop;
-		stmt.m_arg0.m_label = m_phi_source;
+		stmt.m_arg0.m_label = m_phiSource;
 		stmt.m_arg1.m_label = variable->getName().data();
 		stmt.m_arg2.m_label = block->getName().data();
 		stmt.m_trueTargetJump = (dCIL::dListNode*)block;

@@ -42,6 +42,8 @@ dRegisterInterferenceGraph::dRegisterInterferenceGraph (dDataFlowGraph* const fl
 //m_flowGraph->m_cil->Trace();
 	}
 
+//m_flowGraph->m_cil->Trace();
+
 	m_flowGraph->CalculateLiveInputLiveOutput();
 	Build();
 	while (ColorGraph () > m_registerCount) {
@@ -78,8 +80,6 @@ m_flowGraph->m_cil->Trace();
 
 void dRegisterInterferenceGraph::AllocateRegisters ()
 {
-dAssert (0);
-/*
 	for (dCIL::dListNode* stmtNode = m_flowGraph->m_basicBlocks.m_begin; stmtNode != m_flowGraph->m_basicBlocks.m_end; stmtNode = stmtNode->GetNext()) {
 		dThreeAdressStmt& stmt = stmtNode->GetInfo();	
 
@@ -95,7 +95,7 @@ dAssert (0);
 			case dThreeAdressStmt::m_assigment:
 			{
 				stmt.m_arg0.m_label = GetRegisterName (stmt.m_arg0.m_label);
-				switch (stmt.m_arg1.m_type____) 
+				switch (stmt.m_arg1.GetType().m_intrinsicType) 
 				{
 					case dThreeAdressStmt::m_int:
 					{
@@ -111,7 +111,7 @@ dAssert (0);
 				}
 
 				if (stmt.m_operator != dThreeAdressStmt::m_nothing) {
-					switch (stmt.m_arg2.m_type____) 
+					switch (stmt.m_arg2.GetType().m_intrinsicType) 
 					{
 						case dThreeAdressStmt::m_int:
 						{
@@ -167,18 +167,20 @@ dAssert (0);
 				break;
 			}
 
-			case dThreeAdressStmt::m_ret:
+			
 			case dThreeAdressStmt::m_if:
+			case dThreeAdressStmt::m_ifnot:
 			case dThreeAdressStmt::m_param:
 			{
 				stmt.m_arg0.m_label = GetRegisterName (stmt.m_arg0.m_label);
 				break;
 			}
 
+
+			case dThreeAdressStmt::m_ret:
 			case dThreeAdressStmt::m_call:
 			{
-				dAssert (0);
-				if (stmt.m_arg0.m_type____ != dThreeAdressStmt::m_void) {
+				if (stmt.m_arg0.GetType().m_isPointer || (stmt.m_arg0.GetType().m_intrinsicType != dThreeAdressStmt::m_void)) {
 					stmt.m_arg0.m_label = GetRegisterName (stmt.m_arg0.m_label);
 				}
 				break;
@@ -231,8 +233,6 @@ dAssert (0);
 //			}
 //		}
 //	}
-*/
-
 }
 
 
@@ -269,8 +269,6 @@ bool dRegisterInterferenceGraph::IsTempVariable (const dString& name) const
 
 void dRegisterInterferenceGraph::Build()
 {
-	dAssert (0);
-/*
 	dTree<dDataFlowGraph::dDataFlowPoint, dCIL::dListNode*>::Iterator iter (m_flowGraph->m_dataFlowGraph);
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowGraph::dDataFlowPoint& point = iter.GetNode()->GetInfo();
@@ -298,38 +296,42 @@ void dRegisterInterferenceGraph::Build()
 		{
 			case dThreeAdressStmt::m_ret:
 			{
-				switch (stmt.m_arg0.m_type____) 
-				{
-					case dThreeAdressStmt::m_int:
+				if (stmt.m_arg0.GetType().m_isPointer || (stmt.m_arg0.GetType().m_intrinsicType != dThreeAdressStmt::m_void)) {
+					switch (stmt.m_arg0.GetType().m_intrinsicType) 
 					{
-						dTreeNode* const returnRegNode = Find(stmt.m_arg0.m_label);
-						dAssert (returnRegNode);
-						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
-						registerInfo.m_registerIndex = D_RETURN_REGISTER_INDEX;
-						//registerInfo.m_isPrecolored = true;
-						break;
+						case dThreeAdressStmt::m_int:
+						{
+							dTreeNode* const returnRegNode = Find(stmt.m_arg0.m_label);
+							dAssert (returnRegNode);
+							dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
+							registerInfo.m_registerIndex = D_RETURN_REGISTER_INDEX;
+							//registerInfo.m_isPrecolored = true;
+							break;
+						}
+						default:
+							dAssert (0);
 					}
-					default:
-						dAssert (0);
 				}
 				break;
 			}
 
 			case dThreeAdressStmt::m_call:
 			{
-				switch (stmt.m_arg0.m_type____) 
-				{
-					case dThreeAdressStmt::m_int:
+				if (stmt.m_arg0.GetType().m_isPointer || (stmt.m_arg0.GetType().m_intrinsicType != dThreeAdressStmt::m_void)) {
+					switch (stmt.m_arg0.GetType().m_intrinsicType) 
 					{
-						dTreeNode* const returnRegNode = Find(stmt.m_arg0.m_label);
-						dAssert (returnRegNode);
-						dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
-						registerInfo.m_registerIndex = D_RETURN_REGISTER_INDEX;
-						//registerInfo.m_isPrecolored = true;
-						break;
+						case dThreeAdressStmt::m_int:
+						{
+							dTreeNode* const returnRegNode = Find(stmt.m_arg0.m_label);
+							dAssert (returnRegNode);
+							dRegisterInterferenceNode& registerInfo = returnRegNode->GetInfo();
+							registerInfo.m_registerIndex = D_RETURN_REGISTER_INDEX;
+							//registerInfo.m_isPrecolored = true;
+							break;
+						}
+						default:
+							dAssert (0);
 					}
-					default:
-						dAssert (0);
 				}
 
 				int index = D_CALLER_SAVE_REGISTER_INDEX;
@@ -346,7 +348,7 @@ void dRegisterInterferenceGraph::Build()
 
 			case dThreeAdressStmt::m_argument:
 			{
-				switch (stmt.m_arg0.m_type____) 
+				switch (stmt.m_arg0.GetType().m_intrinsicType) 
 				{
 					case dThreeAdressStmt::m_int:
 					{
@@ -418,7 +420,7 @@ void dRegisterInterferenceGraph::Build()
 		dDataFlowGraph::dDataFlowPoint& info = iter.GetNode()->GetInfo();
 		dThreeAdressStmt& stmt = info.m_statement->GetInfo();
 
-		if ((stmt.m_instruction == dThreeAdressStmt::m_assigment) && (stmt.m_operator == dThreeAdressStmt::m_nothing) && (stmt.m_arg1.m_type____ != dThreeAdressStmt::m_constInt) && (stmt.m_arg1.m_type____ != dThreeAdressStmt::m_constFloat)) {
+		if ((stmt.m_instruction == dThreeAdressStmt::m_assigment) && (stmt.m_operator == dThreeAdressStmt::m_nothing) && (stmt.m_arg1.GetType().m_intrinsicType != dThreeAdressStmt::m_constInt) && (stmt.m_arg1.GetType().m_intrinsicType != dThreeAdressStmt::m_constFloat)) {
 //stmt.Trace();
 
 			const dString& variableA = stmt.m_arg0.m_label;
@@ -437,7 +439,6 @@ void dRegisterInterferenceGraph::Build()
 					}
 				}
 				if (canCoalese) {
-					dAssert (0);
 					nodeA->GetInfo().m_isMove = true;
 					nodeB->GetInfo().m_isMove = true;
 					m_coalescedNodes.Append(dCoalescedNodePair (nodeB, nodeA));
@@ -445,7 +446,6 @@ void dRegisterInterferenceGraph::Build()
 			}
 		}
 	}
-*/
 }
 
 dRegisterInterferenceGraph::dTreeNode* dRegisterInterferenceGraph::GetBestNode()

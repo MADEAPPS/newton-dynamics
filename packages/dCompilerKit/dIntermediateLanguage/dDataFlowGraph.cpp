@@ -844,8 +844,6 @@ m_cil->Trace();
 
 void dDataFlowGraph::BuildGeneratedAndKillStatementSets()
 {
-dAssert (0);
-/*
 	dTree<dDataFlowPoint, dCIL::dListNode*>::Iterator iter (m_dataFlowGraph);
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowPoint& point = iter.GetNode()->GetInfo();
@@ -869,6 +867,14 @@ dAssert (0);
 				break;
 			}
 
+			case dThreeAdressStmt::m_loadBase:
+			{
+				dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const node = m_variableDefinitions.Insert(stmt.m_arg0.m_label);
+				node->GetInfo().Append(ptr);
+				break;
+			}
+
+
 #if 0
 			case dThreeAdressStmt::m_load:
 			{
@@ -887,24 +893,6 @@ dAssert (0);
             
 			case dThreeAdressStmt::m_store:
 			{
-				if (stmt.m_arg0.m_label == m_returnVariableName) {
-					statementUsingReturnVariable.Insert(ptr);
-				}
-				break;
-			}
-
-			case dThreeAdressStmt::m_loadBase:
-			{
-				dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const node = m_variableDefinitions.Insert(stmt.m_arg0.m_label);
-				node->GetInfo().Append(ptr);
-				break;
-			}
-
-			case dThreeAdressStmt::m_storeBase:
-			{
-				dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const node = m_variableDefinitions.Insert(stmt.m_arg2.m_label);
-				node->GetInfo().Append(ptr);
-
 				if (stmt.m_arg0.m_label == m_returnVariableName) {
 					statementUsingReturnVariable.Insert(ptr);
 				}
@@ -954,11 +942,23 @@ dAssert (0);
 				}
 				break;
 			}
+
+			
+			{
+				dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const node = m_variableDefinitions.Insert(stmt.m_arg2.m_label);
+				node->GetInfo().Append(ptr);
+
+//				if (stmt.m_arg0.m_label == m_returnVariableName) {
+//					statementUsingReturnVariable.Insert(ptr);
+//				}
+//				break;
+			}
+
 #endif
 
 			case dThreeAdressStmt::m_call:
 			{
-				if (stmt.m_arg0.m_type != dThreeAdressStmt::m_void) {
+				if (stmt.m_arg0.GetType().m_isPointer || (stmt.m_arg0.GetType().m_intrinsicType != dThreeAdressStmt::m_void)) {
 					dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const node = m_variableDefinitions.Insert(stmt.m_arg0.m_label);
 					node->GetInfo().Append(ptr);
 				}
@@ -970,11 +970,13 @@ dAssert (0);
 			//case dThreeAdressStmt::m_leave:
 			case dThreeAdressStmt::m_param:
 			case dThreeAdressStmt::m_if:
+			case dThreeAdressStmt::m_ifnot:
 			case dThreeAdressStmt::m_ret:
 			case dThreeAdressStmt::m_goto:
 			case dThreeAdressStmt::m_nop:
 			case dThreeAdressStmt::m_label:
 			case dThreeAdressStmt::m_function:
+			case dThreeAdressStmt::m_storeBase:
 				break;
 
 			default:
@@ -991,6 +993,8 @@ dAssert (0);
 //DTRACE_INTRUCTION (&stmt);		
 		switch (stmt.m_instruction)
 		{
+			case dThreeAdressStmt::m_param:
+			case dThreeAdressStmt::m_loadBase:
 			case dThreeAdressStmt::m_assigment:
 			{
 				point.m_generateStmt = true;
@@ -1006,6 +1010,7 @@ dAssert (0);
 			}
 
 //			case dThreeAdressStmt::m_storeBase:
+//			case dThreeAdressStmt::m_loadBase:
 //			{
 //				point.m_generateStmt = true;
 //				dAssert (m_variableDefinitions.Find(stmt.m_arg2.m_label));
@@ -1018,27 +1023,24 @@ dAssert (0);
 //				}
 //				break;
 //			}
-
-
-			case dThreeAdressStmt::m_param:
-			{
-				point.m_generateStmt = true;
-				dAssert (m_variableDefinitions.Find(stmt.m_arg0.m_label));
-
-				dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const retRegisterNode = m_variableDefinitions.Find(stmt.m_arg0.m_label);
-				dList<dCIL::dListNode*>& defsList = retRegisterNode->GetInfo();
-				for (dList<dCIL::dListNode*>::dListNode* defNode = defsList.GetFirst(); defNode; defNode = defNode->GetNext()) {
-					dCIL::dListNode* const killStement = defNode->GetInfo();
-					if (killStement != point.m_statement) {
-						point.m_killStmtSet.Insert(killStement);
-					}
-				}
-				break;
-			}
+//			case dThreeAdressStmt::m_param:
+//			{
+//				point.m_generateStmt = true;
+//				dAssert (m_variableDefinitions.Find(stmt.m_arg0.m_label));
+//				dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const retRegisterNode = m_variableDefinitions.Find(stmt.m_arg0.m_label);
+//				dList<dCIL::dListNode*>& defsList = retRegisterNode->GetInfo();
+//				for (dList<dCIL::dListNode*>::dListNode* defNode = defsList.GetFirst(); defNode; defNode = defNode->GetNext()) {
+//					dCIL::dListNode* const killStement = defNode->GetInfo();
+//					if (killStement != point.m_statement) {
+//						point.m_killStmtSet.Insert(killStement);
+//					}
+//				}
+//				break;
+//			}
 
 			case dThreeAdressStmt::m_call:
 			{
-				if (stmt.m_arg0.m_type != dThreeAdressStmt::m_void) {
+				if (stmt.m_arg0.GetType().m_isPointer || (stmt.m_arg0.GetType().m_intrinsicType != dThreeAdressStmt::m_void)) {
 					point.m_generateStmt = true;
 					dAssert (m_variableDefinitions.Find(stmt.m_arg0.m_label));
 
@@ -1057,15 +1059,15 @@ dAssert (0);
 
 			//case dThreeAdressStmt::m_enter:
 			//case dThreeAdressStmt::m_leave:
-			
-			case dThreeAdressStmt::m_load:
-			case dThreeAdressStmt::m_loadBase:
+			//case dThreeAdressStmt::m_load:
 			case dThreeAdressStmt::m_store:
+			case dThreeAdressStmt::m_storeBase:
 			//case dThreeAdressStmt::m_push:
 			//case dThreeAdressStmt::m_pop:
 			case dThreeAdressStmt::m_function:
 			case dThreeAdressStmt::m_nop:
 			case dThreeAdressStmt::m_if:
+			case dThreeAdressStmt::m_ifnot:
 			case dThreeAdressStmt::m_ret:
 			case dThreeAdressStmt::m_goto:
 			case dThreeAdressStmt::m_label:
@@ -1076,7 +1078,6 @@ dAssert (0);
 				dAssert (0);
 		}
 	}
-*/
 }
 
 
@@ -1179,8 +1180,6 @@ void dDataFlowGraph::UpdateReachingDefinitions()
 
 void dDataFlowGraph::BuildGeneratedAndUsedVariableSets()
 {
-dAssert (0);
-/*
 	dTree<dDataFlowPoint, dCIL::dListNode*>::Iterator iter (m_dataFlowGraph);
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowPoint& point = iter.GetNode()->GetInfo();
@@ -1189,10 +1188,10 @@ dAssert (0);
 
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowPoint& point = iter.GetNode()->GetInfo();
-		point.m_generatedVariable.Empty();
 		dThreeAdressStmt& stmt = point.m_statement->GetInfo();	
+//DTRACE_INTRUCTION (&stmt);		
 
-		//DTRACE_INTRUCTION (&stmt);		
+		point.m_generatedVariable.Empty();
 		switch (stmt.m_instruction)
 		{
 			case dThreeAdressStmt::m_argument:
@@ -1205,19 +1204,21 @@ dAssert (0);
 			case dThreeAdressStmt::m_loadBase:
 			{
 				point.m_generatedVariable = stmt.m_arg0.m_label;
-				point.m_usedVariableSet.Insert(stmt.m_arg2.m_label);
+				point.m_usedVariableSet.Insert(stmt.m_arg1.m_label);
 				break;
 			}
 
 			case dThreeAdressStmt::m_storeBase:
 			{
+				//point.m_generatedVariable = stmt.m_arg0.m_label;
 				point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
-				point.m_usedVariableSet.Insert(stmt.m_arg2.m_label);
+				point.m_usedVariableSet.Insert(stmt.m_arg1.m_label);
 				break;
 			}
 
 			case dThreeAdressStmt::m_load:
 			{
+				dAssert (0);
 				point.m_generatedVariable = stmt.m_arg0.m_label;
 				point.m_usedVariableSet.Insert(stmt.m_arg1.m_label);
 				point.m_usedVariableSet.Insert(stmt.m_arg2.m_label);
@@ -1226,6 +1227,7 @@ dAssert (0);
 
 			case dThreeAdressStmt::m_store:
 			{
+				dAssert (0);
 				point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
 				point.m_usedVariableSet.Insert(stmt.m_arg1.m_label);
 				point.m_usedVariableSet.Insert(stmt.m_arg2.m_label);
@@ -1235,7 +1237,7 @@ dAssert (0);
 			case dThreeAdressStmt::m_assigment:
 			{
 				point.m_generatedVariable = stmt.m_arg0.m_label;
-				switch (stmt.m_arg1.m_type)
+				switch (stmt.m_arg1.GetType().m_intrinsicType)
 				{
 					case dThreeAdressStmt::m_int:
 					//case dThreeAdressStmt::m_classPointer:
@@ -1252,7 +1254,7 @@ dAssert (0);
 				}
 
 				if (stmt.m_operator != dThreeAdressStmt::m_nothing) {
-					switch (stmt.m_arg2.m_type)
+					switch (stmt.m_arg2.GetType().m_intrinsicType)
 					{
 						case dThreeAdressStmt::m_int:
 						//case dThreeAdressStmt::m_classPointer:
@@ -1287,7 +1289,7 @@ dAssert (0);
 
 			case dThreeAdressStmt::m_call:
 			{
-				if (stmt.m_arg0.m_type != dThreeAdressStmt::m_void) {
+				if (stmt.m_arg0.GetType().m_intrinsicType != dThreeAdressStmt::m_void) {
 					point.m_generatedVariable = stmt.m_arg0.m_label;
 				}
 				break;
@@ -1295,7 +1297,7 @@ dAssert (0);
 
 			case dThreeAdressStmt::m_ret:
 			{
-				switch (stmt.m_arg0.m_type)
+				switch (stmt.m_arg0.GetType().m_intrinsicType)
 				{
 					case dThreeAdressStmt::m_int:
 						//point.m_usedVariableSet.Insert(m_returnVariableName);
@@ -1319,8 +1321,9 @@ dAssert (0);
 			}
 
 			case dThreeAdressStmt::m_if:
+			case dThreeAdressStmt::m_ifnot:
 			{
-				if (stmt.m_arg0.m_type == dThreeAdressStmt::m_int) {
+				if (stmt.m_arg0.GetType().m_intrinsicType == dThreeAdressStmt::m_int) {
 					point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
 				} else {
 					dAssert (0);
@@ -1348,7 +1351,6 @@ dAssert (0);
 				dAssert (0);
 		}
 	}
-*/
 }
 
 
@@ -1425,9 +1427,6 @@ void dDataFlowGraph::FindNodesInPathway(dCIL::dListNode* const source, dCIL::dLi
 
 bool dDataFlowGraph::DoStatementAreachesStatementB(dCIL::dListNode* const stmtNodeB, dCIL::dListNode* const stmtNodeA) const
 {
-dAssert (0);
-return NULL;
-/*
 	bool canApplyPropagation = false;	
 	dDataFlowPoint& info = m_dataFlowGraph.Find(stmtNodeB)->GetInfo();
 	dDataFlowPoint::dVariableSet<dCIL::dListNode*>& reachingInputs = info.m_reachStmtInputSet;
@@ -1451,7 +1450,7 @@ return NULL;
 		}
 
         bool isSpecialStoreType = (constStmt.m_instruction == dThreeAdressStmt::m_storeBase);
-		if (isSpecialStoreType || (constStmt.m_arg1.m_type == dThreeAdressStmt::m_int) || (constStmt.m_arg1.m_type == dThreeAdressStmt::m_float)) {
+		if (isSpecialStoreType || (constStmt.m_arg1.GetType().m_intrinsicType == dThreeAdressStmt::m_int) || (constStmt.m_arg1.GetType().m_intrinsicType == dThreeAdressStmt::m_float)) {
 			dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const definedStatements = isSpecialStoreType ? m_variableDefinitions.Find(constStmt.m_arg2.m_label) : m_variableDefinitions.Find(constStmt.m_arg1.m_label);
 			if (definedStatements) {
 				dTree<int, dCIL::dListNode*> path;
@@ -1466,7 +1465,7 @@ return NULL;
 					}
 				}
 				
-				if ((constStmt.m_instruction == dThreeAdressStmt::m_load) || ((constStmt.m_operator != dThreeAdressStmt::m_nothing) && ((constStmt.m_arg2.m_type == dThreeAdressStmt::m_int) || (constStmt.m_arg2.m_type == dThreeAdressStmt::m_float)))) {
+				if ((constStmt.m_instruction == dThreeAdressStmt::m_load) || ((constStmt.m_operator != dThreeAdressStmt::m_nothing) && ((constStmt.m_arg2.GetType().m_intrinsicType == dThreeAdressStmt::m_int) || (constStmt.m_arg2.GetType().m_intrinsicType == dThreeAdressStmt::m_float)))) {
 					dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const definedStatements = m_variableDefinitions.Find(constStmt.m_arg2.m_label);
 					if (definedStatements) {
 						dList<dCIL::dListNode*>& statementList = definedStatements->GetInfo();
@@ -1483,15 +1482,12 @@ return NULL;
 	}
 
 	return canApplyPropagation;
-*/
+
 }
 
 
 bool dDataFlowGraph::ApplyCopyPropagation()
 {
-dAssert (0);
-return NULL;
-/*
 	bool ret = false;
 	for (dCIL::dListNode* stmtNode = m_basicBlocks.m_begin; stmtNode != m_basicBlocks.m_end; stmtNode = stmtNode->GetNext()) {
 		dThreeAdressStmt& stmt = stmtNode->GetInfo();
@@ -1502,7 +1498,7 @@ return NULL;
 			case dThreeAdressStmt::m_assigment:
 			{
 				//if ((stmt.m_operator == dThreeAdressStmt::m_nothing) && (stmt.m_arg1.m_type == dThreeAdressStmt::m_intVar)) {
-				if ((stmt.m_operator == dThreeAdressStmt::m_nothing) && (stmt.m_arg1.m_type != dThreeAdressStmt::m_constInt) && (stmt.m_arg1.m_type != dThreeAdressStmt::m_constFloat)){
+				if ((stmt.m_operator == dThreeAdressStmt::m_nothing) && (stmt.m_arg1.GetType().m_intrinsicType != dThreeAdressStmt::m_constInt) && (stmt.m_arg1.GetType().m_intrinsicType != dThreeAdressStmt::m_constFloat)){
 					for (dCIL::dListNode* stmtNode1 = stmtNode->GetNext(); stmtNode1; stmtNode1 = stmtNode1->GetNext()) {
 						dThreeAdressStmt& stmt1 = stmtNode1->GetInfo();
 //DTRACE_INTRUCTION (&stmt1);		
@@ -1702,14 +1698,10 @@ return NULL;
 	}
 
 	return ret;
-*/
 }
 
 bool dDataFlowGraph::ApplyInstructionSematicOrdering()
 {
-dAssert (0);
-return NULL;
-/*
 	bool ret = false;
 	for (dCIL::dListNode* stmtNode = m_function->GetNext(); stmtNode && (stmtNode->GetInfo().m_instruction != dThreeAdressStmt::m_function); stmtNode = stmtNode->GetNext()) {
 		dThreeAdressStmt& stmt = stmtNode->GetInfo();
@@ -1720,12 +1712,12 @@ return NULL;
 			case dThreeAdressStmt::m_assigment:
 			{
 				if (stmt.m_operator != dThreeAdressStmt::m_nothing) {
-					switch (stmt.m_arg1.m_type)
+					switch (stmt.m_arg1.GetType().m_intrinsicType)
 					{
 						case dThreeAdressStmt::m_constInt:
 						{
 							if (m_cil->m_commutativeOperator[stmt.m_operator]) {
-								dAssert (stmt.m_arg2.m_type != dThreeAdressStmt::m_constInt);
+								dAssert (stmt.m_arg2.GetType().m_intrinsicType != dThreeAdressStmt::m_constInt);
 								dSwap (stmt.m_arg1, stmt.m_arg2);
 							} else {
 								dCIL::dListNode* const node = m_cil->NewStatement();
@@ -1750,26 +1742,11 @@ return NULL;
 				}
 				break;
 			}
-
-			case dThreeAdressStmt::m_if:
-			{
-//				dAssert (0);
-				//if ((stmt.m_arg0.m_type == dThreeAdressStmt::m_intConst) && (stmt.m_arg1.m_type == dThreeAdressStmt::m_intVar)) {
-					//stmt.m_operator = m_cil->m_operatorComplement[stmt.m_operator];
-					//dThreeAdressStmt::dArg arg (stmt.m_arg0);
-					//stmt.m_arg0 = stmt.m_arg1;
-					//stmt.m_arg1 = arg;
-					//ret = true;
-				//}
-				
-				break;
-			}
 		}
 	}
 
 //m_cil->Trace();
 	return ret;
-*/
 }
 
 
@@ -1778,12 +1755,12 @@ bool dDataFlowGraph::ApplyRemoveDeadCode()
 	CalculateLiveInputLiveOutput ();
 
 	bool ret = false;
-	dCIL::dListNode* nextStmtNode;
-	for (dCIL::dListNode* stmtNode = m_basicBlocks.m_begin; stmtNode != m_basicBlocks.m_end; stmtNode = nextStmtNode) {
+//	dCIL::dListNode* nextStmtNode;
+	for (dCIL::dListNode* stmtNode = m_basicBlocks.m_begin; stmtNode != m_basicBlocks.m_end; stmtNode = stmtNode->GetNext()) {
 		dThreeAdressStmt& stmt = stmtNode->GetInfo();
 
-//		DTRACE_INTRUCTION (&stmt);		
-		nextStmtNode = stmtNode->GetNext();
+//DTRACE_INTRUCTION (&stmt);		
+//		nextStmtNode = stmtNode->GetNext();
 		switch (stmt.m_instruction) 
 		{
 			case dThreeAdressStmt::m_assigment:
@@ -1801,7 +1778,7 @@ bool dDataFlowGraph::ApplyRemoveDeadCode()
 				}
 				break;
 			}
-
+/*
 			case dThreeAdressStmt::m_load:
 			case dThreeAdressStmt::m_loadBase:
 			{
@@ -1815,17 +1792,24 @@ bool dDataFlowGraph::ApplyRemoveDeadCode()
 				break;
 			}
 
+			case dThreeAdressStmt::m_store:
+			{
+				dAssert (0);
+				break;
+			}
+
 			case dThreeAdressStmt::m_storeBase:
 			{
 				dDataFlowPoint& info = m_dataFlowGraph.Find(stmtNode)->GetInfo();
 				dDataFlowPoint::dVariableSet<dString>& liveOut = info.m_liveOutputSet;
-				if (!liveOut.Find (stmt.m_arg2.m_label)) {
+				if (!liveOut.Find (stmt.m_arg0.m_label)) {
 					ret = true;
 					stmt.m_instruction = dThreeAdressStmt::m_nop;
 					UpdateLiveInputLiveOutput();
 				}
 				break;
 			}
+*/
 		}
 	}
 	return ret;

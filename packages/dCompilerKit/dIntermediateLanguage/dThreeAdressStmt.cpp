@@ -107,10 +107,6 @@ int dThreeAdressStmt::dArgType::GetSizeInByte() const
 	return 0;
 }
 
-const dThreeAdressStmt::dArgType& dThreeAdressStmt::dArg::GetType () const
-{
-	return *this;
-}
 
 void dThreeAdressStmt::dArg::SetType (const dArgType& type)
 {
@@ -337,6 +333,17 @@ void dThreeAdressStmt::Trace (char* const textOut) const
 			}
 			break;
 		}
+
+		case m_ifnot:
+		{
+			if (m_arg2.m_label != "") {
+				sprintf (textOut, "\tifnot (%s %s) goto %s else goto %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), m_arg2.m_label.GetStr());
+			} else {
+				sprintf (textOut, "\tifnot (%s %s) goto %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
+			}
+			break;
+		}
+
 
 		case m_goto:
 		{

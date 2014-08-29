@@ -77,7 +77,11 @@ class dThreeAdressStmt
 		{
 		}
 
-		const dArgType& GetType () const;
+		const dArgType& GetType () const
+		{
+			return *this;
+		}
+
 		void SetType (const dArgType& type);
 		void SetType (dIntrisicType intrinsicType, bool pointer);
 
@@ -113,6 +117,7 @@ class dThreeAdressStmt
 		m_assigment,
 
 		m_if, 
+		m_ifnot, 
 		m_goto,
 		m_label,
 
