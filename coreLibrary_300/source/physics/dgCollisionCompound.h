@@ -202,9 +202,11 @@ class dgCollisionCompound: public dgCollision
 
 	dgFloat32 ConvexRayCastSingleConvex (const dgCollisionInstance* const convexInstance, const dgMatrix& instanceMatrix, const dgVector& instanceVeloc, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const referenceBody, const dgCollisionInstance* const referenceInstance, void* const userData, dgInt32 threadId) const; 
 
-	dgInt32 ClosestDistance (dgBody* const bodyA, dgTriplex& contactA, dgBody* const bodyB, dgTriplex& contactB, dgTriplex& normalAB) const;
-	//dgInt32 ClosestDistanceToConvex (dgBody* const bodyA, dgTriplex& contactA, dgBody* const ConvetvBodyB, dgTriplex& contactB, dgTriplex& normalAB) const;
-	//dgInt32 ClosestDistanceToCompound (dgBody* const compoundBodyA, dgTriplex& contactA, dgBody* const compoundBodyB, dgTriplex& contactB, dgTriplex& normalAB) const;
+	//dgInt32 ClosestDistance (dgBody* const bodyA, dgTriplex& contactA, dgBody* const bodyB, dgTriplex& contactB, dgTriplex& normalAB) const;
+	dgInt32 ClosestDistanceToConvex (dgBody* const bodyA, dgTriplex& contactA, dgBody* const ConvetvBodyB, dgTriplex& contactB, dgTriplex& normalAB) const;
+	dgInt32 ClosestDistance (dgCollisionParamProxy& proxy) const;
+	dgInt32 ClosestDistanceToConvex (dgCollisionParamProxy& proxy) const;
+	dgInt32 ClosestDistanceToCompound (dgBody* const compoundBodyA, dgTriplex& contactA, dgBody* const compoundBodyB, dgTriplex& contactB, dgTriplex& normalAB) const;
 
 #ifdef _DEBUG
 	dgVector InternalSupportVertex (const dgVector& dir) const;

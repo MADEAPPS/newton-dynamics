@@ -1504,80 +1504,90 @@ void dgCollisionCompound::CalculateCollisionTreeArea(dgNodePairs& pairOut, const
 }
 
 
-dgInt32 dgCollisionCompound::ClosestDistance (dgBody* const compoundBody, dgTriplex& contactA, dgBody* const bodyB, dgTriplex& contactB, dgTriplex& normalAB) const
+//dgInt32 dgCollisionCompound::ClosestDistance (dgBody* const compoundBody, dgTriplex& contactA, dgBody* const bodyB, dgTriplex& contactB, dgTriplex& normalAB) const
+dgInt32 dgCollisionCompound::ClosestDistance (dgCollisionParamProxy& proxy) const
 {
-	dgInt32 count = 0;
-	dgAssert(0);
-/*
+	int count = 0;
 	if (m_root) {
-		if (bodyB->m_collision->IsType (dgCollision::dgCollisionConvexShape_RTTI)) {
-			count = ClosestDitanceToConvex (compoundBody, contactA, bodyB, contactB, normalAB);
-		} else if (bodyB->m_collision->IsType (dgCollision::dgCollisionBVH_RTTI)) {
+		//if (bodyB->m_collision->IsType (dgCollision::dgCollisionConvexShape_RTTI)) {
+		if (proxy.m_floatingCollision->IsType (dgCollision::dgCollisionConvexShape_RTTI)) {
+			count = ClosestDistanceToConvex (proxy);
+		} else if (proxy.m_floatingCollision->IsType (dgCollision::dgCollisionBVH_RTTI)) {
 			dgAssert(0);
 		} else {
 			dgAssert(0);
 //			return ClosestDitanceToCompound (compoundBody, contactA, bodyB, contactB, normalAB);
 		}
 	}
-*/
+
 	return count;
 }
 
 
-/*
-dgInt32 dgCollisionCompound::ClosestDitanceToConvex (dgBody* const compoundBody, dgTriplex& contactA, dgBody* const convexBodyB, dgTriplex& contactB, dgTriplex& normalAB) const
+
+//dgInt32 dgCollisionCompound::ClosestDistanceToConvex (dgBody* const bodyA, dgTriplex& contactA, dgBody* const ConvetvBodyB, dgTriplex& contactB, dgTriplex& normalAB) const
+dgInt32 dgCollisionCompound::ClosestDistanceToConvex (dgCollisionParamProxy& proxy) const
 {
-	dgAssert (0);
-	return 0;
+//	dgVector p0;
+//	dgVector p1;
+//	dgContactPoint contacts[16];
+	dgInt32 retFlag = 0;
+//	dgCollisionParamProxy proxy(NULL, contacts, 0);
+//	dgCollisionParamProxy proxy (proxySrc.m_contactJoint, proxySrc.m_contacts, proxySrc.m_threadIndex, proxySrc.m_continueCollision, proxySrc.m_intersectionTestOnly);
+
+
+//	proxy.m_referenceBody = compoundBody;
+//	proxy.m_floatingBody = convexBodyB;
+//	proxy.m_floatingCollision = convexBodyB->m_collision;
+//	proxy.m_floatingMatrix = convexBodyB->m_collisionWorldMatrix ;
+
+//	proxy.m_timestep = dgFloat32 (0.0f);
+//	proxy.m_penetrationPadding = dgFloat32 (0.0f);
+//	proxy.m_continueCollision = 0;
+//	proxy.m_maxContacts = 16;
+//	proxy.m_contacts = &contacts[0];
+//	dgMatrix myMatrix (m_offset * compoundBody->m_matrix);
+//	dgMatrix matrix (convexBodyB->m_collisionWorldMatrix * myMatrix.Inverse());
+//	convexBodyB->m_collision->CalcAABB(matrix, p0, p1);
+
+	dgCollisionInstance* const compoundInstance = proxy.m_referenceCollision;
+	dgCollisionInstance* const otherInstance = proxy.m_floatingCollision;
+
+	const dgMatrix myMatrix = compoundInstance->GetGlobalMatrix();
+	dgMatrix matrix (otherInstance->GetGlobalMatrix() * myMatrix.Inverse());
 
 	dgVector p0;
 	dgVector p1;
-	dgContactPoint contact0;
-	dgContactPoint contact1;
-	dgContactPoint contacts[16];
-	dgCollisionParamProxy proxy(NULL, contacts, 0);
-	proxy.m_referenceBody = compoundBody;
-	proxy.m_floatingBody = convexBodyB;
-	proxy.m_floatingCollision = convexBodyB->m_collision;
-	proxy.m_floatingMatrix = convexBodyB->m_collisionWorldMatrix ;
-
-	proxy.m_timestep = dgFloat32 (0.0f);
-	proxy.m_penetrationPadding = dgFloat32 (0.0f);
-//	proxy.m_unconditionalCast = 1;
-	proxy.m_continueCollision = 0;
-	proxy.m_maxContacts = 16;
-	proxy.m_contacts = &contacts[0];
-
-	dgMatrix myMatrix (m_offset * compoundBody->m_matrix);
-	dgMatrix matrix (convexBodyB->m_collisionWorldMatrix * myMatrix.Inverse());
-	convexBodyB->m_collision->CalcAABB(matrix, p0, p1);
+	otherInstance->CalcAABB(matrix, p0, p1);
 
 	dgUnsigned8 pool[64 * (sizeof (dgNodeBase*) + sizeof (dgFloat32))];
 	dgUpHeap<dgNodeBase*, dgFloat32> heap (pool, sizeof (pool));
-
-	dgInt32 retFlag = 1;
 	
 	dgNodeBase* node = m_root;
-	heap.Push(node, dgBoxDistanceToOrigin2(p0, p1, m_root->m_p0, m_root->m_p1));
+	dgVector boxP0 (p0 - m_root->m_p1);
+	dgVector boxP1 (p1 - m_root->m_p0);
+	heap.Push(node, dgBoxDistanceToOrigin2 (boxP0, boxP1));
 
+	dgContactPoint contact0;
+	dgContactPoint contact1;
 	dgFloat32 minDist2 = dgFloat32 (1.0e10f);
 	while (heap.GetCount() && (heap.Value() <= minDist2)) {
 		const dgNodeBase* const node = heap[0];
 		heap.Pop();
 		if (node->m_type == m_leaf) {
-			dgCollisionConvex* const collision = (dgCollisionConvex*) node->GetShape()->GetChildShape();
-			retFlag = 0;
-			proxy.m_referenceCollision = collision;
-			proxy.m_referenceMatrix = collision->m_offset * myMatrix;
+			dgCollisionInstance* const subShape = node->GetShape();
+			dgCollisionInstance childInstance (*subShape, subShape->GetChildShape());
+
+			childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * myMatrix;
+			proxy.m_referenceCollision = &childInstance; 
 			dgInt32 flag = m_world->ClosestPoint (proxy);
 			if (flag) {
 				retFlag = 1;
-				dgVector err (contacts[0].m_point - contacts[1].m_point);
-				dgFloat32 dist2 = err % err;
+				dgFloat32 dist2 = proxy.m_contactJoint->m_closestDistance * proxy.m_contactJoint->m_closestDistance;
 				if (dist2 < minDist2) {
 					minDist2 = dist2;
-					contact0 = contacts[0];
-					contact1 = contacts[1];
+					contact0 = proxy.m_contacts[0];
+					contact1 = proxy.m_contacts[1];
 				}
 			} else {
 				dgAssert (0);
@@ -1587,32 +1597,30 @@ dgInt32 dgCollisionCompound::ClosestDitanceToConvex (dgBody* const compoundBody,
 		} else {
 			dgNodeBase* left = node->m_left;
 			dgNodeBase* right = node->m_right;
-			heap.Push(left, dgBoxDistanceToOrigin2(p0, p1, left->m_p0, left->m_p1));
-			heap.Push(right, dgBoxDistanceToOrigin2(p0, p1, right->m_p0, right->m_p1));
+
+			dgVector leftBoxP0 (p0 - left->m_p1);
+			dgVector leftBoxP1 (p1 - left->m_p0);
+			heap.Push(left, dgBoxDistanceToOrigin2 (leftBoxP0, leftBoxP1));
+
+			dgVector rightBoxP0 (p0 - right->m_p1);
+			dgVector rightBoxP1 (p1 - right->m_p0);
+			heap.Push(right, dgBoxDistanceToOrigin2 (rightBoxP0, rightBoxP1));
 		}
 	}
 
 	if (retFlag) {
-		contactA.m_x = contact0.m_point.m_x;
-		contactA.m_y = contact0.m_point.m_y;
-		contactA.m_z = contact0.m_point.m_z;
-
-		contactB.m_x = contact1.m_point.m_x;
-		contactB.m_y = contact1.m_point.m_y;
-		contactB.m_z = contact1.m_point.m_z;
-
-		normalAB.m_x = contact0.m_normal.m_x;
-		normalAB.m_y = contact0.m_normal.m_y;
-		normalAB.m_z = contact0.m_normal.m_z;
+		proxy.m_contacts[0] = contact0;
+		proxy.m_contacts[1] = contact1;
+		proxy.m_contactJoint->m_closestDistance = dgSqrt (minDist2);
 	}
 	return retFlag;
 }
 
-dgInt32 dgCollisionCompound::ClosestDitanceToCompound (dgBody* const compoundBodyA, dgTriplex& contactA, dgBody* const compoundBodyB, dgTriplex& contactB, dgTriplex& normalAB) const
+dgInt32 dgCollisionCompound::ClosestDistanceToCompound (dgBody* const compoundBodyA, dgTriplex& contactA, dgBody* const compoundBodyB, dgTriplex& contactB, dgTriplex& normalAB) const
 {
 	dgAssert (0);
 	return 0;
-
+/*
 	dgCollisionCompound* const compoundCollisionB = (dgCollisionCompound *) compoundBodyB->m_collision;
 
 	dgVector p0;
@@ -1757,8 +1765,9 @@ dgInt32 dgCollisionCompound::ClosestDitanceToCompound (dgBody* const compoundBod
 		normalAB.m_z = contact0.m_normal.m_z;
 	}
 	return retFlag;
-}
 */
+}
+
 
 
 

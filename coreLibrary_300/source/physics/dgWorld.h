@@ -390,7 +390,8 @@ class dgWorld
 
 	dgFloat32 CalculateTimeToImpact (dgContact* const contactJoint, dgFloat32 timestep, dgInt32 threadIndex, dgVector& p, dgVector& q, dgVector& normal) const;
 	dgInt32 ClosestPoint (dgCollisionParamProxy& proxy) const;
-	dgInt32 ClosestCompoundPoint (dgBody* const compoundConvexA, dgBody* const collisionB, dgTriplex& contactA, dgTriplex& contactB, dgTriplex& normalAB, dgInt32 threadIndex) const;
+	//dgInt32 ClosestCompoundPoint (dgBody* const compoundConvexA, dgBody* const collisionB, dgTriplex& contactA, dgTriplex& contactB, dgTriplex& normalAB, dgInt32 threadIndex) const;
+	dgInt32 ClosestCompoundPoint (dgCollisionParamProxy& proxy) const;
 
 	bool AreBodyConnectedByJoints (dgBody* const origin, dgBody* const target);
 	

@@ -90,6 +90,7 @@ class dgCollisionConvex::dgPerimenterEdge
 	const dgVector* m_vertex;
 	dgPerimenterEdge* m_next;
 	dgPerimenterEdge* m_prev;
+	dgUnsigned32 m_alived;
 } DG_GCC_VECTOR_ALIGMENT;
 
 
@@ -525,7 +526,7 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 			dgSwap (tetraDiff[i2], tetraDiff[i3]);
 			dgSwap (shapeFaceIndex[i2], shapeFaceIndex[i3]);
 		}
-		if (volume < dgFloat32 (1.0e-6f)) {
+		if (volume < dgFloat32 (1.0e-8f)) {
 			dgTrace (("very import to finsh this\n"));
 			//		dgAssert (0);
 		}
@@ -2167,6 +2168,52 @@ dgCollisionConvex::dgPerimenterEdge* dgCollisionConvex::ReduceContacts (dgPerime
 	dgInt32 buffer [DG_MAX_EDGE_COUNT];
 	dgUpHeap<dgPerimenterEdge*, dgFloat32> heap (buffer, sizeof (buffer));	
 
+	dgPerimenterEdge* ptr = poly; 
+	do {
+		dgVector error (*ptr->m_next->m_vertex - *ptr->m_vertex);
+		dgAssert (error.m_w == 0.0f);
+		dgFloat32 dist2 = error.DotProduct4(error).GetScalar();
+		ptr->m_alived = 1;
+		heap.Push(ptr, dist2);
+		ptr = ptr->m_next;
+	} while (ptr != poly);
+
+	while (heap.GetCount() > maxCount) {
+		dgPerimenterEdge* edge = heap[0];
+		heap.Pop();
+		if (edge->m_alived) {
+			edge->m_next->m_alived = 0;
+			edge->m_next = edge->m_next->m_next; 
+
+			dgVector error (*edge->m_next->m_vertex - *edge->m_vertex);
+			dgAssert (error.m_w == 0.0f);
+			dgFloat32 dist2 = error.DotProduct4(error).GetScalar();
+			heap.Push(edge, dist2);
+		}
+	}
+
+	while ((heap.GetCount() > 1) && (heap.Value(0) < DG_MINK_VERTEX_ERR2)) {
+		dgPerimenterEdge* edge = heap[0];
+		heap.Pop();
+		if (edge->m_alived) {
+			edge->m_next->m_alived = 0;
+			edge->m_next = edge->m_next->m_next; 
+
+			dgVector error (*edge->m_next->m_vertex - *edge->m_vertex);
+			dgAssert (error.m_w == 0.0f);
+			dgFloat32 dist2 = error.DotProduct4(error).GetScalar();
+			heap.Push(edge, dist2);
+		}
+	}
+
+	poly = heap[0]; 
+	heap.Pop();
+	while (!poly->m_alived) {
+		dgAssert (heap.GetCount());
+		poly = heap[0];
+		heap.Pop();
+	}
+/*
 	dgInt32 restart = 1;
 	while (restart) {
 		restart = 0;
@@ -2220,7 +2267,7 @@ dgCollisionConvex::dgPerimenterEdge* dgCollisionConvex::ReduceContacts (dgPerime
 		}
 		poly = heap[0];
 	}
-
+*/
 	return poly;
 }
 

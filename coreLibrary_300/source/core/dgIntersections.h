@@ -183,7 +183,6 @@ DG_INLINE dgInt32 dgOverlapTest (const dgVector& p0, const dgVector& p1, const d
 }
 
 
-
 DG_INLINE dgInt32 dgBoxInclusionTest (const dgVector& p0, const dgVector& p1, const dgVector& q0, const dgVector& q1)
 {
 //	dgInt32 test = (p0.m_x >= q0.m_x) && (p0.m_y >= q0.m_y) && (p0.m_z >= q0.m_z) && (p1.m_x <= q1.m_x) && (p1.m_y <= q1.m_y) && (p1.m_z <= q1.m_z);
@@ -228,14 +227,19 @@ DG_INLINE void dgMovingAABB (dgVector& p0, dgVector& p1, const dgVector& veloc, 
 DG_INLINE dgFloat32 BoxPenetration (const dgVector& minBox, const dgVector& maxBox)
 {
 	dgVector mask ((minBox.CompProduct4(maxBox)) < dgVector (dgFloat32 (0.0f)));
-//	mask = mask & mask.ShiftTripleRight();
-//	mask = mask & mask.ShiftTripleRight();
 	dgVector dist (maxBox.GetMin (minBox.Abs()) & mask);
 	dist = dist.GetMin(dist.ShiftTripleRight());
 	dist = dist.GetMin(dist.ShiftTripleRight());
-	//return dist.m_x;
 	return dist.GetScalar();
 }
+
+DG_INLINE dgFloat32 dgBoxDistanceToOrigin2 (const dgVector& minBox, const dgVector& maxBox)
+{
+	dgVector mask ((minBox.CompProduct4(maxBox)) > dgVector (dgFloat32 (0.0f)));
+	dgVector dist (maxBox.Abs().GetMin (minBox.Abs()) & mask);
+	return dist.DotProduct4(dist).GetScalar();
+}
+
 
 DG_MSC_VECTOR_ALIGMENT 
 class dgFastAABBInfo: public dgObb
