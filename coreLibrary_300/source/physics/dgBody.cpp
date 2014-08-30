@@ -334,10 +334,12 @@ dgVector dgBody::CalculateInverseDynamicForce (const dgVector& desiredVeloc, dgF
 
 dgConstraint* dgBody::GetFirstJoint() const
 {
-	for (dgBodyMasterListRow::dgListNode* node = m_masterNode->GetInfo().GetFirst(); node; node = node->GetNext()) {
-		dgConstraint* const joint = node->GetInfo().m_joint;
-		if (joint->GetId() >= dgConstraint::m_unknownConstraint) {
-			return joint;
+	if (m_masterNode) {
+		for (dgBodyMasterListRow::dgListNode* node = m_masterNode->GetInfo().GetFirst(); node; node = node->GetNext()) {
+			dgConstraint* const joint = node->GetInfo().m_joint;
+			if (joint->GetId() >= dgConstraint::m_unknownConstraint) {
+				return joint;
+			}
 		}
 	}
 	return NULL;
@@ -365,11 +367,13 @@ dgConstraint* dgBody::GetNextJoint(dgConstraint* const joint) const
 
 dgConstraint* dgBody::GetFirstContact() const
 {
-	for (dgBodyMasterListRow::dgListNode* node = m_masterNode->GetInfo().GetFirst(); node; node = node->GetNext()) {
-		dgConstraint* const joint = node->GetInfo().m_joint;
-		//if ((joint->GetId() == dgConstraint::m_contactConstraint) && (joint->GetMaxDOF() != 0)) {
-		if (joint->GetId() == dgConstraint::m_contactConstraint) {
-			return joint;
+	if (m_masterNode) {
+		for (dgBodyMasterListRow::dgListNode* node = m_masterNode->GetInfo().GetFirst(); node; node = node->GetNext()) {
+			dgConstraint* const joint = node->GetInfo().m_joint;
+			//if ((joint->GetId() == dgConstraint::m_contactConstraint) && (joint->GetMaxDOF() != 0)) {
+			if (joint->GetId() == dgConstraint::m_contactConstraint) {
+				return joint;
+			}
 		}
 	}
 	return NULL;
@@ -465,7 +469,7 @@ void dgBody::SetMassMatrix(dgFloat32 mass, dgFloat32 Ixx, dgFloat32 Iyy, dgFloat
 		mass = DG_INFINITE_MASS * 2.0f;
 	}
 
-	dgAssert (m_masterNode);
+	//dgAssert (m_masterNode);
 	if (mass >= DG_INFINITE_MASS) {
 		m_mass.m_x = DG_INFINITE_MASS;
 		m_mass.m_y = DG_INFINITE_MASS;
@@ -476,9 +480,11 @@ void dgBody::SetMassMatrix(dgFloat32 mass, dgFloat32 Ixx, dgFloat32 Iyy, dgFloat
 		m_invMass.m_z = dgFloat32 (0.0f);
 		m_invMass.m_w = dgFloat32 (0.0f);
 
-		dgBodyMasterList& masterList (*m_world);
-		if (masterList.GetFirst() != m_masterNode) {
-			masterList.InsertAfter (masterList.GetFirst(), m_masterNode);
+		if (m_masterNode) {
+			dgBodyMasterList& masterList (*m_world);
+			if (masterList.GetFirst() != m_masterNode) {
+				masterList.InsertAfter (masterList.GetFirst(), m_masterNode);
+			}
 		}
 		SetAparentMassMatrix (m_mass);
 
@@ -505,9 +511,10 @@ void dgBody::SetMassMatrix(dgFloat32 mass, dgFloat32 Ixx, dgFloat32 Iyy, dgFloat
 		m_invMass.m_z = dgFloat32 (1.0f) / Izz1;
 		m_invMass.m_w = dgFloat32 (1.0f) / mass;
 
-		dgBodyMasterList& masterList (*m_world);
-		masterList.RotateToEnd (m_masterNode);
-
+		if (m_masterNode) {
+			dgBodyMasterList& masterList (*m_world);
+			masterList.RotateToEnd (m_masterNode);
+		}
 		SetAparentMassMatrix (dgVector (Ixx, Iyy, Izz, mass));
 	}
 
