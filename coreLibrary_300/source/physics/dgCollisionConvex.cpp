@@ -2168,6 +2168,7 @@ dgCollisionConvex::dgPerimenterEdge* dgCollisionConvex::ReduceContacts (dgPerime
 	dgInt32 buffer [DG_MAX_EDGE_COUNT];
 	dgUpHeap<dgPerimenterEdge*, dgFloat32> heap (buffer, sizeof (buffer));	
 
+#if 0
 	dgPerimenterEdge* ptr = poly; 
 	do {
 		dgVector error (*ptr->m_next->m_vertex - *ptr->m_vertex);
@@ -2213,7 +2214,8 @@ dgCollisionConvex::dgPerimenterEdge* dgCollisionConvex::ReduceContacts (dgPerime
 		poly = heap[0];
 		heap.Pop();
 	}
-/*
+#else 
+
 	dgInt32 restart = 1;
 	while (restart) {
 		restart = 0;
@@ -2223,9 +2225,9 @@ dgCollisionConvex::dgPerimenterEdge* dgCollisionConvex::ReduceContacts (dgPerime
 			heap.Flush();
 			dgPerimenterEdge* ptr = poly; 
 			do {
-				dgFloat32 dist2;
 				dgVector error (*ptr->m_next->m_vertex - *ptr->m_vertex);
-				dist2 = error % error;
+				dgAssert (error.m_w == 0.0f);
+				dgFloat32 dist2 = error.DotProduct4(error).GetScalar();
 				if (dist2 < DG_MINK_VERTEX_ERR2) {
 					ptr0->m_next = ptr->m_next;
 					if (ptr == poly) {
@@ -2244,13 +2246,11 @@ dgCollisionConvex::dgPerimenterEdge* dgCollisionConvex::ReduceContacts (dgPerime
 		}
 	}
 
-
 	if (heap.GetCount()) {
 		if (maxCount > 8) {
 			maxCount = 8;
 		}
 		while (heap.GetCount() > maxCount) {
-			//dgFloat32 dist2;
 			dgPerimenterEdge* ptr = heap[0];
 			heap.Pop();
 			for (dgInt32 i = 0; i < heap.GetCount(); i ++) {
@@ -2267,8 +2267,10 @@ dgCollisionConvex::dgPerimenterEdge* dgCollisionConvex::ReduceContacts (dgPerime
 		}
 		poly = heap[0];
 	}
-*/
+#endif
+
 	return poly;
+
 }
 
 
