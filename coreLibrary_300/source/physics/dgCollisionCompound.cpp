@@ -1509,14 +1509,14 @@ dgInt32 dgCollisionCompound::ClosestDistance (dgCollisionParamProxy& proxy) cons
 {
 	int count = 0;
 	if (m_root) {
-		//if (bodyB->m_collision->IsType (dgCollision::dgCollisionConvexShape_RTTI)) {
 		if (proxy.m_floatingCollision->IsType (dgCollision::dgCollisionConvexShape_RTTI)) {
 			count = ClosestDistanceToConvex (proxy);
+		} else if (proxy.m_floatingCollision->IsType (dgCollision::dgCollisionCompound_RTTI)) {
+			count = ClosestDistanceToCompound (proxy);
 		} else if (proxy.m_floatingCollision->IsType (dgCollision::dgCollisionBVH_RTTI)) {
 			dgAssert(0);
 		} else {
 			dgAssert(0);
-//			return ClosestDitanceToCompound (compoundBody, contactA, bodyB, contactB, normalAB);
 		}
 	}
 
@@ -1524,31 +1524,9 @@ dgInt32 dgCollisionCompound::ClosestDistance (dgCollisionParamProxy& proxy) cons
 }
 
 
-
-//dgInt32 dgCollisionCompound::ClosestDistanceToConvex (dgBody* const bodyA, dgTriplex& contactA, dgBody* const ConvetvBodyB, dgTriplex& contactB, dgTriplex& normalAB) const
 dgInt32 dgCollisionCompound::ClosestDistanceToConvex (dgCollisionParamProxy& proxy) const
 {
-//	dgVector p0;
-//	dgVector p1;
-//	dgContactPoint contacts[16];
 	dgInt32 retFlag = 0;
-//	dgCollisionParamProxy proxy(NULL, contacts, 0);
-//	dgCollisionParamProxy proxy (proxySrc.m_contactJoint, proxySrc.m_contacts, proxySrc.m_threadIndex, proxySrc.m_continueCollision, proxySrc.m_intersectionTestOnly);
-
-
-//	proxy.m_referenceBody = compoundBody;
-//	proxy.m_floatingBody = convexBodyB;
-//	proxy.m_floatingCollision = convexBodyB->m_collision;
-//	proxy.m_floatingMatrix = convexBodyB->m_collisionWorldMatrix ;
-
-//	proxy.m_timestep = dgFloat32 (0.0f);
-//	proxy.m_penetrationPadding = dgFloat32 (0.0f);
-//	proxy.m_continueCollision = 0;
-//	proxy.m_maxContacts = 16;
-//	proxy.m_contacts = &contacts[0];
-//	dgMatrix myMatrix (m_offset * compoundBody->m_matrix);
-//	dgMatrix matrix (convexBodyB->m_collisionWorldMatrix * myMatrix.Inverse());
-//	convexBodyB->m_collision->CalcAABB(matrix, p0, p1);
 
 	dgCollisionInstance* const compoundInstance = proxy.m_referenceCollision;
 	dgCollisionInstance* const otherInstance = proxy.m_floatingCollision;
@@ -1616,158 +1594,91 @@ dgInt32 dgCollisionCompound::ClosestDistanceToConvex (dgCollisionParamProxy& pro
 	return retFlag;
 }
 
-dgInt32 dgCollisionCompound::ClosestDistanceToCompound (dgBody* const compoundBodyA, dgTriplex& contactA, dgBody* const compoundBodyB, dgTriplex& contactB, dgTriplex& normalAB) const
+DG_INLINE void dgCollisionCompound::PushNode (const dgMatrix& matrix, dgUpHeap<dgHeapNodePair, dgFloat32>& heap, dgNodeBase* const myNode, dgNodeBase* const otherNode) const
 {
-	dgAssert (0);
-	return 0;
-/*
-	dgCollisionCompound* const compoundCollisionB = (dgCollisionCompound *) compoundBodyB->m_collision;
-
 	dgVector p0;
 	dgVector p1;
-	dgContactPoint contact0;
-	dgContactPoint contact1;
-	dgContactPoint contacts[16];
-	dgCollisionParamProxy proxy(NULL, contacts, 0);
-	
-	proxy.m_referenceBody = compoundBodyA;
-	proxy.m_floatingBody = compoundBodyB;
-	proxy.m_timestep = dgFloat32 (0.0f);
-	proxy.m_penetrationPadding = dgFloat32 (0.0f);
-//	proxy.m_unconditionalCast = 1;
-	proxy.m_continueCollision = 0;
-	proxy.m_maxContacts = 16;
-	proxy.m_contacts = &contacts[0];
-	
+	dgHeapNodePair pair; 
+	pair.m_nodeA = myNode;
+	pair.m_nodeB = otherNode;
+	matrix.TransformBBox (otherNode->m_p0, otherNode->m_p1, p0, p1);			
+	dgVector boxP0 (p0 - myNode->m_p1);
+	dgVector boxP1 (p1 - myNode->m_p0);	
+	heap.Push(pair, dgBoxDistanceToOrigin2(boxP0, boxP1));
+}
+
+dgInt32 dgCollisionCompound::ClosestDistanceToCompound (dgCollisionParamProxy& proxy) const
+{
+	dgInt32 retFlag = 0;
 
 	dgUnsigned8 pool[128 * (sizeof (dgHeapNodePair) + sizeof (dgFloat32))];
 	dgUpHeap<dgHeapNodePair, dgFloat32> heap (pool, sizeof (pool));
 
-	dgMatrix matrixA (m_offset * compoundBodyA->m_matrix);
-	dgMatrix matrixB (compoundCollisionB->m_offset * compoundBodyB->m_matrix);
-	dgMatrix matrixBA (matrixB * matrixA.Inverse());
-	dgMatrix matrixAB (matrixBA.Inverse());
-	dgVector pA0;
-	dgVector pA1;
-	matrixBA.TransformBBox (compoundCollisionB->m_root->m_p0, compoundCollisionB->m_root->m_p1, pA0, pA1);
+	dgCollisionInstance* const compoundInstance = proxy.m_referenceCollision;
+	dgCollisionInstance* const otherCompoundInstance = proxy.m_floatingCollision;
 
-	dgInt32 retFlag = 1;
-	
-	dgHeapNodePair pair; 
-	pair.m_nodeA = m_root;
-	pair.m_nodeB = compoundCollisionB->m_root;
-	heap.Push(pair, dgBoxDistanceToOrigin2(pA0, pA1, m_root->m_p0, m_root->m_p1));
+	const dgMatrix& myMatrix = compoundInstance->GetGlobalMatrix();
+	const dgMatrix& otherMatrix = otherCompoundInstance->GetGlobalMatrix();
+	dgMatrix matrix (otherMatrix * myMatrix.Inverse());
 
+	const dgCollisionCompound* const otherShape = (dgCollisionCompound*)otherCompoundInstance->GetChildShape();
+	PushNode (matrix, heap, m_root, otherShape->m_root);
+
+	dgContactPoint contact0;
+	dgContactPoint contact1;
 	dgFloat32 minDist2 = dgFloat32 (1.0e10f);
 	while (heap.GetCount() && (heap.Value() <= minDist2)) {
+
 		dgHeapNodePair pair = heap[0];
 		heap.Pop();
 
 		if ((pair.m_nodeA->m_type == m_leaf) && (pair.m_nodeB->m_type == m_leaf)) {
-			retFlag = 0;
-			dgCollisionConvex* const collisionA = (dgCollisionConvex*) pair.m_nodeA->GetShape()->GetChildShape();
-			proxy.m_referenceCollision = collisionA;
-			proxy.m_referenceMatrix = collisionA->m_offset * matrixA;
+			dgCollisionInstance* const mySubShape = pair.m_nodeA->GetShape();
+			dgCollisionInstance myChildInstance (*mySubShape, mySubShape->GetChildShape());
+			myChildInstance.m_globalMatrix = myChildInstance.GetLocalMatrix() * myMatrix;
+			proxy.m_referenceCollision = &myChildInstance; 
 
-			dgCollisionConvex* const collisionB = (dgCollisionConvex*) pair.m_nodeB->GetShape()->GetChildShape();
-			proxy.m_floatingCollision = collisionB;
-			proxy.m_floatingMatrix = collisionB->m_offset * matrixB;
+			dgCollisionInstance* const otherSubShape = pair.m_nodeB->GetShape();
+			dgCollisionInstance otherChildInstance (*otherSubShape, otherSubShape->GetChildShape());
+			otherChildInstance.m_globalMatrix = otherChildInstance.GetLocalMatrix() * otherMatrix;
+			proxy.m_floatingCollision = &otherChildInstance; 
 
 			dgInt32 flag = m_world->ClosestPoint (proxy);
 			if (flag) {
 				retFlag = 1;
-				dgVector err (contacts[0].m_point - contacts[1].m_point);
-				dgFloat32 dist2 = err % err;
+				dgFloat32 dist2 = proxy.m_contactJoint->m_closestDistance * proxy.m_contactJoint->m_closestDistance;
 				if (dist2 < minDist2) {
 					minDist2 = dist2;
-					contact0 = contacts[0];
-					contact1 = contacts[1];
+					contact0 = proxy.m_contacts[0];
+					contact1 = proxy.m_contacts[1];
 				}
 			} else {
 				dgAssert (0);
 				break;
 			}
-
 		} else if (pair.m_nodeA->m_type == m_leaf) {
-			dgVector pB0;
-			dgVector pB1;
-
-			dgHeapNodePair pair1; 
-			pair1.m_nodeA = pair.m_nodeA;
-			pair1.m_nodeB = pair.m_nodeB->m_left;
-			matrixAB.TransformBBox (pair1.m_nodeA->m_p0, pair1.m_nodeA->m_p1, pB0, pB1);			
-			heap.Push(pair1, dgBoxDistanceToOrigin2(pB0, pB1, pair1.m_nodeB->m_p0, pair1.m_nodeB->m_p1));
-
-			dgHeapNodePair pair2; 
-			pair2.m_nodeA = pair.m_nodeA;
-			pair2.m_nodeB = pair.m_nodeB->m_right;
-			matrixAB.TransformBBox (pair2.m_nodeA->m_p0, pair2.m_nodeA->m_p1, pA0, pA1);			
-			heap.Push(pair2, dgBoxDistanceToOrigin2(pB0, pB1, pair2.m_nodeB->m_p0, pair2.m_nodeB->m_p1));
+			PushNode (matrix, heap, pair.m_nodeA, pair.m_nodeB->m_left);
+			PushNode (matrix, heap, pair.m_nodeA, pair.m_nodeB->m_right);
 
 		} else if (pair.m_nodeB->m_type == m_leaf) {
-			dgVector pA0;
-			dgVector pA1;
-
-			dgHeapNodePair pair1; 
-			pair1.m_nodeA = pair.m_nodeA->m_left;
-			pair1.m_nodeB = pair.m_nodeB;
-			matrixBA.TransformBBox (pair1.m_nodeB->m_p0, pair1.m_nodeB->m_p1, pA0, pA1);			
-			heap.Push(pair1, dgBoxDistanceToOrigin2(pA0, pA1, pair1.m_nodeA->m_p0, pair1.m_nodeA->m_p1));
-
-			dgHeapNodePair pair2; 
-			pair2.m_nodeA = pair.m_nodeA->m_left;
-			pair2.m_nodeB = pair.m_nodeB;
-			matrixBA.TransformBBox (pair2.m_nodeB->m_p0, pair2.m_nodeB->m_p1, pA0, pA1);			
-			heap.Push(pair2, dgBoxDistanceToOrigin2(pA0, pA1, pair2.m_nodeA->m_p0, pair2.m_nodeA->m_p1));
+			PushNode (matrix, heap, pair.m_nodeA->m_left, pair.m_nodeB);
+			PushNode (matrix, heap, pair.m_nodeA->m_right, pair.m_nodeB);
 
 		} else {
-
-			dgVector pA0;
-			dgVector pA1;
-
-			dgHeapNodePair pair1; 
-			pair1.m_nodeA = pair.m_nodeA->m_left;
-			pair1.m_nodeB = pair.m_nodeB->m_left;
-			matrixBA.TransformBBox (pair1.m_nodeB->m_p0, pair1.m_nodeB->m_p1, pA0, pA1);			
-			heap.Push(pair1, dgBoxDistanceToOrigin2(pA0, pA1, pair1.m_nodeA->m_p0, pair1.m_nodeA->m_p1));
-
-			dgHeapNodePair pair2; 
-			pair2.m_nodeA = pair.m_nodeA->m_left;
-			pair2.m_nodeB = pair.m_nodeB->m_right;
-			matrixBA.TransformBBox (pair2.m_nodeB->m_p0, pair2.m_nodeB->m_p1, pA0, pA1);			
-			heap.Push(pair2, dgBoxDistanceToOrigin2(pA0, pA1, pair2.m_nodeA->m_p0, pair2.m_nodeA->m_p1));
-
-			dgHeapNodePair pair3; 
-			pair3.m_nodeA = pair.m_nodeA->m_right;
-			pair3.m_nodeB = pair.m_nodeB->m_left;
-			matrixBA.TransformBBox (pair3.m_nodeB->m_p0, pair3.m_nodeB->m_p1, pA0, pA1);			
-			heap.Push(pair3, dgBoxDistanceToOrigin2(pA0, pA1, pair3.m_nodeA->m_p0, pair3.m_nodeA->m_p1));
-
-			dgHeapNodePair pair4; 
-			pair4.m_nodeA = pair.m_nodeA->m_right;
-			pair4.m_nodeB = pair.m_nodeB->m_right;
-			matrixBA.TransformBBox (pair4.m_nodeB->m_p0, pair4.m_nodeB->m_p1, pA0, pA1);			
-			heap.Push(pair4, dgBoxDistanceToOrigin2(pA0, pA1, pair4.m_nodeA->m_p0, pair4.m_nodeA->m_p1));
+			PushNode (matrix, heap, pair.m_nodeA->m_left, pair.m_nodeB->m_left);
+			PushNode (matrix, heap, pair.m_nodeA->m_left, pair.m_nodeB->m_right);
+			PushNode (matrix, heap, pair.m_nodeA->m_right, pair.m_nodeB->m_left);
+			PushNode (matrix, heap, pair.m_nodeA->m_right, pair.m_nodeB->m_right);
 		}
 	}
 
 	if (retFlag) {
-		contactA.m_x = contact0.m_point.m_x;
-		contactA.m_y = contact0.m_point.m_y;
-		contactA.m_z = contact0.m_point.m_z;
-
-		contactB.m_x = contact1.m_point.m_x;
-		contactB.m_y = contact1.m_point.m_y;
-		contactB.m_z = contact1.m_point.m_z;
-
-		normalAB.m_x = contact0.m_normal.m_x;
-		normalAB.m_y = contact0.m_normal.m_y;
-		normalAB.m_z = contact0.m_normal.m_z;
+		proxy.m_contacts[0] = contact0;
+		proxy.m_contacts[1] = contact1;
+		proxy.m_contactJoint->m_closestDistance = dgSqrt (minDist2);
 	}
 	return retFlag;
-*/
 }
-
 
 
 
@@ -1791,8 +1702,6 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompound (dgCollidingPairCollect
 	proxy.m_referenceBody = myBody;
 	proxy.m_floatingBody = otherBody;
 
-//	dgMatrix myMatrix (myCompoundInstance->GetLocalMatrix() * myBody->m_matrix);
-//	dgMatrix otherMatrix (otherCompoundInstance->GetLocalMatrix() * otherBody->m_matrix);
 	const dgMatrix& myMatrix = myCompoundInstance->GetGlobalMatrix();
 	const dgMatrix& otherMatrix = otherCompoundInstance->GetGlobalMatrix();
 	dgOOBBTestData data (otherMatrix * myMatrix.Inverse());

@@ -200,13 +200,14 @@ void ClosestDistance (DemoEntityManager* const scene)
 //	PrimitiveType castinShapeType = _SPHERE_PRIMITIVE;
 //	PrimitiveType castinShapeType = _BOX_PRIMITIVE;
 //	PrimitiveType castinShapeType = _CAPSULE_PRIMITIVE;
-	PrimitiveType castinShapeType = _CYLINDER_PRIMITIVE;
+//	PrimitiveType castinShapeType = _CYLINDER_PRIMITIVE;
 //	PrimitiveType castinShapeType = _CONE_PRIMITIVE;
 //	PrimitiveType castinShapeType = _TAPERED_CAPSULE_PRIMITIVE;
 //	PrimitiveType castinShapeType = _TAPERED_CYLINDER_PRIMITIVE;
 //	PrimitiveType castinShapeType = _CHAMFER_CYLINDER_PRIMITIVE;
 //	PrimitiveType castinShapeType = _RANDOM_CONVEX_HULL_PRIMITIVE;
 //	PrimitiveType castinShapeType = _REGULAR_CONVEX_HULL_PRIMITIVE;
+	PrimitiveType castinShapeType = _COMPOUND_CONVEX_CRUZ_PRIMITIVE;
 
 
 //	ClosestDistanceEntityManager* const parallelManager = new ClosestDistanceEntityManager (scene);
