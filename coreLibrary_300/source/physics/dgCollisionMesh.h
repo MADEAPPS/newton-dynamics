@@ -195,7 +195,7 @@ class dgCollisionMesh: public dgCollision
 
 	dgInt32 CalculatePlaneIntersection (const dgFloat32* const vertex, const dgInt32* const index, dgInt32 indexCount, dgInt32 strideInFloat, const dgPlane& localPlane, dgVector* const contactsOut) const;
 
-	dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const;
+	dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut, dgFloat32 normalSign) const;
 
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
 	virtual void Serialize(dgSerialize callback, void* const userData) const;

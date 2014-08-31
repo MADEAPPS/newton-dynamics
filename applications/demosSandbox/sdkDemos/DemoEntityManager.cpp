@@ -50,12 +50,7 @@ BEGIN_EVENT_TABLE (DemoEntityManager, wxGLCanvas)
 	EVT_ERASE_BACKGROUND(DemoEntityManager::OnEraseBackground)
 END_EVENT_TABLE()
 
-#ifdef _MSC_VER
-	int DemoEntityManager::m_attributes[] = {WX_GL_DOUBLEBUFFER, WX_GL_RGBA, WX_GL_DEPTH_SIZE, 32, 0};
-#else 
-	// some linux systems and laptop are still 16 bit 
-	int DemoEntityManager::m_attributes[] = {WX_GL_DOUBLEBUFFER, WX_GL_RGBA, WX_GL_DEPTH_SIZE, 16, 0};
-#endif
+int DemoEntityManager::m_attributes[] = {WX_GL_DOUBLEBUFFER, WX_GL_RGBA, WX_GL_DEPTH_SIZE, 24, 0};
 
 
 DemoEntityManager::ButtonKey::ButtonKey (bool state)
@@ -516,6 +511,9 @@ void DemoEntityManager::DeserializedPhysicScene (const char* const name)
 
 		NewtonDeserializeBodyArray(m_world, BodyDeserialization, DeserializeFile, file);
 		fclose (file);
+
+//SerializedPhysicScene ("C:/Users/julio/Downloads/serialized_world1.bin");
+		
 	}
 }
 

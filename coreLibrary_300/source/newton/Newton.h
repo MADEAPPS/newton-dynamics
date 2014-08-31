@@ -434,6 +434,9 @@ extern "C" {
 	NEWTON_API void NewtonSetCurrentDevice (const NewtonWorld* const newtonWorld, int deviceIndex);
 	NEWTON_API void NewtonGetDeviceString (const NewtonWorld* const newtonWorld, int deviceIndex, char* const vendorString, int maxSize);
 
+	NEWTON_API dFloat NewtonGetContactMergeTolerance (const NewtonWorld* const newtonWorld);
+	NEWTON_API void NewtonSetContactMergeTolerance (const NewtonWorld* const newtonWorld, dFloat tolerance);
+
 	NEWTON_API void NewtonInvalidateCache (const NewtonWorld* const newtonWorld);
 	NEWTON_API void NewtonSetSolverModel (const NewtonWorld* const newtonWorld, int model);
 

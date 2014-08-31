@@ -56,11 +56,14 @@ class dgCollisionConvexHull: public dgCollisionConvex
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
 
+	virtual const dgConvexSimplexEdge** GetVertexToEdgeMapping() const {return m_vertexToEdgeMapping;}
+
 //	virtual dgFloat32 RayCast (const dgVector& localQ0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
 
 	dgInt32 m_faceCount;
 	dgInt32 m_supportTreeCount;
 	dgConvexSimplexEdge** m_faceArray;
+	const dgConvexSimplexEdge** m_vertexToEdgeMapping;
 	dgConvexBox* m_supportTree;
 
 	friend class dgWorld;

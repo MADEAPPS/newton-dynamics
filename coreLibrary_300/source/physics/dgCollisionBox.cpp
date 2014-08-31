@@ -229,7 +229,7 @@ void dgCollisionBox::MassProperties ()
 }
 
 
-dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const
+dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut, dgFloat32 normalSign) const
 {
 	dgFloat32 test[8];
 	dgPlane plane (normal, - (normal % point));

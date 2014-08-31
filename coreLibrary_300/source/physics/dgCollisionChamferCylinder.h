@@ -41,7 +41,7 @@ class dgCollisionChamferCylinder: public dgCollisionConvex
 	void Init (dgFloat32 radius, dgFloat32 height);
 	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const;
 	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
-	virtual dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut)  const;
+	virtual dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut, dgFloat32 normalSign)  const;
 
 	virtual void DebugCollision  (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
 	virtual dgInt32 CalculateSignature () const;

@@ -534,7 +534,7 @@ dgInt32 dgCollisionTaperedCapsule::CalculateContacts (const dgVector& point, con
 
 
 
-dgInt32 dgCollisionTaperedCapsule::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut) const
+dgInt32 dgCollisionTaperedCapsule::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut, dgFloat32 normalSign) const
 {
 	dgInt32 count = 0;
 	dgVector p0 (m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));

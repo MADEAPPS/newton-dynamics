@@ -222,6 +222,21 @@ void NewtonSelectBroadphaseAlgorithm (const NewtonWorld* const newtonWorld, int 
 	world->GetBroadPhase()->SelectBroadPhaseType(algorithmType);
 }
 
+dFloat NewtonGetContactMergeTolerance (const NewtonWorld* const newtonWorld)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *) newtonWorld;
+	return world->GetContactMergeTolerance();
+}	
+
+void NewtonSetContactMergeTolerance (const NewtonWorld* const newtonWorld, dFloat tolerance)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *) newtonWorld;
+	world->SetContactMergeTolerance(tolerance);
+}
+
+
 // Name: NewtonInvalidateCache 
 // Reset all internal states of the engine.
 //

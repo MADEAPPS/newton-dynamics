@@ -44,7 +44,7 @@ class dgCollisionCylinder: public dgCollisionConvex
 	virtual void MassProperties ();
 	virtual void DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
 	
-	virtual dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const;
+	virtual dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut, dgFloat32 normalSign) const;
 	
 	virtual dgInt32 CalculateSignature () const;
 	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1);

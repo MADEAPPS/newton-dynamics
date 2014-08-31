@@ -631,7 +631,7 @@ void dgCollisionCompound::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVect
 
 
 
-dgInt32 dgCollisionCompound::CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const
+dgInt32 dgCollisionCompound::CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut, dgFloat32 normalSign) const
 {
 	return 0;
 }
@@ -1754,7 +1754,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompound (dgCollidingPairCollect
 							}
 							contactCount += count;
 							if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
-								contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
+								contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, m_world->m_contactTolerance);
 							}
 						} else if (count == -1) {
 							contactCount = -1;
@@ -1905,7 +1905,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToHeightField (dgCollidingPairColl
 							contactCount += count;
 
 							if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
-								contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
+								contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, m_world->m_contactTolerance);
 							}
 						} else if (count == -1) {
 							contactCount = -1;
@@ -2005,7 +2005,7 @@ dgInt32 dgCollisionCompound::CalculateContactsUserDefinedCollision (dgCollidingP
 							contactCount += count;
 
 							if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
-								contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
+								contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, m_world->m_contactTolerance);
 							}
 						} else if (count == -1) {
 							contactCount = -1;
@@ -2100,7 +2100,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingle (dgCollidingPairCollector
 							}
 							contactCount += count;
 							if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
-								contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
+								contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, m_world->m_contactTolerance);
 							}
 						} else if (count == -1) {
 							contactCount = -1;
@@ -2224,7 +2224,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTree (dgCollidingPairCo
 							}
 							contactCount += count;
 							if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
-								contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
+								contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, m_world->m_contactTolerance);
 							}
 						} else if (count == -1) {
 							contactCount = -1;
@@ -2532,7 +2532,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgCollidingPairCo
 									contactCount += count;
 
 									if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
-										contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
+										contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, m_world->m_contactTolerance);
 									}
 
 									if (maxParam == dgFloat32 (0.0f)) {
@@ -2675,7 +2675,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompoundContinue(dgCollidingPair
 									contactCount += count;
 
 									if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
-										contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
+										contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, m_world->m_contactTolerance);
 									}
 
 									if (maxParam == dgFloat32 (0.0f)) {
@@ -2855,7 +2855,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTreeContinue (dgCollidi
 						//	}
 						//	contactCount += count;
 						//	if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
-						//		contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
+						//		contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3);
 						//	}
 						//} else if (count == -1) {
 						//	contactCount = -1;
@@ -2891,7 +2891,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTreeContinue (dgCollidi
 									contactCount += count;
 
 									if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
-										contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE);
+										contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, m_world->m_contactTolerance);
 									}
 
 									if (maxParam == dgFloat32 (0.0f)) {

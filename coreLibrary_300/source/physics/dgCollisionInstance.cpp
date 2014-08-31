@@ -465,7 +465,7 @@ dgMatrix dgCollisionInstance::CalculateInertia () const
 }
 
 
-dgInt32 dgCollisionInstance::CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const
+dgInt32 dgCollisionInstance::CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut, dgFloat32 normalSign) const
 {
 	dgInt32 count = 0;
 	dgAssert(normal.m_w == dgFloat32 (0.0f));
@@ -473,13 +473,13 @@ dgInt32 dgCollisionInstance::CalculatePlaneIntersection (const dgVector& normal,
 	{
 		case m_unit:
 		{
-			count = m_childShape->CalculatePlaneIntersection (normal, point, contactsOut);
+			count = m_childShape->CalculatePlaneIntersection (normal, point, contactsOut, normalSign);
 			break;
 		}
 		case m_uniform:
 		{
 			dgVector point1 (m_invScale.CompProduct4(point));
-			count = m_childShape->CalculatePlaneIntersection (normal, point1, contactsOut);
+			count = m_childShape->CalculatePlaneIntersection (normal, point1, contactsOut, normalSign);
 			for (dgInt32 i = 0; i < count; i ++) {
 				contactsOut[i] = m_scale.CompProduct4(contactsOut[i]);
 			}
@@ -492,7 +492,7 @@ dgInt32 dgCollisionInstance::CalculatePlaneIntersection (const dgVector& normal,
 			dgVector point1 (m_invScale.CompProduct4(point));
 			dgVector normal1 (m_scale.CompProduct4(normal));
 			normal1 = normal1.CompProduct4(normal1.InvMagSqrt());
-			count = m_childShape->CalculatePlaneIntersection (normal1, point1, contactsOut);
+			count = m_childShape->CalculatePlaneIntersection (normal1, point1, contactsOut, normalSign);
 			for (dgInt32 i = 0; i < count; i ++) {
 				contactsOut[i] = m_scale.CompProduct4(contactsOut[i]);
 			}
@@ -505,7 +505,7 @@ dgInt32 dgCollisionInstance::CalculatePlaneIntersection (const dgVector& normal,
 			dgVector point1 (m_aligmentMatrix.UntransformVector (m_invScale.CompProduct4(point)));
 			dgVector normal1 (m_aligmentMatrix.UntransformVector (m_scale.CompProduct4(normal)));
 			normal1 = normal1.CompProduct4(normal1.InvMagSqrt());
-			count = m_childShape->CalculatePlaneIntersection (normal1, point1, contactsOut);
+			count = m_childShape->CalculatePlaneIntersection (normal1, point1, contactsOut, normalSign);
 			for (dgInt32 i = 0; i < count; i ++) {
 				contactsOut[i] = m_scale.CompProduct4(m_aligmentMatrix.TransformVector(contactsOut[i]));
 			}

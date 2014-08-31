@@ -254,7 +254,7 @@ class dgCollision
 	dgUnsigned32 GetSignature () const;
 	dgCollisionID GetCollisionPrimityType () const;
 	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const = 0;
-	virtual dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const = 0;
+	virtual dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut, dgFloat32 normalSign) const = 0;
 
 	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1) = 0;
 	virtual void CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const = 0;

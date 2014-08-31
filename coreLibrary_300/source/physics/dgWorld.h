@@ -34,7 +34,7 @@
 #include "dgCollisionCompoundFractured.h"
 
 #define DG_REDUCE_CONTACT_TOLERANCE			dgFloat32 (5.0e-2f)
-#define DG_PRUNE_CONTACT_TOLERANCE			dgFloat32 (5.0e-2f)
+
 
 #define DG_SLEEP_ENTRIES					8
 #define DG_MAX_DESTROYED_BODIES_BY_FORCE	8
@@ -344,12 +344,15 @@ class dgWorld
 	dgBody* GetSentinelBody() const;
 	dgMemoryAllocator* GetAllocator() const;
 
+
+	dgFloat32 GetContactMergeTolerance() const;
+	void SetContactMergeTolerance(dgFloat32 tolerenace);
+
 	void Sync ();
 	
 	private:
 	
 	void CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex, bool ccdMode, bool intersectionTestOnly);
-
 	dgInt32 PruneContacts (dgInt32 count, dgContactPoint* const contact, dgInt32 maxCount = (DG_CONSTRAINT_MAX_ROWS / 3)) const;
 	dgInt32 ReduceContacts (dgInt32 count, dgContactPoint* const contact, dgInt32 maxCount, dgFloat32 tol, dgInt32 arrayIsSorted = 0) const;
 	
@@ -428,6 +431,7 @@ class dgWorld
 	dgFloat32 m_freezeOmega2;
 	dgFloat32 m_frictiomTheshold;
 	dgFloat32 m_savetimestep;
+	dgFloat32 m_contactTolerance;
 
 	dgSolverSleepTherfesholds m_sleepTable[DG_SLEEP_ENTRIES];
 	

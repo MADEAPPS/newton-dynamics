@@ -32,8 +32,6 @@
 #define DG_MAX_EDGE_COUNT				2048
 #define DG_MAX_CIRCLE_DISCRETE_STEPS	dgFloat32 (256.0f)
 
-#define DG_CLIP_MAX_COUNT				512
-#define DG_CLIP_MAX_POINT_COUNT			64
 #define DG_MAX_VERTEX_CLIP_FACE			16
 #define DG_MAX_SIMD_VERTEX_LIMIT		64
 #define DG_CONNICS_CONTATS_ITERATIONS	32
@@ -2274,159 +2272,6 @@ dgCollisionConvex::dgPerimenterEdge* dgCollisionConvex::ReduceContacts (dgPerime
 }
 
 
-dgInt32 dgCollisionConvex::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut) const
-{
-	dgConvexSimplexEdge* edge = &m_simplex[0];
-	dgPlane plane (normal, - (normal % origin));
-
-	dgFloat32 side0 = plane.Evalue(m_vertex[edge->m_vertex]);
-	dgFloat32 side1 = side0;
-	dgConvexSimplexEdge *firstEdge = NULL;
-	if (side0 > dgFloat32 (0.0f)) {
-		dgConvexSimplexEdge* ptr = edge;
-		do {
-			dgAssert (m_vertex[ptr->m_twin->m_vertex].m_w == dgFloat32 (0.0f));
-			side1 = plane.Evalue (m_vertex[ptr->m_twin->m_vertex]);
-			if (side1 < side0) {
-				if (side1 < dgFloat32 (0.0f)) {
-					firstEdge = ptr;
-					break;
-				}
-
-				side0 = side1;
-				edge = ptr->m_twin;
-				ptr = edge;
-			}
-			ptr = ptr->m_twin->m_next;
-		} while (ptr != edge);
-
-
-		if (!firstEdge) {
-			// we may have a local minimal in the convex hull do to a big flat face
-			for (dgInt32 i = 0; i < m_edgeCount; i ++) {
-				ptr = &m_simplex[i];
-				side0 = plane.Evalue (m_vertex[ptr->m_vertex]);
-				side1 = plane.Evalue (m_vertex[ptr->m_twin->m_vertex]);
-				if ((side1 < dgFloat32 (0.0f)) && (side0 > dgFloat32 (0.0f))){
-					firstEdge = ptr;
-					break;
-				}
-			}
-		}
-
-	} else if (side0 < dgFloat32 (0.0f)) {
-		dgConvexSimplexEdge* ptr = edge;
-		do {
-			dgAssert (m_vertex[ptr->m_twin->m_vertex].m_w == dgFloat32 (0.0f));
-			side1 = plane.Evalue (m_vertex[ptr->m_twin->m_vertex]);
-			if (side1 > side0) {
-				if (side1 >= dgFloat32 (0.0f)) {
-					side0 = side1;
-					firstEdge = ptr->m_twin;
-					break;
-				}
-
-				side0 = side1;
-				edge = ptr->m_twin;
-				ptr = edge;
-			}
-			ptr = ptr->m_twin->m_next;
-		} while (ptr != edge);
-
-		if (!firstEdge) {
-			// we may have a local minimal in the convex hull do to a big flat face
-			for (dgInt32 i = 0; i < m_edgeCount; i ++) {
-				ptr = &m_simplex[i];
-				side0 = plane.Evalue (m_vertex[ptr->m_vertex]);
-				dgFloat32 side1 = plane.Evalue (m_vertex[ptr->m_twin->m_vertex]);
-				if ((side1 < dgFloat32 (0.0f)) && (side0 > dgFloat32 (0.0f))){
-					firstEdge = ptr;
-					break;
-				}
-			}
-		}
-	}
-
-	dgInt32 count = 0;
-	if (firstEdge) {
-		dgAssert (side0 >= dgFloat32 (0.0f));
-		dgAssert ((side1 = plane.Evalue (m_vertex[firstEdge->m_vertex])) >= dgFloat32 (0.0f));
-		dgAssert ((side1 = plane.Evalue (m_vertex[firstEdge->m_twin->m_vertex])) < dgFloat32 (0.0f));
-		dgAssert (dgAbsf (side0 - plane.Evalue (m_vertex[firstEdge->m_vertex])) < dgFloat32 (1.0e-5f));
-
-		dgInt32 maxCount = 0;
-		dgConvexSimplexEdge* ptr = firstEdge;
-		do {
-			if (side0 > dgFloat32 (0.0f)) {
-				dgAssert (plane.Evalue (m_vertex[ptr->m_vertex]) > dgFloat32 (0.0f));
-				dgAssert (plane.Evalue (m_vertex[ptr->m_twin->m_vertex]) < dgFloat32 (0.0f));
-
-				dgVector dp (m_vertex[ptr->m_twin->m_vertex] - m_vertex[ptr->m_vertex]);
-				dgFloat32 t = plane % dp;
-				if (t >= dgFloat32 (-1.e-24f)) {
-					t = dgFloat32 (0.0f);
-				} else {
-					t = side0 / t;
-					if (t > dgFloat32 (0.0f)) {
-						t = dgFloat32 (0.0f);
-					}
-					if (t < dgFloat32 (-1.0f)) {
-						t = dgFloat32 (-1.0f);
-					}
-				}
-
-				dgAssert (t <= dgFloat32 (0.01f));
-				dgAssert (t >= dgFloat32 (-1.05f));
-				contactsOut[count] = m_vertex[ptr->m_vertex] - dp.Scale3 (t);
-
-				dgConvexSimplexEdge* ptr1 = ptr->m_next;
-				for (; ptr1 != ptr; ptr1 = ptr1->m_next) {
-					dgAssert (m_vertex[ptr->m_twin->m_vertex].m_w == dgFloat32 (0.0f));
-					side0 = plane.Evalue (m_vertex[ptr1->m_twin->m_vertex]); 
-					if (side0 >= dgFloat32 (0.0f)) {
-						break;
-					}
-				}
-				dgAssert (ptr1 != ptr);
-				ptr = ptr1->m_twin;
-			} else {
-				contactsOut[count] = m_vertex[ptr->m_vertex];
-				dgConvexSimplexEdge* ptr1 = ptr->m_next;
-				for (; ptr1 != ptr; ptr1 = ptr1->m_next) {
-					dgAssert (m_vertex[ptr1->m_twin->m_vertex].m_w == dgFloat32 (0.0f));
-					side0 = plane.Evalue (m_vertex[ptr1->m_twin->m_vertex]); 
-					if (side0 >= dgFloat32 (0.0f)) {
-						break;
-					}
-				}
-
-				if (ptr1 == ptr) {
-					ptr = ptr1->m_prev->m_twin;
-				} else {
-					ptr = ptr1->m_twin;
-				}
-			}
-
-			count ++;
-			maxCount ++;
-			if (count >= DG_CLIP_MAX_POINT_COUNT) {
-				for (count = 0; count < (DG_CLIP_MAX_POINT_COUNT >> 1); count ++) {
-					contactsOut[count] = contactsOut[count * 2];
-				}
-			}
-
-		} while ((ptr != firstEdge) && (maxCount < DG_CLIP_MAX_COUNT));
-		dgAssert (maxCount < DG_CLIP_MAX_COUNT);
-
-		if (count > 2) {
-			count = RectifyConvexSlice (count, normal, contactsOut);
-		}
-	}
-	return count;
-}
-
-
-
 dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
 {
 	dgVector sum[4];
@@ -2810,6 +2655,8 @@ dgInt32 dgCollisionConvex::CalculateContactsGeneric (const dgVector& point, cons
 	const dgCollisionInstance* const otherInstance = proxy.m_floatingCollision;
 	dgAssert (myInstance->m_childShape == this);
 	const dgCollisionConvex* const otherShape = (dgCollisionConvex*)otherInstance->m_childShape;
+
+	dgAssert (IsType(dgCollisionConvexShape_RTTI));
 	dgAssert (otherShape->IsType(dgCollisionConvexShape_RTTI));
 
 	dgInt32 count1 = 0;
@@ -2818,17 +2665,17 @@ dgInt32 dgCollisionConvex::CalculateContactsGeneric (const dgVector& point, cons
 	dgFloat32 dist = normal % (support0 - point);
 	if (dist >= (-DG_ROBUST_PLANE_CLIP)) {
 		support0 += normal.Scale3 (DG_ROBUST_PLANE_CLIP);
-		count1 = CalculatePlaneIntersection (normal, support0, shape1);
+		count1 = CalculatePlaneIntersection (normal, support0, shape1, dgFloat32 (-1.0f));
 		dgVector err (normal.Scale3 (normal % (point - support0)));
 		for (dgInt32 i = 0; i < count1; i ++) {
 			shape1[i] += err;
 		}
 	} else {
-		count1 = CalculatePlaneIntersection (normal, point, shape1);
+		count1 = CalculatePlaneIntersection (normal, point, shape1, dgFloat32 (-1.0f));
 		if (!count1) {
 			dgVector support1 (SupportVertex(normal, NULL));
 			dgVector center ((support0 + support1).Scale3 (dgFloat32 (0.5f)));
-			count1 = CalculatePlaneIntersection (normal, center, shape1);
+			count1 = CalculatePlaneIntersection (normal, center, shape1, dgFloat32 (-1.0f));
 		}
 	}
 
@@ -2860,17 +2707,17 @@ dgInt32 dgCollisionConvex::CalculateContactsGeneric (const dgVector& point, cons
 		dist = n % (support0 - p);
 		if (dist < DG_ROBUST_PLANE_CLIP) {
 			support0 += n.Scale3 (-DG_ROBUST_PLANE_CLIP);
-			count2 = otherShape->CalculatePlaneIntersection (n, support0, shape2);
+			count2 = otherShape->CalculatePlaneIntersection (n, support0, shape2, dgFloat32 (1.0f));
 			dgVector err (n.Scale3 (n % (p - support0)));
 			for (dgInt32 i = 0; i < count2; i ++) {
 				shape2[i] += err;
 			}
 		} else {
-			count2 = otherShape->CalculatePlaneIntersection (n, p, shape2);
+			count2 = otherShape->CalculatePlaneIntersection (n, p, shape2, dgFloat32 (1.0f));
 			if (!count2) {
 				dgVector support1 (otherShape->SupportVertex(n.Scale3 (dgFloat32 (-1.0f)), &index));
 				dgVector center ((support0 + support1).Scale3 (dgFloat32 (0.5f)));
-				count2 = otherShape->CalculatePlaneIntersection (n, center, shape2);
+				count2 = otherShape->CalculatePlaneIntersection (n, center, shape2, dgFloat32 (1.0f));
 			}
 		}
 		if (count2) {
@@ -3303,5 +3150,355 @@ dgInt32 dgCollisionConvex::CalculateConvexCastContacts(dgCollisionParamProxy& pr
 
 		iter ++;
 	} while (iter < DG_SEPARATION_PLANES_ITERATIONS);
+	return count;
+}
+
+/*
+dgInt32 dgCollisionConvex::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut, dgFloat32 normalSign) const
+{
+	dgAssert (0);
+	dgConvexSimplexEdge* edge = &m_simplex[0];
+	dgPlane plane (normal, - (normal % origin));
+
+	dgFloat32 side0 = plane.Evalue(m_vertex[edge->m_vertex]);
+	dgFloat32 side1 = side0;
+	dgConvexSimplexEdge *firstEdge = NULL;
+	if (side0 > dgFloat32 (0.0f)) {
+		dgConvexSimplexEdge* ptr = edge;
+		do {
+			dgAssert (m_vertex[ptr->m_twin->m_vertex].m_w == dgFloat32 (0.0f));
+			side1 = plane.Evalue (m_vertex[ptr->m_twin->m_vertex]);
+			if (side1 < side0) {
+				if (side1 < dgFloat32 (0.0f)) {
+					firstEdge = ptr;
+					break;
+				}
+
+				side0 = side1;
+				edge = ptr->m_twin;
+				ptr = edge;
+			}
+			ptr = ptr->m_twin->m_next;
+		} while (ptr != edge);
+
+
+		if (!firstEdge) {
+			// we may have a local minimal in the convex hull do to a big flat face
+			for (dgInt32 i = 0; i < m_edgeCount; i ++) {
+				ptr = &m_simplex[i];
+				side0 = plane.Evalue (m_vertex[ptr->m_vertex]);
+				side1 = plane.Evalue (m_vertex[ptr->m_twin->m_vertex]);
+				if ((side1 < dgFloat32 (0.0f)) && (side0 > dgFloat32 (0.0f))){
+					firstEdge = ptr;
+					break;
+				}
+			}
+		}
+
+	} else if (side0 < dgFloat32 (0.0f)) {
+		dgConvexSimplexEdge* ptr = edge;
+		do {
+			dgAssert (m_vertex[ptr->m_twin->m_vertex].m_w == dgFloat32 (0.0f));
+			side1 = plane.Evalue (m_vertex[ptr->m_twin->m_vertex]);
+			if (side1 > side0) {
+				if (side1 >= dgFloat32 (0.0f)) {
+					side0 = side1;
+					firstEdge = ptr->m_twin;
+					break;
+				}
+
+				side0 = side1;
+				edge = ptr->m_twin;
+				ptr = edge;
+			}
+			ptr = ptr->m_twin->m_next;
+		} while (ptr != edge);
+
+		if (!firstEdge) {
+			// we may have a local minimal in the convex hull do to a big flat face
+			for (dgInt32 i = 0; i < m_edgeCount; i ++) {
+				ptr = &m_simplex[i];
+				side0 = plane.Evalue (m_vertex[ptr->m_vertex]);
+				dgFloat32 side1 = plane.Evalue (m_vertex[ptr->m_twin->m_vertex]);
+				if ((side1 < dgFloat32 (0.0f)) && (side0 > dgFloat32 (0.0f))){
+					firstEdge = ptr;
+					break;
+				}
+			}
+		}
+	}
+
+	dgInt32 count = 0;
+	if (firstEdge) {
+		dgAssert (side0 >= dgFloat32 (0.0f));
+		dgAssert ((side1 = plane.Evalue (m_vertex[firstEdge->m_vertex])) >= dgFloat32 (0.0f));
+		dgAssert ((side1 = plane.Evalue (m_vertex[firstEdge->m_twin->m_vertex])) < dgFloat32 (0.0f));
+		dgAssert (dgAbsf (side0 - plane.Evalue (m_vertex[firstEdge->m_vertex])) < dgFloat32 (1.0e-5f));
+
+		dgInt32 maxCount = 0;
+		dgConvexSimplexEdge* ptr = firstEdge;
+		do {
+			if (side0 > dgFloat32 (0.0f)) {
+				dgAssert (plane.Evalue (m_vertex[ptr->m_vertex]) > dgFloat32 (0.0f));
+				dgAssert (plane.Evalue (m_vertex[ptr->m_twin->m_vertex]) < dgFloat32 (0.0f));
+
+				dgVector dp (m_vertex[ptr->m_twin->m_vertex] - m_vertex[ptr->m_vertex]);
+				dgFloat32 t = plane % dp;
+				if (t >= dgFloat32 (-1.e-24f)) {
+					t = dgFloat32 (0.0f);
+				} else {
+					t = side0 / t;
+					if (t > dgFloat32 (0.0f)) {
+						t = dgFloat32 (0.0f);
+					}
+					if (t < dgFloat32 (-1.0f)) {
+						t = dgFloat32 (-1.0f);
+					}
+				}
+
+				dgAssert (t <= dgFloat32 (0.01f));
+				dgAssert (t >= dgFloat32 (-1.05f));
+				contactsOut[count] = m_vertex[ptr->m_vertex] - dp.Scale3 (t);
+
+				dgConvexSimplexEdge* ptr1 = ptr->m_next;
+				for (; ptr1 != ptr; ptr1 = ptr1->m_next) {
+					dgAssert (m_vertex[ptr->m_twin->m_vertex].m_w == dgFloat32 (0.0f));
+					side0 = plane.Evalue (m_vertex[ptr1->m_twin->m_vertex]); 
+					if (side0 >= dgFloat32 (0.0f)) {
+						break;
+					}
+				}
+				dgAssert (ptr1 != ptr);
+				ptr = ptr1->m_twin;
+			} else {
+				contactsOut[count] = m_vertex[ptr->m_vertex];
+				dgConvexSimplexEdge* ptr1 = ptr->m_next;
+				for (; ptr1 != ptr; ptr1 = ptr1->m_next) {
+					dgAssert (m_vertex[ptr1->m_twin->m_vertex].m_w == dgFloat32 (0.0f));
+					side0 = plane.Evalue (m_vertex[ptr1->m_twin->m_vertex]); 
+					if (side0 >= dgFloat32 (0.0f)) {
+						break;
+					}
+				}
+
+				if (ptr1 == ptr) {
+					ptr = ptr1->m_prev->m_twin;
+				} else {
+					ptr = ptr1->m_twin;
+				}
+			}
+
+			count ++;
+			maxCount ++;
+			if (count >= DG_CLIP_MAX_POINT_COUNT) {
+				for (count = 0; count < (DG_CLIP_MAX_POINT_COUNT >> 1); count ++) {
+					contactsOut[count] = contactsOut[count * 2];
+				}
+			}
+
+		} while ((ptr != firstEdge) && (maxCount < DG_CLIP_MAX_COUNT));
+		dgAssert (maxCount < DG_CLIP_MAX_COUNT);
+
+		if (count > 2) {
+			count = RectifyConvexSlice (count, normal, contactsOut);
+		}
+	}
+	return count;
+}
+*/
+
+
+dgInt32 dgCollisionConvex::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut, dgFloat32 normalSign) const
+{
+	dgVector support[4];
+	int featureCount = 3;
+	const dgConvexSimplexEdge* edge = &m_simplex[0];
+	const dgConvexSimplexEdge** vertToEdgeMapping = GetVertexToEdgeMapping();
+	if (vertToEdgeMapping) {
+		dgInt32 edgeIndex;
+		featureCount = 1;
+		support[0] = SupportVertex (normal.Scale4(normalSign), &edgeIndex);
+		edge = vertToEdgeMapping[edgeIndex];
+
+		// 5 degrees
+		const dgFloat32 tiltAngle = dgFloat32 (0.087f);
+		const dgFloat32 tiltAngle2 = tiltAngle * tiltAngle ;
+		dgPlane testPlane (normal, - (normal.DotProduct4(support[0]).GetScalar()));
+		const dgConvexSimplexEdge* ptr = edge;
+		do {
+			const dgVector& p = m_vertex[ptr->m_twin->m_vertex];
+			dgFloat32 test = testPlane.Evalue(p);
+			dgVector dist (p - support[0]);
+			dgFloat32 angle2 = test * test / (dist.DotProduct4(dist).GetScalar());
+
+			if (angle2 < tiltAngle2) {
+				support[featureCount] = p;
+				featureCount ++;
+			}
+			ptr = ptr->m_twin->m_next;
+		} while ((ptr != edge) && (featureCount < 3));
+	}
+
+	dgInt32 count = 0;
+	dgPlane plane (normal, - (normal % origin));
+	switch (featureCount)
+	{
+		case 1:
+			contactsOut[0] = support[0] - normal.CompProduct4(normal.DotProduct4(support[0] - origin));
+			count = 1;
+			break;
+
+		case 2:
+			contactsOut[0] = support[0] - normal.CompProduct4(normal.DotProduct4(support[0] - origin));
+			contactsOut[1] = support[1] - normal.CompProduct4(normal.DotProduct4(support[1] - origin));
+			count = 2;
+			break;
+
+		default:
+		{
+			dgFloat32 side0 = plane.Evalue(m_vertex[edge->m_vertex]);
+			dgFloat32 side1 = side0;
+			const dgConvexSimplexEdge* firstEdge = NULL;
+			if (side0 > dgFloat32 (0.0f)) {
+				const dgConvexSimplexEdge* ptr = edge;
+				do {
+					dgAssert (m_vertex[ptr->m_twin->m_vertex].m_w == dgFloat32 (0.0f));
+					side1 = plane.Evalue (m_vertex[ptr->m_twin->m_vertex]);
+					if (side1 < side0) {
+						if (side1 < dgFloat32 (0.0f)) {
+							firstEdge = ptr;
+							break;
+						}
+
+						side0 = side1;
+						edge = ptr->m_twin;
+						ptr = edge;
+					}
+					ptr = ptr->m_twin->m_next;
+				} while (ptr != edge);
+
+
+				if (!firstEdge) {
+					// we may have a local minimal in the convex hull do to a big flat face
+					for (dgInt32 i = 0; i < m_edgeCount; i ++) {
+						ptr = &m_simplex[i];
+						side0 = plane.Evalue (m_vertex[ptr->m_vertex]);
+						side1 = plane.Evalue (m_vertex[ptr->m_twin->m_vertex]);
+						if ((side1 < dgFloat32 (0.0f)) && (side0 > dgFloat32 (0.0f))){
+							firstEdge = ptr;
+							break;
+						}
+					}
+				}
+
+			} else if (side0 < dgFloat32 (0.0f)) {
+				const dgConvexSimplexEdge* ptr = edge;
+				do {
+					dgAssert (m_vertex[ptr->m_twin->m_vertex].m_w == dgFloat32 (0.0f));
+					side1 = plane.Evalue (m_vertex[ptr->m_twin->m_vertex]);
+					if (side1 > side0) {
+						if (side1 >= dgFloat32 (0.0f)) {
+							side0 = side1;
+							firstEdge = ptr->m_twin;
+							break;
+						}
+
+						side0 = side1;
+						edge = ptr->m_twin;
+						ptr = edge;
+					}
+					ptr = ptr->m_twin->m_next;
+				} while (ptr != edge);
+
+				if (!firstEdge) {
+					// we may have a local minimal in the convex hull do to a big flat face
+					for (dgInt32 i = 0; i < m_edgeCount; i ++) {
+						ptr = &m_simplex[i];
+						side0 = plane.Evalue (m_vertex[ptr->m_vertex]);
+						dgFloat32 side1 = plane.Evalue (m_vertex[ptr->m_twin->m_vertex]);
+						if ((side1 < dgFloat32 (0.0f)) && (side0 > dgFloat32 (0.0f))){
+							firstEdge = ptr;
+							break;
+						}
+					}
+				}
+			}
+
+			if (firstEdge) {
+				dgAssert (side0 >= dgFloat32 (0.0f));
+				dgAssert ((side1 = plane.Evalue (m_vertex[firstEdge->m_vertex])) >= dgFloat32 (0.0f));
+				dgAssert ((side1 = plane.Evalue (m_vertex[firstEdge->m_twin->m_vertex])) < dgFloat32 (0.0f));
+				dgAssert (dgAbsf (side0 - plane.Evalue (m_vertex[firstEdge->m_vertex])) < dgFloat32 (1.0e-5f));
+
+				dgInt32 maxCount = 0;
+				const dgConvexSimplexEdge* ptr = firstEdge;
+				do {
+					if (side0 > dgFloat32 (0.0f)) {
+						dgAssert (plane.Evalue (m_vertex[ptr->m_vertex]) > dgFloat32 (0.0f));
+						dgAssert (plane.Evalue (m_vertex[ptr->m_twin->m_vertex]) < dgFloat32 (0.0f));
+
+						dgVector dp (m_vertex[ptr->m_twin->m_vertex] - m_vertex[ptr->m_vertex]);
+						dgFloat32 t = plane % dp;
+						if (t >= dgFloat32 (-1.e-24f)) {
+							t = dgFloat32 (0.0f);
+						} else {
+							t = side0 / t;
+							if (t > dgFloat32 (0.0f)) {
+								t = dgFloat32 (0.0f);
+							}
+							if (t < dgFloat32 (-1.0f)) {
+								t = dgFloat32 (-1.0f);
+							}
+						}
+
+						dgAssert (t <= dgFloat32 (0.01f));
+						dgAssert (t >= dgFloat32 (-1.05f));
+						contactsOut[count] = m_vertex[ptr->m_vertex] - dp.Scale3 (t);
+
+						dgConvexSimplexEdge* ptr1 = ptr->m_next;
+						for (; ptr1 != ptr; ptr1 = ptr1->m_next) {
+							dgAssert (m_vertex[ptr->m_twin->m_vertex].m_w == dgFloat32 (0.0f));
+							side0 = plane.Evalue (m_vertex[ptr1->m_twin->m_vertex]); 
+							if (side0 >= dgFloat32 (0.0f)) {
+								break;
+							}
+						}
+						dgAssert (ptr1 != ptr);
+						ptr = ptr1->m_twin;
+					} else {
+						contactsOut[count] = m_vertex[ptr->m_vertex];
+						dgConvexSimplexEdge* ptr1 = ptr->m_next;
+						for (; ptr1 != ptr; ptr1 = ptr1->m_next) {
+							dgAssert (m_vertex[ptr1->m_twin->m_vertex].m_w == dgFloat32 (0.0f));
+							side0 = plane.Evalue (m_vertex[ptr1->m_twin->m_vertex]); 
+							if (side0 >= dgFloat32 (0.0f)) {
+								break;
+							}
+						}
+
+						if (ptr1 == ptr) {
+							ptr = ptr1->m_prev->m_twin;
+						} else {
+							ptr = ptr1->m_twin;
+						}
+					}
+
+					count ++;
+					maxCount ++;
+					if (count >= DG_CLIP_MAX_POINT_COUNT) {
+						for (count = 0; count < (DG_CLIP_MAX_POINT_COUNT >> 1); count ++) {
+							contactsOut[count] = contactsOut[count * 2];
+						}
+					}
+
+				} while ((ptr != firstEdge) && (maxCount < DG_CLIP_MAX_COUNT));
+				dgAssert (maxCount < DG_CLIP_MAX_COUNT);
+
+				if (count > 2) {
+					count = RectifyConvexSlice (count, normal, contactsOut);
+				}
+			}
+		}
+	}
 	return count;
 }

@@ -226,7 +226,7 @@ dgInt32 dgCollisionMesh::CalculateSignature () const
 }
 
 
-dgInt32 dgCollisionMesh::CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const
+dgInt32 dgCollisionMesh::CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut, dgFloat32 normalSign) const
 {
 	dgAssert (0);
 	return 0;

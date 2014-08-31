@@ -222,7 +222,7 @@ class dgCollisionCompound: public dgCollision
 	void ImproveNodeFitness (dgNodeBase* const node) const;
 	dgFloat32 CalculateSurfaceArea (dgNodeBase* const node0, dgNodeBase* const node1, dgVector& minBox, dgVector& maxBox) const;
 
-	dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const;
+	dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut, dgFloat32 normalSign) const;
 
 	void PushNode (const dgMatrix& matrix, dgUpHeap<dgHeapNodePair, dgFloat32>& heap, dgNodeBase* const myNode, dgNodeBase* const otehrNode) const;
 

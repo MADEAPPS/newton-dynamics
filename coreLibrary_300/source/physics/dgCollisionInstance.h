@@ -111,7 +111,7 @@ class dgCollisionInstance
 //	dgVector CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& plane) const;
 
 	dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
-	dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const;
+	dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut, dgFloat32 normalSign) const;
 
 	dgInt32 CalculateSignature () const;
 	void SetCollisionBBox (const dgVector& p0, const dgVector& p1);

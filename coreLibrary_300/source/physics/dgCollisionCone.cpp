@@ -227,7 +227,7 @@ void dgCollisionCone::MassProperties ()
 }
 
 
-dgInt32 dgCollisionCone::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut) const
+dgInt32 dgCollisionCone::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut, dgFloat32 normalSign) const
 {
 	dgInt32 count;
 	if (dgAbsf (normal.m_x) < dgFloat32 (0.999f)) { 
@@ -238,7 +238,7 @@ dgInt32 dgCollisionCone::CalculatePlaneIntersection (const dgVector& normal, con
 		dgVector normal1 (normal.m_x, normal.m_y * cosAng + normal.m_z * sinAng, dgFloat32 (0.0f), dgFloat32 (0.0f));
 		dgVector origin1 (origin.m_x, origin.m_y * cosAng + origin.m_z * sinAng, 
 									  origin.m_z * cosAng - origin.m_y * sinAng, dgFloat32 (0.0f));
-		count = dgCollisionConvex::CalculatePlaneIntersection (normal1, origin1, contactsOut);
+		count = dgCollisionConvex::CalculatePlaneIntersection (normal1, origin1, contactsOut, normalSign);
 		for (dgInt32 i = 0; i < count; i ++) {
 			dgFloat32 y = contactsOut[i].m_y;
 			dgFloat32 z = contactsOut[i].m_z;
@@ -247,11 +247,9 @@ dgInt32 dgCollisionCone::CalculatePlaneIntersection (const dgVector& normal, con
 		}
 
 	} else {
-		count = dgCollisionConvex::CalculatePlaneIntersection (normal, origin, contactsOut);
+		count = dgCollisionConvex::CalculatePlaneIntersection (normal, origin, contactsOut, normalSign);
 	}
-
 	return count;
-
 }
 
 

@@ -336,7 +336,7 @@ void dgCollisionConvexPolygon::SetFeatureHit (dgInt32 featureCount, const dgInt3
 	}
 }
 
-dgInt32 dgCollisionConvexPolygon::CalculatePlaneIntersection (const dgVector& normalIn, const dgVector& origin, dgVector* const contactsOut) const
+dgInt32 dgCollisionConvexPolygon::CalculatePlaneIntersection (const dgVector& normalIn, const dgVector& origin, dgVector* const contactsOut, dgFloat32 normalSign) const
 {
 	dgVector normal(normalIn);
 	dgInt32 count = 0;
@@ -606,8 +606,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete (dgCollis
 		dgFloat32 clippedPenetration = dgMax (penetration, DG_IMPULSIVE_CONTACT_PENETRATION);
 		dgVector point (pointInHull + normalInHull.Scale4(clippedPenetration));
 
-		count = hull->CalculatePlaneIntersection (normalInHull.Scale4 (dgFloat32 (-1.0f)), point, pointsContacts);
-		//dgVector step (normalInHull.Scale4((clippedPenetration - proxy.m_skinThickness) * dgFloat32 (0.5f)));
+		count = hull->CalculatePlaneIntersection (normalInHull.Scale4 (dgFloat32 (-1.0f)), point, pointsContacts, 1.0f);
 		dgVector step (normalInHull.Scale4((proxy.m_skinThickness - clippedPenetration) * dgFloat32 (0.5f)));
 
 		const dgMatrix& worldMatrix = hull->m_globalMatrix;
@@ -807,7 +806,8 @@ inside = false;
 
 				contactJoint->m_closestDistance = penetration;
 				dgVector point (pointInHull - normalInHull.Scale4(DG_IMPULSIVE_CONTACT_PENETRATION));
-				count = hull->CalculatePlaneIntersection (normalInHull, point, pointsContacts);
+
+				count = hull->CalculatePlaneIntersection (normalInHull, point, pointsContacts, 1.0f);
 				dgVector step (hullRelativeVeloc.Scale3 (timetoImpact) + normalInHull.Scale4(DG_IMPULSIVE_CONTACT_PENETRATION));
 
 				penetration = dgMax (penetration, dgFloat32 (0.0f));

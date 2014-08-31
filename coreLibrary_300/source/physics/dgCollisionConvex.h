@@ -24,6 +24,8 @@
 
 #include "dgCollision.h"
 
+#define DG_CLIP_MAX_COUNT				512
+#define DG_CLIP_MAX_POINT_COUNT			64
 
 
 class dgConvexSimplexEdge
@@ -71,7 +73,7 @@ class dgCollisionConvex: public dgCollision
 
 	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
 
-	virtual dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const;
+	virtual dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut, dgFloat32 normalSign) const;
 	virtual dgInt32 GetConvexVertexCount() const { return m_vertexCount;}
 
 	bool IntesectionTest (dgCollisionParamProxy& proxy) const;
@@ -129,10 +131,9 @@ class dgCollisionConvex: public dgCollision
 	dgInt32 ConvexPolygonsIntersection (const dgVector& nornal, dgInt32 count1, dgVector* const shape1, dgInt32 count2, dgVector* const shape2, dgVector* const contactOut, dgInt32 maxContacts) const;
 	dgInt32 ConvexPolygonToLineIntersection (const dgVector& normal, dgInt32 count1, dgVector* const shape1, dgInt32 count2, dgVector* const shape2, dgVector* const contactOut, dgVector* const mem) const;
 	dgFloat32 ConvexConicConvexRayCast (const dgCollisionInstance* const convexConicShape, const dgMatrix& conicShapeMatrix, const dgCollisionInstance* const convexCastingShape, const dgMatrix& castingMatrix, const dgVector& castingVeloc, dgFloat32 maxT, dgContactPoint& contactOut) const;
+
+	virtual const dgConvexSimplexEdge** GetVertexToEdgeMapping() const {return NULL;}
 									
-
-	
-
 //	dgVector ReduceLine (dgInt32& indexOut, dgVector* const lineDiff, dgVector* const lineSum) const;
 //	dgVector ReduceTriangle (dgInt32& indexOut, dgVector* const triangleDiff, dgVector* const triangleSum) const;
 //	dgVector ReduceTetrahedrum (dgInt32& indexOut, dgVector* const tetraDiff, dgVector* const tetraSum) const;
@@ -152,13 +153,13 @@ class dgCollisionConvex: public dgCollision
 	dgVector* m_vertex;
 	dgConvexSimplexEdge* m_simplex;
 	
+	
 	dgFloat32 m_boxMinRadius;
 	dgFloat32 m_boxMaxRadius;
 	dgFloat32 m_simplexVolume;
 	
 	dgUnsigned16 m_edgeCount;
 	dgUnsigned16 m_vertexCount;
-
 	
 	public:	
 	static dgVector m_hullDirs[14]; 

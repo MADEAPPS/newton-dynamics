@@ -51,7 +51,7 @@ class dgCollisionConvexPolygon: public dgCollisionConvex
 	
 	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
 
-	virtual dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const;
+	virtual dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut, dgFloat32 normalSign) const;
 
 	virtual dgFloat32 GetVolume () const;
 	virtual dgFloat32 GetBoxMinRadius () const; 

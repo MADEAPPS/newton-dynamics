@@ -212,7 +212,7 @@ void dgCollisionSphere::CalcAABB (const dgMatrix& matrix, dgVector &p0, dgVector
 }
 
 
-dgInt32 dgCollisionSphere::CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const
+dgInt32 dgCollisionSphere::CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut, dgFloat32 normalSign) const
 {
 	dgAssert (normal.m_w == 0.0f);
 	dgAssert ((normal % normal) > dgFloat32 (0.999f));

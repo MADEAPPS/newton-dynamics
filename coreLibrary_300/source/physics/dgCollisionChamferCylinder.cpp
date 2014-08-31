@@ -400,14 +400,14 @@ dgInt32 dgCollisionChamferCylinder::CalculateContacts (const dgVector& point, co
 
 
 
-dgInt32 dgCollisionChamferCylinder::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut) const
+dgInt32 dgCollisionChamferCylinder::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut, dgFloat32 normalSign) const
 {
 	dgInt32 count = 0;
 	if (dgAbsf (normal.m_x) < dgFloat32 (0.999f)) { 
 		count = 1;
 		contactsOut[0] = SupportVertex (normal, NULL);
 	} else {
-		count = dgCollisionConvex::CalculatePlaneIntersection (normal, origin, contactsOut);
+		count = dgCollisionConvex::CalculatePlaneIntersection (normal, origin, contactsOut, normalSign);
 	}
 	return count;
 }

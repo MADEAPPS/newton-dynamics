@@ -42,7 +42,7 @@ class dgCollisionConvexHull::dgConvexBox
 	dgInt32 m_vertexCount;
 	dgInt32 m_leftBox;
 	dgInt32 m_rightBox;
-}DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGMENT;
 
 dgCollisionConvexHull::dgCollisionConvexHull(dgMemoryAllocator* const allocator, dgUnsigned32 signature)
 	:dgCollisionConvex(allocator, signature, m_convexHullCollision)
@@ -91,6 +91,7 @@ dgCollisionConvexHull::dgCollisionConvexHull(dgWorld* const world, dgDeserialize
 	m_vertex = (dgVector*) m_allocator->Malloc (dgInt32 (m_vertexCount * sizeof (dgVector)));
 	m_simplex = (dgConvexSimplexEdge*) m_allocator->Malloc (dgInt32 (m_edgeCount * sizeof (dgConvexSimplexEdge)));
 	m_faceArray = (dgConvexSimplexEdge **) m_allocator->Malloc(dgInt32 (m_faceCount * sizeof(dgConvexSimplexEdge *)));
+	m_vertexToEdgeMapping = (const dgConvexSimplexEdge **) m_allocator->Malloc(dgInt32 (m_vertexCount * sizeof(dgConvexSimplexEdge *)));
 	if (m_supportTreeCount) {
 		m_supportTree = (dgConvexBox *) m_allocator->Malloc(dgInt32 (m_supportTreeCount * sizeof(dgConvexBox)));
 		deserialization (userData, m_supportTree, m_supportTreeCount * sizeof(dgConvexBox));
@@ -113,17 +114,29 @@ dgCollisionConvexHull::dgCollisionConvexHull(dgWorld* const world, dgDeserialize
 		m_faceArray[i] = m_simplex + faceOffset; 
 	}
 
+	for (dgInt32 i = 0; i < m_vertexCount; i ++) {
+		dgInt32 faceOffset;
+		deserialization (userData, &faceOffset, sizeof (dgInt32));
+		m_vertexToEdgeMapping[i] = m_simplex + faceOffset; 
+	}
+
 	SetVolumeAndCG ();
 }
 
 dgCollisionConvexHull::~dgCollisionConvexHull()
 {
+	if (m_vertexToEdgeMapping) {
+		m_allocator->Free(m_vertexToEdgeMapping);
+	}
+
 	if (m_faceArray) {
 		m_allocator->Free(m_faceArray);
 	}
 	if (m_supportTree) {
 		m_allocator->Free(m_supportTree);
 	}
+
+
 }
 
 void dgCollisionConvexHull::BuildHull (dgInt32 count, dgInt32 strideInBytes, dgFloat32 tolerance, const dgFloat32* const vertexArray)
@@ -480,6 +493,7 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 
 	m_vertex = (dgVector*) m_allocator->Malloc (dgInt32 (m_vertexCount * sizeof (dgVector)));
 	m_simplex = (dgConvexSimplexEdge*) m_allocator->Malloc (dgInt32 (m_edgeCount * sizeof (dgConvexSimplexEdge)));
+	m_vertexToEdgeMapping = (const dgConvexSimplexEdge**) m_allocator->Malloc (dgInt32 (m_vertexCount * sizeof (dgConvexSimplexEdge*)));
 
 	for (dgInt32 i = 0; i < vertexCount; i ++) {
 		if (vertexMap[i] != -1) {
@@ -530,7 +544,6 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 	}
 	m_faceArray = (dgConvexSimplexEdge **) m_allocator->Malloc(dgInt32 (m_faceCount * sizeof(dgConvexSimplexEdge *)));
 	memcpy (m_faceArray, &faceArray[0], m_faceCount * sizeof(dgConvexSimplexEdge *));
-	
 	
 	if (vertexCount > DG_CONVEX_VERTEX_CHUNK_SIZE) {
 		// create a face structure for support vertex
@@ -699,6 +712,12 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 			ptr->m_vertex = dgInt16 (index);
 		}
 	}
+
+	for (int i = 0; i < m_edgeCount; i ++) {
+		dgConvexSimplexEdge* const edge = &m_simplex[i];
+		m_vertexToEdgeMapping[edge->m_vertex] = edge;
+	}
+
 
 	SetVolumeAndCG ();
 	return true;
@@ -889,6 +908,9 @@ dgVector dgCollisionConvexHull::SupportVertex (const dgVector& dir, dgInt32* con
 		}
 	}
 
+	if (vertexIndex) {
+		*vertexIndex = index;
+	}
 	dgAssert (index != -1);
 	return m_vertex[index];
 }
@@ -934,5 +956,14 @@ void dgCollisionConvexHull::Serialize(dgSerialize callback, void* const userData
 		faceOffset = dgInt32 (m_faceArray[i] - m_simplex); 
 		callback (userData, &faceOffset, sizeof (dgInt32));
 	}
+
+	for (dgInt32 i = 0; i < m_vertexCount; i ++) {
+		dgInt32 faceOffset;
+		faceOffset = dgInt32 (m_vertexToEdgeMapping[i] - m_simplex); 
+		callback (userData, &faceOffset, sizeof (dgInt32));
+	}
 }
+
+
+
 

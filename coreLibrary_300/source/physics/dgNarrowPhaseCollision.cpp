@@ -631,7 +631,7 @@ dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contact, dg
 
 		dgInt32 index = 0;
 		dgInt32 packContacts = 0;
-		dgFloat32 window = DG_PRUNE_CONTACT_TOLERANCE;
+		dgFloat32 window = m_contactTolerance;
 		dgFloat32 window2 = window * window;
 
 		memset (mask, 0, size_t (count));
@@ -1114,7 +1114,7 @@ void dgWorld::SceneChildContacts (dgCollidingPairCollector::dgPair* const pair, 
 
 	proxy.m_contacts = savedBuffer;
 	if (pair->m_contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
-		pair->m_contactCount = dgInt16 (ReduceContacts (pair->m_contactCount, proxy.m_contacts, DG_CONSTRAINT_MAX_ROWS / 3, DG_REDUCE_CONTACT_TOLERANCE));
+		pair->m_contactCount = dgInt16 (ReduceContacts (pair->m_contactCount, proxy.m_contacts, DG_CONSTRAINT_MAX_ROWS / 3, m_contactTolerance));
 	}
 }
 
@@ -1406,7 +1406,7 @@ dgInt32 dgWorld::Collide (
 
 	count = pair.m_contactCount;
 	if (count > maxContacts) {
-		count = ReduceContacts (count, contacts, maxContacts, DG_REDUCE_CONTACT_TOLERANCE);
+		count = ReduceContacts (count, contacts, maxContacts, m_contactTolerance);
 		count = dgMin (count, maxContacts);
 	}
 

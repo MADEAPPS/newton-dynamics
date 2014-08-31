@@ -465,7 +465,7 @@ dgInt32 dgCollisionCapsule::CalculateContacts (const dgVector& point, const dgVe
 
 
 
-dgInt32 dgCollisionCapsule::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut) const
+dgInt32 dgCollisionCapsule::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut, dgFloat32 normalSign) const
 {
 	dgInt32 count = 0;
 	if (dgAbsf (normal.m_x) > DG_CAPSULE_PERPENDICULAR_NORMAL) {
