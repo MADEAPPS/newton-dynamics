@@ -34,10 +34,8 @@ class dgBroadPhaseNode;
 class dgCollisionInstance;
 
 
+#define DG_MINIMUM_MASS		dgFloat32(1.0e-3f)
 #define DG_INFINITE_MASS	dgFloat32(1.0e15f)
-
-
-
 
 #define OverlapTest(body0,body1) dgOverlapTest ((body0)->m_minAABB, (body0)->m_maxAABB, (body1)->m_minAABB, (body1)->m_maxAABB)
 

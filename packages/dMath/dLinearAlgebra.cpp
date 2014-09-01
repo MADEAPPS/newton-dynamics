@@ -220,6 +220,16 @@ void dComplemtaritySolver::dBodyState::SetTorque (const dVector& torque)
 	m_externalTorque = torque;
 }
 
+const dVector& dComplemtaritySolver::dBodyState::GetForce () const
+{
+	return m_externalForce;
+}
+
+const dVector& dComplemtaritySolver::dBodyState::GetTorque () const
+{
+	return m_externalTorque;
+}
+
 
 void dComplemtaritySolver::dBodyState::UpdateInertia()
 {

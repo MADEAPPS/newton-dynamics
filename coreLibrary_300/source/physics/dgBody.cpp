@@ -465,7 +465,7 @@ void dgBody::SetMassMatrix(dgFloat32 mass, dgFloat32 Ixx, dgFloat32 Iyy, dgFloat
 		mass = DG_INFINITE_MASS * 2.0f;
 	}
 
-	if (mass < dgFloat32 (1.0e-3f)) {
+	if (mass < DG_MINIMUM_MASS) {
 		mass = DG_INFINITE_MASS * 2.0f;
 	}
 

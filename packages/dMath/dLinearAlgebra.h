@@ -197,6 +197,8 @@ class dComplemtaritySolver
 		void SetInertia (dFloat Ixx, dFloat Iyy, dFloat Izz);
 		void GetInertia (dFloat& Ixx, dFloat& Iyy, dFloat& Izz) const;
 
+		void SetVeloc (const dVector& veloc);
+		void SetOmega (const dVector& omega);
 		const dVector& GetOmega() const; 
 		const dVector& GetVelocity() const; 
 
@@ -208,10 +210,10 @@ class dComplemtaritySolver
 		void SetLocalMatrix (const dMatrix& matrix);
 		const dMatrix& GetLocalMatrix () const;
 
-		void SetVeloc (const dVector& veloc);
-		void SetOmega (const dVector& omega);
 		void SetForce (const dVector& force);
 		void SetTorque (const dVector& torque);
+		const dVector& GetForce () const;
+		const dVector& GetTorque () const;
 
 		const dVector& GetCenterOfMass () const;
 
