@@ -178,16 +178,16 @@ void UsingNewtonMeshTool (DemoEntityManager* const scene)
 
 	NewtonSetContactMergeTolerance (scene->GetNewton(), 1.0e-3f);
 	//CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 0.0f, 0.0f), dVector (0.7f, 0.25f, 0.7f, 0.0f), 0.0f);
-	CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 0.015f, 0.0f), dVector (0.0125f, 0.0063f, 0.0063f, 0.0f), 1.0f);
+	//CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 0.015f, 0.0f), dVector (0.0125f, 0.0063f, 0.0063f, 0.0f), 1.0f);
+	//CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 0.0f, 0.0f), dVector (2.0f, 0.5f, 1.0f, 0.0f), 0.0f);
 
-	//CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 0.0f, 0.0f), dVector (2.0f, 1.0f, 2.0f, 0.0f), 0.0f);
-	//CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 2.0f, 0.0f), dVector (1.0f, 1.0f, 1.0f, 0.0f), 1.0f);
+	CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 2.0f, 0.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
 
 	// place camera into position
 	dQuaternion rot;
 //	dVector origin (-40.0f, 10.0f, 0.0f, 0.0f);
-//	dVector origin (-30.0f, 5.0f, 10.0f, 0.0f);
-	dVector origin (-1.0f, 0.25f, 0.0f, 0.0f);
+	dVector origin (-10.0f, 5.0f, 0.0f, 0.0f);
+//	dVector origin (-1.0f, 0.25f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 
 //	NewtonSerializeToFile(scene->GetNewton(), "xxxx.bin");
