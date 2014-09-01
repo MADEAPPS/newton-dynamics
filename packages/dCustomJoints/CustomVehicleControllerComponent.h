@@ -258,10 +258,15 @@ class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComp
 	dInterpolationCurve m_torqueCurve;
 
 	dFloat m_speedMPS;
+	dFloat m_engineRPS;
 	dFloat m_topSpeedMPS;
+	dFloat m_engineToque;
 	dFloat m_crownGearRatio;
-//	dFloat m_engineIdleResistance;
+	dFloat m_engineIdleInvInertia;
+	dFloat m_engineIdleResistance1;
+	dFloat m_engineIdleResistance2;
 	dFloat m_engineInternalFriction;
+	dFloat m_clutchTorqueCouplingTime;
 	dFloat m_radiansPerSecundsAtRedLine;
 	dFloat m_radiansPerSecundsAtPeakPower;
 	dFloat m_radiansPerSecundsAtIdleTorque;

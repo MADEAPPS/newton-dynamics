@@ -63,26 +63,23 @@ class CustomVehicleController::dTireForceSolverSolver: public dComplemtaritySolv
 		dFloat timestepInv = 1.0f / timestep;
 		NewtonBody* const body = controller->GetBody();
 
-static int xxx;
-xxx ++;
-if (xxx >= 20)
-xxx *=1;
-
 		CustomControllerConvexCastPreFilter castFilter (body);
 		controller->m_chassisState.UpdateDynamicInputs();
 		for (dTireList::dListNode* node = controller->m_tireList.GetFirst(); node; node = node->GetNext()) {
 			CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
 			tire->Collide(castFilter, timestepInv);
 			tire->UpdateDynamicInputs(timestep);
+
+//tire->SetVeloc(dVector (0.0f, 0.0f, 0.0f, 0.0f));
+//tire->SetOmega(dVector (0.0f, 0.0f, 0.0f, 0.0f));
+//tire->SetForce(dVector (0.0f, 0.0f, 0.0f, 0.0f));
+//tire->SetTorque(dVector (0.0f, 0.0f, 0.0f, 0.0f));
 		}
+//controller->m_chassisState.SetVeloc(dVector (0.0f, 0.0f, 0.0f, 0.0f));
+//controller->m_chassisState.SetOmega(dVector (0.0f, 0.0f, 0.0f, 0.0f));
+//controller->m_chassisState.SetForce(dVector (0.0f, 0.0f, 0.0f, 0.0f));
+//controller->m_chassisState.SetTorque(dVector (0.0f, 0.0f, 0.0f, 0.0f));
 
-
-		//dVector xxxxx;
-		//NewtonBodyGetOmega(body, &xxxxx[0]);
-		//dAssert (dAbs(xxxxx.m_y) < 0.01f);
-		//NewtonBodySetOmega(body, &xxxxx[0]);
-		//m_chassisState.m_externalForce += m_chassisState.m_matrix[0].Scale (2.0f * m_chassisState.m_mass);
-		//m_chassisState.m_externalForce = dVector (0, 0, 0, 0);
 
 		// update all components
 		if (controller->m_engine) {
@@ -138,7 +135,6 @@ xxx *=1;
 			jointCount ++;
 			dAssert (jointCount < VEHICLE_CONTROLLER_MAX_JOINTS);
 		}
-
 
 		//	for (int i = 0; i < m_angularJointCount; i ++) {
 		//		constraintArray[jointCount] = &m_angularVelocityLinks[i];
@@ -464,6 +460,7 @@ void CustomVehicleController::Finalize()
 	for (dTireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
 		CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
 		tire->m_restSprunMass = dFloat (5.0f * dFloor (sprungMass[index] / 5.0f + 0.5f));
+		tire->CalculateRollingResistance (m_engine->GetTopSpeed());
 		index ++;
 	}
 

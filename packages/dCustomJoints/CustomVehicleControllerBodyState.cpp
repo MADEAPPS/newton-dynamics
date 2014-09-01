@@ -200,7 +200,6 @@ void CustomVehicleControllerBodyStateTire::Init (CustomVehicleController* const 
 	m_localInvInertia[1] = 1.0f / m_localInertia[1];
 	m_localInvInertia[2] = 1.0f / m_localInertia[2];
 	m_localInvInertia[3] = 0.0f;
-	
 
 	m_restSprunMass = 0.0f;
 	m_dampingRatio = tireInfo.m_dampingRatio;
@@ -210,7 +209,7 @@ void CustomVehicleControllerBodyStateTire::Init (CustomVehicleController* const 
 	// initialize all local variables to default values
 	m_brakeTorque = 0.0f;
 	m_engineTorque = 0.0f;
-	m_rotatonSpeed = 0.0f;
+	m_rotationalSpeed = 0.0f;
 	m_rotationAngle = 0.0f;
 	m_steeringAngle = 0.0f;
 	
@@ -304,15 +303,13 @@ void CustomVehicleControllerBodyStateTire::UpdateDynamicInputs(dFloat timestep)
 {
 	CustomVehicleControllerBodyStateChassis& chassis = m_controller->m_chassisState;
 
-//	m_dryFrictionTorque = chassis.m_dryRollingFrictionTorque;
-
 	m_matrix = CalculateSteeringMatrix() * chassis.m_matrix;
 	m_globalCentreOfMass = m_matrix.m_posit;
 	UpdateInertia();
 
 	// get the velocity state for this tire
 	dVector relPosit (m_matrix.m_posit - chassis.m_globalCentreOfMass);
-	m_omega = chassis.m_omega + m_matrix[0].Scale (m_rotatonSpeed);
+	m_omega = chassis.m_omega + m_matrix[0].Scale (m_rotationalSpeed);
 	m_veloc = chassis.m_veloc + chassis.m_omega * relPosit + m_matrix[1].Scale (m_speed);
 
 	// set the initial force on this tire
@@ -388,92 +385,26 @@ void CustomVehicleControllerBodyStateTire::IntegrateForce (dFloat timestep, cons
 */
 
 
+void CustomVehicleControllerBodyStateTire::CalculateRollingResistance (dFloat topSpeed)
+{
+	m_maxAngularVelocity = topSpeed / m_radio;
+}
+
 
 void CustomVehicleControllerBodyStateTire::ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega)
 {
 	CustomVehicleControllerBodyState::ApplyNetForceAndTorque (invTimestep, veloc, omega);
 	const CustomVehicleControllerBodyStateChassis& chassis = m_controller->m_chassisState;
 
-#if 0
-    dAssert (m_tireConstraint.m_state0 != this);
-    dAssert (m_tireConstraint.m_state1 == this);
-    const AppVehicleBodyState* const chassis = m_tireConstraint.m_state0;
-
-    dVector upPin (chassis->m_matrix[1]);
-    dVector lateralPin (m_matrix[0]);
-    dVector longitudinalPin (crossProduct (lateralPin, upPin));
-
-    const dFloat speedFactor = 2.0f;
-    dFloat tireSpeed = m_veloc.dot (longitudinalPin);
-    dFloat maxSpeed = dSqrt(m_veloc.dot(m_veloc)) * speedFactor + 2.0f;
-
-    dFloat tireRps = (m_omega - chassis->m_omega).dot (lateralPin);
-    if ((m_radius * dgAbsf(tireRps)) > maxSpeed) 
-    {
-        if ((tireRps > 0.0f) && (tireSpeed > 0.0f)) 
-        {
-            m_omega = chassis->m_omega + lateralPin * ((tireSpeed * speedFactor + 2.0f) / m_radius);
-        } 
-        else if ((tireRps < 0.0f) && (tireSpeed < 0.0f)) 
-        {
-            m_omega = chassis->m_omega + lateralPin * ((tireSpeed * speedFactor - 2.0f) / m_radius);
-        } 
-        else 
-        {
-            m_omega = chassis->m_omega + lateralPin * (dSign(tireRps) * dAbs (tireSpeed) * speedFactor / m_radius);
-        }
-    }
-
-    tireRps = (m_omega - chassis->m_omega).dot (lateralPin);
-    const dFloat maxRpsAccel = 4.0f;
-    if ((tireRps - m_prevRps) > maxRpsAccel) 
-    {
-        tireRps = m_prevRps + maxRpsAccel;
-        m_omega = chassis->m_omega + lateralPin * tireRps;
-    } 
-    else if ((tireRps - m_prevRps) < -maxRpsAccel) 
-    {
-        tireRps = m_prevRps - maxRpsAccel;
-        m_omega = chassis->m_omega + lateralPin * tireRps;
-    }
-
-    m_prevRps = tireRps;
-    m_averageRps = tireRps;
-    const int count = sizeof (m_averageRpsToople)/sizeof (m_averageRpsToople[0]);
-    for (int i = 1; i < count; i ++) 
-    {
-        m_averageRps += m_averageRpsToople[i];
-        m_averageRpsToople[i - 1] = m_averageRpsToople[i];
-    }
-    m_averageRpsToople[count - 1] = tireRps;
-    m_averageRps *= dFloat (1.0f / count);
-
-
-
-static int xxxxxxx;
-static FILE* xxx;
-if (!xxx) 
-{
-    fopen_s (&xxx, "tire_rpm.csv", "wt");
-    fprintf (xxx, "gear, rps, torque\n");
-}
-
-int gear = m_controller->GetEngine()->GetGear();
-//if ((gear == 2) && (m_myIndex == 4)) {
-if ((gear > 1) && (m_myIndex == 4)) {
-    dFloat tireRps = (m_omega - m_controller->m_chassisState.m_omega) % m_matrix[0];
-    fprintf (xxx, "%d, %f, %f,\n", gear, -tireRps, m_engineTorque);
-    fflush (xxx);
-    dTrace (("%d, %d, %f, %f,\n", xxxxxxx, gear, -tireRps, m_engineTorque));
-    xxxxxxx ++;
-}
-#endif
-
 	// integrate tires angular velocity
 	dVector relOmega (m_omega - chassis.m_omega);
-	m_rotatonSpeed = relOmega % m_matrix[0];
-	m_rotationAngle = dMod (m_rotationAngle + m_rotatonSpeed / invTimestep, 2.0f * 3.141592f);
-
+	m_rotationalSpeed = relOmega % m_matrix[0];
+	if (dAbs (m_rotationalSpeed) > m_maxAngularVelocity) {
+		m_rotationalSpeed *= 0.9f;
+		m_omega = m_matrix[0].Scale (m_rotationalSpeed) + chassis.m_omega;
+	}
+	m_rotationAngle = dMod (m_rotationAngle + m_rotationalSpeed / invTimestep, 2.0f * 3.141592f);
+/*
 if (m_myIndex == 4)
 {
 	dVector f (m_matrix.UnrotateVector(m_externalForce));
@@ -488,7 +419,7 @@ if (m_myIndex == 4)
 		dTrace (("v(%f %f %f) ", v.m_x, v.m_y, v.m_z));
 		dTrace (("w(%f %f %f)\n", w.m_x, w.m_y, w.m_z));
 	}
-
 }
+*/
 }
 

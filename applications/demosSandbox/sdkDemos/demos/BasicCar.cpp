@@ -71,7 +71,7 @@
 #define VIPER_TIRE_SUSPENSION_SPRING		15000.0f
 #define VIPER_TIRE_SUSPENSION_DAMPER		600.0f
 #define VIPER_TIRE_SUSPENSION_LENGTH		0.20f
-#define VIPER_TIRE_BRAKE_TORQUE				2000.0f
+#define VIPER_TIRE_BRAKE_TORQUE				2500.0f
 
 #define VIPER_TIRE_GEAR_1					2.66f
 #define VIPER_TIRE_GEAR_2					1.78f
@@ -337,7 +337,7 @@ class BasicVehicleEntity: public DemoEntity
 		m_controller->SetSteering(steering);
 
 		// add vehicle brakes
-		CustomVehicleControllerComponentBrake* const brakes = new CustomVehicleControllerComponentBrake (m_controller, VIPER_TIRE_BRAKE_TORQUE * 0.5f);
+		CustomVehicleControllerComponentBrake* const brakes = new CustomVehicleControllerComponentBrake (m_controller, VIPER_TIRE_BRAKE_TORQUE);
 		brakes->AddBrakeTire (leftFrontTire);
 		brakes->AddBrakeTire (rightFrontTire);
 		brakes->AddBrakeTire (leftRearTire);
@@ -528,20 +528,20 @@ class BasicVehicleEntity: public DemoEntity
 			}
 */
 		}
-				
+
+			
 		// set the help key
 		m_helpKey.UpdatePushButton (mainWindow, 'H');
 
 		// count the engine key switch
 		m_engineKeySwitchCounter += m_engineKeySwitch.UpdateTriggerButton(mainWindow, 'Y');
-		
 
 		// check transmission type
 		int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
-#if 0
+#if 1
 	#if 0
-		static FILE* file = fopen ("log.bin", "wb");
+		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
 			fwrite (&m_engineKeySwitchCounter, sizeof (int), 1, file);
 			fwrite (&toggleTransmission, sizeof (int), 1, file);
@@ -639,7 +639,7 @@ class BasicVehicleEntity: public DemoEntity
 			dVector p0 (tire.GetCenterOfMass());
 
 const dMatrix& tireMatrix = tire.GetLocalMatrix ();
-p0 += chassis.GetMatrix()[2].Scale ((tireMatrix.m_posit.m_z > 0.0f ? 1.0f : -1.0f) * 0.5f);
+p0 += chassis.GetMatrix()[2].Scale ((tireMatrix.m_posit.m_z > 0.0f ? 1.0f : -1.0f) * 0.25f);
 
 			// draw the tire load 
 			dVector p1 (p0 + tire.GetTireLoad().Scale (scale));
@@ -1038,7 +1038,7 @@ location.m_posit.m_y = 50.0f;
 location.m_posit.m_x = -150.0f;
 
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
-	location.m_posit.m_y += 0.5f;
+	location.m_posit.m_y += 1.0f;
 
 	// make a vehicle entity shell
 	//BasicVehicleEntity* const vehicle = new BasicVehicleEntity (scene, manager, location, "f1.ngd");
