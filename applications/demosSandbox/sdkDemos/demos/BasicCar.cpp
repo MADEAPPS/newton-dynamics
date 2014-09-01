@@ -46,14 +46,11 @@
 #define VIPER_IDLE_TORQUE					300.0f
 #define VIPER_IDLE_TORQUE_RPM				500.0f
 
-#define VIPER_ENGINE_MOMENT_OF_INERTIA		10.0f
-
 #define VIPER_PEAK_TORQUE					490.0f
 #define VIPER_PEAK_TORQUE_RPM				3700.0f
 
 #define VIPER_PEAK_HP						450.0f
 #define VIPER_PEAK_HP_RPM					5200.0f
-
 
 #define VIPER_REDLINE_TORQUE				30.0f
 #define VIPER_REDLINE_TORQUE_RPM			6000.0f
@@ -356,8 +353,10 @@ class BasicVehicleEntity: public DemoEntity
 		// add an engine
 		// first make the gear Box
 		dFloat fowardSpeedGearsBoxRatios[] = {VIPER_TIRE_GEAR_1, VIPER_TIRE_GEAR_2, VIPER_TIRE_GEAR_3, VIPER_TIRE_GEAR_4, VIPER_TIRE_GEAR_5, VIPER_TIRE_GEAR_6};
+
+		CustomVehicleControllerComponentEngine::dTireDifferencial* const differencial = new CustomVehicleControllerComponentEngine::dTireDifferencial (m_controller, leftRearTire, rightRearTire);
 		CustomVehicleControllerComponentEngine::dGearBox* const gearBox = new CustomVehicleControllerComponentEngine::dGearBox(m_controller, VIPER_TIRE_GEAR_REVERSE, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios); 
-		CustomVehicleControllerComponentEngine* const engine = new CustomVehicleControllerComponentEngine (m_controller, gearBox, leftRearTire, rightRearTire);
+		CustomVehicleControllerComponentEngine* const engine = new CustomVehicleControllerComponentEngine (m_controller, gearBox, differencial);
 
 		// the the default transmission type
 		engine->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
@@ -378,8 +377,7 @@ class BasicVehicleEntity: public DemoEntity
 		dFloat viperRedLineTorquePoundPerFoot = VIPER_REDLINE_TORQUE;
 
 		dFloat vehicleTopSpeedKPH = VIPER_TIRE_TOP_SPEED_KMH;
-        dFloat vehicleMomentOfInteria  = VIPER_ENGINE_MOMENT_OF_INERTIA;
-		engine->InitEngineTorqueCurve (vehicleTopSpeedKPH, vehicleMomentOfInteria, viperIdleTorquePoundPerFoot, viperIdleRPM, viperPeakTorquePoundPerFoot, viperPeakTorqueRPM, viperPeakHorsePower, viperPeakHorsePowerRPM, viperRedLineTorquePoundPerFoot, viperRedLineRPM);
+		engine->InitEngineTorqueCurve (vehicleTopSpeedKPH, viperIdleTorquePoundPerFoot, viperIdleRPM, viperPeakTorquePoundPerFoot, viperPeakTorqueRPM, viperPeakHorsePower, viperPeakHorsePowerRPM, viperRedLineTorquePoundPerFoot, viperRedLineRPM);
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();

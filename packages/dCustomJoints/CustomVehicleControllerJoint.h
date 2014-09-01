@@ -55,25 +55,6 @@ class CustomVehicleControllerJoint: public dComplemtaritySolver::dBilateralJoint
 	friend class CustomVehicleControllerComponentSteering;
 };
 
-class CustomVehicleControllerEngineGearJoint: public CustomVehicleControllerJoint
-{
-	public:
-	CUSTOM_JOINTS_API virtual void JacobianDerivative (dComplemtaritySolver::dParamInfo* const constraintParams); 
-	CUSTOM_JOINTS_API virtual void UpdateSolverForces (const dComplemtaritySolver::dJacobianPair* const jacobians) const;
-
-	dFloat m_powerTrainGain;
-};
-
-class CustomVehicleControllerEngineIdleJoint: public CustomVehicleControllerJoint
-{
-	public:
-	CUSTOM_JOINTS_API virtual void JacobianDerivative (dComplemtaritySolver::dParamInfo* const constraintParams); 
-	CUSTOM_JOINTS_API virtual void UpdateSolverForces (const dComplemtaritySolver::dJacobianPair* const jacobians) const;
-
-	dFloat m_omega;
-	dFloat m_friction;
-};
-
 
 class CustomVehicleControllerTireJoint: public CustomVehicleControllerJoint
 {
@@ -94,6 +75,27 @@ class CustomVehicleControllerContactJoint: public CustomVehicleControllerJoint
 	NewtonWorldConvexCastReturnInfo m_contacts[4];
 };
 
+/*
+
+class CustomVehicleControllerEngineGearJoint: public CustomVehicleControllerJoint
+{
+	public:
+	CUSTOM_JOINTS_API virtual void JacobianDerivative (dComplemtaritySolver::dParamInfo* const constraintParams); 
+	CUSTOM_JOINTS_API virtual void UpdateSolverForces (const dComplemtaritySolver::dJacobianPair* const jacobians) const;
+
+	dFloat m_powerTrainGain;
+};
+
+class CustomVehicleControllerEngineIdleJoint: public CustomVehicleControllerJoint
+{
+	public:
+	CUSTOM_JOINTS_API virtual void JacobianDerivative (dComplemtaritySolver::dParamInfo* const constraintParams); 
+	CUSTOM_JOINTS_API virtual void UpdateSolverForces (const dComplemtaritySolver::dJacobianPair* const jacobians) const;
+
+	dFloat m_omega;
+	dFloat m_friction;
+};
+*/
 
 #endif 
 

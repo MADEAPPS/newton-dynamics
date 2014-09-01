@@ -90,33 +90,6 @@ class CustomVehicleControllerBodyStateChassis: public CustomVehicleControllerBod
 };
 
 
-class CustomVehicleControllerBodyStateEngine: public CustomVehicleControllerBodyState
-{
-	public:
-	CUSTOM_JOINTS_API void Init (CustomVehicleController* const controller);
-
-	CUSTOM_JOINTS_API void Update (dFloat timestep, CustomVehicleController* const controller);
-	CUSTOM_JOINTS_API void ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega);
-	CUSTOM_JOINTS_API int CalculateActiveJoints (CustomVehicleController* const controller, CustomVehicleControllerJoint** const jointArray);
-
-	CustomVehicleControllerEngineGearJoint m_leftTire;
-	CustomVehicleControllerEngineGearJoint m_rightTire;
-	CustomVehicleControllerEngineIdleJoint m_idleFriction;
-	dFloat m_radianPerSecund;
-
-	friend class CustomVehicleController;
-	friend class CustomVehicleControllerTireJoint;
-	friend class CustomVehicleControllerEngineGearJoint;
-	friend class CustomVehicleControllerEngineIdleJoint;
-	friend class CustomVehicleControllerBodyStateTire;
-	friend class CustomVehicleControllerBodyStateChassis;
-	friend class CustomVehicleControllerContactJoint;
-	friend class CustomVehicleControllerComponentBrake;
-	friend class CustomVehicleControllerComponentEngine;
-	friend class CustomVehicleControllerComponentSteering;
-};
-
-
 class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodyState
 {
 	public:
@@ -180,7 +153,7 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 	dFloat m_posit;
 	dFloat m_speed;
 	
-	dFloat m_breakTorque;
+	dFloat m_brakeTorque;
 	dFloat m_engineTorque;
 	dFloat m_rotatonSpeed;
 	dFloat m_rotationAngle;

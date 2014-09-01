@@ -36,10 +36,10 @@ class CustomVehicleController: public CustomControllerBase
 	public:
 	class dTireForceSolverSolver;
 	class dWeightDistibutionSolver;
-	class TireList: public dList<CustomVehicleControllerBodyStateTire>
+	class dTireList: public dList<CustomVehicleControllerBodyStateTire>
 	{
 		public:
-		TireList()
+		dTireList()
 			:dList<CustomVehicleControllerBodyStateTire>()
 		{
 		}
@@ -82,12 +82,10 @@ class CustomVehicleController: public CustomControllerBase
 	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 
 	CustomVehicleControllerBodyState m_staticWorld;
-	CustomVehicleControllerBodyStateEngine m_engineState;
+//	CustomVehicleControllerBodyStateEngine m_engineState;
 	CustomVehicleControllerBodyStateChassis m_chassisState;
-	//CustomVehicleControllerComponent::dInterpolationCurve m_tireLateralSlipAngle;
-	//CustomVehicleControllerComponent::dInterpolationCurve m_tireLongitidialSlipRatio;
 
-	TireList m_tireList;
+	dTireList m_tireList;
 	dList<CustomVehicleControllerBodyState*> m_stateList;
 	NewtonCollision* m_tireCastShape;
 	CustomVehicleControllerComponentBrake* m_brakes;

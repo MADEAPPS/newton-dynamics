@@ -30,7 +30,10 @@
 // basically th replace the Pajecka equation with the with the two series expansions 
 // f = x - |x| * x / 3 + x * x * x / 27
 // T = x - |x| * x + x * x * x / 3 - |x| * x * x * x / 27 
-// they also have a better tire fristion modle that teh naive friction cilcle projection
+// they also have a better tire friction model that the naive friction circle projection
+
+// for the differencial equation I am using information from here
+// http://web.mit.edu/2.972/www/reports/differential/differential.html
 
 // NewtonCustomJoint.cpp: implementation of the NewtonCustomJoint class.
 //
@@ -67,7 +70,7 @@ xxx *=1;
 
 		CustomControllerConvexCastPreFilter castFilter (body);
 		controller->m_chassisState.UpdateDynamicInputs();
-		for (TireList::dListNode* node = controller->m_tireList.GetFirst(); node; node = node->GetNext()) {
+		for (dTireList::dListNode* node = controller->m_tireList.GetFirst(); node; node = node->GetNext()) {
 			CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
 			tire->Collide(castFilter, timestepInv);
 			tire->UpdateDynamicInputs(timestep);
@@ -116,12 +119,10 @@ xxx *=1;
 
 	int GetActiveJoints()
 	{
-		// add the engine joints
-		int jointCount = m_controller->m_engineState.CalculateActiveJoints (m_controller, (CustomVehicleControllerJoint**) &m_jointArray[0]);
-		//return jointCount;
+		int jointCount = 0;
 
 		// add all contact joints if any
-		for (TireList::dListNode* node = m_controller->m_tireList.GetFirst(); node; node = node->GetNext()) {
+		for (dTireList::dListNode* node = m_controller->m_tireList.GetFirst(); node; node = node->GetNext()) {
 			CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
 			if (tire->m_contactJoint.m_contactCount) {
 				m_jointArray[jointCount] = &tire->m_contactJoint;
@@ -131,7 +132,7 @@ xxx *=1;
 		}
 
 		// add the joints that connect tire to chassis
-		for (TireList::dListNode* node = m_controller->m_tireList.GetFirst(); node; node = node->GetNext()) {
+		for (dTireList::dListNode* node = m_controller->m_tireList.GetFirst(); node; node = node->GetNext()) {
 			CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
 			m_jointArray[jointCount] = &tire->m_chassisJoint;
 			jointCount ++;
@@ -331,7 +332,7 @@ CustomVehicleControllerBodyStateTire* CustomVehicleController::GetFirstTire () c
 
 CustomVehicleControllerBodyStateTire* CustomVehicleController::GetNextTire (CustomVehicleControllerBodyStateTire* const tire) const
 {
-	TireList::dListNode* const tireNode = m_tireList.GetNodeFromInfo(*tire);
+	dTireList::dListNode* const tireNode = m_tireList.GetNodeFromInfo(*tire);
 	return tireNode->GetNext() ? &tireNode->GetNext()->GetInfo() : NULL;
 }
 
@@ -346,7 +347,7 @@ void CustomVehicleController::SetCenterOfGravity(const dVector& comRelativeToGeo
 
 CustomVehicleControllerBodyStateTire* CustomVehicleController::AddTire (const CustomVehicleControllerBodyStateTire::TireCreationInfo& tireInfo)
 {
-	TireList::dListNode* const tireNode = m_tireList.Append();
+	dTireList::dListNode* const tireNode = m_tireList.Append();
 	CustomVehicleControllerBodyStateTire& tire = tireNode->GetInfo();
 	tire.Init(this, tireInfo);
 
@@ -378,20 +379,9 @@ CustomVehicleControllerComponentBrake* CustomVehicleController::GetHandBrakes() 
 void CustomVehicleController::SetEngine(CustomVehicleControllerComponentEngine* const engine)
 {
 	if (m_engine) {
-		for (dList<CustomVehicleControllerBodyState*>::dListNode* node = m_stateList.GetFirst(); node; node = node->GetNext()) {
-			if (node->GetInfo() == &m_engineState) {
-				m_stateList.Remove(node);
-				break;
-			}
-		}
 		delete m_engine;
 	}
-
 	m_engine = engine;
-	if (m_engine) {
-		m_stateList.Append(&m_engineState);
-		m_engineState.Init(this);
-	}
 }
 
 void CustomVehicleController::SetSteering(CustomVehicleControllerComponentSteering* const steering)
@@ -446,7 +436,7 @@ void CustomVehicleController::Finalize()
 	m_chassisState.m_matrix = dGetIdentityMatrix();
 	m_chassisState.UpdateInertia();
 	dVector dir (m_chassisState.m_localFrame[1]);
-	for (TireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+	for (dTireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
 		CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
 		dVector posit  (tire->m_localFrame.m_posit);  
 		dComplemtaritySolver::dJacobian &jacobian0 = solver.m_jacobians[count];
@@ -471,7 +461,7 @@ void CustomVehicleController::Finalize()
 	solver.Solve (count, 1.0e-6f, sprungMass, unitAccel);
 
 	int index = 0;
-	for (TireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+	for (dTireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
 		CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
 		tire->m_restSprunMass = dFloat (5.0f * dFloor (sprungMass[index] / 5.0f + 0.5f));
 		index ++;
@@ -504,7 +494,7 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 	if (m_finalized) {
 		NewtonBody* const body = GetBody();
 		NewtonBodyGetMatrix(body, &m_chassisState.m_matrix[0][0]);
-		for (TireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+		for (dTireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
 			CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
 			tire->UpdateTransform();
 		}
