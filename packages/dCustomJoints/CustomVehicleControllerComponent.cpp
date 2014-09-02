@@ -228,9 +228,10 @@ int CustomVehicleControllerComponentEngine::dEngineDifferencial::GetTireArray (C
 
 
 CustomVehicleControllerComponentEngine::dGearBox::dGearBox(CustomVehicleController* const controller, dFloat reverseGearRatio, int gearCount, const dFloat* const gearBox)
-	:m_gearsCount(gearCount + 2)
-	,m_currentGear(NULL)
+	:m_currentGear(NULL)
     ,m_controller(controller)
+	,m_shiftTimer(0.0f)
+	,m_gearsCount(gearCount + 2)	
 	,m_automatic(true)
 {
 	memset (m_gears, 0, sizeof (m_gears));
@@ -373,7 +374,14 @@ int CustomVehicleControllerComponentEngine::dGearBox::GetGearCount() const
 void CustomVehicleControllerComponentEngine::dGearBox::Update(dFloat timestep)
 {
 	if (m_automatic) {
-        m_currentGear = m_currentGear->Update(m_controller);
+		m_shiftTimer -= timestep;
+		if (m_shiftTimer < 0.0f) {
+			int oldGear = GetGear();
+			m_currentGear = m_currentGear->Update(m_controller);
+			if (oldGear != GetGear()) {
+				m_shiftTimer = 0.5f;
+			}
+		} 
 	}
 }
 
@@ -632,7 +640,7 @@ void CustomVehicleControllerComponentEngine::InitEngineTorqueCurve (dFloat vehic
 	m_engineIdleResistance2 = (T - W * m_engineIdleResistance1) / (W * W);
 	dAssert (m_engineIdleResistance2 > 0.0f);
 
-	m_gearBox->SetOptimalShiftLimits (m_radiansPerSecundsAtIdleTorque / m_radiansPerSecundsAtRedLine, m_radiansPerSecundsAtPeakPower/ m_radiansPerSecundsAtRedLine);
+	m_gearBox->SetOptimalShiftLimits (rpsTable[2] /rpsTable[4], rpsTable[3] / rpsTable[4]);
 	m_gearBox->SetGear(oldGear);
 }
 
@@ -645,12 +653,12 @@ void CustomVehicleControllerComponentEngine::Update (dFloat timestep)
 	gearBox->Update (timestep);
 
 	int gear = gearBox->GetGear();
-if (gear > (CustomVehicleControllerComponentEngine::dGearBox::m_firstGear + 1))
-{
+//dTrace (("%d\n", gear));
+//if (gear > (CustomVehicleControllerComponentEngine::dGearBox::m_firstGear + 1))
+//{
 //	gearBox->SetGear (CustomVehicleControllerComponentEngine::dGearBox::m_firstGear + 1);
 //	gear = gearBox->GetGear();
-}
-
+//}
 	
 	if (m_engineSwitch) {
 		dFloat gearRatio = gearBox->GetGearRatio(gear);
@@ -686,9 +694,6 @@ if (gear > (CustomVehicleControllerComponentEngine::dGearBox::m_firstGear + 1))
 		}
 		m_engineToque = 0.0f;
 	}
-
-	
-
 
 	dVector front (chassis.m_matrix.RotateVector(chassis.m_localFrame[0]));
 	m_speedMPS = chassis.m_veloc % front;

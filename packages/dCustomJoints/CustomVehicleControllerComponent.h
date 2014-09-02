@@ -213,7 +213,9 @@ class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComp
 		dGearState* m_gears[m_maxGears];
 		dGearState* m_currentGear;
 		CustomVehicleController* m_controller;
+		dFloat m_shiftTimer; 
 		int m_gearsCount;
+		
 		bool m_automatic;
 	};
 
