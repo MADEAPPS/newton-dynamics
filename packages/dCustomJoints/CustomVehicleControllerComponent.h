@@ -93,8 +93,7 @@ class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComp
 		CUSTOM_JOINTS_API virtual ~dDifferencial (){}
 
 		CUSTOM_JOINTS_API dFloat GetShaftOmega() const;
-		CUSTOM_JOINTS_API void ApplyTireTorque(dFloat shaftTorque, dFloat shaftOmega) const;
-		
+		CUSTOM_JOINTS_API void ApplyTireTorque (dFloat shaftTorque, dFloat shaftOmega) const;
 		
 		CUSTOM_JOINTS_API virtual int GetGainArray (dFloat * const gains) const = 0;
 		CUSTOM_JOINTS_API virtual int GetTireArray(CustomVehicleControllerBodyStateTire** const array) const = 0;
@@ -180,14 +179,10 @@ class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComp
 		{
 			public:
 			dReverseGearState (dFloat ratio)
-				:dGearState(ratio, 1000.0f, -1000.0f, m_reverseGear)
+				:dGearState(-dAbs(ratio), 1000.0f, -1000.0f, m_reverseGear)
 			{
 			}
-
-			dGearState* Update(CustomVehicleController* const vehicle)
-			{
-				return NULL;
-			}
+			virtual dGearState* Update(CustomVehicleController* const vehicle);
 		};
 
 		class dNeutralGearState: public dGearState

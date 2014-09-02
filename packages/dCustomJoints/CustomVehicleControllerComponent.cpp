@@ -98,13 +98,15 @@ void CustomVehicleControllerComponentBrake::Update (dFloat timestep)
 }
 
 
-void CustomVehicleControllerComponentEngine::dDifferencial::ApplyTireTorque(dFloat shaftTorque, dFloat shaftOmega) const
+void CustomVehicleControllerComponentEngine::dDifferencial::ApplyTireTorque (dFloat shaftTorque, dFloat shaftOmega) const
 {
 	dFloat differentialGains[32];
 	CustomVehicleControllerBodyStateTire* tireArray[32];
 
 	GetTireArray (tireArray);
 	int count = GetGainArray (differentialGains);
+
+	shaftOmega = dAbs (shaftOmega);
 
 	dFloat gainSum = 0.0f;
 	dFloat gainOmegaSum =  0.0f; 
@@ -114,7 +116,7 @@ void CustomVehicleControllerComponentEngine::dDifferencial::ApplyTireTorque(dFlo
 	}
 
 	if(dAbs (gainOmegaSum) < 1.0e-1f) {
-		dFloat torqueContribution = dSign (shaftOmega) * shaftTorque / gainSum;
+		dFloat torqueContribution = shaftTorque / gainSum;
 		for (int i = 0; i < count; i ++) {
 			dFloat tireTorque = torqueContribution * differentialGains[i];
 			const dMatrix& matrix = tireArray[i]->GetMatrix();
@@ -281,6 +283,7 @@ CustomVehicleControllerComponentEngine::dGearBox::dGearBox(CustomVehicleControll
     }
 }
 
+
 CustomVehicleControllerComponentEngine::dGearBox::~dGearBox ()
 {
 	for (int i = 0; i < m_gearsCount; i ++) {
@@ -349,6 +352,11 @@ CustomVehicleControllerComponentEngine::dGearBox::dGearState* CustomVehicleContr
     return this;
 }
 
+
+CustomVehicleControllerComponentEngine::dGearBox::dGearState* CustomVehicleControllerComponentEngine::dGearBox::dReverseGearState::Update(CustomVehicleController* const vehicle)
+{
+	return this;
+}
 
 
 dFloat CustomVehicleControllerComponentEngine::dGearBox::GetGearRatio(int gear) const 
@@ -525,7 +533,7 @@ dFloat CustomVehicleControllerComponentEngine::GetSpeed () const
 
 dFloat CustomVehicleControllerComponentEngine::GetRPM () const
 {
-	return m_engineRPS * m_crownGearRatio * 9.55f;
+	return dMax (-m_engineRPS * m_crownGearRatio * 9.55f, 0.0f);
 }
 
 dFloat CustomVehicleControllerComponentEngine::GetTopRPM () const
@@ -679,10 +687,12 @@ void CustomVehicleControllerComponentEngine::Update (dFloat timestep)
 	int gear = gearBox->GetGear();
 //dTrace (("%d\n", gear));
 //if (gear > (CustomVehicleControllerComponentEngine::dGearBox::m_firstGear))
-//{
-//	gearBox->SetGear (CustomVehicleControllerComponentEngine::dGearBox::m_firstGear);
+{
+	//gearBox->SetGear (CustomVehicleControllerComponentEngine::dGearBox::m_firstGear);
+//	gearBox->SetGear (CustomVehicleControllerComponentEngine::dGearBox::m_reverseGear);
 //	gear = gearBox->GetGear();
-//}
+}
+
 	
 	if (m_engineSwitch) {
 		if (gear == CustomVehicleControllerComponentEngine::dGearBox::m_newtralGear) {
@@ -693,23 +703,16 @@ void CustomVehicleControllerComponentEngine::Update (dFloat timestep)
 		} else {
 			dFloat gearRatio = gearBox->GetGearRatio(gear);
 			dFloat shaftOmega = m_differencial->GetShaftOmega();
-			dFloat param = GetParam() * 0.5f;
-			m_engineRPS = dAbs (shaftOmega) * gearRatio;
-			dFloat nominalTorque = GetTorque (m_engineRPS) * param - m_engineInternalFriction * m_engineRPS;
-			m_engineToque = m_engineToque + (nominalTorque - m_engineToque) * timestep / m_clutchTorqueCouplingTime;
+			m_engineRPS = shaftOmega * gearRatio;
+			dFloat torqueResistance = - m_engineInternalFriction * m_engineRPS;
 
+			dFloat param = GetParam() * 0.5f;
+			dFloat nominalTorque = -GetTorque (dMax (-m_engineRPS, 0.0f)) * param;
+			dFloat engineTorque = nominalTorque + torqueResistance;
+
+			m_engineToque = m_engineToque + (engineTorque - m_engineToque) * timestep / m_clutchTorqueCouplingTime;
 			dFloat shaftTorque = m_engineToque * gearRatio;
 			m_differencial->ApplyTireTorque(shaftTorque, shaftOmega);
-
-			/*
-			// apply the engine torque on this tire
-			dFloat sign = dSign (gearRatio);
-			dVector reactionTorque (chassis.m_matrix[2].Scale (m_engineToque * sign * 0.25f));
-
-			// there is not direct joint between the tire and the chassis, but there tire inertia should apply some toque to the engine
-			// I will use an arbitrary 25% of the torque goes to the chassis.
-			chassis.SetTorque(chassis.GetTorque() + reactionTorque);
-			*/
 		}
 	} else {
 		m_engineRPS = m_engineRPS * 0.95f;

@@ -111,6 +111,7 @@ class BasicVehicleEntity: public DemoEntity
 		,m_helpKey (true)
 		,m_gearUpKey (false)
 		,m_gearDownKey (false)
+		,m_reverseGear (false)
 		,m_engineKeySwitch(false)
 		,m_automaticTransmission(true)
 		,m_engineKeySwitchCounter(0)
@@ -495,7 +496,6 @@ class BasicVehicleEntity: public DemoEntity
 			handBrakePedal = (joyButtons & 1) ? 1.0f : 0.0f;
 */			
 		} else {
-
 	
 			// get keyboard controls
 			if (mainWindow->GetKeyState ('W')) {
@@ -511,6 +511,7 @@ class BasicVehicleEntity: public DemoEntity
 			if (mainWindow->GetKeyState (' ')) {
 				handBrakePedal = 1.0f;
 			}
+
 
 			// get the steering input
 			steeringVal = (dFloat (mainWindow->GetKeyState ('D')) - dFloat (mainWindow->GetKeyState ('A')));
@@ -533,18 +534,21 @@ class BasicVehicleEntity: public DemoEntity
 		// set the help key
 		m_helpKey.UpdatePushButton (mainWindow, 'H');
 
+		int reverseGear = m_reverseGear.UpdateTriggerButton (mainWindow, 'R') ? 1 : 0;
+
 		// count the engine key switch
 		m_engineKeySwitchCounter += m_engineKeySwitch.UpdateTriggerButton(mainWindow, 'Y');
 
 		// check transmission type
 		int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
-#if 1
+#if 0
 	#if 0
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
 			fwrite (&m_engineKeySwitchCounter, sizeof (int), 1, file);
 			fwrite (&toggleTransmission, sizeof (int), 1, file);
+			fwrite (&reverseGear, sizeof (int), 1, file);
 			fwrite (&gear, sizeof (int), 1, file);
 			fwrite (&steeringVal, sizeof (dFloat), 1, file);
 			fwrite (&engineGasPedal, sizeof (dFloat), 1, file);
@@ -557,11 +561,13 @@ class BasicVehicleEntity: public DemoEntity
 		if (file) {		
 			fread (&m_engineKeySwitchCounter, sizeof (int), 1, file);
 			fread (&toggleTransmission, sizeof (int), 1, file);
+			fread (&reverseGear, sizeof (int), 1, file);
 			fread (&gear, sizeof (int), 1, file);
 			fread (&steeringVal, sizeof (dFloat), 1, file);
 			fread (&engineGasPedal, sizeof (dFloat), 1, file);
 			fread (&handBrakePedal, sizeof (dFloat), 1, file);
 			fread (&brakePedal, sizeof (dFloat), 1, file);
+
 		}
 	#endif
 #endif
@@ -576,6 +582,14 @@ class BasicVehicleEntity: public DemoEntity
 			if (!engine->GetTransmissionMode()) {
 				engine->SetGear(gear);
 			}
+			if (reverseGear) {
+				if (engine->GetGear() == CustomVehicleControllerComponentEngine::dGearBox::m_reverseGear) {
+					engine->SetGear(CustomVehicleControllerComponentEngine::dGearBox::m_newtralGear);
+				} else {
+					engine->SetGear(CustomVehicleControllerComponentEngine::dGearBox::m_reverseGear);
+				}
+			}
+
 			engine->SetParam(engineGasPedal);
 		}
 		if (steering) {
@@ -670,6 +684,7 @@ p0 += chassis.GetMatrix()[2].Scale ((tireMatrix.m_posit.m_z > 0.0f ? 1.0f : -1.0
 	DemoEntityManager::ButtonKey m_helpKey;
 	DemoEntityManager::ButtonKey m_gearUpKey;
 	DemoEntityManager::ButtonKey m_gearDownKey;
+	DemoEntityManager::ButtonKey m_reverseGear;
 	DemoEntityManager::ButtonKey m_engineKeySwitch;
 	DemoEntityManager::ButtonKey m_automaticTransmission;
 	int m_gearMap[10];
@@ -798,11 +813,12 @@ class BasicVehicleControllerManager: public CustomVehicleControllerManager
 		if (m_player->m_helpKey.GetPushButtonState()) {
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "Vehicle driving keyboard control:   Joystick control");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "keySwich			: 'Y'           start engine");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "key switch			: 'Y'           start engine");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "accelerator         : 'W'           stick forward");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "brakes              : 'S'           stick back");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right          : 'D'           stick right");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right          : 'S'           stick left");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "toggle Reverse Gear	: 'R'           toggle reverse Gear");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear up             : '>'           button 2");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear down           : '<'           button 4");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "manual transmission : enter         button 4");

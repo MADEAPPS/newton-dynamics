@@ -77,8 +77,9 @@ class CustomVehicleController::dTireForceSolverSolver: public dComplemtaritySolv
 		}
 static int xxx;
 xxx ++;
-if (xxx == 100){
-controller->m_chassisState.SetVeloc(dVector (0.0f, 0.0f, -20.0f, 0.0f));
+if ((xxx > 500) && (xxx < 504)) 
+{
+//controller->m_chassisState.SetVeloc(dVector (0.0f, 0.0f, 40.0f, 0.0f));
 //controller->m_chassisState.SetOmega(dVector (0.0f, 0.0f, 0.0f, 0.0f));
 //controller->m_chassisState.SetForce(dVector (0.0f, 0.0f, 0.0f, 0.0f));
 //controller->m_chassisState.SetTorque(dVector (0.0f, 0.0f, 0.0f, 0.0f));
