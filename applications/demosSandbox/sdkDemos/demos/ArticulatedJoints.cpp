@@ -637,12 +637,12 @@ class AriculatedJointInputManager: public CustomInputManager
 
 		NewtonDemos* const mainWindow = m_scene->GetRootWindow();
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*) m_player->GetUserData();
-
-		inputs.m_steerValue = int (mainWindow->GetKeyState ('A')) - int (mainWindow->GetKeyState ('D'));
-		inputs.m_throttleValue = int (mainWindow->GetKeyState ('W')) - int (mainWindow->GetKeyState ('S'));
+		
 		inputs.m_tiltValue = int (mainWindow->GetKeyState ('Z')) - int (mainWindow->GetKeyState ('X'));
 		inputs.m_liftValue = int (mainWindow->GetKeyState ('Q')) - int (mainWindow->GetKeyState ('E'));
 		inputs.m_openValue = int (mainWindow->GetKeyState ('F')) - int (mainWindow->GetKeyState ('G'));
+		inputs.m_steerValue = int (mainWindow->GetKeyState ('D')) - int (mainWindow->GetKeyState ('A'));
+		inputs.m_throttleValue = int (mainWindow->GetKeyState ('W')) - int (mainWindow->GetKeyState ('S'));
 
 		// check if we must activate the player
 		if (mainWindow->GetKeyState ('A') || 
