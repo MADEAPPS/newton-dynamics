@@ -103,36 +103,36 @@ class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComp
 		dFloat m_gain1;
 	};
 
-	class dTireDifferencial: public dDifferencial
+	class dEngine2WDDifferencial: public dDifferencial
 	{
 		public:
-		CUSTOM_JOINTS_API dTireDifferencial (CustomVehicleController* const controller, CustomVehicleControllerBodyStateTire* const leftTire, CustomVehicleControllerBodyStateTire* const rightTire);
+		CUSTOM_JOINTS_API dEngine2WDDifferencial (CustomVehicleController* const controller, CustomVehicleControllerBodyStateTire* const leftTire, CustomVehicleControllerBodyStateTire* const rightTire);
 		CUSTOM_JOINTS_API virtual int GetGainArray (dFloat * const gains) const;
 		CUSTOM_JOINTS_API virtual int GetTireArray(CustomVehicleControllerBodyStateTire** const array) const;
 		CUSTOM_JOINTS_API virtual int AddDifferentialJoints (dComplemtaritySolver::dBilateralJoint** const buffer);
-		CUSTOM_JOINTS_API virtual ~dTireDifferencial (){}
+		CUSTOM_JOINTS_API virtual ~dEngine2WDDifferencial (){}
 
 		protected:
 		CustomVehicleControllerBodyStateTire* m_tire0;
 		CustomVehicleControllerBodyStateTire* m_tire1;
 		CustomVehicleControllerEngineDifferencialJoint m_differentialJoint;
-		friend class dEngineDifferencial;
+		friend class dEngine4WDDifferencial;
 	};
 
-	class dEngineDifferencial: public dDifferencial
+	class dEngine4WDDifferencial: public dDifferencial
 	{
 		public:
-		CUSTOM_JOINTS_API dEngineDifferencial (CustomVehicleController* const controller, dTireDifferencial* const frontDifferencial, dTireDifferencial* const rearDifferencial);
+		CUSTOM_JOINTS_API dEngine4WDDifferencial (CustomVehicleController* const controller, dEngine2WDDifferencial* const frontDifferencial, dEngine2WDDifferencial* const rearDifferencial);
 		
 		CUSTOM_JOINTS_API virtual int GetGainArray (dFloat * const gains) const;
 		CUSTOM_JOINTS_API virtual int GetTireArray(CustomVehicleControllerBodyStateTire** const array) const;
 		CUSTOM_JOINTS_API virtual int AddDifferentialJoints (dComplemtaritySolver::dBilateralJoint** const buffer);
 
 		protected:
-		CUSTOM_JOINTS_API virtual ~dEngineDifferencial();
+		CUSTOM_JOINTS_API virtual ~dEngine4WDDifferencial();
 		
-		dTireDifferencial* m_differencial0;
-		dTireDifferencial* m_differencial1;
+		dEngine2WDDifferencial* m_differencial0;
+		dEngine2WDDifferencial* m_differencial1;
 	};
 
 

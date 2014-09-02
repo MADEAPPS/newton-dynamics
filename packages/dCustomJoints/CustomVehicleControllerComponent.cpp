@@ -162,7 +162,7 @@ CustomVehicleControllerComponentEngine::dDifferencial::dDifferencial (CustomVehi
 }
 
 
-CustomVehicleControllerComponentEngine::dTireDifferencial::dTireDifferencial (CustomVehicleController* const controller, CustomVehicleControllerBodyStateTire* const leftTire, CustomVehicleControllerBodyStateTire* const rightTire)
+CustomVehicleControllerComponentEngine::dEngine2WDDifferencial::dEngine2WDDifferencial (CustomVehicleController* const controller, CustomVehicleControllerBodyStateTire* const leftTire, CustomVehicleControllerBodyStateTire* const rightTire)
 	:dDifferencial (controller)
 	,m_tire0(leftTire)
 	,m_tire1(rightTire)
@@ -174,21 +174,21 @@ CustomVehicleControllerComponentEngine::dTireDifferencial::dTireDifferencial (Cu
 	m_differentialJoint.m_ratio = m_tire0->m_radio / m_tire1->m_radio;
 }
 
-int CustomVehicleControllerComponentEngine::dTireDifferencial::GetTireArray (CustomVehicleControllerBodyStateTire** const array) const
+int CustomVehicleControllerComponentEngine::dEngine2WDDifferencial::GetTireArray (CustomVehicleControllerBodyStateTire** const array) const
 {
 	array[0] = m_tire0;
 	array[1] = m_tire1;
 	return 2;
 }
 
-int CustomVehicleControllerComponentEngine::dTireDifferencial::AddDifferentialJoints (dComplemtaritySolver::dBilateralJoint** const buffer)
+int CustomVehicleControllerComponentEngine::dEngine2WDDifferencial::AddDifferentialJoints (dComplemtaritySolver::dBilateralJoint** const buffer)
 {
 	buffer[0] = &m_differentialJoint;
 	return 1;
 }
 
 
-int CustomVehicleControllerComponentEngine::dTireDifferencial::GetGainArray (dFloat* const gains) const
+int CustomVehicleControllerComponentEngine::dEngine2WDDifferencial::GetGainArray (dFloat* const gains) const
 {
 	gains[0] = m_gain0;
 	gains[1] = m_gain1;
@@ -196,7 +196,7 @@ int CustomVehicleControllerComponentEngine::dTireDifferencial::GetGainArray (dFl
 }
 
 
-CustomVehicleControllerComponentEngine::dEngineDifferencial::dEngineDifferencial (CustomVehicleController* const controller, dTireDifferencial* const frontDifferencial, dTireDifferencial* const rearDifferencial)
+CustomVehicleControllerComponentEngine::dEngine4WDDifferencial::dEngine4WDDifferencial (CustomVehicleController* const controller, dEngine2WDDifferencial* const frontDifferencial, dEngine2WDDifferencial* const rearDifferencial)
 	:dDifferencial (controller)
 	,m_differencial0 (frontDifferencial)
 	,m_differencial1 (rearDifferencial)
@@ -216,28 +216,28 @@ CustomVehicleControllerComponentEngine::dEngineDifferencial::dEngineDifferencial
 	m_gain1 = 2.0f - m_gain0;
 }
 
-CustomVehicleControllerComponentEngine::dEngineDifferencial::~dEngineDifferencial()
+CustomVehicleControllerComponentEngine::dEngine4WDDifferencial::~dEngine4WDDifferencial()
 {
 	delete m_differencial0;
 	delete m_differencial1;
 }
 
 
-int CustomVehicleControllerComponentEngine::dEngineDifferencial::GetGainArray (dFloat* const gains) const
+int CustomVehicleControllerComponentEngine::dEngine4WDDifferencial::GetGainArray (dFloat* const gains) const
 {
 	int count0 = m_differencial0->GetGainArray (gains);
 	int count1 = m_differencial1->GetGainArray (&gains[count0]);
 	return count0 + count1;
 }
 
-int CustomVehicleControllerComponentEngine::dEngineDifferencial::GetTireArray (CustomVehicleControllerBodyStateTire** const array) const
+int CustomVehicleControllerComponentEngine::dEngine4WDDifferencial::GetTireArray (CustomVehicleControllerBodyStateTire** const array) const
 {
 	int count0 = m_differencial0->GetTireArray (array);
 	int count1 = m_differencial1->GetTireArray (&array[count0]);
 	return count0 + count1;
 }
 
-int CustomVehicleControllerComponentEngine::dEngineDifferencial::AddDifferentialJoints (dComplemtaritySolver::dBilateralJoint** const buffer)
+int CustomVehicleControllerComponentEngine::dEngine4WDDifferencial::AddDifferentialJoints (dComplemtaritySolver::dBilateralJoint** const buffer)
 {
 	int count0 = m_differencial0->AddDifferentialJoints (buffer);
 	int count1 = m_differencial0->AddDifferentialJoints (buffer + count0);

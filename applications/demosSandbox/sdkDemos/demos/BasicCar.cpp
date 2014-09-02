@@ -181,8 +181,12 @@ class BasicVehicleEntity: public DemoEntity
 		DemoMesh* const mesh = chassis->GetMesh();
 		//dAssert (chassis->GetMeshMatrix().TestIdentity());
 		const dMatrix& meshMatrix = chassis->GetMeshMatrix();
-		float* const vertexList = mesh->m_vertex;
-		return NewtonCreateConvexHull(world, mesh->m_vertexCount, vertexList, 3 * sizeof (float), 0.001f, 0, &meshMatrix[0][0]);
+
+		dVector* const temp = new dVector[mesh->m_vertexCount];
+		meshMatrix.TransformTriplex (&temp[0].m_x, sizeof (dVector), mesh->m_vertex, 3 * sizeof (dFloat), mesh->m_vertexCount);
+		NewtonCollision* const shape = NewtonCreateConvexHull (world, mesh->m_vertexCount, &temp[0].m_x, sizeof (dVector), 0.001f, 0, NULL);
+		delete[] temp;
+		return shape;
 	}
 
 	// interpolate all skeleton transform 
@@ -310,7 +314,7 @@ class BasicVehicleEntity: public DemoEntity
 
 
 	// this function is an example of how to make a high performance super car
-	void BuildMuscleCar ()
+	void BuildRearWheelDriveMuscleCar ()
 	{
 		// step one: find the location of each tire, in the visual mesh and add them one by one to the vehicle controller 
 		dFloat width;
@@ -355,7 +359,7 @@ class BasicVehicleEntity: public DemoEntity
 		// first make the gear Box
 		dFloat fowardSpeedGearsBoxRatios[] = {VIPER_TIRE_GEAR_1, VIPER_TIRE_GEAR_2, VIPER_TIRE_GEAR_3, VIPER_TIRE_GEAR_4, VIPER_TIRE_GEAR_5, VIPER_TIRE_GEAR_6};
 
-		CustomVehicleControllerComponentEngine::dTireDifferencial* const differencial = new CustomVehicleControllerComponentEngine::dTireDifferencial (m_controller, leftRearTire, rightRearTire);
+		CustomVehicleControllerComponentEngine::dEngine2WDDifferencial* const differencial = new CustomVehicleControllerComponentEngine::dEngine2WDDifferencial (m_controller, leftRearTire, rightRearTire);
 		CustomVehicleControllerComponentEngine::dGearBox* const gearBox = new CustomVehicleControllerComponentEngine::dGearBox(m_controller, VIPER_TIRE_GEAR_REVERSE, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios); 
 		CustomVehicleControllerComponentEngine* const engine = new CustomVehicleControllerComponentEngine (m_controller, gearBox, differencial);
 
@@ -374,6 +378,85 @@ class BasicVehicleEntity: public DemoEntity
 		dFloat viperPeakHorsePowerRPM = VIPER_PEAK_HP_RPM;
 		dFloat viperPeakHorsePower = VIPER_PEAK_HP;
 		
+		dFloat viperRedLineRPM = VIPER_REDLINE_TORQUE_RPM;
+		dFloat viperRedLineTorquePoundPerFoot = VIPER_REDLINE_TORQUE;
+
+		dFloat vehicleTopSpeedKPH = VIPER_TIRE_TOP_SPEED_KMH;
+		engine->InitEngineTorqueCurve (vehicleTopSpeedKPH, viperIdleTorquePoundPerFoot, viperIdleRPM, viperPeakTorquePoundPerFoot, viperPeakTorqueRPM, viperPeakHorsePower, viperPeakHorsePowerRPM, viperRedLineTorquePoundPerFoot, viperRedLineRPM);
+
+		// do not forget to call finalize after all components are added or after any change is made to the vehicle
+		m_controller->Finalize();
+	}
+
+
+	// this function is an example of how to make a high performance super car
+	void BuildFourWheelDriveSuperCar ()
+	{
+		// step one: find the location of each tire, in the visual mesh and add them one by one to the vehicle controller 
+		dFloat width;
+		dFloat radius;
+
+		// Muscle cars have the front engine, we need to shift the center of mass to the front to represent that
+		m_controller->SetCenterOfGravity (dVector (0.35f, VIPER_COM_Y_OFFSET, 0.0f, 0.0f)); 
+
+		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
+		CalculateTireDimensions ("fl_tire", width, radius);
+		dVector offset (0.0f, 0.0f, 0.0f, 0.0f);
+		CustomVehicleControllerBodyStateTire* const leftFrontTire = AddTire ("fl_tire", offset, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER, VIPER_TIRE_LATERAL_STIFFNESS, VIPER_TIRE_LONGITUDINAL_STIFFNESS, VIPER_TIRE_ALIGNING_MOMENT_TRAIL);
+		CustomVehicleControllerBodyStateTire* const rightFrontTire = AddTire ("fr_tire", offset, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER, VIPER_TIRE_LATERAL_STIFFNESS, VIPER_TIRE_LONGITUDINAL_STIFFNESS, VIPER_TIRE_ALIGNING_MOMENT_TRAIL);
+
+		// add real tires
+		CalculateTireDimensions ("rl_tire", width, radius);
+		dVector offset1 (0.0f, 0.05f, 0.0f, 0.0f);
+		CustomVehicleControllerBodyStateTire* const leftRearTire = AddTire ("rl_tire", offset1, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER, VIPER_TIRE_LATERAL_STIFFNESS, VIPER_TIRE_LONGITUDINAL_STIFFNESS, VIPER_TIRE_ALIGNING_MOMENT_TRAIL);
+		CustomVehicleControllerBodyStateTire* const rightRearTire = AddTire ("rr_tire", offset1, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER, VIPER_TIRE_LATERAL_STIFFNESS, VIPER_TIRE_LONGITUDINAL_STIFFNESS, VIPER_TIRE_ALIGNING_MOMENT_TRAIL);
+
+		// add an steering Wheel
+		CustomVehicleControllerComponentSteering* const steering = new CustomVehicleControllerComponentSteering (m_controller, VIPER_TIRE_STEER_ANGLE * 3.141592f / 180.0f);
+		steering->AddSteeringTire(leftFrontTire, -1.0f);
+		steering->AddSteeringTire(rightFrontTire, -1.0f);
+		m_controller->SetSteering(steering);
+
+		// add vehicle brakes
+		CustomVehicleControllerComponentBrake* const brakes = new CustomVehicleControllerComponentBrake (m_controller, VIPER_TIRE_BRAKE_TORQUE);
+		brakes->AddBrakeTire (leftFrontTire);
+		brakes->AddBrakeTire (rightFrontTire);
+		brakes->AddBrakeTire (leftRearTire);
+		brakes->AddBrakeTire (rightRearTire);
+		m_controller->SetBrakes(brakes);
+
+		// add vehicle hand brakes
+		CustomVehicleControllerComponentBrake* const handBrakes = new CustomVehicleControllerComponentBrake (m_controller, VIPER_TIRE_BRAKE_TORQUE);
+		handBrakes->AddBrakeTire (leftRearTire);
+		handBrakes->AddBrakeTire (rightRearTire);
+		m_controller->SetHandBrakes(handBrakes);
+
+		// add an engine
+		// first make the gear Box
+		dFloat fowardSpeedGearsBoxRatios[] = {VIPER_TIRE_GEAR_1, VIPER_TIRE_GEAR_2, VIPER_TIRE_GEAR_3, VIPER_TIRE_GEAR_4, VIPER_TIRE_GEAR_5, VIPER_TIRE_GEAR_6};
+
+		CustomVehicleControllerComponentEngine::dEngine2WDDifferencial* const frontDifferencial = new CustomVehicleControllerComponentEngine::dEngine2WDDifferencial (m_controller, leftFrontTire, rightFrontTire);
+		CustomVehicleControllerComponentEngine::dEngine2WDDifferencial* const rearDifferencial = new CustomVehicleControllerComponentEngine::dEngine2WDDifferencial (m_controller, leftRearTire, rightRearTire);
+
+		CustomVehicleControllerComponentEngine::dEngine4WDDifferencial* const differencial = new CustomVehicleControllerComponentEngine::dEngine4WDDifferencial (m_controller, frontDifferencial, rearDifferencial);
+		CustomVehicleControllerComponentEngine::dGearBox* const gearBox = new CustomVehicleControllerComponentEngine::dGearBox(m_controller, VIPER_TIRE_GEAR_REVERSE, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios); 
+		CustomVehicleControllerComponentEngine* const engine = new CustomVehicleControllerComponentEngine (m_controller, gearBox, differencial);
+
+		// the the default transmission type
+		engine->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
+
+		m_controller->SetEngine(engine);
+
+
+		dFloat viperIdleRPM = VIPER_IDLE_TORQUE_RPM;
+		dFloat viperIdleTorquePoundPerFoot = VIPER_IDLE_TORQUE;
+
+		dFloat viperPeakTorqueRPM = VIPER_PEAK_TORQUE_RPM;
+		dFloat viperPeakTorquePoundPerFoot = VIPER_PEAK_TORQUE;
+
+		dFloat viperPeakHorsePowerRPM = VIPER_PEAK_HP_RPM;
+		dFloat viperPeakHorsePower = VIPER_PEAK_HP;
+
 		dFloat viperRedLineRPM = VIPER_REDLINE_TORQUE_RPM;
 		dFloat viperRedLineTorquePoundPerFoot = VIPER_REDLINE_TORQUE;
 
@@ -1054,10 +1137,12 @@ void BasicCar (DemoEntityManager* const scene)
 
 	// make a vehicle entity shell
 	//BasicVehicleEntity* const vehicle = new BasicVehicleEntity (scene, manager, location, "f1.ngd");
-	BasicVehicleEntity* const vehicle = new BasicVehicleEntity (scene, manager, location, "viper.ngd");
-
+	//BasicVehicleEntity* const vehicle = new BasicVehicleEntity (scene, manager, location, "viper.ngd");
+	BasicVehicleEntity* const vehicle = new BasicVehicleEntity (scene, manager, location, "lambDiablo.ngd");
+	
 	// build a muscle car from this vehicle controller
-	vehicle->BuildMuscleCar();
+	//vehicle->BuildReadWheelDriveMuscleCar();
+	vehicle->BuildFourWheelDriveSuperCar();
 
 	// set this vehicle as the player
 	manager->SetAsPlayer(vehicle);
