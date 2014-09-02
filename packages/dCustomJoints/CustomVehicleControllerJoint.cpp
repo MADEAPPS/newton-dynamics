@@ -329,77 +329,6 @@ void CustomVehicleControllerContactJoint::JacobianDerivative (dComplemtaritySolv
 }
 
 /*
-void CustomVehicleControllerEngineGearJoint::UpdateSolverForces (const dComplemtaritySolver::dJacobianPair* const jacobians) const
-{
-#if 0
-	const CustomVehicleControllerBodyStateTire* const tire = (CustomVehicleControllerBodyStateTire*)m_state1;
-	const CustomVehicleControllerBodyStateEngine* const engine = (CustomVehicleControllerBodyStateEngine*)m_state0;
-
-	// get tire lateral force
-	const int index = m_start;
-	const dVector& tireAxis = tire->m_matrix[0];
-	dVector torque (jacobians[index].m_jacobian_IM1.m_angular.Scale(m_jointFeebackForce[0])); 
-
-	dFloat T = torque % tireAxis;
-	dFloat w = tireAxis % tire->m_omega;  
-	dTrace (("omega = %f, torque = %f\n", w, T));
-#endif
-}
-
-void CustomVehicleControllerEngineGearJoint::JacobianDerivative (dComplemtaritySolver::dParamInfo* const constraintParams)
-{
-	const CustomVehicleControllerBodyStateTire* const tire = (CustomVehicleControllerBodyStateTire*)m_state1;
-	const CustomVehicleControllerBodyStateEngine* const engine = (CustomVehicleControllerBodyStateEngine*)m_state0;
-	const CustomVehicleControllerComponentEngine* const engineComponent = m_controller->GetEngine();
-
-	dFloat scale = (engineComponent->GetGear() != CustomVehicleControllerComponentEngine::dGearBox::m_reverseGear) ? dFloat(1.0f) : dFloat(-1.0f);
-
-	const dVector& tireAxis = tire->m_matrix[0];
-	const dVector& engineAxis = engine->m_matrix[0];
-
-	dFloat tireOmega = tireAxis % tire->m_omega;  
-	dFloat engineOmega = engineAxis % engine->m_omega;  
-
-	//dFloat ratio = -(m_powerTrainGain * tireOmega + engineOmega) * constraintParams->m_timestepInv;
-	dFloat ratio = -(tireOmega + engineOmega / m_powerTrainGain) * constraintParams->m_timestepInv;
-	AddAngularRowJacobian (constraintParams, engineAxis, tireAxis.Scale (scale), ratio);
-}
-
-void CustomVehicleControllerEngineGearJoint::UpdateSolverForces (const dComplemtaritySolver::dJacobianPair* const jacobians) const
-{
-#if 0
-	const CustomVehicleControllerBodyStateTire* const tire = (CustomVehicleControllerBodyStateTire*)m_state1;
-	const CustomVehicleControllerBodyStateEngine* const engine = (CustomVehicleControllerBodyStateEngine*)m_state0;
-
-	// get tire lateral force
-	const int index = m_start;
-	const dVector& tireAxis = tire->m_matrix[0];
-	dVector torque (jacobians[index].m_jacobian_IM1.m_angular.Scale(m_jointFeebackForce[0])); 
-
-	dFloat T = torque % tireAxis;
-	dFloat w = tireAxis % tire->m_omega;  
-	dTrace (("omega = %f, torque = %f\n", w, T));
-#endif
-}
-
-void CustomVehicleControllerEngineGearJoint::JacobianDerivative (dComplemtaritySolver::dParamInfo* const constraintParams)
-{
-	const CustomVehicleControllerBodyStateTire* const tire = (CustomVehicleControllerBodyStateTire*)m_state1;
-	const CustomVehicleControllerBodyStateEngine* const engine = (CustomVehicleControllerBodyStateEngine*)m_state0;
-	const CustomVehicleControllerComponentEngine* const engineComponent = m_controller->GetEngine();
-
-	dFloat scale = (engineComponent->GetGear() != CustomVehicleControllerComponentEngine::dGearBox::m_reverseGear) ? dFloat(1.0f) : dFloat(-1.0f);
-
-	const dVector& tireAxis = tire->m_matrix[0];
-	const dVector& engineAxis = engine->m_matrix[0];
-
-	dFloat tireOmega = tireAxis % tire->m_omega;  
-	dFloat engineOmega = engineAxis % engine->m_omega;  
-
-	//dFloat ratio = -(m_powerTrainGain * tireOmega + engineOmega) * constraintParams->m_timestepInv;
-	dFloat ratio = -(tireOmega + engineOmega / m_powerTrainGain) * constraintParams->m_timestepInv;
-	AddAngularRowJacobian (constraintParams, engineAxis, tireAxis.Scale (scale), ratio);
-}
 
 void CustomVehicleControllerEngineIdleJoint::UpdateSolverForces (const dComplemtaritySolver::dJacobianPair* const jacobians) const
 {
@@ -425,3 +354,23 @@ void CustomVehicleControllerEngineIdleJoint::JacobianDerivative (dComplemtarityS
 	constraintParams->m_jointHighFriction[index] = m_friction;
 }
 */
+
+void CustomVehicleControllerEngineDifferencialJoint::UpdateSolverForces (const dComplemtaritySolver::dJacobianPair* const jacobians) const
+{
+}
+
+void CustomVehicleControllerEngineDifferencialJoint::JacobianDerivative (dComplemtaritySolver::dParamInfo* const constraintParams)
+{
+	const CustomVehicleControllerBodyStateTire* const tire0 = (CustomVehicleControllerBodyStateTire*)m_state0;
+	const CustomVehicleControllerBodyStateTire* const tire1 = (CustomVehicleControllerBodyStateTire*)m_state1;
+	//const CustomVehicleControllerComponentEngine* const engineComponent = m_controller->GetEngine();
+
+	dVector axis0 (tire0->m_matrix[0]);
+	dVector axis1 (tire1->m_matrix[0].Scale (-1.0f));
+
+	dFloat omega0 = axis0 % tire0->m_omega;  
+	dFloat omega1 = axis1 % tire1->m_omega;  
+
+	dFloat ratioAccel = - 0.5f * (omega0 + m_ratio * omega1) * constraintParams->m_timestepInv;
+	AddAngularRowJacobian (constraintParams, axis0, axis1, ratioAccel);
+}

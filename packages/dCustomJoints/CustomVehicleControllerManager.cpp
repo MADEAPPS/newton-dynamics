@@ -32,7 +32,7 @@
 // T = x - |x| * x + x * x * x / 3 - |x| * x * x * x / 27 
 // they also have a better tire friction model that the naive friction circle projection
 
-// for the differencial equation I am using information from here
+// for the differential equation I am using information from here
 // http://web.mit.edu/2.972/www/reports/differential/differential.html
 
 // NewtonCustomJoint.cpp: implementation of the NewtonCustomJoint class.
@@ -75,10 +75,14 @@ class CustomVehicleController::dTireForceSolverSolver: public dComplemtaritySolv
 //tire->SetForce(dVector (0.0f, 0.0f, 0.0f, 0.0f));
 //tire->SetTorque(dVector (0.0f, 0.0f, 0.0f, 0.0f));
 		}
-//controller->m_chassisState.SetVeloc(dVector (0.0f, 0.0f, 0.0f, 0.0f));
+static int xxx;
+xxx ++;
+if (xxx == 100){
+controller->m_chassisState.SetVeloc(dVector (0.0f, 0.0f, -20.0f, 0.0f));
 //controller->m_chassisState.SetOmega(dVector (0.0f, 0.0f, 0.0f, 0.0f));
 //controller->m_chassisState.SetForce(dVector (0.0f, 0.0f, 0.0f, 0.0f));
 //controller->m_chassisState.SetTorque(dVector (0.0f, 0.0f, 0.0f, 0.0f));
+}
 
 
 		// update all components
@@ -134,6 +138,10 @@ class CustomVehicleController::dTireForceSolverSolver: public dComplemtaritySolv
 			m_jointArray[jointCount] = &tire->m_chassisJoint;
 			jointCount ++;
 			dAssert (jointCount < VEHICLE_CONTROLLER_MAX_JOINTS);
+		}
+
+		if (m_controller->m_engine) {
+			jointCount += m_controller->m_engine->AddDifferentialJoints(&m_jointArray[jointCount]);
 		}
 
 		//	for (int i = 0; i < m_angularJointCount; i ++) {

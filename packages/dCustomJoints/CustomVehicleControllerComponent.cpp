@@ -114,7 +114,7 @@ void CustomVehicleControllerComponentEngine::dDifferencial::ApplyTireTorque(dFlo
 	}
 
 	if(dAbs (gainOmegaSum) < 1.0e-1f) {
-		dFloat torqueContribution = shaftTorque / gainSum;
+		dFloat torqueContribution = dSign (shaftOmega) * shaftTorque / gainSum;
 		for (int i = 0; i < count; i ++) {
 			dFloat tireTorque = torqueContribution * differentialGains[i];
 			const dMatrix& matrix = tireArray[i]->GetMatrix();
@@ -123,7 +123,7 @@ void CustomVehicleControllerComponentEngine::dDifferencial::ApplyTireTorque(dFlo
 		}
 
 	} else {
-		dFloat shaftPower = shaftTorque * dAbs (shaftOmega) / gainOmegaSum;
+		dFloat shaftPower = shaftTorque * shaftOmega / gainOmegaSum;
 		for (int i = 0; i < count; i ++) {
 			dFloat tireTorque = shaftPower * differentialGains[i];
 			const dMatrix& matrix = tireArray[i]->GetMatrix();
@@ -147,7 +147,7 @@ dFloat CustomVehicleControllerComponentEngine::dDifferencial::GetShaftOmega() co
 	
 	for (int i = 0; i < count; i ++) {
 		gain += differentialGains[i];
-		omega += fabsf (tireArray[i]->m_rotationalSpeed) * differentialGains[i];
+		omega += tireArray[i]->m_rotationalSpeed * differentialGains[i];
 	}
 	return omega / gain;
 }
@@ -167,6 +167,9 @@ CustomVehicleControllerComponentEngine::dTireDifferencial::dTireDifferencial (Cu
 {
 	m_gain0 = 2.0f * m_tire0->m_radio / (m_tire0->m_radio + m_tire1->m_radio);
 	m_gain1 = 2.0f - m_gain0;
+
+	m_differentialJoint.Init(controller, m_tire0, m_tire1);
+	m_differentialJoint.m_ratio = m_tire0->m_radio / m_tire1->m_radio;
 }
 
 int CustomVehicleControllerComponentEngine::dTireDifferencial::GetTireArray (CustomVehicleControllerBodyStateTire** const array) const
@@ -174,6 +177,12 @@ int CustomVehicleControllerComponentEngine::dTireDifferencial::GetTireArray (Cus
 	array[0] = m_tire0;
 	array[1] = m_tire1;
 	return 2;
+}
+
+int CustomVehicleControllerComponentEngine::dTireDifferencial::AddDifferentialJoints (dComplemtaritySolver::dBilateralJoint** const buffer)
+{
+	buffer[0] = &m_differentialJoint;
+	return 1;
 }
 
 
@@ -225,6 +234,14 @@ int CustomVehicleControllerComponentEngine::dEngineDifferencial::GetTireArray (C
 	int count1 = m_differencial1->GetTireArray (&array[count0]);
 	return count0 + count1;
 }
+
+int CustomVehicleControllerComponentEngine::dEngineDifferencial::AddDifferentialJoints (dComplemtaritySolver::dBilateralJoint** const buffer)
+{
+	int count0 = m_differencial0->AddDifferentialJoints (buffer);
+	int count1 = m_differencial0->AddDifferentialJoints (buffer + count0);
+	return count0 + count1;
+}
+
 
 
 CustomVehicleControllerComponentEngine::dGearBox::dGearBox(CustomVehicleController* const controller, dFloat reverseGearRatio, int gearCount, const dFloat* const gearBox)
@@ -644,6 +661,13 @@ void CustomVehicleControllerComponentEngine::InitEngineTorqueCurve (dFloat vehic
 	m_gearBox->SetGear(oldGear);
 }
 
+int CustomVehicleControllerComponentEngine::AddDifferentialJoints (dComplemtaritySolver::dBilateralJoint** const buffer)
+{
+	if (m_differencial) {
+		return m_differencial->AddDifferentialJoints (buffer);
+	}
+	return 0;
+}
 
 void CustomVehicleControllerComponentEngine::Update (dFloat timestep)
 {
@@ -654,27 +678,27 @@ void CustomVehicleControllerComponentEngine::Update (dFloat timestep)
 
 	int gear = gearBox->GetGear();
 //dTrace (("%d\n", gear));
-//if (gear > (CustomVehicleControllerComponentEngine::dGearBox::m_firstGear + 1))
+//if (gear > (CustomVehicleControllerComponentEngine::dGearBox::m_firstGear))
 //{
-//	gearBox->SetGear (CustomVehicleControllerComponentEngine::dGearBox::m_firstGear + 1);
+//	gearBox->SetGear (CustomVehicleControllerComponentEngine::dGearBox::m_firstGear);
 //	gear = gearBox->GetGear();
 //}
 	
 	if (m_engineSwitch) {
-		dFloat gearRatio = gearBox->GetGearRatio(gear);
-		dFloat shaftOmega = m_differencial->GetShaftOmega();
 		if (gear == CustomVehicleControllerComponentEngine::dGearBox::m_newtralGear) {
 			dFloat param = dMax (GetParam(), 0.05f);
 			m_engineToque = GetTorque (m_engineRPS) * param - m_engineIdleResistance1 * m_engineRPS - m_engineIdleResistance2 * m_engineRPS * m_engineRPS;
 			dFloat alpha = m_engineIdleInvInertia * m_engineToque;
 			m_engineRPS = dMin (dMax (m_engineRPS + alpha * timestep, 0.0f), m_radiansPerSecundsAtRedLine);
 		} else {
+			dFloat gearRatio = gearBox->GetGearRatio(gear);
+			dFloat shaftOmega = m_differencial->GetShaftOmega();
 			dFloat param = GetParam() * 0.5f;
-			m_engineRPS = shaftOmega * gearRatio;
-			dFloat nominalTorque = GetTorque (dAbs (m_engineRPS)) * param - m_engineInternalFriction * m_engineRPS;
+			m_engineRPS = dAbs (shaftOmega) * gearRatio;
+			dFloat nominalTorque = GetTorque (m_engineRPS) * param - m_engineInternalFriction * m_engineRPS;
 			m_engineToque = m_engineToque + (nominalTorque - m_engineToque) * timestep / m_clutchTorqueCouplingTime;
 
-			dFloat shaftTorque = -m_engineToque * gearRatio;
+			dFloat shaftTorque = m_engineToque * gearRatio;
 			m_differencial->ApplyTireTorque(shaftTorque, shaftOmega);
 
 			/*

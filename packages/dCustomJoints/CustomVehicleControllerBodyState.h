@@ -49,7 +49,7 @@ class CustomVehicleControllerBodyState: public dComplemtaritySolver::dBodyState
 	friend class CustomVehicleControllerBodyStateTire;
 	friend class CustomVehicleControllerComponentBrake;
 	friend class CustomVehicleControllerBodyStateEngine;
-	friend class CustomVehicleControllerEngineGearJoint;
+	friend class CustomVehicleControllerEngineDifferencialJoint;
 	friend class CustomVehicleControllerEngineIdleJoint;
 	friend class CustomVehicleControllerComponentEngine;
 	friend class CustomVehicleControllerBodyStateChassis;
@@ -169,7 +169,7 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 	friend class CustomVehicleController;
 	friend class CustomVehicleControllerTireJoint;
 	friend class CustomVehicleControllerContactJoint;
-	friend class CustomVehicleControllerEngineGearJoint;
+	friend class CustomVehicleControllerEngineDifferencialJoint;
 	friend class CustomVehicleControllerEngineIdleJoint;
 	friend class CustomVehicleControllerComponentBrake;
 	friend class CustomVehicleControllerComponentEngine;

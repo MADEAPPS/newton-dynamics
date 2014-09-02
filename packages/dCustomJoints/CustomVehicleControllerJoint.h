@@ -75,17 +75,17 @@ class CustomVehicleControllerContactJoint: public CustomVehicleControllerJoint
 	NewtonWorldConvexCastReturnInfo m_contacts[4];
 };
 
-/*
-
-class CustomVehicleControllerEngineGearJoint: public CustomVehicleControllerJoint
+class CustomVehicleControllerEngineDifferencialJoint: public CustomVehicleControllerJoint
 {
 	public:
 	CUSTOM_JOINTS_API virtual void JacobianDerivative (dComplemtaritySolver::dParamInfo* const constraintParams); 
 	CUSTOM_JOINTS_API virtual void UpdateSolverForces (const dComplemtaritySolver::dJacobianPair* const jacobians) const;
 
-	dFloat m_powerTrainGain;
+	dFloat m_ratio;
 };
 
+
+/*
 class CustomVehicleControllerEngineIdleJoint: public CustomVehicleControllerJoint
 {
 	public:
@@ -96,6 +96,8 @@ class CustomVehicleControllerEngineIdleJoint: public CustomVehicleControllerJoin
 	dFloat m_friction;
 };
 */
+
+
 
 #endif 
 

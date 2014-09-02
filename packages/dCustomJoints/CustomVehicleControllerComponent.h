@@ -18,9 +18,10 @@
 #define D_CUSTOM_VEHICLE_CONTROLLER_COMPONENT_H_
 
 #include <CustomJointLibraryStdAfx.h>
+#include <CustomVehicleControllerJoint.h>
 #include <CustomAlloc.h>
 
-
+class dBilateralJoint;
 class CustomVehicleController;
 class CustomVehicleControllerBodyState;
 class CustomVehicleControllerBodyStateTire;
@@ -94,8 +95,10 @@ class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComp
 		CUSTOM_JOINTS_API dFloat GetShaftOmega() const;
 		CUSTOM_JOINTS_API void ApplyTireTorque(dFloat shaftTorque, dFloat shaftOmega) const;
 		
+		
 		CUSTOM_JOINTS_API virtual int GetGainArray (dFloat * const gains) const = 0;
 		CUSTOM_JOINTS_API virtual int GetTireArray(CustomVehicleControllerBodyStateTire** const array) const = 0;
+		CUSTOM_JOINTS_API virtual int AddDifferentialJoints (dComplemtaritySolver::dBilateralJoint** const buffer) = 0;
 		
 		dFloat m_gain0;
 		dFloat m_gain1;
@@ -107,11 +110,13 @@ class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComp
 		CUSTOM_JOINTS_API dTireDifferencial (CustomVehicleController* const controller, CustomVehicleControllerBodyStateTire* const leftTire, CustomVehicleControllerBodyStateTire* const rightTire);
 		CUSTOM_JOINTS_API virtual int GetGainArray (dFloat * const gains) const;
 		CUSTOM_JOINTS_API virtual int GetTireArray(CustomVehicleControllerBodyStateTire** const array) const;
+		CUSTOM_JOINTS_API virtual int AddDifferentialJoints (dComplemtaritySolver::dBilateralJoint** const buffer);
 		CUSTOM_JOINTS_API virtual ~dTireDifferencial (){}
 
 		protected:
 		CustomVehicleControllerBodyStateTire* m_tire0;
 		CustomVehicleControllerBodyStateTire* m_tire1;
+		CustomVehicleControllerEngineDifferencialJoint m_differentialJoint;
 		friend class dEngineDifferencial;
 	};
 
@@ -120,9 +125,9 @@ class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComp
 		public:
 		CUSTOM_JOINTS_API dEngineDifferencial (CustomVehicleController* const controller, dTireDifferencial* const frontDifferencial, dTireDifferencial* const rearDifferencial);
 		
-				
 		CUSTOM_JOINTS_API virtual int GetGainArray (dFloat * const gains) const;
 		CUSTOM_JOINTS_API virtual int GetTireArray(CustomVehicleControllerBodyStateTire** const array) const;
+		CUSTOM_JOINTS_API virtual int AddDifferentialJoints (dComplemtaritySolver::dBilateralJoint** const buffer);
 
 		protected:
 		CUSTOM_JOINTS_API virtual ~dEngineDifferencial();
@@ -247,6 +252,8 @@ class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComp
 	dFloat GetTorque (dFloat radianPerSeconds) const;
 
 	void SetTopSpeed (dFloat topSpeedMeterPerSecunds, dFloat rpsAtPeckPower);
+
+	int AddDifferentialJoints (dComplemtaritySolver::dBilateralJoint** const buffer );
 
 	protected:
 	void ConvertToMetricSystem (dFloat& vehicleSpeedInKilometerPerHours,

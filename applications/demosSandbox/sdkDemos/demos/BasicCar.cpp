@@ -1028,14 +1028,10 @@ void BasicCar (DemoEntityManager* const scene)
 	BasicVehicleControllerManager* const manager = new BasicVehicleControllerManager (world);
 
 	// create a simple vehicle
-//	dMatrix location (dYawMatrix(90.0f * 3.1416f/ 180.0f));
-//	location.m_posit.m_x = 126.0f;
-//	location.m_posit.m_y = 50.0f;
-//	location.m_posit.m_z = 50.0f;
-
-dMatrix location (dGetIdentityMatrix());
-location.m_posit.m_y = 50.0f;
-location.m_posit.m_x = -150.0f;
+	dMatrix location (dYawMatrix(90.0f * 3.1416f/ 180.0f));
+	location.m_posit.m_x = 126.0f;
+	location.m_posit.m_y = 50.0f;
+	location.m_posit.m_z = 50.0f;
 
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
 	location.m_posit.m_y += 1.0f;
