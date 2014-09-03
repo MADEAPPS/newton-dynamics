@@ -86,7 +86,7 @@ class CustomVehicleControllerComponent: public CustomAlloc
 class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComponent
 {
 	public:
-	class dDifferencial
+	class dDifferencial: public CustomAlloc  
 	{
 		public:
 		CUSTOM_JOINTS_API dDifferencial (CustomVehicleController* const controller);
@@ -95,44 +95,69 @@ class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComp
 		CUSTOM_JOINTS_API dFloat GetShaftOmega() const;
 		CUSTOM_JOINTS_API void ApplyTireTorque (dFloat shaftTorque, dFloat shaftOmega) const;
 		
+		CUSTOM_JOINTS_API virtual int GetAxelCount () const = 0;
 		CUSTOM_JOINTS_API virtual int GetGainArray (dFloat * const gains) const = 0;
 		CUSTOM_JOINTS_API virtual int GetTireArray(CustomVehicleControllerBodyStateTire** const array) const = 0;
-		CUSTOM_JOINTS_API virtual int AddDifferentialJoints (dComplemtaritySolver::dBilateralJoint** const buffer) = 0;
-		
-		dFloat m_gain0;
-		dFloat m_gain1;
+		CUSTOM_JOINTS_API virtual int GetDifferentialJoints (dComplemtaritySolver::dBilateralJoint** const buffer) = 0;
 	};
 
-	class dEngine2WDDifferencial: public dDifferencial
+	class dSingleAxelDifferencial: public dDifferencial
 	{
 		public:
-		CUSTOM_JOINTS_API dEngine2WDDifferencial (CustomVehicleController* const controller, CustomVehicleControllerBodyStateTire* const leftTire, CustomVehicleControllerBodyStateTire* const rightTire);
+		CUSTOM_JOINTS_API dSingleAxelDifferencial (CustomVehicleController* const controller, CustomVehicleControllerBodyStateTire* const leftTire, CustomVehicleControllerBodyStateTire* const rightTire);
+
+		CUSTOM_JOINTS_API virtual int GetAxelCount () const;
 		CUSTOM_JOINTS_API virtual int GetGainArray (dFloat * const gains) const;
 		CUSTOM_JOINTS_API virtual int GetTireArray(CustomVehicleControllerBodyStateTire** const array) const;
-		CUSTOM_JOINTS_API virtual int AddDifferentialJoints (dComplemtaritySolver::dBilateralJoint** const buffer);
-		CUSTOM_JOINTS_API virtual ~dEngine2WDDifferencial (){}
+		CUSTOM_JOINTS_API virtual int GetDifferentialJoints (dComplemtaritySolver::dBilateralJoint** const buffer);
+		CUSTOM_JOINTS_API virtual ~dSingleAxelDifferencial (){}
 
 		protected:
+		dFloat m_gain0;
+		dFloat m_gain1;
 		CustomVehicleControllerBodyStateTire* m_tire0;
 		CustomVehicleControllerBodyStateTire* m_tire1;
 		CustomVehicleControllerEngineDifferencialJoint m_differentialJoint;
-		friend class dEngine4WDDifferencial;
+		friend class dMultiAxelDifferencial;
 	};
 
-	class dEngine4WDDifferencial: public dDifferencial
+	class dMultiAxelDifferencial: public dDifferencial
 	{
 		public:
-		CUSTOM_JOINTS_API dEngine4WDDifferencial (CustomVehicleController* const controller, dEngine2WDDifferencial* const frontDifferencial, dEngine2WDDifferencial* const rearDifferencial);
+		class dGainAxelPair
+		{
+			public:
+			dGainAxelPair ()
+				:m_gain (0.0f)
+				,m_axel(NULL)
+			{
+			}
+
+			dGainAxelPair (const dGainAxelPair& copy)
+			{
+			}
+
+			~dGainAxelPair()
+			{
+				if (m_axel) {
+					delete m_axel;
+				}
+			}
+
+			dFloat m_gain;
+			dSingleAxelDifferencial* m_axel;
+		};
+
+		CUSTOM_JOINTS_API dMultiAxelDifferencial (CustomVehicleController* const controller, int count, dSingleAxelDifferencial** const dDifferencialArray);
 		
+		CUSTOM_JOINTS_API virtual int GetAxelCount () const;
 		CUSTOM_JOINTS_API virtual int GetGainArray (dFloat * const gains) const;
 		CUSTOM_JOINTS_API virtual int GetTireArray(CustomVehicleControllerBodyStateTire** const array) const;
-		CUSTOM_JOINTS_API virtual int AddDifferentialJoints (dComplemtaritySolver::dBilateralJoint** const buffer);
+		CUSTOM_JOINTS_API virtual int GetDifferentialJoints (dComplemtaritySolver::dBilateralJoint** const buffer);
 
 		protected:
-		CUSTOM_JOINTS_API virtual ~dEngine4WDDifferencial();
-		
-		dEngine2WDDifferencial* m_differencial0;
-		dEngine2WDDifferencial* m_differencial1;
+		CUSTOM_JOINTS_API virtual ~dMultiAxelDifferencial();
+		dList<dGainAxelPair> m_list;
 	};
 
 

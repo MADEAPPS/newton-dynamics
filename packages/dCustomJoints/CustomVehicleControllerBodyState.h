@@ -49,10 +49,31 @@ class CustomVehicleControllerBodyState: public dComplemtaritySolver::dBodyState
 	friend class CustomVehicleControllerBodyStateTire;
 	friend class CustomVehicleControllerComponentBrake;
 	friend class CustomVehicleControllerBodyStateEngine;
-	friend class CustomVehicleControllerEngineDifferencialJoint;
 	friend class CustomVehicleControllerEngineIdleJoint;
 	friend class CustomVehicleControllerComponentEngine;
 	friend class CustomVehicleControllerBodyStateChassis;
+	friend class CustomVehicleControllerComponentSteering;
+	friend class CustomVehicleControllerEngineDifferencialJoint;
+};
+
+
+
+class CustomVehicleControllerBodyStateContact: public CustomVehicleControllerBodyState
+{
+	private:
+	CUSTOM_JOINTS_API void Init (CustomVehicleController* const controller, const NewtonBody* const body);
+	CUSTOM_JOINTS_API virtual void ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega);
+
+	void UpdateDynamicInputs();
+
+	NewtonBody* m_newtonBody;
+	friend class CustomVehicleController;
+	friend class CustomVehicleControllerTireJoint;
+	friend class CustomVehicleControllerContactJoint;
+	friend class CustomVehicleControllerBodyStateTire;
+	friend class CustomVehicleControllerBodyStateEngine;
+	friend class CustomVehicleControllerComponentBrake;
+	friend class CustomVehicleControllerComponentEngine;
 	friend class CustomVehicleControllerComponentSteering;
 };
 
@@ -142,6 +163,11 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 	dVector m_tireLoad;
 	dVector m_lateralForce;
 	dVector m_longitudinalForce;
+	CustomVehicleControllerTireJoint m_chassisJoint;
+	CustomVehicleControllerContactJoint m_contactJoint[2];
+	CustomVehicleControllerBodyStateContact m_contactBody[2];
+
+	int m_contactCount;
 
 	dFloat m_radio;
 	dFloat m_width;
@@ -161,10 +187,10 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 	dFloat m_aligningMomentTrail;
 	dFloat m_longitudialStiffness;
 
+	
 	void* m_userData;
 	NewtonCollision* m_shape;
-	CustomVehicleControllerTireJoint m_chassisJoint;
-	CustomVehicleControllerContactJoint m_contactJoint;
+
 
 	friend class CustomVehicleController;
 	friend class CustomVehicleControllerTireJoint;

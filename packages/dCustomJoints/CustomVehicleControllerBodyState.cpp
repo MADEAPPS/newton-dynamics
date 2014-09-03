@@ -69,6 +69,74 @@ void CustomVehicleControllerBodyState::ApplyNetForceAndTorque (dFloat invTimeste
 }
 
 
+void CustomVehicleControllerBodyStateContact::Init (CustomVehicleController* const controller, const NewtonBody* const body)
+{
+	CustomVehicleControllerBodyState::Init (controller);
+
+	//m_myJoint = myJoint;
+	m_newtonBody = (NewtonBody*)body;
+
+	m_localFrame = dGetIdentityMatrix();
+	NewtonBodyGetCentreOfMass(body, &m_localFrame[3][0]);
+
+	NewtonBodyGetMatrix(body, &m_matrix[0][0]);
+	NewtonBodyGetMassMatrix(body, &m_mass, &m_localInertia[0], &m_localInertia[1], &m_localInertia[2]);
+
+	NewtonBodyGetOmega(body, &m_omega[0]);
+	NewtonBodyGetVelocity(body, &m_veloc[0]);
+
+	m_globalCentreOfMass = m_matrix.TransformVector(m_localFrame.m_posit);
+
+	dVector force (0.0f, 0.0f, 0.0f, 0.0f);
+	dVector torque (0.0f, 0.0f, 0.0f, 0.0f) ;
+	if (m_invMass > 0.0f) {
+		NewtonBodyGetForceAcc(m_newtonBody, &force[0]);
+		NewtonBodyGetTorqueAcc (m_newtonBody, &torque[0]);
+
+		for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint (m_newtonBody); joint; joint = NewtonBodyGetNextContactJoint (m_newtonBody, joint)) {
+			for (void* contact = NewtonContactJointGetFirstContact (joint); contact; contact = NewtonContactJointGetNextContact (joint, contact)) {
+				dVector point;
+				dVector normal;	
+				dVector tangentDir0;
+				dVector tangentDir1;
+				dVector contactForce;
+
+				NewtonMaterial* const material = NewtonContactGetMaterial (contact);
+				NewtonMaterialGetContactForce (material, m_newtonBody, &contactForce[0]);
+				NewtonMaterialGetContactPositionAndNormal (material, m_newtonBody, &point[0], &normal[0]);
+
+				force += contactForce;
+				torque += (point - m_globalCentreOfMass) * contactForce;
+				//NewtonMaterialGetContactTangentDirections (const NewtonMaterial* const material, NewtonBody* const body, dFloat* const dir0, dFloat* const dir1);
+			}
+		}
+	}
+	m_externalForce = force;
+	m_externalTorque = torque;
+	
+
+	if (m_mass > 1.0e-3f) {
+		m_invMass = 1.0f / m_mass;
+		m_localInvInertia[0] = 1.0f / m_localInertia[0];
+		m_localInvInertia[1] = 1.0f / m_localInertia[1];
+		m_localInvInertia[2] = 1.0f / m_localInertia[2];
+	} else {
+		m_invMass = 0.0f;
+		m_localInvInertia[0] = 0.0f;
+		m_localInvInertia[1] = 0.0f;
+		m_localInvInertia[2] = 0.0f;
+	}
+	UpdateInertia();
+}
+
+void CustomVehicleControllerBodyStateContact::UpdateDynamicInputs()
+{
+	dAssert (0);
+}
+
+void CustomVehicleControllerBodyStateContact::ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega)
+{
+}
 
 void CustomVehicleControllerBodyStateChassis::Init (CustomVehicleController* const controller, const dMatrix& localframe)
 {
@@ -227,7 +295,7 @@ void CustomVehicleControllerBodyStateTire::Init (CustomVehicleController* const 
 
 	// initialize the joints that connect tghsi tire to other vehicle componets;
 	m_chassisJoint.Init(m_controller, &m_controller->m_chassisState, this);
-	m_contactJoint.Init(m_controller, &m_controller->m_staticWorld, this);
+//	m_contactJoint.Init(m_controller, &m_controller->m_staticWorld, this);
 }
 
 void* CustomVehicleControllerBodyStateTire::GetUserData() const
@@ -285,17 +353,40 @@ void CustomVehicleControllerBodyStateTire::Collide (CustomControllerConvexCastPr
 	dMatrix tireMatrix (localMatrix * controllerMatrix);
 	dVector rayDestination (tireMatrix.TransformVector(localMatrix.m_up.Scale(-m_suspensionlenght)));   
 
-	m_contactJoint.m_contactCount = 0;
+//	m_contactJoint.m_contactCount = 0;
+	m_contactCount = 0;
+	NewtonWorldConvexCastReturnInfo contacts[4];
 
 	NewtonCollisionSetScale (m_controller->m_tireCastShape, m_width, m_radio, m_radio);
-	m_contactJoint.m_contactCount = NewtonWorldConvexCast (world, &tireMatrix[0][0], &rayDestination[0], m_controller->m_tireCastShape, &hitParam, &filter, CustomControllerConvexCastPreFilter::Prefilter, m_contactJoint.m_contacts, sizeof (m_contactJoint.m_contacts) / sizeof (m_contactJoint.m_contacts[0]), 0);
-	if (m_contactJoint.m_contactCount) {
-		// this tire hit something generate contact point and normals, 
-		// do not forget to filter bad contacts
+//	m_contactJoint.m_contactCount = NewtonWorldConvexCast (world, &tireMatrix[0][0], &rayDestination[0], m_controller->m_tireCastShape, &hitParam, &filter, CustomControllerConvexCastPreFilter::Prefilter, m_contactJoint.m_contacts, sizeof (m_contactJoint.m_contacts) / sizeof (m_contactJoint.m_contacts[0]), 0);
+	int contactCount = NewtonWorldConvexCast (world, &tireMatrix[0][0], &rayDestination[0], m_controller->m_tireCastShape, &hitParam, &filter, CustomControllerConvexCastPreFilter::Prefilter, contacts, sizeof (contacts) / sizeof (contacts[0]), 0);
+	if (contactCount) {
 		m_posit = hitParam * m_suspensionlenght;
 		m_speed = (posit0 - m_posit) * timestepInv;
+		for (int i = 1; i < contactCount; i ++) {
+			int j = i;
+			NewtonWorldConvexCastReturnInfo tmp (contacts[i]);
+			for (; j && (contacts[j - 1].m_hitBody > tmp.m_hitBody); j --) {
+				contacts[j] = contacts[j - 1];
+			}
+			contacts[j] = tmp;
+		}
+
+		for (int index = 0; (index < contactCount) && (m_contactCount < 2); ) {
+			const NewtonBody* const body = contacts[index].m_hitBody;
+			int count = 1;
+			for (int j = index + 1; (j < contactCount) && (contacts[j].m_hitBody == body); index ++) {
+				count ++;
+			}
+			CustomVehicleControllerContactJoint* const joint = &m_contactJoint[m_contactCount];
+			CustomVehicleControllerBodyStateContact* const externalBody = &m_contactBody[m_contactCount];
+			externalBody->Init (m_controller, body);
+			joint->Init(m_controller, externalBody, this);
+			joint->SetContacts (count, &contacts[index]);
+			m_contactCount ++;
+			index += count;
+		}
 	}
-	//dTrace (("%f ", m_posit));
 }
 
 
@@ -316,26 +407,24 @@ void CustomVehicleControllerBodyStateTire::UpdateDynamicInputs(dFloat timestep)
 	m_externalForce = chassis.m_gravity.Scale (m_mass);
 	m_externalTorque = dVector (0.0f, 0.0f, 0.0f, 0.0f);
 
-	// project contact to the surface of the tire shape
-	for (int i = 0; i < m_contactJoint.m_contactCount; i ++) {
-		NewtonWorldConvexCastReturnInfo& contact = m_contactJoint.m_contacts[i];
-
-		dVector point (contact.m_point[0], contact.m_point[1], contact.m_point[2], 0.0f);
-		dVector radius (point - m_matrix[3]);
-		radius -= m_matrix[0].Scale (m_matrix[0] % radius);
-		dAssert ((radius % radius) > 0.0f);
-		radius = radius.Scale (m_radio / dSqrt (radius % radius));
-		point = m_matrix[3] + radius;
-		contact.m_point[0] = point.m_x;
-		contact.m_point[1] = point.m_y;
-		contact.m_point[2] = point.m_z;
-	}
-
-	// calculate force an torque generate by the suspension
 	m_tireLoad = dVector(0.0f, 0.0f, 0.0f, 0.0f);
 	m_lateralForce = dVector(0.0f, 0.0f, 0.0f, 0.0f);
 	m_longitudinalForce = dVector(0.0f, 0.0f, 0.0f, 0.0f);
-	if (m_contactJoint.m_contactCount) {
+
+	// project contact to the surface of the tire shape
+	for (int i = 0; i < m_contactCount; i ++) {
+		CustomVehicleControllerContactJoint& contact = m_contactJoint[i];
+		for (int j = 0; j < contact.m_contactCount; j ++) {
+			dVector radius (contact.m_contacts[j].m_point - m_matrix[3]);
+			radius -= m_matrix[0].Scale (m_matrix[0] % radius);
+			dAssert ((radius % radius) > 0.0f);
+			radius = radius.Scale (m_radio / dSqrt (radius % radius));
+			contact.m_contacts[j].m_point = m_matrix[3] + radius;
+		}
+	}
+
+	// calculate force an torque generate by the suspension
+	if (m_contactCount) {
 		dFloat distance = m_suspensionlenght - m_posit;
 		dAssert (distance >= 0.0f);
 		dAssert (distance <= m_suspensionlenght);
@@ -362,9 +451,6 @@ void CustomVehicleControllerBodyStateTire::UpdateDynamicInputs(dFloat timestep)
 		// the spring apply the same force in the opposite direction to the tire
 		m_externalForce -= m_tireLoad;
 	}
-
-
-
 }
 
 

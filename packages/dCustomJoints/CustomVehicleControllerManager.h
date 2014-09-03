@@ -81,7 +81,7 @@ class CustomVehicleController: public CustomControllerBase
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 
-	CustomVehicleControllerBodyState m_staticWorld;
+//	CustomVehicleControllerBodyState m_staticWorld;
 	CustomVehicleControllerBodyStateChassis m_chassisState;
 
 	dTireList m_tireList;

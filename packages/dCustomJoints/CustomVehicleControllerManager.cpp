@@ -63,6 +63,12 @@ class CustomVehicleController::dTireForceSolverSolver: public dComplemtaritySolv
 		dFloat timestepInv = 1.0f / timestep;
 		NewtonBody* const body = controller->GetBody();
 
+static int xxx;
+xxx ++;
+if (xxx == 29)
+xxx *=1;
+
+
 		CustomControllerConvexCastPreFilter castFilter (body);
 		controller->m_chassisState.UpdateDynamicInputs();
 		for (dTireList::dListNode* node = controller->m_tireList.GetFirst(); node; node = node->GetNext()) {
@@ -75,8 +81,6 @@ class CustomVehicleController::dTireForceSolverSolver: public dComplemtaritySolv
 //tire->SetForce(dVector (0.0f, 0.0f, 0.0f, 0.0f));
 //tire->SetTorque(dVector (0.0f, 0.0f, 0.0f, 0.0f));
 		}
-static int xxx;
-xxx ++;
 if ((xxx > 500) && (xxx < 504)) 
 {
 //controller->m_chassisState.SetVeloc(dVector (0.0f, 0.0f, 40.0f, 0.0f));
@@ -104,12 +108,19 @@ if ((xxx > 500) && (xxx < 504))
 		}
 
 		// Get the number of active joints for this integration step
-		
 		int bodyCount = 0;
 		for (dList<CustomVehicleControllerBodyState*>::dListNode* stateNode = controller->m_stateList.GetFirst(); stateNode; stateNode = stateNode->GetNext()) {
 			m_bodyArray[bodyCount] = stateNode->GetInfo();
 			bodyCount ++;
 		}
+		for (dTireList::dListNode* node = controller->m_tireList.GetFirst();  node; node = node->GetNext()) {
+			CustomVehicleControllerBodyStateTire& tire = node->GetInfo();
+			for (int i = 0; i < tire.m_contactCount; i ++) {
+				m_bodyArray[bodyCount] = &tire.m_contactBody[i];
+				bodyCount ++;
+			}
+		}
+
 		int jointCount = GetActiveJoints();
 		BuildJacobianMatrix (jointCount, m_jointArray, timestep, jacobianPairArray, jacobianColumn, sizeof (jacobianPairArray)/ sizeof (jacobianPairArray[0]));
 		CalculateReactionsForces (bodyCount, m_bodyArray, jointCount, m_jointArray, timestep, jacobianPairArray, jacobianColumn);
@@ -126,8 +137,8 @@ if ((xxx > 500) && (xxx < 504))
 		// add all contact joints if any
 		for (dTireList::dListNode* node = m_controller->m_tireList.GetFirst(); node; node = node->GetNext()) {
 			CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
-			if (tire->m_contactJoint.m_contactCount) {
-				m_jointArray[jointCount] = &tire->m_contactJoint;
+			for (int i = 0; i < tire->m_contactCount; i ++) {
+				m_jointArray[jointCount] = &tire->m_contactJoint[i];
 				jointCount ++;
 				dAssert (jointCount < VEHICLE_CONTROLLER_MAX_JOINTS);
 			}
@@ -277,7 +288,7 @@ void CustomVehicleController::Init (NewtonCollision* const chassisShape, const d
 	m_chassisState.m_gravityMag = dSqrt (gravityVector % gravityVector);
 	m_chassisState.Init(this, vehicleFrame);
 
-	m_stateList.Append(&m_staticWorld);
+//	m_stateList.Append(&m_staticWorld);
 	m_stateList.Append(&m_chassisState);
 
 	// create the normalized size tire shape

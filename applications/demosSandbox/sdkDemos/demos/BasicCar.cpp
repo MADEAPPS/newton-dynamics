@@ -359,7 +359,7 @@ class BasicVehicleEntity: public DemoEntity
 		// first make the gear Box
 		dFloat fowardSpeedGearsBoxRatios[] = {VIPER_TIRE_GEAR_1, VIPER_TIRE_GEAR_2, VIPER_TIRE_GEAR_3, VIPER_TIRE_GEAR_4, VIPER_TIRE_GEAR_5, VIPER_TIRE_GEAR_6};
 
-		CustomVehicleControllerComponentEngine::dEngine2WDDifferencial* const differencial = new CustomVehicleControllerComponentEngine::dEngine2WDDifferencial (m_controller, leftRearTire, rightRearTire);
+		CustomVehicleControllerComponentEngine::dSingleAxelDifferencial* const differencial = new CustomVehicleControllerComponentEngine::dSingleAxelDifferencial (m_controller, leftRearTire, rightRearTire);
 		CustomVehicleControllerComponentEngine::dGearBox* const gearBox = new CustomVehicleControllerComponentEngine::dGearBox(m_controller, VIPER_TIRE_GEAR_REVERSE, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios); 
 		CustomVehicleControllerComponentEngine* const engine = new CustomVehicleControllerComponentEngine (m_controller, gearBox, differencial);
 
@@ -435,10 +435,12 @@ class BasicVehicleEntity: public DemoEntity
 		// first make the gear Box
 		dFloat fowardSpeedGearsBoxRatios[] = {VIPER_TIRE_GEAR_1, VIPER_TIRE_GEAR_2, VIPER_TIRE_GEAR_3, VIPER_TIRE_GEAR_4, VIPER_TIRE_GEAR_5, VIPER_TIRE_GEAR_6};
 
-		CustomVehicleControllerComponentEngine::dEngine2WDDifferencial* const frontDifferencial = new CustomVehicleControllerComponentEngine::dEngine2WDDifferencial (m_controller, leftFrontTire, rightFrontTire);
-		CustomVehicleControllerComponentEngine::dEngine2WDDifferencial* const rearDifferencial = new CustomVehicleControllerComponentEngine::dEngine2WDDifferencial (m_controller, leftRearTire, rightRearTire);
+		CustomVehicleControllerComponentEngine::dSingleAxelDifferencial* const frontDifferencial = new CustomVehicleControllerComponentEngine::dSingleAxelDifferencial (m_controller, leftFrontTire, rightFrontTire);
+		CustomVehicleControllerComponentEngine::dSingleAxelDifferencial* const rearDifferencial = new CustomVehicleControllerComponentEngine::dSingleAxelDifferencial (m_controller, leftRearTire, rightRearTire);
 
-		CustomVehicleControllerComponentEngine::dEngine4WDDifferencial* const differencial = new CustomVehicleControllerComponentEngine::dEngine4WDDifferencial (m_controller, frontDifferencial, rearDifferencial);
+		CustomVehicleControllerComponentEngine::dSingleAxelDifferencial* array[2] = {frontDifferencial, rearDifferencial};
+		CustomVehicleControllerComponentEngine::dMultiAxelDifferencial* const differencial = new CustomVehicleControllerComponentEngine::dMultiAxelDifferencial (m_controller, 2, array);
+
 		CustomVehicleControllerComponentEngine::dGearBox* const gearBox = new CustomVehicleControllerComponentEngine::dGearBox(m_controller, VIPER_TIRE_GEAR_REVERSE, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios); 
 		CustomVehicleControllerComponentEngine* const engine = new CustomVehicleControllerComponentEngine (m_controller, gearBox, differencial);
 
@@ -1158,6 +1160,7 @@ void BasicCar (DemoEntityManager* const scene)
 //	location.m_x += 20.0f;
 //	location.m_z += 20.0f;
 	dVector size (2.0f, 0.125f, 2.0f, 0.0f);
+	location.m_posit.m_z += 4.0f;
 
 	int count = 5;
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());

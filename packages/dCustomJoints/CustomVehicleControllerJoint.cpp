@@ -129,8 +129,18 @@ void CustomVehicleControllerTireJoint::UpdateSolverForces (const dComplemtarityS
 
 
 CustomVehicleControllerContactJoint::CustomVehicleControllerContactJoint ()
-    :m_contactCount(0)
+   :m_contactCount(0)
 {
+}
+
+void CustomVehicleControllerContactJoint::SetContacts (int count, const NewtonWorldConvexCastReturnInfo* const contacts)
+{
+	count = dMin(count, int (sizeof (m_contacts) / sizeof (m_contacts[0])));
+	for (int i = 0; i < count; i ++) {
+		m_contacts[i].m_point = dVector (&contacts[i].m_point[0]);
+		m_contacts[i].m_normal = dVector (&contacts[i].m_normal[0]);
+	}
+	m_contactCount = count;
 }
 
 
@@ -163,6 +173,7 @@ void CustomVehicleControllerContactJoint::JointAccelerations (dComplemtaritySolv
 void CustomVehicleControllerContactJoint::UpdateSolverForces (const dComplemtaritySolver::dJacobianPair* const jacobians) const
 {
 	CustomVehicleControllerBodyStateTire* const tire = (CustomVehicleControllerBodyStateTire*) m_state1;
+	CustomVehicleControllerBodyStateContact* const externalBody = (CustomVehicleControllerBodyStateContact*) m_state0;
 	const dMatrix& tireMatrix = tire->m_matrix;
 
 	const dVector longitudinalPin = tireMatrix[2];
@@ -185,10 +196,19 @@ void CustomVehicleControllerContactJoint::UpdateSolverForces (const dComplemtari
 
 	// apply the forces to any body that is touching this contact
 	//const int index = m_start;
-	for (int i = 0; i < m_count; i ++) {
-//		dAssert (0);
-//		tire->m_lateralForce = jacobians[index].m_jacobian_IM1.m_linear.Scale(m_jointFeebackForce[0]); 
-//		tire->m_longitudinalForce = jacobians[index + 1].m_jacobian_IM1.m_linear.Scale(m_jointFeebackForce[1]); 
+	
+	if (externalBody->m_invMass > 0.0f) {
+		dVector force (0.0f, 0.0f, 0.0f, 0.0f);
+		dVector torque (0.0f, 0.0f, 0.0f, 0.0f);
+		for (int i = 0; i < m_count; i ++) {
+			const dComplemtaritySolver::dJacobian& jacobian = jacobians[m_start + i].m_jacobian_IM0;
+			force = jacobian.m_linear.Scale(m_jointFeebackForce[i]); 
+			torque = jacobian.m_angular.Scale(m_jointFeebackForce[i]); 
+		}
+
+		NewtonBody* const body = externalBody->m_newtonBody;
+		NewtonBodyAddForce(body, &force[0]);
+		NewtonBodyAddTorque(body, &torque[0]);
 	}
 }
 
@@ -197,6 +217,8 @@ void CustomVehicleControllerContactJoint::JacobianDerivative (dComplemtaritySolv
 {
 	CustomVehicleControllerBodyStateChassis& chassis = m_controller->m_chassisState;
 	CustomVehicleControllerBodyStateTire* const tire = (CustomVehicleControllerBodyStateTire*) m_state1;
+	CustomVehicleControllerBodyStateContact* const externalBody = (CustomVehicleControllerBodyStateContact*) m_state0;
+
 	const dMatrix& tireMatrix = tire->m_matrix;
 
 	const dVector& upPin = chassis.m_matrix[1];
@@ -216,7 +238,9 @@ void CustomVehicleControllerContactJoint::JacobianDerivative (dComplemtaritySolv
 
 				dVector contactPoint (m_contacts[i].m_point);
 				dVector hitBodyPointVelocity;
-				NewtonBodyGetPointVelocity (m_contacts[i].m_hitBody, &contactPoint[0], &hitBodyPointVelocity[0]);
+
+				NewtonBody* const hitBody = externalBody->m_newtonBody;
+				NewtonBodyGetPointVelocity (hitBody, &contactPoint[0], &hitBodyPointVelocity[0]);
 				hitBodyPointVelocity.m_w = 0.0f;
 
 				dVector headingVeloc (tire->m_veloc + hitBodyPointVelocity);
@@ -274,7 +298,7 @@ void CustomVehicleControllerContactJoint::JacobianDerivative (dComplemtaritySolv
 
 				// now use the friction curve approximation 
 				// http://www.ricblues.nl/techniek/Technisch%20Specialist%2093430/6%20Remgedrag%20ABS%20weggedrag/Carsim%20-%20remsimulatieprogramma/Handleiding%20carsim.pdf
-				// basically it replace the Pajecka equation with the with the two series expansions 
+				// basically it replaces the Pajecka equation a series expansions 
 				// f = x - |x| * x / 3 + x * x * x / 27
 				// m = x - |x| * x + x * x * x / 3 + x * x * x * x / 27
 				dFloat tireForceCoef = dMin (K * (1.0f - K / 3.0f + K * K / 27.0f), 1.5f);
@@ -313,8 +337,8 @@ void CustomVehicleControllerContactJoint::JacobianDerivative (dComplemtaritySolv
 
 				// normal force
 				dComplemtaritySolver::dPointDerivativeParam pointData;
-				InitPointParam (pointData, m_contacts[i].m_point);
-				AddLinearRowJacobian (constraintParams, m_contacts[i].m_point, normal.Scale (-1.0f));
+				InitPointParam (pointData, contactPoint);
+				AddLinearRowJacobian (constraintParams, contactPoint, normal.Scale (-1.0f));
 				constraintParams->m_jointLowFriction[index] = 0;
 				dVector velocError (pointData.m_veloc0 - pointData.m_veloc1);
 				dFloat restitution = 0.0f;
@@ -323,37 +347,12 @@ void CustomVehicleControllerContactJoint::JacobianDerivative (dComplemtaritySolv
 					relVelocErr *= (restitution + dFloat (1.0f));
 				}
 				constraintParams->m_jointAccel[index] = dMax (dFloat (-4.0f), relVelocErr) * constraintParams->m_timestepInv;
+				index ++;
 			}
 		}
 	}
 }
 
-/*
-
-void CustomVehicleControllerEngineIdleJoint::UpdateSolverForces (const dComplemtaritySolver::dJacobianPair* const jacobians) const
-{
-}
-
-void CustomVehicleControllerEngineIdleJoint::JacobianDerivative (dComplemtaritySolver::dParamInfo* const constraintParams)
-{
-	//CustomVehicleControllerComponentEngine* const engine = m_controller->GetEngine();
-	CustomVehicleControllerBodyStateEngine* const engineState = (CustomVehicleControllerBodyStateEngine*) m_state0;
-
-	const dVector& pin = engineState->m_matrix[0];
-
-	int index = constraintParams->m_count;
-	AddAngularRowJacobian (constraintParams, pin, 0.0f);
-	dAssert (engineState == &m_controller->m_engineState);
-
-	dFloat alpha = 0.35f * (engineState->m_omega % pin - m_omega) * constraintParams->m_timestepInv;
-
-	m_rowIsMotor[index] = true;
-	m_motorAcceleration[index] = - alpha;
-	constraintParams->m_jointAccel[index] = 0.0f;
-	constraintParams->m_jointLowFriction[index] = -m_friction;
-	constraintParams->m_jointHighFriction[index] = m_friction;
-}
-*/
 
 void CustomVehicleControllerEngineDifferencialJoint::UpdateSolverForces (const dComplemtaritySolver::dJacobianPair* const jacobians) const
 {
@@ -363,7 +362,6 @@ void CustomVehicleControllerEngineDifferencialJoint::JacobianDerivative (dComple
 {
 	const CustomVehicleControllerBodyStateTire* const tire0 = (CustomVehicleControllerBodyStateTire*)m_state0;
 	const CustomVehicleControllerBodyStateTire* const tire1 = (CustomVehicleControllerBodyStateTire*)m_state1;
-	//const CustomVehicleControllerComponentEngine* const engineComponent = m_controller->GetEngine();
 
 	dVector axis0 (tire0->m_matrix[0]);
 	dVector axis1 (tire1->m_matrix[0].Scale (-1.0f));

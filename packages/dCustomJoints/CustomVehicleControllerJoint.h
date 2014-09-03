@@ -66,13 +66,22 @@ class CustomVehicleControllerTireJoint: public CustomVehicleControllerJoint
 class CustomVehicleControllerContactJoint: public CustomVehicleControllerJoint
 {
 	public:
+	class dContact
+	{
+		public: 
+		dVector m_point;
+		dVector m_normal;
+	};
+
 	CUSTOM_JOINTS_API CustomVehicleControllerContactJoint ();
+
+	CUSTOM_JOINTS_API virtual void SetContacts (int count, const NewtonWorldConvexCastReturnInfo* const contacts);
 	CUSTOM_JOINTS_API virtual void UpdateSolverForces (const dComplemtaritySolver::dJacobianPair* const jacobians) const; 
 	CUSTOM_JOINTS_API virtual void JacobianDerivative (dComplemtaritySolver::dParamInfo* const constraintParams); 
 	CUSTOM_JOINTS_API virtual void JointAccelerations (dComplemtaritySolver::dJointAccelerationDecriptor* const accelParam);
 
 	int m_contactCount;
-	NewtonWorldConvexCastReturnInfo m_contacts[4];
+	dContact m_contacts[4];
 };
 
 class CustomVehicleControllerEngineDifferencialJoint: public CustomVehicleControllerJoint
@@ -83,20 +92,6 @@ class CustomVehicleControllerEngineDifferencialJoint: public CustomVehicleContro
 
 	dFloat m_ratio;
 };
-
-
-/*
-class CustomVehicleControllerEngineIdleJoint: public CustomVehicleControllerJoint
-{
-	public:
-	CUSTOM_JOINTS_API virtual void JacobianDerivative (dComplemtaritySolver::dParamInfo* const constraintParams); 
-	CUSTOM_JOINTS_API virtual void UpdateSolverForces (const dComplemtaritySolver::dJacobianPair* const jacobians) const;
-
-	dFloat m_omega;
-	dFloat m_friction;
-};
-*/
-
 
 
 #endif 
