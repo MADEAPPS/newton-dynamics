@@ -73,7 +73,6 @@ void CustomVehicleControllerBodyStateContact::Init (CustomVehicleController* con
 {
 	CustomVehicleControllerBodyState::Init (controller);
 
-	//m_myJoint = myJoint;
 	m_newtonBody = (NewtonBody*)body;
 
 	m_localFrame = dGetIdentityMatrix();
@@ -281,8 +280,6 @@ void CustomVehicleControllerBodyStateTire::Init (CustomVehicleController* const 
 	m_rotationAngle = 0.0f;
 	m_steeringAngle = 0.0f;
 	
-	//m_adhesionCoefficient = 1.0f;
-	//m_idleRollingResistance = 0.0f;
 	m_tireLoad = dVector(0.0f, 0.0f, 0.0f, 0.0f);
 	m_lateralForce = dVector(0.0f, 0.0f, 0.0f, 0.0f);
 	m_longitudinalForce = dVector(0.0f, 0.0f, 0.0f, 0.0f);
@@ -295,7 +292,6 @@ void CustomVehicleControllerBodyStateTire::Init (CustomVehicleController* const 
 
 	// initialize the joints that connect tghsi tire to other vehicle componets;
 	m_chassisJoint.Init(m_controller, &m_controller->m_chassisState, this);
-//	m_contactJoint.Init(m_controller, &m_controller->m_staticWorld, this);
 }
 
 void* CustomVehicleControllerBodyStateTire::GetUserData() const
@@ -330,7 +326,6 @@ dMatrix CustomVehicleControllerBodyStateTire::CalculateGlobalMatrix () const
 
 void CustomVehicleControllerBodyStateTire::UpdateTransform()
 {
-	//dMatrix localMatrix (CustomVehicleController::TireBodyState::CalculateSteeringMatrix ());
 	dMatrix localMatrix (CalculateLocalMatrix ());
 	NewtonCollisionSetMatrix(m_shape, &localMatrix[0][0]);	
 }
@@ -353,12 +348,10 @@ void CustomVehicleControllerBodyStateTire::Collide (CustomControllerConvexCastPr
 	dMatrix tireMatrix (localMatrix * controllerMatrix);
 	dVector rayDestination (tireMatrix.TransformVector(localMatrix.m_up.Scale(-m_suspensionlenght)));   
 
-//	m_contactJoint.m_contactCount = 0;
 	m_contactCount = 0;
 	NewtonWorldConvexCastReturnInfo contacts[4];
 
 	NewtonCollisionSetScale (m_controller->m_tireCastShape, m_width, m_radio, m_radio);
-//	m_contactJoint.m_contactCount = NewtonWorldConvexCast (world, &tireMatrix[0][0], &rayDestination[0], m_controller->m_tireCastShape, &hitParam, &filter, CustomControllerConvexCastPreFilter::Prefilter, m_contactJoint.m_contacts, sizeof (m_contactJoint.m_contacts) / sizeof (m_contactJoint.m_contacts[0]), 0);
 	int contactCount = NewtonWorldConvexCast (world, &tireMatrix[0][0], &rayDestination[0], m_controller->m_tireCastShape, &hitParam, &filter, CustomControllerConvexCastPreFilter::Prefilter, contacts, sizeof (contacts) / sizeof (contacts[0]), 0);
 	if (contactCount) {
 		m_posit = hitParam * m_suspensionlenght;
@@ -375,7 +368,7 @@ void CustomVehicleControllerBodyStateTire::Collide (CustomControllerConvexCastPr
 		for (int index = 0; (index < contactCount) && (m_contactCount < 2); ) {
 			const NewtonBody* const body = contacts[index].m_hitBody;
 			int count = 1;
-			for (int j = index + 1; (j < contactCount) && (contacts[j].m_hitBody == body); index ++) {
+			for (int j = index + 1; (j < contactCount) && (contacts[j].m_hitBody == body); j ++) {
 				count ++;
 			}
 			CustomVehicleControllerContactJoint* const joint = &m_contactJoint[m_contactCount];
@@ -443,7 +436,6 @@ void CustomVehicleControllerBodyStateTire::UpdateDynamicInputs(dFloat timestep)
 		m_tireLoad = m_matrix[1].Scale(load * m_mass);
 
 		// calculate tire force and torque spring and damper apply to the chassis
-		//dVector force (m_matrix[1].Scale(m_tireLoad));
 		dVector torque (relPosit * m_tireLoad);
 		chassis.m_externalForce += m_tireLoad;
 		chassis.m_externalTorque += torque;
@@ -452,23 +444,6 @@ void CustomVehicleControllerBodyStateTire::UpdateDynamicInputs(dFloat timestep)
 		m_externalForce -= m_tireLoad;
 	}
 }
-
-
-/*
-dFloat CustomVehicleControllerBodyStateTire::GetAdhesionCoefficient() const
-{
-	return m_adhesionCoefficient * 0.5f;
-}
-void CustomVehicleControllerBodyStateTire::SetAdhesionCoefficient(dFloat Coefficient)
-{
-	m_adhesionCoefficient = 2.0f * dClamp (Coefficient, dFloat(0.0f), dFloat(1.0f));
-}
-
-void CustomVehicleControllerBodyStateTire::IntegrateForce (dFloat timestep, const dVector& force, const dVector& torque)
-{
-	BodyState::IntegrateForce (timestep, force, torque);
-}
-*/
 
 
 void CustomVehicleControllerBodyStateTire::CalculateRollingResistance (dFloat topSpeed)
@@ -490,22 +465,5 @@ void CustomVehicleControllerBodyStateTire::ApplyNetForceAndTorque (dFloat invTim
 		m_omega = m_matrix[0].Scale (m_rotationalSpeed) + chassis.m_omega;
 	}
 	m_rotationAngle = dMod (m_rotationAngle + m_rotationalSpeed / invTimestep, 2.0f * 3.141592f);
-/*
-if (m_myIndex == 4)
-{
-	dVector f (m_matrix.UnrotateVector(m_externalForce));
-	dVector t (m_matrix.UnrotateVector(m_externalTorque));
-	dVector v (m_matrix.UnrotateVector(m_veloc));
-	dVector w (m_matrix.UnrotateVector(m_omega));
-
-//	if ((t % t) > 10.0f) 
-	{
-		dTrace (("f(%f %f %f) ", f.m_x, f.m_y, f.m_z));
-		dTrace (("t(%f %f %f) ", t.m_x, t.m_y, t.m_z));
-		dTrace (("v(%f %f %f) ", v.m_x, v.m_y, v.m_z));
-		dTrace (("w(%f %f %f)\n", w.m_x, w.m_y, w.m_z));
-	}
-}
-*/
 }
 
