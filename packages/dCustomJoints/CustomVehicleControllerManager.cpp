@@ -61,16 +61,10 @@ class CustomVehicleController::dTireForceSolverSolver: public dComplemtaritySolv
 	{
 		// apply all external forces and torques to chassis and all tire velocities
 		dFloat timestepInv = 1.0f / timestep;
-		NewtonBody* const body = controller->GetBody();
-
-static int xxx;
-xxx ++;
-if (xxx == 29)
-xxx *=1;
-
-
-		CustomControllerConvexCastPreFilter castFilter (body);
 		controller->m_chassisState.UpdateDynamicInputs();
+
+		NewtonBody* const body = controller->GetBody();
+		CustomControllerConvexCastPreFilter castFilter (body);
 		for (dTireList::dListNode* node = controller->m_tireList.GetFirst(); node; node = node->GetNext()) {
 			CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
 			tire->Collide(castFilter, timestepInv);
@@ -81,6 +75,12 @@ xxx *=1;
 //tire->SetForce(dVector (0.0f, 0.0f, 0.0f, 0.0f));
 //tire->SetTorque(dVector (0.0f, 0.0f, 0.0f, 0.0f));
 		}
+
+/*
+static int xxx;
+xxx ++;
+if (xxx == 29)
+xxx *=1;
 if ((xxx > 500) && (xxx < 504)) 
 {
 //controller->m_chassisState.SetVeloc(dVector (0.0f, 0.0f, 40.0f, 0.0f));
@@ -88,7 +88,7 @@ if ((xxx > 500) && (xxx < 504))
 //controller->m_chassisState.SetForce(dVector (0.0f, 0.0f, 0.0f, 0.0f));
 //controller->m_chassisState.SetTorque(dVector (0.0f, 0.0f, 0.0f, 0.0f));
 }
-
+*/
 
 		// update all components
 		if (controller->m_engine) {
@@ -121,6 +121,11 @@ if ((xxx > 500) && (xxx < 504))
 			}
 		}
 
+		for (int i = 0; i < controller->m_externalContactCount; i ++) {
+			m_bodyArray[bodyCount] = &controller->m_externalContactStates[i];
+			bodyCount ++;
+		}
+
 		int jointCount = GetActiveJoints();
 		BuildJacobianMatrix (jointCount, m_jointArray, timestep, jacobianPairArray, jacobianColumn, sizeof (jacobianPairArray)/ sizeof (jacobianPairArray[0]));
 		CalculateReactionsForces (bodyCount, m_bodyArray, jointCount, m_jointArray, timestep, jacobianPairArray, jacobianColumn);
@@ -133,6 +138,13 @@ if ((xxx > 500) && (xxx < 504))
 	int GetActiveJoints()
 	{
 		int jointCount = 0;
+
+
+		for (int i = 0; i < m_controller->m_externalContactCount; i ++) {
+			m_jointArray[jointCount] = &m_controller->m_externalContactJoints[i];
+			jointCount ++;
+			dAssert (jointCount < VEHICLE_CONTROLLER_MAX_JOINTS);
+		}
 
 		// add all contact joints if any
 		for (dTireList::dListNode* node = m_controller->m_tireList.GetFirst(); node; node = node->GetNext()) {
@@ -249,6 +261,7 @@ CustomVehicleController* CustomVehicleControllerManager::CreateVehicle (NewtonCo
 void CustomVehicleController::Init (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, const dVector& gravityVector)
 {
 	m_finalized = false;
+	m_externalContactCount = 0;
 	CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*) GetManager(); 
 	NewtonWorld* const world = manager->GetWorld(); 
 

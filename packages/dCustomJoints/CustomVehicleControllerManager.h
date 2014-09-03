@@ -81,8 +81,9 @@ class CustomVehicleController: public CustomControllerBase
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 
-//	CustomVehicleControllerBodyState m_staticWorld;
 	CustomVehicleControllerBodyStateChassis m_chassisState;
+	CustomVehicleControllerBodyStateContact m_externalContactStates[4];
+	CustomVehicleControllerChassisContactJoint m_externalContactJoints[4];
 
 	dTireList m_tireList;
 	dList<CustomVehicleControllerBodyState*> m_stateList;
@@ -91,12 +92,13 @@ class CustomVehicleController: public CustomControllerBase
 	CustomVehicleControllerComponentEngine* m_engine;
 	CustomVehicleControllerComponentBrake* m_handBrakes;
 	CustomVehicleControllerComponentSteering* m_steering; 
+	int m_externalContactCount;
 	bool m_finalized;
 
 	friend class CustomVehicleControllerManager;
 	friend class CustomVehicleControllerTireJoint;
 	
-	friend class CustomVehicleControllerContactJoint;
+	friend class CustomVehicleControllerTireContactJoint;
 	friend class CustomVehicleControllerEngineIdleJoint;
 	friend class CustomVehicleControllerEngineDifferencialJoint;
 	

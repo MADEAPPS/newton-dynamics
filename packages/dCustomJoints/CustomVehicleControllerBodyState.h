@@ -45,7 +45,7 @@ class CustomVehicleControllerBodyState: public dComplemtaritySolver::dBodyState
 	friend class CustomVehicleController;
 	friend class CustomVehicleControllerJoint;
 	friend class CustomVehicleControllerTireJoint;
-	friend class CustomVehicleControllerContactJoint;
+	friend class CustomVehicleControllerTireContactJoint;
 	friend class CustomVehicleControllerBodyStateTire;
 	friend class CustomVehicleControllerComponentBrake;
 	friend class CustomVehicleControllerBodyStateEngine;
@@ -60,8 +60,9 @@ class CustomVehicleControllerBodyState: public dComplemtaritySolver::dBodyState
 
 class CustomVehicleControllerBodyStateContact: public CustomVehicleControllerBodyState
 {
-	private:
+	public:
 	CUSTOM_JOINTS_API void Init (CustomVehicleController* const controller, const NewtonBody* const body);
+	private:
 	CUSTOM_JOINTS_API virtual void ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega);
 
 	void UpdateDynamicInputs();
@@ -69,7 +70,7 @@ class CustomVehicleControllerBodyStateContact: public CustomVehicleControllerBod
 	NewtonBody* m_newtonBody;
 	friend class CustomVehicleController;
 	friend class CustomVehicleControllerTireJoint;
-	friend class CustomVehicleControllerContactJoint;
+	friend class CustomVehicleControllerTireContactJoint;
 	friend class CustomVehicleControllerBodyStateTire;
 	friend class CustomVehicleControllerBodyStateEngine;
 	friend class CustomVehicleControllerComponentBrake;
@@ -102,7 +103,7 @@ class CustomVehicleControllerBodyStateChassis: public CustomVehicleControllerBod
 
 	friend class CustomVehicleController;
 	friend class CustomVehicleControllerTireJoint;
-	friend class CustomVehicleControllerContactJoint;
+	friend class CustomVehicleControllerTireContactJoint;
 	friend class CustomVehicleControllerBodyStateTire;
 	friend class CustomVehicleControllerBodyStateEngine;
 	friend class CustomVehicleControllerComponentBrake;
@@ -164,7 +165,7 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 	dVector m_lateralForce;
 	dVector m_longitudinalForce;
 	CustomVehicleControllerTireJoint m_chassisJoint;
-	CustomVehicleControllerContactJoint m_contactJoint[2];
+	CustomVehicleControllerTireContactJoint m_contactJoint[2];
 	CustomVehicleControllerBodyStateContact m_contactBody[2];
 
 	int m_contactCount;
@@ -194,7 +195,7 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 
 	friend class CustomVehicleController;
 	friend class CustomVehicleControllerTireJoint;
-	friend class CustomVehicleControllerContactJoint;
+	friend class CustomVehicleControllerTireContactJoint;
 	friend class CustomVehicleControllerEngineDifferencialJoint;
 	friend class CustomVehicleControllerEngineIdleJoint;
 	friend class CustomVehicleControllerComponentBrake;

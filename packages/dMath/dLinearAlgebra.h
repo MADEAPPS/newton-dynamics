@@ -24,7 +24,7 @@
 #endif
 
 
-#define D_MAX_PRAM_INFO_SIZE		8 
+#define D_MAX_PRAM_INFO_SIZE		16 
 #define D_MAX_PLACEMENT_CONTACTS	128
 
 class dSymmetricBiconjugateGradientSolve

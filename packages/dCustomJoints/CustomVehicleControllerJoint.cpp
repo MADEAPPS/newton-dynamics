@@ -128,12 +128,12 @@ void CustomVehicleControllerTireJoint::UpdateSolverForces (const dComplemtarityS
 
 
 
-CustomVehicleControllerContactJoint::CustomVehicleControllerContactJoint ()
+CustomVehicleControllerTireContactJoint::CustomVehicleControllerTireContactJoint ()
    :m_contactCount(0)
 {
 }
 
-void CustomVehicleControllerContactJoint::SetContacts (int count, const NewtonWorldConvexCastReturnInfo* const contacts)
+void CustomVehicleControllerTireContactJoint::SetContacts (int count, const NewtonWorldConvexCastReturnInfo* const contacts)
 {
 	count = dMin(count, int (sizeof (m_contacts) / sizeof (m_contacts[0])));
 	for (int i = 0; i < count; i ++) {
@@ -144,7 +144,7 @@ void CustomVehicleControllerContactJoint::SetContacts (int count, const NewtonWo
 }
 
 
-void CustomVehicleControllerContactJoint::JointAccelerations (dComplemtaritySolver::dJointAccelerationDecriptor* const accelParam)
+void CustomVehicleControllerTireContactJoint::JointAccelerations (dComplemtaritySolver::dJointAccelerationDecriptor* const accelParam)
 {
 	dComplemtaritySolver::dJacobianColum* const jacobianColElements = accelParam->m_colMatrix;
 	dComplemtaritySolver::dJacobianPair* const jacobianMatrixElements = accelParam->m_rowMatrix;
@@ -161,7 +161,7 @@ void CustomVehicleControllerContactJoint::JointAccelerations (dComplemtaritySolv
 		dComplemtaritySolver::dJacobianPair* const row = &jacobianMatrixElements[k];
 
 		dVector relVeloc (row->m_jacobian_IM0.m_linear.CompProduct(bodyVeloc0) + row->m_jacobian_IM0.m_angular.CompProduct(bodyOmega0) +
-						 row->m_jacobian_IM1.m_linear.CompProduct(bodyVeloc1) + row->m_jacobian_IM1.m_angular.CompProduct(bodyOmega1));
+						  row->m_jacobian_IM1.m_linear.CompProduct(bodyVeloc1) + row->m_jacobian_IM1.m_angular.CompProduct(bodyOmega1));
 
 		dFloat vRel = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
 		dFloat aRel = col->m_deltaAccel;
@@ -170,7 +170,7 @@ void CustomVehicleControllerContactJoint::JointAccelerations (dComplemtaritySolv
 }
 
 
-void CustomVehicleControllerContactJoint::UpdateSolverForces (const dComplemtaritySolver::dJacobianPair* const jacobians) const
+void CustomVehicleControllerTireContactJoint::UpdateSolverForces (const dComplemtaritySolver::dJacobianPair* const jacobians) const
 {
 	CustomVehicleControllerBodyStateTire* const tire = (CustomVehicleControllerBodyStateTire*) m_state1;
 	CustomVehicleControllerBodyStateContact* const externalBody = (CustomVehicleControllerBodyStateContact*) m_state0;
@@ -213,7 +213,7 @@ void CustomVehicleControllerContactJoint::UpdateSolverForces (const dComplemtari
 }
 
 
-void CustomVehicleControllerContactJoint::JacobianDerivative (dComplemtaritySolver::dParamInfo* const constraintParams)
+void CustomVehicleControllerTireContactJoint::JacobianDerivative (dComplemtaritySolver::dParamInfo* const constraintParams)
 {
 	CustomVehicleControllerBodyStateChassis& chassis = m_controller->m_chassisState;
 	CustomVehicleControllerBodyStateTire* const tire = (CustomVehicleControllerBodyStateTire*) m_state1;
@@ -372,3 +372,31 @@ void CustomVehicleControllerEngineDifferencialJoint::JacobianDerivative (dComple
 	dFloat ratioAccel = - 0.5f * (omega0 + m_ratio * omega1) * constraintParams->m_timestepInv;
 	AddAngularRowJacobian (constraintParams, axis0, axis1, ratioAccel);
 }
+
+
+CustomVehicleControllerChassisContactJoint::CustomVehicleControllerChassisContactJoint ()
+	:CustomVehicleControllerTireContactJoint()
+{
+}
+
+void CustomVehicleControllerChassisContactJoint::JacobianDerivative (dComplemtaritySolver::dParamInfo* const constraintParams)
+{
+	//CustomVehicleControllerBodyStateChassis* const chassis = (CustomVehicleControllerBodyStateChassis*) m_state1;
+	//CustomVehicleControllerBodyStateContact* const externalBody = (CustomVehicleControllerBodyStateContact*) m_state0;
+	for (int i = 0; i < m_contactCount; i ++) {
+		const dVector& contactPoint = m_contacts[i].m_point;
+		const dVector& contactNormal = m_contacts[i].m_normal;
+		dComplemtaritySolver::dPointDerivativeParam pointData;
+		InitPointParam (pointData, contactPoint);
+		AddLinearRowJacobian (constraintParams, contactPoint, contactNormal.Scale (-1.0f));
+		constraintParams->m_jointLowFriction[i] = 0;
+		dVector velocError (pointData.m_veloc0 - pointData.m_veloc1);
+		dFloat restitution = 0.0f;
+		dFloat relVelocErr = velocError % contactNormal;
+		if (relVelocErr > 0.0f) {
+			relVelocErr *= (restitution + dFloat (1.0f));
+		}
+		constraintParams->m_jointAccel[i] = dMax (dFloat (-4.0f), relVelocErr) * constraintParams->m_timestepInv;
+	}
+}
+
