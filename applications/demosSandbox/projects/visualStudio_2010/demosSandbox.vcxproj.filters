@@ -73,9 +73,6 @@
     <ClCompile Include="..\..\sdkDemos\demos\MeshCollision.cpp">
       <Filter>demos</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\DemoAIListener.cpp">
-      <Filter>mainLogic</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\HeighFieldCollision.cpp">
       <Filter>demos</Filter>
     </ClCompile>
@@ -131,9 +128,6 @@
       <Filter>mainLogic\listeners</Filter>
     </ClCompile>
     <ClCompile Include="..\..\sdkDemos\DemoSoundListener.cpp">
-      <Filter>mainLogic\listeners</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\DemoAIAgent.cpp">
       <Filter>mainLogic\listeners</Filter>
     </ClCompile>
     <ClCompile Include="..\..\sdkDemos\DemoListenerBase.cpp">
@@ -210,9 +204,6 @@
     <ClInclude Include="..\..\sdkDemos\toolBox\toolbox_stdafx.h">
       <Filter>tooBox</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\sdkDemos\DemoAIListener.h">
-      <Filter>mainLogic</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\sdkDemos\toolBox\dHighResolutionTimer.h">
       <Filter>tooBox</Filter>
     </ClInclude>
@@ -235,9 +226,6 @@
       <Filter>mainLogic\listeners</Filter>
     </ClInclude>
     <ClInclude Include="..\..\sdkDemos\DemoSoundListener.h">
-      <Filter>mainLogic\listeners</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\sdkDemos\DemoAIAgent.h">
       <Filter>mainLogic\listeners</Filter>
     </ClInclude>
     <ClInclude Include="..\..\sdkDemos\DemoListenerBase.h">

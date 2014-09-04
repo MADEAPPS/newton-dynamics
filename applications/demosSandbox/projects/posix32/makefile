@@ -56,7 +56,6 @@ SDK_XML_PATH = ../../../../packages/thirdParty/tinyxml
 SDK_INCLUDE_PATH = \
 		-I ../../../../coreLibrary_300/source/newton \
 		-I ../../../../coreLibrary_300/source/core \
-		-I ../../../../coreLibrary_300/source/ai \
 		-I $(SDK_MAIN_PATH) \
 		-I $(SDK_TOOLBOX_PATH) \
 		-I $(SDK_DEMOS_PATH) \
@@ -101,7 +100,6 @@ NEWTON_LIB = \
 
 		
 SDK_MAIN_SRC = \
-		$(SDK_MAIN_PATH)/DemoAIListener.cpp \
 		$(SDK_MAIN_PATH)/DemoCameraListener.cpp \
 		$(SDK_MAIN_PATH)/DemoEntityListener.cpp \
 		$(SDK_MAIN_PATH)/DemoListenerBase.cpp \

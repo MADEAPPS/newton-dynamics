@@ -414,7 +414,6 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\sdkDemos\DemoAIListener.cpp" />
     <ClCompile Include="..\..\sdkDemos\DemoCameraListener.cpp" />
     <ClCompile Include="..\..\sdkDemos\DemoEntityListener.cpp" />
     <ClCompile Include="..\..\sdkDemos\DemoListenerBase.cpp" />
@@ -474,7 +473,6 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
     <ClCompile Include="..\..\sdkDemos\demos\SceneCollision.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\SoftBodies.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\UsingNewtonMeshTool.cpp" />
-    <ClCompile Include="..\..\sdkDemos\DemoAIAgent.cpp" />
     <ClCompile Include="..\..\sdkDemos\DemoCamera.cpp" />
     <ClCompile Include="..\..\sdkDemos\DemoEntity.cpp" />
     <ClCompile Include="..\..\sdkDemos\DemoEntityManager.cpp" />
@@ -484,7 +482,6 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
     <ClCompile Include="..\..\sdkDemos\toolBox\UserPlaneCollision.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\sdkDemos\DemoAIListener.h" />
     <ClInclude Include="..\..\sdkDemos\DemoCameraListener.h" />
     <ClInclude Include="..\..\sdkDemos\DemoEntityListener.h" />
     <ClInclude Include="..\..\sdkDemos\DemoListenerBase.h" />
@@ -501,7 +498,6 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
     <ClInclude Include="..\..\sdkDemos\toolBox\SkyBox.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\TargaToOpenGl.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\toolbox_stdafx.h" />
-    <ClInclude Include="..\..\sdkDemos\DemoAIAgent.h" />
     <ClInclude Include="..\..\sdkDemos\DemoCamera.h" />
     <ClInclude Include="..\..\sdkDemos\DemoEntity.h" />
     <ClInclude Include="..\..\sdkDemos\DemoEntityManager.h" />
