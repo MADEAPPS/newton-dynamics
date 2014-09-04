@@ -134,13 +134,6 @@ typedef long long unsigned64;
 #include <NewtonDebuggerServer.h>
 #include <CustomControllerManager.h>
 
-// AI wrapper 
-//#include <dAI.h>
-//#include <dAIAgent.h>
-//#include <dAIAgentState.h>
-//#include <dAIAgentVehicleController.h>
-//#include <dAIAgentCharacterController.h>
-
 #include <dCRC.h>
 #include <dHeap.h>
 #include <dList.h>

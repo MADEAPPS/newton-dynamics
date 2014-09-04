@@ -191,7 +191,6 @@ libNewton.a : $(DG_OBJ_FILES)
 #	strip -g -S -d -v libNewton.a -o libNewton.a
 	cp libNewton.a ../../../packages/posix64/libNewton.a
 	cp ../../source/newton/Newton.h ../../../packages/posix64/Newton.h
-	cp ../../source/ai/NewtonAI.h ../../../packages/posix64/NewtonAI.h
 	$(COMPILER) -shared -Wl,-soname,libNewton.so $? -o libNewton.so 
 	cp libNewton.so ../../../packages/posix64/libNewton.so
 	#sudo cp libNewton.so /usr/lib
