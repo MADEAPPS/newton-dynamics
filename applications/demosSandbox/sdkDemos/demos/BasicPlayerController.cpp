@@ -19,8 +19,6 @@
 #include "DemoEntityManager.h"
 #include "DemoCamera.h"
 #include "DebugDisplay.h"
-#include "CustomInputManager.h"
-#include "CustomPlayerControllerManager.h"
 
 #define PLAYER_MASS						80.0f
 #define PLAYER_WALK_SPEED				4.0f

@@ -20,10 +20,6 @@
 #include "DemoCamera.h"
 #include "DebugDisplay.h"
 #include "DemoEntityManager.h"
-#include "CustomInputManager.h"
-#include "CustomTriggerManager.h"
-#include "CustomKinematicController.h"
-#include "CustomPlayerControllerManager.h"
 
 
 #define PLAYER_MASS						80.0f

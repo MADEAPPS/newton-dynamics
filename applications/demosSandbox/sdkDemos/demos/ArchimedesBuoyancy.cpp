@@ -4,7 +4,7 @@
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
 #include "DemoMesh.h"
-#include "CustomTriggerManager.h"
+
 #include "../toolBox/OpenGlUtil.h"
 
 

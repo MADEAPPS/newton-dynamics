@@ -132,7 +132,24 @@ typedef long long unsigned64;
 #include <dMathDefines.h>
 #include <CustomJoint.h>
 #include <NewtonDebuggerServer.h>
+
+#include <CustomHinge.h>
+#include <CustomHingeActuator.h>
+#include <CustomBallAndSocket.h>
+#include <CustomSliderActuator.h>
+#include <CustomUniversalActuator.h>
+
+#include <CustomInputManager.h>
+#include <CustomTriggerManager.h>
 #include <CustomControllerManager.h>
+#include <CustomKinematicController.h>
+#include <CustomPlayerControllerManager.h>
+#include <CustomPlayerControllerManager.h>
+#include <CustomVehicleControllerManager.h>
+#include <CustomArcticulatedTransformManager.h>
+
+
+
 
 #include <dCRC.h>
 #include <dHeap.h>
@@ -157,9 +174,6 @@ typedef long long unsigned64;
 #include "dCollisionSphereNodeInfo.h"
 #include "dCollisionConvexHullNodeInfo.h"
 #include "dGeometryNodeSkinModifierInfo.h"
-
-
-
 
 
 #ifdef __USE_DOUBLE_PRECISION__

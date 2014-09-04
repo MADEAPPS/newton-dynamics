@@ -296,6 +296,7 @@ void CustomVehicleController::Init (NewtonCollision* const chassisShape, const d
 
 	// initialize vehicle internal components
 	NewtonBodyGetCentreOfMass (m_body, &m_chassisState.m_com[0]);
+	m_chassisState.m_comOffset = dVector (0.0f, 0.0f, 0.0f, 0.0f);
 
 	m_chassisState.m_gravity = gravityVector;
 	m_chassisState.m_gravityMag = dSqrt (gravityVector % gravityVector);

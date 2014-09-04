@@ -100,9 +100,6 @@
     <ClCompile Include="..\..\sdkDemos\demos\ScaledCollision.cpp">
       <Filter>demos</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\demos\BasicCar.cpp">
-      <Filter>demos</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\sdkDemos\toolBox\PhysicsUtils.cpp">
       <Filter>tooBox</Filter>
     </ClCompile>
@@ -164,6 +161,9 @@
       <Filter>demos</Filter>
     </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\StandardJoints.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\SuperCar.cpp">
       <Filter>demos</Filter>
     </ClCompile>
   </ItemGroup>

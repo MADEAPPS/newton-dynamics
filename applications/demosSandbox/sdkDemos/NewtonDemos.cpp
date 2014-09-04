@@ -54,12 +54,13 @@
 //#define DEFAULT_SCENE	28          // standard joints
 //#define DEFAULT_SCENE	29			// articulated joints
 //#define DEFAULT_SCENE	30			// basic rag doll
-#define DEFAULT_SCENE	31			// basic car
-//#define DEFAULT_SCENE	32			// high performance super car
-//#define DEFAULT_SCENE	33			// basic player controller
-//#define DEFAULT_SCENE	34			// advanced player controller
-//#define DEFAULT_SCENE	35			// cloth patch			
-//#define DEFAULT_SCENE	36			// soft bodies			
+#define DEFAULT_SCENE	31			// heavy wheel vehicle
+//#define DEFAULT_SCENE	32			// super Car
+//#define DEFAULT_SCENE	33			// high performance super car
+//#define DEFAULT_SCENE	34			// basic player controller
+//#define DEFAULT_SCENE	35			// advanced player controller
+//#define DEFAULT_SCENE	36			// cloth patch			
+//#define DEFAULT_SCENE	37			// soft bodies			
 
 
 void Friction (DemoEntityManager* const scene);
@@ -89,7 +90,8 @@ void SimpleConvexFracturing (DemoEntityManager* const scene);
 void StructuredConvexFracturing (DemoEntityManager* const scene);
 void UsingNewtonMeshTool (DemoEntityManager* const scene);
 void MultiRayCast (DemoEntityManager* const scene);
-void BasicCar (DemoEntityManager* const scene);
+void SuperCar (DemoEntityManager* const scene);
+void MilitaryTransport (DemoEntityManager* const scene);
 void BasicPlayerController (DemoEntityManager* const scene);
 void AdvancedPlayerController (DemoEntityManager* const scene);
 void HeightFieldCollision (DemoEntityManager* const scene);
@@ -133,8 +135,9 @@ NewtonDemos::SDKDemos NewtonDemos::m_demosSelection[] =
     {wxT("Starndard Joints"), wxT("show sme of teh common joints"), StandardJoints},
 	{wxT("Articulated robotic actuators joints"), wxT("demonstrate complex array of bodies interconnect by joints"), ArticulatedJoints},
 	{wxT("Basic rag doll"), wxT("demonstrate simple rag doll"), DescreteRagDoll},
-	{wxT("Basic car"), wxT("implement a basic car"), BasicCar},
-	{wxT("High performance super car"), wxT("implement a high performance ray cast car"), BasicCar},
+	{wxT("Heavy vehicle"), wxT("implemnet a militaty typeheavy Vehicle"), MilitaryTransport},
+	{wxT("Super car"), wxT("implement a basic car"), SuperCar},
+	{wxT("High performance super car"), wxT("implement a high performance ray cast car"), SuperCar},
 	{wxT("Basic player controller"), wxT("demonstrate simple player controller"), BasicPlayerController},
 	{wxT("Advanced player controller"), wxT("demonstrate player interacting with other objects"), AdvancedPlayerController},
 	{wxT("Simple cloth Path"), wxT("show simple cloth path"), ClothPath},

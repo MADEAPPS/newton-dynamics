@@ -17,16 +17,10 @@
 #include "PhysicsUtils.h"
 #include "TargaToOpenGl.h"
 #include "DemoEntityManager.h"
-#include "CustomBallAndSocket.h"
-#include "DebugDisplay.h"
 
-#include "CustomHinge.h"
-#include "CustomInputManager.h"
-#include "CustomHingeActuator.h"
-#include "CustomSliderActuator.h"
+#include "DebugDisplay.h"
 #include "HeightFieldPrimitive.h"
-#include "CustomUniversalActuator.h"
-#include "CustomArcticulatedTransformManager.h"
+
 
 #define ARTICULATED_VEHICLE_CAMERA_EYEPOINT			1.5f
 #define ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD	2.0f
