@@ -108,7 +108,8 @@ SDK_DEMOS_SRC = \
 		$(SDK_DEMOS_PATH)/ArchimedesBuoyancy.cpp \
 		$(SDK_DEMOS_PATH)/AdvancedPlayerController.cpp \
 		$(SDK_DEMOS_PATH)/ArticulatedJoints.cpp \
-		$(SDK_DEMOS_PATH)/BasicCar.cpp \
+		$(SDK_DEMOS_PATH)/SuperCar.cpp \
+		$(SDK_DEMOS_PATH)/HeavyVehicles.cpp \
 		$(SDK_DEMOS_PATH)/BasicFriction.cpp \
 		$(SDK_DEMOS_PATH)/BasicPlayerController.cpp \
 		$(SDK_DEMOS_PATH)/BasicRagDoll.cpp \
@@ -120,7 +121,6 @@ SDK_DEMOS_SRC = \
 		$(SDK_DEMOS_PATH)/ContinueCollision1.cpp \
 		$(SDK_DEMOS_PATH)/ConvexApproximation.cpp \
 		$(SDK_DEMOS_PATH)/ConvexCast.cpp \
-		$(SDK_DEMOS_PATH)/HeavyVehicles.cpp \
 		$(SDK_DEMOS_PATH)/HeighFieldCollision.cpp \
 		$(SDK_DEMOS_PATH)/KinematicBodies.cpp \
 		$(SDK_DEMOS_PATH)/MeshCollision.cpp \
