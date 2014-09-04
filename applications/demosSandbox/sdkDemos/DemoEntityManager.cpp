@@ -399,8 +399,8 @@ void DemoEntityManager::InitGraphicsSystem()
 		glXSwapIntervalSGI(0);  //NOTE check for GLX_SGI_swap_control extension : http://www.opengl.org/wiki/Swap_Interval#In_Linux_.2F_GLXw
 	}
 #elif defined(_MACOSX_VER)
-	// aglSetInteger (AGL_SWAP_INTERVAL, 0);
-    wglSwapIntervalEXT (GetContext()->GetWXGLContext());
+    //wglSwapIntervalEXT (GetContext()->GetWXGLContext());
+	wglSwapIntervalEXT (m_context->GetWXGLContext());
 #endif
 
 	// initialize free type library
