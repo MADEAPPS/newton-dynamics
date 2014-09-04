@@ -372,7 +372,7 @@ dgVector dgCollisionChamferCylinder::ConvexConicSupporVertex (const dgVector& di
 
 dgVector dgCollisionChamferCylinder::ConvexConicSupporVertex (const dgVector& point, const dgVector& dir) const
 {
-	dgFloat32 (dir.m_w == 0.0f);
+	dgAssert (dir.m_w == 0.0f);
 	return point + dir.Scale4(m_height);
 }
 
