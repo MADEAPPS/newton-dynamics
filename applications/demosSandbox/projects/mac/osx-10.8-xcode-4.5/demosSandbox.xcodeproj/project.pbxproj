@@ -11,8 +11,6 @@
 		FF084A3F173F188B0059C41D /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = FF084A3D173F188B0059C41D /* MainMenu.xib */; };
 		FF084A85173F1AD30059C41D /* DemoCameraListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFD27435172DA06D00114513 /* DemoCameraListener.cpp */; };
 		FF084A87173F1AD30059C41D /* DemoListenerBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFD2742E172DA02000114513 /* DemoListenerBase.cpp */; };
-		FF084A89173F1AD30059C41D /* DemoAIAgent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F2D1556D9F100E7B112 /* DemoAIAgent.cpp */; };
-		FF084A8B173F1AD30059C41D /* DemoAIListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F2F1556D9F100E7B112 /* DemoAIListener.cpp */; };
 		FF084A8D173F1AD30059C41D /* DemoCamera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F311556D9F100E7B112 /* DemoCamera.cpp */; };
 		FF084A8F173F1AD30059C41D /* DemoEntity.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F331556D9F100E7B112 /* DemoEntity.cpp */; };
 		FF084A91173F1AD30059C41D /* DemoEntityListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F351556D9F100E7B112 /* DemoEntityListener.cpp */; };
@@ -658,8 +656,6 @@
 		FF82376D17C26F8C004C80D4 /* TextureDecal.vs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = TextureDecal.vs; sourceTree = "<group>"; };
 		FF82376E17C26F8C004C80D4 /* swimmingPool.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = swimmingPool.ngd; path = ../../../../media/swimmingPool.ngd; sourceTree = "<group>"; };
 		FF82376F17C26F8C004C80D4 /* tractor.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = tractor.ngd; path = ../../../../media/tractor.ngd; sourceTree = "<group>"; };
-		FF8237BA17CA212E004C80D4 /* DemoAIAgent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DemoAIAgent.h; path = ../../../sdkDemos/DemoAIAgent.h; sourceTree = "<group>"; };
-		FF8237BB17CA212E004C80D4 /* DemoAIListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DemoAIListener.h; path = ../../../sdkDemos/DemoAIListener.h; sourceTree = "<group>"; };
 		FF8237BC17CA212E004C80D4 /* DemoCamera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DemoCamera.h; path = ../../../sdkDemos/DemoCamera.h; sourceTree = "<group>"; };
 		FF8237BD17CA212E004C80D4 /* DemoCameraListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DemoCameraListener.h; path = ../../../sdkDemos/DemoCameraListener.h; sourceTree = "<group>"; };
 		FF8237BE17CA212E004C80D4 /* DemoEntity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DemoEntity.h; path = ../../../sdkDemos/DemoEntity.h; sourceTree = "<group>"; };
@@ -703,8 +699,6 @@
 		FFD27435172DA06D00114513 /* DemoCameraListener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DemoCameraListener.cpp; path = ../../../sdkDemos/DemoCameraListener.cpp; sourceTree = "<group>"; };
 		FFD2A77A172E0A1200114513 /* dVisualDebuggerServer.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = dVisualDebuggerServer.xcodeproj; path = ../../../../../packages/projects/mac/dVisualDebuggerServer/dVisualDebuggerServer.xcodeproj; sourceTree = "<group>"; };
 		FFD2A799172E126900114513 /* dCustomJoints.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = dCustomJoints.xcodeproj; path = ../../../../../packages/projects/mac/dCustomJoints/dCustomJoints.xcodeproj; sourceTree = "<group>"; };
-		FFF60F2D1556D9F100E7B112 /* DemoAIAgent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DemoAIAgent.cpp; path = ../../../sdkDemos/DemoAIAgent.cpp; sourceTree = SOURCE_ROOT; };
-		FFF60F2F1556D9F100E7B112 /* DemoAIListener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DemoAIListener.cpp; path = ../../../sdkDemos/DemoAIListener.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60F311556D9F100E7B112 /* DemoCamera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DemoCamera.cpp; path = ../../../sdkDemos/DemoCamera.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60F331556D9F100E7B112 /* DemoEntity.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DemoEntity.cpp; path = ../../../sdkDemos/DemoEntity.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60F351556D9F100E7B112 /* DemoEntityListener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DemoEntityListener.cpp; path = ../../../sdkDemos/DemoEntityListener.cpp; sourceTree = SOURCE_ROOT; };
@@ -1167,8 +1161,6 @@
 		FF9931B51316828C00D1C65B /* main */ = {
 			isa = PBXGroup;
 			children = (
-				FF8237BA17CA212E004C80D4 /* DemoAIAgent.h */,
-				FF8237BB17CA212E004C80D4 /* DemoAIListener.h */,
 				FF8237BC17CA212E004C80D4 /* DemoCamera.h */,
 				FF8237BD17CA212E004C80D4 /* DemoCameraListener.h */,
 				FF8237BE17CA212E004C80D4 /* DemoEntity.h */,
@@ -1182,8 +1174,6 @@
 				FF6FCF6F175156940088B4D3 /* CocoaOpenglGlue.mm */,
 				FFD27435172DA06D00114513 /* DemoCameraListener.cpp */,
 				FFD2742E172DA02000114513 /* DemoListenerBase.cpp */,
-				FFF60F2D1556D9F100E7B112 /* DemoAIAgent.cpp */,
-				FFF60F2F1556D9F100E7B112 /* DemoAIListener.cpp */,
 				FFF60F311556D9F100E7B112 /* DemoCamera.cpp */,
 				FFF60F331556D9F100E7B112 /* DemoEntity.cpp */,
 				FFF60F351556D9F100E7B112 /* DemoEntityListener.cpp */,
@@ -1667,8 +1657,6 @@
 				FF084AB5173F1B090059C41D /* toolbox_stdafx.cpp in Sources */,
 				FF084A85173F1AD30059C41D /* DemoCameraListener.cpp in Sources */,
 				FF084A87173F1AD30059C41D /* DemoListenerBase.cpp in Sources */,
-				FF084A89173F1AD30059C41D /* DemoAIAgent.cpp in Sources */,
-				FF084A8B173F1AD30059C41D /* DemoAIListener.cpp in Sources */,
 				FF084A8D173F1AD30059C41D /* DemoCamera.cpp in Sources */,
 				FF084A8F173F1AD30059C41D /* DemoEntity.cpp in Sources */,
 				FF084A91173F1AD30059C41D /* DemoEntityListener.cpp in Sources */,
