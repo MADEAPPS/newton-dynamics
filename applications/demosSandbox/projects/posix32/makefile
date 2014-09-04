@@ -147,7 +147,6 @@ SDK_DEMOS_SRC = \
 		$(SDK_DEMOS_PATH)/SoftBodies.cpp \
 		$(SDK_DEMOS_PATH)/StandardJoints.cpp \
 		$(SDK_DEMOS_PATH)/StructuredConvexFracturing.cpp \
-		$(SDK_DEMOS_PATH)/SuperCar.cpp \
 		$(SDK_DEMOS_PATH)/UserStaticCollision.cpp \
 		$(SDK_DEMOS_PATH)/UsingNewtonMeshTool.cpp
 
