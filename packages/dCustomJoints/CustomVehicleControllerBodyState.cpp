@@ -202,7 +202,7 @@ void CustomVehicleControllerBodyStateChassis::UpdateDynamicInputs()
 	dVector torque;
 	NewtonBodyGetForceAcc (body, &force[0]);
 	NewtonBodyGetTorqueAcc (body, &torque[0]);
-	for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint (body); joint && (m_controller->m_externalContactCount < (sizeof (m_controller->m_externalContactStates) / sizeof (m_controller->m_externalContactStates[0]))); joint = NewtonBodyGetNextContactJoint (body, joint)) {
+	for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint (body); joint && (m_controller->m_externalContactCount < int (sizeof (m_controller->m_externalContactStates) / sizeof (m_controller->m_externalContactStates[0]))); joint = NewtonBodyGetNextContactJoint (body, joint)) {
 		NewtonBody* const otherBody = NewtonJointGetBody1(joint);
 		dAssert (NewtonJointGetBody0(joint) == body);
 		dAssert (otherBody != body);

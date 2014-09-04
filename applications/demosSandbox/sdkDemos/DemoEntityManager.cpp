@@ -21,8 +21,6 @@
 #include "DebugDisplay.h"
 #include "TargaToOpenGl.h"
 #include "DemoEntityManager.h"
-
-#include "DemoAIListener.h"
 #include "DemoSoundListener.h"
 #include "DemoEntityListener.h"
 #include "DemoCameraListener.h"
