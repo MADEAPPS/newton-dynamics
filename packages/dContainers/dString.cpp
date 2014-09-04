@@ -100,13 +100,13 @@ class dString::dStringAllocator
 	
 		dStringAllocator()
 		{
-			for (int i = 0; i < sizeof (m_buckects) / sizeof (m_buckects[0]); i ++) {
+			for (int i = 0; i < int (sizeof (m_buckects) / sizeof (m_buckects[0])); i ++) {
 				m_buckects[i].Prefetch ((i + 1)* D_STRING_MEM_GRANULARITY);
 			}
 		}
 		~dStringAllocator()
 		{
-			for (int i = 0; i < sizeof (m_buckects) / sizeof (m_buckects[0]); i ++) {
+			for (int i = 0; i < int (sizeof (m_buckects) / sizeof (m_buckects[0])); i ++) {
 				m_buckects[i].Flush();
 			}
 		}
@@ -504,7 +504,7 @@ int dString::Find (const char* const subString, int subStringLength, int from, i
 			short frequency[256];
 			memset (frequency, -1, sizeof (frequency));
 			for (int i = 0; i < str2Size; i ++) {
-				frequency[subString[i]] = short(i);
+				frequency[int (subString[i])] = short(i);
 			}
 
 			int j = from;
@@ -519,7 +519,7 @@ int dString::Find (const char* const subString, int subStringLength, int from, i
 					return j;
 					
 				}
-				j += dMax(i - frequency[ptr1[i]], 1);
+				j += dMax(i - frequency[int (ptr1[i])], 1);
 			}
 		}
 	}
