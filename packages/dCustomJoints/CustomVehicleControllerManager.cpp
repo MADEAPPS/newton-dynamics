@@ -45,7 +45,7 @@
 #include <CustomVehicleControllerComponent.h>
 #include <CustomVehicleControllerBodyState.h>
 
-#define VEHICLE_CONTROLLER_MAX_BODIES								16
+#define VEHICLE_CONTROLLER_MAX_BODIES								32
 #define VEHICLE_CONTROLLER_MAX_JOINTS								32
 #define VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS						(VEHICLE_CONTROLLER_MAX_JOINTS * 4)
 #define VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SLIP_ANGLE		dFloat(0.75f)
@@ -111,18 +111,21 @@ if ((xxx > 500) && (xxx < 504))
 		int bodyCount = 0;
 		for (dList<CustomVehicleControllerBodyState*>::dListNode* stateNode = controller->m_stateList.GetFirst(); stateNode; stateNode = stateNode->GetNext()) {
 			m_bodyArray[bodyCount] = stateNode->GetInfo();
+			dAssert (bodyCount < int (sizeof (m_bodyArray) / sizeof(m_bodyArray[0])));
 			bodyCount ++;
 		}
 		for (dTireList::dListNode* node = controller->m_tireList.GetFirst();  node; node = node->GetNext()) {
 			CustomVehicleControllerBodyStateTire& tire = node->GetInfo();
 			for (int i = 0; i < tire.m_contactCount; i ++) {
 				m_bodyArray[bodyCount] = &tire.m_contactBody[i];
+				dAssert (bodyCount < int (sizeof (m_bodyArray) / sizeof(m_bodyArray[0])));
 				bodyCount ++;
 			}
 		}
 
 		for (int i = 0; i < controller->m_externalContactCount; i ++) {
 			m_bodyArray[bodyCount] = &controller->m_externalContactStates[i];
+			dAssert (bodyCount < int (sizeof (m_bodyArray) / sizeof(m_bodyArray[0])));
 			bodyCount ++;
 		}
 
@@ -446,7 +449,6 @@ void CustomVehicleController::Finalize()
 	dFloat64 unitAccel[VEHICLE_CONTROLLER_MAX_JOINTS];
 	dFloat64 sprungMass[VEHICLE_CONTROLLER_MAX_JOINTS];
 
-	dAssert (m_tireList.GetCount() <= 4);
 
 	// make sure tire are aligned
 /*
@@ -494,7 +496,9 @@ void CustomVehicleController::Finalize()
 	for (dTireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
 		CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
 		tire->m_restSprunMass = dFloat (5.0f * dFloor (sprungMass[index] / 5.0f + 0.5f));
-		tire->CalculateRollingResistance (m_engine->GetTopSpeed());
+		if (m_engine) {
+			tire->CalculateRollingResistance (m_engine->GetTopSpeed());
+		}
 		index ++;
 	}
 

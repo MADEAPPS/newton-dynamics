@@ -20,235 +20,20 @@
 #include "HeightFieldPrimitive.h"
 #include "../toolBox/DebugDisplay.h"
 
-#define HEAVY_TRANSPORT_MASS				5000.0f
+#define HEAVY_TRANSPORT_MASS						5000.0f
+#define HEAVY_TRANSPORT_COM_Y_OFFSET				-0.2f
+
+#define HEAVY_TRANSPORT_TIRE_MASS					150.0f
+#define HEAVY_TRANSPORT_SUSPENSION_LENGTH			  1.2f	
+#define HEAVY_TRANSPORT_SUSPENSION_SPRING			 30.0f
+#define HEAVY_TRANSPORT_SUSPENSION_DAMPER			  1.0f	
+#define HEAVY_TRANSPORT_LATERAL_STIFFNESS			  40.0f	
+#define HEAVY_TRANSPORT_LONGITUDINAL_STIFFNESS		2000.0f
+#define HEAVY_TRANSPORT_ALIGNING_MOMENT_TRAIL		   1.5f
 
 #define HEAVY_VEHICLE_THIRD_PERSON_VIEW_HIGHT		2.0f
 #define HEAVY_VEHICLE_THIRD_PERSON_VIEW_DIST		10.0f
-#define HEAVY_VEHICLE_THIRD_PERSON_VIEW_FILTER	0.125f
-
-
-/*
-class TireUserData: public DemoEntity::UserData
-{
-	public:
-	TireUserData(CustomWheelVehicle* const carJoint, DemoEntity* const me, void* const tireHandle)
-		:UserData()
-		,m_tireHandle (tireHandle)
-		,m_me(me)
-		,m_carJoint(carJoint)
-	{
-	}
-
-	virtual ~TireUserData()
-	{
-	}
-
-	virtual void OnRender (dFloat timestep) const
-	{
-	}
-
-
-	virtual void OnInterpolateMatrix (DemoEntityManager& world, dFloat param) const
-	{
-		// iterate over all tires and calculate the interpolated matrix between current and next physics frame at parameter param.
-//		CustomWheelVehicle* const vehicle = m_car->m_vehicle;
-//		int count = vehicle->GetTiresCount();
-//		for (int i = 0; i < count; i ++) {
-//			const CustomWheelVehicle::dTire& tire = vehicle->GetTire (i);
-//			DemoEntity* const tireNode = (DemoEntity*) tire.m_userData;
-//			tireNode->InterpolateMatrix (world, param);
-//		}
-	}
-
-	void* m_tireHandle;
-	DemoEntity* m_me;
-	CustomWheelVehicle* m_carJoint;
-
-};
-
-
-
-
-// car need to apply local transform to all it children
-static void TransformCallback (const NewtonBody* body, const dFloat* matrix, int threadIndex)
-{
-	DemoEntity::TransformCallback (body, matrix, threadIndex);
-
-	
-	for (NewtonJoint* joint = NewtonBodyGetFirstJoint (body); joint; joint = NewtonBodyGetNextJoint(body, joint)) {
-		NewtonCustomJoint* const customJoint = (NewtonCustomJoint*) NewtonJointGetUserData(joint);
-		if (customJoint->IsType(CustomWheelVehicle::GetRttiType())) {
-
-			dMatrix chassisInvMatrix (dMatrix(matrix).Inverse());
-			//static dMatrix tireAligmentRotation (dYawMatrix(3.121592f * 0.0f));
-			dMatrix tireAligmentRotation (GetIdentityMatrix());
-
-			CustomWheelVehicle* const vehicleJoint = (CustomWheelVehicle*) customJoint;
-			for (void* handle = vehicleJoint->GetFirstTireHandle(); handle; handle = vehicleJoint->GetNextTireHandle(handle)) {
-				NewtonBody* const tireBody = vehicleJoint->GetTireBody(handle);
-				dMatrix tireGlobalMatrix;
-				NewtonBodyGetMatrix(tireBody, &tireGlobalMatrix[0][0]);
-				dMatrix tireLocalMatrix (tireAligmentRotation * tireGlobalMatrix * chassisInvMatrix);
-				DemoEntity::TransformCallback (tireBody, &tireLocalMatrix[0][0], threadIndex);
-			}
-		}
-	}
-}
-
-
-static NewtonBody* CreateVehicleBody (DemoEntityManager* const scene, const char* const name, const dMatrix& location)
-{
-	dAssert (0);
-	return 0;
-
-	char fileName[2048];
-	GetWorkingFileName (name, fileName);
-	scene->LoadScene (fileName);
-
-	dMatrix matrix (location);
-
-	NewtonWorld* const world = scene->GetNewton();
-
-	matrix.m_posit = FindFloor (scene->GetNewton(), dVector (location.m_posit.m_x, 100.0f, location.m_posit.m_z, 0.0f), 200.0f);
-	matrix.m_posit.m_y += 4.0f;
-
-	DemoEntity* const entity = scene->GetLast()->GetInfo();
-	DemoEntity* const chassis = entity->dHierarchy<DemoEntity>::Find("chassis");
-	dAssert (chassis);
-	dMatrix bodyBindMatrix = chassis->CalculateGlobalMatrix(entity);
-
-	DemoMesh* const mesh = chassis->GetMesh();
-	float* const vertexList = mesh->m_vertex;
-	NewtonCollision* chassisCollision = NewtonCreateConvexHull(world, mesh->m_vertexCount, vertexList, 3 * sizeof (float), 0.001f, 0, NULL);
-
-	// create the rigid body for this vehicle
-	NewtonBody* const rigidBody = NewtonCreateBody (world, chassisCollision, &matrix[0][0]);
-
-	// do not forget to release the collision after done
-	NewtonDestroyCollision (chassisCollision);
-
-	// get the collision from the rigid body
-	chassisCollision = NewtonBodyGetCollision(rigidBody);
-
-	// save the pointer to the graphic object with the body.
-	NewtonBodySetUserData (rigidBody, entity);
-
-	// set the material group id for vehicle
-	//	NewtonBodySetMaterialGroupID (m_vehicleBody, vehicleID);
-	int materialID = 0;
-	NewtonBodySetMaterialGroupID (rigidBody, materialID);
-
-	// set a destructor for this rigid body
-	NewtonBodySetDestructorCallback (rigidBody, PhysicsBodyDestructor);
-
-	// set the force and torque call back function
-	NewtonBodySetForceAndTorqueCallback (rigidBody, PhysicsApplyGravityForce);
-
-	// set the transform call back function
-	//NewtonBodySetTransformCallback (rigidBody, DemoEntity::TransformCallback);
-	NewtonBodySetTransformCallback (rigidBody, TransformCallback);
-	
-
-	// set the matrix for both the rigid body and the graphic body
-	NewtonBodySetMatrix (rigidBody, &matrix[0][0]);
-
-	dVector origin(0, 0, 0, 1);
-	dVector inertia(0, 0, 0, 1);
-
-	// calculate the moment of inertia and the relative center of mass of the solid
-	NewtonConvexCollisionCalculateInertialMatrix (chassisCollision, &inertia[0], &origin[0]);
-
-
-	// set vehicle mass matrix, 
-	dFloat mass = 1000.0f;
-	dFloat Ixx = mass * inertia[0];
-	dFloat Iyy = mass * inertia[1];
-	dFloat Izz = mass * inertia[2];
-	NewtonBodySetMassMatrix (rigidBody, mass, Ixx, Iyy, Izz);
-
-	// the cog may be off by a car, we can add some offset here
-	// Set the vehicle Center of mass
-	//origin += config.m_comOffset;
-	NewtonBodySetCentreOfMass (rigidBody, &origin[0]);
-	return rigidBody;
-
-}
-
-
-static void CalculateTireDimensions (NewtonBody* const carBody, const char* const name, dFloat& width, dFloat& radius)
-{
-	// find the the tire visual mesh 
-	NewtonWorld* const world = NewtonBodyGetWorld(carBody);
-	DemoEntity* const entity = (DemoEntity*) NewtonBodyGetUserData(carBody);
-
-	DemoEntity* const tirePart = entity->dHierarchy<DemoEntity>::Find (name);
-	dAssert (tirePart);
-
-	// make a convex hull collision shape to assist in calculation of the tire shape size
-	DemoMesh* const tireMesh = tirePart->GetMesh();
-	NewtonCollision* const collision = NewtonCreateConvexHull(world, tireMesh->m_vertexCount, tireMesh->m_vertex, 3 * sizeof (dFloat), 0, 0, NULL);
-
-	dMatrix tireLocalMatrix (entity->GetCurrentMatrix());
-	dMatrix tireMatrix (tirePart->CalculateGlobalMatrix() * tireLocalMatrix);
-
-	// find the support points that can be used to define the tire collision mesh
-	dVector extremePoint;
-	dVector upDir (tireMatrix.UnrotateVector(dVector (0.0f, 1.0f, 0.0f, 0.0f)));
-	NewtonCollisionSupportVertex (collision, &upDir[0], &extremePoint[0]);
-	radius = dAbs (upDir % extremePoint);
-
-	dVector widthDir (tireMatrix.UnrotateVector(dVector (0.0f, 0.0f, 1.0f, 0.0f)));
-	NewtonCollisionSupportVertex (collision, &widthDir[0], &extremePoint[0]);
-	width = widthDir % extremePoint;
-
-	widthDir = widthDir.Scale (-1.0f);
-	NewtonCollisionSupportVertex (collision, &widthDir[0], &extremePoint[0]);
-	width += widthDir % extremePoint;
-
-	NewtonDestroyCollision(collision);	
-}
-
-
-
-
-
-static CustomWheelVehicle* CreateWheelVehicle (DemoEntityManager* const scene, const char* const name, const dMatrix& location)
-{
-	// create the car chassis body
-	NewtonBody* const carBody = CreateVehicleBody (scene, name, location);
-
-	// create the car joint
-	CustomWheelVehicle* const carJoint = new CustomWheelVehicle(carBody);
-	DemoEntity* const chassisEntity = (DemoEntity*) NewtonBodyGetUserData(carBody);
-	
-	const char* tireNames[] = {"ltire_0", "ltire_1", "ltire_2", "ltire_3", "rtire_0", "rtire_1", "rtire_2", "rtire_3"};
-	// calculate tire size from a representative tire mesh
-	dFloat width;
-	dFloat radius;
-	CalculateTireDimensions (carBody, tireNames[0], width, radius);
-
-	dFloat tireMass = 60.0f;
-	dFloat suspentionLenght = 0.7f;
-	dFloat suspensionSpring = 60.0f;
-	dFloat suspensionDamper = 5.0f;
-	dFloat tireRollResistance = 0.0f;
-	// add all tires
-	carJoint->BeginAddTire();
-	for (int i = 0; i < int (sizeof (tireNames) / sizeof (tireNames[0])); i ++) {
-		const char* const tireName = tireNames[i];
-		DemoEntity* const tireEntity = chassisEntity->Find(tireName);
-		dAssert (tireEntity);
-
-		dMatrix location (tireEntity->CalculateGlobalMatrix(chassisEntity));
-//		void* const tireHandle = carJoint->AddSingleSuspensionTire (tireEntity, location.m_posit, tireMass, radius, width, suspentionLenght, suspensionSpring, suspensionDamper, tireRollResistance);
-//		tireEntity->SetUserData (new TireUserData (carJoint, tireEntity, tireHandle));
-		carJoint->AddSingleSuspensionTire (tireEntity, location.m_posit, tireMass, radius, width, suspentionLenght, suspensionSpring, suspensionDamper, tireRollResistance);
-	}
-	carJoint->EndAddTire();
-
-	return carJoint;
-}
-*/
+#define HEAVY_VEHICLE_THIRD_PERSON_VIEW_FILTER		0.125f
 
 
 class HeavyVehicleEntity: public DemoEntity
@@ -386,17 +171,15 @@ class HeavyVehicleEntity: public DemoEntity
 		delete[] temp;
 
 		// get the location of this tire relative to the car chassis
-		dMatrix tireLocalMatrix (entity->GetNextMatrix());
-		dMatrix tireMatrix (tirePart->CalculateGlobalMatrix() * tireLocalMatrix);
+		dMatrix tireMatrix (tirePart->CalculateGlobalMatrix(entity));
 
 		// find the support points that can be used to define the with and high of the tire collision mesh
 		dVector extremePoint;
-		dVector upDir (tireMatrix.UnrotateVector(dVector (0.0f, 1.0f, 0.0f, 0.0f)));
+		dVector upDir (0.0f, 1.0f, 0.0f, 0.0f);
 		NewtonCollisionSupportVertex (collision, &upDir[0], &extremePoint[0]);
 		radius = dAbs (upDir % extremePoint);
 
-		//dVector widthDir (tireMatrix.UnrotateVector(tireLocalMatrix.m_right));
-		dVector widthDir (tireMatrix.UnrotateVector(tireLocalMatrix.m_front));
+		dVector widthDir (1.0f, 0.0f, 0.0f, 0.0f);
 		NewtonCollisionSupportVertex (collision, &widthDir[0], &extremePoint[0]);
 		width = widthDir % extremePoint;
 
@@ -478,23 +261,31 @@ class HeavyVehicleEntity: public DemoEntity
 	}
 
 	// this function is an example of how to make a high performance super car
-	void BuildFourWheelDriveSuperCar ()
+	void BuildAllWheelDriveVehicle ()
 	{
-		dAssert (0);
-/*
 		// step one: find the location of each tire, in the visual mesh and add them one by one to the vehicle controller 
 		dFloat width;
 		dFloat radius;
 
 		// Muscle cars have the front engine, we need to shift the center of mass to the front to represent that
-		m_controller->SetCenterOfGravity (dVector (0.35f, VIPER_COM_Y_OFFSET, 0.0f, 0.0f)); 
+		m_controller->SetCenterOfGravity (dVector (0.0f, HEAVY_TRANSPORT_COM_Y_OFFSET, 0.0f, 0.0f)); 
+
 
 		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
-		CalculateTireDimensions ("fl_tire", width, radius);
-		dVector offset (0.0f, 0.0f, 0.0f, 0.0f);
-		CustomVehicleControllerBodyStateTire* const leftFrontTire = AddTire ("fl_tire", offset, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER, VIPER_TIRE_LATERAL_STIFFNESS, VIPER_TIRE_LONGITUDINAL_STIFFNESS, VIPER_TIRE_ALIGNING_MOMENT_TRAIL);
-		CustomVehicleControllerBodyStateTire* const rightFrontTire = AddTire ("fr_tire", offset, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER, VIPER_TIRE_LATERAL_STIFFNESS, VIPER_TIRE_LONGITUDINAL_STIFFNESS, VIPER_TIRE_ALIGNING_MOMENT_TRAIL);
+		CalculateTireDimensions ("ltire_0", width, radius);
 
+		dVector offset (0.0f, 0.30f, 0.0f, 0.0f);
+		CustomVehicleControllerBodyStateTire* const leftTire0 = AddTire ("ltire_0", offset, width, radius, HEAVY_TRANSPORT_MASS, HEAVY_TRANSPORT_SUSPENSION_LENGTH, HEAVY_TRANSPORT_SUSPENSION_SPRING, HEAVY_TRANSPORT_SUSPENSION_DAMPER, HEAVY_TRANSPORT_LATERAL_STIFFNESS, HEAVY_TRANSPORT_LONGITUDINAL_STIFFNESS, HEAVY_TRANSPORT_ALIGNING_MOMENT_TRAIL);
+		CustomVehicleControllerBodyStateTire* const leftTire1 = AddTire ("ltire_1", offset, width, radius, HEAVY_TRANSPORT_MASS, HEAVY_TRANSPORT_SUSPENSION_LENGTH, HEAVY_TRANSPORT_SUSPENSION_SPRING, HEAVY_TRANSPORT_SUSPENSION_DAMPER, HEAVY_TRANSPORT_LATERAL_STIFFNESS, HEAVY_TRANSPORT_LONGITUDINAL_STIFFNESS, HEAVY_TRANSPORT_ALIGNING_MOMENT_TRAIL);
+		CustomVehicleControllerBodyStateTire* const leftTire2 = AddTire ("ltire_2", offset, width, radius, HEAVY_TRANSPORT_MASS, HEAVY_TRANSPORT_SUSPENSION_LENGTH, HEAVY_TRANSPORT_SUSPENSION_SPRING, HEAVY_TRANSPORT_SUSPENSION_DAMPER, HEAVY_TRANSPORT_LATERAL_STIFFNESS, HEAVY_TRANSPORT_LONGITUDINAL_STIFFNESS, HEAVY_TRANSPORT_ALIGNING_MOMENT_TRAIL);
+		CustomVehicleControllerBodyStateTire* const leftTire3 = AddTire ("ltire_3", offset, width, radius, HEAVY_TRANSPORT_MASS, HEAVY_TRANSPORT_SUSPENSION_LENGTH, HEAVY_TRANSPORT_SUSPENSION_SPRING, HEAVY_TRANSPORT_SUSPENSION_DAMPER, HEAVY_TRANSPORT_LATERAL_STIFFNESS, HEAVY_TRANSPORT_LONGITUDINAL_STIFFNESS, HEAVY_TRANSPORT_ALIGNING_MOMENT_TRAIL);
+
+		CustomVehicleControllerBodyStateTire* const rightTire0 = AddTire ("rtire_0", offset, width, radius, HEAVY_TRANSPORT_MASS, HEAVY_TRANSPORT_SUSPENSION_LENGTH, HEAVY_TRANSPORT_SUSPENSION_SPRING, HEAVY_TRANSPORT_SUSPENSION_DAMPER, HEAVY_TRANSPORT_LATERAL_STIFFNESS, HEAVY_TRANSPORT_LONGITUDINAL_STIFFNESS, HEAVY_TRANSPORT_ALIGNING_MOMENT_TRAIL);
+		CustomVehicleControllerBodyStateTire* const rightTire1 = AddTire ("rtire_1", offset, width, radius, HEAVY_TRANSPORT_MASS, HEAVY_TRANSPORT_SUSPENSION_LENGTH, HEAVY_TRANSPORT_SUSPENSION_SPRING, HEAVY_TRANSPORT_SUSPENSION_DAMPER, HEAVY_TRANSPORT_LATERAL_STIFFNESS, HEAVY_TRANSPORT_LONGITUDINAL_STIFFNESS, HEAVY_TRANSPORT_ALIGNING_MOMENT_TRAIL);
+		CustomVehicleControllerBodyStateTire* const rightTire2 = AddTire ("rtire_2", offset, width, radius, HEAVY_TRANSPORT_MASS, HEAVY_TRANSPORT_SUSPENSION_LENGTH, HEAVY_TRANSPORT_SUSPENSION_SPRING, HEAVY_TRANSPORT_SUSPENSION_DAMPER, HEAVY_TRANSPORT_LATERAL_STIFFNESS, HEAVY_TRANSPORT_LONGITUDINAL_STIFFNESS, HEAVY_TRANSPORT_ALIGNING_MOMENT_TRAIL);
+		CustomVehicleControllerBodyStateTire* const rightTire3 = AddTire ("rtire_3", offset, width, radius, HEAVY_TRANSPORT_MASS, HEAVY_TRANSPORT_SUSPENSION_LENGTH, HEAVY_TRANSPORT_SUSPENSION_SPRING, HEAVY_TRANSPORT_SUSPENSION_DAMPER, HEAVY_TRANSPORT_LATERAL_STIFFNESS, HEAVY_TRANSPORT_LONGITUDINAL_STIFFNESS, HEAVY_TRANSPORT_ALIGNING_MOMENT_TRAIL);
+
+/*
 		// add real tires
 		CalculateTireDimensions ("rl_tire", width, radius);
 		dVector offset1 (0.0f, 0.05f, 0.0f, 0.0f);
@@ -554,10 +345,9 @@ class HeavyVehicleEntity: public DemoEntity
 
 		dFloat vehicleTopSpeedKPH = VIPER_TIRE_TOP_SPEED_KMH;
 		engine->InitEngineTorqueCurve (vehicleTopSpeedKPH, viperIdleTorquePoundPerFoot, viperIdleRPM, viperPeakTorquePoundPerFoot, viperPeakTorqueRPM, viperPeakHorsePower, viperPeakHorsePowerRPM, viperRedLineTorquePoundPerFoot, viperRedLineRPM);
-
+*/
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
-*/
 	}
 
 	void ApplyPlayerControl ()
@@ -957,7 +747,7 @@ location.m_posit.m_y = 50.0f;
 location.m_posit.m_z = 50.0f;
 
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
-	location.m_posit.m_y += 1.0f;
+	location.m_posit.m_y += 2.0f;
 
 	NewtonWorld* const world = scene->GetNewton();
 
@@ -965,6 +755,8 @@ location.m_posit.m_z = 50.0f;
 	HeavyVehicleControllerManager* const manager = new HeavyVehicleControllerManager (world);
 	
 	HeavyVehicleEntity* const vehicle = new HeavyVehicleEntity (scene, manager, location, "lav-25.ngd");
+
+	vehicle->BuildAllWheelDriveVehicle();
 
 	// set this vehicle as the player
 	manager->SetAsPlayer(vehicle);
