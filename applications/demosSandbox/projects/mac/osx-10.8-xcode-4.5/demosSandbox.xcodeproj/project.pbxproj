@@ -38,7 +38,6 @@
 		FF084ABB173F1B310059C41D /* KinematicBodies.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF3B296E17300BD6007E6FEC /* KinematicBodies.cpp */; };
 		FF084ABC173F1B310059C41D /* AdvancedPlayerController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFD27431172DA05A00114513 /* AdvancedPlayerController.cpp */; };
 		FF084ABD173F1B310059C41D /* BasicPlayerController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFD27432172DA05A00114513 /* BasicPlayerController.cpp */; };
-		FF084ABE173F1B310059C41D /* BasicCar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F531556DA2300E7B112 /* BasicCar.cpp */; };
 		FF084ABF173F1B310059C41D /* BasicFriction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F551556DA2300E7B112 /* BasicFriction.cpp */; };
 		FF084AC0173F1B310059C41D /* BasicRestitution.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F571556DA2300E7B112 /* BasicRestitution.cpp */; };
 		FF084AC1173F1B310059C41D /* BasicStacking.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F5A1556DA2300E7B112 /* BasicStacking.cpp */; };
@@ -281,6 +280,7 @@
 		FF9BBC5118351FB90060F147 /* ramp.off in Resources */ = {isa = PBXBuildFile; fileRef = FF9BBC4D18351FB90060F147 /* ramp.off */; };
 		FF9BBC5218351FB90060F147 /* ruins.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF9BBC4E18351FB90060F147 /* ruins.ngd */; };
 		FF9BBC5318351FB90060F147 /* ruinsFloor.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF9BBC4F18351FB90060F147 /* ruinsFloor.ngd */; };
+		FF9D2ADE19B8D5F200BC1117 /* SuperCar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF9D2ADD19B8D5F200BC1117 /* SuperCar.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -693,6 +693,7 @@
 		FF9BBC4D18351FB90060F147 /* ramp.off */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ramp.off; path = ../../../../media/ramp.off; sourceTree = "<group>"; };
 		FF9BBC4E18351FB90060F147 /* ruins.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = ruins.ngd; path = ../../../../media/ruins.ngd; sourceTree = "<group>"; };
 		FF9BBC4F18351FB90060F147 /* ruinsFloor.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = ruinsFloor.ngd; path = ../../../../media/ruinsFloor.ngd; sourceTree = "<group>"; };
+		FF9D2ADD19B8D5F200BC1117 /* SuperCar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SuperCar.cpp; path = ../../../sdkDemos/demos/SuperCar.cpp; sourceTree = "<group>"; };
 		FFD2742E172DA02000114513 /* DemoListenerBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DemoListenerBase.cpp; path = ../../../sdkDemos/DemoListenerBase.cpp; sourceTree = "<group>"; };
 		FFD27431172DA05A00114513 /* AdvancedPlayerController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AdvancedPlayerController.cpp; path = ../../../sdkDemos/demos/AdvancedPlayerController.cpp; sourceTree = "<group>"; };
 		FFD27432172DA05A00114513 /* BasicPlayerController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BasicPlayerController.cpp; path = ../../../sdkDemos/demos/BasicPlayerController.cpp; sourceTree = "<group>"; };
@@ -707,7 +708,6 @@
 		FFF60F3F1556D9F100E7B112 /* DemoSoundListener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DemoSoundListener.cpp; path = ../../../sdkDemos/DemoSoundListener.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60F411556D9F100E7B112 /* DemoVisualDebugerListener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DemoVisualDebugerListener.cpp; path = ../../../sdkDemos/DemoVisualDebugerListener.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60F441556D9F100E7B112 /* NewtonDemos.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = NewtonDemos.cpp; path = ../../../sdkDemos/NewtonDemos.cpp; sourceTree = SOURCE_ROOT; };
-		FFF60F531556DA2300E7B112 /* BasicCar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BasicCar.cpp; path = ../../../sdkDemos/demos/BasicCar.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60F551556DA2300E7B112 /* BasicFriction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BasicFriction.cpp; path = ../../../sdkDemos/demos/BasicFriction.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60F571556DA2300E7B112 /* BasicRestitution.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BasicRestitution.cpp; path = ../../../sdkDemos/demos/BasicRestitution.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60F5A1556DA2300E7B112 /* BasicStacking.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BasicStacking.cpp; path = ../../../sdkDemos/demos/BasicStacking.cpp; sourceTree = SOURCE_ROOT; };
@@ -1122,6 +1122,7 @@
 		FF8F28D4131368B90019E923 /* demos */ = {
 			isa = PBXGroup;
 			children = (
+				FF9D2ADD19B8D5F200BC1117 /* SuperCar.cpp */,
 				FF7EDAA3188843F000CB1FFA /* ContinueCollision1.cpp */,
 				FF7EDAA4188843F000CB1FFA /* StandardJoints.cpp */,
 				FF8237C617CA218A004C80D4 /* StructuredConvexFracturing.cpp */,
@@ -1135,7 +1136,6 @@
 				FF3B296E17300BD6007E6FEC /* KinematicBodies.cpp */,
 				FFD27431172DA05A00114513 /* AdvancedPlayerController.cpp */,
 				FFD27432172DA05A00114513 /* BasicPlayerController.cpp */,
-				FFF60F531556DA2300E7B112 /* BasicCar.cpp */,
 				FFF60F551556DA2300E7B112 /* BasicFriction.cpp */,
 				FFF60F571556DA2300E7B112 /* BasicRestitution.cpp */,
 				FFF60F5A1556DA2300E7B112 /* BasicStacking.cpp */,
@@ -1623,7 +1623,6 @@
 				FF084ABB173F1B310059C41D /* KinematicBodies.cpp in Sources */,
 				FF084ABC173F1B310059C41D /* AdvancedPlayerController.cpp in Sources */,
 				FF084ABD173F1B310059C41D /* BasicPlayerController.cpp in Sources */,
-				FF084ABE173F1B310059C41D /* BasicCar.cpp in Sources */,
 				FF084ABF173F1B310059C41D /* BasicFriction.cpp in Sources */,
 				FF084AC0173F1B310059C41D /* BasicRestitution.cpp in Sources */,
 				FF084AC1173F1B310059C41D /* BasicStacking.cpp in Sources */,
@@ -1656,6 +1655,7 @@
 				FF084AB3173F1B090059C41D /* TargaToOpenGl.cpp in Sources */,
 				FF084AB5173F1B090059C41D /* toolbox_stdafx.cpp in Sources */,
 				FF084A85173F1AD30059C41D /* DemoCameraListener.cpp in Sources */,
+				FF9D2ADE19B8D5F200BC1117 /* SuperCar.cpp in Sources */,
 				FF084A87173F1AD30059C41D /* DemoListenerBase.cpp in Sources */,
 				FF084A8D173F1AD30059C41D /* DemoCamera.cpp in Sources */,
 				FF084A8F173F1AD30059C41D /* DemoEntity.cpp in Sources */,
