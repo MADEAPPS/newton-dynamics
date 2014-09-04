@@ -387,7 +387,7 @@ void DemoEntityManager::InitGraphicsSystem()
 	
 	// if Glew doesn't initialize correctly.
 	if (err != GLEW_OK) {
-	  wxMessageBox(wxString(_("GLEW Error: ")) + wxString(_((char*)glewGetErrorString(err))), _("ERROR"), wxOK | wxICON_EXCLAMATION);
+	  //wxMessageBox(wxString(_("GLEW Error: ")) + wxString(_((char*)glewGetErrorString(err))), _("ERROR"), wxOK | wxICON_EXCLAMATION);
 	}
 	
 #if defined (_MSC_VER)
