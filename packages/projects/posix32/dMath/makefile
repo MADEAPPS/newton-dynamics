@@ -24,6 +24,7 @@ SRC_PATH =  ../../../dMath
 NEWTON_SDK = ../../../posix32
 
 LIB_SRCS = \
+	$(SRC_PATH)/dLinearAlgebra.cpp \
 	$(SRC_PATH)/dMathDefines.cpp \
 	$(SRC_PATH)/dMatrix.cpp \
 	$(SRC_PATH)/dQuaternion.cpp \
