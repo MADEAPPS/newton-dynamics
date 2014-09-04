@@ -18,7 +18,8 @@
 #include "DebugDisplay.h"
 
 
-#define D_MESH_HEADER	"Newton Mesh"
+//const D_MESH_HEADER	"Newton Mesh"
+static const char* D_MESH_HEADER = "Newton Mesh";
 
 dVector ForceBetweenBody (NewtonBody* const body0, NewtonBody* const body1)
 {
@@ -616,7 +617,6 @@ void GenericContactProcess (const NewtonJoint* contactJoint, dFloat timestep, in
 
 	NewtonBody* const body = NewtonJointGetBody0(contactJoint);
 	for (void* contact = NewtonContactJointGetFirstContact (contactJoint); contact; contact = NewtonContactJointGetNextContact (contactJoint, contact)) {
-		dFloat speed;
 		dVector point;
 		dVector normal;	
 		dVector dir0;	
@@ -628,8 +628,7 @@ void GenericContactProcess (const NewtonJoint* contactJoint, dFloat timestep, in
 		NewtonMaterialGetContactForce (material, body, &force.m_x);
 		NewtonMaterialGetContactPositionAndNormal (material, body, &point.m_x, &normal.m_x);
 		NewtonMaterialGetContactTangentDirections (material, body, &dir0.m_x, &dir1.m_x);
-		speed = NewtonMaterialGetContactNormalSpeed(material);
-
+		//dFloat speed = NewtonMaterialGetContactNormalSpeed(material);
 
 		//speed = NewtonMaterialGetContactNormalSpeed(material);
 		// play sound base of the contact speed.
@@ -1171,7 +1170,7 @@ NewtonMesh* LoadNewtonMesh (NewtonWorld* const world, const char* const name)
 		if (!strncmp (name, D_MESH_HEADER, strlen(D_MESH_HEADER))) {
 			int size;
 			fread (&size, sizeof (int), 1, file);
-			dAssert (size < sizeof (name));
+			dAssert (size < int (sizeof (name)));
 			fread (name, size, 1, file);
 			name[size] = 0;
 
@@ -1188,7 +1187,7 @@ void SaveNewtonMesh (NewtonMesh* const mesh, const char* const name)
 	GetWorkingFileName (name, fileName);
 	FILE* const file = fopen (fileName, "wb");
 	if (file) {
-		char* const header = D_MESH_HEADER;
+		const char* const header = D_MESH_HEADER;
 		fwrite (header, strlen(D_MESH_HEADER), 1, file);
 
 		int size = strlen(name);

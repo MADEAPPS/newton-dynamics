@@ -195,7 +195,7 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 
         if( NewtonCollisionIntersectionTest(world, collisionA, &poseA[0][0], collisionB, &poseB[0][0],0) ) {
             int contactCount = NewtonCollisionCollide(world, maxSize, collisionA, &poseA[0][0], collisionB, &poseB[0][0], &points[0][0], &normals[0][0], &penetrations[0], &attrbA[0], &attrbB[0], 0);
-            if (contactCount && ((me->m_contactCount + contactCount) <= (sizeof (me->m_contacts) / sizeof (me->m_contacts[0])))) {
+            if (contactCount && ((me->m_contactCount + contactCount) <= int (sizeof (me->m_contacts) / sizeof (me->m_contacts[0])))) {
                 for(int i = 0; i < contactCount; i ++) {
                     me->m_isInPenetration |= (penetrations[i] > 1.0e-3f);
                     me->m_contacts[me->m_contactCount].m_point = dVector (points[i][0], points[i][1], points[i][2], 1.0f);
