@@ -633,20 +633,14 @@ class HeavyVehicleControllerManager: public CustomVehicleControllerManager
 	{
 		if (m_player->m_helpKey.GetPushButtonState()) {
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-/*
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "Vehicle driving keyboard control:   Joystick control");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "key switch			: 'Y'           start engine");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "key switch          : 'Y'           start engine");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "accelerator         : 'W'           stick forward");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "brakes              : 'S'           stick back");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right          : 'D'           stick right");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right          : 'S'           stick left");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "toggle Reverse Gear	: 'R'           toggle reverse Gear");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear up             : '>'           button 2");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear down           : '<'           button 4");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "manual transmission : enter         button 4");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "hand brakes         : space         button 1");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help           : H");
-*/
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "toggle Reverse Gear : 'R'           toggle reverse Gear");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help           : 'H'");
 		}
 	}
 
@@ -757,7 +751,7 @@ void MilitaryTransport (DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 //	CreateLevelMesh (scene, "flatPlane.ngd", 1);
-	CreateHeightFieldTerrain (scene, 10, 8.0f, 3.0f, 0.2f, 200.0f, -50.0f);
+	CreateHeightFieldTerrain (scene, 10, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
 
 //	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
 	dMatrix location (dGetIdentityMatrix());

@@ -371,7 +371,7 @@ dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const casti
 	proxy.m_continueCollision = true;
 	proxy.m_skinThickness = dgFloat32 (0.0f);
 	proxy.m_floatingBody = NULL;
-	proxy.m_referenceBody = NULL;
+	proxy.m_referenceBody = (dgBody*)referenceBody;
 	proxy.m_referenceCollision = &tmpCastingInstance;
 	proxy.m_floatingCollision = (dgCollisionInstance*)referenceCollision;
 

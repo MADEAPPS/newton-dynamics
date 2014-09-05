@@ -40,8 +40,7 @@
 // Reverse 2.90:1 
 
 // vehicle definition for a Muscle car
-//#define VIPER_IDLE_TORQUE					 40.0f
-#define VIPER_IDLE_TORQUE					300.0f
+#define VIPER_IDLE_TORQUE					400.0f
 #define VIPER_IDLE_TORQUE_RPM				500.0f
 
 #define VIPER_PEAK_TORQUE					490.0f
