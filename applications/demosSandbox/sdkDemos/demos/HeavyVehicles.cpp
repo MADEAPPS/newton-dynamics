@@ -27,15 +27,15 @@
 #define HEAVY_TRANSPORT_BRAKE_TORQUE				10000.0f
 #define HEAVY_TRANSPORT_COM_Y_OFFSET				  -0.6f
 
-#define HEAVY_TRANSPORT_TIRE_TOP_SPEED_KMH			 88.0f
+#define HEAVY_TRANSPORT_TIRE_TOP_SPEED_KMH			 72.0f
 
-#define HEAVY_TRANSPORT_IDLE_TORQUE					1050.0f
+#define HEAVY_TRANSPORT_IDLE_TORQUE					1300.0f
 #define HEAVY_TRANSPORT_IDLE_TORQUE_RPM				500.0f
 
-#define HEAVY_TRANSPORT_PEAK_TORQUE					1500.0f
+#define HEAVY_TRANSPORT_PEAK_TORQUE					2000.0f
 #define HEAVY_TRANSPORT_PEAK_TORQUE_RPM				3000.0f
 
-#define HEAVY_TRANSPORT_PEAK_HP						1000.0f
+#define HEAVY_TRANSPORT_PEAK_HP						1200.0f
 #define HEAVY_TRANSPORT_PEAK_HP_RPM					4000.0f
 
 #define HEAVY_TRANSPORT_REDLINE_TORQUE				300.0f
@@ -50,7 +50,7 @@
 
 #define HEAVY_TRANSPORT_SUSPENSION_LENGTH			   1.2f	
 #define HEAVY_TRANSPORT_SUSPENSION_SPRING			2000.0f
-#define HEAVY_TRANSPORT_SUSPENSION_DAMPER			 100.0f	
+#define HEAVY_TRANSPORT_SUSPENSION_DAMPER			 200.0f	
 #define HEAVY_TRANSPORT_LATERAL_STIFFNESS			  20.0f	
 #define HEAVY_TRANSPORT_LONGITUDINAL_STIFFNESS	  100000.0f
 #define HEAVY_TRANSPORT_ALIGNING_MOMENT_TRAIL		   1.5f
@@ -756,8 +756,8 @@ void MilitaryTransport (DemoEntityManager* const scene)
 	// load the sky box
 	scene->CreateSkyBox();
 
-	CreateLevelMesh (scene, "flatPlane.ngd", 1);
-//	CreateHeightFieldTerrain (scene, 10, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
+//	CreateLevelMesh (scene, "flatPlane.ngd", 1);
+	CreateHeightFieldTerrain (scene, 10, 8.0f, 3.0f, 0.2f, 200.0f, -50.0f);
 
 //	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
 	dMatrix location (dGetIdentityMatrix());

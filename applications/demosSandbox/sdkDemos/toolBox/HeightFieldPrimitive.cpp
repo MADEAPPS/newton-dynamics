@@ -298,8 +298,9 @@ freq *= 0.5f;
 		for (int i = 0; i < 4; i ++) {
 			ApplySmoothFilter (elevation, size);
 		}
+		//memset (elevation, 0, size * size * sizeof (dFloat));
 
-		//		SetBaseHeight (elevation, size);
+		//SetBaseHeight (elevation, size);
 		// apply simple calderas
 		//		MakeCalderas (elevation, size, maxElevation * 0.7f, maxElevation * 0.1f);
 

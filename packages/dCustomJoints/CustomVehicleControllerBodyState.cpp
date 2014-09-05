@@ -412,7 +412,7 @@ NewtonCollision* xxx = NewtonCreateSphere(world, 1.0f, 0, NULL);
 dMatrix xxxx0 (dGetIdentityMatrix());
 dVector xxxx1 (0.0f, 0.0f, 0.0f, 0.0f);
 xxxx0.m_posit.m_y = 2.0f;
-NewtonCollisionSetScale (xxx, 0.3f, 0.5, 0.3f);
+//NewtonCollisionSetScale (xxx, 0.3f, 0.5, 0.3f);
 int xxx3 = NewtonWorldConvexCast (world, &xxxx0[0][0], &xxxx1[0], xxx, &hitParam, &filter, CustomControllerConvexCastPreFilter::Prefilter, contacts, sizeof (contacts) / sizeof (contacts[0]), 0);
 */
 
