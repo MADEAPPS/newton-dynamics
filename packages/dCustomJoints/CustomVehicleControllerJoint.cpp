@@ -181,8 +181,8 @@ void CustomVehicleControllerTireContactJoint::UpdateSolverForces (const dComplem
 	dVector hitBodyPointVelocity (0.0f, 0.0f, 0.0f, 0.0f);
 	dVector contactRotationalVeloc (tire->m_omega * radius);
 	dVector headingVeloc (tire->m_veloc - hitBodyPointVelocity);
-	dFloat u = longitudinalPin % headingVeloc;
 
+	dFloat u = longitudinalPin % headingVeloc;
 	dFloat Rw = longitudinalPin % contactRotationalVeloc;
 
 	dFloat uMag = dAbs (u);

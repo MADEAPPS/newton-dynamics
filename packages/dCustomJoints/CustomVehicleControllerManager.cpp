@@ -71,7 +71,8 @@ class CustomVehicleController::dTireForceSolverSolver: public dComplemtaritySolv
 			tire->UpdateDynamicInputs(timestep);
 
 //tire->SetVeloc(dVector (0.0f, 0.0f, 0.0f, 0.0f));
-//tire->SetOmega(dVector (0.0f, 0.0f, 0.0f, 0.0f));
+//dMatrix matrix (tire->GetMatrix());
+//tire->SetOmega(matrix[0].Scale (5.0f));
 //tire->SetForce(dVector (0.0f, 0.0f, 0.0f, 0.0f));
 //tire->SetTorque(dVector (0.0f, 0.0f, 0.0f, 0.0f));
 		}
@@ -81,9 +82,11 @@ static int xxx;
 xxx ++;
 if (xxx == 29)
 xxx *=1;
-if ((xxx > 500) && (xxx < 504)) 
+if (xxx > 500) 
 {
-//controller->m_chassisState.SetVeloc(dVector (0.0f, 0.0f, 40.0f, 0.0f));
+dMatrix matrix (controller->m_chassisState.GetMatrix());
+dMatrix matrix1 (controller->m_chassisState.GetMatrix());
+//controller->m_chassisState.SetVeloc(matrix[0].Scale (-5.0f));
 //controller->m_chassisState.SetOmega(dVector (0.0f, 0.0f, 0.0f, 0.0f));
 //controller->m_chassisState.SetForce(dVector (0.0f, 0.0f, 0.0f, 0.0f));
 //controller->m_chassisState.SetTorque(dVector (0.0f, 0.0f, 0.0f, 0.0f));

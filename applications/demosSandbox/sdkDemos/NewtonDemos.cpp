@@ -56,11 +56,10 @@
 //#define DEFAULT_SCENE	30			// basic rag doll
 #define DEFAULT_SCENE	31			// heavy wheel vehicle
 //#define DEFAULT_SCENE	32			// super Car
-//#define DEFAULT_SCENE	33			// high performance super car
-//#define DEFAULT_SCENE	34			// basic player controller
-//#define DEFAULT_SCENE	35			// advanced player controller
-//#define DEFAULT_SCENE	36			// cloth patch			
-//#define DEFAULT_SCENE	37			// soft bodies			
+//#define DEFAULT_SCENE	33			// basic player controller
+//#define DEFAULT_SCENE	34			// advanced player controller
+//#define DEFAULT_SCENE	35			// cloth patch			
+//#define DEFAULT_SCENE	36			// soft bodies			
 
 
 void Friction (DemoEntityManager* const scene);
@@ -137,7 +136,6 @@ NewtonDemos::SDKDemos NewtonDemos::m_demosSelection[] =
 	{wxT("Basic rag doll"), wxT("demonstrate simple rag doll"), DescreteRagDoll},
 	{wxT("Heavy vehicle"), wxT("implemnet a militaty typeheavy Vehicle"), MilitaryTransport},
 	{wxT("Super car"), wxT("implement a basic car"), SuperCar},
-	{wxT("High performance super car"), wxT("implement a high performance ray cast car"), SuperCar},
 	{wxT("Basic player controller"), wxT("demonstrate simple player controller"), BasicPlayerController},
 	{wxT("Advanced player controller"), wxT("demonstrate player interacting with other objects"), AdvancedPlayerController},
 	{wxT("Simple cloth Path"), wxT("show simple cloth path"), ClothPath},

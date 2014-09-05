@@ -751,6 +751,7 @@ p0 += chassis.GetMatrix()[2].Scale ((tireMatrix.m_posit.m_z > 0.0f ? 1.0f : -1.0
 
 			// show tire longitudinal force
 			dVector p3 (p0 - tire.GetLongitudinalForce().Scale (scale));
+			glColor3f(0.0f, 1.0f, 0.0f);
 			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
 			glVertex3f (p3.m_x, p3.m_y, p3.m_z);
 		}
@@ -973,7 +974,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 			}
 
 			CustomVehicleControllerComponentEngine* const engine = vehicleEntity->m_controller->GetEngine();
-			if (engine->GetKey()) {
+			if (engine && engine->GetKey()) {
 				// see if the player started the engine
 				void* const startEngine = m_engineSounds[0];
 
@@ -1127,6 +1128,7 @@ void SuperCar (DemoEntityManager* const scene)
 
 	// create a simple vehicle
 	dMatrix location (dYawMatrix(90.0f * 3.1416f/ 180.0f));
+	//dMatrix location (dGetIdentityMatrix());
 	location.m_posit.m_x = 126.0f;
 	location.m_posit.m_y = 50.0f;
 	location.m_posit.m_z = 50.0f;
@@ -1174,7 +1176,7 @@ void SuperCar (DemoEntityManager* const scene)
 //	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 
 //	NewtonSerializeToFile (scene->GetNewton(), "C:/Users/Julio/Desktop/newton-dynamics/applications/media/xxxxx.bin");
 
