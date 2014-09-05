@@ -258,9 +258,9 @@ void CustomVehicleControllerTireContactJoint::JacobianDerivative (dComplemtarity
 				dFloat wrAbs = dAbs (Rw);
 
 				// calculate lateral slip angle
-				dFloat sideSlipAngle = 1.0f;
+				dFloat sideSlipAngle = 0.1f;
 				dFloat lateralSpeed = v;
-				if (uAbs > 0.25f) {
+				if (uAbs > (1.0f/32.0f)) {
 					sideSlipAngle = dAtan2 (vAbs, uAbs);
 					dAssert (sideSlipAngle >= 0.0f);
 					dAssert (sideSlipAngle <= (3.141592f * 0.5f));
@@ -269,12 +269,23 @@ void CustomVehicleControllerTireContactJoint::JacobianDerivative (dComplemtarity
 					if (sideSlipAngle > 0.364f) {
 						lateralSpeed = v - 0.364f * uAbs * dSign (v);
 					}
+				} else {
+					if (vAbs > 0.25f) {
+						sideSlipAngle = 0.5f;
+					}
 				}
 
 				// calculate longitudinal slip ratio 
 				dFloat longitudinalSlipRatio = 1.0f;
-				if ((uAbs > 0.25f) || (wrAbs > 0.25f)) {
+				//if ((uAbs > 0.25f) || (wrAbs > 0.25f)) {
+				if (uAbs > (1.0f/32.0f)) {
 					longitudinalSlipRatio = dClamp((u + Rw) / u, -1.0f, 1.0f);
+				} else {
+					if (wrAbs < 1.0e-4f) {
+						longitudinalSlipRatio = 0.0f;
+					} else {
+						longitudinalSlipRatio = dSign(Rw);
+					}
 				}
 
 				// get the normalize tire load
