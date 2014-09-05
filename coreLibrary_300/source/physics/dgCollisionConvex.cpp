@@ -3096,7 +3096,8 @@ dgInt32 dgCollisionConvex::CalculateConvexCastContacts(dgCollisionParamProxy& pr
 			proxy.m_normal = matrix.RotateVector(normal.Scale4 (-1.0f));
 			dgVector step (veloc.Scale4(tacc));
 			proxy.m_closestPointBody0 = matrix.TransformVector(scale.CompProduct4(minkHull.m_p)) & dgVector::m_triplexMask;
-			proxy.m_closestPointBody1 = matrix.TransformVector(scale.CompProduct4(minkHull.m_q - step)) & dgVector::m_triplexMask;
+			//proxy.m_closestPointBody1 = matrix.TransformVector(scale.CompProduct4(minkHull.m_q - step)) & dgVector::m_triplexMask;
+			proxy.m_closestPointBody1 = matrix.TransformVector(scale.CompProduct4(minkHull.m_q) - step) & dgVector::m_triplexMask;
 			proxy.m_contactJoint->m_closestDistance = proxy.m_normal.DotProduct4(proxy.m_closestPointBody0 - proxy.m_closestPointBody1).m_x;
 
 			dgFloat32 penetration = dgMax(num * dgFloat32 (-1.0f) - DG_IMPULSIVE_CONTACT_PENETRATION, dgFloat32 (0.0f));
@@ -3113,7 +3114,8 @@ dgInt32 dgCollisionConvex::CalculateConvexCastContacts(dgCollisionParamProxy& pr
 						count = dgMin(proxy.m_maxContacts, count);
 						dgContactPoint* const contactOut = proxy.m_contacts;
 						for (dgInt32 i = 0; i < count; i ++) {
-							contactOut[i].m_point = matrix.TransformVector(scale.CompProduct4(minkHull.m_hullDiff[i] - step)) & dgVector::m_triplexMask;
+							//contactOut[i].m_point = matrix.TransformVector(scale.CompProduct4(minkHull.m_hullDiff[i] - step)) & dgVector::m_triplexMask;
+							contactOut[i].m_point = matrix.TransformVector(scale.CompProduct4(minkHull.m_hullDiff[i]) - step) & dgVector::m_triplexMask;
 							contactOut[i].m_normal = proxy.m_normal;
 							contactOut[i].m_penetration = penetration;
 							contactOut[i].m_shapeId0 = collConicConvexInstance->GetUserDataID();
