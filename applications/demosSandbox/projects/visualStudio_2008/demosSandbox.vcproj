@@ -913,10 +913,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\sdkDemos\demos\BasicCar.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\sdkDemos\demos\BasicFriction.cpp"
 				>
 			</File>
@@ -1021,6 +1017,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\sdkDemos\demos\SuperCar.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\sdkDemos\demos\UserStaticCollision.cpp"
 				>
 			</File>
@@ -1032,14 +1032,6 @@
 		<Filter
 			Name="mainLogic"
 			>
-			<File
-				RelativePath="..\..\sdkDemos\DemoAIAgent.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\sdkDemos\DemoAIAgent.h"
-				>
-			</File>
 			<File
 				RelativePath="..\..\sdkDemos\DemoCamera.cpp"
 				>
@@ -1171,14 +1163,6 @@
 			<Filter
 				Name="Listeners"
 				>
-				<File
-					RelativePath="..\..\sdkDemos\DemoAIListener.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\sdkDemos\DemoAIListener.h"
-					>
-				</File>
 				<File
 					RelativePath="..\..\sdkDemos\DemoCameraListener.cpp"
 					>
