@@ -687,7 +687,9 @@ void CustomVehicleControllerComponentEngine::InitEngineTorqueCurve (dFloat vehic
 	dFloat W = 0.5f * (rpsTable[3] + rpsTable[4]);
 	dFloat T = GetTorque (W);
 	m_engineIdleResistance2 = (T - W * m_engineIdleResistance1) / (W * W);
-	dAssert (m_engineIdleResistance2 > 0.0f);
+	if (m_engineIdleResistance2 < 1.0e-4f) {
+		m_engineIdleResistance2 =  1.0e-4f;
+	}
 
 	m_gearBox->SetOptimalShiftLimits (rpsTable[2] /rpsTable[4], rpsTable[3] / rpsTable[4]);
 	m_gearBox->SetGear(oldGear);
