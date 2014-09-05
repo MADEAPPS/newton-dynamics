@@ -845,6 +845,8 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 
 	// the user data is the pointer to the collision geometry
 	CalculateMinExtend3d (data->m_p0, data->m_p1, boxP0, boxP1);
+	boxP0 += data->m_boxDistanceTravelInMeshSpace & (data->m_boxDistanceTravelInMeshSpace < dgVector (dgFloat32 (0.0f)));  
+	boxP1 += data->m_boxDistanceTravelInMeshSpace & (data->m_boxDistanceTravelInMeshSpace > dgVector (dgFloat32 (0.0f)));  
 
 	dgVector p0 (boxP0.Scale4(m_horizontalScaleInv).GetInt());
 	dgVector p1 (boxP1.Scale4(m_horizontalScaleInv).GetInt());
