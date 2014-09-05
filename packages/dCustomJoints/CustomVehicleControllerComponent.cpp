@@ -33,17 +33,19 @@ void CustomVehicleControllerComponent::dInterpolationCurve::InitalizeCurve (int 
 
 dFloat CustomVehicleControllerComponent::dInterpolationCurve::GetValue (dFloat param) const
 {
-	dAssert (m_count);
-	param = dClamp (param, 0.0f, m_nodes[m_count - 1].m_param);
-	dFloat interplatedValue = m_nodes[m_count - 1].m_value;
-	for (int i = 1; i < m_count; i ++) {
-		if (param < m_nodes[i].m_param) {
-			dFloat df = m_nodes[i].m_value - m_nodes[i - 1].m_value;
-			dFloat ds = m_nodes[i].m_param - m_nodes[i - 1].m_param;
-			dFloat step = param - m_nodes[i - 1].m_param;
+	dFloat interplatedValue = 0.0f;
+	if (m_count) {
+		param = dClamp (param, 0.0f, m_nodes[m_count - 1].m_param);
+		interplatedValue = m_nodes[m_count - 1].m_value;
+		for (int i = 1; i < m_count; i ++) {
+			if (param < m_nodes[i].m_param) {
+				dFloat df = m_nodes[i].m_value - m_nodes[i - 1].m_value;
+				dFloat ds = m_nodes[i].m_param - m_nodes[i - 1].m_param;
+				dFloat step = param - m_nodes[i - 1].m_param;
 
-			interplatedValue = m_nodes[i - 1].m_value + df * step / ds;
-			break;
+				interplatedValue = m_nodes[i - 1].m_value + df * step / ds;
+				break;
+			}
 		}
 	}
 	return interplatedValue;
@@ -447,7 +449,7 @@ CustomVehicleControllerComponentEngine::CustomVehicleControllerComponentEngine (
 	,m_engineIdleResistance2(0.0f)
 	,m_engineInternalFriction(0.0f)
 	,m_clutchTorqueCouplingTime(0.25f)
-	,m_radiansPerSecundsAtRedLine(0.0f)
+	,m_radiansPerSecundsAtRedLine(100.0f)
 	,m_radiansPerSecundsAtPeakPower(0.0f)
 	,m_radiansPerSecundsAtIdleTorque(0.0f)
 	,m_engineSwitch(false)

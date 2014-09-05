@@ -77,7 +77,7 @@
 #define VIPER_TIRE_GEAR_4 					1.00f
 #define VIPER_TIRE_GEAR_5 					0.74f
 #define VIPER_TIRE_GEAR_6 					0.50f
-#define VIPER_TIRE_GEAR_REVERSE				2.90f
+#define VIPER_TIRE_REVERSE_GEAR				2.90f
 #define VIPER_COM_Y_OFFSET					-0.30f
 
 #define VEHICLE_THIRD_PERSON_VIEW_HIGHT		2.0f
@@ -359,7 +359,7 @@ class SuperCarEntity: public DemoEntity
 		dFloat fowardSpeedGearsBoxRatios[] = {VIPER_TIRE_GEAR_1, VIPER_TIRE_GEAR_2, VIPER_TIRE_GEAR_3, VIPER_TIRE_GEAR_4, VIPER_TIRE_GEAR_5, VIPER_TIRE_GEAR_6};
 
 		CustomVehicleControllerComponentEngine::dSingleAxelDifferencial* const differencial = new CustomVehicleControllerComponentEngine::dSingleAxelDifferencial (m_controller, leftRearTire, rightRearTire);
-		CustomVehicleControllerComponentEngine::dGearBox* const gearBox = new CustomVehicleControllerComponentEngine::dGearBox(m_controller, VIPER_TIRE_GEAR_REVERSE, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios); 
+		CustomVehicleControllerComponentEngine::dGearBox* const gearBox = new CustomVehicleControllerComponentEngine::dGearBox(m_controller, VIPER_TIRE_REVERSE_GEAR, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios); 
 		CustomVehicleControllerComponentEngine* const engine = new CustomVehicleControllerComponentEngine (m_controller, gearBox, differencial);
 
 		// the the default transmission type
@@ -440,7 +440,7 @@ class SuperCarEntity: public DemoEntity
 		CustomVehicleControllerComponentEngine::dSingleAxelDifferencial* array[2] = {frontDifferencial, rearDifferencial};
 		CustomVehicleControllerComponentEngine::dMultiAxelDifferencial* const differencial = new CustomVehicleControllerComponentEngine::dMultiAxelDifferencial (m_controller, 2, array);
 
-		CustomVehicleControllerComponentEngine::dGearBox* const gearBox = new CustomVehicleControllerComponentEngine::dGearBox(m_controller, VIPER_TIRE_GEAR_REVERSE, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios); 
+		CustomVehicleControllerComponentEngine::dGearBox* const gearBox = new CustomVehicleControllerComponentEngine::dGearBox(m_controller, VIPER_TIRE_REVERSE_GEAR, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios); 
 		CustomVehicleControllerComponentEngine* const engine = new CustomVehicleControllerComponentEngine (m_controller, gearBox, differencial);
 
 		// the the default transmission type

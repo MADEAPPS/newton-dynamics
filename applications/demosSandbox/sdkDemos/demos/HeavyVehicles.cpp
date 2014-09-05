@@ -25,8 +25,14 @@
 #define HEAVY_TRANSPORT_TIRE_MASS					 100.0f  
 #define HEAVY_TRANSPORT_STEER_ANGLE					  20.0f	
 #define HEAVY_TRANSPORT_BRAKE_TORQUE				10000.0f
-
 #define HEAVY_TRANSPORT_COM_Y_OFFSET				  -0.2f
+
+
+#define HEAVY_TRANSPORT_GEAR_1						2.5f
+#define HEAVY_TRANSPORT_GEAR_2						2.0f
+#define HEAVY_TRANSPORT_GEAR_3 						1.5f
+#define HEAVY_TRANSPORT_REVERSE_GEAR				2.9f
+
 
 #define HEAVY_TRANSPORT_SUSPENSION_LENGTH			   1.2f	
 #define HEAVY_TRANSPORT_SUSPENSION_SPRING			2000.0f
@@ -310,25 +316,26 @@ class HeavyVehicleEntity: public DemoEntity
 		}
 		m_controller->SetBrakes(brakes);
 
-/*
+
 		// add an engine
 		// first make the gear Box
-		dFloat fowardSpeedGearsBoxRatios[] = {VIPER_TIRE_GEAR_1, VIPER_TIRE_GEAR_2, VIPER_TIRE_GEAR_3, VIPER_TIRE_GEAR_4, VIPER_TIRE_GEAR_5, VIPER_TIRE_GEAR_6};
+		
 
-		CustomVehicleControllerComponentEngine::dSingleAxelDifferencial* const frontDifferencial = new CustomVehicleControllerComponentEngine::dSingleAxelDifferencial (m_controller, leftFrontTire, rightFrontTire);
-		CustomVehicleControllerComponentEngine::dSingleAxelDifferencial* const rearDifferencial = new CustomVehicleControllerComponentEngine::dSingleAxelDifferencial (m_controller, leftRearTire, rightRearTire);
+		CustomVehicleControllerComponentEngine::dSingleAxelDifferencial* axles[4];
+		for (int i = 0; i < 4; i ++) {
+			axles[i] = new CustomVehicleControllerComponentEngine::dSingleAxelDifferencial (m_controller, leftTire[i], rightTire[i]);
+		}
+		CustomVehicleControllerComponentEngine::dMultiAxelDifferencial* const differencial = new CustomVehicleControllerComponentEngine::dMultiAxelDifferencial (m_controller, 4, axles);
 
-		CustomVehicleControllerComponentEngine::dSingleAxelDifferencial* array[2] = {frontDifferencial, rearDifferencial};
-		CustomVehicleControllerComponentEngine::dMultiAxelDifferencial* const differencial = new CustomVehicleControllerComponentEngine::dMultiAxelDifferencial (m_controller, 2, array);
-
-		CustomVehicleControllerComponentEngine::dGearBox* const gearBox = new CustomVehicleControllerComponentEngine::dGearBox(m_controller, VIPER_TIRE_GEAR_REVERSE, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios); 
+		dFloat fowardSpeedGearsBoxRatios[] = {HEAVY_TRANSPORT_GEAR_1, HEAVY_TRANSPORT_GEAR_1, HEAVY_TRANSPORT_GEAR_3};
+		CustomVehicleControllerComponentEngine::dGearBox* const gearBox = new CustomVehicleControllerComponentEngine::dGearBox(m_controller, HEAVY_TRANSPORT_REVERSE_GEAR, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios); 
 		CustomVehicleControllerComponentEngine* const engine = new CustomVehicleControllerComponentEngine (m_controller, gearBox, differencial);
 
 		// the the default transmission type
 		engine->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
 
 		m_controller->SetEngine(engine);
-
+/*
 
 		dFloat viperIdleRPM = VIPER_IDLE_TORQUE_RPM;
 		dFloat viperIdleTorquePoundPerFoot = VIPER_IDLE_TORQUE;
