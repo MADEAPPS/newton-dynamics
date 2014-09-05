@@ -23,9 +23,23 @@
 
 #define HEAVY_TRANSPORT_MASS						5000.0f
 #define HEAVY_TRANSPORT_TIRE_MASS					 100.0f  
-#define HEAVY_TRANSPORT_STEER_ANGLE					  20.0f	
+#define HEAVY_TRANSPORT_STEER_ANGLE					  25.0f	
 #define HEAVY_TRANSPORT_BRAKE_TORQUE				10000.0f
-#define HEAVY_TRANSPORT_COM_Y_OFFSET				  -0.2f
+#define HEAVY_TRANSPORT_COM_Y_OFFSET				  -0.6f
+
+#define HEAVY_TRANSPORT_TIRE_TOP_SPEED_KMH			 88.0f
+
+#define HEAVY_TRANSPORT_IDLE_TORQUE					1050.0f
+#define HEAVY_TRANSPORT_IDLE_TORQUE_RPM				500.0f
+
+#define HEAVY_TRANSPORT_PEAK_TORQUE					1500.0f
+#define HEAVY_TRANSPORT_PEAK_TORQUE_RPM				3000.0f
+
+#define HEAVY_TRANSPORT_PEAK_HP						1000.0f
+#define HEAVY_TRANSPORT_PEAK_HP_RPM					4000.0f
+
+#define HEAVY_TRANSPORT_REDLINE_TORQUE				300.0f
+#define HEAVY_TRANSPORT_REDLINE_TORQUE_RPM			4500.0f
 
 
 #define HEAVY_TRANSPORT_GEAR_1						2.5f
@@ -335,23 +349,23 @@ class HeavyVehicleEntity: public DemoEntity
 		engine->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
 
 		m_controller->SetEngine(engine);
-/*
 
-		dFloat viperIdleRPM = VIPER_IDLE_TORQUE_RPM;
-		dFloat viperIdleTorquePoundPerFoot = VIPER_IDLE_TORQUE;
 
-		dFloat viperPeakTorqueRPM = VIPER_PEAK_TORQUE_RPM;
-		dFloat viperPeakTorquePoundPerFoot = VIPER_PEAK_TORQUE;
+		dFloat viperIdleRPM = HEAVY_TRANSPORT_IDLE_TORQUE_RPM;
+		dFloat viperIdleTorquePoundPerFoot = HEAVY_TRANSPORT_IDLE_TORQUE;
 
-		dFloat viperPeakHorsePowerRPM = VIPER_PEAK_HP_RPM;
-		dFloat viperPeakHorsePower = VIPER_PEAK_HP;
+		dFloat viperPeakTorqueRPM = HEAVY_TRANSPORT_PEAK_TORQUE_RPM;
+		dFloat viperPeakTorquePoundPerFoot = HEAVY_TRANSPORT_PEAK_TORQUE;
 
-		dFloat viperRedLineRPM = VIPER_REDLINE_TORQUE_RPM;
-		dFloat viperRedLineTorquePoundPerFoot = VIPER_REDLINE_TORQUE;
+		dFloat viperPeakHorsePowerRPM = HEAVY_TRANSPORT_PEAK_HP_RPM;
+		dFloat viperPeakHorsePower = HEAVY_TRANSPORT_PEAK_HP;
 
-		dFloat vehicleTopSpeedKPH = VIPER_TIRE_TOP_SPEED_KMH;
+		dFloat viperRedLineRPM = HEAVY_TRANSPORT_REDLINE_TORQUE_RPM;
+		dFloat viperRedLineTorquePoundPerFoot = HEAVY_TRANSPORT_REDLINE_TORQUE;
+
+		dFloat vehicleTopSpeedKPH = HEAVY_TRANSPORT_TIRE_TOP_SPEED_KMH;
 		engine->InitEngineTorqueCurve (vehicleTopSpeedKPH, viperIdleTorquePoundPerFoot, viperIdleRPM, viperPeakTorquePoundPerFoot, viperPeakTorqueRPM, viperPeakHorsePower, viperPeakHorsePowerRPM, viperRedLineTorquePoundPerFoot, viperRedLineRPM);
-*/
+
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
 	}
@@ -771,24 +785,31 @@ location.m_posit.m_z = 50.0f;
 	scene->SetCameraMouseLock (true);
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
-/*
+
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
-	dVector location (origin);
-	location.m_x += 20.0f;
-	location.m_z += 20.0f;
-	dVector size (0.5f, 0.5f, 0.75f, 0.0f);
+	//	dVector location (origin);
+	//	location.m_x += 20.0f;
+	//	location.m_z += 20.0f;
+	location.m_posit.m_z += 4.0f;
 
 	int count = 5;
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _TAPERED_CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _TAPERED_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-*/
+	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
+
+	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
+	//AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+
+	size = dVector(1.0f, 0.5f, 1.0f, 0.0f);
+	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _TAPERED_CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _TAPERED_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+
+	//	NewtonSerializeToFile (scene->GetNewton(), "C:/Users/Julio/Desktop/newton-dynamics/applications/media/xxxxx.bin");
 }
 
