@@ -194,9 +194,7 @@ void CustomVehicleControllerTireContactJoint::UpdateSolverForces (const dComplem
 		}
 	}
 
-	// apply the forces to any body that is touching this contact
-	//const int index = m_start;
-	
+	// calculate force and torque contribution to any external body
 	if (externalBody->m_invMass > 0.0f) {
 		dVector force (0.0f, 0.0f, 0.0f, 0.0f);
 		dVector torque (0.0f, 0.0f, 0.0f, 0.0f);
@@ -205,10 +203,8 @@ void CustomVehicleControllerTireContactJoint::UpdateSolverForces (const dComplem
 			force = jacobian.m_linear.Scale(m_jointFeebackForce[i]); 
 			torque = jacobian.m_angular.Scale(m_jointFeebackForce[i]); 
 		}
-
-		NewtonBody* const body = externalBody->m_newtonBody;
-		NewtonBodyAddForce(body, &force[0]);
-		NewtonBodyAddTorque(body, &torque[0]);
+		externalBody->m_foceAcc += force;
+		externalBody->m_torqueAcc += torque;
 	}
 }
 
@@ -385,10 +381,26 @@ void CustomVehicleControllerEngineDifferencialJoint::JacobianDerivative (dComple
 }
 
 
-CustomVehicleControllerChassisContactJoint::CustomVehicleControllerChassisContactJoint ()
-	:CustomVehicleControllerTireContactJoint()
+
+void CustomVehicleControllerChassisContactJoint::UpdateSolverForces (const dComplemtaritySolver::dJacobianPair* const jacobians) const
 {
+	//CustomVehicleControllerBodyStateTire* const tire = (CustomVehicleControllerBodyStateTire*) m_state1;
+	CustomVehicleControllerBodyStateContact* const externalBody = (CustomVehicleControllerBodyStateContact*) m_state0;
+
+	// calculate force and torque contribution to any external body
+	if (externalBody->GetInvMass() > 0.0f) {
+		dVector force (0.0f, 0.0f, 0.0f, 0.0f);
+		dVector torque (0.0f, 0.0f, 0.0f, 0.0f);
+		for (int i = 0; i < m_count; i ++) {
+			const dComplemtaritySolver::dJacobian& jacobian = jacobians[m_start + i].m_jacobian_IM0;
+			force = jacobian.m_linear.Scale(m_jointFeebackForce[i]); 
+			torque = jacobian.m_angular.Scale(m_jointFeebackForce[i]); 
+		}
+		externalBody->m_foceAcc += force;
+		externalBody->m_torqueAcc += torque;
+	}
 }
+
 
 void CustomVehicleControllerChassisContactJoint::JacobianDerivative (dComplemtaritySolver::dParamInfo* const constraintParams)
 {

@@ -88,10 +88,8 @@ class CustomVehicleControllerTireContactJoint: public CustomVehicleControllerJoi
 class CustomVehicleControllerChassisContactJoint: public CustomVehicleControllerTireContactJoint
 {
 	public:
-	CUSTOM_JOINTS_API CustomVehicleControllerChassisContactJoint ();
-//	CUSTOM_JOINTS_API virtual void UpdateSolverForces (const dComplemtaritySolver::dJacobianPair* const jacobians) const; 
 	CUSTOM_JOINTS_API virtual void JacobianDerivative (dComplemtaritySolver::dParamInfo* const constraintParams); 
-//	CUSTOM_JOINTS_API virtual void JointAccelerations (dComplemtaritySolver::dJointAccelerationDecriptor* const accelParam);
+	CUSTOM_JOINTS_API virtual void UpdateSolverForces (const dComplemtaritySolver::dJacobianPair* const jacobians) const;
 };
 
 

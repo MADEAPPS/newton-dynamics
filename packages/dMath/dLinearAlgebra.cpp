@@ -147,6 +147,11 @@ dFloat dComplemtaritySolver::dBodyState::GetMass () const
 	return m_mass;
 }
 
+dFloat dComplemtaritySolver::dBodyState::GetInvMass () const
+{
+	return m_invMass;
+}
+
 void dComplemtaritySolver::dBodyState::SetMass (dFloat mass)
 {
 	m_mass = mass;
@@ -778,8 +783,8 @@ void dComplemtaritySolver::CalculateReactionsForces (int bodyCount, dBodyState**
 		joindDesc.m_invTimeStep = invTimestep;
 		joindDesc.m_firstPassCoefFlag = firstPassCoef;
 
-		for (int curJoint = 0; curJoint < jointCount; curJoint ++) {
-			dBilateralJoint* const constraint = jointArray[curJoint];
+		for (int i = 0; i < jointCount; i ++) {
+			dBilateralJoint* const constraint = jointArray[i];
 			joindDesc.m_rowsCount = constraint->m_count;
 			joindDesc.m_rowMatrix = &jacobianArray[constraint->m_start];
 			joindDesc.m_colMatrix = &jacobianColumnArray[constraint->m_start];
@@ -790,9 +795,9 @@ void dComplemtaritySolver::CalculateReactionsForces (int bodyCount, dBodyState**
 		dFloat accNorm = dFloat (1.0e10f);
 		for (int passes = 0; (passes < maxPasses) && (accNorm > maxAccNorm); passes ++) {
 			accNorm = dFloat (0.0f);
-			for (int curJoint = 0; curJoint < jointCount; curJoint ++) {
+			for (int i = 0; i < jointCount; i ++) {
 
-				dBilateralJoint* const constraint = jointArray[curJoint];
+				dBilateralJoint* const constraint = jointArray[i];
 				int index = constraint->m_start;
 				int rowsCount = constraint->m_count;
 				int m0 = constraint->m_state0->m_myIndex;
@@ -872,16 +877,16 @@ void dComplemtaritySolver::CalculateReactionsForces (int bodyCount, dBodyState**
 		}
 	}
 
-	for (int i = 0; i < bodyCount; i ++) {
-		dBodyState* const state = bodyArray[i];
-		//int index = state->m_myIndex;
-		dAssert (state->m_myIndex == i);
-		state->ApplyNetForceAndTorque (invTimestepSrc, stateVeloc[i].m_linear, stateVeloc[i].m_angular);
-	}
-
 	for (int i = 0; i < jointCount; i ++) {
 		dBilateralJoint* const constraint = jointArray[i];
 		constraint->UpdateSolverForces (jacobianArray);
 	}
+
+	for (int i = 0; i < bodyCount; i ++) {
+		dBodyState* const state = bodyArray[i];
+		dAssert (state->m_myIndex == i);
+		state->ApplyNetForceAndTorque (invTimestepSrc, stateVeloc[i].m_linear, stateVeloc[i].m_angular);
+	}
+
 }
 

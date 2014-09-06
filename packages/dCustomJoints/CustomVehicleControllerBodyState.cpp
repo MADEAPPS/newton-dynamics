@@ -87,7 +87,8 @@ void CustomVehicleControllerBodyStateContact::Init (CustomVehicleController* con
 	m_globalCentreOfMass = m_matrix.TransformVector(m_localFrame.m_posit);
 
 	dVector force (0.0f, 0.0f, 0.0f, 0.0f);
-	dVector torque (0.0f, 0.0f, 0.0f, 0.0f) ;
+	dVector torque (0.0f, 0.0f, 0.0f, 0.0f);
+
 	if (m_invMass > 0.0f) {
 		NewtonBodyGetForceAcc(m_newtonBody, &force[0]);
 		NewtonBodyGetTorqueAcc (m_newtonBody, &torque[0]);
@@ -109,9 +110,14 @@ void CustomVehicleControllerBodyStateContact::Init (CustomVehicleController* con
 			}
 		}
 	}
+
 	m_externalForce = force;
 	m_externalTorque = torque;
-	
+	m_foceAcc = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+	m_torqueAcc = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+
+	m_maxExterenalAccel2 = 50.0f * 50.0f;
+	m_maxExterenalAlpha2 = 100.0 * 100.0f;
 
 	if (m_mass > 1.0e-3f) {
 		m_invMass = 1.0f / m_mass;
@@ -134,6 +140,28 @@ void CustomVehicleControllerBodyStateContact::UpdateDynamicInputs()
 
 void CustomVehicleControllerBodyStateContact::ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega)
 {
+	if (m_invMass > 0.0f) {
+		dVector force (m_externalForce + m_foceAcc);
+		dVector torque (m_externalForce + m_torqueAcc);
+		dVector accel (force.Scale(m_invMass));
+		dVector alpha (m_invInertia.RotateVector(torque));
+		
+		dFloat accelMag2 = accel % accel;
+		dFloat alphaMag2 = alpha % alpha;
+		for (int i = 0; (i < 8) && ((accelMag2 > m_maxExterenalAccel2) || (alphaMag2 > m_maxExterenalAlpha2)); i ++) {
+			m_foceAcc = m_foceAcc.Scale (0.9f);
+			m_torqueAcc = m_torqueAcc.Scale (0.9f);
+			force = m_externalForce + m_foceAcc;
+			torque = m_externalForce + m_torqueAcc;
+			accel = force.Scale(m_invMass);
+			alpha = m_invInertia.RotateVector(torque);
+			accelMag2 = accel % accel;
+			alphaMag2 = alpha % alpha;
+		}
+
+		NewtonBodyAddForce (m_newtonBody, &m_foceAcc[0]);
+		NewtonBodyAddTorque(m_newtonBody, &m_torqueAcc[0]);
+	}
 }
 
 void CustomVehicleControllerBodyStateChassis::Init (CustomVehicleController* const controller, const dMatrix& localframe)
@@ -196,13 +224,14 @@ void CustomVehicleControllerBodyStateChassis::UpdateDynamicInputs()
 	NewtonBodyGetVelocity (body, &m_veloc[0]);
 	NewtonBodyGetOmega (body, &m_omega[0]);
 
-	m_controller->m_externalContactCount = 0;
+	m_controller->m_externalChassisContactCount = 0;
 
 	dVector force;
 	dVector torque;
 	NewtonBodyGetForceAcc (body, &force[0]);
 	NewtonBodyGetTorqueAcc (body, &torque[0]);
-	for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint (body); joint && (m_controller->m_externalContactCount < int (sizeof (m_controller->m_externalContactStates) / sizeof (m_controller->m_externalContactStates[0]))); joint = NewtonBodyGetNextContactJoint (body, joint)) {
+	const int maxContacts = int (sizeof (m_controller->m_externalContactJoints) / sizeof (m_controller->m_externalContactJoints[0]));
+	for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint (body); joint && (m_controller->m_externalChassisContactCount < maxContacts); joint = NewtonBodyGetNextContactJoint (body, joint)) {
 		NewtonBody* const otherBody = NewtonJointGetBody1(joint);
 		dAssert (NewtonJointGetBody0(joint) == body);
 		dAssert (otherBody != body);
@@ -211,15 +240,15 @@ void CustomVehicleControllerBodyStateChassis::UpdateDynamicInputs()
 		dFloat Iyy;
 		dFloat Izz;
 		dFloat mass;
-		NewtonBodyGetMassMatrix(otherBody, &mass, &Ixx, &Iyy, &Izz);
+		NewtonBodyGetMassMatrix (otherBody, &mass, &Ixx, &Iyy, &Izz);
 		if (mass > 0.0f) {
 			int count = 0;
 			NewtonWorldConvexCastReturnInfo contacts[8];
 			void* contact = NewtonContactJointGetFirstContact (joint);
 			if (contact) {
-				CustomVehicleControllerChassisContactJoint* const externalJoint = &m_controller->m_externalContactJoints[m_controller->m_externalContactCount];
-				CustomVehicleControllerBodyStateContact* const externalBody = &m_controller->m_externalContactStates[m_controller->m_externalContactCount];
-				externalBody->Init (m_controller, body);
+				CustomVehicleControllerBodyStateContact* const externalBody = m_controller->GetContactBody(otherBody);
+
+				CustomVehicleControllerChassisContactJoint* const externalJoint = &m_controller->m_externalContactJoints[m_controller->m_externalChassisContactCount];
 				externalJoint->Init(m_controller, externalBody, this);
 				for (; contact && count < (sizeof (contacts) / sizeof (contacts[0])); contact = NewtonContactJointGetNextContact (joint, contact)) {
 					dVector point;
@@ -229,8 +258,8 @@ void CustomVehicleControllerBodyStateChassis::UpdateDynamicInputs()
 					dVector contactForce;
 
 					NewtonMaterial* const material = NewtonContactGetMaterial (contact);
-					NewtonMaterialGetContactForce (material, body, &contactForce[0]);
-					NewtonMaterialGetContactPositionAndNormal (material, body, &point[0], &normal[0]);
+					NewtonMaterialGetContactForce (material, otherBody, &contactForce[0]);
+					NewtonMaterialGetContactPositionAndNormal (material, otherBody, &point[0], &normal[0]);
 
 					contacts[count].m_point[0] = point.m_x;
 					contacts[count].m_point[1] = point.m_y;
@@ -248,7 +277,7 @@ void CustomVehicleControllerBodyStateChassis::UpdateDynamicInputs()
 					externalBody->m_externalTorque -= (point - externalBody->m_globalCentreOfMass) * contactForce;
 				}
 				externalJoint->SetContacts (count, contacts);
-				m_controller->m_externalContactCount ++;
+				m_controller->m_externalChassisContactCount ++;
 			}
 		}
 	}
@@ -262,6 +291,7 @@ void CustomVehicleControllerBodyStateChassis::UpdateDynamicInputs()
 
 	m_globalCentreOfMass = m_matrix.TransformVector(m_localFrame.m_posit);
 	UpdateInertia();
+
 }
 
 void CustomVehicleControllerBodyStateChassis::ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega)
@@ -437,8 +467,7 @@ int xxx3 = NewtonWorldConvexCast (world, &xxxx0[0][0], &xxxx1[0], xxx, &hitParam
 				count ++;
 			}
 			CustomVehicleControllerTireContactJoint* const joint = &m_contactJoint[m_contactCount];
-			CustomVehicleControllerBodyStateContact* const externalBody = &m_contactBody[m_contactCount];
-			externalBody->Init (m_controller, body);
+			CustomVehicleControllerBodyStateContact* const externalBody = m_controller->GetContactBody (body);
 			joint->Init(m_controller, externalBody, this);
 			joint->SetContacts (count, &contacts[index]);
 			m_contactCount ++;

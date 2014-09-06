@@ -59,13 +59,17 @@ class CustomVehicleController::dTireForceSolverSolver: public dComplemtaritySolv
 		:dComplemtaritySolver()
 		,m_controller(controller)
 	{
+		m_controller->m_externalChassisContactCount = 0;
+		m_controller->m_externalContactStatesCount = 0;
+		m_controller->m_freeContactList = m_controller->m_externalContactStatesPoll.GetFirst();
+
 		// apply all external forces and torques to chassis and all tire velocities
 		dFloat timestepInv = 1.0f / timestep;
-		controller->m_chassisState.UpdateDynamicInputs();
+		m_controller->m_chassisState.UpdateDynamicInputs();
 
 		NewtonBody* const body = controller->GetBody();
 		CustomControllerConvexCastPreFilter castFilter (body);
-		for (dTireList::dListNode* node = controller->m_tireList.GetFirst(); node; node = node->GetNext()) {
+		for (dTireList::dListNode* node = m_controller->m_tireList.GetFirst(); node; node = node->GetNext()) {
 			CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
 			tire->Collide(castFilter, timestepInv);
 			tire->UpdateDynamicInputs(timestep);
@@ -94,29 +98,31 @@ dMatrix matrix1 (controller->m_chassisState.GetMatrix());
 */
 
 		// update all components
-		if (controller->m_engine) {
-			controller->m_engine->Update(timestep);
+		if (m_controller->m_engine) {
+			m_controller->m_engine->Update(timestep);
 		}
 
-		if (controller->m_steering) {
-			controller->m_steering->Update(timestep);
+		if (m_controller->m_steering) {
+			m_controller->m_steering->Update(timestep);
 		}
 
-		if (controller->m_handBrakes) {
-			controller->m_handBrakes->Update(timestep);
+		if (m_controller->m_handBrakes) {
+			m_controller->m_handBrakes->Update(timestep);
 		}
 
-		if (controller->m_brakes) {
-			controller->m_brakes->Update(timestep);
+		if (m_controller->m_brakes) {
+			m_controller->m_brakes->Update(timestep);
 		}
 
 		// Get the number of active joints for this integration step
 		int bodyCount = 0;
-		for (dList<CustomVehicleControllerBodyState*>::dListNode* stateNode = controller->m_stateList.GetFirst(); stateNode; stateNode = stateNode->GetNext()) {
+		for (dList<CustomVehicleControllerBodyState*>::dListNode* stateNode = m_controller->m_stateList.GetFirst(); stateNode; stateNode = stateNode->GetNext()) {
 			m_bodyArray[bodyCount] = stateNode->GetInfo();
 			dAssert (bodyCount < int (sizeof (m_bodyArray) / sizeof(m_bodyArray[0])));
 			bodyCount ++;
 		}
+
+/*
 		for (dTireList::dListNode* node = controller->m_tireList.GetFirst();  node; node = node->GetNext()) {
 			CustomVehicleControllerBodyStateTire& tire = node->GetInfo();
 			for (int i = 0; i < tire.m_contactCount; i ++) {
@@ -125,9 +131,10 @@ dMatrix matrix1 (controller->m_chassisState.GetMatrix());
 				bodyCount ++;
 			}
 		}
+*/
 
-		for (int i = 0; i < controller->m_externalContactCount; i ++) {
-			m_bodyArray[bodyCount] = &controller->m_externalContactStates[i];
+		for (int i = 0; i < m_controller->m_externalContactStatesCount; i ++) {
+			m_bodyArray[bodyCount] = m_controller->m_externalContactStates[i];
 			dAssert (bodyCount < int (sizeof (m_bodyArray) / sizeof(m_bodyArray[0])));
 			bodyCount ++;
 		}
@@ -145,8 +152,7 @@ dMatrix matrix1 (controller->m_chassisState.GetMatrix());
 	{
 		int jointCount = 0;
 
-
-		for (int i = 0; i < m_controller->m_externalContactCount; i ++) {
+		for (int i = 0; i < m_controller->m_externalChassisContactCount; i ++) {
 			m_jointArray[jointCount] = &m_controller->m_externalContactJoints[i];
 			jointCount ++;
 			dAssert (jointCount < VEHICLE_CONTROLLER_MAX_JOINTS);
@@ -267,7 +273,9 @@ CustomVehicleController* CustomVehicleControllerManager::CreateVehicle (NewtonCo
 void CustomVehicleController::Init (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, const dVector& gravityVector)
 {
 	m_finalized = false;
-	m_externalContactCount = 0;
+	m_externalContactStatesCount = 0;
+	m_externalChassisContactCount = 0;
+	m_freeContactList = m_externalContactStatesPoll.GetFirst();
 	CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*) GetManager(); 
 	NewtonWorld* const world = manager->GetWorld(); 
 
@@ -491,9 +499,10 @@ void CustomVehicleController::Finalize()
 		sprungMass[count] = 0.0f;
 		count ++;
 	}
-
-	solver.m_count = count;
-	solver.Solve (count, 1.0e-6f, sprungMass, unitAccel);
+	if (count) {
+		solver.m_count = count;
+		solver.Solve (count, 1.0e-6f, sprungMass, unitAccel);
+	}
 
 	int index = 0;
 	for (dTireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
@@ -508,6 +517,28 @@ void CustomVehicleController::Finalize()
 	m_finalized = true;
 }
 
+
+CustomVehicleControllerBodyStateContact* CustomVehicleController::GetContactBody (const NewtonBody* const body)
+{
+	for (int i = 0; i < m_externalContactStatesCount; i ++) {
+		if (m_externalContactStates[i]->m_newtonBody == body) {
+			return m_externalContactStates[i];
+		}
+	}
+
+	dAssert (m_externalContactStatesPoll.GetCount() < 32);
+	if (!m_freeContactList) {
+		m_freeContactList = m_externalContactStatesPoll.Append();
+	}
+	CustomVehicleControllerBodyStateContact* const externalBody = &m_freeContactList->GetInfo();
+	m_freeContactList = m_freeContactList->GetNext(); 
+	externalBody->Init (this, body);
+	m_externalContactStates[m_externalContactStatesCount] = externalBody;
+	m_externalContactStatesCount ++;
+	dAssert (m_externalContactStatesCount < int (sizeof (m_externalContactStates) / sizeof (m_externalContactStates[0])));
+
+	return externalBody;
+}
 
 void CustomVehicleController::PreUpdate (dFloat timestep, int threadIndex)
 {

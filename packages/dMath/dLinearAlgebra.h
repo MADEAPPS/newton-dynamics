@@ -194,6 +194,8 @@ class dComplemtaritySolver
 		dFloat GetMass () const;
 		void SetMass (dFloat mass);
 
+		dFloat GetInvMass () const;
+
 		void SetInertia (dFloat Ixx, dFloat Iyy, dFloat Izz);
 		void GetInertia (dFloat& Ixx, dFloat& Iyy, dFloat& Izz) const;
 

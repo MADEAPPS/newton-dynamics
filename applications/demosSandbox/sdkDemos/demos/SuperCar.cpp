@@ -390,6 +390,7 @@ class SuperCarEntity: public DemoEntity
 	// this function is an example of how to make a high performance super car
 	void BuildFourWheelDriveSuperCar ()
 	{
+
 		// step one: find the location of each tire, in the visual mesh and add them one by one to the vehicle controller 
 		dFloat width;
 		dFloat radius;
@@ -1109,7 +1110,6 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 // *************************************************************************************************
 void SuperCar (DemoEntityManager* const scene)
 {
-
 	// load the sky box
 	scene->CreateSkyBox();
 	
@@ -1121,15 +1121,14 @@ void SuperCar (DemoEntityManager* const scene)
 	//CreateHeightFieldTerrain (scene, 10, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
 	//CreatePlaneCollision (scene, dVector (0.0f, 1.0f, 0.0f, 0.0f));
 
-
 	NewtonWorld* const world = scene->GetNewton();
 
 	// create a vehicle controller manager
 	SuperCarVehicleControllerManager* const manager = new SuperCarVehicleControllerManager (world);
 
 	// create a simple vehicle
-	//dMatrix location (dYawMatrix(90.0f * 3.1416f/ 180.0f));
-	dMatrix location (dGetIdentityMatrix());
+	dMatrix location (dYawMatrix(90.0f * 3.1416f/ 180.0f));
+	//dMatrix location (dGetIdentityMatrix());
 	location.m_posit.m_x = 126.0f;
 	location.m_posit.m_y = 50.0f;
 	location.m_posit.m_z = 50.0f;
@@ -1154,14 +1153,10 @@ void SuperCar (DemoEntityManager* const scene)
 	scene->SetCameraMouseLock (true);
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
-
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
-//	dVector location (origin);
-//	location.m_x += 20.0f;
-//	location.m_z += 20.0f;
-	location.m_posit.m_z += 4.0f;
+//	location.m_posit.m_z += 4.0f;
 
-	int count = 5;
+	int count = 1;
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 
 	dVector size (3.0f, 0.125f, 3.0f, 0.0f);

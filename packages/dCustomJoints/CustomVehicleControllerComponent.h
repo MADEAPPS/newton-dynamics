@@ -302,7 +302,6 @@ class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComp
 	bool m_engineSwitch;
 
 	friend class CustomVehicleControllerBodyStateTire;
-	friend class CustomVehicleControllerBodyStateEngine;
 	friend class CustomVehicleControllerBodyStateChassis;
 };
 
@@ -317,7 +316,6 @@ class CustomVehicleControllerComponentBrake: public CustomVehicleControllerCompo
 	dList<dList<CustomVehicleControllerBodyStateTire>::dListNode*> m_brakeTires;
 
 	friend class CustomVehicleControllerBodyStateTire;
-	friend class CustomVehicleControllerBodyStateEngine;
 	friend class CustomVehicleControllerBodyStateChassis;
 };
 
@@ -339,7 +337,6 @@ class CustomVehicleControllerComponentSteering: public CustomVehicleControllerCo
 	dFloat m_maxAngle;
 
 	friend class CustomVehicleControllerBodyStateTire;
-	friend class CustomVehicleControllerBodyStateEngine;
 	friend class CustomVehicleControllerBodyStateChassis;
 };
 
