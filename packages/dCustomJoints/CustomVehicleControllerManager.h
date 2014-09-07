@@ -88,7 +88,6 @@ class CustomVehicleController: public CustomControllerBase
 	dTireList m_tireList;
 	CustomVehicleControllerBodyStateChassis m_chassisState;
 	dList<CustomVehicleControllerBodyState*> m_stateList;
-	CustomVehicleControllerChassisContactJoint m_externalContactJoints[4];
 	dList<CustomVehicleControllerBodyStateContact> m_externalContactStatesPoll;
 	dList<CustomVehicleControllerBodyStateContact>::dListNode* m_freeContactList;
 	NewtonCollision* m_tireCastShape;
@@ -97,7 +96,6 @@ class CustomVehicleController: public CustomControllerBase
 	CustomVehicleControllerComponentBrake* m_handBrakes;
 	CustomVehicleControllerComponentSteering* m_steering; 
 	CustomVehicleControllerBodyStateContact* m_externalContactStates[16];
-	int m_externalChassisContactCount;
 	int m_externalContactStatesCount;
 	bool m_finalized;
 

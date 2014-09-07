@@ -65,8 +65,6 @@ class CustomVehicleControllerBodyStateContact: public CustomVehicleControllerBod
 	CUSTOM_JOINTS_API virtual void ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega);
 	CUSTOM_JOINTS_API void UpdateDynamicInputs();
 
-	dVector m_foceAcc;
-	dVector m_torqueAcc;
 	NewtonBody* m_newtonBody;
 	dFloat m_maxExterenalAccel2;
 	dFloat m_maxExterenalAlpha2;
@@ -76,10 +74,8 @@ class CustomVehicleControllerBodyStateContact: public CustomVehicleControllerBod
 	friend class CustomVehicleControllerBodyStateTire;
 	friend class CustomVehicleControllerComponentBrake;
 	friend class CustomVehicleControllerComponentEngine;
-	friend class CustomVehicleControllerComponentSteering;
 	friend class CustomVehicleControllerTireContactJoint;
-	friend class CustomVehicleControllerChassisContactJoint;
-
+	friend class CustomVehicleControllerComponentSteering;
 };
 
 

@@ -203,8 +203,8 @@ void CustomVehicleControllerTireContactJoint::UpdateSolverForces (const dComplem
 			force = jacobian.m_linear.Scale(m_jointFeebackForce[i]); 
 			torque = jacobian.m_angular.Scale(m_jointFeebackForce[i]); 
 		}
-		externalBody->m_foceAcc += force;
-		externalBody->m_torqueAcc += torque;
+//		externalBody->m_foceAcc += force;
+//		externalBody->m_torqueAcc += torque;
 	}
 }
 
@@ -381,39 +381,38 @@ void CustomVehicleControllerEngineDifferencialJoint::JacobianDerivative (dComple
 }
 
 
-
+/*
 void CustomVehicleControllerChassisContactJoint::UpdateSolverForces (const dComplemtaritySolver::dJacobianPair* const jacobians) const
 {
-	//CustomVehicleControllerBodyStateTire* const tire = (CustomVehicleControllerBodyStateTire*) m_state1;
-	CustomVehicleControllerBodyStateContact* const externalBody = (CustomVehicleControllerBodyStateContact*) m_state0;
+	CustomVehicleControllerBodyStateContact* const externalBody = (CustomVehicleControllerBodyStateContact*) m_state1;
 
 	// calculate force and torque contribution to any external body
 	if (externalBody->GetInvMass() > 0.0f) {
 		dVector force (0.0f, 0.0f, 0.0f, 0.0f);
 		dVector torque (0.0f, 0.0f, 0.0f, 0.0f);
 		for (int i = 0; i < m_count; i ++) {
-			const dComplemtaritySolver::dJacobian& jacobian = jacobians[m_start + i].m_jacobian_IM0;
-			force = jacobian.m_linear.Scale(m_jointFeebackForce[i]); 
-			torque = jacobian.m_angular.Scale(m_jointFeebackForce[i]); 
+			const dComplemtaritySolver::dJacobian& jacobian = jacobians[m_start + i].m_jacobian_IM1;
+			force += jacobian.m_linear.Scale(m_jointFeebackForce[i]); 
+			torque += jacobian.m_angular.Scale(m_jointFeebackForce[i]); 
 		}
 		externalBody->m_foceAcc += force;
 		externalBody->m_torqueAcc += torque;
 	}
 }
 
-
 void CustomVehicleControllerChassisContactJoint::JacobianDerivative (dComplemtaritySolver::dParamInfo* const constraintParams)
 {
 	//CustomVehicleControllerBodyStateChassis* const chassis = (CustomVehicleControllerBodyStateChassis*) m_state1;
 	//CustomVehicleControllerBodyStateContact* const externalBody = (CustomVehicleControllerBodyStateContact*) m_state0;
+
 	for (int i = 0; i < m_contactCount; i ++) {
 		const dVector& contactPoint = m_contacts[i].m_point;
 		const dVector& contactNormal = m_contacts[i].m_normal;
 		dComplemtaritySolver::dPointDerivativeParam pointData;
 		InitPointParam (pointData, contactPoint);
-		AddLinearRowJacobian (constraintParams, contactPoint, contactNormal.Scale (-1.0f));
+		AddLinearRowJacobian (constraintParams, contactPoint, contactNormal);
 		constraintParams->m_jointLowFriction[i] = 0;
-		dVector velocError (pointData.m_veloc0 - pointData.m_veloc1);
+		dVector velocError (pointData.m_veloc1 - pointData.m_veloc0);
 		dFloat restitution = 0.0f;
 		dFloat relVelocErr = velocError % contactNormal;
 		if (relVelocErr > 0.0f) {
@@ -422,4 +421,4 @@ void CustomVehicleControllerChassisContactJoint::JacobianDerivative (dComplemtar
 		constraintParams->m_jointAccel[i] = dMax (dFloat (-4.0f), relVelocErr) * constraintParams->m_timestepInv;
 	}
 }
-
+*/

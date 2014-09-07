@@ -59,7 +59,6 @@ class CustomVehicleController::dTireForceSolverSolver: public dComplemtaritySolv
 		:dComplemtaritySolver()
 		,m_controller(controller)
 	{
-		m_controller->m_externalChassisContactCount = 0;
 		m_controller->m_externalContactStatesCount = 0;
 		m_controller->m_freeContactList = m_controller->m_externalContactStatesPoll.GetFirst();
 
@@ -151,12 +150,6 @@ dMatrix matrix1 (controller->m_chassisState.GetMatrix());
 	int GetActiveJoints()
 	{
 		int jointCount = 0;
-
-		for (int i = 0; i < m_controller->m_externalChassisContactCount; i ++) {
-			m_jointArray[jointCount] = &m_controller->m_externalContactJoints[i];
-			jointCount ++;
-			dAssert (jointCount < VEHICLE_CONTROLLER_MAX_JOINTS);
-		}
 
 		// add all contact joints if any
 		for (dTireList::dListNode* node = m_controller->m_tireList.GetFirst(); node; node = node->GetNext()) {
@@ -274,7 +267,6 @@ void CustomVehicleController::Init (NewtonCollision* const chassisShape, const d
 {
 	m_finalized = false;
 	m_externalContactStatesCount = 0;
-	m_externalChassisContactCount = 0;
 	m_freeContactList = m_externalContactStatesPoll.GetFirst();
 	CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*) GetManager(); 
 	NewtonWorld* const world = manager->GetWorld(); 
@@ -545,17 +537,6 @@ void CustomVehicleController::PreUpdate (dFloat timestep, int threadIndex)
 	if (m_finalized) {
 		dTireForceSolverSolver tireSolver (this, timestep);	
 	}
-
-/*
-dTrace (("%f %f %f  ", m_engine->GetSpeed(), m_engineState.m_radianPerSecund, m_engine->GetGearBox()->GetGearRatio(m_engine->GetGear())));
-//for (TireList::dListNode* node = m_tireList.GetFirst()->GetNext()->GetNext(); node; node = node->GetNext()) {
-for (TireList::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
-CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
-dTrace (("%f ", tire->m_rotatonSpeed * tire->m_radio));
-}
-dTrace (("\n"));
-*/
-//dTrace (("f(%f %f %f) T(%f %f %f)\n", m_chassisState.m_externalForce.m_x, m_chassisState.m_externalForce.m_y, m_chassisState.m_externalForce.m_z, m_chassisState.m_externalTorque.m_x, m_chassisState.m_externalTorque.m_y, m_chassisState.m_externalTorque.m_z));
 }
 
 void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)

@@ -390,7 +390,6 @@ class SuperCarEntity: public DemoEntity
 	// this function is an example of how to make a high performance super car
 	void BuildFourWheelDriveSuperCar ()
 	{
-
 		// step one: find the location of each tire, in the visual mesh and add them one by one to the vehicle controller 
 		dFloat width;
 		dFloat radius;
@@ -908,7 +907,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear down           : '<'           button 4");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "manual transmission : enter         button 4");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "hand brakes         : space         button 1");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help           : H");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help           : 'H'");
 		}
 	}
 
@@ -1130,8 +1129,13 @@ void SuperCar (DemoEntityManager* const scene)
 	dMatrix location (dYawMatrix(90.0f * 3.1416f/ 180.0f));
 	//dMatrix location (dGetIdentityMatrix());
 	location.m_posit.m_x = 126.0f;
-	location.m_posit.m_y = 50.0f;
+	location.m_posit.m_y = 5.0f;
 	location.m_posit.m_z = 50.0f;
+
+dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
+dVector size (3.5f, 0.125f, 3.5f, 0.0f);
+AddPrimitiveArray(scene, 100.0f, location.m_posit, size, 1, 1, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix);
+
 
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
 	location.m_posit.m_y += 1.0f;
@@ -1156,10 +1160,9 @@ void SuperCar (DemoEntityManager* const scene)
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 //	location.m_posit.m_z += 4.0f;
 
-	int count = 1;
-	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
-
-	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
+//	int count = 1;
+//	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
+//	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
 //	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 
 	size = dVector(1.0f, 0.5f, 1.0f, 0.0f);

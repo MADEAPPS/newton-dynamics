@@ -887,6 +887,5 @@ void dComplemtaritySolver::CalculateReactionsForces (int bodyCount, dBodyState**
 		dAssert (state->m_myIndex == i);
 		state->ApplyNetForceAndTorque (invTimestepSrc, stateVeloc[i].m_linear, stateVeloc[i].m_angular);
 	}
-
 }
 

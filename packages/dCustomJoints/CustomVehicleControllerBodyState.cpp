@@ -86,14 +86,16 @@ void CustomVehicleControllerBodyStateContact::Init (CustomVehicleController* con
 
 	m_globalCentreOfMass = m_matrix.TransformVector(m_localFrame.m_posit);
 
+/*
 	dVector force (0.0f, 0.0f, 0.0f, 0.0f);
 	dVector torque (0.0f, 0.0f, 0.0f, 0.0f);
-
 	if (m_invMass > 0.0f) {
+		const NewtonBody* const otherBody = m_controller->GetBody();
+
 		NewtonBodyGetForceAcc(m_newtonBody, &force[0]);
 		NewtonBodyGetTorqueAcc (m_newtonBody, &torque[0]);
-
 		for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint (m_newtonBody); joint; joint = NewtonBodyGetNextContactJoint (m_newtonBody, joint)) {
+			if (NewtonJointIsActive(joint) && (NewtonJointGetBody0(joint) != otherBody) && (NewtonJointGetBody1(joint) != otherBody)) {
 			for (void* contact = NewtonContactJointGetFirstContact (joint); contact; contact = NewtonContactJointGetNextContact (joint, contact)) {
 				dVector point;
 				dVector normal;	
@@ -110,14 +112,10 @@ void CustomVehicleControllerBodyStateContact::Init (CustomVehicleController* con
 			}
 		}
 	}
+	}
 
 	m_externalForce = force;
 	m_externalTorque = torque;
-	m_foceAcc = dVector (0.0f, 0.0f, 0.0f, 0.0f);
-	m_torqueAcc = dVector (0.0f, 0.0f, 0.0f, 0.0f);
-
-	m_maxExterenalAccel2 = 50.0f * 50.0f;
-	m_maxExterenalAlpha2 = 100.0 * 100.0f;
 
 	if (m_mass > 1.0e-3f) {
 		m_invMass = 1.0f / m_mass;
@@ -130,6 +128,18 @@ void CustomVehicleControllerBodyStateContact::Init (CustomVehicleController* con
 		m_localInvInertia[1] = 0.0f;
 		m_localInvInertia[2] = 0.0f;
 	}
+*/
+
+	m_externalForce = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+	m_externalTorque = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+
+	m_maxExterenalAccel2 = 50.0f * 50.0f;
+	m_maxExterenalAlpha2 = 100.0 * 100.0f;
+
+	m_invMass = 0.0f;
+	m_localInvInertia[0] = 0.0f;
+	m_localInvInertia[1] = 0.0f;
+	m_localInvInertia[2] = 0.0f;
 	UpdateInertia();
 }
 
@@ -141,8 +151,9 @@ void CustomVehicleControllerBodyStateContact::UpdateDynamicInputs()
 void CustomVehicleControllerBodyStateContact::ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega)
 {
 	if (m_invMass > 0.0f) {
+/*
 		dVector force (m_externalForce + m_foceAcc);
-		dVector torque (m_externalForce + m_torqueAcc);
+		dVector torque (m_externalTorque + m_torqueAcc);
 		dVector accel (force.Scale(m_invMass));
 		dVector alpha (m_invInertia.RotateVector(torque));
 		
@@ -158,9 +169,10 @@ void CustomVehicleControllerBodyStateContact::ApplyNetForceAndTorque (dFloat inv
 			accelMag2 = accel % accel;
 			alphaMag2 = alpha % alpha;
 		}
-
-		NewtonBodyAddForce (m_newtonBody, &m_foceAcc[0]);
-		NewtonBodyAddTorque(m_newtonBody, &m_torqueAcc[0]);
+*/
+		dAssert (0);
+//		NewtonBodyAddForce(m_newtonBody, &m_foceAcc[0]);
+//		NewtonBodyAddTorque(m_newtonBody, &m_torqueAcc[0]);
 	}
 }
 
@@ -224,8 +236,12 @@ void CustomVehicleControllerBodyStateChassis::UpdateDynamicInputs()
 	NewtonBodyGetVelocity (body, &m_veloc[0]);
 	NewtonBodyGetOmega (body, &m_omega[0]);
 
-	m_controller->m_externalChassisContactCount = 0;
+	NewtonBodyGetForceAcc (body, &m_externalForce[0]);
+	NewtonBodyGetTorqueAcc (body, &m_externalTorque[0]);
+	m_externalForce.m_w = 0.0f;
+	m_externalTorque.m_w = 0.0f;
 
+/*
 	dVector force;
 	dVector torque;
 	NewtonBodyGetForceAcc (body, &force[0]);
@@ -281,10 +297,7 @@ void CustomVehicleControllerBodyStateChassis::UpdateDynamicInputs()
 			}
 		}
 	}
-	m_externalForce = force;
-	m_externalTorque = torque;
-	m_externalForce.m_w = 0.0f;
-	m_externalTorque.m_w = 0.0f;
+*/
 
 	dFloat frontSpeed = dMin (m_veloc % m_matrix[0], 50.0f);
 	m_externalForce -= m_matrix[1].Scale (m_aerodynamicsDownForceCoefficient * frontSpeed * frontSpeed);
