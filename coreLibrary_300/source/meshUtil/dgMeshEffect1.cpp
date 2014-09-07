@@ -3217,6 +3217,8 @@ void dgMeshEffect::RepairTJoints ()
 		dgFloat64 tol2 = tol * tol;
 
 		dirty = false;
+		dgAssert (Sanity ());
+
 		dgPolyhedra::Iterator iter (*this);
 		for (iter.Begin(); iter; ) {
 			dgEdge* const edge = &(*iter);
@@ -3284,7 +3286,7 @@ void dgMeshEffect::RepairTJoints ()
 
 								DeleteEdge(edge);
 								DeleteEdge(nextEdge);
-								dgAssert (Sanity ());
+								//dgAssert (Sanity ());
 
 							} else if (edge->m_next->m_next->m_next == edge) {
 								dirty = true;
@@ -3318,7 +3320,7 @@ void dgMeshEffect::RepairTJoints ()
 								deletedEdge->m_next = deletedEdge->m_twin;
 								deletedEdge->m_prev = deletedEdge->m_twin;
 								DeleteEdge(deletedEdge);
-								dgAssert (Sanity ());
+								//dgAssert (Sanity ());
 							}
 						}
 					} else if (FindEdge(edge->m_incidentVertex, edge->m_next->m_next->m_incidentVertex)) {
@@ -3356,7 +3358,7 @@ void dgMeshEffect::RepairTJoints ()
 							deletedEdge->m_next = deletedEdge->m_twin;
 							deletedEdge->m_prev = deletedEdge->m_twin;
 							DeleteEdge(deletedEdge);
-							dgAssert (Sanity ());
+							//dgAssert (Sanity ());
 						}
 
 					} else {
@@ -3389,7 +3391,7 @@ void dgMeshEffect::RepairTJoints ()
 											dirty |= newFace ? true : false;
 										}
 									}
-									dgAssert (Sanity ());
+									//dgAssert (Sanity ());
 								} else if (openEdge->m_prev->m_twin->m_incidentFace > 0) {
 									dirty = true;
 
@@ -3430,7 +3432,7 @@ void dgMeshEffect::RepairTJoints ()
 									deletedEdge->m_next = deletedEdge->m_twin;
 									deletedEdge->m_prev = deletedEdge->m_twin;
 									DeleteEdge(deletedEdge);
-									dgAssert (Sanity ());
+									//dgAssert (Sanity ());
 								}
 							}
 						}
