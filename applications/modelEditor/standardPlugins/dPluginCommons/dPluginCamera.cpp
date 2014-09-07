@@ -22,8 +22,8 @@
 
 
 dPluginCamera::dPluginCamera()
-	:m_matrix (GetIdentityMatrix()) 
-	,m_gridAligment (GetIdentityMatrix())
+	:m_matrix (dGetIdentityMatrix()) 
+	,m_gridAligment (dGetIdentityMatrix())
 	,m_pointOfInterest(0.0f, 0.0f, 0.0f, 0.0f)
 	,m_distance(15.0f)
 	,m_panX(0.0f)
@@ -52,7 +52,7 @@ void dPluginCamera::SetPerspectiveMatrix(dSceneRender* const render, int width, 
 	render->SetPerspectiveProjection(width, height, m_fov * 180.0f / 3.1416f, m_frontPlane, m_backPlane);
 
 	// calculate the same gluLookAt matrix
-	dMatrix modelViewMatrix(GetIdentityMatrix());
+	dMatrix modelViewMatrix(dGetIdentityMatrix());
 	modelViewMatrix[2] = m_matrix.m_front.Scale (-1.0f);
 	modelViewMatrix[0] = m_matrix.m_up * modelViewMatrix[2];
 	modelViewMatrix[1] = modelViewMatrix[2] * modelViewMatrix[0];
@@ -60,12 +60,12 @@ void dPluginCamera::SetPerspectiveMatrix(dSceneRender* const render, int width, 
 	modelViewMatrix = modelViewMatrix.Inverse();
 
 	// apply scale, zoom and pan 
-	dMatrix zoomMatrix(GetIdentityMatrix());
+	dMatrix zoomMatrix(dGetIdentityMatrix());
 	zoomMatrix[0][0] = D_PERSPECTIVE_PIXEL_TO_METERS_SCALE * m_zoom;
 	zoomMatrix[1][1] = D_PERSPECTIVE_PIXEL_TO_METERS_SCALE * m_zoom;
 	zoomMatrix[2][2] = D_PERSPECTIVE_PIXEL_TO_METERS_SCALE * m_zoom;
 
-	dMatrix panMatrix (GetIdentityMatrix());
+	dMatrix panMatrix (dGetIdentityMatrix());
 	// use a pan sensitivity 0f 0.25f
 	dFloat panSensitivity = D_PANNING_SENSITIVITY;
 	panMatrix.m_posit = dVector(m_panX * panSensitivity, m_panY * panSensitivity, 0.0f, 1.0f);
@@ -80,14 +80,14 @@ void dPluginCamera::SetOrtographicMatrix(dSceneRender* const render, int width, 
 	render->SetOrtographicProjection (width, height, -m_backPlane, m_backPlane);
 
 	// set the model view matrix 
-	dMatrix zoomMatrix(GetIdentityMatrix());
+	dMatrix zoomMatrix(dGetIdentityMatrix());
 
 	// us an arbitrary pixels to meters scale = 5.0f
 	zoomMatrix[0][0] = D_ORTOGONAL_PIXEL_TO_METERS_SCALE * m_zoom;
 	zoomMatrix[1][1] = D_ORTOGONAL_PIXEL_TO_METERS_SCALE * m_zoom;
 	zoomMatrix[2][2] = D_ORTOGONAL_PIXEL_TO_METERS_SCALE * m_zoom;
 
-	dMatrix panMatrix (GetIdentityMatrix());
+	dMatrix panMatrix (dGetIdentityMatrix());
 	panMatrix.m_posit = dVector(width/2.0f + m_panX, height/2.0f + m_panY, 0.0f, 1.0f);
 
 	dMatrix matrix (zoomMatrix * aligment * panMatrix);
@@ -176,8 +176,8 @@ void dPluginCamera::BuildConstructionGrid(dSceneRender* const render, int count,
 {
 	_ASSERTE (!m_grid);
 
-	render->PushMatrix(GetIdentityMatrix());
-	render->LoadMatrix(GetIdentityMatrix());
+	render->PushMatrix(dGetIdentityMatrix());
+	render->LoadMatrix(dGetIdentityMatrix());
 
 	m_grid = render->CreateDisplayList();
 	render->BeginDisplayList(m_grid);
@@ -255,7 +255,7 @@ void dPluginCamera::DrawGizmo(dSceneRender* const render, int font) const
 	
 	// display x axis
 	{
-		dMatrix matrix (GetIdentityMatrix());
+		dMatrix matrix (dGetIdentityMatrix());
 		matrix.m_posit = origin;
 		render->PushMatrix(matrix);
 		render->BeginLine();
@@ -371,7 +371,7 @@ dVector xxx (m_matrix[0].Scale (-1.0f));
 	dFloat height = 0.25f * 4;
 	{
 		render->SetMaterialDiffuse(dVector (1.0f, 0.0f, 0.0f, 1.0f));
-		dMatrix tranlation (GetIdentityMatrix());
+		dMatrix tranlation (dGetIdentityMatrix());
 		tranlation.m_posit.m_x = 1.0f + height / 2;
 		render->PushMatrix(tranlation * matrix);
 

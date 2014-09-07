@@ -211,8 +211,8 @@ void EditorRenderViewport::SetCameraMatrix(dViewPortModes mode)
 
 
 		case m_left:
-			SetOrtographicMatrix(m_render, GetWidth(), GetHeight(), GetIdentityMatrix());
-			SetGridMatrix (GetIdentityMatrix());
+			SetOrtographicMatrix(m_render, GetWidth(), GetHeight(), dGetIdentityMatrix());
+			SetGridMatrix (dGetIdentityMatrix());
 			break;
 
 		case m_right:

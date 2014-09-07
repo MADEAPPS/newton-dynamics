@@ -377,7 +377,7 @@ void dPluginRender::Print (int displayListFont, dFloat x, dFloat y, const char* 
 	int height = GetViewPortHeight();
 
 	SetOrtographicProjection (width, height, 0.0f, 1.0f);
-	SetModelViewMatrix(GetIdentityMatrix());
+	SetModelViewMatrix(dGetIdentityMatrix());
 
 	glRasterPos2f(x, dFloat(GetViewPortHeight()) - y);
 

@@ -90,7 +90,7 @@ bool dfbxImport::Import (const char* const fileName, dPluginInterface* const int
 		// Convert the scene to meters using the defined options.
 		FbxGlobalSettings& settings = fbxScene->GetGlobalSettings();
 
-		dMatrix convertMatrix (GetIdentityMatrix());
+		dMatrix convertMatrix (dGetIdentityMatrix());
 
 		const FbxSystemUnit& systemUnit = settings.GetSystemUnit();
 		dFloat scaleFactor = systemUnit.GetScaleFactor();
@@ -121,7 +121,7 @@ bool dfbxImport::Import (const char* const fileName, dPluginInterface* const int
 			}
 		}
 
-		dMatrix axisMatrix (GetIdentityMatrix());
+		dMatrix axisMatrix (dGetIdentityMatrix());
 		axisMatrix.m_front = frontVector;
 		axisMatrix.m_up = upVector;
 		axisMatrix.m_right = frontVector * upVector;
@@ -579,7 +579,7 @@ void dfbxImport::LoadHierarchy  (FbxScene* const fbxScene, dPluginScene* const n
 	if(rootNode) {
 		int count = rootNode->GetChildCount();
 		for(int i = 0; i < count; i++) {
-			nodeStack.Append(ImportStackData (GetIdentityMatrix(), rootNode->GetChild(count - i - 1), ngdScene->GetRootNode()));
+			nodeStack.Append(ImportStackData (dGetIdentityMatrix(), rootNode->GetChild(count - i - 1), ngdScene->GetRootNode()));
 		}
 	}
 
@@ -603,7 +603,7 @@ void dfbxImport::LoadHierarchy  (FbxScene* const fbxScene, dPluginScene* const n
 		dVector pivotTranslation (dFloat(fbxPivotTranslation[0]), dFloat(fbxPivotTranslation[1]), dFloat(fbxPivotTranslation[2]), 1.0f);
 		dVector pivotRotation (dFloat(fbxPivotRotation[0] * 3.14159265359 / 180.0), dFloat(fbxPivotRotation[1] * 3.14159265359 / 180.0), dFloat(fbxPivotRotation[2] * 3.14159265359 / 180.0), 0.0f);
 
-		dMatrix pivotScale (GetIdentityMatrix());
+		dMatrix pivotScale (dGetIdentityMatrix());
 		pivotScale[0][0] = dFloat(fbxPivotScaling[0]);
 		pivotScale[1][1] = dFloat(fbxPivotScaling[1]);
 		pivotScale[2][2] = dFloat(fbxPivotScaling[2]);
@@ -614,7 +614,7 @@ void dfbxImport::LoadHierarchy  (FbxScene* const fbxScene, dPluginScene* const n
 
 		int count = data.m_fbxNode->GetChildCount();
 		for(int i = 0; i < count; i++) {
-			nodeStack.Append(ImportStackData (GetIdentityMatrix(), data.m_fbxNode->GetChild(count - i - 1), node));	
+			nodeStack.Append(ImportStackData (dGetIdentityMatrix(), data.m_fbxNode->GetChild(count - i - 1), node));	
 		}
 	}
 }

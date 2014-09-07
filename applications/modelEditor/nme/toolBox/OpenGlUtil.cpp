@@ -128,7 +128,7 @@ dMatrix GetModelViewMatrix ()
 
 	GLdouble modelview[16]; 
 	glGetDoublev(GL_MODELVIEW_MATRIX, modelview); 
-	dMatrix camMatrix (GetIdentityMatrix());
+	dMatrix camMatrix (dGetIdentityMatrix());
 	for (i = 0; i < 4; i ++) {
 		for (j = 0; j < 4; j ++) {
 			camMatrix[i][j] = dFloat (modelview[i * 4 + j]);

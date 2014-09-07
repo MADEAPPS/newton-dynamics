@@ -81,7 +81,7 @@ void dfbxExport::Export (const char* const fileName, dPluginInterface* const int
 		dAssert (ngdScene);
 
 		// rotate scene 90 degree around the y axis
-		dMatrix rotateScene (GetZeroMatrix());
+		dMatrix rotateScene (dGetZeroMatrix());
 		rotateScene[0][2] = -1.0f;
 		rotateScene[1][1] = 1.0f;
 		rotateScene[2][0] = 1.0f;
@@ -162,7 +162,10 @@ void dfbxExport::LoadNode (dPluginScene* const ngdScene, FbxScene* const fbxScen
 		dMatrix stretchAxis;
 		dMatrix transformMatrix; 
 		matrix.PolarDecomposition (transformMatrix, scale, stretchAxis);
-		dVector eulers (transformMatrix.GetEulerAngles().Scale (180.0f / 3.14159265359f));
+		dVector euler0;
+		dVector euler1;
+		transformMatrix.GetEulerAngles(euler0, euler1);
+		dVector eulers (euler0.Scale (180.0f / 3.14159265359f));
 
 		dAssert (dAbs (stretchAxis[0][0] - 1.0f)  < 1.0e-6f);
 		dAssert (dAbs (stretchAxis[1][1] - 1.0f)  < 1.0e-6f);
@@ -179,7 +182,11 @@ void dfbxExport::LoadNode (dPluginScene* const ngdScene, FbxScene* const fbxScen
 		dMatrix stretchAxis;
 		dMatrix transformMatrix; 
 		matrix.PolarDecomposition (transformMatrix, scale, stretchAxis);
-		dVector eulers (transformMatrix.GetEulerAngles().Scale (180.0f / 3.14159265359f));
+
+		dVector euler0;
+		dVector euler1;
+		transformMatrix.GetEulerAngles(euler0, euler1);
+		dVector eulers (euler0.Scale (180.0f / 3.14159265359f));
 
 		dAssert (dAbs (stretchAxis[0][0] - 1.0f)  < 1.0e-6f);
 		dAssert (dAbs (stretchAxis[1][1] - 1.0f)  < 1.0e-6f);
