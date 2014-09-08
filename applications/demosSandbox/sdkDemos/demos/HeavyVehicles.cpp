@@ -780,7 +780,7 @@ class HeavyVehicleControllerManager: public CustomVehicleControllerManager
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right          : 'D'           stick right");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right          : 'S'           stick left");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "toggle Reverse Gear : 'R'           toggle reverse Gear");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "Toggle Vehicle      : 'V'			Toogle ");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "toggle Vehicle      : 'V'           change vehicle");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help           : 'H'");
 		}
 	}
