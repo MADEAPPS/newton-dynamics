@@ -258,6 +258,7 @@
 		FF87BFAC173F269200472B56 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF87BFAB173F269200472B56 /* CoreFoundation.framework */; };
 		FF87BFAE173F26B900472B56 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF87BFAD173F26B900472B56 /* OpenGL.framework */; };
 		FF87BFB0173F26DF00472B56 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF87BFAF173F26DF00472B56 /* OpenAL.framework */; };
+		FF8AD94419BD40E600C269F2 /* buggy.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF8AD94319BD40E600C269F2 /* buggy.ngd */; };
 		FF8B5E181750F1B80076BE6C /* calibri.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FF8B5E161750F1B80076BE6C /* calibri.ttf */; };
 		FF8B5E191750F1B80076BE6C /* courbd.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FF8B5E171750F1B80076BE6C /* courbd.ttf */; };
 		FF8B5E1A1750F3E70076BE6C /* libfreeType.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF8B5E101750EFC00076BE6C /* libfreeType.a */; };
@@ -673,6 +674,7 @@
 		FF87BFAB173F269200472B56 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
 		FF87BFAD173F26B900472B56 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		FF87BFAF173F26DF00472B56 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = /System/Library/Frameworks/OpenAL.framework; sourceTree = "<absolute>"; };
+		FF8AD94319BD40E600C269F2 /* buggy.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = buggy.ngd; sourceTree = "<group>"; };
 		FF8B5E081750EFC00076BE6C /* freeType.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = freeType.xcodeproj; path = "../../../../../packages/thirdParty/freetype-2.4.0/builds/osx/freeType.xcodeproj"; sourceTree = "<group>"; };
 		FF8B5E161750F1B80076BE6C /* calibri.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = calibri.ttf; path = ../../../../media/calibri.ttf; sourceTree = "<group>"; };
 		FF8B5E171750F1B80076BE6C /* courbd.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = courbd.ttf; path = ../../../../media/courbd.ttf; sourceTree = "<group>"; };
@@ -798,6 +800,7 @@
 		FF506721173F3DDC00D01FDF /* assets */ = {
 			isa = PBXGroup;
 			children = (
+				FF8AD94319BD40E600C269F2 /* buggy.ngd */,
 				FF9AEB8C19B8015A007C1C5C /* colum.ngd */,
 				FF9AEB8D19B8015A007C1C5C /* concreteBrick.tga */,
 				FF9AEB8E19B8015A007C1C5C /* softBox.nme */,
@@ -1592,6 +1595,7 @@
 				FF50674F173F3E9E00D01FDF /* sponza.ngd in Resources */,
 				FF084A3F173F188B0059C41D /* MainMenu.xib in Resources */,
 				FF82377017C26F8C004C80D4 /* aventador.ngd in Resources */,
+				FF8AD94419BD40E600C269F2 /* buggy.ngd in Resources */,
 				FF82377117C26F8C004C80D4 /* forklift_d.tga in Resources */,
 				FF82377217C26F8C004C80D4 /* forklift_underside_d.tga in Resources */,
 				FF9AEB9419B8015A007C1C5C /* softTPot.nme in Resources */,
