@@ -913,6 +913,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\sdkDemos\demos\BasicCar.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\sdkDemos\demos\BasicFriction.cpp"
 				>
 			</File>

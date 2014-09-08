@@ -23,6 +23,13 @@
 
 struct BasciCarParameters
 {
+	enum DifferentialType
+	{
+		m_4WD,
+		m_RWD,
+		m_FWD,
+	};
+
 	dFloat MASS;
 	dFloat TIRE_MASS;
 	dFloat STEER_ANGLE;
@@ -54,6 +61,7 @@ struct BasciCarParameters
 	dFloat LONGITUDINAL_STIFFNESS;
 	dFloat ALIGNING_MOMENT_TRAIL;
 
+	DifferentialType m_differentialType;
 	dMatrix m_tireaLigment;
 };
 
@@ -83,6 +91,8 @@ static BasciCarParameters basicCarParameters =
 	  20.0f,	// LATERAL_STIFFNESS
    10000.0f,	// LONGITUDINAL_STIFFNESS
 	   1.5f,	// ALIGNING_MOMENT_TRAIL
+	   BasciCarParameters::m_4WD,
+
 	   dGetIdentityMatrix(),
 };
 
@@ -298,13 +308,13 @@ class BasicCarEntity: public DemoEntity
 		offset = dVector (-1.7f, 0.0f, 1.0f, 1.0f);
 		rightTire[1] = AddTire (offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
 
-		// add an steering Wheel
+		// add a steering Wheel
 		CustomVehicleControllerComponentSteering* const steering = new CustomVehicleControllerComponentSteering (m_controller, parameters.STEER_ANGLE * 3.141592f / 180.0f);
 		steering->AddSteeringTire (leftTire[0], -1.0f);
 		steering->AddSteeringTire (rightTire[0], -1.0f);
 		m_controller->SetSteering(steering);
 
-		// add vehicle brakes
+		// add all wheels brakes
 		CustomVehicleControllerComponentBrake* const brakes = new CustomVehicleControllerComponentBrake (m_controller, parameters.BRAKE_TORQUE);
 		for (int i = 0; i < 2; i ++) {
 			brakes->AddBrakeTire (leftTire[i]);
@@ -312,13 +322,44 @@ class BasicCarEntity: public DemoEntity
 		}
 		m_controller->SetBrakes(brakes);
 
+		// add hand brakes
+		CustomVehicleControllerComponentBrake* const handBrakes = new CustomVehicleControllerComponentBrake (m_controller, parameters.BRAKE_TORQUE);
+		handBrakes->AddBrakeTire (leftTire[1]);
+		handBrakes->AddBrakeTire (rightTire[1]);
+		m_controller->SetHandBrakes (handBrakes);
+
 		// add an engine
-		// first make the gear Box
-		CustomVehicleControllerComponentEngine::dSingleAxelDifferencial* axles[2];
-		for (int i = 0; i < 2; i ++) {
-			axles[i] = new CustomVehicleControllerComponentEngine::dSingleAxelDifferencial (m_controller, leftTire[i], rightTire[i]);
+		CustomVehicleControllerComponentEngine::dMultiAxelDifferential* differencial = NULL;
+		switch (parameters.m_differentialType)
+		{
+			case BasciCarParameters::m_4WD:
+			{
+				CustomVehicleControllerComponentEngine::dSingleAxelDifferential* axles[2];
+				for (int i = 0; i < 2; i ++) {
+					axles[i] = new CustomVehicleControllerComponentEngine::dSingleAxelDifferential (m_controller, leftTire[i], rightTire[i]);
+				}
+				differencial = new CustomVehicleControllerComponentEngine::dMultiAxelDifferential (m_controller, 2, axles);
+				break;
+			}
+
+			case BasciCarParameters::m_FWD:
+			{
+				CustomVehicleControllerComponentEngine::dSingleAxelDifferential* axles[1];
+				axles[0] = new CustomVehicleControllerComponentEngine::dSingleAxelDifferential (m_controller, leftTire[0], rightTire[0]);
+				differencial = new CustomVehicleControllerComponentEngine::dMultiAxelDifferential (m_controller, 1, axles);
+				break;
+			}
+
+			case BasciCarParameters::m_RWD:
+			default:
+			{
+				CustomVehicleControllerComponentEngine::dSingleAxelDifferential* axles[1];
+				axles[0] = new CustomVehicleControllerComponentEngine::dSingleAxelDifferential (m_controller, leftTire[1], rightTire[1]);
+				differencial = new CustomVehicleControllerComponentEngine::dMultiAxelDifferential (m_controller, 1, axles);
+				break;
+			}
 		}
-		CustomVehicleControllerComponentEngine::dMultiAxelDifferencial* const differencial = new CustomVehicleControllerComponentEngine::dMultiAxelDifferencial (m_controller, 2, axles);
+		
 
 		dFloat fowardSpeedGearsBoxRatios[] = {parameters.GEAR_1, parameters.GEAR_1, parameters.GEAR_3};
 		CustomVehicleControllerComponentEngine::dGearBox* const gearBox = new CustomVehicleControllerComponentEngine::dGearBox(m_controller, parameters.REVERSE_GEAR, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios); 
@@ -467,7 +508,6 @@ class BasicCarEntity: public DemoEntity
 		if (handBrakes) {
 			handBrakes->SetParam(handBrakePedal);
 		}
-		
 	}
 
 	void ApplyNPCControl ()
@@ -586,13 +626,14 @@ class BasicCarControllerManager: public CustomVehicleControllerManager
 	{
 		if (m_player->m_helpKey.GetPushButtonState()) {
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "Vehicle driving keyboard control:   Joystick control");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "key switch          : 'Y'           start engine");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "accelerator         : 'W'           stick forward");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "brakes              : 'S'           stick back");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right          : 'D'           stick right");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right          : 'S'           stick left");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "toggle Reverse Gear : 'R'           toggle reverse Gear");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "Vehicle driving keyboard control");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "key switch          : 'Y'");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "accelerator         : 'W'");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "brakes              : 'S'");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "had brakes          : 'space'");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right          : 'D'");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right          : 'S'");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "toggle Reverse Gear : 'R'");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help           : 'H'");
 		}
 	}
@@ -717,6 +758,7 @@ void BasicCar (DemoEntityManager* const scene)
 	BasicCarControllerManager* const manager = new BasicCarControllerManager (world);
 	
 	// load 
+	basicCarParameters.m_differentialType = BasciCarParameters::m_RWD;
 	BasicCarEntity* const heavyVehicle = new BasicCarEntity (scene, manager, location, basicCarParameters);
 	heavyVehicle->BuidlBasicCar (basicCarParameters);
 

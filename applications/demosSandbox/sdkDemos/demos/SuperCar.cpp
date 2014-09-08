@@ -356,7 +356,7 @@ class SuperCarEntity: public DemoEntity
 		// first make the gear Box
 		dFloat fowardSpeedGearsBoxRatios[] = {VIPER_TIRE_GEAR_1, VIPER_TIRE_GEAR_2, VIPER_TIRE_GEAR_3, VIPER_TIRE_GEAR_4, VIPER_TIRE_GEAR_5, VIPER_TIRE_GEAR_6};
 
-		CustomVehicleControllerComponentEngine::dSingleAxelDifferencial* const differencial = new CustomVehicleControllerComponentEngine::dSingleAxelDifferencial (m_controller, leftRearTire, rightRearTire);
+		CustomVehicleControllerComponentEngine::dSingleAxelDifferential* const differencial = new CustomVehicleControllerComponentEngine::dSingleAxelDifferential (m_controller, leftRearTire, rightRearTire);
 		CustomVehicleControllerComponentEngine::dGearBox* const gearBox = new CustomVehicleControllerComponentEngine::dGearBox(m_controller, VIPER_TIRE_REVERSE_GEAR, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios); 
 		CustomVehicleControllerComponentEngine* const engine = new CustomVehicleControllerComponentEngine (m_controller, gearBox, differencial);
 
@@ -432,11 +432,11 @@ class SuperCarEntity: public DemoEntity
 		// first make the gear Box
 		dFloat fowardSpeedGearsBoxRatios[] = {VIPER_TIRE_GEAR_1, VIPER_TIRE_GEAR_2, VIPER_TIRE_GEAR_3, VIPER_TIRE_GEAR_4, VIPER_TIRE_GEAR_5, VIPER_TIRE_GEAR_6};
 
-		CustomVehicleControllerComponentEngine::dSingleAxelDifferencial* const frontDifferencial = new CustomVehicleControllerComponentEngine::dSingleAxelDifferencial (m_controller, leftFrontTire, rightFrontTire);
-		CustomVehicleControllerComponentEngine::dSingleAxelDifferencial* const rearDifferencial = new CustomVehicleControllerComponentEngine::dSingleAxelDifferencial (m_controller, leftRearTire, rightRearTire);
+		CustomVehicleControllerComponentEngine::dSingleAxelDifferential* const frontDifferencial = new CustomVehicleControllerComponentEngine::dSingleAxelDifferential (m_controller, leftFrontTire, rightFrontTire);
+		CustomVehicleControllerComponentEngine::dSingleAxelDifferential* const rearDifferencial = new CustomVehicleControllerComponentEngine::dSingleAxelDifferential (m_controller, leftRearTire, rightRearTire);
 
-		CustomVehicleControllerComponentEngine::dSingleAxelDifferencial* array[2] = {frontDifferencial, rearDifferencial};
-		CustomVehicleControllerComponentEngine::dMultiAxelDifferencial* const differencial = new CustomVehicleControllerComponentEngine::dMultiAxelDifferencial (m_controller, 2, array);
+		CustomVehicleControllerComponentEngine::dSingleAxelDifferential* array[2] = {frontDifferencial, rearDifferencial};
+		CustomVehicleControllerComponentEngine::dMultiAxelDifferential* const differencial = new CustomVehicleControllerComponentEngine::dMultiAxelDifferential (m_controller, 2, array);
 
 		CustomVehicleControllerComponentEngine::dGearBox* const gearBox = new CustomVehicleControllerComponentEngine::dGearBox(m_controller, VIPER_TIRE_REVERSE_GEAR, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios); 
 		CustomVehicleControllerComponentEngine* const engine = new CustomVehicleControllerComponentEngine (m_controller, gearBox, differencial);
@@ -594,7 +594,6 @@ class SuperCarEntity: public DemoEntity
 				handBrakePedal = 1.0f;
 			}
 
-
 			// get the steering input
 			steeringVal = (dFloat (mainWindow->GetKeyState ('D')) - dFloat (mainWindow->GetKeyState ('A')));
 
@@ -683,7 +682,6 @@ class SuperCarEntity: public DemoEntity
 		if (handBrakes) {
 			handBrakes->SetParam(handBrakePedal);
 		}
-		
 	}
 
 	void ApplyNPCControl ()

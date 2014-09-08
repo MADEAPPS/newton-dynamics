@@ -86,11 +86,11 @@ class CustomVehicleControllerComponent: public CustomAlloc
 class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComponent
 {
 	public:
-	class dDifferencial: public CustomAlloc  
+	class dDifferential: public CustomAlloc  
 	{
 		public:
-		CUSTOM_JOINTS_API dDifferencial (CustomVehicleController* const controller);
-		CUSTOM_JOINTS_API virtual ~dDifferencial (){}
+		CUSTOM_JOINTS_API dDifferential (CustomVehicleController* const controller);
+		CUSTOM_JOINTS_API virtual ~dDifferential (){}
 
 		CUSTOM_JOINTS_API dFloat GetShaftOmega() const;
 		CUSTOM_JOINTS_API void ApplyTireTorque (dFloat shaftTorque, dFloat shaftOmega) const;
@@ -101,16 +101,16 @@ class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComp
 		CUSTOM_JOINTS_API virtual int GetDifferentialJoints (dComplemtaritySolver::dBilateralJoint** const buffer) = 0;
 	};
 
-	class dSingleAxelDifferencial: public dDifferencial
+	class dSingleAxelDifferential: public dDifferential
 	{
 		public:
-		CUSTOM_JOINTS_API dSingleAxelDifferencial (CustomVehicleController* const controller, CustomVehicleControllerBodyStateTire* const leftTire, CustomVehicleControllerBodyStateTire* const rightTire);
+		CUSTOM_JOINTS_API dSingleAxelDifferential (CustomVehicleController* const controller, CustomVehicleControllerBodyStateTire* const leftTire, CustomVehicleControllerBodyStateTire* const rightTire);
 
 		CUSTOM_JOINTS_API virtual int GetAxelCount () const;
 		CUSTOM_JOINTS_API virtual int GetGainArray (dFloat * const gains) const;
 		CUSTOM_JOINTS_API virtual int GetTireArray(CustomVehicleControllerBodyStateTire** const array) const;
 		CUSTOM_JOINTS_API virtual int GetDifferentialJoints (dComplemtaritySolver::dBilateralJoint** const buffer);
-		CUSTOM_JOINTS_API virtual ~dSingleAxelDifferencial (){}
+		CUSTOM_JOINTS_API virtual ~dSingleAxelDifferential (){}
 
 		protected:
 		dFloat m_gain0;
@@ -118,10 +118,10 @@ class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComp
 		CustomVehicleControllerBodyStateTire* m_tire0;
 		CustomVehicleControllerBodyStateTire* m_tire1;
 		CustomVehicleControllerEngineDifferencialJoint m_differentialJoint;
-		friend class dMultiAxelDifferencial;
+		friend class dMultiAxelDifferential;
 	};
 
-	class dMultiAxelDifferencial: public dDifferencial
+	class dMultiAxelDifferential: public dDifferential
 	{
 		public:
 		class dGainAxelPair
@@ -145,10 +145,10 @@ class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComp
 			}
 
 			dFloat m_gain;
-			dSingleAxelDifferencial* m_axel;
+			dSingleAxelDifferential* m_axel;
 		};
 
-		CUSTOM_JOINTS_API dMultiAxelDifferencial (CustomVehicleController* const controller, int count, dSingleAxelDifferencial** const dDifferencialArray);
+		CUSTOM_JOINTS_API dMultiAxelDifferential (CustomVehicleController* const controller, int count, dSingleAxelDifferential** const dDifferencialArray);
 		
 		CUSTOM_JOINTS_API virtual int GetAxelCount () const;
 		CUSTOM_JOINTS_API virtual int GetGainArray (dFloat * const gains) const;
@@ -156,7 +156,7 @@ class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComp
 		CUSTOM_JOINTS_API virtual int GetDifferentialJoints (dComplemtaritySolver::dBilateralJoint** const buffer);
 
 		protected:
-		CUSTOM_JOINTS_API virtual ~dMultiAxelDifferencial();
+		CUSTOM_JOINTS_API virtual ~dMultiAxelDifferential();
 		dList<dGainAxelPair> m_list;
 	};
 
@@ -245,7 +245,7 @@ class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComp
 	};
 
 
-	CUSTOM_JOINTS_API CustomVehicleControllerComponentEngine (CustomVehicleController* const controller, dGearBox* const gearBox, dDifferencial* const differencial);
+	CUSTOM_JOINTS_API CustomVehicleControllerComponentEngine (CustomVehicleController* const controller, dGearBox* const gearBox, dDifferential* const differencial);
 	CUSTOM_JOINTS_API ~CustomVehicleControllerComponentEngine();
 
 	CUSTOM_JOINTS_API virtual void Update (dFloat timestep);
@@ -283,7 +283,7 @@ class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComp
 			dFloat& torqueArRedLineInPoundFoot, dFloat& revolutionsPerMinutesAtRedLineTorque) const;
 
 	dGearBox* m_gearBox;
-	dDifferencial* m_differencial;
+	dDifferential* m_differencial;
 	dInterpolationCurve m_torqueCurve;
 
 	dFloat m_speedMPS;

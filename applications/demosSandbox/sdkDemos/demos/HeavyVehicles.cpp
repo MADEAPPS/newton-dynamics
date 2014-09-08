@@ -396,11 +396,11 @@ class HeavyVehicleEntity: public DemoEntity
 		// first make the gear Box
 		
 
-		CustomVehicleControllerComponentEngine::dSingleAxelDifferencial* axles[4];
+		CustomVehicleControllerComponentEngine::dSingleAxelDifferential* axles[4];
 		for (int i = 0; i < 4; i ++) {
-			axles[i] = new CustomVehicleControllerComponentEngine::dSingleAxelDifferencial (m_controller, leftTire[i], rightTire[i]);
+			axles[i] = new CustomVehicleControllerComponentEngine::dSingleAxelDifferential (m_controller, leftTire[i], rightTire[i]);
 		}
-		CustomVehicleControllerComponentEngine::dMultiAxelDifferencial* const differencial = new CustomVehicleControllerComponentEngine::dMultiAxelDifferencial (m_controller, 4, axles);
+		CustomVehicleControllerComponentEngine::dMultiAxelDifferential* const differencial = new CustomVehicleControllerComponentEngine::dMultiAxelDifferential (m_controller, 4, axles);
 
 		dFloat fowardSpeedGearsBoxRatios[] = {parameters.GEAR_1, parameters.GEAR_1, parameters.GEAR_3};
 		CustomVehicleControllerComponentEngine::dGearBox* const gearBox = new CustomVehicleControllerComponentEngine::dGearBox(m_controller, parameters.REVERSE_GEAR, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios); 
@@ -473,11 +473,11 @@ class HeavyVehicleEntity: public DemoEntity
 
 		// add an engine
 		// first make the gear Box
-		CustomVehicleControllerComponentEngine::dSingleAxelDifferencial* axles[2];
+		CustomVehicleControllerComponentEngine::dSingleAxelDifferential* axles[2];
 		for (int i = 0; i < 2; i ++) {
-			axles[i] = new CustomVehicleControllerComponentEngine::dSingleAxelDifferencial (m_controller, leftTire[i], rightTire[i]);
+			axles[i] = new CustomVehicleControllerComponentEngine::dSingleAxelDifferential (m_controller, leftTire[i], rightTire[i]);
 		}
-		CustomVehicleControllerComponentEngine::dMultiAxelDifferencial* const differencial = new CustomVehicleControllerComponentEngine::dMultiAxelDifferencial (m_controller, 2, axles);
+		CustomVehicleControllerComponentEngine::dMultiAxelDifferential* const differencial = new CustomVehicleControllerComponentEngine::dMultiAxelDifferential (m_controller, 2, axles);
 
 		dFloat fowardSpeedGearsBoxRatios[] = {parameters.GEAR_1, parameters.GEAR_1, parameters.GEAR_3};
 		CustomVehicleControllerComponentEngine::dGearBox* const gearBox = new CustomVehicleControllerComponentEngine::dGearBox(m_controller, parameters.REVERSE_GEAR, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios); 
