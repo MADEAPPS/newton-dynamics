@@ -47,7 +47,7 @@
 
 #define VEHICLE_CONTROLLER_MAX_BODIES								32
 #define VEHICLE_CONTROLLER_MAX_JOINTS								32
-#define VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS						(VEHICLE_CONTROLLER_MAX_JOINTS * 4)
+#define VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS						(VEHICLE_CONTROLLER_MAX_JOINTS * 6)
 #define VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SLIP_ANGLE		dFloat(0.75f)
 #define VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SIDESLIP_RATIO	dFloat(0.95f)
 
@@ -139,8 +139,8 @@ dMatrix matrix1 (controller->m_chassisState.GetMatrix());
 		}
 
 		int jointCount = GetActiveJoints();
-		BuildJacobianMatrix (jointCount, m_jointArray, timestep, jacobianPairArray, jacobianColumn, sizeof (jacobianPairArray)/ sizeof (jacobianPairArray[0]));
-		CalculateReactionsForces (bodyCount, m_bodyArray, jointCount, m_jointArray, timestep, jacobianPairArray, jacobianColumn);
+		BuildJacobianMatrix (jointCount, m_jointArray, timestep, m_jacobianPairArray, m_jacobianColumn, sizeof (m_jacobianPairArray)/ sizeof (m_jacobianPairArray[0]));
+		CalculateReactionsForces (bodyCount, m_bodyArray, jointCount, m_jointArray, timestep, m_jacobianPairArray, m_jacobianColumn);
 	}
 
 	~dTireForceSolverSolver()
@@ -191,8 +191,8 @@ dMatrix matrix1 (controller->m_chassisState.GetMatrix());
 
 	dBodyState* m_bodyArray[VEHICLE_CONTROLLER_MAX_BODIES];
 	dBilateralJoint* m_jointArray[VEHICLE_CONTROLLER_MAX_JOINTS];
-	dJacobianColum jacobianColumn[VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS];
-	dJacobianPair jacobianPairArray[VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS];
+	dJacobianColum m_jacobianColumn[VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS];
+	dJacobianPair m_jacobianPairArray[VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS];
 
 	CustomVehicleController* m_controller;
 };

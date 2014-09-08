@@ -79,9 +79,9 @@
         </dMeshNodeInfo>
         <dMaterialNodeInfo id="0">
             <dNodeInfo name="cabrio_tex.tga" editorFlags="0" />
-            <ambient textureId="-3697176908929061557" color="0.000000 0.000000 0.000000 1.000000" />
-            <diffuse textureId="-3697176908929061557" color="0.000000 0.000000 0.000000 1.000000" />
-            <specular textureId="-3697176908929061557" color="0.000000 0.000000 0.000000 1.000000" />
+            <ambient textureId="-3697176908929061557" color="0.200000 0.200000 0.200000 1.000000" />
+            <diffuse textureId="-3697176908929061557" color="0.700000 0.700000 0.700000 1.000000" />
+            <specular textureId="-3697176908929061557" color="0.700000 0.700000 0.700000 1.000000" />
             <emissive textureId="-1" color="0.000000 0.000000 0.000000 1.000000" />
             <shininess float="12800.000000" />
             <opacity float="1.000000" />
@@ -98,9 +98,9 @@
         </dTextureNodeInfo>
         <dMaterialNodeInfo id="1">
             <dNodeInfo name="tireMaterial" editorFlags="0" />
-            <ambient textureId="-844664387694618071" color="0.000000 0.000000 0.000000 1.000000" />
-            <diffuse textureId="-844664387694618071" color="0.000000 0.000000 0.000000 1.000000" />
-            <specular textureId="-844664387694618071" color="0.000000 0.000000 0.000000 1.000000" />
+            <ambient textureId="-844664387694618071" color="0.200000 0.200000 0.200000 1.000000" />
+            <diffuse textureId="-844664387694618071" color="0.700000 0.700000 0.700000 1.000000" />
+            <specular textureId="-844664387694618071" color="0.700000 0.700000 0.700000 1.000000" />
             <emissive textureId="-1" color="0.000000 0.000000 0.000000 1.000000" />
             <shininess float="12800.000000" />
             <opacity float="1.000000" />
@@ -134,7 +134,7 @@
         </dMeshNodeInfo>
         <dMaterialNodeInfo id="10">
             <dNodeInfo name="Material #35" editorFlags="0" />
-            <ambient textureId="-3756948770637971225" color="0.700000 0.700000 0.700000 1.000000" />
+            <ambient textureId="-3756948770637971225" color="0.200000 0.200000 0.200000 1.000000" />
             <diffuse textureId="-3756948770637971225" color="0.700000 0.700000 0.700000 1.000000" />
             <specular textureId="-3756948770637971225" color="0.900000 0.900000 0.900000 1.000000" />
             <emissive textureId="-1" color="0.000000 0.000000 0.000000 1.000000" />

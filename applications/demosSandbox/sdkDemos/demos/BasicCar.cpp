@@ -287,12 +287,12 @@ class BasicCarEntity: public DemoEntity
 	// create a simple vehicle 
 	void BuidlBasicCar (const BasciCarParameters& parameters)
 	{
-		// step one: find the location of each tire, in the visual mesh and add them one by one to the vehicle controller 
-		dFloat width = 0.35f;
-		dFloat radius = 0.5f;
-
 		// Muscle cars have the front engine, we need to shift the center of mass to the front to represent that
 		m_controller->SetCenterOfGravity (dVector (0.0f, parameters.COM_Y_OFFSET, 0.0f, 0.0f)); 
+
+		// these si the tire size
+		dFloat width = 0.35f;
+		dFloat radius = 0.5f;
 
 		// add left tires
 		CustomVehicleControllerBodyStateTire* leftTire[2]; 
@@ -335,9 +335,8 @@ class BasicCarEntity: public DemoEntity
 			case BasciCarParameters::m_4WD:
 			{
 				CustomVehicleControllerComponentEngine::dSingleAxelDifferential* axles[2];
-				for (int i = 0; i < 2; i ++) {
-					axles[i] = new CustomVehicleControllerComponentEngine::dSingleAxelDifferential (m_controller, leftTire[i], rightTire[i]);
-				}
+				axles[0] = new CustomVehicleControllerComponentEngine::dSingleAxelDifferential (m_controller, leftTire[0], rightTire[0]);
+				axles[1] = new CustomVehicleControllerComponentEngine::dSingleAxelDifferential (m_controller, leftTire[1], rightTire[1]);
 				differencial = new CustomVehicleControllerComponentEngine::dMultiAxelDifferential (m_controller, 2, axles);
 				break;
 			}

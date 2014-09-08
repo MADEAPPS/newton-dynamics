@@ -54,8 +54,8 @@
 //#define DEFAULT_SCENE	28          // standard joints
 //#define DEFAULT_SCENE	29			// articulated joints
 //#define DEFAULT_SCENE	30			// basic rag doll
-#define DEFAULT_SCENE	31			// basic Car
-//#define DEFAULT_SCENE	32			// heavy wheel vehicle
+//#define DEFAULT_SCENE	31			// basic Car
+#define DEFAULT_SCENE	32			// heavy vehicles
 //#define DEFAULT_SCENE	33			// super Car
 //#define DEFAULT_SCENE	34			// basic player controller
 //#define DEFAULT_SCENE	35			// advanced player controller
@@ -137,7 +137,7 @@ NewtonDemos::SDKDemos NewtonDemos::m_demosSelection[] =
 	{wxT("Articulated robotic actuators joints"), wxT("demonstrate complex array of bodies interconnect by joints"), ArticulatedJoints},
 	{wxT("Basic rag doll"), wxT("demonstrate simple rag doll"), DescreteRagDoll},
 	{wxT("Basic Car"), wxT("show how to set up a vehicle controller"), BasicCar},
-	{wxT("Heavy vehicle"), wxT("implement a military type heavy Vehicle"), MilitaryTransport},
+	{wxT("Heavy vehicles"), wxT("implement military type heavy Vehicles"), MilitaryTransport},
 	{wxT("Super car"), wxT("implement a hight performance sport car"), SuperCar},
 	{wxT("Basic player controller"), wxT("demonstrate simple player controller"), BasicPlayerController},
 	{wxT("Advanced player controller"), wxT("demonstrate player interacting with other objects"), AdvancedPlayerController},
