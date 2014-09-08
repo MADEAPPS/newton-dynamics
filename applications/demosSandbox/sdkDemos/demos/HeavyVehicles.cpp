@@ -94,13 +94,13 @@ static VehicleParameters lightTruck =
 	3000.0f,	// BRAKE_TORQUE
 	-0.6f,		// COM_Y_OFFSET
 	72.0f,		// TIRE_TOP_SPEED_KMH
-	1300.0f,	// IDLE_TORQUE
+	 400.0f,	// IDLE_TORQUE
 	500.0f,		// IDLE_TORQUE_RPM
-	2000.0f,	// PEAK_TORQUE
+	 500.0f,	// PEAK_TORQUE
 	3000.0f,	// PEAK_TORQUE_RPM
-	1200.0f,	// PEAK_HP
+	 300.0f,	// PEAK_HP
 	4000.0f,	// PEAK_HP_RPM
-	300.0f,		// REDLINE_TORQUE
+	  60.0f,	// REDLINE_TORQUE
 	4500.0f,	// REDLINE_TORQUE_RPM
 	2.5f,		// GEAR_1
 	2.0f,		// GEAR_2
