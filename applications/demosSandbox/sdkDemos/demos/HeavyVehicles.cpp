@@ -116,6 +116,37 @@ static VehicleParameters lightTruck =
 };
 
 
+
+static VehicleParameters m1a1Param = 
+{
+	5000.0f,	// MASS
+	100.0f,		// TIRE_MASS
+	25.0f,		// STEER_ANGLE
+	10000.0f,	// BRAKE_TORQUE
+	-0.6f,		// COM_Y_OFFSET
+	60.0f,		// TIRE_TOP_SPEED_KMH
+	1000.0f,	// IDLE_TORQUE
+	500.0f,		// IDLE_TORQUE_RPM
+	1200.0f,	// PEAK_TORQUE
+	3000.0f,	// PEAK_TORQUE_RPM
+	800.0f,		// PEAK_HP
+	4000.0f,	// PEAK_HP_RPM
+	300.0f,		// REDLINE_TORQUE
+	4500.0f,	// REDLINE_TORQUE_RPM
+	2.5f,		// GEAR_1
+	2.0f,		// GEAR_2
+	1.5f,		// GEAR_3
+	2.9f,		// REVERSE_GEAR
+	1.2f,		// SUSPENSION_LENGTH
+	250.0f,		// SUSPENSION_SPRING
+	15.0f,		// SUSPENSION_DAMPER
+	20.0f,		// LATERAL_STIFFNESS
+	100000.0f,	// LONGITUDINAL_STIFFNESS
+	1.5f,		// ALIGNING_MOMENT_TRAIL
+	dRollMatrix(3.141592f * 90.0f / 180.0f)
+};
+
+
 #define HEAVY_VEHICLE_THIRD_PERSON_VIEW_HIGHT		2.0f
 #define HEAVY_VEHICLE_THIRD_PERSON_VIEW_DIST		10.0f
 #define HEAVY_VEHICLE_THIRD_PERSON_VIEW_FILTER		0.125f
@@ -348,15 +379,14 @@ class HeavyVehicleEntity: public DemoEntity
 	// this function is an example of how to make a high performance super car
 	void BuildAllWheelDriveVehicle (const VehicleParameters& parameters)
 	{
-		// step one: find the location of each tire, in the visual mesh and add them one by one to the vehicle controller 
-		dFloat width;
-		dFloat radius;
 
 		// Muscle cars have the front engine, we need to shift the center of mass to the front to represent that
 		m_controller->SetCenterOfGravity (dVector (0.0f, parameters.COM_Y_OFFSET, 0.0f, 0.0f)); 
 
 
 		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
+		dFloat width;
+		dFloat radius;
 		CalculateTireDimensions ("ltire_0", width, radius);
 
 		dVector offset (0.0f, 0.35f, 0.0f, 0.0f);
@@ -433,15 +463,12 @@ class HeavyVehicleEntity: public DemoEntity
 
 	void BuildLightTruckVehicle (const VehicleParameters& parameters)
 	{
-		// step one: find the location of each tire, in the visual mesh and add them one by one to the vehicle controller 
-		dFloat width;
-		dFloat radius;
-
 		// Muscle cars have the front engine, we need to shift the center of mass to the front to represent that
 		m_controller->SetCenterOfGravity (dVector (0.0f, parameters.COM_Y_OFFSET, 0.0f, 0.0f)); 
-
-
+		
 		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
+		dFloat width;
+		dFloat radius;
 		dVector offset (0.0f, 0.15f, 0.0f, 0.0f);
 		CalculateTireDimensions ("fl_tire", width, radius);
 
@@ -511,30 +538,25 @@ class HeavyVehicleEntity: public DemoEntity
 
 	void BuildTrackedVehicle (const VehicleParameters& parameters)
 	{
-/*
-		// step one: find the location of each tire, in the visual mesh and add them one by one to the vehicle controller 
-		dFloat width;
-		dFloat radius;
-
 		// Muscle cars have the front engine, we need to shift the center of mass to the front to represent that
 		m_controller->SetCenterOfGravity (dVector (0.0f, parameters.COM_Y_OFFSET, 0.0f, 0.0f)); 
 
-
-		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
+		// add al the tank tires
 		dVector offset (0.0f, 0.15f, 0.0f, 0.0f);
-		CalculateTireDimensions ("fl_tire", width, radius);
+		CustomVehicleControllerBodyStateTire* leftTire[8]; 
+		CustomVehicleControllerBodyStateTire* rightTire[8]; 
+		for (int i = 0; i < 8; i ++) {
+			char name[32];
+			dFloat width;
+			dFloat radius;
+			sprintf (name, "l_tire%d", i);
+			CalculateTireDimensions (name, width, radius);
 
-		// add left tires
-		CustomVehicleControllerBodyStateTire* leftTire[2]; 
-		leftTire[0] = AddTire ("fl_tire", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
-		leftTire[1] = AddTire ("rl_tire", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
-
-		// add right tires
-		CustomVehicleControllerBodyStateTire* rightTire[2];
-		CalculateTireDimensions ("rl_tire", width, radius);
-		rightTire[0] = AddTire ("fr_tire", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
-		rightTire[1] = AddTire ("rr_tire", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
-
+			leftTire[i] = AddTire (name, offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
+			sprintf (name, "r_tire%d", i);
+			rightTire[i] = AddTire (name, offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
+		}
+/*
 		// add an steering Wheel
 		CustomVehicleControllerComponentSteering* const steering = new CustomVehicleControllerComponentSteering (m_controller, parameters.STEER_ANGLE * 3.141592f / 180.0f);
 		steering->AddSteeringTire (leftTire[0], -1.0f);
@@ -1024,28 +1046,20 @@ location.m_posit.m_z = 50.0f;
 	lightVehicle->BuildLightTruckVehicle (lightTruck);
 
 	location.m_posit.m_z -= 12.0f;
-	HeavyVehicleEntity* const m1a1Tank = new HeavyVehicleEntity (scene, manager, location, "m1a1.ngd", heavyTruck);
-	m1a1Tank->BuildTrackedVehicle (heavyTruck);
-
+	HeavyVehicleEntity* const m1a1Tank = new HeavyVehicleEntity (scene, manager, location, "m1a1.ngd", m1a1Param);
+	m1a1Tank->BuildTrackedVehicle (m1a1Param);
 
 	dMatrix camMatrix (manager->m_player->GetNextMatrix());
 	scene->SetCameraMouseLock (true);
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
+	//	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
+	//	int count = 5;
+	//	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
+	//	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
+	//	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 
-	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
-	//	dVector location (origin);
-	//	location.m_x += 20.0f;
-	//	location.m_z += 20.0f;
-	location.m_posit.m_z += 4.0f;
-
-	int count = 5;
-	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
-
-	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
-	//AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-
-	size = dVector(1.0f, 0.5f, 1.0f, 0.0f);
+	//	size = dVector(1.0f, 0.5f, 1.0f, 0.0f);
 	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
@@ -1056,7 +1070,6 @@ location.m_posit.m_z = 50.0f;
 	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-
 	//	NewtonSerializeToFile (scene->GetNewton(), "C:/Users/Julio/Desktop/newton-dynamics/applications/media/xxxxx.bin");
 }
 
