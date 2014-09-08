@@ -56,6 +56,7 @@
 		FF084ACE173F1B310059C41D /* SceneCollision.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F6F1556DA2300E7B112 /* SceneCollision.cpp */; };
 		FF084AD0173F1B310059C41D /* SoftBodies.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F711556DA2300E7B112 /* SoftBodies.cpp */; };
 		FF084AD2173F1B310059C41D /* UsingNewtonMeshTool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F771556DA2300E7B112 /* UsingNewtonMeshTool.cpp */; };
+		FF3BD3C619BE54BD00E676B8 /* m1a1.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF3BD3C519BE54BD00E676B8 /* m1a1.ngd */; };
 		FF50660B173F34B600D01FDF /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF50660A173F34B600D01FDF /* Cocoa.framework */; };
 		FF50660D173F360C00D01FDF /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF50660C173F360C00D01FDF /* IOKit.framework */; };
 		FF50660F173F36B200D01FDF /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF50660E173F36B200D01FDF /* Carbon.framework */; };
@@ -467,6 +468,7 @@
 		FF3B297417300CF0007E6FEC /* UserPlaneCollision.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UserPlaneCollision.cpp; path = ../../../sdkDemos/toolBox/UserPlaneCollision.cpp; sourceTree = "<group>"; };
 		FF3B297917300D39007E6FEC /* PuckSlide.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PuckSlide.cpp; path = ../../../sdkDemos/demos/PuckSlide.cpp; sourceTree = "<group>"; };
 		FF3B297A17300D39007E6FEC /* SimpleBooleans.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SimpleBooleans.cpp; path = ../../../sdkDemos/demos/SimpleBooleans.cpp; sourceTree = "<group>"; };
+		FF3BD3C519BE54BD00E676B8 /* m1a1.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = m1a1.ngd; sourceTree = "<group>"; };
 		FF506608173F33DA00D01FDF /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = /System/Library/Frameworks/CoreGraphics.framework; sourceTree = "<absolute>"; };
 		FF50660A173F34B600D01FDF /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		FF50660C173F360C00D01FDF /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
@@ -802,6 +804,7 @@
 		FF506721173F3DDC00D01FDF /* assets */ = {
 			isa = PBXGroup;
 			children = (
+				FF3BD3C519BE54BD00E676B8 /* m1a1.ngd */,
 				FF8AD94319BD40E600C269F2 /* buggy.ngd */,
 				FF9AEB8C19B8015A007C1C5C /* colum.ngd */,
 				FF9AEB8D19B8015A007C1C5C /* concreteBrick.tga */,
@@ -1487,6 +1490,7 @@
 				FF506786173F3EAC00D01FDF /* reljef.tga in Resources */,
 				FF506787173F3EAC00D01FDF /* rimsa1.tga in Resources */,
 				FF506788173F3EAC00D01FDF /* road_to_dirt.tga in Resources */,
+				FF3BD3C619BE54BD00E676B8 /* m1a1.ngd in Resources */,
 				FF506789173F3EAC00D01FDF /* ROAD.TGA in Resources */,
 				FF50678A173F3EAC00D01FDF /* ROAD1.TGA in Resources */,
 				FF50678B173F3EAC00D01FDF /* ROADP.TGA in Resources */,
