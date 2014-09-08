@@ -732,7 +732,7 @@ void CustomVehicleControllerComponentEngine::Update (dFloat timestep)
 			m_engineRPS = shaftOmega * gearRatio;
 			dFloat torqueResistance = - m_engineInternalFriction * m_engineRPS;
 
-			dFloat param = GetParam() * 0.5f;
+			dFloat param = GetParam();
 			dFloat nominalTorque = -GetTorque (dMax (-m_engineRPS, 0.0f)) * param;
 			dFloat engineTorque = nominalTorque + torqueResistance;
 

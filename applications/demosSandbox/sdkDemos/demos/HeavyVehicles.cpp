@@ -57,7 +57,7 @@ struct VehicleParameters
 	dMatrix m_tireaLigment;
 };
 
-VehicleParameters heavyTruck = 
+static VehicleParameters heavyTruck = 
 {
 	5000.0f,	// MASS
 	 100.0f,	// TIRE_MASS
@@ -86,7 +86,7 @@ VehicleParameters heavyTruck =
 	   dGetIdentityMatrix(),
 };
 
-VehicleParameters lightTruck = 
+static VehicleParameters lightTruck = 
 {
 	2000.0f,	// MASS
 	100.0f,		// TIRE_MASS

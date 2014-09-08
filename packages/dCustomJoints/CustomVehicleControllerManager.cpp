@@ -261,8 +261,6 @@ CustomVehicleController* CustomVehicleControllerManager::CreateVehicle (NewtonCo
 }
 
 
-
-
 void CustomVehicleController::Init (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, const dVector& gravityVector)
 {
 	m_finalized = false;
@@ -278,7 +276,10 @@ void CustomVehicleController::Init (NewtonCollision* const chassisShape, const d
 	// if the shape is a compound collision ass all the pieces one at a time
 	int shapeType = NewtonCollisionGetType (chassisShape);
 	if (shapeType == SERIALIZE_ID_COMPOUND) {
-		dAssert (0);
+		for (void* node = NewtonCompoundCollisionGetFirstNode(chassisShape); node; node = NewtonCompoundCollisionGetNextNode (chassisShape, node)) { 
+			NewtonCollision* const subCollision = NewtonCompoundCollisionGetCollisionFromNode(chassisShape, node);
+			NewtonCompoundCollisionAddSubCollision (vehShape, subCollision);
+		}
 	} else {
 		dAssert ((shapeType == SERIALIZE_ID_CONVEXHULL) || (shapeType == SERIALIZE_ID_BOX));
 		NewtonCompoundCollisionAddSubCollision (vehShape, chassisShape);

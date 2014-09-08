@@ -54,12 +54,13 @@
 //#define DEFAULT_SCENE	28          // standard joints
 //#define DEFAULT_SCENE	29			// articulated joints
 //#define DEFAULT_SCENE	30			// basic rag doll
-#define DEFAULT_SCENE	31			// heavy wheel vehicle
-//#define DEFAULT_SCENE	32			// super Car
-//#define DEFAULT_SCENE	33			// basic player controller
-//#define DEFAULT_SCENE	34			// advanced player controller
-//#define DEFAULT_SCENE	35			// cloth patch			
-//#define DEFAULT_SCENE	36			// soft bodies			
+#define DEFAULT_SCENE	31			// basic Car
+//#define DEFAULT_SCENE	32			// heavy wheel vehicle
+//#define DEFAULT_SCENE	33			// super Car
+//#define DEFAULT_SCENE	34			// basic player controller
+//#define DEFAULT_SCENE	35			// advanced player controller
+//#define DEFAULT_SCENE	36			// cloth patch			
+//#define DEFAULT_SCENE	37			// soft bodies			
 
 
 void Friction (DemoEntityManager* const scene);
@@ -89,6 +90,7 @@ void SimpleConvexFracturing (DemoEntityManager* const scene);
 void StructuredConvexFracturing (DemoEntityManager* const scene);
 void UsingNewtonMeshTool (DemoEntityManager* const scene);
 void MultiRayCast (DemoEntityManager* const scene);
+void BasicCar (DemoEntityManager* const scene);
 void SuperCar (DemoEntityManager* const scene);
 void MilitaryTransport (DemoEntityManager* const scene);
 void BasicPlayerController (DemoEntityManager* const scene);
@@ -118,7 +120,7 @@ NewtonDemos::SDKDemos NewtonDemos::m_demosSelection[] =
 	{wxT("User infinite Plane collision mesh"), wxT("show high file collision mesh"), UserPlaneCollision},
 	{wxT("User Height field collision mesh"), wxT("show high file collision mesh"), UserHeightFieldCollision},
 	{wxT("Compound collision shape"), wxT("demonstrate compound collision"), CompoundCollision},
-	{wxT("Alchemedes Buoyancy"), wxT("show Alchemedes Buoyancy using the trigger volumen manager"), AlchimedesBuoyancy},
+	{wxT("Archimedes Buoyancy"), wxT("show Archimedes Buoyancy using the trigger volume manager"), AlchimedesBuoyancy},
 	{wxT("Uniform scaled collision shape"), wxT("demonstrate scaling shape"), UniformScaledCollision},
 	{wxT("Non uniform scaled collision shape"), wxT("demonstrate scaling shape"), NonUniformScaledCollision},
 	{wxT("Scaled mesh collision"), wxT("demonstrate scaling mesh scaling collision"), ScaledMeshCollision},
@@ -129,13 +131,14 @@ NewtonDemos::SDKDemos NewtonDemos::m_demosSelection[] =
 	{wxT("Structured convex fracture"), wxT("demonstrate structured fracture destruction using Voronoi partition"), StructuredConvexFracturing},
 	{wxT("Parallel ray cast"), wxT("using the threading Job scheduler"), MultiRayCast},
 	{wxT("Continue collision"), wxT("show continue collision"), ContinueCollision},
-    {wxT("Paperwall continue collision"), wxT("show fast continue collision"), ContinueCollision1},
+    {wxT("Paper wall continue collision"), wxT("show fast continue collision"), ContinueCollision1},
 	{wxT("Puck slide"), wxT("show continue collision"), PuckSlide},
-    {wxT("Starndard Joints"), wxT("show sme of teh common joints"), StandardJoints},
+    {wxT("Standard Joints"), wxT("show some of the common joints"), StandardJoints},
 	{wxT("Articulated robotic actuators joints"), wxT("demonstrate complex array of bodies interconnect by joints"), ArticulatedJoints},
 	{wxT("Basic rag doll"), wxT("demonstrate simple rag doll"), DescreteRagDoll},
-	{wxT("Heavy vehicle"), wxT("implemnet a militaty typeheavy Vehicle"), MilitaryTransport},
-	{wxT("Super car"), wxT("implement a basic car"), SuperCar},
+	{wxT("Basic Car"), wxT("show how to set up a vehicle controller"), BasicCar},
+	{wxT("Heavy vehicle"), wxT("implement a military type heavy Vehicle"), MilitaryTransport},
+	{wxT("Super car"), wxT("implement a hight performance sport car"), SuperCar},
 	{wxT("Basic player controller"), wxT("demonstrate simple player controller"), BasicPlayerController},
 	{wxT("Advanced player controller"), wxT("demonstrate player interacting with other objects"), AdvancedPlayerController},
 	{wxT("Simple cloth Path"), wxT("show simple cloth path"), ClothPath},

@@ -421,6 +421,7 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
     <ClCompile Include="..\..\sdkDemos\demos\AdvancedPlayerController.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ArchimedesBuoyancy.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ArticulatedJoints.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\BasicCar.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\SuperCar.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicPlayerController.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicRagDoll.cpp" />

@@ -52,7 +52,7 @@
 #define VIPER_REDLINE_TORQUE				30.0f
 #define VIPER_REDLINE_TORQUE_RPM			6000.0f
 
-#define VIPER_MASS							1500.0f
+#define VIPER_MASS							3500.0f
 #define VIPER_TIRE_STEER_ANGLE				35.0f
 
 // note: tire unsprung mass (note the engine impose a limit of 1.0 / 50.0 mass ratio between connected bodies 
@@ -63,7 +63,7 @@
 #define VIPER_TIRE_TOP_SPEED_KMH			264.0f			 
 
 #define VIPER_TIRE_LATERAL_STIFFNESS		20.0f
-#define VIPER_TIRE_LONGITUDINAL_STIFFNESS	1000.0f
+#define VIPER_TIRE_LONGITUDINAL_STIFFNESS	10000.0f
 #define VIPER_TIRE_ALIGNING_MOMENT_TRAIL	0.5f
 #define VIPER_TIRE_SUSPENSION_SPRING		15000.0f
 #define VIPER_TIRE_SUSPENSION_DAMPER		600.0f
