@@ -556,8 +556,9 @@ bool dSceneGraph::Deserialize (TiXmlElement* const rootNode)
 					node.m_parents.Append(parentNode);
 				}
 			} else {
-				dAssert (!m_rootNode);
-				m_rootNode = myNode;
+				if (!m_rootNode) {
+					m_rootNode = myNode;
+				}
 			}
 
 

@@ -149,6 +149,7 @@ class dScene: public dSceneGraph, public dRefCounter
 
 	DSCENE_API virtual void FreezeScale ();
 	DSCENE_API virtual void FreezeGeometryPivot ();
+	DSCENE_API virtual void FreezeRootRotation ();
 	DSCENE_API virtual void BakeTransform (const dMatrix& matrix);
 	
 	DSCENE_API virtual int GetRevision() const;
@@ -161,7 +162,6 @@ class dScene: public dSceneGraph, public dRefCounter
 
 	DSCENE_API virtual void NewtonWorldToScene (const NewtonWorld* const world, dSceneExportCallback* const visualContext);
 	DSCENE_API virtual void SceneToNewtonWorld (NewtonWorld* world, dList<NewtonBody*>& loadedBodies);
-
 
 	DSCENE_API virtual void DeleteDuplicateTextures();
 	DSCENE_API virtual void DeleteDuplicateMaterials();

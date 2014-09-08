@@ -42,6 +42,7 @@ dPluginRecord** GetPluginArray()
 		//dSphereCollision::GetPlugin(),
 		dFreezeSceneScale::GetPlugin(),
 		dFreezeGeometryScale::GetPlugin(),
+		dFreezeRootRotation::GetPlugin(),
 		dMeshBoxPrimitive::GetPlugin(),
 		dMeshTriangulateMesh::GetPlugin(),
 		dPolygonizeSelections::GetPlugin(),

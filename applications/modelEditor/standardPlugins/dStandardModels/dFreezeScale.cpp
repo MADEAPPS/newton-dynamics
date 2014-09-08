@@ -36,8 +36,6 @@ dFreezeSceneScale* dFreezeSceneScale::GetPlugin()
 	return &plugin;
 }
 
-
-
 bool dFreezeSceneScale::Execute (dPluginInterface* const interface)
 {
 	dPluginScene* const scene = interface->GetScene();
@@ -92,8 +90,40 @@ bool dFreezeGeometryScale::Execute (dPluginInterface* const interface)
 			render->InvalidateCachedDisplayList (meshInfo->GetMesh());
 		}
 	}
-
-
 	return true;
 }
 
+
+dFreezeRootRotation::dFreezeRootRotation()
+{
+}
+
+dFreezeRootRotation::~dFreezeRootRotation()
+{
+}
+
+
+dFreezeRootRotation* dFreezeRootRotation::GetPlugin()
+{
+	static dFreezeRootRotation plugin;
+	return &plugin;
+}
+
+
+bool dFreezeRootRotation::Execute (dPluginInterface* const interface)
+{
+	dPluginScene* const scene = interface->GetScene();
+	interface->Push(new dUndoCurrentScene(interface, scene));
+	scene->FreezeRootRotation();
+
+	dSceneRender* const render = interface->GetRender();
+	dScene::dTreeNode* const geometryCache = scene->FindGetGeometryCacheNode ();
+	for (void* link = scene->GetFirstChildLink(geometryCache); link; link = scene->GetNextChildLink(geometryCache, link)) {
+		dScene::dTreeNode* const meshNode = scene->GetNodeFromLink(link);
+		dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*)scene->GetInfoFromNode(meshNode);
+		if (meshInfo->IsType(dMeshNodeInfo::GetRttiType())) {
+			render->InvalidateCachedDisplayList (meshInfo->GetMesh());
+		}
+	}
+	return true;
+}

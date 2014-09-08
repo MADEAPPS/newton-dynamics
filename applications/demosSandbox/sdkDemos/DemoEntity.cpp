@@ -131,7 +131,7 @@ void DemoEntity::LoadNGD_mesh (const char* const fileName, NewtonWorld* const wo
 	scene.FreezeScale();
 
 	// this will apply all local scale and transform to the mesh
-	//scene.FreezeGeometryPivot();
+	scene.FreezeGeometryPivot();
 	
 	dScene::dTreeNode* meshRootNode = NULL;
 	dScene::dTreeNode* const root = scene.GetRootNode();

@@ -222,12 +222,11 @@ class SuperCarEntity: public DemoEntity
 
 		// find the support points that can be used to define the with and high of the tire collision mesh
 		dVector extremePoint;
-		dVector upDir (0.0f, 1.0f, 0.0f, 0.0f);
+		dVector upDir (tireMatrix.UnrotateVector(dVector (0.0f, 1.0f, 0.0f, 0.0f)));
 		NewtonCollisionSupportVertex (collision, &upDir[0], &extremePoint[0]);
 		radius = dAbs (upDir % extremePoint);
 
-		//dVector widthDir (tireMatrix.UnrotateVector(tireLocalMatrix.m_front));
-		dVector widthDir (1.0f, 0.0f, 0.0f, 0.0f);
+		dVector widthDir (tireMatrix.UnrotateVector(dVector (0.0f, 0.0f, 1.0f, 0.0f)));
 		NewtonCollisionSupportVertex (collision, &widthDir[0], &extremePoint[0]);
 		width = widthDir % extremePoint;
 

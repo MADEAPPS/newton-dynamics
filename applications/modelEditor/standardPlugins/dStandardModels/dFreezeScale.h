@@ -48,5 +48,19 @@ class dFreezeGeometryScale: public dPluginTool
 };
 
 
+class dFreezeRootRotation: public dPluginTool
+{
+	public:
+	dFreezeRootRotation();
+	~dFreezeRootRotation();
+	static dFreezeRootRotation* GetPlugin();
+
+	virtual const char* GetMenuName () { return GetSignature();}
+	virtual const char* GetDescription () {return "Freeze Root Rotation";}
+	virtual const char* GetSignature () {return "Freeze Root Rotation";}
+	virtual bool Execute (dPluginInterface* const interface);
+};
+
+
 
 #endif
