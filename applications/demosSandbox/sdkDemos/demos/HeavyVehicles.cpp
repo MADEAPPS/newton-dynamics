@@ -64,7 +64,7 @@ static VehicleParameters heavyTruck =
 	  25.0f,	// STEER_ANGLE
 	10000.0f,	// BRAKE_TORQUE
 	  -0.6f,	// COM_Y_OFFSET
-	 72.0f,		// TIRE_TOP_SPEED_KMH
+	 60.0f,		// TIRE_TOP_SPEED_KMH
 	1000.0f,	// IDLE_TORQUE
 	500.0f,		// IDLE_TORQUE_RPM
 	1200.0f,	// PEAK_TORQUE
