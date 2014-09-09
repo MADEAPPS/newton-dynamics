@@ -71,6 +71,7 @@ class CustomVehicleController: public CustomControllerBase
 	CUSTOM_JOINTS_API void SetHandBrakes(CustomVehicleControllerComponentBrake* const brakes);
 	CUSTOM_JOINTS_API void SetSteering(CustomVehicleControllerComponentSteering* const steering);
 
+	CUSTOM_JOINTS_API void LinksTiresKinematically (int count, CustomVehicleControllerBodyStateTire** const tires);
 
 	CUSTOM_JOINTS_API void Finalize();
 
@@ -88,6 +89,8 @@ class CustomVehicleController: public CustomControllerBase
 	dTireList m_tireList;
 	CustomVehicleControllerBodyStateChassis m_chassisState;
 	dList<CustomVehicleControllerBodyState*> m_stateList;
+
+	dList<CustomVehicleControllerEngineDifferencialJoint> m_tankTireLinks;
 	dList<CustomVehicleControllerBodyStateContact> m_externalContactStatesPoll;
 	dList<CustomVehicleControllerBodyStateContact>::dListNode* m_freeContactList;
 	NewtonCollision* m_tireCastShape;

@@ -173,7 +173,9 @@ CustomVehicleControllerComponentEngine::dSingleAxelDifferential::dSingleAxelDiff
 	m_gain1 = 2.0f - m_gain0;
 
 	m_differentialJoint.Init(controller, m_tire0, m_tire1);
-	m_differentialJoint.m_ratio = m_tire0->m_radio / m_tire1->m_radio;
+//	m_differentialJoint.m_ratio = m_tire0->m_radio / m_tire1->m_radio;
+	m_differentialJoint.m_radio0 = m_tire0->m_radio;
+	m_differentialJoint.m_radio1 = m_tire1->m_radio;
 }
 
 int CustomVehicleControllerComponentEngine::dSingleAxelDifferential::GetAxelCount () const

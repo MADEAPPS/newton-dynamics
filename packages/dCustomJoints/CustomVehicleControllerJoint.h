@@ -84,15 +84,13 @@ class CustomVehicleControllerTireContactJoint: public CustomVehicleControllerJoi
 	dContact m_contacts[8];
 };
 
-
-
 class CustomVehicleControllerEngineDifferencialJoint: public CustomVehicleControllerJoint
 {
 	public:
 	CUSTOM_JOINTS_API virtual void JacobianDerivative (dComplemtaritySolver::dParamInfo* const constraintParams); 
 	CUSTOM_JOINTS_API virtual void UpdateSolverForces (const dComplemtaritySolver::dJacobianPair* const jacobians) const;
-
-	dFloat m_ratio;
+	dFloat m_radio0;
+	dFloat m_radio1;
 };
 
 

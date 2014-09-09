@@ -46,8 +46,8 @@
 #include <CustomVehicleControllerBodyState.h>
 
 #define VEHICLE_CONTROLLER_MAX_BODIES								32
-#define VEHICLE_CONTROLLER_MAX_JOINTS								32
-#define VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS						(VEHICLE_CONTROLLER_MAX_JOINTS * 6)
+#define VEHICLE_CONTROLLER_MAX_JOINTS								64
+#define VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS						(VEHICLE_CONTROLLER_MAX_JOINTS * 4)
 #define VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SLIP_ANGLE		dFloat(0.75f)
 #define VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SIDESLIP_RATIO	dFloat(0.95f)
 
@@ -55,7 +55,7 @@
 class CustomVehicleController::dTireForceSolverSolver: public dComplemtaritySolver
 {
 	public:
-	dTireForceSolverSolver(CustomVehicleController* const controller, dFloat timestep)
+	dTireForceSolverSolver(CustomVehicleController* const controller, dFloat timestep, int threadId)
 		:dComplemtaritySolver()
 		,m_controller(controller)
 	{
@@ -70,7 +70,7 @@ class CustomVehicleController::dTireForceSolverSolver: public dComplemtaritySolv
 		CustomControllerConvexCastPreFilter castFilter (body);
 		for (dTireList::dListNode* node = m_controller->m_tireList.GetFirst(); node; node = node->GetNext()) {
 			CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
-			tire->Collide(castFilter, timestepInv);
+			tire->Collide(castFilter, timestepInv, threadId);
 			tire->UpdateDynamicInputs(timestep);
 
 //tire->SetVeloc(dVector (0.0f, 0.0f, 0.0f, 0.0f));
@@ -173,19 +173,16 @@ dMatrix matrix1 (controller->m_chassisState.GetMatrix());
 			jointCount += m_controller->m_engine->AddDifferentialJoints(&m_jointArray[jointCount]);
 		}
 
-		//	for (int i = 0; i < m_angularJointCount; i ++) {
-		//		constraintArray[jointCount] = &m_angularVelocityLinks[i];
-		//		jointCount ++;
-		//	}
-		//	for (int i = 0; i < m_trackSteeringCount; i ++) {
-		//		constraintArray[jointCount] = &m_trackSteering[i];
-		//		jointCount ++;
-		//	}
+		for (dList<CustomVehicleControllerEngineDifferencialJoint>::dListNode* node = m_controller->m_tankTireLinks.GetFirst(); node; node = node->GetNext()) {
+			m_jointArray[jointCount] = &node->GetInfo();
+			jointCount ++;
+			dAssert (jointCount < VEHICLE_CONTROLLER_MAX_JOINTS);
+		}
+		//for (int i = 0; i < m_trackSteeringCount; i ++) {
+		//	constraintArray[jointCount] = &m_trackSteering[i];
+		//	jointCount ++;
+		//}
 
-		//	if (m_dryFriction.m_maxForce > 1.0f) {
-		//		constraintArray[jointCount] = &m_dryFriction;
-		//		jointCount ++;
-		//	}
 		return jointCount;
 	}
 
@@ -193,7 +190,6 @@ dMatrix matrix1 (controller->m_chassisState.GetMatrix());
 	dBilateralJoint* m_jointArray[VEHICLE_CONTROLLER_MAX_JOINTS];
 	dJacobianColum m_jacobianColumn[VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS];
 	dJacobianPair m_jacobianPairArray[VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS];
-
 	CustomVehicleController* m_controller;
 };
 
@@ -447,6 +443,17 @@ void CustomVehicleController::SetHandBrakes(CustomVehicleControllerComponentBrak
 }
 
 
+void CustomVehicleController::LinksTiresKinematically (int count, CustomVehicleControllerBodyStateTire** const tires)
+{
+	dFloat radio0 = tires[0]->m_radio;
+	for (int i = 1; i < count; i ++) {
+		CustomVehicleControllerEngineDifferencialJoint* const link = &m_tankTireLinks.Append()->GetInfo();
+		link->Init(this, tires[0], tires[i]);
+		link->m_radio0 = radio0;
+		link->m_radio1 = tires[i]->m_radio;
+	}
+}
+
 void CustomVehicleController::Finalize()
 {
 	dWeightDistibutionSolver solver;
@@ -536,7 +543,7 @@ CustomVehicleControllerBodyStateContact* CustomVehicleController::GetContactBody
 void CustomVehicleController::PreUpdate (dFloat timestep, int threadIndex)
 {
 	if (m_finalized) {
-		dTireForceSolverSolver tireSolver (this, timestep);	
+		dTireForceSolverSolver tireSolver (this, timestep, threadIndex);	
 	}
 }
 

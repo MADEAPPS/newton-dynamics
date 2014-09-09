@@ -376,7 +376,12 @@ void CustomVehicleControllerEngineDifferencialJoint::JacobianDerivative (dComple
 	dFloat omega0 = axis0 % tire0->m_omega;  
 	dFloat omega1 = axis1 % tire1->m_omega;  
 
-	dFloat ratioAccel = - 0.5f * (omega0 + m_ratio * omega1) * constraintParams->m_timestepInv;
+	dFloat ratioAccel = 0.0f;
+	if (m_radio0 <= m_radio1) {
+		ratioAccel = - 0.5f * (omega0 + m_radio0 * omega1 / m_radio1) * constraintParams->m_timestepInv;
+	} else {
+		ratioAccel = - 0.5f * (m_radio1 * omega0 / m_radio0 + omega1) * constraintParams->m_timestepInv;
+	}
 	AddAngularRowJacobian (constraintParams, axis0, axis1, ratioAccel);
 }
 

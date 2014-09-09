@@ -141,7 +141,7 @@ static VehicleParameters m1a1Param =
 	250.0f,		// SUSPENSION_SPRING
 	15.0f,		// SUSPENSION_DAMPER
 	20.0f,		// LATERAL_STIFFNESS
-	100000.0f,	// LONGITUDINAL_STIFFNESS
+	10000.0f,	// LONGITUDINAL_STIFFNESS
 	1.5f,		// ALIGNING_MOMENT_TRAIL
 	dRollMatrix(3.141592f * 90.0f / 180.0f)
 };
@@ -556,6 +556,9 @@ class HeavyVehicleEntity: public DemoEntity
 			sprintf (name, "r_tire%d", i);
 			rightTire[i] = AddTire (name, offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
 		}
+
+		m_controller->LinksTiresKinematically (8, leftTire);
+		m_controller->LinksTiresKinematically (8, rightTire);
 /*
 		// add an steering Wheel
 		CustomVehicleControllerComponentSteering* const steering = new CustomVehicleControllerComponentSteering (m_controller, parameters.STEER_ANGLE * 3.141592f / 180.0f);
@@ -1048,6 +1051,15 @@ location.m_posit.m_z = 50.0f;
 	location.m_posit.m_z -= 12.0f;
 	HeavyVehicleEntity* const m1a1Tank = new HeavyVehicleEntity (scene, manager, location, "m1a1.ngd", m1a1Param);
 	m1a1Tank->BuildTrackedVehicle (m1a1Param);
+
+/*
+for (int i = 0; i < 20; i ++){
+	location.m_posit.m_z -= 12.0f;
+	HeavyVehicleEntity* const m1a1Tank1 = new HeavyVehicleEntity (scene, manager, location, "m1a1.ngd", m1a1Param);
+	m1a1Tank1->BuildTrackedVehicle (m1a1Param);
+}
+*/
+
 
 	dMatrix camMatrix (manager->m_player->GetNextMatrix());
 	scene->SetCameraMouseLock (true);

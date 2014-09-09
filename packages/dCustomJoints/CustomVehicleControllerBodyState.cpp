@@ -430,7 +430,7 @@ void CustomVehicleControllerBodyStateTire::UpdateTransform()
 }
 
 
-void CustomVehicleControllerBodyStateTire::Collide (CustomControllerConvexCastPreFilter& filter, dFloat timestepInv)
+void CustomVehicleControllerBodyStateTire::Collide (CustomControllerConvexCastPreFilter& filter, dFloat timestepInv, int threadId)
 {
 	NewtonBody* const body = m_controller->GetBody();
 	NewtonWorld* const world = NewtonBodyGetWorld(body);
@@ -460,7 +460,7 @@ int xxx3 = NewtonWorldConvexCast (world, &xxxx0[0][0], &xxxx1[0], xxx, &hitParam
 */
 
 	NewtonCollisionSetScale (m_controller->m_tireCastShape, m_width, m_radio, m_radio);
-	int contactCount = NewtonWorldConvexCast (world, &tireMatrix[0][0], &rayDestination[0], m_controller->m_tireCastShape, &hitParam, &filter, CustomControllerConvexCastPreFilter::Prefilter, contacts, sizeof (contacts) / sizeof (contacts[0]), 0);
+	int contactCount = NewtonWorldConvexCast (world, &tireMatrix[0][0], &rayDestination[0], m_controller->m_tireCastShape, &hitParam, &filter, CustomControllerConvexCastPreFilter::Prefilter, contacts, sizeof (contacts) / sizeof (contacts[0]), threadId);
 	if (contactCount) {
 		m_posit = hitParam * m_suspensionlenght;
 		m_speed = (posit0 - m_posit) * timestepInv;
