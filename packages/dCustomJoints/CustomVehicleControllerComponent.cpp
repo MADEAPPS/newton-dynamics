@@ -173,7 +173,6 @@ CustomVehicleControllerComponentEngine::dSingleAxelDifferential::dSingleAxelDiff
 	m_gain1 = 2.0f - m_gain0;
 
 	m_differentialJoint.Init(controller, m_tire0, m_tire1);
-//	m_differentialJoint.m_ratio = m_tire0->m_radio / m_tire1->m_radio;
 	m_differentialJoint.m_radio0 = m_tire0->m_radio;
 	m_differentialJoint.m_radio1 = m_tire1->m_radio;
 }
@@ -268,6 +267,41 @@ int CustomVehicleControllerComponentEngine::dMultiAxelDifferential::GetDifferent
 		count += pair.m_axel->GetDifferentialJoints(&buffer[count]);
 	}
 	return count;
+}
+
+
+CustomVehicleControllerComponentEngine::dTracksSkidDifferential::dTracksSkidDifferential (CustomVehicleController* const controller, CustomVehicleControllerBodyStateTire* const leftTire, CustomVehicleControllerBodyStateTire* const rightTire)
+	:dDifferential(controller)
+	,m_tire0(leftTire)
+	,m_tire1(rightTire)
+{
+	m_gain0 = 2.0f * m_tire0->m_radio / (m_tire0->m_radio + m_tire1->m_radio);
+	m_gain1 = 2.0f - m_gain0;
+}
+
+int CustomVehicleControllerComponentEngine::dTracksSkidDifferential::GetAxelCount () const
+{
+	dAssert (0);
+	return 1;
+}
+
+int CustomVehicleControllerComponentEngine::dTracksSkidDifferential::GetGainArray (dFloat * const gains) const
+{
+	gains[0] = m_gain0;
+	gains[1] = m_gain1;
+	return 2;
+}
+
+int CustomVehicleControllerComponentEngine::dTracksSkidDifferential::GetTireArray(CustomVehicleControllerBodyStateTire** const array) const
+{
+	array[0] = m_tire0;
+	array[1] = m_tire1;
+	return 2;
+}
+
+int CustomVehicleControllerComponentEngine::dTracksSkidDifferential::GetDifferentialJoints (dComplemtaritySolver::dBilateralJoint** const buffer)
+{
+	return 0;
 }
 
 

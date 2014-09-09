@@ -138,8 +138,8 @@ static VehicleParameters m1a1Param =
 	1.5f,		// GEAR_3
 	2.9f,		// REVERSE_GEAR
 	1.2f,		// SUSPENSION_LENGTH
-	250.0f,		// SUSPENSION_SPRING
-	15.0f,		// SUSPENSION_DAMPER
+	350.0f,		// SUSPENSION_SPRING
+	20.0f,		// SUSPENSION_DAMPER
 	20.0f,		// LATERAL_STIFFNESS
 	10000.0f,	// LONGITUDINAL_STIFFNESS
 	1.5f,		// ALIGNING_MOMENT_TRAIL
@@ -423,15 +423,14 @@ class HeavyVehicleEntity: public DemoEntity
 
 
 		// add an engine
-		// first make the gear Box
-		
-
-		CustomVehicleControllerComponentEngine::dSingleAxelDifferential* axles[4];
+		// make the differential
+		CustomVehicleControllerComponentEngine::dSingleAxelDifferential* axels[4];
 		for (int i = 0; i < 4; i ++) {
-			axles[i] = new CustomVehicleControllerComponentEngine::dSingleAxelDifferential (m_controller, leftTire[i], rightTire[i]);
+			axels[i] = new CustomVehicleControllerComponentEngine::dSingleAxelDifferential (m_controller, leftTire[i], rightTire[i]);
 		}
-		CustomVehicleControllerComponentEngine::dMultiAxelDifferential* const differencial = new CustomVehicleControllerComponentEngine::dMultiAxelDifferential (m_controller, 4, axles);
+		CustomVehicleControllerComponentEngine::dMultiAxelDifferential* const differencial = new CustomVehicleControllerComponentEngine::dMultiAxelDifferential (m_controller, 4, axels);
 
+		// make the gear Box
 		dFloat fowardSpeedGearsBoxRatios[] = {parameters.GEAR_1, parameters.GEAR_1, parameters.GEAR_3};
 		CustomVehicleControllerComponentEngine::dGearBox* const gearBox = new CustomVehicleControllerComponentEngine::dGearBox(m_controller, parameters.REVERSE_GEAR, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios); 
 		CustomVehicleControllerComponentEngine* const engine = new CustomVehicleControllerComponentEngine (m_controller, gearBox, differencial);
@@ -497,15 +496,15 @@ class HeavyVehicleEntity: public DemoEntity
 		}
 		m_controller->SetBrakes(brakes);
 
-
 		// add an engine
-		// first make the gear Box
-		CustomVehicleControllerComponentEngine::dSingleAxelDifferential* axles[2];
+		// make the differential
+		CustomVehicleControllerComponentEngine::dSingleAxelDifferential* axels[2];
 		for (int i = 0; i < 2; i ++) {
-			axles[i] = new CustomVehicleControllerComponentEngine::dSingleAxelDifferential (m_controller, leftTire[i], rightTire[i]);
+			axels[i] = new CustomVehicleControllerComponentEngine::dSingleAxelDifferential (m_controller, leftTire[i], rightTire[i]);
 		}
-		CustomVehicleControllerComponentEngine::dMultiAxelDifferential* const differencial = new CustomVehicleControllerComponentEngine::dMultiAxelDifferential (m_controller, 2, axles);
+		CustomVehicleControllerComponentEngine::dMultiAxelDifferential* const differencial = new CustomVehicleControllerComponentEngine::dMultiAxelDifferential (m_controller, 2, axels);
 
+		// make the gear Box
 		dFloat fowardSpeedGearsBoxRatios[] = {parameters.GEAR_1, parameters.GEAR_1, parameters.GEAR_3};
 		CustomVehicleControllerComponentEngine::dGearBox* const gearBox = new CustomVehicleControllerComponentEngine::dGearBox(m_controller, parameters.REVERSE_GEAR, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios); 
 		CustomVehicleControllerComponentEngine* const engine = new CustomVehicleControllerComponentEngine (m_controller, gearBox, differencial);
@@ -541,7 +540,7 @@ class HeavyVehicleEntity: public DemoEntity
 		// Muscle cars have the front engine, we need to shift the center of mass to the front to represent that
 		m_controller->SetCenterOfGravity (dVector (0.0f, parameters.COM_Y_OFFSET, 0.0f, 0.0f)); 
 
-		// add al the tank tires
+		// add all the tank tires
 		dVector offset (0.0f, 0.15f, 0.0f, 0.0f);
 		CustomVehicleControllerBodyStateTire* leftTire[8]; 
 		CustomVehicleControllerBodyStateTire* rightTire[8]; 
@@ -559,30 +558,25 @@ class HeavyVehicleEntity: public DemoEntity
 
 		m_controller->LinksTiresKinematically (8, leftTire);
 		m_controller->LinksTiresKinematically (8, rightTire);
+
+		// add vehicle brakes
+		CustomVehicleControllerComponentBrake* const brakes = new CustomVehicleControllerComponentBrake (m_controller, parameters.BRAKE_TORQUE);
+		brakes->AddBrakeTire (leftTire[0]);
+		brakes->AddBrakeTire (rightTire[0]);
+		m_controller->SetBrakes(brakes);
+
 /*
 		// add an steering Wheel
 		CustomVehicleControllerComponentSteering* const steering = new CustomVehicleControllerComponentSteering (m_controller, parameters.STEER_ANGLE * 3.141592f / 180.0f);
 		steering->AddSteeringTire (leftTire[0], -1.0f);
 		steering->AddSteeringTire (rightTire[0], -1.0f);
 		m_controller->SetSteering(steering);
-
-		// add vehicle brakes
-		CustomVehicleControllerComponentBrake* const brakes = new CustomVehicleControllerComponentBrake (m_controller, parameters.BRAKE_TORQUE);
-		for (int i = 0; i < 2; i ++) {
-			brakes->AddBrakeTire (leftTire[i]);
-			brakes->AddBrakeTire (rightTire[i]);
-		}
-		m_controller->SetBrakes(brakes);
-
-
+*/
 		// add an engine
-		// first make the gear Box
-		CustomVehicleControllerComponentEngine::dSingleAxelDifferential* axles[2];
-		for (int i = 0; i < 2; i ++) {
-			axles[i] = new CustomVehicleControllerComponentEngine::dSingleAxelDifferential (m_controller, leftTire[i], rightTire[i]);
-		}
-		CustomVehicleControllerComponentEngine::dMultiAxelDifferential* const differencial = new CustomVehicleControllerComponentEngine::dMultiAxelDifferential (m_controller, 2, axles);
+		// make the differential
+		CustomVehicleControllerComponentEngine::dTracksSkidDifferential* const differencial = new CustomVehicleControllerComponentEngine::dTracksSkidDifferential (m_controller, leftTire[0], rightTire[0]);
 
+		// make the gear Box
 		dFloat fowardSpeedGearsBoxRatios[] = {parameters.GEAR_1, parameters.GEAR_1, parameters.GEAR_3};
 		CustomVehicleControllerComponentEngine::dGearBox* const gearBox = new CustomVehicleControllerComponentEngine::dGearBox(m_controller, parameters.REVERSE_GEAR, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios); 
 		CustomVehicleControllerComponentEngine* const engine = new CustomVehicleControllerComponentEngine (m_controller, gearBox, differencial);
@@ -607,7 +601,7 @@ class HeavyVehicleEntity: public DemoEntity
 
 		dFloat vehicleTopSpeedKPH = parameters.TIRE_TOP_SPEED_KMH;
 		engine->InitEngineTorqueCurve (vehicleTopSpeedKPH, viperIdleTorquePoundPerFoot, viperIdleRPM, viperPeakTorquePoundPerFoot, viperPeakTorqueRPM, viperPeakHorsePower, viperPeakHorsePowerRPM, viperRedLineTorquePoundPerFoot, viperRedLineRPM);
-*/
+
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
 	}
