@@ -78,6 +78,35 @@ void CustomVehicleControllerComponentSteering::Update (dFloat timestep)
 	}
 }
 
+CustomVehicleControllerComponentTrackSkidSteering::CustomVehicleControllerComponentTrackSkidSteering (CustomVehicleController* const controller, dFloat steeringRPM, dFloat teeringTorque)
+	:CustomVehicleControllerComponentSteering (controller, 0.0f)
+	,m_steeringRPM (dAbs(steeringRPM))
+	,m_steeringTorque (dAbs(teeringTorque))
+{
+	m_differencialTurnRate = m_steeringTorque / (m_steeringRPM * m_steeringRPM);
+}
+
+void CustomVehicleControllerComponentTrackSkidSteering::Update (dFloat timestep)
+{
+	// get the vehicle body state and the angular velocity along its up vector
+	const CustomVehicleControllerBodyStateChassis& state = m_controller->m_chassisState;
+	dFloat omega = state.m_omega % state.m_matrix[1]; 
+
+	dFloat omegaSign = dSign(omega);
+	dFloat torque = -m_steeringTorque * m_param - omega * omega * omegaSign * m_differencialTurnRate;
+
+//	dTrace (("%f %f\n", torque, omega));
+	for (dList<dTireSignPair>::dListNode* node = m_steeringTires.GetFirst(); node; node = node->GetNext()) {
+		dTireSignPair& pair = node->GetInfo();
+		CustomVehicleControllerBodyStateTire& tire = pair.m_tireNode->GetInfo();
+
+		const dMatrix& tireMatrix = tire.GetMatrix();
+		const dMatrix& tireLocalMatrix = tire.GetLocalMatrix();
+		dFloat torqueSign = -dSign (tireLocalMatrix[0] % tireLocalMatrix[3]);
+		tire.SetTorque (tire.GetTorque () + tireMatrix[0].Scale (torque * torqueSign));
+	}
+}
+
 
 CustomVehicleControllerComponentBrake::CustomVehicleControllerComponentBrake (CustomVehicleController* const controller, dFloat maxBrakeTorque)
 	:CustomVehicleControllerComponent (controller)

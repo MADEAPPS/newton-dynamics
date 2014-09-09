@@ -108,6 +108,7 @@ class CustomVehicleControllerBodyStateChassis: public CustomVehicleControllerBod
 	friend class CustomVehicleControllerComponentBrake;
 	friend class CustomVehicleControllerComponentEngine;
 	friend class CustomVehicleControllerComponentSteering;
+	friend class CustomVehicleControllerComponentTrackSkidSteering;
 };
 
 
@@ -165,7 +166,6 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 	dVector m_longitudinalForce;
 	CustomVehicleControllerTireJoint m_chassisJoint;
 	CustomVehicleControllerTireContactJoint m_contactJoint[2];
-//	CustomVehicleControllerBodyStateContact m_contactBody[2];
 	int m_contactCount;
 
 	dFloat m_radio;
@@ -185,11 +185,8 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 	dFloat m_maxAngularVelocity;
 	dFloat m_aligningMomentTrail;
 	dFloat m_longitudialStiffness;
-
-	
 	void* m_userData;
 	NewtonCollision* m_shape;
-
 
 	friend class CustomVehicleController;
 	friend class CustomVehicleControllerTireJoint;

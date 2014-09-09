@@ -114,6 +114,7 @@ class CustomVehicleController: public CustomControllerBase
 	friend class CustomVehicleControllerComponentBrake;
 	friend class CustomVehicleControllerComponentEngine;
 	friend class CustomVehicleControllerComponentSteering;
+	friend class CustomVehicleControllerComponentTrackSkidSteering;
 };
 
 

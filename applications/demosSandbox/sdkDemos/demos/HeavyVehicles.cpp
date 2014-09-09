@@ -122,7 +122,7 @@ static VehicleParameters m1a1Param =
 	5000.0f,	// MASS
 	100.0f,		// TIRE_MASS
 	25.0f,		// STEER_ANGLE
-	10000.0f,	// BRAKE_TORQUE
+	20000.0f,	// BRAKE_TORQUE
 	-0.6f,		// COM_Y_OFFSET
 	60.0f,		// TIRE_TOP_SPEED_KMH
 	1000.0f,	// IDLE_TORQUE
@@ -140,7 +140,7 @@ static VehicleParameters m1a1Param =
 	1.2f,		// SUSPENSION_LENGTH
 	350.0f,		// SUSPENSION_SPRING
 	20.0f,		// SUSPENSION_DAMPER
-	20.0f,		// LATERAL_STIFFNESS
+	60.0f,		// LATERAL_STIFFNESS
 	10000.0f,	// LONGITUDINAL_STIFFNESS
 	1.5f,		// ALIGNING_MOMENT_TRAIL
 	dRollMatrix(3.141592f * 90.0f / 180.0f)
@@ -405,7 +405,7 @@ class HeavyVehicleEntity: public DemoEntity
 		rightTire[2] = AddTire ("rtire_2", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
 		rightTire[3] = AddTire ("rtire_3", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
 
-		// add an steering Wheel
+		// add a steering Wheel
 		CustomVehicleControllerComponentSteering* const steering = new CustomVehicleControllerComponentSteering (m_controller, parameters.STEER_ANGLE * 3.141592f / 180.0f);
 		for (int i = 0; i < 2; i ++) {
 			steering->AddSteeringTire (leftTire[i], -1.0f);
@@ -482,7 +482,7 @@ class HeavyVehicleEntity: public DemoEntity
 		rightTire[0] = AddTire ("fr_tire", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
 		rightTire[1] = AddTire ("rr_tire", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
 
-		// add an steering Wheel
+		// add a steering Wheel
 		CustomVehicleControllerComponentSteering* const steering = new CustomVehicleControllerComponentSteering (m_controller, parameters.STEER_ANGLE * 3.141592f / 180.0f);
 		steering->AddSteeringTire (leftTire[0], -1.0f);
 		steering->AddSteeringTire (rightTire[0], -1.0f);
@@ -565,13 +565,12 @@ class HeavyVehicleEntity: public DemoEntity
 		brakes->AddBrakeTire (rightTire[0]);
 		m_controller->SetBrakes(brakes);
 
-/*
-		// add an steering Wheel
-		CustomVehicleControllerComponentSteering* const steering = new CustomVehicleControllerComponentSteering (m_controller, parameters.STEER_ANGLE * 3.141592f / 180.0f);
+		// add a tank skid steering engine
+		CustomVehicleControllerComponentTrackSkidSteering* const steering = new CustomVehicleControllerComponentTrackSkidSteering (m_controller, 1.0f, 40.0f * parameters.IDLE_TORQUE);
 		steering->AddSteeringTire (leftTire[0], -1.0f);
 		steering->AddSteeringTire (rightTire[0], -1.0f);
 		m_controller->SetSteering(steering);
-*/
+
 		// add an engine
 		// make the differential
 		CustomVehicleControllerComponentEngine::dTracksSkidDifferential* const differencial = new CustomVehicleControllerComponentEngine::dTracksSkidDifferential (m_controller, leftTire[0], rightTire[0]);
@@ -758,7 +757,11 @@ class HeavyVehicleEntity: public DemoEntity
 
 	void ApplyNPCControl ()
 	{
-//		dAssert (0);
+		// simple park NPC vehicle 
+		CustomVehicleControllerComponentBrake* const brakes = m_controller->GetBrakes();
+		if (brakes) {
+			brakes->SetParam (0.5f);
+		}
 	}
 	
 	void Debug () const 

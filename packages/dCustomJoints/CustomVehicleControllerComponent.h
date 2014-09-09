@@ -358,6 +358,18 @@ class CustomVehicleControllerComponentSteering: public CustomVehicleControllerCo
 	friend class CustomVehicleControllerBodyStateChassis;
 };
 
+class CustomVehicleControllerComponentTrackSkidSteering: public CustomVehicleControllerComponentSteering
+{
+	public:
+	CUSTOM_JOINTS_API CustomVehicleControllerComponentTrackSkidSteering (CustomVehicleController* const controller, dFloat steeringRPM, dFloat teeringTorque);
+
+	protected:
+	CUSTOM_JOINTS_API virtual void Update (dFloat timestep);
+
+	dFloat m_steeringRPM;
+	dFloat m_steeringTorque;
+	dFloat m_differencialTurnRate;
+};
 
 #endif 
 
