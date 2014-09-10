@@ -28,7 +28,7 @@
 #define DG_HIGHTFILD_DATA_ID 0x45AF5E07
 
 dgVector dgCollisionHeightField::m_yMask (0xffffffff, 0, 0xffffffff, 0);
-dgVector dgCollisionHeightField::m_padding (dgFloat32 (1.0e-3f), dgFloat32 (1.0e-3f), dgFloat32 (1.0e-3f), dgFloat32 (0.0f));
+dgVector dgCollisionHeightField::m_padding (dgFloat32 (0.25f), dgFloat32 (0.25f), dgFloat32 (0.25f), dgFloat32 (0.0f));
 
 dgInt32 dgCollisionHeightField::m_cellIndices[][4] =
 {
