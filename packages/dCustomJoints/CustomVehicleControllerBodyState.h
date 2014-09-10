@@ -88,6 +88,10 @@ class CustomVehicleControllerBodyStateChassis: public CustomVehicleControllerBod
 	CUSTOM_JOINTS_API void SetDryRollingFrictionTorque (dFloat torque);
 	CUSTOM_JOINTS_API dFloat GetDryRollingFrictionTorque () const;
 
+	void PutToSleep(); 
+	bool IsSleeping () const;
+	
+
 	private:
 	CUSTOM_JOINTS_API void Init (CustomVehicleController* const controller, const dMatrix& localframe);
 	CUSTOM_JOINTS_API void UpdateDynamicInputs();

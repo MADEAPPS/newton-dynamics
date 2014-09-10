@@ -45,6 +45,8 @@
 #include <CustomVehicleControllerComponent.h>
 #include <CustomVehicleControllerBodyState.h>
 
+
+#define VEHICLE_SLEEP_COUNTER										16
 #define VEHICLE_CONTROLLER_MAX_BODIES								32
 #define VEHICLE_CONTROLLER_MAX_JOINTS								64
 #define VEHICLE_CONTROLLER_MAX_JACOBIANS_PAIRS						(VEHICLE_CONTROLLER_MAX_JOINTS * 4)
@@ -66,81 +68,63 @@ class CustomVehicleController::dTireForceSolverSolver: public dComplemtaritySolv
 		dFloat timestepInv = 1.0f / timestep;
 		m_controller->m_chassisState.UpdateDynamicInputs();
 
-		NewtonBody* const body = controller->GetBody();
-		CustomControllerConvexCastPreFilter castFilter (body);
-		for (dTireList::dListNode* node = m_controller->m_tireList.GetFirst(); node; node = node->GetNext()) {
-			CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
-			tire->Collide(castFilter, timestepInv, threadId);
-			tire->UpdateDynamicInputs(timestep);
-
-//tire->SetVeloc(dVector (0.0f, 0.0f, 0.0f, 0.0f));
-//dMatrix matrix (tire->GetMatrix());
-//tire->SetOmega(matrix[0].Scale (5.0f));
-//tire->SetForce(dVector (0.0f, 0.0f, 0.0f, 0.0f));
-//tire->SetTorque(dVector (0.0f, 0.0f, 0.0f, 0.0f));
+		m_controller->m_sleepCounter --;
+		bool isSleeping = m_controller->IsSleeping();
+		if (isSleeping) {
+			if (m_controller->m_sleepCounter > 0) {
+				isSleeping = false;
+			}
+		} else {
+			m_controller->m_sleepCounter = VEHICLE_SLEEP_COUNTER;
 		}
 
-/*
-static int xxx;
-xxx ++;
-if (xxx == 29)
-xxx *=1;
-if (xxx > 500) 
-{
-dMatrix matrix (controller->m_chassisState.GetMatrix());
-dMatrix matrix1 (controller->m_chassisState.GetMatrix());
-//controller->m_chassisState.SetVeloc(matrix[0].Scale (-5.0f));
-//controller->m_chassisState.SetOmega(dVector (0.0f, 0.0f, 0.0f, 0.0f));
-//controller->m_chassisState.SetForce(dVector (0.0f, 0.0f, 0.0f, 0.0f));
-//controller->m_chassisState.SetTorque(dVector (0.0f, 0.0f, 0.0f, 0.0f));
-}
-*/
+		if (isSleeping) {
+			m_controller->m_chassisState.PutToSleep();
 
-		// update all components
-		if (m_controller->m_engine) {
-			m_controller->m_engine->Update(timestep);
-		}
+		} else {
+			NewtonBody* const body = controller->GetBody();
+			CustomControllerConvexCastPreFilter castFilter (body);
+			for (dTireList::dListNode* node = m_controller->m_tireList.GetFirst(); node; node = node->GetNext()) {
+				CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
+				tire->Collide(castFilter, timestepInv, threadId);
+				tire->UpdateDynamicInputs(timestep);
+			}
 
-		if (m_controller->m_steering) {
-			m_controller->m_steering->Update(timestep);
-		}
+			// update all components
+			if (m_controller->m_engine) {
+				m_controller->m_engine->Update(timestep);
+			}
 
-		if (m_controller->m_handBrakes) {
-			m_controller->m_handBrakes->Update(timestep);
-		}
+			if (m_controller->m_steering) {
+				m_controller->m_steering->Update(timestep);
+			}
 
-		if (m_controller->m_brakes) {
-			m_controller->m_brakes->Update(timestep);
-		}
+			if (m_controller->m_handBrakes) {
+				m_controller->m_handBrakes->Update(timestep);
+			}
 
-		// Get the number of active joints for this integration step
-		int bodyCount = 0;
-		for (dList<CustomVehicleControllerBodyState*>::dListNode* stateNode = m_controller->m_stateList.GetFirst(); stateNode; stateNode = stateNode->GetNext()) {
-			m_bodyArray[bodyCount] = stateNode->GetInfo();
-			dAssert (bodyCount < int (sizeof (m_bodyArray) / sizeof(m_bodyArray[0])));
-			bodyCount ++;
-		}
+			if (m_controller->m_brakes) {
+				m_controller->m_brakes->Update(timestep);
+			}
 
-/*
-		for (dTireList::dListNode* node = controller->m_tireList.GetFirst();  node; node = node->GetNext()) {
-			CustomVehicleControllerBodyStateTire& tire = node->GetInfo();
-			for (int i = 0; i < tire.m_contactCount; i ++) {
-				m_bodyArray[bodyCount] = &tire.m_contactBody[i];
+			// Get the number of active joints for this integration step
+			int bodyCount = 0;
+			for (dList<CustomVehicleControllerBodyState*>::dListNode* stateNode = m_controller->m_stateList.GetFirst(); stateNode; stateNode = stateNode->GetNext()) {
+				m_bodyArray[bodyCount] = stateNode->GetInfo();
 				dAssert (bodyCount < int (sizeof (m_bodyArray) / sizeof(m_bodyArray[0])));
 				bodyCount ++;
 			}
-		}
-*/
 
-		for (int i = 0; i < m_controller->m_externalContactStatesCount; i ++) {
-			m_bodyArray[bodyCount] = m_controller->m_externalContactStates[i];
-			dAssert (bodyCount < int (sizeof (m_bodyArray) / sizeof(m_bodyArray[0])));
-			bodyCount ++;
-		}
+			for (int i = 0; i < m_controller->m_externalContactStatesCount; i ++) {
+				m_bodyArray[bodyCount] = m_controller->m_externalContactStates[i];
+				dAssert (bodyCount < int (sizeof (m_bodyArray) / sizeof(m_bodyArray[0])));
+				bodyCount ++;
+			}
 
-		int jointCount = GetActiveJoints();
-		BuildJacobianMatrix (jointCount, m_jointArray, timestep, m_jacobianPairArray, m_jacobianColumn, sizeof (m_jacobianPairArray)/ sizeof (m_jacobianPairArray[0]));
-		CalculateReactionsForces (bodyCount, m_bodyArray, jointCount, m_jointArray, timestep, m_jacobianPairArray, m_jacobianColumn);
+			int jointCount = GetActiveJoints();
+			BuildJacobianMatrix (jointCount, m_jointArray, timestep, m_jacobianPairArray, m_jacobianColumn, sizeof (m_jacobianPairArray)/ sizeof (m_jacobianPairArray[0]));
+			CalculateReactionsForces (bodyCount, m_bodyArray, jointCount, m_jointArray, timestep, m_jacobianPairArray, m_jacobianColumn);
+		}
 	}
 
 	~dTireForceSolverSolver()
@@ -261,6 +245,7 @@ void CustomVehicleController::Init (NewtonCollision* const chassisShape, const d
 {
 	m_finalized = false;
 	m_externalContactStatesCount = 0;
+	m_sleepCounter = VEHICLE_SLEEP_COUNTER;
 	m_freeContactList = m_externalContactStatesPoll.GetFirst();
 	CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*) GetManager(); 
 	NewtonWorld* const world = manager->GetWorld(); 
@@ -514,6 +499,7 @@ void CustomVehicleController::Finalize()
 		index ++;
 	}
 
+	m_sleepCounter = VEHICLE_SLEEP_COUNTER;
 	m_finalized = true;
 }
 
@@ -538,6 +524,21 @@ CustomVehicleControllerBodyStateContact* CustomVehicleController::GetContactBody
 	dAssert (m_externalContactStatesCount < int (sizeof (m_externalContactStates) / sizeof (m_externalContactStates[0])));
 
 	return externalBody;
+}
+
+
+bool CustomVehicleController::IsSleeping()
+{
+	bool inputChanged = (m_engine && m_engine->ParamChanged()) || (m_steering && m_steering->ParamChanged()) || (m_brakes && m_brakes->ParamChanged()) || (m_handBrakes && m_handBrakes->ParamChanged()); 
+	if (inputChanged) {
+		return false;
+	}
+
+	if (!m_chassisState.IsSleeping()) {
+		return false;
+	}
+
+	return true;
 }
 
 void CustomVehicleController::PreUpdate (dFloat timestep, int threadIndex)

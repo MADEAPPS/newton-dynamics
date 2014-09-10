@@ -304,7 +304,49 @@ void CustomVehicleControllerBodyStateChassis::UpdateDynamicInputs()
 
 	m_globalCentreOfMass = m_matrix.TransformVector(m_localFrame.m_posit);
 	UpdateInertia();
+}
 
+void CustomVehicleControllerBodyStateChassis::PutToSleep()
+{
+	NewtonBody* const body = m_controller->GetBody();
+
+//	dVector force;
+//	dVector torque;
+//	NewtonBodyGetForceAcc (body, &force[0]);
+//	NewtonBodyGetTorqueAcc (body, &torque[0]);
+//	NewtonBodySetForce (body, &force[0]);
+//	NewtonBodySetTorque(body, &torque[0]);
+
+	dVector zero (0.0f, 0.0f, 0.0f, 0.0f); 
+	NewtonBodySetForce (body, &zero[0]);
+	NewtonBodySetTorque(body, &zero[0]);
+	NewtonBodySetOmega(body, &zero[0]);
+	NewtonBodySetVelocity(body, &zero[0]);
+}
+
+bool CustomVehicleControllerBodyStateChassis::IsSleeping () const
+{
+	const dFloat velocError = 1.0e-4f;
+	dFloat mag2 = m_veloc % m_veloc;
+	if (mag2 < velocError) {
+		mag2 = m_omega % m_omega;
+		if (mag2 < velocError) {
+			const dFloat accelError = 1.0e-2f;
+			NewtonBody* const body = m_controller->GetBody();
+			dVector force;
+			NewtonBodyGetForce (body, &force[0]);
+			dVector accel (force.Scale(m_invMass));
+			mag2 = accel % accel;
+			if (mag2 < accelError) {
+				dVector torque;
+				NewtonBodyGetTorque(body, &torque[0]);
+				dVector alpha (m_invInertia.RotateVector(torque));
+				mag2 = alpha % alpha;
+				return (mag2 < accelError) ? true : false;
+			}
+		}
+	}
+	return false;
 }
 
 void CustomVehicleControllerBodyStateChassis::ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega)
@@ -487,6 +529,18 @@ int xxx3 = NewtonWorldConvexCast (world, &xxxx0[0][0], &xxxx1[0], xxx, &hitParam
 			index += count;
 		}
 	}
+
+	// project contact to the surface of the tire shape
+	for (int i = 0; i < m_contactCount; i ++) {
+		CustomVehicleControllerTireContactJoint& contact = m_contactJoint[i];
+		for (int j = 0; j < contact.m_contactCount; j ++) {
+			dVector radius (contact.m_contacts[j].m_point - m_matrix[3]);
+			radius -= m_matrix[0].Scale (m_matrix[0] % radius);
+			dAssert ((radius % radius) > 0.0f);
+			radius = radius.Scale (m_radio / dSqrt (radius % radius));
+			contact.m_contacts[j].m_point = m_matrix[3] + radius;
+		}
+	}
 }
 
 
@@ -510,18 +564,6 @@ void CustomVehicleControllerBodyStateTire::UpdateDynamicInputs(dFloat timestep)
 	m_tireLoad = dVector(0.0f, 0.0f, 0.0f, 0.0f);
 	m_lateralForce = dVector(0.0f, 0.0f, 0.0f, 0.0f);
 	m_longitudinalForce = dVector(0.0f, 0.0f, 0.0f, 0.0f);
-
-	// project contact to the surface of the tire shape
-	for (int i = 0; i < m_contactCount; i ++) {
-		CustomVehicleControllerTireContactJoint& contact = m_contactJoint[i];
-		for (int j = 0; j < contact.m_contactCount; j ++) {
-			dVector radius (contact.m_contacts[j].m_point - m_matrix[3]);
-			radius -= m_matrix[0].Scale (m_matrix[0] % radius);
-			dAssert ((radius % radius) > 0.0f);
-			radius = radius.Scale (m_radio / dSqrt (radius % radius));
-			contact.m_contacts[j].m_point = m_matrix[3] + radius;
-		}
-	}
 
 	// calculate force an torque generate by the suspension
 	if (m_contactCount) {

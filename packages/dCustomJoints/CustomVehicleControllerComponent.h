@@ -58,6 +58,7 @@ class CustomVehicleControllerComponent: public CustomAlloc
 
 	void SetParam(dFloat param)
 	{
+		m_paramMemory = m_param;
 		m_param = param;
 	}
 
@@ -70,6 +71,8 @@ class CustomVehicleControllerComponent: public CustomAlloc
 	CustomVehicleControllerComponent (CustomVehicleController* const controller)
 		:m_controller(controller)
 		,m_param(0.0f)
+		,m_paramMemory(0.0f)
+		,m_timer(60)
 	{
 	}
 
@@ -77,10 +80,23 @@ class CustomVehicleControllerComponent: public CustomAlloc
 	{
 	}
 
-	CUSTOM_JOINTS_API virtual void Update (dFloat timestep) = 0;
+	bool ParamChanged()
+	{
+		m_timer --;
+		if (dAbs (m_paramMemory - m_param) > 1.e-3f) {
+			m_timer = 60;
+		}
+		return m_timer > 0;
+	}
+
+	virtual void Update (dFloat timestep) = 0;
 
 	CustomVehicleController* m_controller; 
 	dFloat m_param;
+	dFloat m_paramMemory;
+	int m_timer;
+
+	friend class CustomVehicleController;
 };
 
 class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComponent
@@ -178,7 +194,6 @@ class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComp
 		CustomVehicleControllerBodyStateTire* m_tire1;
 	};
 
-
 	class dGearBox: public CustomAlloc
 	{
 		public:
@@ -261,7 +276,6 @@ class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComp
 		
 		bool m_automatic;
 	};
-
 
 	CUSTOM_JOINTS_API CustomVehicleControllerComponentEngine (CustomVehicleController* const controller, dGearBox* const gearBox, dDifferential* const differencial);
 	CUSTOM_JOINTS_API ~CustomVehicleControllerComponentEngine();

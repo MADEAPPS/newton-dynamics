@@ -72,16 +72,14 @@ class CustomVehicleController: public CustomControllerBase
 	CUSTOM_JOINTS_API void SetSteering(CustomVehicleControllerComponentSteering* const steering);
 
 	CUSTOM_JOINTS_API void LinksTiresKinematically (int count, CustomVehicleControllerBodyStateTire** const tires);
-
 	CUSTOM_JOINTS_API void Finalize();
-
 
 	protected:
 	CUSTOM_JOINTS_API void Cleanup();
 	CUSTOM_JOINTS_API CustomVehicleControllerBodyStateContact* GetContactBody (const NewtonBody* const body);
 	CUSTOM_JOINTS_API void Init (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, const dVector& gravityVector);
 	
-
+	CUSTOM_JOINTS_API bool IsSleeping();
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 
@@ -99,6 +97,7 @@ class CustomVehicleController: public CustomControllerBase
 	CustomVehicleControllerComponentBrake* m_handBrakes;
 	CustomVehicleControllerComponentSteering* m_steering; 
 	CustomVehicleControllerBodyStateContact* m_externalContactStates[16];
+	int m_sleepCounter;
 	int m_externalContactStatesCount;
 	bool m_finalized;
 
