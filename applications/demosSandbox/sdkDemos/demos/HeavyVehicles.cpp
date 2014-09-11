@@ -903,7 +903,8 @@ class HeavyVehicleControllerManager: public CustomVehicleControllerManager
 			glDisable (GL_BLEND);
 		}
 
-dFloat knots[] = {1.0f/4.0f, 1.0f/2.0f, 3.0f/4.0f};
+/*
+dFloat knots[] = {0.0f, 1.0f/4.0f, 1.0f/2.0f, 3.0f/4.0f, 1.0f};
 dVector control[] = 
 {
 	dVector (0.0f, 0.0f, 0.0f, 1.0f),
@@ -914,18 +915,100 @@ dVector control[] =
 	dVector (180.0f, -100.0f, 0.0f, 1.0f),
 	dVector (100.0f, -50.0f, 0.0f, 1.0f),
 };
-dBezierSpline spline (3, 3, knots, control);
+dBezierSpline spline (3, sizeof (knots) / sizeof (knots[0]), knots, control);
 
 glColor3f(1.0f, 1.0f, 1.0f);
 glBegin(GL_LINES);
 dVector p0 (spline.CurvePoint(0.0f)) ;
 for (int i = 1; i < 40; i ++) {
 	dVector p1 (spline.CurvePoint(float (i) / 40.0f)) ;
-	glVertex3f (p0.m_x + 100, p0.m_y + 100, p0.m_z);
-	glVertex3f (p1.m_x + 100, p1.m_y + 100, p1.m_z);
+	glVertex3f (p0.m_x + 500, p0.m_y + 500, p0.m_z);
+	glVertex3f (p1.m_x + 500, p1.m_y + 500, p1.m_z);
 	p0 = p1;
 }
 glEnd();
+*/
+
+
+glDisable (GL_LIGHTING);
+glDisable(GL_TEXTURE_2D);
+
+dFloat knots[] = {0.0f, 1.0f};
+dVector control[] = 
+{
+	dVector (200.0f, 200.0f, 0.0f, 1.0f),
+	dVector (250.0f, 250.0f, 0.0f, 1.0f),
+	dVector (300.0f, 250.0f, 0.0f, 1.0f),
+	dVector (350.0f, 200.0f, 0.0f, 1.0f),
+};
+dBezierSpline spline (3, sizeof (knots) / sizeof (knots[0]), knots, control);
+
+glColor3f(1.0f, 1.0f, 1.0f);
+glBegin(GL_LINES);
+dVector p0 (spline.CurvePoint(0.0f)) ;
+for (int i = 1; i < 40; i ++) {
+	dVector p1 (spline.CurvePoint(float (i) / 40.0f)) ;
+	glVertex3f (p0.m_x, p0.m_y, p0.m_z);
+	glVertex3f (p1.m_x, p1.m_y, p1.m_z);
+	p0 = p1;
+}
+glEnd();
+
+
+dVector points[4];
+points[0] = spline.CurvePoint(0.0f) + dVector (100.0f, 0.0f, 0.0f, 0.0f);
+points[1] = spline.CurvePoint(1.0f) + dVector (100.0f, 0.0f, 0.0f, 0.0f);
+
+dVector derivP0 (spline.CurveDerivative(0.0f));
+dVector derivP1 (spline.CurveDerivative(1.0f));
+
+/*
+dVector points[] = 
+{
+	dVector (0.0f, 0.0f, 0.0f, 1.0f),
+	dVector ( 300.0f,  400.0f, 0.0f, 1.0f),
+	dVector (-100.0f,  400.0f, 0.0f, 1.0f),
+	dVector (-400.0f,   0.0f, 0.0f, 1.0f),
+	dVector (-400.0f, -300.0f, 0.0f, 1.0f),
+};
+dVector tang0 = dVector (20.0f,  0.0f, 0.0f, 1.0f);
+dVector tangn = dVector (00.0f, 30.0f, 0.0f, 1.0f);
+dBezierSpline spline;
+
+int n = sizeof (points) / sizeof (points[0]);
+spline.GlobalCubicInterpolation (n, points, tang0, tangn);
+
+glColor3f(1.0f, 1.0f, 1.0f);
+glBegin(GL_LINES);
+dVector p0 (spline.CurvePoint(0.0f)) ;
+for (int i = 1; i < 40; i ++) {
+	dVector p1 (spline.CurvePoint(float (i) / 40.0f)) ;
+	glVertex3f (p0.m_x + 500, p0.m_y + 500, p0.m_z);
+	glVertex3f (p1.m_x + 500, p1.m_y + 500, p1.m_z);
+	p0 = p1;
+}
+glEnd();
+*/
+
+/*
+glBegin(GL_LINES);
+glColor3f(0.0f, 0.0f, 1.0f);
+glVertex3f (points[0].m_x + 500, points[0].m_y + 500, points[0].m_z);
+glVertex3f (tang0.m_x + points[0].m_x + 500, tang0.m_y + points[0].m_y + 500, points[0].m_z);
+
+glVertex3f (points[n-1].m_x + 500, points[n-1].m_y + 500, points[n-1].m_z);
+glVertex3f (tangn.m_x + points[n-1].m_x + 500, tangn.m_y + points[n-1].m_y + 500, points[n-1].m_z);
+glEnd();
+
+
+glColor3f(1.0f, 0.0f, 0.0f);
+glPointSize(4.0f);
+glBegin(GL_POINTS);
+for (int i = 0; i < sizeof (points) / sizeof (points[0]); i ++) {
+	glVertex3f (points[i].m_x + 500, points[i].m_y + 500, points[i].m_z);
+}
+glEnd();
+*/
 
 	}
 
