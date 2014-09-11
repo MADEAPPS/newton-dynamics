@@ -703,6 +703,14 @@
 			RelativePath="..\..\dAnimation\dAnimationStdAfx.h"
 			>
 		</File>
+		<File
+			RelativePath="..\..\dAnimation\dBézierSpline.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dAnimation\dBézierSpline.h"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

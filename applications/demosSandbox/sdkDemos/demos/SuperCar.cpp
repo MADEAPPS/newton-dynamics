@@ -1154,7 +1154,7 @@ AddPrimitiveArray(scene, 100.0f, location.m_posit, size, 1, 1, 5.0f, _BOX_PRIMIT
 	scene->SetCameraMouseLock (true);
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
-	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
+//	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 //	location.m_posit.m_z += 4.0f;
 
 //	int count = 1;
@@ -1162,7 +1162,7 @@ AddPrimitiveArray(scene, 100.0f, location.m_posit, size, 1, 1, 5.0f, _BOX_PRIMIT
 //	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
 //	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 
-	size = dVector(1.0f, 0.5f, 1.0f, 0.0f);
+//	size = dVector(1.0f, 0.5f, 1.0f, 0.0f);
 //	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
