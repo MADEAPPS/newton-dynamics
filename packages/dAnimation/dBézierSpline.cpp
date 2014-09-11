@@ -35,7 +35,7 @@ dBezierSpline::dBezierSpline (int degree, int knotsCount, const dFloat* const kn
 
 	for (int i = 0; i < m_knotsCount; i ++) {
 		m_knotVector[i + m_degree + 1] = knotVector[i];
-		dAssert (m_knotVector[i + m_degree + 1] <= m_knotVector[i + m_degree]);
+		dAssert (m_knotVector[i + m_degree + 1] >= m_knotVector[i + m_degree]);
 	}
 }
 
@@ -60,10 +60,10 @@ int dBezierSpline::GetSpan(dFloat u) const
 	dAssert (u <= 1.0f);
 	while ((high - low) >= 4) {
 		int mid = (low + high) >> 1;
-		if (u >= m_knotVector[mid]) {
-			high = mid;
-		} else {
+		if (u > m_knotVector[mid]) {
 			low = mid;
+		} else {
+			high = mid;
 		}
 	}
 

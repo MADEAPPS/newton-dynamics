@@ -902,6 +902,31 @@ class HeavyVehicleControllerManager: public CustomVehicleControllerManager
 			// restore color and blend mode
 			glDisable (GL_BLEND);
 		}
+
+dFloat knots[] = {1.0f/4.0f, 1.0f/2.0f, 3.0f/4.0f};
+dVector control[] = 
+{
+	dVector (0.0f, 0.0f, 0.0f, 1.0f),
+	dVector (100.0f, 0.0f, 0.0f, 1.0f),
+	dVector (100.0f, 100.0f, 0.0f, 1.0f),
+	dVector (200.0f, 100.0f, 0.0f, 1.0f),
+	dVector (250.0f,   0.0f, 0.0f, 1.0f),
+	dVector (180.0f, -100.0f, 0.0f, 1.0f),
+	dVector (100.0f, -50.0f, 0.0f, 1.0f),
+};
+dBezierSpline spline (3, 3, knots, control);
+
+glColor3f(1.0f, 1.0f, 1.0f);
+glBegin(GL_LINES);
+dVector p0 (spline.CurvePoint(0.0f)) ;
+for (int i = 1; i < 40; i ++) {
+	dVector p1 (spline.CurvePoint(float (i) / 40.0f)) ;
+	glVertex3f (p0.m_x + 100, p0.m_y + 100, p0.m_z);
+	glVertex3f (p1.m_x + 100, p1.m_y + 100, p1.m_z);
+	p0 = p1;
+}
+glEnd();
+
 	}
 
 
