@@ -16,6 +16,8 @@
 #ifndef __HeightFieldPrimitive_H__
 #define __HeightFieldPrimitive_H__
 
+#define HEIGHTFIELD_DEFAULT_SIZE		7
+#define HEIGHTFIELD_DEFAULT_CELLSIZE	8.0f
 
 class DemoEntityManager;
 NewtonBody* CreateHeightFieldTerrain (DemoEntityManager* const scene, int sizeInPowerOfTwos, dFloat cellSize, dFloat elevationScale, dFloat roughness, dFloat maxElevation, dFloat minElevation);

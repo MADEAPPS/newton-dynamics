@@ -25,9 +25,7 @@ void HeightFieldCollision (DemoEntityManager* const scene)
 	// load the sky box
 	scene->CreateSkyBox();
 
-//	CreateHeightFieldTerrain (scene, 10, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
-	// in 32 build 2 gbyte is no enough memory to make a 1000000 vertex mesh, we will make a 256k vertex mesh 
-	CreateHeightFieldTerrain (scene, 9, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
+	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 1.5f, 0.2f, 200.0f, -50.0f);
 	
 
 	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
