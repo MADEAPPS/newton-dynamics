@@ -23,6 +23,16 @@ dInitRtti(DemoMesh);
 
 #define USING_DISPLAY_LIST
 
+
+
+#if defined(__APPLE__)
+// NOTE: displaylists are horribly slow on OSX
+// they cut the framerate in half
+#	if defined(USING_DISPLAY_LIST)
+#		undef USING_DISPLAY_LIST
+#	endif
+#endif
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -748,7 +758,6 @@ DemoSubMesh* DemoMesh::AddSubMesh()
 
 void DemoMesh::Render (DemoEntityManager* const scene)
 {
-//	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );	
     if (m_optimizedTransparentDiplayList) {
         scene->PushTransparentMesh (this); 
     }
@@ -776,10 +785,6 @@ void DemoMesh::Render (DemoEntityManager* const scene)
 
 void DemoMesh::RenderTransparency () const
 {
-//dMatrix xxxx;
-//glGetFloat (GL_MODELVIEW_MATRIX, &xxxx[0][0]);
-//glCallList(m_optimizedOpaqueDiplayList);
-
     if (m_optimizedTransparentDiplayList) {
         glCallList(m_optimizedTransparentDiplayList);
     } else {
