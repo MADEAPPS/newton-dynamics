@@ -903,7 +903,6 @@ class HeavyVehicleControllerManager: public CustomVehicleControllerManager
 			glDisable (GL_BLEND);
 		}
 
-return ;
 const int segments = 20;
 glDisable (GL_LIGHTING);
 glDisable(GL_TEXTURE_2D);
@@ -967,17 +966,18 @@ for (int i = 1; i <= segments; i ++) {
 }
 glEnd();
 
-glColor3f(1.0f, 0.0f, 0.0f);
+
 glPointSize(4.0f);
 glBegin(GL_POINTS);
-for (int i = 0; i < xxx; i ++) {
-	glVertex3f (points[i].m_x, points[i].m_y, points[i].m_z);
-}
-
 glColor3f(1.0f, 1.0f, 0.0f);
 for (int i = 0; i < spline.GetControlPointCount(); i ++) {
 	dVector p (spline1.GetControlPoint(i));
 	glVertex3f (p.m_x, p.m_y, p.m_z);
+}
+
+glColor3f(1.0f, 0.0f, 0.0f);
+for (int i = 0; i < xxx; i ++) {
+	glVertex3f (points[i].m_x, points[i].m_y, points[i].m_z);
 }
 glEnd();
 
