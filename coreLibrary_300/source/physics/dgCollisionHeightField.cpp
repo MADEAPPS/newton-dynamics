@@ -848,6 +848,9 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 	boxP0 += data->m_boxDistanceTravelInMeshSpace & (data->m_boxDistanceTravelInMeshSpace < dgVector (dgFloat32 (0.0f)));  
 	boxP1 += data->m_boxDistanceTravelInMeshSpace & (data->m_boxDistanceTravelInMeshSpace > dgVector (dgFloat32 (0.0f)));  
 
+	boxP0 = (boxP0.GetMax(dgVector (dgFloat32 (0.0f))) & m_yMask) + boxP0.AndNot(m_yMask);
+	boxP1 = (boxP1.GetMax(dgVector (dgFloat32 (0.0f))) & m_yMask) + boxP1.AndNot(m_yMask);
+
 	dgVector p0 (boxP0.Scale4(m_horizontalScaleInv).GetInt());
 	dgVector p1 (boxP1.Scale4(m_horizontalScaleInv).GetInt());
 

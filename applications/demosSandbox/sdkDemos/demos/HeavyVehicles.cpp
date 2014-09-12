@@ -1122,10 +1122,14 @@ location.m_posit.m_z = 50.0f;
 
 	// add a second Vehicle
 	location.m_posit.m_z += 4.0f;
+	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
+	location.m_posit.m_y += 2.0f;
 	HeavyVehicleEntity* const lightVehicle = new HeavyVehicleEntity (scene, manager, location, "buggy.ngd", lightTruck);
 	lightVehicle->BuildLightTruckVehicle (lightTruck);
 
 	location.m_posit.m_z -= 12.0f;
+	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
+	location.m_posit.m_y += 3.0f;
 	HeavyVehicleEntity* const m1a1Tank = new HeavyVehicleEntity (scene, manager, location, "m1a1.ngd", m1a1Param);
 	m1a1Tank->BuildTrackedVehicle (m1a1Param);
 
