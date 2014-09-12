@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		C54AD38E19C319CF00A6C98B /* BasicCar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C54AD38D19C319CF00A6C98B /* BasicCar.cpp */; };
+		C54AD3AD19C31C2E00A6C98B /* libdAnimation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C54AD3AC19C31C2500A6C98B /* libdAnimation.a */; };
 		C54C93AA19824CF700A280B3 /* libnewton.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C54C939319824CD400A280B3 /* libnewton.a */; };
 		FF084A3F173F188B0059C41D /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = FF084A3D173F188B0059C41D /* MainMenu.xib */; };
 		FF084A85173F1AD30059C41D /* DemoCameraListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFD27435172DA06D00114513 /* DemoCameraListener.cpp */; };
@@ -287,6 +288,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		C54AD3AB19C31C2500A6C98B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C54AD3A719C31C2500A6C98B /* dAnimation.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D2AAC06F0554671400DB518D;
+			remoteInfo = dAnimation;
+		};
 		C54C939219824CD400A280B3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = C54C938E19824CD400A280B3 /* newton.xcodeproj */;
@@ -457,6 +465,7 @@
 
 /* Begin PBXFileReference section */
 		C54AD38D19C319CF00A6C98B /* BasicCar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BasicCar.cpp; path = ../../../sdkDemos/demos/BasicCar.cpp; sourceTree = "<group>"; };
+		C54AD3A719C31C2500A6C98B /* dAnimation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = dAnimation.xcodeproj; path = ../../../../../packages/projects/mac/dAnimation/dAnimation.xcodeproj; sourceTree = "<group>"; };
 		C54C938E19824CD400A280B3 /* newton.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = newton.xcodeproj; path = "../../../../../coreLibrary_300/projects/mac/os10.8-xcode-4.0/newton.xcodeproj"; sourceTree = "<group>"; };
 		FF084A25173F188A0059C41D /* demosSandbox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = demosSandbox.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF084A30173F188A0059C41D /* demosSandbox-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "demosSandbox-Info.plist"; path = "demosSandbox/demosSandbox-Info.plist"; sourceTree = "<group>"; };
@@ -750,6 +759,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C54AD3AD19C31C2E00A6C98B /* libdAnimation.a in Frameworks */,
 				C54C93AA19824CF700A280B3 /* libnewton.a in Frameworks */,
 				FF8B5E1A1750F3E70076BE6C /* libfreeType.a in Frameworks */,
 				FF85000C1740605300BEE80B /* libdContainers.a in Frameworks */,
@@ -789,6 +799,14 @@
 			isa = PBXGroup;
 			children = (
 				FF084A25173F188A0059C41D /* demosSandbox.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C54AD3A819C31C2500A6C98B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C54AD3AC19C31C2500A6C98B /* libdAnimation.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1099,6 +1117,7 @@
 			isa = PBXGroup;
 			children = (
 				C54C938E19824CD400A280B3 /* newton.xcodeproj */,
+				C54AD3A719C31C2500A6C98B /* dAnimation.xcodeproj */,
 				FF8C2CE91313DC3700646B90 /* dMath.xcodeproj */,
 				FF8C2CFF1313DC7F00646B90 /* dScene.xcodeproj */,
 				FFD2A799172E126900114513 /* dCustomJoints.xcodeproj */,
@@ -1283,6 +1302,10 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
+					ProductGroup = C54AD3A819C31C2500A6C98B /* Products */;
+					ProjectRef = C54AD3A719C31C2500A6C98B /* dAnimation.xcodeproj */;
+				},
+				{
 					ProductGroup = FF85FFDF17405FDE00BEE80B /* Products */;
 					ProjectRef = FF8C2CF41313DC6A00646B90 /* dContainers.xcodeproj */;
 				},
@@ -1335,6 +1358,13 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		C54AD3AC19C31C2500A6C98B /* libdAnimation.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libdAnimation.a;
+			remoteRef = C54AD3AB19C31C2500A6C98B /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		C54C939319824CD400A280B3 /* libnewton.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
