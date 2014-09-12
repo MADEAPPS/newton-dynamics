@@ -907,7 +907,7 @@ const int segments = 20;
 glDisable (GL_LIGHTING);
 glDisable(GL_TEXTURE_2D);
 
-dFloat knots[] = {0.0f, 1.0f / 3.0f, 2.0f / 3.0f, 1.0f};
+dFloat knots[] = {0.0f, 1.0f / 4.0f, 2.0f / 4.0f, 3.0f / 4.0f, 1.0f};
 dVector control[] = 
 {
 	dVector (200.0f, 200.0f, 0.0f, 1.0f),
@@ -915,6 +915,7 @@ dVector control[] =
 	dVector (275.0f, 200.0f, 0.0f, 1.0f),
 	dVector (300.0f, 270.0f, 0.0f, 1.0f),
 	dVector (350.0f, 250.0f, 0.0f, 1.0f),
+	dVector (375.0f, 190.0f, 0.0f, 1.0f),
 	dVector (400.0f, 200.0f, 0.0f, 1.0f),
 };
 static dBezierSpline spline (3, sizeof (knots) / sizeof (knots[0]), knots, control);
@@ -940,12 +941,13 @@ for (int i = 0; i < spline.GetControlPointCount(); i ++) {
 glEnd();
 
 
-int xxx = 4;
-dVector points[4];
-points[0] = spline.CurvePoint(0.0f / 3.0f) + dVector (300.0f, 0.0f, 0.0f, 0.0f);
-points[1] = spline.CurvePoint(1.0f / 3.0f) + dVector (300.0f, 0.0f, 0.0f, 0.0f);
-points[2] = spline.CurvePoint(2.0f / 3.0f) + dVector (300.0f, 0.0f, 0.0f, 0.0f);
-points[3] = spline.CurvePoint(3.0f / 3.0f) + dVector (300.0f, 0.0f, 0.0f, 0.0f);
+int xxx = 5;
+dVector points[5];
+points[0] = spline.CurvePoint(0.0f / 4.0f) + dVector (300.0f, 0.0f, 0.0f, 0.0f);
+points[1] = spline.CurvePoint(1.0f / 4.0f) + dVector (300.0f, 0.0f, 0.0f, 0.0f);
+points[2] = spline.CurvePoint(2.0f / 4.0f) + dVector (300.0f, 0.0f, 0.0f, 0.0f);
+points[3] = spline.CurvePoint(3.0f / 4.0f) + dVector (300.0f, 0.0f, 0.0f, 0.0f);
+points[4] = spline.CurvePoint(4.0f / 4.0f) + dVector (300.0f, 0.0f, 0.0f, 0.0f);
 
 dVector derivP0 (spline.CurveDerivative(0.0f));
 dVector derivP1 (spline.CurveDerivative(1.0f));

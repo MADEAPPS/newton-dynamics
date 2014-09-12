@@ -276,8 +276,9 @@ void dBezierSpline::CreateCubicKnotVector(int count, const dVector* const points
 		m_knotVector[m_degree + i] = acc / 3.0f;
 	}
 
-//m_knotVector[4] = 1.0f/3.0f;
-//m_knotVector[5] = 2.0f/3.0f;
+//m_knotVector[4] = 1.0f/4.0f;
+//m_knotVector[5] = 2.0f/4.0f;
+//m_knotVector[6] = 3.0f/4.0f;
 }
 
 
@@ -303,41 +304,20 @@ void dBezierSpline::CreateCubicControlPoints(int count, const dVector* const poi
 		m_controlPoints[2]  = points[1] - m_controlPoints[1].Scale (abc[0]) - m_controlPoints[3].Scale (abc[2]);
 		m_controlPoints[2] = m_controlPoints[2].Scale (1.0f / abc[1]);
 	} else {
-/*
-		dVector r [D_BEZIER_LOCAL_BUFFER_SIZE];
-		dFloat dd [D_BEZIER_LOCAL_BUFFER_SIZE];
-		for (int i = 3; i < count; i ++) {
-			r[i] = points[i - 1];
-		}
-		BasicsFunctions (m_knotVector[m_degree + 1], m_degree + 1, abc);
-		dFloat den = abc[1];
-		m_controlPoints[2]  = (points[1] - m_controlPoints[1].Scale (abc[0])).Scale (1.0f / den);
-
-		for (int i = 3; i < count; i ++) {
-			dd[i] = abc[2] / den;
-			BasicsFunctions (m_knotVector[i + 2], i + 2, abc);
-			den = abc[1] - abc[0] * dd[i];
-			m_controlPoints[i]  = (r[i] - m_controlPoints[i-1].Scale (abc[0])).Scale (1.0f / den);
-		}
-
-		dd[count] = abc[2] / den;
-		BasicsFunctions (m_knotVector[count + 1], count + 1, abc);
-		den = abc[1] - abc[0] * dd[count];
-		//m_controlPoints[count] = (points[count - 1] - m_controlPoints[count + 1].Scale (abc[2]) - m_controlPoints[count - 1].Scale (abc[0])).Scale (1.0f / den);
-		m_controlPoints[count - 1] = (points[count - 2] - m_controlPoints[count].Scale (abc[2]) - m_controlPoints[count - 2].Scale (abc[0])).Scale (1.0f / den);
-		for (int i = count - 1; i >= 2; i --) {
-			m_controlPoints[i] -= m_controlPoints[i + 1].Scale (dd[i + 1]);
-		}
-*/
+		//dVector r [D_BEZIER_LOCAL_BUFFER_SIZE];
+		//dFloat dd [D_BEZIER_LOCAL_BUFFER_SIZE];
+		//for (int i = 3; i < count; i ++) {
+			//r[i] = points[i - 1];
+		//}
 		
 		dFloat dd [D_BEZIER_LOCAL_BUFFER_SIZE];
 		BasicsFunctions (m_knotVector[m_degree + 1], m_degree + 1, abc);
 		dFloat den = abc[1];
 		m_controlPoints[2]  = (points[1] - m_controlPoints[1].Scale (abc[0])).Scale (1.0f / den);
 		for (int i = 3; i < (count - 1); i ++) {
-			dd[i] = abc[2] / den;
+			dd[i + 1] = abc[2] / den;
 			BasicsFunctions (m_knotVector[i + 2], i + 2, abc);
-			den = abc[1] - abc[0] * dd[i];
+			den = abc[1] - abc[0] * dd[i + 1];
 			m_controlPoints[i]  = (points[i - 1] - m_controlPoints[i - 1].Scale (abc[0])).Scale (1.0f / den);
 		}
 
