@@ -1254,7 +1254,7 @@ NEWTON_API void NewtonWorldConvexRayCast (const NewtonWorld* const newtonWorld, 
 // to target position. the shape is global orientation and position is set to matrix and then is swept along the segment to target and it will stop at the very first intersession contact. 
 // 
 // Remarks: for case where the application need to cast solid short to medium rays, it is better to use this function instead of casting and array of parallel rays segments.  
-// examples of these are: implementation of ray cast cars with cylindrical tires, foot placement of character controllers, kinematic motion of objects, user controlled continue collision, etc.
+// examples of these are: implementation of ray cast cars with cylindrical tires, foot placement of character controllers, kinematic motion of objects, user controlled continuous collision, etc.
 // this function may not be as efficient as sampling ray for long segment, for these cases try using parallel ray cast.
 //
 // Remarks: The most common use for the ray cast function is the closest body hit, In this case it is important, for performance reasons, 
@@ -1449,31 +1449,31 @@ void NewtonMaterialSetDefaultCollidable(const NewtonWorld* const newtonWorld, in
 
 
 // Name: NewtonMaterialSetContinuousCollisionMode 
-// Set the material interaction between two physics materials to enable or disable continue collision.
-// continue collision is on by defaults.
+// Set the material interaction between two physics materials to enable or disable continuous collision.
+// continuous collision is on by defaults.
 //
 // Parameters:
 // *const NewtonWorld* *newtonWorld - is the pointer to the Newton world
 // *int* id0 - group id0
 // *int* id1 - group id1
-// *int* state - state for this material: 1 = continue collision on; 0 = continue collision off, default mode is on
+// *int* state - state for this material: 1 = continuous collision on; 0 = continuous collision off, default mode is on
 // 
 // Return: Nothing.
 //
-// Remarks: continue collision mode enable allow the engine to predict colliding contact on rigid bodies
+// Remarks: continuous collision mode enable allow the engine to predict colliding contact on rigid bodies
 // Moving at high speed of subject to strong forces.
 //
-// Remarks: continue collision mode does not prevent rigid bodies from inter penetration instead it prevent bodies from 
+// Remarks: continuous collision mode does not prevent rigid bodies from inter penetration instead it prevent bodies from 
 // passing trough each others by extrapolating contact points when the bodies normal contact calculation determine the bodies are not colliding. 
 //
 // Remarks: for performance reason the bodies angular velocities is only use on the broad face of the collision, 
 // but not on the contact calculation. 
 // 
-// Remarks: continue collision does not perform back tracking to determine time of contact, instead it extrapolate contact by incrementally 
+// Remarks: continuous collision does not perform back tracking to determine time of contact, instead it extrapolate contact by incrementally 
 // extruding the collision geometries of the two colliding bodies along the linear velocity of the bodies during the time step, 
 // if during the extrusion colliding contact are found, a collision is declared and the normal contact resolution is called. 
 //
-// Remarks: for continue collision to be active the continue collision mode must on the material pair of the colliding bodies as well as on at least one of the two colliding bodies.
+// Remarks: for continuous collision to be active the continuous collision mode must on the material pair of the colliding bodies as well as on at least one of the two colliding bodies.
 //
 // Remarks: Because there is penalty of about 40% to 80% depending of the shape complexity of the collision geometry, this feature is set 
 // off by default. It is the job of the application to determine what bodies need this feature on. Good guidelines are: very small objects, 
@@ -3844,7 +3844,7 @@ int NewtonCollisionCollide (const NewtonWorld* const newtonWorld, int maxSize,
 // Parameters:
 // *const NewtonWorld* *newtonWorld - is the pointer to the Newton world.
 // *int* maxSize - size of maximum number of elements in contacts, normals, and penetration.
-// *const dFloat* timestep - maximum time interval considered for the continue collision calculation. 
+// *const dFloat* timestep - maximum time interval considered for the continuous collision calculation. 
 // *const NewtonCollision* *collisionA -  pointer to collision primitive A.
 // *const dFloat* *matrixA - pointer to an array of 16 floats containing the offset matrix of collision primitiveA.
 // *const dFloat* *velocA - pointer to and array of a least 3 times maxSize floats containing the linear velocity of collision primitiveA.
@@ -5607,7 +5607,7 @@ int NewtonBodyGetMaterialGroupID(const NewtonBody* const bodyPtr)
 
 // Name: NewtonBodySetContinuousCollisionMode 
 // Set the continuous collision state mode for this rigid body.
-// continue collision flag is off by default in when bodies are created.
+// continuous collision flag is off by default in when bodies are created.
 //
 // Parameters:
 // *const NewtonBody* *bodyPtr - pointer to the body.
@@ -5615,20 +5615,20 @@ int NewtonBodyGetMaterialGroupID(const NewtonBody* const bodyPtr)
 //
 // Return: Nothing.
 //
-// Remarks: continue collision mode enable allow the engine to predict colliding contact on rigid bodies
+// Remarks: continuous collision mode enable allow the engine to predict colliding contact on rigid bodies
 // Moving at high speed of subject to strong forces.
 //
-// Remarks: continue collision mode does not prevent rigid bodies from inter penetration instead it prevent bodies from 
+// Remarks: continuous collision mode does not prevent rigid bodies from inter penetration instead it prevent bodies from 
 // passing trough each others by extrapolating contact points when the bodies normal contact calculation determine the bodies are not colliding. 
 //
 // Remarks: for performance reason the bodies angular velocities is only use on the broad face of the collision, 
 // but not on the contact calculation. 
 // 
-// Remarks: continue collision does not perform back tracking to determine time of contact, instead it extrapolate contact by incrementally 
+// Remarks: continuous collision does not perform back tracking to determine time of contact, instead it extrapolate contact by incrementally 
 // extruding the collision geometries of the two colliding bodies along the linear velocity of the bodies during the time step, 
 // if during the extrusion colliding contact are found, a collision is declared and the normal contact resolution is called. 
 //
-// Remarks: for continue collision to be active the continue collision mode must on the material pair of the colliding bodies as well as on at least one of the two colliding bodies.
+// Remarks: for continuous collision to be active the continuous collision mode must on the material pair of the colliding bodies as well as on at least one of the two colliding bodies.
 //
 // Remarks: Because there is penalty of about 40% to 80% depending of the shape complexity of the collision geometry, this feature is set 
 // off by default. It is the job of the application to determine what bodies need this feature on. Good guidelines are: very small objects, 

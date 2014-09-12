@@ -34,7 +34,7 @@ static void PlaceLargeFloorBox (DemoEntityManager* const scene)
 }
 */
 
-void ContinueCollision (DemoEntityManager* const scene)
+void ContinuousCollision (DemoEntityManager* const scene)
 {
 	// load the skybox
 	scene->CreateSkyBox();
@@ -87,7 +87,7 @@ void ContinueCollision (DemoEntityManager* const scene)
 //	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 1.7f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 1.7f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 
-	// set continue collision mode on all dynamics bodies
+	// set continuous collision mode on all dynamics bodies
 	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
 		float Ix;
 		float Iy;

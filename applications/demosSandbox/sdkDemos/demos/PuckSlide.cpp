@@ -92,7 +92,7 @@ class PuckEntity: public DemoEntity
 
 		NewtonBodySetMaterialGroupID(m_puckBody, materialID);
 
-		// remember to make continue collision work with auto sleep mode, right now this is no working
+		// remember to make continuous collision work with auto sleep mode, right now this is no working
 		NewtonBodySetContinuousCollisionMode(m_puckBody, 1);
 		NewtonBodySetAutoSleep(m_puckBody, 1);
 
@@ -246,7 +246,7 @@ void PuckSlide (DemoEntityManager* const scene)
 
 		NewtonBodySetMaterialGroupID(tableBody, materialGroupIDs[SBMaterial_SURFACE]);
 
-		// it is not wise to se static body to continue collision mode
+		// it is not wise to se static body to continuous collision mode
 		//NewtonBodySetContinuousCollisionMode(tableBody, 1);
 
 		// do not forget to release the assets	

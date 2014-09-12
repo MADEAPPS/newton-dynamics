@@ -48,9 +48,9 @@
 //#define DEFAULT_SCENE	22			// simple convex fracturing 
 //#define DEFAULT_SCENE	23			// structured convex fracturing 
 //#define DEFAULT_SCENE	24			// multi ray casting using the threading Job scheduler
-//#define DEFAULT_SCENE	25			// continue collision
-//#define DEFAULT_SCENE	26			// paper wall continue collision
-//#define DEFAULT_SCENE	27			// puck slide continue collision
+//#define DEFAULT_SCENE	25			// continuous collision
+//#define DEFAULT_SCENE	26			// paper wall continuous collision
+//#define DEFAULT_SCENE	27			// puck slide continuous collision
 //#define DEFAULT_SCENE	28          // standard joints
 //#define DEFAULT_SCENE	29			// articulated joints
 //#define DEFAULT_SCENE	30			// basic rag doll
@@ -78,8 +78,8 @@ void OptimizedMeshLevelCollision (DemoEntityManager* const scene);
 void UniformScaledCollision (DemoEntityManager* const scene);
 void NonUniformScaledCollision (DemoEntityManager* const scene);
 void ScaledMeshCollision (DemoEntityManager* const scene);
-void ContinueCollision (DemoEntityManager* const scene);
-void ContinueCollision1 (DemoEntityManager* const scene);
+void ContinuousCollision (DemoEntityManager* const scene);
+void ContinuousCollision1 (DemoEntityManager* const scene);
 void PuckSlide (DemoEntityManager* const scene);
 void SceneCollision (DemoEntityManager* const scene);
 void CompoundCollision(DemoEntityManager* const scene);
@@ -130,9 +130,9 @@ NewtonDemos::SDKDemos NewtonDemos::m_demosSelection[] =
 	{wxT("Simple convex fracture"), wxT("demonstrate simple fracture destruction using Voronoi partition"), SimpleConvexFracturing},
 	{wxT("Structured convex fracture"), wxT("demonstrate structured fracture destruction using Voronoi partition"), StructuredConvexFracturing},
 	{wxT("Parallel ray cast"), wxT("using the threading Job scheduler"), MultiRayCast},
-	{wxT("Continue collision"), wxT("show continue collision"), ContinueCollision},
-    {wxT("Paper wall continue collision"), wxT("show fast continue collision"), ContinueCollision1},
-	{wxT("Puck slide"), wxT("show continue collision"), PuckSlide},
+	{wxT("Continuous collision"), wxT("show continuous collision"), ContinuousCollision},
+    {wxT("Paper wall continuous collision"), wxT("show fast continuous collision"), ContinuousCollision1},
+	{wxT("Puck slide"), wxT("show continuous collision"), PuckSlide},
     {wxT("Standard Joints"), wxT("show some of the common joints"), StandardJoints},
 	{wxT("Articulated robotic actuators joints"), wxT("demonstrate complex array of bodies interconnect by joints"), ArticulatedJoints},
 	{wxT("Basic rag doll"), wxT("demonstrate simple rag doll"), DescreteRagDoll},

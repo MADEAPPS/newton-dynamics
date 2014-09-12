@@ -10,7 +10,7 @@
 */
 
 
-/* Continue Collision Detection Test Demo
+/* Continuous Collision Detection Test Demo
 *
 *  <2014> by Auto Machine.
 */
@@ -230,7 +230,7 @@ static NewtonBody* CreateBackgroundWallsAndCellingBody(NewtonWorld* world)
 	return body;
 }
 
-void ContinueCollision1(DemoEntityManager* const scene)
+void ContinuousCollision1(DemoEntityManager* const scene)
 {
 	scene->CreateSkyBox();
 

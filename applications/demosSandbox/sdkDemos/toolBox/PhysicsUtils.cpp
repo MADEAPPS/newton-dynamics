@@ -835,7 +835,7 @@ NewtonBody* CreateSimpleBody (NewtonWorld* const world, void* const userData, dF
 	// assign the wood id
 	NewtonBodySetMaterialGroupID (rigidBody, materialId);
 
-	//  set continue collision mode
+	//  set continuous collision mode
 	//	NewtonBodySetContinuousCollisionMode (rigidBody, continueCollisionMode);
 
 	// set a destructor for this rigid body

@@ -232,7 +232,7 @@ class SimpleFracturedEffectEntity: public DemoEntity
 				// assign the wood id
 				NewtonBodySetMaterialGroupID (rigidBody, materialId);
 
-				//  set continue collision mode
+				//  set continuous collision mode
 				//	NewtonBodySetContinuousCollisionMode (rigidBody, continueCollisionMode);
 
 				// set a destructor for this rigid body
@@ -302,7 +302,7 @@ static void AddFracturedEntity (DemoEntityManager* const scene, DemoMesh* const 
 	// assign the wood id
 	NewtonBodySetMaterialGroupID (rigidBody, materialId);
 
-	//  set continue collision mode
+	//  set continuous collision mode
 	//	NewtonBodySetContinuousCollisionMode (rigidBody, continueCollisionMode);
 
 	// set a destructor for this rigid body
