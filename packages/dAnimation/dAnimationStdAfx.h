@@ -29,11 +29,6 @@
 #endif
 
 
-#if (defined (_POSIX_VER) || defined (_POSIX_VER_64) || defined (_MACOSX_VER))
-	#define dAssert(x)
-#endif
-
-
 #ifdef _MACOSX_VER
 	#ifndef _MAC_IPHONE
 		#include <pthread.h>

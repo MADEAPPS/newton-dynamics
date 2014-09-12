@@ -10,7 +10,7 @@
 */
 
 #include "dAnimationStdAfx.h"
-#include "dBézierSpline.h"
+#include "dBezierSpline.h"
 
 #define D_BEZIER_LOCAL_BUFFER_SIZE 256
 

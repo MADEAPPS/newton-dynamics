@@ -287,12 +287,12 @@ class BasicCarEntity: public DemoEntity
 	// create a simple vehicle 
 	void BuidlBasicCar (const BasciCarParameters& parameters)
 	{
-		// Muscle cars have the front engine, we need to shift the center of mass to the front to represent that
-		m_controller->SetCenterOfGravity (dVector (0.0f, parameters.COM_Y_OFFSET, 0.0f, 0.0f)); 
-
-		// these si the tire size
+		// step one: find the location of each tire, in the visual mesh and add them one by one to the vehicle controller 
 		dFloat width = 0.35f;
 		dFloat radius = 0.5f;
+
+		// Muscle cars have the front engine, we need to shift the center of mass to the front to represent that
+		m_controller->SetCenterOfGravity (dVector (0.0f, parameters.COM_Y_OFFSET, 0.0f, 0.0f)); 
 
 		// add left tires
 		CustomVehicleControllerBodyStateTire* leftTire[2]; 
@@ -335,8 +335,9 @@ class BasicCarEntity: public DemoEntity
 			case BasciCarParameters::m_4WD:
 			{
 				CustomVehicleControllerComponentEngine::dSingleAxelDifferential* axles[2];
-				axles[0] = new CustomVehicleControllerComponentEngine::dSingleAxelDifferential (m_controller, leftTire[0], rightTire[0]);
-				axles[1] = new CustomVehicleControllerComponentEngine::dSingleAxelDifferential (m_controller, leftTire[1], rightTire[1]);
+				for (int i = 0; i < 2; i ++) {
+					axles[i] = new CustomVehicleControllerComponentEngine::dSingleAxelDifferential (m_controller, leftTire[i], rightTire[i]);
+				}
 				differencial = new CustomVehicleControllerComponentEngine::dMultiAxelDifferential (m_controller, 2, axles);
 				break;
 			}
@@ -768,25 +769,28 @@ void BasicCar (DemoEntityManager* const scene)
 	scene->SetCameraMouseLock (true);
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
+//	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
+	//	dVector location (origin);
+	//	location.m_x += 20.0f;
+	//	location.m_z += 20.0f;
+//	location.m_posit.m_z += 4.0f;
 
-	// add some world objects
-	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
-	int count = 5;
-	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
+//	int count = 5;
+//	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 
-	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
-	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
+	//AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 
-	size = dVector(1.0f, 0.5f, 1.0f, 0.0f);
+//	size = dVector(1.0f, 0.5f, 1.0f, 0.0f);
 	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _TAPERED_CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _TAPERED_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 
 	//	NewtonSerializeToFile (scene->GetNewton(), "C:/Users/Julio/Desktop/newton-dynamics/applications/media/xxxxx.bin");

@@ -130,7 +130,7 @@ typedef long long unsigned64;
 #include <dMatrix.h>
 #include <dQuaternion.h>
 #include <dMathDefines.h>
-#include <dBézierSpline.h>
+#include <dBezierSpline.h>
 #include <NewtonDebuggerServer.h>
 
 #include <CustomJoint.h>
