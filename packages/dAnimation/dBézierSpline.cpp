@@ -91,7 +91,7 @@ int dBezierSpline::GetSpan(dFloat u) const
 	return 0;
 }
 
-void dBezierSpline::BascisFunctions (dFloat u, int span, dFloat* const BasicFunctionsOut) const
+void dBezierSpline::BasicsFunctions (dFloat u, int span, dFloat* const BasicFunctionsOut) const
 {
 	BasicFunctionsOut[0] = 1.0f;
 
@@ -111,12 +111,86 @@ void dBezierSpline::BascisFunctions (dFloat u, int span, dFloat* const BasicFunc
 	}
 }
 
+void dBezierSpline::BasicsFunctionsDerivatives (dFloat u, int span, dFloat* const derivativesOut) const
+{
+	dFloat ndu[D_BEZIER_LOCAL_BUFFER_SIZE];
+	dFloat left[D_BEZIER_LOCAL_BUFFER_SIZE];
+	dFloat right[D_BEZIER_LOCAL_BUFFER_SIZE];
+
+	const int width = m_degree + 1;
+	ndu[0] = 1.0f;
+	for (int j = 1; j <= m_degree; j ++) {
+		left[j] = u - m_knotVector[span + 1 - j];
+		right[j] = m_knotVector[span + j] - u;
+		dFloat saved = 0.0f;
+		for (int r = 0; r < j; r ++) {
+			ndu[j * width + r] = right[r + 1] + left[j - r];
+
+			dFloat temp = ndu[r * width + j - 1] / ndu[j * width + r];
+			ndu[r * width + j] = saved + temp * right[r + 1];
+			saved = temp * left[j - r];
+		}
+		ndu[j * width + j] = saved;
+	}
+
+	dFloat a[D_BEZIER_LOCAL_BUFFER_SIZE];
+	for (int j = 0; j <= m_degree; j ++) {
+		derivativesOut[width * 0 + j] = ndu [width * j + m_degree];
+	}
+
+	for (int r = 0; r <= m_degree; r ++) {
+		int s1 = 0;
+		int s2 = 1;
+		a[0] = 1.0f;
+		for (int k = 1; k <= m_degree; k ++) {
+			dFloat d = 0.0f;
+			int rk = r - k;
+			int pk = m_degree - k;
+			if (r >= k)  {
+				a[width * s2 + 0] = a[width * s1 + 0] / ndu[width * (pk + 1) + rk];
+				d = a[width * s2 + 0] * ndu[width * rk + pk];
+			}
+			int j1 = 0;
+			int j2 = 0;
+			if (rk >= -1) {
+				j1 = 1;
+			} else {
+				j1 = -rk;
+			}
+
+			if ((r - 1) <= pk) {
+				j2 = k-1;
+			} else {
+				j2 = m_degree-r;
+			}
+			for (int j = j1; j <= j2; j ++) {
+				a[width * s2 + j] = (a[width * s1 + j] - a[width * s1 + j - 1]) / ndu[width * (pk + 1) + rk + j];
+				d += a[width * s2 + j] * ndu[width * (rk + j) + pk];
+			}
+			if (r <= pk) {
+				a[width * s2 + k] = -a[width * s1 + k - 1] / ndu[width * (pk + 1) + r];
+				d += a[width * s2 + k] * ndu[width * r + pk];
+			}
+			derivativesOut[width * k + r] = d;
+			dSwap(s1, s2);
+		}
+	}
+
+	int s = m_degree;
+	for (int k = 1; k <= m_degree; k ++) {
+		for (int j = 0; j <= m_degree; j ++) {
+			derivativesOut[width * k + j] *= s;
+		}
+		s *= (m_degree - k);
+	}
+}
+
 dVector dBezierSpline::CurvePoint (dFloat u) const
 {
 	dVector point (0.0f, 0.0f, 0.0f, 0.0f);
 	dFloat basicFunctions[D_BEZIER_LOCAL_BUFFER_SIZE];
 	int span = GetSpan(u);
-	BascisFunctions (u, span, basicFunctions);
+	BasicsFunctions (u, span, basicFunctions);
 	
 	for (int i = 0; i <= m_degree; i ++) {
 		point += m_controlPoints[span - m_degree + i].Scale (basicFunctions[i]);
@@ -124,10 +198,20 @@ dVector dBezierSpline::CurvePoint (dFloat u) const
 	return point;
 }
 
-dVector dBezierSpline::CurveDerivative (dFloat u) const
+dVector dBezierSpline::CurveDerivative (dFloat u, int index) const
 {
-	dVector point (0.0f, 0.0f, 0.0f, 0.0f);
+	dAssert (index <= m_degree);
+	
+	dFloat basicsFuncDerivatives[D_BEZIER_LOCAL_BUFFER_SIZE];
+	dVector ck (0.0f, 0.0f, 0.0f, 0.0f);
+	int span = GetSpan(u);
+	BasicsFunctionsDerivatives (u, span, basicsFuncDerivatives);
 
+	const int with = m_degree + 1;
+	dVector point (0.0f, 0.0f, 0.0f, 0.0f);
+	for (int i = 0; i <= m_degree; i ++) {
+		point += m_controlPoints[span - m_degree + i].Scale (basicsFuncDerivatives[with * index + i]);
+	}
 	return point;
 }
 
@@ -196,18 +280,18 @@ void dBezierSpline::CreateCubicControlPoints(int count, const dVector* const poi
 	for (int i = 3; i < count; i ++) {
 		r[i] = points[i - 1];
 	}
-	BascisFunctions (m_knotVector[m_degree + 1], m_degree + 1, abc);
+	BasicsFunctions (m_knotVector[m_degree + 1], m_degree + 1, abc);
 
 	dFloat den = abc[1];
 	m_controlPoints[2]  = (points[1] - m_controlPoints[1].Scale (abc[0])).Scale (1.0f / den);
 	for (int i = 3; i < count; i ++) {
 		dd[i] = abc[2] / den;
-		BascisFunctions (m_knotVector[i + 2], i + 2, abc);
+		BasicsFunctions (m_knotVector[i + 2], i + 2, abc);
 		den = abc[1] - abc[0] * dd[i];
 		m_controlPoints[i]  = (r[i] - m_controlPoints[i-1].Scale (abc[0])).Scale (1.0f / den);
 	}
 	dd[count] = abc[2] / den;
-	BascisFunctions (m_knotVector[count + 2], count + 2, abc);
+	BasicsFunctions (m_knotVector[count + 2], count + 2, abc);
 	den = abc[1] - abc[0] * dd[count];
 	m_controlPoints[count]  = (points[count - 1] - m_controlPoints[count + 1].Scale (abc[2]) - m_controlPoints[count - 1].Scale (abc[0])).Scale (1.0f / den);
 
