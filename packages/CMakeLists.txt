@@ -8,6 +8,14 @@
 # including commercial applications, and to alter it and redistribute it
 # freely.
 
+# dAnimation
+file(GLOB dAnimation_srcs dAnimation/*.cpp)
+add_library(dAnimation ${dAnimation_srcs})
+
+target_include_directories(dAnimation PUBLIC dAnimation/)
+target_link_libraries(dAnimation dMath dContainers)
+
+
 # dContainers
 file(GLOB dContainers_srcs dContainers/*.cpp)
 add_library(dContainers ${dContainers_srcs})
