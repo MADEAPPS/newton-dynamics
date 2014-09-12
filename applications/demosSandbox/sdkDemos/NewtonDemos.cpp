@@ -70,7 +70,7 @@ void ClosestDistance (DemoEntityManager* const scene);
 void ConvexCast (DemoEntityManager* const scene);
 void PrimitiveCollision (DemoEntityManager* const scene);
 void KinematicPlacement (DemoEntityManager* const scene);
-void ClothPath(DemoEntityManager* const scene);
+void ClothPatch(DemoEntityManager* const scene);
 void SoftBodies (DemoEntityManager* const scene);
 void BasicBoxStacks (DemoEntityManager* const scene);
 void SimpleMeshLevelCollision (DemoEntityManager* const scene);
@@ -141,7 +141,7 @@ NewtonDemos::SDKDemos NewtonDemos::m_demosSelection[] =
 	{wxT("Super car"), wxT("implement a hight performance sport car"), SuperCar},
 	{wxT("Basic player controller"), wxT("demonstrate simple player controller"), BasicPlayerController},
 	{wxT("Advanced player controller"), wxT("demonstrate player interacting with other objects"), AdvancedPlayerController},
-	{wxT("Simple cloth Path"), wxT("show simple cloth path"), ClothPath},
+	{wxT("Simple cloth Patch"), wxT("show simple cloth patch"), ClothPatch},
 	{wxT("Simple soft Body"), wxT("show simple soft body"), SoftBodies},
     
 

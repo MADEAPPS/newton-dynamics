@@ -360,7 +360,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 #endif
 
 
-void ClothPath(DemoEntityManager* const scene)
+void ClothPatch(DemoEntityManager* const scene)
 {
     // load the skybox
     scene->CreateSkyBox();
