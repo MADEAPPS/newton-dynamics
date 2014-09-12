@@ -28,6 +28,9 @@ class dBezierSpline : public dContainersAlloc
 	dVector CurveDerivative (dFloat u, int index = 1) const;
 	void GlobalCubicInterpolation (int count, const dVector* const points, const dVector& firstTangent, const dVector& lastTangent);
 
+	int GetControlPointCount() const;
+	dVector GetControlPoint(int i) const;
+
 	private:
 	void Clear();
 	int GetSpan(dFloat u) const;

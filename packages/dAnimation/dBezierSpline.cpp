@@ -52,6 +52,17 @@ dBezierSpline::~dBezierSpline ()
 	Clear();
 }
 
+int dBezierSpline::GetControlPointCount() const
+{
+	return m_controlPointsCount;
+}
+
+dVector dBezierSpline::GetControlPoint(int i) const
+{
+	return m_controlPoints[i];
+}
+
+
 void dBezierSpline::Clear()
 {
 	if (m_knotVector) {
@@ -253,10 +264,9 @@ void dBezierSpline::CreateCubicKnotVector(int count, const dVector* const points
 	}
 
 	for (int i = 1; i < (count - 1); i ++) {
-		dAssert (0);
 		dFloat acc = 0.0f;
 		for (int j = 0; j < m_degree; j ++) {
-			acc += u[j + i];
+			acc += u[j + i - 1];
 		}
 		m_knotVector[m_degree + i] = acc / 3.0f;
 	}
@@ -276,9 +286,15 @@ void dBezierSpline::CreateCubicControlPoints(int count, const dVector* const poi
 	m_controlPoints[m_controlPointsCount - 1] = points[count - 1];
 
 	m_controlPoints[1] = m_controlPoints[0] + firstTangent.Scale (m_knotVector[m_degree + 1] / 3.0f);
-	m_controlPoints[m_controlPointsCount - 2] = m_controlPoints[m_controlPointsCount - 1] - lastTangent.Scale (m_knotVector[m_knotsCount - m_degree - 1] / 3.0f);
-
-	if (count > 2) {
+	m_controlPoints[m_controlPointsCount - 2] = m_controlPoints[m_controlPointsCount - 1] - lastTangent.Scale (m_knotVector[m_knotsCount - m_degree - 2] / 3.0f);
+	if (count == 3) {
+		BasicsFunctions (m_knotVector[m_degree + 1], m_degree + 1, abc);
+		dFloat den = abc[1];
+		m_controlPoints[2]  = points[1] - m_controlPoints[1].Scale (abc[0]) - m_controlPoints[3].Scale (abc[2]);
+		m_controlPoints[2] = m_controlPoints[2].Scale (1.0f / abc[1]);
+	} else {
+		dAssert (0);
+/*
 		for (int i = 3; i < count; i ++) {
 			r[i] = points[i - 1];
 		}
@@ -293,12 +309,15 @@ void dBezierSpline::CreateCubicControlPoints(int count, const dVector* const poi
 			m_controlPoints[i]  = (r[i] - m_controlPoints[i-1].Scale (abc[0])).Scale (1.0f / den);
 		}
 		dd[count] = abc[2] / den;
-		BasicsFunctions (m_knotVector[count + 2], count + 2, abc);
+		//BasicsFunctions (m_knotVector[count + 2], count + 2, abc);
+		BasicsFunctions (m_knotVector[count + 1], count + 1, abc);
 		den = abc[1] - abc[0] * dd[count];
-		m_controlPoints[count]  = (points[count - 1] - m_controlPoints[count + 1].Scale (abc[2]) - m_controlPoints[count - 1].Scale (abc[0])).Scale (1.0f / den);
+		//m_controlPoints[count]  = (points[count - 1] - m_controlPoints[count + 1].Scale (abc[2]) - m_controlPoints[count - 1].Scale (abc[0])).Scale (1.0f / den);
+		m_controlPoints[count - 1]  = (points[count - 2] - m_controlPoints[count].Scale (abc[2]) - m_controlPoints[count - 2].Scale (abc[0])).Scale (1.0f / den);
 
 		for (int i = count - 1; i >= 2; i --) {
 			m_controlPoints[i] -= m_controlPoints[i + 1].Scale (dd[i + 1]);
 		}
+*/
 	}
 }

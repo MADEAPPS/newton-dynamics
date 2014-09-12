@@ -903,42 +903,17 @@ class HeavyVehicleControllerManager: public CustomVehicleControllerManager
 			glDisable (GL_BLEND);
 		}
 
-/*
-dFloat knots[] = {0.0f, 1.0f/4.0f, 1.0f/2.0f, 3.0f/4.0f, 1.0f};
-dVector control[] = 
-{
-	dVector (0.0f, 0.0f, 0.0f, 1.0f),
-	dVector (100.0f, 0.0f, 0.0f, 1.0f),
-	dVector (100.0f, 100.0f, 0.0f, 1.0f),
-	dVector (200.0f, 100.0f, 0.0f, 1.0f),
-	dVector (250.0f,   0.0f, 0.0f, 1.0f),
-	dVector (180.0f, -100.0f, 0.0f, 1.0f),
-	dVector (100.0f, -50.0f, 0.0f, 1.0f),
-};
-dBezierSpline spline (3, sizeof (knots) / sizeof (knots[0]), knots, control);
-
-glColor3f(1.0f, 1.0f, 1.0f);
-glBegin(GL_LINES);
-dVector p0 (spline.CurvePoint(0.0f)) ;
-for (int i = 1; i < 40; i ++) {
-	dVector p1 (spline.CurvePoint(float (i) / 40.0f)) ;
-	glVertex3f (p0.m_x + 500, p0.m_y + 500, p0.m_z);
-	glVertex3f (p1.m_x + 500, p1.m_y + 500, p1.m_z);
-	p0 = p1;
-}
-glEnd();
-*/
-
 
 const int segments = 20;
 glDisable (GL_LIGHTING);
 glDisable(GL_TEXTURE_2D);
 
-dFloat knots[] = {0.0f, 1.0f};
+dFloat knots[] = {0.0f, 0.5, 1.0f};
 dVector control[] = 
 {
 	dVector (200.0f, 200.0f, 0.0f, 1.0f),
 	dVector (250.0f, 250.0f, 0.0f, 1.0f),
+	dVector (275.0f, 200.0f, 0.0f, 1.0f),
 	dVector (300.0f, 250.0f, 0.0f, 1.0f),
 	dVector (350.0f, 200.0f, 0.0f, 1.0f),
 };
@@ -955,10 +930,21 @@ for (int i = 1; i <= segments; i ++) {
 }
 glEnd();
 
-int xxx = 2;
+glColor3f(1.0f, 1.0f, 0.0f);
+glPointSize(4.0f);
+glBegin(GL_POINTS);
+for (int i = 0; i < spline.GetControlPointCount(); i ++) {
+	dVector p (spline.GetControlPoint(i));
+	glVertex3f (p.m_x, p.m_y, p.m_z);
+}
+glEnd();
+
+
+int xxx = 3;
 dVector points[4];
 points[0] = spline.CurvePoint(0.0f) + dVector (200.0f, 0.0f, 0.0f, 0.0f);
-points[1] = spline.CurvePoint(1.0f) + dVector (200.0f, 0.0f, 0.0f, 0.0f);
+points[1] = spline.CurvePoint(0.5f) + dVector (200.0f, 0.0f, 0.0f, 0.0f);
+points[2] = spline.CurvePoint(1.0f) + dVector (200.0f, 0.0f, 0.0f, 0.0f);
 
 dVector derivP0 (spline.CurveDerivative(0.0f));
 dVector derivP1 (spline.CurveDerivative(1.0f));
@@ -985,6 +971,13 @@ glBegin(GL_POINTS);
 for (int i = 0; i < xxx; i ++) {
 	glVertex3f (points[i].m_x, points[i].m_y, points[i].m_z);
 }
+
+glColor3f(1.0f, 1.0f, 0.0f);
+for (int i = 0; i < spline.GetControlPointCount(); i ++) {
+	dVector p (spline1.GetControlPoint(i));
+	glVertex3f (p.m_x, p.m_y, p.m_z);
+}
+
 glEnd();
 
 	}
