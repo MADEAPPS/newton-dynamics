@@ -704,11 +704,11 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\dAnimation\dBézierSpline.cpp"
+			RelativePath="..\..\dAnimation\dBezierSpline.cpp"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dAnimation\dBézierSpline.h"
+			RelativePath="..\..\dAnimation\dBezierSpline.h"
 			>
 		</File>
 	</Files>
