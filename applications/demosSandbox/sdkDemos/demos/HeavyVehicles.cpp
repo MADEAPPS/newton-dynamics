@@ -903,21 +903,22 @@ class HeavyVehicleControllerManager: public CustomVehicleControllerManager
 			glDisable (GL_BLEND);
 		}
 
-
+return ;
 const int segments = 20;
 glDisable (GL_LIGHTING);
 glDisable(GL_TEXTURE_2D);
 
-dFloat knots[] = {0.0f, 0.5, 1.0f};
+dFloat knots[] = {0.0f, 1.0f / 3.0f, 2.0f / 3.0f, 1.0f};
 dVector control[] = 
 {
 	dVector (200.0f, 200.0f, 0.0f, 1.0f),
 	dVector (250.0f, 250.0f, 0.0f, 1.0f),
 	dVector (275.0f, 200.0f, 0.0f, 1.0f),
-	dVector (300.0f, 250.0f, 0.0f, 1.0f),
-	dVector (350.0f, 200.0f, 0.0f, 1.0f),
+	dVector (300.0f, 270.0f, 0.0f, 1.0f),
+	dVector (350.0f, 250.0f, 0.0f, 1.0f),
+	dVector (400.0f, 200.0f, 0.0f, 1.0f),
 };
-dBezierSpline spline (3, sizeof (knots) / sizeof (knots[0]), knots, control);
+static dBezierSpline spline (3, sizeof (knots) / sizeof (knots[0]), knots, control);
 
 glColor3f(1.0f, 1.0f, 1.0f);
 glBegin(GL_LINES);
@@ -940,16 +941,17 @@ for (int i = 0; i < spline.GetControlPointCount(); i ++) {
 glEnd();
 
 
-int xxx = 3;
+int xxx = 4;
 dVector points[4];
-points[0] = spline.CurvePoint(0.0f) + dVector (200.0f, 0.0f, 0.0f, 0.0f);
-points[1] = spline.CurvePoint(0.5f) + dVector (200.0f, 0.0f, 0.0f, 0.0f);
-points[2] = spline.CurvePoint(1.0f) + dVector (200.0f, 0.0f, 0.0f, 0.0f);
+points[0] = spline.CurvePoint(0.0f / 3.0f) + dVector (300.0f, 0.0f, 0.0f, 0.0f);
+points[1] = spline.CurvePoint(1.0f / 3.0f) + dVector (300.0f, 0.0f, 0.0f, 0.0f);
+points[2] = spline.CurvePoint(2.0f / 3.0f) + dVector (300.0f, 0.0f, 0.0f, 0.0f);
+points[3] = spline.CurvePoint(3.0f / 3.0f) + dVector (300.0f, 0.0f, 0.0f, 0.0f);
 
 dVector derivP0 (spline.CurveDerivative(0.0f));
 dVector derivP1 (spline.CurveDerivative(1.0f));
 
-dBezierSpline spline1;
+static dBezierSpline spline1;
 spline1.GlobalCubicInterpolation (xxx, points, derivP0, derivP1);
 
 
@@ -977,7 +979,6 @@ for (int i = 0; i < spline.GetControlPointCount(); i ++) {
 	dVector p (spline1.GetControlPoint(i));
 	glVertex3f (p.m_x, p.m_y, p.m_z);
 }
-
 glEnd();
 
 	}

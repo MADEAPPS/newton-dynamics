@@ -228,7 +228,6 @@ dVector dBezierSpline::CurveDerivative (dFloat u, int index) const
 
 void dBezierSpline::GlobalCubicInterpolation (int count, const dVector* const points, const dVector& firstTangent, const dVector& lastTangent)
 {
-	Clear();
 	CreateCubicKnotVector (count, points);
 	CreateCubicControlPoints (count, points, firstTangent, lastTangent);
 }
@@ -256,8 +255,14 @@ void dBezierSpline::CreateCubicKnotVector(int count, const dVector* const points
 	u[count - 1] = 1.0f;
 
 	m_degree = 3;
-	m_knotsCount = count + 2 * m_degree;
-	m_knotVector = (dFloat*) Alloc (m_knotsCount * sizeof (dFloat));
+	if ((count + 2 * m_degree) != m_knotsCount) {
+		if (m_knotVector) {
+			Free (m_knotVector);
+		}
+		m_knotsCount = count + 2 * m_degree;
+		m_knotVector = (dFloat*) Alloc (m_knotsCount * sizeof (dFloat));
+	}
+
 	for (int i = 0; i < (m_degree + 1); i ++) {
 		m_knotVector[i] = 0.0f;
 		m_knotVector[i + m_knotsCount - m_degree - 1] = 1.0f;
@@ -270,6 +275,9 @@ void dBezierSpline::CreateCubicKnotVector(int count, const dVector* const points
 		}
 		m_knotVector[m_degree + i] = acc / 3.0f;
 	}
+
+m_knotVector[4] = 1.0f/3.0f;
+m_knotVector[5] = 2.0f/3.0f;
 }
 
 
@@ -279,14 +287,19 @@ void dBezierSpline::CreateCubicControlPoints(int count, const dVector* const poi
 	dFloat dd [D_BEZIER_LOCAL_BUFFER_SIZE];
 	dFloat abc[4];
 
-	m_controlPointsCount = m_knotsCount - 2 * (m_degree - 1);
-	m_controlPoints = (dVector*) Alloc (m_controlPointsCount * sizeof (dVector));
+	if ((m_knotsCount - 2 * (m_degree - 1)) != m_controlPointsCount) {
+		if (m_controlPoints) {
+			Free (m_controlPoints);
+		}
+		m_controlPointsCount = m_knotsCount - 2 * (m_degree - 1);
+		m_controlPoints = (dVector*) Alloc (m_controlPointsCount * sizeof (dVector));
+	}
 
 	m_controlPoints[0] = points[0];
 	m_controlPoints[m_controlPointsCount - 1] = points[count - 1];
 
 	m_controlPoints[1] = m_controlPoints[0] + firstTangent.Scale (m_knotVector[m_degree + 1] / 3.0f);
-	m_controlPoints[m_controlPointsCount - 2] = m_controlPoints[m_controlPointsCount - 1] - lastTangent.Scale (m_knotVector[m_knotsCount - m_degree - 2] / 3.0f);
+	m_controlPoints[m_controlPointsCount - 2] = m_controlPoints[m_controlPointsCount - 1] - lastTangent.Scale ((1.0f - m_knotVector[m_knotsCount - m_degree - 2]) / 3.0f);
 	if (count == 3) {
 		BasicsFunctions (m_knotVector[m_degree + 1], m_degree + 1, abc);
 		dFloat den = abc[1];
