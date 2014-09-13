@@ -92,7 +92,7 @@ dNewton::dNewton()
 	NewtonSetThreadsCount(m_world, 4);
 
 	// set the collision copy constructor callback
-	NewtonWorldSetCollisionConstructorDestuctorCallback (m_world, OnCollisionCopyConstruct, OnCollisionDestructorCallback);
+	NewtonWorldSetCollisionConstructorDestructorCallback (m_world, OnCollisionCopyConstruct, OnCollisionDestructorCallback);
 
 	// use default material to implement traditional "Game style" one side material system
 	int defaultMaterial = NewtonMaterialGetDefaultGroupID (m_world);

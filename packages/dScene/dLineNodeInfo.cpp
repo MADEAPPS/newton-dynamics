@@ -338,14 +338,6 @@ dCRCTYPE dLineNodeInfo::CalculateSignature() const
 	return signature;
 }
 
-bool dLineNodeInfo::Deserialize (const dScene* const scene, TiXmlElement* const rootNode) 
-{
-	dAssert (0);
-	DeserialiseBase(scene, dGeometryNodeInfo, rootNode);
-	//	DeserializeMesh (m_mesh, rootNode); 
-	return true;
-}
-
 
 void dLineNodeInfo::Serialize (TiXmlElement* const rootNode) const
 {
@@ -381,4 +373,35 @@ void dLineNodeInfo::Serialize (TiXmlElement* const rootNode) const
 	delete[] buffer;
 	delete[] buffer1;
 }
+
+
+bool dLineNodeInfo::Deserialize (const dScene* const scene, TiXmlElement* const rootNode) 
+{
+	DeserialiseBase(scene, dGeometryNodeInfo, rootNode);
+	TiXmlElement* const bezierCurve = (TiXmlElement*) rootNode->FirstChild ("dBezierSpline");
+
+	int degree;
+	bezierCurve->Attribute("degree", &degree);
+
+	TiXmlElement* const ctrlPoints = (TiXmlElement*) bezierCurve->FirstChild ("controlPoints");
+	int positionCount;
+	ctrlPoints->Attribute("float4", &positionCount);
+	dVector* const positions = new dVector[positionCount];
+	dStringToFloatArray (ctrlPoints->Attribute("floats"), &positions[0][0], 4 * positionCount);
+	
+	TiXmlElement* const knots = (TiXmlElement*) bezierCurve->FirstChild ("knotVector");
+	int knotCount;
+	knots->Attribute("float", &knotCount);
+	dFloat* const knotVector = new dFloat[knotCount];
+	dStringToFloatArray (knots->Attribute("floats"), knotVector, knotCount);
+
+	dAssert (positionCount == (knotCount- 2 * (degree-1)));
+	m_curve.CreateFromKnotVectorAndControlPoints (degree, knotCount- 2 * degree, &knotVector[degree], positions);
+	delete[] knotVector;	
+	delete[] positions;	
+
+	return true;
+
+}
+
 
