@@ -67,6 +67,11 @@ dBezierSpline::~dBezierSpline ()
 	Clear();
 }
 
+int dBezierSpline::GetDegree () const
+{
+	return m_degree;
+}
+
 void dBezierSpline::CreateFromKnotVectorAndControlPoints (int degree, int knotCount, const dFloat* const knotVector, const dVector* const controlPoints)
 {
 	Clear();
@@ -92,6 +97,27 @@ void dBezierSpline::CreateFromKnotVectorAndControlPoints (int degree, int knotCo
 		dAssert (m_knotVector[i + m_degree] >= m_knotVector[i + m_degree - 1]);
 	}
 }
+
+int dBezierSpline::GetKnotCount() const
+{
+	return m_knotsCount;
+}
+
+dFloat* dBezierSpline::GetKnotArray()
+{
+	return m_knotVector;
+}
+
+const dFloat* dBezierSpline::GetKnotArray() const
+{
+	return m_knotVector;
+}
+
+dFloat dBezierSpline::GetKnot(int i) const
+{
+	return m_knotVector[i];
+}
+
 
 int dBezierSpline::GetControlPointCount() const
 {

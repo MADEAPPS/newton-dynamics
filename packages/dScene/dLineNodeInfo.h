@@ -63,12 +63,11 @@ class dLineNodeInfo: public dGeometryNodeInfo
 
 	
 	protected:
+*/
 	virtual dCRCTYPE CalculateSignature() const;
 	virtual void Serialize (TiXmlElement* const rootNode) const; 
 	virtual bool Deserialize (const dScene* const scene, TiXmlElement* const rootNode);
 
-	
-*/
 	virtual void DrawWireFrame(dSceneRender* const render, dScene* const scene, dScene::dTreeNode* const myNode) const;
 	virtual void DrawFlatShaded(dSceneRender* const render, dScene* const scene, dScene::dTreeNode* const myNode) const;
 	dBezierSpline m_curve;

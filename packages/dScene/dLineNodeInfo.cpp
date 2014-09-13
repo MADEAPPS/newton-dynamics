@@ -139,18 +139,6 @@ void dLineNodeInfo::RemoveUnusedVertices(dScene* const world, dScene::dTreeNode*
 }
 
 
-void dLineNodeInfo::Serialize (TiXmlElement* const rootNode) const
-{
- 	SerialiseBase(dGeometryNodeInfo, rootNode);
-	SerializeMesh (m_mesh, rootNode);
-}
-
-bool dLineNodeInfo::Deserialize (const dScene* const scene, TiXmlElement* const rootNode) 
-{
-	DeserialiseBase(scene, dGeometryNodeInfo, rootNode);
-	DeserializeMesh (m_mesh, rootNode); 
-	return true;
-}
 
 void dLineNodeInfo::CalcutateAABB (dVector& p0, dVector& p1) const
 {
@@ -213,17 +201,80 @@ dFloat dLineNodeInfo::RayCast (const dVector& q0, const dVector& q1) const
 	return t;
 }
 
+
+void dLineNodeInfo::DrawWireFrame(dSceneRender* const render, dScene* const scene, dScene::dTreeNode* const myNode) const
+{
+	dAssert (myNode == scene->Find(GetUniqueID()));
+	dAssert (scene->GetInfoFromNode(myNode) == this);
+
+
+	int displayList = render->GetCachedWireframeDisplayList(m_mesh);
+	dAssert (displayList > 0);
+	
+	render->PushMatrix(&m_matrix[0][0]);
+	if (GetEditorFlags() & m_selected) {
+		dVector color (render->GetColor());
+		render->SetColor(dVector (1.0f, 1.0f, 0.0f, 0.0f));
+		render->DrawDisplayList(displayList);
+		render->SetColor(color);
+	} else {
+		render->DrawDisplayList(displayList);
+	}
+	render->PopMatrix();
+}
+*/
+
+void dLineNodeInfo::DrawWireFrame(dSceneRender* const render, dScene* const scene, dScene::dTreeNode* const myNode) const
+{
+	dAssert (myNode == scene->Find(GetUniqueID()));
+	dAssert (scene->GetInfoFromNode(myNode) == this);
+
+	//	int displayList = render->GetCachedFlatShadedDisplayList(m_mesh);
+	//	dAssert (displayList > 0);
+	if (m_curve.GetControlPointArray()) {
+
+		dVector savedColor (render->GetColor());
+
+		render->PushMatrix(&m_matrix[0][0]);
+		//render->DrawDisplayList(displayList);
+
+		render->BeginLine();
+		render->SetColor(dVector (1.0f, 1.0f, 1.0f));
+
+		dFloat scale = 1.0f / m_renderSegments;
+		dVector p0 (m_curve.CurvePoint(0.0f));
+		for (int i = 1; i <= m_renderSegments; i ++) {
+			dFloat u = i * scale;
+			dVector p1 (m_curve.CurvePoint(u));
+			render->DrawLine (p0, p1);
+			p0 = p1;
+		}
+		render->End();
+		render->PopMatrix();
+
+		render->SetColor(savedColor);
+	}
+}
+
+void dLineNodeInfo::DrawFlatShaded(dSceneRender* const render, dScene* const scene, dScene::dTreeNode* const myNode) const
+{
+	DrawWireFrame (render, scene, myNode);
+}
+
+
+
 dCRCTYPE dLineNodeInfo::CalculateSignature() const
 {
 	dCRCTYPE signature = 0;
-
+	dAssert (0);
+#if 0
 	int vertexCount = NewtonMeshGetVertexCount (m_mesh); 
 	int vertexStride = NewtonMeshGetVertexStrideInByte(m_mesh);
 	signature = dCRC64 (NewtonMeshGetVertexArray (m_mesh), vertexStride * vertexCount, signature);
 
 	// for now just compare the vertex array, do no forget to add more text using the face winding and material indexed  
 
-#if 0
+
 	// save the polygon array
 	int faceCount = NewtonMeshGetTotalFaceCount (mesh); 
 	int indexCount = NewtonMeshGetTotalIndexCount (mesh); 
@@ -287,61 +338,47 @@ dCRCTYPE dLineNodeInfo::CalculateSignature() const
 	return signature;
 }
 
-void dLineNodeInfo::DrawWireFrame(dSceneRender* const render, dScene* const scene, dScene::dTreeNode* const myNode) const
+bool dLineNodeInfo::Deserialize (const dScene* const scene, TiXmlElement* const rootNode) 
 {
-	dAssert (myNode == scene->Find(GetUniqueID()));
-	dAssert (scene->GetInfoFromNode(myNode) == this);
-
-
-	int displayList = render->GetCachedWireframeDisplayList(m_mesh);
-	dAssert (displayList > 0);
-	
-	render->PushMatrix(&m_matrix[0][0]);
-	if (GetEditorFlags() & m_selected) {
-		dVector color (render->GetColor());
-		render->SetColor(dVector (1.0f, 1.0f, 0.0f, 0.0f));
-		render->DrawDisplayList(displayList);
-		render->SetColor(color);
-	} else {
-		render->DrawDisplayList(displayList);
-	}
-	render->PopMatrix();
-}
-*/
-
-void dLineNodeInfo::DrawWireFrame(dSceneRender* const render, dScene* const scene, dScene::dTreeNode* const myNode) const
-{
-	dAssert (myNode == scene->Find(GetUniqueID()));
-	dAssert (scene->GetInfoFromNode(myNode) == this);
-
-	//	int displayList = render->GetCachedFlatShadedDisplayList(m_mesh);
-	//	dAssert (displayList > 0);
-	if (m_curve.GetControlPointArray()) {
-
-		dVector savedColor (render->GetColor());
-
-		render->PushMatrix(&m_matrix[0][0]);
-		//render->DrawDisplayList(displayList);
-
-		render->BeginLine();
-		render->SetColor(dVector (1.0f, 1.0f, 1.0f));
-
-		dFloat scale = 1.0f / m_renderSegments;
-		dVector p0 (m_curve.CurvePoint(0.0f));
-		for (int i = 1; i <= m_renderSegments; i ++) {
-			dFloat u = i * scale;
-			dVector p1 (m_curve.CurvePoint(u));
-			render->DrawLine (p0, p1);
-			p0 = p1;
-		}
-		render->End();
-		render->PopMatrix();
-
-		render->SetColor(savedColor);
-	}
+	dAssert (0);
+	DeserialiseBase(scene, dGeometryNodeInfo, rootNode);
+	//	DeserializeMesh (m_mesh, rootNode); 
+	return true;
 }
 
-void dLineNodeInfo::DrawFlatShaded(dSceneRender* const render, dScene* const scene, dScene::dTreeNode* const myNode) const
+
+void dLineNodeInfo::Serialize (TiXmlElement* const rootNode) const
 {
-	DrawWireFrame (render, scene, myNode);
+	SerialiseBase(dGeometryNodeInfo, rootNode);
+
+	TiXmlElement* const bezierCurve = new TiXmlElement ("dBezierSpline");
+	rootNode->LinkEndChild (bezierCurve);
+
+	bezierCurve->SetAttribute("degree", m_curve.GetDegree());
+
+	int pointCount = m_curve.GetControlPointCount();
+	const dVector* const controlPoints = m_curve.GetControlPointArray();
+	int bufferSizeInBytes = pointCount * sizeof (dVector) * 12;
+	char* const buffer = new char[bufferSizeInBytes];
+	dFloatArrayToString (&controlPoints[0][0], pointCount * sizeof (dVector) / sizeof (dFloat), buffer, bufferSizeInBytes);
+
+	TiXmlElement* const ctrlPoints = new TiXmlElement ("controlPoints");
+	bezierCurve->LinkEndChild (ctrlPoints);
+	ctrlPoints->SetAttribute("float4", pointCount);
+	ctrlPoints->SetAttribute("floats", buffer);
+
+	int knotCount = m_curve.GetKnotCount();
+	const dFloat* const knotPoints = m_curve.GetKnotArray();
+	int buffer1SizeInBytes = knotCount * sizeof (dFloat) * 12;
+	char* const buffer1 = new char[buffer1SizeInBytes];
+	dFloatArrayToString (knotPoints, knotCount, buffer1, buffer1SizeInBytes);
+
+	TiXmlElement* const knotVector = new TiXmlElement ("knotVector");
+	bezierCurve->LinkEndChild (knotVector);
+	knotVector->SetAttribute("float", knotCount);
+	knotVector->SetAttribute("floats", buffer1);
+
+	delete[] buffer;
+	delete[] buffer1;
 }
+
