@@ -155,6 +155,11 @@ static VehicleParameters m1a1Param =
 class HeavyVehicleEntity: public DemoEntity
 {
 	public: 
+	class TrackSystem
+	{
+		DemoEntity* m_BezierEntity;
+	};
+
 	class TireAligmentTransform: public UserData
 	{
 		public: 
@@ -534,9 +539,26 @@ class HeavyVehicleEntity: public DemoEntity
 		m_controller->Finalize();
 	}
 
+	void SetTracks (const char* const entName, TrackSystem& track)
+	{
+		//threadShoe
+		DemoEntity* const tirePart = Find (entName);
+		dAssert (tirePart);
+	}
+
+
+	void SetTracks ()
+	{
+		SetTracks ("leftTrackPath", m_leftTrack);
+		SetTracks ("rightTrackPath", m_rightTrack);
+	}
 
 	void BuildTrackedVehicle (const VehicleParameters& parameters)
 	{
+
+		// set up the tank Track
+		SetTracks ();
+
 		// Muscle cars have the front engine, we need to shift the center of mass to the front to represent that
 		m_controller->SetCenterOfGravity (dVector (0.0f, parameters.COM_Y_OFFSET, 0.0f, 0.0f)); 
 
@@ -834,7 +856,8 @@ p0 += chassis.GetMatrix()[2].Scale ((tireMatrix.m_posit.m_z > 0.0f ? 1.0f : -1.0
 
 	}
 
-
+	TrackSystem m_leftTrack;
+	TrackSystem m_rightTrack;
 	CustomVehicleController* m_controller;
 	DemoEntityManager::ButtonKey m_helpKey;
 	DemoEntityManager::ButtonKey m_gearUpKey;

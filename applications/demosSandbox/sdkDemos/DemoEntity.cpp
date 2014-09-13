@@ -195,6 +195,8 @@ void DemoEntity::LoadNGD_mesh (const char* const fileName, NewtonWorld* const wo
 					}
 					DemoMesh* const mesh = cacheNode->GetInfo();
 					entity->SetMesh(mesh, sceneInfo->GetGeometryTransform());
+				} else if (meshInfo->GetTypeId() == dLineNodeInfo::GetRttiType()) {
+//					dAssert (0);
 				}
 			}
 

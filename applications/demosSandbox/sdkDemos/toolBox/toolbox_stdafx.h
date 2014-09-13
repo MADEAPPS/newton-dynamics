@@ -149,9 +149,6 @@ typedef long long unsigned64;
 #include <CustomVehicleControllerManager.h>
 #include <CustomArcticulatedTransformManager.h>
 
-
-
-
 #include <dCRC.h>
 #include <dHeap.h>
 #include <dList.h>
@@ -167,6 +164,7 @@ typedef long long unsigned64;
 #include "dBoneNodeInfo.h"
 #include "dSceneNodeInfo.h"
 #include "dMeshNodeInfo.h"
+#include "dLineNodeInfo.h"
 #include "dTextureNodeInfo.h"
 #include "dMaterialNodeInfo.h"
 #include "dRigidbodyNodeInfo.h"
