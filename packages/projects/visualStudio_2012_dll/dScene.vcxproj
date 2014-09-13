@@ -84,7 +84,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton;../../thirdParty/tinyxml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dAnimation;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/newton;../../thirdParty/tinyxml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_DSCENE_DLL;_DSCENE_EXPORTS;_DCONTAINERS_DLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -119,7 +119,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton;../../thirdParty/tinyxml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dAnimation;../../dContainers;../../dCustomJoints;../../../coreLibrary_300/source/newton;../../thirdParty/tinyxml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_DSCENE_DLL;_DSCENE_EXPORTS;_DCONTAINERS_DLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -225,6 +225,7 @@
     <ClCompile Include="..\..\dScene\dGeometryNodeInfo.cpp" />
     <ClCompile Include="..\..\dScene\dGeometryNodeModifierInfo.cpp" />
     <ClCompile Include="..\..\dScene\dGeometryNodeSkinModifierInfo.cpp" />
+    <ClCompile Include="..\..\dScene\dLineNodeInfo.cpp" />
     <ClCompile Include="..\..\dScene\dMaterialNodeInfo.cpp" />
     <ClCompile Include="..\..\dScene\dMeshNodeInfo.cpp" />
     <ClCompile Include="..\..\dScene\dNodeInfo.cpp" />
@@ -261,6 +262,7 @@
     <ClInclude Include="..\..\dScene\dGeometryNodeInfo.h" />
     <ClInclude Include="..\..\dScene\dGeometryNodeModifierInfo.h" />
     <ClInclude Include="..\..\dScene\dGeometryNodeSkinModifierInfo.h" />
+    <ClInclude Include="..\..\dScene\dLineNodeInfo.h" />
     <ClInclude Include="..\..\dScene\dMaterialNodeInfo.h" />
     <ClInclude Include="..\..\dScene\dMeshNodeInfo.h" />
     <ClInclude Include="..\..\dScene\dNodeInfo.h" />
