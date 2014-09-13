@@ -917,7 +917,10 @@ dVector control[] =
 	dVector (250.0f, 150.0f, 0.0f, 1.0f),
 	dVector (200.0f, 200.0f, 0.0f, 1.0f),
 };
-static dBezierSpline spline (3, sizeof (knots) / sizeof (knots[0]), knots, control);
+static dBezierSpline spline;
+if (!spline.GetControlPointArray()) {
+	spline.CreateFromKnotVectorAndControlPoints(3, sizeof (knots) / sizeof (knots[0]), knots, control);
+}
 
 glColor3f(1.0f, 1.0f, 1.0f);
 glBegin(GL_LINES);
