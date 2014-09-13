@@ -87,7 +87,7 @@
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../dPluginCommons;../../dSerializedNewtonWorlds;../../../../../coreLibrary_300/source/newton;../../../../../packages;../../../../../packages/dMath;../../../../../packages/dScene;../../../../../packages/dContainers;../../../../../packages/thirdParty/tinyxml;../../../../../packages/thirdParty/glew/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../dPluginCommons;../../dSerializedNewtonWorlds;../../../../../coreLibrary_300/source/newton;../../../../../packages;../../../../../packages/dMath;../../../../../packages/dScene;../../../../../packages/dAnimation;../../../../../packages/dContainers;../../../../../packages/thirdParty/tinyxml;../../../../../packages/thirdParty/glew/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;NOPCH;__WXMSW__;WXUSINGDLL;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;_DSCENE_DLL;_DCONTAINERS_DLL;NEWTON_PLUGIN_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -120,7 +120,7 @@ xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/stdPlugins/*.*"  /
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../dPluginCommons;../../dSerializedNewtonWorlds;../../../../../coreLibrary_300/source/newton;../../../../../packages;../../../../../packages/dMath;../../../../../packages/dScene;../../../../../packages/dContainers;../../../../../packages/thirdParty/tinyxml;../../../../../packages/thirdParty/glew/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../dPluginCommons;../../dSerializedNewtonWorlds;../../../../../coreLibrary_300/source/newton;../../../../../packages;../../../../../packages/dMath;../../../../../packages/dScene;../../../../../packages/dAnimation;../../../../../packages/dContainers;../../../../../packages/thirdParty/tinyxml;../../../../../packages/thirdParty/glew/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;NOPCH;__WXMSW__;WXUSINGDLL;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;_DSCENE_DLL;_DCONTAINERS_DLL;NEWTON_PLUGIN_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -150,7 +150,7 @@ xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/stdPlugins/*.*"  /
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../dPluginCommons;../../dSerializedNewtonWorlds;../../../../../coreLibrary_300/source/newton;../../../../../packages;../../../../../packages/dMath;../../../../../packages/dScene;../../../../../packages/dContainers;../../../../../packages/thirdParty/tinyxml;../../../../../packages/thirdParty/glew/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../dPluginCommons;../../dSerializedNewtonWorlds;../../../../../coreLibrary_300/source/newton;../../../../../packages;../../../../../packages/dMath;../../../../../packages/dScene;../../../../../packages/dAnimation;../../../../../packages/dContainers;../../../../../packages/thirdParty/tinyxml;../../../../../packages/thirdParty/glew/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;NOPCH;__WXMSW__;WXUSINGDLL;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;_DSCENE_DLL;_DCONTAINERS_DLL;NEWTON_PLUGIN_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -183,7 +183,7 @@ xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/stdPlugins/*.*"  /
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../dPluginCommons;../../dSerializedNewtonWorlds;../../../../../coreLibrary_300/source/newton;../../../../../packages;../../../../../packages/dMath;../../../../../packages/dScene;../../../../../packages/dContainers;../../../../../packages/thirdParty/tinyxml;../../../../../packages/thirdParty/glew/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../dPluginCommons;../../dSerializedNewtonWorlds;../../../../../coreLibrary_300/source/newton;../../../../../packages;../../../../../packages/dMath;../../../../../packages/dScene;../../../../../packages/dAnimation;../../../../../packages/dContainers;../../../../../packages/thirdParty/tinyxml;../../../../../packages/thirdParty/glew/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;NOPCH;__WXMSW__;WXUSINGDLL;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;_DSCENE_DLL;_DCONTAINERS_DLL;NEWTON_PLUGIN_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>

@@ -20,16 +20,23 @@ class dBezierSpline : public dContainersAlloc
 
 	// empty spline
 	dBezierSpline ();
+	dBezierSpline (const dBezierSpline& src);
 
 	// create from knot vector and control points
-	dBezierSpline (int degree, int knotCount, const dFloat* const knotVector, const dVector* const controlPoints);
+//	dBezierSpline (int degree, int knotCount, const dFloat* const knotVector, const dVector* const controlPoints);
 	virtual ~dBezierSpline ();
 	dVector CurvePoint (dFloat u) const;
 	dVector CurveDerivative (dFloat u, int index = 1) const;
+
+	void CreateFromKnotVectorAndControlPoints (int degree, int knotCount, const dFloat* const knotVector, const dVector* const controlPoints);
+
 	void GlobalCubicInterpolation (int count, const dVector* const points, const dVector& firstTangent, const dVector& lastTangent);
 
 	int GetControlPointCount() const;
+	dVector* GetControlPointArray();
+	const dVector* GetControlPointArray() const;
 	dVector GetControlPoint(int i) const;
+	
 
 	private:
 	void Clear();
@@ -44,11 +51,11 @@ class dBezierSpline : public dContainersAlloc
 
 	dFloat* m_knotVector;
 	dVector* m_controlPoints; 
-	int m_degree;
 
+	int m_degree;
 	int m_knotsCount;
 	int m_controlPointsCount;
-	int m_knotMaxSize;
+//	int m_knotMaxSize;
 };
 
 

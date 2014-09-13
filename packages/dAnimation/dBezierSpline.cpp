@@ -22,6 +22,20 @@ dBezierSpline::dBezierSpline ()
 {
 }
 
+dBezierSpline::dBezierSpline (const dBezierSpline& src)
+	:m_knotVector(NULL)
+	,m_controlPoints(NULL) 
+	,m_degree(0)
+	,m_knotsCount(0)
+	,m_controlPointsCount(0)
+//	,m_knotMaxSize(0)
+{
+	if (src.m_knotsCount) {
+		CreateFromKnotVectorAndControlPoints (m_degree, m_knotsCount = 2 * m_degree, &src.m_knotVector[m_degree], src.m_controlPoints);
+	}
+}
+
+/*
 dBezierSpline::dBezierSpline (int degree, int knotsCount, const dFloat* const knotVector, const dVector* const controlPoints)
 	:dContainersAlloc()
 	,m_degree(degree)
@@ -46,10 +60,37 @@ dBezierSpline::dBezierSpline (int degree, int knotsCount, const dFloat* const kn
 		dAssert (m_knotVector[i + m_degree] >= m_knotVector[i + m_degree - 1]);
 	}
 }
+*/
 
 dBezierSpline::~dBezierSpline ()
 {
 	Clear();
+}
+
+void dBezierSpline::CreateFromKnotVectorAndControlPoints (int degree, int knotCount, const dFloat* const knotVector, const dVector* const controlPoints)
+{
+	Clear();
+	dAssert (knotCount);
+	dAssert (knotVector[0] == 0.0f);
+	dAssert (knotVector[knotCount - 1] == 1.0f);
+
+	m_degree = degree;
+	m_knotsCount = knotCount + 2 * degree;
+	m_controlPointsCount = knotCount + m_degree - 1;
+
+	m_knotVector = (dFloat*) Alloc (m_knotsCount * sizeof (dFloat));
+	m_controlPoints = (dVector*) Alloc (m_controlPointsCount * sizeof (dVector));
+
+	memcpy (m_controlPoints, controlPoints, m_controlPointsCount * sizeof (dVector));
+	for (int i = 0; i < m_degree; i ++) {
+		m_knotVector[i] = 0.0f;
+		m_knotVector[i + m_knotsCount - m_degree] = 1.0f;
+	}
+
+	for (int i = 0; i < knotCount; i ++) {
+		m_knotVector[i + m_degree] = knotVector[i];
+		dAssert (m_knotVector[i + m_degree] >= m_knotVector[i + m_degree - 1]);
+	}
 }
 
 int dBezierSpline::GetControlPointCount() const
@@ -62,6 +103,15 @@ dVector dBezierSpline::GetControlPoint(int i) const
 	return m_controlPoints[i];
 }
 
+dVector* dBezierSpline::GetControlPointArray()
+{
+	return m_controlPoints;
+}
+
+const dVector* dBezierSpline::GetControlPointArray() const
+{
+	return m_controlPoints;
+}
 
 void dBezierSpline::Clear()
 {

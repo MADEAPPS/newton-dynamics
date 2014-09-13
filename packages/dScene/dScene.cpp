@@ -425,6 +425,14 @@ dScene::dTreeNode* dScene::CreateMeshNode(dTreeNode* const parent)
 	return node;
 }
 
+dScene::dTreeNode* dScene::CreateLineNode(dTreeNode* const parent)
+{
+	dTreeNode* const cacheNode = GetGeometryCacheNode();
+	dTreeNode* const node = CreateNode ("dLineNodeInfo", parent);
+	AddReference (cacheNode, node);
+	return node;
+}
+
 dScene::dTreeNode* dScene::CreateSkinModifierNode(dTreeNode* const parent)
 {
 	return CreateNode ("dGeometryNodeSkinModifierInfo", parent);

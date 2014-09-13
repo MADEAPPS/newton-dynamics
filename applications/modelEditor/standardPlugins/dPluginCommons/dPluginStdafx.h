@@ -55,6 +55,7 @@
 #include <dBoneNodeInfo.h>
 #include <dRootNodeInfo.h>
 #include <dMeshNodeInfo.h>
+#include <dLineNodeInfo.h>
 #include <dSceneNodeInfo.h>
 #include <dSceneModelInfo.h>
 #include <dTextureNodeInfo.h>

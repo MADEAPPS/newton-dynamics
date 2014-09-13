@@ -38,18 +38,7 @@
 
 #include <dPluginStdafx.h>
 #include <dUndoRedo.h>
-#include <dSceneStdafx.h>
-
-#include <dScene.h>
-#include <dNodeInfo.h>
-#include <dSceneGraph.h>
 #include <dUndoCurrentScene.h>
-
-//#include <dRootNodeInfo.h>
-//#include <dMeshNodeInfo.h>
-//#include <dSceneNodeInfo.h>
-//#include <dTextureNodeInfo.h>
-//#include <dMaterialNodeInfo.h>
 
 #include <dPluginUtils.h>
 #include <dPluginScene.h>

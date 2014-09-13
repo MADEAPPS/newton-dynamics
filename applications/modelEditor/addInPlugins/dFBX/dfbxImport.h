@@ -32,7 +32,7 @@ class dfbxImport: public dImportPlugin
 	{
 	};
 
-	class GlobalMeshMap: public dTree<dPluginScene::dTreeNode*, FbxMesh*>
+	class GlobalMeshMap: public dTree<dPluginScene::dTreeNode*, FbxGeometry*>
 	{
 	};
 
@@ -82,6 +82,8 @@ class dfbxImport: public dImportPlugin
 	void PopulateScene (FbxScene* const fbxScene, dPluginScene* const ngdScene);
 	void LoadHierarchy  (FbxScene* const fbxScene, dPluginScene* const ngdScene, GlobalNoceMap& nodeMap);
 	void ImportMeshNode (FbxScene* const fbxScene, dPluginScene* const ngdScene, FbxNode* const fbxMeshNode, dPluginScene::dTreeNode* const node, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials);
+	void ImportLineShape (FbxScene* const fbxScene, dPluginScene* const ngdScene, FbxNode* const fbxMeshNode, dPluginScene::dTreeNode* const node, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials);
+	void ImportNurbCurveShape (FbxScene* const fbxScene, dPluginScene* const ngdScene, FbxNode* const fbxMeshNode, dPluginScene::dTreeNode* const node, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials);
 	void ImportMaterials (FbxScene* const fbxScene, dPluginScene* const ngdScene, FbxNode* const fbxMeshNode, dPluginScene::dTreeNode* const meshNode, GlobalMaterialMap& materialCache, LocalMaterialMap& localMaterilIndex, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials);
 	void ImportTexture (dPluginScene* const ngdScene, FbxProperty pProperty, dPluginScene::dTreeNode* const materialNode, GlobalTextureMap& textureCache);
 	

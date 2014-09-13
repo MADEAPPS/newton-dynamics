@@ -94,6 +94,7 @@
 #endif
 
 #include <dStdAfxMath.h>
+#include <dAnimationStdAfx.h>
 #include <dContainersStdAfx.h>
 
 #include <dMathDefines.h>
@@ -110,6 +111,9 @@
 #include <dClassInfo.h>
 #include <dRefCounter.h>
 #include <dBaseHierarchy.h>
+
+
+#include <dBezierSpline.h>
 
 #include <Newton.h>
 

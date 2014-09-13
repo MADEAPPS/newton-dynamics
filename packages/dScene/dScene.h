@@ -87,9 +87,9 @@ class dScene: public dSceneGraph, public dRefCounter
 	DSCENE_API virtual dTreeNode* CreateCollisionCompoundNode(dTreeNode* const parent);
 	DSCENE_API virtual dTreeNode* CreateCollisionConvexHullNode(dTreeNode* const parent);
 	DSCENE_API virtual dTreeNode* CreateCollisionChamferCylinderNode(dTreeNode* const parent);
-	//DSCENE_API virtual dScene::dTreeNode* CreateCollisioTreeNode(dTreeNode* const parent);
 	DSCENE_API virtual dTreeNode* CreateCollisioTreeNode(dTreeNode* const parent);
 	DSCENE_API virtual dTreeNode* CreateMeshNode(dTreeNode* const parent);
+	DSCENE_API virtual dTreeNode* CreateLineNode(dTreeNode* const parent);
 	DSCENE_API virtual dTreeNode* CreateSkinModifierNode(dTreeNode* const parent);
 
 	DSCENE_API virtual dTreeNode* CreateMaterialNode (int id);
