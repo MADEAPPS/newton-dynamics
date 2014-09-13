@@ -209,7 +209,7 @@ class dInfinitePlane
 		dInfinitePlane* const me = (dInfinitePlane*) collideDesc->m_userData;
 
 		// build that aabb of each face and submit only the one that pass the test.
-		if (NewtonUserMeshCollisionContinueOveralapTest (collideDesc, continueCollisionHandle, &me->m_minBox[0], &me->m_maxBox[0])) {
+		if (NewtonUserMeshCollisionContinuousOverlapTest (collideDesc, continueCollisionHandle, &me->m_minBox[0], &me->m_maxBox[0])) {
 			const dVector& p0 = me->m_minBox;
 			const dVector& p1 = me->m_maxBox;
 			dVector centre ((p1 + p0).Scale (0.5f));

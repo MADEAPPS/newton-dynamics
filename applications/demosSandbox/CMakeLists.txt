@@ -16,14 +16,14 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
 include_directories(sdkDemos/)
 include_directories(sdkDemos/toolBox/)
 
-file(GLOB_RECURSE sandbos_srcs RELATIVE ${CMAKE_CURRENT_LIST_DIR} sdkDemos/*.cpp)
+file(GLOB_RECURSE sandbox_srcs RELATIVE ${CMAKE_CURRENT_LIST_DIR} sdkDemos/*.cpp)
 
 # these can't be compiled
-list(REMOVE_ITEM sandbos_srcs "sdkDemos/demos/SpecialTrackJoints.cpp")
-list(REMOVE_ITEM sandbos_srcs "sdkDemos/toolBox/LevelPrimitive.cpp")
-list(REMOVE_ITEM sandbos_srcs "sdkDemos/toolBox/ShaderPrograms.cpp")
+list(REMOVE_ITEM sandbox_srcs "sdkDemos/demos/SpecialTrackJoints.cpp")
+list(REMOVE_ITEM sandbox_srcs "sdkDemos/toolBox/LevelPrimitive.cpp")
+list(REMOVE_ITEM sandbox_srcs "sdkDemos/toolBox/ShaderPrograms.cpp")
 
-add_executable(demosSandbox ${sandbos_srcs})
+add_executable(demosSandbox ${sandbox_srcs})
 
 target_link_libraries(demosSandbox dMath dScene dCustomJoints dContainers dVisualDebuggerServer dAnimation)
 

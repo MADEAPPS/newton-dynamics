@@ -972,9 +972,9 @@ class CollsionTreeFaceMap
 		CollsionTreeFaceMap* const me = (CollsionTreeFaceMap*) context;
 
 		// repmap material index, by enumerating the face and storing the user material info at each face index
-		int faceIndex = NewtonTreeCollisionGetFaceAtribute (me->m_collisionTree, indexArray, indexCount); 
+		int faceIndex = NewtonTreeCollisionGetFaceAttribute (me->m_collisionTree, indexArray, indexCount); 
 		me->m_faceMapInfo[me->m_faceCount].m_materialIndex = faceIndex;
-		NewtonTreeCollisionSetFaceAtribute (me->m_collisionTree, indexArray, indexCount, me->m_faceCount); 
+		NewtonTreeCollisionSetFaceAttribute (me->m_collisionTree, indexArray, indexCount, me->m_faceCount); 
 
 		me->m_faceCount ++;
 		return 1;
