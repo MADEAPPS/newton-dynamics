@@ -383,6 +383,14 @@
 			RelativePath="..\..\dAnimation\dAnimationStdAfx.h"
 			>
 		</File>
+		<File
+			RelativePath="..\..\dAnimation\dBezierSpline.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\dAnimation\dBezierSpline.h"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
