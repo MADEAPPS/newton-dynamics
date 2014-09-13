@@ -1091,7 +1091,7 @@ NewtonWorldDestructorCallback NewtonWorldGetDestructorCallback(const NewtonWorld
 }
 
 
-void NewtonWorldSetCollisionConstructorDestuctorCallback (const NewtonWorld* const newtonWorld, NewtonCollisionCopyConstructionCallback constructor, NewtonCollisionDestructorCallback destructor)
+void NewtonWorldSetCollisionConstructorDestructorCallback (const NewtonWorld* const newtonWorld, NewtonCollisionCopyConstructionCallback constructor, NewtonCollisionDestructorCallback destructor)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *) newtonWorld;
@@ -1495,7 +1495,7 @@ void NewtonMaterialSetDefaultCollidable(const NewtonWorld* const newtonWorld, in
 
 
 // Name: NewtonMaterialSetSurfaceThickness 
-// Set an imaginary thickness between the collision geometry of two colliding bodies who’s physics 
+// Set an imaginary thickness between the collision geometry of two colliding bodies whoï¿½s physics 
 // properties are defined by this material pair 
 //
 // Parameters:
@@ -3040,7 +3040,7 @@ dFloat NewtonCollisionGetMaxBreakImpactImpulse(const NewtonCollision* const conv
 }
 */
 
-int NewtonConvexHullGetVetexData (const NewtonCollision* const convexHullCollision, dFloat** const vertexData, int* strideInBytes)
+int NewtonConvexHullGetVertexData (const NewtonCollision* const convexHullCollision, dFloat** const vertexData, int* strideInBytes)
 {
 	dgAssert (0);
 	return 0;
@@ -3139,7 +3139,7 @@ void NewtonConvexCollisionCalculateInertialMatrix(const NewtonCollision* convexC
 // Remarks: This function is only effective when called from *NewtonApplyForceAndTorque callback*
 //
 // Remarks: This function adds buoyancy force and torque to a body when it is immersed in a fluid.
-// The force is calculated according to Archimedes’ Buoyancy Principle. When the parameter *buoyancyPlane* is set to NULL, the body is considered
+// The force is calculated according to Archimedes Buoyancy Principle. When the parameter *buoyancyPlane* is set to NULL, the body is considered
 // to completely immersed in the fluid. This can be used to simulate boats and lighter than air vehicles etc..
 //
 // Remarks: If *buoyancyPlane* return 0 buoyancy calculation for this collision primitive is ignored, this could be used to filter buoyancy calculation 
@@ -3246,7 +3246,7 @@ NewtonCollision* NewtonCreateUserMeshCollision(
 
 
 
-int NewtonUserMeshCollisionContinueOveralapTest (const NewtonUserMeshCollisionCollideDesc* const collideDescData, const void* const rayHandle, const dFloat* const minAabb, const dFloat* const maxAabb)
+int NewtonUserMeshCollisionContinuousOverlapTest (const NewtonUserMeshCollisionCollideDesc* const collideDescData, const void* const rayHandle, const dFloat* const minAabb, const dFloat* const maxAabb)
 {
 	const dgFastRayTest* const ray = (dgFastRayTest*) rayHandle;
 
@@ -3457,7 +3457,7 @@ void NewtonTreeCollisionEndBuild(const NewtonCollision* const treeCollision, int
 // The application can use this user data to achieve per polygon material behavior in large static collision meshes.
 //
 // See also: NewtonTreeCollisionSetFaceAtribute, NewtonCreateTreeCollision, NewtonCreateTreeCollisionFromSerialization
-int NewtonTreeCollisionGetFaceAtribute(const NewtonCollision* const treeCollision, const int* const faceIndexArray, int indexCount)
+int NewtonTreeCollisionGetFaceAttribute(const NewtonCollision* const treeCollision, const int* const faceIndexArray, int indexCount)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionBVH* const collision = (dgCollisionBVH*) ((dgCollisionInstance*)treeCollision)->GetChildShape();
@@ -3483,7 +3483,7 @@ int NewtonTreeCollisionGetFaceAtribute(const NewtonCollision* const treeCollisio
 // some collision event occurs.
 //
 // See also: NewtonTreeCollisionGetFaceAtribute, NewtonCreateTreeCollision, NewtonCreateTreeCollisionFromSerialization
-void NewtonTreeCollisionSetFaceAtribute(const NewtonCollision* const treeCollision, const int* const faceIndexArray, int indexCount, int attribute)
+void NewtonTreeCollisionSetFaceAttribute(const NewtonCollision* const treeCollision, const int* const faceIndexArray, int indexCount, int attribute)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionBVH* const collision = (dgCollisionBVH*) ((dgCollisionInstance*)treeCollision)->GetChildShape();
@@ -7914,10 +7914,10 @@ NewtonMesh* NewtonMeshSimplify (const NewtonMesh* const mesh, int maxVertexCount
 	return (NewtonMesh*) ((dgMeshEffect*) mesh)->CreateSimplification (maxVertexCount, (dgReportProgress) progressReportCallback, reportPrgressUserData);
 }
 
-NewtonMesh* NewtonMeshApproximateConvexDecomposition (const NewtonMesh* const mesh, dFloat maxConcavity, dFloat backFaceDistanceFactor, int maxCount, int maxVertexPerHull, NewtonReportProgress progressReportCallback, void* const reportPrgressUserData)
+NewtonMesh* NewtonMeshApproximateConvexDecomposition (const NewtonMesh* const mesh, dFloat maxConcavity, dFloat backFaceDistanceFactor, int maxCount, int maxVertexPerHull, NewtonReportProgress progressReportCallback, void* const reportProgressUserData)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	return (NewtonMesh*) ((dgMeshEffect*) mesh)->CreateConvexApproximation (maxConcavity, backFaceDistanceFactor, maxCount, maxVertexPerHull, (dgReportProgress) progressReportCallback, reportPrgressUserData);
+	return (NewtonMesh*) ((dgMeshEffect*) mesh)->CreateConvexApproximation (maxConcavity, backFaceDistanceFactor, maxCount, maxVertexPerHull, (dgReportProgress) progressReportCallback, reportProgressUserData);
 }
 
 
