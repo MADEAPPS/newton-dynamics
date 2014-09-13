@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C5E3826A19C4FD08005B9535 /* Newton.h in Headers */ = {isa = PBXBuildFile; fileRef = C5E3826719C4FD08005B9535 /* Newton.h */; };
+		C5E3826B19C4FD08005B9535 /* NewtonClass.h in Headers */ = {isa = PBXBuildFile; fileRef = C5E3826819C4FD08005B9535 /* NewtonClass.h */; };
+		C5E3826C19C4FD08005B9535 /* NewtonStdAfx.h in Headers */ = {isa = PBXBuildFile; fileRef = C5E3826919C4FD08005B9535 /* NewtonStdAfx.h */; };
 		FF7EDA9C188842FD00CB1FFA /* dgMeshEffect.h in Headers */ = {isa = PBXBuildFile; fileRef = FF7EDA9A188842FD00CB1FFA /* dgMeshEffect.h */; };
 		FF7EDA9D188842FD00CB1FFA /* dgMeshEffect6.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF7EDA9B188842FD00CB1FFA /* dgMeshEffect6.cpp */; };
 		FF7EDAA11888436A00CB1FFA /* dgCollisionCompoundFractured.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF7EDA9F1888436A00CB1FFA /* dgCollisionCompoundFractured.cpp */; };
@@ -140,6 +143,9 @@
 
 /* Begin PBXFileReference section */
 		32BAE0B70371A74B00C91783 /* newton_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = newton_Prefix.pch; sourceTree = "<group>"; };
+		C5E3826719C4FD08005B9535 /* Newton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Newton.h; path = ../../../source/newton/Newton.h; sourceTree = "<group>"; };
+		C5E3826819C4FD08005B9535 /* NewtonClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NewtonClass.h; path = ../../../source/newton/NewtonClass.h; sourceTree = "<group>"; };
+		C5E3826919C4FD08005B9535 /* NewtonStdAfx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NewtonStdAfx.h; path = ../../../source/newton/NewtonStdAfx.h; sourceTree = "<group>"; };
 		D2AAC06F0554671400DB518D /* libnewton.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libnewton.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF7EDA9A188842FD00CB1FFA /* dgMeshEffect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgMeshEffect.h; path = ../../../source/meshUtil/dgMeshEffect.h; sourceTree = "<group>"; };
 		FF7EDA9B188842FD00CB1FFA /* dgMeshEffect6.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dgMeshEffect6.cpp; path = ../../../source/meshUtil/dgMeshEffect6.cpp; sourceTree = "<group>"; };
@@ -409,6 +415,9 @@
 		FFF899F9132D161E00A262F2 /* newton */ = {
 			isa = PBXGroup;
 			children = (
+				C5E3826719C4FD08005B9535 /* Newton.h */,
+				C5E3826819C4FD08005B9535 /* NewtonClass.h */,
+				C5E3826919C4FD08005B9535 /* NewtonStdAfx.h */,
 				FFF89B1E132D17D800A262F2 /* Newton.cpp */,
 				FFF89B20132D17D800A262F2 /* NewtonClass.cpp */,
 			);
@@ -494,13 +503,16 @@
 				FF9BBC841835206D0060F147 /* dgCRC.h in Headers */,
 				FF9BBC851835206D0060F147 /* dgDebug.h in Headers */,
 				FF9BBC861835206D0060F147 /* dgDelaunayTetrahedralization.h in Headers */,
+				C5E3826B19C4FD08005B9535 /* NewtonClass.h in Headers */,
 				FF9BBC871835206D0060F147 /* dgFastQueue.h in Headers */,
+				C5E3826C19C4FD08005B9535 /* NewtonStdAfx.h in Headers */,
 				FF9BBC881835206D0060F147 /* dgGeneralMatrix.h in Headers */,
 				FF9BBC891835206D0060F147 /* dgGeneralVector.h in Headers */,
 				FF9BBC8A1835206D0060F147 /* dgGoogol.h in Headers */,
 				FF9BBC8B1835206D0060F147 /* dgGraph.h in Headers */,
 				FF9BBC8C1835206D0060F147 /* dgHeap.h in Headers */,
 				FF9BBC8D1835206D0060F147 /* dgIntersections.h in Headers */,
+				C5E3826A19C4FD08005B9535 /* Newton.h in Headers */,
 				FF9BBC8E1835206D0060F147 /* dgList.h in Headers */,
 				FF9BBC8F1835206D0060F147 /* dgMatrix.h in Headers */,
 				FF9BBC901835206D0060F147 /* dgMemory.h in Headers */,
