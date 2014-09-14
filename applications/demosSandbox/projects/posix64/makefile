@@ -73,7 +73,6 @@ SDK_SCENE_MAKE = ../../../../packages/projects/$(PLATFORM)/dScene
 SDK_JOINTS_MAKE = ../../../../packages/projects/$(PLATFORM)/dCustomJoints
 SDK_CONTAINERS_MAKE = ../../../../packages/projects/$(PLATFORM)/dContainers
 SDK_VISUALDEBUGGER_MAKE = ../../../../packages/projects/$(PLATFORM)/dVisualDebuggerServer
-SDK_AILIBRARY_MAKE = ../../../../packages/projects/$(PLATFORM)/dAILibrary
 SDK_XML_MAKE = ../../../../packages/projects/$(PLATFORM)/thirdParty/tinyxml
 
 
@@ -89,7 +88,7 @@ NEWTON_LIB = \
 	$(SDK_NEWTON_PATH)/libdJointLibrary.a \
 	$(SDK_NEWTON_PATH)/libTinyXML.a
 #	$(SDK_NEWTON_PATH)/libdVisualDebuggerServer.a \
-#	$(SDK_NEWTON_PATH)/libdAILibrary.a \
+
 
 
 SDK_MAIN_SRC = \

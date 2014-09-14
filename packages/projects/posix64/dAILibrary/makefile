@@ -16,11 +16,6 @@
 # low level library
 #
 # ******************************************************
-LIB_NAME = libdAILibrary.a
-
-INCLUDED_PATH = ../../../dAILibrary
-SRC_PATH = ../../../dAILibrary
-
 SDK_MATH = ../../../dMath
 SDK_CONTAINERS = ../../../dContainers
 SDK_JOINTS = ../../../dCustomJoints

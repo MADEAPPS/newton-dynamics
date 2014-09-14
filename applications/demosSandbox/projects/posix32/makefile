@@ -47,7 +47,6 @@ SDK_SCENE_PATH = ../../../../packages/dScene
 SDK_JOINTS_PATH = ../../../../packages/dCustomJoints
 SDK_CONTAINERS_PATH = ../../../../packages/dContainers
 SDK_VISUALDEBUGGER_PATH = ../../../../packages/dVisualDebuggerServer
-SDK_AILIBRARY_PATH = ../../../../packages/dAILibrary
 SDK_XML_PATH = ../../../../packages/thirdParty/tinyxml
 
 
@@ -77,9 +76,7 @@ SDK_SCENE_MAKE = ../../../../packages/projects/$(PLATFORM)/dScene
 SDK_JOINTS_MAKE = ../../../../packages/projects/$(PLATFORM)/dCustomJoints
 SDK_CONTAINERS_MAKE = ../../../../packages/projects/$(PLATFORM)/dContainers
 SDK_VISUALDEBUGGER_MAKE = ../../../../packages/projects/$(PLATFORM)/dVisualDebuggerServer
-SDK_AILIBRARY_MAKE = ../../../../packages/projects/$(PLATFORM)/dAILibrary
 SDK_XML_MAKE = ../../../../packages/projects/$(PLATFORM)/thirdParty/tinyxml
-
 
 
 LIBS  = -L/usr/lib -lstdc++ -lrt -lm -lGL -lGLU -lGLEW -lpthread -lenet -lopenal `wx-config --libs --gl-libs` `freetype-config --libs`
@@ -94,7 +91,6 @@ NEWTON_LIB = \
 	$(SDK_NEWTON_PATH)/libdJointLibrary.a \
 	$(SDK_NEWTON_PATH)/libTinyXML.a	
 #	$(SDK_NEWTON_PATH)/libdVisualDebuggerServer.a \
-#	$(SDK_NEWTON_PATH)/libdAILibrary.a \
 	
 SDK_MAIN_SRC = \
 		$(SDK_MAIN_PATH)/DemoCameraListener.cpp \

@@ -179,32 +179,42 @@ class HeavyVehicleEntity: public DemoEntity
 
 			DemoEntity* const threadMesh = me->Find ("threadShoe");
 			dAssert (threadMesh);
-			int pieceCount = int (m_length / 0.25f) + 1;
+			dFloat threadSize = 0.29f;
+			int pieceCount = int (m_length / threadSize) + 1;
 
 			int count = 0;
 			dFloat steps[200];
-			dFloat length = 0.0f;
 			steps[0] = 0.0f;
+
+			int samplingRate = pieceCount * 10;
 			dVector p0 (m_bezierMesh->m_curve.CurvePoint(0.0f));
-			for (int i = 1; i < pieceCount * 10; i ++) {
-				dFloat u = dFloat (i) / (pieceCount * 10);
+			for (int i = 1; i < samplingRate + 15; i ++) {
+				dFloat u = dMod (dFloat (i) / samplingRate, 1.0f);
 				dVector p1 (m_bezierMesh->m_curve.CurvePoint(u));
 				dVector err (p1 - p0);
 				dFloat err2 = dSqrt (err % err);
-				if (err2 > 0.25f) {
+				if (err2 > threadSize) {
 					p0 = p1;
 					steps[count] = u;
 					count ++;
 				}
 			}
 
+
+			dMatrix yaw (dRollMatrix(3.141592f * 90.0f / 180.0f) * dPitchMatrix(3.141592f * 180.0f / 180.0f));
 			dMatrix bezierMatrix (m_bezierEntity->GetMeshMatrix() * m_bezierEntity->GetCurrentMatrix());
 			dVector q0 (m_bezierMesh->m_curve.CurvePoint(steps[0]));
 			p0.m_w = 1.0f;
+			dMatrix matrix (dGetIdentityMatrix());
 			for (int i = 1; i < count; i ++) {
 				dVector q1 (m_bezierMesh->m_curve.CurvePoint(steps[i]));
 				q1.m_w = 1.0f;
-				dMatrix matrix (dGetIdentityMatrix());
+				dVector dir (q1 - q0);
+				dir = dir.Scale (1.0f / dSqrt (dir % dir));
+				matrix.m_front = dVector (dir.m_z, -dir.m_y, 0.0f, 0.0f);
+				matrix.m_up = dVector (dir.m_y, dir.m_z, 0.0f, 0.0f);
+				matrix.m_right = dVector (0.0f, 0.0f, 1.0f, 0.0f);
+				matrix = yaw * matrix;
 				matrix.m_posit = bezierMatrix.TransformVector (q0);
 				DemoEntity* const threadPart = new DemoEntity (matrix, me);
 				threadPart->SetMesh(threadMesh->GetMesh(), dGetIdentityMatrix());

@@ -813,7 +813,7 @@ dAssert (0);
 
 		for (int i = 0; i < pointsCount; i ++) {
 			const FbxVector4& p = controlPoints[i];
-			vertexArray[i] = dVector (dFloat(p[0]), dFloat(p[1]), dFloat(p[2]), 0.0f);
+			vertexArray[i] = dVector (dFloat(p[0]), dFloat(p[1]), dFloat(p[2]), 1.0f);
 		}
 		FbxNurbsCurve::EType type = fbxCurve->GetType();
 		if ((type == FbxNurbsCurve::eClosed) || (type == FbxNurbsCurve::ePeriodic)) {

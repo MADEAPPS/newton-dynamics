@@ -84,7 +84,7 @@
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/ai;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAILibrary;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/fmod/api/inc;../../../../packages/thirdParty/fox/fox-1.6.44/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -121,7 +121,7 @@
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/ai;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAILibrary;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/fmod/api/inc;../../../../packages/thirdParty/fox/fox-1.6.44/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -155,7 +155,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/ai;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAILibrary;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/fmod/api/inc;../../../../packages/thirdParty/fox/fox-1.6.44/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -190,7 +190,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/ai;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAILibrary;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/fmod/api/inc;../../../../packages/thirdParty/fox/fox-1.6.44/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -302,9 +302,6 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\coreLibrary_300\projects\windows\project_vs2010\physics.vcxproj">
       <Project>{39737a8f-6151-4259-8e39-25530345d4b4}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010\dAILibrary.vcxproj">
-      <Project>{2f95c24f-6935-4288-a71c-dab402e4eabc}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010\dAnimation.vcxproj">
       <Project>{e3c14351-bad1-4add-ab9a-31054d6e7cdb}</Project>

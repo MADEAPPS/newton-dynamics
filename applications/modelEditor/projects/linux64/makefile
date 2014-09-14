@@ -45,7 +45,6 @@ SDK_SCENE_PATH = ../../../../packages/dScene
 SDK_JOINTS_PATH = ../../../../packages/dCustomJoints
 SDK_CONTAINERS_PATH = ../../../../packages/dContainers
 SDK_VISUALDEBUGGER_PATH = ../../../../packages/dVisualDebuggerServer
-SDK_AILIBRARY_PATH = ../../../../packages/dAILibrary
 SDK_XML_PATH = ../../../../packages/thirdParty/tinyxml
 SDK_FOX_PATH = ../../../../packages/thirdParty/fox/fox-1.6.44/include
 SDK_FMOD_PATH = ../../../../packages/thirdParty/fmod/api/inc
@@ -77,7 +76,6 @@ SDK_SCENE_MAKE = ../../../../packages/projects/$(PLATFORM)/dScene
 SDK_JOINTS_MAKE = ../../../../packages/projects/$(PLATFORM)/dCustomJoints
 SDK_CONTAINERS_MAKE = ../../../../packages/projects/$(PLATFORM)/dContainers
 SDK_VISUALDEBUGGER_MAKE = ../../../../packages/projects/$(PLATFORM)/dVisualDebuggerServer
-SDK_AILIBRARY_MAKE = ../../../../packages/projects/$(PLATFORM)/dAILibrary
 SDK_XML_MAKE = ../../../../packages/projects/$(PLATFORM)/thirdParty/tinyxml
 SDK_FOX_MAKE = ../../../../packages/thirdParty/fox/fox-1.6.44
 SDK_ENET_MAKE = ../../../../packages/thirdParty/enet-1.2
@@ -94,7 +92,6 @@ NEWTON_LIB = \
 	$(SDK_NEWTON_PATH)/libdContainers.a \
 	$(SDK_NEWTON_PATH)/libdJointLibrary.a \
 	$(SDK_NEWTON_PATH)/libdVisualDebuggerServer.a \
-	$(SDK_NEWTON_PATH)/libdAILibrary.a \
 	$(SDK_NEWTON_PATH)/libTinyXML.a
 
 FOX_LIB = $(SDK_FOX_MAKE)/src/.libs/libFOX-1.6.so

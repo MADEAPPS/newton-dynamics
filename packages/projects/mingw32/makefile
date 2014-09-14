@@ -25,7 +25,6 @@ SDK_SCENE_MAKE = ../../../../packages/projects/$(PLATFORM)/dScene
 SDK_JOINTS_MAKE = ../../../../packages/projects/$(PLATFORM)/dCustomJoints
 SDK_CONTAINERS_MAKE = ../../../../packages/projects/$(PLATFORM)/dContainers
 SDK_VISUALDEBUGGER_MAKE = ../../../../packages/projects/$(PLATFORM)/dVisualDebuggerServer
-SDK_AILIBRARY_MAKE = ../../../../packages/projects/$(PLATFORM)/dAILibrary
 SDK_XML_MAKE = ../../../../packages/projects/$(PLATFORM)/thirdParty/tinyxml
 
 
