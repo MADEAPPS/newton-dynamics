@@ -58,7 +58,6 @@
 		FF084ACE173F1B310059C41D /* SceneCollision.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F6F1556DA2300E7B112 /* SceneCollision.cpp */; };
 		FF084AD0173F1B310059C41D /* SoftBodies.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F711556DA2300E7B112 /* SoftBodies.cpp */; };
 		FF084AD2173F1B310059C41D /* UsingNewtonMeshTool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F771556DA2300E7B112 /* UsingNewtonMeshTool.cpp */; };
-		FF3BD3C619BE54BD00E676B8 /* m1a1.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF3BD3C519BE54BD00E676B8 /* m1a1.ngd */; };
 		FF50660B173F34B600D01FDF /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF50660A173F34B600D01FDF /* Cocoa.framework */; };
 		FF50660D173F360C00D01FDF /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF50660C173F360C00D01FDF /* IOKit.framework */; };
 		FF50660F173F36B200D01FDF /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF50660E173F36B200D01FDF /* Carbon.framework */; };
@@ -261,7 +260,6 @@
 		FF87BFAC173F269200472B56 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF87BFAB173F269200472B56 /* CoreFoundation.framework */; };
 		FF87BFAE173F26B900472B56 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF87BFAD173F26B900472B56 /* OpenGL.framework */; };
 		FF87BFB0173F26DF00472B56 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF87BFAF173F26DF00472B56 /* OpenAL.framework */; };
-		FF8AD94419BD40E600C269F2 /* buggy.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF8AD94319BD40E600C269F2 /* buggy.ngd */; };
 		FF8B5E181750F1B80076BE6C /* calibri.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FF8B5E161750F1B80076BE6C /* calibri.ttf */; };
 		FF8B5E191750F1B80076BE6C /* courbd.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FF8B5E171750F1B80076BE6C /* courbd.ttf */; };
 		FF8B5E1A1750F3E70076BE6C /* libfreeType.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF8B5E101750EFC00076BE6C /* libfreeType.a */; };
@@ -285,6 +283,8 @@
 		FF9BBC5218351FB90060F147 /* ruins.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF9BBC4E18351FB90060F147 /* ruins.ngd */; };
 		FF9BBC5318351FB90060F147 /* ruinsFloor.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF9BBC4F18351FB90060F147 /* ruinsFloor.ngd */; };
 		FF9D2ADE19B8D5F200BC1117 /* SuperCar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF9D2ADD19B8D5F200BC1117 /* SuperCar.cpp */; };
+		FFA358BC19C54F9800E2AAA4 /* buggy_.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FFA358BA19C54F9800E2AAA4 /* buggy_.ngd */; };
+		FFA358BD19C54F9800E2AAA4 /* m1a1_.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FFA358BB19C54F9800E2AAA4 /* m1a1_.ngd */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -478,7 +478,6 @@
 		FF3B297417300CF0007E6FEC /* UserPlaneCollision.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UserPlaneCollision.cpp; path = ../../../sdkDemos/toolBox/UserPlaneCollision.cpp; sourceTree = "<group>"; };
 		FF3B297917300D39007E6FEC /* PuckSlide.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PuckSlide.cpp; path = ../../../sdkDemos/demos/PuckSlide.cpp; sourceTree = "<group>"; };
 		FF3B297A17300D39007E6FEC /* SimpleBooleans.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SimpleBooleans.cpp; path = ../../../sdkDemos/demos/SimpleBooleans.cpp; sourceTree = "<group>"; };
-		FF3BD3C519BE54BD00E676B8 /* m1a1.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = m1a1.ngd; sourceTree = "<group>"; };
 		FF506608173F33DA00D01FDF /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = /System/Library/Frameworks/CoreGraphics.framework; sourceTree = "<absolute>"; };
 		FF50660A173F34B600D01FDF /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		FF50660C173F360C00D01FDF /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
@@ -687,7 +686,6 @@
 		FF87BFAB173F269200472B56 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
 		FF87BFAD173F26B900472B56 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		FF87BFAF173F26DF00472B56 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = /System/Library/Frameworks/OpenAL.framework; sourceTree = "<absolute>"; };
-		FF8AD94319BD40E600C269F2 /* buggy.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = buggy.ngd; sourceTree = "<group>"; };
 		FF8B5E081750EFC00076BE6C /* freeType.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = freeType.xcodeproj; path = "../../../../../packages/thirdParty/freetype-2.4.0/builds/osx/freeType.xcodeproj"; sourceTree = "<group>"; };
 		FF8B5E161750F1B80076BE6C /* calibri.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = calibri.ttf; path = ../../../../media/calibri.ttf; sourceTree = "<group>"; };
 		FF8B5E171750F1B80076BE6C /* courbd.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = courbd.ttf; path = ../../../../media/courbd.ttf; sourceTree = "<group>"; };
@@ -709,6 +707,8 @@
 		FF9BBC4E18351FB90060F147 /* ruins.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = ruins.ngd; path = ../../../../media/ruins.ngd; sourceTree = "<group>"; };
 		FF9BBC4F18351FB90060F147 /* ruinsFloor.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = ruinsFloor.ngd; path = ../../../../media/ruinsFloor.ngd; sourceTree = "<group>"; };
 		FF9D2ADD19B8D5F200BC1117 /* SuperCar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SuperCar.cpp; path = ../../../sdkDemos/demos/SuperCar.cpp; sourceTree = "<group>"; };
+		FFA358BA19C54F9800E2AAA4 /* buggy_.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = buggy_.ngd; sourceTree = "<group>"; };
+		FFA358BB19C54F9800E2AAA4 /* m1a1_.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = m1a1_.ngd; sourceTree = "<group>"; };
 		FFD2742E172DA02000114513 /* DemoListenerBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DemoListenerBase.cpp; path = ../../../sdkDemos/DemoListenerBase.cpp; sourceTree = "<group>"; };
 		FFD27431172DA05A00114513 /* AdvancedPlayerController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AdvancedPlayerController.cpp; path = ../../../sdkDemos/demos/AdvancedPlayerController.cpp; sourceTree = "<group>"; };
 		FFD27432172DA05A00114513 /* BasicPlayerController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BasicPlayerController.cpp; path = ../../../sdkDemos/demos/BasicPlayerController.cpp; sourceTree = "<group>"; };
@@ -822,8 +822,8 @@
 		FF506721173F3DDC00D01FDF /* assets */ = {
 			isa = PBXGroup;
 			children = (
-				FF3BD3C519BE54BD00E676B8 /* m1a1.ngd */,
-				FF8AD94319BD40E600C269F2 /* buggy.ngd */,
+				FFA358BA19C54F9800E2AAA4 /* buggy_.ngd */,
+				FFA358BB19C54F9800E2AAA4 /* m1a1_.ngd */,
 				FF9AEB8C19B8015A007C1C5C /* colum.ngd */,
 				FF9AEB8D19B8015A007C1C5C /* concreteBrick.tga */,
 				FF9AEB8E19B8015A007C1C5C /* softBox.nme */,
@@ -1501,6 +1501,7 @@
 				FF506774173F3EAC00D01FDF /* needle_red.tga in Resources */,
 				FF506775173F3EAC00D01FDF /* NewtonSky0001.tga in Resources */,
 				FF506776173F3EAC00D01FDF /* NewtonSky0002.tga in Resources */,
+				FFA358BC19C54F9800E2AAA4 /* buggy_.ngd in Resources */,
 				FF506777173F3EAC00D01FDF /* NewtonSky0003.tga in Resources */,
 				FF506778173F3EAC00D01FDF /* NewtonSky0004.tga in Resources */,
 				FF506779173F3EAC00D01FDF /* NewtonSky0005.tga in Resources */,
@@ -1520,7 +1521,6 @@
 				FF506786173F3EAC00D01FDF /* reljef.tga in Resources */,
 				FF506787173F3EAC00D01FDF /* rimsa1.tga in Resources */,
 				FF506788173F3EAC00D01FDF /* road_to_dirt.tga in Resources */,
-				FF3BD3C619BE54BD00E676B8 /* m1a1.ngd in Resources */,
 				FF506789173F3EAC00D01FDF /* ROAD.TGA in Resources */,
 				FF50678A173F3EAC00D01FDF /* ROAD1.TGA in Resources */,
 				FF50678B173F3EAC00D01FDF /* ROADP.TGA in Resources */,
@@ -1630,9 +1630,9 @@
 				FF5067F9173F3EAD00D01FDF /* env1.tga in Resources */,
 				FF5067FA173F3EAD00D01FDF /* f1.ngd in Resources */,
 				FF50674F173F3E9E00D01FDF /* sponza.ngd in Resources */,
+				FFA358BD19C54F9800E2AAA4 /* m1a1_.ngd in Resources */,
 				FF084A3F173F188B0059C41D /* MainMenu.xib in Resources */,
 				FF82377017C26F8C004C80D4 /* aventador.ngd in Resources */,
-				FF8AD94419BD40E600C269F2 /* buggy.ngd in Resources */,
 				FF82377117C26F8C004C80D4 /* forklift_d.tga in Resources */,
 				FF82377217C26F8C004C80D4 /* forklift_underside_d.tga in Resources */,
 				FF9AEB9419B8015A007C1C5C /* softTPot.nme in Resources */,
