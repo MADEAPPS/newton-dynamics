@@ -264,6 +264,8 @@
 		FF8B5E191750F1B80076BE6C /* courbd.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FF8B5E171750F1B80076BE6C /* courbd.ttf */; };
 		FF8B5E1A1750F3E70076BE6C /* libfreeType.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF8B5E101750EFC00076BE6C /* libfreeType.a */; };
 		FF8B5E1C1750F4670076BE6C /* BasicRagDoll.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8B5E1B1750F4670076BE6C /* BasicRagDoll.cpp */; };
+		FF93FBFB19C566EA00F4094D /* buggy_.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF93FBF919C566EA00F4094D /* buggy_.ngd */; };
+		FF93FBFC19C566EA00F4094D /* m1a1_.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF93FBFA19C566EA00F4094D /* m1a1_.ngd */; };
 		FF9AEB8919B7FFDA007C1C5C /* revHigh.wav in Resources */ = {isa = PBXBuildFile; fileRef = FF9AEB8619B7FFDA007C1C5C /* revHigh.wav */; };
 		FF9AEB8A19B7FFDA007C1C5C /* revLow.wav in Resources */ = {isa = PBXBuildFile; fileRef = FF9AEB8719B7FFDA007C1C5C /* revLow.wav */; };
 		FF9AEB8B19B7FFDA007C1C5C /* revMiddle.wav in Resources */ = {isa = PBXBuildFile; fileRef = FF9AEB8819B7FFDA007C1C5C /* revMiddle.wav */; };
@@ -283,8 +285,6 @@
 		FF9BBC5218351FB90060F147 /* ruins.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF9BBC4E18351FB90060F147 /* ruins.ngd */; };
 		FF9BBC5318351FB90060F147 /* ruinsFloor.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF9BBC4F18351FB90060F147 /* ruinsFloor.ngd */; };
 		FF9D2ADE19B8D5F200BC1117 /* SuperCar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF9D2ADD19B8D5F200BC1117 /* SuperCar.cpp */; };
-		FFA358BC19C54F9800E2AAA4 /* buggy_.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FFA358BA19C54F9800E2AAA4 /* buggy_.ngd */; };
-		FFA358BD19C54F9800E2AAA4 /* m1a1_.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FFA358BB19C54F9800E2AAA4 /* m1a1_.ngd */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -694,6 +694,8 @@
 		FF8C2CF41313DC6A00646B90 /* dContainers.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = dContainers.xcodeproj; path = ../../../../../packages/projects/mac/dContainers/dContainers.xcodeproj; sourceTree = "<group>"; };
 		FF8C2CFF1313DC7F00646B90 /* dScene.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = dScene.xcodeproj; path = ../../../../../packages/projects/mac/dScene/dScene.xcodeproj; sourceTree = "<group>"; };
 		FF8C2D0A1313DC9500646B90 /* tinyxml.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = tinyxml.xcodeproj; path = ../../../../../packages/projects/mac/tinyxml/tinyxml.xcodeproj; sourceTree = "<group>"; };
+		FF93FBF919C566EA00F4094D /* buggy_.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = buggy_.ngd; path = ../../../../media/buggy_.ngd; sourceTree = "<group>"; };
+		FF93FBFA19C566EA00F4094D /* m1a1_.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = m1a1_.ngd; path = ../../../../media/m1a1_.ngd; sourceTree = "<group>"; };
 		FF9AEB8619B7FFDA007C1C5C /* revHigh.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = revHigh.wav; path = ../../../../media/revHigh.wav; sourceTree = "<group>"; };
 		FF9AEB8719B7FFDA007C1C5C /* revLow.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = revLow.wav; path = ../../../../media/revLow.wav; sourceTree = "<group>"; };
 		FF9AEB8819B7FFDA007C1C5C /* revMiddle.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = revMiddle.wav; path = ../../../../media/revMiddle.wav; sourceTree = "<group>"; };
@@ -707,8 +709,6 @@
 		FF9BBC4E18351FB90060F147 /* ruins.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = ruins.ngd; path = ../../../../media/ruins.ngd; sourceTree = "<group>"; };
 		FF9BBC4F18351FB90060F147 /* ruinsFloor.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = ruinsFloor.ngd; path = ../../../../media/ruinsFloor.ngd; sourceTree = "<group>"; };
 		FF9D2ADD19B8D5F200BC1117 /* SuperCar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SuperCar.cpp; path = ../../../sdkDemos/demos/SuperCar.cpp; sourceTree = "<group>"; };
-		FFA358BA19C54F9800E2AAA4 /* buggy_.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = buggy_.ngd; sourceTree = "<group>"; };
-		FFA358BB19C54F9800E2AAA4 /* m1a1_.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = m1a1_.ngd; sourceTree = "<group>"; };
 		FFD2742E172DA02000114513 /* DemoListenerBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DemoListenerBase.cpp; path = ../../../sdkDemos/DemoListenerBase.cpp; sourceTree = "<group>"; };
 		FFD27431172DA05A00114513 /* AdvancedPlayerController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AdvancedPlayerController.cpp; path = ../../../sdkDemos/demos/AdvancedPlayerController.cpp; sourceTree = "<group>"; };
 		FFD27432172DA05A00114513 /* BasicPlayerController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BasicPlayerController.cpp; path = ../../../sdkDemos/demos/BasicPlayerController.cpp; sourceTree = "<group>"; };
@@ -847,7 +847,7 @@
 				FF506687173F3D8800D01FDF /* boxStacks_1.ngd */,
 				FF506688173F3D8800D01FDF /* boxStacks_3.ngd */,
 				FF50668A173F3D8800D01FDF /* brickwall.tga */,
-				FFA358BA19C54F9800E2AAA4 /* buggy_.ngd */,
+				FF93FBF919C566EA00F4094D /* buggy_.ngd */,
 				FF50668B173F3D8800D01FDF /* buggy_sk.tga */,
 				FF50668C173F3D8800D01FDF /* cabrio_tex.tga */,
 				FF8B5E161750F1B80076BE6C /* calibri.ttf */,
@@ -916,7 +916,7 @@
 				FF5066C4173F3D8800D01FDF /* logo_php.tga */,
 				FF5066C5173F3D8800D01FDF /* lshape.ngd */,
 				FF9BBC4C18351FB90060F147 /* lumber.ngd */,
-				FFA358BB19C54F9800E2AAA4 /* m1a1_.ngd */,
+				FF93FBFA19C566EA00F4094D /* m1a1_.ngd */,
 				FF5066C6173F3D8800D01FDF /* MANOR.TGA */,
 				FF5066C7173F3D8800D01FDF /* marble.tga */,
 				FF5066C8173F3D8800D01FDF /* mask.ngd */,
@@ -1501,7 +1501,7 @@
 				FF506774173F3EAC00D01FDF /* needle_red.tga in Resources */,
 				FF506775173F3EAC00D01FDF /* NewtonSky0001.tga in Resources */,
 				FF506776173F3EAC00D01FDF /* NewtonSky0002.tga in Resources */,
-				FFA358BC19C54F9800E2AAA4 /* buggy_.ngd in Resources */,
+				FF93FBFB19C566EA00F4094D /* buggy_.ngd in Resources */,
 				FF506777173F3EAC00D01FDF /* NewtonSky0003.tga in Resources */,
 				FF506778173F3EAC00D01FDF /* NewtonSky0004.tga in Resources */,
 				FF506779173F3EAC00D01FDF /* NewtonSky0005.tga in Resources */,
@@ -1630,7 +1630,7 @@
 				FF5067F9173F3EAD00D01FDF /* env1.tga in Resources */,
 				FF5067FA173F3EAD00D01FDF /* f1.ngd in Resources */,
 				FF50674F173F3E9E00D01FDF /* sponza.ngd in Resources */,
-				FFA358BD19C54F9800E2AAA4 /* m1a1_.ngd in Resources */,
+				FF93FBFC19C566EA00F4094D /* m1a1_.ngd in Resources */,
 				FF084A3F173F188B0059C41D /* MainMenu.xib in Resources */,
 				FF82377017C26F8C004C80D4 /* aventador.ngd in Resources */,
 				FF82377117C26F8C004C80D4 /* forklift_d.tga in Resources */,
