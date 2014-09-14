@@ -199,7 +199,7 @@ void dLineNodeInfo::Serialize (TiXmlElement* const rootNode) const
 
 	int pointCount = m_curve.GetControlPointCount();
 	const dVector* const controlPoints = m_curve.GetControlPointArray();
-	int bufferSizeInBytes = pointCount * sizeof (dVector) * 12;
+	int bufferSizeInBytes = pointCount * sizeof (dVector) * 3;
 	char* const buffer = new char[bufferSizeInBytes];
 	dFloatArrayToString (&controlPoints[0][0], pointCount * sizeof (dVector) / sizeof (dFloat), buffer, bufferSizeInBytes);
 
@@ -210,7 +210,7 @@ void dLineNodeInfo::Serialize (TiXmlElement* const rootNode) const
 
 	int knotCount = m_curve.GetKnotCount();
 	const dFloat* const knotPoints = m_curve.GetKnotArray();
-	int buffer1SizeInBytes = knotCount * sizeof (dFloat) * 12;
+	int buffer1SizeInBytes = knotCount * sizeof (dFloat) * 3;
 	char* const buffer1 = new char[buffer1SizeInBytes];
 	dFloatArrayToString (knotPoints, knotCount, buffer1, buffer1SizeInBytes);
 
