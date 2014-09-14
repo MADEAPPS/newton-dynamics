@@ -1005,7 +1005,9 @@ NewtonCollision* CreateCollisionTree (NewtonWorld* world, DemoEntity* const enti
 	for (DemoEntity* model = entity->GetFirst(); model; model = model->GetNext()) {
 
 		dMatrix matrix (model->GetMeshMatrix() * model->CalculateGlobalMatrix(entity));
-		DemoMesh* const mesh = model->GetMesh();
+		DemoMesh* const mesh = (DemoMesh*)model->GetMesh();
+		dAssert (mesh->IsType(DemoMesh::GetRttiType()));
+
 		dFloat* const vertex = mesh->m_vertex;
 		for (DemoMesh::dListNode* nodes = mesh->GetFirst(); nodes; nodes = nodes->GetNext()) {
 			DemoSubMesh& segment = nodes->GetInfo();
@@ -1112,7 +1114,9 @@ NewtonBody* CreateLevelMesh (DemoEntityManager* const scene, const char* const n
 	NewtonWorld* const world = scene->GetNewton();
 	for (DemoEntityManager::dListNode* node = scene->GetLast(); node; node = node->GetPrev()) {
 		DemoEntity* const ent = node->GetInfo();
-		DemoMesh* const mesh = ent->GetMesh();
+		DemoMesh* const mesh = (DemoMesh*) ent->GetMesh();
+		dAssert (mesh->IsType(DemoMesh::GetRttiType()));
+
 		if (mesh) {
 			if (mesh->GetName() == "levelGeometry_mesh") {
 				levelBody = CreateLevelMeshBody (world, ent, optimized);

@@ -127,7 +127,7 @@ class dClosestDistanceRecord: public CustomControllerBase
 		dVector size(0.5f, 0.5f, 0.75f, 0.0f);
 		NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), size, shapeType, materialID);
 
-		//	DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "wood_0.tga", "wood_0.tga", "wood_1.tga");
+		//	DemoMesh____* const geometry = new DemoMesh____("cylinder_1", collision, "wood_0.tga", "wood_0.tga", "wood_1.tga");
 		DemoMesh* const geometry = new DemoMesh("convexShape", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 		m_body = CreateSimpleSolid (scene, geometry, 1.0f, matrix, collision, materialID);
 

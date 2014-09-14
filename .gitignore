@@ -66,3 +66,5 @@ packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/
 *.dep
 packages/dCompilerKit/dLittleScriptLanguage/dLittleScriptParser.cpp.txt
 packages/dCompilerKit/dVirtualAssembler/dAssemblerParser.cpp.txt
+*.pch
+*.pch

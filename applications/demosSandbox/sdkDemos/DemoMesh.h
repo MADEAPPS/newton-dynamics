@@ -16,6 +16,23 @@
 class DemoMesh;
 class DemoEntityManager;
 
+
+class DemoMeshInterface: public dClassInfo  
+{
+	public:
+	DemoMeshInterface();
+	~DemoMeshInterface();
+	const dString& GetName () const;
+
+	virtual void RenderTransparency () const = 0;
+	virtual void Render (DemoEntityManager* const scene) = 0;
+	virtual void RenderNormals () = 0;
+
+	dAddRtti(dClassInfo,DOMMY_API);
+
+	dString m_name;
+};
+
 class DemoSubMesh
 {
 	public:
@@ -37,12 +54,11 @@ class DemoSubMesh
 	dVector m_diffuse;
 	dVector m_specular;
 	dFloat m_opacity;
-	//char m_textureName[D_NAME_STRING_LENGTH];
 	dString  m_textureName;
 };
 
 
-class DemoMesh: public dList<DemoSubMesh>, virtual public dClassInfo  
+class DemoMesh: public DemoMeshInterface, public dList<DemoSubMesh>
 {
 	public:
 	DemoMesh(const DemoMesh& mesh);
@@ -58,7 +74,6 @@ class DemoMesh: public dList<DemoSubMesh>, virtual public dClassInfo
 	DemoSubMesh* AddSubMesh();
 	void AllocVertexData (int vertexCount);
 
-	virtual const dString& GetName () const;
 	virtual const dString& GetTextureName (const DemoSubMesh* const subMesh) const;
 
     virtual void RenderTransparency () const;
@@ -71,7 +86,7 @@ class DemoMesh: public dList<DemoSubMesh>, virtual public dClassInfo
 	protected:
 	virtual ~DemoMesh();
 
-	dAddRtti(dClassInfo,DOMMY_API);
+	dAddRtti (DemoMeshInterface, DOMMY_API);
 	
 	void  ResetOptimization();
 	void  SpliteSegment(dListNode* const node, int maxIndexCount);
@@ -84,13 +99,26 @@ class DemoMesh: public dList<DemoSubMesh>, virtual public dClassInfo
 	dFloat* m_normal;
 	unsigned m_optimizedOpaqueDiplayList;
 	unsigned m_optimizedTransparentDiplayList;		
-	dString m_name;
 };
 
 
 
+class DemoBezierCurve: public DemoMeshInterface
+{
+	public:
+	DemoBezierCurve(const dScene* const scene, dScene::dTreeNode* const meshNode);
 
+
+	virtual void RenderTransparency () const;
+	virtual void Render (DemoEntityManager* const scene);
+	virtual void RenderNormals ();
+
+	dBezierSpline m_curve;
+
+	dAddRtti (DemoMeshInterface, DOMMY_API);
+};
 
 
 #endif 
+
 

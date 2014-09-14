@@ -120,7 +120,8 @@ class RagDollManager: public CustomArticulaledTransformManager
 
 	void GetDimentions(DemoEntity* const bodyPart, dVector& origin, dVector& size) const
 	{	
-		DemoMesh* const mesh = bodyPart->GetMesh();
+		DemoMesh* const mesh = (DemoMesh*)bodyPart->GetMesh();
+		dAssert (mesh->IsType(DemoMesh::GetRttiType()));
 
 		dFloat* const array = mesh->m_vertex;
 		dVector pmin( 1.0e20f,  1.0e20f,  1.0e20f, 0.0f);
@@ -196,7 +197,8 @@ class RagDollManager: public CustomArticulaledTransformManager
 	{
 		dVector points[1024 * 16];
 
-		DemoMesh* const mesh = bodyPart->GetMesh();
+		DemoMesh* const mesh = (DemoMesh*)bodyPart->GetMesh();
+		dAssert (mesh->IsType(DemoMesh::GetRttiType()));
 		dAssert (mesh->m_vertexCount && (mesh->m_vertexCount < int (sizeof (points)/ sizeof (points[0]))));
 
 		// go over the vertex array and find and collect all vertices's weighted by this bone.

@@ -115,7 +115,8 @@ class ComplexScene: public DemoEntity
 		// find the visual mesh and make a collision tree
 		NewtonWorld* const world = scene->GetNewton();
 		DemoEntity* const entity = scene->GetLast()->GetInfo();
-		DemoMesh* const mesh = entity->GetMesh();
+		DemoMesh* const mesh = (DemoMesh*)entity->GetMesh();
+		dAssert (mesh->IsType(DemoMesh::GetRttiType()));
 
 		NewtonCollision* const tree = NewtonCreateTreeCollision(world, 0);
 		NewtonTreeCollisionBeginBuild(tree);

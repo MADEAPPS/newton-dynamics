@@ -84,7 +84,7 @@ freq *= 0.5f;
 
 
 /*
-	static DemoMesh* CreateVisualMesh (dFloat* const elevation, int size, dFloat cellSize, dFloat texelsDensity)
+	static DemoMesh____* CreateVisualMesh (dFloat* const elevation, int size, dFloat cellSize, dFloat texelsDensity)
 	{
 		dVector* const normals = new dVector [size * size];
 

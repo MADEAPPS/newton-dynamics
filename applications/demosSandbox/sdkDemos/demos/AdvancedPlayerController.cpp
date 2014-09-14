@@ -515,7 +515,9 @@ class PlaformEntityEntity: public DemoEntity
 	{
 		scene->Append(this);
 
-		DemoMesh* const mesh = source->GetMesh();
+		DemoMesh* const mesh = (DemoMesh*)source->GetMesh();
+		dAssert (mesh->IsType(DemoMesh::GetRttiType()));
+
 		SetMesh(mesh, source->GetMeshMatrix());
 
 		const dFloat mass = 100.0f;
@@ -597,7 +599,8 @@ static void LoadFloor(DemoEntityManager* const scene, NewtonCollision* const sce
 	DemoEntityManager::dListNode* const floorNode = LoadScene(scene, "flatPlane.ngd", matrix);
 
 	DemoEntity* const entity = floorNode->GetInfo();
-	DemoMesh* const mesh = entity->GetMesh();
+	DemoMesh* const mesh = (DemoMesh*)entity->GetMesh();
+	dAssert (mesh->IsType(DemoMesh::GetRttiType()));
 
 	NewtonCollision* const tree = NewtonCreateTreeCollision(world, 0);
 	NewtonTreeCollisionBeginBuild(tree);
@@ -656,7 +659,8 @@ static void LoadFerryBridge (DemoEntityManager* const scene, TriggerManager* con
 	for (DemoEntityManager::dListNode* node = bridgeNodes->GetNext(); node; node = node->GetNext()) {
 		DemoEntity* const entity = node->GetInfo();
 		if (entity->GetName().Find("ramp") != -1) {
-			DemoMesh* const mesh = entity->GetMesh();
+			DemoMesh* const mesh = (DemoMesh*)entity->GetMesh();
+			dAssert (mesh->IsType(DemoMesh::GetRttiType()));
 
 			const dMatrix& meshMatrix = entity->GetMeshMatrix();
 			//const dMatrix& meshMatrix (GetIdentityMatrix());
@@ -679,7 +683,8 @@ static void LoadFerryBridge (DemoEntityManager* const scene, TriggerManager* con
 		DemoEntity* const entity = node->GetInfo();
 		node = node->GetNext() ;
 		if (entity->GetName().Find("startTrigger") != -1) {
-			DemoMesh* const mesh = entity->GetMesh();
+			DemoMesh* const mesh = (DemoMesh*)entity->GetMesh();
+			dAssert (mesh->IsType(DemoMesh::GetRttiType()));
 
 			const dMatrix& meshMatrix = entity->GetMeshMatrix();
 			// create a trigger to match his mesh
@@ -728,7 +733,8 @@ static void LoadSlide (DemoEntityManager* const scene, TriggerManager* const tri
 	for (DemoEntityManager::dListNode* node = bridgeNodes->GetNext(); node; node = node->GetNext()) {
 		DemoEntity* const entity = node->GetInfo();
 		if (entity->GetName().Find("ramp") != -1) {
-			DemoMesh* const mesh = entity->GetMesh();
+			DemoMesh* const mesh = (DemoMesh*)entity->GetMesh();
+			dAssert (mesh->IsType(DemoMesh::GetRttiType()));
 
 			NewtonCollision* const collision = NewtonCreateConvexHull(world, mesh->m_vertexCount, mesh->m_vertex, 3 * sizeof (dFloat), 0, 0, NULL);
 			void* const proxy = NewtonSceneCollisionAddSubCollision (sceneCollision, collision);
@@ -751,7 +757,8 @@ static void LoadSlide (DemoEntityManager* const scene, TriggerManager* const tri
 		DemoEntity* const entity = node->GetInfo();
 		node = node->GetNext() ;
 		if (entity->GetName().Find("startTrigger") != -1) {
-			DemoMesh* const mesh = entity->GetMesh();
+			DemoMesh* const mesh = (DemoMesh*)entity->GetMesh();
+			dAssert (mesh->IsType(DemoMesh::GetRttiType()));
 
 			// create a trigger to match his mesh
 			NewtonCollision* const collision = NewtonCreateConvexHull(world, mesh->m_vertexCount, mesh->m_vertex, 3 * sizeof (dFloat), 0, 0, NULL);
@@ -800,7 +807,8 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 	for (DemoEntityManager::dListNode* node = bridgeNodes->GetNext(); node; node = node->GetNext()) {
 		DemoEntity* const entity = node->GetInfo();
 		if (entity->GetName().Find("ramp") != -1) {	
-			DemoMesh* const mesh = entity->GetMesh();
+			DemoMesh* const mesh = (DemoMesh*)entity->GetMesh();
+			dAssert (mesh->IsType(DemoMesh::GetRttiType()));
 
 			NewtonCollision* const collision = NewtonCreateConvexHull(world, mesh->m_vertexCount, mesh->m_vertex, 3 * sizeof (dFloat), 0, 0, NULL);
 			void* const proxy = NewtonSceneCollisionAddSubCollision (sceneCollision, collision);
@@ -822,7 +830,8 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 	for (DemoEntityManager::dListNode* node = bridgeNodes->GetNext(); node; node = node->GetNext()) {
 		DemoEntity* const entity = node->GetInfo();
 		if (entity->GetName().Find("plank") != -1) {	
-			DemoMesh* const mesh = entity->GetMesh();
+			DemoMesh* const mesh = (DemoMesh*)entity->GetMesh();
+			dAssert (mesh->IsType(DemoMesh::GetRttiType()));
 
 			// note: because the mesh matrix can have scale, for simplicity just apply the local mesh matrix to the vertex cloud
 			dVector pool[128];

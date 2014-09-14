@@ -91,7 +91,8 @@ class SimpleSoftBodyEntity: public DemoEntity
 
 	void CreateVisualMesh ()
 	{
-		DemoMesh* const mesh = GetMesh();
+		DemoMesh* const mesh = (DemoMesh*)GetMesh();
+		dAssert (mesh->IsType(DemoMesh::GetRttiType()));
 
 		// now create a visual representation for this mesh
 		int vertexCount = NewtonDeformableMeshGetVertexCount (m_softCollision); 
@@ -342,7 +343,8 @@ class SimpleSoftBodyEntity: public DemoEntity
 
 	virtual void Render(dFloat timeStep, DemoEntityManager* const scene) const
 	{
-		DemoMesh* const mesh = GetMesh();
+		DemoMesh* const mesh = (DemoMesh*)GetMesh();
+		dAssert (mesh->IsType(DemoMesh::GetRttiType()));
 
 		// regenerate the soft body mesh for rendering
 		NewtonDeformableMeshUpdateRenderNormals(m_softCollision);

@@ -32,38 +32,9 @@ class dLineNodeInfo: public dGeometryNodeInfo
 	dLineNodeInfo(const dLineNodeInfo& me);
 	virtual ~dLineNodeInfo(void);
 
+	virtual const dBezierSpline& GetCurve() const;
+
 	virtual void BakeTransform (const dMatrix& matrix);
-/*
-	virtual NewtonMesh* GetMesh () const;
-	virtual void SetMesh (NewtonMesh* const mesh);
-	virtual void ReplaceMesh (NewtonMesh* const mesh);
-
-	
-
-	virtual void ConvertToPolygons();
-	virtual void ConvertToTriangles();
-
-	virtual void RepairTJoints ();
-	virtual void RemoveUnusedVertices(dScene* const world, dScene::dTreeNode* const myNode);
-
-	virtual void SmoothNormals (dFloat angleInRadiants);
-
-	virtual void BeginBuild ();
-	virtual void AddPolygon (int pointsCount, const neMeshInfoFlatPoint* const points, int materialID);
-	virtual void EndBuild ();
-	virtual void BuildFromVertexListIndexList(int faceCount, const int* const faceIndexCount, const int* faceMaterialIndex, 
-												const dFloat* const vertex, int vertexStrideInBytes, const int* vertexIndex,
-												const dFloat* const normal, int normalStrideInBytes, const int* normalIndex,
-												const dFloat* const uv0, int uv0StrideInBytes, const int* uv0Index,
-												const dFloat* const uv1, int uv1StrideInBytes, const int* uv1Index);
-
-
-	virtual void CalcutateAABB (dVector& p0, dVector& p1) const;
-	virtual dFloat RayCast (const dVector& p0, const dVector& p1) const;
-
-	
-	protected:
-*/
 	virtual dCRCTYPE CalculateSignature() const;
 	virtual void Serialize (TiXmlElement* const rootNode) const; 
 	virtual bool Deserialize (const dScene* const scene, TiXmlElement* const rootNode);

@@ -109,7 +109,8 @@ static void CreateScaleStaticMesh (DemoEntity* const entity, NewtonCollision* co
 {
 	// now make a scale version of the same model
 	// first Get The mesh and make a scale copy
-	DemoMesh* const mesh = entity->GetMesh();
+	DemoMesh* const mesh = (DemoMesh*)entity->GetMesh();
+	dAssert (mesh->IsType(DemoMesh::GetRttiType()));
 
 	// since the render does no handle scale, we will made a duplicated mesh with the scale baked in
 	DemoMesh* const scaledMesh =  new DemoMesh (*mesh);

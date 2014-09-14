@@ -56,6 +56,11 @@ dLineNodeInfo::~dLineNodeInfo(void)
 }
 
 
+const dBezierSpline& dLineNodeInfo::GetCurve() const
+{
+	return m_curve;
+}
+
 void dLineNodeInfo::BakeTransform (const dMatrix& transform)
 {
 	dVector scale; 
@@ -67,162 +72,6 @@ void dLineNodeInfo::BakeTransform (const dMatrix& transform)
 
 	matrix.TransformTriplex (&m_curve.GetControlPointArray()[0].m_x, sizeof (dVector), &m_curve.GetControlPointArray()[0].m_x, sizeof (dVector), m_curve.GetControlPointCount());
 }
-
-
-/*
-void dLineNodeInfo::BeginBuild ()
-{
-	NewtonMeshBeginFace(m_mesh);
-}
-
-void dLineNodeInfo::AddPolygon (int pointsCount, const neMeshInfoFlatPoint* const points, int materialID)
-{
-	NewtonMeshAddFace(m_mesh, pointsCount, &points[0].m_x, sizeof (neMeshInfoFlatPoint), materialID);
-}
-
-void dLineNodeInfo::EndBuild ()
-{
-	NewtonMeshEndFace(m_mesh);
-}
-
-void dLineNodeInfo::ConvertToTriangles()
-{
-	NewtonMeshTriangulate (m_mesh);
-}
-
-void dLineNodeInfo::ConvertToPolygons()
-{
-	NewtonMeshPolygonize(m_mesh);
-}
-void dLineNodeInfo::RepairTJoints ()
-{
-	NewtonMeshFixTJoints (m_mesh);
-}
-
-
-void dLineNodeInfo::SmoothNormals (dFloat angleInRadiants)
-{
-	NewtonMeshCalculateVertexNormals(m_mesh, angleInRadiants);
-}
-
-
-void dLineNodeInfo::BuildFromVertexListIndexList(int faceCount, const int* const faceIndexCount, const int* faceMaterialIndex, 
-	const dFloat* const vertex, int vertexStrideInBytes, const int* vertexIndex,
-	const dFloat* const normal, int normalStrideInBytes, const int* normalIndex,
-	const dFloat* const uv0, int uv0StrideInBytes, const int* uv0Index,
-	const dFloat* const uv1, int uv1StrideInBytes, const int* uv1Index)
-{
-	NewtonMeshBuildFromVertexListIndexList(m_mesh, faceCount, faceIndexCount, faceMaterialIndex, 
-		vertex, vertexStrideInBytes, vertexIndex,normal, normalStrideInBytes, normalIndex,
-		uv0, uv0StrideInBytes, uv0Index, uv1, uv1StrideInBytes, uv1Index);
-}
-
-void dLineNodeInfo::RemoveUnusedVertices(dScene* const world, dScene::dTreeNode* const myNode)
-{
-	dAssert (world->GetInfoFromNode(myNode) == this);
-
-	int vertexCount = NewtonMeshGetVertexCount(m_mesh);
-	int* vertexRemapArray = new int [vertexCount];
-
-	NewtonRemoveUnusedVertices(m_mesh, vertexRemapArray);
-
-	for (void* ptr0 = world->GetFirstChildLink (myNode); ptr0; ptr0 = world->GetNextChildLink(myNode, ptr0)) {
-		dScene::dTreeNode* node = world->GetNodeFromLink(ptr0);
-		dNodeInfo* info = world->GetInfoFromNode(node);
-		if (info->IsType(dGeometryNodeModifierInfo::GetRttiType())) {
-			dGeometryNodeModifierInfo* const modifier = (dGeometryNodeModifierInfo*) info;
-			modifier->RemoveUnusedVertices(vertexRemapArray);
-		}
-	}
-
-	delete vertexRemapArray;
-}
-
-
-
-void dLineNodeInfo::CalcutateAABB (dVector& p0, dVector& p1) const
-{
-//	int strideInBytes = NewtonMeshGetVertexStrideInByte(m_mesh);
-//	dFloat64* const vertexList = NewtonMeshGetVertexArray(m_mesh);
-//	dFloat t = 1.2f;
-//	for (void* face = NewtonMeshGetFirstFace (m_mesh); face; face = NewtonMeshGetNextFace (m_mesh, face)) {
-//		if (!NewtonMeshIsFaceOpen (m_mesh, face)) {
-
-//	dMatrix matrix (GetIdentityMatrix());
-//	NewtonMeshCalculateOOBB(const NewtonMesh* const mesh, dFloat* const matrix, dFloat* const x, dFloat* const y, dFloat* const z);
-
-	p0 = dVector (1.0e10f, 1.0e10f, 1.0e10f, 0.0f);
-	p1 = dVector (-1.0e10f, -1.0e10f, -1.0e10f, 0.0f);
-
-	int strideInBytes = NewtonMeshGetVertexStrideInByte(m_mesh);
-	int stride = strideInBytes / sizeof (dFloat64) ;
-	dFloat64* const vertexList = NewtonMeshGetVertexArray(m_mesh);
-	for (void* ptr = NewtonMeshGetFirstVertex(m_mesh); ptr; ptr = NewtonMeshGetNextVertex(m_mesh, ptr)) {
-		int index = NewtonMeshGetVertexIndex (m_mesh, ptr);
-
-		dFloat x = dFloat (vertexList[index * stride + 0]);
-		dFloat y = dFloat (vertexList[index * stride + 1]);
-		dFloat z = dFloat (vertexList[index * stride + 2]);
-		dVector v (m_matrix.TransformVector(dVector (x, y, z, 0.0f)));
-
-		p0[0] = dMin(v[0], p0[0]);
-		p0[1] = dMin(v[1], p0[1]);
-		p0[2] = dMin(v[2], p0[2]);
-					   
-		p1[0] = dMax(v[0], p1[0]);
-		p1[1] = dMax(v[1], p1[1]);
-		p1[2] = dMax(v[2], p1[2]);
-	}
-}
-
-
-dFloat dLineNodeInfo::RayCast (const dVector& q0, const dVector& q1) const
-{
-	//	int vertexCount = NewtonMeshGetVertexCount(m_mesh);
-	int strideInBytes = NewtonMeshGetVertexStrideInByte(m_mesh);
-	dFloat64* const vertexList = NewtonMeshGetVertexArray(m_mesh);
-	dFloat t = 1.2f;
-
-	dVector p0 = m_matrix.UntransformVector(q0);
-	dVector p1 = m_matrix.UntransformVector(q1);
-	for (void* face = NewtonMeshGetFirstFace (m_mesh); face; face = NewtonMeshGetNextFace (m_mesh, face)) {
-		if (!NewtonMeshIsFaceOpen (m_mesh, face)) {
-
-			int indices[1024];
-			int vertexCount = NewtonMeshGetFaceIndexCount (m_mesh, face);
-			NewtonMeshGetFaceIndices (m_mesh, face, indices);
-
-			dFloat t1 = dPolygonRayCast (p0, p1, vertexCount, vertexList, strideInBytes, indices);
-			if (t1 < t) {
-				t = t1;		
-			}
-		}
-	}
-	return t;
-}
-
-
-void dLineNodeInfo::DrawWireFrame(dSceneRender* const render, dScene* const scene, dScene::dTreeNode* const myNode) const
-{
-	dAssert (myNode == scene->Find(GetUniqueID()));
-	dAssert (scene->GetInfoFromNode(myNode) == this);
-
-
-	int displayList = render->GetCachedWireframeDisplayList(m_mesh);
-	dAssert (displayList > 0);
-	
-	render->PushMatrix(&m_matrix[0][0]);
-	if (GetEditorFlags() & m_selected) {
-		dVector color (render->GetColor());
-		render->SetColor(dVector (1.0f, 1.0f, 0.0f, 0.0f));
-		render->DrawDisplayList(displayList);
-		render->SetColor(color);
-	} else {
-		render->DrawDisplayList(displayList);
-	}
-	render->PopMatrix();
-}
-*/
 
 void dLineNodeInfo::DrawWireFrame(dSceneRender* const render, dScene* const scene, dScene::dTreeNode* const myNode) const
 {

@@ -36,7 +36,7 @@ DemoEntity::DemoEntity(const dMatrix& matrix, DemoEntity* const parent)
 
 
 
-DemoEntity::DemoEntity(DemoEntityManager& world, const dScene* const scene, dScene::dTreeNode* const rootSceneNode, dTree<DemoMesh*, dScene::dTreeNode*>& meshCache, DemoEntityManager::EntityDictionary& entityDictionary, DemoEntity* const parent)
+DemoEntity::DemoEntity(DemoEntityManager& world, const dScene* const scene, dScene::dTreeNode* const rootSceneNode, dTree<DemoMeshInterface*, dScene::dTreeNode*>& meshCache, DemoEntityManager::EntityDictionary& entityDictionary, DemoEntity* const parent)
 	:dClassInfo()
 	,dHierarchy<DemoEntity>() 
 	,m_matrix(dGetIdentityMatrix()) 
@@ -72,7 +72,7 @@ DemoEntity::DemoEntity(DemoEntityManager& world, const dScene* const scene, dSce
 	// if this node has a mesh, find it and attach it to this entity
 	dScene::dTreeNode* const meshNode = scene->FindChildByType(rootSceneNode, dMeshNodeInfo::GetRttiType());
 	if (meshNode) {
-		DemoMesh* const mesh = meshCache.Find(meshNode)->GetInfo();
+		DemoMeshInterface* const mesh = meshCache.Find(meshNode)->GetInfo();
 		SetMesh(mesh, sceneInfo->GetGeometryTransform());
 	}
 
@@ -156,7 +156,7 @@ void DemoEntity::LoadNGD_mesh (const char* const fileName, NewtonWorld* const wo
 		
 		stack = 1;
 
-		dTree<DemoMesh*, dScene::dTreeNode*> meshDictionary;
+		dTree<DemoMeshInterface*, dScene::dTreeNode*> meshDictionary;
 		while (stack) {
 			stack --;
 
@@ -188,15 +188,21 @@ void DemoEntity::LoadNGD_mesh (const char* const fileName, NewtonWorld* const wo
 
 				dNodeInfo* const meshInfo = scene.GetInfoFromNode(meshNode);
 				if (meshInfo->GetTypeId() == dMeshNodeInfo::GetRttiType()) {
-					dTree<DemoMesh*, dScene::dTreeNode*>::dTreeNode* cacheNode = meshDictionary.Find(meshNode);
+					dTree<DemoMeshInterface*, dScene::dTreeNode*>::dTreeNode* cacheNode = meshDictionary.Find(meshNode);
 					if (!cacheNode) {
-						DemoMesh* const mesh = new DemoMesh(&scene, meshNode);
+						DemoMeshInterface* const mesh = new DemoMesh(&scene, meshNode);
 						cacheNode = meshDictionary.Insert(mesh, meshNode);
 					}
-					DemoMesh* const mesh = cacheNode->GetInfo();
+					DemoMeshInterface* const mesh = cacheNode->GetInfo();
 					entity->SetMesh(mesh, sceneInfo->GetGeometryTransform());
 				} else if (meshInfo->GetTypeId() == dLineNodeInfo::GetRttiType()) {
-//					dAssert (0);
+					dTree<DemoMeshInterface*, dScene::dTreeNode*>::dTreeNode* cacheNode = meshDictionary.Find(meshNode);
+					if (!cacheNode) {
+						DemoMeshInterface* const mesh = new DemoBezierCurve(&scene, meshNode);
+						cacheNode = meshDictionary.Insert(mesh, meshNode);
+					}
+					DemoMeshInterface* const mesh = cacheNode->GetInfo();
+					entity->SetMesh(mesh, sceneInfo->GetGeometryTransform());
 				}
 			}
 
@@ -212,17 +218,13 @@ void DemoEntity::LoadNGD_mesh (const char* const fileName, NewtonWorld* const wo
 		}
 
 		while (meshDictionary.GetCount()) {
-			dTree<DemoMesh*, dScene::dTreeNode*>::dTreeNode* const node = meshDictionary.GetRoot();
-			DemoMesh* const mesh = node->GetInfo();
+			dTree<DemoMeshInterface*, dScene::dTreeNode*>::dTreeNode* const node = meshDictionary.GetRoot();
+			DemoMeshInterface* const mesh = node->GetInfo();
 			mesh->Release();
 			meshDictionary.Remove(node);
 		}
 	}
 }
-
-
-
-
 
 
 
@@ -247,12 +249,12 @@ void DemoEntity::TransformCallback(const NewtonBody* body, const dFloat* matrix,
 }
 
 
-DemoMesh* DemoEntity::GetMesh() const
+DemoMeshInterface* DemoEntity::GetMesh() const
 {
 	return m_mesh;
 }
 
-void DemoEntity::SetMesh(DemoMesh* const mesh, const dMatrix& meshMatrix)
+void DemoEntity::SetMesh(DemoMeshInterface* const mesh, const dMatrix& meshMatrix)
 {
 	m_meshMatrix = meshMatrix;
 	if (m_mesh) {

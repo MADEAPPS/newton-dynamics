@@ -228,11 +228,11 @@ void DemoEntityManager::RemoveEntity (DemoEntity* const ent)
 	}
 }
 
-void DemoEntityManager::PushTransparentMesh (const DemoMesh* const mesh)
+void DemoEntityManager::PushTransparentMesh (const DemoMeshInterface* const mesh)
 {
     dMatrix matrix;
     glGetFloat (GL_MODELVIEW_MATRIX, &matrix[0][0]);
-    TransparentMesh entry (matrix, mesh);
+    TransparentMesh entry (matrix, (DemoMesh*) mesh);
     m_tranparentHeap.Push (entry, matrix.m_posit.m_z);
 }
 
@@ -466,7 +466,7 @@ void DemoEntityManager::BodyDeserialization (NewtonBody* const body, NewtonDeser
 	#endif
 
 	//for visual mesh we will collision mesh and convert it to a visual mesh using NewtonMesh 
-	DemoMesh* const mesh = new DemoMesh(bodyIndentification, collision, NULL, NULL, NULL);
+	DemoMeshInterface* const mesh = new DemoMesh(bodyIndentification, collision, NULL, NULL, NULL);
 	entity->SetMesh(mesh, dGetIdentityMatrix());
 	mesh->Release();
 }
@@ -552,11 +552,11 @@ void DemoEntityManager::Set2DDisplayRenderFunction (RenderHoodCallback callback,
 void DemoEntityManager::LoadVisualScene(dScene* const scene, EntityDictionary& dictionary)
 {
 	// load all meshes into a Mesh cache for reuse
-	dTree<DemoMesh*, dScene::dTreeNode*> meshDictionary;
+	dTree<DemoMeshInterface*, dScene::dTreeNode*> meshDictionary;
 	for (dScene::dTreeNode* node = scene->GetFirstNode (); node; node = scene->GetNextNode (node)) {
 		dNodeInfo* info = scene->GetInfoFromNode(node);
 		if (info->GetTypeId() == dMeshNodeInfo::GetRttiType()) {
-			DemoMesh* const mesh = new DemoMesh(scene, node);
+			DemoMeshInterface* const mesh = new DemoMesh(scene, node);
 			meshDictionary.Insert(mesh, node);
 		}
 	}
@@ -575,9 +575,9 @@ void DemoEntityManager::LoadVisualScene(dScene* const scene, EntityDictionary& d
 	}
 
 	// release all meshes before exiting
-	dTree<DemoMesh*, dScene::dTreeNode*>::Iterator iter (meshDictionary);
+	dTree<DemoMeshInterface*, dScene::dTreeNode*>::Iterator iter (meshDictionary);
 	for (iter.Begin(); iter; iter++) {
-		DemoMesh* const mesh = iter.GetNode()->GetInfo();
+		DemoMeshInterface* const mesh = iter.GetNode()->GetInfo();
 		mesh->Release();
 	}
 }

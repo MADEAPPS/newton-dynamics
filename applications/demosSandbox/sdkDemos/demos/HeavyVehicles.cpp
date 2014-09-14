@@ -249,7 +249,8 @@ class HeavyVehicleEntity: public DemoEntity
 		DemoEntity* const chassis = dHierarchy<DemoEntity>::Find("chassis");
 		dAssert (chassis);
 
-		DemoMesh* const mesh = chassis->GetMesh();
+		DemoMesh* const mesh = (DemoMesh*)chassis->GetMesh();
+		dAssert (mesh->IsType(DemoMesh::GetRttiType()));
 		//dAssert (chassis->GetMeshMatrix().TestIdentity());
 		const dMatrix& meshMatrix = chassis->GetMeshMatrix();
 
@@ -283,7 +284,8 @@ class HeavyVehicleEntity: public DemoEntity
 		dAssert (tirePart);
 
 		// make a convex hull collision shape to assist in calculation of the tire shape size
-		DemoMesh* const tireMesh = tirePart->GetMesh();
+		DemoMesh* const tireMesh = (DemoMesh*)tirePart->GetMesh();
+		dAssert (tireMesh->IsType(DemoMesh::GetRttiType()));
 		dMatrix meshMatrix (tirePart->GetMeshMatrix());
 		dVector* const temp = new dVector [tireMesh->m_vertexCount];
 		meshMatrix.TransformTriplex (&temp[0].m_x, sizeof (dVector), tireMesh->m_vertex, 3 * sizeof (dFloat), tireMesh->m_vertexCount);
@@ -555,7 +557,6 @@ class HeavyVehicleEntity: public DemoEntity
 
 	void BuildTrackedVehicle (const VehicleParameters& parameters)
 	{
-
 		// set up the tank Track
 		SetTracks ();
 
@@ -925,7 +926,7 @@ class HeavyVehicleControllerManager: public CustomVehicleControllerManager
 			// restore color and blend mode
 			glDisable (GL_BLEND);
 		}
-
+/*
 const int segments = 20;
 glDisable (GL_LIGHTING);
 glDisable(GL_TEXTURE_2D);
@@ -1006,7 +1007,7 @@ for (int i = 0; i < xxx; i ++) {
 	glVertex3f (points[i].m_x, points[i].m_y, points[i].m_z);
 }
 glEnd();
-
+*/
 	}
 
 	void SetAsPlayer (HeavyVehicleEntity* const player)

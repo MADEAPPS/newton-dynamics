@@ -10,15 +10,14 @@
 */
 
 
-// DemoMesh.cpp: implementation of the DemoMesh class.
-//
-//////////////////////////////////////////////////////////////////////
 #include "toolbox_stdafx.h"
 #include "DemoMesh.h"
 #include "TargaToOpenGl.h"
 #include "DemoEntityManager.h"
 
+dInitRtti(DemoMeshInterface);
 dInitRtti(DemoMesh);
+dInitRtti(DemoBezierCurve);
 
 
 #define USING_DISPLAY_LIST
@@ -32,6 +31,25 @@ dInitRtti(DemoMesh);
 #		undef USING_DISPLAY_LIST
 #	endif
 #endif
+
+DemoMeshInterface::DemoMeshInterface()
+	:dClassInfo()
+	,m_name()
+{
+}
+
+DemoMeshInterface::~DemoMeshInterface()
+{
+}
+
+const dString& DemoMeshInterface::GetName () const
+{
+	//	strcpy (nameOut, m_name);
+	return m_name;
+}
+
+
+
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -124,7 +142,7 @@ void DemoSubMesh::AllocIndexData (int indexCount)
 
 
 DemoMesh::DemoMesh(const char* const name)
-	:dClassInfo()
+	:DemoMeshInterface()
 	,dList<DemoSubMesh>()
 	,m_vertexCount(0)
 	,m_uv (NULL)
@@ -132,19 +150,17 @@ DemoMesh::DemoMesh(const char* const name)
 	,m_normal(NULL)
 	,m_optimizedOpaqueDiplayList(0)	
 	,m_optimizedTransparentDiplayList(0)
-	,m_name()
 {
 }
 
 DemoMesh::DemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode)
-	:dClassInfo()
+	:DemoMeshInterface()
 	,dList<DemoSubMesh>()
 	,m_uv(NULL)
 	,m_vertex(NULL)
 	,m_normal(NULL)
 	,m_optimizedOpaqueDiplayList(0)
 	,m_optimizedTransparentDiplayList(0)
-	,m_name()
 {
 	dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*)scene->GetInfoFromNode(meshNode);
 	m_name = meshInfo->GetName();
@@ -218,7 +234,7 @@ DemoMesh::DemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode)
 }
 
 DemoMesh::DemoMesh(NewtonMesh* const mesh)
-	:dClassInfo()
+	:DemoMeshInterface()
 	,m_uv(NULL)
 	,m_vertex(NULL)
 	,m_normal(NULL)
@@ -282,7 +298,7 @@ DemoMesh::DemoMesh(NewtonMesh* const mesh)
 }
 
 DemoMesh::DemoMesh(const DemoMesh& mesh)
-	:dClassInfo()
+	:DemoMeshInterface()
 	,dList<DemoSubMesh>()
 	,m_uv(NULL)
 	,m_vertex(NULL)
@@ -318,7 +334,7 @@ DemoMesh::DemoMesh(const DemoMesh& mesh)
 }
 
 DemoMesh::DemoMesh(const char* const name, const NewtonCollision* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat opacity)
-	:dClassInfo()
+	:DemoMeshInterface()
 	,dList<DemoSubMesh>()
 	,m_uv(NULL)
 	,m_vertex(NULL)
@@ -400,7 +416,7 @@ DemoMesh::DemoMesh(const char* const name, const NewtonCollision* const collisio
 
 
 DemoMesh::DemoMesh(const char* const name, dFloat* const elevation, int size, dFloat cellSize, dFloat texelsDensity, int tileSize)
-	:dClassInfo()
+	:DemoMeshInterface()
 	,dList<DemoSubMesh>()
 	,m_uv(NULL)
 	,m_vertex(NULL)
@@ -568,11 +584,6 @@ NewtonMesh* DemoMesh::CreateNewtonMesh(NewtonWorld* const world, const dMatrix& 
 	return mesh;
 }
 
-const dString& DemoMesh::GetName () const
-{
-//	strcpy (nameOut, m_name);
-	return m_name;
-}
 
 const dString& DemoMesh::GetTextureName (const DemoSubMesh* const subMesh) const
 {
@@ -825,3 +836,47 @@ void DemoMesh::RenderNormals ()
 
 	glEnable (GL_LIGHTING);
 }
+
+
+DemoBezierCurve::DemoBezierCurve(const dScene* const scene, dScene::dTreeNode* const bezierNode)
+	:DemoMeshInterface()
+	,m_curve()
+{
+	dLineNodeInfo* const bezeriInfo = (dLineNodeInfo*)scene->GetInfoFromNode(bezierNode);
+	dAssert (bezeriInfo->IsType(dLineNodeInfo::GetRttiType()));
+	m_name = bezeriInfo->GetName();
+
+	m_curve = bezeriInfo->GetCurve();
+}
+
+void DemoBezierCurve::RenderTransparency () const
+{
+}
+
+void DemoBezierCurve::RenderNormals ()
+{
+}	
+
+void DemoBezierCurve::Render (DemoEntityManager* const scene)
+{
+#if 1
+	glDisable (GL_LIGHTING);
+	glDisable(GL_TEXTURE_2D);
+	glColor3f(1.0f, 1.0f, 1.0f);
+
+	const int segments = 100;
+	dFloat scale = 1.0f / segments;
+	glBegin(GL_LINES);
+	dVector p0 (m_curve.CurvePoint(0.0f)) ;
+	for (int i = 1; i <= segments; i ++) {
+		dVector p1 (m_curve.CurvePoint(i * scale));
+		glVertex3f (p0.m_x, p0.m_y, p0.m_z);
+		glVertex3f (p1.m_x, p1.m_y, p1.m_z);
+		p0 = p1;
+	}
+	glEnd();
+
+	glEnable (GL_LIGHTING);
+#endif
+}
+

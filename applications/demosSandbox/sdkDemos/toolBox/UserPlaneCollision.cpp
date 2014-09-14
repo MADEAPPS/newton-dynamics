@@ -372,7 +372,7 @@ class dInfinitePlane
 	static DemoEntity* CreateVisualMesh (DemoEntityManager* const scene, const dVector& plane)
 	{
 		// make a visual entity
-		DemoMesh* const mesh = CreateVisualMesh (plane);
+		DemoMesh____* const mesh = CreateVisualMesh (plane);
 
 		// get the transformation matrix that takes the plane to the world local space
 		dMatrix matrix (dgGrammSchmidt(plane));

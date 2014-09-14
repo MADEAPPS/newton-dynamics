@@ -13,7 +13,7 @@
 #define __DEMO_ENTITY_H__
 
 #include "DemoEntityManager.h"
-class DemoMesh;
+class DemoMeshInterface;
 
 
 class DemoEntity: public dHierarchy<DemoEntity>, virtual public dClassInfo
@@ -37,11 +37,11 @@ class DemoEntity: public dHierarchy<DemoEntity>, virtual public dClassInfo
 
 	DemoEntity(const DemoEntity& copyFrom);
 	DemoEntity(const dMatrix& matrix, DemoEntity* const parent);
-	DemoEntity(DemoEntityManager& world, const dScene* const scene, dScene::dTreeNode* const rootSceneNode, dTree<DemoMesh*, dScene::dTreeNode*>& meshCache, DemoEntityManager::EntityDictionary& entityDictionary, DemoEntity* const parent = NULL);
+	DemoEntity(DemoEntityManager& world, const dScene* const scene, dScene::dTreeNode* const rootSceneNode, dTree<DemoMeshInterface*, dScene::dTreeNode*>& meshCache, DemoEntityManager::EntityDictionary& entityDictionary, DemoEntity* const parent = NULL);
 	virtual ~DemoEntity(void);
 
-	DemoMesh* GetMesh() const;
-	void SetMesh(DemoMesh* const m_mesh, const dMatrix& meshMatrix);
+	DemoMeshInterface* GetMesh() const;
+	void SetMesh (DemoMeshInterface* const m_mesh, const dMatrix& meshMatrix);
 
 	const dMatrix& GetMeshMatrix() const;  
 	void SetMeshMatrix(const dMatrix& matrix);  
@@ -69,11 +69,12 @@ class DemoEntity: public dHierarchy<DemoEntity>, virtual public dClassInfo
 	virtual void SimulationPostListener(DemoEntityManager* const scene, DemoEntityManager::dListNode* const mynode, dFloat timeStep){};
 
 	virtual void MessageHandler (NewtonBody* const sender, int message, void* const data) {}
-
-
 	static void TransformCallback(const NewtonBody* body, const dFloat* matrix, int threadIndex);
 
 	protected:
+
+
+
 	mutable dMatrix m_matrix;			// interpolated matrix
 	dVector m_curPosition;				// position one physics simulation step in the future
 	dVector m_nextPosition;             // position at the current physics simulation step
@@ -81,7 +82,7 @@ class DemoEntity: public dHierarchy<DemoEntity>, virtual public dClassInfo
 	dQuaternion m_nextRotation;         // rotation at the current physics simulation step  
 
 	dMatrix m_meshMatrix;
-	DemoMesh* m_mesh;
+	DemoMeshInterface* m_mesh;
 	UserData* m_userData;
 
 	unsigned m_lock;

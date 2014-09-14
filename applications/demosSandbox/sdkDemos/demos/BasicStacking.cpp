@@ -89,7 +89,7 @@ static void BuildPyramid (DemoEntityManager* const scene, dFloat mass, const dVe
 	NewtonCollision* const collision = CreateConvexCollision (world, shapeMatrix, size, type, defaultMaterialID);
 
 	DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "wood_4.tga", "wood_4.tga", "wood_1.tga");
-	//DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+	//DemoMesh____* const geometry = new DemoMesh____("cylinder_1", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
 	//	matrix = dRollMatrix(3.141592f/2.0f);
 	dFloat startElevation = 100.0f;

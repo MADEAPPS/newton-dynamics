@@ -175,7 +175,8 @@ class SuperCarEntity: public DemoEntity
 		DemoEntity* const chassis = dHierarchy<DemoEntity>::Find("car_body");
 		dAssert (chassis);
 
-		DemoMesh* const mesh = chassis->GetMesh();
+		DemoMesh* const mesh = (DemoMesh*)chassis->GetMesh();
+		dAssert (mesh->IsType(DemoMesh::GetRttiType()));
 		//dAssert (chassis->GetMeshMatrix().TestIdentity());
 		const dMatrix& meshMatrix = chassis->GetMeshMatrix();
 
@@ -209,7 +210,8 @@ class SuperCarEntity: public DemoEntity
 		dAssert (tirePart);
 
 		// make a convex hull collision shape to assist in calculation of the tire shape size
-		DemoMesh* const tireMesh = tirePart->GetMesh();
+		DemoMesh* const tireMesh = (DemoMesh*)tirePart->GetMesh();
+		dAssert (tireMesh->IsType(DemoMesh::GetRttiType()));
 		//dAssert (tirePart->GetMeshMatrix().TestIdentity());
 		const dMatrix& meshMatrix = tirePart->GetMeshMatrix();
 		dVector* const temp = new dVector [tireMesh->m_vertexCount];

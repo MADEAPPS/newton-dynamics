@@ -98,7 +98,9 @@ static int MakeRandomPoisonPointCloud(NewtonMesh* const mesh, dVector* const poi
 static void OnReconstructMainMeshCallBack (NewtonBody* const body, NewtonFracturedCompoundMeshPart* const mainMesh, const NewtonCollision* const fracturedCompoundCollision)
 {
 	DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(body);
-	DemoMesh* const visualMesh = entity->GetMesh();
+	DemoMesh* const visualMesh = (DemoMesh*)entity->GetMesh();
+	dAssert (visualMesh->IsType(DemoMesh::GetRttiType()));
+	
 	dAssert (NewtonCollisionGetType(fracturedCompoundCollision) == SERIALIZE_ID_FRACTURED_COMPOUND);
 
 	visualMesh->RemoveAll();
@@ -240,7 +242,7 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
 	// load the mesh asset
 	DemoEntity entity(GetIdentityMatrix(), NULL);	
 	entity.LoadNGD_mesh (assetName, world);
-	DemoMesh* const mesh = entity.GetMesh();
+	DemoMesh____* const mesh = entity.GetMesh();
 	dAssert (mesh);
 
 	// convert the mesh to a newtonMesh

@@ -393,7 +393,8 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		dFloat maxWidth = 0.0f;
 		dFloat minWidth = 0.0f;
 
-		DemoMesh* const mesh = bodyPart->GetMesh();
+		DemoMesh* const mesh = (DemoMesh*)bodyPart->GetMesh();
+		dAssert (mesh->IsType(DemoMesh::GetRttiType()));
 		const dMatrix& matrix = bodyPart->GetMeshMatrix();
 		dFloat* const array = mesh->m_vertex;
 		for (int i = 0; i < mesh->m_vertexCount; i ++) {
@@ -412,7 +413,8 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 	{
 		dVector points[1024 * 16];
 
-		DemoMesh* const mesh = bodyPart->GetMesh();
+		DemoMesh* const mesh = (DemoMesh*)bodyPart->GetMesh();
+		dAssert (mesh->IsType(DemoMesh::GetRttiType()));
 		dAssert (mesh->m_vertexCount && (mesh->m_vertexCount < int (sizeof (points)/ sizeof (points[0]))));
 
 		// go over the vertex array and find and collect all vertices's weighted by this bone.
@@ -429,7 +431,9 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 	NewtonCollision* MakeConvexHullAggregate(DemoEntity* const bodyPart) const
 	{
-		NewtonMesh* const mesh = bodyPart->GetMesh()->CreateNewtonMesh (GetWorld(), bodyPart->GetMeshMatrix());
+		dAssert (bodyPart->GetMesh()->IsType(DemoMesh::GetRttiType()));
+		NewtonMesh* const mesh = ((DemoMesh*)bodyPart->GetMesh())->CreateNewtonMesh (GetWorld(), bodyPart->GetMeshMatrix());
+		
 		NewtonMesh* const convexApproximation = NewtonMeshApproximateConvexDecomposition (mesh, 0.01f, 0.2f, 32, 100, NULL, NULL);
 		
 		NewtonCollision* const compound = NewtonCreateCompoundCollisionFromMesh (GetWorld(), convexApproximation, 0.001f, 0, 0);
@@ -745,7 +749,8 @@ static void LoadLumberYardMesh (DemoEntityManager* const scene, const DemoEntity
 
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());	
 	for (DemoEntity* child = entity.GetFirst(); child; child = child->GetNext()) {
-		DemoMesh* const mesh = child->GetMesh();
+		DemoMesh* const mesh = (DemoMesh*)child->GetMesh();
+		dAssert (mesh->IsType(DemoMesh::GetRttiType()));
 		if (mesh) {
 			dTree<NewtonCollision*, DemoMesh*>::dTreeNode* node = filter.Find(mesh);
 			if (!node) {

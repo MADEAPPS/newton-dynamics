@@ -25,6 +25,8 @@ class dBezierSpline : public dContainersAlloc
 	// create from knot vector and control points
 	virtual ~dBezierSpline ();
 
+	dBezierSpline& operator = (const dBezierSpline &copy) ;
+
 	int GetDegree () const;
 
 	dVector CurvePoint (dFloat u) const;
