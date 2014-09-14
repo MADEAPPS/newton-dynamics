@@ -178,7 +178,7 @@
       <PreprocessorDefinitions>_DEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;PTW32_STATIC_LIB;_WIN_32_VER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>
       </ExceptionHandling>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <StructMemberAlignment>Default</StructMemberAlignment>
       <BufferSecurityCheck>false</BufferSecurityCheck>
@@ -219,7 +219,7 @@
       <PreprocessorDefinitions>_DEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;PTW32_STATIC_LIB;_WIN_64_VER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>
       </ExceptionHandling>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <StructMemberAlignment>Default</StructMemberAlignment>
       <BufferSecurityCheck>false</BufferSecurityCheck>

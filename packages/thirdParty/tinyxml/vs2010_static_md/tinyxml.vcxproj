@@ -102,6 +102,7 @@
       </AdditionalIncludeDirectories>
       <AdditionalOptions>
       </AdditionalOptions>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -143,6 +144,7 @@
       </AdditionalIncludeDirectories>
       <AdditionalOptions>
       </AdditionalOptions>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -170,7 +172,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeaderOutputFile>
       </PrecompiledHeaderOutputFile>
@@ -212,7 +214,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeaderOutputFile>
       </PrecompiledHeaderOutputFile>
