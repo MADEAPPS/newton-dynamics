@@ -157,7 +157,65 @@ class HeavyVehicleEntity: public DemoEntity
 	public: 
 	class TrackSystem
 	{
-		DemoEntity* m_BezierEntity;
+		public:
+		TrackSystem()
+			:m_bezierEntity(NULL)
+			,m_bezierMesh(NULL)
+		{
+		}
+
+		void Init (HeavyVehicleEntity* const me, const char* const name)
+		{
+			//threadShoe
+			m_bezierEntity = me->Find (name);
+			dAssert (m_bezierEntity);
+			m_bezierMesh = (DemoBezierCurve*) m_bezierEntity->GetMesh();
+			dAssert (m_bezierMesh->IsType(DemoBezierCurve::GetRttiType()));
+
+			m_length = m_bezierMesh->m_curve.CalculateLength (0.01f);
+
+
+			m_bezierEntity = me->Find (name);
+
+			DemoEntity* const threadMesh = me->Find ("threadShoe");
+			dAssert (threadMesh);
+			int pieceCount = int (m_length / 0.25f) + 1;
+
+			int count = 0;
+			dFloat steps[200];
+			dFloat length = 0.0f;
+			steps[0] = 0.0f;
+			dVector p0 (m_bezierMesh->m_curve.CurvePoint(0.0f));
+			for (int i = 1; i < pieceCount * 10; i ++) {
+				dFloat u = dFloat (i) / (pieceCount * 10);
+				dVector p1 (m_bezierMesh->m_curve.CurvePoint(u));
+				dVector err (p1 - p0);
+				dFloat err2 = dSqrt (err % err);
+				if (err2 > 0.25f) {
+					p0 = p1;
+					steps[count] = u;
+					count ++;
+				}
+			}
+
+			dMatrix bezierMatrix (m_bezierEntity->GetMeshMatrix() * m_bezierEntity->GetCurrentMatrix());
+			dVector q0 (m_bezierMesh->m_curve.CurvePoint(steps[0]));
+			p0.m_w = 1.0f;
+			for (int i = 1; i < count; i ++) {
+				dVector q1 (m_bezierMesh->m_curve.CurvePoint(steps[i]));
+				q1.m_w = 1.0f;
+				dMatrix matrix (dGetIdentityMatrix());
+				matrix.m_posit = bezierMatrix.TransformVector (q0);
+				DemoEntity* const threadPart = new DemoEntity (matrix, me);
+				threadPart->SetMesh(threadMesh->GetMesh(), dGetIdentityMatrix());
+				q0 = q1;
+			}
+
+		}
+
+		DemoEntity* m_bezierEntity;
+		DemoBezierCurve* m_bezierMesh;
+		dFloat m_length;
 	};
 
 	class TireAligmentTransform: public UserData
@@ -541,18 +599,10 @@ class HeavyVehicleEntity: public DemoEntity
 		m_controller->Finalize();
 	}
 
-	void SetTracks (const char* const entName, TrackSystem& track)
-	{
-		//threadShoe
-		DemoEntity* const tirePart = Find (entName);
-		dAssert (tirePart);
-	}
-
-
 	void SetTracks ()
 	{
-		SetTracks ("leftTrackPath", m_leftTrack);
-		SetTracks ("rightTrackPath", m_rightTrack);
+		m_leftTrack.Init(this, "leftTrackPath");
+		m_rightTrack.Init(this, "rightTrackPath");
 	}
 
 	void BuildTrackedVehicle (const VehicleParameters& parameters)

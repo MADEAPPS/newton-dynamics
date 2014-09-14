@@ -32,6 +32,8 @@ class dBezierSpline : public dContainersAlloc
 	dVector CurvePoint (dFloat u) const;
 	dVector CurveDerivative (dFloat u, int index = 1) const;
 
+	dFloat CalculateLength (dFloat tol) const;
+
 	void CreateFromKnotVectorAndControlPoints (int degree, int knotCount, const dFloat* const knotVector, const dVector* const controlPoints);
 
 	void GlobalCubicInterpolation (int count, const dVector* const points, const dVector& firstTangent, const dVector& lastTangent);

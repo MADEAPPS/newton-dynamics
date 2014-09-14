@@ -389,3 +389,56 @@ void dBezierSpline::CreateCubicControlPoints(int count, const dVector* const poi
 		}
 	}
 }
+
+
+dFloat dBezierSpline::CalculateLength (dFloat tol) const
+{
+	dVector stackPool[32][3];
+	int stack = 0;
+
+	dFloat length = 0.0f;
+	dFloat tol2 = tol * tol;
+	dFloat u0 = m_knotVector[m_degree];
+	dVector p0 (CurvePoint (u0));
+
+	for (int i = m_degree; i < (m_knotsCount - m_degree - 1); i ++) {
+		dFloat u1 = m_knotVector[i + 1];
+		dVector p1 (CurvePoint (u1));
+		stackPool[stack][0] = p0;
+		stackPool[stack][1] = p1;
+		stackPool[stack][2] = dVector (u0, u1, 0.0f, 0.0f);
+		stack ++;
+		while (stack) {
+			stack --;
+			dVector q0 (stackPool[stack][0]);
+			dVector q1 (stackPool[stack][1]);
+			dFloat t0 = stackPool[stack][2][0];
+			dFloat t1 = stackPool[stack][2][1];
+			dFloat t01 = (t1 + t0) * 0.5f;
+
+			dVector p01 ((q1 + q0).Scale (0.5f));
+			dVector q01 (CurvePoint (t01));
+			dVector err (q01 - p01);
+
+			dFloat err2 = err % err;
+			if (err2 < tol2) {
+				dVector step (q1 - q0);
+				length += dSqrt (step % step);
+			} else {
+				stackPool[stack][0] = q01;
+				stackPool[stack][1] = q1;
+				stackPool[stack][2] = dVector (t01, t1, 0.0f, 0.0f);
+				stack ++;
+
+				stackPool[stack][0] = q0;
+				stackPool[stack][1] = q01;
+				stackPool[stack][2] = dVector (t0, t01, 0.0f, 0.0f);
+				stack ++;
+			}
+		}
+		u0 = u1;
+		p0 = p1;
+	}
+
+	return length;
+}
