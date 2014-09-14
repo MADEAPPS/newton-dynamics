@@ -169,8 +169,6 @@
 		08FB77ACFE841707C02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				FF93FBF419C566AE00F4094D /* dLineNodeInfo.cpp */,
-				FF93FBF519C566AE00F4094D /* dLineNodeInfo.h */,
 				FF8C27071313D82800646B90 /* dBoneNodeInfo.cpp */,
 				FF9BBC0A18351C160060F147 /* dBoneNodeInfo.h */,
 				FF8C270B1313D82800646B90 /* dCollisionBoxNodeInfo.cpp */,
@@ -201,6 +199,8 @@
 				FF9BBC1718351C160060F147 /* dGeometryNodeModifierInfo.h */,
 				FF8C27251313D82800646B90 /* dGeometryNodeSkinModifierInfo.cpp */,
 				FF9BBC1818351C160060F147 /* dGeometryNodeSkinModifierInfo.h */,
+				FF93FBF419C566AE00F4094D /* dLineNodeInfo.cpp */,
+				FF93FBF519C566AE00F4094D /* dLineNodeInfo.h */,
 				FF8C272A1313D82800646B90 /* dMaterialNodeInfo.cpp */,
 				FF9BBC1918351C160060F147 /* dMaterialNodeInfo.h */,
 				FF8C272C1313D82800646B90 /* dMeshNodeInfo.cpp */,
