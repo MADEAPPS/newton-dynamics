@@ -111,6 +111,11 @@ dVector dBezierSpline::GetControlPoint(int i) const
 	return m_controlPoints[i];
 }
 
+void dBezierSpline::SetControlPoint(int i, const dVector& point)
+{
+	m_controlPoints[i] = point;
+}
+
 dVector* dBezierSpline::GetControlPointArray()
 {
 	return m_controlPoints;

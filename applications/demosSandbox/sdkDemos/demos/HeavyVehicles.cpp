@@ -170,6 +170,8 @@ class HeavyVehicleEntity: public DemoEntity
 			:m_bezierEntity(NULL)
 			,m_bezierMesh(NULL)
 			,m_intepolants(NULL)
+			,m_controlPointsOffset(NULL)
+			,m_controlPointBindIndex(NULL)
 		{
 		}
 
@@ -178,10 +180,76 @@ class HeavyVehicleEntity: public DemoEntity
 			if (m_intepolants) {
 				delete[] m_intepolants;
 			}
+			if (m_controlPointsOffset) {
+				delete[] m_controlPointsOffset;
+				delete[] m_controlPointBindIndex;
+			}
 		}
+
+
+		dFloat GetTireRadius (DemoEntity* const tire) const
+		{
+			for (CustomVehicleControllerBodyStateTire* tireNode = m_vehicle->m_controller->GetFirstTire (); tireNode; tireNode = m_vehicle->m_controller->GetNextTire(tireNode)) {
+				if (tireNode->GetUserData() == tire) {
+					return tireNode->GetTireRadio();
+				}
+			}
+			dAssert (0);
+			return 0.0f;
+		}
+
+		void CalculaterBinding()
+		{
+			m_controlPointCount = m_bezierMesh->m_curve.GetControlPointCount();
+			m_controlPointsOffset = new dVector[m_controlPointCount];
+			m_controlPointBindIndex = new int[m_controlPointCount];
+
+			DemoEntity* const tire = (DemoEntity*) m_tire->GetUserData();
+			dString name (tire->GetName());
+			name.Replace(name.Find ("0"), 1, "", 0);
+
+			dFloat radius[8];  
+			dMatrix tireMatrix[8];  
+			for (int i = 0; i < 8; i ++) {
+				dString name1 (name + i);
+				dAssert (m_vehicle->Find(name1.GetStr()));
+				DemoEntity* const tireEnt = m_vehicle->Find(name1.GetStr());
+				m_bindingTires[i] = tireEnt;
+				radius[i] = GetTireRadius(tireEnt);
+				tireMatrix[i] = tireEnt->GetMeshMatrix() * tireEnt->GetCurrentMatrix();
+			}
+
+			for (int i = 0; i < m_controlPointCount; i ++) {
+				m_controlPointBindIndex[i] = -1;
+				m_controlPointsOffset[i] = m_shapeMatrix.TransformVector(m_bezierMesh->m_curve.GetControlPoint(i));
+			}
+
+			for (int i = 0; i < m_controlPointCount; i ++) {
+				int index = -1;
+				dFloat dist2 = 1.0e10f;
+
+				const dVector& p0 = m_controlPointsOffset[i];
+				for (int j = 0; j < 8; j ++) {
+					dVector dist (p0 - tireMatrix[j].m_posit);
+					dFloat mag2 = dist % dist;
+					if (mag2 < dist2) {
+						dist2 = mag2;
+						index = j;
+					}
+				}
+				dAssert (index != -1);
+				dFloat r2 = (radius[index] + 0.2f) * (radius[index] + 0.2f);
+				if (dist2 < r2) {
+					m_controlPointBindIndex[i] = index;
+					m_controlPointsOffset[i] -= tireMatrix[index].m_posit;
+				}
+			}
+		}
+
 
 		void Init (HeavyVehicleEntity* const me, const char* const name, CustomVehicleControllerBodyStateTire* const tire)
 		{
+			m_vehicle = me;
 			m_tire = tire;
 			m_parameter = 0.0f;
 			m_bezierEntity = me->Find (name);
@@ -190,7 +258,6 @@ class HeavyVehicleEntity: public DemoEntity
 			dAssert (m_bezierMesh->IsType(DemoBezierCurve::GetRttiType()));
 
 			m_length = m_bezierMesh->m_curve.CalculateLength (0.01f);
-
 
 			m_bezierEntity = me->Find (name);
 
@@ -233,7 +300,6 @@ class HeavyVehicleEntity: public DemoEntity
 				m_intepolants[i] = steps[i];
 			}
 
-
 			m_aligmentMatrix = dRollMatrix(3.141592f * 90.0f / 180.0f) * dPitchMatrix(3.141592f * 180.0f / 180.0f);
 			m_shapeMatrix = m_bezierEntity->GetMeshMatrix() * m_bezierEntity->GetCurrentMatrix();
 			dVector q0 (m_bezierMesh->m_curve.CurvePoint(m_intepolants[0].m_u));
@@ -252,6 +318,8 @@ class HeavyVehicleEntity: public DemoEntity
 				m_intepolants[i-1].m_threadLink = threadPart;
 				q0 = q1;
 			}
+
+			CalculaterBinding();
 		}
 
 		dFloat CalculateKnotParam (dFloat t) const
@@ -293,6 +361,20 @@ class HeavyVehicleEntity: public DemoEntity
 
 		void AnimateThread (DemoEntityManager& world, dFloat timestep) 
 		{
+			dVector matrixPalette[8];
+			for (int i = 0; i < 8; i ++) {
+				matrixPalette[i] = (m_bindingTires[i]->GetMeshMatrix() * m_bindingTires[i]->GetCurrentMatrix()).m_posit;
+			}
+
+			for (int i = 0; i < m_controlPointCount; i ++) {
+				if (m_controlPointBindIndex[i] != -1) {
+					int index = m_controlPointBindIndex[i];
+					dVector p (m_controlPointsOffset[i] + matrixPalette[index]);
+					m_bezierMesh->m_curve.SetControlPoint (i, m_shapeMatrix.UntransformVector(p));
+				}
+			}
+
+
 			dFloat radio = m_tire->GetTireRadio();
 			dFloat omega = m_tire->GetTireRotationSpeed();
 
@@ -333,15 +415,18 @@ class HeavyVehicleEntity: public DemoEntity
 		dMatrix m_shapeMatrix;
 		dMatrix m_aligmentMatrix;
 		
+		HeavyVehicleEntity* m_vehicle;
 		DemoEntity* m_bezierEntity;
 		DemoBezierCurve* m_bezierMesh;
 		CustomVehicleControllerBodyStateTire* m_tire;
-		
 		ConstantSpeedKnotInterpolant* m_intepolants;
+		DemoEntity* m_bindingTires[8];
+		dVector* m_controlPointsOffset;
+		int* m_controlPointBindIndex;
 		dFloat m_length;
 		dFloat m_parameter;
+		int m_controlPointCount;
 		int m_interpolantsCount;
-
 	};
 
 	class TireAligmentTransform: public UserData
@@ -757,6 +842,8 @@ class HeavyVehicleEntity: public DemoEntity
 			dFloat radius;
 			sprintf (name, "l_tire%d", i);
 			CalculateTireDimensions (name, width, radius);
+			// add the tire thread thickness
+			radius += 0.1f;
 
 			leftTire[i] = AddTire (name, offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
 			sprintf (name, "r_tire%d", i);
@@ -1346,7 +1433,7 @@ location.m_posit.m_z = 50.0f;
 	// set this vehicle as the player
 	manager->SetAsPlayer(m1a1Tank);
 
-
+/*
 location.m_posit.m_z += 20.0f;
 for (int i = 0; i < 5; i ++){
 	location.m_posit.m_z += 12.0f;
@@ -1355,9 +1442,8 @@ for (int i = 0; i < 5; i ++){
 	HeavyVehicleEntity* const m1a1Tank1 = new HeavyVehicleEntity (scene, manager, location, "m1a1_.ngd", m1a1Param);
 	m1a1Tank1->BuildTrackedVehicle (m1a1Param);
 }
-
-
-
+*/
+	
 	dMatrix camMatrix (manager->m_player->GetNextMatrix());
 	scene->SetCameraMouseLock (true);
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);

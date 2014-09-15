@@ -780,7 +780,6 @@ void dfbxImport::ImportNurbCurveShape (FbxScene* const fbxScene, dPluginScene* c
 {
 	GlobalMeshMap::dTreeNode* instanceNode = meshCache.Find(fbxNode->GetLine());
 	if (instanceNode) {
-dAssert (0);
 		dScene::dTreeNode* const meshInstance = instanceNode->GetInfo();
 		ngdScene->AddReference (node, meshInstance);
 	} else {

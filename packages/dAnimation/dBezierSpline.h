@@ -42,6 +42,8 @@ class dBezierSpline : public dContainersAlloc
 	dVector* GetControlPointArray();
 	const dVector* GetControlPointArray() const;
 	dVector GetControlPoint(int i) const;
+
+	void SetControlPoint(int i, const dVector& point);
 	
 	int GetKnotCount() const;
 	dFloat* GetKnotArray();
