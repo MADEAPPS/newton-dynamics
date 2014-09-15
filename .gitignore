@@ -71,3 +71,4 @@ packages/dCompilerKit/dVirtualAssembler/dAssemblerParser.cpp.txt
 *.rsp
 *.bsc
 *.sbr
+*.res

@@ -75,6 +75,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "demosSandbox", "demosSandbo
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "core", "..\..\..\..\coreLibrary_300\projects\windows\project_vs2008\core.vcproj", "{57AC4F2D-B115-4931-8F6E-AF8AD616B6AA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{03BCA23C-02A5-415B-A37B-26600BC2CE96} = {03BCA23C-02A5-415B-A37B-26600BC2CE96}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "newton", "..\..\..\..\coreLibrary_300\projects\windows\project_vs2008\newton.vcproj", "{68D9962C-0EC7-445A-B0FD-F87B16D43901}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -84,6 +87,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "newton", "..\..\..\..\coreL
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "physics", "..\..\..\..\coreLibrary_300\projects\windows\project_vs2008\physics.vcproj", "{39737A8F-6151-4259-8E39-25530345D4B4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{03BCA23C-02A5-415B-A37B-26600BC2CE96} = {03BCA23C-02A5-415B-A37B-26600BC2CE96}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "base", "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2008\wx_vc9_base.vcproj", "{3FCC50C2-81E9-5DB2-B8D8-2129427568B1}"
 EndProject
@@ -535,9 +541,10 @@ Global
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.Debug|Win32.Build.0 = debug|Win32
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.Debug|x64.ActiveCfg = debug|x64
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.Debug|x64.Build.0 = debug|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.DebugDll|Win32.ActiveCfg = debug_mdd|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.DebugDll|x64.ActiveCfg = debug_mdd|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.DebugDll|x64.Build.0 = debug_mdd|x64
+		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.DebugDll|Win32.ActiveCfg = debug|Win32
+		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.DebugDll|Win32.Build.0 = debug|Win32
+		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.DebugDll|x64.ActiveCfg = debug|x64
+		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.DebugDll|x64.Build.0 = debug|x64
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release_md|Win32.ActiveCfg = release_md|Win32
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release_md|Win32.Build.0 = release_md|Win32
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release_md|x64.ActiveCfg = release_md|x64
@@ -546,9 +553,10 @@ Global
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.Release|Win32.Build.0 = release|Win32
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.Release|x64.ActiveCfg = release|x64
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.Release|x64.Build.0 = release|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.ReleaseDLL|Win32.ActiveCfg = release_md|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.ReleaseDLL|x64.ActiveCfg = release_md|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.ReleaseDLL|x64.Build.0 = release_md|x64
+		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.ReleaseDLL|Win32.ActiveCfg = release|Win32
+		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.ReleaseDLL|Win32.Build.0 = release|Win32
+		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.ReleaseDLL|x64.ActiveCfg = release|x64
+		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.ReleaseDLL|x64.Build.0 = release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
