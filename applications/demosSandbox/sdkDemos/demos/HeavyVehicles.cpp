@@ -65,7 +65,7 @@ static VehicleParameters heavyTruck =
 	10000.0f,	// BRAKE_TORQUE
 	  -0.6f,	// COM_Y_OFFSET
 	 60.0f,		// TIRE_TOP_SPEED_KMH
-	1000.0f,	// IDLE_TORQUE
+	3500.0f,	// IDLE_TORQUE
 	500.0f,		// IDLE_TORQUE_RPM
 	1200.0f,	// PEAK_TORQUE
 	3000.0f,	// PEAK_TORQUE_RPM
@@ -94,7 +94,7 @@ static VehicleParameters lightTruck =
 	3000.0f,	// BRAKE_TORQUE
 	-0.6f,		// COM_Y_OFFSET
 	72.0f,		// TIRE_TOP_SPEED_KMH
-	 400.0f,	// IDLE_TORQUE
+	1200.0f,	// IDLE_TORQUE
 	500.0f,		// IDLE_TORQUE_RPM
 	 500.0f,	// PEAK_TORQUE
 	3000.0f,	// PEAK_TORQUE_RPM
@@ -125,7 +125,7 @@ static VehicleParameters m1a1Param =
 	20000.0f,	// BRAKE_TORQUE
 	-0.6f,		// COM_Y_OFFSET
 	60.0f,		// TIRE_TOP_SPEED_KMH
-	1000.0f,	// IDLE_TORQUE
+	3500.0f,	// IDLE_TORQUE
 	500.0f,		// IDLE_TORQUE_RPM
 	1200.0f,	// PEAK_TORQUE
 	3000.0f,	// PEAK_TORQUE_RPM
