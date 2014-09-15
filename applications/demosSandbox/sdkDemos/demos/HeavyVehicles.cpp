@@ -180,9 +180,10 @@ class HeavyVehicleEntity: public DemoEntity
 			}
 		}
 
-		void Init (HeavyVehicleEntity* const me, const char* const name)
+		void Init (HeavyVehicleEntity* const me, const char* const name, CustomVehicleControllerBodyStateTire* const tire)
 		{
-			//threadShoe
+			m_tire = tire;
+			m_parameter = 0.0f;
 			m_bezierEntity = me->Find (name);
 			dAssert (m_bezierEntity);
 			m_bezierMesh = (DemoBezierCurve*) m_bezierEntity->GetMesh();
@@ -253,16 +254,70 @@ class HeavyVehicleEntity: public DemoEntity
 			}
 		}
 
-
-		void AnimateThread (DemoEntityManager& world) 
+		dFloat CalculateKnotParam (dFloat t) const
 		{
-			dVector q0 (m_bezierMesh->m_curve.CurvePoint(m_intepolants[0].m_u));
+			int low = 0;
+			int high = m_interpolantsCount - 1;
+
+			while ((high - low) >= 4) {
+				int mid = (low + high) >> 1;
+				if (t > m_intepolants[mid].m_dist) {
+					low = mid;
+				} else {
+					high = mid;
+				}
+			}
+
+			dAssert (m_intepolants[low].m_dist <= t);
+			for (int i = low; i < m_interpolantsCount; i ++) {
+				if (m_intepolants[i + 1].m_dist >= t) {
+					low = i;
+					break;
+				}
+			}
+
+			dFloat u0 = m_intepolants[low].m_u;
+			dFloat h0 = m_intepolants[low].m_dist;
+			dFloat du = m_intepolants[low + 1].m_u - u0;
+			dFloat dh = m_intepolants[low + 1].m_dist - h0;
+			return u0 + du * (t - h0) / dh;
+		}
+
+		void InterpolateMatrix (DemoEntityManager& world, dFloat param)
+		{
+			for (int i = 0; i < m_interpolantsCount - 1; i ++) {
+				DemoEntity* const threadPart = m_intepolants[i].m_threadLink;
+				threadPart->InterpolateMatrix (world, param);
+			}
+		}
+
+		void AnimateThread (DemoEntityManager& world, dFloat timestep) 
+		{
+			dFloat radio = m_tire->GetTireRadio();
+			dFloat omega = m_tire->GetTireRotationSpeed();
+
+			dFloat step = omega * radio * timestep;
+
+			m_parameter = dMod (m_parameter + step, m_length);
+			if (m_parameter < 0.0f) {
+				m_parameter += m_length;
+			}
+			dAssert (m_parameter >= 0.0f);
+			dAssert (m_parameter <= m_length);
+
+			dFloat u = CalculateKnotParam (m_parameter);
+			dVector q0 (m_bezierMesh->m_curve.CurvePoint(u));
 			dMatrix matrix (dGetIdentityMatrix());
 			for (int i = 1; i < m_interpolantsCount; i ++) {
 				DemoEntity* const threadPart = m_intepolants[i-1].m_threadLink;
 
-				dVector q1 (m_bezierMesh->m_curve.CurvePoint(m_intepolants[i].m_u));
-				q1.m_w = 1.0f;
+				dFloat t = dMod (m_parameter + m_intepolants[i].m_dist, m_length);
+				if (t < 0.0f) {
+					t += m_length;
+				}
+
+				dFloat u = CalculateKnotParam (t);
+				dVector q1 (m_bezierMesh->m_curve.CurvePoint(u));
 				dVector dir (q1 - q0);
 				dir = dir.Scale (1.0f / dSqrt (dir % dir));
 				matrix.m_front = dVector (dir.m_z, -dir.m_y, 0.0f, 0.0f);
@@ -270,18 +325,22 @@ class HeavyVehicleEntity: public DemoEntity
 				matrix.m_right = dVector (0.0f, 0.0f, 1.0f, 0.0f);
 				matrix = m_aligmentMatrix * matrix;
 				matrix.m_posit = m_shapeMatrix.TransformVector (q0);
-				threadPart->SetNextMatrix (world, dQuaternion(matrix), matrix.m_posit);
+				threadPart->SetMatrix (world, dQuaternion(matrix), matrix.m_posit);
 				q0 = q1;
 			}
 		}
 
 		dMatrix m_shapeMatrix;
 		dMatrix m_aligmentMatrix;
+		
 		DemoEntity* m_bezierEntity;
 		DemoBezierCurve* m_bezierMesh;
-		int m_interpolantsCount;
+		CustomVehicleControllerBodyStateTire* m_tire;
+		
 		ConstantSpeedKnotInterpolant* m_intepolants;
 		dFloat m_length;
+		dFloat m_parameter;
+		int m_interpolantsCount;
 
 	};
 
@@ -396,6 +455,11 @@ class HeavyVehicleEntity: public DemoEntity
 				tirePart->InterpolateMatrix (world, param);
 			}
 		}
+
+		if (m_leftTrack.m_bezierEntity) {
+			m_leftTrack.InterpolateMatrix (world, param);
+			m_rightTrack.InterpolateMatrix  (world, param);
+		}
 	}
 
 	void CalculateTireDimensions (const char* const tireName, dFloat& width, dFloat& radius) const
@@ -480,8 +544,7 @@ class HeavyVehicleEntity: public DemoEntity
 		return m_controller->AddTire (tireInfo);
 	}
 
-
-	void UpdateTireTransforms()
+	void UpdateTireTransforms(dFloat timestep)
 	{
 		NewtonBody* const body = m_controller->GetBody();
 		//NewtonWorld* const world = NewtonBodyGetWorld(body);
@@ -510,8 +573,8 @@ class HeavyVehicleEntity: public DemoEntity
 
 		// update the thread location
 		if (m_leftTrack.m_bezierEntity) {
-			m_leftTrack.AnimateThread (*scene);
-			m_rightTrack.AnimateThread (*scene);
+			m_leftTrack.AnimateThread (*scene, timestep);
+			m_rightTrack.AnimateThread (*scene, timestep);
 		}
 	}
 
@@ -673,17 +736,14 @@ class HeavyVehicleEntity: public DemoEntity
 		m_controller->Finalize();
 	}
 
-	void SetTracks ()
+	void SetTracks (CustomVehicleControllerBodyStateTire* const leftTire, CustomVehicleControllerBodyStateTire* const rightTire)
 	{
-		m_leftTrack.Init(this, "leftTrackPath");
-		m_rightTrack.Init(this, "rightTrackPath");
+		m_leftTrack.Init(this, "leftTrackPath", leftTire);
+		m_rightTrack.Init(this, "rightTrackPath", rightTire);
 	}
 
 	void BuildTrackedVehicle (const VehicleParameters& parameters)
 	{
-		// set up the tank Track
-		SetTracks ();
-
 		// Muscle cars have the front engine, we need to shift the center of mass to the front to represent that
 		m_controller->SetCenterOfGravity (dVector (0.0f, parameters.COM_Y_OFFSET, 0.0f, 0.0f)); 
 
@@ -747,6 +807,9 @@ class HeavyVehicleEntity: public DemoEntity
 
 		dFloat vehicleTopSpeedKPH = parameters.TIRE_TOP_SPEED_KMH;
 		engine->InitEngineTorqueCurve (vehicleTopSpeedKPH, viperIdleTorquePoundPerFoot, viperIdleRPM, viperPeakTorquePoundPerFoot, viperPeakTorqueRPM, viperPeakHorsePower, viperPeakHorsePowerRPM, viperRedLineTorquePoundPerFoot, viperRedLineRPM);
+
+		// set up the tank Track
+		SetTracks (leftTire[0], rightTire[0]);
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
@@ -1194,7 +1257,7 @@ glEnd();
 		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
 			CustomVehicleController* const controller = &node->GetInfo();
 			HeavyVehicleEntity* const vehicleEntity = (HeavyVehicleEntity*)NewtonBodyGetUserData (controller->GetBody());
-			vehicleEntity->UpdateTireTransforms();
+			vehicleEntity->UpdateTireTransforms(timestep);
 		}
 		
 		UpdateCamera (timestep);
@@ -1267,9 +1330,6 @@ location.m_posit.m_z = 50.0f;
 	HeavyVehicleEntity* const heavyVehicle = new HeavyVehicleEntity (scene, manager, location, "lav-25.ngd", heavyTruck);
 	heavyVehicle->BuildAllWheelDriveVehicle (heavyTruck);
 
-	// set this vehicle as the player
-	manager->SetAsPlayer(heavyVehicle);
-
 	// add a second Vehicle
 	location.m_posit.m_z += 4.0f;
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
@@ -1282,6 +1342,10 @@ location.m_posit.m_z = 50.0f;
 	location.m_posit.m_y += 3.0f;
 	HeavyVehicleEntity* const m1a1Tank = new HeavyVehicleEntity (scene, manager, location, "m1a1_.ngd", m1a1Param);
 	m1a1Tank->BuildTrackedVehicle (m1a1Param);
+
+	// set this vehicle as the player
+	manager->SetAsPlayer(m1a1Tank);
+
 
 /*
 for (int i = 0; i < 20; i ++){

@@ -143,17 +143,27 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 	CUSTOM_JOINTS_API dMatrix CalculateSteeringMatrix () const;
 	CUSTOM_JOINTS_API dMatrix CalculateSuspensionMatrix () const;
 
-	const dVector& GetTireLoad () const
+	CUSTOM_JOINTS_API dFloat GetTireRadio () const
+	{
+		return m_radio;
+	}
+
+	CUSTOM_JOINTS_API dFloat GetTireRotationSpeed () const
+	{
+		return m_rotationalSpeed;
+	}
+
+	CUSTOM_JOINTS_API const dVector& GetTireLoad () const
 	{
 		return m_tireLoad;
 	}
 
-	const dVector& GetLateralForce () const
+	CUSTOM_JOINTS_API const dVector& GetLateralForce () const
 	{
 		return m_lateralForce;
 	}
 
-	const dVector& GetLongitudinalForce () const
+	CUSTOM_JOINTS_API const dVector& GetLongitudinalForce () const
 	{
 		return m_longitudinalForce;
 	}
