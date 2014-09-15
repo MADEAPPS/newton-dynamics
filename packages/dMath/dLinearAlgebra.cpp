@@ -642,15 +642,6 @@ void dComplemtaritySolver::dFrictionLessContactJoint::JointAccelerations (dJoint
 	}
 }
 
-
-
-
-
-
-
-
-
-
 int dComplemtaritySolver::BuildJacobianMatrix (int jointCount, dBilateralJoint** const jointArray, dFloat timestep, dJacobianPair* const jacobianArray, dJacobianColum* const jacobianColumnArray, int maxRowCount)
 {
 	int rowCount = 0;

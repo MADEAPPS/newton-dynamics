@@ -2434,12 +2434,11 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTree (dgCollidingPairCo
 
 
 
-
-
-
-
 dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
+	if (proxy.m_timestep < dgFloat32 (1.0e-4f)) {
+		return 0;
+	}
 	dgContactPoint* const contacts = proxy.m_contacts;
 	const dgNodeBase* stackPool[DG_COMPOUND_STACK_DEPTH];
 	dgContact* const constraint = pair->m_contact;
@@ -2566,6 +2565,10 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgCollidingPairCo
 
 dgInt32 dgCollisionCompound::CalculateContactsToCompoundContinue(dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
+	if (proxy.m_timestep < dgFloat32 (1.0e-4f)) {
+		return 0;
+	}
+
 	dgInt32 contactCount = 0;
 	dgContactPoint* const contacts = proxy.m_contacts;
 	const dgNodeBase* stackPool[4 * DG_COMPOUND_STACK_DEPTH][2];
@@ -2748,6 +2751,10 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompoundContinue(dgCollidingPair
 
 dgInt32 dgCollisionCompound::CalculateContactsToCollisionTreeContinue (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
+	if (proxy.m_timestep < dgFloat32 (1.0e-4f)) {
+		return 0;
+	}
+
 	dgContactPoint* const contacts = proxy.m_contacts;
 
 	dgNodePairs stackPool[4 * DG_COMPOUND_STACK_DEPTH];

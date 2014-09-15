@@ -1765,20 +1765,14 @@ dgInt32 dgBroadPhase::ConvexCast (dgCollisionInstance* const shape, const dgMatr
 										totalCount++;
 									}
 								}
+								if (maxParam < 1.0e-4f) {
+									break;
+								}
 							}
 						}
 					}
 
 				} else {
-//					dgAssert (node->m_left);
-//					dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNode*)));
-//					stackPool[stack] = node->m_left;
-//					stack++;
-//					dgAssert (node->m_right);
-//					dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgNode*)));
-//					stackPool[stack] = node->m_right;
-//					stack++;
-
 					const dgNode* const left = me->m_left;
 					dgAssert (left);
 					dgVector minBox (left->m_minBox - boxP1);

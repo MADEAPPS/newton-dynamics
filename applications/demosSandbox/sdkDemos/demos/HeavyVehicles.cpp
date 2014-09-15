@@ -1346,16 +1346,16 @@ location.m_posit.m_z = 50.0f;
 	// set this vehicle as the player
 	manager->SetAsPlayer(m1a1Tank);
 
-/*
+
 location.m_posit.m_z += 20.0f;
-for (int i = 0; i < 20; i ++){
+for (int i = 0; i < 5; i ++){
 	location.m_posit.m_z += 12.0f;
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
 	location.m_posit.m_y += 3.0f;
 	HeavyVehicleEntity* const m1a1Tank1 = new HeavyVehicleEntity (scene, manager, location, "m1a1_.ngd", m1a1Param);
 	m1a1Tank1->BuildTrackedVehicle (m1a1Param);
 }
-*/
+
 
 
 	dMatrix camMatrix (manager->m_player->GetNextMatrix());
