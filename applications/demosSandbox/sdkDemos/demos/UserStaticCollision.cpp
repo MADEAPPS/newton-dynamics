@@ -93,9 +93,9 @@ void UserHeightFieldCollision (DemoEntityManager* const scene)
 
 	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
 	dQuaternion rot (camMatrix);
-	dVector origin (1000.0f, 0.0f, 1000.0f, 0.0f);
-	dFloat hight = 1000.0f;
-	origin = FindFloor (scene->GetNewton(), dVector (origin.m_x, hight, origin .m_z, 0.0f), hight * 2);
+	dVector origin (250.0f, 0.0f, 250.0f, 0.0f);
+	dFloat height = 1000.0f;
+	origin = FindFloor (scene->GetNewton(), dVector (origin.m_x, height, origin .m_z, 0.0f), height * 2);
 	origin.m_y += 10.0f;
 
 	scene->SetCameraMatrix(rot, origin);
