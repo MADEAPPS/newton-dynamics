@@ -227,16 +227,19 @@ dgFloat32 dgBody::RayCast (const dgLineBox& line, OnRayCastAction filter, OnRayP
 		const dgMatrix& globalMatrix = m_collision->GetGlobalMatrix();
 		dgVector localP0 (globalMatrix.UntransformVector (l0));
 		dgVector localP1 (globalMatrix.UntransformVector (l1));
-		dgFloat32 t = m_collision->RayCast (localP0, localP1, dgFloat32 (1.0f), contactOut, preFilter, this, userData);
-		if (t < dgFloat32 (1.0f)) {
-			dgVector p (globalMatrix.TransformVector(localP0 + (localP1 - localP0).Scale3(t)));
-			dgVector l1l0 (line.m_l1 - line.m_l0);
-			t = ((p - line.m_l0) % l1l0) / (l1l0 % l1l0);
-			if (t < maxT) {
-				dgAssert (t >= dgFloat32 (0.0f));
-				dgAssert (t <= dgFloat32 (1.0f));
-				contactOut.m_normal = globalMatrix.RotateVector (contactOut.m_normal);
-				maxT = filter (this, contactOut.m_collision0, p, contactOut.m_normal, contactOut.m_shapeId0, userData, t);
+		dgVector p1p0 (localP1 - localP0);
+		if ((p1p0 % p1p0) > dgFloat32 (1.0e-6f)) {
+			dgFloat32 t = m_collision->RayCast (localP0, localP1, dgFloat32 (1.0f), contactOut, preFilter, this, userData);
+			if (t < dgFloat32 (1.0f)) {
+				dgVector p (globalMatrix.TransformVector(localP0 + (localP1 - localP0).Scale3(t)));
+				dgVector l1l0 (line.m_l1 - line.m_l0);
+				t = ((p - line.m_l0) % l1l0) / (l1l0 % l1l0);
+				if (t < maxT) {
+					dgAssert (t >= dgFloat32 (0.0f));
+					dgAssert (t <= dgFloat32 (1.0f));
+					contactOut.m_normal = globalMatrix.RotateVector (contactOut.m_normal);
+					maxT = filter (this, contactOut.m_collision0, p, contactOut.m_normal, contactOut.m_shapeId0, userData, t);
+				}
 			}
 		}
 	} 

@@ -1561,6 +1561,9 @@ void dgBroadPhase::RayCast (const dgVector& l0, const dgVector& l1, OnRayCastAct
 							dgFloat32 param = me->m_body->RayCast (line, filter, prefilter, userData, maxParam);
 							if (param < maxParam) {
 								maxParam = param;
+								if (maxParam < dgFloat32 (1.0e-3f)) {
+									break;
+								}
 							}
 						}
 					} else {
