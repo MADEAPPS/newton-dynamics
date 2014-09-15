@@ -2283,6 +2283,11 @@ dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& l
 	dgVector point0 (localP0);
 	dgVector p0p1 (localP0 - localP1);
 
+	// avoid NaN as a result of a division by zero
+	if ((p0p1.TestZero().GetSignMask() & 7) == 7) {
+		return dgFloat32(1.2f);
+	}
+
 	dgFloat32 param = dgFloat32 (0.0f);
 
 	dgInt32 index = 0;

@@ -275,7 +275,12 @@ dgFloat32 dgCollisionChamferCylinder::RayCast (const dgVector& q0, const dgVecto
 	}
 
 	dgVector dq ((q1 - q0) & dgVector::m_triplexMask);
-	dgAssert ((dq % dq) > 0.0f);
+	
+	// avoid NaN as a result of a division by zero
+	if ((dq % dq) <= 0.0f) {
+		return dgFloat32(1.2f);
+	}
+
 	//dgVector dir (dq.Scale3 (dgRsqrt(dq % dq)));
 	dgVector dir (dq.CompProduct4 (dq.InvMagSqrt()));
 	if (dgAbsf (dir.m_x) > 0.9999f) {
