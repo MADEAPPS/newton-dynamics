@@ -750,9 +750,9 @@ static void LoadLumberYardMesh (DemoEntityManager* const scene, const DemoEntity
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());	
 	for (DemoEntity* child = entity.GetFirst(); child; child = child->GetNext()) {
 		DemoMesh* const mesh = (DemoMesh*)child->GetMesh();
-		dAssert (mesh->IsType(DemoMesh::GetRttiType()));
 		if (mesh) {
-			dTree<NewtonCollision*, DemoMesh*>::dTreeNode* node = filter.Find(mesh);
+            dAssert (mesh->IsType(DemoMesh::GetRttiType()));
+  			dTree<NewtonCollision*, DemoMesh*>::dTreeNode* node = filter.Find(mesh);
 			if (!node) {
 				// make a collision shape only for and instance
 				dFloat* const array = mesh->m_vertex;
