@@ -715,7 +715,7 @@ void CustomVehicleControllerComponentEngine::InitEngineTorqueCurve (dFloat vehic
 	dAssert (rpsAtPeakHorsePower < rpsAtRedLineTorque);
 
 	dAssert (idleTorque > 0.0f);
-	dAssert (idleTorque < peakTorque);
+	//dAssert (idleTorque < peakTorque);
 	dAssert (peakTorque > torqueAtPeakPower);
 	dAssert (torqueAtPeakPower > torqueAtRedLine);
 	dAssert (torqueAtRedLine > 0.0f);
