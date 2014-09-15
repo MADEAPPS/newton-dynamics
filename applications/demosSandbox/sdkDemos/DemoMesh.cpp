@@ -864,7 +864,7 @@ void DemoBezierCurve::Render (DemoEntityManager* const scene)
 	glDisable(GL_TEXTURE_2D);
 	glColor3f(1.0f, 1.0f, 1.0f);
 
-	const int segments = 100;
+	const int segments = 500;
 	dFloat scale = 1.0f / segments;
 	glBegin(GL_LINES);
 	dVector p0 (m_curve.CurvePoint(0.0f)) ;

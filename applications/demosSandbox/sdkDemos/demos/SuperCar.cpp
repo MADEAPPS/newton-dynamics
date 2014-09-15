@@ -1110,7 +1110,12 @@ void SuperCar (DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
-	
+
+DemoEntity* const ent = new DemoEntity (dGetIdentityMatrix(), NULL);
+scene->Append(ent);
+ent->LoadNGD_mesh ("carPath.ngd", scene->GetNewton());
+
+
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 	//CreateLevelMesh (scene, "raceTrack2.ngd", 0);
 	//CreateLevelMesh (scene, "raceTrack2.ngd", 1);

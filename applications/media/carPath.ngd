@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<NewtonGameDynamnics>
+    <header description="Newton Dynamnics 3.00, universal file format" revision="104" />
+    <nodes count="5">
+        <dRootNodeInfo>
+            <dNodeInfo name="rootNode" editorFlags="3" />
+            <childrenNodes count="3" indices="3 1 2" />
+        </dRootNodeInfo>
+        <dSceneCacheInfo cacheId="-3320094658024126097">
+            <dNodeInfo name="dMaterialCache" editorFlags="0" />
+            <parentNodes count="1" indices="0" />
+        </dSceneCacheInfo>
+        <dSceneNodeInfo>
+            <dNodeInfo name="Curve001" editorFlags="0" />
+            <color float4="0.750000 0.750000 0.000000 0.000000" />
+            <transform position="1.000000 0.000000 0.000000 1.000000" eulerAngles="0.000000 -0.000000 -1.570796 0.000000" localScale="1.000000 1.000000 1.000000 1.000000" stretchAxis="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
+            <geometryTransform matrix="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 -4.585568 -18.346638 1.000000" />
+            <parentNodes count="1" indices="0" />
+            <childrenNodes count="1" indices="4" />
+        </dSceneNodeInfo>
+        <dSceneCacheInfo cacheId="-7649022316178375635">
+            <dNodeInfo name="dGeometryCache" editorFlags="0" />
+            <parentNodes count="1" indices="0" />
+            <childrenNodes count="1" indices="4" />
+        </dSceneCacheInfo>
+        <dLineNodeInfo>
+            <dGeometryNodeInfo>
+                <dNodeInfo name="Curve001_line" editorFlags="0" />
+                <pivotMatrix float16="1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000" />
+            </dGeometryNodeInfo>
+            <dBezierSpline degree="3">
+                <controlPoints float4="21" floats="0.000000 -9.859100 120.454788 1.000000 0.000000 3.832228 120.141342 1.000000 0.000000 47.693993 138.869705 1.000000 0.000000 126.764801 147.721390 1.000000 0.000000 168.465530 41.702709 1.000000 0.000000 132.502197 -30.625187 1.000000 0.000000 152.270660 -136.707703 1.000000 0.000000 94.236221 -130.140503 1.000000 0.000000 22.000565 -153.496964 1.000000 0.000000 12.998098 -20.180664 1.000000 0.000000 100.250534 10.893828 1.000000 0.000000 69.069870 144.521545 1.000000 0.000000 -74.346581 -16.189890 1.000000 0.000000 3.032467 -149.267029 1.000000 0.000000 -80.768387 -147.876450 1.000000 0.000000 -159.294403 -152.891632 1.000000 0.000000 -114.055138 -20.387537 1.000000 0.000000 -148.802704 54.410370 1.000000 0.000000 -120.356277 190.190231 1.000000 0.000000 -45.339314 121.267036 1.000000 0.000000 -9.859100 120.454788 1.000000" />
+                <knotVector float="25" floats="0.000000 0.000000 0.000000 0.000000 0.027348 0.098104 0.113960 0.242948 0.262322 0.291927 0.329729 0.398279 0.451606 0.488582 0.595398 0.665335 0.703988 0.729324 0.805891 0.875586 0.929130 1.000000 1.000000 1.000000 1.000000" />
+            </dBezierSpline>
+            <parentNodes count="2" indices="2 3" />
+        </dLineNodeInfo>
+    </nodes>
+</NewtonGameDynamnics>
