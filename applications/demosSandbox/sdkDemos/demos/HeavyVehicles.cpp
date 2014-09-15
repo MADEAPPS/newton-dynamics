@@ -148,7 +148,7 @@ static VehicleParameters m1a1Param =
 
 
 #define HEAVY_VEHICLE_THIRD_PERSON_VIEW_HIGHT		2.0f
-#define HEAVY_VEHICLE_THIRD_PERSON_VIEW_DIST		10.0f
+#define HEAVY_VEHICLE_THIRD_PERSON_VIEW_DIST		15.0f
 #define HEAVY_VEHICLE_THIRD_PERSON_VIEW_FILTER		0.125f
 
 
@@ -158,10 +158,26 @@ class HeavyVehicleEntity: public DemoEntity
 	class TrackSystem
 	{
 		public:
+		class ConstantSpeedKnotInterpolant
+		{
+			public:
+			dFloat m_u;
+			dFloat m_dist;
+			DemoEntity* m_threadLink;
+		};
+
 		TrackSystem()
 			:m_bezierEntity(NULL)
 			,m_bezierMesh(NULL)
+			,m_intepolants(NULL)
 		{
+		}
+
+		~TrackSystem()
+		{
+			if (m_intepolants) {
+				delete[] m_intepolants;
+			}
 		}
 
 		void Init (HeavyVehicleEntity* const me, const char* const name)
@@ -182,50 +198,91 @@ class HeavyVehicleEntity: public DemoEntity
 			dFloat threadSize = 0.29f;
 			int pieceCount = int (m_length / threadSize) + 1;
 
-			int count = 0;
-			dFloat steps[200];
-			steps[0] = 0.0f;
+			// create the uniform speed knot interpolation table
+			ConstantSpeedKnotInterpolant steps[1024];
+			steps[0].m_u = 0.0f;
+			steps[0].m_dist = 0.0f;
 
+			int count = 0;
+			steps[count].m_u = 0.0f;
+			steps[count].m_dist = 0.0f;
+			count ++;
 			int samplingRate = pieceCount * 10;
+			dFloat distAcc = 0.0f;
+			dFloat stepAcc = threadSize;
 			dVector p0 (m_bezierMesh->m_curve.CurvePoint(0.0f));
 			for (int i = 1; i < samplingRate + 15; i ++) {
 				dFloat u = dMod (dFloat (i) / samplingRate, 1.0f);
 				dVector p1 (m_bezierMesh->m_curve.CurvePoint(u));
 				dVector err (p1 - p0);
-				dFloat err2 = dSqrt (err % err);
-				if (err2 > threadSize) {
-					p0 = p1;
-					steps[count] = u;
+				dFloat errMag = dSqrt (err % err);
+				distAcc += errMag;
+				if (distAcc > stepAcc) {
+					stepAcc += threadSize;
+					steps[count].m_u = u;
+					steps[count].m_dist = distAcc;
 					count ++;
 				}
+				p0 = p1;
+			}
+
+			m_interpolantsCount = count;
+			m_intepolants = new ConstantSpeedKnotInterpolant[count];
+			for (int i = 0; i < count; i ++) {
+				m_intepolants[i] = steps[i];
 			}
 
 
-			dMatrix yaw (dRollMatrix(3.141592f * 90.0f / 180.0f) * dPitchMatrix(3.141592f * 180.0f / 180.0f));
-			dMatrix bezierMatrix (m_bezierEntity->GetMeshMatrix() * m_bezierEntity->GetCurrentMatrix());
-			dVector q0 (m_bezierMesh->m_curve.CurvePoint(steps[0]));
-			p0.m_w = 1.0f;
+			m_aligmentMatrix = dRollMatrix(3.141592f * 90.0f / 180.0f) * dPitchMatrix(3.141592f * 180.0f / 180.0f);
+			m_shapeMatrix = m_bezierEntity->GetMeshMatrix() * m_bezierEntity->GetCurrentMatrix();
+			dVector q0 (m_bezierMesh->m_curve.CurvePoint(m_intepolants[0].m_u));
 			dMatrix matrix (dGetIdentityMatrix());
-			for (int i = 1; i < count; i ++) {
-				dVector q1 (m_bezierMesh->m_curve.CurvePoint(steps[i]));
+			for (int i = 1; i < m_interpolantsCount; i ++) {
+				dVector q1 (m_bezierMesh->m_curve.CurvePoint(m_intepolants[i].m_u));
+				dVector dir (q1 - q0);
+				dir = dir.Scale (1.0f / dSqrt (dir % dir));
+				matrix.m_front = dVector (dir.m_z, -dir.m_y, 0.0f, 0.0f);
+				matrix.m_up = dVector (dir.m_y, dir.m_z, 0.0f, 0.0f);
+				matrix.m_right = dVector (0.0f, 0.0f, 1.0f, 0.0f);
+				matrix = m_aligmentMatrix * matrix;
+				matrix.m_posit = m_shapeMatrix.TransformVector (q0);
+				DemoEntity* const threadPart = new DemoEntity (matrix, me);
+				threadPart->SetMesh(threadMesh->GetMesh(), dGetIdentityMatrix());
+				m_intepolants[i-1].m_threadLink = threadPart;
+				q0 = q1;
+			}
+		}
+
+
+		void AnimateThread (DemoEntityManager& world) 
+		{
+			dVector q0 (m_bezierMesh->m_curve.CurvePoint(m_intepolants[0].m_u));
+			dMatrix matrix (dGetIdentityMatrix());
+			for (int i = 1; i < m_interpolantsCount; i ++) {
+				DemoEntity* const threadPart = m_intepolants[i-1].m_threadLink;
+
+				dVector q1 (m_bezierMesh->m_curve.CurvePoint(m_intepolants[i].m_u));
 				q1.m_w = 1.0f;
 				dVector dir (q1 - q0);
 				dir = dir.Scale (1.0f / dSqrt (dir % dir));
 				matrix.m_front = dVector (dir.m_z, -dir.m_y, 0.0f, 0.0f);
 				matrix.m_up = dVector (dir.m_y, dir.m_z, 0.0f, 0.0f);
 				matrix.m_right = dVector (0.0f, 0.0f, 1.0f, 0.0f);
-				matrix = yaw * matrix;
-				matrix.m_posit = bezierMatrix.TransformVector (q0);
-				DemoEntity* const threadPart = new DemoEntity (matrix, me);
-				threadPart->SetMesh(threadMesh->GetMesh(), dGetIdentityMatrix());
+				matrix = m_aligmentMatrix * matrix;
+				matrix.m_posit = m_shapeMatrix.TransformVector (q0);
+				threadPart->SetNextMatrix (world, dQuaternion(matrix), matrix.m_posit);
 				q0 = q1;
 			}
-
 		}
 
+		dMatrix m_shapeMatrix;
+		dMatrix m_aligmentMatrix;
 		DemoEntity* m_bezierEntity;
 		DemoBezierCurve* m_bezierMesh;
+		int m_interpolantsCount;
+		ConstantSpeedKnotInterpolant* m_intepolants;
 		dFloat m_length;
+
 	};
 
 	class TireAligmentTransform: public UserData
@@ -427,6 +484,7 @@ class HeavyVehicleEntity: public DemoEntity
 	void UpdateTireTransforms()
 	{
 		NewtonBody* const body = m_controller->GetBody();
+		//NewtonWorld* const world = NewtonBodyGetWorld(body);
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(body));
 		
 #if 0
@@ -449,6 +507,12 @@ class HeavyVehicleEntity: public DemoEntity
 			tirePart->SetMatrix(*scene, rot, matrix.m_posit);
 		}
 #endif
+
+		// update the thread location
+		if (m_leftTrack.m_bezierEntity) {
+			m_leftTrack.AnimateThread (*scene);
+			m_rightTrack.AnimateThread (*scene);
+		}
 	}
 
 	// this function is an example of how to make a high performance super car
@@ -1132,7 +1196,7 @@ glEnd();
 			HeavyVehicleEntity* const vehicleEntity = (HeavyVehicleEntity*)NewtonBodyGetUserData (controller->GetBody());
 			vehicleEntity->UpdateTireTransforms();
 		}
-
+		
 		UpdateCamera (timestep);
 	}
 
