@@ -1,13 +1,13 @@
 /* Copyright (c) <2009> <Newton Game Dynamics>
-* 
-* This software is provided 'as-is', without any express or implied
-* warranty. In no event will the authors be held liable for any damages
-* arising from the use of this software.
-* 
-* Permission is granted to anyone to use this software for any purpose,
-* including commercial applications, and to alter it and redistribute it
-* freely
-*/
+ *
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
+ *
+ * Permission is granted to anyone to use this software for any purpose,
+ * including commercial applications, and to alter it and redistribute it
+ * freely
+ */
 
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
@@ -26,26 +26,20 @@ void HeightFieldCollision (DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 1.5f, 0.2f, 200.0f, -50.0f);
-	
 
-	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
-	dQuaternion rot (camMatrix);
-	dVector origin (1000.0f, 0.0f, 1000.0f, 0.0f);
-	dFloat hight = 1000.0f;
-	origin = FindFloor (scene->GetNewton(), dVector (origin.m_x, hight, origin .m_z, 0.0f), hight * 2);
-	origin.m_y += 10.0f;
 
-	scene->SetCameraMatrix(rot, origin);
+	dMatrix locationTransform (dGetIdentityMatrix());
+	locationTransform.m_posit = FindFloor (scene->GetNewton(), dVector(126, 50, 50), 100.0f);
+	locationTransform.m_posit.m_y += 2.0f;
 
-	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
-	dVector location (origin);
-	location.m_x += 40.0f;
-	location.m_z += 0.0f;
-	dVector size (0.5f, 0.5f, 0.75f, 0.0f);
+	scene->SetCameraMatrix(dQuaternion(locationTransform), locationTransform.m_posit + dVector(0, 5, 0));
 
-//	int count = 5;
-	int count = 10;
-	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
+	const int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
+	const dVector location (locationTransform.m_posit + dVector(20, 20, 0));
+	const dVector size (0.5f, 0.5f, 0.75f, 0.0f);
+	const int count = 5;
+	const dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
+
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
