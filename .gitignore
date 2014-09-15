@@ -68,3 +68,6 @@ packages/dCompilerKit/dLittleScriptLanguage/dLittleScriptParser.cpp.txt
 packages/dCompilerKit/dVirtualAssembler/dAssemblerParser.cpp.txt
 *.pch
 *.pch
+*.rsp
+*.bsc
+*.sbr
