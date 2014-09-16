@@ -1091,12 +1091,12 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 	}
 
 
-	dMatrix CalculateStartMatrix () const
+	dMatrix CalculateSplineMatrix (dFloat64 param) const
 	{
 		DemoBezierCurve* const path = (DemoBezierCurve*) m_aiPath->GetMesh();
 
-		dBigVector origin (path->m_curve.CurvePoint(0.0f)); 
-		dBigVector tangent (path->m_curve.CurveDerivative(0.0f, 1)); 
+		dBigVector origin (path->m_curve.CurvePoint(param)); 
+		dBigVector tangent (path->m_curve.CurveDerivative(param, 1)); 
 		tangent = tangent.Scale (1.0 / sqrt (tangent % tangent));
 		dBigVector p1 (origin + tangent);
 
@@ -1127,7 +1127,44 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		path->SetVisible(true);
 		path->SetRenderResolution (500);
 
+		// load a street cone model and place at equal distance along the path
+		DemoEntity* const coneEnt = new DemoEntity(dGetIdentityMatrix(), NULL);
+		coneEnt->LoadNGD_mesh ("streetCone.ngd", scene->GetNewton());
+		DemoMesh* const mesh = (DemoMesh*) coneEnt->GetMesh();
+		dAssert (mesh);
 
+		NewtonWorld* const world = scene->GetNewton();
+		dMatrix offsetMatrix (coneEnt->GetMeshMatrix());
+		NewtonCollision* const collision = NewtonCreateConvexHull(world, mesh->m_vertexCount, mesh->m_vertex, 3 * sizeof (dFloat), 1.0e-3f, 0, &offsetMatrix[0][0]);
+
+		dFloat64 slineLength = path->m_curve.CalculateLength(0.01f);
+		int segmentCount = slineLength / 5.0f;
+
+		dFloat64 step = slineLength / segmentCount;
+
+		dFloat streetWidth = 8.0f;
+
+		dFloat64 acc = 0.0f;
+		dFloat64 dist = 0.0;
+		dBigVector p0 (path->m_curve.CurvePoint(0.0f));
+		for (int i = 1; i < 1000; i ++) {
+			dFloat64 t = dFloat64 (i) / 1000.0f;
+			dBigVector p1 (path->m_curve.CurvePoint(t));
+			dBigVector dp (p1 - p0);
+			dist += sqrt (dp % dp);
+			if (dist > acc) {
+				acc += step;
+				dMatrix matrix (CalculateSplineMatrix  (dFloat64 (i-1) / 1000.0f));
+				matrix.m_posit += matrix.m_right.Scale (streetWidth);
+				CreateSimpleSolid (scene, mesh, 20.0f, matrix, collision, 0);
+				matrix.m_posit -= matrix.m_right.Scale (streetWidth * 2.0f);
+				CreateSimpleSolid (scene, mesh, 20.0f, matrix, collision, 0);
+			}
+			p0 = p1;
+		}
+
+		NewtonDestroyCollision(collision);
+		coneEnt->Release();
 	}
 
 	// use this to display debug information about vehicle 
@@ -1180,7 +1217,7 @@ void SuperCar (DemoEntityManager* const scene)
 	SuperCarVehicleControllerManager* const manager = new SuperCarVehicleControllerManager (world);
 
 	// create a simple vehicle
-	dMatrix location (manager->CalculateStartMatrix ());
+	dMatrix location (manager->CalculateSplineMatrix (0.0f));
 	location.m_posit += location.m_right.Scale (2.0f);
 
 //dMatrix shapeOffsetMatrix (dGetIdentityMatrix());

@@ -1422,7 +1422,7 @@ location.m_posit.m_z = 50.0f;
 
 	// create a vehicle controller manager
 	HeavyVehicleControllerManager* const manager = new HeavyVehicleControllerManager (world);
-/*	
+	
 	HeavyVehicleEntity* const heavyVehicle = new HeavyVehicleEntity (scene, manager, location, "lav-25.ngd", heavyTruck);
 	heavyVehicle->BuildAllWheelDriveVehicle (heavyTruck);
 
@@ -1432,7 +1432,7 @@ location.m_posit.m_z = 50.0f;
 	location.m_posit.m_y += 2.0f;
 	HeavyVehicleEntity* const lightVehicle = new HeavyVehicleEntity (scene, manager, location, "buggy_.ngd", lightTruck);
 	lightVehicle->BuildLightTruckVehicle (lightTruck);
-*/
+
 	location.m_posit.m_z -= 12.0f;
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
 	location.m_posit.m_y += 3.0f;
