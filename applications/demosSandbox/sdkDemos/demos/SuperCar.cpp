@@ -1122,6 +1122,32 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 };
 
 
+static dMatrix CalculateStartMatrix (SuperCarVehicleControllerManager* const manager)
+{
+	DemoEntity* const aiPath = manager->m_aiPath;
+	
+	DemoBezierCurve* const path = (DemoBezierCurve*) aiPath->GetMesh();
+
+	dBigVector origin (path->m_curve.CurvePoint(0.0f)); 
+	dBigVector tangent (path->m_curve.CurveDerivative(0.0f, 1)); 
+	tangent = tangent.Scale (1.0 / sqrt (tangent % tangent));
+	dBigVector p1 (origin + tangent);
+
+	dBigVector dir; 
+	path->m_curve.FindClosestKnot (dir, p1, 4);
+
+	dir -= origin;
+	dir = dir.Scale (1.0 / sqrt (dir % dir));
+	dMatrix matrix (dGetIdentityMatrix());
+
+	dMatrix pathMatrix (aiPath->GetMeshMatrix() * aiPath->GetCurrentMatrix());
+	matrix.m_front = pathMatrix.RotateVector (dVector (dir.m_x, dir.m_y, dir.m_z, 0.0f));
+	matrix.m_right = matrix.m_front * matrix.m_up;
+	matrix.m_right.m_w = 0.0f;
+	matrix.m_posit = pathMatrix.TransformVector(dVector (origin.m_x, origin.m_y, origin.m_z, 1.0f));
+	return matrix;
+}
+
 
 // *************************************************************************************************
 // 
@@ -1147,17 +1173,13 @@ void SuperCar (DemoEntityManager* const scene)
 	SuperCarVehicleControllerManager* const manager = new SuperCarVehicleControllerManager (world);
 
 	// create a simple vehicle
-	dMatrix location (dYawMatrix(90.0f * 3.1416f/ 180.0f));
-	//dMatrix location (dGetIdentityMatrix());
-	location.m_posit.m_x = 126.0f;
-	location.m_posit.m_y = 5.0f;
-	location.m_posit.m_z = 50.0f;
+	dMatrix location (CalculateStartMatrix (manager));
+	location.m_posit += location.m_right.Scale (2.0f);
 
-dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
-dVector size (3.5f, 0.125f, 3.5f, 0.0f);
-AddPrimitiveArray(scene, 100.0f, location.m_posit, size, 1, 1, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix);
-
-
+//dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
+//dVector size (3.5f, 0.125f, 3.5f, 0.0f);
+//AddPrimitiveArray(scene, 100.0f, location.m_posit, size, 1, 1, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix);
+	
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
 	location.m_posit.m_y += 1.0f;
 

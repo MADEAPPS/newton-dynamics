@@ -808,7 +808,7 @@ void dfbxImport::ImportNurbCurveShape (FbxScene* const fbxScene, dPluginScene* c
 
 	    int pointsCount = fbxCurve->GetControlPointsCount();
 		const FbxVector4* const controlPoints = fbxCurve->GetControlPoints();
-		dVector* const vertexArray = new dVector[pointsCount + 1]; 
+		dBigVector* const vertexArray = new dBigVector[pointsCount + 1]; 
 
 		for (int i = 0; i < pointsCount; i ++) {
 			const FbxVector4& p = controlPoints[i];
@@ -826,7 +826,7 @@ void dfbxImport::ImportNurbCurveShape (FbxScene* const fbxScene, dPluginScene* c
 		double scale = 1.0 / knots[knotCount - 1];
 		dAssert (pointsCount == knotCount - 2 * (degree - 1));
 
-		dFloat* const knotArray = new dFloat[pointsCount]; 
+		dFloat64* const knotArray = new dFloat64[pointsCount]; 
 		for (int i = 0; i < knotCount - degree * 2; i ++) {
 			double val = knots[i + degree];
 			knotArray[i] = dFloat (val * scale);
