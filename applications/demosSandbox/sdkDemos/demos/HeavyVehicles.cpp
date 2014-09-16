@@ -868,7 +868,7 @@ class HeavyVehicleEntity: public DemoEntity
 		m_controller->SetBrakes(brakes);
 
 		// add a tank skid steering engine
-		CustomVehicleControllerComponentTrackSkidSteering* const steering = new CustomVehicleControllerComponentTrackSkidSteering (m_controller, 1.0f, 40.0f * parameters.IDLE_TORQUE);
+		CustomVehicleControllerComponentTrackSkidSteering* const steering = new CustomVehicleControllerComponentTrackSkidSteering (m_controller, 1.0f, 10.0f * parameters.IDLE_TORQUE);
 		steering->AddSteeringTire (leftTire[0], -1.0f);
 		steering->AddSteeringTire (rightTire[0], -1.0f);
 		m_controller->SetSteering(steering);
