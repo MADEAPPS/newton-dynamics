@@ -259,17 +259,21 @@ void dBezierSpline::BasicsFunctionsDerivatives (dFloat u, int span, dFloat* cons
 	}
 }
 
-dVector dBezierSpline::CurvePoint (dFloat u) const
+dVector dBezierSpline::CurvePoint (dFloat u, int span) const
 {
 	dVector point (0.0f, 0.0f, 0.0f, 0.0f);
 	dFloat basicFunctions[D_BEZIER_LOCAL_BUFFER_SIZE];
-	int span = GetSpan(u);
 	BasicsFunctions (u, span, basicFunctions);
-	
 	for (int i = 0; i <= m_degree; i ++) {
 		point += m_controlPoints[span - m_degree + i].Scale (basicFunctions[i]);
 	}
 	return point;
+}
+
+dVector dBezierSpline::CurvePoint (dFloat u) const
+{
+	int span = GetSpan(u);
+	return CurvePoint (u, span);
 }
 
 dVector dBezierSpline::CurveDerivative (dFloat u, int index) const
@@ -446,4 +450,17 @@ dFloat dBezierSpline::CalculateLength (dFloat tol) const
 	}
 
 	return length;
+}
+
+
+dFloat dBezierSpline::FindClosestKnot (const dVector& point, int subdivitionSteps) const
+{
+	dFloat bestKnot = 0.0f;
+	dFloat distance = 1.0e10f;
+	for (int i = m_degree; i < (m_knotsCount - m_degree); i ++) {
+		dVector p (CurvePoint (m_knotVector[i], i));
+		
+	}
+
+	return 0;
 }

@@ -76,7 +76,7 @@
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)\$(ProjectName)_d.dll"
 				GenerateDebugInformation="true"
-				ImportLibrary="$(OutDir)/$(ProjectName)_d.lib"
+				ImportLibrary="$(TargetDir)$(TargetName).lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -160,7 +160,7 @@
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)\$(ProjectName)_d.dll"
 				GenerateDebugInformation="true"
-				ImportLibrary="$(OutDir)/$(ProjectName)_d.lib"
+				ImportLibrary="$(TargetDir)$(TargetName).lib"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -241,6 +241,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				GenerateDebugInformation="true"
+				ImportLibrary="$(TargetDir)$(TargetName).lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -322,7 +323,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				GenerateDebugInformation="true"
-				ImportLibrary="$(OutDir)/$(ProjectName).lib"
+				ImportLibrary="$(TargetDir)$(TargetName).lib"
 				TargetMachine="17"
 			/>
 			<Tool

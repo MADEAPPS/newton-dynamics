@@ -42,7 +42,6 @@ class dBezierSpline : public dContainersAlloc
 	dVector* GetControlPointArray();
 	const dVector* GetControlPointArray() const;
 	dVector GetControlPoint(int i) const;
-
 	void SetControlPoint(int i, const dVector& point);
 	
 	int GetKnotCount() const;
@@ -50,11 +49,13 @@ class dBezierSpline : public dContainersAlloc
 	const dFloat* GetKnotArray() const;
 	dFloat GetKnot(int i) const;
 
-
+	dFloat FindClosestKnot (const dVector& point, int subdivitionSteps = 2) const;
+	
 	private:
 	void Clear();
 	int GetSpan(dFloat u) const;
 
+	dVector CurvePoint (dFloat u, int span) const;
 	void CreateCubicKnotVector(int count, const dVector* const points);
 	void CreateCubicControlPoints(int count, const dVector* const points, const dVector& firstTangent, const dVector& lastTangent);
 
