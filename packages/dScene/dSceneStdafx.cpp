@@ -81,6 +81,21 @@ void dFloatArrayToString (const dFloat* const array, int count, char* const stri
 	}
 }
 
+void dFloatArrayToString (const dFloat64* const array, int count, char* const string, int maxSixeInBytes)
+{
+	if (count) {
+		char* ptr = string;
+		sprintf (string, " ");
+		for (int i = 0; i < count; i ++) {
+			sprintf (ptr, "%f ", array[i]);
+			ptr += strlen (ptr);
+			dAssert ((ptr - string) < maxSixeInBytes);
+		}
+		string[ptr - string - 1] = 0;
+	}
+}
+
+
 void dStringToIntArray (const char* const string, int* const array, int maxCount)
 {
 	const char* ptr = string;
@@ -120,6 +135,27 @@ void dStringToFloatArray (const char* const string, dFloat* const array, int max
 		array[i] = val;
 	}
 }
+
+void dStringToFloatArray (const char* const string, dFloat64* const array, int maxCount)
+{
+	const char* ptr = string;
+	for (int i = 0; i < maxCount; i ++) {
+		char value[128];
+		while (*ptr == ' ') {
+			ptr ++;
+		}
+		int j = 0;
+		while (*ptr != ' ' && *ptr) {
+			value[j] = *ptr;
+			ptr ++;
+			j ++;
+		}
+		value[j] = 0;
+		dFloat64 val = atof (value);
+		array[i] = val;
+	}
+}
+
 
 static int SortVertexArray (const void *A, const void *B) 
 {

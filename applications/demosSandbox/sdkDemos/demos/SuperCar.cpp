@@ -692,7 +692,7 @@ class SuperCarEntity: public DemoEntity
 	}
 
 
-	void Debug () const 
+	void Debug (DemoEntity* const m_aiPath) const 
 	{
 		NewtonBody* const body = m_controller->GetBody();
 		const CustomVehicleControllerBodyStateChassis& chassis = m_controller->GetChassisState ();
@@ -720,7 +720,6 @@ class SuperCarEntity: public DemoEntity
 		glVertex3f (r0.m_x, r0.m_y, r0.m_z);
 		glVertex3f (r1.m_x, r1.m_y, r1.m_z);
 
-
 		// draw the velocity vector, a little higher so that is not hidden by the vehicle mesh 
 		dVector veloc;
 		NewtonBodyGetVelocity(body, &veloc[0]);
@@ -734,8 +733,9 @@ class SuperCarEntity: public DemoEntity
 			const CustomVehicleControllerBodyStateTire& tire = *node;
 			dVector p0 (tire.GetCenterOfMass());
 
-const dMatrix& tireMatrix = tire.GetLocalMatrix ();
-p0 += chassis.GetMatrix()[2].Scale ((tireMatrix.m_posit.m_z > 0.0f ? 1.0f : -1.0f) * 0.25f);
+			// offset the origin of of tire force so that they are visible
+			const dMatrix& tireMatrix = tire.GetLocalMatrix ();
+			p0 += chassis.GetMatrix()[2].Scale ((tireMatrix.m_posit.m_z > 0.0f ? 1.0f : -1.0f) * 0.25f);
 
 			// draw the tire load 
 			dVector p1 (p0 + tire.GetTireLoad().Scale (scale));
@@ -755,11 +755,22 @@ p0 += chassis.GetMatrix()[2].Scale ((tireMatrix.m_posit.m_z > 0.0f ? 1.0f : -1.0
 			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
 			glVertex3f (p3.m_x, p3.m_y, p3.m_z);
 		}
-
 		glEnd();
 
 		glLineWidth(1.0f);
 
+		// render AI information
+		dMatrix pathMatrix (m_aiPath->GetMeshMatrix() * m_aiPath->GetCurrentMatrix());
+		dBigVector q; 
+		DemoBezierCurve* const path = (DemoBezierCurve*) m_aiPath->GetMesh();
+		path->m_curve.FindClosestKnot (q, pathMatrix.UntransformVector(p0), 4);
+		dVector p1 (pathMatrix.TransformVector(dVector (q.m_x, q.m_y, q.m_z, q.m_w)));
+
+		glBegin(GL_LINES);
+		glColor3f (1.0f, 0.0f, 1.0f);
+		glVertex3f (p0.m_x, p0.m_y, p0.m_z);
+		glVertex3f (p1.m_x, p1.m_y, p1.m_z);
+		glEnd();
 	}
 
 
@@ -807,6 +818,16 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 			m_engineSounds[i] = channel;
 			m_soundsCount ++;
 		}
+
+		// create a Bezier Spline path for AI car to drive
+		m_aiPath = new DemoEntity (dGetIdentityMatrix(), NULL);
+		scene->Append(m_aiPath);
+		m_aiPath->LoadNGD_mesh ("carPath.ngd", scene->GetNewton());
+		DemoBezierCurve* const path = (DemoBezierCurve*) m_aiPath->GetMesh();
+		dAssert (path->IsType(DemoBezierCurve::GetRttiType()));
+
+		path->SetVisible(true);
+		path->SetRenderResolution (500);
 	}
 
 	~SuperCarVehicleControllerManager ()
@@ -1082,12 +1103,13 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		for (dListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
 			CustomVehicleController* const controller = &ptr->GetInfo();
 			SuperCarEntity* const vehicleEntity = (SuperCarEntity*)NewtonBodyGetUserData (controller->GetBody());
-			vehicleEntity->Debug();
+			vehicleEntity->Debug(m_aiPath);
 		}
 	}
 
 	bool m_externalView;
 	SuperCarEntity* m_player;
+	DemoEntity* m_aiPath;
 
 	GLuint m_gears;
 	GLuint m_redNeedle;
@@ -1110,11 +1132,6 @@ void SuperCar (DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
-
-DemoEntity* const ent = new DemoEntity (dGetIdentityMatrix(), NULL);
-scene->Append(ent);
-ent->LoadNGD_mesh ("carPath.ngd", scene->GetNewton());
-
 
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 	//CreateLevelMesh (scene, "raceTrack2.ngd", 0);

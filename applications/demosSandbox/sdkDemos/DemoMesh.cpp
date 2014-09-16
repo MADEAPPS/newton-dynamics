@@ -35,6 +35,7 @@ dInitRtti(DemoBezierCurve);
 DemoMeshInterface::DemoMeshInterface()
 	:dClassInfo()
 	,m_name()
+	,m_isVisible(true)
 {
 }
 
@@ -49,6 +50,15 @@ const dString& DemoMeshInterface::GetName () const
 }
 
 
+bool DemoMeshInterface::GetVisible () const
+{
+	return m_isVisible;
+}
+
+void DemoMeshInterface::SetVisible (bool visibilityFlag)
+{
+	m_isVisible = visibilityFlag;
+}
 
 
 //////////////////////////////////////////////////////////////////////
@@ -747,10 +757,6 @@ void  DemoMesh::ResetOptimization()
 	}
 }
 
-
-
-
-
 void DemoMesh::AllocVertexData (int vertexCount)
 {
 	m_vertexCount = vertexCount;
@@ -769,52 +775,56 @@ DemoSubMesh* DemoMesh::AddSubMesh()
 
 void DemoMesh::Render (DemoEntityManager* const scene)
 {
-    if (m_optimizedTransparentDiplayList) {
-        scene->PushTransparentMesh (this); 
-    }
-
-	if (m_optimizedOpaqueDiplayList) {
-		glCallList(m_optimizedOpaqueDiplayList);
-	} else if (!m_optimizedTransparentDiplayList) {
-		glEnableClientState (GL_VERTEX_ARRAY);
-		glEnableClientState (GL_NORMAL_ARRAY);
-		glEnableClientState (GL_TEXTURE_COORD_ARRAY);
-
-		glVertexPointer (3, GL_FLOAT, 0, m_vertex);
-		glNormalPointer (GL_FLOAT, 0, m_normal);
-		glTexCoordPointer (2, GL_FLOAT, 0, m_uv);
-
-		for (dListNode* nodes = GetFirst(); nodes; nodes = nodes->GetNext()) {
-			DemoSubMesh& segment = nodes->GetInfo();
-			segment.Render();
+	if (m_isVisible) {
+		if (m_optimizedTransparentDiplayList) {
+			scene->PushTransparentMesh (this); 
 		}
-		glDisableClientState(GL_VERTEX_ARRAY);	// disable vertex arrays
-		glDisableClientState(GL_NORMAL_ARRAY);	// disable normal arrays
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);	// disable normal arrays
+
+		if (m_optimizedOpaqueDiplayList) {
+			glCallList(m_optimizedOpaqueDiplayList);
+		} else if (!m_optimizedTransparentDiplayList) {
+			glEnableClientState (GL_VERTEX_ARRAY);
+			glEnableClientState (GL_NORMAL_ARRAY);
+			glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+
+			glVertexPointer (3, GL_FLOAT, 0, m_vertex);
+			glNormalPointer (GL_FLOAT, 0, m_normal);
+			glTexCoordPointer (2, GL_FLOAT, 0, m_uv);
+
+			for (dListNode* nodes = GetFirst(); nodes; nodes = nodes->GetNext()) {
+				DemoSubMesh& segment = nodes->GetInfo();
+				segment.Render();
+			}
+			glDisableClientState(GL_VERTEX_ARRAY);	// disable vertex arrays
+			glDisableClientState(GL_NORMAL_ARRAY);	// disable normal arrays
+			glDisableClientState(GL_TEXTURE_COORD_ARRAY);	// disable normal arrays
+		}
 	}
 }
 
 void DemoMesh::RenderTransparency () const
 {
-    if (m_optimizedTransparentDiplayList) {
-        glCallList(m_optimizedTransparentDiplayList);
-    } else {
-        glEnableClientState (GL_VERTEX_ARRAY);
-        glEnableClientState (GL_NORMAL_ARRAY);
-        glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+	if (m_isVisible) {
+		if (m_optimizedTransparentDiplayList) {
+			glCallList(m_optimizedTransparentDiplayList);
+		} else {
+			glEnableClientState (GL_VERTEX_ARRAY);
+			glEnableClientState (GL_NORMAL_ARRAY);
+			glEnableClientState (GL_TEXTURE_COORD_ARRAY);
 
-        glVertexPointer (3, GL_FLOAT, 0, m_vertex);
-        glNormalPointer (GL_FLOAT, 0, m_normal);
-        glTexCoordPointer (2, GL_FLOAT, 0, m_uv);
+			glVertexPointer (3, GL_FLOAT, 0, m_vertex);
+			glNormalPointer (GL_FLOAT, 0, m_normal);
+			glTexCoordPointer (2, GL_FLOAT, 0, m_uv);
 
-        for (dListNode* nodes = GetFirst(); nodes; nodes = nodes->GetNext()) {
-            DemoSubMesh& segment = nodes->GetInfo();
-            segment.Render();
-        }
-        glDisableClientState(GL_VERTEX_ARRAY);	// disable vertex arrays
-        glDisableClientState(GL_NORMAL_ARRAY);	// disable normal arrays
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY);	// disable normal arrays
-    }
+			for (dListNode* nodes = GetFirst(); nodes; nodes = nodes->GetNext()) {
+				DemoSubMesh& segment = nodes->GetInfo();
+				segment.Render();
+			}
+			glDisableClientState(GL_VERTEX_ARRAY);	// disable vertex arrays
+			glDisableClientState(GL_NORMAL_ARRAY);	// disable normal arrays
+			glDisableClientState(GL_TEXTURE_COORD_ARRAY);	// disable normal arrays
+		}
+	}
 }
 
 void DemoMesh::RenderNormals ()
@@ -841,7 +851,9 @@ void DemoMesh::RenderNormals ()
 DemoBezierCurve::DemoBezierCurve(const dScene* const scene, dScene::dTreeNode* const bezierNode)
 	:DemoMeshInterface()
 	,m_curve()
+	,m_renderResolution(50)
 {
+	m_isVisible = false;
 	dLineNodeInfo* const bezeriInfo = (dLineNodeInfo*)scene->GetInfoFromNode(bezierNode);
 	dAssert (bezeriInfo->IsType(dLineNodeInfo::GetRttiType()));
 	m_name = bezeriInfo->GetName();
@@ -857,26 +869,48 @@ void DemoBezierCurve::RenderNormals ()
 {
 }	
 
+int DemoBezierCurve::GetRenderResolution () const
+{
+	return m_renderResolution;
+}
+
+void DemoBezierCurve::SetRenderResolution (int breaks)
+{
+	m_renderResolution = breaks;
+}
+
+
 void DemoBezierCurve::Render (DemoEntityManager* const scene)
 {
-#if 1
-	glDisable (GL_LIGHTING);
-	glDisable(GL_TEXTURE_2D);
-	glColor3f(1.0f, 1.0f, 1.0f);
+	if (m_isVisible) {
+		glDisable (GL_LIGHTING);
+		glDisable(GL_TEXTURE_2D);
+		glColor3f(1.0f, 1.0f, 1.0f);
 
-	const int segments = 500;
-	dFloat scale = 1.0f / segments;
-	glBegin(GL_LINES);
-	dVector p0 (m_curve.CurvePoint(0.0f)) ;
-	for (int i = 1; i <= segments; i ++) {
-		dVector p1 (m_curve.CurvePoint(i * scale));
-		glVertex3f (p0.m_x, p0.m_y, p0.m_z);
-		glVertex3f (p1.m_x, p1.m_y, p1.m_z);
-		p0 = p1;
+		dFloat64 scale = 1.0f / m_renderResolution;
+		glBegin(GL_LINES);
+		dBigVector p0 (m_curve.CurvePoint(0.0f)) ;
+		for (int i = 1; i <= m_renderResolution; i ++) {
+			dBigVector p1 (m_curve.CurvePoint(i * scale));
+			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
+			glVertex3f (p1.m_x, p1.m_y, p1.m_z);
+			p0 = p1;
+		}
+		glEnd();
+
+
+		glPointSize(4.0f);
+		glBegin(GL_POINTS);
+		glColor3f(1.0f, 0.0f, 0.0f);
+		int count = m_curve.GetKnotCount();
+		for (int i = 0; i < count; i ++) {
+			dFloat u = m_curve.GetKnot(i);
+			dBigVector p0 (m_curve.CurvePoint(u));
+			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
+		}
+		glEnd();
+
+		glEnable (GL_LIGHTING);
 	}
-	glEnd();
-
-	glEnable (GL_LIGHTING);
-#endif
 }
 

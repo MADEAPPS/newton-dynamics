@@ -24,6 +24,9 @@ class DemoMeshInterface: public dClassInfo
 	~DemoMeshInterface();
 	const dString& GetName () const;
 
+	bool GetVisible () const;
+	void SetVisible (bool visibilityFlag);
+
 	virtual void RenderTransparency () const = 0;
 	virtual void Render (DemoEntityManager* const scene) = 0;
 	virtual void RenderNormals () = 0;
@@ -31,6 +34,7 @@ class DemoMeshInterface: public dClassInfo
 	dAddRtti(dClassInfo,DOMMY_API);
 
 	dString m_name;
+	bool m_isVisible;
 };
 
 class DemoSubMesh
@@ -108,12 +112,15 @@ class DemoBezierCurve: public DemoMeshInterface
 	public:
 	DemoBezierCurve(const dScene* const scene, dScene::dTreeNode* const meshNode);
 
+	int GetRenderResolution () const;
+	void SetRenderResolution (int breaks);
 
 	virtual void RenderTransparency () const;
 	virtual void Render (DemoEntityManager* const scene);
 	virtual void RenderNormals ();
 
 	dBezierSpline m_curve;
+	int m_renderResolution;
 
 	dAddRtti (DemoMeshInterface, DOMMY_API);
 };

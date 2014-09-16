@@ -221,7 +221,8 @@ class HeavyVehicleEntity: public DemoEntity
 
 			for (int i = 0; i < m_controlPointCount; i ++) {
 				m_controlPointBindIndex[i] = -1;
-				m_controlPointsOffset[i] = m_shapeMatrix.TransformVector(m_bezierMesh->m_curve.GetControlPoint(i));
+				dBigVector q (m_bezierMesh->m_curve.GetControlPoint(i));
+				m_controlPointsOffset[i] = m_shapeMatrix.TransformVector(dVector (q.m_x, q.m_y, q.m_z, q.m_w));
 			}
 
 			for (int i = 0; i < m_controlPointCount; i ++) {
@@ -278,10 +279,12 @@ class HeavyVehicleEntity: public DemoEntity
 			int samplingRate = pieceCount * 10;
 			dFloat distAcc = 0.0f;
 			dFloat stepAcc = threadSize;
-			dVector p0 (m_bezierMesh->m_curve.CurvePoint(0.0f));
+			dBigVector q (m_bezierMesh->m_curve.CurvePoint(0.0f));
+			dVector p0 (dVector (q.m_x, q.m_y, q.m_z, q.m_w));
 			for (int i = 1; i < samplingRate + 15; i ++) {
 				dFloat u = dMod (dFloat (i) / samplingRate, 1.0f);
-				dVector p1 (m_bezierMesh->m_curve.CurvePoint(u));
+				dBigVector q (m_bezierMesh->m_curve.CurvePoint(u));
+				dVector p1 (dVector (q.m_x, q.m_y, q.m_z, q.m_w));
 				dVector err (p1 - p0);
 				dFloat errMag = dSqrt (err % err);
 				distAcc += errMag;
@@ -302,10 +305,12 @@ class HeavyVehicleEntity: public DemoEntity
 
 			m_aligmentMatrix = dRollMatrix(3.141592f * 90.0f / 180.0f) * dPitchMatrix(3.141592f * 180.0f / 180.0f);
 			m_shapeMatrix = m_bezierEntity->GetMeshMatrix() * m_bezierEntity->GetCurrentMatrix();
-			dVector q0 (m_bezierMesh->m_curve.CurvePoint(m_intepolants[0].m_u));
+			dBigVector r (m_bezierMesh->m_curve.CurvePoint(m_intepolants[0].m_u));
+			dVector q0 (dVector (r.m_x, r.m_y, r.m_z, r.m_w));
 			dMatrix matrix (dGetIdentityMatrix());
 			for (int i = 1; i < m_interpolantsCount; i ++) {
-				dVector q1 (m_bezierMesh->m_curve.CurvePoint(m_intepolants[i].m_u));
+				dBigVector r (m_bezierMesh->m_curve.CurvePoint(m_intepolants[i].m_u));
+				dVector q1 (dVector (r.m_x, r.m_y, r.m_z, r.m_w));
 				dVector dir (q1 - q0);
 				dir = dir.Scale (1.0f / dSqrt (dir % dir));
 				matrix.m_front = dVector (dir.m_z, -dir.m_y, 0.0f, 0.0f);
@@ -388,7 +393,8 @@ class HeavyVehicleEntity: public DemoEntity
 			dAssert (m_parameter <= m_length);
 
 			dFloat u = CalculateKnotParam (m_parameter);
-			dVector q0 (m_bezierMesh->m_curve.CurvePoint(u));
+			dBigVector q (m_bezierMesh->m_curve.CurvePoint(u));
+			dVector q0 (dVector (q.m_x, q.m_y, q.m_z, q.m_w));
 			dMatrix matrix (dGetIdentityMatrix());
 			for (int i = 1; i < m_interpolantsCount; i ++) {
 				DemoEntity* const threadPart = m_intepolants[i-1].m_threadLink;
@@ -399,7 +405,8 @@ class HeavyVehicleEntity: public DemoEntity
 				}
 
 				dFloat u = CalculateKnotParam (t);
-				dVector q1 (m_bezierMesh->m_curve.CurvePoint(u));
+				dBigVector q (m_bezierMesh->m_curve.CurvePoint(u));
+				dVector q1 (dVector (q.m_x, q.m_y, q.m_z, q.m_w));
 				dVector dir (q1 - q0);
 				dir = dir.Scale (1.0f / dSqrt (dir % dir));
 				matrix.m_front = dVector (dir.m_z, -dir.m_y, 0.0f, 0.0f);

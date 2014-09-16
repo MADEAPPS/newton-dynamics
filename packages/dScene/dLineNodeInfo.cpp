@@ -91,11 +91,11 @@ void dLineNodeInfo::DrawWireFrame(dSceneRender* const render, dScene* const scen
 		render->SetColor(dVector (1.0f, 1.0f, 1.0f));
 
 		dFloat scale = 1.0f / m_renderSegments;
-		dVector p0 (m_curve.CurvePoint(0.0f));
+		dBigVector p0 (m_curve.CurvePoint(0.0f));
 		for (int i = 1; i <= m_renderSegments; i ++) {
 			dFloat u = i * scale;
-			dVector p1 (m_curve.CurvePoint(u));
-			render->DrawLine (p0, p1);
+			dBigVector p1 (m_curve.CurvePoint(u));
+			render->DrawLine (dVector(dFloat(p0.m_x), dFloat(p0.m_y), dFloat(p0.m_z), dFloat(p0.m_w)), dVector(dFloat(p1.m_x), dFloat(p1.m_y), dFloat(p1.m_z), dFloat(p1.m_w)));
 			p0 = p1;
 		}
 		render->End();
@@ -198,10 +198,10 @@ void dLineNodeInfo::Serialize (TiXmlElement* const rootNode) const
 	bezierCurve->SetAttribute("degree", m_curve.GetDegree());
 
 	int pointCount = m_curve.GetControlPointCount();
-	const dVector* const controlPoints = m_curve.GetControlPointArray();
+	const dBigVector* const controlPoints = m_curve.GetControlPointArray();
 	int bufferSizeInBytes = pointCount * sizeof (dVector) * 3;
 	char* const buffer = new char[bufferSizeInBytes];
-	dFloatArrayToString (&controlPoints[0][0], pointCount * sizeof (dVector) / sizeof (dFloat), buffer, bufferSizeInBytes);
+	dFloatArrayToString (&controlPoints[0][0], pointCount * sizeof (dBigVector) / sizeof (dFloat), buffer, bufferSizeInBytes);
 
 	TiXmlElement* const ctrlPoints = new TiXmlElement ("controlPoints");
 	bezierCurve->LinkEndChild (ctrlPoints);
@@ -209,7 +209,7 @@ void dLineNodeInfo::Serialize (TiXmlElement* const rootNode) const
 	ctrlPoints->SetAttribute("floats", buffer);
 
 	int knotCount = m_curve.GetKnotCount();
-	const dFloat* const knotPoints = m_curve.GetKnotArray();
+	const dFloat64* const knotPoints = m_curve.GetKnotArray();
 	int buffer1SizeInBytes = knotCount * sizeof (dFloat) * 3;
 	char* const buffer1 = new char[buffer1SizeInBytes];
 	dFloatArrayToString (knotPoints, knotCount, buffer1, buffer1SizeInBytes);
@@ -235,13 +235,13 @@ bool dLineNodeInfo::Deserialize (const dScene* const scene, TiXmlElement* const 
 	TiXmlElement* const ctrlPoints = (TiXmlElement*) bezierCurve->FirstChild ("controlPoints");
 	int positionCount;
 	ctrlPoints->Attribute("float4", &positionCount);
-	dVector* const positions = new dVector[positionCount];
+	dBigVector* const positions = new dBigVector[positionCount];
 	dStringToFloatArray (ctrlPoints->Attribute("floats"), &positions[0][0], 4 * positionCount);
 	
 	TiXmlElement* const knots = (TiXmlElement*) bezierCurve->FirstChild ("knotVector");
 	int knotCount;
 	knots->Attribute("float", &knotCount);
-	dFloat* const knotVector = new dFloat[knotCount];
+	dFloat64* const knotVector = new dFloat64[knotCount];
 	dStringToFloatArray (knots->Attribute("floats"), knotVector, knotCount);
 
 	dAssert (positionCount == (knotCount- 2 * (degree-1)));
@@ -250,7 +250,6 @@ bool dLineNodeInfo::Deserialize (const dScene* const scene, TiXmlElement* const 
 	delete[] positions;	
 
 	return true;
-
 }
 
 
