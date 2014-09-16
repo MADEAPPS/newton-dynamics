@@ -820,14 +820,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		}
 
 		// create a Bezier Spline path for AI car to drive
-		m_aiPath = new DemoEntity (dGetIdentityMatrix(), NULL);
-		scene->Append(m_aiPath);
-		m_aiPath->LoadNGD_mesh ("carPath.ngd", scene->GetNewton());
-		DemoBezierCurve* const path = (DemoBezierCurve*) m_aiPath->GetMesh();
-		dAssert (path->IsType(DemoBezierCurve::GetRttiType()));
-
-		path->SetVisible(true);
-		path->SetRenderResolution (500);
+		CreatedrivingTestCourt(scene);
 	}
 
 	~SuperCarVehicleControllerManager ()
@@ -1097,6 +1090,46 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		camera->SetNextMatrix (*scene, camMatrix, camOrigin);
 	}
 
+
+	dMatrix CalculateStartMatrix () const
+	{
+		DemoBezierCurve* const path = (DemoBezierCurve*) m_aiPath->GetMesh();
+
+		dBigVector origin (path->m_curve.CurvePoint(0.0f)); 
+		dBigVector tangent (path->m_curve.CurveDerivative(0.0f, 1)); 
+		tangent = tangent.Scale (1.0 / sqrt (tangent % tangent));
+		dBigVector p1 (origin + tangent);
+
+		dBigVector dir; 
+		path->m_curve.FindClosestKnot (dir, p1, 4);
+
+		dir -= origin;
+		dir = dir.Scale (1.0 / sqrt (dir % dir));
+		dMatrix matrix (dGetIdentityMatrix());
+
+		dMatrix pathMatrix (m_aiPath->GetMeshMatrix() * m_aiPath->GetCurrentMatrix());
+		matrix.m_front = pathMatrix.RotateVector (dVector (dir.m_x, dir.m_y, dir.m_z, 0.0f));
+		matrix.m_right = matrix.m_front * matrix.m_up;
+		matrix.m_right.m_w = 0.0f;
+		matrix.m_posit = pathMatrix.TransformVector(dVector (origin.m_x, origin.m_y, origin.m_z, 1.0f));
+		return matrix;
+	}
+
+	void CreatedrivingTestCourt(DemoEntityManager* const scene)
+	{
+		// create a Bezier Spline path for AI car to drive
+		m_aiPath = new DemoEntity (dGetIdentityMatrix(), NULL);
+		scene->Append(m_aiPath);
+		m_aiPath->LoadNGD_mesh ("carPath.ngd", scene->GetNewton());
+		DemoBezierCurve* const path = (DemoBezierCurve*) m_aiPath->GetMesh();
+		dAssert (path->IsType(DemoBezierCurve::GetRttiType()));
+
+		path->SetVisible(true);
+		path->SetRenderResolution (500);
+
+
+	}
+
 	// use this to display debug information about vehicle 
 	void Debug () const
 	{
@@ -1121,32 +1154,6 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 	void* m_engineSounds[16];
 };
 
-
-static dMatrix CalculateStartMatrix (SuperCarVehicleControllerManager* const manager)
-{
-	DemoEntity* const aiPath = manager->m_aiPath;
-	
-	DemoBezierCurve* const path = (DemoBezierCurve*) aiPath->GetMesh();
-
-	dBigVector origin (path->m_curve.CurvePoint(0.0f)); 
-	dBigVector tangent (path->m_curve.CurveDerivative(0.0f, 1)); 
-	tangent = tangent.Scale (1.0 / sqrt (tangent % tangent));
-	dBigVector p1 (origin + tangent);
-
-	dBigVector dir; 
-	path->m_curve.FindClosestKnot (dir, p1, 4);
-
-	dir -= origin;
-	dir = dir.Scale (1.0 / sqrt (dir % dir));
-	dMatrix matrix (dGetIdentityMatrix());
-
-	dMatrix pathMatrix (aiPath->GetMeshMatrix() * aiPath->GetCurrentMatrix());
-	matrix.m_front = pathMatrix.RotateVector (dVector (dir.m_x, dir.m_y, dir.m_z, 0.0f));
-	matrix.m_right = matrix.m_front * matrix.m_up;
-	matrix.m_right.m_w = 0.0f;
-	matrix.m_posit = pathMatrix.TransformVector(dVector (origin.m_x, origin.m_y, origin.m_z, 1.0f));
-	return matrix;
-}
 
 
 // *************************************************************************************************
@@ -1173,7 +1180,7 @@ void SuperCar (DemoEntityManager* const scene)
 	SuperCarVehicleControllerManager* const manager = new SuperCarVehicleControllerManager (world);
 
 	// create a simple vehicle
-	dMatrix location (CalculateStartMatrix (manager));
+	dMatrix location (manager->CalculateStartMatrix ());
 	location.m_posit += location.m_right.Scale (2.0f);
 
 //dMatrix shapeOffsetMatrix (dGetIdentityMatrix());

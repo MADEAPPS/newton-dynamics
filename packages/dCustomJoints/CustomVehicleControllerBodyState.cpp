@@ -31,6 +31,11 @@ void CustomVehicleControllerBodyState::Init(CustomVehicleController* const contr
 	m_controller = controller;
 }
 
+CustomVehicleController* CustomVehicleControllerBodyState::GetController() const
+{
+	return m_controller;
+}
+
 dFloat CustomVehicleControllerBodyState::GetMass () const
 {
 	return dComplemtaritySolver::dBodyState::GetMass();

@@ -31,6 +31,8 @@ class CustomVehicleControllerBodyState: public dComplemtaritySolver::dBodyState
 	CUSTOM_JOINTS_API const dMatrix& GetLocalMatrix () const;
 	CUSTOM_JOINTS_API const dVector& GetCenterOfMass () const;
 
+	CUSTOM_JOINTS_API CustomVehicleController* GetController() const;
+
 	protected:
 	CUSTOM_JOINTS_API CustomVehicleControllerBodyState();
 	CUSTOM_JOINTS_API virtual ~CustomVehicleControllerBodyState() {}

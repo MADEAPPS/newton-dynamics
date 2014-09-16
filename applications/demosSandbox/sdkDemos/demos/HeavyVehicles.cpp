@@ -163,13 +163,13 @@ class HeavyVehicleEntity: public DemoEntity
 			public:
 			dFloat m_u;
 			dFloat m_dist;
-			DemoEntity* m_threadLink;
 		};
 
 		TrackSystem()
 			:m_bezierEntity(NULL)
 			,m_bezierMesh(NULL)
 			,m_intepolants(NULL)
+			,m_linksEntity(NULL)
 			,m_controlPointsOffset(NULL)
 			,m_controlPointBindIndex(NULL)
 		{
@@ -178,6 +178,7 @@ class HeavyVehicleEntity: public DemoEntity
 		~TrackSystem()
 		{
 			if (m_intepolants) {
+				delete[] m_linksEntity;
 				delete[] m_intepolants;
 			}
 			if (m_controlPointsOffset) {
@@ -247,6 +248,64 @@ class HeavyVehicleEntity: public DemoEntity
 			}
 		}
 
+		void CalculaterUniformSpaceSamples()
+		{
+			DemoEntity* const threadMesh = m_vehicle->Find ("threadShoe");
+			dAssert (threadMesh);
+			dFloat threadSize = 0.29f;
+			m_linksCount = int (m_length / threadSize) + 1;
+			threadSize = m_length / m_linksCount;
+			
+			m_linksEntity = new DemoEntity*[m_linksCount];
+			for (int i = 0; i < m_linksCount; i ++) {
+				DemoEntity* const threadPart = new DemoEntity (dGetIdentityMatrix(), m_vehicle);
+				threadPart->SetMesh(threadMesh->GetMesh(), dGetIdentityMatrix());
+				m_linksEntity[i] = threadPart;
+			}
+
+
+			// create the uniform speed knot interpolation table
+			ConstantSpeedKnotInterpolant steps[1024];
+			steps[0].m_u = 0.0f;
+			steps[0].m_dist = 0.0f;
+
+			int count = 0;
+			steps[count].m_u = 0.0f;
+			steps[count].m_dist = 0.0f;
+			count ++;
+			int samplingRate = m_linksCount * 10;
+			dFloat distAcc = 0.0f;
+
+			threadSize *= 0.25f;
+			dFloat stepAcc = threadSize;
+			dBigVector q (m_bezierMesh->m_curve.CurvePoint(0.0f));
+			dVector p0 (dVector (q.m_x, q.m_y, q.m_z, q.m_w));
+			for (int i = 1; i < samplingRate + 15; i ++) {
+				dFloat u = dFloat (i) / samplingRate;
+				dBigVector q (m_bezierMesh->m_curve.CurvePoint(dMod (u, 1.0f)));
+				dVector p1 (dVector (q.m_x, q.m_y, q.m_z, q.m_w));
+				dVector err (p1 - p0);
+				dFloat errMag = dSqrt (err % err);
+				distAcc += errMag;
+				if (distAcc > stepAcc) {
+					stepAcc += threadSize;
+					steps[count].m_u = u;
+					steps[count].m_dist = distAcc;
+					count ++;
+					dAssert (count < int (sizeof (steps) / sizeof (steps[0])));
+				}
+				p0 = p1;
+			}
+
+			m_interpolantsCount = count;
+			m_intepolants = new ConstantSpeedKnotInterpolant[count];
+			for (int i = 0; i < count; i ++) {
+				m_intepolants[i] = steps[i];
+			}
+
+			m_aligmentMatrix = dRollMatrix(3.141592f * 90.0f / 180.0f) * dPitchMatrix(3.141592f * 180.0f / 180.0f);
+			m_shapeMatrix = m_bezierEntity->GetMeshMatrix() * m_bezierEntity->GetCurrentMatrix();
+		}
 
 		void Init (HeavyVehicleEntity* const me, const char* const name, CustomVehicleControllerBodyStateTire* const tire)
 		{
@@ -261,70 +320,12 @@ class HeavyVehicleEntity: public DemoEntity
 			m_length = m_bezierMesh->m_curve.CalculateLength (0.01f);
 
 			m_bezierEntity = me->Find (name);
-
-			DemoEntity* const threadMesh = me->Find ("threadShoe");
-			dAssert (threadMesh);
-			dFloat threadSize = 0.29f;
-			int pieceCount = int (m_length / threadSize) + 1;
-
-			// create the uniform speed knot interpolation table
-			ConstantSpeedKnotInterpolant steps[1024];
-			steps[0].m_u = 0.0f;
-			steps[0].m_dist = 0.0f;
-
-			int count = 0;
-			steps[count].m_u = 0.0f;
-			steps[count].m_dist = 0.0f;
-			count ++;
-			int samplingRate = pieceCount * 10;
-			dFloat distAcc = 0.0f;
-			dFloat stepAcc = threadSize;
-			dBigVector q (m_bezierMesh->m_curve.CurvePoint(0.0f));
-			dVector p0 (dVector (q.m_x, q.m_y, q.m_z, q.m_w));
-			for (int i = 1; i < samplingRate + 15; i ++) {
-				dFloat u = dMod (dFloat (i) / samplingRate, 1.0f);
-				dBigVector q (m_bezierMesh->m_curve.CurvePoint(u));
-				dVector p1 (dVector (q.m_x, q.m_y, q.m_z, q.m_w));
-				dVector err (p1 - p0);
-				dFloat errMag = dSqrt (err % err);
-				distAcc += errMag;
-				if (distAcc > stepAcc) {
-					stepAcc += threadSize;
-					steps[count].m_u = u;
-					steps[count].m_dist = distAcc;
-					count ++;
-				}
-				p0 = p1;
-			}
-
-			m_interpolantsCount = count;
-			m_intepolants = new ConstantSpeedKnotInterpolant[count];
-			for (int i = 0; i < count; i ++) {
-				m_intepolants[i] = steps[i];
-			}
-
-			m_aligmentMatrix = dRollMatrix(3.141592f * 90.0f / 180.0f) * dPitchMatrix(3.141592f * 180.0f / 180.0f);
-			m_shapeMatrix = m_bezierEntity->GetMeshMatrix() * m_bezierEntity->GetCurrentMatrix();
-			dBigVector r (m_bezierMesh->m_curve.CurvePoint(m_intepolants[0].m_u));
-			dVector q0 (dVector (r.m_x, r.m_y, r.m_z, r.m_w));
-			dMatrix matrix (dGetIdentityMatrix());
-			for (int i = 1; i < m_interpolantsCount; i ++) {
-				dBigVector r (m_bezierMesh->m_curve.CurvePoint(m_intepolants[i].m_u));
-				dVector q1 (dVector (r.m_x, r.m_y, r.m_z, r.m_w));
-				dVector dir (q1 - q0);
-				dir = dir.Scale (1.0f / dSqrt (dir % dir));
-				matrix.m_front = dVector (dir.m_z, -dir.m_y, 0.0f, 0.0f);
-				matrix.m_up = dVector (dir.m_y, dir.m_z, 0.0f, 0.0f);
-				matrix.m_right = dVector (0.0f, 0.0f, 1.0f, 0.0f);
-				matrix = m_aligmentMatrix * matrix;
-				matrix.m_posit = m_shapeMatrix.TransformVector (q0);
-				DemoEntity* const threadPart = new DemoEntity (matrix, me);
-				threadPart->SetMesh(threadMesh->GetMesh(), dGetIdentityMatrix());
-				m_intepolants[i-1].m_threadLink = threadPart;
-				q0 = q1;
-			}
-
+			CalculaterUniformSpaceSamples();
 			CalculaterBinding();
+
+			NewtonWorld* const world = NewtonBodyGetWorld (m_tire->GetController()->GetBody());
+			AnimateThread (*((DemoEntityManager*)NewtonWorldGetUserData(world)), 0.0f);
+			AnimateThread (*((DemoEntityManager*)NewtonWorldGetUserData(world)), 0.0f);
 		}
 
 		dFloat CalculateKnotParam (dFloat t) const
@@ -353,13 +354,13 @@ class HeavyVehicleEntity: public DemoEntity
 			dFloat h0 = m_intepolants[low].m_dist;
 			dFloat du = m_intepolants[low + 1].m_u - u0;
 			dFloat dh = m_intepolants[low + 1].m_dist - h0;
-			return u0 + du * (t - h0) / dh;
+			return dMod (u0 + du * (t - h0) / dh, 1.0f);
 		}
 
 		void InterpolateMatrix (DemoEntityManager& world, dFloat param)
 		{
-			for (int i = 0; i < m_interpolantsCount - 1; i ++) {
-				DemoEntity* const threadPart = m_intepolants[i].m_threadLink;
+			for (int i = 0; i < m_linksCount; i ++) {
+				DemoEntity* const threadPart = m_linksEntity[i];
 				threadPart->InterpolateMatrix (world, param);
 			}
 		}
@@ -379,7 +380,6 @@ class HeavyVehicleEntity: public DemoEntity
 				}
 			}
 
-
 			dFloat radio = m_tire->GetTireRadio();
 			dFloat omega = m_tire->GetTireRotationSpeed();
 
@@ -392,22 +392,19 @@ class HeavyVehicleEntity: public DemoEntity
 			dAssert (m_parameter >= 0.0f);
 			dAssert (m_parameter <= m_length);
 
-			dFloat u = CalculateKnotParam (m_parameter);
-			dBigVector q (m_bezierMesh->m_curve.CurvePoint(u));
-			dVector q0 (dVector (q.m_x, q.m_y, q.m_z, q.m_w));
 			dMatrix matrix (dGetIdentityMatrix());
-			for (int i = 1; i < m_interpolantsCount; i ++) {
-				DemoEntity* const threadPart = m_intepolants[i-1].m_threadLink;
-
-				dFloat t = dMod (m_parameter + m_intepolants[i].m_dist, m_length);
-				if (t < 0.0f) {
-					t += m_length;
-				}
-
-				dFloat u = CalculateKnotParam (t);
-				dBigVector q (m_bezierMesh->m_curve.CurvePoint(u));
+			dFloat size = m_length / m_linksCount;
+			dFloat u0 = CalculateKnotParam (dMod (m_parameter + (m_linksCount - 1) * size, m_length));
+			dBigVector q (m_bezierMesh->m_curve.CurvePoint(u0));
+			dVector q0 (dVector (q.m_x, q.m_y, q.m_z, q.m_w));
+			for (int i = 0; i < m_linksCount; i ++) {
+				DemoEntity* const threadPart = m_linksEntity[i];
+				dFloat s = dMod (m_parameter + i * size, m_length);
+				dFloat u1 = CalculateKnotParam (s);
+				dBigVector q (m_bezierMesh->m_curve.CurvePoint(u1));
 				dVector q1 (dVector (q.m_x, q.m_y, q.m_z, q.m_w));
 				dVector dir (q1 - q0);
+
 				dir = dir.Scale (1.0f / dSqrt (dir % dir));
 				matrix.m_front = dVector (dir.m_z, -dir.m_y, 0.0f, 0.0f);
 				matrix.m_up = dVector (dir.m_y, dir.m_z, 0.0f, 0.0f);
@@ -416,6 +413,7 @@ class HeavyVehicleEntity: public DemoEntity
 				matrix.m_posit = m_shapeMatrix.TransformVector (q0);
 				threadPart->SetMatrix (world, dQuaternion(matrix), matrix.m_posit);
 				q0 = q1;
+				u0 = u1;
 			}
 		}
 
@@ -428,10 +426,13 @@ class HeavyVehicleEntity: public DemoEntity
 		CustomVehicleControllerBodyStateTire* m_tire;
 		ConstantSpeedKnotInterpolant* m_intepolants;
 		DemoEntity* m_bindingTires[8];
+		DemoEntity** m_linksEntity;
 		dVector* m_controlPointsOffset;
 		int* m_controlPointBindIndex;
+
 		dFloat m_length;
 		dFloat m_parameter;
+		int m_linksCount;
 		int m_controlPointCount;
 		int m_interpolantsCount;
 	};
@@ -997,7 +998,7 @@ class HeavyVehicleEntity: public DemoEntity
 		int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
 #if 0
-	#if 0
+	#if 1
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
 			fwrite (&m_engineKeySwitchCounter, sizeof (int), 1, file);
@@ -1110,8 +1111,9 @@ class HeavyVehicleEntity: public DemoEntity
 			const CustomVehicleControllerBodyStateTire& tire = *node;
 			dVector p0 (tire.GetCenterOfMass());
 
-const dMatrix& tireMatrix = tire.GetLocalMatrix ();
-p0 += chassis.GetMatrix()[2].Scale ((tireMatrix.m_posit.m_z > 0.0f ? 1.0f : -1.0f) * 0.25f);
+			// offset the origin so that it is visible 
+			const dMatrix& tireMatrix = tire.GetLocalMatrix ();
+			p0 += chassis.GetMatrix()[2].Scale ((tireMatrix.m_posit.m_z > 0.0f ? 1.0f : -1.0f) * 0.25f);
 
 			// draw the tire load 
 			dVector p1 (p0 + tire.GetTireLoad().Scale (scale));
@@ -1420,7 +1422,7 @@ location.m_posit.m_z = 50.0f;
 
 	// create a vehicle controller manager
 	HeavyVehicleControllerManager* const manager = new HeavyVehicleControllerManager (world);
-	
+/*	
 	HeavyVehicleEntity* const heavyVehicle = new HeavyVehicleEntity (scene, manager, location, "lav-25.ngd", heavyTruck);
 	heavyVehicle->BuildAllWheelDriveVehicle (heavyTruck);
 
@@ -1430,7 +1432,7 @@ location.m_posit.m_z = 50.0f;
 	location.m_posit.m_y += 2.0f;
 	HeavyVehicleEntity* const lightVehicle = new HeavyVehicleEntity (scene, manager, location, "buggy_.ngd", lightTruck);
 	lightVehicle->BuildLightTruckVehicle (lightTruck);
-
+*/
 	location.m_posit.m_z -= 12.0f;
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
 	location.m_posit.m_y += 3.0f;
