@@ -44,7 +44,7 @@ file(GLOB dScene_srcs dScene/*.cpp)
 add_library(dScene ${dScene_srcs})
 
 target_include_directories(dScene PUBLIC dScene/)
-target_link_libraries(dScene dMath dContainers NewtonStatic)
+target_link_libraries(dScene dAnimation dMath dContainers NewtonStatic)
 
 
 # dVisualDebuggerServer
