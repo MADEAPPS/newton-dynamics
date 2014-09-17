@@ -267,6 +267,7 @@
 		FF93FBFB19C566EA00F4094D /* buggy_.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF93FBF919C566EA00F4094D /* buggy_.ngd */; };
 		FF93FBFC19C566EA00F4094D /* m1a1_.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF93FBFA19C566EA00F4094D /* m1a1_.ngd */; };
 		FF93FC2F19C760A500F4094D /* carPath.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF93FC2E19C760A500F4094D /* carPath.ngd */; };
+		FF93FC3E19C93C0C00F4094D /* streetCone.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF93FC3D19C93C0C00F4094D /* streetCone.ngd */; };
 		FF9AEB8919B7FFDA007C1C5C /* revHigh.wav in Resources */ = {isa = PBXBuildFile; fileRef = FF9AEB8619B7FFDA007C1C5C /* revHigh.wav */; };
 		FF9AEB8A19B7FFDA007C1C5C /* revLow.wav in Resources */ = {isa = PBXBuildFile; fileRef = FF9AEB8719B7FFDA007C1C5C /* revLow.wav */; };
 		FF9AEB8B19B7FFDA007C1C5C /* revMiddle.wav in Resources */ = {isa = PBXBuildFile; fileRef = FF9AEB8819B7FFDA007C1C5C /* revMiddle.wav */; };
@@ -698,6 +699,7 @@
 		FF93FBF919C566EA00F4094D /* buggy_.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = buggy_.ngd; path = ../../../../media/buggy_.ngd; sourceTree = "<group>"; };
 		FF93FBFA19C566EA00F4094D /* m1a1_.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = m1a1_.ngd; path = ../../../../media/m1a1_.ngd; sourceTree = "<group>"; };
 		FF93FC2E19C760A500F4094D /* carPath.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = carPath.ngd; path = ../../../../media/carPath.ngd; sourceTree = "<group>"; };
+		FF93FC3D19C93C0C00F4094D /* streetCone.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = streetCone.ngd; path = ../../../../media/streetCone.ngd; sourceTree = "<group>"; };
 		FF9AEB8619B7FFDA007C1C5C /* revHigh.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = revHigh.wav; path = ../../../../media/revHigh.wav; sourceTree = "<group>"; };
 		FF9AEB8719B7FFDA007C1C5C /* revLow.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = revLow.wav; path = ../../../../media/revLow.wav; sourceTree = "<group>"; };
 		FF9AEB8819B7FFDA007C1C5C /* revMiddle.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = revMiddle.wav; path = ../../../../media/revMiddle.wav; sourceTree = "<group>"; };
@@ -983,6 +985,7 @@
 				FF506700173F3D8900D01FDF /* stackPerformance20x20.ngd */,
 				FF9AEB9019B8015A007C1C5C /* starter.wav */,
 				FF506701173F3D8900D01FDF /* streaked.tga */,
+				FF93FC3D19C93C0C00F4094D /* streetCone.ngd */,
 				FF82376E17C26F8C004C80D4 /* swimmingPool.ngd */,
 				FF506702173F3D8900D01FDF /* teapot.ngd */,
 				FF506703173F3D8900D01FDF /* tekwall2.tga */,
@@ -1469,6 +1472,7 @@
 				FF506754173F3EAC00D01FDF /* tiles.tga in Resources */,
 				FF506755173F3EAC00D01FDF /* tire_skid.wav in Resources */,
 				FF506756173F3EAC00D01FDF /* tire.ngd in Resources */,
+				FF93FC3E19C93C0C00F4094D /* streetCone.ngd in Resources */,
 				FF506757173F3EAC00D01FDF /* tire20.tga in Resources */,
 				FF506758173F3EAC00D01FDF /* tire21.tga in Resources */,
 				FF506759173F3EAC00D01FDF /* tirebigc.tga in Resources */,
