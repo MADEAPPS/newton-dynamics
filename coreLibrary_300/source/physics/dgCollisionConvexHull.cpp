@@ -49,6 +49,7 @@ dgCollisionConvexHull::dgCollisionConvexHull(dgMemoryAllocator* const allocator,
 	,m_faceCount (0)
 	,m_supportTreeCount (0)
 	,m_faceArray (NULL)
+	,m_vertexToEdgeMapping(NULL)
 	,m_supportTree (NULL)
 {
 	m_edgeCount = 0;
@@ -63,6 +64,7 @@ dgCollisionConvexHull::dgCollisionConvexHull(dgMemoryAllocator* const allocator,
 	,m_faceCount (0)
 	,m_supportTreeCount (0)
 	,m_faceArray (NULL)
+	,m_vertexToEdgeMapping(NULL)
 	,m_supportTree (NULL)
 {
 	m_edgeCount = 0;
@@ -79,6 +81,7 @@ dgCollisionConvexHull::dgCollisionConvexHull(dgWorld* const world, dgDeserialize
 	,m_faceCount (0)
 	,m_supportTreeCount (0)
 	,m_faceArray (NULL)
+	,m_vertexToEdgeMapping(NULL)
 	,m_supportTree (NULL)
 {
 	m_rtti |= dgCollisionConvexHull_RTTI;
@@ -135,8 +138,6 @@ dgCollisionConvexHull::~dgCollisionConvexHull()
 	if (m_supportTree) {
 		m_allocator->Free(m_supportTree);
 	}
-
-
 }
 
 void dgCollisionConvexHull::BuildHull (dgInt32 count, dgInt32 strideInBytes, dgFloat32 tolerance, const dgFloat32* const vertexArray)

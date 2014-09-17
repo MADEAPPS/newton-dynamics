@@ -2756,7 +2756,7 @@ NewtonCollision* NewtonCreateCompoundCollisionFromMesh (const NewtonWorld* const
 	for (NewtonMesh* segment = NewtonMeshCreateFirstSingleSegment (convexAproximation); segment; segment = nextSegment) {
 		nextSegment = NewtonMeshCreateNextSingleSegment (convexAproximation, segment);
 
-		NewtonCollision* const convexHull = NewtonCreateConvexHullFromMesh (newtonWorld, segment, 0.01f, subShapeID);
+		NewtonCollision* const convexHull = NewtonCreateConvexHullFromMesh (newtonWorld, segment, hullTolerance, subShapeID);
 		if (convexHull) {
 			NewtonCompoundCollisionAddSubCollision (compound, convexHull);
 			NewtonDestroyCollision(convexHull);
