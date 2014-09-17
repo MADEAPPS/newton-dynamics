@@ -714,7 +714,7 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 		}
 	}
 
-	for (int i = 0; i < m_edgeCount; i ++) {
+	for (dgInt32 i = 0; i < m_edgeCount; i ++) {
 		dgConvexSimplexEdge* const edge = &m_simplex[i];
 		m_vertexToEdgeMapping[edge->m_vertex] = edge;
 	}

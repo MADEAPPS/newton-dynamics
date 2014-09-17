@@ -69,6 +69,7 @@ class dgCollisionCylinder: public dgCollisionConvex
 	dgFloat32 m_height;
 	dgFloat32 m_radius;
 
+	dgVector m_profile[4];
 	dgVector m_vertex[DG_CYLINDER_SEGMENTS * 2];
 	static dgInt32 m_shapeRefCount;
 	static dgConvexSimplexEdge m_edgeArray[];
