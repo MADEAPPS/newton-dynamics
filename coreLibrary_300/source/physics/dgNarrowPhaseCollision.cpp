@@ -1914,7 +1914,7 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 	dgInt32* const indexArray = (dgInt32*)data.m_faceVertexIndex;
 	data.SortFaceArray();
 
-	for (dgInt32 i = data.m_faceCount - 1; (i >= 0) && (count < 16); i --) {
+	for (dgInt32 i = data.m_faceCount - 1; (i >= 0) && (count < 32); i --) {
 		dgInt32 address = data.m_faceIndexStart[i];
 		const dgInt32* const localIndexArray = &indexArray[address];
 
