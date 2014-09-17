@@ -1228,8 +1228,8 @@ void SuperCar (DemoEntityManager* const scene)
 	location.m_posit.m_y += 1.0f;
 
 	// make a vehicle entity shell
-	//SuperCarEntity* const vehicle = new SuperCarEntity (scene, manager, location, "f1.ngd");
-	SuperCarEntity* const vehicle = new SuperCarEntity (scene, manager, location, "viper.ngd");
+	SuperCarEntity* const vehicle = new SuperCarEntity (scene, manager, location, "f1.ngd");
+	//SuperCarEntity* const vehicle = new SuperCarEntity (scene, manager, location, "viper.ngd");
 	//SuperCarEntity* const vehicle = new SuperCarEntity (scene, manager, location, "lambDiablo.ngd");
 	
 	// build a muscle car from this vehicle controller

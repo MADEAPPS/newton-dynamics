@@ -512,7 +512,7 @@ dFloat64 dBezierSpline::FindClosestKnot (dBigVector& closestPoint, const dBigVec
 			startSpan --;
 			dAssert (startSpan >= 0);
 		} else if (u1 >= m_knotVector[startSpan + 1]) {
-			startSpan --;
+			startSpan ++;
 			dAssert (startSpan < (m_knotsCount - m_degree));
 		} 
 
