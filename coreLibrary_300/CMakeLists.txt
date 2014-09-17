@@ -20,16 +20,20 @@ file(GLOB physics_srcs source/physics/*.cpp) # physics engine
 file(GLOB mesh_srcs source/meshUtil/*.cpp)   # mesh geometry
 file(GLOB newton_srcs source/newton/*.cpp)   # Newton engine
 
-# add modified pthread library
 if (WIN32)
-  target_include_directories(NewtonObj PRIVATE ${NEWTON_SOURCE}/pthreads.2)
-
+  # modified pthread library
   file(GLOB_RECURSE pthread_srcs ${NEWTON_SOURCE}/pthreads.2/pthread.c)
 else (WIN32)
   set(pthread_srcs "")
 endif (WIN32)
 
 add_library(NewtonObj OBJECT ${dg_srcs} ${physics_srcs} ${mesh_srcs} ${newton_srcs} ${pthread_srcs})
+
+
+if (WIN32)
+  # add modified pthread library
+  target_include_directories(NewtonObj PRIVATE ${NEWTON_SOURCE}/pthreads.2)
+endif (WIN32)
 
 target_include_directories(NewtonObj PRIVATE ${NEWTON_SOURCE}/core)
 target_include_directories(NewtonObj PRIVATE ${NEWTON_SOURCE}/physics)
@@ -53,7 +57,7 @@ if (UNIX)
   include("GNUInstallDirs")
 else (UNIX)
   set(CMAKE_INSTALL_LIBDIR "lib")
-  set(CMKAE_INSTALL_INCLUDEDIR "include")
+  set(CMAKE_INSTALL_INCLUDEDIR "include")
 endif (UNIX)
 
 install(TARGETS Newton DESTINATION ${CMAKE_INSTALL_LIBDIR})
@@ -77,6 +81,9 @@ if (MSVC)
   set_source_files_properties(${NEWTON_SOURCE}/newton/NewtonClass.cpp PROPERTIES COMPILE_FLAGS "/YcNewtonStdAfx.h")
   set_source_files_properties(${NEWTON_SOURCE}/physics/dgWorld.cpp PROPERTIES COMPILE_FLAGS "/YcdgPhysicsStdafx.h")
 
-  set_target_properties(NewtonLib PROPERTIES COMPILE_FLAGS "/YudgStdafx.h /YuNewtonStdAfx.h /YudgPhysicsStdafx.h")
-  set_target_properties (NewtonLib PROPERTIES COMPILE_DEFINITIONS "_NEWTON_STATIC_LIB;_WIN_32_VER;PTW32_BUILD;PTW32_STATIC_LIB;_CRT_SECURE_NO_WARNINGS")
+  set_target_properties(NewtonStatic PROPERTIES COMPILE_FLAGS "/YudgStdafx.h /YuNewtonStdAfx.h /YudgPhysicsStdafx.h")
+  set_target_properties (NewtonStatic PROPERTIES COMPILE_DEFINITIONS "_NEWTON_STATIC_LIB;_WIN_32_VER;PTW32_BUILD;PTW32_STATIC_LIB;_CRT_SECURE_NO_WARNINGS")
+
+  set_target_properties(Newton PROPERTIES COMPILE_FLAGS "/YudgStdafx.h /YuNewtonStdAfx.h /YudgPhysicsStdafx.h")
+  set_target_properties (Newton PROPERTIES COMPILE_DEFINITIONS "_NEWTON_BUILD_DLL;_WIN_32_VER;PTW32_BUILD;PTW32_STATIC_LIB;_CRT_SECURE_NO_WARNINGS")
 endif(MSVC)
