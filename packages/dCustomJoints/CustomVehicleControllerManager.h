@@ -77,6 +77,7 @@ class CustomVehicleController: public CustomControllerBase
 	protected:
 	CUSTOM_JOINTS_API void Cleanup();
 	CUSTOM_JOINTS_API CustomVehicleControllerBodyStateContact* GetContactBody (const NewtonBody* const body);
+	CUSTOM_JOINTS_API void Init (NewtonBody* const body, const dMatrix& vehicleFrame, const dVector& gravityVector);
 	CUSTOM_JOINTS_API void Init (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, const dVector& gravityVector);
 	
 	CUSTOM_JOINTS_API bool IsSleeping();
@@ -123,6 +124,7 @@ class CustomVehicleControllerManager: public CustomControllerManager<CustomVehic
 	CUSTOM_JOINTS_API CustomVehicleControllerManager(NewtonWorld* const world);
 	CUSTOM_JOINTS_API virtual ~CustomVehicleControllerManager();
 
+	CUSTOM_JOINTS_API virtual CustomVehicleController* CreateVehicle (NewtonBody* const body, const dMatrix& vehicleFrame, const dVector& gravityVector);
 	CUSTOM_JOINTS_API virtual CustomVehicleController* CreateVehicle (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, const dVector& gravityVector);
 	CUSTOM_JOINTS_API virtual void DestroyController (CustomVehicleController* const controller);
 };

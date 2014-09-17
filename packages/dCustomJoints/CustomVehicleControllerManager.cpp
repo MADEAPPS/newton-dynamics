@@ -233,6 +233,13 @@ void CustomVehicleControllerManager::DestroyController (CustomVehicleController*
 }
 
 
+CustomVehicleController* CustomVehicleControllerManager::CreateVehicle (NewtonBody* const body, const dMatrix& vehicleFrame, const dVector& gravityVector)
+{
+	CustomVehicleController* const controller = CreateController();
+	controller->Init (body, vehicleFrame, gravityVector);
+	return controller;
+}
+
 CustomVehicleController* CustomVehicleControllerManager::CreateVehicle (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, const dVector& gravityVector)
 {
 	CustomVehicleController* const controller = CreateController();
@@ -241,8 +248,27 @@ CustomVehicleController* CustomVehicleControllerManager::CreateVehicle (NewtonCo
 }
 
 
+
 void CustomVehicleController::Init (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, const dVector& gravityVector)
 {
+	CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*) GetManager(); 
+	NewtonWorld* const world = manager->GetWorld(); 
+
+	// create a body and an call the low level init function
+	dMatrix locationMatrix (dGetIdentityMatrix());
+	NewtonBody* const body = NewtonCreateDynamicBody(world, chassisShape, &locationMatrix[0][0]);
+
+	// set vehicle mass, inertia and center of mass
+	NewtonBodySetMassProperties (body, mass, chassisShape);
+
+	// initialize 
+	Init (body, vehicleFrame, gravityVector);
+}
+
+
+void CustomVehicleController::Init (NewtonBody* const body, const dMatrix& vehicleFrame, const dVector& gravityVector)
+{
+	m_body = body;
 	m_finalized = false;
 	m_externalContactStatesCount = 0;
 	m_sleepCounter = VEHICLE_SLEEP_COUNTER;
@@ -255,6 +281,7 @@ void CustomVehicleController::Init (NewtonCollision* const chassisShape, const d
 	NewtonCompoundCollisionBeginAddRemove(vehShape);
 
 	// if the shape is a compound collision ass all the pieces one at a time
+	NewtonCollision* const chassisShape = NewtonBodyGetCollision (m_body);
 	int shapeType = NewtonCollisionGetType (chassisShape);
 	if (shapeType == SERIALIZE_ID_COMPOUND) {
 		for (void* node = NewtonCompoundCollisionGetFirstNode(chassisShape); node; node = NewtonCompoundCollisionGetNextNode (chassisShape, node)) { 
@@ -268,11 +295,14 @@ void CustomVehicleController::Init (NewtonCollision* const chassisShape, const d
 	NewtonCompoundCollisionEndAddRemove (vehShape);	
 
 	// create the rigid body for this vehicle
-	dMatrix locationMatrix (dGetIdentityMatrix());
-	m_body = NewtonCreateDynamicBody(world, vehShape, &locationMatrix[0][0]);
-
+//	dMatrix locationMatrix (dGetIdentityMatrix());
+//	m_body = NewtonCreateDynamicBody(world, vehShape, &locationMatrix[0][0]);
+	
 	// set vehicle mass, inertia and center of mass
-	NewtonBodySetMassProperties (m_body, mass, vehShape);
+//	NewtonBodySetMassProperties (m_body, mass, vehShape);
+
+	// replace the collision shape of the vehicle with this new one
+	NewtonBodySetCollision(m_body, vehShape);
 
 	// set linear and angular drag to zero
 	dVector drag(0.0f, 0.0f, 0.0f, 0.0f);
@@ -290,7 +320,6 @@ void CustomVehicleController::Init (NewtonCollision* const chassisShape, const d
 	m_chassisState.m_gravityMag = dSqrt (gravityVector % gravityVector);
 	m_chassisState.Init(this, vehicleFrame);
 
-//	m_stateList.Append(&m_staticWorld);
 	m_stateList.Append(&m_chassisState);
 
 	// create the normalized size tire shape
