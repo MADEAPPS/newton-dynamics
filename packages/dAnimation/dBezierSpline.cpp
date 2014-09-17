@@ -272,12 +272,14 @@ dBigVector dBezierSpline::CurvePoint (dFloat64 u, int span) const
 
 dBigVector dBezierSpline::CurvePoint (dFloat64 u) const
 {
+	u = dMod (u, 1.0f);
 	int span = GetSpan(u);
 	return CurvePoint (u, span);
 }
 
 dBigVector dBezierSpline::CurveDerivative (dFloat64 u, int index) const
 {
+	u = dMod (u, 1.0f);
 	dAssert (index <= m_degree);
 	
 	dFloat64 basicsFuncDerivatives[D_BEZIER_LOCAL_BUFFER_SIZE];
@@ -294,6 +296,7 @@ dBigVector dBezierSpline::CurveDerivative (dFloat64 u, int index) const
 
 int dBezierSpline::CurveAllDerivatives (dFloat64 u, dBigVector* const derivatives) const
 {
+	u = dMod (u, 1.0f);
 	dFloat64 basicsFuncDerivatives[D_BEZIER_LOCAL_BUFFER_SIZE];
 	int span = GetSpan(u);
 	BasicsFunctionsDerivatives (u, span, basicsFuncDerivatives);
@@ -479,7 +482,7 @@ dFloat64 dBezierSpline::FindClosestKnot (dBigVector& closestPoint, const dBigVec
 	dBigVector closestControlPoint (m_controlPoints[0]);
 	subdivitionSteps = dMax (subdivitionSteps, 1);
 	dFloat64 scale = 1.0f / subdivitionSteps;
-	for (int span = m_degree; span < (m_knotsCount - m_degree); span ++) {
+	for (int span = m_degree; span < (m_knotsCount - m_degree - 1); span ++) {
 		dFloat64 param = 0.0f;
 		for (int i = 0; i < subdivitionSteps; i ++) {
 			dFloat64 u = m_knotVector[span] + (m_knotVector[span + 1] - m_knotVector[span]) * param;
