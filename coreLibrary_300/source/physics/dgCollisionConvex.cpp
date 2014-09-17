@@ -3318,9 +3318,9 @@ dgInt32 dgCollisionConvex::CalculatePlaneIntersection (const dgVector& normal, c
 dgInt32 dgCollisionConvex::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut, dgFloat32 normalSign) const
 {
 	dgVector support[4];
-	int featureCount = 3;
+	dgInt32 featureCount = 3;
 	const dgConvexSimplexEdge* edge = &m_simplex[0];
-	const dgConvexSimplexEdge** vertToEdgeMapping = GetVertexToEdgeMapping();
+	const dgConvexSimplexEdge** const vertToEdgeMapping = GetVertexToEdgeMapping();
 	if (vertToEdgeMapping) {
 		dgInt32 edgeIndex;
 		featureCount = 1;

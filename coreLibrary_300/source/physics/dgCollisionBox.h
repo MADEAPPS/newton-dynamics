@@ -40,6 +40,7 @@ class dgCollisionBox: public dgCollisionConvex
 	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const;
 	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
 	virtual dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut, dgFloat32 normalSign) const;
+	virtual const dgConvexSimplexEdge** GetVertexToEdgeMapping() const;
 	
 	virtual dgInt32 CalculateSignature () const;
 	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1);
@@ -50,9 +51,11 @@ class dgCollisionBox: public dgCollisionConvex
 
 	static dgInt32 CalculateSignature (dgFloat32 dx, dgFloat32 dy, dgFloat32 dz);
 
+	
+
 	dgVector m_size[2];
 	dgVector m_vertex[8];
-	
+	static dgVector m_indexMark;
 	static dgConvexSimplexEdge m_edgeArray[];
 	static dgConvexSimplexEdge* m_vertexToEdgeMap[];
 	friend class dgWorld;
