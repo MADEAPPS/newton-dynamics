@@ -130,8 +130,8 @@
     </Link>
     <PostBuildEvent>
       <Command>rem xcopy  "$(OutDir)$(TargetName).lib" "C:\Users\julio\Downloads\crash/*.*"  /F /Y /R
-xcopy  "$(OutDir)$(TargetName).dll" "C:\Users\julio\Downloads\physic_demo/*.*"  /F /Y /R
-xcopy  "$(OutDir)$(TargetName).pdb" "C:\Users\julio\Downloads\physic_demo/*.*"  /F /Y /R
+rem xcopy  "$(OutDir)$(TargetName).dll" "C:\Users\julio\Downloads\physic_demo/*.*"  /F /Y /R
+rem xcopy  "$(OutDir)$(TargetName).pdb" "C:\Users\julio\Downloads\physic_demo/*.*"  /F /Y /R
 
 </Command>
     </PostBuildEvent>
