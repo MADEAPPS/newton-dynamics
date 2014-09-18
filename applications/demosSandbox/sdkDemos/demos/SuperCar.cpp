@@ -102,7 +102,7 @@ class SuperCarEntity: public DemoEntity
 	};
 
 
-	SuperCarEntity (DemoEntityManager* const scene, CustomVehicleControllerManager* const manager, const dMatrix& location, const char* const filename)
+	SuperCarEntity (DemoEntityManager* const scene, CustomVehicleControllerManager* const manager, const dMatrix& location, const char* const filename, dFloat distanceToPath)
 		:DemoEntity (dGetIdentityMatrix(), NULL)
 		,m_controller(NULL)
 		,m_gearUpKey (false)
@@ -113,6 +113,7 @@ class SuperCarEntity: public DemoEntity
 		,m_engineKeySwitchCounter(0)
 		,m_engineOldKeyState(false)
 		,m_engineRPMOn(false)
+		,m_distanceToPath(distanceToPath)
 	{
 		// add this entity to the scene for rendering
 		scene->Append(this);
@@ -480,7 +481,7 @@ class SuperCarEntity: public DemoEntity
 	}
 
 
-	void ApplyPlayerControl ()
+	void ApplyPlayerControl (void* const startEngineSoundHandle)
 	{
 		NewtonBody* const body = m_controller->GetBody();
 		NewtonWorld* const world = NewtonBodyGetWorld(body);
@@ -593,7 +594,15 @@ class SuperCarEntity: public DemoEntity
 
 		if (engine) {
 			m_engineOldKeyState = engine->GetKey();
-			engine->SetKey ((m_engineKeySwitchCounter & 1) ? true : false);
+			if (m_engineKeySwitchCounter) {
+				// play the start engine sound
+				dSoundManager* const soundManager = scene->GetSoundManager();
+				soundManager->PlayChannel(startEngineSoundHandle);
+				engine->SetKey (true);
+			} else {
+				engine->SetKey (false);
+			}
+			
 
 			if (toggleTransmission) {
 				engine->SetTransmissionMode (!engine->GetTransmissionMode());
@@ -622,10 +631,9 @@ class SuperCarEntity: public DemoEntity
 		}
 	}
 
-	void ApplyNPCControl (DemoEntity* const path, void* const startEngineSoundHandle)
+	void ApplyNPCControl (dFloat timestep, DemoEntity* const pathEntity, void* const startEngineSoundHandle)
 	{
 		//drive the vehicle by trying to follow the spline path as close as possible 
-
 		NewtonBody* const body = m_controller->GetBody();
 		NewtonWorld* const world = NewtonBodyGetWorld(body);
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
@@ -646,16 +654,64 @@ class SuperCarEntity: public DemoEntity
 			engine->SetTransmissionMode (0);
 
 			// engage first Gear 
-			engine->SetGear (CustomVehicleControllerComponentEngine::dGearBox::m_firstGear);
+			engine->SetGear (CustomVehicleControllerComponentEngine::dGearBox::m_firstGear + 2);
 
 			// play the start engine sound
 			dSoundManager* const soundManager = scene->GetSoundManager();
 			soundManager->PlayChannel(startEngineSoundHandle);
 		}
 		
-		engine->SetParam (0.1f);
-		steering->SetParam (-0.5f);
 		
+		const CustomVehicleControllerBodyStateChassis& chassis = m_controller->GetChassisState ();
+		dMatrix matrix (chassis.GetLocalMatrix() * chassis.GetMatrix());
+
+		dVector veloc (chassis.GetVelocity());
+		veloc.m_y = 0.0f;
+		m_debugTargetHeading = chassis.GetCenterOfMass();
+
+		if ((veloc % veloc) < 0.02f) {
+			// if the vehicle is no moving start the motion
+			engine->SetParam (0.5f);
+			//steering->SetParam (-0.5f);
+			return;
+		}
+
+		// calculate steering value to state with in the path
+		dFloat lookAheadTime = timestep / 0.25f;
+		
+		dVector lookAheadDir(veloc.Scale (lookAheadTime));
+		dFloat mag2 = lookAheadDir % lookAheadDir; 
+
+		const dFloat loakAheadDist = 8.0f;
+		if (mag2 < (loakAheadDist * loakAheadDist)) {
+			lookAheadDir = lookAheadDir.Scale (loakAheadDist / dSqrt (mag2));
+		}
+
+		dVector p0 (m_debugTargetHeading + lookAheadDir);
+		p0.m_y = 0.0f;
+
+		// find the closet point to the past on the spline
+		dMatrix pathMatrix (pathEntity->GetMeshMatrix() * pathEntity->GetCurrentMatrix());
+		dBigVector q; 
+		DemoBezierCurve* const path = (DemoBezierCurve*) pathEntity->GetMesh();
+		dFloat64 u = path->m_curve.FindClosestKnot (q, pathMatrix.UntransformVector(p0), 4);
+		dBigVector tangent (path->m_curve.CurveDerivative (u));
+		dVector p1 (pathMatrix.TransformVector(dVector (q.m_x, q.m_y, q.m_z, q.m_w)));
+		dVector curveTangent (pathMatrix.RotateVector(dVector (tangent.m_x, tangent.m_y, tangent.m_z, tangent.m_w)));
+		dVector binormal = curveTangent * dVector (0.0f, 1.0f, 0.0f, 0.0f);
+		p1 += binormal.Scale (m_distanceToPath / dSqrt(binormal % binormal));
+
+		dVector error (p1 - p0);
+		mag2 = error % error;
+		if (mag2 > 0.5f) {
+			p0 += error.Scale (0.3f);
+		} 
+		// project a point ahead, say 0.25 of a second 
+		m_debugTargetHeading = p0;
+
+		dVector localDir (matrix.UntransformVector(m_debugTargetHeading));
+		dFloat angle (dAtan2 (localDir.m_z, localDir.m_x));
+		steering->SetParam (-angle / steering->GetMaxSteeringAngle ());
 	}
 
 
@@ -738,6 +794,15 @@ class SuperCarEntity: public DemoEntity
 		glVertex3f (p0.m_x, p0.m_y, p0.m_z);
 		glVertex3f (p1.m_x, p1.m_y, p1.m_z);
 		glEnd();
+
+
+		glBegin(GL_LINES);
+		glColor3f (1.0f, 0.0f, 1.0f);
+		glVertex3f (p0.m_x, p0.m_y, p0.m_z);
+		glVertex3f (m_debugTargetHeading.m_x, m_debugTargetHeading.m_y, m_debugTargetHeading.m_z);
+		glEnd();
+
+		 
 	}
 
 
@@ -751,6 +816,9 @@ class SuperCarEntity: public DemoEntity
 	int m_engineKeySwitchCounter;
 	bool m_engineOldKeyState;
 	bool m_engineRPMOn;
+	dFloat m_distanceToPath;
+
+	dVector m_debugTargetHeading; 
 };
 
 
@@ -956,10 +1024,10 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 
 			if (vehicleEntity == m_player) {
 				// do player control
-				vehicleEntity->ApplyPlayerControl ();
+				vehicleEntity->ApplyPlayerControl (m_engineSounds[0]);
 			} else {
 				// do no player control
-				vehicleEntity->ApplyNPCControl (m_raceTrackPath, m_engineSounds[0]);
+				vehicleEntity->ApplyNPCControl (timestep, m_raceTrackPath, m_engineSounds[0]);
 			}
 
 			CustomVehicleControllerComponentEngine* const engine = vehicleEntity->m_controller->GetEngine();
@@ -1198,29 +1266,34 @@ void SuperCar (DemoEntityManager* const scene)
 
 	// create a simple vehicle
 	dMatrix location (manager->CalculateSplineMatrix (0.0f));
-	location.m_posit += location.m_right.Scale (2.0f);
-
-//dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
-//dVector size (3.5f, 0.125f, 3.5f, 0.0f);
-//AddPrimitiveArray(scene, 100.0f, location.m_posit, size, 1, 1, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix);
-	
+	location.m_posit += location.m_right.Scale (3.0f);
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
 	location.m_posit.m_y += 1.0f;
+	SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location, "f1.ngd", 3.0f);
+	vehicle0->BuildFourWheelDriveSuperCar();
 
-	// make a vehicle entity shell
-	SuperCarEntity* const vehicle = new SuperCarEntity (scene, manager, location, "f1.ngd");
-	//SuperCarEntity* const vehicle = new SuperCarEntity (scene, manager, location, "viper.ngd");
-	//SuperCarEntity* const vehicle = new SuperCarEntity (scene, manager, location, "lambDiablo.ngd");
+
+	location.m_posit += location.m_right.Scale (-6.0f);
+	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
+	location.m_posit.m_y += 1.0f;
+	SuperCarEntity* const vehicle1 = new SuperCarEntity (scene, manager, location, "viper.ngd", -3.0f);
+	vehicle1->BuildFourWheelDriveSuperCar();
+
+	location.m_posit += location.m_right.Scale (3.0f);
+	location.m_posit += location.m_front.Scale (-8.0f);
+	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
+	location.m_posit.m_y += 1.0f;
+	SuperCarEntity* const vehicle2 = new SuperCarEntity (scene, manager, location, "lambDiablo.ngd", 0.0f);
+	vehicle2->BuildFourWheelDriveSuperCar();
 	
 	// build a muscle car from this vehicle controller
 	//vehicle->BuildRearWheelDriveMuscleCar();
-	vehicle->BuildFourWheelDriveSuperCar();
 
 	// set this vehicle as the player
 //	manager->SetAsPlayer(vehicle);
 
 	// set the camera matrix, we only care the initial direction since it will be following the player vehicle
-	dMatrix camMatrix (vehicle->GetNextMatrix());
+	dMatrix camMatrix (vehicle1->GetNextMatrix());
 	scene->SetCameraMouseLock (true);
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 

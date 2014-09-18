@@ -68,6 +68,11 @@ void CustomVehicleControllerComponentSteering::AddSteeringTire (CustomVehicleCon
 }
 
 
+dFloat CustomVehicleControllerComponentSteering::GetMaxSteeringAngle () const
+{
+	return m_maxAngle;
+}
+
 void CustomVehicleControllerComponentSteering::CalculateAkermanParameters (
 	const CustomVehicleControllerBodyStateTire* const rearLeftTire, const CustomVehicleControllerBodyStateTire* const rearRightTire, 
 	const CustomVehicleControllerBodyStateTire* const frontLeftTire, const CustomVehicleControllerBodyStateTire* const frontRightTire) 

@@ -356,10 +356,11 @@ class CustomVehicleControllerComponentSteering: public CustomVehicleControllerCo
 	public:
 	CUSTOM_JOINTS_API CustomVehicleControllerComponentSteering (CustomVehicleController* const controller, dFloat maxAngleInRadians);
 	CUSTOM_JOINTS_API void AddSteeringTire (CustomVehicleControllerBodyStateTire* const tire);
-	CUSTOM_JOINTS_API virtual void Update (dFloat timestep);
 
-	void CalculateAkermanParameters (const CustomVehicleControllerBodyStateTire* const rearLeftTire, const CustomVehicleControllerBodyStateTire* const rearRightTire, 
-									 const CustomVehicleControllerBodyStateTire* const frontLeftTire, const CustomVehicleControllerBodyStateTire* const frontRightTire); 
+	CUSTOM_JOINTS_API dFloat GetMaxSteeringAngle () const;
+	CUSTOM_JOINTS_API virtual void Update (dFloat timestep);
+	CUSTOM_JOINTS_API void CalculateAkermanParameters (const CustomVehicleControllerBodyStateTire* const rearLeftTire, const CustomVehicleControllerBodyStateTire* const rearRightTire, 
+													   const CustomVehicleControllerBodyStateTire* const frontLeftTire, const CustomVehicleControllerBodyStateTire* const frontRightTire); 
 
 
 	dList<CustomVehicleControllerBodyStateTire*> m_steeringTires;
