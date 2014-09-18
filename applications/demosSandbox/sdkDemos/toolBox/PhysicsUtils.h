@@ -90,7 +90,7 @@ NewtonBody* CreateLevelMesh (DemoEntityManager* const scene, const char* const l
 void SaveNewtonMesh (NewtonMesh* const mesh, const char* const fileName);
 NewtonMesh* LoadNewtonMesh (NewtonWorld* const world, const char* const fileName);
 
-
+void CalculatePickForceAndTorque (const NewtonBody* const body, const dVector& pointOnBodyInGlobalSpace, const dVector& targetPositionInGlobalScale, dFloat timestep);
 
 //void SerializationWorld (const char* const name, NewtonWorld* const world);
 

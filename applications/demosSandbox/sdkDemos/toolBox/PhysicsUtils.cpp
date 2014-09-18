@@ -1202,3 +1202,62 @@ void SaveNewtonMesh (NewtonMesh* const mesh, const char* const name)
 	}
 }
 
+
+void CalculatePickForceAndTorque (const NewtonBody* const body, const dVector& pointOnBodyInGlobalSpace, const dVector& targetPositionInGlobalScale, dFloat timestep)
+{
+	dVector com; 
+	dMatrix matrix; 
+	dVector omega0;
+	dVector veloc0;
+	dVector omega1;
+	dVector veloc1;
+	dVector pointVeloc;
+
+	const dFloat stiffness = 0.3f;
+
+	dFloat invTimeStep = 1.0f / timestep;
+	NewtonWorld* const world = NewtonBodyGetWorld (body);
+	NewtonWorldCriticalSectionLock (world, 0);
+
+	// calculate the desired impulse
+	NewtonBodyGetMatrix(body, &matrix[0][0]);
+	NewtonBodyGetOmega (body, &omega0[0]);
+	NewtonBodyGetVelocity (body, &veloc0[0]);
+
+	NewtonBodyGetPointVelocity (body, &pointOnBodyInGlobalSpace[0], &pointVeloc[0]);
+
+	dVector deltaVeloc (targetPositionInGlobalScale - pointOnBodyInGlobalSpace);
+	deltaVeloc = deltaVeloc.Scale (stiffness * invTimeStep) - pointVeloc;
+	for (int i = 0; i < 3; i ++) {
+		dVector veloc (0.0f, 0.0f, 0.0f, 0.0f);
+		veloc[i] = deltaVeloc[i];
+		NewtonBodyAddImpulse (body, &veloc[0], &pointOnBodyInGlobalSpace[0]);
+	}
+
+	// damp angular velocity
+	NewtonBodyGetOmega (body, &omega1[0]);
+	NewtonBodyGetVelocity (body, &veloc1[0]);
+	omega1 = omega1.Scale (0.9f);
+
+	// restore body velocity and angular velocity
+	NewtonBodySetOmega (body, &omega0[0]);
+	NewtonBodySetVelocity(body, &veloc0[0]);
+
+	// convert the delta velocity change to a external force and torque
+	dFloat Ixx;
+	dFloat Iyy;
+	dFloat Izz;
+	dFloat mass;
+	NewtonBodyGetMassMatrix (body, &mass, &Ixx, &Iyy, &Izz);
+
+	dVector angularMomentum (Ixx, Iyy, Izz);
+	angularMomentum = matrix.RotateVector (angularMomentum.CompProduct(matrix.UnrotateVector(omega1 - omega0)));
+
+	dVector force ((veloc1 - veloc0).Scale (mass * invTimeStep));
+	dVector torque (angularMomentum.Scale(invTimeStep));
+
+	NewtonBodyAddForce(body, &force[0]);
+	NewtonBodyAddTorque(body, &torque[0]);
+
+	NewtonWorldCriticalSectionUnlock (world);
+}
