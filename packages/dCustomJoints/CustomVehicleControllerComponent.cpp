@@ -57,24 +57,48 @@ dFloat CustomVehicleControllerComponent::dInterpolationCurve::GetValue (dFloat p
 CustomVehicleControllerComponentSteering::CustomVehicleControllerComponentSteering (CustomVehicleController* const controller, dFloat maxAngleInRadians)
 	:CustomVehicleControllerComponent (controller)
 	,m_maxAngle (dAbs (maxAngleInRadians))
+	,m_akermanWheelBaseWidth(0.0f)
+	,m_akermanAxelSeparation(0.0f)
 {
 }
 
-void CustomVehicleControllerComponentSteering::AddSteeringTire (CustomVehicleControllerBodyStateTire* const tireNode, dFloat sign)
+void CustomVehicleControllerComponentSteering::AddSteeringTire (CustomVehicleControllerBodyStateTire* const tireNode)
 {
-	dTireSignPair& pair = m_steeringTires.Append()->GetInfo();
-
-	pair.m_sign = (sign >= 0.0f) ? 1.0f : -1.0f;
-	pair.m_tireNode = m_controller->m_tireList.GetNodeFromInfo (*tireNode);
+	m_steeringTires.Append(tireNode);
 }
 
+
+void CustomVehicleControllerComponentSteering::CalculateAkermanParameters (
+	const CustomVehicleControllerBodyStateTire* const rearLeftTire, const CustomVehicleControllerBodyStateTire* const rearRightTire, 
+	const CustomVehicleControllerBodyStateTire* const frontLeftTire, const CustomVehicleControllerBodyStateTire* const frontRightTire) 
+{
+	const dMatrix& leftRearMatrix = rearLeftTire->GetLocalMatrix();
+	const dMatrix& rightRearMatrix = rearRightTire->GetLocalMatrix();
+	dVector rearDist (rightRearMatrix.m_posit - leftRearMatrix.m_posit);
+	m_akermanWheelBaseWidth = (rearDist % leftRearMatrix.m_front) * 0.5f;
+
+	const dMatrix& frontLeftTireMatrix = frontLeftTire->GetLocalMatrix();
+	dVector akermanAxelSeparation (frontLeftTireMatrix.m_posit - leftRearMatrix.m_posit);
+	m_akermanAxelSeparation = dAbs (akermanAxelSeparation % frontLeftTireMatrix.m_right);
+}
 
 void CustomVehicleControllerComponentSteering::Update (dFloat timestep)
 {
-	for (dList<dTireSignPair>::dListNode* node = m_steeringTires.GetFirst(); node; node = node->GetNext()) {
-		dTireSignPair& pair = node->GetInfo();
-		CustomVehicleControllerBodyStateTire& tire = pair.m_tireNode->GetInfo();
-		tire.m_steeringAngle = m_maxAngle * m_param * pair.m_sign;
+	dFloat angle = m_maxAngle * m_param;
+	if ((m_akermanWheelBaseWidth == 0.0f) || (dAbs (angle) < (2.0f * 2.141592f / 180.0f))) {
+		for (dList<CustomVehicleControllerBodyStateTire*>::dListNode* node = m_steeringTires.GetFirst(); node; node = node->GetNext()) {
+			CustomVehicleControllerBodyStateTire& tire = *node->GetInfo();
+			tire.m_steeringAngle = angle;
+		}
+	} else {
+		dAssert (dAbs (angle) >= (2.0f * 2.141592f / 180.0f));
+		dFloat posit = m_akermanAxelSeparation / dTan (angle);
+		dFloat leftAngle = dAtan2 (m_akermanAxelSeparation, posit + m_akermanWheelBaseWidth);
+		dFloat righAngle = dAtan2 (m_akermanAxelSeparation, posit - m_akermanWheelBaseWidth);
+		for (dList<CustomVehicleControllerBodyStateTire*>::dListNode* node = m_steeringTires.GetFirst(); node; node = node->GetNext()) {		
+			CustomVehicleControllerBodyStateTire& tire = *node->GetInfo();
+			tire.m_steeringAngle = angle;
+		}
 	}
 }
 
@@ -93,13 +117,11 @@ void CustomVehicleControllerComponentTrackSkidSteering::Update (dFloat timestep)
 	dFloat omega = state.m_omega % state.m_matrix[1]; 
 
 	dFloat omegaSign = dSign(omega);
-	dFloat torque = -m_steeringTorque * m_param - omega * omega * omegaSign * m_differencialTurnRate;
+	dFloat torque = m_steeringTorque * m_param - omega * omega * omegaSign * m_differencialTurnRate;
 
 //	dTrace (("%f %f\n", torque, omega));
-	for (dList<dTireSignPair>::dListNode* node = m_steeringTires.GetFirst(); node; node = node->GetNext()) {
-		dTireSignPair& pair = node->GetInfo();
-		CustomVehicleControllerBodyStateTire& tire = pair.m_tireNode->GetInfo();
-
+	for (dList<CustomVehicleControllerBodyStateTire*>::dListNode* node = m_steeringTires.GetFirst(); node; node = node->GetNext()) {
+		CustomVehicleControllerBodyStateTire& tire = *node->GetInfo();
 		const dMatrix& tireMatrix = tire.GetMatrix();
 		const dMatrix& tireLocalMatrix = tire.GetLocalMatrix();
 		dFloat torqueSign = -dSign (tireLocalMatrix[0] % tireLocalMatrix[3]);

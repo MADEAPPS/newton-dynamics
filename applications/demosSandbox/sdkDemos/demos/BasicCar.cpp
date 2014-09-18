@@ -310,8 +310,8 @@ class BasicCarEntity: public DemoEntity
 
 		// add a steering Wheel
 		CustomVehicleControllerComponentSteering* const steering = new CustomVehicleControllerComponentSteering (m_controller, parameters.STEER_ANGLE * 3.141592f / 180.0f);
-		steering->AddSteeringTire (leftTire[0], -1.0f);
-		steering->AddSteeringTire (rightTire[0], -1.0f);
+		steering->AddSteeringTire (leftTire[0]);
+		steering->AddSteeringTire (rightTire[0]);
 		m_controller->SetSteering(steering);
 
 		// add all wheels brakes

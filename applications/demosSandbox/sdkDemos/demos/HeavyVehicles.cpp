@@ -674,7 +674,6 @@ class HeavyVehicleEntity: public DemoEntity
 	// this function is an example of how to make a high performance super car
 	void BuildAllWheelDriveVehicle (const VehicleParameters& parameters)
 	{
-
 		// Muscle cars have the front engine, we need to shift the center of mass to the front to represent that
 		m_controller->SetCenterOfGravity (dVector (0.0f, parameters.COM_Y_OFFSET, 0.0f, 0.0f)); 
 
@@ -703,9 +702,10 @@ class HeavyVehicleEntity: public DemoEntity
 		// add a steering Wheel
 		CustomVehicleControllerComponentSteering* const steering = new CustomVehicleControllerComponentSteering (m_controller, parameters.STEER_ANGLE * 3.141592f / 180.0f);
 		for (int i = 0; i < 2; i ++) {
-			steering->AddSteeringTire (leftTire[i], -1.0f);
-			steering->AddSteeringTire (rightTire[i], -1.0f);
+			steering->AddSteeringTire (leftTire[i]);
+			steering->AddSteeringTire (rightTire[i]);
 		}
+		//steering->CalculateAkermanParameters (leftRearTire, rightRearTire, leftFrontTire, rightFrontTire);
 		m_controller->SetSteering(steering);
 
 		// add vehicle brakes
@@ -779,8 +779,9 @@ class HeavyVehicleEntity: public DemoEntity
 
 		// add a steering Wheel
 		CustomVehicleControllerComponentSteering* const steering = new CustomVehicleControllerComponentSteering (m_controller, parameters.STEER_ANGLE * 3.141592f / 180.0f);
-		steering->AddSteeringTire (leftTire[0], -1.0f);
-		steering->AddSteeringTire (rightTire[0], -1.0f);
+		steering->AddSteeringTire (leftTire[0]);
+		steering->AddSteeringTire (rightTire[0]);
+		//steering->CalculateAkermanParameters (leftRearTire, rightRearTire, leftFrontTire, rightFrontTire);
 		m_controller->SetSteering(steering);
 
 		// add vehicle brakes
@@ -869,8 +870,8 @@ class HeavyVehicleEntity: public DemoEntity
 
 		// add a tank skid steering engine
 		CustomVehicleControllerComponentTrackSkidSteering* const steering = new CustomVehicleControllerComponentTrackSkidSteering (m_controller, 1.0f, 10.0f * parameters.IDLE_TORQUE);
-		steering->AddSteeringTire (leftTire[0], -1.0f);
-		steering->AddSteeringTire (rightTire[0], -1.0f);
+		steering->AddSteeringTire (leftTire[0]);
+		steering->AddSteeringTire (rightTire[0]);
 		m_controller->SetSteering(steering);
 
 		// add an engine
@@ -969,7 +970,7 @@ class HeavyVehicleEntity: public DemoEntity
 
 
 			// get the steering input
-			steeringVal = (dFloat (mainWindow->GetKeyState ('D')) - dFloat (mainWindow->GetKeyState ('A')));
+			steeringVal = (dFloat (mainWindow->GetKeyState ('A')) - dFloat (mainWindow->GetKeyState ('D')));
 
 /*
 			// check for gear change (note key code for '>' = '.' and key code for '<' == ',')
