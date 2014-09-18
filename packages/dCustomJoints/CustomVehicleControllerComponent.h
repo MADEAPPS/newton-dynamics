@@ -196,7 +196,7 @@ class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComp
 
 	class dGearBox: public CustomAlloc
 	{
-		public:
+	public:
 		enum dGearID
 		{
 			m_reverseGear = 0,
@@ -207,7 +207,7 @@ class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComp
 
 		class dGearState: public CustomAlloc  
 		{
-			public:
+		public:
 			dGearState (dFloat ratio, dFloat shiftUp, dFloat shiftDown, dGearID id) 
 				:m_ratio(ratio)
 				,m_shiftUp (shiftUp)
@@ -235,7 +235,7 @@ class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComp
 
 		class dReverseGearState: public dGearState
 		{
-			public:
+		public:
 			dReverseGearState (dFloat ratio)
 				:dGearState(-dAbs(ratio), 1000.0f, -1000.0f, m_reverseGear)
 			{
@@ -245,7 +245,7 @@ class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComp
 
 		class dNeutralGearState: public dGearState
 		{
-			public:
+		public:
 			dNeutralGearState (dGearState* const first, dGearState* const reverse)
 				:dGearState(0.0f, 1000.0f, -1000.0f, m_newtralGear)
 			{
@@ -273,7 +273,7 @@ class CustomVehicleControllerComponentEngine: public CustomVehicleControllerComp
 		CustomVehicleController* m_controller;
 		dFloat m_shiftTimer; 
 		int m_gearsCount;
-		
+
 		bool m_automatic;
 	};
 
