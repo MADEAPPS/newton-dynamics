@@ -1203,7 +1203,7 @@ void SaveNewtonMesh (NewtonMesh* const mesh, const char* const name)
 }
 
 
-void CalculatePickForceAndTorque (const NewtonBody* const body, const dVector& pointOnBodyInGlobalSpace, const dVector& targetPositionInGlobalScale, dFloat timestep)
+void CalculatePickForceAndTorque (const NewtonBody* const body, const dVector& pointOnBodyInGlobalSpace, const dVector& targetPositionInGlobalSpace, dFloat timestep)
 {
 	dVector com; 
 	dMatrix matrix; 
@@ -1226,7 +1226,7 @@ void CalculatePickForceAndTorque (const NewtonBody* const body, const dVector& p
 
 	NewtonBodyGetPointVelocity (body, &pointOnBodyInGlobalSpace[0], &pointVeloc[0]);
 
-	dVector deltaVeloc (targetPositionInGlobalScale - pointOnBodyInGlobalSpace);
+	dVector deltaVeloc (targetPositionInGlobalSpace - pointOnBodyInGlobalSpace);
 	deltaVeloc = deltaVeloc.Scale (stiffness * invTimeStep) - pointVeloc;
 	for (int i = 0; i < 3; i ++) {
 		dVector veloc (0.0f, 0.0f, 0.0f, 0.0f);
@@ -1237,7 +1237,7 @@ void CalculatePickForceAndTorque (const NewtonBody* const body, const dVector& p
 	// damp angular velocity
 	NewtonBodyGetOmega (body, &omega1[0]);
 	NewtonBodyGetVelocity (body, &veloc1[0]);
-	omega1 = omega1.Scale (0.9f);
+	omega1 = omega1.Scale (0.95f);
 
 	// restore body velocity and angular velocity
 	NewtonBodySetOmega (body, &omega0[0]);
@@ -1258,6 +1258,10 @@ void CalculatePickForceAndTorque (const NewtonBody* const body, const dVector& p
 
 	NewtonBodyAddForce(body, &force[0]);
 	NewtonBodyAddTorque(body, &torque[0]);
+
+	// make sure the body is unfrozen, if it is picked
+	//NewtonBodySetFreezeState (body, 0);
+	NewtonBodySetSleepState (body, 0);
 
 	NewtonWorldCriticalSectionUnlock (world);
 }

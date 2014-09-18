@@ -18,22 +18,14 @@
 #include "DemoCamera.h"
 #include "MousePick.h"
 #include "NewtonDemos.h"
+#include "PhysicsUtils.h"
 #include "DemoCameraListener.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-#define MOUSE_PICK_DAMP			 10.0f
-#define MOUSE_PICK_STIFFNESS	 100.0f
 
-
-dVector DemoCameraListener::m_pickedBodyDisplacement;
-dVector DemoCameraListener::m_pickedBodyLocalAtachmentPoint;
-dVector DemoCameraListener::m_pickedBodyLocalAtachmentNormal;
-NewtonBody* DemoCameraListener::m_targetPicked = NULL;
-NewtonBodyDestructor DemoCameraListener::m_bodyDestructor;
-NewtonApplyForceAndTorque DemoCameraListener::m_chainPickBodyForceCallback; 
 
 DemoCameraListener::DemoCameraListener(DemoEntityManager* const scene)
 	:DemoListenerBase(scene, "cameraListener")
@@ -49,6 +41,7 @@ DemoCameraListener::DemoCameraListener(DemoEntityManager* const scene)
 	,m_pickedBodyParam(0.0f)
 	,m_prevMouseState(false)
 	,m_mouseLockState(false)
+	,m_targetPicked(NULL)
 {
 }
 
@@ -59,14 +52,8 @@ DemoCameraListener::~DemoCameraListener()
 
 void DemoCameraListener::PreUpdate (const NewtonWorld* const world, dFloat timestep)
 {
-
-}
-
-void DemoCameraListener::PostUpdate (const NewtonWorld* const world, dFloat timestep)
-{
 	// update the camera;
 	DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-//	m_camera->UpdateInputs (timestep, *scene);
 
 	NewtonDemos* const mainWin = scene->GetRootWindow();
 
@@ -123,7 +110,7 @@ void DemoCameraListener::PostUpdate (const NewtonWorld* const world, dFloat time
 
 	m_mousePosX = mouseX;
 	m_mousePosY = mouseY;
-	
+
 	dMatrix matrix (dRollMatrix(m_pitch) * dYawMatrix(m_yaw));
 	dQuaternion rot (matrix);
 	m_camera->SetMatrix (*scene, rot, targetMatrix.m_posit);
@@ -131,77 +118,15 @@ void DemoCameraListener::PostUpdate (const NewtonWorld* const world, dFloat time
 	UpdatePickBody(scene, timestep);
 }
 
+void DemoCameraListener::PostUpdate (const NewtonWorld* const world, dFloat timestep)
+{
+}
+
 void DemoCameraListener::SetCameraMouseLock (bool loockState)
 {
 	m_mouseLockState = loockState;
 }
 
-void DemoCameraListener::OnPickedBodyDestroyedNotify (const NewtonBody* body)
-{
-	if (m_bodyDestructor) {
-		m_bodyDestructor (body);
-	}
-
-	// the body was destroyed, set the pointer and call back to NULL
-	m_targetPicked = NULL;
-	m_bodyDestructor = NULL;
-	m_chainPickBodyForceCallback = NULL; 
-}
-
-
-void DemoCameraListener::OnPickedBodyApplyForce (const NewtonBody* body, dFloat timestep, int threadIndex)
-{
-	dVector com;
-	dMatrix matrix;
-
-	// apply the thew body forces
-	if (m_chainPickBodyForceCallback) {
-		m_chainPickBodyForceCallback (body, timestep, threadIndex);
-	}
-
-	// add the mouse pick penalty force and torque
-	NewtonBodyGetMatrix(body, &matrix[0][0]);
-	NewtonBodyGetCentreOfMass (body, &com[0]);
-
-	if (NewtonBodyGetType(body) == NEWTON_KINEMATIC_BODY) {
-		// mouse pick a kinematic body, simple update the position to the mouse delta
-
-		// calculate the displacement
-		matrix.m_posit = matrix.TransformVector(m_pickedBodyDisplacement.Scale (0.3f));
-		NewtonBodySetMatrix(body, &matrix[0][0]);
-
-	} else {
-		// we pick a dynamics body, update by applying forces
-		dFloat mass;
-		dFloat Ixx;
-		dFloat Iyy;
-		dFloat Izz;
-
-		dVector veloc;
-		dVector omega;
-
-		NewtonBodyGetOmega(body, &omega[0]);
-		NewtonBodyGetVelocity(body, &veloc[0]);
-		NewtonBodyGetMassMatrix (body, &mass, &Ixx, &Iyy, &Izz);
-
-		dVector force (m_pickedBodyDisplacement.Scale (mass * MOUSE_PICK_STIFFNESS));
-		dVector dampForce (veloc.Scale (MOUSE_PICK_DAMP * mass));
-		force -= dampForce;
-
-
-		// calculate local point relative to center of mass
-		dVector point (matrix.RotateVector (m_pickedBodyLocalAtachmentPoint - com));
-		dVector torque (point * force);
-
-		dVector torqueDamp (omega.Scale (mass * 0.1f));
-
-		NewtonBodyAddForce (body, &force.m_x);
-		NewtonBodyAddTorque (body, &torque.m_x);
-
-		// make sure the body is unfrozen, if it is picked
-		NewtonBodySetFreezeState (body, 0);
-	}
-}
 
 void DemoCameraListener::RenderPickedTarget () const
 {
@@ -238,10 +163,8 @@ void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, float ti
 	NewtonDemos* const mainWin = scene->GetRootWindow();
 
 	// handle pick body from the screen
-
 	bool mousePickState = mainWin->GetMouseKeyState(0);
 	if (!m_targetPicked) {
-
 		if (!m_prevMouseState && mousePickState) {
 			dFloat param;
 			dVector posit;
@@ -259,49 +182,35 @@ void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, float ti
 
 				// save point local to the body matrix
 				m_pickedBodyParam = param;
-				m_pickedBodyDisplacement = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+				matrix.m_posit = posit;
 				m_pickedBodyLocalAtachmentPoint = matrix.UntransformVector (posit);
 
 				// convert normal to local space
 				m_pickedBodyLocalAtachmentNormal = matrix.UnrotateVector(normal);
-
-				// link th force and torque callback
-				m_chainPickBodyForceCallback = NewtonBodyGetForceAndTorqueCallback (m_targetPicked);
-				dAssert (m_chainPickBodyForceCallback != OnPickedBodyApplyForce);
-
-				// set a new call back
-				NewtonBodySetForceAndTorqueCallback (m_targetPicked, OnPickedBodyApplyForce);
-
-				// save the destructor call back
-				m_bodyDestructor = NewtonBodyGetDestructorCallback(m_targetPicked);
-				NewtonBodySetDestructorCallback(m_targetPicked, OnPickedBodyDestroyedNotify);
 			}
 		}
 
 	} else {
 		if (mainWin->GetMouseKeyState(0)) {
-			dMatrix matrix;
-			NewtonBodyGetMatrix(m_targetPicked, &matrix[0][0]);
-			dVector p2 (matrix.TransformVector (m_pickedBodyLocalAtachmentPoint));
-
 			float x = dFloat (m_mousePosX);
 			float y = dFloat (m_mousePosY);
 			dVector p0 (m_camera->ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
 			dVector p1 (m_camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
-			dVector p (p0 + (p1 - p0).Scale (m_pickedBodyParam));
-			m_pickedBodyDisplacement = p - p2;
-			dFloat mag2 = m_pickedBodyDisplacement % m_pickedBodyDisplacement;
-			if (mag2 > dFloat (20 * 20)) {
-				m_pickedBodyDisplacement = m_pickedBodyDisplacement.Scale (20.0f / dSqrt (m_pickedBodyDisplacement % m_pickedBodyDisplacement));
-			}
+			m_pickedBodyTargetPosition = p0 + (p1 - p0).Scale (m_pickedBodyParam);
+
+			dMatrix matrix;
+			NewtonBodyGetMatrix (m_targetPicked, &matrix[0][0]);
+			dVector point (matrix.TransformVector(m_pickedBodyLocalAtachmentPoint));
+			CalculatePickForceAndTorque (m_targetPicked, point, m_pickedBodyTargetPosition, timestep);
 		} else {
-			// unchain the callbacks
-			NewtonBodySetForceAndTorqueCallback (m_targetPicked, m_chainPickBodyForceCallback);
-			NewtonBodySetDestructorCallback(m_targetPicked, m_bodyDestructor);
-			m_targetPicked = NULL;
-			m_bodyDestructor = NULL;
+			if (m_targetPicked) {
+				NewtonBodySetSleepState (m_targetPicked, 0);
+			}
+			m_targetPicked = NULL; 
 		}
 	}
 
 	m_prevMouseState = mousePickState;
 }
+
+
