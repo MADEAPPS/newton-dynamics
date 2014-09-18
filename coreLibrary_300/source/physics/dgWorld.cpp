@@ -517,6 +517,7 @@ void dgWorld::BodyEnableSimulation (dgBody* const body)
 		dgBodyMasterList::AddBody(body);
 		body->SetMassMatrix(body->m_mass.m_w, body->m_mass.m_x, body->m_mass.m_y, body->m_mass.m_z);
 		m_broadPhase->Add (body);
+		dgAssert (body->m_masterNode);
 	}
 }
 
@@ -526,7 +527,13 @@ void dgWorld::BodyDisableSimulation(dgBody* const body)
 		m_broadPhase->Remove(body);
 		dgBodyMasterList::RemoveBody(body);
 		m_disableBodies.Insert(0, body);
+		dgAssert (!body->m_masterNode);
 	}
+}
+
+bool dgWorld::GetBodyEnableDisableSimulationState (dgBody* const body) const
+{
+	return body->m_masterNode ? true : false;
 }
 
 dgDynamicBody* dgWorld::CreateDynamicBody(dgCollisionInstance* const collision, const dgMatrix& matrix)

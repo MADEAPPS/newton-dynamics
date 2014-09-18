@@ -340,6 +340,7 @@ class dgWorld
 
 	void BodyEnableSimulation (dgBody* const body);
 	void BodyDisableSimulation (dgBody* const body);
+	bool GetBodyEnableDisableSimulationState (dgBody* const body) const;
 
 	dgBody* GetSentinelBody() const;
 	dgMemoryAllocator* GetAllocator() const;

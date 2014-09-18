@@ -423,7 +423,7 @@ class BasicCarEntity: public DemoEntity
 		}
 
 		// get the steering input
-		steeringVal = (dFloat (mainWindow->GetKeyState ('D')) - dFloat (mainWindow->GetKeyState ('A')));
+		steeringVal = (dFloat (mainWindow->GetKeyState ('A')) - dFloat (mainWindow->GetKeyState ('D')));
 
 /*
 		// check for gear change (note key code for '>' = '.' and key code for '<' == ',')

@@ -4528,6 +4528,15 @@ void NewtonBodyDisableSimulation(const NewtonBody* const bodyPtr)
 	world->BodyDisableSimulation (body);
 }
 
+int NewtonBodyGetEnableDisableSimulationState(const NewtonBody* const bodyPtr)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgBody* const body = (dgBody *)bodyPtr;
+	dgWorld* const world = body->GetWorld();
+	return world->GetBodyEnableDisableSimulationState(body) ? 1 : 0;
+
+}
+
 int NewtonBodyGetCollidable (const NewtonBody* const bodyPtr)
 {
 	TRACE_FUNCTION(__FUNCTION__);
