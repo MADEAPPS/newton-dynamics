@@ -279,63 +279,6 @@ dgInt32 dgCollisionCylinder::CalculateContacts (const dgVector& point, const dgV
 }
 
 
-dgInt32 dgCollisionCylinder::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut, dgFloat32 normalSign) const
-{
-	dgInt32 count;
-	if (dgAbsf (normal.m_x) < dgFloat32 (0.999f)) { 
-		dgFloat32 magInv = dgRsqrt (normal.m_y * normal.m_y + normal.m_z * normal.m_z);
-		dgFloat32 cosAng = normal.m_y * magInv;
-		dgFloat32 sinAng = normal.m_z * magInv;
-/*
-		dgAssert (dgAbsf (normal.m_z * cosAng - normal.m_y * sinAng) < dgFloat32 (1.0e-4f));
-		dgVector normal1 (normal.m_x, normal.m_y * cosAng + normal.m_z * sinAng, dgFloat32 (0.0f), dgFloat32 (0.0f));
-		dgVector origin1 (origin.m_x, origin.m_y * cosAng + origin.m_z * sinAng, origin.m_z * cosAng - origin.m_y * sinAng, dgFloat32 (0.0f));
-
-		count = dgCollisionConvex::CalculatePlaneIntersection (normal1, origin1, contactsOut, normalSign);
-		for (dgInt32 i = 0; i < count; i ++) {
-			dgFloat32 y = contactsOut[i].m_y;
-			dgFloat32 z = contactsOut[i].m_z;
-			contactsOut[i].m_y = y * cosAng - z * sinAng; 
-			contactsOut[i].m_z = z * cosAng + y * sinAng;
-		}
-*/
-
-		if (dgAbsf (normal.m_x) > dgFloat32 (0.15f)) {
-			contactsOut[0] = SupportVertex(normal, NULL);
-			count = 1;
-		}  else {
-			dgAssert (dgAbsf (normal.m_z * cosAng - normal.m_y * sinAng) < dgFloat32 (1.0e-4f));
-			dgVector normal1 (normal.m_x, normal.m_y * cosAng + normal.m_z * sinAng, dgFloat32 (0.0f), dgFloat32 (0.0f));
-			dgVector origin1 (origin.m_x, origin.m_y * cosAng + origin.m_z * sinAng, origin.m_z * cosAng - origin.m_y * sinAng, dgFloat32 (0.0f));
-
-			count = 0;
-			int i0 = 3;
-			dgVector test0 ((m_profile[i0] - origin1).DotProduct4(normal1));
-			for (int i = 0; (i < 4) && (count < 2); i ++) {
-				dgVector test1 ((m_profile[i] - origin1).DotProduct4(normal1));
-				dgVector acrossPlane (test0.CompProduct4(test1));
-				if (acrossPlane.m_x < 0.0f) {
-					dgVector step (m_profile[i] - m_profile[i0]);
-					contactsOut[count] = m_profile[i0] - step.Scale4(test0.m_x/(step.DotProduct4(normal1).m_x));
-					count ++;
-				}
-				i0 = i;
-				test0 = test1;
-			}
-
-			for (dgInt32 i = 0; i < count; i ++) {
-				dgFloat32 y = contactsOut[i].m_y;
-				dgFloat32 z = contactsOut[i].m_z;
-				contactsOut[i].m_y = y * cosAng - z * sinAng; 
-				contactsOut[i].m_z = z * cosAng + y * sinAng;
-			}
-		}
-
-	} else {
-		count = dgCollisionConvex::CalculatePlaneIntersection (normal, origin, contactsOut, normalSign);
-	}
-	return count;
-}
 
 
 dgFloat32 dgCollisionCylinder::RayCast (const dgVector& q0, const dgVector& q1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
@@ -437,3 +380,74 @@ void dgCollisionCylinder::Serialize(dgSerialize callback, void* const userData) 
 	callback (userData, &size, sizeof (dgVector));
 }
 
+
+
+dgInt32 dgCollisionCylinder::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut, dgFloat32 normalSign) const
+{
+	dgInt32 count;
+	if (dgAbsf (normal.m_x) < dgFloat32 (0.999f)) { 
+/*
+		dgFloat32 magInv = dgRsqrt (normal.m_y * normal.m_y + normal.m_z * normal.m_z);
+		dgFloat32 cosAng = normal.m_y * magInv;
+		dgFloat32 sinAng = normal.m_z * magInv;
+
+		dgAssert (dgAbsf (normal.m_z * cosAng - normal.m_y * sinAng) < dgFloat32 (1.0e-4f));
+		dgVector normal1 (normal.m_x, normal.m_y * cosAng + normal.m_z * sinAng, dgFloat32 (0.0f), dgFloat32 (0.0f));
+		dgVector origin1 (origin.m_x, origin.m_y * cosAng + origin.m_z * sinAng, origin.m_z * cosAng - origin.m_y * sinAng, dgFloat32 (0.0f));
+
+		count = dgCollisionConvex::CalculatePlaneIntersection (normal1, origin1, contactsOut, normalSign);
+		for (dgInt32 i = 0; i < count; i ++) {
+			dgFloat32 y = contactsOut[i].m_y;
+			dgFloat32 z = contactsOut[i].m_z;
+			contactsOut[i].m_y = y * cosAng - z * sinAng; 
+			contactsOut[i].m_z = z * cosAng + y * sinAng;
+		}
+*/
+
+		if (dgAbsf (normal.m_x) > dgFloat32 (0.15f)) {
+			contactsOut[0] = SupportVertex(normal , NULL);
+			contactsOut[1] = SupportVertex(normal.CompProduct4(dgVector::m_negOne) , NULL);
+			dgVector test0 ((contactsOut[0] - origin).DotProduct4(normal).Abs());
+			dgVector test1 ((contactsOut[1] - origin).DotProduct4(normal).Abs()); 
+			if ((test0 > test1).GetSignMask()) {
+				contactsOut[0] = contactsOut[1];
+			}
+			count = 1;
+
+		}  else {
+			dgFloat32 magInv = dgRsqrt (normal.m_y * normal.m_y + normal.m_z * normal.m_z);
+			dgFloat32 cosAng = normal.m_y * magInv;
+			dgFloat32 sinAng = normal.m_z * magInv;
+
+			dgAssert (dgAbsf (normal.m_z * cosAng - normal.m_y * sinAng) < dgFloat32 (1.0e-4f));
+			dgVector normal1 (normal.m_x, normal.m_y * cosAng + normal.m_z * sinAng, dgFloat32 (0.0f), dgFloat32 (0.0f));
+			dgVector origin1 (origin.m_x, origin.m_y * cosAng + origin.m_z * sinAng, origin.m_z * cosAng - origin.m_y * sinAng, dgFloat32 (0.0f));
+
+			count = 0;
+			int i0 = 3;
+			dgVector test0 ((m_profile[i0] - origin1).DotProduct4(normal1));
+			for (int i = 0; (i < 4) && (count < 2); i ++) {
+				dgVector test1 ((m_profile[i] - origin1).DotProduct4(normal1));
+				dgVector acrossPlane (test0.CompProduct4(test1));
+				if (acrossPlane.m_x < 0.0f) {
+					dgVector step (m_profile[i] - m_profile[i0]);
+					contactsOut[count] = m_profile[i0] - step.Scale4(test0.m_x/(step.DotProduct4(normal1).m_x));
+					count ++;
+				}
+				i0 = i;
+				test0 = test1;
+			}
+
+			for (dgInt32 i = 0; i < count; i ++) {
+				dgFloat32 y = contactsOut[i].m_y;
+				dgFloat32 z = contactsOut[i].m_z;
+				contactsOut[i].m_y = y * cosAng - z * sinAng; 
+				contactsOut[i].m_z = z * cosAng + y * sinAng;
+			}
+		}
+
+	} else {
+		count = dgCollisionConvex::CalculatePlaneIntersection (normal, origin, contactsOut, normalSign);
+	}
+	return count;
+}
