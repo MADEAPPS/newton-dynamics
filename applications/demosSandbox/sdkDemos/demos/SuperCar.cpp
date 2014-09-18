@@ -654,7 +654,7 @@ class SuperCarEntity: public DemoEntity
 			engine->SetTransmissionMode (0);
 
 			// engage first Gear 
-			engine->SetGear (CustomVehicleControllerComponentEngine::dGearBox::m_firstGear + 2);
+			engine->SetGear (CustomVehicleControllerComponentEngine::dGearBox::m_firstGear + 1);
 
 			// play the start engine sound
 			dSoundManager* const soundManager = scene->GetSoundManager();
@@ -1269,7 +1269,7 @@ void SuperCar (DemoEntityManager* const scene)
 	location.m_posit += location.m_right.Scale (3.0f);
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
 	location.m_posit.m_y += 1.0f;
-	SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location, "f1.ngd", 3.0f);
+	SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location, "lambDiablo.ngd", 3.0f);
 	vehicle0->BuildFourWheelDriveSuperCar();
 
 
@@ -1283,7 +1283,7 @@ void SuperCar (DemoEntityManager* const scene)
 	location.m_posit += location.m_front.Scale (-8.0f);
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
 	location.m_posit.m_y += 1.0f;
-	SuperCarEntity* const vehicle2 = new SuperCarEntity (scene, manager, location, "lambDiablo.ngd", 0.0f);
+	SuperCarEntity* const vehicle2 = new SuperCarEntity (scene, manager, location, "f1.ngd", 0.0f);
 	vehicle2->BuildFourWheelDriveSuperCar();
 	
 	// build a muscle car from this vehicle controller
